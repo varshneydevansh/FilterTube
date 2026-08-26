@@ -47,6 +47,63 @@
     const seenVideoChannelUpdates = new Map();
     let pendingVideoChannelFlush = null;
     const AUTOPLAY_ENDPOINT_KEYS = new Set(['autoplayVideo', 'nextButtonVideo', 'previousButtonVideo']);
+    const BLOCKTUBE_CHANNEL_NAME_SOURCE = 'blocktube-channel-name';
+    const BLOCKTUBE_CHANNEL_NAME_BOUNDARY = "[ \n\r\t!@#$%^&*()_\\-=+\\[\\]\\\\\\|;:'\",\\.\\/<>\\?`~:]+";
+    const blockTubeChannelNameRegexCache = new WeakMap();
+
+    function isBlockTubeChannelNameRule(entry) {
+        return Boolean(entry && typeof entry === 'object' && entry.source === BLOCKTUBE_CHANNEL_NAME_SOURCE);
+    }
+
+    function getBlockTubeChannelNameRegex(entry) {
+        if (!isBlockTubeChannelNameRule(entry)) return null;
+        const cached = blockTubeChannelNameRegexCache.get(entry);
+        if (cached !== undefined) return cached;
+
+        const raw = (typeof entry.originalInput === 'string' ? entry.originalInput : entry.name || '').trim();
+        if (!raw) {
+            blockTubeChannelNameRegexCache.set(entry, null);
+            return null;
+        }
+
+        let pattern = '';
+        let flags = 'i';
+        const regexLiteral = raw.match(/^\/((?:\\.|[^/])+)\/([gimsuy]*)$/);
+        if (regexLiteral) {
+            pattern = regexLiteral[1];
+            flags = regexLiteral[2] || '';
+        } else {
+            const escaped = raw.replace(/[\\^$*+?.()|[\]{}]/g, '\\$&');
+            pattern = `(^|${BLOCKTUBE_CHANNEL_NAME_BOUNDARY})(${escaped})(${BLOCKTUBE_CHANNEL_NAME_BOUNDARY}|$)`;
+        }
+
+        let compiled = null;
+        try {
+            compiled = new RegExp(pattern, flags);
+        } catch (e) {
+            compiled = null;
+        }
+        blockTubeChannelNameRegexCache.set(entry, compiled);
+        return compiled;
+    }
+
+    function matchesBlockTubeChannelNameRule(entry, channelInfo) {
+        const regex = getBlockTubeChannelNameRegex(entry);
+        const channelName = typeof channelInfo?.name === 'string' ? channelInfo.name.trim() : '';
+        if (!regex || !channelName) return false;
+        try {
+            regex.lastIndex = 0;
+            return regex.test(channelName);
+        } catch (e) {
+            return false;
+        } finally {
+            try {
+                regex.lastIndex = 0;
+            } catch (e) {
+            }
+        }
+    }
+
     function hasAutoplayEndpointKey(obj) {
         if (!obj || typeof obj !== 'object') return false;
         for (const key of AUTOPLAY_ENDPOINT_KEYS) {
@@ -1013,6 +1070,10 @@
             try {
                 const buildIndex = window.FilterTubeIdentity?.buildChannelFilterIndex;
                 if (typeof buildIndex === 'function') {
+                    // The shared index understands BlockTube channel-name
+                    // rules and buckets their literal matches. Keep those
+                    // rules in the index so a large imported list does not
+                    // scan every marker for every video renderer.
                     return buildIndex(filterChannels, this.channelMap);
                 }
             } catch (e) {
@@ -1022,6 +1083,7 @@
 
         _matchesAnyChannel(channelInfo, filterChannels, index = null) {
             if (!channelInfo) return false;
+            const list = Array.isArray(filterChannels) ? filterChannels : [];
             try {
                 const matchesIndex = window.FilterTubeIdentity?.channelMetaMatchesIndex;
                 if (index && typeof matchesIndex === 'function') {
@@ -1030,8 +1092,10 @@
             } catch (e) {
             }
 
-            const list = Array.isArray(filterChannels) ? filterChannels : [];
             for (const filterChannel of list) {
+                if (isBlockTubeChannelNameRule(filterChannel) && Array.isArray(index?.blockTubeNameRules)) {
+                    continue;
+                }
                 if (this._matchesChannel(filterChannel, channelInfo)) {
                     return true;
                 }
@@ -3354,17 +3418,22 @@
                     } else if (condition === 'shorter') {
                         matches = durationMinutes < min;
                         this._log('[FilterTube] Checking: ' + durationMinutes.toFixed(1) + ' < ' + min + ' = ' + matches);
-                    } else {
-                        if (max > 0) {
-                            // "Only between" => block outside range
-                            matches = durationMinutes < min || durationMinutes > max;
-                            this._log('[FilterTube] Checking: outside range ' + min + '-' + max + ' for ' + durationMinutes.toFixed(1) + ' = ' + matches);
-                        }
                     }
 
-                    const shouldBlock = condition === 'between'
-                        ? matches
-                        : (mode === 'allow' ? !matches : matches);
+                    let shouldBlock = false;
+                    if (condition === 'between') {
+                        if (max > 0) {
+                            const insideRange = durationMinutes >= min && durationMinutes <= max;
+                            // The existing UI/default means "only between";
+                            // imported BlockTube block ranges explicitly set
+                            // mode=block and mean "block between" instead.
+                            const rangeMode = cf.duration.mode === 'block' ? 'block' : 'allow';
+                            shouldBlock = rangeMode === 'block' ? insideRange : !insideRange;
+                            this._log('[FilterTube] Checking: ' + (rangeMode === 'block' ? 'inside' : 'outside') + ' range ' + min + '-' + max + ' for ' + durationMinutes.toFixed(1) + ' = ' + shouldBlock);
+                        }
+                    } else {
+                        shouldBlock = mode === 'allow' ? !matches : matches;
+                    }
 
                     if (shouldBlock) {
                         this._log('[FilterTube] BLOCKING by duration filter: ' + durationMinutes.toFixed(1) + ' min (' + condition + ')');
@@ -3789,6 +3858,9 @@
          * Handles both legacy string filters and new object filters with name/id/handle
          */
         _matchesChannel(filterChannel, channelInfo) {
+            if (matchesBlockTubeChannelNameRule(filterChannel, channelInfo)) {
+                return true;
+            }
             const sharedChannelMatchesFilter = window.FilterTubeIdentity?.channelMatchesFilter;
             if (typeof sharedChannelMatchesFilter === 'function') {
                 return sharedChannelMatchesFilter(channelInfo, filterChannel, this.channelMap);

@@ -186,6 +186,25 @@ const StateManager = (() => {
     const MAX_CHANNEL_ENRICHMENTS_PER_SESSION = 10;
     let channelEnrichmentProcessedThisSession = 0;
 
+    // Imported-channel enrichment is deliberately separate from the normal
+    // post-entry queue. A CSV/TXT/FilterTube/BlockTube list can contain
+    // thousands of identifiers, so it must never inherit the ordinary
+    // import/startup cadence or its ten-item session budget. The job is
+    // persisted so closing the dashboard pauses the work instead of losing the
+    // user's place; it resumes when the dashboard is opened again. The storage
+    // key keeps its old name so already queued migration jobs survive the
+    // upgrade, but the queue itself is format-agnostic.
+    const IMPORTED_CHANNEL_ENRICHMENT_JOB_KEY = 'ftBlockTubeEnrichmentJobV1';
+    const IMPORTED_CHANNEL_ENRICHMENT_MIN_DELAY_MS = 20000;
+    const IMPORTED_CHANNEL_ENRICHMENT_RETRY_DELAY_MS = 6 * 60 * 60 * 1000;
+    const IMPORTED_CHANNEL_ENRICHMENT_MAX_RETRY_DELAY_MS = 24 * 60 * 60 * 1000;
+    const IMPORTED_CHANNEL_ENRICHMENT_MAX_ATTEMPTS = 4;
+    let importedChannelEnrichmentQueue = [];
+    let importedChannelEnrichmentTimer = 0;
+    let importedChannelEnrichmentInFlight = false;
+    let importedChannelEnrichmentNextRunAt = 0;
+    let importedChannelEnrichmentPersistChain = Promise.resolve();
+
     let isSaving = false;
     let listeners = [];
 
@@ -549,7 +568,628 @@ const StateManager = (() => {
         channelEnrichmentQueue.length = 0;
         channelEnrichmentAttempted.clear();
         isEnriching = false;
+        channelEnrichmentProcessedThisSession = 0;
     }
+
+    const isValidChannelId = (value) => /^UC[a-zA-Z0-9_-]{22}$/.test(String(value || '').trim());
+
+    const isImportedChannelSource = (channel) => {
+        if (!channel || typeof channel !== 'object') return false;
+        const source = typeof channel.source === 'string' ? channel.source.trim().toLowerCase() : '';
+        return source === 'import'
+            || source === 'managed_channel_list'
+            || source === 'blocktube'
+            || source === 'blocktube-channel-name';
+    };
+
+    const isValidImportedChannelLookup = (value) => {
+        const normalized = String(value || '').trim();
+        if (!normalized) return false;
+        if (isValidChannelId(normalized)) return true;
+        if (/^@[A-Za-z0-9._-]{2,}$/.test(normalized)) return true;
+        if (/^(?:c|user)\/[^\s/?#]+$/i.test(normalized)) return true;
+        try {
+            const url = new URL(normalized.startsWith('http') ? normalized : `https://${normalized}`);
+            const host = String(url.hostname || '').replace(/^www\./i, '').toLowerCase();
+            if (!['youtube.com', 'm.youtube.com', 'music.youtube.com'].includes(host)) return false;
+            const parts = url.pathname.split('/').filter(Boolean);
+            return /^UC[a-zA-Z0-9_-]{22}$/.test(parts[1] || '')
+                || /^@[A-Za-z0-9._-]{2,}$/.test(parts[0] || '')
+                || /^(?:c|user)$/i.test(parts[0] || '') && Boolean(parts[1]);
+        } catch (error) {
+            return false;
+        }
+    };
+
+    const getImportedChannelLookup = (channel) => {
+        if (!isImportedChannelSource(channel)) return '';
+        const candidates = [
+            channel.id,
+            channel.handle,
+            channel.handleDisplay,
+            channel.canonicalHandle,
+            channel.customUrl,
+            channel.originalInput,
+            channel.name
+        ];
+        return candidates.map(value => String(value || '').trim()).find(isValidImportedChannelLookup) || '';
+    };
+
+    const isImportedPlaceholderName = (channel, name) => {
+        const normalizedName = String(name || '').trim().toLowerCase();
+        if (!normalizedName) return true;
+        const candidates = [
+            channel?.id,
+            channel?.handle,
+            channel?.handleDisplay,
+            channel?.canonicalHandle,
+            channel?.customUrl,
+            channel?.originalInput
+        ].map(value => String(value || '').trim().toLowerCase()).filter(Boolean);
+        if (candidates.includes(normalizedName)) return true;
+        return normalizedName.startsWith('@')
+            || normalizedName.startsWith('c/')
+            || normalizedName.startsWith('user/')
+            || normalizedName.includes('youtube.com/')
+            || normalizedName.includes('youtu.be/');
+    };
+
+    const importedChannelNeedsEnrichment = (channel) => {
+        if (!isImportedChannelSource(channel) || channel.topicChannel === true) return false;
+        const lookup = getImportedChannelLookup(channel);
+        if (!lookup) return false;
+        const name = typeof channel.name === 'string' ? channel.name.trim() : '';
+        const handle = typeof channel.handle === 'string' ? channel.handle.trim() : '';
+        const handleDisplay = typeof channel.handleDisplay === 'string' ? channel.handleDisplay.trim() : '';
+        const canonicalHandle = typeof channel.canonicalHandle === 'string' ? channel.canonicalHandle.trim() : '';
+        const customUrl = typeof channel.customUrl === 'string' ? channel.customUrl.trim() : '';
+        const logo = typeof channel.logo === 'string' ? channel.logo.trim() : '';
+        const hasAlternateIdentity = Boolean(handle || handleDisplay || canonicalHandle || customUrl);
+        const hasDisplayName = Boolean(name && !isImportedPlaceholderName(channel, name));
+        return !hasAlternateIdentity || !hasDisplayName || !logo;
+    };
+
+    const importedChannelEnrichmentTaskKey = (task) => {
+        if (!task) return '';
+        const lookup = String(task.input || task.id || '').trim();
+        if (!isValidImportedChannelLookup(lookup)) return '';
+        const targetProfileId = typeof task.targetProfileId === 'string' ? task.targetProfileId.trim() : '';
+        const profile = task.profile === 'kids' ? 'kids' : 'main';
+        const listType = task.listType === 'whitelist' ? 'whitelist' : 'blocklist';
+        return `${targetProfileId || 'default'}:${profile}:${listType}:${lookup.toLowerCase()}`;
+    };
+
+    const normalizeImportedChannelEnrichmentTask = (raw) => {
+        if (!raw || typeof raw !== 'object') return null;
+        const input = String(raw.input || raw.id || '').trim();
+        if (!isValidImportedChannelLookup(input)) return null;
+        const id = isValidChannelId(input) ? input : '';
+        const attemptsValue = Number(raw.attempts);
+        const nextAttemptValue = Number(raw.nextAttemptAt);
+        return {
+            id,
+            input,
+            profile: raw.profile === 'kids' ? 'kids' : 'main',
+            listType: raw.listType === 'whitelist' ? 'whitelist' : 'blocklist',
+            source: typeof raw.source === 'string' && raw.source.trim() ? raw.source.trim() : 'import',
+            targetProfileId: typeof raw.targetProfileId === 'string' ? raw.targetProfileId.trim() : '',
+            actorProfileId: typeof raw.actorProfileId === 'string' ? raw.actorProfileId.trim() : '',
+            attempts: Number.isFinite(attemptsValue) && attemptsValue >= 0 ? Math.floor(attemptsValue) : 0,
+            nextAttemptAt: Number.isFinite(nextAttemptValue) && nextAttemptValue > 0 ? Math.floor(nextAttemptValue) : 0
+        };
+    };
+
+    const normalizeImportedChannelEnrichmentJob = (value) => {
+        const raw = value && typeof value === 'object' && !Array.isArray(value) ? value : {};
+        const pending = [];
+        const seen = new Set();
+        const addTask = (candidate) => {
+            const task = normalizeImportedChannelEnrichmentTask(candidate);
+            const key = importedChannelEnrichmentTaskKey(task);
+            if (!task || !key || seen.has(key)) return;
+            seen.add(key);
+            pending.push(task);
+        };
+        (Array.isArray(raw.pending) ? raw.pending : []).forEach(addTask);
+        const inFlight = normalizeImportedChannelEnrichmentTask(raw.inFlight);
+        const nextRunValue = Number(raw.nextRunAt);
+        return {
+            version: 1,
+            pending,
+            inFlight,
+            nextRunAt: Number.isFinite(nextRunValue) && nextRunValue > 0 ? Math.floor(nextRunValue) : 0,
+            updatedAt: Number.isFinite(Number(raw.updatedAt)) ? Math.floor(Number(raw.updatedAt)) : 0
+        };
+    };
+
+    const readImportedChannelEnrichmentJob = () => new Promise((resolve) => {
+        const storage = typeof chrome !== 'undefined' ? chrome.storage?.local : null;
+        if (!storage || typeof storage.get !== 'function') {
+            resolve(null);
+            return;
+        }
+        try {
+            storage.get(IMPORTED_CHANNEL_ENRICHMENT_JOB_KEY, (items) => {
+                const error = typeof chrome !== 'undefined' ? chrome.runtime?.lastError : null;
+                if (error) {
+                    resolve(null);
+                    return;
+                }
+                resolve(items?.[IMPORTED_CHANNEL_ENRICHMENT_JOB_KEY] || null);
+            });
+        } catch (error) {
+            resolve(null);
+        }
+    });
+
+    const enqueueImportedChannelEnrichmentStorageOperation = (operation) => {
+        const next = importedChannelEnrichmentPersistChain
+            .catch(() => {})
+            .then(operation);
+        importedChannelEnrichmentPersistChain = next.catch(() => {});
+        return next;
+    };
+
+    const persistImportedChannelEnrichmentJob = (job) => enqueueImportedChannelEnrichmentStorageOperation(() => new Promise((resolve) => {
+        const storage = typeof chrome !== 'undefined' ? chrome.storage?.local : null;
+        if (!storage || typeof storage.set !== 'function') {
+            resolve(false);
+            return;
+        }
+        try {
+            storage.set({
+                [IMPORTED_CHANNEL_ENRICHMENT_JOB_KEY]: {
+                    version: 1,
+                    pending: Array.isArray(job?.pending) ? job.pending : [],
+                    inFlight: job?.inFlight || null,
+                    nextRunAt: Number(job?.nextRunAt) || 0,
+                    updatedAt: Date.now()
+                }
+            }, () => {
+                const error = typeof chrome !== 'undefined' ? chrome.runtime?.lastError : null;
+                resolve(!error);
+            });
+        } catch (error) {
+            resolve(false);
+        }
+    }));
+
+    const removeImportedChannelEnrichmentJob = () => enqueueImportedChannelEnrichmentStorageOperation(() => new Promise((resolve) => {
+        const storage = typeof chrome !== 'undefined' ? chrome.storage?.local : null;
+        if (!storage || typeof storage.remove !== 'function') {
+            resolve(false);
+            return;
+        }
+        try {
+            storage.remove(IMPORTED_CHANNEL_ENRICHMENT_JOB_KEY, () => {
+                const error = typeof chrome !== 'undefined' ? chrome.runtime?.lastError : null;
+                resolve(!error);
+            });
+        } catch (error) {
+            resolve(false);
+        }
+    }));
+
+    const collectImportedChannelEnrichmentCandidates = async (profileIds = null) => {
+        const candidates = [];
+        const seen = new Set();
+        const activeProfileId = await getImportedChannelActiveProfileId();
+        let profilesV4 = null;
+        const requestedProfileIds = Array.isArray(profileIds)
+            ? [...new Set(profileIds.map(value => String(value || '').trim()).filter(Boolean))]
+            : [];
+        const targetProfileIds = requestedProfileIds.length ? requestedProfileIds : [activeProfileId];
+        const addCandidate = (channel, profile, listType, targetProfileId) => {
+            if (!importedChannelNeedsEnrichment(channel)) return;
+            if (channel.managedListPaused === true) return;
+            // A child profile can only continue work for itself. The active
+            // account/parent may seed work for its managed children, but a
+            // child must never create tasks that it cannot authorize later.
+            if (profilesV4 && !canImportedEnrichmentActorManageTarget(profilesV4, activeProfileId, targetProfileId)) return;
+            const input = getImportedChannelLookup(channel);
+            const key = `${targetProfileId}:${profile}:${listType}:${input.toLowerCase()}`;
+            if (seen.has(key)) return;
+            seen.add(key);
+            candidates.push({
+                id: isValidChannelId(input) ? input : '',
+                input,
+                profile: profile === 'kids' ? 'kids' : 'main',
+                listType: listType === 'whitelist' ? 'whitelist' : 'blocklist',
+                source: typeof channel.source === 'string' && channel.source.trim()
+                    ? channel.source.trim()
+                    : 'import',
+                targetProfileId,
+                actorProfileId: activeProfileId
+            });
+        };
+
+        const io = window.FilterTubeIO || {};
+        if (typeof io.loadProfilesV4 === 'function') {
+            try {
+                profilesV4 = await io.loadProfilesV4();
+            } catch (error) {
+            }
+        }
+        const profiles = profilesV4?.profiles && typeof profilesV4.profiles === 'object' && !Array.isArray(profilesV4.profiles)
+            ? profilesV4.profiles
+            : null;
+
+        if (profiles) {
+            targetProfileIds.forEach((targetProfileId) => {
+                const profileState = profiles[targetProfileId];
+                const main = profileState?.main && typeof profileState.main === 'object' ? profileState.main : {};
+                const kids = profileState?.kids && typeof profileState.kids === 'object' ? profileState.kids : {};
+                (Array.isArray(main.channels) ? main.channels : [])
+                    .forEach(channel => addCandidate(channel, 'main', 'blocklist', targetProfileId));
+                (Array.isArray(main.whitelistChannels) ? main.whitelistChannels : [])
+                    .forEach(channel => addCandidate(channel, 'main', 'whitelist', targetProfileId));
+                (Array.isArray(kids.blockedChannels) ? kids.blockedChannels : [])
+                    .forEach(channel => addCandidate(channel, 'kids', 'blocklist', targetProfileId));
+                (Array.isArray(kids.whitelistChannels) ? kids.whitelistChannels : [])
+                    .forEach(channel => addCandidate(channel, 'kids', 'whitelist', targetProfileId));
+            });
+        } else if (targetProfileIds.includes(activeProfileId)) {
+            // Legacy V3 fallback when profiles V4 is unavailable.
+            (Array.isArray(state.channels) ? state.channels : [])
+                .forEach(channel => addCandidate(channel, 'main', 'blocklist', activeProfileId));
+            (Array.isArray(state.whitelistChannels) ? state.whitelistChannels : [])
+                .forEach(channel => addCandidate(channel, 'main', 'whitelist', activeProfileId));
+            const kids = state.kids || {};
+            (Array.isArray(kids.blockedChannels) ? kids.blockedChannels : [])
+                .forEach(channel => addCandidate(channel, 'kids', 'blocklist', activeProfileId));
+            (Array.isArray(kids.whitelistChannels) ? kids.whitelistChannels : [])
+                .forEach(channel => addCandidate(channel, 'kids', 'whitelist', activeProfileId));
+        }
+        return candidates;
+    };
+
+    const getImportedChannelEnrichmentProfileContext = async (fallback = 'default') => {
+        let profiles = null;
+        try {
+            const io = window.FilterTubeIO || {};
+            if (typeof io.loadProfilesV4 === 'function') {
+                profiles = await io.loadProfilesV4();
+            }
+        } catch (error) {
+        }
+        const activeId = typeof profiles?.activeProfileId === 'string' ? profiles.activeProfileId.trim() : '';
+        return {
+            profiles,
+            activeProfileId: activeId || String(fallback || 'default').trim() || 'default'
+        };
+    };
+
+    const canImportedEnrichmentActorManageTarget = (profilesV4, actorProfileId, targetProfileId) => {
+        const actorId = String(actorProfileId || '').trim();
+        const targetId = String(targetProfileId || '').trim();
+        if (!actorId || !targetId) return false;
+        if (actorId === targetId) return true;
+        const profiles = profilesV4?.profiles && typeof profilesV4.profiles === 'object' && !Array.isArray(profilesV4.profiles)
+            ? profilesV4.profiles
+            : null;
+        if (!profiles || !profiles[actorId] || !profiles[targetId]) return false;
+        const actor = profiles[actorId];
+        if (actor?.type === 'child') return false;
+        if (actorId === 'default') return true;
+        return String(profiles[targetId]?.parentProfileId || '').trim() === actorId;
+    };
+
+    const getImportedChannelActiveProfileId = async (fallback = 'default') => {
+        const context = await getImportedChannelEnrichmentProfileContext(fallback);
+        return context.activeProfileId;
+    };
+
+    const mergeImportedChannelEnrichmentQueue = (storedJob, candidates, targetProfileId) => {
+        const stored = normalizeImportedChannelEnrichmentJob(storedJob);
+        const candidateTasks = (Array.isArray(candidates) ? candidates : [])
+            .map((candidate) => normalizeImportedChannelEnrichmentTask({
+                ...candidate,
+                targetProfileId: candidate?.targetProfileId || targetProfileId,
+                actorProfileId: candidate?.actorProfileId || targetProfileId
+            }))
+            .filter(Boolean);
+        const candidateByKey = new Map(candidateTasks.map(task => [importedChannelEnrichmentTaskKey(task), task]));
+        const merged = [];
+        const seen = new Set();
+        const addStoredTask = (candidate) => {
+            const task = normalizeImportedChannelEnrichmentTask(candidate);
+            const key = importedChannelEnrichmentTaskKey(task);
+            if (!task || !key || seen.has(key)) return;
+            const taskTarget = task.targetProfileId || targetProfileId;
+            if (taskTarget === targetProfileId && !candidateByKey.has(key)) return;
+            seen.add(key);
+            merged.push({
+                ...task,
+                targetProfileId: taskTarget,
+                actorProfileId: task.actorProfileId || taskTarget
+            });
+        };
+        addStoredTask(stored.inFlight);
+        stored.pending.forEach(addStoredTask);
+        candidateTasks.forEach((task) => {
+            const key = importedChannelEnrichmentTaskKey(task);
+            if (!key || seen.has(key)) return;
+            seen.add(key);
+            merged.push(task);
+        });
+        return {
+            version: 1,
+            pending: merged,
+            inFlight: null,
+            nextRunAt: stored.nextRunAt || 0,
+            updatedAt: Date.now()
+        };
+    };
+
+    const scheduleImportedChannelEnrichmentProcessing = (delayMs = 0) => {
+        try {
+            if (importedChannelEnrichmentTimer) clearTimeout(importedChannelEnrichmentTimer);
+            importedChannelEnrichmentTimer = setTimeout(() => {
+                importedChannelEnrichmentTimer = 0;
+                return processImportedChannelEnrichmentQueue();
+            }, Math.max(0, Number(delayMs) || 0));
+        } catch (error) {
+        }
+    };
+
+    const isCompleteImportedChannel = (channel) => {
+        if (!channel || typeof channel !== 'object') return false;
+        if (channel.topicChannel === true) return true;
+        const id = String(channel.id || '').trim();
+        const name = typeof channel.name === 'string' ? channel.name.trim() : '';
+        const handle = typeof channel.handle === 'string' ? channel.handle.trim() : '';
+        const handleDisplay = typeof channel.handleDisplay === 'string' ? channel.handleDisplay.trim() : '';
+        const canonicalHandle = typeof channel.canonicalHandle === 'string' ? channel.canonicalHandle.trim() : '';
+        const customUrl = typeof channel.customUrl === 'string' ? channel.customUrl.trim() : '';
+        const logo = typeof channel.logo === 'string' ? channel.logo.trim() : '';
+        const hasAlternateIdentity = Boolean(handle || handleDisplay || canonicalHandle || customUrl);
+        const hasDisplayName = Boolean(name && name.toLowerCase() !== id.toLowerCase() && !name.startsWith('@'));
+        return isValidChannelId(id) && hasAlternateIdentity && hasDisplayName && !!logo;
+    };
+
+    const sendImportedChannelEnrichmentRequest = (task) => new Promise((resolve) => {
+        if (typeof chrome === 'undefined' || !chrome.runtime || typeof chrome.runtime.sendMessage !== 'function') {
+            resolve({ response: null, error: 'runtime_unavailable' });
+            return;
+        }
+        try {
+            chrome.runtime.sendMessage({
+                type: 'addFilteredChannel',
+                input: task.input || task.id,
+                filterAll: false,
+                collaborationWith: null,
+                collaborationGroupId: null,
+                displayHandle: null,
+                canonicalHandle: null,
+                channelName: null,
+                customUrl: null,
+                source: task.source || 'import',
+                profile: task.profile || 'main',
+                listType: task.listType || 'blocklist',
+                targetProfileId: task.targetProfileId || null,
+                actorProfileId: task.actorProfileId || null,
+                enrichmentFromImport: true
+            }, (response) => {
+                const error = chrome.runtime?.lastError;
+                resolve({ response: response || null, error: error?.message || '' });
+            });
+        } catch (error) {
+            resolve({ response: null, error: error?.message || 'runtime_request_failed' });
+        }
+    });
+
+    const processImportedChannelEnrichmentQueue = async () => {
+        if (importedChannelEnrichmentInFlight || !importedChannelEnrichmentQueue.length) return;
+        if (isEnriching) {
+            scheduleImportedChannelEnrichmentProcessing(2000);
+            return;
+        }
+
+        const profileContext = await getImportedChannelEnrichmentProfileContext();
+        const currentProfileId = profileContext.activeProfileId;
+        const now = Date.now();
+        const globalDelay = Math.max(0, importedChannelEnrichmentNextRunAt - now);
+        const taskIndex = importedChannelEnrichmentQueue.findIndex((task) => {
+            const taskTarget = task.targetProfileId || currentProfileId;
+            const taskActor = task.actorProfileId || taskTarget;
+            return taskActor === currentProfileId
+                && canImportedEnrichmentActorManageTarget(profileContext.profiles, taskActor, taskTarget)
+                && Number(task.nextAttemptAt) <= now
+                && globalDelay <= 0;
+        });
+        if (taskIndex === -1) {
+            const nextEligibleAt = importedChannelEnrichmentQueue
+                .filter(task => {
+                    const taskTarget = task.targetProfileId || currentProfileId;
+                    const taskActor = task.actorProfileId || taskTarget;
+                    return taskActor === currentProfileId
+                        && canImportedEnrichmentActorManageTarget(profileContext.profiles, taskActor, taskTarget);
+                })
+                .reduce((earliest, task) => Math.min(earliest, Number(task.nextAttemptAt) || now), Infinity);
+            if (Number.isFinite(nextEligibleAt)) {
+                scheduleImportedChannelEnrichmentProcessing(Math.max(globalDelay, nextEligibleAt - now));
+            }
+            return;
+        }
+
+        const task = importedChannelEnrichmentQueue.splice(taskIndex, 1)[0];
+        if (!task) {
+            scheduleImportedChannelEnrichmentProcessing(0);
+            return;
+        }
+
+        importedChannelEnrichmentInFlight = true;
+        importedChannelEnrichmentNextRunAt = now + IMPORTED_CHANNEL_ENRICHMENT_MIN_DELAY_MS;
+        await persistImportedChannelEnrichmentJob({
+            pending: importedChannelEnrichmentQueue,
+            inFlight: task,
+            nextRunAt: importedChannelEnrichmentNextRunAt
+        });
+
+        const result = await sendImportedChannelEnrichmentRequest(task);
+        const enrichedChannel = result.response?.channelData || result.response?.channel || null;
+        const complete = result.response?.success === true && isCompleteImportedChannel(enrichedChannel);
+        if (!complete) {
+            const targetProfileChanged = result.response?.errorCode === 'target_profile_changed';
+            const attempts = Math.max(0, Number(task.attempts) || 0) + 1;
+            if (targetProfileChanged) {
+                // A profile switch is a pause, not a failed YouTube lookup. Keep
+                // the attempt budget intact so switching back can continue soon.
+                importedChannelEnrichmentQueue.push({
+                    ...task,
+                    nextAttemptAt: Date.now() + IMPORTED_CHANNEL_ENRICHMENT_MIN_DELAY_MS
+                });
+            } else if (attempts < IMPORTED_CHANNEL_ENRICHMENT_MAX_ATTEMPTS) {
+                const retryDelay = Math.min(
+                    IMPORTED_CHANNEL_ENRICHMENT_MAX_RETRY_DELAY_MS,
+                    IMPORTED_CHANNEL_ENRICHMENT_RETRY_DELAY_MS * (2 ** Math.min(attempts - 1, 2))
+                );
+                importedChannelEnrichmentQueue.push({
+                    ...task,
+                    attempts,
+                    nextAttemptAt: Date.now() + retryDelay
+                });
+            }
+        }
+
+        importedChannelEnrichmentInFlight = false;
+        importedChannelEnrichmentNextRunAt = Date.now() + IMPORTED_CHANNEL_ENRICHMENT_MIN_DELAY_MS;
+        if (importedChannelEnrichmentQueue.length > 0) {
+            await persistImportedChannelEnrichmentJob({
+                pending: importedChannelEnrichmentQueue,
+                inFlight: null,
+                nextRunAt: importedChannelEnrichmentNextRunAt
+            });
+            const nextEligibleAt = importedChannelEnrichmentQueue
+                .filter(taskItem => {
+                    const taskTarget = taskItem.targetProfileId || currentProfileId;
+                    const taskActor = taskItem.actorProfileId || taskTarget;
+                    return taskActor === currentProfileId
+                        && canImportedEnrichmentActorManageTarget(profileContext.profiles, taskActor, taskTarget);
+                })
+                .reduce((earliest, taskItem) => Math.min(earliest, Number(taskItem.nextAttemptAt) || importedChannelEnrichmentNextRunAt), Infinity);
+            scheduleImportedChannelEnrichmentProcessing(Math.max(
+                IMPORTED_CHANNEL_ENRICHMENT_MIN_DELAY_MS,
+                Number.isFinite(nextEligibleAt) ? nextEligibleAt - Date.now() : IMPORTED_CHANNEL_ENRICHMENT_MIN_DELAY_MS
+            ));
+        } else {
+            await removeImportedChannelEnrichmentJob();
+            importedChannelEnrichmentNextRunAt = 0;
+        }
+    };
+
+    const startImportedChannelEnrichment = async (options = {}) => {
+        if (!state.isLoaded) {
+            await loadSettings({ notify: false, resetEnrichment: false, scheduleEnrichment: false });
+        }
+        const targetProfileId = await getImportedChannelActiveProfileId();
+        const storedJob = await readImportedChannelEnrichmentJob();
+        const requestedProfileIds = Array.isArray(options?.profileIds)
+            ? options.profileIds
+            : [targetProfileId];
+        const candidates = await collectImportedChannelEnrichmentCandidates(requestedProfileIds);
+        const mergedJob = mergeImportedChannelEnrichmentQueue(storedJob, candidates, targetProfileId);
+        importedChannelEnrichmentQueue = mergedJob.pending;
+        importedChannelEnrichmentNextRunAt = mergedJob.nextRunAt || 0;
+        if (!importedChannelEnrichmentQueue.length) {
+            await removeImportedChannelEnrichmentJob();
+            return { ok: true, pending: 0, targetProfileId };
+        }
+        await persistImportedChannelEnrichmentJob(mergedJob);
+        scheduleImportedChannelEnrichmentProcessing(Math.max(0, importedChannelEnrichmentNextRunAt - Date.now()));
+        return { ok: true, pending: importedChannelEnrichmentQueue.length, targetProfileId };
+    };
+
+    const resumeImportedChannelEnrichment = async (options = {}) => {
+        const storedJob = await readImportedChannelEnrichmentJob();
+        if (!state.isLoaded) {
+            await loadSettings({ notify: false, resetEnrichment: false, scheduleEnrichment: false });
+        }
+        const targetProfileId = await getImportedChannelActiveProfileId();
+        let allProfileIds = [];
+        try {
+            const profilesV4 = await window.FilterTubeIO?.loadProfilesV4?.();
+            allProfileIds = profilesV4?.profiles && typeof profilesV4.profiles === 'object'
+                ? Object.keys(profilesV4.profiles)
+                : [];
+        } catch (error) {
+        }
+        const storedProfileIds = [
+            ...(Array.isArray(storedJob?.pending) ? storedJob.pending : []),
+            storedJob?.inFlight
+        ].map(task => String(task?.targetProfileId || '').trim()).filter(Boolean);
+        const requestedProfileIds = Array.isArray(options?.profileIds) ? options.profileIds : [];
+        const candidateProfileIds = [...new Set([
+            targetProfileId,
+            ...requestedProfileIds,
+            ...allProfileIds,
+            ...storedProfileIds
+        ].map(value => String(value || '').trim()).filter(Boolean))];
+        const mergedJob = mergeImportedChannelEnrichmentQueue(
+            storedJob,
+            await collectImportedChannelEnrichmentCandidates(candidateProfileIds),
+            targetProfileId
+        );
+        importedChannelEnrichmentQueue = mergedJob.pending;
+        importedChannelEnrichmentNextRunAt = mergedJob.nextRunAt || 0;
+        if (!importedChannelEnrichmentQueue.length) {
+            await removeImportedChannelEnrichmentJob();
+            return { ok: true, pending: 0, resumed: Boolean(storedJob), targetProfileId };
+        }
+        await persistImportedChannelEnrichmentJob(mergedJob);
+        scheduleImportedChannelEnrichmentProcessing(Math.max(0, importedChannelEnrichmentNextRunAt - Date.now()));
+        return { ok: true, pending: importedChannelEnrichmentQueue.length, resumed: Boolean(storedJob), targetProfileId };
+    };
+
+    const getImportedChannelEnrichmentStatus = async () => {
+        const storedJob = normalizeImportedChannelEnrichmentJob(await readImportedChannelEnrichmentJob());
+        const pendingByKey = new Map();
+
+        const addPendingTask = (candidate) => {
+            const task = normalizeImportedChannelEnrichmentTask(candidate);
+            const key = importedChannelEnrichmentTaskKey(task);
+            if (!task || !key) return;
+            pendingByKey.set(key, task);
+        };
+
+        storedJob.pending.forEach(addPendingTask);
+        importedChannelEnrichmentQueue.forEach(addPendingTask);
+
+        const storedInFlight = normalizeImportedChannelEnrichmentTask(storedJob.inFlight);
+        const inFlight = Boolean(storedInFlight || importedChannelEnrichmentInFlight);
+        if (storedInFlight) {
+            pendingByKey.delete(importedChannelEnrichmentTaskKey(storedInFlight));
+        }
+
+        const pendingTasks = [...pendingByKey.values()];
+        const now = Date.now();
+        const globalNextRunAt = Math.max(
+            Number(storedJob.nextRunAt) || 0,
+            Number(importedChannelEnrichmentNextRunAt) || 0
+        );
+        const hasReadyTask = pendingTasks.some(task => (Number(task.nextAttemptAt) || 0) <= now);
+        const earliestTaskRunAt = pendingTasks
+            .filter(task => Number(task.nextAttemptAt) > now)
+            .reduce((earliest, task) => Math.min(earliest, Number(task.nextAttemptAt)), Infinity);
+        const taskNextRunAt = hasReadyTask
+            ? now
+            : (Number.isFinite(earliestTaskRunAt) ? earliestTaskRunAt : 0);
+        const nextRunAt = Math.max(globalNextRunAt, taskNextRunAt);
+        const pending = pendingTasks.length;
+
+        return {
+            pending,
+            inFlight,
+            total: pending + (inFlight ? 1 : 0),
+            nextRunAt,
+            updatedAt: Number(storedJob.updatedAt) || 0
+        };
+    };
+
+    // Compatibility aliases keep older tab-view builds working while the
+    // public API now describes the actual format-agnostic behavior.
+    const startBlockTubeEnrichment = startImportedChannelEnrichment;
+    const resumeBlockTubeEnrichment = resumeImportedChannelEnrichment;
 
     function getKidsState() {
         if (!state.kids) {
@@ -631,6 +1271,12 @@ const StateManager = (() => {
     }
 
     function queueChannelForEnrichment(channel, profile = 'main') {
+        // Every imported source uses the persisted, long-interval queue below.
+        // Keeping these rows out of this ten-item session queue prevents a
+        // large CSV/TXT/JSON import from accidentally using ordinary
+        // import/startup pacing. The imported queue is explicitly resumed
+        // after import and on dashboard reload.
+        if (isImportedChannelSource(channel)) return;
         if (!shouldEnrichChannel(channel)) return;
         const key = channelEnrichmentKey(channel, profile);
         if (!key || channelEnrichmentAttempted.has(key)) return;
@@ -2754,6 +3400,12 @@ const StateManager = (() => {
         saveSettings,
         ensureLoaded,
         getKidsState,
+        startImportedChannelEnrichment,
+        resumeImportedChannelEnrichment,
+        getImportedChannelEnrichmentStatus,
+        // Backward-compatible names for older tab-view code.
+        startBlockTubeEnrichment,
+        resumeBlockTubeEnrichment,
 
         // Keywords
         addKeyword,

@@ -736,6 +736,10 @@ function initializeFiltersTabs() {
             <div id="importSubscriptionsActions" class="subscriptions-import-actions" hidden></div>
         </div>
 
+        <div id="importedChannelEnrichmentNotice" class="subscriptions-import-inline subscriptions-import-inline--info imported-channel-enrichment-inline" hidden>
+            <div id="importedChannelEnrichmentStatus" class="subscriptions-import-status" role="status" aria-live="polite"></div>
+        </div>
+
         <div id="channelListEl" class="advanced-list"></div>
     `;
 
@@ -3609,6 +3613,8 @@ document.addEventListener('DOMContentLoaded', async () => {
     const importSubscriptionsBtn = document.getElementById('importSubscriptionsBtn');
     const importSubscriptionsStatus = document.getElementById('importSubscriptionsStatus');
     const importSubscriptionsActions = document.getElementById('importSubscriptionsActions');
+    const importedChannelEnrichmentNotice = document.getElementById('importedChannelEnrichmentNotice');
+    const importedChannelEnrichmentStatus = document.getElementById('importedChannelEnrichmentStatus');
     const channelListEl = document.getElementById('channelListEl');
     const searchChannels = document.getElementById('searchChannels');
     const channelSort = document.getElementById('channelSort');
@@ -3803,6 +3809,8 @@ document.addEventListener('DOMContentLoaded', async () => {
         inProgress: false,
         canEnableWhitelist: false
     };
+    let importedChannelEnrichmentStatusTimer = 0;
+    let importedChannelEnrichmentStatusRequest = 0;
 
     if (ftProfileDropdownTab && ftProfileDropdownTab.parentNode !== document.body) {
         document.body.appendChild(ftProfileDropdownTab);
@@ -3882,8 +3890,11 @@ document.addEventListener('DOMContentLoaded', async () => {
     // STATE MANAGEMENT
     // ============================================================================
 
-    // Load initial settings
+    // Load initial settings. Imported CSV/TXT/FilterTube/BlockTube channel
+    // rows resume through the serialized persisted queue; ordinary user-added
+    // channels keep their existing bounded post-entry enrichment behavior.
     await StateManager.loadSettings();
+    await (StateManager.resumeImportedChannelEnrichment || StateManager.resumeBlockTubeEnrichment)?.();
     await initializeUpdateRefreshPromptSetting(settingShowUpdateRefreshPrompt);
 
     // Apply theme immediately
@@ -4688,6 +4699,74 @@ document.addEventListener('DOMContentLoaded', async () => {
             || !importSubscriptionsActions.hidden;
         importSubscriptionsNotice.hidden = !showNotice;
         importSubscriptionsStatus.hidden = !statusText;
+    }
+
+    function formatImportedChannelEnrichmentWait(nextRunAt) {
+        const remainingMs = Math.max(0, Number(nextRunAt) - Date.now());
+        if (!remainingMs) return 'Next lookup will start shortly.';
+        const remainingSeconds = Math.ceil(remainingMs / 1000);
+        if (remainingSeconds < 60) return `Next lookup in about ${remainingSeconds} seconds.`;
+        const remainingMinutes = Math.ceil(remainingSeconds / 60);
+        if (remainingMinutes < 60) return `Next lookup in about ${remainingMinutes} minutes.`;
+        const remainingHours = Math.ceil(remainingMinutes / 60);
+        return `Next lookup in about ${remainingHours} hours.`;
+    }
+
+    async function refreshImportedChannelEnrichmentStatus() {
+        if (!importedChannelEnrichmentNotice || !importedChannelEnrichmentStatus) return null;
+        const requestId = ++importedChannelEnrichmentStatusRequest;
+        const getter = StateManager?.getImportedChannelEnrichmentStatus;
+        if (typeof getter !== 'function') {
+            importedChannelEnrichmentNotice.hidden = true;
+            importedChannelEnrichmentStatus.textContent = '';
+            return null;
+        }
+
+        let status = null;
+        try {
+            status = await getter();
+        } catch (error) {
+            status = null;
+        }
+        if (requestId !== importedChannelEnrichmentStatusRequest) return status;
+
+        const total = Math.max(0, Number(status?.total) || 0);
+        if (!total) {
+            importedChannelEnrichmentNotice.hidden = true;
+            importedChannelEnrichmentNotice.setAttribute('aria-busy', 'false');
+            importedChannelEnrichmentStatus.textContent = '';
+            return status;
+        }
+
+        const pending = Math.max(0, Number(status?.pending) || 0);
+        const inFlight = status?.inFlight === true;
+        const progress = inFlight
+            ? ` ${pending ? `${pending} ${pluralize(pending, 'lookup')} waiting.` : 'No additional lookups are waiting.'}`
+            : ` ${pluralize(total, 'lookup')} queued.`;
+        importedChannelEnrichmentStatus.textContent = [
+            `Channel details are still being completed: ${total} imported channel ${total === 1 ? 'lookup remains.' : 'lookups remain.'}${progress}`,
+            'FilterTube performs one lookup about every 20 seconds to avoid a burst of requests to YouTube.',
+            'The saved rule is active immediately from its identifier. Each lookup asks YouTube for the name, handle or custom URL, and avatar together. If YouTube omits a field in that response, FilterTube keeps the partial result and retries later instead of sending a burst of requests. A name can appear first because the imported file may already contain it (BlockTube often stores it in a context comment); “Not fetched” means that imported identifier is still waiting.',
+            'Name-only rules, including BlockTube name-only rules, have no unique UC ID and stay name-only. Closing this dashboard pauses the queue; reopening Filters resumes it.',
+            formatImportedChannelEnrichmentWait(status?.nextRunAt)
+        ].join(' ');
+        importedChannelEnrichmentNotice.hidden = false;
+        importedChannelEnrichmentNotice.setAttribute('aria-busy', inFlight ? 'true' : 'false');
+        return status;
+    }
+
+    function scheduleImportedChannelEnrichmentStatusRefresh(delayMs = 0) {
+        if (!importedChannelEnrichmentNotice) return;
+        if (importedChannelEnrichmentStatusTimer) {
+            clearTimeout(importedChannelEnrichmentStatusTimer);
+        }
+        importedChannelEnrichmentStatusTimer = setTimeout(async () => {
+            importedChannelEnrichmentStatusTimer = 0;
+            const status = await refreshImportedChannelEnrichmentStatus();
+            if (Number(status?.total) > 0) {
+                scheduleImportedChannelEnrichmentStatusRefresh(10000);
+            }
+        }, Math.max(0, Number(delayMs) || 0));
     }
 
     function syncSubscriptionsImportControls() {
@@ -8905,6 +8984,108 @@ document.addEventListener('DOMContentLoaded', async () => {
         };
     }
 
+    function findManagedBlockTubePayload(rawText) {
+        const text = normalizeString(rawText);
+        if (!/^\s*[\[{]/.test(text)) return null;
+
+        let root = null;
+        try {
+            root = JSON.parse(text);
+        } catch (e) {
+            return null;
+        }
+
+        const candidates = [
+            root,
+            root?.storageData,
+            root?.data,
+            root?.payload,
+            root?.backup
+        ];
+        for (const candidateValue of candidates) {
+            let candidate = candidateValue;
+            if (typeof candidate === 'string') {
+                try {
+                    candidate = JSON.parse(candidate);
+                } catch (e) {
+                    candidate = null;
+                }
+            }
+            if (candidate?.filterData && typeof candidate.filterData === 'object' && !Array.isArray(candidate.filterData)) {
+                return candidate;
+            }
+        }
+        return null;
+    }
+
+    function inspectManagedBlockTubeImport(rawText) {
+        const payload = findManagedBlockTubePayload(rawText);
+        if (!payload) return null;
+
+        const io = window.FilterTubeIO || {};
+        if (typeof io.previewBlockTubeMigration !== 'function') {
+            return {
+                payload,
+                preview: {
+                    ok: false,
+                    error: 'The BlockTube migration importer is not ready yet.'
+                }
+            };
+        }
+
+        try {
+            return {
+                payload,
+                preview: io.previewBlockTubeMigration(payload)
+            };
+        } catch (error) {
+            return {
+                payload,
+                preview: {
+                    ok: false,
+                    error: normalizeString(error?.message) || 'BlockTube backup could not be read.'
+                }
+            };
+        }
+    }
+
+    function getManagedBlockTubeSkippedCount(preview = {}) {
+        const report = safeObject(preview.report);
+        return safeArray(report.invalid).length
+            + safeArray(report.unsupported).length
+            + safeArray(report.unknown).length;
+    }
+
+    function renderManagedBlockTubeMigrationPreview(text, listName, inspection) {
+        const preview = safeObject(inspection?.preview);
+        const counts = safeObject(preview.counts);
+        const report = safeObject(preview.report);
+        const inactiveCount = safeArray(report.inactive).length;
+        const skippedCount = getManagedBlockTubeSkippedCount(preview);
+        let rows = '';
+        try {
+            // The full migration preview owns the counts and apply behavior. The
+            // generic parser is used only for a small human-readable sample here.
+            const sample = parseManagedChannelListJson(text, { listName });
+            rows = renderManagedRuleListPreviewSheet(sample);
+        } catch (e) {
+        }
+
+        return `
+            <div class="managed-channel-list-modal__preview-title">Preview · BlockTube JSON</div>
+            <div class="managed-channel-list-modal__preview-grid">
+                <div class="managed-channel-list-modal__preview-stat"><strong>${Number(counts.channels) || 0}</strong><span>Effective channels</span></div>
+                <div class="managed-channel-list-modal__preview-stat"><strong>${Number(counts.videoIds) || 0}</strong><span>Video IDs</span></div>
+                <div class="managed-channel-list-modal__preview-stat"><strong>${skippedCount}</strong><span>Unsupported / skipped</span></div>
+            </div>
+            <div class="managed-channel-list-modal__preview-note">
+                BlockTube JSON detected. Import keeps ${Number(counts.channelIds) || 0} channel IDs, ${Number(counts.channelNameRules) || 0} channel-name rules, ${Number(counts.keywords) || 0} title rules, ${Number(counts.comments) || 0} comment rules, and ${Number(counts.regex) || 0} validated regex rules.
+                ${Number(counts.mappedOptions) || 0} safe setting groups and ${Number(counts.durationFilters) || 0} duration filters are reviewed separately. ${inactiveCount} unsafe/inactive field${inactiveCount === 1 ? '' : 's'} stay quarantined and are never executed. Channel IDs are enriched only after approval, one serialized lookup about every 20 seconds.
+            </div>
+            ${rows}
+        `;
+    }
+
     function readManagedChannelListFile(file) {
         return new Promise((resolve, reject) => {
             const reader = new FileReader();
@@ -9179,7 +9360,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                         </div>
                         <div class="managed-channel-list-modal__mini-lines">
                             <code>raw.githubusercontent.com/.../list.csv</code>
-                            <small>CSV, TXT, FilterTube JSON, or BlockTube JSON loads into the same preview.</small>
+                    <small>CSV, TXT, FilterTube JSON, or BlockTube migration JSON loads into the matching preview. Incomplete channel rows are completed later in the paced background queue.</small>
                         </div>
                     </article>
                     <article class="managed-channel-list-modal__format-panel managed-channel-list-modal__format-panel--blocktube">
@@ -9196,7 +9377,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                     </article>
                 </div>
                 <div class="managed-channel-list-modal__format-note">
-                    Files only add channel and keyword rules. They cannot change profiles, PINs, trusted devices, time limits, Main/Kids access, or sync targets.
+                    CSV, TXT, and FilterTube rule-list files add channel and keyword rules. BlockTube migration JSON also imports its supported Main YouTube video IDs and safe setting mappings. Incomplete channel identifiers from any of these formats are completed after approval, one serialized lookup at a time; a large list can take time. No file can change profiles, PINs, trusted devices, time limits, Main/Kids access, or sync targets.
                 </div>`;
             modalLayout.append(formatGuide, formColumn);
 
@@ -9292,7 +9473,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 
             const help = document.createElement('div');
             help.className = 'managed-channel-list-modal__help';
-            help.textContent = 'TXT bare rows stay channel-only; use keyword: for TXT keywords. CSV and supported JSON can add channels and keywords. If this is a protected profile, send the updated policy from Family Controls when another verified device needs the same rules.';
+            help.textContent = 'TXT bare rows stay channel-only; use keyword: for TXT keywords. CSV, TXT, FilterTube JSON, and BlockTube migration JSON all complete missing channel names, handles/custom URLs, and avatars after approval in a slow persisted queue. A large list can take time; this avoids a request burst. If this is a protected profile, send the updated policy from Family Controls when another verified device needs the same rules.';
             formColumn.appendChild(help);
 
             const previewEl = document.createElement('div');
@@ -9335,11 +9516,23 @@ document.addEventListener('DOMContentLoaded', async () => {
                 if (!text) {
                     previewEl.innerHTML = `
                         <div class="managed-channel-list-modal__preview-title">Preview</div>
-                        <div class="managed-channel-list-modal__preview-empty">Paste CSV, load a URL, choose a file, or use the template. The preview will show Type, Value, and Source before anything is applied.</div>
+                        <div class="managed-channel-list-modal__preview-empty">Paste CSV, TXT, FilterTube JSON, or BlockTube migration JSON; load a URL, choose a file, or use the template. The preview will show Type, Value, and Source before anything is applied.</div>
                     `;
                     return;
                 }
                 const name = normalizeString(nameInput.value) || 'Imported rule list';
+                const blockTubeInspection = inspectManagedBlockTubeImport(text);
+                if (blockTubeInspection) {
+                    if (!blockTubeInspection.preview?.ok) {
+                        previewEl.innerHTML = `
+                            <div class="managed-channel-list-modal__preview-title">Preview · BlockTube JSON</div>
+                            <div class="managed-channel-list-modal__preview-empty">${escapeManagedRuleListPreviewCell(blockTubeInspection.preview?.error || 'BlockTube backup could not be read.')}</div>
+                        `;
+                        return;
+                    }
+                    previewEl.innerHTML = renderManagedBlockTubeMigrationPreview(text, name, blockTubeInspection);
+                    return;
+                }
                 try {
                     const parsed = parseManagedChannelListText(text, { listName: name });
                     const counts = countManagedRuleListRows(parsed);
@@ -10627,8 +10820,17 @@ document.addEventListener('DOMContentLoaded', async () => {
         }
 
         if (!changedCount) {
+            const enrichmentStarter = StateManager.startImportedChannelEnrichment
+                || StateManager.startBlockTubeEnrichment;
+            const enrichment = typeof enrichmentStarter === 'function'
+                ? await enrichmentStarter({ profileIds: eligibleIds })
+                : { pending: 0 };
+            scheduleImportedChannelEnrichmentStatusRefresh(0);
+            const metadataNotice = enrichment?.pending
+                ? ` Channel details continue slowly (${Number(enrichment.pending) || 0} pending), one row at a time; large lists can take time.`
+                : '';
             UIComponents.showToast(
-                duplicateCount ? 'Selected profiles already have this list' : 'No selected profiles were changed',
+                `${duplicateCount ? 'Selected profiles already have this list' : 'No selected profiles were changed'}${metadataNotice}`,
                 'info'
             );
             return;
@@ -10641,13 +10843,21 @@ document.addEventListener('DOMContentLoaded', async () => {
         });
         profilesV4Cache = { ...fresh, schemaVersion: 4, profiles };
         await StateManager.loadSettings({ notify: false, resetEnrichment: false, scheduleEnrichment: false });
+        const enrichmentStarter = StateManager.startImportedChannelEnrichment
+            || StateManager.startBlockTubeEnrichment;
+        const enrichment = typeof enrichmentStarter === 'function'
+            ? await enrichmentStarter({ profileIds: changedProfileIds })
+            : { pending: 0 };
         await refreshProfilesUI();
         renderChannels();
         renderKidsChannels();
         renderKeywords();
         renderKidsKeywords();
+        const metadataNotice = enrichment?.pending
+            ? ` Channel details continue slowly (${Number(enrichment.pending) || 0} pending), one row at a time; large lists can take time. Closing this dashboard pauses the queue and reopening it resumes.`
+            : ' Channel details are already complete.';
         UIComponents.showToast(
-            `Imported ${addedCount} list-derived ${pluralize(addedCount, 'rule')} into ${changedCount} protected ${changedCount === 1 ? 'profile' : 'profiles'}`,
+            `Imported ${addedCount} list-derived ${pluralize(addedCount, 'rule')} into ${changedCount} protected ${changedCount === 1 ? 'profile' : 'profiles'}.${metadataNotice}`,
             'success'
         );
 
@@ -10692,6 +10902,96 @@ document.addEventListener('DOMContentLoaded', async () => {
         return ['main'];
     }
 
+    async function applyManagedBlockTubeMigrationToActiveProfile(payload, freshProfiles = null) {
+        const io = window.FilterTubeIO || {};
+        if (typeof io.importV3 !== 'function') {
+            UIComponents.showToast('BlockTube migration importer is unavailable', 'error');
+            return null;
+        }
+
+        try {
+            const profilesV4 = freshProfiles || (typeof io.loadProfilesV4 === 'function' ? await io.loadProfilesV4() : null);
+            const currentActive = normalizeString(profilesV4?.activeProfileId) || activeProfileId || 'default';
+            if (getProfileType(profilesV4, currentActive) === 'child') {
+                UIComponents.showToast('Open the parent/account profile before importing BlockTube JSON', 'error');
+                return null;
+            }
+
+            const auth = {};
+            if (currentActive === 'default' && extractMasterPinVerifier(profilesV4)) {
+                if (!sessionMasterPin) {
+                    const okAdmin = await ensureAdminUnlocked(profilesV4, { sensitiveAction: true });
+                    if (!okAdmin) return null;
+                }
+                auth.localMasterPin = sessionMasterPin;
+            }
+
+            if (typeof io.createAutoBackup === 'function') {
+                await io.createAutoBackup('before_blocktube_import');
+            }
+
+            const importResult = await io.importV3(payload, {
+                strategy: 'merge',
+                scope: 'auto',
+                auth
+            });
+
+            // Do not send imported identifiers through the ordinary post-entry
+            // queue. Every import format uses the explicitly started,
+            // persisted queue below so a large list remains one lookup at a
+            // time with a long delay. Keep any ordinary user-added-channel
+            // enrichment already waiting; the imported queue is separate.
+            await StateManager.loadSettings({ notify: false, resetEnrichment: false, scheduleEnrichment: false });
+            const enrichmentStarter = StateManager.startImportedChannelEnrichment
+                || StateManager.startBlockTubeEnrichment;
+            const enrichment = typeof enrichmentStarter === 'function'
+                ? await enrichmentStarter()
+                : { pending: 0 };
+            const state = StateManager.getState();
+            const SettingsAPI = window.FilterTubeSettings || {};
+            if (SettingsAPI.applyThemePreference) {
+                SettingsAPI.applyThemePreference(state.theme);
+            }
+            if (typeof io.loadProfilesV4 === 'function') {
+                profilesV4Cache = await io.loadProfilesV4();
+            }
+            await refreshProfilesUI();
+            renderChannels();
+            renderKidsChannels();
+            renderKeywords();
+            renderKidsKeywords();
+
+            const receipt = safeObject(importResult?.receipt);
+            if (receipt.verified === true) {
+                await showChoiceModal({
+                    title: 'BlockTube Import Verified',
+                    message: 'FilterTube saved the complete supported BlockTube migration and read it back before reporting success.',
+                    details: [
+                        `Added ${Number(receipt.addedChannels) || 0} effective channels (${Number(receipt.channelIds) || 0} IDs + ${Number(receipt.channelNameRules) || 0} name rules) · ${Number(receipt.addedVideoIds) || 0} video IDs`,
+                        `Added ${Number(receipt.addedKeywords) || 0} keyword/comment rules · ${Number(receipt.regex) || 0} regex rules reviewed`,
+                        `Already present: ${Number(receipt.duplicateChannels) || 0} channels · ${Number(receipt.duplicateKeywords) || 0} keyword/comment rules · ${Number(receipt.duplicateVideoIds) || 0} video IDs`,
+                        `Skipped or unsupported outcomes: ${Number(receipt.skippedRows) || 0}`,
+                        enrichment?.pending
+                            ? `Channel metadata queue: ${Number(enrichment.pending) || 0} imported rows pending. It performs one serialized lookup about every 20 seconds and retries incomplete/unavailable channels with a long backoff; no burst of requests was made during import. Closing this dashboard pauses the queue and reopening it resumes.`
+                            : 'All imported channel rows already have complete metadata; no metadata lookup is pending.'
+                    ],
+                    choices: [
+                        { value: 'done', label: 'Done', recommended: true }
+                    ],
+                    cancelText: 'Close'
+                });
+            } else {
+                UIComponents.showToast('BlockTube JSON imported', 'success');
+            }
+            return importResult;
+        } catch (error) {
+            const message = normalizeString(error?.message) || 'The BlockTube file could not be imported';
+            UIComponents.showToast(`BlockTube import failed: ${message.slice(0, 180)}`, 'error');
+            console.error('Managed BlockTube import failed', error);
+            return null;
+        }
+    }
+
     async function importManagedRuleListToActiveProfileSurfaces(surfaces) {
         const targetSurfaces = [...new Set(safeArray(surfaces)
             .map(surface => surface === 'kids' ? 'kids' : (surface === 'main' ? 'main' : ''))
@@ -10734,22 +11034,53 @@ document.addEventListener('DOMContentLoaded', async () => {
         if (!importPayload) return;
 
         const parsed = parseManagedChannelListText(importPayload.text, { listName: importPayload.name });
+        const blockTubeInspection = inspectManagedBlockTubeImport(importPayload.text);
+        if (blockTubeInspection && !blockTubeInspection.preview?.ok) {
+            UIComponents.showToast(blockTubeInspection.preview?.error || 'BlockTube backup could not be read', 'error');
+            return;
+        }
+        const isBlockTubeImport = Boolean(blockTubeInspection?.preview?.ok === true);
+        if (isBlockTubeImport && targetSurfaces.some(surface => surface !== 'main')) {
+            UIComponents.showToast('BlockTube Migration JSON applies to Main YouTube only. Select Main YouTube, then import it as a complete migration.', 'error');
+            return;
+        }
         const parsedCounts = countManagedRuleListRows(parsed);
-        if (!parsedCounts.total) {
+        const blockTubeCounts = safeObject(blockTubeInspection?.preview?.counts);
+        if (!isBlockTubeImport && !parsedCounts.total) {
             UIComponents.showToast('No valid channels or keywords found. CSV can use channel_id and keyword columns.', 'error');
             return;
         }
 
+        const applyLabel = isBlockTubeImport
+            ? 'BlockTube JSON'
+            : (formatManagedChannelListSourceFormat(parsed.sourceFormat) || 'rule list')
+                .replace(/^CSV rules$|^CSV-like text$/, 'CSV')
+                .replace(/^TXT rules$|^text list$/, 'TXT');
+        const blockTubeSkipped = getManagedBlockTubeSkippedCount(blockTubeInspection?.preview || {});
         const confirmImport = await showChoiceModal({
-            title: `Apply CSV to ${surfaceLabel}?`,
-            message: `${formatManagedRuleListCount(parsedCounts)} found. Apply this list to ${getProfileName(fresh, currentActive)} on ${surfaceLabel}.`,
-            details: [
-                `${formatManagedRuleListCount(parsedCounts)} ready`,
-                parsed.skippedCount ? `${parsed.skippedCount} ${parsed.skippedCount === 1 ? 'row was' : 'rows were'} skipped` : 'No rows skipped',
-                'Nothing changes until you confirm.'
-            ],
+            title: `Apply ${applyLabel} to ${surfaceLabel}?`,
+            message: isBlockTubeImport
+                ? `BlockTube migration found ${Number(blockTubeCounts.channels) || 0} effective channels and ${Number(blockTubeCounts.videoIds) || 0} video IDs. Apply the complete supported migration to ${getProfileName(fresh, currentActive)} on Main YouTube.`
+                : `${formatManagedRuleListCount(parsedCounts)} found. Apply this list to ${getProfileName(fresh, currentActive)} on ${surfaceLabel}.`,
+            details: isBlockTubeImport
+                ? [
+                    `${Number(blockTubeCounts.channels) || 0} effective channels (${Number(blockTubeCounts.channelIds) || 0} IDs + ${Number(blockTubeCounts.channelNameRules) || 0} name rules) · ${Number(blockTubeCounts.videoIds) || 0} video IDs`,
+                    `${Number(blockTubeCounts.keywords) || 0} title rules · ${Number(blockTubeCounts.comments) || 0} comment rules · ${Number(blockTubeCounts.regex) || 0} validated regex rules`,
+                    `${Number(blockTubeCounts.mappedOptions) || 0} mapped setting groups · ${Number(blockTubeCounts.durationFilters) || 0} duration filters · ${safeArray(blockTubeInspection.preview?.report?.inactive).length} inactive preserved`,
+                    `${blockTubeSkipped} unsupported, invalid, or unknown outcomes`,
+                    'No per-channel YouTube requests are made while the list is being reviewed. After approval, imported channel identifiers use a separate persisted queue: one serialized lookup about every 20 seconds, with retries backed off for hours; a large list can take time. Nothing changes until you confirm.'
+                ]
+                : [
+                    `${formatManagedRuleListCount(parsedCounts)} ready`,
+                    parsed.skippedCount ? `${parsed.skippedCount} ${parsed.skippedCount === 1 ? 'row was' : 'rows were'} skipped` : 'No rows skipped',
+                    'No per-channel YouTube requests are made while the list is being reviewed. After approval, incomplete channel identifiers are completed in a persisted one-at-a-time queue; a large list can take time. Nothing changes until you confirm.'
+                ],
             choices: [
-                { value: 'apply', label: 'Apply List', className: 'btn-primary' }
+                {
+                    value: 'apply',
+                    label: isBlockTubeImport ? 'Apply BlockTube JSON' : 'Apply List',
+                    className: 'btn-primary'
+                }
             ],
             cancelText: 'Cancel'
         });
@@ -10757,6 +11088,11 @@ document.addEventListener('DOMContentLoaded', async () => {
 
         const okAdmin = await ensureProfileUnlocked(fresh, currentActive, { sensitiveAction: true });
         if (!okAdmin) return;
+
+        if (isBlockTubeImport) {
+            await applyManagedBlockTubeMigrationToActiveProfile(blockTubeInspection.payload, fresh);
+            return;
+        }
 
         const importedAt = Date.now();
         let nextProfile = profile;
@@ -10781,8 +11117,17 @@ document.addEventListener('DOMContentLoaded', async () => {
         }
 
         if (!changed) {
+            const enrichmentStarter = StateManager.startImportedChannelEnrichment
+                || StateManager.startBlockTubeEnrichment;
+            const enrichment = typeof enrichmentStarter === 'function'
+                ? await enrichmentStarter()
+                : { pending: 0 };
+            scheduleImportedChannelEnrichmentStatusRefresh(0);
+            const metadataNotice = enrichment?.pending
+                ? ` Channel details continue slowly (${Number(enrichment.pending) || 0} pending), one row at a time; large lists can take time.`
+                : '';
             UIComponents.showToast(
-                duplicateCount ? 'This profile already has that list' : 'No profile rules were changed',
+                `${duplicateCount ? 'This profile already has that list' : 'No profile rules were changed'}${metadataNotice}`,
                 'info'
             );
             return;
@@ -10796,13 +11141,24 @@ document.addEventListener('DOMContentLoaded', async () => {
             profiles
         });
         profilesV4Cache = { ...fresh, schemaVersion: 4, activeProfileId: currentActive, profiles };
+        // Keep ordinary rule-list imports out of the fast post-entry queue.
+        // They still receive complete channel metadata through the same
+        // serialized, persisted queue used by every imported list format.
         await StateManager.loadSettings({ notify: false, resetEnrichment: false, scheduleEnrichment: false });
+        const enrichmentStarter = StateManager.startImportedChannelEnrichment
+            || StateManager.startBlockTubeEnrichment;
+        const enrichment = typeof enrichmentStarter === 'function'
+            ? await enrichmentStarter()
+            : { pending: 0 };
         await refreshProfilesUI();
         renderChannels();
         renderKidsChannels();
         renderKeywords();
         renderKidsKeywords();
-        UIComponents.showToast(`Imported ${addedCount} ${pluralize(addedCount, 'rule')} into ${surfaceLabel}`, 'success');
+        const metadataNotice = enrichment?.pending
+            ? ` Channel details continue slowly (${Number(enrichment.pending) || 0} pending), one row at a time; large lists can take time. Closing this dashboard pauses the queue and reopening it resumes.`
+            : ' Channel details are already complete.';
+        UIComponents.showToast(`Imported ${addedCount} ${pluralize(addedCount, 'rule')} into ${surfaceLabel}.${metadataNotice}`, 'success');
     }
 
     async function removeManagedChannelListFromProfiles(profileIds) {
@@ -22948,6 +23304,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             managedChildEdit = null;
             await clearProfileUnlockSessionsExcept(targetId, profiles);
             await StateManager.loadSettings();
+            await (StateManager.resumeImportedChannelEnrichment || StateManager.resumeBlockTubeEnrichment)?.();
             await refreshProfilesUI();
             void runNanahManagedBackgroundSync({ reason: 'profile_switch' });
             updateStats();
@@ -23409,8 +23766,30 @@ document.addEventListener('DOMContentLoaded', async () => {
             }
 
             let blockTubeMigrationApproved = false;
-            if (payload?.filterData && typeof io.previewBlockTubeMigration === 'function') {
-                const preview = io.previewBlockTubeMigration(payload);
+            let blockTubePayloadCandidate = null;
+            const blockTubeCandidates = [
+                payload,
+                payload?.storageData,
+                payload?.data,
+                payload?.payload,
+                payload?.backup
+            ];
+            for (let i = 0; i < blockTubeCandidates.length; i += 1) {
+                let candidate = blockTubeCandidates[i];
+                if (typeof candidate === 'string') {
+                    try {
+                        candidate = JSON.parse(candidate);
+                    } catch (e) {
+                        candidate = null;
+                    }
+                }
+                if (candidate?.filterData && typeof candidate.filterData === 'object' && !Array.isArray(candidate.filterData)) {
+                    blockTubePayloadCandidate = candidate;
+                    break;
+                }
+            }
+            if (blockTubePayloadCandidate && typeof io.previewBlockTubeMigration === 'function') {
+                const preview = io.previewBlockTubeMigration(blockTubePayloadCandidate);
                 if (!preview?.ok) {
                     UIComponents.showToast(preview?.error || 'BlockTube backup could not be read', 'error');
                     return;
@@ -23425,9 +23804,9 @@ document.addEventListener('DOMContentLoaded', async () => {
                     title: 'Review BlockTube Migration',
                     message: 'FilterTube will merge safe supported rules into the Default Main profile. Imported JavaScript is never run and uiPass is never used as a FilterTube PIN.',
                     details: [
-                        `${counts.channels || 0} channels · ${counts.videoIds || 0} video IDs`,
+                        `${counts.channels || 0} effective channels (${counts.channelIds || 0} IDs + ${counts.channelNameRules || 0} name rules) · ${counts.videoIds || 0} video IDs`,
                         `${counts.keywords || 0} title rules · ${counts.comments || 0} comment rules · ${counts.regex || 0} validated regex rules`,
-                        `${counts.mappedOptions || 0} mapped setting groups`,
+                        `${counts.mappedOptions || 0} mapped setting groups · ${counts.durationFilters || 0} duration filters`,
                         `${inactiveCount} preserved inactive · ${unsupportedCount} unsupported · ${invalidCount} invalid · ${unknownCount} unknown`,
                         'The original backup is unchanged. No per-channel YouTube requests are made during import.'
                     ],
@@ -23531,7 +23910,13 @@ document.addEventListener('DOMContentLoaded', async () => {
                 }
             });
 
-            await StateManager.loadSettings();
+            await StateManager.loadSettings({ notify: false, resetEnrichment: false, scheduleEnrichment: false });
+            const enrichmentStarter = StateManager.startImportedChannelEnrichment
+                || StateManager.startBlockTubeEnrichment;
+            const importedChannelEnrichment = typeof enrichmentStarter === 'function'
+                ? await enrichmentStarter()
+                : null;
+            scheduleImportedChannelEnrichmentStatusRefresh(0);
             const state = StateManager.getState();
             const SettingsAPI = window.FilterTubeSettings || {};
             if (SettingsAPI.applyThemePreference) {
@@ -23550,14 +23935,17 @@ document.addEventListener('DOMContentLoaded', async () => {
                     title: 'BlockTube Import Verified',
                     message: 'FilterTube saved the reviewed rules and read them back from the active profile before reporting success.',
                     details: [
-                        `Added ${Number(receipt.addedChannels) || 0} channels · ${Number(receipt.addedVideoIds) || 0} video IDs`,
+                        `Added ${Number(receipt.addedChannels) || 0} effective channels (${Number(receipt.channelIds) || 0} IDs + ${Number(receipt.channelNameRules) || 0} name rules) · ${Number(receipt.addedVideoIds) || 0} video IDs`,
                         `Added ${Number(receipt.addedKeywords) || 0} keyword/comment rules · ${Number(receipt.regex) || 0} regex rules reviewed`,
                         `Already present: ${Number(receipt.duplicateChannels) || 0} channels · ${Number(receipt.duplicateKeywords) || 0} keyword/comment rules · ${Number(receipt.duplicateVideoIds) || 0} video IDs`,
                         `Skipped or unsupported outcomes: ${Number(receipt.skippedRows) || 0}`,
                         `Target profile: ${normalizeString(receipt.targetProfileId) || 'default'}`,
                         importResult?.restoredNanahState
                             ? 'Trusted-device recovery data was also restored.'
-                            : 'No trusted-device identity was changed.'
+                            : 'No trusted-device identity was changed.',
+                        importedChannelEnrichment?.pending
+                            ? `Imported channel metadata will be completed in the background one row at a time about every 20 seconds (${Number(importedChannelEnrichment.pending) || 0} pending). Large lists can take time; this pacing avoids a burst of YouTube requests. Closing this dashboard pauses the queue and reopening it resumes.`
+                            : 'All imported channel metadata is already complete; no background lookup is pending.'
                     ],
                     choices: [
                         { value: 'done', label: 'Done', recommended: true }
@@ -23565,10 +23953,13 @@ document.addEventListener('DOMContentLoaded', async () => {
                     cancelText: 'Close'
                 });
             } else {
+                const metadataNotice = importedChannelEnrichment?.pending
+                    ? ` Channel details continue slowly (${Number(importedChannelEnrichment.pending) || 0} pending), one row at a time; large lists can take time. Closing this dashboard pauses the queue and reopening it resumes.`
+                    : ' Channel details are already complete.';
                 UIComponents.showToast(
-                    importResult?.restoredNanahState
+                    `${importResult?.restoredNanahState
                         ? 'Import verified and trusted-device recovery data restored'
-                        : 'Import verified',
+                        : 'Import verified'}.${metadataNotice}`,
                     'success'
                 );
             }
@@ -25608,6 +25999,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                 : null
         });
         renderManagedChildEditorBanner();
+        scheduleImportedChannelEnrichmentStatusRefresh(0);
     }
 
     function renderKidsKeywords() {
@@ -26237,12 +26629,12 @@ document.addEventListener('DOMContentLoaded', async () => {
         ftRuleListFormatsBtn.addEventListener('click', async () => {
             const action = await showChoiceModal({
                 title: 'Supported Rule List Formats',
-                message: 'Rule list imports add channels and keywords only. Full FilterTube backups belong under Choose JSON; channel/title list files belong here.',
+                message: 'Rule list imports add ordinary channels and keywords. BlockTube migration JSON also carries its supported video IDs and safe setting mappings. Full FilterTube backups belong under Choose JSON; channel/title list files belong here.',
                 details: [
                     'CSV: channel_id,keyword,notes or type,value,notes.',
                     'Text: bare rows are channels; typed rows can use channel: @SomeChannel or keyword: brainrot.',
                     'Rule-list JSON: channels and keywords arrays.',
-                    'BlockTube JSON: filterData channel/title arrays can be previewed here as channel and keyword rules.',
+                    'BlockTube JSON: filterData channel/title arrays are previewed here, and supported video IDs/settings are applied by the migration importer. Missing channel metadata is enriched one ID at a time after approval.',
                     'Public URLs: raw HTTPS CSV, text, or JSON files can be loaded into the preview.'
                 ],
                 choices: [

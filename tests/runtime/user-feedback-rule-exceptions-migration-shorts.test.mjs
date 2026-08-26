@@ -165,7 +165,7 @@ test('BlockTube preview translates safe data and reports unsafe or unsupported d
   const preview = window.FilterTubeIO.previewBlockTubeMigration({
     filterData: {
       title: ['poop', '/music/iu'],
-      channelId: ['UC123'],
+      channelId: [`UC${'1'.repeat(22)}`],
       channelName: [],
       videoId: ['abcdefghijk'],
       comment: ['bad comment'],
@@ -186,11 +186,14 @@ test('BlockTube preview translates safe data and reports unsafe or unsupported d
   assert.equal(preview.ok, true);
   assert.deepEqual(JSON.parse(JSON.stringify(preview.counts)), {
     channels: 1,
+    channelIds: 1,
+    channelNameRules: 0,
     keywords: 2,
     comments: 1,
     regex: 1,
     videoIds: 1,
-    mappedOptions: 2
+    mappedOptions: 1,
+    durationFilters: 1
   });
   assert.equal(globalThis.__mustNeverRun, undefined);
   assert.ok(preview.report.inactive.some(row => row.field === 'filterData.javascript'));

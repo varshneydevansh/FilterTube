@@ -70,6 +70,7 @@ function initialStorage() {
 function createContext({ failActiveProfileWrite = false } = {}) {
   const storage = structuredClone(initialStorage());
   let shouldFailV4 = failActiveProfileWrite;
+  let savedSettingsPayload = null;
   const runtime = {
     lastError: null,
     getManifest: () => ({ permissions: ['storage', 'unlimitedStorage'] })
@@ -134,9 +135,13 @@ function createContext({ failActiveProfileWrite = false } = {}) {
       channelMap: {},
       contentFilters: {}
     }),
-    saveSettings: async () => ({ compiledSettings: {}, error: null }),
+    saveSettings: async payload => {
+      savedSettingsPayload = plain(payload);
+      return { compiledSettings: {}, error: null };
+    },
     setThemePreference: async () => {}
   };
+  context.__getSavedSettingsPayload = () => savedSettingsPayload;
 
   vm.runInNewContext(ioSource, context, { filename: 'js/io_manager.js' });
   return context;
@@ -191,6 +196,108 @@ test('failed active-profile write rejects the import and restores the complete p
 
   assert.deepEqual(plain(context.__storage), before);
   assert.deepEqual(context.__storage.preservedUnrelatedKey, { value: 'must survive rollback' });
+});
+
+test('nested BlockTube backups preserve channel-name rules, channel IDs, video IDs, comments, and duration semantics', async () => {
+  const context = createContext();
+  const channelId = `UC${'a'.repeat(22)}`;
+  const input = {
+    storageData: {
+      filterData: {
+        title: ['blocked title', '/^CaseSensitive$/'],
+        channelId: [`// Blocked by context menu (Acme (TV) Channel) (26/08/2026, 00:00:00)`, channelId],
+        channelName: ['Creator Name', '/^CaseSensitive Channel$/'],
+        videoId: ['abcdefghijk'],
+        comment: ['blocked comment'],
+        vidLength: [60, 120],
+        javascript: ['alert("must not run")']
+      },
+      options: {
+        trending: true,
+        mixes: true,
+        shorts: true,
+        vidLength_type: 'block',
+        enable_javascript: true
+      },
+      uiPass: '1234'
+    }
+  };
+
+  const preview = context.FilterTubeIO.previewBlockTubeMigration(input);
+  assert.equal(preview.ok, true);
+  assert.deepEqual(plain(preview.counts), {
+    channels: 3,
+    channelIds: 1,
+    channelNameRules: 2,
+    keywords: 2,
+    comments: 1,
+    regex: 1,
+    videoIds: 1,
+    mappedOptions: 3,
+    durationFilters: 1
+  });
+  assert.ok(preview.report.translated.some(row => row.treatment === 'preserved_channel_name_regex_rule'));
+  assert.ok(preview.report.inactive.some(row => row.field === 'uiPass'));
+  assert.ok(preview.report.inactive.some(row => row.field === 'filterData.javascript'));
+
+  const result = await context.FilterTubeIO.importV3(input, { strategy: 'merge', scope: 'auto' });
+  assert.equal(result.ok, true);
+  assert.equal(result.receipt.channels, 3);
+
+  const main = context.__storage.ftProfilesV4.profiles.default.main;
+  const importedId = main.channels.find(channel => channel.source === 'blocktube');
+  assert.equal(importedId.id, channelId);
+  assert.equal(importedId.name, 'Acme (TV) Channel');
+  assert.equal(main.channels.filter(channel => channel.source === 'blocktube-channel-name').length, 2);
+  assert.deepEqual(main.videoIds, ['abcdefghijk']);
+
+  const savedPayload = context.__getSavedSettingsPayload();
+  assert.equal(savedPayload.contentFilters.duration.mode, 'block');
+  assert.equal(savedPayload.contentFilters.duration.condition, 'between');
+  assert.equal(savedPayload.contentFilters.duration.minMinutes, 1);
+  assert.equal(savedPayload.contentFilters.duration.maxMinutes, 2);
+  assert.equal(savedPayload.hideExploreTrending, true);
+  assert.equal(savedPayload.hideMixPlaylists, true);
+  assert.equal(savedPayload.hideShorts, true);
+});
+
+test('split BlockTube context-menu labels are rejoined instead of becoming fake channel IDs', async () => {
+  const context = createContext();
+  const channelId = `UC${'b'.repeat(22)}`;
+  const input = {
+    filterData: {
+      channelId: [
+        '// Blocked by context menu (Broken channel label',
+        '...)',
+        channelId
+      ],
+      channelName: [],
+      title: [],
+      comment: [],
+      videoId: [],
+      vidLength: []
+    },
+    options: {}
+  };
+
+  const preview = context.FilterTubeIO.previewBlockTubeMigration(input);
+  assert.deepEqual(plain(preview.counts), {
+    channels: 1,
+    channelIds: 1,
+    channelNameRules: 0,
+    keywords: 0,
+    comments: 0,
+    regex: 0,
+    videoIds: 0,
+    mappedOptions: 0,
+    durationFilters: 0
+  });
+  assert.ok(preview.report.translated.some(row => row.treatment === 'rejoined_split_context_comment'));
+
+  await context.FilterTubeIO.importV3(input, { strategy: 'merge', scope: 'auto' });
+  const imported = context.__storage.ftProfilesV4.profiles.default.main.channels[0];
+  assert.equal(imported.id, channelId);
+  assert.equal(imported.name, 'Broken channel label...');
 });
 
 test('all extension manifests grant local storage capacity for reviewed large imports', () => {

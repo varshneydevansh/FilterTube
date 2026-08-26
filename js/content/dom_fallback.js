@@ -12,6 +12,9 @@ const currentPageChannelMetaCache = {
     path: '',
     meta: null
 };
+const FILTERTUBE_DOM_BLOCKTUBE_CHANNEL_NAME_SOURCE = 'blocktube-channel-name';
+const FILTERTUBE_DOM_BLOCKTUBE_CHANNEL_NAME_BOUNDARY = "[ \n\r\t!@#$%^&*()_\\-=+\\[\\]\\\\\\|;:'\",\\.\\/<>\\?`~:]+";
+const filterTubeDomBlockTubeChannelNameRegexCache = new WeakMap();
 
 function getFilteringTracker() {
     const tracker = window.filteringTracker;
@@ -51,7 +54,8 @@ function getListSignatureForRun(list) {
                 const name = typeof entry.name === 'string' ? entry.name.trim().toLowerCase() : '';
                 const originalInput = typeof entry.originalInput === 'string' ? entry.originalInput.trim().toLowerCase() : '';
                 if (pattern) return `${pattern}::${flags}`.toLowerCase();
-                return [id, handle, customUrl, name, originalInput].filter(Boolean).join('::');
+                const source = typeof entry.source === 'string' ? entry.source.trim().toLowerCase() : '';
+                return [source, id, handle, customUrl, name, originalInput].filter(Boolean).join('::');
             }
             return '';
         }).filter(Boolean).join('|');
@@ -79,6 +83,168 @@ function normalizeUcIdForComparison(value) {
 function normalizeChannelNameForComparison(value) {
     if (!value || typeof value !== 'string') return '';
     return value.trim().toLowerCase().replace(/\s+/g, ' ');
+}
+
+function isFilterTubeDomBlockTubeChannelNameRule(entry) {
+    return Boolean(
+        entry &&
+        typeof entry === 'object' &&
+        entry.source === FILTERTUBE_DOM_BLOCKTUBE_CHANNEL_NAME_SOURCE
+    );
+}
+
+function getFilterTubeDomBlockTubeChannelNameRegex(entry) {
+    if (!isFilterTubeDomBlockTubeChannelNameRule(entry)) return null;
+    const cached = filterTubeDomBlockTubeChannelNameRegexCache.get(entry);
+    if (cached !== undefined) return cached;
+
+    const raw = (typeof entry.originalInput === 'string' ? entry.originalInput : entry.name || '').trim();
+    if (!raw) {
+        filterTubeDomBlockTubeChannelNameRegexCache.set(entry, null);
+        return null;
+    }
+
+    let pattern = '';
+    let flags = 'i';
+    const regexLiteral = raw.match(/^\/((?:\\.|[^/])+)\/([gimsuy]*)$/);
+    if (regexLiteral) {
+        pattern = regexLiteral[1];
+        // BlockTube keeps an omitted regex flag omitted; this matters for
+        // case-sensitive channel-name rules.
+        flags = regexLiteral[2] || '';
+    } else {
+        const escaped = raw.replace(/[\\^$*+?.()|[\]{}]/g, '\\$&');
+        pattern = `(^|${FILTERTUBE_DOM_BLOCKTUBE_CHANNEL_NAME_BOUNDARY})(${escaped})(${FILTERTUBE_DOM_BLOCKTUBE_CHANNEL_NAME_BOUNDARY}|$)`;
+    }
+
+    let compiled = null;
+    try {
+        compiled = new RegExp(pattern, flags);
+    } catch (e) {
+        compiled = null;
+    }
+    filterTubeDomBlockTubeChannelNameRegexCache.set(entry, compiled);
+    return compiled;
+}
+
+function matchesFilterTubeDomBlockTubeChannelNameRule(entry, channelInfo) {
+    const regex = getFilterTubeDomBlockTubeChannelNameRegex(entry);
+    const channelName = typeof channelInfo?.name === 'string' ? channelInfo.name.trim() : '';
+    if (!regex || !channelName) return false;
+    try {
+        regex.lastIndex = 0;
+        return regex.test(channelName);
+    } catch (e) {
+        return false;
+    } finally {
+        try {
+            regex.lastIndex = 0;
+        } catch (e) {
+        }
+    }
+}
+
+function getFilterTubeDomBlockTubeChannelNameDescriptor(entry) {
+    if (!isFilterTubeDomBlockTubeChannelNameRule(entry)) return null;
+    const raw = (typeof entry.originalInput === 'string' ? entry.originalInput : entry.name || '').trim();
+    if (!raw) return null;
+
+    const regexLiteral = raw.match(/^\/((?:\\.|[^/])+)\/([gimsuy]*)$/);
+    return regexLiteral
+        ? { entry, regex: getFilterTubeDomBlockTubeChannelNameRegex(entry), literal: '' }
+        : {
+            entry,
+            // Literal rules are matched directly by the indexed hot path;
+            // compile their regex lazily only for single-rule callers.
+            regex: null,
+            literal: raw,
+            literalLower: raw.toLowerCase()
+        };
+}
+
+function buildFilterTubeDomBlockTubeChannelNameMatcher(rules) {
+    const literalPrefixBuckets = new Map();
+    const literalFallback = [];
+    const regexRules = [];
+
+    for (const rule of Array.isArray(rules) ? rules : []) {
+        const descriptor = getFilterTubeDomBlockTubeChannelNameDescriptor(rule);
+        if (!descriptor || (!descriptor.literal && !descriptor.regex)) continue;
+        if (!descriptor.literal) {
+            regexRules.push(descriptor);
+            continue;
+        }
+        if (descriptor.literalLower.length !== descriptor.literal.length) {
+            literalFallback.push(descriptor);
+            continue;
+        }
+
+        const prefix = descriptor.literalLower.slice(0, 3);
+        const prefixBucket = literalPrefixBuckets.get(prefix) || [];
+        prefixBucket.push(descriptor);
+        literalPrefixBuckets.set(prefix, prefixBucket);
+    }
+
+    return { literalPrefixBuckets, literalFallback, regexRules };
+}
+
+function testFilterTubeDomBlockTubeChannelNameDescriptor(descriptor, channelName) {
+    const regex = descriptor?.regex || (
+        descriptor?.literal
+            ? getFilterTubeDomBlockTubeChannelNameRegex(descriptor.entry)
+            : null
+    );
+    if (!regex || !channelName) return false;
+    try {
+        regex.lastIndex = 0;
+        return regex.test(channelName);
+    } catch (e) {
+        return false;
+    } finally {
+        try {
+            regex.lastIndex = 0;
+        } catch (e) {
+        }
+    }
+}
+
+function matchesFilterTubeDomBlockTubeChannelNameRules(channelName, matcher) {
+    const normalizedName = typeof channelName === 'string' ? channelName.trim() : '';
+    if (!normalizedName || !matcher) return false;
+
+    const lowerName = normalizedName.toLowerCase();
+    for (let index = 0; index < normalizedName.length; index += 1) {
+        if (index > 0 && !FILTERTUBE_DOM_BLOCKTUBE_CHANNEL_NAME_BOUNDARY.includes(normalizedName[index - 1])) continue;
+        const candidateKeys = [
+            lowerName.slice(index, index + 3),
+            lowerName.slice(index, index + 2),
+            lowerName.slice(index, index + 1)
+        ];
+        for (const key of candidateKeys) {
+            const bucket = matcher.literalPrefixBuckets.get(key);
+            if (!bucket) continue;
+
+            for (const descriptor of bucket) {
+                const end = index + descriptor.literal.length;
+                if (end > normalizedName.length) continue;
+                if (lowerName.length !== normalizedName.length) {
+                    if (testFilterTubeDomBlockTubeChannelNameDescriptor(descriptor, normalizedName)) return true;
+                    continue;
+                }
+                if (!lowerName.startsWith(descriptor.literalLower, index)) continue;
+                if (end < normalizedName.length && !FILTERTUBE_DOM_BLOCKTUBE_CHANNEL_NAME_BOUNDARY.includes(normalizedName[end])) continue;
+                return true;
+            }
+        }
+    }
+
+    for (const descriptor of matcher.literalFallback) {
+        if (testFilterTubeDomBlockTubeChannelNameDescriptor(descriptor, normalizedName)) return true;
+    }
+    for (const descriptor of matcher.regexRules) {
+        if (testFilterTubeDomBlockTubeChannelNameDescriptor(descriptor, normalizedName)) return true;
+    }
+    return false;
 }
 
 function normalizeCustomUrlForComparison(value) {
@@ -573,6 +739,7 @@ function getCompiledChannelFilterIndex(settings, listOverride = null) {
     const names = new Set();
     const stableNames = new Set();
     const nameOnlyNames = new Set();
+    const blockTubeNameRules = [];
     const unresolvedHandleKeys = [];
     const unresolvedHandleKeysSeen = new Set();
 
@@ -618,6 +785,11 @@ function getCompiledChannelFilterIndex(settings, listOverride = null) {
 
     for (const entry of list) {
         if (!entry) continue;
+
+        if (isFilterTubeDomBlockTubeChannelNameRule(entry)) {
+            blockTubeNameRules.push(entry);
+            continue;
+        }
 
         if (typeof entry === 'string') {
             const s = entry.trim();
@@ -678,6 +850,8 @@ function getCompiledChannelFilterIndex(settings, listOverride = null) {
         names,
         stableNames,
         nameOnlyNames,
+        blockTubeNameRules,
+        blockTubeNameMatcher: buildFilterTubeDomBlockTubeChannelNameMatcher(blockTubeNameRules),
         unresolvedHandleKeys
     };
 
@@ -691,6 +865,16 @@ function getCompiledChannelFilterIndex(settings, listOverride = null) {
 
 function channelMetaMatchesIndex(meta, index, channelMap) {
     if (!meta || !index) return false;
+
+    if (index.blockTubeNameMatcher && matchesFilterTubeDomBlockTubeChannelNameRules(meta.name, index.blockTubeNameMatcher)) {
+        return true;
+    }
+    if (Array.isArray(index.blockTubeNameRules)) {
+        for (const rule of index.blockTubeNameRules) {
+            if (matchesFilterTubeDomBlockTubeChannelNameRule(rule, meta)) return true;
+        }
+    }
+
     const lookupChannelMap = getChannelMapLookup(channelMap || {});
 
     const metaId = normalizeUcIdForComparison(meta.id || '');
@@ -3596,70 +3780,13 @@ function installFilterTubeHomeFeedPolish() {
         if (document.getElementById('filtertube-home-feed-polish-style')) return;
         const style = document.createElement('style');
         style.id = 'filtertube-home-feed-polish-style';
+        // Do not change Home card metrics after YouTube has started laying out
+        // the feed. Late font, flex, padding, and fixed/sticky rail rules were
+        // causing visible reflow while infinite-scroll batches hydrated. Keep
+        // only interaction affordances and disable rail animation.
         style.textContent = `
-        html[data-filtertube-mobile-surface="true"][data-filtertube-route-home="true"] ytm-video-with-context-renderer:not([data-filtertube-short="true"]) h3,
-        html[data-filtertube-mobile-surface="true"][data-filtertube-route-home="true"] ytm-compact-video-renderer:not([data-filtertube-short="true"]) h3,
-        html[data-filtertube-mobile-surface="true"][data-filtertube-route-home="true"] ytm-media-item:not([data-filtertube-short="true"]) h3,
-        html[data-filtertube-mobile-surface="true"][data-filtertube-route-home="true"] ytm-rich-item-renderer:not([data-filtertube-short="true"]) h3,
-        html[data-filtertube-mobile-surface="true"][data-filtertube-route-home="true"] ytm-video-with-context-renderer:not([data-filtertube-short="true"]) .compact-media-item-headline,
-        html[data-filtertube-mobile-surface="true"][data-filtertube-route-home="true"] ytm-compact-video-renderer:not([data-filtertube-short="true"]) .compact-media-item-headline,
-        html[data-filtertube-mobile-surface="true"][data-filtertube-route-home="true"] ytm-media-item:not([data-filtertube-short="true"]) .compact-media-item-headline,
-        html[data-filtertube-mobile-surface="true"][data-filtertube-route-home="true"] :not([data-filtertube-short="true"]) > .yt-lockup-metadata-view-model__title {
-            font-size: 13px !important;
-            line-height: 1.28 !important;
-            letter-spacing: 0 !important;
-            overflow-wrap: anywhere !important;
-        }
-
-        html[data-filtertube-mobile-surface="true"][data-filtertube-route-home="true"] ytm-video-with-context-renderer .subhead,
-        html[data-filtertube-mobile-surface="true"][data-filtertube-route-home="true"] ytm-compact-video-renderer .subhead,
-        html[data-filtertube-mobile-surface="true"][data-filtertube-route-home="true"] ytm-media-item .subhead,
-        html[data-filtertube-mobile-surface="true"][data-filtertube-route-home="true"] ytm-badge-and-byline-renderer,
-        html[data-filtertube-mobile-surface="true"][data-filtertube-route-home="true"] .yt-lockup-metadata-view-model__metadata {
-            display: flex !important;
-            flex-direction: column !important;
-            align-items: flex-start !important;
-            gap: 2px !important;
-            min-width: 0 !important;
-            max-width: 100% !important;
-        }
-
-        html[data-filtertube-mobile-surface="true"][data-filtertube-route-home="true"] ytm-video-with-context-renderer .YtmCompactMediaItemByline,
-        html[data-filtertube-mobile-surface="true"][data-filtertube-route-home="true"] ytm-compact-video-renderer .YtmCompactMediaItemByline,
-        html[data-filtertube-mobile-surface="true"][data-filtertube-route-home="true"] ytm-media-item .YtmCompactMediaItemByline,
-        html[data-filtertube-mobile-surface="true"][data-filtertube-route-home="true"] ytm-media-item .compact-media-item-byline,
-        html[data-filtertube-mobile-surface="true"][data-filtertube-route-home="true"] .yt-content-metadata-view-model__metadata-row,
-        html[data-filtertube-mobile-surface="true"][data-filtertube-route-home="true"] .yt-lockup-metadata-view-model__metadata .yt-core-attributed-string {
-            display: block !important;
-            width: 100% !important;
-            max-width: 100% !important;
-            min-width: 0 !important;
-            white-space: normal !important;
-            overflow: visible !important;
-            text-overflow: clip !important;
-        }
-
-        html[data-filtertube-mobile-surface="true"][data-filtertube-route-home="true"] ytm-video-with-context-renderer .YtmCompactMediaItemByline:first-child,
-        html[data-filtertube-mobile-surface="true"][data-filtertube-route-home="true"] ytm-compact-video-renderer .YtmCompactMediaItemByline:first-child,
-        html[data-filtertube-mobile-surface="true"][data-filtertube-route-home="true"] ytm-media-item .YtmCompactMediaItemByline:first-child,
-        html[data-filtertube-mobile-surface="true"][data-filtertube-route-home="true"] ytm-media-item .compact-media-item-byline:first-child,
-        html[data-filtertube-mobile-surface="true"][data-filtertube-route-home="true"] .yt-content-metadata-view-model__metadata-row:first-child {
-            color: var(--yt-spec-text-primary, currentColor) !important;
-        }
-
         html[data-filtertube-mobile-surface="true"][data-filtertube-route-home="true"] [data-filtertube-channel-row-clickable="true"] {
-            min-height: 44px !important;
-            width: 100% !important;
-            display: flex !important;
-            flex-direction: column !important;
-            align-items: flex-start !important;
-            justify-content: center !important;
-            gap: 2px !important;
-            max-width: 100% !important;
-            min-width: 0 !important;
             cursor: pointer !important;
-            border-radius: 8px !important;
-            padding: 2px 0 !important;
             touch-action: manipulation !important;
             -webkit-tap-highlight-color: rgba(0, 0, 0, 0.08) !important;
         }
@@ -3668,163 +3795,12 @@ function installFilterTubeHomeFeedPolish() {
             opacity: 0.72 !important;
         }
 
-        html[data-filtertube-mobile-surface="true"][data-filtertube-route-home="true"] ytm-video-with-context-renderer .YtmCompactMediaItemByline:not(:first-child),
-        html[data-filtertube-mobile-surface="true"][data-filtertube-route-home="true"] ytm-compact-video-renderer .YtmCompactMediaItemByline:not(:first-child),
-        html[data-filtertube-mobile-surface="true"][data-filtertube-route-home="true"] ytm-media-item .YtmCompactMediaItemByline:not(:first-child),
-        html[data-filtertube-mobile-surface="true"][data-filtertube-route-home="true"] ytm-media-item .compact-media-item-byline:not(:first-child),
-        html[data-filtertube-mobile-surface="true"][data-filtertube-route-home="true"] .yt-content-metadata-view-model__metadata-row:not(:first-child) {
-            opacity: 0.84 !important;
-        }
-
-        html[data-filtertube-mobile-surface="true"][data-filtertube-route-home="true"] ytm-video-with-context-renderer .subhead,
-        html[data-filtertube-mobile-surface="true"][data-filtertube-route-home="true"] ytm-compact-video-renderer .subhead,
-        html[data-filtertube-mobile-surface="true"][data-filtertube-route-home="true"] ytm-media-item .subhead,
-        html[data-filtertube-mobile-surface="true"][data-filtertube-route-home="true"] ytm-video-with-context-renderer .details,
-        html[data-filtertube-mobile-surface="true"][data-filtertube-route-home="true"] ytm-compact-video-renderer .details,
-        html[data-filtertube-mobile-surface="true"][data-filtertube-route-home="true"] ytm-media-item .details,
-        html[data-filtertube-mobile-surface="true"][data-filtertube-route-home="true"] ytm-video-with-context-renderer .metadata,
-        html[data-filtertube-mobile-surface="true"][data-filtertube-route-home="true"] ytm-compact-video-renderer .metadata,
-        html[data-filtertube-mobile-surface="true"][data-filtertube-route-home="true"] ytm-media-item .metadata,
-        html[data-filtertube-mobile-surface="true"][data-filtertube-route-home="true"] .yt-lockup-metadata-view-model__metadata,
-        html[data-filtertube-mobile-surface="true"][data-filtertube-route-home="true"] #metadata-line {
-            font-size: 11.2px !important;
-            line-height: 1.34 !important;
-            white-space: normal !important;
-            overflow: visible !important;
-            text-overflow: clip !important;
-            letter-spacing: 0 !important;
-        }
-
-        html[data-filtertube-mobile-surface="true"][data-filtertube-route-home="true"] .filtertube-home-byline-split {
-            display: flex !important;
-            flex-direction: column !important;
-            align-items: flex-start !important;
-            gap: 1px !important;
-            width: 100% !important;
-            min-width: 0 !important;
-            max-width: 100% !important;
-            white-space: normal !important;
-        }
-
-        html[data-filtertube-mobile-surface="true"][data-filtertube-route-home="true"] .filtertube-home-inline-byline-text {
-            display: flex !important;
-            flex-direction: column !important;
-            align-items: flex-start !important;
-            gap: 1px !important;
-            width: 100% !important;
-            min-width: 0 !important;
-            max-width: 100% !important;
-            white-space: normal !important;
-        }
-
-        html[data-filtertube-mobile-surface="true"][data-filtertube-route-home="true"] .filtertube-home-channel-line {
-            max-width: 100% !important;
-            display: -webkit-box !important;
-            -webkit-box-orient: vertical !important;
-            -webkit-line-clamp: 1 !important;
-            color: var(--yt-spec-text-primary, currentColor) !important;
-            font-size: 12px !important;
-            line-height: 1.28 !important;
-            overflow: hidden !important;
-            text-overflow: ellipsis !important;
-            white-space: normal !important;
-            overflow-wrap: anywhere !important;
-        }
-
-        html[data-filtertube-mobile-surface="true"][data-filtertube-route-home="true"] .filtertube-home-meta-line {
-            max-width: 100% !important;
-            display: -webkit-box !important;
-            -webkit-box-orient: vertical !important;
-            -webkit-line-clamp: 2 !important;
-            color: var(--yt-spec-text-secondary, currentColor) !important;
-            font-size: 11px !important;
-            line-height: 1.28 !important;
-            overflow: hidden !important;
-            text-overflow: ellipsis !important;
-            white-space: normal !important;
-            overflow-wrap: anywhere !important;
-            opacity: 0.86 !important;
-        }
-
-        html[data-filtertube-mobile-surface="true"][data-filtertube-route-home="true"] ytm-post-renderer,
-        html[data-filtertube-mobile-surface="true"][data-filtertube-route-home="true"] ytm-backstage-post-renderer,
-        html[data-filtertube-mobile-surface="true"][data-filtertube-route-home="true"] ytm-backstage-post-thread-renderer,
-        html[data-filtertube-mobile-surface="true"][data-filtertube-route-home="true"] .ytmBackstagePostRendererHost,
-        html[data-filtertube-mobile-surface="true"][data-filtertube-route-home="true"] .ytmBackstagePostThreadRendererHost,
-        html[data-filtertube-mobile-surface="true"][data-filtertube-route-home="true"] ytd-post-renderer {
-            display: block !important;
-            padding: 10px 12px 12px !important;
-            margin: 8px 0 !important;
-            border-radius: 14px !important;
-            background: var(--yt-spec-base-background, Canvas) !important;
-            box-sizing: border-box !important;
-            overflow: hidden !important;
-        }
-
-        html[data-filtertube-mobile-surface="true"][data-filtertube-route-home="true"] ytm-post-renderer #home-content-text,
-        html[data-filtertube-mobile-surface="true"][data-filtertube-route-home="true"] ytm-post-renderer #content-text,
-        html[data-filtertube-mobile-surface="true"][data-filtertube-route-home="true"] ytm-backstage-post-renderer #home-content-text,
-        html[data-filtertube-mobile-surface="true"][data-filtertube-route-home="true"] ytm-backstage-post-renderer #content-text,
-        html[data-filtertube-mobile-surface="true"][data-filtertube-route-home="true"] ytm-backstage-post-renderer .ytmBackstagePostRendererHostContentText,
-        html[data-filtertube-mobile-surface="true"][data-filtertube-route-home="true"] ytm-backstage-post-thread-renderer .ytmBackstagePostRendererHostContentText,
-        html[data-filtertube-mobile-surface="true"][data-filtertube-route-home="true"] .ytmBackstagePostRendererHost .ytmBackstagePostRendererHostContentText,
-        html[data-filtertube-mobile-surface="true"][data-filtertube-route-home="true"] .ytmBackstagePostThreadRendererHost .ytmBackstagePostRendererHostContentText,
-        html[data-filtertube-mobile-surface="true"][data-filtertube-route-home="true"] .ytmBackstagePostRendererHostContentText,
-        html[data-filtertube-mobile-surface="true"][data-filtertube-route-home="true"] ytd-post-renderer #home-content-text,
-        html[data-filtertube-mobile-surface="true"][data-filtertube-route-home="true"] ytd-post-renderer #content-text {
-            font-size: 13px !important;
-            line-height: 1.38 !important;
-            letter-spacing: 0 !important;
-            color: var(--yt-spec-text-primary, currentColor) !important;
-            overflow-wrap: anywhere !important;
-        }
-
-        html[data-filtertube-mobile-surface="true"][data-filtertube-route-home="true"] ytm-post-renderer img,
-        html[data-filtertube-mobile-surface="true"][data-filtertube-route-home="true"] ytm-backstage-post-renderer img,
-        html[data-filtertube-mobile-surface="true"][data-filtertube-route-home="true"] ytm-backstage-post-thread-renderer img,
-        html[data-filtertube-mobile-surface="true"][data-filtertube-route-home="true"] .ytmBackstagePostRendererHost img,
-        html[data-filtertube-mobile-surface="true"][data-filtertube-route-home="true"] .ytmBackstagePostThreadRendererHost img,
-        html[data-filtertube-mobile-surface="true"][data-filtertube-route-home="true"] ytd-post-renderer img {
-            border-radius: 12px !important;
-        }
-
         html[data-filtertube-mobile-surface="true"][data-filtertube-route-home="true"] ytm-chip-cloud-renderer,
         html[data-filtertube-mobile-surface="true"][data-filtertube-route-home="true"] ytm-feed-filter-chip-bar-renderer,
         html[data-filtertube-mobile-surface="true"][data-filtertube-route-home="true"] yt-chip-cloud-renderer,
         html[data-filtertube-mobile-surface="true"][data-filtertube-route-home="true"] ytd-feed-filter-chip-bar-renderer {
-            transition: transform 160ms ease, opacity 160ms ease !important;
-            will-change: transform, opacity !important;
-        }
-
-        html[data-filtertube-home-chip-rail-reveal="true"][data-filtertube-mobile-surface="true"][data-filtertube-route-home="true"] ytm-chip-cloud-renderer,
-        html[data-filtertube-home-chip-rail-reveal="true"][data-filtertube-mobile-surface="true"][data-filtertube-route-home="true"] ytm-feed-filter-chip-bar-renderer,
-        html[data-filtertube-home-chip-rail-reveal="true"][data-filtertube-mobile-surface="true"][data-filtertube-route-home="true"] yt-chip-cloud-renderer,
-        html[data-filtertube-home-chip-rail-reveal="true"][data-filtertube-mobile-surface="true"][data-filtertube-route-home="true"] ytd-feed-filter-chip-bar-renderer {
-            position: fixed !important;
-            top: 0 !important;
-            left: 0 !important;
-            right: 0 !important;
-            width: 100vw !important;
-            max-width: 100vw !important;
-            z-index: 1200 !important;
-            opacity: 1 !important;
-            transform: translateY(0) !important;
-            box-sizing: border-box !important;
-            padding: 8px 12px !important;
-            background: var(--yt-spec-base-background, Canvas) !important;
-            box-shadow: 0 8px 24px rgba(15, 23, 42, 0.18) !important;
-            backdrop-filter: saturate(1.25) blur(14px) !important;
-            -webkit-backdrop-filter: saturate(1.25) blur(14px) !important;
-        }
-
-        html[data-filtertube-home-chip-rail-reveal="true"][data-filtertube-mobile-surface="true"][data-filtertube-route-home="true"] ytm-chip-cloud-chip-renderer,
-        html[data-filtertube-home-chip-rail-reveal="true"][data-filtertube-mobile-surface="true"][data-filtertube-route-home="true"] yt-chip-cloud-chip-renderer,
-        html[data-filtertube-home-chip-rail-reveal="true"][data-filtertube-mobile-surface="true"][data-filtertube-route-home="true"] chip-shape,
-        html[data-filtertube-home-chip-rail-reveal="true"][data-filtertube-mobile-surface="true"][data-filtertube-route-home="true"] chip-shape button,
-        html[data-filtertube-home-chip-rail-reveal="true"][data-filtertube-mobile-surface="true"][data-filtertube-route-home="true"] ytm-chip-cloud-chip-renderer button,
-        html[data-filtertube-home-chip-rail-reveal="true"][data-filtertube-mobile-surface="true"][data-filtertube-route-home="true"] yt-chip-cloud-chip-renderer button {
-            min-height: 44px !important;
-            align-items: center !important;
+            transition: none !important;
+            will-change: auto !important;
         }`;
         document.head?.appendChild(style);
     } catch (e) {
@@ -4087,12 +4063,26 @@ function applyFilterTubeHomeChannelTapTargets() {
             try {
                 const href = getFilterTubeChannelHrefFromCard(card);
                 const row = getFilterTubeHomeChannelRow(card);
-                getFilterTubeHomeBylineRows(card).forEach(splitFilterTubeHomeCombinedByline);
-                cleanFilterTubeHomeVideoTitle(card);
                 if (!row) return;
-                splitFilterTubeHomeCombinedByline(row);
-                cleanFilterTubeHomeVideoTitle(card);
-                if (!href) return;
+                const getPolishSignature = () => [
+                    href,
+                    row.getAttribute('data-filtertube-channel-label') || '',
+                    row.textContent || ''
+                ].map(value => normalizeFilterTubeHomeText(String(value || ''))).join('\u0001');
+                if (card.getAttribute('data-filtertube-home-polish-signature') === getPolishSignature()) {
+                    return;
+                }
+                // Home cards are still being laid out when YouTube hydrates a
+                // feed batch. Only annotate the existing row here; rewriting
+                // its text or child tree makes the card reflow after paint.
+                if (!href) {
+                    row.removeAttribute('data-filtertube-channel-row-clickable');
+                    row.removeAttribute('data-filtertube-channel-href');
+                    row.removeAttribute('role');
+                    row.removeAttribute('tabindex');
+                    card.setAttribute('data-filtertube-home-polish-signature', getPolishSignature());
+                    return;
+                }
                 row.setAttribute('data-filtertube-channel-row-clickable', 'true');
                 row.setAttribute('data-filtertube-channel-href', href);
                 row.setAttribute('role', 'link');
@@ -4104,6 +4094,7 @@ function applyFilterTubeHomeChannelTapTargets() {
                     ''
                 ).replace(/\s+/g, ' ').trim();
                 if (label) row.setAttribute('aria-label', `Open ${label} channel`);
+                card.setAttribute('data-filtertube-home-polish-signature', getPolishSignature());
             } catch (e) {
             }
         });
@@ -4226,28 +4217,11 @@ function restoreFilterTubeHomeChipRailPosition() {
             try {
                 const scroller = getFilterTubeHorizontalScroller(rail);
                 if (scroller && Number.isFinite(state.chipScrollLeft)) {
-                    scroller.scrollLeft = state.chipScrollLeft;
-                }
-                const selectedChip = rail.querySelector?.(
-                    'yt-chip-cloud-chip-renderer[selected], ' +
-                    'ytm-chip-cloud-chip-renderer[selected], ' +
-                    'yt-chip-cloud-chip-renderer[aria-selected="true"], ' +
-                    'ytm-chip-cloud-chip-renderer[aria-selected="true"], ' +
-                    '[role="tab"][aria-selected="true"], ' +
-                    'chip-shape[aria-selected="true"]'
-                );
-                const rememberedLabel = (state.selectedChipLabel || '').toLowerCase();
-                const rememberedChip = rememberedLabel ? Array.from(rail.querySelectorAll(
-                    'yt-chip-cloud-chip-renderer, ytm-chip-cloud-chip-renderer, [role="tab"], chip-shape'
-                )).find(chip => normalizeFilterTubeHomeChipLabel(chip).toLowerCase() === rememberedLabel) : null;
-                const targetChip = selectedChip || rememberedChip;
-                if (targetChip && Number.isFinite(state.chipScrollLeft) && scroller) {
-                    scroller.scrollLeft = state.chipScrollLeft;
-                }
-                targetChip?.scrollIntoView?.({ block: 'nearest', inline: 'nearest' });
-                if (scroller && Number.isFinite(state.chipScrollLeft)) {
                     const current = Number(scroller.scrollLeft) || 0;
-                    if (Math.abs(current - state.chipScrollLeft) > 48) {
+                    // Keep this restoration horizontal-only. scrollIntoView() also
+                    // changes the document's vertical scroll position and fights
+                    // YouTube's scroll anchoring while infinite-scroll batches land.
+                    if (Math.abs(current - state.chipScrollLeft) > 1) {
                         scroller.scrollLeft = state.chipScrollLeft;
                     }
                 }
@@ -4263,13 +4237,10 @@ function scheduleFilterTubeHomeChipRailRestore() {
         if (!isFilterTubeHomeRoute()) return;
         const state = window.__filtertubeHomeChipRailState || (window.__filtertubeHomeChipRailState = {});
         if (state.restoreTimer) clearTimeout(state.restoreTimer);
-        restoreFilterTubeHomeChipRailPosition();
         state.restoreTimer = setTimeout(() => {
             state.restoreTimer = 0;
             restoreFilterTubeHomeChipRailPosition();
-        }, 90);
-        setTimeout(restoreFilterTubeHomeChipRailPosition, 240);
-        setTimeout(restoreFilterTubeHomeChipRailPosition, 520);
+        }, 120);
     } catch (e) {
     }
 }
@@ -4279,6 +4250,7 @@ function installFilterTubeHomeChipRailReveal() {
         const root = document.documentElement;
         if (!root || root.hasAttribute('data-filtertube-home-chip-rail-bound')) return;
         root.setAttribute('data-filtertube-home-chip-rail-bound', 'true');
+        const chipRailSelector = 'ytm-chip-cloud-renderer, ytm-feed-filter-chip-bar-renderer, yt-chip-cloud-renderer, ytd-feed-filter-chip-bar-renderer';
         const state = window.__filtertubeHomeChipRailState || (window.__filtertubeHomeChipRailState = {
             lastTop: 0,
             hideTimer: 0
@@ -4329,7 +4301,16 @@ function installFilterTubeHomeChipRailReveal() {
                     }
                     rail.setAttribute('data-filtertube-chip-rail-scroll-bound', 'true');
                 });
-                scheduleFilterTubeHomeChipRailRestore();
+            } catch (e) {
+            }
+        };
+        const scheduleChipRailBinding = () => {
+            try {
+                if (!isFilterTubeHomeRoute() || state.bindTimer) return;
+                state.bindTimer = setTimeout(() => {
+                    state.bindTimer = 0;
+                    bindChipRailScrollMemory();
+                }, 100);
             } catch (e) {
             }
         };
@@ -4366,16 +4347,38 @@ function installFilterTubeHomeChipRailReveal() {
         window.addEventListener('scroll', update, { passive: true, capture: true });
         document.addEventListener('touchmove', update, { passive: true, capture: true });
         try {
-            const observer = new MutationObserver(() => {
-                bindChipRailScrollMemory();
+            const observer = new MutationObserver((mutations = []) => {
+                // YouTube appends/recycles many nodes per feed batch. Do not
+                // schedule a chip pass for ordinary card insertions; only a
+                // mutation inside/replacing the chip rail can require rebinding.
+                const touchesChipRail = mutations.some(mutation => {
+                    const target = mutation?.target;
+                    try {
+                        if (target?.nodeType === 1 && (
+                            target.matches?.(chipRailSelector) ||
+                            target.closest?.(chipRailSelector)
+                        )) {
+                            return true;
+                        }
+                    } catch (e) {
+                    }
+                    for (const node of [...(mutation?.addedNodes || []), ...(mutation?.removedNodes || [])]) {
+                        if (!node || node.nodeType !== 1) continue;
+                        try {
+                            if (node.matches?.(chipRailSelector) || node.querySelector?.(chipRailSelector)) return true;
+                        } catch (e) {
+                        }
+                    }
+                    return false;
+                });
+                if (touchesChipRail) scheduleChipRailBinding();
             });
             observer.observe(document.documentElement, { childList: true, subtree: true });
             state.chipRailObserver = observer;
         } catch (e) {
         }
         bindChipRailScrollMemory();
-        setTimeout(bindChipRailScrollMemory, 120);
-        setTimeout(bindChipRailScrollMemory, 360);
+        scheduleChipRailBinding();
     } catch (e) {
     }
 }
@@ -4392,15 +4395,6 @@ function applyFilterTubeHomeFeedPolish() {
     installFilterTubeHomeChannelTapTargetHandler();
     installFilterTubeHomeChipRailReveal();
     applyFilterTubeHomeChannelTapTargets();
-    restoreFilterTubeHomeChipRailPosition();
-    try {
-        setTimeout(applyFilterTubeHomeChannelTapTargets, 80);
-        setTimeout(applyFilterTubeHomeChannelTapTargets, 240);
-        setTimeout(restoreFilterTubeHomeChipRailPosition, 80);
-        setTimeout(restoreFilterTubeHomeChipRailPosition, 240);
-        setTimeout(restoreFilterTubeHomeChipRailPosition, 520);
-    } catch (e) {
-    }
 }
 
 // DOM fallback function that processes already-rendered content
@@ -4427,7 +4421,14 @@ async function applyDOMFallback(settings, options = {}) {
     }
     runState.running = true;
 
-    const yieldToMain = () => new Promise(resolve => setTimeout(resolve, 0));
+    const yieldToMain = () => {
+        // Home feed cards are laid out in a compacting grid. A timer yield lets
+        // the browser paint after every chunk of hides, so the surviving cards
+        // visibly move several times. Keep Home filtering in one render turn;
+        // retain timer yields on heavier non-Home surfaces.
+        if (isFilterTubeHomeRoute()) return Promise.resolve();
+        return new Promise(resolve => setTimeout(resolve, 0));
+    };
 
     try {
 
@@ -4499,6 +4500,8 @@ async function applyDOMFallback(settings, options = {}) {
     const scrollingElement = document.scrollingElement || document.documentElement || document.body;
     const previousScrollTop = scrollingElement ? scrollingElement.scrollTop : window.pageYOffset;
     const previousScrollLeft = scrollingElement ? scrollingElement.scrollLeft : window.pageXOffset;
+    const previousScrollHeight = scrollingElement ? Number(scrollingElement.scrollHeight) || 0 : 0;
+    const previousClientHeight = scrollingElement ? Number(scrollingElement.clientHeight) || 0 : 0;
 
     try {
         const path = document.location?.pathname || '';
@@ -6142,7 +6145,13 @@ async function applyDOMFallback(settings, options = {}) {
                         } else if (condition === 'shorter') {
                             hideByDuration = durationMinutes < min;
                         } else if (max > 0) {
-                            hideByDuration = durationMinutes < min || durationMinutes > max;
+                            const insideRange = durationMinutes >= min && durationMinutes <= max;
+                            // FilterTube's normal/default behavior is "only
+                            // between" (hide outside). BlockTube imports set
+                            // mode=block to hide videos inside the range.
+                            hideByDuration = durationSettings.mode === 'block'
+                                ? insideRange
+                                : !insideRange;
                         }
                     }
                 }
@@ -7097,7 +7106,19 @@ async function applyDOMFallback(settings, options = {}) {
     } catch (e) {
     }
 
-    if (allowPreserveScroll && scrollingElement) {
+    const currentScrollHeight = scrollingElement ? Number(scrollingElement.scrollHeight) || 0 : 0;
+    const currentClientHeight = scrollingElement ? Number(scrollingElement.clientHeight) || 0 : 0;
+    const layoutChangedDuringRun = Boolean(
+        filterTubeHiddenRowsThisRun > 0 ||
+        (previousScrollHeight > 0 && Math.abs(currentScrollHeight - previousScrollHeight) > 4) ||
+        (previousClientHeight > 0 && Math.abs(currentClientHeight - previousClientHeight) > 4)
+    );
+
+    // When filtering changed the page height, let the browser's scroll anchoring
+    // keep the user's viewport with the surviving cards. Re-applying the old
+    // absolute offset here makes the grid visibly jump after YouTube compacts a
+    // newly loaded batch.
+    if (allowPreserveScroll && scrollingElement && !layoutChangedDuringRun) {
         const didScrollDuringRun = (scrollState.lastScrollTs || 0) > runStartedAt;
         const now2 = Date.now();
         const isUserScrollingNow = now2 - (scrollState.lastScrollTs || 0) < 150;
@@ -7454,7 +7475,7 @@ function shouldHideContent(title, channel, settings, options = {}) {
         if (isPlaylistPanelItem) {
             const index = getCompiledChannelFilterIndex(settings);
             const candidate = normalizeChannelNameForComparison(channel);
-            if (index && candidate && index.names.has(candidate)) {
+            if (index && candidate && channelMetaMatchesIndex({ name: channel }, index, settings.channelMap || {})) {
                 return true;
             }
         }

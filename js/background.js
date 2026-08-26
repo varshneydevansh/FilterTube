@@ -793,6 +793,23 @@ function isProfileSessionAuthorized(profilesV4, profileId) {
     return true;
 }
 
+// Imported metadata may be written to a child profile while its parent/account
+// profile is the active, already-authorized profile. This is narrower than a
+// general profile mutation: the actor must be the active account/parent and
+// the target must be that actor's child (or the active profile itself).
+function canActiveProfileManageEnrichmentTarget(profilesV4, targetProfileId) {
+    const activeId = normalizeString(profilesV4?.activeProfileId) || DEFAULT_PROFILE_ID;
+    const targetId = normalizeString(targetProfileId);
+    if (!targetId || targetId === activeId) return true;
+    const profiles = safeObject(profilesV4?.profiles);
+    const activeProfile = safeObject(profiles[activeId]);
+    const targetProfile = safeObject(profiles[targetId]);
+    if (!profiles[activeId] || !profiles[targetId]) return false;
+    if (activeProfile.type === 'child') return false;
+    return activeId === DEFAULT_PROFILE_ID
+        || normalizeString(targetProfile.parentProfileId) === activeId;
+}
+
 function getSessionPinFailedAttemptState(profileId, now = Date.now(), profilesV4 = null) {
     const id = normalizeString(profileId) || DEFAULT_PROFILE_ID;
     const existing = safeObject(sessionPinFailedAttempts.get(id));
@@ -1215,6 +1232,97 @@ function cloneJsonValue(value) {
     }
 }
 
+const METADATA_ONLY_CHANNEL_REFRESH_FIELDS = [
+    'name',
+    'handle',
+    'handleDisplay',
+    'canonicalHandle',
+    'logo',
+    'customUrl',
+    'topicChannel',
+    'managedListId',
+    'managedListName',
+    'managedListSourceLabel',
+    'managedListSourceUrl',
+    'managedListSourceFormat',
+    'managedListImportedAt',
+    'managedListLastCheckedAt',
+    'managedListContentHash',
+    'managedListSourceTitle',
+    'managedListSourceVersion',
+    'managedListSourceUpdatedLabel',
+    'managedListSourceHomepage'
+];
+
+function stripMetadataOnlyChannelFields(value) {
+    if (!value || typeof value !== 'object') return value;
+    if (Array.isArray(value)) return value.map(stripMetadataOnlyChannelFields);
+
+    const output = { ...value };
+    const id = normalizeString(output.id);
+    if (/^UC[a-zA-Z0-9_-]{22}$/.test(id)) {
+        METADATA_ONLY_CHANNEL_REFRESH_FIELDS.forEach((field) => {
+            // A Filter All channel derives a keyword from its name. Keep that
+            // name in the comparison so this semantic change still refreshes
+            // YouTube instead of being mistaken for avatar metadata.
+            if (field === 'name' && output.filterAll === true) return;
+            delete output[field];
+        });
+    }
+    return output;
+}
+
+function stripMetadataOnlyChannelLists(value) {
+    const cloned = cloneJsonValue(value);
+    if (cloned == null && value != null) return value;
+    if (Array.isArray(cloned)) return cloned.map(stripMetadataOnlyChannelFields);
+    if (!cloned || typeof cloned !== 'object') return cloned;
+
+    if (Array.isArray(cloned.filterChannels)) {
+        cloned.filterChannels = cloned.filterChannels.map(stripMetadataOnlyChannelFields);
+    }
+    const profiles = cloned.profiles && typeof cloned.profiles === 'object' && !Array.isArray(cloned.profiles)
+        ? cloned.profiles
+        : {};
+    Object.values(profiles).forEach((profile) => {
+        if (!profile || typeof profile !== 'object') return;
+        [profile, profile.main, profile.kids].forEach((surface) => {
+            if (!surface || typeof surface !== 'object') return;
+            ['channels', 'blockedChannels', 'whitelistChannels', 'allowedChannels'].forEach((key) => {
+                if (Array.isArray(surface[key])) {
+                    surface[key] = surface[key].map(stripMetadataOnlyChannelFields);
+                }
+            });
+        });
+    });
+    return cloned;
+}
+
+function isMetadataOnlyChannelListChange(change) {
+    if (!change
+        || !Object.prototype.hasOwnProperty.call(change, 'oldValue')
+        || !Object.prototype.hasOwnProperty.call(change, 'newValue')) {
+        return false;
+    }
+    try {
+        return JSON.stringify(stripMetadataOnlyChannelLists(change.oldValue))
+            === JSON.stringify(stripMetadataOnlyChannelLists(change.newValue));
+    } catch (e) {
+        return false;
+    }
+}
+
+function isMetadataOnlySettingsChange(changes) {
+    const keys = Object.keys(changes || {});
+    if (!keys.length) return false;
+    const allowedKeys = new Set(['ftProfilesV4', 'filterChannels', 'uiChannels', 'channelMap']);
+    if (keys.some(key => !allowedKeys.has(key))) return false;
+    if (!changes.ftProfilesV4 && !changes.filterChannels) return false;
+    if (changes.ftProfilesV4 && !isMetadataOnlyChannelListChange(changes.ftProfilesV4)) return false;
+    if (changes.filterChannels && !isMetadataOnlyChannelListChange(changes.filterChannels)) return false;
+    return true;
+}
+
 function normalizeSelfControlSession(value, now = Date.now()) {
     const raw = safeObject(value);
     if (normalizeString(raw.schema) !== SELF_CONTROL_SESSION_SCHEMA || raw.version !== 1) return null;
@@ -1569,8 +1677,17 @@ function applyAdvertVoidDefaultMigrationOnce() {
 }
 
 function schedulePostBlockEnrichment(channel, profile = 'main', metadata = {}) {
-    const source = typeof metadata?.source === 'string' ? metadata.source : '';
-    if (source === 'postBlockEnrichment') return;
+    const source = typeof metadata?.source === 'string' ? metadata.source.trim() : '';
+    const normalizedSource = source.toLowerCase();
+    const importedSource = normalizedSource === 'import'
+        || normalizedSource === 'managed_channel_list'
+        || normalizedSource === 'blocktube'
+        || normalizedSource === 'blocktube-channel-name';
+    // Imported-list work is explicitly paced by StateManager's persisted
+    // queue. Do not let an import task also enter the ordinary post-block
+    // queue, otherwise one imported ID would schedule a second lookup at the
+    // normal 3.5s cadence.
+    if (source === 'postBlockEnrichment' || metadata?.enrichmentFromImport === true || importedSource || normalizedSource === 'postblockenrichment') return;
 
     const topicFlag = channel?.topicChannel === true || metadata?.topicChannel === true;
     if (topicFlag) return;
@@ -3695,6 +3812,7 @@ async function getCompiledSettings(sender = null, profileType = null, forceRefre
                     if (handle.startsWith('@')) return true;
                     if (customUrl.startsWith('c/') || customUrl.startsWith('user/')) return true;
                     if (originalInput.startsWith('watch:')) return true;
+                    if (ch.source === 'blocktube-channel-name' && (originalInput || typeof ch.name === 'string')) return true;
 
                     console.warn('FilterTube Background: Dropping invalid channel entry missing id/handle/customUrl', ch);
                     return false;
@@ -5961,6 +6079,7 @@ browserAPI.storage.onChanged.addListener((changes, area) => {
                 break;
             }
         }
+        const metadataOnlyChange = isMetadataOnlySettingsChange(changes);
 
         if (settingsChanged) {
             console.log('FilterTube Background: Settings changed, invalidating caches and re-compiling.');
@@ -5971,7 +6090,10 @@ browserAPI.storage.onChanged.addListener((changes, area) => {
             // Content scripts will re-request via their own onChanged listeners.
             getCompiledSettings({ url: 'https://www.youtube.com/' });
             getCompiledSettings({ url: 'https://www.youtubekids.com/' });
-            refreshYouTubeTabs();
+            // Metadata-only channel enrichment changes the dashboard row but
+            // does not change the already-blocking UC rule. Refreshing every
+            // YouTube tab here would make Home repaint/reflow once per lookup.
+            if (!metadataOnlyChange) refreshYouTubeTabs();
         }
     }
 });
@@ -6698,30 +6820,48 @@ browserAPI.runtime.onMessage.addListener((message, sender, sendResponse) => {
     if (message.type === 'addFilteredChannel') {
         const targetProfile = message.profile || 'main';
         const targetListType = message.listType === 'whitelist' ? 'whitelist' : 'blocklist';
+        const enrichmentMetadata = {
+            displayHandle: message.displayHandle,
+            canonicalHandle: message.canonicalHandle,
+            channelName: message.channelName,
+            channelLogo: message.channelLogo,
+            videoTitleHint: message.videoTitleHint,
+            expectedChannelName: message.expectedChannelName,
+            lowConfidenceExpectedName: message.lowConfidenceExpectedName === true,
+            customUrl: message.customUrl,
+            source: message.source || null
+        };
+        if (Array.isArray(message.alternateIds) && message.alternateIds.length > 0) {
+            enrichmentMetadata.alternateIds = message.alternateIds;
+        }
+        if (message.enrichmentFromImport === true) {
+            enrichmentMetadata.enrichmentFromImport = true;
+        }
+        const targetProfileId = typeof message.targetProfileId === 'string'
+            ? message.targetProfileId.trim()
+            : '';
+        if (targetProfileId) {
+            enrichmentMetadata.targetProfileId = targetProfileId;
+        }
+        const actorProfileId = typeof message.actorProfileId === 'string'
+            ? message.actorProfileId.trim()
+            : '';
+        if (actorProfileId) {
+            enrichmentMetadata.actorProfileId = actorProfileId;
+        }
 
         handleAddFilteredChannel(
             message.input,
             message.filterAll,
             message.collaborationWith,
             message.collaborationGroupId,
-            {
-                displayHandle: message.displayHandle,
-                canonicalHandle: message.canonicalHandle,
-                channelName: message.channelName,
-                channelLogo: message.channelLogo,
-                videoTitleHint: message.videoTitleHint,
-                expectedChannelName: message.expectedChannelName,
-                lowConfidenceExpectedName: message.lowConfidenceExpectedName === true,
-                customUrl: message.customUrl,
-                alternateIds: Array.isArray(message.alternateIds) ? message.alternateIds : [],
-                source: message.source || null
-            },
+            enrichmentMetadata,
             targetProfile,
             message.videoId || '',
             targetListType
         ).then(result => {
             try {
-                if (result && result.success) {
+                if (result && result.success && message.enrichmentFromImport !== true) {
                     const backupTrigger = targetListType === 'whitelist'
                         ? (targetProfile === 'kids' ? 'kids_whitelist_channel_added' : 'whitelist_channel_added')
                         : (targetProfile === 'kids' ? 'kids_channel_added' : 'channel_added');
@@ -6946,9 +7086,34 @@ async function handleAddFilteredChannel(input, filterAll = false, collaborationW
         }
 
         activeProfileId = typeof profilesV4.activeProfileId === 'string' ? profilesV4.activeProfileId : DEFAULT_PROFILE_ID;
-        if (!isProfileSessionAuthorized(profilesV4, activeProfileId)) {
+        const sessionProfileId = activeProfileId;
+        if (!isProfileSessionAuthorized(profilesV4, sessionProfileId)) {
             return { success: false, error: 'Profile is locked', errorCode: 'profile_locked' };
         }
+
+        const requestedTargetProfileId = normalizeString(metadata?.targetProfileId);
+        const requestedActorProfileId = normalizeString(metadata?.actorProfileId)
+            || requestedTargetProfileId
+            || sessionProfileId;
+        if (requestedActorProfileId !== sessionProfileId) {
+            return {
+                success: false,
+                error: 'The active profile changed before channel enrichment completed',
+                errorCode: 'target_profile_changed'
+            };
+        }
+        if (
+            requestedTargetProfileId
+            && !canActiveProfileManageEnrichmentTarget(profilesV4, requestedTargetProfileId)
+        ) {
+            return {
+                success: false,
+                error: 'The target profile is not managed by the active profile',
+                errorCode: 'target_profile_not_managed'
+            };
+        }
+
+        activeProfileId = requestedTargetProfileId || sessionProfileId;
 
         activeProfile = safeObject(safeObject(profilesV4.profiles)[activeProfileId]);
         activeMain = safeObject(activeProfile.main);
@@ -7213,6 +7378,38 @@ async function handleAddFilteredChannel(input, filterAll = false, collaborationW
             return { success: false, error: channelInfo.error || 'Failed to fetch channel info' };
         }
 
+        // A migration lookup can spend seconds on YouTube before returning.
+        // Re-read the active profile immediately before mutating storage so a
+        // profile switch during that fetch cannot overwrite another profile's
+        // rules with the stale snapshot captured above.
+        if (requestedTargetProfileId) {
+            const latestProfileStorage = await storageGet([FT_PROFILES_V4_KEY]);
+            const latestProfilesV4 = latestProfileStorage?.[FT_PROFILES_V4_KEY];
+            const latestActiveProfileId = normalizeString(latestProfilesV4?.activeProfileId);
+            if (latestActiveProfileId !== requestedActorProfileId) {
+                return {
+                    success: false,
+                    error: 'The active profile changed before channel enrichment completed',
+                    errorCode: 'target_profile_changed'
+                };
+            }
+            if (!isProfileSessionAuthorized(latestProfilesV4, latestActiveProfileId)) {
+                return { success: false, error: 'Profile is locked', errorCode: 'profile_locked' };
+            }
+            if (!canActiveProfileManageEnrichmentTarget(latestProfilesV4, requestedTargetProfileId)) {
+                return {
+                    success: false,
+                    error: 'The target profile is not managed by the active profile',
+                    errorCode: 'target_profile_not_managed'
+                };
+            }
+            profilesV4 = latestProfilesV4;
+            activeProfileId = requestedTargetProfileId;
+            activeProfile = safeObject(safeObject(profilesV4.profiles)[activeProfileId]);
+            activeMain = safeObject(activeProfile.main);
+            activeKids = safeObject(activeProfile.kids);
+        }
+
         // Never persist a channel without a resolved UC ID.
         if (!channelInfo.id || typeof channelInfo.id !== 'string' || !channelInfo.id.toUpperCase().startsWith('UC')) {
             console.warn('FilterTube Background: Refusing to persist channel without UC ID', {
@@ -7306,6 +7503,42 @@ async function handleAddFilteredChannel(input, filterAll = false, collaborationW
         const incomingHandleForMatch = normalizeHandleForMatch(
             channelInfo.handle || channelInfo.canonicalHandle || channelInfo.handleDisplay || ''
         );
+        const normalizeCustomUrlForMatch = (value) => {
+            const normalized = normalizeChannelInput(value);
+            return /^(?:c|user)\/[^\s/?#]+$/i.test(normalized)
+                ? normalized.toLowerCase()
+                : '';
+        };
+        const incomingCustomUrlForMatch = normalizeCustomUrlForMatch(
+            metadata.customUrl
+            || channelInfo.customUrl
+            || ((isCustomUrl || isUserUrl) ? normalizedValue : '')
+        );
+        const isImportedChannelSource = (value) => {
+            const source = typeof value === 'string' ? value.trim().toLowerCase() : '';
+            return source === 'import'
+                || source === 'managed_channel_list'
+                || source === 'blocktube'
+                || source === 'blocktube-channel-name';
+        };
+        const isImportedPlaceholderName = (channel, value) => {
+            const name = String(value || '').trim().toLowerCase();
+            if (!name) return true;
+            const candidates = [
+                channel?.id,
+                channel?.handle,
+                channel?.handleDisplay,
+                channel?.canonicalHandle,
+                channel?.customUrl,
+                channel?.originalInput
+            ].map(item => String(item || '').trim().toLowerCase()).filter(Boolean);
+            return candidates.includes(name)
+                || name.startsWith('@')
+                || name.startsWith('c/')
+                || name.startsWith('user/')
+                || name.includes('youtube.com/')
+                || name.includes('youtu.be/');
+        };
         const existingIndex = channels.findIndex((ch) => {
             if (!ch) return false;
 
@@ -7326,6 +7559,13 @@ async function handleAddFilteredChannel(input, filterAll = false, collaborationW
                 if (incomingIdForMatch && existingIdForMatch && incomingIdForMatch !== existingIdForMatch) {
                     return false;
                 }
+                return true;
+            }
+
+            const existingCustomUrlForMatch = normalizeCustomUrlForMatch(
+                ch.customUrl || ch.originalInput || ''
+            );
+            if (incomingCustomUrlForMatch && existingCustomUrlForMatch === incomingCustomUrlForMatch) {
                 return true;
             }
 
@@ -7397,7 +7637,21 @@ async function handleAddFilteredChannel(input, filterAll = false, collaborationW
                 if (!incomingName) return existingName;
 
                 const existingSource = typeof existing?.source === 'string' ? existing.source.trim() : '';
-                const sameChannelId = existing.id && channelInfo.id && existing.id === channelInfo.id;
+                const existingId = String(existing?.id || '').trim();
+                const incomingResolvedId = String(channelInfo?.id || '').trim();
+                const sameChannelId = Boolean(
+                    existingId
+                    && incomingResolvedId
+                    && existingId.toLowerCase() === incomingResolvedId.toLowerCase()
+                );
+                const existingCustomUrlForMatch = normalizeCustomUrlForMatch(
+                    existing.customUrl || existing.originalInput || ''
+                );
+                const customUrlMatches = Boolean(
+                    incomingCustomUrlForMatch
+                    && existingCustomUrlForMatch
+                    && incomingCustomUrlForMatch === existingCustomUrlForMatch
+                );
                 const canRepairFallbackMenuName = (
                     incomingName
                     && incomingName !== existingName
@@ -7410,31 +7664,47 @@ async function handleAddFilteredChannel(input, filterAll = false, collaborationW
                     normalizeHandleForMatch(existing.handle || existing.canonicalHandle || existing.handleDisplay || '') ||
                     (typeof existing.customUrl === 'string' && existing.customUrl.trim())
                 );
+                const canRepairImportedExistingName = (
+                    incomingName !== existingName
+                    && metadata.enrichmentFromImport === true
+                    && isImportedChannelSource(existingSource)
+                    && (sameChannelId || customUrlMatches || isImportedPlaceholderName(existing, existingName))
+                );
                 const canRepairWeakExistingName = (
                     incomingName !== existingName
                     && sameChannelId
                     && incomingSource === 'postBlockEnrichment'
                     && !existingAltIdentity
+                    && existingName === existingId
                 );
 
                 if (canRepairFallbackMenuName) {
                     return incomingName;
                 }
 
-                if (canRepairWeakExistingName) {
+                if (canRepairImportedExistingName || canRepairWeakExistingName) {
                     return incomingName;
                 }
 
                 return existingName;
             })();
 
+            const existingId = String(existing?.id || '').trim();
+            const incomingResolvedId = String(channelInfo?.id || '').trim();
+            const resolvedPrimaryId = isUcIdLike(existingId)
+                ? existingId
+                : (isUcIdLike(incomingResolvedId) ? incomingResolvedId : (existingId || incomingResolvedId));
             const mergedAlternateIds = normalizeAlternateChannelIds(
-                [...(Array.isArray(existing.alternateIds) ? existing.alternateIds : []), ...incomingAlternateIds],
-                existing.id || channelInfo.id
+                [
+                    ...(Array.isArray(existing.alternateIds) ? existing.alternateIds : []),
+                    ...incomingAlternateIds,
+                    ...(isUcIdLike(existingId) && isUcIdLike(incomingResolvedId) ? [incomingResolvedId] : [])
+                ],
+                resolvedPrimaryId
             );
             const updated = {
                 ...existing,
-                id: existing.id || channelInfo.id,
+                id: resolvedPrimaryId,
                 handle: existing.handle || channelInfo.handle,
                 handleDisplay: (isHandleLike(existing.handleDisplay) ? existing.handleDisplay : '') || channelInfo.handleDisplay || null,
                 canonicalHandle: (isHandleLike(existing.canonicalHandle) ? existing.canonicalHandle : '') || channelInfo.canonicalHandle || null,
@@ -7572,6 +7842,7 @@ async function handleAddFilteredChannel(input, filterAll = false, collaborationW
             existingIndex !== -1 &&
             !finalHasAlternateIdentity &&
             incomingSource !== 'postBlockEnrichment' &&
+            metadata.enrichmentFromImport !== true &&
             finalChannelData?.id &&
             String(finalChannelData.id).toUpperCase().startsWith('UC')
         );
@@ -7621,7 +7892,15 @@ async function handleAddFilteredChannel(input, filterAll = false, collaborationW
             };
         }
 
-        if (didMutateChannelList && isKids) {
+        // V4 is the authoritative per-profile store. A child/managed-profile
+        // enrichment must not project its private channel list into the
+        // legacy global `filterChannels`/V3 mirrors, which cannot represent
+        // profile ownership and could make the parent/default view appear to
+        // change while a child row is being repaired.
+        const shouldWriteLegacyMainProjection = !requestedTargetProfileId
+            || requestedTargetProfileId === DEFAULT_PROFILE_ID;
+
+        if (didMutateChannelList && isKids && shouldWriteLegacyMainProjection) {
             const existingKidsV3 = safeObject(profilesV3.kids);
             profilesV3.kids = {
                 ...existingKidsV3,
@@ -7643,7 +7922,7 @@ async function handleAddFilteredChannel(input, filterAll = false, collaborationW
                     });
                 });
             } catch (e) { }
-        } else if (didMutateChannelList) {
+        } else if (didMutateChannelList && shouldWriteLegacyMainProjection) {
             if (targetListType === 'blocklist') {
                 storageWritePayload.filterChannels = channels;
                 try {

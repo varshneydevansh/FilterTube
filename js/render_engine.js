@@ -1241,6 +1241,8 @@ const RenderEngine = (() => {
 
         // Determine source and target
         const mapping = deriveChannelMapping(channel, state.channelMap);
+        const isBlockTubeNameOnlyRule = channel?.source === 'blocktube-channel-name'
+            && !String(channel?.id || '').trim();
 
         // Source text (what user entered)
         const sourceText = document.createElement('span');
@@ -1265,8 +1267,11 @@ const RenderEngine = (() => {
             }
         } else {
             targetBadge.className = 'node-source-text';
-            targetBadge.textContent = mapping.target || 'Not fetched';
+            targetBadge.textContent = mapping.target || (isBlockTubeNameOnlyRule ? 'Name rule only' : 'Not fetched');
             targetBadge.style.opacity = '0.5';
+            targetBadge.title = isBlockTubeNameOnlyRule
+                ? 'BlockTube exported this as a channel-name rule without a unique UC channel ID, so there is no safe channel profile to enrich.'
+                : 'The channel identifier is saved and its name, handle/custom URL, and avatar are still waiting for the paced metadata lookup.';
         }
 
         nodeContainer.appendChild(sourceText);

@@ -6897,10 +6897,11 @@ async function initialize() {
             syncCategoryPolicyShellState(response.settings);
         }
         if (response?.success) {
-            await ensureMainWorldRuntimeForSettings(response.settings);
-        }
-        if (response?.success) {
+            // Start the Home DOM pass before the optional MAIN-world injection.
+            // Firefox's fallback injector loads several scripts serially; waiting
+            // for it leaves the first Home batch visible long enough to flash.
             initializeDOMFallback(response.settings);
+            await ensureMainWorldRuntimeForSettings(response.settings);
         }
     } catch (error) {
         debugLog('❌ Error during initialization:', error);
@@ -6911,6 +6912,19 @@ async function initializeDOMFallback(settings) {
     if (settings && typeof syncCategoryPolicyShellState === 'function') {
         syncCategoryPolicyShellState(settings);
     }
+
+    // Home is already visible while the normal fallback startup gate is
+    // waiting for YouTube hydration. Run one synchronous-render-turn pass so
+    // blocked cards do not flash into the feed and then disappear a second
+    // later. Keep the existing gate for observer/menu setup and non-Home
+    // surfaces.
+    if ((document.location?.pathname || '') === '/' && settings && typeof applyDOMFallback === 'function') {
+        try {
+            await applyDOMFallback(settings, { preserveScroll: false, forceReprocess: true });
+        } catch (e) {
+        }
+    }
+
     await new Promise(resolve => setTimeout(resolve, 1000));
     if (!settings) {
         const response = await requestSettingsFromBackground();

@@ -28,6 +28,10 @@
     ];
     const ZERO_WIDTH_REGEX = /[\u200B-\u200F\u202A-\u202E\u2066-\u2069\uFEFF]/g;
     const UC_ID_REGEX = /^UC[\w-]{22}$/i;
+    const BLOCKTUBE_CHANNEL_NAME_SOURCE = 'blocktube-channel-name';
+    const BLOCKTUBE_CHANNEL_NAME_BOUNDARY = "[ \n\r\t!@#$%^&*()_\\-=+\\[\\]\\\\\\|;:'\",\\.\\/<>\\?`~:]+";
+    const blockTubeChannelNameRegexCache = new WeakMap();
+    const blockTubeChannelNameDescriptorCache = new WeakMap();
 
     function normalizeHandleGlyphs(value) {
         let normalized = value;
@@ -228,6 +232,165 @@
         return value.trim().toLowerCase().replace(/\s+/g, ' ');
     }
 
+    function isBlockTubeChannelNameRule(entry) {
+        return Boolean(
+            entry &&
+            typeof entry === 'object' &&
+            entry.source === BLOCKTUBE_CHANNEL_NAME_SOURCE
+        );
+    }
+
+    function getBlockTubeChannelNameRegex(entry) {
+        if (!isBlockTubeChannelNameRule(entry)) return null;
+        const cached = blockTubeChannelNameRegexCache.get(entry);
+        if (cached !== undefined) return cached;
+
+        const raw = (typeof entry.originalInput === 'string' ? entry.originalInput : entry.name || '').trim();
+        if (!raw) {
+            blockTubeChannelNameRegexCache.set(entry, null);
+            return null;
+        }
+
+        let pattern = '';
+        let flags = 'i';
+        const regexLiteral = raw.match(/^\/((?:\\.|[^/])+)\/([gimsuy]*)$/);
+        if (regexLiteral) {
+            pattern = regexLiteral[1];
+            // BlockTube preserves omitted regex flags; an omitted flag is
+            // intentionally not upgraded to case-insensitive matching.
+            flags = regexLiteral[2] || '';
+        } else {
+            const escaped = raw.replace(/[\\^$*+?.()|[\]{}]/g, '\\$&');
+            pattern = `(^|${BLOCKTUBE_CHANNEL_NAME_BOUNDARY})(${escaped})(${BLOCKTUBE_CHANNEL_NAME_BOUNDARY}|$)`;
+        }
+
+        let compiled = null;
+        try {
+            compiled = new RegExp(pattern, flags);
+        } catch (e) {
+            compiled = null;
+        }
+        blockTubeChannelNameRegexCache.set(entry, compiled);
+        return compiled;
+    }
+
+    function getBlockTubeChannelNameDescriptor(entry) {
+        if (!isBlockTubeChannelNameRule(entry)) return null;
+        const cached = blockTubeChannelNameDescriptorCache.get(entry);
+        if (cached !== undefined) return cached;
+
+        const raw = (typeof entry.originalInput === 'string' ? entry.originalInput : entry.name || '').trim();
+        if (!raw) {
+            blockTubeChannelNameDescriptorCache.set(entry, null);
+            return null;
+        }
+
+        const regexLiteral = raw.match(/^\/((?:\\.|[^/])+)\/([gimsuy]*)$/);
+        const descriptor = regexLiteral
+            ? { entry, regex: getBlockTubeChannelNameRegex(entry), literal: '' }
+            : {
+                entry,
+                // Literal rules are matched directly by the indexed hot path;
+                // compile their regex lazily only for single-rule callers.
+                regex: null,
+                literal: raw,
+                literalLower: raw.toLowerCase()
+            };
+        blockTubeChannelNameDescriptorCache.set(entry, descriptor);
+        return descriptor;
+    }
+
+    function testBlockTubeChannelNameDescriptor(descriptor, channelName) {
+        const regex = descriptor?.regex || (
+            descriptor?.literal
+                ? getBlockTubeChannelNameRegex(descriptor.entry)
+                : null
+        );
+        if (!regex || !channelName) return false;
+        try {
+            regex.lastIndex = 0;
+            return regex.test(channelName);
+        } catch (e) {
+            return false;
+        } finally {
+            try {
+                regex.lastIndex = 0;
+            } catch (e) {
+            }
+        }
+    }
+
+    function buildBlockTubeChannelNameMatcher(rules) {
+        const literalPrefixBuckets = new Map();
+        const literalFallback = [];
+        const regexRules = [];
+
+        for (const rule of Array.isArray(rules) ? rules : []) {
+            const descriptor = getBlockTubeChannelNameDescriptor(rule);
+            if (!descriptor || (!descriptor.literal && !descriptor.regex)) continue;
+            if (!descriptor.literal) {
+                regexRules.push(descriptor);
+                continue;
+            }
+
+            // JavaScript's Unicode case-folding can change string length (for
+            // example, some dotted-I forms). Keep those uncommon literals on
+            // the exact regex path so the indexed ASCII path stays correct.
+            if (descriptor.literalLower.length !== descriptor.literal.length) {
+                literalFallback.push(descriptor);
+                continue;
+            }
+
+            const prefix = descriptor.literalLower.slice(0, 3);
+            const prefixBucket = literalPrefixBuckets.get(prefix) || [];
+            prefixBucket.push(descriptor);
+            literalPrefixBuckets.set(prefix, prefixBucket);
+        }
+
+        return { literalPrefixBuckets, literalFallback, regexRules };
+    }
+
+    function matchesBlockTubeChannelNameRules(channelName, matcher) {
+        const normalizedName = typeof channelName === 'string' ? channelName.trim() : '';
+        if (!normalizedName || !matcher) return false;
+
+        const lowerName = normalizedName.toLowerCase();
+        for (let index = 0; index < normalizedName.length; index += 1) {
+            if (index > 0 && !BLOCKTUBE_CHANNEL_NAME_BOUNDARY.includes(normalizedName[index - 1])) continue;
+            const candidateKeys = [
+                lowerName.slice(index, index + 3),
+                lowerName.slice(index, index + 2),
+                lowerName.slice(index, index + 1)
+            ];
+            for (const key of candidateKeys) {
+                const bucket = matcher.literalPrefixBuckets.get(key);
+                if (!bucket) continue;
+                for (const descriptor of bucket) {
+                    const end = index + descriptor.literal.length;
+                    if (end > normalizedName.length) continue;
+                    if (!lowerName.startsWith(descriptor.literalLower, index)) continue;
+                    if (end < normalizedName.length && !BLOCKTUBE_CHANNEL_NAME_BOUNDARY.includes(normalizedName[end])) continue;
+                    return true;
+                }
+            }
+        }
+
+        for (const descriptor of matcher.literalFallback) {
+            if (testBlockTubeChannelNameDescriptor(descriptor, normalizedName)) return true;
+        }
+        for (const descriptor of matcher.regexRules) {
+            if (testBlockTubeChannelNameDescriptor(descriptor, normalizedName)) return true;
+        }
+        return false;
+    }
+
+    function matchesBlockTubeChannelNameRule(entry, channelInfo) {
+        if (!isBlockTubeChannelNameRule(entry)) return false;
+        const descriptor = getBlockTubeChannelNameDescriptor(entry);
+        const channelName = typeof channelInfo?.name === 'string' ? channelInfo.name.trim() : '';
+        return testBlockTubeChannelNameDescriptor(descriptor, channelName);
+    }
+
     function normalizeCustomUrlForComparison(url) {
         if (!url || typeof url !== 'string') return '';
         let cleaned = url.trim();
@@ -278,6 +441,7 @@
         const names = new Set();
         const stableNames = new Set();
         const nameOnlyNames = new Set();
+        const blockTubeNameRules = [];
         const unresolvedHandleKeys = [];
         const unresolvedHandleKeysSeen = new Set();
 
@@ -332,6 +496,11 @@
         for (const entry of filterChannels) {
             if (!entry) continue;
 
+            if (isBlockTubeChannelNameRule(entry)) {
+                blockTubeNameRules.push(entry);
+                continue;
+            }
+
             if (typeof entry === 'string') {
                 const value = entry.trim();
                 if (!value) continue;
@@ -383,12 +552,25 @@
             names,
             stableNames,
             nameOnlyNames,
+            blockTubeNameRules,
+            blockTubeNameMatcher: buildBlockTubeChannelNameMatcher(blockTubeNameRules),
             unresolvedHandleKeys
         };
     }
 
     function channelMetaMatchesIndex(meta, index, channelMap = {}) {
         if (!meta || !index) return false;
+
+        if (index.blockTubeNameMatcher && matchesBlockTubeChannelNameRules(meta.name, index.blockTubeNameMatcher)) {
+            return true;
+        }
+        // Keep compatibility with indexes produced by older callers that only
+        // expose the raw marker list.
+        if (Array.isArray(index.blockTubeNameRules)) {
+            for (const rule of index.blockTubeNameRules) {
+                if (matchesBlockTubeChannelNameRule(rule, meta)) return true;
+            }
+        }
         const lookupChannelMap = getChannelMapLookup(channelMap);
 
         const metaIds = collectChannelUcIds(meta);
@@ -442,6 +624,10 @@
      */
     function channelMatchesFilter(meta, filterChannel, channelMap = {}) {
         if (!filterChannel) return false;
+
+        if (isBlockTubeChannelNameRule(filterChannel)) {
+            return matchesBlockTubeChannelNameRule(filterChannel, meta);
+        }
 
         const metaIds = collectChannelUcIds(meta);
         const metaId = metaIds[0] || '';

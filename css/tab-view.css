@@ -2819,11 +2819,16 @@ html[data-theme="dark"] .help-device-map-legend li {
     box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.58);
 }
 
+.subscriptions-import-inline[hidden] {
+    display: none !important;
+}
+
 .subscriptions-import-status {
     min-width: 0;
     color: var(--ft-color-text-primary);
     font-size: 0.92rem;
     line-height: 1.4;
+    overflow-wrap: anywhere;
 }
 
 .subscriptions-import-inline.is-loading .subscriptions-import-status {

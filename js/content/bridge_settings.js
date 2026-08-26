@@ -1806,6 +1806,98 @@ function scheduleSettingsRefreshFromStorage({ forceReprocess = true } = {}) {
     }, delay);
 }
 
+const FILTERTUBE_METADATA_ONLY_CHANNEL_FIELDS = [
+    'name',
+    'handle',
+    'handleDisplay',
+    'canonicalHandle',
+    'logo',
+    'customUrl',
+    'topicChannel',
+    'managedListId',
+    'managedListName',
+    'managedListSourceLabel',
+    'managedListSourceUrl',
+    'managedListSourceFormat',
+    'managedListImportedAt',
+    'managedListLastCheckedAt',
+    'managedListContentHash',
+    'managedListSourceTitle',
+    'managedListSourceVersion',
+    'managedListSourceUpdatedLabel',
+    'managedListSourceHomepage'
+];
+
+function filterTubeStripMetadataOnlyChannelFields(value) {
+    if (!value || typeof value !== 'object') return value;
+    if (Array.isArray(value)) return value.map(filterTubeStripMetadataOnlyChannelFields);
+
+    const output = { ...value };
+    const id = typeof output.id === 'string' ? output.id.trim() : '';
+    if (/^UC[a-zA-Z0-9_-]{22}$/.test(id)) {
+        FILTERTUBE_METADATA_ONLY_CHANNEL_FIELDS.forEach((field) => {
+            if (field === 'name' && output.filterAll === true) return;
+            delete output[field];
+        });
+    }
+    return output;
+}
+
+function filterTubeStripMetadataOnlyChannelLists(value) {
+    let cloned = value;
+    try {
+        cloned = JSON.parse(JSON.stringify(value));
+    } catch (e) {
+        return value;
+    }
+    if (Array.isArray(cloned)) return cloned.map(filterTubeStripMetadataOnlyChannelFields);
+    if (!cloned || typeof cloned !== 'object') return cloned;
+
+    if (Array.isArray(cloned.filterChannels)) {
+        cloned.filterChannels = cloned.filterChannels.map(filterTubeStripMetadataOnlyChannelFields);
+    }
+    const profiles = cloned.profiles && typeof cloned.profiles === 'object' && !Array.isArray(cloned.profiles)
+        ? cloned.profiles
+        : {};
+    Object.values(profiles).forEach((profile) => {
+        if (!profile || typeof profile !== 'object') return;
+        [profile, profile.main, profile.kids].forEach((surface) => {
+            if (!surface || typeof surface !== 'object') return;
+            ['channels', 'blockedChannels', 'whitelistChannels', 'allowedChannels'].forEach((key) => {
+                if (Array.isArray(surface[key])) {
+                    surface[key] = surface[key].map(filterTubeStripMetadataOnlyChannelFields);
+                }
+            });
+        });
+    });
+    return cloned;
+}
+
+function filterTubeIsMetadataOnlySettingsChange(changes) {
+    const keys = Object.keys(changes || {});
+    if (!keys.length) return false;
+    const allowedKeys = new Set(['ftProfilesV4', 'filterChannels', 'uiChannels', 'channelMap']);
+    if (keys.some(key => !allowedKeys.has(key))) return false;
+    if (!changes.ftProfilesV4 && !changes.filterChannels) return false;
+    if (changes.ftProfilesV4 && !Object.prototype.hasOwnProperty.call(changes.ftProfilesV4, 'oldValue')) return false;
+    if (changes.filterChannels && !Object.prototype.hasOwnProperty.call(changes.filterChannels, 'oldValue')) return false;
+    try {
+        if (changes.ftProfilesV4
+            && JSON.stringify(filterTubeStripMetadataOnlyChannelLists(changes.ftProfilesV4.oldValue))
+                !== JSON.stringify(filterTubeStripMetadataOnlyChannelLists(changes.ftProfilesV4.newValue))) {
+            return false;
+        }
+        if (changes.filterChannels
+            && JSON.stringify(filterTubeStripMetadataOnlyChannelLists(changes.filterChannels.oldValue))
+                !== JSON.stringify(filterTubeStripMetadataOnlyChannelLists(changes.filterChannels.newValue))) {
+            return false;
+        }
+        return true;
+    } catch (e) {
+        return false;
+    }
+}
+
 function handleStorageChanges(changes, area) {
     if (area !== 'local') return;
 
@@ -1863,6 +1955,7 @@ function handleStorageChanges(changes, area) {
         'hideSearchShelves'
     ];
     if (Object.keys(changes).some(key => relevantKeys.includes(key))) {
+        if (filterTubeIsMetadataOnlySettingsChange(changes)) return;
         // FIX: Apply changes IMMEDIATELY without debounce
         scheduleSettingsRefreshFromStorage({ forceReprocess: !(isVideoChannelMapOnly || isVideoMetaMapOnly) });
     }

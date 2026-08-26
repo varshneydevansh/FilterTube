@@ -547,7 +547,7 @@
                                                             Restore a full FilterTube backup JSON.<br />
                                                         </span>
                                                         <span class="import-export-hint">
-                                                            Use this for complete profile, settings, and backup restore. For channel/keyword-only CSV, TXT, JSON, URLs, or BlockTube channel/title lists, use Rule list imports below.
+                                                            Use this for complete profile, settings, and backup restore. For channel/keyword-only CSV, TXT, JSON, URLs, or BlockTube migration JSON, use Rule list imports below.
                                                         </span>
                                                         <div class="import-backup-format-strip" aria-label="Supported backup imports">
                                                             <span>FilterTube backup JSON</span>
@@ -596,7 +596,7 @@
                                                         <details class="rule-list-format-disclosure" open>
                                                             <summary>
                                                                 <span>See examples before import</span>
-                                                                <code>CSV · JSON · TXT · URL</code>
+                                                                <code>CSV · JSON · TXT · URL · BLOCKTUBE JSON</code>
                                                             </summary>
                                                             <div class="rule-list-format-showcase" aria-label="Rule list format previews">
                                                                 <div class="rule-list-format-showcase__header">
@@ -791,11 +791,11 @@
                                                                     <div class="rule-list-format-panel__copy">
                                                                         <span class="rule-list-format-panel__eyebrow">Migration JSON</span>
                                                                         <strong>BlockTube export preview</strong>
-                                                                        <span>Best when a parent is moving an existing BlockTube channel/title list into FilterTube.</span>
+                                                                        <span>Best when a parent is moving an existing BlockTube backup into FilterTube.</span>
                                                                         <div class="rule-list-format-panel__facts">
                                                                             <span><code>filterData.channelId</code> and <code>channelName</code> become channel rules.</span>
                                                                             <span><code>filterData.title</code> becomes keyword rules.</span>
-                                                                            <span>BlockTube JSON still cannot choose Main/Kids, PINs, profiles, or sync targets.</span>
+                                                                            <span>BlockTube JSON applies supported rules to Main YouTube only; incomplete channel identifiers are enriched one at a time after approval, never in a request burst.</span>
                                                                         </div>
                                                                     </div>
                                                                     <div class="rule-list-preview-json rule-list-preview-json--blocktube" aria-label="BlockTube JSON rule list example">
@@ -864,8 +864,9 @@
                                                             </summary>
                                                             <div class="rule-list-parser-notes" aria-label="Rule list parser boundaries">
                                                                 <span><b>Channels:</b> <code>UC...</code>, <code>@handle</code>, <code>/channel/UC...</code>, <code>/c/Name</code>, <code>/user/Name</code>, or YouTube channel URLs.</span>
-                                                                <span><b>Keywords:</b> CSV <code>keyword</code> cells, JSON <code>keywords</code>, or TXT rows starting with <code>keyword:</code>.</span>
+                                                                <span><b>Keywords:</b> CSV <code>keyword</code> cells, JSON <code>keywords</code>, or TXT rows starting with <code>keyword:</code>. BlockTube <code>filterData.title</code> and <code>comment</code> are mapped separately.</span>
                                                                 <span><b>Messy files:</b> invalid rows are skipped with row numbers and reasons in preview before anything changes.</span>
+                                                                <span><b>Metadata pacing:</b> incomplete channel identifiers from CSV, TXT, FilterTube JSON, and BlockTube JSON are enriched only after approval, one serialized lookup about every 20 seconds, with retries backed off for hours.</span>
                                                                 <span><b>Authority:</b> files never choose profile, Main/Kids target, PIN, time limit, trusted device, or sync destination.</span>
                                                             </div>
                                                         </details>
@@ -1550,7 +1551,7 @@
                                     </div>
                                     <div class="help-item">
                                         <div class="help-item-title">Safer complete BlockTube migration</div>
-                                        <div class="help-item-body">Large BlockTube JSON exports are previewed, capacity-checked, applied transactionally, read back, and summarized with an apply receipt. A failed write rolls the import back instead of reporting false success. Imported JavaScript is never executed, the BlockTube UI password never becomes a FilterTube PIN, and importing rules does not replace the FilterTube theme.</div>
+                                        <div class="help-item-body">Large BlockTube JSON exports are previewed, capacity-checked, applied transactionally, read back, and summarized with an apply receipt. A failed write rolls the import back instead of reporting false success. Imported JavaScript is never executed, the BlockTube UI password never becomes a FilterTube PIN, and importing rules does not replace the FilterTube theme. After approval, missing channel names, handles or custom URLs, and avatars are filled one ID at a time with a long delay; the queue pauses when the dashboard is closed and resumes when it is opened again.</div>
                                     </div>
                                     <div class="help-item">
                                         <div class="help-item-title">Official category filtering</div>
@@ -1718,7 +1719,7 @@
                                         </div>
                                         <div class="help-item">
                                             <div class="help-item-title">Where do imported lists go?</div>
-                                            <div class="help-item-body">Use <strong>Settings &gt; Rule list imports</strong>. Choose Main YouTube, YouTube Kids, or Both before applying. Import files can add channel and keyword rules only; they cannot change PINs, devices, profiles, time limits, or access.</div>
+                                            <div class="help-item-body">Use <strong>Settings &gt; Rule list imports</strong>. Choose Main YouTube, YouTube Kids, or Both before applying. CSV, TXT, and FilterTube rule-list files add channel and keyword rules; BlockTube migration JSON also imports its supported Main YouTube video IDs and safe setting mappings. Missing names, handles/custom URLs, and avatars are completed after approval in a slow persisted queue, regardless of import format. Files cannot change PINs, devices, profiles, time limits, or access.</div>
                                         </div>
                                         <div class="help-item">
                                             <div class="help-item-title">What should I avoid touching at first?</div>
@@ -1886,7 +1887,7 @@
                                         </div>
                                         <div class="help-item">
                                             <div class="help-item-title">Rule list imports</div>
-                                            <div class="help-item-body">Open Settings &gt; Import / Export &gt; Rule list imports. Choose Main YouTube, YouTube Kids, or Both, then preview a CSV, TXT, raw HTTPS list, FilterTube JSON rule list, or BlockTube rule JSON before applying it. Imported rows are then reviewed and edited from the normal Main/Kids rule pages.</div>
+                                            <div class="help-item-body">Open Settings &gt; Import / Export &gt; Rule list imports. Choose Main YouTube, YouTube Kids, or Both, then preview a CSV, TXT, raw HTTPS list, FilterTube JSON rule list, or BlockTube migration JSON before applying it. Imported rows are then reviewed and edited from the normal Main/Kids rule pages. Missing channel metadata is enriched slowly after approval for every supported import format, one row at a time.</div>
                                         </div>
                                         <div class="help-item">
                                             <div class="help-item-title">Filter All Content (per-channel)</div>
@@ -2378,7 +2379,7 @@
                                         </div>
                                         <div class="help-item">
                                             <div class="help-item-title">Moving from BlockTube</div>
-                                            <div class="help-item-body">Choose the BlockTube JSON as a backup import. FilterTube first shows counts for channels, video IDs, title rules, comment rules, regex rules, mapped settings, and unsupported fields. Large imports are capacity-checked and applied as a transaction: if any required write fails, FilterTube restores the previous state instead of showing false success. A successful import is read back and produces an apply receipt. Imported JavaScript stays inactive, BlockTube's UI password is never used as a FilterTube PIN, and the FilterTube theme is preserved. You can download the migration report before importing.</div>
+                                            <div class="help-item-body">Choose the BlockTube migration JSON under Rule list imports (or choose it in the full backup importer). FilterTube first shows counts for channels, video IDs, title rules, comment rules, regex rules, mapped settings, and unsupported fields. Large imports are capacity-checked and applied as a transaction: if any required write fails, FilterTube restores the previous state instead of showing false success. A successful import is read back and produces an apply receipt. Imported JavaScript stays inactive, BlockTube's UI password is never used as a FilterTube PIN, and the FilterTube theme is preserved. Missing channel metadata is fetched only after approval, one request about every 20 seconds with retry backoff, and the job resumes when the dashboard is opened again. You can download the migration report before importing.</div>
                                         </div>
                                     </div>
                                 </div>

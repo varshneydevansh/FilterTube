@@ -38,7 +38,15 @@
 
     /** Filters out primitives, nulls, and arrays so we only pass plain objects. */
     function safeObject(value) {
-        return value && typeof value === 'object' && !Array.isArray(value) ? value : {};
+        if (value && typeof value === 'object' && !Array.isArray(value)) return value;
+        if (typeof value === 'string') {
+            try {
+                const parsed = JSON.parse(value);
+                if (parsed && typeof parsed === 'object' && !Array.isArray(parsed)) return parsed;
+            } catch (e) {
+            }
+        }
+        return {};
     }
 
     function normalizeString(value) {
@@ -512,6 +520,7 @@
             ...(normalizeString(entry.managedListName) ? { managedListName: normalizeString(entry.managedListName) } : {}),
             ...(normalizeString(entry.managedListSourceLabel) ? { managedListSourceLabel: normalizeString(entry.managedListSourceLabel) } : {}),
             ...(normalizeString(entry.managedListSourceUrl) ? { managedListSourceUrl: normalizeString(entry.managedListSourceUrl) } : {}),
+            ...(normalizeString(entry.managedListSourceFormat) ? { managedListSourceFormat: normalizeString(entry.managedListSourceFormat) } : {}),
             ...(typeof entry.managedListImportedAt === 'number' && Number.isFinite(entry.managedListImportedAt) ? { managedListImportedAt: entry.managedListImportedAt } : {}),
             ...(typeof entry.managedListLastCheckedAt === 'number' && Number.isFinite(entry.managedListLastCheckedAt) ? { managedListLastCheckedAt: entry.managedListLastCheckedAt } : {}),
             ...(normalizeString(entry.managedListContentHash) ? { managedListContentHash: normalizeString(entry.managedListContentHash) } : {}),
@@ -1057,11 +1066,22 @@
      * FilterTube v3 exports plus legacy BlockTube exports.
      */
     function detectFormat(data) {
-        if (!data || typeof data !== 'object') return 'unknown';
-        if (safeObject(data.meta).application === 'FilterTube' && normalizeNumber(safeObject(data.meta).version, 0) === 3) {
+        const root = safeObject(data);
+        if (!root || typeof root !== 'object') return 'unknown';
+        if (safeObject(root.meta).application === 'FilterTube' && normalizeNumber(safeObject(root.meta).version, 0) === 3) {
             return 'filtertube-v3';
         }
-        if (data.filterData && typeof data.filterData === 'object') {
+        let candidate = root;
+        if (!(candidate.filterData && typeof candidate.filterData === 'object')) {
+            for (const key of ['storageData', 'data', 'payload', 'backup']) {
+                const nested = safeObject(root[key]);
+                if (nested.filterData && typeof nested.filterData === 'object') {
+                    candidate = nested;
+                    break;
+                }
+            }
+        }
+        if (candidate.filterData && typeof candidate.filterData === 'object') {
             return 'blocktube';
         }
         return 'unknown';
@@ -1073,8 +1093,19 @@
      * so we normalize those entries and fabricate reasonable defaults.
      */
     function parseBlockTube(data) {
-        const filterData = safeObject(data.filterData);
-        const options = safeObject(data.options);
+        const root = safeObject(data);
+        let blockTubeData = root;
+        if (!(blockTubeData.filterData && typeof blockTubeData.filterData === 'object')) {
+            for (const key of ['storageData', 'data', 'payload', 'backup']) {
+                const nested = safeObject(root[key]);
+                if (nested.filterData && typeof nested.filterData === 'object') {
+                    blockTubeData = nested;
+                    break;
+                }
+            }
+        }
+        const filterData = safeObject(blockTubeData.filterData);
+        const options = safeObject(blockTubeData.options);
         const now = nowTs();
         const migrationReport = {
             format: 'blocktube',
@@ -1102,7 +1133,7 @@
         Object.keys(options).forEach(key => {
             if (!knownOptionFields.has(key)) migrationReport.unknown.push(`options.${key}`);
         });
-        Object.keys(safeObject(data)).forEach(key => {
+        Object.keys(blockTubeData).forEach(key => {
             if (!['filterData', 'options', 'uiTheme', 'uiPass'].includes(key)) {
                 migrationReport.unknown.push(key);
             }
@@ -1127,8 +1158,71 @@
             return { pattern, flags };
         };
 
+        // BlockTube normally exports the editable text arrays, but a few
+        // storage/debug tools expose its compiled [pattern, flags] tuples
+        // instead. Keep both forms readable without treating a compiled
+        // channel-id regex as a literal FilterTube channel name.
+        const getCompiledBlockTubeRule = (raw) => {
+            if (Array.isArray(raw) && typeof raw[0] === 'string') {
+                return {
+                    pattern: raw[0].trim(),
+                    flags: typeof raw[1] === 'string' ? raw[1].trim() : ''
+                };
+            }
+            if (raw && typeof raw === 'object') {
+                const pattern = typeof raw.pattern === 'string'
+                    ? raw.pattern
+                    : (typeof raw.source === 'string' ? raw.source : '');
+                if (pattern) {
+                    return {
+                        pattern: pattern.trim(),
+                        flags: typeof raw.flags === 'string' ? raw.flags.trim() : ''
+                    };
+                }
+            }
+            return null;
+        };
+
+        const normalizeBlockTubeRuleValue = (raw) => {
+            if (typeof raw === 'string') return raw.trim();
+            const compiled = getCompiledBlockTubeRule(raw);
+            if (!compiled || !compiled.pattern) return '';
+            return `/${compiled.pattern}/${compiled.flags}`;
+        };
+
+        const normalizeBlockTubeExactValue = (raw) => {
+            if (typeof raw === 'string') return raw.trim();
+            const compiled = getCompiledBlockTubeRule(raw);
+            if (!compiled || !compiled.pattern) return '';
+            const exact = compiled.pattern.match(/^\^([\s\S]+)\$$/);
+            return exact ? exact[1].trim() : `/${compiled.pattern}/${compiled.flags}`;
+        };
+
+        const BLOCKTUBE_CONTEXT_COMMENT_PREFIX = '// Blocked by context menu (';
+        const parseBlockTubeContextComment = (raw) => {
+            const value = normalizeBlockTubeRuleValue(raw);
+            if (!value.startsWith(BLOCKTUBE_CONTEXT_COMMENT_PREFIX)) return null;
+
+            let body = value.slice(BLOCKTUBE_CONTEXT_COMMENT_PREFIX.length);
+
+            // Newer BlockTube exports append a local timestamp after the
+            // channel label. Remove it before stripping the comment's final
+            // parenthesis; otherwise the timestamp's closing parenthesis is
+            // removed first and the channel label keeps a trailing `)`.
+            body = body.replace(/\s+\(\d{2}\/\d{2}\/\d{4}, \d{2}:\d{2}:\d{2}\)$/, '');
+            const complete = body.endsWith(')');
+            if (complete) body = body.slice(0, -1);
+            return {
+                raw: value,
+                name: body.trim(),
+                complete
+            };
+        };
+
+        const isBlockTubeChannelId = value => /^UC[\w-]{22}$/i.test(normalizeString(value));
+
         const buildBlockTubeKeyword = (raw, scope, comments) => {
-            const value = normalizeString(raw);
+            const value = normalizeBlockTubeRuleValue(raw);
             if (!value || value.startsWith('//')) return null;
             const parsedRegex = parseRegexRow(value, `filterData.${scope === 'comment' ? 'comment' : 'title'}`);
             if (parsedRegex?.invalid) return null;
@@ -1160,83 +1254,187 @@
         };
 
         const channels = [];
-        let pendingName = null;
-        for (const raw of safeArray(filterData.channelId)) {
-            const entry = normalizeString(raw);
+        let pendingContextComment = null;
+        const channelIdValues = Array.isArray(filterData.channelId)
+            ? filterData.channelId
+            : (filterData.channelId == null ? [] : [filterData.channelId]);
+        const channelNameValues = Array.isArray(filterData.channelName)
+            ? filterData.channelName
+            : (filterData.channelName == null ? [] : [filterData.channelName]);
+        const titleValues = Array.isArray(filterData.title)
+            ? filterData.title
+            : (filterData.title == null ? [] : [filterData.title]);
+        const commentValues = Array.isArray(filterData.comment)
+            ? filterData.comment
+            : (filterData.comment == null ? [] : [filterData.comment]);
+        const videoIdValues = Array.isArray(filterData.videoId)
+            ? filterData.videoId
+            : (filterData.videoId == null ? [] : [filterData.videoId]);
+        const durationValues = Array.isArray(filterData.vidLength)
+            ? filterData.vidLength
+            : (filterData.vidLength == null ? [] : [filterData.vidLength]);
+
+        for (let index = 0; index < channelIdValues.length; index += 1) {
+            const raw = channelIdValues[index];
+            const entry = normalizeBlockTubeExactValue(raw);
             if (!entry) continue;
-            if (entry.startsWith('//')) {
-                const nameMatch = entry.match(/\(([^)]+)\)/);
-                if (nameMatch && nameMatch[1]) {
-                    pendingName = nameMatch[1].trim();
-                }
+
+            const contextComment = parseBlockTubeContextComment(entry);
+            if (contextComment) {
+                pendingContextComment = contextComment;
                 continue;
             }
-            channels.push({
-                id: entry,
-                name: pendingName || entry,
-                handle: null,
-                customUrl: null,
-                filterAll: false,
-                source: 'import',
-                addedAt: now
+
+            // A damaged export in the supplied backup split one comment's
+            // closing `...)` into a later array cell. Join that exact
+            // continuation back to the pending comment instead of importing
+            // it as a channel ID.
+            if (pendingContextComment && /^\.\.\.\)$/.test(entry)) {
+                const repairedComment = parseBlockTubeContextComment(`${pendingContextComment.raw}${entry}`);
+                if (repairedComment) {
+                    pendingContextComment = repairedComment;
+                    migrationReport.translated.push({
+                        field: `filterData.channelId[${index}]`,
+                        treatment: 'rejoined_split_context_comment'
+                    });
+                    continue;
+                }
+            }
+
+            if (isBlockTubeChannelId(entry)) {
+                const contextName = pendingContextComment?.name || '';
+                channels.push({
+                    id: entry,
+                    name: contextName || entry,
+                    handle: null,
+                    customUrl: null,
+                    filterAll: false,
+                    // A BlockTube channel ID is intentionally marked separately
+                    // from a generic file import so StateManager can enrich the
+                    // bare UC ID with the channel's handle/logo later.
+                    source: 'blocktube',
+                    originalInput: entry,
+                    addedAt: now
+                });
+                pendingContextComment = null;
+                continue;
+            }
+
+            // BlockTube's channelId field is an exact UC ID list. Ignore
+            // empty placeholders above, but surface any other value so the
+            // import receipt explains why it was not converted into a rule.
+            migrationReport.invalid.push({
+                field: `filterData.channelId[${index}]`,
+                value: entry,
+                reason: 'invalid_channel_id'
             });
-            pendingName = null;
         }
 
-        for (const raw of safeArray(filterData.channelName)) {
-            const name = normalizeString(raw);
+        for (const raw of channelNameValues) {
+            const name = normalizeBlockTubeRuleValue(raw);
             if (!name || name.startsWith('//')) continue;
             const parsedRegex = parseRegexRow(name, 'filterData.channelName');
             if (parsedRegex) {
                 if (!parsedRegex.invalid) {
-                    migrationReport.inactive.push({ field: 'filterData.channelName', value: name, reason: 'channel_name_regex_has_no_safe_channel_identity_equivalent' });
+                    migrationReport.translated.push({ field: 'filterData.channelName', value: name, treatment: 'preserved_channel_name_regex_rule' });
                 }
-                continue;
+            } else {
+                migrationReport.translated.push({ field: 'filterData.channelName', value: name, treatment: 'preserved_channel_name_boundary_rule' });
             }
+
+            if (parsedRegex?.invalid) continue;
+
+            // BlockTube evaluates channelName against the channel-name field,
+            // not against titles/descriptions. Keep this as a channel row with
+            // provenance so FilterTube can reproduce that scope at runtime.
             channels.push({
                 id: '',
                 name,
                 handle: null,
                 customUrl: null,
                 filterAll: false,
-                source: 'import',
+                source: 'blocktube-channel-name',
+                originalInput: name,
                 addedAt: now
             });
         }
 
         const keywords = [];
-        for (const raw of safeArray(filterData.title)) {
+        for (const raw of titleValues) {
             const entry = buildBlockTubeKeyword(raw, 'title', false);
             if (entry) keywords.push(entry);
         }
-        for (const raw of safeArray(filterData.comment)) {
+        for (const raw of commentValues) {
             const entry = buildBlockTubeKeyword(raw, 'comment', true);
             if (entry) keywords.push(entry);
         }
 
         const videoIds = [];
-        for (const raw of safeArray(filterData.videoId)) {
-            const vid = normalizeString(raw);
+        for (const raw of videoIdValues) {
+            const vid = normalizeBlockTubeExactValue(raw);
             if (!vid || vid.startsWith('//')) continue;
             videoIds.push(vid);
         }
 
-        const durationValues = safeArray(filterData.vidLength);
-        const minSeconds = Number.isFinite(Number(durationValues[0])) ? Number(durationValues[0]) : null;
-        const maxSeconds = Number.isFinite(Number(durationValues[1])) ? Number(durationValues[1]) : null;
+        const parseBlockTubeSeconds = (raw, index) => {
+            if (raw === null || raw === undefined || raw === '') return null;
+            const value = Number(raw);
+            if (!Number.isFinite(value) || value < 0) {
+                migrationReport.invalid.push({ field: `filterData.vidLength[${index}]`, value: raw, reason: 'invalid_non_negative_seconds' });
+                return null;
+            }
+            return value;
+        };
+        const minSeconds = parseBlockTubeSeconds(durationValues[0], 0);
+        const maxSeconds = parseBlockTubeSeconds(durationValues[1], 1);
+        const durationType = options.vidLength_type === 'block' ? 'block' : 'allow';
         let durationFilter = null;
         if (minSeconds !== null || maxSeconds !== null) {
-            if (options.vidLength_type === 'block' && minSeconds !== null && maxSeconds !== null) {
+            if (minSeconds !== null && maxSeconds !== null && minSeconds <= maxSeconds && maxSeconds > 0) {
                 durationFilter = {
                     enabled: true,
                     condition: 'between',
                     minMinutes: minSeconds / 60,
                     maxMinutes: maxSeconds / 60,
-                    value: ''
+                    value: '',
+                    // FilterTube's default "between" condition means
+                    // "allow only inside". BlockTube's block mode means the
+                    // inverse: hide videos inside the range.
+                    mode: durationType === 'block' ? 'block' : 'allow'
                 };
-                migrationReport.translated.push({ field: 'filterData.vidLength', treatment: 'seconds_to_minutes_block_between' });
+                migrationReport.translated.push({
+                    field: 'filterData.vidLength',
+                    treatment: durationType === 'block'
+                        ? 'seconds_to_minutes_block_inside_range'
+                        : 'seconds_to_minutes_allow_inside_range'
+                });
+            } else if (durationType === 'allow' && minSeconds !== null && maxSeconds === null && minSeconds > 0) {
+                durationFilter = {
+                    enabled: true,
+                    condition: 'shorter',
+                    minMinutes: minSeconds / 60,
+                    maxMinutes: 0,
+                    value: String(minSeconds / 60),
+                    mode: 'block'
+                };
+                migrationReport.translated.push({ field: 'filterData.vidLength', treatment: 'allow_min_seconds_to_block_shorter_than' });
+            } else if (durationType === 'allow' && minSeconds === null && maxSeconds !== null && maxSeconds > 0) {
+                durationFilter = {
+                    enabled: true,
+                    condition: 'longer',
+                    minMinutes: maxSeconds / 60,
+                    maxMinutes: 0,
+                    value: String(maxSeconds / 60),
+                    mode: 'block'
+                };
+                migrationReport.translated.push({ field: 'filterData.vidLength', treatment: 'allow_max_seconds_to_block_longer_than' });
             } else {
-                migrationReport.unsupported.push({ field: 'filterData.vidLength', reason: 'allow_between_or_open_bound_has_no_exact_duration_equivalent' });
+                migrationReport.unsupported.push({
+                    field: 'filterData.vidLength',
+                    reason: durationType === 'block'
+                        ? 'blocktube_block_mode_requires_two_valid_bounds'
+                        : 'allow_range_is_empty_or_zero_bound'
+                });
             }
         }
 
@@ -1270,15 +1468,26 @@
         if (importedJavascript || options.enable_javascript === true) {
             migrationReport.inactive.push({ field: 'filterData.javascript', reason: 'arbitrary_javascript_quarantined_and_never_executed' });
         }
-        if (Object.prototype.hasOwnProperty.call(data, 'uiPass')) {
+        if (Object.prototype.hasOwnProperty.call(blockTubeData, 'uiPass')) {
             migrationReport.inactive.push({ field: 'uiPass', reason: 'never_imported_as_filtertube_pin' });
         }
-        if (Object.prototype.hasOwnProperty.call(data, 'uiTheme')) {
+        if (Object.prototype.hasOwnProperty.call(blockTubeData, 'uiTheme')) {
             migrationReport.inactive.push({ field: 'uiTheme', reason: 'optional_preference_not_applied_by_rule_import' });
         }
         if (Object.prototype.hasOwnProperty.call(options, 'block_message')) {
             migrationReport.inactive.push({ field: 'options.block_message', reason: 'custom_overlay_copy_not_enabled' });
         }
+
+        const mergedChannels = mergeChannelLists([], channels);
+        const rawChannelNameRules = channelNameValues
+            .map(normalizeBlockTubeRuleValue)
+            .filter(value => value && !value.startsWith('//'));
+        migrationReport.summary = {
+            rawChannelIdRules: channels.filter(entry => entry?.source === 'blocktube').length,
+            rawChannelNameRules: rawChannelNameRules.length,
+            effectiveChannelIdRules: mergedChannels.filter(entry => entry?.source === 'blocktube').length,
+            effectiveChannelNameRules: mergedChannels.filter(entry => entry?.source === 'blocktube-channel-name').length
+        };
 
         return {
             ok: true,
@@ -1287,8 +1496,8 @@
             // user's current FilterTube theme as a side effect of importing rules.
             theme: null,
             mainSettings,
-            mainChannels: channels,
-            mainKeywords: keywords,
+            mainChannels: mergedChannels,
+            mainKeywords: mergeKeywordLists([], keywords),
             migrationReport,
             channelMap: {},
             profilesV3: {
@@ -1297,7 +1506,7 @@
                     applyKidsRulesOnMain: false,
                     whitelistedChannels: [],
                     whitelistedKeywords: [],
-                    videoIds,
+                    videoIds: mergeStringList([], videoIds),
                     subscriptions: []
                 },
                 kids: {
@@ -1323,11 +1532,14 @@
             ok: parsed.ok === true,
             counts: {
                 channels: safeArray(parsed.mainChannels).length,
+                channelIds: safeArray(parsed.mainChannels).filter(entry => entry?.source === 'blocktube').length,
+                channelNameRules: safeArray(parsed.mainChannels).filter(entry => entry?.source === 'blocktube-channel-name').length,
                 keywords: safeArray(parsed.mainKeywords).filter(entry => entry?.scope !== 'comment').length,
                 comments: safeArray(parsed.mainKeywords).filter(entry => entry?.scope === 'comment').length,
                 regex: safeArray(parsed.mainKeywords).filter(entry => entry?.matchMode === 'regex').length,
                 videoIds: safeArray(parsed.profilesV3?.main?.videoIds).length,
-                mappedOptions: Object.keys(safeObject(parsed.mainSettings)).length
+                mappedOptions: Object.keys(safeObject(parsed.mainSettings)).filter(key => key !== 'contentFilters').length,
+                durationFilters: parsed.mainSettings?.contentFilters?.duration?.enabled === true ? 1 : 0
             },
             report: parsed.migrationReport
         };
@@ -2201,6 +2413,8 @@
         const receipt = {
             targetProfileId: importedTargetProfileId,
             channels: safeArray(parsedMainChannels).length,
+            channelIds: safeArray(parsedMainChannels).filter(entry => entry?.source === 'blocktube').length,
+            channelNameRules: safeArray(parsedMainChannels).filter(entry => entry?.source === 'blocktube-channel-name').length,
             keywords: safeArray(parsedMainKeywords).filter(entry => entry?.scope !== 'comment').length,
             comments: safeArray(parsedMainKeywords).filter(entry => entry?.scope === 'comment').length,
             regex: safeArray(parsedMainKeywords).filter(entry => entry?.matchMode === 'regex').length,
