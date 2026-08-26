@@ -3502,7 +3502,9 @@ function hasActiveDOMFallbackWork(settings) {
             'hideComments',
             'filterComments',
             'hideHomeFeed',
-            'hideSponsoredCards',
+            // Sponsored surfaces are handled by route-scoped CSS and the
+            // MAIN-world Advert Void runtime. They do not require the generic
+            // video-card mutation observer or repeated renderer scans.
             'hidePlayables',
             'hideWatchPlaylistPanel',
             'hidePlaylistCards',

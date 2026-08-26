@@ -3,6 +3,7 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 
 const seed = fs.readFileSync('js/seed.js', 'utf8');
+const domFallback = fs.readFileSync('js/content/dom_fallback.js', 'utf8');
 const background = fs.readFileSync('js/background.js', 'utf8');
 const stateManager = fs.readFileSync('js/state_manager.js', 'utf8');
 const sharedSettings = fs.readFileSync('js/settings_shared.js', 'utf8');
@@ -59,8 +60,7 @@ test('Advert Void removes observed Player ad plans before YouTube schedules play
 
 test('ad recognition requires player interruption or visible ad evidence', () => {
   const detection = sliceBetween(seed, 'function adVoidHasInterruption(player) {', '\n    function adVoidCaptureAudio');
-  assert.match(detection, /className\.includes\('ad-showing'\)/);
-  assert.match(detection, /className\.includes\('ad-interrupting'\)/);
+  assert.match(detection, /className\.includes\('ad-showing'\) && className\.includes\('ad-interrupting'\)/);
   assert.match(detection, /!adVoidNodeIsVisible\(candidate\)/);
   assert.match(detection, /selector === '\.video-ads'/);
   assert.match(detection, /selector === '\.ytp-ad-module'/);
@@ -118,11 +118,24 @@ test('Advert Void diagnostics expose bounded transition and playback evidence', 
 
 test('active ad frames are covered by the player state itself', () => {
   assert.match(seed, /data-filtertube-ad-void-enabled/);
-  assert.match(seed, /\.html5-video-player\.ad-showing video/);
-  assert.match(seed, /\.html5-video-player\.ad-interrupting video/);
+  assert.match(seed, /\.html5-video-player\.ad-showing\.ad-interrupting video/);
+  assert.doesNotMatch(seed, /\.html5-video-player\.ad-showing video,/);
+  assert.doesNotMatch(seed, /\.html5-video-player\.ad-interrupting video \{/);
   assert.doesNotMatch(seed, /Sending advert to The Void/);
   assert.match(seed, /video\[data-filtertube-ad-void-content="true"\]/);
   assert.doesNotMatch(seed, /\.html5-video-player\.ad-created video/);
+});
+
+test('Advert Void does not activate generic renderer rescans', () => {
+  const activeWork = sliceBetween(
+    domFallback,
+    'function hasActiveDOMFallbackWork(settings) {',
+    'function clearStaleDOMFallbackVisibility() {'
+  );
+  const hasActiveWork = Function(`${activeWork}; return hasActiveDOMFallbackWork;`)();
+  assert.doesNotMatch(activeWork, /'hideSponsoredCards'/);
+  assert.match(domFallback, /if \(settings\.hideSponsoredCards\) \{[\s\S]*ytd-ad-slot-renderer/);
+  assert.equal(hasActiveWork({ enabled: true, listMode: 'blocklist', hideSponsoredCards: true }), false);
 });
 
 test('the extension restores user audio and owns no network-blocking path', () => {

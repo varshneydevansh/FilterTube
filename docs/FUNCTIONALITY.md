@@ -193,7 +193,7 @@ The next release-facing checkpoint is staged in `data/release_notes.json` instea
 - **Channel Filtering**: Blocks/allows content from specific channels using @handles, channel IDs, or channel names
 - **Comments Filtering**: Removes comment sections entirely when hideAllComments is enabled
 - **Shorts Filtering**: Blocks YouTube Shorts content when hideAllShorts is enabled
-- **Advert Void**: The default-on `hideSponsoredCards` control applies to YouTube Main and YouTube Kids in both Blocklist and Whitelist modes. It removes the observed Player ad plan before YouTube schedules playback and hides sponsored DOM cards. If an advert still escapes into the player, the live `ad-showing`/`ad-interrupting` fallback quarantines and advances only confirmed advert media. No FilterTube transition banner is shown. Recommendation and inline-preview players are excluded, and the feature creates no additional YouTube requests.
+- **Advert Void**: The default-on `hideSponsoredCards` control applies to YouTube Main and YouTube Kids in both Blocklist and Whitelist modes. It removes the observed Player ad plan before YouTube schedules playback and hides sponsored DOM cards. If an advert still escapes into the player, the fallback requires the paired `ad-showing` and `ad-interrupting` state (or independent visible-ad evidence), then quarantines and advances only confirmed advert media. A stale single player class cannot hide the requested video. No FilterTube transition banner is shown. Recommendation and inline-preview players are excluded, and the feature creates no additional YouTube requests. The dedicated ad path does not activate the generic renderer mutation observer, reducing scroll-time card reflow.
 
 ### **Whitelist Mode Features (v3.2.5)**
 

@@ -39,8 +39,10 @@ the Android app's ad-free outcome through a browser-appropriate sequence:
    removing `playerAds`, `adPlacements`, `adSlots`, and
    `adBreakHeartbeatParams`. This applies to initial Player data plus intercepted
    `/youtubei/v1/player` and `/youtubei/v1/get_watch` JSON responses.
-2. As a fallback, inspect YouTube's active player for `ad-showing`/`ad-interrupting`, a visible
-   ad renderer with a real internal signal, or visible Skip/advertiser text.
+2. As a fallback, inspect YouTube's active player for the paired `ad-showing` **and**
+   `ad-interrupting` state, a visible ad renderer with a real internal signal, or
+   visible Skip/advertiser text. Requiring both player classes prevents a stale
+   class left behind during an SPA/player swap from being treated as a live ad.
 3. A setting-scoped style tied directly to `ad-showing`/`ad-interrupting` hides
    an escaped advert frame without displaying an intermediate FilterTube banner.
    Snapshot the viewer's current mute and volume state, then quarantine the advert's audio.
@@ -81,6 +83,24 @@ The manifest installs that seed on both YouTube Main and YouTube Kids, and the
 Kids compiled settings carry the active profile's same default-on, user-disableable flag. This matches
 the Android Kids player, which invokes the same suppression bridge as Main. The
 DOM fallback continues to remove sponsored cards and companion renderers.
+
+### Advert Void observer boundary (2026-08-26)
+
+The dedicated Advert Void path and the sponsored-card CSS path remain active
+when `hideSponsoredCards` is enabled, but the setting no longer counts as
+generic DOM-fallback mutation work. This keeps the broad renderer/mutation
+observer from repeatedly rescanning ordinary video cards while the MAIN-world
+player observer handles advert state. The change reduces scroll-time reflow and
+card reordering without weakening sponsored-card CSS cleanup or Player-payload
+ad-plan sanitization.
+
+The player fallback now treats `ad-showing` and `ad-interrupting` as a paired
+signal. A single stale class cannot hide, mute, or advance the requested video;
+the independent visible-ad selector/text evidence remains available. The
+focused contract is covered by
+`tests/runtime/ad-void-player-suppression-current-behavior.test.mjs` and the
+implementation boundary is recorded in
+`audit/FILTERTUBE_AD_VOID_PLAYER_STATE_AND_DOM_WORK_BOUNDARY_2026-08-26.md`.
 
 ## 2026-08-23 post-v3.3.5 runtime checkpoint
 

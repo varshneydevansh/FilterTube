@@ -144,13 +144,11 @@
         const style = document.createElement('style');
         style.id = AD_VOID_STYLE_ID;
         style.textContent = `
-            html[data-filtertube-ad-void-enabled] .html5-video-player.ad-showing video,
-            html[data-filtertube-ad-void-enabled] .html5-video-player.ad-interrupting video {
+            html[data-filtertube-ad-void-enabled] .html5-video-player.ad-showing.ad-interrupting video {
                 opacity: 0 !important;
                 visibility: hidden !important;
             }
-            html[data-filtertube-ad-void-enabled] .html5-video-player.ad-showing video[data-filtertube-ad-void-content="true"],
-            html[data-filtertube-ad-void-enabled] .html5-video-player.ad-interrupting video[data-filtertube-ad-void-content="true"] {
+            html[data-filtertube-ad-void-enabled] .html5-video-player.ad-showing.ad-interrupting video[data-filtertube-ad-void-content="true"] {
                 position: absolute !important;
                 inset: 0 !important;
                 z-index: 1002 !important;
@@ -360,7 +358,9 @@
 
     function adVoidHasInterruption(player) {
         const className = String(player?.className || '');
-        if (className.includes('ad-showing') || className.includes('ad-interrupting')) {
+        // YouTube can leave either class behind during SPA/player swaps. A
+        // single stale class must never hide or mute the requested video.
+        if (className.includes('ad-showing') && className.includes('ad-interrupting')) {
             return true;
         }
         for (const selector of AD_VOID_SELECTORS) {
