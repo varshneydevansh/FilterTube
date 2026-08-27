@@ -86,6 +86,13 @@ exist, is terminated/deleted, is name-only, or has a queue inconsistency; and
 available. This keeps the report readable without making the user scan a guide
 for states they did not select.
 
+The report is an opaque, bounded review sheet: the Filters page cannot show
+through it, the report controls have visible labels, status rows use compact
+badges, and internal queue codes such as `incomplete_channel_metadata` are
+translated into readable result text. Exact YouTube messages for permanent
+failures remain unchanged for verification. On narrow screens, rows become
+stacked cards with field labels instead of forcing a horizontal table scroll.
+
 For an unresolved imported channel row with a unique identity, the report also
 offers **Remove rule**. After parent/account authorization and confirmation it
 removes only matching imported records from the report's recorded targets,

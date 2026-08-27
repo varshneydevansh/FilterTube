@@ -5081,7 +5081,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                 ruleListReportStatusLabel(row.status),
                 Number(row.row) || '',
                 row.originalValue || row.value || '',
-                row.reason || '',
+                formatRuleListReportReason(row),
                 safeArray(summary?.report?.targets).map(formatRuleListReportTarget).join(' + ')
             ].map(escapeCsv).join(','))
         ].join('\n');
@@ -5091,6 +5091,35 @@ document.addEventListener('DOMContentLoaded', async () => {
         anchor.download = `FilterTube-Import-Report-${Date.now()}.csv`;
         anchor.click();
         setTimeout(() => URL.revokeObjectURL(blobUrl), 1000);
+    }
+
+    function formatRuleListReportReason(row) {
+        const rawReason = normalizeString(row?.reason || row?.lastError);
+        if (!rawReason) {
+            return row?.status === 'complete'
+                ? 'Channel details are complete.'
+                : 'Waiting for the first lookup.';
+        }
+        const normalizedReason = rawReason.toLowerCase();
+        const knownReasons = {
+            incomplete_channel_metadata: 'Some channel details are still missing. FilterTube will try again.',
+            temporary_fetch_failure: 'YouTube returned a temporary error. FilterTube will try again.',
+            fetch_failed: 'YouTube did not return channel details. FilterTube will try again.',
+            metadata_unavailable: 'YouTube did not provide complete channel details.',
+            timeout: 'YouTube took too long to respond. FilterTube will try again.',
+            channel_not_found: 'YouTube could not find this channel.',
+            channel_deleted: 'YouTube reports that this channel was deleted.',
+            channel_terminated: 'YouTube reports that this account was terminated.',
+            channel_unavailable: 'YouTube reports that this channel is unavailable.'
+        };
+        if (knownReasons[normalizedReason]) return knownReasons[normalizedReason];
+        if (/^[a-z0-9]+(?:_[a-z0-9]+)+$/.test(rawReason)) {
+            return rawReason
+                .split('_')
+                .map(word => word.charAt(0).toUpperCase() + word.slice(1))
+                .join(' ');
+        }
+        return rawReason;
     }
 
     const REPORT_IMPORTED_CHANNEL_SOURCES = new Set([
@@ -5252,7 +5281,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         card.setAttribute('aria-label', 'Rule list import reports');
         const header = document.createElement('div');
         header.className = 'card-header ft-modal-header';
-        header.innerHTML = '<h3>Import Reports</h3><p>Blocking rules are active as soon as a valid identifier is saved. This report separately tracks metadata completion and rows that need correction. Permanent lookup failures stop retrying here instead of being hidden.</p>';
+        header.innerHTML = '<h3>Import reports</h3><p>Your rules are active as soon as a valid identifier is saved. This view follows background channel-detail completion and highlights rows that need review.</p>';
         const controls = document.createElement('div');
         controls.className = 'rule-list-report-controls';
         const reportSelect = document.createElement('select');
@@ -5294,7 +5323,20 @@ document.addEventListener('DOMContentLoaded', async () => {
         search.className = 'text-input';
         search.type = 'search';
         search.placeholder = 'Search imported value or reason…';
-        controls.append(reportSelect, statusSelect, search);
+        const createReportControl = (labelText, control, ariaLabel) => {
+            const field = document.createElement('label');
+            field.className = 'rule-list-report-control';
+            const label = document.createElement('span');
+            label.textContent = labelText;
+            control.setAttribute('aria-label', ariaLabel);
+            field.append(label, control);
+            return field;
+        };
+        controls.append(
+            createReportControl('Import', reportSelect, 'Choose an import report'),
+            createReportControl('Show', statusSelect, 'Filter report rows by status'),
+            createReportControl('Find a row', search, 'Search imported values or reasons')
+        );
         const body = document.createElement('div');
         body.className = 'rule-list-report-modal__body';
         const actions = document.createElement('div');
@@ -5322,7 +5364,14 @@ document.addEventListener('DOMContentLoaded', async () => {
             const filtered = activeSummary.rows.filter((row) => {
                 if (status !== 'all' && row.status !== status) return false;
                 if (!query) return true;
-                return [row.originalValue, row.value, row.name, row.reason]
+                return [
+                    row.originalValue,
+                    row.value,
+                    row.name,
+                    row.reason,
+                    formatRuleListReportReason(row),
+                    ruleListReportStatusLabel(row.status)
+                ]
                     .some(value => normalizeString(value).toLowerCase().includes(query));
             });
             const shown = filtered.slice(0, visibleLimit);
@@ -5335,14 +5384,23 @@ document.addEventListener('DOMContentLoaded', async () => {
                 ['fetching', counts.fetching, 'Fetching'],
                 ['needs_attention', counts.needs_attention, 'Needs attention']
             ];
+            const selectedCount = filtered.length;
+            const selectedLabel = status === 'all' ? 'All rows' : ruleListReportStatusLabel(status);
+            const visibleRowsNote = filtered.length > shown.length
+                ? ` Showing the first ${shown.length} rows; use search or Show more to narrow the list.`
+                : '';
             body.innerHTML = `
-                <div class="rule-list-report-summary">
-                    ${summaryMetrics.map(([, count, label]) => `<div><strong>${count}</strong><span>${label}</span></div>`).join('')}
+                <div class="rule-list-report-selected-state is-${status}" role="status" aria-live="polite">
+                    <div class="rule-list-report-selected-state__heading"><span>Viewing</span><strong>${escapeManagedRuleListPreviewCell(selectedLabel)}</strong></div>
+                    <span>${selectedCount} ${pluralize(selectedCount, 'matching row')} · ${escapeManagedRuleListPreviewCell(statusDescriptions[status] || statusDescriptions.all)}${visibleRowsNote}</span>
                 </div>
-                <div class="rule-list-report-selected-state"><strong>${escapeManagedRuleListPreviewCell(status === 'all' ? 'All rows' : ruleListReportStatusLabel(status))}</strong><span>${escapeManagedRuleListPreviewCell(statusDescriptions[status] || statusDescriptions.all)}</span></div>
+                <div class="rule-list-report-summary" role="list" aria-label="Import row counts">
+                    ${summaryMetrics.map(([key, count, label]) => `<div class="is-${key}" role="listitem"><strong>${count}</strong><span>${label}</span></div>`).join('')}
+                </div>
                 <div class="rule-list-report-context">
-                    <strong>${escapeManagedRuleListPreviewCell(activeSummary.report.sourceLabel)}</strong>
-                    <span>${escapeManagedRuleListPreviewCell(reportTargets || 'No target recorded')} · ${activeSummary.report.counts.keywords} keyword rules · ${activeSummary.report.counts.duplicates} duplicates</span>
+                    <div><small>Import</small><strong>${escapeManagedRuleListPreviewCell(activeSummary.report.sourceLabel)}</strong></div>
+                    <div><small>Applies to</small><span>${escapeManagedRuleListPreviewCell(reportTargets || 'No target recorded')}</span></div>
+                    <div><small>Other rules</small><span>${activeSummary.report.counts.keywords} keywords · ${activeSummary.report.counts.duplicates} duplicates</span></div>
                 </div>
                 <div class="rule-list-report-table" role="table" aria-label="Import report rows">
                     <div class="rule-list-report-row rule-list-report-row--head" role="row">
@@ -5363,6 +5421,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                             : '';
                         const resultReason = row.reason
                             || (row.status === 'complete' ? 'Channel metadata is complete.' : 'Waiting for metadata.');
+                        const readableReason = formatRuleListReportReason({ ...row, reason: resultReason });
                         const manualGuidance = permanentFailure
                             ? 'Verify this identifier on YouTube or replace it with an exact channel URL/UC ID. The saved rule remains active until you change or remove it.'
                             : '';
@@ -5372,10 +5431,10 @@ document.addEventListener('DOMContentLoaded', async () => {
                         ].join('');
                         return `
                             <div class="rule-list-report-row is-${row.status}" role="row">
-                                <span><b>${ruleListReportStatusLabel(row.status)}</b>${row.attempts ? `<small>Attempt ${row.attempts}</small>` : ''}</span>
-                                <span><small>${row.row ? `Row ${row.row}` : 'Imported row'}</small><code>${escapeManagedRuleListPreviewCell(row.originalValue || row.value || '')}</code></span>
-                                <span><span>${escapeManagedRuleListPreviewCell(resultReason + targetProgress + retryTiming)}</span>${manualGuidance ? `<small>${escapeManagedRuleListPreviewCell(manualGuidance)}</small>` : ''}</span>
-                                <span><span class="rule-list-report-actions">${actionMarkup}</span></span>
+                                <span data-label="Status"><b class="rule-list-report-status-badge is-${row.status}">${ruleListReportStatusLabel(row.status)}</b>${row.attempts ? `<small>Attempt ${row.attempts}</small>` : ''}</span>
+                                <span data-label="Imported value"><small>${row.row ? `Source row ${row.row}` : 'Imported row'}</small><code>${escapeManagedRuleListPreviewCell(row.originalValue || row.value || '')}</code></span>
+                                <span data-label="Result"><strong class="rule-list-report-result-title">${escapeManagedRuleListPreviewCell(readableReason)}</strong>${targetProgress || retryTiming ? `<small>${escapeManagedRuleListPreviewCell(`${targetProgress}${retryTiming}`.trim())}</small>` : ''}${manualGuidance ? `<small>${escapeManagedRuleListPreviewCell(manualGuidance)}</small>` : ''}</span>
+                                <span data-label="Action"><span class="rule-list-report-actions">${actionMarkup}</span></span>
                             </div>
                         `;
                     }).join('') || '<div class="rule-list-report-empty">No rows match this filter.</div>'}

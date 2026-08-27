@@ -578,6 +578,10 @@ test('import and profile-switch paths preserve the normal post-entry enrichment 
   assert.match(tabViewSource, /The UC ID, channel name, handle\/custom URL, and avatar are available/);
   assert.match(tabViewSource, /rule-list-report-selected-state/);
   assert.doesNotMatch(tabViewSource, /rule-list-report-filter-help/);
+  assert.match(tabViewSource, /function formatRuleListReportReason\(row\)/);
+  assert.match(tabViewSource, /Some channel details are still missing/);
+  assert.match(tabViewSource, /createReportControl/);
+  assert.match(tabViewSource, /data-label="Status"/);
   assert.match(tabViewSource, /Remove imported channel rule\?/);
   assert.match(tabViewSource, /rule-list-report-remove/);
   assert.match(tabViewSource, /metadata lookup stopped/);
@@ -592,6 +596,11 @@ test('import and profile-switch paths preserve the normal post-entry enrichment 
   assert.match(tabViewCssSource, /\.subscriptions-import-inline\[hidden\]\s*\{\s*display:\s*none\s*!important;/s);
   assert.match(tabViewCssSource, /\.rule-list-report-selected-state\s*\{/);
   assert.match(tabViewCssSource, /\.rule-list-report-actions\s*\{/);
+  assert.match(tabViewCssSource, /background:\s*#fffdf9/);
+  assert.match(tabViewCssSource, /\.rule-list-report-actions \.btn-secondary\s*\{[\s\S]*display:\s*inline-flex/);
+  assert.match(tabViewCssSource, /grid-template-columns:\s*minmax\(110px, 0\.58fr\)/);
+  assert.match(tabViewCssSource, /@media \(min-width: 768px\)/);
+  assert.match(tabViewCssSource, /@media \(min-width: 960px\)/);
   assert.match(backgroundSource, /resolvedPrimaryId/);
   assert.match(backgroundSource, /incomingCustomUrlForMatch/);
   assert.match(backgroundSource, /actorProfileId/);

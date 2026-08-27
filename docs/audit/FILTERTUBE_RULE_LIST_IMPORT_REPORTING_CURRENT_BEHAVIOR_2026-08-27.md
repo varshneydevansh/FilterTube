@@ -63,6 +63,11 @@ identity lookup queue.
 - Current status builds per-target identity and queue indexes before joining
   rows; it does not scan a 15,000-row saved channel list for each report row.
 - The modal mounts at most 200 result rows and expands in 200-row pages.
+- The report sheet is opaque, labels its three controls, translates internal
+  queue error codes into readable result text, and uses compact status/action
+  treatments so rows do not expand around oversized buttons.
+- At mobile widths the report table becomes stacked labeled cards rather than
+  introducing a horizontal scroll surface.
 - Report history retains at most 12 reports and 50,000 total rows, always
   retaining the newest report.
 - Existing Main/Kids rule-list virtualization remains the Channel Management
