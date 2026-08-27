@@ -7091,6 +7091,8 @@ async function initializeDOMFallback(settings) {
         let lastFallbackRunTs = 0;
         let pendingImmediateFallbackTimer = 0;
         const MIN_FALLBACK_INTERVAL_MS = 250;
+        const pendingFallbackCandidates = new Set();
+        let pendingFallbackNeedsFullPass = false;
 
         const debouncedFallback = debounce(() => {
             if (isFilterTubeNativeOverlayQuietMode() || isFilterTubeManagedViewingRouteDenied()) return;
@@ -7099,8 +7101,16 @@ async function initializeDOMFallback(settings) {
         }, 200);
 
         let immediateFallbackScheduled = false;
-        function scheduleImmediateFallback() {
+        function scheduleImmediateFallback(candidateElements = null, forceFullPass = candidateElements == null) {
             if (isFilterTubeNativeOverlayQuietMode() || isFilterTubeManagedViewingRouteDenied()) return;
+            if (forceFullPass) {
+                pendingFallbackNeedsFullPass = true;
+            }
+            for (const candidate of Array.isArray(candidateElements) ? candidateElements : []) {
+                if (candidate instanceof Element && candidate.isConnected !== false) {
+                    pendingFallbackCandidates.add(candidate);
+                }
+            }
             if (immediateFallbackScheduled) return;
             immediateFallbackScheduled = true;
             requestAnimationFrame(() => {
@@ -7115,7 +7125,7 @@ async function initializeDOMFallback(settings) {
                         pendingImmediateFallbackTimer = 0;
                         if (isFilterTubeNativeOverlayQuietMode() || isFilterTubeManagedViewingRouteDenied()) return;
                         lastFallbackRunTs = Date.now();
-                        applyDOMFallback(null);
+                        runPendingFallbackRequest();
                         try {
                             schedulePrefetchScan();
                         } catch (e) {
@@ -7125,12 +7135,30 @@ async function initializeDOMFallback(settings) {
                 }
 
                 lastFallbackRunTs = now;
-                applyDOMFallback(null);
+                runPendingFallbackRequest();
                 try {
                     schedulePrefetchScan();
                 } catch (e) {
                 }
             });
+        }
+
+        function runPendingFallbackRequest() {
+            const candidates = Array.from(pendingFallbackCandidates);
+            const needsFullPass = pendingFallbackNeedsFullPass;
+            pendingFallbackCandidates.clear();
+            pendingFallbackNeedsFullPass = false;
+
+            const isHome = (document.location?.pathname || '') === '/';
+            if (isHome && !needsFullPass && candidates.length > 0) {
+                applyDOMFallback(null, {
+                    preserveScroll: false,
+                    incrementalHomeCards: true,
+                    candidateElements: candidates
+                });
+                return;
+            }
+            applyDOMFallback(null);
         }
 
         const whitelistPendingRefreshState = {
@@ -7383,21 +7411,91 @@ async function initializeDOMFallback(settings) {
             return false;
         }
 
+        const fallbackFullPassSelector = [
+            'yt-chip-cloud-chip-renderer',
+            'ytm-chip-cloud-chip-renderer',
+            'ytd-rich-section-renderer',
+            'ytd-shelf-renderer',
+            'ytd-rich-shelf-renderer',
+            'ytd-reel-shelf-renderer',
+            'ytd-item-section-renderer',
+            'ytd-guide-entry-renderer',
+            'ytd-comment-thread-renderer',
+            'ytd-inline-survey-renderer',
+            'grid-shelf-view-model',
+            'ytd-horizontal-card-list-renderer',
+            'yt-section-header-view-model',
+            'ytm-rich-section-renderer',
+            'ytm-item-section-renderer',
+            'ytm-section-list-renderer',
+            'ytm-guide-entry-renderer',
+            'ytm-comment-thread-renderer'
+        ].join(',');
+        const FALLBACK_MUTATION_CANDIDATE_LIMIT = 240;
+
         function fallbackMutationSummary(mutations) {
-            const summary = { hasAddedNodes: false, hasFallbackRelevantContent: false };
+            const summary = {
+                hasAddedNodes: false,
+                hasFallbackRelevantContent: false,
+                requiresFullFallback: false,
+                candidateElements: []
+            };
+            const candidates = new Set();
+            const addCandidate = (candidate) => {
+                if (!(candidate instanceof Element)) return false;
+                const owner = typeof getFilterTubeVisualCardOwner === 'function'
+                    ? getFilterTubeVisualCardOwner(candidate)
+                    : candidate;
+                if (!(owner instanceof Element) || owner.isConnected === false) return false;
+                if (candidates.has(owner)) return true;
+                if (candidates.size >= FALLBACK_MUTATION_CANDIDATE_LIMIT) {
+                    summary.requiresFullFallback = true;
+                    return true;
+                }
+                candidates.add(owner);
+                return true;
+            };
+            const collectCandidates = (node) => {
+                if (!(node instanceof Element)) return false;
+                let foundCandidate = false;
+                try {
+                    const closest = node.closest?.(VIDEO_CARD_SELECTORS);
+                    if (closest) foundCandidate = addCandidate(closest) || foundCandidate;
+                    if (node.matches?.(VIDEO_CARD_SELECTORS)) foundCandidate = addCandidate(node) || foundCandidate;
+                    for (const nested of node.querySelectorAll?.(VIDEO_CARD_SELECTORS) || []) {
+                        foundCandidate = addCandidate(nested) || foundCandidate;
+                        if (summary.requiresFullFallback) break;
+                    }
+                } catch (e) {
+                }
+                return foundCandidate;
+            };
             try {
                 for (const mutation of mutations || []) {
                     if (!mutation?.addedNodes || mutation.addedNodes.length === 0) continue;
                     summary.hasAddedNodes = true;
                     for (const node of mutation.addedNodes) {
-                        if (nodeLooksFallbackRelevant(node)) {
-                            summary.hasFallbackRelevantContent = true;
-                            return summary;
+                        if (!(node instanceof Element)) continue;
+                        const relevant = nodeLooksFallbackRelevant(node) || Boolean(node.closest?.(VIDEO_CARD_SELECTORS));
+                        if (!relevant) continue;
+                        summary.hasFallbackRelevantContent = true;
+                        const foundCandidate = collectCandidates(node);
+                        try {
+                            if (node.matches?.(fallbackFullPassSelector) || node.querySelector?.(fallbackFullPassSelector)) {
+                                summary.requiresFullFallback = true;
+                            }
+                        } catch (e) {
+                            summary.requiresFullFallback = true;
+                        }
+                        if (!foundCandidate) {
+                            summary.requiresFullFallback = true;
                         }
                     }
                 }
             } catch (e) {
+                summary.requiresFullFallback = true;
             }
+            summary.candidateElements = Array.from(candidates);
             return summary;
         }
         let fallbackMutationObserverActive = false;
@@ -7421,7 +7519,10 @@ async function initializeDOMFallback(settings) {
                 primeAllowOnlyCategoryCards(mutations);
                 queueWhitelistPendingHide(mutations);
                 if (mutationSummary.hasFallbackRelevantContent) {
-                    scheduleImmediateFallback();
+                    scheduleImmediateFallback(
+                        mutationSummary.candidateElements,
+                        mutationSummary.requiresFullFallback
+                    );
                 }
             }
         });

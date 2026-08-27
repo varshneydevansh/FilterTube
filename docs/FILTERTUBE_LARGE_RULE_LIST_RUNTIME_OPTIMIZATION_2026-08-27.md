@@ -15,6 +15,8 @@ This slice reduces repeated work caused by large channel and video-ID lists on Y
 - Per-card hidden-time counters still update immediately, but storage persistence is coalesced into one queued write for a synchronous hide/restore burst.
 - A second stats write is scheduled if counters change while the first storage operation is in flight.
 - The per-card saved-time console message and its channel-name DOM query now run only when `window.__filtertubeDebug` is enabled.
+- Home-feed mutation bursts collect and deduplicate affected visual card owners. Ordinary card hydration/insertion uses an incremental card pass instead of immediately rescanning every card, shelf, Short, comment, chip, and guide entry.
+- Structural Home mutations involving chip rails, sections, shelves, comments, guide entries, surveys, or grid shelves retain the full fallback pass.
 
 ## Channel identity contract
 
@@ -37,11 +39,10 @@ The post-change source-level benchmark used the supplied BlockTube backup with 1
 | Reused engine and indexes | 3.75 ms | 3.38 ms |
 | Replacement settings forcing rebuild | 17.87 ms | 15.53 ms |
 
-This benchmark isolates JSON filtering work. It does not claim that all Home-page flashing is resolved; full DOM fallback scans remain a separate optimization boundary.
+This benchmark isolates JSON filtering work. Home mutation targeting is protected by source-level ownership tests and still needs live YouTube interaction proof after reloading the unpacked extension.
 
 ## Deliberately deferred
 
-- Targeted MutationObserver card queues instead of full fallback scans.
 - Lightweight candidate extraction for channel-only policies.
 - Dashboard projection and metadata-row index caching.
 - Recursive JSON structural sharing or in-place mutation.

@@ -224,3 +224,21 @@ test('hidden-card statistics persist once per synchronous mutation burst', () =>
   assert.match(incrementBlock, /if \(window\.__filtertubeDebug === true\)/);
   assert.equal((incrementBlock.match(/console\.log\(`FilterTube: Saved/g) || []).length, 1);
 });
+
+test('Home mutation fallback queues affected cards while structural mutations retain the full pass', () => {
+  const bridge = read('js/content_bridge.js');
+  const fallback = read('js/content/dom_fallback.js');
+
+  assert.match(bridge, /const pendingFallbackCandidates = new Set\(\)/);
+  assert.match(bridge, /function scheduleImmediateFallback\(candidateElements = null, forceFullPass = candidateElements == null\)/);
+  assert.match(bridge, /incrementalHomeCards: true/);
+  assert.match(bridge, /candidateElements: candidates/);
+  assert.match(bridge, /const fallbackFullPassSelector = \[/);
+  assert.match(bridge, /mutationSummary\.requiresFullFallback/);
+  assert.match(bridge, /mutationSummary\.candidateElements/);
+
+  assert.match(fallback, /function collectFilterTubeVisualCardOwnersFromCandidates\(candidates, selector\)/);
+  assert.match(fallback, /const useIncrementalHomeCards = Boolean\(/);
+  assert.match(fallback, /collectFilterTubeVisualCardOwnersFromCandidates\(candidateElements, videoSelector\)/);
+  assert.match(fallback, /if \(useIncrementalHomeCards\) \{\s*return;\s*\}/);
+});

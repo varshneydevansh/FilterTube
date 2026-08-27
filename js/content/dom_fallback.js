@@ -439,6 +439,37 @@ function collectFilterTubeVisualCardOwners(selector) {
     return owners;
 }
 
+function collectFilterTubeVisualCardOwnersFromCandidates(candidates, selector) {
+    const owners = [];
+    const seen = new Set();
+    const addCandidate = (candidate) => {
+        if (!(candidate instanceof Element)) return;
+        const owner = getFilterTubeVisualCardOwner(candidate);
+        if (!owner || seen.has(owner) || owner.isConnected === false) return;
+        try {
+            if (!owner.matches?.(selector) && !owner.querySelector?.(selector)) return;
+        } catch (e) {
+            return;
+        }
+        seen.add(owner);
+        owners.push(owner);
+    };
+
+    for (const candidate of Array.isArray(candidates) ? candidates : []) {
+        if (!(candidate instanceof Element)) continue;
+        try {
+            const closest = candidate.closest?.(selector);
+            if (closest) addCandidate(closest);
+            if (candidate.matches?.(selector)) addCandidate(candidate);
+            for (const nested of candidate.querySelectorAll?.(selector) || []) {
+                addCandidate(nested);
+            }
+        } catch (e) {
+        }
+    }
+    return owners;
+}
+
 function getCategoryPolicySignature(settings) {
     const categoryFilters = settings && typeof settings === 'object'
         ? settings.categoryFilters
@@ -4414,11 +4445,27 @@ async function applyDOMFallback(settings, options = {}) {
     });
 
     runState.latestSettings = effectiveSettings;
-    runState.latestOptions = options;
     if (runState.running) {
+        const priorOptions = runState.latestOptions || {};
+        const priorIncremental = priorOptions.incrementalHomeCards === true;
+        const nextIncremental = options.incrementalHomeCards === true;
+        if (priorIncremental && nextIncremental) {
+            runState.latestOptions = {
+                ...priorOptions,
+                ...options,
+                candidateElements: Array.from(new Set([
+                    ...(Array.isArray(priorOptions.candidateElements) ? priorOptions.candidateElements : []),
+                    ...(Array.isArray(options.candidateElements) ? options.candidateElements : [])
+                ]))
+            };
+        } else if (!priorIncremental || !nextIncremental) {
+            // A full pass dominates an incremental pass while one is running.
+            runState.latestOptions = priorIncremental ? options : priorOptions;
+        }
         runState.pending = true;
         return;
     }
+    runState.latestOptions = options;
     runState.running = true;
 
     const yieldToMain = () => {
@@ -4445,7 +4492,19 @@ async function applyDOMFallback(settings, options = {}) {
     })();
 
     currentSettings = effectiveSettings;
-    const { forceReprocess = false, preserveScroll = true, onlyWhitelistPending = false } = options;
+    const {
+        forceReprocess = false,
+        preserveScroll = true,
+        onlyWhitelistPending = false,
+        incrementalHomeCards = false,
+        candidateElements = null
+    } = options;
+    const useIncrementalHomeCards = Boolean(
+        incrementalHomeCards === true &&
+        isFilterTubeHomeRoute() &&
+        Array.isArray(candidateElements) &&
+        candidateElements.length > 0
+    );
     if (enforceCurrentChannelPageDirectAccess(effectiveSettings)) return;
     enforceCurrentWatchOwnerBlock(effectiveSettings);
     syncRouteScopedContentControls(effectiveSettings);
@@ -4703,11 +4762,12 @@ async function applyDOMFallback(settings, options = {}) {
     }
 
     // 1. Video/Content Filtering
-    const videoElements = collectFilterTubeVisualCardOwners(
-        (onlyWhitelistPending && listMode === 'whitelist')
-            ? `${VIDEO_CARD_SELECTORS}[data-filtertube-whitelist-pending="true"]`
-            : VIDEO_CARD_SELECTORS
-    );
+    const videoSelector = (onlyWhitelistPending && listMode === 'whitelist')
+        ? `${VIDEO_CARD_SELECTORS}[data-filtertube-whitelist-pending="true"]`
+        : VIDEO_CARD_SELECTORS;
+    const videoElements = useIncrementalHomeCards
+        ? collectFilterTubeVisualCardOwnersFromCandidates(candidateElements, videoSelector)
+        : collectFilterTubeVisualCardOwners(videoSelector);
     const categoryPolicySignature = getCategoryPolicySignature(effectiveSettings);
     const languagePolicySignature = getLanguagePolicySignature(effectiveSettings);
     const isWatchPage = (() => {
@@ -6605,6 +6665,10 @@ async function applyDOMFallback(settings, options = {}) {
 
     if (filterTubeHiddenRowsThisRun > 0) {
         scheduleFilterTubeContinuationNudge(`hidden rows: ${filterTubeHiddenRowsThisRun}`);
+    }
+
+    if (useIncrementalHomeCards) {
+        return;
     }
 
     if (onlyWhitelistPending && listMode === 'whitelist') {
