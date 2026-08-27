@@ -21,6 +21,7 @@ This slice reduces repeated work caused by large channel and video-ID lists on Y
 - Content-side rule edits replace their array snapshot. Newly learned channel mappings increment a lightweight in-memory revision, immediately invalidating identity-keyed channel indexes without cloning the map or performing a full-list signature scan.
 - Channel/video-ID-only JSON filtering keeps channel, collaborator, video, playlist, and renderer identity extraction, but skips description, tags, and extended searchable metadata that no active rule can consume.
 - Any block keyword, allow keyword, comment keyword, or debug trace retains the complete searchable metadata extraction path.
+- Channel identities learned from rendered Home cards are batched for 120 ms and recheck only those changed card owners. Identity stamps on Search, Watch, Shorts, channel, and Kids routes retain the full fallback path.
 
 ## Channel identity contract
 

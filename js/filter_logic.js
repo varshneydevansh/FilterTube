@@ -33,7 +33,7 @@
         log(stage, details = {}) {
             if (!this.enabled()) return;
             try {
-                console.info('[FilterTube Perf]', stage, JSON.stringify(details));
+                console.warn('[FilterTube Perf]', stage, JSON.stringify(details));
             } catch (e) {
             }
         }

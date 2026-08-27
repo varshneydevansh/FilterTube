@@ -1756,9 +1756,31 @@ function stampChannelIdentity(card, info, options = {}) {
     if (!changed || options?.scheduleFallback === false) return changed;
 
     if (typeof applyDOMFallback !== 'function') return true;
-    const state = window.__filtertubeStampFallbackState || (window.__filtertubeStampFallbackState = { timer: 0 });
+    const state = window.__filtertubeStampFallbackState || (window.__filtertubeStampFallbackState = {
+        timer: 0,
+        candidates: new Set()
+    });
+    if (!(state.candidates instanceof Set)) state.candidates = new Set();
+    if (card?.isConnected !== false) state.candidates.add(card);
     if (state.timer) return true;
-    state.timer = setTimeout(() => { state.timer = 0; try { applyDOMFallback(null); } catch (e) { } }, 120);
+    state.timer = setTimeout(() => {
+        state.timer = 0;
+        const candidates = Array.from(state.candidates).filter(candidate => candidate?.isConnected !== false);
+        state.candidates.clear();
+        try {
+            const isHome = (document.location?.pathname || '') === '/';
+            if (isHome && candidates.length > 0) {
+                applyDOMFallback(null, {
+                    preserveScroll: false,
+                    incrementalHomeCards: true,
+                    candidateElements: candidates
+                });
+                return;
+            }
+            applyDOMFallback(null);
+        } catch (e) {
+        }
+    }, 120);
     return true;
 }
 

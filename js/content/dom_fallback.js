@@ -33,7 +33,9 @@ window.FilterTubePerfDebug = window.FilterTubePerfDebug || {
     log(stage, details = {}) {
         if (!this.enabled()) return;
         try {
-            console.info('[FilterTube Perf]', stage, JSON.stringify(details));
+            // Routine log/info calls are intentionally gated in the isolated
+            // world. Warn remains visible while this explicit perf flag is on.
+            console.warn('[FilterTube Perf]', stage, JSON.stringify(details));
         } catch (e) {
         }
     }

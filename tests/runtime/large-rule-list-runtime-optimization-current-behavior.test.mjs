@@ -304,3 +304,17 @@ test('temporary performance diagnostics are opt-in and aggregate expensive stage
   assert.match(fallback, /perf\.log\('dom-fallback'/);
   assert.match(bridge, /perf\?\.log\?\.\('observer-fallback-request'/);
 });
+
+test('learned Home card identities batch into an incremental fallback pass', () => {
+  const bridge = read('js/content_bridge.js');
+  const start = bridge.indexOf('function stampChannelIdentity(card, info, options = {}) {');
+  const end = bridge.indexOf('function resetCardIdentityIfStale(card, videoId) {', start);
+  const stamp = bridge.slice(start, end);
+
+  assert.match(stamp, /candidates: new Set\(\)/);
+  assert.match(stamp, /state\.candidates\.add\(card\)/);
+  assert.match(stamp, /const isHome = \(document\.location\?\.pathname \|\| ''\) === '\/'/);
+  assert.match(stamp, /incrementalHomeCards: true/);
+  assert.match(stamp, /candidateElements: candidates/);
+  assert.match(stamp, /applyDOMFallback\(null\)/, 'non-Home identity stamps must retain the full fallback path');
+});
