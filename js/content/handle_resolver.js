@@ -38,13 +38,22 @@ function persistChannelMappings(mappings = []) {
         currentSettings.channelMap = {};
     }
     const map = currentSettings.channelMap;
+    let changed = false;
     mappings.forEach(mapping => {
         if (!mapping || !mapping.id || !mapping.handle) return;
         const idKey = mapping.id.toLowerCase();
         const handleKey = mapping.handle.toLowerCase();
+        if (map[idKey] === mapping.handle && map[handleKey] === mapping.id) return;
         map[idKey] = mapping.handle;
         map[handleKey] = mapping.id;
+        changed = true;
     });
+    if (changed) {
+        // Invalidate identity-keyed channel indexes without cloning a large
+        // channel map or rescanning every imported rule for a signature.
+        currentSettings.__filtertubeChannelMapRevision =
+            (Number(currentSettings.__filtertubeChannelMapRevision) || 0) + 1;
+    }
 }
 
 function normalizeHandleGlyphs(value) {
