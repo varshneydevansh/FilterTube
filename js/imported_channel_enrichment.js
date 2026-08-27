@@ -29,6 +29,23 @@
         'blocktube',
         'blocktube-channel-name'
     ]);
+    const PERMANENT_ERROR_CODES = new Set([
+        'channel_not_found',
+        'channel_deleted',
+        'channel_terminated',
+        'channel_unavailable',
+        'resource_not_found',
+        'not_found',
+        'http_404',
+        'http_410'
+    ]);
+    const PERMANENT_ERROR_PATTERNS = [
+        /\bchannel\b[\s\S]{0,80}\b(?:does not|doesn't|no longer)\s+exist\b/i,
+        /\bchannel\b[\s\S]{0,80}\b(?:not found|was deleted|has been deleted|is deleted|is unavailable)\b/i,
+        /\b(?:resource|page)\b[\s\S]{0,40}\b(?:not found|is unavailable)\b/i,
+        /\b(?:this\s+)?account\b[\s\S]{0,80}\bterminated\b/i,
+        /\b(?:channel|channel page|page)\b[\s\S]{0,40}\b(?:404|410)\b/i
+    ];
 
     function safeObject(value) {
         return value && typeof value === 'object' && !Array.isArray(value) ? value : {};
@@ -40,6 +57,26 @@
 
     function text(value) {
         return typeof value === 'string' ? value.trim() : '';
+    }
+
+    function classifyEnrichmentFailure(result) {
+        const errorCode = text(result?.errorCode).toLowerCase();
+        const error = text(result?.error);
+        if (PERMANENT_ERROR_CODES.has(errorCode)) {
+            return { permanent: true, failureKind: 'permanent', errorCode };
+        }
+        if (PERMANENT_ERROR_PATTERNS.some(pattern => pattern.test(`${errorCode} ${error}`))) {
+            return {
+                permanent: true,
+                failureKind: 'permanent',
+                errorCode: errorCode || (/\bterminated\b/i.test(error) ? 'channel_terminated' : 'channel_not_found')
+            };
+        }
+        return { permanent: false, failureKind: 'transient', errorCode };
+    }
+
+    function isTerminalTask(task) {
+        return text(task?.failureKind).toLowerCase() === 'permanent';
     }
 
     function isValidChannelId(value) {
@@ -218,6 +255,15 @@
         const attempts = Number(raw.attempts);
         const nextAttemptAt = Number(raw.nextAttemptAt);
         const lastErrorAt = Number(raw.lastErrorAt);
+        const lastError = text(raw.lastError);
+        const failureClassification = classifyEnrichmentFailure({
+            errorCode: raw.errorCode,
+            error: lastError
+        });
+        const failureKind = text(raw.failureKind).toLowerCase() === 'permanent'
+            || failureClassification.permanent
+            ? 'permanent'
+            : '';
         return {
             id: isValidChannelId(input) ? input : '',
             input,
@@ -233,28 +279,36 @@
             nextAttemptAt: Number.isFinite(nextAttemptAt) && nextAttemptAt > 0
                 ? Math.floor(nextAttemptAt)
                 : 0,
-            lastError: text(raw.lastError),
+            lastError,
             lastErrorAt: Number.isFinite(lastErrorAt) && lastErrorAt > 0
                 ? Math.floor(lastErrorAt)
-                : 0
+                : 0,
+            failureKind,
+            errorCode: text(raw.errorCode).toLowerCase() || (failureKind ? failureClassification.errorCode : '')
         };
     }
 
     function normalizeJob(value) {
         const raw = safeObject(value);
         const pending = [];
+        const attention = [];
         const seen = new Set();
-        const addTask = (candidate) => {
+        const addTask = (candidate, destination) => {
             const task = normalizeTask(candidate);
             const keys = scopedTaskIdentityKeys(task);
             if (!task || !keys.length || keys.some(key => seen.has(key))) return;
             keys.forEach(key => seen.add(key));
-            pending.push(task);
+            (isTerminalTask(task) ? attention : destination).push(task);
         };
-        safeArray(raw.pending).forEach(addTask);
+        // Terminal rows are retained separately so a permanent lookup failure
+        // remains reportable without being selected by the active worker.
+        safeArray(raw.attention).forEach(task => addTask(task, attention));
+        safeArray(raw.failed).forEach(task => addTask(task, attention));
+        safeArray(raw.pending).forEach(task => addTask(task, pending));
         return {
             version: 2,
             pending,
+            attention,
             inFlight: normalizeTask(raw.inFlight),
             nextRunAt: Number.isFinite(Number(raw.nextRunAt)) && Number(raw.nextRunAt) > 0
                 ? Math.floor(Number(raw.nextRunAt))
@@ -330,19 +384,21 @@
             const normalized = normalizeJob(job);
             const pending = normalized.pending.length;
             const inFlight = Boolean(normalized.inFlight);
+            const attention = normalized.attention.length;
             return {
                 ok: true,
                 scheduler: 'background',
                 pending,
                 inFlight,
                 total: pending + (inFlight ? 1 : 0),
+                attention,
                 paused: normalized.paused,
                 pausedReason: normalized.pausedReason,
                 blockedReason: normalized.blockedReason,
                 lastError: normalized.lastError,
                 lastErrorAt: normalized.lastErrorAt,
                 lastCompletedAt: normalized.lastCompletedAt,
-                initialTotal: Math.max(normalized.initialTotal, pending + (inFlight ? 1 : 0) + normalized.completed),
+                initialTotal: Math.max(normalized.initialTotal, pending + (inFlight ? 1 : 0) + normalized.completed + attention),
                 completed: normalized.completed,
                 nextRunAt: normalized.nextRunAt,
                 updatedAt: normalized.updatedAt,
@@ -558,8 +614,9 @@
                 scopedTaskIdentityKeys(task).map(key => candidateAliasCanonical.get(key) || key)
             )];
             const merged = [];
+            const mergedAttention = [];
             const seen = new Set();
-            const addStored = (rawTask) => {
+            const addStored = (rawTask, destination) => {
                 const task = normalizeTask(rawTask);
                 const keys = canonicalTaskKeys(task);
                 if (!task || !keys.length || keys.some(key => seen.has(key))) return;
@@ -569,9 +626,10 @@
                     ? activeProfileId
                     : (text(task.actorProfileId) || activeProfileId);
                 keys.forEach(key => seen.add(key));
-                merged.push({ ...task, targetProfileId, actorProfileId });
+                destination.push({ ...task, targetProfileId, actorProfileId });
             };
-            stored.pending.forEach(addStored);
+            stored.attention.forEach(task => addStored(task, mergedAttention));
+            stored.pending.forEach(task => addStored(task, merged));
             candidateTasks.forEach((task) => {
                 const keys = canonicalTaskKeys(task);
                 if (!keys.length || keys.some(key => seen.has(key))) return;
@@ -582,6 +640,7 @@
                 ...stored,
                 version: 2,
                 pending: merged,
+                attention: mergedAttention,
                 inFlight: null
             };
         };
@@ -607,8 +666,12 @@
             const normalized = normalizeJob(job);
             if (!normalized.pending.length && !normalized.inFlight) {
                 await stopWake();
-                await removeJob();
-                return status(normalized);
+                if (normalized.attention.length) {
+                    await writeJob({ ...normalized, nextRunAt: 0 });
+                } else {
+                    await removeJob();
+                }
+                return status({ ...normalized, nextRunAt: 0 });
             }
             if (normalized.paused || normalized.blockedReason) {
                 await writeJob({ ...normalized, nextRunAt: 0 });
@@ -624,8 +687,12 @@
             let job = recoveredJob(await readJob());
             if (!job.pending.length && !job.inFlight) {
                 await stopWake();
-                await removeJob();
-                return status(job);
+                if (job.attention.length) {
+                    await writeJob({ ...job, nextRunAt: 0 });
+                } else {
+                    await removeJob();
+                }
+                return status({ ...job, nextRunAt: 0 });
             }
             if (job.paused) {
                 await stopWake();
@@ -673,6 +740,7 @@
             let hasReadyTask = false;
             for (let index = 0; index < job.pending.length; index += 1) {
                 const task = job.pending[index];
+                if (isTerminalTask(task)) continue;
                 const targetProfileId = text(task.targetProfileId) || activeProfileId;
                 if (!canManageTarget(profiles, activeProfileId, targetProfileId)) continue;
                 hasManageableTask = true;
@@ -758,32 +826,51 @@
                     maxAttempts,
                     Math.max(0, Number(task.attempts) || 0) + 1
                 );
-                const retryDelay = attempts >= maxAttempts
-                    ? maxRetryDelayMs
-                    : Math.min(
-                        maxRetryDelayMs,
-                        retryDelayMs * (2 ** Math.min(attempts - 1, 2))
-                    );
-                // Keep incomplete rows queued even after the attempt counter
-                // reaches its cap. A transient YouTube/CORS response must not
-                // disappear from the job and be misreported as complete.
-                job.pending.push({
-                    ...task,
-                    attempts,
-                    nextAttemptAt: now() + retryDelay,
-                    lastError: job.lastError,
-                    lastErrorAt: job.lastErrorAt
-                });
+                const failure = classifyEnrichmentFailure(result);
+                if (failure.permanent) {
+                    const terminalTask = {
+                        ...task,
+                        attempts,
+                        nextAttemptAt: 0,
+                        failureKind: 'permanent',
+                        errorCode: failure.errorCode || errorCode,
+                        lastError: job.lastError,
+                        lastErrorAt: job.lastErrorAt
+                    };
+                    const terminalKeys = new Set(scopedTaskIdentityKeys(terminalTask));
+                    job.attention = [
+                        ...job.attention.filter(item => !scopedTaskIdentityKeys(item).some(key => terminalKeys.has(key))),
+                        terminalTask
+                    ];
+                } else {
+                    const retryDelay = attempts >= maxAttempts
+                        ? maxRetryDelayMs
+                        : Math.min(
+                            maxRetryDelayMs,
+                            retryDelayMs * (2 ** Math.min(attempts - 1, 2))
+                        );
+                    // Keep incomplete rows queued even after the attempt counter
+                    // reaches its cap. A transient YouTube/CORS response must not
+                    // disappear from the job and be misreported as complete.
+                    job.pending.push({
+                        ...task,
+                        attempts,
+                        nextAttemptAt: now() + retryDelay,
+                        lastError: job.lastError,
+                        lastErrorAt: job.lastErrorAt
+                    });
+                }
             } else {
                 job.lastCompletedAt = now();
                 job.completed = Math.max(0, Number(job.completed) || 0) + 1;
             }
 
-            if (!job.pending.length) {
+            if (!job.pending.length && !job.attention.length) {
                 await stopWake();
                 await removeJob();
                 return status(job);
             }
+            if (!job.pending.length) return finishOrSchedule({ ...job, nextRunAt: 0 });
 
             const completionTime = now();
             const hasReadyPendingTask = job.pending.some(taskItem => {
@@ -843,13 +930,23 @@
             const candidates = collectCandidates(profiles, scope, false);
             let merged = mergeJob(stored, candidates, scope, profiles);
             const importedTotal = countImportedRows(profiles, scope);
-            merged.initialTotal = Math.max(merged.initialTotal, importedTotal, merged.pending.length + (merged.inFlight ? 1 : 0));
-            merged.completed = Math.max(merged.completed, merged.initialTotal - merged.pending.length - (merged.inFlight ? 1 : 0));
+            merged.initialTotal = Math.max(
+                merged.initialTotal,
+                importedTotal,
+                merged.pending.length + (merged.inFlight ? 1 : 0) + merged.attention.length
+            );
+            merged.completed = Math.max(
+                merged.completed,
+                merged.initialTotal
+                    - merged.pending.length
+                    - (merged.inFlight ? 1 : 0)
+                    - merged.attention.length
+            );
             if (unpause) {
                 merged.paused = false;
                 merged.pausedReason = '';
             }
-            if (!merged.pending.length && !merged.inFlight) {
+            if (!merged.pending.length && !merged.inFlight && !merged.attention.length) {
                 await stopWake();
                 await removeJob();
                 return status(merged);
@@ -896,7 +993,7 @@
 
         const pause = () => enqueueOperation(async () => {
             const stored = recoveredJob(await readJob());
-            if (!stored.pending.length && !stored.inFlight) {
+            if (!stored.pending.length && !stored.inFlight && !stored.attention.length) {
                 await stopWake();
                 await removeJob();
                 return status(stored);
@@ -913,7 +1010,7 @@
 
         const wake = () => enqueueOperation(async () => {
             const stored = recoveredJob(await readJob());
-            if (!stored.pending.length && !stored.inFlight) {
+            if (!stored.pending.length && !stored.inFlight && !stored.attention.length) {
                 await stopWake();
                 return status(stored);
             }
@@ -926,7 +1023,7 @@
 
         const profilesChanged = () => enqueueOperation(async () => {
             const stored = await readJob();
-            if (!stored.pending.length && !stored.inFlight) return status(stored);
+            if (!stored.pending.length && !stored.inFlight && !stored.attention.length) return status(stored);
             return sync({ allProfiles: true, unpause: false });
         });
 

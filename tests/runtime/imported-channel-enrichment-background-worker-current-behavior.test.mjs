@@ -282,6 +282,90 @@ test('incomplete responses remain queued with exponential retry backoff', async 
   assert.equal(runtime.enrichCalls.length, 1);
 });
 
+test('permanent not-found responses stop retrying but remain reportable for manual verification', async () => {
+  const id = validId('n');
+  const runtime = createRuntime({
+    channels: [incompleteChannel(id)],
+    responseForTask: () => ({
+      success: false,
+      errorCode: 'channel_not_found',
+      error: 'This channel does not exist.',
+      retryable: false
+    })
+  });
+
+  await runtime.scheduler.start();
+  await runtime.runNextTimer();
+
+  const job = runtime.storage.ftBlockTubeEnrichmentJobV1;
+  assert.ok(job);
+  assert.equal(job.pending.length, 0);
+  assert.equal(job.attention.length, 1);
+  assert.equal(job.attention[0].input, id);
+  assert.equal(job.attention[0].failureKind, 'permanent');
+  assert.equal(job.attention[0].errorCode, 'channel_not_found');
+  assert.equal(job.attention[0].lastError, 'This channel does not exist.');
+  assert.equal(job.attention[0].nextAttemptAt, 0);
+
+  const status = await runtime.scheduler.getStatus();
+  assert.equal(status.pending, 0);
+  assert.equal(status.attention, 1);
+  assert.equal(status.total, 0);
+  assert.equal(status.nextRunAt, 0);
+  assert.equal(runtime.timers.filter(timer => !timer.cleared).length, 0);
+
+  await runtime.scheduler.wake();
+  assert.equal(runtime.enrichCalls.length, 1);
+});
+
+test('terminated-account responses are also terminal and retain the YouTube reason', async () => {
+  const id = validId('t');
+  const runtime = createRuntime({
+    channels: [incompleteChannel(id)],
+    responseForTask: () => ({
+      success: false,
+      error: "This account has been terminated for a violation of YouTube's Terms of Service."
+    })
+  });
+
+  await runtime.scheduler.start();
+  await runtime.runNextTimer();
+
+  const task = runtime.storage.ftBlockTubeEnrichmentJobV1.attention[0];
+  assert.equal(task.failureKind, 'permanent');
+  assert.equal(task.errorCode, 'channel_terminated');
+  assert.equal(task.lastError, "This account has been terminated for a violation of YouTube's Terms of Service.");
+});
+
+test('reload migrates an old pending 404 row into manual attention instead of retrying it', async () => {
+  const id = validId('h');
+  const runtime = createRuntime({
+    channels: [incompleteChannel(id)],
+    storedJob: {
+      version: 2,
+      pending: [{
+        id,
+        input: id,
+        targetProfileId: 'default',
+        profile: 'main',
+        listType: 'blocklist',
+        source: 'import',
+        attempts: 4,
+        nextAttemptAt: 1_000_000 + 6 * 60 * 60 * 1000,
+        lastError: 'Failed to fetch channel page: 404'
+      }],
+      nextRunAt: 1_000_000 + 6 * 60 * 60 * 1000
+    }
+  });
+
+  const status = await runtime.scheduler.initialize();
+  assert.equal(status.pending, 0);
+  assert.equal(status.attention, 1);
+  assert.equal(runtime.enrichCalls.length, 0);
+  assert.equal(runtime.timers.filter(timer => !timer.cleared).length, 0);
+  assert.equal(runtime.storage.ftBlockTubeEnrichmentJobV1.attention[0].failureKind, 'permanent');
+});
+
 test('a failed row does not pause fresh rows behind its retry timestamp', async () => {
   const failedId = validId('f');
   const freshId = validId('q');

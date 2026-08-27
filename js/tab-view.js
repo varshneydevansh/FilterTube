@@ -4778,13 +4778,19 @@ document.addEventListener('DOMContentLoaded', async () => {
 
         const pending = Math.max(0, Number(status?.pending) || 0);
         const inFlight = status?.inFlight === true;
+        const attention = Math.max(0, Number(status?.attention) || 0);
         const paused = status?.paused === true;
         const blockedReason = typeof status?.blockedReason === 'string' ? status.blockedReason : '';
         const minDelaySeconds = Math.max(1, Math.round((Number(status?.minDelayMs) || 7000) / 1000));
         const maxDelaySeconds = Math.max(minDelaySeconds, Math.round((Number(status?.maxDelayMs) || 15000) / 1000));
         const initialTotal = Math.max(total, Number(status?.initialTotal) || 0);
-        const completed = Math.max(0, Math.min(initialTotal, Number(status?.completed) || (initialTotal - total)));
-        const progressPercent = initialTotal ? Math.round((completed / initialTotal) * 100) : 0;
+        const hasReportedCompleted = Number.isFinite(Number(status?.completed));
+        const completed = Math.max(
+            0,
+            Math.min(initialTotal, hasReportedCompleted ? Number(status.completed) : initialTotal - total - attention)
+        );
+        const settled = Math.min(initialTotal, completed + attention);
+        const progressPercent = initialTotal ? Math.round((settled / initialTotal) * 100) : 0;
         const eta = blockedReason || paused
             ? 'Paused'
             : `${formatImportedChannelEnrichmentDuration(total * minDelaySeconds)}–${formatImportedChannelEnrichmentDuration(total * maxDelaySeconds)}`;
@@ -4806,11 +4812,12 @@ document.addEventListener('DOMContentLoaded', async () => {
             <div class="imported-enrichment-metrics">
                 <div><b>${completed.toLocaleString()}</b><span>Completed${initialTotal ? ` of ${initialTotal.toLocaleString()}` : ''}</span></div>
                 <div><b>${total.toLocaleString()}</b><span>Remaining</span></div>
+                <div><b>${attention.toLocaleString()}</b><span>Needs manual review</span></div>
                 <div><b>${eta}</b><span>Estimated active time</span></div>
             </div>
             <div class="imported-enrichment-progress" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="${progressPercent}"><span style="width:${progressPercent}%"></span></div>
             <p>${lifecycleMessage}</p>
-            <small>${scheduleMessage} Valid identifiers are filtering now; names, handles/custom URLs, and avatars fill in together. Failed or partial responses stay visible in Import Reports and retry without stopping fresh rows.</small>
+            <small>${scheduleMessage} Valid identifiers are filtering now; names, handles/custom URLs, and avatars fill in together. Temporary failures stay visible in Import Reports and retry without stopping fresh rows. Permanent not-found/deleted responses stop retrying and remain there with the exact reason for manual verification.</small>
         `;
         importedChannelEnrichmentNotice.hidden = false;
         importedChannelEnrichmentNotice.setAttribute('aria-busy', inFlight ? 'true' : 'false');
@@ -5012,7 +5019,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                     ? 'Rules with valid identifiers are active now. Names, handles/custom URLs, and avatars continue in the paced background queue.'
                     : 'No channel metadata lookup is currently pending.',
                 attention
-                    ? 'Open the report to see exact source rows, reasons, and channel links. Name-only rows need an exact channel link for identity metadata.'
+                    ? 'Open the report to see exact source rows and reasons. Permanent lookup failures such as “This channel does not exist.” need manual verification or replacement with an exact channel URL/UC ID.'
                     : 'No imported row currently needs manual correction.'
             ],
             choices: [
@@ -5100,13 +5107,13 @@ document.addEventListener('DOMContentLoaded', async () => {
         const overlay = document.createElement('div');
         overlay.className = 'ft-modal-overlay rule-list-report-modal-overlay';
         const card = document.createElement('div');
-        card.className = 'ft-modal rule-list-report-modal';
+        card.className = 'card ft-modal rule-list-report-modal';
         card.setAttribute('role', 'dialog');
         card.setAttribute('aria-modal', 'true');
         card.setAttribute('aria-label', 'Rule list import reports');
         const header = document.createElement('div');
-        header.className = 'ft-modal-header';
-        header.innerHTML = '<h3>Import Reports</h3><p>Blocking rules are active as soon as a valid identifier is saved. This report separately tracks metadata completion and rows that need correction.</p>';
+        header.className = 'card-header ft-modal-header';
+        header.innerHTML = '<h3>Import Reports</h3><p>Blocking rules are active as soon as a valid identifier is saved. This report separately tracks metadata completion and rows that need correction. Permanent lookup failures stop retrying here instead of being hidden.</p>';
         const controls = document.createElement('div');
         controls.className = 'rule-list-report-controls';
         const reportSelect = document.createElement('select');
@@ -5190,16 +5197,22 @@ document.addEventListener('DOMContentLoaded', async () => {
                     </div>
                     ${shown.map((row) => {
                         const url = row.type === 'channel' ? ruleListReportChannelUrl(row) : '';
+                        const permanentFailure = row.failureKind === 'permanent';
                         const targetProgress = row.targetCount > 1 ? ` ${row.completedTargets}/${row.targetCount} targets complete.` : '';
                         const retryTiming = row.nextAttemptAt > Date.now()
                             ? ` Next retry ${new Date(row.nextAttemptAt).toLocaleString()}.`
+                            : '';
+                        const resultReason = row.reason
+                            || (row.status === 'complete' ? 'Channel metadata is complete.' : 'Waiting for metadata.');
+                        const manualGuidance = permanentFailure
+                            ? 'Verify this identifier on YouTube or replace it with an exact channel URL/UC ID. The saved rule remains active until you change or remove it.'
                             : '';
                         return `
                             <div class="rule-list-report-row is-${row.status}" role="row">
                                 <span><b>${ruleListReportStatusLabel(row.status)}</b>${row.attempts ? `<small>Attempt ${row.attempts}</small>` : ''}</span>
                                 <span><small>${row.row ? `Row ${row.row}` : 'Imported row'}</small><code>${escapeManagedRuleListPreviewCell(row.originalValue || row.value || '')}</code></span>
-                                <span>${escapeManagedRuleListPreviewCell((row.reason || (row.status === 'complete' ? 'Channel metadata is complete.' : 'Waiting for metadata.')) + targetProgress + retryTiming)}</span>
-                                <span>${url ? `<a class="btn-secondary" href="${escapeManagedRuleListPreviewCell(url)}" target="_blank" rel="noopener noreferrer">Open channel</a>` : '<small>Provide an exact channel link to replace a name-only or invalid row.</small>'}</span>
+                                <span><span>${escapeManagedRuleListPreviewCell(resultReason + targetProgress + retryTiming)}</span>${manualGuidance ? `<small>${escapeManagedRuleListPreviewCell(manualGuidance)}</small>` : ''}</span>
+                                <span>${url ? `<a class="btn-secondary" href="${escapeManagedRuleListPreviewCell(url)}" target="_blank" rel="noopener noreferrer">${permanentFailure ? 'Verify channel' : 'Open channel'}</a>` : (permanentFailure ? '<small>Verify the imported value manually, then replace it with an exact channel link or UC ID.</small>' : '<small>Provide an exact channel link to replace a name-only or invalid row.</small>')}</span>
                             </div>
                         `;
                     }).join('') || '<div class="rule-list-report-empty">No rows match this filter.</div>'}
@@ -5267,7 +5280,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             const affectsKids = latest.report.targets.some(target => target.surface === 'kids');
             kidsNotice.hidden = !affectsKids || (!incomplete && !attention);
             kidsStatus.textContent = affectsKids
-                ? `Latest import: ${incomplete} channel ${pluralize(incomplete, 'row')} still completing and ${attention} ${pluralize(attention, 'row')} need attention. Imported rules with valid identifiers are already active.`
+                ? `Latest import: ${incomplete} channel ${pluralize(incomplete, 'row')} still completing and ${attention} ${pluralize(attention, 'row')} need manual verification. Imported rules with valid identifiers are already active; permanent lookup failures remain in the report with their exact reason.`
                 : '';
         }
         if (viewChannelImportReports) viewChannelImportReports.hidden = false;
@@ -5276,7 +5289,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             const shouldShow = incomplete > 0 || attention > 0;
             importedChannelEnrichmentNotice.hidden = !shouldShow;
             if (shouldShow) {
-                importedChannelEnrichmentStatus.textContent = `Latest import report: ${incomplete} channel ${pluralize(incomplete, 'row')} still completing and ${attention} ${pluralize(attention, 'row')} need attention. Valid saved identifiers are already filtering; open the report for exact rows and reasons.`;
+                importedChannelEnrichmentStatus.textContent = `Latest import report: ${incomplete} channel ${pluralize(incomplete, 'row')} still completing and ${attention} ${pluralize(attention, 'row')} need manual verification. Valid saved identifiers are already filtering; permanent lookup failures remain in the report with their exact reason.`;
                 if (importedChannelEnrichmentToggle) importedChannelEnrichmentToggle.hidden = true;
             }
         }
@@ -11504,8 +11517,10 @@ document.addEventListener('DOMContentLoaded', async () => {
                 : { pending: 0 };
             scheduleImportedChannelEnrichmentStatusRefresh(0);
             const metadataNotice = enrichment?.pending
-                ? ` Channel details continue in the background (${Number(enrichment.pending) || 0} pending), one row at a time at a randomized 7–15 second interval while the worker is awake; large lists can take time. Closing this dashboard does not stop the queue.`
-                : '';
+                ? ` Channel details continue in the background (${Number(enrichment.pending) || 0} pending), one row at a time at a randomized 7–15 second interval while the worker is awake; large lists can take time. Closing this dashboard does not stop the queue. Permanent not-found or terminated rows stop retrying and remain in Import Reports for manual verification.`
+                : (enrichment?.attention
+                    ? ` ${Number(enrichment.attention) || 0} imported channel ${Number(enrichment.attention) === 1 ? 'row needs' : 'rows need'} manual verification; see Import Reports for the exact YouTube reason.`
+                    : '');
             const report = await saveParsedRuleListImportReport({
                 parsed,
                 label: importPayload.name,
@@ -11541,8 +11556,10 @@ document.addEventListener('DOMContentLoaded', async () => {
         renderKeywords();
         renderKidsKeywords();
         const metadataNotice = enrichment?.pending
-            ? ` Channel details continue in the background (${Number(enrichment.pending) || 0} pending), one row at a time with a randomized 7–15 second interval while the worker is awake; large lists can take time. Closing this dashboard does not stop the queue.`
-            : ' Channel details are already complete.';
+            ? ` Channel details continue in the background (${Number(enrichment.pending) || 0} pending), one row at a time with a randomized 7–15 second interval while the worker is awake; large lists can take time. Closing this dashboard does not stop the queue. Permanent not-found or terminated rows stop retrying and remain in Import Reports for manual verification.`
+            : (enrichment?.attention
+                ? ` ${Number(enrichment.attention) || 0} imported channel ${Number(enrichment.attention) === 1 ? 'row needs' : 'rows need'} manual verification; see Import Reports for the exact YouTube reason.`
+                : ' Channel details are already complete.');
         const importReport = await saveParsedRuleListImportReport({
             parsed,
             label: importPayload.name,
@@ -11697,8 +11714,10 @@ document.addEventListener('DOMContentLoaded', async () => {
                         `Already present: ${Number(receipt.duplicateChannels) || 0} channels · ${Number(receipt.duplicateKeywords) || 0} keyword/comment rules · ${Number(receipt.duplicateVideoIds) || 0} video IDs`,
                         `Skipped or unsupported outcomes: ${Number(receipt.skippedRows) || 0}`,
                         enrichment?.pending
-                            ? `Channel metadata queue: ${Number(enrichment.pending) || 0} imported rows pending. The background worker performs one serialized lookup at a randomized 7–15 second interval while awake. A failed row retries after about 2 minutes, then backs off up to 30 minutes; that retry never pauses fresh rows. No burst of requests was made during import. Closing this dashboard does not stop the queue, although browser shutdown or wakeup limits can delay it.`
-                            : 'All imported channel rows already have complete metadata; no metadata lookup is pending.'
+                            ? `Channel metadata queue: ${Number(enrichment.pending) || 0} imported rows pending. The background worker performs one serialized lookup at a randomized 7–15 second interval while awake. A failed row retries after about 2 minutes, then backs off up to 30 minutes; that retry never pauses fresh rows. Permanent not-found or terminated rows stop retrying and remain in Import Reports for manual verification. No burst of requests was made during import. Closing this dashboard does not stop the queue, although browser shutdown or wakeup limits can delay it.`
+                            : (enrichment?.attention
+                                ? `${Number(enrichment.attention) || 0} imported channel ${Number(enrichment.attention) === 1 ? 'row needs' : 'rows need'} manual verification in Import Reports; the exact YouTube reason is retained.`
+                                : 'All imported channel rows already have complete metadata; no metadata lookup is pending.')
                     ],
                     choices: [
                         { value: 'report', label: 'View Import Report', className: 'btn-primary', recommended: blockTubeIssues.length > 0 },
@@ -11797,12 +11816,12 @@ document.addEventListener('DOMContentLoaded', async () => {
                     `${Number(blockTubeCounts.keywords) || 0} title rules · ${Number(blockTubeCounts.comments) || 0} comment rules · ${Number(blockTubeCounts.regex) || 0} validated regex rules`,
                     `${Number(blockTubeCounts.mappedOptions) || 0} mapped setting groups · ${Number(blockTubeCounts.durationFilters) || 0} duration filters · ${safeArray(blockTubeInspection.preview?.report?.inactive).length} inactive preserved`,
                     `${blockTubeSkipped} unsupported, invalid, or unknown outcomes`,
-                    'No per-channel YouTube requests are made while the list is being reviewed. After approval, imported channel identifiers use a separate persisted background queue: one serialized lookup at a randomized 7–15 second interval while awake. A failed row retries after about 2 minutes and backs off up to 30 minutes without pausing fresh rows; a large list can still take time. Nothing changes until you confirm.'
+                    'No per-channel YouTube requests are made while the list is being reviewed. After approval, imported channel identifiers use a separate persisted background queue: one serialized lookup at a randomized 7–15 second interval while awake. A failed row retries after about 2 minutes and backs off up to 30 minutes without pausing fresh rows; permanent not-found or terminated rows stop retrying and remain in Import Reports for manual verification. A large list can still take time. Nothing changes until you confirm.'
                 ]
                 : [
                     `${formatManagedRuleListCount(parsedCounts)} ready`,
                     parsed.skippedCount ? `${parsed.skippedCount} ${parsed.skippedCount === 1 ? 'row was' : 'rows were'} skipped` : 'No rows skipped',
-                    'No per-channel YouTube requests are made while the list is being reviewed. After approval, incomplete channel identifiers are completed in a persisted one-at-a-time queue. A failed row retries after about 2 minutes and backs off up to 30 minutes without pausing fresh rows; a large list can still take time. Nothing changes until you confirm.'
+                    'No per-channel YouTube requests are made while the list is being reviewed. After approval, incomplete channel identifiers are completed in a persisted one-at-a-time queue. A failed row retries after about 2 minutes and backs off up to 30 minutes without pausing fresh rows; permanent not-found or terminated rows stop retrying and remain in Import Reports for manual verification. A large list can still take time. Nothing changes until you confirm.'
                 ],
             choices: [
                 {
@@ -11858,8 +11877,10 @@ document.addEventListener('DOMContentLoaded', async () => {
                 : { pending: 0 };
             scheduleImportedChannelEnrichmentStatusRefresh(0);
             const metadataNotice = enrichment?.pending
-                ? ` Channel details continue in the background (${Number(enrichment.pending) || 0} pending), one row at a time at a randomized 7–15 second interval while the worker is awake; large lists can take time. Closing this dashboard does not stop the queue.`
-                : '';
+                ? ` Channel details continue in the background (${Number(enrichment.pending) || 0} pending), one row at a time at a randomized 7–15 second interval while the worker is awake; large lists can take time. Closing this dashboard does not stop the queue. Permanent not-found or terminated rows stop retrying and remain in Import Reports for manual verification.`
+                : (enrichment?.attention
+                    ? ` ${Number(enrichment.attention) || 0} imported channel ${Number(enrichment.attention) === 1 ? 'row needs' : 'rows need'} manual verification; see Import Reports for the exact YouTube reason.`
+                    : '');
             const report = await saveParsedRuleListImportReport({
                 parsed,
                 label: importPayload.name,
@@ -11899,8 +11920,10 @@ document.addEventListener('DOMContentLoaded', async () => {
         renderKeywords();
         renderKidsKeywords();
         const metadataNotice = enrichment?.pending
-            ? ` Channel details continue in the background (${Number(enrichment.pending) || 0} pending), one row at a time with a randomized 7–15 second interval while the worker is awake; large lists can take time. Closing this dashboard does not stop the queue.`
-            : ' Channel details are already complete.';
+            ? ` Channel details continue in the background (${Number(enrichment.pending) || 0} pending), one row at a time with a randomized 7–15 second interval while the worker is awake; large lists can take time. Closing this dashboard does not stop the queue. Permanent not-found or terminated rows stop retrying and remain in Import Reports for manual verification.`
+            : (enrichment?.attention
+                ? ` ${Number(enrichment.attention) || 0} imported channel ${Number(enrichment.attention) === 1 ? 'row needs' : 'rows need'} manual verification; see Import Reports for the exact YouTube reason.`
+                : ' Channel details are already complete.');
         const importReport = await saveParsedRuleListImportReport({
             parsed,
             label: importPayload.name,
@@ -24715,8 +24738,10 @@ document.addEventListener('DOMContentLoaded', async () => {
                             ? 'Trusted-device recovery data was also restored.'
                             : 'No trusted-device identity was changed.',
                         importedChannelEnrichment?.pending
-                            ? `Imported channel metadata will be completed in the extension background one row at a time at a randomized 7–15 second interval while the worker is awake (${Number(importedChannelEnrichment.pending) || 0} pending). Large lists can take time; this pacing avoids a burst of YouTube requests. Closing this dashboard does not stop the queue, although browser shutdown or wakeup limits can delay it.`
-                            : 'All imported channel metadata is already complete; no background lookup is pending.'
+                            ? `Imported channel metadata will be completed in the extension background one row at a time at a randomized 7–15 second interval while the worker is awake (${Number(importedChannelEnrichment.pending) || 0} pending). Large lists can take time; this pacing avoids a burst of YouTube requests. Permanent not-found or terminated rows stop retrying and remain in Import Reports for manual verification. Closing this dashboard does not stop the queue, although browser shutdown or wakeup limits can delay it.`
+                            : (importedChannelEnrichment?.attention
+                                ? `${Number(importedChannelEnrichment.attention) || 0} imported channel ${Number(importedChannelEnrichment.attention) === 1 ? 'row needs' : 'rows need'} manual verification in Import Reports; the exact YouTube reason is retained.`
+                                : 'All imported channel metadata is already complete; no background lookup is pending.')
                     ],
                     choices: [
                         { value: 'done', label: 'Done', recommended: true }
@@ -24725,8 +24750,10 @@ document.addEventListener('DOMContentLoaded', async () => {
                 });
             } else {
                 const metadataNotice = importedChannelEnrichment?.pending
-                    ? ` Channel details continue in the extension background (${Number(importedChannelEnrichment.pending) || 0} pending), one row at a time at a randomized 7–15 second interval while the worker is awake; large lists can take time. Closing this dashboard does not stop the queue.`
-                    : ' Channel details are already complete.';
+                    ? ` Channel details continue in the extension background (${Number(importedChannelEnrichment.pending) || 0} pending), one row at a time at a randomized 7–15 second interval while the worker is awake; large lists can take time. Closing this dashboard does not stop the queue. Permanent not-found or terminated rows stop retrying and remain in Import Reports for manual verification.`
+                    : (importedChannelEnrichment?.attention
+                        ? ` ${Number(importedChannelEnrichment.attention) || 0} imported channel ${Number(importedChannelEnrichment.attention) === 1 ? 'row needs' : 'rows need'} manual verification; see Import Reports for the exact YouTube reason.`
+                        : ' Channel details are already complete.');
                 UIComponents.showToast(
                     `${importResult?.restoredNanahState
                         ? 'Import verified and trusted-device recovery data restored'

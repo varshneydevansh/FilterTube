@@ -60,12 +60,17 @@ reporting model as other list formats.
 | Pending | Valid saved identifier is waiting in the paced queue. | Active | Wait or pause/resume the queue |
 | Fetching | This row is the one serialized lookup currently in flight. | Active | None |
 | Retrying | YouTube returned an error or incomplete metadata; attempt count, reason, and next retry are retained per row. | Active | Wait; inspect/export the report if it persists |
+| Needs attention: permanent lookup | YouTube explicitly reported that the channel is missing, unavailable, or terminated. The exact reason is retained and this row is no longer retried automatically. | Active from its saved identifier | Verify the identifier on YouTube, then replace or remove the rule manually |
 | Needs attention: name only | The source supplied a display-name boundary without a unique identity. | Active as a name rule | Add an exact channel link or UC ID if exact identity is required |
 | Needs attention: skipped | The parser could not safely convert the source row. | Not imported | Correct the reported source row and import it again |
 | Needs attention: queue missing | The rule is active but incomplete metadata is no longer represented in the persisted queue. | Active | Reopen/resume completion and inspect the row |
 
-The report viewer filters by state and searches original values or reasons. It
-renders at most 200 rows at once and offers another 200 on demand, preventing a
+The report viewer filters by state and searches original values or reasons. A
+permanent lookup row displays the exact YouTube response (for example, “This
+channel does not exist.” or the terminated-account alert), a manual verification
+instruction, and a direct **Verify channel** link when an identity URL can be
+constructed. It renders at most 200 rows at once and offers another 200 on
+demand, preventing a
 large report from recreating the full-list DOM lag. Unresolved rows can be
 downloaded as CSV. Reports retain the latest 12 imports subject to a 50,000-row
 history budget; the newest report is always retained.
@@ -76,6 +81,12 @@ the active dashboard or popup patches that row in memory and rerenders only its
 bounded visible list. Other extension contexts avoid repeatedly parsing the
 large channel list. Imported enrichment also avoids rewriting legacy list
 projections; V4 remains authoritative.
+
+The report modal uses an opaque bounded sheet with a fixed footer, so report
+rows scroll inside the sheet while **Download unresolved CSV** and **Done** stay
+anchored at the bottom. The report table is windowed to 200 visible rows and
+uses an internal horizontal scroll on narrow surfaces; it does not recreate the
+15,000-row Filters DOM.
 
 ## Parser behavior
 

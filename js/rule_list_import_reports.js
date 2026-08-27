@@ -16,6 +16,16 @@
     const MAX_REPORTS = 12;
     const MAX_RETAINED_ROWS = 50000;
     const IMPORTED_SOURCES = new Set(['import', 'managed_channel_list', 'blocktube', 'blocktube-channel-name']);
+    const PERMANENT_ERROR_CODES = new Set([
+        'channel_not_found',
+        'channel_deleted',
+        'channel_terminated',
+        'channel_unavailable',
+        'resource_not_found',
+        'not_found',
+        'http_404',
+        'http_410'
+    ]);
 
     function text(value) {
         return typeof value === 'string' ? value.trim() : '';
@@ -27,6 +37,19 @@
 
     function safeArray(value) {
         return Array.isArray(value) ? value : [];
+    }
+
+    function isTerminalTask(task) {
+        const item = safeObject(task);
+        const errorCode = text(item.errorCode).toLowerCase();
+        const error = text(item.lastError);
+        return text(item.failureKind).toLowerCase() === 'permanent'
+            || PERMANENT_ERROR_CODES.has(errorCode)
+            || /\bchannel\b[\s\S]{0,80}\b(?:does not|doesn't|no longer)\s+exist\b/i.test(error)
+            || /\bchannel\b[\s\S]{0,80}\b(?:not found|was deleted|has been deleted|is deleted|is unavailable)\b/i.test(error)
+            || /\b(?:resource|page)\b[\s\S]{0,40}\b(?:not found|is unavailable)\b/i.test(error)
+            || /\b(?:this\s+)?account\b[\s\S]{0,80}\bterminated\b/i.test(error)
+            || /\b(?:channel|channel page|page)\b[\s\S]{0,40}\b(?:404|410)\b/i.test(error);
     }
 
     function decode(value) {
@@ -283,9 +306,19 @@
             if (!taskBelongsToTarget(task, target)) return;
             taskKeys(task).forEach(key => pendingByIdentity.set(key, task));
         });
+        const attentionByIdentity = new Map();
+        const terminalTasks = [
+            ...safeArray(safeObject(job).attention),
+            ...safeArray(safeObject(job).failed),
+            ...safeArray(safeObject(job).pending).filter(isTerminalTask)
+        ];
+        terminalTasks.forEach((task) => {
+            if (!taskBelongsToTarget(task, target)) return;
+            taskKeys(task).forEach(key => attentionByIdentity.set(key, task));
+        });
         const inFlight = safeObject(job).inFlight;
         const inFlightKeys = taskBelongsToTarget(inFlight, target) ? new Set(taskKeys(inFlight)) : new Set();
-        return { channelsByIdentity, channelsByName, pendingByIdentity, inFlightKeys };
+        return { channelsByIdentity, channelsByName, pendingByIdentity, attentionByIdentity, inFlightKeys };
     }
 
     function deriveTargetStatus(report, entry, target, context) {
@@ -302,6 +335,18 @@
             };
         }
         if (isCompleteChannel(channel)) return { status: 'complete', reason: '' };
+
+        const attentionTask = keys.map(key => context.attentionByIdentity.get(key)).find(Boolean);
+        if (attentionTask) {
+            return {
+                status: 'needs_attention',
+                reason: text(attentionTask.lastError) || 'YouTube could not verify this channel identifier.',
+                failureKind: text(attentionTask.failureKind) || 'permanent',
+                errorCode: text(attentionTask.errorCode),
+                attempts: Math.max(0, Math.floor(Number(attentionTask.attempts) || 0)),
+                lastErrorAt: Math.max(0, Math.floor(Number(attentionTask.lastErrorAt) || 0))
+            };
+        }
 
         if (keys.some(key => context.inFlightKeys.has(key))) {
             return { status: 'fetching', reason: 'Channel details are being fetched now.' };
@@ -344,6 +389,8 @@
                 ...entry,
                 status,
                 reason: text(firstRelevant.reason || firstRelevant.lastError),
+                failureKind: text(firstRelevant.failureKind),
+                errorCode: text(firstRelevant.errorCode),
                 attempts: Math.max(0, Math.floor(Number(firstRelevant.attempts) || 0)),
                 nextAttemptAt: Math.max(0, Math.floor(Number(firstRelevant.nextAttemptAt) || 0)),
                 completedTargets: targetStatuses.filter(row => row.status === 'complete').length,

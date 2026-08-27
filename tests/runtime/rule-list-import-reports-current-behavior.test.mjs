@@ -94,6 +94,90 @@ test('import reports distinguish complete, pending, retrying, and name-only rows
   assert.match(summary.rows.find((row) => row.originalValue === 'Creator display name').reason, /name-only/i);
 });
 
+test('import reports preserve a permanent channel lookup reason and manual-verification state', () => {
+  const api = loadReportApi();
+  const id = `UC${'p'.repeat(22)}`;
+  const report = api.normalizeReport({
+    id: 'report-permanent-failure',
+    label: 'Not found import',
+    targets: [{ profileId: 'default', surface: 'main', listType: 'blocklist' }],
+    channels: [{ id, originalValue: id, sourceRow: 12 }]
+  });
+  const profiles = {
+    profiles: {
+      default: {
+        main: {
+          channels: [{
+            id,
+            name: id,
+            handle: null,
+            customUrl: null,
+            logo: null,
+            source: 'import',
+            originalInput: id
+          }]
+        }
+      }
+    }
+  };
+  const summary = api.summarize(report, {
+    profiles,
+    job: {
+      attention: [{
+        id,
+        input: id,
+        targetProfileId: 'default',
+        profile: 'main',
+        listType: 'blocklist',
+        failureKind: 'permanent',
+        errorCode: 'channel_not_found',
+        attempts: 1,
+        lastError: 'This channel does not exist.'
+      }]
+    }
+  });
+
+  assert.equal(summary.statuses.needs_attention, 1);
+  assert.equal(summary.rows[0].status, 'needs_attention');
+  assert.equal(summary.rows[0].failureKind, 'permanent');
+  assert.equal(summary.rows[0].errorCode, 'channel_not_found');
+  assert.equal(summary.rows[0].reason, 'This channel does not exist.');
+});
+
+test('report derivation recognizes a legacy pending 404 as permanent attention', () => {
+  const api = loadReportApi();
+  const id = `UC${'q'.repeat(22)}`;
+  const report = api.normalizeReport({
+    id: 'report-legacy-404',
+    targets: [{ profileId: 'default', surface: 'main', listType: 'blocklist' }],
+    channels: [{ id, originalValue: id }]
+  });
+  const summary = api.summarize(report, {
+    profiles: {
+      profiles: {
+        default: {
+          main: {
+            channels: [{ id, name: id, source: 'import', originalInput: id, logo: null }]
+          }
+        }
+      }
+    },
+    job: {
+      pending: [{
+        id,
+        input: id,
+        targetProfileId: 'default',
+        profile: 'main',
+        listType: 'blocklist',
+        lastError: 'Failed to fetch channel page: 404'
+      }]
+    }
+  });
+
+  assert.equal(summary.rows[0].status, 'needs_attention');
+  assert.equal(summary.rows[0].reason, 'Failed to fetch channel page: 404');
+});
+
 test('report store persists newest reports with a bounded history', async () => {
   const api = loadReportApi();
   const storage = {};

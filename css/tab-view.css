@@ -2925,7 +2925,7 @@ html[data-theme="dark"] .help-device-map-legend li {
 
 @media (min-width: 769px) {
     .imported-enrichment-metrics {
-        grid-template-columns: repeat(3, minmax(0, 1fr));
+        grid-template-columns: repeat(4, minmax(0, 1fr));
     }
 }
 
@@ -2962,21 +2962,39 @@ html[data-theme="dark"] .help-device-map-legend li {
 }
 
 .rule-list-report-modal-overlay > .rule-list-report-modal {
+    box-sizing: border-box;
     display: grid;
     grid-template-rows: auto auto minmax(0, 1fr) auto;
     width: min(1180px, calc(100vw - 2rem));
     height: min(860px, calc(100dvh - 2rem));
     max-width: calc(100vw - 2rem);
     max-height: calc(100dvh - 2rem);
+    margin: 0;
     overflow: hidden;
+}
+
+.rule-list-report-modal.card:hover {
+    transform: none;
+}
+
+.rule-list-report-modal .ft-modal-header {
+    display: block;
+    min-width: 0;
+    padding: var(--ft-space-lg);
+}
+
+.rule-list-report-modal .ft-modal-header h3 {
+    margin: 0;
 }
 
 .rule-list-report-modal .ft-modal-header p {
     margin: 0.35rem 0 0;
     color: var(--ft-color-text-muted);
+    line-height: 1.45;
 }
 
 .rule-list-report-controls {
+    min-width: 0;
     display: grid;
     grid-template-columns: minmax(220px, 1.2fr) minmax(150px, 0.45fr) minmax(220px, 1fr);
     gap: 0.65rem;
@@ -2985,6 +3003,7 @@ html[data-theme="dark"] .help-device-map-legend li {
 
 .rule-list-report-modal__body {
     min-height: 0;
+    min-width: 0;
     overflow: auto;
     padding: 0 var(--ft-space-lg) var(--ft-space-lg);
     overscroll-behavior: contain;
@@ -3046,6 +3065,11 @@ html[data-theme="dark"] .help-device-map-legend li {
     min-width: 0;
 }
 
+.rule-list-report-row > span > small {
+    color: var(--ft-color-text-muted);
+    line-height: 1.35;
+}
+
 .rule-list-report-row code {
     overflow: hidden;
     text-overflow: ellipsis;
@@ -3078,6 +3102,7 @@ html[data-theme="dark"] .help-device-map-legend li {
 }
 
 .rule-list-report-modal .ft-modal-actions {
+    min-width: 0;
     margin: 0;
     padding: 0.8rem var(--ft-space-lg) var(--ft-space-lg);
     border-top: 1px solid var(--ft-color-border);
@@ -5181,6 +5206,28 @@ html[data-theme="dark"] .video-filter-compact-option:has(.video-filter-compact-r
     .rule-list-report-controls,
     .rule-list-report-summary {
         grid-template-columns: 1fr;
+    }
+
+    .rule-list-report-modal-overlay {
+        align-items: flex-start;
+        padding: 0.55rem;
+    }
+
+    .rule-list-report-modal-overlay > .rule-list-report-modal {
+        width: 100%;
+        max-width: 100%;
+        height: calc(100dvh - 1.1rem);
+        max-height: calc(100dvh - 1.1rem);
+    }
+
+    .rule-list-report-modal .ft-modal-header,
+    .rule-list-report-modal__body,
+    .rule-list-report-modal .ft-modal-actions {
+        padding-inline: 0.85rem;
+    }
+
+    .rule-list-report-table {
+        min-width: 680px;
     }
 
     .rule-list-report-context {

@@ -15,6 +15,7 @@ CSV, TXT, FilterTube rule-list JSON, BlockTube migration JSON, and managed-list 
 The queue keeps the existing storage key `ftBlockTubeEnrichmentJobV1` so jobs created by the previous page-owned implementation are not discarded. The background schema is version 2 and stores:
 
 - pending tasks and one `inFlight` task;
+- terminal `attention` tasks for permanent channel outcomes;
 - `nextRunAt` and per-task retry timestamps/attempts;
 - explicit user pause state;
 - profile-lock or profile-context blocking state;
@@ -22,8 +23,9 @@ The queue keeps the existing storage key `ftBlockTubeEnrichmentJobV1` so jobs cr
 
 Pending tasks also retain their own `lastError` and `lastErrorAt`. The dashboard
 joins those task records with persistent rule-list import reports so pending,
-retrying, name-only, and skipped source rows remain distinguishable. The report
-contract and CSV/TXT/JSON/file/URL user flow are documented in
+retrying, terminal not-found/terminated, name-only, and skipped source rows
+remain distinguishable. The report contract and CSV/TXT/JSON/file/URL user flow
+are documented in
 `FILTERTUBE_RULE_LIST_IMPORT_REPORTS_CURRENT_BEHAVIOR_2026-08-27.md`.
 
 The worker rescans all profiles when it starts. This both recovers interrupted work and discovers incomplete imported rows from an older build that never wrote a queue job. A dashboard reload can request the same rescan, but opening the dashboard is no longer required for the worker to continue.
@@ -32,7 +34,18 @@ The worker rescans all profiles when it starts. This both recovers interrupted w
 
 Each task calls the existing background `handleAddFilteredChannel` path with `enrichmentFromImport: true`. That path performs one channel-page lookup and merges the returned UC ID, display name, handle/canonical handle or legacy custom URL, avatar, and alternate IDs into the existing rule. The saved rule remains active from its identifier before enrichment finishes.
 
-A task is complete when it has a valid UC ID, a non-placeholder display name, at least one alternate identity (`handle`, `handleDisplay`, `canonicalHandle`, or `customUrl`), and a logo. A failed or partial response remains in the persisted queue and is retried after about two minutes, then with exponential delay up to a 30-minute ceiling. The attempt counter is capped after four attempts, but the row is not discarded: it remains queued at the ceiling so a transient YouTube/CORS failure cannot be reported as complete. The retry timestamp belongs to that row; it never pauses fresh rows in the same import. Name-only rules still remain name-only because they do not provide a unique UC ID to resolve.
+A task is complete when it has a valid UC ID, a non-placeholder display name, at least one alternate identity (`handle`, `handleDisplay`, `canonicalHandle`, or `customUrl`), and a logo. A temporary or partial response remains in the persisted queue and is retried after about two minutes, then with exponential delay up to a 30-minute ceiling. The attempt counter is capped after four attempts, but the row is not discarded: it remains queued at the ceiling so a transient YouTube/CORS failure cannot be reported as complete. The retry timestamp belongs to that row; it never pauses fresh rows in the same import.
+
+Explicit permanent channel outcomes are different. HTTP 404/410 responses,
+YouTube's “This channel does not exist”/unavailable page, and the
+“This account has been terminated for a violation of YouTube's Terms of
+Service.” alert are saved as terminal `attention` tasks after the current
+lookup. They are removed from the active retry queue, retain the exact YouTube
+reason, and are not retried every 30 minutes. The identifier rule remains
+active so filtering does not silently disappear; the report tells the user to
+verify the identifier on YouTube or replace/remove the rule manually. Name-only
+rules still remain name-only because they do not provide a unique UC ID to
+resolve.
 
 ## Timing and lifecycle
 
@@ -46,14 +59,15 @@ Closing the dashboard does not stop an unprotected queue. Browser shutdown or se
 
 The import confirmation and rule-list guidance now tell the user that metadata completion happens in the extension background, that large lists can take time, and that closing the dashboard does not stop the queue. The live status notice reports pending/in-flight counts, timing caveats, lock/block state, and the Pause/Resume action. Each import also saves an exact report with source rows, selected Main/Kids targets, skipped reasons, name-only boundaries, retry state, and a bounded unresolved-row CSV export.
 
-The live notice separates completed, remaining, estimated active processing
-time, progress, and next-lookup state. Its estimate is the 7–15 second pacing
-range; browser sleep and per-row retries can extend wall-clock time. Existing
-imports created before reports were introduced are recovered from saved row
-provenance without copying the full list into report storage.
+The live notice separates completed, remaining active rows, terminal rows
+needing manual review, estimated active processing time, progress, and
+next-lookup state. Its estimate is the 7–15 second pacing range; browser sleep
+and per-row retries can extend wall-clock time. Existing imports created before
+reports were introduced are recovered from saved row provenance without copying
+the full list into report storage.
 
 ## Verification in this worktree
 
-- `tests/runtime/imported-channel-enrichment-background-worker-current-behavior.test.mjs` covers startup discovery, 7–15 second jitter, coarse alarm scheduling, pause/resume, interrupted-task recovery, profile-lock blocking, isolated retry backoff, and recovery from the old queue-wide retry timestamp.
+- `tests/runtime/imported-channel-enrichment-background-worker-current-behavior.test.mjs` covers startup discovery, 7–15 second jitter, coarse alarm scheduling, pause/resume, interrupted-task recovery, profile-lock blocking, isolated retry backoff, permanent not-found/terminated outcomes, legacy 404 migration, and recovery from the old queue-wide retry timestamp.
 - `tests/runtime/blocktube-enrichment-route-current-behavior.test.mjs` covers the dashboard proxy boundary, all imported source labels, target-profile payload forwarding, and manifest wiring.
 - Source syntax checks and `git diff --check` are required before this phase is committed.
