@@ -29,6 +29,21 @@ try {
     console.warn('FilterTube Background: Failed to load security helpers', e);
 }
 
+try {
+    if (typeof importScripts === 'function' && !globalThis.FilterTubeImportedChannelEnrichment) {
+        importScripts('imported_channel_enrichment.js');
+    }
+} catch (e) {
+    console.warn('FilterTube Background: Failed to load imported enrichment scheduler', e);
+}
+
+const IMPORTED_CHANNEL_ENRICHMENT_ACTIONS = new Set([
+    'FilterTube_StartImportedChannelEnrichment',
+    'FilterTube_ResumeImportedChannelEnrichment',
+    'FilterTube_GetImportedChannelEnrichmentStatus',
+    'FilterTube_PauseImportedChannelEnrichment'
+]);
+
 function safeArray(value) {
     return Array.isArray(value) ? value : [];
 }
@@ -1463,6 +1478,7 @@ try {
     if (browserAPI.tabs?.onRemoved && typeof browserAPI.tabs.onRemoved.addListener === 'function') {
         browserAPI.tabs.onRemoved.addListener((tabId) => {
             clearSessionPinCacheForTab(tabId);
+            void wakeImportedChannelEnrichment();
         });
     }
 } catch (e) {
@@ -4672,6 +4688,39 @@ async function performWatchIdentityFetch(videoId) {
 browserAPI.runtime.onMessage.addListener(function (request, sender, sendResponse) {
     const action = request?.action || request?.type;
 
+    if (IMPORTED_CHANNEL_ENRICHMENT_ACTIONS.has(action)) {
+        if (!isTrustedUiSender(sender)) {
+            sendResponse?.({ ok: false, error: 'untrusted_sender' });
+            return false;
+        }
+
+        let operation = null;
+        if (!importedChannelEnrichmentScheduler) {
+            operation = Promise.resolve({ ok: false, error: 'scheduler_unavailable' });
+        } else if (action === 'FilterTube_StartImportedChannelEnrichment') {
+            operation = importedChannelEnrichmentScheduler.start({
+                profileIds: request?.profileIds
+            });
+        } else if (action === 'FilterTube_ResumeImportedChannelEnrichment') {
+            operation = importedChannelEnrichmentScheduler.resume({
+                profileIds: request?.profileIds,
+                unpause: request?.unpause === true
+            });
+        } else if (action === 'FilterTube_PauseImportedChannelEnrichment') {
+            operation = importedChannelEnrichmentScheduler.pause();
+        } else {
+            operation = importedChannelEnrichmentScheduler.getStatus();
+        }
+
+        Promise.resolve(operation)
+            .then(result => sendResponse?.(result || { ok: false, error: 'scheduler_unavailable' }))
+            .catch(error => sendResponse?.({
+                ok: false,
+                error: error?.message || 'imported_enrichment_request_failed'
+            }));
+        return true;
+    }
+
     if (action === 'FilterTube_ReleaseNotesCheck') {
         storageGet([SHOW_UPDATE_REFRESH_PROMPT_KEY, 'releaseNotesSeenVersion', 'releaseNotesPayload']).then(async (data) => {
             if (data?.[SHOW_UPDATE_REFRESH_PROMPT_KEY] === false) {
@@ -4823,6 +4872,7 @@ browserAPI.runtime.onMessage.addListener(function (request, sender, sendResponse
         const profileId = normalizeString(request?.profileId) || DEFAULT_PROFILE_ID;
         const pin = normalizeString(request?.pin);
         verifyAndCacheSessionPin(profileId, pin, sender).then((result) => {
+            if (result?.ok === true) void wakeImportedChannelEnrichment();
             sendResponse?.(result);
         }).catch((e) => {
             sendResponse?.({ ok: false, error: e?.message || 'failed' });
@@ -4837,6 +4887,7 @@ browserAPI.runtime.onMessage.addListener(function (request, sender, sendResponse
         if (profileId) {
             sessionPinCache.delete(profileId);
         }
+        void wakeImportedChannelEnrichment();
         sendResponse?.({ ok: true });
         return false;
     } else if (action === 'FilterTube_SetListMode') {
@@ -6047,6 +6098,11 @@ browserAPI.runtime.onMessage.addListener(function (request, sender, sendResponse
 // Listen for storage changes to re-compile settings
 browserAPI.storage.onChanged.addListener((changes, area) => {
     if (area === 'local') {
+        if (changes[FT_PROFILES_V4_KEY] && importedChannelEnrichmentScheduler) {
+            importedChannelEnrichmentScheduler.profilesChanged().catch((error) => {
+                console.warn('FilterTube Background: imported enrichment profile rescan failed', error);
+            });
+        }
         if (changes[FT_PROFILES_V4_KEY]?.newValue) {
             enforceSelfControlProfileSnapshot(changes[FT_PROFILES_V4_KEY].newValue).catch((error) => {
                 console.warn('FilterTube Background: failed to restore Self-Control Session policy', error);
@@ -8090,6 +8146,119 @@ async function handleToggleChannelFilterAll(channelId, value) {
         return { success: false, error: error.message };
     }
 }
+
+async function loadImportedChannelEnrichmentProfiles() {
+    const stored = await storageGet([
+        FT_PROFILES_V4_KEY,
+        'ftProfilesV3',
+        'filterChannels',
+        'uiKeywords',
+        'filterKeywords'
+    ]);
+    if (isValidProfilesV4(stored?.[FT_PROFILES_V4_KEY])) {
+        return stored[FT_PROFILES_V4_KEY];
+    }
+    try {
+        return buildProfilesV4FromLegacyState(stored, {});
+    } catch (error) {
+        return null;
+    }
+}
+
+function isCompleteImportedChannelEnrichment(channel) {
+    if (!channel || typeof channel !== 'object') return false;
+    if (channel.topicChannel === true) return true;
+
+    const id = normalizeString(channel.id);
+    const name = normalizeString(channel.name);
+    const hasAlternateIdentity = Boolean(
+        normalizeString(channel.handle)
+        || normalizeString(channel.handleDisplay)
+        || normalizeString(channel.canonicalHandle)
+        || normalizeString(channel.customUrl)
+    );
+    const hasDisplayName = Boolean(
+        name
+        && name.toLowerCase() !== id.toLowerCase()
+        && !name.startsWith('@')
+    );
+    return /^UC[a-zA-Z0-9_-]{22}$/.test(id)
+        && hasAlternateIdentity
+        && hasDisplayName
+        && Boolean(normalizeString(channel.logo));
+}
+
+function canImportedChannelEnrichmentTarget(profilesV4, actorProfileId, targetProfileId) {
+    const actorId = normalizeString(actorProfileId) || DEFAULT_PROFILE_ID;
+    return canActiveProfileManageEnrichmentTarget({
+        ...safeObject(profilesV4),
+        activeProfileId: actorId
+    }, targetProfileId);
+}
+
+function isImportedChannelEnrichmentAuthorized(profilesV4, actorProfileId) {
+    return isProfileSessionAuthorized(profilesV4, normalizeString(actorProfileId) || DEFAULT_PROFILE_ID);
+}
+
+const importedChannelEnrichmentScheduler = globalThis.FilterTubeImportedChannelEnrichment?.create?.({
+    storageGet: (keys) => storageGet(keys),
+    storageSet: (payload) => browserAPI.storage.local.set(payload),
+    storageRemove: (key) => browserAPI.storage.local.remove(key),
+    createAlarm: (name, when) => browserAPI.alarms?.create(name, { when }),
+    clearAlarm: (name) => browserAPI.alarms?.clear(name),
+    loadProfiles: loadImportedChannelEnrichmentProfiles,
+    isAuthorized: isImportedChannelEnrichmentAuthorized,
+    canManageTarget: canImportedChannelEnrichmentTarget,
+    isComplete: isCompleteImportedChannelEnrichment,
+    enrich: (task) => handleAddFilteredChannel(
+        task.input,
+        false,
+        null,
+        null,
+        {
+            source: task.source || 'import',
+            enrichmentFromImport: true,
+            targetProfileId: task.targetProfileId || '',
+            actorProfileId: task.actorProfileId || ''
+        },
+        task.profile || 'main',
+        '',
+        task.listType || 'blocklist'
+    )
+}) || null;
+
+function wakeImportedChannelEnrichment() {
+    try {
+        return importedChannelEnrichmentScheduler?.wake?.() || Promise.resolve(null);
+    } catch (error) {
+        return Promise.resolve(null);
+    }
+}
+
+function initializeImportedChannelEnrichment() {
+    try {
+        return Promise.resolve(importedChannelEnrichmentScheduler?.initialize?.()).catch((error) => {
+            console.warn('FilterTube Background: imported enrichment initialization failed', error);
+            return null;
+        });
+    } catch (error) {
+        return Promise.resolve(null);
+    }
+}
+
+if (browserAPI.alarms?.onAlarm && typeof browserAPI.alarms.onAlarm.addListener === 'function') {
+    browserAPI.alarms.onAlarm.addListener((alarm) => {
+        importedChannelEnrichmentScheduler?.handleAlarm?.(alarm?.name);
+    });
+}
+
+if (browserAPI.runtime?.onStartup && typeof browserAPI.runtime.onStartup.addListener === 'function') {
+    browserAPI.runtime.onStartup.addListener(() => {
+        initializeImportedChannelEnrichment().catch(() => {});
+    });
+}
+
+void initializeImportedChannelEnrichment();
 
 console.log(`FilterTube Background ${IS_FIREFOX ? 'Script' : 'Service Worker'} loaded and ready to serve filtered content.`);
 

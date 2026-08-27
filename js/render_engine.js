@@ -28,6 +28,152 @@ const RenderEngine = (() => {
         else clearTimeout(id);
     };
 
+    const LARGE_LIST_VIRTUALIZATION_THRESHOLD = 120;
+    const LARGE_LIST_OVERSCAN = 10;
+    const DEFAULT_LIST_GAP_PX = 16;
+
+    function scheduleFrame(callback) {
+        if (typeof requestAnimationFrame === 'function') {
+            return { type: 'raf', id: requestAnimationFrame(callback) };
+        }
+        return { type: 'timeout', id: setTimeout(callback, 0) };
+    }
+
+    function cancelFrameTask(task) {
+        if (!task) return;
+        if (task.type === 'raf' && typeof cancelAnimationFrame === 'function') {
+            cancelAnimationFrame(task.id);
+            return;
+        }
+        clearTimeout(task.id);
+    }
+
+    function getListGap(container) {
+        try {
+            const computed = typeof getComputedStyle === 'function' ? getComputedStyle(container) : null;
+            const raw = computed?.rowGap || computed?.gap || '';
+            const parsed = Number.parseFloat(raw);
+            return Number.isFinite(parsed) ? Math.max(0, parsed) : DEFAULT_LIST_GAP_PX;
+        } catch (e) {
+            return DEFAULT_LIST_GAP_PX;
+        }
+    }
+
+    function cancelVirtualList(container) {
+        const state = container?.__ftVirtualListState;
+        if (!state) return;
+
+        state.disposed = true;
+        cancelFrameTask(state.frameTask);
+        if (state.handleScroll && typeof container.removeEventListener === 'function') {
+            container.removeEventListener('scroll', state.handleScroll);
+        }
+        container.__ftVirtualListState = null;
+        container.classList?.remove('ft-virtualized-list');
+    }
+
+    function cancelContainerRenderTasks(container) {
+        cancelIdle(container?.__ftKeywordRenderTaskId);
+        cancelIdle(container?.__ftChannelRenderTaskId);
+        if (container) {
+            container.__ftKeywordRenderTaskId = 0;
+            container.__ftChannelRenderTaskId = 0;
+        }
+        cancelVirtualList(container);
+    }
+
+    function renderWindowedList(container, items, renderItem, options = {}) {
+        const list = Array.isArray(items) ? items : [];
+        const itemHeight = Math.max(48, Number(options.itemHeight) || 72);
+        const overscan = Math.max(4, Math.floor(Number(options.overscan) || LARGE_LIST_OVERSCAN));
+        const gap = getListGap(container);
+        const previousScrollTop = Math.max(0, Number(container.scrollTop) || 0);
+        const total = list.length;
+        const state = {
+            disposed: false,
+            frameTask: null,
+            handleScroll: null,
+            start: -1,
+            end: -1,
+            rows: new Map()
+        };
+
+        const topSpacer = document.createElement('div');
+        topSpacer.className = 'ft-virtual-list-spacer';
+        topSpacer.setAttribute('aria-hidden', 'true');
+
+        const rowHost = document.createElement('div');
+        rowHost.className = 'ft-virtual-list-window';
+
+        const bottomSpacer = document.createElement('div');
+        bottomSpacer.className = 'ft-virtual-list-spacer';
+        bottomSpacer.setAttribute('aria-hidden', 'true');
+
+        const totalHeight = Math.max(0, (total * itemHeight) + (Math.max(0, total - 1) * gap));
+
+        const renderWindow = (force = false, requestedScrollTop = null) => {
+            if (state.disposed) return;
+
+            const viewportHeight = Math.max(Number(container.clientHeight) || 0, itemHeight * 6);
+            const actualViewportHeight = Math.max(0, Number(container.clientHeight) || 0);
+            const maxScrollTop = Math.max(0, totalHeight - actualViewportHeight);
+            const requested = Number.isFinite(requestedScrollTop)
+                ? Math.max(0, Math.min(requestedScrollTop, maxScrollTop))
+                : (Number(container.scrollTop) || 0);
+            const scrollTop = Math.max(0, requested);
+            const stride = itemHeight + gap;
+            const visibleCount = Math.max(1, Math.ceil(viewportHeight / stride));
+            const start = Math.max(0, Math.min(total, Math.floor(scrollTop / stride) - overscan));
+            const end = Math.min(total, start + visibleCount + (overscan * 2));
+
+            if (!force && start === state.start && end === state.end) return;
+
+            const topHeight = Math.max(0, start * stride);
+            const windowHeight = Math.max(0, ((end - start) * itemHeight) + (Math.max(0, end - start - 1) * gap));
+            topSpacer.style.height = `${Math.round(topHeight)}px`;
+            bottomSpacer.style.height = `${Math.round(Math.max(0, totalHeight - topHeight - windowHeight))}px`;
+
+            const nextRows = new Map();
+            const fragment = document.createDocumentFragment();
+            for (let index = start; index < end; index += 1) {
+                const item = state.rows.get(index) || renderItem(list[index], index);
+                if (!(item instanceof Node)) continue;
+                if (item.dataset) item.dataset.filtertubeVirtualIndex = String(index);
+                nextRows.set(index, item);
+                fragment.appendChild(item);
+            }
+            rowHost.innerHTML = '';
+            rowHost.appendChild(fragment);
+            state.rows = nextRows;
+            state.start = start;
+            state.end = end;
+
+            if (Number.isFinite(requestedScrollTop)) {
+                if (Number(container.scrollTop) !== scrollTop) {
+                    container.scrollTop = scrollTop;
+                }
+            }
+        };
+
+        state.handleScroll = () => {
+            if (state.disposed || state.frameTask) return;
+            state.frameTask = scheduleFrame(() => {
+                state.frameTask = null;
+                renderWindow();
+            });
+        };
+
+        cancelVirtualList(container);
+        container.classList?.add('ft-virtualized-list');
+        container.innerHTML = '';
+        container.appendChild(topSpacer);
+        container.appendChild(rowHost);
+        container.appendChild(bottomSpacer);
+        container.__ftVirtualListState = state;
+        container.addEventListener('scroll', state.handleScroll, { passive: true });
+        renderWindow(true, previousScrollTop);
+    }
+
     // ============================================================================
     // KEYWORD RENDERING
     // ============================================================================
@@ -169,10 +315,13 @@ const RenderEngine = (() => {
     function renderKeywordList(container, options = {}) {
         if (!container) return;
 
+        cancelContainerRenderTasks(container);
+
         const {
             showSearch = false,
             showSort = false,
             minimal = false,
+            virtualize = !minimal,
             searchValue = '',
             sortValue = 'newest',
             dateFrom = null,
@@ -296,10 +445,9 @@ const RenderEngine = (() => {
             return;
         }
 
-        // Render each keyword
-        displayKeywords.forEach(entry => {
+        const renderKeywordRow = (entry) => {
             const effectiveProfile = (profile !== 'kids' && entry?.__ftFromKids) ? 'kids' : profile;
-            const item = createKeywordListItem(entry, {
+            return createKeywordListItem(entry, {
                 minimal,
                 profile: effectiveProfile,
                 includeToggles,
@@ -310,6 +458,19 @@ const RenderEngine = (() => {
                 onUpdateDateFilter,
                 onToggleComments
             });
+        };
+
+        if (virtualize && displayKeywords.length > LARGE_LIST_VIRTUALIZATION_THRESHOLD) {
+            renderWindowedList(container, displayKeywords, renderKeywordRow, {
+                itemHeight: 72,
+                overscan: LARGE_LIST_OVERSCAN
+            });
+            return;
+        }
+
+        // Render each keyword
+        displayKeywords.forEach(entry => {
+            const item = renderKeywordRow(entry);
             if (item instanceof Node) {
                 container.appendChild(item);
             }
@@ -671,8 +832,7 @@ const RenderEngine = (() => {
     function renderChannelList(container, options = {}) {
         if (!container) return;
 
-        cancelIdle(container.__ftChannelRenderTaskId);
-        container.__ftChannelRenderTaskId = 0;
+        cancelContainerRenderTasks(container);
         container.__ftChannelRenderGen = (container.__ftChannelRenderGen || 0) + 1;
         const renderGen = container.__ftChannelRenderGen;
 
@@ -681,6 +841,7 @@ const RenderEngine = (() => {
             showSort = false,
             showNodeMapping = false,
             minimal = false,
+            virtualize = !minimal,
             searchValue = '',
             sortValue = 'newest',
             dateFrom = null,
@@ -859,6 +1020,14 @@ const RenderEngine = (() => {
                 modeOverride: effectiveProfile === 'kids' ? kidsMode : mainMode
             });
         };
+
+        if (virtualize && displayChannels.length > LARGE_LIST_VIRTUALIZATION_THRESHOLD) {
+            renderWindowedList(container, displayChannels, renderChannelRow, {
+                itemHeight: showNodeMapping ? 136 : 80,
+                overscan: LARGE_LIST_OVERSCAN
+            });
+            return;
+        }
 
         let cursor = 0;
         const total = displayChannels.length;

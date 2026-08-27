@@ -738,6 +738,7 @@ function initializeFiltersTabs() {
 
         <div id="importedChannelEnrichmentNotice" class="subscriptions-import-inline subscriptions-import-inline--info imported-channel-enrichment-inline" hidden>
             <div id="importedChannelEnrichmentStatus" class="subscriptions-import-status" role="status" aria-live="polite"></div>
+            <button id="importedChannelEnrichmentToggle" class="btn-secondary imported-channel-enrichment-toggle" type="button" hidden></button>
         </div>
 
         <div id="channelListEl" class="advanced-list"></div>
@@ -2067,7 +2068,12 @@ function initializeFiltersTabs() {
             { id: 'channels', label: 'Channel Management', content: channelsContent },
             { id: 'content', label: 'Content Controls', content: contentTab }
         ],
-        defaultTab: 'keywords'
+        defaultTab: 'keywords',
+        onTabChange: (tabId) => {
+            document.dispatchEvent(new CustomEvent('filtertube:rules-tab-changed', {
+                detail: { surface: 'main', tabId }
+            }));
+        }
     });
 
     container.appendChild(tabs.container);
@@ -3235,7 +3241,12 @@ function initializeKidsTabs() {
             { id: 'kidsChannels', label: 'Channel Management', content: kidsChannelsContent },
             { id: 'kidsContent', label: 'Content Controls', content: kidsContentTab }
         ],
-        defaultTab: 'kidsKeywords'
+        defaultTab: 'kidsKeywords',
+        onTabChange: (tabId) => {
+            document.dispatchEvent(new CustomEvent('filtertube:rules-tab-changed', {
+                detail: { surface: 'kids', tabId }
+            }));
+        }
     });
 
     container.appendChild(tabs.container);
@@ -3615,6 +3626,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     const importSubscriptionsActions = document.getElementById('importSubscriptionsActions');
     const importedChannelEnrichmentNotice = document.getElementById('importedChannelEnrichmentNotice');
     const importedChannelEnrichmentStatus = document.getElementById('importedChannelEnrichmentStatus');
+    const importedChannelEnrichmentToggle = document.getElementById('importedChannelEnrichmentToggle');
     const channelListEl = document.getElementById('channelListEl');
     const searchChannels = document.getElementById('searchChannels');
     const channelSort = document.getElementById('channelSort');
@@ -4704,12 +4716,17 @@ document.addEventListener('DOMContentLoaded', async () => {
     function formatImportedChannelEnrichmentWait(nextRunAt) {
         const remainingMs = Math.max(0, Number(nextRunAt) - Date.now());
         if (!remainingMs) return 'Next lookup will start shortly.';
+        // A pre-background build could persist a failed row's retry as a
+        // queue-wide multi-hour wake. Do not surface that stale value while
+        // the background worker migrates it to the per-row schedule.
+        if (remainingMs > 30 * 60 * 1000) {
+            return 'The older queue timing is being corrected; fresh rows continue on the normal interval.';
+        }
         const remainingSeconds = Math.ceil(remainingMs / 1000);
         if (remainingSeconds < 60) return `Next lookup in about ${remainingSeconds} seconds.`;
         const remainingMinutes = Math.ceil(remainingSeconds / 60);
         if (remainingMinutes < 60) return `Next lookup in about ${remainingMinutes} minutes.`;
-        const remainingHours = Math.ceil(remainingMinutes / 60);
-        return `Next lookup in about ${remainingHours} hours.`;
+        return 'The next lookup is being rescheduled by the background worker.';
     }
 
     async function refreshImportedChannelEnrichmentStatus() {
@@ -4719,6 +4736,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         if (typeof getter !== 'function') {
             importedChannelEnrichmentNotice.hidden = true;
             importedChannelEnrichmentStatus.textContent = '';
+            if (importedChannelEnrichmentToggle) importedChannelEnrichmentToggle.hidden = true;
             return null;
         }
 
@@ -4735,23 +4753,47 @@ document.addEventListener('DOMContentLoaded', async () => {
             importedChannelEnrichmentNotice.hidden = true;
             importedChannelEnrichmentNotice.setAttribute('aria-busy', 'false');
             importedChannelEnrichmentStatus.textContent = '';
+            if (importedChannelEnrichmentToggle) importedChannelEnrichmentToggle.hidden = true;
             return status;
         }
 
         const pending = Math.max(0, Number(status?.pending) || 0);
         const inFlight = status?.inFlight === true;
+        const paused = status?.paused === true;
+        const blockedReason = typeof status?.blockedReason === 'string' ? status.blockedReason : '';
+        const minDelaySeconds = Math.max(1, Math.round((Number(status?.minDelayMs) || 7000) / 1000));
+        const maxDelaySeconds = Math.max(minDelaySeconds, Math.round((Number(status?.maxDelayMs) || 15000) / 1000));
         const progress = inFlight
             ? ` ${pending ? `${pending} ${pluralize(pending, 'lookup')} waiting.` : 'No additional lookups are waiting.'}`
             : ` ${pluralize(total, 'lookup')} queued.`;
+        const lifecycleMessage = blockedReason === 'profile_locked'
+            ? 'Metadata completion is waiting because this profile is locked. Unlock the profile to continue.'
+            : blockedReason
+                ? 'Metadata completion is waiting for the active profile context to be restored.'
+                : paused
+                    ? 'Metadata completion is paused by you. Resume it whenever you want the remaining details fetched.'
+                    : 'This queue runs in the FilterTube background, so closing this dashboard does not stop it. Browser shutdown or background wakeup limits can delay the next lookup.';
+        const scheduleMessage = blockedReason || paused
+            ? ''
+            : `While the background is awake, FilterTube spaces lookups randomly between ${minDelaySeconds} and ${maxDelaySeconds} seconds; it never sends the whole list as a burst. ${formatImportedChannelEnrichmentWait(status?.nextRunAt)}`;
         importedChannelEnrichmentStatus.textContent = [
             `Channel details are still being completed: ${total} imported channel ${total === 1 ? 'lookup remains.' : 'lookups remain.'}${progress}`,
-            'FilterTube performs one lookup about every 20 seconds to avoid a burst of requests to YouTube.',
+            lifecycleMessage,
+            scheduleMessage,
             'The saved rule is active immediately from its identifier. Each lookup asks YouTube for the name, handle or custom URL, and avatar together. If YouTube omits a field in that response, FilterTube keeps the partial result and retries later instead of sending a burst of requests. A name can appear first because the imported file may already contain it (BlockTube often stores it in a context comment); “Not fetched” means that imported identifier is still waiting.',
-            'Name-only rules, including BlockTube name-only rules, have no unique UC ID and stay name-only. Closing this dashboard pauses the queue; reopening Filters resumes it.',
-            formatImportedChannelEnrichmentWait(status?.nextRunAt)
+            'Name-only rules, including BlockTube name-only rules, have no unique UC ID and stay name-only.'
         ].join(' ');
         importedChannelEnrichmentNotice.hidden = false;
         importedChannelEnrichmentNotice.setAttribute('aria-busy', inFlight ? 'true' : 'false');
+        if (importedChannelEnrichmentToggle) {
+            importedChannelEnrichmentToggle.hidden = false;
+            importedChannelEnrichmentToggle.disabled = blockedReason === 'profile_locked';
+            importedChannelEnrichmentToggle.dataset.paused = paused ? 'true' : 'false';
+            importedChannelEnrichmentToggle.textContent = paused ? 'Resume metadata completion' : 'Pause metadata completion';
+            importedChannelEnrichmentToggle.title = blockedReason === 'profile_locked'
+                ? 'Unlock this profile to continue metadata completion.'
+                : (paused ? 'Resume the background metadata queue.' : 'Pause the background metadata queue.');
+        }
         return status;
     }
 
@@ -8481,9 +8523,45 @@ document.addEventListener('DOMContentLoaded', async () => {
         return normalizeProfileChannel(raw) ? raw : '';
     }
 
+    function managedChannelIdentityValue(value) {
+        const raw = normalizeString(value);
+        if (!raw) return '';
+        const extracted = extractManagedChannelListToken(raw) || raw;
+        const normalized = extracted.replace(/^\/+/, '');
+        const idMatch = normalized.match(/^(?:channel\/)?(UC[a-zA-Z0-9_-]{22})$/i);
+        if (idMatch) return `id:${idMatch[1].toLowerCase()}`;
+        const handleMatch = normalized.match(/^@[A-Za-z0-9._-]{2,}$/);
+        if (handleMatch) return `handle:${handleMatch[0].toLowerCase()}`;
+        const customMatch = normalized.match(/^(c|user)\/([^\s/?#]+)$/i);
+        if (customMatch) return `custom:${customMatch[1].toLowerCase()}/${customMatch[2].toLowerCase()}`;
+        return '';
+    }
+
+    function managedChannelEntryKeys(channel) {
+        const values = [
+            channel?.id,
+            ...(Array.isArray(channel?.alternateIds) ? channel.alternateIds : []),
+            channel?.handle,
+            channel?.handleDisplay,
+            channel?.canonicalHandle,
+            channel?.customUrl,
+            channel?.originalInput
+        ];
+        const keys = [...new Set(values.map(managedChannelIdentityValue).filter(Boolean))];
+        if (keys.length) return keys;
+        const name = normalizeString(channel?.name).toLowerCase();
+        return name ? [`name:${name}`] : [];
+    }
+
     function managedChannelEntryKey(channel) {
-        return normalizeString(channel?.id || channel?.handle || channel?.customUrl || channel?.originalInput || channel?.name)
-            .toLowerCase();
+        return managedChannelEntryKeys(channel)[0] || '';
+    }
+
+    function addManagedChannelIdentityKeys(seen, channel) {
+        const keys = managedChannelEntryKeys(channel);
+        if (!keys.length || keys.some(key => seen.has(key))) return false;
+        keys.forEach(key => seen.add(key));
+        return true;
     }
 
     function isManagedChannelListRowPaused(row) {
@@ -8596,9 +8674,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             if (!extracted) return false;
             const channel = normalizeProfileChannel(extracted);
             if (!channel) return false;
-            const key = managedChannelEntryKey(channel);
-            if (!key || seenChannels.has(key)) return false;
-            seenChannels.add(key);
+            if (!addManagedChannelIdentityKeys(seenChannels, channel)) return false;
             channels.push({
                 ...channel,
                 source: 'managed_channel_list',
@@ -8865,9 +8941,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                 skippedCount += 1;
                 return;
             }
-            const key = managedChannelEntryKey(channel);
-            if (!key || seen.has(key)) return;
-            seen.add(key);
+            if (!addManagedChannelIdentityKeys(seen, channel)) return;
             channels.push({
                 ...channel,
                 source: 'managed_channel_list',
@@ -8936,9 +9010,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             if (!extracted) return false;
             const channel = normalizeProfileChannel(extracted);
             if (!channel) return false;
-            const key = managedChannelEntryKey(channel);
-            if (!key || seen.has(key)) return true;
-            seen.add(key);
+            if (!addManagedChannelIdentityKeys(seen, channel)) return true;
             channels.push({
                 ...channel,
                 source: 'managed_channel_list',
@@ -9080,7 +9152,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             </div>
             <div class="managed-channel-list-modal__preview-note">
                 BlockTube JSON detected. Import keeps ${Number(counts.channelIds) || 0} channel IDs, ${Number(counts.channelNameRules) || 0} channel-name rules, ${Number(counts.keywords) || 0} title rules, ${Number(counts.comments) || 0} comment rules, and ${Number(counts.regex) || 0} validated regex rules.
-                ${Number(counts.mappedOptions) || 0} safe setting groups and ${Number(counts.durationFilters) || 0} duration filters are reviewed separately. ${inactiveCount} unsafe/inactive field${inactiveCount === 1 ? '' : 's'} stay quarantined and are never executed. Channel IDs are enriched only after approval, one serialized lookup about every 20 seconds.
+                ${Number(counts.mappedOptions) || 0} safe setting groups and ${Number(counts.durationFilters) || 0} duration filters are reviewed separately. ${inactiveCount} unsafe/inactive field${inactiveCount === 1 ? '' : 's'} stay quarantined and are never executed. Channel IDs are enriched only after approval by the background worker, one serialized lookup at a randomized 7–15 second interval while it is awake.
             </div>
             ${rows}
         `;
@@ -9377,7 +9449,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                     </article>
                 </div>
                 <div class="managed-channel-list-modal__format-note">
-                    CSV, TXT, and FilterTube rule-list files add channel and keyword rules. BlockTube migration JSON also imports its supported Main YouTube video IDs and safe setting mappings. Incomplete channel identifiers from any of these formats are completed after approval, one serialized lookup at a time; a large list can take time. No file can change profiles, PINs, trusted devices, time limits, Main/Kids access, or sync targets.
+                    CSV, TXT, and FilterTube rule-list files add channel and keyword rules. BlockTube migration JSON also imports its supported Main YouTube video IDs and safe setting mappings. Incomplete channel identifiers from any of these formats are completed after approval by the extension background worker, one serialized lookup at a randomized 7–15 second interval while awake; a large list can take time. No file can change profiles, PINs, trusted devices, time limits, Main/Kids access, or sync targets.
                 </div>`;
             modalLayout.append(formatGuide, formColumn);
 
@@ -9682,8 +9754,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             });
 
             actions.append(cancelBtn, okBtn);
-            body.appendChild(actions);
-            card.append(header, body);
+            card.append(header, body, actions);
             overlay.appendChild(card);
             document.body.appendChild(overlay);
             renderPreview();
@@ -9725,11 +9796,18 @@ document.addEventListener('DOMContentLoaded', async () => {
         const keywordListKey = managedRuleListKeyFor(surface, 'keyword', item);
         const existingChannels = Array.isArray(item[channelListKey]) ? item[channelListKey] : [];
         const existingKeywords = Array.isArray(item[keywordListKey]) ? item[keywordListKey] : [];
-        const seenChannels = new Set(existingChannels.map(managedChannelEntryKey).filter(Boolean));
+        const seenChannels = new Set();
+        const uniqueExistingChannels = [];
+        existingChannels.forEach(channel => {
+            const keys = managedChannelEntryKeys(channel);
+            if (!keys.length || keys.some(key => seenChannels.has(key))) return;
+            keys.forEach(key => seenChannels.add(key));
+            uniqueExistingChannels.push(channel);
+        });
         const seenKeywords = new Set(existingKeywords.map(row => normalizeString(row?.word).toLowerCase()).filter(Boolean));
         const channelsToAdd = [];
         const keywordsToAdd = [];
-        let duplicateCount = 0;
+        let duplicateCount = Math.max(0, existingChannels.length - uniqueExistingChannels.length);
         const sourceMetadata = {
             ...safeObject(parsed?.sourceMetadata),
             ...safeObject(metadata.sourceMetadata)
@@ -9753,12 +9831,10 @@ document.addEventListener('DOMContentLoaded', async () => {
             addedAt: metadata.importedAt || Date.now()
         });
         safeArray(parsed?.channels).forEach((channel) => {
-            const key = managedChannelEntryKey(channel);
-            if (!key || seenChannels.has(key)) {
+            if (!addManagedChannelIdentityKeys(seenChannels, channel)) {
                 duplicateCount += 1;
                 return;
             }
-            seenChannels.add(key);
             channelsToAdd.push(decorateManagedListRow(channel));
         });
         safeArray(parsed?.keywords).forEach((keyword) => {
@@ -9771,14 +9847,16 @@ document.addEventListener('DOMContentLoaded', async () => {
             seenKeywords.add(key);
             keywordsToAdd.push(decorateManagedListRow(entry));
         });
-        if (channelsToAdd.length) {
-            item[channelListKey] = [...channelsToAdd, ...existingChannels];
+        if (channelsToAdd.length || uniqueExistingChannels.length !== existingChannels.length) {
+            item[channelListKey] = [...channelsToAdd, ...uniqueExistingChannels];
         }
         if (keywordsToAdd.length) {
             item[keywordListKey] = [...keywordsToAdd, ...existingKeywords];
         }
         return {
-            changed: channelsToAdd.length > 0 || keywordsToAdd.length > 0,
+            changed: channelsToAdd.length > 0
+                || keywordsToAdd.length > 0
+                || uniqueExistingChannels.length !== existingChannels.length,
             addedCount: channelsToAdd.length + keywordsToAdd.length,
             channelAddedCount: channelsToAdd.length,
             keywordAddedCount: keywordsToAdd.length,
@@ -10827,7 +10905,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                 : { pending: 0 };
             scheduleImportedChannelEnrichmentStatusRefresh(0);
             const metadataNotice = enrichment?.pending
-                ? ` Channel details continue slowly (${Number(enrichment.pending) || 0} pending), one row at a time; large lists can take time.`
+                ? ` Channel details continue in the background (${Number(enrichment.pending) || 0} pending), one row at a time at a randomized 7–15 second interval while the worker is awake; large lists can take time. Closing this dashboard does not stop the queue.`
                 : '';
             UIComponents.showToast(
                 `${duplicateCount ? 'Selected profiles already have this list' : 'No selected profiles were changed'}${metadataNotice}`,
@@ -10854,7 +10932,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         renderKeywords();
         renderKidsKeywords();
         const metadataNotice = enrichment?.pending
-            ? ` Channel details continue slowly (${Number(enrichment.pending) || 0} pending), one row at a time; large lists can take time. Closing this dashboard pauses the queue and reopening it resumes.`
+            ? ` Channel details continue in the background (${Number(enrichment.pending) || 0} pending), one row at a time with a randomized 7–15 second interval while the worker is awake; large lists can take time. Closing this dashboard does not stop the queue.`
             : ' Channel details are already complete.';
         UIComponents.showToast(
             `Imported ${addedCount} list-derived ${pluralize(addedCount, 'rule')} into ${changedCount} protected ${changedCount === 1 ? 'profile' : 'profiles'}.${metadataNotice}`,
@@ -10938,9 +11016,9 @@ document.addEventListener('DOMContentLoaded', async () => {
 
             // Do not send imported identifiers through the ordinary post-entry
             // queue. Every import format uses the explicitly started,
-            // persisted queue below so a large list remains one lookup at a
-            // time with a long delay. Keep any ordinary user-added-channel
-            // enrichment already waiting; the imported queue is separate.
+            // persisted background queue so a large list remains one lookup at
+            // a time with a randomized delay. Keep any ordinary user-added-
+            // channel enrichment already waiting; the imported queue is separate.
             await StateManager.loadSettings({ notify: false, resetEnrichment: false, scheduleEnrichment: false });
             const enrichmentStarter = StateManager.startImportedChannelEnrichment
                 || StateManager.startBlockTubeEnrichment;
@@ -10972,7 +11050,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                         `Already present: ${Number(receipt.duplicateChannels) || 0} channels · ${Number(receipt.duplicateKeywords) || 0} keyword/comment rules · ${Number(receipt.duplicateVideoIds) || 0} video IDs`,
                         `Skipped or unsupported outcomes: ${Number(receipt.skippedRows) || 0}`,
                         enrichment?.pending
-                            ? `Channel metadata queue: ${Number(enrichment.pending) || 0} imported rows pending. It performs one serialized lookup about every 20 seconds and retries incomplete/unavailable channels with a long backoff; no burst of requests was made during import. Closing this dashboard pauses the queue and reopening it resumes.`
+                            ? `Channel metadata queue: ${Number(enrichment.pending) || 0} imported rows pending. The background worker performs one serialized lookup at a randomized 7–15 second interval while awake. A failed row retries after about 2 minutes, then backs off up to 30 minutes; that retry never pauses fresh rows. No burst of requests was made during import. Closing this dashboard does not stop the queue, although browser shutdown or wakeup limits can delay it.`
                             : 'All imported channel rows already have complete metadata; no metadata lookup is pending.'
                     ],
                     choices: [
@@ -11068,12 +11146,12 @@ document.addEventListener('DOMContentLoaded', async () => {
                     `${Number(blockTubeCounts.keywords) || 0} title rules · ${Number(blockTubeCounts.comments) || 0} comment rules · ${Number(blockTubeCounts.regex) || 0} validated regex rules`,
                     `${Number(blockTubeCounts.mappedOptions) || 0} mapped setting groups · ${Number(blockTubeCounts.durationFilters) || 0} duration filters · ${safeArray(blockTubeInspection.preview?.report?.inactive).length} inactive preserved`,
                     `${blockTubeSkipped} unsupported, invalid, or unknown outcomes`,
-                    'No per-channel YouTube requests are made while the list is being reviewed. After approval, imported channel identifiers use a separate persisted queue: one serialized lookup about every 20 seconds, with retries backed off for hours; a large list can take time. Nothing changes until you confirm.'
+                    'No per-channel YouTube requests are made while the list is being reviewed. After approval, imported channel identifiers use a separate persisted background queue: one serialized lookup at a randomized 7–15 second interval while awake. A failed row retries after about 2 minutes and backs off up to 30 minutes without pausing fresh rows; a large list can still take time. Nothing changes until you confirm.'
                 ]
                 : [
                     `${formatManagedRuleListCount(parsedCounts)} ready`,
                     parsed.skippedCount ? `${parsed.skippedCount} ${parsed.skippedCount === 1 ? 'row was' : 'rows were'} skipped` : 'No rows skipped',
-                    'No per-channel YouTube requests are made while the list is being reviewed. After approval, incomplete channel identifiers are completed in a persisted one-at-a-time queue; a large list can take time. Nothing changes until you confirm.'
+                    'No per-channel YouTube requests are made while the list is being reviewed. After approval, incomplete channel identifiers are completed in a persisted one-at-a-time queue. A failed row retries after about 2 minutes and backs off up to 30 minutes without pausing fresh rows; a large list can still take time. Nothing changes until you confirm.'
                 ],
             choices: [
                 {
@@ -11124,7 +11202,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                 : { pending: 0 };
             scheduleImportedChannelEnrichmentStatusRefresh(0);
             const metadataNotice = enrichment?.pending
-                ? ` Channel details continue slowly (${Number(enrichment.pending) || 0} pending), one row at a time; large lists can take time.`
+                ? ` Channel details continue in the background (${Number(enrichment.pending) || 0} pending), one row at a time at a randomized 7–15 second interval while the worker is awake; large lists can take time. Closing this dashboard does not stop the queue.`
                 : '';
             UIComponents.showToast(
                 `${duplicateCount ? 'This profile already has that list' : 'No profile rules were changed'}${metadataNotice}`,
@@ -11156,7 +11234,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         renderKeywords();
         renderKidsKeywords();
         const metadataNotice = enrichment?.pending
-            ? ` Channel details continue slowly (${Number(enrichment.pending) || 0} pending), one row at a time; large lists can take time. Closing this dashboard pauses the queue and reopening it resumes.`
+            ? ` Channel details continue in the background (${Number(enrichment.pending) || 0} pending), one row at a time with a randomized 7–15 second interval while the worker is awake; large lists can take time. Closing this dashboard does not stop the queue.`
             : ' Channel details are already complete.';
         UIComponents.showToast(`Imported ${addedCount} ${pluralize(addedCount, 'rule')} into ${surfaceLabel}.${metadataNotice}`, 'success');
     }
@@ -23944,7 +24022,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                             ? 'Trusted-device recovery data was also restored.'
                             : 'No trusted-device identity was changed.',
                         importedChannelEnrichment?.pending
-                            ? `Imported channel metadata will be completed in the background one row at a time about every 20 seconds (${Number(importedChannelEnrichment.pending) || 0} pending). Large lists can take time; this pacing avoids a burst of YouTube requests. Closing this dashboard pauses the queue and reopening it resumes.`
+                            ? `Imported channel metadata will be completed in the extension background one row at a time at a randomized 7–15 second interval while the worker is awake (${Number(importedChannelEnrichment.pending) || 0} pending). Large lists can take time; this pacing avoids a burst of YouTube requests. Closing this dashboard does not stop the queue, although browser shutdown or wakeup limits can delay it.`
                             : 'All imported channel metadata is already complete; no background lookup is pending.'
                     ],
                     choices: [
@@ -23954,7 +24032,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                 });
             } else {
                 const metadataNotice = importedChannelEnrichment?.pending
-                    ? ` Channel details continue slowly (${Number(importedChannelEnrichment.pending) || 0} pending), one row at a time; large lists can take time. Closing this dashboard pauses the queue and reopening it resumes.`
+                    ? ` Channel details continue in the extension background (${Number(importedChannelEnrichment.pending) || 0} pending), one row at a time at a randomized 7–15 second interval while the worker is awake; large lists can take time. Closing this dashboard does not stop the queue.`
                     : ' Channel details are already complete.';
                 UIComponents.showToast(
                     `${importResult?.restoredNanahState
@@ -25851,8 +25929,16 @@ document.addEventListener('DOMContentLoaded', async () => {
         };
     }
 
+    function isAdvancedRuleListActive(listEl) {
+        if (!listEl) return false;
+        const view = listEl.closest('.view-section');
+        if (!view?.classList.contains('active')) return false;
+        const pane = listEl.closest('.tab-pane');
+        return !pane || pane.classList.contains('active');
+    }
+
     function renderKeywords() {
-        if (!keywordListEl) return;
+        if (!isAdvancedRuleListActive(keywordListEl)) return;
         const targetList = keywordRuleTarget?.value === 'allow' ? 'allow' : 'block';
         syncMainRuleTargetEditor('keyword', targetList);
         RenderEngine.renderKeywordList(keywordListEl, {
@@ -25964,7 +26050,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     }
 
     function renderChannels() {
-        if (!channelListEl) return;
+        if (!isAdvancedRuleListActive(channelListEl)) return;
         const targetList = channelRuleTarget?.value === 'allow' ? 'allow' : 'block';
         syncMainRuleTargetEditor('channel', targetList);
         channelSourceFilterValue = updateChannelSourceFilterOptions(channelSourceFilter, 'main', channelSourceFilterValue);
@@ -26003,7 +26089,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     }
 
     function renderKidsKeywords() {
-        if (!kidsKeywordListEl) return;
+        if (!isAdvancedRuleListActive(kidsKeywordListEl)) return;
         const targetList = kidsKeywordRuleTarget?.value === 'allow' ? 'allow' : 'block';
         syncKidsRuleTargetEditor('keyword', targetList);
         const baseState = isManagedChildEditFor('kids') ? buildManagedChildState('kids') : StateManager.getState();
@@ -26041,7 +26127,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     }
 
     function renderKidsChannels() {
-        if (!kidsChannelListEl) return;
+        if (!isAdvancedRuleListActive(kidsChannelListEl)) return;
         const targetList = kidsChannelRuleTarget?.value === 'allow' ? 'allow' : 'block';
         syncKidsRuleTargetEditor('channel', targetList);
         kidsChannelSourceFilterValue = updateChannelSourceFilterOptions(kidsChannelSourceFilter, 'kids', kidsChannelSourceFilterValue);
@@ -26515,6 +26601,34 @@ document.addEventListener('DOMContentLoaded', async () => {
     syncKidsRuleTargetEditor('keyword', initialKidsRuleTarget);
     syncKidsRuleTargetEditor('channel', initialKidsRuleTarget);
 
+    const renderActiveRulesTab = (surface, tabId) => {
+        if (surface === 'kids') {
+            if (tabId === 'kidsChannels') renderKidsChannels();
+            else if (tabId === 'kidsKeywords') renderKidsKeywords();
+            return;
+        }
+        if (tabId === 'channels') renderChannels();
+        else if (tabId === 'keywords') renderKeywords();
+    };
+
+    document.addEventListener('filtertube:rules-tab-changed', (event) => {
+        renderActiveRulesTab(
+            normalizeString(event?.detail?.surface) || 'main',
+            normalizeString(event?.detail?.tabId)
+        );
+    });
+
+    document.addEventListener('filtertube:view-changed', (event) => {
+        const viewId = normalizeString(event?.detail?.viewId);
+        if (viewId === 'filters') {
+            const tabId = document.querySelector('#filtersView .tab-pane.active')?.getAttribute('data-tab-id') || 'keywords';
+            renderActiveRulesTab('main', tabId);
+        } else if (viewId === 'kids') {
+            const tabId = document.querySelector('#kidsView .tab-pane.active')?.getAttribute('data-tab-id') || 'kidsKeywords';
+            renderActiveRulesTab('kids', tabId);
+        }
+    });
+
     // Initial render
     renderKeywords();
     renderChannels();
@@ -26565,6 +26679,28 @@ document.addEventListener('DOMContentLoaded', async () => {
             }
             if (action === 'retry-import') {
                 await startSubscribedChannelsImport('manual');
+            }
+        });
+    }
+
+    if (importedChannelEnrichmentToggle) {
+        importedChannelEnrichmentToggle.addEventListener('click', async () => {
+            const isPaused = importedChannelEnrichmentToggle.dataset.paused === 'true';
+            const action = isPaused
+                ? StateManager?.explicitResumeImportedChannelEnrichment
+                : StateManager?.pauseImportedChannelEnrichment;
+            if (typeof action !== 'function') return;
+
+            importedChannelEnrichmentToggle.disabled = true;
+            try {
+                const result = await action();
+                if (result?.ok === false) {
+                    UIComponents.showToast(result.error || 'Could not update metadata completion', 'error');
+                }
+            } catch (error) {
+                UIComponents.showToast('Could not update metadata completion', 'error');
+            } finally {
+                await refreshImportedChannelEnrichmentStatus();
             }
         });
     }

@@ -5,9 +5,12 @@ import assert from 'node:assert/strict';
 
 const stateManagerSource = fs.readFileSync('js/state_manager.js', 'utf8');
 const backgroundSource = fs.readFileSync('js/background.js', 'utf8');
+const helperSource = fs.readFileSync('js/imported_channel_enrichment.js', 'utf8');
 const tabViewSource = fs.readFileSync('js/tab-view.js', 'utf8');
 const renderEngineSource = fs.readFileSync('js/render_engine.js', 'utf8');
 const tabViewCssSource = fs.readFileSync('css/tab-view.css', 'utf8');
+const manifestSources = ['manifest.json', 'manifest.chrome.json', 'manifest.opera.json', 'manifest.firefox.json']
+  .map(path => fs.readFileSync(path, 'utf8'));
 
 function clone(value) {
   return value == null ? value : structuredClone(value);
@@ -47,12 +50,57 @@ function profilesFor(channels) {
   };
 }
 
-function createStateManagerRuntime({ response = null, channels = [], profilesV4: suppliedProfilesV4 = null } = {}) {
+function createStateManagerRuntime({ response = null, channels = [], profilesV4: suppliedProfilesV4 = null, browserMode = false } = {}) {
   const profilesV4 = clone(suppliedProfilesV4 || profilesFor(clone(channels)));
   const storage = {};
   const timers = [];
   const runtimeMessages = [];
   let timerId = 0;
+  let importedPaused = false;
+
+  const importedPendingCount = (message = {}) => {
+    const activeProfileId = profilesV4.activeProfileId || 'default';
+    const requestedIds = Array.isArray(message.profileIds) && message.profileIds.length
+      ? new Set(message.profileIds.map(value => String(value || '').trim()).filter(Boolean))
+      : new Set([activeProfileId]);
+    let count = 0;
+    requestedIds.forEach(profileId => {
+      const profile = profilesV4.profiles?.[profileId];
+      if (!profile) return;
+      const lists = [
+        profile.main?.channels,
+        profile.main?.whitelistChannels,
+        profile.kids?.blockedChannels,
+        profile.kids?.whitelistChannels
+      ];
+      lists.forEach(list => {
+        (Array.isArray(list) ? list : []).forEach(channel => {
+          const source = String(channel?.source || '').trim().toLowerCase();
+          const incomplete = !channel?.handle && !channel?.customUrl && !channel?.logo;
+          if (['import', 'managed_channel_list', 'blocktube', 'blocktube-channel-name'].includes(source) && incomplete) {
+            count += 1;
+          }
+        });
+      });
+    });
+    return count;
+  };
+
+  const importedStatus = (message = {}) => {
+    const pending = importedPendingCount(message);
+    return {
+      ok: true,
+      scheduler: 'background',
+      pending,
+      inFlight: false,
+      total: pending,
+      paused: importedPaused,
+      minDelayMs: 7000,
+      maxDelayMs: 15000,
+      alarmFloorMs: 30000,
+      nextRunAt: pending ? Date.now() + 7000 : 0
+    };
+  };
 
   const settings = {
     enabled: true,
@@ -160,6 +208,25 @@ function createStateManagerRuntime({ response = null, channels = [], profilesV4:
         lastError: null,
         sendMessage(message, callback) {
           runtimeMessages.push(clone(message));
+          if (message.action === 'FilterTube_StartImportedChannelEnrichment') {
+            importedPaused = false;
+            callback?.(clone(importedStatus(message)));
+            return;
+          }
+          if (message.action === 'FilterTube_ResumeImportedChannelEnrichment') {
+            if (message.unpause === true) importedPaused = false;
+            callback?.(clone(importedStatus(message)));
+            return;
+          }
+          if (message.action === 'FilterTube_PauseImportedChannelEnrichment') {
+            importedPaused = true;
+            callback?.(clone(importedStatus(message)));
+            return;
+          }
+          if (message.action === 'FilterTube_GetImportedChannelEnrichmentStatus') {
+            callback?.(clone(importedStatus(message)));
+            return;
+          }
           callback?.(clone(response || {
             success: true,
             channelData: {
@@ -180,6 +247,47 @@ function createStateManagerRuntime({ response = null, channels = [], profilesV4:
       }
     }
   };
+  if (browserMode) {
+    context.browser = {
+      runtime: {
+        sendMessage(message, callback) {
+          assert.equal(callback, undefined, 'Firefox browser messaging must use the returned Promise');
+          runtimeMessages.push(clone(message));
+          if (message.action === 'FilterTube_StartImportedChannelEnrichment') {
+            importedPaused = false;
+            return Promise.resolve(clone(importedStatus(message)));
+          }
+          if (message.action === 'FilterTube_ResumeImportedChannelEnrichment') {
+            if (message.unpause === true) importedPaused = false;
+            return Promise.resolve(clone(importedStatus(message)));
+          }
+          if (message.action === 'FilterTube_PauseImportedChannelEnrichment') {
+            importedPaused = true;
+            return Promise.resolve(clone(importedStatus(message)));
+          }
+          if (message.action === 'FilterTube_GetImportedChannelEnrichmentStatus') {
+            return Promise.resolve(clone(importedStatus(message)));
+          }
+          return Promise.resolve(clone(response || {
+            success: true,
+            channelData: {
+              id: message.input,
+              name: 'Complete channel',
+              handle: '@complete-channel',
+              handleDisplay: '@complete-channel',
+              canonicalHandle: '@complete-channel',
+              logo: 'https://example.test/avatar.jpg',
+              customUrl: null
+            }
+          }));
+        }
+      },
+      storage: {
+        local,
+        onChanged: { addListener() {} }
+      }
+    };
+  }
   context.window = context;
   context.globalThis = context;
 
@@ -260,25 +368,21 @@ test('ordinary user enrichment stays fast while every imported source uses the p
   assert.equal(genericStatus.pending, 2);
   assert.equal(genericStatus.inFlight, false);
   assert.equal(genericStatus.total, 2);
-  assert.equal(generic.timers.at(-1).delayMs, 0);
-  await generic.runNextTimer();
-  assert.equal(generic.runtimeMessages.length, 1);
-  assert.equal(generic.runtimeMessages[0].enrichmentFromImport, true);
-  assert.equal(generic.runtimeMessages[0].input, importedChannel.id);
-  assert.equal(generic.storage.ftBlockTubeEnrichmentJobV1.pending.length, 1);
-  assert.equal(generic.storage.ftBlockTubeEnrichmentJobV1.pending[0].source, 'managed_channel_list');
-  assert.equal(generic.storage.ftBlockTubeEnrichmentJobV1.pending[0].listType, 'blocklist');
+  assert.equal(generic.timers.length, 0);
+  assert.equal(generic.runtimeMessages[0].action, 'FilterTube_StartImportedChannelEnrichment');
+  assert.deepEqual(generic.runtimeMessages[0].profileIds, undefined);
+  assert.equal(generic.storage.ftBlockTubeEnrichmentJobV1, undefined);
   const genericAfterLookupStatus = await generic.manager.getImportedChannelEnrichmentStatus();
-  assert.equal(genericAfterLookupStatus.pending, 1);
-  assert.equal(genericAfterLookupStatus.total, 1);
+  assert.equal(genericAfterLookupStatus.pending, 2);
+  assert.equal(genericAfterLookupStatus.total, 2);
+  assert.equal(generic.runtimeMessages[2].action, 'FilterTube_GetImportedChannelEnrichmentStatus');
 
   const reload = createStateManagerRuntime({ channels: [managedListChannel] });
   await reload.manager.loadSettings({ scheduleEnrichment: false });
   const reloadStarted = await reload.manager.resumeImportedChannelEnrichment();
   assert.equal(reloadStarted.pending, 1);
-  assert.equal(reload.timers.at(-1).delayMs, 0);
-  await reload.runNextTimer();
-  assert.equal(reload.runtimeMessages[0].enrichmentFromImport, true);
+  assert.equal(reload.timers.length, 0);
+  assert.equal(reload.runtimeMessages[0].action, 'FilterTube_ResumeImportedChannelEnrichment');
   assert.equal(reload.storage.ftBlockTubeEnrichmentJobV1, undefined);
 
   const migration = createStateManagerRuntime({ channels: [blockTubeChannel] });
@@ -286,15 +390,16 @@ test('ordinary user enrichment stays fast while every imported source uses the p
   const started = await migration.manager.startBlockTubeEnrichment();
 
   assert.equal(started.pending, 1);
-  assert.equal(migration.runtimeMessages.length, 0);
-  assert.equal(migration.storage.ftBlockTubeEnrichmentJobV1.pending.length, 1);
-  assert.equal(migration.storage.ftBlockTubeEnrichmentJobV1.pending[0].id, blockTubeChannel.id);
-  assert.equal(migration.timers.at(-1).delayMs, 0);
-
-  await migration.runNextTimer();
   assert.equal(migration.runtimeMessages.length, 1);
-  assert.equal(migration.runtimeMessages[0].enrichmentFromImport, true);
-  assert.equal(migration.runtimeMessages[0].targetProfileId, 'default');
+  assert.equal(migration.runtimeMessages[0].action, 'FilterTube_StartImportedChannelEnrichment');
+  assert.equal(migration.storage.ftBlockTubeEnrichmentJobV1, undefined);
+
+  const paused = await migration.manager.pauseImportedChannelEnrichment();
+  assert.equal(paused.paused, true);
+  const resumed = await migration.manager.explicitResumeImportedChannelEnrichment();
+  assert.equal(resumed.paused, false);
+  assert.equal(migration.runtimeMessages.at(-2).action, 'FilterTube_PauseImportedChannelEnrichment');
+  assert.equal(migration.runtimeMessages.at(-1).action, 'FilterTube_ResumeImportedChannelEnrichment');
   assert.equal(migration.storage.ftBlockTubeEnrichmentJobV1, undefined);
 
   const parentChannel = {
@@ -357,9 +462,7 @@ test('ordinary user enrichment stays fast while every imported source uses the p
   await parentRuntime.manager.loadSettings({ scheduleEnrichment: false });
   const parentStarted = await parentRuntime.manager.startImportedChannelEnrichment({ profileIds: ['child'] });
   assert.equal(parentStarted.pending, 1);
-  await parentRuntime.runNextTimer();
-  assert.equal(parentRuntime.runtimeMessages[0].targetProfileId, 'child');
-  assert.equal(parentRuntime.runtimeMessages[0].actorProfileId, 'parent');
+  assert.deepEqual(parentRuntime.runtimeMessages[0].profileIds, ['child']);
 
   const childRuntime = createStateManagerRuntime({
     profilesV4: {
@@ -379,13 +482,11 @@ test('ordinary user enrichment stays fast while every imported source uses the p
   });
   await childRuntime.manager.loadSettings({ scheduleEnrichment: false });
   const childStarted = await childRuntime.manager.startImportedChannelEnrichment({ profileIds: ['parent', 'child'] });
-  assert.equal(childStarted.pending, 1);
-  await childRuntime.runNextTimer();
-  assert.equal(childRuntime.runtimeMessages[0].targetProfileId, 'child');
-  assert.equal(childRuntime.runtimeMessages[0].actorProfileId, 'child');
+  assert.equal(childStarted.pending, 2);
+  assert.deepEqual(childRuntime.runtimeMessages[0].profileIds, ['parent', 'child']);
 });
 
-test('failed imported metadata lookup is persisted and retried with a long backoff', async () => {
+test('StateManager delegates imported retry state to the background worker', async () => {
   const channel = {
     id: validId('r'),
     name: validId('r'),
@@ -400,15 +501,34 @@ test('failed imported metadata lookup is persisted and retried with a long backo
   });
 
   await runtime.manager.loadSettings({ scheduleEnrichment: false });
-  await runtime.manager.startImportedChannelEnrichment();
-  await runtime.runNextTimer();
+  const started = await runtime.manager.startImportedChannelEnrichment();
+  const status = await runtime.manager.getImportedChannelEnrichmentStatus();
 
-  const job = runtime.storage.ftBlockTubeEnrichmentJobV1;
-  assert.equal(runtime.runtimeMessages.length, 1);
-  assert.equal(job.pending.length, 1);
-  assert.equal(job.pending[0].attempts, 1);
-  assert.ok(job.pending[0].nextAttemptAt - Date.now() > (6 * 60 * 60 * 1000) - 10000);
-  assert.ok(runtime.timers.at(-1).delayMs > (6 * 60 * 60 * 1000) - 10000);
+  assert.equal(started.pending, 1);
+  assert.equal(status.pending, 1);
+  assert.equal(runtime.runtimeMessages[0].action, 'FilterTube_StartImportedChannelEnrichment');
+  assert.equal(runtime.runtimeMessages[1].action, 'FilterTube_GetImportedChannelEnrichmentStatus');
+  assert.equal(runtime.timers.length, 0);
+  assert.equal(runtime.storage.ftBlockTubeEnrichmentJobV1, undefined);
+});
+
+test('StateManager uses Promise-based browser messaging for Firefox background commands', async () => {
+  const runtime = createStateManagerRuntime({
+    browserMode: true,
+    channels: [{
+      id: validId('f'),
+      name: validId('f'),
+      handle: null,
+      customUrl: null,
+      logo: null,
+      source: 'import'
+    }]
+  });
+
+  const status = await runtime.manager.getImportedChannelEnrichmentStatus();
+  assert.equal(status.scheduler, 'background');
+  assert.equal(status.pending, 1);
+  assert.equal(runtime.runtimeMessages[0].action, 'FilterTube_GetImportedChannelEnrichmentStatus');
 });
 
 test('import and profile-switch paths preserve the normal post-entry enrichment contract', () => {
@@ -430,12 +550,45 @@ test('import and profile-switch paths preserve the normal post-entry enrichment 
   assert.match(tabViewSource, /StateManager\.startBlockTubeEnrichment/);
   assert.match(tabViewSource, /id="importedChannelEnrichmentNotice"/);
   assert.match(tabViewSource, /getImportedChannelEnrichmentStatus/);
-  assert.match(tabViewSource, /one lookup about every 20 seconds/);
+  const importModalStart = tabViewSource.indexOf('async function showManagedChannelListImportModal');
+  const importModalEnd = tabViewSource.indexOf('async function promptManagedChannelListSurface');
+  assert.ok(importModalStart >= 0);
+  assert.ok(importModalEnd > importModalStart);
+  const importModalSource = tabViewSource.slice(importModalStart, importModalEnd);
+  assert.match(importModalSource, /actions\.append\(cancelBtn, okBtn\);\s+card\.append\(header, body, actions\)/);
+  assert.doesNotMatch(importModalSource, /body\.appendChild\(actions\)/);
+  assert.match(tabViewCssSource, /grid-template-rows:\s*auto minmax\(0, 1fr\) auto/);
+  assert.match(tabViewCssSource, /\.managed-channel-list-modal__body\s*\{[\s\S]*display:\s*flex;[\s\S]*overflow:\s*auto;/);
+  assert.match(tabViewCssSource, /\.managed-channel-list-modal \.ft-modal-actions\s*\{[\s\S]*align-self:\s*stretch;[\s\S]*padding:[^;]*var\(--ft-space-lg\)/);
+  assert.match(tabViewSource, /randomized 7–15 second interval/);
+  assert.match(tabViewSource, /extension background/);
+  assert.match(tabViewSource, /Pause metadata completion/);
   assert.match(tabViewSource, /Name-only rules, including BlockTube name-only rules, have no unique UC ID/);
+  assert.match(tabViewSource, /A failed row retries after about 2 minutes/);
+  assert.match(tabViewSource, /backs off up to 30 minutes without pausing fresh rows/);
+  assert.match(tabViewSource, /older queue timing is being corrected/);
+  assert.match(tabViewSource, /function managedChannelEntryKeys\(channel\)/);
+  assert.match(tabViewSource, /alternateIds/);
+  assert.match(tabViewSource, /addManagedChannelIdentityKeys\(seenChannels, channel\)/);
   assert.match(renderEngineSource, /Name rule only/);
   assert.match(renderEngineSource, /paced metadata lookup/);
   assert.match(tabViewCssSource, /\.subscriptions-import-inline\[hidden\]\s*\{\s*display:\s*none\s*!important;/s);
   assert.match(backgroundSource, /resolvedPrimaryId/);
   assert.match(backgroundSource, /incomingCustomUrlForMatch/);
   assert.match(backgroundSource, /actorProfileId/);
+  assert.match(backgroundSource, /FilterTube_StartImportedChannelEnrichment/);
+  assert.match(backgroundSource, /FilterTube_PauseImportedChannelEnrichment/);
+  assert.match(backgroundSource, /importedChannelEnrichmentScheduler/);
+  assert.match(backgroundSource, /alarms\.onAlarm/);
+  assert.match(helperSource, /DEFAULT_MIN_DELAY_MS = 7000/);
+  assert.match(helperSource, /DEFAULT_MAX_DELAY_MS = 15000/);
+  assert.match(helperSource, /DEFAULT_ALARM_FLOOR_MS = 30000/);
+  assert.match(helperSource, /DEFAULT_RETRY_DELAY_MS = 2 \* 60 \* 1000/);
+  assert.match(helperSource, /DEFAULT_MAX_RETRY_DELAY_MS = 30 \* 60 \* 1000/);
+  assert.match(helperSource, /hasReadyPendingTask/);
+  assert.match(helperSource, /staleGlobalDelay/);
+  manifestSources.forEach((manifest) => assert.match(manifest, /"alarms"/));
+  assert.match(manifestSources.at(-1), /js\/imported_channel_enrichment\.js/);
+  assert.match(stateManagerSource, /FilterTube_StartImportedChannelEnrichment/);
+  assert.match(stateManagerSource, /explicitResumeImportedChannelEnrichment/);
 });

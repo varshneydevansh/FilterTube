@@ -2831,6 +2831,14 @@ html[data-theme="dark"] .help-device-map-legend li {
     overflow-wrap: anywhere;
 }
 
+.imported-channel-enrichment-toggle {
+    align-self: start;
+    min-height: 38px;
+    border-radius: 999px;
+    padding-inline: 0.9rem;
+    white-space: nowrap;
+}
+
 .subscriptions-import-inline.is-loading .subscriptions-import-status {
     display: inline-flex;
     align-items: center;
@@ -2924,7 +2932,7 @@ html[data-theme="dark"] .help-device-map-legend li {
 .ft-modal-overlay.managed-channel-list-modal-overlay > .managed-channel-list-modal {
     box-sizing: border-box;
     display: grid;
-    grid-template-rows: auto minmax(0, 1fr);
+    grid-template-rows: auto minmax(0, 1fr) auto;
     width: min(1120px, calc(100vw - (var(--managed-rule-modal-gutter, 1rem) * 2)));
     max-width: calc(100vw - (var(--managed-rule-modal-gutter, 1rem) * 2));
     height: auto;
@@ -2948,10 +2956,11 @@ html[data-theme="dark"] .help-device-map-legend li {
 }
 
 .managed-channel-list-modal__body {
-    display: grid;
-    grid-template-rows: auto auto auto;
+    display: flex;
+    flex-direction: column;
     gap: 0.9rem;
     min-height: 0;
+    margin-top: 0;
     overflow: auto;
     overscroll-behavior: contain;
     padding: var(--ft-space-lg);
@@ -2980,12 +2989,13 @@ html[data-theme="dark"] .help-device-map-legend li {
 }
 
 .managed-channel-list-modal .ft-modal-actions {
-    position: sticky;
-    bottom: calc(var(--ft-space-lg) * -1);
-    align-self: end;
-    z-index: 2;
-    margin: 0 -0.05rem;
-    padding: 0.85rem 0 0;
+    box-sizing: border-box;
+    align-items: center;
+    align-self: stretch;
+    flex-wrap: wrap;
+    gap: 0.6rem;
+    margin: 0;
+    padding: 0.85rem var(--ft-space-lg) var(--ft-space-lg);
     border-top: 1px solid rgba(15, 23, 42, 0.08);
     background: linear-gradient(180deg, rgba(255, 255, 255, 0.58), var(--ft-color-bg-card) 42%);
 }
@@ -3807,6 +3817,27 @@ padding: var(--ft-space-xs) var(--ft-space-sm);
     max-height: min(75vh, 860px);
     overflow-y: auto;
     padding-bottom: var(--ft-space-xs);
+}
+
+/* Large rule lists keep only the visible window in the DOM. The outer list
+   owns scrolling; the inner host owns the normal card gap. */
+.advanced-list.ft-virtualized-list {
+    gap: 0;
+    overflow-anchor: none;
+}
+
+.ft-virtual-list-window {
+    display: flex;
+    flex-direction: column;
+    gap: var(--ft-space-md);
+    min-width: 0;
+}
+
+.ft-virtual-list-spacer {
+    flex: 0 0 auto;
+    width: 100%;
+    min-height: 0;
+    pointer-events: none;
 }
 
 .list-item {
@@ -4896,6 +4927,10 @@ html[data-theme="dark"] .video-filter-compact-option:has(.video-filter-compact-r
     .subscriptions-import-modal__actions {
         display: grid;
         grid-template-columns: 1fr;
+    }
+
+    .imported-channel-enrichment-toggle {
+        width: 100%;
     }
 
     .content-control-group {

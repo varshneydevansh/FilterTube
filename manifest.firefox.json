@@ -4,7 +4,7 @@
   "description": "Restore peace of mind to your digital video experience.",
   "version": "3.3.6",
   "background": {
-    "scripts": ["js/shared/identity.js", "js/background.js"]
+    "scripts": ["js/shared/identity.js", "js/imported_channel_enrichment.js", "js/background.js"]
   },
   "browser_specific_settings": {
     "gecko": {
@@ -26,7 +26,7 @@
       "128": "icons/icon-128.png"
     }
   },
-  "permissions": ["storage", "unlimitedStorage", "activeTab", "scripting", "tabs", "downloads"],
+  "permissions": ["storage", "unlimitedStorage", "activeTab", "scripting", "tabs", "downloads", "alarms"],
   "content_scripts": [
     {
       "matches": ["*://*.youtube.com/*", "*://*.youtubekids.com/*"],

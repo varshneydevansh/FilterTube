@@ -61,8 +61,8 @@ All imported formats use the same format-agnostic persisted queue. It scans Main
 The current queue:
 
 - is stored under the existing ftBlockTubeEnrichmentJobV1 storage key for compatibility with already queued migrations;
-- processes one lookup at a time, with a minimum delay of about 20 seconds;
-- retries incomplete or failed lookups with multi-hour backoff and a bounded attempt count;
+- processes one lookup at a time, with a randomized 7–15 second delay between scheduling points;
+- retries incomplete or failed lookups after about 2 minutes, then 4 minutes, 8 minutes, and at most 30 minutes; a failed row does not delay fresh rows;
 - persists pending and in-flight work so a reload can resume it;
 - keeps ordinary user-added channel enrichment out of the import queue and keeps imported work out of the ordinary fast post-block queue;
 - validates the active actor and target profile before and immediately before a write;
@@ -81,7 +81,7 @@ The import confirmation and help text now explain that metadata completion happe
 - the one-at-a-time pacing policy;
 - why a name can appear before a handle or avatar;
 - why name-only rules are not enriched;
-- that closing the dashboard pauses the current queue and reopening it resumes it.
+- that closing the dashboard does not stop the background queue; browser shutdown or wakeup limits can delay it.
 
 The notice respects the HTML hidden attribute even though the shared inline-notice CSS uses display: grid, and its text can wrap on narrow layouts.
 

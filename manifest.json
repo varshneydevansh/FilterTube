@@ -21,7 +21,8 @@
         "activeTab",
         "scripting",
         "tabs",
-        "downloads"
+        "downloads",
+        "alarms"
     ],
     "content_scripts": [
         {

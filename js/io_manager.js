@@ -343,25 +343,159 @@
         };
     }
 
+    function normalizeChannelIdentityValue(value) {
+        const raw = normalizeString(value);
+        if (!raw) return '';
+
+        const decode = (candidate) => {
+            try {
+                return decodeURIComponent(candidate);
+            } catch (e) {
+                return candidate;
+            }
+        };
+        const normalized = raw.replace(/^\/+/, '');
+        const idMatch = normalized.match(/^(?:channel\/)?(UC[\w-]{22})$/i);
+        if (idMatch) return `id:${idMatch[1].toLowerCase()}`;
+
+        const handleMatch = normalized.match(/^(@[A-Za-z0-9._-]{2,})$/);
+        if (handleMatch) return `handle:${handleMatch[1].toLowerCase()}`;
+
+        const customMatch = normalized.match(/^(c|user)\/([^\s/?#]+)$/i);
+        if (customMatch) return `custom:${customMatch[1].toLowerCase()}/${decode(customMatch[2]).toLowerCase()}`;
+
+        const looksLikeUrl = /^https?:\/\//i.test(raw)
+            || /^(?:www\.)?(?:m\.|music\.)?youtube\.com\//i.test(raw);
+        if (!looksLikeUrl || typeof URL !== 'function') return '';
+        try {
+            const candidate = new URL(/^https?:\/\//i.test(raw) ? raw : `https://${raw}`);
+            const host = normalizeString(candidate.hostname).replace(/^www\./i, '').toLowerCase();
+            if (!['youtube.com', 'm.youtube.com', 'music.youtube.com'].includes(host)) return '';
+            const parts = candidate.pathname.split('/').filter(Boolean).map(decode);
+            if (parts[0]?.toLowerCase() === 'channel' && /^UC[\w-]{22}$/i.test(parts[1] || '')) {
+                return `id:${parts[1].toLowerCase()}`;
+            }
+            if (parts[0] && /^@[A-Za-z0-9._-]{2,}$/.test(parts[0])) {
+                return `handle:${parts[0].toLowerCase()}`;
+            }
+            if (parts[0] && /^(c|user)$/i.test(parts[0]) && parts[1]) {
+                return `custom:${parts[0].toLowerCase()}/${parts[1].toLowerCase()}`;
+            }
+        } catch (e) {
+        }
+        return '';
+    }
+
+    function channelIdentityKeys(entry) {
+        const values = [
+            entry?.id,
+            ...(Array.isArray(entry?.alternateIds) ? entry.alternateIds : []),
+            entry?.handle,
+            entry?.handleDisplay,
+            entry?.canonicalHandle,
+            entry?.customUrl,
+            entry?.originalInput
+        ];
+        const keys = [...new Set(values.map(normalizeChannelIdentityValue).filter(Boolean))];
+        if (keys.length) return keys;
+        const name = normalizeString(entry?.name).toLowerCase();
+        return name ? [`name:${name}`] : [];
+    }
+
+    function uniqueChannelEntries(entries) {
+        const seen = new Set();
+        const unique = [];
+        for (const entry of safeArray(entries)) {
+            const keys = channelIdentityKeys(entry);
+            if (!keys.length) continue;
+            if (keys.some(key => seen.has(key))) {
+                // Retain aliases discovered on a duplicate row as part of the
+                // same identity cluster (for example UC-A + alternate UC-B),
+                // so a later UC-B row is also recognized as a duplicate.
+                keys.forEach(key => seen.add(key));
+                continue;
+            }
+            keys.forEach(key => seen.add(key));
+            unique.push(entry);
+        }
+        return unique;
+    }
+
     /**
-     * Returns the best identifier for a channel. Preference order mirrors how
-     * we normally resolve handles/IDs/custom URLs in content scripts.
+     * Returns the best identifier for a channel. Identity aliases are kept
+     * separately so a later import can merge a UC ID with its alternate ID,
+     * handle, or custom URL. A name-only rule remains name-scoped because a
+     * display name is not a unique channel identity.
      */
     function channelKey(entry) {
-        const id = normalizeString(entry?.id).toLowerCase();
-        const handle = normalizeString(entry?.handle).toLowerCase();
-        const customUrl = normalizeString(entry?.customUrl).toLowerCase();
-        if (id) return `id:${id}`;
-        if (handle) return `handle:${handle}`;
-        if (customUrl) return `custom:${customUrl}`;
-        const name = normalizeString(entry?.name).toLowerCase();
-        return name ? `name:${name}` : '';
+        return channelIdentityKeys(entry)[0] || '';
+    }
+
+    function isPlaceholderChannelName(entry, value) {
+        const name = normalizeString(value).toLowerCase();
+        if (!name) return true;
+        const identityValues = [
+            entry?.id,
+            ...(Array.isArray(entry?.alternateIds) ? entry.alternateIds : []),
+            entry?.handle,
+            entry?.handleDisplay,
+            entry?.canonicalHandle,
+            entry?.customUrl,
+            entry?.originalInput
+        ].map(normalizeString).filter(Boolean).map(item => item.toLowerCase());
+        return identityValues.includes(name)
+            || name.startsWith('@')
+            || name.startsWith('c/')
+            || name.startsWith('user/')
+            || name.includes('youtube.com/')
+            || name.includes('youtu.be/');
     }
 
     function mergeChannelEntries(existing, incoming) {
         if (!existing) return incoming;
         if (!incoming) return existing;
         const merged = { ...existing, ...incoming };
+
+        // Import rows often start as a bare UC ID. Do not let that placeholder
+        // erase metadata already learned from YouTube on a previous import or
+        // a user-added rule.
+        const existingHasMetadata = Boolean(
+            normalizeString(existing.handle)
+            || normalizeString(existing.handleDisplay)
+            || normalizeString(existing.canonicalHandle)
+            || normalizeString(existing.customUrl)
+            || normalizeString(existing.logo)
+        );
+        const incomingHasMetadata = Boolean(
+            normalizeString(incoming.handle)
+            || normalizeString(incoming.handleDisplay)
+            || normalizeString(incoming.canonicalHandle)
+            || normalizeString(incoming.customUrl)
+            || normalizeString(incoming.logo)
+        );
+        if ((!incomingHasMetadata && existingHasMetadata)
+            || (isPlaceholderChannelName(incoming, incoming.name)
+                && !isPlaceholderChannelName(existing, existing.name))) {
+            merged.name = existing.name;
+        }
+        const existingId = normalizeString(existing.id);
+        const incomingId = normalizeString(incoming.id);
+        if (/^UC[\w-]{22}$/i.test(existingId)) {
+            merged.id = existingId;
+        } else if (incomingId) {
+            merged.id = incomingId;
+        }
+        for (const field of ['handle', 'handleDisplay', 'canonicalHandle', 'logo', 'customUrl']) {
+            if (!normalizeString(incoming[field]) && normalizeString(existing[field])) {
+                merged[field] = existing[field];
+            }
+        }
+        if (!normalizeString(incoming.originalInput) && normalizeString(existing.originalInput)) {
+            merged.originalInput = existing.originalInput;
+        }
+        if (existing.filterAll === true && incoming.filterAll !== true) {
+            merged.filterAll = true;
+        }
 
         const existingAdded = normalizeNumber(existing.addedAt, 0);
         const incomingAdded = normalizeNumber(incoming.addedAt, 0);
@@ -405,10 +539,14 @@
             }
         }
 
+        const mergedPrimaryId = normalizeString(merged.id).toLowerCase();
         merged.alternateIds = Array.from(new Set([
             ...(Array.isArray(existing.alternateIds) ? existing.alternateIds : []),
-            ...(Array.isArray(incoming.alternateIds) ? incoming.alternateIds : [])
-        ].filter(value => typeof value === 'string' && /^UC[\w-]{22}$/i.test(value.trim()))));
+            ...(Array.isArray(incoming.alternateIds) ? incoming.alternateIds : []),
+            existingId,
+            incomingId
+        ].filter(value => typeof value === 'string' && /^UC[\w-]{22}$/i.test(value.trim()))
+            .filter(value => value.trim().toLowerCase() !== mergedPrimaryId)));
 
         return merged;
     }
@@ -1009,22 +1147,39 @@
      */
     function mergeChannelLists(existing, incoming) {
         const map = new Map();
+        const identityIndex = new Map();
+
+        const add = (entry, source) => {
+            const sanitized = sanitizeChannelEntry(entry, { source: entry?.source || source });
+            if (!sanitized) return;
+
+            const aliases = channelIdentityKeys(sanitized);
+            if (!aliases.length) return;
+            const matchingMapKeys = [...new Set(
+                aliases
+                    .map(alias => identityIndex.get(alias))
+                    .filter(mapKey => mapKey && map.has(mapKey))
+            )];
+
+            let mapKey = matchingMapKeys[0] || channelKey(sanitized);
+            let merged = matchingMapKeys.reduce(
+                (current, matchingKey) => mergeChannelEntries(current, map.get(matchingKey)),
+                null
+            );
+            merged = mergeChannelEntries(merged, sanitized);
+            if (!mapKey || !merged) return;
+
+            matchingMapKeys.slice(1).forEach(matchingKey => map.delete(matchingKey));
+            map.set(mapKey, merged);
+            channelIdentityKeys(merged).forEach(alias => identityIndex.set(alias, mapKey));
+        };
 
         for (const entry of safeArray(existing)) {
-            const sanitized = sanitizeChannelEntry(entry, { source: entry?.source || 'user' });
-            if (!sanitized) continue;
-            const key = channelKey(sanitized);
-            if (!key) continue;
-            map.set(key, sanitized);
+            add(entry, 'user');
         }
 
         for (const entry of safeArray(incoming)) {
-            const sanitized = sanitizeChannelEntry(entry, { source: entry?.source || 'import' });
-            if (!sanitized) continue;
-            const key = channelKey(sanitized);
-            if (!key) continue;
-            const existingEntry = map.get(key);
-            map.set(key, mergeChannelEntries(existingEntry, sanitized));
+            add(entry, 'import');
         }
 
         return Array.from(map.values());
@@ -2378,10 +2533,13 @@
         const persistedProfilesV4 = await loadProfilesV4();
         const persistedTarget = safeObject(safeObject(persistedProfilesV4?.profiles)[importedTargetProfileId]);
         const persistedMain = safeObject(persistedTarget.main);
-        const persistedChannelKeys = new Set(safeArray(persistedMain.channels).map(channelKey));
+        const persistedChannelKeys = new Set(safeArray(persistedMain.channels).flatMap(channelIdentityKeys));
         const persistedKeywordKeys = new Set(safeArray(persistedMain.keywords).map(keywordKey));
         const persistedVideoIds = new Set(safeArray(persistedMain.videoIds || persistedMain.blockedVideoIds).map(normalizeString));
-        const missingChannels = safeArray(parsedMainChannels).filter(entry => !persistedChannelKeys.has(channelKey(entry)));
+        const missingChannels = safeArray(parsedMainChannels).filter(entry => {
+            const keys = channelIdentityKeys(entry);
+            return !keys.some(key => persistedChannelKeys.has(key));
+        });
         const missingKeywords = safeArray(parsedMainKeywords).filter(entry => !persistedKeywordKeys.has(keywordKey(entry)));
         const missingVideoIds = safeArray(parsed.profilesV3?.main?.videoIds)
             .map(normalizeString)
@@ -2396,13 +2554,17 @@
 
         const beforeTarget = safeObject(safeObject(localProfilesV4BeforeImport?.profiles)[importedTargetProfileId]);
         const beforeMain = safeObject(beforeTarget.main);
-        const beforeChannelKeys = new Set(safeArray(beforeMain.channels).map(channelKey));
+        const beforeChannelKeys = new Set(safeArray(beforeMain.channels).flatMap(channelIdentityKeys));
         const beforeKeywordKeys = new Set(safeArray(beforeMain.keywords).map(keywordKey));
         const beforeVideoIds = new Set(safeArray(beforeMain.videoIds || beforeMain.blockedVideoIds).map(normalizeString));
-        const incomingUniqueChannelKeys = new Set(safeArray(parsedMainChannels).map(channelKey));
+        const incomingUniqueChannels = uniqueChannelEntries(parsedMainChannels);
+        const incomingUniqueChannelKeys = new Set(incomingUniqueChannels.map(channelKey).filter(Boolean));
         const incomingUniqueKeywordKeys = new Set(safeArray(parsedMainKeywords).map(keywordKey));
         const incomingUniqueVideoIds = new Set(safeArray(parsed.profilesV3?.main?.videoIds).map(normalizeString).filter(Boolean));
-        const addedChannels = Array.from(incomingUniqueChannelKeys).filter(key => !beforeChannelKeys.has(key)).length;
+        const addedChannels = incomingUniqueChannels.filter(entry => {
+            const keys = channelIdentityKeys(entry);
+            return keys.length > 0 && !keys.some(key => beforeChannelKeys.has(key));
+        }).length;
         const addedKeywords = Array.from(incomingUniqueKeywordKeys).filter(key => !beforeKeywordKeys.has(key)).length;
         const addedVideoIds = Array.from(incomingUniqueVideoIds).filter(videoId => !beforeVideoIds.has(videoId)).length;
         const migrationReport = safeObject(parsed.migrationReport);
@@ -2412,9 +2574,9 @@
         const storageBytesAfter = await getStorageBytesInUse();
         const receipt = {
             targetProfileId: importedTargetProfileId,
-            channels: safeArray(parsedMainChannels).length,
-            channelIds: safeArray(parsedMainChannels).filter(entry => entry?.source === 'blocktube').length,
-            channelNameRules: safeArray(parsedMainChannels).filter(entry => entry?.source === 'blocktube-channel-name').length,
+            channels: incomingUniqueChannels.length,
+            channelIds: incomingUniqueChannels.filter(entry => entry?.source === 'blocktube').length,
+            channelNameRules: incomingUniqueChannels.filter(entry => entry?.source === 'blocktube-channel-name').length,
             keywords: safeArray(parsedMainKeywords).filter(entry => entry?.scope !== 'comment').length,
             comments: safeArray(parsedMainKeywords).filter(entry => entry?.scope === 'comment').length,
             regex: safeArray(parsedMainKeywords).filter(entry => entry?.matchMode === 'regex').length,
@@ -2422,7 +2584,8 @@
             addedChannels,
             addedKeywords,
             addedVideoIds,
-            duplicateChannels: Math.max(0, incomingUniqueChannelKeys.size - addedChannels),
+            duplicateChannels: Math.max(0, safeArray(parsedMainChannels).length - incomingUniqueChannels.length)
+                + Math.max(0, incomingUniqueChannels.length - addedChannels),
             duplicateKeywords: Math.max(0, incomingUniqueKeywordKeys.size - addedKeywords),
             duplicateVideoIds: Math.max(0, incomingUniqueVideoIds.size - addedVideoIds),
             skippedRows,

@@ -261,6 +261,55 @@ test('nested BlockTube backups preserve channel-name rules, channel IDs, video I
   assert.equal(savedPayload.hideShorts, true);
 });
 
+test('channel imports deduplicate UC aliases while keeping name-only rules separate', async () => {
+  const context = createContext();
+  const primaryId = `UC${'a'.repeat(22)}`;
+  const alternateId = `UC${'b'.repeat(22)}`;
+  const payload = {
+    meta: { version: 3 },
+    settings: { main: {}, kids: {} },
+    profiles: {
+      main: {
+        channels: [
+          { id: primaryId, name: primaryId, originalInput: primaryId },
+          {
+            id: primaryId.toLowerCase(),
+            name: 'Resolved Channel',
+            handle: '@resolved-channel',
+            logo: 'https://example.test/resolved.jpg',
+            alternateIds: [alternateId]
+          },
+          { id: alternateId, name: 'Same Channel Through Alternate ID' },
+          { id: '', name: 'Creator Name', originalInput: 'Creator Name' }
+        ],
+        keywords: [],
+        videoIds: [],
+        whitelistedChannels: [],
+        whitelistedKeywords: []
+      },
+      kids: {
+        blockedChannels: [],
+        blockedKeywords: [],
+        videoIds: [],
+        whitelistedChannels: [],
+        whitelistedKeywords: []
+      }
+    }
+  };
+
+  const result = await context.FilterTubeIO.importV3(payload, { strategy: 'merge', scope: 'auto' });
+  assert.equal(result.ok, true);
+  assert.equal(result.receipt.channels, 2);
+  assert.equal(result.receipt.duplicateChannels, 2);
+
+  const channels = context.__storage.ftProfilesV4.profiles.default.main.channels;
+  assert.equal(channels.length, 2);
+  const resolved = channels.find(channel => channel.id.toLowerCase() === primaryId.toLowerCase());
+  assert.equal(resolved.name, 'Resolved Channel');
+  assert.deepEqual(resolved.alternateIds, [alternateId]);
+  assert.equal(channels.some(channel => channel.name === 'Creator Name'), true);
+});
+
 test('split BlockTube context-menu labels are rejoined instead of becoming fake channel IDs', async () => {
   const context = createContext();
   const channelId = `UC${'b'.repeat(22)}`;

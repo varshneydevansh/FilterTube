@@ -45,7 +45,7 @@ function doc() {
 }
 
 function groupForMethod(name) {
-  if (['getStateManager', 'getUIComponents', 'getSettings', 'scheduleIdle', 'cancelIdle', 'safeTimestamp'].includes(name)) return 'dependencyAndSchedulingHelpers';
+  if (['getStateManager', 'getUIComponents', 'getSettings', 'scheduleIdle', 'cancelIdle', 'scheduleFrame', 'cancelFrameTask', 'getListGap', 'cancelVirtualList', 'cancelContainerRenderTasks', 'renderWindowedList', 'safeTimestamp'].includes(name)) return 'dependencyAndSchedulingHelpers';
   if (['createPillBadge', 'applySourceClasses', 'createSourceBadge', 'createKidsSyncBadge', 'createCollaborationBadge'].includes(name)) return 'badgeAndSourceDecoration';
   if ([
     'normalizeChannelHandle',
@@ -58,7 +58,7 @@ function groupForMethod(name) {
     'getTopicChannelTooltip',
     'deriveChannelMapping'
   ].includes(name)) return 'channelDisplayIdentityHelpers';
-  if (['renderKeywordList', 'createKeywordListItem', 'findChannelByRef', 'createFallbackExactToggle', 'createFallbackDeleteButton'].includes(name)) return 'keywordRenderingAndRowActions';
+  if (['renderKeywordList', 'normalizeKeywordDateFilterForUi', 'formatKeywordDateFilterLabel', 'attachKeywordHelpBubble', 'createRuleTargetBadge', 'createMoveRuleButton', 'createKeywordListItem', 'findChannelByRef', 'createFallbackExactToggle', 'getExactKeywordHelpText', 'createFallbackDeleteButton'].includes(name)) return 'keywordRenderingAndRowActions';
   if ([
     'renderChannelList',
     'createChannelListItem',
@@ -204,6 +204,8 @@ class MiniElement extends MiniNode {
     this.className = '';
     this._innerHTML = '';
     this._textContent = '';
+    this.clientHeight = 480;
+    this.scrollTop = 0;
     this.classList = new MiniClassList(this);
   }
 
@@ -271,6 +273,11 @@ class MiniElement extends MiniNode {
     const listeners = this.eventListeners.get(type) || [];
     listeners.push(listener);
     this.eventListeners.set(type, listeners);
+  }
+
+  removeEventListener(type, listener) {
+    const listeners = this.eventListeners.get(type) || [];
+    this.eventListeners.set(type, listeners.filter((candidate) => candidate !== listener));
   }
 }
 
@@ -480,13 +487,13 @@ test('render engine method semantic register is scoped to current behavior', () 
   assert.match(text, /Status: current-behavior register/);
   assert.match(text, /Runtime behavior now includes channel source\s+filtering and managed-list source badges/);
   assert.match(text, /source file: js\/render_engine\.js/);
-  assert.match(text, /IIFE-scoped declarations: 35/);
-  assert.match(text, /plain function declarations: 30/);
+  assert.match(text, /IIFE-scoped declarations: 47/);
+  assert.match(text, /plain function declarations: 42/);
   assert.match(text, /const arrow helper declarations: 5/);
   assert.match(text, /async function declarations: 0/);
   assert.match(text, /public API entries: 4/);
   assert.match(text, /semantic method groups: 6/);
-  assert.match(text, /row-action listener sites: 7/);
+  assert.match(text, /row-action listener sites: 11/);
   assert.match(text, /direct StateManager optional calls: 26/);
   assert.match(text, /unique StateManager methods reached: 11/);
   assert.match(text, /querySelector calls: 0/);
@@ -503,33 +510,33 @@ test('render engine register pins source fingerprint and broad callable reconcil
   const text = doc();
 
   assert.deepEqual(stats, {
-    bytes: 60425,
-    sha256: 'b649683b280482864cabc5d5ee1099aa660d6e864a1606307409a22c95e75800',
-    splitLines: 1413,
-    wcLines: 1412
+    bytes: 75413,
+    sha256: '6c3950d03e2ddf1b3327cdd1c6a88c5ff216c564e45f8e3e2f0bc3db4b61d1bd',
+    splitLines: 1734,
+    wcLines: 1733
   });
-  assert.equal(broadRows.length, 127);
-  assert.equal(controlArtifacts, 86);
-  assert.equal(heldOutsideRegister, 6);
+  assert.equal(broadRows.length, 154);
+  assert.equal(controlArtifacts, 96);
+  assert.equal(heldOutsideRegister, 11);
   assert.deepEqual({
     if: broadCounts.if,
     while: broadCounts.while
   }, {
-    if: 85,
+    if: 95,
     while: 1
   });
 
   for (const expected of [
-    'source split lines: 1413',
-    'source wc -l: 1412',
-    'source bytes: 60425',
-    'source sha256: b649683b280482864cabc5d5ee1099aa660d6e864a1606307409a22c95e75800',
-    'broad lexical callable matches: 127',
-    'accepted IIFE-scoped declaration rows: 35',
-    'semantic method rows promoted: 35',
-    'control-flow lexical artifacts: 86 (`if`: 85, `while`: 1)',
-    'local/render callback declarations held outside this IIFE method register: 6',
-    'executable current-behavior probes: 8'
+    'source split lines: 1734',
+    'source wc -l: 1733',
+    'source bytes: 75413',
+    'source sha256: 6c3950d03e2ddf1b3327cdd1c6a88c5ff216c564e45f8e3e2f0bc3db4b61d1bd',
+    'broad lexical callable matches: 154',
+    'accepted IIFE-scoped declaration rows: 47',
+    'semantic method rows promoted: 47',
+    'control-flow lexical artifacts: 96 (`if`: 95, `while`: 1)',
+    'local/render callback declarations held outside this IIFE method register: 11',
+    'executable current-behavior probes: 9'
   ]) {
     assert.ok(text.includes(expected), `missing source reconciliation line ${expected}`);
   }
@@ -538,18 +545,18 @@ test('render engine register pins source fingerprint and broad callable reconcil
 test('render engine register accounts for every current IIFE-scoped declaration', () => {
   const rows = methodRows();
 
-  assert.equal(rows.length, 35);
+  assert.equal(rows.length, 47);
   assert.deepEqual(countBy(rows, 'kind'), {
     'const arrow': 5,
-    function: 30
+    function: 42
   });
   assert.deepEqual(countBy(rows, 'group'), {
     badgeAndSourceDecoration: 5,
     channelDisplayIdentityHelpers: 9,
     channelRenderingAndRowActions: 7,
     collaborationGrouping: 3,
-    dependencyAndSchedulingHelpers: 6,
-    keywordRenderingAndRowActions: 5
+    dependencyAndSchedulingHelpers: 12,
+    keywordRenderingAndRowActions: 11
   });
 
   for (const row of rows) {
@@ -599,19 +606,19 @@ test('render engine register pins current row-action DOM and scheduler surface',
     'toggleKidsKeywordExact'
   ]);
 
-  assert.equal((source.match(/\.addEventListener\(/g) || []).length, 7);
-  assert.equal((source.match(/document\.createElement\(/g) || []).length, 30);
-  assert.equal((source.match(/document\.createDocumentFragment\(/g) || []).length, 1);
-  assert.equal((source.match(/\.innerHTML\s*=/g) || []).length, 10);
-  assert.equal((source.match(/\.setAttribute\(/g) || []).length, 12);
+  assert.equal((source.match(/\.addEventListener\(/g) || []).length, 11);
+  assert.equal((source.match(/document\.createElement\(/g) || []).length, 37);
+  assert.equal((source.match(/document\.createDocumentFragment\(/g) || []).length, 2);
+  assert.equal((source.match(/\.innerHTML\s*=/g) || []).length, 12);
+  assert.equal((source.match(/\.setAttribute\(/g) || []).length, 24);
   assert.equal((source.match(/querySelector(All)?\(/g) || []).length, 0);
 
   for (const token of [
-    'row-action listener sites: 7',
-    'document.createElement calls: 30',
-    'document.createDocumentFragment calls: 1',
-    'innerHTML writes: 10',
-    'setAttribute calls: 12',
+    'row-action listener sites: 11',
+    'document.createElement calls: 37',
+    'document.createDocumentFragment calls: 2',
+    'innerHTML writes: 12',
+    'setAttribute calls: 24',
     'querySelector calls: 0'
   ]) {
     assert.ok(text.includes(token), `missing current DOM surface token ${token}`);
@@ -627,7 +634,7 @@ test('render engine source still proves current behavior boundaries', () => {
   assert.match(source, /if \(profile !== 'kids' && state\.syncKidsToMain && kidsMode === mainMode\)/);
   assert.match(source, /displayKeywords = \[\.\.\.displayKeywords, \.\.\.kidsOnly\]/);
   assert.match(source, /container\.innerHTML = ''/);
-  assert.match(source, /createKeywordListItem\(entry, \{ minimal, profile: effectiveProfile/);
+  assert.match(source, /return createKeywordListItem\(entry, \{/);
 
   assert.match(source, /await StateManager\?\.toggleChannelFilterAllCommentsByRef\?\.\(entry\.channelRef\)/);
   assert.match(source, /await StateManager\?\.toggleKeywordComments\(entry\.word\)/);
@@ -635,7 +642,7 @@ test('render engine source still proves current behavior boundaries', () => {
   assert.match(source, /await StateManager\?\.removeKidsKeyword\?\.\(entry\.word\)/);
   assert.match(source, /await StateManager\?\.removeKeyword\(entry\.word\)/);
 
-  assert.match(source, /cancelIdle\(container\.__ftChannelRenderTaskId\)/);
+  assert.match(source, /cancelContainerRenderTasks\(container\)/);
   assert.match(source, /container\.__ftChannelRenderGen = \(container\.__ftChannelRenderGen \|\| 0\) \+ 1/);
   assert.match(source, /if \(container\.__ftChannelRenderGen !== renderGen\) return/);
   assert.match(source, /container\.__ftChannelRenderTaskId = scheduleIdle\(processBatch\)/);
@@ -918,6 +925,77 @@ test('render engine executable probes channel idle batching and stale task cance
   assert.equal(container.children.length, 65);
   assert.equal(container.__ftChannelRenderTaskId, 0);
   assert.match(doc(), /Channel rendering cancels a previous container task,\s+appends the first 60\s+full rows immediately/);
+});
+
+test('render engine keeps large Main and Kids keyword/channel DOM windows bounded', async () => {
+  const channels = Array.from({ length: 500 }, (_, index) => ({
+    id: `UC${String(index).padStart(22, '0')}`,
+    name: `Main Channel ${index}`,
+    filterAll: false,
+    addedAt: index
+  }));
+  const keywords = Array.from({ length: 500 }, (_, index) => ({
+    word: `keyword-${index}`,
+    exact: false,
+    comments: false,
+    addedAt: index
+  }));
+  const runtime = loadRenderEngineRuntime({
+    state: baseRenderState({
+      channels,
+      keywords,
+      kids: {
+        mode: 'blocklist',
+        blockedKeywords: keywords.map((entry) => ({ ...entry, word: `kids-${entry.word}` })),
+        blockedChannels: channels.map((entry) => ({ ...entry, id: `${entry.id}K`, name: `Kids ${entry.name}` })),
+        whitelistKeywords: [],
+        whitelistChannels: []
+      }
+    })
+  });
+
+  const mainChannelContainer = runtime.document.createElement('div');
+  runtime.RenderEngine.renderChannelList(mainChannelContainer, {
+    profile: 'main',
+    showNodeMapping: true
+  });
+  assert.equal(mainChannelContainer.children.length, 3);
+  assert.ok(mainChannelContainer.classList.contains('ft-virtualized-list'));
+  assert.ok(mainChannelContainer.children[1].children.length < channels.length);
+
+  const mainKeywordContainer = runtime.document.createElement('div');
+  runtime.RenderEngine.renderKeywordList(mainKeywordContainer, {
+    profile: 'main',
+    includeToggles: true
+  });
+  assert.equal(mainKeywordContainer.children.length, 3);
+  assert.ok(mainKeywordContainer.classList.contains('ft-virtualized-list'));
+  assert.ok(mainKeywordContainer.children[1].children.length < keywords.length);
+
+  const kidsChannelContainer = runtime.document.createElement('div');
+  runtime.RenderEngine.renderChannelList(kidsChannelContainer, {
+    profile: 'kids',
+    showNodeMapping: true
+  });
+  assert.equal(kidsChannelContainer.children.length, 3);
+  assert.ok(kidsChannelContainer.children[1].children.length < channels.length);
+
+  const kidsKeywordContainer = runtime.document.createElement('div');
+  runtime.RenderEngine.renderKeywordList(kidsKeywordContainer, {
+    profile: 'kids',
+    includeToggles: true
+  });
+  assert.equal(kidsKeywordContainer.children.length, 3);
+  assert.ok(kidsKeywordContainer.children[1].children.length < keywords.length);
+
+  const firstRenderedIndex = mainChannelContainer.children[1].children[0].dataset.filtertubeVirtualIndex;
+  mainChannelContainer.scrollTop = 3000;
+  await fire(mainChannelContainer, 'scroll');
+  assert.equal(runtime.timers.length, 1);
+  runtime.timers[0].fn();
+  const nextRenderedIndex = mainChannelContainer.children[1].children[0].dataset.filtertubeVirtualIndex;
+  assert.notEqual(nextRenderedIndex, firstRenderedIndex);
+  assert.ok(mainChannelContainer.children[1].children.length < channels.length);
 });
 
 test('render engine register preserves future proof fields', () => {
