@@ -738,7 +738,10 @@ function initializeFiltersTabs() {
 
         <div id="importedChannelEnrichmentNotice" class="subscriptions-import-inline subscriptions-import-inline--info imported-channel-enrichment-inline" hidden>
             <div id="importedChannelEnrichmentStatus" class="subscriptions-import-status" role="status" aria-live="polite"></div>
-            <button id="importedChannelEnrichmentToggle" class="btn-secondary imported-channel-enrichment-toggle" type="button" hidden></button>
+            <div class="imported-channel-enrichment-actions">
+                <button id="viewChannelImportReports" class="btn-secondary imported-channel-enrichment-toggle" type="button">View import reports</button>
+                <button id="importedChannelEnrichmentToggle" class="btn-secondary imported-channel-enrichment-toggle" type="button" hidden></button>
+            </div>
         </div>
 
         <div id="channelListEl" class="advanced-list"></div>
@@ -2275,6 +2278,11 @@ function initializeKidsTabs() {
             </div>
         </div>
 
+        <div id="kidsImportedChannelReportNotice" class="subscriptions-import-inline subscriptions-import-inline--info imported-channel-enrichment-inline" hidden>
+            <div id="kidsImportedChannelReportStatus" class="subscriptions-import-status" role="status" aria-live="polite"></div>
+            <button id="kidsViewChannelImportReports" class="btn-secondary imported-channel-enrichment-toggle" type="button">View import reports</button>
+        </div>
+
         <div id="kidsChannelListEl" class="advanced-list"></div>
     `;
 
@@ -3627,6 +3635,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     const importedChannelEnrichmentNotice = document.getElementById('importedChannelEnrichmentNotice');
     const importedChannelEnrichmentStatus = document.getElementById('importedChannelEnrichmentStatus');
     const importedChannelEnrichmentToggle = document.getElementById('importedChannelEnrichmentToggle');
+    const viewChannelImportReports = document.getElementById('viewChannelImportReports');
     const channelListEl = document.getElementById('channelListEl');
     const searchChannels = document.getElementById('searchChannels');
     const channelSort = document.getElementById('channelSort');
@@ -3672,6 +3681,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     const ftImportSyncDeviceBtn = document.getElementById('ftImportSyncDeviceBtn');
     const ftImportRuleListBtn = document.getElementById('ftImportRuleListBtn');
     const ftManageRuleListsBtn = document.getElementById('ftManageRuleListsBtn');
+    const ftImportReportsBtn = document.getElementById('ftImportReportsBtn');
     const ftCheckStaleRuleListsBtn = document.getElementById('ftCheckStaleRuleListsBtn');
     const ftToggleRuleListAutoCheckBtn = document.getElementById('ftToggleRuleListAutoCheckBtn');
     const ftRuleListAutoCheckStatus = document.getElementById('ftRuleListAutoCheckStatus');
@@ -4754,6 +4764,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             importedChannelEnrichmentNotice.setAttribute('aria-busy', 'false');
             importedChannelEnrichmentStatus.textContent = '';
             if (importedChannelEnrichmentToggle) importedChannelEnrichmentToggle.hidden = true;
+            await refreshRuleListReportNotices();
             return status;
         }
 
@@ -4809,6 +4820,428 @@ document.addEventListener('DOMContentLoaded', async () => {
                 scheduleImportedChannelEnrichmentStatusRefresh(10000);
             }
         }, Math.max(0, Number(delayMs) || 0));
+    }
+
+    const ruleListReportApi = window.FilterTubeRuleListImportReports || null;
+    const readRuleListReportStorage = (keys) => {
+        if (typeof browser !== 'undefined' && browser?.storage?.local?.get) {
+            return browser.storage.local.get(keys);
+        }
+        return new Promise((resolve, reject) => {
+            try {
+                if (!runtimeAPI?.storage?.local?.get) {
+                    resolve({});
+                    return;
+                }
+                runtimeAPI?.storage?.local?.get(keys, (result) => {
+                    const error = runtimeAPI?.runtime?.lastError;
+                    if (error) reject(new Error(error.message || 'Storage read failed'));
+                    else resolve(result || {});
+                });
+            } catch (error) {
+                reject(error);
+            }
+        });
+    };
+    const writeRuleListReportStorage = (payload) => {
+        if (typeof browser !== 'undefined' && browser?.storage?.local?.set) {
+            return browser.storage.local.set(payload);
+        }
+        return new Promise((resolve, reject) => {
+            try {
+                if (!runtimeAPI?.storage?.local?.set) {
+                    reject(new Error('Storage is unavailable'));
+                    return;
+                }
+                runtimeAPI?.storage?.local?.set(payload, () => {
+                    const error = runtimeAPI?.runtime?.lastError;
+                    if (error) reject(new Error(error.message || 'Storage write failed'));
+                    else resolve(true);
+                });
+            } catch (error) {
+                reject(error);
+            }
+        });
+    };
+    const ruleListReportStore = ruleListReportApi?.createStore?.({
+        storageGet: readRuleListReportStorage,
+        storageSet: writeRuleListReportStorage
+    }) || null;
+
+    function createRuleListImportReportId() {
+        return `rule-import-${Date.now().toString(36)}-${Math.random().toString(36).slice(2, 8)}`;
+    }
+
+    function buildRuleListImportTargets(profilesV4, profileIds, surfaces, forcedListType = '') {
+        const profileMap = safeObject(profilesV4?.profiles);
+        const targets = [];
+        [...new Set(safeArray(profileIds).map(normalizeString).filter(Boolean))].forEach((profileId) => {
+            safeArray(surfaces).forEach((surfaceValue) => {
+                const surface = surfaceValue === 'kids' ? 'kids' : 'main';
+                const surfaceState = safeObject(safeObject(profileMap[profileId])[surface]);
+                targets.push({
+                    profileId,
+                    profileName: getProfileName(profilesV4, profileId),
+                    surface,
+                    listType: forcedListType || (surfaceState.mode === 'whitelist' ? 'whitelist' : 'blocklist')
+                });
+            });
+        });
+        return targets;
+    }
+
+    function buildRuleListImportReport({
+        id = '',
+        label = '',
+        sourceFormat = '',
+        sourceLabel = '',
+        sourceUrl = '',
+        targets = [],
+        channels = [],
+        issues = [],
+        counts = {}
+    } = {}) {
+        const reportId = normalizeString(id) || createRuleListImportReportId();
+        return ruleListReportApi?.normalizeReport?.({
+            id: reportId,
+            createdAt: Date.now(),
+            updatedAt: Date.now(),
+            label: normalizeString(label) || 'Rule list import',
+            sourceFormat: normalizeString(sourceFormat) || 'unknown',
+            sourceLabel: normalizeString(sourceLabel) || 'Imported list',
+            sourceUrl: normalizeString(sourceUrl),
+            targets,
+            channels: safeArray(channels).map((channel, index) => ({
+                entryId: `${reportId}-channel-${index + 1}`,
+                id: normalizeString(channel?.id),
+                alternateIds: safeArray(channel?.alternateIds),
+                handle: normalizeString(channel?.handle || channel?.handleDisplay || channel?.canonicalHandle),
+                customUrl: normalizeString(channel?.customUrl),
+                originalInput: normalizeString(channel?.importOriginalValue || channel?.originalInput || channel?.id || channel?.name),
+                originalValue: normalizeString(channel?.importOriginalValue || channel?.originalInput || channel?.id || channel?.name),
+                name: normalizeString(channel?.name),
+                sourceRow: Number(channel?.importSourceRow || channel?.sourceRow) || index + 1,
+                nameOnly: channel?.nameOnly === true || channel?.source === 'blocktube-channel-name'
+            })),
+            issues,
+            counts
+        }) || null;
+    }
+
+    async function saveRuleListImportReport(report) {
+        if (!report || !ruleListReportStore) return null;
+        try {
+            const saved = await ruleListReportStore.save(report);
+            await refreshRuleListReportNotices();
+            return saved;
+        } catch (error) {
+            console.warn('FilterTube: failed to save rule-list import report', error);
+            return null;
+        }
+    }
+
+    async function saveParsedRuleListImportReport({
+        parsed,
+        label,
+        sourceLabel,
+        sourceUrl,
+        targets,
+        addedCount = 0,
+        duplicateCount = 0,
+        videoIds = 0,
+        sourceFormat = ''
+    } = {}) {
+        const counts = countManagedRuleListRows(parsed);
+        return saveRuleListImportReport(buildRuleListImportReport({
+            label,
+            sourceFormat: sourceFormat || parsed?.sourceFormat,
+            sourceLabel,
+            sourceUrl,
+            targets,
+            channels: parsed?.channels,
+            issues: parsed?.skippedRows,
+            counts: {
+                channels: counts.channels,
+                keywords: counts.keywords,
+                videoIds,
+                added: addedCount,
+                duplicates: Math.max(0, Number(duplicateCount) || 0) + Math.max(0, Number(parsed?.duplicateCount) || 0),
+                skipped: Math.max(0, Number(parsed?.skippedCount) || 0)
+            }
+        }));
+    }
+
+    async function showRuleListImportCompletion(report, {
+        title = 'Import Complete',
+        message = 'The reviewed rules were saved.',
+        details = []
+    } = {}) {
+        if (!report) {
+            UIComponents.showToast(message, 'success');
+            return;
+        }
+        const runtime = await loadRuleListReportRuntime();
+        const summary = ruleListReportApi.summarize(report, runtime);
+        const incomplete = summary.statuses.pending + summary.statuses.fetching + summary.statuses.retrying;
+        const attention = summary.statuses.needs_attention;
+        const choice = await showChoiceModal({
+            title,
+            message,
+            details: [
+                ...safeArray(details),
+                `${summary.statuses.complete} channel rows complete · ${incomplete} completing in background · ${attention} need attention`,
+                incomplete
+                    ? 'Rules with valid identifiers are active now. Names, handles/custom URLs, and avatars continue in the paced background queue.'
+                    : 'No channel metadata lookup is currently pending.',
+                attention
+                    ? 'Open the report to see exact source rows, reasons, and channel links. Name-only rows need an exact channel link for identity metadata.'
+                    : 'No imported row currently needs manual correction.'
+            ],
+            choices: [
+                { value: 'report', label: 'View Import Report', className: 'btn-primary', recommended: attention > 0 },
+                { value: 'done', label: 'Done', className: 'btn-secondary', recommended: attention <= 0 }
+            ],
+            cancelText: 'Close'
+        });
+        if (choice === 'report') await showRuleListImportReportsModal(report.id);
+    }
+
+    async function loadRuleListReportRuntime() {
+        const io = window.FilterTubeIO || {};
+        const [reports, profiles, storedJob] = await Promise.all([
+            ruleListReportStore?.read?.() || Promise.resolve([]),
+            typeof io.loadProfilesV4 === 'function' ? io.loadProfilesV4().catch(() => profilesV4Cache || {}) : Promise.resolve(profilesV4Cache || {}),
+            readRuleListReportStorage([ruleListReportApi?.ENRICHMENT_JOB_KEY || 'ftBlockTubeEnrichmentJobV1']).catch(() => ({}))
+        ]);
+        const jobKey = ruleListReportApi?.ENRICHMENT_JOB_KEY || 'ftBlockTubeEnrichmentJobV1';
+        return { reports: safeArray(reports), profiles: profiles || {}, job: safeObject(storedJob?.[jobKey]) };
+    }
+
+    function formatRuleListReportTarget(target) {
+        const profile = normalizeString(target?.profileName) || (target?.profileId === 'default' ? 'Default' : normalizeString(target?.profileId));
+        const surface = target?.surface === 'kids' ? 'Kids' : 'Main';
+        const list = target?.listType === 'whitelist' ? 'allow list' : 'block list';
+        return `${profile || 'Profile'} · ${surface} ${list}`;
+    }
+
+    function ruleListReportStatusLabel(status) {
+        if (status === 'needs_attention') return 'Needs attention';
+        if (status === 'retrying') return 'Retrying';
+        if (status === 'fetching') return 'Fetching';
+        if (status === 'pending') return 'Pending';
+        return 'Complete';
+    }
+
+    function ruleListReportChannelUrl(row) {
+        const idKey = safeArray(row?.identityKeys).find(key => /^id:uc/i.test(key));
+        if (idKey) return `https://www.youtube.com/channel/${idKey.slice(3)}`;
+        const handleKey = safeArray(row?.identityKeys).find(key => key.startsWith('handle:'));
+        if (handleKey) return `https://www.youtube.com/${handleKey.slice(7)}`;
+        const customKey = safeArray(row?.identityKeys).find(key => key.startsWith('custom:'));
+        if (customKey) return `https://www.youtube.com/${customKey.slice(7)}`;
+        return '';
+    }
+
+    function downloadRuleListImportReportCsv(summary) {
+        const rows = safeArray(summary?.rows).filter(row => row.status !== 'complete');
+        const escapeCsv = (value) => `"${String(value ?? '').replace(/"/g, '""')}"`;
+        const csv = [
+            ['status', 'source_row', 'original_value', 'reason', 'targets'].map(escapeCsv).join(','),
+            ...rows.map((row) => [
+                ruleListReportStatusLabel(row.status),
+                Number(row.row) || '',
+                row.originalValue || row.value || '',
+                row.reason || '',
+                safeArray(summary?.report?.targets).map(formatRuleListReportTarget).join(' + ')
+            ].map(escapeCsv).join(','))
+        ].join('\n');
+        const blobUrl = URL.createObjectURL(new Blob([csv], { type: 'text/csv;charset=utf-8' }));
+        const anchor = document.createElement('a');
+        anchor.href = blobUrl;
+        anchor.download = `FilterTube-Import-Report-${Date.now()}.csv`;
+        anchor.click();
+        setTimeout(() => URL.revokeObjectURL(blobUrl), 1000);
+    }
+
+    async function showRuleListImportReportsModal(preferredReportId = '') {
+        if (!ruleListReportApi || !ruleListReportStore) {
+            UIComponents.showToast('Import reports are unavailable', 'error');
+            return;
+        }
+        const runtime = await loadRuleListReportRuntime();
+        if (!runtime.reports.length) {
+            UIComponents.showToast('No saved rule-list import reports yet', 'info');
+            return;
+        }
+
+        const overlay = document.createElement('div');
+        overlay.className = 'ft-modal-overlay rule-list-report-modal-overlay';
+        const card = document.createElement('div');
+        card.className = 'ft-modal rule-list-report-modal';
+        card.setAttribute('role', 'dialog');
+        card.setAttribute('aria-modal', 'true');
+        card.setAttribute('aria-label', 'Rule list import reports');
+        const header = document.createElement('div');
+        header.className = 'ft-modal-header';
+        header.innerHTML = '<h3>Import Reports</h3><p>Blocking rules are active as soon as a valid identifier is saved. This report separately tracks metadata completion and rows that need correction.</p>';
+        const controls = document.createElement('div');
+        controls.className = 'rule-list-report-controls';
+        const reportSelect = document.createElement('select');
+        reportSelect.className = 'select-input';
+        runtime.reports.forEach((report) => {
+            const option = document.createElement('option');
+            option.value = report.id;
+            option.textContent = `${report.label} · ${new Date(report.createdAt).toLocaleString()}`;
+            reportSelect.appendChild(option);
+        });
+        reportSelect.value = runtime.reports.some(report => report.id === preferredReportId)
+            ? preferredReportId
+            : runtime.reports[0].id;
+        const statusSelect = document.createElement('select');
+        statusSelect.className = 'select-input';
+        [
+            ['all', 'All rows'],
+            ['needs_attention', 'Needs attention'],
+            ['retrying', 'Retrying'],
+            ['pending', 'Pending'],
+            ['fetching', 'Fetching'],
+            ['complete', 'Complete']
+        ].forEach(([value, label]) => {
+            const option = document.createElement('option');
+            option.value = value;
+            option.textContent = label;
+            statusSelect.appendChild(option);
+        });
+        const search = document.createElement('input');
+        search.className = 'text-input';
+        search.type = 'search';
+        search.placeholder = 'Search imported value or reason…';
+        controls.append(reportSelect, statusSelect, search);
+        const body = document.createElement('div');
+        body.className = 'rule-list-report-modal__body';
+        const actions = document.createElement('div');
+        actions.className = 'ft-modal-actions';
+        const downloadBtn = document.createElement('button');
+        downloadBtn.className = 'btn-secondary';
+        downloadBtn.type = 'button';
+        downloadBtn.textContent = 'Download unresolved CSV';
+        const closeBtn = document.createElement('button');
+        closeBtn.className = 'btn-primary';
+        closeBtn.type = 'button';
+        closeBtn.textContent = 'Done';
+        actions.append(downloadBtn, closeBtn);
+        card.append(header, controls, body, actions);
+        overlay.appendChild(card);
+        document.body.appendChild(overlay);
+
+        let activeSummary = null;
+        let visibleLimit = 200;
+        const render = () => {
+            const report = runtime.reports.find(item => item.id === reportSelect.value) || runtime.reports[0];
+            activeSummary = ruleListReportApi.summarize(report, runtime);
+            const status = statusSelect.value;
+            const query = normalizeString(search.value).toLowerCase();
+            const filtered = activeSummary.rows.filter((row) => {
+                if (status !== 'all' && row.status !== status) return false;
+                if (!query) return true;
+                return [row.originalValue, row.value, row.name, row.reason]
+                    .some(value => normalizeString(value).toLowerCase().includes(query));
+            });
+            const shown = filtered.slice(0, visibleLimit);
+            const counts = activeSummary.statuses;
+            const reportTargets = activeSummary.report.targets.map(formatRuleListReportTarget).join(' + ');
+            body.innerHTML = `
+                <div class="rule-list-report-summary">
+                    <div><strong>${counts.complete}</strong><span>Complete</span></div>
+                    <div><strong>${counts.pending + counts.fetching}</strong><span>Pending</span></div>
+                    <div><strong>${counts.retrying}</strong><span>Retrying</span></div>
+                    <div><strong>${counts.needs_attention}</strong><span>Needs attention</span></div>
+                </div>
+                <div class="rule-list-report-context">
+                    <strong>${escapeManagedRuleListPreviewCell(activeSummary.report.sourceLabel)}</strong>
+                    <span>${escapeManagedRuleListPreviewCell(reportTargets || 'No target recorded')} · ${activeSummary.report.counts.keywords} keyword rules · ${activeSummary.report.counts.duplicates} duplicates</span>
+                </div>
+                <div class="rule-list-report-table" role="table" aria-label="Import report rows">
+                    <div class="rule-list-report-row rule-list-report-row--head" role="row">
+                        <span>Status</span><span>Imported value</span><span>Result</span><span>Action</span>
+                    </div>
+                    ${shown.map((row) => {
+                        const url = row.type === 'channel' ? ruleListReportChannelUrl(row) : '';
+                        const targetProgress = row.targetCount > 1 ? ` ${row.completedTargets}/${row.targetCount} targets complete.` : '';
+                        const retryTiming = row.nextAttemptAt > Date.now()
+                            ? ` Next retry ${new Date(row.nextAttemptAt).toLocaleString()}.`
+                            : '';
+                        return `
+                            <div class="rule-list-report-row is-${row.status}" role="row">
+                                <span><b>${ruleListReportStatusLabel(row.status)}</b>${row.attempts ? `<small>Attempt ${row.attempts}</small>` : ''}</span>
+                                <span><small>${row.row ? `Row ${row.row}` : 'Imported row'}</small><code>${escapeManagedRuleListPreviewCell(row.originalValue || row.value || '')}</code></span>
+                                <span>${escapeManagedRuleListPreviewCell((row.reason || (row.status === 'complete' ? 'Channel metadata is complete.' : 'Waiting for metadata.')) + targetProgress + retryTiming)}</span>
+                                <span>${url ? `<a class="btn-secondary" href="${escapeManagedRuleListPreviewCell(url)}" target="_blank" rel="noopener noreferrer">Open channel</a>` : '<small>Provide an exact channel link to replace a name-only or invalid row.</small>'}</span>
+                            </div>
+                        `;
+                    }).join('') || '<div class="rule-list-report-empty">No rows match this filter.</div>'}
+                </div>
+                ${filtered.length > shown.length ? `<button class="btn-secondary rule-list-report-load-more" type="button">Show ${Math.min(200, filtered.length - shown.length)} more</button>` : ''}
+            `;
+            body.querySelector('.rule-list-report-load-more')?.addEventListener('click', () => {
+                visibleLimit += 200;
+                render();
+            });
+            downloadBtn.disabled = activeSummary.rows.every(row => row.status === 'complete');
+        };
+        const resetAndRender = () => {
+            visibleLimit = 200;
+            render();
+        };
+        reportSelect.addEventListener('change', resetAndRender);
+        statusSelect.addEventListener('change', resetAndRender);
+        search.addEventListener('input', resetAndRender);
+        downloadBtn.addEventListener('click', () => activeSummary && downloadRuleListImportReportCsv(activeSummary));
+        const close = () => overlay.remove();
+        closeBtn.addEventListener('click', close);
+        overlay.addEventListener('click', event => event.target === overlay && close());
+        render();
+        reportSelect.focus();
+    }
+
+    async function refreshRuleListReportNotices() {
+        const kidsNotice = document.getElementById('kidsImportedChannelReportNotice');
+        const kidsStatus = document.getElementById('kidsImportedChannelReportStatus');
+        if (!ruleListReportApi || !ruleListReportStore) {
+            if (kidsNotice) kidsNotice.hidden = true;
+            return null;
+        }
+        let runtime = null;
+        try {
+            runtime = await loadRuleListReportRuntime();
+        } catch (error) {
+            return null;
+        }
+        if (!runtime.reports.length) {
+            if (kidsNotice) kidsNotice.hidden = true;
+            return runtime;
+        }
+        const latest = ruleListReportApi.summarize(runtime.reports[0], runtime);
+        const incomplete = latest.statuses.pending + latest.statuses.fetching + latest.statuses.retrying;
+        const attention = latest.statuses.needs_attention;
+        if (kidsNotice && kidsStatus) {
+            const affectsKids = latest.report.targets.some(target => target.surface === 'kids');
+            kidsNotice.hidden = !affectsKids || (!incomplete && !attention);
+            kidsStatus.textContent = affectsKids
+                ? `Latest import: ${incomplete} channel ${pluralize(incomplete, 'row')} still completing and ${attention} ${pluralize(attention, 'row')} need attention. Imported rules with valid identifiers are already active.`
+                : '';
+        }
+        if (viewChannelImportReports) viewChannelImportReports.hidden = false;
+        const queueTotal = safeArray(runtime.job?.pending).length + (runtime.job?.inFlight ? 1 : 0);
+        if (importedChannelEnrichmentNotice && importedChannelEnrichmentStatus && !queueTotal) {
+            const shouldShow = incomplete > 0 || attention > 0;
+            importedChannelEnrichmentNotice.hidden = !shouldShow;
+            if (shouldShow) {
+                importedChannelEnrichmentStatus.textContent = `Latest import report: ${incomplete} channel ${pluralize(incomplete, 'row')} still completing and ${attention} ${pluralize(attention, 'row')} need attention. Valid saved identifiers are already filtering; open the report for exact rows and reasons.`;
+                if (importedChannelEnrichmentToggle) importedChannelEnrichmentToggle.hidden = true;
+            }
+        }
+        return runtime;
     }
 
     function syncSubscriptionsImportControls() {
@@ -8635,13 +9068,13 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     function parseManagedChannelKeywordCsv(text, { listName = '' } = {}) {
         const lines = normalizeString(text).split(/\r?\n/);
-        const dataLines = lines.filter((line) => {
+        const dataLines = lines.map((line, index) => ({ line, row: index + 1 })).filter(({ line }) => {
             const trimmed = normalizeString(line);
             return trimmed && !/^(#|!|\/\/|\[)/.test(trimmed);
         });
-        if (!dataLines.length || !dataLines[0].includes(',')) return null;
+        if (!dataLines.length || !dataLines[0].line.includes(',')) return null;
 
-        const headers = splitManagedChannelListCsvRow(dataLines[0]).map(normalizeManagedChannelListCsvHeader);
+        const headers = splitManagedChannelListCsvRow(dataLines[0].line).map(normalizeManagedChannelListCsvHeader);
         const channelIndexes = [];
         const keywordIndexes = [];
         const typeIndexes = [];
@@ -8669,43 +9102,55 @@ document.addEventListener('DOMContentLoaded', async () => {
         const channels = [];
         const keywords = [];
         let skippedCount = 0;
-        const addChannelToken = (token) => {
+        let duplicateCount = 0;
+        const skippedRows = [];
+        const addChannelToken = (token, sourceRow) => {
             const extracted = extractManagedChannelListToken(token);
-            if (!extracted) return false;
+            if (!extracted) return 'invalid';
             const channel = normalizeProfileChannel(extracted);
-            if (!channel) return false;
-            if (!addManagedChannelIdentityKeys(seenChannels, channel)) return false;
+            if (!channel) return 'invalid';
+            if (!addManagedChannelIdentityKeys(seenChannels, channel)) return 'duplicate';
             channels.push({
                 ...channel,
                 source: 'managed_channel_list',
                 managedListId: listId,
-                managedListName: normalizeString(listName) || 'Imported rule list'
+                managedListName: normalizeString(listName) || 'Imported rule list',
+                importSourceRow: sourceRow,
+                importOriginalValue: normalizeString(token)
             });
-            return true;
+            return 'added';
         };
-        const addKeywordToken = (token) => {
+        const addKeywordToken = (token, sourceRow) => {
             const keyword = normalizeProfileKeyword(token, { comments: true });
-            if (!keyword) return false;
+            if (!keyword) return 'invalid';
             const key = normalizeString(keyword.word).toLowerCase();
-            if (!key || seenKeywords.has(key)) return false;
+            if (!key) return 'invalid';
+            if (seenKeywords.has(key)) return 'duplicate';
             seenKeywords.add(key);
             keywords.push({
                 ...keyword,
                 source: 'managed_channel_list',
                 managedListId: listId,
-                managedListName: normalizeString(listName) || 'Imported rule list'
+                managedListName: normalizeString(listName) || 'Imported rule list',
+                importSourceRow: sourceRow,
+                importOriginalValue: normalizeString(token)
             });
-            return true;
+            return 'added';
         };
 
-        dataLines.slice(1).forEach((line) => {
+        dataLines.slice(1).forEach(({ line, row }) => {
             const cells = splitManagedChannelListCsvRow(line);
             let rowAccepted = false;
+            let rowDuplicate = false;
+            const accept = (outcome) => {
+                if (outcome === 'added') rowAccepted = true;
+                if (outcome === 'duplicate') rowDuplicate = true;
+            };
             channelIndexes.forEach((index) => {
-                if (addChannelToken(cells[index])) rowAccepted = true;
+                accept(addChannelToken(cells[index], row));
             });
             keywordIndexes.forEach((index) => {
-                if (addKeywordToken(cells[index])) rowAccepted = true;
+                accept(addKeywordToken(cells[index], row));
             });
             if (hasTypedValueRows) {
                 typeIndexes.forEach((typeIndex) => {
@@ -8713,16 +9158,24 @@ document.addEventListener('DOMContentLoaded', async () => {
                     valueIndexes.forEach((valueIndex) => {
                         const value = cells[valueIndex];
                         if (['channel', 'channels', 'channelid', 'handle', 'url'].includes(type)) {
-                            if (addChannelToken(value)) rowAccepted = true;
+                            accept(addChannelToken(value, row));
                             return;
                         }
                         if (['keyword', 'keywords', 'term', 'terms', 'phrase', 'phrases'].includes(type)) {
-                            if (addKeywordToken(value)) rowAccepted = true;
+                            accept(addKeywordToken(value, row));
                         }
                     });
                 });
             }
-            if (!rowAccepted) skippedCount += 1;
+            if (rowDuplicate) duplicateCount += 1;
+            if (!rowAccepted && !rowDuplicate) {
+                skippedCount += 1;
+                skippedRows.push({
+                    row,
+                    value: line,
+                    reason: 'No valid channel identifier or keyword was found in the mapped CSV columns.'
+                });
+            }
         });
 
         return {
@@ -8733,6 +9186,8 @@ document.addEventListener('DOMContentLoaded', async () => {
             channels,
             keywords,
             skippedCount,
+            skippedRows,
+            duplicateCount,
             totalLineCount: dataLines.length > 0 ? dataLines.length - 1 : 0
         };
     }
@@ -8903,6 +9358,11 @@ document.addEventListener('DOMContentLoaded', async () => {
         const listId = buildManagedChannelListId(listName || 'Imported list', text);
         const items = getManagedChannelListJsonItems(parsedRoot);
         const keywordItems = getManagedChannelListJsonKeywordItems(parsedRoot);
+        const rawRuleRows = safeArray(parsedRootObject.rules);
+        const sourceRowFor = (entry, fallback) => {
+            const rawIndex = rawRuleRows.findIndex(candidate => candidate === entry);
+            return rawIndex >= 0 ? rawIndex + 1 : fallback;
+        };
         const schema = normalizeString(parsedRootObject.schema || parsedRootObject.type).toLowerCase();
         const sourceFormat = schema === 'filtertube_rule_list' || schema === 'filtertube_managed_rule_list'
             ? 'filtertube_rule_list_json'
@@ -8914,43 +9374,70 @@ document.addEventListener('DOMContentLoaded', async () => {
         const channels = [];
         const keywords = [];
         let skippedCount = 0;
-        const addKeyword = (entry) => {
+        let duplicateCount = 0;
+        const skippedRows = [];
+        const addKeyword = (entry, sourceRow) => {
             const token = extractManagedChannelListJsonKeyword(entry);
             const keyword = normalizeProfileKeyword(token, { comments: true });
-            if (!keyword) return false;
+            if (!keyword) return 'invalid';
             const key = normalizeString(keyword.word).toLowerCase();
-            if (!key || seenKeywords.has(key)) return true;
+            if (!key) return 'invalid';
+            if (seenKeywords.has(key)) return 'duplicate';
             seenKeywords.add(key);
             keywords.push({
                 ...keyword,
                 source: 'managed_channel_list',
                 managedListId: listId,
-                managedListName: normalizeString(listName) || 'Imported rule list'
+                managedListName: normalizeString(listName) || 'Imported rule list',
+                importSourceRow: sourceRow,
+                importOriginalValue: typeof entry === 'string' ? entry : JSON.stringify(entry)
             });
-            return true;
+            return 'added';
         };
 
-        items.forEach((entry) => {
+        items.forEach((entry, index) => {
+            const sourceRow = sourceRowFor(entry, index + 1);
             const entryType = getManagedChannelListJsonEntryType(entry);
             if (['keyword', 'keywords', 'term', 'phrase'].includes(entryType)) {
-                if (!addKeyword(entry)) skippedCount += 1;
+                const outcome = addKeyword(entry, sourceRow);
+                if (outcome === 'duplicate') duplicateCount += 1;
+                if (outcome === 'invalid') {
+                    skippedCount += 1;
+                    skippedRows.push({ row: sourceRow, value: JSON.stringify(entry), reason: 'Keyword row has no usable value.' });
+                }
                 return;
             }
             const channel = normalizeManagedChannelListJsonChannel(entry);
             if (!channel) {
                 skippedCount += 1;
+                skippedRows.push({ row: sourceRow, value: JSON.stringify(entry), reason: 'Channel row has no supported ID, handle, custom URL, or name.' });
                 return;
             }
-            if (!addManagedChannelIdentityKeys(seen, channel)) return;
+            if (!addManagedChannelIdentityKeys(seen, channel)) {
+                duplicateCount += 1;
+                return;
+            }
             channels.push({
                 ...channel,
                 source: 'managed_channel_list',
                 managedListId: listId,
-                managedListName: normalizeString(listName) || 'Imported rule list'
+                managedListName: normalizeString(listName) || 'Imported rule list',
+                importSourceRow: sourceRow,
+                importOriginalValue: typeof entry === 'string' ? entry : JSON.stringify(entry)
             });
         });
-        keywordItems.forEach((entry) => {
-            if (!addKeyword(entry)) skippedCount += 1;
+        keywordItems.forEach((entry, index) => {
+            const sourceRow = sourceRowFor(entry, items.length + index + 1);
+            const outcome = addKeyword(entry, sourceRow);
+            if (outcome === 'duplicate') duplicateCount += 1;
+            if (outcome === 'invalid') {
+                skippedCount += 1;
+                skippedRows.push({
+                    row: sourceRow,
+                    value: typeof entry === 'string' ? entry : JSON.stringify(entry),
+                    reason: 'Keyword row has no usable value.'
+                });
+            }
         });
 
         return {
@@ -8961,6 +9448,8 @@ document.addEventListener('DOMContentLoaded', async () => {
             channels,
             keywords,
             skippedCount,
+            skippedRows,
+            duplicateCount,
             totalLineCount: items.length + keywordItems.length
         };
     }
@@ -8974,7 +9463,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                     return parsedJson;
                 }
             } catch (e) {
-                // Fall through to line parsing so pasted mixed text still works.
+                throw new Error('This looks like JSON, but it is not valid JSON. Fix the JSON syntax and preview it again.');
             }
         }
         const parsedCsv = parseManagedChannelKeywordCsv(text, { listName });
@@ -8988,39 +9477,46 @@ document.addEventListener('DOMContentLoaded', async () => {
         const channels = [];
         const keywords = [];
         let skippedCount = 0;
+        let duplicateCount = 0;
+        const skippedRows = [];
         let typedRowCount = 0;
 
-        const addTextKeyword = (token) => {
+        const addTextKeyword = (token, sourceRow) => {
             const keyword = normalizeProfileKeyword(token, { comments: true });
-            if (!keyword) return false;
+            if (!keyword) return 'invalid';
             const key = normalizeString(keyword.word).toLowerCase();
-            if (!key || seenKeywords.has(key)) return true;
+            if (!key) return 'invalid';
+            if (seenKeywords.has(key)) return 'duplicate';
             seenKeywords.add(key);
             keywords.push({
                 ...keyword,
                 source: 'managed_channel_list',
                 managedListId: listId,
-                managedListName: normalizeString(listName) || 'Imported rule list'
+                managedListName: normalizeString(listName) || 'Imported rule list',
+                importSourceRow: sourceRow,
+                importOriginalValue: normalizeString(token)
             });
-            return true;
+            return 'added';
         };
 
-        const addTextChannel = (token) => {
+        const addTextChannel = (token, sourceRow) => {
             const extracted = extractManagedChannelListToken(token);
-            if (!extracted) return false;
+            if (!extracted) return 'invalid';
             const channel = normalizeProfileChannel(extracted);
-            if (!channel) return false;
-            if (!addManagedChannelIdentityKeys(seen, channel)) return true;
+            if (!channel) return 'invalid';
+            if (!addManagedChannelIdentityKeys(seen, channel)) return 'duplicate';
             channels.push({
                 ...channel,
                 source: 'managed_channel_list',
                 managedListId: listId,
-                managedListName: normalizeString(listName) || 'Imported rule list'
+                managedListName: normalizeString(listName) || 'Imported rule list',
+                importSourceRow: sourceRow,
+                importOriginalValue: normalizeString(token)
             });
-            return true;
+            return 'added';
         };
 
-        lines.forEach((line) => {
+        lines.forEach((line, index) => {
             const trimmed = normalizeString(line);
             if (!trimmed || /^(#|!|\/\/|\[)/.test(trimmed)) return;
             const typedMatch = trimmed.match(/^([A-Za-z][A-Za-z0-9 _-]{1,24})\s*[:=]\s*(.+)$/);
@@ -9029,17 +9525,37 @@ document.addEventListener('DOMContentLoaded', async () => {
                 const value = normalizeString(typedMatch[2]);
                 if (['keyword', 'keywords', 'term', 'terms', 'phrase', 'phrases'].includes(type)) {
                     typedRowCount += 1;
-                    if (!addTextKeyword(value)) skippedCount += 1;
+                    const outcome = addTextKeyword(value, index + 1);
+                    if (outcome === 'duplicate') duplicateCount += 1;
+                    if (outcome === 'invalid') {
+                        skippedCount += 1;
+                        skippedRows.push({ row: index + 1, value: line, reason: 'Keyword value is empty or invalid.' });
+                    }
                     return;
                 }
                 if (['channel', 'channels', 'channelid', 'handle', 'url', 'ucid', 'customurl'].includes(type)) {
                     typedRowCount += 1;
-                    if (!addTextChannel(value)) skippedCount += 1;
+                    const outcome = addTextChannel(value, index + 1);
+                    if (outcome === 'duplicate') duplicateCount += 1;
+                    if (outcome === 'invalid') {
+                        skippedCount += 1;
+                        skippedRows.push({ row: index + 1, value: line, reason: 'Channel value is not a supported UC ID, handle, custom URL, or YouTube URL.' });
+                    }
                     return;
                 }
             }
-            if (!addTextChannel(trimmed)) {
+            const outcome = addTextChannel(trimmed, index + 1);
+            if (outcome === 'duplicate') {
+                duplicateCount += 1;
+                return;
+            }
+            if (outcome === 'invalid') {
                 skippedCount += 1;
+                skippedRows.push({
+                    row: index + 1,
+                    value: line,
+                    reason: 'Bare TXT rows are channels; use keyword: for a keyword or provide a supported channel identifier.'
+                });
                 return;
             }
         });
@@ -9052,6 +9568,8 @@ document.addEventListener('DOMContentLoaded', async () => {
             channels,
             keywords,
             skippedCount,
+            skippedRows,
+            duplicateCount,
             totalLineCount: lines.filter(line => normalizeString(line)).length
         };
     }
@@ -9160,6 +9678,10 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     function readManagedChannelListFile(file) {
         return new Promise((resolve, reject) => {
+            if ((Number(file?.size) || 0) > 1024 * 1024) {
+                reject(new Error('List is larger than 1 MB. Split it into smaller files before importing.'));
+                return;
+            }
             const reader = new FileReader();
             reader.onload = () => resolve(typeof reader.result === 'string' ? reader.result : '');
             reader.onerror = () => reject(reader.error || new Error('Unable to read file'));
@@ -9177,13 +9699,13 @@ document.addEventListener('DOMContentLoaded', async () => {
     ].join('\n');
 
     const MANAGED_RULE_LIST_TXT_TEMPLATE = [
-        '# One rule per line. Use channel: or keyword: so the preview is exact.',
-        'channel: @SomeChannel',
-        'channel: UCxxxxxxxxxxxxxxxxxxxxxx',
-        'channel: c/ChannelURL',
-        'channel: https://www.youtube.com/@AnotherChannel',
-        'keyword: brainrot',
-        'keyword: scary thumbnail'
+        '# One rule per line. Remove # and replace the example before import.',
+        '# channel: @SomeChannel',
+        '# channel: UCxxxxxxxxxxxxxxxxxxxxxx',
+        '# channel: c/ChannelURL',
+        '# channel: https://www.youtube.com/@AnotherChannel',
+        '# keyword: brainrot',
+        '# keyword: scary thumbnail'
     ].join('\n');
 
     const MANAGED_RULE_LIST_JSON_TEMPLATE = JSON.stringify({
@@ -9191,9 +9713,10 @@ document.addEventListener('DOMContentLoaded', async () => {
         version: 1,
         metadata: {
             title: 'Family rule list',
-            description: 'Channels and keywords only. This is not a full FilterTube backup.'
+            description: 'Channels and keywords only. Copy examples into rules after replacing their values.'
         },
-        rules: [
+        rules: [],
+        examples: [
             { type: 'channel', value: '@SomeChannel', notes: 'channel handle' },
             { type: 'channel', value: 'UCxxxxxxxxxxxxxxxxxxxxxx', notes: 'channel ID' },
             { type: 'channel', value: 'c/ChannelURL', notes: 'custom channel URL' },
@@ -9258,6 +9781,25 @@ document.addEventListener('DOMContentLoaded', async () => {
                         <span role="cell">${escapeManagedRuleListPreviewCell(row.source)}</span>
                     </div>
                 `).join('')}
+            </div>
+        `;
+    }
+
+    function renderManagedRuleListSkippedRows(parsed = {}) {
+        const rows = safeArray(parsed.skippedRows).slice(0, 6);
+        if (!rows.length) return '';
+        const remaining = Math.max(0, safeArray(parsed.skippedRows).length - rows.length);
+        return `
+            <div class="managed-channel-list-modal__issues" role="region" aria-label="Rows that need correction">
+                <strong>Rows that will not be imported</strong>
+                ${rows.map((row) => `
+                    <div class="managed-channel-list-modal__issue-row">
+                        <span>${Number(row?.row) > 0 ? `Row ${Number(row.row)}` : 'Input row'}</span>
+                        <code>${escapeManagedRuleListPreviewCell(row?.value || '')}</code>
+                        <small>${escapeManagedRuleListPreviewCell(row?.reason || 'Row could not be imported.')}</small>
+                    </div>
+                `).join('')}
+                ${remaining ? `<small>${remaining} more unresolved ${pluralize(remaining, 'row')} will remain available in the saved import report.</small>` : ''}
             </div>
         `;
     }
@@ -9616,6 +10158,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                             <div class="managed-channel-list-modal__preview-stat"><strong>${parsed.skippedCount || 0}</strong><span>Skipped</span></div>
                         </div>
                         ${renderManagedRuleListPreviewSheet(parsed)}
+                        ${renderManagedRuleListSkippedRows(parsed)}
                         <div class="managed-channel-list-modal__preview-note">${counts.total ? 'Ready to review. Confirming will apply only these rule values.' : buildManagedRuleListEmptyPreviewNote(text, parsed)}</div>
                     `;
                 } catch (error) {
@@ -9648,6 +10191,23 @@ document.addEventListener('DOMContentLoaded', async () => {
                 if (!text) {
                     setError('Paste rules or choose a list file first.');
                     return;
+                }
+                const blockTubeInspection = inspectManagedBlockTubeImport(text);
+                if (blockTubeInspection && blockTubeInspection.preview?.ok !== true) {
+                    setError(blockTubeInspection.preview?.error || 'BlockTube backup could not be read.');
+                    return;
+                }
+                if (!blockTubeInspection) {
+                    try {
+                        const parsed = parseManagedChannelListText(text, { listName: name });
+                        if (!countManagedRuleListRows(parsed).total) {
+                            setError(buildManagedRuleListEmptyPreviewNote(text, parsed));
+                            return;
+                        }
+                    } catch (error) {
+                        setError(error?.message || buildManagedRuleListParseErrorMessage(text));
+                        return;
+                    }
                 }
                 const loadedSourceMatches = loadedSourceUrl && text === loadedSourceText;
                 closeWith({
@@ -10907,10 +11467,20 @@ document.addEventListener('DOMContentLoaded', async () => {
             const metadataNotice = enrichment?.pending
                 ? ` Channel details continue in the background (${Number(enrichment.pending) || 0} pending), one row at a time at a randomized 7–15 second interval while the worker is awake; large lists can take time. Closing this dashboard does not stop the queue.`
                 : '';
-            UIComponents.showToast(
-                `${duplicateCount ? 'Selected profiles already have this list' : 'No selected profiles were changed'}${metadataNotice}`,
-                'info'
-            );
+            const report = await saveParsedRuleListImportReport({
+                parsed,
+                label: importPayload.name,
+                sourceLabel: importPayload.sourceLabel,
+                sourceUrl: importPayload.sourceUrl,
+                targets: buildRuleListImportTargets(fresh, eligibleIds, surfaces),
+                addedCount: 0,
+                duplicateCount
+            });
+            await showRuleListImportCompletion(report, {
+                title: 'Import Reviewed',
+                message: duplicateCount ? 'The selected profiles already contain these rules.' : 'No profile rules changed.',
+                details: [metadataNotice.trim() || 'No channel metadata lookup is pending.']
+            });
             return;
         }
 
@@ -10934,10 +11504,20 @@ document.addEventListener('DOMContentLoaded', async () => {
         const metadataNotice = enrichment?.pending
             ? ` Channel details continue in the background (${Number(enrichment.pending) || 0} pending), one row at a time with a randomized 7–15 second interval while the worker is awake; large lists can take time. Closing this dashboard does not stop the queue.`
             : ' Channel details are already complete.';
-        UIComponents.showToast(
-            `Imported ${addedCount} list-derived ${pluralize(addedCount, 'rule')} into ${changedCount} protected ${changedCount === 1 ? 'profile' : 'profiles'}.${metadataNotice}`,
-            'success'
-        );
+        const importReport = await saveParsedRuleListImportReport({
+            parsed,
+            label: importPayload.name,
+            sourceLabel: importPayload.sourceLabel,
+            sourceUrl: importPayload.sourceUrl,
+            targets: buildRuleListImportTargets({ ...fresh, profiles }, eligibleIds, surfaces),
+            addedCount,
+            duplicateCount
+        });
+        await showRuleListImportCompletion(importReport, {
+            title: 'Rule List Import Complete',
+            message: `Imported ${addedCount} list-derived ${pluralize(addedCount, 'rule')} into ${changedCount} protected ${changedCount === 1 ? 'profile' : 'profiles'}.`,
+            details: [metadataNotice.trim()]
+        });
 
         const remoteScope = surfaces.length > 1 || (parsedCounts.channels && parsedCounts.keywords)
             ? 'rules_bundle'
@@ -10980,7 +11560,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         return ['main'];
     }
 
-    async function applyManagedBlockTubeMigrationToActiveProfile(payload, freshProfiles = null) {
+    async function applyManagedBlockTubeMigrationToActiveProfile(payload, freshProfiles = null, importContext = {}) {
         const io = window.FilterTubeIO || {};
         if (typeof io.importV3 !== 'function') {
             UIComponents.showToast('BlockTube migration importer is unavailable', 'error');
@@ -11040,8 +11620,36 @@ document.addEventListener('DOMContentLoaded', async () => {
             renderKidsKeywords();
 
             const receipt = safeObject(importResult?.receipt);
+            const preview = safeObject(importContext.preview);
+            const migrationReport = safeObject(preview.report || importResult?.migrationReport);
+            const blockTubeIssues = [
+                ...safeArray(migrationReport.invalid),
+                ...safeArray(migrationReport.unsupported),
+                ...safeArray(migrationReport.unknown).map(value => ({ field: normalizeString(value), reason: 'Unsupported BlockTube field' }))
+            ].map((issue, index) => ({
+                row: index + 1,
+                value: normalizeString(issue?.value || issue?.field || issue),
+                reason: normalizeString(issue?.reason).replace(/_/g, ' ') || 'This BlockTube value has no safe FilterTube equivalent.'
+            }));
+            const importReport = await saveRuleListImportReport(buildRuleListImportReport({
+                label: normalizeString(importContext.label) || 'BlockTube migration',
+                sourceFormat: 'blocktube_json_rules',
+                sourceLabel: normalizeString(importContext.sourceLabel) || 'BlockTube JSON',
+                sourceUrl: normalizeString(importContext.sourceUrl),
+                targets: [{ profileId: currentActive, surface: 'main', listType: 'blocklist' }],
+                channels: safeArray(preview.channelEntries),
+                issues: blockTubeIssues,
+                counts: {
+                    channels: Number(receipt.channels || preview.counts?.channels) || 0,
+                    keywords: (Number(receipt.keywords) || 0) + (Number(receipt.comments) || 0),
+                    videoIds: Number(receipt.videoIds || preview.counts?.videoIds) || 0,
+                    added: (Number(receipt.addedChannels) || 0) + (Number(receipt.addedKeywords) || 0) + (Number(receipt.addedVideoIds) || 0),
+                    duplicates: (Number(receipt.duplicateChannels) || 0) + (Number(receipt.duplicateKeywords) || 0) + (Number(receipt.duplicateVideoIds) || 0),
+                    skipped: Number(receipt.skippedRows) || blockTubeIssues.length
+                }
+            }));
             if (receipt.verified === true) {
-                await showChoiceModal({
+                const choice = await showChoiceModal({
                     title: 'BlockTube Import Verified',
                     message: 'FilterTube saved the complete supported BlockTube migration and read it back before reporting success.',
                     details: [
@@ -11054,10 +11662,14 @@ document.addEventListener('DOMContentLoaded', async () => {
                             : 'All imported channel rows already have complete metadata; no metadata lookup is pending.'
                     ],
                     choices: [
-                        { value: 'done', label: 'Done', recommended: true }
+                        { value: 'report', label: 'View Import Report', className: 'btn-primary', recommended: blockTubeIssues.length > 0 },
+                        { value: 'done', label: 'Done', className: 'btn-secondary', recommended: blockTubeIssues.length === 0 }
                     ],
                     cancelText: 'Close'
                 });
+                if (choice === 'report' && importReport) {
+                    await showRuleListImportReportsModal(importReport.id);
+                }
             } else {
                 UIComponents.showToast('BlockTube JSON imported', 'success');
             }
@@ -11168,7 +11780,12 @@ document.addEventListener('DOMContentLoaded', async () => {
         if (!okAdmin) return;
 
         if (isBlockTubeImport) {
-            await applyManagedBlockTubeMigrationToActiveProfile(blockTubeInspection.payload, fresh);
+            await applyManagedBlockTubeMigrationToActiveProfile(blockTubeInspection.payload, fresh, {
+                preview: blockTubeInspection.preview,
+                label: importPayload.name,
+                sourceLabel: importPayload.sourceLabel,
+                sourceUrl: importPayload.sourceUrl
+            });
             return;
         }
 
@@ -11204,10 +11821,19 @@ document.addEventListener('DOMContentLoaded', async () => {
             const metadataNotice = enrichment?.pending
                 ? ` Channel details continue in the background (${Number(enrichment.pending) || 0} pending), one row at a time at a randomized 7–15 second interval while the worker is awake; large lists can take time. Closing this dashboard does not stop the queue.`
                 : '';
-            UIComponents.showToast(
-                `${duplicateCount ? 'This profile already has that list' : 'No profile rules were changed'}${metadataNotice}`,
-                'info'
-            );
+            const report = await saveParsedRuleListImportReport({
+                parsed,
+                label: importPayload.name,
+                sourceLabel: importPayload.sourceLabel,
+                sourceUrl: importPayload.sourceUrl,
+                targets: buildRuleListImportTargets(fresh, [currentActive], targetSurfaces),
+                duplicateCount
+            });
+            await showRuleListImportCompletion(report, {
+                title: 'Import Reviewed',
+                message: duplicateCount ? 'This profile already contains these rules.' : 'No profile rules changed.',
+                details: [metadataNotice.trim() || 'No channel metadata lookup is pending.']
+            });
             return;
         }
 
@@ -11236,7 +11862,20 @@ document.addEventListener('DOMContentLoaded', async () => {
         const metadataNotice = enrichment?.pending
             ? ` Channel details continue in the background (${Number(enrichment.pending) || 0} pending), one row at a time with a randomized 7–15 second interval while the worker is awake; large lists can take time. Closing this dashboard does not stop the queue.`
             : ' Channel details are already complete.';
-        UIComponents.showToast(`Imported ${addedCount} ${pluralize(addedCount, 'rule')} into ${surfaceLabel}.${metadataNotice}`, 'success');
+        const importReport = await saveParsedRuleListImportReport({
+            parsed,
+            label: importPayload.name,
+            sourceLabel: importPayload.sourceLabel,
+            sourceUrl: importPayload.sourceUrl,
+            targets: buildRuleListImportTargets({ ...fresh, profiles }, [currentActive], targetSurfaces),
+            addedCount,
+            duplicateCount
+        });
+        await showRuleListImportCompletion(importReport, {
+            title: 'Rule List Import Complete',
+            message: `Imported ${addedCount} ${pluralize(addedCount, 'rule')} into ${surfaceLabel}.`,
+            details: [metadataNotice.trim()]
+        });
     }
 
     async function removeManagedChannelListFromProfiles(profileIds) {
@@ -26641,6 +27280,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     updateStats();
     renderSubscriptionsImportState();
     syncSubscriptionsImportControls();
+    void refreshRuleListReportNotices();
 
     if (runtimeAPI?.runtime?.onMessage?.addListener) {
         runtimeAPI.runtime.onMessage.addListener((message) => {
@@ -26704,6 +27344,14 @@ document.addEventListener('DOMContentLoaded', async () => {
             }
         });
     }
+
+    [viewChannelImportReports, document.getElementById('kidsViewChannelImportReports'), ftImportReportsBtn]
+        .filter(Boolean)
+        .forEach((button) => {
+            button.addEventListener('click', () => {
+                void showRuleListImportReportsModal();
+            });
+        });
 
     if (importSubscriptionsBtn) {
         importSubscriptionsBtn.addEventListener('click', async () => {

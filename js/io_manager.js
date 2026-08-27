@@ -1696,6 +1696,15 @@
                 mappedOptions: Object.keys(safeObject(parsed.mainSettings)).filter(key => key !== 'contentFilters').length,
                 durationFilters: parsed.mainSettings?.contentFilters?.duration?.enabled === true ? 1 : 0
             },
+            channelEntries: safeArray(parsed.mainChannels).map((entry, index) => ({
+                id: normalizeString(entry?.id),
+                name: normalizeString(entry?.name),
+                handle: normalizeString(entry?.handle),
+                customUrl: normalizeString(entry?.customUrl),
+                originalInput: normalizeString(entry?.originalInput || entry?.id || entry?.name),
+                sourceRow: index + 1,
+                nameOnly: entry?.source === 'blocktube-channel-name'
+            })),
             report: parsed.migrationReport
         };
     }

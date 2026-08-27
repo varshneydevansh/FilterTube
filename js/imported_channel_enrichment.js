@@ -217,6 +217,7 @@
         if (!isValidLookup(input)) return null;
         const attempts = Number(raw.attempts);
         const nextAttemptAt = Number(raw.nextAttemptAt);
+        const lastErrorAt = Number(raw.lastErrorAt);
         return {
             id: isValidChannelId(input) ? input : '',
             input,
@@ -231,6 +232,10 @@
             attempts: Number.isFinite(attempts) && attempts >= 0 ? Math.floor(attempts) : 0,
             nextAttemptAt: Number.isFinite(nextAttemptAt) && nextAttemptAt > 0
                 ? Math.floor(nextAttemptAt)
+                : 0,
+            lastError: text(raw.lastError),
+            lastErrorAt: Number.isFinite(lastErrorAt) && lastErrorAt > 0
+                ? Math.floor(lastErrorAt)
                 : 0
         };
     }
@@ -742,7 +747,9 @@
                 job.pending.push({
                     ...task,
                     attempts,
-                    nextAttemptAt: now() + retryDelay
+                    nextAttemptAt: now() + retryDelay,
+                    lastError: job.lastError,
+                    lastErrorAt: job.lastErrorAt
                 });
             } else {
                 job.lastCompletedAt = now();

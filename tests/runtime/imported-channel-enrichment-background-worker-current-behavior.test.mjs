@@ -397,4 +397,6 @@ test('repeated incomplete responses stay queued after the attempt cap', async ()
   assert.equal(retained.pending.length, 1);
   assert.equal(retained.pending[0].attempts, 1);
   assert.equal(retained.pending[0].nextAttemptAt, 1_000_000 + 30 * 60 * 1000);
+  assert.equal(retained.pending[0].lastError, 'temporary');
+  assert.equal(retained.pending[0].lastErrorAt, 1_000_000);
 });

@@ -570,12 +570,12 @@ export const FILE_LANE_RULES = Object.freeze([
   },
   {
     id: 'state-io-runtime',
-    patterns: [/^js\/(?:state_manager|io_manager)\.js$/],
+    patterns: [/^js\/(?:state_manager|io_manager|imported_channel_enrichment)\.js$/],
     lanes: ['settings']
   },
   {
     id: 'extension-ui-runtime',
-    patterns: [/^js\/(?:popup|tab-view|render_engine|ui_components|managed_parent_command_center)\.js$/],
+    patterns: [/^js\/(?:popup|tab-view|render_engine|ui_components|managed_parent_command_center|rule_list_import_reports)\.js$/],
     lanes: ['release', 'whitelist', 'blocking', 'menu', 'settings', 'smoke']
   },
   {

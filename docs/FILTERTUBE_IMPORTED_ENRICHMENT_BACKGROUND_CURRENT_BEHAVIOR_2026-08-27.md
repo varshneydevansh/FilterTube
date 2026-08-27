@@ -20,6 +20,12 @@ The queue keeps the existing storage key `ftBlockTubeEnrichmentJobV1` so jobs cr
 - profile-lock or profile-context blocking state;
 - the last error and completion timestamps.
 
+Pending tasks also retain their own `lastError` and `lastErrorAt`. The dashboard
+joins those task records with persistent rule-list import reports so pending,
+retrying, name-only, and skipped source rows remain distinguishable. The report
+contract and CSV/TXT/JSON/file/URL user flow are documented in
+`FILTERTUBE_RULE_LIST_IMPORT_REPORTS_CURRENT_BEHAVIOR_2026-08-27.md`.
+
 The worker rescans all profiles when it starts. This both recovers interrupted work and discovers incomplete imported rows from an older build that never wrote a queue job. A dashboard reload can request the same rescan, but opening the dashboard is no longer required for the worker to continue.
 
 ## One lookup and completion contract
@@ -38,7 +44,7 @@ Closing the dashboard does not stop an unprotected queue. Browser shutdown or se
 
 ## User communication
 
-The import confirmation and rule-list guidance now tell the user that metadata completion happens in the extension background, that large lists can take time, and that closing the dashboard does not stop the queue. The live status notice reports pending/in-flight counts, timing caveats, lock/block state, and the Pause/Resume action.
+The import confirmation and rule-list guidance now tell the user that metadata completion happens in the extension background, that large lists can take time, and that closing the dashboard does not stop the queue. The live status notice reports pending/in-flight counts, timing caveats, lock/block state, and the Pause/Resume action. Each import also saves an exact report with source rows, selected Main/Kids targets, skipped reasons, name-only boundaries, retry state, and a bounded unresolved-row CSV export.
 
 ## Verification in this worktree
 
