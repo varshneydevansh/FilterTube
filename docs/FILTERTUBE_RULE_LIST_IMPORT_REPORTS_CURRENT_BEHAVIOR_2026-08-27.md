@@ -75,6 +75,25 @@ large report from recreating the full-list DOM lag. Unresolved rows can be
 downloaded as CSV. Reports retain the latest 12 imports subject to a 50,000-row
 history budget; the newest report is always retained.
 
+The report summary keeps the five counts visible but shows the detailed state
+meaning only for the currently selected filter. Selecting **Pending** explains
+that the first paced lookup is waiting; **Fetching** identifies the one active
+lookup; **Retrying** explains that YouTube returned a temporary error or
+incomplete metadata while the rule remains active; **Needs attention** explains
+that automatic completion has stopped, usually because the channel does not
+exist, is terminated/deleted, is name-only, or has a queue inconsistency; and
+**Complete** confirms that the UC ID, name, handle/custom URL, and avatar are
+available. This keeps the report readable without making the user scan a guide
+for states they did not select.
+
+For an unresolved imported channel row with a unique identity, the report also
+offers **Remove rule**. After parent/account authorization and confirmation it
+removes only matching imported records from the report's recorded targets,
+leaves the report as history, and lets the background queue drop the lookup on
+its next rescan. A **Fetching** or **Complete** row has no remove action while
+that state is active, and a name-only row cannot be removed through this action
+because it has no safe unique identity to match.
+
 Queue/report-only storage writes do not reload the full profile. Imported
 metadata writes carry a small revision marker and the completed channel row, so
 the active dashboard or popup patches that row in memory and rerenders only its

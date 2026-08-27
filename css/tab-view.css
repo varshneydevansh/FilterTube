@@ -3011,7 +3011,7 @@ html[data-theme="dark"] .help-device-map-legend li {
 
 .rule-list-report-summary {
     display: grid;
-    grid-template-columns: repeat(4, minmax(0, 1fr));
+    grid-template-columns: repeat(5, minmax(0, 1fr));
     gap: 0.65rem;
 }
 
@@ -3026,6 +3026,21 @@ html[data-theme="dark"] .help-device-map-legend li {
 
 .rule-list-report-summary strong {
     font-size: 1.25rem;
+}
+
+.rule-list-report-selected-state {
+    display: grid;
+    gap: 0.2rem;
+    margin: 0.75rem 0;
+    padding: 0.7rem 0.8rem;
+    border-left: 3px solid var(--ft-color-accent);
+    border-radius: 0 var(--ft-radius-md) var(--ft-radius-md) 0;
+    background: color-mix(in srgb, var(--ft-color-accent) 6%, var(--ft-color-bg-card));
+}
+
+.rule-list-report-selected-state span {
+    color: var(--ft-color-text-muted);
+    line-height: 1.45;
 }
 
 .rule-list-report-context {
@@ -3073,6 +3088,17 @@ html[data-theme="dark"] .help-device-map-legend li {
 .rule-list-report-row code {
     overflow: hidden;
     text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.rule-list-report-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.4rem;
+    align-items: center;
+}
+
+.rule-list-report-actions .btn-secondary {
     white-space: nowrap;
 }
 

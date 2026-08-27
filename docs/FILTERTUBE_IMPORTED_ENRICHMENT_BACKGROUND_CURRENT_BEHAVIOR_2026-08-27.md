@@ -66,6 +66,14 @@ and per-row retries can extend wall-clock time. Existing imports created before
 reports were introduced are recovered from saved row provenance without copying
 the full list into report storage.
 
+The Import Reports view explains only the state selected by the user while
+keeping the five counts visible. For unresolved imported channel rows with a
+unique identity, it provides a confirmed **Remove rule** action that removes
+matching imported records from the recorded targets and allows the queue to
+drop those lookups on its next rescan. It deliberately does not remove a row
+while its lookup is **Fetching**, and it cannot safely remove a name-only row
+without a unique identity.
+
 ## Verification in this worktree
 
 - `tests/runtime/imported-channel-enrichment-background-worker-current-behavior.test.mjs` covers startup discovery, 7–15 second jitter, coarse alarm scheduling, pause/resume, interrupted-task recovery, profile-lock blocking, isolated retry backoff, permanent not-found/terminated outcomes, legacy 404 migration, and recovery from the old queue-wide retry timestamp.

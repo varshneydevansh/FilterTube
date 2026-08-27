@@ -573,6 +573,14 @@ test('import and profile-switch paths preserve the normal post-entry enrichment 
   assert.match(tabViewSource, /Temporary failures stay visible in Import Reports/);
   assert.match(tabViewSource, /Permanent not-found\/deleted responses stop retrying/);
   assert.match(tabViewSource, /Verify this identifier on YouTube or replace it/);
+  assert.match(tabViewSource, /const statusDescriptions = \{/);
+  assert.match(tabViewSource, /The row is waiting for its first paced lookup/);
+  assert.match(tabViewSource, /The UC ID, channel name, handle\/custom URL, and avatar are available/);
+  assert.match(tabViewSource, /rule-list-report-selected-state/);
+  assert.doesNotMatch(tabViewSource, /rule-list-report-filter-help/);
+  assert.match(tabViewSource, /Remove imported channel rule\?/);
+  assert.match(tabViewSource, /rule-list-report-remove/);
+  assert.match(tabViewSource, /metadata lookup stopped/);
   assert.match(tabViewSource, /A failed row retries after about 2 minutes/);
   assert.match(tabViewSource, /backs off up to 30 minutes without pausing fresh rows/);
   assert.match(tabViewSource, /older queue timing is being corrected/);
@@ -582,6 +590,8 @@ test('import and profile-switch paths preserve the normal post-entry enrichment 
   assert.match(renderEngineSource, /Name rule only/);
   assert.match(renderEngineSource, /paced metadata lookup/);
   assert.match(tabViewCssSource, /\.subscriptions-import-inline\[hidden\]\s*\{\s*display:\s*none\s*!important;/s);
+  assert.match(tabViewCssSource, /\.rule-list-report-selected-state\s*\{/);
+  assert.match(tabViewCssSource, /\.rule-list-report-actions\s*\{/);
   assert.match(backgroundSource, /resolvedPrimaryId/);
   assert.match(backgroundSource, /incomingCustomUrlForMatch/);
   assert.match(backgroundSource, /actorProfileId/);

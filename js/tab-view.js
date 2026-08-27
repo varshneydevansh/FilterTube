@@ -5093,6 +5093,145 @@ document.addEventListener('DOMContentLoaded', async () => {
         setTimeout(() => URL.revokeObjectURL(blobUrl), 1000);
     }
 
+    const REPORT_IMPORTED_CHANNEL_SOURCES = new Set([
+        'import',
+        'managed_channel_list',
+        'blocktube',
+        'blocktube-channel-name'
+    ]);
+
+    function ruleListReportChannelListKey(target) {
+        const item = safeObject(target);
+        if (item.surface === 'kids') return item.listType === 'whitelist' ? 'whitelistChannels' : 'blockedChannels';
+        return item.listType === 'whitelist' ? 'whitelistChannels' : 'channels';
+    }
+
+    function isImportedRuleListChannel(channel) {
+        const source = normalizeString(channel?.source).toLowerCase();
+        return Boolean(normalizeString(channel?.managedListId)) || REPORT_IMPORTED_CHANNEL_SOURCES.has(source);
+    }
+
+    function ruleListReportChannelMatches(channel, row) {
+        const rowKeys = new Set(safeArray(row?.identityKeys).map(key => normalizeString(key).toLowerCase()).filter(Boolean));
+        if (!rowKeys.size || !ruleListReportApi?.identityKeys) return false;
+        return ruleListReportApi.identityKeys(channel).some(key => rowKeys.has(normalizeString(key).toLowerCase()));
+    }
+
+    async function removeRuleListImportReportChannel(reportValue, row) {
+        const report = ruleListReportApi?.normalizeReport?.(reportValue);
+        if (!report || row?.type !== 'channel' || !safeArray(row.identityKeys).length) {
+            UIComponents.showToast('This row has no unique channel identifier to remove safely', 'info');
+            return false;
+        }
+
+        const io = window.FilterTubeIO || {};
+        if (typeof io.loadProfilesV4 !== 'function' || typeof io.saveProfilesV4 !== 'function') {
+            UIComponents.showToast('Profiles unavailable', 'error');
+            return false;
+        }
+
+        const fresh = await io.loadProfilesV4();
+        const currentActive = normalizeString(fresh?.activeProfileId) || activeProfileId || 'default';
+        if (getProfileType(fresh, currentActive) === 'child') {
+            UIComponents.showToast('Switch to the parent/account profile to remove this imported rule', 'error');
+            return false;
+        }
+
+        const profiles = { ...safeObject(fresh?.profiles) };
+        const targets = safeArray(report.targets);
+        const unavailableTargets = targets.filter((target) => {
+            const targetId = normalizeString(target?.profileId) || 'default';
+            return !safeObject(profiles[targetId]) || !canActiveProfileManageProfile(fresh, targetId);
+        });
+        if (unavailableTargets.length) {
+            UIComponents.showToast('Open the parent/account profile to remove rules from every report target', 'error');
+            return false;
+        }
+
+        const confirmed = await showConfirmModal({
+            title: 'Remove imported channel rule?',
+            message: `This removes the imported channel rule from ${targets.length === 1 ? 'its recorded target' : 'all recorded targets'}. The rule will stop filtering there and its metadata lookup will stop.`,
+            details: [
+                row.name || row.originalValue || 'Imported channel',
+                'The import report stays available as a history record. You can import or add the channel again later if needed.'
+            ],
+            confirmText: 'Remove rule',
+            cancelText: 'Keep rule'
+        });
+        if (!confirmed) return false;
+
+        const okUnlocked = await ensureProfileUnlocked(fresh, currentActive, { sensitiveAction: true });
+        if (!okUnlocked) return false;
+
+        let removedCount = 0;
+        for (const target of targets) {
+            const targetId = normalizeString(target?.profileId) || 'default';
+            const profile = safeObject(profiles[targetId]);
+            const surface = target?.surface === 'kids' ? 'kids' : 'main';
+            const listKey = ruleListReportChannelListKey(target);
+            const nextSurface = getProfileSurface(profile, surface);
+            const list = Array.isArray(nextSurface[listKey]) ? nextSurface[listKey] : [];
+            const filtered = list.filter((channel) => {
+                const shouldRemove = isImportedRuleListChannel(channel)
+                    && ruleListReportChannelMatches(channel, row);
+                if (shouldRemove) removedCount += 1;
+                return !shouldRemove;
+            });
+            if (filtered.length === list.length) continue;
+
+            nextSurface[listKey] = filtered;
+            let nextProfile = setProfileSurface(profile, surface, nextSurface);
+            if (getProfileType(fresh, targetId) === 'child') {
+                const history = buildManagedChildLocalEditReport({
+                    actorProfileId: currentActive,
+                    targetProfileId: targetId,
+                    surface,
+                    priorProfile: profile,
+                    nextSurface
+                });
+                history.historyRow = {
+                    ...history.historyRow,
+                    actionType: 'policy.channel_list.remove',
+                    summary: {
+                        ...safeObject(history.historyRow.summary),
+                        label: 'Imported channel rule removed',
+                        surface,
+                        removedCount: list.length - filtered.length,
+                        sourceRow: Number(row.row) || 0
+                    }
+                };
+                nextProfile = recordManagedChildLocalEditHistory(nextProfile, history);
+            }
+            profiles[targetId] = nextProfile;
+        }
+
+        if (!removedCount) {
+            UIComponents.showToast('This imported channel rule is already removed or only exists as a manual rule', 'info');
+            return false;
+        }
+
+        await io.saveProfilesV4({
+            ...fresh,
+            schemaVersion: 4,
+            profiles
+        });
+        profilesV4Cache = { ...fresh, schemaVersion: 4, profiles };
+        await StateManager.loadSettings({ notify: true, resetEnrichment: false, scheduleEnrichment: false });
+        const enrichmentStarter = StateManager.startImportedChannelEnrichment
+            || StateManager.startBlockTubeEnrichment;
+        if (typeof enrichmentStarter === 'function') await enrichmentStarter();
+        await refreshProfilesUI();
+        renderChannels();
+        renderKidsChannels();
+        renderKeywords();
+        renderKidsKeywords();
+        UIComponents.showToast(
+            `Removed ${removedCount} imported channel ${removedCount === 1 ? 'rule' : 'rules'}; metadata lookup stopped`,
+            'success'
+        );
+        return true;
+    }
+
     async function showRuleListImportReportsModal(preferredReportId = '') {
         if (!ruleListReportApi || !ruleListReportStore) {
             UIComponents.showToast('Import reports are unavailable', 'error');
@@ -5129,6 +5268,14 @@ document.addEventListener('DOMContentLoaded', async () => {
             : runtime.reports[0].id;
         const statusSelect = document.createElement('select');
         statusSelect.className = 'select-input';
+        const statusDescriptions = {
+            all: 'Every row in this import.',
+            needs_attention: 'Automatic completion has stopped for this row—usually “channel does not exist,” terminated/deleted, a name-only entry, or a queue inconsistency. The rule remains active unless you remove it.',
+            retrying: 'YouTube returned a temporary error or incomplete metadata; the rule remains active and will be tried again.',
+            pending: 'The row is waiting for its first paced lookup.',
+            fetching: 'This is the one channel lookup currently running.',
+            complete: 'The UC ID, channel name, handle/custom URL, and avatar are available.'
+        };
         [
             ['all', 'All rows'],
             ['needs_attention', 'Needs attention'],
@@ -5140,6 +5287,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             const option = document.createElement('option');
             option.value = value;
             option.textContent = label;
+            option.title = statusDescriptions[value];
             statusSelect.appendChild(option);
         });
         const search = document.createElement('input');
@@ -5180,13 +5328,18 @@ document.addEventListener('DOMContentLoaded', async () => {
             const shown = filtered.slice(0, visibleLimit);
             const counts = activeSummary.statuses;
             const reportTargets = activeSummary.report.targets.map(formatRuleListReportTarget).join(' + ');
+            const summaryMetrics = [
+                ['complete', counts.complete, 'Complete'],
+                ['pending', counts.pending, 'Pending'],
+                ['retrying', counts.retrying, 'Retrying'],
+                ['fetching', counts.fetching, 'Fetching'],
+                ['needs_attention', counts.needs_attention, 'Needs attention']
+            ];
             body.innerHTML = `
                 <div class="rule-list-report-summary">
-                    <div><strong>${counts.complete}</strong><span>Complete</span></div>
-                    <div><strong>${counts.pending + counts.fetching}</strong><span>Pending</span></div>
-                    <div><strong>${counts.retrying}</strong><span>Retrying</span></div>
-                    <div><strong>${counts.needs_attention}</strong><span>Needs attention</span></div>
+                    ${summaryMetrics.map(([, count, label]) => `<div><strong>${count}</strong><span>${label}</span></div>`).join('')}
                 </div>
+                <div class="rule-list-report-selected-state"><strong>${escapeManagedRuleListPreviewCell(status === 'all' ? 'All rows' : ruleListReportStatusLabel(status))}</strong><span>${escapeManagedRuleListPreviewCell(statusDescriptions[status] || statusDescriptions.all)}</span></div>
                 <div class="rule-list-report-context">
                     <strong>${escapeManagedRuleListPreviewCell(activeSummary.report.sourceLabel)}</strong>
                     <span>${escapeManagedRuleListPreviewCell(reportTargets || 'No target recorded')} · ${activeSummary.report.counts.keywords} keyword rules · ${activeSummary.report.counts.duplicates} duplicates</span>
@@ -5196,8 +5349,14 @@ document.addEventListener('DOMContentLoaded', async () => {
                         <span>Status</span><span>Imported value</span><span>Result</span><span>Action</span>
                     </div>
                     ${shown.map((row) => {
+                        const rowIndex = activeSummary.rows.indexOf(row);
                         const url = row.type === 'channel' ? ruleListReportChannelUrl(row) : '';
                         const permanentFailure = row.failureKind === 'permanent';
+                        const canRemove = row.type === 'channel'
+                            && row.status !== 'complete'
+                            && row.status !== 'fetching'
+                            && row.reason !== 'The saved rule is no longer present in this target.'
+                            && safeArray(row.identityKeys).length > 0;
                         const targetProgress = row.targetCount > 1 ? ` ${row.completedTargets}/${row.targetCount} targets complete.` : '';
                         const retryTiming = row.nextAttemptAt > Date.now()
                             ? ` Next retry ${new Date(row.nextAttemptAt).toLocaleString()}.`
@@ -5207,12 +5366,16 @@ document.addEventListener('DOMContentLoaded', async () => {
                         const manualGuidance = permanentFailure
                             ? 'Verify this identifier on YouTube or replace it with an exact channel URL/UC ID. The saved rule remains active until you change or remove it.'
                             : '';
+                        const actionMarkup = [
+                            url ? `<a class="btn-secondary" href="${escapeManagedRuleListPreviewCell(url)}" target="_blank" rel="noopener noreferrer">${permanentFailure ? 'Verify channel' : 'Open channel'}</a>` : (permanentFailure ? '<small>Verify the imported value manually, then replace it with an exact channel link or UC ID.</small>' : '<small>Provide an exact channel link to replace a name-only or invalid row.</small>'),
+                            canRemove ? `<button class="btn-secondary rule-list-report-remove" type="button" data-report-row-index="${rowIndex}">Remove rule</button>` : ''
+                        ].join('');
                         return `
                             <div class="rule-list-report-row is-${row.status}" role="row">
                                 <span><b>${ruleListReportStatusLabel(row.status)}</b>${row.attempts ? `<small>Attempt ${row.attempts}</small>` : ''}</span>
                                 <span><small>${row.row ? `Row ${row.row}` : 'Imported row'}</small><code>${escapeManagedRuleListPreviewCell(row.originalValue || row.value || '')}</code></span>
                                 <span><span>${escapeManagedRuleListPreviewCell(resultReason + targetProgress + retryTiming)}</span>${manualGuidance ? `<small>${escapeManagedRuleListPreviewCell(manualGuidance)}</small>` : ''}</span>
-                                <span>${url ? `<a class="btn-secondary" href="${escapeManagedRuleListPreviewCell(url)}" target="_blank" rel="noopener noreferrer">${permanentFailure ? 'Verify channel' : 'Open channel'}</a>` : (permanentFailure ? '<small>Verify the imported value manually, then replace it with an exact channel link or UC ID.</small>' : '<small>Provide an exact channel link to replace a name-only or invalid row.</small>')}</span>
+                                <span><span class="rule-list-report-actions">${actionMarkup}</span></span>
                             </div>
                         `;
                     }).join('') || '<div class="rule-list-report-empty">No rows match this filter.</div>'}
@@ -5222,6 +5385,22 @@ document.addEventListener('DOMContentLoaded', async () => {
             body.querySelector('.rule-list-report-load-more')?.addEventListener('click', () => {
                 visibleLimit += 200;
                 render();
+            });
+            body.querySelectorAll('.rule-list-report-remove').forEach((button) => {
+                button.addEventListener('click', async () => {
+                    const rowIndex = Number(button.dataset.reportRowIndex);
+                    const row = Number.isInteger(rowIndex) ? activeSummary?.rows?.[rowIndex] : null;
+                    if (!row) return;
+                    button.disabled = true;
+                    button.textContent = 'Removing…';
+                    try {
+                        const removed = await removeRuleListImportReportChannel(activeSummary.report, row);
+                        if (removed) runtime = await loadRuleListReportRuntime();
+                    } catch (error) {
+                        UIComponents.showToast(error?.message || 'Unable to remove this imported channel rule', 'error');
+                    }
+                    render();
+                });
             });
             downloadBtn.disabled = activeSummary.rows.every(row => row.status === 'complete');
         };
