@@ -29,51 +29,6 @@ function getFilteringTracker() {
     };
 }
 
-function getListSignatureForRun(list) {
-    try {
-        const active = window.__filtertubeDomFallbackActiveRun;
-        if (active && active.signatures && typeof active.signatures.get === 'function') {
-            const cached = active.signatures.get(list);
-            if (typeof cached === 'string') return cached;
-        }
-    } catch (e) {
-    }
-
-    let signature = '';
-    try {
-        signature = list.map(entry => {
-            if (!entry) return '';
-            if (entry instanceof RegExp) return entry.toString();
-            if (typeof entry === 'string') return entry.trim().toLowerCase();
-            if (typeof entry === 'object') {
-                const pattern = typeof entry.pattern === 'string' ? entry.pattern : '';
-                const flags = typeof entry.flags === 'string' ? entry.flags : 'i';
-                const id = typeof entry.id === 'string' ? entry.id.trim().toLowerCase() : '';
-                const handle = typeof entry.handle === 'string' ? entry.handle.trim().toLowerCase() : '';
-                const customUrl = typeof entry.customUrl === 'string' ? entry.customUrl.trim().toLowerCase() : '';
-                const name = typeof entry.name === 'string' ? entry.name.trim().toLowerCase() : '';
-                const originalInput = typeof entry.originalInput === 'string' ? entry.originalInput.trim().toLowerCase() : '';
-                if (pattern) return `${pattern}::${flags}`.toLowerCase();
-                const source = typeof entry.source === 'string' ? entry.source.trim().toLowerCase() : '';
-                return [source, id, handle, customUrl, name, originalInput].filter(Boolean).join('::');
-            }
-            return '';
-        }).filter(Boolean).join('|');
-    } catch (e) {
-        signature = '';
-    }
-
-    try {
-        const active = window.__filtertubeDomFallbackActiveRun;
-        if (active && active.signatures && typeof active.signatures.set === 'function') {
-            active.signatures.set(list, signature);
-        }
-    } catch (e) {
-    }
-
-    return signature;
-}
-
 function normalizeUcIdForComparison(value) {
     if (!value || typeof value !== 'string') return '';
     const match = value.match(/(UC[\w-]{22})/i);
@@ -698,11 +653,9 @@ function normalizeHandleForComparison(value) {
 function getCompiledKeywordRegexes(rawList) {
     if (!Array.isArray(rawList) || rawList.length === 0) return [];
 
-    const signature = getListSignatureForRun(rawList);
-
     const cached = compiledKeywordRegexCache.get(rawList);
-    if (cached && cached.signature === signature && Array.isArray(cached.compiled)) {
-        return cached.compiled;
+    if (Array.isArray(cached)) {
+        return cached;
     }
 
     const compiled = [];
@@ -730,7 +683,10 @@ function getCompiledKeywordRegexes(rawList) {
         }
     }
 
-    compiledKeywordRegexCache.set(rawList, { signature, compiled });
+    // Compiled settings and content-side rule edits replace list arrays. Cache
+    // by that immutable snapshot identity instead of hashing every rule during
+    // every DOM pass; a replacement array naturally compiles a replacement set.
+    compiledKeywordRegexCache.set(rawList, compiled);
     return compiled;
 }
 
@@ -753,12 +709,11 @@ function getCompiledChannelFilterIndex(settings, listOverride = null) {
     if (!Array.isArray(list) || list.length === 0) return null;
 
     const channelMap = settings.channelMap || {};
-    const signature = getListSignatureForRun(list);
 
     const existing = listOverride
         ? compiledChannelFilterIndexCacheByList.get(list)
         : compiledChannelFilterIndexCache.get(settings);
-    if (existing && existing.sourceList === list && existing.sourceChannelMap === channelMap && existing.sourceSignature === signature) {
+    if (existing && existing.sourceList === list && existing.sourceChannelMap === channelMap) {
         return existing;
     }
 
@@ -874,7 +829,6 @@ function getCompiledChannelFilterIndex(settings, listOverride = null) {
     const index = {
         sourceList: list,
         sourceChannelMap: channelMap,
-        sourceSignature: signature,
         ids,
         handles,
         customUrls,
@@ -4479,10 +4433,6 @@ async function applyDOMFallback(settings, options = {}) {
 
     try {
 
-    window.__filtertubeDomFallbackActiveRun = {
-        signatures: new WeakMap()
-    };
-
     const supportsHasSelector = (() => {
         try {
             return typeof CSS !== 'undefined' && typeof CSS.supports === 'function' && CSS.supports('selector(:has(*))');
@@ -7288,10 +7238,6 @@ async function applyDOMFallback(settings, options = {}) {
         // ignore
     }
     } finally {
-        try {
-            delete window.__filtertubeDomFallbackActiveRun;
-        } catch (e) {
-        }
         runState.running = false;
         if (runState.pending) {
             runState.pending = false;

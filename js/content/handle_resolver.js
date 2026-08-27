@@ -34,10 +34,13 @@ function persistChannelMappings(mappings = []) {
     }
 
     if (!currentSettings || typeof currentSettings !== 'object') return;
-    if (!currentSettings.channelMap || typeof currentSettings.channelMap !== 'object') {
-        currentSettings.channelMap = {};
-    }
-    const map = currentSettings.channelMap;
+    const map = {
+        ...(
+            currentSettings.channelMap && typeof currentSettings.channelMap === 'object'
+                ? currentSettings.channelMap
+                : {}
+        )
+    };
     mappings.forEach(mapping => {
         if (!mapping || !mapping.id || !mapping.handle) return;
         const idKey = mapping.id.toLowerCase();
@@ -45,6 +48,9 @@ function persistChannelMappings(mappings = []) {
         map[idKey] = mapping.handle;
         map[handleKey] = mapping.id;
     });
+    // Replace the map snapshot so identity-keyed channel indexes invalidate
+    // immediately without rescanning every imported rule for a signature.
+    currentSettings.channelMap = map;
 }
 
 function normalizeHandleGlyphs(value) {

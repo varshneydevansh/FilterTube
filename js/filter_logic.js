@@ -2005,28 +2005,33 @@
         _buildCandidate(item, rendererType, wrapperRendererType = null, options = {}) {
             const rules = FILTER_RULES[rendererType] || {};
             const title = this._extractTitle(item, rules);
-            let description = this._extractDescription(item, rules);
+            const shouldExtractSearchMetadata = options && options.extractSearchMetadata === true;
+            let description = shouldExtractSearchMetadata ? this._extractDescription(item, rules) : '';
             const shouldExtractChannelIdentity = options && options.extractChannelIdentity === true;
             const channelInfo = shouldExtractChannelIdentity
                 ? this._extractChannelInfo(item, rules)
                 : this._emptyChannelInfo();
             const collaborators = Array.isArray(channelInfo) ? channelInfo : [channelInfo].filter(Boolean);
             const videoId = this._extractVideoId(item, rules);
-            const cachedVideoMeta = videoId && this.settings?.videoMetaMap?.[videoId] && typeof this.settings.videoMetaMap[videoId] === 'object'
+            const cachedVideoMeta = shouldExtractSearchMetadata && videoId && this.settings?.videoMetaMap?.[videoId] && typeof this.settings.videoMetaMap[videoId] === 'object'
                 ? this.settings.videoMetaMap[videoId]
                 : null;
             if (!description && typeof cachedVideoMeta?.shortDescription === 'string') {
                 description = cachedVideoMeta.shortDescription.trim();
             }
             const playlistId = this._extractPlaylistId(item);
-            const metadataParts = [
-                ...this._collectTextFromPaths(item, rules.channelName),
-                ...this._collectTextFromPaths(item, rules.duration),
-                ...this._collectTextFromPaths(item, rules.publishedTime),
-                ...this._collectTextFromPaths(item, rules.viewCount),
-                ...this._collectTextFromPaths(item, rules.metadataRows),
-                ...this._collectTextFromPaths(item, rules.commentText),
-                ...this._collectTextFromPaths(item, [
+            // Search metadata is comparatively expensive to collect and is not
+            // consulted by channel/video-ID/content policies. Keep the full
+            // extraction path only when a keyword policy (or debug tracing)
+            // can actually consume it.
+            const channelNameParts = shouldExtractSearchMetadata ? this._collectTextFromPaths(item, rules.channelName) : [];
+            const durationParts = shouldExtractSearchMetadata ? this._collectTextFromPaths(item, rules.duration) : [];
+            const publishedTimeParts = shouldExtractSearchMetadata ? this._collectTextFromPaths(item, rules.publishedTime) : [];
+            const viewCountParts = shouldExtractSearchMetadata ? this._collectTextFromPaths(item, rules.viewCount) : [];
+            const metadataRowParts = shouldExtractSearchMetadata ? this._collectTextFromPaths(item, rules.metadataRows) : [];
+            const commentTextParts = shouldExtractSearchMetadata ? this._collectTextFromPaths(item, rules.commentText) : [];
+            const extendedMetadataParts = shouldExtractSearchMetadata
+                ? this._collectTextFromPaths(item, [
                     'metadataText.simpleText',
                     'metadataText.runs',
                     'detailedMetadataSnippets.0.snippetText.simpleText',
@@ -2042,6 +2047,15 @@
                     'accessibility.accessibilityData.label',
                     'accessibilityText'
                 ])
+                : [];
+            const metadataParts = [
+                ...channelNameParts,
+                ...durationParts,
+                ...publishedTimeParts,
+                ...viewCountParts,
+                ...metadataRowParts,
+                ...commentTextParts,
+                ...extendedMetadataParts
             ];
             const channel = collaborators[0] || { name: '', id: '', handle: '', customUrl: '', logo: '' };
             const lowerTitle = title.toLowerCase();
@@ -2073,14 +2087,16 @@
                 playlistId,
                 title,
                 description,
-                tags: [
-                    ...this._collectTextFromPaths(item, ['videoDetails.keywords', 'playerResponse.videoDetails.keywords']),
-                    ...(Array.isArray(cachedVideoMeta?.keywords) ? cachedVideoMeta.keywords : [])
-                ],
+                tags: shouldExtractSearchMetadata
+                    ? [
+                        ...this._collectTextFromPaths(item, ['videoDetails.keywords', 'playerResponse.videoDetails.keywords']),
+                        ...(Array.isArray(cachedVideoMeta?.keywords) ? cachedVideoMeta.keywords : [])
+                    ]
+                    : [],
                 metadataText: metadataParts.join(' ').trim(),
-                durationText: this._collectTextFromPaths(item, rules.duration).join(' '),
-                publishedTimeText: this._collectTextFromPaths(item, rules.publishedTime).join(' '),
-                viewCountText: this._collectTextFromPaths(item, rules.viewCount).join(' '),
+                durationText: durationParts.join(' '),
+                publishedTimeText: publishedTimeParts.join(' '),
+                viewCountText: viewCountParts.join(' '),
                 channel,
                 collaborators,
                 isMix,
@@ -2365,8 +2381,14 @@
 
             const listMode = (this.settings.listMode === 'whitelist') ? 'whitelist' : 'blocklist';
             const needsChannelIdentity = this._hasChannelPolicyRules(listMode);
+            const needsSearchMetadata = this.debugEnabled || [
+                this.settings.filterKeywords,
+                this.settings.whitelistKeywords,
+                this.settings.filterKeywordsComments
+            ].some(list => Array.isArray(list) && list.length > 0);
             const candidate = this._buildCandidate(item, rendererType, unwrappedRenderer.wrapperRendererType, {
-                extractChannelIdentity: needsChannelIdentity
+                extractChannelIdentity: needsChannelIdentity,
+                extractSearchMetadata: needsSearchMetadata
             });
             const title = candidate.title;
             let channelInfo = candidate.collaborators.length > 1 ? candidate.collaborators : candidate.channel;

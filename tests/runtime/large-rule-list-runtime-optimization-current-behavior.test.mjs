@@ -225,6 +225,48 @@ test('hidden-card statistics persist once per synchronous mutation burst', () =>
   assert.equal((incrementBlock.match(/console\.log\(`FilterTube: Saved/g) || []).length, 1);
 });
 
+test('DOM fallback caches compiled rule lists by immutable snapshot identity', () => {
+  const fallback = read('js/content/dom_fallback.js');
+  const resolver = read('js/content/handle_resolver.js');
+
+  assert.doesNotMatch(fallback, /function getListSignatureForRun\(/);
+  assert.doesNotMatch(fallback, /sourceSignature/);
+  assert.match(fallback, /compiledKeywordRegexCache\.get\(rawList\)/);
+  assert.match(fallback, /existing\.sourceList === list && existing\.sourceChannelMap === channelMap/);
+  assert.match(resolver, /currentSettings\.channelMap = map/);
+  assert.doesNotMatch(resolver, /const map = currentSettings\.channelMap;/);
+});
+
+test('channel-only JSON filtering skips unused search metadata extraction', () => {
+  const identity = loadIdentity();
+  const runtime = loadFilterTubeEngine({ identity });
+  const channelId = 'UC1234567890123456789012';
+  const filter = new runtime.engine.YouTubeDataFilter(settings({ filterChannels: [channelId] }));
+  let collections = 0;
+  const originalCollect = filter._collectTextFromPaths.bind(filter);
+  filter._collectTextFromPaths = (...args) => {
+    collections++;
+    return originalCollect(...args);
+  };
+
+  const blocked = filter._shouldBlock(videoRenderer({ channelId }).videoRenderer, 'videoRenderer');
+  assert.equal(blocked, true);
+  assert.equal(collections, 0, 'channel-only policy should not collect keyword-search metadata');
+
+  const keywordFilter = new runtime.engine.YouTubeDataFilter(settings({
+    filterChannels: [channelId],
+    filterKeywords: [{ pattern: 'ordinary', flags: 'i' }]
+  }));
+  let keywordCollections = 0;
+  const keywordOriginalCollect = keywordFilter._collectTextFromPaths.bind(keywordFilter);
+  keywordFilter._collectTextFromPaths = (...args) => {
+    keywordCollections++;
+    return keywordOriginalCollect(...args);
+  };
+  keywordFilter._shouldBlock(videoRenderer({ channelId: 'UC0000000000000000000000' }).videoRenderer, 'videoRenderer');
+  assert.ok(keywordCollections > 0, 'keyword policy must preserve full searchable metadata extraction');
+});
+
 test('Home mutation fallback queues affected cards while structural mutations retain the full pass', () => {
   const bridge = read('js/content_bridge.js');
   const fallback = read('js/content/dom_fallback.js');
