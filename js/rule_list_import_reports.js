@@ -15,6 +15,7 @@
     const ENRICHMENT_JOB_KEY = 'ftBlockTubeEnrichmentJobV1';
     const MAX_REPORTS = 12;
     const MAX_RETAINED_ROWS = 50000;
+    const IMPORTED_SOURCES = new Set(['import', 'managed_channel_list', 'blocktube', 'blocktube-channel-name']);
 
     function text(value) {
         return typeof value === 'string' ? value.trim() : '';
@@ -115,6 +116,20 @@
             && Boolean(text(item.logo));
     }
 
+    function isImportedChannel(channel) {
+        return Boolean(text(channel?.managedListId))
+            || IMPORTED_SOURCES.has(text(channel?.source).toLowerCase());
+    }
+
+    function normalizeSelector(value) {
+        const item = safeObject(value);
+        const managedListId = text(item.managedListId);
+        const sources = [...new Set(safeArray(item.sources).map(source => text(source).toLowerCase()).filter(Boolean))];
+        return managedListId || sources.length
+            ? { managedListId, sources }
+            : null;
+    }
+
     function normalizeTarget(value) {
         const item = safeObject(value);
         return {
@@ -177,6 +192,7 @@
             sourceFormat: text(item.sourceFormat) || 'unknown',
             sourceLabel: text(item.sourceLabel) || 'Imported list',
             sourceUrl: text(item.sourceUrl),
+            selector: normalizeSelector(item.selector),
             targets,
             channels: safeArray(item.channels).map(normalizeEntry),
             issues: safeArray(item.issues).map(normalizeIssue),
@@ -203,6 +219,37 @@
         return normalized.listType === 'whitelist'
             ? safeArray(surface.whitelistChannels)
             : safeArray(surface.channels || surface.blockedChannels);
+    }
+
+    function selectorMatches(channel, selector) {
+        const normalized = normalizeSelector(selector);
+        if (!normalized) return false;
+        if (normalized.managedListId) return text(channel?.managedListId) === normalized.managedListId;
+        return normalized.sources.includes(text(channel?.source).toLowerCase());
+    }
+
+    function resolveReportEntries(report, profiles) {
+        if (report.channels.length || !report.selector) return report.channels;
+        const rows = [];
+        const seen = new Set();
+        report.targets.forEach((target) => {
+            getTargetChannels(profiles, target).forEach((channel) => {
+                if (!selectorMatches(channel, report.selector)) return;
+                const keys = identityKeys(channel);
+                const name = text(channel?.name || channel?.originalInput).toLowerCase();
+                const key = keys[0] || (name ? `name:${name}` : '');
+                if (!key || seen.has(key)) return;
+                seen.add(key);
+                rows.push(normalizeEntry({
+                    ...channel,
+                    entryId: `recovered-${rows.length + 1}`,
+                    sourceRow: 0,
+                    originalValue: channel?.originalInput || channel?.id || channel?.name,
+                    nameOnly: text(channel?.source).toLowerCase() === 'blocktube-channel-name'
+                }, rows.length));
+            });
+        });
+        return rows;
     }
 
     function taskBelongsToTarget(task, target) {
@@ -284,7 +331,8 @@
     function summarize(reportValue, { profiles = {}, job = {} } = {}) {
         const report = normalizeReport(reportValue);
         const contexts = new Map(report.targets.map(target => [targetKey(target), buildTargetContext(profiles, job, target)]));
-        const rows = report.channels.map((entry) => {
+        const entries = resolveReportEntries(report, profiles);
+        const rows = entries.map((entry) => {
             const targetStatuses = report.targets.map((target) => ({
                 target,
                 ...deriveTargetStatus(report, entry, target, contexts.get(targetKey(target)))
@@ -315,6 +363,58 @@
             if (Object.prototype.hasOwnProperty.call(statuses, row.status)) statuses[row.status] += 1;
         });
         return { report, rows, statuses };
+    }
+
+    function createBackfillReports(profilesValue) {
+        const profiles = safeObject(profilesValue);
+        const groups = new Map();
+        const profileMap = safeObject(profiles.profiles);
+        const addTarget = (profileId, profileName, surface, listType, channels) => {
+            safeArray(channels).forEach((channel) => {
+                if (!isImportedChannel(channel)) return;
+                const managedListId = text(channel?.managedListId);
+                const rawSource = text(channel?.source).toLowerCase() || 'import';
+                const source = rawSource.startsWith('blocktube') ? 'blocktube' : rawSource;
+                const groupKey = managedListId ? `list:${managedListId}` : `source:${source}`;
+                if (!groups.has(groupKey)) {
+                    const sourceLabel = text(channel?.managedListSourceLabel)
+                        || (source.startsWith('blocktube') ? 'BlockTube migration' : 'Recovered imported rules');
+                    groups.set(groupKey, {
+                        id: `recovered-${groupKey.replace(/[^a-z0-9_-]+/gi, '-').slice(0, 80)}`,
+                        createdAt: Math.max(1, Number(channel?.managedListImportedAt || channel?.addedAt) || Date.now()),
+                        updatedAt: Date.now(),
+                        label: text(channel?.managedListName) || sourceLabel,
+                        sourceFormat: text(channel?.managedListSourceFormat) || (source.startsWith('blocktube') ? 'blocktube_json_rules' : 'recovered_import'),
+                        sourceLabel,
+                        sourceUrl: text(channel?.managedListSourceUrl),
+                        selector: managedListId
+                            ? { managedListId }
+                            : { sources: source === 'blocktube' ? ['blocktube', 'blocktube-channel-name'] : [source] },
+                        targets: [],
+                        channels: [],
+                        issues: [],
+                        counts: { channels: 0, keywords: 0, videoIds: 0, added: 0, duplicates: 0, skipped: 0 }
+                    });
+                }
+                const report = groups.get(groupKey);
+                const target = normalizeTarget({ profileId, profileName, surface, listType });
+                if (!report.targets.some(item => targetKey(item) === targetKey(target))) report.targets.push(target);
+                report.counts.channels += 1;
+                report.counts.added += 1;
+                report.createdAt = Math.min(report.createdAt, Math.max(1, Number(channel?.managedListImportedAt || channel?.addedAt) || report.createdAt));
+            });
+        };
+        Object.entries(profileMap).forEach(([profileId, profileValue]) => {
+            const profile = safeObject(profileValue);
+            const profileName = text(profile.name) || (profileId === 'default' ? 'Default' : profileId);
+            const main = safeObject(profile.main);
+            const kids = safeObject(profile.kids);
+            addTarget(profileId, profileName, 'main', 'blocklist', main.channels || main.blockedChannels);
+            addTarget(profileId, profileName, 'main', 'whitelist', main.whitelistChannels);
+            addTarget(profileId, profileName, 'kids', 'blocklist', kids.blockedChannels);
+            addTarget(profileId, profileName, 'kids', 'whitelist', kids.whitelistChannels);
+        });
+        return [...groups.values()].map(normalizeReport).sort((a, b) => b.createdAt - a.createdAt).slice(0, MAX_REPORTS);
     }
 
     function createStore({ storageGet, storageSet, maxReports = MAX_REPORTS, maxRetainedRows = MAX_RETAINED_ROWS } = {}) {
@@ -368,6 +468,7 @@
         isCompleteChannel,
         normalizeReport,
         summarize,
+        createBackfillReports,
         createStore
     };
 })(typeof globalThis !== 'undefined' ? globalThis : window);

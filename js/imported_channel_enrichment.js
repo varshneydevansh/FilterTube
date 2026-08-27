@@ -267,6 +267,8 @@
             lastCompletedAt: Number.isFinite(Number(raw.lastCompletedAt))
                 ? Math.floor(Number(raw.lastCompletedAt))
                 : 0,
+            initialTotal: Math.max(0, Math.floor(Number(raw.initialTotal) || 0)),
+            completed: Math.max(0, Math.floor(Number(raw.completed) || 0)),
             updatedAt: Number.isFinite(Number(raw.updatedAt)) ? Math.floor(Number(raw.updatedAt)) : 0
         };
     }
@@ -340,6 +342,8 @@
                 lastError: normalized.lastError,
                 lastErrorAt: normalized.lastErrorAt,
                 lastCompletedAt: normalized.lastCompletedAt,
+                initialTotal: Math.max(normalized.initialTotal, pending + (inFlight ? 1 : 0) + normalized.completed),
+                completed: normalized.completed,
                 nextRunAt: normalized.nextRunAt,
                 updatedAt: normalized.updatedAt,
                 minDelayMs,
@@ -499,6 +503,25 @@
                 safeArray(kids.whitelistChannels).forEach(channel => addCandidate(channel, 'kids', 'whitelist', targetProfileId));
             });
             return candidates;
+        };
+
+        const countImportedRows = (profiles, profileIds) => {
+            const { profileMap } = getProfileContext(profiles);
+            let count = 0;
+            safeArray(profileIds).forEach((profileId) => {
+                const profile = safeObject(profileMap[profileId]);
+                const main = safeObject(profile.main);
+                const kids = safeObject(profile.kids);
+                [
+                    ...safeArray(main.channels),
+                    ...safeArray(main.whitelistChannels),
+                    ...safeArray(kids.blockedChannels),
+                    ...safeArray(kids.whitelistChannels)
+                ].forEach((channel) => {
+                    if (isImportedSource(channel) && getLookup(channel)) count += 1;
+                });
+            });
+            return count;
         };
 
         const recoveredJob = (job) => {
@@ -753,6 +776,7 @@
                 });
             } else {
                 job.lastCompletedAt = now();
+                job.completed = Math.max(0, Number(job.completed) || 0) + 1;
             }
 
             if (!job.pending.length) {
@@ -818,6 +842,9 @@
                 : (allProfiles ? Object.keys(profileMap) : [activeProfileId]);
             const candidates = collectCandidates(profiles, scope, false);
             let merged = mergeJob(stored, candidates, scope, profiles);
+            const importedTotal = countImportedRows(profiles, scope);
+            merged.initialTotal = Math.max(merged.initialTotal, importedTotal, merged.pending.length + (merged.inFlight ? 1 : 0));
+            merged.completed = Math.max(merged.completed, merged.initialTotal - merged.pending.length - (merged.inFlight ? 1 : 0));
             if (unpause) {
                 merged.paused = false;
                 merged.pausedReason = '';

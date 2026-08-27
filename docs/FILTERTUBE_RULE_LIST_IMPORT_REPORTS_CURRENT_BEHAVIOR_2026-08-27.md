@@ -44,6 +44,13 @@ reporting model as other list formats.
 10. Reports remain available from Settings and from Main/Kids Channel
     Management notices. Closing the dashboard does not erase the report or stop
     the background-owned queue.
+11. Existing imported rows created before report storage receive compact
+    recovered reports. Recovery selects the authoritative profile rows by
+    managed-list ID or import source instead of copying a 15,000-row list into
+    report storage.
+12. An open report refreshes its derived state every ten seconds. Visible
+    Main/Kids channel rows rerender when imported names, handles/custom URLs, or
+    avatars change, without requiring a hard dashboard refresh.
 
 ## Import report states
 
@@ -62,6 +69,13 @@ renders at most 200 rows at once and offers another 200 on demand, preventing a
 large report from recreating the full-list DOM lag. Unresolved rows can be
 downloaded as CSV. Reports retain the latest 12 imports subject to a 50,000-row
 history budget; the newest report is always retained.
+
+Queue/report-only storage writes do not reload the full profile. Imported
+metadata writes carry a small revision marker and the completed channel row, so
+the active dashboard or popup patches that row in memory and rerenders only its
+bounded visible list. Other extension contexts avoid repeatedly parsing the
+large channel list. Imported enrichment also avoids rewriting legacy list
+projections; V4 remains authoritative.
 
 ## Parser behavior
 

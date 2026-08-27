@@ -108,6 +108,7 @@ const StateManager = (() => {
         channelMap: {},
         theme: 'light',
         themeSource: 'system',
+        activeProfileId: 'default',
         isLoaded: false,
         kids: {
             blockedKeywords: [],
@@ -355,6 +356,9 @@ const StateManager = (() => {
         };
 
         const activeProfileFromV4 = pickActiveProfileFromV4();
+        state.activeProfileId = typeof profilesV4?.activeProfileId === 'string' && profilesV4.activeProfileId.trim()
+            ? profilesV4.activeProfileId.trim()
+            : 'default';
         if (activeProfileFromV4 && activeProfileFromV4.settings && typeof activeProfileFromV4.settings === 'object') {
             state.syncKidsToMain = !!activeProfileFromV4.settings.syncKidsToMain;
         }
@@ -686,22 +690,76 @@ const StateManager = (() => {
 
     function computeChannelSignature() {
         const mainChannels = Array.isArray(state.channels) ? state.channels : [];
+        const mainWhitelistChannels = Array.isArray(state.whitelistChannels) ? state.whitelistChannels : [];
         const kids = state.kids || {};
         const kidsChannels = Array.isArray(kids.blockedChannels) ? kids.blockedChannels : [];
+        const kidsWhitelistChannels = Array.isArray(kids.whitelistChannels) ? kids.whitelistChannels : [];
+        let hash = 2166136261;
+        let count = 0;
+        const addRows = (rows, scope) => rows.forEach((channel) => {
+            const value = [
+                scope,
+                channelEnrichmentKey(channel, scope),
+                channel?.name,
+                channel?.handle,
+                channel?.canonicalHandle,
+                channel?.customUrl,
+                channel?.logo,
+                channel?.managedListId,
+                channel?.managedListName,
+                channel?.source
+            ].map(item => String(item || '')).join('\u001f');
+            count += 1;
+            for (let index = 0; index < value.length; index += 1) {
+                hash ^= value.charCodeAt(index);
+                hash = Math.imul(hash, 16777619);
+            }
+        });
+        addRows(mainChannels, 'main:block');
+        addRows(mainWhitelistChannels, 'main:allow');
+        addRows(kidsChannels, 'kids:block');
+        addRows(kidsWhitelistChannels, 'kids:allow');
+        return `${count}:${hash >>> 0}`;
+    }
 
-        const mainSig = mainChannels
-            .map(ch => channelEnrichmentKey(ch, 'main'))
-            .filter(Boolean)
-            .sort()
-            .join('|');
-
-        const kidsSig = kidsChannels
-            .map(ch => channelEnrichmentKey(ch, 'kids'))
-            .filter(Boolean)
-            .sort()
-            .join('|');
-
-        return `${mainSig}|||${kidsSig}`;
+    function applyImportedChannelMetadataPatch(revisionValue) {
+        const revision = revisionValue && typeof revisionValue === 'object' && !Array.isArray(revisionValue)
+            ? revisionValue
+            : {};
+        const targetProfileId = typeof revision.targetProfileId === 'string' ? revision.targetProfileId.trim() : '';
+        const channel = revision.channel && typeof revision.channel === 'object' && !Array.isArray(revision.channel)
+            ? revision.channel
+            : null;
+        if (!channel || !targetProfileId || targetProfileId !== state.activeProfileId) return false;
+        const surface = revision.surface === 'kids' ? 'kids' : 'main';
+        const listType = revision.listType === 'whitelist' ? 'whitelist' : 'blocklist';
+        const list = surface === 'kids'
+            ? (listType === 'whitelist' ? state.kids?.whitelistChannels : state.kids?.blockedChannels)
+            : (listType === 'whitelist' ? state.whitelistChannels : state.channels);
+        if (!Array.isArray(list)) return false;
+        const incomingIds = new Set([
+            channel.id,
+            ...(Array.isArray(channel.alternateIds) ? channel.alternateIds : []),
+            channel.handle,
+            channel.handleDisplay,
+            channel.canonicalHandle,
+            channel.customUrl,
+            channel.originalInput
+        ].map(value => String(value || '').trim().toLowerCase()).filter(Boolean));
+        const index = list.findIndex((row) => [
+            row?.id,
+            ...(Array.isArray(row?.alternateIds) ? row.alternateIds : []),
+            row?.handle,
+            row?.handleDisplay,
+            row?.canonicalHandle,
+            row?.customUrl,
+            row?.originalInput
+        ].some(value => incomingIds.has(String(value || '').trim().toLowerCase())));
+        if (index < 0) return false;
+        list[index] = channel;
+        const eventChannel = { ...channel, __ftMetadataOnly: true };
+        notifyListeners(surface === 'kids' ? 'kidsChannelUpdated' : 'channelUpdated', eventChannel);
+        return true;
     }
 
     function queueChannelForEnrichment(channel, profile = 'main') {
@@ -2738,6 +2796,26 @@ const StateManager = (() => {
 
                 const changedKeys = Object.keys(changes || {});
                 if (changedKeys.length === 1 && changedKeys[0] === 'channelMap') {
+                    return;
+                }
+                const importedMetadataOnly = Boolean(changes.ftImportedChannelMetadataRevision)
+                    && changedKeys.every(key => [
+                        'ftProfilesV4',
+                        'ftImportedChannelMetadataRevision',
+                        'ftBlockTubeEnrichmentJobV1'
+                    ].includes(key));
+                const isDashboardPage = /\/html\/tab-view\.html$/i.test(window.location?.pathname || '');
+                if (importedMetadataOnly) {
+                    const revision = changes.ftImportedChannelMetadataRevision?.newValue;
+                    if (applyImportedChannelMetadataPatch(revision)) return;
+                    if (!isDashboardPage) return;
+                }
+                const operationalKeys = new Set([
+                    'ftBlockTubeEnrichmentJobV1',
+                    'ftRuleListImportReportsV1',
+                    'ftImportedChannelMetadataRevision'
+                ]);
+                if (changedKeys.length > 0 && changedKeys.every(key => operationalKeys.has(key))) {
                     return;
                 }
 

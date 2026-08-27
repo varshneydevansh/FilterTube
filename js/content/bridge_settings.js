@@ -1876,6 +1876,11 @@ function filterTubeStripMetadataOnlyChannelLists(value) {
 function filterTubeIsMetadataOnlySettingsChange(changes) {
     const keys = Object.keys(changes || {});
     if (!keys.length) return false;
+    if (changes.ftImportedChannelMetadataRevision && keys.every(key => [
+        'ftProfilesV4',
+        'ftImportedChannelMetadataRevision',
+        'ftBlockTubeEnrichmentJobV1'
+    ].includes(key))) return true;
     const allowedKeys = new Set(['ftProfilesV4', 'filterChannels', 'uiChannels', 'channelMap']);
     if (keys.some(key => !allowedKeys.has(key))) return false;
     if (!changes.ftProfilesV4 && !changes.filterChannels) return false;

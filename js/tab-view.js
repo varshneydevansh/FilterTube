@@ -4739,6 +4739,14 @@ document.addEventListener('DOMContentLoaded', async () => {
         return 'The next lookup is being rescheduled by the background worker.';
     }
 
+    function formatImportedChannelEnrichmentDuration(seconds) {
+        const totalMinutes = Math.max(1, Math.ceil(Number(seconds) / 60));
+        if (totalMinutes < 60) return `${totalMinutes} min`;
+        const hours = Math.floor(totalMinutes / 60);
+        const minutes = totalMinutes % 60;
+        return minutes ? `${hours} hr ${minutes} min` : `${hours} hr`;
+    }
+
     async function refreshImportedChannelEnrichmentStatus() {
         if (!importedChannelEnrichmentNotice || !importedChannelEnrichmentStatus) return null;
         const requestId = ++importedChannelEnrichmentStatusRequest;
@@ -4774,9 +4782,12 @@ document.addEventListener('DOMContentLoaded', async () => {
         const blockedReason = typeof status?.blockedReason === 'string' ? status.blockedReason : '';
         const minDelaySeconds = Math.max(1, Math.round((Number(status?.minDelayMs) || 7000) / 1000));
         const maxDelaySeconds = Math.max(minDelaySeconds, Math.round((Number(status?.maxDelayMs) || 15000) / 1000));
-        const progress = inFlight
-            ? ` ${pending ? `${pending} ${pluralize(pending, 'lookup')} waiting.` : 'No additional lookups are waiting.'}`
-            : ` ${pluralize(total, 'lookup')} queued.`;
+        const initialTotal = Math.max(total, Number(status?.initialTotal) || 0);
+        const completed = Math.max(0, Math.min(initialTotal, Number(status?.completed) || (initialTotal - total)));
+        const progressPercent = initialTotal ? Math.round((completed / initialTotal) * 100) : 0;
+        const eta = blockedReason || paused
+            ? 'Paused'
+            : `${formatImportedChannelEnrichmentDuration(total * minDelaySeconds)}–${formatImportedChannelEnrichmentDuration(total * maxDelaySeconds)}`;
         const lifecycleMessage = blockedReason === 'profile_locked'
             ? 'Metadata completion is waiting because this profile is locked. Unlock the profile to continue.'
             : blockedReason
@@ -4787,13 +4798,20 @@ document.addEventListener('DOMContentLoaded', async () => {
         const scheduleMessage = blockedReason || paused
             ? ''
             : `While the background is awake, FilterTube spaces lookups randomly between ${minDelaySeconds} and ${maxDelaySeconds} seconds; it never sends the whole list as a burst. ${formatImportedChannelEnrichmentWait(status?.nextRunAt)}`;
-        importedChannelEnrichmentStatus.textContent = [
-            `Channel details are still being completed: ${total} imported channel ${total === 1 ? 'lookup remains.' : 'lookups remain.'}${progress}`,
-            lifecycleMessage,
-            scheduleMessage,
-            'The saved rule is active immediately from its identifier. Each lookup asks YouTube for the name, handle or custom URL, and avatar together. If YouTube omits a field in that response, FilterTube keeps the partial result and retries later instead of sending a burst of requests. A name can appear first because the imported file may already contain it (BlockTube often stores it in a context comment); “Not fetched” means that imported identifier is still waiting.',
-            'Name-only rules, including BlockTube name-only rules, have no unique UC ID and stay name-only.'
-        ].join(' ');
+        importedChannelEnrichmentStatus.innerHTML = `
+            <div class="imported-enrichment-heading">
+                <strong>Completing imported channel details</strong>
+                <span>${paused ? 'Paused' : (blockedReason ? 'Waiting' : (inFlight ? 'Fetching now' : 'Running'))}</span>
+            </div>
+            <div class="imported-enrichment-metrics">
+                <div><b>${completed.toLocaleString()}</b><span>Completed${initialTotal ? ` of ${initialTotal.toLocaleString()}` : ''}</span></div>
+                <div><b>${total.toLocaleString()}</b><span>Remaining</span></div>
+                <div><b>${eta}</b><span>Estimated active time</span></div>
+            </div>
+            <div class="imported-enrichment-progress" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="${progressPercent}"><span style="width:${progressPercent}%"></span></div>
+            <p>${lifecycleMessage}</p>
+            <small>${scheduleMessage} Valid identifiers are filtering now; names, handles/custom URLs, and avatars fill in together. Failed or partial responses stay visible in Import Reports and retry without stopping fresh rows.</small>
+        `;
         importedChannelEnrichmentNotice.hidden = false;
         importedChannelEnrichmentNotice.setAttribute('aria-busy', inFlight ? 'true' : 'false');
         if (importedChannelEnrichmentToggle) {
@@ -5008,11 +5026,16 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     async function loadRuleListReportRuntime() {
         const io = window.FilterTubeIO || {};
-        const [reports, profiles, storedJob] = await Promise.all([
+        let [reports, profiles, storedJob] = await Promise.all([
             ruleListReportStore?.read?.() || Promise.resolve([]),
             typeof io.loadProfilesV4 === 'function' ? io.loadProfilesV4().catch(() => profilesV4Cache || {}) : Promise.resolve(profilesV4Cache || {}),
             readRuleListReportStorage([ruleListReportApi?.ENRICHMENT_JOB_KEY || 'ftBlockTubeEnrichmentJobV1']).catch(() => ({}))
         ]);
+        if (!safeArray(reports).length && typeof ruleListReportApi?.createBackfillReports === 'function') {
+            const recovered = ruleListReportApi.createBackfillReports(profiles);
+            for (const report of recovered) await ruleListReportStore.save(report);
+            if (recovered.length) reports = await ruleListReportStore.read();
+        }
         const jobKey = ruleListReportApi?.ENRICHMENT_JOB_KEY || 'ftBlockTubeEnrichmentJobV1';
         return { reports: safeArray(reports), profiles: profiles || {}, job: safeObject(storedJob?.[jobKey]) };
     }
@@ -5068,7 +5091,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             UIComponents.showToast('Import reports are unavailable', 'error');
             return;
         }
-        const runtime = await loadRuleListReportRuntime();
+        let runtime = await loadRuleListReportRuntime();
         if (!runtime.reports.length) {
             UIComponents.showToast('No saved rule-list import reports yet', 'info');
             return;
@@ -5197,7 +5220,23 @@ document.addEventListener('DOMContentLoaded', async () => {
         statusSelect.addEventListener('change', resetAndRender);
         search.addEventListener('input', resetAndRender);
         downloadBtn.addEventListener('click', () => activeSummary && downloadRuleListImportReportCsv(activeSummary));
-        const close = () => overlay.remove();
+        const liveRefreshTimer = setInterval(async () => {
+            if (!document.body.contains(overlay)) return;
+            try {
+                const selectedReportId = reportSelect.value;
+                runtime = await loadRuleListReportRuntime();
+                if (!runtime.reports.length) return;
+                if (!runtime.reports.some(report => report.id === selectedReportId)) {
+                    reportSelect.value = runtime.reports[0].id;
+                }
+                render();
+            } catch (error) {
+            }
+        }, 10000);
+        const close = () => {
+            clearInterval(liveRefreshTimer);
+            overlay.remove();
+        };
         closeBtn.addEventListener('click', close);
         overlay.addEventListener('click', event => event.target === overlay && close());
         render();
@@ -24142,14 +24181,19 @@ document.addEventListener('DOMContentLoaded', async () => {
         }
 
         if (eventType === 'channelUpdated') {
-            const channelOnlyToggleUpdate = !!(data && (
+            const metadataOnlyChannelUpdate = data?.__ftMetadataOnly === true;
+            const channelOnlyToggleUpdate = !metadataOnlyChannelUpdate && !!(data && (
                 Object.prototype.hasOwnProperty.call(data, 'filterAll') ||
                 Object.prototype.hasOwnProperty.call(data, 'filterAllComments')
             ));
-            if (!channelOnlyToggleUpdate) {
+            const patchedVisibleChannel = !channelOnlyToggleUpdate
+                && RenderEngine?.patchChannelListItem?.(channelListEl, data) === true;
+            if (!channelOnlyToggleUpdate && !patchedVisibleChannel) {
                 renderChannels();
             }
-            renderKeywords(); // Re-render keywords in case channel-derived keywords changed
+            if (!metadataOnlyChannelUpdate) {
+                renderKeywords(); // Re-render keywords in case channel-derived keywords changed
+            }
             updateStats();
             renderListModeControls();
             syncSubscriptionsImportControls();
@@ -24169,14 +24213,24 @@ document.addEventListener('DOMContentLoaded', async () => {
         }
 
         if (eventType === 'kidsChannelUpdated') {
-            const kidsChannelOnlyToggleUpdate = !!(data && (
+            const metadataOnlyKidsChannelUpdate = data?.__ftMetadataOnly === true;
+            const kidsChannelOnlyToggleUpdate = !metadataOnlyKidsChannelUpdate && !!(data && (
                 Object.prototype.hasOwnProperty.call(data, 'filterAll') ||
                 Object.prototype.hasOwnProperty.call(data, 'filterAllComments')
             ));
-            if (!kidsChannelOnlyToggleUpdate) {
+            const patchedVisibleKidsChannel = !kidsChannelOnlyToggleUpdate
+                && RenderEngine?.patchChannelListItem?.(kidsChannelListEl, data) === true;
+            if (!kidsChannelOnlyToggleUpdate && !patchedVisibleKidsChannel) {
                 renderKidsChannels();
             }
-            renderKidsKeywords();
+            const currentState = StateManager.getState();
+            const shouldPatchSyncedMain = !kidsChannelOnlyToggleUpdate
+                && currentState?.syncKidsToMain === true
+                && currentState?.kids?.mode === currentState?.mode;
+            const patchedVisibleSyncedMainChannel = shouldPatchSyncedMain
+                && RenderEngine?.patchChannelListItem?.(channelListEl, data) === true;
+            if (shouldPatchSyncedMain && !patchedVisibleSyncedMainChannel) renderChannels();
+            if (!metadataOnlyKidsChannelUpdate) renderKidsKeywords();
             updateStats();
             renderListModeControls();
         }

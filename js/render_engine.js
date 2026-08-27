@@ -78,6 +78,7 @@ const RenderEngine = (() => {
         if (container) {
             container.__ftKeywordRenderTaskId = 0;
             container.__ftChannelRenderTaskId = 0;
+            container.__ftPatchChannelListItem = null;
         }
         cancelVirtualList(container);
     }
@@ -95,7 +96,51 @@ const RenderEngine = (() => {
             handleScroll: null,
             start: -1,
             end: -1,
-            rows: new Map()
+            rows: new Map(),
+            replaceMatchingItem: (matcher, nextValue, renderReplacement) => {
+                if (state.disposed || typeof matcher !== 'function' || typeof renderReplacement !== 'function') return false;
+                for (const [index, currentItem] of state.rows.entries()) {
+                    const currentValue = list[index];
+                    if (!matcher(currentValue, index)) continue;
+
+                    let nextItem = null;
+                    try {
+                        const preservedValue = currentValue?.__ftFromKids
+                            ? { ...nextValue, __ftFromKids: true }
+                            : nextValue;
+                        list[index] = preservedValue;
+                        nextItem = renderReplacement(preservedValue, index, currentValue);
+                    } catch (error) {
+                        list[index] = currentValue;
+                        return false;
+                    }
+                    if (!(nextItem instanceof Node)) {
+                        list[index] = currentValue;
+                        return false;
+                    }
+                    if (nextItem.dataset) nextItem.dataset.filtertubeVirtualIndex = String(index);
+
+                    const parent = currentItem?.parentNode;
+                    if (parent && typeof parent.replaceChild === 'function') {
+                        parent.replaceChild(nextItem, currentItem);
+                    } else if (parent && Array.isArray(parent.children)) {
+                        const childIndex = parent.children.indexOf(currentItem);
+                        if (childIndex < 0) {
+                            list[index] = currentValue;
+                            return false;
+                        }
+                        parent.children[childIndex] = nextItem;
+                        nextItem.parentNode = parent;
+                        currentItem.parentNode = null;
+                    } else {
+                        list[index] = currentValue;
+                        return false;
+                    }
+                    state.rows.set(index, nextItem);
+                    return true;
+                }
+                return false;
+            }
         };
 
         const topSpacer = document.createElement('div');
@@ -321,7 +366,7 @@ const RenderEngine = (() => {
             showSearch = false,
             showSort = false,
             minimal = false,
-            virtualize = !minimal,
+            virtualize = true,
             searchValue = '',
             sortValue = 'newest',
             dateFrom = null,
@@ -462,7 +507,7 @@ const RenderEngine = (() => {
 
         if (virtualize && displayKeywords.length > LARGE_LIST_VIRTUALIZATION_THRESHOLD) {
             renderWindowedList(container, displayKeywords, renderKeywordRow, {
-                itemHeight: 72,
+                itemHeight: minimal ? 48 : 72,
                 overscan: LARGE_LIST_OVERSCAN
             });
             return;
@@ -841,7 +886,7 @@ const RenderEngine = (() => {
             showSort = false,
             showNodeMapping = false,
             minimal = false,
-            virtualize = !minimal,
+            virtualize = true,
             searchValue = '',
             sortValue = 'newest',
             dateFrom = null,
@@ -1021,9 +1066,35 @@ const RenderEngine = (() => {
             });
         };
 
+        // Metadata completion changes identity decoration, not list membership or
+        // order. Keep large lists responsive by replacing only a visible row. A
+        // search or alphabetical sort can change membership/order, so those
+        // views deliberately fall back to their normal full render path.
+        container.__ftPatchChannelListItem = (updatedChannel) => {
+            if (!virtualize
+                || displayChannels.length <= LARGE_LIST_VIRTUALIZATION_THRESHOLD
+                || !updatedChannel
+                || searchValue
+                || (showSort && sortValue === 'az')) {
+                return false;
+            }
+            const updatedKey = deriveChannelKey(updatedChannel);
+            if (!updatedKey) return false;
+            const isCurrentListRow = displayChannels.some(channelItem => deriveChannelKey(channelItem) === updatedKey);
+            if (!isCurrentListRow) return true;
+            const virtualState = container.__ftVirtualListState;
+            if (!virtualState?.replaceMatchingItem) return false;
+            virtualState.replaceMatchingItem(
+                currentChannel => deriveChannelKey(currentChannel) === updatedKey,
+                updatedChannel,
+                nextChannel => renderChannelRow(nextChannel)
+            );
+            return true;
+        };
+
         if (virtualize && displayChannels.length > LARGE_LIST_VIRTUALIZATION_THRESHOLD) {
             renderWindowedList(container, displayChannels, renderChannelRow, {
-                itemHeight: showNodeMapping ? 136 : 80,
+                itemHeight: minimal ? 48 : (showNodeMapping ? 136 : 80),
                 overscan: LARGE_LIST_OVERSCAN
             });
             return;
@@ -1342,6 +1413,15 @@ const RenderEngine = (() => {
             infoGroup.appendChild(createPillBadge({
                 text: `List: ${managedListName}`,
                 title: 'This channel came from an imported parent-approved channel list',
+                variantClass: 'badge-variant-managed-list'
+            }));
+        } else if (['import', 'managed_channel_list', 'blocktube', 'blocktube-channel-name'].includes(String(channel?.source || '').trim().toLowerCase())) {
+            const importedSource = String(channel?.source || '').trim().toLowerCase();
+            infoGroup.appendChild(createPillBadge({
+                text: importedSource.startsWith('blocktube') ? 'Imported: BlockTube' : 'Imported by user',
+                title: importedSource.startsWith('blocktube')
+                    ? 'This channel rule came from a BlockTube migration'
+                    : 'This channel rule came from a user-approved imported list',
                 variantClass: 'badge-variant-managed-list'
             }));
         }
@@ -1715,6 +1795,15 @@ const RenderEngine = (() => {
         return deleteBtn;
     }
 
+    function patchChannelListItem(container, channel) {
+        if (!container || !channel || typeof container.__ftPatchChannelListItem !== 'function') return false;
+        try {
+            return container.__ftPatchChannelListItem(channel) === true;
+        } catch (error) {
+            return false;
+        }
+    }
+
     // ============================================================================
     // PUBLIC API
     // ============================================================================
@@ -1722,6 +1811,7 @@ const RenderEngine = (() => {
     return {
         renderKeywordList,
         renderChannelList,
+        patchChannelListItem,
         createKeywordListItem,
         createChannelListItem
     };

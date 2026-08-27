@@ -46,6 +46,12 @@ Closing the dashboard does not stop an unprotected queue. Browser shutdown or se
 
 The import confirmation and rule-list guidance now tell the user that metadata completion happens in the extension background, that large lists can take time, and that closing the dashboard does not stop the queue. The live status notice reports pending/in-flight counts, timing caveats, lock/block state, and the Pause/Resume action. Each import also saves an exact report with source rows, selected Main/Kids targets, skipped reasons, name-only boundaries, retry state, and a bounded unresolved-row CSV export.
 
+The live notice separates completed, remaining, estimated active processing
+time, progress, and next-lookup state. Its estimate is the 7–15 second pacing
+range; browser sleep and per-row retries can extend wall-clock time. Existing
+imports created before reports were introduced are recovered from saved row
+provenance without copying the full list into report storage.
+
 ## Verification in this worktree
 
 - `tests/runtime/imported-channel-enrichment-background-worker-current-behavior.test.mjs` covers startup discovery, 7–15 second jitter, coarse alarm scheduling, pause/resume, interrupted-task recovery, profile-lock blocking, isolated retry backoff, and recovery from the old queue-wide retry timestamp.

@@ -563,7 +563,9 @@ test('import and profile-switch paths preserve the normal post-entry enrichment 
   assert.match(tabViewSource, /randomized 7–15 second interval/);
   assert.match(tabViewSource, /extension background/);
   assert.match(tabViewSource, /Pause metadata completion/);
-  assert.match(tabViewSource, /Name-only rules, including BlockTube name-only rules, have no unique UC ID/);
+  assert.match(tabViewSource, /Estimated active time/);
+  assert.match(tabViewSource, /Completing imported channel details/);
+  assert.match(tabViewSource, /Failed or partial responses stay visible in Import Reports/);
   assert.match(tabViewSource, /A failed row retries after about 2 minutes/);
   assert.match(tabViewSource, /backs off up to 30 minutes without pausing fresh rows/);
   assert.match(tabViewSource, /older queue timing is being corrected/);
@@ -579,6 +581,9 @@ test('import and profile-switch paths preserve the normal post-entry enrichment 
   assert.match(backgroundSource, /FilterTube_StartImportedChannelEnrichment/);
   assert.match(backgroundSource, /FilterTube_PauseImportedChannelEnrichment/);
   assert.match(backgroundSource, /importedChannelEnrichmentScheduler/);
+  assert.match(backgroundSource, /ftImportedChannelMetadataRevision/);
+  assert.match(backgroundSource, /channel: finalChannelData/);
+  assert.match(backgroundSource, /shouldProjectImportedMetadataToLegacy/);
   assert.match(backgroundSource, /alarms\.onAlarm/);
   assert.match(helperSource, /DEFAULT_MIN_DELAY_MS = 7000/);
   assert.match(helperSource, /DEFAULT_MAX_DELAY_MS = 15000/);
@@ -591,4 +596,12 @@ test('import and profile-switch paths preserve the normal post-entry enrichment 
   assert.match(manifestSources.at(-1), /js\/imported_channel_enrichment\.js/);
   assert.match(stateManagerSource, /FilterTube_StartImportedChannelEnrichment/);
   assert.match(stateManagerSource, /explicitResumeImportedChannelEnrichment/);
+  assert.match(stateManagerSource, /importedMetadataOnly/);
+  assert.match(stateManagerSource, /applyImportedChannelMetadataPatch/);
+  assert.match(stateManagerSource, /__ftMetadataOnly: true/);
+  assert.match(tabViewSource, /metadataOnlyChannelUpdate/);
+  assert.match(tabViewSource, /metadataOnlyKidsChannelUpdate/);
+  assert.match(tabViewSource, /if \(!metadataOnlyChannelUpdate\) \{\s+renderKeywords\(\);/);
+  assert.match(tabViewSource, /if \(!metadataOnlyKidsChannelUpdate\) renderKidsKeywords\(\);/);
+  assert.match(stateManagerSource, /ftRuleListImportReportsV1/);
 });

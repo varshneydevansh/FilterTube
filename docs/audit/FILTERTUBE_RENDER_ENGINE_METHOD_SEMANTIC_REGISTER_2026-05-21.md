@@ -1,7 +1,8 @@
 # FilterTube Render Engine Method Semantic Register - Current Behavior - 2026-05-21
 
 Status: current-behavior register. Runtime behavior now includes channel source
-filtering and managed-list source badges for parent-facing channel visibility.
+filtering, imported provenance badges, bounded popup lists, and incremental
+metadata-row patching for parent-facing channel visibility.
 
 This register promotes `js/render_engine.js` from representative UI/render
 tokens to a source-derived method inventory. It covers the popup/tab-view list
@@ -21,20 +22,20 @@ list-mode, or performance behavior changes.
 
 ```text
 source file: js/render_engine.js
-source split lines: 1734
-source wc -l: 1733
-source bytes: 75413
-source sha256: 6c3950d03e2ddf1b3327cdd1c6a88c5ff216c564e45f8e3e2f0bc3db4b61d1bd
-broad lexical callable matches: 154
-IIFE-scoped declarations: 47
-plain function declarations: 42
+source split lines: 1824
+source wc -l: 1823
+source bytes: 80085
+source sha256: 8b61423073f9ce8637653615d50c674a79298c23e59b31793ff867a2e953fd6f
+broad lexical callable matches: 157
+IIFE-scoped declarations: 48
+plain function declarations: 43
 const arrow helper declarations: 5
 async function declarations: 0
-public API entries: 4
+public API entries: 5
 semantic method groups: 6
-accepted IIFE-scoped declaration rows: 47
-semantic method rows promoted: 47
-control-flow lexical artifacts: 96 (`if`: 95, `while`: 1)
+accepted IIFE-scoped declaration rows: 48
+semantic method rows promoted: 48
+control-flow lexical artifacts: 98 (`if`: 97, `while`: 1)
 local/render callback declarations held outside this IIFE method register: 11
 row-action listener sites: 11
 direct StateManager optional calls: 26
@@ -47,7 +48,7 @@ innerHTML writes: 12
 setAttribute calls: 24
 querySelector calls: 0
 executable current-behavior probes: 9
-runtime behavior changed: yes - Main and Kids channel source filter, managed-list badge visibility, and bounded large-list rendering
+runtime behavior changed: yes - Main and Kids source badges, bounded popup/dashboard rendering, and visible-row metadata patching
 ```
 
 ## Method Group Counts
@@ -55,7 +56,7 @@ runtime behavior changed: yes - Main and Kids channel source filter, managed-lis
 ```text
 badgeAndSourceDecoration: 5
 channelDisplayIdentityHelpers: 9
-channelRenderingAndRowActions: 7
+channelRenderingAndRowActions: 8
 collaborationGrouping: 3
 dependencyAndSchedulingHelpers: 12
 keywordRenderingAndRowActions: 11
@@ -69,7 +70,7 @@ keywordRenderingAndRowActions: 11
 | `badgeAndSourceDecoration` | 5 | Creates source badges, Kids sync badges, source classes, and collaboration badge DOM. | Display contract, localization/accessibility proof, source-class meaning, class/style ownership, and negative visual-regression fixtures. |
 | `channelDisplayIdentityHelpers` | 9 | Decodes and normalizes handles/custom URLs, creates YouTube channel links, detects topic channels, derives mapping arrows, and formats channel display identity. | Identity confidence, URL safety, topic-channel policy, mapping provenance, display-versus-rule distinction, and negative identity fixtures. |
 | `keywordRenderingAndRowActions` | 11 | Chooses keyword source by profile/list mode, merges synced Kids entries, filters/sorts/date-filters, writes empty states, renders rows or a bounded large-list window, and binds exact/comment/delete actions. | Visible-row parity, Main/Kids mode fixtures, callback-vs-StateManager authority, row-action mutation report, no-rule row behavior, keyboard accessibility proof, and variable-height window accuracy. |
-| `channelRenderingAndRowActions` | 7 | Chooses channel source by profile/list mode, merges synced Kids entries, filters/sorts/date-filters, renders large lists through a bounded scroll window or smaller lists through idle batches, renders minimal/full rows, and binds delete/Filter All actions. | Idle work budget, stale batch/virtual-window cancellation, list-index stability, spacer geometry, whitelist spacer policy, callback-vs-StateManager authority, and large-list performance fixtures. |
+| `channelRenderingAndRowActions` | 8 | Chooses channel source by profile/list mode, merges synced Kids entries, filters/sorts/date-filters, renders large lists through a bounded scroll window or smaller lists through idle batches, patches visible metadata rows, renders minimal/full rows, and binds delete/Filter All actions. | Idle work budget, stale batch/virtual-window cancellation, list-index stability, spacer geometry, whitelist spacer policy, callback-vs-StateManager authority, and large-list performance fixtures. |
 | `collaborationGrouping` | 3 | Groups channels by collaboration id, compares collaborator identity, and builds present/missing collaboration metadata for row badges. | Collaboration identity policy, partial-group display proof, missing-member negative fixtures, and cross-feature row-action proof. |
 
 ## Current Method Inventory
@@ -86,49 +87,51 @@ keywordRenderingAndRowActions: 11
 | 51 | `function` | `getListGap` | `dependencyAndSchedulingHelpers` |
 | 62 | `function` | `cancelVirtualList` | `dependencyAndSchedulingHelpers` |
 | 75 | `function` | `cancelContainerRenderTasks` | `dependencyAndSchedulingHelpers` |
-| 85 | `function` | `renderWindowedList` | `dependencyAndSchedulingHelpers` |
-| 181 | `function` | `safeTimestamp` | `dependencyAndSchedulingHelpers` |
-| 185 | `function` | `createPillBadge` | `badgeAndSourceDecoration` |
-| 193 | `function` | `applySourceClasses` | `badgeAndSourceDecoration` |
-| 201 | `function` | `createSourceBadge` | `badgeAndSourceDecoration` |
-| 216 | `function` | `createKidsSyncBadge` | `badgeAndSourceDecoration` |
-| 224 | `function` | `normalizeChannelHandle` | `channelDisplayIdentityHelpers` |
-| 231 | `function` | `decodeChannelDisplayValue` | `channelDisplayIdentityHelpers` |
-| 241 | `function` | `normalizeChannelCustomPath` | `channelDisplayIdentityHelpers` |
-| 256 | `function` | `getChannelPageUrl` | `channelDisplayIdentityHelpers` |
-| 278 | `function` | `getChannelDisplayName` | `channelDisplayIdentityHelpers` |
-| 285 | `function` | `createChannelNameNode` | `channelDisplayIdentityHelpers` |
-| 315 | `function` | `renderKeywordList` | `keywordRenderingAndRowActions` |
-| 480 | `function` | `normalizeKeywordDateFilterForUi` | `keywordRenderingAndRowActions` |
-| 495 | `function` | `formatKeywordDateFilterLabel` | `keywordRenderingAndRowActions` |
-| 508 | `function` | `attachKeywordHelpBubble` | `keywordRenderingAndRowActions` |
-| 516 | `function` | `createRuleTargetBadge` | `keywordRenderingAndRowActions` |
-| 527 | `function` | `createMoveRuleButton` | `keywordRenderingAndRowActions` |
-| 546 | `function` | `createKeywordListItem` | `keywordRenderingAndRowActions` |
-| 832 | `function` | `renderChannelList` | `channelRenderingAndRowActions` |
-| 1075 | `function` | `groupChannelsByCollaboration` | `collaborationGrouping` |
-| 1093 | `function` | `buildCollaborationMeta` | `collaborationGrouping` |
-| 1140 | `function` | `matchesCollaborator` | `collaborationGrouping` |
-| 1153 | `function` | `createCollaborationBadge` | `badgeAndSourceDecoration` |
-| 1180 | `function` | `createChannelListItem` | `channelRenderingAndRowActions` |
-| 1205 | `function` | `createMinimalChannelItem` | `channelRenderingAndRowActions` |
-| 1269 | `function` | `createFullChannelItem` | `channelRenderingAndRowActions` |
-| 1404 | `function` | `createNodeMapping` | `channelRenderingAndRowActions` |
-| 1456 | `function` | `createFilterAllToggle` | `channelRenderingAndRowActions` |
-| 1503 | `function` | `createFallbackFilterAllToggle` | `channelRenderingAndRowActions` |
-| 1538 | `function` | `isTopicChannel` | `channelDisplayIdentityHelpers` |
-| 1549 | `function` | `getTopicChannelTooltip` | `channelDisplayIdentityHelpers` |
-| 1557 | `function` | `findChannelByRef` | `keywordRenderingAndRowActions` |
-| 1576 | `function` | `deriveChannelMapping` | `channelDisplayIdentityHelpers` |
-| 1669 | `function` | `createFallbackExactToggle` | `keywordRenderingAndRowActions` |
-| 1699 | `function` | `getExactKeywordHelpText` | `keywordRenderingAndRowActions` |
-| 1710 | `function` | `createFallbackDeleteButton` | `keywordRenderingAndRowActions` |
+| 86 | `function` | `renderWindowedList` | `dependencyAndSchedulingHelpers` |
+| 226 | `function` | `safeTimestamp` | `dependencyAndSchedulingHelpers` |
+| 230 | `function` | `createPillBadge` | `badgeAndSourceDecoration` |
+| 238 | `function` | `applySourceClasses` | `badgeAndSourceDecoration` |
+| 246 | `function` | `createSourceBadge` | `badgeAndSourceDecoration` |
+| 261 | `function` | `createKidsSyncBadge` | `badgeAndSourceDecoration` |
+| 269 | `function` | `normalizeChannelHandle` | `channelDisplayIdentityHelpers` |
+| 276 | `function` | `decodeChannelDisplayValue` | `channelDisplayIdentityHelpers` |
+| 286 | `function` | `normalizeChannelCustomPath` | `channelDisplayIdentityHelpers` |
+| 301 | `function` | `getChannelPageUrl` | `channelDisplayIdentityHelpers` |
+| 323 | `function` | `getChannelDisplayName` | `channelDisplayIdentityHelpers` |
+| 330 | `function` | `createChannelNameNode` | `channelDisplayIdentityHelpers` |
+| 360 | `function` | `renderKeywordList` | `keywordRenderingAndRowActions` |
+| 525 | `function` | `normalizeKeywordDateFilterForUi` | `keywordRenderingAndRowActions` |
+| 540 | `function` | `formatKeywordDateFilterLabel` | `keywordRenderingAndRowActions` |
+| 553 | `function` | `attachKeywordHelpBubble` | `keywordRenderingAndRowActions` |
+| 561 | `function` | `createRuleTargetBadge` | `keywordRenderingAndRowActions` |
+| 572 | `function` | `createMoveRuleButton` | `keywordRenderingAndRowActions` |
+| 591 | `function` | `createKeywordListItem` | `keywordRenderingAndRowActions` |
+| 877 | `function` | `renderChannelList` | `channelRenderingAndRowActions` |
+| 1146 | `function` | `groupChannelsByCollaboration` | `collaborationGrouping` |
+| 1164 | `function` | `buildCollaborationMeta` | `collaborationGrouping` |
+| 1211 | `function` | `matchesCollaborator` | `collaborationGrouping` |
+| 1224 | `function` | `createCollaborationBadge` | `badgeAndSourceDecoration` |
+| 1251 | `function` | `createChannelListItem` | `channelRenderingAndRowActions` |
+| 1276 | `function` | `createMinimalChannelItem` | `channelRenderingAndRowActions` |
+| 1340 | `function` | `createFullChannelItem` | `channelRenderingAndRowActions` |
+| 1484 | `function` | `createNodeMapping` | `channelRenderingAndRowActions` |
+| 1536 | `function` | `createFilterAllToggle` | `channelRenderingAndRowActions` |
+| 1583 | `function` | `createFallbackFilterAllToggle` | `channelRenderingAndRowActions` |
+| 1618 | `function` | `isTopicChannel` | `channelDisplayIdentityHelpers` |
+| 1629 | `function` | `getTopicChannelTooltip` | `channelDisplayIdentityHelpers` |
+| 1637 | `function` | `findChannelByRef` | `keywordRenderingAndRowActions` |
+| 1656 | `function` | `deriveChannelMapping` | `channelDisplayIdentityHelpers` |
+| 1749 | `function` | `createFallbackExactToggle` | `keywordRenderingAndRowActions` |
+| 1779 | `function` | `getExactKeywordHelpText` | `keywordRenderingAndRowActions` |
+| 1790 | `function` | `createFallbackDeleteButton` | `keywordRenderingAndRowActions` |
+| 1798 | `function` | `patchChannelListItem` | `channelRenderingAndRowActions` |
 
 ## Current Public API
 
 ```text
 renderKeywordList
 renderChannelList
+patchChannelListItem
 createKeywordListItem
 createChannelListItem
 ```
@@ -188,9 +191,13 @@ behaviors without changing runtime source:
   full rows immediately, schedules the remaining batch, and clears the
   container task id after completion.
 - Large Main/Kids keyword and channel lists render only the visible window plus
-  overscan rows, with top/bottom spacers preserving scroll geometry. Scroll
+  overscan rows, with top/bottom spacers preserving scroll geometry. Popup
+  `minimal` lists use the same window once they cross the threshold. Scroll
   updates are coalesced to one animation-frame/timeout task and are cancelled
   whenever a new render starts.
+- `patchChannelListItem()` replaces only a visible large-list channel row when
+  imported metadata changes. Search and alphabetical-sort views retain the
+  full-render fallback because metadata can change membership or order there.
 
 ## Current Behavior Boundaries
 
@@ -200,7 +207,7 @@ behaviors without changing runtime source:
   match, filters by search/date, sorts by selected order, clears the container
   through `innerHTML`, writes empty-state markup, and appends row nodes. Full
   lists above the large-list threshold use a bounded scroll window; popup
-  `minimal` rendering retains its lightweight path.
+  `minimal` rendering uses the same bounded window for large lists.
 - `createKeywordListItem()` binds row actions either through caller callbacks or
   direct `StateManager` methods. Channel-derived keyword rows call
   `toggleChannelFilterAllCommentsByRef`; user keyword rows can call Main or Kids
@@ -209,8 +216,8 @@ behaviors without changing runtime source:
   increments `container.__ftChannelRenderGen`, chooses Main/Kids and
   blocklist/whitelist channel sources, optionally merges Kids rows into Main,
   builds index maps, and clears the container. Full lists above the large-list
-  threshold use a bounded scroll window; smaller lists and popup `minimal`
-  rendering retain the existing idle batches.
+  threshold use a bounded scroll window, including popup `minimal` lists;
+  smaller lists retain the existing idle batches.
 - `createFilterAllToggle()` and `createFallbackFilterAllToggle()` return a
   hidden disabled spacer in whitelist mode, so whitelist visual parity depends
   on row-render policy rather than a shared row-action authority.

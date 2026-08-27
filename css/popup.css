@@ -407,6 +407,10 @@ label {
     margin-bottom: var(--ft-space-xs);
 }
 
+.keyword-list.ft-virtualized-list {
+    overflow-anchor: none;
+}
+
 .keyword-item {
     display: flex;
     align-items: center;

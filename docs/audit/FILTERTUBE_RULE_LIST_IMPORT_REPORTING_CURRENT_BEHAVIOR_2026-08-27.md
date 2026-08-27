@@ -49,6 +49,13 @@ is never silently matched to a similar channel.
 serialized network work. Its task schema now retains `lastError` and
 `lastErrorAt` per retrying row in addition to queue-wide diagnostics.
 
+Legacy imported rows that predate `ftRuleListImportReportsV1` are recovered on
+first report access. Recovery stores a compact selector by `managedListId` or
+import source and resolves the current authoritative rows when the report is
+opened; it does not copy a large channel list into the report store. BlockTube
+channel-name rows are kept as name-only boundaries and are never sent to the
+identity lookup queue.
+
 ## Performance boundary
 
 - The report schema stores one imported channel entry plus shared targets; it
@@ -60,6 +67,14 @@ serialized network work. Its task schema now retains `lastError` and
   retaining the newest report.
 - Existing Main/Kids rule-list virtualization remains the Channel Management
   renderer boundary.
+- Imported metadata writes carry one small
+  `ftImportedChannelMetadataRevision` with the completed row. StateManager and
+  the popup/dashboard use it to patch visible rows in memory, while background
+  and YouTube content contexts skip a full profile rescan, legacy projection,
+  settings recompilation, and tab refresh for metadata-only work.
+- Main/Kids and popup channel/keyword lists use the same large-list windowing
+  boundary; metadata completion does not recreate the entire 15,000-row DOM
+  when the changed row is outside the visible window.
 
 ## Parser and input boundary
 
@@ -87,6 +102,8 @@ serialized network work. Its task schema now retains `lastError` and
   proves per-row error persistence in the paced background queue.
 - Existing BlockTube transaction, alias deduplication, background ownership,
   and large-list virtualization tests remain part of the focused command.
+- Render-engine source-register proof covers imported provenance badges and the
+  bounded virtual-list render surface.
 
 Focused automated command at implementation time:
 
@@ -100,7 +117,7 @@ node --test \
   tests/runtime/render-engine-method-semantic-register-current-behavior.test.mjs
 ```
 
-Result: 42 passed, 0 failed.
+Result: 44 passed, 0 failed.
 
 ## Manual proof boundary
 

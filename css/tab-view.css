@@ -2833,7 +2833,7 @@ html[data-theme="dark"] .help-device-map-legend li {
 
 .imported-channel-enrichment-toggle {
     align-self: start;
-    min-height: 38px;
+    min-height: 44px;
     border-radius: 999px;
     padding-inline: 0.9rem;
     white-space: nowrap;
@@ -2845,6 +2845,88 @@ html[data-theme="dark"] .help-device-map-legend li {
     justify-content: flex-end;
     flex-wrap: wrap;
     gap: 0.55rem;
+}
+
+.imported-channel-enrichment-inline {
+    align-items: end;
+    padding: 0.9rem 1rem;
+}
+
+.imported-enrichment-heading {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.75rem;
+    margin-bottom: 0.65rem;
+}
+
+.imported-enrichment-heading strong {
+    font-size: 0.98rem;
+}
+
+.imported-enrichment-heading > span {
+    padding: 0.2rem 0.55rem;
+    border-radius: 999px;
+    color: var(--ft-color-accent, #b7473a);
+    background: color-mix(in srgb, var(--ft-color-accent, #b7473a) 10%, transparent);
+    font-size: 0.875rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+}
+
+.imported-enrichment-metrics {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 0.55rem;
+}
+
+.imported-enrichment-metrics > div {
+    display: grid;
+    gap: 0.08rem;
+    min-width: 0;
+    padding: 0.52rem 0.65rem;
+    border: 1px solid color-mix(in srgb, var(--ft-color-border, #d7dce3) 72%, transparent);
+    border-radius: 0.72rem;
+    background: color-mix(in srgb, var(--ft-color-bg-card, #fff) 82%, transparent);
+}
+
+.imported-enrichment-metrics b {
+    font-size: 1rem;
+    line-height: 1.2;
+}
+
+.imported-enrichment-metrics span,
+.imported-channel-enrichment-inline small {
+    color: var(--ft-color-text-muted, #667085);
+    font-size: 0.875rem;
+}
+
+.imported-enrichment-progress {
+    height: 0.42rem;
+    margin: 0.65rem 0;
+    overflow: hidden;
+    border-radius: 999px;
+    background: color-mix(in srgb, var(--ft-color-border, #d7dce3) 62%, transparent);
+}
+
+.imported-enrichment-progress > span {
+    display: block;
+    height: 100%;
+    min-width: 0.2rem;
+    border-radius: inherit;
+    background: var(--ft-color-accent, #b7473a);
+    transition: width 0.25s ease;
+}
+
+.imported-channel-enrichment-inline p {
+    margin: 0 0 0.28rem;
+}
+
+@media (min-width: 769px) {
+    .imported-enrichment-metrics {
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+    }
 }
 
 .managed-channel-list-modal__issues {

@@ -157,6 +157,8 @@ test('background worker owns imported enrichment and keeps 7–15 second jitter 
   const started = await runtime.scheduler.start();
   assert.equal(started.scheduler, 'background');
   assert.equal(started.pending, 2);
+  assert.equal(started.initialTotal, 2);
+  assert.equal(started.completed, 0);
   assert.equal(runtime.timers.at(-1).delayMs, 0);
   assert.ok(runtime.alarms.some(alarm => alarm.when >= 1_030_000));
 
@@ -168,6 +170,8 @@ test('background worker owns imported enrichment and keeps 7–15 second jitter 
 
   const afterFirst = await runtime.scheduler.getStatus();
   assert.equal(afterFirst.pending, 1);
+  assert.equal(afterFirst.initialTotal, 2);
+  assert.equal(afterFirst.completed, 1);
   assert.equal(afterFirst.inFlight, false);
   assert.equal(afterFirst.minDelayMs, 7000);
   assert.equal(afterFirst.maxDelayMs, 15000);

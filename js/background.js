@@ -1330,6 +1330,11 @@ function isMetadataOnlyChannelListChange(change) {
 function isMetadataOnlySettingsChange(changes) {
     const keys = Object.keys(changes || {});
     if (!keys.length) return false;
+    if (changes.ftImportedChannelMetadataRevision && keys.every(key => [
+        'ftProfilesV4',
+        'ftImportedChannelMetadataRevision',
+        'ftBlockTubeEnrichmentJobV1'
+    ].includes(key))) return true;
     const allowedKeys = new Set(['ftProfilesV4', 'filterChannels', 'uiChannels', 'channelMap']);
     if (keys.some(key => !allowedKeys.has(key))) return false;
     if (!changes.ftProfilesV4 && !changes.filterChannels) return false;
@@ -6098,12 +6103,13 @@ browserAPI.runtime.onMessage.addListener(function (request, sender, sendResponse
 // Listen for storage changes to re-compile settings
 browserAPI.storage.onChanged.addListener((changes, area) => {
     if (area === 'local') {
-        if (changes[FT_PROFILES_V4_KEY] && importedChannelEnrichmentScheduler) {
+        const importedMetadataWrite = Boolean(changes.ftImportedChannelMetadataRevision);
+        if (changes[FT_PROFILES_V4_KEY] && importedChannelEnrichmentScheduler && !importedMetadataWrite) {
             importedChannelEnrichmentScheduler.profilesChanged().catch((error) => {
                 console.warn('FilterTube Background: imported enrichment profile rescan failed', error);
             });
         }
-        if (changes[FT_PROFILES_V4_KEY]?.newValue) {
+        if (changes[FT_PROFILES_V4_KEY]?.newValue && !importedMetadataWrite) {
             enforceSelfControlProfileSnapshot(changes[FT_PROFILES_V4_KEY].newValue).catch((error) => {
                 console.warn('FilterTube Background: failed to restore Self-Control Session policy', error);
             });
@@ -6137,7 +6143,7 @@ browserAPI.storage.onChanged.addListener((changes, area) => {
         }
         const metadataOnlyChange = isMetadataOnlySettingsChange(changes);
 
-        if (settingsChanged) {
+        if (settingsChanged && !metadataOnlyChange) {
             console.log('FilterTube Background: Settings changed, invalidating caches and re-compiling.');
             compiledSettingsCache.main = null;
             compiledSettingsCache.kids = null;
@@ -6149,7 +6155,7 @@ browserAPI.storage.onChanged.addListener((changes, area) => {
             // Metadata-only channel enrichment changes the dashboard row but
             // does not change the already-blocking UC rule. Refreshing every
             // YouTube tab here would make Home repaint/reflow once per lookup.
-            if (!metadataOnlyChange) refreshYouTubeTabs();
+            refreshYouTubeTabs();
         }
     }
 });
@@ -7955,8 +7961,9 @@ async function handleAddFilteredChannel(input, filterAll = false, collaborationW
         // change while a child row is being repaired.
         const shouldWriteLegacyMainProjection = !requestedTargetProfileId
             || requestedTargetProfileId === DEFAULT_PROFILE_ID;
+        const shouldProjectImportedMetadataToLegacy = metadata.enrichmentFromImport !== true;
 
-        if (didMutateChannelList && isKids && shouldWriteLegacyMainProjection) {
+        if (didMutateChannelList && isKids && shouldWriteLegacyMainProjection && shouldProjectImportedMetadataToLegacy) {
             const existingKidsV3 = safeObject(profilesV3.kids);
             profilesV3.kids = {
                 ...existingKidsV3,
@@ -7978,7 +7985,7 @@ async function handleAddFilteredChannel(input, filterAll = false, collaborationW
                     });
                 });
             } catch (e) { }
-        } else if (didMutateChannelList && shouldWriteLegacyMainProjection) {
+        } else if (didMutateChannelList && shouldWriteLegacyMainProjection && shouldProjectImportedMetadataToLegacy) {
             if (targetListType === 'blocklist') {
                 storageWritePayload.filterChannels = channels;
                 try {
@@ -7996,6 +8003,17 @@ async function handleAddFilteredChannel(input, filterAll = false, collaborationW
                 };
                 storageWritePayload.ftProfilesV3 = profilesV3;
             }
+        }
+
+        if (didMutateChannelList && metadata.enrichmentFromImport === true) {
+            storageWritePayload.ftImportedChannelMetadataRevision = {
+                updatedAt: Date.now(),
+                targetProfileId: activeProfileId,
+                surface: isKids ? 'kids' : 'main',
+                listType: targetListType,
+                channelId: normalizeString(finalChannelData?.id),
+                channel: finalChannelData
+            };
         }
 
         if (didMutateChannelList && Object.keys(storageWritePayload).length > 0) {

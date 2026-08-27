@@ -1986,8 +1986,21 @@ document.addEventListener('DOMContentLoaded', async () => {
             renderKeywords();
         }
 
-        if (['channelAdded', 'channelRemoved', 'channelUpdated', 'load', 'save'].includes(eventType)) {
+        if (['channelAdded', 'channelRemoved', 'load', 'save'].includes(eventType)) {
             renderChannels();
+        }
+
+        if (eventType === 'channelUpdated') {
+            const patchedVisibleChannel = popupActiveProfileType !== 'kids'
+                && RenderEngine?.patchChannelListItem?.(channelListEl, data) === true;
+            if (!patchedVisibleChannel && popupActiveProfileType !== 'kids') {
+                renderChannels();
+            }
+        }
+
+        if (eventType === 'kidsChannelUpdated' && popupActiveProfileType === 'kids') {
+            const patchedVisibleKidsChannel = RenderEngine?.patchChannelListItem?.(channelListEl, data) === true;
+            if (!patchedVisibleKidsChannel) renderChannels();
         }
 
         if (eventType === 'settingUpdated') {

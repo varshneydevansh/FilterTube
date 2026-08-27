@@ -109,6 +109,39 @@ test('report store persists newest reports with a bounded history', async () => 
   assert.equal(Array.from(reports, (report) => report.id).join(','), 'new,middle');
 });
 
+test('older imported rows receive compact recovered reports without copying the large channel list into storage', () => {
+  const api = loadReportApi();
+  const id = `UC${'r'.repeat(22)}`;
+  const profiles = {
+    profiles: {
+      default: {
+        name: 'Default',
+        main: {
+          channels: [{
+            id,
+            name: id,
+            source: 'managed_channel_list',
+            managedListId: 'old-list',
+            managedListName: 'User block list',
+            managedListSourceLabel: 'channels.csv',
+            originalInput: id
+          }]
+        }
+      }
+    }
+  };
+  const reports = api.createBackfillReports(profiles);
+  assert.equal(reports.length, 1);
+  assert.equal(reports[0].channels.length, 0);
+  assert.equal(reports[0].selector.managedListId, 'old-list');
+  const summary = api.summarize(reports[0], {
+    profiles,
+    job: { pending: [{ input: id, id, targetProfileId: 'default', profile: 'main', listType: 'blocklist' }] }
+  });
+  assert.equal(summary.rows.length, 1);
+  assert.equal(summary.rows[0].status, 'pending');
+});
+
 test('dashboard exposes persistent import reports without rendering every row at once', () => {
   assert.match(html, /id="ftImportReportsBtn"/);
   assert.match(html, /rule_list_import_reports\.js/);
@@ -116,4 +149,6 @@ test('dashboard exposes persistent import reports without rendering every row at
   assert.match(tabSource, /Download unresolved CSV/);
   assert.match(tabSource, /View Import Report/);
   assert.match(tabSource, /Rows that will not be imported/);
+  assert.match(tabSource, /createBackfillReports/);
+  assert.match(tabSource, /Estimated active time/);
 });

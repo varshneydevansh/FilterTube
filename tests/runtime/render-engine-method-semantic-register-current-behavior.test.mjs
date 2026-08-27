@@ -66,7 +66,8 @@ function groupForMethod(name) {
     'createFullChannelItem',
     'createNodeMapping',
     'createFilterAllToggle',
-    'createFallbackFilterAllToggle'
+    'createFallbackFilterAllToggle',
+    'patchChannelListItem'
   ].includes(name)) return 'channelRenderingAndRowActions';
   if (['groupChannelsByCollaboration', 'buildCollaborationMeta', 'matchesCollaborator'].includes(name)) return 'collaborationGrouping';
   return 'UNCLASSIFIED';
@@ -427,6 +428,7 @@ function loadRenderEngineRuntime(options = {}) {
   return {
     RenderEngine: context.RenderEngine,
     document: context.document,
+    state,
     calls,
     timers,
     canceledTimerIds
@@ -485,13 +487,13 @@ test('render engine method semantic register is scoped to current behavior', () 
   const text = doc();
 
   assert.match(text, /Status: current-behavior register/);
-  assert.match(text, /Runtime behavior now includes channel source\s+filtering and managed-list source badges/);
+  assert.match(text, /Runtime behavior now includes channel source\s+filtering, imported provenance badges, bounded popup lists/);
   assert.match(text, /source file: js\/render_engine\.js/);
-  assert.match(text, /IIFE-scoped declarations: 47/);
-  assert.match(text, /plain function declarations: 42/);
+  assert.match(text, /IIFE-scoped declarations: 48/);
+  assert.match(text, /plain function declarations: 43/);
   assert.match(text, /const arrow helper declarations: 5/);
   assert.match(text, /async function declarations: 0/);
-  assert.match(text, /public API entries: 4/);
+  assert.match(text, /public API entries: 5/);
   assert.match(text, /semantic method groups: 6/);
   assert.match(text, /row-action listener sites: 11/);
   assert.match(text, /direct StateManager optional calls: 26/);
@@ -510,31 +512,31 @@ test('render engine register pins source fingerprint and broad callable reconcil
   const text = doc();
 
   assert.deepEqual(stats, {
-    bytes: 75413,
-    sha256: '6c3950d03e2ddf1b3327cdd1c6a88c5ff216c564e45f8e3e2f0bc3db4b61d1bd',
-    splitLines: 1734,
-    wcLines: 1733
+    bytes: 80085,
+    sha256: '8b61423073f9ce8637653615d50c674a79298c23e59b31793ff867a2e953fd6f',
+    splitLines: 1824,
+    wcLines: 1823
   });
-  assert.equal(broadRows.length, 154);
-  assert.equal(controlArtifacts, 96);
+  assert.equal(broadRows.length, 157);
+  assert.equal(controlArtifacts, 98);
   assert.equal(heldOutsideRegister, 11);
   assert.deepEqual({
     if: broadCounts.if,
     while: broadCounts.while
   }, {
-    if: 95,
+    if: 97,
     while: 1
   });
 
   for (const expected of [
-    'source split lines: 1734',
-    'source wc -l: 1733',
-    'source bytes: 75413',
-    'source sha256: 6c3950d03e2ddf1b3327cdd1c6a88c5ff216c564e45f8e3e2f0bc3db4b61d1bd',
-    'broad lexical callable matches: 154',
-    'accepted IIFE-scoped declaration rows: 47',
-    'semantic method rows promoted: 47',
-    'control-flow lexical artifacts: 96 (`if`: 95, `while`: 1)',
+    'source split lines: 1824',
+    'source wc -l: 1823',
+    'source bytes: 80085',
+    'source sha256: 8b61423073f9ce8637653615d50c674a79298c23e59b31793ff867a2e953fd6f',
+    'broad lexical callable matches: 157',
+    'accepted IIFE-scoped declaration rows: 48',
+    'semantic method rows promoted: 48',
+    'control-flow lexical artifacts: 98 (`if`: 97, `while`: 1)',
     'local/render callback declarations held outside this IIFE method register: 11',
     'executable current-behavior probes: 9'
   ]) {
@@ -545,15 +547,15 @@ test('render engine register pins source fingerprint and broad callable reconcil
 test('render engine register accounts for every current IIFE-scoped declaration', () => {
   const rows = methodRows();
 
-  assert.equal(rows.length, 47);
+  assert.equal(rows.length, 48);
   assert.deepEqual(countBy(rows, 'kind'), {
     'const arrow': 5,
-    function: 42
+    function: 43
   });
   assert.deepEqual(countBy(rows, 'group'), {
     badgeAndSourceDecoration: 5,
     channelDisplayIdentityHelpers: 9,
-    channelRenderingAndRowActions: 7,
+    channelRenderingAndRowActions: 8,
     collaborationGrouping: 3,
     dependencyAndSchedulingHelpers: 12,
     keywordRenderingAndRowActions: 11
@@ -578,6 +580,7 @@ test('render engine register preserves every source row and public API entry', (
   assert.deepEqual(publicRows.map((row) => row.name), [
     'renderKeywordList',
     'renderChannelList',
+    'patchChannelListItem',
     'createKeywordListItem',
     'createChannelListItem'
   ]);
@@ -647,6 +650,8 @@ test('render engine source still proves current behavior boundaries', () => {
   assert.match(source, /if \(container\.__ftChannelRenderGen !== renderGen\) return/);
   assert.match(source, /container\.__ftChannelRenderTaskId = scheduleIdle\(processBatch\)/);
   assert.match(source, /const batchSize = minimal \? 80 : 60/);
+  assert.match(source, /virtualize = true/);
+  assert.match(source, /__ftPatchChannelListItem/);
 
   assert.match(source, /if \(effectiveMode === 'whitelist'\) \{[\s\S]*spacer\.style\.visibility = 'hidden'/);
   assert.match(source, /await StateManager\?\.toggleKidsChannelFilterAll\?\.\(index\)/);
@@ -834,6 +839,13 @@ test('render engine executable probes channel source filter and managed list bad
   assert.equal(container.children.length, 1);
   assert.ok(container.textContent.includes('Manual Channel'));
   assert.ok(!container.textContent.includes('List:'));
+
+  const blockTubeRow = runtime.RenderEngine.createChannelListItem({
+    id: 'UCblocktube00000000000000',
+    name: 'Recovered BlockTube Channel',
+    source: 'blocktube'
+  }, 0, { profile: 'main' });
+  assert.ok(blockTubeRow.textContent.includes('Imported: BlockTube'));
 });
 
 test('render engine executable probes Kids channel source filter and managed list badge', () => {
@@ -971,6 +983,29 @@ test('render engine keeps large Main and Kids keyword/channel DOM windows bounde
   assert.equal(mainKeywordContainer.children.length, 3);
   assert.ok(mainKeywordContainer.classList.contains('ft-virtualized-list'));
   assert.ok(mainKeywordContainer.children[1].children.length < keywords.length);
+
+  const popupChannelContainer = runtime.document.createElement('div');
+  runtime.RenderEngine.renderChannelList(popupChannelContainer, {
+    profile: 'main',
+    minimal: true,
+    showSearch: true
+  });
+  assert.ok(popupChannelContainer.classList.contains('ft-virtualized-list'));
+  assert.ok(popupChannelContainer.children[1].children.length < channels.length);
+
+  const popupKeywordContainer = runtime.document.createElement('div');
+  runtime.RenderEngine.renderKeywordList(popupKeywordContainer, {
+    profile: 'main',
+    minimal: true,
+    showSearch: true
+  });
+  assert.ok(popupKeywordContainer.classList.contains('ft-virtualized-list'));
+  assert.ok(popupKeywordContainer.children[1].children.length < keywords.length);
+
+  const updatedChannel = { ...channels[499], name: 'Updated Main Channel 499', handle: '@updated-main-499' };
+  runtime.state.channels[499] = updatedChannel;
+  assert.equal(runtime.RenderEngine.patchChannelListItem(popupChannelContainer, updatedChannel), true);
+  assert.ok(popupChannelContainer.textContent.includes('Updated Main Channel 499'));
 
   const kidsChannelContainer = runtime.document.createElement('div');
   runtime.RenderEngine.renderChannelList(kidsChannelContainer, {
