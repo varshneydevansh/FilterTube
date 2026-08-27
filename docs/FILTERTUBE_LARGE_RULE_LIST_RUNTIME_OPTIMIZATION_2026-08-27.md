@@ -51,6 +51,32 @@ On a representative metadata-rich video renderer, the channel-only candidate pat
 
 The shared JavaScript changes apply to Chrome and Firefox. Firefox still needs a live large-list profile before claiming browser-specific timing.
 
+## Temporary live performance diagnostics
+
+The diagnostic logger is opt-in and emits aggregate stage timings instead of per-card messages. In the YouTube developer console, enable it and reload with:
+
+```js
+localStorage.setItem('filtertubePerfDebug', '1');
+location.reload();
+```
+
+Filter the console for `[FilterTube Perf]`. The logger reports:
+
+- `json-engine-build`: settings normalization and reusable JSON index construction;
+- `json-filter`: total, mapping harvest, index refresh, and recursive filtering time;
+- `dom-channel-index-build`: DOM channel-index compilation after a real rule or mapping revision;
+- `observer-fallback-request`: candidate count and time spent waiting in the observer queue;
+- `dom-fallback`: full versus incremental pass, card count, route, rule counts, and wall time.
+
+After capturing a Home-feed scroll session, disable it with:
+
+```js
+localStorage.removeItem('filtertubePerfDebug');
+document.documentElement.removeAttribute('data-filtertube-perf-debug');
+```
+
+These logs do not change filtering decisions. Console collection itself adds some overhead, so timings should be used to compare stages and identify repeated slow passes rather than as release benchmarks.
+
 ## Deliberately deferred
 
 - Dashboard projection and metadata-row index caching.

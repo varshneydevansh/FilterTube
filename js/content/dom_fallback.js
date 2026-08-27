@@ -16,6 +16,29 @@ const FILTERTUBE_DOM_BLOCKTUBE_CHANNEL_NAME_SOURCE = 'blocktube-channel-name';
 const FILTERTUBE_DOM_BLOCKTUBE_CHANNEL_NAME_BOUNDARY = "[ \n\r\t!@#$%^&*()_\\-=+\\[\\]\\\\\\|;:'\",\\.\\/<>\\?`~:]+";
 const filterTubeDomBlockTubeChannelNameRegexCache = new WeakMap();
 
+window.FilterTubePerfDebug = window.FilterTubePerfDebug || {
+    enabled() {
+        try {
+            return document.documentElement?.getAttribute('data-filtertube-perf-debug') === 'true' ||
+                localStorage.getItem('filtertubePerfDebug') === '1';
+        } catch (e) {
+            return false;
+        }
+    },
+    now() {
+        return typeof performance !== 'undefined' && typeof performance.now === 'function'
+            ? performance.now()
+            : Date.now();
+    },
+    log(stage, details = {}) {
+        if (!this.enabled()) return;
+        try {
+            console.info('[FilterTube Perf]', stage, JSON.stringify(details));
+        } catch (e) {
+        }
+    }
+};
+
 function getFilteringTracker() {
     const tracker = window.filteringTracker;
     if (tracker && typeof tracker.reset === 'function' && typeof tracker.logSummary === 'function') {
@@ -723,6 +746,10 @@ function getCompiledChannelFilterIndex(settings, listOverride = null) {
         return existing;
     }
 
+    const perf = window.FilterTubePerfDebug;
+    const perfEnabled = perf?.enabled?.() === true;
+    const perfStartedAt = perfEnabled ? perf.now() : 0;
+
     const lookupChannelMap = getChannelMapLookup(channelMap);
 
     const ids = new Set();
@@ -851,6 +878,17 @@ function getCompiledChannelFilterIndex(settings, listOverride = null) {
         compiledChannelFilterIndexCacheByList.set(list, index);
     } else {
         compiledChannelFilterIndexCache.set(settings, index);
+    }
+    if (perfEnabled) {
+        perf.log('dom-channel-index-build', {
+            durationMs: Number((perf.now() - perfStartedAt).toFixed(2)),
+            rules: list.length,
+            ids: ids.size,
+            handles: handles.size,
+            names: names.size,
+            nameOnlyRules: nameOnlyNames.size,
+            mapRevision: channelMapRevision
+        });
     }
     return index;
 }
@@ -4394,6 +4432,20 @@ async function applyDOMFallback(settings, options = {}) {
     const effectiveSettings = settings || currentSettings;
     if (!effectiveSettings || typeof effectiveSettings !== 'object') return;
 
+    const perf = window.FilterTubePerfDebug;
+    const perfEnabled = perf?.enabled?.() === true;
+    const perfStartedAt = perfEnabled ? perf.now() : 0;
+    const perfRun = {
+        route: (() => {
+            try { return document.location?.pathname || ''; } catch (e) { return ''; }
+        })(),
+        mode: options.incrementalHomeCards === true ? 'incremental-home' : 'full',
+        requestedCandidates: Array.isArray(options.candidateElements) ? options.candidateElements.length : 0,
+        cards: 0,
+        forceReprocess: options.forceReprocess === true,
+        activeWork: false
+    };
+
     syncCategoryPolicyShellState(effectiveSettings);
 
     const listMode = (effectiveSettings && effectiveSettings.listMode === 'whitelist') ? 'whitelist' : 'blocklist';
@@ -4468,6 +4520,7 @@ async function applyDOMFallback(settings, options = {}) {
     applyFilterTubeHomeFeedPolish();
 
     const hasActiveFallbackWork = hasActiveDOMFallbackWork(effectiveSettings);
+    perfRun.activeWork = hasActiveFallbackWork || onlyWhitelistPending;
     if (!hasActiveFallbackWork && !onlyWhitelistPending) {
         const state = window.__filtertubeDomFallbackPerfState || (window.__filtertubeDomFallbackPerfState = {
             hadActiveWork: false,
@@ -4725,6 +4778,8 @@ async function applyDOMFallback(settings, options = {}) {
     const videoElements = useIncrementalHomeCards
         ? collectFilterTubeVisualCardOwnersFromCandidates(candidateElements, videoSelector)
         : collectFilterTubeVisualCardOwners(videoSelector);
+    perfRun.mode = useIncrementalHomeCards ? 'incremental-home' : 'full';
+    perfRun.cards = videoElements.length;
     const categoryPolicySignature = getCategoryPolicySignature(effectiveSettings);
     const languagePolicySignature = getLanguagePolicySignature(effectiveSettings);
     const isWatchPage = (() => {
@@ -7245,6 +7300,17 @@ async function applyDOMFallback(settings, options = {}) {
         // ignore
     }
     } finally {
+        if (perfEnabled) {
+            const durationMs = perf.now() - perfStartedAt;
+            if (durationMs >= 1) {
+                perf.log('dom-fallback', {
+                    ...perfRun,
+                    durationMs: Number(durationMs.toFixed(2)),
+                    channelRules: Array.isArray(effectiveSettings.filterChannels) ? effectiveSettings.filterChannels.length : 0,
+                    keywordRules: Array.isArray(effectiveSettings.filterKeywords) ? effectiveSettings.filterKeywords.length : 0
+                });
+            }
+        }
         runState.running = false;
         if (runState.pending) {
             runState.pending = false;

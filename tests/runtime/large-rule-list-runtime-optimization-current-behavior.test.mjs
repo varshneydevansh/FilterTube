@@ -285,3 +285,22 @@ test('Home mutation fallback queues affected cards while structural mutations re
   assert.match(fallback, /collectFilterTubeVisualCardOwnersFromCandidates\(candidateElements, videoSelector\)/);
   assert.match(fallback, /if \(useIncrementalHomeCards\) \{\s*return;\s*\}/);
 });
+
+test('temporary performance diagnostics are opt-in and aggregate expensive stages', () => {
+  const filterLogic = read('js/filter_logic.js');
+  const fallback = read('js/content/dom_fallback.js');
+  const bridge = read('js/content_bridge.js');
+
+  for (const source of [filterLogic, fallback]) {
+    assert.match(source, /data-filtertube-perf-debug/);
+    assert.match(source, /localStorage\.getItem\('filtertubePerfDebug'\) === '1'/);
+    assert.match(source, /\[FilterTube Perf\]/);
+  }
+  assert.match(filterLogic, /perf\.log\('json-engine-build'/);
+  assert.match(filterLogic, /perf\.log\('json-filter'/);
+  assert.match(filterLogic, /harvestMs/);
+  assert.match(filterLogic, /indexRefreshMs/);
+  assert.match(fallback, /perf\.log\('dom-channel-index-build'/);
+  assert.match(fallback, /perf\.log\('dom-fallback'/);
+  assert.match(bridge, /perf\?\.log\?\.\('observer-fallback-request'/);
+});

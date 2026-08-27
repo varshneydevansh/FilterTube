@@ -16,6 +16,29 @@
     }
     window.filterTubeLogicHasRun = true;
 
+    window.FilterTubePerfDebug = window.FilterTubePerfDebug || {
+        enabled() {
+            try {
+                return document.documentElement?.getAttribute('data-filtertube-perf-debug') === 'true' ||
+                    localStorage.getItem('filtertubePerfDebug') === '1';
+            } catch (e) {
+                return false;
+            }
+        },
+        now() {
+            return typeof performance !== 'undefined' && typeof performance.now === 'function'
+                ? performance.now()
+                : Date.now();
+        },
+        log(stage, details = {}) {
+            if (!this.enabled()) return;
+            try {
+                console.info('[FilterTube Perf]', stage, JSON.stringify(details));
+            } catch (e) {
+            }
+        }
+    };
+
     // Debug logging with sequence numbers and bridge relay
     let filterLogicDebugSequence = 0;
     function postLogToBridge(level, ...args) {
@@ -4137,14 +4160,23 @@
             // Reset them for every payload so page metadata never leaks across routes.
             this.pageChannelMeta = null;
             this.blockedCount = 0;
+            const perf = window.FilterTubePerfDebug;
+            const perfEnabled = perf?.enabled?.() === true;
+            const perfStartedAt = perfEnabled ? perf.now() : 0;
+            let harvestMs = 0;
+            let indexRefreshMs = 0;
 
             // 1. HARVEST FIRST: Learn ID/Handle mappings before filtering
+            const harvestStartedAt = perfEnabled ? perf.now() : 0;
             try {
                 this._harvestChannelData(data);
             } catch (e) {
                 console.warn('FilterTube: Harvesting failed', e);
             }
+            if (perfEnabled) harvestMs = perf.now() - harvestStartedAt;
+            const indexStartedAt = perfEnabled ? perf.now() : 0;
             this._refreshChannelFilterIndexesIfNeeded();
+            if (perfEnabled) indexRefreshMs = perf.now() - indexStartedAt;
 
             // Global kill-switch: allow the extension to stay installed but stop mutating YouTube data.
             // We still harvest mappings above so 3-dot menu / resolver stays warm.
@@ -4158,6 +4190,30 @@
             const startTime = Date.now();
             const filtered = this.filter(data);
             const endTime = Date.now();
+
+            if (perfEnabled) {
+                const totalMs = perf.now() - perfStartedAt;
+                const filterMs = Math.max(0, totalMs - harvestMs - indexRefreshMs);
+                if (totalMs >= 1) {
+                    perf.log('json-filter', {
+                        dataName,
+                        totalMs: Number(totalMs.toFixed(2)),
+                        harvestMs: Number(harvestMs.toFixed(2)),
+                        indexRefreshMs: Number(indexRefreshMs.toFixed(2)),
+                        filterMs: Number(filterMs.toFixed(2)),
+                        blocked: this.blockedCount,
+                        channelRules: Array.isArray(this.settings.filterChannels) ? this.settings.filterChannels.length : 0,
+                        keywordRules: Array.isArray(this.settings.filterKeywords) ? this.settings.filterKeywords.length : 0,
+                        contentFilters: {
+                            duration: this.settings.contentFilters?.duration?.enabled === true,
+                            uploadDate: this.settings.contentFilters?.uploadDate?.enabled === true,
+                            uppercase: this.settings.contentFilters?.uppercase?.enabled === true,
+                            category: this.settings.categoryFilters?.enabled === true,
+                            language: this.settings.languageFilters?.enabled === true
+                        }
+                    });
+                }
+            }
 
             this._log(`✅ Filtered ${dataName} in ${endTime - startTime}ms, blocked ${this.blockedCount} items`);
 
@@ -4190,7 +4246,19 @@
 
         reusableFilterSettings = sourceSettings;
         reusableFilterChannelMap = sourceChannelMap;
+        const perf = window.FilterTubePerfDebug;
+        const perfEnabled = perf?.enabled?.() === true;
+        const perfStartedAt = perfEnabled ? perf.now() : 0;
         reusableFilter = new YouTubeDataFilter(sourceSettings);
+        if (perfEnabled) {
+            perf.log('json-engine-build', {
+                durationMs: Number((perf.now() - perfStartedAt).toFixed(2)),
+                channelRules: Array.isArray(sourceSettings.filterChannels) ? sourceSettings.filterChannels.length : 0,
+                keywordRules: Array.isArray(sourceSettings.filterKeywords) ? sourceSettings.filterKeywords.length : 0,
+                allowChannelRules: Array.isArray(sourceSettings.whitelistChannels) ? sourceSettings.whitelistChannels.length : 0,
+                allowKeywordRules: Array.isArray(sourceSettings.whitelistKeywords) ? sourceSettings.whitelistKeywords.length : 0
+            });
+        }
         return reusableFilter;
     }
 

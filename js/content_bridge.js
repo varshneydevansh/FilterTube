@@ -7093,6 +7093,7 @@ async function initializeDOMFallback(settings) {
         const MIN_FALLBACK_INTERVAL_MS = 250;
         const pendingFallbackCandidates = new Set();
         let pendingFallbackNeedsFullPass = false;
+        let pendingFallbackQueuedAt = 0;
 
         const debouncedFallback = debounce(() => {
             if (isFilterTubeNativeOverlayQuietMode() || isFilterTubeManagedViewingRouteDenied()) return;
@@ -7103,6 +7104,9 @@ async function initializeDOMFallback(settings) {
         let immediateFallbackScheduled = false;
         function scheduleImmediateFallback(candidateElements = null, forceFullPass = candidateElements == null) {
             if (isFilterTubeNativeOverlayQuietMode() || isFilterTubeManagedViewingRouteDenied()) return;
+            if (!pendingFallbackQueuedAt) {
+                pendingFallbackQueuedAt = window.FilterTubePerfDebug?.now?.() || Date.now();
+            }
             if (forceFullPass) {
                 pendingFallbackNeedsFullPass = true;
             }
@@ -7146,8 +7150,20 @@ async function initializeDOMFallback(settings) {
         function runPendingFallbackRequest() {
             const candidates = Array.from(pendingFallbackCandidates);
             const needsFullPass = pendingFallbackNeedsFullPass;
+            const perf = window.FilterTubePerfDebug;
+            const queuedForMs = pendingFallbackQueuedAt
+                ? (perf?.now?.() || Date.now()) - pendingFallbackQueuedAt
+                : 0;
             pendingFallbackCandidates.clear();
             pendingFallbackNeedsFullPass = false;
+            pendingFallbackQueuedAt = 0;
+
+            perf?.log?.('observer-fallback-request', {
+                route: document.location?.pathname || '',
+                mode: needsFullPass ? 'full' : 'incremental-candidate',
+                candidates: candidates.length,
+                queuedForMs: Number(queuedForMs.toFixed(2))
+            });
 
             const isHome = (document.location?.pathname || '') === '/';
             if (isHome && !needsFullPass && candidates.length > 0) {
