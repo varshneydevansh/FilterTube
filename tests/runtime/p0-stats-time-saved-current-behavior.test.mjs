@@ -167,12 +167,14 @@ test('stats_dashboard_refreshes_on_stats_by_surface_change is not satisfied toda
   assert.doesNotMatch(reloadKeys, /'statsBySurface'/);
 });
 
-test('stats_storage_write_is_batched_or_debounced is not satisfied today', () => {
+test('stats_storage_write_is_batched_or_debounced is satisfied by one queued write per burst', () => {
   const save = saveStatsBlock();
 
   assert.match(save, /chrome\.storage\.local\.get\(\['stats', 'statsBySurface'\]/);
-  assert.match(save, /chrome\.storage\.local\.set\(payload\)/);
-  assert.doesNotMatch(save, /setTimeout|clearTimeout|requestIdleCallback|debounce|queueMicrotask|pendingStatsWrite|batched/);
+  assert.match(save, /statsSavePending = true/);
+  assert.match(save, /statsSaveScheduled \|\| statsSaveInFlight/);
+  assert.match(save, /queueMicrotask/);
+  assert.match(save, /chrome\.storage\.local\.set\(payload, finishWrite\)/);
 });
 
 test('stats_legacy_background_path_cannot_override_surface_stats is not satisfied today', () => {

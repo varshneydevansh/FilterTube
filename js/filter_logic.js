@@ -1061,6 +1061,9 @@
             this.channelMap = rawSettings.channelMap || this.settings.channelMap || {}; // UC ID <-> @handle mappings
             this.filterChannelIndex = this._buildChannelFilterIndex(this.settings.filterChannels);
             this.whitelistChannelIndex = this._buildChannelFilterIndex(this.settings.whitelistChannels);
+            this.channelIndexesDirty = false;
+            this.blockedVideoIdSet = new Set(Array.isArray(this.settings.blockedVideoIds) ? this.settings.blockedVideoIds : []);
+            this.allowedVideoIdSet = new Set(Array.isArray(this.settings.allowedVideoIds) ? this.settings.allowedVideoIds : []);
             this.pageChannelMeta = null;
             this.blockedCount = 0;
             this.debugEnabled = !!window.__filtertubeDebug;
@@ -1079,6 +1082,13 @@
             } catch (e) {
             }
             return null;
+        }
+
+        _refreshChannelFilterIndexesIfNeeded() {
+            if (!this.channelIndexesDirty) return;
+            this.filterChannelIndex = this._buildChannelFilterIndex(this.settings.filterChannels);
+            this.whitelistChannelIndex = this._buildChannelFilterIndex(this.settings.whitelistChannels);
+            this.channelIndexesDirty = false;
         }
 
         _matchesAnyChannel(channelInfo, filterChannels, index = null) {
@@ -1775,6 +1785,7 @@
                 this.channelMap[keyHandle] = id;      // @bts -> UCLkAepWjdylmXSltofFvsYQ (original case)
                 this.settings.channelMap[keyId] = handle;
                 this.settings.channelMap[keyHandle] = id;
+                this.channelIndexesDirty = true;
 
                 postLogToBridge('log', `🧠 LEARNED MAPPING: ${id} <-> ${handle}`);
 
@@ -1816,6 +1827,7 @@
             if (this.channelMap[normalizedCustomUrl] !== id) {
                 this.channelMap[normalizedCustomUrl] = id;  // c/name -> UC... (original case)
                 this.settings.channelMap[normalizedCustomUrl] = id;
+                this.channelIndexesDirty = true;
 
                 postLogToBridge('log', `🧠 LEARNED CUSTOM URL MAPPING: ${customUrl} -> ${id}`);
 
@@ -2465,14 +2477,14 @@
                     return 0;
                 };
 
-                const blockSpecificity = videoId && Array.isArray(this.settings.blockedVideoIds) && this.settings.blockedVideoIds.includes(videoId)
+                const blockSpecificity = videoId && this.blockedVideoIdSet.has(videoId)
                     ? 3
                     : matchSpecificity(
                         Array.isArray(this.settings.filterChannels) ? this.settings.filterChannels : [],
                         this.filterChannelIndex,
                         Array.isArray(this.settings.filterKeywords) ? this.settings.filterKeywords : []
                     );
-                const allowSpecificity = videoId && Array.isArray(this.settings.allowedVideoIds) && this.settings.allowedVideoIds.includes(videoId)
+                const allowSpecificity = videoId && this.allowedVideoIdSet.has(videoId)
                     ? 3
                     : matchSpecificity(
                         Array.isArray(this.settings.whitelistChannels) ? this.settings.whitelistChannels : [],
@@ -4099,12 +4111,18 @@
                 return data;
             }
 
+            // These fields were constructor-local before the engine became reusable.
+            // Reset them for every payload so page metadata never leaks across routes.
+            this.pageChannelMeta = null;
+            this.blockedCount = 0;
+
             // 1. HARVEST FIRST: Learn ID/Handle mappings before filtering
             try {
                 this._harvestChannelData(data);
             } catch (e) {
                 console.warn('FilterTube: Harvesting failed', e);
             }
+            this._refreshChannelFilterIndexesIfNeeded();
 
             // Global kill-switch: allow the extension to stay installed but stop mutating YouTube data.
             // We still harvest mappings above so 3-dot menu / resolver stays warm.
@@ -4115,8 +4133,6 @@
 
             // 2. THEN FILTER
             this._log(`🔄 Starting to filter ${dataName}`);
-            this.blockedCount = 0;
-
             const startTime = Date.now();
             const filtered = this.filter(data);
             const endTime = Date.now();
@@ -4131,13 +4147,38 @@
     // GLOBAL INTERFACE
     // ============================================================================
 
+    const EMPTY_ENGINE_SETTINGS = {};
+    let reusableFilter = null;
+    let reusableFilterSettings = null;
+    let reusableFilterChannelMap = null;
+
+    function getReusableFilter(settings) {
+        const sourceSettings = settings && typeof settings === 'object' ? settings : EMPTY_ENGINE_SETTINGS;
+        const sourceChannelMap = sourceSettings.channelMap && typeof sourceSettings.channelMap === 'object'
+            ? sourceSettings.channelMap
+            : null;
+
+        if (
+            reusableFilter &&
+            reusableFilterSettings === sourceSettings &&
+            reusableFilterChannelMap === sourceChannelMap
+        ) {
+            return reusableFilter;
+        }
+
+        reusableFilterSettings = sourceSettings;
+        reusableFilterChannelMap = sourceChannelMap;
+        reusableFilter = new YouTubeDataFilter(sourceSettings);
+        return reusableFilter;
+    }
+
     // Export the filtering functionality globally
     window.FilterTubeEngine = {
         YouTubeDataFilter,
 
         // Full processing: harvest + filtering
         processData: function (data, settings, dataName = 'data') {
-            const filter = new YouTubeDataFilter(settings);
+            const filter = getReusableFilter(settings);
             return filter.processData(data, dataName);
         },
 
@@ -4147,7 +4188,7 @@
         harvestOnly: function (data, settings) {
             if (!data) return;
             try {
-                const filter = new YouTubeDataFilter(settings || { filterChannels: [], filterKeywords: [] });
+                const filter = getReusableFilter(settings);
                 filter._harvestChannelData(data);
             } catch (e) {
                 console.warn('FilterTube: harvestOnly failed', e);

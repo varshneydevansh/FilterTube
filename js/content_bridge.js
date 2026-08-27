@@ -990,6 +990,9 @@ let statsCountToday = 0;
 let statsTotalSeconds = 0; // Track total seconds saved instead of using multiplier
 let statsLastDate = new Date().toDateString();
 let statsInitialized = false;
+let statsSaveScheduled = false;
+let statsSaveInFlight = false;
+let statsSavePending = false;
 
 function getStatsSurfaceKey() {
     try {
@@ -4536,11 +4539,11 @@ function incrementHiddenStats(element) {
             element.setAttribute('data-filtertube-time-saved', secondsSaved.toString());
         }
 
-        // Formatting for log
-        const channelEl = element.querySelector('#channel-name a, .ytd-channel-name a, ytd-channel-name a');
-        const channelInfo = element.getAttribute('data-filtertube-channel-handle') || channelEl?.textContent?.trim() || '';
-
-        console.log(`FilterTube: Saved ${secondsSaved}s from "${title}"${channelInfo ? ' - ' + channelInfo : ''}`);
+        if (window.__filtertubeDebug === true) {
+            const channelEl = element.querySelector('#channel-name a, .ytd-channel-name a, ytd-channel-name a');
+            const channelInfo = element.getAttribute('data-filtertube-channel-handle') || channelEl?.textContent?.trim() || '';
+            console.log(`FilterTube: Saved ${secondsSaved}s from "${title}"${channelInfo ? ' - ' + channelInfo : ''}`);
+        }
 
         saveStats();
     }
@@ -4573,20 +4576,42 @@ function decrementHiddenStats(element) {
  * Save stats to storage
  */
 function saveStats() {
-    const minutesSaved = Math.floor(statsTotalSeconds / 60);
+    statsSavePending = true;
+    if (statsSaveScheduled || statsSaveInFlight) return;
 
-    if (chrome && chrome.storage) {
-        const surface = getStatsSurfaceKey();
+    statsSaveScheduled = true;
+    const enqueue = typeof queueMicrotask === 'function'
+        ? queueMicrotask
+        : (callback) => Promise.resolve().then(callback);
+    enqueue(flushStatsToStorage);
+}
+
+function flushStatsToStorage() {
+    statsSaveScheduled = false;
+    if (!statsSavePending || statsSaveInFlight) return;
+
+    statsSavePending = false;
+    if (typeof chrome === 'undefined' || !chrome.storage?.local) return;
+
+    statsSaveInFlight = true;
+    const surface = getStatsSurfaceKey();
+    const nextStats = {
+        hiddenCount: statsCountToday,
+        savedMinutes: Math.floor(statsTotalSeconds / 60),
+        savedSeconds: statsTotalSeconds,
+        lastDate: statsLastDate
+    };
+
+    const finishWrite = () => {
+        statsSaveInFlight = false;
+        if (statsSavePending) saveStats();
+    };
+
+    try {
         chrome.storage.local.get(['stats', 'statsBySurface'], (result) => {
-            const nextStats = {
-                hiddenCount: statsCountToday,
-                savedMinutes: minutesSaved,
-                savedSeconds: statsTotalSeconds,
-                lastDate: statsLastDate
-            };
-
-            const existingBySurface = (result.statsBySurface && typeof result.statsBySurface === 'object' && !Array.isArray(result.statsBySurface))
-                ? result.statsBySurface
+            const safeResult = result && typeof result === 'object' ? result : {};
+            const existingBySurface = (safeResult.statsBySurface && typeof safeResult.statsBySurface === 'object' && !Array.isArray(safeResult.statsBySurface))
+                ? safeResult.statsBySurface
                 : {};
 
             const statsBySurface = {
@@ -4594,17 +4619,21 @@ function saveStats() {
                 [surface]: nextStats
             };
 
-            const payload = {
-                statsBySurface
-            };
+            const payload = { statsBySurface };
 
             // Back-compat: keep `stats` in sync for main.
             if (surface === 'main') {
                 payload.stats = nextStats;
             }
 
-            chrome.storage.local.set(payload);
+            try {
+                chrome.storage.local.set(payload, finishWrite);
+            } catch (e) {
+                finishWrite();
+            }
         });
+    } catch (e) {
+        finishWrite();
     }
 }
 
