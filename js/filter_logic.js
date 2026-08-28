@@ -4099,7 +4099,8 @@
             if (Array.isArray(obj)) {
                 const filtered = [];
                 for (let i = 0; i < obj.length; i++) {
-                    const item = this.filter(obj[i], `${path}[${i}]`);
+                    const childPath = this.debugEnabled ? `${path}[${i}]` : path;
+                    const item = this.filter(obj[i], childPath);
                     if (item !== null) {
                         filtered.push(item);
                     }
@@ -4131,10 +4132,12 @@
             for (const [key, value] of Object.entries(obj)) {
                 if (AUTOPLAY_ENDPOINT_KEYS.has(key) && this._shouldBlockAutoplayEndpoint(value, key)) {
                     this.blockedCount++;
-                    this._log(`✂️ Removed ${key} endpoint at ${path}.${key}`);
+                    const endpointPath = this.debugEnabled ? `${path}.${key}` : path;
+                    this._log(`✂️ Removed ${key} endpoint at ${endpointPath}`);
                     continue;
                 }
-                const filteredValue = this.filter(value, `${path}.${key}`);
+                const childPath = this.debugEnabled ? `${path}.${key}` : path;
+                const filteredValue = this.filter(value, childPath);
                 if (filteredValue !== null) {
                     result[key] = filteredValue;
                 }

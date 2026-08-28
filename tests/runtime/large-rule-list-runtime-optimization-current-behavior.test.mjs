@@ -232,10 +232,40 @@ test('DOM fallback caches compiled rule lists by immutable snapshot identity', (
   assert.doesNotMatch(fallback, /function getListSignatureForRun\(/);
   assert.doesNotMatch(fallback, /sourceSignature/);
   assert.match(fallback, /compiledKeywordRegexCache\.get\(rawList\)/);
+  assert.equal((fallback.match(/compiledChannelFilterIndexCacheByList\.get\(list\)/g) || []).length, 1);
+  assert.equal((fallback.match(/compiledChannelFilterIndexCacheByList\.set\(list, index\)/g) || []).length, 1);
+  assert.doesNotMatch(fallback, /compiledChannelFilterIndexCache\.get\(settings\)/);
   assert.match(fallback, /existing\.sourceChannelMapRevision === channelMapRevision/);
   assert.match(resolver, /currentSettings\.__filtertubeChannelMapRevision/);
   assert.match(resolver, /const map = currentSettings\.channelMap/);
   assert.doesNotMatch(resolver, /const map = \{\s*\.\.\./);
+});
+
+test('recursive JSON traversal only constructs diagnostic paths when debugging is enabled', () => {
+  const filterLogic = read('js/filter_logic.js');
+  const start = filterLogic.indexOf("filter(obj, path = 'root') {");
+  const end = filterLogic.indexOf("processData(data, dataName = 'unknown') {", start);
+  const traversal = filterLogic.slice(start, end);
+
+  assert.match(traversal, /this\.debugEnabled \? `\$\{path\}\[\$\{i\}\]` : path/);
+  assert.match(traversal, /this\.debugEnabled \? `\$\{path\}\.\$\{key\}` : path/);
+  assert.doesNotMatch(traversal, /this\.filter\(obj\[i\], `\$\{path\}\[\$\{i\}\]`\)/);
+  assert.doesNotMatch(traversal, /this\.filter\(value, `\$\{path\}\.\$\{key\}`\)/);
+});
+
+test('one bridge settings dispatch retains both delivery paths but replays seed snapshots once', () => {
+  const bridge = read('js/content/bridge_settings.js');
+  const injector = read('js/injector.js');
+  const seed = read('js/seed.js');
+
+  assert.match(bridge, /const dispatchRevision = \+\+mainWorldSettingsDispatchRevision/);
+  assert.match(bridge, /revision: dispatchRevision/);
+  assert.match(bridge, /tryApplySettingsToSeed\(settings, dispatchRevision\)/);
+  assert.match(injector, /currentSettingsRevision = Number\.isSafeInteger\(revision\)/);
+  assert.match(injector, /updateSeedSettings\(currentSettingsRevision\)/);
+  assert.match(seed, /normalizedDispatchRevision === lastSettingsDispatchRevision/);
+  assert.match(seed, /if \(assigningProcessedYtInitialData\)/);
+  assert.match(seed, /if \(assigningProcessedYtInitialPlayerResponse\)/);
 });
 
 test('channel-only JSON filtering skips unused search metadata extraction', () => {

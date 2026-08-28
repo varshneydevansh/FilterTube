@@ -209,6 +209,7 @@
     };
 
     var settingsReceived = false;
+    var currentSettingsRevision = 0;
     var initialDataQueue = [];
 
     // Cache for collaboration data from filter_logic.js
@@ -2311,7 +2312,7 @@
     window.addEventListener('message', (event) => {
         if (event.source !== window || !event.data) return;
 
-        const { type, payload, source } = event.data;
+        const { type, payload, source, revision } = event.data;
 
         // Ignore our own messages and only accept from content_bridge or filter_logic
         if (source === 'injector') return;
@@ -2326,10 +2327,11 @@
 
             // Update current settings
             currentSettings = { ...currentSettings, ...payload };
+            currentSettingsRevision = Number.isSafeInteger(revision) && revision > 0 ? revision : 0;
             settingsReceived = true;
 
             // Update seed.js via global filterTube object
-            updateSeedSettings();
+            updateSeedSettings(currentSettingsRevision);
 
             // Process any queued data
             if (!hasNetworkJsonWork(currentSettings)) {
@@ -3917,10 +3919,10 @@
     }
 
     // Function to update seed.js settings
-    function updateSeedSettings() {
+    function updateSeedSettings(dispatchRevision = currentSettingsRevision) {
         if (window.filterTube && typeof window.filterTube.updateSettings === 'function') {
             postLog('log', 'Updating seed.js with received settings');
-            window.filterTube.updateSettings(currentSettings);
+            window.filterTube.updateSettings(currentSettings, dispatchRevision);
             postLog('log', 'Seed.js settings updated successfully');
         } else {
             postLog('warn', 'window.filterTube.updateSettings not available yet, will retry');
@@ -3929,7 +3931,7 @@
             setTimeout(() => {
                 if (window.filterTube && typeof window.filterTube.updateSettings === 'function') {
                     postLog('log', 'Retrying seed.js settings update');
-                    window.filterTube.updateSettings(currentSettings);
+                    window.filterTube.updateSettings(currentSettings, dispatchRevision);
                     postLog('log', 'Seed.js settings updated successfully on retry');
                 } else {
                     postLog('error', 'Failed to update seed.js settings after retry');
@@ -4014,7 +4016,7 @@
 
         // Update settings if already received
         if (settingsReceived) {
-            window.filterTube.updateSettings(currentSettings);
+            window.filterTube.updateSettings(currentSettings, currentSettingsRevision);
             postLog('log', 'Updated seed.js with current settings');
         }
 

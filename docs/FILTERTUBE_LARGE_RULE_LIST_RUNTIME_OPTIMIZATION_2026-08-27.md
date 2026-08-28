@@ -78,6 +78,24 @@ document.documentElement.removeAttribute('data-filtertube-perf-debug');
 
 These logs do not change filtering decisions. Console collection itself adds some overhead, so timings should be used to compare stages and identify repeated slow passes rather than as release benchmarks.
 
+## 2026-08-28 Home trace follow-up
+
+The user-supplied Home capture with 15,453 channel rules showed that the remaining long tasks were not primarily rule-index lookups:
+
+- `ytInitialData-queued` spent 273.3 ms in recursive filtering;
+- later `ytInitialData-reprocess` passes spent 111.3-136.6 ms in recursive filtering;
+- every replay was followed by a second `ytInitialData` pass taking 98.4-136.8 ms;
+- the DOM fallback built the same 15,453-rule channel index twice in a single pass (17.0 ms plus 18.5 ms, and later 13.3 ms plus 15.7 ms).
+
+The follow-up removes those duplicated costs while retaining the same filtering decisions:
+
+- seed assignments of an already-filtered queued or replayed `ytInitialData`/`ytInitialPlayerResponse` bypass FilterTube's own setter processing, preventing a second recursive pass over the result;
+- one isolated-world settings dispatch carries a revision through both the direct seed path and the injector compatibility path, so seed snapshot replay runs once even though both startup delivery paths remain available;
+- DOM channel indexes are consistently cached by rule-list snapshot identity, including ordinary and override callers, so one list/map revision compiles once;
+- recursive traversal constructs diagnostic object paths only when FilterTube debug logging is enabled.
+
+A source-level 500-card, 15,453-channel benchmark measured the diagnostic-path change separately at 21.23 ms before and 20.25 ms after (4.6% lower median). The larger expected live saving is removal of the duplicate 98-137 ms JSON pass and duplicate 13-19 ms DOM index build observed in the capture. Chrome and Firefox builds pass; another live capture is still required to establish installed-browser timing.
+
 ## Deliberately deferred
 
 - Dashboard projection and metadata-row index caching.

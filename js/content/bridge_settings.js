@@ -327,6 +327,8 @@ if (window.__filtertubeRuntimeBridgeListenerAttached !== true) {
 }
 
 let pendingSeedSettings = null;
+let pendingSeedSettingsRevision = 0;
+let mainWorldSettingsDispatchRevision = 0;
 let seedListenerAttached = false;
 
 function normalizeSettingsForHost(settings) {
@@ -1677,11 +1679,12 @@ function requestSettingsFromBackground(options = {}) {
     });
 }
 
-function tryApplySettingsToSeed(settings) {
+function tryApplySettingsToSeed(settings, dispatchRevision = 0) {
     if (window.filterTube?.updateSettings) {
         try {
-            window.filterTube.updateSettings(settings);
+            window.filterTube.updateSettings(settings, dispatchRevision);
             pendingSeedSettings = null;
+            pendingSeedSettingsRevision = 0;
             return true;
         } catch (error) {
             debugLog('❌ Failed to forward settings to seed.js:', error);
@@ -1695,7 +1698,7 @@ function ensureSeedReadyListener() {
     seedListenerAttached = true;
     window.addEventListener('filterTubeSeedReady', () => {
         if (pendingSeedSettings) {
-            tryApplySettingsToSeed(pendingSeedSettings);
+            tryApplySettingsToSeed(pendingSeedSettings, pendingSeedSettingsRevision);
         }
     });
 }
@@ -1703,7 +1706,7 @@ function ensureSeedReadyListener() {
 function scheduleSeedRetry() {
     setTimeout(() => {
         if (pendingSeedSettings) {
-            if (!tryApplySettingsToSeed(pendingSeedSettings)) {
+            if (!tryApplySettingsToSeed(pendingSeedSettings, pendingSeedSettingsRevision)) {
                 scheduleSeedRetry();
             }
         }
@@ -1711,12 +1714,14 @@ function scheduleSeedRetry() {
 }
 
 function sendSettingsToMainWorld(settings) {
+    const dispatchRevision = ++mainWorldSettingsDispatchRevision;
     latestSettings = settings;
     currentSettings = settings;
 
     if (applyManagedViewingRouteGate(settings)) {
         releaseManagedTimeLimitRuntime();
         pendingSeedSettings = null;
+        pendingSeedSettingsRevision = 0;
         return;
     }
     applyManagedTimeLimitRuntime(settings);
@@ -1724,11 +1729,13 @@ function sendSettingsToMainWorld(settings) {
     window.postMessage({
         type: 'FilterTube_SettingsToInjector',
         payload: settings,
+        revision: dispatchRevision,
         source: 'content_bridge'
     }, '*');
 
-    if (!tryApplySettingsToSeed(settings)) {
+    if (!tryApplySettingsToSeed(settings, dispatchRevision)) {
         pendingSeedSettings = settings;
+        pendingSeedSettingsRevision = dispatchRevision;
         ensureSeedReadyListener();
         scheduleSeedRetry();
     }

@@ -86,17 +86,20 @@ export function loadSeedRuntime(options = {}) {
     },
     XMLHttpRequest: makeXhr,
     postMessage() {},
+    addEventListener() {},
     dispatchEvent(event) {
       calls.dispatchEvent.push(event?.type || '');
     }
   };
   const documentObject = {
+    addEventListener() {},
     location: {
       hostname: options.hostname || 'www.youtube.com',
       pathname: options.pathname || '/',
       origin: options.origin || 'https://www.youtube.com'
     },
     documentElement: {
+      toggleAttribute() {},
       getAttribute(name) {
         if (name === 'data-filtertube-debug') {
           return options.debug === true ? 'true' : null;
@@ -149,7 +152,8 @@ export function loadSeedRuntime(options = {}) {
     setTimeout() {
       return 0;
     },
-    clearTimeout() {}
+    clearTimeout() {},
+    clearInterval() {}
   };
   context.globalThis = context;
   vm.createContext(context);

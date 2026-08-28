@@ -39,6 +39,9 @@
     let dataHooksEstablished = false;
     let rawYtInitialData = null;
     let rawYtInitialPlayerResponse = null;
+    let lastSettingsDispatchRevision = 0;
+    let assigningProcessedYtInitialData = false;
+    let assigningProcessedYtInitialPlayerResponse = false;
 
     const originalAudioState = {
         videoId: '',
@@ -1636,6 +1639,10 @@
                         return originalYtInitialData;
                     },
                     set: function(newValue) {
+                        if (assigningProcessedYtInitialData) {
+                            originalYtInitialData = newValue;
+                            return;
+                        }
                         if (isSeedDebugEnabled()) {
                             seedDebugLog('🎯 ytInitialData intercepted via setter');
                             seedDebugLog('Data keys:', newValue ? Object.keys(newValue) : 'null');
@@ -1685,6 +1692,10 @@
                         return originalYtInitialPlayerResponse;
                     },
                     set: function(newValue) {
+                        if (assigningProcessedYtInitialPlayerResponse) {
+                            originalYtInitialPlayerResponse = newValue;
+                            return;
+                        }
                         if (isSeedDebugEnabled()) {
                             seedDebugLog('🎯 ytInitialPlayerResponse intercepted via setter');
                             seedDebugLog('Data keys:', newValue ? Object.keys(newValue) : 'null');
@@ -2044,7 +2055,17 @@
     /**
      * Update settings and process any queued data
      */
-    function updateSettings(newSettings) {
+    function updateSettings(newSettings, dispatchRevision = 0) {
+        const normalizedDispatchRevision = Number.isSafeInteger(dispatchRevision) && dispatchRevision > 0
+            ? dispatchRevision
+            : 0;
+        if (normalizedDispatchRevision && normalizedDispatchRevision === lastSettingsDispatchRevision) {
+            seedDebugLog(`⏭️ Ignoring duplicate settings dispatch ${normalizedDispatchRevision}`);
+            return;
+        }
+        if (normalizedDispatchRevision) {
+            lastSettingsDispatchRevision = normalizedDispatchRevision;
+        }
         seedDebugLog('📥 Settings update received');
         seedDebugLog('Settings details:', {
             profileType: newSettings.profileType,
@@ -2104,13 +2125,23 @@
                 // Update the appropriate global variable
                 if (item.name.includes('ytInitialData')) {
                     replayedInitialData = true;
-                    window.ytInitialData = processed;
+                    assigningProcessedYtInitialData = true;
+                    try {
+                        window.ytInitialData = processed;
+                    } finally {
+                        assigningProcessedYtInitialData = false;
+                    }
                     if (window.filterTube) {
                         window.filterTube.lastYtInitialData = processed;
                     }
                 } else if (item.name.includes('ytInitialPlayerResponse')) {
                     replayedPlayerResponse = true;
-                    window.ytInitialPlayerResponse = processed;
+                    assigningProcessedYtInitialPlayerResponse = true;
+                    try {
+                        window.ytInitialPlayerResponse = processed;
+                    } finally {
+                        assigningProcessedYtInitialPlayerResponse = false;
+                    }
                     if (window.filterTube) {
                         window.filterTube.lastYtInitialPlayerResponse = processed;
                     }
@@ -2130,7 +2161,12 @@
             if (sourceInitialData && !replayedInitialData) {
                 seedDebugLog('🔄 Reprocessing stored ytInitialData snapshot with new settings');
                 const reprocessed = processWithEngine(sourceInitialData, 'ytInitialData-reprocess');
-                window.ytInitialData = reprocessed;
+                assigningProcessedYtInitialData = true;
+                try {
+                    window.ytInitialData = reprocessed;
+                } finally {
+                    assigningProcessedYtInitialData = false;
+                }
                 window.filterTube.lastYtInitialData = reprocessed;
             }
 
@@ -2142,7 +2178,12 @@
             if (sourcePlayerResponse && !replayedPlayerResponse) {
                 seedDebugLog('🔄 Reprocessing stored ytInitialPlayerResponse snapshot with new settings');
                 const reprocessed = processWithEngine(sourcePlayerResponse, 'ytInitialPlayerResponse-reprocess');
-                window.ytInitialPlayerResponse = reprocessed;
+                assigningProcessedYtInitialPlayerResponse = true;
+                try {
+                    window.ytInitialPlayerResponse = reprocessed;
+                } finally {
+                    assigningProcessedYtInitialPlayerResponse = false;
+                }
                 window.filterTube.lastYtInitialPlayerResponse = reprocessed;
             }
         }

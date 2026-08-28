@@ -560,3 +560,28 @@ test('youtubei fetch before settings are loaded passes through without parse or 
   assert.equal(runtime.calls.jsonStringify.length, 0);
   assert.deepEqual(body, payload);
 });
+
+test('settings replay assigns filtered globals without re-entering the JSON filter and ignores duplicate dispatches', () => {
+  const runtime = loadSeedRuntime({ pathname: '/' });
+  const firstSettings = settings({
+    filterChannels: [{ id: 'UC1234567890123456789012' }]
+  });
+  const nextSettings = settings({
+    filterChannels: [{ id: 'UC1234567890123456789012' }],
+    hideAllShorts: true
+  });
+
+  runtime.window.filterTube.updateSettings(firstSettings, 1);
+  runtime.window.ytInitialData = homeContinuationPayload();
+  assert.deepEqual(runtime.calls.processData.map((call) => call.dataName), ['ytInitialData']);
+
+  runtime.window.filterTube.updateSettings(nextSettings, 2);
+  assert.deepEqual(runtime.calls.processData.map((call) => call.dataName), [
+    'ytInitialData',
+    'ytInitialData-reprocess'
+  ]);
+
+  runtime.window.filterTube.updateSettings({ ...nextSettings }, 2);
+  assert.equal(runtime.calls.processData.length, 2, 'the injector copy of one bridge dispatch must not replay the snapshot');
+  assert.equal(runtime.window.filterTube.settings, nextSettings);
+});

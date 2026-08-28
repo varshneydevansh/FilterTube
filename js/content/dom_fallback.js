@@ -6,7 +6,6 @@ installFilterTubeRoutineConsoleGate();
 const CHANNEL_ONLY_TAGS = new Set([]);
 
 const compiledKeywordRegexCache = new WeakMap();
-const compiledChannelFilterIndexCache = new WeakMap();
 const compiledChannelFilterIndexCacheByList = new WeakMap();
 const currentPageChannelMetaCache = {
     path: '',
@@ -736,9 +735,7 @@ function getCompiledChannelFilterIndex(settings, listOverride = null) {
     const channelMap = settings.channelMap || {};
     const channelMapRevision = Number(settings.__filtertubeChannelMapRevision) || 0;
 
-    const existing = listOverride
-        ? compiledChannelFilterIndexCacheByList.get(list)
-        : compiledChannelFilterIndexCache.get(settings);
+    const existing = compiledChannelFilterIndexCacheByList.get(list);
     if (
         existing &&
         existing.sourceList === list &&
@@ -876,11 +873,7 @@ function getCompiledChannelFilterIndex(settings, listOverride = null) {
         unresolvedHandleKeys
     };
 
-    if (listOverride) {
-        compiledChannelFilterIndexCacheByList.set(list, index);
-    } else {
-        compiledChannelFilterIndexCache.set(settings, index);
-    }
+    compiledChannelFilterIndexCacheByList.set(list, index);
     if (perfEnabled) {
         perf.log('dom-channel-index-build', {
             durationMs: Number((perf.now() - perfStartedAt).toFixed(2)),
