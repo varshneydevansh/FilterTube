@@ -12,7 +12,7 @@ import { ActionLink, Panel, SectionHeading } from "@/components/marketing-ui";
 import { Reveal } from "@/components/reveal";
 import {
   appDemoVideoHref,
-  androidOpenTestingHref,
+  androidPlayStoreHref,
   demoVideoHref,
   detailPages,
   docsHref,
@@ -187,12 +187,12 @@ function AppReleaseStatusSection() {
   const appCards = [
     {
       eyebrow: "Android phone + tablet",
-      title: "The complete custom app is open for testing.",
-      body: "Google Play open testing contains FilterTube's feature-rich custom viewing experience for YouTube Main and Kids. Anyone eligible can join without an invitation. It is different from the simpler direct APK available on GitHub.",
+      title: "The complete custom app is public on Google Play.",
+      body: "FilterTube's public Google Play app includes the feature-rich custom viewing experience for YouTube Main and Kids. Install it from the listing or search Google Play for FilterTube. It is different from the simpler direct APK available on GitHub.",
       image: "/apps/android.png",
       imageAlt: "FilterTube Android app artwork",
-      action: "Become a tester",
-      href: androidOpenTestingHref,
+      action: "Open on Google Play",
+      href: androidPlayStoreHref,
       themeClass: "ft-app-release-card--android",
     },
     {
@@ -297,7 +297,7 @@ function QuickGuideSection() {
                   [
                     "1",
                     "Install and open FilterTube",
-                    "Use the browser extension first. Android users can also join Google Play open testing directly—no invitation is required.",
+                    "Use the browser extension first. Android users can install the public app from Google Play or search the store for FilterTube.",
                   ],
                   [
                     "2",
@@ -504,8 +504,8 @@ export default function HomePage() {
                   Live now
                 </span>
                 <span className="text-pretty">
-                  Desktop extensions are live. Android Google Play open
-                  testing is available now in 177 countries and regions.
+                  Desktop extensions and the Android app are live. Find
+                  FilterTube on Google Play.
                 </span>
               </div>
 
@@ -556,8 +556,8 @@ export default function HomePage() {
                 </a>
               </div>
               <p className="ft-hero-status mt-5 max-w-[720px] rounded-2xl px-5 py-3 text-sm font-medium leading-6 text-white md:px-6">
-                Desktop extensions are available now. The complete Android app
-                is in Google Play open testing; iPhone and iPad are being
+                Desktop extensions are available now, and the complete Android
+                app is public on Google Play. iPhone and iPad are being
                 finalized for TestFlight.
               </p>
             </div>
@@ -918,8 +918,8 @@ export default function HomePage() {
                     The safest first step is small: add one keyword or channel,
                     refresh YouTube, and confirm it works. Then build profiles,
                     PINs, imports, or family device updates around that.
-                    Android users can also join Google Play open testing
-                    directly without an invitation.
+                    Android users can install the public app from Google Play
+                    or search the store for FilterTube.
                   </p>
                   <div className="mt-8 flex flex-col gap-3 sm:flex-row">
                     <ActionLink external href={demoVideoHref}>
@@ -930,8 +930,8 @@ export default function HomePage() {
                     </ActionLink>
                   </div>
                   <div className="mt-4 flex flex-wrap gap-3">
-                    <ActionLink external href={androidOpenTestingHref}>
-                      Join Android open testing
+                    <ActionLink external href={androidPlayStoreHref}>
+                      Open FilterTube on Google Play
                     </ActionLink>
                     <ActionLink href={downloadsHref} variant="secondary">
                       Open downloads

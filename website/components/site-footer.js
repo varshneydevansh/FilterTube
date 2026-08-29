@@ -51,9 +51,10 @@ export function SiteFooter() {
                   Built to leave the screen calmer than it was.
                 </h2>
                 <p className="mt-5 max-w-[56ch] text-base leading-8 text-[var(--color-muted)]">
-                  FilterTube is live today on desktop browsers, with Android
-                  phone/tablet testing and dedicated iOS, iPad, TV, Kids, and
-                  local intelligence paths shaped into the same serene system.
+                  FilterTube is live today on desktop browsers and Android
+                  phone/tablet through Google Play, with dedicated iOS, iPad,
+                  TV, Kids, and local intelligence paths shaped into the same
+                  serene system.
                 </p>
                 <div className="mt-8 flex flex-col gap-3 sm:flex-row">
                   <ActionLink external href={extensionInstallHref}>

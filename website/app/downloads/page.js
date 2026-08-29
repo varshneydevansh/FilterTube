@@ -11,7 +11,6 @@ import {
 import { HeroVideo } from "@/components/hero-video";
 import { ActionLink, Panel } from "@/components/marketing-ui";
 import {
-  androidOpenTestingHref,
   androidPlayStoreHref,
   docsHref,
   githubHref,
@@ -21,7 +20,7 @@ import {
 export const metadata = {
   title: "Downloads",
   description:
-    "Download FilterTube for browsers, join Android Google Play open testing, or follow final iPhone and iPad testing progress.",
+    "Download FilterTube for browsers, install the public Android app from Google Play, or follow final iPhone and iPad testing progress.",
 };
 
 const releaseHref = `${githubHref}/releases`;
@@ -52,14 +51,14 @@ const primaryDownloads = [
   },
   {
     title: "Android phone/tablet",
-    label: "Open testing available now",
+    label: "Available on Google Play",
     icon: AndroidLogo,
     description:
-      "The feature-rich Android custom viewing app is available through Google Play open testing in 177 countries and regions. No invitation or email is needed. The direct APK is a separate, simpler build and does not include the complete custom frontend.",
+      "The feature-rich Android custom viewing app is publicly available on Google Play. Install it from the listing or search Google Play for FilterTube. The direct APK is a separate, simpler build and does not include the complete custom frontend.",
     actions: [
       {
-        label: "Become a tester",
-        href: androidOpenTestingHref,
+        label: "Open on Google Play",
+        href: androidPlayStoreHref,
       },
       {
         label: "Simpler direct APK",
@@ -92,13 +91,13 @@ const androidMarkets = [
     title: "Google Play",
     status: "Complete custom viewing app",
     detail:
-      "The open-test build is FilterTube's feature-rich, complete custom viewing experience for YouTube Main and Kids. Anyone eligible can join directly through Google Play.",
+      "The Google Play build is FilterTube's feature-rich, complete custom viewing experience for YouTube Main and Kids. Anyone can install it directly from the public listing or find it by searching Google Play.",
   },
   {
     title: "Direct APK",
     status: "Separate simpler build",
     detail:
-      "The direct-install APK is not the complete custom frontend available through Google Play open testing. Keep this distinction clear before downloading or sideloading it.",
+      "The direct-install APK is not the complete custom frontend available through Google Play. Keep this distinction clear before downloading or sideloading it.",
   },
   {
     title: "IzzyOnDroid",
@@ -208,8 +207,8 @@ export default function DownloadsPage() {
             <p className="mt-6 max-w-[68ch] text-pretty text-base leading-8 text-[var(--color-muted)] md:text-lg">
               Browser releases stay public on GitHub and store listings. Android
               phone/tablet builds can be attached to the same release stream for
-              Google Play open testing, GrapheneOS, and other direct-install
-              users. iPhone and iPad are in final build and testing alignment,
+              Google Play, GrapheneOS, and other direct-install users. iPhone
+              and iPad are in final build and testing alignment,
               with Apple Developer account access currently delaying TestFlight.
             </p>
           </div>
@@ -231,11 +230,11 @@ export default function DownloadsPage() {
                   App release state
                 </p>
                 <h2 className="mt-5 font-display text-4xl tracking-[-0.06em] text-[var(--color-ink)] md:text-5xl">
-                  Android open testing is live; Apple testing is being finalized.
+                  Android is public on Google Play; Apple testing is being finalized.
                 </h2>
                 <p className="mt-5 text-sm leading-7 text-[var(--color-muted)]">
-                  Anyone eligible can join the Google Play open test directly in
-                  177 countries and regions. The iPhone and iPad build is in final alignment, while
+                  Anyone can install the Android app from Google Play or search
+                  the store for FilterTube. The iPhone and iPad build is in final alignment, while
                   Apple Developer account access is the current TestFlight delay.
                   TV remains separate platform work.
                 </p>
@@ -247,9 +246,8 @@ export default function DownloadsPage() {
                     Android
                   </h3>
                   <p className="mt-3 text-sm leading-7 text-[var(--color-muted)]">
-                    Google Play open testing is active. Use the testing page to
-                    become a tester and install the app—no invitation or email is
-                    required.
+                    The public Google Play listing is live. Open the link above
+                    or search Google Play for FilterTube to install the app.
                   </p>
                 </div>
                 <div className="rounded-[1.2rem] border border-[color:var(--color-line)] bg-[color:var(--color-soft-panel)] p-5">

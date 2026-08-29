@@ -9,6 +9,16 @@ This document records the public website, extension dashboard, and release-scrip
 The post-v3.3.5 public-surface commits are now recorded here as a separate
 checkpoint from the older May validation notes.
 
+### August 29, 2026 public Android release
+
+- The Android phone/tablet app is now publicly available on Google Play at
+  `https://play.google.com/store/apps/details?id=com.filtertube.app`.
+- The extension dashboard and website now use the public store listing as the
+  primary Android CTA. Users can install from the link or search Google Play
+  for FilterTube.
+- Android copy no longer presents the app as an open-testing enrollment path;
+  the separate direct APK remains clearly identified as a simpler build.
+
 ### Committed website and dashboard work
 
 - `54c35a22` simplified the public navigation and split everyday setup copy

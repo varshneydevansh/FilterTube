@@ -28,8 +28,6 @@ export const docsHref =
 export const githubHref = "https://github.com/varshneydevansh/FilterTube";
 export const redditHref = "https://www.reddit.com/r/FilterTube/";
 export const downloadsHref = "/downloads";
-export const androidOpenTestingHref =
-  "https://play.google.com/apps/testing/com.filtertube.app";
 export const androidPlayStoreHref =
   "https://play.google.com/store/apps/details?id=com.filtertube.app";
 
@@ -72,8 +70,8 @@ export const browserLinks = [
   },
   {
     name: "Android",
-    note: "Open testing",
-    href: androidOpenTestingHref,
+    note: "Google Play",
+    href: androidPlayStoreHref,
     logo: "/apps/android.png",
   },
   {
@@ -120,8 +118,8 @@ export const homeStoryNotes = [
   "FilterTube is built by a neurodivergent developer who needed calmer YouTube for ADHD focus, then shaped further by parents and caregivers.",
   "Families with autistic children and other neurodivergent users are part of the reason the controls are becoming simpler, clearer, and easier to trust.",
   "Use profiles when different people need different rules. Use a PIN when those rules should not be changed casually.",
-  "Desktop extensions work today. FilterTube for Android is available through Google Play open testing in 177 countries and regions; anyone eligible can join without an invitation.",
-  "The Android open-test build includes Main, Kids, profiles, protected time, and content-first playback.",
+  "Desktop extensions work today. FilterTube for Android is publicly available on Google Play and can be installed from the listing or found by searching Google Play for FilterTube.",
+  "The Android app includes Main, Kids, profiles, protected time, and content-first playback.",
   "The iPhone and iPad build is in final testing alignment. Apple Developer account access is delaying TestFlight for now and will be resolved as soon as possible.",
 ];
 
@@ -181,9 +179,9 @@ export const homeCapabilityCards = [
     title:
       "The same rule model is moving from desktop into phone, tablet, and TV.",
     description:
-      "The extension is live, the working Android build is in Google Play open testing, and the native Apple build is in final testing alignment.",
+      "The extension and Android app are live, and the native Apple build is in final testing alignment.",
     points: [
-      "Join the Android open test directly on Google Play—no invitation or email is required.",
+      "Open the public Android listing directly or search Google Play for FilterTube.",
       "Apple Developer account access is currently delaying TestFlight and will be resolved as soon as possible.",
       "Remote family updates use verified device trust, not a public account full of private viewing data.",
     ],
@@ -262,9 +260,9 @@ export const homeFaqItems = [
       "No. Filtering is local-first. Device sync can help two trusted devices connect or pick up an update, but it is designed so the helper service cannot read your rules.",
   },
   {
-    question: "How do I join Android app testing?",
+    question: "How do I install the Android app?",
     answer:
-      "Open the Google Play testing page and choose Become a tester. No invitation or email is required.",
+      "Open the public FilterTube listing on Google Play and install it, or search Google Play for FilterTube and choose the app from the official listing.",
   },
 ];
 
@@ -357,15 +355,15 @@ export const detailPages = {
     slug: "mobile",
     icon: DeviceMobile,
     tone: "sage",
-    status: "Store testing",
+    status: "Available on Google Play",
     eyebrow: "Dedicated apps",
     navTitle: "Mobile overview",
     routeSummary:
-      "A calm overview of the working Android release build, finalizing Apple builds, and the future TV app family.",
+      "A calm overview of the public Android app, finalizing Apple builds, and the future TV app family.",
     titleLead: "A calm FilterTube companion for",
     titleDisplay: "phones and tablets",
     description:
-      "The working Android phone and tablet build is available through Google Play open testing in 177 countries and regions. The native iPhone and iPad build is in final alignment, with Apple Developer account access currently delaying TestFlight.",
+      "The Android phone and tablet app is publicly available on Google Play. The native iPhone and iPad build is in final alignment, with Apple Developer account access currently delaying TestFlight.",
     heroArtworks: [
       {
         src: "/apps/android.png",
@@ -415,8 +413,8 @@ export const detailPages = {
     ],
     featureCards: [
       {
-        title: "Android open testing is available now",
-        body: "Join directly through Google Play to test the working phone and tablet build—no invitation or email is required.",
+        title: "Android is available on Google Play",
+        body: "Install the public phone and tablet app from the Google Play listing, or search Google Play for FilterTube.",
       },
       {
         title: "Home that reassures first",
@@ -435,7 +433,7 @@ export const detailPages = {
     milestoneIntro:
       "Mobile is the control center for status, rule changes, and profile switching, not a stretched copy of the browser popup.",
     milestones: [
-      "Android testers can join the Google Play open test directly.",
+      "Android users can install the public Google Play app directly.",
       "Protection status is understandable in one glance.",
       "Profiles and PIN gates feel native and trustworthy.",
       "The visual tone stays calm enough for family use.",
@@ -596,23 +594,23 @@ export const detailPages = {
     slug: "android",
     icon: DeviceMobile,
     tone: "forest",
-    status: "Google Play open testing",
+    status: "Available on Google Play",
     eyebrow: "Android app",
     navTitle: "Android",
     routeSummary:
-      "The feature-rich Android custom viewing app is available through Google Play open testing.",
+      "The feature-rich Android custom viewing app is publicly available on Google Play.",
     titleLead: "A flexible FilterTube companion for",
     titleDisplay: "Android devices",
     description:
-      "Google Play open testing contains FilterTube's complete custom viewing experience, including rules, profiles, protected time, YouTube Main, YouTube Kids, and content-first ad-free playback. Anyone eligible can join without an invitation. The direct APK is a separate, simpler build without this complete custom frontend.",
+      "The public Google Play app contains FilterTube's complete custom viewing experience, including rules, profiles, protected time, YouTube Main, YouTube Kids, and content-first ad-free playback. Users can install it from the listing or search Google Play for FilterTube. The direct APK is a separate, simpler build without this complete custom frontend.",
     heroArtwork: {
       src: "/apps/android.png",
       alt: "FilterTube Android app artwork",
     },
-    chips: ["Complete custom frontend", "Ad-free playback", "Open testing"],
+    chips: ["Complete custom frontend", "Ad-free playback", "Google Play"],
     primaryCta: {
-      label: "Join Google Play open testing",
-      href: androidOpenTestingHref,
+      label: "Open on Google Play",
+      href: androidPlayStoreHref,
       external: true,
     },
     secondaryCta: {
@@ -621,12 +619,12 @@ export const detailPages = {
       external: false,
     },
     previewLabel: "Android intent",
-    previewTitle: "The complete custom app works now; active testers unlock the public path.",
+    previewTitle: "The complete custom app is available to everyone.",
     previewRows: [
       {
         label: "Access",
-        value: "Open test",
-        detail: "Join directly through Google Play. No invitation or email is required.",
+        value: "Public listing",
+        detail: "Install from the listing or search Google Play for FilterTube.",
       },
       {
         label: "Profiles",
@@ -636,7 +634,7 @@ export const detailPages = {
       {
         label: "Current build",
         value: "Custom frontend",
-        detail: "The feature-rich Main and Kids viewing experience is available for real-device open testing.",
+        detail: "The feature-rich Main and Kids viewing experience is available on public Android installs.",
       },
     ],
     featureCards: [
@@ -649,15 +647,15 @@ export const detailPages = {
         body: "The product stays legible even while scenic theming and motion are active.",
       },
       {
-        title: "Open testing on real devices",
-        body: "Google Play open testers can install the app now and help prove it across real phones and tablets.",
+        title: "Available on real Android devices",
+        body: "Anyone can install the app from Google Play and use the complete experience across phones and tablets.",
       },
     ],
     milestoneTitle: "Android priorities",
     milestoneIntro:
       "Android balances flexibility with the same calm trust posture used elsewhere.",
     milestones: [
-      "Welcome Google Play open testers and collect real-device feedback.",
+      "Welcome Android users from the public Google Play listing.",
       "Keep the working release build stable across real phones and tablets.",
       "Keep product-control language clear and direct.",
       "Use serene visuals without losing Android’s practical character.",

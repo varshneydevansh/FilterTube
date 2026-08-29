@@ -3,9 +3,10 @@
 ## Post-v3.3.5 source-history index
 
 The following index records every commit after the v3.3.5 stability baseline
-(`2fd04d3`) through the current unreleased checkpoint. The detailed contracts
-remain in the existing topic documents linked below; this table is the
-chronological index, not a replacement for those documents.
+(`2fd04d3`) through the v3.3.6 source train. The detailed contracts remain in
+the existing topic documents linked below; this table is the chronological
+index, not a replacement for those documents. The v3.3.7 delta after the last
+release commit (`3513cef9`) is documented in the section below.
 
 | Date | Commit | Recorded change | Canonical detail |
 | --- | --- | --- | --- |
@@ -48,6 +49,113 @@ commits form the v3.3.6 source train. Website edits are tracked in the
 [website surface changelog](docs/WEBSITE_APP_RELEASE_SURFACE_CHANGELOG.md), and
 the [post-v3.3.5 ledger](docs/POST_3_3_5_CHANGE_LEDGER_2026-08-23.md) retains the
 file-level cross-check behind the canonical topic documentation.
+
+## Version 3.3.7 — Faster Large Lists, Persistent Imports, And Public Android
+
+Release baseline: `3513cef91282a489f4b246bca5ca35845c8154d2` (`Use GitHub CLI
+credentials for release publishing`). This release documents the fifteen
+commits through `2cf9db06` plus the current public Android website and
+extension-dashboard changes in the working tree.
+
+### Commit history after the last release
+
+| Date | Commit | Change | Canonical detail |
+| --- | --- | --- | --- |
+| 2026-08-25 | `1a6a4440` | Make GitHub release uploads resumable | [Release upload test](tests/runtime/release-upload-resume-current-behavior.test.mjs) |
+| 2026-08-26 | `809019b8` | Harden Advert Void observer boundaries | [Advert Void boundary](docs/audit/FILTERTUBE_AD_VOID_PLAYER_STATE_AND_DOM_WORK_BOUNDARY_2026-08-26.md) |
+| 2026-08-26 | `a4212f22` | Fix Home feed stability and imported channel enrichment | [Home/import stability](docs/FILTERTUBE_IMPORT_HOME_STABILITY_CURRENT_BEHAVIOR_2026-08-26.md) |
+| 2026-08-27 | `64342c21` | Persist imported enrichment and virtualize large rule lists | [Imported enrichment](docs/FILTERTUBE_IMPORTED_ENRICHMENT_BACKGROUND_CURRENT_BEHAVIOR_2026-08-27.md) |
+| 2026-08-27 | `b7edbd7a` | Add persistent rule-list import reports | [Import reports](docs/FILTERTUBE_RULE_LIST_IMPORT_REPORTS_CURRENT_BEHAVIOR_2026-08-27.md) |
+| 2026-08-27 | `00252f02` | Improve imported metadata reporting and list responsiveness | [Import reports](docs/FILTERTUBE_RULE_LIST_IMPORT_REPORTS_CURRENT_BEHAVIOR_2026-08-27.md) |
+| 2026-08-27 | `0180b429` | Handle permanent imported channel lookup failures | [Imported enrichment](docs/FILTERTUBE_IMPORTED_ENRICHMENT_BACKGROUND_CURRENT_BEHAVIOR_2026-08-27.md) |
+| 2026-08-27 | `595a5cd2` | Clarify import report states and removal actions | [Import reports](docs/FILTERTUBE_RULE_LIST_IMPORT_REPORTS_CURRENT_BEHAVIOR_2026-08-27.md) |
+| 2026-08-27 | `56d1af60` | Improve import report review sheet UX | [Import reporting](docs/FILTERTUBE_RULE_LIST_IMPORT_REPORTING_CURRENT_BEHAVIOR_2026-08-27.md) |
+| 2026-08-27 | `1c8f0f42` | Optimize large rule-list filtering runtime | [Large-list optimization](docs/FILTERTUBE_LARGE_RULE_LIST_RUNTIME_OPTIMIZATION_2026-08-27.md) |
+| 2026-08-27 | `0a316e88` | Target Home fallback to changed cards | [Large-list optimization](docs/FILTERTUBE_LARGE_RULE_LIST_RUNTIME_OPTIMIZATION_2026-08-27.md) |
+| 2026-08-27 | `1836b665` | Avoid repeated large-list metadata scans | [Large-list optimization](docs/FILTERTUBE_LARGE_RULE_LIST_RUNTIME_OPTIMIZATION_2026-08-27.md) |
+| 2026-08-28 | `a7f12be0` | Add opt-in filtering performance diagnostics | [Large-list optimization](docs/FILTERTUBE_LARGE_RULE_LIST_RUNTIME_OPTIMIZATION_2026-08-27.md) |
+| 2026-08-28 | `f38a5262` | Target Home identity fallback updates | [Large-list optimization](docs/FILTERTUBE_LARGE_RULE_LIST_RUNTIME_OPTIMIZATION_2026-08-27.md) |
+| 2026-08-28 | `2cf9db06` | Avoid duplicate large-list filtering passes | [Large-list optimization](docs/FILTERTUBE_LARGE_RULE_LIST_RUNTIME_OPTIMIZATION_2026-08-27.md) |
+
+### Release transport
+
+- **Resumable GitHub publishing**: release publication now uses the GitHub CLI
+  credential path, checks whether the tag already has a release, creates new
+  releases as drafts, uploads only missing assets, verifies the final asset set,
+  and publishes only after verification. An interrupted upload can resume
+  without recreating the release or re-uploading completed assets.
+
+### Large rule-list and Home performance
+
+- **Reusable filter engines and indexes**: unchanged settings snapshots and
+  channel maps reuse compiled JSON filtering state; channel identities and
+  video IDs use compiled indexes and `Set` membership while retaining existing
+  matching and precedence semantics.
+- **Less metadata work**: channel/video-only policies skip description, tags,
+  view, and extended metadata extraction; keyword, comment, allow-keyword, and
+  debug paths retain complete searchable metadata.
+- **Targeted Home fallback**: ordinary card insertions and identity updates
+  process only deduplicated changed card owners. Structural changes such as
+  shelves, chip rails, comments, guides, surveys, and grids retain the full
+  fallback path.
+- **Reduced repaint and storage churn**: hidden-time counters persist through
+  coalesced writes, debug-only card diagnostics avoid normal console and DOM
+  queries, and metadata-only enrichment updates do not refresh YouTube tabs.
+- **Duplicate work removed**: filtered `ytInitialData`/Player setter replay is
+  bypassed when the payload is already filtered, settings revisions prevent
+  duplicate startup processing, DOM indexes are cached by snapshot identity,
+  and diagnostic object paths are built only when performance diagnostics are
+  enabled.
+- **Opt-in diagnostics**: `localStorage.setItem('filtertubePerfDebug', '1')`
+  exposes aggregate JSON, DOM-index, observer, and fallback timings without
+  changing filtering decisions. The source-level benchmark and live-capture
+  limitations remain documented in the optimization record.
+
+### Imported channel completion and reports
+
+- **Background-owned enrichment**: CSV, TXT, FilterTube JSON, BlockTube
+  migration JSON, and managed imports share a persisted queue owned by the
+  background runtime rather than the dashboard. It performs one lookup at a
+  time with randomized 7–15 second pacing while awake, retries incomplete
+  results independently, and uses a coarse Chrome alarm for restart recovery.
+- **Profile-safe metadata writes**: active actor, target profile, and lock
+  authority are checked before and immediately before writes. Resolved names,
+  handles/custom URLs, avatars, alternate IDs, and IDs merge into the existing
+  imported rule without creating duplicates or projecting private child rules
+  into legacy global storage.
+- **Permanent failure handling**: not-found, unavailable, and terminated
+  channels become terminal attention rows with the exact reason retained; they
+  remain active as identifier rules and are not retried indefinitely. Name-only
+  rows remain explicitly non-enrichable.
+- **Persistent Import Reports**: reports distinguish complete, pending,
+  fetching, retrying, permanent lookup, name-only, skipped, and missing-queue
+  states. They remain available after dashboard closure, support bounded
+  rendering for large imports, unresolved CSV export, and safe removal of
+  unresolved uniquely identified imported rules.
+- **Responsive report UI**: the review sheet uses an opaque bounded modal,
+  fixed footer actions, readable status explanations, stacked narrow-screen
+  rows, visible Main/Kids target context, and incremental visible-row updates.
+
+### Advert Void safety and public app distribution
+
+- **Advert Void boundary**: escaped-player suppression now requires paired
+  `ad-showing` and `ad-interrupting` state or independent visible-ad evidence,
+  so a stale single SPA class cannot hide or mute the requested video. The
+  dedicated sponsored-card path no longer activates generic renderer rescans.
+- **Public Android app**: the extension dashboard and website now announce the
+  Android phone/tablet app as publicly available on Google Play. Users can
+  install it from the [public listing](https://play.google.com/store/apps/details?id=com.filtertube.app)
+  or search Google Play for “FilterTube”. The simpler direct APK remains a
+  separate distribution path, and iOS/iPad remains in TestFlight preparation.
+
+### Release boundary
+
+The v3.3.7 source-level work is covered by focused runtime tests and successful
+Chrome/Firefox packaging checks recorded in the linked topic documents. The
+large-list timing numbers are fixture measurements, not a universal browser
+performance claim. Installed-browser interaction, store rollout, and native
+Android implementation evidence remain separate from this extension source
+release.
 
 ## Version 3.3.6 — Filtering, Protected Time, Advert Void, And UI Reliability
 

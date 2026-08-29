@@ -1,7 +1,7 @@
 # FilterTube Advert Void Player-State and DOM-Work Boundary — 2026-08-26
 
 Status: current-behavior record for the Advert Void stability maintenance
-that is being released with the existing v3.3.6 source train.
+that is being released with the v3.3.7 source train.
 
 ## Scope
 

@@ -3,7 +3,7 @@
   <h1>FilterTube</h1>
   <p>Peace of Mind for your Digital Space</p>
   
-  [![Ask DeepWiki](https://deepwiki.com/badge.svg)](https://deepwiki.com/varshneydevansh/FilterTube) ![Version](https://img.shields.io/badge/version-3.3.6-blue.svg) ![License](https://img.shields.io/badge/license-MIT-green.svg) ![Lines of Code](https://img.shields.io/badge/total%20lines-607.8k-brightgreen.svg) ![JavaScript LoC](https://img.shields.io/badge/javascript-106.5k%20lines-yellow.svg) ![Top Language](https://img.shields.io/github/languages/top/varshneydevansh/FilterTube?color=f1e05a) ![Repo Size](https://img.shields.io/github/repo-size/varshneydevansh/FilterTube?color=orange)
+  [![Ask DeepWiki](https://deepwiki.com/badge.svg)](https://deepwiki.com/varshneydevansh/FilterTube) ![Version](https://img.shields.io/badge/version-3.3.7-blue.svg) ![License](https://img.shields.io/badge/license-MIT-green.svg) ![Lines of Code](https://img.shields.io/badge/total%20lines-616.9k-brightgreen.svg) ![JavaScript LoC](https://img.shields.io/badge/javascript-111.8k%20lines-yellow.svg) ![Top Language](https://img.shields.io/github/languages/top/varshneydevansh/FilterTube?color=f1e05a) ![Repo Size](https://img.shields.io/github/repo-size/varshneydevansh/FilterTube?color=orange)
   
 </div>
 
@@ -15,11 +15,20 @@ The public website now also acts as the download hub for browser releases, Andro
 
 👉 **[filtertube.in/downloads](https://filtertube.in/downloads)**
 
-The current unreleased post-v3.3.5 source checkpoint is documented in the
+The current v3.3.7 post-v3.3.5 source checkpoint is documented in the
 [changelog history index](CHANGELOG.md), with the runtime, category, language,
 Nanah, app-sync, and website contracts kept in the existing [documentation
 map](docs/CODEMAP.md). Native Android/iOS parity and installed-device behavior
 remain evidence-gated; the extension is still the runtime source of truth.
+
+## What's New in v3.3.7
+
+- **Large rule lists are faster and steadier**: reusable filter engines, compiled channel/video indexes, incremental Home-card targeting, coalesced hidden-time writes, and duplicate-pass removal reduce repeated work while preserving rule semantics.
+- **Imported channel completion is persistent**: CSV, TXT, FilterTube JSON, BlockTube migration JSON, and managed imports use a background-owned queue with serialized 7–15 second pacing, retry backoff, permanent-failure attention states, profile safety, and Chrome alarm recovery.
+- **Import reports are reviewable**: persistent reports distinguish complete, pending, fetching, retrying, permanent lookup failures, name-only rules, skipped rows, and missing queue work; reports support bounded rendering, unresolved CSV export, and safe removal of unresolved imported rules.
+- **Home and Advert Void behavior is safer**: Home fallback targets changed cards and structural mutations precisely, while ad suppression requires paired player interruption state and no longer activates generic renderer rescans.
+- **Public release workflow is resumable**: GitHub CLI credentials, draft-first releases, missing-asset detection, and final upload verification allow interrupted release publication to resume safely.
+- **Android is public on Google Play**: install from the [public listing](https://play.google.com/store/apps/details?id=com.filtertube.app) or search Google Play for “FilterTube”.
 
 ## What's New in v3.3.5
 
@@ -208,7 +217,7 @@ Learn more in [Proactive Channel Identity](docs/PROACTIVE_CHANNEL_IDENTITY.md).
 
 ### For Users
 The easiest way to install FilterTube is via our official website:
-👉 **[Install FilterTube.in](https://filtertube.in/downloads)** (browser builds today, Android phone/tablet release links as they become public)
+👉 **[Install FilterTube.in](https://filtertube.in/downloads)** (browser builds and the public Android phone/tablet Google Play listing)
 
 Prefer a direct store link? Pick your browser:
 

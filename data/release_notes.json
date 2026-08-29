@@ -3,6 +3,23 @@
     "_comment": "Shared release notes source for the dashboard What's New tab and the YouTube release banner. Keep entries sorted newest-first by version."
   },
   {
+    "version": "3.3.7",
+    "headline": "Faster large lists, persistent imports, and public Android",
+    "summary": "FilterTube 3.3.7 reduces repeated work on large rule lists, moves imported channel completion into a persistent background queue, adds bounded import reports, hardens Home and Advert Void behavior, makes GitHub release uploads resumable, and announces the public Android Google Play app.",
+    "bannerSummary": "Faster large-list filtering, persistent imported-channel completion, reviewable import reports, safer Home and Advert Void behavior, resumable release uploads, and the public Android Google Play app are included in 3.3.7.",
+    "highlights": [
+      "Large channel and video-ID lists reuse compiled engines and Set-backed indexes, skip metadata that no active rule can consume, coalesce hidden-time writes, and target changed Home-card owners incrementally while retaining full passes for structural mutations.",
+      "The final large-list follow-up prevents duplicate filtered JSON setter passes, propagates settings revisions through both startup paths, reuses DOM indexes by immutable snapshot identity, and constructs diagnostic paths only when performance debugging is enabled.",
+      "CSV, TXT, FilterTube rule-list JSON, BlockTube migration JSON, and managed imports now share a background-owned persisted enrichment queue with one lookup at a time, randomized 7–15 second pacing while awake, per-row retries, Chrome alarm recovery, profile authorization, and terminal not-found or terminated states.",
+      "Persistent Import Reports explain complete, pending, fetching, retrying, permanent lookup, name-only, skipped, and missing-queue states; they remain available after dashboard closure, render large reports in bounded windows, export unresolved rows, and can safely remove unresolved uniquely identified imported rules.",
+      "Home feed startup and mutation handling target changed cards and preserve structural fallback boundaries, while metadata-only enrichment updates avoid refreshing YouTube tabs and reducing card reflow.",
+      "Advert Void now requires paired `ad-showing` and `ad-interrupting` player state or independent visible-ad evidence, and sponsored-card handling no longer counts as generic renderer mutation work.",
+      "GitHub release publishing uses the GitHub CLI credential path, creates drafts before upload, resumes existing tags, uploads only missing assets, verifies the final asset set, and publishes only after verification.",
+      "The Android phone/tablet app is publicly available on Google Play. Users can install it from the [public listing](https://play.google.com/store/apps/details?id=com.filtertube.app) or search Google Play for FilterTube."
+    ],
+    "detailsUrl": "https://github.com/varshneydevansh/FilterTube/releases/tag/v3.3.7"
+  },
+  {
     "version": "3.3.6",
     "headline": "Stronger filtering, protected time, and calmer ad-free playback",
     "summary": "FilterTube 3.3.6 brings direct-access enforcement, per-profile protected time and Self-Control sessions, reliable blocked and allowed rule collections, official category filtering, default-on Advert Void, and extensive current-YouTube compatibility work.",
@@ -15,7 +32,7 @@
       "Category filtering uses YouTube's official `microformat.playerMicroformatRenderer.category`, bounded same-origin Player metadata hydration, clear Block selected or Allow only selected intent, and safer Watch, rail, Mix, comment, and renderer ownership.",
       "Advert Void is enabled by default for new and upgraded profiles on YouTube Main and Kids. The shared Web runtime removes observed Player ad-plan fields without extra requests; native playback discards unmodeled ad-plan data or normalizes the raw Reel response where exposed, while guarded fallback handles escaped interruptions.",
       "Experimental spoken-language filtering and original-audio preference use YouTube Player evidence when available and fail open when recommendation metadata is unavailable.",
-      "Hide YouTube Playables, current camelCase renderer and collaboration handling, improved Help readability and search, clearer popup and dashboard controls, and Android closed-testing and iOS status surfaces are included.",
+      "Hide YouTube Playables, current camelCase renderer and collaboration handling, improved Help readability and search, clearer popup and dashboard controls, and the public Android Google Play and iOS status surfaces are included.",
       "Settings includes an unchecked-by-default device-wide opt-out for automatic reload reminders and What's New banners on YouTube and YouTube Kids. The dashboard's What's New page remains available manually."
     ],
     "detailsUrl": "https://github.com/varshneydevansh/FilterTube/releases/tag/v3.3.6"
