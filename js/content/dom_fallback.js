@@ -1347,6 +1347,7 @@ function openWatchPlaylistPanelIfCollapsed() {
 }
 
 const FILTERTUBE_DIRECT_ACCESS_PENDING_TTL_MS = 6000;
+const FILTERTUBE_DIRECT_ACCESS_OVERLAY_DELAY_MS = 180;
 
 function getCurrentDirectAccessPlayerHost() {
     try {
@@ -1369,8 +1370,7 @@ function getDirectAccessState() {
         pendingStartedAt: 0,
         pausedByGuard: false,
         wasPlaying: false,
-        recheckTimer: 0,
-        failOpenVideoId: ''
+        recheckTimer: 0
     });
 }
 
@@ -1384,6 +1384,7 @@ function installDirectAccessPlayGuard() {
             if (current.decision !== 'pending' && current.decision !== 'blocked') return;
             const media = event?.target;
             if (String(media?.tagName || '').toLowerCase() !== 'video') return;
+            if (current.decision === 'pending') current.wasPlaying = true;
             try {
                 media.pause?.();
             } catch (e) {
@@ -1400,7 +1401,6 @@ function pauseCurrentWatchForDirectAccess(videoId, decision = 'pending') {
         state.pendingStartedAt = 0;
         state.pausedByGuard = false;
         state.wasPlaying = false;
-        state.failOpenVideoId = '';
     }
     state.decision = decision === 'blocked' ? 'blocked' : 'pending';
     installDirectAccessPlayGuard();
@@ -1479,7 +1479,6 @@ function releaseDisabledDirectAccessState() {
     releaseDirectAccessGuard(videoId, true);
     clearCurrentShortAdmissionOverlay();
     try {
-        getDirectAccessState().failOpenVideoId = '';
         document.documentElement?.removeAttribute?.('data-filtertube-direct-channel-redirect');
         document.querySelectorAll('[data-filtertube-current-watch-blocked="true"]').forEach(element => {
             try {
@@ -1514,13 +1513,140 @@ function scheduleDirectAccessRecheck(delayMs = 250) {
     }, Math.max(80, Number(delayMs) || 250));
 }
 
+function showDirectAccessPendingState(state, isShortRoute, message) {
+    const elapsed = Date.now() - Number(state?.pendingStartedAt || 0);
+    if (elapsed < FILTERTUBE_DIRECT_ACCESS_OVERLAY_DELAY_MS) {
+        clearDirectAccessOverlay();
+        if (isShortRoute) clearCurrentShortAdmissionOverlay();
+        scheduleDirectAccessRecheck(FILTERTUBE_DIRECT_ACCESS_OVERLAY_DELAY_MS - elapsed);
+        return;
+    }
+    if (isShortRoute) {
+        pauseCurrentShortPlayer();
+        setCurrentShortAdmissionOverlay('pending', message);
+    } else {
+        setDirectAccessOverlay('pending', message);
+    }
+}
+
 function getDirectAccessRuleRequirements(settings) {
     const hasList = value => Array.isArray(value) && value.length > 0;
+    const contentFilters = settings?.contentFilters && typeof settings.contentFilters === 'object'
+        ? settings.contentFilters
+        : {};
+    const keywordRules = [
+        ...(Array.isArray(settings?.filterKeywords) ? settings.filterKeywords : []),
+        ...(Array.isArray(settings?.whitelistKeywords) ? settings.whitelistKeywords : [])
+    ];
+    const needsKeywordDates = hasDateGatedKeywords(keywordRules);
+    const needsRuleText = hasList(settings?.filterKeywords) || hasList(settings?.whitelistKeywords);
     return {
         hasExplicitVideoRules: hasList(settings?.blockedVideoIds) || hasList(settings?.allowedVideoIds),
         needsIdentity: hasList(settings?.filterChannels) || hasList(settings?.whitelistChannels),
-        needsText: hasList(settings?.filterKeywords) || hasList(settings?.whitelistKeywords)
+        needsRuleText,
+        needsUppercaseText: contentFilters.uppercase?.enabled === true,
+        needsText: needsRuleText || contentFilters.uppercase?.enabled === true,
+        needsDuration: contentFilters.duration?.enabled === true,
+        needsUploadDate: contentFilters.uploadDate?.enabled === true,
+        needsKeywordDates,
+        needsDates: contentFilters.uploadDate?.enabled === true || needsKeywordDates,
+        needsCategory: Boolean(getActiveCategoryPolicy(settings)),
+        needsLanguage: Boolean(getActiveLanguagePolicy(settings))
     };
+}
+
+function getCurrentWatchContentFilterDecision(settings, metadata = {}) {
+    const filters = settings?.contentFilters && typeof settings.contentFilters === 'object' ? settings.contentFilters : {};
+    if (filters.duration?.enabled === true) {
+        const seconds = Number(metadata.lengthSeconds);
+        if (!Number.isFinite(seconds) || seconds <= 0) return { pending: true, kind: 'duration' };
+        const minutes = seconds / 60;
+        const rule = filters.duration;
+        const condition = rule.condition || 'between';
+        let min = Number(rule.minMinutes ?? rule.minutes ?? rule.valueMinutes ?? rule.minutesMin ?? rule.value ?? 0);
+        let max = Number(rule.maxMinutes ?? rule.minutesMax ?? rule.valueMinutesMax ?? 0);
+        if (!Number.isFinite(min)) min = 0;
+        if (!Number.isFinite(max)) max = 0;
+        if ((min <= 0 || max <= 0) && typeof rule.value === 'string') {
+            const match = rule.value.trim().match(/^(\d+(?:\.\d+)?)\s*-\s*(\d+(?:\.\d+)?)$/);
+            if (match) {
+                if (min <= 0) min = Number(match[1]);
+                if (max <= 0) max = Number(match[2]);
+            }
+        }
+        if (max > 0 && min > max) [min, max] = [max, min];
+        const mode = rule.mode === 'allow' || rule.mode === 'block' ? rule.mode : 'block';
+        let blocked = false;
+        if (condition === 'longer') {
+            const matches = minutes > min;
+            blocked = mode === 'allow' ? !matches : matches;
+        } else if (condition === 'shorter') {
+            const matches = minutes < min;
+            blocked = mode === 'allow' ? !matches : matches;
+        } else if (max > 0) {
+            const inside = minutes >= min && minutes <= max;
+            blocked = rule.mode === 'block' ? inside : !inside;
+        }
+        if (blocked) return { blocked: true, kind: 'duration', durationSeconds: seconds };
+    }
+    if (filters.uploadDate?.enabled === true) {
+        const rawDate = metadata.publishDate || metadata.uploadDate || '';
+        const publishedAt = rawDate ? new Date(rawDate).getTime() : NaN;
+        if (!Number.isFinite(publishedAt)) return { pending: true, kind: 'upload-date' };
+        const rule = filters.uploadDate;
+        const parseDate = value => {
+            const parsed = typeof value === 'string' && value ? new Date(value).getTime() : NaN;
+            return Number.isFinite(parsed) ? parsed : null;
+        };
+        const condition = rule.condition || 'newer';
+        let blocked = false;
+        if (condition === 'newer') {
+            const cutoff = parseDate(rule.fromDate);
+            blocked = cutoff !== null && publishedAt < cutoff;
+        } else if (condition === 'older') {
+            const cutoff = parseDate(rule.toDate);
+            blocked = cutoff !== null && publishedAt < cutoff;
+        } else if (condition === 'between') {
+            let from = parseDate(rule.fromDate);
+            let to = parseDate(rule.toDate);
+            if (from !== null && to !== null) {
+                if (from > to) [from, to] = [to, from];
+                blocked = publishedAt < from || publishedAt > to;
+            }
+        }
+        if (blocked) return { blocked: true, kind: 'upload-date', publishDate: rawDate };
+    }
+    if (filters.uppercase?.enabled === true) {
+        if (metadata.textVerified !== true) return { pending: true, kind: 'uppercase' };
+        const title = String(metadata.title || '');
+        const rule = filters.uppercase;
+        const mode = rule.mode || 'single_word';
+        const minLength = Number(rule.minWordLength) || 2;
+        const lettersOnly = title.replace(/[^a-zA-Z]/g, '');
+        const allCaps = lettersOnly.length > 3 && lettersOnly === lettersOnly.toUpperCase();
+        const hasUppercaseWord = title.replace(/[^\w\s]/g, ' ').split(/\s+/).some(word => {
+            const letters = word.replace(/[^a-zA-Z]/g, '');
+            return letters.length >= minLength && letters.length === word.length && letters === letters.toUpperCase();
+        });
+        if ((mode === 'all_caps' && allCaps) || (mode === 'single_word' && hasUppercaseWord) || (mode === 'both' && (allCaps || hasUppercaseWord))) {
+            return { blocked: true, kind: 'uppercase' };
+        }
+    }
+    const categoryPolicy = getActiveCategoryPolicy(settings);
+    if (categoryPolicy) {
+        const category = String(metadata.category || '').trim();
+        const decision = getCategoryPolicyDecision(settings, category);
+        if (decision === 'unknown') return { pending: true, kind: 'category' };
+        if (decision === 'blocked') return { blocked: true, kind: 'category', category };
+    }
+    const languagePolicy = getActiveLanguagePolicy(settings);
+    if (languagePolicy) {
+        const languageCode = String(metadata.languageCode || '').trim();
+        const decision = getLanguagePolicyDecision(settings, languageCode);
+        if (decision === 'unknown') return { pending: true, kind: 'language' };
+        if (decision === 'blocked') return { blocked: true, kind: 'language', languageCode };
+    }
+    return { blocked: false, kind: 'none' };
 }
 
 function getCurrentWatchDescriptionText() {
@@ -1544,6 +1670,7 @@ function getCurrentWatchAdmissionDecision(settings, context = {}) {
     const ownerMeta = context.ownerMeta && typeof context.ownerMeta === 'object' ? context.ownerMeta : {};
     const searchText = typeof context.searchText === 'string' ? context.searchText : '';
     const textFields = Array.isArray(context.textFields) ? context.textFields : [];
+    const publishTimestamp = Number.isFinite(context.publishTimestamp) ? context.publishTimestamp : null;
     const ownerName = ownerMeta.name || ownerMeta.handle || ownerMeta.id || '';
     const listMode = settings?.listMode === 'whitelist' ? 'whitelist' : 'blocklist';
 
@@ -1552,7 +1679,7 @@ function getCurrentWatchAdmissionDecision(settings, context = {}) {
         const compiled = getCompiledKeywordRegexes(keywords);
         for (let index = 0; index < compiled.length; index += 1) {
             const regex = compiled[index];
-            if (!regex || !keywordDateFilterAllows(regex, null)) continue;
+            if (!regex || !keywordDateFilterAllows(regex, publishTimestamp)) continue;
             if (matchesKeyword(regex, searchText)) {
                 const source = textFields.find(field => (
                     field && typeof field.text === 'string' && field.text && matchesKeyword(regex, field.text)
@@ -1629,6 +1756,11 @@ function formatCurrentWatchAdmissionMessage(decision, ownerMeta = {}) {
         const identity = ownerName || decision.videoId || '';
         return `Not in Allow only selected${identity ? `\n${trimForOverlay(identity)}` : ''}`;
     }
+    if (decision?.kind === 'duration') return `Blocked by Duration Filter\nDuration: ${Math.round(Number(decision.durationSeconds) || 0)} seconds`;
+    if (decision?.kind === 'upload-date') return `Blocked by Upload Date Filter\nPublished: ${trimForOverlay(decision.publishDate)}`;
+    if (decision?.kind === 'uppercase') return 'Blocked by Uppercase Title Filter';
+    if (decision?.kind === 'category') return `Blocked by Category Filter\nCategory: ${trimForOverlay(decision.category || 'Unknown')}`;
+    if (decision?.kind === 'language') return `Blocked by Language Filter\nLanguage: ${trimForOverlay(decision.languageCode || 'Unavailable')}`;
     return 'Blocked by an active FilterTube rule';
 }
 
@@ -1689,7 +1821,9 @@ function enforceCurrentWatchOwnerBlock(settings) {
         const routeVideoId = getCurrentWatchVideoId();
         if (!routeVideoId) return;
         const requirements = getDirectAccessRuleRequirements(settings);
-        if (!requirements.hasExplicitVideoRules && !requirements.needsIdentity && !requirements.needsText && listMode !== 'whitelist') {
+        if (!requirements.hasExplicitVideoRules && !requirements.needsIdentity && !requirements.needsText &&
+            !requirements.needsDuration && !requirements.needsDates && !requirements.needsCategory &&
+            !requirements.needsLanguage && listMode !== 'whitelist') {
             releaseDirectAccessGuard(routeVideoId, true);
             return;
         }
@@ -1721,19 +1855,23 @@ function enforceCurrentWatchOwnerBlock(settings) {
         ];
         const currentVideoSearchText = currentVideoTextFields.map(field => field.text).filter(Boolean).join(' ');
         const hasPlayerText = cachedVideoMeta?.textVerified === true;
+        const hasPlayerDuration = Number(cachedVideoMeta?.lengthSeconds) > 0;
+        const hasPlayerDates = Boolean(cachedVideoMeta?.publishDate || cachedVideoMeta?.uploadDate);
+        const hasPlayerCategory = Boolean(String(cachedVideoMeta?.category || '').trim());
+        const hasPlayerLanguage = Boolean(String(cachedVideoMeta?.languageCode || '').trim());
+        const publishTimestamp = hasPlayerDates
+            ? new Date(cachedVideoMeta.publishDate || cachedVideoMeta.uploadDate).getTime()
+            : null;
         const explicitlyBlocked = Array.isArray(settings?.blockedVideoIds) && settings.blockedVideoIds.includes(routeVideoId);
         const explicitlyAllowed = Array.isArray(settings?.allowedVideoIds) && settings.allowedVideoIds.includes(routeVideoId);
-        const directState = getDirectAccessState();
-        if (ownerMeta?.videoId && (!requirements.needsText || hasPlayerText)) {
-            directState.failOpenVideoId = '';
-        }
-
         if (explicitlyAllowed) {
             releaseDirectAccessGuard(routeVideoId, true);
             return;
         }
 
-        if (!explicitlyBlocked && !requirements.needsIdentity && !requirements.needsText && listMode !== 'whitelist') {
+        if (!explicitlyBlocked && !requirements.needsIdentity && !requirements.needsText &&
+            !requirements.needsDuration && !requirements.needsDates && !requirements.needsCategory &&
+            !requirements.needsLanguage && listMode !== 'whitelist') {
             releaseDirectAccessGuard(routeVideoId, true);
             return;
         }
@@ -1752,6 +1890,41 @@ function enforceCurrentWatchOwnerBlock(settings) {
             ownerMeta = ownerMeta || { videoId: routeVideoId, id: '', handle: '', customUrl: '', name: '' };
         }
 
+        const missingRuleMetadata = !explicitlyBlocked && (
+            (requirements.needsIdentity && (!ownerMeta || !ownerMeta.videoId)) ||
+            (requirements.needsRuleText && !hasPlayerText) ||
+            (requirements.needsKeywordDates && !hasPlayerDates)
+        );
+        if (missingRuleMetadata) {
+            if (typeof scheduleVideoMetaFetch === 'function') {
+                scheduleVideoMetaFetch(routeVideoId, {
+                    needDuration: false,
+                    needDates: requirements.needsKeywordDates,
+                    needCategory: false,
+                    needLanguage: false,
+                    needIdentity: requirements.needsIdentity || listMode === 'whitelist',
+                    needText: requirements.needsRuleText,
+                    priority: 'high'
+                });
+            }
+            const state = pauseCurrentWatchForDirectAccess(routeVideoId, 'pending');
+            if (!state.pendingStartedAt) state.pendingStartedAt = Date.now();
+            const unavailable = Date.now() - state.pendingStartedAt > FILTERTUBE_DIRECT_ACCESS_PENDING_TTL_MS;
+            const message = unavailable
+                ? 'Required video metadata unavailable\nPlayback remains blocked by active FilterTube rules'
+                : 'Checking this video against all active FilterTube rules…';
+            if (unavailable && isShortRoute) {
+                pauseCurrentShortPlayer();
+                setCurrentShortAdmissionOverlay('pending', message);
+            } else if (unavailable) {
+                setDirectAccessOverlay('pending', message);
+            } else {
+                showDirectAccessPendingState(state, isShortRoute, message);
+            }
+            scheduleDirectAccessRecheck(unavailable ? 1000 : 250);
+            return;
+        }
+
         if (!ownerMeta || !ownerMeta.videoId) {
             if (isShortRoute && routeVideoId) {
                 scheduleCurrentShortIdentityResolution(settings, routeVideoId);
@@ -1765,8 +1938,6 @@ function enforceCurrentWatchOwnerBlock(settings) {
                 })
                 : false;
             if (earlyKeywordBlock) {
-                ownerMeta = { videoId: routeVideoId, id: '', handle: '', customUrl: '', name: '' };
-            } else if (listMode !== 'whitelist' && directState.failOpenVideoId === routeVideoId) {
                 ownerMeta = { videoId: routeVideoId, id: '', handle: '', customUrl: '', name: '' };
             } else {
                 if (typeof scheduleVideoMetaFetch === 'function') {
@@ -1800,9 +1971,7 @@ function enforceCurrentWatchOwnerBlock(settings) {
                     getDirectAccessState().decision = 'blocked';
                     return;
                 }
-                directState.failOpenVideoId = routeVideoId;
-                releaseDirectAccessGuard(routeVideoId, true);
-                if (isShortRoute) clearCurrentShortAdmissionOverlay();
+                getDirectAccessState().decision = 'blocked';
                 return;
             }
         }
@@ -1825,24 +1994,10 @@ function enforceCurrentWatchOwnerBlock(settings) {
                         priority: 'high'
                     });
                 }
-                if (listMode !== 'whitelist') {
-                    const knownTextBlocked = currentVideoSearchText
-                        ? shouldHideContent(currentVideoSearchText, ownerMeta.name || ownerMeta.handle || ownerMeta.id || '', settings, {
-                            videoId: routeVideoId,
-                            channelMeta: ownerMeta,
-                            contentTag: 'watch-current-video'
-                        })
-                        : false;
-                    if (!knownTextBlocked) {
-                        directState.failOpenVideoId = routeVideoId;
-                        releaseDirectAccessGuard(routeVideoId, true);
-                        return;
-                    }
-                }
                 const state = pauseCurrentWatchForDirectAccess(routeVideoId, 'pending');
                 if (!state.pendingStartedAt) state.pendingStartedAt = Date.now();
                 if (Date.now() - state.pendingStartedAt <= FILTERTUBE_DIRECT_ACCESS_PENDING_TTL_MS) {
-                    setDirectAccessOverlay('pending', 'Checking video title and description…');
+                    showDirectAccessPendingState(state, isShortRoute, 'Checking video title and description…');
                     scheduleDirectAccessRecheck();
                     return;
                 }
@@ -1850,13 +2005,83 @@ function enforceCurrentWatchOwnerBlock(settings) {
         }
 
         const ownerName = ownerMeta.name || ownerMeta.handle || ownerMeta.id || '';
-        const shouldBlock = shouldHideContent(currentVideoSearchText, ownerName, settings, {
+        let admissionDecision = getCurrentWatchAdmissionDecision(settings, {
+            videoId: ownerMeta.videoId,
+            ownerMeta,
+            searchText: currentVideoSearchText,
+            textFields: currentVideoTextFields,
+            publishTimestamp
+        });
+        if (!admissionDecision.blocked && admissionDecision.kind === 'allowed-rule') {
+            releaseDirectAccessGuard(ownerMeta.videoId, true);
+            if (isShortRoute) clearCurrentShortAdmissionOverlay();
+            return;
+        }
+
+        if (!admissionDecision.blocked) {
+            const missingContentMetadata = (
+                (requirements.needsDuration && !hasPlayerDuration) ||
+                (requirements.needsUploadDate && !hasPlayerDates) ||
+                (requirements.needsUppercaseText && !hasPlayerText) ||
+                (requirements.needsCategory && !hasPlayerCategory) ||
+                (requirements.needsLanguage && !hasPlayerLanguage)
+            );
+            if (missingContentMetadata) {
+                if (typeof scheduleVideoMetaFetch === 'function') {
+                    scheduleVideoMetaFetch(routeVideoId, {
+                        needDuration: requirements.needsDuration,
+                        needDates: requirements.needsUploadDate,
+                        needCategory: requirements.needsCategory,
+                        needLanguage: requirements.needsLanguage,
+                        needIdentity: false,
+                        needText: requirements.needsUppercaseText,
+                        priority: 'high'
+                    });
+                }
+                const state = pauseCurrentWatchForDirectAccess(routeVideoId, 'pending');
+                if (!state.pendingStartedAt) state.pendingStartedAt = Date.now();
+                const unavailable = Date.now() - state.pendingStartedAt > FILTERTUBE_DIRECT_ACCESS_PENDING_TTL_MS;
+                const message = unavailable
+                    ? 'Required video metadata unavailable\nPlayback remains blocked by active FilterTube rules'
+                    : 'Checking this video against all active FilterTube rules…';
+                if (unavailable) {
+                    if (isShortRoute) pauseCurrentShortPlayer();
+                    if (isShortRoute) setCurrentShortAdmissionOverlay('pending', message);
+                    else setDirectAccessOverlay('pending', message);
+                } else {
+                    showDirectAccessPendingState(state, isShortRoute, message);
+                }
+                scheduleDirectAccessRecheck(unavailable ? 1000 : 250);
+                return;
+            }
+            const contentDecision = getCurrentWatchContentFilterDecision(settings, cachedVideoMeta || {});
+            if (contentDecision.pending) {
+                const state = pauseCurrentWatchForDirectAccess(routeVideoId, 'pending');
+                if (!state.pendingStartedAt) state.pendingStartedAt = Date.now();
+                showDirectAccessPendingState(state, isShortRoute, 'Checking this video against all active FilterTube rules…');
+                scheduleDirectAccessRecheck();
+                return;
+            }
+            if (contentDecision.blocked) {
+                pauseCurrentWatchForDirectAccess(routeVideoId, 'blocked');
+                if (isShortRoute) {
+                    pauseCurrentShortPlayer();
+                    setCurrentShortAdmissionOverlay('blocked', formatCurrentWatchAdmissionMessage(contentDecision, ownerMeta || {}));
+                } else {
+                    setDirectAccessOverlay('blocked', formatCurrentWatchAdmissionMessage(contentDecision, ownerMeta || {}));
+                }
+                return;
+            }
+        }
+
+        const shouldBlock = admissionDecision.blocked || shouldHideContent(currentVideoSearchText, ownerName, settings, {
             skipKeywords: false,
             videoId: ownerMeta.videoId,
             channelHref: ownerMeta.mappedIdAuthoritative
                 ? ''
                 : (ownerMeta.ownerAnchor?.getAttribute?.('href') || ownerMeta.ownerAnchor?.href || ''),
             channelMeta: ownerMeta,
+            publishTimestamp,
             contentTag: 'watch-current-video'
         });
         if (!shouldBlock) {
@@ -1871,12 +2096,6 @@ function enforceCurrentWatchOwnerBlock(settings) {
             return;
         }
 
-        let admissionDecision = getCurrentWatchAdmissionDecision(settings, {
-            videoId: ownerMeta.videoId,
-            ownerMeta,
-            searchText: currentVideoSearchText,
-            textFields: currentVideoTextFields
-        });
         if (!admissionDecision.blocked) {
             // Keep shouldHideContent as the enforcement authority because it also
             // owns legacy active-resolution behavior. Never mislabel an uncommon

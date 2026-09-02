@@ -49,6 +49,34 @@ function loadAdmissionDecision() {
   return context.decide;
 }
 
+function loadContentFilterDecision() {
+  const source = read('js/content/dom_fallback.js');
+  const block = sliceBetween(
+    source,
+    'function getCurrentWatchContentFilterDecision(settings, metadata = {}) {',
+    'function getCurrentWatchDescriptionText() {'
+  );
+  const context = {
+    getActiveCategoryPolicy(settings) {
+      return settings.categoryFilters?.enabled ? settings.categoryFilters : null;
+    },
+    getCategoryPolicyDecision(settings, category) {
+      if (!category) return 'unknown';
+      return settings.categoryFilters.selected.includes(category) ? 'blocked' : 'allowed';
+    },
+    getActiveLanguagePolicy(settings) {
+      return settings.languageFilters?.enabled ? settings.languageFilters : null;
+    },
+    getLanguagePolicyDecision(settings, languageCode) {
+      if (!languageCode) return 'unknown';
+      return settings.languageFilters.selected.includes(languageCode) ? 'blocked' : 'allowed';
+    }
+  };
+  vm.createContext(context);
+  vm.runInContext(`${block}\nthis.decideContent = getCurrentWatchContentFilterDecision;`, context);
+  return context.decideContent;
+}
+
 test('Watch admission exposes the exact winning rule family without changing precedence', () => {
   const decide = loadAdmissionDecision();
   const ownerMeta = { id: 'UCED', name: 'Ed Sheeran' };
@@ -75,7 +103,7 @@ test('Watch admission exposes the exact winning rule family without changing pre
   }, baseContext).blocked, false, 'equal-specificity allow rules still win');
 });
 
-test('current-player overlays identify channel, keyword, video, whitelist, language, and category decisions', () => {
+test('current-player overlays identify every video-admission rule family', () => {
   const source = read('js/content/dom_fallback.js');
   const formatter = sliceBetween(
     source,
@@ -97,6 +125,9 @@ test('current-player overlays identify channel, keyword, video, whitelist, langu
   assert.match(formatter, /Blocked channel/);
   assert.match(formatter, /Blocked keyword\\nMatched:/);
   assert.match(formatter, /Not in Allow only selected/);
+  assert.match(formatter, /Blocked by Duration Filter/);
+  assert.match(formatter, /Blocked by Upload Date Filter/);
+  assert.match(formatter, /Blocked by Uppercase Title Filter/);
   assert.doesNotMatch(watchAdmission, /`Blocked by FilterTube/);
   assert.match(watchAdmission, /shouldHideContent\(currentVideoSearchText, ownerName, settings/);
   assert.match(watchAdmission, /admissionDecision = \{ blocked: true, kind: 'rule' \}/);
@@ -146,17 +177,48 @@ test('global Disabled releases direct-access state before any route enforcement'
   assert.match(source, /querySelectorAll\('\[data-filtertube-current-watch-blocked="true"\]'\)/);
 });
 
-test('unresolved direct playback is held and uses the bounded shared metadata scheduler', () => {
+test('unresolved direct playback is held, delays neutral UI, and requests every active metadata family', () => {
   const dom = read('js/content/dom_fallback.js');
   const bridge = read('js/content_bridge.js');
 
   assert.match(dom, /FILTERTUBE_DIRECT_ACCESS_PENDING_TTL_MS = 6000/);
+  assert.match(dom, /FILTERTUBE_DIRECT_ACCESS_OVERLAY_DELAY_MS = 180/);
   assert.match(dom, /needIdentity: requirements\.needsIdentity/);
   assert.match(dom, /needText: requirements\.needsText/);
+  assert.match(dom, /needDuration: requirements\.needsDuration/);
+  assert.match(dom, /needDates: requirements\.needsKeywordDates/);
+  assert.match(dom, /needDates: requirements\.needsUploadDate/);
+  assert.match(dom, /needCategory: requirements\.needsCategory/);
+  assert.match(dom, /needLanguage: requirements\.needsLanguage/);
   assert.match(dom, /document\.addEventListener\('play',[\s\S]*media\.pause\?\.\(\)/);
   assert.match(bridge, /needIdentity: Boolean\(left\.needIdentity \|\| right\.needIdentity\)/);
   assert.match(bridge, /needText: Boolean\(left\.needText \|\| right\.needText\)/);
   assert.match(bridge, /WATCH_META_FETCH_MAX_PER_WINDOW = 24/);
+});
+
+test('direct Watch content admission applies duration, date, uppercase, category, and language rules', () => {
+  const decide = loadContentFilterDecision();
+  assert.equal(decide({ contentFilters: { duration: { enabled: true, condition: 'longer', minMinutes: 3 } } }, { lengthSeconds: 240 }).kind, 'duration');
+  assert.equal(decide({ contentFilters: { duration: { enabled: true, condition: 'longer', minMinutes: 5 } } }, { lengthSeconds: 240 }).blocked, false);
+  assert.equal(decide({ contentFilters: { uploadDate: { enabled: true, condition: 'newer', fromDate: '2026-01-01' } } }, { publishDate: '2025-01-01' }).kind, 'upload-date');
+  assert.equal(decide({ contentFilters: { uppercase: { enabled: true, mode: 'all_caps' } } }, { textVerified: true, title: 'THIS IS A VIDEO' }).kind, 'uppercase');
+  assert.equal(decide({ categoryFilters: { enabled: true, selected: ['Music'] } }, { category: 'Music' }).kind, 'category');
+  assert.equal(decide({ languageFilters: { enabled: true, selected: ['es'] } }, { languageCode: 'es' }).kind, 'language');
+  assert.equal(decide({ contentFilters: { duration: { enabled: true } } }, {}).pending, true);
+});
+
+test('a verified allow rule keeps its existing precedence over general content filters', () => {
+  const source = read('js/content/dom_fallback.js');
+  const admission = sliceBetween(
+    source,
+    'function enforceCurrentWatchOwnerBlock(settings) {',
+    'const FILTERTUBE_CATEGORY_PENDING_TTL_MS'
+  );
+  assert.ok(
+    admission.indexOf("admissionDecision.kind === 'allowed-rule'") <
+      admission.indexOf('getCurrentWatchContentFilterDecision(settings, cachedVideoMeta || {})'),
+    'specific allow decisions must remain the fast-path exception before general content filters'
+  );
 });
 
 test('direct admission uses only route-bound Player metadata for current Watch identity and text', () => {
@@ -285,17 +347,17 @@ test('exact Player identity repairs a conflicting persisted video channel mappin
   assert.match(bridge, /entries: cleaned\.map\(\(\{[\s\S]*identityVerified,[\s\S]*textVerified,[\s\S]*\.\.\.entry/);
 });
 
-test('Block selected never repeatedly pauses an allowed Watch video while description metadata loads', () => {
+test('Block selected never converts unresolved Watch metadata into an allowed decision', () => {
   const dom = read('js/content/dom_fallback.js');
   const admission = sliceBetween(
     dom,
     'function enforceCurrentWatchOwnerBlock(settings) {',
     'const FILTERTUBE_CATEGORY_PENDING_TTL_MS'
   );
-  assert.match(admission, /if \(listMode !== 'whitelist'\) \{[\s\S]*const knownTextBlocked/);
-  assert.match(admission, /directState\.failOpenVideoId = routeVideoId;[\s\S]*releaseDirectAccessGuard\(routeVideoId, true\);[\s\S]*return;/);
-  assert.match(admission, /directState\.failOpenVideoId === routeVideoId/);
-  assert.match(dom, /failOpenVideoId: ''/);
+  assert.match(admission, /Required video metadata unavailable\\nPlayback remains blocked/);
+  assert.match(admission, /pauseCurrentWatchForDirectAccess\(routeVideoId, 'pending'\)/);
+  assert.doesNotMatch(admission, /failOpenVideoId/);
+  assert.doesNotMatch(dom, /failOpenVideoId/);
 });
 
 test('metadata bridge carries exact needs so text-only admission does not wait for category', () => {
