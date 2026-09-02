@@ -2799,7 +2799,7 @@ Runtime gate cross-check:
 | Block-action close | Runs only after the block action has already resolved through the action handler. | `js/content_bridge.js:12541-12556`, `js/content_bridge.js:13296-13309` |
 | Native dropdown injection | Requires a clicked menu button, visible dropdown, and duplicate-schedule guards before calling `handleDropdownAppeared()`. | `js/content/block_channel.js:2355-2444` |
 | Quick-block fallback rerun | Requires quick-block fallback success before scheduling `applyDOMFallback()`. | `js/content/block_channel.js:1739-1764` |
-| Watch playlist navigation | Requires a blocked/current playlist state and next allowed link or next button before clicking. | `js/content/dom_fallback.js:871-920`, `js/content/dom_fallback.js:2424-2437`, `js/content/dom_fallback.js:3810-3822` |
+| Watch playlist navigation | Direct current-watch admission clicks only a verified allowed playlist link; if none exists it remains blocked. Separate playlist ended/repair guards retain their own next-button behavior. | `js/content/dom_fallback.js:871-920`, `js/content/dom_fallback.js:2424-2437`, `js/content/dom_fallback.js:3810-3822` |
 
 Desktop direct user-action risk:
 

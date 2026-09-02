@@ -1116,12 +1116,15 @@ document.addEventListener('DOMContentLoaded', async () => {
         if (popupSelfControlSessionState) {
             const remaining = formatPopupManagedTimeRemaining(popupSelfControlSessionState.remainingSeconds)
                 .replace(' left', '');
+            const hardWhitelist = popupSelfControlSessionState.sessionKind === 'hard_whitelist';
             ftManagedTimeStatusPopup.hidden = false;
             ftManagedTimeStatusPopup.classList.remove('is-exhausted');
             ftManagedTimeStatusPopup.classList.add('is-self-control');
-            if (statusLabel) statusLabel.textContent = 'Strict session';
+            if (statusLabel) statusLabel.textContent = hardWhitelist ? 'Hard whitelist' : 'Strict session';
             ftManagedTimeStatusValuePopup.textContent = remaining;
-            ftManagedTimeStatusPopup.title = `${popupSelfControlSessionState.profileName || 'Active profile'} is pinned until the session ends`;
+            ftManagedTimeStatusPopup.title = hardWhitelist
+                ? `${popupSelfControlSessionState.profileName || 'Active profile'} allows ${Number(popupSelfControlSessionState.allowedChannelCount) || 0} Main channel${Number(popupSelfControlSessionState.allowedChannelCount) === 1 ? '' : 's'} until the session ends`
+                : `${popupSelfControlSessionState.profileName || 'Active profile'} is pinned until the session ends`;
             applyLockGateIfNeeded();
             return;
         }

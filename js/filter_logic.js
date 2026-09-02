@@ -303,6 +303,14 @@
         const languageConfidence = ['high', 'medium', 'unknown'].includes(meta.languageConfidence)
             ? meta.languageConfidence
             : '';
+        const title = typeof meta.title === 'string' ? meta.title.trim() : '';
+        const channelId = typeof meta.channelId === 'string' && /^UC[a-zA-Z0-9_-]{22}$/.test(meta.channelId.trim())
+            ? meta.channelId.trim()
+            : '';
+        const channelName = typeof meta.channelName === 'string' ? meta.channelName.trim() : '';
+        const channelHandle = typeof meta.channelHandle === 'string' ? meta.channelHandle.trim() : '';
+        const identityVerified = meta.identityVerified === true;
+        const textVerified = meta.textVerified === true;
         const shortDescription = typeof meta.shortDescription === 'string' ? meta.shortDescription.trim() : '';
         const keywords = Array.isArray(meta.keywords)
             ? meta.keywords.map(value => typeof value === 'string' ? value.trim() : '').filter(Boolean)
@@ -314,6 +322,8 @@
             || (typeof uploadDate === 'string' && uploadDate.trim())
             || (typeof category === 'string' && category.trim())
             || languageCode
+            || identityVerified
+            || textVerified
             || shortDescription
             || keywords.length > 0
         );
@@ -328,6 +338,12 @@
             languageCode,
             languageSource,
             languageConfidence,
+            title,
+            channelId,
+            channelName,
+            channelHandle,
+            identityVerified ? 'identity-verified' : '',
+            textVerified ? 'text-verified' : '',
             shortDescription,
             keywords.join('\u0001')
         ].join('|');
@@ -348,6 +364,12 @@
             languageCode,
             languageSource,
             languageConfidence,
+            ...(title ? { title } : {}),
+            ...(channelId ? { channelId } : {}),
+            ...(channelName ? { channelName } : {}),
+            ...(channelHandle ? { channelHandle } : {}),
+            ...(identityVerified ? { identityVerified: true } : {}),
+            ...(textVerified ? { textVerified: true } : {}),
             ...(shortDescription ? { shortDescription } : {}),
             ...(keywords.length > 0 ? { keywords } : {})
         });
@@ -1509,17 +1531,29 @@
                 const shortDescription = typeof videoDetails?.shortDescription === 'string'
                     ? videoDetails.shortDescription.trim()
                     : '';
+                const title = typeof videoDetails?.title === 'string'
+                    ? videoDetails.title.trim()
+                    : (typeof playerMicroformat?.title?.simpleText === 'string' ? playerMicroformat.title.simpleText.trim() : '');
+                const channelName = typeof videoDetails?.author === 'string'
+                    ? videoDetails.author.trim()
+                    : (typeof playerMicroformat?.ownerChannelName === 'string' ? playerMicroformat.ownerChannelName.trim() : '');
                 const keywords = Array.isArray(videoDetails?.keywords)
                     ? videoDetails.keywords.map(value => typeof value === 'string' ? value.trim() : '').filter(Boolean)
                     : [];
 
-                if (lengthSeconds || publishDate || uploadDate || category || language.languageCode || shortDescription || keywords.length > 0) {
+                if (lengthSeconds || publishDate || uploadDate || category || language.languageCode || title || ownerId || ownerHandle || channelName || shortDescription || keywords.length > 0) {
                     this._registerVideoMetaMapping(videoId, {
                         lengthSeconds,
                         publishDate,
                         uploadDate,
                         category,
                         ...language,
+                        title,
+                        channelId: ownerId || '',
+                        channelName,
+                        channelHandle: ownerHandle || '',
+                        identityVerified: true,
+                        textVerified: true,
                         shortDescription,
                         keywords
                     });
@@ -1695,6 +1729,12 @@
             const incomingLanguageConfidence = ['high', 'medium', 'unknown'].includes(meta.languageConfidence)
                 ? meta.languageConfidence
                 : '';
+            const incomingTitle = typeof meta.title === 'string' ? meta.title.trim() : '';
+            const incomingChannelId = typeof meta.channelId === 'string' && /^UC[a-zA-Z0-9_-]{22}$/.test(meta.channelId.trim())
+                ? meta.channelId.trim()
+                : '';
+            const incomingChannelName = typeof meta.channelName === 'string' ? meta.channelName.trim() : '';
+            const incomingChannelHandle = typeof meta.channelHandle === 'string' ? meta.channelHandle.trim() : '';
             const incomingShortDescription = typeof meta.shortDescription === 'string' ? meta.shortDescription.trim() : '';
             const incomingKeywords = Array.isArray(meta.keywords)
                 ? meta.keywords.map(value => typeof value === 'string' ? value.trim() : '').filter(Boolean)
@@ -1708,6 +1748,12 @@
             if (incomingLanguageCode) merged.languageCode = incomingLanguageCode;
             if (incomingLanguageSource) merged.languageSource = incomingLanguageSource;
             if (incomingLanguageConfidence) merged.languageConfidence = incomingLanguageConfidence;
+            if (incomingTitle) merged.title = incomingTitle;
+            if (incomingChannelId) merged.channelId = incomingChannelId;
+            if (incomingChannelName) merged.channelName = incomingChannelName;
+            if (incomingChannelHandle) merged.channelHandle = incomingChannelHandle;
+            if (meta.identityVerified === true) merged.identityVerified = true;
+            if (meta.textVerified === true) merged.textVerified = true;
             if (incomingShortDescription) merged.shortDescription = incomingShortDescription;
             if (incomingKeywords.length > 0) merged.keywords = incomingKeywords;
             const same =
@@ -1718,6 +1764,12 @@
                 && (existing.languageCode === merged.languageCode)
                 && (existing.languageSource === merged.languageSource)
                 && (existing.languageConfidence === merged.languageConfidence)
+                && (existing.title === merged.title)
+                && (existing.channelId === merged.channelId)
+                && (existing.channelName === merged.channelName)
+                && (existing.channelHandle === merged.channelHandle)
+                && (existing.identityVerified === merged.identityVerified)
+                && (existing.textVerified === merged.textVerified)
                 && (existing.shortDescription === merged.shortDescription)
                 && JSON.stringify(existing.keywords || []) === JSON.stringify(merged.keywords || []);
             if (same) return;

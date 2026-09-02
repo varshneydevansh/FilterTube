@@ -256,10 +256,10 @@ test('engagement_side_effect_current_watch_block_can_click_and_pause_today', () 
   assert.match(block, /if \(listMode === 'whitelist'\) return/);
   assert.equal(count(block, /video\.pause\(\)/g), 2);
   assert.match(block, /targetLink\.click\(\)/);
-  assert.match(block, /nextButton\.click\(\)/);
+  assert.doesNotMatch(block, /nextButton\.click\(\)/);
   assert.match(openPanelBlock, /clickable\.click\(\)/);
   assert.match(block, /toggleVisibility\(selected, true, `Current watch blocked:/);
-  assert.match(block, /toggleVisibility\(shell, true, `Current watch blocked:/);
+  assert.doesNotMatch(block, /toggleVisibility\(shell, true, `Current watch blocked:/);
   assert.doesNotMatch(block + openPanelBlock, /ownerConfidence|engagementSideEffectAuthority|sideEffectBudget|maxPerNavigation/);
 });
 

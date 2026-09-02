@@ -188,7 +188,7 @@ test('DOM fallback source still proves selected lifecycle callback side effects'
     /function enforceCurrentWatchOwnerBlock/,
     /targetLink\.click\(\)/,
     /applyDOMFallback\(settings, \{ preserveScroll: true, forceReprocess: true \}\)/,
-    /nextButton\.click\(\)/,
+    /No verified allowed successor exists/,
     /const yieldToMain = \(\) => new Promise\(resolve => setTimeout\(resolve, 0\)\)/,
     /window\.__filtertubeScrollState/,
     /window\.addEventListener\('scroll'/,

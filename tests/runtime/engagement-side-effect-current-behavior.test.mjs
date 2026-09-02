@@ -117,7 +117,7 @@ test('legacy shorts and watch identity fallbacks still have direct page fetch pa
   assert.match(watchBlock, /pendingWatchFetches/);
 });
 
-test('current watch owner block can pause playback and synthetic-click playlist or player next targets', () => {
+test('current watch owner block can pause playback and click only a verified allowed playlist target', () => {
   const text = source('js/content/dom_fallback.js');
   const block = sliceBetween(
     text,
@@ -129,8 +129,8 @@ test('current watch owner block can pause playback and synthetic-click playlist 
   assert.match(block, /toggleVisibility\(selected, true, `Current watch blocked:/);
   assert.match(block, /targetLink\.click\(\)/);
   assert.match(block, /openWatchPlaylistPanelIfCollapsed\(\)/);
-  assert.match(block, /nextButton\.click\(\)/);
-  assert.match(block, /toggleVisibility\(shell, true, `Current watch blocked:/);
+  assert.doesNotMatch(block, /nextButton\.click\(\)/);
+  assert.doesNotMatch(block, /toggleVisibility\(shell, true, `Current watch blocked:/);
 });
 
 test('playlist navigation guards synthesize click-based skip behavior on blocked next entries', () => {

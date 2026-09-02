@@ -1,5 +1,11 @@
 # Changelog
 
+## Unreleased
+
+- **Hard Timer Whitelist**: Chrome, Firefox, Android, and iOS now offer an explicit non-cancellable Main YouTube allow-only session. It requires at least one selected Main Allowed channel, forces filtering and Whitelist mode, blocks policy/profile changes until expiry, restores the complete pre-session profile afterward, and retains its recovery snapshot if restoration must be retried.
+- **Global Disabled direct-access cleanup (#77)**: the master Disabled state now releases pending/blocked Watch and Shorts admission guards, removes direct-access overlays and markers, restores hidden current-watch elements, and clears channel-page redirect state before any retained channel, video, or keyword rule can run.
+- **Verified playlist successor only (#69)**: blocking the currently playing video or channel may advance to a playlist row only after that row is confirmed allowed. If no verified allowed successor exists, FilterTube keeps the current player blocked instead of clicking YouTube's generic Next button or hiding the whole Watch shell.
+
 ## Post-v3.3.5 source-history index
 
 The following index records every commit after the v3.3.5 stability baseline

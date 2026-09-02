@@ -503,9 +503,33 @@
                                             <p class="import-export-hint"><strong>Important:</strong> there is no FilterTube cancel button after activation. The browser owner can still disable or uninstall an extension unless the browser or device is externally managed.</p>
                                         </div>
                                         <div id="ftSelfControlActive" class="ft-self-control-active" role="status" aria-live="polite" hidden>
-                                            <span>Settings and profile switching are locked</span>
+                                            <span id="ftSelfControlActiveLabel">Settings and profile switching are locked</span>
                                             <strong id="ftSelfControlCountdown">—</strong>
                                             <small id="ftSelfControlEndsAt"></small>
+                                        </div>
+                                        <div class="ft-hard-whitelist-session">
+                                            <div class="card-header">
+                                                <div>
+                                                    <p class="ft-self-control-card__eyebrow">Selected-channel focus</p>
+                                                    <h3>Hard Timer Whitelist</h3>
+                                                </div>
+                                                <span class="view-meta-pill">Main YouTube</span>
+                                            </div>
+                                            <p class="import-export-summary">Allow only the channels already listed in Main Allowed rules for a non-cancellable timer.</p>
+                                            <p class="import-export-hint">This starts an explicit allow-only session for Main YouTube. It enables filtering, forces Whitelist mode, ignores Main keyword/video allow rules for the session, pins this profile, and locks settings, rules, imports, and profile switching until the countdown finishes. Kids keeps its current mode and rules but is frozen with the profile snapshot.</p>
+                                            <div id="ftHardWhitelistReady" class="ft-self-control-ready">
+                                                <div class="ft-self-control-presets" role="group" aria-label="Hard Timer Whitelist duration">
+                                                    <button class="btn-secondary" type="button" data-hard-whitelist-minutes="30">30 minutes</button>
+                                                    <button class="btn-secondary" type="button" data-hard-whitelist-minutes="60">1 hour</button>
+                                                    <button class="btn-secondary" type="button" data-hard-whitelist-minutes="120">2 hours</button>
+                                                </div>
+                                                <div class="ft-self-control-custom">
+                                                    <label for="ftHardWhitelistMinutes">Custom minutes</label>
+                                                    <input id="ftHardWhitelistMinutes" class="text-input" type="number" min="1" max="10080" step="1" value="60" inputmode="numeric" />
+                                                    <button id="ftStartHardWhitelistBtn" class="btn-primary" type="button">Review and Start</button>
+                                                </div>
+                                                <p class="import-export-hint"><strong>Important:</strong> at least one Main Allowed channel is required. There is no FilterTube cancel button after activation.</p>
+                                            </div>
                                         </div>
                                     </div>
                                 </div>

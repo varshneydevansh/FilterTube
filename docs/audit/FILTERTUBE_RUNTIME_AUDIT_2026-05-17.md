@@ -6064,7 +6064,7 @@ The user review about YouTube recommendation drift cannot be proven from static 
 | Playlist selected-row guard | `js/content/dom_fallback.js:2384-2396` | Prevents native click, pauses video, then synthetic-clicks a link. | `INSTRUMENT` |
 | Playlist ended guard | `js/content/dom_fallback.js:2434` | Synthetic-clicks next button. | `INSTRUMENT` |
 | Collapsed playlist opener | `js/content/dom_fallback.js:762-777` | Clicks a collapsed playlist entry point to expose rows. | `INSTRUMENT` |
-| Current blocked watch skip | `js/content/dom_fallback.js:871-918` | Pauses current video, clicks next allowed playlist target or YouTube next button. | `INSTRUMENT` + `GATE` |
+| Current blocked watch skip | `js/content/dom_fallback.js:871-918` | Pauses the current video and clicks a verified allowed playlist target; with no verified successor it remains blocked. | `INSTRUMENT` + `GATE` |
 | Hidden selected playlist skip | `js/content/dom_fallback.js:3795-3823` | If selected playlist row is hidden, synthetic-clicks next button after a throttle. | `INSTRUMENT` |
 | Watch playlist repair skip | `js/content/dom_fallback.js:4462-4512` | Pauses/reset current video and clicks next visible playlist target. | `INSTRUMENT` |
 | Broad DOM media actions | `js/content/dom_fallback.js:822`, `js/content/dom_fallback.js:866`, `js/content_bridge.js:3749` | Pauses media under some filter states. | `INSTRUMENT` |

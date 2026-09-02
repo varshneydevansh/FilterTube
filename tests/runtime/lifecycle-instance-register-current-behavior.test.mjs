@@ -3569,7 +3569,7 @@ test('lifecycle instance register enumerates every current observer listener tim
   assert.match(directUserActionBlockChannelSource, /document\.addEventListener\('click', \(e\) => \{[\s\S]*const menuButton = target\.closest\([\s\S]*menuButtonSelector[\s\S]*lastClickedMenuButton = menuButton;[\s\S]*setTimeout\(\(\) => \{[\s\S]*tryInjectIntoVisibleDropdown\(\);[\s\S]*\}, 150\);/);
   assert.match(directUserActionBlockChannelSource, /if \(typeof requestAnimationFrame === 'function'\) \{[\s\S]*requestAnimationFrame\(\(\) => setTimeout\(run, 0\)\);[\s\S]*return;[\s\S]*setTimeout\(run, 0\);/);
   assert.match(directUserActionDomFallbackSource, /const targetLink = findNextAllowedWatchPlaylistLink\(settings, ownerMeta\.videoId\);[\s\S]*setTimeout\(\(\) => \{[\s\S]*targetLink\.click\(\);[\s\S]*\}, 60\);/);
-  assert.match(directUserActionDomFallbackSource, /const nextButton = document\.querySelector\('\.ytp-next-button:not\(\[disabled\]\)'\);[\s\S]*setTimeout\(\(\) => \{[\s\S]*nextButton\.click\(\);[\s\S]*\}, 80\);/);
+  assert.doesNotMatch(directUserActionDomFallbackSource, /nextButton\.click\(\)/);
   assert.match(directUserActionDomFallbackSource, /Defer to avoid racing YouTube's internal end-of-video transition\.[\s\S]*setTimeout\(\(\) => \{[\s\S]*nextBtn\.click\(\);[\s\S]*\}, 0\);/);
   assert.match(directUserActionDomFallbackSource, /window\.__filtertubeLastPlaylistSkipTs = now;[\s\S]*setTimeout\(\(\) => \{[\s\S]*const nextBtn = document\.querySelector\('\.ytp-next-button:not\(\[disabled\]\)'\);[\s\S]*if \(nextBtn\) nextBtn\.click\(\);[\s\S]*\}, 80\);/);
   const youtubeSpaDesktopStartupReadinessHotTimerRows = youtubeSpaDesktopResidualHotTimerRows

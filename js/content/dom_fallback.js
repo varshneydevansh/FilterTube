@@ -1137,6 +1137,34 @@ function getCurrentWatchOwnerMeta(settings) {
     };
 }
 
+function getCurrentWatchExactOwnerMeta(settings) {
+    const videoId = getCurrentWatchVideoId();
+    if (!videoId) return null;
+    const exactMeta = settings?.videoMetaMap?.[videoId];
+    if (!exactMeta || typeof exactMeta !== 'object' || exactMeta.identityVerified !== true) return null;
+
+    const id = typeof exactMeta.channelId === 'string' && /^UC[\w-]{22}$/i.test(exactMeta.channelId.trim())
+        ? exactMeta.channelId.trim()
+        : '';
+    const handle = typeof exactMeta.channelHandle === 'string'
+        ? normalizeHandleForComparison(exactMeta.channelHandle)
+        : '';
+    const name = typeof exactMeta.channelName === 'string' ? exactMeta.channelName.trim() : '';
+    if (!id && !handle && !name) return null;
+
+    return {
+        id,
+        handle,
+        customUrl: '',
+        name,
+        videoId,
+        exactVideoIdentity: true,
+        mappedIdAuthoritative: Boolean(id),
+        ownerRoot: null,
+        ownerAnchor: null
+    };
+}
+
 function getCurrentShortPlayerHost() {
     try {
         return document.querySelector(
@@ -1442,6 +1470,36 @@ function releaseDirectAccessGuard(videoId, resumePlayback = true) {
     }
 }
 
+function isFilterTubeFilteringEnabled(settings) {
+    return Boolean(settings && typeof settings === 'object' && settings.enabled !== false);
+}
+
+function releaseDisabledDirectAccessState() {
+    const videoId = getCurrentWatchVideoId();
+    releaseDirectAccessGuard(videoId, true);
+    clearCurrentShortAdmissionOverlay();
+    try {
+        getDirectAccessState().failOpenVideoId = '';
+        document.documentElement?.removeAttribute?.('data-filtertube-direct-channel-redirect');
+        document.querySelectorAll('[data-filtertube-current-watch-blocked="true"]').forEach(element => {
+            try {
+                element.removeAttribute('data-filtertube-current-watch-blocked');
+                element.removeAttribute('data-filtertube-hidden-by-channel');
+                toggleVisibility(element, false, '', true);
+            } catch (e) {
+            }
+        });
+        const watchState = window.__filtertubeCurrentWatchBlockState;
+        if (watchState) {
+            watchState.lastVideoId = '';
+            watchState.lastAttemptTs = 0;
+            watchState.retryVideoId = '';
+            watchState.retryCount = 0;
+        }
+    } catch (e) {
+    }
+}
+
 function scheduleDirectAccessRecheck(delayMs = 250) {
     const state = getDirectAccessState();
     if (state.recheckTimer) return;
@@ -1481,8 +1539,105 @@ function getCurrentWatchDescriptionText() {
     }
 }
 
+function getCurrentWatchAdmissionDecision(settings, context = {}) {
+    const videoId = typeof context.videoId === 'string' ? context.videoId : '';
+    const ownerMeta = context.ownerMeta && typeof context.ownerMeta === 'object' ? context.ownerMeta : {};
+    const searchText = typeof context.searchText === 'string' ? context.searchText : '';
+    const textFields = Array.isArray(context.textFields) ? context.textFields : [];
+    const ownerName = ownerMeta.name || ownerMeta.handle || ownerMeta.id || '';
+    const listMode = settings?.listMode === 'whitelist' ? 'whitelist' : 'blocklist';
+
+    const keywordMatch = (keywords, includeOwner = false) => {
+        if (!Array.isArray(keywords) || keywords.length === 0) return null;
+        const compiled = getCompiledKeywordRegexes(keywords);
+        for (let index = 0; index < compiled.length; index += 1) {
+            const regex = compiled[index];
+            if (!regex || !keywordDateFilterAllows(regex, null)) continue;
+            if (matchesKeyword(regex, searchText)) {
+                const source = textFields.find(field => (
+                    field && typeof field.text === 'string' && field.text && matchesKeyword(regex, field.text)
+                ));
+                return {
+                    pattern: regex.source || '',
+                    source: source?.label || 'video metadata'
+                };
+            }
+            if (includeOwner && ownerName && matchesKeyword(regex, ownerName)) {
+                return {
+                    pattern: regex.source || '',
+                    source: 'channel identity'
+                };
+            }
+        }
+        return null;
+    };
+
+    const channelMatch = channels => {
+        if (!Array.isArray(channels) || channels.length === 0) return false;
+        const index = getCompiledChannelFilterIndex(settings, channels);
+        return Boolean(index && channelMetaMatchesIndex(ownerMeta, index, settings?.channelMap || {}));
+    };
+
+    const explicitlyBlocked = Boolean(
+        videoId && Array.isArray(settings?.blockedVideoIds) && settings.blockedVideoIds.includes(videoId)
+    );
+    const explicitlyAllowed = Boolean(
+        videoId && Array.isArray(settings?.allowedVideoIds) && settings.allowedVideoIds.includes(videoId)
+    );
+    const blockedChannel = channelMatch(settings?.filterChannels);
+    const allowedChannel = channelMatch(settings?.whitelistChannels);
+    const blockedKeyword = keywordMatch(settings?.filterKeywords);
+    const allowedKeyword = keywordMatch(settings?.whitelistKeywords);
+
+    const blockSpecificity = explicitlyBlocked ? 3 : (blockedChannel ? 2 : (blockedKeyword ? 1 : 0));
+    const allowSpecificity = explicitlyAllowed ? 3 : (allowedChannel ? 2 : (allowedKeyword ? 1 : 0));
+    if (blockSpecificity > 0 || allowSpecificity > 0) {
+        if (allowSpecificity >= blockSpecificity && allowSpecificity > 0) {
+            return { blocked: false, kind: 'allowed-rule' };
+        }
+        if (explicitlyBlocked) return { blocked: true, kind: 'video', videoId };
+        if (blockedChannel) return { blocked: true, kind: 'channel', ownerName };
+        return { blocked: true, kind: 'keyword', ...blockedKeyword };
+    }
+
+    if (listMode === 'whitelist') {
+        return { blocked: true, kind: 'allow-only', videoId, ownerName };
+    }
+
+    // Preserve the DOM fallback's legacy blocklist behavior where a keyword can
+    // match the rendered channel text even when no stable channel rule matches.
+    const ownerKeyword = keywordMatch(settings?.filterKeywords, true);
+    if (ownerKeyword) return { blocked: true, kind: 'keyword', ...ownerKeyword };
+    return { blocked: false, kind: 'none' };
+}
+
+function formatCurrentWatchAdmissionMessage(decision, ownerMeta = {}) {
+    const ownerName = ownerMeta.name || ownerMeta.handle || ownerMeta.id || decision?.ownerName || '';
+    const trimForOverlay = value => String(value || '').replace(/\s+/g, ' ').trim().slice(0, 160);
+    if (decision?.kind === 'video') {
+        return `Blocked video\nVideo ID: ${trimForOverlay(decision.videoId)}`;
+    }
+    if (decision?.kind === 'channel') {
+        return `Blocked channel${ownerName ? `\n${trimForOverlay(ownerName)}` : ''}`;
+    }
+    if (decision?.kind === 'keyword') {
+        const raw = decision.pattern || 'matched rule';
+        const source = trimForOverlay(decision.source || 'video metadata');
+        return `Blocked keyword\nMatched: ${trimForOverlay(raw)}${source ? `\nSource: ${source}` : ''}`;
+    }
+    if (decision?.kind === 'allow-only') {
+        const identity = ownerName || decision.videoId || '';
+        return `Not in Allow only selected${identity ? `\n${trimForOverlay(identity)}` : ''}`;
+    }
+    return 'Blocked by an active FilterTube rule';
+}
+
 function enforceCurrentChannelPageDirectAccess(settings) {
     try {
+        if (!isFilterTubeFilteringEnabled(settings)) {
+            releaseDisabledDirectAccessState();
+            return false;
+        }
         const path = String(document.location?.pathname || '');
         if (!isCreatorChannelPagePath(path)) return false;
         const routeMeta = buildChannelMetadata('', path) || {};
@@ -1516,6 +1671,10 @@ function enforceCurrentChannelPageDirectAccess(settings) {
 
 function enforceCurrentWatchOwnerBlock(settings) {
     try {
+        if (!isFilterTubeFilteringEnabled(settings)) {
+            releaseDisabledDirectAccessState();
+            return;
+        }
         const path = String(document.location?.pathname || '');
         const isShortRoute = /^\/shorts\/[a-zA-Z0-9_-]{11}(?:\/|$)/.test(path);
         const isEmbedRoute = /^\/embed\/[a-zA-Z0-9_-]{11}(?:\/|$)/.test(path);
@@ -1535,21 +1694,33 @@ function enforceCurrentWatchOwnerBlock(settings) {
             return;
         }
 
-        let ownerMeta = getCurrentWatchOwnerMeta(settings);
-        const title = document.querySelector('ytm-watch h1, ytd-watch-metadata h1, h1.title')?.textContent?.trim() || '';
-        const visibleDescription = getCurrentWatchDescriptionText();
+        const exactOwnerMeta = getCurrentWatchExactOwnerMeta(settings);
+        let ownerMeta = requirements.needsIdentity
+            ? exactOwnerMeta
+            : (exactOwnerMeta || { videoId: routeVideoId, id: '', handle: '', customUrl: '', name: '' });
         const cachedVideoMeta = settings?.videoMetaMap?.[routeVideoId] || null;
-        const currentVideoSearchText = [
-            title,
-            visibleDescription,
-            typeof cachedVideoMeta?.shortDescription === 'string' ? cachedVideoMeta.shortDescription : '',
-            Array.isArray(cachedVideoMeta?.keywords) ? cachedVideoMeta.keywords.join(' ') : ''
-        ].filter(Boolean).join(' ');
-        const hasPlayerText = Boolean(
-            visibleDescription ||
-            (typeof cachedVideoMeta?.shortDescription === 'string' && cachedVideoMeta.shortDescription.trim()) ||
-            (Array.isArray(cachedVideoMeta?.keywords) && cachedVideoMeta.keywords.some(value => typeof value === 'string' && value.trim()))
-        );
+        const currentVideoTextFields = [
+            {
+                label: 'title',
+                text: cachedVideoMeta?.textVerified === true && typeof cachedVideoMeta?.title === 'string'
+                    ? cachedVideoMeta.title
+                    : ''
+            },
+            {
+                label: 'player description',
+                text: cachedVideoMeta?.textVerified === true && typeof cachedVideoMeta?.shortDescription === 'string'
+                    ? cachedVideoMeta.shortDescription
+                    : ''
+            },
+            {
+                label: 'YouTube metadata keywords',
+                text: cachedVideoMeta?.textVerified === true && Array.isArray(cachedVideoMeta?.keywords)
+                    ? cachedVideoMeta.keywords.join(' ')
+                    : ''
+            }
+        ];
+        const currentVideoSearchText = currentVideoTextFields.map(field => field.text).filter(Boolean).join(' ');
+        const hasPlayerText = cachedVideoMeta?.textVerified === true;
         const explicitlyBlocked = Array.isArray(settings?.blockedVideoIds) && settings.blockedVideoIds.includes(routeVideoId);
         const explicitlyAllowed = Array.isArray(settings?.allowedVideoIds) && settings.allowedVideoIds.includes(routeVideoId);
         const directState = getDirectAccessState();
@@ -1700,12 +1871,25 @@ function enforceCurrentWatchOwnerBlock(settings) {
             return;
         }
 
+        let admissionDecision = getCurrentWatchAdmissionDecision(settings, {
+            videoId: ownerMeta.videoId,
+            ownerMeta,
+            searchText: currentVideoSearchText,
+            textFields: currentVideoTextFields
+        });
+        if (!admissionDecision.blocked) {
+            // Keep shouldHideContent as the enforcement authority because it also
+            // owns legacy active-resolution behavior. Never mislabel an uncommon
+            // fallback match as a channel decision when it cannot be classified.
+            admissionDecision = { blocked: true, kind: 'rule' };
+        }
+
         if (isShortRoute) {
             pauseCurrentWatchForDirectAccess(ownerMeta.videoId, 'blocked');
             pauseCurrentShortPlayer();
             setCurrentShortAdmissionOverlay(
                 'blocked',
-                `Blocked by channel or video rule${ownerName ? `\n${ownerName}` : ''}`
+                formatCurrentWatchAdmissionMessage(admissionDecision, ownerMeta)
             );
             return;
         }
@@ -1713,7 +1897,7 @@ function enforceCurrentWatchOwnerBlock(settings) {
         pauseCurrentWatchForDirectAccess(ownerMeta.videoId, 'blocked');
         setDirectAccessOverlay(
             'blocked',
-            `Blocked by FilterTube${ownerName ? `\n${ownerName}` : ''}`
+            formatCurrentWatchAdmissionMessage(admissionDecision, ownerMeta)
         );
 
         try {
@@ -1817,22 +2001,14 @@ function enforceCurrentWatchOwnerBlock(settings) {
             return;
         }
 
-        const nextButton = document.querySelector('.ytp-next-button:not([disabled])');
-        if (nextButton) {
-            setTimeout(() => {
-                try {
-                    nextButton.click();
-                } catch (e) {
-                }
-            }, 80);
-            return;
-        }
-
+        // No verified allowed successor exists. Keep the current player blocked
+        // instead of delegating to YouTube's generic Next button, whose target
+        // has not been checked against the active FilterTube rules.
         const shell = document.querySelector('ytm-watch, ytd-watch-flexy');
         if (shell) {
             shell.setAttribute('data-filtertube-current-watch-blocked', 'true');
-            toggleVisibility(shell, true, `Current watch blocked: ${ownerName}`, true);
         }
+        return;
     } catch (e) {
     }
 }
@@ -4509,6 +4685,18 @@ async function applyDOMFallback(settings, options = {}) {
         Array.isArray(candidateElements) &&
         candidateElements.length > 0
     );
+    if (!isFilterTubeFilteringEnabled(effectiveSettings)) {
+        releaseDisabledDirectAccessState();
+        clearContentControlStyles();
+        clearStaleDOMFallbackVisibility();
+        const state = window.__filtertubeDomFallbackPerfState || (window.__filtertubeDomFallbackPerfState = {
+            hadActiveWork: false,
+            lastCleanupTs: 0
+        });
+        state.hadActiveWork = false;
+        state.lastCleanupTs = Date.now();
+        return;
+    }
     if (enforceCurrentChannelPageDirectAccess(effectiveSettings)) return;
     enforceCurrentWatchOwnerBlock(effectiveSettings);
     syncRouteScopedContentControls(effectiveSettings);

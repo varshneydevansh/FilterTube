@@ -31,6 +31,30 @@ The session begins only after explicit confirmation. Its policy snapshot,
 profile identity, start time, and deadline are stored in extension-local
 storage.
 
+## Hard Timer Whitelist
+
+Hard Timer Whitelist is an explicit session kind (`hard_whitelist`) alongside
+the legacy general session. It is scoped to Main YouTube and may start only
+when the active profile already has at least one Main `whitelistChannels` row.
+During the timer, FilterTube enables filtering, forces Main into Whitelist
+mode, and retains those selected channel rows as the only allow set. Main
+`whitelistKeywords` and `allowedVideoIds` are cleared in the temporary policy
+snapshot so they cannot widen the selected-channel boundary. Kids keeps its
+current mode and rules; it is frozen with the profile rather than silently
+converted to a second whitelist session.
+
+Hard sessions retain a separate copy of the complete pre-session profile. On
+expiry, including after a browser or app restart, that original copy is
+restored before the session record is removed. If the restore cannot be
+persisted, the expired hard-session record is retained and the lock fails
+closed until a later retry succeeds. Existing v1 sessions without
+`sessionKind` continue to use the general Self-Control behavior.
+
+The native Android and iOS shells reconcile expiry on app launch, foreground,
+and while an active app scene is open. Mobile operating systems may suspend an
+app in the background, so no background execution guarantee is claimed; the
+next foreground/resume or relaunch performs the reconciliation.
+
 ## Enforcement contract
 
 The background runtime owns enforcement. UI disabling is only presentation.

@@ -99,14 +99,14 @@ test('playlist card CSS and JS can hide parent shelf or horizontal list from one
   assert.doesNotMatch(jsBlock, /negativeSiblingVisible|broadHideBoundaryAuthority|playlistCardBoundary/);
 });
 
-test('current-watch owner enforcement can hide selected playlist row and click alternate targets today', () => {
+test('current-watch owner enforcement can hide the selected row and click only a verified allowed target', () => {
   const fallback = read('js/content/dom_fallback.js');
   const currentWatch = sliceBetween(fallback, 'function enforceCurrentWatchOwnerBlock', 'function markedChannelIsStillBlocked');
 
   assert.match(currentWatch, /const selected = getPlaylistPanelRows\(getPlaylistPanelContainer\(\) \|\| document\)/);
   assert.match(currentWatch, /toggleVisibility\(selected, true, `Current watch blocked: \$\{ownerName\}`, true\)/);
   assert.match(currentWatch, /targetLink\.click\(\)/);
-  assert.match(currentWatch, /nextButton\.click\(\)/);
+  assert.doesNotMatch(currentWatch, /nextButton\.click\(\)/);
   assert.doesNotMatch(currentWatch, /selectedRowPreservationPolicy|broadHideBoundaryAuthority|ownerConfidenceReport/);
 });
 

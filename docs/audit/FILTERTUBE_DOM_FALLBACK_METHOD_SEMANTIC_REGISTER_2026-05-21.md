@@ -194,8 +194,8 @@ not independent approval to change DOM fallback behavior.
   `backgroundOnly: true`.
 - `enforceCurrentWatchOwnerBlock()` can pause the current video, hide the
   selected playlist row, open a collapsed playlist panel, click an allowed
-  playlist item, retry `applyDOMFallback()`, click the player Next button, or
-  hide the whole watch shell.
+  playlist item, or retry `applyDOMFallback()`. It keeps the current player
+  blocked when no verified allowed successor exists.
 - `toggleVisibility()` couples visual hide/restore with `filteringTracker`,
   `incrementHiddenStats()`, `decrementHiddenStats()`, inline display writes, and
   `handleMediaPlayback()`. `updateContainerVisibility()` can collapse parent

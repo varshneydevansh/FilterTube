@@ -220,7 +220,7 @@ test('hide_restore_current_watch_owner_block_has_playback_side_effect_reason is 
   assert.match(currentWatch, /video\.pause\(\)/);
   assert.match(currentWatch, /targetLink\.click\(\)/);
   assert.match(currentWatch, /toggleVisibility\(selected, true, `Current watch blocked:/);
-  assert.match(currentWatch, /toggleVisibility\(shell, true, `Current watch blocked:/);
+  assert.doesNotMatch(currentWatch, /toggleVisibility\(shell, true, `Current watch blocked:/);
   assert.doesNotMatch(currentWatch, /mediaPolicy/);
   assert.doesNotMatch(currentWatch, /navigationPolicy/);
   assert.doesNotMatch(currentWatch, /hideRestoreAuthority/);

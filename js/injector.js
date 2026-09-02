@@ -814,6 +814,9 @@
         const language = extractVideoLanguageFromPlayerResponse(playerResponse);
         const metadata = {
             videoId: expectedVideoId,
+            title: typeof details?.title === 'string'
+                ? details.title.trim()
+                : (typeof microformat?.title?.simpleText === 'string' ? microformat.title.simpleText.trim() : ''),
             lengthSeconds: microformat?.lengthSeconds || details?.lengthSeconds || null,
             publishDate: typeof microformat?.publishDate === 'string' ? microformat.publishDate : '',
             uploadDate: typeof microformat?.uploadDate === 'string' ? microformat.uploadDate : '',
@@ -833,6 +836,8 @@
             keywords: Array.isArray(details?.keywords)
                 ? details.keywords.map(value => typeof value === 'string' ? value.trim() : '').filter(Boolean)
                 : [],
+            identityVerified: true,
+            textVerified: true,
             ...language
         };
         return metadata;
@@ -840,7 +845,7 @@
 
     function loadedVideoMetaSatisfies(metadata, needs = {}) {
         if (!metadata) return false;
-        const hasText = Boolean(metadata.shortDescription || metadata.keywords?.length);
+        const hasText = Boolean(metadata.textVerified || metadata.title || metadata.shortDescription || metadata.keywords?.length);
         const hasIdentity = Boolean(metadata.channelId || metadata.channelHandle || metadata.channelName);
         const hasDuration = Boolean(Number(metadata.lengthSeconds) > 0);
         const hasDates = Boolean(metadata.publishDate || metadata.uploadDate);

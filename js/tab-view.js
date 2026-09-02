@@ -3666,6 +3666,10 @@ document.addEventListener('DOMContentLoaded', async () => {
     const ftStartSelfControlBtn = document.getElementById('ftStartSelfControlBtn');
     const ftSelfControlCountdown = document.getElementById('ftSelfControlCountdown');
     const ftSelfControlEndsAt = document.getElementById('ftSelfControlEndsAt');
+    const ftSelfControlActiveLabel = document.getElementById('ftSelfControlActiveLabel');
+    const ftHardWhitelistReady = document.getElementById('ftHardWhitelistReady');
+    const ftHardWhitelistMinutes = document.getElementById('ftHardWhitelistMinutes');
+    const ftStartHardWhitelistBtn = document.getElementById('ftStartHardWhitelistBtn');
     const ftProfileSelector = document.getElementById('ftProfileSelector');
     const ftProfileMenuTab = document.getElementById('ftProfileMenuTab');
     const ftProfileBadgeBtnTab = document.getElementById('ftProfileBadgeBtnTab');
@@ -13005,15 +13009,25 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     function renderSelfControlSession() {
         const active = isSelfControlSessionActive();
+        const hardWhitelist = active && selfControlSessionState?.sessionKind === 'hard_whitelist';
         if (ftSelfControlReady) ftSelfControlReady.hidden = active;
+        if (ftHardWhitelistReady) ftHardWhitelistReady.hidden = active;
         if (ftSelfControlActive) ftSelfControlActive.hidden = !active;
-        if (ftSelfControlStateBadge) ftSelfControlStateBadge.textContent = active ? 'Locked' : 'Ready';
+        if (ftSelfControlStateBadge) ftSelfControlStateBadge.textContent = active
+            ? (hardWhitelist ? 'Hard Whitelist Locked' : 'Locked')
+            : 'Ready';
         if (!active) return;
         const remainingSeconds = Math.max(0, Math.ceil((Number(selfControlSessionState.lockedUntil) - Date.now()) / 1000));
         selfControlSessionState.remainingSeconds = remainingSeconds;
         if (ftSelfControlCountdown) ftSelfControlCountdown.textContent = formatSelfControlRemaining(remainingSeconds);
+        if (ftSelfControlActiveLabel) {
+            ftSelfControlActiveLabel.textContent = hardWhitelist
+                ? `Hard Whitelist active · Main allows ${Number(selfControlSessionState.allowedChannelCount) || 0} selected channel${Number(selfControlSessionState.allowedChannelCount) === 1 ? '' : 's'} only`
+                : 'Settings and profile switching are locked';
+        }
         if (ftSelfControlEndsAt) {
-            ftSelfControlEndsAt.textContent = `Ends ${new Date(Number(selfControlSessionState.lockedUntil)).toLocaleString()} · Profile: ${selfControlSessionState.profileName || 'Active profile'}`;
+            const sessionLabel = hardWhitelist ? 'Hard Whitelist' : 'Self-Control';
+            ftSelfControlEndsAt.textContent = `${sessionLabel} ends ${new Date(Number(selfControlSessionState.lockedUntil)).toLocaleString()} · Profile: ${selfControlSessionState.profileName || 'Active profile'}`;
         }
         if (lockGateEl?.dataset?.selfControl === 'true') {
             const countdown = lockGateEl.querySelector('[data-self-control-countdown]');
@@ -13072,6 +13086,59 @@ document.addEventListener('DOMContentLoaded', async () => {
         }
         applyLockGateIfNeeded();
         UIComponents.showToast('Self-Control Session started', 'success');
+    }
+
+    async function startHardWhitelistSession(minutes) {
+        const duration = Number(minutes);
+        if (!Number.isInteger(duration) || duration < 1 || duration > 10080) {
+            UIComponents.showToast('Choose between 1 minute and 7 days', 'error');
+            return;
+        }
+        const activeProfile = safeObject(safeObject(profilesV4Cache?.profiles)[activeProfileId]);
+        const allowedChannels = Array.isArray(activeProfile?.main?.whitelistChannels)
+            ? activeProfile.main.whitelistChannels
+            : [];
+        if (allowedChannels.length === 0) {
+            UIComponents.showToast('Add at least one Main Allowed channel first', 'error');
+            return;
+        }
+        const selected = await showChoiceModal({
+            title: 'Start Hard Timer Whitelist?',
+            message: `For ${duration} minute${duration === 1 ? '' : 's'}, FilterTube will allow only ${allowedChannels.length} selected Main channel${allowedChannels.length === 1 ? '' : 's'} in ${getProfileName(profilesV4Cache, activeProfileId)}.`,
+            details: [
+                'Main YouTube filtering will be enabled and Whitelist mode will be forced.',
+                'Main keyword and video allow rules will not widen this channel-only session.',
+                'Profile switching, rules, modes, imports, and settings will be blocked.',
+                'Kids keeps its current mode and rules, but the profile snapshot is frozen.',
+                'Closing or restarting the browser will not pause the countdown.',
+                'FilterTube will not offer a cancel button.'
+            ],
+            choices: [{ value: 'start', label: 'Start Hard Whitelist', className: 'btn-primary' }],
+            cancelText: 'Go Back'
+        });
+        if (selected !== 'start') return;
+        const response = await sendRuntimeMessage({
+            action: 'FilterTube_StartHardWhitelistSession',
+            minutes: duration
+        });
+        if (!response?.ok || response?.active !== true) {
+            const message = response?.error === 'session_already_active'
+                ? 'A timer session is already active'
+                : response?.error === 'hard_whitelist_requires_allowed_channels'
+                    ? 'Add at least one Main Allowed channel first'
+                    : 'Could not start Hard Timer Whitelist';
+            UIComponents.showToast(message, 'error');
+            return;
+        }
+        selfControlSessionState = response;
+        renderSelfControlSession();
+        if (profilesV4Cache) renderProfileSelector(profilesV4Cache);
+        if (lockGateEl) {
+            try { lockGateEl.remove(); } catch (e) { }
+            lockGateEl = null;
+        }
+        applyLockGateIfNeeded();
+        UIComponents.showToast('Hard Timer Whitelist started', 'success');
     }
 
     function isUiLocked() {
@@ -24377,6 +24444,18 @@ document.addEventListener('DOMContentLoaded', async () => {
     if (ftStartSelfControlBtn) {
         ftStartSelfControlBtn.addEventListener('click', () => {
             startSelfControlSession(Number(ftSelfControlMinutes?.value)).catch(() => { });
+        });
+    }
+    document.querySelectorAll('[data-hard-whitelist-minutes]').forEach((button) => {
+        button.addEventListener('click', () => {
+            const minutes = Number(button.getAttribute('data-hard-whitelist-minutes'));
+            if (ftHardWhitelistMinutes) ftHardWhitelistMinutes.value = String(minutes);
+            startHardWhitelistSession(minutes).catch(() => { });
+        });
+    });
+    if (ftStartHardWhitelistBtn) {
+        ftStartHardWhitelistBtn.addEventListener('click', () => {
+            startHardWhitelistSession(Number(ftHardWhitelistMinutes?.value)).catch(() => { });
         });
     }
     await runRuleListAutoCheckIfDue({ reason: 'dashboard_open' });

@@ -107,7 +107,7 @@ test('synthetic event/action register is backed by current source snippets', () 
   assert.match(blockChannel, /dropdown\.dispatchEvent\(new KeyboardEvent\('keydown'/);
   assert.match(fallback, /clickable\.click\(\)/);
   assert.match(fallback, /targetLink\.click\(\)/);
-  assert.match(fallback, /nextButton\.click\(\)/);
+  assert.doesNotMatch(fallback, /nextButton\.click\(\)/);
   assert.match(fallback, /nextBtn\.click\(\)/);
   assert.match(fallback, /target\.click\(\)/);
   assert.match(injector, /window\.dispatchEvent\(new Event\('scroll'\)\)/);

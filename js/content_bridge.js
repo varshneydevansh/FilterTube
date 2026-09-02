@@ -1946,6 +1946,12 @@ function persistVideoMetaMapping(entries = []) {
         const languageCodeRaw = entry?.languageCode;
         const languageSourceRaw = entry?.languageSource;
         const languageConfidenceRaw = entry?.languageConfidence;
+        const titleRaw = entry?.title;
+        const channelIdRaw = entry?.channelId;
+        const channelNameRaw = entry?.channelName;
+        const channelHandleRaw = entry?.channelHandle;
+        const identityVerified = entry?.identityVerified === true;
+        const textVerified = entry?.textVerified === true;
         const shortDescriptionRaw = entry?.shortDescription;
         const keywordsRaw = entry?.keywords;
         const existing = currentSettings.videoMetaMap[videoId] && typeof currentSettings.videoMetaMap[videoId] === 'object'
@@ -1963,6 +1969,12 @@ function persistVideoMetaMapping(entries = []) {
         const incomingLanguageConfidence = ['high', 'medium', 'unknown'].includes(languageConfidenceRaw)
             ? languageConfidenceRaw
             : '';
+        const incomingTitle = typeof titleRaw === 'string' ? titleRaw.trim() : '';
+        const incomingChannelId = typeof channelIdRaw === 'string' && /^UC[a-zA-Z0-9_-]{22}$/.test(channelIdRaw.trim())
+            ? channelIdRaw.trim()
+            : '';
+        const incomingChannelName = typeof channelNameRaw === 'string' ? channelNameRaw.trim() : '';
+        const incomingChannelHandle = typeof channelHandleRaw === 'string' ? channelHandleRaw.trim() : '';
         const incomingShortDescription = typeof shortDescriptionRaw === 'string' ? shortDescriptionRaw.trim() : '';
         const incomingKeywords = Array.isArray(keywordsRaw)
             ? keywordsRaw.map(value => typeof value === 'string' ? value.trim() : '').filter(Boolean)
@@ -1976,6 +1988,12 @@ function persistVideoMetaMapping(entries = []) {
             languageCode: incomingLanguageCode || (typeof existing.languageCode === 'string' ? existing.languageCode.trim() : ''),
             languageSource: incomingLanguageSource || (typeof existing.languageSource === 'string' ? existing.languageSource.trim() : ''),
             languageConfidence: incomingLanguageConfidence || (typeof existing.languageConfidence === 'string' ? existing.languageConfidence.trim() : ''),
+            title: incomingTitle || (typeof existing.title === 'string' ? existing.title : ''),
+            channelId: incomingChannelId || (typeof existing.channelId === 'string' ? existing.channelId.trim() : ''),
+            channelName: incomingChannelName || (typeof existing.channelName === 'string' ? existing.channelName : ''),
+            channelHandle: incomingChannelHandle || (typeof existing.channelHandle === 'string' ? existing.channelHandle : ''),
+            identityVerified: identityVerified || existing.identityVerified === true,
+            textVerified: textVerified || existing.textVerified === true,
             // Keep creator text in the page session so keyword matching can reuse
             // Player responses without expanding persistent extension storage.
             shortDescription: incomingShortDescription || (typeof existing.shortDescription === 'string' ? existing.shortDescription : ''),
@@ -1984,8 +2002,13 @@ function persistVideoMetaMapping(entries = []) {
                 : (Array.isArray(existing.keywords) ? existing.keywords : [])
         };
 
-        if (!meta.lengthSeconds && !meta.publishDate && !meta.uploadDate && !meta.category && !meta.languageCode && !meta.shortDescription && meta.keywords.length === 0) continue;
-        if (existing && typeof existing === 'object' && String(existing.lengthSeconds ?? '').trim() === String(meta.lengthSeconds ?? '').trim() && String(existing.publishDate ?? '').trim() === String(meta.publishDate ?? '').trim() && String(existing.uploadDate ?? '').trim() === String(meta.uploadDate ?? '').trim() && String(existing.category ?? '').trim() === String(meta.category ?? '').trim() && String(existing.languageCode ?? '').trim() === String(meta.languageCode ?? '').trim() && String(existing.languageSource ?? '').trim() === String(meta.languageSource ?? '').trim() && String(existing.languageConfidence ?? '').trim() === String(meta.languageConfidence ?? '').trim() && String(existing.shortDescription ?? '').trim() === String(meta.shortDescription ?? '').trim() && JSON.stringify(existing.keywords || []) === JSON.stringify(meta.keywords || [])) continue;
+        if (!meta.lengthSeconds && !meta.publishDate && !meta.uploadDate && !meta.category && !meta.languageCode && !meta.identityVerified && !meta.textVerified && !meta.shortDescription && meta.keywords.length === 0) continue;
+        if (meta.identityVerified === true && /^UC[a-zA-Z0-9_-]{22}$/.test(meta.channelId || '')) {
+            // Exact Player metadata repairs any older video -> channel mapping
+            // even when the session metadata itself was already up to date.
+            persistVideoChannelMapping(videoId, meta.channelId);
+        }
+        if (existing && typeof existing === 'object' && String(existing.lengthSeconds ?? '').trim() === String(meta.lengthSeconds ?? '').trim() && String(existing.publishDate ?? '').trim() === String(meta.publishDate ?? '').trim() && String(existing.uploadDate ?? '').trim() === String(meta.uploadDate ?? '').trim() && String(existing.category ?? '').trim() === String(meta.category ?? '').trim() && String(existing.languageCode ?? '').trim() === String(meta.languageCode ?? '').trim() && String(existing.languageSource ?? '').trim() === String(meta.languageSource ?? '').trim() && String(existing.languageConfidence ?? '').trim() === String(meta.languageConfidence ?? '').trim() && String(existing.title ?? '').trim() === String(meta.title ?? '').trim() && String(existing.channelId ?? '').trim() === String(meta.channelId ?? '').trim() && String(existing.channelName ?? '').trim() === String(meta.channelName ?? '').trim() && String(existing.channelHandle ?? '').trim() === String(meta.channelHandle ?? '').trim() && existing.identityVerified === meta.identityVerified && existing.textVerified === meta.textVerified && String(existing.shortDescription ?? '').trim() === String(meta.shortDescription ?? '').trim() && JSON.stringify(existing.keywords || []) === JSON.stringify(meta.keywords || [])) continue;
         try {
             if (Object.prototype.hasOwnProperty.call(currentSettings.videoMetaMap, videoId)) {
                 delete currentSettings.videoMetaMap[videoId];
@@ -2015,7 +2038,17 @@ function persistVideoMetaMapping(entries = []) {
 
     browserAPI_BRIDGE.runtime.sendMessage({
         action: 'updateVideoMetaMap',
-        entries: cleaned.map(({ shortDescription, keywords, ...entry }) => entry)
+        entries: cleaned.map(({
+            title,
+            channelId,
+            channelName,
+            channelHandle,
+            identityVerified,
+            textVerified,
+            shortDescription,
+            keywords,
+            ...entry
+        }) => entry)
     }); return cleaned.map(entry => entry.videoId);
 }
 
@@ -2213,12 +2246,12 @@ function areWatchMetaFetchNeedsSatisfied(videoId, needs) {
     const hasLanguage = Boolean(languageCode) && !(
         languageCode.toLowerCase() === 'und' && languageSource === 'player-unavailable'
     );
-    const mappedChannelId = currentSettings?.videoChannelMap?.[videoId];
-    const hasIdentity = typeof mappedChannelId === 'string' && /^UC[a-zA-Z0-9_-]{22}$/.test(mappedChannelId.trim());
-    const hasText = Boolean(
-        (typeof existing?.shortDescription === 'string' && existing.shortDescription.trim()) ||
-        (Array.isArray(existing?.keywords) && existing.keywords.some(value => typeof value === 'string' && value.trim()))
+    const hasIdentity = existing?.identityVerified === true && Boolean(
+        (typeof existing?.channelId === 'string' && /^UC[a-zA-Z0-9_-]{22}$/.test(existing.channelId.trim())) ||
+        (typeof existing?.channelHandle === 'string' && existing.channelHandle.trim()) ||
+        (typeof existing?.channelName === 'string' && existing.channelName.trim())
     );
+    const hasText = existing?.textVerified === true;
 
     return (!wants.needDuration || hasDuration)
         && (!wants.needDates || hasDates)
@@ -2476,6 +2509,7 @@ async function fetchVideoMetaFromWatchUrl(videoId, needs = null) {
         const channelId = typeof metadata?.channelId === 'string' ? metadata.channelId.trim() : '';
         const channelName = typeof metadata?.channelName === 'string' ? metadata.channelName.trim() : '';
         const channelHandle = typeof metadata?.channelHandle === 'string' ? metadata.channelHandle.trim() : '';
+        const title = typeof metadata?.title === 'string' ? metadata.title.trim() : '';
         const shortDescription = typeof metadata?.shortDescription === 'string' ? metadata.shortDescription.trim() : '';
         const keywords = Array.isArray(metadata?.keywords)
             ? metadata.keywords.map(value => typeof value === 'string' ? value.trim() : '').filter(Boolean)
@@ -2495,7 +2529,9 @@ async function fetchVideoMetaFromWatchUrl(videoId, needs = null) {
 
         if (
             !lengthSeconds && !publishDate && !uploadDate && !category && !languageCode &&
-            !channelId && !channelName && !channelHandle && !shortDescription && keywords.length === 0
+            !title && !channelId && !channelName && !channelHandle &&
+            metadata?.identityVerified !== true && metadata?.textVerified !== true &&
+            !shortDescription && keywords.length === 0
         ) return null;
 
         persistVideoMetaMapping([{
@@ -2507,6 +2543,12 @@ async function fetchVideoMetaFromWatchUrl(videoId, needs = null) {
             languageCode,
             languageSource,
             languageConfidence,
+            title,
+            channelId,
+            channelName,
+            channelHandle,
+            identityVerified: metadata?.identityVerified === true,
+            textVerified: metadata?.textVerified === true,
             shortDescription,
             keywords
         }]);

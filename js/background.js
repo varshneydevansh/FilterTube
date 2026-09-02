@@ -1231,9 +1231,13 @@ const CURRENT_VERSION = (browserAPI.runtime.getManifest()?.version || '').trim()
 const FT_PROFILES_V4_KEY = 'ftProfilesV4';
 const SELF_CONTROL_SESSION_KEY = 'ftSelfControlSessionV1';
 const SELF_CONTROL_SESSION_SCHEMA = 'filtertube_self_control_session';
+const SELF_CONTROL_SESSION_KIND_GENERAL = 'self_control';
+const SELF_CONTROL_SESSION_KIND_HARD_WHITELIST = 'hard_whitelist';
+const SELF_CONTROL_SESSION_ALARM = 'ftSelfControlSessionExpiry';
 const SELF_CONTROL_MIN_MINUTES = 1;
 const SELF_CONTROL_MAX_MINUTES = 10080;
 const DEFAULT_PROFILE_ID = 'default';
+let restoringExpiredHardWhitelistSession = false;
 const QUICK_BLOCK_DEFAULT_MIGRATION_KEY = 'quickBlockDefaultV327Applied';
 const QUICK_BLOCK_DEFAULT_TARGET_VERSION = '3.2.9';
 const KEYWORD_COMMENTS_SCOPE_MIGRATION_KEY = 'keywordCommentsScopeMigrationV332Applied';
@@ -1346,45 +1350,127 @@ function isMetadataOnlySettingsChange(changes) {
 function normalizeSelfControlSession(value, now = Date.now()) {
     const raw = safeObject(value);
     if (normalizeString(raw.schema) !== SELF_CONTROL_SESSION_SCHEMA || raw.version !== 1) return null;
+    const sessionKind = normalizeString(raw.sessionKind) === SELF_CONTROL_SESSION_KIND_HARD_WHITELIST
+        ? SELF_CONTROL_SESSION_KIND_HARD_WHITELIST
+        : SELF_CONTROL_SESSION_KIND_GENERAL;
     const sessionId = normalizeString(raw.sessionId);
     const profileId = normalizeString(raw.profileId);
     const profileName = normalizeString(raw.profileName) || 'Profile';
     const startedAt = normalizeNonNegativeInteger(raw.startedAt);
     const lockedUntil = normalizeNonNegativeInteger(raw.lockedUntil);
     const profileSnapshot = cloneJsonValue(raw.profileSnapshot);
+    const restoreProfileSnapshot = raw.restoreProfileSnapshot
+        ? cloneJsonValue(raw.restoreProfileSnapshot)
+        : null;
     if (!sessionId || !profileId || startedAt == null || lockedUntil == null || lockedUntil <= startedAt || !profileSnapshot) return null;
     return {
         schema: SELF_CONTROL_SESSION_SCHEMA,
         version: 1,
+        sessionKind,
         sessionId,
         profileId,
         profileName,
         startedAt,
         lockedUntil,
         profileSnapshot,
+        restoreProfileSnapshot,
         active: now < lockedUntil,
         remainingSeconds: Math.max(0, Math.ceil((lockedUntil - now) / 1000))
     };
+}
+
+async function scheduleSelfControlSessionExpiry(session, when = session?.lockedUntil) {
+    if (!session || !Number.isFinite(Number(when)) || !browserAPI.alarms?.create) return false;
+    try {
+        await Promise.resolve(browserAPI.alarms.create(SELF_CONTROL_SESSION_ALARM, { when: Number(when) }));
+        return true;
+    } catch (e) {
+        console.warn('FilterTube: failed to schedule Self-Control expiry alarm', e);
+        return false;
+    }
+}
+
+async function clearSelfControlSessionExpiryAlarm() {
+    if (!browserAPI.alarms?.clear) return false;
+    try {
+        await Promise.resolve(browserAPI.alarms.clear(SELF_CONTROL_SESSION_ALARM));
+        return true;
+    } catch (e) {
+        return false;
+    }
 }
 
 async function getActiveSelfControlSession({ clearExpired = true } = {}) {
     const data = await storageGet([SELF_CONTROL_SESSION_KEY]);
     const session = normalizeSelfControlSession(data?.[SELF_CONTROL_SESSION_KEY]);
     if (!session || session.active !== true) {
-        if (clearExpired && data?.[SELF_CONTROL_SESSION_KEY]) {
+        let hardWhitelistRestored = false;
+        if (clearExpired && session?.sessionKind === SELF_CONTROL_SESSION_KIND_HARD_WHITELIST && !restoringExpiredHardWhitelistSession) {
+            restoringExpiredHardWhitelistSession = true;
+            try {
+                hardWhitelistRestored = await restoreExpiredHardWhitelistProfile(session);
+            } finally {
+                restoringExpiredHardWhitelistSession = false;
+            }
+            if (!hardWhitelistRestored) {
+                // The one-shot alarm has already fired, so retain a retry
+                // while preserving the original snapshot as recovery data.
+                await scheduleSelfControlSessionExpiry(session, Date.now() + 60_000);
+            }
+        }
+        // Keep the hard-session record as the recovery authority until the
+        // original profile has been written successfully. This lets a later
+        // read retry after a transient storage/decode failure.
+        const canClearExpiredSession = !session
+            || session.sessionKind !== SELF_CONTROL_SESSION_KIND_HARD_WHITELIST
+            || hardWhitelistRestored;
+        if (clearExpired && data?.[SELF_CONTROL_SESSION_KEY] && canClearExpiredSession) {
             await browserAPI.storage.local.remove(SELF_CONTROL_SESSION_KEY);
+            await clearSelfControlSessionExpiryAlarm();
         }
         return null;
     }
     return session;
 }
 
+async function restoreExpiredHardWhitelistProfile(session) {
+    const restoreProfileSnapshot = session?.restoreProfileSnapshot;
+    if (!restoreProfileSnapshot || typeof restoreProfileSnapshot !== 'object' || Array.isArray(restoreProfileSnapshot)) return false;
+    try {
+        const stored = await storageGet([FT_PROFILES_V4_KEY]);
+        const profilesV4 = stored?.[FT_PROFILES_V4_KEY];
+        if (!isValidProfilesV4(profilesV4)) return false;
+        const profiles = {
+            ...safeObject(profilesV4.profiles),
+            [session.profileId]: cloneJsonValue(restoreProfileSnapshot)
+        };
+        await browserAPI.storage.local.set({
+            [FT_PROFILES_V4_KEY]: {
+                ...profilesV4,
+                schemaVersion: 4,
+                activeProfileId: session.profileId,
+                profiles
+            }
+        });
+        compiledSettingsCache.main = null;
+        compiledSettingsCache.kids = null;
+        return true;
+    } catch (e) {
+        return false;
+    }
+}
+
 function publicSelfControlSessionState(session) {
     if (!session) return { ok: true, active: false, remainingSeconds: 0 };
+    const isHardWhitelist = session.sessionKind === SELF_CONTROL_SESSION_KIND_HARD_WHITELIST;
+    const main = safeObject(session.profileSnapshot?.main);
     return {
         ok: true,
         active: true,
         sessionId: session.sessionId,
+        sessionKind: session.sessionKind,
+        hardWhitelist: isHardWhitelist,
+        allowedChannelCount: isHardWhitelist ? safeArray(main.whitelistChannels).length : 0,
         profileId: session.profileId,
         profileName: session.profileName,
         startedAt: session.startedAt,
@@ -1395,7 +1481,12 @@ function publicSelfControlSessionState(session) {
     };
 }
 
-async function startSelfControlSession(request, sender, sendResponse) {
+async function startSelfControlSession(
+    request,
+    sender,
+    sendResponse,
+    sessionKind = SELF_CONTROL_SESSION_KIND_GENERAL
+) {
     try {
         if (!isTrustedUiSender(sender)) {
             sendResponse?.({ ok: false, error: 'untrusted_sender' });
@@ -1424,20 +1515,46 @@ async function startSelfControlSession(request, sender, sendResponse) {
             sendResponse?.({ ok: false, error: 'active_profile_unavailable' });
             return;
         }
+        const normalizedSessionKind = sessionKind === SELF_CONTROL_SESSION_KIND_HARD_WHITELIST
+            ? SELF_CONTROL_SESSION_KIND_HARD_WHITELIST
+            : SELF_CONTROL_SESSION_KIND_GENERAL;
+        const sourceMain = safeObject(profileSnapshot.main);
+        const selectedAllowedChannels = safeArray(sourceMain.whitelistChannels);
+        if (normalizedSessionKind === SELF_CONTROL_SESSION_KIND_HARD_WHITELIST && selectedAllowedChannels.length === 0) {
+            sendResponse?.({ ok: false, error: 'hard_whitelist_requires_allowed_channels' });
+            return;
+        }
         profileSnapshot.settings = {
             ...safeObject(profileSnapshot.settings),
             enabled: true
         };
+        if (normalizedSessionKind === SELF_CONTROL_SESSION_KIND_HARD_WHITELIST) {
+            // Hard Whitelist is deliberately channel-only: retaining existing
+            // keyword/video allow rules would widen the user's selected
+            // channel set while the timer is active. The original profile is
+            // still retained by the session snapshot for expiry restoration.
+            profileSnapshot.main = {
+                ...sourceMain,
+                mode: 'whitelist',
+                whitelistChannels: selectedAllowedChannels,
+                whitelistKeywords: [],
+                allowedVideoIds: []
+            };
+        }
         const startedAt = Date.now();
         const session = normalizeSelfControlSession({
             schema: SELF_CONTROL_SESSION_SCHEMA,
             version: 1,
+            sessionKind: normalizedSessionKind,
             sessionId: `self-${startedAt}-${Math.random().toString(36).slice(2, 10)}`,
             profileId,
             profileName: normalizeString(profile.name) || (profileId === DEFAULT_PROFILE_ID ? 'Default' : 'Profile'),
             startedAt,
             lockedUntil: startedAt + (minutes * 60 * 1000),
-            profileSnapshot
+            profileSnapshot,
+            restoreProfileSnapshot: normalizedSessionKind === SELF_CONTROL_SESSION_KIND_HARD_WHITELIST
+                ? cloneJsonValue(profile)
+                : null
         }, startedAt);
         await browserAPI.storage.local.set({
             [SELF_CONTROL_SESSION_KEY]: session,
@@ -1451,6 +1568,7 @@ async function startSelfControlSession(request, sender, sendResponse) {
                 }
             }
         });
+        await scheduleSelfControlSessionExpiry(session);
         compiledSettingsCache.main = null;
         compiledSettingsCache.kids = null;
         sendResponse?.(publicSelfControlSessionState(session));
@@ -4832,6 +4950,14 @@ browserAPI.runtime.onMessage.addListener(function (request, sender, sendResponse
         return true;
     } else if (action === 'FilterTube_StartSelfControlSession') {
         startSelfControlSession(request, sender, sendResponse);
+        return true;
+    } else if (action === 'FilterTube_StartHardWhitelistSession') {
+        startSelfControlSession(
+            request,
+            sender,
+            sendResponse,
+            SELF_CONTROL_SESSION_KIND_HARD_WHITELIST
+        );
         return true;
     } else if (action === 'FilterTube_GetManagedTimeLimitState') {
         handleManagedTimeLimitStateQuery(request, sender, sendResponse);
@@ -8321,18 +8447,46 @@ function initializeImportedChannelEnrichment() {
     }
 }
 
+async function reconcileSelfControlSessionExpiry() {
+    try {
+        const data = await storageGet([SELF_CONTROL_SESSION_KEY]);
+        const session = normalizeSelfControlSession(data?.[SELF_CONTROL_SESSION_KEY]);
+        if (session?.active === true) {
+            await scheduleSelfControlSessionExpiry(session);
+            return session;
+        }
+        if (session) {
+            // This also restores an expired hard session before clearing it.
+            await getActiveSelfControlSession();
+            return null;
+        }
+        await clearSelfControlSessionExpiryAlarm();
+    } catch (error) {
+        // Keep the persisted session untouched when storage is unavailable;
+        // the next alarm/startup retry remains the recovery path.
+        console.warn('FilterTube: Self-Control expiry reconciliation failed', error);
+    }
+    return null;
+}
+
 if (browserAPI.alarms?.onAlarm && typeof browserAPI.alarms.onAlarm.addListener === 'function') {
     browserAPI.alarms.onAlarm.addListener((alarm) => {
+        if (alarm?.name === SELF_CONTROL_SESSION_ALARM) {
+            reconcileSelfControlSessionExpiry().catch(() => {});
+            return;
+        }
         importedChannelEnrichmentScheduler?.handleAlarm?.(alarm?.name);
     });
 }
 
 if (browserAPI.runtime?.onStartup && typeof browserAPI.runtime.onStartup.addListener === 'function') {
     browserAPI.runtime.onStartup.addListener(() => {
+        reconcileSelfControlSessionExpiry().catch(() => {});
         initializeImportedChannelEnrichment().catch(() => {});
     });
 }
 
+void reconcileSelfControlSessionExpiry();
 void initializeImportedChannelEnrichment();
 
 console.log(`FilterTube Background ${IS_FIREFOX ? 'Script' : 'Service Worker'} loaded and ready to serve filtered content.`);

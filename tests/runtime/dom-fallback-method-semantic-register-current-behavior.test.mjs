@@ -702,9 +702,9 @@ test('DOM fallback source backs whitelist fail-closed resolver and current-watch
   assert.match(fallback, /fetchIdForHandle\(`@\$\{safeKey\}`, \{ skipNetwork: true, backgroundOnly: true \}\)/);
   assert.match(fallback, /video\.pause\(\)/);
   assert.match(fallback, /targetLink\.click\(\)/);
-  assert.match(fallback, /nextButton\.click\(\)/);
+  assert.doesNotMatch(fallback, /nextButton\.click\(\)/);
   assert.match(fallback, /openWatchPlaylistPanelIfCollapsed\(\)/);
-  assert.match(fallback, /toggleVisibility\(shell, true, `Current watch blocked: \$\{ownerName\}`, true\)/);
+  assert.doesNotMatch(fallback, /toggleVisibility\(shell, true, `Current watch blocked: \$\{ownerName\}`, true\)/);
   assert.match(fallback, /markedChannelIsStillBlocked/);
   assert.match(fallback, /isExplicitlyHiddenByFilterTube/);
   assert.match(fallback, /clearBlockedElementAttributes\(element\)/);
@@ -714,8 +714,7 @@ test('DOM fallback source backs whitelist fail-closed resolver and current-watch
     'whitelist mode can fail closed',
     '`backgroundOnly: true`',
     '`enforceCurrentWatchOwnerBlock()` can pause the current video',
-    'click the player Next button',
-    'hide the whole watch shell'
+    'keep the current player blocked when no verified allowed successor exists'
   ]) {
     assert.ok(text.includes(token), `missing whitelist/watch boundary token ${token}`);
   }

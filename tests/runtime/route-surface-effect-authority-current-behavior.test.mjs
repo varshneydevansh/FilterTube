@@ -160,7 +160,7 @@ test('DOM fallback uses broad active predicates before route specific effects', 
   assert.equal(active.includes('routeInactiveNoWorkCounter'), false);
 });
 
-test('watch current-video effects include pause and click side effects behind local route checks', () => {
+test('watch current-video effects pause blocked playback and navigate only to a verified allowed row', () => {
   const source = read('js/content/dom_fallback.js');
   const block = sliceBetween(
     source,
@@ -170,10 +170,11 @@ test('watch current-video effects include pause and click side effects behind lo
 
   assert.match(block, /path\.startsWith\('\/watch'\)/);
   assert.match(block, /listMode === 'whitelist'/);
-  assert.match(block, /shouldHideContent\(title, ownerName, settings/);
+  assert.match(block, /shouldHideContent\(currentVideoSearchText, ownerName, settings/);
+  assert.match(block, /getCurrentWatchAdmissionDecision\(settings/);
   assert.match(block, /video\.pause\(\)/);
   assert.match(block, /targetLink\.click\(\)/);
-  assert.match(block, /nextButton\.click\(\)/);
+  assert.doesNotMatch(block, /nextButton\.click\(\)/);
   assert.equal(block.includes('sideEffectRouteBudget'), false);
 });
 

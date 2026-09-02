@@ -132,8 +132,8 @@ test('current-watch owner block can pause media hide selected row and synthesize
   assert.match(currentWatch, /targetLink\.click\(\)/);
   assert.match(currentWatch, /openWatchPlaylistPanelIfCollapsed\(\)/);
   assert.match(currentWatch, /applyDOMFallback\(settings, \{ preserveScroll: true, forceReprocess: true \}\)/);
-  assert.match(currentWatch, /nextButton\.click\(\)/);
-  assert.match(currentWatch, /toggleVisibility\(shell, true, `Current watch blocked: \$\{ownerName\}`, true\)/);
+  assert.doesNotMatch(currentWatch, /nextButton\.click\(\)/);
+  assert.doesNotMatch(currentWatch, /toggleVisibility\(shell, true, `Current watch blocked: \$\{ownerName\}`, true\)/);
   assert.doesNotMatch(currentWatch, /ytmWatchPlayerNoPlaybackSideEffectReport|ytmWatchPlayerSyntheticNavigationBudget/);
 });
 

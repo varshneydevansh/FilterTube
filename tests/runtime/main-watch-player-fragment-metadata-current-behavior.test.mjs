@@ -266,7 +266,18 @@ test('no-rule processing preserves player response and queues owner plus meta si
         lengthSeconds: '183',
         publishDate: '2021-05-20T20:46:13-07:00',
         uploadDate: '2021-05-20T20:46:13-07:00',
-        category: 'Music'
+        category: 'Music',
+        languageCode: 'und',
+        languageSource: 'player-unavailable-v2',
+        languageConfidence: 'unknown',
+        title: "BTS (방탄소년단) 'Butter' Official MV",
+        channelId: 'UC3IZKseVpdzPSBaWxBxundA',
+        channelName: 'HYBE LABELS',
+        channelHandle: '@HYBELABELS',
+        identityVerified: true,
+        textVerified: true,
+        shortDescription: "BTS (방탄소년단) 'Butter' Official MV #BTS #Butter",
+        keywords: ['BTS', 'BANGTAN', 'Butter']
       }],
       source: 'filter_logic'
     }
