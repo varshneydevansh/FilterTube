@@ -4,6 +4,8 @@ Date: 2026-09-02
 
 Status: implementation baseline documented; installed-browser acceptance remains open
 
+The canonical current-player contract is [Current-video admission behavior](CURRENT_VIDEO_ADMISSION_BEHAVIOR_2026-09-02.md). It supersedes earlier descriptions of unresolved Watch/Shorts playback failing open after a timeout.
+
 ## Scope and evidence boundary
 
 This document separates three states that must not be conflated:
@@ -21,8 +23,8 @@ Source tests prove parser, matcher, state-machine, and reduced-renderer behavior
 | Home | `/browse` and continuation JSON filtering | Incremental DOM card filtering after hydration | Blocklist fails open until a positive match; Allow only fails closed |
 | Search | `/search` and continuation JSON filtering | DOM filtering for hydrated/A-B renderer variants | Same blocklist/Allow-only policy |
 | Channel | `/browse` JSON plus page channel metadata | DOM cards inherit current creator-page identity; direct blocked-channel route redirects | Page identity may vouch for otherwise ownerless cards |
-| Watch | Route video ID plus metadata verified for that exact video | Bounded current-video resolver | Blocklist fails open after bounded unresolved admission; Allow only remains blocked |
-| Shorts | Route Short ID plus metadata verified for that exact Short | Bounded current-video resolver and per-item overlay | Same as Watch; the Shorts application shell remains usable |
+| Watch | Route video ID plus metadata verified for that exact video | Bounded current-video resolver | Unresolved required metadata holds only the player; after six seconds the status becomes `metadata unavailable`, but playback does not fail open |
+| Shorts | Route Short ID plus metadata verified for that exact Short | Bounded current-video resolver and per-item overlay | Same as Watch; the Shorts application shell remains usable and unknown metadata is never labeled as a verified rule match |
 
 Rule precedence is `video > channel > keyword`; an allow rule wins an equal-specificity tie. Global Disabled is an authority boundary: no content rule, direct-access guard, overlay, pause listener, redirect, or automatic successor navigation may remain active after it is selected.
 
@@ -71,8 +73,10 @@ The current extension working tree contains the following implementation work an
 
 - Hard Timer Whitelist session type, UI, expiry alarm/reconciliation, exact pre-session profile restoration, mutation locks, tests, and specification/checklist updates.
 - Global Disabled direct-access cleanup for #77.
-- Exact current-video Player identity/text verification for Watch/Shorts admission.
-- Reason-specific direct-access banners for blocked video, channel, keyword, and Allow-only decisions.
+- Exact route-bound Player identity/text verification for Watch/Shorts/embed admission.
+- Current-player coverage for explicit video, channel, keyword, Allow-only, duration, upload date, uppercase title, category, and language rules.
+- Reason-specific blocked banners only after a verified rejection; delayed neutral pending UI and no timeout-to-allow for missing metadata.
+- Presentation-only controls remain outside player admission and cannot create a blocked-video banner.
 - Verified playlist-successor-only behavior for #69.
 - Focused direct-access, metadata, lifecycle, and audit-register test updates.
 
