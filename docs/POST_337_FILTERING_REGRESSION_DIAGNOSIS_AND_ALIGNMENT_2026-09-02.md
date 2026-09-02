@@ -80,13 +80,13 @@ This baseline does **not** claim an installed-browser fix for #75, #76, or #77 u
 
 ## Alignment checklist
 
-- [ ] Add a focused fixture for a Home card processed before identity and restamped afterward.
-- [ ] Invalidate and reevaluate exactly that card when its channel identity changes.
-- [ ] Add `compactChannelRenderer` JSON policy with blocklist, Allow-only, no-rule, and map-side-effect fixtures.
-- [ ] Admit direct `richGridMedia` as a known policy renderer and add blocked/preserved fixtures.
-- [ ] Add Search Shorts late-map reevaluation coverage without neighboring-card inference.
-- [ ] Re-run the representative 15k rule list at beginning/middle/end rule positions.
-- [ ] Build Chrome and Firefox packages.
+- [x] Add a focused source contract for a Home card processed before identity and restamped afterward.
+- [x] Invalidate and reevaluate exactly that card when its channel identity changes.
+- [x] Add `compactChannelRenderer` JSON policy with blocklist, Allow-only, no-rule, and map-side-effect fixtures.
+- [x] Admit direct `richGridMedia` as a known policy renderer and add blocked/preserved fixtures.
+- [x] Add Search Shorts mapped-owner coverage without neighboring-card inference.
+- [x] Re-run the representative 15k rule list at beginning/middle/end rule positions.
+- [x] Build Chrome and Firefox packages.
 - [ ] Verify cold load and SPA navigation on Home, Search, Channel, Watch, and Shorts.
 - [ ] Reproduce Chrome 151 / Windows 10 if that browser build and environment are available.
 - [ ] Verify Firefox/macOS #77 by disabling FilterTube while the direct-access guard is pending and while it is blocked.

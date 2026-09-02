@@ -59,7 +59,7 @@ function countToken(source, token) {
   return source.split(token).length - 1;
 }
 
-test('main search compact channel audit doc records fixture and current verdicts', () => {
+test('main search compact channel audit doc records the historical gap and aligned verdict', () => {
   const doc = read(auditDocPath);
   const runtimeResults = read('docs/audit/FILTERTUBE_RUNTIME_FIXTURE_RESULTS_2026-05-17.md');
   const traceability = read('docs/audit/FILTERTUBE_CAPTURE_FIXTURE_TRACEABILITY_2026-05-18.md');
@@ -67,10 +67,11 @@ test('main search compact channel audit doc records fixture and current verdicts
   const ledger = read('docs/audit/FILTERTUBE_OBJECTIVE_COVERAGE_LEDGER_2026-05-18.md');
 
   for (const phrase of [
-    '`compactChannelRenderer` has no direct `FILTER_RULES` entry today',
-    'passes through matching keyword and channel rules',
-    'passes through whitelist non-match mode',
-    'still queues one channel-map side effect'
+    'Alignment update - 2026-09-02',
+    '`compactChannelRenderer` is now a direct filtering authority',
+    'matching blocklist channel or keyword rule removes the row',
+    'whitelist non-match removes the row',
+    'Channel-map harvesting still runs before filtering'
   ]) {
     assert.ok(doc.includes(phrase), `missing audit doc phrase: ${phrase}`);
   }
@@ -112,7 +113,7 @@ test('compactChannelRenderer passes through no-rule mode while queuing channel-m
   }]);
 });
 
-test('compactChannelRenderer passes through matching keyword and channel rules today', () => {
+test('compactChannelRenderer is removed by matching keyword and channel rules', () => {
   const keywordRun = runEngine({
     filterKeywords: [keyword('NYUSHA MUSIC')]
   });
@@ -123,11 +124,19 @@ test('compactChannelRenderer passes through matching keyword and channel rules t
     }]
   });
 
-  assert.deepEqual(plain(keywordRun.output), plain(keywordRun.input));
-  assert.deepEqual(plain(channelRun.output), plain(channelRun.input));
+  assert.deepEqual(plain(keywordRun.output), { contents: [] });
+  assert.deepEqual(plain(channelRun.output), { contents: [] });
+  assert.deepEqual(plain(keywordRun.messages), [{
+    type: 'FilterTube_UpdateChannelMap',
+    payload: [{
+      id: 'UCm9VWKAFz0aXpuEHPHMae7w',
+      handle: '@NYUSHAmusic'
+    }],
+    source: 'filter_logic'
+  }]);
 });
 
-test('compactChannelRenderer passes through whitelist allow and whitelist non-match modes today', () => {
+test('compactChannelRenderer preserves whitelist match and removes whitelist non-match', () => {
   const allowRun = runEngine({
     listMode: 'whitelist',
     whitelistChannels: [{
@@ -144,10 +153,10 @@ test('compactChannelRenderer passes through whitelist allow and whitelist non-ma
   });
 
   assert.deepEqual(plain(allowRun.output), plain(allowRun.input));
-  assert.deepEqual(plain(noMatchRun.output), plain(noMatchRun.input));
+  assert.deepEqual(plain(noMatchRun.output), { contents: [] });
 });
 
-test('matching channel rule removes supported universal watch-card sibling but leaves compact channel row', () => {
+test('matching channel rule removes both universal watch-card and compact channel siblings', () => {
   const compact = loadCapture();
   const universal = loadCapture(universalFixturePath);
   const input = {
@@ -164,18 +173,14 @@ test('matching channel rule removes supported universal watch-card sibling but l
     }]
   }), fixturePath);
 
-  assert.deepEqual(plain(output), {
-    contents: [
-      { compactChannelRenderer: compact.renderer }
-    ]
-  });
+  assert.deepEqual(plain(output), { contents: [] });
 });
 
-test('compactChannelRenderer direct rule and future authority contracts are absent today', () => {
+test('compactChannelRenderer has a direct rule without inventing a second authority path', () => {
   const logic = read('js/filter_logic.js');
   const directRulesBlock = logic.slice(
     logic.indexOf('const FILTER_RULES = {'),
-    logic.indexOf('relatedChipCloudRenderer: {')
+    logic.indexOf('// FILTERING ENGINE')
   );
   const runtime = [
     'js/filter_logic.js',
@@ -185,7 +190,7 @@ test('compactChannelRenderer direct rule and future authority contracts are abse
     'js/content/dom_extractors.js'
   ].map(read).join('\n');
 
-  assert.doesNotMatch(directRulesBlock, /\n\s*compactChannelRenderer\s*:/);
+  assert.match(directRulesBlock, /\n\s*compactChannelRenderer\s*:/);
 
   for (const symbol of [
     'mainSearchCompactChannelContract',

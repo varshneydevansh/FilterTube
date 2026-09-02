@@ -39,6 +39,25 @@ function videoRenderer(overrides = {}) {
   };
 }
 
+function richGridMedia(overrides = {}) {
+  return {
+    videoId: 'richgrid001',
+    title: { runs: [{ text: 'Creator grid upload' }] },
+    shortBylineText: {
+      runs: [{
+        text: 'Calm Channel',
+        navigationEndpoint: {
+          browseEndpoint: {
+            browseId: 'UC1234567890123456789012',
+            canonicalBaseUrl: '/@calmchannel'
+          }
+        }
+      }]
+    },
+    ...overrides
+  };
+}
+
 function runEngine(payload, settings, options = {}) {
   const { engine } = loadFilterTubeEngine(options);
   return engine.processData(payload, settings, options.dataName || 'fixture');
@@ -53,6 +72,22 @@ test('empty blocklist mode leaves a simple videoRenderer intact', () => {
   const output = runEngine(input, baseSettings());
 
   assert.deepEqual(plain(output), plain(input));
+});
+
+test('direct richGridMedia is an explicit policy card despite lacking a Renderer suffix', () => {
+  const input = { contents: [{ richGridMedia: richGridMedia() }] };
+  const noRuleOutput = runEngine(plain(input), baseSettings());
+  const blockedOutput = runEngine(plain(input), baseSettings({
+    filterChannels: [{ id: 'UC1234567890123456789012' }]
+  }));
+  const whitelistMissOutput = runEngine(plain(input), baseSettings({
+    listMode: 'whitelist',
+    whitelistChannels: [{ id: 'UC0000000000000000000000' }]
+  }));
+
+  assert.deepEqual(plain(noRuleOutput), plain(input));
+  assert.deepEqual(plain(blockedOutput), { contents: [] });
+  assert.deepEqual(plain(whitelistMissOutput), { contents: [] });
 });
 
 test('disabled filtering returns the original payload reference', () => {
@@ -701,7 +736,7 @@ test('channelRenderer currently blocks by channel rule but ignores keyword-only 
   assert.deepEqual(plain(channelOutput), { contents: [] });
 });
 
-test('compactChannelRenderer currently has no direct JSON rule for channel rules', () => {
+test('compactChannelRenderer directly applies channel rules', () => {
   const input = {
     contents: [{
       compactChannelRenderer: {
@@ -721,7 +756,7 @@ test('compactChannelRenderer currently has no direct JSON rule for channel rules
     filterChannels: [{ id: 'UC5555555555555555555555', handle: '@blockedcompact' }]
   }));
 
-  assert.deepEqual(plain(output), plain(input));
+  assert.deepEqual(plain(output), { contents: [] });
 });
 
 test('searchRefinementCardRenderer currently has no direct JSON rule for keyword or channel rules', () => {
@@ -927,6 +962,15 @@ test('shortsLockupViewModel currently blocks title keywords but not channel-only
   }));
 
   assert.deepEqual(plain(channelOutput), plain(channelInput));
+
+  const mappedChannelOutput = runEngine(plain(channelInput), baseSettings({
+    filterChannels: [{ id: 'UC9999999999999999999999' }],
+    videoChannelMap: {
+      abcdefghijk: 'UC9999999999999999999999'
+    }
+  }));
+
+  assert.deepEqual(plain(mappedChannelOutput), { contents: [] });
 });
 
 test('shortsLockupViewModel currently ignores belowThumbnailMetadata owner identity for channel rules', () => {
@@ -1335,7 +1379,14 @@ test('harvestOnly currently emits video-meta map writes from player metadata', (
       lengthSeconds: '245',
       publishDate: '2026-05-01',
       uploadDate: '2026-05-02',
-      category: 'Education'
+      category: 'Education',
+      languageCode: 'und',
+      languageSource: 'player-unavailable-v2',
+      languageConfidence: 'unknown',
+      channelId: 'UC1234567890123456789012',
+      channelHandle: '@calmchannel',
+      identityVerified: true,
+      textVerified: true
     }],
     source: 'filter_logic'
   }]);
@@ -1375,7 +1426,14 @@ test('harvestOnly reads category from a streamed MWEB get_watch playerResponse',
       lengthSeconds: '0',
       publishDate: '2026-07-21',
       uploadDate: '2026-07-21',
-      category: 'Education'
+      category: 'Education',
+      languageCode: 'und',
+      languageSource: 'player-unavailable-v2',
+      languageConfidence: 'unknown',
+      channelId: 'UCXRt-HjEaTF6J6regWoopjw',
+      channelHandle: '@RussianwithNastya',
+      identityVerified: true,
+      textVerified: true
     }],
     source: 'filter_logic'
   }]);

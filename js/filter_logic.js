@@ -674,6 +674,13 @@
         'guideRenderer'
     ]);
 
+    // YouTube has a small number of policy-owned card keys that do not use the
+    // Renderer/ViewModel suffix convention. Keep this explicit so arbitrary
+    // layout objects never become filtering authorities.
+    const NON_SUFFIX_POLICY_RENDERERS = new Set([
+        'richGridMedia'
+    ]);
+
     // Comprehensive filter rules for all YouTube renderer types
     const FILTER_RULES = {
         // ------------------------------------------------------------------
@@ -975,6 +982,20 @@
             channelId: 'channelId',
             channelName: ['title.simpleText', 'displayName.simpleText'],
             channelHandle: ['navigationEndpoint.browseEndpoint.canonicalBaseUrl']
+        },
+        compactChannelRenderer: {
+            channelId: ['channelId', 'navigationEndpoint.browseEndpoint.browseId'],
+            channelName: [
+                'title.simpleText',
+                'title.runs',
+                'displayName.simpleText',
+                'displayName.runs'
+            ],
+            channelHandle: [
+                'navigationEndpoint.browseEndpoint.canonicalBaseUrl',
+                'navigationEndpoint.commandMetadata.webCommandMetadata.url',
+                'subscriberCountText.runs'
+            ]
         },
         gridChannelRenderer: {
             channelId: 'channelId',
@@ -4169,7 +4190,11 @@
             }
 
             // Handle objects - check if this object should be filtered
-            const rendererTypes = Object.keys(obj).filter(key => key.endsWith('Renderer') || key.endsWith('ViewModel'));
+            const rendererTypes = Object.keys(obj).filter(key => (
+                key.endsWith('Renderer') ||
+                key.endsWith('ViewModel') ||
+                NON_SUFFIX_POLICY_RENDERERS.has(key)
+            ));
 
             for (const rendererType of rendererTypes) {
                 if (this._shouldBlock(obj[rendererType], rendererType)) {

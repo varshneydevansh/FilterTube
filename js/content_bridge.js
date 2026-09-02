@@ -1753,7 +1753,17 @@ function stampChannelIdentity(card, info, options = {}) {
 
     const name = info.name ? String(info.name) : '';
     if (name && card.getAttribute('data-filtertube-channel-name') !== name) { card.setAttribute('data-filtertube-channel-name', name); changed = true; }
-    if (!changed || options?.scheduleFallback === false) return changed;
+    if (!changed) return false;
+
+    // A card may have been admitted before its creator identity hydrated. The
+    // incremental Home pass normally skips processed cards, so invalidate only
+    // this card's processing stamp before queueing its bounded reevaluation.
+    // Keep the newly learned channel attributes intact: they are the evidence
+    // the next pass must evaluate.
+    card.removeAttribute('data-filtertube-processed');
+    card.removeAttribute('data-filtertube-last-processed-id');
+
+    if (options?.scheduleFallback === false) return true;
 
     if (typeof applyDOMFallback !== 'function') return true;
     const state = window.__filtertubeStampFallbackState || (window.__filtertubeStampFallbackState = {

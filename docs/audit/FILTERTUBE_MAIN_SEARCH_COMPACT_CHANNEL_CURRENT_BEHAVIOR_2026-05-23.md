@@ -93,6 +93,21 @@ expansion, compact-channel behavior changes, endpoint admission changes, search
 refinement changes, watch-card changes, channel-map behavior changes, or
 whitelist optimization changes.
 
+## Alignment update - 2026-09-02
+
+The user explicitly approved the post-v3.3.7 filtering alignment after issue
+#76 exposed this historical gap with a large BlockTube import. The reduced
+fixture is retained, but its runtime verdict is now updated:
+
+- `compactChannelRenderer` is now a direct filtering authority using its UC ID,
+  canonical handle/URL, display name, and title fields.
+- A matching blocklist channel or keyword rule removes the row.
+- A whitelist match preserves the row; whitelist non-match removes the row.
+- Channel-map harvesting still runs before filtering, so the existing
+  `FilterTube_UpdateChannelMap` side effect is preserved.
+- No separate compact-channel authority or endpoint path was introduced; the
+  row uses the shared `FILTER_RULES` and precedence contract.
+
 ## Executable Proof
 
 ```bash

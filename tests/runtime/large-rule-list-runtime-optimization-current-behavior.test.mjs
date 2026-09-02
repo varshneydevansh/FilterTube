@@ -65,6 +65,38 @@ function videoRenderer({ videoId = 'video000001', title = 'Ordinary video', chan
   };
 }
 
+test('15k BlockTube channel-name rule matches at the beginning middle and end', () => {
+  const total = 15453;
+  const positions = [0, Math.floor(total / 2), total - 1];
+  const input = {
+    contents: [videoRenderer({
+      videoId: 'smlvideo001',
+      title: 'SML fixture upload',
+      channelId: 'UCnSWkrRWNQWNhDusoWr_HXQ',
+      channelName: 'SML'
+    })]
+  };
+
+  for (const position of positions) {
+    const channels = Array.from({ length: total }, (_, index) => ({
+      id: '',
+      name: `Unrelated creator ${index}`,
+      originalInput: `Unrelated creator ${index}`,
+      source: 'blocktube-channel-name'
+    }));
+    channels[position] = {
+      id: '',
+      name: 'SML',
+      originalInput: 'SML',
+      source: 'blocktube-channel-name'
+    };
+
+    const { engine } = loadFilterTubeEngine();
+    const output = engine.processData(plain(input), settings({ filterChannels: channels }), `15k-position-${position}`);
+    assert.deepEqual(plain(output), { contents: [] }, `SML must match at rule position ${position}`);
+  }
+});
+
 test('unchanged settings reuse compiled channel indexes', () => {
   const sharedIdentity = loadIdentity();
   const builds = [];
@@ -346,5 +378,11 @@ test('learned Home card identities batch into an incremental fallback pass', () 
   assert.match(stamp, /const isHome = \(document\.location\?\.pathname \|\| ''\) === '\/'/);
   assert.match(stamp, /incrementalHomeCards: true/);
   assert.match(stamp, /candidateElements: candidates/);
+  assert.match(stamp, /card\.removeAttribute\('data-filtertube-processed'\)/);
+  assert.match(stamp, /card\.removeAttribute\('data-filtertube-last-processed-id'\)/);
+  assert.ok(
+    stamp.indexOf("card.removeAttribute('data-filtertube-processed')") < stamp.indexOf('state.candidates.add(card)'),
+    'late identity must invalidate the processed stamp before the incremental candidate is queued'
+  );
   assert.match(stamp, /applyDOMFallback\(null\)/, 'non-Home identity stamps must retain the full fallback path');
 });
