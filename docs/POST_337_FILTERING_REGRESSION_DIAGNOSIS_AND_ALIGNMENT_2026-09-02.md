@@ -63,7 +63,7 @@ Alignment requirement: admit this exact known content key without turning arbitr
 
 Some Shorts lockups expose title/video identity without creator identity. They cannot be channel-matched until an exact video-to-channel mapping is available.
 
-Alignment requirement: preserve fail-open blocklist behavior for genuinely unresolved items, reevaluate once exact mapping arrives, and never infer a creator from neighboring cards.
+Alignment result: modern `belowThumbnailMetadata` owner name, UC ID, and canonical handle paths are now direct rule evidence. Genuinely ownerless items preserve fail-open blocklist behavior, then reevaluate once an exact video-to-channel mapping arrives; creator identity is never inferred from neighboring cards.
 
 ## Current local implementation baseline
 

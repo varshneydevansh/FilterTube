@@ -973,7 +973,7 @@ test('shortsLockupViewModel currently blocks title keywords but not channel-only
   assert.deepEqual(plain(mappedChannelOutput), { contents: [] });
 });
 
-test('shortsLockupViewModel currently ignores belowThumbnailMetadata owner identity for channel rules', () => {
+test('shortsLockupViewModel applies belowThumbnailMetadata owner identity to channel rules', () => {
   const input = {
     contents: [{
       shortsLockupViewModel: {
@@ -1002,7 +1002,7 @@ test('shortsLockupViewModel currently ignores belowThumbnailMetadata owner ident
     filterChannels: [{ id: 'UC9999999999999999999999', handle: '@blockedshortsowner' }]
   }));
 
-  assert.deepEqual(plain(output), plain(input));
+  assert.deepEqual(plain(output), { contents: [] });
 });
 
 test('reelItemRenderer currently blocks by title keyword but has no UC or handle extraction path', () => {

@@ -1094,11 +1094,33 @@
         },
         shortsLockupViewModel: {
             videoId: ['onTap.innertubeCommand.reelWatchEndpoint.videoId'],
-            title: ['accessibilityText']
+            title: ['accessibilityText'],
+            channelName: [
+                'belowThumbnailMetadata.primaryText.content',
+                'belowThumbnailMetadata.primaryText.runs'
+            ],
+            channelId: [
+                'belowThumbnailMetadata.avatar.avatarViewModel.endpoint.innertubeCommand.browseEndpoint.browseId'
+            ],
+            channelHandle: [
+                'belowThumbnailMetadata.avatar.avatarViewModel.endpoint.innertubeCommand.browseEndpoint.canonicalBaseUrl',
+                'belowThumbnailMetadata.avatar.avatarViewModel.endpoint.innertubeCommand.commandMetadata.webCommandMetadata.url'
+            ]
         },
         shortsLockupViewModelV2: {
             videoId: ['onTap.innertubeCommand.reelWatchEndpoint.videoId'],
-            title: ['accessibilityText']
+            title: ['accessibilityText'],
+            channelName: [
+                'belowThumbnailMetadata.primaryText.content',
+                'belowThumbnailMetadata.primaryText.runs'
+            ],
+            channelId: [
+                'belowThumbnailMetadata.avatar.avatarViewModel.endpoint.innertubeCommand.browseEndpoint.browseId'
+            ],
+            channelHandle: [
+                'belowThumbnailMetadata.avatar.avatarViewModel.endpoint.innertubeCommand.browseEndpoint.canonicalBaseUrl',
+                'belowThumbnailMetadata.avatar.avatarViewModel.endpoint.innertubeCommand.commandMetadata.webCommandMetadata.url'
+            ]
         },
 
         // ------------------------------------------------------------------
