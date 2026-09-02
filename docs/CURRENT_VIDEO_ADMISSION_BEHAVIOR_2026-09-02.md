@@ -69,6 +69,8 @@ A verified specific allow decision keeps its existing fast-path precedence and r
 
 Only metadata required by active rules is requested. A duration-only policy does not wait for category or language, and a text-only policy does not request unrelated fields. Loaded Player responses are reused before a player metadata request is made.
 
+Desktop flat Player responses and MWEB/experiment `get_watch` streamed arrays are both accepted. For a streamed response, admission examines only its bounded top-level items and their `playerResponse` wrapper, then still requires the extracted video ID to equal the current route video ID. It does not recursively treat Watch-next recommendations as current-video authority.
+
 ## SPA and direct-entry performance
 
 Normal YouTube SPA playback should not acquire a visible checking step when route-bound Player metadata already proves the result. The synchronous verified path releases an allowed item immediately.
@@ -77,10 +79,13 @@ When metadata is not ready, FilterTube must prefer correctness over speculative 
 
 - playback is paused immediately;
 - the neutral overlay is delayed 180 ms so short metadata races do not flicker;
+- pending retries rerun only current-player admission and never force a full Watch/card scan or rewrite an unchanged overlay;
 - an attempted `play` during the pending state is remembered; and
 - if the final result is allowed, FilterTube resumes only when it had interrupted active or attempted playback.
 
 This makes initial direct entry and a cache-miss SPA transition use the same policy without imposing the slow path on already-verifiable SPA transitions.
+
+The document-level play guard also compares the route video ID with the last admitted video. If YouTube restores a buffered player during browser Back/Forward before its normal SPA mutation pass completes, a different route video is returned to `pending` and paused before the preceding route's allow decision can be reused.
 
 ## Global Disabled boundary
 
@@ -110,8 +115,9 @@ A verified blocked current item may move only to a playlist row that is positive
 
 ## Source verification recorded on 2026-09-02
 
-- `node --test tests/runtime/direct-access-admission-current-behavior.test.mjs`: 16/16 passed.
-- `npm run build:chrome`: passed and produced the Chrome v3.3.7 package.
+- `node --test tests/runtime/direct-access-admission-current-behavior.test.mjs`: 19/19 passed after SPA history, admission-only retry, and streamed `get_watch` coverage was added.
+- The combined current-admission, player-language, and 15k large-rule runtime lanes passed 34/34.
+- `npm run build:chrome` and `npm run build:firefox`: passed and produced the v3.3.7 packages.
 - `git diff --check`: passed for the implementation and documentation changes.
 
 These are source/build checks, not installed-browser proof.

@@ -800,6 +800,13 @@
     }
 
     function extractVideoMetaFromPlayerResponse(candidate, expectedVideoId) {
+        if (Array.isArray(candidate)) {
+            for (const item of candidate) {
+                const streamedMetadata = extractVideoMetaFromPlayerResponse(item, expectedVideoId);
+                if (streamedMetadata) return streamedMetadata;
+            }
+            return null;
+        }
         const playerResponse = candidate?.playerResponse || candidate?.response || candidate;
         if (!playerResponse || typeof playerResponse !== 'object') return null;
         const details = playerResponse?.videoDetails || null;

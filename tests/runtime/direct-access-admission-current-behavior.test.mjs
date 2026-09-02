@@ -77,6 +77,19 @@ function loadContentFilterDecision() {
   return context.decideContent;
 }
 
+function loadPlayerMetaExtractor() {
+  const source = read('js/injector.js');
+  const block = sliceBetween(
+    source,
+    '    function normalizeVideoLanguageCode(value) {',
+    '    function loadedVideoMetaSatisfies(metadata, needs = {}) {'
+  );
+  const context = {};
+  vm.createContext(context);
+  vm.runInContext(`${block}\nthis.extractPlayerMeta = extractVideoMetaFromPlayerResponse;`, context);
+  return context.extractPlayerMeta;
+}
+
 test('Watch admission exposes the exact winning rule family without changing precedence', () => {
   const decide = loadAdmissionDecision();
   const ownerMeta = { id: 'UCED', name: 'Ed Sheeran' };
@@ -194,6 +207,97 @@ test('unresolved direct playback is held, delays neutral UI, and requests every 
   assert.match(bridge, /needIdentity: Boolean\(left\.needIdentity \|\| right\.needIdentity\)/);
   assert.match(bridge, /needText: Boolean\(left\.needText \|\| right\.needText\)/);
   assert.match(bridge, /WATCH_META_FETCH_MAX_PER_WINDOW = 24/);
+});
+
+test('pending current-video admission rechecks only the player and never forces a full Watch scan', () => {
+  const source = read('js/content/dom_fallback.js');
+  const recheck = sliceBetween(
+    source,
+    'function scheduleDirectAccessRecheck(delayMs = 250) {',
+    'function showDirectAccessPendingState(state, isShortRoute, message) {'
+  );
+
+  assert.match(recheck, /enforceCurrentWatchOwnerBlock\(state\.latestSettings\)/);
+  assert.doesNotMatch(recheck, /applyDOMFallback/);
+  assert.doesNotMatch(recheck, /forceReprocess/);
+
+  const directOverlay = sliceBetween(
+    source,
+    'function setDirectAccessOverlay(stateValue, message) {',
+    'function clearDirectAccessOverlay() {'
+  );
+  const shortOverlay = sliceBetween(
+    source,
+    'function setCurrentShortAdmissionOverlay(state, message) {',
+    'function clearCurrentShortAdmissionOverlay() {'
+  );
+  assert.match(directOverlay, /if \(overlay\.textContent !== nextMessage\) overlay\.textContent = nextMessage/);
+  assert.match(shortOverlay, /if \(overlay\.textContent !== nextMessage\) overlay\.textContent = nextMessage/);
+});
+
+test('streamed get_watch arrays provide exact current-video metadata without a second Player request', () => {
+  const extract = loadPlayerMetaExtractor();
+  const payload = [
+    {
+      playerResponse: {
+        videoDetails: {
+          videoId: 'Kw3935PH01E',
+          channelId: 'UCgwv23FVv3lqh567yagXfNg',
+          author: 'DisneyMusicVEVO',
+          title: 'Shakira - Zoo Official Music Video',
+          lengthSeconds: '198',
+          shortDescription: 'Music video by Shakira',
+          keywords: ['Shakira', 'Zoo']
+        },
+        microformat: {
+          playerMicroformatRenderer: {
+            externalVideoId: 'Kw3935PH01E',
+            externalChannelId: 'UCgwv23FVv3lqh567yagXfNg',
+            ownerChannelName: 'DisneyMusicVEVO',
+            ownerProfileUrl: 'http://www.youtube.com/@DisneyMusicVEVO',
+            category: 'Music',
+            publishDate: '2025-11-12T12:00:07-08:00',
+            uploadDate: '2025-11-12T12:00:07-08:00',
+            lengthSeconds: '198'
+          }
+        }
+      }
+    },
+    { watchNextResponse: { contents: {} } }
+  ];
+
+  const metadata = extract(payload, 'Kw3935PH01E');
+  assert.equal(metadata.videoId, 'Kw3935PH01E');
+  assert.equal(metadata.channelId, 'UCgwv23FVv3lqh567yagXfNg');
+  assert.equal(metadata.channelName, 'DisneyMusicVEVO');
+  assert.equal(metadata.channelHandle, '@DisneyMusicVEVO');
+  assert.equal(metadata.lengthSeconds, '198');
+  assert.equal(metadata.identityVerified, true);
+  assert.equal(metadata.textVerified, true);
+  assert.equal(extract(payload, 'AAAAAAAAAAA'), null, 'another route may not consume this player item');
+});
+
+test('an already-buffered SPA Back or Forward player cannot inherit the previous route allow decision', () => {
+  const source = read('js/content/dom_fallback.js');
+  const guard = sliceBetween(
+    source,
+    'function installDirectAccessPlayGuard() {',
+    'function pauseCurrentWatchForDirectAccess(videoId, decision = \'pending\') {'
+  );
+  const admission = sliceBetween(
+    source,
+    'function enforceCurrentWatchOwnerBlock(settings) {',
+    'const FILTERTUBE_CATEGORY_PENDING_TTL_MS'
+  );
+
+  assert.match(guard, /const routeVideoId = getCurrentWatchVideoId\(\)/);
+  assert.match(guard, /routeVideoId && current\.videoId !== routeVideoId/);
+  assert.match(guard, /current\.decision = 'pending'/);
+  assert.match(guard, /scheduleDirectAccessRecheck\(0\)/);
+  assert.ok(
+    admission.indexOf('installDirectAccessPlayGuard();') < admission.indexOf('const exactOwnerMeta'),
+    'the route-change play guard must be installed before metadata admission'
+  );
 });
 
 test('direct Watch content admission applies duration, date, uppercase, category, and language rules', () => {

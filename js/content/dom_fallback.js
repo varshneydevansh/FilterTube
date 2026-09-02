@@ -1190,8 +1190,10 @@ function setCurrentShortAdmissionOverlay(state, message) {
         overlay.setAttribute('aria-live', 'polite');
     }
     if (overlay.parentElement !== host) host.appendChild(overlay);
-    overlay.setAttribute('data-state', state === 'blocked' ? 'blocked' : 'pending');
-    overlay.textContent = message;
+    const nextState = state === 'blocked' ? 'blocked' : 'pending';
+    const nextMessage = String(message || '');
+    if (overlay.getAttribute('data-state') !== nextState) overlay.setAttribute('data-state', nextState);
+    if (overlay.textContent !== nextMessage) overlay.textContent = nextMessage;
     host.setAttribute('data-filtertube-current-short-admission-host', 'true');
     return true;
 }
@@ -1370,7 +1372,8 @@ function getDirectAccessState() {
         pendingStartedAt: 0,
         pausedByGuard: false,
         wasPlaying: false,
-        recheckTimer: 0
+        recheckTimer: 0,
+        latestSettings: null
     });
 }
 
@@ -1381,6 +1384,18 @@ function installDirectAccessPlayGuard() {
     try {
         document.addEventListener('play', event => {
             const current = getDirectAccessState();
+            const routeVideoId = getCurrentWatchVideoId();
+            // YouTube can restore an already-buffered player on Back/Forward
+            // before its normal SPA mutation pass reaches FilterTube. Never let
+            // the preceding route's allowed decision authorize the new video.
+            if (routeVideoId && current.videoId !== routeVideoId && current.latestSettings) {
+                current.videoId = routeVideoId;
+                current.decision = 'pending';
+                current.pendingStartedAt = Date.now();
+                current.pausedByGuard = true;
+                current.wasPlaying = true;
+                scheduleDirectAccessRecheck(0);
+            }
             if (current.decision !== 'pending' && current.decision !== 'blocked') return;
             const media = event?.target;
             if (String(media?.tagName || '').toLowerCase() !== 'video') return;
@@ -1428,8 +1443,10 @@ function setDirectAccessOverlay(stateValue, message) {
     }
     if (overlay.parentElement !== host) host.appendChild(overlay);
     host.setAttribute('data-filtertube-direct-access-overlay-host', 'true');
-    overlay.setAttribute('data-state', stateValue === 'blocked' ? 'blocked' : 'pending');
-    overlay.textContent = message || (stateValue === 'blocked' ? 'Blocked by FilterTube' : 'Checking FilterTube rules…');
+    const nextState = stateValue === 'blocked' ? 'blocked' : 'pending';
+    const nextMessage = String(message || (stateValue === 'blocked' ? 'Blocked by FilterTube' : 'Checking FilterTube rules…'));
+    if (overlay.getAttribute('data-state') !== nextState) overlay.setAttribute('data-state', nextState);
+    if (overlay.textContent !== nextMessage) overlay.textContent = nextMessage;
     return true;
 }
 
@@ -1505,12 +1522,14 @@ function scheduleDirectAccessRecheck(delayMs = 250) {
     state.recheckTimer = setTimeout(() => {
         state.recheckTimer = 0;
         try {
-            if (typeof applyDOMFallback === 'function') {
-                applyDOMFallback(null, { preserveScroll: true, forceReprocess: true });
+            // Admission waits on one route-bound Player response. Rechecking it
+            // must not rescan the Watch rail or every card against a 15k+ list.
+            if (state.latestSettings && typeof enforceCurrentWatchOwnerBlock === 'function') {
+                enforceCurrentWatchOwnerBlock(state.latestSettings);
             }
         } catch (e) {
         }
-    }, Math.max(80, Number(delayMs) || 250));
+    }, Math.max(0, Number(delayMs) || 0));
 }
 
 function showDirectAccessPendingState(state, isShortRoute, message) {
@@ -1807,6 +1826,8 @@ function enforceCurrentWatchOwnerBlock(settings) {
             releaseDisabledDirectAccessState();
             return;
         }
+        const directAccessState = getDirectAccessState();
+        directAccessState.latestSettings = settings;
         const path = String(document.location?.pathname || '');
         const isShortRoute = /^\/shorts\/[a-zA-Z0-9_-]{11}(?:\/|$)/.test(path);
         const isEmbedRoute = /^\/embed\/[a-zA-Z0-9_-]{11}(?:\/|$)/.test(path);
@@ -1827,6 +1848,7 @@ function enforceCurrentWatchOwnerBlock(settings) {
             releaseDirectAccessGuard(routeVideoId, true);
             return;
         }
+        installDirectAccessPlayGuard();
 
         const exactOwnerMeta = getCurrentWatchExactOwnerMeta(settings);
         let ownerMeta = requirements.needsIdentity
