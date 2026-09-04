@@ -2,7 +2,7 @@
 
 Date: 2026-09-02
 
-Status: source implementation and focused tests completed in `7e85404a`; installed-browser acceptance remains open
+Status: source implementation updated on 2026-09-03; focused tests pass; installed-browser acceptance remains open
 
 ## Product contract
 
@@ -48,8 +48,8 @@ These controls continue to run in their existing route/CSS/DOM owners. They are 
 | Disabled | Released | Admission overlays and markers removed | Filtering is enabled again |
 | No active admission rules | Released immediately | No admission UI | An admission rule becomes active |
 | Verified allowed | Allowed immediately, or resumed if FilterTube had paused an attempted play | No admission UI | Route or policy changes |
-| Unresolved | Paused; capturing `play` events prevents a network/SPA race from starting playback | No UI for the first 180 ms, then neutral `Checking...` status | Exact metadata produces an allowed or blocked decision, Disabled is selected, or the route changes |
-| Metadata unavailable after 6 seconds | Still paused | Neutral `Required video metadata unavailable` status; never a blocked-rule claim | Metadata arrives, Disabled is selected, or the route changes |
+| Unresolved | Paused; capturing `play` events prevents a cold-entry, browser-history, or SPA race from starting playback | No UI for the first 180 ms, then neutral `Checking...` status | Exact metadata produces an allowed or blocked decision, Disabled is selected, or the route changes |
+| Metadata unavailable after 6 seconds | Still paused | Neutral `Unable to verify required metadata` status; never a blocked-rule claim | Metadata arrives, Disabled is selected, or the route changes |
 | Verified blocked | Paused | Reason-specific blocked message | Route or policy changes, or Disabled is selected |
 
 The six-second value is a status threshold, not an authorization timeout. There is no timeout-to-allow or `failOpenVideoId` path for the current player. FilterTube continues bounded rechecks because allowing an unresolved video would recreate the direct-link loophole.
@@ -65,15 +65,15 @@ The existing rule precedence is preserved:
 3. keyword;
 4. equal-specificity allow wins a block.
 
-A verified specific allow decision keeps its existing fast-path precedence and releases the player before the general duration/date/uppercase/category/language pass. This document records that implemented behavior; changing allow-rule authority would be a separate product-policy change.
+A verified specific allow decision wins an equal-or-less-specific block/allow-list conflict, but it does not bypass independent duration, upload-date, uppercase-title, category, or language rules. Every active video-admission rule must pass before playback is released.
 
-Only metadata required by active rules is requested. A duration-only policy does not wait for category or language, and a text-only policy does not request unrelated fields. Loaded Player responses are reused before a player metadata request is made.
+All metadata required by the active rules is requested together for the current video. A duration-only policy does not wait for category or language, and a text-only policy does not request unrelated fields. Loaded Player responses are reused before a player metadata request is made. Current-video metadata uses a dedicated bounded request owner and is not held behind the card scheduler's queue, rate budget, or one-minute same-ID cooldown.
 
 Desktop flat Player responses and MWEB/experiment `get_watch` streamed arrays are both accepted. For a streamed response, admission examines only its bounded top-level items and their `playerResponse` wrapper, then still requires the extracted video ID to equal the current route video ID. It does not recursively treat Watch-next recommendations as current-video authority.
 
 ## SPA and direct-entry performance
 
-Normal YouTube SPA playback should not acquire a visible checking step when route-bound Player metadata already proves the result. The synchronous verified path releases an allowed item immediately.
+Normal YouTube SPA playback should not acquire a visible checking step when route-bound Player metadata already proves the result. The verified path releases an allowed item immediately. A newly intercepted Player or streamed `get_watch` record for the current route reruns admission immediately; it does not wait for the card/UI metadata debounce.
 
 When metadata is not ready, FilterTube must prefer correctness over speculative playback:
 
@@ -87,6 +87,8 @@ This makes initial direct entry and a cache-miss SPA transition use the same pol
 
 The document-level play guard also compares the route video ID with the last admitted video. If YouTube restores a buffered player during browser Back/Forward before its normal SPA mutation pass completes, a different route video is returned to `pending` and paused before the preceding route's allow decision can be reused.
 
+Navigation start and `popstate` synchronously invalidate the preceding video's decision receipt: the old blocked overlay and markers are cleared, the recycled player remains paused, and its old video ID cannot authorize or reject the destination. `yt-navigate-finish` then evaluates the destination route. Cold direct Watch entry establishes the same guard immediately after compiled settings arrive, before the general one-second DOM hydration wait.
+
 ## Global Disabled boundary
 
 Global Disabled is checked before Watch/Shorts/channel direct-access enforcement. Selecting it:
@@ -96,6 +98,8 @@ Global Disabled is checked before Watch/Shorts/channel direct-access enforcement
 - removes current-watch blocked/hidden markers and restores affected elements;
 - clears retained retry state; and
 - clears direct-channel redirect state.
+
+An enabled DOM pass that was yielded before the setting changed is stale. It aborts when it resumes and cannot restore an old admission decision or re-hide content after Disabled cleanup.
 
 No saved channel, video, keyword, Allow-only, content, category, or language rule may continue admission activity while FilterTube is globally Disabled.
 
@@ -109,16 +113,19 @@ A verified blocked current item may move only to a playlist row that is positive
 - `getCurrentWatchAdmissionDecision()` evaluates explicit video, channel, keyword, and Allow-only rules with the existing specificity contract.
 - `getCurrentWatchContentFilterDecision()` evaluates duration, upload date, uppercase, category, and language rules.
 - `enforceCurrentWatchOwnerBlock()` owns the route-bound state machine for Watch, Shorts, and embeds.
-- `showDirectAccessPendingState()` owns the delayed neutral pending UI.
+- `showCurrentVideoAdmissionPendingState()` owns the exact neutral checking/unavailable messages while `showDirectAccessPendingState()` owns the delayed display.
 - `releaseDisabledDirectAccessState()` owns the Global Disabled cleanup boundary.
 - `tests/runtime/direct-access-admission-current-behavior.test.mjs` pins current rule scope, exact metadata binding, pending behavior, Disabled cleanup, banner reasons, embed scope, and playlist successor behavior.
 
-## Source verification recorded on 2026-09-02
+## Source verification recorded on 2026-09-03
 
-- `node --test tests/runtime/direct-access-admission-current-behavior.test.mjs`: 19/19 passed after SPA history, admission-only retry, and streamed `get_watch` coverage was added.
-- The combined current-admission, player-language, and 15k large-rule runtime lanes passed 34/34.
+- `node --test tests/runtime/direct-access-admission-current-behavior.test.mjs`: 25/25 passed, including exact reasons, cold direct-entry ordering, synchronous Back/SPA receipt invalidation, recycled-player transition isolation, all-rule evaluation, immediate current-Player admission, dedicated current metadata fetching, and stale-Disabled-pass coverage.
+- The combined current-admission, player-language, and 15k large-rule runtime checks passed 40/40.
+- `node --check js/content/dom_fallback.js` and `node --check js/content_bridge.js`: passed.
 - `npm run build:chrome` and `npm run build:firefox`: passed and produced the v3.3.7 packages.
-- `git diff --check`: passed for the implementation and documentation changes.
+- `git diff --check`: passed for the implementation, tests, and documentation changes.
+
+`npm run test:changed` reached the required release lane but remains red on unrelated, pre-existing source-fingerprint and audit-snapshot drift (50 failures in that lane). Those historical snapshots were not rewritten as part of this current-player fix.
 
 These are source/build checks, not installed-browser proof.
 

@@ -1372,9 +1372,92 @@ function getDirectAccessState() {
         pendingStartedAt: 0,
         pausedByGuard: false,
         wasPlaying: false,
+        routeTransitionPending: false,
         recheckTimer: 0,
         latestSettings: null
     });
+}
+
+function hasCurrentVideoAdmissionRules(settings) {
+    if (!isFilterTubeFilteringEnabled(settings)) return false;
+    const requirements = getDirectAccessRuleRequirements(settings);
+    return Boolean(
+        requirements.hasExplicitVideoRules ||
+        requirements.needsIdentity ||
+        requirements.needsText ||
+        requirements.needsDuration ||
+        requirements.needsDates ||
+        requirements.needsCategory ||
+        requirements.needsLanguage ||
+        settings?.listMode === 'whitelist'
+    );
+}
+
+function clearCurrentVideoAdmissionPresentation() {
+    clearDirectAccessOverlay();
+    clearCurrentShortAdmissionOverlay();
+    clearCurrentWatchCategoryOverlay();
+    try {
+        document.querySelectorAll('[data-filtertube-current-watch-blocked="true"]').forEach(element => {
+            element.removeAttribute('data-filtertube-current-watch-blocked');
+            element.removeAttribute('data-filtertube-hidden-by-channel');
+            toggleVisibility(element, false, '', true);
+        });
+    } catch (e) {
+    }
+}
+
+function beginCurrentVideoRouteTransition(settings = currentSettings) {
+    if (!isFilterTubeFilteringEnabled(settings)) {
+        releaseDisabledDirectAccessState();
+        return false;
+    }
+    if (!hasCurrentVideoAdmissionRules(settings)) {
+        releaseDirectAccessGuard('', false);
+        clearCurrentVideoAdmissionPresentation();
+        return false;
+    }
+
+    const state = getDirectAccessState();
+    if (state.recheckTimer) {
+        clearTimeout(state.recheckTimer);
+        state.recheckTimer = 0;
+    }
+    state.latestSettings = settings;
+    // The old video ID and its receipt lose authority as soon as navigation
+    // begins. Do not resume the recycled player here; YouTube's new-video play
+    // attempt will be captured by the guard and resumed only after admission.
+    state.videoId = '';
+    state.decision = 'pending';
+    state.routeTransitionPending = true;
+    state.pendingStartedAt = Date.now();
+    state.pausedByGuard = true;
+    state.wasPlaying = false;
+    clearCurrentVideoAdmissionPresentation();
+    try {
+        releaseCurrentWatchCategoryGuard('', false);
+    } catch (e) {
+    }
+    installDirectAccessPlayGuard();
+    try {
+        document.querySelector('video.html5-main-video, video')?.pause?.();
+    } catch (e) {
+    }
+    return true;
+}
+
+function enforceCurrentVideoAdmissionForRoute(settings = currentSettings) {
+    if (!isFilterTubeFilteringEnabled(settings)) {
+        releaseDisabledDirectAccessState();
+        return;
+    }
+    if (!getCurrentWatchVideoId()) {
+        releaseDirectAccessGuard('', false);
+        clearCurrentVideoAdmissionPresentation();
+        return;
+    }
+    getDirectAccessState().routeTransitionPending = false;
+    enforceCurrentWatchOwnerBlock(settings);
 }
 
 function installDirectAccessPlayGuard() {
@@ -1384,6 +1467,23 @@ function installDirectAccessPlayGuard() {
     try {
         document.addEventListener('play', event => {
             const current = getDirectAccessState();
+            if (!isFilterTubeFilteringEnabled(current.latestSettings)) {
+                releaseDisabledDirectAccessState();
+                return;
+            }
+            const media = event?.target;
+            if (String(media?.tagName || '').toLowerCase() !== 'video') return;
+            // Between navigation-start/popstate and yt-navigate-finish, the URL
+            // and recycled player can still describe the route we are leaving.
+            // Keep playback closed without granting that stale route a receipt.
+            if (current.routeTransitionPending) {
+                current.wasPlaying = true;
+                try {
+                    media.pause?.();
+                } catch (e) {
+                }
+                return;
+            }
             const routeVideoId = getCurrentWatchVideoId();
             // YouTube can restore an already-buffered player on Back/Forward
             // before its normal SPA mutation pass reaches FilterTube. Never let
@@ -1397,8 +1497,6 @@ function installDirectAccessPlayGuard() {
                 scheduleDirectAccessRecheck(0);
             }
             if (current.decision !== 'pending' && current.decision !== 'blocked') return;
-            const media = event?.target;
-            if (String(media?.tagName || '').toLowerCase() !== 'video') return;
             if (current.decision === 'pending') current.wasPlaying = true;
             try {
                 media.pause?.();
@@ -1476,6 +1574,7 @@ function releaseDirectAccessGuard(videoId, resumePlayback = true) {
     );
     state.videoId = videoId || '';
     state.decision = 'allowed';
+    state.routeTransitionPending = false;
     state.pendingStartedAt = 0;
     state.pausedByGuard = false;
     state.wasPlaying = false;
@@ -1494,7 +1593,8 @@ function isFilterTubeFilteringEnabled(settings) {
 function releaseDisabledDirectAccessState() {
     const videoId = getCurrentWatchVideoId();
     releaseDirectAccessGuard(videoId, true);
-    clearCurrentShortAdmissionOverlay();
+    getDirectAccessState().latestSettings = { enabled: false };
+    clearCurrentVideoAdmissionPresentation();
     try {
         document.documentElement?.removeAttribute?.('data-filtertube-direct-channel-redirect');
         document.querySelectorAll('[data-filtertube-current-watch-blocked="true"]').forEach(element => {
@@ -1548,6 +1648,23 @@ function showDirectAccessPendingState(state, isShortRoute, message) {
     }
 }
 
+function showCurrentVideoAdmissionPendingState(state, isShortRoute) {
+    const unavailable = Date.now() - Number(state?.pendingStartedAt || 0) > FILTERTUBE_DIRECT_ACCESS_PENDING_TTL_MS;
+    const message = unavailable
+        ? 'Unable to verify required metadata\nPlayback remains paused'
+        : 'Checking FilterTube rules…';
+    if (unavailable) {
+        if (isShortRoute) {
+            pauseCurrentShortPlayer();
+            setCurrentShortAdmissionOverlay('pending', message);
+        } else {
+            setDirectAccessOverlay('pending', message);
+        }
+        return;
+    }
+    showDirectAccessPendingState(state, isShortRoute, message);
+}
+
 function getDirectAccessRuleRequirements(settings) {
     const hasList = value => Array.isArray(value) && value.length > 0;
     const contentFilters = settings?.contentFilters && typeof settings.contentFilters === 'object'
@@ -1572,6 +1689,25 @@ function getDirectAccessRuleRequirements(settings) {
         needsCategory: Boolean(getActiveCategoryPolicy(settings)),
         needsLanguage: Boolean(getActiveLanguagePolicy(settings))
     };
+}
+
+function scheduleCurrentVideoAdmissionMetadata(videoId, requirements, listMode) {
+    const needs = {
+        needDuration: requirements.needsDuration,
+        needDates: requirements.needsDates,
+        needCategory: requirements.needsCategory,
+        needLanguage: requirements.needsLanguage,
+        needIdentity: requirements.needsIdentity || listMode === 'whitelist',
+        needText: requirements.needsText,
+        priority: 'high'
+    };
+    if (typeof scheduleCurrentVideoAdmissionMetaFetch === 'function') {
+        return scheduleCurrentVideoAdmissionMetaFetch(videoId, needs);
+    }
+    if (typeof scheduleVideoMetaFetch === 'function') {
+        return scheduleVideoMetaFetch(videoId, needs);
+    }
+    return false;
 }
 
 function getCurrentWatchContentFilterDecision(settings, metadata = {}) {
@@ -1822,12 +1958,26 @@ function enforceCurrentChannelPageDirectAccess(settings) {
 
 function enforceCurrentWatchOwnerBlock(settings) {
     try {
+        // A coalesced DOM pass may finish after a settings update. Current-video
+        // admission must always use the latest global settings, especially when
+        // the update turned FilterTube off while the older pass was yielded.
+        if (currentSettings && typeof currentSettings === 'object' && currentSettings !== settings) {
+            settings = currentSettings;
+        }
         if (!isFilterTubeFilteringEnabled(settings)) {
             releaseDisabledDirectAccessState();
             return;
         }
         const directAccessState = getDirectAccessState();
         directAccessState.latestSettings = settings;
+        if (directAccessState.routeTransitionPending) {
+            clearCurrentVideoAdmissionPresentation();
+            try {
+                document.querySelector('video.html5-main-video, video')?.pause?.();
+            } catch (e) {
+            }
+            return;
+        }
         const path = String(document.location?.pathname || '');
         const isShortRoute = /^\/shorts\/[a-zA-Z0-9_-]{11}(?:\/|$)/.test(path);
         const isEmbedRoute = /^\/embed\/[a-zA-Z0-9_-]{11}(?:\/|$)/.test(path);
@@ -1885,11 +2035,6 @@ function enforceCurrentWatchOwnerBlock(settings) {
             ? new Date(cachedVideoMeta.publishDate || cachedVideoMeta.uploadDate).getTime()
             : null;
         const explicitlyBlocked = Array.isArray(settings?.blockedVideoIds) && settings.blockedVideoIds.includes(routeVideoId);
-        const explicitlyAllowed = Array.isArray(settings?.allowedVideoIds) && settings.allowedVideoIds.includes(routeVideoId);
-        if (explicitlyAllowed) {
-            releaseDirectAccessGuard(routeVideoId, true);
-            return;
-        }
 
         if (!explicitlyBlocked && !requirements.needsIdentity && !requirements.needsText &&
             !requirements.needsDuration && !requirements.needsDates && !requirements.needsCategory &&
@@ -1918,32 +2063,11 @@ function enforceCurrentWatchOwnerBlock(settings) {
             (requirements.needsKeywordDates && !hasPlayerDates)
         );
         if (missingRuleMetadata) {
-            if (typeof scheduleVideoMetaFetch === 'function') {
-                scheduleVideoMetaFetch(routeVideoId, {
-                    needDuration: false,
-                    needDates: requirements.needsKeywordDates,
-                    needCategory: false,
-                    needLanguage: false,
-                    needIdentity: requirements.needsIdentity || listMode === 'whitelist',
-                    needText: requirements.needsRuleText,
-                    priority: 'high'
-                });
-            }
+            scheduleCurrentVideoAdmissionMetadata(routeVideoId, requirements, listMode);
             const state = pauseCurrentWatchForDirectAccess(routeVideoId, 'pending');
             if (!state.pendingStartedAt) state.pendingStartedAt = Date.now();
-            const unavailable = Date.now() - state.pendingStartedAt > FILTERTUBE_DIRECT_ACCESS_PENDING_TTL_MS;
-            const message = unavailable
-                ? 'Required video metadata unavailable\nPlayback remains blocked by active FilterTube rules'
-                : 'Checking this video against all active FilterTube rules…';
-            if (unavailable && isShortRoute) {
-                pauseCurrentShortPlayer();
-                setCurrentShortAdmissionOverlay('pending', message);
-            } else if (unavailable) {
-                setDirectAccessOverlay('pending', message);
-            } else {
-                showDirectAccessPendingState(state, isShortRoute, message);
-            }
-            scheduleDirectAccessRecheck(unavailable ? 1000 : 250);
+            showCurrentVideoAdmissionPendingState(state, isShortRoute);
+            scheduleDirectAccessRecheck(Date.now() - state.pendingStartedAt > FILTERTUBE_DIRECT_ACCESS_PENDING_TTL_MS ? 1000 : 250);
             return;
         }
 
@@ -1962,38 +2086,11 @@ function enforceCurrentWatchOwnerBlock(settings) {
             if (earlyKeywordBlock) {
                 ownerMeta = { videoId: routeVideoId, id: '', handle: '', customUrl: '', name: '' };
             } else {
-                if (typeof scheduleVideoMetaFetch === 'function') {
-                    scheduleVideoMetaFetch(routeVideoId, {
-                        needDuration: false,
-                        needDates: false,
-                        needCategory: false,
-                        needIdentity: requirements.needsIdentity || listMode === 'whitelist',
-                        needText: requirements.needsText,
-                        priority: 'high'
-                    });
-                }
+                scheduleCurrentVideoAdmissionMetadata(routeVideoId, requirements, listMode);
                 const state = pauseCurrentWatchForDirectAccess(routeVideoId, 'pending');
                 if (!state.pendingStartedAt) state.pendingStartedAt = Date.now();
-                if (Date.now() - state.pendingStartedAt <= FILTERTUBE_DIRECT_ACCESS_PENDING_TTL_MS) {
-                    if (isShortRoute) {
-                        pauseCurrentShortPlayer();
-                        setCurrentShortAdmissionOverlay('pending', 'Checking this Short against your FilterTube rules…');
-                    } else {
-                        setDirectAccessOverlay('pending', 'Checking this video against your FilterTube rules…');
-                    }
-                    scheduleDirectAccessRecheck();
-                    return;
-                }
-                if (listMode === 'whitelist') {
-                    if (isShortRoute) {
-                        setCurrentShortAdmissionOverlay('blocked', 'Video identity unavailable\nBlocked by Allow only selected');
-                    } else {
-                        setDirectAccessOverlay('blocked', 'Video identity unavailable\nBlocked by Allow only selected');
-                    }
-                    getDirectAccessState().decision = 'blocked';
-                    return;
-                }
-                getDirectAccessState().decision = 'blocked';
+                showCurrentVideoAdmissionPendingState(state, isShortRoute);
+                scheduleDirectAccessRecheck(Date.now() - state.pendingStartedAt > FILTERTUBE_DIRECT_ACCESS_PENDING_TTL_MS ? 1000 : 250);
                 return;
             }
         }
@@ -2006,23 +2103,12 @@ function enforceCurrentWatchOwnerBlock(settings) {
                 contentTag: 'watch-current-video'
             });
             if (!channelOnlyBlocked) {
-                if (typeof scheduleVideoMetaFetch === 'function') {
-                    scheduleVideoMetaFetch(routeVideoId, {
-                        needDuration: false,
-                        needDates: false,
-                        needCategory: false,
-                        needIdentity: false,
-                        needText: true,
-                        priority: 'high'
-                    });
-                }
+                scheduleCurrentVideoAdmissionMetadata(routeVideoId, requirements, listMode);
                 const state = pauseCurrentWatchForDirectAccess(routeVideoId, 'pending');
                 if (!state.pendingStartedAt) state.pendingStartedAt = Date.now();
-                if (Date.now() - state.pendingStartedAt <= FILTERTUBE_DIRECT_ACCESS_PENDING_TTL_MS) {
-                    showDirectAccessPendingState(state, isShortRoute, 'Checking video title and description…');
-                    scheduleDirectAccessRecheck();
-                    return;
-                }
+                showCurrentVideoAdmissionPendingState(state, isShortRoute);
+                scheduleDirectAccessRecheck(Date.now() - state.pendingStartedAt > FILTERTUBE_DIRECT_ACCESS_PENDING_TTL_MS ? 1000 : 250);
+                return;
             }
         }
 
@@ -2034,12 +2120,6 @@ function enforceCurrentWatchOwnerBlock(settings) {
             textFields: currentVideoTextFields,
             publishTimestamp
         });
-        if (!admissionDecision.blocked && admissionDecision.kind === 'allowed-rule') {
-            releaseDirectAccessGuard(ownerMeta.videoId, true);
-            if (isShortRoute) clearCurrentShortAdmissionOverlay();
-            return;
-        }
-
         if (!admissionDecision.blocked) {
             const missingContentMetadata = (
                 (requirements.needsDuration && !hasPlayerDuration) ||
@@ -2049,39 +2129,20 @@ function enforceCurrentWatchOwnerBlock(settings) {
                 (requirements.needsLanguage && !hasPlayerLanguage)
             );
             if (missingContentMetadata) {
-                if (typeof scheduleVideoMetaFetch === 'function') {
-                    scheduleVideoMetaFetch(routeVideoId, {
-                        needDuration: requirements.needsDuration,
-                        needDates: requirements.needsUploadDate,
-                        needCategory: requirements.needsCategory,
-                        needLanguage: requirements.needsLanguage,
-                        needIdentity: false,
-                        needText: requirements.needsUppercaseText,
-                        priority: 'high'
-                    });
-                }
+                scheduleCurrentVideoAdmissionMetadata(routeVideoId, requirements, listMode);
                 const state = pauseCurrentWatchForDirectAccess(routeVideoId, 'pending');
                 if (!state.pendingStartedAt) state.pendingStartedAt = Date.now();
-                const unavailable = Date.now() - state.pendingStartedAt > FILTERTUBE_DIRECT_ACCESS_PENDING_TTL_MS;
-                const message = unavailable
-                    ? 'Required video metadata unavailable\nPlayback remains blocked by active FilterTube rules'
-                    : 'Checking this video against all active FilterTube rules…';
-                if (unavailable) {
-                    if (isShortRoute) pauseCurrentShortPlayer();
-                    if (isShortRoute) setCurrentShortAdmissionOverlay('pending', message);
-                    else setDirectAccessOverlay('pending', message);
-                } else {
-                    showDirectAccessPendingState(state, isShortRoute, message);
-                }
-                scheduleDirectAccessRecheck(unavailable ? 1000 : 250);
+                showCurrentVideoAdmissionPendingState(state, isShortRoute);
+                scheduleDirectAccessRecheck(Date.now() - state.pendingStartedAt > FILTERTUBE_DIRECT_ACCESS_PENDING_TTL_MS ? 1000 : 250);
                 return;
             }
             const contentDecision = getCurrentWatchContentFilterDecision(settings, cachedVideoMeta || {});
             if (contentDecision.pending) {
                 const state = pauseCurrentWatchForDirectAccess(routeVideoId, 'pending');
                 if (!state.pendingStartedAt) state.pendingStartedAt = Date.now();
-                showDirectAccessPendingState(state, isShortRoute, 'Checking this video against all active FilterTube rules…');
-                scheduleDirectAccessRecheck();
+                scheduleCurrentVideoAdmissionMetadata(routeVideoId, requirements, listMode);
+                showCurrentVideoAdmissionPendingState(state, isShortRoute);
+                scheduleDirectAccessRecheck(Date.now() - state.pendingStartedAt > FILTERTUBE_DIRECT_ACCESS_PENDING_TTL_MS ? 1000 : 250);
                 return;
             }
             if (contentDecision.blocked) {
@@ -2096,16 +2157,7 @@ function enforceCurrentWatchOwnerBlock(settings) {
             }
         }
 
-        const shouldBlock = admissionDecision.blocked || shouldHideContent(currentVideoSearchText, ownerName, settings, {
-            skipKeywords: false,
-            videoId: ownerMeta.videoId,
-            channelHref: ownerMeta.mappedIdAuthoritative
-                ? ''
-                : (ownerMeta.ownerAnchor?.getAttribute?.('href') || ownerMeta.ownerAnchor?.href || ''),
-            channelMeta: ownerMeta,
-            publishTimestamp,
-            contentTag: 'watch-current-video'
-        });
+        const shouldBlock = admissionDecision.blocked;
         if (!shouldBlock) {
             releaseDirectAccessGuard(ownerMeta.videoId, true);
             if (isShortRoute) clearCurrentShortAdmissionOverlay();
@@ -2116,13 +2168,6 @@ function enforceCurrentWatchOwnerBlock(settings) {
             } catch (e) {
             }
             return;
-        }
-
-        if (!admissionDecision.blocked) {
-            // Keep shouldHideContent as the enforcement authority because it also
-            // owns legacy active-resolution behavior. Never mislabel an uncommon
-            // fallback match as a channel decision when it cannot be classified.
-            admissionDecision = { blocked: true, kind: 'rule' };
         }
 
         if (isShortRoute) {
@@ -4844,6 +4889,20 @@ async function applyDOMFallback(settings, options = {}) {
     const effectiveSettings = settings || currentSettings;
     if (!effectiveSettings || typeof effectiveSettings !== 'object') return;
 
+    currentSettings = effectiveSettings;
+    if (!isFilterTubeFilteringEnabled(effectiveSettings)) {
+        releaseDisabledDirectAccessState();
+        clearContentControlStyles();
+        clearStaleDOMFallbackVisibility();
+        const state = window.__filtertubeDomFallbackPerfState || (window.__filtertubeDomFallbackPerfState = {
+            hadActiveWork: false,
+            lastCleanupTs: 0
+        });
+        state.hadActiveWork = false;
+        state.lastCleanupTs = Date.now();
+        return;
+    }
+
     const perf = window.FilterTubePerfDebug;
     const perfEnabled = perf?.enabled?.() === true;
     const perfStartedAt = perfEnabled ? perf.now() : 0;
@@ -4912,7 +4971,6 @@ async function applyDOMFallback(settings, options = {}) {
         }
     })();
 
-    currentSettings = effectiveSettings;
     const {
         forceReprocess = false,
         preserveScroll = true,
@@ -4926,18 +4984,6 @@ async function applyDOMFallback(settings, options = {}) {
         Array.isArray(candidateElements) &&
         candidateElements.length > 0
     );
-    if (!isFilterTubeFilteringEnabled(effectiveSettings)) {
-        releaseDisabledDirectAccessState();
-        clearContentControlStyles();
-        clearStaleDOMFallbackVisibility();
-        const state = window.__filtertubeDomFallbackPerfState || (window.__filtertubeDomFallbackPerfState = {
-            hadActiveWork: false,
-            lastCleanupTs: 0
-        });
-        state.hadActiveWork = false;
-        state.lastCleanupTs = Date.now();
-        return;
-    }
     if (enforceCurrentChannelPageDirectAccess(effectiveSettings)) return;
     enforceCurrentWatchOwnerBlock(effectiveSettings);
     syncRouteScopedContentControls(effectiveSettings);
@@ -7094,6 +7140,7 @@ async function applyDOMFallback(settings, options = {}) {
 
             if (elementIndex > 0 && elementIndex % 60 === 0) {
                 await yieldToMain();
+                if (currentSettings !== effectiveSettings) return;
             }
         }
     } catch (e) {
@@ -7135,6 +7182,7 @@ async function applyDOMFallback(settings, options = {}) {
 
             if (i > 0 && i % 40 === 0) {
                 await yieldToMain();
+                if (currentSettings !== effectiveSettings) return;
             }
         }
     } catch (e) {
@@ -7160,6 +7208,7 @@ async function applyDOMFallback(settings, options = {}) {
                 toggleVisibility(chip, hideChip, `Chip: ${label}`);
                 if (i > 0 && i % 60 === 0) {
                     await yieldToMain();
+                    if (currentSettings !== effectiveSettings) return;
                 }
             }
         } catch (e) {
@@ -7181,6 +7230,7 @@ async function applyDOMFallback(settings, options = {}) {
             }
             if (i > 0 && i % 60 === 0) {
                 await yieldToMain();
+                if (currentSettings !== effectiveSettings) return;
             }
         }
     } catch (e) {
@@ -7263,6 +7313,7 @@ async function applyDOMFallback(settings, options = {}) {
             }
             if (i > 0 && i % 60 === 0) {
                 await yieldToMain();
+                if (currentSettings !== effectiveSettings) return;
             }
         }
     } catch (e) {
@@ -7469,6 +7520,7 @@ async function applyDOMFallback(settings, options = {}) {
         toggleVisibility(target, shouldHideShort, reason);
             if (elementIndex > 0 && elementIndex % 60 === 0) {
                 await yieldToMain();
+                if (currentSettings !== effectiveSettings) return;
             }
         }
     } catch (e) {
@@ -7573,6 +7625,7 @@ async function applyDOMFallback(settings, options = {}) {
 
             if (i > 0 && i % 30 === 0) {
                 await yieldToMain();
+                if (currentSettings !== effectiveSettings) return;
             }
         }
     } catch (e) {

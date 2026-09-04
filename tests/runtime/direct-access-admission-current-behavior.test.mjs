@@ -142,8 +142,8 @@ test('current-player overlays identify every video-admission rule family', () =>
   assert.match(formatter, /Blocked by Upload Date Filter/);
   assert.match(formatter, /Blocked by Uppercase Title Filter/);
   assert.doesNotMatch(watchAdmission, /`Blocked by FilterTube/);
-  assert.match(watchAdmission, /shouldHideContent\(currentVideoSearchText, ownerName, settings/);
-  assert.match(watchAdmission, /admissionDecision = \{ blocked: true, kind: 'rule' \}/);
+  assert.doesNotMatch(watchAdmission, /admissionDecision = \{ blocked: true, kind: 'rule' \}/);
+  assert.match(watchAdmission, /const shouldBlock = admissionDecision\.blocked/);
   assert.match(categoryAdmission, /Blocked by Language Filter\\nLanguage:/);
   assert.match(categoryAdmission, /Blocked by Category Filter\\nCategory:/);
 });
@@ -157,7 +157,6 @@ test('direct admission checks URL video IDs before owner identity is required', 
   );
 
   assert.match(block, /const explicitlyBlocked = Array\.isArray\(settings\?\.blockedVideoIds\)/);
-  assert.match(block, /const explicitlyAllowed = Array\.isArray\(settings\?\.allowedVideoIds\)/);
   assert.ok(block.indexOf('if (explicitlyBlocked)') < block.indexOf('if (!ownerMeta || !ownerMeta.videoId)'));
   assert.match(block, /pauseCurrentWatchForDirectAccess\(ownerMeta\.videoId, 'blocked'\)/);
   assert.match(block, /setDirectAccessOverlay\(/);
@@ -196,11 +195,13 @@ test('unresolved direct playback is held, delays neutral UI, and requests every 
 
   assert.match(dom, /FILTERTUBE_DIRECT_ACCESS_PENDING_TTL_MS = 6000/);
   assert.match(dom, /FILTERTUBE_DIRECT_ACCESS_OVERLAY_DELAY_MS = 180/);
+  assert.match(dom, /Unable to verify required metadata\\nPlayback remains paused/);
+  assert.match(dom, /Checking FilterTube rules…/);
+  assert.doesNotMatch(dom, /Video identity unavailable\\nBlocked by Allow only selected/);
   assert.match(dom, /needIdentity: requirements\.needsIdentity/);
   assert.match(dom, /needText: requirements\.needsText/);
   assert.match(dom, /needDuration: requirements\.needsDuration/);
-  assert.match(dom, /needDates: requirements\.needsKeywordDates/);
-  assert.match(dom, /needDates: requirements\.needsUploadDate/);
+  assert.match(dom, /needDates: requirements\.needsDates/);
   assert.match(dom, /needCategory: requirements\.needsCategory/);
   assert.match(dom, /needLanguage: requirements\.needsLanguage/);
   assert.match(dom, /document\.addEventListener\('play',[\s\S]*media\.pause\?\.\(\)/);
@@ -279,6 +280,7 @@ test('streamed get_watch arrays provide exact current-video metadata without a s
 
 test('an already-buffered SPA Back or Forward player cannot inherit the previous route allow decision', () => {
   const source = read('js/content/dom_fallback.js');
+  const bridge = read('js/content_bridge.js');
   const guard = sliceBetween(
     source,
     'function installDirectAccessPlayGuard() {',
@@ -291,12 +293,122 @@ test('an already-buffered SPA Back or Forward player cannot inherit the previous
   );
 
   assert.match(guard, /const routeVideoId = getCurrentWatchVideoId\(\)/);
+  assert.ok(
+    guard.indexOf('if (current.routeTransitionPending)') < guard.indexOf('const routeVideoId = getCurrentWatchVideoId();'),
+    'a recycled player must remain paused until navigation finish establishes the new route'
+  );
   assert.match(guard, /routeVideoId && current\.videoId !== routeVideoId/);
   assert.match(guard, /current\.decision = 'pending'/);
   assert.match(guard, /scheduleDirectAccessRecheck\(0\)/);
+  assert.match(bridge, /document\.addEventListener\('yt-navigate-start',[\s\S]*beginCurrentVideoRouteTransition\(currentSettings\)/);
+  assert.match(bridge, /window\.addEventListener\('popstate',[\s\S]*beginCurrentVideoRouteTransition\(currentSettings\)/);
+  assert.match(bridge, /document\.addEventListener\('yt-navigate-finish',[\s\S]*enforceCurrentVideoAdmissionForRoute\(currentSettings\)/);
+  assert.match(source, /function beginCurrentVideoRouteTransition\(settings = currentSettings\)[\s\S]*clearCurrentVideoAdmissionPresentation\(\)/);
   assert.ok(
     admission.indexOf('installDirectAccessPlayGuard();') < admission.indexOf('const exactOwnerMeta'),
     'the route-change play guard must be installed before metadata admission'
+  );
+});
+
+test('blocked-video presentation loses authority immediately when browser Back or SPA navigation starts', () => {
+  const source = read('js/content/dom_fallback.js');
+  const transition = sliceBetween(
+    source,
+    'function beginCurrentVideoRouteTransition(settings = currentSettings) {',
+    'function enforceCurrentVideoAdmissionForRoute(settings = currentSettings) {'
+  );
+  const state = {
+    videoId: 'BLOCKED0001',
+    decision: 'blocked',
+    pendingStartedAt: 0,
+    pausedByGuard: true,
+    wasPlaying: true,
+    routeTransitionPending: false,
+    recheckTimer: 0,
+    latestSettings: null
+  };
+  let cleared = 0;
+  let guardInstalled = 0;
+  let pauses = 0;
+  const context = {
+    currentSettings: { enabled: true, filterChannels: [{ id: 'UCBLOCKED' }] },
+    isFilterTubeFilteringEnabled: settings => settings?.enabled !== false,
+    hasCurrentVideoAdmissionRules: () => true,
+    getDirectAccessState: () => state,
+    clearCurrentVideoAdmissionPresentation: () => { cleared += 1; },
+    releaseCurrentWatchCategoryGuard() {},
+    installDirectAccessPlayGuard: () => { guardInstalled += 1; },
+    releaseDisabledDirectAccessState() {},
+    releaseDirectAccessGuard() {},
+    document: { querySelector: () => ({ pause: () => { pauses += 1; } }) },
+    clearTimeout() {},
+    Date
+  };
+  vm.createContext(context);
+  vm.runInContext(`${transition}\nthis.beginTransition = beginCurrentVideoRouteTransition;`, context);
+
+  assert.equal(context.beginTransition(context.currentSettings), true);
+  assert.equal(state.videoId, '');
+  assert.equal(state.decision, 'pending');
+  assert.equal(state.routeTransitionPending, true);
+  assert.equal(state.wasPlaying, false, 'the transition must not resume the recycled blocked player');
+  assert.equal(cleared, 1, 'the previous blocked receipt must disappear synchronously');
+  assert.equal(guardInstalled, 1);
+  assert.equal(pauses, 1);
+});
+
+test('a recycled player cannot bind the old URL while navigation is in progress', () => {
+  const source = read('js/content/dom_fallback.js');
+  const guard = sliceBetween(
+    source,
+    'function installDirectAccessPlayGuard() {',
+    "function pauseCurrentWatchForDirectAccess(videoId, decision = 'pending') {"
+  );
+  const state = {
+    videoId: '',
+    decision: 'pending',
+    routeTransitionPending: true,
+    wasPlaying: false,
+    latestSettings: { enabled: true }
+  };
+  let playListener = null;
+  let routeReads = 0;
+  let pauses = 0;
+  const context = {
+    getDirectAccessState: () => state,
+    isFilterTubeFilteringEnabled: settings => settings?.enabled !== false,
+    releaseDisabledDirectAccessState() {},
+    getCurrentWatchVideoId: () => { routeReads += 1; return 'BLOCKED0001'; },
+    scheduleDirectAccessRecheck() {},
+    document: {
+      addEventListener: (type, listener) => {
+        if (type === 'play') playListener = listener;
+      }
+    }
+  };
+  vm.createContext(context);
+  vm.runInContext(`${guard}\nthis.installGuard = installDirectAccessPlayGuard;`, context);
+  context.installGuard();
+  playListener({ target: { tagName: 'VIDEO', pause: () => { pauses += 1; } } });
+
+  assert.equal(routeReads, 0, 'the URL being left must not be read as the new video identity');
+  assert.equal(state.videoId, '');
+  assert.equal(state.decision, 'pending');
+  assert.equal(state.wasPlaying, true);
+  assert.equal(pauses, 1);
+});
+
+test('cold direct Watch admission starts before the general one-second DOM hydration delay', () => {
+  const bridge = read('js/content_bridge.js');
+  const init = sliceBetween(
+    bridge,
+    'async function initializeDOMFallback(settings) {',
+    'function primeAllowOnlyCategoryCards(mutations, settingsOverride = null) {'
+  );
+  assert.ok(
+    init.indexOf('enforceCurrentVideoAdmissionForRoute(settings);') <
+      init.indexOf('await new Promise(resolve => setTimeout(resolve, 1000));'),
+    'external/direct entry must establish admission before the hydration wait'
   );
 });
 
@@ -311,18 +423,16 @@ test('direct Watch content admission applies duration, date, uppercase, category
   assert.equal(decide({ contentFilters: { duration: { enabled: true } } }, {}).pending, true);
 });
 
-test('a verified allow rule keeps its existing precedence over general content filters', () => {
+test('a verified allow rule still has to pass every active content filter', () => {
   const source = read('js/content/dom_fallback.js');
   const admission = sliceBetween(
     source,
     'function enforceCurrentWatchOwnerBlock(settings) {',
     'const FILTERTUBE_CATEGORY_PENDING_TTL_MS'
   );
-  assert.ok(
-    admission.indexOf("admissionDecision.kind === 'allowed-rule'") <
-      admission.indexOf('getCurrentWatchContentFilterDecision(settings, cachedVideoMeta || {})'),
-    'specific allow decisions must remain the fast-path exception before general content filters'
-  );
+  assert.doesNotMatch(admission, /admissionDecision\.kind === 'allowed-rule'[\s\S]*releaseDirectAccessGuard/);
+  assert.doesNotMatch(admission, /if \(explicitlyAllowed\) \{\s*releaseDirectAccessGuard/);
+  assert.match(admission, /getCurrentWatchContentFilterDecision\(settings, cachedVideoMeta \|\| \{\}\)/);
 });
 
 test('direct admission uses only route-bound Player metadata for current Watch identity and text', () => {
@@ -458,10 +568,59 @@ test('Block selected never converts unresolved Watch metadata into an allowed de
     'function enforceCurrentWatchOwnerBlock(settings) {',
     'const FILTERTUBE_CATEGORY_PENDING_TTL_MS'
   );
-  assert.match(admission, /Required video metadata unavailable\\nPlayback remains blocked/);
+  assert.match(dom, /Unable to verify required metadata\\nPlayback remains paused/);
   assert.match(admission, /pauseCurrentWatchForDirectAccess\(routeVideoId, 'pending'\)/);
+  assert.doesNotMatch(admission, /getDirectAccessState\(\)\.decision = 'blocked'/);
   assert.doesNotMatch(admission, /failOpenVideoId/);
   assert.doesNotMatch(dom, /failOpenVideoId/);
+});
+
+test('current Player metadata reruns admission immediately instead of waiting for the card debounce', () => {
+  const bridge = read('js/content_bridge.js');
+  const handler = sliceBetween(
+    bridge,
+    "} else if (type === 'FilterTube_UpdateVideoMetaMap') {",
+    "} else if (type === 'FilterTube_UpdateCustomUrlMap') {"
+  );
+
+  assert.match(handler, /updatedCurrentVideo[\s\S]*enforceCurrentWatchOwnerBlock\(currentSettings\)/);
+  assert.ok(
+    handler.indexOf('enforceCurrentWatchOwnerBlock(currentSettings)') < handler.indexOf('scheduleVideoMetaDomRerun()'),
+    'the exact current Player record must settle admission before card/UI debounce work'
+  );
+});
+
+test('current-video admission has a dedicated bounded fetch path outside the one-minute card cooldown', () => {
+  const bridge = read('js/content_bridge.js');
+  const scheduler = sliceBetween(
+    bridge,
+    'function scheduleCurrentVideoAdmissionMetaFetch(videoId, needs = null) {',
+    'async function fetchVideoMetaFromWatchUrl(videoId, needs = null) {'
+  );
+
+  assert.match(scheduler, /pendingCurrentVideoAdmissionMetaFetches\.get\(v\)/);
+  assert.match(scheduler, /now - lastAttempt < 1500/);
+  assert.match(scheduler, /needsExpandedWhilePending/);
+  assert.doesNotMatch(scheduler, /lastWatchMetaFetchAttempt/);
+  assert.doesNotMatch(scheduler, /WATCH_META_FETCH_MAX_PER_WINDOW/);
+  assert.doesNotMatch(scheduler, /60 \* 1000/);
+});
+
+test('Disabled reaches the play guard and cleanup before an older DOM pass can retain authority', () => {
+  const source = read('js/content/dom_fallback.js');
+  const guard = sliceBetween(
+    source,
+    'function installDirectAccessPlayGuard() {',
+    "function pauseCurrentWatchForDirectAccess(videoId, decision = 'pending') {"
+  );
+  const applyBody = source.slice(source.indexOf('async function applyDOMFallback(settings, options = {}) {'));
+
+  assert.match(guard, /isFilterTubeFilteringEnabled\(current\.latestSettings\)/);
+  assert.ok(
+    applyBody.indexOf('if (!isFilterTubeFilteringEnabled(effectiveSettings))') <
+      applyBody.indexOf('if (runState.running)'),
+    'Disabled cleanup must not wait behind an older coalesced DOM pass'
+  );
 });
 
 test('metadata bridge carries exact needs so text-only admission does not wait for category', () => {

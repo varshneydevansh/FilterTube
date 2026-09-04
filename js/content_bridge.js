@@ -2152,6 +2152,8 @@ function touchDomForVideoMetaUpdate(videoId) {
 }
 
 const pendingWatchMetaFetches = new Map();
+const pendingCurrentVideoAdmissionMetaFetches = new Map();
+const lastCurrentVideoAdmissionMetaFetchAttempt = new Map();
 const queuedWatchMetaFetches = new Set();
 const watchMetaFetchQueue = [];
 const watchMetaFetchPriorities = new Map();
@@ -2496,6 +2498,58 @@ function processWatchMetaFetchQueue() {
             });
         pendingWatchMetaFetches.set(nextVideoId, fetchPromise);
     }
+}
+
+function scheduleCurrentVideoAdmissionMetaFetch(videoId, needs = null) {
+    const v = typeof videoId === 'string' ? videoId.trim() : '';
+    if (!/^[a-zA-Z0-9_-]{11}$/.test(v)) return false;
+    if (typeof getCurrentWatchVideoId === 'function' && getCurrentWatchVideoId() !== v) return false;
+
+    const requestedNeeds = mergeWatchMetaFetchNeeds(null, needs);
+    if (areWatchMetaFetchNeedsSatisfied(v, requestedNeeds)) return false;
+
+    const pending = pendingCurrentVideoAdmissionMetaFetches.get(v);
+    if (pending) {
+        pending.needs = mergeWatchMetaFetchNeeds(pending.needs, requestedNeeds);
+        return true;
+    }
+
+    const now = Date.now();
+    const lastAttempt = lastCurrentVideoAdmissionMetaFetchAttempt.get(v) || 0;
+    if (now - lastAttempt < 1500) return false;
+
+    const entry = { needs: requestedNeeds };
+    pendingCurrentVideoAdmissionMetaFetches.set(v, entry);
+    lastCurrentVideoAdmissionMetaFetchAttempt.set(v, now);
+    const dispatchedNeeds = requestedNeeds;
+
+    entry.promise = fetchVideoMetaFromWatchUrl(v, dispatchedNeeds)
+        .catch(() => null)
+        .finally(() => {
+            const finalNeeds = entry.needs;
+            const needsExpandedWhilePending = [
+                'needDuration',
+                'needDates',
+                'needCategory',
+                'needLanguage',
+                'needIdentity',
+                'needText'
+            ].some(key => finalNeeds?.[key] && !dispatchedNeeds?.[key]);
+            pendingCurrentVideoAdmissionMetaFetches.delete(v);
+
+            const stillCurrent = typeof getCurrentWatchVideoId !== 'function' || getCurrentWatchVideoId() === v;
+            if (!stillCurrent) return;
+            if (needsExpandedWhilePending && !areWatchMetaFetchNeedsSatisfied(v, finalNeeds)) {
+                lastCurrentVideoAdmissionMetaFetchAttempt.delete(v);
+                scheduleCurrentVideoAdmissionMetaFetch(v, finalNeeds);
+                return;
+            }
+            try {
+                enforceCurrentWatchOwnerBlock(currentSettings);
+            } catch (e) {
+            }
+        });
+    return true;
 }
 
 async function fetchVideoMetaFromWatchUrl(videoId, needs = null) {
@@ -6836,19 +6890,15 @@ function handleMainWorldMessages(event) {
             }
         }
 
-        const currentWatchVideoId = (() => {
-            try {
-                if (!String(document.location?.pathname || '').startsWith('/watch')) return '';
-                return new URLSearchParams(document.location?.search || '').get('v') || '';
-            } catch (e) {
-                return '';
-            }
-        })();
-        const updatedCurrentWatch = Boolean(
-            currentWatchVideoId && updates.some(entry => entry?.videoId === currentWatchVideoId)
+        const currentVideoId = typeof getCurrentWatchVideoId === 'function' ? getCurrentWatchVideoId() : '';
+        const updatedCurrentVideo = Boolean(
+            currentVideoId && updates.some(entry => entry?.videoId === currentVideoId)
         );
 
-        if (didTouchDom || updatedCurrentWatch) {
+        if (updatedCurrentVideo && typeof enforceCurrentWatchOwnerBlock === 'function') {
+            enforceCurrentWatchOwnerBlock(currentSettings);
+        }
+        if (didTouchDom) {
             try {
                 scheduleVideoMetaDomRerun();
             } catch (e) {
@@ -6992,6 +7042,32 @@ function handleMainWorldMessages(event) {
     }
 }
 
+let currentVideoAdmissionNavigationListenersInstalled = false;
+
+function installCurrentVideoAdmissionNavigationListeners() {
+    if (currentVideoAdmissionNavigationListenersInstalled) return;
+    currentVideoAdmissionNavigationListenersInstalled = true;
+
+    document.addEventListener('yt-navigate-start', () => {
+        try {
+            beginCurrentVideoRouteTransition(currentSettings);
+        } catch (e) {
+        }
+    }, true);
+    window.addEventListener('popstate', () => {
+        try {
+            beginCurrentVideoRouteTransition(currentSettings);
+        } catch (e) {
+        }
+    }, true);
+    document.addEventListener('yt-navigate-finish', () => {
+        try {
+            enforceCurrentVideoAdmissionForRoute(currentSettings);
+        } catch (e) {
+        }
+    }, true);
+}
+
 async function initialize() {
     try {
         initializeStats(); // Initialize statistics tracking
@@ -7015,6 +7091,12 @@ async function initializeDOMFallback(settings) {
     if (settings && typeof syncCategoryPolicyShellState === 'function') {
         syncCategoryPolicyShellState(settings);
     }
+
+    installCurrentVideoAdmissionNavigationListeners();
+    // Direct URLs do not emit a YouTube SPA navigation event. Establish the
+    // playback gate as soon as compiled settings arrive, before the general
+    // DOM hydration delay and before optional MAIN-world setup completes.
+    enforceCurrentVideoAdmissionForRoute(settings);
 
     // Home is already visible while the normal fallback startup gate is
     // waiting for YouTube hydration. Run one synchronous-render-turn pass so
