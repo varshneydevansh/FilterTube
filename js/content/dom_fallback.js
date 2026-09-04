@@ -1396,6 +1396,7 @@ function installDirectAccessPlayGuard() {
 function pauseCurrentWatchForDirectAccess(videoId, decision = 'pending') {
     const state = getDirectAccessState();
     if (state.videoId !== videoId) {
+        cancelDirectAccessActions();
         state.videoId = videoId;
         state.pendingStartedAt = 0;
         state.pausedByGuard = false;
@@ -1445,6 +1446,7 @@ function clearDirectAccessOverlay() {
 
 function releaseDirectAccessGuard(videoId, resumePlayback = true) {
     const state = getDirectAccessState();
+    cancelDirectAccessActions();
     if (state.recheckTimer) {
         clearTimeout(state.recheckTimer);
         state.recheckTimer = 0;
@@ -1472,6 +1474,30 @@ function releaseDirectAccessGuard(videoId, resumePlayback = true) {
 
 function isFilterTubeFilteringEnabled(settings) {
     return Boolean(settings && typeof settings === 'object' && settings.enabled !== false);
+}
+
+function cancelDirectAccessActions() {
+    const state = getDirectAccessState();
+    state.actionGeneration = (state.actionGeneration || 0) + 1;
+    state.actionTimers?.forEach(timer => clearTimeout(timer));
+    state.actionTimers = new Set();
+}
+
+function scheduleDirectAccessAction(videoId, delayMs, action) {
+    const state = getDirectAccessState();
+    const generation = state.actionGeneration || 0;
+    if (!state.actionTimers) state.actionTimers = new Set();
+    const timer = setTimeout(() => {
+        state.actionTimers.delete(timer);
+        // A released guard or a different route invalidates work queued earlier.
+        // Check again even after clearTimeout: a callback may already be queued.
+        if ((state.actionGeneration || 0) !== generation ||
+            !isFilterTubeFilteringEnabled(currentSettings) ||
+            state.decision !== 'blocked' || state.videoId !== videoId ||
+            getCurrentWatchVideoId() !== videoId) return;
+        action();
+    }, delayMs);
+    state.actionTimers.add(timer);
 }
 
 function releaseDisabledDirectAccessState() {
@@ -1961,24 +1987,26 @@ function enforceCurrentWatchOwnerBlock(settings) {
 
         const targetLink = findNextAllowedWatchPlaylistLink(settings, ownerMeta.videoId);
         if (targetLink) {
-            setTimeout(() => {
+            scheduleDirectAccessAction(ownerMeta.videoId, 60, () => {
                 try {
-                    targetLink.click();
+                    // Rules and the playlist DOM may have changed since scheduling.
+                    const targetLink = findNextAllowedWatchPlaylistLink(currentSettings, ownerMeta.videoId);
+                    if (targetLink) targetLink.click();
                 } catch (e) {
                 }
-            }, 60);
+            });
             return;
         }
 
         if (openWatchPlaylistPanelIfCollapsed()) {
-            setTimeout(() => {
+            scheduleDirectAccessAction(ownerMeta.videoId, 260, () => {
                 try {
                     if (typeof applyDOMFallback === 'function') {
-                        applyDOMFallback(settings, { preserveScroll: true, forceReprocess: true });
+                        applyDOMFallback(null, { preserveScroll: true, forceReprocess: true });
                     }
                 } catch (e) {
                 }
-            }, 260);
+            });
             return;
         }
 
@@ -1990,14 +2018,14 @@ function enforceCurrentWatchOwnerBlock(settings) {
         }
         if (state.retryCount < 3) {
             state.retryCount += 1;
-            setTimeout(() => {
+            scheduleDirectAccessAction(ownerMeta.videoId, 1300, () => {
                 try {
                     if (typeof applyDOMFallback === 'function') {
-                        applyDOMFallback(settings, { preserveScroll: true, forceReprocess: true });
+                        applyDOMFallback(null, { preserveScroll: true, forceReprocess: true });
                     }
                 } catch (e) {
                 }
-            }, 1300);
+            });
             return;
         }
 

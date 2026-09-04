@@ -19,6 +19,7 @@
     "managed:provider": "node scripts/managed-delivery-provider.mjs",
     "managed:nearby": "node scripts/managed-delivery-provider.mjs --lan-discovery",
     "test": "node scripts/run-test-lane.mjs smoke",
+    "test:direct-access": "node --test tests/runtime/direct-access-admission-current-behavior.test.mjs tests/runtime/issue-77-playback-regression.test.mjs",
     "audit:runtime": "node --test tests/runtime/*.test.mjs",
     "test:release": "node scripts/run-test-lane.mjs release",
     "test:whitelist": "node scripts/run-test-lane.mjs whitelist",
