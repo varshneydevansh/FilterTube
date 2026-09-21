@@ -67,7 +67,7 @@
                 "*://*.youtube.com/embed/*",
                 "*://*.youtube-nocookie.com/embed/*"
             ],
-            "js": ["js/seed.js"],
+            "js": ["js/content/external_youtube_network.js", "js/seed.js"],
             "run_at": "document_start",
             "all_frames": true,
             "world": "MAIN"
@@ -79,6 +79,7 @@
             ],
             "js": [
                 "js/shared/identity.js",
+                "js/content/external_youtube_guard.js",
                 "js/content/dom_state.js",
                 "js/content/menu.js",
                 "js/content/dom_helpers.js",
@@ -95,6 +96,18 @@
             ],
             "run_at": "document_start",
             "all_frames": true,
+            "world": "ISOLATED"
+        },
+        {
+            "matches": ["https://*.google.com/search*"],
+            "js": ["js/content/external_youtube_network.js"],
+            "run_at": "document_start",
+            "world": "MAIN"
+        },
+        {
+            "matches": ["https://*.google.com/search*"],
+            "js": ["js/shared/identity.js", "js/content/external_youtube_guard.js"],
+            "run_at": "document_start",
             "world": "ISOLATED"
         }
     ],

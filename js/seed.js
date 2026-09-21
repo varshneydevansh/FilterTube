@@ -279,32 +279,22 @@
         // Never borrow a video from inline previews, Shorts, miniplayers, or
         // recommendation cards. Advert decisions belong to this Watch player.
         const videos = Array.from(player?.querySelectorAll?.('video') || [])
-            .filter(video => video && video.readyState > 0 && player.contains(video));
-        const adVideo = videos.find(video => !video.paused)
-            || videos.find(video => adVoidNodeIsVisible(video))
-            || videos[0]
-            || null;
+            .filter(video => video && video.readyState > 0 && player.contains(video)
+                && video.getAttribute?.('data-filtertube-admission-background') !== 'true');
         const expectedDuration = adVoidExpectedContentDuration();
-        let contentVideo = null;
-        if (expectedDuration > 0) {
-            contentVideo = videos
-                .filter(video => video !== adVideo && Number.isFinite(video.duration))
-                .sort((left, right) => (
-                    Math.abs(left.duration - expectedDuration) - Math.abs(right.duration - expectedDuration)
-                ))[0] || null;
-            if (contentVideo && Math.abs(contentVideo.duration - expectedDuration) > 2.5) {
-                contentVideo = null;
-            }
-        }
-        if (!contentVideo) {
-            contentVideo = videos.find(video => (
-                video !== adVideo
-                && video.paused
-                && Number.isFinite(video.duration)
-                && video.duration > 0
-                && Math.abs(video.duration - Number(adVideo?.duration || 0)) > 0.5
-            )) || null;
-        }
+        // Identify content before choosing an advert. Once promoted, content
+        // also plays: "first unpaused video" would swap the roles next pass.
+        // A different duration alone is not evidence of requested content.
+        const contentCandidates = expectedDuration > 0 ? videos.filter(video => (
+            Number.isFinite(video.duration)
+            && Math.abs(video.duration - expectedDuration) <= 2.5
+        )) : [];
+        const contentVideo = contentCandidates.length === 1 ? contentCandidates[0] : null;
+        const advertCandidates = videos.filter(video => !contentCandidates.includes(video));
+        const adVideo = advertCandidates.find(video => !video.paused)
+            || advertCandidates.find(video => adVoidNodeIsVisible(video))
+            || advertCandidates[0]
+            || null;
         return { adVideo, contentVideo, videos, expectedDuration };
     }
 
