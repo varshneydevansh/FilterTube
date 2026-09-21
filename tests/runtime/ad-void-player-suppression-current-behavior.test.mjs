@@ -93,6 +93,56 @@ test('media-role discovery cannot classify an inline preview as Watch content', 
   assert.doesNotMatch(roles, /document\.querySelectorAll\('video\.html5-main-video'\)/);
 });
 
+function discoverRoles(videos, expectedDuration) {
+  const source = sliceBetween(seed, 'function adVoidMediaRoles(player) {', '\n    function adVoidNodeIsVisible');
+  const discover = Function('adVoidExpectedContentDuration', 'adVoidNodeIsVisible',
+    `${source}; return adVoidMediaRoles;`)(() => expectedDuration, () => true);
+  return discover({ querySelectorAll: () => videos, contains: video => videos.includes(video) });
+}
+
+function media(duration, paused = false, decorative = false) {
+  return { duration, paused, readyState: 4,
+    getAttribute: () => decorative ? 'true' : null };
+}
+
+test('parallel content does not become the advert on the next playing pass', () => {
+  const content = media(1378);
+  const advert = media(30);
+  for (const videos of [[content, advert], [advert, content]]) {
+    const roles = discoverRoles(videos, 1378);
+    assert.equal(roles.contentVideo, content);
+    assert.equal(roles.adVideo, advert);
+  }
+});
+
+test('unknown duration does not promote an arbitrary second advert as content', () => {
+  assert.equal(discoverRoles([media(30), media(60, true)], 0).contentVideo, null);
+});
+
+test('decorative banner media is excluded and lone content is not an advert', () => {
+  const content = media(1378, true);
+  const roles = discoverRoles([content, media(10, false, true)], 1378);
+  assert.equal(roles.adVideo, null);
+  assert.equal(roles.contentVideo, null);
+  assert.deepEqual(roles.videos, [content]);
+});
+
+test('ambiguous matching durations are not promoted or advanced as adverts', () => {
+  const roles = discoverRoles([media(30), media(31)], 30);
+  assert.equal(roles.contentVideo, null);
+  assert.equal(roles.adVideo, null);
+});
+
+test('quarantine does nothing without an advert belonging to the selected player', () => {
+  const source = sliceBetween(seed, 'function adVoidQuarantine(adVideo, player, contentVideo) {', '\n    function adVoidClickSkip');
+  const quarantine = Function(`${source}; return adVoidQuarantine;`)();
+  // Any audio helper call would throw: these paths must return before effects.
+  quarantine(null, { contains: () => true }, null);
+  quarantine(media(30), { contains: () => false }, null);
+  assert.doesNotMatch(source, /document\.querySelectorAll/);
+  assert.match(source, /data-filtertube-admission-background/);
+});
+
 test('Advert Void diagnostics expose bounded transition and playback evidence', () => {
   const runtime = sliceBetween(seed, 'const AD_VOID_POLL_MS = 900;', '\n    function isOriginalAudioPreferenceEnabled');
   assert.match(runtime, /window\.__filtertubeAdVoidLog/);

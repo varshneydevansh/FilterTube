@@ -295,7 +295,7 @@
             || advertCandidates.find(video => adVoidNodeIsVisible(video))
             || advertCandidates[0]
             || null;
-        return { adVideo, contentVideo, videos, expectedDuration };
+        return { adVideo, contentVideo: adVideo ? contentVideo : null, videos, expectedDuration };
     }
 
     function adVoidNodeIsVisible(node) {
@@ -415,6 +415,7 @@
     }
 
     function adVoidQuarantine(adVideo, player, contentVideo) {
+        if (!adVideo || !player?.contains(adVideo)) return;
         adVoidCaptureAudio(adVideo, player);
         if (!contentVideo) {
             try { if (typeof player?.mute === 'function') player.mute(); } catch (e) {}
@@ -428,7 +429,9 @@
             '.ytp-ad-module video',
             '.ytp-ad-player-overlay video'
         ]) {
-            document.querySelectorAll(selector).forEach(node => media.add(node));
+            player.querySelectorAll(selector).forEach(node => {
+                if (node.getAttribute?.('data-filtertube-admission-background') !== 'true') media.add(node);
+            });
         }
         media.forEach(node => {
             if (node !== contentVideo) adVoidMuteMedia(node);
