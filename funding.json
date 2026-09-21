@@ -1,0 +1,76 @@
+{
+  "$schema": "https://fundingjson.org/schema/v1.1.0.json",
+  "version": "v1.1.0",
+  "entity": {
+    "type": "individual",
+    "role": "owner",
+    "name": "Devansh Varshney",
+    "email": "hello@filtertube.in",
+    "description": "Devansh Varshney is the creator and maintainer of FilterTube, a free and open-source, local-first content filtering project focused on giving users direct control over their viewing experience. FilterTube is developed with a particular focus on attention management, parental controls, privacy, accessibility, and support for families and neurodivergent users. Development includes browser extensions and mobile applications, with work extending to Android TV and iOS/iPadOS.",
+    "webpageUrl": {
+      "url": "https://filtertube.in"
+    }
+  },
+  "projects": [
+    {
+      "guid": "filtertube",
+      "name": "FilterTube",
+      "description": "FilterTube is a free and open-source, local-first content filtering project that lets users control what appears on supported video platforms through blocklists, allowlists, keyword and channel rules, content controls, profiles, and parental protections. FilterTube is designed to keep filtering decisions under the user's control and to minimize reliance on FilterTube-operated services or accounts. The project includes browser extensions and an Android application, with Android TV and iOS/iPadOS support under development.",
+      "webpageUrl": {
+        "url": "https://filtertube.in"
+      },
+      "repositoryUrl": {
+        "url": "https://github.com/varshneydevansh/FilterTube"
+      },
+      "licenses": [
+        "spdx:MIT"
+      ],
+      "tags": [
+        "browser-extension",
+        "content-filtering",
+        "privacy",
+        "parental-controls",
+        "productivity",
+        "android",
+        "accessibility",
+        "open-source"
+      ]
+    }
+  ],
+  "funding": {
+    "channels": [
+      {
+        "guid": "ko-fi",
+        "type": "payment-provider",
+        "address": "https://ko-fi.com/filtertube",
+        "description": "Support the ongoing development and maintenance of FilterTube with a one-time or monthly contribution."
+      }
+    ],
+    "plans": [
+      {
+        "guid": "monthly-sustainability",
+        "status": "active",
+        "name": "Monthly sustainability goal",
+        "description": "Help FilterTube reach $100 per month for ongoing development, maintenance, testing, distribution, and infrastructure.",
+        "amount": 100,
+        "currency": "USD",
+        "frequency": "monthly",
+        "channels": [
+          "ko-fi"
+        ]
+      },
+      {
+        "guid": "one-time-support",
+        "status": "active",
+        "name": "One-time support",
+        "description": "Make a one-time contribution of any amount toward FilterTube's ongoing development and maintenance.",
+        "amount": 0,
+        "currency": "USD",
+        "frequency": "one-time",
+        "channels": [
+          "ko-fi"
+        ]
+      }
+    ]
+  }
+}
