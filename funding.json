@@ -44,15 +44,21 @@
         "type": "payment-provider",
         "address": "https://ko-fi.com/filtertube",
         "description": "Support the ongoing development and maintenance of FilterTube with a one-time or monthly contribution."
+      },
+      {
+        "guid": "institutional-grants",
+        "type": "other",
+        "address": "hello@filtertube.in",
+        "description": "Companies, foundations, and grant programs can contact Devansh Varshney to arrange grant agreements, invoicing, compliance documentation, and payment."
       }
     ],
     "plans": [
       {
-        "guid": "monthly-sustainability",
+        "guid": "community-monthly",
         "status": "active",
-        "name": "Monthly sustainability goal",
-        "description": "Help FilterTube reach $100 per month for ongoing development, maintenance, testing, distribution, and infrastructure.",
-        "amount": 100,
+        "name": "Monthly community support",
+        "description": "Provide recurring support for FilterTube development, testing, distribution, documentation, and infrastructure.",
+        "amount": 10,
         "currency": "USD",
         "frequency": "monthly",
         "channels": [
@@ -60,15 +66,27 @@
         ]
       },
       {
-        "guid": "one-time-support",
+        "guid": "community-one-time",
         "status": "active",
-        "name": "One-time support",
-        "description": "Make a one-time contribution of any amount toward FilterTube's ongoing development and maintenance.",
+        "name": "One-time community support",
+        "description": "Make a one-time contribution of any amount toward FilterTube development, maintenance, testing, and distribution.",
         "amount": 0,
         "currency": "USD",
         "frequency": "one-time",
         "channels": [
           "ko-fi"
+        ]
+      },
+      {
+        "guid": "twelve-month-development-grant",
+        "status": "active",
+        "name": "Twelve-month FilterTube development grant",
+        "description": "A $10,000 institutional grant will fund twelve months of focused work on FilterTube. Milestones are: improve reliable filtering and admission enforcement across supported browser and embedded playback surfaces; advance Android phone, tablet, and TV usability and release quality; advance iOS and iPadOS toward public release while preserving feature parity; expand automated regression, accessibility, and performance testing; strengthen privacy, parental-control, user documentation, and reproducible release processes; and publish periodic progress updates with completed work, test evidence, releases, and remaining risks. Funding primarily supports maintainer time, test devices, distribution accounts, and essential project infrastructure. Scope and milestone reporting can be agreed with the funder before disbursement.",
+        "amount": 10000,
+        "currency": "USD",
+        "frequency": "one-time",
+        "channels": [
+          "institutional-grants"
         ]
       }
     ]
