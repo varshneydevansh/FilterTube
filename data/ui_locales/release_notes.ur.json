@@ -14,5 +14,329 @@
       "GitHub ریلیز کی اشاعت GitHub CLI کی اسناد استعمال کرتی ہے، اپ لوڈ سے پہلے مسودے بناتی ہے، موجودہ tags سے دوبارہ جاری رہتی ہے، صرف غائب assets اپ لوڈ کرتی ہے، آخری assets کی فہرست کی تصدیق کرتی ہے، اور تصدیق کے بعد ہی شائع کرتی ہے۔",
       "Android فون اور ٹیبلٹ کے لیے FilterTube ایپ اب Google Play پر عوام کے لیے دستیاب ہے۔ اسے [عوامی صفحے](https://play.google.com/store/apps/details?id=com.filtertube.app) سے انسٹال کریں یا Google Play میں FilterTube تلاش کریں۔"
     ]
+  },
+  "3.3.6": {
+    "headline": "زیادہ مضبوط فلٹرنگ، محفوظ وقت، اور اشتہارات کے بغیر پُرسکون پلے بیک",
+    "summary": "FilterTube 3.3.6 براہِ راست رسائی کے نفاذ، ہر پروفائل کے لیے محفوظ وقت اور Self-Control سیشنز، بلاک اور اجازت والے قواعد کے قابلِ اعتماد مجموعوں، سرکاری زمرہ فلٹرنگ، پہلے سے فعال Advert Void، اور موجودہ YouTube کے ساتھ وسیع مطابقتی کام پر مشتمل ہے۔",
+    "bannerSummary": "3.3.6 میں براہِ راست رسائی کی فلٹرنگ، محفوظ وقت، قواعدی فہرست اور BlockTube درآمد، سرکاری زمرے، Advert Void اور موجودہ YouTube سے مطابقت شامل ہیں۔",
+    "highlights": [
+      "YouTube کے براہِ راست دورے، playlist کی منتقلی، autoplay اور معاون embed اب feed filtering جیسے ہی ویڈیو اور چینل داخلہ قواعد سے گزرتے ہیں، اس لیے ان قواعد کو بائی پاس نہیں کرتے۔",
+      "روزانہ YouTube حدود اب فعال پروفائل کے مطابق لاگو ہوتی ہیں، باقی وقت دکھاتی ہیں، restart کے بعد بھی برقرار رہتی ہیں، اور PIN کے ذریعے پروفائل بدلنے کے ساتھ مکمل صفحے کا timeout استعمال کرتی ہیں۔ رضاکارانہ Self-Control سیشنز الٹی گنتی ختم ہونے تک منتخب قواعد کو lock رکھتے ہیں۔",
+      "Main اور Kids کے لیے بلاک قواعد اور اجازت والے قواعد الگ مجموعے رہتے ہیں، جبکہ اوپر کی Blocklist یا Whitelist پالیسی طے کرتی ہے کہ دیکھنے کو کون سا مجموعہ کنٹرول کرے گا۔",
+      "بڑی BlockTube اور زیرِ انتظام قواعدی فہرستوں کی درآمد میں پیش منظر، گنجائش کی جانچ، لین دین کی واپسی، دوبارہ پڑھ کر تصدیق، اور شامل، نقل، نظرانداز، چینل، کلیدی لفظ، regex اور ویڈیو ID کی زیادہ واضح گنتی شامل ہے۔",
+      "زمرہ فلٹرنگ YouTube کا سرکاری `microformat.playerMicroformatRenderer.category` فیلڈ، اسی origin سے محدود Player metadata فراہمی، منتخب زمروں کو بلاک کرنے یا صرف انہیں اجازت دینے کے واضح انتخاب، اور Watch، rail، Mix، تبصروں اور renderer کی زیادہ محفوظ ملکیت استعمال کرتی ہے۔",
+      "YouTube Main اور Kids پر نئے اور upgrade کیے گئے پروفائلز کے لیے Advert Void پہلے سے فعال ہے۔ مشترکہ Web runtime بغیر اضافی درخواستوں کے Player میں دیکھے گئے ad-plan فیلڈز ہٹاتا ہے؛ native playback غیر ماڈل شدہ ad-plan data خارج کرتا ہے یا دستیاب ہونے پر خام Reel response کو معمول کے مطابق بناتا ہے، جبکہ محفوظ fallback بچ نکلنے والی رکاوٹوں کو سنبھالتا ہے۔",
+      "تجرباتی بولی جانے والی زبان کی فلٹرنگ اور اصل آڈیو کی ترجیح دستیاب ہونے پر YouTube Player کے شواہد استعمال کرتی ہے اور سفارشات کا metadata دستیاب نہ ہو تو مواد کو گزرنے دیتی ہے۔",
+      "اس ریلیز میں YouTube Playables کو چھپانا، موجودہ camelCase renderer اور collaboration handling، زیادہ قابلِ مطالعہ Help اور search، واضح popup اور dashboard controls، اور عوامی Android Google Play اور iOS status صفحات بھی شامل ہیں۔",
+      "Settings میں تمام آلات کے لیے پہلے سے غیر منتخب opt-out موجود ہے، جو YouTube اور YouTube Kids پر خودکار reload یاددہانیوں اور What's New بینرز کو بند کرتا ہے۔ Dashboard کا What's New صفحہ دستی طور پر اب بھی دستیاب ہے۔"
+    ]
+  },
+  "3.3.5": {
+    "headline": "YouTube خرابی سے بحالی اور Shorts چینل کو پہلے بلاک کرنا",
+    "summary": "یہ ریلیز پہلے سے کھلے YouTube ٹیبز میں content runtime کے دو بار داخل ہونے کی خرابی درست کرتی ہے، اور چینل قواعد یا whitelist mode فعال ہونے پر نظر آنے والے Shorts کے چینل کی شناخت پہلے طے کرتی ہے۔",
+    "bannerSummary": "دہرے runtime injection کو درست کرتی ہے، بلاک شدہ Shorts چینلز کی شناخت بہتر بناتی ہے، اور v3.3.4 rollback کی حد دستاویز کرتی ہے۔",
+    "highlights": [
+      "Install/update/profile refresh اب پہلے سے کھلے YouTube ٹیبز میں manifest content scripts دوبارہ داخل نہیں کرتا، جس سے `Identifier ... has already been declared` syntax errors بار بار نہیں آتے۔",
+      "پہلے سے کھلے YouTube ٹیبز کو duplicate script declarations کے بغیر زیرِ انتظام time-limit/runtime checks پھر بھی موصول ہو سکتے ہیں۔",
+      "نظر آنے والے اور تقریباً نظر آنے والے Shorts اب موجودہ محدود background `/shorts/<videoId>` owner resolver استعمال کرتے ہیں جب channel blocklist قواعد یا whitelist mode فعال ہوں۔",
+      "سیکھے گئے Shorts video-to-channel mappings محفوظ کیے جاتے ہیں اور فوراً دوبارہ process ہوتے ہیں، اس لیے بلاک چینل کے Shorts چھپانے سے پہلے hover یا menu interaction درکار نہیں۔",
+      "ڈیسک ٹاپ Shorts hosts، مثلاً `.shortsLockupViewModelHost` اور `.ytGridShelfViewModelGridShelfItem`، مخصوص Shorts fallback/enrichment راستوں میں شامل ہیں۔",
+      "Blocklist mode نامعلوم Shorts کو شناخت حل ہونے سے پہلے نہیں چھپاتا؛ موجودہ pending راستے کی بدولت whitelist mode زیادہ سخت رہتا ہے۔",
+      "YouTube خرابی کی رپورٹ کی تحقیقات کے دوران v3.3.4 کو store پر v3.3.2 پیکیج کی طرف rollback کے طور پر دستاویز کیا گیا ہے۔"
+    ]
+  },
+  "3.3.4": {
+    "headline": "Store پر v3.3.2 پیکیج کی طرف واپسی",
+    "summary": "v3.3.4 browser store کے لیے rollback ریلیز تھی جس میں v3.3.3 سے متعلق YouTube خرابی کی رپورٹ کی تحقیقات کے دوران پچھلا v3.3.2 پیکیج استعمال ہوا۔",
+    "bannerSummary": "Rollback ریلیز: YouTube خرابی کی رپورٹ کی تحقیقات کے دوران v3.3.4 نے v3.3.2 پیکیج استعمال کیا۔",
+    "highlights": [
+      "v3.3.4 کے لیے source سے آنے والے کسی نئے feature کام کا دعویٰ نہیں کیا گیا۔",
+      "مسئلہ #64 کی تحقیقات کے دوران مشتبہ v3.3.3 پیکیج کو stores سے ہٹانے کے لیے rollback استعمال ہوا۔",
+      "اگلی source ریلیز v3.3.5 میں duplicate runtime injection اور Shorts identity کی اصلاحات شامل ہیں۔"
+    ]
+  },
+  "3.3.3": {
+    "headline": "خاندانی آلات کی اپ ڈیٹس، قواعدی فہرستیں، تاریخ والے کلیدی الفاظ، اور YouTube DOM کی تجدید",
+    "summary": "یہ ریلیز والدین/نگہداشت کنندگان کے کنٹرول کو زیادہ قابلِ فہم بناتی ہے، جائزہ شدہ قواعدی فہرستوں کی درآمد اور تاریخ تک محدود keyword قواعد شامل کرتی ہے، Home/Internet Pickup ماڈل دستاویز کرتی ہے، اور موجودہ YouTube/YTM markup کے لیے فلٹرنگ تازہ کرتی ہے۔",
+    "bannerSummary": "اس ریلیز میں Family Device Updates، جائزہ شدہ قواعدی فہرستوں کی درآمد، تاریخ والے keywords، والدین کو ترجیح دینے والی Help، اور موجودہ YouTube/YTM DOM مطابقت شامل ہے۔",
+    "highlights": [
+      "والدین/نگہداشت کنندگان کے پروفائلز محفوظ پروفائلز سنبھال سکتے ہیں، والدین کے dashboard سے بچوں/محفوظ پروفائلز کے قواعد میں ترمیم کر سکتے ہیں، اور منظور شدہ اپ ڈیٹس تصدیق شدہ محفوظ آلات کو بھیج سکتے ہیں۔",
+      "Family Device Updates اب فوری Send Update، واضح Home Pickup، اور واضح Internet Pickup کی وضاحت کرتی ہے، اور pickup services کو اختیار کا ذریعہ نہیں سمجھتی۔",
+      "محفوظ پروفائلز کے وقت کی حدود اب پرانے اور نئے YouTube ٹیبز دیکھتی ہیں، پُرسکون timeout screen دکھاتی ہیں، اور اضافی وقت کی درخواستیں والدین کے جائزے کے لیے درج کرتی ہیں۔",
+      "قواعدی فہرست کی درآمد CSV، TXT، سادہ JSON، BlockTube طرز کے JSON، اور خام HTTPS URLs کی معاونت کرتی ہے؛ لاگو کرنے سے پہلے preview، Main/Kids/Both targets، templates، فہرست کا انتظام، pause/resume/remove، تازگی کی جانچ اور refresh بھی شامل ہیں۔",
+      "تاریخ پر مبنی keyword filtering کسی لفظ کو upload date کے بعد سے، اس تاریخ تک، یا دو تاریخوں کے درمیان لاگو کر سکتی ہے۔ YouTube کی جانب سے فراہم ہونے پر comment filtering اصل ویڈیو کی upload date استعمال کرتی ہے۔",
+      "Help اور dashboard controls اب والدین کو ترجیح دینے والی آسان زبان، تیز help bubbles، اور Exact، Comment، Date، PINs، قواعدی فہرستوں اور آلات کی اپ ڈیٹس کی واضح وضاحتیں استعمال کرتے ہیں۔",
+      "Dashboard اب فعال Android closed-testing صارفین کو hello@filtertube.in پر ای میل کرنے کی دعوت دیتا ہے اور YouTube کے صفحے کی ساخت بدلنے پر filtering کی خرابیوں کی اطلاع دینے کی نمایاں یاددہانی رکھتا ہے۔",
+      "YouTube desktop lockup selectors اور YTM mobile camelCase DOM دستاویز کیے گئے ہیں تاکہ حقیقی ویڈیو کارڈز فلٹر ہوتے رہیں، جبکہ Watch-page chip bars fallback کام نہ جگائیں اور scroll jumps نہ کریں۔",
+      "ابھی بھی الگ: خودکار LAN peer discovery، hosted FilterTube Internet Pickup service، خاموش public auto-subscribe catalogs، native Android/iOS parity، اور دو نصب شدہ آلات پر دستی smoke test کے شواہد۔"
+    ]
+  },
+  "3.3.2": {
+    "headline": "موبائل/ٹیبلیٹ ایپ MVP، زیادہ ہموار YouTube، اور زیادہ محفوظ whitelist",
+    "summary": "عوامی ایپ ریلیز سطح Android فون/ٹیبلیٹ کے آخری ٹیسٹ اور iOS/iPad status کے لیے تیار ہے؛ extension dashboard اب ان ایپ راستوں کی طرف رہنمائی کرتا ہے، فعال قواعد نہ ہونے پر YouTube SPA کام کم کرتی ہے، اور اس ریلیز میں whitelist/end-screen کی درستگی کی اصلاحات شامل ہیں۔",
+    "bannerSummary": "اس ریلیز میں موبائل/ٹیبلیٹ ایپ کے اجرا کے راستے، زیادہ ہموار YouTube runtime، production میں خاموش logs، اور whitelist/end-screen leakage کی اصلاحات شامل ہیں۔",
+    "highlights": [
+      "ویب سائٹ download hub اور extension dashboard اب Android فون/ٹیبلیٹ کے آخری ٹیسٹ راستے اور iOS/iPad کے TestFlight/App Store status راستے دکھاتے ہیں۔",
+      "Android فون/ٹیبلیٹ ریلیز کی تیاری مشترکہ FilterTube runtime، YouTube Main، عوامی YouTube Kids رسائی، پروفائلز، PIN قواعد، اور Nanah sync کے گرد دستاویز کی گئی ہے۔",
+      "YouTube SPA performance کام اب فعال قواعد یا route کی ضرورت نہ ہونے پر زیادہ JSON clone/parse/replay، DOM fallback، quick-block، fallback-menu، اور whitelist-pending کام چھوڑ دیتا ہے۔",
+      "Production extension contexts میں معمول کی console logging اب صرف واضح debug mode پر ہوتی ہے تاکہ عام browsing میں YouTube کے hot paths پر console overhead نہ پڑے۔",
+      "Whitelist release fixes میں Shorts creator fallback، list-target forwarding، اور end-screen controls کے لیے compact autoplay/watch-next endpoint filtering شامل ہیں۔",
+      "ضروری runtime state برقرار رکھتے ہوئے FilterTube DOM state attributes کو مضبوط کیا گیا ہے تاکہ وسیع طور پر نظر آنے والے `data-filtertube-*` fingerprints کم ہوں۔",
+      "Accounts & Sync اب Family Device Updates میں Send Update، اختیاری Home Pickup، اور گھر سے دور/بعد میں کھولنے پر Internet Pickup دستاویز کرتی ہے تاکہ والدین live sync، home pickup، online pickup اور غیر اختیاری authority میں فرق سمجھ سکیں۔",
+      "محفوظ پروفائلز کے وقت کی حدود کے لیے اب روزانہ YouTube budgets، timeout screens، اضافی وقت کی درخواستوں کی تاریخ، اور والدین/نگہداشت کنندہ کی منظوری کی ریلیز دستاویز موجود ہے۔",
+      "Nanah/import راستے extension اور native app payloads کے درمیان چینل سے اخذ کردہ Filter All keywords کی ملکیت برقرار رکھتے ہیں، بشمول row color، source-badge metadata اور pairing context۔"
+    ]
+  },
+  "3.3.1": {
+    "headline": "بغیر تیسرے فریق سرور کے P2P کے ذریعے آلات میں محفوظ sync",
+    "summary": "Accounts & Sync اب Nanah کو تین آسان راستوں کی صورت میں پیش کرتا ہے، جس میں والدین/بچے کی بہتر targeting، reconnect کے زیادہ واضح قواعد، اور حقیقی استعمال کے لیے کہیں زیادہ وسیع دستاویزات شامل ہیں۔",
+    "bannerSummary": "Nanah sync، والدین/بچے کا بہتر کنٹرول، reconnect کے محفوظ قواعد، اور Accounts & Sync کے نئے flow کی مکمل دستاویزات۔",
+    "highlights": [
+      "Accounts & Sync اب تین زیادہ واضح راستوں سے شروع ہوتا ہے: Send this profile once، Parent controls child، اور Move full account۔",
+      "Nanah کے advanced controls اب بھی دستیاب ہیں، لیکن پورے flow کی قیادت کرنے کے بجائے Advanced حصے میں چھپے ہیں۔",
+      "Parent/source sessions دور دراز target profile زیادہ واضح طور پر منتخب کر سکتی ہیں، اور managed-link saves اب بھیجنے والے تک mirror ہوتی ہیں تاکہ دونوں آلات میں trust record یکساں رہے۔",
+      "Trusted links refresh کے بعد بھی محفوظ رہتی ہیں، لیکن reconnect اب بھی نیا live session ہوتا ہے، پوشیدہ background sync نہیں۔",
+      "Locked child updates، reconnect rules، device-label persistence، اور self-join/session-burn protection کو زیادہ محفوظ parental control کے لیے سخت کیا گیا۔",
+      "README، Architecture، Technical، Functionality، Profiles & PIN، project plan، user guide، اور concern tracker اب موجودہ Nanah desktop checkpoint کو کہیں زیادہ تفصیل سے دستاویز کرتے ہیں۔"
+    ]
+  },
+  "3.3.0": {
+    "headline": "Collaboration recovery اور cross-browser import کو مضبوط بنانا",
+    "summary": "Watch/YTM collaboration menus مکمل rosters زیادہ قابلِ اعتماد طور پر واپس لاتے ہیں، subscriptions کی درآمد مختلف browsers میں مضبوط ہوئی ہے، اور سطح کے لحاظ سے کئی whitelist اور Quick Block اصلاحات اب 3.3.0 میں شامل ہیں۔",
+    "bannerSummary": "بہتر collab menus، مضبوط whitelist import، زیادہ محفوظ Quick Block surfaces، براہِ راست channel links، اور 3-dot block item کے لیے نیا toggle۔",
+    "highlights": [
+      "موبائل YouTube home/watch-next/Mix طرز کے کارڈز اب اسی 3-dot اور collaborator recovery flow میں شامل ہیں، بجائے اس کے کہ نامکمل single-channel menus پر واپس جائیں۔",
+      "Watch-page right rail، playlist rows، اور Watch جیسے lockups اب مکمل collaborator roster واپس لا سکتے ہیں اور فعال 3-dot menu کو اسی جگہ refresh کر سکتے ہیں۔",
+      "Mix/watch recovery زیادہ محفوظ ہے: حقیقی collaboration cards درست طور پر upgrade ہوتے ہیں، جبکہ '&' یا 'and' والے عام نام اب جعلی collaboration menus نہیں بنتے۔",
+      "پیچیدہ surfaces پر Quick Block زیادہ مستحکم ہے: زیادہ desktop cards کے اوپر رہتا ہے، mobile search-suggestion dropdowns سے بچتا ہے، اور mobile watch-next layouts میں بہتر جگہ پکڑتا ہے۔",
+      "Subscribed-channel whitelist import اب حالیہ page-browse responses برقرار رکھتا ہے، حقیقی /feed/channels growth کو ترجیح دیتا ہے، اور /feed/channels کو ایک نمایاں management surface کے طور پر محفوظ رکھتا ہے۔",
+      "YouTube desktop/mobile renderers میں whitelist filtering زیادہ سخت اور محفوظ ہے، جس میں creator pages کی بہتر handling اور Mixes/subscriptions hide controls کی بہتری شامل ہے۔",
+      "نئے controls اور polish: Channel Management rows حقیقی channel pages سے link کرتی ہیں، 3-dot block item غیر فعال کیا جا سکتا ہے، اور encrypted Firefox export زیادہ محفوظ fallback path استعمال کرتا ہے۔"
+    ]
+  },
+  "3.2.9": {
+    "headline": "Subscribed Channels درآمد، whitelist، اور PIN تحفظ کی bug fix",
+    "summary": "فعال YouTube account کی subscriptions whitelist میں درآمد کریں، mode بدلنے کے زیادہ واضح مفہوم اور /feed/channels کے زیادہ قابلِ اعتماد startup flow کے ساتھ۔",
+    "bannerSummary": "اپنی موجودہ YouTube subscriptions سے whitelist بنائیں، inline progress اور whitelist activation کے زیادہ واضح رویے کے ساتھ۔",
+    "highlights": [
+      "نیا Tab View import فعال signed-in YouTube account سے subscribed channels کو whitelist میں درآمد کر سکتا ہے۔",
+      "Import startup اب ایک فعال YouTube ٹیب دوبارہ استعمال کرتا ہے، اسے /feed/channels پر لے جاتا ہے، اور شروع کرنے سے پہلے FilterTube bridge کا انتظار کرتا ہے۔",
+      "Whitelist کی عبارت زیادہ واضح ہے: Import Only blocklist کو نہیں چھیڑتا، جبکہ Import + Turn On Whitelist موجودہ blocklist-to-whitelist migration path پر چلتا ہے۔",
+      "دستاویزات اب import architecture، FEchannels request flow، renderer sources، اور whitelist semantics کا کہیں زیادہ تفصیل سے احاطہ کرتی ہیں۔"
+    ]
+  },
+  "3.2.8": {
+    "headline": "Theme کی تجدید اور scenic UI shell کی ترتیب",
+    "summary": "Popup اور dashboard surfaces اب زیادہ پُرسکون scenic theme system استعمال کرتی ہیں، جس میں زیادہ compact layout، نمایاں tint states، اور light/dark توازن بہتر ہے۔",
+    "bannerSummary": "Popup اور dashboard کے لیے نیا theme: زیادہ پُرسکون transparency، واضح pills، اور بہتر responsive layout behavior۔",
+    "highlights": [
+      "Scenic UI کی تجدید: popup اور dashboard اب مقامی hero video کو ambient background media کے طور پر استعمال کرتے ہوئے زیادہ پُرسکون product shell بانٹتے ہیں۔",
+      "Light اور dark theme کی ترتیب: dark mode scenic background کو پھیکے مرکزی glow کے بغیر نمایاں رکھتا ہے، جبکہ light mode صاف transparency استعمال کرتا ہے۔",
+      "Responsive صفائی: popup spacing زیادہ compact، profile dropdown چھوٹا، Help/Support card layout بہتر، اور filter surfaces پر mobile fit زیادہ اچھا ہے۔",
+      "Control tint کی اصلاح: دونوں themes میں enabled/disabled states، pill colors، search fields اور import/export actions اب زیادہ واضح ہیں۔"
+    ]
+  },
+  "3.2.7": {
+    "headline": "Category filters، hover پر Quick Block cross، اور Mobile 3 Dot UI",
+    "summary": "نئی category filtering اور ایک ٹیپ والا Quick Cross Block پہلے سے فعال ہے۔",
+    "bannerSummary": "Card hover سے نئے category filters اور Quick Cross Block استعمال کریں، اور YT Mobile blocking کی بہتر معاونت پائیں۔",
+    "highlights": [
+      "Category Filtering: YouTube category (Music، Gaming، Education وغیرہ) کے مطابق ویڈیوز کو بلاک یا اجازت دیں۔",
+      "Quick Cross Block پہلے سے ON: `Show Quick Cross Block button` v3.2.7 میں پہلے سے فعال ہے (صارفین اسے بند کر سکتے ہیں)۔",
+      "Mobile Blocking: YT Mobile میں 3 Dot UI اور Quick Cross Block کے ذریعے blocking کی بہتر معاونت، جو فی الحال Home Page پر کام کرتی ہے۔"
+    ]
+  },
+  "3.2.6": {
+    "headline": "UI/UX کو خوبصورت بنانا اور content-based filtering",
+    "summary": "جدید design کے ساتھ مکمل typography بہتریاں اور تین نئے content filters: duration، date، اور uppercase۔",
+    "bannerSummary": "نئے خوبصورت UI میں duration، upload date، اور clickbait detection کے content filters۔",
+    "highlights": [
+      "Typography updates: بہتر readability کے لیے جدید اور refined font scale۔",
+      "Content-based filters: duration (زیادہ/کم/درمیان)، upload date (نئی/پرانی/درمیان)، اور uppercase detection (clickbait titles)۔",
+      "`videoMetaMap` system: ذہین batching کے ساتھ مستقل video metadata storage (75ms window، 1500 entries کی حد)۔",
+      "Dashboard improvements: surface کے لحاظ سے stats (Main بمقابلہ Kids)، بہتر stat cards، اور donate promo card۔"
+    ]
+  },
+  "3.2.5": {
+    "headline": "Whitelist mode کو فروغ اور استحکام",
+    "summary": "Whitelist mode اب بنیادی allow-only راستہ ہے، جس میں بہتر extraction، playlist safeguards، اور کم CPU استعمال شامل ہیں۔",
+    "bannerSummary": "زیادہ صاف UI، بہتر playlist stability، اور Kids support کے ساتھ whitelist mode کو فروغ دیا گیا۔",
+    "highlights": [
+      "Whitelist mode کو فروغ دیا گیا: wording/UI اب اسے experimental نہیں کہتے۔",
+      "Whitelist surfaces کے لیے 3-dot menu کی صفائی اور search-secondary handling۔",
+      "Thumbnail anchors اور parent containers کے ساتھ متعدد ذرائع سے channel extraction۔",
+      "Confirmation dialogs اور bridge optimizations کے ساتھ mode-aware state tracking۔",
+      "Playlist stability: منتخب rows نظر آتی رہتی ہیں؛ pending identities اب blocked rows کو دوبارہ ظاہر نہیں کرتیں۔",
+      "Zero-network architecture کے ساتھ Kids mode whitelist support۔"
+    ]
+  },
+  "3.2.4": {
+    "headline": "بہتر Whitelist mode اور performance optimizations",
+    "summary": "Experimental whitelist mode میں نمایاں بہتریاں، بہتر UX، performance optimizations، اور Kids mode کی وسیع معاونت۔",
+    "bannerSummary": "Whitelist mode زیادہ ذہین، صاف UI، بہتر performance، اور Kids support کے ساتھ۔",
+    "highlights": [
+      "EXPERIMENTAL: 3-dot menu cleanup، ذہین search processing، اور mode-aware state tracking کے ساتھ بہتر whitelist mode۔",
+      "Performance boost: bridge-level optimizations اور selective processing CPU استعمال گھٹاتے ہیں۔",
+      "UI improvements: mode بدلتے وقت حادثاتی data loss روکنے کے لیے confirmation dialogs۔",
+      "Kids mode support: whitelist functionality اب zero-network architecture کے ساتھ YouTube Kids پر کام کرتی ہے۔",
+      "Search optimizations: UI clutter روکنے کے لیے right-rail watch cards کو ذہانت سے سنبھالا جاتا ہے۔",
+      "Channel extraction: thumbnail anchors اور parent containers کے ساتھ متعدد ذرائع سے identity resolution۔",
+      "Mode switching: ذہین reprocessing کے ساتھ blocklist/whitelist کے درمیان ہموار تبدیلیاں۔"
+    ]
+  },
+  "3.2.3": {
+    "headline": "Experimental Whitelist mode اور UI improvements",
+    "summary": "'صرف اجازت دیں' filtering کے لیے whitelist mode کا alpha release، اس کے ساتھ UI updates اور mobile menu support۔",
+    "bannerSummary": "Experimental whitelist mode آزمائیں — اجازت یافتہ چینلز کے سوا سب کچھ چھپائیں۔",
+    "highlights": [
+      "EXPERIMENTAL: whitelist mode واضح طور پر اجازت یافتہ چینلز/keywords کے سوا تمام content چھپاتا ہے۔",
+      "Popup اور tab view میں blocklist اور whitelist کے درمیان آسان toggle کے ساتھ دوہری filtering modes۔",
+      "مرحلہ وار migration — چینلز جمع کرنے کے لیے blocklist پر جائیں، پھر انہیں واپس whitelist میں merge کریں۔",
+      "Whitelist mode میں Watch page protection ویڈیو پلے بیک کی فعالیت برقرار رکھتی ہے۔",
+      "Optimistic UI updates فوراً content چھپاتی ہیں اور blocking ناکام ہونے پر خودکار طور پر بحال کرتی ہیں۔",
+      "YouTube mobile renderers کی درست handling کے ساتھ بہتر mobile menu support۔",
+      "Production noise کم کرنے کے لیے تمام console logs اب debug flag کے پیچھے ہیں۔"
+    ]
+  },
+  "3.2.2": {
+    "headline": "UI/UX improvements اور Debug gating",
+    "summary": "Optimistic updates، mobile menu support، debug-gated logging، scroll preservation، اور state management کی refinement۔",
+    "bannerSummary": "فوری UI feedback، mobile menu polish، اور مستحکم state handling کے ساتھ debug-gated logs۔",
+    "highlights": [
+      "Optimistic UI updates: blocking ناکام ہونے پر خودکار بحالی کے ساتھ content فوراً چھپ جاتا ہے۔",
+      "درست renderer tags کے ساتھ `ytm-menu-popup-renderer` کے لیے بہتر mobile menu support۔",
+      "`window.__filtertubeDebug` کے ذریعے debug-gated logging۔",
+      "جھٹکے دار jumps روکنے کے لیے DOM fallback کے دوران scroll محفوظ رکھنا۔",
+      "Background requests کم کرنے کے لیے channel enrichment کی حد (10 فی session)۔",
+      "`requestIdleCallback` اور batching کے ساتھ idle-scheduled rendering۔",
+      "غیر ضروری renders سے بچنے کے لیے signature comparison کے ساتھ external reload debouncing۔",
+      "منتخب notifications: صرف signature بدلنے پر `load`؛ ورنہ `externalUpdate`۔",
+      "Shared global state کے ذریعے bridge state management۔"
+    ]
+  },
+  "3.2.1": {
+    "headline": "Lag کے بغیر processing اور performance boost",
+    "summary": "بڑی performance optimizations UI lag ختم کرتی ہیں، Chromium browsers میں بہترین نتائج اور Firefox میں نمایاں بہتری کے ساتھ۔",
+    "bannerSummary": "Async processing، compiled caching، اور batched updates کے ساتھ lag-free filtering۔",
+    "highlights": [
+      "Async DOM processing main thread کو کام جاری رکھنے دیتی ہے اور بھاری filtering کے دوران browser کو freeze ہونے سے روکتی ہے۔",
+      "Compiled regex اور channel filter caching O(1) lookups فراہم کرتی ہے اور CPU استعمال 60–80% کم کرتی ہے۔",
+      "Batched storage updates ذہین 250ms intervals کے ساتھ I/O operations کو 70–90% گھٹاتی ہیں۔",
+      "Debounced settings refresh ضرورت سے زیادہ DOM reprocessing روکتا ہے۔",
+      "Run state management overlapping executions کو روکتا ہے اور requests کو مناسب طور پر queue کرتا ہے۔",
+      "Chromium browsers: lag میں 90% سے زیادہ کمی؛ Firefox: نمایاں بہتری، مزید optimization جاری۔"
+    ]
+  },
+  "3.2.0": {
+    "headline": "فوری blocking اور zero-network Kids",
+    "summary": "3-dot menus چینل کے نام فوراً دکھاتے ہیں، network requests نمایاں طور پر کم ہوتی ہیں، اور YouTube Kids مکمل طور پر offline کام کرتا ہے۔",
+    "bannerSummary": "Proactive XHR interception کے ساتھ zero-delay blocking؛ Kids mode کسی network fetch کے بغیر کام کرتا ہے۔",
+    "highlights": [
+      "3-dot menus اب درست چینل نام فوراً دکھاتے ہیں — 'Fetching...' کی تاخیر نہیں۔",
+      "چینل کی شناخت intercepted YouTube JSON responses سے آتی ہے، جس سے network calls کم ہوتی ہیں۔",
+      "قابلِ اعتماد blocking کے لیے YouTube Kids بغیر کسی network fetch کے مکمل کام کرتا ہے۔",
+      "غائب metadata پس منظر میں قابو شدہ رفتار سے پُر ہوتا ہے (6 گھنٹے کا cooldown)۔",
+      "Topic channels (مثلاً 'Music - Topic') کو `@handles` کے بغیر خاص طور پر سنبھالا جاتا ہے۔",
+      "ASCII اور Mermaid flow diagrams کے ساتھ نئی جامع دستاویزات۔"
+    ]
+  },
+  "3.1.9": {
+    "headline": "پروفائل کے مطابق backups اور lock سے محفوظ controls",
+    "summary": "Auto-backup اور content controls اب profile locks/PINs کا احترام کرتے ہیں، ہر پروفائل کی settings ورثے میں لیتے ہیں، اور profile dropdown lock gate کے اوپر بھی قابلِ کلک رہتا ہے۔",
+    "bannerSummary": "ہر پروفائل کے لیے auto-backup اور locked-profile gating؛ profile selector ہمیشہ قابلِ کلک ہے۔",
+    "highlights": [
+      "اگر auto-backup بند ہو یا پروفائل locked ہو تو auto-backup mode/format selectors غیر فعال ہو جاتے ہیں؛ نئے پروفائلز auto-backup preferences ورثے میں لیتے ہیں۔",
+      "Auto-backup scheduling اب پروفائل بنانے اور mode/format بدلنے پر شروع ہوتی ہے، مگر صرف تب جب اس پروفائل کے لیے auto-backup فعال ہو۔",
+      "Locked حالت میں content-control toggles اور backup controls غیر فعال رہتے یا واپس پلٹتے ہیں؛ non-master پروفائلز کے لیے export scope صرف فعال پروفائل تک محدود ہے۔",
+      "Profile dropdown کا z-index درست کرنے سے lock gate banner نظر آنے پر بھی اس پر کلک کیا جا سکتا ہے۔",
+      "Profile/PIN model، پروفائل کے دائرے والے backups، اور UI gating rules کی دستاویزات تازہ کی گئیں۔"
+    ]
+  },
+  "3.1.8": {
+    "headline": "Support tab اور قابلِ اعتماد auto-backups",
+    "summary": "نیا Support صفحہ (Ko-fi) شامل ہوا ہے اور auto-backups اب Chrome اور Firefox دونوں پر قابلِ اعتماد طور پر کام کرتے ہیں۔",
+    "bannerSummary": "Auto-backups اب مختلف browsers پر کام کرتے ہیں اور ایک تازہ ترین backup file کو overwrite کرتے ہیں۔",
+    "highlights": [
+      "Dashboard میں Ko-fi embed کے ساتھ Support صفحہ شامل کیا گیا۔",
+      "Auto-backups اب ایک ہی rolling file overwrite کرتے ہیں: Downloads/FilterTube Backup/FilterTube-Backup-Latest.json۔",
+      "Download strategy مختلف browsers پر کام کرتی ہے (دستیاب ہونے پر Blob URL؛ Chrome MV3 service worker کے لیے data: URL fallback)۔",
+      "Firefox downloads اب data: URL پابندیوں کی وجہ سے ناکام نہیں ہوتے۔"
+    ]
+  },
+  "3.1.7": {
+    "headline": "YT Kids اور auto-backup کی معاونت",
+    "summary": "YT Kids پر چینل کی بنیاد پر مواد بلاک کیا جا سکتا ہے اور auto-backups اب آن یا آف کیے جا سکتے ہیں۔",
+    "bannerSummary": "نئی setting: auto-backups فعال/غیر فعال کریں۔ Exports اب Downloads/FilterTube Export/ میں محفوظ ہوتے ہیں۔",
+    "highlights": [
+      "YT Kids میں مکمل Channel اور Keyword پر مبنی blocking شامل کی گئی؛ YT Kids کے 3-dot menu UI کو پس منظر میں سن کر چینلز بلاک ہوتے ہیں۔",
+      "Auto-backups فعال/غیر فعال کرنے کے لیے Settings toggle شامل کیا گیا (بہترین کوشش؛ Save As prompts نہیں)۔",
+      "Auto-backups rotation کے ساتھ Downloads/FilterTube Backup/ میں محفوظ ہوتے ہیں (تازہ ترین فائلیں برقرار رہتی ہیں)۔",
+      "Manual exports اب خاموشی سے Downloads/FilterTube Export/ میں download ہوتے ہیں۔"
+    ]
+  },
+  "3.1.6": {
+    "headline": "Import/Export کی معاونت اور release banner",
+    "summary": "Banner CTA اب براہِ راست dashboard کے What's New صفحے سے جڑتا ہے، منتخب cards اسی JSON سے load ہوتے ہیں، اور imports c/ChannelName اور merge rules کو بہتر طور پر سمجھتے ہیں۔",
+    "bannerSummary": "Release banner extension کے اندر What's New tab کھولتا ہے اور import/export کی دستاویز اب پورا flow بتاتی ہے۔",
+    "highlights": [
+      "Release notes JSON dashboard cards اور YouTube banner دونوں کو ایک ہی single source of truth سے hydrate کرتا ہے۔",
+      "CTA background messaging کے ذریعے tab-view کھولتا ہے تاکہ blockers کبھی chrome-extension:// links کو نہ روکیں۔",
+      "Import/export documentation اور code واضح کرتے ہیں کہ merge سے پہلے UC/handle/c/ChannelName inputs کو کیسے normalize کیا جاتا ہے۔"
+    ]
+  },
+  "3.1.5": {
+    "headline": "Shorts اور صرف اراکین کے لیے مواد آخرکار واقعی غائب",
+    "summary": "Watch page اور sidebar اب Shorts renderers اور صرف اراکین کے لیے shelves کو دکھنے سے پہلے چھپاتے ہیں، اور toggle state اب برقرار رہتی ہے۔",
+    "bannerSummary": "Watch اور sidebar میں صرف اراکین کے لیے مواد اور Shorts کو زیادہ مضبوطی سے چھپایا گیا ہے تاکہ بلاک شدہ rows دوبارہ ظاہر نہ ہوں۔",
+    "highlights": [
+      "Cards render ہونے سے پہلے sidebar `/shorts/` hrefs، overlays، اور aria-labels چیک کرتا ہے۔",
+      "صرف اراکین کے لیے مواد کی شناخت compact، Watch اور shelf rows کو نئے badges اور playlist heuristics کے ساتھ سنبھالتی ہے۔",
+      "صرف اراکین کے لیے toggle کی persistence bug درست کی گئی تاکہ reloads کے بعد بھی state برقرار رہے۔"
+    ]
+  },
+  "3.1.4": {
+    "headline": "Dashboard responsive ہو جاتا ہے",
+    "summary": "Mobile پر navigation صاف طور پر collapse ہوتی ہے، inputs اچھے انداز میں wrap ہوتے ہیں، اور playlist/Mix controls کے toggles زیادہ واضح ہیں۔",
+    "highlights": [
+      "چھوٹی screens کے لیے hamburger nav اور overlay، بہتر grid spacing کے ساتھ۔",
+      "ہلکے tracks، درمیان میں thumbs، اور dark mode میں بہتر contrast والے toggles۔",
+      "Mix toggle فعال ہونے پر Mix/Radio chip چھپتی ہے؛ playlist hiding radio items چھوڑ دیتی ہے۔"
+    ]
+  },
+  "3.1.3": {
+    "headline": "Help legend کی نئی شکل",
+    "summary": "Cards، pills، اور tooltips بالکل واضح کرتی ہیں کہ Exact / Comment / Filter All کیا کرتے ہیں، اور dashboard کے تازہ styling سے مطابقت رکھتی ہیں۔",
+    "highlights": [
+      "Help tab badge tints اور collaboration labels کو ان کے مطابق رنگوں میں دکھاتا ہے۔",
+      "Popup اور tab search bars ایک جیسی full-width ترتیب اختیار کرتے ہیں۔",
+      "وضاحت کے لیے content-control descriptions کو hover tooltips میں منتقل کیا گیا۔"
+    ]
+  },
+  "3.1.2": {
+    "headline": "Playlist autoplay کو مزید مضبوط بنانا",
+    "summary": "Autoplay بلاک شدہ playlist rows کو دکھائے بغیر آگے نکل جاتا ہے، اور YouTube کی دوبارہ processing کے بعد بھی مستقل hiding برقرار رہتی ہے۔",
+    "highlights": [
+      "Next-click صرف اسی وقت چلتا ہے جب اگلی playlist row واقعی نظر آ رہی ہو۔",
+      "Watch playlist panel rows اس وقت بھی چھپی رہتی ہیں جب identity کچھ دیر کے لیے unresolved ہو۔",
+      "Blocking کے بعد 3-dot menu صاف طور پر بند ہوتا ہے تاکہ miniplayer چلتا رہے۔"
+    ]
+  },
+  "3.1.1": {
+    "headline": "Help tab اور identity کی اصلاحات",
+    "summary": "Dashboard میں مخصوص Help tab شامل ہوتا ہے جبکہ UC ↔ handle ↔ custom URL mapping زیادہ قابلِ اعتماد ہو جاتی ہے۔",
+    "highlights": [
+      "Help reference تمام toggles، badges، اور keyword behavior دستاویز کرتی ہے۔",
+      "Playlist navigation playback flash کے بغیر blocked rows کو چھوڑتی ہے۔",
+      "Handle/custom URL fallback درست UC ID کو زیادہ قابلِ اعتماد طور پر شناخت کرتا ہے۔"
+    ]
+  },
+  "3.1.0": {
+    "headline": "دستاویزات اور hybrid filtering کی وضاحت",
+    "summary": "Hybrid interception اور DOM fallback architecture کو diagrams کے ساتھ دستاویز کیا گیا تاکہ واضح ہو کہ FilterTube blocks کیسے نافذ کرتا ہے۔",
+    "highlights": [
+      "Watch-page 3-dot parity کو home/search collaborators کے ساتھ دستاویز کیا گیا۔",
+      "Playlist کی باقی ماندہ regressions درج کی گئیں تاکہ fixes نمایاں رہیں۔",
+      "3.1.0 bump کے ساتھ manifests، build tooling، اور UI footer ہم آہنگ کیے گئے۔"
+    ]
   }
 }
