@@ -1,0 +1,228 @@
+{
+  "keys": [
+    "managedOverlay.profile.this",
+    "managedOverlay.blocked.eyebrow",
+    "managedOverlay.blocked.title",
+    "managedOverlay.blocked.message",
+    "managedOverlay.openDashboard",
+    "managedOverlay.duration.zeroMinutes",
+    "managedOverlay.duration.hoursMinutes",
+    "managedOverlay.duration.hours",
+    "managedOverlay.duration.minutes",
+    "managedOverlay.duration.zeroSeconds",
+    "managedOverlay.duration.minutesSeconds",
+    "managedOverlay.duration.seconds",
+    "managedOverlay.profile.protected",
+    "managedOverlay.timeRemaining.status",
+    "managedOverlay.timeRemaining.title",
+    "managedOverlay.reset.midnight",
+    "managedOverlay.reset.nextDaily",
+    "managedOverlay.brand.time",
+    "managedOverlay.timeout.eyebrow.parentReview",
+    "managedOverlay.timeout.eyebrow.dailyPause",
+    "managedOverlay.timeout.title.parentReview",
+    "managedOverlay.timeout.title.dailyPause",
+    "managedOverlay.timeout.copy.parentReview",
+    "managedOverlay.timeout.copy.dailyPause",
+    "managedOverlay.timeout.profilePill",
+    "managedOverlay.timeout.fact.dailyLimit",
+    "managedOverlay.timeout.fact.usedToday",
+    "managedOverlay.timeout.fact.reset",
+    "managedOverlay.timeout.guidance.parentReview",
+    "managedOverlay.timeout.guidance.dailyPause",
+    "managedOverlay.switch.action",
+    "managedOverlay.switch.loading",
+    "managedOverlay.switch.cancel",
+    "managedOverlay.switch.noOtherProfile",
+    "managedOverlay.switch.loadFailed",
+    "managedOverlay.profile.generic",
+    "managedOverlay.profile.account",
+    "managedOverlay.switch.open",
+    "managedOverlay.profile.genericLowercase",
+    "managedOverlay.switch.pinPrompt",
+    "managedOverlay.switch.switching",
+    "managedOverlay.switch.switchingTo",
+    "managedOverlay.switch.pinRateLimited",
+    "managedOverlay.switch.pinIncorrect",
+    "managedOverlay.switch.failed",
+    "managedOverlay.request.action",
+    "managedOverlay.request.initialInstruction",
+    "managedOverlay.request.sent",
+    "managedOverlay.request.saved",
+    "managedOverlay.request.alreadySaved",
+    "managedOverlay.request.unavailable"
+  ],
+  "translations": {
+    "ha": [
+      "Wannan bayanin martaba", "Bayanin martaba da FilterTube ke sarrafawa", "Ba a samun {surface} a wannan bayanin martaba", "{profileName} na iya amfani da wuraren kallo da bayanin martabar iyaye ko mai kulawa ya amince da su kawai.", "Buɗe FilterTube",
+      "minti 0", "{hours} sa {minutes} min", "{hours} sa", "{minutes} min", "sakan 0", "{minutes} min {seconds} s", "{seconds} s", "Bayanin martaba mai kariya", "Lokacin {surface} da ya rage: {timeLeft}", "{profileName} na da sauran {timeLeft} a yau.",
+      "Ana sake saiti da tsakar dare ({timezone}).", "Ana sake saitawa lokacin sabunta tsarin yau da kullum na gaba.", "FilterTube · lokacin bayanin martaba", "Ana buƙatar bitar iyaye", "An kai iyakar hutun yau da kullum", "{surface} na buƙatar amincewar iyaye.", "Lokacin kallon yau ya ƙare.",
+      "{profileName} na buƙatar iyaye ko mai kulawa su duba wannan ƙa'idar lokaci kafin a ci gaba da {surface}.", "{profileName} ya yi amfani da lokacin YouTube da aka ware masa na yau. {surface} zai ci gaba da tsayawa har zuwa sake saitin yau da kullum ko sai an amince da ƙarin lokaci.", "{profileName} · {surface}", "Iyakar yau da kullum", "An yi amfani da shi yau", "Sake saiti",
+      "Canza zuwa bayanin martabar iyaye, mai kulawa, ko wani bayanin martaba mai izini. Bayanin martabar da lokaci ya ƙare ba zai iya rufe wannan allon ko amince wa kansa damar shiga ba.", "Canza bayanin martaba yana buƙatar binciken PIN na yau da kullum. Ana adana buƙatar ƙarin lokaci domin iyaye su duba ta, amma ba ta buɗe wannan bayanin martaba da kanta ba.", "Canza bayanin martaba", "Ana loda bayanan martaba…", "Soke canza bayanin martaba", "Babu wani bayanin martaba a wannan na'ura.", "An kasa loda bayanan martaba. Ka bar wannan shafi a buɗe ka sake gwadawa.",
+      "Bayanin martaba", "Bayanin martabar asusu", "Buɗe", "wannan bayanin martaba", "Shigar da PIN na {profileName}", "Ana canzawa…", "Ana canzawa zuwa {profileName}…", "An yi ƙoƙarin shigar da PIN mara daidai sau da yawa. Jira kafin sake gwadawa.", "PIN ɗin bai dace ba.", "Canza bayanin martaba ya gaza. A sake gwadawa.", "Nemi ƙarin lokaci",
+      "Buƙatar da aka adana a nan tana sanar da bayanin martabar iyaye kawai cewa ana buƙatar ƙarin lokaci. Ba ta buɗe YouTube da kanta ba.", "An aika buƙata", "An adana buƙata domin iyaye su duba ta. YouTube zai ci gaba da tsayawa har sai iyaye ko mai kulawa ya ƙara lokaci daga FilterTube.", "An riga an adana buƙata ta kwanan nan domin iyaye su duba ta. YouTube zai ci gaba da tsayawa har sai an ƙara lokaci daga FilterTube.", "Iyaye ko mai kulawa na iya buɗe FilterTube daga amintaccen bayanin martaba su ƙara lokaci. Wannan maɓallin bai buɗe YouTube ba."
+    ],
+    "tr": [
+      "Bu profil", "FilterTube tarafından yönetilen profil", "{surface} bu profilde kullanılamıyor", "{profileName} yalnızca ebeveyn veya bakıcı profilinin onayladığı izleme alanlarını kullanabilir.", "FilterTube'u aç",
+      "0 dk", "{hours} sa {minutes} dk", "{hours} sa", "{minutes} dk", "0 sn", "{minutes} dk {seconds} sn", "{seconds} sn", "Korumalı profil", "{surface} için kalan süre: {timeLeft}", "{profileName} için bugün {timeLeft} kaldı.",
+      "Gece yarısında sıfırlanır ({timezone}).", "Bir sonraki günlük ilke sıfırlamasında sıfırlanır.", "FilterTube · profil süresi", "Ebeveyn incelemesi gerekiyor", "Günlük duraklama süresine ulaşıldı", "{surface} ebeveyn onayı gerektiriyor.", "Bugünün izleme süresi tamamlandı.",
+      "{profileName}, {surface} devam etmeden önce bu süre kuralının bir ebeveyn veya bakıcı tarafından incelenmesini gerektiriyor.", "{profileName} bugünkü YouTube süresini kullandı. {surface}, günlük sıfırlamaya veya ek süre onaylanana kadar duraklatılmış kalır.", "{profileName} · {surface}", "Günlük sınır", "Bugün kullanılan", "Sıfırlama",
+      "Ebeveyn, bakıcı veya başka bir yetkili profile geçin. Süresi dolan profil bu ekranı kapatamaz veya kendi erişimini onaylayamaz.", "Profil değiştirme normal PIN kontrolünden geçer. Ek süre isteği ebeveyn incelemesi için kaydedilir, ancak bu profilin kilidini kendi başına asla açmaz.", "Profili değiştir", "Profiller yükleniyor…", "Profil değiştirmeyi iptal et", "Bu cihazda başka profil yok.", "Profiller yüklenemedi. Bu sayfayı açık tutup tekrar deneyin.",
+      "Profil", "Hesap profili", "Aç", "bu profil", "{profileName} için PIN'i girin", "Değiştiriliyor…", "{profileName} profiline geçiliyor…", "Çok fazla yanlış PIN denemesi. Tekrar denemeden önce bekleyin.", "Bu PIN doğru değildi.", "Profil değiştirilemedi. Tekrar deneyin.", "Ek süre iste",
+      "Burada kaydedilen istek yalnızca ebeveyn profiline daha fazla süre gerektiğini bildirir. YouTube'un kilidini kendi başına açmaz.", "İstek gönderildi", "İstek ebeveyn incelemesi için kaydedildi. Ebeveyn veya bakıcı FilterTube üzerinden ek süre verene kadar YouTube duraklatılmış kalır.", "Yakın zamanda bir istek zaten ebeveyn incelemesi için kaydedildi. FilterTube üzerinden ek süre verilene kadar YouTube duraklatılmış kalır.", "Ebeveyn veya bakıcı güvenilir bir profilden FilterTube'u açıp ek süre verebilir. Bu düğme YouTube'un kilidini açmadı."
+    ],
+    "pa-Arab": [
+      "ایہ پروفائل", "FilterTube دا زیرِانتظام پروفائل", "{surface} ایس پروفائل لئی دستیاب نئیں", "{profileName} صرف اوہ دیکھن والیاں جگہاں ورت سکدا اے جنہاں دی والدین یا نگہبان والے پروفائل نے منظوری دتی ہووے۔", "FilterTube کھولو",
+      "0 منٹ", "{hours} گھنٹے {minutes} منٹ", "{hours} گھنٹے", "{minutes} منٹ", "0 سیکنڈ", "{minutes} منٹ {seconds} سیکنڈ", "{seconds} سیکنڈ", "محفوظ پروفائل", "{surface} لئی باقی وقت: {timeLeft}", "{profileName} کول اج {timeLeft} باقی اے۔",
+      "آدھی رات نوں ری سیٹ ہوندا اے ({timezone})۔", "اگلے روزانہ پالیسی ری سیٹ تے ری سیٹ ہووے گا۔", "FilterTube · پروفائل دا وقت", "والدین دی جانچ ضروری اے", "روزانہ دا وقفہ پورا ہو گیا", "{surface} لئی والدین دی منظوری لوڑیںدی اے۔", "اج دا دیکھن دا وقت پورا ہو گیا اے۔",
+      "{profileName} نوں ایس وقت دے اصول دی جانچ لئی والد یا نگہبان دی لوڑ اے، فیر ایہ {surface} جاری رہ سکدا اے۔", "{profileName} اج دا YouTube وقت ورت چکیا اے۔ {surface} روزانہ ری سیٹ تک یا ودھ وقت منظور ہون تک رُکیا رہے گا۔", "{profileName} · {surface}", "روزانہ حد", "اج ورتیا", "ری سیٹ",
+      "والدین، نگہبان یا کسے ہور مجاز پروفائل تے چلے جاؤ۔ جس پروفائل دا وقت مک گیا اے اوہ ایس سکرین نوں بند نئیں کر سکدا تے نہ اپنی رسائی منظور کر سکدا اے۔", "پروفائل بدلنے لئی معمول دی PIN جانچ ضروری اے۔ ودھ وقت دی درخواست والدین دی جانچ لئی محفوظ ہوندی اے، پر ایہ اپنے آپ ایس پروفائل نوں کدی وی ان لاک نئیں کردی۔", "پروفائل بدلو", "پروفائل لوڈ ہو رہے نیں…", "پروفائل بدلنا منسوخ کرو", "ایس ڈیوائس تے ہور کوئی پروفائل دستیاب نئیں۔", "پروفائل لوڈ نئیں ہو سکے۔ ایس صفحے نوں کھلا رکھو تے فیر کوشش کرو۔",
+      "پروفائل", "اکاؤنٹ پروفائل", "کھولو", "ایہ پروفائل", "{profileName} لئی PIN درج کرو", "بدل رہیا اے…", "{profileName} تے تبدیل ہو رہیا اے…", "غلط PIN دیاں بہت ساریاں کوششاں ہو گئیاں۔ دوبارہ کوشش توں پہلاں انتظار کرو۔", "ایہ PIN ٹھیک نئیں سی۔", "پروفائل بدلنا ناکام ہویا۔ دوبارہ کوشش کرو۔", "ودھ وقت دی درخواست کرو",
+      "ایتھے محفوظ کیتی درخواست صرف والدین دے پروفائل نوں دسدی اے کہ ہور وقت چاہیدا اے۔ ایہ اپنے آپ YouTube نوں ان لاک نئیں کردی۔", "درخواست بھیج دتی", "درخواست والدین دی جانچ لئی محفوظ اے۔ جد تک والد یا نگہبان FilterTube توں ہور وقت منظور نئیں کردا، YouTube رُکیا رہندا اے۔", "حال وچ والدین دی جانچ لئی اک درخواست پہلے ہی محفوظ اے۔ جد تک FilterTube توں ہور وقت منظور نئیں ہوندا، YouTube رُکیا رہندا اے۔", "والد یا نگہبان بھروسے والے پروفائل توں FilterTube کھول کے ہور وقت دے سکدا اے۔ ایس بٹن نے YouTube نوں ان لاک نئیں کیتا۔"
+    ],
+    "fil": [
+      "Profile na ito", "Profile na pinamamahalaan ng FilterTube", "Hindi available ang {surface} para sa profile na ito", "Magagamit lang ni {profileName} ang mga panonood na inaprubahan ng profile ng magulang o tagapag-alaga.", "Buksan ang FilterTube",
+      "0 min", "{hours} h {minutes} min", "{hours} h", "{minutes} min", "0 s", "{minutes} min {seconds} s", "{seconds} s", "Protektadong profile", "Natitirang oras sa {surface}: {timeLeft}", "May natitira pang {timeLeft} kay {profileName} ngayong araw.",
+      "Magre-reset sa hatinggabi ({timezone}).", "Magre-reset sa susunod na arawang pag-reset ng patakaran.", "FilterTube · oras ng profile", "Kailangan ng pagsusuri ng magulang", "Naabot na ang pang-araw-araw na pahinga", "Kailangan ng pag-apruba ng magulang para sa {surface}.", "Tapos na ang oras ng panonood ngayong araw.",
+      "Kailangan ni {profileName} ng magulang o tagapag-alaga para suriin ang tuntunin sa oras na ito bago makapagpatuloy ang {surface}.", "Nagamit na ni {profileName} ang itinakdang oras ng YouTube ngayong araw. Naka-pause ang {surface} hanggang sa arawang pag-reset o pag-apruba ng dagdag na oras.", "{profileName} · {surface}", "Pang-araw-araw na limitasyon", "Nagamit ngayong araw", "Pag-reset",
+      "Lumipat sa profile ng magulang, tagapag-alaga, o iba pang awtorisadong profile. Hindi maaaring isara ng profile na naubusan ng oras ang screen na ito o aprubahan ang sarili nitong access.", "Dadaan sa karaniwang PIN check ang pagpapalit ng profile. Isine-save ang kahilingan para sa dagdag na oras para masuri ng magulang, pero hindi nito maa-unlock ang profile nang mag-isa.", "Magpalit ng profile", "Nilo-load ang mga profile…", "Kanselahin ang pagpapalit ng profile", "Walang ibang profile sa device na ito.", "Hindi ma-load ang mga profile. Panatilihing bukas ang page na ito at subukan ulit.",
+      "Profile", "Profile ng account", "Buksan", "profile na ito", "Ilagay ang PIN para kay {profileName}", "Nagpapalit…", "Lumilipat kay {profileName}…", "Napakaraming maling PIN. Maghintay bago subukang muli.", "Hindi tama ang PIN na iyon.", "Hindi napalitan ang profile. Subukan ulit.", "Humiling ng dagdag na oras",
+      "Ang kahilingang nai-save dito ay nagsasabi lang sa profile ng magulang na kailangan ng dagdag na oras. Hindi nito naa-unlock ang YouTube nang mag-isa.", "Naipadala ang kahilingan", "Nai-save ang kahilingan para sa pagsusuri ng magulang. Naka-pause ang YouTube hanggang magbigay ng dagdag na oras ang magulang o tagapag-alaga sa FilterTube.", "May kamakailang kahilingan nang nai-save para sa pagsusuri ng magulang. Naka-pause ang YouTube hanggang may magbigay ng dagdag na oras sa FilterTube.", "Maaari pa ring buksan ng magulang o tagapag-alaga ang FilterTube at magbigay ng dagdag na oras mula sa pinagkakatiwalaang profile. Hindi na-unlock ng button na ito ang YouTube."
+    ],
+    "ta": [
+      "இந்தச் சுயவிவரம்", "FilterTube நிர்வகிக்கும் சுயவிவரம்", "{surface} இந்தச் சுயவிவரத்தில் கிடைக்காது", "{profileName} பெற்றோர் அல்லது பராமரிப்பாளர் சுயவிவரம் அனுமதித்த பார்வை இடங்களை மட்டுமே பயன்படுத்த முடியும்.", "FilterTube-ஐத் திற",
+      "0 நிமி", "{hours} ம {minutes} நிமி", "{hours} ம", "{minutes} நிமி", "0 வி", "{minutes} நிமி {seconds} வி", "{seconds} வி", "பாதுகாக்கப்பட்ட சுயவிவரம்", "{surface} பயன்பாட்டிற்கு மீதமுள்ள நேரம்: {timeLeft}", "{profileName}-க்கு இன்று {timeLeft} மீதமுள்ளது.",
+      "நள்ளிரவில் மீட்டமைக்கப்படும் ({timezone}).", "அடுத்த தினசரி கொள்கை மீட்டமைப்பில் மீட்டமைக்கப்படும்.", "FilterTube · சுயவிவர நேரம்", "பெற்றோர் பரிசீலனை தேவை", "தினசரி இடைநிறுத்த நேரம் எட்டப்பட்டது", "{surface} தொடர பெற்றோரின் ஒப்புதல் தேவை.", "இன்றைய பார்வை நேரம் முடிந்தது.",
+      "{surface} தொடர்வதற்கு முன் இந்த நேர விதியைப் பெற்றோர் அல்லது பராமரிப்பாளர் பரிசீலிக்க {profileName}-க்கு தேவை.", "{profileName} இன்றைய YouTube நேர ஒதுக்கீட்டை பயன்படுத்திவிட்டது. தினசரி மீட்டமைப்பு வரை அல்லது கூடுதல் நேரம் ஒப்புதல் அளிக்கப்படும் வரை {surface} இடைநிறுத்தப்பட்டிருக்கும்.", "{profileName} · {surface}", "தினசரி வரம்பு", "இன்று பயன்படுத்தியது", "மீட்டமைப்பு",
+      "பெற்றோர், பராமரிப்பாளர் அல்லது வேறு அங்கீகரிக்கப்பட்ட சுயவிவரத்திற்கு மாறவும். நேரம் முடிந்த சுயவிவரம் இந்தத் திரையை மூடவோ தனக்குத் தானே அணுகலை அனுமதிக்கவோ முடியாது.", "சுயவிவர மாறுதலில் வழக்கமான PIN சரிபார்ப்பு உண்டு. கூடுதல் நேரக் கோரிக்கை பெற்றோர் பரிசீலனைக்காகச் சேமிக்கப்படும்; ஆனால் அது மட்டும் இந்தச் சுயவிவரத்தை ஒருபோதும் திறக்காது.", "சுயவிவரத்தை மாற்று", "சுயவிவரங்கள் ஏற்றப்படுகின்றன…", "சுயவிவர மாற்றத்தை ரத்து செய்", "இந்தச் சாதனத்தில் வேறு சுயவிவரம் இல்லை.", "சுயவிவரங்களை ஏற்ற முடியவில்லை. இந்தப் பக்கத்தைத் திறந்தபடி வைத்து மீண்டும் முயலவும்.",
+      "சுயவிவரம்", "கணக்குச் சுயவிவரம்", "திற", "இந்தச் சுயவிவரம்", "{profileName}-க்கான PIN-ஐ உள்ளிடவும்", "மாற்றப்படுகிறது…", "{profileName}-க்கு மாறுகிறது…", "தவறான PIN முயற்சிகள் அதிகம். மீண்டும் முயல்வதற்கு முன் காத்திருக்கவும்.", "அந்த PIN சரியாக இல்லை.", "சுயவிவர மாற்றம் தோல்வியடைந்தது. மீண்டும் முயலவும்.", "கூடுதல் நேரத்தைக் கோரு",
+      "இங்கே சேமிக்கப்படும் கோரிக்கை, கூடுதல் நேரம் தேவை என்பதைப் பெற்றோர் சுயவிவரத்திற்குத் தெரிவிப்பது மட்டுமே. அது மட்டும் YouTube-ஐத் திறக்காது.", "கோரிக்கை அனுப்பப்பட்டது", "பெற்றோர் பரிசீலனைக்காகக் கோரிக்கை சேமிக்கப்பட்டது. FilterTube-இல் பெற்றோர் அல்லது பராமரிப்பாளர் கூடுதல் நேரம் வழங்கும் வரை YouTube இடைநிறுத்தப்பட்டிருக்கும்.", "சமீபத்திய கோரிக்கை ஏற்கனவே பெற்றோர் பரிசீலனைக்காகச் சேமிக்கப்பட்டுள்ளது. FilterTube-இல் கூடுதல் நேரம் வழங்கப்படும் வரை YouTube இடைநிறுத்தப்பட்டிருக்கும்.", "நம்பகமான சுயவிவரத்திலிருந்து பெற்றோர் அல்லது பராமரிப்பாளர் FilterTube-ஐத் திறந்து கூடுதல் நேரம் வழங்கலாம். இந்தப் பொத்தான் YouTube-ஐத் திறக்கவில்லை."
+    ],
+    "yue-Hant": [
+      "呢個個人檔案", "FilterTube 管理嘅個人檔案", "{surface} 呢個個人檔案用唔到", "{profileName} 只可以用家長或照顧者個人檔案批准嘅觀看空間。", "開啟 FilterTube",
+      "0分鐘", "{hours}小時 {minutes}分鐘", "{hours}小時", "{minutes}分鐘", "0秒", "{minutes}分鐘 {seconds}秒", "{seconds}秒", "受保護嘅個人檔案", "{surface} 剩餘時間：{timeLeft}", "{profileName} 今日仲有 {timeLeft}。",
+      "喺午夜重設（{timezone}）。", "喺下一次每日政策重設時重設。", "FilterTube · 個人檔案時間", "需要家長審核", "已到每日暫停時間", "{surface} 需要家長批准。", "今日嘅觀看時間已用完。",
+      "{profileName} 需要家長或照顧者審核呢條時間規則，之後先可以繼續使用 {surface}。", "{profileName} 已用晒今日嘅 YouTube 時間額度。{surface} 會繼續暫停，直到每日重設或者批准更多時間。", "{profileName} · {surface}", "每日上限", "今日已用", "重設",
+      "轉去家長、照顧者或其他獲授權嘅個人檔案。用盡時間嘅個人檔案唔可以關閉呢個畫面，亦唔可以批准自己嘅存取權限。", "切換個人檔案要照常檢查 PIN。增加時間嘅請求會保存畀家長審核，但本身永遠唔會解鎖呢個個人檔案。", "切換個人檔案", "正在載入個人檔案…", "取消切換個人檔案", "呢部裝置冇其他個人檔案。", "個人檔案載入失敗。請保持此頁開啟並再試。",
+      "個人檔案", "帳戶個人檔案", "開啟", "呢個個人檔案", "請輸入 {profileName} 嘅 PIN", "正在切換…", "正在切換至 {profileName}…", "PIN 錯誤次數太多。請等一陣再試。", "PIN 不正確。", "切換個人檔案失敗。請再試。", "申請更多時間",
+      "喺呢度保存嘅申請只會通知家長個人檔案需要更多時間，本身唔會解鎖 YouTube。", "已送出申請", "申請已保存畀家長審核。家長或照顧者透過 FilterTube 批准更多時間之前，YouTube 會繼續暫停。", "最近已經有一個申請保存畀家長審核。喺 FilterTube 批准更多時間之前，YouTube 會繼續暫停。", "家長或照顧者仍可以喺可信任嘅個人檔案開啟 FilterTube 並批准更多時間。呢個按鈕冇解鎖 YouTube。"
+    ],
+    "wuu-Hans": [
+      "迭个档案", "FilterTube管个档案", "{surface}迭个档案里用勿着", "{profileName}只好用家长或者看护人档案里批准个观看场地。", "开FilterTube",
+      "0分钟", "{hours}钟头 {minutes}分钟", "{hours}钟头", "{minutes}分钟", "0秒钟", "{minutes}分钟 {seconds}秒钟", "{seconds}秒钟", "受保护个档案", "{surface}剩个辰光：{timeLeft}", "{profileName}今朝还剩 {timeLeft}辰光。",
+      "夜里十二点重设（{timezone}）。", "下一趟每日规则重设时重设。", "FilterTube · 档案辰光", "要家长来复核", "每日暂停辰光到头了", "{surface}要家长批准。", "今朝观看辰光用完了。",
+      "{profileName}要家长或者看护人看一看迭条辰光规则，之后 {surface} 才好继续。", "{profileName}今朝 YouTube 个观看时间额用完哉。{surface}要一直停着，等每日重设或者另外批准辰光。", "{profileName} · {surface}", "每日上限", "今朝用脱个", "重设",
+      "换到家长、看护人或者另一个准许个档案去。用完辰光个档案勿好关脱迭个画面，也勿好自家批准自家登录。", "换档案照平常要验 PIN。再要辰光个申请会存着畀家长看，不过勿会自家把迭个档案解锁。", "换档案", "档案拿来哉…", "取消换档案", "迭部设备呒别个档案。", "档案拿勿来。迭个页面先开着，再试一趟。",
+      "档案", "账号档案", "开", "迭个档案", "输入 {profileName} 个 PIN", "换着哉…", "换到 {profileName} 哉…", "PIN 错得忒多哉。再试之前先等一歇。", "迭个 PIN 弄错哉。", "换档案勿成功。再试一趟。", "申请再要辰光",
+      "迭头保存个申请只会话畀家长档案晓得还要辰光。自家勿会把 YouTube 解锁。", "申请发出哉", "申请存着畀家长看。家长或者看护人从 FilterTube 批准更多辰光之前，YouTube 一直停着。", "最近个申请已经存着畀家长看。FilterTube 批准更多辰光之前，YouTube 一直停着。", "家长或者看护人还可以从信得过个档案开 FilterTube 批准更多辰光。迭个按钮呒有把 YouTube 解锁。"
+    ],
+    "fa": [
+      "این نمایه", "نمایهٔ تحت مدیریت FilterTube", "{surface} برای این نمایه در دسترس نیست", "{profileName} فقط می‌تواند از فضاهای تماشایی استفاده کند که نمایهٔ والد یا مراقب تأیید کرده است.", "باز کردن FilterTube",
+      "۰ دقیقه", "{hours} ساعت {minutes} دقیقه", "{hours} ساعت", "{minutes} دقیقه", "۰ ثانیه", "{minutes} دقیقه {seconds} ثانیه", "{seconds} ثانیه", "نمایهٔ محافظت‌شده", "زمان باقی‌مانده برای {surface}: {timeLeft}", "{profileName} امروز {timeLeft} زمان باقی‌مانده دارد.",
+      "نیمه‌شب بازنشانی می‌شود ({timezone}).", "در بازنشانی روزانهٔ بعدی سیاست، بازنشانی می‌شود.", "FilterTube · زمان نمایه", "بررسی والد لازم است", "به پایان زمان مکث روزانه رسیده‌اید", "{surface} به تأیید والد نیاز دارد.", "زمان تماشای امروز به پایان رسیده است.",
+      "{profileName} پیش از ادامهٔ {surface} نیاز دارد که والد یا مراقب این قانون زمان را بررسی کند.", "{profileName} از سهمیهٔ تماشای امروز YouTube استفاده کرده است. {surface} تا بازنشانی روزانه یا تأیید زمان بیشتر متوقف می‌ماند.", "{profileName} · {surface}", "محدودیت روزانه", "استفاده‌شده امروز", "بازنشانی",
+      "به نمایهٔ والد، مراقب یا نمایهٔ مجاز دیگری بروید. نمایه‌ای که زمانش تمام شده نمی‌تواند این صفحه را ببندد یا دسترسی خودش را تأیید کند.", "تعویض نمایه طبق روال به بررسی PIN نیاز دارد. درخواست زمان بیشتر برای بررسی والد ذخیره می‌شود، اما به‌تنهایی هرگز قفل این نمایه را باز نمی‌کند.", "تعویض نمایه", "در حال بارگیری نمایه‌ها…", "لغو تعویض نمایه", "هیچ نمایهٔ دیگری در این دستگاه موجود نیست.", "بارگیری نمایه‌ها ناموفق بود. این صفحه را باز نگه دارید و دوباره امتحان کنید.",
+      "نمایه", "نمایهٔ حساب", "باز کردن", "این نمایه", "PIN مربوط به {profileName} را وارد کنید", "در حال تعویض…", "در حال تعویض به {profileName}…", "تعداد تلاش‌های ناموفق PIN زیاد است. پیش از تلاش دوباره صبر کنید.", "PIN درست نبود.", "تعویض نمایه ناموفق بود. دوباره امتحان کنید.", "درخواست زمان بیشتر",
+      "درخواست ذخیره‌شده در اینجا فقط به نمایهٔ والد می‌گوید که زمان بیشتری لازم است. این درخواست به‌تنهایی قفل YouTube را باز نمی‌کند.", "درخواست ارسال شد", "درخواست برای بررسی والد ذخیره شد. YouTube تا وقتی والد یا مراقب از FilterTube زمان بیشتری ندهد متوقف می‌ماند.", "درخواست اخیر از قبل برای بررسی والد ذخیره شده است. YouTube تا وقتی از FilterTube زمان بیشتری داده نشود متوقف می‌ماند.", "والد یا مراقب همچنان می‌تواند از یک نمایهٔ مورداعتماد FilterTube را باز کند و زمان بیشتری بدهد. این دکمه قفل YouTube را باز نکرد."
+    ],
+    "ko": [
+      "이 프로필", "FilterTube 관리 프로필", "{surface}은(는) 이 프로필에서 사용할 수 없습니다", "{profileName}은(는) 부모 또는 보호자 프로필에서 승인한 시청 공간만 사용할 수 있습니다.", "FilterTube 열기",
+      "0분", "{hours}시간 {minutes}분", "{hours}시간", "{minutes}분", "0초", "{minutes}분 {seconds}초", "{seconds}초", "보호된 프로필", "{surface} 남은 시간: {timeLeft}", "{profileName}의 오늘 남은 시간은 {timeLeft}입니다.",
+      "자정에 초기화됩니다({timezone}).", "다음 일일 정책 초기화 시 재설정됩니다.", "FilterTube · 프로필 시간", "부모 검토 필요", "일일 일시중지 시간에 도달했습니다", "{surface}에 부모의 승인이 필요합니다.", "오늘의 시청 시간이 끝났습니다.",
+      "{profileName}이(가) {surface}을(를) 계속 이용하려면 부모 또는 보호자가 이 시간 규칙을 검토해야 합니다.", "{profileName}이(가) 오늘의 YouTube 시청 시간 할당량을 모두 사용했습니다. {surface}은(는) 일일 초기화 또는 추가 시간 승인 전까지 일시중지 상태로 유지됩니다.", "{profileName} · {surface}", "일일 한도", "오늘 사용함", "초기화",
+      "부모, 보호자 또는 다른 승인된 프로필로 전환하세요. 시간이 끝난 프로필은 이 화면을 닫거나 자신의 접근을 승인할 수 없습니다.", "프로필 전환에는 일반 PIN 확인이 적용됩니다. 추가 시간 요청은 부모 검토를 위해 저장되지만, 그 자체로는 이 프로필을 절대 잠금 해제하지 않습니다.", "프로필 전환", "프로필 불러오는 중…", "프로필 전환 취소", "이 기기에서 사용할 수 있는 다른 프로필이 없습니다.", "프로필을 불러오지 못했습니다. 이 페이지를 열어 둔 채 다시 시도하세요.",
+      "프로필", "계정 프로필", "열기", "이 프로필", "{profileName}의 PIN을 입력하세요", "전환 중…", "{profileName}(으)로 전환 중…", "잘못된 PIN을 너무 많이 입력했습니다. 다시 시도하기 전에 기다리세요.", "PIN이 올바르지 않습니다.", "프로필 전환에 실패했습니다. 다시 시도하세요.", "추가 시간 요청",
+      "여기에 저장된 요청은 시간이 더 필요하다는 사실을 부모 프로필에 알릴 뿐입니다. 그 자체로 YouTube를 잠금 해제하지 않습니다.", "요청을 보냈습니다", "부모 검토를 위해 요청을 저장했습니다. 부모 또는 보호자가 FilterTube에서 추가 시간을 허용할 때까지 YouTube는 일시중지 상태로 유지됩니다.", "최근 요청이 이미 부모 검토를 위해 저장되어 있습니다. FilterTube에서 추가 시간이 허용될 때까지 YouTube는 일시중지 상태로 유지됩니다.", "부모 또는 보호자는 신뢰할 수 있는 프로필에서 FilterTube를 열어 추가 시간을 허용할 수 있습니다. 이 버튼은 YouTube를 잠금 해제하지 않았습니다."
+    ],
+    "am": [
+      "ይህ መገለጫ", "በFilterTube የሚተዳደር መገለጫ", "{surface} ለዚህ መገለጫ አይገኝም", "{profileName} የወላጅ ወይም የአሳዳጊ መገለጫ የፈቀዳቸውን የመመልከቻ ቦታዎች ብቻ መጠቀም ይችላል።", "FilterTube ክፈት",
+      "0 ደቂቃ", "{hours} ሰዓ {minutes} ደቂቃ", "{hours} ሰዓ", "{minutes} ደቂቃ", "0 ሰከንድ", "{minutes} ደቂቃ {seconds} ሰከንድ", "{seconds} ሰከንድ", "የተጠበቀ መገለጫ", "የ{surface} ቀሪ ጊዜ፦ {timeLeft}", "{profileName} ዛሬ {timeLeft} ቀርቶታል።",
+      "እኩለ ሌሊት ላይ ይጀምራል ({timezone})።", "በሚቀጥለው የዕለታዊ ፖሊሲ ዳግም ማስጀመሪያ ላይ ይጀምራል።", "FilterTube · የመገለጫ ጊዜ", "የወላጅ ግምገማ ያስፈልጋል", "የዕለታዊ ማቆሚያ ጊዜ ደርሷል", "{surface} የወላጅ ፈቃድ ይፈልጋል።", "የዛሬ የመመልከቻ ጊዜ አልቋል።",
+      "{surface} ከመቀጠሉ በፊት {profileName} ወላጅ ወይም አሳዳጊ ይህን የጊዜ ደንብ እንዲገመግም ይፈልጋል።", "{profileName} የዛሬውን የYouTube ጊዜ አበል ተጠቅሟል። {surface} እስከ ዕለታዊ ዳግም ማስጀመሪያው ወይም ተጨማሪ ጊዜ እስኪፈቀድ ድረስ ቆሞ ይቆያል።", "{profileName} · {surface}", "የዕለት ገደብ", "ዛሬ የተጠቀመው", "ዳግም ማስጀመሪያ",
+      "ወደ ወላጅ፣ አሳዳጊ ወይም ሌላ ፈቃድ ያለው መገለጫ ይቀይሩ። ጊዜው ያለቀበት መገለጫ ይህን ማያ ገጽ መዝጋት ወይም የራሱን መዳረሻ ማጽደቅ አይችልም።", "መገለጫ ሲቀየር መደበኛው የPIN ማረጋገጫ ይፈጸማል። ተጨማሪ ጊዜ የሚጠይቀው ጥያቄ ለወላጅ ግምገማ ይቀመጣል፤ ግን ይህ ብቻውን ይህን መገለጫ በፍጹም አይከፍትም።", "መገለጫ ቀይር", "መገለጫዎች በመጫን ላይ…", "የመገለጫ ለውጥን ሰርዝ", "በዚህ መሣሪያ ላይ ሌላ መገለጫ የለም።", "መገለጫዎችን መጫን አልተቻለም። ይህን ገጽ ክፍት ያቆዩና እንደገና ይሞክሩ።",
+      "መገለጫ", "የመለያ መገለጫ", "ክፈት", "ይህ መገለጫ", "የ{profileName} PIN ያስገቡ", "በመቀየር ላይ…", "ወደ {profileName} በመቀየር ላይ…", "ብዙ የተሳሳቱ PIN ሙከራዎች ተደርገዋል። እንደገና ከመሞከርዎ በፊት ይጠብቁ።", "ያ PIN ትክክል አልነበረም።", "መገለጫ መቀየር አልተሳካም። እንደገና ይሞክሩ።", "ተጨማሪ ጊዜ ይጠይቁ",
+      "እዚህ የተቀመጠው ጥያቄ ተጨማሪ ጊዜ እንደሚያስፈልግ ለወላጅ መገለጫ ብቻ ያሳውቃል። በራሱ YouTubeን አይከፍትም።", "ጥያቄ ተልኳል", "ጥያቄው ለወላጅ ግምገማ ተቀምጧል። ወላጅ ወይም አሳዳጊ ከFilterTube ተጨማሪ ጊዜ እስኪፈቅድ ድረስ YouTube ቆሞ ይቆያል።", "ቅርብ ጊዜ የቀረበ ጥያቄ ለወላጅ ግምገማ አስቀድሞ ተቀምጧል። ከFilterTube ተጨማሪ ጊዜ እስኪፈቀድ ድረስ YouTube ቆሞ ይቆያል።", "ወላጅ ወይም አሳዳጊ ከታመነ መገለጫ FilterTubeን ከፍቶ ተጨማሪ ጊዜ መስጠት ይችላል። ይህ አዝራር YouTubeን አልከፈተም።"
+    ],
+    "th": [
+      "โปรไฟล์นี้", "โปรไฟล์ที่ FilterTube จัดการ", "{surface} ไม่พร้อมใช้งานสำหรับโปรไฟล์นี้", "{profileName} ใช้ได้เฉพาะพื้นที่รับชมที่โปรไฟล์ผู้ปกครองหรือผู้ดูแลอนุมัติแล้วเท่านั้น", "เปิด FilterTube",
+      "0 นาที", "{hours} ชม. {minutes} นาที", "{hours} ชม.", "{minutes} นาที", "0 วินาที", "{minutes} นาที {seconds} วินาที", "{seconds} วินาที", "โปรไฟล์ที่ได้รับการปกป้อง", "เวลา {surface} ที่เหลือ: {timeLeft}", "วันนี้ {profileName} เหลือเวลา {timeLeft}",
+      "รีเซ็ตตอนเที่ยงคืน ({timezone})", "รีเซ็ตเมื่อถึงเวลารีเซ็ตนโยบายรายวันครั้งถัดไป", "FilterTube · เวลาโปรไฟล์", "ต้องให้ผู้ปกครองตรวจสอบ", "ถึงเวลาหยุดพักประจำวันแล้ว", "{surface} ต้องได้รับอนุมัติจากผู้ปกครอง", "เวลาดูวันนี้ครบแล้ว",
+      "{profileName} ต้องให้ผู้ปกครองหรือผู้ดูแลตรวจสอบกฎเวลานี้ก่อนจึงจะใช้ {surface} ต่อได้", "{profileName} ใช้เวลา YouTube ที่ได้รับอนุญาตสำหรับวันนี้หมดแล้ว {surface} จะหยุดชั่วคราวจนกว่าจะรีเซ็ตประจำวันหรือได้รับอนุมัติเวลาเพิ่ม", "{profileName} · {surface}", "ขีดจำกัดรายวัน", "ใช้ไปวันนี้", "รีเซ็ต",
+      "สลับไปยังโปรไฟล์ของผู้ปกครอง ผู้ดูแล หรือโปรไฟล์อื่นที่ได้รับอนุญาต โปรไฟล์ที่หมดเวลาจะปิดหน้าจอนี้หรืออนุมัติการเข้าถึงของตัวเองไม่ได้", "การสลับโปรไฟล์ยังต้องตรวจ PIN ตามปกติ คำขอเวลาเพิ่มจะบันทึกให้ผู้ปกครองตรวจสอบ แต่จะไม่ปลดล็อกโปรไฟล์นี้ด้วยตัวเองเด็ดขาด", "สลับโปรไฟล์", "กำลังโหลดโปรไฟล์…", "ยกเลิกการสลับโปรไฟล์", "ไม่มีโปรไฟล์อื่นในอุปกรณ์นี้", "โหลดโปรไฟล์ไม่สำเร็จ เปิดหน้านี้ค้างไว้แล้วลองอีกครั้ง",
+      "โปรไฟล์", "โปรไฟล์บัญชี", "เปิด", "โปรไฟล์นี้", "ป้อน PIN ของ {profileName}", "กำลังสลับ…", "กำลังสลับไปยัง {profileName}…", "ป้อน PIN ผิดหลายครั้งเกินไป โปรดรอสักครู่ก่อนลองอีกครั้ง", "PIN ไม่ถูกต้อง", "สลับโปรไฟล์ไม่สำเร็จ ลองอีกครั้ง", "ขอเวลาเพิ่ม",
+      "คำขอที่บันทึกไว้ที่นี่เพียงแจ้งโปรไฟล์ผู้ปกครองว่าต้องการเวลาเพิ่ม แต่คำขอนี้ไม่ได้ปลดล็อก YouTube ด้วยตัวเอง", "ส่งคำขอแล้ว", "บันทึกคำขอไว้ให้ผู้ปกครองตรวจสอบ YouTube จะหยุดชั่วคราวจนกว่าผู้ปกครองหรือผู้ดูแลจะให้เวลาเพิ่มจาก FilterTube", "มีคำขอล่าสุดที่บันทึกไว้ให้ผู้ปกครองตรวจสอบอยู่แล้ว YouTube จะหยุดชั่วคราวจนกว่าจะได้รับเวลาเพิ่มจาก FilterTube", "ผู้ปกครองหรือผู้ดูแลยังเปิด FilterTube จากโปรไฟล์ที่เชื่อถือได้เพื่อให้เวลาเพิ่มได้ ปุ่มนี้ไม่ได้ปลดล็อก YouTube"
+    ],
+    "jv": [
+      "Profil iki", "Profil sing dikelola FilterTube", "{surface} ora kasedhiya kanggo profil iki", "{profileName} mung bisa nggunakake papan kanggo nonton sing disetujoni profil wong tuwa utawa pengasuh.", "Bukak FilterTube",
+      "0 menit", "{hours} jam {minutes} menit", "{hours} jam", "{minutes} menit", "0 detik", "{minutes} menit {seconds} detik", "{seconds} detik", "Profil sing dilindhungi", "Sisa wektu {surface}: {timeLeft}", "{profileName} isih duwe {timeLeft} dina iki.",
+      "Direset tengah wengi ({timezone}).", "Direset nalika reset kabijakan saben dina sabanjure.", "FilterTube · wektu profil", "Perlu ditinjau wong tuwa", "Wektu ngaso saben dina wis tekan", "{surface} mbutuhake idin wong tuwa.", "Wektu nonton dina iki wis rampung.",
+      "{profileName} perlu njaluk wong tuwa utawa pengasuh mriksa aturan wektu iki sadurunge {surface} bisa diterusake.", "{profileName} wis nggunakake jatah wektu YouTube dina iki. {surface} bakal tetep mandheg nganti reset saben dina utawa nganti wektu tambahan disetujoni.", "{profileName} · {surface}", "Wates saben dina", "Wis digunakake dina iki", "Reset",
+      "Ganti menyang profil wong tuwa, pengasuh, utawa profil liyane sing sah. Profil sing wektune entek ora bisa nutup layar iki utawa nyetujoni akses kanggo awake dhewe.", "Ganti profil tetep nganggo pamriksa PIN sing lumrah. Panjaluk wektu tambahan disimpen kanggo ditinjau wong tuwa, nanging panjaluk kuwi ora bakal mbukak kunci profil iki dhewe.", "Ganti profil", "Profil lagi dimuat…", "Batal ngganti profil", "Ora ana profil liyane ing piranti iki.", "Profil ora bisa dimuat. Aja tutup kaca iki lan coba maneh.",
+      "Profil", "Profil akun", "Bukak", "profil iki", "Lebokna PIN kanggo {profileName}", "Lagi ngalih…", "Lagi ngalih menyang {profileName}…", "Kakehan nyoba nganggo PIN sing salah. Enteni sadurunge nyoba maneh.", "PIN kuwi ora bener.", "Ganti profil gagal. Coba maneh.", "Nyuwun wektu tambahan",
+      "Panjaluk sing disimpen ing kene mung menehi kabar marang profil wong tuwa yen wektu tambahan dibutuhake. Panjaluk iki ora mbukak kunci YouTube dhewe.", "Panjaluk wis dikirim", "Panjaluk disimpen kanggo ditinjau wong tuwa. YouTube bakal tetep mandheg nganti wong tuwa utawa pengasuh menehi wektu tambahan liwat FilterTube.", "Panjaluk anyar wis disimpen kanggo ditinjau wong tuwa. YouTube bakal tetep mandheg nganti wektu tambahan diwenehake liwat FilterTube.", "Wong tuwa utawa pengasuh isih bisa mbukak FilterTube saka profil sing dipercaya lan menehi wektu tambahan. Tombol iki ora mbukak kunci YouTube."
+    ],
+    "it": [
+      "Questo profilo", "Profilo gestito da FilterTube", "{surface} non è disponibile per questo profilo", "{profileName} può usare solo gli spazi di visione approvati dal profilo del genitore o tutore.", "Apri FilterTube",
+      "0 min", "{hours} h {minutes} min", "{hours} h", "{minutes} min", "0 s", "{minutes} min {seconds} s", "{seconds} s", "Profilo protetto", "Tempo rimanente per {surface}: {timeLeft}", "A {profileName} restano {timeLeft} oggi.",
+      "Si reimposta a mezzanotte ({timezone}).", "Si reimposta al successivo ripristino giornaliero della policy.", "FilterTube · tempo del profilo", "È necessaria la revisione di un genitore", "Pausa giornaliera raggiunta", "{surface} richiede l'approvazione di un genitore.", "Il tempo di visione di oggi è terminato.",
+      "Un genitore o tutore deve esaminare questa regola temporale per {profileName} prima che {surface} possa continuare.", "{profileName} ha esaurito il tempo YouTube disponibile per oggi. {surface} resta in pausa fino al ripristino giornaliero o all'approvazione di altro tempo.", "{profileName} · {surface}", "Limite giornaliero", "Usato oggi", "Ripristino",
+      "Passa a un profilo di un genitore, tutore o altro profilo autorizzato. Il profilo che ha esaurito il tempo non può chiudere questa schermata né approvare il proprio accesso.", "Il cambio di profilo richiede la normale verifica del PIN. La richiesta di altro tempo viene salvata per la revisione del genitore, ma da sola non sblocca mai questo profilo.", "Cambia profilo", "Caricamento profili…", "Annulla cambio profilo", "Non sono disponibili altri profili su questo dispositivo.", "Impossibile caricare i profili. Tieni aperta questa pagina e riprova.",
+      "Profilo", "Profilo dell'account", "Apri", "questo profilo", "Inserisci il PIN di {profileName}", "Cambio in corso…", "Passaggio a {profileName}…", "Troppi tentativi con PIN errato. Attendi prima di riprovare.", "Il PIN non è corretto.", "Cambio profilo non riuscito. Riprova.", "Richiedi altro tempo",
+      "La richiesta salvata qui informa solo il profilo del genitore che serve altro tempo. Da sola non sblocca YouTube.", "Richiesta inviata", "Richiesta salvata per la revisione del genitore. YouTube resta in pausa finché un genitore o tutore non concede altro tempo da FilterTube.", "Una richiesta recente è già stata salvata per la revisione del genitore. YouTube resta in pausa finché non viene concesso altro tempo da FilterTube.", "Un genitore o tutore può ancora aprire FilterTube da un profilo attendibile e concedere altro tempo. Questo pulsante non ha sbloccato YouTube."
+    ],
+    "gu": [
+      "આ પ્રોફાઇલ", "FilterTube દ્વારા સંચાલિત પ્રોફાઇલ", "{surface} આ પ્રોફાઇલ માટે ઉપલબ્ધ નથી", "{profileName} ફક્ત માતા-પિતા અથવા સંભાળકની પ્રોફાઇલ દ્વારા મંજૂર કરેલા જોવાના સ્થળોનો ઉપયોગ કરી શકે છે.", "FilterTube ખોલો",
+      "0 મિનિટ", "{hours} કલાક {minutes} મિનિટ", "{hours} કલાક", "{minutes} મિનિટ", "0 સેકન્ડ", "{minutes} મિનિટ {seconds} સેકન્ડ", "{seconds} સેકન્ડ", "સુરક્ષિત પ્રોફાઇલ", "{surface} માટે બાકી સમય: {timeLeft}", "{profileName} પાસે આજે {timeLeft} બાકી છે.",
+      "મધરાતે રીસેટ થાય છે ({timezone}).", "આગામી દૈનિક નીતિ રીસેટ સમયે રીસેટ થાય છે.", "FilterTube · પ્રોફાઇલ સમય", "માતા-પિતાની સમીક્ષા જરૂરી છે", "દૈનિક વિરામનો સમય પૂરો થયો", "{surface} માટે માતા-પિતાની મંજૂરી જરૂરી છે.", "આજનો જોવાનો સમય પૂરો થયો.",
+      "{surface} ચાલુ રહે તે પહેલાં {profileName} માટે માતા-પિતા અથવા સંભાળકે આ સમયના નિયમની સમીક્ષા કરવી જરૂરી છે.", "{profileName} એ આજનો YouTube સમય-હિસ્સો વાપરી લીધો છે. દૈનિક રીસેટ થાય અથવા વધુ સમય મંજૂર થાય ત્યાં સુધી {surface} થોભેલું રહેશે.", "{profileName} · {surface}", "દૈનિક મર્યાદા", "આજે વપરાયેલ", "રીસેટ",
+      "માતા-પિતા, સંભાળક અથવા બીજી અધિકૃત પ્રોફાઇલ પર સ્વિચ કરો. સમય પૂરો થયેલી પ્રોફાઇલ આ સ્ક્રીન બંધ કરી શકતી નથી કે પોતાની ઍક્સેસ મંજૂર કરી શકતી નથી.", "પ્રોફાઇલ બદલવા માટે સામાન્ય PIN તપાસ થાય છે. વધુ સમયની વિનંતી માતા-પિતાની સમીક્ષા માટે સાચવાય છે, પરંતુ તે પોતાની રીતે આ પ્રોફાઇલને ક્યારેય અનલૉક કરતી નથી.", "પ્રોફાઇલ બદલો", "પ્રોફાઇલ લોડ થઈ રહી છે…", "પ્રોફાઇલ બદલવાનું રદ કરો", "આ ઉપકરણ પર બીજી કોઈ પ્રોફાઇલ ઉપલબ્ધ નથી.", "પ્રોફાઇલ લોડ થઈ શકી નથી. આ પાનું ખુલ્લું રાખીને ફરી પ્રયાસ કરો.",
+      "પ્રોફાઇલ", "ખાતા પ્રોફાઇલ", "ખોલો", "આ પ્રોફાઇલ", "{profileName} માટે PIN દાખલ કરો", "બદલાઈ રહ્યું છે…", "{profileName} પર સ્વિચ થઈ રહ્યું છે…", "ખોટા PINના ઘણા પ્રયાસો થયા. ફરી પ્રયાસ કરતાં પહેલાં રાહ જુઓ.", "આ PIN સાચો નહોતો.", "પ્રોફાઇલ બદલી શકાઈ નથી. ફરી પ્રયાસ કરો.", "વધુ સમયની વિનંતી કરો",
+      "અહીં સાચવેલી વિનંતી ફક્ત માતા-પિતાની પ્રોફાઇલને જણાવે છે કે વધુ સમય જોઈએ. તે પોતાની રીતે YouTube અનલૉક કરતી નથી.", "વિનંતી મોકલાઈ", "વિનંતી માતા-પિતાની સમીક્ષા માટે સાચવાઈ છે. માતા-પિતા અથવા સંભાળક FilterTube માંથી વધુ સમય આપે ત્યાં સુધી YouTube થોભેલું રહેશે.", "તાજેતરની વિનંતી પહેલેથી જ માતા-પિતાની સમીક્ષા માટે સાચવાઈ છે. FilterTube માંથી વધુ સમય મંજૂર થાય ત્યાં સુધી YouTube થોભેલું રહેશે.", "માતા-પિતા અથવા સંભાળક વિશ્વસનીય પ્રોફાઇલમાંથી FilterTube ખોલીને વધુ સમય આપી શકે છે. આ બટને YouTube અનલૉક કર્યું નથી."
+    ],
+    "kn": [
+      "ಈ ಪ್ರೊಫೈಲ್", "FilterTube ನಿರ್ವಹಿಸುವ ಪ್ರೊಫೈಲ್", "{surface} ಈ ಪ್ರೊಫೈಲ್‌ಗೆ ಲಭ್ಯವಿಲ್ಲ", "{profileName} ಪೋಷಕ ಅಥವಾ ಪಾಲಕರ ಪ್ರೊಫೈಲ್ ಅನುಮೋದಿಸಿದ ವೀಕ್ಷಣಾ ಸ್ಥಳಗಳನ್ನು ಮಾತ್ರ ಬಳಸಬಹುದು.", "FilterTube ತೆರೆಯಿರಿ",
+      "0 ನಿಮಿಷ", "{hours} ಗಂಟೆ {minutes} ನಿಮಿಷ", "{hours} ಗಂಟೆ", "{minutes} ನಿಮಿಷ", "0 ಸೆಕೆಂಡ್", "{minutes} ನಿಮಿಷ {seconds} ಸೆಕೆಂಡ್", "{seconds} ಸೆಕೆಂಡ್", "ರಕ್ಷಿತ ಪ್ರೊಫೈಲ್", "{surface} ಉಳಿದ ಸಮಯ: {timeLeft}", "{profileName} ಅವರಿಗೆ ಇಂದು {timeLeft} ಉಳಿದಿದೆ.",
+      "ಮಧ್ಯರಾತ್ರಿ ಮರುಹೊಂದಿಸಲಾಗುತ್ತದೆ ({timezone}).", "ಮುಂದಿನ ದೈನಂದಿನ ನೀತಿ ಮರುಹೊಂದಿಸುವಾಗ ಮರುಹೊಂದಿಸಲಾಗುತ್ತದೆ.", "FilterTube · ಪ್ರೊಫೈಲ್ ಸಮಯ", "ಪೋಷಕರ ಪರಿಶೀಲನೆ ಅಗತ್ಯ", "ದೈನಂದಿನ ವಿರಾಮದ ಸಮಯ ತಲುಪಿದೆ", "{surface}ಗೆ ಪೋಷಕರ ಅನುಮೋದನೆ ಅಗತ್ಯವಿದೆ.", "ಇಂದಿನ ವೀಕ್ಷಣಾ ಸಮಯ ಮುಗಿದಿದೆ.",
+      "{surface} ಮುಂದುವರಿಯುವ ಮೊದಲು {profileName}ಗೆ ಪೋಷಕರು ಅಥವಾ ಪಾಲಕರು ಈ ಸಮಯದ ನಿಯಮವನ್ನು ಪರಿಶೀಲಿಸಬೇಕು.", "{profileName} ಇಂದಿನ YouTube ಸಮಯದ ಮಿತಿಯನ್ನು ಬಳಸಿದ್ದಾರೆ. ದೈನಂದಿನ ಮರುಹೊಂದಿಸುವವರೆಗೆ ಅಥವಾ ಹೆಚ್ಚುವರಿ ಸಮಯ ಅನುಮೋದಿಸುವವರೆಗೆ {surface} ವಿರಾಮದಲ್ಲೇ ಇರುತ್ತದೆ.", "{profileName} · {surface}", "ದೈನಂದಿನ ಮಿತಿ", "ಇಂದು ಬಳಸಿದ್ದು", "ಮರುಹೊಂದಿಸಿ",
+      "ಪೋಷಕರು, ಪಾಲಕರು ಅಥವಾ ಬೇರೆ ಅಧಿಕೃತ ಪ್ರೊಫೈಲ್‌ಗೆ ಬದಲಿಸಿ. ಸಮಯ ಮುಗಿದ ಪ್ರೊಫೈಲ್ ಈ ಪರದೆಯನ್ನು ಮುಚ್ಚಲು ಅಥವಾ ತನ್ನದೇ ಪ್ರವೇಶವನ್ನು ಅನುಮೋದಿಸಲು ಸಾಧ್ಯವಿಲ್ಲ.", "ಪ್ರೊಫೈಲ್ ಬದಲಿಸಲು ಸಾಮಾನ್ಯ PIN ಪರಿಶೀಲನೆ ನಡೆಯುತ್ತದೆ. ಹೆಚ್ಚುವರಿ ಸಮಯದ ವಿನಂತಿಯನ್ನು ಪೋಷಕರ ಪರಿಶೀಲನೆಗಾಗಿ ಉಳಿಸಲಾಗುತ್ತದೆ, ಆದರೆ ಅದು ಮಾತ್ರ ಈ ಪ್ರೊಫೈಲ್ ಅನ್ನು ಎಂದಿಗೂ ಅನ್‌ಲಾಕ್ ಮಾಡುವುದಿಲ್ಲ.", "ಪ್ರೊಫೈಲ್ ಬದಲಿಸಿ", "ಪ್ರೊಫೈಲ್‌ಗಳನ್ನು ಲೋಡ್ ಮಾಡಲಾಗುತ್ತಿದೆ…", "ಪ್ರೊಫೈಲ್ ಬದಲಾವಣೆಯನ್ನು ರದ್ದುಮಾಡಿ", "ಈ ಸಾಧನದಲ್ಲಿ ಬೇರೆ ಯಾವುದೇ ಪ್ರೊಫೈಲ್ ಲಭ್ಯವಿಲ್ಲ.", "ಪ್ರೊಫೈಲ್‌ಗಳನ್ನು ಲೋಡ್ ಮಾಡಲು ಸಾಧ್ಯವಾಗಲಿಲ್ಲ. ಈ ಪುಟವನ್ನು ತೆರೆದಿಟ್ಟು ಮತ್ತೆ ಪ್ರಯತ್ನಿಸಿ.",
+      "ಪ್ರೊಫೈಲ್", "ಖಾತೆ ಪ್ರೊಫೈಲ್", "ತೆರೆಯಿರಿ", "ಈ ಪ್ರೊಫೈಲ್", "{profileName} ಅವರ PIN ನಮೂದಿಸಿ", "ಬದಲಾಯಿಸಲಾಗುತ್ತಿದೆ…", "{profileName}ಗೆ ಬದಲಾಯಿಸಲಾಗುತ್ತಿದೆ…", "ತಪ್ಪಾದ PIN ಪ್ರಯತ್ನಗಳು ತುಂಬಾ ಹೆಚ್ಚು. ಮತ್ತೆ ಪ್ರಯತ್ನಿಸುವ ಮೊದಲು ಕಾಯಿರಿ.", "ಆ PIN ಸರಿಯಾಗಿರಲಿಲ್ಲ.", "ಪ್ರೊಫೈಲ್ ಬದಲಾವಣೆ ವಿಫಲವಾಗಿದೆ. ಮತ್ತೆ ಪ್ರಯತ್ನಿಸಿ.", "ಹೆಚ್ಚುವರಿ ಸಮಯವನ್ನು ವಿನಂತಿಸಿ",
+      "ಇಲ್ಲಿ ಉಳಿಸಿದ ವಿನಂತಿಯು ಹೆಚ್ಚುವರಿ ಸಮಯ ಬೇಕೆಂದು ಪೋಷಕರ ಪ್ರೊಫೈಲ್‌ಗೆ ತಿಳಿಸುವುದಷ್ಟೇ. ಅದು ಮಾತ್ರ YouTube ಅನ್ನು ಅನ್‌ಲಾಕ್ ಮಾಡುವುದಿಲ್ಲ.", "ವಿನಂತಿ ಕಳುಹಿಸಲಾಗಿದೆ", "ಪೋಷಕರ ಪರಿಶೀಲನೆಗಾಗಿ ವಿನಂತಿಯನ್ನು ಉಳಿಸಲಾಗಿದೆ. ಪೋಷಕರು ಅಥವಾ ಪಾಲಕರು FilterTube ಮೂಲಕ ಹೆಚ್ಚುವರಿ ಸಮಯ ನೀಡುವವರೆಗೆ YouTube ವಿರಾಮದಲ್ಲೇ ಇರುತ್ತದೆ.", "ಇತ್ತೀಚಿನ ವಿನಂತಿಯನ್ನು ಈಗಾಗಲೇ ಪೋಷಕರ ಪರಿಶೀಲನೆಗಾಗಿ ಉಳಿಸಲಾಗಿದೆ. FilterTube ಮೂಲಕ ಹೆಚ್ಚುವರಿ ಸಮಯ ನೀಡುವವರೆಗೆ YouTube ವಿರಾಮದಲ್ಲೇ ಇರುತ್ತದೆ.", "ಪೋಷಕರು ಅಥವಾ ಪಾಲಕರು ನಂಬಲರ್ಹ ಪ್ರೊಫೈಲ್‌ನಿಂದ FilterTube ತೆರೆಯಿರಿ ಹೆಚ್ಚುವರಿ ಸಮಯ ನೀಡಬಹುದು. ಈ ಬಟನ್ YouTube ಅನ್ನು ಅನ್‌ಲಾಕ್ ಮಾಡಿಲ್ಲ."
+    ],
+    "apc": [
+      "هالملف الشخصي", "ملف شخصي مدار من FilterTube", "{surface} مو متاح لهالملف الشخصي", "{profileName} بيقدر يستخدم بس مساحات المشاهدة اللي وافق عليها ملف الأهل أو وليّ الرعاية.", "افتح FilterTube",
+      "0 دقيقة", "{hours} ساعة {minutes} دقيقة", "{hours} ساعة", "{minutes} دقيقة", "0 ثانية", "{minutes} دقيقة {seconds} ثانية", "{seconds} ثانية", "ملف شخصي محمي", "الوقت الباقي لـ {surface}: {timeLeft}", "باقي لـ {profileName} اليوم {timeLeft}.",
+      "بيتصفّر بنص الليل ({timezone}).", "بيتصفّر مع إعادة ضبط السياسة اليومية الجاية.", "FilterTube · وقت الملف الشخصي", "مراجعة الأهل مطلوبة", "وصلت فترة التوقّف اليومية", "{surface} بدّه موافقة الأهل.", "خلص وقت المشاهدة لليوم.",
+      "{profileName} بحاجة إنو الأهل أو وليّ الرعاية يراجعوا قاعدة الوقت هاي قبل ما يقدر {surface} يكفّي.", "{profileName} استهلك وقت YouTube المسموح إلو اليوم. {surface} بيضل موقوف لحد إعادة الضبط اليومية أو الموافقة على وقت زيادة.", "{profileName} · {surface}", "الحد اليومي", "المستخدم اليوم", "إعادة ضبط",
+      "حوّل لملف الأهل أو وليّ الرعاية أو ملف تاني مسموح. الملف اللي خلص وقته ما بيقدر يسكر هالشاشة ولا يوافق لحاله على دخوله.", "تبديل الملفات بيضل بحاجة لفحص PIN العادي. طلب الوقت الزيادة بينحفظ لمراجعة الأهل، بس أبداً ما بيفتح هالملف لحاله.", "بدّل الملف الشخصي", "عم نحمّل الملفات…", "إلغاء تبديل الملف", "ما في ملف تاني متاح على هالجهاز.", "ما قدرنا نحمّل الملفات. خلّي هالصفحة مفتوحة وجرّب مرة تانية.",
+      "ملف شخصي", "ملف الحساب", "افتح", "هالملف الشخصي", "أدخل PIN تبع {profileName}", "عم يتبدّل…", "عم نبدّل لـ {profileName}…", "محاولات PIN الغلط كتيرة. استنى قبل ما تجرّب من جديد.", "هالـ PIN مو صحيح.", "فشل تبديل الملف. جرّب مرة تانية.", "اطلب وقت زيادة",
+      "الطلب المحفوظ هون بس بيخبر ملف الأهل إنو في حاجة لوقت زيادة. ما بيفتح YouTube لحاله.", "انبعت الطلب", "انحفظ الطلب لمراجعة الأهل. YouTube بيضل موقوف لحد ما الأهل أو وليّ الرعاية يعطوا وقت زيادة من FilterTube.", "في طلب جديد محفوظ من قبل لمراجعة الأهل. YouTube بيضل موقوف لحد ما ينعطى وقت زيادة من FilterTube.", "الأهل أو وليّ الرعاية لسه فيهن يفتحوا FilterTube من ملف موثوق ويعطوا وقت زيادة. هالزر ما فتح YouTube."
+    ],
+    "apd": [
+      "الملف ده", "ملف بإدارة FilterTube", "{surface} ما متاح للملف ده", "{profileName} بقدر يستخدم بس أماكن المشاهدة المسموح بيها من ملف الوالد أو الراعي.", "افتح FilterTube",
+      "0 دقيقة", "{hours} ساعة {minutes} دقيقة", "{hours} ساعة", "{minutes} دقيقة", "0 ثانية", "{minutes} دقيقة {seconds} ثانية", "{seconds} ثانية", "ملف محمي", "الزمن الباقي لـ {surface}: {timeLeft}", "باقي لـ {profileName} {timeLeft} اليوم.",
+      "بيتجدد نص الليل ({timezone}).", "بيتجدد في المرة الجاية لتجديد سياسة اليوم.", "FilterTube · زمن الملف", "مراجعة الوالد مطلوبة", "وصل زمن الوقفة اليومية", "{surface} محتاج موافقة الوالد.", "زمن المشاهدة لليوم انتهى.",
+      "{profileName} محتاج الوالد أو الراعي يراجع قاعدة الزمن دي قبل ما {surface} يواصل.", "{profileName} استهلك زمن YouTube المسموح ليه اليوم. {surface} بفضل واقف لحد التجديد اليومي أو الموافقة على زمن زيادة.", "{profileName} · {surface}", "الحد اليومي", "المستخدم اليوم", "التجديد",
+      "حوّل لملف الوالد أو الراعي أو ملف تاني مصرح بيه. الملف الزمن انتهى ليه ما بقدر يقفل الشاشة دي ولا يوافق على دخوله بنفسه.", "تبديل الملفات بمر بفحص PIN العادي. طلب الزمن الزيادة بيتحفظ لمراجعة الوالد، لكن ما بفتح الملف ده براهو أبداً.", "بدّل الملف", "جاري تحميل الملفات…", "إلغاء تبديل الملف", "ما في ملف تاني متاح في الجهاز ده.", "الملفات ما قدرت تتحمل. خلّي الصفحة دي مفتوحة وجرب تاني.",
+      "ملف", "ملف الحساب", "افتح", "الملف ده", "أدخل PIN بتاع {profileName}", "جاري التبديل…", "جاري التبديل لـ {profileName}…", "محاولات PIN الغلط كتيرة. انتظر قبل ما تجرب تاني.", "PIN ده ما صحيح.", "تبديل الملف فشل. جرب تاني.", "اطلب زمن زيادة",
+      "الطلب المحفوظ هنا بس بيبلغ ملف الوالد إنو محتاجين زمن زيادة. ما بفتح YouTube براهو.", "الطلب اتبعت", "الطلب اتحفظ لمراجعة الوالد. YouTube بفضل واقف لحد ما الوالد أو الراعي يدي زمن زيادة من FilterTube.", "في طلب قريب محفوظ من قبل لمراجعة الوالد. YouTube بفضل واقف لحد ما زمن زيادة يتمنح من FilterTube.", "الوالد أو الراعي لسه بقدر يفتح FilterTube من ملف موثوق ويدي زمن زيادة. الزر ده ما فتح YouTube."
+    ],
+    "yo": [
+      "Profaili yìí", "Profaili tí FilterTube ń ṣàkóso", "{surface} kò sí fún profaili yìí", "{profileName} lè lo àwọn àyè ìwòye tí profaili òbí tàbí olùtọ́jú fọwọ́ sí nìkan.", "Ṣí FilterTube",
+      "ìṣẹ́jú 0", "{hours} wákàtí {minutes} ìṣẹ́jú", "{hours} wákàtí", "{minutes} ìṣẹ́jú", "ìṣẹ́jú-àáyá 0", "{minutes} ìṣẹ́jú {seconds} ìṣẹ́jú-àáyá", "{seconds} ìṣẹ́jú-àáyá", "Profaili tí a dáàbò bò", "Àkókò {surface} tó kù: {timeLeft}", "{profileName} ní {timeLeft} tó kù lónìí.",
+      "Yóò tún bẹ̀rẹ̀ ní ọ̀gànjọ́ ({timezone}).", "Yóò tún bẹ̀rẹ̀ ní ìgbàtúnṣe ìlànà ojoojúmọ́ tó kàn.", "FilterTube · àkókò profaili", "Àyẹ̀wò òbí ṣe pàtàkì", "Àkókò ìsinmi ojoojúmọ́ ti dé", "{surface} nílò ìfọwọ́sí òbí.", "Àkókò wíwo òní ti parí.",
+      "{profileName} nílò kí òbí tàbí olùtọ́jú ṣàyẹ̀wò òfin àkókò yìí kí {surface} tó lè tẹ̀síwájú.", "{profileName} ti lo àkókò YouTube tí a yàn fún òní. {surface} yóò dúró títí di ìgbàtúnṣe ojoojúmọ́ tàbí kí a fọwọ́sí àkókò sí i.", "{profileName} · {surface}", "Ààlà ojoojúmọ́", "Èyí tí a lò lónìí", "Ìgbàtúnṣe",
+      "Yí padà sí profaili òbí, olùtọ́jú, tàbí profaili mìíràn tí a fún ní àṣẹ. Profaili tó ti lo àkókò rẹ̀ kò lè ti ojú ìbòjú yìí tàbí fọwọ́sí ààyè tirẹ̀.", "Yíyí profaili padà máa ń tẹ̀lé àyẹ̀wò PIN déédé. A máa fi ìbéèrè àkókò sí i pamọ́ fún àyẹ̀wò òbí, ṣùgbọ́n kò lè ṣí profaili yìí fúnra rẹ̀ láé.", "Yí profaili padà", "Ń ṣí àwọn profaili…", "Fagilé yíyí profaili padà", "Kò sí profaili mìíràn lórí ẹ̀rọ yìí.", "A kò lè ṣí àwọn profaili. Jọ̀wọ́ fi ojú-ewé yìí sílẹ̀ ní ṣíṣí kí o sì tún gbìyànjú.",
+      "Profaili", "Profaili àkáǹtì", "Ṣí", "profaili yìí", "Tẹ PIN fún {profileName}", "Ń yí padà…", "Ń yí padà sí {profileName}…", "Ìgbìyànjú PIN tí kò tọ́ pọ̀ jù. Dúró kí o tó tún gbìyànjú.", "PIN yẹn kò tọ́.", "Yíyí profaili padà kùnà. Tún gbìyànjú.", "Béèrè fún àkókò sí i",
+      "Ìbéèrè tí a fi pamọ́ síbí ń sọ fún profaili òbí nìkan pé a nílò àkókò sí i. Kò ṣí YouTube fúnra rẹ̀.", "A ti fi ìbéèrè ránṣẹ́", "A fi ìbéèrè pamọ́ fún àyẹ̀wò òbí. YouTube yóò dúró títí òbí tàbí olùtọ́jú yóò fi fúnni ní àkókò sí i láti FilterTube.", "A ti fi ìbéèrè tuntun pamọ́ tẹ́lẹ̀ fún àyẹ̀wò òbí. YouTube yóò dúró títí a ó fi fúnni ní àkókò sí i láti FilterTube.", "Òbí tàbí olùtọ́jú ṣì lè ṣí FilterTube láti profaili tí a gbẹ́kẹ̀lé kí ó sì fúnni ní àkókò sí i. Bọ́tìnì yìí kò ṣí YouTube."
+    ],
+    "bho": [
+      "ई प्रोफाइल", "FilterTube से चलावल जाए वाला प्रोफाइल", "{surface} एह प्रोफाइल खातिर नइखे उपलब्ध", "{profileName} खाली ओही देखे के जगह इस्तेमाल कर सकेला जेकरा माई-बाप भा देखभाल करे वाला के प्रोफाइल मंजूरी देले बा।", "FilterTube खोलीं",
+      "0 मिनट", "{hours} घंटा {minutes} मिनट", "{hours} घंटा", "{minutes} मिनट", "0 सेकंड", "{minutes} मिनट {seconds} सेकंड", "{seconds} सेकंड", "सुरक्षित प्रोफाइल", "{surface} के बाकी समय: {timeLeft}", "{profileName} के आज {timeLeft} बाकी बा।",
+      "आधी रात के रीसेट होई ({timezone})।", "अगिला रोज के नीति रीसेट पर रीसेट होई।", "FilterTube · प्रोफाइल के समय", "माई-बाप के समीक्षा जरूरी बा", "रोज के रोक के समय पूरा हो गइल", "{surface} खातिर माई-बाप के मंजूरी जरूरी बा।", "आज के देखे के समय पूरा हो गइल।",
+      "{surface} फेरु चले से पहिले {profileName} के माई-बाप भा देखभाल करे वाला से समय के एह नियम के समीक्षा करावे के जरूरत बा।", "{profileName} आज के YouTube समय-सीमा पूरा इस्तेमाल कर लिहलस। रोज के रीसेट होखे भा अउरी समय मंजूर होखे तबे {surface} फेरु चली; तबले ई रुकी रही।", "{profileName} · {surface}", "रोज के सीमा", "आज इस्तेमाल भइल", "रीसेट",
+      "माई-बाप, देखभाल करे वाला भा दोसर मंजूर प्रोफाइल पर बदलीं। जे प्रोफाइल के समय पूरा हो गइल बा, ऊ एह स्क्रीन के बंद नइखे कर सकत आ अपना पहुँच खुद मंजूर नइखे कर सकत।", "प्रोफाइल बदले में रोज के PIN जाँच होई। अउरी समय के अरजी माई-बाप के देखे खातिर सेव होई, बाकिर ई अपने आप एह प्रोफाइल के कबो अनलॉक ना करी।", "प्रोफाइल बदलीं", "प्रोफाइल लोड हो रहल बा…", "प्रोफाइल बदले के रद्द करीं", "एह डिवाइस पर अउरी प्रोफाइल नइखे।", "प्रोफाइल लोड ना हो सकल। एह पन्ना के खुलल रहे दीं आ फेरु कोशिश करीं।",
+      "प्रोफाइल", "खाता प्रोफाइल", "खोलीं", "ई प्रोफाइल", "{profileName} के PIN डालीं", "बदल रहल बा…", "{profileName} पर बदल रहल बा…", "गलत PIN के बहुत कोशिश भइल। फेरु कोशिश करे से पहिले रुक के इंतजार करीं।", "ऊ PIN सही ना रहे।", "प्रोफाइल बदलल ना जा सकल। फेरु कोशिश करीं।", "अउरी समय मांगीं",
+      "इहाँ सेव कइल अरजी खाली माई-बाप के प्रोफाइल के बतावेला कि अउरी समय चाहीं। ई अपने आप YouTube के अनलॉक ना करे।", "अरजी भेजल गइल", "अरजी माई-बाप के समीक्षा खातिर सेव बा। माई-बाप भा देखभाल करे वाला FilterTube से अउरी समय देई तबले YouTube रुकी रही।", "हाल के अरजी पहिले से माई-बाप के समीक्षा खातिर सेव बा। FilterTube से अउरी समय मिले तबले YouTube रुकी रही।", "माई-बाप भा देखभाल करे वाला भरोसेमंद प्रोफाइल से FilterTube खोल के अउरी समय दे सकेला। एह बटन से YouTube अनलॉक ना भइल।"
+    ]
+  }
+}
