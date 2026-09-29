@@ -14,5 +14,329 @@
       "Buga sakin GitHub yana amfani da takardun izinin GitHub CLI, yana ƙirƙirar drafts kafin loda fayiloli, yana ci gaba daga tags da ake da su, yana loda assets da suka ɓace kawai, yana tantance cikakken tarin assets na ƙarshe, kuma yana bugawa ne bayan tantancewar.",
       "Manhajar FilterTube don wayoyi da allunan Android yanzu tana samuwa ga jama'a a Google Play. Za a iya girka ta daga [shafin jama'a](https://play.google.com/store/apps/details?id=com.filtertube.app) ko a nemo FilterTube a Google Play."
     ]
+  },
+  "3.3.6": {
+    "headline": "Ingantaccen tacewa, lokacin kariya, da sake kunna bidiyo cikin nutsuwa ba tare da talla ba",
+    "summary": "FilterTube 3.3.6 ya ƙara aiwatar da ƙa'idojin shiga kai tsaye, lokacin kariya da zaman Self-Control ga kowane profile, tarin ƙa'idojin toshewa da izini masu aminci, tacewa bisa rukunan hukuma, Advert Void da aka kunna tun farko, da faɗin ayyukan daidaitawa da YouTube na yanzu.",
+    "bannerSummary": "3.3.6 ya ƙunshi tace shiga kai tsaye, lokacin kariya, shigo da jerin ƙa'idoji da BlockTube, rukunan hukuma, Advert Void, da daidaitawa da YouTube na yanzu.",
+    "highlights": [
+      "Ziyartar YouTube kai tsaye, sauyawar playlist, autoplay, da embed da ake tallafawa yanzu suna bin ƙa'idojin karɓar bidiyo da tashoshi iri ɗaya da tace feed; ba sa ƙara kauce musu.",
+      "Iyakar lokacin YouTube ta kowace rana yanzu tana aiki bisa profile mai aiki, tana nuna lokacin da ya rage, tana wanzuwa bayan restart, kuma tana amfani da cikakken shafin timeout mai sauya profile ta PIN. Zaman Self-Control na son rai suna kulle ƙa'idojin da aka zaɓa har sai countdown ya ƙare.",
+      "Ƙa'idojin da aka toshe da waɗanda aka yarda da su suna ci gaba da zama tarin daban-daban ga Main da Kids; babban tsarin Blocklist ko Whitelist ne ke zaɓar tarin da zai sarrafa kallo.",
+      "Shigo da manyan jerin BlockTube da na ƙa'idojin da ake sarrafawa yana da preview, duba ƙarfin ajiya, transactional rollback, tabbatarwa ta sake karantawa, da ƙarin bayyanannun ƙididdiga na ƙara, maimaituwa, tsallakewa, tashoshi, kalmomin nema, regex da video-ID.",
+      "Tace rukuni tana amfani da filin hukuma na YouTube `microformat.playerMicroformatRenderer.category`, cike Player metadata a iyaka daga origin ɗaya, zaɓuɓɓukan toshe rukunan da aka zaɓa ko barinsu kaɗai, tare da ingantaccen sarrafa Watch, rail, Mix, comments da mallakar renderer.",
+      "Advert Void yana kunne tun farko ga sababbin profiles da waɗanda aka haɓaka a YouTube Main da Kids. Shared Web runtime yana cire filayen ad-plan na Player da aka gani ba tare da ƙarin requests ba; native playback yana watsar da bayanan ad-plan da ba a tsara su ba ko ya daidaita raw Reel response idan yana nan, yayin da guarded fallback ke magance interruptions da suka kuɓuta.",
+      "Tace harshen magana na gwaji da fifita original audio suna amfani da shaidar YouTube Player idan tana samuwa, kuma suna barin content ya wuce idan babu recommendation metadata.",
+      "Wannan release kuma ya ƙunshi ɓoye YouTube Playables, sarrafa camelCase renderers na yanzu da collaboration, Help da search masu sauƙin karantawa, controls na popup da dashboard masu bayyana, da shafukan matsayin jama'a na Android Google Play da iOS.",
+      "Settings ya ƙunshi zaɓin opt-out na dukkan na'urori wanda ba a zaɓa tun farko ba, don kashe tunatarwar reload ta atomatik da What's New banners a YouTube da YouTube Kids. Shafin What's New na Dashboard yana nan don buɗewa da hannu."
+    ]
+  },
+  "3.3.5": {
+    "headline": "Dawowa daga matsalolin YouTube da toshe tashoshin Shorts da wuri",
+    "summary": "Wannan release ya gyara shigar da content runtime sau biyu a YouTube tabs da aka riga aka buɗe kuma ya warware asalin tashoshin Shorts da ake gani da wuri idan ƙa'idojin toshe tashoshi ko whitelist mode suna aiki.",
+    "bannerSummary": "Yana gyara runtime injection sau biyu, yana inganta gano asalin tashoshin Shorts da aka toshe, kuma yana rubuta iyakar rollback ta v3.3.4.",
+    "highlights": [
+      "Install/update/profile refresh ba sa ƙara shigar da manifest content scripts a YouTube tabs da aka buɗe, don haka kuskuren syntax `Identifier ... has already been declared` ba ya maimaituwa.",
+      "YouTube tabs da aka buɗe har yanzu suna iya karɓar gwaje-gwajen time-limit/runtime da ake sarrafawa ba tare da maimaita ayyana scripts ba.",
+      "Shorts da ake gani ko kusan gani yanzu suna amfani da iyakantaccen background `/shorts/<videoId>` owner resolver idan channel blocklist rules ko whitelist mode suna aiki.",
+      "Ana adana learned Shorts video-to-channel mappings kuma ana sake sarrafa su nan take, don haka Shorts na tashar da aka toshe ba sa buƙatar hover ko mu'amalar menu kafin ɓoyewa.",
+      "Desktop Shorts hosts kamar `.shortsLockupViewModelHost` da `.ytGridShelfViewModelGridShelfItem` suna cikin takamaiman hanyoyin Shorts fallback/enrichment.",
+      "Blocklist mode ba ya ɓoye Shorts da ba a sani ba sai an warware identity; whitelist mode ya fi tsauri ta hanyar pending path da ke akwai.",
+      "An rubuta v3.3.4 a matsayin store rollback zuwa package v3.3.2 yayin da ake binciken rahoton matsalar YouTube."
+    ]
+  },
+  "3.3.4": {
+    "headline": "Store rollback zuwa package v3.3.2",
+    "summary": "v3.3.4 release ce ta rollback ga browser stores wadda ta yi amfani da tsohon package v3.3.2 yayin binciken rahotannin matsalar YouTube da suka shafi v3.3.3.",
+    "bannerSummary": "Rollback release: v3.3.4 ta yi amfani da package v3.3.2 yayin binciken rahotannin matsalar YouTube.",
+    "highlights": [
+      "Ba a yi ikirarin wani sabon aikin feature da ya fito daga source ga v3.3.4 ba.",
+      "An yi amfani da rollback don cire package v3.3.3 da ake zargi daga stores yayin binciken issue #64.",
+      "Source release ta gaba, v3.3.5, tana ɗauke da gyaran duplicate runtime injection da Shorts identity."
+    ]
+  },
+  "3.3.3": {
+    "headline": "Sabunta na'urorin iyali, jerin ƙa'idoji, kalmomin nema na kwanan wata, da sabunta YouTube DOM",
+    "summary": "Wannan release ya sauƙaƙa fahimtar ikon iyaye/masu kula, ya ƙara shigo da jerin ƙa'idojin da aka duba da ƙa'idojin kalmomin nema masu iyakar kwanan wata, ya rubuta Home/Internet Pickup model, kuma ya sabunta tacewa ga markup na YouTube/YTM na yanzu.",
+    "bannerSummary": "Wannan release ya ƙunshi Family Device Updates, shigo da jerin ƙa'idojin da aka duba, kalmomin nema masu iyakar kwanan wata, Help mai fifita iyaye, da dacewa da YouTube/YTM DOM na yanzu.",
+    "highlights": [
+      "Profiles na iyaye/masu kula za su iya sarrafa profiles masu kariya, gyara ƙa'idojin yara/profiles masu kariya daga parent dashboard, da aika sabuntawa da aka amince da su zuwa na'urorin kariya da aka tabbatar.",
+      "Family Device Updates yanzu suna bayyana Send Update kai tsaye, Home Pickup bayyananne, da Internet Pickup bayyananne, ba tare da ɗaukar pickup services a matsayin iko ba.",
+      "Iyakar lokacin profiles masu kariya yanzu tana duba tsofaffi da sababbin YouTube tabs, tana nuna allon timeout mai natsuwa, kuma tana rubuta buƙatar ƙarin lokaci don iyaye su duba.",
+      "Shigo da jerin ƙa'idoji yana tallafawa CSV, TXT, JSON mai sauƙi, JSON irin na BlockTube, da raw HTTPS URLs; tare da preview kafin amfani, Main/Kids/Both targets, templates, sarrafa lists, pause/resume/remove, duba tsufa da refresh.",
+      "Tace kalmomin nema bisa kwanan wata na iya amfani da kalma daga, zuwa, ko tsakanin upload dates. Tace comments tana amfani da upload date na babban video idan YouTube ya samar da shi.",
+      "Help da dashboard controls yanzu suna amfani da harshe mai sauƙi mai fifita iyaye, help bubbles masu sauri, da bayanin Exact, Comment, Date, PINs, jerin ƙa'idoji da updates na na'urori mafi bayyane.",
+      "Dashboard yanzu yana gayyatar masu amfani da Android closed-testing masu aiki su aika email zuwa hello@filtertube.in kuma yana riƙe da fitacciyar tunatarwa don ba da rahoton matsalar tacewa idan YouTube ya sauya tsarin shafuka.",
+      "YouTube desktop lockup selectors da YTM mobile camelCase DOM an rubuta su don a ci gaba da tace ainihin video cards, yayin da Watch-page chip bars ba sa kunna fallback work ko haifar da tsalle-tsallen scroll.",
+      "Har yanzu daban: gano LAN peers ta atomatik, hosted FilterTube Internet Pickup service, silent public auto-subscribe catalogs, native Android/iOS parity, da shaidar manual smoke test a kan na'urori biyu da aka girka."
+    ]
+  },
+  "3.3.2": {
+    "headline": "MVP na manhajar mobile/tablet, YouTube mai sauƙin aiki, da whitelist mafi aminci",
+    "summary": "Wurin sakin manhaja ga jama'a ya shirya don gwajin ƙarshe na Android phone/tablet da matsayin iOS/iPad; extension dashboard yanzu yana nuna waɗannan hanyoyin, aikin YouTube SPA ya fi shiru idan babu ƙa'idoji masu aiki, kuma wannan release ya ƙunshi gyaran daidaiton whitelist/end-screen.",
+    "bannerSummary": "Wannan release ya ƙunshi hanyoyin sakin manhajar mobile/tablet, ingantaccen halin YouTube runtime, logs masu shiru a production, da gyaran leaks na whitelist/end-screen.",
+    "highlights": [
+      "Cibiyar saukarwa ta website da extension dashboard yanzu suna nuna hanyar gwajin ƙarshe ta Android phone/tablet da hanyar matsayin TestFlight/App Store ta iOS/iPad.",
+      "An rubuta saitin sakin Android phone/tablet bisa shared FilterTube runtime, YouTube Main, damar shiga YouTube Kids ga jama'a, profiles, PIN rules da Nanah sync.",
+      "Aikin saurin YouTube SPA yanzu yana tsallake ƙarin JSON clone/parse/replay, DOM fallback, quick-block, fallback-menu, da whitelist-pending work idan babu ƙa'idoji masu aiki ko buƙatar route.",
+      "Production extension contexts suna ƙuntata routine console logging ga lokacin da aka kunna debug mode a sarari, don browsing na yau da kullum kada ya ɗauki console overhead a YouTube hot paths.",
+      "Gyaran sakin whitelist ya shafi Shorts creator fallback, tura list-target, da compact autoplay/watch-next endpoint filtering ga end-screen controls.",
+      "An ƙarfafa FilterTube DOM state attributes don rage manyan alamomin `data-filtertube-*` da ake gani yayin kiyaye runtime state da ake buƙata.",
+      "Accounts & Sync yanzu yana rubuta Family Device Updates game da Send Update, Home Pickup na zaɓi, da Internet Pickup idan ana waje/za a buɗe daga baya, domin iyaye su gane live sync, home pickup, online pickup da abin da ba iko ba.",
+      "Iyakar lokacin profile mai kariya yanzu tana da release-facing documentation game da daily YouTube budgets, timeout screens, tarihin buƙatar ƙarin lokaci, da amincewar iyaye/masu kula.",
+      "Hanyoyin Nanah/import suna riƙe mallakar Filter All keywords da aka samo daga tashoshi tsakanin extension da native app payloads, ciki har da row color, source-badge metadata da pairing context."
+    ]
+  },
+  "3.3.1": {
+    "headline": "Amintaccen P2P sync tsakanin na'urori ba tare da third-party server ba",
+    "summary": "Accounts & Sync yanzu yana gabatar da Nanah ta hanyoyi uku masu sauƙi, tare da ingantaccen targeting na iyaye/yara, ƙa'idojin reconnect masu bayyane, da faɗin documentation don amfani na gaske.",
+    "bannerSummary": "Nanah sync, ingantaccen kulawar iyaye/yara, ƙa'idojin reconnect mafi aminci, da cikakkun docs na sabon Accounts & Sync flow.",
+    "highlights": [
+      "Accounts & Sync yanzu yana farawa da hanyoyi uku mafi bayyane: Send this profile once, Parent controls child, da Move full account.",
+      "Advanced Nanah controls har yanzu suna nan, amma suna ɓoye a Advanced section maimakon su jagoranci dukan flow.",
+      "Parent/source sessions za su iya zaɓar remote target profile da kyau, kuma managed-link saves yanzu ana madubi zuwa sender don na'urorin biyu su riƙe trust record iri ɗaya.",
+      "Trusted links suna nan bayan refresh, amma reconnect har yanzu sabon live session ne, ba hidden background sync ba.",
+      "An ƙarfafa locked child updates, reconnect rules, adana device labels, da kariya daga self-join/session-burn don ingantaccen kulawar iyaye.",
+      "README, Architecture, Technical, Functionality, Profiles & PIN, project plan, user guide, da concern tracker yanzu suna rubuta Nanah desktop checkpoint na yanzu da ƙarin bayani."
+    ]
+  },
+  "3.3.0": {
+    "headline": "Maido da collaboration da ƙarfafa imports tsakanin browsers",
+    "summary": "Watch/YTM collaboration menus suna maido da cikakken roster cikin aminci, subscription import ya ƙaru ƙarfi tsakanin browsers, kuma an haɗa wasu gyaran whitelist da Quick Block na musamman ga surfaces a cikin 3.3.0.",
+    "bannerSummary": "Ingantattun collab menus, whitelist import mai ƙarfi, Quick Block surfaces mafi aminci, links kai tsaye zuwa tashoshi, da sabon toggle na 3-dot block item.",
+    "highlights": [
+      "Mobile YouTube home/watch-next/Mix-style cards yanzu suna shiga flow ɗin dawo da collaborators da 3-dot iri ɗaya, maimakon su koma menus marasa cikakken bayani na channel guda.",
+      "Watch-page right rail, playlist rows, da watch-like lockups yanzu suna iya dawo da cikakken collaborator roster da refresh active 3-dot menu a wurin.",
+      "Mix/watch recovery ya fi aminci: ana haɓaka ainihin collaboration cards daidai, yayin da sunaye na yau da kullum masu ɗauke da '&' ko 'and' ba sa zama menus na bogi.",
+      "Quick Block ya fi kwanciyar hankali a surfaces masu rikitarwa: yana nan sama da ƙarin desktop cards, yana kauce wa mobile search-suggestion dropdowns, kuma yana anchor da kyau a mobile watch-next layouts.",
+      "Subscribed-channel whitelist import yanzu yana riƙe recent page browse responses, yana fifita haɓakar /feed/channels ta gaske, kuma yana kiyaye /feed/channels a matsayin management surface mai gani.",
+      "Whitelist filtering ya fi tsauri da aminci a YouTube desktop/mobile renderers, ciki har da ingantaccen sarrafa creator pages da Mixes/subscriptions hide controls.",
+      "Sabbin controls da polish: Channel Management rows suna haɗawa zuwa ainihin channel pages, ana iya kashe 3-dot block item, kuma encrypted Firefox export yana amfani da fallback mafi aminci."
+    ]
+  },
+  "3.2.9": {
+    "headline": "Shigo da Subscribed Channels, whitelist, da gyaran PIN protection",
+    "summary": "Shigo da subscriptions na active YouTube account zuwa whitelist tare da ma'anar sauya mode mafi bayyane da ingantaccen startup flow na /feed/channels.",
+    "bannerSummary": "Gina whitelist daga YouTube subscriptions ɗinka na yanzu tare da inline progress da ingantaccen halin kunna whitelist.",
+    "highlights": [
+      "Sabon Tab View import yana iya shigo da subscribed channels daga active signed-in YouTube account zuwa whitelist.",
+      "Import startup yanzu yana sake amfani da live YouTube tab, yana kai shi /feed/channels, kuma yana jiran FilterTube bridge kafin farawa.",
+      "Rubutun whitelist ya fi bayyane: Import Only baya taɓa blocklist, yayin da Import + Turn On Whitelist ke bin hanyar ƙaura daga blocklist zuwa whitelist da ke akwai.",
+      "Documentation yanzu yana ƙarin bayani game da import architecture, FEchannels request flow, renderer sources, da whitelist semantics."
+    ]
+  },
+  "3.2.8": {
+    "headline": "Sabunta theme da daidaita Scenic UI shell",
+    "summary": "Popup da dashboard surfaces yanzu suna amfani da tsarin scenic theme mai natsuwa, tare da layout mafi matsewa, tint states mafi bayyane, da daidaiton light/dark mafi kyau.",
+    "bannerSummary": "An inganta theme na popup da dashboard da transparency mai natsuwa, pills masu bayyani, da ingantaccen responsive layout.",
+    "highlights": [
+      "Scenic UI refresh: popup da dashboard yanzu suna raba product shell mai natsuwa, tare da local hero video a matsayin ambient background media.",
+      "Light da dark theme tuning: dark mode yana nuna scenic background ba tare da center glow mai dusashewa ba, yayin da light mode ke amfani da transparency mafi tsafta.",
+      "Responsive cleanup: popup spacing ya matse, profile dropdown ya yi ƙanƙanta, Help/Support card layout ya inganta, kuma mobile fit a filter surfaces ya fi kyau.",
+      "Control tint fixes: enabled/disabled states, pill colors, search fields da import/export actions yanzu sun fi bayyane a duka themes."
+    ]
+  },
+  "3.2.7": {
+    "headline": "Category filters, Quick Block cross yayin hover, da Mobile 3 Dot UI",
+    "summary": "Sabuwar category filtering da Quick Cross Block na taɓawa guda da aka kunna tun farko.",
+    "bannerSummary": "Yi amfani da sabbin category filters da Quick Cross Block daga kan hover na cards, tare da ingantaccen tallafin toshewa a YT Mobile.",
+    "highlights": [
+      "Category Filtering: toshe ko ba da izinin videos bisa YouTube category (Music, Gaming, Education, da sauransu).",
+      "Quick Cross Block default ON: `Show Quick Cross Block button` yana kunne tun farko a v3.2.7 (users na iya kashe shi).",
+      "Mobile Blocking: ingantaccen tallafin toshewa a YT Mobile ta 3 Dot UI da Quick Cross Block, wanda yanzu ke aiki a Home Page."
+    ]
+  },
+  "3.2.6": {
+    "headline": "Kawata UI/UX da tacewa bisa content",
+    "summary": "Cikakken inganta typography da modern design, tare da sabbin content filters uku: duration, date, da uppercase.",
+    "bannerSummary": "Sabon UI mai kyau tare da content filters na duration, upload date, da gano clickbait.",
+    "highlights": [
+      "Typography updates: modern kuma refined font scale don sauƙin karantawa.",
+      "Content-based filters: duration (mafi tsawo/gajere/tsakanin), upload date (mafi sabo/tsoho/tsakanin), da gano uppercase (clickbait titles).",
+      "Tsarin `videoMetaMap`: ajiyar video metadata mai dawwama tare da batching mai hankali (75ms window, iyakar entries 1500).",
+      "Dashboard improvements: stats na musamman ga surface (Main da Kids), stat cards ingantattu, da donate promo card."
+    ]
+  },
+  "3.2.5": {
+    "headline": "Ɗaukaka Whitelist mode da ƙarfafa kwanciyar hankali",
+    "summary": "Whitelist mode yanzu ita ce babbar hanyar allow-only, tare da extraction mai hankali, kariyar playlist, da rage amfani da CPU.",
+    "bannerSummary": "An ɗaukaka whitelist mode tare da UI mafi tsafta, ingantaccen playlist stability, da Kids support.",
+    "highlights": [
+      "An ɗaukaka whitelist mode: wording/UI ba sa ƙara nuna shi a matsayin experimental.",
+      "Share 3-dot menu da search-secondary handling ga whitelist surfaces.",
+      "Ciro channels daga sources da yawa tare da thumbnail anchors da parent containers.",
+      "Mode-aware state tracking tare da confirmation dialogs da bridge optimizations.",
+      "Playlist stability: layukan da aka zaɓa suna nan a gani; pending identities ba sa sake nuna layukan da aka toshe.",
+      "Kids mode whitelist support tare da tsarin da ba ya amfani da network."
+    ]
+  },
+  "3.2.4": {
+    "headline": "Ingantaccen Whitelist mode da performance optimizations",
+    "summary": "Muhimman gyare-gyare ga experimental whitelist mode tare da ingantaccen UX, performance optimizations da faɗaɗa Kids mode support.",
+    "bannerSummary": "Whitelist mode ya fi hankali tare da UI mafi tsafta, ingantaccen performance, da Kids support.",
+    "highlights": [
+      "EXPERIMENTAL: ingantaccen whitelist mode tare da 3-dot menu cleanup, intelligent search processing da mode-aware state tracking.",
+      "Performance boost: bridge-level optimizations da selective processing suna rage amfani da CPU.",
+      "UI improvements: confirmation dialogs suna hana asarar data ta kuskure yayin sauya mode.",
+      "Kids mode support: whitelist functionality yanzu tana aiki a YouTube Kids da zero-network architecture.",
+      "Search optimizations: ana sarrafa right-rail watch cards da hankali don hana cunkushewar UI.",
+      "Channel extraction: multi-source identity resolution tare da thumbnail anchors da parent containers.",
+      "Mode switching: sauyawa mai santsi tsakanin blocklist/whitelist tare da intelligent reprocessing."
+    ]
+  },
+  "3.2.3": {
+    "headline": "Experimental Whitelist mode da UI improvements",
+    "summary": "Alpha release na whitelist mode don tacewa ta allow-only, tare da ingantattun UI updates da mobile menu support.",
+    "bannerSummary": "Gwada experimental whitelist mode — ɓoye komai sai channels da aka yarda da su.",
+    "highlights": [
+      "EXPERIMENTAL: whitelist mode tana ɓoye duk content sai channels/keywords da aka amince da su a sarari.",
+      "Dual filtering modes tare da sauƙin sauyawa tsakanin blocklist da whitelist a popup da tab view.",
+      "Stage migration — koma blocklist don tattara channels, sannan a haɗa su koma whitelist.",
+      "Watch page protection a whitelist mode yana kiyaye video playback functionality.",
+      "Optimistic UI updates suna ɓoye content nan take kuma suna mayar da shi ta atomatik idan blocking ya gaza.",
+      "Ingantaccen mobile menu support tare da madaidaicin sarrafa YouTube mobile renderers.",
+      "Duk console logs yanzu suna ƙarƙashin debug flag don rage hayaniyar production."
+    ]
+  },
+  "3.2.2": {
+    "headline": "UI/UX improvements da Debug gating",
+    "summary": "Optimistic updates, mobile menu support, debug-gated logging, kiyaye scroll, da gyare-gyaren state management.",
+    "bannerSummary": "UI feedback nan take, mobile menu polish da debug-gated logs tare da ingantaccen state handling.",
+    "highlights": [
+      "Optimistic UI updates: content yana ɓoyewa nan take kuma yana dawowa ta atomatik idan blocking ya gaza.",
+      "Ingantaccen mobile menu support ga `ytm-menu-popup-renderer` tare da daidaitattun renderer tags.",
+      "Debug-gated logging ta `window.__filtertubeDebug`.",
+      "Kiyaye scroll yayin DOM fallback don hana tsalle-tsalle masu tayar da hankali.",
+      "Channel enrichment limit (10 a kowane session) don rage background requests.",
+      "Idle-scheduled rendering da `requestIdleCallback` da batching.",
+      "External reload debouncing ta signature comparison don guje wa renders marasa amfani.",
+      "Selective notifications: `load` ne kawai idan signature ta canza; in ba haka ba `externalUpdate`.",
+      "Bridge state management ta shared global state."
+    ]
+  },
+  "3.2.1": {
+    "headline": "Processing ba tare da lag ba da performance boost",
+    "summary": "Manyan performance optimizations suna kawar da UI lag, tare da kyakkyawan sakamako a Chromium browsers da gagarumin ci gaba a Firefox.",
+    "bannerSummary": "Lag-free filtering tare da async processing, compiled caching, da batched updates.",
+    "highlights": [
+      "Async DOM processing yana bai wa main thread dama ya yi aiki kuma yana hana browser daskarewa yayin filtering mai nauyi.",
+      "Compiled regex da channel filter caching suna ba da O(1) lookups, suna rage amfani da CPU da 60–80%.",
+      "Batched storage updates suna rage I/O operations da 70–90% ta amfani da 250ms intervals masu hankali.",
+      "Debounced settings refresh yana hana yawan DOM reprocessing.",
+      "Run state management yana hana overlapping executions kuma yana queue requests yadda ya kamata.",
+      "Chromium browsers: lag ya ragu sama da 90%; Firefox: gagarumin ci gaba yayin da optimization ke ci gaba."
+    ]
+  },
+  "3.2.0": {
+    "headline": "Toshewa nan take da Kids ba tare da network ba",
+    "summary": "3-dot menus suna nuna sunan channel nan take, network requests sun ragu sosai, kuma YouTube Kids yana aiki gaba ɗaya offline.",
+    "bannerSummary": "Toshewa ba tare da jinkiri ba da proactive XHR interception; Kids mode yana aiki ba tare da network fetches ba.",
+    "highlights": [
+      "3-dot menus yanzu suna nuna sunan channel daidai nan take — babu jinkirin 'Fetching...'.",
+      "Channel identity tana fitowa daga intercepted YouTube JSON responses, tana rage network calls.",
+      "YouTube Kids yana aiki gaba ɗaya ba tare da network fetches don toshewa mai aminci ba.",
+      "Ana cike metadata da ya ɓace a background cikin sauri mai iyaka (cooldown na awa 6).",
+      "Topic channels (misali, 'Music - Topic') ana sarrafa su musamman ba tare da `@handles` ba.",
+      "Sabbin cikakkun documents tare da ASCII da Mermaid flow diagrams."
+    ]
+  },
+  "3.1.9": {
+    "headline": "Backups da ke la'akari da profile da controls masu kariyar lock",
+    "summary": "Auto-backup da content controls yanzu suna bin profile locks/PINs, suna gadon settings na kowane profile, kuma profile dropdown yana ci gaba da dannuwa sama da lock gate.",
+    "bannerSummary": "Auto-backup ga kowane profile da kulle profiles masu kariya; profile selector yana ci gaba da dannuwa koyaushe.",
+    "highlights": [
+      "Masu zaɓar mode/format na auto-backup suna kashewa idan auto-backup a kashe yake ko profile yana kulle; sababbin profiles suna gadon auto-backup preferences.",
+      "Auto-backup scheduling yanzu yana farawa lokacin ƙirƙirar profile da sauya mode/format, amma idan auto-backup yana kunne ga wannan profile kawai.",
+      "Content-control toggles da backup controls suna nan a kashe ko suna komawa baya idan an kulle; export scope na non-master profiles yana iyakantuwa ga active profile kawai.",
+      "Gyaran z-index na profile dropdown yana sa a iya danna shi ko da lock gate banner yana bayyane.",
+      "An sabunta documentation na profile/PIN model, profile-scoped backups, da UI gating rules."
+    ]
+  },
+  "3.1.8": {
+    "headline": "Support tab da amintattun auto-backups",
+    "summary": "An ƙara sabon Support page (Ko-fi) kuma auto-backups yanzu suna aiki cikin aminci a Chrome da Firefox.",
+    "bannerSummary": "Auto-backups yanzu suna aiki a browsers daban-daban kuma suna maye gurbin fayil ɗaya na backup mafi sabo.",
+    "highlights": [
+      "An ƙara Support page a dashboard tare da Ko-fi embed.",
+      "Auto-backups yanzu suna overwrite fayil ɗaya mai juyawa: Downloads/FilterTube Backup/FilterTube-Backup-Latest.json.",
+      "Download strategy tana aiki a browsers daban-daban (Blob URL idan akwai; data: URL fallback ga Chrome MV3 service worker).",
+      "Firefox downloads ba sa ƙara faɗuwa saboda takunkumin data: URL."
+    ]
+  },
+  "3.1.7": {
+    "headline": "YT Kids da tallafin auto-backup",
+    "summary": "Ana iya toshe content bisa channel a YT Kids kuma yanzu ana iya kunna/kashe auto-backups.",
+    "bannerSummary": "Sabuwar setting: kunna/kashe auto-backups. Ana adana exports a Downloads/FilterTube Export/.",
+    "highlights": [
+      "An ƙara cikakken toshewa bisa Channel da Keyword a YT Kids; ana toshe channels ta sauraron UI na 3-dot menu a YT Kids a hankali.",
+      "An ƙara Settings toggle don kunna/kashe auto-backups (ƙoƙari mafi kyau; babu Save As prompts).",
+      "Ana adana auto-backups a Downloads/FilterTube Backup/ tare da juyawa (ana barin fayiloli mafi sabo).",
+      "Manual exports yanzu ana sauke su a hankali zuwa Downloads/FilterTube Export/."
+    ]
+  },
+  "3.1.6": {
+    "headline": "Tallafin import/export da release banner",
+    "summary": "Banner CTA yanzu yana haɗa kai tsaye da What's New na dashboard, ana ɗauko curated cards daga JSON ɗin nan, kuma imports sun fi bin c/ChannelName da merge rules.",
+    "bannerSummary": "Release banner yana buɗe What's New tab a cikin extension kuma import/export documentation yanzu yana bayyana cikakken flow.",
+    "highlights": [
+      "Release notes JSON yana ciyar da dashboard cards da YouTube banner daga tushe guda na gaskiya.",
+      "CTA yana buɗe tab-view ta background messaging don blockers kada su hana chrome-extension:// links.",
+      "Import/export documentation da code suna bayyana yadda ake daidaita UC/handle/c/ChannelName inputs kafin haɗawa."
+    ]
+  },
+  "3.1.5": {
+    "headline": "Shorts da abubuwan membobi sun ɓace da gaske",
+    "summary": "Watch page da sidebar yanzu suna ɓoye Shorts renderers da members-only shelves kafin su bayyana, kuma toggle state ta ƙarshe tana dawwama.",
+    "bannerSummary": "An ƙarfafa ɓoye Members-only da Shorts a Watch da sidebar domin blocked rows kada su sake bayyana.",
+    "highlights": [
+      "Sidebar yana duba `/shorts/` hrefs, overlays, da aria-labels kafin a render cards.",
+      "Gano members-only yana rufe compact, Watch, da shelf rows tare da sababbin badges da playlist heuristics.",
+      "An gyara members-only toggle persistence bug don state ta dawwama bayan reload."
+    ]
+  },
+  "3.1.4": {
+    "headline": "Dashboard ya zama responsive",
+    "summary": "Navigation tana rufewa da kyau a mobile, inputs suna wrap cikin sauƙi, kuma playlist/Mix controls sun samu toggle mafi bayyane.",
+    "highlights": [
+      "Hamburger nav da overlay ga ƙananan screens tare da ingantaccen grid spacing.",
+      "Toggles masu sauƙin tracks, thumbs a tsakiya, da mafi kyawun dark-mode contrast.",
+      "Mix/Radio chip tana ɓoyewa idan Mix toggle yana kunne; playlist hiding tana tsallake radio items."
+    ]
+  },
+  "3.1.3": {
+    "headline": "Sabon fasalin Help legend",
+    "summary": "Cards, pills, da tooltips suna bayyana daidai abin da Exact / Comment / Filter All suke yi, daidai da sabon salo na dashboard.",
+    "highlights": [
+      "Help tab yana nuna badge tints da collaboration labels da launukan da suka dace.",
+      "Popup da tab search bars suna bin tsari iri ɗaya na cikakken faɗi.",
+      "An matsar da content control descriptions zuwa hover tooltips don su fi bayyana."
+    ]
+  },
+  "3.1.2": {
+    "headline": "Ƙarfafa playlist autoplay",
+    "summary": "Autoplay yana tsallake blocked playlist rows ba tare da nuna su ko na ɗan lokaci ba, kuma sticky hiding yana jure sake sarrafa YouTube.",
+    "highlights": [
+      "Next-click yana faruwa ne kawai idan playlist row na gaba yana bayyane da gaske.",
+      "Watch playlist panel rows suna ɓoye ko da identity ba a warware ba na ɗan lokaci.",
+      "3-dot menu yana rufewa da kyau bayan blocking don miniplayer ya ci gaba da aiki."
+    ]
+  },
+  "3.1.1": {
+    "headline": "Help tab da gyaran identity",
+    "summary": "Dashboard ya samu keɓaɓɓen Help tab yayin da UC ↔ handle ↔ custom URL mapping ya zama abin dogaro.",
+    "highlights": [
+      "Help reference tana rubuta duk toggles, badges, da keyword behaviors.",
+      "Playlist navigation tana tsallake blocked rows ba tare da playback flashes ba.",
+      "Handle/custom URL fallback yana gano UC ID daidai cikin aminci."
+    ]
+  },
+  "3.1.0": {
+    "headline": "Bayyananniyar documentation da hybrid filtering",
+    "summary": "An rubuta hybrid interception + DOM fallback architecture tare da diagrams don bayyana yadda FilterTube ke aiwatar da blocking.",
+    "highlights": [
+      "An rubuta daidaiton Watch-page 3-dot menu da collaborators na home/search.",
+      "An jera ragowar playlist regressions don gyaransu ya ci gaba da bayyana.",
+      "An daidaita manifests, build tooling, da UI footer tare da 3.1.0 version bump."
+    ]
   }
 }
