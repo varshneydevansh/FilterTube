@@ -14,5 +14,383 @@
       "La pubblicazione delle release GitHub usa le credenziali di GitHub CLI, crea bozze prima del caricamento, riprende i tag esistenti, carica solo gli asset mancanti, verifica l'insieme finale degli asset e pubblica soltanto dopo la verifica.",
       "L'app FilterTube per telefoni e tablet Android è ora disponibile al pubblico su Google Play. Si può installare dalla [pagina pubblica](https://play.google.com/store/apps/details?id=com.filtertube.app) oppure cercando FilterTube su Google Play."
     ]
+  },
+  "3.3.6": {
+    "ctaLabel": "Scopri le novità",
+    "headline": "Filtri più solidi, tempo protetto e riproduzione senza annunci più fluida",
+    "summary": "FilterTube 3.3.6 introduce controlli anche per l’accesso diretto, tempo protetto e sessioni Self-Control per profilo, raccolte affidabili di regole bloccate e consentite, filtri ufficiali per categoria, Advert Void attivo per impostazione predefinita e un’ampia compatibilità con la versione attuale di YouTube.",
+    "bannerSummary": "La versione 3.3.6 include filtri per l’accesso diretto, tempo protetto, importazione di elenchi di regole e BlockTube, categorie ufficiali, Advert Void e compatibilità con YouTube aggiornato.",
+    "highlights": [
+      "Le visite dirette a YouTube, i passaggi tra playlist, la riproduzione automatica e gli incorporamenti supportati seguono ora le stesse regole di ammissione per video e canali, senza aggirare il filtraggio del feed.",
+      "I limiti giornalieri di YouTube si applicano a ogni profilo attivo, mostrano il tempo rimanente, persistono dopo il riavvio e usano una schermata di timeout a pagina intera con cambio profilo compatibile con il PIN; le sessioni volontarie Self-Control bloccano le regole selezionate fino alla fine del conto alla rovescia.",
+      "Le raccolte di regole bloccate e consentite restano indipendenti per YouTube principale e Kids; la modalità Bloccati o Consentiti in alto determina quale raccolta controlla la visione.",
+      "Le importazioni di BlockTube e di elenchi gestiti supportano ora anteprima, controlli di capacità, rollback transazionale, verifica rileggendo i dati e conteggi più chiari di elementi aggiunti, duplicati, saltati, canali, parole chiave, espressioni regolari e ID video.",
+      "Il filtro per categoria usa il campo ufficiale di YouTube `microformat.playerMicroformatRenderer.category`, il caricamento controllato dei metadati Player dalla stessa origine, le opzioni chiare «Blocca selezionati» o «Consenti solo selezionati» e una gestione più sicura di Watch, barra laterale, Mix, commenti e renderer.",
+      "Advert Void è attivo per impostazione predefinita nei profili nuovi e aggiornati su YouTube principale e Kids. Il runtime Web condiviso rimuove i campi di pianificazione pubblicitaria osservati nel Player senza richieste aggiuntive; la riproduzione nativa scarta i dati del piano non modellati o normalizza la risposta Reel grezza quando disponibile, mentre un ripiego protetto gestisce le interruzioni che riescono a passare.",
+      "I filtri sperimentali per la lingua parlata e la preferenza per l’audio originale usano, quando disponibili, le prove del Player YouTube e non bloccano i contenuti se mancano i metadati dei consigli.",
+      "Sono inclusi anche Nascondi YouTube Playables, la gestione aggiornata dei renderer camelCase e delle collaborazioni, una sezione Aiuto più leggibile e ricercabile, controlli popup e dashboard più chiari e le informazioni pubbliche sullo stato Android Google Play e iOS.",
+      "Le impostazioni includono un’opzione, disattivata per impostazione predefinita e valida per tutto il dispositivo, per disabilitare gli avvisi automatici di ricaricamento e i banner Novità su YouTube e YouTube Kids. La pagina Novità della dashboard resta consultabile manualmente."
+    ],
+    "detailsUrl": "https://github.com/varshneydevansh/FilterTube/releases/tag/v3.3.6"
+  },
+  "3.3.5": {
+    "ctaLabel": "Scopri le novità",
+    "headline": "Ripristino dei problemi di YouTube e blocco anticipato dei canali Shorts",
+    "summary": "Questa versione corregge la doppia iniezione del runtime dei contenuti nelle schede YouTube già aperte e identifica prima il canale degli Shorts visibili quando sono attive le regole di blocco canali o la modalità Consentiti.",
+    "bannerSummary": "Corregge la doppia iniezione del runtime, migliora l’identificazione dei canali bloccati negli Shorts e documenta i limiti del rollback v3.3.4.",
+    "highlights": [
+      "L’installazione, l’aggiornamento e l’aggiornamento del profilo non reiniettano più gli script dei contenuti del manifest nelle schede YouTube già aperte, evitando errori di sintassi ripetuti `Identifier ... has already been declared`.",
+      "Le schede YouTube già aperte continuano a ricevere i controlli runtime e dei limiti di tempo gestiti senza dichiarazioni duplicate degli script.",
+      "Gli Shorts visibili e quasi visibili usano ora il resolver proprietario `/shorts/<videoId>` già esistente e limitato, eseguito in background, quando sono attive le regole di blocco canali o la modalità Consentiti.",
+      "Le associazioni apprese tra video Shorts e canali vengono salvate e rielaborate subito: gli Shorts di canali bloccati non richiedono più il passaggio del mouse o l’apertura del menu per essere nascosti.",
+      "Host desktop degli Shorts come `.shortsLockupViewModelHost` e `.ytGridShelfViewModelGridShelfItem` sono inclusi nei percorsi dedicati di ripiego e arricchimento degli Shorts.",
+      "La modalità Bloccati non nasconde gli Shorts sconosciuti finché non ne viene risolta l’identità; la modalità Consentiti resta più rigorosa e usa il percorso di attesa esistente.",
+      "È documentato che la v3.3.4 è stata un rollback sullo store al pacchetto v3.3.2 mentre veniva analizzata la segnalazione di problemi YouTube."
+    ],
+    "detailsUrl": "https://github.com/varshneydevansh/FilterTube/releases/tag/v3.3.5"
+  },
+  "3.3.4": {
+    "ctaLabel": "Scopri le novità",
+    "headline": "Rollback sullo store al pacchetto v3.3.2",
+    "summary": "La v3.3.4 era una versione di rollback dello store del browser che usava il pacchetto precedente v3.3.2 mentre veniva analizzata la segnalazione di problemi YouTube relativa alla v3.3.3.",
+    "bannerSummary": "Versione di rollback: la v3.3.4 usava il pacchetto v3.3.2 mentre venivano esaminate le segnalazioni di problemi YouTube.",
+    "highlights": [
+      "Per la v3.3.4 non vengono rivendicate nuove funzionalità sviluppate nel sorgente.",
+      "Il rollback è stato usato per riportare gli store lontano dal pacchetto sospetto v3.3.3 durante l’analisi del problema #64.",
+      "La v3.3.5 è la successiva release sorgente, con le correzioni per l’iniezione runtime duplicata e l’identità dei canali Shorts."
+    ],
+    "detailsUrl": "https://github.com/varshneydevansh/FilterTube/releases/tag/v3.3.4"
+  },
+  "3.3.3": {
+    "ctaLabel": "Scopri le novità",
+    "headline": "Aggiornamenti dei dispositivi familiari, elenchi di regole, parole chiave per data e refresh del DOM YouTube",
+    "summary": "Questa release semplifica il controllo parentale, aggiunge importazioni revisionate di elenchi di regole e regole con parole chiave limitate per data, documenta il modello di ritiro Home/Internet e aggiorna i filtri per il markup attuale di YouTube/YTM.",
+    "bannerSummary": "In questa release: aggiornamenti dei dispositivi familiari, importazioni revisionate di elenchi di regole, parole chiave con date, guida pensata prima per i genitori e compatibilità con il DOM attuale di YouTube/YTM.",
+    "highlights": [
+      "I profili genitore/accompagnatore possono gestire i profili protetti, modificare le regole dei figli/protetti dalla dashboard del genitore e inviare aggiornamenti approvati ai dispositivi protetti verificati.",
+      "Gli aggiornamenti dei dispositivi familiari spiegano l’invio live «Invia aggiornamento», il ritiro esplicito a casa e il ritiro esplicito via Internet, senza attribuire autorità ai servizi di ritiro.",
+      "I limiti di tempo dei profili protetti controllano ora le schede YouTube vecchie e nuove, mostrano una schermata di timeout tranquilla e registrano le richieste di tempo extra per la revisione del genitore.",
+      "L’importazione di elenchi di regole supporta CSV, TXT, JSON semplice, JSON in stile BlockTube e URL HTTPS grezzi, con anteprima prima dell’applicazione, destinazioni principale/Kids/entrambi, modelli, gestione degli elenchi, pausa/ripresa/rimozione, controlli di obsolescenza e refresh.",
+      "Il filtro per data delle parole chiave può applicare una parola chiave solo il giorno/dopo, il giorno/prima o tra date di caricamento. Il filtro dei commenti usa la data di caricamento del video principale quando YouTube la espone.",
+      "Aiuto e controlli dashboard usano formule più semplici, prioritarie per i genitori, suggerimenti più rapidi e spiegazioni più chiare di Esatto, Commenti, Data, PIN, elenchi di regole e aggiornamenti dei dispositivi.",
+      "La dashboard invita gli utenti attivi del test Android chiuso a scrivere a hello@filtertube.in e mantiene un promemoria visibile per segnalare interruzioni dei filtri quando YouTube cambia la struttura delle pagine.",
+      "I selettori desktop di YouTube lockup e il DOM mobile camelCase di YTM sono documentati, così le vere schede video continuano a essere filtrate mentre le barre dei chip nella pagina Watch non attivano il ripiego né causano salti di scorrimento.",
+      "Restano separati: rilevamento automatico dei peer LAN, un servizio ospitato FilterTube Internet Pickup, cataloghi pubblici di sottoscrizione automatica silenziosa, parità nativa Android/iOS e prove manuali su due dispositivi installati."
+    ],
+    "detailsUrl": "https://github.com/varshneydevansh/FilterTube/releases/tag/v3.3.3"
+  },
+  "3.3.2": {
+    "ctaLabel": "Scopri le novità",
+    "headline": "MVP dell’app per telefoni e tablet, YouTube più fluido e lista consentiti più sicura",
+    "summary": "La distribuzione pubblica dell’app è pronta per i test finali su telefoni/tablet Android e per gli aggiornamenti di stato iOS/iPad. La dashboard dell’estensione rimanda ora a questi percorsi; il lavoro sulla SPA di YouTube è più leggero quando non ci sono regole attive e questa versione include correzioni di correttezza per la lista consentiti e le schermate finali.",
+    "bannerSummary": "Questa versione include i percorsi di rilascio dell’app per telefoni/tablet, un runtime YouTube più fluido, log silenziosi in produzione e correzioni per le fughe nella lista consentiti e nelle schermate finali.",
+    "highlights": [
+      "Il centro download del sito e la dashboard dell’estensione mostrano ora il percorso di test finale dell’app Android per telefoni/tablet e la pagina di stato TestFlight/App Store per iOS/iPad.",
+      "La preparazione al rilascio Android per telefoni/tablet è documentata attorno al runtime condiviso di FilterTube, YouTube principale, accesso pubblico a YouTube Kids, profili, regole PIN e sincronizzazione Nanah.",
+      "Le ottimizzazioni SPA di YouTube saltano più operazioni di copia/analisi/riproduzione JSON, ripiego DOM, blocco rapido, menu alternativo e attesa della lista consentiti quando non ci sono regole attive o necessità di percorso.",
+      "I contesti di produzione dell’estensione limitano i normali log della console alla modalità debug esplicita, così la navigazione normale non paga il costo della console nei percorsi più usati di YouTube.",
+      "Le correzioni per la lista consentiti coprono il ripiego del creator Shorts, l’inoltro del destinatario della lista e il filtraggio compatto degli endpoint autoplay/watch-next per i controlli di fine video.",
+      "Gli attributi di stato DOM di FilterTube sono stati rafforzati per ridurre le tracce `data-filtertube-*` ampiamente visibili, mantenendo lo stato runtime necessario.",
+      "Account e sincronizzazione documenta gli aggiornamenti dei dispositivi familiari con Invia aggiornamento, Home Pickup facoltativo e Internet Pickup quando si è fuori o si aprirà più tardi, chiarendo ai genitori cosa è sincronizzazione live, pickup da casa, pickup online e cosa non conferisce autorità.",
+      "I limiti di tempo dei profili protetti hanno ora documentazione di rilascio sui budget giornalieri YouTube, le schermate di timeout, la cronologia delle richieste di tempo extra e l’approvazione del genitore/accompagnatore.",
+      "I percorsi Nanah/importazione conservano la proprietà delle parole chiave Filter All derivate dal canale tra i payload dell’estensione e dell’app nativa, inclusi colore della riga, metadati del badge sorgente e contesto di associazione."
+    ],
+    "detailsUrl": "https://github.com/varshneydevansh/FilterTube/releases/tag/v3.3.2"
+  },
+  "3.3.1": {
+    "ctaLabel": "Scopri le novità",
+    "headline": "Sincronizzazione sicura tra dispositivi via P2P, senza server di terze parti",
+    "summary": "Account e sincronizzazione presenta Nanah tramite tre percorsi più semplici, con una selezione genitore/figlio più chiara, regole di riconnessione più comprensibili e documentazione molto più ampia per l’uso quotidiano.",
+    "bannerSummary": "Sincronizzazione Nanah, migliore controllo genitore/figlio, riconnessione più sicura e documentazione completa per il nuovo flusso Account e sincronizzazione.",
+    "highlights": [
+      "Account e sincronizzazione inizia ora con tre percorsi più chiari: invia questo profilo una volta, il genitore controlla il figlio e trasferisci l’intero account.",
+      "I controlli Nanah avanzati restano disponibili, ma sono nascosti nella sezione Avanzate invece di guidare l’intero flusso.",
+      "Le sessioni genitore/sorgente possono scegliere con maggiore chiarezza il profilo remoto destinatario; i salvataggi dei collegamenti gestiti vengono ora replicati al mittente, così entrambi i dispositivi mantengono lo stesso record di fiducia.",
+      "I collegamenti attendibili restano salvati dopo l’aggiornamento, ma la riconnessione apre comunque una nuova sessione live e non una sincronizzazione nascosta in background.",
+      "Gli aggiornamenti dei figli bloccati, le regole di riconnessione, la persistenza delle etichette dei dispositivi e la protezione da auto-adesione/bruciatura della sessione sono stati rafforzati per un controllo parentale più sicuro.",
+      "README, Architettura, documentazione tecnica e funzionale, Profili e PIN, piano del progetto, guida utente e registro delle criticità descrivono ora con molti più dettagli il checkpoint desktop attuale di Nanah."
+    ],
+    "detailsUrl": "https://github.com/varshneydevansh/FilterTube/releases/tag/v3.3.1"
+  },
+  "3.3.0": {
+    "ctaLabel": "Scopri le novità",
+    "headline": "Ripristino delle collaborazioni e importazione più robusta tra browser",
+    "summary": "I menu di collaborazione in Watch/YTM recuperano i partecipanti in modo più affidabile, l’importazione delle iscrizioni funziona meglio tra browser e la versione 3.3.0 include diverse correzioni della lista consentiti e di Blocco rapido specifiche per ciascuna superficie.",
+    "bannerSummary": "Menu di collaborazione migliori, importazione più robusta della lista consentiti, superfici Blocco rapido più sicure, collegamenti diretti ai canali e una nuova opzione per la voce di blocco nel menu a tre punti.",
+    "highlights": [
+      "Le schede di YouTube mobile in Home, watch-next e stile Mix partecipano ora allo stesso flusso di recupero del menu a tre punti e dei collaboratori, senza ripiegare su menu incompleti con un solo canale.",
+      "La barra laterale destra della pagina Watch, le righe delle playlist e i riquadri simili a Watch recuperano ora l’elenco completo dei collaboratori e aggiornano sul posto il menu attivo a tre punti.",
+      "Il recupero Mix/Watch è più sicuro: le vere schede di collaborazione vengono gestite correttamente, mentre nomi semplici con «&» o «and» non generano più falsi menu di collaborazione.",
+      "Blocco rapido è più stabile sulle superfici complesse: resta sopra più schede desktop, evita i menu a discesa dei suggerimenti di ricerca su mobile e si ancora meglio nei layout mobile watch-next.",
+      "L’importazione delle iscrizioni canali nella lista consentiti conserva ora le risposte recenti di navigazione delle pagine, preferisce la crescita reale di /feed/channels e mantiene /feed/channels come superficie di gestione visibile.",
+      "Il filtraggio della lista consentiti è più rigoroso e sicuro nei renderer desktop/mobile di YouTube, con gestione migliore delle pagine creator e controlli più efficaci per nascondere Mix e iscrizioni.",
+      "Nuovi controlli e rifiniture: le righe Gestione canali rimandano alle vere pagine dei canali, la voce di blocco nel menu a tre punti può essere disattivata e l’esportazione Firefox cifrata usa un percorso alternativo più sicuro."
+    ],
+    "detailsUrl": "https://github.com/varshneydevansh/FilterTube/releases/tag/v3.3.0"
+  },
+  "3.2.9": {
+    "ctaLabel": "Scopri le novità",
+    "headline": "Importa i canali a cui sei iscritto, usa la lista consentiti e correggi la protezione PIN",
+    "summary": "Importa nella lista consentiti le iscrizioni dell’account YouTube attivo, con una semantica più chiara per il cambio di modalità e un avvio più affidabile di /feed/channels.",
+    "bannerSummary": "Crea la lista consentiti dalle iscrizioni YouTube attuali, con avanzamento in linea e attivazione più chiara.",
+    "highlights": [
+      "Nuova importazione nella vista schede: i canali a cui sei iscritto possono essere importati nella lista consentiti dall’account YouTube attualmente connesso.",
+      "L’avvio dell’importazione riutilizza una scheda YouTube attiva, la porta su /feed/channels e attende il bridge FilterTube prima di iniziare.",
+      "Il testo della copia nella lista consentiti è più chiaro: «Importa soltanto» lascia invariata la lista bloccati, mentre «Importa e attiva lista consentiti» segue il percorso di migrazione esistente da bloccati a consentiti.",
+      "La documentazione descrive con molti più dettagli l’architettura di importazione, il flusso di richieste FEchannels, le sorgenti dei renderer e la semantica della lista consentiti."
+    ],
+    "detailsUrl": "https://github.com/varshneydevansh/FilterTube/releases/tag/v3.2.9"
+  },
+  "3.2.8": {
+    "ctaLabel": "Scopri le novità",
+    "headline": "Rinnovo del tema e rifinitura dell’interfaccia panoramica",
+    "summary": "Popup e dashboard usano ora il più pacato sistema di temi panoramici, con layout più compatto, stati colorati più evidenti e un equilibrio migliore tra chiaro e scuro.",
+    "bannerSummary": "Tema popup e dashboard rifinito, con trasparenze più tranquille, pulsanti a pillola più evidenti e layout responsive migliore.",
+    "highlights": [
+      "Rinnovo dell’interfaccia panoramica: popup e dashboard condividono ora un guscio di prodotto più tranquillo, con il video hero locale come sfondo ambientale.",
+      "Rifinitura dei temi chiaro e scuro: la modalità scura mantiene visibile lo sfondo panoramico senza il bagliore sbiadito al centro, mentre quella chiara usa trasparenze più pulite.",
+      "Pulizia responsive: spaziatura del popup più compatta, menu a discesa dei profili più piccolo, schede Aiuto/Supporto meglio disposte e adattamento mobile migliorato nelle superfici di filtro.",
+      "Correzioni delle tinte dei controlli: stati attivo/disattivo, colori delle pillole, campi di ricerca e azioni di importazione/esportazione risultano più chiari in entrambi i temi."
+    ],
+    "detailsUrl": "https://github.com/varshneydevansh/FilterTube/releases/tag/v3.2.8"
+  },
+  "3.2.7": {
+    "ctaLabel": "Scopri le novità",
+    "headline": "Filtri per categoria, blocco rapido al passaggio e supporto mobile",
+    "summary": "Nuovi filtri per categoria e blocco incrociato rapido con un tocco, attivo per impostazione predefinita.",
+    "bannerSummary": "Usa i nuovi filtri per categoria e il blocco incrociato rapido al passaggio sulla scheda; migliore supporto al blocco su YouTube mobile.",
+    "highlights": [
+      "Filtro per categoria: blocca o consenti i video in base alla categoria YouTube (Musica, Giochi, Istruzione e così via).",
+      "Blocco incrociato rapido attivo per impostazione predefinita: «Mostra pulsante Blocco incrociato rapido» è attivo di default nella v3.2.7, ma puoi comunque disattivarlo.",
+      "Blocco mobile: migliorato il supporto al blocco su YouTube mobile per l’interfaccia a tre punti e il Blocco incrociato rapido, ora funzionanti nella Home."
+    ],
+    "detailsUrl": "https://github.com/varshneydevansh/FilterTube/releases/tag/v3.2.7"
+  },
+  "3.2.6": {
+    "ctaLabel": "Scopri le novità",
+    "headline": "Rifinitura UI/UX e filtri basati sui contenuti",
+    "summary": "Migliorata la tipografia con un design moderno e aggiunti tre filtri per i contenuti: durata, data e testo in maiuscolo.",
+    "bannerSummary": "Nuova interfaccia curata con filtri per durata, data di caricamento e rilevamento del clickbait.",
+    "highlights": [
+      "Aggiornamento tipografico: scala dei caratteri moderna e rifinita per migliorare la leggibilità.",
+      "Filtri basati sui contenuti: durata (maggiore/minore/tra), data di caricamento (più recente/più vecchia/tra) e rilevamento delle maiuscole nei titoli clickbait.",
+      "Sistema videoMetaMap: archiviazione persistente dei metadati video con raggruppamento intelligente (finestra di 75 ms, limite di 1500 voci).",
+      "Miglioramenti alla dashboard: statistiche specifiche per superficie (principale e Kids), schede statistiche migliorate e scheda promozionale per le donazioni."
+    ],
+    "detailsUrl": "https://github.com/varshneydevansh/FilterTube/releases/tag/v3.2.6"
+  },
+  "3.2.5": {
+    "ctaLabel": "Scopri le novità",
+    "headline": "Modalità lista consentiti promossa e maggiore stabilità",
+    "summary": "La modalità lista consentiti è ora il percorso principale per consentire soltanto gli elementi autorizzati, con estrazione più intelligente, protezioni per le playlist e minor uso della CPU.",
+    "bannerSummary": "La modalità lista consentiti diventa principale, con interfaccia più pulita, playlist più stabili e supporto Kids.",
+    "highlights": [
+      "Modalità lista consentiti promossa: il testo e l’interfaccia non la indicano più come sperimentale.",
+      "Pulizia del menu a tre punti e gestione della ricerca secondaria nelle superfici della lista consentiti.",
+      "Estrazione dei canali da più fonti, con ancore delle miniature e contenitori genitori.",
+      "Tracciamento dello stato consapevole della modalità, finestre di conferma e ottimizzazioni del bridge.",
+      "Maggiore stabilità delle playlist: le righe selezionate restano visibili e le identità in attesa non fanno riapparire righe bloccate.",
+      "Supporto alla lista consentiti in modalità Kids con architettura senza rete."
+    ],
+    "detailsUrl": "https://github.com/varshneydevansh/FilterTube/releases/tag/v3.2.5"
+  },
+  "3.2.4": {
+    "ctaLabel": "Scopri le novità",
+    "headline": "Modalità lista consentiti migliorata e ottimizzazioni delle prestazioni",
+    "summary": "Miglioramenti significativi alla modalità sperimentale lista consentiti: esperienza d’uso migliore, ottimizzazioni delle prestazioni e supporto più ampio alla modalità Kids.",
+    "bannerSummary": "La modalità lista consentiti diventa più intelligente, con interfaccia più pulita, prestazioni migliori e supporto Kids.",
+    "highlights": [
+      "SPERIMENTALE: modalità lista consentiti migliorata con pulizia del menu a tre punti, gestione intelligente della ricerca e tracciamento dello stato consapevole della modalità.",
+      "Prestazioni migliorate: le ottimizzazioni a livello bridge e l’elaborazione selettiva riducono l’uso della CPU.",
+      "Miglioramenti dell’interfaccia: le finestre di conferma evitano perdite accidentali di dati quando si cambia modalità.",
+      "Supporto Kids: la lista consentiti funziona ora su YouTube Kids con un’architettura senza rete.",
+      "Ottimizzazioni della ricerca: le schede Watch della barra laterale destra vengono gestite in modo intelligente per evitare disordine nell’interfaccia.",
+      "Estrazione dei canali: risoluzione dell’identità da più fonti, con ancore delle miniature e contenitori genitori.",
+      "Cambio modalità: passaggi fluidi tra lista bloccati e lista consentiti con rielaborazione intelligente."
+    ],
+    "detailsUrl": "https://github.com/varshneydevansh/FilterTube/releases/tag/v3.2.4"
+  },
+  "3.2.3": {
+    "ctaLabel": "Scopri le novità",
+    "headline": "Modalità sperimentale lista consentiti e miglioramenti dell’interfaccia",
+    "summary": "Versione alpha della modalità lista consentiti per filtrare consentendo solo gli elementi autorizzati, con aggiornamenti dell’interfaccia e supporto ai menu mobile.",
+    "bannerSummary": "Prova la modalità sperimentale lista consentiti: nasconde tutto tranne i canali autorizzati.",
+    "highlights": [
+      "SPERIMENTALE: la modalità lista consentiti nasconde tutti i contenuti tranne i canali e le parole chiave autorizzati esplicitamente.",
+      "Due modalità di filtro, con passaggio semplice tra lista bloccati e lista consentiti nel popup e nella vista schede.",
+      "Migrazione temporanea: passa alla lista bloccati per raccogliere canali, poi uniscili di nuovo alla lista consentiti.",
+      "La protezione della pagina Watch in modalità lista consentiti mantiene la riproduzione video funzionante.",
+      "Gli aggiornamenti ottimistici dell’interfaccia nascondono subito i contenuti e li ripristinano automaticamente se il blocco non riesce.",
+      "Supporto migliorato ai menu mobile con gestione corretta dei renderer YouTube mobile.",
+      "Tutti i log della console sono ora subordinati al flag debug per ridurre il rumore in produzione."
+    ],
+    "detailsUrl": "https://github.com/varshneydevansh/FilterTube/releases/tag/v3.2.3"
+  },
+  "3.2.2": {
+    "ctaLabel": "Scopri le novità",
+    "headline": "Miglioramenti UI/UX e logging controllato dal debug",
+    "summary": "Aggiornamenti ottimistici, supporto ai menu mobile, log subordinati al debug, conservazione dello scorrimento e perfezionamenti della gestione dello stato.",
+    "bannerSummary": "Feedback immediato dell’interfaccia, menu mobile rifiniti e log controllati dal debug con gestione stabile dello stato.",
+    "highlights": [
+      "Aggiornamenti ottimistici dell’interfaccia: i contenuti vengono nascosti subito e ripristinati automaticamente se il blocco non riesce.",
+      "Supporto migliorato al menu mobile per ytm-menu-popup-renderer, con tag renderer corretti.",
+      "Logging controllato dal debug tramite window.__filtertubeDebug.",
+      "Conservazione dello scorrimento durante il ripiego DOM per evitare salti fastidiosi.",
+      "Limite all’arricchimento dei canali (10 per sessione) per ridurre le richieste in background.",
+      "Rendering pianificato nei periodi inattivi con requestIdleCallback e batching.",
+      "Debounce dei ricaricamenti esterni con confronto delle firme per evitare rendering ridondanti.",
+      "Notifiche selettive: `load` solo quando cambia la firma; altrimenti `externalUpdate`.",
+      "Gestione dello stato del bridge tramite stato globale condiviso."
+    ],
+    "detailsUrl": "https://github.com/varshneydevansh/FilterTube/releases/tag/v3.2.2"
+  },
+  "3.2.1": {
+    "ctaLabel": "Scopri le novità",
+    "headline": "Elaborazione senza rallentamenti e prestazioni migliorate",
+    "summary": "Importanti ottimizzazioni delle prestazioni eliminano i rallentamenti dell’interfaccia, con ottimi risultati nei browser Chromium e miglioramenti significativi in Firefox.",
+    "bannerSummary": "Filtri fluidi grazie all’elaborazione asincrona, cache compilata e aggiornamenti raggruppati.",
+    "highlights": [
+      "L’elaborazione DOM asincrona cede periodicamente il controllo al thread principale, evitando il blocco del browser durante i filtri più pesanti.",
+      "La cache compilata di espressioni regolari e filtri canale offre ricerche O(1) e riduce l’uso della CPU del 60–80%.",
+      "Gli aggiornamenti di archiviazione raggruppati riducono le operazioni I/O del 70–90% con intervalli intelligenti di 250 ms.",
+      "L’aggiornamento delle impostazioni con debounce evita rielaborazioni DOM eccessive.",
+      "La gestione dello stato di esecuzione impedisce esecuzioni sovrapposte e accoda correttamente le richieste.",
+      "Browser Chromium: oltre il 90% di rallentamenti in meno; Firefox: miglioramenti significativi e ottimizzazione ancora in corso."
+    ],
+    "detailsUrl": "https://github.com/varshneydevansh/FilterTube/releases/tag/v3.2.1"
+  },
+  "3.2.0": {
+    "ctaLabel": "Scopri le novità",
+    "headline": "Blocco immediato e YouTube Kids senza rete",
+    "summary": "I menu a tre punti mostrano subito i nomi dei canali, le richieste di rete diminuiscono drasticamente e YouTube Kids funziona completamente offline.",
+    "bannerSummary": "Blocco senza ritardi grazie all’intercettazione proattiva di XHR; la modalità Kids funziona senza richieste di rete.",
+    "highlights": [
+      "I menu a tre punti mostrano subito il nome corretto del canale: niente più attese con «Recupero in corso…».",
+      "L’identità del canale proviene dalle risposte JSON di YouTube intercettate, riducendo le chiamate di rete.",
+      "YouTube Kids funziona completamente senza richieste di rete, per un blocco affidabile.",
+      "I metadati mancanti vengono completati in background a una frequenza controllata (intervallo di 6 ore).",
+      "I canali tematici (ad es. «Music - Topic») vengono gestiti appositamente senza @handle.",
+      "Nuova documentazione completa con diagrammi di flusso ASCII e Mermaid."
+    ],
+    "detailsUrl": "https://github.com/varshneydevansh/FilterTube/releases/tag/v3.2.0"
+  },
+  "3.1.9": {
+    "ctaLabel": "Scopri le novità",
+    "headline": "Backup consapevoli del profilo e controlli protetti dal blocco",
+    "summary": "Backup automatici e controlli dei contenuti rispettano ora blocchi/PIN dei profili ed ereditano impostazioni specifiche per profilo; il menu a discesa dei profili resta selezionabile sopra la schermata di blocco.",
+    "bannerSummary": "Backup automatici per profilo e controlli sui profili bloccati; il selettore di profilo resta sempre cliccabile.",
+    "highlights": [
+      "I selettori di modalità/formato del backup automatico vengono disattivati se il backup è spento o il profilo è bloccato; i nuovi profili ereditano le preferenze di backup automatico.",
+      "La pianificazione dei backup automatici si attiva alla creazione del profilo e quando cambiano modalità/formato, solo se il backup automatico è abilitato per quel profilo.",
+      "Le opzioni dei controlli contenuti e del backup restano disabilitate o vengono ripristinate quando il profilo è bloccato; per i profili non principali l’esportazione è limitata al profilo attivo.",
+      "La correzione dello z-index del menu a discesa mantiene il selettore di profilo cliccabile anche quando è visibile il banner di blocco.",
+      "Documentazione aggiornata sul modello profilo/PIN, sui backup per profilo e sulle regole che governano i controlli dell’interfaccia."
+    ],
+    "detailsUrl": "https://github.com/varshneydevansh/FilterTube/releases/tag/v3.1.9"
+  },
+  "3.1.8": {
+    "ctaLabel": "Scopri le novità",
+    "headline": "Scheda Supporto e backup automatici affidabili",
+    "summary": "Nuova pagina Supporto (Ko-fi) e backup automatici ora affidabili sia su Chrome che su Firefox.",
+    "bannerSummary": "I backup automatici funzionano ora su più browser e sovrascrivono un unico file con l’ultimo backup.",
+    "highlights": [
+      "Aggiunta una pagina Supporto nella dashboard con incorporamento Ko-fi.",
+      "I backup automatici sovrascrivono ora un unico file rotante: Downloads/FilterTube Backup/FilterTube-Backup-Latest.json.",
+      "La strategia di download funziona su più browser (URL Blob quando disponibile; URL data: come ripiego per il service worker Chrome MV3).",
+      "I download Firefox non falliscono più a causa delle restrizioni sugli URL data:."
+    ],
+    "detailsUrl": "https://github.com/varshneydevansh/FilterTube/releases/tag/v3.1.8"
+  },
+  "3.1.7": {
+    "ctaLabel": "Scopri le novità",
+    "headline": "Supporto a YT Kids e ai backup automatici",
+    "summary": "Blocca i contenuti per canale su YT Kids e attiva o disattiva i backup automatici.",
+    "bannerSummary": "Nuova impostazione: attiva/disattiva i backup automatici. Le esportazioni vengono salvate in Downloads/FilterTube Export/.",
+    "highlights": [
+      "Aggiunto il blocco completo basato su canali e parole chiave su YT Kids: i canali vengono rilevati ascoltando passivamente l’interfaccia del menu a tre punti di YT Kids.",
+      "Aggiunta nelle Impostazioni un’opzione per attivare/disattivare i backup automatici (al meglio; senza richieste Salva con nome).",
+      "I backup automatici vengono salvati in Downloads/FilterTube Backup/ con rotazione, mantenendo i file più recenti.",
+      "Le esportazioni manuali vengono ora scaricate senza finestre di conferma in Downloads/FilterTube Export/."
+    ],
+    "detailsUrl": "https://github.com/varshneydevansh/FilterTube/releases/tag/v3.1.7"
+  },
+  "3.1.6": {
+    "ctaLabel": "Scopri le novità",
+    "headline": "Supporto a importazione/esportazione e banner di rilascio",
+    "summary": "Il pulsante del banner apre direttamente la dashboard Novità; le schede selezionate vengono caricate dallo stesso JSON e le importazioni gestiscono meglio c/ChannelName e l’unione delle regole.",
+    "bannerSummary": "Il banner di rilascio apre la scheda Novità nell’estensione e la documentazione descrive ora tutto il flusso di importazione/esportazione.",
+    "highlights": [
+      "Il JSON delle note di rilascio alimenta sia le schede della dashboard sia il banner YouTube, come unica fonte di verità.",
+      "Il pulsante apre la vista schede tramite messaggi in background, così i blocchi non intercettano i collegamenti chrome-extension://.",
+      "La documentazione e il codice di importazione/esportazione chiariscono come gli input UC/handle/c/ChannelName vengono normalizzati prima dell’unione."
+    ],
+    "detailsUrl": "https://github.com/varshneydevansh/FilterTube/releases/tag/v3.1.6"
+  },
+  "3.1.5": {
+    "ctaLabel": "Scopri le novità",
+    "headline": "Shorts e contenuti per abbonati sono davvero scomparsi",
+    "summary": "La pagina Watch e la barra laterale nascondono ora i renderer Shorts e le sezioni riservate ai membri prima che appaiano; anche lo stato dell’opzione resta salvato.",
+    "bannerSummary": "Il blocco dei contenuti per membri e degli Shorts è stato rafforzato in Watch e nella barra laterale, così le righe bloccate non riappaiono.",
+    "highlights": [
+      "La barra laterale controlla href /shorts/, sovrapposizioni ed etichette aria-label prima del rendering delle schede.",
+      "Il rilevamento dei contenuti per membri copre righe compatte, Watch e scaffali, con nuovi badge ed euristiche per le playlist.",
+      "Corretto il salvataggio dell’opzione per i contenuti riservati ai membri, così lo stato resta dopo il ricaricamento."
+    ],
+    "detailsUrl": "https://github.com/varshneydevansh/FilterTube/releases/tag/v3.1.5"
+  },
+  "3.1.4": {
+    "ctaLabel": "Scopri le novità",
+    "headline": "Dashboard adattabile",
+    "summary": "La navigazione si comprime ordinatamente su mobile, i campi si adattano con fluidità e i controlli playlist/Mix hanno opzioni più chiare.",
+    "highlights": [
+      "Menu hamburger e sovrapposizione per gli schermi piccoli, con spaziatura della griglia rifinita.",
+      "Interruttori con tracce più leggere, cursori centrati e migliore contrasto in modalità scura.",
+      "Il chip Mix/Radio si nasconde quando è attiva l’opzione Mix; il blocco delle playlist ignora gli elementi radio."
+    ],
+    "detailsUrl": "https://github.com/varshneydevansh/FilterTube/releases/tag/v3.1.4"
+  },
+  "3.1.3": {
+    "ctaLabel": "Scopri le novità",
+    "headline": "Rinnovo della legenda della Guida",
+    "summary": "Schede, pillole e suggerimenti spiegano esattamente le funzioni Esatto / Commento / Filtra tutto, in linea con lo stile rinnovato della dashboard.",
+    "highlights": [
+      "La scheda Guida mostra i colori dei badge e le etichette di collaborazione con le tinte corrispondenti.",
+      "Le barre di ricerca del popup e della vista schede adottano la stessa larghezza completa.",
+      "Le descrizioni dei controlli dei contenuti sono state spostate nei suggerimenti al passaggio per maggiore chiarezza."
+    ],
+    "detailsUrl": "https://github.com/varshneydevansh/FilterTube/releases/tag/v3.1.3"
+  },
+  "3.1.2": {
+    "ctaLabel": "Scopri le novità",
+    "headline": "Rafforzata la riproduzione automatica delle playlist",
+    "summary": "La riproduzione automatica salta le righe bloccate della playlist senza mostrarle per un istante; il nascondimento persistente sopravvive alla rielaborazione di YouTube.",
+    "highlights": [
+      "Il passaggio al contenuto successivo avviene solo quando la riga successiva della playlist è effettivamente visibile.",
+      "Le righe della playlist nel pannello Watch restano nascoste anche se l’identità non è risolta per un breve periodo.",
+      "Il menu a tre punti si chiude correttamente dopo il blocco, così il miniplayer continua la riproduzione."
+    ],
+    "detailsUrl": "https://github.com/varshneydevansh/FilterTube/commit/1224715a84c48ee6d3ddd93b13cc62e487574a31"
+  },
+  "3.1.1": {
+    "ctaLabel": "Scopri le novità",
+    "headline": "Scheda Guida e correzioni dell’identità",
+    "summary": "La dashboard aggiunge una scheda Guida dedicata e rende più affidabile la corrispondenza tra UC, handle e URL personalizzati.",
+    "highlights": [
+      "La guida di riferimento descrive tutti gli interruttori, i badge e il comportamento delle parole chiave.",
+      "La navigazione delle playlist salta le righe bloccate senza mostrare lampi di riproduzione.",
+      "Il ripiego per handle/URL personalizzati individua con maggiore affidabilità l’ID UC corretto."
+    ],
+    "detailsUrl": "https://github.com/varshneydevansh/FilterTube/commit/1b2e442831a40c52148bc9ff830c70c2e6aa909c"
+  },
+  "3.1.0": {
+    "ctaLabel": "Scopri le novità",
+    "headline": "Documentazione e chiarezza sul filtraggio ibrido",
+    "summary": "L’architettura ibrida di intercettazione e ripiego DOM è stata documentata con diagrammi, per spiegare come FilterTube applica i blocchi.",
+    "highlights": [
+      "Documentata la parità del menu a tre punti della pagina Watch con quelli di Home, ricerca e collaboratori.",
+      "Catalogate le regressioni delle playlist ancora aperte, così le relative correzioni restano tracciabili.",
+      "Manifest, strumenti di build e piè di pagina dell’interfaccia sono stati allineati all’aumento di versione 3.1.0."
+    ],
+    "detailsUrl": "https://github.com/varshneydevansh/FilterTube/commit/076baa2ecb14a3e8f5bdf420caa1af7096548f15"
   }
 }
