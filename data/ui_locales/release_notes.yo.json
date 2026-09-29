@@ -14,5 +14,361 @@
       "Ìtẹ̀jáde ìtújáde GitHub ń lo ìwé-ẹ̀rí GitHub CLI, ó ń ṣẹ̀dá drafts kí ìgbéjáde tó bẹ̀rẹ̀, ó ń bá tags tó ti wà lọ, ó ń gbé assets tó sọnù nìkan jáde, ó ń ṣàyẹ̀wò gbogbo assets tó parí, ó sì ń tẹ̀jáde lẹ́yìn ìjẹ́rìí nìkan.",
       "App FilterTube fún fóònù àti tablet Android ti wà fún gbogbo ènìyàn lórí Google Play. Fi í sílẹ̀ láti [ojú-ewé gbangba](https://play.google.com/store/apps/details?id=com.filtertube.app) tàbí wá FilterTube lórí Google Play."
     ]
+  },
+  "3.3.6": {
+    "ctaLabel": "Wo ohun tuntun",
+    "headline": "Fílọ́tẹ̀ tó lágbára sí i, àkókò tó dáàbò bo, àti píṣiṣẹ́ láìsí ìpolówó tó rọrùn",
+    "summary": "FilterTube 3.3.6 mú ìmúṣẹ àṣẹ ìwọlé tààrà wá, àkókò ààbò àti àwọn ìgbà Self-Control fún profaili kọ̀ọ̀kan, àwọn àkójọ òfin tí a gbẹ́kẹ̀lé fún Blocked àti Allowed, fílọ́tẹ̀ ẹ̀ka òṣìṣẹ́, Advert Void tí a tan gẹ́gẹ́ bíi àṣà, àti iṣẹ́ ìbáramu tó gbòòrò pẹ̀lú YouTube òde òní.",
+    "bannerSummary": "Fílọ́tẹ̀ ìwọlé tààrà, àkókò ààbò, ìgbéwọlé àkójọ òfin àti BlockTube, ẹ̀ka òṣìṣẹ́, Advert Void, àti ìbáramu pẹ̀lú YouTube òde òní.",
+    "highlights": [
+      "Àbẹ̀wò YouTube tààrà, ìyípadà playlist, autoplay, àti àwọn embed tí a ń ṣe àtìlẹ́yìn fún ti ń gba àwọn òfin ìfọwọ́sí fídíò àti ikanni kan náà kọjá gẹ́gẹ́ bí fílọ́tẹ̀ feed; wọn kò tún ń fo fílọ́tẹ̀ mọ́.",
+      "Ààlà àkókò YouTube ojoojúmọ́ ti ń ṣiṣẹ́ lórí profaili tó ń ṣiṣẹ́ báyìí, ó ń fi àkókò tó kù hàn, ó sì ń dúró lẹ́yìn ìtún-bẹ̀rẹ̀; ó tún ń lo ojú ìdádúró tó gba gbogbo ojú-ewé pẹ̀lú yíyí profaili tó nílò PIN. Àwọn ìgbà Self-Control tí a yàn fúnra wa ń ti àwọn òfin tí a yàn pa títí ìṣírò-àkókò yóò fi parí.",
+      "Àwọn òfin Blocked àti Allowed ṣì jẹ́ àkójọ ọ̀tọ̀ fún Main àti Kids; ìlànà Blocklist tàbí Whitelist tó wà lókè ló ń pinnu àkójọ tí yóò ṣàkóso ohun tí a ń wò.",
+      "Ìgbéwọlé ńlá ti BlockTube àti àkójọ òfin tí a ń ṣàkóso ń lo àkọ́kọ́-wò, àyẹ̀wò agbára, transactional rollback àti ìjẹ́rìí read-back; iye added, duplicate, skipped, channel, keyword, regex àti video-ID sì túbọ̀ ṣe kedere.",
+      "Fílọ́tẹ̀ ẹ̀ka ń lo `microformat.playerMicroformatRenderer.category` òṣìṣẹ́ YouTube, ìkó metadata Player láti orísun kan náà tó ní ààlà, àṣàyàn tó ṣe kedere láti dí àwọn ẹ̀ka tí a yàn tàbí láti gba àwọn wọ̀nyẹn nìkan, àti ìṣàkóso tó ní ààbò sí i fún Watch, rail, Mix, comments àti renderer ownership.",
+      "Advert Void ti ṣiṣẹ́ gẹ́gẹ́ bí àṣà fún àwọn profaili tuntun àti èyí tí a ṣe àtúnṣe lórí YouTube Main àti Kids. Web runtime pínpín ń yọ àwọn field ètò ìpolówó Player tí a rí kúrò láìsí request àfikún; native playback ń sọ data ètò ìpolówó tí a kò ṣe àwòṣe nù tàbí ṣàtúnṣe raw Reel response bí ó bá hàn, nígbà tí fallback tó ní ààbò ń bójú tó àwọn ìdíwọ̀ tí ó sálọ.",
+      "Fílọ́tẹ̀ èdè tí a ń sọ̀rọ̀ àti àṣàyàn original-audio tí ó ṣì jẹ́ ìdánwò ń lo ẹ̀rí YouTube Player bí ó bá wà; tí recommendation metadata kò bá sí, wọ́n ń jẹ́ kí àkóónú kọjá.",
+      "Ó tún ní fífi YouTube Playables pamọ́, ìtọ́jú camelCase renderer àti collaboration òde òní, Help àti search tó rọrùn láti kà, controls popup àti dashboard tó ṣe kedere sí i, àti ojú ìfihàn wíwà Android lórí Google Play àti ipò iOS.",
+      "Settings ti ní àṣàyàn opt-out fún gbogbo ẹ̀rọ, tí a kò ṣàyàn gẹ́gẹ́ bíi àṣà, fún àwọn ìránnilétí reload aládàáṣe àti àwọn banner What's New lórí YouTube àti YouTube Kids. Ojú-ewé What's New dashboard ṣì ṣeé ṣí pẹ̀lú ọwọ́."
+    ]
+  },
+  "3.3.5": {
+    "ctaLabel": "Wo ohun tuntun",
+    "headline": "Ìmúpadàbọ̀ láti ìṣòro YouTube àti dídí ikanni Shorts ní kíákíá",
+    "summary": "Ìtújáde yìí ń ṣàtúnṣe ìfíwọlé content runtime lẹ́ẹ̀mejì nínú àwọn tab YouTube tó ti ṣí, ó sì ń yanjú ìdánimọ̀ ikanni Shorts tó hàn ní kíákíá bí àwọn òfin ikanni tàbí mode whitelist bá ń ṣiṣẹ́.",
+    "bannerSummary": "Ó ń ṣàtúnṣe ìfíwọlé runtime lẹ́ẹ̀mejì, ó sì ń rí ìdánimọ̀ ikanni Shorts ní kíákíá.",
+    "highlights": [
+      "Install/update/profile refresh kò tún ń fi manifest content scripts sínú àwọn tab YouTube tó ti ṣí; èyí ń dènà àṣìṣe syntax tó ń tún ṣẹlẹ̀ `Identifier ... has already been declared`.",
+      "Àwọn tab YouTube tó ti ṣí ṣì lè gba àyẹ̀wò time-limit/runtime tí a ń ṣàkóso láìsí ìkéde script lẹ́ẹ̀mejì.",
+      "Shorts tó hàn tàbí tó sún mọ́ ìfarahàn ti ń lo owner resolver `/shorts/<videoId>` abẹ́lẹ̀ tó ti wà, tí a fi ààlà sí, nígbà tí òfin channel blocklist tàbí mode whitelist bá ń ṣiṣẹ́.",
+      "Àwọn maapu Shorts video-to-channel tí a ti kọ́ ń wà ní ìpamọ́, a sì ń tún ṣiṣẹ́ lé wọn lórí lẹ́sẹ̀kẹsẹ̀; nítorí náà a kò nílò hover tàbí menu interaction kí Shorts ikanni tí a dí tó fara pamọ́.",
+      "Àwọn desktop Shorts host bíi `.shortsLockupViewModelHost` àti `.ytGridShelfViewModelGridShelfItem` wà nínú àwọn ọ̀nà Shorts fallback/enrichment pàtó.",
+      "Ní mode Blocklist, a kì í fi Shorts tí a kò mọ̀ pamọ́ títí ìdánimọ̀ wọn yóò fi yanjú; mode whitelist ṣì le koko sí i nípasẹ̀ ọ̀nà pending tó wà.",
+      "A kọ v3.3.4 sílẹ̀ gẹ́gẹ́ bí rollback store sí package v3.3.2 nígbà tí a ń ṣèwádìí ìròyìn ìṣòro YouTube."
+    ]
+  },
+  "3.3.4": {
+    "ctaLabel": "Wo ohun tuntun",
+    "headline": "Ìpadà sí package v3.3.2 nínú store",
+    "summary": "v3.3.4 jẹ́ version rollback browser-store tó lo package v3.3.2 àtijọ́ nígbà tí a ń ṣèwádìí ìròyìn ìṣòro YouTube tó kan v3.3.3.",
+    "bannerSummary": "Rollback store: v3.3.4 lo package v3.3.2 nígbà ìwádìí ìṣòro YouTube.",
+    "highlights": [
+      "A kò sọ pé iṣẹ́ feature tuntun tó jáde láti source wà fún v3.3.4.",
+      "A lo rollback láti gbé stores kúrò lórí package v3.3.3 tí a fura sí nígbà ìwádìí issue #64.",
+      "Source release tó tẹ̀lé, v3.3.5, mú àtúnṣe duplicate runtime injection àti Shorts identity wá."
+    ]
+  },
+  "3.3.3": {
+    "ctaLabel": "Wo ohun tuntun",
+    "headline": "Àwọn àtúnṣe ẹ̀rọ ẹbí, àkójọ òfin, àwọn keyword ọjọ́, àti àtúnṣe YouTube DOM",
+    "summary": "Ìtújáde yìí mú kí ìṣàkóso òbí/olùtọ́jú rọrùn láti lóye, ó fi imports àkójọ òfin tí a ti ṣàyẹ̀wò àti àwọn òfin keyword tó ní ààlà ọjọ́ kún un, ó ṣàlàyé model Home/Internet Pickup, ó sì tún fílọ́tẹ̀ ṣe fún markup YouTube/YTM òde òní.",
+    "bannerSummary": "Àwọn àtúnṣe ẹ̀rọ ẹbí, imports àkójọ òfin tí a ṣe àyẹ̀wò, keyword tó dá lórí ọjọ́, Help tó kọ́kọ́ rántí òbí, àti ìbáramu DOM YouTube/YTM òde òní.",
+    "highlights": [
+      "Àwọn profaili òbí/olùtọ́jú lè ṣàkóso profaili tó ní ààbò, ṣàtúnṣe òfin ọmọdé/profaili tó ní ààbò láti dashboard òbí, wọ́n sì lè fi àwọn update tí a fọwọ́sí ránṣẹ́ sí àwọn ẹ̀rọ tó ní ààbò tí a ti fìdí múlẹ̀.",
+      "Family Device Updates ń ṣàlàyé Send Update lẹ́sẹ̀kẹsẹ̀, Home Pickup tí a yàn ní kedere, àti Internet Pickup tí a yàn ní kedere; a kò ka iṣẹ́ pickup sí orísun àṣẹ.",
+      "Ààlà àkókò profaili tó ní ààbò ń ṣàyẹ̀wò àwọn tab YouTube àtijọ́ àti tuntun, ń fi ojú ìparí àkókò tó rọrùn hàn, ó sì ń kọ àwọn ìbéèrè àkókò àfikún sílẹ̀ fún àyẹ̀wò òbí.",
+      "Imports àkójọ òfin ń ṣe àtìlẹ́yìn fún CSV, TXT, simple JSON, BlockTube-style JSON àti raw HTTPS URLs; wọ́n ní àkọ́kọ́-wò kí a tó lò ó, Main/Kids/Both targeting, templates, ìṣàkóso àkójọ, pause/resume/remove, àyẹ̀wò stale àti refresh.",
+      "Fílọ́tẹ̀ keyword ọjọ́ lè lo keyword láti ọjọ́ ìgbéjáde lọ, kí ó tó dé ọjọ́ náà, tàbí láàárín ọjọ́ méjì. Fílọ́tẹ̀ comments ń lo ọjọ́ ìgbéjáde fídíò òbí bí YouTube bá fi í hàn.",
+      "Help àti dashboard controls ń lo ọ̀rọ̀ tó rọrùn tí ó kọ́kọ́ ronú nípa òbí, help bubbles tó yára sí i, àti àlàyé tó ṣe kedere fún Exact, Comment, Date, PINs, rule lists àti device updates.",
+      "Dashboard ń pè àwọn olùdánwò Android closed-testing tó ń ṣiṣẹ́ láti fi email ránṣẹ́ sí hello@filtertube.in; ó sì ń fi ìránnilétí hàn pé kí wọ́n ròyìn ìṣòro fílọ́tẹ̀ bí ìṣètò ojú-ewé YouTube bá yí padà.",
+      "A kọ YouTube desktop lockup selectors àti YTM mobile camelCase DOM sílẹ̀ kí àwọn káàdì fídíò gidi lè máa gba fílọ́tẹ̀, nígbà tí Watch-page chip bars kò jí iṣẹ́ fallback tàbí fa scroll jumps.",
+      "Ohun tó ṣì yàtọ̀: automatic LAN peer discovery, iṣẹ́ FilterTube Internet Pickup tí a gbàlejò, àwọn katalogi auto-subscribe gbogbo ènìyàn tó ń ṣiṣẹ́ ní ìdákẹ́jẹ́ẹ́, native Android/iOS parity, àti ẹ̀rí manual smoke test lórí ẹ̀rọ méjì tí a ti fi sílẹ̀."
+    ]
+  },
+  "3.3.2": {
+    "ctaLabel": "Wo ohun tuntun",
+    "headline": "MVP app mobile/tablet, YouTube tó rọrùn sí i, àti whitelist tó ní ààbò sí i",
+    "summary": "Ojú-ọ̀nà ìtújáde app gbogbogbò ti ṣetán fún ìdánwò ìkẹyìn Android phone/tablet àti ipò iOS/iPad; extension dashboard ń tọ́ka sí àwọn ọ̀nà app wọ̀nyẹn, iṣẹ́ YouTube SPA dákẹ́ sí i tí kò bá sí òfin tó ń ṣiṣẹ́, àwọn àtúnṣe whitelist/end-screen correctness sì wà nínú ìtújáde yìí.",
+    "bannerSummary": "Ipò app Android/iOS, iṣẹ́ YouTube SPA tó fẹ́ẹ̀rẹ́, àti àtúnṣe whitelist/end-screen.",
+    "highlights": [
+      "Website downloads hub àti extension dashboard ń fi Android phone/tablet final-testing path àti iOS/iPad TestFlight/App Store status path hàn.",
+      "A kọ ìṣètò Android phone/tablet release sílẹ̀ lórí shared FilterTube runtime, YouTube Main, ààyè YouTube Kids gbogbogbò, profaili, PIN rules àti Nanah sync.",
+      "Iṣẹ́ YouTube SPA performance ń fo JSON clone/parse/replay, DOM fallback, quick-block, fallback-menu àti whitelist-pending sí i tí kò bá sí òfin tó ń ṣiṣẹ́ tàbí àìní route.",
+      "Àwọn production extension context ń fi console logging àṣà sílẹ̀ lẹ́yìn explicit debug mode kí ìṣàwárí deede má bàa ná console overhead lórí àwọn ọ̀nà YouTube tó ń ṣiṣẹ́ gan-an.",
+      "Àwọn àtúnṣe whitelist fún release ní Shorts creator fallback, list-target forwarding, àti compact autoplay/watch-next endpoint filtering fún end-screen controls.",
+      "A ti mú FilterTube DOM state attributes lágbára láti dín àwọn fingerprint `data-filtertube-*` tó gbòòrò tí a lè rí kù, nígbà tí a ń pa runtime state tó ṣe pàtàkì mọ́.",
+      "Accounts & Sync ń ṣàlàyé Family Device Updates pẹ̀lú Send Update, Home Pickup àṣàyàn, àti Internet Pickup nígbà tí ènìyàn kò sí tàbí tí yóò ṣí i lẹ́yìn; ó ń jẹ́ kí òbí mọ ohun tó jẹ́ live sync, home pickup, online pickup, àti ohun tí kì í ṣe àṣẹ.",
+      "Ààlà àkókò profaili tó ní ààbò ní ìwé release fún daily YouTube budgets, timeout screens, ìtàn request-more-time, àti ìfọwọ́sí òbí/olùtọ́jú.",
+      "Àwọn ọ̀nà Nanah/import ń pa ownership keyword Filter All tó wá láti channel mọ́ láàárín extension àti native app payloads, pẹ̀lú row color, source-badge metadata àti pairing context."
+    ]
+  },
+  "3.3.1": {
+    "ctaLabel": "Wo ohun tuntun",
+    "headline": "Mímu sync dáàbò bo láàárín ẹ̀rọ nípasẹ̀ P2P láìsí server ẹni-kẹta",
+    "summary": "Accounts & Sync ń fi Nanah hàn gẹ́gẹ́ bí ọ̀nà mẹ́ta tó rọrùn sí i, pẹ̀lú targeting òbí/ọmọ tó lágbára sí i, àwọn òfin reconnect tó ṣe kedere sí i, àti ìwé ìtọ́sọ́nà tó pọ̀ sí i fún lílo gidi.",
+    "bannerSummary": "Ọ̀nà Nanah mẹ́ta tó ṣe kedere, targeting tó lágbára, àti òfin reconnect tó rọrùn láti lóye.",
+    "highlights": [
+      "Accounts & Sync ń bẹ̀rẹ̀ báyìí pẹ̀lú ọ̀nà mẹ́ta tó ṣe kedere: Fi profaili yìí ránṣẹ́ lẹ́ẹ̀kan, Òbí ń ṣàkóso ọmọ, àti Gbé gbogbo account lọ.",
+      "Àwọn Advanced Nanah controls ṣì wà, ṣùgbọ́n a fi wọ́n pamọ́ sí abala Advanced dípò kí wọ́n ṣáájú gbogbo flow.",
+      "Àwọn parent/source sessions lè yan profaili remote target ní kedere sí i; ìfipamọ́ managed-link tún ń ṣe àfihàn sí olùránṣẹ́ kí ẹ̀rọ méjèèjì lè ní trust record kan náà.",
+      "Trusted links ṣì ń wà lẹ́yìn refresh, ṣùgbọ́n reconnect ṣì jẹ́ live session tuntun, kì í ṣe background sync tó fara sin.",
+      "A ti mú locked child updates, reconnect rules, device-label persistence àti self-join/session-burn protection lágbára sí i fún ìṣàkóso òbí tó ní ààbò sí i.",
+      "README, Architecture, Technical, Functionality, Profiles & PIN, project plan, user guide àti concern tracker ń ṣàlàyé checkpoint Nanah desktop òde òní ní kíkún sí i."
+    ]
+  },
+  "3.3.0": {
+    "ctaLabel": "Wo ohun tuntun",
+    "headline": "Ìmúpadàbọ̀ collaboration + ìgbéwọlé tó lágbára láàárín browser",
+    "summary": "Àwọn akojọ collaboration Watch/YTM ń rí roster pípé padà ní ìgbẹ́kẹ̀lé sí i, ìgbéwọlé subscriptions túbọ̀ lágbára láàárín browser, àwọn àtúnṣe whitelist àti Quick Block fún ojú-ọ̀nà pàtó sì wà nínú 3.3.0.",
+    "bannerSummary": "Ìmúpadà roster collaborator pípé, ìgbéwọlé subscription tó lágbára sí i, àti àtúnṣe whitelist/Quick Block.",
+    "highlights": [
+      "Àwọn káàdì YouTube mobile home/watch-next/Mix-style ń kópa nínú flow ìmúpadà 3-dot àti collaborator kan náà dípò kí wọ́n padà sí menu single-channel tí kò pé.",
+      "Watch-page right rail, playlist rows àti watch-like lockups lè mú roster collaborator pípé padà, wọ́n sì lè refresh menu 3-dot tó ń ṣiṣẹ́ níbi tó wà.",
+      "Ìmúpadà Mix/watch ní ààbò sí i: àwọn káàdì collaboration gidi ń ṣe upgrade dáadáa, ṣùgbọ́n àwọn orúkọ lasan tó ní '&' tàbí 'and' kò tún di menu collaboration èké.",
+      "Quick Block dúró ṣinṣin sí i lórí àwọn ojú-ọ̀nà tó díjú: ó dúró lókè àwọn káàdì desktop púpọ̀ sí i, ó yẹra fún mobile search-suggestion dropdowns, ó sì dára sí i lórí mobile watch-next layouts.",
+      "Ìgbéwọlé whitelist àwọn ikanni tí a ti subscribe ń pa page browse responses tuntun mọ́, ó fẹ́ràn ìdàgbàsókè /feed/channels gidi, ó sì ń pa /feed/channels mọ́ gẹ́gẹ́ bí ojú-ọ̀nà ìṣàkóso tó hàn.",
+      "Fílọ́tẹ̀ whitelist túbọ̀ muna àti ní ààbò sí i lórí àwọn YouTube desktop/mobile renderers, pẹ̀lú ìtọ́jú creator-page àti Mixes/subscriptions hide controls tó dára sí i.",
+      "Àwọn controls tuntun àti polish: Channel Management rows ń tọ́ka sí ojú-ewé ikanni gidi, a lè pa ohun 3-dot block item, Firefox encrypted export sì ń lo fallback tó ní ààbò sí i."
+    ]
+  },
+  "3.2.9": {
+    "ctaLabel": "Wo ohun tuntun",
+    "headline": "Ìgbéwọlé àwọn Ikanni Tí A Subscribe + Whitelist + àtúnṣe ààbò PIN",
+    "summary": "Gbé subscriptions account YouTube tó ń ṣiṣẹ́ wọ whitelist pẹ̀lú àlàyé mode-switch tó ṣe kedere sí i àti ìbẹ̀rẹ̀ /feed/channels tó ṣeé gbẹ́kẹ̀lé sí i.",
+    "bannerSummary": "Gbé àwọn ikanni tí a subscribe láti account YouTube tó ń ṣiṣẹ́ wọ whitelist pẹ̀lú ìbẹ̀rẹ̀ tó dájú sí i.",
+    "highlights": [
+      "Nínú New Tab View, a lè gbé àwọn ikanni tí a subscribe wọ whitelist láti account YouTube tó ti wọlé tó ń ṣiṣẹ́.",
+      "Ìbẹ̀rẹ̀ ìgbéwọlé ń lo tab YouTube live tó ti wà, ó ń tọ́ ọ sí /feed/channels, ó sì ń dúró de FilterTube bridge kí ó tó bẹ̀rẹ̀.",
+      "Ọ̀rọ̀ whitelist ṣe kedere sí i: Import Only kò kan blocklist, nígbà tí Import + Turn On Whitelist ń tẹ̀lé ọ̀nà migration blocklist-to-whitelist tó ti wà.",
+      "Ìwé ìtọ́sọ́nà ṣàlàyé import architecture, FEchannels request flow, renderer sources àti whitelist semantics ní kíkún sí i."
+    ]
+  },
+  "3.2.8": {
+    "ctaLabel": "Wo ohun tuntun",
+    "headline": "Àtúnṣe àkòrí + ṣíṣe UI shell scenic dáadáa",
+    "summary": "Àwọn ojú-ọ̀nà popup àti dashboard ti ń lo ètò àkòrí scenic tó rọrùn sí i, pẹ̀lú ìṣètò tó há díẹ̀, tint states tó lágbára sí i, àti ìwọ̀ntúnwọ̀nsì light/dark tó dára.",
+    "bannerSummary": "Àkòrí scenic tó rọrùn, ìṣètò tó há díẹ̀, àti ìwọ̀ntúnwọ̀nsì light/dark tó dára.",
+    "highlights": [
+      "Àtúnṣe Scenic UI: popup àti dashboard pín product shell tó rọrùn kan náà, pẹ̀lú fidíò hero agbègbè gẹ́gẹ́ bí media abẹ́lẹ̀ tó rọrùn.",
+      "Ṣíṣe àkòrí light àti dark dáadáa: mode dark ń jẹ́ kí abẹ́lẹ̀ scenic hàn láìsí center glow tó rẹ̀, mode light sì ń lo transparency tó mọ́ tónítóní sí i.",
+      "Ìtúnṣe responsive: ààyè popup há díẹ̀, profile dropdown kéré sí i, ìṣètò Help/Support card dára sí i, mobile fit sì ti sunwọ̀n lórí gbogbo ojú-ọ̀nà filter.",
+      "Àtúnṣe control tint: enabled/disabled states, pill colors, search fields, àti import/export actions ti ṣe kedere sí i nínú àkòrí méjèèjì."
+    ]
+  },
+  "3.2.7": {
+    "ctaLabel": "Wo ohun tuntun",
+    "headline": "Àwọn filter ẹ̀ka + Quick Block hover cross + mobile 3 Dot UI",
+    "summary": "Fílọ́tẹ̀ ẹ̀ka tuntun àti quick cross block tí a lè ṣe pẹ̀lú ìfọwọ́kan kan ti tan gẹ́gẹ́ bíi àṣà.",
+    "bannerSummary": "Ṣàlẹ̀mọ́ àwọn ẹ̀ka YouTube, kí o sì lo quick cross block ìfọwọ́kan kan tó tan gẹ́gẹ́ bíi àṣà.",
+    "highlights": [
+      "Category Filtering: dí tàbí gba àwọn fídíò láyè gẹ́gẹ́ bí ẹ̀ka YouTube (Music, Gaming, Education, àti bẹ́ẹ̀ bẹ́ẹ̀ lọ).",
+      "Quick Cross Block Default ON: `Show Quick Cross Block button` jẹ́ enabled gẹ́gẹ́ bíi àṣà nínú v3.2.7 (àwọn olùlò ṣì lè disable rẹ̀).",
+      "Mobile Blocking: àtìlẹ́yìn YT Mobile dára sí i fún 3 Dot UI àti Quick Cross Block; ó ń ṣiṣẹ́ lórí Home Page báyìí."
+    ]
+  },
+  "3.2.6": {
+    "ctaLabel": "Wo ohun tuntun",
+    "headline": "Ṣíṣe UI/UX lẹ́wà àti fílọ́tẹ̀ tó dá lórí àkóónú",
+    "summary": "Àtúnṣe typography pípé pẹ̀lú àwòrán òde òní àti àwọn filter àkóónú tuntun mẹ́ta (ìgbà pípẹ́, ọjọ́, lẹ́tà ńlá).",
+    "bannerSummary": "Typography tó dára, duration/date/uppercase filters, àti àtúnṣe dashboard.",
+    "highlights": [
+      "Àwọn àtúnṣe typography: ìwọ̀n font òde òní àti tó túnṣe dáadáa fún kíkà tó rọrùn.",
+      "Àwọn filter tó dá lórí àkóónú: duration (pípẹ́/kúkúrú/láàárín), upload date (tuntun/àtijọ́/láàárín), àti uppercase detection (clickbait titles).",
+      "Ètò videoMetaMap: ibi ìpamọ́ metadata fídíò tó dúró pẹ́ pẹ̀lú intelligent batching (window 75ms, ààlà 1500 entries).",
+      "Àtúnṣe dashboard: surface-specific stats (Main àti Kids), stat cards tó dára sí i, àti donate promo card."
+    ]
+  },
+  "3.2.5": {
+    "ctaLabel": "Wo ohun tuntun",
+    "headline": "Whitelist mode di ọ̀nà pàtàkì + ìdúróṣinṣin",
+    "summary": "Whitelist mode ti di ọ̀nà àkọ́kọ́ láti gba àwọn ohun tí a yàn nìkan láyè, pẹ̀lú yíyọ ìdánimọ̀ jáde tó gbọ́n sí i, ààbò playlist, àti lílo CPU tó kéré.",
+    "bannerSummary": "Whitelist mode pàtàkì, ìdánimọ̀ ikanni tó dára, ààbò playlist àti lílo CPU tó kéré.",
+    "highlights": [
+      "A gbé whitelist mode ga: wording/UI kò tún fi àmì experimental sí i mọ́.",
+      "Ìmọ́tótó 3-dot menu àti search-secondary handling fún àwọn ojú-ọ̀nà whitelist.",
+      "Yíyọ ikanni jáde láti ọ̀pọ̀ orísun pẹ̀lú thumbnail anchors àti parent containers.",
+      "Mode-aware state tracking, confirmation dialogs àti bridge optimizations.",
+      "Ìdúróṣinṣin playlist: àwọn row tí a yàn ṣì hàn; pending identities kò tún fi àwọn row tí a dí hàn.",
+      "Àtìlẹ́yìn whitelist mode Kids pẹ̀lú ètò tí kò lo network."
+    ]
+  },
+  "3.2.4": {
+    "ctaLabel": "Wo ohun tuntun",
+    "headline": "Whitelist Mode tó dára sí i + àtúnṣe iṣẹ́",
+    "summary": "Àwọn ìmúdára pàtàkì sí mode whitelist tó ṣì jẹ́ experimental pẹ̀lú UX tó dára, àtúnṣe performance, àti àtìlẹ́yìn Kids tó gbòòrò sí i.",
+    "bannerSummary": "Ìrírí whitelist, performance, ààbò ìpàdánù data, àti àtìlẹ́yìn Kids ti dára sí i.",
+    "highlights": [
+      "EXPERIMENTAL: Whitelist mode tó dára sí i pẹ̀lú ìmọ́tótó 3-dot menu, smart search processing àti mode-aware state tracking.",
+      "Ìmúgbòòrò performance: Bridge-level optimizations àti selective processing dín lílo CPU kù.",
+      "Àtúnṣe UI: Confirmation dialogs ń dènà ìpàdánù data láìròtẹ́lẹ̀ nígbà yíyí mode padà.",
+      "Àtìlẹ́yìn Kids mode: whitelist ń ṣiṣẹ́ lórí YouTube Kids pẹ̀lú ètò tí kò lo network.",
+      "Àtúnṣe search: a ń bójú tó right-rail watch cards lọ́nà tó gbọ́n láti dènà ìpọ̀jù UI.",
+      "Yíyan ikanni jáde: multi-source identity resolution pẹ̀lú thumbnail anchors àti parent containers.",
+      "Yíyí mode padà: ìyípadà rọrùn láàárín blocklist/whitelist pẹ̀lú reprocessing tó gbọ́n."
+    ]
+  },
+  "3.2.3": {
+    "ctaLabel": "Wo ohun tuntun",
+    "headline": "Whitelist Mode ìdánwò + àtúnṣe UI",
+    "summary": "Ìtújáde alpha ti mode whitelist fún fílọ́tẹ̀ 'gba èyí tí a yàn nìkan', pẹ̀lú àwọn UI updates tó dára sí i àti àtìlẹ́yìn mobile menu.",
+    "bannerSummary": "Whitelist alpha, mode toggle rọrùn nínú popup/tab view, àti àtìlẹ́yìn mobile menu.",
+    "highlights": [
+      "EXPERIMENTAL: whitelist mode ń fi gbogbo àkóónú pamọ́ àyàfi àwọn ikanni/keywords tí a fọwọ́sí ní kedere.",
+      "Dual filtering modes pẹ̀lú toggle rọrùn láàárín blocklist àti whitelist nínú popup àti tab view.",
+      "Staging migration — yí sí blocklist láti kó àwọn ikanni jọ, lẹ́yìn náà darapọ̀ wọn padà sínú whitelist.",
+      "Ààbò ojú-ewé Watch nínú whitelist mode ń pa agbára playback fídíò mọ́.",
+      "Optimistic UI updates ń fi àkóónú pamọ́ lẹ́sẹ̀kẹsẹ̀, wọ́n sì ń mú un padà fúnra wọn tí blocking bá kùnà.",
+      "Àtìlẹ́yìn mobile menu tó dára sí i pẹ̀lú mímú YouTube mobile renderer lọ́nà tó tọ́.",
+      "Gbogbo console logs wà lẹ́yìn debug flag báyìí láti dín ariwo production kù."
+    ]
+  },
+  "3.2.2": {
+    "ctaLabel": "Wo ohun tuntun",
+    "headline": "Àwọn àtúnṣe UI/UX àti ìṣàkóso debug",
+    "summary": "Optimistic updates, àtìlẹ́yìn mobile menu, logging tí debug ń ṣàkóso, pípa scroll mọ́, àti àtúnṣe ìṣàkóso state.",
+    "bannerSummary": "Fílọ́tẹ̀ tó hàn kíákíá, mobile menus, ìṣàkóso debug, àti pípa scroll mọ́.",
+    "highlights": [
+      "Optimistic UI updates: àkóónú ń fara pamọ́ lẹ́sẹ̀kẹsẹ̀, ó sì ń padà fúnra rẹ̀ tí blocking bá kùnà.",
+      "Àtìlẹ́yìn mobile menu tó dára fún ytm-menu-popup-renderer pẹ̀lú renderer tags tó tọ́.",
+      "Logging tí debug ń ṣàkóso nípasẹ̀ `window.__filtertubeDebug`.",
+      "Pa ipò scroll mọ́ nígbà DOM fallback láti dènà ìfo ojú-ewé tó ń yọni lẹ́nu.",
+      "Ààlà channel enrichment (10 fún session kọ̀ọ̀kan) láti dín background requests kù.",
+      "Rendering tí a ṣètò nígbà idle pẹ̀lú requestIdleCallback àti batching.",
+      "Debounce external reload pẹ̀lú signature comparison láti yẹra fún renders tí a kò nílò.",
+      "Àwọn notifications yíyan: `load` nígbà signature bá yí padà nìkan; bí bẹ́ẹ̀ kọ́, `externalUpdate`.",
+      "Ìṣàkóso Bridge state nípasẹ̀ shared global state."
+    ]
+  },
+  "3.2.1": {
+    "ctaLabel": "Wo ohun tuntun",
+    "headline": "Ṣíṣe láìsí lag + ìmúgbòòrò iṣẹ́",
+    "summary": "Àwọn àtúnṣe performance pàtàkì ń mú UI lag kúrò, pẹ̀lú àbájáde tó dára lórí Chromium àti ìmúdára pàtàkì lórí Firefox.",
+    "bannerSummary": "Àwọn àtúnṣe performance ń dín dídì UI kù nígbà fílọ́tẹ̀ tó wuwo.",
+    "highlights": [
+      "Async DOM processing ń fún main thread ní àyè láti ṣiṣẹ́, ó sì ń dènà kí browser má bàa dì nígbà fílọ́tẹ̀ tó wuwo.",
+      "Compiled regex àti channel filter caching ń pèsè O(1) lookups, wọ́n sì ń dín lílo CPU kù ní 60–80%.",
+      "Batched storage updates ń dín I/O operations kù ní 70–90% pẹ̀lú àwọn àárín 250ms tó gbọ́n.",
+      "Debounced settings refresh ń dènà DOM reprocessing tó pọ̀ jù.",
+      "Run state management ń dènà executions tó bára wọn dé, ó sì ń kó requests sínú queue lọ́nà tó tọ́.",
+      "Chromium browsers: lag dín kù ju 90% lọ; Firefox: ìmúdára pàtàkì pẹ̀lú iṣẹ́ tó ṣì ń lọ."
+    ]
+  },
+  "3.2.0": {
+    "ctaLabel": "Wo ohun tuntun",
+    "headline": "Dídí lẹ́sẹ̀kẹsẹ̀ + Kids láìsí network",
+    "summary": "Àwọn menu 3-dot ń fi orúkọ ikanni hàn lẹ́sẹ̀kẹsẹ̀, network requests dín kù púpọ̀, YouTube Kids sì ń ṣiṣẹ́ lórí offline pátápátá.",
+    "bannerSummary": "Orúkọ ikanni lẹ́sẹ̀kẹsẹ̀, network requests díẹ̀ sí i, àti dídí Kids offline.",
+    "highlights": [
+      "Àwọn menu 3-dot ń fi orúkọ ikanni tó tọ́ hàn lẹ́sẹ̀kẹsẹ̀ báyìí — kò sí àkókò ìdúró 'Fetching...'.",
+      "Ìdánimọ̀ ikanni ti ń wá láti àwọn ìdáhùn YouTube JSON tí a dáwọ́ dúró, èyí sì ń dín àwọn ìpè network kù.",
+      "YouTube Kids ń ṣiṣẹ́ láìsí network fetch kankan fún dídí tó ṣeé gbẹ́kẹ̀lé.",
+      "A ń kún metadata tó sọnù ní abẹ́lẹ̀ pẹ̀lú ìwọ̀n tó ní àkóso (cooldown wákàtí mẹ́fà).",
+      "A ń bójú tó topic channels (bíi 'Music - Topic') lọ́nà pàtàkì láìsí @handles.",
+      "Ìwé ìtọ́sọ́nà tuntun tó pé pẹ̀lú àwọn flow diagram ASCII àti Mermaid."
+    ]
+  },
+  "3.1.9": {
+    "ctaLabel": "Wo ohun tuntun",
+    "headline": "Àwọn backup tó mọ profaili + controls tí lock ń dáàbò bo",
+    "summary": "Auto-backup àti àwọn control àkóónú ti ń bọ̀wọ̀ fún profile lock/PIN, wọ́n ń jogún àwọn settings profaili kọ̀ọ̀kan, profile dropdown sì ṣì ṣeé tẹ bó tilẹ̀ jẹ́ pé lock gate banner wà lórí rẹ̀.",
+    "bannerSummary": "Backup àti controls ń bọ̀wọ̀ fún profile locks; dropdown ṣì ṣeé tẹ.",
+    "highlights": [
+      "Àwọn aṣàyàn auto-backup mode/format máa ń disable tí auto-backup bá wà ní off tàbí tí profaili bá tii; àwọn profaili tuntun sì ń jogún auto-backup preferences.",
+      "Auto-backup scheduling ń bẹ̀rẹ̀ nígbà tí a ṣẹ̀dá profaili tàbí tí mode/format bá yí padà, ṣùgbọ́n bí auto-backup bá ti enabled fún profaili náà nìkan.",
+      "Àwọn content-control toggles àti backup controls máa ń disable/tún padà nígbà tí a bá tii; export scope fún àwọn profaili tí kì í ṣe master jẹ́ active-profile-only.",
+      "Àtúnṣe z-index profile dropdown ń jẹ́ kí a lè tẹ̀ ẹ́ bó tilẹ̀ jẹ́ pé lock gate banner hàn.",
+      "A ti ṣe àtúnṣe docs nípa profile/PIN model, backups tó jẹ́ ti profaili kọ̀ọ̀kan, àti UI gating rules."
+    ]
+  },
+  "3.1.8": {
+    "ctaLabel": "Wo ohun tuntun",
+    "headline": "Support tab + auto-backups tó ṣeé gbẹ́kẹ̀lé",
+    "summary": "A fi Support page tuntun (Ko-fi) kún un, auto-backups sì ń ṣiṣẹ́ dáadáa lórí Chrome àti Firefox báyìí.",
+    "bannerSummary": "Support page Ko-fi tuntun àti auto-backups tó ń ṣiṣẹ́ lórí Chrome/Firefox.",
+    "highlights": [
+      "A fi Support page tó ní Ko-fi embed kún dashboard.",
+      "Auto-backups ń kọ sórí fáìlì yíyí kan náà báyìí: Downloads/FilterTube Backup/FilterTube-Backup-Latest.json.",
+      "Ọ̀nà download tó ń ṣiṣẹ́ lórí browser ọ̀tọ̀ọ̀tọ̀: Blob URL bí ó bá wà; data: URL fallback fún Chrome MV3 service worker.",
+      "Àwọn download Firefox kò tún kùnà nítorí àwọn ìdíwọ̀ data: URL."
+    ]
+  },
+  "3.1.7": {
+    "ctaLabel": "Wo ohun tuntun",
+    "headline": "Àtìlẹ́yìn YT Kids àti auto-backup",
+    "summary": "Ó ṣeé ṣe báyìí láti dí àkóónú tó dá lórí ikanni lórí YT Kids, a sì lè tan tàbí pa auto-backups.",
+    "bannerSummary": "Dídí ikanni lórí YouTube Kids àti auto-backup tí a lè tan tàbí pa.",
+    "highlights": [
+      "A fi dídí Channel àti Keyword pípé kún YT Kids; ó ń dí ikanni nípa fífetí sí UI menu 3-dot YT Kids láìfọ̀rọ̀ sọ̀rọ̀.",
+      "A fi Settings toggle kún un láti enable/disable auto-backups (best-effort; kò sí Save As prompts).",
+      "Auto-backups ń fipamọ́ sí Downloads/FilterTube Backup/ pẹ̀lú ìyípo fáìlì (àwọn fáìlì tuntun ni a ń pa mọ́).",
+      "Àwọn manual exports ń download lọ́gán sí Downloads/FilterTube Export/."
+    ]
+  },
+  "3.1.6": {
+    "ctaLabel": "Wo ohun tuntun",
+    "headline": "Àtìlẹ́yìn Import/Export + release banner",
+    "summary": "Banner CTA ń ṣí What's New dashboard taara báyìí, àwọn káàdì tí a yàn sì ń bọ láti JSON kan náà; imports sì ń bọ̀wọ̀ fún c/ChannelName àti merge rules dáadáa sí i.",
+    "bannerSummary": "Ọ̀nà taara sí What's New, àwọn káàdì láti JSON kan, àti import tó dára sí i.",
+    "highlights": [
+      "Release notes JSON ń pèsè dashboard cards àti YouTube banner láti orísun òtítọ́ kan náà báyìí.",
+      "CTA ń ṣí tab-view nípasẹ̀ background messaging kí blockers má bàa dí àwọn chrome-extension:// links.",
+      "Àwọn docs àti kóòdù import/export ṣàlàyé bí UC/handle/c/ChannelName inputs ṣe ń di normalized kí a tó merge wọn."
+    ]
+  },
+  "3.1.5": {
+    "ctaLabel": "Wo ohun tuntun",
+    "headline": "Shorts àti Members-only ti pòórá gan-an",
+    "summary": "Watch page àti sidebar ń fi Shorts renderers àti members-only shelves pamọ́ kí wọ́n tó yọ, toggle state sì ń dúró dáadáa níkẹyìn.",
+    "bannerSummary": "Shorts àti members-only shelves ń fara pamọ́ kí wọ́n tó hàn; toggle state ń dúró.",
+    "highlights": [
+      "Sidebar ń ṣàyẹ̀wò /shorts/ hrefs, overlays àti aria-labels kí káàdì tó render.",
+      "Members-only detection ń bo compact, watch àti shelf rows pẹ̀lú badges tuntun àti playlist heuristics.",
+      "A ṣàtúnṣe toggle persistence bug fún members-only kí state lè dúró lẹ́yìn reload."
+    ]
+  },
+  "3.1.4": {
+    "ctaLabel": "Wo ohun tuntun",
+    "headline": "Dashboard ti ṣe ìbáramu responsive",
+    "summary": "Navigation ń kó jọ dáadáa lórí mobile, inputs ń wrap lọ́nà àdánidá, playlist/mix controls sì ní toggles tó ṣe kedere sí i.",
+    "bannerSummary": "Navigation tó bá mobile mu, inputs responsive, àti playlist/Mix controls tó ṣe kedere.",
+    "highlights": [
+      "Hamburger nav àti overlay fún àwọn screen kékeré pẹ̀lú grid spacing tó túnṣe.",
+      "Toggles ní tracks fẹ́ẹ̀rẹ́, thumbs tó wà ní àárín, àti dark-mode contrast tó dára sí i.",
+      "Mix/Radio chip ń fara pamọ́ tí Mix toggle bá wà lórí; fífi playlist pamọ́ sì ń fo radio items."
+    ]
+  },
+  "3.1.3": {
+    "ctaLabel": "Wo ohun tuntun",
+    "headline": "Àtúnṣe tuntun sí Help legend",
+    "summary": "Àwọn cards, pills àti tooltips ń ṣàlàyé gangan ohun tí Exact / Comment / Filter All ń ṣe, wọ́n sì bá dashboard styling tuntun mu.",
+    "bannerSummary": "Àwọn Help cards tuntun ń ṣàlàyé Exact, Comment àti Filter All.",
+    "highlights": [
+      "Help tab ń fi badge tints àti collaboration labels hàn pẹ̀lú colors tó bá ara wọn mu.",
+      "Popup àti tab search bars ti wà ní ìlà full-width kan náà.",
+      "A gbé àwọn àpèjúwe content control sínú hover tooltips fún kíkedere sí i."
+    ]
+  },
+  "3.1.2": {
+    "ctaLabel": "Wo ohun tuntun",
+    "headline": "Agbára autoplay playlist ti pọ̀ sí i",
+    "summary": "Autoplay ń fo àwọn playlist rows tí a dí kọjá láìjẹ́ kí wọ́n yọ fún ìṣẹ́jú kan, sticky hiding sì ń wà lẹ́yìn tí YouTube bá tún process ṣe.",
+    "bannerSummary": "Autoplay ń fo àwọn row tí a dí láìfọ́lẹ̀; fífi playlist pamọ́ ṣì ń ṣiṣẹ́.",
+    "highlights": [
+      "Next-click kì í ṣẹlẹ̀ àyàfi bí playlist row tó tẹ̀lé bá hàn gan-an.",
+      "Watch playlist panel rows ṣì fara pamọ́ bó tilẹ̀ jẹ́ pé a kò tíì yan identity fún ìgbà díẹ̀.",
+      "3-dot menu ń ti pa dáadáa lẹ́yìn dídí kí miniplayer lè máa ṣiṣẹ́."
+    ]
+  },
+  "3.1.1": {
+    "ctaLabel": "Wo ohun tuntun",
+    "headline": "Help tab + àtúnṣe ìdánimọ̀",
+    "summary": "Help tab pàtàkì kan ti dé dashboard, UC ↔ handle ↔ custom URL mapping sì ti ṣeé gbẹ́kẹ̀lé sí i.",
+    "bannerSummary": "Help reference tuntun àti ìpinnu ìdánimọ̀ ikanni tó dára sí i.",
+    "highlights": [
+      "Help reference ń ṣàkọsílẹ̀ gbogbo toggles, badges àti keyword behaviors.",
+      "Playlist navigation ń fo àwọn row tí a dí kọjá láìsí playback flash.",
+      "Handle/custom URL fallback ń tọ́ka sí UC ID tó tọ́ pẹ̀lú ìgbẹ́kẹ̀lé sí i."
+    ]
+  },
+  "3.1.0": {
+    "ctaLabel": "Wo ohun tuntun",
+    "headline": "Àwọn docs + ìmọ̀ kedere nípa fílọ́tẹ̀ hybrid",
+    "summary": "A ti fi hybrid interception + DOM fallback architecture àti àwọn diagram rẹ̀ sí ìwé kí ó lè hàn bí FilterTube ṣe ń mú ìdíwọ̀ ṣẹ.",
+    "bannerSummary": "A ti ṣàlàyé hybrid interception àti DOM fallback filtering architecture ní kedere.",
+    "highlights": [
+      "A ti kọ Watch-page 3-dot parity pẹ̀lú àwọn home/search collaborators sílẹ̀.",
+      "A ti ṣàkọsílẹ̀ àwọn playlist regressions tó kù kí a lè máa tọ́jú àtúnṣe wọn.",
+      "A ti mú manifests, build tooling àti UI footer bá 3.1.0 version bump mu."
+    ]
   }
 }
