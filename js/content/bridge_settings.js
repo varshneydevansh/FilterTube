@@ -31,6 +31,16 @@ if (!(window.__filtertubeMainWorldImportCapabilityWaiters instanceof Set)) {
     window.__filtertubeMainWorldImportCapabilityWaiters = new Set();
 }
 
+function managedOverlayText(key, fallback, values = {}) {
+    try {
+        const localized = window.__filterTubeContentUiCopy?.text?.(key, fallback, values);
+        if (typeof localized === 'string' && localized.trim()) return localized;
+    } catch (_) {
+    }
+    return String(fallback).replace(/\{([a-zA-Z][a-zA-Z0-9]*)\}/g, (match, name) =>
+        Object.prototype.hasOwnProperty.call(values, name) ? String(values[name]) : match);
+}
+
 function markMainWorldImportBridgeReady() {
     window.__filtertubeMainWorldImportBridgeReady = true;
     if (!(window.__filtertubeMainWorldBridgeWaiters instanceof Set)) return;
@@ -841,7 +851,8 @@ function showManagedViewingBlockedOverlay(decision) {
             host.appendChild(overlay);
         }
 
-        const profileName = String(decision.profileName || 'This profile').trim() || 'This profile';
+        const fallbackProfileName = managedOverlayText('managedOverlay.profile.this', 'This profile');
+        const profileName = String(decision.profileName || fallbackProfileName).trim() || fallbackProfileName;
         const surfaceLabel = decision.surface === 'kids' ? 'YouTube Kids' : 'YouTube';
         overlay.innerHTML = '';
         appendManagedOverlayBackground(overlay);
@@ -849,20 +860,28 @@ function showManagedViewingBlockedOverlay(decision) {
         const panel = createManagedOverlayPanel();
 
         const eyebrow = document.createElement('div');
-        eyebrow.textContent = 'FilterTube managed profile';
+        eyebrow.textContent = managedOverlayText('managedOverlay.blocked.eyebrow', 'FilterTube managed profile');
         eyebrow.style.cssText = 'color:#fca5a5;font-size:12px;font-weight:800;text-transform:uppercase;letter-spacing:0;margin-bottom:10px';
 
         const title = document.createElement('h1');
-        title.textContent = `${surfaceLabel} is not available for this profile`;
+        title.textContent = managedOverlayText(
+            'managedOverlay.blocked.title',
+            '{surface} is not available for this profile',
+            { surface: surfaceLabel }
+        );
         title.style.cssText = 'font-size:23px;line-height:1.2;margin:0 0 10px;font-weight:800;color:#fff';
 
         const copy = document.createElement('p');
-        copy.textContent = `${profileName} can use only the viewing spaces approved by the parent or caregiver profile.`;
+        copy.textContent = managedOverlayText(
+            'managedOverlay.blocked.message',
+            '{profileName} can use only the viewing spaces approved by the parent or caregiver profile.',
+            { profileName }
+        );
         copy.style.cssText = 'font-size:14px;line-height:1.5;margin:0;color:#cbd5e1';
 
         const dashboardButton = document.createElement('button');
         dashboardButton.type = 'button';
-        dashboardButton.textContent = 'Open FilterTube';
+        dashboardButton.textContent = managedOverlayText('managedOverlay.openDashboard', 'Open FilterTube');
         dashboardButton.style.cssText = [
             'min-height:44px',
             'width:100%',
@@ -1050,23 +1069,30 @@ function pauseManagedTimeoutVideos() {
 
 function formatManagedTimeoutDuration(seconds) {
     const total = Math.max(0, Math.floor(Number(seconds) || 0));
-    if (!total) return '0m';
+    if (!total) return managedOverlayText('managedOverlay.duration.zeroMinutes', '0m');
     const hours = Math.floor(total / 3600);
     const minutes = Math.floor((total % 3600) / 60);
-    if (hours && minutes) return `${hours}h ${minutes}m`;
-    if (hours) return `${hours}h`;
-    return `${Math.max(1, minutes)}m`;
+    if (hours && minutes) {
+        return managedOverlayText('managedOverlay.duration.hoursMinutes', '{hours}h {minutes}m', { hours, minutes });
+    }
+    if (hours) return managedOverlayText('managedOverlay.duration.hours', '{hours}h', { hours });
+    return managedOverlayText('managedOverlay.duration.minutes', '{minutes}m', { minutes: Math.max(1, minutes) });
 }
 
 function formatManagedTimeRemaining(seconds) {
     const total = Math.max(0, Math.floor(Number(seconds) || 0));
-    if (!total) return '0s';
+    if (!total) return managedOverlayText('managedOverlay.duration.zeroSeconds', '0s');
     const hours = Math.floor(total / 3600);
     const minutes = Math.floor((total % 3600) / 60);
     const remainder = total % 60;
-    if (hours) return `${hours}h ${minutes}m`;
-    if (minutes) return `${minutes}m ${remainder}s`;
-    return `${remainder}s`;
+    if (hours) return managedOverlayText('managedOverlay.duration.hoursMinutes', '{hours}h {minutes}m', { hours, minutes });
+    if (minutes) {
+        return managedOverlayText('managedOverlay.duration.minutesSeconds', '{minutes}m {seconds}s', {
+            minutes,
+            seconds: remainder
+        });
+    }
+    return managedOverlayText('managedOverlay.duration.seconds', '{seconds}s', { seconds: remainder });
 }
 
 function removeManagedTimeLimitStatus() {
@@ -1124,11 +1150,20 @@ function showManagedTimeLimitStatus(state) {
             host.appendChild(status);
         }
 
-        const profileName = String(state.profileName || 'Protected profile').trim() || 'Protected profile';
+        const fallbackProfileName = managedOverlayText('managedOverlay.profile.protected', 'Protected profile');
+        const profileName = String(state.profileName || fallbackProfileName).trim() || fallbackProfileName;
         const surfaceLabel = state.surface === 'kids' ? 'YouTube Kids' : 'YouTube';
         const timeLeft = formatManagedTimeRemaining(remainingSeconds);
-        status.textContent = `${surfaceLabel} time left: ${timeLeft}`;
-        status.title = `${profileName} has ${timeLeft} left today.`;
+        status.textContent = managedOverlayText(
+            'managedOverlay.timeRemaining.status',
+            '{surface} time left: {timeLeft}',
+            { surface: surfaceLabel, timeLeft }
+        );
+        status.title = managedOverlayText(
+            'managedOverlay.timeRemaining.title',
+            '{profileName} has {timeLeft} left today.',
+            { profileName, timeLeft }
+        );
     } catch (e) {
     }
 }
@@ -1169,12 +1204,13 @@ function showManagedTimeoutOverlay(state) {
             host.appendChild(overlay);
         }
 
-        const profileName = String(state?.profileName || 'This profile').trim() || 'This profile';
+        const fallbackProfileName = managedOverlayText('managedOverlay.profile.this', 'This profile');
+        const profileName = String(state?.profileName || fallbackProfileName).trim() || fallbackProfileName;
         const surfaceLabel = state?.surface === 'kids' ? 'YouTube Kids' : 'YouTube';
         const timezone = String(state?.timezone || '').trim();
         const resetCopy = timezone
-            ? `Resets at midnight (${timezone}).`
-            : 'Resets at the next daily policy reset.';
+            ? managedOverlayText('managedOverlay.reset.midnight', 'Resets at midnight ({timezone}).', { timezone })
+            : managedOverlayText('managedOverlay.reset.nextDaily', 'Resets at the next daily policy reset.');
         const totalBudgetCopy = formatManagedTimeoutDuration(state?.totalBudgetSeconds);
         const usedCopy = formatManagedTimeoutDuration(state?.consumedSeconds);
         const policyExpired = state?.reason === 'expired_policy_requires_parent_revalidation';
@@ -1207,31 +1243,47 @@ function showManagedTimeoutOverlay(state) {
         brandMark.alt = 'FilterTube';
         brandMark.src = browserAPI_BRIDGE.runtime.getURL('icons/icon-48.png');
         const brandText = document.createElement('span');
-        brandText.textContent = 'FilterTube · profile time';
+        brandText.textContent = managedOverlayText('managedOverlay.brand.time', 'FilterTube · profile time');
         brand.append(brandMark, brandText);
 
         const eyebrow = document.createElement('div');
         eyebrow.className = 'filtertube-managed-overlay__eyebrow';
-        eyebrow.textContent = policyExpired ? 'Parent review needed' : 'Daily pause reached';
+        eyebrow.textContent = policyExpired
+            ? managedOverlayText('managedOverlay.timeout.eyebrow.parentReview', 'Parent review needed')
+            : managedOverlayText('managedOverlay.timeout.eyebrow.dailyPause', 'Daily pause reached');
 
         const title = document.createElement('h1');
         title.id = 'filtertube-managed-timeout-title';
         title.className = 'filtertube-managed-overlay__title';
-        title.append(document.createTextNode(policyExpired ? `${surfaceLabel} needs ` : `Today's watching time is `));
-        const titleEmphasis = document.createElement('span');
-        titleEmphasis.className = 'filtertube-managed-overlay__title-emphasis';
-        titleEmphasis.textContent = policyExpired ? 'parent approval.' : 'complete.';
-        title.appendChild(titleEmphasis);
+        title.textContent = policyExpired
+            ? managedOverlayText(
+                'managedOverlay.timeout.title.parentReview',
+                '{surface} needs parent approval.',
+                { surface: surfaceLabel }
+            )
+            : managedOverlayText('managedOverlay.timeout.title.dailyPause', "Today's watching time is complete.");
 
         const copy = document.createElement('p');
         copy.className = 'filtertube-managed-overlay__lede';
         copy.textContent = policyExpired
-            ? `${profileName} needs a parent or caregiver to review this time rule before ${surfaceLabel} can continue.`
-            : `${profileName} has used today's YouTube time allowance. ${surfaceLabel} stays paused until the daily reset or until more time is approved.`;
+            ? managedOverlayText(
+                'managedOverlay.timeout.copy.parentReview',
+                '{profileName} needs a parent or caregiver to review this time rule before {surface} can continue.',
+                { profileName, surface: surfaceLabel }
+            )
+            : managedOverlayText(
+                'managedOverlay.timeout.copy.dailyPause',
+                "{profileName} has used today's YouTube time allowance. {surface} stays paused until the daily reset or until more time is approved.",
+                { profileName, surface: surfaceLabel }
+            );
 
         const profilePill = document.createElement('div');
         profilePill.className = 'filtertube-managed-overlay__profile';
-        profilePill.textContent = `${profileName} · ${surfaceLabel}`;
+        profilePill.textContent = managedOverlayText(
+            'managedOverlay.timeout.profilePill',
+            '{profileName} · {surface}',
+            { profileName, surface: surfaceLabel }
+        );
 
         story.append(brand, eyebrow, title, copy, profilePill);
 
@@ -1241,9 +1293,9 @@ function showManagedTimeoutOverlay(state) {
         const facts = document.createElement('dl');
         facts.className = 'filtertube-managed-overlay__facts';
         [
-            ['Daily limit', totalBudgetCopy],
-            ['Used today', usedCopy],
-            ['Reset', resetCopy]
+            [managedOverlayText('managedOverlay.timeout.fact.dailyLimit', 'Daily limit'), totalBudgetCopy],
+            [managedOverlayText('managedOverlay.timeout.fact.usedToday', 'Used today'), usedCopy],
+            [managedOverlayText('managedOverlay.timeout.fact.reset', 'Reset'), resetCopy]
         ].forEach(([label, value]) => {
             const fact = document.createElement('div');
             fact.className = 'filtertube-managed-overlay__fact';
@@ -1258,8 +1310,14 @@ function showManagedTimeoutOverlay(state) {
         const guidance = document.createElement('div');
         guidance.className = 'filtertube-managed-overlay__guidance';
         guidance.textContent = policyExpired
-            ? 'Switch to a parent, caregiver, or another authorized profile. The exhausted profile cannot dismiss this screen or approve its own access.'
-            : 'Switching profiles follows the normal PIN check. A request for more time is saved for parent review, but never unlocks this profile by itself.';
+            ? managedOverlayText(
+                'managedOverlay.timeout.guidance.parentReview',
+                'Switch to a parent, caregiver, or another authorized profile. The exhausted profile cannot dismiss this screen or approve its own access.'
+            )
+            : managedOverlayText(
+                'managedOverlay.timeout.guidance.dailyPause',
+                'Switching profiles follows the normal PIN check. A request for more time is saved for parent review, but never unlocks this profile by itself.'
+            );
 
         const actionArea = document.createElement('div');
         actionArea.className = 'filtertube-managed-overlay__actions';
@@ -1271,21 +1329,21 @@ function showManagedTimeoutOverlay(state) {
         const switchButton = document.createElement('button');
         switchButton.type = 'button';
         switchButton.className = 'filtertube-managed-overlay__button filtertube-managed-overlay__button--primary';
-        switchButton.textContent = 'Switch profile';
+        switchButton.textContent = managedOverlayText('managedOverlay.switch.action', 'Switch profile');
         switchButton.addEventListener('click', () => {
             if (!profileSwitcher.hidden) {
                 profileSwitcher.hidden = true;
                 profileSwitcher.innerHTML = '';
-                switchButton.textContent = 'Switch profile';
+                switchButton.textContent = managedOverlayText('managedOverlay.switch.action', 'Switch profile');
                 return;
             }
             switchButton.disabled = true;
-            switchButton.textContent = 'Loading profiles…';
+            switchButton.textContent = managedOverlayText('managedOverlay.switch.loading', 'Loading profiles…');
             browserAPI_BRIDGE.runtime.sendMessage({
                 action: 'FilterTube_GetManagedProfileSwitchOptions'
             }, response => {
                 switchButton.disabled = false;
-                switchButton.textContent = 'Cancel profile switch';
+                switchButton.textContent = managedOverlayText('managedOverlay.switch.cancel', 'Cancel profile switch');
                 profileSwitcher.hidden = false;
                 profileSwitcher.innerHTML = '';
                 const options = Array.isArray(response?.options) ? response.options : [];
@@ -1294,8 +1352,8 @@ function showManagedTimeoutOverlay(state) {
                     empty.className = 'filtertube-managed-overlay__instruction';
                     empty.setAttribute('data-visible', 'true');
                     empty.textContent = response?.ok
-                        ? 'No other profile is available on this device.'
-                        : 'Profiles could not be loaded. Keep this page open and try again.';
+                        ? managedOverlayText('managedOverlay.switch.noOtherProfile', 'No other profile is available on this device.')
+                        : managedOverlayText('managedOverlay.switch.loadFailed', 'Profiles could not be loaded. Keep this page open and try again.');
                     profileSwitcher.appendChild(empty);
                     return;
                 }
@@ -1310,39 +1368,55 @@ function showManagedTimeoutOverlay(state) {
                     meta.className = 'filtertube-managed-overlay__profile-meta';
                     const name = document.createElement('span');
                     name.className = 'filtertube-managed-overlay__profile-name';
-                    name.textContent = option.profileName || 'Profile';
+                    name.textContent = option.profileName || managedOverlayText('managedOverlay.profile.generic', 'Profile');
                     const type = document.createElement('span');
                     type.className = 'filtertube-managed-overlay__profile-type';
-                    type.textContent = option.type === 'child' ? 'Protected profile' : 'Account profile';
+                    type.textContent = option.type === 'child'
+                        ? managedOverlayText('managedOverlay.profile.protected', 'Protected profile')
+                        : managedOverlayText('managedOverlay.profile.account', 'Account profile');
                     meta.append(name, type);
                     const lock = document.createElement('span');
                     lock.className = 'filtertube-managed-overlay__profile-lock';
-                    lock.textContent = option.requiresPin ? 'PIN' : 'Open';
+                    lock.textContent = option.requiresPin ? 'PIN' : managedOverlayText('managedOverlay.switch.open', 'Open');
                     optionButton.append(avatar, meta, lock);
                     optionButton.addEventListener('click', () => {
                         let pin = '';
                         if (option.requiresPin) {
-                            pin = String(window.prompt(`Enter the PIN for ${option.profileName || 'this profile'}`) || '').trim();
+                            const profileNameForPrompt = option.profileName
+                                || managedOverlayText('managedOverlay.profile.genericLowercase', 'this profile');
+                            pin = String(window.prompt(managedOverlayText(
+                                'managedOverlay.switch.pinPrompt',
+                                'Enter the PIN for {profileName}',
+                                { profileName: profileNameForPrompt }
+                            )) || '').trim();
                             if (!pin) return;
                         }
                         optionButton.disabled = true;
-                        lock.textContent = 'Switching…';
+                        lock.textContent = managedOverlayText('managedOverlay.switch.switching', 'Switching…');
                         browserAPI_BRIDGE.runtime.sendMessage({
                             action: 'FilterTube_SwitchManagedProfile',
                             targetProfileId: option.profileId,
                             pin
                         }, result => {
                             if (result?.ok) {
-                                instruction.textContent = `Switching to ${result.profileName || option.profileName || 'profile'}…`;
+                                const targetProfileName = result.profileName || option.profileName
+                                    || managedOverlayText('managedOverlay.profile.genericLowercase', 'this profile');
+                                instruction.textContent = managedOverlayText(
+                                    'managedOverlay.switch.switchingTo',
+                                    'Switching to {profileName}…',
+                                    { profileName: targetProfileName }
+                                );
                                 instruction.setAttribute('data-visible', 'true');
                                 profileSwitcher.querySelectorAll('button').forEach(button => { button.disabled = true; });
                                 return;
                             }
                             optionButton.disabled = false;
-                            lock.textContent = option.requiresPin ? 'PIN' : 'Open';
+                            lock.textContent = option.requiresPin ? 'PIN' : managedOverlayText('managedOverlay.switch.open', 'Open');
                             instruction.textContent = result?.reason === 'rate_limited'
-                                ? 'Too many incorrect PIN attempts. Wait before trying again.'
-                                : (result?.reason === 'incorrect_pin' ? 'That PIN was not correct.' : 'Profile switch failed. Try again.');
+                                ? managedOverlayText('managedOverlay.switch.pinRateLimited', 'Too many incorrect PIN attempts. Wait before trying again.')
+                                : (result?.reason === 'incorrect_pin'
+                                    ? managedOverlayText('managedOverlay.switch.pinIncorrect', 'That PIN was not correct.')
+                                    : managedOverlayText('managedOverlay.switch.failed', 'Profile switch failed. Try again.'));
                             instruction.setAttribute('data-visible', 'true');
                         });
                     });
@@ -1354,15 +1428,18 @@ function showManagedTimeoutOverlay(state) {
         const askButton = document.createElement('button');
         askButton.type = 'button';
         askButton.className = 'filtertube-managed-overlay__button';
-        askButton.textContent = 'Request more time';
+        askButton.textContent = managedOverlayText('managedOverlay.request.action', 'Request more time');
 
         const instruction = document.createElement('p');
         instruction.className = 'filtertube-managed-overlay__instruction';
-        instruction.textContent = 'Request saved here only tells the parent profile that more time is needed. It does not unlock YouTube by itself.';
+        instruction.textContent = managedOverlayText(
+            'managedOverlay.request.initialInstruction',
+            'Request saved here only tells the parent profile that more time is needed. It does not unlock YouTube by itself.'
+        );
 
         askButton.addEventListener('click', () => {
             instruction.setAttribute('data-visible', 'true');
-            askButton.textContent = 'Request sent';
+            askButton.textContent = managedOverlayText('managedOverlay.request.sent', 'Request sent');
             askButton.disabled = true;
             pauseManagedTimeoutVideos();
             const requestKey = [
@@ -1385,15 +1462,27 @@ function showManagedTimeoutOverlay(state) {
                         const err = browserAPI_BRIDGE.runtime?.lastError;
                         if (!err && response?.ok === true) {
                             instruction.textContent = response.recorded === true
-                                ? 'Request saved for parent review. YouTube stays paused until a parent or caregiver grants more time from FilterTube.'
-                                : 'A recent request is already saved for parent review. YouTube stays paused until more time is granted from FilterTube.';
+                                ? managedOverlayText(
+                                    'managedOverlay.request.saved',
+                                    'Request saved for parent review. YouTube stays paused until a parent or caregiver grants more time from FilterTube.'
+                                )
+                                : managedOverlayText(
+                                    'managedOverlay.request.alreadySaved',
+                                    'A recent request is already saved for parent review. YouTube stays paused until more time is granted from FilterTube.'
+                                );
                         } else {
-                            instruction.textContent = 'A parent or caregiver can still open FilterTube and grant more time from a trusted profile. This button did not unlock YouTube.';
+                            instruction.textContent = managedOverlayText(
+                                'managedOverlay.request.unavailable',
+                                'A parent or caregiver can still open FilterTube and grant more time from a trusted profile. This button did not unlock YouTube.'
+                            );
                         }
                         pauseManagedTimeoutVideos();
                     });
                 } catch (e) {
-                    instruction.textContent = 'A parent or caregiver can still open FilterTube and grant more time from a trusted profile. This button did not unlock YouTube.';
+                    instruction.textContent = managedOverlayText(
+                        'managedOverlay.request.unavailable',
+                        'A parent or caregiver can still open FilterTube and grant more time from a trusted profile. This button did not unlock YouTube.'
+                    );
                 }
             }
         });
