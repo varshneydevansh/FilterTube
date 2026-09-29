@@ -14,5 +14,361 @@
       "GitHub release ಪ್ರಕಟಣೆ GitHub CLI credentials ಬಳಸುತ್ತದೆ, ಅಪ್‌ಲೋಡ್ ಮೊದಲು drafts ಸೃಷ್ಟಿಸುತ್ತದೆ, ಇರುವ tagsನಿಂದ ಮುಂದುವರಿಯುತ್ತದೆ, ಇಲ್ಲದ assets ಮಾತ್ರ ಅಪ್‌ಲೋಡ್ ಮಾಡುತ್ತದೆ, ಅಂತಿಮ asset ಸಮೂಹವನ್ನು ಪರಿಶೀಲಿಸುತ್ತದೆ ಮತ್ತು ಪರಿಶೀಲನೆಯ ನಂತರ ಮಾತ್ರ ಪ್ರಕಟಿಸುತ್ತದೆ.",
       "Android ಫೋನ್ ಮತ್ತು ಟ್ಯಾಬ್ಲೆಟ್‌ಗಳ FilterTube ಆ್ಯಪ್ ಈಗ Google Playನಲ್ಲಿ ಸಾರ್ವಜನಿಕವಾಗಿ ಲಭ್ಯವಿದೆ. ಅದನ್ನು [ಸಾರ್ವಜನಿಕ ಪುಟದಿಂದ](https://play.google.com/store/apps/details?id=com.filtertube.app) ಸ್ಥಾಪಿಸಿ ಅಥವಾ Google Playನಲ್ಲಿ FilterTube ಹುಡುಕಿ."
     ]
+  },
+  "3.3.6": {
+    "ctaLabel": "ಹೊಸದೇನು ನೋಡಿ",
+    "headline": "ಬಲವಾದ ಫಿಲ್ಟರಿಂಗ್, ರಕ್ಷಿತ ಸಮಯ ಮತ್ತು ಶಾಂತ ಜಾಹೀರಾತು-ಮುಕ್ತ ಪ್ಲೇಬ್ಯಾಕ್",
+    "summary": "FilterTube 3.3.6 ನೇರ ಪ್ರವೇಶ ಜಾರಿ, ಪ್ರತಿ profileಗೆ ರಕ್ಷಿತ ಸಮಯ ಮತ್ತು Self-Control sessions, ವಿಶ್ವಾಸಾರ್ಹ Blocked ಹಾಗೂ Allowed rule collections, ಅಧಿಕೃತ category filtering, default-on Advert Void ಮತ್ತು ಇಂದಿನ YouTube ಜೊತೆ ವ್ಯಾಪಕ compatibility ಕೆಲಸವನ್ನು ತರುತ್ತದೆ.",
+    "bannerSummary": "ನೇರ ಪ್ರವೇಶ ಫಿಲ್ಟರಿಂಗ್, ರಕ್ಷಿತ ಸಮಯ, rule-list ಮತ್ತು BlockTube imports, ಅಧಿಕೃತ categories, Advert Void ಹಾಗೂ ಇಂದಿನ YouTube compatibility.",
+    "highlights": [
+      "ನೇರ YouTube ಭೇಟಿಗಳು, playlist transitions, autoplay ಮತ್ತು ಬೆಂಬಲಿತ embeds ಈಗ feed filteringನಂತೆಯೇ video ಹಾಗೂ channel admission rules ಮೂಲಕ ಸಾಗುತ್ತವೆ; ಆದ್ದರಿಂದ ಅವು filtering ಅನ್ನು bypass ಮಾಡುವುದಿಲ್ಲ.",
+      "ದೈನಂದಿನ YouTube limits ಈಗ ಸಕ್ರಿಯ profileಗೆ ಅನ್ವಯಿಸುತ್ತವೆ, ಉಳಿದ ಸಮಯ ತೋರಿಸುತ್ತವೆ, restarts ಬಳಿಕವೂ ಉಳಿಯುತ್ತವೆ ಮತ್ತು PIN-ಆಧಾರಿತ profile switching ಇರುವ full-page timeout screen ಬಳಸುತ್ತವೆ. ಸ್ವಯಂ ಆಯ್ಕೆ ಮಾಡಿದ Self-Control sessions countdown ಮುಗಿಯುವವರೆಗೂ ಆಯ್ದ rules ಅನ್ನು lock ಮಾಡುತ್ತವೆ.",
+      "Blocked rules ಮತ್ತು Allowed rules Main ಹಾಗೂ Kidsಗೆ ಪ್ರತ್ಯೇಕ collections ಆಗಿಯೇ ಉಳಿಯುತ್ತವೆ; ಮೇಲಿನ Blocklist ಅಥವಾ Whitelist policy ವೀಕ್ಷಣೆಯನ್ನು ಯಾವ collection ನಿಯಂತ್ರಿಸಬೇಕು ಎಂದು ಆರಿಸುತ್ತದೆ.",
+      "ದೊಡ್ಡ BlockTube ಮತ್ತು managed rule-list imports preview, capacity checks, transactional rollback ಹಾಗೂ read-back verification ಬಳಸುತ್ತವೆ; added, duplicate, skipped, channel, keyword, regex ಮತ್ತು video-ID counts ಇನ್ನಷ್ಟು ಸ್ಪಷ್ಟವಾಗಿವೆ.",
+      "Category filtering YouTubeನ ಅಧಿಕೃತ `microformat.playerMicroformatRenderer.category`, ಮಿತಿಗೊಳಿಸಿದ same-origin Player metadata hydration, ಆಯ್ದ categories ಅನ್ನು block ಮಾಡುವ ಅಥವಾ ಅವುಗಳನ್ನು ಮಾತ್ರ allow ಮಾಡುವ ಸ್ಪಷ್ಟ ಆಯ್ಕೆಗಳು ಮತ್ತು Watch, rail, Mix, comments ಹಾಗೂ renderer ownershipಗೆ ಸುರಕ್ಷಿತ ನಿರ್ವಹಣೆ ಬಳಸುತ್ತದೆ.",
+      "Advert Void ಈಗ YouTube Main ಮತ್ತು Kidsನ ಹೊಸ ಹಾಗೂ upgraded profilesಗೆ default ಆಗಿ enabled. Shared Web runtime ಹೆಚ್ಚುವರಿ requests ಇಲ್ಲದೆ Playerನಲ್ಲಿ ಕಂಡ ad-plan fields ತೆಗೆದುಹಾಕುತ್ತದೆ; native playback ಮಾದರಿಗೊಳಿಸದ ad-plan data ತ್ಯಜಿಸುತ್ತದೆ ಅಥವಾ ಕಾಣಿಸಿದಾಗ raw Reel response ಅನ್ನು normalize ಮಾಡುತ್ತದೆ; guarded fallback ತಪ್ಪಿಸಿಕೊಂಡ interruptions ನಿಭಾಯಿಸುತ್ತದೆ.",
+      "ಪ್ರಾಯೋಗಿಕ spoken-language filtering ಮತ್ತು original-audio preference ಲಭ್ಯವಿದ್ದಾಗ YouTube Player evidence ಬಳಸುತ್ತವೆ; recommendation metadata ಲಭ್ಯವಿಲ್ಲದಿದ್ದರೆ fail open ಆಗುತ್ತವೆ.",
+      "YouTube Playables ಮರೆಮಾಡುವುದು, ಪ್ರಸ್ತುತ camelCase renderer ಮತ್ತು collaboration handling, ಸುಧಾರಿತ Help readability ಹಾಗೂ search, ಸ್ಪಷ್ಟ popup ಮತ್ತು dashboard controls, ಹಾಗೆಯೇ ಸಾರ್ವಜನಿಕ Android Google Play ಮತ್ತು iOS status surfaces ಕೂಡ ಸೇರಿವೆ.",
+      "Settingsನಲ್ಲಿ device-wide opt-out ಸೇರಿದೆ; ಅದು default ಆಗಿ unchecked ಮತ್ತು YouTube ಹಾಗೂ YouTube Kidsನ automatic reload reminders ಮತ್ತು What's New banners ಅನ್ನು ನಿಷ್ಕ್ರಿಯಗೊಳಿಸುತ್ತದೆ. Dashboardನ What's New ಪುಟವನ್ನು ಕೈಯಾರೆ ತೆರೆಯಬಹುದು."
+    ]
+  },
+  "3.3.5": {
+    "ctaLabel": "ಹೊಸದೇನು ನೋಡಿ",
+    "headline": "YouTube ದೋಷದಿಂದ ಚೇತರಿಕೆ ಮತ್ತು Shorts channel blocking ಮುಂಚಿತವಾಗಿ",
+    "summary": "ಈ release ಈಗಾಗಲೇ ತೆರೆದಿರುವ YouTube tabsನಲ್ಲಿ content runtimeನ duplicate injection ಸರಿಪಡಿಸುತ್ತದೆ; channel rules ಅಥವಾ whitelist mode ಸಕ್ರಿಯವಾಗಿರುವಾಗ ಕಾಣುವ Shortsನ channel identity ಅನ್ನು ಕೂಡ ಬೇಗ resolve ಮಾಡುತ್ತದೆ.",
+    "bannerSummary": "ಪುನರಾವರ್ತಿತ runtime injection ದೋಷ ಸರಿಪಡಿಸಿ Shorts channel identity ಅನ್ನು ಬೇಗ ಪತ್ತೆಹಚ್ಚುತ್ತದೆ.",
+    "highlights": [
+      "Install/update/profile refresh ಈಗಾಗಲೇ ತೆರೆದ YouTube tabsಗೆ manifest content scripts ಅನ್ನು ಮರು-inject ಮಾಡುವುದಿಲ್ಲ; ಇದರಿಂದ `Identifier ... has already been declared` ಎಂಬ ಪುನರಾವರ್ತಿತ syntax errors ತಡೆಯಲ್ಪಡುತ್ತವೆ.",
+      "ಈಗಾಗಲೇ ತೆರೆದ YouTube tabs duplicate script declarations ಇಲ್ಲದೆ managed time-limit/runtime checks ಪಡೆಯಬಹುದು.",
+      "Channel blocklist rules ಅಥವಾ whitelist mode ಸಕ್ರಿಯವಾಗಿರುವಾಗ visible ಮತ್ತು near-visible Shorts ಈಗಿರುವ bounded background `/shorts/<videoId>` owner resolver ಬಳಸುತ್ತವೆ.",
+      "ಕಲಿತ Shorts video-to-channel mappings ಉಳಿಸಿ ತಕ್ಷಣ ಮರುಪ್ರಕ್ರಿಯೆಗೊಳಿಸಲಾಗುತ್ತವೆ; ಹೀಗಾಗಿ blocked channel Shorts ಮರೆಮಾಡುವ ಮೊದಲು hover ಅಥವಾ menu interaction ಬೇಕಾಗುವುದಿಲ್ಲ.",
+      "`.shortsLockupViewModelHost` ಮತ್ತು `.ytGridShelfViewModelGridShelfItem` ಮುಂತಾದ desktop Shorts hosts ಅನ್ನು dedicated Shorts fallback/enrichment pathsಗೆ ಸೇರಿಸಲಾಗಿದೆ.",
+      "Blocklist modeನಲ್ಲಿ identity resolve ಆಗುವವರೆಗೆ ತಿಳಿಯದ Shorts ಮರೆಮಾಡುವುದಿಲ್ಲ; whitelist mode ಇರುವ pending path ಮೂಲಕ ಹೆಚ್ಚು ಕಟ್ಟುನಿಟ್ಟಾಗಿರುತ್ತದೆ.",
+      "YouTube breakage report ಪರಿಶೀಲನೆಯಲ್ಲಿದ್ದಾಗ v3.3.4 ಅನ್ನು v3.3.2 packageಗೆ store rollback ಎಂದು ದಾಖಲಿಸಲಾಗಿದೆ."
+    ]
+  },
+  "3.3.4": {
+    "ctaLabel": "ಹೊಸದೇನು ನೋಡಿ",
+    "headline": "Store rollback ಮೂಲಕ v3.3.2 packageಗೆ ಹಿಂದಿರುಗಿದೆ",
+    "summary": "v3.3.4 browser-store rollback version ಆಗಿದ್ದು, v3.3.3 ಕುರಿತು YouTube breakage report ಪರಿಶೀಲಿಸುವಾಗ ಹಿಂದಿನ v3.3.2 package ಬಳಸಿತು.",
+    "bannerSummary": "Store rollback: YouTube ಸಮಸ್ಯೆ ಪರಿಶೀಲನೆಯಲ್ಲಿದ್ದಾಗ v3.3.4 v3.3.2 package ಬಳಸಿತು.",
+    "highlights": [
+      "v3.3.4ಗಾಗಿ ಹೊಸ source-forward feature work ಇದೆ ಎಂದು ಹೇಳಲಾಗಿಲ್ಲ.",
+      "Issue #64 ತನಿಖೆಯ ವೇಳೆ ಶಂಕಿತ v3.3.3 packageನಿಂದ stores ಅನ್ನು ದೂರ ಮಾಡಲು rollback ಬಳಸಲಾಯಿತು.",
+      "ಮುಂದಿನ source release v3.3.5 duplicate runtime injection ಮತ್ತು Shorts identity fixes ತರುತ್ತದೆ."
+    ]
+  },
+  "3.3.3": {
+    "ctaLabel": "ಹೊಸದೇನು ನೋಡಿ",
+    "headline": "ಕುಟುಂಬ device updates, rule lists, date keywords ಮತ್ತು YouTube DOM refresh",
+    "summary": "ಈ release parent/caregiver controls ಅನ್ನು ಅರ್ಥಮಾಡಿಕೊಳ್ಳಲು ಸುಲಭಗೊಳಿಸುತ್ತದೆ, reviewed rule-list imports ಮತ್ತು date-limited keyword rules ಸೇರಿಸುತ್ತದೆ, Home/Internet Pickup model ದಾಖಲಿಸುತ್ತದೆ ಮತ್ತು ಇಂದಿನ YouTube/YTM markupಗೆ filtering refresh ಮಾಡುತ್ತದೆ.",
+    "bannerSummary": "ಕುಟುಂಬ device updates, reviewed rule-list imports, date-based keywords, parent-first Help ಮತ್ತು ಇಂದಿನ YouTube/YTM DOM compatibility.",
+    "highlights": [
+      "Parent/caregiver profiles protected profiles ನಿರ್ವಹಿಸಬಹುದು, parent dashboardನಿಂದ child/protected rules edit ಮಾಡಬಹುದು ಮತ್ತು ಅನುಮೋದಿತ updates ಅನ್ನು verified protected devicesಗೆ ಕಳುಹಿಸಬಹುದು.",
+      "Family Device Updates ಈಗ live Send Update, ಸ್ಪಷ್ಟ Home Pickup ಮತ್ತು ಸ್ಪಷ್ಟ Internet Pickup ವಿವರಿಸುತ್ತದೆ; pickup services ಅನ್ನು authority ಎಂದು ಪರಿಗಣಿಸುವುದಿಲ್ಲ.",
+      "Protected profile time limits ಈಗ ಹಳೆಯ ಮತ್ತು ಹೊಸ YouTube tabs ಎರಡನ್ನೂ ಪರಿಶೀಲಿಸುತ್ತವೆ, ಶಾಂತ timeout screen ತೋರಿಸುತ್ತವೆ ಮತ್ತು ಹೆಚ್ಚುವರಿ ಸಮಯದ ವಿನಂತಿಗಳನ್ನು parent reviewಗಾಗಿ ದಾಖಲಿಸುತ್ತವೆ.",
+      "Rule-list imports CSV, TXT, simple JSON, BlockTube-style JSON ಮತ್ತು raw HTTPS URLs ಬೆಂಬಲಿಸುತ್ತವೆ; apply ಮಾಡುವ ಮೊದಲು preview, Main/Kids/Both targeting, templates, list management, pause/resume/remove, stale checks ಮತ್ತು refresh ಇವೆ.",
+      "Date-based keyword filtering upload dateನಿಂದ/ಅದಕ್ಕಿಂತ ಮುಂಚೆ ಅಥವಾ ದಿನಾಂಕಗಳ ನಡುವೆ ಮಾತ್ರ keyword ಅನ್ವಯಿಸಬಹುದು. YouTube ಒದಗಿಸಿದಾಗ comment filtering parent video upload date ಬಳಸುತ್ತದೆ.",
+      "Help ಮತ್ತು dashboard controls ಸರಳ parent-first ಪದಗಳು, ವೇಗವಾದ help bubbles ಮತ್ತು Exact, Comment, Date, PINs, rule lists ಹಾಗೂ device updatesಗೆ ಸ್ಪಷ್ಟ ವಿವರಣೆ ಬಳಸುತ್ತವೆ.",
+      "Dashboard ಸಕ್ರಿಯ Android closed-testing ಬಳಕೆದಾರರಿಗೆ hello@filtertube.inಗೆ email ಮಾಡಲು ಆಹ್ವಾನಿಸುತ್ತದೆ; YouTube page structure ಬದಲಾದಾಗ filtering breakage ವರದಿ ಮಾಡಲು ಗೋಚರಿಸುವ ಜ್ಞಾಪನೆಯನ್ನೂ ಉಳಿಸುತ್ತದೆ.",
+      "YouTube desktop lockup selectors ಮತ್ತು YTM mobile camelCase DOM ದಾಖಲಿಸಲಾಗಿದೆ; ಇದರಿಂದ ನಿಜವಾದ video cards filtering ಪಡೆಯುತ್ತವೆ, Watch-page chip bars fallback ಕೆಲಸ ಪ್ರಾರಂಭಿಸುವುದಿಲ್ಲ ಅಥವಾ scroll jumps ಉಂಟುಮಾಡುವುದಿಲ್ಲ.",
+      "ಇನ್ನೂ ಪ್ರತ್ಯೇಕವಾಗಿರುವವು: automatic LAN peer discovery, hosted FilterTube Internet Pickup service, ಮೌನ public auto-subscribe catalogs, native Android/iOS parity ಮತ್ತು ಸ್ಥಾಪಿಸಿದ ಎರಡು devicesನಲ್ಲಿ manual smoke evidence."
+    ]
+  },
+  "3.3.2": {
+    "ctaLabel": "ಹೊಸದೇನು ನೋಡಿ",
+    "headline": "Mobile/tablet app MVP, ಸುಗಮ YouTube ಮತ್ತು ಸುರಕ್ಷಿತ whitelist",
+    "summary": "Public app release surface Android phone/tablet final testing ಮತ್ತು iOS/iPad statusಗೆ ಸಿದ್ಧವಾಗಿದೆ; extension dashboard ಈಗ ಆ app paths ತೋರಿಸುತ್ತದೆ, active rules ಇಲ್ಲದಾಗ YouTube SPA ಕೆಲಸ ಕಡಿಮೆಯಾಗುತ್ತದೆ ಮತ್ತು whitelist/end-screen correctness fixes ಈ releaseನಲ್ಲಿ ಸೇರಿವೆ.",
+    "bannerSummary": "Android/iOS app status, ಹಗುರವಾದ YouTube SPA ಕೆಲಸ ಮತ್ತು whitelist/end-screen fixes.",
+    "highlights": [
+      "Website downloads hub ಮತ್ತು extension dashboard ಈಗ Android phone/tablet final-testing path ಹಾಗೂ iOS/iPad TestFlight/App Store status path ತೋರಿಸುತ್ತವೆ.",
+      "Android phone/tablet release setup shared FilterTube runtime, YouTube Main, public YouTube Kids access, profiles, PIN rules ಮತ್ತು Nanah sync ಆಧಾರದ ಮೇಲೆ ದಾಖಲಿಸಲಾಗಿದೆ.",
+      "YouTube SPA performance ಕೆಲಸ active rules ಇಲ್ಲದಿದ್ದಾಗ ಅಥವಾ route ಅಗತ್ಯವಿಲ್ಲದಾಗ ಇನ್ನಷ್ಟು JSON clone/parse/replay, DOM fallback, quick-block, fallback-menu ಮತ್ತು whitelist-pending ಕೆಲಸವನ್ನು ಬಿಟ್ಟುಬಿಡುತ್ತದೆ.",
+      "Production extension contexts ಸಾಮಾನ್ಯ console logging ಅನ್ನು explicit debug mode ಹಿಂದೆ ಇಡುತ್ತವೆ, ಹೀಗಾಗಿ ಸಾಮಾನ್ಯ browsingಗೆ YouTube hot pathsನಲ್ಲಿ console overhead ಇರುವುದಿಲ್ಲ.",
+      "Whitelist release fixes Shorts creator fallback, list-target forwarding ಮತ್ತು end-screen controlsಗಾಗಿ compact autoplay/watch-next endpoint filtering ಒಳಗೊಂಡಿವೆ.",
+      "FilterTube DOM state attributes ಅಗತ್ಯ runtime state ಉಳಿಸಿಕೊಂಡೇ ವ್ಯಾಪಕ ಗೋಚರ `data-filtertube-*` fingerprints ಕಡಿಮೆ ಮಾಡುವಂತೆ ಬಲಪಡಿಸಲಾಗಿದೆ.",
+      "Accounts & Sync Family Device Updates ಅನ್ನು Send Update, optional Home Pickup ಮತ್ತು away/opens-later Internet Pickup ಮೂಲಕ ವಿವರಿಸುತ್ತದೆ; live sync, home pickup, online pickup ಮತ್ತು authority ಅಲ್ಲದ ವಿಷಯ ಯಾವುದು ಎಂದು parents ಅರ್ಥಮಾಡಿಕೊಳ್ಳಬಹುದು.",
+      "Protected profile time limitsಗೆ daily YouTube budgets, timeout screens, request-more-time history ಮತ್ತು parent/caregiver approval ಕುರಿತು release-facing documentation ಇದೆ.",
+      "Nanah/import paths extension ಮತ್ತು native app payloadಗಳ ನಡುವೆ channel-derived Filter All keyword ownership ಉಳಿಸುತ್ತವೆ; row color, source-badge metadata ಮತ್ತು pairing context ಕೂಡ ಸೇರಿವೆ."
+    ]
+  },
+  "3.3.1": {
+    "ctaLabel": "ಹೊಸದೇನು ನೋಡಿ",
+    "headline": "ಮೂರನೇ ಪಕ್ಷದ server ಇಲ್ಲದೆ P2P ಮೂಲಕ ಸಾಧನಗಳ ನಡುವೆ ಸುರಕ್ಷಿತ sync",
+    "summary": "Accounts & Sync ಈಗ Nanah ಅನ್ನು ಮೂರು ಸರಳ ಮಾರ್ಗಗಳಾಗಿ ತೋರಿಸುತ್ತದೆ, parent/child targeting ಬಲಪಡಿಸುತ್ತದೆ, reconnect rules ಸ್ಪಷ್ಟಪಡಿಸುತ್ತದೆ ಮತ್ತು ನೈಜ ಬಳಕೆಗೆ ಹೆಚ್ಚಿನ documentation ಒದಗಿಸುತ್ತದೆ.",
+    "bannerSummary": "ಮೂರು ಸ್ಪಷ್ಟ Nanah ಮಾರ್ಗಗಳು, ಬಲವಾದ targeting ಮತ್ತು ಸ್ಪಷ್ಟ reconnect rules.",
+    "highlights": [
+      "Accounts & Sync ಈಗ ಮೂರು ಸ್ಪಷ್ಟ ಮಾರ್ಗಗಳೊಂದಿಗೆ ಆರಂಭವಾಗುತ್ತದೆ: ಈ profile ಅನ್ನು ಒಮ್ಮೆ ಕಳುಹಿಸಿ, Parent controls child, Move full account.",
+      "Advanced Nanah controls ಇನ್ನೂ ಲಭ್ಯವಿವೆ, ಆದರೆ ಇಡೀ flow ಮುನ್ನಡೆಸುವ ಬದಲು Advanced ವಿಭಾಗದ ಹಿಂದೆ ಇವೆ.",
+      "Parent/source sessions remote target profile ಅನ್ನು ಹೆಚ್ಚು ಸ್ಪಷ್ಟವಾಗಿ ಆಯ್ಕೆಮಾಡಬಹುದು; managed-link saves ಕಳುಹಿಸಿದವರಿಗೂ mirror ಆಗುತ್ತವೆ, ಹೀಗಾಗಿ ಎರಡೂ devices ಒಂದೇ trust record ಇಟ್ಟುಕೊಳ್ಳುತ್ತವೆ.",
+      "Trusted links refresh ನಂತರವೂ ಉಳಿಯುತ್ತವೆ, ಆದರೆ reconnect ಹೊಸ live session ಆಗಿಯೇ ಇರುತ್ತದೆ; ಅದು ಮರೆಯಾದ background sync ಅಲ್ಲ.",
+      "Locked child updates, reconnect rules, device-label persistence ಮತ್ತು self-join/session-burn protection ಸುರಕ್ಷಿತ parent controlಗಾಗಿ ಬಲಪಡಿಸಲಾಗಿದೆ.",
+      "README, Architecture, Technical, Functionality, Profiles & PIN, project plan, user guide ಮತ್ತು concern tracker ಈಗಿನ Nanah desktop checkpoint ಅನ್ನು ಹೆಚ್ಚಿನ ವಿವರದಲ್ಲಿ ದಾಖಲಿಸುತ್ತವೆ."
+    ]
+  },
+  "3.3.0": {
+    "ctaLabel": "ಹೊಸದೇನು ನೋಡಿ",
+    "headline": "Collaboration recovery + cross-browser import ಇನ್ನಷ್ಟು ಬಲಿಷ್ಠ",
+    "summary": "Watch/YTM collaboration menus ಸಂಪೂರ್ಣ rosters ಅನ್ನು ಹೆಚ್ಚು ವಿಶ್ವಾಸಾರ್ಹವಾಗಿ ಮರಳಿ ಪಡೆಯುತ್ತವೆ, subscriptions import browserಗಳಾದ್ಯಂತ ಬಲವಾಗಿದೆ ಮತ್ತು surface-specific whitelist ಹಾಗೂ Quick Block fixes 3.3.0ನಲ್ಲಿ ಸೇರಿವೆ.",
+    "bannerSummary": "ಸಂಪೂರ್ಣ collaborator roster recovery, ಬಲವಾದ subscription import ಮತ್ತು whitelist/Quick Block fixes.",
+    "highlights": [
+      "Mobile YouTube home/watch-next/Mix-style cards ಈಗ ಅಪೂರ್ಣ single-channel menusಗೆ ಬೀಳುವುದಕ್ಕೆ ಬದಲು ಅದೇ 3-dot ಮತ್ತು collaborator recovery flowನಲ್ಲಿ ಪಾಲ್ಗೊಳ್ಳುತ್ತವೆ.",
+      "Watch-page right rail, playlist rows ಮತ್ತು watch-like lockups ಈಗ ಸಂಪೂರ್ಣ collaborator roster ಪಡೆಯಬಹುದು ಮತ್ತು ಸಕ್ರಿಯ 3-dot menu ಅನ್ನು ಅಲ್ಲಿಯೇ refresh ಮಾಡಬಹುದು.",
+      "Mix/watch recovery ಹೆಚ್ಚು ಸುರಕ್ಷಿತ: ನಿಜವಾದ collaboration cards ಸರಿಯಾಗಿ upgrade ಆಗುತ್ತವೆ, ಆದರೆ '&' ಅಥವಾ 'and' ಇರುವ ಸಾಮಾನ್ಯ ಹೆಸರುಗಳು ತಪ್ಪಾಗಿ collaboration menus ಆಗುವುದಿಲ್ಲ.",
+      "ಸಂಕೀರ್ಣ surfacesನಲ್ಲಿ Quick Block ಹೆಚ್ಚು ಸ್ಥಿರ: ಇನ್ನಷ್ಟು desktop cards ಮೇಲೆ ಇರುತ್ತದೆ, mobile search-suggestion dropdownಗಳನ್ನು ತಪ್ಪಿಸುತ್ತದೆ ಮತ್ತು mobile watch-next layoutsನಲ್ಲಿ ಉತ್ತಮವಾಗಿ ಅಂಟುತ್ತದೆ.",
+      "Subscribed-channel whitelist import ಇತ್ತೀಚಿನ page browse responses ಉಳಿಸುತ್ತದೆ, ನಿಜವಾದ /feed/channels growthಗೆ ಆದ್ಯತೆ ನೀಡುತ್ತದೆ ಮತ್ತು /feed/channels ಅನ್ನು ಗೋಚರ management surface ಆಗಿ ಇಡುತ್ತದೆ.",
+      "Whitelist filtering YouTube desktop/mobile renderersನಲ್ಲಿ ಹೆಚ್ಚು ಕಟ್ಟುನಿಟ್ಟು ಮತ್ತು ಸುರಕ್ಷಿತವಾಗಿದೆ; creator-page handling ಹಾಗೂ Mixes/subscriptions hide controls ಕೂಡ ಸುಧಾರಿಸಿವೆ.",
+      "ಹೊಸ controls ಮತ್ತು polish: Channel Management rows ನಿಜವಾದ channel pages સાથે link થાય છે, 3-dot block item બંધ કરી શકાય છે અને encrypted Firefox export વધુ ಸುರક્ષિત fallback path વાપરે છે."
+    ]
+  },
+  "3.2.9": {
+    "ctaLabel": "ಹೊಸದೇನು ನೋಡಿ",
+    "headline": "ಸಬ್ಸ್ಕ್ರೈಬ್ ಮಾಡಿದ ಚಾನಲ್‌ಗಳ ಆಮದು + Whitelist + PIN ರಕ್ಷಣೆಯ ದೋಷ ತಿದ್ದುಪಡಿ",
+    "summary": "ಸಕ್ರಿಯ YouTube accountನ subscriptions ಅನ್ನು whitelistಗೆ ಹೆಚ್ಚು ಸ್ಪಷ್ಟ mode-switch semantics ಮತ್ತು ವಿಶ್ವಾಸಾರ್ಹ /feed/channels startup flowನೊಂದಿಗೆ ಆಮದು ಮಾಡಿಕೊಳ್ಳಿ.",
+    "bannerSummary": "ಸಕ್ರಿಯ YouTube accountನ subscribed channels ಅನ್ನು ವಿಶ್ವಾಸಾರ್ಹ startup ಜೊತೆಗೆ whitelistಗೆ ಆಮದು ಮಾಡಿ.",
+    "highlights": [
+      "New Tab Viewನಲ್ಲಿ ಸಕ್ರಿಯ sign-in ಆಗಿರುವ YouTube accountನ subscribed channels ಅನ್ನು whitelistಗೆ import ಮಾಡಬಹುದು.",
+      "Import startup ಈಗ live YouTube tab ಮರುಬಳಸಿ /feed/channelsಗೆ ಕಳುಹಿಸುತ್ತದೆ ಮತ್ತು ಆರಂಭಿಸುವ ಮೊದಲು FilterTube bridgeಗಾಗಿ ಕಾಯುತ್ತದೆ.",
+      "Whitelist copy ಸ್ಪಷ್ಟವಾಗಿದೆ: Import Only blocklist ಅನ್ನು ಹಾಗೆಯೇ ಬಿಡುತ್ತದೆ; Import + Turn On Whitelist ಈಗಿರುವ blocklist-to-whitelist migration path ಅನುಸರಿಸುತ್ತದೆ.",
+      "Documentation ಈಗ import architecture, FEchannels request flow, renderer sources ಮತ್ತು whitelist semantics ಅನ್ನು ಹೆಚ್ಚು ವಿವರವಾಗಿ ಒಳಗೊಂಡಿದೆ."
+    ]
+  },
+  "3.2.8": {
+    "ctaLabel": "ಹೊಸದೇನು ನೋಡಿ",
+    "headline": "ಥೀಮ್ ಪುನರ್‌ನವೀಕರಣ + scenic UI shell ಹೊಂದಾಣಿಕೆ",
+    "summary": "Popup ಮತ್ತು dashboard surfaces ಈಗ ಹೆಚ್ಚು ಶಾಂತ scenic theme system ಬಳಸುತ್ತವೆ; layout ಬಿಗಿಯಾಗಿದ್ದು, tint states ಬಲವಾಗಿವೆ ಮತ್ತು light/dark balance ಉತ್ತಮವಾಗಿದೆ.",
+    "bannerSummary": "ಶಾಂತ scenic theme, ಬಿಗಿಯಾದ layout ಮತ್ತು ಉತ್ತಮ light/dark balance.",
+    "highlights": [
+      "Scenic UI refresh: popup ಮತ್ತು dashboard ಈಗ local hero video ಅನ್ನು ambient background media ಆಗಿ ಬಳಸುವ ಶಾಂತ product shell ಹಂಚಿಕೊಳ್ಳುತ್ತವೆ.",
+      "Light/dark theme tuning: dark mode scenic background ಅನ್ನು ಮಂಕಾದ center glow ಇಲ್ಲದೆ ಕಾಣುವಂತೆ ಮಾಡುತ್ತದೆ; light mode ಹೆಚ್ಚು ಸ್ವಚ್ಛ transparency ಬಳಸುತ್ತದೆ.",
+      "Responsive cleanup: popup spacing ಬಿಗಿ, profile dropdown ಚಿಕ್ಕದು, Help/Support card layout ಉತ್ತಮ ಮತ್ತು filter surfacesಗಳೆಲ್ಲೆಡೆ mobile fit ಸುಧಾರಿಸಿದೆ.",
+      "Control tint fixes: enabled/disabled states, pill colors, search fields ಮತ್ತು import/export actions ಎರಡೂ themesನಲ್ಲಿ ಹೆಚ್ಚು ಸ್ಪಷ್ಟವಾಗಿವೆ."
+    ]
+  },
+  "3.2.7": {
+    "ctaLabel": "ಹೊಸದೇನು ನೋಡಿ",
+    "headline": "ವರ್ಗ ಫಿಲ್ಟರ್‌ಗಳು + Quick Block hover cross + mobile 3 Dot UI",
+    "summary": "ಹೊಸ category filtering ಮತ್ತು ಒಂದು-ಟ್ಯಾಪ್ quick cross block default ಆಗಿ ON.",
+    "bannerSummary": "YouTube categories filter ಮಾಡಿ ಮತ್ತು default-on quick cross block ಅನ್ನು ಒಂದೇ tapನಲ್ಲಿ ಬಳಸಿ.",
+    "highlights": [
+      "Category Filtering: YouTube category (Music, Gaming, Education ಇತ್ಯಾದಿ) ಪ್ರಕಾರ videoಗಳನ್ನು block ಅಥವಾ allow ಮಾಡಿ.",
+      "Quick Cross Block Default ON: `Show Quick Cross Block button` v3.2.7ನಲ್ಲಿ default ಆಗಿ enabled (ಬಳಕೆದಾರರು ಬಯಸಿದರೆ disable ಮಾಡಬಹುದು).",
+      "Mobile Blocking: YT Mobileನಲ್ಲಿ 3 Dot UI ಮತ್ತು Quick Cross Blockಗೆ ಉತ್ತಮ support; ಇದು ಈಗ Home Pageನಲ್ಲಿ ಕಾರ್ಯನಿರ್ವಹಿಸುತ್ತದೆ."
+    ]
+  },
+  "3.2.6": {
+    "ctaLabel": "ಹೊಸದೇನು ನೋಡಿ",
+    "headline": "UI/UX ಸುಂದರೀಕರಣ ಮತ್ತು content-based filtering",
+    "summary": "ಆಧುನಿಕ ವಿನ್ಯಾಸದ ಸಂಪೂರ್ಣ typography ಸುಧಾರಣೆಗಳು ಮತ್ತು ಮೂರು ಹೊಸ content filters (duration, date, uppercase).",
+    "bannerSummary": "ಸುಧಾರಿತ typography, duration/date/uppercase filters ಮತ್ತು dashboard ಸುಧಾರಣೆಗಳು.",
+    "highlights": [
+      "Typography updates: ಸುಲಭ ಓದಿಗೆ ಆಧುನಿಕ ಮತ್ತು refined font scale.",
+      "Content-based filters: duration (longer/shorter/between), upload date (newer/older/between), ಮತ್ತು uppercase detection (clickbait titles).",
+      "videoMetaMap system: intelligent batching ಜೊತೆಗೆ persistent video metadata storage (75ms window, 1500 entry cap).",
+      "Dashboard improvements: surface-specific stats (Main vs Kids), ಉತ್ತಮ stat cards ಮತ್ತು donate promo card."
+    ]
+  },
+  "3.2.5": {
+    "ctaLabel": "ಹೊಸದೇನು ನೋಡಿ",
+    "headline": "Whitelist mode ಪ್ರಮುಖವಾಯಿತು + ಸ್ಥಿರತೆ",
+    "summary": "Whitelist mode ಈಗ ಮುಖ್ಯ allow-only ಮಾರ್ಗವಾಗಿದೆ; ಇದರಲ್ಲಿ ಚತುರ extraction, playlist safeguards ಮತ್ತು ಕಡಿಮೆ CPU ಬಳಕೆ ಸೇರಿವೆ.",
+    "bannerSummary": "ಮುಖ್ಯ whitelist mode, ಉತ್ತಮ channel ಗುರುತಿಸುವಿಕೆ, playlist safeguards ಮತ್ತು ಕಡಿಮೆ CPU ಬಳಕೆ.",
+    "highlights": [
+      "Whitelist mode promoted: wording/UI ಈಗ experimental ಎಂದು ಗುರುತಿಸುವುದಿಲ್ಲ.",
+      "3-dot menu cleanup ಮತ್ತು whitelist surfacesಗಾಗಿ search-secondary handling.",
+      "Thumbnail anchors ಮತ್ತು parent containers ಬಳಸಿ multi-source channel extraction.",
+      "Mode-aware state tracking, confirmation dialogs ಮತ್ತು bridge optimizations.",
+      "Playlist stability: ಆಯ್ದ rows ಕಾಣಿಸುತ್ತಲೇ ಇರುತ್ತವೆ; pending identities blocked rows ಅನ್ನು ಮರಳಿ ತೋರಿಸುವುದಿಲ್ಲ.",
+      "Zero-network architectureನೊಂದಿಗೆ Kids mode whitelist support."
+    ]
+  },
+  "3.2.4": {
+    "ctaLabel": "ಹೊಸದೇನು ನೋಡಿ",
+    "headline": "ವರ್ಧಿತ Whitelist Mode + performance optimizations",
+    "summary": "ಪ್ರಾಯೋಗಿಕ whitelist modeಗೆ ಉತ್ತಮ UX, performance optimizations ಮತ್ತು ವಿಸ್ತರಿಸಿದ Kids mode support ಸೇರಿದಂತೆ ಮಹತ್ವದ ಸುಧಾರಣೆಗಳು.",
+    "bannerSummary": "Whitelist ಅನುಭವ, performance, data-loss ತಡೆ ಮತ್ತು Kids support ಸುಧಾರಿಸಿವೆ.",
+    "highlights": [
+      "EXPERIMENTAL: 3-dot menu cleanup, intelligent search processing ಮತ್ತು mode-aware state tracking ಇರುವ ವರ್ಧಿತ whitelist mode.",
+      "Performance boost: Bridge-level optimizations ಮತ್ತು selective processing CPU ಬಳಕೆಯನ್ನು ಕಡಿಮೆ ಮಾಡುತ್ತವೆ.",
+      "UI improvements: mode ಬದಲಿಸುವಾಗ confirmation dialogs ಆಕಸ್ಮಿಕ data loss ತಡೆಯುತ್ತವೆ.",
+      "Kids mode support: zero-network architectureನೊಂದಿಗೆ whitelist functionality ಈಗ YouTube Kidsನಲ್ಲಿ ಕಾರ್ಯನಿರ್ವಹಿಸುತ್ತದೆ.",
+      "Search optimizations: UI clutter ತಪ್ಪಿಸಲು right-rail watch cards ಅನ್ನು ಚತುರವಾಗಿ ನಿರ್ವಹಿಸಲಾಗುತ್ತದೆ.",
+      "Channel extraction: thumbnail anchors ಮತ್ತು parent containers ಬಳಸಿ multi-source identity resolution.",
+      "Mode switching: ಬುದ್ಧಿವಂತ reprocessing ಜೊತೆಗೆ blocklist/whitelist ನಡುವೆ ಸುಗಮ ಬದಲಾವಣೆ."
+    ]
+  },
+  "3.2.3": {
+    "ctaLabel": "ಹೊಸದೇನು ನೋಡಿ",
+    "headline": "ಪ್ರಾಯೋಗಿಕ Whitelist Mode + UI ಸುಧಾರಣೆಗಳು",
+    "summary": "'allow-only' filteringಗಾಗಿ whitelist mode alpha release, ಜೊತೆಗೆ ಉತ್ತಮ UI updates ಮತ್ತು mobile menu support.",
+    "bannerSummary": "Alpha whitelist mode, popup/tab viewನಲ್ಲಿ ಸುಲಭ mode toggle ಮತ್ತು mobile menu support.",
+    "highlights": [
+      "EXPERIMENTAL: whitelist mode ಸ್ಪಷ್ಟವಾಗಿ ಅನುಮತಿಸಿದ channels/keywords ಹೊರತುಪಡಿಸಿ ಎಲ್ಲ content ಅನ್ನು ಮರೆಮಾಡುತ್ತದೆ.",
+      "Popup ಮತ್ತು tab viewನಲ್ಲಿ blocklist/whitelist ನಡುವೆ ಸುಲಭ toggle ಹೊಂದಿರುವ dual filtering modes.",
+      "Staging migration — channels ಸಂಗ್ರಹಿಸಲು blocklistಗೆ ಬದಲಿಸಿ, ನಂತರ whitelistಗೆ merge ಮಾಡಿ.",
+      "Whitelist modeನಲ್ಲಿ Watch page protection video playback functionality ಉಳಿಸುತ್ತದೆ.",
+      "Optimistic UI updates content ಅನ್ನು ತಕ್ಷಣ ಮರೆಮಾಡುತ್ತವೆ; blocking ವಿಫಲವಾದರೆ ಸ್ವಯಂಚಾಲಿತವಾಗಿ ಮರುಸ್ಥಾಪಿಸುತ್ತವೆ.",
+      "ಸರಿಯಾದ YouTube mobile renderer handlingನೊಂದಿಗೆ ಉತ್ತಮ mobile menu support.",
+      "Production noise ಕಡಿಮೆ ಮಾಡಲು ಎಲ್ಲ console logs ಈಗ debug flag ಹಿಂದೆ ಇವೆ."
+    ]
+  },
+  "3.2.2": {
+    "ctaLabel": "ಹೊಸದೇನು ನೋಡಿ",
+    "headline": "UI/UX ಸುಧಾರಣೆಗಳು ಮತ್ತು debug gating",
+    "summary": "Optimistic updates, mobile menu support, debug-gated logging, scroll preservation ಮತ್ತು state management ಸುಧಾರಣೆಗಳು.",
+    "bannerSummary": "ವೇಗವಾಗಿ ಕಾಣುವ filtering, mobile menus, debug control ಮತ್ತು scroll preservation.",
+    "highlights": [
+      "Optimistic UI updates: content ತಕ್ಷಣ ಮರೆಮಾಡುತ್ತದೆ ಮತ್ತು blocking ವಿಫಲವಾದರೆ ಸ್ವಯಂಚಾಲಿತವಾಗಿ ಹಿಂದಿರುಗಿಸುತ್ತದೆ.",
+      "ಸರಿಯಾದ renderer tagsನೊಂದಿಗೆ ytm-menu-popup-rendererಗಾಗಿ ಸುಧಾರಿತ mobile menu support.",
+      "`window.__filtertubeDebug` ಮೂಲಕ debug-gated logging.",
+      "DOM fallback ಸಮಯದಲ್ಲಿ ಅಸಹಜ ಜಿಗಿತಗಳನ್ನು ತಡೆಯಲು scroll position ಉಳಿಸಿ.",
+      "Background requests ಕಡಿಮೆ ಮಾಡಲು channel enrichment limit (ಪ್ರತಿ sessionಗೆ 10).",
+      "requestIdleCallback ಮತ್ತು batchingನೊಂದಿಗೆ idle-scheduled rendering.",
+      "ಅನಗತ್ಯ renders ತಪ್ಪಿಸಲು signature comparison ಬಳಸಿ external reload debounce ಮಾಡುತ್ತದೆ.",
+      "Selective notifications: signature ಬದಲಾದಾಗ ಮಾತ್ರ `load`; ಇಲ್ಲದಿದ್ದರೆ `externalUpdate`.",
+      "Shared global state ಮೂಲಕ Bridge state management."
+    ]
+  },
+  "3.2.1": {
+    "ctaLabel": "ಹೊಸದೇನು ನೋಡಿ",
+    "headline": "Lag-free processing + performance boost",
+    "summary": "ಪ್ರಮುಖ performance optimizations UI lag ತೆಗೆದುಹಾಕುತ್ತವೆ; Chromium browsersನಲ್ಲಿ ಅತ್ಯುತ್ತಮ ಫಲಿತಾಂಶ ಮತ್ತು Firefoxನಲ್ಲಿ ಗಣನೀಯ ಸುಧಾರಣೆಗಳಿವೆ.",
+    "bannerSummary": "ಭಾರಿ filtering ಸಮಯದಲ್ಲಿ UI freeze ಕಡಿಮೆ ಮಾಡುವ ದೊಡ್ಡ performance ಸುಧಾರಣೆಗಳು.",
+    "highlights": [
+      "Async DOM processing main threadಗೆ yield ನೀಡಿ ಭಾರಿ filtering ಸಮಯದಲ್ಲಿ browser freeze ಆಗುವುದನ್ನು ತಡೆಯುತ್ತದೆ.",
+      "Compiled regex ಮತ್ತು channel filter caching O(1) lookups ಒದಗಿಸಿ CPU ಬಳಕೆಯನ್ನು 60–80% ಕಡಿಮೆ ಮಾಡುತ್ತವೆ.",
+      "Batched storage updates ಬುದ್ಧಿವಂತ 250ms intervals ಮೂಲಕ I/O operations ಅನ್ನು 70–90% ಕಡಿಮೆ ಮಾಡುತ್ತವೆ.",
+      "Debounced settings refresh ಅತಿಯಾದ DOM reprocessing ತಡೆಯುತ್ತದೆ.",
+      "Run state management overlapping executions ತಡೆದು requests ಅನ್ನು ಸರಿಯಾಗಿ queue ಮಾಡುತ್ತದೆ.",
+      "Chromium browsers: 90%ಕ್ಕೂ ಹೆಚ್ಚು lag reduction; Firefox: ಗಮನಾರ್ಹ ಸುಧಾರಣೆಗಳೊಂದಿಗೆ optimization ಮುಂದುವರಿಯುತ್ತದೆ."
+    ]
+  },
+  "3.2.0": {
+    "ctaLabel": "ಹೊಸದೇನು ನೋಡಿ",
+    "headline": "ತಕ್ಷಣದ blocking + Kidsಗೆ zero-network",
+    "summary": "3-dot menus channel names ಅನ್ನು ತಕ್ಷಣ ತೋರಿಸುತ್ತವೆ, network requests ಬಹಳ ಕಡಿಮೆಯಾಗುತ್ತವೆ ಮತ್ತು YouTube Kids ಸಂಪೂರ್ಣ offline ಆಗಿ ಕಾರ್ಯನಿರ್ವಹಿಸುತ್ತದೆ.",
+    "bannerSummary": "ತಕ್ಷಣದ channel names, ಕಡಿಮೆ network requests ಮತ್ತು offline Kids blocking.",
+    "highlights": [
+      "3-dot menus ಈಗ ಸರಿಯಾದ channel names ತಕ್ಷಣ ತೋರಿಸುತ್ತವೆ — ಇನ್ನು 'Fetching...'ಗಾಗಿ ಕಾಯಬೇಕಿಲ್ಲ.",
+      "Channel identity intercepted YouTube JSON responsesನಿಂದ ಬರುತ್ತದೆ, ಇದರಿಂದ network calls ಕಡಿಮೆಯಾಗುತ್ತವೆ.",
+      "ವಿಶ್ವಾಸಾರ್ಹ blockingಗಾಗಿ YouTube Kids ಯಾವುದೇ network fetch ಇಲ್ಲದೆ ಕಾರ್ಯನಿರ್ವಹಿಸುತ್ತದೆ.",
+      "ಕಾಣೆಯಾದ metadata ಅನ್ನು ನಿಯಂತ್ರಿತ ದರದಲ್ಲಿ backgroundನಲ್ಲಿ ತುಂಬಲಾಗುತ್ತದೆ (6-hour cooldown).",
+      "Topic channels (ಉದಾ. 'Music - Topic') ಅನ್ನು @handles ಇಲ್ಲದೆ ವಿಶೇಷವಾಗಿ ನಿರ್ವಹಿಸಲಾಗುತ್ತದೆ.",
+      "ASCII ಮತ್ತು Mermaid flow diagrams ಹೊಂದಿರುವ ಹೊಸ ಸಮಗ್ರ documentation."
+    ]
+  },
+  "3.1.9": {
+    "ctaLabel": "ಹೊಸದೇನು ನೋಡಿ",
+    "headline": "Profile ಆಧಾರಿತ backups + lock gate ನಿಯಂತ್ರಣಗಳು",
+    "summary": "Auto-backup ಮತ್ತು content controls ಈಗ profile locks/PINಗಳಿಗೆ ಹೊಂದಿಕೊಳ್ಳುತ್ತವೆ, ಪ್ರತಿ profileನ settings ಅನ್ನು ಪಡೆದುಕೊಳ್ಳುತ್ತವೆ ಮತ್ತು lock gate banner ಇದ್ದಾಗಲೂ profile dropdown ಕ್ಲಿಕ್ ಮಾಡಬಹುದು.",
+    "bannerSummary": "Backups ಮತ್ತು controls profile locks ಪಾಲಿಸುತ್ತವೆ; dropdown ಇನ್ನೂ ಕ್ಲಿಕ್ ಮಾಡಬಹುದು.",
+    "highlights": [
+      "Auto-backup ಆಫ್ ಇದ್ದಾಗ ಅಥವಾ profile lock ಆಗಿದ್ದಾಗ auto-backup mode/format selectors ನಿಷ್ಕ್ರಿಯ; ಹೊಸ profiles auto-backup preferences ಪಡೆಯುತ್ತವೆ.",
+      "Auto-backup scheduling profile ರಚನೆ ಮತ್ತು mode/format ಬದಲಾವಣೆ ವೇಳೆ ಈಗ trigger ಆಗುತ್ತದೆ, ಆದರೆ ಆ profileಗೆ auto-backup enabled ಇದ್ದರೆ ಮಾತ್ರ.",
+      "Lock ಇದ್ದಾಗ content-control toggles ಮತ್ತು backup controls ನಿಷ್ಕ್ರಿಯವಾಗುತ್ತವೆ/ಹಿಂದಿರುಗುತ್ತವೆ; non-master profilesಗೆ export scope active-profile-only ಆಗಿರುತ್ತದೆ.",
+      "Profile dropdown z-index fix lock gate banner ಕಾಣುತ್ತಿದ್ದರೂ ಅದನ್ನು ಕ್ಲಿಕ್ ಮಾಡಬಹುದಾಗಿರಿಸುತ್ತದೆ.",
+      "Profile/PIN model, profile-scoped backups ಮತ್ತು UI gating rules ಕುರಿತು docs ನವೀಕರಿಸಲಾಗಿದೆ."
+    ]
+  },
+  "3.1.8": {
+    "ctaLabel": "ಹೊಸದೇನು ನೋಡಿ",
+    "headline": "Support tab + ವಿಶ್ವಾಸಾರ್ಹ auto-backups",
+    "summary": "Dashboardನಲ್ಲಿ ಹೊಸ Support page (Ko-fi) ಸೇರಿದೆ ಮತ್ತು auto-backups ಈಗ Chrome ಹಾಗೂ Firefox ಎರಡರಲ್ಲೂ ವಿಶ್ವಾಸಾರ್ಹವಾಗಿ ಕಾರ್ಯನಿರ್ವಹಿಸುತ್ತವೆ.",
+    "bannerSummary": "ಹೊಸ Ko-fi Support page ಮತ್ತು Chrome/Firefoxನಲ್ಲಿ ಕಾರ್ಯನಿರ್ವಹಿಸುವ auto-backups.",
+    "highlights": [
+      "Ko-fi embed ಇರುವ Support page dashboardಗೆ ಸೇರಿಸಲಾಗಿದೆ.",
+      "Auto-backups ಈಗ ಒಂದೇ rolling file ಅನ್ನು overwrite ಮಾಡುತ್ತವೆ: Downloads/FilterTube Backup/FilterTube-Backup-Latest.json.",
+      "Cross-browser download strategy: Blob URL ಲಭ್ಯವಿದ್ದರೆ ಅದನ್ನು ಬಳಸಿ; Chrome MV3 service workerಗೆ data: URL fallback.",
+      "data: URL ನಿರ್ಬಂಧಗಳಿಂದಾಗಿ Firefox downloads ಇನ್ನು ವಿಫಲವಾಗುವುದಿಲ್ಲ."
+    ]
+  },
+  "3.1.7": {
+    "ctaLabel": "ಹೊಸದೇನು ನೋಡಿ",
+    "headline": "YT Kids + auto-backup support",
+    "summary": "YT Kidsನಲ್ಲಿ channel-based content ಅನ್ನು block ಮಾಡಬಹುದು ಮತ್ತು auto-backups ಅನ್ನು ಈಗ toggle ಮಾಡಿ ಆನ್/ಆಫ್ ಮಾಡಬಹುದು.",
+    "bannerSummary": "YouTube Kidsನಲ್ಲಿ channel blocking ಮತ್ತು toggle ಮಾಡಬಹುದಾದ auto-backup.",
+    "highlights": [
+      "YT Kidsನಲ್ಲಿ ಸಂಪೂರ್ಣ Channel ಮತ್ತು Keyword ಆಧಾರಿತ blocking ಸೇರಿಸಲಾಗಿದೆ; YT Kids 3-dot menu UI ಅನ್ನು passive listening ಮಾಡುವ ಮೂಲಕ channels block ಮಾಡುತ್ತದೆ.",
+      "Auto-backups ಸಕ್ರಿಯ/ನಿಷ್ಕ್ರಿಯ ಮಾಡಲು Settings toggle ಸೇರಿಸಲಾಗಿದೆ (best-effort; Save As prompts ಇಲ್ಲ).",
+      "Auto-backups rotation ಜೊತೆಗೆ Downloads/FilterTube Backup/ನಲ್ಲಿ ಉಳಿಯುತ್ತವೆ (ಇತ್ತೀಚಿನ files ಉಳಿಯುತ್ತವೆ).",
+      "Manual exports ಈಗ ಮೌನವಾಗಿ Downloads/FilterTube Export/ಗೆ download ಆಗುತ್ತವೆ."
+    ]
+  },
+  "3.1.6": {
+    "ctaLabel": "ಹೊಸದೇನು ನೋಡಿ",
+    "headline": "Import/Export support + release banner",
+    "summary": "Banner CTA ಈಗ ನೇರವಾಗಿ dashboardನ What's New ತೆರೆಯುತ್ತದೆ, ಆಯ್ದ cards ಅದೇ JSONನಿಂದ load ಆಗುತ್ತವೆ ಮತ್ತು imports c/ChannelName ಹಾಗೂ merge rules ಅನ್ನು ಉತ್ತಮವಾಗಿ ಪಾಲಿಸುತ್ತವೆ.",
+    "bannerSummary": "What's Newಗೆ ನೇರ link, ಒಂದೇ JSONನಿಂದ cards ಮತ್ತು ಉತ್ತಮ imports.",
+    "highlights": [
+      "Release notes JSON ಈಗ dashboard cards ಮತ್ತು YouTube banner ಎರಡಕ್ಕೂ ಒಂದೇ source of truthನಿಂದ hydration ಮಾಡುತ್ತದೆ.",
+      "Blockers chrome-extension:// links ತಡೆಯದಂತೆ CTA background messaging ಮೂಲಕ tab-view ತೆರೆಯುತ್ತದೆ.",
+      "Import/export docs ಮತ್ತು code mergeಗೆ ಮೊದಲು UC/handle/c/ChannelName inputs ಹೇಗೆ normalize ಆಗುತ್ತವೆ ಎಂಬುದನ್ನು ವಿವರಿಸುತ್ತವೆ."
+    ]
+  },
+  "3.1.5": {
+    "ctaLabel": "ಹೊಸದೇನು ನೋಡಿ",
+    "headline": "Shorts + Members-only ನಿಜವಾಗಿಯೂ ಮರೆಮಾಡಲಾಗಿದೆ",
+    "summary": "Watch page ಮತ್ತು sidebar ಈಗ Shorts renderers ಹಾಗೂ members-only shelves ಕಾಣಿಸಿಕೊಳ್ಳುವ ಮೊದಲು ಮರೆಮಾಡುತ್ತವೆ; toggle state ಕೂಡ ಕೊನೆಗೂ ಉಳಿಯುತ್ತದೆ.",
+    "bannerSummary": "Shorts ಮತ್ತು members-only shelves ಕಾಣುವ ಮೊದಲು ಮರೆ; toggle state ಉಳಿಯುತ್ತದೆ.",
+    "highlights": [
+      "Cards render ಆಗುವ ಮೊದಲು sidebar /shorts/ hrefs, overlays ಮತ್ತು aria-labels ಪರಿಶೀಲಿಸುತ್ತದೆ.",
+      "Members-only detection compact, watch ಮತ್ತು shelf rows ಅನ್ನು ಹೊಸ badges ಮತ್ತು playlist heuristics ಮೂಲಕ ಗುರುತಿಸುತ್ತದೆ.",
+      "Members-only toggle persistence bug ಸರಿಪಡಿಸಲಾಗಿದೆ; reload ನಂತರವೂ state ಉಳಿಯುತ್ತದೆ."
+    ]
+  },
+  "3.1.4": {
+    "ctaLabel": "ಹೊಸದೇನು ನೋಡಿ",
+    "headline": "Dashboard responsive ಆಗಿದೆ",
+    "summary": "Mobileನಲ್ಲಿ navigation ಸರಿಯಾಗಿ ಕುಗ್ಗುತ್ತದೆ, inputs ಸಹಜವಾಗಿ wrap ಆಗುತ್ತವೆ ಮತ್ತು playlist/mix controlsಗೆ ಹೆಚ್ಚು ಸ್ಪಷ್ಟ toggles ಇವೆ.",
+    "bannerSummary": "Mobile-friendly navigation, responsive inputs ಮತ್ತು ಸ್ಪಷ್ಟ playlist/Mix controls.",
+    "highlights": [
+      "ಸಣ್ಣ screensಗಾಗಿ ಸುಧಾರಿತ grid spacing ಜೊತೆಗೆ hamburger nav ಮತ್ತು overlay.",
+      "Toggles ಹಗುರವಾದ tracks, ಮಧ್ಯದಲ್ಲಿರುವ thumbs ಮತ್ತು ಉತ್ತಮ dark-mode contrast ಹೊಂದಿವೆ.",
+      "Mix toggle ಆನ್ ಇದ್ದಾಗ Mix/Radio chip ಮರೆಮಾಡುತ್ತದೆ; playlist hiding radio items ಅನ್ನು ಬಿಟ್ಟುಬಿಡುತ್ತದೆ."
+    ]
+  },
+  "3.1.3": {
+    "ctaLabel": "ಹೊಸದೇನು ನೋಡಿ",
+    "headline": "Help legendಗೆ ಹೊಸ ರೂಪ",
+    "summary": "Cards, pills ಮತ್ತು tooltips Exact / Comment / Filter All ನಿಖರವಾಗಿ ಏನು ಮಾಡುತ್ತವೆ ಎಂದು ವಿವರಿಸುತ್ತವೆ ಮತ್ತು refreshed dashboard stylingಗೆ ಹೊಂದಿಕೆಯಾಗುತ್ತವೆ.",
+    "bannerSummary": "Exact, Comment ಮತ್ತು Filter All ವಿವರಿಸುವ ನವೀಕರಿಸಿದ Help cards.",
+    "highlights": [
+      "Help tab badge tints ಮತ್ತು collaboration labels ಅನ್ನು ಹೊಂದುವ colors ಜೊತೆ ತೋರಿಸುತ್ತದೆ.",
+      "Popup ಮತ್ತು tab search bars ಒಂದೇ full-width rhythmಗೆ ಹೊಂದಿಸಲ್ಪಟ್ಟಿವೆ.",
+      "ಸ್ಪಷ್ಟತೆಗಾಗಿ content control descriptions ಅನ್ನು hover tooltipsಗೆ ವರ್ಗಾಯಿಸಲಾಗಿದೆ."
+    ]
+  },
+  "3.1.2": {
+    "ctaLabel": "ಹೊಸದೇನು ನೋಡಿ",
+    "headline": "Playlist autoplay ಬಲಪಡಿಸಲಾಗಿದೆ",
+    "summary": "Autoplay ಈಗ blocked playlist rows ಅನ್ನು flash ಮಾಡದೆ ದಾಟುತ್ತದೆ ಮತ್ತು YouTube ಮರುಪ್ರಕ್ರಿಯೆಗೊಳಿಸಿದರೂ sticky hiding ಉಳಿಯುತ್ತದೆ.",
+    "bannerSummary": "Autoplay blocked rows ಅನ್ನು flash ಇಲ್ಲದೆ ದಾಟುತ್ತದೆ; playlist hiding ಉಳಿಯುತ್ತದೆ.",
+    "highlights": [
+      "ಮುಂದಿನ playlist row ನಿಜವಾಗಿಯೂ ಕಾಣಿಸಿದಾಗ ಮಾತ್ರ Next-click ಆಗುತ್ತದೆ.",
+      "Identity ಸ್ವಲ್ಪ ಸಮಯ resolve ಆಗದಿದ್ದರೂ Watch playlist panel rows ಮರೆಮಾಡಿಯೇ ಇರುತ್ತವೆ.",
+      "Blocking ನಂತರ 3-dot menu ಸರಿಯಾಗಿ ಮುಚ್ಚುತ್ತದೆ, miniplayer ಮಾತ್ರ ಪ್ಲೇ ಆಗುತ್ತಿರುತ್ತದೆ."
+    ]
+  },
+  "3.1.1": {
+    "ctaLabel": "ಹೊಸದೇನು ನೋಡಿ",
+    "headline": "Help tab + ಗುರುತಿನ ತಿದ್ದುಪಡಿಗಳು",
+    "summary": "Dashboardನಲ್ಲಿ ಪ್ರತ್ಯೇಕ Help tab ಸೇರಿದೆ ಮತ್ತು UC ↔ handle ↔ custom URL mapping ಹೆಚ್ಚು ವಿಶ್ವಾಸಾರ್ಹವಾಗಿದೆ.",
+    "bannerSummary": "ಹೊಸ Help reference ಮತ್ತು ಉತ್ತಮ channel identity resolution.",
+    "highlights": [
+      "Help reference ಎಲ್ಲಾ toggles, badges ಮತ್ತು keyword behaviors ದಾಖಲಿಸುತ್ತದೆ.",
+      "Playlist navigation playback flash ಇಲ್ಲದೆ blocked rows ದಾಟುತ್ತದೆ.",
+      "Handle/custom URL fallback ಸರಿಯಾದ UC IDಗೆ ಹೆಚ್ಚು ವಿಶ್ವಾಸಾರ್ಹವಾಗಿ ಹೊಂದಿಕೊಳ್ಳುತ್ತದೆ."
+    ]
+  },
+  "3.1.0": {
+    "ctaLabel": "ಹೊಸದೇನು ನೋಡಿ",
+    "headline": "Docs + hybrid filtering ಸ್ಪಷ್ಟತೆ",
+    "summary": "Hybrid interception + DOM fallback architecture ಅನ್ನು diagrams ಮೂಲಕ ದಾಖಲಿಸಲಾಗಿದೆ; FilterTube blocks ಹೇಗೆ ಜಾರಿಗೊಳಿಸುತ್ತದೆ ಎಂಬುದು ಇದರಿಂದ ತಿಳಿಯುತ್ತದೆ.",
+    "bannerSummary": "Hybrid interception ಮತ್ತು DOM fallback filtering architecture ಸ್ಪಷ್ಟವಾಗಿ ದಾಖಲಿಸಲಾಗಿದೆ.",
+    "highlights": [
+      "Home/search collaborators ಜೊತೆ Watch-page 3-dot parity ದಾಖಲಿಸಲಾಗಿದೆ.",
+      "ಉಳಿದ playlist regressions ಪಟ್ಟಿ ಮಾಡಲಾಗಿದೆ, ಇದರಿಂದ fixes ಗಮನದಲ್ಲಿರುತ್ತವೆ.",
+      "Manifests, build tooling ಮತ್ತು UI footer ಅನ್ನು 3.1.0 version bump ಜೊತೆ sync ಮಾಡಲಾಗಿದೆ."
+    ]
   }
 }
