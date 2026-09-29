@@ -346,8 +346,9 @@ before locale validation in the admission and first-run overlays
 managed-link policy, self-control, and list-mode copy remains unkeyed in
 `js/tab-view.js:13737-13751,15085-15454,15841-16254,17949-18054,18391-18883,22470-22630,26195-27136,28291-28320`.
 Injected channel-menu progress and error states also bypass localization in
-`js/content_bridge.js:13771-13971,14619-14801`. The popup's list-mode tooltip
-is still English at `js/popup.js:1364-1368`. Browser name/description messages
+`js/content_bridge.js:13771-13971,14619-14801` at this audit checkpoint;
+their source and catalog wiring is being addressed separately. The popup's
+list-mode tooltip was localized in `5a6f6c8f`. Browser name/description messages
 are English-only in `_locales/en/messages.json`; 12 target tags have no
 matching browser locale directory (`ur, pcm, arz, ha, pa-Arab, yue-Hant,
 wuu-Hans, jv, apc, apd, yo, bho`).
