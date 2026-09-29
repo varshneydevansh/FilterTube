@@ -323,3 +323,44 @@ verification remain release gates. The broad repository smoke lane currently
 has unrelated source/audit-snapshot failures in the dirty playback worktree;
 use the focused localization tests and strict catalog check for this
 checkpoint's source-level verification.
+
+## Coverage audit checkpoint (2026-09-29)
+
+Live reruns of `node scripts/check-ui-locales.mjs` report 1,477/1,477 keyed
+catalog entries in all 38 target catalogs and 1,135/1,135 static dashboard
+fragments in every non-English catalog. The same checker confirms the current
+3.3.7 release-note draft for all 37 non-English targets. A separate
+`node scripts/check-release-note-locales.mjs --require-all` now validates 28/28
+release entries in all 37 non-English targets.
+These are structural checks, not fluency or whole-extension coverage: the UI
+checker explicitly disclaims full coverage and translation quality.
+
+The release/runtime gate remains English-only: `js/ui_localization.js` lists
+only `en` as released, so all 37 non-English targets remain preview-only and
+browser-language `auto` falls back to English. The read-only runtime audit
+also found unkeyed safety-relevant managed-viewing and daily-time-limit
+overlays in `js/content/bridge_settings.js:827-1412`; `auto` is not resolved
+before locale validation in the admission and first-run overlays
+(`js/content/admission_overlay.js:54-69`,
+`js/content/first_run_prompt.js:12-23`); and substantial generated Nanah,
+managed-link policy, self-control, and list-mode copy remains unkeyed in
+`js/tab-view.js:13737-13751,15085-15454,15841-16254,17949-18054,18391-18883,22470-22630,26195-27136,28291-28320`.
+Injected channel-menu progress and error states also bypass localization in
+`js/content_bridge.js:13771-13971,14619-14801`. The popup's list-mode tooltip
+is still English at `js/popup.js:1364-1368`. Browser name/description messages
+are English-only in `_locales/en/messages.json`; 12 target tags have no
+matching browser locale directory (`ur, pcm, arz, ha, pa-Arab, yue-Hant,
+wuu-Hans, jv, apc, apd, yo, bho`).
+
+Catalog parity does not guarantee translated values: a local exact-string
+audit found 20 Pidgin (`pcm`) catalog entries of at least 60 characters still
+identical to English, including full UI sentences. These and fluent-speaker,
+RTL, accessibility, and installed-browser reviews remain open. The previously
+disclosed Urdu draft used a public translation endpoint on bundled English UI
+copy only; no saved rules, user data, or secrets were transmitted, and that
+draft was removed and rebuilt locally. During the subsequent 2026-09-29
+translation batch, a subagent separately tested only the generic phrase
+`Add to {count} profiles` with `translate.googleapis.com/translate_a/single`
+for Korean before being stopped. No batch, saved rule, or user data was sent,
+and that result was not used as a translation source. No network was used for
+the coverage audit itself or for the remaining drafts.
