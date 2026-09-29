@@ -1,0 +1,13 @@
+{
+  "english": {
+    "dashboard.ruleEditor.viewKidsKeywordRules": "View Kids keyword rules",
+    "dashboard.ruleEditor.viewKidsChannelRules": "View Kids channel rules",
+    "dashboard.ruleEditor.sourceFilterTitle": "Filter channel rules by source",
+    "dashboard.ruleEditor.allSources": "All sources",
+    "dashboard.ruleEditor.manualSource": "Manual",
+    "dashboard.ruleEditor.importedLists": "Imported lists",
+    "dashboard.ruleEditor.importedListsCount": "Imported lists ({count})",
+    "dashboard.ruleEditor.listSource": "List: {name} ({count})",
+    "dashboard.import.viewReports": "View import reports"
+  }
+}

@@ -530,10 +530,10 @@ test('render engine register pins source fingerprint and broad callable reconcil
   const text = doc();
 
   assert.deepEqual(stats, {
-    bytes: 92333,
-    sha256: '14f7543bcdfe207a28bd389fc18ccfe61a350de1326beb420411c2b470358df9',
-    splitLines: 2064,
-    wcLines: 2063
+    bytes: 93770,
+    sha256: 'aa2942ded66d836c133eab2a0cbec624a76cf2c252c68b5e053a2e7c10ce76aa',
+    splitLines: 2094,
+    wcLines: 2093
   });
   assert.equal(broadRows.length, 171);
   assert.equal(controlArtifacts, 102);
@@ -547,10 +547,10 @@ test('render engine register pins source fingerprint and broad callable reconcil
   });
 
   for (const expected of [
-    'source split lines: 2064',
-    'source wc -l: 2063',
-    'source bytes: 92333',
-    'source sha256: 14f7543bcdfe207a28bd389fc18ccfe61a350de1326beb420411c2b470358df9',
+    'source split lines: 2094',
+    'source wc -l: 2093',
+    'source bytes: 93770',
+    'source sha256: aa2942ded66d836c133eab2a0cbec624a76cf2c252c68b5e053a2e7c10ce76aa',
     'broad lexical callable matches: 171',
     'accepted IIFE-scoped declaration rows: 51',
     'semantic method rows promoted: 51',

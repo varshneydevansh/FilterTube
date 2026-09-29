@@ -1,0 +1,13 @@
+{
+  "render.sourceCollaboration": "Collaboration",
+  "render.importedBlockTube": "Imported: BlockTube",
+  "render.importedByUser": "Imported by user",
+  "render.blockTubeMigrationTitle": "This channel rule came from a BlockTube migration",
+  "render.userApprovedImportTitle": "This channel rule came from a user-approved imported list",
+  "render.nodeMappingSourceTitle": "What you entered",
+  "render.nodeMappingFetchedIdTitle": "Fetched ID",
+  "render.nodeMappingNameRuleOnly": "Name rule only",
+  "render.nodeMappingNotFetched": "Not fetched",
+  "render.nodeMappingNameRuleTitle": "BlockTube exported this as a channel-name rule without a unique UC channel ID, so there is no safe channel profile to enrich.",
+  "render.nodeMappingWaitingForMetadataTitle": "The channel identifier is saved and its name, handle/custom URL, and avatar are still waiting for the paced metadata lookup."
+}

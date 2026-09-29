@@ -326,12 +326,17 @@
         const channel = keys.map(key => context.channelsByIdentity.get(key)).find(Boolean)
             || (entry.nameOnly ? context.channelsByName.get(text(entry.name || entry.originalValue).toLowerCase()) : null);
         if (!channel) {
-            return { status: 'needs_attention', reason: 'The saved rule is no longer present in this target.' };
+            return {
+                status: 'needs_attention',
+                reason: 'The saved rule is no longer present in this target.',
+                reasonCode: 'saved_rule_missing'
+            };
         }
         if (entry.nameOnly) {
             return {
                 status: 'needs_attention',
-                reason: 'This is a name-only rule. Add a channel link or UC ID if you want exact channel identity and metadata.'
+                reason: 'This is a name-only rule. Add a channel link or UC ID if you want exact channel identity and metadata.',
+                reasonCode: 'name_only_rule'
             };
         }
         if (isCompleteChannel(channel)) return { status: 'complete', reason: '' };
@@ -341,6 +346,7 @@
             return {
                 status: 'needs_attention',
                 reason: text(attentionTask.lastError) || 'YouTube could not verify this channel identifier.',
+                reasonCode: text(attentionTask.errorCode) || 'channel_not_verified',
                 failureKind: text(attentionTask.failureKind) || 'permanent',
                 errorCode: text(attentionTask.errorCode),
                 attempts: Math.max(0, Math.floor(Number(attentionTask.attempts) || 0)),
@@ -349,13 +355,14 @@
         }
 
         if (keys.some(key => context.inFlightKeys.has(key))) {
-            return { status: 'fetching', reason: 'Channel details are being fetched now.' };
+            return { status: 'fetching', reason: 'Channel details are being fetched now.', reasonCode: 'channel_fetching' };
         }
         const task = keys.map(key => context.pendingByIdentity.get(key)).find(Boolean);
         if (!task) {
             return {
                 status: 'needs_attention',
-                reason: 'The rule is active, but its incomplete metadata is not currently queued.'
+                reason: 'The rule is active, but its incomplete metadata is not currently queued.',
+                reasonCode: 'metadata_not_queued'
             };
         }
         const attempts = Math.max(0, Math.floor(Number(task.attempts) || 0));
@@ -365,10 +372,15 @@
                 attempts,
                 nextAttemptAt: Math.max(0, Math.floor(Number(task.nextAttemptAt) || 0)),
                 lastError: text(task.lastError) || 'YouTube returned incomplete channel details.',
+                reasonCode: text(task.lastError) ? '' : 'incomplete_channel_details',
                 lastErrorAt: Math.max(0, Math.floor(Number(task.lastErrorAt) || 0))
             };
         }
-        return { status: 'pending', reason: 'The rule is active; channel details are waiting in the paced queue.' };
+        return {
+            status: 'pending',
+            reason: 'The rule is active; channel details are waiting in the paced queue.',
+            reasonCode: 'waiting_in_paced_queue'
+        };
     }
 
     const STATUS_PRIORITY = ['needs_attention', 'retrying', 'fetching', 'pending', 'complete'];
@@ -389,6 +401,7 @@
                 ...entry,
                 status,
                 reason: text(firstRelevant.reason || firstRelevant.lastError),
+                reasonCode: text(firstRelevant.reasonCode),
                 failureKind: text(firstRelevant.failureKind),
                 errorCode: text(firstRelevant.errorCode),
                 attempts: Math.max(0, Math.floor(Number(firstRelevant.attempts) || 0)),

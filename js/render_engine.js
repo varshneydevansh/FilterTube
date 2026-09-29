@@ -297,6 +297,13 @@ const RenderEngine = (() => {
         const isFromComments = sourceKey === 'comments';
         const isKidsSynced = sourceKey === 'kids';
         const isCollaboration = sourceKey === 'collab';
+        const label = isCollaboration
+            ? ['render.sourceCollaboration', 'Collaboration']
+            : isFromComments
+                ? ['render.sourceComments', 'From Comments']
+                : isKidsSynced
+                    ? ['render.sourceKids', 'From Kids']
+                    : ['render.sourceChannel', 'From Channel'];
         const badge = createPillBadge({
             text: isCollaboration ? 'Collaboration' : (isFromComments ? 'From Comments' : (isKidsSynced ? 'From Kids' : 'From Channel')),
             title,
@@ -306,14 +313,7 @@ const RenderEngine = (() => {
                 ? 'badge-variant-comments'
                 : (isKidsSynced ? 'badge-variant-kids' : '')
         });
-        if (!isCollaboration) {
-            const label = isFromComments
-                ? ['render.sourceComments', 'From Comments']
-                : isKidsSynced
-                    ? ['render.sourceKids', 'From Kids']
-                    : ['render.sourceChannel', 'From Channel'];
-            setRendererCopy(badge, 'textContent', label[0], label[1]);
-        }
+        setRendererCopy(badge, 'textContent', label[0], label[1]);
         return badge;
     }
 
@@ -1617,13 +1617,29 @@ const RenderEngine = (() => {
             infoGroup.appendChild(managedListBadge);
         } else if (['import', 'managed_channel_list', 'blocktube', 'blocktube-channel-name'].includes(String(channel?.source || '').trim().toLowerCase())) {
             const importedSource = String(channel?.source || '').trim().toLowerCase();
-            infoGroup.appendChild(createPillBadge({
-                text: importedSource.startsWith('blocktube') ? 'Imported: BlockTube' : 'Imported by user',
-                title: importedSource.startsWith('blocktube')
+            const isBlockTubeImport = importedSource.startsWith('blocktube');
+            const importedBadge = createPillBadge({
+                text: isBlockTubeImport ? 'Imported: BlockTube' : 'Imported by user',
+                title: isBlockTubeImport
                     ? 'This channel rule came from a BlockTube migration'
                     : 'This channel rule came from a user-approved imported list',
                 variantClass: 'badge-variant-managed-list'
-            }));
+            });
+            setRendererCopy(
+                importedBadge,
+                'textContent',
+                isBlockTubeImport ? 'render.importedBlockTube' : 'render.importedByUser',
+                isBlockTubeImport ? 'Imported: BlockTube' : 'Imported by user'
+            );
+            setRendererCopy(
+                importedBadge,
+                'title',
+                isBlockTubeImport ? 'render.blockTubeMigrationTitle' : 'render.userApprovedImportTitle',
+                isBlockTubeImport
+                    ? 'This channel rule came from a BlockTube migration'
+                    : 'This channel rule came from a user-approved imported list'
+            );
+            infoGroup.appendChild(importedBadge);
         }
 
         if (collaborationMeta) {
@@ -1699,7 +1715,7 @@ const RenderEngine = (() => {
         const sourceText = document.createElement('span');
         sourceText.className = 'node-source-text';
         sourceText.textContent = mapping.source;
-        sourceText.title = 'What you entered';
+        setRendererCopy(sourceText, 'title', 'render.nodeMappingSourceTitle', 'What you entered');
 
         // Connector arrow
         const connector = document.createElement('span');
@@ -1714,15 +1730,29 @@ const RenderEngine = (() => {
             if (isTopicChannel(channel)) {
                 targetBadge.title = getTopicChannelTooltip(channel);
             } else {
-                targetBadge.title = 'Fetched ID';
+                setRendererCopy(targetBadge, 'title', 'render.nodeMappingFetchedIdTitle', 'Fetched ID');
             }
         } else {
             targetBadge.className = 'node-source-text';
-            targetBadge.textContent = mapping.target || (isBlockTubeNameOnlyRule ? 'Name rule only' : 'Not fetched');
+            if (mapping.target) {
+                targetBadge.textContent = mapping.target;
+            } else {
+                setRendererCopy(
+                    targetBadge,
+                    'textContent',
+                    isBlockTubeNameOnlyRule ? 'render.nodeMappingNameRuleOnly' : 'render.nodeMappingNotFetched',
+                    isBlockTubeNameOnlyRule ? 'Name rule only' : 'Not fetched'
+                );
+            }
             targetBadge.style.opacity = '0.5';
-            targetBadge.title = isBlockTubeNameOnlyRule
-                ? 'BlockTube exported this as a channel-name rule without a unique UC channel ID, so there is no safe channel profile to enrich.'
-                : 'The channel identifier is saved and its name, handle/custom URL, and avatar are still waiting for the paced metadata lookup.';
+            setRendererCopy(
+                targetBadge,
+                'title',
+                isBlockTubeNameOnlyRule ? 'render.nodeMappingNameRuleTitle' : 'render.nodeMappingWaitingForMetadataTitle',
+                isBlockTubeNameOnlyRule
+                    ? 'BlockTube exported this as a channel-name rule without a unique UC channel ID, so there is no safe channel profile to enrich.'
+                    : 'The channel identifier is saved and its name, handle/custom URL, and avatar are still waiting for the paced metadata lookup.'
+            );
         }
 
         nodeContainer.appendChild(sourceText);

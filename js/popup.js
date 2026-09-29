@@ -100,6 +100,36 @@ function initializePopupFiltersTabs() {
     const catalog = window.FilterTubeContentControlsCatalog?.getCatalog?.() || [];
     const categoryOptions = window.FilterTubeContentControlsCatalog?.getCategoryOptions?.() || [];
     const languageOptions = window.FilterTubeContentControlsCatalog?.getLanguageOptions?.() || [];
+    function popupTaxonomyDisplayLabel(option) {
+        if (option?.labelKey) return popupUiText(option.labelKey, option.label);
+        if (option?.code && typeof Intl?.DisplayNames === 'function') {
+            try {
+                const locale = window.FilterTubeUiLocalization?.locale || 'en';
+                const fallbackLocales = { arz: 'ar', apc: 'ar', apd: 'ar', 'wuu-Hans': 'zh-Hans', 'pa-Arab': 'ur', bho: 'hi', fil: 'id' };
+                const displayNames = new Intl.DisplayNames([locale], { type: 'language' });
+                let label = displayNames.of(option.code);
+                const englishLabel = locale === 'en'
+                    ? label
+                    : new Intl.DisplayNames(['en'], { type: 'language' }).of(option.code);
+                const fallbackLocale = fallbackLocales[locale];
+                if (fallbackLocale && (!label || label === option.code || label === englishLabel)) {
+                    label = new Intl.DisplayNames([fallbackLocale], { type: 'language' }).of(option.code) || label;
+                }
+                if (typeof label === 'string' && label.trim()) return label;
+            } catch (_) {
+                // Keep the English catalog label when the browser lacks this language display name.
+            }
+        }
+        return option?.label || '';
+    }
+    const popupCategoryDisplayLabel = value => {
+        const option = categoryOptions.find(item => item.label.toLowerCase() === String(value || '').trim().toLowerCase());
+        return option ? popupTaxonomyDisplayLabel(option) : value;
+    };
+    const popupLanguageDisplayLabel = code => {
+        const option = languageOptions.find(item => item.code === code);
+        return option ? popupTaxonomyDisplayLabel(option) : code.toUpperCase();
+    };
     let feedRowsContainer = null;
     let feedGroupElement = null;
 
@@ -329,7 +359,7 @@ function initializePopupFiltersTabs() {
             ? popupUiText('popup.allowed', 'Allowed') : popupUiText('popup.blocked', 'Blocked');
         categorySelectionCount.textContent = count === 0
             ? popupUiText('popup.noCategories', 'No categories selected — filter is inactive')
-            : `${mode}: ${popupCategorySelected.join(', ')}`;
+            : `${mode}: ${popupCategorySelected.map(popupCategoryDisplayLabel).join(', ')}`;
         categoryClear.disabled = count === 0;
         categoryMode.disabled = !categoryEnabled.checked;
         categoryPanel.style.display = categoryEnabled.checked ? 'block' : 'none';
@@ -340,14 +370,16 @@ function initializePopupFiltersTabs() {
         const selectedKeys = new Set(popupCategorySelected.map(value => value.toLowerCase()));
         categoryList.innerHTML = '';
 
-        categoryOptions.filter(option => !needle || option.label.toLowerCase().includes(needle)).forEach(option => {
+        categoryOptions.filter(option => !needle || option.label.toLowerCase().includes(needle)
+            || popupTaxonomyDisplayLabel(option).toLowerCase().includes(needle)).forEach(option => {
             const active = selectedKeys.has(option.label.toLowerCase());
+            const displayLabel = popupTaxonomyDisplayLabel(option);
             const pill = document.createElement('button');
             pill.type = 'button';
             pill.className = 'ft-category-pill';
             pill.classList.toggle('active', active);
             pill.setAttribute('aria-pressed', active ? 'true' : 'false');
-            pill.setAttribute('aria-label', `${option.label}, ${active
+            pill.setAttribute('aria-label', `${displayLabel}, ${active
                 ? popupUiText('popup.selected', 'selected') : popupUiText('popup.notSelected', 'not selected')}`);
             pill.style.setProperty('--ft-category-color', option.color);
             pill.style.setProperty('--ft-category-color-bg', hexToRgba(option.color, 0.10));
@@ -358,7 +390,7 @@ function initializePopupFiltersTabs() {
             swatch.className = 'ft-category-swatch';
             const label = document.createElement('span');
             label.className = 'ft-category-label';
-            label.textContent = option.label;
+            label.textContent = displayLabel;
             const selectionMark = document.createElement('span');
             selectionMark.className = 'ft-category-selection-mark';
             selectionMark.setAttribute('aria-hidden', 'true');
@@ -453,7 +485,7 @@ function initializePopupFiltersTabs() {
         const modeLabel = languageMode.value === 'allow'
             ? popupUiText('popup.allowed', 'Allowed') : popupUiText('popup.blocked', 'Blocked');
         languageCount.textContent = popupLanguageSelected.length
-            ? `${modeLabel}: ${popupLanguageSelected.map(code => languageOptions.find(option => option.code === code)?.label || code.toUpperCase()).join(', ')}`
+            ? `${modeLabel}: ${popupLanguageSelected.map(popupLanguageDisplayLabel).join(', ')}`
             : popupUiText('popup.noLanguages', 'No languages selected — filter is inactive');
         languageClear.disabled = popupLanguageSelected.length === 0;
         languageMode.disabled = !languageEnabled.checked;
@@ -465,8 +497,10 @@ function initializePopupFiltersTabs() {
         const needle = languageSearch.value.trim().toLowerCase();
         const selected = new Set(popupLanguageSelected);
         languageList.innerHTML = '';
-        languageOptions.filter(option => !needle || option.label.toLowerCase().includes(needle) || option.code.includes(needle)).forEach(option => {
+        languageOptions.filter(option => !needle || option.label.toLowerCase().includes(needle)
+            || popupTaxonomyDisplayLabel(option).toLowerCase().includes(needle) || option.code.includes(needle)).forEach(option => {
             const active = selected.has(option.code);
+            const displayLabel = popupTaxonomyDisplayLabel(option);
             const pill = document.createElement('button');
             pill.type = 'button';
             pill.className = `ft-category-pill${active ? ' active' : ''}`;
@@ -476,7 +510,7 @@ function initializePopupFiltersTabs() {
             swatch.className = 'ft-category-swatch';
             const label = document.createElement('span');
             label.className = 'ft-category-label';
-            label.textContent = `${option.label} · ${option.code.toUpperCase()}`;
+            label.textContent = `${displayLabel} · ${option.code.toUpperCase()}`;
             const mark = document.createElement('span');
             mark.className = 'ft-category-selection-mark';
             mark.textContent = '✓';
@@ -490,6 +524,13 @@ function initializePopupFiltersTabs() {
             languageList.appendChild(pill);
         });
     }
+
+    window.addEventListener('filtertube-ui-locale-changed', () => {
+        renderPopupCategoryList();
+        updatePopupCategorySummary();
+        renderPopupLanguageList();
+        updatePopupLanguageSummary();
+    });
 
     function applyPopupLanguageFilters(filters = {}, profileType = 'main') {
         languageGroup.style.display = profileType === 'kids' ? 'none' : '';

@@ -23,10 +23,10 @@ list-mode, or performance behavior changes.
 
 ```text
 source file: js/render_engine.js
-source split lines: 2064
-source wc -l: 2063
-source bytes: 92333
-source sha256: 14f7543bcdfe207a28bd389fc18ccfe61a350de1326beb420411c2b470358df9
+source split lines: 2094
+source wc -l: 2093
+source bytes: 93770
+source sha256: aa2942ded66d836c133eab2a0cbec624a76cf2c252c68b5e053a2e7c10ce76aa
 broad lexical callable matches: 171
 IIFE-scoped declarations: 51
 plain function declarations: 46
@@ -118,17 +118,17 @@ keywordRenderingAndRowActions: 14
 | 1428 | `function` | `createChannelListItem` | `channelRenderingAndRowActions` |
 | 1453 | `function` | `createMinimalChannelItem` | `channelRenderingAndRowActions` |
 | 1519 | `function` | `createFullChannelItem` | `channelRenderingAndRowActions` |
-| 1686 | `function` | `createNodeMapping` | `channelRenderingAndRowActions` |
-| 1738 | `function` | `createFilterAllToggle` | `channelRenderingAndRowActions` |
-| 1804 | `function` | `createFallbackFilterAllToggle` | `channelRenderingAndRowActions` |
-| 1854 | `function` | `isTopicChannel` | `channelDisplayIdentityHelpers` |
-| 1865 | `function` | `getTopicChannelTooltip` | `channelDisplayIdentityHelpers` |
-| 1873 | `function` | `findChannelByRef` | `keywordRenderingAndRowActions` |
-| 1892 | `function` | `deriveChannelMapping` | `channelDisplayIdentityHelpers` |
-| 1985 | `function` | `createFallbackExactToggle` | `keywordRenderingAndRowActions` |
-| 2015 | `function` | `getExactKeywordHelpText` | `keywordRenderingAndRowActions` |
-| 2030 | `function` | `createFallbackDeleteButton` | `keywordRenderingAndRowActions` |
-| 2038 | `function` | `patchChannelListItem` | `channelRenderingAndRowActions` |
+| 1702 | `function` | `createNodeMapping` | `channelRenderingAndRowActions` |
+| 1768 | `function` | `createFilterAllToggle` | `channelRenderingAndRowActions` |
+| 1834 | `function` | `createFallbackFilterAllToggle` | `channelRenderingAndRowActions` |
+| 1884 | `function` | `isTopicChannel` | `channelDisplayIdentityHelpers` |
+| 1895 | `function` | `getTopicChannelTooltip` | `channelDisplayIdentityHelpers` |
+| 1903 | `function` | `findChannelByRef` | `keywordRenderingAndRowActions` |
+| 1922 | `function` | `deriveChannelMapping` | `channelDisplayIdentityHelpers` |
+| 2015 | `function` | `createFallbackExactToggle` | `keywordRenderingAndRowActions` |
+| 2045 | `function` | `getExactKeywordHelpText` | `keywordRenderingAndRowActions` |
+| 2060 | `function` | `createFallbackDeleteButton` | `keywordRenderingAndRowActions` |
+| 2068 | `function` | `patchChannelListItem` | `channelRenderingAndRowActions` |
 
 ## Current Public API
 

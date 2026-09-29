@@ -21,6 +21,29 @@ function tabViewUiText(key, fallback, values = {}) {
     return interpolate(fallback);
 }
 
+function tabViewTaxonomyDisplayLabel(option) {
+    if (option?.labelKey) return tabViewUiText(option.labelKey, option.label);
+    if (option?.code && typeof Intl?.DisplayNames === 'function') {
+        try {
+            const locale = window.FilterTubeUiLocalization?.locale || 'en';
+            const fallbackLocales = { arz: 'ar', apc: 'ar', apd: 'ar', 'wuu-Hans': 'zh-Hans', 'pa-Arab': 'ur', bho: 'hi', fil: 'id' };
+            const displayNames = new Intl.DisplayNames([locale], { type: 'language' });
+            let label = displayNames.of(option.code);
+            const englishLabel = locale === 'en'
+                ? label
+                : new Intl.DisplayNames(['en'], { type: 'language' }).of(option.code);
+            const fallbackLocale = fallbackLocales[locale];
+            if (fallbackLocale && (!label || label === option.code || label === englishLabel)) {
+                label = new Intl.DisplayNames([fallbackLocale], { type: 'language' }).of(option.code) || label;
+            }
+            if (typeof label === 'string' && label.trim()) return label;
+        } catch (_) {
+            // Keep the English catalog label when the browser lacks this language display name.
+        }
+    }
+    return option?.label || '';
+}
+
 function setTabViewLocalizedCopy(element, property, key, fallback, values = {}) {
     if (!element) return element;
     const copies = element.__ftTabViewLocalizedCopy || (element.__ftTabViewLocalizedCopy = {});
@@ -784,10 +807,10 @@ function initializeFiltersTabs() {
                     <option value="oldest" data-ft-tabview-i18n="dashboard.ruleEditor.oldestFirst">Oldest First</option>
                     <option value="az" data-ft-tabview-i18n="dashboard.ruleEditor.alphabetical">A-Z</option>
                 </select>
-                <select id="channelSourceFilter" class="select-input channel-source-filter" title="Show manual channels, imported-list channels, or one saved list">
-                    <option value="all">All sources</option>
-                    <option value="manual">Manual</option>
-                    <option value="lists">Imported lists</option>
+                <select id="channelSourceFilter" class="select-input channel-source-filter" title="Filter channel rules by source" data-ft-tabview-title="dashboard.ruleEditor.sourceFilterTitle">
+                    <option value="all" data-ft-tabview-i18n="dashboard.ruleEditor.allSources">All sources</option>
+                    <option value="manual" data-ft-tabview-i18n="dashboard.ruleEditor.manualSource">Manual</option>
+                    <option value="lists" data-ft-tabview-i18n="dashboard.ruleEditor.importedLists">Imported lists</option>
                 </select>
             </div>
         </div>
@@ -1205,6 +1228,10 @@ function initializeFiltersTabs() {
     videoFiltersRows.appendChild(uppercaseRow);
 
     const categoryOptions = window.FilterTubeContentControlsCatalog?.getCategoryOptions?.() || [];
+    const categoryDisplayLabel = value => {
+        const option = categoryOptions.find(item => item.label.toLowerCase() === String(value || '').trim().toLowerCase());
+        return option ? tabViewTaxonomyDisplayLabel(option) : value;
+    };
 
     const categoryFiltersSection = document.createElement('div');
     categoryFiltersSection.className = 'content-control-group category-filters-section';
@@ -1387,7 +1414,7 @@ function initializeFiltersTabs() {
                 : tabViewUiText('popup.blocked', 'Blocked');
             categoryMainSelectionCount.textContent = count === 0
                 ? tabViewUiText('popup.noCategories', 'No categories selected — filter is inactive')
-                : `${mode}: ${categorySelectedMain.join(', ')}`;
+                : `${mode}: ${categorySelectedMain.map(categoryDisplayLabel).join(', ')}`;
         }
         if (categoryMainClear) categoryMainClear.disabled = count === 0;
     }
@@ -1404,7 +1431,8 @@ function initializeFiltersTabs() {
         const filtered = categoryOptions.filter(opt => {
             if (!needle) return true;
             const label = String(opt?.label || '').toLowerCase();
-            return label.includes(needle);
+            const displayLabel = tabViewTaxonomyDisplayLabel(opt).toLowerCase();
+            return label.includes(needle) || displayLabel.includes(needle);
         });
 
         filtered.forEach(opt => {
@@ -1413,6 +1441,7 @@ function initializeFiltersTabs() {
 
             const key = label.toLowerCase();
             const isActive = selectedSet.has(key);
+            const displayLabel = tabViewTaxonomyDisplayLabel(opt).trim();
 
             const pill = document.createElement('button');
             pill.type = 'button';
@@ -1423,11 +1452,13 @@ function initializeFiltersTabs() {
             pill.setAttribute('data-ft-category', 'true');
             pill.setAttribute('data-ft-category-label', label);
             pill.setAttribute('aria-pressed', isActive ? 'true' : 'false');
-            pill.setAttribute('aria-label', `${label}, ${isActive ? 'selected' : 'not selected'}`);
+            pill.setAttribute('aria-label', `${displayLabel}, ${isActive
+                ? tabViewUiText('popup.selected', 'selected') : tabViewUiText('popup.notSelected', 'not selected')}`);
             pill.addEventListener('click', () => {
                 const nextActive = pill.getAttribute('aria-pressed') !== 'true';
                 pill.setAttribute('aria-pressed', nextActive ? 'true' : 'false');
-                pill.setAttribute('aria-label', `${label}, ${nextActive ? 'selected' : 'not selected'}`);
+                pill.setAttribute('aria-label', `${displayLabel}, ${nextActive
+                    ? tabViewUiText('popup.selected', 'selected') : tabViewUiText('popup.notSelected', 'not selected')}`);
                 pill.classList.toggle('active', nextActive);
                 updateCategorySelection(profileType, label, nextActive);
                 scheduleSaveCategoryFilters(profileType, { showToast: false });
@@ -1438,7 +1469,7 @@ function initializeFiltersTabs() {
 
             const text = document.createElement('span');
             text.className = 'ft-category-label';
-            text.textContent = label;
+            text.textContent = displayLabel;
 
             const selectionMark = document.createElement('span');
             selectionMark.className = 'ft-category-selection-mark';
@@ -1593,7 +1624,10 @@ function initializeFiltersTabs() {
     const normalizeLanguageSelection = values => normalizeSelectedArray(values)
         .map(value => String(value).toLowerCase().replace(/_/g, '-').split('-')[0])
         .filter(Boolean);
-    const languageLabelForCode = code => languageOptions.find(option => option.code === code)?.label || String(code || '').toUpperCase();
+    const languageLabelForCode = code => {
+        const option = languageOptions.find(item => item.code === code);
+        return option ? tabViewTaxonomyDisplayLabel(option) : String(code || '').toUpperCase();
+    };
 
     function updateLanguageSelectionSummary() {
         const mode = languageModeMain?.value === 'allow'
@@ -1613,7 +1647,8 @@ function initializeFiltersTabs() {
         if (!list) return;
         list.innerHTML = '';
         const selected = new Set(languageSelectedMain);
-        languageOptions.filter(option => !needle || option.label.toLowerCase().includes(needle) || option.code.includes(needle)).forEach(option => {
+        languageOptions.filter(option => !needle || option.label.toLowerCase().includes(needle)
+            || tabViewTaxonomyDisplayLabel(option).toLowerCase().includes(needle) || option.code.includes(needle)).forEach(option => {
             const active = selected.has(option.code);
             const pill = document.createElement('button');
             pill.type = 'button';
@@ -1622,7 +1657,7 @@ function initializeFiltersTabs() {
             pill.style.setProperty('--ft-category-color', option.color || '#3b82f6');
             pill.style.setProperty('--ft-category-color-bg-active', hexToRgba(option.color || '#3b82f6', 0.18));
             pill.innerHTML = `<span class="ft-category-swatch"></span><span class="ft-category-label"></span><span class="ft-category-selection-mark" aria-hidden="true">✓</span>`;
-            pill.querySelector('.ft-category-label').textContent = `${option.label} · ${option.code.toUpperCase()}`;
+            pill.querySelector('.ft-category-label').textContent = `${tabViewTaxonomyDisplayLabel(option)} · ${option.code.toUpperCase()}`;
             pill.addEventListener('click', () => {
                 languageSelectedMain = active
                     ? languageSelectedMain.filter(code => code !== option.code)
@@ -1634,6 +1669,13 @@ function initializeFiltersTabs() {
             list.appendChild(pill);
         });
     }
+
+    window.addEventListener('filtertube-ui-locale-changed', () => {
+        renderCategoryList(categoryMainList, categorySelectedMain, categoryMainSearch?.value || '', 'main');
+        renderLanguageList();
+        updateCategorySelectionSummary();
+        updateLanguageSelectionSummary();
+    });
 
     function updateLanguageFilterUI() {
         const enabled = languageEnabledMain?.checked === true;
@@ -2269,49 +2311,49 @@ function initializeKidsTabs() {
     kidsKeywordsContent.innerHTML = `
         <section class="ft-rule-list-editor" aria-labelledby="kidsKeywordRuleListTitle">
             <div class="ft-rule-list-editor__copy">
-                <h3 id="kidsKeywordRuleListTitle">View Kids keyword rules</h3>
+                <h3 id="kidsKeywordRuleListTitle" data-ft-tabview-i18n="dashboard.ruleEditor.viewKidsKeywordRules">View Kids keyword rules</h3>
                 <p id="kidsKeywordRuleTargetHelp">Showing blocked Kids keyword rules. Changing this view does not change Kids filtering mode or Main rules.</p>
             </div>
-            <div class="ft-rule-target-tabs" role="tablist" aria-label="Choose which Kids keyword rule list to view and edit">
+            <div class="ft-rule-target-tabs" role="tablist" aria-label="Choose the keyword rule list to edit" data-ft-tabview-aria-label="dashboard.ruleEditor.chooseKeywordList">
                 <button type="button" class="ft-rule-target-tab is-active" role="tab" aria-selected="true" aria-controls="kidsKeywordListEl" data-rule-target-for="kids-keyword" data-rule-target="block">Blocked rules</button>
                 <button type="button" class="ft-rule-target-tab" role="tab" aria-selected="false" aria-controls="kidsKeywordListEl" data-rule-target-for="kids-keyword" data-rule-target="allow">Allowed rules</button>
             </div>
             <input id="kidsKeywordRuleTarget" type="hidden" value="block" />
         </section>
         <div class="input-row">
-            <input type="text" id="kidsKeywordInput" class="text-input" placeholder="Enter keyword to block on Kids..." />
-            <button id="kidsAddKeywordBtn" class="btn-primary">Add Keyword</button>
+            <input type="text" id="kidsKeywordInput" class="text-input" placeholder="Enter keyword to block on Kids..." data-ft-tabview-placeholder="dashboard.ruleEditor.kidsKeywordBlockPlaceholder" />
+            <button id="kidsAddKeywordBtn" class="btn-primary" data-ft-tabview-i18n="dashboard.ruleEditor.addBlockedKeyword">Add blocked keyword</button>
         </div>
         <div id="managedChildKidsBanner" class="ft-managed-child-editor" hidden></div>
 
         <div class="filter-controls">
-            <input type="text" id="kidsSearchKeywords" class="search-input" placeholder="Search keywords..." />
+            <input type="text" id="kidsSearchKeywords" class="search-input" placeholder="Search keywords..." data-ft-tabview-placeholder="dashboard.ruleEditor.searchKeywords" />
             <div class="sort-controls">
-                <span class="label">Sort by:</span>
+                <span class="label" data-ft-tabview-i18n="dashboard.ruleEditor.sortBy">Sort by:</span>
                 <select id="kidsKeywordSort" class="select-input">
-                    <option value="newest">Newest First</option>
-                    <option value="oldest">Oldest First</option>
-                    <option value="az">A-Z</option>
+                    <option value="newest" data-ft-tabview-i18n="dashboard.ruleEditor.newestFirst">Newest First</option>
+                    <option value="oldest" data-ft-tabview-i18n="dashboard.ruleEditor.oldestFirst">Oldest First</option>
+                    <option value="az" data-ft-tabview-i18n="dashboard.ruleEditor.alphabetical">A-Z</option>
                 </select>
             </div>
         </div>
 
         <div class="date-filter-controls">
             <div class="date-range-controls">
-                <span class="label">Date:</span>
+                <span class="label" data-ft-tabview-i18n="dashboard.ruleEditor.date">Date:</span>
                 <select id="kidsKeywordDatePreset" class="select-input">
-                    <option value="all">All time</option>
-                    <option value="today">Today</option>
-                    <option value="7d">Last 7 days</option>
-                    <option value="30d">Last 30 days</option>
-                    <option value="custom">Custom</option>
+                    <option value="all" data-ft-tabview-i18n="dashboard.ruleEditor.allTime">All time</option>
+                    <option value="today" data-ft-tabview-i18n="dashboard.ruleEditor.today">Today</option>
+                    <option value="7d" data-ft-tabview-i18n="dashboard.ruleEditor.last7Days">Last 7 days</option>
+                    <option value="30d" data-ft-tabview-i18n="dashboard.ruleEditor.last30Days">Last 30 days</option>
+                    <option value="custom" data-ft-tabview-i18n="dashboard.ruleEditor.custom">Custom</option>
                 </select>
             </div>
             <div class="date-inputs">
                 <input type="date" id="kidsKeywordDateFrom" class="select-input date-input custom-date-input" />
-                <span class="date-sep">to</span>
+                <span class="date-sep" data-ft-tabview-i18n="dashboard.ruleEditor.to">to</span>
                 <input type="date" id="kidsKeywordDateTo" class="select-input date-input custom-date-input" />
-                <button id="kidsKeywordDateClear" class="btn-secondary date-clear-btn" type="button">Clear</button>
+                <button id="kidsKeywordDateClear" class="btn-secondary date-clear-btn" type="button" data-ft-tabview-i18n="dashboard.ruleEditor.clear">Clear</button>
             </div>
         </div>
 
@@ -2323,65 +2365,67 @@ function initializeKidsTabs() {
     kidsChannelsContent.innerHTML = `
         <section class="ft-rule-list-editor" aria-labelledby="kidsChannelRuleListTitle">
             <div class="ft-rule-list-editor__copy">
-                <h3 id="kidsChannelRuleListTitle">View Kids channel rules</h3>
+                <h3 id="kidsChannelRuleListTitle" data-ft-tabview-i18n="dashboard.ruleEditor.viewKidsChannelRules">View Kids channel rules</h3>
                 <p id="kidsChannelRuleTargetHelp">Showing blocked Kids channel rules. Changing this view does not change Kids filtering mode or Main rules.</p>
             </div>
-            <div class="ft-rule-target-tabs" role="tablist" aria-label="Choose which Kids channel rule list to view and edit">
+            <div class="ft-rule-target-tabs" role="tablist" aria-label="Choose the channel rule list to edit" data-ft-tabview-aria-label="dashboard.ruleEditor.chooseChannelList">
                 <button type="button" class="ft-rule-target-tab is-active" role="tab" aria-selected="true" aria-controls="kidsChannelListEl" data-rule-target-for="kids-channel" data-rule-target="block">Blocked rules</button>
                 <button type="button" class="ft-rule-target-tab" role="tab" aria-selected="false" aria-controls="kidsChannelListEl" data-rule-target-for="kids-channel" data-rule-target="allow">Allowed rules</button>
             </div>
             <input id="kidsChannelRuleTarget" type="hidden" value="block" />
         </section>
         <div class="input-row">
-            <input type="text" id="kidsChannelInput" class="text-input" placeholder="@handle, Channel ID, or c/ChannelName" />
-            <button id="kidsAddChannelBtn" class="btn-primary">Add Channel</button>
+            <input type="text" id="kidsChannelInput" class="text-input" placeholder="@handle, Channel ID, or c/ChannelName" data-ft-tabview-placeholder="dashboard.ruleEditor.kidsChannelBlockPlaceholder" />
+            <button id="kidsAddChannelBtn" class="btn-primary" data-ft-tabview-i18n="dashboard.ruleEditor.addBlockedChannel">Add blocked channel</button>
         </div>
         <div id="managedChildKidsChannelBanner" class="ft-managed-child-editor" hidden></div>
 
         <div class="filter-controls">
-            <input type="text" id="kidsSearchChannels" class="search-input" placeholder="Search channels..." />
+            <input type="text" id="kidsSearchChannels" class="search-input" placeholder="Search channels..." data-ft-tabview-placeholder="dashboard.ruleEditor.searchChannels" />
             <div class="sort-controls">
-                <span class="label">Sort by:</span>
+                <span class="label" data-ft-tabview-i18n="dashboard.ruleEditor.sortBy">Sort by:</span>
                 <select id="kidsChannelSort" class="select-input">
-                    <option value="newest">Newest First</option>
-                    <option value="oldest">Oldest First</option>
-                    <option value="az">A-Z</option>
+                    <option value="newest" data-ft-tabview-i18n="dashboard.ruleEditor.newestFirst">Newest First</option>
+                    <option value="oldest" data-ft-tabview-i18n="dashboard.ruleEditor.oldestFirst">Oldest First</option>
+                    <option value="az" data-ft-tabview-i18n="dashboard.ruleEditor.alphabetical">A-Z</option>
                 </select>
-                <select id="kidsChannelSourceFilter" class="select-input channel-source-filter" title="Show manual Kids channels, imported-list channels, or one saved list">
-                    <option value="all">All sources</option>
-                    <option value="manual">Manual</option>
-                    <option value="lists">Imported lists</option>
+                <select id="kidsChannelSourceFilter" class="select-input channel-source-filter" title="Filter channel rules by source" data-ft-tabview-title="dashboard.ruleEditor.sourceFilterTitle">
+                    <option value="all" data-ft-tabview-i18n="dashboard.ruleEditor.allSources">All sources</option>
+                    <option value="manual" data-ft-tabview-i18n="dashboard.ruleEditor.manualSource">Manual</option>
+                    <option value="lists" data-ft-tabview-i18n="dashboard.ruleEditor.importedLists">Imported lists</option>
                 </select>
             </div>
         </div>
 
         <div class="date-filter-controls">
             <div class="date-range-controls">
-                <span class="label">Date:</span>
+                <span class="label" data-ft-tabview-i18n="dashboard.ruleEditor.date">Date:</span>
                 <select id="kidsChannelDatePreset" class="select-input">
-                    <option value="all">All time</option>
-                    <option value="today">Today</option>
-                    <option value="7d">Last 7 days</option>
-                    <option value="30d">Last 30 days</option>
-                    <option value="custom">Custom</option>
+                    <option value="all" data-ft-tabview-i18n="dashboard.ruleEditor.allTime">All time</option>
+                    <option value="today" data-ft-tabview-i18n="dashboard.ruleEditor.today">Today</option>
+                    <option value="7d" data-ft-tabview-i18n="dashboard.ruleEditor.last7Days">Last 7 days</option>
+                    <option value="30d" data-ft-tabview-i18n="dashboard.ruleEditor.last30Days">Last 30 days</option>
+                    <option value="custom" data-ft-tabview-i18n="dashboard.ruleEditor.custom">Custom</option>
                 </select>
             </div>
             <div class="date-inputs">
                 <input type="date" id="kidsChannelDateFrom" class="select-input date-input custom-date-input" />
-                <span class="date-sep">to</span>
+                <span class="date-sep" data-ft-tabview-i18n="dashboard.ruleEditor.to">to</span>
                 <input type="date" id="kidsChannelDateTo" class="select-input date-input custom-date-input" />
-                <button id="kidsChannelDateClear" class="btn-secondary date-clear-btn" type="button">Clear</button>
+                <button id="kidsChannelDateClear" class="btn-secondary date-clear-btn" type="button" data-ft-tabview-i18n="dashboard.ruleEditor.clear">Clear</button>
             </div>
         </div>
 
         <div id="kidsImportedChannelReportNotice" class="subscriptions-import-inline subscriptions-import-inline--info imported-channel-enrichment-inline" hidden>
             <div id="kidsImportedChannelReportStatus" class="subscriptions-import-status" role="status" aria-live="polite"></div>
-            <button id="kidsViewChannelImportReports" class="btn-secondary imported-channel-enrichment-toggle" type="button">View import reports</button>
+            <button id="kidsViewChannelImportReports" class="btn-secondary imported-channel-enrichment-toggle" type="button" data-ft-tabview-i18n="dashboard.import.viewReports">View import reports</button>
         </div>
 
         <div id="kidsChannelListEl" class="advanced-list"></div>
     `;
     bindTabViewLocalizedMarkup(channelsContent);
+    bindTabViewLocalizedMarkup(kidsKeywordsContent);
+    bindTabViewLocalizedMarkup(kidsChannelsContent);
 
     const kidsContentTab = document.createElement('div');
     kidsContentTab.id = 'kidsContentControlsSection';
@@ -2669,6 +2713,10 @@ function initializeKidsTabs() {
     kidsContentTab.appendChild(kidsVideoFiltersSection);
 
     const categoryOptions = window.FilterTubeContentControlsCatalog?.getCategoryOptions?.() || [];
+    const kidsCategoryDisplayLabel = value => {
+        const option = categoryOptions.find(item => item.label.toLowerCase() === String(value || '').trim().toLowerCase());
+        return option ? tabViewTaxonomyDisplayLabel(option) : value;
+    };
 
     function hexToRgba(hex, alpha) {
         if (!hex || typeof hex !== 'string') return '';
@@ -2838,7 +2886,7 @@ function initializeKidsTabs() {
             : tabViewUiText('popup.blocked', 'Blocked');
         kidsCategorySelectionCount.textContent = count === 0
             ? tabViewUiText('popup.noCategories', 'No categories selected — filter is inactive')
-            : `${mode}: ${kidsCategorySelected.join(', ')}`;
+            : `${mode}: ${kidsCategorySelected.map(kidsCategoryDisplayLabel).join(', ')}`;
         kidsCategoryClear.disabled = count === 0;
     }
 
@@ -2853,7 +2901,8 @@ function initializeKidsTabs() {
         const filtered = categoryOptions.filter(opt => {
             if (!needle) return true;
             const label = String(opt?.label || '').toLowerCase();
-            return label.includes(needle);
+            const displayLabel = tabViewTaxonomyDisplayLabel(opt).toLowerCase();
+            return label.includes(needle) || displayLabel.includes(needle);
         });
 
         filtered.forEach(opt => {
@@ -2862,6 +2911,7 @@ function initializeKidsTabs() {
 
             const key = label.toLowerCase();
             const isActive = selectedSet.has(key);
+            const displayLabel = tabViewTaxonomyDisplayLabel(opt).trim();
 
             const pill = document.createElement('button');
             pill.type = 'button';
@@ -2873,13 +2923,15 @@ function initializeKidsTabs() {
             pill.setAttribute('data-ft-category', 'true');
             pill.setAttribute('data-ft-category-label', label);
             pill.setAttribute('aria-pressed', isActive ? 'true' : 'false');
-            pill.setAttribute('aria-label', `${label}, ${isActive ? 'selected' : 'not selected'}`);
+            pill.setAttribute('aria-label', `${displayLabel}, ${isActive
+                ? tabViewUiText('popup.selected', 'selected') : tabViewUiText('popup.notSelected', 'not selected')}`);
             pill.classList.toggle('active', isActive);
 
             pill.addEventListener('click', () => {
                 const nextActive = pill.getAttribute('aria-pressed') !== 'true';
                 pill.setAttribute('aria-pressed', nextActive ? 'true' : 'false');
-                pill.setAttribute('aria-label', `${label}, ${nextActive ? 'selected' : 'not selected'}`);
+                pill.setAttribute('aria-label', `${displayLabel}, ${nextActive
+                    ? tabViewUiText('popup.selected', 'selected') : tabViewUiText('popup.notSelected', 'not selected')}`);
                 pill.classList.toggle('active', nextActive);
                 updateKidsCategorySelection(label, nextActive);
                 scheduleSaveKidsCategoryFilters({ showToast: false });
@@ -2890,7 +2942,7 @@ function initializeKidsTabs() {
 
             const text = document.createElement('span');
             text.className = 'ft-category-label';
-            text.textContent = label;
+            text.textContent = displayLabel;
 
             const selectionMark = document.createElement('span');
             selectionMark.className = 'ft-category-selection-mark';
@@ -2903,6 +2955,11 @@ function initializeKidsTabs() {
             listEl.appendChild(pill);
         });
     }
+
+    window.addEventListener('filtertube-ui-locale-changed', () => {
+        renderKidsCategoryList(kidsCategoryList, kidsCategorySelected, kidsCategorySearch?.value || '');
+        updateKidsCategorySelectionSummary();
+    });
 
     function updateKidsCategoryUi() {
         if (kidsCategoryPanel) kidsCategoryPanel.style.display = kidsCategoryEnabled?.checked ? 'block' : 'none';
@@ -5221,19 +5278,39 @@ document.addEventListener('DOMContentLoaded', async () => {
         return { reports: safeArray(reports), profiles: profiles || {}, job: safeObject(storedJob?.[jobKey]) };
     }
 
+    function ruleListImportReportText(key, fallback, values = {}) {
+        return tabViewUiText(`dashboard.importReport.${key}`, fallback, values);
+    }
+
+    function setRuleListImportReportCopy(element, property, key, fallback, values = {}) {
+        return setTabViewLocalizedCopy(element, property, `dashboard.importReport.${key}`, fallback, values);
+    }
+
     function formatRuleListReportTarget(target) {
-        const profile = normalizeString(target?.profileName) || (target?.profileId === 'default' ? 'Default' : normalizeString(target?.profileId));
-        const surface = target?.surface === 'kids' ? 'Kids' : 'Main';
-        const list = target?.listType === 'whitelist' ? 'allow list' : 'block list';
-        return `${profile || 'Profile'} · ${surface} ${list}`;
+        const profile = normalizeString(target?.profileName)
+            || (target?.profileId === 'default'
+                ? tabViewUiText('popup.profile.defaultName', 'Default')
+                : normalizeString(target?.profileId))
+            || tabViewUiText('popup.profile.genericName', 'Profile');
+        const surface = target?.surface === 'kids'
+            ? tabViewUiText('family.commandCenter.surface.kids', 'Kids')
+            : tabViewUiText('family.commandCenter.surface.main', 'Main');
+        const list = target?.listType === 'whitelist'
+            ? tabViewUiText('popup.whitelist', 'Whitelist')
+            : tabViewUiText('popup.blocklist', 'Blocklist');
+        return `${profile} · ${surface} ${list}`;
     }
 
     function ruleListReportStatusLabel(status) {
-        if (status === 'needs_attention') return 'Needs attention';
-        if (status === 'retrying') return 'Retrying';
-        if (status === 'fetching') return 'Fetching';
-        if (status === 'pending') return 'Pending';
-        return 'Complete';
+        const statusCopy = {
+            all: ['status.allRows', 'All rows'],
+            needs_attention: ['status.needsAttention', 'Needs attention'],
+            retrying: ['status.retrying', 'Retrying'],
+            fetching: ['status.fetching', 'Fetching'],
+            pending: ['status.pending', 'Pending'],
+            complete: ['status.complete', 'Complete']
+        }[status] || ['status.complete', 'Complete'];
+        return tabViewUiText(`dashboard.importReport.${statusCopy[0]}`, statusCopy[1]);
     }
 
     function ruleListReportChannelUrl(row) {
@@ -5271,22 +5348,47 @@ document.addEventListener('DOMContentLoaded', async () => {
         const rawReason = normalizeString(row?.reason || row?.lastError);
         if (!rawReason) {
             return row?.status === 'complete'
-                ? 'Channel details are complete.'
-                : 'Waiting for the first lookup.';
+                ? tabViewUiText('dashboard.importReport.reason.complete', 'Channel details are complete.')
+                : tabViewUiText('dashboard.importReport.reason.waitingFirstLookup', 'Waiting for the first lookup.');
         }
         const normalizedReason = rawReason.toLowerCase();
         const knownReasons = {
-            incomplete_channel_metadata: 'Some channel details are still missing. FilterTube will try again.',
-            temporary_fetch_failure: 'YouTube returned a temporary error. FilterTube will try again.',
-            fetch_failed: 'YouTube did not return channel details. FilterTube will try again.',
-            metadata_unavailable: 'YouTube did not provide complete channel details.',
-            timeout: 'YouTube took too long to respond. FilterTube will try again.',
-            channel_not_found: 'YouTube could not find this channel.',
-            channel_deleted: 'YouTube reports that this channel was deleted.',
-            channel_terminated: 'YouTube reports that this account was terminated.',
-            channel_unavailable: 'YouTube reports that this channel is unavailable.'
+            incomplete_channel_metadata: ['reason.incompleteMetadata', 'Some channel details are still missing. FilterTube will try again.'],
+            temporary_fetch_failure: ['reason.temporaryError', 'YouTube returned a temporary error. FilterTube will try again.'],
+            fetch_failed: ['reason.fetchFailed', 'YouTube did not return channel details. FilterTube will try again.'],
+            metadata_unavailable: ['reason.metadataUnavailable', 'YouTube did not provide complete channel details.'],
+            timeout: ['reason.timeout', 'YouTube took too long to respond. FilterTube will try again.'],
+            channel_not_found: ['reason.channelNotFound', 'YouTube could not find this channel.'],
+            resource_not_found: ['reason.channelNotFound', 'YouTube could not find this channel.'],
+            not_found: ['reason.channelNotFound', 'YouTube could not find this channel.'],
+            http_404: ['reason.channelNotFound', 'YouTube could not find this channel.'],
+            http_410: ['reason.channelDeleted', 'YouTube reports that this channel was deleted.'],
+            channel_deleted: ['reason.channelDeleted', 'YouTube reports that this channel was deleted.'],
+            channel_terminated: ['reason.channelTerminated', 'YouTube reports that this account was terminated.'],
+            channel_unavailable: ['reason.channelUnavailable', 'YouTube reports that this channel is unavailable.'],
+            saved_rule_missing: ['reason.savedRuleMissing', 'The saved rule is no longer present in this target.'],
+            name_only_rule: ['reason.nameOnly', 'This is a name-only rule. Add a channel link or UC ID if you want exact channel identity and metadata.'],
+            channel_not_verified: ['reason.notVerified', 'YouTube could not verify this channel identifier.'],
+            channel_fetching: ['reason.fetching', 'Channel details are being fetched now.'],
+            metadata_not_queued: ['reason.metadataNotQueued', 'The rule is active, but its incomplete metadata is not currently queued.'],
+            incomplete_channel_details: ['reason.incompleteDetails', 'YouTube returned incomplete channel details.'],
+            waiting_in_paced_queue: ['reason.waitingInQueue', 'The rule is active; channel details are waiting in the paced queue.'],
+            channel_details_complete: ['reason.complete', 'Channel details are complete.'],
+            waiting_for_first_lookup: ['reason.waitingFirstLookup', 'Waiting for the first lookup.'],
+            'channel metadata is complete.': ['result.complete', 'Channel metadata is complete.'],
+            'waiting for metadata.': ['result.waiting', 'Waiting for metadata.'],
+            'channel details are complete.': ['reason.complete', 'Channel details are complete.'],
+            'waiting for the first lookup.': ['reason.waitingFirstLookup', 'Waiting for the first lookup.'],
+            'the saved rule is no longer present in this target.': ['reason.savedRuleMissing', 'The saved rule is no longer present in this target.'],
+            'this is a name-only rule. add a channel link or uc id if you want exact channel identity and metadata.': ['reason.nameOnly', 'This is a name-only rule. Add a channel link or UC ID if you want exact channel identity and metadata.'],
+            'youtube could not verify this channel identifier.': ['reason.notVerified', 'YouTube could not verify this channel identifier.'],
+            'channel details are being fetched now.': ['reason.fetching', 'Channel details are being fetched now.'],
+            'the rule is active, but its incomplete metadata is not currently queued.': ['reason.metadataNotQueued', 'The rule is active, but its incomplete metadata is not currently queued.'],
+            'youtube returned incomplete channel details.': ['reason.incompleteDetails', 'YouTube returned incomplete channel details.'],
+            'the rule is active; channel details are waiting in the paced queue.': ['reason.waitingInQueue', 'The rule is active; channel details are waiting in the paced queue.']
         };
-        if (knownReasons[normalizedReason]) return knownReasons[normalizedReason];
+        const knownReason = knownReasons[normalizeString(row?.reasonCode).toLowerCase()] || knownReasons[normalizedReason];
+        if (knownReason) return tabViewUiText(`dashboard.importReport.${knownReason[0]}`, knownReason[1]);
         if (/^[a-z0-9]+(?:_[a-z0-9]+)+$/.test(rawReason)) {
             return rawReason
                 .split('_')
@@ -5452,10 +5554,19 @@ document.addEventListener('DOMContentLoaded', async () => {
         card.className = 'card ft-modal rule-list-report-modal';
         card.setAttribute('role', 'dialog');
         card.setAttribute('aria-modal', 'true');
-        card.setAttribute('aria-label', 'Rule list import reports');
+        setRuleListImportReportCopy(card, 'aria-label', 'dialogLabel', 'Rule list import reports');
         const header = document.createElement('div');
         header.className = 'card-header ft-modal-header';
-        header.innerHTML = '<h3>Import reports</h3><p>Your rules are active as soon as a valid identifier is saved. This view follows background channel-detail completion and highlights rows that need review.</p>';
+        const heading = document.createElement('h3');
+        setRuleListImportReportCopy(heading, 'textContent', 'title', 'Import reports');
+        const introduction = document.createElement('p');
+        setRuleListImportReportCopy(
+            introduction,
+            'textContent',
+            'intro',
+            'Your rules are active as soon as a valid identifier is saved. This view follows background channel-detail completion and highlights rows that need review.'
+        );
+        header.append(heading, introduction);
         const controls = document.createElement('div');
         controls.className = 'rule-list-report-controls';
         const reportSelect = document.createElement('select');
@@ -5472,44 +5583,49 @@ document.addEventListener('DOMContentLoaded', async () => {
         const statusSelect = document.createElement('select');
         statusSelect.className = 'select-input';
         const statusDescriptions = {
-            all: 'Every row in this import.',
-            needs_attention: 'Automatic completion has stopped for this row—usually “channel does not exist,” terminated/deleted, a name-only entry, or a queue inconsistency. The rule remains active unless you remove it.',
-            retrying: 'YouTube returned a temporary error or incomplete metadata; the rule remains active and will be tried again.',
-            pending: 'The row is waiting for its first paced lookup.',
-            fetching: 'This is the one channel lookup currently running.',
-            complete: 'The UC ID, channel name, handle/custom URL, and avatar are available.'
+            all: ['description.allRows', 'Every row in this import.'],
+            needs_attention: ['description.needsAttention', 'Automatic completion has stopped for this row—usually “channel does not exist,” terminated/deleted, a name-only entry, or a queue inconsistency. The rule remains active unless you remove it.'],
+            retrying: ['description.retrying', 'YouTube returned a temporary error or incomplete metadata; the rule remains active and will be tried again.'],
+            pending: ['description.pending', 'The row is waiting for its first paced lookup.'],
+            fetching: ['description.fetching', 'This is the one channel lookup currently running.'],
+            complete: ['description.complete', 'The UC ID, channel name, handle/custom URL, and avatar are available.']
+        };
+        const statusDescription = status => {
+            const [key, fallback] = statusDescriptions[status] || statusDescriptions.all;
+            return ruleListImportReportText(key, fallback);
         };
         [
-            ['all', 'All rows'],
-            ['needs_attention', 'Needs attention'],
-            ['retrying', 'Retrying'],
-            ['pending', 'Pending'],
-            ['fetching', 'Fetching'],
-            ['complete', 'Complete']
-        ].forEach(([value, label]) => {
+            ['all', 'status.allRows', 'All rows'],
+            ['needs_attention', 'status.needsAttention', 'Needs attention'],
+            ['retrying', 'status.retrying', 'Retrying'],
+            ['pending', 'status.pending', 'Pending'],
+            ['fetching', 'status.fetching', 'Fetching'],
+            ['complete', 'status.complete', 'Complete']
+        ].forEach(([value, key, fallback]) => {
             const option = document.createElement('option');
             option.value = value;
-            option.textContent = label;
-            option.title = statusDescriptions[value];
+            setRuleListImportReportCopy(option, 'textContent', key, fallback);
+            const [descriptionKey, descriptionFallback] = statusDescriptions[value];
+            setRuleListImportReportCopy(option, 'title', descriptionKey, descriptionFallback);
             statusSelect.appendChild(option);
         });
         const search = document.createElement('input');
         search.className = 'text-input';
         search.type = 'search';
-        search.placeholder = 'Search imported value or reason…';
-        const createReportControl = (labelText, control, ariaLabel) => {
+        setRuleListImportReportCopy(search, 'placeholder', 'search.placeholder', 'Search imported value or reason…');
+        const createReportControl = (labelKey, labelFallback, control, ariaKey, ariaFallback) => {
             const field = document.createElement('label');
             field.className = 'rule-list-report-control';
             const label = document.createElement('span');
-            label.textContent = labelText;
-            control.setAttribute('aria-label', ariaLabel);
+            setRuleListImportReportCopy(label, 'textContent', labelKey, labelFallback);
+            setRuleListImportReportCopy(control, 'aria-label', ariaKey, ariaFallback);
             field.append(label, control);
             return field;
         };
         controls.append(
-            createReportControl('Import', reportSelect, 'Choose an import report'),
-            createReportControl('Show', statusSelect, 'Filter report rows by status'),
-            createReportControl('Find a row', search, 'Search imported values or reasons')
+            createReportControl('control.import', 'Import', reportSelect, 'control.chooseImport', 'Choose an import report'),
+            createReportControl('control.show', 'Show', statusSelect, 'control.filterByStatus', 'Filter report rows by status'),
+            createReportControl('control.findRow', 'Find a row', search, 'control.searchAriaLabel', 'Search imported values or reasons')
         );
         const body = document.createElement('div');
         body.className = 'rule-list-report-modal__body';
@@ -5518,11 +5634,11 @@ document.addEventListener('DOMContentLoaded', async () => {
         const downloadBtn = document.createElement('button');
         downloadBtn.className = 'btn-secondary';
         downloadBtn.type = 'button';
-        downloadBtn.textContent = 'Download unresolved CSV';
+        setRuleListImportReportCopy(downloadBtn, 'textContent', 'button.downloadUnresolvedCsv', 'Download unresolved CSV');
         const closeBtn = document.createElement('button');
         closeBtn.className = 'btn-primary';
         closeBtn.type = 'button';
-        closeBtn.textContent = 'Done';
+        setRuleListImportReportCopy(closeBtn, 'textContent', 'button.done', 'Done');
         actions.append(downloadBtn, closeBtn);
         card.append(header, controls, body, actions);
         overlay.appendChild(card);
@@ -5552,33 +5668,38 @@ document.addEventListener('DOMContentLoaded', async () => {
             const counts = activeSummary.statuses;
             const reportTargets = activeSummary.report.targets.map(formatRuleListReportTarget).join(' + ');
             const summaryMetrics = [
-                ['complete', counts.complete, 'Complete'],
-                ['pending', counts.pending, 'Pending'],
-                ['retrying', counts.retrying, 'Retrying'],
-                ['fetching', counts.fetching, 'Fetching'],
-                ['needs_attention', counts.needs_attention, 'Needs attention']
+                ['complete', counts.complete],
+                ['pending', counts.pending],
+                ['retrying', counts.retrying],
+                ['fetching', counts.fetching],
+                ['needs_attention', counts.needs_attention]
             ];
             const selectedCount = filtered.length;
-            const selectedLabel = status === 'all' ? 'All rows' : ruleListReportStatusLabel(status);
+            const selectedLabel = ruleListReportStatusLabel(status);
+            const rowsMatch = ruleListImportReportText('summary.rowsMatch', '{count} rows match', { count: selectedCount });
             const visibleRowsNote = filtered.length > shown.length
-                ? ` Showing the first ${shown.length} rows; use search or Show more to narrow the list.`
+                ? ruleListImportReportText(
+                    'summary.visibleNote',
+                    'Showing the first {shown} rows. Use search or Show more to narrow the list.',
+                    { shown: shown.length }
+                )
                 : '';
             body.innerHTML = `
                 <div class="rule-list-report-selected-state is-${status}" role="status" aria-live="polite">
-                    <div class="rule-list-report-selected-state__heading"><span>Viewing</span><strong>${escapeManagedRuleListPreviewCell(selectedLabel)}</strong></div>
-                    <span>${selectedCount} ${pluralize(selectedCount, 'matching row')} · ${escapeManagedRuleListPreviewCell(statusDescriptions[status] || statusDescriptions.all)}${visibleRowsNote}</span>
+                    <div class="rule-list-report-selected-state__heading"><span>${escapeManagedRuleListPreviewCell(ruleListImportReportText('summary.viewing', 'Viewing'))}</span><strong>${escapeManagedRuleListPreviewCell(selectedLabel)}</strong></div>
+                    <span>${escapeManagedRuleListPreviewCell(rowsMatch)} · ${escapeManagedRuleListPreviewCell(statusDescription(status))}${visibleRowsNote ? ` ${escapeManagedRuleListPreviewCell(visibleRowsNote)}` : ''}</span>
                 </div>
-                <div class="rule-list-report-summary" role="list" aria-label="Import row counts">
-                    ${summaryMetrics.map(([key, count, label]) => `<div class="is-${key}" role="listitem"><strong>${count}</strong><span>${label}</span></div>`).join('')}
+                <div class="rule-list-report-summary" role="list" aria-label="${escapeManagedRuleListPreviewCell(ruleListImportReportText('summary.rowCountsAriaLabel', 'Import row counts'))}">
+                    ${summaryMetrics.map(([key, count]) => `<div class="is-${key}" role="listitem"><strong>${count}</strong><span>${escapeManagedRuleListPreviewCell(ruleListReportStatusLabel(key))}</span></div>`).join('')}
                 </div>
                 <div class="rule-list-report-context">
-                    <div><small>Import</small><strong>${escapeManagedRuleListPreviewCell(activeSummary.report.sourceLabel)}</strong></div>
-                    <div><small>Applies to</small><span>${escapeManagedRuleListPreviewCell(reportTargets || 'No target recorded')}</span></div>
-                    <div><small>Other rules</small><span>${activeSummary.report.counts.keywords} keywords · ${activeSummary.report.counts.duplicates} duplicates</span></div>
+                    <div><small>${escapeManagedRuleListPreviewCell(ruleListImportReportText('control.import', 'Import'))}</small><strong>${escapeManagedRuleListPreviewCell(activeSummary.report.sourceLabel)}</strong></div>
+                    <div><small>${escapeManagedRuleListPreviewCell(ruleListImportReportText('context.appliesTo', 'Applies to'))}</small><span>${escapeManagedRuleListPreviewCell(reportTargets || ruleListImportReportText('context.noTarget', 'No target recorded'))}</span></div>
+                    <div><small>${escapeManagedRuleListPreviewCell(ruleListImportReportText('context.otherRules', 'Other rules'))}</small><span>${escapeManagedRuleListPreviewCell(ruleListImportReportText('context.keywordDuplicateCounts', 'Keywords: {keywords} · Duplicates: {duplicates}', { keywords: activeSummary.report.counts.keywords, duplicates: activeSummary.report.counts.duplicates }))}</span></div>
                 </div>
-                <div class="rule-list-report-table" role="table" aria-label="Import report rows">
+                <div class="rule-list-report-table" role="table" aria-label="${escapeManagedRuleListPreviewCell(ruleListImportReportText('table.ariaLabel', 'Import report rows'))}">
                     <div class="rule-list-report-row rule-list-report-row--head" role="row">
-                        <span>Status</span><span>Imported value</span><span>Result</span><span>Action</span>
+                        <span>${escapeManagedRuleListPreviewCell(ruleListImportReportText('table.status', 'Status'))}</span><span>${escapeManagedRuleListPreviewCell(ruleListImportReportText('table.importedValue', 'Imported value'))}</span><span>${escapeManagedRuleListPreviewCell(ruleListImportReportText('table.result', 'Result'))}</span><span>${escapeManagedRuleListPreviewCell(ruleListImportReportText('table.action', 'Action'))}</span>
                     </div>
                     ${shown.map((row) => {
                         const rowIndex = activeSummary.rows.indexOf(row);
@@ -5589,31 +5710,38 @@ document.addEventListener('DOMContentLoaded', async () => {
                             && row.status !== 'fetching'
                             && row.reason !== 'The saved rule is no longer present in this target.'
                             && safeArray(row.identityKeys).length > 0;
-                        const targetProgress = row.targetCount > 1 ? ` ${row.completedTargets}/${row.targetCount} targets complete.` : '';
+                        const targetProgress = row.targetCount > 1
+                            ? ruleListImportReportText('row.targetProgress', '{completed}/{total} targets complete.', {
+                                completed: row.completedTargets,
+                                total: row.targetCount
+                            })
+                            : '';
                         const retryTiming = row.nextAttemptAt > Date.now()
-                            ? ` Next retry ${new Date(row.nextAttemptAt).toLocaleString()}.`
+                            ? ruleListImportReportText('row.retryTiming', 'Next retry {date}.', { date: new Date(row.nextAttemptAt).toLocaleString() })
                             : '';
                         const resultReason = row.reason
-                            || (row.status === 'complete' ? 'Channel metadata is complete.' : 'Waiting for metadata.');
+                            || (row.status === 'complete'
+                                ? ruleListImportReportText('result.complete', 'Channel metadata is complete.')
+                                : ruleListImportReportText('result.waiting', 'Waiting for metadata.'));
                         const readableReason = formatRuleListReportReason({ ...row, reason: resultReason });
                         const manualGuidance = permanentFailure
-                            ? 'Verify this identifier on YouTube or replace it with an exact channel URL/UC ID. The saved rule remains active until you change or remove it.'
+                            ? ruleListImportReportText('guidance.permanent', 'Verify this identifier on YouTube or replace it with an exact channel URL/UC ID. The saved rule remains active until you change or remove it.')
                             : '';
                         const actionMarkup = [
-                            url ? `<a class="btn-secondary" href="${escapeManagedRuleListPreviewCell(url)}" target="_blank" rel="noopener noreferrer">${permanentFailure ? 'Verify channel' : 'Open channel'}</a>` : (permanentFailure ? '<small>Verify the imported value manually, then replace it with an exact channel link or UC ID.</small>' : '<small>Provide an exact channel link to replace a name-only or invalid row.</small>'),
-                            canRemove ? `<button class="btn-secondary rule-list-report-remove" type="button" data-report-row-index="${rowIndex}">Remove rule</button>` : ''
+                            url ? `<a class="btn-secondary" href="${escapeManagedRuleListPreviewCell(url)}" target="_blank" rel="noopener noreferrer">${escapeManagedRuleListPreviewCell(ruleListImportReportText(permanentFailure ? 'action.verifyChannel' : 'action.openChannel', permanentFailure ? 'Verify channel' : 'Open channel'))}</a>` : (permanentFailure ? `<small>${escapeManagedRuleListPreviewCell(ruleListImportReportText('guidance.manualVerification', 'Verify the imported value manually, then replace it with an exact channel link or UC ID.'))}</small>` : `<small>${escapeManagedRuleListPreviewCell(ruleListImportReportText('guidance.provideExact', 'Provide an exact channel link to replace a name-only or invalid row.'))}</small>`),
+                            canRemove ? `<button class="btn-secondary rule-list-report-remove" type="button" data-report-row-index="${rowIndex}">${escapeManagedRuleListPreviewCell(ruleListImportReportText('action.removeRule', 'Remove rule'))}</button>` : ''
                         ].join('');
                         return `
                             <div class="rule-list-report-row is-${row.status}" role="row">
-                                <span data-label="Status"><b class="rule-list-report-status-badge is-${row.status}">${ruleListReportStatusLabel(row.status)}</b>${row.attempts ? `<small>Attempt ${row.attempts}</small>` : ''}</span>
-                                <span data-label="Imported value"><small>${row.row ? `Source row ${row.row}` : 'Imported row'}</small><code>${escapeManagedRuleListPreviewCell(row.originalValue || row.value || '')}</code></span>
-                                <span data-label="Result"><strong class="rule-list-report-result-title">${escapeManagedRuleListPreviewCell(readableReason)}</strong>${targetProgress || retryTiming ? `<small>${escapeManagedRuleListPreviewCell(`${targetProgress}${retryTiming}`.trim())}</small>` : ''}${manualGuidance ? `<small>${escapeManagedRuleListPreviewCell(manualGuidance)}</small>` : ''}</span>
-                                <span data-label="Action"><span class="rule-list-report-actions">${actionMarkup}</span></span>
+                                <span data-label="${escapeManagedRuleListPreviewCell(ruleListImportReportText('table.status', 'Status'))}"><b class="rule-list-report-status-badge is-${row.status}">${escapeManagedRuleListPreviewCell(ruleListReportStatusLabel(row.status))}</b>${row.attempts ? `<small>${escapeManagedRuleListPreviewCell(ruleListImportReportText('row.attempt', 'Attempt {attempts}', { attempts: row.attempts }))}</small>` : ''}</span>
+                                <span data-label="${escapeManagedRuleListPreviewCell(ruleListImportReportText('table.importedValue', 'Imported value'))}"><small>${escapeManagedRuleListPreviewCell(row.row ? ruleListImportReportText('row.sourceRow', 'Source row {row}', { row: row.row }) : ruleListImportReportText('row.importedRow', 'Imported row'))}</small><code>${escapeManagedRuleListPreviewCell(row.originalValue || row.value || '')}</code></span>
+                                <span data-label="${escapeManagedRuleListPreviewCell(ruleListImportReportText('table.result', 'Result'))}"><strong class="rule-list-report-result-title">${escapeManagedRuleListPreviewCell(readableReason)}</strong>${targetProgress || retryTiming ? `<small>${escapeManagedRuleListPreviewCell(`${targetProgress} ${retryTiming}`.trim())}</small>` : ''}${manualGuidance ? `<small>${escapeManagedRuleListPreviewCell(manualGuidance)}</small>` : ''}</span>
+                                <span data-label="${escapeManagedRuleListPreviewCell(ruleListImportReportText('table.action', 'Action'))}"><span class="rule-list-report-actions">${actionMarkup}</span></span>
                             </div>
                         `;
-                    }).join('') || '<div class="rule-list-report-empty">No rows match this filter.</div>'}
+                    }).join('') || `<div class="rule-list-report-empty">${escapeManagedRuleListPreviewCell(ruleListImportReportText('state.noRows', 'No rows match this filter.'))}</div>`}
                 </div>
-                ${filtered.length > shown.length ? `<button class="btn-secondary rule-list-report-load-more" type="button">Show ${Math.min(200, filtered.length - shown.length)} more</button>` : ''}
+                ${filtered.length > shown.length ? `<button class="btn-secondary rule-list-report-load-more" type="button">${escapeManagedRuleListPreviewCell(ruleListImportReportText('button.showMore', 'Show {count} more', { count: Math.min(200, filtered.length - shown.length) }))}</button>` : ''}
             `;
             body.querySelector('.rule-list-report-load-more')?.addEventListener('click', () => {
                 visibleLimit += 200;
@@ -5625,7 +5753,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                     const row = Number.isInteger(rowIndex) ? activeSummary?.rows?.[rowIndex] : null;
                     if (!row) return;
                     button.disabled = true;
-                    button.textContent = 'Removing…';
+                    button.textContent = ruleListImportReportText('button.removing', 'Removing…');
                     try {
                         const removed = await removeRuleListImportReportChannel(activeSummary.report, row);
                         if (removed) runtime = await loadRuleListReportRuntime();
@@ -5637,6 +5765,8 @@ document.addEventListener('DOMContentLoaded', async () => {
             });
             downloadBtn.disabled = activeSummary.rows.every(row => row.status === 'complete');
         };
+        const refreshLocalizedReport = () => render();
+        window.addEventListener?.('filtertube-ui-locale-changed', refreshLocalizedReport);
         const resetAndRender = () => {
             visibleLimit = 200;
             render();
@@ -5660,6 +5790,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         }, 10000);
         const close = () => {
             clearInterval(liveRefreshTimer);
+            window.removeEventListener?.('filtertube-ui-locale-changed', refreshLocalizedReport);
             overlay.remove();
         };
         closeBtn.addEventListener('click', close);
@@ -24581,6 +24712,12 @@ document.addEventListener('DOMContentLoaded', async () => {
         }
     }
 
+    window.addEventListener('filtertube-ui-locale-changed', () => {
+        if (!profilesV4Cache) return;
+        renderProfileSelector(profilesV4Cache);
+        renderProfilesManager(profilesV4Cache);
+    });
+
     async function switchToProfile(nextProfileId) {
         if (isHandlingProfileSwitch) return;
         if (isSelfControlSessionActive()) {
@@ -27426,12 +27563,16 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     function collectChannelSourceFilterOptions(surface = 'main') {
         const summaries = new Map();
+        const fallbackListName = tabViewUiText(
+            'family.commandCenter.channelLists.importedRuleList',
+            'Imported rule list'
+        );
         getChannelSourceFilterRows(surface).forEach((row) => {
             const listId = normalizeString(row?.managedListId);
             if (!listId) return;
             const listName = normalizeString(row?.managedListName)
                 || normalizeString(row?.managedListSourceLabel)
-                || 'Imported list';
+                || fallbackListName;
             if (!summaries.has(listId)) {
                 summaries.set(listId, {
                     id: listId,
@@ -27441,7 +27582,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             }
             const summary = summaries.get(listId);
             summary.count += 1;
-            if (summary.name === 'Imported list' && listName !== 'Imported list') {
+            if (summary.name === fallbackListName && listName !== fallbackListName) {
                 summary.name = listName;
             }
         });
@@ -27460,21 +27601,52 @@ document.addEventListener('DOMContentLoaded', async () => {
         const allowed = new Set(['all', 'manual', 'lists']);
         summaries.forEach(summary => allowed.add(`list:${summary.id}`));
         const nextValue = allowed.has(currentValue) ? currentValue : 'all';
+        Array.from(selectEl.options || []).forEach(option => tabViewLocalizedNodes.delete(option));
         selectEl.innerHTML = '';
+        const importedListCount = summaries.reduce((sum, item) => sum + item.count, 0);
         [
-            { value: 'all', label: 'All sources' },
-            { value: 'manual', label: 'Manual' },
-            { value: 'lists', label: summaries.length ? `Imported lists (${summaries.reduce((sum, item) => sum + item.count, 0)})` : 'Imported lists' }
+            {
+                value: 'all',
+                key: 'dashboard.ruleEditor.allSources',
+                fallback: 'All sources'
+            },
+            {
+                value: 'manual',
+                key: 'dashboard.ruleEditor.manualSource',
+                fallback: 'Manual'
+            },
+            {
+                value: 'lists',
+                key: importedListCount ? 'dashboard.ruleEditor.importedListsCount' : 'dashboard.ruleEditor.importedLists',
+                fallback: importedListCount ? 'Imported lists ({count})' : 'Imported lists',
+                values: importedListCount ? { count: importedListCount } : {}
+            }
         ].forEach((item) => {
             const option = document.createElement('option');
             option.value = item.value;
-            option.textContent = item.label;
+            setTabViewLocalizedCopy(option, 'textContent', item.key, item.fallback, item.values);
             selectEl.appendChild(option);
         });
         summaries.forEach((summary) => {
             const option = document.createElement('option');
             option.value = `list:${summary.id}`;
-            option.textContent = `List: ${truncateChannelSourceFilterLabel(summary.name)} (${summary.count})`;
+            const fallbackListName = tabViewUiText(
+                'family.commandCenter.channelLists.importedRuleList',
+                'Imported rule list'
+            );
+            const usesFallbackListName = summary.name === fallbackListName;
+            setTabViewLocalizedCopy(
+                option,
+                'textContent',
+                'dashboard.ruleEditor.listSource',
+                'List: {name} ({count})',
+                () => ({
+                    name: truncateChannelSourceFilterLabel(usesFallbackListName
+                        ? tabViewUiText('family.commandCenter.channelLists.importedRuleList', 'Imported rule list')
+                        : summary.name),
+                    count: summary.count
+                })
+            );
             option.title = summary.name;
             selectEl.appendChild(option);
         });

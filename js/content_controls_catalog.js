@@ -2,21 +2,21 @@
     'use strict';
 
     const categoryOptions = [
-        { label: 'Film & Animation', color: '#ef4444' },
-        { label: 'Autos & Vehicles', color: '#f97316' },
-        { label: 'Music', color: '#f59e0b' },
-        { label: 'Pets & Animals', color: '#84cc16' },
-        { label: 'Sports', color: '#22c55e' },
-        { label: 'Travel & Events', color: '#14b8a6' },
-        { label: 'Gaming', color: '#0ea5e9' },
-        { label: 'People & Blogs', color: '#3b82f6' },
-        { label: 'Comedy', color: '#6366f1' },
-        { label: 'Entertainment', color: '#8b5cf6' },
-        { label: 'News & Politics', color: '#a855f7' },
-        { label: 'Howto & Style', color: '#ec4899' },
-        { label: 'Education', color: '#f43f5e' },
-        { label: 'Science & Technology', color: '#64748b' },
-        { label: 'Nonprofits & Activism', color: '#10b981' }
+        { label: 'Film & Animation', labelKey: 'content.category.filmAnimation', color: '#ef4444' },
+        { label: 'Autos & Vehicles', labelKey: 'content.category.autosVehicles', color: '#f97316' },
+        { label: 'Music', labelKey: 'content.category.music', color: '#f59e0b' },
+        { label: 'Pets & Animals', labelKey: 'content.category.petsAnimals', color: '#84cc16' },
+        { label: 'Sports', labelKey: 'content.category.sports', color: '#22c55e' },
+        { label: 'Travel & Events', labelKey: 'content.category.travelEvents', color: '#14b8a6' },
+        { label: 'Gaming', labelKey: 'content.category.gaming', color: '#0ea5e9' },
+        { label: 'People & Blogs', labelKey: 'content.category.peopleBlogs', color: '#3b82f6' },
+        { label: 'Comedy', labelKey: 'content.category.comedy', color: '#6366f1' },
+        { label: 'Entertainment', labelKey: 'content.category.entertainment', color: '#8b5cf6' },
+        { label: 'News & Politics', labelKey: 'content.category.newsPolitics', color: '#a855f7' },
+        { label: 'Howto & Style', labelKey: 'content.category.howtoStyle', color: '#ec4899' },
+        { label: 'Education', labelKey: 'content.category.education', color: '#f43f5e' },
+        { label: 'Science & Technology', labelKey: 'content.category.scienceTechnology', color: '#64748b' },
+        { label: 'Nonprofits & Activism', labelKey: 'content.category.nonprofitsActivism', color: '#10b981' }
     ];
 
     // Store stable base BCP-47 codes. A selected base language matches regional

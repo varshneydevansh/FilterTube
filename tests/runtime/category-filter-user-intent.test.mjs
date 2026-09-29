@@ -126,7 +126,8 @@ test('category selection is visibly and programmatically explicit in full and po
 
   for (const source of [tabView, popup]) {
     assert.match(source, /ft-category-selection-mark/);
-    assert.match(source, /selected' : 'not selected'/);
+    assert.match(source, /popup\.selected/);
+    assert.match(source, /popup\.notSelected/);
     assert.match(source, /Allowed/);
     assert.match(source, /Blocked/);
   }

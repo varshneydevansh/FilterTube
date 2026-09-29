@@ -289,11 +289,37 @@ and dashboard-static checks pass. This proves key/placeholder coverage, not
 fluent translation quality or complete runtime UI coverage. Arabic variants
 in the deferred family batch currently share Modern Standard Arabic phrasing.
 
-A source audit still finds unkeyed generated dashboard copy, especially toast
-messages and import/report views; content category and spoken-language labels
-also remain English. These are distinct follow-on localization tranches. The
+A source audit at the 767-key checkpoint found unkeyed generated dashboard
+copy, especially toast messages and import/report views; content category and
+spoken-language labels also remained English. These became distinct follow-on
+localization tranches. The
 follow-on renderer now marks untranslated historical What's New cards as
 English source; that is an explicit fallback policy, not a translation of
 their text. Keep every non-English choice labeled as a preview until the
 remaining generated surfaces and fluent-speaker/RTL/installed-browser review
 have passed.
+
+## Generated-control follow-on checkpoint (2026-09-29)
+
+The Kids rule editor and both channel-source selectors now localize their
+generated headings, options, counts, and help labels. Renderer collaboration,
+imported-source, and channel-mapping copy is keyed. Category names have
+localized display labels while their existing English selection IDs remain
+unchanged; spoken-language names use the browser's `Intl.DisplayNames` for the
+selected interface locale with an English fallback. Import-report modal copy
+and its fixed failure reasons now use stable reason codes plus translated
+display strings, without changing the readable English reason returned by
+the report API. The generated family-control view also rerenders when the
+interface locale changes.
+
+Across these bounded surfaces, all 38 catalogs now have 873/873 keyed strings;
+the strict catalog and 1,135-fragment dashboard-static checks pass. This is
+catalog parity, not a claim that the entire extension is translated. The
+source audit still finds many unkeyed dynamic dashboard messages (including
+roughly 266 literal toast callsites in `js/tab-view.js`), and 27 older What's
+New entries remain English with an explicit English-source badge. Native
+speaker review, RTL/long-text and accessibility QA, and installed-browser
+verification remain release gates. The broad repository smoke lane currently
+has unrelated source/audit-snapshot failures in the dirty playback worktree;
+use the focused localization tests and strict catalog check for this
+checkpoint's source-level verification.

@@ -102,6 +102,8 @@ test('staged keys still describe copy present on extension UI surfaces', () => {
   vm.runInNewContext(fs.readFileSync(path.join(root, 'js/content_controls_catalog.js'), 'utf8'), context);
   const groups = context.window.FilterTubeContentControlsCatalog.getCatalog();
   const controls = new Map(groups.flatMap(group => group.controls.map(control => [control.key, control])));
+  const categories = new Map(context.window.FilterTubeContentControlsCatalog.getCategoryOptions()
+    .map(option => [option.labelKey, option]));
   const surfaces = [
     'src/extension-shell/popup.jsx',
     'html/tab-view.html',
@@ -116,6 +118,10 @@ test('staged keys still describe copy present on extension UI surfaces', () => {
     'js/content/external_youtube_guard.js'
   ].map(file => fs.readFileSync(path.join(root, file), 'utf8')).join('\n');
   for (const [key, source] of Object.entries(english)) {
+    if (key.startsWith('content.category.')) {
+      assert.equal(categories.get(key)?.label, source, key);
+      continue;
+    }
     if (key.startsWith('controls.group.')) {
       assert.equal(groups.find(group => group.id === key.slice('controls.group.'.length))?.title, source, key);
       continue;
