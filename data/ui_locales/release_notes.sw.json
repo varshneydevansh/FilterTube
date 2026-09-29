@@ -14,5 +14,329 @@
       "Uchapishaji wa matoleo ya GitHub hutumia vitambulisho vya GitHub CLI, huunda rasimu kabla ya kupakia, huendelea kutoka kwenye lebo zilizopo, hupakia vipengee vinavyokosekana pekee, hukagua seti ya mwisho ya vipengee, na huchapisha baada ya uthibitishaji tu.",
       "Programu ya FilterTube ya simu na kompyuta kibao za Android sasa inapatikana kwa umma kwenye Google Play. Isakinishe kutoka [ukurasa wa umma](https://play.google.com/store/apps/details?id=com.filtertube.app) au utafute FilterTube kwenye Google Play."
     ]
+  },
+  "3.3.6": {
+    "headline": "Uchujaji ulioimarishwa, muda unaolindwa, na uchezaji tulivu usio na matangazo",
+    "summary": "FilterTube 3.3.6 inaleta utekelezaji wa ufikiaji wa moja kwa moja, muda unaolindwa na vipindi vya Self-Control kwa kila wasifu, makusanyo ya kanuni za kuzuia na kuruhusu yanayoaminika, uchujaji wa kategoria rasmi, Advert Void iliyowashwa kwa chaguo-msingi, na kazi nyingi za ulinganifu na YouTube ya sasa.",
+    "bannerSummary": "3.3.6 inajumuisha uchujaji wa ufikiaji wa moja kwa moja, muda unaolindwa, uingizaji wa orodha za kanuni na BlockTube, kategoria rasmi, Advert Void, na ulinganifu na YouTube ya sasa.",
+    "highlights": [
+      "Ziara za moja kwa moja za YouTube, mabadiliko ya playlist, autoplay, na embed zinazotumika sasa hupitia kanuni zilezile za kukubali video na chaneli kama uchujaji wa feed, badala ya kuzipita.",
+      "Vikomo vya kila siku vya YouTube sasa hutumika kwa wasifu ulio hai, huonyesha muda uliobaki, hudumu baada ya kuwasha upya, na hutumia ukurasa wa timeout wa skrini nzima wenye kubadilisha wasifu kwa PIN. Vipindi vya hiari vya Self-Control hufunga kanuni zilizochaguliwa hadi hesabu ya muda iishe.",
+      "Kanuni zilizozuiwa na kanuni zinazoruhusiwa zinaendelea kuwa makusanyo tofauti kwa Main na Kids; sera kuu ya Blocklist au Whitelist huchagua mkusanyo unaodhibiti kutazama.",
+      "Uingizaji mkubwa wa BlockTube na orodha za kanuni zinazosimamiwa una preview, ukaguzi wa uwezo, rollback ya transaction, uthibitishaji wa kusoma tena, na hesabu zilizo wazi zaidi za zilizoongezwa, rudufu, zilizorukwa, chaneli, maneno muhimu, regex, na video-ID.",
+      "Uchujaji wa kategoria hutumia field rasmi ya YouTube `microformat.playerMicroformatRenderer.category`, kujaza metadata ya Player kwa kikomo kutoka origin ileile, chaguo zilizo wazi za kuzuia kategoria zilizochaguliwa au kuruhusu hizo pekee, na umiliki salama zaidi wa Watch, rail, Mix, maoni, na renderer.",
+      "Advert Void huwashwa kwa chaguo-msingi kwa wasifu wapya na walioboreshwa kwenye YouTube Main na Kids. Runtime ya Web inayoshirikiwa huondoa field za mpango wa matangazo za Player zilizoonekana bila maombi ya ziada; uchezaji native hutupa data ya mpango wa matangazo isiyomodeliwa au husawazisha response ghafi ya Reel inapopatikana, huku fallback iliyolindwa ikishughulikia usumbufu uliopenya.",
+      "Uchujaji wa majaribio wa lugha inayozungumzwa na upendeleo wa sauti asilia hutumia ushahidi wa YouTube Player unapopatikana na huruhusu maudhui yapite metadata ya mapendekezo isipokuwepo.",
+      "Toleo hili pia linajumuisha kuficha YouTube Playables, ushughulikiaji wa renderer za sasa za camelCase na ushirikiano, Help na utafutaji unaosomeka zaidi, vidhibiti vya popup na dashboard vilivyo wazi zaidi, na kurasa za hali za umma za Android Google Play na iOS.",
+      "Settings ina chaguo la opt-out la vifaa vyote, ambalo halijawekewa alama kwa chaguo-msingi, ili kuzima vikumbusho vya kupakia upya kiotomatiki na mabango ya What's New kwenye YouTube na YouTube Kids. Ukurasa wa What's New wa Dashboard bado unaweza kufunguliwa mwenyewe."
+    ]
+  },
+  "3.3.5": {
+    "headline": "Kupona kutokana na hitilafu za YouTube na kuzuia chaneli za Shorts mapema",
+    "summary": "Toleo hili hurekebisha kuingizwa mara mbili kwa content runtime katika vichupo vya YouTube vilivyo wazi tayari na hutatua mapema utambulisho wa chaneli za Shorts zinazoonekana wakati kanuni za kuzuia chaneli au hali ya whitelist zimetumika.",
+    "bannerSummary": "Hurekebisha runtime kuingizwa mara mbili, huboresha utatuzi wa utambulisho wa chaneli za Shorts zilizozuiwa, na kurekodi mpaka wa rollback wa v3.3.4.",
+    "highlights": [
+      "Install/update/profile refresh haziingizi tena manifest content scripts katika vichupo vya YouTube vilivyo wazi tayari, hivyo kuzuia hitilafu za sintaksia zinazorudiwa `Identifier ... has already been declared`.",
+      "Vichupo vya YouTube vilivyo wazi tayari bado vinaweza kupokea ukaguzi unaosimamiwa wa time-limit/runtime bila matamko ya script yaliyorudiwa.",
+      "Shorts zinazoonekana na zinazokaribia kuonekana sasa hutumia owner resolver ya background yenye kikomo `/shorts/<videoId>` wakati kanuni za channel blocklist au hali ya whitelist zimetumika.",
+      "Ramani zilizojifunza za video-to-channel za Shorts huhifadhiwa na kuchakatwa tena mara moja, hivyo Shorts za chaneli zilizozuiwa hazihitaji hover au mwingiliano wa menu ili kufichwa.",
+      "Host za Shorts za desktop kama `.shortsLockupViewModelHost` na `.ytGridShelfViewModelGridShelfItem` zimejumuishwa katika njia maalum za fallback/enrichment za Shorts.",
+      "Hali ya blocklist haifichi Shorts zisizojulikana kabla utambulisho haujatatuliwa; hali ya whitelist hubaki kali zaidi kupitia njia iliyopo ya pending.",
+      "v3.3.4 imeandikwa kama rollback ya store kurudi kwenye kifurushi v3.3.2 wakati ripoti ya hitilafu ya YouTube ilipokuwa inachunguzwa."
+    ]
+  },
+  "3.3.4": {
+    "headline": "Rollback ya store kurudi kwenye kifurushi v3.3.2",
+    "summary": "v3.3.4 ilikuwa toleo la rollback la store ya kivinjari lililotumia kifurushi cha awali v3.3.2 wakati ripoti za hitilafu za YouTube dhidi ya v3.3.3 zilipokuwa zikichunguzwa.",
+    "bannerSummary": "Toleo la rollback: v3.3.4 lilitumia kifurushi v3.3.2 wakati ripoti za hitilafu za YouTube zilipokuwa zikichunguzwa.",
+    "highlights": [
+      "Hakuna kazi mpya ya vipengele inayodaiwa kutoka kwenye source kwa v3.3.4.",
+      "Rollback ilitumika kuondoa kifurushi kinachoshukiwa cha v3.3.3 kwenye stores wakati issue #64 ilipochunguzwa.",
+      "Toleo linalofuata la source, v3.3.5, linajumuisha marekebisho ya runtime kuingizwa mara mbili na utambulisho wa Shorts."
+    ]
+  },
+  "3.3.3": {
+    "headline": "Masasisho ya vifaa vya familia, orodha za kanuni, maneno muhimu ya tarehe, na DOM ya YouTube",
+    "summary": "Toleo hili hurahisisha kuelewa udhibiti wa mzazi/mlezi, huongeza uingizaji wa orodha za kanuni zilizokaguliwa na kanuni za maneno muhimu zenye tarehe, huandika mfano wa Home/Internet Pickup, na kusasisha uchujaji kwa markup ya sasa ya YouTube/YTM.",
+    "bannerSummary": "Toleo hili linajumuisha Family Device Updates, uingizaji wa orodha za kanuni zilizokaguliwa, maneno muhimu yenye tarehe, Help inayoweka wazazi mbele, na ulinganifu wa sasa wa YouTube/YTM DOM.",
+    "highlights": [
+      "Wasifu wa wazazi/walezi unaweza kusimamia wasifu unaolindwa, kuhariri kanuni za watoto/wasifu unaolindwa kutoka dashboard ya mzazi, na kutuma masasisho yaliyoidhinishwa kwenye vifaa vilivyolindwa vilivyothibitishwa.",
+      "Family Device Updates sasa hueleza Send Update ya moja kwa moja, Home Pickup ya wazi, na Internet Pickup ya wazi bila kuchukulia huduma za pickup kama mamlaka.",
+      "Vikomo vya muda vya wasifu unaolindwa sasa hukagua vichupo vya YouTube vya zamani na vipya, huonyesha skrini tulivu ya timeout, na kurekodi maombi ya muda wa ziada kwa ukaguzi wa mzazi.",
+      "Uingizaji wa orodha za kanuni hutumia CSV, TXT, JSON rahisi, JSON ya mtindo wa BlockTube, na URL ghafi za HTTPS; pamoja na preview kabla ya kutumia, malengo ya Main/Kids/Both, templates, usimamizi wa orodha, pause/resume/remove, ukaguzi wa uchakavu na refresh.",
+      "Uchujaji wa maneno muhimu kwa tarehe unaweza kutumia neno muhimu kuanzia, hadi, au kati ya tarehe za kupakiwa. Uchujaji wa maoni hutumia tarehe ya kupakiwa ya video kuu pale YouTube inapoitoa.",
+      "Help na vidhibiti vya dashboard sasa hutumia lugha rahisi zaidi inayoweka wazazi mbele, help bubbles za haraka zaidi, na maelezo yaliyo wazi zaidi ya Exact, Comment, Date, PINs, orodha za kanuni na masasisho ya vifaa.",
+      "Dashboard sasa inawaalika watumiaji hai wa closed-testing ya Android kutuma barua pepe kwa hello@filtertube.in na inaendelea kuonyesha kikumbusho cha kuripoti hitilafu za uchujaji YouTube inapobadilisha muundo wa ukurasa.",
+      "YouTube desktop lockup selectors na YTM mobile camelCase DOM zimeandikwa ili kadi halisi za video ziendelee kuchujwa huku Watch-page chip bars zisichochee fallback au kusababisha kuruka kwa scroll.",
+      "Bado ni tofauti: ugunduzi wa peer wa LAN kiotomatiki, huduma ya FilterTube Internet Pickup iliyohostiwa, catalogs za public auto-subscribe zisizo na ujumbe, usawa wa native Android/iOS, na ushahidi wa smoke test ya mikono kwenye vifaa viwili vilivyosakinishwa."
+    ]
+  },
+  "3.3.2": {
+    "headline": "MVP ya programu ya simu/tableti, YouTube laini zaidi, na whitelist salama zaidi",
+    "summary": "Uso wa kutolewa kwa programu ya umma uko tayari kwa majaribio ya mwisho ya Android kwa simu/tableti na hali ya iOS/iPad; dashboard ya extension sasa inaelekeza kwenye njia hizo za programu, kazi ya YouTube SPA hupungua bila kanuni hai, na toleo hili lina marekebisho ya usahihi wa whitelist/end-screen.",
+    "bannerSummary": "Toleo hili lina njia za kutolewa kwa programu ya simu/tableti, runtime ya YouTube laini zaidi, logs tulivu za production, na marekebisho ya uvujaji wa whitelist/end-screen.",
+    "highlights": [
+      "Kitovu cha upakuaji wa tovuti na dashboard ya extension sasa vinaonyesha njia ya majaribio ya mwisho ya Android kwa simu/tableti na njia ya hali ya TestFlight/App Store ya iOS/iPad.",
+      "Mipangilio ya toleo la Android kwa simu/tableti imeandikwa kuzunguka runtime ya pamoja ya FilterTube, YouTube Main, ufikiaji wa umma wa YouTube Kids, wasifu, kanuni za PIN, na Nanah sync.",
+      "Kazi ya utendaji ya YouTube SPA sasa huruka kazi zaidi za JSON clone/parse/replay, DOM fallback, quick-block, fallback-menu na whitelist-pending wakati hakuna kanuni hai au hitaji la route.",
+      "Production extension contexts huzuia console logging ya kawaida isipokuwa debug mode imewashwa wazi, ili kuvinjari kawaida kusibebe gharama ya console kwenye njia za haraka za YouTube.",
+      "Marekebisho ya kutolewa kwa whitelist yanajumuisha Shorts creator fallback, forwarding ya list-target, na uchujaji mfupi wa endpoint za autoplay/watch-next kwa vidhibiti vya end-screen.",
+      "Sifa za hali ya DOM za FilterTube zimeimarishwa ili kupunguza alama zinazoonekana kwa upana za `data-filtertube-*` huku hali muhimu ya runtime ikibaki.",
+      "Accounts & Sync sasa huandika Family Device Updates kuhusu Send Update, Home Pickup ya hiari, na Internet Pickup ukiwa mbali/kufungua baadaye ili wazazi waelewe live sync, home pickup, online pickup, na kisicho mamlaka.",
+      "Vikomo vya muda vya wasifu unaolindwa sasa vina nyaraka za release kuhusu bajeti za YouTube za kila siku, skrini za timeout, historia ya maombi ya muda wa ziada, na idhini ya mzazi/mlezi.",
+      "Njia za Nanah/import hudumisha umiliki wa maneno muhimu ya Filter All yaliyotokana na chaneli kati ya payload za extension na programu native, pamoja na rangi ya mstari, metadata ya source-badge, na muktadha wa pairing."
+    ]
+  },
+  "3.3.1": {
+    "headline": "Usawazishaji salama wa P2P kati ya vifaa bila seva ya mhusika mwingine",
+    "summary": "Accounts & Sync sasa huwasilisha Nanah kama njia tatu rahisi zaidi, zenye ulengaji bora wa mzazi/mtoto, kanuni za kuunganisha tena zilizo wazi zaidi, na nyaraka pana zaidi za matumizi halisi.",
+    "bannerSummary": "Nanah sync, udhibiti bora wa mzazi/mtoto, kanuni salama zaidi za kuunganisha tena, na nyaraka kamili za mtiririko mpya wa Accounts & Sync.",
+    "highlights": [
+      "Accounts & Sync sasa huanza na njia tatu zilizo wazi zaidi: Send this profile once, Parent controls child, na Move full account.",
+      "Vidhibiti vya juu vya Nanah bado vinapatikana, lakini vimefichwa katika sehemu ya Advanced badala ya kuongoza mtiririko mzima.",
+      "Parent/source sessions zinaweza kuchagua target profile ya mbali kwa uwazi zaidi, na hifadhi za managed-link sasa huakisiwa kwa mtumaji ili vifaa vyote viwili vihifadhi rekodi ileile ya trust.",
+      "Trusted links hubaki kuhifadhiwa baada ya refresh, lakini kuunganisha tena bado ni session mpya ya moja kwa moja badala ya sync iliyofichwa ya chinichini.",
+      "Masasisho ya mtoto yaliyofungwa, kanuni za kuunganisha tena, uhifadhi wa lebo za vifaa, na kinga dhidi ya self-join/session-burn zimeimarishwa kwa udhibiti salama zaidi wa mzazi.",
+      "README, Architecture, Technical, Functionality, Profiles & PIN, mpango wa mradi, mwongozo wa mtumiaji, na kifuatiliaji cha wasiwasi sasa vinaandika checkpoint ya sasa ya Nanah desktop kwa undani zaidi."
+    ]
+  },
+  "3.3.0": {
+    "headline": "Urejeshaji wa ushirikiano na uimara wa uingizaji kati ya browsers",
+    "summary": "Menu za ushirikiano za Watch/YTM hurejesha roster kamili kwa uhakika zaidi, uingizaji wa subscriptions una nguvu zaidi kati ya browsers, na marekebisho kadhaa ya whitelist na Quick Block ya kila uso yamejumuishwa katika 3.3.0.",
+    "bannerSummary": "Menu bora za collab, uingizaji imara wa whitelist, surfaces salama zaidi za Quick Block, links za moja kwa moja za chaneli, na toggle mpya ya kipengee cha block cha 3-dot.",
+    "highlights": [
+      "Kadi za YouTube mobile za mtindo wa home/watch-next/Mix sasa hushiriki flow ileile ya urejeshaji wa collaborator na 3-dot badala ya kurudi kwenye menu zisizokamilika za chaneli moja.",
+      "Right rail ya Watch, mistari ya playlist, na lockups zinazofanana na Watch sasa zinaweza kurejesha roster kamili ya collaborators na ku-refresh menu hai ya 3-dot hapo hapo.",
+      "Urejeshaji wa Mix/watch ni salama zaidi: kadi halisi za ushirikiano huboreshwa ipasavyo, huku majina ya kawaida yenye '&' au 'and' yasiwe tena menu bandia za ushirikiano.",
+      "Quick Block ni thabiti zaidi kwenye surfaces changamano: hukaa juu ya kadi nyingi zaidi za desktop, huepuka dropdown za mapendekezo ya utafutaji wa mobile, na hujikita vizuri zaidi kwenye layout za mobile watch-next.",
+      "Uingizaji wa whitelist wa subscribed-channel sasa huhifadhi majibu ya hivi karibuni ya page browse, hupendelea ukuaji halisi wa /feed/channels, na hudumisha /feed/channels kama uso wa usimamizi unaoonekana.",
+      "Uchujaji wa whitelist ni mkali na salama zaidi kwenye renderer za YouTube desktop/mobile, ukiwemo ushughulikiaji bora wa ukurasa wa creator na vidhibiti bora vya kuficha Mixes/subscriptions.",
+      "Vidhibiti na polish mpya: mistari ya Channel Management huunganisha kwenye kurasa halisi za chaneli, kipengee cha block cha 3-dot kinaweza kuzimwa, na Firefox encrypted export hutumia fallback salama zaidi."
+    ]
+  },
+  "3.2.9": {
+    "headline": "Uingizaji wa chaneli ulizosubscribe, whitelist, na marekebisho ya PIN protection",
+    "summary": "Ingiza subscriptions za akaunti hai ya YouTube kwenye whitelist kwa maana iliyo wazi zaidi ya kubadilisha hali na mtiririko wa kuanza /feed/channels ulioaminika zaidi.",
+    "bannerSummary": "Tengeneza whitelist kutokana na subscriptions zako za sasa za YouTube, ikiwa na progress ya ndani ya ukurasa na uanzishaji wa whitelist ulio wazi zaidi.",
+    "highlights": [
+      "Uingizaji mpya wa Tab View unaweza kuingiza kwenye whitelist chaneli ulizosubscribe kutoka akaunti hai ya YouTube iliyoingia.",
+      "Import startup sasa hutumia tena tab hai ya YouTube, huipeleka kwenye /feed/channels, na kusubiri FilterTube bridge kabla ya kuanza.",
+      "Maandishi ya whitelist yako wazi zaidi: Import Only huacha blocklist bila mabadiliko, huku Import + Turn On Whitelist ikifuata njia iliyopo ya kuhamisha blocklist hadi whitelist.",
+      "Nyaraka sasa zinaeleza kwa undani zaidi usanifu wa import, mtiririko wa ombi la FEchannels, vyanzo vya renderer, na maana ya whitelist."
+    ]
+  },
+  "3.2.8": {
+    "headline": "Kusasisha mandhari na kurekebisha ganda la Scenic UI",
+    "summary": "Popup na dashboard sasa hutumia mfumo tulivu zaidi wa mandhari scenic, wenye mpangilio mfupi zaidi, hali za tint zilizo wazi zaidi, na uwiano bora wa mwanga/giza.",
+    "bannerSummary": "Mandhari iliyoboreshwa ya popup na dashboard yenye uwazi tulivu zaidi, pills zilizo wazi zaidi, na mpangilio responsive ulio bora.",
+    "highlights": [
+      "Scenic UI refresh: popup na dashboard sasa hushiriki ganda tulivu zaidi la bidhaa, likitumia hero video ya ndani kama background ya mazingira.",
+      "Light na dark theme tuning: dark mode huweka mandhari scenic ionekane bila mwanga wa katikati uliofifia, huku light mode ikitumia uwazi safi zaidi.",
+      "Responsive cleanup: nafasi za popup ni fupi zaidi, profile dropdown ni ndogo, mpangilio wa kadi za Help/Support umeboreshwa, na mobile fit ya filter surfaces ni bora zaidi.",
+      "Control tint fixes: hali za enabled/disabled, rangi za pill, search fields, na vitendo vya import/export sasa vinaeleweka zaidi kwenye themes zote mbili."
+    ]
+  },
+  "3.2.7": {
+    "headline": "Category Filters, Quick Block cross wakati wa hover, na UI ya 3 Dot kwa simu",
+    "summary": "Uchujaji mpya wa kategoria na Quick Cross Block ya mguso mmoja iliyowashwa kwa chaguo-msingi.",
+    "bannerSummary": "Tumia filters mpya za kategoria na Quick Cross Block unapopita juu ya kadi, pamoja na usaidizi bora wa kuzuia kwenye YT Mobile.",
+    "highlights": [
+      "Category Filtering: zuia au ruhusu video kwa kategoria ya YouTube (Muziki, Michezo ya kompyuta, Elimu, n.k.).",
+      "Quick Cross Block imewashwa kwa chaguo-msingi: `Show Quick Cross Block button` huwashwa kwenye v3.2.7 (watumiaji bado wanaweza kuizima).",
+      "Mobile Blocking: usaidizi bora wa kuzuia kwenye YT Mobile kupitia UI ya 3 Dot na Quick Cross Block, kwa sasa ikifanya kazi kwenye Home Page."
+    ]
+  },
+  "3.2.6": {
+    "headline": "Kupamba UI/UX na uchujaji unaotegemea maudhui",
+    "summary": "Uboreshaji kamili wa typography kwa design ya kisasa, pamoja na filters tatu mpya za maudhui: duration, date na uppercase.",
+    "bannerSummary": "UI mpya nzuri yenye filters za maudhui za duration, upload date na kugundua clickbait.",
+    "highlights": [
+      "Typography updates: kiwango cha font cha kisasa na kilichoboreshwa kwa usomaji bora.",
+      "Content-based filters: duration (ndefu/fupi/kati ya), upload date (mpya/ya zamani/kati ya), na uppercase detection (majina ya video ya clickbait).",
+      "Mfumo wa `videoMetaMap`: uhifadhi endelevu wa metadata ya video wenye batching mahiri (dirisha la 75ms, kikomo cha entries 1500).",
+      "Dashboard improvements: stats za kila surface (Main dhidi ya Kids), stat cards zilizoboreshwa, na kadi ya promo ya mchango."
+    ]
+  },
+  "3.2.5": {
+    "headline": "Kuipa Whitelist mode kipaumbele na kuongeza uthabiti",
+    "summary": "Whitelist mode sasa ndiyo njia kuu ya kuruhusu vilivyochaguliwa pekee, ikiwa na extraction mahiri zaidi, ulinzi wa playlist, na matumizi madogo ya CPU.",
+    "bannerSummary": "Whitelist mode imepewa kipaumbele pamoja na UI safi zaidi, uthabiti bora wa playlist, na usaidizi wa Kids.",
+    "highlights": [
+      "Whitelist mode imepandishwa: maandishi/UI hayaionyeshi tena kama ya majaribio.",
+      "Kusafisha 3-dot menu na kushughulikia search-secondary kwa whitelist surfaces.",
+      "Utoaji wa chaneli kutoka vyanzo vingi kwa thumbnail anchors na parent containers.",
+      "Ufuatiliaji wa state unaotambua mode pamoja na confirmation dialogs na bridge optimizations.",
+      "Uthabiti wa playlist: mistari iliyochaguliwa hubaki kuonekana; pending identities hazionyeshi tena mistari iliyozuiwa.",
+      "Whitelist support ya Kids mode yenye usanifu usiotumia mtandao."
+    ]
+  },
+  "3.2.4": {
+    "headline": "Whitelist mode iliyoboreshwa na optimizations za utendaji",
+    "summary": "Maboresho makubwa ya whitelist mode ya majaribio yenye UX bora, optimizations za utendaji, na usaidizi mpana wa Kids mode.",
+    "bannerSummary": "Whitelist mode inakuwa mahiri zaidi kwa UI safi, utendaji bora, na usaidizi wa Kids.",
+    "highlights": [
+      "YA MAJARIBIO: whitelist mode iliyoboreshwa yenye kusafisha 3-dot menu, kuchakata search kwa akili, na kufuatilia state kulingana na mode.",
+      "Performance boost: optimizations za kiwango cha bridge na processing teule hupunguza matumizi ya CPU.",
+      "UI improvements: confirmation dialogs huzuia upotevu wa data wa bahati mbaya wakati wa kubadili mode.",
+      "Kids mode support: whitelist functionality sasa hufanya kazi kwenye YouTube Kids kwa usanifu usiotumia mtandao.",
+      "Search optimizations: right-rail watch cards hushughulikiwa kwa akili ili kuzuia msongamano wa UI.",
+      "Channel extraction: kutatua identity kutoka vyanzo vingi kwa thumbnail anchors na parent containers.",
+      "Kubadili mode: mabadiliko laini kati ya blocklist/whitelist pamoja na reprocessing mahiri."
+    ]
+  },
+  "3.2.3": {
+    "headline": "Whitelist mode ya majaribio na maboresho ya UI",
+    "summary": "Alpha release ya whitelist mode kwa uchujaji wa kuruhusu vilivyochaguliwa pekee, pamoja na maboresho ya UI na usaidizi wa menu za simu.",
+    "bannerSummary": "Jaribu whitelist mode ya majaribio — ficha kila kitu isipokuwa chaneli zinazoruhusiwa.",
+    "highlights": [
+      "YA MAJARIBIO: whitelist mode huficha maudhui yote isipokuwa chaneli/maneno muhimu yaliyoruhusiwa waziwazi.",
+      "Njia mbili za uchujaji zenye kubadilisha kwa urahisi kati ya blocklist na whitelist kwenye popup na tab view.",
+      "Uhamishaji wa hatua kwa hatua — badili kwenda blocklist kukusanya chaneli, kisha zirejeshe kwenye whitelist kwa kuziunganisha.",
+      "Ulinzi wa ukurasa wa Watch katika whitelist mode hudumisha utendaji wa uchezaji video.",
+      "Optimistic UI updates huficha maudhui mara moja na kuyarejesha kiotomatiki ikiwa kuzuia kutashindwa.",
+      "Usaidizi bora wa menu za simu pamoja na ushughulikiaji sahihi wa renderer za YouTube za simu.",
+      "Console logs zote sasa hutegemea debug flag ili kupunguza kelele za production."
+    ]
+  },
+  "3.2.2": {
+    "headline": "Maboresho ya UI/UX na udhibiti wa Debug",
+    "summary": "Optimistic updates, usaidizi wa menu za simu, logging inayodhibitiwa na debug, kuhifadhi scroll, na maboresho ya usimamizi wa state.",
+    "bannerSummary": "Majibu ya UI ya papo hapo, menu za simu zilizoboreshwa na logs za debug pamoja na usimamizi thabiti wa state.",
+    "highlights": [
+      "Optimistic UI updates: maudhui hufichwa mara moja na kurejeshwa kiotomatiki ikiwa kuzuia kutashindwa.",
+      "Usaidizi bora wa menu ya simu kwa `ytm-menu-popup-renderer` wenye renderer tags sahihi.",
+      "Logging inayodhibitiwa na debug kupitia `window.__filtertubeDebug`.",
+      "Kuhifadhi scroll wakati wa DOM fallback ili kuzuia kuruka kunakokera.",
+      "Kikomo cha channel enrichment (10 kwa session) ili kupunguza maombi ya background.",
+      "Rendering iliyopangwa wakati wa idle kwa `requestIdleCallback` na batching.",
+      "External reload debouncing kwa kulinganisha signature ili kuepuka renders zisizohitajika.",
+      "Notifications teule: `load` tu signature ikibadilika; vinginevyo `externalUpdate`.",
+      "Bridge state management kupitia shared global state."
+    ]
+  },
+  "3.2.1": {
+    "headline": "Uchakataji bila lag na ongezeko la utendaji",
+    "summary": "Optimizations kubwa za utendaji huondoa UI lag, zikiwa na matokeo bora sana kwenye browsers za Chromium na maboresho makubwa kwenye Firefox.",
+    "bannerSummary": "Uchujaji bila lag kwa async processing, compiled caching, na batched updates.",
+    "highlights": [
+      "Async DOM processing huachia main thread muda na kuzuia browser kuganda wakati wa uchujaji mzito.",
+      "Compiled regex na channel filter caching hutoa O(1) lookups na kupunguza matumizi ya CPU kwa 60–80%.",
+      "Batched storage updates hupunguza shughuli za I/O kwa 70–90% kwa kutumia vipindi mahiri vya 250ms.",
+      "Debounced settings refresh huzuia DOM reprocessing iliyozidi.",
+      "Run state management huzuia executions kuingiliana na hupanga requests ipasavyo.",
+      "Browsers za Chromium: lag imepungua zaidi ya 90%; Firefox: maboresho makubwa na optimization inaendelea."
+    ]
+  },
+  "3.2.0": {
+    "headline": "Kuzuia papo hapo na Kids bila mtandao",
+    "summary": "Menu za 3-dot huonyesha majina ya chaneli mara moja, maombi ya mtandao hupungua sana, na YouTube Kids hufanya kazi kabisa offline.",
+    "bannerSummary": "Kuzuia bila kuchelewa kwa proactive XHR interception; Kids mode hufanya kazi bila fetch yoyote ya mtandao.",
+    "highlights": [
+      "Menu za 3-dot sasa huonyesha jina sahihi la chaneli mara moja — hakuna kusubiri 'Fetching...'.",
+      "Utambulisho wa chaneli hutokana na majibu ya JSON ya YouTube yaliyonaswa, hivyo kupunguza miito ya mtandao.",
+      "YouTube Kids hufanya kazi kabisa bila network fetch kwa ajili ya kuzuia kwa uhakika.",
+      "Metadata inayokosekana hujazwa chinichini kwa kiwango kinachodhibitiwa (cooldown ya saa 6).",
+      "Topic channels (kwa mfano, 'Music - Topic') hushughulikiwa maalum bila `@handles`.",
+      "Nyaraka mpya za kina zenye michoro ya mtiririko ya ASCII na Mermaid."
+    ]
+  },
+  "3.1.9": {
+    "headline": "Backups zinazotambua wasifu na controls zinazolindwa na lock",
+    "summary": "Auto-backup na controls za maudhui sasa huheshimu locks/PINs za wasifu, hurithi settings za kila wasifu, na profile dropdown hubaki kubofya juu ya lock gate.",
+    "bannerSummary": "Auto-backup kwa kila wasifu na kufunga wasifu unaolindwa; profile selector hubaki kubofya kila wakati.",
+    "highlights": [
+      "Vichagua vya mode/format vya auto-backup huzimwa auto-backup ikiwa imezimwa au wasifu umefungwa; wasifu wapya hurithi mapendeleo ya auto-backup.",
+      "Upangaji wa auto-backup sasa huanzishwa wakati wa kuunda wasifu na kubadilisha mode/format, lakini tu auto-backup ikiwa imewashwa kwa wasifu huo.",
+      "Content-control toggles na backup controls hubaki zimezimwa/hurejeshwa zikiwa zimefungwa; export scope hulazimishwa kuwa wasifu hai pekee kwa wasifu zisizo master.",
+      "Marekebisho ya z-index ya profile dropdown huiweka ikibofya hata banner ya lock gate inapoonekana.",
+      "Nyaraka zimesasishwa kuhusu profile/PIN model, backups za kila wasifu, na kanuni za UI gating."
+    ]
+  },
+  "3.1.8": {
+    "headline": "Support tab na auto-backups zinazoaminika",
+    "summary": "Ukurasa mpya wa Support (Ko-fi) umeongezwa na auto-backups sasa hufanya kazi kwa uhakika kwenye Chrome na Firefox.",
+    "bannerSummary": "Auto-backups sasa hufanya kazi kwenye browsers mbalimbali na hubadilisha faili moja la backup ya hivi karibuni.",
+    "highlights": [
+      "Ukurasa wa Support umeongezwa kwenye dashboard ukiwa na Ko-fi embed.",
+      "Auto-backups sasa hubadilisha faili moja linalozungushwa: Downloads/FilterTube Backup/FilterTube-Backup-Latest.json.",
+      "Mkakati wa upakuaji ni wa browsers mbalimbali (Blob URL ikipatikana; data: URL fallback kwa Chrome MV3 service worker).",
+      "Upakuaji wa Firefox haufeli tena kwa sababu ya vizuizi vya data: URL."
+    ]
+  },
+  "3.1.7": {
+    "headline": "YT Kids na usaidizi wa auto-backup",
+    "summary": "Maudhui yanaweza kuzuiwa kwa misingi ya chaneli kwenye YT Kids na auto-backups sasa zinaweza kuwashwa/kuzimwa.",
+    "bannerSummary": "Setting mpya: washa/zima auto-backups. Exports sasa huhifadhiwa kwenye Downloads/FilterTube Export/.",
+    "highlights": [
+      "Uzuiaji kamili wa Channel na Keyword umeongezwa kwenye YT Kids; chaneli huzuiwa kwa kusikiliza kimyakimya UI ya menu ya 3-dot ya YT Kids.",
+      "Setting toggle ya kuwasha/kuzima auto-backups imeongezwa (jitihada bora; hakuna Save As prompts).",
+      "Auto-backups huhifadhiwa kwenye Downloads/FilterTube Backup/ kwa mzunguko (faili za karibuni huhifadhiwa).",
+      "Manual exports sasa hupakuliwa kimyakimya kwenye Downloads/FilterTube Export/."
+    ]
+  },
+  "3.1.6": {
+    "headline": "Usaidizi wa import/export na release banner",
+    "summary": "Banner CTA sasa hufungua moja kwa moja What's New ya dashboard, kadi zilizochaguliwa hupakiwa kutoka JSON ileile, na imports huheshimu zaidi c/ChannelName pamoja na merge rules.",
+    "bannerSummary": "Release banner hufungua tab ya What's New ndani ya extension na nyaraka za import/export sasa zinaeleza mtiririko wote.",
+    "highlights": [
+      "Release notes JSON hujaza kadi za dashboard na banner ya YouTube kutoka chanzo kimoja cha ukweli.",
+      "CTA hufungua tab-view kupitia background messaging ili blockers zisikamate kamwe links za chrome-extension://.",
+      "Nyaraka na code za import/export hufafanua jinsi inputs za UC/handle/c/ChannelName zinavyonormalishwa kabla ya kuunganishwa."
+    ]
+  },
+  "3.1.5": {
+    "headline": "Shorts na maudhui ya wanachama sasa yamefichwa kweli",
+    "summary": "Ukurasa wa Watch na sidebar sasa huficha Shorts renderers na shelves za wanachama kabla hazijaonekana, na hali ya toggle hatimaye huhifadhiwa.",
+    "bannerSummary": "Kuficha maudhui ya wanachama na Shorts kumaimarishwa kwenye Watch na sidebar ili mistari iliyozuiwa isijitokeze tena.",
+    "highlights": [
+      "Sidebar hukagua href za `/shorts/`, overlays, na aria-labels kabla kadi hazijachorwa.",
+      "Utambuzi wa maudhui ya wanachama hushughulikia mistari compact, Watch, na shelves kwa badges mpya na playlist heuristics.",
+      "Hitilafu ya kuhifadhi toggle ya wanachama imerekebishwa ili hali idumu baada ya reload."
+    ]
+  },
+  "3.1.4": {
+    "headline": "Dashboard inakuwa responsive",
+    "summary": "Navigation hukunjika vizuri kwenye simu, inputs hujipanga kwa ustadi, na controls za playlist/Mix hupata toggles zilizo wazi zaidi.",
+    "highlights": [
+      "Hamburger nav na overlay kwa screens ndogo pamoja na nafasi bora ya grid.",
+      "Toggles zenye tracks nyepesi, thumbs za katikati, na contrast bora ya dark mode.",
+      "Mix/Radio chip hufichwa Mix toggle ikiwa imewashwa; kuficha playlist huruka vipengee vya radio."
+    ]
+  },
+  "3.1.3": {
+    "headline": "Kubadilisha mwonekano wa Help legend",
+    "summary": "Cards, pills, na tooltips hueleza hasa Exact / Comment / Filter All hufanya nini, sambamba na mtindo mpya wa dashboard.",
+    "highlights": [
+      "Help tab huonyesha badge tints na collaboration labels kwa rangi zinazolingana.",
+      "Search bars za popup na tab hupangwa kwa mpangilio uleule wa upana kamili.",
+      "Maelezo ya content controls yamehamishwa kwenye hover tooltips kwa uwazi zaidi."
+    ]
+  },
+  "3.1.2": {
+    "headline": "Kuimarisha playlist autoplay",
+    "summary": "Autoplay huruka mistari ya playlist iliyozuiwa bila kuionyesha hata kwa muda mfupi, na kuficha kwa kudumu hudumu YouTube inapochakata tena.",
+    "highlights": [
+      "Next-click huwashwa tu wakati mstari unaofuata wa playlist unaonekana kweli.",
+      "Mistari ya paneli ya playlist ya Watch hubaki imefichwa hata identity ikiwa haijatatuliwa kwa muda mfupi.",
+      "Menu ya 3-dot hufungwa vizuri baada ya kuzuia ili miniplayer iendelee kucheza."
+    ]
+  },
+  "3.1.1": {
+    "headline": "Help tab na marekebisho ya identity",
+    "summary": "Help tab maalum inaingia kwenye dashboard huku ulinganishaji wa UC ↔ handle ↔ custom URL ukiwa thabiti zaidi.",
+    "highlights": [
+      "Help reference huandika toggles zote, badges na tabia za maneno muhimu.",
+      "Playlist navigation huruka mistari iliyozuiwa bila flashes za uchezaji.",
+      "Handle/custom URL fallback hupata UC ID sahihi kwa uhakika zaidi."
+    ]
+  },
+  "3.1.0": {
+    "headline": "Nyaraka na uwazi wa hybrid filtering",
+    "summary": "Usanifu wa hybrid interception + DOM fallback umeandikwa kwa michoro ili kueleza jinsi FilterTube inavyotekeleza vizuizi.",
+    "highlights": [
+      "Usawa wa menu ya 3-dot ya Watch-page na collaborators wa home/search umeandikwa.",
+      "Playlist regressions zilizosalia zimeorodheshwa ili marekebisho yabaki yanaonekana.",
+      "Manifests, build tooling na UI footer zimesawazishwa na ongezeko la toleo 3.1.0."
+    ]
   }
 }
