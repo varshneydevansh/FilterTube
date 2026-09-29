@@ -17,10 +17,10 @@ function contentCopyInstaller() {
   return source.slice(start, end + marker.length);
 }
 
-async function loadContentCopy({ locale, localeCatalog = {} }) {
+async function loadContentCopy({ locale, localeCatalog = {}, browserLanguage = 'en-US' }) {
   const requests = [];
   const window = {
-    navigator: { language: 'en-US' },
+    navigator: { language: browserLanguage },
     chrome: {
       storage: { local: { get(_key, callback) { callback({ ftUiLocalePreference: locale }); } } },
       runtime: { getURL: file => `chrome-extension://filtertube/${file}` }
@@ -72,6 +72,17 @@ test('content copy loads the selected packaged catalog locally and falls back pe
 
 test('English preference uses the English fallback without requesting a catalog', async () => {
   const { copy, requests } = await loadContentCopy({ locale: 'en' });
+
+  assert.equal(copy.text('content.menu.block', 'Block'), 'Block');
+  assert.deepEqual(requests, []);
+});
+
+test('automatic browser language does not activate an unreleased content-menu preview', async () => {
+  const { copy, requests } = await loadContentCopy({
+    locale: 'auto',
+    browserLanguage: 'ar-EG',
+    localeCatalog: { 'content.menu.block': 'حظر' }
+  });
 
   assert.equal(copy.text('content.menu.block', 'Block'), 'Block');
   assert.deepEqual(requests, []);

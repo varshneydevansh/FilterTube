@@ -32,7 +32,10 @@
 
         let requested = typeof stored?.ftUiLocalePreference === 'string'
             ? stored.ftUiLocalePreference : 'en';
-        if (requested === 'auto') requested = root.navigator?.language || 'en';
+        // Auto may select only released UI languages. The content script does
+        // not load the dashboard runtime; English is its current release gate.
+        // An explicitly selected preview locale still loads below.
+        if (requested === 'auto') requested = 'en';
         requested = requested.trim().replace(/_/g, '-');
         if (!/^[a-z]{2,3}(?:-[a-zA-Z0-9]{2,8})*$/.test(requested)) return null;
 
