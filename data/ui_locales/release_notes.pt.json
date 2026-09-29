@@ -14,5 +14,329 @@
       "A publicação de versões no GitHub usa as credenciais do GitHub CLI, cria rascunhos antes do envio, retoma tags existentes, envia apenas recursos em falta, verifica o conjunto final de recursos e só publica depois da verificação.",
       "A aplicação FilterTube para telemóveis e tablets Android está agora disponível publicamente no Google Play. Pode instalá-la a partir da [página pública](https://play.google.com/store/apps/details?id=com.filtertube.app) ou procurar FilterTube no Google Play."
     ]
+  },
+  "3.3.6": {
+    "headline": "Filtragem reforçada, tempo protegido e reprodução sem anúncios mais tranquila",
+    "summary": "O FilterTube 3.3.6 traz aplicação das regras de acesso direto, limites de tempo protegidos e sessões de autocontrolo por perfil, coleções fiáveis de regras bloqueadas e permitidas, filtragem por categorias oficiais, Advert Void ativado por predefinição e amplo trabalho de compatibilidade com o YouTube atual.",
+    "bannerSummary": "A versão 3.3.6 inclui filtragem de acesso direto, tempo protegido, importação de listas de regras e BlockTube, categorias oficiais, Advert Void e compatibilidade com o YouTube atual.",
+    "highlights": [
+      "As visitas diretas ao YouTube, as transições entre playlists, a reprodução automática e os vídeos incorporados suportados passam agora pelas mesmas regras de admissão de vídeos e canais que a filtragem do feed.",
+      "Os limites diários do YouTube aplicam-se agora por perfil ativo, mostram o tempo restante, sobrevivem a reinícios e usam uma página de tempo limite em ecrã inteiro com mudança de perfil protegida por PIN. As sessões voluntárias de autocontrolo bloqueiam as regras selecionadas até terminar a contagem decrescente.",
+      "As regras bloqueadas e as regras permitidas continuam a ser coleções independentes para Main e Kids, enquanto a política geral de Blocklist ou Whitelist escolhe qual controla a visualização.",
+      "As importações grandes de BlockTube e de listas de regras geridas incluem pré-visualização, verificação de capacidade, reversão transacional e verificação de leitura, além de contagens mais claras de itens adicionados, duplicados, ignorados, canais, palavras-chave, expressões regulares e IDs de vídeo.",
+      "A filtragem por categoria usa o campo oficial do YouTube `microformat.playerMicroformatRenderer.category`, hidratação limitada de metadados do Player com a mesma origem, opções claras para bloquear categorias selecionadas ou permitir apenas as selecionadas, e gestão mais segura de Watch, rail, Mix, comentários e renderizadores.",
+      "O Advert Void fica ativado por predefinição para perfis novos e atualizados no YouTube Main e Kids. O runtime Web partilhado remove campos observados do plano de anúncios do Player sem pedidos adicionais; a reprodução nativa descarta dados de planos de anúncios não modelados ou normaliza a resposta Reel bruta quando exposta, enquanto a alternativa controlada trata interrupções escapadas.",
+      "A filtragem experimental do idioma falado e a preferência pelo áudio original usam evidências do YouTube Player quando disponíveis e permitem a passagem quando faltam metadados de recomendação.",
+      "Esta versão também inclui ocultar YouTube Playables, tratamento dos renderizadores camelCase atuais e colaboração, melhor legibilidade e pesquisa na Ajuda, controlos mais claros no popup e dashboard, e páginas públicas de estado para Android Google Play e iOS.",
+      "As Definições incluem uma opção global, desmarcada por predefinição, para desativar lembretes automáticos de recarregamento e banners What's New no YouTube e YouTube Kids. A página What's New do dashboard continua disponível manualmente."
+    ]
+  },
+  "3.3.5": {
+    "headline": "Recuperação de falhas do YouTube e bloqueio mais cedo de canais Shorts",
+    "summary": "Esta versão corrige a injeção duplicada do content runtime em separadores do YouTube já abertos e resolve mais cedo a identidade dos canais de Shorts visíveis quando estão ativas regras de bloqueio de canais ou o modo de whitelist.",
+    "bannerSummary": "Corrige a injeção duplicada do runtime, melhora a resolução da identidade de canais bloqueados em Shorts e documenta o limite do rollback da v3.3.4.",
+    "highlights": [
+      "A instalação/atualização/atualização de perfil já não volta a injetar scripts de conteúdo do manifesto em separadores do YouTube abertos, evitando erros de sintaxe repetidos `Identifier ... has already been declared`.",
+      "Os separadores do YouTube já abertos continuam a poder receber verificações geridas de limites de tempo/runtime sem declarações duplicadas de scripts.",
+      "Os Shorts visíveis e quase visíveis usam agora o resolvedor de proprietário de fundo limitado existente `/shorts/<videoId>` quando as regras de blocklist de canais ou o modo whitelist estão ativos.",
+      "As associações aprendidas entre vídeos Shorts e canais são persistidas e reprocessadas imediatamente, para que Shorts de canais bloqueados sejam ocultados sem passar o rato nem interagir com menus.",
+      "Anfitriões de Shorts para computador, como `.shortsLockupViewModelHost` e `.ytGridShelfViewModelGridShelfItem`, estão incluídos em percursos dedicados de fallback/enriquecimento de Shorts.",
+      "O modo blocklist não oculta Shorts desconhecidos antes de a identidade ser resolvida; o modo whitelist mantém-se mais rigoroso pelo percurso pendente existente.",
+      "A v3.3.4 está documentada como um rollback nas lojas para o pacote v3.3.2 enquanto era investigada a denúncia de falha do YouTube."
+    ]
+  },
+  "3.3.4": {
+    "headline": "Rollback nas lojas para o pacote v3.3.2",
+    "summary": "A v3.3.4 foi uma versão de rollback para as lojas de extensões que usou o pacote anterior v3.3.2 enquanto eram investigadas as denúncias de falhas do YouTube na v3.3.3.",
+    "bannerSummary": "Versão de rollback: a v3.3.4 usou o pacote v3.3.2 enquanto eram investigadas as denúncias de falhas do YouTube.",
+    "highlights": [
+      "Não são reivindicadas novas funcionalidades provenientes do código-fonte para a v3.3.4.",
+      "O rollback foi usado para retirar das lojas o pacote v3.3.3 suspeito enquanto se investigava o problema #64.",
+      "A versão seguinte proveniente do código-fonte, v3.3.5, inclui as correções de injeção duplicada do runtime e identidade de Shorts."
+    ]
+  },
+  "3.3.3": {
+    "headline": "Atualizações entre dispositivos da família, listas de regras, palavras-chave por data e atualização do DOM do YouTube",
+    "summary": "Esta versão torna o controlo parental mais fácil de compreender, adiciona importações verificadas de listas de regras e regras de palavras-chave limitadas por data, documenta o modelo Home/Internet Pickup e atualiza a filtragem para a marcação atual do YouTube/YTM.",
+    "bannerSummary": "Esta versão inclui atualizações familiares entre dispositivos, importações verificadas de listas de regras, palavras-chave por data, Ajuda orientada primeiro para os pais e compatibilidade com o DOM atual do YouTube/YTM.",
+    "highlights": [
+      "Os perfis de pais/responsáveis podem gerir perfis protegidos, editar regras de crianças/perfis protegidos no dashboard parental e enviar atualizações aprovadas para dispositivos protegidos verificados.",
+      "As Atualizações de Dispositivos da Família explicam agora o envio imediato de atualizações, Home Pickup explícito e Internet Pickup explícito, sem tratar os serviços de recolha como autoridade.",
+      "Os limites de tempo dos perfis protegidos verificam agora separadores antigos e novos do YouTube, mostram um ecrã de tempo limite tranquilo e registam pedidos de tempo adicional para análise parental.",
+      "A importação de listas de regras suporta CSV, TXT, JSON simples, JSON no estilo BlockTube e URLs HTTPS brutos, com pré-visualização antes de aplicar, destinos Main/Kids/Both, modelos, gestão de listas, pausa/retoma/remoção, verificações de atualidade e atualização.",
+      "A filtragem por data pode aplicar uma palavra-chave apenas a partir de, até ou entre datas de carregamento. A filtragem de comentários usa a data de carregamento do vídeo principal quando o YouTube a disponibiliza.",
+      "A Ajuda e os controlos do dashboard usam agora linguagem mais simples e orientada primeiro para os pais, dicas mais rápidas e explicações mais claras de Exact, Comment, Date, PINs, listas de regras e atualizações de dispositivos.",
+      "O dashboard convida agora utilizadores ativos do teste fechado Android a enviar email para hello@filtertube.in e mantém um lembrete visível para comunicar falhas de filtragem quando o YouTube altera a estrutura das páginas.",
+      "Os seletores desktop lockup do YouTube e o DOM móvel camelCase do YTM estão documentados para que os cartões de vídeo reais continuem filtrados, enquanto as barras de chips da página Watch não ativam fallback nem causam saltos de deslocamento.",
+      "Continuam separados: descoberta automática de pares na LAN, um serviço alojado FilterTube Internet Pickup, catálogos públicos silenciosos de subscrição automática, paridade nativa Android/iOS e provas de testes manuais em dois dispositivos instalados."
+    ]
+  },
+  "3.3.2": {
+    "headline": "MVP da aplicação móvel/tablet, YouTube mais fluido e whitelist mais segura",
+    "summary": "A superfície pública de lançamento da aplicação está pronta para os testes finais Android em telemóveis/tablets e o estado iOS/iPad; o dashboard da extensão aponta para esses percursos, o trabalho SPA do YouTube é mais discreto quando não existem regras ativas e esta versão inclui correções de exatidão de whitelist/ecrã final.",
+    "bannerSummary": "Esta versão inclui percursos de lançamento da aplicação móvel/tablet, comportamento mais fluido do runtime do YouTube, registos silenciosos em produção e correções de fugas de whitelist/ecrã final.",
+    "highlights": [
+      "O centro de transferências do site e o dashboard da extensão apresentam agora o percurso de testes finais Android para telemóvel/tablet e o percurso de estado TestFlight/App Store para iOS/iPad.",
+      "A configuração de lançamento Android para telemóvel/tablet está documentada em torno do runtime FilterTube partilhado, YouTube Main, acesso público ao YouTube Kids, perfis, regras PIN e sincronização Nanah.",
+      "O trabalho de desempenho SPA do YouTube evita agora mais operações de clonagem/análise/reprodução JSON, fallback DOM, bloqueio rápido, menus de fallback e trabalho pendente de whitelist quando não há regras ativas nem necessidade de rota.",
+      "Os contextos de produção da extensão limitam os registos de consola de rotina ao modo de depuração explícito, para a navegação normal não pagar o custo da consola nos percursos intensivos do YouTube.",
+      "As correções de lançamento de whitelist abrangem fallback de criador Shorts, encaminhamento do destino da lista e filtragem compacta de endpoints autoplay/watch-next para controlos de ecrã final.",
+      "Os atributos de estado DOM do FilterTube foram reforçados para reduzir impressões digitais visíveis amplas `data-filtertube-*`, preservando o estado de runtime necessário.",
+      "Contas e Sincronização documenta agora as Atualizações de Dispositivos da Família em torno de Send Update, Home Pickup opcional e Internet Pickup quando se está fora/abrir mais tarde, para os pais distinguirem sincronização em direto, recolha em casa, recolha online e o que não constitui autoridade.",
+      "Os limites de tempo de perfis protegidos têm agora documentação de lançamento para orçamentos diários do YouTube, ecrãs de tempo limite, histórico de pedidos de tempo adicional e aprovação parental/responsável.",
+      "Os percursos Nanah/importação preservam a propriedade de palavras-chave Filter All derivadas de canais entre payloads da extensão e da aplicação nativa, incluindo cor da linha, metadados do emblema de origem e contexto de emparelhamento."
+    ]
+  },
+  "3.3.1": {
+    "headline": "Sincronização segura entre dispositivos por P2P, sem servidor de terceiros",
+    "summary": "Contas e Sincronização apresenta agora o Nanah como três percursos mais simples, com direcionamento parental/infantil mais forte, regras de reconexão mais claras e documentação muito mais abrangente para utilização no mundo real.",
+    "bannerSummary": "Sincronização Nanah, melhor controlo parental/infantil, regras de reconexão mais seguras e documentação completa do novo fluxo Contas e Sincronização.",
+    "highlights": [
+      "Contas e Sincronização começa agora com três percursos mais claros: Enviar este perfil uma vez, Pai controla criança e Mover conta completa.",
+      "Os controlos avançados do Nanah continuam disponíveis, mas ficam ocultos numa secção Avançado em vez de liderarem todo o fluxo.",
+      "As sessões parent/source podem escolher com mais clareza um perfil de destino remoto, e as gravações de ligações geridas são agora espelhadas para o remetente para que ambos os dispositivos mantenham o mesmo registo de confiança.",
+      "As ligações de confiança continuam guardadas após atualização, mas a reconexão continua a ser uma nova sessão em direto, não uma sincronização oculta em segundo plano.",
+      "Atualizações de crianças bloqueadas, regras de reconexão, persistência de nomes de dispositivos e proteção contra autoentrada/consumo da sessão foram reforçadas para um controlo parental mais seguro.",
+      "O README, Architecture, Technical, Functionality, Profiles & PIN, plano do projeto, guia do utilizador e registo de preocupações documentam agora com muito mais detalhe o ponto de situação atual do Nanah para computador."
+    ]
+  },
+  "3.3.0": {
+    "headline": "Recuperação da colaboração e reforço das importações entre navegadores",
+    "summary": "Os menus de colaboração Watch/YTM recuperam listas completas de forma mais fiável, a importação de subscrições é mais robusta entre navegadores e várias correções de whitelist e Quick Block específicas de superfícies estão agora incluídas na v3.3.0.",
+    "bannerSummary": "Melhores menus collab, importação de whitelist reforçada, superfícies Quick Block mais seguras, ligações diretas a canais e um novo botão para o item de bloqueio de 3 pontos.",
+    "highlights": [
+      "Os cartões móveis do YouTube home/watch-next/estilo Mix participam agora no mesmo fluxo de recuperação de colaboradores e menu de 3 pontos, em vez de recorrerem a menus incompletos de canal único.",
+      "O rail lateral da página Watch, as linhas de playlist e os lockups semelhantes a Watch podem agora recuperar a lista completa de colaboradores e atualizar o menu ativo de 3 pontos no próprio local.",
+      "A recuperação Mix/watch é mais segura: os cartões de colaboração verdadeiros são atualizados corretamente, enquanto nomes simples com '&' ou 'and' já não se tornam falsos menus de colaboração.",
+      "O Quick Block é mais estável em superfícies complexas: fica acima de mais cartões desktop, evita listas suspensas de sugestões de pesquisa móvel e ancora-se melhor nos layouts móveis watch-next.",
+      "A importação de subscrições para whitelist mantém agora respostas recentes de navegação de páginas, dá preferência ao crescimento real de /feed/channels e preserva /feed/channels como superfície de gestão visível.",
+      "A filtragem whitelist é mais rigorosa e segura nos renderizadores desktop/móveis do YouTube, com melhor tratamento das páginas de criadores e controlos melhorados para ocultar Mixes/subscrições.",
+      "Novos controlos e melhorias: as linhas de Channel Management ligam a páginas reais de canais, o item de bloqueio de 3 pontos pode ser desativado e a exportação encriptada do Firefox usa uma alternativa mais segura."
+    ]
+  },
+  "3.2.9": {
+    "headline": "Importação de canais subscritos, whitelist e correção de proteção PIN",
+    "summary": "Importe para a whitelist as subscrições da conta YouTube ativa, com semântica mais clara ao mudar de modo e um arranque mais fiável de /feed/channels.",
+    "bannerSummary": "Crie uma whitelist a partir das suas subscrições atuais do YouTube, com progresso em linha e ativação mais clara da whitelist.",
+    "highlights": [
+      "A nova importação da Tab View permite importar para a whitelist canais subscritos pela conta YouTube ativa com sessão iniciada.",
+      "O arranque da importação reutiliza agora um separador YouTube ativo, encaminha-o para /feed/channels e aguarda a ponte FilterTube antes de começar.",
+      "O texto da whitelist é mais claro: Import Only deixa a blocklist intacta, enquanto Import + Turn On Whitelist segue o percurso existente de migração de blocklist para whitelist.",
+      "A documentação cobre agora com muito mais detalhe a arquitetura de importação, o fluxo de pedidos FEchannels, as fontes dos renderizadores e a semântica da whitelist."
+    ]
+  },
+  "3.2.8": {
+    "headline": "Renovação do tema e ajustes da interface panorâmica",
+    "summary": "As superfícies do popup e do dashboard usam agora o sistema de tema panorâmico mais tranquilo, com layout mais compacto, estados de tonalidade mais fortes e melhor equilíbrio entre claro e escuro.",
+    "bannerSummary": "Tema renovado para popup e dashboard, com transparência mais tranquila, pills mais claras e melhor comportamento responsivo.",
+    "highlights": [
+      "Renovação da interface panorâmica: o popup e o dashboard partilham agora uma estrutura de produto mais tranquila, com o vídeo hero local como fundo ambiente.",
+      "Ajustes dos temas claro e escuro: o modo escuro mantém visível o fundo panorâmico sem o brilho central desbotado, enquanto o modo claro usa transparência mais limpa.",
+      "Ajustes responsivos: espaçamento do popup mais compacto, lista de perfis menor, melhor layout dos cartões Help/Support e melhor adaptação móvel das superfícies de filtro.",
+      "Correções da tonalidade dos controlos: estados ativado/desativado, cores das pills, campos de pesquisa e ações de importação/exportação são agora mais claros nos dois temas."
+    ]
+  },
+  "3.2.7": {
+    "headline": "Filtros por categoria, cruz Quick Block ao passar o rato e bloqueio móvel",
+    "summary": "Novo filtro por categoria e bloqueio rápido com cruz ativado por predefinição.",
+    "bannerSummary": "Use os novos filtros por categoria e a cruz Quick Block ao passar o rato nos cartões, com melhor suporte para bloqueio no YT Mobile.",
+    "highlights": [
+      "Filtragem por categoria: bloqueie ou permita vídeos pela categoria do YouTube (Música, Jogos, Educação, etc.).",
+      "Quick Cross Block ativado por predefinição: `Show Quick Cross Block button` fica ativado por predefinição na v3.2.7, mas os utilizadores podem desativá-lo.",
+      "Bloqueio móvel: melhor suporte para bloqueio no YT Mobile pela interface de 3 pontos e Quick Cross Block, atualmente a funcionar na página Home."
+    ]
+  },
+  "3.2.6": {
+    "headline": "Embelezamento da interface e filtragem baseada em conteúdo",
+    "summary": "Melhorias completas de tipografia com design moderno e três novos filtros de conteúdo: duração, data e maiúsculas.",
+    "bannerSummary": "Nova interface elegante com filtros de conteúdo para duração, data de carregamento e deteção de clickbait.",
+    "highlights": [
+      "Atualizações de tipografia: escala de fontes moderna e refinada para melhor legibilidade.",
+      "Filtros baseados em conteúdo: duração (mais longa/mais curta/entre), data de carregamento (mais recente/mais antiga/entre) e deteção de maiúsculas (títulos clickbait).",
+      "Sistema `videoMetaMap`: armazenamento persistente de metadados de vídeo com agrupamento inteligente (janela de 75 ms, limite de 1500 entradas).",
+      "Melhorias no dashboard: estatísticas específicas por superfície (Main vs Kids), cartões de estatísticas melhorados e cartão promocional de doação."
+    ]
+  },
+  "3.2.5": {
+    "headline": "Whitelist promovida e estabilidade",
+    "summary": "O modo whitelist é agora o percurso principal de permitir apenas, com extração mais inteligente, proteções para playlists e menor uso de CPU.",
+    "bannerSummary": "Modo whitelist promovido com interface mais limpa, maior estabilidade de playlists e suporte para Kids.",
+    "highlights": [
+      "Modo whitelist promovido: a linguagem e a interface já não o assinalam como experimental.",
+      "Limpeza do menu de 3 pontos e tratamento secundário da pesquisa para superfícies whitelist.",
+      "Extração de canais a partir de várias fontes, com âncoras de miniaturas e contentores principais.",
+      "Acompanhamento de estado consciente do modo, com caixas de confirmação e otimizações da ponte.",
+      "Estabilidade das playlists: as linhas selecionadas permanecem visíveis; identidades pendentes já não revelam linhas bloqueadas.",
+      "Suporte de whitelist no modo Kids com arquitetura sem rede."
+    ]
+  },
+  "3.2.4": {
+    "headline": "Modo whitelist melhorado e otimizações de desempenho",
+    "summary": "Melhorias significativas no modo whitelist experimental, com melhor UX, otimizações de desempenho e suporte alargado para o modo Kids.",
+    "bannerSummary": "O modo whitelist fica mais inteligente, com interface mais limpa, melhor desempenho e suporte para Kids.",
+    "highlights": [
+      "EXPERIMENTAL: modo whitelist melhorado com limpeza do menu de 3 pontos, processamento inteligente da pesquisa e acompanhamento de estado consciente do modo.",
+      "Aumento de desempenho: otimizações ao nível da ponte e processamento seletivo reduzem o uso de CPU.",
+      "Melhorias da interface: caixas de confirmação evitam perda acidental de dados ao mudar de modo.",
+      "Suporte do modo Kids: a funcionalidade whitelist passa a funcionar no YouTube Kids com arquitetura sem rede.",
+      "Otimizações da pesquisa: os cartões de vídeos no rail direito são tratados de forma inteligente para evitar desorganização da interface.",
+      "Extração de canais: resolução de identidade através de várias fontes, com âncoras de miniaturas e contentores principais.",
+      "Mudança de modo: transições fluidas entre blocklist/whitelist com reprocessamento inteligente."
+    ]
+  },
+  "3.2.3": {
+    "headline": "Modo whitelist experimental e melhorias da interface",
+    "summary": "Versão alfa do modo whitelist para filtragem de permitir apenas, com melhorias de interface e suporte a menus móveis.",
+    "bannerSummary": "Experimente o modo whitelist: oculte tudo exceto os canais permitidos.",
+    "highlights": [
+      "EXPERIMENTAL: o modo whitelist oculta todo o conteúdo, exceto canais/palavras-chave explicitamente permitidos.",
+      "Dois modos de filtragem com alternância fácil entre blocklist e whitelist no popup e na vista de separador.",
+      "Migração faseada: mude para blocklist para recolher canais e depois volte a integrá-los na whitelist.",
+      "A proteção da página Watch no modo whitelist mantém a reprodução de vídeo funcional.",
+      "Atualizações otimistas da interface ocultam conteúdo instantaneamente e restauram-no automaticamente se o bloqueio falhar.",
+      "Suporte melhorado para menus móveis com tratamento correto dos renderizadores móveis do YouTube.",
+      "Todos os registos da consola ficam agora condicionados por uma opção de depuração para reduzir o ruído em produção."
+    ]
+  },
+  "3.2.2": {
+    "headline": "Melhorias de UI/UX e controlo de depuração",
+    "summary": "Atualizações otimistas, suporte a menus móveis, registos condicionados pela depuração, preservação do deslocamento e refinamentos da gestão de estado.",
+    "bannerSummary": "Resposta instantânea da interface, menus móveis melhorados e registos controlados por depuração com gestão de estado estável.",
+    "highlights": [
+      "Atualizações otimistas da interface: o conteúdo é ocultado instantaneamente e restaurado automaticamente se o bloqueio falhar.",
+      "Suporte melhorado do menu móvel para `ytm-menu-popup-renderer` com etiquetas corretas de renderizador.",
+      "Registos controlados pela depuração via `window.__filtertubeDebug`.",
+      "Preservação do deslocamento durante o fallback DOM para evitar saltos bruscos.",
+      "Limite de enriquecimento de canais (10 por sessão) para reduzir pedidos em segundo plano.",
+      "Renderização agendada em períodos ociosos com `requestIdleCallback` e agrupamento.",
+      "Debounce de recarregamentos externos com comparação de assinatura para evitar renderizações redundantes.",
+      "Notificações seletivas: `load` apenas quando a assinatura muda; caso contrário, `externalUpdate`.",
+      "Gestão do estado da ponte através de estado global partilhado."
+    ]
+  },
+  "3.2.1": {
+    "headline": "Processamento sem atrasos e aumento de desempenho",
+    "summary": "Otimizações importantes de desempenho eliminam atrasos na interface, com excelentes resultados em navegadores Chromium e melhorias significativas no Firefox.",
+    "bannerSummary": "Filtragem sem atrasos com processamento assíncrono, cache compilada e atualizações agrupadas.",
+    "highlights": [
+      "O processamento assíncrono do DOM cede tempo à thread principal e impede o bloqueio do navegador durante filtragens intensivas.",
+      "Regex compiladas e cache de filtros de canais permitem pesquisas O(1), reduzindo o uso de CPU em 60–80%.",
+      "Atualizações agrupadas do armazenamento reduzem operações de E/S em 70–90% através de intervalos inteligentes de 250 ms.",
+      "A atualização de definições com debounce evita reprocessamento excessivo do DOM.",
+      "A gestão do estado de execução impede execuções sobrepostas e coloca pedidos em fila corretamente.",
+      "Navegadores Chromium: redução de atrasos superior a 90%; Firefox: melhorias significativas, com otimização contínua."
+    ]
+  },
+  "3.2.0": {
+    "headline": "Bloqueio instantâneo e Kids sem rede",
+    "summary": "Os menus de 3 pontos mostram nomes de canais instantaneamente, os pedidos de rede diminuem drasticamente e o YouTube Kids funciona totalmente offline.",
+    "bannerSummary": "Bloqueio sem atrasos com interceção proativa de XHR; o modo Kids funciona sem quaisquer pedidos de rede.",
+    "highlights": [
+      "Os menus de 3 pontos mostram agora instantaneamente o nome correto do canal, sem esperas por 'Fetching...'.",
+      "A identidade do canal provém de respostas JSON do YouTube intercetadas, reduzindo chamadas de rede.",
+      "O YouTube Kids funciona totalmente sem pedidos de rede para garantir bloqueios fiáveis.",
+      "Os metadados em falta são preenchidos em segundo plano a uma cadência controlada (período de espera de 6 horas).",
+      "Canais de tópico (por exemplo, 'Music - Topic') são tratados especialmente sem `@handles`.",
+      "Nova documentação abrangente com diagramas de fluxo ASCII e Mermaid."
+    ]
+  },
+  "3.1.9": {
+    "headline": "Cópias de segurança por perfil e controlos protegidos por bloqueio",
+    "summary": "A cópia de segurança automática e os controlos de conteúdo respeitam agora os bloqueios/PIN dos perfis, herdam definições por perfil e o menu suspenso dos perfis continua clicável por cima do bloqueio.",
+    "bannerSummary": "Cópia de segurança automática por perfil e bloqueio de perfis protegidos; o seletor de perfil está sempre clicável.",
+    "highlights": [
+      "Os seletores de modo/formato da cópia automática ficam desativados quando a cópia está desligada ou o perfil está bloqueado; os novos perfis herdam as preferências de cópia automática.",
+      "O agendamento da cópia automática é agora acionado ao criar um perfil e ao mudar o modo/formato, apenas quando a cópia automática está ativada nesse perfil.",
+      "Os controlos de conteúdo e de cópia ficam desativados/revertem quando o perfil está bloqueado; o âmbito de exportação é limitado ao perfil ativo para perfis que não sejam principais.",
+      "A correção do z-index do menu de perfis mantém-no clicável mesmo quando o banner de bloqueio está visível.",
+      "A documentação foi atualizada sobre o modelo de perfis/PIN, cópias por perfil e regras de bloqueio da interface."
+    ]
+  },
+  "3.1.8": {
+    "headline": "Separador de Suporte e cópias automáticas fiáveis",
+    "summary": "Foi adicionada uma nova página de Suporte (Ko-fi) e as cópias automáticas funcionam agora de forma fiável no Chrome e no Firefox.",
+    "bannerSummary": "As cópias automáticas são agora compatíveis entre navegadores e substituem um único ficheiro de cópia mais recente.",
+    "highlights": [
+      "Adicionada uma página de Suporte ao dashboard com incorporação Ko-fi.",
+      "As cópias automáticas substituem agora um único ficheiro rotativo: Downloads/FilterTube Backup/FilterTube-Backup-Latest.json.",
+      "A estratégia de transferência funciona entre navegadores (URL Blob quando disponível; URL data: como alternativa para o service worker Chrome MV3).",
+      "As transferências do Firefox já não falham devido a restrições de URLs data:."
+    ]
+  },
+  "3.1.7": {
+    "headline": "YT Kids e suporte a cópias automáticas",
+    "summary": "É possível bloquear conteúdo por canal no YT Kids e as cópias automáticas podem agora ser ativadas/desativadas.",
+    "bannerSummary": "Nova definição: ativar/desativar cópias automáticas. As exportações são agora guardadas em Downloads/FilterTube Export/.",
+    "highlights": [
+      "Adicionado bloqueio completo por Canal e Palavra-chave no YT Kids; os canais são bloqueados através da escuta passiva da interface do menu de 3 pontos do YT Kids.",
+      "Adicionada uma opção nas Definições para ativar/desativar cópias automáticas (melhor esforço, sem pedidos para Guardar como).",
+      "As cópias automáticas são guardadas em Downloads/FilterTube Backup/ com rotação (mantendo os ficheiros mais recentes).",
+      "As exportações manuais são agora transferidas silenciosamente para Downloads/FilterTube Export/."
+    ]
+  },
+  "3.1.6": {
+    "headline": "Suporte de importação/exportação e banner de versão",
+    "summary": "O CTA do banner liga diretamente ao What's New do dashboard, os cartões selecionados são carregados do mesmo JSON e as importações respeitam melhor c/ChannelName e as regras de fusão.",
+    "bannerSummary": "O banner da versão abre o separador What's New dentro da extensão e a documentação de importação/exportação explica agora todo o fluxo.",
+    "highlights": [
+      "O JSON das notas de versão alimenta tanto os cartões do dashboard como o banner do YouTube, a partir de uma única fonte de verdade.",
+      "O CTA abre tab-view através de mensagens em segundo plano para que os bloqueadores nunca intercetem ligações chrome-extension://.",
+      "A documentação e o código de importação/exportação esclarecem como entradas UC/handle/c/ChannelName são normalizadas antes da fusão."
+    ]
+  },
+  "3.1.5": {
+    "headline": "Shorts e conteúdo exclusivo para membros finalmente ocultados",
+    "summary": "A página Watch e a barra lateral ocultam agora renderizadores Shorts e prateleiras exclusivas para membros antes de surgirem, e o estado da opção fica finalmente guardado.",
+    "bannerSummary": "O ocultamento de conteúdo exclusivo para membros e de Shorts foi reforçado em Watch e na barra lateral para que as linhas bloqueadas não reapareçam.",
+    "highlights": [
+      "A barra lateral verifica links `/shorts/`, sobreposições e atributos aria-label antes de renderizar cartões.",
+      "A deteção de conteúdo exclusivo para membros abrange linhas compactas, Watch e prateleiras, com novos emblemas e heurísticas de playlist.",
+      "Corrigido o erro de persistência da opção de conteúdo exclusivo para membros, para que o estado sobreviva aos recarregamentos."
+    ]
+  },
+  "3.1.4": {
+    "headline": "O dashboard torna-se responsivo",
+    "summary": "A navegação recolhe-se de forma limpa em dispositivos móveis, os campos ajustam-se com flexibilidade e os controlos de playlist/Mix têm opções mais claras.",
+    "highlights": [
+      "Navegação hamburger e sobreposição para ecrãs pequenos, com espaçamento de grelha refinado.",
+      "Opções com faixas mais leves, botões centrados e melhor contraste no modo escuro.",
+      "O chip Mix/Radio fica oculto quando a opção Mix está ativa; ocultar playlists ignora elementos de rádio."
+    ]
+  },
+  "3.1.3": {
+    "headline": "Renovação da legenda de Ajuda",
+    "summary": "Cartões, pills e dicas descrevem exatamente o que Exact / Comment / Filter All fazem, em sintonia com o estilo renovado do dashboard.",
+    "highlights": [
+      "O separador Ajuda mostra tons de emblemas e etiquetas de colaboração com as cores correspondentes.",
+      "As barras de pesquisa do popup e do separador seguem o mesmo ritmo de largura total.",
+      "As descrições dos controlos de conteúdo foram transferidas para dicas ao passar o rato, para maior clareza."
+    ]
+  },
+  "3.1.2": {
+    "headline": "Reforço da reprodução automática de playlists",
+    "summary": "A reprodução automática salta linhas bloqueadas de playlists sem as mostrar e o ocultamento persistente resiste ao reprocessamento do YouTube.",
+    "highlights": [
+      "O clique em seguinte só é acionado quando a próxima linha da playlist está realmente visível.",
+      "As linhas do painel de playlist Watch permanecem ocultas mesmo que a identidade esteja brevemente por resolver.",
+      "O menu de 3 pontos fecha corretamente depois do bloqueio para que o miniplayer continue a reproduzir."
+    ]
+  },
+  "3.1.1": {
+    "headline": "Separador Ajuda e correções de identidade",
+    "summary": "Chega um separador Ajuda dedicado ao dashboard e o mapeamento UC ↔ handle ↔ URL personalizada fica mais resiliente.",
+    "highlights": [
+      "A referência de Ajuda documenta todas as opções, emblemas e comportamentos de palavras-chave.",
+      "A navegação de playlists salta linhas bloqueadas sem flashes de reprodução.",
+      "A alternativa handle/URL personalizada identifica o ID UC correto com maior fiabilidade."
+    ]
+  },
+  "3.1.0": {
+    "headline": "Documentação e clareza da filtragem híbrida",
+    "summary": "A arquitetura híbrida de interceção e fallback DOM foi documentada com diagramas para explicar como o FilterTube aplica bloqueios.",
+    "highlights": [
+      "Documentada a paridade do menu de 3 pontos da página Watch com os colaboradores da página inicial/pesquisa.",
+      "Catalogadas as regressões de playlist ainda pendentes para manter as correções visíveis.",
+      "Manifestos, ferramentas de build e rodapé da interface sincronizados com a atualização para a versão 3.1.0."
+    ]
   }
 }
