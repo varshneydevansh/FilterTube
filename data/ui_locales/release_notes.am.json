@@ -14,5 +14,361 @@
       "የGitHub ልቀት ማተም GitHub CLI ምስክርነቶችን ይጠቀማል፣ ከመስቀል በፊት drafts ይፈጥራል፣ ካሉ tags ይቀጥላል፣ የጎደሉ assets ብቻ ይሰቅላል፣ የመጨረሻውን asset ስብስብ ያረጋግጣል፣ ከማረጋገጡ በኋላ ብቻ ያትማል።",
       "ለAndroid ስልኮችና ታብሌቶች የFilterTube መተግበሪያ አሁን በGoogle Play ለሕዝብ ቀርቧል። ከ[ይፋዊ ገጹ](https://play.google.com/store/apps/details?id=com.filtertube.app) ይጫኑት ወይም Google Play ላይ FilterTubeን ይፈልጉ።"
     ]
+  },
+  "3.3.6": {
+    "ctaLabel": "አዲሱን ይመልከቱ",
+    "headline": "የተጠናከረ ማጣሪያ፣ የተጠበቀ ጊዜ እና የተረጋጋ ያለ-ማስታወቂያ እይታ",
+    "summary": "FilterTube 3.3.6 ቀጥተኛ መዳረሻን ማስፈጸም፣ ለእያንዳንዱ ፕሮፋይል የተጠበቀ ጊዜና የራስ-ቁጥጥር ክፍለ ጊዜዎች፣ አስተማማኝ የታገዱና የተፈቀዱ ደንብ ስብስቦች፣ ይፋዊ የምድብ ማጣሪያ፣ በነባሪ የነቃ Advert Void እና ለአሁኑ YouTube ሰፊ የተኳሃኝነት ሥራዎችን ያመጣል።",
+    "bannerSummary": "ቀጥተኛ መዳረሻ ማጣሪያ፣ የተጠበቀ ጊዜ፣ የደንብ ዝርዝርና BlockTube ማስመጣት፣ ይፋዊ ምድቦች፣ Advert Void እና ከአሁኑ YouTube ጋር ተኳሃኝነት።",
+    "highlights": [
+      "በቀጥታ የYouTube ጉብኝቶች፣ በplaylist መካከል የሚደረጉ ሽግግሮች፣ ራስ-ሰር ማጫወት እና የሚደገፉ የተካተቱ ማጫወቻዎች ከfeed ማጣሪያ ጋር ተመሳሳይ የቪዲዮና የቻናል መፍቀድ ደንቦችን ያልፋሉ፤ ስለዚህ ማጣሪያውን አያልፉም።",
+      "ዕለታዊ የYouTube ጊዜ ገደቦች አሁን በንቁው ፕሮፋይል ላይ ይተገበራሉ፣ የቀረውን ጊዜ ያሳያሉ፣ ከዳግም ማስነሳት በኋላም ይቀጥላሉ እና PINን በመጠቀም ፕሮፋይል መቀየር የሚቻልበት ሙሉ ገጽ የጊዜ ማብቂያ ማያ ይጠቀማሉ። በፈቃደኝነት የሚጀመሩ የራስ-ቁጥጥር ክፍለ ጊዜዎች የመረጡትን ደንቦች ቆጠራው እስኪያበቃ ድረስ ይቆልፋሉ።",
+      "የታገዱ ደንቦችና የተፈቀዱ ደንቦች ለMain እና Kids የተለያዩ ስብስቦች ሆነው ይቆያሉ፤ የላይኛው Blocklist ወይም Whitelist ፖሊሲ የትኛው ስብስብ እይታን እንደሚቆጣጠር ይመርጣል።",
+      "ትላልቅ የBlockTube እና የሚተዳደሩ የደንብ ዝርዝሮች ማስመጣት ቅድመ እይታ፣ የአቅም ምርመራ፣ በግብይት የተመሠረተ መመለስ እና ከጽሑፍ በኋላ ማረጋገጫ ይጠቀማሉ። የታከሉ፣ የተደጋገሙ፣ የተዘለሉ፣ የቻናል፣ የቁልፍ ቃል፣ regex እና የቪዲዮ-ID ብዛቶችም በግልጽ ይታያሉ።",
+      "የምድብ ማጣሪያ የYouTube ይፋዊውን `microformat.playerMicroformatRenderer.category`፣ የተገደበ በተመሳሳይ አመጣጥ የPlayer metadata መጫን እና የተመረጡትን ምድቦች ማገድ ወይም እነሱን ብቻ መፍቀድ የሚሉ ግልጽ ምርጫዎችን ይጠቀማል። Watch፣ rail፣ Mix፣ አስተያየቶችና renderer ባለቤትነትም ይበልጥ በደህና ይተዳደራሉ።",
+      "Advert Void አሁን በYouTube Main እና Kids ላይ ለአዳዲስና ለተሻሻሉ ፕሮፋይሎች በነባሪ ንቁ ነው። የጋራው Web runtime ተጨማሪ ጥያቄ ሳያደርግ በPlayer የታዩ የማስታወቂያ ዕቅድ መስኮችን ያስወግዳል፤ native playback ያልተመሰሉ የዕቅድ ውሂቦችን ይጥላል ወይም ሲታይ ጥሬውን Reel ምላሽ ያስተካክላል፣ ጥንቃቄ ያለው አማራጭ አያያዝም የሚያልፉ መቋረጦችን ይቆጣጠራል።",
+      "ሙከራ ላይ ያለው የተነገረ ቋንቋ ማጣሪያና የመጀመሪያ ድምፅ ምርጫ ሲገኝ ከYouTube Player ማስረጃ ይጠቀማሉ፤ የምክር metadata ሲጎድል ግን ይዘቱን እንዲያልፍ ይፈቅዳሉ።",
+      "ይህ ልቀት YouTube Playablesን መደበቅ፣ የአሁኑን camelCase renderer እና collaboration አያያዝ፣ የተሻለ የHelp ንባብና ፍለጋ፣ የተጠራራ የpopup እና dashboard መቆጣጠሪያዎችን፣ እንዲሁም የAndroid Google Play ህዝባዊ መቅረብና የiOS ሁኔታ መረጃን ያካትታል።",
+      "Settings ላይ ለመሣሪያው ሁሉ የሚሠራ እና በነባሪ ያልተመረጠ የራስ-ሰር ዳግም መጫን ማስታወሻዎችና በYouTube እና YouTube Kids ላይ የWhat's New ሰንደቆች መተው ምርጫ ተጨምሯል። የdashboard የWhat's New ገጽ በእጅ ሊከፈት ይችላል።"
+    ]
+  },
+  "3.3.5": {
+    "ctaLabel": "አዲሱን ይመልከቱ",
+    "headline": "የYouTube ችግር መመለሻ እና የShorts ቻናል እገዳ ቀደም ብሎ",
+    "summary": "ይህ ልቀት በክፍት የYouTube ትሮች ውስጥ የcontent runtime ብዙ ጊዜ መጫንን ያስተካክላል፣ የቻናል ደንቦች ወይም whitelist ሁነታ ንቁ ሲሆኑም የሚታየውን የShorts ቻናል ማንነት ቀድሞ ይፈታል።",
+    "bannerSummary": "የተደጋጋሚ runtime መጫን ስህተትን ያስተካክላል፣ የShorts ቻናል ማንነትን ቀድሞ ይለያል።",
+    "highlights": [
+      "ጫን/አዘምን/ፕሮፋይል ማደስ አሁን ቀድሞ በክፍት ያሉ የYouTube ትሮች ላይ የmanifest content scriptsን እንደገና አይጫንም፤ ይህም ተደጋጋሚ `Identifier ... has already been declared` የሚል የsyntax ስህተት ይከላከላል።",
+      "ቀድሞ ክፍት የነበሩ የYouTube ትሮች አሁንም የሚተዳደሩ የጊዜ ገደብና runtime ምርመራዎችን ያገኛሉ፣ ሳይደጋገሙ የscript መግለጫዎችን ግን።",
+      "የቻናል blocklist ደንቦች ወይም whitelist ሁነታ ንቁ ሲሆኑ፣ የሚታዩና በቅርብ የሚታዩ Shorts አሁን ነባሩን የተገደበ የbackground `/shorts/<videoId>` ባለቤት መፍቻ ይጠቀማሉ።",
+      "የተማሩ የShorts ቪዲዮ-ወደ-ቻናል ካርታዎች ይቀመጣሉ እና ወዲያውኑ እንደገና ይሠራሉ፤ ስለዚህ የታገዱ ቻናሎች Shorts ከመደበቃቸው በፊት hover ወይም menu መንካት አያስፈልግም።",
+      "እንደ `.shortsLockupViewModelHost` እና `.ytGridShelfViewModelGridShelfItem` ያሉ የdesktop Shorts hosts በተለዩ የShorts fallback እና enrichment መንገዶች ውስጥ ተካትተዋል።",
+      "በBlocklist ሁነታ ማንነቱ እስኪፈታ ድረስ ያልታወቁ Shorts አይደበቁም፤ whitelist ሁነታ ግን በነባሩ pending መንገድ የበለጠ ጥብቅ ይቆያል።",
+      "3.3.4 የYouTube ችግር ሪፖርቱ ሲመረመር ወደ 3.3.2 ጥቅል የተመለሰ የstore ልቀት እንደነበር ተመዝግቧል።"
+    ]
+  },
+  "3.3.4": {
+    "ctaLabel": "አዲሱን ይመልከቱ",
+    "headline": "የstore መመለሻ ወደ 3.3.2 ጥቅል",
+    "summary": "3.3.4 የbrowser store መመለሻ ልቀት ነበር፤ የYouTube ችግር ሪፖርቱ ከ3.3.3 ጋር ሲመረመር ቀድሞውን 3.3.2 ጥቅል ተጠቅሟል።",
+    "bannerSummary": "የstore መመለሻ፦ የYouTube ችግር ሲመረመር 3.3.4 የ3.3.2 ጥቅልን ተጠቅሟል።",
+    "highlights": [
+      "ለ3.3.4 ከምንጭ ኮድ የመጣ አዲስ ባህሪ እንዳለ አልተገለጸም።",
+      "የYouTube ችግር #64 ሲመረመር፣ የተጠረጠረውን 3.3.3 ጥቅል ከstoreዎች ለማስወገድ መመለሻው ተጠቅሟል።",
+      "ቀጣዩ ከምንጭ ኮድ የተለቀቀው 3.3.5 የruntime ድግግሞሽ መጫንና የShorts ማንነት መፍቻ ማስተካከያዎችን ይዞ መጣ።"
+    ]
+  },
+  "3.3.3": {
+    "ctaLabel": "አዲሱን ይመልከቱ",
+    "headline": "የቤተሰብ መሣሪያ ዝማኔዎች፣ የደንብ ዝርዝሮች፣ የቀን ቁልፍ ቃላትና የYouTube DOM ማደስ",
+    "summary": "ይህ ልቀት የወላጅ/እንክብካቤ ሰጪ ቁጥጥርን ይበልጥ ግልጽ ያደርጋል፣ በግምገማ የሚያልፉ የደንብ ዝርዝር ማስመጣትንና በቀን የተገደቡ የቁልፍ ቃል ደንቦችን ይጨምራል፣ የHome/Internet Pickup ሞዴሉን ይመዘግባል እና ለአሁኑ የYouTube/YTM አወቃቀር ማጣሪያን ያድሳል።",
+    "bannerSummary": "የቤተሰብ መሣሪያ ዝማኔዎች፣ በግምገማ የሚያልፉ የደንብ ዝርዝሮች፣ በቀን የሚገደቡ ቁልፍ ቃላት፣ ወላጅን የሚያስቀድም እገዛ እና ከአሁኑ YouTube/YTM DOM ጋር ተኳሃኝነት።",
+    "highlights": [
+      "የወላጅ/እንክብካቤ ሰጪ ፕሮፋይሎች የተጠበቁ ፕሮፋይሎችን ሊቆጣጠሩ፣ የልጅ/የተጠበቁ ደንቦችን ከወላጅ dashboard ሊያርትዑ እና የጸደቁ ዝማኔዎችን ወደ የተረጋገጡ የተጠበቁ መሣሪያዎች ሊልኩ ይችላሉ።",
+      "የFamily Device Updates መረጃ አሁን በቀጥታ የሚላክ Send Updateን፣ ግልጽ Home Pickupን እና ግልጽ Internet Pickupን ያብራራል፤ የpickup አገልግሎቶች የሥልጣን ምንጭ እንዳልሆኑም ይገልጻል።",
+      "የተጠበቁ ፕሮፋይሎች የጊዜ ገደቦች አሁን በአሮጌና በአዲስ የYouTube ትሮች ይመረመራሉ፣ የተረጋጋ የጊዜ ማብቂያ ማያ ያሳያሉ እና ተጨማሪ ጊዜ ጥያቄዎችን ለወላጅ ግምገማ ይመዘግባሉ።",
+      "የደንብ ዝርዝር ማስመጣት CSV፣ TXT፣ ቀላል JSON፣ BlockTube ዓይነት JSON እና ጥሬ HTTPS URLዎችን ይደግፋል፤ ከመተግበሩ በፊት ቅድመ እይታ፣ Main/Kids/Both መምረጥ፣ አብነቶች፣ ዝርዝር ማስተዳደር፣ ማቆም/መቀጠል/ማስወገድ፣ ያረጀ መሆኑን ማረጋገጥና ማደስ አሉ።",
+      "በቀን የተመሠረተ ማጣሪያ ቁልፍ ቃልን ከሰቀላ ቀን ጀምሮ፣ እስከ ቀኑ ድረስ ወይም በቀኖች መካከል ብቻ እንዲተገበር ይፈቅዳል። YouTube ሲያቀርበው የአስተያየት ማጣሪያ የዋናውን ቪዲዮ ሰቀላ ቀን ይጠቀማል።",
+      "የHelp እና dashboard መቆጣጠሪያዎች ቀለል ያለ ወላጅን የሚያስቀድም ቋንቋ፣ ፈጣን help bubbles እና Exact፣ Comment፣ Date፣ Filter All፣ PIN፣ የደንብ ዝርዝሮችና የመሣሪያ ዝማኔዎች ላይ ግልጽ ማብራሪያዎችን ይጠቀማሉ።",
+      "dashboard አሁን በንቁ Android የተዘጋ ሙከራ ላይ ያሉ ተሳታፊዎችን hello@filtertube.in ኢሜይል እንዲልኩ ይጋብዛል፤ YouTube የገጽ አወቃቀር ሲቀየር የማጣሪያ ብልሽቶችን ሪፖርት እንዲያደርጉም የሚታይ ማስታወሻ ይቆያል።",
+      "የYouTube desktop lockup selectorዎችና የYTM mobile camelCase DOM ተመዝግበዋል፤ ይህ እውነተኛ የቪዲዮ ካርዶች እንዲቀጥሉ ያጣራል፣ የWatch ቺፕ መስመሮች ግን fallback ሥራ እንዳያነቁ ወይም ማሸብለል እንዳያንቀሳቅሱ ያደርጋል።",
+      "አሁንም የተለዩ የሆኑት፦ ራስ-ሰር የLAN አቻ መፈለግ፣ በhost የሚሰጥ FilterTube Internet Pickup አገልግሎት፣ ያለ ግልጽ እርምጃ የሚደረጉ ይፋዊ የauto-subscribe ካታሎጎች፣ የnative Android/iOS እኩልነት እና በተጫኑ ሁለት መሣሪያዎች ላይ የተደረገ የእጅ ሙከራ ማስረጃ።"
+    ]
+  },
+  "3.3.2": {
+    "ctaLabel": "አዲሱን ይመልከቱ",
+    "headline": "የሞባይል/ታብሌት መተግበሪያ MVP፣ ለስላሳ YouTube እና የበለጠ ደህና whitelist",
+    "summary": "ይፋዊ የመተግበሪያ ልቀት መረጃ ለAndroid ስልክ/ታብሌት የመጨረሻ ሙከራና ለiOS/iPad ሁኔታ ዝግጁ ነው፤ የextension dashboard ወደ እነዚህ መንገዶች ይመራል፣ ንቁ ደንቦች ሳይኖሩ የYouTube SPA ሥራ ይቀንሳል፣ የwhitelistና end-screen ትክክለኛነት ማስተካከያዎችም ተካትተዋል።",
+    "bannerSummary": "የAndroid/iOS የመተግበሪያ ሁኔታ፣ የቀለለ YouTube SPA ሥራ፣ እና የwhitelist/end-screen ማስተካከያዎች።",
+    "highlights": [
+      "የድረ-ገጹ downloads hub እና የextension dashboard አሁን የAndroid ስልክ/ታብሌት የመጨረሻ ሙከራ መንገድንና የiOS/iPad TestFlight/App Store ሁኔታ መንገድን ያሳያሉ።",
+      "የAndroid ስልክ/ታብሌት ልቀት ዝግጅት በጋራ የFilterTube runtime፣ YouTube Main፣ ይፋዊ YouTube Kids መዳረሻ፣ ፕሮፋይሎች፣ PIN ደንቦችና Nanah ማመሳሰል ላይ ተመስርቶ ተመዝግቧል።",
+      "YouTube SPA የአፈጻጸም ማሻሻያዎች ንቁ ደንቦች ወይም የመንገድ ፍላጎት ሳይኖር ተጨማሪ JSON clone/parse/replay፣ DOM fallback፣ quick-block፣ fallback-menu እና whitelist-pending ሥራን ይዘላሉ።",
+      "የproduction extension አካባቢዎች መደበኛ የconsole መዝገብ መጻፍን በግልጽ debug mode ብቻ ይፈቅዳሉ፤ ስለዚህ በYouTube ፈጣን መንገዶች መደበኛ አሰሳ ይህን የኮንሶል ጫና አይሸከምም።",
+      "የwhitelist ልቀት ማስተካከያዎች የShorts ፈጣሪ fallbackን፣ የዝርዝር ዒላማ ማስተላለፍን እና ለend-screen መቆጣጠሪያዎች የአጭር autoplay/watch-next endpoint ማጣሪያን ያካትታሉ።",
+      "የFilterTube DOM ሁኔታ ባህሪያት አስፈላጊውን runtime ሁኔታ እየጠበቁ ሰፊ የሚታዩ `data-filtertube-*` ፍንጮችን እንዲቀንሱ ተጠናክረዋል።",
+      "Accounts & Sync የFamily Device Updatesን Send Update፣ አማራጭ Home Pickup እና በሌሉበት/በኋላ የሚከፈት Internet Pickup ዙሪያ ያብራራል፤ ወላጆች ቀጥተኛ ማመሳሰል፣ የቤት መቀበል፣ የኦንላይን መቀበልና የሥልጣን ምንጭ ያልሆነውን ሊለዩ ይችላሉ።",
+      "የተጠበቁ ፕሮፋይሎች የጊዜ ገደቦች አሁን ለዕለታዊ የYouTube ጊዜ በጀት፣ የጊዜ ማብቂያ ማያ፣ ተጨማሪ ጊዜ ጥያቄ ታሪክና የወላጅ/እንክብካቤ ሰጪ ማጽደቅ የልቀት ማብራሪያ አላቸው።",
+      "Nanah/ማስመጣት መንገዶች ከቻናል የተነሳውን Filter All የቁልፍ ቃል ባለቤትነት በextensionና native app payloadዎች መካከል ይጠብቃሉ፤ ይህም የረድፍ ቀለም፣ የsource-badge metadata እና የማጣመር አውድን ያካትታል።"
+    ]
+  },
+  "3.3.1": {
+    "ctaLabel": "አዲሱን ይመልከቱ",
+    "headline": "በመሣሪያዎች መካከል በP2P እና ያለ 3ኛ ወገን ሰርቨር ደህንነቱ የተጠበቀ ማመሳሰል",
+    "summary": "Accounts & Sync አሁን Nanahን እንደ ሶስት ቀላል መንገዶች ያቀርባል፤ የወላጅ/ልጅ ዒላማ ማድረግና እንደገና መገናኘት ደንቦች ተጠናክረዋል፣ ለእውነተኛ አጠቃቀምም ብዙ ሰነዶች ተጨምረዋል።",
+    "bannerSummary": "ሶስት ግልጽ የNanah መንገዶች፣ የተሻለ የዒላማ ምርጫና እንደገና የመገናኘት ደንቦች።",
+    "highlights": [
+      "Accounts & Sync አሁን በሶስት ግልጽ መንገዶች ይጀምራል፦ ይህን ፕሮፋይል አንድ ጊዜ ላክ፣ ወላጅ ልጅን ይቆጣጠር፣ ወይም ሙሉ መለያን አንቀሳቅስ።",
+      "የላቁ Nanah ቁጥጥሮች አሁንም ይገኛሉ፣ ነገር ግን ከዋናው ፍሰት ይልቅ በAdvanced ክፍል ውስጥ ተደብቀዋል።",
+      "የወላጅ/ምንጭ ክፍለ ጊዜዎች የርቀት ዒላማ ፕሮፋይልን በቀላሉ ይመርጣሉ፤ የተተዳደሩ አገናኞች ሲቀመጡም ወደ ላኪው ይመለሳሉ፣ ስለዚህ ሁለቱም መሣሪያዎች ተመሳሳይ የእምነት መዝገብ ይይዛሉ።",
+      "የታመኑ አገናኞች ከrefresh በኋላ ይቀመጣሉ፤ እንደገና መገናኘት ግን አዲስ የቀጥታ ክፍለ ጊዜ ነው፣ የተደበቀ የbackground ማመሳሰል አይደለም።",
+      "የተቆለፉ የልጅ ዝማኔዎች፣ እንደገና የመገናኘት ደንቦች፣ የመሣሪያ ስም ማስቀመጥ እና ራስን የመቀላቀል/ክፍለ ጊዜ ማቃጠል መከላከያዎች ለደህንነቱ የተሻለ የወላጅ ቁጥጥር ተጠናክረዋል።",
+      "README፣ Architecture፣ Technical፣ Functionality፣ Profiles & PIN፣ project plan፣ user guide እና concern tracker አሁን ያለውን የNanah desktop ሁኔታ በበለጠ ዝርዝር ይገልጻሉ።"
+    ]
+  },
+  "3.3.0": {
+    "ctaLabel": "አዲሱን ይመልከቱ",
+    "headline": "የcollaboration መመለሻ + በተለያዩ አሳሾች መካከል የማስመጣት ጥንካሬ",
+    "summary": "የWatch/YTM collaboration ምናሌዎች ሙሉ rosterዎችን በተሻለ ያገኛሉ፣ የsubscriptions ማስመጣት በአሳሾች ሁሉ የበለጠ ጠንካራ ሆኗል፣ እና በተወሰኑ ገጾች ላይ የwhitelistና Quick Block ማስተካከያዎች በ3.3.0 ተካትተዋል።",
+    "bannerSummary": "ሙሉ የcollaborator ዝርዝር መመለስ፣ ጠንካራ የsubscription ማስመጣት እና የwhitelist/Quick Block ማስተካከያዎች።",
+    "highlights": [
+      "የሞባይል YouTube home/watch-next/Mix ዓይነት ካርዶች አሁን በተመሳሳይ የ3-dotና collaborator መመለሻ ሂደት ይሳተፋሉ፤ ያልተሟላ ነጠላ-ቻናል ምናሌ አይቀርም።",
+      "የWatch ገጽ ቀኝ የጎን ክፍል፣ playlist ረድፎችና Watch ዓይነት lockupዎች አሁን ሙሉ collaborator rosterን ሊመልሱ እና ንቁውን የ3-dot ምናሌ በቦታው ሊያድሱ ይችላሉ።",
+      "የMix/Watch መመለሻ ይበልጥ ደህና ነው፦ እውነተኛ የcollaboration ካርዶች በትክክል ይሻሻላሉ፣ `&` ወይም `and` ያለባቸው መደበኛ ስሞች ግን በስህተት collaboration ምናሌ አይሆኑም።",
+      "Quick Block በተወሳሰቡ ገጾች ላይ የበለጠ የተረጋጋ ነው፦ በብዙ የdesktop ካርዶች ላይ ይታያል፣ የሞባይል search-suggestion dropdownን ይርቃል እና በሞባይል watch-next አቀማመጥ ላይ በተሻለ ይመራል።",
+      "የተመዘገቡ ቻናሎች whitelist ማስመጣት የቅርብ ጊዜ የገጽ browse ምላሾችን ይጠብቃል፣ እውነተኛ /feed/channels እድገትን ይመርጣል እና /feed/channelsን የሚታይ የማስተዳደሪያ ገጽ አድርጎ ያቆያል።",
+      "የwhitelist ማጣሪያ በYouTube desktop/mobile rendererዎች ሁሉ ይበልጥ ጥብቅና ደህና ሆኗል፤ የፈጣሪ ገጽ አያያዝና የMixes/subscriptions መደበቂያ መቆጣጠሪያዎችም ተሻሽለዋል።",
+      "አዲስ ቁጥጥሮችና ማስዋቢያዎች፦ የChannel Management ረድፎች ወደ እውነተኛ የቻናል ገጾች ያገናኛሉ፣ የ3-dot block ንጥል ሊጠፋ ይችላል፣ እና የተመሰጠረ Firefox ወደ ውጭ መላክ የበለጠ ደህና fallback ይጠቀማል።"
+    ]
+  },
+  "3.2.9": {
+    "ctaLabel": "አዲሱን ይመልከቱ",
+    "headline": "የተመዘገቡ ቻናሎች ማስመጣት + Whitelist + የPIN ጥበቃ ማስተካከያ",
+    "summary": "የንቁ YouTube መለያ የsubscriptions ዝርዝርን ወደ whitelist ከግልጽ የሁነታ መቀየር ትርጉምና ከበለጠ አስተማማኝ /feed/channels መነሻ ሂደት ጋር ያስመጣል።",
+    "bannerSummary": "ከንቁው YouTube መለያ የተመዘገቡ ቻናሎችን ወደ whitelist ማስመጣት፣ የተሻለ መነሻና ግልጽ የሁነታ ምርጫዎች።",
+    "highlights": [
+      "በNew Tab View ውስጥ የተመዘገቡ ቻናሎች ከንቁ የተገባበት YouTube መለያ ወደ whitelist ሊገቡ ይችላሉ።",
+      "የማስመጣት መነሻ አሁን ያለ የYouTube ትርን እንደገና ይጠቀማል፣ ወደ /feed/channels ይመራዋል እና ከመጀመሩ በፊት FilterTube bridge እስኪዘጋጅ ይጠብቃል።",
+      "የwhitelist ጽሑፍ ግልጽ ነው፦ Import Only የblocklistን አይነካም፣ Import + Turn On Whitelist ግን ነባሩን ከblocklist ወደ whitelist የማዛወር ሂደት ይከተላል።",
+      "ሰነዶች አሁን የማስመጣት አወቃቀር፣ የFEchannels ጥያቄ ፍሰት፣ የrenderer ምንጮችና የwhitelist ትርጉምን በበለጠ ዝርዝር ይሸፍናሉ።"
+    ]
+  },
+  "3.2.8": {
+    "ctaLabel": "አዲሱን ይመልከቱ",
+    "headline": "የገጽታ ማደስ + የተፈጥሮ የUI አቀማመጥ ማስተካከያ",
+    "summary": "የpopup እና dashboard ገጾች አሁን የተረጋጋውን scenic የገጽታ ስርዓት በተጠበበ አቀማመጥ፣ በጠነከሩ የቀለም ሁኔታዎችና በተሻለ የብርሃን/ጨለማ ሚዛን ይጠቀማሉ።",
+    "bannerSummary": "ተረጋጋ የscenic ገጽታ፣ የተጠበበ አቀማመጥና የተሻለ ብርሃን/ጨለማ ሚዛን።",
+    "highlights": [
+      "የScenic UI ማደስ፦ popup እና dashboard አሁን የአካባቢያዊውን hero ቪዲዮ እንደ የአካባቢ ዳራ ሚዲያ የሚጠቀም ተረጋጋ የምርት አቀማመጥ ይጋራሉ።",
+      "የብርሃንና ጨለማ ገጽታ ማስተካከያ፦ ጨለማ ሁነታ ዳራው የታጠበ የመሃል ብርሃን ሳይኖረው እንዲታይ ያደርጋል፣ ብርሃን ሁነታ ደግሞ ንጹህ ግልጽነት ይጠቀማል።",
+      "የresponsive ማጽዳት፦ የpopup ክፍተቶች ተጠበቡ፣ የprofile dropdown አነሰ፣ የHelp/Support ካርድ አቀማመጥ ተሻሻለ እና በማጣሪያ ገጾች ሁሉ የሞባይል ተስማሚነት ተሻሻለ።",
+      "የቁጥጥር ቀለም ማስተካከያ፦ የነቃ/የጠፋ ሁኔታዎች፣ pill ቀለሞች፣ የፍለጋ መስኮችና የማስመጣት/ወደ ውጭ መላክ እርምጃዎች በሁለቱም ገጽታዎች ይበልጥ ግልጽ ሆነዋል።"
+    ]
+  },
+  "3.2.7": {
+    "ctaLabel": "አዲሱን ይመልከቱ",
+    "headline": "የምድብ ማጣሪያዎች + የQuick Block ማንዣበብ መስቀል + የሞባይል 3-dot UI",
+    "summary": "አዲስ የምድብ ማጣሪያ፣ በአንድ መንካት የሚሠራ ፈጣን መስቀል እገዳ በነባሪ ነቅቷል።",
+    "bannerSummary": "የYouTube ምድቦችን ያጣሩ፤ በነባሪ የነቃ ፈጣን መስቀል እገዳን በአንድ መንካት ይጠቀሙ።",
+    "highlights": [
+      "የምድብ ማጣሪያ፦ ቪዲዮዎችን በYouTube ምድብ (ሙዚቃ፣ ጨዋታ፣ ትምህርት ወዘተ) መሠረት ያግዱ ወይም ይፍቀዱ።",
+      "Quick Cross Block በነባሪ በርቷል፦ `Show Quick Cross Block button` በv3.2.7 በነባሪ ተመርጧል (ተጠቃሚዎች አሁንም ሊያጠፉት ይችላሉ)።",
+      "የሞባይል እገዳ፦ በYT Mobile ላይ ለ3 Dot UI እና Quick Cross Block የተሻለ ድጋፍ፤ አሁን በHome Page ላይ ይሠራል።"
+    ]
+  },
+  "3.2.6": {
+    "ctaLabel": "አዲሱን ይመልከቱ",
+    "headline": "የUI/UX ውበት ማሻሻያ እና በይዘት የተመሠረተ ማጣሪያ",
+    "summary": "ዘመናዊ ንድፍ ያለው ሙሉ የፊደል ማሻሻያ፣ ሶስት አዳዲስ የይዘት ማጣሪያዎች (ቆይታ፣ ቀን፣ አቢይ ፊደል)።",
+    "bannerSummary": "የተሻለ የፊደል ንድፍ፣ የቆይታ/ቀን/አቢይ-ፊደል ማጣሪያ እና የdashboard ማሻሻያዎች።",
+    "highlights": [
+      "የፊደል ማሻሻያዎች፦ ለቀላል ንባብ ዘመናዊና የተጠራራ የፊደል መጠን መለኪያ።",
+      "በይዘት የተመሠረቱ ማጣሪያዎች፦ ቆይታ (ረዘም/አጭር/በመካከል)፣ የሰቀላ ቀን (አዲስ/አሮጌ/በመካከል) እና የአቢይ ፊደል ለይቶ ማወቅ (clickbait ርዕሶች)።",
+      "የvideoMetaMap ስርዓት፦ ቋሚ የቪዲዮ metadata ማከማቻ ከብልህ የቡድን ማዘመን ጋር (75ms መስኮት፣ ከፍተኛው 1500 መዝገብ)።",
+      "የDashboard ማሻሻያዎች፦ በገጽታ የተለዩ ስታቲስቲክሶች (Main እና Kids)፣ የተሻሻሉ የስታቲስቲክስ ካርዶች እና የልገሳ ማስተዋወቂያ ካርድ።"
+    ]
+  },
+  "3.2.5": {
+    "ctaLabel": "አዲሱን ይመልከቱ",
+    "headline": "Whitelist ሁነታ ዋና ሆነ + መረጋጋት",
+    "summary": "Whitelist ሁነታ አሁን ዋናው የመፍቀድ-ብቻ መንገድ ሆኗል፤ ብልህ መረጃ ማውጣት፣ የplaylist ጥበቃዎችና የCPU ጭነት ቅነሳ አሉት።",
+    "bannerSummary": "ዋና የwhitelist ሁነታ፣ የተሻለ ቻናል መለየት፣ የplaylist ጥበቃና የCPU ጭነት ቅነሳ።",
+    "highlights": [
+      "የተሻሻለ whitelist ሁነታ፦ ቃላትና UI ከሙከራ ላይ ነው የሚል ምልክት ተነስቶ መደበኛ ሆነ።",
+      "የ3-dot ምናሌ ማጽዳትና ለwhitelist ገጾች የፍለጋ-ሁለተኛ አያያዝ።",
+      "ከብዙ ምንጮች የቻናል መለየት፦ የthumbnail መልሕቆችና የወላጅ ኮንቴይነሮች።",
+      "ሁነታን የሚያውቅ የሁኔታ ክትትል፣ የማረጋገጫ መገናኛዎችና የbridge ማመቻቸቶች።",
+      "የPlaylist መረጋጋት፦ የተመረጡ ረድፎች በሚታዩበት ቦታ ይቆያሉ፤ ገና ያልተፈቱ ማንነቶች የታገዱ ረድፎችን አያሳዩም።",
+      "የKids ሁነታ whitelist ድጋፍ ከዜሮ-ኔትወርክ አወቃቀር ጋር።"
+    ]
+  },
+  "3.2.4": {
+    "ctaLabel": "አዲሱን ይመልከቱ",
+    "headline": "የተሻሻለ Whitelist ሁነታ + የአፈጻጸም ማመቻቸቶች",
+    "summary": "በሙከራ ላይ ባለው whitelist ሁነታ ላይ በተጠቃሚ ተሞክሮ፣ በአፈጻጸም ማመቻቸትና በተስፋፋ የKids ሁነታ ድጋፍ ላይ ጉልህ ማሻሻያዎች።",
+    "bannerSummary": "የwhitelist ተሞክሮ፣ ፍጥነት፣ የውሂብ መጥፋት መከላከልና የKids ሁነታ ድጋፍ ተሻሽለዋል።",
+    "highlights": [
+      "ሙከራ፦ የተሻሻለ whitelist ሁነታ ከ3-dot ምናሌ ማጽዳት፣ ብልህ የፍለጋ ሂደትና ሁነታን ከሚያውቅ የሁኔታ ክትትል ጋር።",
+      "የአፈጻጸም ጭማሪ፦ በBridge ደረጃ ያሉ ማመቻቸቶችና የተመረጠ ሂደት የCPU ጭነትን ይቀንሳሉ።",
+      "የUI ማሻሻያዎች፦ ሁነታ ሲቀየር የማረጋገጫ መገናኛዎች ያልታሰበ የውሂብ መጥፋትን ይከላከላሉ።",
+      "የKids ሁነታ ድጋፍ፦ whitelist ባህሪ በYouTube Kids ላይ በዜሮ-ኔትወርክ አወቃቀር ይሠራል።",
+      "የፍለጋ ማመቻቸት፦ በቀኝ የጎን ክፍል ያሉ የWatch ካርዶች የUI መጨናነቅን ለመከላከል በብልህነት ይያዛሉ።",
+      "የቻናል መለየት፦ ከብዙ ምንጮች የሚመጣ ማንነት መፍታት ከthumbnail መልሕቆችና የወላጅ ኮንቴይነሮች ጋር።",
+      "ሁነታ መቀየር፦ በblocklist/whitelist መካከል ብልህ ዳግም ሂደት ያለው ቀላል ሽግግር።"
+    ]
+  },
+  "3.2.3": {
+    "ctaLabel": "አዲሱን ይመልከቱ",
+    "headline": "በሙከራ ላይ ያለ Whitelist ሁነታ + የUI ማሻሻያዎች",
+    "summary": "ለ'የተፈቀዱትን ብቻ' ማጣሪያ የalpha whitelist ልቀት፣ በተጨማሪም የUI ዝማኔዎችና የሞባይል ምናሌ ድጋፍ።",
+    "bannerSummary": "የalpha whitelist ሁነታ፣ በpopup እና tab view ላይ ቀላል መቀያየርና የሞባይል ምናሌ ድጋፍ።",
+    "highlights": [
+      "ሙከራ፦ whitelist ሁነታ በግልጽ የተፈቀዱ ቻናሎች/ቁልፍ ቃላት ላይ ያልሆነን ሁሉንም ይዘት ይደብቃል።",
+      "ሁለት የማጣሪያ ሁነታዎች፦ በpopup እና tab view ውስጥ በblocklistና whitelist መካከል በቀላሉ ይቀያይሩ።",
+      "የዝግጅት ማዛወር፦ ቻናሎችን ለመሰብሰብ ወደ blocklist ይቀይሩ፣ ከዚያም ወደ whitelist ያዋህዱ።",
+      "በwhitelist ሁነታ የWatch ገጽ ጥበቃ የቪዲዮ ማጫወት ተግባርን ይጠብቃል።",
+      "Optimistic UI ዝማኔዎች ይዘቱን ወዲያውኑ ይደብቃሉ፤ እገዳው ካልተሳካ በራስ-ሰር ይመልሳሉ።",
+      "የተሻሻለ የሞባይል ምናሌ ድጋፍ ከትክክለኛ የYouTube mobile renderer አያያዝ ጋር።",
+      "ሁሉም የconsole መዝገቦች በdebug ባንዲራ ስር ተደርገዋል፣ የproduction ድምፅን ለመቀነስ።"
+    ]
+  },
+  "3.2.2": {
+    "ctaLabel": "አዲሱን ይመልከቱ",
+    "headline": "የUI/UX ማሻሻያዎች እና የDebug መቆጣጠር",
+    "summary": "Optimistic ዝማኔዎች፣ የሞባይል ምናሌ ድጋፍ፣ debug የሚቆጣጠረው መዝገብ መጻፍ፣ የማሸብለል ጥበቃና የሁኔታ አስተዳደር ማሻሻያዎች።",
+    "bannerSummary": "በፍጥነት የሚታይ ማጣሪያ፣ የሞባይል ምናሌ ድጋፍ፣ debug ቁጥጥር እና የማሸብለል ጥበቃ።",
+    "highlights": [
+      "Optimistic UI ዝማኔዎች፦ ይዘት ወዲያውኑ ይደበቃል፣ እገዳው ካልተሳካ ግን በራስ-ሰር ይመለሳል።",
+      "ለytm-menu-popup-renderer የተሻሻለ የሞባይል ምናሌ ድጋፍ ከትክክለኛ renderer መለያዎች ጋር።",
+      "በ`window.__filtertubeDebug` የሚቆጣጠር መዝገብ መጻፍ።",
+      "በDOM fallback ጊዜ ድንገተኛ የገጽ መዝለልን ለመከላከል የማሸብለል አቀማመጥን ማስጠበቅ።",
+      "የቻናል enrichment ገደብ (በአንድ session 10) የbackground ጥያቄዎችን ለመቀነስ።",
+      "በrequestIdleCallbackና batching የሚመራ በidle ጊዜ ማሳየት።",
+      "ያለ አስፈላጊነት ዳግም ማቅረብን ለማስወገድ ፊርማን በማነጻጸር ውጫዊ reloadን ማዘግየት።",
+      "የተመረጡ ማሳወቂያዎች፦ ፊርማው ሲቀየር ብቻ `load`፤ ካልተቀየረ `externalUpdate`።",
+      "በጋራ የglobal ሁኔታ በኩል የBridge ሁኔታን ማስተዳደር።"
+    ]
+  },
+  "3.2.1": {
+    "ctaLabel": "አዲሱን ይመልከቱ",
+    "headline": "ያለ መዘግየት ሂደት + የፍጥነት ጭማሪ",
+    "summary": "ዋና የአፈጻጸም ማመቻቸቶች UI መዘግየትን ያስወግዳሉ፤ በChromium አሳሾች ጥሩ ውጤትና በFirefox ጉልህ ማሻሻያ አሳይተዋል።",
+    "bannerSummary": "በከባድ ማጣሪያ ጊዜ የUI መቆምን የሚቀንስ ዋና የአፈጻጸም ማሻሻያ።",
+    "highlights": [
+      "በማመሳሰል ያልሆነ DOM ሂደት ዋናው የbrowser ክር እንዲተነፍስ ያደርጋል፣ በከባድ ማጣሪያ ጊዜም browser እንዳይቆም ይከላከላል።",
+      "የተቀናበረ regex እና የቻናል ማጣሪያ መሸጎጫ O(1) ፍለጋን ያቀርባሉ፣ የCPU ጭነትንም በ60–80% ይቀንሳሉ።",
+      "በቡድን የstorage ዝማኔዎች የI/O ሥራዎችን በ70–90% ይቀንሳሉ፣ በብልህ የ250ms ክፍተቶች ያዘምናሉ።",
+      "የተዘገየ የsettings ማደስ ከመጠን በላይ DOM እንደገና መሥራትን ይከላከላል።",
+      "የሩጫ ሁኔታ አስተዳደር እርስ በርስ የሚደራረቡ ሂደቶችን ይከላከላል እና ጥያቄዎችን በትክክል ወረፋ ውስጥ ያስገባል።",
+      "የChromium አሳሾች፦ ከ90% በላይ የመዘግየት ቅነሳ፤ Firefox፦ አሁንም እየተሻሻለ ያለ ጉልህ ማሻሻያ።"
+    ]
+  },
+  "3.2.0": {
+    "ctaLabel": "አዲሱን ይመልከቱ",
+    "headline": "ፈጣን እገዳ + ለKids ዜሮ-ኔትወርክ",
+    "summary": "3-dot ምናሌዎች የቻናል ስሞችን ወዲያውኑ ያሳያሉ፣ የኔትወርክ ጥያቄዎች በጣም ይቀንሳሉ እና YouTube Kids ሙሉ በሙሉ ከመስመር ውጭ ይሠራል።",
+    "bannerSummary": "ወዲያውኑ የሚታዩ የቻናል ስሞች፣ ያነሱ የኔትወርክ ጥያቄዎችና ለKids ከመስመር ውጭ እገዳ።",
+    "highlights": [
+      "3-dot ምናሌዎች አሁን ትክክለኛ የቻናል ስሞችን ወዲያውኑ ያሳያሉ፤ ከእንግዲህ 'Fetching...' መጠበቅ የለም።",
+      "የቻናል ማንነት ከተጠለፉ የYouTube JSON ምላሾች ይመጣል፣ ይህም የኔትወርክ ጥሪዎችን ይቀንሳል።",
+      "YouTube Kids አስተማማኝ እገዳ እንዲኖር ምንም የኔትወርክ fetch ሳያደርግ ይሠራል።",
+      "የጎደለ metadata በቁጥጥር ሥር በሆነ ፍጥነት ከbackground ይሞላል (የ6 ሰዓት የመጠበቂያ ጊዜ)።",
+      "የርዕስ ቻናሎች (ለምሳሌ 'Music - Topic') ያለ @handle በልዩ ሁኔታ ይያዛሉ።",
+      "ከASCII እና Mermaid ፍሰት ንድፎች ጋር አዲስ ሁሉን አቀፍ ሰነድ።"
+    ]
+  },
+  "3.1.9": {
+    "ctaLabel": "አዲሱን ይመልከቱ",
+    "headline": "ፕሮፋይልን የሚያውቁ ምትኬዎች + በመቆለፊያ የሚገደቡ መቆጣጠሪያዎች",
+    "summary": "ራስ-ሰር ምትኬና የይዘት መቆጣጠሪያዎች አሁን የፕሮፋይል መቆለፊያ/PINን ያከብራሉ፣ በፕሮፋይል መሠረት የሆኑ ቅንብሮችን ይወርሳሉ እና በመቆለፊያ መከላከያ ላይ እንኳ የፕሮፋይል dropdown ሊጫን ይችላል።",
+    "bannerSummary": "ምትኬዎችና መቆጣጠሪያዎች የፕሮፋይል መቆለፊያን ያከብራሉ፤ dropdown መንካትም ይቻላል።",
+    "highlights": [
+      "ራስ-ሰር ምትኬ ጠፍቶ ወይም ፕሮፋይሉ ተቆልፎ ሲሆን የሁነታ/ቅርጸት መምረጫዎች ይጠፋሉ፤ አዲስ ፕሮፋይሎችም የምትኬ ምርጫዎችን ይወርሳሉ።",
+      "ራስ-ሰር የምትኬ መርሃ ግብር ፕሮፋይል ሲፈጠር ወይም ሁነታ/ቅርጸት ሲቀየር ይጀምራል፣ ግን ራስ-ሰር ምትኬ ለዚያ ፕሮፋይል ከነቃ ብቻ።",
+      "ፕሮፋይሉ ሲቆለፍ የይዘት መቆጣጠሪያዎችና የምትኬ መቆጣጠሪያዎች ይጠፋሉ ወይም ይመለሳሉ፤ ዋና ያልሆኑ ፕሮፋይሎች የወጪ መላክ ወሰን በንቁው ፕሮፋይል ብቻ እንዲሆን ያስገድዳሉ።",
+      "የፕሮፋይል dropdown የz-index ማስተካከያ የመቆለፊያ ማስታወቂያ ሲታይም እንዲጫን ያደርገዋል።",
+      "ሰነዶች የprofile/PIN ሞዴልን፣ በፕሮፋይል የተለዩ ምትኬዎችንና የUI ቁጥጥር ደንቦችን አዘምነዋል።"
+    ]
+  },
+  "3.1.8": {
+    "ctaLabel": "አዲሱን ይመልከቱ",
+    "headline": "የድጋፍ ትር + አስተማማኝ ራስ-ሰር ምትኬዎች",
+    "summary": "አዲስ የድጋፍ ገጽ (Ko-fi) ተጨምሯል፣ ራስ-ሰር ምትኬዎችም አሁን በChromeና Firefox ሁለቱም አስተማማኝ ሆነዋል።",
+    "bannerSummary": "አዲስ የKo-fi ድጋፍ ገጽና በChrome/Firefox የሚሠሩ ራስ-ሰር ምትኬዎች።",
+    "highlights": [
+      "በdashboard ውስጥ Ko-fi embed ያለው የSupport ገጽ ተጨምሯል።",
+      "ራስ-ሰር ምትኬዎች አሁን አንድ ተደጋጋሚ ፋይል ላይ ይጻፋሉ፦ Downloads/FilterTube Backup/FilterTube-Backup-Latest.json።",
+      "በአሳሽ ሁሉ የሚሠራ የማውረድ ዘዴ፦ ሲገኝ Blob URL፣ በChrome MV3 service worker ግን data: URL fallback።",
+      "የdata: URL ገደቦች ምክንያት የFirefox ማውረድ ከእንግዲህ አይሳካም።"
+    ]
+  },
+  "3.1.7": {
+    "ctaLabel": "አዲሱን ይመልከቱ",
+    "headline": "YT Kids + ራስ-ሰር ምትኬ ድጋፍ",
+    "summary": "በYT Kids ላይ በቻናል የተመሠረተ ይዘትን ማገድ ይቻላል፣ ራስ-ሰር ምትኬዎችም አሁን ሊነቁና ሊጠፉ ይችላሉ።",
+    "bannerSummary": "በYouTube Kids ላይ የቻናል እገዳና ሊቀያየር የሚችል ራስ-ሰር ምትኬ።",
+    "highlights": [
+      "በYT Kids ላይ ሙሉ በሙሉ በቻናልና በቁልፍ ቃል የሚመራ እገዳ ታክሏል፤ በYT Kids ውስጥ ያለውን 3-dot ምናሌ UI በዝምታ በመከታተል ቻናሎችን ያግዳል።",
+      "ምትኬዎችን ለማንቃት/ለማጥፋት የSettings መቀያየሪያ ተጨምሯል (በተቻለ መጠን፣ Save As ጥያቄ የለም)።",
+      "ራስ-ሰር ምትኬዎች ወደ Downloads/FilterTube Backup/ ይቀመጣሉ፣ ብዙ ቅጂዎችም በተደጋጋሚ ይቀየራሉ (የቅርብ ጊዜዎቹ ይቀመጣሉ)።",
+      "በእጅ የሚላኩ ወደ ውጭ ፋይሎች አሁን ሳይጠየቁ ወደ Downloads/FilterTube Export/ ይወርዳሉ።"
+    ]
+  },
+  "3.1.6": {
+    "ctaLabel": "አዲሱን ይመልከቱ",
+    "headline": "የማስመጣት/ወደ ውጭ መላክ ድጋፍ + የልቀት ሰንደቅ",
+    "summary": "የሰንደቅ ጥሪ ቁልፍ ወደ What's New dashboard በቀጥታ ያገናኛል፣ የተመረጡ ካርዶችም ከተመሳሳይ JSON ይጫናሉ፤ ማስመጣት የc/ChannelName + merge ደንቦችን በበለጠ ትክክል ያከብራል።",
+    "bannerSummary": "ወደ What's New ቀጥተኛ አገናኝ፣ ከአንድ JSON የሚመጡ ካርዶችና የተሻለ ማስመጣት።",
+    "highlights": [
+      "የልቀት ማስታወሻዎች JSON አሁን የdashboard ካርዶችንና የYouTube ሰንደቅን ከአንድ የእውነት ምንጭ ያዘጋጃል።",
+      "ጥሪ ቁልፉ blockerዎች የchrome-extension:// አገናኞችን እንዳያግዱ በbackground messaging ወደ tab-view ይከፍታል።",
+      "የማስመጣት/ወደ ውጭ መላክ ሰነድና ኮድ UC/handle/c/ChannelName ግቤቶች ከመዋሃዳቸው በፊት እንዴት እንደሚመደቡ ያብራራሉ።"
+    ]
+  },
+  "3.1.5": {
+    "ctaLabel": "አዲሱን ይመልከቱ",
+    "headline": "Shorts + አባላት ብቻ ይዘት በእውነት ተወግደዋል",
+    "summary": "የWatch ገጽና የጎን መደርደሪያ የShorts rendererዎችንና ለአባላት ብቻ የሆኑ ረድፎችን ከመታየታቸው በፊት ይደብቃሉ፤ የመቀያየሪያው ሁኔታም በመጨረሻ ይቀመጣል።",
+    "bannerSummary": "Shortsና የአባላት-ብቻ መደርደሪያዎች ከመታየታቸው በፊት ይደበቃሉ፤ ቅንብሩም ይቀመጣል።",
+    "highlights": [
+      "የጎን መደርደሪያ ካርዶች ከመታየታቸው በፊት የ/shorts/ አገናኞችን፣ overlaysንና aria-labelዎችን ይመረምራሉ።",
+      "የአባላት-ብቻ መለየት compact፣ watchና shelf ረድፎችን በአዲስ badgeዎችና playlist ግምቶች ይሸፍናል።",
+      "የአባላት-ብቻ መቀያየሪያ የማስቀመጥ ችግር ተስተካክሏል፤ ሁኔታው ከreload በኋላም ይቆያል።"
+    ]
+  },
+  "3.1.4": {
+    "ctaLabel": "አዲሱን ይመልከቱ",
+    "headline": "Dashboard ለተለያዩ መጠኖች ተስማሚ ሆነ",
+    "summary": "አሰሳ በሞባይል ላይ በንጹህ ሁኔታ ይጠበባል፣ ግቤቶች በተፈጥሮ ይሸበለላሉ እና playlist/Mix መቆጣጠሪያዎች የበለጠ ግልጽ መቀያየሪያዎች አላቸው።",
+    "bannerSummary": "በሞባይል የሚስማማ አሰሳ፣ ተስማሚ ግቤቶችና ግልጽ የplaylist/Mix መቆጣጠሪያዎች።",
+    "highlights": [
+      "ለትንንሽ ማያዎች Hamburger አሰሳና overlay ከተሻሻለ የgrid ክፍተት ጋር።",
+      "መቀያየሪያዎች ቀለል ያሉ trackዎች፣ መሃል የተቀመጡ thumbዎችና የተሻለ የጨለማ ሁነታ ንጽጽር አላቸው።",
+      "Mix toggle ሲነቃ Mix/Radio ቺፕ ይደበቃል፤ playlist መደበቂያ የradio ንጥሎችን ይዘላል።"
+    ]
+  },
+  "3.1.3": {
+    "ctaLabel": "አዲሱን ይመልከቱ",
+    "headline": "የHelp መመሪያ ዳግም ንድፍ",
+    "summary": "ካርዶች፣ pillዎችና tooltips Exact / Comment / Filter All በትክክል ምን እንደሚያደርጉ ያብራራሉ፤ ከታደሰው dashboard ቅጥ ጋርም ይጣጣማሉ።",
+    "bannerSummary": "Exact፣ Commentና Filter All የሚያደርጉትን የሚያብራሩ የታደሱ የHelp ካርዶች።",
+    "highlights": [
+      "የHelp ትር ከተመሳሳይ ቀለም ጋር የbadge ቀለሞችንና collaboration መለያዎችን ያሳያል።",
+      "የpopupና tab ፍለጋ መስመሮች ወደ ተመሳሳይ ሙሉ-ስፋት አቀማመጥ ተመጣጠኑ።",
+      "የይዘት ቁጥጥር መግለጫዎች ግልጽነት ለማሻሻል በhover የሚታዩ tooltips ውስጥ ተቀመጡ።"
+    ]
+  },
+  "3.1.2": {
+    "ctaLabel": "አዲሱን ይመልከቱ",
+    "headline": "የPlaylist autoplay ጥንካሬ",
+    "summary": "Autoplay አሁን የታገዱ playlist ረድፎችን ሳያሳይ ያልፋል፤ የተጣበቀ መደበቅም YouTube ዳግም ሲያስኬድ ይቆያል።",
+    "bannerSummary": "Autoplay የታገዱ ረድፎችን ሳያበራ ያልፋል፤ የplaylist መደበቅም ይቆያል።",
+    "highlights": [
+      "ቀጣይ ረድፍ በእውነት የሚታይ ሲሆን ብቻ የNext-click እርምጃ ይፈጸማል።",
+      "የWatch playlist ፓነል ረድፎች ማንነታቸው ለአጭር ጊዜ ሳይፈታ ቢቀርም ተደብቀው ይቆያሉ።",
+      "ከእገዳ በኋላ የ3-dot ምናሌ በንጹህ ሁኔታ ይዘጋል፣ miniplayer ግን ማጫወቱን ይቀጥላል።"
+    ]
+  },
+  "3.1.1": {
+    "ctaLabel": "አዲሱን ይመልከቱ",
+    "headline": "የHelp ትር + የማንነት ማስተካከያዎች",
+    "summary": "በdashboard ውስጥ የተለየ Help ትር ተጨምሯል፤ UC ↔ handle ↔ custom URL ካርታ ማድረግም የበለጠ አስተማማኝ ሆኗል።",
+    "bannerSummary": "አዲስ የHelp ማጣቀሻና የተሻለ የቻናል ማንነት መፍታት።",
+    "highlights": [
+      "የHelp ማጣቀሻ ሁሉንም መቀያየሪያዎች፣ badgeዎችና የቁልፍ ቃል ባህሪያትን ይመዘግባል።",
+      "የPlaylist አሰሳ የታገዱ ረድፎችን ያለ የማጫወት ብልጭታ ያልፋል።",
+      "የHandle/custom URL fallback ወደ ትክክለኛው UC ID በበለጠ አስተማማኝ ሁኔታ ይገናኛል።"
+    ]
+  },
+  "3.1.0": {
+    "ctaLabel": "አዲሱን ይመልከቱ",
+    "headline": "ሰነዶች + የተዋሃደ ማጣሪያ ግልጽነት",
+    "summary": "የhybrid interception + DOM fallback አወቃቀር በንድፎች ተመዝግቧል፣ ይህም FilterTube እገዳዎችን እንዴት እንደሚያስፈጽም ያብራራል።",
+    "bannerSummary": "የhybrid interception እና DOM fallback ማጣሪያ አወቃቀር በግልጽ ሰነድ ተቀምጧል።",
+    "highlights": [
+      "የWatch ገጽ 3-dot ባህሪ ከhome/search collaborator ካርዶች ጋር እኩል እንደሆነ ተመዝግቧል።",
+      "ያልተፈቱ የplaylist ችግሮች ወደ ዝርዝር ተዘርዝረዋል፣ ማስተካከያዎቹ እንዳይረሱም ያግዛል።",
+      "manifestዎች፣ build tooling እና UI footer ከ3.1.0 ልቀት ቁጥር ጋር ተመሳሰሉ።"
+    ]
   }
 }
