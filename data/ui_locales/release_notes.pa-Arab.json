@@ -14,5 +14,329 @@
       "GitHub release publishing، GitHub CLI credentials ورتدی اے، upload توں پہلاں drafts بناؤندی اے، موجود tags توں کم جاری رکھدی اے، صرف غیر موجود assets upload کردی اے، آخری asset set دی جانچ کردی اے، تے تصدیق توں بعد ای publish کردی اے۔",
       "Android فون تے ٹیبلیٹاں لئی FilterTube ایپ ہُن Google Play اُتے عام لوکاں لئی دستیاب اے۔ [عوامی صفحے](https://play.google.com/store/apps/details?id=com.filtertube.app) توں انسٹال کرو یا Google Play اُتے FilterTube لبھو۔"
     ]
+  },
+  "3.3.6": {
+    "headline": "ہور مضبوط فلٹرنگ، محفوظ وقت، تے اشتہاراں توں بغیر پرسکون پلے بیک",
+    "summary": "FilterTube 3.3.6 وچ سیدھی رسائی دے اصول لاگو کرنا، ہر profile لئی محفوظ وقت تے Self-Control sessions، بلاک تے اجازت والے اصولاں دے بھروسےجوگ مجموعے، سرکاری category filtering، شروع توں چالو Advert Void، تے موجودہ YouTube نال وسیع مطابقتی کم شامل اے۔",
+    "bannerSummary": "3.3.6 وچ سیدھی رسائی دی filtering، محفوظ وقت، rule-list تے BlockTube درآمد، سرکاری categories، Advert Void، تے موجودہ YouTube نال مطابقت شامل اے۔",
+    "highlights": [
+      "YouTube اُتے سیدھے جانا، playlist بدلنا، autoplay، تے معاون embed ہُن feed filtering وانگّو ویڈیو تے چینل داخلے دے اصولاں وچوں لنگھدے نیں؛ انہاں اصولاں توں بچ نئیں سکدے۔",
+      "روزانہ YouTube حد ہُن فعال profile دے حساب نال لاگو ہُندی اے، باقی وقت وکھاؤندی اے، restart توں بعد وی قائم رہندی اے، تے PIN نال profile بدلّن والا پوری سکرین دا timeout صفحہ ورتدی اے۔ اپنی مرضی دے Self-Control sessions countdown مکّن تک چُنے اصول lock کردے نیں۔",
+      "Main تے Kids لئی بلاک اصول تے اجازت والے اصول وکھرے مجموعے رہندے نیں؛ اُتلا Blocklist یا Whitelist پالیسی ایہہ چُندی اے کہ ویکھن اُتے کیہڑا مجموعہ اختیار رکھے گا۔",
+      "وڈیاں BlockTube تے managed rule-list imports وچ preview، گنجائش دی جانچ، transaction واپس کرنا، دوبارہ پڑھ کے تصدیق، تے شامل، دہرے، چھڈے، چینل، keyword، regex تے video-ID دیاں ہور صاف گنتیاں شامل نیں۔",
+      "Category filtering YouTube دا سرکاری `microformat.playerMicroformatRenderer.category` field، اوہو origin توں محدود Player metadata لینا، چُنی categories بلاک کرن یا صرف اوہناں دی اجازت دین دے صاف اختیار، تے Watch، rail، Mix، تبصریاں تے renderer دی ہور محفوظ ذمہ داری ورتدی اے۔",
+      "YouTube Main تے Kids اُتے نویں تے upgrade کیتے profiles لئی Advert Void شروع توں چالو اے۔ سانجھی Web runtime ودھیک requests توں بغیر Player دے نظر آئے ad-plan fields ہٹاؤندی اے؛ native playback نہ-ماڈل شدہ ad-plan data چھڈ دیندی اے یا دستیاب ہووے تے raw Reel response نوں معمول مطابق کردندی اے، جدکہ guarded fallback بچ نکلّیاں رکاوٹاں سنبھالدا اے۔",
+      "تجرباتی بولی زبان دی filtering تے اصل آواز دی ترجیح، دستیاب ہووے تے YouTube Player دے ثبوت ورتدے نیں، تے سفارش metadata نہ ہووے تے content نوں لنگھن دیندے نیں۔",
+      "ایس release وچ YouTube Playables لُکانا، موجودہ camelCase renderer تے collaboration سنبھالنا، ہور پڑھّن جوگ Help تے search، صاف popup تے dashboard controls، تے عوام لئی Android Google Play تے iOS status pages وی شامل نیں۔",
+      "Settings وچ ساریاں devices لئی default طور تے نہ-چُنا opt-out اختیار اے، جیہڑا YouTube تے YouTube Kids اُتے automatic reload reminders تے What's New banners بند کردا اے۔ Dashboard دا What's New صفحہ ہتھیں کھولن لئی ہن وی موجود اے۔"
+    ]
+  },
+  "3.3.5": {
+    "headline": "YouTube خرابی توں بحالی تے Shorts چینل پہلے بلاک کرنا",
+    "summary": "ایہہ release پہلے کھلے YouTube tabs وچ content runtime دوبارہ inject ہون دی خرابی ٹھیک کردی اے، تے channel rules یا whitelist mode چالو ہووے تے نظر آؤندے Shorts دے چینل دی شناخت پہلے سلجھاؤندی اے۔",
+    "bannerSummary": "دہرے runtime injection نوں ٹھیک کردی اے، بلاک Shorts channels دی شناخت بہتر کردی اے، تے v3.3.4 rollback دی حد درج کردی اے۔",
+    "highlights": [
+      "Install/update/profile refresh ہُن پہلے کھلے YouTube tabs وچ manifest content scripts دوبارہ نئیں پاؤندے، ایس لئی `Identifier ... has already been declared` syntax errors بار بار نئیں آندے۔",
+      "پہلے کھلے YouTube tabs نوں duplicate script declarations توں بغیر managed time-limit/runtime checks مل سکدے نیں۔",
+      "نظر آؤندے تے نظر آؤن دے نیڑے Shorts ہُن پہلے توں موجود محدود background `/shorts/<videoId>` owner resolver ورتدے نیں جدوں channel blocklist rules یا whitelist mode چالو ہون۔",
+      "سکھیاں Shorts video-to-channel mappings محفوظ کیتیاں جاندیاں نیں تے فوراً دوبارہ process ہُندیاں نیں، ایس لئی بلاک چینل دے Shorts لُکاؤن توں پہلاں hover یا menu وچ عمل دی لوڑ نئیں۔",
+      "Desktop Shorts hosts جیویں `.shortsLockupViewModelHost` تے `.ytGridShelfViewModelGridShelfItem` خاص Shorts fallback/enrichment paths وچ شامل نیں۔",
+      "Blocklist mode نامعلوم Shorts نوں شناخت سلجھّن توں پہلاں نئیں لُکاؤندا؛ موجودہ pending path دے کارن whitelist mode ہور سخت رہندا اے۔",
+      "YouTube خرابی دی رپورٹ دی تحقیق دوران v3.3.4 نوں store اُتے v3.3.2 package ول rollback دے طور تے درج کیتا گیا اے۔"
+    ]
+  },
+  "3.3.4": {
+    "headline": "Store اُتے v3.3.2 package ول واپسی",
+    "summary": "v3.3.4 browser stores لئی rollback release سی، جیہڑی v3.3.3 نال جُڑیاں YouTube خرابی دیاں رپورٹاں دی تحقیق دوران پچھلا v3.3.2 package ورتدی سی۔",
+    "bannerSummary": "Rollback release: YouTube خرابی دیاں رپورٹاں دی تحقیق دوران v3.3.4 نے v3.3.2 package ورتیا۔",
+    "highlights": [
+      "v3.3.4 لئی source توں آیا کوئی نواں feature کم دعویٰ نہیں کیتا گیا۔",
+      "Issue #64 دی تحقیق کردیاں مشکوک v3.3.3 package نوں stores توں ہٹاؤن لئی rollback ورتیا گیا۔",
+      "اگلی source release، v3.3.5، وچ duplicate runtime injection تے Shorts identity دیاں اصلاحاں شامل نیں۔"
+    ]
+  },
+  "3.3.3": {
+    "headline": "خاندان دے device updates، rule lists، تاریخ والے keywords، تے YouTube DOM دی تجدید",
+    "summary": "ایہہ release والدین/نگہداشت کرن والے دا اختیار سمجھن نوں آسان کردی اے، reviewed rule-list imports تے تاریخ تک محدود keyword rules جوڑدی اے، Home/Internet Pickup model لکھدی اے، تے موجودہ YouTube/YTM markup لئی filtering تازہ کردی اے۔",
+    "bannerSummary": "ایس release وچ Family Device Updates، reviewed rule-list imports، تاریخ والے keywords، والدین نوں پہلے رکھن والی Help، تے موجودہ YouTube/YTM DOM نال مطابقت شامل اے۔",
+    "highlights": [
+      "والدین/نگہداشت کرن والے profiles محفوظ profiles سنبھال سکدے نیں، parent dashboard توں بچے/محفوظ profiles دے rules بدل سکدے نیں، تے منظور شدہ updates تصدیق شدہ محفوظ devices نوں بھیج سکدے نیں۔",
+      "Family Device Updates ہُن live Send Update، واضح Home Pickup، تے واضح Internet Pickup سمجھاؤندیاں نیں، pickup services نوں اختیار دا ذریعہ نئیں سمجھدیاں۔",
+      "محفوظ profile دیاں time limits ہُن پرانے تے نویں YouTube tabs جانچدیاں نیں، پرسکون timeout screen وکھاؤندیاں نیں، تے ہور وقت دیاں درخواستاں والدین دے جائزے لئی لکھدیاں نیں۔",
+      "Rule-list imports CSV، TXT، سادہ JSON، BlockTube طرز دے JSON، تے کچّے HTTPS URLs ورت سکدے نیں؛ لاگو کرن توں پہلاں preview، Main/Kids/Both targets، templates، list management، pause/resume/remove، تازگی دی جانچ تے refresh سمیت۔",
+      "تاریخ اُتے مبنی keyword filtering، upload date توں بعد، اوہدے تک، یا دو تاریخاں دے وچ keyword لاگو کر سکدی اے۔ YouTube دےوے تے comment filtering parent video دی upload date ورتدی اے۔",
+      "Help تے dashboard controls ہُن آسان والدین-پہلے بولی، تیز help bubbles، تے Exact، Comment، Date، PINs، rule lists تے device updates دیاں صاف وضاحتاں ورتدے نیں۔",
+      "Dashboard ہُن فعال Android closed-testing users نوں hello@filtertube.in اُتے email کرن لئی آکھدا اے تے YouTube page structure بدلّن تے filtering ٹُٹّن دی رپورٹ کرن دی نمایاں یاددہانی رکھدا اے۔",
+      "YouTube desktop lockup selectors تے YTM mobile camelCase DOM درج کیتے گئے نیں تاں جو اصل video cards filter ہُندے رہن، جدکہ Watch-page chip bars fallback کم نہ جگاؤن یا scroll jump نہ کرن۔",
+      "ہن وی وکھرے: automatic LAN peer discovery، hosted FilterTube Internet Pickup service، چپ چاپ public auto-subscribe catalogs، native Android/iOS parity، تے دو نصب devices اُتے manual smoke-test دے ثبوت۔"
+    ]
+  },
+  "3.3.2": {
+    "headline": "Mobile/tablet app MVP، ہور ہموار YouTube، تے محفوظ whitelist",
+    "summary": "عوام لئی app release surface Android phone/tablet دے آخری tests تے iOS/iPad status لئی تیار اے؛ extension dashboard ہن اوہناں app paths ول رہنمائی کردا اے، فعال rules نہ ہون تے YouTube SPA دا کم گھٹ اے، تے ایس release وچ whitelist/end-screen درستی دیاں اصلاحاں شامل نیں۔",
+    "bannerSummary": "ایس release وچ mobile/tablet app release paths، ہور ہموار YouTube runtime behavior، production وچ خاموش logs، تے whitelist/end-screen leakage دیاں اصلاحاں شامل نیں۔",
+    "highlights": [
+      "Website downloads hub تے extension dashboard ہُن Android phone/tablet final-testing path تے iOS/iPad TestFlight/App Store status path وکھاؤندے نیں۔",
+      "Android phone/tablet release setup نوں shared FilterTube runtime، YouTube Main، public YouTube Kids access، profiles، PIN rules، تے Nanah sync دے گرد درج کیتا گیا اے۔",
+      "فعال rules یا route دی لوڑ نہ ہووے تے YouTube SPA performance کم ہور JSON clone/parse/replay، DOM fallback، quick-block، fallback-menu، تے whitelist-pending کم چھوڑدا اے۔",
+      "Production extension contexts معمول دی console logging صرف صاف طور تے debug mode چالو ہون تے کردے نیں، تاں جو عام browsing وچ YouTube دے hot paths اُتے console overhead نہ پئے۔",
+      "Whitelist release fixes وچ Shorts creator fallback، list-target forwarding، تے end-screen controls لئی compact autoplay/watch-next endpoint filtering شامل اے۔",
+      "FilterTube DOM state attributes مضبوط کیتے گئے نیں تاں جو وسیع `data-filtertube-*` نشان گھٹن تے ضروری runtime state برقرار رہے۔",
+      "Accounts & Sync ہُن Family Device Updates وچ Send Update، اختیاری Home Pickup، تے باہر ہون/بعد وچ کھولن والے Internet Pickup نوں لکھدی اے، تاں جو والدین live sync، home pickup، online pickup، تے اختیار نہ ہون والی شے دا فرق سمجھ سکن۔",
+      "محفوظ profile time limits لئی ہن روزانہ YouTube budgets، timeout screens، ہور وقت دیاں درخواستاں دی تاریخ، تے والدین/نگہداشت کرن والے دی منظوری بارے release-facing documentation اے۔",
+      "Nanah/import paths extension تے native app payloads وچ channel-derived Filter All keyword ownership برقرار رکھدے نیں، بشمول row color، source-badge metadata، تے pairing context۔"
+    ]
+  },
+  "3.3.1": {
+    "headline": "تیجے فریق دے server توں بغیر P2P device sync محفوظ",
+    "summary": "Accounts & Sync ہُن Nanah دے تین ہور آسان راستے دکھاؤندی اے، جس وچ والدین/بچے دی بہتر target چُنائی، reconnect دے صاف rules، تے حقیقی استعمال لئی کافی ودھ documentation شامل اے۔",
+    "bannerSummary": "Nanah sync، والدین/بچے دا بہتر اختیار، محفوظ reconnect rules، تے نویں Accounts & Sync flow دے پورے docs۔",
+    "highlights": [
+      "Accounts & Sync ہُن تین صاف راستیاں توں شروع ہُندی اے: Send this profile once، Parent controls child، تے Move full account۔",
+      "Advanced Nanah controls ہن وی موجود نیں، پر پورے flow دی قیادت کرن دی بجائے Advanced section وچ لُکائے گئے نیں۔",
+      "Parent/source sessions remote target profile ہور صاف چُن سکدیاں نیں، تے managed-link saves ہُن sender ول وی mirror ہُندیاں نیں تاں جو دونویں devices اُتے اوہی trust record رہے۔",
+      "Trusted links refresh توں بعد وی محفوظ رہندے نیں، پر reconnect ہن وی نواں live session اے، hidden background sync نئیں۔",
+      "Locked child updates، reconnect rules، device-label persistence، تے self-join/session-burn protection والدین دے محفوظ اختیار لئی مضبوط کیتے گئے نیں۔",
+      "README، Architecture، Technical، Functionality، Profiles & PIN، project plan، user guide، تے concern tracker موجودہ Nanah desktop checkpoint نوں ہور تفصیل نال درج کردے نیں۔"
+    ]
+  },
+  "3.3.0": {
+    "headline": "Collaboration دی بحالی تے browsers وچ imports مضبوط",
+    "summary": "Watch/YTM collaboration menus پورا roster ہور بھروسے نال واپس لیاندے نیں، subscription import browsers وچ بہتر اے، تے surface-specific whitelist تے Quick Block دیاں کئی اصلاحاں ہُن 3.3.0 وچ شامل نیں۔",
+    "bannerSummary": "بہتر collab menus، مضبوط whitelist import، محفوظ Quick Block surfaces، چینلاں دے سیدھے links، تے 3-dot block item لئی نواں toggle۔",
+    "highlights": [
+      "Mobile YouTube home/watch-next/Mix-style cards ہُن اوہی 3-dot تے collaborator recovery flow ورتدے نیں، ادھورے single-channel menus ول واپس نئیں جاندے۔",
+      "Watch-page right rail، playlist rows، تے watch-like lockups ہُن پورا collaborator roster واپس لا سکدے نیں تے active 3-dot menu نوں اَتھے ای refresh کر سکدے نیں۔",
+      "Mix/watch recovery ہور محفوظ اے: حقیقی collaboration cards ٹھیک طرح upgrade ہُندے نیں، جدکہ '&' یا 'and' والے عام ناں غلط collaboration menus نئیں بناندے۔",
+      "پیچیدہ surfaces اُتے Quick Block ہور مستحکم اے: ہور desktop cards توں اُتے رہندا اے، mobile search-suggestion dropdowns توں بچدا اے، تے mobile watch-next layouts وچ بہتر ٹکدا اے۔",
+      "Subscribed-channel whitelist import ہُن حالیہ page browse responses سنبھالدا اے، اصلی /feed/channels ودھوتری نوں ترجیح دیندا اے، تے /feed/channels نوں نظر آؤندی management surface رکھدا اے۔",
+      "YouTube desktop/mobile renderers وچ whitelist filtering ہور سخت تے محفوظ اے، جس وچ creator-page handling تے Mixes/subscriptions hide controls دی بہتری شامل اے۔",
+      "نویں controls تے polish: Channel Management rows اصلی channel pages نال link کردیاں نیں، 3-dot block item بند ہو سکدا اے، تے encrypted Firefox export ہور محفوظ fallback ورتدا اے۔"
+    ]
+  },
+  "3.2.9": {
+    "headline": "Subscribed Channels درآمد، whitelist، تے PIN protection دی bug fix",
+    "summary": "فعال YouTube account دیاں subscriptions whitelist وچ درآمد کرو، mode بدلّن دی صاف سمجھ تے /feed/channels دے بھروسےجوگ startup flow دے نال۔",
+    "bannerSummary": "اپنی موجودہ YouTube subscriptions توں whitelist بناؤ، inline progress تے whitelist چالو کرن دے صاف behavior دے نال۔",
+    "highlights": [
+      "نواں Tab View import، فعال sign-in YouTube account دیاں subscribed channels نوں whitelist وچ درآمد کر سکدا اے۔",
+      "Import startup ہُن live YouTube tab دوبارہ ورتدا اے، اوہنوں /feed/channels ول بھیجدا اے، تے شروع کرن توں پہلاں FilterTube bridge دی اُڈیک کردا اے۔",
+      "Whitelist دی لکھت صاف اے: Import Only blocklist نوں نئیں چھیڑدا، جدکہ Import + Turn On Whitelist موجودہ blocklist-to-whitelist migration path اُتے چلدا اے۔",
+      "Documentation ہُن import architecture، FEchannels request flow، renderer sources، تے whitelist semantics دی ہور تفصیل دیندی اے۔"
+    ]
+  },
+  "3.2.8": {
+    "headline": "Theme refresh تے Scenic UI shell دی ترتیب",
+    "summary": "Popup تے dashboard surfaces ہُن ہور پرسکون scenic theme system ورتدے نیں، جس وچ layout ہور compact، tint states صاف، تے light/dark دا توازن بہتر اے۔",
+    "bannerSummary": "Popup تے dashboard لئی بہتر theme، پرسکون transparency، صاف pills، تے responsive layout دا چنگا behavior۔",
+    "highlights": [
+      "Scenic UI refresh: popup تے dashboard ہُن local hero video نوں ambient background media بنا کے پرسکون product shell سانجھی کردے نیں۔",
+      "Light تے dark theme tuning: dark mode وچ scenic background پھیکے center glow توں بغیر نظر آؤندا اے، جدکہ light mode صاف transparency ورتدا اے۔",
+      "Responsive cleanup: popup spacing compact، profile dropdown چھوٹا، Help/Support card layout بہتر، تے filter surfaces اُتے mobile fit چنگی اے۔",
+      "Control tint fixes: enabled/disabled states، pill colors، search fields تے import/export actions ہن دونوں themes وچ زیادہ صاف نیں۔"
+    ]
+  },
+  "3.2.7": {
+    "headline": "Category filters، hover اُتے Quick Block cross، تے Mobile 3 Dot UI",
+    "summary": "نئی category filtering تے اک tap والا Quick Cross Block شروع توں فعال اے۔",
+    "bannerSummary": "Cards اُتے hover کرکے نویں category filters تے Quick Cross Block ورتو؛ YT Mobile blocking دی مدد وی بہتر اے۔",
+    "highlights": [
+      "Category Filtering: YouTube category (Music، Gaming، Education وغیرہ) دے حساب نال videos بلاک یا allow کرو۔",
+      "Quick Cross Block شروع توں ON: `Show Quick Cross Block button` v3.2.7 وچ default طور تے فعال اے (users ایہنوں بند کر سکدے نیں)۔",
+      "Mobile Blocking: YT Mobile blocking لئی 3 Dot UI تے Quick Cross Block دی بہتر مدد، جیہڑی ہن Home Page اُتے کم کردی اے۔"
+    ]
+  },
+  "3.2.6": {
+    "headline": "UI/UX نوں خوبصورت بنانا تے content-based filtering",
+    "summary": "جدید design نال typography وچ پوری بہتری، نال تین نویں content filters: duration، date، تے uppercase۔",
+    "bannerSummary": "Duration، upload date، تے clickbait detection لئی content filters والا سوہنا نواں UI۔",
+    "highlights": [
+      "Typography updates: ہور پڑھّن جوگ modern تے refined font scale۔",
+      "Content-based filters: duration (لمبی/چھوٹی/وچکارلی)، upload date (نویں/پرانی/وچکارلی)، تے uppercase detection (clickbait titles)۔",
+      "`videoMetaMap` system: ہوشیار batching نال video metadata دا مستقل storage (75ms window، 1500 entries دی حد)۔",
+      "Dashboard improvements: surface-specific stats (Main تے Kids)، بہتر stat cards، تے donate promo card۔"
+    ]
+  },
+  "3.2.5": {
+    "headline": "Whitelist mode نوں اگے کرنا تے استحکام",
+    "summary": "Whitelist mode ہُن بنیادی allow-only راستہ اے، بہتر extraction، playlist safeguards، تے گھٹ CPU استعمال دے نال۔",
+    "bannerSummary": "صاف UI، بہتر playlist stability، تے Kids support دے نال whitelist mode نوں اگے کیتا گیا۔",
+    "highlights": [
+      "Whitelist mode نوں اگے کیتا گیا: wording/UI ہُن اوہنوں experimental نئیں آکھدی۔",
+      "Whitelist surfaces لئی 3-dot menu cleanup تے search-secondary handling۔",
+      "Thumbnail anchors تے parent containers نال کئی sources توں channel extraction۔",
+      "Confirmation dialogs تے bridge optimizations نال mode-aware state tracking۔",
+      "Playlist stability: چُنے rows نظر آؤندے رہندے نیں؛ pending identities ہُن blocked rows واپس نئیں وکھاؤندیاں۔",
+      "Zero-network architecture نال Kids mode whitelist support۔"
+    ]
+  },
+  "3.2.4": {
+    "headline": "بہتر Whitelist mode تے performance optimizations",
+    "summary": "Experimental whitelist mode وچ وڈیاں بہتریاں، بہتر UX، performance optimizations، تے Kids mode دی ودھی ہوئی مدد۔",
+    "bannerSummary": "Whitelist mode ہور ذہین: صاف UI، بہتر performance، تے Kids support۔",
+    "highlights": [
+      "EXPERIMENTAL: 3-dot menu cleanup، ذہین search processing، تے mode-aware state tracking والا بہتر whitelist mode۔",
+      "Performance boost: bridge-level optimizations تے selective processing CPU استعمال گھٹاؤندے نیں۔",
+      "UI improvements: mode بدلّن تے غلطی نال data گواچن توں بچاؤن لئی confirmation dialogs۔",
+      "Kids mode support: whitelist functionality ہُن zero-network architecture نال YouTube Kids اُتے کم کردی اے۔",
+      "Search optimizations: UI clutter توں بچاؤن لئی right-rail watch cards ذہانت نال سنبھالے جاندے نیں۔",
+      "Channel extraction: thumbnail anchors تے parent containers نال multi-source identity resolution۔",
+      "Mode switching: ذہین reprocessing نال blocklist/whitelist دے وچ ہموار تبدیلی۔"
+    ]
+  },
+  "3.2.3": {
+    "headline": "Experimental Whitelist mode تے UI improvements",
+    "summary": "صرف allow کرن والی filtering لئی whitelist mode دی alpha release، نال بہتر UI updates تے mobile menu support۔",
+    "bannerSummary": "Experimental whitelist mode آزماؤ — اجازت والے channels توں بغیر سب کجھ لُکا دو۔",
+    "highlights": [
+      "EXPERIMENTAL: whitelist mode صاف طور تے اجازت والے channels/keywords توں بغیر سارے content نوں لُکا دیندا اے۔",
+      "Popup تے tab view وچ blocklist تے whitelist دے وچ سوکھے toggle نال dual filtering modes۔",
+      "مرحلہ وار migration — channels اکٹھے کرن لئی blocklist ول بدلو، پھر اوہناں نوں whitelist وچ واپس merge کرو۔",
+      "Whitelist mode وچ Watch page protection ویڈیو playback functionality برقرار رکھدی اے۔",
+      "Optimistic UI updates content فوراً لُکاؤندیاں نیں تے blocking ناکام ہووے تے آپے بحال کردیاں نیں۔",
+      "YouTube mobile renderers دی ٹھیک handling نال بہتر mobile menu support۔",
+      "Production noise گھٹاؤن لئی سارے console logs ہُن debug flag دے پچھے نیں۔"
+    ]
+  },
+  "3.2.2": {
+    "headline": "UI/UX improvements تے Debug gating",
+    "summary": "Optimistic updates، mobile menu support، debug-gated logging، scroll محفوظ رکھنا، تے state management وچ بہتریاں۔",
+    "bannerSummary": "فوری UI feedback، صاف کیتے mobile menus، تے مستحکم state handling نال debug-gated logs۔",
+    "highlights": [
+      "Optimistic UI updates: blocking ناکام ہووے تے خودکار بحالی دے نال content فوراً لُکاؤندی اے۔",
+      "درست renderer tags نال `ytm-menu-popup-renderer` لئی بہتر mobile menu support۔",
+      "`window.__filtertubeDebug` دے ذریعے debug-gated logging۔",
+      "پریشان کن jumps روکّن لئی DOM fallback دوران scroll محفوظ رکھنا۔",
+      "Background requests گھٹاؤن لئی channel enrichment limit (ہر session وچ 10)۔",
+      "`requestIdleCallback` تے batching نال idle-scheduled rendering۔",
+      "Signature comparison نال external reload debouncing تاں جو فالتو renders نہ ہون۔",
+      "چُنے notifications: signature بدلے تے `load`؛ ورنہ `externalUpdate`۔",
+      "Shared global state دے ذریعے bridge state management۔"
+    ]
+  },
+  "3.2.1": {
+    "headline": "Lag توں بغیر processing تے performance boost",
+    "summary": "وڈیاں performance optimizations UI lag ختم کردیاں نیں، Chromium browsers وچ بہترین نتائج تے Firefox وچ نمایاں بہتریاں دے نال۔",
+    "bannerSummary": "Async processing، compiled caching، تے batched updates نال lag-free filtering۔",
+    "highlights": [
+      "Async DOM processing main thread نوں وقت دیندی اے تے بھاری filtering دوران browser freeze ہون توں روکدی اے۔",
+      "Compiled regex تے channel filter caching O(1) lookups دیندیاں نیں، CPU استعمال 60–80% گھٹاؤندیاں نیں۔",
+      "Batched storage updates ذہین 250ms intervals نال I/O operations 70–90% گھٹاؤندیاں نیں۔",
+      "Debounced settings refresh ودھ DOM reprocessing توں روکدی اے۔",
+      "Run state management overlapping executions روکدی اے تے requests ٹھیک طرح queue کردی اے۔",
+      "Chromium browsers: lag 90% توں ودھ گھٹیا؛ Firefox: نمایاں بہتری، optimization جاری۔"
+    ]
+  },
+  "3.2.0": {
+    "headline": "فوری blocking تے network توں بغیر Kids",
+    "summary": "3-dot menus چینل دے ناں فوراً وکھاؤندے نیں، network requests کافی گھٹدیاں نیں، تے YouTube Kids پورا offline کم کردا اے۔",
+    "bannerSummary": "Proactive XHR interception نال بنا دیر blocking؛ Kids mode کوئی network fetch توں بغیر کم کردا اے۔",
+    "highlights": [
+      "3-dot menus ہُن ٹھیک چینل ناں فوراً وکھاؤندے نیں — 'Fetching...' دی دیر نئیں۔",
+      "چینل دی شناخت intercepted YouTube JSON responses توں آؤندی اے، جس نال network calls گھٹدیاں نیں۔",
+      "بھروسےجوگ blocking لئی YouTube Kids پورا network fetch توں بغیر کم کردا اے۔",
+      "غائب metadata قابو والی رفتار نال background وچ پُر ہُندا اے (6 گھنٹے cooldown)۔",
+      "Topic channels (مثلاً 'Music - Topic') نوں `@handles` توں بغیر خاص سنبھالیا جاندا اے۔",
+      "ASCII تے Mermaid flow diagrams والے نویں جامع documents۔"
+    ]
+  },
+  "3.1.9": {
+    "headline": "Profile-aware backups تے lock نال محفوظ controls",
+    "summary": "Auto-backup تے content controls ہُن profile locks/PINs دا خیال رکھدے نیں، ہر profile دیاں settings وارثی وچ لیندے نیں، تے profile dropdown lock gate اُتے وی click ہو سکدا اے۔",
+    "bannerSummary": "ہر profile لئی auto-backup تے locked-profile gating؛ profile selector ہر ویلے click ہو سکدا اے۔",
+    "highlights": [
+      "Auto-backup mode/format selectors، auto-backup بند ہووے یا profile lock ہووے تے غیر فعال ہو جاندے نیں؛ نویں profiles auto-backup preferences وارثی وچ لیندے نیں۔",
+      "Auto-backup scheduling ہُن profile بنان تے mode/format بدلن وقت چالو ہُندی اے، پر صرف جدوں اوہ profile لئی auto-backup فعال ہووے۔",
+      "Lock حالت وچ content-control toggles تے backup controls غیر فعال یا واپس پچھلی حالت وچ چلے جاندے نیں؛ non-master profiles لئی export scope صرف active profile تک محدود اے۔",
+      "Profile dropdown دا z-index fix، lock gate banner نظر آؤندا ہووے تے وی اوہنوں click جوگ رکھدا اے۔",
+      "Profile/PIN model، profile-scoped backups، تے UI gating rules بارے documentation تازہ کیتی گئی۔"
+    ]
+  },
+  "3.1.8": {
+    "headline": "Support tab تے بھروسےجوگ auto-backups",
+    "summary": "نواں Support page (Ko-fi) شامل کیتا گیا اے، تے auto-backups ہُن Chrome تے Firefox دونویں اُتے بھروسے نال کم کردے نیں۔",
+    "bannerSummary": "Auto-backups ہُن browsers وچ کم کردے نیں تے اک تازہ ترین backup file نوں overwrite کردے نیں۔",
+    "highlights": [
+      "Dashboard وچ Ko-fi embed نال Support page شامل کیتا گیا۔",
+      "Auto-backups ہُن اک گھماؤ والی file overwrite کردے نیں: Downloads/FilterTube Backup/FilterTube-Backup-Latest.json۔",
+      "Download strategy browsers وچ کم کردی اے (موجود ہووے تے Blob URL؛ Chrome MV3 service worker لئی data: URL fallback)۔",
+      "data: URL دیاں پابندیاں کارن Firefox downloads ہُن fail نئیں ہُندے۔"
+    ]
+  },
+  "3.1.7": {
+    "headline": "YT Kids تے auto-backup support",
+    "summary": "YT Kids اُتے channel دی بنیاد اُتے content بلاک کیتا جا سکدا اے تے auto-backups ہُن چالو یا بند کیتے جا سکدے نیں۔",
+    "bannerSummary": "نویں setting: auto-backups چالو/بند کرو۔ Exports ہُن Downloads/FilterTube Export/ وچ محفوظ ہُندے نیں۔",
+    "highlights": [
+      "YT Kids وچ مکمل Channel تے Keyword-بنیاد blocking شامل کیتی؛ YT Kids دے 3-dot menu UI نوں پس منظر وچ سن کے channels بلاک ہُندے نیں۔",
+      "Auto-backups چالو/بند کرن لئی Settings toggle شامل کیتا گیا (بہترین کوشش؛ Save As prompts نئیں)۔",
+      "Auto-backups rotation دے نال Downloads/FilterTube Backup/ وچ محفوظ ہُندے نیں (تازہ ترین files برقرار رہندیاں نیں)۔",
+      "Manual exports ہُن خاموشی نال Downloads/FilterTube Export/ وچ download ہُندے نیں۔"
+    ]
+  },
+  "3.1.6": {
+    "headline": "Import/Export support تے release banner",
+    "summary": "Banner CTA ہُن dashboard دے What's New ول سیدھا لنک کردا اے، چُنے cards اوہی JSON توں load ہُندے نیں، تے imports c/ChannelName تے merge rules نوں بہتر سمجھدے نیں۔",
+    "bannerSummary": "Release banner extension دے اندر What's New tab کھولدا اے تے import/export documentation ہُن پورا flow سمجھاؤندی اے۔",
+    "highlights": [
+      "Release notes JSON، dashboard cards تے YouTube banner دونویں نوں اکّو single source of truth توں چلاندا اے۔",
+      "CTA background messaging راہیں tab-view کھولدا اے تاں جو blockers chrome-extension:// links نوں نہ روکّن۔",
+      "Import/export documentation تے code سمجھاؤندے نیں کہ UC/handle/c/ChannelName inputs merge توں پہلاں کیویں normalize ہُندے نیں۔"
+    ]
+  },
+  "3.1.5": {
+    "headline": "Shorts تے صرف ممبراں لئی content واقعی لُک گیا",
+    "summary": "Watch page تے sidebar ہُن Shorts renderers تے members-only shelves نوں چمک کے نظر آؤن توں پہلاں لُکاؤندے نیں، تے toggle state آخرکار قائم رہندی اے۔",
+    "bannerSummary": "Watch تے sidebar وچ Members-only تے Shorts لُکاؤن نوں مضبوط کیتا گیا تاں جو blocked rows واپس نہ آون۔",
+    "highlights": [
+      "Cards render ہون توں پہلاں sidebar `/shorts/` hrefs، overlays، تے aria-labels چیک کردا اے۔",
+      "Members-only detection ہُن compact، Watch، تے shelf rows نوں نویں badges تے playlist heuristics سمیت سنبھالدی اے۔",
+      "Members-only toggle persistence bug ٹھیک کیتا گیا تاں جو reloads توں بعد وی state قائم رہے۔"
+    ]
+  },
+  "3.1.4": {
+    "headline": "Dashboard responsive ہو گیا",
+    "summary": "Mobile اُتے navigation صاف ڈھنگ نال سمٹدی اے، inputs آسانی نال wrap ہُندے نیں، تے playlist/Mix controls دے toggles ہور صاف نیں۔",
+    "highlights": [
+      "چھوٹی screens لئی hamburger nav تے overlay، بہتر grid spacing دے نال۔",
+      "ہلکے tracks، درمیان وچ thumbs، تے dark mode وچ بہتر contrast والے toggles۔",
+      "Mix toggle چالو ہووے تے Mix/Radio chip لُکدی اے؛ playlist hiding radio items نوں چھڈدی اے۔"
+    ]
+  },
+  "3.1.3": {
+    "headline": "Help legend دی نئی صورت",
+    "summary": "Cards، pills، تے tooltips ٹھیک ٹھیک لکھدے نیں کہ Exact / Comment / Filter All کی کردے نیں، تے تازہ dashboard styling نال میل کھاندے نیں۔",
+    "highlights": [
+      "Help tab badge tints تے collaboration labels نوں اوہناں دے مطابق رنگاں وچ وکھاؤندا اے۔",
+      "Popup تے tab search bars اوہی full-width rhythm وچ align ہُندے نیں۔",
+      "Content control descriptions صاف سمجھ لئی hover tooltips وچ منتقل کیتیاں گئیاں۔"
+    ]
+  },
+  "3.1.2": {
+    "headline": "Playlist autoplay مضبوط کیتا",
+    "summary": "Autoplay blocked playlist rows نوں چمک کے دکھائے بغیر لنگھ جاندا اے، تے YouTube دی دوبارہ processing دے بعد وی sticky hiding قائم رہندی اے۔",
+    "highlights": [
+      "Next-click صرف اوہدوں چلدا اے جدوں اگلی playlist row واقعی نظر آ رہی ہووے۔",
+      "Watch playlist panel rows اوہدوں وی لُکیاں رہندیاں نیں جدوں identity تھوڑی دیر لئی حل نہ ہووے۔",
+      "Blocking دے بعد 3-dot menu صاف بند ہُندا اے تاں جو miniplayer چلدا رہے۔"
+    ]
+  },
+  "3.1.1": {
+    "headline": "Help tab تے identity fixes",
+    "summary": "Dashboard وچ مخصوص Help tab آؤندا اے، جدکہ UC ↔ handle ↔ custom URL mapping ہور بھروسےجوگ ہُندی اے۔",
+    "highlights": [
+      "Help reference سارے toggles، badges، تے keyword behaviors درج کردی اے۔",
+      "Playlist navigation playback flashes توں بغیر blocked rows لنگھدی اے۔",
+      "Handle/custom URL fallback ٹھیک UC ID ہور بھروسے نال لبھدا اے۔"
+    ]
+  },
+  "3.1.0": {
+    "headline": "دستاویزات تے hybrid filtering دی وضاحت",
+    "summary": "Hybrid interception + DOM fallback architecture نوں diagrams نال درج کیتا گیا اے تاں جو سمجھ آوے FilterTube blocks کیویں لاگو کردا اے۔",
+    "highlights": [
+      "Watch-page 3-dot parity نوں home/search collaborators دے نال درج کیتا گیا۔",
+      "باقی playlist regressions دی فہرست بنائی گئی تاں جو fixes نظر آندیاں رہن۔",
+      "3.1.0 version bump دے نال manifests، build tooling، تے UI footer ہم آہنگ کیتے گئے۔"
+    ]
   }
 }
