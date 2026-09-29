@@ -1589,5 +1589,6 @@
   "dashboard.ruleEditor.move.kidsKeywordToBlocked": "Kids कीवर्ड अवरोधित नियमांमध्ये हलवला",
   "dashboard.ruleEditor.move.kidsKeywordToAllowed": "Kids कीवर्ड अनुमत नियमांमध्ये हलवला",
   "dashboard.ruleEditor.move.kidsChannelToBlocked": "Kids चॅनेल अवरोधित नियमांमध्ये हलवले",
-  "dashboard.ruleEditor.move.kidsChannelToAllowed": "Kids चॅनेल अनुमत नियमांमध्ये हलवले"
+  "dashboard.ruleEditor.move.kidsChannelToAllowed": "Kids चॅनेल अनुमत नियमांमध्ये हलवले",
+  "popup.languageChoiceLabel": "भाषा: {language} ({code}), {selectionState}"
 }

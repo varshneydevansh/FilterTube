@@ -1589,5 +1589,6 @@
   "dashboard.ruleEditor.move.kidsKeywordToBlocked": "Kids anahtar kelimesi engellenen kurallara taşındı",
   "dashboard.ruleEditor.move.kidsKeywordToAllowed": "Kids anahtar kelimesi izin verilen kurallara taşındı",
   "dashboard.ruleEditor.move.kidsChannelToBlocked": "Kids kanalı engellenen kurallara taşındı",
-  "dashboard.ruleEditor.move.kidsChannelToAllowed": "Kids kanalı izin verilen kurallara taşındı"
+  "dashboard.ruleEditor.move.kidsChannelToAllowed": "Kids kanalı izin verilen kurallara taşındı",
+  "popup.languageChoiceLabel": "Dil: {language} ({code}) — {selectionState}"
 }

@@ -1589,5 +1589,6 @@
   "dashboard.ruleEditor.move.kidsKeywordToBlocked": "Kids कीवर्ड को अवरुद्ध नियमों में ले जाया गया",
   "dashboard.ruleEditor.move.kidsKeywordToAllowed": "Kids कीवर्ड को अनुमति वाले नियमों में ले जाया गया",
   "dashboard.ruleEditor.move.kidsChannelToBlocked": "Kids चैनल को अवरुद्ध नियमों में ले जाया गया",
-  "dashboard.ruleEditor.move.kidsChannelToAllowed": "Kids चैनल को अनुमति वाले नियमों में ले जाया गया"
+  "dashboard.ruleEditor.move.kidsChannelToAllowed": "Kids चैनल को अनुमति वाले नियमों में ले जाया गया",
+  "popup.languageChoiceLabel": "भाषा {language} ({code}), {selectionState}"
 }

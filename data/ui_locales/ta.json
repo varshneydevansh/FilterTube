@@ -1589,5 +1589,6 @@
   "dashboard.ruleEditor.move.kidsKeywordToBlocked": "Kids முக்கியச் சொல்லைத் தடுக்கப்பட்ட விதிகளுக்கு நகர்த்தியது",
   "dashboard.ruleEditor.move.kidsKeywordToAllowed": "Kids முக்கியச் சொல்லை அனுமதிக்கப்பட்ட விதிகளுக்கு நகர்த்தியது",
   "dashboard.ruleEditor.move.kidsChannelToBlocked": "Kids சேனலைத் தடுக்கப்பட்ட விதிகளுக்கு நகர்த்தியது",
-  "dashboard.ruleEditor.move.kidsChannelToAllowed": "Kids சேனலை அனுமதிக்கப்பட்ட விதிகளுக்கு நகர்த்தியது"
+  "dashboard.ruleEditor.move.kidsChannelToAllowed": "Kids சேனலை அனுமதிக்கப்பட்ட விதிகளுக்கு நகர்த்தியது",
+  "popup.languageChoiceLabel": "மொழி: {language} ({code}) — {selectionState}"
 }

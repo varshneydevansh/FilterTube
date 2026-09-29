@@ -1589,5 +1589,6 @@
   "dashboard.ruleEditor.move.kidsKeywordToBlocked": "የKids ቁልፍ ቃል ወደ የታገዱ ደንቦች ተዛወረ",
   "dashboard.ruleEditor.move.kidsKeywordToAllowed": "የKids ቁልፍ ቃል ወደ የተፈቀዱ ደንቦች ተዛወረ",
   "dashboard.ruleEditor.move.kidsChannelToBlocked": "የKids ቻናል ወደ የታገዱ ደንቦች ተዛወረ",
-  "dashboard.ruleEditor.move.kidsChannelToAllowed": "የKids ቻናል ወደ የተፈቀዱ ደንቦች ተዛወረ"
+  "dashboard.ruleEditor.move.kidsChannelToAllowed": "የKids ቻናል ወደ የተፈቀዱ ደንቦች ተዛወረ",
+  "popup.languageChoiceLabel": "ቋንቋ፦ {language} ({code})፣ {selectionState}"
 }

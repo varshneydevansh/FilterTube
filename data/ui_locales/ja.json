@@ -1589,5 +1589,6 @@
   "dashboard.ruleEditor.move.kidsKeywordToBlocked": "Kids のキーワードをブロックルールに移動しました",
   "dashboard.ruleEditor.move.kidsKeywordToAllowed": "Kids のキーワードを許可ルールに移動しました",
   "dashboard.ruleEditor.move.kidsChannelToBlocked": "Kids のチャンネルをブロックルールに移動しました",
-  "dashboard.ruleEditor.move.kidsChannelToAllowed": "Kids のチャンネルを許可ルールに移動しました"
+  "dashboard.ruleEditor.move.kidsChannelToAllowed": "Kids のチャンネルを許可ルールに移動しました",
+  "popup.languageChoiceLabel": "言語：{language}（{code}）、{selectionState}"
 }

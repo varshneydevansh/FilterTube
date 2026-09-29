@@ -1589,5 +1589,6 @@
   "dashboard.ruleEditor.move.kidsKeywordToBlocked": "Kids کے کلیدی لفظ کو مسدود قواعد میں منتقل کر دیا گیا",
   "dashboard.ruleEditor.move.kidsKeywordToAllowed": "Kids کے کلیدی لفظ کو اجازت یافتہ قواعد میں منتقل کر دیا گیا",
   "dashboard.ruleEditor.move.kidsChannelToBlocked": "Kids چینل کو مسدود قواعد میں منتقل کر دیا گیا",
-  "dashboard.ruleEditor.move.kidsChannelToAllowed": "Kids چینل کو اجازت یافتہ قواعد میں منتقل کر دیا گیا"
+  "dashboard.ruleEditor.move.kidsChannelToAllowed": "Kids چینل کو اجازت یافتہ قواعد میں منتقل کر دیا گیا",
+  "popup.languageChoiceLabel": "زبان: {language} ({code}) — انتخاب کی حالت: {selectionState}"
 }

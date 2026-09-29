@@ -1589,5 +1589,6 @@
   "dashboard.ruleEditor.move.kidsKeywordToBlocked": "Inilipat ang Kids keyword sa mga naka-block na panuntunan",
   "dashboard.ruleEditor.move.kidsKeywordToAllowed": "Inilipat ang Kids keyword sa mga pinapayagang panuntunan",
   "dashboard.ruleEditor.move.kidsChannelToBlocked": "Inilipat ang Kids channel sa mga naka-block na panuntunan",
-  "dashboard.ruleEditor.move.kidsChannelToAllowed": "Inilipat ang Kids channel sa mga pinapayagang panuntunan"
+  "dashboard.ruleEditor.move.kidsChannelToAllowed": "Inilipat ang Kids channel sa mga pinapayagang panuntunan",
+  "popup.languageChoiceLabel": "Wika: {language} ({code}), {selectionState}"
 }

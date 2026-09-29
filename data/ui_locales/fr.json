@@ -1589,5 +1589,6 @@
   "dashboard.ruleEditor.move.kidsKeywordToBlocked": "Mot-clé Kids déplacé vers les règles bloquées",
   "dashboard.ruleEditor.move.kidsKeywordToAllowed": "Mot-clé Kids déplacé vers les règles autorisées",
   "dashboard.ruleEditor.move.kidsChannelToBlocked": "Chaîne Kids déplacée vers les règles bloquées",
-  "dashboard.ruleEditor.move.kidsChannelToAllowed": "Chaîne Kids déplacée vers les règles autorisées"
+  "dashboard.ruleEditor.move.kidsChannelToAllowed": "Chaîne Kids déplacée vers les règles autorisées",
+  "popup.languageChoiceLabel": "Langue : {language} ({code}), état de sélection : {selectionState}"
 }

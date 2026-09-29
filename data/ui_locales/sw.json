@@ -1589,5 +1589,6 @@
   "dashboard.ruleEditor.move.kidsKeywordToBlocked": "Neno kuu la Kids limehamishiwa kwenye sheria zilizozuiwa",
   "dashboard.ruleEditor.move.kidsKeywordToAllowed": "Neno kuu la Kids limehamishiwa kwenye sheria zinazoruhusiwa",
   "dashboard.ruleEditor.move.kidsChannelToBlocked": "Kituo cha Kids kimehamishiwa kwenye sheria zilizozuiwa",
-  "dashboard.ruleEditor.move.kidsChannelToAllowed": "Kituo cha Kids kimehamishiwa kwenye sheria zinazoruhusiwa"
+  "dashboard.ruleEditor.move.kidsChannelToAllowed": "Kituo cha Kids kimehamishiwa kwenye sheria zinazoruhusiwa",
+  "popup.languageChoiceLabel": "Lugha: {language} ({code}), {selectionState}"
 }

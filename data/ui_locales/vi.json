@@ -1589,5 +1589,6 @@
   "dashboard.ruleEditor.move.kidsKeywordToBlocked": "Đã chuyển từ khóa Kids sang quy tắc bị chặn",
   "dashboard.ruleEditor.move.kidsKeywordToAllowed": "Đã chuyển từ khóa Kids sang quy tắc được phép",
   "dashboard.ruleEditor.move.kidsChannelToBlocked": "Đã chuyển kênh Kids sang quy tắc bị chặn",
-  "dashboard.ruleEditor.move.kidsChannelToAllowed": "Đã chuyển kênh Kids sang quy tắc được phép"
+  "dashboard.ruleEditor.move.kidsChannelToAllowed": "Đã chuyển kênh Kids sang quy tắc được phép",
+  "popup.languageChoiceLabel": "Ngôn ngữ: {language} ({code}), {selectionState}"
 }

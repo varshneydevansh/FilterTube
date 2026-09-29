@@ -1589,5 +1589,6 @@
   "dashboard.ruleEditor.move.kidsKeywordToBlocked": "Kids কীওয়ার্ডটি ব্লক করা নিয়মে সরানো হয়েছে",
   "dashboard.ruleEditor.move.kidsKeywordToAllowed": "Kids কীওয়ার্ডটি অনুমোদিত নিয়মে সরানো হয়েছে",
   "dashboard.ruleEditor.move.kidsChannelToBlocked": "Kids চ্যানেলটি ব্লক করা নিয়মে সরানো হয়েছে",
-  "dashboard.ruleEditor.move.kidsChannelToAllowed": "Kids চ্যানেলটি অনুমোদিত নিয়মে সরানো হয়েছে"
+  "dashboard.ruleEditor.move.kidsChannelToAllowed": "Kids চ্যানেলটি অনুমোদিত নিয়মে সরানো হয়েছে",
+  "popup.languageChoiceLabel": "ভাষা: {language} ({code}) — {selectionState}"
 }

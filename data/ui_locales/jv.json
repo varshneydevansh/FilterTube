@@ -1589,5 +1589,6 @@
   "dashboard.ruleEditor.move.kidsKeywordToBlocked": "Tembung kunci Kids dipindhah menyang aturan sing diblokir",
   "dashboard.ruleEditor.move.kidsKeywordToAllowed": "Tembung kunci Kids dipindhah menyang aturan sing diidinake",
   "dashboard.ruleEditor.move.kidsChannelToBlocked": "Kanal Kids dipindhah menyang aturan sing diblokir",
-  "dashboard.ruleEditor.move.kidsChannelToAllowed": "Kanal Kids dipindhah menyang aturan sing diidinake"
+  "dashboard.ruleEditor.move.kidsChannelToAllowed": "Kanal Kids dipindhah menyang aturan sing diidinake",
+  "popup.languageChoiceLabel": "Basa: {language} ({code}), {selectionState}"
 }

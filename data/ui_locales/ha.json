@@ -1589,5 +1589,6 @@
   "dashboard.ruleEditor.move.kidsKeywordToBlocked": "An matsar da kalmar maɓalli ta Kids zuwa ƙa'idodin da aka toshe",
   "dashboard.ruleEditor.move.kidsKeywordToAllowed": "An matsar da kalmar maɓalli ta Kids zuwa ƙa'idodin da aka yarda",
   "dashboard.ruleEditor.move.kidsChannelToBlocked": "An matsar da tashar Kids zuwa ƙa'idodin da aka toshe",
-  "dashboard.ruleEditor.move.kidsChannelToAllowed": "An matsar da tashar Kids zuwa ƙa'idodin da aka yarda"
+  "dashboard.ruleEditor.move.kidsChannelToAllowed": "An matsar da tashar Kids zuwa ƙa'idodin da aka yarda",
+  "popup.languageChoiceLabel": "Harshe: {language} ({code}), {selectionState}"
 }

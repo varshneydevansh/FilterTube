@@ -1589,5 +1589,6 @@
   "dashboard.ruleEditor.move.kidsKeywordToBlocked": "Kids کی ورڈ نوں بلاک کیتے گئے اصولاں وچ لے گیا",
   "dashboard.ruleEditor.move.kidsKeywordToAllowed": "Kids کی ورڈ نوں اجازت والے اصولاں وچ لے گیا",
   "dashboard.ruleEditor.move.kidsChannelToBlocked": "Kids چینل نوں بلاک کیتے گئے اصولاں وچ لے گیا",
-  "dashboard.ruleEditor.move.kidsChannelToAllowed": "Kids چینل نوں اجازت والے اصولاں وچ لے گیا"
+  "dashboard.ruleEditor.move.kidsChannelToAllowed": "Kids چینل نوں اجازت والے اصولاں وچ لے گیا",
+  "popup.languageChoiceLabel": "زبان: {language} ({code}) — چناؤ دی حالت: {selectionState}"
 }

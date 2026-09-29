@@ -1589,5 +1589,6 @@
   "dashboard.ruleEditor.move.kidsKeywordToBlocked": "Kids 關鍵字已移到封鎖規則",
   "dashboard.ruleEditor.move.kidsKeywordToAllowed": "Kids 關鍵字已移到允許規則",
   "dashboard.ruleEditor.move.kidsChannelToBlocked": "Kids 頻道已移到封鎖規則",
-  "dashboard.ruleEditor.move.kidsChannelToAllowed": "Kids 頻道已移到允許規則"
+  "dashboard.ruleEditor.move.kidsChannelToAllowed": "Kids 頻道已移到允許規則",
+  "popup.languageChoiceLabel": "語言：{language}（{code}），{selectionState}"
 }

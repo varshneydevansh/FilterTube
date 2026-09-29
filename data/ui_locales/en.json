@@ -1589,5 +1589,6 @@
   "dashboard.ruleEditor.move.kidsKeywordToBlocked": "Kids keyword moved to Blocked rules",
   "dashboard.ruleEditor.move.kidsKeywordToAllowed": "Kids keyword moved to Allowed rules",
   "dashboard.ruleEditor.move.kidsChannelToBlocked": "Kids channel moved to Blocked rules",
-  "dashboard.ruleEditor.move.kidsChannelToAllowed": "Kids channel moved to Allowed rules"
+  "dashboard.ruleEditor.move.kidsChannelToAllowed": "Kids channel moved to Allowed rules",
+  "popup.languageChoiceLabel": "{language} ({code}), {selectionState}"
 }

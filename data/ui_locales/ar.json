@@ -1589,5 +1589,6 @@
   "dashboard.ruleEditor.move.kidsKeywordToBlocked": "تم نقل كلمة Kids المفتاحية إلى القواعد المحظورة",
   "dashboard.ruleEditor.move.kidsKeywordToAllowed": "تم نقل كلمة Kids المفتاحية إلى القواعد المسموح بها",
   "dashboard.ruleEditor.move.kidsChannelToBlocked": "تم نقل قناة Kids إلى القواعد المحظورة",
-  "dashboard.ruleEditor.move.kidsChannelToAllowed": "تم نقل قناة Kids إلى القواعد المسموح بها"
+  "dashboard.ruleEditor.move.kidsChannelToAllowed": "تم نقل قناة Kids إلى القواعد المسموح بها",
+  "popup.languageChoiceLabel": "اللغة {language} ({code})، حالة الاختيار: {selectionState}"
 }

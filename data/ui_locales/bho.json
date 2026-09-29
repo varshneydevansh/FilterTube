@@ -1589,5 +1589,6 @@
   "dashboard.ruleEditor.move.kidsKeywordToBlocked": "Kids कीवर्ड के रोकल नियम में सरका दिहल गइल",
   "dashboard.ruleEditor.move.kidsKeywordToAllowed": "Kids कीवर्ड के मंजूर नियम में सरका दिहल गइल",
   "dashboard.ruleEditor.move.kidsChannelToBlocked": "Kids चैनल के रोकल नियम में सरका दिहल गइल",
-  "dashboard.ruleEditor.move.kidsChannelToAllowed": "Kids चैनल के मंजूर नियम में सरका दिहल गइल"
+  "dashboard.ruleEditor.move.kidsChannelToAllowed": "Kids चैनल के मंजूर नियम में सरका दिहल गइल",
+  "popup.languageChoiceLabel": "भाषा: {language} ({code}), {selectionState}"
 }

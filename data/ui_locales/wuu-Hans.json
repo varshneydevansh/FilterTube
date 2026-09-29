@@ -1589,5 +1589,6 @@
   "dashboard.ruleEditor.move.kidsKeywordToBlocked": "Kids关键词挪到拦阻规则里哉",
   "dashboard.ruleEditor.move.kidsKeywordToAllowed": "Kids关键词挪到放行规则里哉",
   "dashboard.ruleEditor.move.kidsChannelToBlocked": "Kids频道挪到拦阻规则里哉",
-  "dashboard.ruleEditor.move.kidsChannelToAllowed": "Kids频道挪到放行规则里哉"
+  "dashboard.ruleEditor.move.kidsChannelToAllowed": "Kids频道挪到放行规则里哉",
+  "popup.languageChoiceLabel": "语言：{language}（{code}），{selectionState}"
 }

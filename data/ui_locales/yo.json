@@ -1589,5 +1589,6 @@
   "dashboard.ruleEditor.move.kidsKeywordToBlocked": "A gbe ọ̀rọ̀ pàtàkì Kids lọ sí àwọn òfin ìdènà",
   "dashboard.ruleEditor.move.kidsKeywordToAllowed": "A gbe ọ̀rọ̀ pàtàkì Kids lọ sí àwọn òfin ìyọ̀nda",
   "dashboard.ruleEditor.move.kidsChannelToBlocked": "A gbe ikanni Kids lọ sí àwọn òfin ìdènà",
-  "dashboard.ruleEditor.move.kidsChannelToAllowed": "A gbe ikanni Kids lọ sí àwọn òfin ìyọ̀nda"
+  "dashboard.ruleEditor.move.kidsChannelToAllowed": "A gbe ikanni Kids lọ sí àwọn òfin ìyọ̀nda",
+  "popup.languageChoiceLabel": "Èdè: {language} ({code}), {selectionState}"
 }

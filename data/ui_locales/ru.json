@@ -1589,5 +1589,6 @@
   "dashboard.ruleEditor.move.kidsKeywordToBlocked": "Ключевое слово Kids перемещено в заблокированные правила",
   "dashboard.ruleEditor.move.kidsKeywordToAllowed": "Ключевое слово Kids перемещено в разрешённые правила",
   "dashboard.ruleEditor.move.kidsChannelToBlocked": "Канал Kids перемещён в заблокированные правила",
-  "dashboard.ruleEditor.move.kidsChannelToAllowed": "Канал Kids перемещён в разрешённые правила"
+  "dashboard.ruleEditor.move.kidsChannelToAllowed": "Канал Kids перемещён в разрешённые правила",
+  "popup.languageChoiceLabel": "Язык: {language} ({code}), {selectionState}"
 }
