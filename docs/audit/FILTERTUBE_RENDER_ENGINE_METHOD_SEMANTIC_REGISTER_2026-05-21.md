@@ -23,10 +23,10 @@ list-mode, or performance behavior changes.
 
 ```text
 source file: js/render_engine.js
-source split lines: 2094
-source wc -l: 2093
-source bytes: 93770
-source sha256: aa2942ded66d836c133eab2a0cbec624a76cf2c252c68b5e053a2e7c10ce76aa
+source split lines: 2095
+source wc -l: 2094
+source bytes: 93845
+source sha256: 90a22771f0d9947dc2bd3b325a4bacdbfd3d0219265c10d16a43a80f3fc53ba6
 broad lexical callable matches: 171
 IIFE-scoped declarations: 51
 plain function declarations: 46
@@ -103,32 +103,32 @@ keywordRenderingAndRowActions: 14
 | 368 | `function` | `getChannelPageUrl` | `channelDisplayIdentityHelpers` |
 | 390 | `function` | `getChannelDisplayName` | `channelDisplayIdentityHelpers` |
 | 397 | `function` | `createChannelNameNode` | `channelDisplayIdentityHelpers` |
-| 427 | `function` | `renderKeywordList` | `keywordRenderingAndRowActions` |
-| 589 | `function` | `normalizeKeywordDateFilterForUi` | `keywordRenderingAndRowActions` |
-| 604 | `function` | `formatKeywordDateFilterLabel` | `keywordRenderingAndRowActions` |
-| 628 | `function` | `attachKeywordHelpBubble` | `keywordRenderingAndRowActions` |
-| 636 | `function` | `createRuleTargetBadge` | `keywordRenderingAndRowActions` |
-| 658 | `function` | `createMoveRuleButton` | `keywordRenderingAndRowActions` |
-| 679 | `function` | `createKeywordListItem` | `keywordRenderingAndRowActions` |
-| 1057 | `function` | `renderChannelList` | `channelRenderingAndRowActions` |
-| 1323 | `function` | `groupChannelsByCollaboration` | `collaborationGrouping` |
-| 1341 | `function` | `buildCollaborationMeta` | `collaborationGrouping` |
-| 1388 | `function` | `matchesCollaborator` | `collaborationGrouping` |
-| 1401 | `function` | `createCollaborationBadge` | `badgeAndSourceDecoration` |
-| 1428 | `function` | `createChannelListItem` | `channelRenderingAndRowActions` |
-| 1453 | `function` | `createMinimalChannelItem` | `channelRenderingAndRowActions` |
-| 1519 | `function` | `createFullChannelItem` | `channelRenderingAndRowActions` |
-| 1702 | `function` | `createNodeMapping` | `channelRenderingAndRowActions` |
-| 1768 | `function` | `createFilterAllToggle` | `channelRenderingAndRowActions` |
-| 1834 | `function` | `createFallbackFilterAllToggle` | `channelRenderingAndRowActions` |
-| 1884 | `function` | `isTopicChannel` | `channelDisplayIdentityHelpers` |
-| 1895 | `function` | `getTopicChannelTooltip` | `channelDisplayIdentityHelpers` |
-| 1903 | `function` | `findChannelByRef` | `keywordRenderingAndRowActions` |
-| 1922 | `function` | `deriveChannelMapping` | `channelDisplayIdentityHelpers` |
-| 2015 | `function` | `createFallbackExactToggle` | `keywordRenderingAndRowActions` |
-| 2045 | `function` | `getExactKeywordHelpText` | `keywordRenderingAndRowActions` |
-| 2060 | `function` | `createFallbackDeleteButton` | `keywordRenderingAndRowActions` |
-| 2068 | `function` | `patchChannelListItem` | `channelRenderingAndRowActions` |
+| 428 | `function` | `renderKeywordList` | `keywordRenderingAndRowActions` |
+| 590 | `function` | `normalizeKeywordDateFilterForUi` | `keywordRenderingAndRowActions` |
+| 605 | `function` | `formatKeywordDateFilterLabel` | `keywordRenderingAndRowActions` |
+| 629 | `function` | `attachKeywordHelpBubble` | `keywordRenderingAndRowActions` |
+| 637 | `function` | `createRuleTargetBadge` | `keywordRenderingAndRowActions` |
+| 659 | `function` | `createMoveRuleButton` | `keywordRenderingAndRowActions` |
+| 680 | `function` | `createKeywordListItem` | `keywordRenderingAndRowActions` |
+| 1058 | `function` | `renderChannelList` | `channelRenderingAndRowActions` |
+| 1324 | `function` | `groupChannelsByCollaboration` | `collaborationGrouping` |
+| 1342 | `function` | `buildCollaborationMeta` | `collaborationGrouping` |
+| 1389 | `function` | `matchesCollaborator` | `collaborationGrouping` |
+| 1402 | `function` | `createCollaborationBadge` | `badgeAndSourceDecoration` |
+| 1429 | `function` | `createChannelListItem` | `channelRenderingAndRowActions` |
+| 1454 | `function` | `createMinimalChannelItem` | `channelRenderingAndRowActions` |
+| 1520 | `function` | `createFullChannelItem` | `channelRenderingAndRowActions` |
+| 1703 | `function` | `createNodeMapping` | `channelRenderingAndRowActions` |
+| 1769 | `function` | `createFilterAllToggle` | `channelRenderingAndRowActions` |
+| 1835 | `function` | `createFallbackFilterAllToggle` | `channelRenderingAndRowActions` |
+| 1885 | `function` | `isTopicChannel` | `channelDisplayIdentityHelpers` |
+| 1896 | `function` | `getTopicChannelTooltip` | `channelDisplayIdentityHelpers` |
+| 1904 | `function` | `findChannelByRef` | `keywordRenderingAndRowActions` |
+| 1923 | `function` | `deriveChannelMapping` | `channelDisplayIdentityHelpers` |
+| 2016 | `function` | `createFallbackExactToggle` | `keywordRenderingAndRowActions` |
+| 2046 | `function` | `getExactKeywordHelpText` | `keywordRenderingAndRowActions` |
+| 2061 | `function` | `createFallbackDeleteButton` | `keywordRenderingAndRowActions` |
+| 2069 | `function` | `patchChannelListItem` | `channelRenderingAndRowActions` |
 
 ## Current Public API
 

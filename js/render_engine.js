@@ -410,7 +410,8 @@ const RenderEngine = (() => {
         link.href = channelUrl;
         link.target = '_blank';
         link.rel = 'noopener noreferrer';
-        link.title = `Open channel on YouTube: ${channelUrl}`;
+        setRendererCopy(link, 'title', 'render.openChannelOnYouTube',
+            'Open channel on YouTube: {url}', { url: channelUrl });
         return link;
     }
 

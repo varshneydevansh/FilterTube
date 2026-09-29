@@ -8,6 +8,8 @@
     "build:ui": "node scripts/build-extension-ui.mjs",
     "check:ui-locales": "node scripts/check-ui-locales.mjs",
     "check:ui-locales:targets": "node scripts/check-ui-locales.mjs --require-all",
+    "check:release-note-locales": "node scripts/check-release-note-locales.mjs",
+    "check:release-note-locales:complete": "node scripts/check-release-note-locales.mjs --require-all",
     "audit:ui-copy": "python3 scripts/audit-ui-copy.py",
     "audit:ui-copy:complete": "python3 scripts/audit-ui-copy.py --require-complete",
     "dev": "node build.js",
