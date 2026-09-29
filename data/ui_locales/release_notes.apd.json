@@ -14,5 +14,361 @@
       "نشر إصدارات GitHub بستخدم بيانات GitHub CLI، وبعمل مسودات قبل الرفع، وبواصل من الوسوم الموجودة، وبرفع الملفات الناقصة بس، وبتأكد من مجموعة الملفات النهائية، وبنشر بعد التأكد بس.",
       "تطبيق FilterTube لهواتف وأجهزة Android اللوحية بقى متاح للكل في Google Play. ثبّتو من [الصفحة العامة](https://play.google.com/store/apps/details?id=com.filtertube.app) أو فتش عن FilterTube في Google Play."
     ]
+  },
+  "3.3.6": {
+    "ctaLabel": "شوف الجديد",
+    "headline": "فلترة أقوى، ووقت محمي، وتشغيل أهدى من غير إعلانات",
+    "summary": "FilterTube 3.3.6 بضيف تطبيق قواعد الوصول المباشر، ووقت محمي وجلسات Self-Control لكل ملف شخصي، ومجموعات موثوقة للقواعد الممنوعة والمسموحة، وفلترة الفئات الرسمية، وAdvert Void شغال افتراضياً، وشغل توافق كتير مع YouTube الحالي.",
+    "bannerSummary": "فلترة الوصول المباشر، والوقت المحمي، واستيراد قوائم القواعد وBlockTube، والفئات الرسمية، وAdvert Void، وتوافق أحسن مع YouTube الحالي.",
+    "highlights": [
+      "زيارات YouTube المباشرة، والتنقل بين playlists، والتشغيل التلقائي، وembeds المدعومة، هسه بتمر بنفس قواعد قبول الفيديو والقناة البتطبقها فلترة الـfeed، وما بتتجاوز الفلترة.",
+      "حدود YouTube اليومية بقت تنطبق على الملف الشخصي الشغال، وبتوري الزمن الباقي، وبتستمر بعد إعادة التشغيل، وبتستخدم شاشة timeout كاملة مع تبديل ملفات شخصية محمي بـPIN. جلسات Self-Control الاختيارية بتقفل القواعد المختارة لحدي ما العد التنازلي يخلص.",
+      "قواعد Blocked وAllowed بقت مجموعات منفصلة لـMain وKids؛ وسياسة Blocklist أو Whitelist الأساسية هي البتحدد المجموعة البتتحكم في المشاهدة.",
+      "استيراد قوائم BlockTube الكبيرة وقوائم القواعد المُدارة بستخدم هسه معاينة، وفحص السعة، وtransactional rollback، والتحقق read-back، ومعاها أعداد أوضح للمضاف والمكرر والمتخطى والقنوات والكلمات المفتاحية وregex ومعرفات الفيديو.",
+      "فلترة الفئات بتستخدم `microformat.playerMicroformatRenderer.category` الرسمية من YouTube، وتحميل محدود لـPlayer metadata من نفس المصدر، وخيارات واضحة لحظر الفئات المختارة أو السماح بيها بس، وتعامل أأمن مع Watch والـrail وMix والتعليقات وملكية renderer.",
+      "Advert Void بقى شغال افتراضياً للملفات الجديدة والمحدّثة على YouTube Main وKids. الـWeb runtime المشترك بشيل حقول خطة الإعلانات المرصودة في Player من غير requests زيادة؛ والـnative playback بتخلص من بيانات الخطة الما متشكلة أو بتظبط raw Reel response لو ظهر، والـfallback المحمي بتعامل مع المقاطعات البتعدي.",
+      "فلترة اللغة المنطوقة التجريبية وتفضيل الصوت الأصلي بستخدموا دليل من YouTube Player لو متوفر؛ ولو recommendation metadata ما متوفرة، بخلو المحتوى يعدي.",
+      "كمان الإصدار فيهو إخفاء YouTube Playables، والتعامل مع camelCase renderer والتعاون بالشكل الحالي، وHelp والبحث أسهل في القراءة، وتحكمات popup وdashboard أوضح، ومعلومات توفر Android في Google Play وحالة iOS.",
+      "Settings بقى فيهو خيار إيقاف لكل الجهاز، وما مختار افتراضياً، للتذكيرات التلقائية بإعادة التحميل وبانرات What's New في YouTube وYouTube Kids. صفحة What's New في dashboard لسه ممكن تفتحها يدوي."
+    ]
+  },
+  "3.3.5": {
+    "ctaLabel": "شوف الجديد",
+    "headline": "التعافي من أعطال YouTube وحظر قنوات Shorts بدري",
+    "summary": "الإصدار ده بصلّح حقن content runtime المكرر في تبويبات YouTube المفتوحة، وبحل هوية قناة Shorts الظاهرة بدري لما قواعد القنوات أو وضع whitelist تكون شغالة.",
+    "bannerSummary": "بصلّح حقن runtime المكرر وبحدد هوية قناة Shorts بدري.",
+    "highlights": [
+      "Install/update/profile refresh ما بقى يعيد حقن manifest content scripts في تبويبات YouTube المفتوحة، وده بمنع أخطاء syntax المتكررة `Identifier ... has already been declared`.",
+      "تبويبات YouTube المفتوحة لسه بتستقبل فحوصات الوقت المحدود والـruntime المُدارة من غير تكرار script declarations.",
+      "Shorts الظاهرة أو القريبة تظهر هسه بتستخدم owner resolver الخلفي المحدود الموجود `/shorts/<videoId>` لما قواعد channel blocklist أو وضع whitelist تكون شغالة.",
+      "خرائط Shorts المتعلمة البتربط الفيديو بالقناة بتتحفظ وبتتعالج تاني فوراً، عشان Shorts القنوات الممنوعة تنخفي من غير hover أو menu interaction قبلها.",
+      "استضافات desktop Shorts زي `.shortsLockupViewModelHost` و`.ytGridShelfViewModelGridShelfItem` اتضافت لمسارات Shorts المخصصة للـfallback/enrichment.",
+      "في وضع Blocklist، Shorts الما معروفة ما بتتخفى لحدي ما هويتها تتحدد؛ ووضع whitelist بظل أشد عبر مسار pending الموجود.",
+      "v3.3.4 موثق كـstore rollback لحزمة v3.3.2 خلال التحقيق في تقرير عطل YouTube."
+    ]
+  },
+  "3.3.4": {
+    "ctaLabel": "شوف الجديد",
+    "headline": "متاجر المتصفح رجعت لحزمة v3.3.2",
+    "summary": "v3.3.4 كان إصدار rollback للمتاجر، واستخدم حزمة v3.3.2 الأقدم خلال التحقيق في تقرير عطل YouTube المرتبط بـv3.3.3.",
+    "bannerSummary": "Rollback للمتجر: v3.3.4 استخدم حزمة v3.3.2 خلال التحقيق في مشكلة YouTube.",
+    "highlights": [
+      "ما في ادعاء بميزات جديدة من تغييرات المصدر في v3.3.4.",
+      "استخدموا rollback عشان يبعدوا المتاجر من حزمة v3.3.3 المشتبه فيها خلال التحقيق في المشكلة #64.",
+      "الإصدار المصدري البعده، v3.3.5، جاب إصلاحات حقن runtime المكرر وحل هوية Shorts."
+    ]
+  },
+  "3.3.3": {
+    "ctaLabel": "شوف الجديد",
+    "headline": "تحديثات أجهزة الأسرة، وقوائم القواعد، وكلمات بالتاريخ، وتحديث DOM في YouTube",
+    "summary": "الإصدار ده بخلي تحكم الوالدين/مقدم الرعاية أسهل في الفهم، وبضيف استيراد قوائم قواعد مراجعة وقواعد كلمات مفتاحية محدودة بتاريخ، وبوثق نموذج Home/Internet Pickup، وبجدد الفلترة عشان markup الحالي في YouTube/YTM.",
+    "bannerSummary": "تحديثات أجهزة الأسرة، واستيراد قوائم قواعد مراجعة، وكلمات حسب التاريخ، وHelp موجه للأهل، وتوافق DOM مع YouTube/YTM الحالي.",
+    "highlights": [
+      "ملفات الوالدين/مقدمي الرعاية بتقدر تدير الملفات المحمية، وتعدل قواعد الأطفال/الملفات المحمية من dashboard الوالدين، وترسل التحديثات الموافق عليها للأجهزة المحمية المتحقق منها.",
+      "Family Device Updates هسه بشرح Send Update المباشر، وHome Pickup الواضح، وInternet Pickup الواضح، وما بعتبر خدمات pickup مصدر صلاحية.",
+      "حدود وقت الملف المحمي بتفحص هسه تبويبات YouTube القديمة والجديدة، وبتوري شاشة timeout هادية، وبتسجل طلبات الزمن الزيادة لمراجعة الوالدين.",
+      "استيراد قوائم القواعد بدعم CSV وTXT وJSON البسيط وJSON بطريقة BlockTube وروابط HTTPS الخام؛ وفي معاينة قبل التطبيق، واختيار Main/Kids/Both، وقوالب وإدارة قوائم، وإيقاف/استئناف/إزالة، وفحص القدم والتحديث.",
+      "فلترة الكلمات حسب التاريخ ممكن تطبق الكلمة من تاريخ الرفع أو قبله أو بين تاريخين بس. فلترة التعليقات بتستخدم تاريخ رفع الفيديو الأساسي لو YouTube وفره.",
+      "Help وتحكمات dashboard بقت تستخدم كلام أبسط وموجه للأهل، وhelp bubbles أسرع، وشرح أوضح لـExact وComment وDate وPINs وقوائم القواعد وتحديثات الأجهزة.",
+      "Dashboard هسه بدعو مستخدمي اختبار Android المغلق والنشطين يرسلوا إيميل لـhello@filtertube.in، وبخلي تذكير ظاهر للإبلاغ عن أعطال الفلترة لما يتغير هيكل صفحات YouTube.",
+      "توثقت selectors تبع YouTube desktop lockup وDOM تبع YTM mobile camelCase عشان بطاقات الفيديو الحقيقية تواصل الفلترة، وchip bars في صفحة Watch ما تصحي شغل fallback أو تعمل قفزات scroll.",
+      "لسه منفصلين: اكتشاف أجهزة LAN تلقائياً، وخدمة FilterTube Internet Pickup مستضافة، وكاتالوجات auto-subscribe عامة صامتة، وتكافؤ Android/iOS native، ودليل manual smoke test على جهازين مثبتين."
+    ]
+  },
+  "3.3.2": {
+    "ctaLabel": "شوف الجديد",
+    "headline": "MVP لتطبيق الموبايل/التابلت، YouTube أسلس، وwhitelist أأمن",
+    "summary": "واجهة إصدار التطبيق العام جاهزة للاختبار النهائي لـAndroid phone/tablet ولمتابعة وضع iOS/iPad؛ وextension dashboard بقى بيوجه لمسارات التطبيق، وشغل YouTube SPA أخف لما ما في قواعد شغالة، وإصلاحات صحة whitelist/end-screen داخلة في الإصدار.",
+    "bannerSummary": "حالة تطبيق Android/iOS، وشغل YouTube SPA أخف، وإصلاحات whitelist/end-screen.",
+    "highlights": [
+      "مركز تنزيلات الموقع وextension dashboard هسه بعرضوا مسار الاختبار النهائي لـAndroid phone/tablet ومسار حالة iOS/iPad TestFlight/App Store.",
+      "إعداد إصدار Android phone/tablet موثق حول FilterTube runtime المشترك وYouTube Main والوصول العام لـYouTube Kids والملفات الشخصية وقواعد PIN ومزامنة Nanah.",
+      "شغل أداء YouTube SPA بقى بتخطى المزيد من JSON clone/parse/replay وDOM fallback وquick-block وfallback-menu وwhitelist-pending لو ما في قواعد فعالة أو ما في حاجة للمسار.",
+      "سياقات extension production بتحط console logging العادي خلف debug mode الصريح عشان التصفح الطبيعي ما يتحمل console overhead في مسارات YouTube السريعة.",
+      "إصلاحات whitelist للإصدار بتغطي Shorts creator fallback وتمرير list-target وفلترة endpoint المختصرة لـautoplay/watch-next لتحكمات end-screen.",
+      "اتقوت DOM state attributes في FilterTube عشان تقلل بصمات `data-filtertube-*` الظاهرة الواسعة مع الحفاظ على runtime state الضرورية.",
+      "Accounts & Sync بقى بشرح Family Device Updates عبر Send Update وHome Pickup الاختياري وInternet Pickup وقت الغياب أو الفتح لاحقاً، عشان الأهل يفهموا شنو live sync وhome pickup وonline pickup وشنو ما مصدر صلاحية.",
+      "حدود وقت الملف المحمي بقى عندها توثيق ظاهر للإصدار عن ميزانيات YouTube اليومية وشاشات timeout وسجل طلب وقت زيادة وموافقة الوالدين/مقدمي الرعاية.",
+      "مسارات Nanah/import بتحافظ على ملكية keyword Filter All المشتق من القناة بين extension وnative app payloads، بما فيها لون الصف وsource-badge metadata وسياق الاقتران."
+    ]
+  },
+  "3.3.1": {
+    "ctaLabel": "شوف الجديد",
+    "headline": "مزامنة آمنة بين الأجهزة عبر P2P من غير سيرفر طرف ثالث",
+    "summary": "Accounts & Sync بقى بعرض Nanah كـ3 مسارات أبسط، باستهداف أقوى للأهل/الأطفال، وقواعد reconnect أوضح، وتوثيق أوسع للاستخدام الحقيقي.",
+    "bannerSummary": "ثلاث مسارات Nanah واضحة، واستهداف أقوى، وقواعد reconnect مفهومة.",
+    "highlights": [
+      "Accounts & Sync بقى ببدأ بثلاث مسارات أوضح: أرسل الملف ده مرة، الوالدين يتحكموا في الطفل، وانقل الحساب كله.",
+      "تحكمات Nanah المتقدمة لسه موجودة، لكنها مخفية في قسم Advanced بدل ما تقود كل التدفق.",
+      "جلسات الوالدين/المصدر بتقدر تختار profile هدف بعيد أوضح، وحفظ managed-link بينعكس كمان للمرسل عشان الجهازين يحتفظوا بسجل الثقة نفسه.",
+      "الروابط الموثوقة بتفضل محفوظة بعد refresh، لكن reconnect بظل جلسة مباشرة جديدة، مش مزامنة خلفية مخفية.",
+      "تحديثات الطفل المقفولة وقواعد reconnect وحفظ device-label وحماية self-join/session-burn اتقوت لتحكم أهلي أأمن.",
+      "README وArchitecture وTechnical وFunctionality وProfiles & PIN وproject plan وuser guide وconcern tracker هسه بوثقوا نقطة Nanah desktop الحالية بتفصيل أكتر."
+    ]
+  },
+  "3.3.0": {
+    "ctaLabel": "شوف الجديد",
+    "headline": "تعافي collaboration + استيراد أقوى بين المتصفحات",
+    "summary": "قوائم collaboration في Watch/YTM بقت بترجع roster كامل بموثوقية أكبر، واستيراد subscriptions أقوى عبر المتصفحات، وكذا إصلاح خاص بـwhitelist وQuick Block داخل في 3.3.0.",
+    "bannerSummary": "استعادة roster كامل للمتعاونين، واستيراد subscriptions أقوى، وإصلاحات whitelist/Quick Block.",
+    "highlights": [
+      "بطاقات YouTube mobile home/watch-next/Mix بقت داخلة في نفس تدفق استعادة 3-dot والمتعاونين بدل ما ترجع لقوائم قناة واحدة ناقصة.",
+      "right rail في صفحة Watch وصفوف playlist وlockups الشبيهة بالمشاهدة بقت بتستعيد roster المتعاونين كامل وبتحدث قائمة 3-dot النشطة في مكانها.",
+      "استعادة Mix/watch أأمن: بطاقات collaboration الحقيقية بتتطور صح، لكن الأسماء العادية البتحتوي '&' أو 'and' ما بتتحول لقوائم collaboration غلط.",
+      "Quick Block بقى أثبت في الأسطح المعقدة: بظهر فوق بطاقات desktop أكتر، وبيتجنب قوائم اقتراح البحث في الموبايل، وبثبت أحسن في layouts بتاعة watch-next على الموبايل.",
+      "استيراد whitelist للقنوات المشترَك فيها بحافظ على ردود تصفح الصفحة الحديثة، وبيفضل نمو /feed/channels الحقيقي، وبخلي /feed/channels سطح إدارة ظاهر.",
+      "فلترة whitelist بقت أشد وأأمن في renderers تبع YouTube desktop/mobile، مع تعامل أحسن مع صفحات المبدعين وتحكمات إخفاء Mixes/subscriptions.",
+      "تحكمات وتحسينات جديدة: صفوف Channel Management بتربط بصفحات القنوات الحقيقية، وعنصر block في قائمة 3-dot ممكن تطفيه، وتصدير Firefox المشفّر بستخدم fallback أأمن."
+    ]
+  },
+  "3.2.9": {
+    "ctaLabel": "شوف الجديد",
+    "headline": "استيراد القنوات المشترَك فيها + Whitelist + إصلاح حماية PIN",
+    "summary": "استورد subscriptions حساب YouTube الشغال إلى whitelist بمعنى أوضح لتبديل الوضع وتدفق بداية /feed/channels أضمن.",
+    "bannerSummary": "استيراد القنوات المشترَك فيها من حساب YouTube الشغال إلى whitelist ببداية أضمن.",
+    "highlights": [
+      "في New Tab View، القنوات المشترَك فيها ممكن تستوردها من حساب YouTube النشط المسجل دخوله إلى whitelist.",
+      "بداية الاستيراد هسه بتستخدم تبويب YouTube مباشر موجود، وبتوديه لـ/feed/channels، وبتستنى FilterTube bridge قبل البداية.",
+      "نص whitelist أوضح: Import Only بخلي blocklist زي ما هي، أما Import + Turn On Whitelist فبيتبع مسار الترحيل الموجود من blocklist لـwhitelist.",
+      "التوثيق بقى بغطّي بنية الاستيراد وتدفق طلب FEchannels ومصادر renderer ومعنى whitelist بتفصيل أكتر."
+    ]
+  },
+  "3.2.8": {
+    "ctaLabel": "شوف الجديد",
+    "headline": "تجديد الثيم + ضبط غلاف واجهة scenic",
+    "summary": "واجهات popup وdashboard بقت بتستخدم نظام ثيم scenic أهدأ، بتخطيط أضيق وحالات tint أوضح وتوازن أحسن بين الفاتح والغامق.",
+    "bannerSummary": "ثيم scenic هادي، وتخطيط أضيق، وتوازن أحسن بين الوضع الفاتح والغامق.",
+    "highlights": [
+      "تجديد Scenic UI: popup وdashboard بقوا بشتركوا في غلاف منتج أهدأ، والفيديو المحلي hero شغال كخلفية ambient.",
+      "ضبط ثيم الفاتح والغامق: الوضع الغامق بخلي الخلفية scenic ظاهرة من غير الوهج الوسطي الباهت، والوضع الفاتح بستخدم شفافية أنضف.",
+      "تنظيف responsive: مسافات popup أضيق، وprofile dropdown أصغر، وتخطيط بطاقة Help/Support أحسن، وملاءمة الموبايل اتحسنت في كل واجهات الفلترة.",
+      "إصلاحات tint للتحكمات: حالات enabled/disabled وألوان pill وحقول البحث وإجراءات الاستيراد/التصدير بقت أوضح في الثيمين."
+    ]
+  },
+  "3.2.7": {
+    "ctaLabel": "شوف الجديد",
+    "headline": "فلاتر الفئات + Quick Block hover cross + واجهة 3 Dot للموبايل",
+    "summary": "فلترة فئات جديدة، وزر quick cross block بنقرة واحدة شغال افتراضياً.",
+    "bannerSummary": "فلتر فئات YouTube واستعمل quick cross block بنقرة واحدة، شغال افتراضياً.",
+    "highlights": [
+      "Category Filtering: احظر الفيديوهات أو اسمح بيها حسب فئة YouTube (Music وGaming وEducation وغيرها).",
+      "Quick Cross Block Default ON: `Show Quick Cross Block button` متفعل افتراضياً في v3.2.7 (المستخدم لسه بقدر يعطلو).",
+      "حظر الموبايل: دعم أحسن لـYT Mobile مع 3 Dot UI وQuick Cross Block، والشغل حالياً نافع في Home Page."
+    ]
+  },
+  "3.2.6": {
+    "ctaLabel": "شوف الجديد",
+    "headline": "تجميل UI/UX وفلترة حسب المحتوى",
+    "summary": "تحسين كامل للخطوط بتصميم حديث وثلاث فلاتر محتوى جديدة (المدة والتاريخ والحروف الكبيرة).",
+    "bannerSummary": "خطوط أحسن، وفلاتر للمدة والتاريخ والحروف الكبيرة، وتحسينات dashboard.",
+    "highlights": [
+      "تحديث الخطوط: مقياس خطوط حديث ومحسّن عشان القراءة تكون أسهل.",
+      "فلاتر حسب المحتوى: المدة (أطول/أقصر/بيناتهم)، وتاريخ الرفع (أحدث/أقدم/بيناتهم)، وكشف الحروف الكبيرة (عناوين clickbait).",
+      "نظام videoMetaMap: تخزين مستمر لبيانات الفيديو مع batching ذكي (نافذة 75ms، الحد 1500 مدخل).",
+      "تحسينات dashboard: إحصائيات حسب السطح (Main مقابل Kids)، وبطاقات إحصائيات محسنة، وبطاقة ترويج للتبرع."
+    ]
+  },
+  "3.2.5": {
+    "ctaLabel": "شوف الجديد",
+    "headline": "وضع Whitelist بقى أساسي + ثبات",
+    "summary": "وضع whitelist بقى المسار الأساسي للسماح بالحاجات المحددة بس، مع استخراج أذكى وحماية playlist واستهلاك CPU أقل.",
+    "bannerSummary": "Whitelist أساسي، وتعرّف أحسن على القنوات، وحماية playlist واستهلاك CPU أقل.",
+    "highlights": [
+      "ترقية وضع whitelist: الصياغة والواجهة ما بقت تعتبره تجريبي.",
+      "تنظيف قائمة 3-dot ومعالجة البحث الثانوي لواجهات whitelist.",
+      "استخراج قنوات من مصادر متعددة مع thumbnail anchors وparent containers.",
+      "تتبّع state واعي بالوضع، وحوارات تأكيد، وتحسينات bridge.",
+      "ثبات playlist: الصفوف المختارة بتظل ظاهرة؛ والهويات المعلّقة ما بتظهر الصفوف المحظورة.",
+      "دعم whitelist في وضع Kids ببنية من غير شبكة."
+    ]
+  },
+  "3.2.4": {
+    "ctaLabel": "شوف الجديد",
+    "headline": "تحسين وضع Whitelist + تحسينات الأداء",
+    "summary": "تحسينات كبيرة لوضع whitelist التجريبي مع UX أحسن وتحسين أداء ودعم أوسع لوضع Kids.",
+    "bannerSummary": "تجربة whitelist والأداء ومنع ضياع البيانات ودعم Kids اتحسنوا.",
+    "highlights": [
+      "تجريبي: وضع whitelist محسن مع تنظيف قائمة 3-dot ومعالجة بحث ذكية وتتبّع state واعي بالوضع.",
+      "دفعة أداء: تحسينات على مستوى Bridge ومعالجة انتقائية بتقلل استهلاك CPU.",
+      "تحسينات الواجهة: حوارات التأكيد بتمنع ضياع بيانات بالغلط عند تغيير الوضع.",
+      "دعم Kids: وظيفة whitelist هسه بتشتغل في YouTube Kids ببنية من غير شبكة.",
+      "تحسين البحث: بطاقات watch بالـright rail بتتدار بذكاء عشان تمنع زحمة الواجهة.",
+      "استخراج القنوات: حل الهوية من مصادر متعددة مع thumbnail anchors وparent containers.",
+      "تبديل الوضع: انتقال سلس بين blocklist وwhitelist مع إعادة معالجة ذكية."
+    ]
+  },
+  "3.2.3": {
+    "ctaLabel": "شوف الجديد",
+    "headline": "وضع Whitelist تجريبي + تحسينات الواجهة",
+    "summary": "إصدار alpha لوضع whitelist لفلترة 'السماح للمختار بس'، ومعاه تحديثات واجهة أحسن ودعم قوائم الموبايل.",
+    "bannerSummary": "Whitelist alpha، وتبديل سهل بين الأوضاع في popup وtab view، ودعم قوائم الموبايل.",
+    "highlights": [
+      "تجريبي: وضع whitelist بخفي كل المحتوى ما عدا القنوات/الكلمات المفتاحية المسموح بيها صراحة.",
+      "وضعي فلترة مع toggle ساهل بين blocklist وwhitelist في popup وtab view.",
+      "ترحيل مرحلي — انتقل لـblocklist عشان تجمع القنوات، وبعدها ادمجها تاني في whitelist.",
+      "حماية صفحة Watch في وضع whitelist بتحافظ على تشغيل الفيديو.",
+      "تحديثات UI التفاؤلية بتخفي المحتوى فوراً وبترجعو تلقائياً لو الحظر فشل.",
+      "دعم أحسن لقوائم الموبايل مع التعامل الصحيح مع YouTube mobile renderer.",
+      "كل console logs بقت خلف debug flag عشان تقلل ضوضاء production."
+    ]
+  },
+  "3.2.2": {
+    "ctaLabel": "شوف الجديد",
+    "headline": "تحسينات UI/UX والتحكم في debug",
+    "summary": "تحديثات تفاؤلية، ودعم قوائم الموبايل، وlogging بتحكم debug، والحفاظ على scroll، وتحسينات إدارة الحالة.",
+    "bannerSummary": "فلترة بتظهر بسرعة، وقوائم موبايل، وتحكم debug، وحفظ موضع scroll.",
+    "highlights": [
+      "تحديثات UI التفاؤلية: المحتوى بخفى فوراً وبرجع تلقائياً لو الحظر فشل.",
+      "دعم أحسن لقائمة الموبايل لـytm-menu-popup-renderer مع renderer tags صحيحة.",
+      "Logging بتحكم debug عبر `window.__filtertubeDebug`.",
+      "حفظ موضع scroll أثناء DOM fallback عشان الصفحة ما تقفز فجأة.",
+      "حدود إثراء القنوات (10 في كل session) لتقليل background requests.",
+      "عرض مجدول وقت الخمول باستخدام requestIdleCallback وbatching.",
+      "تأخير external reload بمقارنة signature عشان يمنع renders المتكررة من غير داعي.",
+      "إشعارات انتقائية: `load` بس لما signature تتغير، وإلا `externalUpdate`.",
+      "إدارة حالة Bridge عبر حالة global مشتركة."
+    ]
+  },
+  "3.2.1": {
+    "ctaLabel": "شوف الجديد",
+    "headline": "معالجة من غير lag + زيادة أداء",
+    "summary": "تحسينات أداء كبيرة بتزيل بطء الواجهة، بنتائج ممتازة في متصفحات Chromium وتحسينات ملحوظة في Firefox.",
+    "bannerSummary": "تحسينات أداء كبيرة بتقلل تجميد الواجهة وقت الفلترة الثقيلة.",
+    "highlights": [
+      "معالجة DOM غير متزامنة بتدي main thread فرصة وبتمنع تجميد المتصفح وقت الفلترة التقيلة.",
+      "regex مترجمة مسبقاً وتخزين مؤقت لفلاتر القنوات بيوفر lookup O(1) وبقلل CPU بنسبة 60–80%.",
+      "تحديثات storage المجمعة بتقلل عمليات I/O بنسبة 70–90% بفواصل ذكية قدرها 250ms.",
+      "تحديث settings المؤجل بمنع إعادة معالجة DOM الزيادة.",
+      "إدارة run state بتمنع التنفيذ المتداخل وبتحط الطلبات في queue بطريقة سليمة.",
+      "متصفحات Chromium: تقليل lag بأكتر من 90%؛ Firefox: تحسينات كبيرة ولسه الشغل مستمر."
+    ]
+  },
+  "3.2.0": {
+    "ctaLabel": "شوف الجديد",
+    "headline": "حظر فوري + Kids من غير شبكة",
+    "summary": "قوائم 3-dot بتوري أسماء القنوات فوراً، وطلبات الشبكة بتنقص شديد، وYouTube Kids بشتغل بالكامل offline.",
+    "bannerSummary": "أسماء قنوات بتظهر فوراً، وطلبات شبكة أقل، وحظر Kids offline.",
+    "highlights": [
+      "قوائم 3-dot بقت بتعرض اسم القناة الصحيح فوراً — ما في انتظار 'Fetching...'.",
+      "هوية القناة بتجي من ردود YouTube JSON الملتقطة، وده بقلل طلبات الشبكة.",
+      "YouTube Kids بشتغل من غير أي network fetch عشان الحظر يكون موثوق.",
+      "الـmetadata الناقصة بتتملي في الخلفية بمعدل مضبوط (cooldown ست ساعات).",
+      "قنوات Topic (مثلاً 'Music - Topic') بتتدار بطريقة خاصة من غير @handles.",
+      "توثيق شامل جديد مع مخططات تدفق ASCII وMermaid."
+    ]
+  },
+  "3.1.9": {
+    "ctaLabel": "شوف الجديد",
+    "headline": "نسخ احتياطي واعي بالملف الشخصي + تحكمات محمية بالقفل",
+    "summary": "النسخ الاحتياطي التلقائي وتحكمات المحتوى هسه بتحترم قفل/PIN الملف الشخصي، وبتورث إعدادات كل ملف، وقائمة الملف الشخصي بظل ممكن تنقر فوق بانر قفل الوصول.",
+    "bannerSummary": "النسخ والتحكمات بتحترم أقفال الملفات؛ والقائمة لسه قابلة للنقر.",
+    "highlights": [
+      "اختيارات وضع/تنسيق النسخ التلقائي بتتعطل لما النسخ يكون مطفي أو الملف الشخصي مقفول؛ والملفات الجديدة بتورث تفضيلات النسخ التلقائي.",
+      "جدولة النسخ التلقائي بقت تشتغل وقت إنشاء ملف أو تغيير الوضع/التنسيق بس لو النسخ التلقائي شغال للملف ده.",
+      "مفاتيح تحكم المحتوى والنسخ بظلوا متعطلين/بيرجعوا وقت القفل؛ ونطاق التصدير للملفات الما رئيسية بيكون للملف النشط بس.",
+      "إصلاح z-index لقائمة الملف الشخصي بخليها قابلة للنقر حتى لو بانر قفل الوصول ظاهر.",
+      "التوثيق اتحدث عن نموذج profile/PIN والنسخ الخاصة بكل profile وقواعد UI gating."
+    ]
+  },
+  "3.1.8": {
+    "ctaLabel": "شوف الجديد",
+    "headline": "تبويب Support + نسخ تلقائي مضمون",
+    "summary": "صفحة Support جديدة (Ko-fi) اتضافت، والنسخ التلقائي بقى شغال بمصداقية على Chrome وFirefox.",
+    "bannerSummary": "صفحة دعم Ko-fi جديدة ونسخ تلقائي شغال في Chrome وFirefox.",
+    "highlights": [
+      "صفحة Support مع Ko-fi embed اتضافت للـdashboard.",
+      "النسخ التلقائي بقى بكتب فوق ملف واحد دوّار: Downloads/FilterTube Backup/FilterTube-Backup-Latest.json.",
+      "طريقة تنزيل بين المتصفحات: Blob URL لو متوفر؛ وdata: URL كـfallback لـChrome MV3 service worker.",
+      "تنزيلات Firefox ما بقت تفشل بسبب قيود data: URL."
+    ]
+  },
+  "3.1.7": {
+    "ctaLabel": "شوف الجديد",
+    "headline": "دعم YT Kids والنسخ التلقائي",
+    "summary": "المحتوى المبني على القناة بقى ممكن يتمنع في YT Kids، والنسخ التلقائي بقى ممكن تشغلو أو تطفيو.",
+    "bannerSummary": "حظر بالقناة في YouTube Kids ونسخ تلقائي ممكن تشغلو وتطفيو.",
+    "highlights": [
+      "حظر كامل حسب القناة والكلمة المفتاحية اتضاف لـYT Kids؛ وبيمنع القنوات عبر الاستماع السلبي لواجهة قائمة 3-dot في YT Kids.",
+      "خيار Settings اتضاف لتشغيل/إيقاف النسخ التلقائي (best-effort؛ من غير طلبات Save As).",
+      "النسخ التلقائي بتتحفظ في Downloads/FilterTube Backup/ مع تدوير الملفات والاحتفاظ بالأحدث.",
+      "الصادرات اليدوية هسه بتنزل من غير سؤال في Downloads/FilterTube Export/."
+    ]
+  },
+  "3.1.6": {
+    "ctaLabel": "شوف الجديد",
+    "headline": "دعم الاستيراد/التصدير + بانر الإصدار",
+    "summary": "CTA البانر بقى بيفتح What's New في dashboard مباشرة، والبطاقات المختارة بتتحمل من نفس JSON، والاستيراد بقى يحترم c/ChannelName وقواعد الدمج بصورة أحسن.",
+    "bannerSummary": "رابط مباشر لـWhat's New، وبطاقات من JSON واحد، واستيراد محسّن.",
+    "highlights": [
+      "Release notes JSON هسه بجهز بطاقات dashboard وبانر YouTube من مصدر حقيقة واحد.",
+      "CTA بفتح tab-view برسائل background عشان blockers ما يمنعوا روابط chrome-extension://.",
+      "توثيق وكود import/export بشرحوا كيف مدخلات UC/handle/c/ChannelName بتتطبع قبل الدمج."
+    ]
+  },
+  "3.1.5": {
+    "ctaLabel": "شوف الجديد",
+    "headline": "Shorts وMembers-only اختفوا فعلاً",
+    "summary": "صفحة Watch والـsidebar بقوا بيخفوا Shorts renderers ورفوف members-only قبل ما تطلع، وحالة المفتاح أخيراً بقت محفوظة.",
+    "bannerSummary": "Shorts ورفوف members-only بتتخفى قبل الظهور وحالة المفتاح بتتحفظ.",
+    "highlights": [
+      "فحوصات sidebar بتشوف hrefs فيها /shorts/ وoverlays وaria-labels قبل ما البطاقات تظهر.",
+      "كشف members-only بشمل صفوف compact وwatch وshelf مع badges جديدة وheuristics للـplaylist.",
+      "مشكلة حفظ مفتاح members-only اتصلحت عشان الحالة تفضل بعد reload."
+    ]
+  },
+  "3.1.4": {
+    "ctaLabel": "شوف الجديد",
+    "headline": "Dashboard بقى responsive",
+    "summary": "التنقل بينكمش بترتيب في الموبايل، والحقول بتلتف بسلاسة، وتحكمات playlist/mix بقت عندها toggles أوضح.",
+    "bannerSummary": "تنقل مناسب للموبايل، وحقول متجاوبة، وتحكمات playlist/Mix أوضح.",
+    "highlights": [
+      "Hamburger nav وoverlay للشاشات الصغيرة مع مسافات grid محسنة.",
+      "Toggles بقت عندها tracks أخف وthumbs في النص وتباين أحسن للوضع الغامق.",
+      "chip تبع Mix/Radio بتتخفى لما toggle Mix شغال؛ وإخفاء playlist بتتجاوز عناصر radio."
+    ]
+  },
+  "3.1.3": {
+    "ctaLabel": "شوف الجديد",
+    "headline": "تجديد دليل Help",
+    "summary": "Cards وpills وtooltips بشرحوا بالضبط شنو Exact / Comment / Filter All بعملوا، وبطابقوا styling الـdashboard الجديد.",
+    "bannerSummary": "بطاقات Help محدثة بتشرح Exact وComment وFilter All.",
+    "highlights": [
+      "تبويب Help بوري ألوان badge وتسميات collaboration بألوان مطابقة.",
+      "أشرطة بحث popup وtab اتظبطت على نفس الإيقاع بعرض كامل.",
+      "أوصاف تحكم المحتوى اتحولت لـhover tooltips عشان تكون أوضح."
+    ]
+  },
+  "3.1.2": {
+    "ctaLabel": "شوف الجديد",
+    "headline": "تقوية autoplay للـplaylist",
+    "summary": "Autoplay بقى بتجاوز صفوف playlist الممنوعة من غير ما يوريها لحظة، والإخفاء الثابت بفضل شغال لما YouTube يعيد المعالجة.",
+    "bannerSummary": "Autoplay بتخطى الصفوف الممنوعة من غير وميض؛ وإخفاء playlist بفضل شغال.",
+    "highlights": [
+      "Next-click ما بيحصل إلا لما صف playlist الجاي يكون ظاهر فعلاً.",
+      "صفوف لوحة playlist في Watch بتظل مخفية حتى لو الهوية ما اتحلت للحظات.",
+      "قائمة 3-dot بتتقفل بنضافة بعد الحظر عشان miniplayer يواصل التشغيل."
+    ]
+  },
+  "3.1.1": {
+    "ctaLabel": "شوف الجديد",
+    "headline": "تبويب Help + إصلاحات الهوية",
+    "summary": "تبويب Help مخصوص وصل للـdashboard، وربط UC ↔ handle ↔ custom URL بقى أضمن.",
+    "bannerSummary": "مرجع Help جديد وحل أحسن لهوية القنوات.",
+    "highlights": [
+      "مرجع Help بوثق كل toggles وbadges وسلوك الكلمات المفتاحية.",
+      "التنقل في playlist بتجاوز الصفوف الممنوعة من غير وميض تشغيل.",
+      "fallback تبع handle/custom URL بيمسك UC ID الصحيح بموثوقية أكتر."
+    ]
+  },
+  "3.1.0": {
+    "ctaLabel": "شوف الجديد",
+    "headline": "توثيق + وضوح الفلترة الهجينة",
+    "summary": "بنية hybrid interception + DOM fallback اتوثقت بالرسومات عشان توضّح كيف FilterTube بفرض الحظر.",
+    "bannerSummary": "بنية فلترة hybrid interception وDOM fallback موثقة بوضوح.",
+    "highlights": [
+      "اتوثق تكافؤ 3-dot بصفحة Watch مع collaborators بتاعين home/search.",
+      "اتجمعت regressions playlist الباقية في قائمة عشان الإصلاحات تظل واضحة.",
+      "اتزامنت manifests وأدوات build وUI footer مع رفع نسخة 3.1.0."
+    ]
   }
 }
