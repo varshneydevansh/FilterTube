@@ -1475,5 +1475,15 @@
   "dashboard.importEnrichment.pause": "Pause metadata completion",
   "dashboard.importEnrichment.unlockToContinue": "Unlock this profile make metadata completion continue.",
   "dashboard.importEnrichment.resumeHelp": "Continue the background metadata queue.",
-  "dashboard.importEnrichment.pauseHelp": "Pause the background metadata queue."
+  "dashboard.importEnrichment.pauseHelp": "Pause the background metadata queue.",
+  "content.menu.actionBlockChannel": "Block dis channel",
+  "content.menu.actionFetching": "We dey fetch…",
+  "content.menu.actionBlockingSingular": "We dey block {count} channel…",
+  "content.menu.actionBlockingPlural": "We dey block {count} channels…",
+  "content.menu.actionBlockedCount": "✓ We don block {count}",
+  "content.menu.actionBlockedChannelSingular": "✓ We don block {count} channel",
+  "content.menu.actionBlockedChannels": "✓ We don block {count} channels",
+  "content.menu.actionBrokenHandle": "✗ Dis channel handle no dey work (404)",
+  "content.menu.actionFailed": "✗ We no fit block am",
+  "content.menu.actionError": "✗ Error"
 }

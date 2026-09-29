@@ -1475,5 +1475,15 @@
   "dashboard.importEnrichment.pause": "Metadatenvervollständigung pausieren",
   "dashboard.importEnrichment.unlockToContinue": "Entsperre dieses Profil, um die Metadatenvervollständigung fortzusetzen.",
   "dashboard.importEnrichment.resumeHelp": "Die Metadaten-Warteschlange im Hintergrund fortsetzen.",
-  "dashboard.importEnrichment.pauseHelp": "Die Metadaten-Warteschlange im Hintergrund pausieren."
+  "dashboard.importEnrichment.pauseHelp": "Die Metadaten-Warteschlange im Hintergrund pausieren.",
+  "content.menu.actionBlockChannel": "Kanal blockieren",
+  "content.menu.actionFetching": "Wird geladen…",
+  "content.menu.actionBlockingSingular": "{count} Kanal wird blockiert…",
+  "content.menu.actionBlockingPlural": "{count} Kanäle werden blockiert…",
+  "content.menu.actionBlockedCount": "✓ {count} blockiert",
+  "content.menu.actionBlockedChannelSingular": "✓ {count} Kanal blockiert",
+  "content.menu.actionBlockedChannels": "✓ {count} Kanäle blockiert",
+  "content.menu.actionBrokenHandle": "✗ Kanal-Handle ungültig (404)",
+  "content.menu.actionFailed": "✗ Kanal konnte nicht blockiert werden",
+  "content.menu.actionError": "✗ Fehler"
 }

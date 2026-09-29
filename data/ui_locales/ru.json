@@ -1475,5 +1475,15 @@
   "dashboard.importEnrichment.pause": "Приостановить заполнение метаданных",
   "dashboard.importEnrichment.unlockToContinue": "Разблокируйте этот профиль, чтобы продолжить заполнение метаданных.",
   "dashboard.importEnrichment.resumeHelp": "Возобновить фоновую очередь метаданных.",
-  "dashboard.importEnrichment.pauseHelp": "Приостановить фоновую очередь метаданных."
+  "dashboard.importEnrichment.pauseHelp": "Приостановить фоновую очередь метаданных.",
+  "content.menu.actionBlockChannel": "Заблокировать канал",
+  "content.menu.actionFetching": "Загрузка…",
+  "content.menu.actionBlockingSingular": "Блокировка {count} канала…",
+  "content.menu.actionBlockingPlural": "Блокировка {count} каналов…",
+  "content.menu.actionBlockedCount": "✓ Заблокировано: {count}",
+  "content.menu.actionBlockedChannelSingular": "✓ Заблокирован {count} канал",
+  "content.menu.actionBlockedChannels": "✓ Заблокировано {count} каналов",
+  "content.menu.actionBrokenHandle": "✗ Идентификатор канала недействителен (404)",
+  "content.menu.actionFailed": "✗ Не удалось заблокировать",
+  "content.menu.actionError": "✗ Ошибка"
 }

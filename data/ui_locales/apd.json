@@ -1475,5 +1475,15 @@
   "dashboard.importEnrichment.pause": "وقف إكمال البيانات الوصفية مؤقتاً",
   "dashboard.importEnrichment.unlockToContinue": "افتح الملف الشخصي دا عشان تواصل إكمال البيانات الوصفية.",
   "dashboard.importEnrichment.resumeHelp": "واصل صف البيانات الوصفية في الخلفية.",
-  "dashboard.importEnrichment.pauseHelp": "وقف صف البيانات الوصفية في الخلفية مؤقتاً."
+  "dashboard.importEnrichment.pauseHelp": "وقف صف البيانات الوصفية في الخلفية مؤقتاً.",
+  "content.menu.actionBlockChannel": "احظر القناة",
+  "content.menu.actionFetching": "جاري الجلب…",
+  "content.menu.actionBlockingSingular": "جاري حظر {count} قناة…",
+  "content.menu.actionBlockingPlural": "جاري حظر {count} قنوات…",
+  "content.menu.actionBlockedCount": "✓ اتحظرت {count}",
+  "content.menu.actionBlockedChannelSingular": "✓ اتحظرت {count} قناة",
+  "content.menu.actionBlockedChannels": "✓ اتحظرت {count} قنوات",
+  "content.menu.actionBrokenHandle": "✗ معرّف القناة ما شغال (404)",
+  "content.menu.actionFailed": "✗ ما قدرنا نحظر القناة",
+  "content.menu.actionError": "✗ خطأ"
 }

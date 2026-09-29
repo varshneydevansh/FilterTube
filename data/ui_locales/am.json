@@ -1475,5 +1475,15 @@
   "dashboard.importEnrichment.pause": "የሜታዳታ ማጠናቀቅን አቁም",
   "dashboard.importEnrichment.unlockToContinue": "የሜታዳታ ማጠናቀቅን ለመቀጠል ይህን መገለጫ ክፈት።",
   "dashboard.importEnrichment.resumeHelp": "የጀርባ ሜታዳታ ወረፋውን ቀጥል።",
-  "dashboard.importEnrichment.pauseHelp": "የጀርባ ሜታዳታ ወረፋውን አቁም።"
+  "dashboard.importEnrichment.pauseHelp": "የጀርባ ሜታዳታ ወረፋውን አቁም።",
+  "content.menu.actionBlockChannel": "ቻናል አግድ",
+  "content.menu.actionFetching": "በማምጣት ላይ…",
+  "content.menu.actionBlockingSingular": "{count} ቻናል በማገድ ላይ…",
+  "content.menu.actionBlockingPlural": "{count} ቻናሎችን በማገድ ላይ…",
+  "content.menu.actionBlockedCount": "✓ {count} ታግዷል",
+  "content.menu.actionBlockedChannelSingular": "✓ {count} ቻናል ታግዷል",
+  "content.menu.actionBlockedChannels": "✓ {count} ቻናሎች ታግደዋል",
+  "content.menu.actionBrokenHandle": "✗ የቻናሉ መለያ አይሰራም (404)",
+  "content.menu.actionFailed": "✗ ማገድ አልተቻለም",
+  "content.menu.actionError": "✗ ስህተት"
 }

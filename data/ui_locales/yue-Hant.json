@@ -1475,5 +1475,15 @@
   "dashboard.importEnrichment.pause": "暫停補齊中繼資料",
   "dashboard.importEnrichment.unlockToContinue": "解鎖呢個個人檔案先可以繼續補齊中繼資料。",
   "dashboard.importEnrichment.resumeHelp": "繼續背景中繼資料佇列。",
-  "dashboard.importEnrichment.pauseHelp": "暫停背景中繼資料佇列。"
+  "dashboard.importEnrichment.pauseHelp": "暫停背景中繼資料佇列。",
+  "content.menu.actionBlockChannel": "封鎖頻道",
+  "content.menu.actionFetching": "正在載入…",
+  "content.menu.actionBlockingSingular": "正在封鎖 {count} 個頻道…",
+  "content.menu.actionBlockingPlural": "正在封鎖 {count} 個頻道…",
+  "content.menu.actionBlockedCount": "✓ 已封鎖 {count}",
+  "content.menu.actionBlockedChannelSingular": "✓ 已封鎖 {count} 個頻道",
+  "content.menu.actionBlockedChannels": "✓ 已封鎖 {count} 個頻道",
+  "content.menu.actionBrokenHandle": "✗ 頻道名稱代號失效（404）",
+  "content.menu.actionFailed": "✗ 無法封鎖頻道",
+  "content.menu.actionError": "✗ 發生錯誤"
 }

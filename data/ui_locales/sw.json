@@ -1475,5 +1475,15 @@
   "dashboard.importEnrichment.pause": "Sitisha ukamilishaji wa metadata",
   "dashboard.importEnrichment.unlockToContinue": "Fungua wasifu huu ili uendelee kukamilisha metadata.",
   "dashboard.importEnrichment.resumeHelp": "Endelea na foleni ya metadata ya chinichini.",
-  "dashboard.importEnrichment.pauseHelp": "Sitisha foleni ya metadata ya chinichini."
+  "dashboard.importEnrichment.pauseHelp": "Sitisha foleni ya metadata ya chinichini.",
+  "content.menu.actionBlockChannel": "Zuia chaneli",
+  "content.menu.actionFetching": "Inapakia…",
+  "content.menu.actionBlockingSingular": "Inazuia chaneli {count}…",
+  "content.menu.actionBlockingPlural": "Inazuia chaneli {count}…",
+  "content.menu.actionBlockedCount": "✓ Imezuiwa {count}",
+  "content.menu.actionBlockedChannelSingular": "✓ Chaneli {count} imezuiwa",
+  "content.menu.actionBlockedChannels": "✓ Chaneli {count} zimezuiwa",
+  "content.menu.actionBrokenHandle": "✗ Jina la utambulisho wa chaneli halifanyi kazi (404)",
+  "content.menu.actionFailed": "✗ Imeshindwa kuzuia",
+  "content.menu.actionError": "✗ Hitilafu"
 }

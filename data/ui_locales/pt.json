@@ -1475,5 +1475,15 @@
   "dashboard.importEnrichment.pause": "Pausar o preenchimento dos metadados",
   "dashboard.importEnrichment.unlockToContinue": "Desbloqueie este perfil para continuar a preencher os metadados.",
   "dashboard.importEnrichment.resumeHelp": "Retome a fila de metadados em segundo plano.",
-  "dashboard.importEnrichment.pauseHelp": "Pause a fila de metadados em segundo plano."
+  "dashboard.importEnrichment.pauseHelp": "Pause a fila de metadados em segundo plano.",
+  "content.menu.actionBlockChannel": "Bloquear canal",
+  "content.menu.actionFetching": "Buscando…",
+  "content.menu.actionBlockingSingular": "Bloqueando {count} canal…",
+  "content.menu.actionBlockingPlural": "Bloqueando {count} canais…",
+  "content.menu.actionBlockedCount": "✓ {count} bloqueado(s)",
+  "content.menu.actionBlockedChannelSingular": "✓ {count} canal bloqueado",
+  "content.menu.actionBlockedChannels": "✓ {count} canais bloqueados",
+  "content.menu.actionBrokenHandle": "✗ Identificador do canal inválido (404)",
+  "content.menu.actionFailed": "✗ Não foi possível bloquear",
+  "content.menu.actionError": "✗ Erro"
 }

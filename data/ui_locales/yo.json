@@ -1475,5 +1475,15 @@
   "dashboard.importEnrichment.pause": "Dá àfikún metadata dúró",
   "dashboard.importEnrichment.unlockToContinue": "Ṣí ìdènà profáìlì yìí kí àfikún metadata lè tẹ̀síwájú.",
   "dashboard.importEnrichment.resumeHelp": "Tẹ̀síwájú pẹ̀lú ìlà metadata ẹ̀yìn.",
-  "dashboard.importEnrichment.pauseHelp": "Dá ìlà metadata ẹ̀yìn dúró."
+  "dashboard.importEnrichment.pauseHelp": "Dá ìlà metadata ẹ̀yìn dúró.",
+  "content.menu.actionBlockChannel": "Dènà ikanni",
+  "content.menu.actionFetching": "Ń gbà wá…",
+  "content.menu.actionBlockingSingular": "Ń dènà ikanni {count}…",
+  "content.menu.actionBlockingPlural": "Ń dènà àwọn ikanni {count}…",
+  "content.menu.actionBlockedCount": "✓ A ti dènà {count}",
+  "content.menu.actionBlockedChannelSingular": "✓ A ti dènà ikanni {count}",
+  "content.menu.actionBlockedChannels": "✓ A ti dènà àwọn ikanni {count}",
+  "content.menu.actionBrokenHandle": "✗ Àmì ìdánimọ̀ ikanni kò ṣiṣẹ́ (404)",
+  "content.menu.actionFailed": "✗ A kò lè dènà ikanni",
+  "content.menu.actionError": "✗ Àṣìṣe"
 }

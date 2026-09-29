@@ -1475,5 +1475,15 @@
   "dashboard.importEnrichment.pause": "मेटाडेटा पूरा करना रोकें",
   "dashboard.importEnrichment.unlockToContinue": "मेटाडेटा पूरा करना जारी रखने के लिए इस प्रोफ़ाइल को अनलॉक करें।",
   "dashboard.importEnrichment.resumeHelp": "बैकग्राउंड मेटाडेटा कतार फिर शुरू करें।",
-  "dashboard.importEnrichment.pauseHelp": "बैकग्राउंड मेटाडेटा कतार रोकें।"
+  "dashboard.importEnrichment.pauseHelp": "बैकग्राउंड मेटाडेटा कतार रोकें।",
+  "content.menu.actionBlockChannel": "चैनल ब्लॉक करें",
+  "content.menu.actionFetching": "प्राप्त किया जा रहा है…",
+  "content.menu.actionBlockingSingular": "{count} चैनल को ब्लॉक किया जा रहा है…",
+  "content.menu.actionBlockingPlural": "{count} चैनलों को ब्लॉक किया जा रहा है…",
+  "content.menu.actionBlockedCount": "✓ {count} ब्लॉक किए गए",
+  "content.menu.actionBlockedChannelSingular": "✓ {count} चैनल ब्लॉक किया गया",
+  "content.menu.actionBlockedChannels": "✓ {count} चैनल ब्लॉक किए गए",
+  "content.menu.actionBrokenHandle": "✗ चैनल हैंडल काम नहीं कर रहा (404)",
+  "content.menu.actionFailed": "✗ ब्लॉक नहीं हो सका",
+  "content.menu.actionError": "✗ त्रुटि"
 }

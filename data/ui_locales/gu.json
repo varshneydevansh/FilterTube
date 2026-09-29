@@ -1475,5 +1475,15 @@
   "dashboard.importEnrichment.pause": "મેટાડેટા પૂર્ણ કરવાનું થોભાવો",
   "dashboard.importEnrichment.unlockToContinue": "મેટાડેટા પૂર્ણ કરવાનું ચાલુ રાખવા માટે આ પ્રોફાઇલ અનલૉક કરો.",
   "dashboard.importEnrichment.resumeHelp": "બૅકગ્રાઉન્ડ મેટાડેટા કતાર ફરી શરૂ કરો.",
-  "dashboard.importEnrichment.pauseHelp": "બૅકગ્રાઉન્ડ મેટાડેટા કતાર થોભાવો."
+  "dashboard.importEnrichment.pauseHelp": "બૅકગ્રાઉન્ડ મેટાડેટા કતાર થોભાવો.",
+  "content.menu.actionBlockChannel": "ચૅનલ બ્લૉક કરો",
+  "content.menu.actionFetching": "મેળવી રહ્યું છે…",
+  "content.menu.actionBlockingSingular": "{count} ચૅનલ બ્લૉક થઈ રહી છે…",
+  "content.menu.actionBlockingPlural": "{count} ચૅનલો બ્લૉક થઈ રહી છે…",
+  "content.menu.actionBlockedCount": "✓ {count} બ્લૉક થઈ",
+  "content.menu.actionBlockedChannelSingular": "✓ {count} ચૅનલ બ્લૉક થઈ",
+  "content.menu.actionBlockedChannels": "✓ {count} ચૅનલો બ્લૉક થઈ",
+  "content.menu.actionBrokenHandle": "✗ ચૅનલનું હૅન્ડલ કામ કરતું નથી (404)",
+  "content.menu.actionFailed": "✗ બ્લૉક કરી શકાયું નથી",
+  "content.menu.actionError": "✗ ભૂલ"
 }

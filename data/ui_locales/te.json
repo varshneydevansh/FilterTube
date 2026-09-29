@@ -1475,5 +1475,15 @@
   "dashboard.importEnrichment.pause": "మెటాడేటా పూర్తి చేయడాన్ని నిలిపివేయండి",
   "dashboard.importEnrichment.unlockToContinue": "మెటాడేటా పూర్తి చేయడాన్ని కొనసాగించడానికి ఈ ప్రొఫైల్‌ను అన్‌లాక్ చేయండి.",
   "dashboard.importEnrichment.resumeHelp": "బ్యాక్‌గ్రౌండ్ మెటాడేటా క్యూను కొనసాగించండి.",
-  "dashboard.importEnrichment.pauseHelp": "బ్యాక్‌గ్రౌండ్ మెటాడేటా క్యూను నిలిపివేయండి."
+  "dashboard.importEnrichment.pauseHelp": "బ్యాక్‌గ్రౌండ్ మెటాడేటా క్యూను నిలిపివేయండి.",
+  "content.menu.actionBlockChannel": "ఛానెల్‌ను బ్లాక్ చేయండి",
+  "content.menu.actionFetching": "తీసుకువస్తోంది…",
+  "content.menu.actionBlockingSingular": "{count} ఛానెల్‌ను బ్లాక్ చేస్తోంది…",
+  "content.menu.actionBlockingPlural": "{count} ఛానెల్‌లను బ్లాక్ చేస్తోంది…",
+  "content.menu.actionBlockedCount": "✓ {count} బ్లాక్ చేయబడ్డాయి",
+  "content.menu.actionBlockedChannelSingular": "✓ {count} ఛానెల్ బ్లాక్ చేయబడింది",
+  "content.menu.actionBlockedChannels": "✓ {count} ఛానెల్‌లు బ్లాక్ చేయబడ్డాయి",
+  "content.menu.actionBrokenHandle": "✗ ఛానెల్ హ్యాండిల్ పని చేయడం లేదు (404)",
+  "content.menu.actionFailed": "✗ బ్లాక్ చేయడం సాధ్యం కాలేదు",
+  "content.menu.actionError": "✗ లోపం"
 }

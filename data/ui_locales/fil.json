@@ -1475,5 +1475,15 @@
   "dashboard.importEnrichment.pause": "I-pause ang pagkumpleto ng metadata",
   "dashboard.importEnrichment.unlockToContinue": "I-unlock ang profile na ito para ipagpatuloy ang pagkumpleto ng metadata.",
   "dashboard.importEnrichment.resumeHelp": "Ipagpatuloy ang metadata queue sa background.",
-  "dashboard.importEnrichment.pauseHelp": "I-pause ang metadata queue sa background."
+  "dashboard.importEnrichment.pauseHelp": "I-pause ang metadata queue sa background.",
+  "content.menu.actionBlockChannel": "I-block ang channel",
+  "content.menu.actionFetching": "Kinukuha…",
+  "content.menu.actionBlockingSingular": "Bina-block ang {count} channel…",
+  "content.menu.actionBlockingPlural": "Bina-block ang {count} channel…",
+  "content.menu.actionBlockedCount": "✓ Na-block ang {count}",
+  "content.menu.actionBlockedChannelSingular": "✓ Na-block ang {count} channel",
+  "content.menu.actionBlockedChannels": "✓ Na-block ang {count} channel",
+  "content.menu.actionBrokenHandle": "✗ Hindi gumagana ang handle ng channel (404)",
+  "content.menu.actionFailed": "✗ Hindi na-block",
+  "content.menu.actionError": "✗ Error"
 }

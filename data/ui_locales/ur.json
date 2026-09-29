@@ -1475,5 +1475,15 @@
   "dashboard.importEnrichment.pause": "میٹا ڈیٹا کی تکمیل روکیں",
   "dashboard.importEnrichment.unlockToContinue": "میٹا ڈیٹا کی تکمیل جاری رکھنے کے لیے اس پروفائل کو اَن لاک کریں۔",
   "dashboard.importEnrichment.resumeHelp": "پس منظر کی میٹا ڈیٹا قطار دوبارہ شروع کریں۔",
-  "dashboard.importEnrichment.pauseHelp": "پس منظر کی میٹا ڈیٹا قطار روکیں۔"
+  "dashboard.importEnrichment.pauseHelp": "پس منظر کی میٹا ڈیٹا قطار روکیں۔",
+  "content.menu.actionBlockChannel": "چینل بلاک کریں",
+  "content.menu.actionFetching": "حاصل کیا جا رہا ہے…",
+  "content.menu.actionBlockingSingular": "{count} چینل بلاک کیا جا رہا ہے…",
+  "content.menu.actionBlockingPlural": "{count} چینلز بلاک کیے جا رہے ہیں…",
+  "content.menu.actionBlockedCount": "✓ {count} بلاک ہو گئے",
+  "content.menu.actionBlockedChannelSingular": "✓ {count} چینل بلاک ہو گیا",
+  "content.menu.actionBlockedChannels": "✓ {count} چینلز بلاک ہو گئے",
+  "content.menu.actionBrokenHandle": "✗ چینل کا ہینڈل کام نہیں کر رہا (404)",
+  "content.menu.actionFailed": "✗ بلاک نہیں ہو سکا",
+  "content.menu.actionError": "✗ خرابی"
 }

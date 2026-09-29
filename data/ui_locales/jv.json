@@ -1475,5 +1475,15 @@
   "dashboard.importEnrichment.pause": "Ngaso ngrampungake metadata",
   "dashboard.importEnrichment.unlockToContinue": "Bukak kunci profil iki supaya bisa nerusake ngrampungake metadata.",
   "dashboard.importEnrichment.resumeHelp": "Terusake antrian metadata ing latar mburi.",
-  "dashboard.importEnrichment.pauseHelp": "Ngaso antrian metadata ing latar mburi."
+  "dashboard.importEnrichment.pauseHelp": "Ngaso antrian metadata ing latar mburi.",
+  "content.menu.actionBlockChannel": "Blokir kanal",
+  "content.menu.actionFetching": "Lagi njupuk…",
+  "content.menu.actionBlockingSingular": "Lagi mblokir {count} kanal…",
+  "content.menu.actionBlockingPlural": "Lagi mblokir {count} kanal…",
+  "content.menu.actionBlockedCount": "✓ Wis mblokir {count}",
+  "content.menu.actionBlockedChannelSingular": "✓ Kanal {count} wis diblokir",
+  "content.menu.actionBlockedChannels": "✓ Kanal {count} wis diblokir",
+  "content.menu.actionBrokenHandle": "✗ Handle kanal ora bisa digunakake (404)",
+  "content.menu.actionFailed": "✗ Gagal mblokir",
+  "content.menu.actionError": "✗ Kesalahan"
 }

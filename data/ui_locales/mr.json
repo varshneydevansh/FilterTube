@@ -1475,5 +1475,15 @@
   "dashboard.importEnrichment.pause": "मेटाडेटा पूर्ण करणे थांबवा",
   "dashboard.importEnrichment.unlockToContinue": "मेटाडेटा पूर्ण करणे सुरू ठेवण्यासाठी हे प्रोफाइल अनलॉक करा.",
   "dashboard.importEnrichment.resumeHelp": "पार्श्वभूमीतील मेटाडेटा रांग पुन्हा सुरू करा.",
-  "dashboard.importEnrichment.pauseHelp": "पार्श्वभूमीतील मेटाडेटा रांग थांबवा."
+  "dashboard.importEnrichment.pauseHelp": "पार्श्वभूमीतील मेटाडेटा रांग थांबवा.",
+  "content.menu.actionBlockChannel": "चॅनेल ब्लॉक करा",
+  "content.menu.actionFetching": "मिळवत आहे…",
+  "content.menu.actionBlockingSingular": "{count} चॅनेल ब्लॉक करत आहे…",
+  "content.menu.actionBlockingPlural": "{count} चॅनेल्स ब्लॉक करत आहे…",
+  "content.menu.actionBlockedCount": "✓ {count} ब्लॉक केले",
+  "content.menu.actionBlockedChannelSingular": "✓ {count} चॅनेल ब्लॉक केले",
+  "content.menu.actionBlockedChannels": "✓ {count} चॅनेल ब्लॉक केले",
+  "content.menu.actionBrokenHandle": "✗ चॅनेल हँडल काम करत नाही (404)",
+  "content.menu.actionFailed": "✗ ब्लॉक करता आले नाही",
+  "content.menu.actionError": "✗ त्रुटी"
 }

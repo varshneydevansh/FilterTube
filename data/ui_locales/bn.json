@@ -1475,5 +1475,15 @@
   "dashboard.importEnrichment.pause": "মেটাডেটা সম্পূর্ণ করা থামান",
   "dashboard.importEnrichment.unlockToContinue": "মেটাডেটা সম্পূর্ণ করা চালিয়ে যেতে এই প্রোফাইলটি আনলক করুন।",
   "dashboard.importEnrichment.resumeHelp": "ব্যাকগ্রাউন্ড মেটাডেটা সারি আবার শুরু করুন।",
-  "dashboard.importEnrichment.pauseHelp": "ব্যাকগ্রাউন্ড মেটাডেটা সারি থামান।"
+  "dashboard.importEnrichment.pauseHelp": "ব্যাকগ্রাউন্ড মেটাডেটা সারি থামান।",
+  "content.menu.actionBlockChannel": "চ্যানেল ব্লক করুন",
+  "content.menu.actionFetching": "আনা হচ্ছে…",
+  "content.menu.actionBlockingSingular": "{count}টি চ্যানেল ব্লক করা হচ্ছে…",
+  "content.menu.actionBlockingPlural": "{count}টি চ্যানেল ব্লক করা হচ্ছে…",
+  "content.menu.actionBlockedCount": "✓ {count}টি ব্লক করা হয়েছে",
+  "content.menu.actionBlockedChannelSingular": "✓ {count}টি চ্যানেল ব্লক করা হয়েছে",
+  "content.menu.actionBlockedChannels": "✓ {count}টি চ্যানেল ব্লক করা হয়েছে",
+  "content.menu.actionBrokenHandle": "✗ চ্যানেলের হ্যান্ডেলটি কাজ করছে না (404)",
+  "content.menu.actionFailed": "✗ ব্লক করা যায়নি",
+  "content.menu.actionError": "✗ ত্রুটি"
 }

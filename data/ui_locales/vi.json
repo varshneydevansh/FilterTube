@@ -1475,5 +1475,15 @@
   "dashboard.importEnrichment.pause": "Tạm dừng hoàn tất siêu dữ liệu",
   "dashboard.importEnrichment.unlockToContinue": "Mở khóa hồ sơ này để tiếp tục hoàn tất siêu dữ liệu.",
   "dashboard.importEnrichment.resumeHelp": "Tiếp tục hàng đợi siêu dữ liệu chạy nền.",
-  "dashboard.importEnrichment.pauseHelp": "Tạm dừng hàng đợi siêu dữ liệu chạy nền."
+  "dashboard.importEnrichment.pauseHelp": "Tạm dừng hàng đợi siêu dữ liệu chạy nền.",
+  "content.menu.actionBlockChannel": "Chặn kênh",
+  "content.menu.actionFetching": "Đang tải…",
+  "content.menu.actionBlockingSingular": "Đang chặn {count} kênh…",
+  "content.menu.actionBlockingPlural": "Đang chặn {count} kênh…",
+  "content.menu.actionBlockedCount": "✓ Đã chặn {count}",
+  "content.menu.actionBlockedChannelSingular": "✓ Đã chặn {count} kênh",
+  "content.menu.actionBlockedChannels": "✓ Đã chặn {count} kênh",
+  "content.menu.actionBrokenHandle": "✗ Định danh kênh không hợp lệ (404)",
+  "content.menu.actionFailed": "✗ Không thể chặn",
+  "content.menu.actionError": "✗ Lỗi"
 }

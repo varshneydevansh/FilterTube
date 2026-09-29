@@ -1475,5 +1475,15 @@
   "dashboard.importEnrichment.pause": "หยุดทำรายการข้อมูลเมตาชั่วคราว",
   "dashboard.importEnrichment.unlockToContinue": "ปลดล็อกโปรไฟล์นี้เพื่อทำรายการข้อมูลเมตาต่อ",
   "dashboard.importEnrichment.resumeHelp": "ทำคิวข้อมูลเมตาเบื้องหลังต่อ",
-  "dashboard.importEnrichment.pauseHelp": "หยุดคิวข้อมูลเมตาเบื้องหลังชั่วคราว"
+  "dashboard.importEnrichment.pauseHelp": "หยุดคิวข้อมูลเมตาเบื้องหลังชั่วคราว",
+  "content.menu.actionBlockChannel": "บล็อกช่อง",
+  "content.menu.actionFetching": "กำลังดึงข้อมูล…",
+  "content.menu.actionBlockingSingular": "กำลังบล็อกช่อง {count} ช่อง…",
+  "content.menu.actionBlockingPlural": "กำลังบล็อกช่อง {count} ช่อง…",
+  "content.menu.actionBlockedCount": "✓ บล็อกแล้ว {count}",
+  "content.menu.actionBlockedChannelSingular": "✓ บล็อกช่องแล้ว {count} ช่อง",
+  "content.menu.actionBlockedChannels": "✓ บล็อกช่องแล้ว {count} ช่อง",
+  "content.menu.actionBrokenHandle": "✗ ตัวระบุช่องใช้ไม่ได้ (404)",
+  "content.menu.actionFailed": "✗ บล็อกไม่สำเร็จ",
+  "content.menu.actionError": "✗ เกิดข้อผิดพลาด"
 }

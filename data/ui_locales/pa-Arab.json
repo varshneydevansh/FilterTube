@@ -1475,5 +1475,15 @@
   "dashboard.importEnrichment.pause": "میٹا ڈیٹا دی تکمیل روکّو",
   "dashboard.importEnrichment.unlockToContinue": "میٹا ڈیٹا دی تکمیل جاری رکھن لئی ایہہ پروفائل اَن لاک کرو۔",
   "dashboard.importEnrichment.resumeHelp": "پس منظر دی میٹا ڈیٹا قطار دوبارہ شروع کرو۔",
-  "dashboard.importEnrichment.pauseHelp": "پس منظر دی میٹا ڈیٹا قطار روکّو۔"
+  "dashboard.importEnrichment.pauseHelp": "پس منظر دی میٹا ڈیٹا قطار روکّو۔",
+  "content.menu.actionBlockChannel": "چینل بلاک کرو",
+  "content.menu.actionFetching": "لیا جا رہیا اے…",
+  "content.menu.actionBlockingSingular": "{count} چینل بلاک کیتا جا رہیا اے…",
+  "content.menu.actionBlockingPlural": "{count} چینلاں بلاک کیتے جا رہے نیں…",
+  "content.menu.actionBlockedCount": "✓ {count} بلاک ہو گئے",
+  "content.menu.actionBlockedChannelSingular": "✓ {count} چینل بلاک ہو گیا",
+  "content.menu.actionBlockedChannels": "✓ {count} چینلاں بلاک ہو گئے",
+  "content.menu.actionBrokenHandle": "✗ چینل دا ہینڈل کم نئیں کردا (404)",
+  "content.menu.actionFailed": "✗ بلاک نئیں ہو سکیا",
+  "content.menu.actionError": "✗ خرابی"
 }

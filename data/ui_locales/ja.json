@@ -1475,5 +1475,15 @@
   "dashboard.importEnrichment.pause": "メタデータの補完を一時停止",
   "dashboard.importEnrichment.unlockToContinue": "メタデータの補完を続けるには、このプロフィールのロックを解除してください。",
   "dashboard.importEnrichment.resumeHelp": "バックグラウンドのメタデータキューを再開します。",
-  "dashboard.importEnrichment.pauseHelp": "バックグラウンドのメタデータキューを一時停止します。"
+  "dashboard.importEnrichment.pauseHelp": "バックグラウンドのメタデータキューを一時停止します。",
+  "content.menu.actionBlockChannel": "チャンネルをブロック",
+  "content.menu.actionFetching": "取得中…",
+  "content.menu.actionBlockingSingular": "チャンネルを{count}件ブロック中…",
+  "content.menu.actionBlockingPlural": "チャンネルを{count}件ブロック中…",
+  "content.menu.actionBlockedCount": "✓ {count}件をブロックしました",
+  "content.menu.actionBlockedChannelSingular": "✓ チャンネルを{count}件ブロックしました",
+  "content.menu.actionBlockedChannels": "✓ チャンネルを{count}件ブロックしました",
+  "content.menu.actionBrokenHandle": "✗ チャンネルのハンドルが無効です (404)",
+  "content.menu.actionFailed": "✗ ブロックできませんでした",
+  "content.menu.actionError": "✗ エラー"
 }

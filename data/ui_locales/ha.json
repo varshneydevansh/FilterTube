@@ -1475,5 +1475,15 @@
   "dashboard.importEnrichment.pause": "Dakatar da kammala metadata",
   "dashboard.importEnrichment.unlockToContinue": "Buɗe wannan bayanin martaba don ci gaba da kammala metadata.",
   "dashboard.importEnrichment.resumeHelp": "Ci gaba da jerin metadata na baya.",
-  "dashboard.importEnrichment.pauseHelp": "Dakatar da jerin metadata na baya."
+  "dashboard.importEnrichment.pauseHelp": "Dakatar da jerin metadata na baya.",
+  "content.menu.actionBlockChannel": "Toshe tashar",
+  "content.menu.actionFetching": "Ana ɗauko…",
+  "content.menu.actionBlockingSingular": "Ana toshe tashar {count}…",
+  "content.menu.actionBlockingPlural": "Ana toshe tashoshi {count}…",
+  "content.menu.actionBlockedCount": "✓ An toshe {count}",
+  "content.menu.actionBlockedChannelSingular": "✓ An toshe tashar {count}",
+  "content.menu.actionBlockedChannels": "✓ An toshe tashoshi {count}",
+  "content.menu.actionBrokenHandle": "✗ Handle ɗin tashar ba ya aiki (404)",
+  "content.menu.actionFailed": "✗ An kasa toshe tashar",
+  "content.menu.actionError": "✗ Kuskure"
 }

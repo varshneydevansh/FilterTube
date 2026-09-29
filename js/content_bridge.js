@@ -8875,7 +8875,7 @@ function openFilterTubePlaylistFallbackPopover(button, row) {
                 synthetic.className = 'filtertube-block-channel-item filtertube-fallback-handoff';
                 const syntheticTitle = document.createElement('span');
                 syntheticTitle.className = 'filtertube-menu-title';
-                syntheticTitle.textContent = 'Block Channel';
+                syntheticTitle.textContent = filterTubeContentMenuText('content.menu.actionBlockChannel', 'Block Channel');
                 synthetic.appendChild(syntheticTitle);
                 try {
                     await handleBlockChannelClick(info, synthetic, !!filterAll, row);
@@ -8961,7 +8961,7 @@ function openFilterTubePlaylistFallbackPopover(button, row) {
                 synthetic.className = 'filtertube-block-channel-item filtertube-fallback-retry';
                 const syntheticTitle = document.createElement('span');
                 syntheticTitle.className = 'filtertube-menu-title';
-                syntheticTitle.textContent = 'Block Channel';
+                syntheticTitle.textContent = filterTubeContentMenuText('content.menu.actionBlockChannel', 'Block Channel');
                 synthetic.appendChild(syntheticTitle);
                 try {
                     await handleBlockChannelClick({ ...(info || {}), videoId }, synthetic, !!filterAll, row);
@@ -13759,7 +13759,7 @@ async function handleBlockChannelClick(channelInfo, menuItem, filterAll = false,
 
     // Show "Fetching..." state IMMEDIATELY for instant user feedback
     if (titleSpan) {
-        titleSpan.textContent = 'Fetching...';
+        titleSpan.textContent = filterTubeContentMenuText('content.menu.actionFetching', 'Fetching...');
         titleSpan.style.color = '#9ca3af'; // gray
     }
     menuItem.classList.add('filtertube-pending');
@@ -13859,7 +13859,11 @@ async function handleBlockChannelClick(channelInfo, menuItem, filterAll = false,
             if (selectedKeys.length === 0) {
                 menuItem.setAttribute('data-is-done-button', 'false');
             } else {
-                if (titleSpan) titleSpan.textContent = `Blocking ${selectedKeys.length} channel${selectedKeys.length > 1 ? 's' : ''}...`;
+                if (titleSpan) {
+                    titleSpan.textContent = selectedKeys.length === 1
+                        ? filterTubeContentMenuText('content.menu.actionBlockingSingular', 'Blocking {count} channel...', { count: selectedKeys.length })
+                        : filterTubeContentMenuText('content.menu.actionBlockingPlural', 'Blocking {count} channels...', { count: selectedKeys.length });
+                }
                 let successCount = 0;
                 const collaboratorSource = state?.collaborators?.length ? state.collaborators : channelInfo.allCollaborators;
                 const selectedCollaborators = collaboratorSource.filter(collaborator =>
@@ -13911,7 +13915,7 @@ async function handleBlockChannelClick(channelInfo, menuItem, filterAll = false,
 
                 if (titleSpan) {
                     if (successCount > 0) {
-                        titleSpan.textContent = `✓ Blocked ${successCount}`;
+                        titleSpan.textContent = filterTubeContentMenuText('content.menu.actionBlockedCount', '✓ Blocked {count}', { count: successCount });
                         titleSpan.style.color = '#10b981';
                     } else {
                         titleSpan.textContent = originalText;
@@ -13925,7 +13929,11 @@ async function handleBlockChannelClick(channelInfo, menuItem, filterAll = false,
                 }
             }
         } else {
-            if (titleSpan) titleSpan.textContent = `Blocking ${collaboratorCount} channels...`;
+            if (titleSpan) {
+                titleSpan.textContent = collaboratorCount === 1
+                    ? filterTubeContentMenuText('content.menu.actionBlockingSingular', 'Blocking {count} channel...', { count: collaboratorCount })
+                    : filterTubeContentMenuText('content.menu.actionBlockingPlural', 'Blocking {count} channels...', { count: collaboratorCount });
+            }
 
             let successCount = 0;
             for (let i = 0; i < collaboratorCount; i++) {
@@ -13959,7 +13967,9 @@ async function handleBlockChannelClick(channelInfo, menuItem, filterAll = false,
             }
 
             if (titleSpan) {
-                titleSpan.textContent = `✓ Blocked ${successCount} channels`;
+                titleSpan.textContent = successCount === 1
+                    ? filterTubeContentMenuText('content.menu.actionBlockedChannelSingular', '✓ Blocked {count} channel', { count: successCount })
+                    : filterTubeContentMenuText('content.menu.actionBlockedChannels', '✓ Blocked {count} channels', { count: successCount });
                 titleSpan.style.color = '#10b981'; // green
             }
 
@@ -14607,9 +14617,9 @@ async function handleBlockChannelClick(channelInfo, menuItem, filterAll = false,
             // Error state
             if (titleSpan) {
                 if (handleResolutionFailed404 && requestedHandle) {
-                    titleSpan.textContent = '✗ Channel handle broken (404)';
+                    titleSpan.textContent = filterTubeContentMenuText('content.menu.actionBrokenHandle', '✗ Channel handle broken (404)');
                 } else {
-                    titleSpan.textContent = '✗ Failed to block';
+                    titleSpan.textContent = filterTubeContentMenuText('content.menu.actionFailed', '✗ Failed to block');
                 }
                 titleSpan.style.color = '#ef4444'; // red
             }
@@ -14789,7 +14799,7 @@ async function handleBlockChannelClick(channelInfo, menuItem, filterAll = false,
         }
         if (!blockPersisted) {
             if (titleSpan) {
-                titleSpan.textContent = '✗ Error';
+                titleSpan.textContent = filterTubeContentMenuText('content.menu.actionError', '✗ Error');
                 titleSpan.style.color = '#ef4444';
             }
             setTimeout(() => {

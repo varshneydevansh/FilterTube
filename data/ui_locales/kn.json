@@ -1475,5 +1475,15 @@
   "dashboard.importEnrichment.pause": "ಮೆಟಾಡೇಟಾ ಪೂರ್ಣಗೊಳಿಸುವುದನ್ನು ವಿರಾಮಗೊಳಿಸಿ",
   "dashboard.importEnrichment.unlockToContinue": "ಮೆಟಾಡೇಟಾ ಪೂರ್ಣಗೊಳಿಸುವುದನ್ನು ಮುಂದುವರಿಸಲು ಈ ಪ್ರೊಫೈಲ್ ಅನ್‌ಲಾಕ್ ಮಾಡಿ.",
   "dashboard.importEnrichment.resumeHelp": "ಹಿನ್ನೆಲೆ ಮೆಟಾಡೇಟಾ ಸರದಿಯನ್ನು ಮುಂದುವರಿಸಿ.",
-  "dashboard.importEnrichment.pauseHelp": "ಹಿನ್ನೆಲೆ ಮೆಟಾಡೇಟಾ ಸರದಿಯನ್ನು ವಿರಾಮಗೊಳಿಸಿ."
+  "dashboard.importEnrichment.pauseHelp": "ಹಿನ್ನೆಲೆ ಮೆಟಾಡೇಟಾ ಸರದಿಯನ್ನು ವಿರಾಮಗೊಳಿಸಿ.",
+  "content.menu.actionBlockChannel": "ಚಾನಲ್ ನಿರ್ಬಂಧಿಸಿ",
+  "content.menu.actionFetching": "ಪಡೆಯಲಾಗುತ್ತಿದೆ…",
+  "content.menu.actionBlockingSingular": "{count} ಚಾನಲ್ ನಿರ್ಬಂಧಿಸಲಾಗುತ್ತಿದೆ…",
+  "content.menu.actionBlockingPlural": "{count} ಚಾನಲ್‌ಗಳನ್ನು ನಿರ್ಬಂಧಿಸಲಾಗುತ್ತಿದೆ…",
+  "content.menu.actionBlockedCount": "✓ {count} ನಿರ್ಬಂಧಿಸಲಾಗಿದೆ",
+  "content.menu.actionBlockedChannelSingular": "✓ {count} ಚಾನಲ್ ನಿರ್ಬಂಧಿಸಲಾಗಿದೆ",
+  "content.menu.actionBlockedChannels": "✓ {count} ಚಾನಲ್‌ಗಳನ್ನು ನಿರ್ಬಂಧಿಸಲಾಗಿದೆ",
+  "content.menu.actionBrokenHandle": "✗ ಚಾನಲ್ ಹ್ಯಾಂಡಲ್ ಕೆಲಸ ಮಾಡುತ್ತಿಲ್ಲ (404)",
+  "content.menu.actionFailed": "✗ ನಿರ್ಬಂಧಿಸಲು ಸಾಧ್ಯವಾಗಲಿಲ್ಲ",
+  "content.menu.actionError": "✗ ದೋಷ"
 }

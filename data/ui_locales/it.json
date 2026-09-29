@@ -1475,5 +1475,15 @@
   "dashboard.importEnrichment.pause": "Metti in pausa il completamento dei metadati",
   "dashboard.importEnrichment.unlockToContinue": "Sblocca questo profilo per continuare a completare i metadati.",
   "dashboard.importEnrichment.resumeHelp": "Riprendi la coda dei metadati in background.",
-  "dashboard.importEnrichment.pauseHelp": "Metti in pausa la coda dei metadati in background."
+  "dashboard.importEnrichment.pauseHelp": "Metti in pausa la coda dei metadati in background.",
+  "content.menu.actionBlockChannel": "Blocca canale",
+  "content.menu.actionFetching": "Caricamento…",
+  "content.menu.actionBlockingSingular": "Blocco di {count} canale…",
+  "content.menu.actionBlockingPlural": "Blocco di {count} canali…",
+  "content.menu.actionBlockedCount": "✓ Bloccati {count}",
+  "content.menu.actionBlockedChannelSingular": "✓ {count} canale bloccato",
+  "content.menu.actionBlockedChannels": "✓ {count} canali bloccati",
+  "content.menu.actionBrokenHandle": "✗ Identificativo del canale non valido (404)",
+  "content.menu.actionFailed": "✗ Impossibile bloccare",
+  "content.menu.actionError": "✗ Errore"
 }

@@ -1475,5 +1475,15 @@
   "dashboard.importEnrichment.pause": "Jeda pelengkapan metadata",
   "dashboard.importEnrichment.unlockToContinue": "Buka kunci profil ini untuk melanjutkan pelengkapan metadata.",
   "dashboard.importEnrichment.resumeHelp": "Lanjutkan antrean metadata di latar belakang.",
-  "dashboard.importEnrichment.pauseHelp": "Jeda antrean metadata di latar belakang."
+  "dashboard.importEnrichment.pauseHelp": "Jeda antrean metadata di latar belakang.",
+  "content.menu.actionBlockChannel": "Blokir kanal",
+  "content.menu.actionFetching": "Mengambil…",
+  "content.menu.actionBlockingSingular": "Memblokir {count} channel…",
+  "content.menu.actionBlockingPlural": "Memblokir {count} channel…",
+  "content.menu.actionBlockedCount": "✓ {count} berhasil diblokir",
+  "content.menu.actionBlockedChannelSingular": "✓ {count} channel diblokir",
+  "content.menu.actionBlockedChannels": "✓ {count} channel diblokir",
+  "content.menu.actionBrokenHandle": "✗ Handle channel tidak valid (404)",
+  "content.menu.actionFailed": "✗ Gagal memblokir",
+  "content.menu.actionError": "✗ Kesalahan"
 }

@@ -1475,5 +1475,15 @@
   "dashboard.importEnrichment.pause": "மெட்டாடேட்டா நிறைவை இடைநிறுத்தவும்",
   "dashboard.importEnrichment.unlockToContinue": "மெட்டாடேட்டா நிறைவைத் தொடர இந்தச் சுயவிவரத்தைத் திறக்கவும்.",
   "dashboard.importEnrichment.resumeHelp": "பின்னணியில் உள்ள மெட்டாடேட்டா வரிசையைத் தொடரவும்.",
-  "dashboard.importEnrichment.pauseHelp": "பின்னணியில் உள்ள மெட்டாடேட்டா வரிசையை இடைநிறுத்தவும்."
+  "dashboard.importEnrichment.pauseHelp": "பின்னணியில் உள்ள மெட்டாடேட்டா வரிசையை இடைநிறுத்தவும்.",
+  "content.menu.actionBlockChannel": "சேனலைத் தடு",
+  "content.menu.actionFetching": "பெறுகிறது…",
+  "content.menu.actionBlockingSingular": "{count} சேனலைத் தடுக்கிறது…",
+  "content.menu.actionBlockingPlural": "{count} சேனல்களைத் தடுக்கிறது…",
+  "content.menu.actionBlockedCount": "✓ {count} தடுக்கப்பட்டது",
+  "content.menu.actionBlockedChannelSingular": "✓ {count} சேனல் தடுக்கப்பட்டது",
+  "content.menu.actionBlockedChannels": "✓ {count} சேனல்கள் தடுக்கப்பட்டன",
+  "content.menu.actionBrokenHandle": "✗ சேனல் அடையாளக் குறியீடு வேலை செய்யவில்லை (404)",
+  "content.menu.actionFailed": "✗ தடுக்க முடியவில்லை",
+  "content.menu.actionError": "✗ பிழை"
 }

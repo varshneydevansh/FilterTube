@@ -1475,5 +1475,15 @@
   "dashboard.importEnrichment.pause": "Meta verilerin tamamlanmasını duraklat",
   "dashboard.importEnrichment.unlockToContinue": "Meta verileri tamamlamaya devam etmek için bu profili aç.",
   "dashboard.importEnrichment.resumeHelp": "Arka plan meta veri kuyruğunu sürdür.",
-  "dashboard.importEnrichment.pauseHelp": "Arka plan meta veri kuyruğunu duraklat."
+  "dashboard.importEnrichment.pauseHelp": "Arka plan meta veri kuyruğunu duraklat.",
+  "content.menu.actionBlockChannel": "Kanalı engelle",
+  "content.menu.actionFetching": "Alınıyor…",
+  "content.menu.actionBlockingSingular": "{count} kanal engelleniyor…",
+  "content.menu.actionBlockingPlural": "{count} kanal engelleniyor…",
+  "content.menu.actionBlockedCount": "✓ {count} engellendi",
+  "content.menu.actionBlockedChannelSingular": "✓ {count} kanal engellendi",
+  "content.menu.actionBlockedChannels": "✓ {count} kanal engellendi",
+  "content.menu.actionBrokenHandle": "✗ Kanal tanıtıcısı çalışmıyor (404)",
+  "content.menu.actionFailed": "✗ Engellenemedi",
+  "content.menu.actionError": "✗ Hata"
 }

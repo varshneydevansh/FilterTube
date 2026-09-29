@@ -1,0 +1,14 @@
+{
+  "english": {
+    "content.menu.actionBlockChannel": "Block Channel",
+    "content.menu.actionFetching": "Fetching...",
+    "content.menu.actionBlockingSingular": "Blocking {count} channel...",
+    "content.menu.actionBlockingPlural": "Blocking {count} channels...",
+    "content.menu.actionBlockedCount": "✓ Blocked {count}",
+    "content.menu.actionBlockedChannelSingular": "✓ Blocked {count} channel",
+    "content.menu.actionBlockedChannels": "✓ Blocked {count} channels",
+    "content.menu.actionBrokenHandle": "✗ Channel handle broken (404)",
+    "content.menu.actionFailed": "✗ Failed to block",
+    "content.menu.actionError": "✗ Error"
+  }
+}

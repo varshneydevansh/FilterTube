@@ -1475,5 +1475,15 @@
   "dashboard.importEnrichment.pause": "메타데이터 완성 일시 중지",
   "dashboard.importEnrichment.unlockToContinue": "메타데이터 완성을 계속하려면 이 프로필의 잠금을 해제하세요.",
   "dashboard.importEnrichment.resumeHelp": "백그라운드 메타데이터 대기열을 재개하세요.",
-  "dashboard.importEnrichment.pauseHelp": "백그라운드 메타데이터 대기열을 일시 중지하세요."
+  "dashboard.importEnrichment.pauseHelp": "백그라운드 메타데이터 대기열을 일시 중지하세요.",
+  "content.menu.actionBlockChannel": "채널 차단",
+  "content.menu.actionFetching": "가져오는 중…",
+  "content.menu.actionBlockingSingular": "채널 {count}개 차단 중…",
+  "content.menu.actionBlockingPlural": "채널 {count}개 차단 중…",
+  "content.menu.actionBlockedCount": "✓ {count}개 차단됨",
+  "content.menu.actionBlockedChannelSingular": "✓ 채널 {count}개 차단됨",
+  "content.menu.actionBlockedChannels": "✓ 채널 {count}개 차단됨",
+  "content.menu.actionBrokenHandle": "✗ 채널 핸들이 잘못되었습니다 (404)",
+  "content.menu.actionFailed": "✗ 차단하지 못했습니다",
+  "content.menu.actionError": "✗ 오류"
 }

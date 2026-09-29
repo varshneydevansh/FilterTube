@@ -1475,5 +1475,15 @@
   "dashboard.importEnrichment.pause": "暂停补全元数据",
   "dashboard.importEnrichment.unlockToContinue": "把搿个档案解锁，接牢补全元数据。",
   "dashboard.importEnrichment.resumeHelp": "接牢后台元数据队列。",
-  "dashboard.importEnrichment.pauseHelp": "暂停后台元数据队列。"
+  "dashboard.importEnrichment.pauseHelp": "暂停后台元数据队列。",
+  "content.menu.actionBlockChannel": "拦脱频道",
+  "content.menu.actionFetching": "正拿来哉…",
+  "content.menu.actionBlockingSingular": "正拦脱 {count} 个频道哉…",
+  "content.menu.actionBlockingPlural": "正拦脱 {count} 个频道哉…",
+  "content.menu.actionBlockedCount": "✓ 拦脱 {count} 哉",
+  "content.menu.actionBlockedChannelSingular": "✓ {count} 个频道拦脱哉",
+  "content.menu.actionBlockedChannels": "✓ {count} 个频道拦脱哉",
+  "content.menu.actionBrokenHandle": "✗ 频道账号勿对（404）",
+  "content.menu.actionFailed": "✗ 拦勿脱",
+  "content.menu.actionError": "✗ 错哉"
 }

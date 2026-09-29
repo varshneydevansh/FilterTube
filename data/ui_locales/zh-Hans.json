@@ -1475,5 +1475,15 @@
   "dashboard.importEnrichment.pause": "暂停补全元数据",
   "dashboard.importEnrichment.unlockToContinue": "解锁此个人资料以继续补全元数据。",
   "dashboard.importEnrichment.resumeHelp": "继续后台元数据队列。",
-  "dashboard.importEnrichment.pauseHelp": "暂停后台元数据队列。"
+  "dashboard.importEnrichment.pauseHelp": "暂停后台元数据队列。",
+  "content.menu.actionBlockChannel": "屏蔽频道",
+  "content.menu.actionFetching": "正在获取…",
+  "content.menu.actionBlockingSingular": "正在屏蔽 {count} 个频道…",
+  "content.menu.actionBlockingPlural": "正在屏蔽 {count} 个频道…",
+  "content.menu.actionBlockedCount": "✓ 已屏蔽 {count}",
+  "content.menu.actionBlockedChannelSingular": "✓ 已屏蔽 {count} 个频道",
+  "content.menu.actionBlockedChannels": "✓ 已屏蔽 {count} 个频道",
+  "content.menu.actionBrokenHandle": "✗ 频道账号句柄无效 (404)",
+  "content.menu.actionFailed": "✗ 屏蔽失败",
+  "content.menu.actionError": "✗ 出错"
 }

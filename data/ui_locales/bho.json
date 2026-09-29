@@ -1475,5 +1475,15 @@
   "dashboard.importEnrichment.pause": "मेटाडेटा पूरा कइल रोक दीं",
   "dashboard.importEnrichment.unlockToContinue": "मेटाडेटा पूरा कइल जारी रखे खातिर एह प्रोफाइल के अनलॉक करीं।",
   "dashboard.importEnrichment.resumeHelp": "बैकग्राउंड मेटाडेटा कतार फेर से शुरू करीं।",
-  "dashboard.importEnrichment.pauseHelp": "बैकग्राउंड मेटाडेटा कतार रोक दीं।"
+  "dashboard.importEnrichment.pauseHelp": "बैकग्राउंड मेटाडेटा कतार रोक दीं।",
+  "content.menu.actionBlockChannel": "चैनल के ब्लॉक करीं",
+  "content.menu.actionFetching": "लावल जा रहल बा…",
+  "content.menu.actionBlockingSingular": "{count} चैनल के ब्लॉक कइल जा रहल बा…",
+  "content.menu.actionBlockingPlural": "{count} चैनलन के ब्लॉक कइल जा रहल बा…",
+  "content.menu.actionBlockedCount": "✓ {count} ब्लॉक भइल",
+  "content.menu.actionBlockedChannelSingular": "✓ {count} चैनल ब्लॉक भइल",
+  "content.menu.actionBlockedChannels": "✓ {count} चैनल ब्लॉक भइल",
+  "content.menu.actionBrokenHandle": "✗ चैनल के हैंडल काम नइखे करत (404)",
+  "content.menu.actionFailed": "✗ ब्लॉक ना हो सकल",
+  "content.menu.actionError": "✗ गलती"
 }

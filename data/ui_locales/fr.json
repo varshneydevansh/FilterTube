@@ -1475,5 +1475,15 @@
   "dashboard.importEnrichment.pause": "Mettre en pause la complétion des métadonnées",
   "dashboard.importEnrichment.unlockToContinue": "Déverrouillez ce profil pour poursuivre la complétion des métadonnées.",
   "dashboard.importEnrichment.resumeHelp": "Reprenez la file d’attente des métadonnées en arrière-plan.",
-  "dashboard.importEnrichment.pauseHelp": "Mettez en pause la file d’attente des métadonnées en arrière-plan."
+  "dashboard.importEnrichment.pauseHelp": "Mettez en pause la file d’attente des métadonnées en arrière-plan.",
+  "content.menu.actionBlockChannel": "Bloquer la chaîne",
+  "content.menu.actionFetching": "Récupération…",
+  "content.menu.actionBlockingSingular": "Blocage de {count} chaîne…",
+  "content.menu.actionBlockingPlural": "Blocage de {count} chaînes…",
+  "content.menu.actionBlockedCount": "✓ {count} bloqué(s)",
+  "content.menu.actionBlockedChannelSingular": "✓ {count} chaîne bloquée",
+  "content.menu.actionBlockedChannels": "✓ {count} chaînes bloquées",
+  "content.menu.actionBrokenHandle": "✗ Identifiant de chaîne invalide (404)",
+  "content.menu.actionFailed": "✗ Impossible de bloquer",
+  "content.menu.actionError": "✗ Erreur"
 }

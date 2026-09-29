@@ -1475,5 +1475,15 @@
   "dashboard.importEnrichment.pause": "مکث در تکمیل فراداده",
   "dashboard.importEnrichment.unlockToContinue": "برای ادامهٔ تکمیل فراداده، قفل این نمایه را باز کنید.",
   "dashboard.importEnrichment.resumeHelp": "صف فرادادهٔ پس‌زمینه را ادامه دهید.",
-  "dashboard.importEnrichment.pauseHelp": "صف فرادادهٔ پس‌زمینه را مکث کنید."
+  "dashboard.importEnrichment.pauseHelp": "صف فرادادهٔ پس‌زمینه را مکث کنید.",
+  "content.menu.actionBlockChannel": "مسدود کردن کانال",
+  "content.menu.actionFetching": "در حال دریافت…",
+  "content.menu.actionBlockingSingular": "در حال مسدود کردن {count} کانال…",
+  "content.menu.actionBlockingPlural": "در حال مسدود کردن {count} کانال…",
+  "content.menu.actionBlockedCount": "✓ {count} مورد مسدود شد",
+  "content.menu.actionBlockedChannelSingular": "✓ {count} کانال مسدود شد",
+  "content.menu.actionBlockedChannels": "✓ {count} کانال مسدود شد",
+  "content.menu.actionBrokenHandle": "✗ شناسهٔ کانال معتبر نیست (404)",
+  "content.menu.actionFailed": "✗ مسدود کردن ناموفق بود",
+  "content.menu.actionError": "✗ خطا"
 }
