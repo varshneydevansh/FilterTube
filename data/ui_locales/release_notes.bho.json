@@ -14,5 +14,361 @@
       "GitHub release publish करे में GitHub CLI credentials लागेला, upload से पहिले drafts बनावल जाला, पुरान tags से आगे बढ़ल जाला, खाली ना होखे वाला assets upload होखेला, अंतिम asset set के जाँच होला, आ जाँच के बादे publish होला।",
       "Android फोन आ टैबलेट खातिर FilterTube ऐप अब Google Play पर सभे खातिर उपलब्ध बा। [सार्वजनिक पन्ना](https://play.google.com/store/apps/details?id=com.filtertube.app) से इंस्टॉल करीं भा Google Play पर FilterTube खोजीं।"
     ]
+  },
+  "3.3.6": {
+    "ctaLabel": "नया का बा देखीं",
+    "headline": "मजबूत फिल्टरिंग, सुरक्षित समय, आ बिना विज्ञापन के शांत प्लेबैक",
+    "summary": "FilterTube 3.3.6 सीधा पहुँच लागू करे ला, हर profile खातिर सुरक्षित समय आ Self-Control session देला, भरोसेमंद Blocked आ Allowed नियम-समूह रखेला, आधिकारिक category filtering देला, Advert Void के default से चालू रखेला, आ आज के YouTube से खूब compatibility सुधारेला।",
+    "bannerSummary": "सीधा पहुँच filtering, सुरक्षित समय, नियम-सूची आ BlockTube आयात, आधिकारिक category, Advert Void, आ आज के YouTube से compatibility।",
+    "highlights": [
+      "YouTube पर सीधा जाए, playlist बदले, autoplay चले, आ समर्थित embed अब feed filtering वाला वीडियो आ channel admission नियम से गुजरे ला; ई लोग filtering के bypass ना करे।",
+      "रोज के YouTube समय-सीमा अब चालू profile पर लागू होखे ला, बचल समय देखावे ला, restart के बादो रहे ला, आ PIN से profile बदले वाला पूरा-पन्ना timeout screen इस्तेमाल करे ला। अपनी मर्जी से शुरू Self-Control session countdown खतम होखे तक चुनल नियम lock रखे ला।",
+      "Blocked आ Allowed नियम Main आ Kids खातिर अलग-अलग collection बनल रहे ला; ऊपर के Blocklist चाहे Whitelist policy तय करे ला कि देखे के काम केहू collection नियंत्रित करी।",
+      "बड़ BlockTube आ managed rule-list imports preview, capacity check, transactional rollback, आ read-back verification इस्तेमाल करे ला; added, duplicate, skipped, channel, keyword, regex, आ video-ID के गिनती भी साफ देखाई देला।",
+      "Category filtering YouTube के आधिकारिक `microformat.playerMicroformatRenderer.category`, सीमित same-origin Player metadata hydration, चुनल category block करे चाहे खाली ओकरे allow करे के साफ विकल्प, आ Watch, rail, Mix, comments आ renderer ownership के सुरक्षित ढंग इस्तेमाल करे ला।",
+      "Advert Void अब YouTube Main आ Kids पर नया आ upgrade भइल profile खातिर default से चालू बा। Shared Web runtime बिना extra request के Player में देखल ad-plan field हटावे ला; native playback बिना model वाला ad-plan data छोड़ देला चाहे देखाई पड़े त raw Reel response normalize करे ला, आ guarded fallback बच निकलल interruption संभाले ला।",
+      "Experimental spoken-language filtering आ original-audio preference उपलब्ध होखे पर YouTube Player evidence इस्तेमाल करे ला; recommendation metadata ना मिले त content के गुजर जाए देला।",
+      "YouTube Playables छिपावल, आज के camelCase renderer आ collaboration handling, आसान Help पढ़ाई आ search, साफ popup आ dashboard control, आ public Android Google Play तथा iOS status surface भी शामिल बा।",
+      "Settings में पूरा device खातिर opt-out बा, जे default से unchecked बा, automatic reload reminder आ YouTube तथा YouTube Kids पर What's New banner बंद करे खातिर। Dashboard के What's New पन्ना अबहियों हाथ से खोले जा सकेला।"
+    ]
+  },
+  "3.3.5": {
+    "ctaLabel": "नया का बा देखीं",
+    "headline": "YouTube के गड़बड़ी से उबरल आ Shorts channel पहिले block होखे",
+    "summary": "ई release पहिले से खुलल YouTube tab में content runtime के दोहरल injection ठीक करे ला, आ channel नियम चाहे whitelist mode चालू होखे त देखाई देत Shorts के channel पहचान पहिले सुलझावे ला।",
+    "bannerSummary": "दोहरल runtime injection के गड़बड़ी ठीक करे ला आ Shorts channel पहचान पहिले निकाले ला।",
+    "highlights": [
+      "Install/update/profile refresh अब खुलल YouTube tab में manifest content scripts फेर से inject ना करे; एहसे `Identifier ... has already been declared` वाला syntax error बार-बार ना आवे।",
+      "पहिले से खुलल YouTube tab अबहियों managed time-limit/runtime checks पा सकेला, बिना script declaration दोहरवले।",
+      "Channel blocklist नियम चाहे whitelist mode चालू होखे त देखाई देत आ लगे देखाई देत Shorts अब मौजूद bounded background `/shorts/<videoId>` owner resolver इस्तेमाल करे ला।",
+      "सीखल Shorts video-to-channel mapping सहेजल जाला आ तुरते फेर process होखे ला; एहसे blocked channel के Shorts छिपे से पहिले hover चाहे menu छुए के जरूरत ना पड़े।",
+      "`.shortsLockupViewModelHost` आ `.ytGridShelfViewModelGridShelfItem` जइसन desktop Shorts host अब खास Shorts fallback/enrichment path में शामिल बा।",
+      "Blocklist mode में पहचान सुलझे तक अनजान Shorts ना छिपे; whitelist mode मौजूद pending path से अउरी कड़ा रहे ला।",
+      "YouTube टूटे के report पर जाँच चले के समय v3.3.4 के store rollback करके v3.3.2 package रखल गइल रहे, अइसन दर्ज बा।"
+    ]
+  },
+  "3.3.4": {
+    "ctaLabel": "नया का बा देखीं",
+    "headline": "Store फेर v3.3.2 package पर लौटल",
+    "summary": "v3.3.4 browser-store rollback version रहे, जे v3.3.3 से जुड़ल YouTube गड़बड़ी के report जाँचे जात रहे त पहिले वाला v3.3.2 package इस्तेमाल कइलस।",
+    "bannerSummary": "Store rollback: YouTube दिक्कत जाँचत घरी v3.3.4 में v3.3.2 package रहे।",
+    "highlights": [
+      "v3.3.4 खातिर source से नया feature काम कइल गइल बा, अइसन दावा नइखे।",
+      "Issue #64 के जाँच में संदिग्ध v3.3.3 package से store हटावे खातिर rollback इस्तेमाल भइल।",
+      "अगिला source release v3.3.5 दोहरल runtime injection आ Shorts identity के सुधार ले आइल।"
+    ]
+  },
+  "3.3.3": {
+    "ctaLabel": "नया का बा देखीं",
+    "headline": "परिवार के device update, नियम-सूची, तारीख वाला keyword, आ YouTube DOM नवीनीकरण",
+    "summary": "ई release माता-पिता/देखभाल करे वाला के control समझल आसान बनावे ला, जाँचल rule-list import आ तारीख से सीमित keyword नियम जोड़े ला, Home/Internet Pickup model लिखे ला, आ आज के YouTube/YTM markup खातिर filtering ताजा करे ला।",
+    "bannerSummary": "परिवार device update, जाँचल rule-list import, तारीख-आधारित keyword, parent-first Help, आ आज के YouTube/YTM DOM से compatibility।",
+    "highlights": [
+      "Parent/caregiver profile सुरक्षित profile संभाल सकेला, parent dashboard से बच्चा/सुरक्षित profile के नियम edit कर सकेला, आ मंजूर update सत्यापित सुरक्षित device पर भेज सकेला।",
+      "Family Device Updates अब live Send Update, साफ Home Pickup, आ साफ Internet Pickup समझावे ला; pickup service के authority के स्रोत ना माने ला।",
+      "Protected profile के समय सीमा अब पुरान आ नया YouTube tab जाँचे ला, शांत timeout screen देखावे ला, आ अउरी समय के request माता-पिता के समीक्षा खातिर लिखे ला।",
+      "Rule-list import CSV, TXT, simple JSON, BlockTube-style JSON, आ raw HTTPS URL support करे ला; लागू करे से पहिले preview, Main/Kids/Both targeting, template, list management, pause/resume/remove, stale check, आ refresh देला।",
+      "Date-based keyword filtering keyword के upload date से/पहिले चाहे दू तारीख के बीच लागू कर सकेला। YouTube देवे त comment filtering parent video के upload date इस्तेमाल करे ला।",
+      "Help आ dashboard control सरल parent-first भाषा, तेज help bubble, आ Exact, Comment, Date, PIN, rule list, आ device update के साफ समझावन इस्तेमाल करे ला।",
+      "Dashboard अब active Android closed-testing user के hello@filtertube.in पर email करे के कहेला, आ YouTube page structure बदले पर filtering टूटे के report करे के याद दिलावेला।",
+      "YouTube desktop lockup selector आ YTM mobile camelCase DOM के दस्तावेज बनावल गइल बा ताकि असली video card फिल्टर होखे, बाकिर Watch-page chip bar fallback काम ना जगावे चाहे scroll jump ना करावे।",
+      "अबहीं अलग बा: automatic LAN peer discovery, hosted FilterTube Internet Pickup service, चुपचाप public auto-subscribe catalog, native Android/iOS parity, आ install भइल दू device पर manual smoke test के प्रमाण।"
+    ]
+  },
+  "3.3.2": {
+    "ctaLabel": "नया का बा देखीं",
+    "headline": "Mobile/tablet app MVP, आसान YouTube, आ सुरक्षित whitelist",
+    "summary": "Public app release surface Android phone/tablet के final testing आ iOS/iPad status खातिर तैयार बा; extension dashboard अब ओ app path बतावेला, active नियम ना होखे त YouTube SPA काम कम चलेला, आ whitelist/end-screen correctness सुधार एह release में बा।",
+    "bannerSummary": "Android/iOS app status, हल्का YouTube SPA काम, आ whitelist/end-screen सुधार।",
+    "highlights": [
+      "Website downloads hub आ extension dashboard अब Android phone/tablet final-testing path आ iOS/iPad TestFlight/App Store status path देखावे ला।",
+      "Android phone/tablet release setup shared FilterTube runtime, YouTube Main, public YouTube Kids access, profile, PIN नियम, आ Nanah sync पर दस्तावेज कइल गइल बा।",
+      "YouTube SPA performance काम active नियम चाहे route के जरूरत ना होखे त अउरी JSON clone/parse/replay, DOM fallback, quick-block, fallback-menu, आ whitelist-pending काम छोड़ देला।",
+      "Production extension context आम console logging के साफ debug mode के पीछे रखेला ताकि सामान्य browsing में YouTube hot path पर console overhead ना पड़े।",
+      "Whitelist release सुधार में Shorts creator fallback, list-target forwarding, आ end-screen control खातिर छोट autoplay/watch-next endpoint filtering शामिल बा।",
+      "FilterTube DOM state attribute के मजबूत कइल गइल बा ताकि चौड़ा देखाई देत `data-filtertube-*` fingerprint घटे, बाकिर जरूरत के runtime state बचल रहे।",
+      "Accounts & Sync अब Family Device Updates के Send Update, optional Home Pickup, आ दूर रहला/बाद में खोले वाला Internet Pickup से समझावे ला ताकि माता-पिता live sync, home pickup, online pickup, आ authority ना होखे वाला चीज के अंतर समझें।",
+      "Protected profile time limit खातिर daily YouTube budget, timeout screen, request-more-time history, आ parent/caregiver approval के release documentation बा।",
+      "Nanah/import path extension आ native app payload के बीच channel-derived Filter All keyword ownership बचा के रखेला; row color, source-badge metadata, आ pairing context भी शामिल बा।"
+    ]
+  },
+  "3.3.1": {
+    "ctaLabel": "नया का बा देखीं",
+    "headline": "तीसरा पक्ष server बिना P2P से device के बीच सुरक्षित sync",
+    "summary": "Accounts & Sync अब Nanah के तीन आसान रास्ता में देखावे ला, parent/child targeting मजबूत करे ला, reconnect नियम साफ करे ला, आ असली इस्तेमाल खातिर ढेर documentation देला।",
+    "bannerSummary": "Nanah के तीन साफ रास्ता, मजबूत targeting, आ समझे लायक reconnect नियम।",
+    "highlights": [
+      "Accounts & Sync अब तीन साफ रास्ता से शुरू होला: ई profile एक बेर भेजीं, Parent controls child, आ Move full account.",
+      "Advanced Nanah control अबहियों बा, बाकिर पूरा flow के आगे रहे के बजाय Advanced section में छिपल बा।",
+      "Parent/source session remote target profile साफ चुने सकेला, आ managed-link save भेजे वाला के लगे भी mirror होला ताकि दूनो device पर एके trust record रहे।",
+      "Trusted link refresh के बादो सहेजल रहे ला, बाकिर reconnect नया live session होला, छिपल background sync ना।",
+      "Locked child update, reconnect नियम, device label persistence, आ self-join/session-burn protection सुरक्षित parent control खातिर मजबूत कइल गइल बा।",
+      "README, Architecture, Technical, Functionality, Profiles & PIN, project plan, user guide, आ concern tracker अब आज के Nanah desktop checkpoint के ढेर विस्तार से लिखेला।"
+    ]
+  },
+  "3.3.0": {
+    "ctaLabel": "नया का बा देखीं",
+    "headline": "Collaboration recovery + cross-browser import मजबूत",
+    "summary": "Watch/YTM collaboration menu अब पूरा roster अउरी भरोसा से वापस पावेला, subscription import browser भर में मजबूत बा, आ अलग-अलग surface के whitelist तथा Quick Block सुधार 3.3.0 में जुड़ल बा।",
+    "bannerSummary": "पूरा collaborator roster recovery, मजबूत subscription import, आ whitelist/Quick Block सुधार।",
+    "highlights": [
+      "Mobile YouTube home/watch-next/Mix-style card अब अधूरा single-channel menu पर लौटे के बजाय ओही 3-dot आ collaborator recovery flow में भाग लेला।",
+      "Watch-page right rail, playlist row, आ watch-जइसन lockup अब पूरा collaborator roster वापस पा सकेला आ चालू 3-dot menu के ओही जगह refresh कर सकेला।",
+      "Mix/watch recovery अउरी सुरक्षित बा: असली collaboration card ठीक से upgrade होला, बाकिर '&' चाहे 'and' वाला साधारण नाम झूठा collaboration menu ना बने।",
+      "जटिल surface पर Quick Block अउरी स्थिर बा: अउरी desktop card से ऊपर रहे ला, mobile search-suggestion dropdown से बचे ला, आ mobile watch-next layout पर बेहतर टिके ला।",
+      "Subscribed-channel whitelist import हाल के page browse response बचावेला, असली /feed/channels बढ़त के प्राथमिकता देला, आ /feed/channels के देखाई देत management surface रखेला।",
+      "Whitelist filtering YouTube desktop/mobile renderer पर अउरी कड़ा आ सुरक्षित बा; creator-page handling आ Mixes/subscriptions hide control भी सुधरल बा।",
+      "नया control आ polish: Channel Management row असली channel page से जुड़ेला, 3-dot block item बंद कइल जा सकेला, आ encrypted Firefox export अउरी सुरक्षित fallback path इस्तेमाल करे ला।"
+    ]
+  },
+  "3.2.9": {
+    "ctaLabel": "नया का बा देखीं",
+    "headline": "Subscribed Channel Import + Whitelist + PIN सुरक्षा बग सुधार",
+    "summary": "चलत YouTube account के subscription whitelist में आयात करीं; mode बदलल के मतलब अउरी साफ बा आ /feed/channels startup flow अउरी भरोसेमंद बा।",
+    "bannerSummary": "चलत YouTube account से subscribed channel whitelist में लाईं, अउरी भरोसेमंद शुरुआत के साथ।",
+    "highlights": [
+      "New Tab View में चालू signed-in YouTube account से subscribed channel whitelist में import हो सकेला।",
+      "Import startup अब मौजूद live YouTube tab फेर इस्तेमाल करे ला, ओकरा के /feed/channels पर भेजेला, आ शुरू करे से पहिले FilterTube bridge के इंतजार करे ला।",
+      "Whitelist copy अउरी साफ बा: Import Only blocklist ना बदले ला, जबकि Import + Turn On Whitelist मौजूदा blocklist-to-whitelist migration path अपनावेला।",
+      "Documentation अब import architecture, FEchannels request flow, renderer sources, आ whitelist semantics के अउरी विस्तार से बतावेला।"
+    ]
+  },
+  "3.2.8": {
+    "ctaLabel": "नया का बा देखीं",
+    "headline": "Theme refresh + scenic UI shell के सुधार",
+    "summary": "Popup आ dashboard surface अब अउरी शांत scenic theme system इस्तेमाल करे ला, जवना में layout सुघर बा, tint state साफ बा, आ light/dark balance बढ़िया बा।",
+    "bannerSummary": "शांत scenic theme, सुघर layout, आ बेहतर light/dark balance।",
+    "highlights": [
+      "Scenic UI refresh: popup आ dashboard अब शांत product shell साझा करेला, जे local hero video के हल्का background media बनावेला।",
+      "Light/dark theme सुधार: dark mode scenic background के बिना फीका center glow देखावेला, जबकि light mode अउरी साफ transparency इस्तेमाल करेला।",
+      "Responsive सफाई: popup spacing सुघर, profile dropdown छोट, Help/Support card layout बढ़िया, आ filter surface भर में mobile fit बेहतर।",
+      "Control tint सुधार: enabled/disabled state, pill color, search field, आ import/export action दुनो theme में अउरी साफ देखाई देला।"
+    ]
+  },
+  "3.2.7": {
+    "ctaLabel": "नया का बा देखीं",
+    "headline": "Category filter + Quick Block hover cross + mobile 3 Dot UI",
+    "summary": "नया category filtering आ एक बेर tap पर quick cross block default से चालू बा।",
+    "bannerSummary": "YouTube category filter करीं आ default-on quick cross block एक tap में इस्तेमाल करीं।",
+    "highlights": [
+      "Category Filtering: YouTube category (Music, Gaming, Education वगैरह) के हिसाब से video block करीं चाहे allow करीं।",
+      "Quick Cross Block Default ON: `Show Quick Cross Block button` v3.2.7 में default से enabled बा (user चाहें त disable कर सकेला)।",
+      "Mobile Blocking: YT Mobile में 3 Dot UI आ Quick Cross Block खातिर बेहतर support; ई अभी Home Page पर काम करेला।"
+    ]
+  },
+  "3.2.6": {
+    "ctaLabel": "नया का बा देखीं",
+    "headline": "UI/UX सुंदर बनावल आ content-based filtering",
+    "summary": "आधुनिक design के साथ typography के पूरा सुधार आ तीन नया content filter (duration, date, uppercase)।",
+    "bannerSummary": "बेहतर typography, duration/date/uppercase filter, आ dashboard सुधार।",
+    "highlights": [
+      "Typography update: आसानी से पढ़े खातिर आधुनिक आ निखरल font scale।",
+      "Content-based filter: duration (लंबा/छोट/बीच में), upload date (नया/पुरान/बीच में), आ uppercase detection (clickbait title)।",
+      "videoMetaMap system: समझदार batching के साथ टिकाऊ video metadata storage (75ms window, अधिकतम 1500 entry)।",
+      "Dashboard सुधार: surface के हिसाब से stats (Main बनाम Kids), बेहतर stat card, आ donate promo card।"
+    ]
+  },
+  "3.2.5": {
+    "ctaLabel": "नया का बा देखीं",
+    "headline": "Whitelist mode मुख्य बनल + स्थिरता",
+    "summary": "Whitelist mode अब चुने भर के allow करे वाला मुख्य रास्ता बा, जवना में समझदार extraction, playlist सुरक्षा, आ कम CPU इस्तेमाल बा।",
+    "bannerSummary": "मुख्य whitelist mode, बेहतर channel पहचान, playlist सुरक्षा, आ कम CPU इस्तेमाल।",
+    "highlights": [
+      "Whitelist mode के बढ़ावा: wording/UI अब ओकरा के experimental ना बतावे।",
+      "3-dot menu के सफाई आ whitelist surface खातिर search-secondary handling।",
+      "Thumbnail anchor आ parent container के साथ कई स्रोत से channel extraction।",
+      "Mode-aware state tracking, confirmation dialog, आ bridge optimization।",
+      "Playlist स्थिरता: चुनल row देखात रहे; pending identity blocked row के फेरु ना देखावे।",
+      "बिना network architecture के Kids mode whitelist support।"
+    ]
+  },
+  "3.2.4": {
+    "ctaLabel": "नया का बा देखीं",
+    "headline": "बेहतर Whitelist Mode + performance सुधार",
+    "summary": "प्रायोगिक whitelist mode में UX, performance optimization, आ Kids mode support बढ़ावे वाला अहम सुधार।",
+    "bannerSummary": "Whitelist अनुभव, performance, data loss रोकथाम, आ Kids support बेहतर भइल।",
+    "highlights": [
+      "EXPERIMENTAL: 3-dot menu सफाई, चतुर search processing, आ mode-aware state tracking वाला बेहतर whitelist mode।",
+      "Performance boost: Bridge-level optimization आ चुनल processing CPU इस्तेमाल घटावे ला।",
+      "UI सुधार: mode बदलत समय confirmation dialog गलती से data loss होखे से रोके ला।",
+      "Kids mode support: बिना network architecture के whitelist functionality अब YouTube Kids पर चले ला।",
+      "Search optimization: UI में भीड़ रोके खातिर right-rail watch card के समझदारी से संभालल जाला।",
+      "Channel extraction: thumbnail anchor आ parent container से कई स्रोत के identity resolve कइल जाला।",
+      "Mode switching: समझदार reprocessing के साथ blocklist/whitelist में आसान बदलाव।"
+    ]
+  },
+  "3.2.3": {
+    "ctaLabel": "नया का बा देखीं",
+    "headline": "प्रायोगिक Whitelist Mode + UI सुधार",
+    "summary": "'खाली मंजूर चीज' filtering खातिर whitelist mode के alpha release, साथे बेहतर UI update आ mobile menu support।",
+    "bannerSummary": "Whitelist alpha, popup/tab view में आसान mode toggle, आ mobile menu support।",
+    "highlights": [
+      "EXPERIMENTAL: whitelist mode साफ तौर पर मंजूर channel/keyword छोड़ के बाकी सब content छिपावे ला।",
+      "Popup आ tab view में blocklist आ whitelist के बीच आसान toggle वाला दोहरा filtering mode।",
+      "Staging migration — channel जमा करे खातिर blocklist पर जाईं, फेर ओकरा के whitelist में मिला दीं।",
+      "Whitelist mode में Watch page सुरक्षा video playback चालू रखे ला।",
+      "Optimistic UI update content तुरते छिपावे ला आ blocking fail होखे त अपने-आप लौटा देला।",
+      "YouTube mobile renderer के सही handling के साथ बेहतर mobile menu support।",
+      "Production noise घटावे खातिर सब console log अब debug flag के पीछे बा।"
+    ]
+  },
+  "3.2.2": {
+    "ctaLabel": "नया का बा देखीं",
+    "headline": "UI/UX सुधार आ debug gating",
+    "summary": "Optimistic update, mobile menu support, debug के अधीन logging, scroll बचावल, आ state management में सुधार।",
+    "bannerSummary": "फटाफट दिखे वाला filtering, mobile menu, debug control, आ scroll बचाव।",
+    "highlights": [
+      "Optimistic UI update: content तुरते छिपे ला आ blocking fail होखे त अपने-आप वापस आवे ला।",
+      "सही renderer tag के साथ ytm-menu-popup-renderer खातिर बेहतर mobile menu support।",
+      "`window.__filtertubeDebug` के जरिए debug-gated logging।",
+      "DOM fallback के दौरान scroll position बचाईं ताकि पन्ना अचानक ना उछले।",
+      "Background request घटावे खातिर channel enrichment सीमा (हर session में 10)।",
+      "requestIdleCallback आ batching से idle समय पर rendering schedule होला।",
+      "बेकार render दोहराव रोके खातिर signature comparison वाला external reload debounce।",
+      "चुनल notification: signature बदले त `load`; ना त `externalUpdate`।",
+      "साझा global state के जरिए Bridge state management।"
+    ]
+  },
+  "3.2.1": {
+    "ctaLabel": "नया का बा देखीं",
+    "headline": "बिना lag के processing + performance बढ़ोतरी",
+    "summary": "बड़ performance optimization UI lag हटा देला; Chromium browser में बढ़िया नतीजा आ Firefox में खास सुधार बा।",
+    "bannerSummary": "भारी filtering समय UI freeze घटावे वाला बड़ा performance सुधार।",
+    "highlights": [
+      "Async DOM processing main thread के मौका देला आ भारी filtering में browser freeze होखे से बचावेला।",
+      "Compiled regex आ channel filter caching O(1) lookup देला आ CPU इस्तेमाल 60–80% घटावेला।",
+      "Batched storage update समझदार 250ms अंतराल से I/O operation 70–90% घटावेला।",
+      "Debounced settings refresh जरूरत से ज्यादा DOM reprocessing रोकेला।",
+      "Run state management overlapping execution रोकेला आ request सही से queue में रखेला।",
+      "Chromium browser: lag 90% से अधिक घटल; Firefox: बढ़िया सुधार, optimization जारी बा।"
+    ]
+  },
+  "3.2.0": {
+    "ctaLabel": "नया का बा देखीं",
+    "headline": "तुरंत blocking + Kids खातिर बिना network",
+    "summary": "3-dot menu channel नाम फटाफट देखावे ला, network request बहुत घटेला, आ YouTube Kids पूरा offline चलेला।",
+    "bannerSummary": "तुरंत channel नाम, कम network request, आ offline Kids blocking।",
+    "highlights": [
+      "3-dot menu अब सही channel नाम तुरंत देखावे ला — 'Fetching...' खातिर रुके के जरूरत नइखे।",
+      "Channel पहचान intercepted YouTube JSON response से आवेला, एहसे network call घटेला।",
+      "भरोसेमंद blocking खातिर YouTube Kids कवनो network fetch बिना चलेला।",
+      "गायब metadata नियंत्रित गति से background में भरल जाला (6 घंटा cooldown)।",
+      "Topic channel (जइसे 'Music - Topic') के @handle बिना खास तरीका से संभालल जाला।",
+      "ASCII आ Mermaid flow diagram वाला नया विस्तृत documentation।"
+    ]
+  },
+  "3.1.9": {
+    "ctaLabel": "नया का बा देखीं",
+    "headline": "Profile समझे वाला backup + lock से बंधल control",
+    "summary": "Auto-backup आ content control अब profile lock/PIN माने ला, हर profile के settings अपना ला, आ lock gate banner ऊपर रहला परो profile dropdown क्लिक हो सकेला।",
+    "bannerSummary": "Backup आ control profile lock माने ला; dropdown अबहियों क्लिक हो सकेला।",
+    "highlights": [
+      "Auto-backup बंद होखे चाहे profile lock होखे त auto-backup mode/format selector disable हो जाला; नया profile auto-backup preference अपना लेला।",
+      "Auto-backup scheduling profile बने चाहे mode/format बदले पर चले ला, बाकिर तबे जब ओ profile खातिर auto-backup चालू होखे।",
+      "Lock होखे पर content-control toggle आ backup control बंद/वापस हो जाला; non-master profile खातिर export scope खाली active profile होला।",
+      "Profile dropdown के z-index सुधार lock gate banner देखाई देत घरी भी ओकरा क्लिक करे देला।",
+      "Profile/PIN model, profile-scoped backup, आ UI gating rule पर docs अपडेट भइल बा।"
+    ]
+  },
+  "3.1.8": {
+    "ctaLabel": "नया का बा देखीं",
+    "headline": "Support tab + भरोसेमंद auto-backup",
+    "summary": "Dashboard में नया Support page (Ko-fi) जुड़ल बा, आ auto-backup अब Chrome आ Firefox दुनो में भरोसेमंद ढंग से चलेला।",
+    "bannerSummary": "नया Ko-fi Support page आ Chrome/Firefox पर चले वाला auto-backup।",
+    "highlights": [
+      "Dashboard में Ko-fi embed वाला Support page जोड़ल गइल।",
+      "Auto-backup अब एके rolling file के ऊपर लिखेला: Downloads/FilterTube Backup/FilterTube-Backup-Latest.json।",
+      "Cross-browser download तरीका: Blob URL उपलब्ध होखे त; Chrome MV3 service worker खातिर data: URL fallback।",
+      "data: URL के पाबंदी से Firefox download अब fail ना होखे।"
+    ]
+  },
+  "3.1.7": {
+    "ctaLabel": "नया का बा देखीं",
+    "headline": "YT Kids + auto-backup सहायता",
+    "summary": "YT Kids पर channel के आधार पर content block हो सकेला आ auto-backup के अब चालू-बंद कइल जा सकेला।",
+    "bannerSummary": "YouTube Kids में channel blocking आ toggle होखे वाला auto-backup।",
+    "highlights": [
+      "YT Kids में पूरा Channel आ Keyword आधारित blocking जुड़ल; YT Kids के 3-dot menu UI के चुपचाप सुन के channel block करे ला।",
+      "Auto-backup चालू/बंद करे खातिर Settings toggle जोड़ल गइल (best-effort; Save As prompt ना)।",
+      "Auto-backup rotation के साथ Downloads/FilterTube Backup/ में सहेजल जाला (सबसे नया file रखल जाला)।",
+      "Manual export अब चुपचाप Downloads/FilterTube Export/ में download होला।"
+    ]
+  },
+  "3.1.6": {
+    "ctaLabel": "नया का बा देखीं",
+    "headline": "Import/Export सहायता + release banner",
+    "summary": "Banner CTA अब सीधा What's New dashboard खोले ला, चुनल card ओही JSON से load होला, आ import c/ChannelName तथा merge rule अउरी बढ़िया माने ला।",
+    "bannerSummary": "What's New पर सीधा link, एके JSON से card, आ बेहतर import।",
+    "highlights": [
+      "Release notes JSON अब dashboard card आ YouTube banner दुनो के एके source of truth से hydrate करे ला।",
+      "CTA background messaging से tab-view खोले ला ताकि blocker chrome-extension:// link ना रोके।",
+      "Import/export docs आ code बतावेला कि merge से पहिले UC/handle/c/ChannelName input कइसे normalize होला।"
+    ]
+  },
+  "3.1.5": {
+    "ctaLabel": "नया का बा देखीं",
+    "headline": "Shorts + Members-only सचमुच गायब",
+    "summary": "Watch page आ sidebar अब Shorts renderer आ members-only shelf के देखाई देवे से पहिले छिपा देला, आ toggle state आखिर बचल रहे ला।",
+    "bannerSummary": "Shorts आ members-only shelf देखाई देवे से पहिले छिपे ला; toggle state बचल रहे ला।",
+    "highlights": [
+      "Card render होखे से पहिले sidebar /shorts/ href, overlay, आ aria-label जाँचे ला।",
+      "Members-only detection compact, watch, आ shelf row के नया badge आ playlist heuristic से पकड़े ला।",
+      "Members-only toggle persistence bug ठीक भइल ताकि reload के बादो state रहे।"
+    ]
+  },
+  "3.1.4": {
+    "ctaLabel": "नया का बा देखीं",
+    "headline": "Dashboard responsive बनल",
+    "summary": "Mobile पर navigation साफ ढंग से सिमटे ला, input सहजता से wrap होला, आ playlist/mix control अउरी साफ toggle देला।",
+    "bannerSummary": "Mobile-friendly navigation, responsive input, आ साफ playlist/Mix control।",
+    "highlights": [
+      "छोट screen खातिर सुधरल grid spacing के साथ Hamburger nav आ overlay।",
+      "Toggle में हल्का track, बीच में thumb, आ बेहतर dark-mode contrast बा।",
+      "Mix toggle चालू होखे त Mix/Radio chip छिपे ला; playlist hiding radio item छोड़ देला।"
+    ]
+  },
+  "3.1.3": {
+    "ctaLabel": "नया का बा देखीं",
+    "headline": "Help legend के नया रूप",
+    "summary": "Card, pill, आ tooltip साफ बतावेला कि Exact / Comment / Filter All का करे ला, आ नया dashboard styling से मेल खाला।",
+    "bannerSummary": "Exact, Comment, आ Filter All समझावे वाला नया Help card।",
+    "highlights": [
+      "Help tab badge tint आ collaboration label के मेल खाइल color में देखावेला।",
+      "Popup आ tab search bar एके full-width ताल में सजावल गइल।",
+      "Content control के व्याख्या साफ करे खातिर hover tooltip में डालल गइल।"
+    ]
+  },
+  "3.1.2": {
+    "ctaLabel": "नया का बा देखीं",
+    "headline": "Playlist autoplay के सुरक्षा मजबूत",
+    "summary": "Autoplay अब blocked playlist row के चमकवले बिना पार करेला, आ YouTube फेर process करे पर sticky hiding बनल रहे ला।",
+    "bannerSummary": "Autoplay blocked row के बिना flash पार करेला; playlist hiding बनल रहे ला।",
+    "highlights": [
+      "Next-click खाली तब होला जब अगिला playlist row सचमुच देखाई देत होखे।",
+      "Watch playlist panel row identity कुछ देर resolve ना होखे तबो छिपल रहे ला।",
+      "Blocking के बाद 3-dot menu साफ ढंग से बंद होला ताकि miniplayer चलत रहे।"
+    ]
+  },
+  "3.1.1": {
+    "ctaLabel": "नया का बा देखीं",
+    "headline": "Help tab + पहचान के सुधार",
+    "summary": "Dashboard में अलग Help tab आइल बा आ UC ↔ handle ↔ custom URL mapping अउरी भरोसेमंद बनल बा।",
+    "bannerSummary": "नया Help reference आ बेहतर channel identity resolution।",
+    "highlights": [
+      "Help reference सब toggle, badge, आ keyword behavior लिखेला।",
+      "Playlist navigation playback flash बिना blocked row छोड़ देला।",
+      "Handle/custom URL fallback सही UC ID पर अउरी भरोसे से पहुँचे ला।"
+    ]
+  },
+  "3.1.0": {
+    "ctaLabel": "नया का बा देखीं",
+    "headline": "Docs + hybrid filtering के साफ समझ",
+    "summary": "Hybrid interception + DOM fallback architecture के diagram समेत लिखल गइल बा ताकि पता चले FilterTube block कइसे लागू करे ला।",
+    "bannerSummary": "Hybrid interception आ DOM fallback filtering architecture साफ दस्तावेज में बा।",
+    "highlights": [
+      "Home/search collaborator के साथ Watch-page 3-dot parity दस्तावेज में दर्ज भइल।",
+      "बाकी playlist regression के सूची बनावल गइल ताकि सुधार पर नजर रहे।",
+      "Manifest, build tooling, आ UI footer के 3.1.0 version bump से मिलावल गइल।"
+    ]
   }
 }
