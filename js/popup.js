@@ -16,6 +16,21 @@ function popupUiText(key, fallback, values = {}) {
     }
 }
 
+function popupLanguageChoiceLabel(languageName, languageCode, selected) {
+    const selectionState = selected
+        ? popupUiText('popup.selected', 'selected')
+        : popupUiText('popup.notSelected', 'not selected');
+    return popupUiText(
+        'popup.languageChoiceLabel',
+        '{language} ({code}), {selectionState}',
+        {
+            language: languageName,
+            code: String(languageCode || '').toUpperCase(),
+            selectionState
+        }
+    );
+}
+
 function popupChannelErrorText(error) {
     const message = typeof error === 'string' ? error.trim() : '';
     const knownErrors = {
@@ -505,6 +520,7 @@ function initializePopupFiltersTabs() {
             pill.type = 'button';
             pill.className = `ft-category-pill${active ? ' active' : ''}`;
             pill.setAttribute('aria-pressed', active ? 'true' : 'false');
+            pill.setAttribute('aria-label', popupLanguageChoiceLabel(displayLabel, option.code, active));
             pill.style.setProperty('--ft-category-color', option.color || '#3b82f6');
             const swatch = document.createElement('span');
             swatch.className = 'ft-category-swatch';

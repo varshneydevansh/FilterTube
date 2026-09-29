@@ -1,0 +1,5 @@
+{
+  "english": {
+    "popup.languageChoiceLabel": "{language} ({code}), {selectionState}"
+  }
+}
