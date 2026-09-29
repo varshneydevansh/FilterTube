@@ -14,5 +14,383 @@
       "GitHub release publishing dey use GitHub CLI credentials, create drafts before upload, continue from tags wey already dey, upload only assets wey miss, verify the final asset set, and publish only after the check.",
       "FilterTube app for Android phones and tablets don open to everybody for Google Play. You fit install am from the [public listing](https://play.google.com/store/apps/details?id=com.filtertube.app) or search Google Play for FilterTube."
     ]
+  },
+  "3.3.6": {
+    "ctaLabel": "See Wetin New",
+    "headline": "Filtering Don Strong, Time Dey Protected, Play Without Ads Dey Smoother",
+    "summary": "FilterTube 3.3.6 don add rules wey still dey check person when e enter YouTube direct, protected time and Self-Control sessions for each profile, separate and reliable lists for blocked and allowed rules, official category filtering, Advert Void wey dey on from start, and plenty fixes for current YouTube.",
+    "bannerSummary": "3.3.6 get direct-access filtering, protected time, rule-list and BlockTube imports, official categories, Advert Void, plus support for current YouTube.",
+    "highlights": [
+      "Whether person visit YouTube direct, change playlist, autoplay run, or use embed wey we support, e go pass the same checks for video and channel; e no go skip feed filtering.",
+      "Daily YouTube limit now dey apply to each active profile. E show the time wey remain and still dey work after restart. The full-page timeout check PIN when person switch profile; Self-Control session wey person choose go lock the rules until countdown finish.",
+      "For Main and Kids, Blocked Rules and Allowed Rules still dey as separate collections. The main Blocklist or Whitelist policy decide which collection go control wetin person fit watch.",
+      "When person import large BlockTube or managed rule lists, e go see preview, capacity checks, transactional rollback, read-back verification, and clearer counts for added, duplicate, skipped, channel, keyword, regex, and video-ID entries.",
+      "Category filtering use YouTube official `microformat.playerMicroformatRenderer.category`, bounded same-origin Player metadata hydration, clear choice to Block selected or Allow only selected, and safer handling for Watch, rail, Mix, comment, and renderer ownership.",
+      "Advert Void dey on by default for new and upgraded profiles on YouTube Main and Kids. Shared Web runtime remove Player ad-plan fields wey e detect without extra requests. Native playback discard ad-plan data wey no get model for, or normalize raw Reel response where e dey available; guarded fallback handle ad interruptions.",
+      "Experimental spoken-language filtering and original-audio preference use YouTube Player evidence when e dey available; when recommendation metadata no dey, dem fail open.",
+      "E also include hiding YouTube Playables, current camelCase renderer and collaboration handling, clearer Help and search, better popup and dashboard controls, and public Android Google Play and iOS status surfaces.",
+      "Settings get one option wey no dey checked by default to stop automatic reload reminders and What's New banners across the device for YouTube and YouTube Kids. Person fit still open What's New page for dashboard by hand."
+    ],
+    "detailsUrl": "https://github.com/varshneydevansh/FilterTube/releases/tag/v3.3.6"
+  },
+  "3.3.5": {
+    "ctaLabel": "See Wetin New",
+    "headline": "YouTube Trouble Recovery, Make Shorts Channel Block Start Earlier",
+    "summary": "This release don fix the content runtime wey dey inject twice for YouTube tabs wey already open. E also dey find the identity of visible Shorts channel earlier when channel rules or whitelist mode dey on.",
+    "bannerSummary": "E fix duplicate runtime injection, improve how blocked Shorts channel identity dey resolve, and explain where v3.3.4 rollback stop.",
+    "highlights": [
+      "When person install/update/refresh profile, e no inject manifest content scripts again inside YouTube tabs wey don open. This stop repeated `Identifier ... has already been declared` syntax errors.",
+      "YouTube tabs wey already open still dey get managed time-limit/runtime checks, but script declaration no dey happen twice.",
+      "When channel blocklist rules or whitelist mode dey on, visible and near-visible Shorts now use the existing bounded background `/shorts/<videoId>` owner resolver.",
+      "Learned Shorts video-to-channel mappings dey save and dem process am again straightaway. So Shorts from blocked channel no need person hover or open menu before e hide.",
+      "Desktop Shorts hosts like `.shortsLockupViewModelHost` and `.ytGridShelfViewModelGridShelfItem` don join dedicated Shorts fallback/enrichment paths.",
+      "Blocklist mode no go hide Shorts wey identity never resolve; whitelist mode still dey stricter through the existing pending path.",
+      "The docs don record say v3.3.4 na store rollback to v3.3.2 package while dem investigate YouTube trouble report."
+    ],
+    "detailsUrl": "https://github.com/varshneydevansh/FilterTube/releases/tag/v3.3.5"
+  },
+  "3.3.4": {
+    "ctaLabel": "See Wetin New",
+    "headline": "Store Don Roll Back Go v3.3.2 Package",
+    "summary": "v3.3.4 na browser-store rollback release. E use the earlier v3.3.2 package while dem investigate the YouTube trouble report wey concern v3.3.3.",
+    "bannerSummary": "Rollback release: v3.3.4 use v3.3.2 package while dem dey investigate YouTube trouble reports.",
+    "highlights": [
+      "v3.3.4 no claim any new feature work from source.",
+      "Dem use this rollback move store away from the v3.3.3 package wey dem suspect while dem dey investigate issue #64.",
+      "v3.3.5 na the next source release, and e carry fixes for duplicate runtime injection and Shorts identity."
+    ],
+    "detailsUrl": "https://github.com/varshneydevansh/FilterTube/releases/tag/v3.3.4"
+  },
+  "3.3.3": {
+    "ctaLabel": "See Wetin New",
+    "headline": "Family Device Updates, Rule Lists, Date Keywords, YouTube DOM Refresh",
+    "summary": "This release make parent/caregiver control easier to understand. E add reviewed rule-list imports and keyword rules wey depend on date, explain Home/Internet Pickup, and update filtering for current YouTube/YTM markup.",
+    "bannerSummary": "Family Device Updates, reviewed rule-list imports, date-limited keywords, parent-first Help, and current YouTube/YTM DOM support dey inside.",
+    "highlights": [
+      "Parent/caregiver profiles fit manage protected profiles, change child/protected rules from parent dashboard, and send approved updates to protected devices wey dem don verify.",
+      "Family Device Updates explain live Send Update, Home Pickup wey person start clear, and Internet Pickup wey person start clear. E no treat pickup service as authority.",
+      "Protected-profile time limits now check both old and new YouTube tabs, show calm timeout screen, and record extra-time requests make parent review am.",
+      "Rule-list imports fit use CSV, TXT, simple JSON, BlockTube-style JSON, and raw HTTPS URLs. Dem come with preview-before-apply, Main/Kids/Both target, templates, list management, pause/resume/remove, stale checks, and refresh.",
+      "Date-based keyword filtering fit use keyword only after/on a date, before/on a date, or between upload dates. Comment filtering use parent video upload date when YouTube show am.",
+      "Help and dashboard controls now use plainer words for parents, faster help bubbles, and clearer explanation for Exact, Comment, Date, PINs, rule lists, and device updates.",
+      "Dashboard invite active Android closed-testing users make dem email hello@filtertube.in. E also keep visible reminder make people report filtering break when YouTube change page structure.",
+      "Dem don document YouTube desktop lockup selectors and YTM mobile camelCase DOM. Real video cards still dey filter, but Watch-page chip bars no dey wake fallback work or make scroll jump.",
+      "These ones still dey separate: automatic LAN peer discovery, hosted FilterTube Internet Pickup service, silent public auto-subscribe catalogs, native Android/iOS parity, and proof from manual smoke test on two installed devices."
+    ],
+    "detailsUrl": "https://github.com/varshneydevansh/FilterTube/releases/tag/v3.3.3"
+  },
+  "3.3.2": {
+    "ctaLabel": "See Wetin New",
+    "headline": "Mobile/Tablet App MVP, YouTube Dey Smoother, Whitelist Dey Safer",
+    "summary": "Public app release surface don ready for final Android phone/tablet testing and iOS/iPad status. Extension dashboard now dey point to those app paths. When active rules no dey, YouTube SPA dey do less work; this release also get whitelist/end-screen correctness fixes.",
+    "bannerSummary": "Mobile/tablet app release surfaces, smoother YouTube runtime, quiet production logs, and whitelist/end-screen leak fixes dey inside.",
+    "highlights": [
+      "Website downloads hub and extension dashboard now show where to do final Android phone/tablet testing and where to check iOS/iPad TestFlight/App Store status.",
+      "Dem don document Android phone/tablet release setup around shared FilterTube runtime, YouTube Main, public YouTube Kids access, profiles, PIN rules, and Nanah sync.",
+      "When no active rules or route need dey, YouTube SPA performance work now skip more JSON clone/parse/replay, DOM fallback, quick-block, fallback-menu, and whitelist-pending work.",
+      "Production extension contexts now keep routine console logs behind debug mode wey person turn on clear. So normal browsing no pay extra console work for YouTube hot paths.",
+      "Whitelist release fixes include Shorts creator fallback, list-target forwarding, and compact autoplay/watch-next endpoint filtering for end-screen controls.",
+      "FilterTube DOM state attributes don stronger to reduce broad visible `data-filtertube-*` fingerprints, while dem still keep runtime state wey necessary.",
+      "Accounts & Sync now explain Family Device Updates with Send Update, optional Home Pickup, and Internet Pickup for when person dey away or go open am later. Parents fit know wetin be live sync, home pickup, online pickup, and wetin no be authority.",
+      "Protected profile time limits now get release docs for daily YouTube budgets, timeout screens, request-more-time history, and parent/caregiver approval.",
+      "Nanah/import paths keep channel-derived Filter All keyword ownership between extension and native app payloads, plus row color, source-badge metadata, and pairing context."
+    ],
+    "detailsUrl": "https://github.com/varshneydevansh/FilterTube/releases/tag/v3.3.2"
+  },
+  "3.3.1": {
+    "ctaLabel": "See Wetin New",
+    "headline": "Safe Sync Between Devices with p2p, No Third-Party Server",
+    "summary": "Accounts & Sync now show Nanah for three easier ways. E make parent/child targeting stronger, explain reconnect rules better, and add plenty documentation for real-life use.",
+    "bannerSummary": "Nanah sync, better parent/child control, safer reconnect rules, and full docs for the new Accounts & Sync flow.",
+    "highlights": [
+      "Accounts & Sync now start with three clearer ways: Send this profile once, Parent controls child, and Move full account.",
+      "Advanced Nanah controls still dey, but dem hide am inside Advanced section instead make dem lead the whole flow.",
+      "Parent/source sessions fit choose remote target profile clearer, and managed-link saves now copy back to sender so both devices keep the same trust record.",
+      "Trusted links still dey after refresh, but reconnect still need fresh live session; e no be hidden background sync.",
+      "Locked-child updates, reconnect rules, device-label persistence, and protection from self-join/session-burn don tighten for safer parent control.",
+      "README, Architecture, Technical, Functionality, Profiles & PIN, project plan, user guide, and concern tracker now explain current Nanah desktop checkpoint with more detail."
+    ],
+    "detailsUrl": "https://github.com/varshneydevansh/FilterTube/releases/tag/v3.3.1"
+  },
+  "3.3.0": {
+    "ctaLabel": "See Wetin New",
+    "headline": "Collaboration Recovery + Cross-Browser Import Don Strong",
+    "summary": "Watch/YTM collaboration menus dey recover full rosters more reliably, subscriptions import don stronger across browsers, and 3.3.0 bundle some whitelist and Quick Block fixes wey depend on surface.",
+    "bannerSummary": "Better collab menus, stronger whitelist import, safer Quick Block surfaces, direct channel links, and new toggle for the 3-dot block item.",
+    "highlights": [
+      "Mobile YouTube home/watch-next/Mix-style cards now join the same 3-dot and collaborator recovery flow, instead make dem fall back to incomplete single-channel menus.",
+      "Watch-page right rail, playlist rows, and watch-like lockups fit now recover full collaborator roster and refresh the active 3-dot menu in place.",
+      "Mix/watch recovery safer now: real collaboration cards upgrade well, while normal names wey get '&' or 'and' no go become fake collaboration menus again.",
+      "Quick Block dey more stable for complex surfaces: e stay above more desktop cards, avoid mobile search-suggestion dropdowns, and anchor better on mobile watch-next layouts.",
+      "Subscribed-channel whitelist import keep recent page browse responses, prefer real `/feed/channels` growth, and keep `/feed/channels` visible as management surface.",
+      "Whitelist filtering stricter and safer across YouTube desktop/mobile renderers, including better creator-page handling and improved Mixes/subscriptions hide controls.",
+      "New controls and polish: Channel Management rows link real channel pages, person fit disable 3-dot block item, and encrypted Firefox export get safer fallback."
+    ],
+    "detailsUrl": "https://github.com/varshneydevansh/FilterTube/releases/tag/v3.3.0"
+  },
+  "3.2.9": {
+    "ctaLabel": "See Wetin New",
+    "headline": "Subscribed Channels Import + Whitelist + PIN Protection Bug Fix",
+    "summary": "Import subscriptions from the YouTube account wey active into whitelist. Mode-switching meaning clearer now, and `/feed/channels` startup more reliable.",
+    "bannerSummary": "Build whitelist from your current YouTube subscriptions, with progress showing inside the page and clearer whitelist activation.",
+    "highlights": [
+      "New Tab View import fit bring subscribed channels from active signed-in YouTube account into whitelist.",
+      "Import startup dey reuse live YouTube tab, send am to `/feed/channels`, and wait for FilterTube bridge before e start.",
+      "Whitelist wording clearer now: Import Only no touch blocklist; Import + Turn On Whitelist follow the old blocklist-to-whitelist migration way.",
+      "Docs now explain import architecture, FEchannels request flow, renderer sources, and whitelist meaning with more detail."
+    ],
+    "detailsUrl": "https://github.com/varshneydevansh/FilterTube/releases/tag/v3.2.9"
+  },
+  "3.2.8": {
+    "ctaLabel": "See Wetin New",
+    "headline": "Theme Don Fresh, Scenic UI Shell Don Tune Well",
+    "summary": "Popup and dashboard now use calmer Scenic theme system, tighter layout, stronger tint states, and better light/dark balance.",
+    "bannerSummary": "Refined popup + dashboard theme with calmer transparency, stronger pills, and better responsive layout.",
+    "highlights": [
+      "Scenic UI refresh: popup and dashboard now share calmer product shell, with local hero video as ambient background media.",
+      "Light and dark theme tuning: dark mode keep scenic background visible without washed center glow, while light mode use cleaner transparency.",
+      "Responsive cleanup: popup spacing tighter, profile dropdown smaller, Help/Support card layout better, and filter surfaces fit mobile better.",
+      "Control tint fixes: enabled/disabled states, pill colors, search fields, and import/export actions dey clearer for both themes."
+    ],
+    "detailsUrl": "https://github.com/varshneydevansh/FilterTube/releases/tag/v3.2.8"
+  },
+  "3.2.7": {
+    "ctaLabel": "See Wetin New",
+    "headline": "Category Filters + Quick Block Hover + Mobile 3 Dot UI",
+    "summary": "New category filtering don land, and one-tap quick cross block dey on by default.",
+    "bannerSummary": "Use new category filters and quick cross block from card hover, plus better YT Mobile blocking support.",
+    "highlights": [
+      "Category Filtering: block or allow videos by YouTube category like Music, Gaming, Education, and others.",
+      "Quick Cross Block Default ON: `Show Quick Cross Block button` dey enabled by default for v3.2.7 (users still fit disable am).",
+      "Mobile Blocking: better YT Mobile blocking support for 3 Dot UI and Quick Cross Block; dem dey work on Home Page now."
+    ],
+    "detailsUrl": "https://github.com/varshneydevansh/FilterTube/releases/tag/v3.2.7"
+  },
+  "3.2.6": {
+    "ctaLabel": "See Wetin New",
+    "headline": "UI/UX Don Fine, Filtering Fit Use Video Content",
+    "summary": "Typography don improve finish with modern design, and dem add three new content filters: duration, date, and uppercase.",
+    "bannerSummary": "New fine UI with content filters for duration, upload date, and clickbait detection.",
+    "highlights": [
+      "Typography updates: modern and refined font scale make reading easier.",
+      "Content-based filters: duration (longer/shorter/between), upload date (newer/older/between), and uppercase detection for clickbait titles.",
+      "videoMetaMap system: e dey store video metadata persistently and batch work smartly (75ms window, 1500 entry cap).",
+      "Dashboard improvements: stats by surface (Main vs Kids), better stat cards, and donate promo card."
+    ],
+    "detailsUrl": "https://github.com/varshneydevansh/FilterTube/releases/tag/v3.2.6"
+  },
+  "3.2.5": {
+    "ctaLabel": "See Wetin New",
+    "headline": "Whitelist Mode Don Become Main, Stability Better",
+    "summary": "Whitelist mode na now the main allow-only way, with smarter extraction, playlist safeguards, and less CPU use.",
+    "bannerSummary": "Whitelist mode don become main, with cleaner UI, steadier playlist, and Kids support.",
+    "highlights": [
+      "Whitelist mode don get promoted: wording/UI no longer call am experimental.",
+      "3-dot menu cleaner now, and whitelist surfaces handle search-secondary better.",
+      "Channel extraction dey use different sources, with thumbnail anchors and parent containers.",
+      "Mode-aware state tracking now dey work with confirmation dialogs and bridge optimizations.",
+      "Playlist stability: selected rows still show; pending identities no go bring blocked rows back.",
+      "Kids mode whitelist support dey work with zero-network architecture."
+    ],
+    "detailsUrl": "https://github.com/varshneydevansh/FilterTube/releases/tag/v3.2.5"
+  },
+  "3.2.4": {
+    "ctaLabel": "See Wetin New",
+    "headline": "Whitelist Mode Better, Performance Work Don Improve",
+    "summary": "Experimental whitelist mode don get big improvements for UX, performance, and wider Kids mode support.",
+    "bannerSummary": "Whitelist mode don smarter, UI cleaner, performance better, and Kids dey supported.",
+    "highlights": [
+      "EXPERIMENTAL: Whitelist mode don improve with 3-dot menu cleanup, smarter search processing, and mode-aware state tracking.",
+      "Performance boost: bridge-level optimizations and selective processing reduce CPU use.",
+      "UI improvements: confirmation dialogs stop person from losing data by mistake when switching modes.",
+      "Kids mode support: whitelist now work on YouTube Kids with zero-network architecture.",
+      "Search optimizations: e handle right-rail watch cards smartly so UI no clutter.",
+      "Channel extraction: e find identity from different sources using thumbnail anchors and parent containers.",
+      "Mode switching: person fit move between blocklist/whitelist smoothly, and system go reprocess smartly."
+    ],
+    "detailsUrl": "https://github.com/varshneydevansh/FilterTube/releases/tag/v3.2.4"
+  },
+  "3.2.3": {
+    "ctaLabel": "See Wetin New",
+    "headline": "Experimental Whitelist Mode + UI Don Better",
+    "summary": "Alpha release of whitelist mode for 'allow-only' filtering, plus better UI updates and mobile menu support.",
+    "bannerSummary": "Try experimental whitelist mode — hide everything apart from channels wey person allow clearly.",
+    "highlights": [
+      "EXPERIMENTAL: whitelist mode hide all content apart from channels/keywords wey person allow clearly.",
+      "Two filtering modes dey available; person fit switch between blocklist and whitelist inside popup and tab view.",
+      "Staging migration — move to blocklist make you collect channels, then merge them back into whitelist.",
+      "Watch page protection for whitelist mode make video playback still work.",
+      "Optimistic UI updates hide content sharp-sharp and restore am automatically if blocking fail.",
+      "Mobile menu support don better, and YouTube mobile renderers dey handle correctly.",
+      "All console logs now dey behind debug flag so production no get too much noise."
+    ],
+    "detailsUrl": "https://github.com/varshneydevansh/FilterTube/releases/tag/v3.2.3"
+  },
+  "3.2.2": {
+    "ctaLabel": "See Wetin New",
+    "headline": "UI/UX Don Better + Debug Control",
+    "summary": "Optimistic updates, mobile menu support, debug-gated logging, scroll preservation, and state management refinements dey inside.",
+    "bannerSummary": "UI feedback sharp-sharp, mobile menu cleaner, and debug-gated logs with stable state handling.",
+    "highlights": [
+      "Optimistic UI updates: content hide sharp-sharp, and auto-restore if blocking fail.",
+      "Mobile menu support for `ytm-menu-popup-renderer` don better, with correct renderer tags.",
+      "Debug-gated logging dey use `window.__filtertubeDebug`.",
+      "During DOM fallback, scroll position dey stay so page no jump anyhow.",
+      "Channel enrichment limit na 10 per session to reduce background requests.",
+      "Rendering dey schedule when idle, using requestIdleCallback and batching.",
+      "External reload dey debounce and compare signature so system no render again without need.",
+      "Selective notifications: 'load' only when signature change; if not, use 'externalUpdate'.",
+      "Bridge state dey managed through shared global state."
+    ],
+    "detailsUrl": "https://github.com/varshneydevansh/FilterTube/releases/tag/v3.2.2"
+  },
+  "3.2.1": {
+    "ctaLabel": "See Wetin New",
+    "headline": "Processing Without Lag + System Don Faster",
+    "summary": "Big performance changes remove UI lag; Chromium browsers get excellent results and Firefox improve well too.",
+    "bannerSummary": "Filter without lag using async processing, compiled caching, and batched updates.",
+    "highlights": [
+      "Async DOM processing dey give main thread small breaks, so browser no freeze when filtering heavy work.",
+      "Compiled regex and channel-filter caching give O(1) lookup and reduce CPU use by 60–80%.",
+      "Batched storage updates reduce I/O operations by 70–90% with smart 250ms intervals.",
+      "Debounced settings refresh stop DOM from reprocessing too much.",
+      "Run-state management stop overlapping executions and queue requests properly.",
+      "Chromium browsers: lag reduce by 90% or more; Firefox improve well, and optimization still dey continue."
+    ],
+    "detailsUrl": "https://github.com/varshneydevansh/FilterTube/releases/tag/v3.2.1"
+  },
+  "3.2.0": {
+    "ctaLabel": "See Wetin New",
+    "headline": "Block Am Sharp + Kids No Need Network",
+    "summary": "3-dot menus show channel names sharp-sharp, network requests drop plenty, and YouTube Kids work fully offline.",
+    "bannerSummary": "Block without delay through proactive XHR interception; Kids mode work without any network fetch.",
+    "highlights": [
+      "3-dot menus show correct channel names sharp-sharp — no more waiting for 'Fetching...'.",
+      "Channel identity come from intercepted YouTube JSON responses, so network calls reduce.",
+      "YouTube Kids work fully without network fetch for reliable blocking.",
+      "Missing metadata dey fill in background at controlled rate (6-hour cooldown).",
+      "Topic channels (for example 'Music - Topic') get special handling without @handles.",
+      "New comprehensive docs come with ASCII and Mermaid flow diagrams."
+    ],
+    "detailsUrl": "https://github.com/varshneydevansh/FilterTube/releases/tag/v3.2.0"
+  },
+  "3.1.9": {
+    "ctaLabel": "See Wetin New",
+    "headline": "Backup Wey Know Profile + Controls Wey Lock",
+    "summary": "Auto-backup and content controls dey respect profile locks/PINs, collect settings for each profile, and keep profile dropdown clickable even when lock gate show.",
+    "bannerSummary": "Auto-backup for each profile + gate for locked profile; profile selector dey clickable all the time.",
+    "highlights": [
+      "Auto-backup mode/format selectors go disable when auto-backup off or profile lock; new profiles go inherit auto-backup preferences.",
+      "Auto-backup schedule go start when person create profile or change mode/format, but only if auto-backup dey enabled for that profile.",
+      "When profile lock, content-control toggles and backup controls go disable or return to old state; export for non-master profile go cover active profile only.",
+      "Profile dropdown z-index fix make am still clickable even when lock gate banner dey show.",
+      "Docs don update profile/PIN model, backups for each profile, and UI gating rules."
+    ],
+    "detailsUrl": "https://github.com/varshneydevansh/FilterTube/releases/tag/v3.1.9"
+  },
+  "3.1.8": {
+    "ctaLabel": "See Wetin New",
+    "headline": "Support Tab + Auto-backup Wey You Fit Trust",
+    "summary": "New Support page (Ko-fi) don land, and auto-backups now dey work well for Chrome and Firefox.",
+    "bannerSummary": "Auto-backups now work across browsers and overwrite only one latest backup file.",
+    "highlights": [
+      "Support page with Ko-fi embed don enter dashboard.",
+      "Auto-backups overwrite one rolling file: Downloads/FilterTube Backup/FilterTube-Backup-Latest.json.",
+      "Download strategy work across browsers (Blob URL when available; data: URL fallback for Chrome MV3 service worker).",
+      "Firefox downloads no dey fail again because of data: URL restrictions."
+    ],
+    "detailsUrl": "https://github.com/varshneydevansh/FilterTube/releases/tag/v3.1.8"
+  },
+  "3.1.7": {
+    "ctaLabel": "See Wetin New",
+    "headline": "YT Kids + Auto-backup Support",
+    "summary": "Person fit block content by channel for YT Kids, and now fit turn auto-backups on or off.",
+    "bannerSummary": "New setting: make auto-backups work or stop am. Exports go save for Downloads/FilterTube Export/.",
+    "highlights": [
+      "Complete Channel and Keyword blocking for YT Kids don add; e dey listen quietly to the 3-dot menu UI.",
+      "Settings don get toggle to turn auto-backups on/off (best-effort; no Save As prompts).",
+      "Auto-backups dey save for Downloads/FilterTube Backup/ with rotation, so dem keep latest files.",
+      "Manual exports dey download quietly to Downloads/FilterTube Export/."
+    ],
+    "detailsUrl": "https://github.com/varshneydevansh/FilterTube/releases/tag/v3.1.7"
+  },
+  "3.1.6": {
+    "ctaLabel": "See Wetin New",
+    "headline": "Import/Export Support + Release Banner",
+    "summary": "Banner CTA now carry person straight to What's New dashboard; curated cards load from same JSON; and import handle c/ChannelName plus rule merging better.",
+    "bannerSummary": "Release banner open the extension's What's New tab, and import/export docs now explain the full flow.",
+    "highlights": [
+      "One release notes JSON dey fill both dashboard cards and YouTube banner.",
+      "CTA open tab-view through background messaging, so blockers no intercept `chrome-extension://` links.",
+      "Import/export docs and code explain how UC/handle/c/ChannelName inputs dey normalize before dem merge."
+    ],
+    "detailsUrl": "https://github.com/varshneydevansh/FilterTube/releases/tag/v3.1.6"
+  },
+  "3.1.5": {
+    "ctaLabel": "See Wetin New",
+    "headline": "Shorts + Members-only Don Disappear for Real",
+    "summary": "Watch page and sidebar now hide Shorts renderers and members-only shelves before dem flash, and toggle state finally dey stick.",
+    "bannerSummary": "Members-only + Shorts hiding don stronger for Watch and sidebar, so blocked rows no go show again.",
+    "highlights": [
+      "Sidebar check `/shorts/` hrefs, overlays, and aria-labels before cards render.",
+      "Members-only detection cover compact, Watch, and shelf rows, with new badges and playlist heuristics.",
+      "Members-only toggle persistence bug don fix, so setting still dey after reload."
+    ],
+    "detailsUrl": "https://github.com/varshneydevansh/FilterTube/releases/tag/v3.1.5"
+  },
+  "3.1.4": {
+    "ctaLabel": "See Wetin New",
+    "headline": "Dashboard Fit Every Screen",
+    "summary": "Navigation dey collapse well for mobile, inputs dey wrap smoothly, and playlist/mix controls get clearer toggles.",
+    "highlights": [
+      "Hamburger nav + overlay for small screens, with better grid spacing.",
+      "Toggle tracks lighter, thumbs center, and dark-mode contrast better.",
+      "Mix/Radio chip dey hide when Mix toggle on; playlist hiding dey skip radio items."
+    ],
+    "detailsUrl": "https://github.com/varshneydevansh/FilterTube/releases/tag/v3.1.4"
+  },
+  "3.1.3": {
+    "ctaLabel": "See Wetin New",
+    "headline": "Help Legend Don Get New Look",
+    "summary": "Cards, pills, and tooltips explain clear wetin Exact / Comment / Filter All dey do, and dem match the new dashboard style.",
+    "highlights": [
+      "Help tab dey show badge tints and collaboration labels with matching colors.",
+      "Popup + tab search bars dey line up with same full-width spacing.",
+      "Content-control descriptions don move go hover tooltips so e clear pass."
+    ],
+    "detailsUrl": "https://github.com/varshneydevansh/FilterTube/releases/tag/v3.1.3"
+  },
+  "3.1.2": {
+    "ctaLabel": "See Wetin New",
+    "headline": "Playlist Autoplay Don Strong",
+    "summary": "Autoplay now skip blocked playlist rows without flashing them, and sticky hiding still work after YouTube process the page again.",
+    "highlights": [
+      "Next-click go happen only when the next playlist row truly dey visible.",
+      "Watch playlist panel rows go stay hidden even if identity no resolve for small time.",
+      "3-dot menu close cleanly after blocking, so miniplayer fit continue to play."
+    ],
+    "detailsUrl": "https://github.com/varshneydevansh/FilterTube/commit/1224715a84c48ee6d3ddd93b13cc62e487574a31"
+  },
+  "3.1.1": {
+    "ctaLabel": "See Wetin New",
+    "headline": "Help Tab + Identity Fixes",
+    "summary": "Dashboard don get one Help tab of its own, and UC ↔ handle ↔ custom URL mapping dey more reliable.",
+    "highlights": [
+      "Help reference document all toggles, badges, and keyword behavior.",
+      "Playlist navigation dey skip blocked rows without playback flash.",
+      "Handle/custom URL fallback dey find the correct UC ID more reliably."
+    ],
+    "detailsUrl": "https://github.com/varshneydevansh/FilterTube/commit/1b2e442831a40c52148bc9ff830c70c2e6aa909c"
+  },
+  "3.1.0": {
+    "ctaLabel": "See Wetin New",
+    "headline": "Docs Don Make Hybrid Filtering Clear",
+    "summary": "Dem don record hybrid interception + DOM fallback architecture with diagrams, to show how FilterTube dey enforce blocks.",
+    "highlights": [
+      "Docs explain Watch-page 3-dot parity with Home/search collaborators.",
+      "Outstanding playlist regressions don enter list so people fit track fixes.",
+      "Manifests, build tooling, and UI footer don sync with 3.1.0 bump."
+    ],
+    "detailsUrl": "https://github.com/varshneydevansh/FilterTube/commit/076baa2ecb14a3e8f5bdf420caa1af7096548f15"
   }
 }
