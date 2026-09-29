@@ -13723,9 +13723,9 @@ document.addEventListener('DOMContentLoaded', async () => {
         const hours = Math.floor(value / 3600);
         const minutes = Math.floor((value % 3600) / 60);
         const remainder = value % 60;
-        if (hours > 0) return `${hours}h ${minutes}m ${remainder}s`;
-        if (minutes > 0) return `${minutes}m ${remainder}s`;
-        return `${remainder}s`;
+        if (hours > 0) return tabViewUiText('dashboard.selfControl.duration.hoursMinutesSeconds', '{hours}h {minutes}m {seconds}s', { hours, minutes, seconds: remainder });
+        if (minutes > 0) return tabViewUiText('dashboard.selfControl.duration.minutesSeconds', '{minutes}m {seconds}s', { minutes, seconds: remainder });
+        return tabViewUiText('dashboard.selfControl.duration.seconds', '{seconds}s', { seconds: remainder });
     }
 
     function renderSelfControlSession() {
@@ -13735,20 +13735,34 @@ document.addEventListener('DOMContentLoaded', async () => {
         if (ftHardWhitelistReady) ftHardWhitelistReady.hidden = active;
         if (ftSelfControlActive) ftSelfControlActive.hidden = !active;
         if (ftSelfControlStateBadge) ftSelfControlStateBadge.textContent = active
-            ? (hardWhitelist ? 'Hard Whitelist Locked' : 'Locked')
-            : 'Ready';
+            ? (hardWhitelist
+                ? tabViewUiText('dashboard.selfControl.state.hardWhitelistLocked', 'Hard Whitelist Locked')
+                : tabViewUiText('dashboard.selfControl.state.locked', 'Locked'))
+            : tabViewUiText('dashboard.selfControl.state.ready', 'Ready');
         if (!active) return;
         const remainingSeconds = Math.max(0, Math.ceil((Number(selfControlSessionState.lockedUntil) - Date.now()) / 1000));
         selfControlSessionState.remainingSeconds = remainingSeconds;
         if (ftSelfControlCountdown) ftSelfControlCountdown.textContent = formatSelfControlRemaining(remainingSeconds);
         if (ftSelfControlActiveLabel) {
+            const allowedChannelCount = Number(selfControlSessionState.allowedChannelCount) || 0;
             ftSelfControlActiveLabel.textContent = hardWhitelist
-                ? `Hard Whitelist active · Main allows ${Number(selfControlSessionState.allowedChannelCount) || 0} selected channel${Number(selfControlSessionState.allowedChannelCount) === 1 ? '' : 's'} only`
-                : 'Settings and profile switching are locked';
+                ? tabViewUiText(allowedChannelCount === 1
+                    ? 'dashboard.selfControl.hardWhitelistActive.one'
+                    : 'dashboard.selfControl.hardWhitelistActive.other',
+                allowedChannelCount === 1
+                    ? 'Hard Whitelist active · Main allows {count} selected channel only'
+                    : 'Hard Whitelist active · Main allows {count} selected channels only', { count: allowedChannelCount })
+                : tabViewUiText('dashboard.selfControl.settingsAndProfilesLocked', 'Settings and profile switching are locked');
         }
         if (ftSelfControlEndsAt) {
-            const sessionLabel = hardWhitelist ? 'Hard Whitelist' : 'Self-Control';
-            ftSelfControlEndsAt.textContent = `${sessionLabel} ends ${new Date(Number(selfControlSessionState.lockedUntil)).toLocaleString()} · Profile: ${selfControlSessionState.profileName || 'Active profile'}`;
+            const sessionLabel = hardWhitelist
+                ? tabViewUiText('dashboard.selfControl.sessionName.hardWhitelist', 'Hard Whitelist')
+                : tabViewUiText('dashboard.selfControl.sessionName.selfControl', 'Self-Control');
+            ftSelfControlEndsAt.textContent = tabViewUiText('dashboard.selfControl.endsAt', '{sessionLabel} ends {dateTime} · Profile: {profileName}', {
+                sessionLabel,
+                dateTime: new Date(Number(selfControlSessionState.lockedUntil)).toLocaleString(),
+                profileName: selfControlSessionState.profileName || tabViewUiText('dashboard.selfControl.activeProfileFallback', 'Active profile')
+            });
         }
         if (lockGateEl?.dataset?.selfControl === 'true') {
             const countdown = lockGateEl.querySelector('[data-self-control-countdown]');
@@ -13776,26 +13790,39 @@ document.addEventListener('DOMContentLoaded', async () => {
     async function startSelfControlSession(minutes) {
         const duration = Number(minutes);
         if (!Number.isInteger(duration) || duration < 1 || duration > 10080) {
-            UIComponents.showToast('Choose between 1 minute and 7 days', 'error');
+            UIComponents.showToast(tabViewUiText('dashboard.selfControl.invalidDuration', 'Choose between 1 minute and 7 days'), 'error');
             return;
         }
         const selected = await showChoiceModal({
-            title: 'Start Self-Control Session?',
-            message: `For ${duration} minute${duration === 1 ? '' : 's'}, FilterTube will pin ${getProfileName(profilesV4Cache, activeProfileId)} and keep its current rules and settings fixed.`,
+            title: tabViewUiText('dashboard.selfControl.start.title', 'Start Self-Control Session?'),
+            message: tabViewUiText(duration === 1
+                ? 'dashboard.selfControl.start.message.one'
+                : 'dashboard.selfControl.start.message.other',
+            duration === 1
+                ? 'For {duration} minute, FilterTube will pin {profileName} and keep its current rules and settings fixed.'
+                : 'For {duration} minutes, FilterTube will pin {profileName} and keep its current rules and settings fixed.', {
+                duration,
+                profileName: getProfileName(profilesV4Cache, activeProfileId)
+            }),
             details: [
-                'Filtering will be enabled with this profile’s current Block/Allow-only mode and rules.',
-                'Profile switching will be blocked.',
-                'Blocklist/allow-only mode, rules, imports, and settings cannot be changed.',
-                'Closing or restarting the browser will not pause the countdown.',
-                'FilterTube will not offer a cancel button.'
+                tabViewUiText('dashboard.selfControl.start.detail.currentPolicy', 'Filtering will be enabled with this profile’s current Block/Allow-only mode and rules.'),
+                tabViewUiText('dashboard.selfControl.start.detail.profileSwitching', 'Profile switching will be blocked.'),
+                tabViewUiText('dashboard.selfControl.start.detail.settingsLocked', 'Blocklist/allow-only mode, rules, imports, and settings cannot be changed.'),
+                tabViewUiText('dashboard.selfControl.start.detail.countdownContinues', 'Closing or restarting the browser will not pause the countdown.'),
+                tabViewUiText('dashboard.selfControl.start.detail.noCancel', 'FilterTube will not offer a cancel button.')
             ],
-            choices: [{ value: 'start', label: 'Start Locked Session', className: 'btn-primary' }],
-            cancelText: 'Go Back'
+            choices: [{ value: 'start', label: tabViewUiText('dashboard.selfControl.start.action', 'Start Locked Session'), className: 'btn-primary' }],
+            cancelText: tabViewUiText('dashboard.selfControl.start.cancel', 'Go Back')
         });
         if (selected !== 'start') return;
         const response = await sendRuntimeMessage({ action: 'FilterTube_StartSelfControlSession', minutes: duration });
         if (!response?.ok || response?.active !== true) {
-            UIComponents.showToast(response?.error === 'session_already_active' ? 'A Self-Control Session is already active' : 'Could not start Self-Control Session', 'error');
+            UIComponents.showToast(tabViewUiText(response?.error === 'session_already_active'
+                ? 'dashboard.selfControl.error.alreadyActive'
+                : 'dashboard.selfControl.error.startFailed',
+            response?.error === 'session_already_active'
+                ? 'A Self-Control Session is already active'
+                : 'Could not start Self-Control Session'), 'error');
             return;
         }
         selfControlSessionState = response;
@@ -13806,13 +13833,13 @@ document.addEventListener('DOMContentLoaded', async () => {
             lockGateEl = null;
         }
         applyLockGateIfNeeded();
-        UIComponents.showToast('Self-Control Session started', 'success');
+        UIComponents.showToast(tabViewUiText('dashboard.selfControl.started', 'Self-Control Session started'), 'success');
     }
 
     async function startHardWhitelistSession(minutes) {
         const duration = Number(minutes);
         if (!Number.isInteger(duration) || duration < 1 || duration > 10080) {
-            UIComponents.showToast('Choose between 1 minute and 7 days', 'error');
+            UIComponents.showToast(tabViewUiText('dashboard.selfControl.invalidDuration', 'Choose between 1 minute and 7 days'), 'error');
             return;
         }
         const activeProfile = safeObject(safeObject(profilesV4Cache?.profiles)[activeProfileId]);
@@ -13820,22 +13847,42 @@ document.addEventListener('DOMContentLoaded', async () => {
             ? activeProfile.main.whitelistChannels
             : [];
         if (allowedChannels.length === 0) {
-            UIComponents.showToast('Add at least one Main Allowed channel first', 'error');
+            UIComponents.showToast(tabViewUiText('dashboard.selfControl.hardWhitelist.emptyChannels', 'Add at least one Main Allowed channel first'), 'error');
             return;
         }
+        const oneMinute = duration === 1;
+        const oneChannel = allowedChannels.length === 1;
+        const hardWhitelistMessageKey = oneMinute
+            ? (oneChannel
+                ? 'dashboard.selfControl.hardWhitelist.start.message.oneMinute.oneChannel'
+                : 'dashboard.selfControl.hardWhitelist.start.message.oneMinute.multipleChannels')
+            : (oneChannel
+                ? 'dashboard.selfControl.hardWhitelist.start.message.multipleMinutes.oneChannel'
+                : 'dashboard.selfControl.hardWhitelist.start.message.multipleMinutes.multipleChannels');
+        const hardWhitelistMessageFallback = oneMinute
+            ? (oneChannel
+                ? 'For {duration} minute, FilterTube will allow only {count} selected Main channel in {profileName}.'
+                : 'For {duration} minute, FilterTube will allow only {count} selected Main channels in {profileName}.')
+            : (oneChannel
+                ? 'For {duration} minutes, FilterTube will allow only {count} selected Main channel in {profileName}.'
+                : 'For {duration} minutes, FilterTube will allow only {count} selected Main channels in {profileName}.');
         const selected = await showChoiceModal({
-            title: 'Start Hard Timer Whitelist?',
-            message: `For ${duration} minute${duration === 1 ? '' : 's'}, FilterTube will allow only ${allowedChannels.length} selected Main channel${allowedChannels.length === 1 ? '' : 's'} in ${getProfileName(profilesV4Cache, activeProfileId)}.`,
+            title: tabViewUiText('dashboard.selfControl.hardWhitelist.start.title', 'Start Hard Timer Whitelist?'),
+            message: tabViewUiText(hardWhitelistMessageKey, hardWhitelistMessageFallback, {
+                duration,
+                count: allowedChannels.length,
+                profileName: getProfileName(profilesV4Cache, activeProfileId)
+            }),
             details: [
-                'Main YouTube filtering will be enabled and Whitelist mode will be forced.',
-                'Main keyword and video allow rules will not widen this channel-only session.',
-                'Profile switching, rules, modes, imports, and settings will be blocked.',
-                'Kids keeps its current mode and rules, but the profile snapshot is frozen.',
-                'Closing or restarting the browser will not pause the countdown.',
-                'FilterTube will not offer a cancel button.'
+                tabViewUiText('dashboard.selfControl.hardWhitelist.start.detail.mainFiltering', 'Main YouTube filtering will be enabled and Whitelist mode will be forced.'),
+                tabViewUiText('dashboard.selfControl.hardWhitelist.start.detail.noRuleExpansion', 'Main keyword and video allow rules will not widen this channel-only session.'),
+                tabViewUiText('dashboard.selfControl.hardWhitelist.start.detail.settingsLocked', 'Profile switching, rules, modes, imports, and settings will be blocked.'),
+                tabViewUiText('dashboard.selfControl.hardWhitelist.start.detail.kidsFrozen', 'Kids keeps its current mode and rules, but the profile snapshot is frozen.'),
+                tabViewUiText('dashboard.selfControl.hardWhitelist.start.detail.countdownContinues', 'Closing or restarting the browser will not pause the countdown.'),
+                tabViewUiText('dashboard.selfControl.hardWhitelist.start.detail.noCancel', 'FilterTube will not offer a cancel button.')
             ],
-            choices: [{ value: 'start', label: 'Start Hard Whitelist', className: 'btn-primary' }],
-            cancelText: 'Go Back'
+            choices: [{ value: 'start', label: tabViewUiText('dashboard.selfControl.hardWhitelist.start.action', 'Start Hard Whitelist'), className: 'btn-primary' }],
+            cancelText: tabViewUiText('dashboard.selfControl.start.cancel', 'Go Back')
         });
         if (selected !== 'start') return;
         const response = await sendRuntimeMessage({
@@ -13844,10 +13891,10 @@ document.addEventListener('DOMContentLoaded', async () => {
         });
         if (!response?.ok || response?.active !== true) {
             const message = response?.error === 'session_already_active'
-                ? 'A timer session is already active'
+                ? tabViewUiText('dashboard.selfControl.hardWhitelist.error.alreadyActive', 'A timer session is already active')
                 : response?.error === 'hard_whitelist_requires_allowed_channels'
-                    ? 'Add at least one Main Allowed channel first'
-                    : 'Could not start Hard Timer Whitelist';
+                    ? tabViewUiText('dashboard.selfControl.hardWhitelist.emptyChannels', 'Add at least one Main Allowed channel first')
+                    : tabViewUiText('dashboard.selfControl.hardWhitelist.error.startFailed', 'Could not start Hard Timer Whitelist');
             UIComponents.showToast(message, 'error');
             return;
         }
@@ -13859,7 +13906,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             lockGateEl = null;
         }
         applyLockGateIfNeeded();
-        UIComponents.showToast('Hard Timer Whitelist started', 'success');
+        UIComponents.showToast(tabViewUiText('dashboard.selfControl.hardWhitelist.started', 'Hard Timer Whitelist started'), 'success');
     }
 
     function isUiLocked() {
@@ -14399,7 +14446,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         const hint = document.createElement('div');
         hint.className = 'import-export-hint';
         hint.textContent = selfControlLocked
-            ? 'This profile and its current filtering policy are fixed until the countdown finishes. Profile switching and settings changes are unavailable.'
+            ? tabViewUiText('dashboard.selfControl.lockGate.hint', 'This profile and its current filtering policy are fixed until the countdown finishes. Profile switching and settings changes are unavailable.')
             : copy.gateMessage;
 
         const actions = document.createElement('div');
@@ -14418,7 +14465,9 @@ document.addEventListener('DOMContentLoaded', async () => {
             actions.appendChild(countdown);
             const end = document.createElement('span');
             end.className = 'import-export-hint';
-            end.textContent = `Unlocks automatically ${new Date(Number(selfControlSessionState?.lockedUntil)).toLocaleString()}.`;
+            end.textContent = tabViewUiText('dashboard.selfControl.lockGate.unlocksAt', 'Unlocks automatically {dateTime}.', {
+                dateTime: new Date(Number(selfControlSessionState?.lockedUntil)).toLocaleString()
+            });
             actions.appendChild(end);
         } else {
             const unlockBtn = document.createElement('button');
