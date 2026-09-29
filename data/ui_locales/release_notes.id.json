@@ -14,5 +14,329 @@
       "Penerbitan rilis GitHub menggunakan kredensial GitHub CLI, membuat draf sebelum mengunggah, melanjutkan tag yang sudah ada, hanya mengunggah aset yang belum ada, memverifikasi kumpulan aset akhir, dan baru menerbitkan setelah verifikasi.",
       "Aplikasi FilterTube untuk ponsel dan tablet Android kini tersedia untuk umum di Google Play. Aplikasi dapat dipasang dari [halaman publik](https://play.google.com/store/apps/details?id=com.filtertube.app) atau ditemukan dengan mencari FilterTube di Google Play."
     ]
+  },
+  "3.3.6": {
+    "headline": "Pemfilteran lebih kuat, waktu terlindungi, dan pemutaran tanpa iklan yang lebih tenang",
+    "summary": "FilterTube 3.3.6 menghadirkan penegakan akses langsung, waktu terlindungi dan sesi Self-Control per profil, koleksi aturan blokir dan izin yang andal, pemfilteran kategori resmi, Advert Void yang aktif secara default, serta banyak pekerjaan kompatibilitas dengan YouTube terkini.",
+    "bannerSummary": "3.3.6 mencakup pemfilteran akses langsung, waktu terlindungi, impor daftar aturan dan BlockTube, kategori resmi, Advert Void, serta kompatibilitas YouTube terkini.",
+    "highlights": [
+      "Kunjungan langsung ke YouTube, perpindahan playlist, autoplay, dan embed yang didukung kini mengikuti aturan penerimaan video dan kanal yang sama dengan pemfilteran feed.",
+      "Batas harian YouTube kini berlaku per profil aktif, menampilkan waktu tersisa, bertahan setelah restart, dan memakai halaman timeout layar penuh dengan pergantian profil berbasis PIN. Sesi Self-Control sukarela mengunci aturan yang dipilih sampai hitung mundur selesai.",
+      "Aturan yang diblokir dan aturan yang diizinkan tetap menjadi koleksi terpisah untuk Main dan Kids, sementara kebijakan Blocklist atau Whitelist teratas menentukan koleksi mana yang mengendalikan tontonan.",
+      "Impor BlockTube dan daftar aturan terkelola berukuran besar menggunakan pratinjau, pemeriksaan kapasitas, rollback transaksional, verifikasi baca-balik, serta jumlah yang lebih jelas untuk item ditambahkan, duplikat, dilewati, kanal, kata kunci, regex, dan ID video.",
+      "Pemfilteran kategori menggunakan field resmi YouTube `microformat.playerMicroformatRenderer.category`, pengisian metadata Player terbatas dari origin yang sama, pilihan jelas untuk memblokir kategori terpilih atau hanya mengizinkannya, serta penanganan Watch, rail, Mix, komentar, dan renderer yang lebih aman.",
+      "Advert Void aktif secara default untuk profil baru dan yang ditingkatkan pada YouTube Main dan Kids. Runtime Web bersama menghapus field rencana iklan Player yang teramati tanpa permintaan tambahan; pemutaran native membuang data rencana iklan yang tidak dimodelkan atau menormalkan respons Reel mentah jika tersedia, sementara fallback terjaga menangani interupsi yang lolos.",
+      "Pemfilteran bahasa lisan eksperimental dan preferensi audio asli memakai bukti YouTube Player jika tersedia dan membiarkan konten lewat saat metadata rekomendasi tidak tersedia.",
+      "Rilis ini juga mencakup penyembunyian YouTube Playables, penanganan renderer camelCase terkini dan kolaborasi, Help dan pencarian yang lebih mudah dibaca, kontrol popup dan dashboard yang lebih jelas, serta halaman status publik Android Google Play dan iOS.",
+      "Settings mencakup opsi opt-out untuk semua perangkat yang tidak dicentang secara default untuk mematikan pengingat reload otomatis dan banner What's New di YouTube dan YouTube Kids. Halaman What's New dashboard tetap tersedia untuk dibuka manual."
+    ]
+  },
+  "3.3.5": {
+    "headline": "Pemulihan kerusakan YouTube dan pemblokiran kanal Shorts lebih awal",
+    "summary": "Rilis ini memperbaiki injeksi content runtime ganda di tab YouTube yang sudah terbuka dan lebih awal menyelesaikan identitas kanal Shorts yang terlihat saat aturan blokir kanal atau mode whitelist aktif.",
+    "bannerSummary": "Memperbaiki injeksi runtime ganda, meningkatkan resolusi identitas kanal Shorts yang diblokir, dan mendokumentasikan batas rollback v3.3.4.",
+    "highlights": [
+      "Install/update/refresh profil tidak lagi menyuntikkan ulang content script manifest ke tab YouTube yang sudah terbuka sehingga kesalahan sintaks `Identifier ... has already been declared` tidak berulang.",
+      "Tab YouTube yang sudah terbuka tetap dapat menerima pemeriksaan batas waktu/runtime terkelola tanpa deklarasi script ganda.",
+      "Shorts yang terlihat dan hampir terlihat kini menggunakan resolver pemilik background `/shorts/<videoId>` yang sudah ada dan dibatasi saat aturan blocklist kanal atau mode whitelist aktif.",
+      "Pemetaan video Shorts ke kanal yang dipelajari disimpan dan langsung diproses ulang, sehingga Shorts dari kanal yang diblokir tidak memerlukan hover atau interaksi menu sebelum disembunyikan.",
+      "Host Shorts desktop seperti `.shortsLockupViewModelHost` dan `.ytGridShelfViewModelGridShelfItem` dimasukkan ke jalur fallback/pengayaan Shorts khusus.",
+      "Mode blocklist tidak menyembunyikan Shorts yang belum dikenal sebelum identitasnya terselesaikan; mode whitelist tetap lebih ketat melalui jalur pending yang ada.",
+      "v3.3.4 didokumentasikan sebagai rollback store ke paket v3.3.2 saat laporan kerusakan YouTube sedang diselidiki."
+    ]
+  },
+  "3.3.4": {
+    "headline": "Rollback store ke paket v3.3.2",
+    "summary": "v3.3.4 adalah rilis rollback untuk store browser yang memakai paket v3.3.2 sebelumnya saat laporan kerusakan YouTube pada v3.3.3 diselidiki.",
+    "bannerSummary": "Rilis rollback: v3.3.4 memakai paket v3.3.2 saat laporan kerusakan YouTube diselidiki.",
+    "highlights": [
+      "Tidak ada klaim pekerjaan fitur baru yang bersumber langsung dari kode untuk v3.3.4.",
+      "Rollback digunakan untuk memindahkan store dari paket v3.3.3 yang dicurigai sambil menyelidiki issue #64.",
+      "Rilis source berikutnya, v3.3.5, membawa perbaikan injeksi runtime ganda dan identitas Shorts."
+    ]
+  },
+  "3.3.3": {
+    "headline": "Pembaruan perangkat keluarga, daftar aturan, kata kunci tanggal, dan penyegaran DOM YouTube",
+    "summary": "Rilis ini membuat kontrol orang tua lebih mudah dipahami, menambahkan impor daftar aturan yang ditinjau dan aturan kata kunci berbatas tanggal, mendokumentasikan model Home/Internet Pickup, serta menyegarkan pemfilteran untuk markup YouTube/YTM terkini.",
+    "bannerSummary": "Rilis ini mencakup Family Device Updates, impor daftar aturan yang ditinjau, kata kunci berbatas tanggal, Help yang mengutamakan orang tua, dan kompatibilitas DOM YouTube/YTM terkini.",
+    "highlights": [
+      "Profil orang tua/pengasuh dapat mengelola profil terlindungi, mengedit aturan anak/profil terlindungi dari dashboard orang tua, dan mengirim pembaruan yang disetujui ke perangkat terlindungi yang terverifikasi.",
+      "Family Device Updates kini menjelaskan Send Update langsung, Home Pickup eksplisit, dan Internet Pickup eksplisit tanpa menganggap layanan pickup sebagai otoritas.",
+      "Batas waktu profil terlindungi kini memeriksa tab YouTube lama dan baru, menampilkan layar timeout yang tenang, dan mencatat permintaan waktu tambahan untuk ditinjau orang tua.",
+      "Impor daftar aturan mendukung CSV, TXT, JSON sederhana, JSON bergaya BlockTube, dan URL HTTPS mentah dengan pratinjau sebelum diterapkan, target Main/Kids/Both, template, pengelolaan daftar, jeda/lanjutkan/hapus, pemeriksaan kedaluwarsa, dan refresh.",
+      "Pemfilteran kata kunci berbasis tanggal dapat menerapkan kata kunci hanya mulai dari, hingga, atau di antara tanggal upload. Pemfilteran komentar memakai tanggal upload video induk jika YouTube menyediakannya.",
+      "Kontrol Help dan dashboard kini menggunakan bahasa yang lebih sederhana dan mengutamakan orang tua, gelembung bantuan yang lebih cepat, serta penjelasan Exact, Comment, Date, PIN, daftar aturan, dan pembaruan perangkat yang lebih jelas.",
+      "Dashboard kini mengundang pengguna aktif closed-testing Android untuk mengirim email ke hello@filtertube.in dan mempertahankan pengingat terlihat untuk melaporkan kerusakan filter saat YouTube mengubah struktur halaman.",
+      "Selector lockup desktop YouTube dan DOM mobile YTM camelCase didokumentasikan agar kartu video nyata tetap difilter sementara chip bar halaman Watch tidak memicu kerja fallback atau menyebabkan lompatan scroll.",
+      "Tetap terpisah: penemuan peer LAN otomatis, layanan FilterTube Internet Pickup yang di-host, katalog auto-subscribe publik senyap, parity native Android/iOS, dan bukti smoke test manual dua perangkat terpasang."
+    ]
+  },
+  "3.3.2": {
+    "headline": "MVP aplikasi mobile/tablet, YouTube lebih mulus, dan whitelist lebih aman",
+    "summary": "Permukaan rilis aplikasi publik siap untuk pengujian akhir Android ponsel/tablet dan status iOS/iPad; dashboard extension kini mengarah ke jalur aplikasi itu, pekerjaan SPA YouTube lebih tenang saat tak ada aturan aktif, dan rilis ini menyertakan perbaikan kebenaran whitelist/end-screen.",
+    "bannerSummary": "Rilis ini mencakup jalur rilis aplikasi mobile/tablet, perilaku runtime YouTube lebih mulus, log produksi yang tenang, dan perbaikan kebocoran whitelist/end-screen.",
+    "highlights": [
+      "Hub unduhan situs dan dashboard extension kini menampilkan jalur pengujian akhir Android ponsel/tablet serta jalur status TestFlight/App Store iOS/iPad.",
+      "Penyiapan rilis Android ponsel/tablet didokumentasikan di sekitar runtime FilterTube bersama, YouTube Main, akses publik YouTube Kids, profil, aturan PIN, dan sinkronisasi Nanah.",
+      "Pekerjaan performa SPA YouTube kini melewati lebih banyak clone/parse/replay JSON, DOM fallback, quick-block, fallback-menu, dan pekerjaan whitelist-pending saat tidak ada aturan aktif atau kebutuhan rute.",
+      "Konteks extension produksi kini membatasi log console rutin pada mode debug eksplisit agar penelusuran normal tidak menanggung overhead console di jalur YouTube yang sering dijalankan.",
+      "Perbaikan rilis whitelist mencakup fallback kreator Shorts, penerusan target daftar, dan pemfilteran endpoint autoplay/watch-next ringkas untuk kontrol end-screen.",
+      "Atribut state DOM FilterTube diperkuat untuk mengurangi sidik jari `data-filtertube-*` yang terlihat luas sambil mempertahankan state runtime yang diperlukan.",
+      "Accounts & Sync kini mendokumentasikan Family Device Updates seputar Send Update, Home Pickup opsional, dan Internet Pickup saat jauh/buka nanti agar orang tua memahami sinkronisasi langsung, pickup rumah, pickup online, dan hal yang bukan otoritas.",
+      "Batas waktu profil terlindungi kini memiliki dokumentasi rilis untuk anggaran YouTube harian, layar timeout, riwayat permintaan waktu tambahan, dan persetujuan orang tua/pengasuh.",
+      "Jalur Nanah/impor mempertahankan kepemilikan kata kunci Filter All turunan kanal antara payload extension dan aplikasi native, termasuk warna baris, metadata badge sumber, dan konteks pairing."
+    ]
+  },
+  "3.3.1": {
+    "headline": "Sinkronisasi antarperangkat aman lewat P2P tanpa server pihak ketiga",
+    "summary": "Accounts & Sync kini menyajikan Nanah dalam tiga jalur yang lebih sederhana, dengan penargetan orang tua/anak yang lebih kuat, aturan reconnect lebih jelas, dan dokumentasi penggunaan nyata yang jauh lebih luas.",
+    "bannerSummary": "Sinkronisasi Nanah, kontrol orang tua/anak yang lebih baik, aturan reconnect yang lebih aman, dan dokumentasi lengkap untuk alur Accounts & Sync baru.",
+    "highlights": [
+      "Accounts & Sync kini dimulai dengan tiga jalur yang lebih jelas: Send this profile once, Parent controls child, dan Move full account.",
+      "Kontrol Nanah lanjutan tetap tersedia, tetapi disembunyikan di bagian Advanced alih-alih menjadi panduan utama seluruh alur.",
+      "Sesi parent/source dapat memilih profil target jarak jauh dengan lebih jelas, dan penyimpanan managed-link kini dicerminkan ke pengirim agar kedua perangkat menyimpan catatan trust yang sama.",
+      "Link tepercaya tetap tersimpan setelah refresh, tetapi reconnect tetap merupakan sesi live baru, bukan sinkronisasi background tersembunyi.",
+      "Pembaruan anak yang terkunci, aturan reconnect, persistensi label perangkat, dan perlindungan self-join/session-burn diperketat untuk kontrol orang tua yang lebih aman.",
+      "README, Architecture, Technical, Functionality, Profiles & PIN, rencana proyek, panduan pengguna, dan pelacak kekhawatiran kini mendokumentasikan checkpoint desktop Nanah saat ini dengan jauh lebih rinci."
+    ]
+  },
+  "3.3.0": {
+    "headline": "Pemulihan kolaborasi dan penguatan impor lintas browser",
+    "summary": "Menu kolaborasi Watch/YTM memulihkan roster lengkap dengan lebih andal, impor subscription lebih kuat lintas browser, dan beberapa perbaikan whitelist serta Quick Block khusus permukaan kini disertakan dalam 3.3.0.",
+    "bannerSummary": "Menu collab lebih baik, impor whitelist lebih kuat, permukaan Quick Block lebih aman, link kanal langsung, dan toggle baru untuk item blokir 3 titik.",
+    "highlights": [
+      "Kartu YouTube mobile home/watch-next/bergaya Mix kini ikut dalam alur pemulihan kolaborator dan 3-dot yang sama, alih-alih kembali ke menu satu kanal yang tidak lengkap.",
+      "Rail kanan halaman Watch, baris playlist, dan lockup mirip Watch kini dapat memulihkan roster kolaborator penuh dan memperbarui menu 3-dot aktif di tempat.",
+      "Pemulihan Mix/watch lebih aman: kartu kolaborasi sungguhan ditingkatkan dengan benar, sedangkan nama biasa yang mengandung '&' atau 'and' tidak lagi menjadi menu kolaborasi palsu.",
+      "Quick Block lebih stabil di permukaan kompleks: berada di atas lebih banyak kartu desktop, menghindari dropdown saran pencarian mobile, dan lebih baik menempel pada layout watch-next mobile.",
+      "Impor whitelist subscription kanal kini mempertahankan respons browse halaman terbaru, mengutamakan pertumbuhan /feed/channels yang nyata, dan mempertahankan /feed/channels sebagai permukaan pengelolaan yang terlihat.",
+      "Pemfilteran whitelist lebih ketat dan aman di renderer desktop/mobile YouTube, termasuk penanganan halaman kreator yang lebih baik dan kontrol hide Mixes/subscription yang ditingkatkan.",
+      "Kontrol dan pemolesan baru: baris Channel Management mengarah ke halaman kanal nyata, item blokir 3-dot dapat dinonaktifkan, dan ekspor Firefox terenkripsi memakai fallback yang lebih aman."
+    ]
+  },
+  "3.2.9": {
+    "headline": "Impor kanal subscribed, whitelist, dan perbaikan bug perlindungan PIN",
+    "summary": "Impor subscription akun YouTube aktif ke whitelist dengan semantik pergantian mode yang lebih jelas dan alur mulai /feed/channels yang lebih andal.",
+    "bannerSummary": "Bangun whitelist dari subscription YouTube saat ini dengan progres inline dan perilaku aktivasi whitelist yang lebih jelas.",
+    "highlights": [
+      "Impor Tab View baru memungkinkan kanal subscribed dari akun YouTube aktif yang sedang login diimpor ke whitelist.",
+      "Startup impor kini memakai ulang tab YouTube live, mengarahkannya ke /feed/channels, dan menunggu bridge FilterTube sebelum mulai.",
+      "Teks whitelist lebih jelas: Import Only membiarkan blocklist tidak berubah, sedangkan Import + Turn On Whitelist mengikuti jalur migrasi blocklist-ke-whitelist yang ada.",
+      "Dokumentasi kini membahas arsitektur impor, alur permintaan FEchannels, sumber renderer, dan semantik whitelist dengan jauh lebih terperinci."
+    ]
+  },
+  "3.2.8": {
+    "headline": "Penyegaran tema dan penyetelan kerangka UI scenic",
+    "summary": "Permukaan popup dan dashboard kini memakai sistem tema scenic yang lebih tenang, dengan tata letak lebih rapat, status tint lebih kuat, serta keseimbangan terang/gelap yang lebih baik.",
+    "bannerSummary": "Tema popup dan dashboard diperbarui dengan transparansi lebih tenang, pill lebih jelas, dan perilaku tata letak responsif yang lebih baik.",
+    "highlights": [
+      "Penyegaran UI scenic: popup dan dashboard kini berbagi kerangka produk yang lebih tenang dengan video hero lokal sebagai media latar ambient.",
+      "Penyetelan tema terang dan gelap: mode gelap mempertahankan latar scenic tanpa cahaya tengah yang pudar, sedangkan mode terang memakai transparansi yang lebih bersih.",
+      "Pembersihan responsif: jarak popup lebih rapat, dropdown profil lebih kecil, tata letak kartu Help/Support lebih baik, dan kecocokan mobile di seluruh permukaan filter meningkat.",
+      "Perbaikan tint kontrol: status aktif/nonaktif, warna pill, field pencarian, serta tindakan impor/ekspor kini lebih jelas pada kedua tema."
+    ]
+  },
+  "3.2.7": {
+    "headline": "Filter kategori, Quick Block cross saat hover, dan UI 3 Dot mobile",
+    "summary": "Pemfilteran kategori baru dan Quick Cross Block sekali ketuk aktif secara default.",
+    "bannerSummary": "Gunakan filter kategori baru dan Quick Cross Block saat hover pada kartu, dengan dukungan blokir YT Mobile yang lebih baik.",
+    "highlights": [
+      "Pemfilteran Kategori: blokir atau izinkan video berdasarkan kategori YouTube (Musik, Gaming, Pendidikan, dll.).",
+      "Quick Cross Block default ON: `Show Quick Cross Block button` aktif secara default di v3.2.7 (pengguna tetap dapat menonaktifkannya).",
+      "Pemblokiran Mobile: dukungan lebih baik untuk blokir di YT Mobile lewat UI 3 Dot dan Quick Cross Block, saat ini berfungsi di Home Page."
+    ]
+  },
+  "3.2.6": {
+    "headline": "Mempercantik UI/UX dan pemfilteran berbasis konten",
+    "summary": "Peningkatan tipografi menyeluruh dengan desain modern, serta tiga filter konten baru (durasi, tanggal, huruf kapital).",
+    "bannerSummary": "UI baru yang cantik dengan filter konten untuk durasi, tanggal upload, dan deteksi clickbait.",
+    "highlights": [
+      "Pembaruan tipografi: skala font modern dan halus agar lebih mudah dibaca.",
+      "Filter berbasis konten: durasi (lebih panjang/pendek/di antara), tanggal upload (lebih baru/lama/di antara), dan deteksi huruf kapital (judul clickbait).",
+      "Sistem `videoMetaMap`: penyimpanan metadata video persisten dengan batching cerdas (jendela 75ms, batas 1500 entri).",
+      "Peningkatan dashboard: statistik khusus permukaan (Main vs Kids), kartu statistik yang disempurnakan, dan kartu promosi donasi."
+    ]
+  },
+  "3.2.5": {
+    "headline": "Mode whitelist dipromosikan dan stabilitas ditingkatkan",
+    "summary": "Mode whitelist kini menjadi jalur utama allow-only dengan ekstraksi lebih cerdas, pengamanan playlist, dan penggunaan CPU yang lebih rendah.",
+    "bannerSummary": "Mode whitelist dipromosikan dengan UI lebih bersih, playlist lebih stabil, dan dukungan Kids.",
+    "highlights": [
+      "Mode whitelist dipromosikan: wording/UI tidak lagi menandainya sebagai eksperimen.",
+      "Pembersihan menu 3-dot dan penanganan search-secondary untuk permukaan whitelist.",
+      "Ekstraksi kanal dari banyak sumber dengan jangkar thumbnail dan kontainer induk.",
+      "Pelacakan state sesuai mode dengan dialog konfirmasi dan optimasi bridge.",
+      "Stabilitas playlist: baris terpilih tetap terlihat; identitas pending tidak lagi membuka kembali baris yang diblokir.",
+      "Dukungan whitelist mode Kids dengan arsitektur zero-network."
+    ]
+  },
+  "3.2.4": {
+    "headline": "Mode whitelist yang ditingkatkan dan optimasi performa",
+    "summary": "Peningkatan signifikan pada mode whitelist eksperimental dengan UX lebih baik, optimasi performa, dan dukungan mode Kids yang diperluas.",
+    "bannerSummary": "Whitelist makin cerdas dengan UI lebih bersih, performa lebih baik, dan dukungan Kids.",
+    "highlights": [
+      "EKSPERIMENTAL: mode whitelist yang ditingkatkan dengan pembersihan menu 3-dot, pemrosesan pencarian cerdas, dan pelacakan state sesuai mode.",
+      "Peningkatan performa: optimasi tingkat bridge dan pemrosesan selektif mengurangi penggunaan CPU.",
+      "Peningkatan UI: dialog konfirmasi mencegah kehilangan data yang tidak disengaja saat mengganti mode.",
+      "Dukungan mode Kids: fungsi whitelist kini berfungsi di YouTube Kids dengan arsitektur zero-network.",
+      "Optimasi pencarian: kartu tontonan rail kanan ditangani secara cerdas untuk mencegah UI berantakan.",
+      "Ekstraksi kanal: resolusi identitas multi-sumber dengan jangkar thumbnail dan kontainer induk.",
+      "Pergantian mode: transisi mulus antara blocklist/whitelist dengan pemrosesan ulang cerdas."
+    ]
+  },
+  "3.2.3": {
+    "headline": "Mode whitelist eksperimental dan peningkatan UI",
+    "summary": "Rilis alfa mode whitelist untuk pemfilteran allow-only, ditambah pembaruan UI dan dukungan menu mobile.",
+    "bannerSummary": "Coba mode whitelist eksperimental—sembunyikan semuanya kecuali kanal yang diizinkan.",
+    "highlights": [
+      "EKSPERIMENTAL: mode whitelist menyembunyikan semua konten kecuali kanal/kata kunci yang secara eksplisit diizinkan.",
+      "Dua mode pemfilteran dengan pergantian mudah antara blocklist dan whitelist di popup dan tab view.",
+      "Migrasi bertahap—pindah ke blocklist untuk mengumpulkan kanal, lalu gabungkan kembali ke whitelist.",
+      "Perlindungan halaman Watch dalam mode whitelist menjaga fungsi pemutaran video.",
+      "Pembaruan UI optimistis menyembunyikan konten seketika dan memulihkannya otomatis jika pemblokiran gagal.",
+      "Dukungan menu mobile yang ditingkatkan dengan penanganan renderer mobile YouTube yang tepat.",
+      "Semua log console kini berada di balik debug flag untuk mengurangi noise produksi."
+    ]
+  },
+  "3.2.2": {
+    "headline": "Peningkatan UI/UX dan pengendalian debug",
+    "summary": "Pembaruan optimistis, dukungan menu mobile, logging yang dikendalikan debug, pelestarian scroll, dan penyempurnaan manajemen state.",
+    "bannerSummary": "Umpan balik UI instan, menu mobile lebih rapi, serta log debug dengan penanganan state stabil.",
+    "highlights": [
+      "Pembaruan UI optimistis: konten langsung disembunyikan dan dipulihkan otomatis jika pemblokiran gagal.",
+      "Dukungan menu mobile `ytm-menu-popup-renderer` yang ditingkatkan dengan tag renderer yang benar.",
+      "Logging yang dikendalikan debug melalui `window.__filtertubeDebug`.",
+      "Mempertahankan scroll selama DOM fallback agar tidak terjadi lompatan yang mengganggu.",
+      "Batas pengayaan kanal (10 per sesi) untuk mengurangi permintaan background.",
+      "Rendering terjadwal saat idle dengan `requestIdleCallback` dan batching.",
+      "Debounce reload eksternal dengan perbandingan signature untuk menghindari render berulang.",
+      "Notifikasi selektif: `load` hanya saat signature berubah; selain itu `externalUpdate`.",
+      "Manajemen state bridge melalui state global bersama."
+    ]
+  },
+  "3.2.1": {
+    "headline": "Pemrosesan bebas lag dan peningkatan performa",
+    "summary": "Optimasi performa besar menghilangkan lag UI, dengan hasil sangat baik di browser Chromium dan peningkatan signifikan di Firefox.",
+    "bannerSummary": "Pemfilteran bebas lag dengan pemrosesan async, cache terkompilasi, dan pembaruan batch.",
+    "highlights": [
+      "Pemrosesan DOM async memberi waktu kembali ke main thread dan mencegah browser membeku saat pemfilteran berat.",
+      "Regex terkompilasi dan cache filter kanal menyediakan lookup O(1), sehingga penggunaan CPU berkurang 60–80%.",
+      "Pembaruan storage batch mengurangi operasi I/O sebesar 70–90% dengan interval cerdas 250ms.",
+      "Refresh settings yang di-debounce mencegah pemrosesan ulang DOM berlebihan.",
+      "Manajemen run state mencegah eksekusi tumpang tindih dan mengantrekan permintaan dengan benar.",
+      "Browser Chromium: lag berkurang lebih dari 90%; Firefox: peningkatan signifikan dengan optimasi berkelanjutan."
+    ]
+  },
+  "3.2.0": {
+    "headline": "Pemblokiran instan dan Kids tanpa jaringan",
+    "summary": "Menu 3-dot langsung menampilkan nama kanal, permintaan jaringan turun drastis, dan YouTube Kids berfungsi sepenuhnya offline.",
+    "bannerSummary": "Pemblokiran tanpa jeda dengan intersepsi XHR proaktif; mode Kids berjalan tanpa pengambilan jaringan apa pun.",
+    "highlights": [
+      "Menu 3-dot kini langsung menampilkan nama kanal yang benar—tanpa jeda 'Fetching...'.",
+      "Identitas kanal berasal dari respons JSON YouTube yang diintersep, sehingga panggilan jaringan berkurang.",
+      "YouTube Kids berfungsi sepenuhnya tanpa pengambilan jaringan demi pemblokiran yang andal.",
+      "Metadata yang hilang diisi di background dengan laju terkontrol (cooldown 6 jam).",
+      "Kanal topik (misalnya 'Music - Topic') ditangani khusus tanpa `@handles`.",
+      "Dokumentasi komprehensif baru dengan diagram alur ASCII dan Mermaid."
+    ]
+  },
+  "3.1.9": {
+    "headline": "Backup yang mengenali profil dan kontrol yang dikunci",
+    "summary": "Auto-backup dan kontrol konten kini mematuhi lock/PIN profil, mewarisi setelan per profil, dan dropdown profil tetap dapat diklik di atas lock gate.",
+    "bannerSummary": "Auto-backup per profil dan gating profil terkunci; pemilih profil selalu dapat diklik.",
+    "highlights": [
+      "Pemilih mode/format auto-backup dinonaktifkan saat auto-backup mati atau profil terkunci; profil baru mewarisi preferensi auto-backup.",
+      "Penjadwalan auto-backup kini berjalan saat pembuatan profil dan perubahan mode/format, hanya jika auto-backup aktif untuk profil itu.",
+      "Toggle kontrol konten dan kontrol backup tetap nonaktif/kembali saat terkunci; cakupan ekspor dipaksa hanya profil aktif untuk profil non-master.",
+      "Perbaikan z-index dropdown profil membuatnya tetap dapat diklik meskipun banner lock gate terlihat.",
+      "Dokumentasi diperbarui untuk model profil/PIN, backup cakupan profil, dan aturan gating UI."
+    ]
+  },
+  "3.1.8": {
+    "headline": "Tab Support dan auto-backup yang andal",
+    "summary": "Halaman Support baru (Ko-fi) ditambahkan dan auto-backup kini berfungsi andal di Chrome maupun Firefox.",
+    "bannerSummary": "Auto-backup kini lintas-browser dan menimpa satu file backup terbaru.",
+    "highlights": [
+      "Menambahkan halaman Support di dashboard dengan embed Ko-fi.",
+      "Auto-backup kini menimpa satu file bergulir: Downloads/FilterTube Backup/FilterTube-Backup-Latest.json.",
+      "Strategi download lintas-browser (Blob URL bila tersedia; fallback data: URL untuk Chrome MV3 service worker).",
+      "Download Firefox tidak lagi gagal karena pembatasan data: URL."
+    ]
+  },
+  "3.1.7": {
+    "headline": "YT Kids dan dukungan auto-backup",
+    "summary": "Konten berbasis kanal dapat diblokir di YT Kids dan auto-backup kini dapat diaktifkan atau dinonaktifkan.",
+    "bannerSummary": "Setelan baru: aktifkan/nonaktifkan auto-backup. Ekspor kini disimpan ke Downloads/FilterTube Export/.",
+    "highlights": [
+      "Menambahkan pemblokiran lengkap berbasis Channel & Keyword di YT Kids; kanal diblokir dengan mendengarkan pasif UI menu 3-dot YT Kids.",
+      "Menambahkan toggle Settings untuk mengaktifkan/menonaktifkan auto-backup (upaya terbaik; tanpa prompt Save As).",
+      "Auto-backup disimpan ke Downloads/FilterTube Backup/ dengan rotasi (file terbaru tetap disimpan).",
+      "Ekspor manual kini diunduh secara diam-diam ke Downloads/FilterTube Export/."
+    ]
+  },
+  "3.1.6": {
+    "headline": "Dukungan impor/ekspor dan banner rilis",
+    "summary": "CTA banner kini menautkan langsung ke What's New dashboard, kartu pilihan dimuat dari JSON yang sama, dan impor lebih baik mengikuti c/ChannelName + aturan merge.",
+    "bannerSummary": "Banner rilis membuka tab What's New di dalam extension dan dokumentasi impor/ekspor kini menjelaskan seluruh alurnya.",
+    "highlights": [
+      "JSON release note mengisi kartu dashboard dan banner YouTube dari satu sumber kebenaran.",
+      "CTA membuka tab-view melalui messaging background agar blocker tidak pernah mencegat link chrome-extension://.",
+      "Dokumentasi dan kode impor/ekspor menjelaskan bagaimana input UC/handle/c/ChannelName dinormalisasi sebelum digabung."
+    ]
+  },
+  "3.1.5": {
+    "headline": "Shorts dan khusus anggota akhirnya benar-benar tersembunyi",
+    "summary": "Halaman Watch dan sidebar kini menyembunyikan renderer Shorts serta shelf khusus anggota sebelum sempat muncul, dan state toggle akhirnya tersimpan.",
+    "bannerSummary": "Penyembunyian khusus anggota dan Shorts diperkuat di Watch dan sidebar sehingga baris yang diblokir tidak muncul lagi.",
+    "highlights": [
+      "Sidebar memeriksa href `/shorts/`, overlay, dan aria-label sebelum kartu dirender.",
+      "Deteksi khusus anggota mencakup baris compact, Watch, dan shelf dengan badge serta heuristik playlist baru.",
+      "Bug persistensi toggle khusus anggota diperbaiki agar state tetap bertahan setelah reload."
+    ]
+  },
+  "3.1.4": {
+    "headline": "Dashboard menjadi responsif",
+    "summary": "Navigasi dapat dilipat rapi di mobile, input membungkus dengan baik, dan kontrol playlist/Mix memiliki toggle yang lebih jelas.",
+    "highlights": [
+      "Navigasi hamburger dan overlay untuk layar kecil dengan jarak grid yang disempurnakan.",
+      "Toggle dengan track lebih ringan, thumb di tengah, dan kontras mode gelap yang lebih baik.",
+      "Chip Mix/Radio disembunyikan saat toggle Mix aktif; penyembunyian playlist melewati item radio."
+    ]
+  },
+  "3.1.3": {
+    "headline": "Perombakan legenda Help",
+    "summary": "Kartu, pill, dan tooltip mendokumentasikan dengan tepat fungsi Exact / Comment / Filter All, sesuai gaya dashboard yang diperbarui.",
+    "highlights": [
+      "Tab Help menampilkan warna badge dan label kolaborasi dengan warna yang sesuai.",
+      "Bilah pencarian popup dan tab menggunakan ritme lebar penuh yang sama.",
+      "Deskripsi kontrol konten dipindahkan ke tooltip hover agar lebih jelas."
+    ]
+  },
+  "3.1.2": {
+    "headline": "Penguatan autoplay playlist",
+    "summary": "Autoplay kini melewati baris playlist yang diblokir tanpa menampilkannya sekilas, dan penyembunyian tetap bertahan setelah YouTube memproses ulang halaman.",
+    "highlights": [
+      "Klik Next hanya berjalan bila baris playlist berikutnya benar-benar terlihat.",
+      "Baris panel playlist Watch tetap tersembunyi meskipun identitasnya belum terselesaikan sesaat.",
+      "Menu 3-dot menutup dengan rapi setelah pemblokiran agar miniplayer tetap memutar."
+    ]
+  },
+  "3.1.1": {
+    "headline": "Tab Help dan perbaikan identitas",
+    "summary": "Tab Help khusus hadir di dashboard sementara pemetaan UC ↔ handle ↔ URL khusus menjadi lebih andal.",
+    "highlights": [
+      "Referensi Help mendokumentasikan semua toggle, badge, dan perilaku kata kunci.",
+      "Navigasi playlist melewati baris yang diblokir tanpa kilatan pemutaran.",
+      "Fallback handle/URL khusus lebih andal menemukan UC ID yang benar."
+    ]
+  },
+  "3.1.0": {
+    "headline": "Dokumentasi dan kejelasan pemfilteran hibrida",
+    "summary": "Arsitektur intersepsi hibrida + DOM fallback didokumentasikan dengan diagram agar jelas bagaimana FilterTube menerapkan blokir.",
+    "highlights": [
+      "Mendokumentasikan kesetaraan menu 3-dot halaman Watch dengan kolaborator home/search.",
+      "Mencatat regresi playlist yang belum terselesaikan agar perbaikannya tetap terlihat.",
+      "Manifest, build tooling, dan footer UI diselaraskan dengan kenaikan versi 3.1.0."
+    ]
   }
 }
