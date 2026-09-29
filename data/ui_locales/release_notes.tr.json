@@ -14,5 +14,329 @@
       "GitHub sürüm yayımlama işlemi GitHub CLI kimlik bilgilerini kullanır, yüklemeden önce taslak oluşturur, mevcut etiketlerden devam eder, yalnızca eksik varlıkları yükler, son varlık kümesini doğrular ve sadece doğrulamadan sonra yayımlar.",
       "Android telefon ve tabletler için FilterTube uygulaması artık Google Play'de herkese açık. Uygulamayı [herkese açık sayfadan](https://play.google.com/store/apps/details?id=com.filtertube.app) yükleyebilir veya Google Play'de FilterTube'u arayabilirsiniz."
     ]
+  },
+  "3.3.6": {
+    "headline": "Daha güçlü filtreleme, korunan süre ve daha sakin reklamsız oynatma",
+    "summary": "FilterTube 3.3.6; doğrudan erişim denetimini, profil başına korunan süreyi ve Self-Control oturumlarını, güvenilir engellenen ve izin verilen kural koleksiyonlarını, resmî kategori filtrelemeyi, varsayılan olarak açık Advert Void'u ve güncel YouTube ile kapsamlı uyumluluk çalışmalarını getiriyor.",
+    "bannerSummary": "3.3.6; doğrudan erişim filtreleme, korunan süre, kural listesi ve BlockTube içe aktarma, resmî kategoriler, Advert Void ve güncel YouTube uyumluluğu içerir.",
+    "highlights": [
+      "YouTube'a doğrudan ziyaretler, playlist geçişleri, autoplay ve desteklenen gömülü videolar artık feed filtrelemesiyle aynı video ve kanal kabul kurallarından geçiyor; bu kuralları atlayamıyor.",
+      "Günlük YouTube sınırları artık etkin profile göre uygulanıyor, kalan süreyi gösteriyor, yeniden başlatmalardan sonra korunuyor ve PIN ile profil değiştirmeye olanak tanıyan tam sayfa zaman aşımı ekranı kullanıyor. İsteğe bağlı Self-Control oturumları, geri sayım bitene kadar seçilen kuralları kilitliyor.",
+      "Engellenen kurallar ve izin verilen kurallar Main ve Kids için ayrı koleksiyonlar olarak kalıyor; en üstteki Blocklist veya Whitelist ilkesi, görüntülemeyi hangi koleksiyonun denetleyeceğini belirliyor.",
+      "Büyük BlockTube ve yönetilen kural listesi içe aktarımlarında önizleme, kapasite denetimleri, işlemsel geri alma, okuma yoluyla doğrulama ve eklenen, yinelenen, atlanan öğeler, kanallar, anahtar kelimeler, regex ve video kimlikleri için daha anlaşılır sayımlar bulunuyor.",
+      "Kategori filtreleme, YouTube'un resmî `microformat.playerMicroformatRenderer.category` alanını, aynı kaynaktan sınırlı Player üstverisi getirmeyi, seçili kategorileri engelleme veya yalnızca bunlara izin verme seçeneklerini ve Watch, rail, Mix, yorumlar ile renderer sahipliğinin daha güvenli yönetimini kullanıyor.",
+      "Advert Void, YouTube Main ve Kids'te yeni ve yükseltilmiş profiller için varsayılan olarak açıktır. Ortak Web runtime'ı, ek istek göndermeden Player'da görülen reklam planı alanlarını kaldırır; yerel oynatma modellenmemiş reklam planı verilerini atar veya sunulmuşsa ham Reel yanıtını normalleştirir. Korunan fallback, aradan kaçan kesintileri ele alır.",
+      "Deneysel konuşma dili filtreleme ve özgün sesi tercih etme, mevcut olduğunda YouTube Player kanıtını kullanıyor ve öneri üstverisi bulunmadığında içeriğin geçmesine izin veriyor.",
+      "Bu sürüm ayrıca YouTube Playables'ı gizlemeyi, güncel camelCase renderer ve collaboration işlemlerini, daha okunaklı Help ve aramayı, daha açık popup ve dashboard kontrollerini ve herkese açık Android Google Play ve iOS durum sayfalarını içeriyor.",
+      "Settings'te tüm cihazlar için varsayılan olarak işaretlenmemiş bir devre dışı bırakma seçeneği bulunuyor. Bu seçenek, YouTube ve YouTube Kids'teki otomatik yeniden yükleme hatırlatıcılarını ve What's New banner'larını kapatıyor. Dashboard'un What's New sayfası elle görüntülenmeye devam ediyor."
+    ]
+  },
+  "3.3.5": {
+    "headline": "YouTube hatalarından kurtarma ve Shorts kanallarını daha erken engelleme",
+    "summary": "Bu sürüm, açık YouTube sekmelerine content runtime'ın tekrar tekrar eklenmesi sorununu gideriyor ve kanal kuralları veya whitelist modu etkinken görünen Shorts kanallarının kimliğini daha erken çözüyor.",
+    "bannerSummary": "Yinelenen runtime eklemesini düzeltir, engellenen Shorts kanallarının kimlik çözümlemesini iyileştirir ve v3.3.4 geri alma sınırını belgeler.",
+    "highlights": [
+      "Yükleme/güncelleme/profil yenileme artık açık YouTube sekmelerine manifest content script'lerini yeniden eklemiyor; böylece `Identifier ... has already been declared` sözdizimi hataları tekrarlanmıyor.",
+      "Açık YouTube sekmeleri, yinelenen script bildirimleri olmadan yönetilen time-limit/runtime denetimlerini almaya devam edebiliyor.",
+      "Kanal blocklist kuralları veya whitelist modu etkinken görünen ve görünmek üzere olan Shorts artık mevcut sınırlı arka plan `/shorts/<videoId>` sahip çözümleyicisini kullanıyor.",
+      "Öğrenilen Shorts video-kanal eşleştirmeleri kaydedilip hemen yeniden işleniyor; bu nedenle engellenen kanalların Shorts'larını gizlemek için üzerine gelmek veya menüyle etkileşim kurmak gerekmiyor.",
+      "`.shortsLockupViewModelHost` ve `.ytGridShelfViewModelGridShelfItem` gibi masaüstü Shorts host'ları özel Shorts fallback/zenginleştirme yollarına eklendi.",
+      "Blocklist modu, kimlik çözülene kadar bilinmeyen Shorts'ları gizlemiyor; mevcut bekleme yolu sayesinde whitelist modu daha katı kalıyor.",
+      "YouTube hata bildirimi incelenirken v3.3.4'ün store'da v3.3.2 paketine geri dönen bir sürüm olduğu belgelendi."
+    ]
+  },
+  "3.3.4": {
+    "headline": "Store'da v3.3.2 paketine geri dönüş",
+    "summary": "v3.3.4, v3.3.3 hakkındaki YouTube hata bildirimleri incelenirken önceki v3.3.2 paketini kullanan bir tarayıcı mağazası geri dönüş sürümüydü.",
+    "bannerSummary": "Geri dönüş sürümü: YouTube hata bildirimleri incelenirken v3.3.4, v3.3.2 paketini kullandı.",
+    "highlights": [
+      "v3.3.4 için kaynak koddan gelen yeni bir özellik çalışması iddia edilmiyor.",
+      "Issue #64 incelenirken şüpheli v3.3.3 paketini mağazalardan kaldırmak için geri dönüş kullanıldı.",
+      "Sonraki kaynak sürümü v3.3.5, yinelenen runtime ekleme ve Shorts kimliği düzeltmelerini içeriyor."
+    ]
+  },
+  "3.3.3": {
+    "headline": "Aile cihazı güncellemeleri, kural listeleri, tarihli anahtar kelimeler ve YouTube DOM yenilemesi",
+    "summary": "Bu sürüm, ebeveyn/bakım veren denetimini daha anlaşılır hâle getiriyor, incelenmiş kural listesi içe aktarımlarını ve tarihle sınırlı anahtar kelime kurallarını ekliyor, Home/Internet Pickup modelini belgeliyor ve filtrelemeyi güncel YouTube/YTM işaretlemesine göre yeniliyor.",
+    "bannerSummary": "Bu sürüm Family Device Updates, incelenmiş kural listesi içe aktarımları, tarihle sınırlı anahtar kelimeler, ebeveyn odaklı Help ve güncel YouTube/YTM DOM uyumluluğu içeriyor.",
+    "highlights": [
+      "Ebeveyn/bakım veren profilleri korumalı profilleri yönetebilir, ebeveyn dashboard'undan çocuk/korumalı profil kurallarını düzenleyebilir ve onaylanan güncellemeleri doğrulanmış korumalı cihazlara gönderebilir.",
+      "Family Device Updates artık anlık Send Update'ı, açıkça başlatılan Home Pickup'ı ve açıkça başlatılan Internet Pickup'ı açıklıyor; pickup hizmetlerini yetki kaynağı saymıyor.",
+      "Korumalı profil zaman sınırları artık eski ve yeni YouTube sekmelerini denetliyor, sakin bir zaman aşımı ekranı gösteriyor ve ek süre isteklerini ebeveyn incelemesi için kaydediyor.",
+      "Kural listesi içe aktarımları CSV, TXT, basit JSON, BlockTube tarzı JSON ve ham HTTPS URL'lerini destekliyor. Uygulamadan önce önizleme, Main/Kids/Both hedefleri, şablonlar, liste yönetimi, duraklatma/sürdürme/kaldırma, güncellik denetimleri ve yenileme de bulunuyor.",
+      "Tarihe dayalı anahtar kelime filtreleme, anahtar kelimeyi yükleme tarihinden sonra, o tarihe kadar veya iki tarih arasında uygulayabiliyor. YouTube sağlıyorsa yorum filtreleme, ana videonun yüklenme tarihini kullanıyor.",
+      "Help ve dashboard kontrolleri artık daha sade, ebeveyn odaklı ifadeler, daha hızlı yardım balonları ve Exact, Comment, Date, PIN'ler, kural listeleri ve cihaz güncellemeleri için daha net açıklamalar kullanıyor.",
+      "Dashboard artık etkin Android kapalı test kullanıcılarını hello@filtertube.in adresine e-posta göndermeye davet ediyor ve YouTube sayfa yapısını değiştirdiğinde filtreleme sorunlarını bildirmeleri için görünür bir hatırlatıcı sunuyor.",
+      "YouTube masaüstü lockup seçicileri ve YTM mobil camelCase DOM'u belgelendi; böylece gerçek video kartları filtrelenmeye devam ederken Watch sayfası chip çubukları fallback çalışmasını başlatmıyor veya kaydırma sıçramasına neden olmuyor.",
+      "Ayrı kalan konular: otomatik LAN eş keşfi, barındırılan FilterTube Internet Pickup hizmeti, sessiz herkese açık otomatik abone katalogları, yerel Android/iOS eşitliği ve kurulmuş iki cihazda elle yapılan smoke test kanıtı."
+    ]
+  },
+  "3.3.2": {
+    "headline": "Mobil/tablet uygulama MVP'si, daha akıcı YouTube ve daha güvenli whitelist",
+    "summary": "Herkese açık uygulama sürüm yüzeyi, Android telefon/tablet son testleri ve iOS/iPad durumu için hazır. Extension dashboard artık bu uygulama yollarını gösteriyor, etkin kural yokken YouTube SPA daha az çalışıyor ve bu sürüm whitelist/end-screen doğruluk düzeltmeleri içeriyor.",
+    "bannerSummary": "Bu sürüm mobil/tablet uygulama yayın yollarını, daha akıcı YouTube runtime davranışını, üretimde sessiz günlükleri ve whitelist/end-screen sızıntısı düzeltmelerini içeriyor.",
+    "highlights": [
+      "Web sitesinin indirme merkezi ve extension dashboard artık Android telefon/tablet son test yolunu ve iOS/iPad TestFlight/App Store durum yolunu gösteriyor.",
+      "Android telefon/tablet sürüm kurulumu; ortak FilterTube runtime'ı, YouTube Main, herkese açık YouTube Kids erişimi, profiller, PIN kuralları ve Nanah senkronizasyonu çevresinde belgelendi.",
+      "Etkin kural veya rota gereksinimi yokken YouTube SPA performans çalışması artık daha fazla JSON kopyalama/ayrıştırma/yineleme, DOM fallback, quick-block, fallback-menu ve whitelist-pending işini atlıyor.",
+      "Üretim extension bağlamlarında rutin console günlüğü yalnızca açık debug modu etkin olduğunda tutuluyor; normal gezinme, YouTube'un yoğun yollarında console ek yükü oluşturmuyor.",
+      "Whitelist sürüm düzeltmeleri Shorts içerik üreticisi fallback'ini, liste hedefinin iletilmesini ve end-screen kontrolleri için kompakt autoplay/watch-next uç noktası filtrelemesini kapsıyor.",
+      "FilterTube DOM durum öznitelikleri, gerekli runtime durumunu korurken geniş ölçekte görünen `data-filtertube-*` izlerini azaltmak için güçlendirildi.",
+      "Accounts & Sync artık Family Device Updates'i Send Update, isteğe bağlı Home Pickup ve uzaktayken/sonra açılacak Internet Pickup çevresinde belgeliyor; böylece ebeveynler canlı senkronizasyonu, evden almayı, çevrimiçi almayı ve yetki olmayan şeyleri anlayabiliyor.",
+      "Korumalı profil zaman sınırları için günlük YouTube bütçeleri, zaman aşımı ekranları, ek süre istek geçmişi ve ebeveyn/bakım veren onayı hakkında sürüm belgeleri eklendi.",
+      "Nanah/içe aktarma yolları, extension ve yerel uygulama payload'ları arasında kanallardan türetilen Filter All anahtar kelimelerinin sahipliğini koruyor; satır rengi, kaynak rozeti üstverisi ve eşleştirme bağlamı da korunuyor."
+    ]
+  },
+  "3.3.1": {
+    "headline": "Üçüncü taraf sunucu olmadan güvenli P2P cihaz senkronizasyonu",
+    "summary": "Accounts & Sync artık Nanah'ı daha basit üç yol olarak sunuyor; ebeveyn/çocuk hedeflemesi güçlendi, yeniden bağlanma kuralları netleşti ve gerçek kullanım belgeleri büyük ölçüde genişletildi.",
+    "bannerSummary": "Nanah senkronizasyonu, daha iyi ebeveyn/çocuk denetimi, daha güvenli yeniden bağlanma kuralları ve yeni Accounts & Sync akışının tam belgeleri.",
+    "highlights": [
+      "Accounts & Sync artık üç daha anlaşılır yolla başlıyor: Bu profili bir kez gönder, Ebeveyn çocuğu denetler ve Tüm hesabı taşı.",
+      "Gelişmiş Nanah kontrolleri kullanılabilir durumda, ancak tüm akışa yön vermek yerine Advanced bölümünde saklanıyor.",
+      "Ebeveyn/kaynak oturumları uzak hedef profili daha açık biçimde seçebiliyor ve yönetilen bağlantı kayıtları artık gönderene de yansıtılıyor; böylece iki cihaz aynı güven kaydını tutuyor.",
+      "Güvenilen bağlantılar yenilemeden sonra kaydedilmiş kalıyor; ancak yeniden bağlanma gizli arka plan eşitlemesi değil, yeni bir canlı oturum olmaya devam ediyor.",
+      "Kilitli çocuk güncellemeleri, yeniden bağlanma kuralları, cihaz etiketi kalıcılığı ve kendi kendine katılma/oturum tüketimi koruması, daha güvenli ebeveyn denetimi için güçlendirildi.",
+      "README, Architecture, Technical, Functionality, Profiles & PIN, proje planı, kullanıcı kılavuzu ve endişe takipçisi güncel Nanah masaüstü kontrol noktasını çok daha ayrıntılı belgeliyor."
+    ]
+  },
+  "3.3.0": {
+    "headline": "Collaboration kurtarma ve tarayıcılar arası içe aktarmayı güçlendirme",
+    "summary": "Watch/YTM collaboration menüleri tam katılımcı listelerini daha güvenilir biçimde geri getiriyor, abonelik içe aktarma tarayıcılar arasında güçlendi ve yüzeye özel birkaç whitelist ile Quick Block düzeltmesi 3.3.0'a eklendi.",
+    "bannerSummary": "Daha iyi collab menüleri, daha güçlü whitelist içe aktarma, daha güvenli Quick Block yüzeyleri, doğrudan kanal bağlantıları ve 3 noktalı engelleme öğesi için yeni bir düğme.",
+    "highlights": [
+      "Mobil YouTube home/watch-next/Mix tarzı kartlar artık eksik tek kanallı menülere dönmek yerine aynı 3 nokta ve collaborator kurtarma akışına katılıyor.",
+      "Watch sayfası sağ rail'i, playlist satırları ve Watch benzeri lockup'lar tam collaborator listesini geri getirip etkin 3 nokta menüsünü yerinde yenileyebiliyor.",
+      "Mix/watch kurtarma daha güvenli: gerçek collaboration kartları doğru biçimde yükseltiliyor; '&' veya 'and' içeren sıradan adlar sahte collaboration menülerine dönüşmüyor.",
+      "Quick Block karmaşık yüzeylerde daha kararlı: daha fazla masaüstü kartının üstünde kalıyor, mobil arama önerisi açılır menülerinden kaçınıyor ve mobil watch-next düzenlerinde daha iyi konumlanıyor.",
+      "Abone olunan kanalları whitelist'e aktarma artık yakın tarihli sayfa gezinme yanıtlarını koruyor, gerçek /feed/channels büyümesini tercih ediyor ve /feed/channels'i görünür bir yönetim yüzeyi olarak tutuyor.",
+      "Whitelist filtreleme YouTube'un masaüstü/mobil renderer'larında daha katı ve güvenli; içerik üreticisi sayfalarının işlenmesi ve Mixes/abonelik gizleme kontrolleri iyileştirildi.",
+      "Yeni kontroller ve düzenlemeler: Channel Management satırları gerçek kanal sayfalarına bağlanıyor, 3 noktalı engelleme öğesi devre dışı bırakılabiliyor ve şifreli Firefox dışa aktarımı daha güvenli fallback kullanıyor."
+    ]
+  },
+  "3.2.9": {
+    "headline": "Abone olunan kanalları içe aktarma, whitelist ve PIN koruması hata düzeltmesi",
+    "summary": "Etkin YouTube hesabının aboneliklerini, mod değiştirmenin anlamı daha açık ve /feed/channels başlangıç akışı daha güvenilir olacak şekilde whitelist'e aktarın.",
+    "bannerSummary": "Satır içi ilerleme ve daha anlaşılır whitelist etkinleştirmesiyle mevcut YouTube aboneliklerinizden whitelist oluşturun.",
+    "highlights": [
+      "Yeni Tab View içe aktarma özelliği, oturum açmış etkin YouTube hesabından abone olunan kanalları whitelist'e aktarabiliyor.",
+      "İçe aktarma başlangıcı artık etkin bir YouTube sekmesini yeniden kullanıyor, /feed/channels'e yönlendiriyor ve başlamadan önce FilterTube bridge'ini bekliyor.",
+      "Whitelist metinleri daha açık: Import Only blocklist'e dokunmuyor; Import + Turn On Whitelist ise mevcut blocklist'ten whitelist'e geçiş yolunu izliyor.",
+      "Belgeler artık içe aktarma mimarisini, FEchannels istek akışını, renderer kaynaklarını ve whitelist anlamını çok daha ayrıntılı ele alıyor."
+    ]
+  },
+  "3.2.8": {
+    "headline": "Temanın yenilenmesi ve Scenic UI kabuğunun ayarlanması",
+    "summary": "Popup ve dashboard yüzeyleri artık daha sakin Scenic tema sistemini kullanıyor; düzen daha sıkı, renk durumları daha belirgin ve açık/koyu dengesi daha iyi.",
+    "bannerSummary": "Daha sakin saydamlık, belirgin pills ve gelişmiş duyarlı düzen davranışıyla yenilenen popup ve dashboard teması.",
+    "highlights": [
+      "Scenic UI yenilemesi: popup ve dashboard artık yerel hero videoyu ortam arka planı olarak kullanan daha sakin ürün kabuğunu paylaşıyor.",
+      "Açık ve koyu tema ayarı: koyu mod Scenic arka planı soluk orta parıltı olmadan görünür tutarken açık mod daha temiz saydamlık kullanıyor.",
+      "Duyarlı düzenlemeler: popup aralıkları sıkılaştırıldı, profil açılır menüsü küçültüldü, Help/Support kart düzeni ve filtre yüzeylerinin mobil uyumu iyileştirildi.",
+      "Denetim rengi düzeltmeleri: etkin/devre dışı durumları, pill renkleri, arama alanları ve içe/dışa aktarma işlemleri her iki temada da daha net okunuyor."
+    ]
+  },
+  "3.2.7": {
+    "headline": "Kategori filtreleri, hover sırasında Quick Block çarpısı ve mobil 3 nokta arayüzü",
+    "summary": "Yeni kategori filtreleme ve varsayılan olarak etkin tek dokunuşlu Quick Cross Block.",
+    "bannerSummary": "Kartın üzerine gelerek yeni kategori filtrelerini ve Quick Cross Block'u kullanın; YT Mobile engelleme desteği de iyileştirildi.",
+    "highlights": [
+      "Kategori Filtreleme: videoları YouTube kategorisine göre (Müzik, Oyun, Eğitim vb.) engelleyin veya izin verin.",
+      "Quick Cross Block varsayılan olarak AÇIK: `Show Quick Cross Block button`, v3.2.7'de varsayılan olarak etkindir (kullanıcılar kapatabilir).",
+      "Mobil Engelleme: YT Mobile engellemesi için 3 Nokta arayüzü ve Quick Cross Block desteği iyileştirildi; şu anda Ana Sayfa'da çalışıyor."
+    ]
+  },
+  "3.2.6": {
+    "headline": "UI/UX'i güzelleştirme ve içeriğe dayalı filtreleme",
+    "summary": "Modern tasarımla kapsamlı tipografi iyileştirmeleri ve üç yeni içerik filtresi: süre, tarih ve büyük harf.",
+    "bannerSummary": "Süre, yüklenme tarihi ve clickbait algılama için içerik filtrelerine sahip güzel yeni arayüz.",
+    "highlights": [
+      "Tipografi güncellemeleri: daha iyi okunabilirlik için modern ve inceltilmiş yazı tipi ölçeği.",
+      "İçeriğe dayalı filtreler: süre (daha uzun/kısa/arasında), yüklenme tarihi (daha yeni/eski/arasında) ve büyük harf algılama (clickbait başlıkları).",
+      "`videoMetaMap` sistemi: akıllı toplu işlemle kalıcı video üstverisi depolama (75 ms pencere, 1.500 kayıt sınırı).",
+      "Dashboard iyileştirmeleri: yüzeye özel istatistikler (Main ve Kids), geliştirilmiş istatistik kartları ve bağış tanıtım kartı."
+    ]
+  },
+  "3.2.5": {
+    "headline": "Whitelist modunu öne çıkarma ve kararlılığı artırma",
+    "summary": "Whitelist modu artık yalnızca izin verilenleri gösteren ana yol; daha akıllı çıkarım, playlist korumaları ve daha düşük CPU kullanımı sunuyor.",
+    "bannerSummary": "Daha temiz arayüz, daha kararlı playlist'ler ve Kids desteğiyle Whitelist modu öne çıkarıldı.",
+    "highlights": [
+      "Whitelist modu öne çıkarıldı: metinler ve arayüz artık bu modu deneysel olarak işaretlemiyor.",
+      "Whitelist yüzeyleri için 3 nokta menüsü temizlendi ve ikincil arama işlemesi geliştirildi.",
+      "Küçük resim bağlantıları ve üst kapsayıcılarla birden fazla kaynaktan kanal çıkarımı.",
+      "Onay iletişim kutuları ve bridge iyileştirmeleriyle moda duyarlı durum takibi.",
+      "Playlist kararlılığı: seçilen satırlar görünür kalır; bekleyen kimlikler engellenen satırları yeniden göstermez.",
+      "Ağ kullanmayan mimariyle Kids modunda Whitelist desteği."
+    ]
+  },
+  "3.2.4": {
+    "headline": "Geliştirilmiş Whitelist modu ve performans iyileştirmeleri",
+    "summary": "Deneysel whitelist modunda daha iyi UX, performans iyileştirmeleri ve genişletilmiş Kids desteğiyle önemli geliştirmeler.",
+    "bannerSummary": "Whitelist modu daha temiz arayüz, daha iyi performans ve Kids desteğiyle akıllanıyor.",
+    "highlights": [
+      "DENEYSEL: 3 nokta menüsü temizliği, akıllı arama işleme ve moda duyarlı durum takibiyle geliştirilmiş whitelist modu.",
+      "Performans artışı: bridge düzeyindeki iyileştirmeler ve seçici işleme CPU kullanımını azaltıyor.",
+      "Arayüz iyileştirmeleri: mod değiştirilirken yanlışlıkla veri kaybını onay iletişim kutuları önlüyor.",
+      "Kids modu desteği: whitelist işlevi artık ağ kullanmayan mimariyle YouTube Kids'te çalışıyor.",
+      "Arama iyileştirmeleri: arayüz karmaşasını önlemek için sağ raydaki izleme kartları akıllıca işleniyor.",
+      "Kanal çıkarımı: küçük resim bağlantıları ve üst kapsayıcılarla çok kaynaklı kimlik çözümleme.",
+      "Mod değiştirme: akıllı yeniden işlemeyle blocklist ve whitelist arasında sorunsuz geçiş."
+    ]
+  },
+  "3.2.3": {
+    "headline": "Deneysel Whitelist modu ve arayüz iyileştirmeleri",
+    "summary": "Yalnızca izin verilenleri filtreleyen whitelist modunun alfa sürümü; geliştirilmiş arayüz güncellemeleri ve mobil menü desteğiyle.",
+    "bannerSummary": "Deneysel whitelist modunu deneyin — izin verilen kanallar dışındaki her şeyi gizleyin.",
+    "highlights": [
+      "DENEYSEL: Whitelist modu, açıkça izin verilen kanallar/anahtar kelimeler dışındaki tüm içeriği gizler.",
+      "Popup ve sekme görünümünde blocklist ile whitelist arasında kolay geçiş sağlayan çift filtreleme modu.",
+      "Aşamalı geçiş: kanalları toplamak için blocklist'e geçin, sonra tekrar whitelist'e birleştirin.",
+      "Whitelist modundaki Watch sayfası koruması video oynatma işlevini sürdürür.",
+      "İyimser arayüz güncellemeleri içeriği anında gizler ve engelleme başarısız olursa otomatik olarak geri yükler.",
+      "YouTube mobil renderer'larının doğru işlenmesiyle geliştirilmiş mobil menü desteği.",
+      "Üretim gürültüsünü azaltmak için tüm console log'ları artık debug flag'i arkasında."
+    ]
+  },
+  "3.2.2": {
+    "headline": "UI/UX iyileştirmeleri ve Debug denetimi",
+    "summary": "İyimser güncellemeler, mobil menü desteği, debug kontrollü günlükler, kaydırma konumunun korunması ve durum yönetimi iyileştirmeleri.",
+    "bannerSummary": "Anında arayüz tepkisi, geliştirilmiş mobil menüler ve kararlı durum yönetimiyle debug kontrollü günlükler.",
+    "highlights": [
+      "İyimser arayüz güncellemeleri: engelleme başarısız olursa otomatik geri yüklemeyle içeriği anında gizler.",
+      "Doğru renderer etiketleriyle `ytm-menu-popup-renderer` için geliştirilmiş mobil menü desteği.",
+      "`window.__filtertubeDebug` üzerinden debug kontrollü günlükleme.",
+      "Sarsıcı sıçramaları önlemek için DOM fallback sırasında kaydırma konumunu koruma.",
+      "Arka plan isteklerini azaltmak için kanal zenginleştirme sınırı (oturum başına 10).",
+      "`requestIdleCallback` ve toplu işlemle boşta planlanan görüntüleme.",
+      "Gereksiz görüntülemeleri önlemek için imza karşılaştırmalı harici yeniden yükleme geciktirmesi.",
+      "Seçici bildirimler: yalnızca imza değiştiğinde `load`; aksi hâlde `externalUpdate`.",
+      "Paylaşılan global durum üzerinden bridge durum yönetimi."
+    ]
+  },
+  "3.2.1": {
+    "headline": "Gecikmesiz işleme ve performans artışı",
+    "summary": "Büyük performans iyileştirmeleri arayüz gecikmesini ortadan kaldırıyor; Chromium tarayıcılarında mükemmel sonuçlar ve Firefox'ta önemli gelişmeler sağlıyor.",
+    "bannerSummary": "Asenkron işleme, derlenmiş önbellek ve toplu güncellemelerle gecikmesiz filtreleme.",
+    "highlights": [
+      "Asenkron DOM işleme ana iş parçacığına zaman kazandırır ve yoğun filtreleme sırasında tarayıcının donmasını engeller.",
+      "Derlenmiş regex ve kanal filtresi önbelleği O(1) aramalar sağlar ve CPU kullanımını %60–80 azaltır.",
+      "Akıllı 250 ms aralıklarla toplu depolama güncellemeleri G/Ç işlemlerini %70–90 azaltır.",
+      "Geciktirilmiş ayar yenileme, aşırı DOM yeniden işlemeyi önler.",
+      "Çalıştırma durumu yönetimi çakışan yürütmeleri önler ve istekleri doğru sıraya koyar.",
+      "Chromium tarayıcıları: gecikmede %90'dan fazla azalma; Firefox: optimizasyon sürerken önemli gelişmeler."
+    ]
+  },
+  "3.2.0": {
+    "headline": "Anında engelleme ve ağ kullanmayan Kids",
+    "summary": "3 nokta menüleri kanal adlarını anında gösteriyor, ağ istekleri ciddi ölçüde azalıyor ve YouTube Kids tamamen çevrimdışı çalışıyor.",
+    "bannerSummary": "Proaktif XHR yakalamayla gecikmesiz engelleme; Kids modu hiçbir ağ isteği olmadan çalışıyor.",
+    "highlights": [
+      "3 nokta menüleri artık doğru kanal adını anında gösteriyor; 'Fetching...' beklemesi yok.",
+      "Kanal kimliği, yakalanan YouTube JSON yanıtlarından geliyor ve ağ çağrılarını azaltıyor.",
+      "Güvenilir engelleme için YouTube Kids hiçbir ağ isteği olmadan tamamen çalışıyor.",
+      "Eksik üstveriler kontrollü hızda arka planda tamamlanıyor (6 saatlik bekleme).",
+      "Konu kanalları (ör. 'Music - Topic') `@handle` olmadan özel olarak işleniyor.",
+      "ASCII ve Mermaid akış diyagramlarını içeren yeni kapsamlı belgeler."
+    ]
+  },
+  "3.1.9": {
+    "headline": "Profil duyarlı yedeklemeler ve kilitle korunan kontroller",
+    "summary": "Otomatik yedekleme ve içerik kontrolleri artık profil kilitlerine/PIN'lerine uyuyor, profil başına ayarları devralıyor ve profil açılır menüsü kilit ekranının üstünde tıklanabilir kalıyor.",
+    "bannerSummary": "Profil başına otomatik yedekleme ve korumalı profil kilidi; profil seçici her zaman tıklanabilir.",
+    "highlights": [
+      "Otomatik yedekleme kapalıysa veya profil kilitliyse mod/biçim seçicileri devre dışı kalır; yeni profiller otomatik yedekleme tercihlerini devralır.",
+      "Otomatik yedekleme zamanlaması artık profil oluşturulurken ve mod/biçim değişikliklerinde tetiklenir, ancak yalnızca o profilde etkinse.",
+      "Kilitliyken içerik denetimi ve yedekleme kontrolleri devre dışı kalır veya geri alınır; ana profil olmayan profillerin dışa aktarma kapsamı yalnızca etkin profille sınırlandırılır.",
+      "Profil açılır menüsünün z-index düzeltmesi, kilit ekranı banner'ı görünürken bile menünün tıklanabilir olmasını sağlar.",
+      "Profil/PIN modeli, profil kapsamlı yedeklemeler ve arayüz kilitleme kuralları için belgeler güncellendi."
+    ]
+  },
+  "3.1.8": {
+    "headline": "Support sekmesi ve güvenilir otomatik yedeklemeler",
+    "summary": "Yeni bir Support sayfası (Ko-fi) eklendi ve otomatik yedeklemeler artık hem Chrome hem Firefox'ta güvenilir biçimde çalışıyor.",
+    "bannerSummary": "Otomatik yedeklemeler artık tarayıcılar arasında çalışıyor ve tek bir en yeni yedek dosyasının üzerine yazıyor.",
+    "highlights": [
+      "Dashboard'a Ko-fi yerleştirmeli bir Support sayfası eklendi.",
+      "Otomatik yedeklemeler artık tek bir döngüsel dosyanın üzerine yazıyor: Downloads/FilterTube Backup/FilterTube-Backup-Latest.json.",
+      "İndirme stratejisi tarayıcılar arasında çalışıyor (varsa Blob URL; Chrome MV3 service worker için data: URL yedeği).",
+      "Firefox indirmeleri artık data: URL kısıtlamaları nedeniyle başarısız olmuyor."
+    ]
+  },
+  "3.1.7": {
+    "headline": "YT Kids ve otomatik yedekleme desteği",
+    "summary": "YT Kids'te kanala göre içerik engellenebilir ve otomatik yedeklemeler artık açılıp kapatılabilir.",
+    "bannerSummary": "Yeni ayar: otomatik yedeklemeleri aç/kapat. Dışa aktarımlar artık Downloads/FilterTube Export/ konumuna kaydediliyor.",
+    "highlights": [
+      "YT Kids'e Channel ve Keyword tabanlı tam engelleme eklendi; YT Kids'in 3 nokta menü arayüzü pasif biçimde dinlenerek kanallar engelleniyor.",
+      "Otomatik yedeklemeleri açıp kapatmak için bir Settings anahtarı eklendi (olabildiğince iyi çaba; Farklı Kaydet istemi yok).",
+      "Otomatik yedeklemeler döndürülerek Downloads/FilterTube Backup/ içine kaydediliyor (en yeni dosyalar tutuluyor).",
+      "Manuel dışa aktarımlar artık sessizce Downloads/FilterTube Export/ konumuna indiriliyor."
+    ]
+  },
+  "3.1.6": {
+    "headline": "İçe/dışa aktarma desteği ve sürüm banner'ı",
+    "summary": "Banner CTA'sı artık doğrudan dashboard'daki What's New sayfasına gidiyor, seçilmiş kartlar aynı JSON'dan yükleniyor ve içe aktarmalar c/ChannelName ile birleştirme kurallarını daha iyi izliyor.",
+    "bannerSummary": "Sürüm banner'ı extension içindeki What's New sekmesini açıyor; içe/dışa aktarma belgeleri artık tüm akışı açıklıyor.",
+    "highlights": [
+      "Release notes JSON'u hem dashboard kartlarını hem YouTube banner'ını tek bir doğruluk kaynağından besliyor.",
+      "CTA, engelleyicilerin chrome-extension:// bağlantılarını yakalamasını önlemek için tab-view'u arka plan mesajlaşmasıyla açıyor.",
+      "İçe/dışa aktarma belgeleri ve kodu, UC/handle/c/ChannelName girdilerinin birleştirmeden önce nasıl normalleştirildiğini açıklıyor."
+    ]
+  },
+  "3.1.5": {
+    "headline": "Shorts ve yalnızca üyelere özel içerik gerçekten gizlendi",
+    "summary": "Watch sayfası ve kenar çubuğu artık Shorts renderer'larını ve yalnızca üyelere özel rafları görünmeden gizliyor; geçiş anahtarının durumu da kalıcı hâle geldi.",
+    "bannerSummary": "Engellenen satırların geri gelmemesi için yalnızca üyelere özel içerik ve Shorts gizleme Watch ve kenar çubuğunda güçlendirildi.",
+    "highlights": [
+      "Kenar çubuğu kartlar oluşturulmadan önce `/shorts/` href'lerini, kaplamaları ve aria-label'ları denetliyor.",
+      "Yalnızca üyelere özel içerik algılama artık yeni rozetler ve playlist sezgiselleriyle compact, Watch ve raf satırlarını kapsıyor.",
+      "Yalnızca üyelere özel içerik anahtarının kalıcılık sorunu düzeltildi; ayar yeniden yüklemelerden sonra korunuyor."
+    ]
+  },
+  "3.1.4": {
+    "headline": "Dashboard duyarlı hâle geldi",
+    "summary": "Gezinme mobilde düzgünce daralıyor, giriş alanları doğal biçimde satır değiştiriyor ve playlist/Mix kontrollerinin anahtarları daha anlaşılır.",
+    "highlights": [
+      "Küçük ekranlar için hamburger gezinme ve kaplama, iyileştirilmiş grid aralıklarıyla.",
+      "Daha hafif izlere, ortalanmış tutamaçlara ve daha iyi koyu mod karşıtlığına sahip anahtarlar.",
+      "Mix anahtarı açıksa Mix/Radio chip'i gizlenir; playlist gizleme radyo öğelerini atlar."
+    ]
+  },
+  "3.1.3": {
+    "headline": "Help açıklaması yenilendi",
+    "summary": "Kartlar, pills ve araç ipuçları Exact / Comment / Filter All'ın ne yaptığını tam olarak belgeliyor ve yenilenen dashboard stiliyle eşleşiyor.",
+    "highlights": [
+      "Help sekmesi rozet tonlarını ve collaboration etiketlerini eşleşen renklerle gösteriyor.",
+      "Popup ve sekme arama çubukları aynı tam genişlik düzenine hizalanıyor.",
+      "İçerik kontrolü açıklamaları, netlik için üzerine gelme araç ipuçlarına taşındı."
+    ]
+  },
+  "3.1.2": {
+    "headline": "Playlist autoplay güçlendirildi",
+    "summary": "Autoplay, engellenen playlist satırlarını göstermeden atlıyor ve YouTube yeniden işlese de kalıcı gizleme sürüyor.",
+    "highlights": [
+      "Sonraki playlist satırı gerçekten görünür olduğunda Next-click tetikleniyor.",
+      "Kimlik kısa süreliğine çözümlenmemiş olsa bile Watch playlist paneli satırları gizli kalıyor.",
+      "Engellemeden sonra 3 nokta menüsü düzgünce kapanıyor, böylece mini oynatıcı oynatmaya devam ediyor."
+    ]
+  },
+  "3.1.1": {
+    "headline": "Help sekmesi ve kimlik düzeltmeleri",
+    "summary": "Dashboard'a özel bir Help sekmesi eklendi; UC ↔ handle ↔ özel URL eşlemesi daha güvenilir hâle geldi.",
+    "highlights": [
+      "Help başvuru kaynağı tüm anahtarları, rozetleri ve anahtar kelime davranışlarını belgeliyor.",
+      "Playlist gezinmesi, engellenen satırları oynatma parlaması olmadan atlıyor.",
+      "Handle/özel URL yedeği doğru UC ID'yi daha güvenilir biçimde buluyor."
+    ]
+  },
+  "3.1.0": {
+    "headline": "Belgeler ve hibrit filtreleme daha anlaşılır",
+    "summary": "FilterTube'un engellemeleri nasıl uyguladığını açıklamak için hibrit interception + DOM fallback mimarisi diyagramlarla kayda geçirildi.",
+    "highlights": [
+      "Watch sayfasındaki 3 nokta menüsünün home/search collaborators ile eşitliği belgelendi.",
+      "Düzeltmelerin görünür kalması için çözülmemiş playlist gerilemeleri listelendi.",
+      "3.1.0 sürüm artışıyla manifest'ler, build araçları ve UI altbilgisi eşitlendi."
+    ]
   }
 }
