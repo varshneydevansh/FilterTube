@@ -39,11 +39,12 @@ function PopupShell() {
             tabIndex="0"
             aria-pressed="true"
             title="Toggle Filtering"
+            data-ft-i18n-title="popup.toggleFiltering"
           >
             <img src="../icons/icon-48.png" alt="FilterTube" className="logo-icon" />
             <div className="brand-text">
               <h1 className="app-title">FilterTube</h1>
-              <span id="extensionStatusText" className="extension-status">
+              <span id="extensionStatusText" className="extension-status" data-ft-i18n="popup.enabled">
                 Enabled
               </span>
             </div>
@@ -58,6 +59,7 @@ function PopupShell() {
                 aria-haspopup="listbox"
                 aria-expanded="false"
                 title="Active profile"
+                data-ft-i18n-title="popup.activeProfile"
               />
               <div
                 id="ftProfileDropdownPopup"
@@ -72,6 +74,8 @@ function PopupShell() {
               className="icon-button ft-popup-open"
               title="Open full settings"
               aria-label="Open full settings"
+              data-ft-i18n-title="popup.openFullSettings"
+              data-ft-i18n-aria-label="popup.openFullSettings"
               type="button"
             >
               <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor">
@@ -94,7 +98,7 @@ function PopupShell() {
           aria-live="polite"
           hidden
         >
-          <span className="ft-popup-time-status__label">YouTube time</span>
+          <span className="ft-popup-time-status__label" data-ft-i18n="popup.youtubeTime">YouTube time</span>
           <strong id="ftManagedTimeStatusValuePopup" className="ft-popup-time-status__value" />
         </div>
 
@@ -102,10 +106,10 @@ function PopupShell() {
           <section className="ft-popup-filter-card">
             <div className="ft-popup-filter-card__header">
               <div>
-                <p className="ft-popup-filter-card__eyebrow">Quick control</p>
-                <h3 className="ft-popup-filter-card__title">Update this profile fast</h3>
+                <p className="ft-popup-filter-card__eyebrow" data-ft-i18n="popup.quickControl">Quick control</p>
+                <h3 className="ft-popup-filter-card__title" data-ft-i18n="popup.updateProfile">Update this profile fast</h3>
               </div>
-              <span className="ft-popup-filter-card__badge">Local-first</span>
+              <span className="ft-popup-filter-card__badge" data-ft-i18n="popup.localFirst">Local-first</span>
             </div>
 
             <div id="popupFiltersTabsContainer" />

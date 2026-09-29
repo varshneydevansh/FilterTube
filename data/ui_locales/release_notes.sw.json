@@ -1,0 +1,18 @@
+{
+  "3.3.7": {
+    "ctaLabel": "Angalia mapya",
+    "headline": "Orodha kubwa ni za haraka zaidi, uingizaji huhifadhiwa, Android iko wazi kwa umma",
+    "summary": "FilterTube 3.3.7 inapunguza kazi zinazojirudia kwenye orodha kubwa za kanuni, inahamisha ukamilishaji wa chaneli zilizoingizwa kwenye foleni ya kudumu ya chinichini, inaongeza ripoti za uingizaji zenye ukubwa unaodhibitiwa, inaimarisha tabia ya Mwanzo na Advert Void, inaruhusu upakiaji wa matoleo ya GitHub kuendelea, na inatangaza programu ya Android kupatikana kwa umma kwenye Google Play.",
+    "bannerSummary": "Toleo la 3.3.7 lina uchujaji wa haraka zaidi wa orodha kubwa, foleni ya kudumu ya kukamilisha chaneli zilizoingizwa, ripoti za uingizaji zinazoweza kukaguliwa, Mwanzo na Advert Void zilizo salama zaidi, upakiaji wa matoleo unaoweza kuendelea, na programu ya Android iliyo wazi kwa umma kwenye Google Play.",
+    "highlights": [
+      "Orodha kubwa za chaneli na vitambulisho vya video hutumia tena injini zilizokusanywa na faharasa zinazotumia Set, huruka metadata isiyohitajika na kanuni zozote zinazotumika, huunganisha maandishi ya muda wa kufichwa, na hushughulikia kadi za Mwanzo zilizobadilika hatua kwa hatua; mabadiliko ya muundo bado hupokea uchakataji kamili.",
+      "Uboreshaji wa mwisho wa orodha kubwa huzuia utekelezaji maradufu wa setter za JSON zilizochujwa, husafirisha marekebisho ya mipangilio kupitia njia zote mbili za kuanza, hutumia tena faharasa za DOM ikiwa snapshot isiyobadilika ni ileile, na hutengeneza njia za uchunguzi pale tu utatuzi wa utendaji umewashwa.",
+      "Uingizaji wa CSV, TXT, JSON ya orodha ya kanuni za FilterTube, JSON ya uhamishaji ya BlockTube, na uingizaji unaodhibitiwa sasa hushiriki foleni ya kudumu ya kuongeza taarifa inayoendeshwa chinichini: utafutaji mmoja kwa wakati, nafasi nasibu ya sekunde 7–15 kifaa kikiwa macho, majaribio mapya kwa kila mstari, urejeshaji kwa kengele za Chrome, idhini kwa wasifu, na hali za mwisho za haikupatikana au imesitishwa.",
+      "Import Reports za kudumu hufafanua hali za imekamilika, inasubiri, inatafuta, inajaribu tena, utafutaji umeshindwa kabisa, jina pekee, imerukwa, na foleni haipo. Hubaki kupatikana baada ya kufunga dashibodi, huonyesha ripoti kubwa kwa sehemu zenye ukubwa mdogo, huhamisha mistari ambayo haijatatuliwa, na huondoa kwa usalama kanuni zilizoingizwa ambazo hazijatatuliwa na zenye utambulisho wa kipekee.",
+      "Uanzishaji wa feed ya Mwanzo na ushughulikiaji wa mabadiliko hulenga kadi zilizobadilika na huhifadhi njia kamili ya ziada kwa mabadiliko ya muundo. Masasisho yanayoongeza metadata pekee hayaburudishi vichupo vya YouTube na hupunguza upangaji upya wa kadi.",
+      "Advert Void sasa inahitaji hali za kichezaji `ad-showing` na `ad-interrupting` kwa pamoja au ushahidi huru wa tangazo linaloonekana. Ushughulikiaji wa kadi zilizodhaminiwa hauhesabiwi tena kama kazi ya jumla ya mabadiliko ya renderer.",
+      "Uchapishaji wa matoleo ya GitHub hutumia vitambulisho vya GitHub CLI, huunda rasimu kabla ya kupakia, huendelea kutoka kwenye lebo zilizopo, hupakia vipengee vinavyokosekana pekee, hukagua seti ya mwisho ya vipengee, na huchapisha baada ya uthibitishaji tu.",
+      "Programu ya FilterTube ya simu na kompyuta kibao za Android sasa inapatikana kwa umma kwenye Google Play. Isakinishe kutoka [ukurasa wa umma](https://play.google.com/store/apps/details?id=com.filtertube.app) au utafute FilterTube kwenye Google Play."
+    ]
+  }
+}

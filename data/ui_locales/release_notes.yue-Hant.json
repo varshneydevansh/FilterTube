@@ -1,0 +1,18 @@
+{
+  "3.3.7": {
+    "ctaLabel": "睇吓有咩新嘢",
+    "headline": "大型清單快咗、匯入會保留、Android 開放畀公眾",
+    "summary": "FilterTube 3.3.7 減少處理大型規則清單時重複做嘅工作，將補完已匯入頻道資料嘅工作搬到會持續保存嘅背景佇列，加入有限大小嘅匯入報告，加強 Home 同 Advert Void 嘅處理方式，令 GitHub 發佈檔案上載可以接住做，並宣布 Android App 已經喺 Google Play 公開畀大家使用。",
+    "bannerSummary": "3.3.7 有更快嘅大型清單篩選、持續保存嘅匯入頻道補完佇列、方便檢視嘅匯入報告、更安全嘅 Home 同 Advert Void、可以接住上載嘅發佈檔案，以及喺 Google Play 公開嘅 Android App。",
+    "highlights": [
+      "大型頻道同影片 ID 清單會重用已編譯嘅引擎同以 Set 為基礎嘅索引，略過冇任何啟用中規則會用到嘅 metadata，合併隱藏時間嘅寫入，並逐步處理有變嘅 Home 卡片；遇到結構變更時仍會完整處理。",
+      "大型清單嘅最後一項改進會避免重複執行篩選後嘅 JSON setter，喺兩條啟動路徑傳遞設定修訂，喺 immutable snapshot 一樣時重用 DOM 索引，亦只會喺開咗效能除錯時先建立診斷路徑。",
+      "CSV、TXT、FilterTube 規則清單 JSON、BlockTube 遷移 JSON 同受管理嘅匯入，而家共用一條由背景管理並持續保存嘅資料補完佇列：一次查一項、裝置喚醒時隨機相隔 7 至 15 秒、逐行重試、透過 Chrome alarms 復原、按 profile 授權，並記錄最後搵唔到或已終止嘅狀態。",
+      "持續保存嘅 Import Reports 會解釋已完成、等緊、搜尋中、重試中、永久搜尋失敗、只有名稱、略過咗同冇佇列等狀態。閂咗 dashboard 之後仍然睇到；大型報告會分成有限範圍顯示，可以匯出未解決嘅行，亦可以安全移除身份獨特但未解決嘅已匯入規則。",
+      "Home feed 啟動同變更處理會針對有變嘅卡片，並保留結構變更時嘅完整後備處理。只係補充 metadata 嘅更新唔會刷新 YouTube 分頁，亦會減少卡片重新排位。",
+      "Advert Void 而家需要播放器同時處於 `ad-showing` 同 `ad-interrupting` 狀態，或者有獨立證據證明睇到廣告。處理贊助卡片唔再計作一般 renderer mutation 工作。",
+      "GitHub 發佈會用 GitHub CLI 憑證，上載之前先建立草稿，接續已有 tag，只上載欠缺嘅 assets，檢查最後嘅 assets 清單，確認無誤之後先發佈。",
+      "Android 手機同平板用嘅 FilterTube App 而家已經喺 Google Play 公開。可以喺[公開頁面](https://play.google.com/store/apps/details?id=com.filtertube.app)安裝，或者喺 Google Play 搜尋 FilterTube。"
+    ]
+  }
+}

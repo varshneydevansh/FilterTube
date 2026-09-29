@@ -58,7 +58,7 @@ function groupForMethod(name) {
     'getTopicChannelTooltip',
     'deriveChannelMapping'
   ].includes(name)) return 'channelDisplayIdentityHelpers';
-  if (['renderKeywordList', 'normalizeKeywordDateFilterForUi', 'formatKeywordDateFilterLabel', 'attachKeywordHelpBubble', 'createRuleTargetBadge', 'createMoveRuleButton', 'createKeywordListItem', 'findChannelByRef', 'createFallbackExactToggle', 'getExactKeywordHelpText', 'createFallbackDeleteButton'].includes(name)) return 'keywordRenderingAndRowActions';
+  if (['renderKeywordList', 'normalizeKeywordDateFilterForUi', 'formatKeywordDateFilterLabel', 'attachKeywordHelpBubble', 'createRuleTargetBadge', 'createMoveRuleButton', 'createKeywordListItem', 'findChannelByRef', 'createFallbackExactToggle', 'getExactKeywordHelpText', 'createFallbackDeleteButton', 'rendererText', 'setRendererCopy', 'refreshRendererLocalizedTree'].includes(name)) return 'keywordRenderingAndRowActions';
   if ([
     'renderChannelList',
     'createChannelListItem',
@@ -339,6 +339,7 @@ function loadRenderEngineRuntime(options = {}) {
   const calls = [];
   const timers = [];
   const canceledTimerIds = [];
+  const windowListeners = new Map();
   const state = plain(options.state || baseRenderState());
 
   const context = {
@@ -363,6 +364,19 @@ function loadRenderEngineRuntime(options = {}) {
     },
     clearTimeout(id) {
       canceledTimerIds.push(id);
+    },
+    addEventListener(type, listener) {
+      const listeners = windowListeners.get(type) || [];
+      listeners.push(listener);
+      windowListeners.set(type, listeners);
+    },
+    removeEventListener(type, listener) {
+      const listeners = windowListeners.get(type) || [];
+      windowListeners.set(type, listeners.filter((candidate) => candidate !== listener));
+    },
+    dispatchEvent(event) {
+      for (const listener of windowListeners.get(event?.type) || []) listener(event);
+      return true;
     },
     StateManager: {
       getState() {
@@ -428,10 +442,14 @@ function loadRenderEngineRuntime(options = {}) {
   return {
     RenderEngine: context.RenderEngine,
     document: context.document,
+    context,
     state,
     calls,
     timers,
-    canceledTimerIds
+    canceledTimerIds,
+    dispatchWindowEvent(type) {
+      context.dispatchEvent({ type });
+    }
   };
 }
 
@@ -489,13 +507,13 @@ test('render engine method semantic register is scoped to current behavior', () 
   assert.match(text, /Status: current-behavior register/);
   assert.match(text, /Runtime behavior now includes channel source\s+filtering, imported provenance badges, bounded popup lists/);
   assert.match(text, /source file: js\/render_engine\.js/);
-  assert.match(text, /IIFE-scoped declarations: 48/);
-  assert.match(text, /plain function declarations: 43/);
+  assert.match(text, /IIFE-scoped declarations: 51/);
+  assert.match(text, /plain function declarations: 46/);
   assert.match(text, /const arrow helper declarations: 5/);
   assert.match(text, /async function declarations: 0/);
   assert.match(text, /public API entries: 5/);
   assert.match(text, /semantic method groups: 6/);
-  assert.match(text, /row-action listener sites: 11/);
+  assert.match(text, /event listener sites: 12/);
   assert.match(text, /direct StateManager optional calls: 26/);
   assert.match(text, /unique StateManager methods reached: 11/);
   assert.match(text, /querySelector calls: 0/);
@@ -512,33 +530,33 @@ test('render engine register pins source fingerprint and broad callable reconcil
   const text = doc();
 
   assert.deepEqual(stats, {
-    bytes: 80085,
-    sha256: '8b61423073f9ce8637653615d50c674a79298c23e59b31793ff867a2e953fd6f',
-    splitLines: 1824,
-    wcLines: 1823
+    bytes: 89274,
+    sha256: 'e8b792200c6cac6afbf727b91172ea048dfff8e3276e3d45d0334c6f3a443ab8',
+    splitLines: 2006,
+    wcLines: 2005
   });
-  assert.equal(broadRows.length, 157);
-  assert.equal(controlArtifacts, 98);
-  assert.equal(heldOutsideRegister, 11);
+  assert.equal(broadRows.length, 170);
+  assert.equal(controlArtifacts, 102);
+  assert.equal(heldOutsideRegister, 17);
   assert.deepEqual({
     if: broadCounts.if,
     while: broadCounts.while
   }, {
-    if: 97,
+    if: 101,
     while: 1
   });
 
   for (const expected of [
-    'source split lines: 1824',
-    'source wc -l: 1823',
-    'source bytes: 80085',
-    'source sha256: 8b61423073f9ce8637653615d50c674a79298c23e59b31793ff867a2e953fd6f',
-    'broad lexical callable matches: 157',
-    'accepted IIFE-scoped declaration rows: 48',
-    'semantic method rows promoted: 48',
-    'control-flow lexical artifacts: 98 (`if`: 97, `while`: 1)',
-    'local/render callback declarations held outside this IIFE method register: 11',
-    'executable current-behavior probes: 9'
+    'source split lines: 2006',
+    'source wc -l: 2005',
+    'source bytes: 89274',
+    'source sha256: e8b792200c6cac6afbf727b91172ea048dfff8e3276e3d45d0334c6f3a443ab8',
+    'broad lexical callable matches: 170',
+    'accepted IIFE-scoped declaration rows: 51',
+    'semantic method rows promoted: 51',
+    'control-flow lexical artifacts: 102 (`if`: 101, `while`: 1)',
+    'local/render callback declarations held outside this IIFE method register: 17',
+    'executable current-behavior probes: 10'
   ]) {
     assert.ok(text.includes(expected), `missing source reconciliation line ${expected}`);
   }
@@ -547,10 +565,10 @@ test('render engine register pins source fingerprint and broad callable reconcil
 test('render engine register accounts for every current IIFE-scoped declaration', () => {
   const rows = methodRows();
 
-  assert.equal(rows.length, 48);
+  assert.equal(rows.length, 51);
   assert.deepEqual(countBy(rows, 'kind'), {
     'const arrow': 5,
-    function: 43
+    function: 46
   });
   assert.deepEqual(countBy(rows, 'group'), {
     badgeAndSourceDecoration: 5,
@@ -558,7 +576,7 @@ test('render engine register accounts for every current IIFE-scoped declaration'
     channelRenderingAndRowActions: 8,
     collaborationGrouping: 3,
     dependencyAndSchedulingHelpers: 12,
-    keywordRenderingAndRowActions: 11
+    keywordRenderingAndRowActions: 14
   });
 
   for (const row of rows) {
@@ -609,19 +627,19 @@ test('render engine register pins current row-action DOM and scheduler surface',
     'toggleKidsKeywordExact'
   ]);
 
-  assert.equal((source.match(/\.addEventListener\(/g) || []).length, 11);
-  assert.equal((source.match(/document\.createElement\(/g) || []).length, 37);
+  assert.equal((source.match(/\.addEventListener(?:\?\.|\()/g) || []).length, 12);
+  assert.equal((source.match(/document\.createElement\(/g) || []).length, 39);
   assert.equal((source.match(/document\.createDocumentFragment\(/g) || []).length, 2);
-  assert.equal((source.match(/\.innerHTML\s*=/g) || []).length, 12);
-  assert.equal((source.match(/\.setAttribute\(/g) || []).length, 24);
+  assert.equal((source.match(/\.innerHTML\s*=/g) || []).length, 8);
+  assert.equal((source.match(/\.setAttribute\(/g) || []).length, 26);
   assert.equal((source.match(/querySelector(All)?\(/g) || []).length, 0);
 
   for (const token of [
-    'row-action listener sites: 11',
-    'document.createElement calls: 37',
+    'event listener sites: 12',
+    'document.createElement calls: 39',
     'document.createDocumentFragment calls: 2',
-    'innerHTML writes: 12',
-    'setAttribute calls: 24',
+    'innerHTML writes: 8',
+    'setAttribute calls: 26',
     'querySelector calls: 0'
   ]) {
     assert.ok(text.includes(token), `missing current DOM surface token ${token}`);
@@ -1071,6 +1089,140 @@ test('render engine register preserves future proof fields', () => {
   ]) {
     assert.ok(text.includes(field), `missing future proof field ${field}`);
   }
+});
+
+test('Main and Kids rule-list fixed copy localizes and refreshes without changing saved rules', () => {
+  const translations = {
+    es: {
+      'render.emptyKeywordsAllowed': 'SIN PALABRAS PERMITIDAS',
+      'render.emptyKeywordsBlocked': 'SIN PALABRAS BLOQUEADAS',
+      'render.emptyChannelsBlocked': 'SIN CANALES BLOQUEADOS',
+      'render.commentLabel': 'Comentario',
+      'render.commentOnTooltip': 'Comentario activado',
+      'render.exactLabel': 'Exacto',
+      'render.exactOnTooltip': 'Coincidencia exacta para «{word}»',
+      'render.exactAriaLabel': '{label}: {details}',
+      'render.dateLabel': 'Fecha',
+      'render.dateAfter': 'Después de {date}',
+      'render.dateOnTooltip': 'Filtro de fecha activo para videos {dateRange}',
+      'render.dateAriaLabel': '{label}: {details}',
+      'render.sourceKids': 'Desde Kids',
+      'render.kidsSyncBadgeTitle': 'Regla sincronizada desde YouTube Kids'
+    },
+    id: {
+      'render.emptyKeywordsAllowed': 'KATA KUNCI DIIZINKAN KOSONG',
+      'render.emptyKeywordsBlocked': 'KATA KUNCI DIBLOKIR KOSONG',
+      'render.emptyChannelsBlocked': 'KANAL DIBLOKIR KOSONG',
+      'render.commentLabel': 'Komentar',
+      'render.commentOnTooltip': 'Komentar aktif',
+      'render.exactLabel': 'Tepat',
+      'render.exactOnTooltip': 'Cocok persis dengan “{word}”',
+      'render.exactAriaLabel': '{label} — {details}',
+      'render.dateLabel': 'Tanggal',
+      'render.dateAfter': 'Sesudah {date}',
+      'render.dateOnTooltip': 'Tanggal aktif untuk video {dateRange}',
+      'render.dateAriaLabel': '{label} — {details}',
+      'render.sourceKids': 'Dari Kids',
+      'render.kidsSyncBadgeTitle': 'Aturan disinkronkan dari YouTube Kids'
+    }
+  };
+  let activeLocale = 'es';
+  const runtime = loadRenderEngineRuntime();
+  runtime.context.FilterTubeUiLocalization = {
+    get locale() {
+      return activeLocale;
+    },
+    text(key, values = {}) {
+      const template = translations[activeLocale]?.[key];
+      if (!template) throw new Error(`missing localized fixture key: ${key}`);
+      return template.replace(/\{([a-zA-Z][a-zA-Z0-9]*)\}/g, (match, name) =>
+        Object.prototype.hasOwnProperty.call(values, name) ? String(values[name]) : match);
+    }
+  };
+
+  const mainEmpty = runtime.document.createElement('div');
+  runtime.RenderEngine.renderKeywordList(mainEmpty, {
+    profile: 'main',
+    stateOverride: baseRenderState({ mode: 'whitelist' })
+  });
+  assert.equal(mainEmpty.textContent, 'SIN PALABRAS PERMITIDAS');
+
+  const kidsEmpty = runtime.document.createElement('div');
+  runtime.RenderEngine.renderKeywordList(kidsEmpty, {
+    profile: 'kids',
+    stateOverride: baseRenderState({
+      kids: { mode: 'blocklist', blockedKeywords: [], blockedChannels: [], whitelistKeywords: [], whitelistChannels: [] }
+    })
+  });
+  assert.equal(kidsEmpty.textContent, 'SIN PALABRAS BLOQUEADAS');
+
+  const channelsEmpty = runtime.document.createElement('div');
+  runtime.RenderEngine.renderChannelList(channelsEmpty, {
+    profile: 'kids',
+    stateOverride: baseRenderState()
+  });
+  assert.equal(channelsEmpty.textContent, 'SIN CANALES BLOQUEADOS');
+
+  const savedKidsEntry = { word: 'Kids Phrase', exact: false, comments: true };
+  const state = baseRenderState({
+    syncKidsToMain: true,
+    keywords: [{
+      word: 'Main Phrase',
+      exact: true,
+      comments: true,
+      dateFilter: { enabled: true, condition: 'after', fromDate: '2025-01-02' }
+    }],
+    kids: {
+      mode: 'blocklist',
+      blockedKeywords: [savedKidsEntry],
+      blockedChannels: [],
+      whitelistKeywords: [],
+      whitelistChannels: []
+    }
+  });
+  const rules = runtime.document.createElement('div');
+  runtime.RenderEngine.renderKeywordList(rules, { profile: 'main', stateOverride: state });
+
+  const mainRow = rowContaining(rules, 'Main Phrase');
+  const comment = mainRow.children[1].children.find((node) => node.textContent === 'Comentario');
+  const exact = mainRow.children[1].children.find((node) => node.textContent === 'Exacto');
+  const date = mainRow.children[1].children.find((node) => node.textContent === 'Fecha');
+  assert.ok(comment && exact && date);
+  assert.equal(comment.getAttribute('title'), 'Comentario activado');
+  assert.equal(comment.getAttribute('data-filtertube-help'), 'Comentario activado');
+  assert.equal(exact.getAttribute('title'), 'Coincidencia exacta para «Main Phrase»');
+  assert.equal(exact.getAttribute('aria-label'), 'Exacto: Coincidencia exacta para «Main Phrase»');
+  assert.equal(date.getAttribute('title'), 'Filtro de fecha activo para videos después de 2025-01-02');
+  assert.equal(date.getAttribute('aria-label'), 'Fecha: Filtro de fecha activo para videos después de 2025-01-02');
+
+  const kidsRow = rowContaining(rules, 'Kids Phrase');
+  const kidsBadge = kidsRow.children[0].children.find((node) => node.classList?.contains('channel-derived-badge'));
+  assert.ok(kidsBadge);
+  assert.equal(kidsBadge.textContent, 'Desde Kids');
+  assert.equal(kidsBadge.getAttribute('title'), 'Regla sincronizada desde YouTube Kids');
+  assert.equal(savedKidsEntry.__ftFromKids, undefined, 'rendering must not annotate the saved Kids rule');
+
+  activeLocale = 'id';
+  runtime.dispatchWindowEvent('filtertube-ui-locale-changed');
+
+  assert.equal(mainEmpty.textContent, 'KATA KUNCI DIIZINKAN KOSONG');
+  assert.equal(kidsEmpty.textContent, 'KATA KUNCI DIBLOKIR KOSONG');
+  assert.equal(channelsEmpty.textContent, 'KANAL DIBLOKIR KOSONG');
+  assert.equal(comment.textContent, 'Komentar');
+  assert.equal(comment.getAttribute('title'), 'Komentar aktif');
+  assert.equal(comment.getAttribute('aria-label'), 'Komentar aktif');
+  assert.equal(exact.textContent, 'Tepat');
+  assert.equal(exact.getAttribute('title'), 'Cocok persis dengan “Main Phrase”');
+  assert.equal(exact.getAttribute('aria-label'), 'Tepat — Cocok persis dengan “Main Phrase”');
+  assert.equal(date.textContent, 'Tanggal');
+  assert.equal(date.getAttribute('title'), 'Tanggal aktif untuk video sesudah 2025-01-02');
+  assert.equal(date.getAttribute('aria-label'), 'Tanggal — Tanggal aktif untuk video sesudah 2025-01-02');
+  assert.equal(kidsBadge.textContent, 'Dari Kids');
+  assert.equal(kidsBadge.getAttribute('title'), 'Aturan disinkronkan dari YouTube Kids');
+  assert.equal(state.keywords[0].word, 'Main Phrase');
+  assert.equal(state.keywords[0].dateFilter.fromDate, '2025-01-02');
+  assert.equal(savedKidsEntry.word, 'Kids Phrase');
+  assert.equal(savedKidsEntry.__ftFromKids, undefined);
 });
 
 test('runtime source lacks render engine method authority symbols', () => {

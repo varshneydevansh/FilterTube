@@ -1,0 +1,18 @@
+{
+  "3.3.7": {
+    "ctaLabel": "Yenilikleri Gör",
+    "headline": "Büyük listeler daha hızlı, içe aktarımlar kalıcı, Android herkese açık",
+    "summary": "FilterTube 3.3.7 büyük kural listelerindeki yinelenen işleri azaltır, içe aktarılan kanalların tamamlanmasını kalıcı bir arka plan kuyruğuna taşır, boyutu sınırlandırılmış içe aktarma raporları ekler, Ana Sayfa ve Advert Void davranışını güçlendirir, GitHub sürüm yüklemelerinin sürdürülmesini sağlar ve Android uygulamasının Google Play'de herkese açıldığını duyurur.",
+    "bannerSummary": "3.3.7; büyük listelerde daha hızlı filtreleme, içe aktarılan kanalları tamamlamak için kalıcı kuyruk, incelenebilir içe aktarma raporları, daha güvenli Ana Sayfa ve Advert Void davranışı, sürdürülebilen sürüm yüklemeleri ve Google Play'de herkese açık Android uygulaması sunar.",
+    "highlights": [
+      "Büyük kanal ve video kimliği listeleri derlenmiş motorları ve Set tabanlı dizinleri yeniden kullanır, etkin kuralların kullanamayacağı üst verileri atlar, gizli süre yazımlarını birleştirir ve değişen Ana Sayfa kartlarını aşamalı olarak işler; yapısal değişikliklerde tam işlem korunur.",
+      "Büyük listelere yönelik son iyileştirme, filtrelenmiş JSON setter işlemlerinin yinelenen geçişlerini önler, ayar revizyonlarını her iki başlatma yolundan iletir, değişmez anlık görüntü aynı olduğunda DOM dizinlerini yeniden kullanır ve tanılama yollarını yalnızca performans hata ayıklaması açıkken oluşturur.",
+      "CSV, TXT, FilterTube kural listesi JSON'u, BlockTube geçiş JSON'u ve yönetilen içe aktarımlar artık arka planın yönettiği kalıcı bir zenginleştirme kuyruğunu paylaşır: aynı anda tek arama, cihaz uyanıkken rastgele 7–15 saniye aralık, satır başına yeniden deneme, Chrome alarmlarıyla kurtarma, profile göre yetkilendirme ve bulunamadı ya da sonlandırıldı nihai durumları.",
+      "Kalıcı İçe Aktarma Raporları tamamlandı, bekliyor, aranıyor, yeniden deneniyor, kalıcı arama hatası, yalnızca ad, atlandı ve kuyruk eksik durumlarını açıklar. Kontrol paneli kapandıktan sonra da kullanılabilir, büyük raporları sınırlı bölümler hâlinde gösterir, çözümlenmemiş satırları dışa aktarır ve benzersiz kimliği olan çözümlenmemiş içe aktarma kurallarını güvenle kaldırabilir.",
+      "Ana Sayfa akışının başlatılması ve değişikliklerin işlenmesi, değişen kartları hedef alırken yapısal değişiklikler için tam geri dönüş yolunu korur. Yalnızca üst veriyi zenginleştiren güncellemeler YouTube sekmelerini yenilemez ve kartların yeniden düzenlenmesini azaltır.",
+      "Advert Void artık oynatıcının `ad-showing` ve `ad-interrupting` durumlarının birlikte bulunmasını veya görünür reklama ilişkin bağımsız kanıtı gerektirir. Sponsorlu kart işlemleri artık genel renderer değişikliği işi sayılmaz.",
+      "GitHub sürüm yayımlama işlemi GitHub CLI kimlik bilgilerini kullanır, yüklemeden önce taslak oluşturur, mevcut etiketlerden devam eder, yalnızca eksik varlıkları yükler, son varlık kümesini doğrular ve sadece doğrulamadan sonra yayımlar.",
+      "Android telefon ve tabletler için FilterTube uygulaması artık Google Play'de herkese açık. Uygulamayı [herkese açık sayfadan](https://play.google.com/store/apps/details?id=com.filtertube.app) yükleyebilir veya Google Play'de FilterTube'u arayabilirsiniz."
+    ]
+  }
+}

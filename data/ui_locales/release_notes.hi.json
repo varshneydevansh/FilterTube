@@ -1,0 +1,18 @@
+{
+  "3.3.7": {
+    "ctaLabel": "नई सुविधाएँ देखें",
+    "headline": "बड़ी सूचियाँ तेज़, आयात स्थायी, और Android सभी के लिए उपलब्ध",
+    "summary": "FilterTube 3.3.7 बड़ी नियम-सूचियों पर दोहराया जाने वाला काम घटाता है, आयात किए गए चैनलों का विवरण पूरा करने के लिए स्थायी बैकग्राउंड कतार जोड़ता है, सीमित आकार वाली आयात रिपोर्ट देता है, होम और Advert Void के व्यवहार को मज़बूत करता है, GitHub रिलीज़ अपलोड फिर से शुरू करने देता है, और Google Play पर सार्वजनिक Android ऐप की घोषणा करता है।",
+    "bannerSummary": "3.3.7 में बड़ी सूचियों की तेज़ फ़िल्टरिंग, आयात किए चैनलों को पूरा करने के लिए स्थायी कतार, समीक्षा योग्य आयात रिपोर्ट, होम और Advert Void की बेहतर सुरक्षा, फिर से शुरू होने वाले रिलीज़ अपलोड और Google Play पर सार्वजनिक Android ऐप शामिल हैं।",
+    "highlights": [
+      "बड़ी चैनल और वीडियो-ID सूचियाँ compiled engines और Set-आधारित indexes का दोबारा उपयोग करती हैं, सक्रिय नियमों के लिए बेकार metadata छोड़ती हैं, छिपे समय की writes को जोड़ती हैं और बदले हुए Home कार्डों को क्रमिक रूप से प्रोसेस करती हैं; संरचनात्मक बदलावों पर पूरा प्रोसेस जारी रहता है।",
+      "बड़ी सूचियों का अंतिम सुधार filtered JSON setters के दोहराव वाले passes रोकता है, दोनों startup paths में settings revisions आगे भेजता है, समान immutable snapshot पर DOM indexes दोबारा इस्तेमाल करता है, और performance debugging चालू होने पर ही diagnostic paths बनाता है।",
+      "CSV, TXT, FilterTube rule-list JSON, BlockTube migration JSON और managed imports अब background द्वारा संचालित एक स्थायी enrichment queue साझा करते हैं: एक समय में एक lookup, डिवाइस सक्रिय रहने पर यादृच्छिक 7–15 सेकंड का अंतर, हर row के लिए retry, Chrome alarms से recovery, profile authorization और अंत में not found या terminated status।",
+      "स्थायी Import Reports completed, pending, fetching, retrying, permanent lookup failure, name-only, skipped और missing-queue स्थितियाँ समझाती हैं। वे dashboard बंद होने के बाद भी उपलब्ध रहती हैं, बड़ी रिपोर्ट को सीमित हिस्सों में दिखाती हैं, अनसुलझी rows export करती हैं और विशिष्ट पहचान वाले अनसुलझे imported rules को सुरक्षित रूप से हटाने देती हैं।",
+      "Home feed का startup और बदलावों का प्रबंधन बदले हुए कार्डों को लक्ष्य करता है और संरचनात्मक बदलावों के लिए full fallback बनाए रखता है। केवल metadata जोड़ने वाले updates YouTube tabs को refresh नहीं करते और कार्डों के दोबारा खिसकने को घटाते हैं।",
+      "Advert Void अब player की `ad-showing` और `ad-interrupting` दोनों स्थितियाँ या दिख रहे विज्ञापन का स्वतंत्र प्रमाण माँगता है। Sponsored-card handling अब सामान्य renderer mutation work में नहीं गिनी जाती।",
+      "GitHub release publishing, GitHub CLI credentials का उपयोग करता है, upload से पहले drafts बनाता है, मौजूदा tags से काम जारी रखता है, केवल ग़ायब assets upload करता है, अंतिम asset set की जाँच करता है और जाँच के बाद ही publish करता है।",
+      "Android फ़ोन और टैबलेट के लिए FilterTube ऐप अब Google Play पर सार्वजनिक रूप से उपलब्ध है। इसे [सार्वजनिक पेज](https://play.google.com/store/apps/details?id=com.filtertube.app) से इंस्टॉल करें या Google Play पर FilterTube खोजें।"
+    ]
+  }
+}

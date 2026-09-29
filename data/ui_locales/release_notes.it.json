@@ -1,0 +1,18 @@
+{
+  "3.3.7": {
+    "ctaLabel": "Scopri le novità",
+    "headline": "Elenchi grandi più veloci, importazioni persistenti e Android disponibile al pubblico",
+    "summary": "FilterTube 3.3.7 riduce il lavoro ripetuto sugli elenchi di regole più grandi, sposta il completamento dei canali importati in una coda persistente in background, aggiunge rapporti di importazione con limiti, rende più robusto il comportamento di Home e Advert Void, permette di riprendere i caricamenti delle release su GitHub e annuncia l'app Android pubblica su Google Play.",
+    "bannerSummary": "La versione 3.3.7 offre un filtraggio più rapido degli elenchi grandi, una coda persistente per completare i canali importati, rapporti di importazione consultabili, maggiore sicurezza per Home e Advert Void, caricamenti delle release riprendibili e l'app Android pubblica su Google Play.",
+    "highlights": [
+      "Gli elenchi grandi di canali e ID video riutilizzano motori compilati e indici basati su Set, ignorano i metadati che nessuna regola attiva può usare, raggruppano le scritture del tempo nascosto e aggiornano in modo incrementale le schede Home modificate, mantenendo scansioni complete per i cambiamenti strutturali.",
+      "L'ultimo intervento sugli elenchi grandi evita passaggi duplicati dei setter JSON filtrati, propaga le revisioni delle impostazioni in entrambi i percorsi di avvio, riutilizza gli indici DOM quando lo snapshot immutabile è identico e costruisce i percorsi diagnostici solo se è attivo il debug delle prestazioni.",
+      "Le importazioni CSV, TXT, JSON di elenchi di regole FilterTube, JSON di migrazione BlockTube e gestite ora condividono una coda persistente di arricchimento gestita in background: una ricerca alla volta, intervalli casuali di 7–15 secondi mentre il dispositivo è attivo, nuovi tentativi per riga, ripristino tramite allarmi di Chrome, autorizzazione del profilo e stati finali non trovato o terminato.",
+      "I Rapporti di importazione persistenti spiegano gli stati completato, in attesa, in ricerca, nuovo tentativo, ricerca fallita definitivamente, solo nome, ignorato e coda mancante. Restano disponibili dopo la chiusura della dashboard, mostrano i rapporti grandi in finestre limitate, esportano le righe non risolte e consentono di rimuovere in sicurezza le regole importate non risolte con identità univoca.",
+      "L'avvio del feed Home e la gestione delle modifiche intervengono sulle schede cambiate e conservano il percorso completo di ripiego per le modifiche strutturali. Gli aggiornamenti che arricchiscono solo i metadati evitano di aggiornare le schede di YouTube e riducono il riassestamento delle schede.",
+      "Advert Void ora richiede contemporaneamente gli stati del player `ad-showing` e `ad-interrupting` oppure prove indipendenti di annunci visibili. La gestione delle schede sponsorizzate non viene più conteggiata come lavoro generico di mutazione del renderer.",
+      "La pubblicazione delle release GitHub usa le credenziali di GitHub CLI, crea bozze prima del caricamento, riprende i tag esistenti, carica solo gli asset mancanti, verifica l'insieme finale degli asset e pubblica soltanto dopo la verifica.",
+      "L'app FilterTube per telefoni e tablet Android è ora disponibile al pubblico su Google Play. Si può installare dalla [pagina pubblica](https://play.google.com/store/apps/details?id=com.filtertube.app) oppure cercando FilterTube su Google Play."
+    ]
+  }
+}

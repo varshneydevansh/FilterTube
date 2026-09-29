@@ -1,0 +1,18 @@
+{
+  "3.3.7": {
+    "ctaLabel": "Voir les nouveautés",
+    "headline": "De grandes listes plus rapides, des imports persistants et Android accessible au public",
+    "summary": "FilterTube 3.3.7 réduit les traitements répétés sur les grandes listes de règles, confie la complétion des chaînes importées à une file d’attente persistante en arrière-plan, ajoute des rapports d’importation limités, renforce le comportement de l’Accueil et d’Advert Void, permet de reprendre les téléversements de versions sur GitHub et annonce l’application Android publique sur Google Play.",
+    "bannerSummary": "La version 3.3.7 apporte un filtrage plus rapide des grandes listes, une file persistante pour compléter les chaînes importées, des rapports d’importation consultables, un Accueil et Advert Void plus sûrs, des téléversements de versions reprenables et l’application Android publique sur Google Play.",
+    "highlights": [
+      "Les grandes listes de chaînes et d’identifiants vidéo réutilisent des moteurs compilés et des index fondés sur Set, ignorent les métadonnées inutilisables par les règles actives, regroupent les écritures liées au temps masqué et ciblent progressivement les cartes d’Accueil modifiées, tout en gardant un traitement complet pour les changements structurels.",
+      "Le dernier ajustement des grandes listes évite les passages en double des setters JSON filtrés, propage les révisions des paramètres dans les deux chemins de démarrage, réutilise les index DOM lorsque l’instantané immuable est identique et ne construit les chemins de diagnostic que si le débogage des performances est activé.",
+      "Les imports CSV, TXT, JSON de listes de règles FilterTube, JSON de migration BlockTube et imports gérés partagent désormais une file d’enrichissement persistante pilotée en arrière-plan : une recherche à la fois, un délai aléatoire de 7 à 15 secondes pendant l’activité, des tentatives par ligne, une récupération par alarmes Chrome, une autorisation par profil et des états finaux introuvable ou interrompu.",
+      "Les rapports d’importation persistants décrivent les états terminé, en attente, en recherche, nouvelle tentative, recherche définitivement échouée, nom uniquement, ignoré et file manquante. Ils restent disponibles après la fermeture du tableau de bord, affichent les grands rapports par fenêtres limitées, exportent les lignes non résolues et permettent de supprimer sans risque les règles importées non résolues dont l’identité est unique.",
+      "Le démarrage du flux d’Accueil et le traitement de ses changements ciblent les cartes modifiées tout en conservant le recours complet pour les changements structurels. Les mises à jour qui enrichissent uniquement les métadonnées évitent d’actualiser les onglets YouTube et réduisent le réagencement des cartes.",
+      "Advert Void exige désormais les états simultanés du lecteur `ad-showing` et `ad-interrupting`, ou une preuve indépendante de publicité visible. Le traitement des cartes sponsorisées ne compte plus comme un travail générique de mutation du moteur de rendu.",
+      "La publication des versions sur GitHub utilise les identifiants de GitHub CLI, crée les brouillons avant l’envoi, reprend les tags existants, téléverse uniquement les ressources manquantes, vérifie l’ensemble final des ressources et ne publie qu’après cette vérification.",
+      "L’application FilterTube pour téléphones et tablettes Android est désormais disponible publiquement sur Google Play. Elle peut être installée depuis la [fiche publique](https://play.google.com/store/apps/details?id=com.filtertube.app) ou en recherchant FilterTube sur Google Play."
+    ]
+  }
+}

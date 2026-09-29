@@ -1,0 +1,18 @@
+{
+  "3.3.7": {
+    "ctaLabel": "Ver novedades",
+    "headline": "Listas grandes más rápidas, importaciones persistentes y Android público",
+    "summary": "FilterTube 3.3.7 reduce el trabajo repetido en listas grandes de reglas, mueve la finalización de canales importados a una cola persistente en segundo plano, añade informes de importación acotados, refuerza el comportamiento de Inicio y Advert Void, permite reanudar las cargas de versiones en GitHub y anuncia la aplicación pública de Android en Google Play.",
+    "bannerSummary": "La versión 3.3.7 incluye un filtrado más rápido de listas grandes, una cola persistente para completar canales importados, informes de importación revisables, mejoras de seguridad en Inicio y Advert Void, cargas reanudables de versiones y la aplicación pública de Android en Google Play.",
+    "highlights": [
+      "Las listas grandes de canales e ID de vídeo reutilizan motores compilados e índices basados en Set, omiten metadatos que ninguna regla activa puede usar, agrupan las escrituras del tiempo oculto y procesan de forma incremental las tarjetas de Inicio modificadas, manteniendo pasadas completas para cambios estructurales.",
+      "El último ajuste de listas grandes evita pasadas duplicadas de setters JSON filtrados, propaga las revisiones de ajustes por ambas rutas de inicio, reutiliza índices DOM cuando la instantánea inmutable es la misma y crea rutas de diagnóstico solo con la depuración de rendimiento activada.",
+      "Las importaciones CSV, TXT, JSON de listas de reglas de FilterTube, JSON de migración de BlockTube e importaciones administradas comparten ahora una cola de enriquecimiento persistente controlada en segundo plano: una consulta a la vez, intervalos aleatorios de 7–15 segundos mientras el dispositivo está activo, reintentos por fila, recuperación mediante alarmas de Chrome, autorización por perfil y estados finales de no encontrado o detenido.",
+      "Los informes persistentes de importación explican los estados completado, pendiente, consultando, reintentando, búsqueda fallida permanente, solo nombre, omitido y cola ausente. Siguen disponibles al cerrar el panel, muestran informes grandes por partes, exportan filas sin resolver y permiten eliminar con seguridad reglas importadas sin resolver cuya identidad sea única.",
+      "El inicio del feed de Inicio y la gestión de cambios procesan las tarjetas modificadas y conservan la alternativa para cambios estructurales; las actualizaciones que solo enriquecen metadatos evitan recargar pestañas de YouTube y reducen el reajuste de las tarjetas.",
+      "Advert Void ahora exige conjuntamente los estados del reproductor `ad-showing` y `ad-interrupting`, o pruebas independientes de anuncios visibles. La gestión de tarjetas patrocinadas ya no cuenta como trabajo genérico de mutación del renderizador.",
+      "La publicación de versiones en GitHub usa las credenciales de GitHub CLI, crea borradores antes de subir archivos, reanuda etiquetas existentes, carga solo los recursos que faltan, verifica el conjunto final de recursos y publica únicamente tras esa verificación.",
+      "La aplicación FilterTube para teléfonos y tabletas Android ya está disponible públicamente en Google Play. Se puede instalar desde la [ficha pública](https://play.google.com/store/apps/details?id=com.filtertube.app) o buscar FilterTube en Google Play."
+    ]
+  }
+}

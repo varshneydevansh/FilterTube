@@ -5,6 +5,39 @@
  * to eliminate code duplication and improve maintainability.
  */
 
+function popupUiText(key, fallback, values = {}) {
+    const interpolateFallback = () => String(fallback).replace(/\{([a-zA-Z][a-zA-Z0-9]*)\}/g, (match, name) =>
+        Object.prototype.hasOwnProperty.call(values, name) ? String(values[name]) : match);
+    try {
+        const translated = window.FilterTubeUiLocalization?.text?.(key, values);
+        return typeof translated === 'string' && translated ? translated : interpolateFallback();
+    } catch (_) {
+        return interpolateFallback();
+    }
+}
+
+function popupChannelErrorText(error) {
+    const message = typeof error === 'string' ? error.trim() : '';
+    const knownErrors = {
+        'Profile is locked': ['popup.channel.profileLocked', 'Profile is locked'],
+        'Invalid format. Use @handle, Channel ID, legacy c/ChannelName': [
+            'popup.channel.invalidKidsFormat', 'Invalid format. Use @handle, Channel ID, legacy c/ChannelName'
+        ],
+        'Invalid format. Use @handle, Channel ID, legacy c/ChannelName, or YouTube URL': [
+            'popup.channel.invalidFormat',
+            'Invalid format. Use @handle, Channel ID, legacy c/ChannelName, or YouTube URL'
+        ],
+        'Channel already exists': ['popup.channel.alreadyExists', 'Channel already exists'],
+        'Failed to add Kids channel': ['popup.channel.kidsAddFailed', 'Failed to add Kids channel'],
+        'Connection to background failed': ['popup.channel.connectionFailed', 'Connection to background failed'],
+        'Unknown error': ['popup.channel.unknownError', 'Unknown error']
+    };
+    const known = knownErrors[message];
+    if (known) return popupUiText(known[0], known[1]);
+    if (!message) return popupUiText('popup.channel.addFailed', 'Failed to add channel');
+    return popupUiText('popup.channel.addError', 'Failed to add channel: {error}', { error: message });
+}
+
 // Initialize tabs for the popup
 function initializePopupFiltersTabs() {
     const container = document.getElementById('popupFiltersTabsContainer');
@@ -15,16 +48,16 @@ function initializePopupFiltersTabs() {
     keywordsContent.innerHTML = `
         <div class="input-group">
             <div class="search-row">
-                <input type="text" id="searchKeywordsPopup" class="text-input search-input" placeholder="Search keywords..." />
+                <input type="text" id="searchKeywordsPopup" class="text-input search-input" placeholder="Search keywords..." data-ft-i18n-placeholder="popup.searchKeywords" />
             </div>
 
             <div class="add-keyword-row">
-                <input type="text" id="newKeywordInput" class="text-input" placeholder="Add keyword..." />
-                <button id="addKeywordBtn" class="btn btn-small btn-primary">Add</button>
+                <input type="text" id="newKeywordInput" class="text-input" placeholder="Add keyword..." data-ft-i18n-placeholder="popup.addKeywordPlaceholder" />
+                <button id="addKeywordBtn" class="btn btn-small btn-primary" data-ft-i18n="popup.addRule">Add</button>
             </div>
 
             <div id="keywordList" class="keyword-list">
-                <div class="empty-state">No keywords added</div>
+                <div class="empty-state" data-ft-i18n="popup.noKeywords">No keywords added</div>
             </div>
         </div>
     `;
@@ -34,16 +67,16 @@ function initializePopupFiltersTabs() {
     channelsContent.innerHTML = `
         <div class="input-group">
             <div class="search-row">
-                <input type="text" id="searchChannelsPopup" class="text-input search-input" placeholder="Search channels..." />
+                <input type="text" id="searchChannelsPopup" class="text-input search-input" placeholder="Search channels..." data-ft-i18n-placeholder="popup.searchChannels" />
             </div>
 
             <div class="add-keyword-row">
-                <input type="text" id="channelInput" class="text-input" placeholder="Add @handle, Channel ID.. or c/ChannelName" />
-                <button id="addChannelBtn" class="btn btn-small btn-primary">Add</button>
+                <input type="text" id="channelInput" class="text-input" placeholder="Add @handle, Channel ID.. or c/ChannelName" data-ft-i18n-placeholder="popup.channelInput" />
+                <button id="addChannelBtn" class="btn btn-small btn-primary" data-ft-i18n="popup.addRule">Add</button>
             </div>
 
             <div id="channelList" class="keyword-list">
-                <div class="empty-state">No channels added</div>
+                <div class="empty-state" data-ft-i18n="popup.noChannels">No channels added</div>
             </div>
         </div>
     `;
@@ -59,6 +92,7 @@ function initializePopupFiltersTabs() {
     contentControlsSearch.id = 'searchContentControlsPopup';
     contentControlsSearch.className = 'text-input search-input';
     contentControlsSearch.placeholder = 'Search content controls...';
+    contentControlsSearch.setAttribute('data-ft-i18n-placeholder', 'popup.searchContentControls');
 
     contentSearchRow.appendChild(contentControlsSearch);
     contentTab.appendChild(contentSearchRow);
@@ -106,6 +140,7 @@ function initializePopupFiltersTabs() {
         const titleEl = document.createElement('div');
         titleEl.className = 'content-control-group__title';
         titleEl.textContent = group?.title || '';
+        if (group?.id) titleEl.setAttribute('data-ft-i18n', `controls.group.${group.id}`);
 
         headerEl.appendChild(titleEl);
         groupEl.appendChild(headerEl);
@@ -129,7 +164,7 @@ function initializePopupFiltersTabs() {
             label.setAttribute('for', checkboxId);
             label.className = 'toggle-label';
             label.innerHTML = `
-                <span class="toggle-title">${control.title || ''}</span>
+                <span class="toggle-title" data-ft-i18n="controls.title.${control.key}">${control.title || ''}</span>
             `;
 
             const switchLabel = document.createElement('label');
@@ -168,6 +203,7 @@ function initializePopupFiltersTabs() {
     const categoryHeaderTitle = document.createElement('div');
     categoryHeaderTitle.className = 'content-control-group__title';
     categoryHeaderTitle.textContent = 'Category Filters';
+    categoryHeaderTitle.setAttribute('data-ft-i18n', 'popup.categoryFilters');
     categoryHeader.appendChild(categoryHeaderTitle);
     categoryGroup.appendChild(categoryHeader);
 
@@ -185,10 +221,12 @@ function initializePopupFiltersTabs() {
     const categoryTitle = document.createElement('div');
     categoryTitle.className = 'toggle-title';
     categoryTitle.textContent = 'Category Filter';
+    categoryTitle.setAttribute('data-ft-i18n', 'popup.categoryFilter');
 
     const categoryDescription = document.createElement('div');
     categoryDescription.className = 'toggle-desc';
     categoryDescription.textContent = 'Uses official categories independently of Blocklist or Whitelist mode.';
+    categoryDescription.setAttribute('data-ft-i18n', 'popup.categoryDescription');
 
     categoryInfo.appendChild(categoryTitle);
     categoryInfo.appendChild(categoryDescription);
@@ -200,8 +238,8 @@ function initializePopupFiltersTabs() {
     categoryMode.id = 'popupCategoryFilter_mode';
     categoryMode.className = 'select-input';
     categoryMode.innerHTML = `
-        <option value="block">Block selected</option>
-        <option value="allow">Allow only selected</option>
+        <option value="block" data-ft-i18n="popup.blockSelected">Block selected</option>
+        <option value="allow" data-ft-i18n="popup.allowOnlySelected">Allow only selected</option>
     `;
 
     const categoryToggle = document.createElement('label');
@@ -230,6 +268,7 @@ function initializePopupFiltersTabs() {
     categorySearch.id = 'popupCategoryFilter_search';
     categorySearch.className = 'text-input search-input ft-category-search';
     categorySearch.placeholder = 'Search categories...';
+    categorySearch.setAttribute('data-ft-i18n-placeholder', 'popup.searchCategories');
     categoryPanel.appendChild(categorySearch);
 
     const categorySelectionBar = document.createElement('div');
@@ -243,6 +282,7 @@ function initializePopupFiltersTabs() {
     categoryClear.type = 'button';
     categoryClear.className = 'ft-category-clear';
     categoryClear.textContent = 'Clear';
+    categoryClear.setAttribute('data-ft-i18n', 'popup.clear');
 
     categorySelectionBar.appendChild(categorySelectionCount);
     categorySelectionBar.appendChild(categoryClear);
@@ -257,6 +297,7 @@ function initializePopupFiltersTabs() {
     categoryManage.type = 'button';
     categoryManage.className = 'video-filters-manage';
     categoryManage.textContent = 'Open full Category Filters';
+    categoryManage.setAttribute('data-ft-i18n', 'popup.openCategories');
     categoryPanel.appendChild(categoryManage);
 
     categoryRows.appendChild(categoryPanel);
@@ -284,9 +325,10 @@ function initializePopupFiltersTabs() {
 
     function updatePopupCategorySummary() {
         const count = popupCategorySelected.length;
-        const mode = categoryMode.value === 'allow' ? 'Allowed' : 'Blocked';
+        const mode = categoryMode.value === 'allow'
+            ? popupUiText('popup.allowed', 'Allowed') : popupUiText('popup.blocked', 'Blocked');
         categorySelectionCount.textContent = count === 0
-            ? 'No categories selected — filter is inactive'
+            ? popupUiText('popup.noCategories', 'No categories selected — filter is inactive')
             : `${mode}: ${popupCategorySelected.join(', ')}`;
         categoryClear.disabled = count === 0;
         categoryMode.disabled = !categoryEnabled.checked;
@@ -305,7 +347,8 @@ function initializePopupFiltersTabs() {
             pill.className = 'ft-category-pill';
             pill.classList.toggle('active', active);
             pill.setAttribute('aria-pressed', active ? 'true' : 'false');
-            pill.setAttribute('aria-label', `${option.label}, ${active ? 'selected' : 'not selected'}`);
+            pill.setAttribute('aria-label', `${option.label}, ${active
+                ? popupUiText('popup.selected', 'selected') : popupUiText('popup.notSelected', 'not selected')}`);
             pill.style.setProperty('--ft-category-color', option.color);
             pill.style.setProperty('--ft-category-color-bg', hexToRgba(option.color, 0.10));
             pill.style.setProperty('--ft-category-color-border', hexToRgba(option.color, 0.45));
@@ -377,17 +420,17 @@ function initializePopupFiltersTabs() {
     languageGroup.setAttribute('data-ft-control-group', 'true');
     languageGroup.setAttribute('data-ft-group-title', 'Language Filters');
     languageGroup.innerHTML = `
-        <div class="content-control-group__header"><div class="content-control-group__title">Language Filters <span class="ft-experimental-badge">Experimental</span></div></div>
+        <div class="content-control-group__header"><div class="content-control-group__title"><span data-ft-i18n="popup.languageFilters">Language Filters</span> <span class="ft-experimental-badge" data-ft-i18n="popup.experimental">Experimental</span></div></div>
         <div class="content-control-group__rows">
             <div class="toggle-row popup-category-row">
-                <div class="toggle-info"><div class="toggle-title">Spoken Language</div><div class="toggle-desc">Uses original/default audio evidence; auto-dubbed alternatives do not change the source language.</div></div>
-                <div class="ft-category-controls popup-category-controls"><select id="popupLanguageFilter_mode" class="select-input"><option value="block">Block selected</option><option value="allow">Allow only selected</option></select><label class="switch"><input id="popupLanguageFilter_enabled" type="checkbox"><span class="slider round"></span></label></div>
+                <div class="toggle-info"><div class="toggle-title" data-ft-i18n="popup.spokenLanguage">Spoken Language</div><div class="toggle-desc" data-ft-i18n="popup.languageDescription">Uses original/default audio evidence; auto-dubbed alternatives do not change the source language.</div></div>
+                <div class="ft-category-controls popup-category-controls"><select id="popupLanguageFilter_mode" class="select-input"><option value="block" data-ft-i18n="popup.blockSelected">Block selected</option><option value="allow" data-ft-i18n="popup.allowOnlySelected">Allow only selected</option></select><label class="switch"><input id="popupLanguageFilter_enabled" type="checkbox"><span class="slider round"></span></label></div>
             </div>
             <div id="popupLanguageFilter_panel" class="language-filter-picker popup-language-filter-picker" style="display: none;">
-                <input id="popupLanguageFilter_search" type="text" class="text-input search-input ft-category-search" placeholder="Search languages...">
-                <div class="ft-category-selection-bar"><span id="popupLanguageFilter_count" class="ft-category-selection-count" aria-live="polite"></span><button id="popupLanguageFilter_clear" type="button" class="ft-category-clear">Clear</button></div>
+                <input id="popupLanguageFilter_search" type="text" class="text-input search-input ft-category-search" placeholder="Search languages..." data-ft-i18n-placeholder="popup.searchLanguages">
+                <div class="ft-category-selection-bar"><span id="popupLanguageFilter_count" class="ft-category-selection-count" aria-live="polite"></span><button id="popupLanguageFilter_clear" type="button" class="ft-category-clear" data-ft-i18n="popup.clear">Clear</button></div>
                 <div id="popupLanguageFilter_list" class="ft-category-options"></div>
-                <button id="popupLanguageFilter_manage" type="button" class="video-filters-manage">Open full Language Filters</button>
+                <button id="popupLanguageFilter_manage" type="button" class="video-filters-manage" data-ft-i18n="popup.openLanguages">Open full Language Filters</button>
             </div>
         </div>`;
     // Keep the experimental language picker at the end of Content Controls.
@@ -407,10 +450,11 @@ function initializePopupFiltersTabs() {
         .map(value => value.toLowerCase().replace(/_/g, '-').split('-')[0]);
 
     function updatePopupLanguageSummary() {
-        const modeLabel = languageMode.value === 'allow' ? 'Allowed' : 'Blocked';
+        const modeLabel = languageMode.value === 'allow'
+            ? popupUiText('popup.allowed', 'Allowed') : popupUiText('popup.blocked', 'Blocked');
         languageCount.textContent = popupLanguageSelected.length
             ? `${modeLabel}: ${popupLanguageSelected.map(code => languageOptions.find(option => option.code === code)?.label || code.toUpperCase()).join(', ')}`
-            : 'No languages selected — filter is inactive';
+            : popupUiText('popup.noLanguages', 'No languages selected — filter is inactive');
         languageClear.disabled = popupLanguageSelected.length === 0;
         languageMode.disabled = !languageEnabled.checked;
         languagePanel.style.display = languageEnabled.checked ? 'block' : 'none';
@@ -497,6 +541,7 @@ function initializePopupFiltersTabs() {
         const videoFiltersTitle = document.createElement('div');
         videoFiltersTitle.className = 'content-control-group__title';
         videoFiltersTitle.textContent = 'Feeds';
+        videoFiltersTitle.setAttribute('data-ft-i18n', 'popup.feeds');
 
         videoFiltersHeader.appendChild(videoFiltersTitle);
         videoFiltersSection.appendChild(videoFiltersHeader);
@@ -521,6 +566,8 @@ function initializePopupFiltersTabs() {
     durationTitle.className = 'toggle-title';
     durationTitle.textContent = 'Duration Filter';
     durationTitle.title = 'Hide long videos (>60m)';
+    durationTitle.setAttribute('data-ft-i18n', 'popup.durationFilter');
+    durationTitle.setAttribute('data-ft-i18n-title', 'popup.durationHint');
 
     durationInfo.appendChild(durationTitle);
 
@@ -552,6 +599,7 @@ function initializePopupFiltersTabs() {
     const kidsDurationTitle = document.createElement('div');
     kidsDurationTitle.className = 'toggle-title';
     kidsDurationTitle.textContent = 'Duration Filter';
+    kidsDurationTitle.setAttribute('data-ft-i18n', 'popup.durationFilter');
 
     kidsDurationInfo.appendChild(kidsDurationTitle);
 
@@ -584,6 +632,8 @@ function initializePopupFiltersTabs() {
     uploadDateTitle.className = 'toggle-title';
     uploadDateTitle.textContent = 'Upload Date Filter';
     uploadDateTitle.title = 'Shows videos from the past 30 days';
+    uploadDateTitle.setAttribute('data-ft-i18n', 'popup.uploadDateFilter');
+    uploadDateTitle.setAttribute('data-ft-i18n-title', 'popup.uploadDateHint');
 
     uploadDateInfo.appendChild(uploadDateTitle);
 
@@ -615,6 +665,7 @@ function initializePopupFiltersTabs() {
     const kidsUploadDateTitle = document.createElement('div');
     kidsUploadDateTitle.className = 'toggle-title';
     kidsUploadDateTitle.textContent = 'Upload Date Filter';
+    kidsUploadDateTitle.setAttribute('data-ft-i18n', 'popup.uploadDateFilter');
 
     kidsUploadDateInfo.appendChild(kidsUploadDateTitle);
 
@@ -647,6 +698,8 @@ function initializePopupFiltersTabs() {
     uppercaseTitle.className = 'toggle-title';
     uppercaseTitle.textContent = 'Uppercase Title Filter';
     uppercaseTitle.title = 'Block AI slop with ALL CAPS titles';
+    uppercaseTitle.setAttribute('data-ft-i18n', 'popup.uppercaseFilter');
+    uppercaseTitle.setAttribute('data-ft-i18n-title', 'popup.uppercaseHint');
 
     uppercaseInfo.appendChild(uppercaseTitle);
 
@@ -678,6 +731,7 @@ function initializePopupFiltersTabs() {
     const kidsUppercaseTitle = document.createElement('div');
     kidsUppercaseTitle.className = 'toggle-title';
     kidsUppercaseTitle.textContent = 'Uppercase Title Filter';
+    kidsUppercaseTitle.setAttribute('data-ft-i18n', 'popup.uppercaseFilter');
 
     kidsUppercaseInfo.appendChild(kidsUppercaseTitle);
 
@@ -701,6 +755,7 @@ function initializePopupFiltersTabs() {
     manageInTab.className = 'video-filters-manage';
     manageInTab.type = 'button';
     manageInTab.textContent = 'Manage in Tab View';
+    manageInTab.setAttribute('data-ft-i18n', 'popup.manageInTab');
 
     videoFiltersRows.appendChild(manageInTab);
 
@@ -787,7 +842,10 @@ function initializePopupFiltersTabs() {
             kidsRows.forEach(row => row.style.display = showKids ? 'flex' : 'none');
         }
 
-        manageInTab.textContent = showKids ? 'Manage Kids Content Controls in Tab View' : 'Manage Categories in Tab View';
+        const key = showKids ? 'popup.manageKidsControls' : 'popup.manageCategories';
+        manageInTab.setAttribute('data-ft-i18n', key);
+        manageInTab.textContent = popupUiText(key,
+            showKids ? 'Manage Kids Content Controls in Tab View' : 'Manage Categories in Tab View');
     }
 
     async function applyPopupVideoFiltersForActiveProfile() {
@@ -979,6 +1037,12 @@ function initializePopupFiltersTabs() {
     });
 
     container.appendChild(tabs.container);
+    window.addEventListener('filtertube-ui-locale-changed', () => {
+        window.FilterTubeUiLocalization?.apply?.(container);
+        updatePopupCategorySummary();
+        updatePopupLanguageSummary();
+        updatePopupVideoFiltersVisibility();
+    });
 }
 
 // Main initialization
@@ -1093,15 +1157,25 @@ document.addEventListener('DOMContentLoaded', async () => {
         });
     }
 
-    function formatPopupManagedTimeRemaining(seconds) {
+    function formatPopupManagedTimeRemaining(seconds, compact = false) {
         const safeSeconds = Math.max(0, Math.floor(Number(seconds) || 0));
-        if (safeSeconds <= 0) return 'Limit reached';
+        if (safeSeconds <= 0) return popupUiText('popup.limitReached', 'Limit reached');
         const hours = Math.floor(safeSeconds / 3600);
         const minutes = Math.floor((safeSeconds % 3600) / 60);
         const remainder = safeSeconds % 60;
-        if (hours > 0) return `${hours}h ${minutes}m left`;
-        if (minutes > 0) return `${minutes}m ${remainder}s left`;
-        return `${remainder}s left`;
+        if (hours > 0) {
+            return compact
+                ? popupUiText('popup.timeHoursMinutesCompact', '{hours}h {minutes}m', { hours, minutes })
+                : popupUiText('popup.timeHoursMinutesLeft', '{hours}h {minutes}m left', { hours, minutes });
+        }
+        if (minutes > 0) {
+            return compact
+                ? popupUiText('popup.timeMinutesSecondsCompact', '{minutes}m {seconds}s', { minutes, seconds: remainder })
+                : popupUiText('popup.timeMinutesSecondsLeft', '{minutes}m {seconds}s left', { minutes, seconds: remainder });
+        }
+        return compact
+            ? popupUiText('popup.timeSecondsCompact', '{seconds}s', { seconds: remainder })
+            : popupUiText('popup.timeSecondsLeft', '{seconds}s left', { seconds: remainder });
     }
 
     async function refreshPopupManagedTimeStatus() {
@@ -1114,17 +1188,26 @@ document.addEventListener('DOMContentLoaded', async () => {
         }
         const statusLabel = ftManagedTimeStatusPopup.querySelector('.ft-popup-time-status__label');
         if (popupSelfControlSessionState) {
-            const remaining = formatPopupManagedTimeRemaining(popupSelfControlSessionState.remainingSeconds)
-                .replace(' left', '');
+            const remaining = formatPopupManagedTimeRemaining(popupSelfControlSessionState.remainingSeconds, true);
             const hardWhitelist = popupSelfControlSessionState.sessionKind === 'hard_whitelist';
+            const statusKey = hardWhitelist ? 'popup.hardWhitelist' : 'popup.strictSession';
+            const statusFallback = hardWhitelist ? 'Hard whitelist' : 'Strict session';
             ftManagedTimeStatusPopup.hidden = false;
             ftManagedTimeStatusPopup.classList.remove('is-exhausted');
             ftManagedTimeStatusPopup.classList.add('is-self-control');
-            if (statusLabel) statusLabel.textContent = hardWhitelist ? 'Hard whitelist' : 'Strict session';
+            if (statusLabel) {
+                statusLabel.textContent = popupUiText(statusKey, statusFallback);
+                statusLabel.setAttribute('data-ft-i18n', statusKey);
+            }
             ftManagedTimeStatusValuePopup.textContent = remaining;
+            const profileName = popupSelfControlSessionState.profileName || popupUiText('popup.activeProfile', 'Active profile');
             ftManagedTimeStatusPopup.title = hardWhitelist
-                ? `${popupSelfControlSessionState.profileName || 'Active profile'} allows ${Number(popupSelfControlSessionState.allowedChannelCount) || 0} Main channel${Number(popupSelfControlSessionState.allowedChannelCount) === 1 ? '' : 's'} until the session ends`
-                : `${popupSelfControlSessionState.profileName || 'Active profile'} is pinned until the session ends`;
+                ? popupUiText('popup.hardWhitelistTimerTitle', 'Main channels allowed for {profileName}: {channelCount} · until the session ends', {
+                    profileName,
+                    channelCount: Number(popupSelfControlSessionState.allowedChannelCount) || 0
+                })
+                : popupUiText('popup.strictSessionTimerTitle', '{profileName} is pinned until the session ends', { profileName });
+            updatePopupSelfControlLockGateCopy();
             applyLockGateIfNeeded();
             return;
         }
@@ -1134,7 +1217,10 @@ document.addEventListener('DOMContentLoaded', async () => {
             applyLockGateIfNeeded();
         }
         ftManagedTimeStatusPopup.classList.remove('is-self-control');
-        if (statusLabel) statusLabel.textContent = 'YouTube time';
+        if (statusLabel) {
+            statusLabel.textContent = popupUiText('popup.youtubeTime', 'YouTube time');
+            statusLabel.setAttribute('data-ft-i18n', 'popup.youtubeTime');
+        }
         const response = await sendRuntimeMessage({
             action: 'FilterTube_GetManagedTimeLimitState',
             profileType: popupActiveProfileType === 'kids' ? 'kids' : 'main'
@@ -1148,8 +1234,12 @@ document.addEventListener('DOMContentLoaded', async () => {
         const timedOut = response.timedOut === true || Number(response.remainingSeconds) <= 0;
         ftManagedTimeStatusPopup.hidden = false;
         ftManagedTimeStatusPopup.classList.toggle('is-exhausted', timedOut);
-        ftManagedTimeStatusValuePopup.textContent = formatPopupManagedTimeRemaining(response.remainingSeconds);
-        ftManagedTimeStatusPopup.title = `${response.profileName || 'Active profile'} · ${ftManagedTimeStatusValuePopup.textContent}`;
+        const remaining = formatPopupManagedTimeRemaining(response.remainingSeconds);
+        ftManagedTimeStatusValuePopup.textContent = remaining;
+        ftManagedTimeStatusPopup.title = popupUiText('popup.managedTimeTimerTitle', '{profileName} · {remaining}', {
+            profileName: response.profileName || popupUiText('popup.activeProfile', 'Active profile'),
+            remaining
+        });
     }
 
     async function syncSessionUnlockStateFromBackground() {
@@ -1226,11 +1316,15 @@ document.addEventListener('DOMContentLoaded', async () => {
             'ft-list-mode-pill',
             effectiveMode === 'blocklist' ? 'toggle-variant-red' : ''
         ].filter(Boolean).join(' ');
-        toggle.textContent = effectiveMode === 'whitelist' ? 'Whitelist' : 'Blocklist';
+        const modeKey = effectiveMode === 'whitelist' ? 'popup.whitelist' : 'popup.blocklist';
+        const modeLabel = popupUiText(modeKey, effectiveMode === 'whitelist' ? 'Whitelist' : 'Blocklist');
+        toggle.textContent = modeLabel;
+        toggle.setAttribute('data-ft-i18n', modeKey);
         toggle.title = effectiveMode === 'whitelist'
             ? 'Whitelist mode: show content matching Allowed rules'
             : 'Blocklist mode: hide content matching Blocked rules';
-        toggle.setAttribute('aria-label', toggle.title);
+        toggle.setAttribute('aria-label', modeLabel);
+        toggle.setAttribute('data-ft-i18n-aria-label', modeKey);
         toggle.setAttribute('role', 'button');
         toggle.setAttribute('aria-pressed', 'true');
         toggle.setAttribute('tabindex', isUiLocked() ? '-1' : '0');
@@ -1262,17 +1356,23 @@ document.addEventListener('DOMContentLoaded', async () => {
                 let copyBlocklist = false;
                 if (nextState && whitelistEmpty && blocklistHasRules) {
                     copyBlocklist = window.confirm(profileType === 'kids'
-                        ? 'Copy your current YT Kids blocked rules into Allowed rules? Your blocked rules will be kept.'
-                        : 'Copy your current blocked rules into Allowed rules? Your blocked rules will be kept.');
+                        ? popupUiText('popup.listMode.copyKidsRulesConfirm',
+                            'Copy your current YT Kids blocked rules into Allowed rules? Your blocked rules will be kept.')
+                        : popupUiText('popup.listMode.copyRulesConfirm',
+                            'Copy the current blocked rules into Allowed rules? Your blocked rules will be kept.'));
                     if (!copyBlocklist) {
                         UIComponents.showToast(profileType === 'kids'
-                            ? 'YT Kids Allowed rules are empty — videos will stay hidden until you add allow rules.'
-                            : 'Allowed rules are empty — videos will stay hidden until you add allow rules.', 'info');
+                            ? popupUiText('popup.listMode.emptyKidsAllowedRules',
+                                'YT Kids Allowed rules are empty — videos will stay hidden until you add allow rules.')
+                            : popupUiText('popup.listMode.emptyAllowedRules',
+                                'Allowed rules are empty — videos will stay hidden until you add allow rules.'), 'info');
                     }
                 } else if (nextState && whitelistEmpty) {
                     UIComponents.showToast(profileType === 'kids'
-                        ? 'YT Kids Allowed rules are empty — videos will stay hidden until you add allow rules.'
-                        : 'Allowed rules are empty — videos will stay hidden until you add allow rules.', 'info');
+                        ? popupUiText('popup.listMode.emptyKidsAllowedRules',
+                            'YT Kids Allowed rules are empty — videos will stay hidden until you add allow rules.')
+                        : popupUiText('popup.listMode.emptyAllowedRules',
+                            'Allowed rules are empty — videos will stay hidden until you add allow rules.'), 'info');
                 }
 
                 const resp = await sendRuntimeMessage({
@@ -1283,14 +1383,18 @@ document.addEventListener('DOMContentLoaded', async () => {
                 });
 
                 if (!resp || resp.ok !== true) {
-                    UIComponents.showToast('Failed to update list mode', 'error');
+                    UIComponents.showToast(popupUiText('popup.listMode.updateFailed', 'Failed to update list mode'), 'error');
                     renderListModeControls();
                     return;
                 }
 
                 if (resp.copiedBlocklist) {
                     const copiedCount = (Number(resp.copiedChannels) || 0) + (Number(resp.copiedKeywords) || 0);
-                    UIComponents.showToast(`Copied ${copiedCount} blocked ${copiedCount === 1 ? 'rule' : 'rules'} into Allowed rules. Blocked rules were kept.`, 'success');
+                    const copiedKey = copiedCount === 1 ? 'popup.listMode.copiedRule' : 'popup.listMode.copiedRules';
+                    const copiedFallback = copiedCount === 1
+                        ? 'Copied {count} blocked rule into Allowed rules. Blocked rules were kept.'
+                        : 'Copied {count} blocked rules into Allowed rules. Blocked rules were kept.';
+                    UIComponents.showToast(popupUiText(copiedKey, copiedFallback, { count: copiedCount }), 'success');
                 }
 
                 await StateManager.loadSettings();
@@ -1332,6 +1436,22 @@ document.addEventListener('DOMContentLoaded', async () => {
     }
 
     let lockGateEl = null;
+
+    function updatePopupSelfControlLockGateCopy() {
+        if (!lockGateEl || !popupSelfControlSessionState?.active) return;
+        const title = lockGateEl.querySelector('[data-ft-popup-self-control-title]');
+        if (title) {
+            title.textContent = popupUiText('popup.selfControlSessionActive', 'Self-Control Session Active');
+        }
+        const hint = lockGateEl.querySelector('[data-ft-popup-self-control-hint]');
+        if (hint) {
+            hint.textContent = popupUiText(
+                'popup.selfControlPinnedHint',
+                'This profile and its filters are pinned. {remaining}.',
+                { remaining: formatPopupManagedTimeRemaining(popupSelfControlSessionState.remainingSeconds, true) }
+            );
+        }
+    }
 
     function safeObject(value) {
         return value && typeof value === 'object' && !Array.isArray(value) ? value : {};
@@ -1376,32 +1496,26 @@ document.addEventListener('DOMContentLoaded', async () => {
         const profile = safeObject(profiles[profileId]);
         const raw = normalizeString(profile.name);
         if (raw) return raw;
-        return profileId === 'default' ? 'Default' : 'Profile';
+        return profileId === 'default'
+            ? popupUiText('popup.profile.defaultName', 'Default')
+            : popupUiText('popup.profile.genericName', 'Profile');
     }
 
     function buildProfileLabel(profilesV4, profileId) {
         const name = getProfileName(profilesV4, profileId);
         const locked = isProfileLocked(profilesV4, profileId);
-        if (profileId === 'default') {
-            return locked ? `${name} (Master, locked)` : `${name} (Master)`;
-        }
-        const type = getProfileType(profilesV4, profileId);
-        if (type === 'account') {
-            return locked ? `${name} (Account, locked)` : `${name} (Account)`;
-        }
-        return locked ? `${name} (Child, locked)` : `${name} (Child)`;
+        const type = profileId === 'default' ? 'Master' : getProfileType(profilesV4, profileId) === 'account' ? 'Account' : 'Child';
+        const key = `popup.profile.label${type}${locked ? 'Locked' : ''}`;
+        const fallback = `${name} (${type}${locked ? ', locked' : ''})`;
+        return popupUiText(key, fallback, { name });
     }
 
     function buildProfileSubtitle(profilesV4, profileId) {
         const locked = isProfileLocked(profilesV4, profileId);
-        if (profileId === 'default') {
-            return locked ? 'Master • Locked' : 'Master';
-        }
-        const type = getProfileType(profilesV4, profileId);
-        if (type === 'account') {
-            return locked ? 'Account • Locked' : 'Account';
-        }
-        return locked ? 'Child • Locked' : 'Child';
+        const type = profileId === 'default' ? 'Master' : getProfileType(profilesV4, profileId) === 'account' ? 'Account' : 'Child';
+        const key = `popup.profile.subtitle${type}${locked ? 'Locked' : ''}`;
+        const fallback = `${type}${locked ? ' • Locked' : ''}`;
+        return popupUiText(key, fallback);
     }
 
     function getProfileType(profilesV4, profileId) {
@@ -1417,32 +1531,37 @@ document.addEventListener('DOMContentLoaded', async () => {
         const name = getProfileName(profilesV4, profileId);
         if (profileId === 'default') {
             return {
-                eyebrow: 'Master access',
-                title: 'Enter Master PIN',
-                message: 'Default is protected. Enter the Master PIN to continue.',
-                placeholder: 'Master PIN',
-                gateTitle: 'Master Profile Locked',
-                gateMessage: `Unlock ${name} with the Master PIN to view management controls.`
+                eyebrow: popupUiText('profileAccess.masterEyebrow', 'Master access'),
+                title: popupUiText('profileAccess.enterMasterPinTitle', 'Enter Master PIN'),
+                message: popupUiText('profileAccess.masterPinMessage', 'Default is protected. Enter the Master PIN to continue.'),
+                placeholder: popupUiText('profileAccess.masterPinPlaceholder', 'Master PIN'),
+                gateTitle: popupUiText('profileAccess.masterGateTitle', 'Master Profile Locked'),
+                gateMessage: popupUiText('profileAccess.masterGateMessage',
+                    'Unlock {name} with the Master PIN to view management controls.', { name })
             };
         }
         const type = getProfileType(profilesV4, profileId);
         if (type === 'account') {
             return {
-                eyebrow: 'Protected account',
-                title: `Unlock ${name}`,
-                message: `${name} is a locked independent account. Enter its profile PIN to continue.`,
-                placeholder: 'Profile PIN',
-                gateTitle: 'Protected Account',
-                gateMessage: `Unlock ${name} to view management controls.`
+                eyebrow: popupUiText('profileAccess.protectedAccountEyebrow', 'Protected account'),
+                title: popupUiText('profileAccess.unlockProfileTitle', 'Unlock {name}', { name }),
+                message: popupUiText('profileAccess.lockedAccountMessage',
+                    '{name} is a locked independent account. Enter its profile PIN to continue.', { name }),
+                placeholder: popupUiText('profileAccess.profilePinPlaceholder', 'Profile PIN'),
+                gateTitle: popupUiText('profileAccess.protectedAccountGateTitle', 'Protected Account'),
+                gateMessage: popupUiText('profileAccess.unlockProfileGateMessage',
+                    'Unlock {name} to view management controls.', { name })
             };
         }
         return {
-            eyebrow: 'Protected profile',
-            title: `Unlock ${name}`,
-            message: `${name} is a locked protected profile. Enter its profile PIN to continue.`,
-            placeholder: 'Profile PIN',
-            gateTitle: 'Protected Profile',
-            gateMessage: `Unlock ${name} to view management controls.`
+            eyebrow: popupUiText('profileAccess.protectedProfileEyebrow', 'Protected profile'),
+            title: popupUiText('profileAccess.unlockProfileTitle', 'Unlock {name}', { name }),
+            message: popupUiText('profileAccess.lockedProfileMessage',
+                '{name} is a locked protected profile. Enter its profile PIN to continue.', { name }),
+            placeholder: popupUiText('profileAccess.profilePinPlaceholder', 'Profile PIN'),
+            gateTitle: popupUiText('profileAccess.protectedProfileGateTitle', 'Protected Profile'),
+            gateMessage: popupUiText('profileAccess.unlockProfileGateMessage',
+                'Unlock {name} to view management controls.', { name })
         };
     }
 
@@ -1549,7 +1668,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         }
     }
 
-    async function showPromptModal({ eyebrow = '', title, message, placeholder = '', inputType = 'text', confirmText = 'Confirm', cancelText = 'Cancel', initialValue = '' }) {
+    async function showPromptModal({ eyebrow = '', title, message, placeholder = '', inputType = 'text', confirmText = 'Confirm', cancelText = popupUiText('popup.modal.cancel', 'Cancel'), initialValue = '' }) {
         return new Promise((resolve) => {
             const overlay = document.createElement('div');
             overlay.className = 'ft-modal-overlay';
@@ -1674,14 +1793,14 @@ document.addEventListener('DOMContentLoaded', async () => {
             message: copy.message,
             placeholder: copy.placeholder,
             inputType: 'password',
-            confirmText: 'Unlock'
+            confirmText: popupUiText('profileAccess.unlockButton', 'Unlock')
         });
 
         const normalized = normalizeString(pin);
         if (!normalized) return false;
         const ok = await verifyPin(normalized, verifier);
         if (!ok) {
-            UIComponents.showToast('Incorrect PIN', 'error');
+            UIComponents.showToast(popupUiText('popup.pin.incorrect', 'Incorrect PIN'), 'error');
             return false;
         }
         unlockedProfiles.add(profileId);
@@ -1751,18 +1870,33 @@ document.addEventListener('DOMContentLoaded', async () => {
         const copy = getProfileAccessCopy(profilesV4, activeProfileId);
         const activeIsChild = getProfileType(profilesV4, activeProfileId) === 'child';
         const h3 = document.createElement('h3');
-        h3.textContent = selfControlLocked ? 'Self-Control Session Active' : (activeIsChild ? 'Managed Protected Profile' : copy.gateTitle);
+        if (selfControlLocked) {
+            h3.setAttribute('data-ft-popup-self-control-title', 'true');
+            h3.textContent = popupUiText('popup.selfControlSessionActive', 'Self-Control Session Active');
+        } else {
+            h3.textContent = activeIsChild
+                ? popupUiText('popup.profile.managedChildTitle', 'Managed Protected Profile')
+                : copy.gateTitle;
+        }
         cardHeader.appendChild(h3);
 
         const body = document.createElement('div');
         body.className = 'card-body';
         const hint = document.createElement('div');
         hint.className = 'import-export-hint';
-        hint.textContent = selfControlLocked
-            ? `This profile and its filters are pinned. ${formatPopupManagedTimeRemaining(popupSelfControlSessionState.remainingSeconds)}.`
-            : activeIsChild
-            ? 'This protected profile can use its own viewing rules, but FilterTube settings and rule editing stay parent-managed. Switch to the parent profile to make changes.'
-            : copy.gateMessage;
+        if (selfControlLocked) {
+            hint.setAttribute('data-ft-popup-self-control-hint', 'true');
+            hint.textContent = popupUiText(
+                'popup.selfControlPinnedHint',
+                'This profile and its filters are pinned. {remaining}.',
+                { remaining: formatPopupManagedTimeRemaining(popupSelfControlSessionState.remainingSeconds, true) }
+            );
+        } else if (activeIsChild) {
+            hint.textContent = popupUiText('popup.profile.managedChildHint',
+                'This protected profile can use its own viewing rules, but FilterTube settings and rule editing stay parent-managed. Switch to the parent profile to make changes.');
+        } else {
+            hint.textContent = copy.gateMessage;
+        }
 
         const actions = document.createElement('div');
         actions.style.display = 'flex';
@@ -1775,7 +1909,9 @@ document.addEventListener('DOMContentLoaded', async () => {
             const unlockBtn = document.createElement('button');
             unlockBtn.className = 'btn-primary';
             unlockBtn.type = 'button';
-            unlockBtn.textContent = activeIsChild ? 'Switch Profile' : 'Unlock';
+            unlockBtn.textContent = activeIsChild
+                ? popupUiText('popup.profile.switchAction', 'Switch Profile')
+                : popupUiText('profileAccess.unlockButton', 'Unlock');
             unlockBtn.addEventListener('click', async () => {
                 if (activeIsChild) {
                     toggleProfileDropdown();
@@ -1785,9 +1921,9 @@ document.addEventListener('DOMContentLoaded', async () => {
                     const ok = await ensureProfileUnlocked(profilesV4Cache, activeProfileId);
                     if (!ok) return;
                     await refreshProfilesUI();
-                    UIComponents.showToast('Unlocked', 'success');
+                    UIComponents.showToast(popupUiText('popup.pin.unlocked', 'Unlocked'), 'success');
                 } catch (e) {
-                    UIComponents.showToast('Failed to unlock', 'error');
+                    UIComponents.showToast(popupUiText('popup.pin.unlockFailed', 'Failed to unlock'), 'error');
                 }
             });
             actions.appendChild(unlockBtn);
@@ -1799,6 +1935,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 
         appContainer.insertBefore(gate, appContent);
         lockGateEl = gate;
+        updatePopupSelfControlLockGateCopy();
     }
 
     function renderProfileSelector(profilesV4) {
@@ -1824,7 +1961,9 @@ document.addEventListener('DOMContentLoaded', async () => {
             const type = getProfileType(profilesV4, id);
             const isChild = type === 'child';
             btn.disabled = popupSelfControlSessionState?.active === true;
-            btn.title = btn.disabled ? 'Profile switching is locked until the Self-Control Session ends' : '';
+            btn.title = btn.disabled
+                ? popupUiText('popup.profile.switchLocked', 'Profile switching is locked until the Self-Control Session ends')
+                : '';
             btn.className = `ft-profile-dropdown-item${id === current ? ' is-active' : ''}${locked ? ' is-locked' : ''}${isChild ? ' is-child' : ''}`;
             btn.setAttribute('role', 'option');
             btn.setAttribute('aria-selected', id === current ? 'true' : 'false');
@@ -1872,9 +2011,9 @@ document.addEventListener('DOMContentLoaded', async () => {
             const header = document.createElement('div');
             header.className = 'ft-profile-dropdown-group';
             header.setAttribute('role', 'presentation');
-            header.textContent = accountId === 'default'
-                ? `${getProfileName(profilesV4, accountId)} (Master)`
-                : `${getProfileName(profilesV4, accountId)} (Account)`;
+            const groupKey = accountId === 'default' ? 'popup.profile.groupMaster' : 'popup.profile.groupAccount';
+            const groupFallback = accountId === 'default' ? '{name} (Master)' : '{name} (Account)';
+            header.textContent = popupUiText(groupKey, groupFallback, { name: getProfileName(profilesV4, accountId) });
             ftProfileDropdownPopup.appendChild(header);
 
             appendProfileBtn(accountId);
@@ -1909,7 +2048,8 @@ document.addEventListener('DOMContentLoaded', async () => {
     async function switchToProfile(nextProfileId) {
         if (isHandlingProfileSwitch) return;
         if (popupSelfControlSessionState?.active === true) {
-            UIComponents.showToast('Profile switching is locked until the Self-Control Session ends', 'error');
+            UIComponents.showToast(popupUiText('popup.profile.switchLocked',
+                'Profile switching is locked until the Self-Control Session ends'), 'error');
             return;
         }
         const targetId = normalizeString(nextProfileId);
@@ -1919,13 +2059,13 @@ document.addEventListener('DOMContentLoaded', async () => {
         try {
             const io = window.FilterTubeIO || {};
             if (typeof io.loadProfilesV4 !== 'function' || typeof io.saveProfilesV4 !== 'function') {
-                UIComponents.showToast('Profiles unavailable', 'error');
+                UIComponents.showToast(popupUiText('popup.profile.unavailable', 'Profiles unavailable'), 'error');
                 return;
             }
             const profilesV4 = await io.loadProfilesV4();
             const profiles = safeObject(profilesV4?.profiles);
             if (!profiles[targetId]) {
-                UIComponents.showToast('Profile not found', 'error');
+                UIComponents.showToast(popupUiText('popup.profile.notFound', 'Profile not found'), 'error');
                 return;
             }
 
@@ -1948,10 +2088,10 @@ document.addEventListener('DOMContentLoaded', async () => {
             renderChannels();
             updateCheckboxes();
             applyLockGateIfNeeded();
-            UIComponents.showToast('Profile switched', 'success');
+            UIComponents.showToast(popupUiText('popup.profile.switched', 'Profile switched'), 'success');
         } catch (e) {
             console.warn('Popup: profile switch failed', e);
-            UIComponents.showToast('Failed to switch profile', 'error');
+            UIComponents.showToast(popupUiText('popup.profile.switchFailed', 'Failed to switch profile'), 'error');
         } finally {
             isHandlingProfileSwitch = false;
         }
@@ -2115,26 +2255,39 @@ document.addEventListener('DOMContentLoaded', async () => {
 
         if (toggleEnabledBrandBtn) {
             const enabled = state.enabled !== false;
-            const activeProfileName = getProfileName(profilesV4Cache, normalizeString(profilesV4Cache?.activeProfileId) || 'default');
             toggleEnabledBrandBtn.classList.toggle('ft-enabled', enabled);
             toggleEnabledBrandBtn.classList.toggle('ft-disabled', !enabled);
             toggleEnabledBrandBtn.classList.toggle('is-locked', locked);
             toggleEnabledBrandBtn.setAttribute('aria-pressed', enabled ? 'true' : 'false');
             toggleEnabledBrandBtn.setAttribute('aria-disabled', locked ? 'true' : 'false');
             toggleEnabledBrandBtn.tabIndex = locked ? -1 : 0;
-            toggleEnabledBrandBtn.title = locked
-                ? `Unlock ${activeProfileName} to change filtering state.`
-                : (enabled ? 'Filtering Active (click to pause)' : 'Filtering Paused (click to enable)');
-
             const statusText = document.getElementById('extensionStatusText');
             if (statusText) {
-                statusText.textContent = enabled ? 'Enabled' : 'Disabled';
+                const statusKey = enabled ? 'popup.enabled' : 'popup.disabled';
+                statusText.textContent = popupUiText(statusKey, enabled ? 'Enabled' : 'Disabled');
+                statusText.setAttribute('data-ft-i18n', statusKey);
                 statusText.classList.toggle('disabled', !enabled);
             }
         }
 
         updateSubscriptionsShortcut();
     }
+
+    window.addEventListener('filtertube-ui-locale-changed', () => {
+        updateCheckboxes();
+        renderListModeControls();
+        if (isPopupChannelAddInProgress && addChannelBtn) {
+            addChannelBtn.textContent = popupUiText('popup.channel.fetching', 'Fetching...');
+        }
+        if (profilesV4Cache) renderProfileSelector(profilesV4Cache);
+        if (lockGateEl) {
+            const previousGate = lockGateEl;
+            lockGateEl = null;
+            previousGate.remove();
+            applyLockGateIfNeeded();
+        }
+        refreshPopupManagedTimeStatus().catch(() => {});
+    });
 
     // Initial render
     renderKeywords();
@@ -2194,6 +2347,8 @@ document.addEventListener('DOMContentLoaded', async () => {
         });
     }
 
+    let isPopupChannelAddInProgress = false;
+
     // Add keyword
     if (addKeywordBtn) {
         addKeywordBtn.addEventListener('click', async () => {
@@ -2207,7 +2362,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                 });
             if (success) {
                 if (newKeywordInput) newKeywordInput.value = '';
-                UIComponents.flashButtonSuccess(addKeywordBtn, 'Added!', 1200);
+                UIComponents.flashButtonSuccess(addKeywordBtn, popupUiText('popup.rule.added', 'Added!'), 1200);
             }
         });
     }
@@ -2226,8 +2381,8 @@ document.addEventListener('DOMContentLoaded', async () => {
             const input = (channelInput?.value || '').trim();
             if (!input) return;
 
-            const originalText = addChannelBtn.textContent;
-            addChannelBtn.textContent = 'Fetching...';
+            isPopupChannelAddInProgress = true;
+            addChannelBtn.textContent = popupUiText('popup.channel.fetching', 'Fetching...');
             addChannelBtn.disabled = true;
 
             try {
@@ -2240,18 +2395,23 @@ document.addEventListener('DOMContentLoaded', async () => {
                 if (result.success) {
                     if (channelInput) channelInput.value = '';
                     // Reset button text BEFORE flashing success message
-                    addChannelBtn.textContent = originalText;
+                    isPopupChannelAddInProgress = false;
+                    addChannelBtn.textContent = popupUiText('popup.addRule', 'Add');
                     addChannelBtn.disabled = false;
-                    UIComponents.flashButtonSuccess(addChannelBtn, 'Added!', 1200);
+                    UIComponents.flashButtonSuccess(addChannelBtn, popupUiText('popup.rule.added', 'Added!'), 1200);
                 } else {
-                    addChannelBtn.textContent = originalText;
+                    isPopupChannelAddInProgress = false;
+                    addChannelBtn.textContent = popupUiText('popup.addRule', 'Add');
                     addChannelBtn.disabled = false;
-                    alert(result.error || 'Failed to add channel');
+                    alert(popupChannelErrorText(result.error));
                 }
             } catch (error) {
-                addChannelBtn.textContent = originalText;
+                isPopupChannelAddInProgress = false;
+                addChannelBtn.textContent = popupUiText('popup.addRule', 'Add');
                 addChannelBtn.disabled = false;
-                alert('Failed to add channel: ' + error.message);
+                alert(popupChannelErrorText(error?.message));
+            } finally {
+                isPopupChannelAddInProgress = false;
             }
         });
     }
@@ -2308,7 +2468,8 @@ document.addEventListener('DOMContentLoaded', async () => {
         const handleToggle = async () => {
             if (isUiLocked()) {
                 updateCheckboxes();
-                UIComponents.showToast('Unlock profile to change filtering state', 'error');
+                UIComponents.showToast(popupUiText('popup.profile.unlockRequired',
+                    'Unlock profile to change filtering state'), 'error');
                 return;
             }
             const state = StateManager.getState();

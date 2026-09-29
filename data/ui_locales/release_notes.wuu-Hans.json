@@ -1,0 +1,18 @@
+{
+  "3.3.7": {
+    "ctaLabel": "看看搿歇有啥新个",
+    "headline": "大清单处理更快哉、导入信息会保存、Android 对大家开放哉",
+    "summary": "FilterTube 3.3.7 减少大规则清单里反复做个工作，把导入频道信息个补全搬到会一直保存个后台队列里，加上有大小限制个导入报告，让 Home 同 Advert Void 处理得更牢靠，GitHub 发布上传可以停了再接着做，并宣布 Android 应用在 Google Play 上对大家开放哉。",
+    "bannerSummary": "3.3.7 有更快个大清单过滤、一直保存个导入频道补全队列、便于查看个导入报告、更安全个 Home 同 Advert Void、可以接着做个发布上传，还有 Google Play 上公开个 Android 应用。",
+    "highlights": [
+      "大频道清单同视频 ID 清单会重复用已经编译好个引擎同 Set 索引，跳过活动规则用勿着个 metadata，把隐藏时间个写入合并起来，逐步处理改脱个 Home 卡片；碰着结构改动还是要完整处理。",
+      "大清单最后个改进会避免过滤后个 JSON setter 重复运行，通过两条启动路径传递设置修订，immutable snapshot 相同时重复用 DOM 索引，只有性能调试打开了才造诊断路径。",
+      "CSV、TXT、FilterTube 规则清单 JSON、BlockTube 迁移 JSON 同管理个导入现在共用后台管理、一直保存个补充信息队列：一趟只查一项，设备醒着时随机等 7 到 15 秒，每行能重试，用 Chrome alarms 恢复，按 profile 授权，最后记成没查着或已经停脱。",
+      "一直保存个 Import Reports 说明已完成、等待、查询中、重试中、查询彻底失败、只有名称、跳过、队列缺失等状态。关脱 dashboard 以后还看得到；大报告分成有限块显示，可以导出没解决个行，也能安全删除身份唯一个未解决导入规则。",
+      "Home feed 启动同变化处理会盯住改脱个卡片，碰着结构变化仍保留完整处理作为备用。只补 metadata 个更新勿会刷新 YouTube 标签页，也会少点卡片重新排位置。",
+      "Advert Void 现在要 player 同时处于 `ad-showing` 同 `ad-interrupting` 状态，或者有独立证据看得到广告。赞助卡片处理勿再算一般 renderer mutation 工作。",
+      "GitHub release 发布用 GitHub CLI 凭证，上传前先造草稿，从现成 tag 接着做，只上传缺脱个 assets，检查最后个 asset 集合，检查好以后才发布。",
+      "Android 手机同平板用个 FilterTube 应用现在在 Google Play 上对公众开放哉。可以从[公开页面](https://play.google.com/store/apps/details?id=com.filtertube.app)安装，也可以在 Google Play 里搜 FilterTube。"
+    ]
+  }
+}

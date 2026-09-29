@@ -1,0 +1,10 @@
+{
+  "extensionName": {
+    "message": "FilterTube",
+    "description": "The extension name shown by the browser."
+  },
+  "extensionDescription": {
+    "message": "آرامش خاطر را به تجربهٔ ویدیوهای دیجیتال خود بازگردانید.",
+    "description": "The extension description shown by the browser."
+  }
+}

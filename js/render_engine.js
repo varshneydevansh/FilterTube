@@ -31,6 +31,56 @@ const RenderEngine = (() => {
     const LARGE_LIST_VIRTUALIZATION_THRESHOLD = 120;
     const LARGE_LIST_OVERSCAN = 10;
     const DEFAULT_LIST_GAP_PX = 16;
+    const localizedRendererContainers = new Set();
+
+    function rendererText(key, fallback, values = {}) {
+        const resolvedValues = typeof values === 'function' ? values() : values;
+        try {
+            const translated = window.FilterTubeUiLocalization?.text?.(key, resolvedValues);
+            if (typeof translated === 'string') return translated;
+        } catch (e) {
+        }
+        return String(fallback).replace(/\{([a-zA-Z][a-zA-Z0-9]*)\}/g, (match, name) =>
+            Object.prototype.hasOwnProperty.call(resolvedValues || {}, name)
+                ? String(resolvedValues[name])
+                : match);
+    }
+
+    function setRendererCopy(element, property, key, fallback, values = {}) {
+        if (!element) return element;
+        const copies = element.__ftRendererCopy || (element.__ftRendererCopy = {});
+        copies[property] = { key, fallback, values };
+        const text = rendererText(key, fallback, values);
+        if (property === 'textContent') element.textContent = text;
+        else element.setAttribute(property, text);
+        return element;
+    }
+
+    function refreshRendererLocalizedTree(root) {
+        const visit = (node) => {
+            if (!node) return;
+            const copies = node.__ftRendererCopy;
+            if (copies) {
+                for (const [property, copy] of Object.entries(copies)) {
+                    const text = rendererText(copy.key, copy.fallback, copy.values);
+                    if (property === 'textContent') node.textContent = text;
+                    else node.setAttribute(property, text);
+                }
+            }
+            Array.from(node.children || []).forEach(visit);
+        };
+        visit(root);
+    }
+
+    window.addEventListener?.('filtertube-ui-locale-changed', () => {
+        for (const container of localizedRendererContainers) {
+            if (container?.isConnected === false) {
+                localizedRendererContainers.delete(container);
+                continue;
+            }
+            refreshRendererLocalizedTree(container);
+        }
+    });
 
     function scheduleFrame(callback) {
         if (typeof requestAnimationFrame === 'function') {
@@ -247,7 +297,7 @@ const RenderEngine = (() => {
         const isFromComments = sourceKey === 'comments';
         const isKidsSynced = sourceKey === 'kids';
         const isCollaboration = sourceKey === 'collab';
-        return createPillBadge({
+        const badge = createPillBadge({
             text: isCollaboration ? 'Collaboration' : (isFromComments ? 'From Comments' : (isKidsSynced ? 'From Kids' : 'From Channel')),
             title,
             variantClass: isCollaboration
@@ -256,14 +306,31 @@ const RenderEngine = (() => {
                 ? 'badge-variant-comments'
                 : (isKidsSynced ? 'badge-variant-kids' : '')
         });
+        if (!isCollaboration) {
+            const label = isFromComments
+                ? ['render.sourceComments', 'From Comments']
+                : isKidsSynced
+                    ? ['render.sourceKids', 'From Kids']
+                    : ['render.sourceChannel', 'From Channel'];
+            setRendererCopy(badge, 'textContent', label[0], label[1]);
+        }
+        return badge;
     }
 
     function createKidsSyncBadge() {
-        return createPillBadge({
+        const badge = createPillBadge({
             text: 'From Kids',
             title: 'This entry is synced from your YouTube Kids blocklist',
             variantClass: 'badge-variant-kids'
         });
+        setRendererCopy(badge, 'textContent', 'render.sourceKids', 'From Kids');
+        setRendererCopy(
+            badge,
+            'title',
+            'render.kidsSyncBadgeTitle',
+            'This entry is synced from your YouTube Kids blocklist'
+        );
+        return badge;
     }
 
     function normalizeChannelHandle(handle) {
@@ -361,6 +428,7 @@ const RenderEngine = (() => {
         if (!container) return;
 
         cancelContainerRenderTasks(container);
+        localizedRendererContainers.add(container);
 
         const {
             showSearch = false,
@@ -473,20 +541,16 @@ const RenderEngine = (() => {
 
         // Empty state
         if (displayKeywords.length === 0) {
-            const emptyMsg = showSearch && searchValue
-                ? 'No keywords found'
-                : (() => {
-                    if (profile === 'kids') {
-                        return kidsMode === 'whitelist' ? 'No keywords allowed' : 'No keywords blocked';
-                    }
-                    return mainMode === 'whitelist' ? 'No keywords allowed' : 'No keywords blocked';
-                })();
-
-            if (minimal) {
-                container.innerHTML = `<div class="empty-state">${emptyMsg}</div>`;
-            } else {
-                container.innerHTML = `<div class="empty-state-large" style="padding: 20px;">${emptyMsg}</div>`;
-            }
+            const emptyCopy = showSearch && searchValue
+                ? ['render.emptyKeywordsFound', 'No keywords found']
+                : (profile === 'kids' ? kidsMode : mainMode) === 'whitelist'
+                    ? ['render.emptyKeywordsAllowed', 'No keywords allowed']
+                    : ['render.emptyKeywordsBlocked', 'No keywords blocked'];
+            const emptyState = document.createElement('div');
+            emptyState.className = minimal ? 'empty-state' : 'empty-state-large';
+            if (!minimal) emptyState.style.padding = '20px';
+            setRendererCopy(emptyState, 'textContent', emptyCopy[0], emptyCopy[1]);
+            container.appendChild(emptyState);
             return;
         }
 
@@ -539,15 +603,26 @@ const RenderEngine = (() => {
 
     function formatKeywordDateFilterLabel(value) {
         const filter = normalizeKeywordDateFilterForUi(value);
-        if (!filter.enabled) return 'Date';
-        if (filter.condition === 'before') return filter.toDate ? `Before ${filter.toDate}` : 'Date on';
-        if (filter.condition === 'between') {
-            if (filter.fromDate && filter.toDate) return `${filter.fromDate} - ${filter.toDate}`;
-            if (filter.fromDate) return `After ${filter.fromDate}`;
-            if (filter.toDate) return `Before ${filter.toDate}`;
-            return 'Date on';
+        if (!filter.enabled) return rendererText('render.dateLabel', 'Date');
+        if (filter.condition === 'before') {
+            return filter.toDate
+                ? rendererText('render.dateBefore', 'Before {date}', { date: filter.toDate })
+                : rendererText('render.dateOn', 'Date on');
         }
-        return filter.fromDate ? `After ${filter.fromDate}` : 'Date on';
+        if (filter.condition === 'between') {
+            if (filter.fromDate && filter.toDate) {
+                return rendererText('render.dateBetween', '{fromDate} - {toDate}', {
+                    fromDate: filter.fromDate,
+                    toDate: filter.toDate
+                });
+            }
+            if (filter.fromDate) return rendererText('render.dateAfter', 'After {date}', { date: filter.fromDate });
+            if (filter.toDate) return rendererText('render.dateBefore', 'Before {date}', { date: filter.toDate });
+            return rendererText('render.dateOn', 'Date on');
+        }
+        return filter.fromDate
+            ? rendererText('render.dateAfter', 'After {date}', { date: filter.fromDate })
+            : rendererText('render.dateOn', 'Date on');
     }
 
     function attachKeywordHelpBubble(element, message) {
@@ -657,10 +732,12 @@ const RenderEngine = (() => {
         const commentsEnabled = entry.comments === true;
         let commentsToggle = null;
         if (shouldShowCommentsToggle) {
-            const commentsToggleText = minimal ? 'C' : 'Comment';
-            const commentsToggleTitle = commentsEnabled
+            const commentsToggleText = minimal ? 'C' : rendererText('render.commentLabel', 'Comment');
+            const commentsToggleTitleKey = commentsEnabled ? 'render.commentOnTooltip' : 'render.commentOffTooltip';
+            const commentsToggleTitleFallback = commentsEnabled
                 ? 'Comment is on: this keyword also checks matching comment text.'
                 : 'Comment is off: this keyword checks video titles and metadata only.';
+            const commentsToggleTitle = rendererText(commentsToggleTitleKey, commentsToggleTitleFallback);
             commentsToggle = UIComponents?.createToggleButton
                 ? UIComponents.createToggleButton({
                     text: commentsToggleText,
@@ -718,6 +795,12 @@ const RenderEngine = (() => {
                 })();
 
             attachKeywordHelpBubble(commentsToggle, commentsToggleTitle);
+            if (!minimal) {
+                setRendererCopy(commentsToggle, 'textContent', 'render.commentLabel', 'Comment');
+            }
+            setRendererCopy(commentsToggle, 'title', commentsToggleTitleKey, commentsToggleTitleFallback);
+            setRendererCopy(commentsToggle, 'aria-label', commentsToggleTitleKey, commentsToggleTitleFallback);
+            setRendererCopy(commentsToggle, 'data-filtertube-help', commentsToggleTitleKey, commentsToggleTitleFallback);
         }
 
         if (isChannelDerived && shouldShowToggles && profile === 'kids') {
@@ -725,6 +808,12 @@ const RenderEngine = (() => {
                 sourceKey: channelDerivedSourceKey,
                 title: 'Auto-added by "Filter All" - managed in Channel Management'
             });
+            setRendererCopy(
+                badge,
+                'title',
+                'render.autoAddedFilterAllTitle',
+                'Auto-added by "Filter All" - managed in Channel Management'
+            );
 
             if (!minimal) {
                 if (badge instanceof Node) controls.appendChild(badge);
@@ -735,8 +824,19 @@ const RenderEngine = (() => {
                 if (channel) {
                     const originLabel = document.createElement('span');
                     originLabel.className = 'channel-derived-origin';
-                    originLabel.textContent = `Linked to ${decodeChannelDisplayValue(channel.name || channel.handleDisplay || channel.handle || channel.customUrl || channel.id)}`;
-                    originLabel.title = `This keyword is automatically synced with channel's "Filter All" setting`;
+                    setRendererCopy(
+                        originLabel,
+                        'textContent',
+                        'render.linkedToChannel',
+                        'Linked to {channelName}',
+                        () => ({ channelName: decodeChannelDisplayValue(channel.name || channel.handleDisplay || channel.handle || channel.customUrl || channel.id) })
+                    );
+                    setRendererCopy(
+                        originLabel,
+                        'title',
+                        'render.keywordAutoSyncedWithFilterAll',
+                        'This keyword is automatically synced with channel\'s "Filter All" setting'
+                    );
                     left.appendChild(originLabel);
                 }
             }
@@ -745,6 +845,12 @@ const RenderEngine = (() => {
                 sourceKey: channelDerivedSourceKey,
                 title: 'Auto-added by "Filter All Content" - managed in Channel Management'
             });
+            setRendererCopy(
+                badge,
+                'title',
+                'render.autoAddedFilterAllContentTitle',
+                'Auto-added by "Filter All Content" - managed in Channel Management'
+            );
             if (commentsToggle) controls.appendChild(commentsToggle);
 
             if (!minimal) {
@@ -757,8 +863,20 @@ const RenderEngine = (() => {
                 if (channel) {
                     const originLabel = document.createElement('span');
                     originLabel.className = 'channel-derived-origin';
-                    originLabel.textContent = `Linked to ${decodeChannelDisplayValue(channel.name || channel.handleDisplay || channel.handle || channel.customUrl || channel.id)}`;
-                    originLabel.title = `This keyword filters content mentioning "${entry.word}" - automatically synced with channel's "Filter All Content" setting`;
+                    setRendererCopy(
+                        originLabel,
+                        'textContent',
+                        'render.linkedToChannel',
+                        'Linked to {channelName}',
+                        () => ({ channelName: decodeChannelDisplayValue(channel.name || channel.handleDisplay || channel.handle || channel.customUrl || channel.id) })
+                    );
+                    setRendererCopy(
+                        originLabel,
+                        'title',
+                        'render.keywordFilterAllContentOrigin',
+                        'This keyword filters content mentioning "{word}" - automatically synced with channel\'s "Filter All Content" setting',
+                        () => ({ word: entry.word })
+                    );
                     left.appendChild(originLabel);
                 }
             }
@@ -766,7 +884,7 @@ const RenderEngine = (() => {
             // User keyword: show exact toggle and delete button
 
             // Exact toggle
-            const exactToggleText = minimal ? 'E' : 'Exact';
+            const exactToggleText = minimal ? 'E' : rendererText('render.exactLabel', 'Exact');
             const exactToggleTitle = getExactKeywordHelpText(entry);
             const exactToggle = UIComponents?.createToggleButton ?
                 UIComponents.createToggleButton({
@@ -790,12 +908,39 @@ const RenderEngine = (() => {
                 }) :
                 createFallbackExactToggle(entry, minimal, profile);
             attachKeywordHelpBubble(exactToggle, exactToggleTitle);
+            if (!minimal) {
+                setRendererCopy(exactToggle, 'textContent', 'render.exactLabel', 'Exact');
+            }
+            const exactToggleTitleKey = entry.exact ? 'render.exactOnTooltip' : 'render.exactOffTooltip';
+            const exactToggleTitleFallback = entry.exact
+                ? 'Exact is on: "{word}" must appear as its own word.'
+                : 'Exact is off: "{word}" can also match plurals or longer forms when YouTube exposes that text.';
+            const exactToggleValues = () => ({ word: String(entry.word || 'this keyword').trim() || 'this keyword' });
+            setRendererCopy(exactToggle, 'title', exactToggleTitleKey, exactToggleTitleFallback, exactToggleValues);
+            setRendererCopy(exactToggle, 'data-filtertube-help', exactToggleTitleKey, exactToggleTitleFallback, exactToggleValues);
+            setRendererCopy(
+                exactToggle,
+                'aria-label',
+                'render.exactAriaLabel',
+                '{label}: {details}',
+                () => ({
+                    label: minimal ? 'E' : rendererText('render.exactLabel', 'Exact'),
+                    details: rendererText(exactToggleTitleKey, exactToggleTitleFallback, exactToggleValues)
+                })
+            );
 
             const dateFilter = normalizeKeywordDateFilterForUi(entry.dateFilter);
-            const dateToggleText = minimal ? 'D' : 'Date';
-            const dateToggleTitle = dateFilter.enabled
-                ? `Date is on: this keyword only applies to videos ${formatKeywordDateFilterLabel(dateFilter).toLowerCase()}. If Comment is also on, comments use the parent video's upload date.`
+            const dateToggleText = minimal ? 'D' : rendererText('render.dateLabel', 'Date');
+            const dateToggleTitleKey = dateFilter.enabled ? 'render.dateOnTooltip' : 'render.dateOffTooltip';
+            const dateToggleTitleFallback = dateFilter.enabled
+                ? "Date is on: this keyword only applies to videos {dateRange}. If Comment is also on, comments use the parent video's upload date."
                 : 'Date is off: set this only when the keyword should apply to newer, older, or date-range videos.';
+            const dateToggleValues = () => ({
+                dateRange: formatKeywordDateFilterLabel(dateFilter).toLocaleLowerCase(window.FilterTubeUiLocalization?.locale || 'en')
+            });
+            const dateToggleTitle = rendererText(dateToggleTitleKey, dateToggleTitleFallback, dateToggleValues);
+            const dateToggleLabel = () => minimal ? 'D' : rendererText('render.dateLabel', 'Date');
+            const dateToggleDetails = () => rendererText(dateToggleTitleKey, dateToggleTitleFallback, dateToggleValues);
             const dateToggle = (() => {
                 const toggle = document.createElement('div');
                 toggle.className = `exact-toggle toggle-variant-amber ${dateFilter.enabled ? 'active' : ''}`.trim();
@@ -803,7 +948,10 @@ const RenderEngine = (() => {
                 toggle.title = dateToggleTitle;
                 toggle.setAttribute('role', 'button');
                 toggle.setAttribute('aria-pressed', dateFilter.enabled ? 'true' : 'false');
-                toggle.setAttribute('aria-label', `${dateToggleText}: ${dateToggleTitle}`);
+                toggle.setAttribute('aria-label', rendererText('render.dateAriaLabel', '{label}: {details}', {
+                    label: dateToggleText,
+                    details: dateToggleTitle
+                }));
                 toggle.setAttribute('tabindex', '0');
                 const activate = async () => {
                     if (typeof onUpdateDateFilter === 'function') {
@@ -820,6 +968,18 @@ const RenderEngine = (() => {
                 return toggle;
             })();
             attachKeywordHelpBubble(dateToggle, dateToggleTitle);
+            if (!minimal) {
+                setRendererCopy(dateToggle, 'textContent', 'render.dateLabel', 'Date');
+            }
+            setRendererCopy(dateToggle, 'title', dateToggleTitleKey, dateToggleTitleFallback, dateToggleValues);
+            setRendererCopy(dateToggle, 'data-filtertube-help', dateToggleTitleKey, dateToggleTitleFallback, dateToggleValues);
+            setRendererCopy(
+                dateToggle,
+                'aria-label',
+                'render.dateAriaLabel',
+                '{label}: {details}',
+                () => ({ label: dateToggleLabel(), details: dateToggleDetails() })
+            );
 
             // Delete button
             const deleteHandler = async () => {
@@ -878,6 +1038,7 @@ const RenderEngine = (() => {
         if (!container) return;
 
         cancelContainerRenderTasks(container);
+        localizedRendererContainers.add(container);
         container.__ftChannelRenderGen = (container.__ftChannelRenderGen || 0) + 1;
         const renderGen = container.__ftChannelRenderGen;
 
@@ -996,20 +1157,16 @@ const RenderEngine = (() => {
         container.innerHTML = '';
 
         if (displayChannels.length === 0) {
-            const emptyMsg = showSearch && searchValue
-                ? 'No channels found'
-                : (() => {
-                    if (profile === 'kids') {
-                        return kidsMode === 'whitelist' ? 'No channels allowed' : 'No channels blocked';
-                    }
-                    return mainMode === 'whitelist' ? 'No channels allowed' : 'No channels blocked';
-                })();
-
-            if (minimal) {
-                container.innerHTML = `<div class="empty-state">${emptyMsg}</div>`;
-            } else {
-                container.innerHTML = `<div class="empty-state-large" style="padding: 20px;">${emptyMsg}</div>`;
-            }
+            const emptyCopy = showSearch && searchValue
+                ? ['render.emptyChannelsFound', 'No channels found']
+                : (profile === 'kids' ? kidsMode : mainMode) === 'whitelist'
+                    ? ['render.emptyChannelsAllowed', 'No channels allowed']
+                    : ['render.emptyChannelsBlocked', 'No channels blocked'];
+            const emptyState = document.createElement('div');
+            emptyState.className = minimal ? 'empty-state' : 'empty-state-large';
+            if (!minimal) emptyState.style.padding = '20px';
+            setRendererCopy(emptyState, 'textContent', emptyCopy[0], emptyCopy[1]);
+            container.appendChild(emptyState);
             return;
         }
 
@@ -1399,10 +1556,17 @@ const RenderEngine = (() => {
         }
 
         if (channel?.source === 'comments') {
-            infoGroup.appendChild(createSourceBadge({
+            const commentsBadge = createSourceBadge({
                 sourceKey: 'comments',
                 title: 'This channel was blocked from the YouTube comments menu'
-            }));
+            });
+            setRendererCopy(
+                commentsBadge,
+                'title',
+                'render.channelCommentsBadgeTitle',
+                'This channel was blocked from the YouTube comments menu'
+            );
+            infoGroup.appendChild(commentsBadge);
         }
 
         const managedListId = typeof channel?.managedListId === 'string' ? channel.managedListId.trim() : '';
@@ -1410,11 +1574,25 @@ const RenderEngine = (() => {
             const managedListName = (typeof channel?.managedListName === 'string' && channel.managedListName.trim())
                 || (typeof channel?.managedListSourceLabel === 'string' && channel.managedListSourceLabel.trim())
                 || 'Imported list';
-            infoGroup.appendChild(createPillBadge({
+            const managedListBadge = createPillBadge({
                 text: `List: ${managedListName}`,
                 title: 'This channel came from an imported parent-approved channel list',
                 variantClass: 'badge-variant-managed-list'
-            }));
+            });
+            setRendererCopy(
+                managedListBadge,
+                'textContent',
+                'render.managedListLabel',
+                'List: {listName}',
+                () => ({ listName: managedListName })
+            );
+            setRendererCopy(
+                managedListBadge,
+                'title',
+                'render.parentApprovedListBadgeTitle',
+                'This channel came from an imported parent-approved channel list'
+            );
+            infoGroup.appendChild(managedListBadge);
         } else if (['import', 'managed_channel_list', 'blocktube', 'blocktube-channel-name'].includes(String(channel?.source || '').trim().toLowerCase())) {
             const importedSource = String(channel?.source || '').trim().toLowerCase();
             infoGroup.appendChild(createPillBadge({
@@ -1779,9 +1957,13 @@ const RenderEngine = (() => {
     function getExactKeywordHelpText(entry = {}) {
         const word = String(entry.word || 'this keyword').trim() || 'this keyword';
         if (entry.exact) {
-            return `Exact is on: "${word}" must appear as its own word.`;
+            return rendererText('render.exactOnTooltip', 'Exact is on: "{word}" must appear as its own word.', { word });
         }
-        return `Exact is off: "${word}" can also match plurals or longer forms when YouTube exposes that text.`;
+        return rendererText(
+            'render.exactOffTooltip',
+            'Exact is off: "{word}" can also match plurals or longer forms when YouTube exposes that text.',
+            { word }
+        );
     }
 
     /**

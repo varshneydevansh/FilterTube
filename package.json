@@ -6,6 +6,10 @@
   "scripts": {
     "build:nanah-vendor": "node scripts/build-nanah-vendor.mjs",
     "build:ui": "node scripts/build-extension-ui.mjs",
+    "check:ui-locales": "node scripts/check-ui-locales.mjs",
+    "check:ui-locales:targets": "node scripts/check-ui-locales.mjs --require-all",
+    "audit:ui-copy": "python3 scripts/audit-ui-copy.py",
+    "audit:ui-copy:complete": "python3 scripts/audit-ui-copy.py --require-complete",
     "dev": "node build.js",
     "build": "node build.js",
     "build:chrome": "node build.js chrome",

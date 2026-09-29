@@ -20,6 +20,30 @@ body {
     position: relative;
 }
 
+.ft-interface-language-field {
+    display: grid;
+    gap: 0.5rem;
+    width: 100%;
+    font-weight: 600;
+}
+
+.ft-interface-language-field[hidden] {
+    display: none;
+}
+
+.ft-interface-language-field .select-input {
+    width: 100%;
+    min-width: 0;
+    min-height: 2.75rem;
+}
+
+.ft-interface-language-card .import-export-hint {
+    margin: 0.75rem 0 0;
+    font-size: 0.875rem;
+    line-height: 1.5;
+    overflow-wrap: anywhere;
+}
+
 body::after {
     content: "";
     position: fixed;
@@ -2435,6 +2459,29 @@ html[data-theme="dark"] .card::after {
     transform: translateY(-50%);
     color: #2f6f48;
     font-weight: 900;
+}
+
+/* Keep directional controls on the reading-side edge in RTL interface previews. */
+:root[dir="rtl"] .nav-toggle {
+    left: auto;
+    right: 1rem;
+}
+
+:root[dir="rtl"] .ft-success-toast {
+    right: auto;
+    left: 20px;
+    animation-name: slideInLeft, fadeOut;
+}
+
+@keyframes slideInLeft {
+    from { transform: translateX(-100%); opacity: 0; }
+    to { transform: translateX(0); opacity: 1; }
+}
+
+:root[dir="rtl"] .help-flow article:not(:last-child)::after {
+    content: "←";
+    right: auto;
+    left: -0.78rem;
 }
 
 .help-flow article span {

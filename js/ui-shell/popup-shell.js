@@ -324,10 +324,11 @@
         role: "button",
         tabIndex: "0",
         "aria-pressed": "true",
-        title: "Toggle Filtering"
+        title: "Toggle Filtering",
+        "data-ft-i18n-title": "popup.toggleFiltering"
       },
       /* @__PURE__ */ _("img", { src: "../icons/icon-48.png", alt: "FilterTube", className: "logo-icon" }),
-      /* @__PURE__ */ _("div", { className: "brand-text" }, /* @__PURE__ */ _("h1", { className: "app-title" }, "FilterTube"), /* @__PURE__ */ _("span", { id: "extensionStatusText", className: "extension-status" }, "Enabled"))
+      /* @__PURE__ */ _("div", { className: "brand-text" }, /* @__PURE__ */ _("h1", { className: "app-title" }, "FilterTube"), /* @__PURE__ */ _("span", { id: "extensionStatusText", className: "extension-status", "data-ft-i18n": "popup.enabled" }, "Enabled"))
     ), /* @__PURE__ */ _("div", { className: "header-actions" }, /* @__PURE__ */ _("div", { id: "ftProfileMenuPopup", className: "ft-profile-menu" }, /* @__PURE__ */ _(
       "button",
       {
@@ -336,7 +337,8 @@
         type: "button",
         "aria-haspopup": "listbox",
         "aria-expanded": "false",
-        title: "Active profile"
+        title: "Active profile",
+        "data-ft-i18n-title": "popup.activeProfile"
       }
     ), /* @__PURE__ */ _(
       "div",
@@ -353,6 +355,8 @@
         className: "icon-button ft-popup-open",
         title: "Open full settings",
         "aria-label": "Open full settings",
+        "data-ft-i18n-title": "popup.openFullSettings",
+        "data-ft-i18n-aria-label": "popup.openFullSettings",
         type: "button"
       },
       /* @__PURE__ */ _("svg", { width: "18", height: "18", viewBox: "0 0 24 24", fill: "none", stroke: "currentColor" }, /* @__PURE__ */ _("path", { d: "M8 8h8v8", strokeWidth: "1.8", strokeLinecap: "round", strokeLinejoin: "round" }), /* @__PURE__ */ _(
@@ -373,9 +377,9 @@
         "aria-live": "polite",
         hidden: true
       },
-      /* @__PURE__ */ _("span", { className: "ft-popup-time-status__label" }, "YouTube time"),
+      /* @__PURE__ */ _("span", { className: "ft-popup-time-status__label", "data-ft-i18n": "popup.youtubeTime" }, "YouTube time"),
       /* @__PURE__ */ _("strong", { id: "ftManagedTimeStatusValuePopup", className: "ft-popup-time-status__value" })
-    ), /* @__PURE__ */ _("main", { className: "app-content ft-popup-content" }, /* @__PURE__ */ _("section", { className: "ft-popup-filter-card" }, /* @__PURE__ */ _("div", { className: "ft-popup-filter-card__header" }, /* @__PURE__ */ _("div", null, /* @__PURE__ */ _("p", { className: "ft-popup-filter-card__eyebrow" }, "Quick control"), /* @__PURE__ */ _("h3", { className: "ft-popup-filter-card__title" }, "Update this profile fast")), /* @__PURE__ */ _("span", { className: "ft-popup-filter-card__badge" }, "Local-first")), /* @__PURE__ */ _("div", { id: "popupFiltersTabsContainer" })))));
+    ), /* @__PURE__ */ _("main", { className: "app-content ft-popup-content" }, /* @__PURE__ */ _("section", { className: "ft-popup-filter-card" }, /* @__PURE__ */ _("div", { className: "ft-popup-filter-card__header" }, /* @__PURE__ */ _("div", null, /* @__PURE__ */ _("p", { className: "ft-popup-filter-card__eyebrow", "data-ft-i18n": "popup.quickControl" }, "Quick control"), /* @__PURE__ */ _("h3", { className: "ft-popup-filter-card__title", "data-ft-i18n": "popup.updateProfile" }, "Update this profile fast")), /* @__PURE__ */ _("span", { className: "ft-popup-filter-card__badge", "data-ft-i18n": "popup.localFirst" }, "Local-first")), /* @__PURE__ */ _("div", { id: "popupFiltersTabsContainer" })))));
   }
   applyExtensionEnvironment("popup");
   var mountNode = document.getElementById("popupRoot");

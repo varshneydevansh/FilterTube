@@ -1,0 +1,18 @@
+{
+  "3.3.7": {
+    "ctaLabel": "Lihat Yang Baru",
+    "headline": "Daftar besar lebih cepat, impor tersimpan, dan Android tersedia untuk umum",
+    "summary": "FilterTube 3.3.7 mengurangi pekerjaan berulang pada daftar aturan besar, memindahkan penyelesaian kanal impor ke antrean latar belakang yang tersimpan, menambahkan laporan impor dengan batas tampilan, memperkuat perilaku Beranda dan Advert Void, memungkinkan unggahan rilis GitHub dilanjutkan, dan mengumumkan aplikasi Android publik di Google Play.",
+    "bannerSummary": "FilterTube 3.3.7 menghadirkan pemfilteran daftar besar yang lebih cepat, antrean tersimpan untuk melengkapi kanal impor, laporan impor yang mudah ditinjau, Beranda dan Advert Void yang lebih aman, unggahan rilis yang dapat dilanjutkan, serta aplikasi Android publik di Google Play.",
+    "highlights": [
+      "Daftar kanal dan ID video yang besar menggunakan kembali mesin terkompilasi dan indeks berbasis Set, melewati metadata yang tidak diperlukan aturan aktif, menggabungkan penulisan waktu tersembunyi, serta memproses kartu Beranda yang berubah secara bertahap sambil tetap menjalankan pemrosesan penuh untuk perubahan struktural.",
+      "Penyempurnaan terakhir untuk daftar besar mencegah pemanggilan setter JSON terfilter secara ganda, meneruskan revisi setelan melalui kedua jalur mulai, menggunakan kembali indeks DOM untuk snapshot tak berubah yang sama, dan hanya membuat jalur diagnostik saat debug performa diaktifkan.",
+      "Impor CSV, TXT, JSON daftar aturan FilterTube, JSON migrasi BlockTube, dan impor terkelola kini memakai antrean pengayaan persisten yang dikelola di latar belakang: satu pencarian pada satu waktu, jeda acak 7–15 detik saat perangkat aktif, percobaan ulang per baris, pemulihan melalui alarm Chrome, otorisasi profil, serta status akhir tidak ditemukan atau dihentikan.",
+      "Laporan Impor persisten menjelaskan status selesai, menunggu, sedang dicari, mencoba lagi, pencarian gagal permanen, hanya nama, dilewati, dan antrean tidak tersedia. Laporan tetap tersedia setelah dasbor ditutup, menampilkan laporan besar dalam bagian terbatas, mengekspor baris yang belum terselesaikan, dan dapat menghapus aturan impor belum terselesaikan yang identitasnya unik dengan aman.",
+      "Pemulaian feed Beranda dan penanganan perubahan kini menargetkan kartu yang berubah dan mempertahankan pemrosesan penuh sebagai cadangan untuk perubahan struktural. Pembaruan yang hanya memperkaya metadata tidak menyegarkan tab YouTube dan mengurangi penataan ulang kartu.",
+      "Advert Void kini mensyaratkan status pemutar `ad-showing` dan `ad-interrupting` secara bersamaan atau bukti iklan terlihat yang independen. Penanganan kartu bersponsor tidak lagi dihitung sebagai pekerjaan mutasi renderer umum.",
+      "Penerbitan rilis GitHub menggunakan kredensial GitHub CLI, membuat draf sebelum mengunggah, melanjutkan tag yang sudah ada, hanya mengunggah aset yang belum ada, memverifikasi kumpulan aset akhir, dan baru menerbitkan setelah verifikasi.",
+      "Aplikasi FilterTube untuk ponsel dan tablet Android kini tersedia untuk umum di Google Play. Aplikasi dapat dipasang dari [halaman publik](https://play.google.com/store/apps/details?id=com.filtertube.app) atau ditemukan dengan mencari FilterTube di Google Play."
+    ]
+  }
+}

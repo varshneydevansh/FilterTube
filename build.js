@@ -26,7 +26,7 @@ const { version: PACKAGE_VERSION } = require('./package.json');
 // Configuration
 const ALL_BROWSER_TARGETS = ['chrome', 'firefox', 'opera'];
 const VERSION = PACKAGE_VERSION; // Matches manifest/package
-const COMMON_DIRS = ['js', 'css', 'html', 'icons', 'data', 'assets'];
+const COMMON_DIRS = ['_locales', 'js', 'css', 'html', 'icons', 'data', 'assets'];
 const COMMON_FILES = ['README.md', 'CHANGELOG.md', 'LICENSE'];
 const REPO_OWNER = 'varshneydevansh';
 const REPO_NAME = 'FilterTube';

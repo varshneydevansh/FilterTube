@@ -1,0 +1,18 @@
+{
+  "3.3.7": {
+    "ctaLabel": "नया का बा देखीं",
+    "headline": "बड़हन सूची अउरी तेज, आयात के जानकारी बचल रही, Android सभे खातिर खुलल",
+    "summary": "FilterTube 3.3.7 बड़हन नियम-सूची में बार-बार होखे वाला काम घटावेला, आयात भइल चैनल के जानकारी पूरा करे के काम टिकाऊ बैकग्राउंड कतार में भेजेला, सीमित आकार के आयात रिपोर्ट जोड़ेला, Home आ Advert Void के व्यवहार मजबूत करेला, GitHub रिलीज अपलोड फेरु चालू करे देला, आ Google Play पर Android ऐप सभे खातिर उपलब्ध होखे के घोषणा करेला।",
+    "bannerSummary": "3.3.7 में बड़हन सूची के तेज फिल्टरिंग, आयात भइल चैनल पूरा करे खातिर टिकाऊ कतार, जाँच सके लायक आयात रिपोर्ट, अउरी सुरक्षित Home आ Advert Void, फेरु चालू हो सके वाला रिलीज अपलोड, आ Google Play पर सभे खातिर Android ऐप शामिल बा।",
+    "highlights": [
+      "बड़हन चैनल आ वीडियो-ID सूची compiled engines आ Set-आधारित indexes के फेरु इस्तेमाल करेली, अइसन metadata छोड़ देली जेकरा के कवनो चालू नियम इस्तेमाल ना कर सके, छिपल समय के लिखाई एक साथ करेली, आ बदलल Home कार्ड के धीरे-धीरे संभालेली; संरचना बदले पर पूरा प्रक्रिया जारी रहेला।",
+      "बड़हन सूची खातिर आखिरी सुधार filtered JSON setter के दोहराव वाला pass रोकेला, दूनो startup path से setting revisions आगे भेजेला, immutable snapshot एके रहे पर DOM indexes फेरु इस्तेमाल करेला, आ performance debugging चालू होखे पर ही diagnostic path बनावेला।",
+      "CSV, TXT, FilterTube नियम-सूची JSON, BlockTube migration JSON, आ managed imports अब बैकग्राउंड से चले वाला टिकाऊ enrichment queue साझा करेला: एक बेर में एक lookup, डिवाइस जागल रहे त अनियमित 7–15 सेकंड के अंतर, हर row खातिर retry, Chrome alarms से recovery, profile के अनुमति, आ आखिरी में not found भा terminated के स्थिति।",
+      "टिकाऊ Import Reports पूरा, बाकी, खोजत, फेरु कोशिश, हमेशा खातिर lookup असफल, खाली नाम, छोड़ल, आ queue ना होखे के स्थिति बतावेली। Dashboard बंद होखला परो उपलब्ध रहेली, बड़हन रिपोर्ट के सीमित हिस्सा में देखावेली, अनसुलझल row export करेली, आ अलग पहचान वाला अनसुलझल आयात नियम के सुरक्षित तरीका से हटावे देली।",
+      "Home feed के शुरुआत आ बदलाव के देखरेख बदलल कार्ड पर ध्यान देला आ संरचनात्मक बदलाव खातिर पूरा fallback बचा के रखेला। खाली metadata जोड़े वाला update YouTube tab refresh ना करे आ कार्ड के फेरु सजावे के काम घटावे।",
+      "Advert Void अब player के `ad-showing` आ `ad-interrupting` दुनो स्थिति एक साथ माँगे ला, ना त देखाई देत विज्ञापन के अलग सबूत चाहीं। Sponsored-card संभाले के काम अब आम renderer mutation work ना गिनाला।",
+      "GitHub release publish करे में GitHub CLI credentials लागेला, upload से पहिले drafts बनावल जाला, पुरान tags से आगे बढ़ल जाला, खाली ना होखे वाला assets upload होखेला, अंतिम asset set के जाँच होला, आ जाँच के बादे publish होला।",
+      "Android फोन आ टैबलेट खातिर FilterTube ऐप अब Google Play पर सभे खातिर उपलब्ध बा। [सार्वजनिक पन्ना](https://play.google.com/store/apps/details?id=com.filtertube.app) से इंस्टॉल करीं भा Google Play पर FilterTube खोजीं।"
+    ]
+  }
+}

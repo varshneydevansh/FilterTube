@@ -1,0 +1,18 @@
+{
+  "3.3.7": {
+    "ctaLabel": "Duba sababbin abubuwa",
+    "headline": "Manyan jerin sun fi sauri, shigo da bayanai yana dawwama, Android ya buɗe ga jama'a",
+    "summary": "FilterTube 3.3.7 yana rage aikin da ake maimaitawa a manyan jerin ƙa'idoji, yana mayar da cika bayanan tashoshin da aka shigo da su zuwa jerin aiki na baya mai dawwama, yana ƙara rahotannin shigo da bayanai masu iyakantaccen girma, yana ƙarfafa halayen Home da Advert Void, yana ba da damar ci gaba da loda sakin GitHub, kuma yana sanar da samuwar manhajar Android ga jama'a a Google Play.",
+    "bannerSummary": "3.3.7 ya ƙunshi tace manyan jerin cikin sauri, jerin aiki mai dawwama don kammala bayanan tashoshin da aka shigo da su, rahotannin shigo da bayanai da ake iya dubawa, ingantaccen tsaron Home da Advert Void, loda sakin da za a iya ci gaba da shi, da manhajar Android a Google Play ga jama'a.",
+    "highlights": [
+      "Manyan jerin tashoshi da ID na bidiyo suna sake amfani da compiled engines da fihirisa bisa Set, suna tsallake metadata da babu wata ƙa'ida mai aiki da za ta yi amfani da ita, suna haɗa rubuce-rubucen lokacin ɓoyewa, kuma suna sarrafa katunan Home da suka canza a hankali; ana ci gaba da cikakken sarrafawa idan canjin tsarin ya faru.",
+      "Gyaran ƙarshe ga manyan jerin yana hana maimaita aikin filtered JSON setters, yana wuce da sabbin sigogin saituna ta hanyoyin farawa biyu, yana sake amfani da DOM indexes idan immutable snapshot ɗin bai canza ba, kuma yana gina hanyoyin bincike ne kawai idan an kunna performance debugging.",
+      "Shigo da CSV, TXT, JSON na jerin ƙa'idojin FilterTube, JSON na sauyin BlockTube, da shigo da bayanan da ake sarrafawa yanzu suna amfani da jerin aikin enrichment mai dawwama da ke ƙarƙashin kulawar bango: bincike ɗaya a lokaci guda, tazarar bazata ta sakan 7–15 yayin da na'ura ke aiki, sake gwadawa ga kowane layi, dawo da aiki ta Chrome alarms, izini bisa profile, da matsayin ƙarshe na ba a samu ba ko an dakatar.",
+      "Import Reports masu dawwama suna bayyana matsayin an kammala, na jira, ana nema, ana sake gwadawa, bincike ya gaza har abada, suna kawai, an tsallake, da jerin aiki ya ɓace. Ana iya samunsu bayan an rufe dashboard, suna nuna manyan rahotanni a ƙananan ɓangarori, suna fitar da layukan da ba a warware ba, kuma suna iya cire ƙa'idojin da aka shigo da su waɗanda ba a warware ba cikin aminci idan suna da keɓaɓɓiyar shaida.",
+      "Fara feed na Home da sarrafa sauye-sauye suna niyya ga katunan da suka canza, tare da riƙe cikakken madadin sarrafawa don canjin tsari. Sabuntawar da ke ƙara metadata kawai ba sa sabunta shafukan YouTube kuma suna rage sake tsara katunan.",
+      "Advert Void yanzu yana buƙatar yanayin player `ad-showing` da `ad-interrupting` a lokaci guda ko wata shaida mai zaman kanta ta talla da ake gani. Ba a ƙara ƙirga sarrafa katunan tallafi a matsayin aikin canjin renderer na gaba ɗaya ba.",
+      "Buga sakin GitHub yana amfani da takardun izinin GitHub CLI, yana ƙirƙirar drafts kafin loda fayiloli, yana ci gaba daga tags da ake da su, yana loda assets da suka ɓace kawai, yana tantance cikakken tarin assets na ƙarshe, kuma yana bugawa ne bayan tantancewar.",
+      "Manhajar FilterTube don wayoyi da allunan Android yanzu tana samuwa ga jama'a a Google Play. Za a iya girka ta daga [shafin jama'a](https://play.google.com/store/apps/details?id=com.filtertube.app) ko a nemo FilterTube a Google Play."
+    ]
+  }
+}

@@ -1,0 +1,10 @@
+{
+  "extensionName": {
+    "message": "FilterTube",
+    "description": "The extension name shown by the browser."
+  },
+  "extensionDescription": {
+    "message": "Restore peace of mind to your digital video experience.",
+    "description": "The extension description shown by the browser."
+  }
+}

@@ -1,0 +1,18 @@
+{
+  "3.3.7": {
+    "ctaLabel": "See Wetin New",
+    "headline": "Big lists dey faster, imports dey stay, Android don open to everybody",
+    "summary": "FilterTube 3.3.7 dey reduce repeated work for big rule lists, move the work wey dey complete imported channels go one background queue wey dey stay, add import reports wey get size limit, make Home and Advert Void work stronger, allow GitHub release uploads to continue after pause, and announce say Android app don open to everybody for Google Play.",
+    "bannerSummary": "For 3.3.7, big-list filtering dey faster, imported-channel completion get one queue wey dey stay, import reports easy to review, Home and Advert Void safer, release uploads fit continue, and Android app dey open to everybody for Google Play.",
+    "highlights": [
+      "Big channel and video-ID lists dey reuse compiled engines and Set-based indexes, skip metadata wey no active rule fit use, join hidden-time writes together, and handle changed Home cards small-small; structural changes still get full processing.",
+      "The final big-list update stop filtered JSON setter work from running twice, pass settings revisions through both startup paths, reuse DOM indexes when immutable snapshot no change, and build diagnostic paths only when performance debugging dey on.",
+      "CSV, TXT, FilterTube rule-list JSON, BlockTube migration JSON, and managed imports now share one persistent enrichment queue wey background dey manage: one lookup at a time, random 7–15 second wait while device dey awake, retry for each row, recovery through Chrome alarms, profile authorization, and final not-found or terminated status.",
+      "Persistent Import Reports explain complete, pending, fetching, retrying, permanent lookup failure, name-only, skipped, and missing-queue status. Dem still dey available after dashboard close, show big reports for limited sections, export rows wey no resolve, and safely remove unresolved imported rules wey get unique identity.",
+      "Home feed startup and change handling dey target cards wey change and keep full fallback for structural changes. Updates wey only add metadata no dey refresh YouTube tabs and dey reduce card rearrangement.",
+      "Advert Void now need both player states `ad-showing` and `ad-interrupting` together, or separate proof say advert dey visible. Sponsored-card handling no longer count as general renderer mutation work.",
+      "GitHub release publishing dey use GitHub CLI credentials, create drafts before upload, continue from tags wey already dey, upload only assets wey miss, verify the final asset set, and publish only after the check.",
+      "FilterTube app for Android phones and tablets don open to everybody for Google Play. You fit install am from the [public listing](https://play.google.com/store/apps/details?id=com.filtertube.app) or search Google Play for FilterTube."
+    ]
+  }
+}

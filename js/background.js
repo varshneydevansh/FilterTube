@@ -3267,6 +3267,23 @@ async function loadReleaseNotesData() {
     return releaseNotesCache;
 }
 
+const localizedReleaseNotesCache = new Map();
+async function loadLocalizedReleaseNote(version) {
+    try {
+        const saved = await storageGet(['ftUiLocalePreference']);
+        const locale = saved?.ftUiLocalePreference;
+        if (typeof locale !== 'string' || !/^[a-z]{2,3}(?:-[a-zA-Z0-9]{2,8})*$/.test(locale) || locale === 'en') return null;
+        if (!localizedReleaseNotesCache.has(locale)) {
+            const resource = browserAPI.runtime.getURL(`data/ui_locales/release_notes.${locale}.json`);
+            const pending = fetch(resource).then(response => response.ok ? response.json() : null).catch(() => null);
+            localizedReleaseNotesCache.set(locale, pending);
+        }
+        return (await localizedReleaseNotesCache.get(locale))?.[version] || null;
+    } catch (_) {
+        return null;
+    }
+}
+
 /**
  * Looks up the given version in release_notes.json and builds the payload used
  * both in the dashboard cards and the YouTube banner CTA.
@@ -3277,12 +3294,13 @@ async function buildReleaseNotesPayload(version) {
         if (Array.isArray(data)) {
             const entry = data.find(note => note?.version === version);
             if (entry) {
+                const localized = await loadLocalizedReleaseNote(version);
                 return {
                     version,
-                    headline: entry.headline || RELEASE_NOTES_TEMPLATE.headline,
-                    body: entry.bannerSummary || entry.summary || entry.body || RELEASE_NOTES_TEMPLATE.body,
+                    headline: localized?.headline || entry.headline || RELEASE_NOTES_TEMPLATE.headline,
+                    body: localized?.bannerSummary || localized?.summary || entry.bannerSummary || entry.summary || entry.body || RELEASE_NOTES_TEMPLATE.body,
                     link: WHATS_NEW_PAGE_URL,
-                    ctaLabel: entry.ctaLabel || RELEASE_NOTES_TEMPLATE.ctaLabel
+                    ctaLabel: localized?.ctaLabel || entry.ctaLabel || RELEASE_NOTES_TEMPLATE.ctaLabel
                 };
             }
         }

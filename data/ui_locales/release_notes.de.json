@@ -1,0 +1,18 @@
+{
+  "3.3.7": {
+    "ctaLabel": "Neuigkeiten ansehen",
+    "headline": "Große Listen schneller, dauerhafte Importe und Android öffentlich verfügbar",
+    "summary": "FilterTube 3.3.7 reduziert wiederholte Arbeit bei großen Regellisten, verlagert die Vervollständigung importierter Kanäle in eine dauerhaft gespeicherte Hintergrundwarteschlange, ergänzt begrenzte Importberichte, macht das Verhalten der Startseite und von Advert Void robuster, ermöglicht fortsetzbare Uploads von GitHub-Releases und kündigt die öffentliche Android-App bei Google Play an.",
+    "bannerSummary": "Version 3.3.7 bietet schnelleres Filtern großer Listen, eine dauerhafte Warteschlange zur Vervollständigung importierter Kanäle, überprüfbare Importberichte, ein sichereres Verhalten von Startseite und Advert Void, fortsetzbare Release-Uploads und die öffentliche Android-App bei Google Play.",
+    "highlights": [
+      "Große Kanal- und Video-ID-Listen verwenden kompilierte Engines und Set-basierte Indizes erneut, überspringen Metadaten, die keine aktive Regel benötigt, bündeln Schreibvorgänge zur verborgenen Zeit und bearbeiten geänderte Startseiten-Karten schrittweise. Bei strukturellen Änderungen bleiben vollständige Durchläufe erhalten.",
+      "Die abschließende Verbesserung für große Listen verhindert doppelte Durchläufe gefilterter JSON-Setter, gibt Einstellungsrevisionen über beide Startpfade weiter, verwendet DOM-Indizes bei identischen unveränderlichen Snapshots erneut und erstellt Diagnosepfade nur bei aktivierter Performance-Analyse.",
+      "CSV-, TXT-, FilterTube-Regellisten-JSON-, BlockTube-Migrations-JSON- und verwaltete Importe nutzen jetzt eine gemeinsame, dauerhaft gespeicherte und im Hintergrund gesteuerte Anreicherungswarteschlange: eine Abfrage gleichzeitig, zufällige Abstände von 7 bis 15 Sekunden bei aktivem Gerät, Wiederholungen pro Zeile, Wiederherstellung durch Chrome-Alarme, Profilberechtigung und endgültige Zustände für nicht gefunden oder beendet.",
+      "Dauerhafte Importberichte erläutern die Zustände abgeschlossen, ausstehend, wird abgerufen, erneuter Versuch, dauerhaft fehlgeschlagene Suche, nur Name, übersprungen und fehlende Warteschlange. Sie bleiben nach dem Schließen des Dashboards verfügbar, zeigen große Berichte in begrenzten Abschnitten an, exportieren nicht aufgelöste Zeilen und können nicht aufgelöste importierte Regeln mit eindeutiger Identität sicher entfernen.",
+      "Der Start des Startseiten-Feeds und die Verarbeitung von Änderungen bearbeiten gezielt geänderte Karten und behalten den vollständigen Rückfallweg für strukturelle Änderungen bei. Aktualisierungen, die nur Metadaten anreichern, aktualisieren keine YouTube-Tabs und verringern das Neuanordnen der Karten.",
+      "Advert Void erfordert jetzt gleichzeitig die Player-Zustände `ad-showing` und `ad-interrupting` oder einen unabhängigen Nachweis sichtbarer Werbung. Die Verarbeitung gesponserter Karten zählt nicht mehr als allgemeine Renderer-Mutationsarbeit.",
+      "Die Veröffentlichung von GitHub-Releases verwendet die Zugangsdaten des GitHub CLI, erstellt Entwürfe vor dem Upload, setzt vorhandene Tags fort, lädt nur fehlende Assets hoch, überprüft den endgültigen Asset-Satz und veröffentlicht erst nach erfolgreicher Prüfung.",
+      "Die FilterTube-App für Android-Smartphones und -Tablets ist jetzt öffentlich bei Google Play verfügbar. Sie lässt sich über den [öffentlichen Eintrag](https://play.google.com/store/apps/details?id=com.filtertube.app) installieren oder durch die Suche nach FilterTube bei Google Play finden."
+    ]
+  }
+}

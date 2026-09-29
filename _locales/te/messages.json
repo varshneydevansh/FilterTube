@@ -1,0 +1,10 @@
+{
+  "extensionName": {
+    "message": "FilterTube",
+    "description": "The extension name shown by the browser."
+  },
+  "extensionDescription": {
+    "message": "మీ డిజిటల్ వీడియో అనుభవంలో మనశ్శాంతిని తిరిగి పొందండి.",
+    "description": "The extension description shown by the browser."
+  }
+}

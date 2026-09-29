@@ -1,0 +1,18 @@
+{
+  "3.3.7": {
+    "ctaLabel": "Xem điểm mới",
+    "headline": "Danh sách lớn nhanh hơn, nhập dữ liệu được lưu bền vững và Android đã mở công khai",
+    "summary": "FilterTube 3.3.7 giảm công việc lặp lại trên các danh sách quy tắc lớn, chuyển việc hoàn tất thông tin kênh đã nhập sang hàng đợi nền được lưu bền vững, bổ sung báo cáo nhập có giới hạn, tăng độ an toàn cho Trang chủ và Advert Void, cho phép tiếp tục tải bản phát hành lên GitHub và thông báo ứng dụng Android đã có mặt công khai trên Google Play.",
+    "bannerSummary": "Bản 3.3.7 có bộ lọc danh sách lớn nhanh hơn, hàng đợi bền vững để hoàn tất kênh đã nhập, báo cáo nhập dễ xem xét, Trang chủ và Advert Void an toàn hơn, tải bản phát hành có thể tiếp tục và ứng dụng Android công khai trên Google Play.",
+    "highlights": [
+      "Danh sách kênh và ID video lớn dùng lại bộ máy đã biên dịch và chỉ mục dựa trên Set, bỏ qua siêu dữ liệu mà không quy tắc đang bật nào cần đến, gộp các lần ghi thời gian ẩn và xử lý tăng dần những thẻ Trang chủ đã thay đổi; các thay đổi cấu trúc vẫn được xử lý toàn bộ.",
+      "Bước hoàn thiện cuối cho danh sách lớn ngăn chạy lặp các setter JSON đã lọc, truyền phiên bản cài đặt qua cả hai đường khởi động, dùng lại chỉ mục DOM khi ảnh chụp bất biến giống nhau và chỉ tạo đường dẫn chẩn đoán khi bật gỡ lỗi hiệu năng.",
+      "Các lượt nhập CSV, TXT, JSON danh sách quy tắc FilterTube, JSON chuyển đổi BlockTube và lượt nhập được quản lý giờ dùng chung hàng đợi bổ sung thông tin bền vững do nền quản lý: mỗi lần chỉ tra cứu một mục, ngẫu nhiên chờ 7–15 giây khi thiết bị đang hoạt động, thử lại theo từng hàng, khôi phục bằng báo thức Chrome, phân quyền theo hồ sơ và ghi trạng thái cuối là không tìm thấy hoặc đã kết thúc.",
+      "Báo cáo nhập bền vững giải thích các trạng thái hoàn tất, đang chờ, đang tra cứu, thử lại, tra cứu thất bại vĩnh viễn, chỉ có tên, đã bỏ qua và thiếu hàng đợi. Báo cáo vẫn có sau khi đóng bảng điều khiển, hiển thị báo cáo lớn theo từng phần giới hạn, xuất các hàng chưa giải quyết và cho phép xóa an toàn quy tắc đã nhập chưa giải quyết có danh tính duy nhất.",
+      "Việc khởi động và xử lý thay đổi của nguồn cấp Trang chủ nhắm đến các thẻ đã đổi, đồng thời giữ cách xử lý toàn bộ dự phòng cho thay đổi cấu trúc. Các cập nhật chỉ bổ sung siêu dữ liệu sẽ không làm mới thẻ YouTube và giúp giảm việc sắp xếp lại thẻ.",
+      "Advert Void giờ yêu cầu đồng thời trạng thái trình phát `ad-showing` và `ad-interrupting`, hoặc bằng chứng độc lập rằng quảng cáo đang hiển thị. Việc xử lý thẻ được tài trợ không còn được tính là công việc thay đổi renderer chung.",
+      "Quy trình phát hành GitHub dùng thông tin xác thực GitHub CLI, tạo bản nháp trước khi tải lên, tiếp tục từ tag hiện có, chỉ tải những tài sản còn thiếu, xác minh toàn bộ tài sản cuối cùng rồi mới phát hành.",
+      "Ứng dụng FilterTube cho điện thoại và máy tính bảng Android hiện đã mở công khai trên Google Play. Bạn có thể cài từ [trang công khai](https://play.google.com/store/apps/details?id=com.filtertube.app) hoặc tìm FilterTube trên Google Play."
+    ]
+  }
+}

@@ -9,6 +9,38 @@ const FILTERTUBE_SEMANTIC_ML_ENABLED = false;
 const ANDROID_CLOSED_TESTING_INVITE_DISMISSED_KEY = 'filtertube_android_closed_testing_invite_dismissed_v1';
 const SHOW_UPDATE_REFRESH_PROMPT_KEY = 'showUpdateRefreshPrompt';
 
+function tabViewUiText(key, fallback, values = {}) {
+    const interpolate = text => String(text ?? '').replace(/\{([a-zA-Z][a-zA-Z0-9]*)\}/g, (match, name) =>
+        Object.prototype.hasOwnProperty.call(values, name) ? String(values[name]) : match);
+    try {
+        const localized = window.FilterTubeUiLocalization?.text?.(key, values);
+        if (typeof localized === 'string' && localized.trim()) return localized;
+    } catch (_) {
+    }
+    return interpolate(fallback);
+}
+
+function tabViewModalActionText(label) {
+    const keys = {
+        Confirm: 'dashboard.modal.confirm',
+        Cancel: 'dashboard.modal.cancel',
+        Continue: 'dashboard.modal.continue',
+        Save: 'dashboard.modal.save'
+    };
+    const key = keys[label];
+    return key ? tabViewUiText(key, label) : label;
+}
+
+function localizeFilterModeOptions(select) {
+    for (const option of Array.from(select?.options || [])) {
+        const key = option.value === 'allow'
+            ? 'popup.allowOnlySelected'
+            : (option.value === 'block' ? 'popup.blockSelected' : '');
+        if (key) option.setAttribute('data-ft-i18n', key);
+    }
+    window.FilterTubeUiLocalization?.apply?.(select);
+}
+
 /**
  * The refresh reminder is intentionally kept outside profile settings. It is
  * a device-wide preference for automatic update prompts on YouTube and
@@ -1179,6 +1211,7 @@ function initializeFiltersTabs() {
         value: 'block',
         onChange: () => scheduleSaveCategoryFilters('main', { showToast: true })
     });
+    localizeFilterModeOptions(categoryMainMode);
 
     const categoryMainToggle = document.createElement('label');
     categoryMainToggle.className = 'switch';
@@ -1300,13 +1333,17 @@ function initializeFiltersTabs() {
     function updateCategorySelectionSummary() {
         const count = categorySelectedMain.length;
         if (categoryMainSelectionCount) {
-            const mode = document.getElementById('categoryFilter_mode')?.value === 'allow' ? 'Allowed' : 'Blocked';
+            const mode = document.getElementById('categoryFilter_mode')?.value === 'allow'
+                ? tabViewUiText('popup.allowed', 'Allowed')
+                : tabViewUiText('popup.blocked', 'Blocked');
             categoryMainSelectionCount.textContent = count === 0
-                ? 'No categories selected — filter is inactive'
+                ? tabViewUiText('popup.noCategories', 'No categories selected — filter is inactive')
                 : `${mode}: ${categorySelectedMain.join(', ')}`;
         }
         if (categoryMainClear) categoryMainClear.disabled = count === 0;
     }
+
+    window.addEventListener('filtertube-ui-locale-changed', updateCategorySelectionSummary);
 
     function renderCategoryList(listEl, selected = [], searchValue = '', profileType = 'main') {
         if (!listEl) return;
@@ -1416,9 +1453,12 @@ function initializeFiltersTabs() {
         const signature = computeCategoryFiltersSignature(next);
         const priorSignature = computeCategoryFiltersSignature(managedState?.categoryFilters || StateManager.getState()?.categoryFilters || {});
         const previousSignature = lastSavedCategoryFiltersSignatureMain;
+        const savedMessage = managedState
+            ? tabViewUiText('dashboard.toast.protectedCategoryFiltersSaved', 'Protected profile category filters saved')
+            : tabViewUiText('dashboard.toast.categoryFiltersSaved', 'Category filters saved');
         if (signature && (signature === priorSignature || (!managedState && signature === previousSignature))) {
             if (showToast && Date.now() - lastCategoryFiltersToastTs > 900) {
-                UIComponents.showToast(managedState ? 'Protected profile category filters saved' : 'Category filters saved', 'success');
+                UIComponents.showToast(savedMessage, 'success');
                 lastCategoryFiltersToastTs = Date.now();
             }
             return;
@@ -1441,7 +1481,7 @@ function initializeFiltersTabs() {
         }
 
         if (showToast) {
-            UIComponents.showToast(managedState ? 'Protected profile category filters saved' : 'Category filters saved', 'success');
+            UIComponents.showToast(savedMessage, 'success');
             lastCategoryFiltersToastTs = Date.now();
         }
     }
@@ -1475,7 +1515,7 @@ function initializeFiltersTabs() {
                     <div class="toggle-description">Uses YouTube's original/default audio evidence; auto-dubbed alternatives do not change the source language.</div>
                 </div>
                 <div class="ft-category-controls">
-                    <select id="languageFilter_mode" class="select-input"><option value="block">Block selected</option><option value="allow">Allow only selected</option></select>
+                    <select id="languageFilter_mode" class="select-input"><option value="block" data-ft-i18n="popup.blockSelected">Block selected</option><option value="allow" data-ft-i18n="popup.allowOnlySelected">Allow only selected</option></select>
                     <label class="switch"><input id="languageFilter_enabled" type="checkbox"><span class="slider round"></span></label>
                 </div>
             </div>
@@ -1491,6 +1531,7 @@ function initializeFiltersTabs() {
 
     const languageEnabledMain = languageFiltersSection.querySelector('#languageFilter_enabled');
     const languageModeMain = languageFiltersSection.querySelector('#languageFilter_mode');
+    localizeFilterModeOptions(languageModeMain);
     const languagePanelMain = languageFiltersSection.querySelector('#languageFilter_panel');
     const languageSearchMain = languageFiltersSection.querySelector('#languageFilter_search');
     const languageSelectionCountMain = languageFiltersSection.querySelector('#languageFilter_selectionCount');
@@ -1506,12 +1547,16 @@ function initializeFiltersTabs() {
     const languageLabelForCode = code => languageOptions.find(option => option.code === code)?.label || String(code || '').toUpperCase();
 
     function updateLanguageSelectionSummary() {
-        const mode = languageModeMain?.value === 'allow' ? 'Allowed' : 'Blocked';
+        const mode = languageModeMain?.value === 'allow'
+            ? tabViewUiText('popup.allowed', 'Allowed')
+            : tabViewUiText('popup.blocked', 'Blocked');
         if (languageSelectionCountMain) languageSelectionCountMain.textContent = languageSelectedMain.length
             ? `${mode}: ${languageSelectedMain.map(languageLabelForCode).join(', ')}`
-            : 'No languages selected — filter is inactive';
+            : tabViewUiText('popup.noLanguages', 'No languages selected — filter is inactive');
         if (languageClearMain) languageClearMain.disabled = languageSelectedMain.length === 0;
     }
+
+    window.addEventListener('filtertube-ui-locale-changed', updateLanguageSelectionSummary);
 
     function renderLanguageList() {
         const list = languageListMain;
@@ -1901,11 +1946,13 @@ function initializeFiltersTabs() {
                 const ts = Date.now();
                 if (ts - lastVideoFiltersToastTs < 800) return;
                 lastVideoFiltersToastTs = ts;
-                UIComponents.showToast(managedState ? 'Protected profile video filters saved' : 'Video filters saved', 'success');
+                UIComponents.showToast(managedState
+                    ? tabViewUiText('dashboard.toast.protectedVideoFiltersSaved', 'Protected profile video filters saved')
+                    : tabViewUiText('dashboard.toast.videoFiltersSaved', 'Video filters saved'), 'success');
             })
             .catch((err) => {
                 console.error('Failed to save video filters:', err);
-                UIComponents.showToast('Failed to save video filters', 'error');
+                UIComponents.showToast(tabViewUiText('dashboard.toast.videoFiltersSaveFailed', 'Failed to save video filters'), 'error');
             });
     }
 
@@ -2633,6 +2680,7 @@ function initializeKidsTabs() {
         options: kidsCategoryModeOptions,
         value: 'block'
     });
+    localizeFilterModeOptions(kidsCategoryMode);
 
     const kidsCategoryToggle = document.createElement('label');
     kidsCategoryToggle.className = 'switch';
@@ -2735,12 +2783,16 @@ function initializeKidsTabs() {
 
     function updateKidsCategorySelectionSummary() {
         const count = kidsCategorySelected.length;
-        const mode = kidsCategoryMode?.value === 'allow' ? 'Allowed' : 'Blocked';
+        const mode = kidsCategoryMode?.value === 'allow'
+            ? tabViewUiText('popup.allowed', 'Allowed')
+            : tabViewUiText('popup.blocked', 'Blocked');
         kidsCategorySelectionCount.textContent = count === 0
-            ? 'No categories selected — filter is inactive'
+            ? tabViewUiText('popup.noCategories', 'No categories selected — filter is inactive')
             : `${mode}: ${kidsCategorySelected.join(', ')}`;
         kidsCategoryClear.disabled = count === 0;
     }
+
+    window.addEventListener('filtertube-ui-locale-changed', updateKidsCategorySelectionSummary);
 
     function renderKidsCategoryList(listEl, selected = [], searchValue = '') {
         if (!listEl) return;
@@ -2853,10 +2905,12 @@ function initializeKidsTabs() {
 
         Promise.resolve(savePromise)
             .then(() => {
-                if (showToast) UIComponents.showToast(managedState ? 'Protected profile Kids category filters saved' : 'Kids category filters saved', 'success');
+                if (showToast) UIComponents.showToast(managedState
+                    ? tabViewUiText('dashboard.toast.protectedKidsCategoryFiltersSaved', 'Protected profile Kids category filters saved')
+                    : tabViewUiText('dashboard.toast.kidsCategoryFiltersSaved', 'Kids category filters saved'), 'success');
             })
             .catch(() => {
-                if (showToast) UIComponents.showToast('Failed to save kids category filters', 'error');
+                if (showToast) UIComponents.showToast(tabViewUiText('dashboard.toast.kidsCategoryFiltersSaveFailed', 'Failed to save kids category filters'), 'error');
             });
     }
 
@@ -3073,10 +3127,12 @@ function initializeKidsTabs() {
                 const ts = Date.now();
                 if (ts - lastKidsVideoFiltersToastTs < 800) return;
                 lastKidsVideoFiltersToastTs = ts;
-                UIComponents.showToast(managedState ? 'Protected profile Kids video filters saved' : 'Kids video filters saved', 'success');
+                UIComponents.showToast(managedState
+                    ? tabViewUiText('dashboard.toast.protectedKidsVideoFiltersSaved', 'Protected profile Kids video filters saved')
+                    : tabViewUiText('dashboard.toast.kidsVideoFiltersSaved', 'Kids video filters saved'), 'success');
             })
             .catch(() => {
-                if (showToast) UIComponents.showToast('Failed to save kids video filters', 'error');
+                if (showToast) UIComponents.showToast(tabViewUiText('dashboard.toast.kidsVideoFiltersSaveFailed', 'Failed to save kids video filters'), 'error');
             });
     }
 
@@ -3486,12 +3542,26 @@ function focusFamilyDeviceUpdatesCard() {
  * Hydrates the “What’s New” tab with curated release note cards pulled from
  * data/release_notes.json. Shared content with the release banner.
  */
+let releaseNotesLoadRevision = 0;
 async function loadReleaseNotesIntoDashboard() {
     const listEl = document.getElementById('releaseNotesList');
     if (!listEl) return;
+    const revision = ++releaseNotesLoadRevision;
+
+    const localizedCopy = (key, fallback) => {
+        try {
+            return window.FilterTubeUiLocalization?.text?.(key) || fallback;
+        } catch (_) {
+            return fallback;
+        }
+    };
 
     function showEmptyState(message) {
-        listEl.innerHTML = `<div class="release-notes-empty">${message}</div>`;
+        listEl.replaceChildren();
+        const empty = document.createElement('div');
+        empty.className = 'release-notes-empty';
+        empty.textContent = message;
+        listEl.appendChild(empty);
     }
 
     try {
@@ -3500,15 +3570,43 @@ async function loadReleaseNotesIntoDashboard() {
             : 'data/release_notes.json';
         const response = await fetch(url);
         if (!response.ok) {
-            showEmptyState('Unable to load release notes right now.');
+            showEmptyState(localizedCopy('release.unavailable', 'Unable to load release notes right now.'));
             return;
         }
-        const notes = await response.json();
+        let notes = await response.json();
         if (!Array.isArray(notes) || notes.length === 0) {
-            showEmptyState('No release notes available yet.');
+            showEmptyState(localizedCopy('release.empty', 'No release notes available yet.'));
             return;
         }
 
+        const locale = window.FilterTubeUiLocalization?.locale || 'en';
+        if (locale !== 'en') {
+            try {
+                const localizedUrl = runtimeAPI?.runtime?.getURL
+                    ? runtimeAPI.runtime.getURL(`data/ui_locales/release_notes.${locale}.json`)
+                    : `data/ui_locales/release_notes.${locale}.json`;
+                const localizedResponse = await fetch(localizedUrl);
+                if (localizedResponse.ok) {
+                    const translations = await localizedResponse.json();
+                    notes = notes.map(note => {
+                        const translated = translations?.[note.version];
+                        if (!translated) return note;
+                        return {
+                            ...note,
+                            headline: translated.headline || note.headline,
+                            summary: translated.summary || note.summary,
+                            bannerSummary: translated.bannerSummary || note.bannerSummary,
+                            highlights: Array.isArray(translated.highlights) && translated.highlights.length === note.highlights?.length
+                                ? translated.highlights : note.highlights
+                        };
+                    });
+                }
+            } catch (_) {
+                // Keep the source release notes when a preview locale has no translated entry.
+            }
+        }
+
+        if (revision !== releaseNotesLoadRevision) return;
         listEl.innerHTML = '';
 
         const validNotes = notes.filter(note => note && typeof note.version === 'string' && note.version.trim());
@@ -3536,17 +3634,17 @@ async function loadReleaseNotesIntoDashboard() {
             if (isCurrent) {
                 const status = document.createElement('span');
                 status.className = 'release-note-card__status';
-                status.textContent = 'Current';
+                status.textContent = localizedCopy('release.current', 'Current');
                 header.appendChild(status);
             }
 
             const title = document.createElement('h4');
             title.className = 'release-note-card__title';
-            title.textContent = note.headline || 'New update';
+            title.textContent = note.headline || localizedCopy('release.newUpdate', 'New update');
 
             const summary = document.createElement('p');
             summary.className = 'release-note-card__summary';
-            summary.textContent = note.summary || note.body || 'Details coming soon.';
+            summary.textContent = note.summary || note.body || localizedCopy('release.detailsComing', 'Details coming soon.');
 
             const highlights = Array.isArray(note.highlights) ? note.highlights.filter(Boolean) : [];
             let highlightsList = null;
@@ -3586,10 +3684,15 @@ async function loadReleaseNotesIntoDashboard() {
             listEl.appendChild(card);
         });
     } catch (error) {
+        if (revision !== releaseNotesLoadRevision) return;
         console.error('Tab-View: Failed to load release notes', error);
-        showEmptyState('Unable to load release notes right now.');
+        showEmptyState(localizedCopy('release.unavailable', 'Unable to load release notes right now.'));
     }
 }
+
+window.addEventListener('filtertube-ui-locale-changed', () => {
+    if (document.getElementById('releaseNotesList')) loadReleaseNotesIntoDashboard();
+});
 
 document.addEventListener('DOMContentLoaded', async () => {
     try {
@@ -4704,7 +4807,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             enableBtn.type = 'button';
             enableBtn.className = 'btn-primary';
             enableBtn.dataset.importAction = 'enable-whitelist';
-            enableBtn.textContent = 'Turn On Whitelist';
+            enableBtn.textContent = tabViewUiText('dashboard.import.turnOnWhitelistAction', 'Turn On Whitelist');
             importSubscriptionsActions.appendChild(enableBtn);
             importSubscriptionsActions.hidden = false;
         }
@@ -4714,7 +4817,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             retryBtn.type = 'button';
             retryBtn.className = 'btn-secondary';
             retryBtn.dataset.importAction = 'retry-import';
-            retryBtn.textContent = 'Retry Import';
+            retryBtn.textContent = tabViewUiText('dashboard.import.retryAction', 'Retry Import');
             importSubscriptionsActions.appendChild(retryBtn);
             importSubscriptionsActions.hidden = false;
         }
@@ -5546,7 +5649,9 @@ document.addEventListener('DOMContentLoaded', async () => {
         importSubscriptionsBtn.setAttribute('aria-disabled', (locked || busy) ? 'true' : 'false');
         importSubscriptionsBtn.setAttribute('aria-busy', busy ? 'true' : 'false');
         importSubscriptionsBtn.classList.toggle('is-loading', busy);
-        importSubscriptionsBtn.textContent = busy ? 'Importing…' : 'Import Subscribed Channels';
+        importSubscriptionsBtn.textContent = busy
+            ? tabViewUiText('dashboard.import.buttonBusyLabel', 'Importing…')
+            : tabViewUiText('dashboard.import.buttonLabel', 'Import Subscribed Channels');
         importSubscriptionsBtn.title = locked
             ? 'Unlock this profile to import subscribed channels.'
             : 'Import subscribed channels into whitelist only. You will choose separately whether to turn whitelist mode on.';
@@ -5619,30 +5724,30 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     function updateSubscriptionsImportWaitState(phase, options = {}) {
         const tabTitle = normalizeString(options.tabTitle);
-        const tabLabel = tabTitle || 'the selected YouTube tab';
+        const tabLabel = tabTitle || tabViewUiText('dashboard.import.selectedYoutubeTab', 'the selected YouTube tab');
         let title = '';
         let message = '';
         let meta = normalizeString(options.meta);
 
         if (phase === 'searching') {
-            title = 'Looking For YouTube';
-            message = 'Checking open YouTube tabs for the active account.';
+            title = tabViewUiText('dashboard.import.waitSearchTitle', 'Looking For YouTube');
+            message = tabViewUiText('dashboard.import.waitSearchMessage', 'Checking open YouTube tabs for the active account.');
         } else if (phase === 'waiting_page') {
-            title = 'Waiting For YouTube';
-            message = `Waiting for ${tabLabel} to finish loading.`;
-            meta = meta || 'Keep the tab open for a moment.';
+            title = tabViewUiText('dashboard.import.waitPageTitle', 'Waiting For YouTube');
+            message = tabViewUiText('dashboard.import.waitPageMessage', 'Waiting for {tabTitle} to finish loading.', { tabTitle: tabLabel });
+            meta = meta || tabViewUiText('dashboard.import.waitPageMeta', 'Keep the tab open for a moment.');
         } else if (phase === 'waiting_bridge') {
-            title = 'Starting FilterTube';
-            message = `Waiting for FilterTube to finish starting in ${tabLabel}.`;
-            meta = meta || 'The import will begin automatically once the bridge is ready.';
+            title = tabViewUiText('dashboard.import.waitBridgeTitle', 'Starting FilterTube');
+            message = tabViewUiText('dashboard.import.waitBridgeMessage', 'Waiting for FilterTube to finish starting in {tabTitle}.', { tabTitle: tabLabel });
+            meta = meta || tabViewUiText('dashboard.import.waitBridgeMeta', 'The import will begin automatically once the bridge is ready.');
         } else if (phase === 'bootstrapping_bridge') {
-            title = 'Connecting To YouTube';
-            message = `Connecting FilterTube to ${tabLabel}.`;
-            meta = meta || 'This can happen when the YouTube tab was already open before FilterTube reloaded.';
+            title = tabViewUiText('dashboard.import.bootstrapTitle', 'Connecting To YouTube');
+            message = tabViewUiText('dashboard.import.bootstrapMessage', 'Connecting FilterTube to {tabTitle}.', { tabTitle: tabLabel });
+            meta = meta || tabViewUiText('dashboard.import.bootstrapMeta', 'This can happen when the YouTube tab was already open before FilterTube reloaded.');
         } else if (phase === 'opening_fallback') {
-            title = 'Opening YouTube';
-            message = 'Opening a background YouTube tab for the active account.';
-            meta = meta || 'Waiting for YouTube and FilterTube to finish loading…';
+            title = tabViewUiText('dashboard.import.openingTitle', 'Opening YouTube');
+            message = tabViewUiText('dashboard.import.openingMessage', 'Opening a background YouTube tab for the active account.');
+            meta = meta || tabViewUiText('dashboard.import.openingMeta', 'Waiting for YouTube and FilterTube to finish loading…');
         } else {
             return;
         }
@@ -5762,21 +5867,21 @@ document.addEventListener('DOMContentLoaded', async () => {
     function describeSubscriptionsImportError(result = {}) {
         const code = normalizeString(result?.errorCode);
         if (code === 'signed_out') {
-            return 'Sign in to YouTube in the selected tab, then retry the import.';
+            return tabViewUiText('dashboard.import.errorSignedOut', 'Sign in to YouTube in the selected tab, then retry the import.');
         }
         if (code === 'receiver_unavailable' || code === 'subscriptions_import_unavailable') {
-            return 'The YouTube tab is still starting FilterTube. Keep it open for a moment, then retry.';
+            return tabViewUiText('dashboard.import.errorReceiverUnavailable', 'The YouTube tab is still starting FilterTube. Keep it open for a moment, then retry.');
         }
         if (code === 'profile_locked') {
-            return 'Unlock this profile before importing subscribed channels.';
+            return tabViewUiText('dashboard.import.errorProfileLocked', 'Unlock this profile before importing subscribed channels.');
         }
         if (code === 'profile_changed') {
-            return 'The active profile changed during import. Retry once the intended profile is active again.';
+            return tabViewUiText('dashboard.import.errorProfileChanged', 'The active profile changed during import. Retry once the intended profile is active again.');
         }
         if (code === 'tab_import_failed') {
-            return 'The selected YouTube tab was not ready for import. Retry after the page finishes loading.';
+            return tabViewUiText('dashboard.import.errorTabImportFailed', 'The selected YouTube tab was not ready for import. Retry after the page finishes loading.');
         }
-        return normalizeString(result?.error) || 'Unable to import subscribed channels right now.';
+        return normalizeString(result?.error) || tabViewUiText('dashboard.import.errorFallback', 'Unable to import subscribed channels right now.');
     }
 
     function getProfileColors(seed) {
@@ -6127,34 +6232,43 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     function getProfileAccessCopy(profilesV4, profileId) {
         const name = getProfileName(profilesV4, profileId);
+        const localized = (key, fallback, values = {}) => {
+            try {
+                const translated = window.FilterTubeUiLocalization?.text?.(key, values);
+                if (typeof translated === 'string' && translated.trim()) return translated;
+            } catch (_) {
+            }
+            return String(fallback ?? '').replace(/\{([a-zA-Z][a-zA-Z0-9]*)\}/g, (match, name) =>
+                Object.prototype.hasOwnProperty.call(values, name) ? String(values[name]) : match);
+        };
         if (profileId === 'default') {
             return {
-                eyebrow: 'Master access',
-                title: 'Enter Master PIN',
-                message: 'Default is protected. Enter the Master PIN to continue.',
-                placeholder: 'Master PIN',
-                gateTitle: 'Master Profile Locked',
-                gateMessage: `Unlock ${name} with the Master PIN to view management controls.`
+                eyebrow: localized('profileAccess.masterEyebrow', 'Master access'),
+                title: localized('profileAccess.enterMasterPinTitle', 'Enter Master PIN'),
+                message: localized('profileAccess.masterPinMessage', 'Default is protected. Enter the Master PIN to continue.'),
+                placeholder: localized('profileAccess.masterPinPlaceholder', 'Master PIN'),
+                gateTitle: localized('profileAccess.masterGateTitle', 'Master Profile Locked'),
+                gateMessage: localized('profileAccess.masterGateMessage', 'Unlock {name} with the Master PIN to view management controls.', { name })
             };
         }
         const type = getProfileType(profilesV4, profileId);
         if (type === 'account') {
             return {
-                eyebrow: 'Protected account',
-                title: `Unlock ${name}`,
-                message: `${name} is a locked independent account. Enter its profile PIN to continue.`,
-                placeholder: 'Profile PIN',
-                gateTitle: 'Protected Account',
-                gateMessage: `Unlock ${name} to view management controls.`
+                eyebrow: localized('profileAccess.protectedAccountEyebrow', 'Protected account'),
+                title: localized('profileAccess.unlockProfileTitle', `Unlock ${name}`, { name }),
+                message: localized('profileAccess.lockedAccountMessage', `${name} is a locked independent account. Enter its profile PIN to continue.`, { name }),
+                placeholder: localized('profileAccess.profilePinPlaceholder', 'Profile PIN'),
+                gateTitle: localized('profileAccess.protectedAccountGateTitle', 'Protected Account'),
+                gateMessage: localized('profileAccess.unlockProfileGateMessage', `Unlock ${name} to view management controls.`, { name })
             };
         }
         return {
-            eyebrow: 'Protected profile',
-            title: `Unlock ${name}`,
-            message: `${name} is a locked protected profile. Enter its profile PIN to continue.`,
-            placeholder: 'Profile PIN',
-            gateTitle: 'Protected Profile',
-            gateMessage: `Unlock ${name} to view management controls.`
+            eyebrow: localized('profileAccess.protectedProfileEyebrow', 'Protected profile'),
+            title: localized('profileAccess.unlockProfileTitle', `Unlock ${name}`, { name }),
+            message: localized('profileAccess.lockedProfileMessage', `${name} is a locked protected profile. Enter its profile PIN to continue.`, { name }),
+            placeholder: localized('profileAccess.profilePinPlaceholder', 'Profile PIN'),
+            gateTitle: localized('profileAccess.protectedProfileGateTitle', 'Protected Profile'),
+            gateMessage: localized('profileAccess.unlockProfileGateMessage', `Unlock ${name} to view management controls.`, { name })
         };
     }
 
@@ -13381,7 +13495,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     async function startSubscribedChannelsImport(trigger = 'manual') {
         if (isUiLocked()) {
             updateCheckboxes();
-            UIComponents.showToast('Unlock this profile to import subscribed channels', 'error');
+            UIComponents.showToast(tabViewUiText('dashboard.toast.subscriptionsImportLocked', 'Unlock this profile to import subscribed channels'), 'error');
             return;
         }
 
@@ -13436,7 +13550,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                 inProgress: false,
                 canEnableWhitelist: false
             });
-            UIComponents.showToast('Sign in to YouTube, then retry the import', 'info');
+            UIComponents.showToast(tabViewUiText('dashboard.toast.subscriptionsImportSignIn', 'Sign in to YouTube, then retry the import'), 'info');
             return;
         }
 
@@ -13452,7 +13566,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                 inProgress: false,
                 canEnableWhitelist: false
             });
-            UIComponents.showToast('YouTube tab is still loading', 'error');
+            UIComponents.showToast(tabViewUiText('dashboard.toast.subscriptionsImportTabLoading', 'YouTube tab is still loading'), 'error');
             return;
         }
 
@@ -13506,7 +13620,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                 canEnableWhitelist: false
             });
             if (trigger !== 'auto') {
-                UIComponents.showToast('Subscribed channel import failed', 'error');
+                UIComponents.showToast(tabViewUiText('dashboard.toast.subscriptionsImportFailed', 'Subscribed channel import failed'), 'error');
             }
             return;
         }
@@ -13541,7 +13655,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                 inProgress: false,
                 canEnableWhitelist: false
             });
-            UIComponents.showToast('No subscribed channels found', 'info');
+            UIComponents.showToast(tabViewUiText('dashboard.toast.subscriptionsImportNoChannels', 'No subscribed channels found'), 'info');
             return;
         }
 
@@ -13551,7 +13665,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                 totalApplied,
                 meta: metaParts.join(' • ')
             });
-            UIComponents.showToast('Subscribed channels imported and whitelist mode enabled', 'success');
+            UIComponents.showToast(tabViewUiText('dashboard.toast.subscriptionsImportCompleteAndWhitelistEnabled', 'Subscribed channels imported and whitelist mode enabled'), 'success');
             return;
         }
 
@@ -13577,7 +13691,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             inProgress: false,
             canEnableWhitelist: whitelistOff
         });
-        UIComponents.showToast('Subscribed channels imported', 'success');
+        UIComponents.showToast(tabViewUiText('dashboard.toast.subscriptionsImportComplete', 'Subscribed channels imported'), 'success');
     }
 
     function resolveViewAccess(requestedViewId) {
@@ -13668,7 +13782,9 @@ document.addEventListener('DOMContentLoaded', async () => {
         header.className = 'card-header';
         const copy = getProfileAccessCopy(profilesV4, activeProfileId);
         const h3 = document.createElement('h3');
-        h3.textContent = selfControlLocked ? 'Self-Control Session Active' : copy.gateTitle;
+        h3.textContent = selfControlLocked
+            ? tabViewUiText('popup.selfControlSessionActive', 'Self-Control Session Active')
+            : copy.gateTitle;
         header.appendChild(h3);
 
         const body = document.createElement('div');
@@ -13701,15 +13817,15 @@ document.addEventListener('DOMContentLoaded', async () => {
             const unlockBtn = document.createElement('button');
             unlockBtn.className = 'btn-primary';
             unlockBtn.type = 'button';
-            unlockBtn.textContent = 'Unlock';
+            unlockBtn.textContent = tabViewUiText('profileAccess.unlockButton', 'Unlock');
             unlockBtn.addEventListener('click', async () => {
                 try {
                     const ok = await ensureProfileUnlocked(profilesV4Cache, activeProfileId);
                     if (!ok) return;
                     await refreshProfilesUI();
-                    UIComponents.showToast('Unlocked', 'success');
+                    UIComponents.showToast(tabViewUiText('dashboard.toast.unlockSuccess', 'Unlocked'), 'success');
                 } catch (e) {
-                    UIComponents.showToast('Failed to unlock', 'error');
+                    UIComponents.showToast(tabViewUiText('dashboard.toast.unlockFailed', 'Failed to unlock'), 'error');
                 }
             });
             actions.appendChild(unlockBtn);
@@ -13766,12 +13882,12 @@ document.addEventListener('DOMContentLoaded', async () => {
             const cancelBtn = document.createElement('button');
             cancelBtn.className = 'btn-secondary';
             cancelBtn.type = 'button';
-            cancelBtn.textContent = cancelText;
+            cancelBtn.textContent = tabViewModalActionText(cancelText);
 
             const okBtn = document.createElement('button');
             okBtn.className = 'btn-primary';
             okBtn.type = 'button';
-            okBtn.textContent = confirmText;
+            okBtn.textContent = tabViewModalActionText(confirmText);
 
             const cleanup = () => {
                 try {
@@ -13858,11 +13974,11 @@ document.addEventListener('DOMContentLoaded', async () => {
             const cancelBtn = document.createElement('button');
             cancelBtn.className = 'btn-secondary';
             cancelBtn.type = 'button';
-            cancelBtn.textContent = cancelText;
+            cancelBtn.textContent = tabViewModalActionText(cancelText);
             const okBtn = document.createElement('button');
             okBtn.className = 'btn-primary';
             okBtn.type = 'button';
-            okBtn.textContent = confirmText;
+            okBtn.textContent = tabViewModalActionText(confirmText);
 
             const onKeydown = (e) => {
                 if (e.key === 'Escape') {
@@ -13940,7 +14056,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             const cancelBtn = document.createElement('button');
             cancelBtn.className = 'btn-secondary';
             cancelBtn.type = 'button';
-            cancelBtn.textContent = cancelText;
+            cancelBtn.textContent = tabViewModalActionText(cancelText);
 
             const cleanup = () => {
                 try {
@@ -23631,22 +23747,22 @@ document.addEventListener('DOMContentLoaded', async () => {
         }
 
         return showChoiceModal({
-            title: 'Import Subscribed Channels',
-            message: 'This feature appends channels from your active YouTube account into this profile\'s whitelist.',
+            title: tabViewUiText('dashboard.import.modeChoiceTitle', 'Import Subscribed Channels'),
+            message: tabViewUiText('dashboard.import.modeChoiceMessage', 'This feature appends channels from your active YouTube account into this profile\'s whitelist.'),
             details: [
-                'Import Only keeps the imported subscriptions stored in whitelist and leaves your current blocklist exactly as it is.',
-                'Import + Turn On Whitelist stores the subscribed channels in Allowed rules and enables Allow only selected. Your current Blocked rules stay unchanged.',
-                'Choose whether to store the whitelist only, or store it and turn on whitelist mode when the import finishes.'
+                tabViewUiText('dashboard.import.modeChoiceImportOnly', 'Import Only keeps the imported subscriptions stored in whitelist and leaves your current blocklist exactly as it is.'),
+                tabViewUiText('dashboard.import.modeChoiceTurnOn', 'Import + Turn On Whitelist stores the subscribed channels in Allowed rules and enables Allow only selected. Your current Blocked rules stay unchanged.'),
+                tabViewUiText('dashboard.import.modeChoiceSummary', 'Choose whether to store the whitelist only, or store it and turn on whitelist mode when the import finishes.')
             ],
             choices: [
                 {
                     value: 'import-only',
-                    label: 'Import Only',
+                    label: tabViewUiText('dashboard.import.importOnly', 'Import Only'),
                     recommended: true
                 },
                 {
                     value: 'import-and-enable',
-                    label: 'Import + Turn On Whitelist',
+                    label: tabViewUiText('dashboard.import.importAndEnable', 'Import + Turn On Whitelist'),
                     className: 'btn-secondary btn-import'
                 }
             ],
@@ -23672,7 +23788,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             : extractProfilePinVerifier(profilesV4, profileId);
         if (!verifier) return true;
         if (isManagedAdminUnlockRateLimited(profileId, profilesV4)) {
-            UIComponents.showToast('Too many incorrect PIN attempts. Try again later.', 'error');
+            UIComponents.showToast(tabViewUiText('dashboard.toast.pinRateLimited', 'Too many incorrect PIN attempts. Try again later.'), 'error');
             return false;
         }
 
@@ -23683,7 +23799,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             message: copy.message,
             placeholder: copy.placeholder,
             inputType: 'password',
-            confirmText: 'Unlock'
+            confirmText: tabViewUiText('profileAccess.unlockButton', 'Unlock')
         });
         const normalized = normalizeString(pin);
         if (!normalized) return false;
@@ -23692,8 +23808,8 @@ document.addEventListener('DOMContentLoaded', async () => {
             const failedAttempt = await recordManagedAdminUnlockFailure(profileId, profilesV4);
             UIComponents.showToast(
                 failedAttempt.rateLimited
-                    ? 'Too many incorrect PIN attempts. Try again later.'
-                    : 'Incorrect PIN',
+                    ? tabViewUiText('dashboard.toast.pinRateLimited', 'Too many incorrect PIN attempts. Try again later.')
+                    : tabViewUiText('dashboard.toast.pinIncorrect', 'Incorrect PIN'),
                 'error'
             );
             return false;
@@ -24173,7 +24289,9 @@ document.addEventListener('DOMContentLoaded', async () => {
                 const pinBtn = document.createElement('button');
                 pinBtn.className = 'btn-secondary';
                 pinBtn.type = 'button';
-                pinBtn.textContent = isProfileLocked(profilesV4, profileId) ? 'Change PIN' : 'Set PIN';
+                pinBtn.textContent = isProfileLocked(profilesV4, profileId)
+                    ? tabViewUiText('dashboard.pin.changeButton', 'Change PIN')
+                    : tabViewUiText('dashboard.pin.setButton', 'Set PIN');
                 pinBtn.disabled = childAdminRestricted;
                 pinBtn.title = childAdminRestricted
                     ? childAdminTitle
@@ -24208,29 +24326,29 @@ document.addEventListener('DOMContentLoaded', async () => {
                     }
 
                     const pin1 = await showPromptModal({
-                        title: 'Set Profile Switching PIN',
-                        message: 'Enter the PIN used only for switching into this profile. Parent/admin authority stays separate.',
-                        placeholder: 'Profile switching PIN',
+                        title: tabViewUiText('dashboard.pin.profileSetTitle', 'Set Profile Switching PIN'),
+                        message: tabViewUiText('dashboard.pin.profilePrompt', 'Enter the PIN used only for switching into this profile. Parent/admin authority stays separate.'),
+                        placeholder: tabViewUiText('dashboard.pin.profilePlaceholder', 'Profile switching PIN'),
                         inputType: 'password',
                         confirmText: 'Continue'
                     });
                     if (pin1 === null) return;
                     const pin2 = await showPromptModal({
-                        title: 'Confirm Profile Switching PIN',
-                        message: 'Re-enter the profile switching PIN to confirm.',
-                        placeholder: 'Profile switching PIN',
+                        title: tabViewUiText('dashboard.pin.profileConfirmTitle', 'Confirm Profile Switching PIN'),
+                        message: tabViewUiText('dashboard.pin.profileConfirmPrompt', 'Re-enter the profile switching PIN to confirm.'),
+                        placeholder: tabViewUiText('dashboard.pin.profilePlaceholder', 'Profile switching PIN'),
                         inputType: 'password',
                         confirmText: 'Save'
                     });
                     if (pin2 === null) return;
                     if (normalizeString(pin1) !== normalizeString(pin2) || !normalizeString(pin1)) {
-                        UIComponents.showToast('PINs do not match', 'error');
+                        UIComponents.showToast(tabViewUiText('dashboard.toast.pinMismatch', 'PINs do not match'), 'error');
                         return;
                     }
 
                     const Security = window.FilterTubeSecurity || {};
                     if (typeof Security.createPinVerifier !== 'function') {
-                        UIComponents.showToast('Security manager unavailable', 'error');
+                        UIComponents.showToast(tabViewUiText('dashboard.toast.securityManagerUnavailable', 'Security manager unavailable'), 'error');
                         return;
                     }
 
@@ -24252,13 +24370,13 @@ document.addEventListener('DOMContentLoaded', async () => {
                     });
                     clearProfileUnlockSession.run(profileId);
                     await refreshProfilesUI();
-                    UIComponents.showToast('Profile switching PIN updated', 'success');
+                    UIComponents.showToast(tabViewUiText('dashboard.toast.profilePinUpdated', 'Profile switching PIN updated'), 'success');
                 });
 
                 const clearPinBtn = document.createElement('button');
                 clearPinBtn.className = 'btn-secondary';
                 clearPinBtn.type = 'button';
-                clearPinBtn.textContent = 'Remove PIN';
+                clearPinBtn.textContent = tabViewUiText('dashboard.pin.removeButton', 'Remove PIN');
                 clearPinBtn.disabled = !isProfileLocked(profilesV4, profileId) || childAdminRestricted;
                 clearPinBtn.title = childAdminRestricted
                     ? childAdminTitle
@@ -24312,7 +24430,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                     clearProfileUnlockSession.run(profileId);
                     await notifyBackgroundLocked(profileId);
                     await refreshProfilesUI();
-                    UIComponents.showToast('Profile switching PIN removed', 'success');
+                    UIComponents.showToast(tabViewUiText('dashboard.toast.profilePinRemoved', 'Profile switching PIN removed'), 'success');
                 });
 
                 actions.appendChild(pinBtn);
@@ -24870,7 +24988,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                 if (!password) return;
                 const Security = window.FilterTubeSecurity || {};
                 if (typeof Security.decryptJson !== 'function') {
-                    UIComponents.showToast('Security manager unavailable', 'error');
+                    UIComponents.showToast(tabViewUiText('dashboard.toast.securityManagerUnavailable', 'Security manager unavailable'), 'error');
                     return;
                 }
                 payload = await Security.decryptJson(parsed.encrypted, password);
@@ -26194,29 +26312,31 @@ document.addEventListener('DOMContentLoaded', async () => {
             }
 
             const pin1 = await showPromptModal({
-                title: hasExisting ? 'Change Master PIN' : 'Set Master PIN',
-                message: 'Enter a new Master PIN.',
-                placeholder: 'Master PIN',
+                title: hasExisting
+                    ? tabViewUiText('dashboard.pin.masterChangeTitle', 'Change Master PIN')
+                    : tabViewUiText('dashboard.pin.masterSetTitle', 'Set Master PIN'),
+                message: tabViewUiText('dashboard.pin.masterPrompt', 'Enter a new Master PIN.'),
+                placeholder: tabViewUiText('profileAccess.masterPinPlaceholder', 'Master PIN'),
                 inputType: 'password',
                 confirmText: 'Continue'
             });
             if (pin1 === null) return;
             const pin2 = await showPromptModal({
-                title: 'Confirm Master PIN',
-                message: 'Re-enter the Master PIN to confirm.',
-                placeholder: 'Master PIN',
+                title: tabViewUiText('dashboard.pin.masterConfirmTitle', 'Confirm Master PIN'),
+                message: tabViewUiText('dashboard.pin.masterConfirmPrompt', 'Re-enter the Master PIN to confirm.'),
+                placeholder: tabViewUiText('profileAccess.masterPinPlaceholder', 'Master PIN'),
                 inputType: 'password',
                 confirmText: 'Save'
             });
             if (pin2 === null) return;
             if (normalizeString(pin1) !== normalizeString(pin2) || !normalizeString(pin1)) {
-                UIComponents.showToast('PINs do not match', 'error');
+                UIComponents.showToast(tabViewUiText('dashboard.toast.pinMismatch', 'PINs do not match'), 'error');
                 return;
             }
 
             const Security = window.FilterTubeSecurity || {};
             if (typeof Security.createPinVerifier !== 'function') {
-                UIComponents.showToast('Security manager unavailable', 'error');
+                UIComponents.showToast(tabViewUiText('dashboard.toast.securityManagerUnavailable', 'Security manager unavailable'), 'error');
                 return;
             }
 
@@ -26242,7 +26362,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             sessionMasterPin = normalizeString(pin1);
             markProfileUnlockSession.run('default');
             await refreshProfilesUI();
-            UIComponents.showToast('Master PIN updated', 'success');
+            UIComponents.showToast(tabViewUiText('dashboard.toast.masterPinUpdated', 'Master PIN updated'), 'success');
         });
     }
 
@@ -26294,7 +26414,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             clearProfileUnlockSession.run('default');
             await notifyBackgroundLocked('default');
             await refreshProfilesUI();
-            UIComponents.showToast('Master PIN removed', 'success');
+            UIComponents.showToast(tabViewUiText('dashboard.toast.masterPinRemoved', 'Master PIN removed'), 'success');
         });
     }
 

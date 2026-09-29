@@ -1,0 +1,10 @@
+{
+  "extensionName": {
+    "message": "FilterTube",
+    "description": "The extension name shown by the browser."
+  },
+  "extensionDescription": {
+    "message": "Rudisha utulivu katika matumizi yako ya video za kidijitali.",
+    "description": "The extension description shown by the browser."
+  }
+}

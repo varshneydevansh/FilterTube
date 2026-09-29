@@ -1,0 +1,18 @@
+{
+  "3.3.7": {
+    "ctaLabel": "Tingnan ang mga bago",
+    "headline": "Mas mabilis na malalaking listahan, tuloy-tuloy na pag-import, bukas na sa publiko ang Android",
+    "summary": "Binabawasan ng FilterTube 3.3.7 ang paulit-ulit na gawain sa malalaking listahan ng panuntunan, inililipat ang pagkumpleto ng mga na-import na channel sa tuloy-tuloy na background queue, nagdaragdag ng mga ulat sa pag-import na may limitadong laki, pinatitibay ang kilos ng Home at Advert Void, nagbibigay-daan na ipagpatuloy ang pag-upload ng release sa GitHub, at inanunsyo ang pampublikong Android app sa Google Play.",
+    "bannerSummary": "Kasama sa 3.3.7 ang mas mabilis na pag-filter ng malalaking listahan, tuloy-tuloy na queue para kumpletuhin ang mga na-import na channel, mga ulat sa pag-import na madaling suriin, mas ligtas na Home at Advert Void, naipagpapatuloy na pag-upload ng release, at pampublikong Android app sa Google Play.",
+    "highlights": [
+      "Muling ginagamit ng malalaking listahan ng channel at video ID ang mga compiled engine at Set-based na index, nilalaktawan ang metadata na hindi kailangan ng aktibong panuntunan, pinagsasama ang mga pagsulat sa oras ng pagtatago, at paisa-isang inaasikaso ang nagbagong Home card; buo pa rin ang pagproseso kapag may pagbabagong estruktural.",
+      "Pinipigilan ng huling pag-aayos para sa malalaking listahan ang dobleng pagpapatakbo ng mga filtered JSON setter, ipinapasa ang mga pagbabago sa setting sa parehong startup path, muling ginagamit ang mga DOM index kapag magkapareho ang immutable snapshot, at gumagawa lang ng diagnostic path kapag naka-enable ang performance debugging.",
+      "Pinagsasaluhan na ngayon ng CSV, TXT, JSON ng listahan ng panuntunan ng FilterTube, JSON ng migration ng BlockTube, at mga pinamamahalaang import ang isang tuloy-tuloy na enrichment queue na pinapatakbo sa background: isang lookup lang bawat pagkakataon, random na pagitan na 7–15 segundo kapag gising ang device, retry kada row, pagbawi gamit ang Chrome alarm, pahintulot ayon sa profile, at huling status na hindi nahanap o winakasan.",
+      "Ipinapaliwanag ng tuloy-tuloy na Import Reports ang mga status na kumpleto, nakabinbin, kinukuha, sinusubukang muli, permanenteng bigo ang lookup, pangalan lang, nilaktawan, at walang queue. Magagamit pa rin ang mga ito kapag isinara ang dashboard, hinahati sa limitadong bahagi ang malalaking ulat, ine-export ang mga row na hindi pa nalulutas, at ligtas na naaalis ang mga hindi pa nalulutas na na-import na panuntunang may natatanging pagkakakilanlan.",
+      "Tinututukan ng pagsisimula at paghawak sa mga pagbabago ng Home feed ang mga nagbagong card at pinananatili ang buong fallback para sa mga pagbabagong estruktural. Hindi nire-refresh ng mga update na metadata lang ang dinaragdag ang mga tab ng YouTube at nababawasan ang muling pag-aayos ng card.",
+      "Nangangailangan na ngayon ang Advert Void ng magkasabay na player state na `ad-showing` at `ad-interrupting`, o ng hiwalay na patunay na may nakikitang ad. Hindi na binibilang na pangkalahatang renderer mutation work ang paghawak sa sponsored card.",
+      "Gumagamit ang paglalathala ng GitHub release ng mga credential ng GitHub CLI, gumagawa ng draft bago mag-upload, nagpapatuloy mula sa mga umiiral na tag, ina-upload lang ang nawawalang asset, bineberipika ang huling set ng asset, at saka lang naglalathala kapag napatunayan na.",
+      "Bukas na sa publiko sa Google Play ang FilterTube app para sa mga Android phone at tablet. I-install ito mula sa [pampublikong page](https://play.google.com/store/apps/details?id=com.filtertube.app) o hanapin ang FilterTube sa Google Play."
+    ]
+  }
+}

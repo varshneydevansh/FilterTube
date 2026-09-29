@@ -1,0 +1,18 @@
+{
+  "3.3.7": {
+    "ctaLabel": "Wo ohun tuntun",
+    "headline": "Àwọn àkójọ ńlá yára sí i, ìgbéwọlé ń wà pẹ́, Android sì ti ṣí sí gbogbo ènìyàn",
+    "summary": "FilterTube 3.3.7 dín iṣẹ́ tí ń tún ara rẹ̀ ṣe kù lórí àwọn àkójọ òfin ńlá, ó gbé ìparí àlàyé àwọn ikanni tí a gbé wọlé sínú ìlà iṣẹ́ abẹ́lẹ̀ tó ń wà pẹ́, ó fi àwọn ìròyìn ìgbéwọlé tó ní ààlà kún un, ó mú ìhùwàsí Home àti Advert Void lágbára sí i, ó jẹ́ kí a tún bẹ̀rẹ̀ ìgbéjáde fáìlì ìtújáde GitHub, ó sì kéde pé app Android wà fún gbogbo ènìyàn lórí Google Play.",
+    "bannerSummary": "3.3.7 ní fífọ àwọn àkójọ ńlá yára sí i, ìlà iṣẹ́ tó ń wà pẹ́ fún pípé àlàyé àwọn ikanni tí a gbé wọlé, àwọn ìròyìn ìgbéwọlé tó rọrùn láti ṣàyẹ̀wò, Home àti Advert Void tó ní ààbò sí i, ìgbéjáde ìtújáde tí a lè tún bẹ̀rẹ̀, àti app Android fún gbogbo ènìyàn lórí Google Play.",
+    "highlights": [
+      "Àwọn àkójọ ikanni àti ID fídíò ńlá tún ń lo àwọn ẹ̀rọ tí a ti ṣàkójọpọ̀ àti àwọn atọ́ka tí Set dá lé, wọ́n fo metadata tí kò sí òfin tó ń ṣiṣẹ́ tó lè lò, wọ́n so àwọn ìkọ̀wé àkókò ìfarapamọ́ pọ̀, wọ́n sì ń bójú tó àwọn káàdì Home tó yí padà díẹ̀díẹ̀; àwọn ìyípadà ìṣètò ṣì gba ìṣàkóso kíkún.",
+      "Àtúnṣe ìkẹyìn fún àwọn àkójọ ńlá ń dí àwọn ìgbésẹ̀ setter JSON tí a ti ṣàyẹ̀wò lọ́wọ́ láti má ṣe ṣẹlẹ̀ lẹ́ẹ̀mejì, ó ń gbé àtúnyẹ̀wò ètò kọjá ọ̀nà ìbẹ̀rẹ̀ méjèèjì, ó tún ń lo àwọn atọ́ka DOM bí snapshot tí kò yí padà bá jẹ́ kan náà, ó sì ń kọ́ ọ̀nà àyẹ̀wò nìkan tí a bá tan performance debugging.",
+      "Àwọn ìgbéwọlé CSV, TXT, JSON àkójọ òfin FilterTube, JSON ìyípadà BlockTube, àti ìgbéwọlé tí a ń ṣàkóso ń lo ìlà iṣẹ́ ìmúgbòòrò tó ń wà pẹ́ tí iṣẹ́ abẹ́lẹ̀ ń ṣàkóso pọ̀: ìwádìí kan lẹ́ẹ̀kan, àárín àkókò aláìdọ́gba 7–15 ìṣẹ́jú-àáyá nígbà tí ẹ̀rọ bá wà lójúfò, ìgbìyànjú tuntun fún ìlà kọ̀ọ̀kan, ìmúpadàbọ̀ láti inú àwọn ìkìlọ̀ Chrome, àṣẹ gẹ́gẹ́ bí profaili, àti ipò ìkẹyìn kò rí tàbí ti parí.",
+      "Import Reports tó ń wà pẹ́ ń ṣàlàyé àwọn ipò pé ó ti parí, ó ń dúró, ó ń wá, ó tún ń gbìyànjú, ìwádìí kùnà pátápátá, orúkọ nìkan, a fo ó, àti pé kò sí ìlà iṣẹ́. Wọ́n ṣì wà lẹ́yìn tí a ti pa dashboard, wọ́n ń fi àwọn ìròyìn ńlá hàn ní àwọn apá kéékèèké, wọ́n ń kó àwọn ìlà tí a kò tíì yanjú jáde, wọ́n sì lè yọ àwọn òfin tí a gbé wọlé tí a kò tíì yanjú tí ìdánimọ̀ wọn yàtọ̀ kúrò láìléwu.",
+      "Ìbẹ̀rẹ̀ feed Home àti mímú àwọn ìyípadà ṣe ń dojú kọ àwọn káàdì tó yí padà, ó sì ń pa ọ̀nà ìtọ́jú kíkún mọ́ fún ìyípadà ìṣètò. Àwọn àtúnṣe tó ń fi metadata kún nìkan kì í ṣe refresh àwọn tab YouTube, wọ́n sì ń dín àtúnṣètò káàdì kù.",
+      "Advert Void nílò àwọn ipò player `ad-showing` àti `ad-interrupting` papọ̀ báyìí, tàbí ẹ̀rí òmìnira pé ìpolówó kan hàn. Mímú káàdì onígbọ̀wọ́ ṣe kò tún jẹ́ iṣẹ́ renderer mutation gbogbogbòò.",
+      "Ìtẹ̀jáde ìtújáde GitHub ń lo ìwé-ẹ̀rí GitHub CLI, ó ń ṣẹ̀dá drafts kí ìgbéjáde tó bẹ̀rẹ̀, ó ń bá tags tó ti wà lọ, ó ń gbé assets tó sọnù nìkan jáde, ó ń ṣàyẹ̀wò gbogbo assets tó parí, ó sì ń tẹ̀jáde lẹ́yìn ìjẹ́rìí nìkan.",
+      "App FilterTube fún fóònù àti tablet Android ti wà fún gbogbo ènìyàn lórí Google Play. Fi í sílẹ̀ láti [ojú-ewé gbangba](https://play.google.com/store/apps/details?id=com.filtertube.app) tàbí wá FilterTube lórí Google Play."
+    ]
+  }
+}

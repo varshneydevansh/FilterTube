@@ -1,0 +1,18 @@
+{
+  "3.3.7": {
+    "ctaLabel": "Deleng Sing Anyar",
+    "headline": "Dhaptar gedhé luwih cepet, impor tetep kasimpen, Android wis kabuka kanggo umum",
+    "summary": "FilterTube 3.3.7 nyuda pakaryan bola-bali ing dhaptar aturan gedhé, mindhah pangisènan informasi saluran impor menyang antrian latar mburi sing kasimpen terus, nambah laporan impor kanthi tampilan winates, nguwataké prilaku Home lan Advert Void, ngidini unggahan rilis GitHub diterusaké manèh, lan ngumumaké app Android umum ing Google Play.",
+    "bannerSummary": "3.3.7 nggawa nyaring dhaptar gedhé sing luwih cepet, antrian kasimpen kanggo ngrampungaké saluran impor, laporan impor sing bisa ditliti, Home lan Advert Void sing luwih aman, unggahan rilis sing bisa diterusaké, lan app Android umum ing Google Play.",
+    "highlights": [
+      "Dhaptar saluran lan ID video sing gedhé migunakaké manèh mesin sing wis dikompilasi lan indeks adhedhasar Set, ngliwati metadata sing ora dibutuhaké déning aturan aktif, nggabungaké panulisan wektu didhelikaké, lan ngolah kertu Home sing owah kanthi bertahap; owah-owahan struktural tetep diproses sakabèhé.",
+      "Pambenahan pungkasan kanggo dhaptar gedhé nyegah setter JSON sing wis disaring supaya ora mlaku kaping pindho, nerusaké revisi setelan liwat rong dalan wiwitan, migunakaké manèh indeks DOM nalika snapshot tetep ora owah, lan mung nggawé dalan diagnostik nalika performance debugging diuripaké.",
+      "Impor CSV, TXT, JSON dhaptar aturan FilterTube, JSON migrasi BlockTube, lan impor sing dikelola saiki padha-padha migunakaké antrian enrichment sing kasimpen lan dikelola ing latar mburi: nggoleki siji-siji, sela acak 7–15 detik nalika piranti urip, nyoba manèh saben baris, mulihaké liwat Chrome alarms, idin miturut profil, lan status pungkasan ora ketemu utawa dipungkasi.",
+      "Import Reports sing kasimpen nerangaké status rampung, ngentèni, njupuk data, nyoba manèh, telusuran gagal permanen, mung jeneng, dilewati, lan antrian ora ana. Laporan tetep bisa dibukak sawisé dashboard ditutup, laporan gedhé ditampilaké ing pérangan winates, baris sing durung rampung bisa diekspor, lan aturan impor sing durung rampung kanthi identitas unik bisa dibusak kanthi aman.",
+      "Wiwitan feed Home lan pangolahan owah-owahan ngarah marang kertu sing owah lan tetep nyedhiyakaké pangolahan sakabèhé kanggo owah-owahan struktural. Nganyari sing mung nambah metadata ora nyegeraké tab YouTube lan nyuda owah-owahan tata kertu.",
+      "Advert Void saiki mbutuhaké status pamuter `ad-showing` lan `ad-interrupting` bebarengan utawa bukti kapisah yèn iklan katon. Pangolahan kertu sponsor ora diitung manèh minangka tugas owah-owahan renderer umum.",
+      "Penerbitan rilis GitHub migunakaké kredensial GitHub CLI, nggawé draf sadurungé ngunggah, nerusaké tag sing wis ana, mung ngunggah aset sing durung ana, mriksa kumpulan aset pungkasan, lan mung nerbitaké sawisé dipriksa.",
+      "App FilterTube kanggo telpon lan tablet Android saiki wis kabuka kanggo umum ing Google Play. Pasang saka [kaca umum](https://play.google.com/store/apps/details?id=com.filtertube.app) utawa goleki FilterTube ing Google Play."
+    ]
+  }
+}

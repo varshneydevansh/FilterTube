@@ -1,0 +1,10 @@
+{
+  "extensionName": {
+    "message": "FilterTube",
+    "description": "The extension name shown by the browser."
+  },
+  "extensionDescription": {
+    "message": "በዲጂታል ቪዲዮ ተሞክሮዎ ውስጥ የአእምሮ ሰላምን መልሰው ያግኙ።",
+    "description": "The extension description shown by the browser."
+  }
+}

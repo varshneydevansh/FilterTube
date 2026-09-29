@@ -35,7 +35,7 @@
                             <rect x="3" y="14" width="7" height="7"></rect>
                         </svg>
                     </span>
-                    <span class="nav-label">Dashboard</span>
+                    <span class="nav-label" data-ft-i18n="navigation.dashboard">Dashboard</span>
                 </li>
                 <li class="nav-item" data-tab="filters">
                     <span class="nav-icon">
@@ -44,7 +44,7 @@
                             <polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"></polygon>
                         </svg>
                     </span>
-                    <span class="nav-label">Filters</span>
+                    <span class="nav-label" data-ft-i18n="navigation.filters">Filters</span>
                 </li>
                 <li class="nav-item" data-tab="semantic" hidden aria-hidden="true" data-feature-state="future">
                     <span class="nav-icon">
@@ -70,7 +70,7 @@
                             <path d="M18 15v5"></path>
                         </svg>
                     </span>
-                    <span class="nav-label">Kids Mode</span>
+                    <span class="nav-label" data-ft-i18n="navigation.kids">Kids Mode</span>
                 </li>
                 <li class="nav-item" data-tab="settings">
                     <span class="nav-icon">
@@ -82,7 +82,7 @@
                             </path>
                         </svg>
                     </span>
-                    <span class="nav-label">Settings</span>
+                    <span class="nav-label" data-ft-i18n="navigation.settings">Settings</span>
                 </li>
                 <li class="nav-item" data-tab="sync">
                     <span class="nav-icon">
@@ -94,7 +94,7 @@
                             <path d="M16 17h4v-4"></path>
                         </svg>
                     </span>
-                    <span class="nav-label">Accounts &amp; Sync</span>
+                    <span class="nav-label" data-ft-i18n="navigation.sync">Accounts &amp; Sync</span>
                 </li>
                 <li class="nav-item" data-tab="whatsnew">
                     <span class="nav-icon">
@@ -109,7 +109,7 @@
                             <path d="M16 12h4"></path>
                         </svg>
                     </span>
-                    <span class="nav-label">What’s New</span>
+                    <span class="nav-label" data-ft-i18n="navigation.whatsNew">What’s New</span>
                 </li>
                 <li class="nav-item" data-tab="help">
                     <span class="nav-icon">
@@ -120,7 +120,7 @@
                             <line x1="12" y1="17" x2="12.01" y2="17"></line>
                         </svg>
                     </span>
-                    <span class="nav-label">Help</span>
+                    <span class="nav-label" data-ft-i18n="navigation.help">Help</span>
                 </li>
                 <li class="nav-item" data-tab="about">
                     <span class="nav-icon">
@@ -131,7 +131,7 @@
                             <path d="M19 4h2v6"></path>
                         </svg>
                     </span>
-                    <span class="nav-label">About</span>
+                    <span class="nav-label" data-ft-i18n="navigation.about">About</span>
                 </li>
                 <li class="nav-item" data-tab="donate">
                     <span class="nav-icon">
@@ -140,7 +140,7 @@
                             <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78L12 21.23l8.84-8.84a5.5 5.5 0 0 0 0-7.78z"></path>
                         </svg>
                     </span>
-                    <span class="nav-label">Donate</span>
+                    <span class="nav-label" data-ft-i18n="navigation.donate">Donate</span>
                 </li>
             </ul>
 
@@ -934,6 +934,22 @@
                             </div>
 
                             <div class="settings-system">
+                                <div class="card settings-card ft-interface-language-card">
+                                    <div class="card-header">
+                                        <h3 data-ft-i18n="settings.interfaceLanguage">Interface language</h3>
+                                    </div>
+                                    <div class="card-body settings-card__body">
+                                        <label id="ftInterfaceLanguageField" class="ft-interface-language-field" for="ftInterfaceLanguage">
+                                            <span data-ft-i18n="settings.interfaceLanguage">Interface language</span>
+                                            <select id="ftInterfaceLanguage" class="select-input">
+                                                <option value="auto" data-ft-i18n="settings.languageAuto">Use browser language</option>
+                                                <option value="en">English</option>
+                                            </select>
+                                        </label>
+                                        <p class="import-export-hint" data-ft-i18n="settings.interfaceLanguageHint">Changes FilterTube’s interface only. It does not change video-language rules, YouTube, or your saved filters.</p>
+                                        <p class="import-export-hint" id="ftInterfaceLanguageProgress" data-ft-i18n="settings.moreLanguages">English is the only complete interface language today. More translations are in progress.</p>
+                                    </div>
+                                </div>
                                 <div class="card settings-card">
                                     <div class="card-header">
                                         <h3>Backups</h3>
@@ -2669,9 +2685,12 @@
     <script src="../js/rule_list_import_reports.js"></script>
     <script src="../js/state_manager.js"></script>
     <script src="../js/render_engine.js"></script>
+    <script src="../js/ui_localization.js"></script>
+    <script src="../js/ui_static_copy_capture.js"></script>
     <script src="../js/ui-shell/tab-view-decor.js"></script>
     <script src="../js/managed_parent_command_center.js"></script>
     <script src="../js/tab-view.js"></script>
+    <script src="../js/ui_localization_boot.js"></script>
 </body>
 
 </html>

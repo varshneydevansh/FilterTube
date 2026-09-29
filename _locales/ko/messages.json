@@ -1,0 +1,10 @@
+{
+  "extensionName": {
+    "message": "FilterTube",
+    "description": "The extension name shown by the browser."
+  },
+  "extensionDescription": {
+    "message": "디지털 동영상 경험에서 마음의 평화를 되찾으세요.",
+    "description": "The extension description shown by the browser."
+  }
+}

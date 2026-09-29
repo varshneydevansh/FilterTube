@@ -1,10 +1,11 @@
 {
   "manifest_version": 3,
-  "name": "FilterTube",
-  "description": "Restore peace of mind to your digital video experience.",
+  "name": "__MSG_extensionName__",
+  "description": "__MSG_extensionDescription__",
+  "default_locale": "en",
   "version": "3.3.7",
   "background": {
-    "scripts": ["js/shared/identity.js", "js/imported_channel_enrichment.js", "js/background.js"]
+    "scripts": ["js/shared/identity.js", "js/content/admission_overlay.js", "js/imported_channel_enrichment.js", "js/background.js"]
   },
   "browser_specific_settings": {
     "gecko": {
@@ -32,7 +33,7 @@
       "matches": ["*://*.youtube.com/*", "*://*.youtubekids.com/*"],
       "exclude_matches": ["*://*.youtube.com/embed/*"],
       "js": [
-        "js/shared/identity.js",
+        "js/shared/identity.js", "js/content/admission_overlay.js",
         "js/content/dom_state.js",
         "js/content/menu.js",
         "js/content/dom_helpers.js",
@@ -59,7 +60,7 @@
     {
       "matches": ["*://*.youtube.com/embed/*", "*://*.youtube-nocookie.com/embed/*"],
       "js": [
-        "js/shared/identity.js",
+        "js/shared/identity.js", "js/content/admission_overlay.js",
         "js/content/external_youtube_guard.js",
         "js/content/dom_state.js",
         "js/content/menu.js",
@@ -86,7 +87,7 @@
     },
     {
       "matches": ["https://*.google.com/search*"],
-      "js": ["js/shared/identity.js", "js/content/external_youtube_guard.js"],
+      "js": ["js/shared/identity.js", "js/content/admission_overlay.js", "js/content/external_youtube_guard.js"],
       "run_at": "document_start"
     }
   ],
@@ -96,12 +97,17 @@
         "js/injector.js",
         "js/filter_logic.js",
         "js/seed.js",
-        "js/shared/identity.js",
+        "js/shared/identity.js", "js/content/admission_overlay.js",
+        "data/ui_locales/*.json",
         "assets/images/homepage_hero_day.mp4",
         "icons/icon-48.png",
         "icons/file.svg"
       ],
       "matches": ["*://*.youtube.com/*", "*://*.youtube-nocookie.com/*", "*://*.youtubekids.com/*"]
+    },
+    {
+      "resources": ["icons/icon-48.png", "data/ui_locales/*.json"],
+      "matches": ["https://*.google.com/*"]
     }
   ],
   "icons": {
