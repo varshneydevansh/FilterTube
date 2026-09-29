@@ -14,5 +14,383 @@
       "GitHub release publishing, GitHub CLI credentials का उपयोग करता है, upload से पहले drafts बनाता है, मौजूदा tags से काम जारी रखता है, केवल ग़ायब assets upload करता है, अंतिम asset set की जाँच करता है और जाँच के बाद ही publish करता है।",
       "Android फ़ोन और टैबलेट के लिए FilterTube ऐप अब Google Play पर सार्वजनिक रूप से उपलब्ध है। इसे [सार्वजनिक पेज](https://play.google.com/store/apps/details?id=com.filtertube.app) से इंस्टॉल करें या Google Play पर FilterTube खोजें।"
     ]
+  },
+  "3.3.6": {
+    "version": "3.3.6",
+    "headline": "बेहतर फ़िल्टरिंग, सुरक्षित समय-सीमा और विज्ञापन-मुक्त प्लेबैक",
+    "summary": "FilterTube 3.3.6 में सीधे पहुँच पर नियंत्रण, हर प्रोफ़ाइल के लिए सुरक्षित समय-सीमा और Self-Control सत्र, अवरुद्ध और अनुमत नियमों के भरोसेमंद संग्रह, आधिकारिक श्रेणी फ़िल्टरिंग, डिफ़ॉल्ट रूप से चालू Advert Void और मौजूदा YouTube के लिए व्यापक संगतता सुधार शामिल हैं।",
+    "bannerSummary": "3.3.6 में सीधे पहुँच की फ़िल्टरिंग, सुरक्षित समय-सीमा, नियम-सूची और BlockTube आयात, आधिकारिक श्रेणियाँ, Advert Void और मौजूदा YouTube संगतता शामिल हैं।",
+    "highlights": [
+      "सीधे YouTube पर जाना, प्लेलिस्ट बदलना, ऑटोप्ले और समर्थित एम्बेड अब वीडियो और चैनल की उन्हीं पात्रता जाँचों से गुजरते हैं जो फ़ीड फ़िल्टरिंग में होती हैं—वे फ़िल्टर को बायपास नहीं कर सकते।",
+      "दैनिक YouTube सीमाएँ अब सक्रिय प्रोफ़ाइल के अनुसार लागू होती हैं, बचा हुआ समय दिखाती हैं और रीस्टार्ट के बाद भी बनी रहती हैं। PIN-आधारित प्रोफ़ाइल स्विचिंग वाला पूरा-स्क्रीन टाइमआउट पेज मिलता है; स्वैच्छिक Self-Control सत्र चुने गए नियमों को उलटी गिनती पूरी होने तक लॉक रखते हैं।",
+      "Main और Kids के लिए अवरुद्ध नियम और अनुमत नियम अलग-अलग संग्रह बने रहते हैं; ऊपर की ब्लॉकलिस्ट या व्हाइटलिस्ट नीति तय करती है कि देखने को कौन-सा संग्रह नियंत्रित करेगा।",
+      "बड़े BlockTube और प्रबंधित नियम-सूची आयात में अब पूर्वावलोकन, क्षमता जाँच, लेन-देन रोलबैक और पढ़कर सत्यापन शामिल हैं। जोड़े गए, डुप्लिकेट, छोड़े गए चैनल, कीवर्ड, रेगेक्स और वीडियो ID की गिनती भी अधिक स्पष्ट है।",
+      "श्रेणी फ़िल्टरिंग YouTube के आधिकारिक `microformat.playerMicroformatRenderer.category`, सीमित same-origin Player मेटाडेटा लोडिंग और स्पष्ट “चुने हुए अवरुद्ध करें” या “केवल चुने हुए की अनुमति दें” विकल्पों का उपयोग करती है। Watch, rail, Mix, टिप्पणियों और renderers की ज़िम्मेदारी भी अधिक सुरक्षित ढंग से अलग की गई है।",
+      "YouTube Main और Kids के नए तथा अपग्रेड किए गए प्रोफ़ाइल में Advert Void डिफ़ॉल्ट रूप से चालू है। साझा Web runtime बिना अतिरिक्त अनुरोध के पहचाने गए Player विज्ञापन-योजना फ़ील्ड हटाता है; native playback मॉडल में न आए विज्ञापन-योजना डेटा को छोड़ देता है या उपलब्ध होने पर कच्चे Reel उत्तर को सामान्यीकृत करता है, जबकि सुरक्षित fallback बाकी रुकावटें संभालता है।",
+      "प्रायोगिक बोली जाने वाली भाषा फ़िल्टरिंग और मूल ऑडियो प्राथमिकता उपलब्ध होने पर YouTube Player के संकेत इस्तेमाल करती हैं; सुझाव मेटाडेटा उपलब्ध न होने पर सामग्री को अनुमति दी जाती है।",
+      "YouTube Playables छिपाना, मौजूदा camelCase renderer और collaboration समर्थन, अधिक पठनीय Help और बेहतर खोज, popup और dashboard नियंत्रणों की स्पष्टता, तथा Android Google Play और iOS की सार्वजनिक स्थिति वाले पृष्ठ भी शामिल हैं।",
+      "Settings में एक डिवाइस-व्यापी विकल्प जोड़ा गया है, जो डिफ़ॉल्ट रूप से अनचेक रहता है और YouTube तथा YouTube Kids पर अपने-आप reload reminder और What's New बैनर बंद कर सकता है। Dashboard का What's New पृष्ठ फिर भी हाथ से खोला जा सकता है।"
+    ],
+    "detailsUrl": "https://github.com/varshneydevansh/FilterTube/releases/tag/v3.3.6"
+  },
+  "3.3.5": {
+    "version": "3.3.5",
+    "headline": "YouTube खराबी से उबरना और Shorts चैनल पहले पहचानना",
+    "summary": "इस रिलीज़ में पहले से खुले YouTube टैब में content runtime के दोबारा inject होने की समस्या ठीक की गई है। चैनल नियम या व्हाइटलिस्ट मोड चालू होने पर Shorts की चैनल पहचान भी पहले सुलझ जाती है।",
+    "bannerSummary": "Runtime का दोहरा injection ठीक किया, अवरुद्ध चैनलों के Shorts की पहचान बेहतर की और v3.3.4 के rollback की सीमा समझाई।",
+    "highlights": [
+      "Install/update/profile refresh अब पहले से खुले YouTube टैब में manifest content scripts दोबारा inject नहीं करता, जिससे `Identifier ... has already been declared` वाली बार-बार होने वाली syntax त्रुटियाँ रुकती हैं।",
+      "पहले से खुले YouTube टैब अब भी प्रबंधित समय-सीमा/runtime जाँच पा सकते हैं, बिना scripts की दोहरी घोषणा के।",
+      "चैनल ब्लॉकलिस्ट नियम या व्हाइटलिस्ट मोड सक्रिय होने पर दिखने वाले और लगभग दिखने वाले Shorts अब मौजूदा सीमित background `/shorts/<videoId>` owner resolver इस्तेमाल करते हैं।",
+      "सीखी गई Shorts video-to-channel mappings सहेजी जाती हैं और तुरंत दोबारा संसाधित होती हैं, इसलिए अवरुद्ध चैनल के Shorts छिपाने के लिए hover या menu interaction की ज़रूरत नहीं पड़ती।",
+      "`.shortsLockupViewModelHost` और `.ytGridShelfViewModelGridShelfItem` जैसे desktop Shorts hosts को अलग Shorts fallback/enrichment पथों में शामिल किया गया है।",
+      "ब्लॉकलिस्ट मोड में पहचान सुलझने तक अज्ञात Shorts नहीं छिपते; व्हाइटलिस्ट मोड मौजूदा pending पथ के कारण अधिक सख्त रहता है।",
+      "v3.3.4 को store rollback के रूप में दर्ज किया गया है: YouTube खराबी रिपोर्ट की जाँच के दौरान इसमें v3.3.2 पैकेज इस्तेमाल हुआ।"
+    ],
+    "detailsUrl": "https://github.com/varshneydevansh/FilterTube/releases/tag/v3.3.5"
+  },
+  "3.3.4": {
+    "version": "3.3.4",
+    "headline": "Store में v3.3.2 पैकेज पर rollback",
+    "summary": "v3.3.4 ब्राउज़र store का rollback रिलीज़ था। v3.3.3 के YouTube खराबी रिपोर्ट की जाँच के दौरान इसमें पहले वाला v3.3.2 पैकेज इस्तेमाल किया गया।",
+    "bannerSummary": "Rollback रिलीज़: YouTube खराबी रिपोर्ट की जाँच के दौरान v3.3.4 में v3.3.2 पैकेज इस्तेमाल हुआ।",
+    "highlights": [
+      "v3.3.4 के लिए कोई नया source-forward फीचर कार्य दावा नहीं किया गया है।",
+      "समस्या #64 की जाँच करते समय संदिग्ध v3.3.3 पैकेज से stores को हटाने के लिए rollback इस्तेमाल किया गया।",
+      "अगली source रिलीज़ v3.3.5 में दोहरे runtime injection और Shorts पहचान की समस्याएँ ठीक की गईं।"
+    ],
+    "detailsUrl": "https://github.com/varshneydevansh/FilterTube/releases/tag/v3.3.4"
+  },
+  "3.3.3": {
+    "version": "3.3.3",
+    "headline": "परिवार के डिवाइस अपडेट, नियम-सूचियाँ, तारीख वाले कीवर्ड और YouTube DOM अपडेट",
+    "summary": "इस रिलीज़ में माता-पिता/देखभालकर्ता नियंत्रण समझना आसान हुआ, समीक्षा के बाद नियम-सूची आयात और तारीख-सीमित कीवर्ड नियम जोड़े गए, Home/Internet Pickup मॉडल समझाया गया और मौजूदा YouTube/YTM markup के लिए फ़िल्टरिंग अपडेट की गई।",
+    "bannerSummary": "इस रिलीज़ में Family Device Updates, समीक्षा किए हुए नियम-सूची आयात, तारीख-सीमित कीवर्ड, माता-पिता-केंद्रित Help और मौजूदा YouTube/YTM DOM संगतता शामिल हैं।",
+    "highlights": [
+      "माता-पिता/देखभालकर्ता प्रोफ़ाइल सुरक्षित प्रोफ़ाइलों को प्रबंधित कर सकती हैं, parent dashboard से बच्चों/सुरक्षित प्रोफ़ाइलों के नियम संपादित कर सकती हैं और सत्यापित सुरक्षित डिवाइसों पर स्वीकृत अपडेट भेज सकती हैं।",
+      "Family Device Updates में अब live Send Update, स्पष्ट Home Pickup और स्पष्ट Internet Pickup की व्याख्या है; pickup सेवाओं को अधिकार का स्रोत नहीं माना गया है।",
+      "सुरक्षित प्रोफ़ाइलों की समय-सीमाएँ अब पुराने और नए YouTube टैब जाँचती हैं, शांत timeout स्क्रीन दिखाती हैं और अतिरिक्त समय के अनुरोध को माता-पिता की समीक्षा के लिए दर्ज करती हैं।",
+      "नियम-सूची आयात CSV, TXT, सरल JSON, BlockTube-शैली JSON और raw HTTPS URL का समर्थन करता है; लागू करने से पहले preview, Main/Kids/Both लक्ष्य, templates, सूची प्रबंधन, pause/resume/remove, पुराने डेटा की जाँच और refresh उपलब्ध हैं।",
+      "तारीख-आधारित कीवर्ड फ़िल्टर किसी कीवर्ड को अपलोड की तारीख पर/बाद में, उस तारीख तक, या तारीखों के बीच लागू कर सकता है। YouTube द्वारा उपलब्ध कराने पर टिप्पणी फ़िल्टर parent video की अपलोड तारीख इस्तेमाल करता है।",
+      "Help और dashboard नियंत्रणों में सरल, माता-पिता-केंद्रित भाषा, तेज़ Help bubbles और Exact, Comment, Date, PIN, नियम-सूची तथा डिवाइस अपडेट की अधिक स्पष्ट व्याख्या है।",
+      "Dashboard अब सक्रिय Android closed-testing उपयोगकर्ताओं को hello@filtertube.in पर ईमेल भेजने का निमंत्रण देता है और YouTube की page structure बदलने से फ़िल्टरिंग टूटने पर रिपोर्ट करने की याद दिलाता है।",
+      "YouTube desktop lockup selectors और YTM mobile camelCase DOM का दस्तावेज़ीकरण किया गया है, ताकि असली video cards फ़िल्टर होते रहें और Watch-page chip bars fallback काम शुरू न करें या scroll jump न कराएँ।",
+      "अब भी अलग रखे गए विषय: automatic LAN peer discovery, hosted FilterTube Internet Pickup service, चुपचाप अपडेट होने वाले सार्वजनिक auto-subscribe catalogs, native Android/iOS parity और इंस्टॉल किए गए दो डिवाइसों के बीच manual smoke परीक्षण।"
+    ],
+    "detailsUrl": "https://github.com/varshneydevansh/FilterTube/releases/tag/v3.3.3"
+  },
+  "3.3.2": {
+    "version": "3.3.2",
+    "headline": "मोबाइल/टैबलेट ऐप MVP, बेहतर YouTube और सुरक्षित व्हाइटलिस्ट",
+    "summary": "सार्वजनिक ऐप रिलीज़ पेज Android फ़ोन/टैबलेट के अंतिम परीक्षण और iOS/iPad स्थिति के लिए तैयार है; extension dashboard अब इन ऐप पथों की ओर ले जाता है। सक्रिय नियम न होने पर YouTube SPA कम काम करता है, और व्हाइटलिस्ट/end-screen शुद्धता सुधार भी शामिल हैं।",
+    "bannerSummary": "मोबाइल/टैबलेट ऐप रिलीज़ पेज, बेहतर YouTube runtime, production में शांत logs और whitelist/end-screen leak fixes इस रिलीज़ में शामिल हैं।",
+    "highlights": [
+      "वेबसाइट डाउनलोड हब और extension dashboard अब Android फ़ोन/टैबलेट के अंतिम परीक्षण का रास्ता और iOS/iPad TestFlight/App Store स्थिति दिखाते हैं।",
+      "Android फ़ोन/टैबलेट रिलीज़ तैयारी में साझा FilterTube runtime, YouTube Main, सार्वजनिक YouTube Kids पहुँच, profiles, PIN rules और Nanah sync शामिल हैं।",
+      "YouTube SPA performance कार्य अब सक्रिय नियम या route आवश्यकता न होने पर अधिक JSON clone/parse/replay, DOM fallback, quick-block, fallback-menu और whitelist-pending काम छोड़ देता है।",
+      "Production extension contexts में नियमित console logging केवल स्पष्ट debug mode चालू होने पर होती है, ताकि सामान्य browsing में YouTube hot paths पर अतिरिक्त बोझ न पड़े।",
+      "Whitelist release fixes में Shorts creator fallback, list-target forwarding और end-screen controls के compact autoplay/watch-next endpoint filtering शामिल हैं।",
+      "FilterTube DOM state attributes को मजबूत किया गया है, ताकि ज़रूरी runtime state रखते हुए व्यापक रूप से दिखने वाले `data-filtertube-*` संकेत कम हों।",
+      "Accounts & Sync अब Family Device Updates को Send Update, वैकल्पिक Home Pickup और बाद में/दूर से खोलने के लिए Internet Pickup के ज़रिये समझाता है। इससे माता-पिता को live sync, home pickup, online pickup और अधिकार-स्रोत के बीच अंतर स्पष्ट होता है।",
+      "सुरक्षित प्रोफ़ाइल समय-सीमाओं के लिए रिलीज़ दस्तावेज़ जोड़े गए: दैनिक YouTube सीमा, timeout स्क्रीन, अतिरिक्त समय अनुरोध इतिहास और माता-पिता/देखभालकर्ता की मंज़ूरी।",
+      "Nanah/import पथ extension और native app payloads के बीच चैनल से निकली Filter All keyword ownership सुरक्षित रखते हैं, जिसमें row color, source-badge metadata और pairing context शामिल हैं।"
+    ],
+    "detailsUrl": "https://github.com/varshneydevansh/FilterTube/releases/tag/v3.3.2"
+  },
+  "3.3.1": {
+    "version": "3.3.1",
+    "headline": "बिना किसी तीसरे-पक्ष सर्वर के P2P द्वारा सुरक्षित डिवाइस सिंक",
+    "summary": "Accounts & Sync अब Nanah को तीन सरल रास्तों में प्रस्तुत करता है, parent/child targeting बेहतर करता है, reconnect नियम स्पष्ट करता है और वास्तविक उपयोग के लिए दस्तावेज़ीकरण का दायरा बढ़ाता है।",
+    "bannerSummary": "Nanah sync, बेहतर parent/child control, सुरक्षित reconnect नियम और नए Accounts & Sync flow के लिए पूरी documentation।",
+    "highlights": [
+      "Accounts & Sync अब तीन स्पष्ट रास्तों से शुरू होता है: Send this profile once, Parent controls child और Move full account।",
+      "Advanced Nanah controls उपलब्ध हैं, पर अब पूरे flow का नेतृत्व करने के बजाय Advanced section के पीछे रखे गए हैं।",
+      "Parent/source sessions अब दूरस्थ target profile अधिक स्पष्ट रूप से चुन सकते हैं; managed-link save अब sender तक भी mirror होता है ताकि दोनों डिवाइस पर एक ही trust record रहे।",
+      "Trusted links refresh के बाद भी सहेजे रहते हैं, लेकिन reconnect अब भी एक नया live session है, छिपा हुआ background sync नहीं।",
+      "सुरक्षित parental control के लिए locked child updates, reconnect नियम, device-label persistence और self-join/session-burn सुरक्षा कड़ी की गई।",
+      "README, Architecture, Technical, Functionality, Profiles & PIN, project plan, user guide और concern tracker में मौजूदा Nanah desktop स्थिति का अधिक विस्तृत दस्तावेज़ीकरण है।"
+    ],
+    "detailsUrl": "https://github.com/varshneydevansh/FilterTube/releases/tag/v3.3.1"
+  },
+  "3.3.0": {
+    "version": "3.3.0",
+    "headline": "Collaboration recovery और cross-browser import को अधिक मज़बूत बनाया",
+    "summary": "Watch/YTM collaboration menus अब पूरी roster अधिक भरोसे से प्राप्त करते हैं, subscription import विभिन्न browsers में बेहतर है और कई surface-specific whitelist व Quick Block fixes को 3.3.0 में शामिल किया गया है।",
+    "bannerSummary": "बेहतर collab menus, मज़बूत whitelist import, सुरक्षित Quick Block surfaces, सीधे channel links और 3-dot block item के लिए नया toggle।",
+    "highlights": [
+      "Mobile YouTube home/watch-next/Mix-जैसे cards अब अधूरे single-channel menus के बजाय उसी 3-dot और collaborator recovery flow का उपयोग करते हैं।",
+      "Watch-page right rail, playlist rows और watch-जैसे lockups अब पूरी collaborator roster प्राप्त कर सकते हैं और सक्रिय 3-dot menu को वहीं refresh कर सकते हैं।",
+      "Mix/watch recovery अधिक सुरक्षित है: असली collaboration cards ठीक से upgrade होते हैं, जबकि नामों में मौजूद साधारण '&' या 'and' अब गलत तरीके से collaboration menus नहीं बनाते।",
+      "जटिल surfaces पर Quick Block अधिक स्थिर है: यह अधिक desktop cards के ऊपर रहता है, mobile search-suggestion dropdowns से बचता है और mobile watch-next layouts पर बेहतर anchor होता है।",
+      "Subscribed-channel whitelist import हाल की YouTube page browse responses रखता है, असली `/feed/channels` growth को प्राथमिकता देता है और `/feed/channels` को दिखाई देने वाला management surface बनाए रखता है।",
+      "YouTube desktop/mobile renderers में whitelist filtering अधिक सख्त और सुरक्षित है, जिसमें बेहतर creator-page handling और Mixes/subscriptions hide controls शामिल हैं।",
+      "नए controls और polish: Channel Management rows असली channel pages से जुड़ती हैं, 3-dot block item बंद किया जा सकता है और encrypted Firefox export सुरक्षित fallback इस्तेमाल करता है।"
+    ],
+    "detailsUrl": "https://github.com/varshneydevansh/FilterTube/releases/tag/v3.3.0"
+  },
+  "3.2.9": {
+    "version": "3.2.9",
+    "headline": "Subscribed Channel Import, Whitelist और PIN सुरक्षा बग फ़िक्स",
+    "summary": "सक्रिय YouTube खाते की subscriptions को whitelist में आयात करें; mode-switch अर्थ अधिक स्पष्ट है और `/feed/channels` का startup flow अधिक भरोसेमंद है।",
+    "bannerSummary": "वर्तमान YouTube subscriptions से whitelist बनाएँ, inline progress देखें और whitelist activation के व्यवहार को स्पष्ट समझें।",
+    "highlights": [
+      "नया Tab View import: साइन-इन किए हुए सक्रिय YouTube खाते से subscribed channels को whitelist में आयात किया जा सकता है।",
+      "Import startup अब live YouTube tab दोबारा इस्तेमाल करता है, उसे `/feed/channels` पर ले जाता है और शुरू करने से पहले FilterTube bridge के तैयार होने की प्रतीक्षा करता है।",
+      "Whitelist copy अधिक स्पष्ट है: Import Only blocklist को नहीं बदलता, जबकि Import + Turn On Whitelist मौजूदा blocklist-to-whitelist migration पथ अपनाता है।",
+      "दस्तावेज़ में import architecture, FEchannels request flow, renderer sources और whitelist semantics अधिक विस्तार से शामिल हैं।"
+    ],
+    "detailsUrl": "https://github.com/varshneydevansh/FilterTube/releases/tag/v3.2.9"
+  },
+  "3.2.8": {
+    "version": "3.2.8",
+    "headline": "थीम ताज़ा करना और Scenic UI shell को बेहतर बनाना",
+    "summary": "Popup और dashboard अब अधिक शांत scenic theme system का उपयोग करते हैं, जिसमें सघन layout, स्पष्ट tint states और light/dark balance बेहतर है।",
+    "bannerSummary": "Popup और dashboard की refined theme: शांत transparency, स्पष्ट pills और बेहतर responsive layout।",
+    "highlights": [
+      "Scenic UI refresh: popup और dashboard अब शांत product shell साझा करते हैं, जिसमें local hero video ambient background media है।",
+      "Light/dark theme tuning: dark mode में scenic background दिखाई देता रहता है और बीच का धुंधला glow नहीं रहता; light mode में साफ़ transparency है।",
+      "Responsive cleanup: popup spacing सघन, profile dropdown छोटा, Help/Support card layout बेहतर और मोबाइल filter surfaces पर fit सुधरा।",
+      "Control tint fixes: enabled/disabled states, pill colors, search fields और import/export actions दोनों themes में अधिक स्पष्ट हैं।"
+    ],
+    "detailsUrl": "https://github.com/varshneydevansh/FilterTube/releases/tag/v3.2.8"
+  },
+  "3.2.7": {
+    "version": "3.2.7",
+    "headline": "Category Filters, hover पर Quick Cross Block, Mobile 3-Dot UI और Quick Cross Block Support",
+    "summary": "नई category filtering और डिफ़ॉल्ट रूप से चालू one-tap quick cross block।",
+    "bannerSummary": "Card hover से नए category filters और quick cross block इस्तेमाल करें; YT Mobile blocking support भी बेहतर है।",
+    "highlights": [
+      "Category Filtering: YouTube category (Music, Gaming, Education आदि) के आधार पर videos block या allow करें।",
+      "Quick Cross Block डिफ़ॉल्ट रूप से ON: `Show Quick Cross Block button` v3.2.7 में डिफ़ॉल्ट रूप से enabled है; उपयोगकर्ता इसे बंद कर सकते हैं।",
+      "Mobile Blocking: YT Mobile के 3 Dot UI और Quick Cross Block का बेहतर समर्थन; फिलहाल Home Page पर काम करता है।"
+    ],
+    "detailsUrl": "https://github.com/varshneydevansh/FilterTube/releases/tag/v3.2.7"
+  },
+  "3.2.6": {
+    "version": "3.2.6",
+    "headline": "UI/UX सुधार और content-based filtering",
+    "summary": "आधुनिक डिज़ाइन के साथ typography में व्यापक सुधार और तीन नए content filters—duration, date और uppercase।",
+    "bannerSummary": "सुंदर नया UI, जिसमें duration, upload date और clickbait detection के content filters शामिल हैं।",
+    "highlights": [
+      "Typography updates: बेहतर पठनीयता के लिए आधुनिक और परिष्कृत font scale।",
+      "Content-based filters: duration (longer/shorter/between), upload date (newer/older/between) और uppercase detection (clickbait titles)।",
+      "`videoMetaMap` system: बुद्धिमान batching (75ms window, 1500 entry cap) के साथ video metadata का persistent storage।",
+      "Dashboard improvements: surface-specific stats (Main vs Kids), बेहतर stat cards और donate promo card।"
+    ],
+    "detailsUrl": "https://github.com/varshneydevansh/FilterTube/releases/tag/v3.2.6"
+  },
+  "3.2.5": {
+    "version": "3.2.5",
+    "headline": "Whitelist को मुख्य मोड बनाया और स्थिरता बढ़ाई",
+    "summary": "Whitelist mode अब मुख्य allow-only रास्ता है; बेहतर extraction, playlist safeguards और कम CPU उपयोग शामिल हैं।",
+    "bannerSummary": "Whitelist mode को बढ़ावा: साफ़ UI, बेहतर playlist stability और Kids support।",
+    "highlights": [
+      "Promoted whitelist mode: wording/UI में अब इसे experimental नहीं कहा गया है।",
+      "3-dot menu की सफ़ाई और whitelist surfaces के लिए search-secondary handling।",
+      "Thumbnail anchors और parent containers के साथ multi-source channel extraction।",
+      "Mode-aware state tracking, confirmation dialogs और bridge optimizations।",
+      "Playlist stability: चुनी हुई rows दिखाई देती हैं; pending identities अब blocked rows को वापस नहीं दिखातीं।",
+      "Zero-network architecture के साथ Kids mode whitelist support।"
+    ],
+    "detailsUrl": "https://github.com/varshneydevansh/FilterTube/releases/tag/v3.2.5"
+  },
+  "3.2.4": {
+    "version": "3.2.4",
+    "headline": "बेहतर Whitelist Mode और performance optimizations",
+    "summary": "Experimental whitelist mode में बड़े सुधार, बेहतर UX, performance optimizations और विस्तृत Kids mode support।",
+    "bannerSummary": "Whitelist mode अधिक स्मार्ट: साफ़ UI, बेहतर performance और Kids support।",
+    "highlights": [
+      "EXPERIMENTAL: 3-dot menu cleanup, intelligent search processing और mode-aware state tracking वाला बेहतर whitelist mode।",
+      "Performance boost: bridge-level optimizations और selective processing CPU उपयोग घटाते हैं।",
+      "UI improvements: mode बदलते समय confirmation dialogs आकस्मिक data loss रोकते हैं।",
+      "Kids mode support: whitelist सुविधा अब YouTube Kids पर zero-network architecture के साथ काम करती है।",
+      "Search optimizations: right-rail watch cards को समझदारी से संभालकर UI clutter रोका जाता है।",
+      "Channel extraction: thumbnail anchors और parent containers सहित कई sources से identity resolution।",
+      "Mode switching: intelligent reprocessing के साथ blocklist/whitelist में सहज बदलाव।"
+    ],
+    "detailsUrl": "https://github.com/varshneydevansh/FilterTube/releases/tag/v3.2.4"
+  },
+  "3.2.3": {
+    "version": "3.2.3",
+    "headline": "Experimental Whitelist Mode और UI सुधार",
+    "summary": "“allow-only” filtering के लिए whitelist का alpha release, साथ में UI updates और mobile menu support।",
+    "bannerSummary": "Experimental whitelist आज़माएँ—स्पष्ट रूप से अनुमत channels/keywords के अलावा सब छिपाएँ।",
+    "highlights": [
+      "EXPERIMENTAL: whitelist mode स्पष्ट रूप से अनुमत channels/keywords को छोड़कर सारी सामग्री छिपाता है।",
+      "Popup और Tab View में blocklist और whitelist के बीच आसान toggle वाले dual filtering modes।",
+      "Staging migration—channels इकट्ठा करने के लिए blocklist पर जाएँ, फिर उन्हें whitelist में merge करें।",
+      "Whitelist mode में watch page protection video playback को बनाए रखती है।",
+      "Optimistic UI updates सामग्री को तुरंत छिपाते हैं और block विफल होने पर अपने-आप वापस दिखाते हैं।",
+      "सही YouTube mobile renderer handling के साथ बेहतर mobile menu support।",
+      "Production noise घटाने के लिए सभी console logs अब debug flag के पीछे हैं।"
+    ],
+    "detailsUrl": "https://github.com/varshneydevansh/FilterTube/releases/tag/v3.2.3"
+  },
+  "3.2.2": {
+    "version": "3.2.2",
+    "headline": "UI सुधार और Debug Logging नियंत्रण",
+    "summary": "Optimistic updates, mobile menu support, debug-gated logging, scroll preservation और state management refinements।",
+    "bannerSummary": "तुरंत UI feedback, बेहतर mobile menu और debug-gated logs के साथ स्थिर state handling।",
+    "highlights": [
+      "Optimistic UI updates: सामग्री तुरंत छिपती है और block विफल होने पर auto-restore होती है।",
+      "`ytm-menu-popup-renderer` के लिए सही renderer tags सहित बेहतर mobile menu support।",
+      "`window.__filtertubeDebug` के ज़रिये debug-gated logging।",
+      "DOM fallback के दौरान scroll preservation, ताकि अचानक jumps न हों।",
+      "Background requests घटाने के लिए channel enrichment सीमा 10 प्रति session।",
+      "`requestIdleCallback` और batching के साथ idle-scheduled rendering।",
+      "Signature comparison के साथ external reload debounce, जिससे अनावश्यक renders रुकते हैं।",
+      "Selective notifications: signature बदलने पर ही `load`; अन्यथा `externalUpdate`।",
+      "Shared global state के ज़रिये bridge state management।"
+    ],
+    "detailsUrl": "https://github.com/varshneydevansh/FilterTube/releases/tag/v3.2.2"
+  },
+  "3.2.1": {
+    "version": "3.2.1",
+    "headline": "Lag-free processing और performance boost",
+    "summary": "बड़े performance optimizations UI lag हटाते हैं; Chromium browsers में शानदार परिणाम और Firefox में भी महत्वपूर्ण सुधार।",
+    "bannerSummary": "Async processing, compiled caching और batched updates के साथ lag-free filtering।",
+    "highlights": [
+      "Main thread को yield करने वाली async DOM processing भारी filtering के दौरान browser freeze होने से रोकती है।",
+      "Compiled regex और channel filter caching O(1) lookup देती है और CPU usage 60–80% घटाती है।",
+      "बुद्धिमान 250ms intervals वाले batched storage updates I/O operations को 70–90% घटाते हैं।",
+      "Debounced settings refresh अत्यधिक DOM reprocessing रोकता है।",
+      "Run state management overlapping executions रोकता है और requests को ठीक से queue करता है।",
+      "Chromium browsers में 90% से अधिक lag reduction; Firefox में महत्वपूर्ण सुधार, optimization जारी।"
+    ],
+    "detailsUrl": "https://github.com/varshneydevansh/FilterTube/releases/tag/v3.2.1"
+  },
+  "3.2.0": {
+    "version": "3.2.0",
+    "headline": "तुरंत blocking और zero-network Kids",
+    "summary": "3-dot menus तुरंत सही channel names दिखाते हैं, network requests बहुत घटती हैं और YouTube Kids पूरी तरह offline काम करता है।",
+    "bannerSummary": "Proactive XHR interception से zero-delay blocking; Kids mode किसी network fetch के बिना काम करता है।",
+    "highlights": [
+      "3-dot menus अब सही channel names तुरंत दिखाते हैं—अब 'Fetching...' की देरी नहीं।",
+      "Channel identity intercepted YouTube JSON responses से आती है, जिससे network calls घटती हैं।",
+      "YouTube Kids भरोसेमंद blocking के लिए बिना किसी network fetch के चलता है।",
+      "Missing metadata controlled rate (6-hour cooldown) पर background में पूरी होती है।",
+      "Topic channels (जैसे `Music - Topic`) को `@handles` के बिना विशेष रूप से संभाला जाता है।",
+      "ASCII और Mermaid flow diagrams वाला व्यापक दस्तावेज़ीकरण जोड़ा गया है।"
+    ],
+    "detailsUrl": "https://github.com/varshneydevansh/FilterTube/releases/tag/v3.2.0"
+  },
+  "3.1.9": {
+    "version": "3.1.9",
+    "headline": "Profile-aware backups और lock-gated controls",
+    "summary": "Auto-backup और content controls अब profile locks/PIN का सम्मान करते हैं, प्रति-प्रोफ़ाइल settings लेते हैं, और lock gate banner दिखने पर भी profile dropdown क्लिक किया जा सकता है।",
+    "bannerSummary": "Per-profile auto-backup और locked-profile gating; profile selector हमेशा क्लिक करने योग्य।",
+    "highlights": [
+      "Auto-backup बंद होने या profile locked होने पर auto-backup mode/format selectors disable होते हैं; नए profiles auto-backup preferences inherit करते हैं।",
+      "Auto-backup scheduling अब profile creation और mode/format changes पर तभी चलता है जब उस profile के लिए auto-backup enabled हो।",
+      "Locked होने पर content-control toggles और backup controls disabled/revert रहते हैं; non-master profiles के लिए export scope केवल active profile तक सीमित होता है।",
+      "Profile dropdown का z-index ठीक किया गया, ताकि lock gate banner दिखने पर भी वह क्लिक किया जा सके।",
+      "Profile/PIN model, profile-scoped backups और UI gating rules के दस्तावेज़ अपडेट किए गए।"
+    ],
+    "detailsUrl": "https://github.com/varshneydevansh/FilterTube/releases/tag/v3.1.9"
+  },
+  "3.1.8": {
+    "version": "3.1.8",
+    "headline": "Support tab और भरोसेमंद auto-backups",
+    "summary": "नई Support page (Ko-fi) जोड़ी गई और auto-backups अब Chrome तथा Firefox दोनों में भरोसेमंद ढंग से काम करते हैं।",
+    "bannerSummary": "Auto-backups अब cross-browser हैं और एक ही latest backup file overwrite करते हैं।",
+    "highlights": [
+      "Dashboard में Ko-fi embed वाला Support page जोड़ा गया।",
+      "Auto-backups अब एक rolling file overwrite करते हैं: `Downloads/FilterTube Backup/FilterTube-Backup-Latest.json`।",
+      "Download strategy cross-browser है (उपलब्ध हो तो Blob URL; Chrome MV3 service worker के लिए `data:` URL fallback)।",
+      "`data:` URL restrictions के कारण Firefox downloads अब विफल नहीं होते।"
+    ],
+    "detailsUrl": "https://github.com/varshneydevansh/FilterTube/releases/tag/v3.1.8"
+  },
+  "3.1.7": {
+    "version": "3.1.7",
+    "headline": "YT Kids और auto-backup support",
+    "summary": "YT Kids पर channel-आधारित content blocking जोड़ी गई और auto backups को चालू/बंद किया जा सकता है।",
+    "bannerSummary": "Auto backups enable/disable करने की नई setting। Manual exports अब `Downloads/FilterTube Export/` में सहेजे जाते हैं।",
+    "highlights": [
+      "YT Kids पर channel और keyword आधारित पूर्ण blocking जोड़ी गई; यह YT Kids के 3-dot menu UI को passive सुनकर channels block करती है।",
+      "Auto backups enable/disable करने के लिए Settings toggle जोड़ा गया (best-effort; Save As prompt नहीं)।",
+      "Auto backups rotation के साथ `Downloads/FilterTube Backup/` में सहेजे जाते हैं; नवीनतम files रखी जाती हैं।",
+      "Manual exports अब बिना अतिरिक्त prompt के `Downloads/FilterTube Export/` में डाउनलोड होते हैं।"
+    ],
+    "detailsUrl": "https://github.com/varshneydevansh/FilterTube/releases/tag/v3.1.7"
+  },
+  "3.1.6": {
+    "version": "3.1.6",
+    "headline": "Import/Export support और release banner",
+    "summary": "Banner CTA अब सीधे dashboard के What's New पर जाता है, curated cards उसी JSON से लोड होते हैं और imports `c/ChannelName` तथा merge rules का बेहतर सम्मान करते हैं।",
+    "bannerSummary": "Release banner अब extension के अंदर What's New tab खोलता है और import/export दस्तावेज़ पूरा flow समझाते हैं।",
+    "highlights": [
+      "Release notes JSON dashboard cards और YouTube banner—दोनों को एक ही source of truth से भरता है।",
+      "CTA background messaging से tab-view खोलता है ताकि blockers `chrome-extension://` links को intercept न करें।",
+      "Import/export docs और code बताते हैं कि merge से पहले UC/handle/c/ChannelName inputs कैसे normalize होते हैं।"
+    ],
+    "detailsUrl": "https://github.com/varshneydevansh/FilterTube/releases/tag/v3.1.6"
+  },
+  "3.1.5": {
+    "version": "3.1.5",
+    "headline": "Shorts और Members-only सचमुच गायब",
+    "summary": "Watch page और sidebar अब Shorts renderers तथा members-only shelves को flash होने से पहले छिपाते हैं, और toggle state अब सहेजी रहती है।",
+    "bannerSummary": "Watch और sidebar में Members-only तथा Shorts को अधिक मज़बूती से छिपाया गया ताकि blocked rows दोबारा न दिखें।",
+    "highlights": [
+      "Sidebar cards render होने से पहले `/shorts/` hrefs, overlays और `aria-labels` जाँचता है।",
+      "Members-only detection अब compact, watch और shelf rows को cover करता है, साथ में नए badges और playlist heuristics।",
+      "Members-only toggle persistence bug ठीक किया गया, ताकि state reload के बाद भी बनी रहे।"
+    ],
+    "detailsUrl": "https://github.com/varshneydevansh/FilterTube/releases/tag/v3.1.5"
+  },
+  "3.1.4": {
+    "version": "3.1.4",
+    "headline": "Responsive dashboard",
+    "summary": "Mobile पर navigation साफ़-सुथरे ढंग से collapse होता है, inputs सहज wrap होते हैं और playlist/Mix controls के toggles अधिक स्पष्ट हैं।",
+    "highlights": [
+      "छोटी screens के लिए hamburger nav और overlay, साथ में refined grid spacing।",
+      "Toggles में हल्की tracks, centered thumbs और बेहतर dark-mode contrast।",
+      "Mix toggle चालू होने पर Mix/Radio chip छिपता है; playlist hiding radio items छोड़ती है।"
+    ],
+    "detailsUrl": "https://github.com/varshneydevansh/FilterTube/releases/tag/v3.1.4"
+  },
+  "3.1.3": {
+    "version": "3.1.3",
+    "headline": "Help legend नया रूप",
+    "summary": "Cards, pills और tooltips ठीक-ठीक बताते हैं कि Exact / Comment / Filter All क्या करते हैं और refreshed dashboard styling से मेल खाते हैं।",
+    "highlights": [
+      "Help tab badge tints और collaboration labels को matching colors में दिखाता है।",
+      "Popup और tab search bars एक ही full-width rhythm में align होते हैं।",
+      "स्पष्टता के लिए content control descriptions hover tooltips में रखे गए हैं।"
+    ],
+    "detailsUrl": "https://github.com/varshneydevansh/FilterTube/releases/tag/v3.1.3"
+  },
+  "3.1.2": {
+    "version": "3.1.2",
+    "headline": "Playlist autoplay को मज़बूत बनाया",
+    "summary": "Autoplay अब blocked playlist rows को flash किए बिना पार करता है और YouTube reprocessing के बाद भी sticky hiding बना रहता है।",
+    "highlights": [
+      "Next-click तभी होता है जब अगली playlist row वास्तव में visible हो।",
+      "Watch playlist panel rows hidden रहती हैं, भले identity थोड़ी देर के लिए unresolved हो।",
+      "Blocking के बाद 3-dot menu साफ़ बंद होता है, ताकि miniplayer चलता रहे।"
+    ],
+    "detailsUrl": "https://github.com/varshneydevansh/FilterTube/commit/1224715a84c48ee6d3ddd93b13cc62e487574a31"
+  },
+  "3.1.1": {
+    "version": "3.1.1",
+    "headline": "Help tab और identity fixes",
+    "summary": "Dashboard में dedicated Help tab जोड़ा गया और UC ↔ handle ↔ custom URL mapping अधिक resilient हुई।",
+    "highlights": [
+      "Help reference में सभी toggles, badges और keyword behaviors दर्ज हैं।",
+      "Playlist navigation blocked rows को playback flash के बिना छोड़ देती है।",
+      "Handle/custom URL fallback सही UC ID पर अधिक भरोसे से पहुँचता है।"
+    ],
+    "detailsUrl": "https://github.com/varshneydevansh/FilterTube/commit/1b2e442831a40c52148bc9ff830c70c2e6aa909c"
+  },
+  "3.1.0": {
+    "version": "3.1.0",
+    "headline": "Docs और hybrid filtering की स्पष्टता",
+    "summary": "Hybrid interception + DOM fallback architecture को diagrams के साथ दर्ज किया गया, ताकि समझ सकें कि FilterTube blocks कैसे लागू करता है।",
+    "highlights": [
+      "Watch-page 3-dot parity को home/search collaborators के साथ दस्तावेज़ित किया गया।",
+      "लंबित playlist regressions सूचीबद्ध किए गए, ताकि fixes दिखाई देते रहें।",
+      "3.1.0 bump के साथ manifests, build tooling और UI footer सिंक किए गए।"
+    ],
+    "detailsUrl": "https://github.com/varshneydevansh/FilterTube/commit/076baa2ecb14a3e8f5bdf420caa1af7096548f15"
   }
 }

@@ -14,5 +14,383 @@
       "GitHub 发布流程使用 GitHub CLI 凭据，在上传前创建草稿，支持续用已有标签，只上传缺失资源，验证最终资源集合，并且仅在验证通过后发布。",
       "FilterTube Android 手机和平板应用现已在 Google Play 面向公众开放。用户可从[公开页面](https://play.google.com/store/apps/details?id=com.filtertube.app)安装，也可在 Google Play 搜索 FilterTube。"
     ]
+  },
+  "3.3.6": {
+    "version": "3.3.6",
+    "headline": "更强的过滤、受保护的使用时长与更稳定的无广告播放",
+    "summary": "FilterTube 3.3.6 带来直接访问拦截、按配置文件设置的受保护使用时长和自我约束会话、可靠的屏蔽与允许规则集合、官方类别过滤、默认启用的 Advert Void，以及大量针对当前 YouTube 的兼容性改进。",
+    "bannerSummary": "3.3.6 包含直接访问过滤、受保护的使用时长、规则列表和 BlockTube 导入、官方类别、Advert Void，以及当前 YouTube 兼容性改进。",
+    "highlights": [
+      "直接访问 YouTube、切换播放列表、自动播放和受支持的嵌入式播放器现在都遵循与信息流过滤相同的视频和频道准入规则，不再绕过过滤。",
+      "每日 YouTube 使用时长现在按当前配置文件分别计算，显示剩余时间，重启后仍会保留，并使用全屏超时页面和 PIN 码配置文件切换；自愿开启的自我约束会话会锁定所选规则，直到倒计时结束。",
+      "Main 和 Kids 的屏蔽规则与允许规则仍是彼此独立的集合；顶部的黑名单或白名单策略决定由哪个集合控制观看内容。",
+      "大型 BlockTube 和受管理规则列表导入现在支持预览、容量检查、事务回滚、读取回查，并更清楚地统计新增、重复、跳过的频道、关键词、正则表达式和视频 ID。",
+      "类别过滤使用 YouTube 官方字段 `microformat.playerMicroformatRenderer.category`、受限的同源 Player 元数据加载、明确的“屏蔽所选”或“仅允许所选”意图，并更安全地划分 Watch、侧栏、Mix、评论和渲染器的处理职责。",
+      "新建和升级的 YouTube Main 与 Kids 配置文件默认启用 Advert Void。共享 Web runtime 无需额外请求即可移除检测到的 Player 广告计划字段；原生播放会丢弃未建模的广告计划数据，或在可用时规范化原始 Reel 响应，受保护的后备逻辑则处理剩余的中断。",
+      "实验性的语音语言过滤和原始音轨偏好在可用时使用 YouTube Player 证据；推荐元数据不可用时则默认放行。",
+      "本版还包含隐藏 YouTube Playables、支持当前 camelCase 渲染器和协作内容、改进帮助内容的可读性与搜索、让弹窗和控制面板控件更清晰，以及 Android Google Play 和 iOS 公共状态页面。",
+      "设置中新增一个默认不勾选的全设备选项，可关闭 YouTube 和 YouTube Kids 上的自动重载提醒与“最新动态”横幅。控制面板中的“最新动态”页面仍可手动打开。"
+    ],
+    "detailsUrl": "https://github.com/varshneydevansh/FilterTube/releases/tag/v3.3.6"
+  },
+  "3.3.5": {
+    "version": "3.3.5",
+    "headline": "修复 YouTube 故障并更早识别 Shorts 频道",
+    "summary": "本版修复了已打开的 YouTube 标签页中 content runtime 被重复注入的问题，并在频道屏蔽规则或白名单模式生效时，更早解析可见 Shorts 的频道身份。",
+    "bannerSummary": "修复 runtime 重复注入、改进被屏蔽频道的 Shorts 身份解析，并说明 3.3.4 的回滚边界。",
+    "highlights": [
+      "安装、更新或刷新配置文件时，不再向已打开的 YouTube 标签页重复注入 manifest content scripts，从而避免反复出现 `Identifier ... has already been declared` 语法错误。",
+      "已打开的 YouTube 标签页仍可接收受管理的时长限制和 runtime 检查，而不会重复声明脚本。",
+      "当频道黑名单规则或白名单模式生效时，可见和近乎可见的 Shorts 现在会使用现有的、有界后台 `/shorts/<videoId>` 所属频道解析器。",
+      "已学习到的 Shorts 视频到频道映射会被持久化并立即重新处理，因此无需悬停或打开菜单，被屏蔽频道的 Shorts 也能及时隐藏。",
+      "桌面 Shorts 容器（例如 `.shortsLockupViewModelHost` 和 `.ytGridShelfViewModelGridShelfItem`）已纳入专用 Shorts 后备处理和增强路径。",
+      "黑名单模式在身份解析前不会隐藏未知 Shorts；白名单模式仍通过现有的待处理路径保持更严格的行为。",
+      "文档说明了 3.3.4 是商店回滚版本：调查 YouTube 故障报告期间，它使用了 3.3.2 软件包。"
+    ],
+    "detailsUrl": "https://github.com/varshneydevansh/FilterTube/releases/tag/v3.3.5"
+  },
+  "3.3.4": {
+    "version": "3.3.4",
+    "headline": "商店回滚至 3.3.2 软件包",
+    "summary": "3.3.4 是浏览器商店回滚版本：在调查针对 3.3.3 的 YouTube 故障报告期间，改用较早的 3.3.2 软件包。",
+    "bannerSummary": "回滚版本：调查 YouTube 故障报告期间，3.3.4 使用了 3.3.2 软件包。",
+    "highlights": [
+      "3.3.4 不包含基于新源代码的功能更新。",
+      "调查问题 #64 期间，使用回滚将商店中的版本退回，以避开疑似有问题的 3.3.3 软件包。",
+      "后续的源代码版本 3.3.5 修复了 runtime 重复注入和 Shorts 身份解析。"
+    ],
+    "detailsUrl": "https://github.com/varshneydevansh/FilterTube/releases/tag/v3.3.4"
+  },
+  "3.3.3": {
+    "version": "3.3.3",
+    "headline": "家庭设备更新、规则列表、日期关键词与 YouTube DOM 更新",
+    "summary": "本版让家长/照护者控制更易理解，加入经过审核的规则列表导入和带日期限制的关键词规则，完善 Home/Internet Pickup 模型说明，并更新对当前 YouTube/YTM 标记结构的过滤支持。",
+    "bannerSummary": "本版包含家庭设备更新、经审核的规则列表导入、带日期限制的关键词、以家长为先的帮助内容，以及对当前 YouTube/YTM DOM 的兼容。",
+    "highlights": [
+      "家长/照护者配置文件可以管理受保护配置文件、在家长控制面板编辑孩子和受保护配置文件的规则，并向已验证的受保护设备发送已批准的更新。",
+      "家庭设备更新现在会分别说明实时“发送更新”、显式 Home Pickup 和显式 Internet Pickup，不会把取件服务当作权限来源。",
+      "受保护配置文件的时长限制现在会检查旧版和新版 YouTube 标签页，显示平静的超时页面，并记录额外时间请求供家长审核。",
+      "规则列表导入支持 CSV、TXT、简单 JSON、BlockTube 风格 JSON 和原始 HTTPS URL；提供应用前预览、Main/Kids/Both 目标、模板、列表管理、暂停/恢复/移除、过期检查和刷新。",
+      "日期关键词过滤可仅在上传日期当天/之后、当天/之前或某个日期范围内应用关键词。若 YouTube 提供父视频的上传日期，评论过滤会使用该日期。",
+      "帮助内容和控制面板控件改用更简单、以家长为先的措辞，帮助气泡响应更快，并更清楚地说明 Exact、Comment、Date、PIN、规则列表和设备更新。",
+      "控制面板现在会邀请正在参加 Android 封闭测试的用户发送邮件至 hello@filtertube.in；同时保留醒目的提醒，鼓励用户在 YouTube 更改页面结构并导致过滤异常时提交报告。",
+      "文档记录了 YouTube 桌面 lockup 选择器和 YTM 移动端 camelCase DOM，使真实视频卡片继续接受过滤，同时避免 Watch 页面芯片栏唤醒后备处理或造成滚动跳动。",
+      "仍未包含：自动局域网对等发现、托管的 FilterTube Internet Pickup 服务、静默公开的自动订阅目录、原生 Android/iOS 一致性，以及已安装设备间的手动双设备测试证据。"
+    ],
+    "detailsUrl": "https://github.com/varshneydevansh/FilterTube/releases/tag/v3.3.3"
+  },
+  "3.3.2": {
+    "version": "3.3.2",
+    "headline": "移动/平板应用 MVP、更流畅的 YouTube 与更安全的白名单",
+    "summary": "面向公众的应用发布页面已准备好用于 Android 手机/平板最终测试，并展示 iOS/iPad 状态；扩展程序控制面板现在会指向这些应用路径；没有活动规则时 YouTube SPA 的工作更少，并包含白名单与片尾屏幕正确性修复。",
+    "bannerSummary": "本版包含移动/平板应用发布页面、更流畅的 YouTube runtime、生产环境安静日志，以及白名单和片尾屏幕泄漏修复。",
+    "highlights": [
+      "网站下载中心和扩展程序控制面板现在展示 Android 手机/平板最终测试入口，以及 iOS/iPad TestFlight/App Store 状态入口。",
+      "Android 手机/平板发布准备文档围绕共享 FilterTube runtime、YouTube Main、公开访问 YouTube Kids、配置文件、PIN 规则和 Nanah 同步编写。",
+      "YouTube SPA 性能优化现在会在没有活动规则或路由需求时，跳过更多 JSON 克隆/解析/重放、DOM 后备处理、快速屏蔽、后备菜单和白名单待处理工作。",
+      "生产环境中的扩展程序上下文现在只有在明确启用调试模式时才记录常规控制台日志，避免 YouTube 热路径在正常浏览时承担额外开销。",
+      "白名单发布修复涵盖 Shorts 创作者后备解析、列表目标转发，以及对片尾控件 autoplay/watch-next endpoint 的紧凑过滤。",
+      "强化了 FilterTube DOM 状态属性，在保留必要 runtime 状态的同时，减少广泛可见的 `data-filtertube-*` 标记。",
+      "“账户与同步”现在通过“发送更新”、可选 Home Pickup 和用于离线/稍后打开的 Internet Pickup 来说明家庭设备更新。家长可以了解哪些是实时同步、家庭取件、在线取件，以及哪些不构成权限来源。",
+      "增加了面向发布的受保护配置文件时长限制文档，说明每日 YouTube 额度、超时页面、更多时间请求记录和家长/照护者批准。",
+      "Nanah/导入流程会在扩展程序与原生应用数据之间保留由频道派生的 Filter All 关键词归属，包括行颜色、来源徽章元数据和配对上下文。"
+    ],
+    "detailsUrl": "https://github.com/varshneydevansh/FilterTube/releases/tag/v3.3.2"
+  },
+  "3.3.1": {
+    "version": "3.3.1",
+    "headline": "通过 P2P 安全跨设备同步，无需第三方服务器",
+    "summary": "“账户与同步”将 Nanah 组织为三种更简单的使用路径，改进家长/孩子目标定位，让重新连接规则更清晰，并大幅扩展面向实际使用场景的文档。",
+    "bannerSummary": "Nanah 同步、更好的家长/孩子控制、更安全的重新连接规则，以及新版“账户与同步”流程的完整文档。",
+    "highlights": [
+      "“账户与同步”现在从三个更清晰的路径开始：“发送此配置文件一次”、“家长控制孩子”和“迁移整个账户”。",
+      "高级 Nanah 控件仍然可用，但现在收在“高级”部分中，不再主导整个流程。",
+      "家长/来源会话可以更清楚地选择远程目标配置文件；保存受管理链接时也会同步到发送方，使两台设备保留相同的信任记录。",
+      "刷新后仍会保留受信任链接，但重新连接仍需要建立新的实时会话，而不是隐式后台同步。",
+      "为加强家长控制，改进了锁定状态下的孩子更新、重新连接规则、设备标签持久化，以及防止自行加入/会话重放的保护。",
+      "README、Architecture、Technical、Functionality、Profiles & PIN、项目计划、用户指南和问题跟踪器现在更详细地记录了 Nanah 当前的桌面端状态。"
+    ],
+    "detailsUrl": "https://github.com/varshneydevansh/FilterTube/releases/tag/v3.3.1"
+  },
+  "3.3.0": {
+    "version": "3.3.0",
+    "headline": "恢复协作筛选并强化跨浏览器导入",
+    "summary": "Watch/YTM 协作菜单能更可靠地恢复完整名单，跨浏览器订阅导入得到加强，并将多个针对特定界面的白名单和快速屏蔽修复打包进 3.3.0。",
+    "bannerSummary": "改进协作菜单、白名单导入、各界面快速屏蔽和频道直达链接，并新增三点菜单屏蔽项开关。",
+    "highlights": [
+      "移动版 YouTube 首页、Watch Next 和 Mix 风格卡片现在会加入同一套三点菜单和协作者恢复流程，不再退回到不完整的单频道菜单。",
+      "Watch 页面右侧栏、播放列表行和类似 Watch 的卡片现在可以恢复完整协作者名单，并原地刷新当前的三点菜单。",
+      "Mix/Watch 恢复逻辑更安全：真实协作卡片会正确升级，而普通名称中的“&”或“and”不再被误识别为协作菜单。",
+      "快速屏蔽在复杂界面上更稳定：可以覆盖更多桌面卡片、不再遮挡移动搜索建议下拉框，并能更好地锚定在移动版 Watch Next 布局上。",
+      "订阅频道白名单导入会保留最近的 YouTube 页面浏览响应、优先使用真实的 `/feed/channels` 数据，并将 `/feed/channels` 保留为可见的管理入口。",
+      "白名单过滤在 YouTube 桌面/移动渲染器上的行为更严格、更安全，包括更好的创作者页面处理，以及改进 Mixes/订阅内容的隐藏控制。",
+      "新增控制和改进：频道管理行会链接到真实频道页面，可关闭三点菜单中的屏蔽项，加密的 Firefox 导出也采用更安全的后备路径。"
+    ],
+    "detailsUrl": "https://github.com/varshneydevansh/FilterTube/releases/tag/v3.3.0"
+  },
+  "3.2.9": {
+    "version": "3.2.9",
+    "headline": "订阅频道导入、白名单与 PIN 保护错误修复",
+    "summary": "将当前 YouTube 账号的订阅导入白名单，改进模式切换说明，并让 `/feed/channels` 的启动流程更可靠。",
+    "bannerSummary": "从当前 YouTube 订阅构建白名单，显示内联进度，并让白名单启用行为更清晰。",
+    "highlights": [
+      "新增 Tab View 导入：可将当前已登录 YouTube 账号订阅的频道导入白名单。",
+      "导入启动时会复用一个实时 YouTube 标签页，将其导航到 `/feed/channels`，并等待 FilterTube bridge 就绪后才开始。",
+      "白名单文案更清晰：“仅导入”不会更改黑名单；“导入并启用白名单”沿用现有从黑名单迁移到白名单的流程。",
+      "文档现在更详细地介绍了导入架构、FEchannels 请求流程、渲染器来源和白名单语义。"
+    ],
+    "detailsUrl": "https://github.com/varshneydevansh/FilterTube/releases/tag/v3.2.9"
+  },
+  "3.2.8": {
+    "version": "3.2.8",
+    "headline": "主题焕新与景致界面外壳调整",
+    "summary": "弹窗和控制面板现在使用更舒缓的景致主题系统，布局更紧凑、色调状态更鲜明，浅色和深色模式的平衡也更好。",
+    "bannerSummary": "改进弹窗与控制面板主题：透明效果更平和、标签强调更清晰、响应式布局更佳。",
+    "highlights": [
+      "Scenic UI 焕新：弹窗和控制面板共享更舒缓的产品界面外壳，并以本地 hero 视频作为氛围背景。",
+      "微调浅色和深色主题：深色模式保留景致背景，不再出现褪色的中央光晕；浅色模式则使用更干净的透明效果。",
+      "响应式布局清理：缩小弹窗间距和配置文件下拉列表，优化帮助/支持卡片布局，并改善各过滤界面在手机上的适配。",
+      "修正控件色调：启用/禁用状态、标签颜色、搜索框和导入/导出操作在两种主题中都更清晰。"
+    ],
+    "detailsUrl": "https://github.com/varshneydevansh/FilterTube/releases/tag/v3.2.8"
+  },
+  "3.2.7": {
+    "version": "3.2.7",
+    "headline": "类别过滤、悬停快速交叉屏蔽、移动端三点菜单与快速交叉屏蔽支持",
+    "summary": "新增类别过滤，并默认启用一键快速交叉屏蔽。",
+    "bannerSummary": "在卡片悬停时使用新的类别过滤和快速交叉屏蔽；同时改进 YT Mobile 屏蔽支持。",
+    "highlights": [
+      "类别过滤：按 YouTube 类别（音乐、游戏、教育等）屏蔽或允许视频。",
+      "快速交叉屏蔽默认开启：v3.2.7 默认启用 `Show Quick Cross Block button`（用户仍可关闭）。",
+      "移动端屏蔽：改进 YT Mobile 的三点菜单和快速交叉屏蔽支持；目前在首页生效。"
+    ],
+    "detailsUrl": "https://github.com/varshneydevansh/FilterTube/releases/tag/v3.2.7"
+  },
+  "3.2.6": {
+    "version": "3.2.6",
+    "headline": "界面美化与基于内容的过滤",
+    "summary": "全面改进字体排版与现代化设计，并新增三种内容过滤器：时长、日期和大写字母。",
+    "bannerSummary": "全新美观界面，并提供时长、上传日期和标题党检测等内容过滤器。",
+    "highlights": [
+      "字体排版更新：采用现代精致的字号比例，提升可读性。",
+      "基于内容的过滤器：时长（更长/更短/介于两者之间）、上传日期（更新/较早/介于两者之间）和大写字母检测（标题党）。",
+      "`videoMetaMap` 系统：持久保存视频元数据，并进行智能批处理（75 毫秒窗口，最多 1500 条）。",
+      "控制面板改进：按界面区分统计（Main/Kids）、增强统计卡片，并新增捐赠宣传卡片。"
+    ],
+    "detailsUrl": "https://github.com/varshneydevansh/FilterTube/releases/tag/v3.2.6"
+  },
+  "3.2.5": {
+    "version": "3.2.5",
+    "headline": "白名单成为主推模式并提升稳定性",
+    "summary": "白名单模式现在是主要的“仅允许”路径，频道提取更智能，增加播放列表防护并降低 CPU 使用率。",
+    "bannerSummary": "白名单模式得到强化：界面更清爽、播放列表更稳定，并支持 Kids。",
+    "highlights": [
+      "白名单模式成为主推模式：文案和界面不再将其标记为实验性功能。",
+      "清理三点菜单，并改进白名单界面的搜索次级项处理。",
+      "多来源频道提取使用缩略图锚点和父级容器。",
+      "增加按模式跟踪状态，并加入确认对话框和 bridge 优化。",
+      "提高播放列表稳定性：所选行保持可见，待定身份解析不再显示被屏蔽的行。",
+      "Kids 模式现在支持白名单，并采用零网络架构。"
+    ],
+    "detailsUrl": "https://github.com/varshneydevansh/FilterTube/releases/tag/v3.2.5"
+  },
+  "3.2.4": {
+    "version": "3.2.4",
+    "headline": "增强白名单模式与性能优化",
+    "summary": "显著改进实验性白名单模式，提供更好的用户体验、性能优化和更广泛的 Kids 模式支持。",
+    "bannerSummary": "白名单模式更智能：界面更清楚、性能更好，并支持 Kids。",
+    "highlights": [
+      "实验性功能：增强白名单模式，改进三点菜单清理、智能搜索处理和按模式跟踪状态。",
+      "性能提升：bridge 层优化和选择性处理减少 CPU 使用率。",
+      "界面改进：切换模式时通过确认对话框防止意外丢失数据。",
+      "支持 Kids：白名单现在可在 YouTube Kids 上工作，且无需网络请求。",
+      "搜索优化：智能处理右侧栏的观看卡片，防止界面杂乱。",
+      "频道提取：通过缩略图锚点和父级容器，从多个来源解析身份。",
+      "模式切换：在黑名单/白名单之间无缝切换，并智能重新处理内容。"
+    ],
+    "detailsUrl": "https://github.com/varshneydevansh/FilterTube/releases/tag/v3.2.4"
+  },
+  "3.2.3": {
+    "version": "3.2.3",
+    "headline": "实验性白名单模式与界面改进",
+    "summary": "白名单 alpha 版用于“仅允许”过滤，并带来界面更新和移动菜单支持。",
+    "bannerSummary": "试用实验性白名单模式——隐藏所有内容，只显示明确允许的频道和关键词。",
+    "highlights": [
+      "实验性功能：白名单模式会隐藏除明确允许的频道/关键词以外的所有内容。",
+      "在弹窗和 Tab View 中轻松切换黑名单与白名单两种过滤模式。",
+      "暂存迁移：切换到黑名单收集频道，再将内容合并回白名单。",
+      "白名单模式的观看页面保护会维持视频播放功能。",
+      "乐观式 UI 更新可立即隐藏内容；如果屏蔽失败会自动恢复。",
+      "增强移动菜单支持，并正确处理 YouTube 移动渲染器。",
+      "所有控制台日志现在都由调试标志控制，以减少生产环境噪音。"
+    ],
+    "detailsUrl": "https://github.com/varshneydevansh/FilterTube/releases/tag/v3.2.3"
+  },
+  "3.2.2": {
+    "version": "3.2.2",
+    "headline": "界面改进与调试日志控制",
+    "summary": "乐观式更新、移动菜单支持、调试门控日志、滚动位置保留和状态管理优化。",
+    "bannerSummary": "即时界面反馈、移动菜单润色、受调试开关控制的日志，以及稳定的状态处理。",
+    "highlights": [
+      "乐观式 UI 更新：内容立即隐藏；如果屏蔽失败则自动恢复。",
+      "增强对 `ytm-menu-popup-renderer` 移动菜单的支持，并使用正确的渲染器标签。",
+      "通过 `window.__filtertubeDebug` 控制调试日志。",
+      "DOM 后备处理期间保留滚动位置，避免突兀跳动。",
+      "限制每个会话的频道信息补全数量（10 个），减少后台请求。",
+      "使用 `requestIdleCallback` 和批处理在空闲时安排渲染。",
+      "通过签名比较延迟外部重载，避免重复渲染。",
+      "选择性通知：仅在签名变化时发送 `load`，否则发送 `externalUpdate`。",
+      "通过共享全局状态管理 bridge 状态。"
+    ],
+    "detailsUrl": "https://github.com/varshneydevansh/FilterTube/releases/tag/v3.2.2"
+  },
+  "3.2.1": {
+    "version": "3.2.1",
+    "headline": "无卡顿处理与性能提升",
+    "summary": "重大性能优化消除了界面延迟，在 Chromium 浏览器中效果显著，在 Firefox 中也有明显改善。",
+    "bannerSummary": "通过异步处理、编译缓存和批量更新，实现无延迟过滤。",
+    "highlights": [
+      "异步 DOM 处理会让出主线程，避免大量过滤时浏览器冻结。",
+      "编译后的正则表达式和频道过滤器缓存提供 O(1) 查找，将 CPU 使用率降低 60–80%。",
+      "批量存储更新利用智能的 250 毫秒间隔减少 70–90% 的 I/O 操作。",
+      "防抖的设置刷新可避免过度重新处理 DOM。",
+      "运行状态管理可防止任务重叠，并正确排队请求。",
+      "Chromium 浏览器延迟降低 90% 以上；Firefox 也有显著改善，优化仍在持续。"
+    ],
+    "detailsUrl": "https://github.com/varshneydevansh/FilterTube/releases/tag/v3.2.1"
+  },
+  "3.2.0": {
+    "version": "3.2.0",
+    "headline": "即时屏蔽与零网络 Kids",
+    "summary": "三点菜单即时显示正确的频道名称，大幅减少网络请求，YouTube Kids 完全离线运行。",
+    "bannerSummary": "借助主动拦截 XHR 实现零延迟屏蔽；Kids 模式无需任何网络获取。",
+    "highlights": [
+      "三点菜单现在会立即显示正确的频道名称，不再出现“正在获取...”的延迟。",
+      "频道身份来自被拦截的 YouTube JSON 响应，从而减少网络调用。",
+      "YouTube Kids 完全不需要网络获取即可可靠屏蔽。",
+      "缺失的元数据按受控速率在后台补齐（冷却时间 6 小时）。",
+      "主题频道（如 `Music - Topic`）会单独处理，无需 `@handle`。",
+      "新增包含 ASCII 和 Mermaid 流程图的完整文档。"
+    ],
+    "detailsUrl": "https://github.com/varshneydevansh/FilterTube/releases/tag/v3.2.0"
+  },
+  "3.1.9": {
+    "version": "3.1.9",
+    "headline": "按配置文件管理备份与锁定门控控制",
+    "summary": "自动备份和内容控件现在遵循配置文件锁定/PIN，继承各配置文件的设置；即使出现锁定提示横幅，配置文件下拉菜单仍可点击。",
+    "bannerSummary": "按配置文件自动备份并限制锁定配置文件的功能；配置文件选择器始终可用。",
+    "highlights": [
+      "自动备份关闭或配置文件锁定时，自动备份模式/格式选择器会禁用；新配置文件会继承自动备份偏好。",
+      "只有当该配置文件启用了自动备份时，创建配置文件以及更改模式/格式才会触发自动备份计划。",
+      "锁定时，内容控件切换和备份控件会保持禁用或恢复原状；非主配置文件的导出范围会强制限定为当前配置文件。",
+      "修复配置文件下拉菜单的 z-index，使锁定门控横幅显示时它仍可点击。",
+      "更新了配置文件/PIN 模型、按配置文件备份和界面门控规则的文档。"
+    ],
+    "detailsUrl": "https://github.com/varshneydevansh/FilterTube/releases/tag/v3.1.9"
+  },
+  "3.1.8": {
+    "version": "3.1.8",
+    "headline": "支持选项卡与可靠的自动备份",
+    "summary": "新增支持页面（Ko-fi），自动备份现在可在 Chrome 和 Firefox 上可靠运行。",
+    "bannerSummary": "自动备份现在支持跨浏览器，并覆盖同一个最新备份文件。",
+    "highlights": [
+      "控制面板新增带 Ko-fi 嵌入内容的支持页面。",
+      "自动备份现在会覆盖单个滚动文件：`Downloads/FilterTube Backup/FilterTube-Backup-Latest.json`。",
+      "下载策略兼容不同浏览器：可用时使用 Blob URL；Chrome MV3 service worker 则回退到 `data:` URL。",
+      "Firefox 不再因 `data:` URL 限制而导致下载失败。"
+    ],
+    "detailsUrl": "https://github.com/varshneydevansh/FilterTube/releases/tag/v3.1.8"
+  },
+  "3.1.7": {
+    "version": "3.1.7",
+    "headline": "支持 YT Kids 和自动备份",
+    "summary": "在 YT Kids 中新增按频道屏蔽内容的功能，并可切换自动备份。",
+    "bannerSummary": "新增启用/禁用自动备份的设置。导出文件现在保存至 `Downloads/FilterTube Export/`。",
+    "highlights": [
+      "在 YT Kids 中新增完整的基于频道和关键词的屏蔽：通过被动监听 YT Kids 的三点菜单 UI 来屏蔽频道。",
+      "设置中新增启用/禁用自动备份的开关（尽力而为，不显示“另存为”提示）。",
+      "自动备份会保存到 `Downloads/FilterTube Backup/` 并轮换文件，只保留最新文件。",
+      "手动导出现在会静默下载到 `Downloads/FilterTube Export/`。"
+    ],
+    "detailsUrl": "https://github.com/varshneydevansh/FilterTube/releases/tag/v3.1.7"
+  },
+  "3.1.6": {
+    "version": "3.1.6",
+    "headline": "导入/导出支持与发布横幅",
+    "summary": "横幅 CTA 现在会直接打开控制面板的“最新动态”，精选卡片从同一 JSON 加载，导入也更好地遵守 `c/ChannelName` 和合并规则。",
+    "bannerSummary": "发布横幅现在会打开扩展内的“最新动态”标签页，导入/导出文档也介绍了完整流程。",
+    "highlights": [
+      "发布说明 JSON 同时为控制面板卡片和 YouTube 横幅提供数据，保持单一事实来源。",
+      "CTA 通过后台消息打开 Tab View，避免拦截器截获 `chrome-extension://` 链接。",
+      "导入/导出文档和代码说明了 UC/handle/c/ChannelName 输入在合并前如何规范化。"
+    ],
+    "detailsUrl": "https://github.com/varshneydevansh/FilterTube/releases/tag/v3.1.6"
+  },
+  "3.1.5": {
+    "version": "3.1.5",
+    "headline": "Shorts 和仅限会员内容真正隐藏了",
+    "summary": "观看页面和侧栏现在会在 Shorts 渲染器与仅限会员内容货架闪现前将其隐藏，切换状态也终于能够保存。",
+    "bannerSummary": "加固观看页面与侧栏对仅限会员内容和 Shorts 的隐藏，防止被屏蔽的行再次出现。",
+    "highlights": [
+      "侧栏会在卡片渲染前检查 `/shorts/` href、叠层和 aria-label。",
+      "仅限会员内容检测现在覆盖 compact、watch 和 shelf 行，并加入新徽标和播放列表启发式规则。",
+      "修复仅限会员内容开关的持久化问题，使状态在重载后保留。"
+    ],
+    "detailsUrl": "https://github.com/varshneydevansh/FilterTube/releases/tag/v3.1.5"
+  },
+  "3.1.4": {
+    "version": "3.1.4",
+    "headline": "控制面板适配响应式布局",
+    "summary": "导航在手机上可整齐收起，输入框可自然换行，播放列表/Mix 控件也有了更清晰的开关。",
+    "highlights": [
+      "为小屏幕添加汉堡菜单和遮罩，并优化网格间距。",
+      "开关采用更轻的轨道、居中的滑块，并改善深色模式下的对比度。",
+      "启用 Mix 开关时隐藏 Mix/Radio 芯片；隐藏播放列表时跳过 Radio 项目。"
+    ],
+    "detailsUrl": "https://github.com/varshneydevansh/FilterTube/releases/tag/v3.1.4"
+  },
+  "3.1.3": {
+    "version": "3.1.3",
+    "headline": "焕新帮助说明图例",
+    "summary": "卡片、标签和提示准确说明 Exact、Comment 与 Filter All 的作用，并与更新后的控制面板样式保持一致。",
+    "highlights": [
+      "帮助标签展示徽标色调和协作标签颜色，并保持颜色一致。",
+      "弹窗和 Tab View 的搜索栏统一为相同的全宽布局。",
+      "将内容控件说明放入悬停提示，便于查看。"
+    ],
+    "detailsUrl": "https://github.com/varshneydevansh/FilterTube/releases/tag/v3.1.3"
+  },
+  "3.1.2": {
+    "version": "3.1.2",
+    "headline": "加固播放列表自动播放",
+    "summary": "自动播放现在会跳过被屏蔽的播放列表行而不会短暂显示它们；即使 YouTube 重新处理页面，隐藏状态仍会保持。",
+    "highlights": [
+      "仅当下一条播放列表行实际可见时，才会触发下一条操作。",
+      "即使身份暂时无法解析，观看页面播放列表面板中的行也会保持隐藏。",
+      "屏蔽后会正确关闭三点菜单，让迷你播放器继续播放。"
+    ],
+    "detailsUrl": "https://github.com/varshneydevansh/FilterTube/commit/1224715a84c48ee6d3ddd93b13cc62e487574a31"
+  },
+  "3.1.1": {
+    "version": "3.1.1",
+    "headline": "帮助标签与身份识别修复",
+    "summary": "控制面板新增专用帮助标签，UC ↔ handle ↔ 自定义 URL 的映射也更可靠。",
+    "highlights": [
+      "帮助参考页记录所有开关、徽标和关键词行为。",
+      "播放列表导航会跳过被屏蔽行，不会短暂闪现播放。",
+      "handle/自定义 URL 后备解析能更可靠地锁定正确的 UC ID。"
+    ],
+    "detailsUrl": "https://github.com/varshneydevansh/FilterTube/commit/1b2e442831a40c52148bc9ff830c70c2e6aa909c"
+  },
+  "3.1.0": {
+    "version": "3.1.0",
+    "headline": "文档与混合过滤架构说明更清晰",
+    "summary": "通过图示记录拦截与 DOM 后备处理的混合架构，帮助用户了解 FilterTube 如何执行屏蔽。",
+    "highlights": [
+      "记录了观看页面三点菜单与首页/搜索协作者菜单的一致性。",
+      "整理仍待处理的播放列表问题，让修复状态保持可见。",
+      "同步清单、构建工具和界面页脚，配合 3.1.0 版本升级。"
+    ],
+    "detailsUrl": "https://github.com/varshneydevansh/FilterTube/commit/076baa2ecb14a3e8f5bdf420caa1af7096548f15"
   }
 }
