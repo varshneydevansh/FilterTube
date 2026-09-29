@@ -74,3 +74,31 @@ test('first-run copy stays safe when a catalog is unavailable and mirrors RTL pr
   assert.equal(title.textContent, 'FilterTube is active');
   assert.equal(container.dir, 'rtl');
 });
+
+test('first-run auto locale ignores staged browser languages and keeps bundled English copy', async () => {
+  const title = promptElement('firstRun.activeTitle');
+  title.textContent = 'FilterTube is active';
+  const container = {
+    isConnected: true,
+    style: {},
+    querySelectorAll() { return [title]; },
+    querySelector() { return null; }
+  };
+  let fetchCount = 0;
+  const context = {
+    navigator: { language: 'ar-EG' },
+    api: {
+      storage: { local: { get(_key, callback) { callback({ ftUiLocalePreference: 'auto' }); } } },
+      runtime: { getURL(path) { return `extension://filtertube/${path}`; } }
+    },
+    fetch() { fetchCount += 1; return Promise.resolve({ ok: true, json: () => Promise.resolve({}) }); }
+  };
+  context.window = context;
+  vm.createContext(context);
+  const localizePrompt = vm.runInContext(`(() => { ${localizeSource}; return localizePrompt; })()`, context);
+  await localizePrompt(container);
+
+  assert.equal(title.textContent, 'FilterTube is active');
+  assert.equal(container.dir, undefined, 'unreleased auto locales must not apply RTL preview direction');
+  assert.equal(fetchCount, 0, 'auto must not fetch a staged Arabic catalog');
+});

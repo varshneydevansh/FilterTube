@@ -8,6 +8,35 @@
     const RTL_LANGUAGES = new Set(['apc', 'apd', 'ar', 'arz', 'fa', 'he', 'ur', 'yi']);
     const RTL_SCRIPTS = new Set(['Adlm', 'Arab', 'Hebr', 'Nkoo', 'Rohg', 'Thaa']);
 
+    function resolveAutomaticAdmissionLocale(requestedLocale) {
+        // Keep the fallback aligned with RELEASED_LOCALES in js/ui_localization.js.
+        // Content scripts do not load the dashboard localization runtime, so only
+        // its released allowlist (never its preview/staged list) may opt in here.
+        const configured = root.FilterTubeUiLocalization?.releasedLocales;
+        const releasedLocales = Array.isArray(configured) ? configured : ['en'];
+        const available = releasedLocales.filter(locale => typeof locale === 'string'
+            && /^[a-z]{2,3}(?:-[a-zA-Z0-9]{2,8})*$/.test(locale));
+        if (!available.includes('en')) available.unshift('en');
+
+        const code = String(requestedLocale || 'en').trim().replace(/_/g, '-');
+        let requested = 'en';
+        if (/^[a-z]{2,3}(?:-[a-zA-Z0-9]{2,8})*$/.test(code)) {
+            try { requested = Intl.getCanonicalLocales(code)[0] || 'en'; } catch (e) {}
+        }
+        const candidates = [requested];
+        try { candidates.push(new Intl.Locale(requested).maximize().toString()); } catch (e) {}
+        for (const candidate of candidates) {
+            const parts = candidate.split('-');
+            while (parts.length) {
+                const prefix = parts.join('-');
+                const match = available.find(locale => locale.toLowerCase() === prefix.toLowerCase());
+                if (match) return match;
+                parts.pop();
+            }
+        }
+        return 'en';
+    }
+
     function admissionTextDirection(locale) {
         const parts = String(locale || '').split('-');
         const script = parts.find(part => /^[A-Za-z]{4}$/.test(part));
@@ -62,7 +91,10 @@
                 } catch (_) { resolve({}); }
             }
         }).then(saved => {
-            const locale = saved?.ftUiLocalePreference;
+            const preference = saved?.ftUiLocalePreference;
+            const locale = preference === 'auto'
+                ? resolveAutomaticAdmissionLocale(root.navigator?.language)
+                : preference;
             localeDirection = admissionTextDirection(locale);
             if (typeof locale !== 'string' || !/^[a-z]{2,3}(?:-[a-zA-Z0-9]{2,8})*$/.test(locale) || locale === 'en') return null;
             return fetch(runtimeAPI.runtime.getURL(`data/ui_locales/${locale}.json`))

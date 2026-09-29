@@ -15,7 +15,7 @@ function sliceBetween(source, startNeedle, endNeedle) {
   return source.slice(start, end);
 }
 
-function loadAdmissionRuntime(locale = 'ar') {
+function loadAdmissionRuntime(locale = 'ar', browserLocale = 'en-US') {
   let document;
 
   class FakeElement {
@@ -101,6 +101,7 @@ function loadAdmissionRuntime(locale = 'ar') {
   const requested = [];
   const context = {
     document,
+    navigator: { language: browserLocale },
     chrome: {
       runtime: { getURL: resource => `extension://filtertube/${resource}` },
       storage: { local: { get(_key, callback) { callback({ ftUiLocalePreference: locale }); } } }
@@ -168,6 +169,22 @@ test('Google player admission overlay owns RTL direction, mirrored accent, and l
   assert.equal(overlay.__filtertubeAdmissionStatus.textContent, arabicCatalog['admission.blockedStatus']);
   assert.equal(overlay.__filtertubeAdmissionTitle.textContent, arabicCatalog['admission.blockedTitle']);
   assert.deepEqual(runtime.requested, ['extension://filtertube/data/ui_locales/ar.json']);
+});
+
+test('automatic admission locale stays on the released English fallback without delaying overlay presentation', async () => {
+  const runtime = loadAdmissionRuntime('auto', 'ar-EG');
+  const overlay = runtime.document.createElement('div');
+  runtime.document.body.appendChild(overlay);
+
+  runtime.context.FilterTubeAdmissionOverlay.render(overlay, 'blocked', 'Blocked channel');
+
+  assert.equal(overlay.getAttribute('dir'), 'ltr', 'auto resolution must not delay the initial overlay');
+  assert.equal(overlay.getAttribute('aria-label'), 'Blocked channel');
+  await flushLocaleLoad();
+
+  assert.equal(overlay.getAttribute('dir'), 'ltr', 'an unreleased browser locale must resolve to English');
+  assert.equal(overlay.getAttribute('aria-label'), 'Blocked channel');
+  assert.deepEqual(runtime.requested, [], 'auto must not fetch a staged Arabic catalog');
 });
 
 test('direct Watch and Shorts overlays localize only keyed reason lines and keep newest state', async () => {

@@ -16,7 +16,10 @@
                 const result = api.storage.local.get('ftUiLocalePreference', resolve);
                 if (result?.then) result.then(resolve, () => resolve({}));
             });
-            const locale = stored?.ftUiLocalePreference;
+            const preference = stored?.ftUiLocalePreference;
+            const locale = preference === 'auto'
+                ? resolveAutomaticPromptLocale(window.navigator?.language)
+                : preference;
             if (typeof locale !== 'string' || !/^[a-z]{2,3}(?:-[a-zA-Z0-9]{2,8})*$/.test(locale) || locale === 'en') return;
             const response = await fetch(api.runtime.getURL(`data/ui_locales/${locale}.json`));
             if (!response.ok || !container.isConnected) return;
@@ -35,6 +38,34 @@
                 container.style.left = '16px';
             }
         } catch (_) { /* The bundled English copy remains usable. */ }
+
+        function resolveAutomaticPromptLocale(requestedLocale) {
+            // Match the released-only gate in js/ui_localization.js. Explicitly
+            // selected preview locales bypass this resolver and keep working.
+            const configured = window.FilterTubeUiLocalization?.releasedLocales;
+            const releasedLocales = Array.isArray(configured) ? configured : ['en'];
+            const available = releasedLocales.filter(value => typeof value === 'string'
+                && /^[a-z]{2,3}(?:-[a-zA-Z0-9]{2,8})*$/.test(value));
+            if (!available.includes('en')) available.unshift('en');
+
+            const code = String(requestedLocale || 'en').trim().replace(/_/g, '-');
+            let requested = 'en';
+            if (/^[a-z]{2,3}(?:-[a-zA-Z0-9]{2,8})*$/.test(code)) {
+                try { requested = Intl.getCanonicalLocales(code)[0] || 'en'; } catch (_) {}
+            }
+            const candidates = [requested];
+            try { candidates.push(new Intl.Locale(requested).maximize().toString()); } catch (_) {}
+            for (const candidate of candidates) {
+                const parts = candidate.split('-');
+                while (parts.length) {
+                    const prefix = parts.join('-');
+                    const match = available.find(value => value.toLowerCase() === prefix.toLowerCase());
+                    if (match) return match;
+                    parts.pop();
+                }
+            }
+            return 'en';
+        }
     }
 
     function getPalette() {
