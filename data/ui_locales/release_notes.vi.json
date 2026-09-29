@@ -14,5 +14,329 @@
       "Quy trình phát hành GitHub dùng thông tin xác thực GitHub CLI, tạo bản nháp trước khi tải lên, tiếp tục từ tag hiện có, chỉ tải những tài sản còn thiếu, xác minh toàn bộ tài sản cuối cùng rồi mới phát hành.",
       "Ứng dụng FilterTube cho điện thoại và máy tính bảng Android hiện đã mở công khai trên Google Play. Bạn có thể cài từ [trang công khai](https://play.google.com/store/apps/details?id=com.filtertube.app) hoặc tìm FilterTube trên Google Play."
     ]
+  },
+  "3.3.6": {
+    "headline": "Lọc mạnh hơn, bảo vệ thời gian và phát video không quảng cáo ổn định hơn",
+    "summary": "FilterTube 3.3.6 bổ sung việc thực thi quy tắc truy cập trực tiếp, thời gian được bảo vệ và phiên Self-Control theo từng hồ sơ, các bộ quy tắc chặn/cho phép đáng tin cậy, lọc theo danh mục chính thức, bật sẵn Advert Void và nhiều cải tiến tương thích với YouTube hiện tại.",
+    "bannerSummary": "Bản 3.3.6 có lọc truy cập trực tiếp, thời gian được bảo vệ, nhập danh sách quy tắc và BlockTube, danh mục chính thức, Advert Void và tương thích với YouTube hiện tại.",
+    "highlights": [
+      "Truy cập thẳng vào YouTube, chuyển playlist, tự động phát và các video nhúng được hỗ trợ giờ đều phải tuân theo cùng quy tắc cho phép video và kênh như bộ lọc nguồn cấp dữ liệu, không còn bỏ qua bộ lọc.",
+      "Giới hạn thời gian YouTube hằng ngày giờ áp dụng theo hồ sơ đang hoạt động, hiển thị thời gian còn lại, tồn tại sau khi khởi động lại và dùng trang hết thời gian toàn màn hình có chuyển hồ sơ bằng PIN. Phiên Self-Control tự nguyện khóa các quy tắc đã chọn đến khi hết đếm ngược.",
+      "Quy tắc bị chặn và quy tắc được cho phép vẫn là hai bộ riêng cho Main và Kids; chính sách Blocklist hoặc Whitelist cấp cao nhất quyết định bộ nào kiểm soát nội dung xem.",
+      "Việc nhập danh sách BlockTube và danh sách quy tắc được quản lý cỡ lớn có xem trước, kiểm tra dung lượng, hoàn tác giao dịch, xác minh đọc lại và số liệu rõ hơn cho mục được thêm, trùng lặp, bỏ qua, kênh, từ khóa, regex và ID video.",
+      "Lọc theo danh mục dùng trường chính thức của YouTube `microformat.playerMicroformatRenderer.category`, nạp giới hạn siêu dữ liệu Player từ cùng origin, tùy chọn rõ ràng để chặn danh mục đã chọn hoặc chỉ cho phép các danh mục đó, cùng cách quản lý Watch, rail, Mix, bình luận và renderer an toàn hơn.",
+      "Advert Void được bật sẵn cho hồ sơ mới và đã nâng cấp trên YouTube Main và Kids. Runtime Web dùng chung loại bỏ các trường kế hoạch quảng cáo Player được phát hiện mà không gửi thêm yêu cầu; phát native loại bỏ dữ liệu kế hoạch quảng cáo chưa được mô hình hóa hoặc chuẩn hóa phản hồi Reel thô khi có thể, còn fallback có bảo vệ xử lý các gián đoạn lọt qua.",
+      "Lọc ngôn ngữ lời nói thử nghiệm và tùy chọn ưu tiên âm thanh gốc dùng bằng chứng từ YouTube Player khi có, đồng thời cho nội dung đi qua nếu thiếu siêu dữ liệu đề xuất.",
+      "Bản này cũng có ẩn YouTube Playables, xử lý renderer camelCase hiện tại và nội dung cộng tác, Help và tìm kiếm dễ đọc hơn, điều khiển popup/dashboard rõ hơn, cùng các trang trạng thái công khai cho Android Google Play và iOS.",
+      "Settings có tùy chọn tắt trên toàn thiết bị, mặc định chưa đánh dấu, để tắt lời nhắc tải lại tự động và banner What's New trên YouTube và YouTube Kids. Trang What's New trong Dashboard vẫn mở được thủ công."
+    ]
+  },
+  "3.3.5": {
+    "headline": "Khôi phục sau lỗi YouTube và chặn kênh Shorts sớm hơn",
+    "summary": "Bản này sửa lỗi chèn content runtime lặp lại vào các tab YouTube đang mở và xác định danh tính kênh của Shorts đang hiển thị sớm hơn khi quy tắc chặn kênh hoặc chế độ whitelist được bật.",
+    "bannerSummary": "Sửa lỗi chèn runtime trùng lặp, cải thiện việc xác định kênh Shorts bị chặn và ghi lại ranh giới rollback của v3.3.4.",
+    "highlights": [
+      "Cài đặt/cập nhật/làm mới hồ sơ không còn chèn lại content script trong manifest vào tab YouTube đã mở, tránh lỗi cú pháp lặp lại `Identifier ... has already been declared`.",
+      "Các tab YouTube đã mở vẫn có thể nhận kiểm tra time-limit/runtime được quản lý mà không khai báo script trùng lặp.",
+      "Shorts đang hiển thị hoặc sắp hiển thị giờ dùng bộ phân giải chủ sở hữu nền có giới hạn `/shorts/<videoId>` hiện có khi quy tắc blocklist kênh hoặc chế độ whitelist đang bật.",
+      "Ánh xạ video Shorts sang kênh đã học được lưu lại và xử lý lại ngay, nên Shorts từ kênh bị chặn không cần rê chuột hoặc mở menu mới bị ẩn.",
+      "Các host Shorts trên máy tính như `.shortsLockupViewModelHost` và `.ytGridShelfViewModelGridShelfItem` được đưa vào đường xử lý fallback/bổ sung dữ liệu Shorts riêng.",
+      "Chế độ blocklist không ẩn Shorts chưa rõ danh tính cho đến khi xác định được danh tính; chế độ whitelist vẫn nghiêm ngặt hơn nhờ đường xử lý pending hiện có.",
+      "v3.3.4 được ghi nhận là bản rollback trên store về gói v3.3.2 trong thời gian điều tra báo cáo lỗi YouTube."
+    ]
+  },
+  "3.3.4": {
+    "headline": "Rollback trên store về gói v3.3.2",
+    "summary": "v3.3.4 là bản rollback cho store trình duyệt, sử dụng gói v3.3.2 trước đó trong khi điều tra báo cáo lỗi YouTube liên quan đến v3.3.3.",
+    "bannerSummary": "Bản rollback: v3.3.4 dùng gói v3.3.2 trong thời gian điều tra các báo cáo lỗi YouTube.",
+    "highlights": [
+      "Không tuyên bố có tính năng mới nào xuất phát từ mã nguồn trong v3.3.4.",
+      "Rollback được dùng để đưa gói v3.3.3 bị nghi ngờ khỏi các store trong khi điều tra issue #64.",
+      "Bản phát hành mã nguồn tiếp theo, v3.3.5, có các sửa lỗi chèn runtime trùng lặp và nhận diện Shorts."
+    ]
+  },
+  "3.3.3": {
+    "headline": "Cập nhật thiết bị gia đình, danh sách quy tắc, từ khóa theo ngày và làm mới DOM YouTube",
+    "summary": "Bản này giúp phụ huynh/người chăm sóc dễ hiểu các quyền kiểm soát hơn, thêm nhập danh sách quy tắc đã được xem xét và quy tắc từ khóa giới hạn theo ngày, ghi lại mô hình Home/Internet Pickup, đồng thời cập nhật bộ lọc cho markup YouTube/YTM hiện tại.",
+    "bannerSummary": "Bản này có Family Device Updates, nhập danh sách quy tắc đã xem xét, từ khóa giới hạn theo ngày, Help ưu tiên phụ huynh và tương thích với DOM YouTube/YTM hiện tại.",
+    "highlights": [
+      "Hồ sơ phụ huynh/người chăm sóc có thể quản lý hồ sơ được bảo vệ, sửa quy tắc của trẻ/hồ sơ được bảo vệ từ dashboard của phụ huynh và gửi cập nhật đã duyệt đến thiết bị được bảo vệ đã xác minh.",
+      "Family Device Updates giờ giải thích Send Update trực tiếp, Home Pickup tường minh và Internet Pickup tường minh, không xem dịch vụ pickup là thẩm quyền.",
+      "Giới hạn thời gian của hồ sơ được bảo vệ giờ kiểm tra cả tab YouTube cũ và mới, hiển thị màn hình hết giờ nhẹ nhàng và ghi lại yêu cầu thêm thời gian để phụ huynh xem xét.",
+      "Nhập danh sách quy tắc hỗ trợ CSV, TXT, JSON đơn giản, JSON kiểu BlockTube và URL HTTPS thô; có xem trước trước khi áp dụng, đích Main/Kids/Both, mẫu, quản lý danh sách, tạm dừng/tiếp tục/xóa, kiểm tra độ mới và làm mới.",
+      "Lọc từ khóa theo ngày có thể áp dụng từ sau, đến trước hoặc trong khoảng ngày tải lên. Lọc bình luận dùng ngày tải lên của video cha khi YouTube cung cấp.",
+      "Help và các điều khiển dashboard giờ dùng lời lẽ đơn giản hơn, ưu tiên phụ huynh, bong bóng trợ giúp nhanh hơn và giải thích rõ hơn về Exact, Comment, Date, PIN, danh sách quy tắc và cập nhật thiết bị.",
+      "Dashboard giờ mời người dùng đang tham gia thử nghiệm kín Android gửi email đến hello@filtertube.in và vẫn hiện nhắc nhở báo lỗi lọc khi YouTube thay đổi cấu trúc trang.",
+      "Selector lockup YouTube trên desktop và DOM camelCase của YTM trên mobile được ghi lại để thẻ video thật tiếp tục được lọc, còn thanh chip trên Watch không kích hoạt fallback hoặc gây nhảy cuộn.",
+      "Vẫn là các hạng mục riêng: tự động dò peer LAN, dịch vụ FilterTube Internet Pickup được host, danh mục đăng ký tự động công khai nhưng im lặng, parity Android/iOS native và bằng chứng smoke test thủ công trên hai thiết bị đã cài."
+    ]
+  },
+  "3.3.2": {
+    "headline": "MVP ứng dụng di động/máy tính bảng, YouTube mượt hơn và whitelist an toàn hơn",
+    "summary": "Bề mặt phát hành ứng dụng công khai đã sẵn sàng cho kiểm thử cuối Android trên điện thoại/máy tính bảng và cập nhật trạng thái iOS/iPad; dashboard extension giờ trỏ đến các lộ trình ứng dụng đó, hoạt động SPA của YouTube yên hơn khi không có quy tắc hoạt động, và bản này có sửa lỗi tính đúng đắn của whitelist/end-screen.",
+    "bannerSummary": "Bản này có lộ trình phát hành ứng dụng di động/máy tính bảng, runtime YouTube mượt hơn, log production yên lặng và sửa lỗi rò rỉ whitelist/end-screen.",
+    "highlights": [
+      "Trung tâm tải xuống của website và dashboard extension giờ hiển thị lộ trình kiểm thử cuối Android cho điện thoại/máy tính bảng và lộ trình trạng thái TestFlight/App Store cho iOS/iPad.",
+      "Thiết lập phát hành Android cho điện thoại/máy tính bảng được ghi lại xoay quanh runtime FilterTube dùng chung, YouTube Main, quyền truy cập YouTube Kids công khai, hồ sơ, quy tắc PIN và đồng bộ Nanah.",
+      "Công việc hiệu năng SPA của YouTube giờ bỏ qua thêm các thao tác clone/parse/replay JSON, DOM fallback, quick-block, fallback-menu và whitelist-pending khi không có quy tắc hoạt động hoặc yêu cầu tuyến.",
+      "Ngữ cảnh extension production chỉ bật log console thường xuyên trong debug mode rõ ràng để việc duyệt bình thường không chịu overhead console trên các luồng YouTube nóng.",
+      "Các sửa lỗi phát hành whitelist gồm fallback creator của Shorts, chuyển tiếp đích danh sách và lọc endpoint autoplay/watch-next gọn cho điều khiển end-screen.",
+      "Thuộc tính trạng thái DOM của FilterTube được gia cố để giảm dấu vết `data-filtertube-*` hiển thị rộng, đồng thời giữ trạng thái runtime cần thiết.",
+      "Accounts & Sync giờ ghi lại Family Device Updates với Send Update, Home Pickup tùy chọn và Internet Pickup khi đi xa/mở sau, giúp phụ huynh hiểu sync trực tiếp, pickup tại nhà, pickup trực tuyến và điều gì không phải thẩm quyền.",
+      "Giới hạn thời gian hồ sơ được bảo vệ giờ có tài liệu phát hành về ngân sách YouTube hằng ngày, màn hình hết giờ, lịch sử yêu cầu thêm thời gian và phê duyệt của phụ huynh/người chăm sóc.",
+      "Các đường Nanah/import giữ quyền sở hữu Filter All keyword suy ra từ kênh giữa payload extension và ứng dụng native, gồm màu hàng, metadata huy hiệu nguồn và ngữ cảnh ghép nối."
+    ]
+  },
+  "3.3.1": {
+    "headline": "Đồng bộ thiết bị P2P an toàn, không cần máy chủ bên thứ ba",
+    "summary": "Accounts & Sync giờ trình bày Nanah thành ba lộ trình đơn giản hơn, với nhắm mục tiêu phụ huynh/trẻ mạnh hơn, quy tắc kết nối lại rõ hơn và tài liệu sử dụng thực tế rộng hơn nhiều.",
+    "bannerSummary": "Đồng bộ Nanah, kiểm soát phụ huynh/trẻ tốt hơn, quy tắc kết nối lại an toàn hơn và tài liệu đầy đủ cho luồng Accounts & Sync mới.",
+    "highlights": [
+      "Accounts & Sync giờ bắt đầu bằng ba lộ trình rõ ràng hơn: Send this profile once, Parent controls child và Move full account.",
+      "Các điều khiển Nanah nâng cao vẫn có, nhưng được giấu trong mục Advanced thay vì dẫn dắt toàn bộ quy trình.",
+      "Phiên parent/source có thể chọn hồ sơ đích từ xa rõ hơn, và thao tác lưu managed-link giờ được phản chiếu về bên gửi để cả hai thiết bị giữ cùng hồ sơ tin cậy.",
+      "Link đáng tin cậy vẫn được lưu sau khi làm mới, nhưng kết nối lại vẫn là một phiên trực tiếp mới chứ không phải đồng bộ nền ẩn.",
+      "Cập nhật trẻ bị khóa, quy tắc kết nối lại, lưu nhãn thiết bị và bảo vệ self-join/session-burn được siết chặt để phụ huynh kiểm soát an toàn hơn.",
+      "README, Architecture, Technical, Functionality, Profiles & PIN, kế hoạch dự án, hướng dẫn người dùng và trình theo dõi quan ngại giờ ghi lại checkpoint Nanah desktop hiện tại chi tiết hơn nhiều."
+    ]
+  },
+  "3.3.0": {
+    "headline": "Khôi phục cộng tác và gia cố nhập dữ liệu đa trình duyệt",
+    "summary": "Menu cộng tác Watch/YTM khôi phục đầy đủ thành viên đáng tin cậy hơn, nhập subscription mạnh hơn trên các trình duyệt, và một số sửa lỗi whitelist/Quick Block theo từng bề mặt được gộp vào 3.3.0.",
+    "bannerSummary": "Menu collab tốt hơn, nhập whitelist mạnh hơn, bề mặt Quick Block an toàn hơn, liên kết trực tiếp đến kênh và nút bật/tắt mới cho mục chặn 3 chấm.",
+    "highlights": [
+      "Thẻ YouTube mobile kiểu home/watch-next/Mix giờ tham gia cùng luồng khôi phục collaborator và menu 3 chấm thay vì rơi về menu một kênh thiếu thông tin.",
+      "Rail phải của Watch, hàng playlist và lockup kiểu Watch giờ có thể khôi phục đủ roster collaborator và làm mới menu 3 chấm đang mở ngay tại chỗ.",
+      "Khôi phục Mix/watch an toàn hơn: thẻ cộng tác thật được nâng cấp đúng cách, còn tên thông thường có '&' hoặc 'and' không còn biến thành menu cộng tác giả.",
+      "Quick Block ổn định hơn trên bề mặt phức tạp: nằm phía trên nhiều thẻ desktop hơn, tránh dropdown gợi ý tìm kiếm mobile và neo tốt hơn trên layout watch-next mobile.",
+      "Nhập whitelist kênh đã đăng ký giờ giữ phản hồi duyệt trang gần đây, ưu tiên tăng trưởng /feed/channels thực tế và giữ /feed/channels làm bề mặt quản lý hiển thị.",
+      "Lọc whitelist nghiêm ngặt và an toàn hơn trên renderer YouTube desktop/mobile, gồm xử lý trang creator tốt hơn và điều khiển ẩn Mixes/subscription được cải thiện.",
+      "Điều khiển và đánh bóng mới: hàng Channel Management liên kết đến trang kênh thật, có thể tắt mục chặn 3 chấm và xuất mã hóa trên Firefox dùng fallback an toàn hơn."
+    ]
+  },
+  "3.2.9": {
+    "headline": "Nhập kênh đã đăng ký, whitelist và sửa lỗi bảo vệ PIN",
+    "summary": "Nhập subscription của tài khoản YouTube đang hoạt động vào whitelist với ý nghĩa chuyển chế độ rõ hơn và luồng khởi động /feed/channels đáng tin cậy hơn.",
+    "bannerSummary": "Tạo whitelist từ subscription YouTube hiện tại với tiến trình nội dòng và hành vi bật whitelist rõ ràng hơn.",
+    "highlights": [
+      "Tính năng nhập mới trong Tab View có thể nhập kênh đã đăng ký từ tài khoản YouTube đang đăng nhập vào whitelist.",
+      "Khởi động nhập giờ dùng lại tab YouTube đang hoạt động, chuyển tab đến /feed/channels và đợi cầu nối FilterTube trước khi bắt đầu.",
+      "Nội dung whitelist rõ hơn: Import Only giữ nguyên blocklist, còn Import + Turn On Whitelist theo luồng chuyển blocklist sang whitelist hiện có.",
+      "Tài liệu giờ trình bày kiến trúc nhập, luồng yêu cầu FEchannels, nguồn renderer và ý nghĩa whitelist chi tiết hơn nhiều."
+    ]
+  },
+  "3.2.8": {
+    "headline": "Làm mới theme và tinh chỉnh khung giao diện Scenic",
+    "summary": "Các bề mặt popup và dashboard giờ dùng hệ thống theme scenic dịu hơn, bố cục gọn hơn, trạng thái tint rõ hơn và cân bằng sáng/tối tốt hơn.",
+    "bannerSummary": "Theme popup và dashboard được tinh chỉnh với độ trong suốt dịu hơn, pill rõ hơn và bố cục responsive tốt hơn.",
+    "highlights": [
+      "Làm mới Scenic UI: popup và dashboard giờ dùng chung khung sản phẩm dịu hơn với video hero cục bộ làm nền không khí.",
+      "Tinh chỉnh theme sáng và tối: dark mode giữ nền scenic hiển thị mà không có quầng sáng nhạt ở giữa, còn light mode dùng độ trong suốt sạch hơn.",
+      "Dọn dẹp responsive: khoảng cách popup gọn hơn, dropdown hồ sơ nhỏ hơn, bố cục thẻ Help/Support tốt hơn và hiển thị mobile trên các bề mặt lọc được cải thiện.",
+      "Sửa màu tint điều khiển: trạng thái bật/tắt, màu pill, ô tìm kiếm và thao tác nhập/xuất giờ rõ hơn trong cả hai theme."
+    ]
+  },
+  "3.2.7": {
+    "headline": "Lọc danh mục, dấu chéo Quick Block khi rê chuột và UI 3 chấm trên mobile",
+    "summary": "Bổ sung lọc danh mục và bật sẵn Quick Cross Block chỉ với một lần chạm.",
+    "bannerSummary": "Dùng bộ lọc danh mục mới và Quick Cross Block khi rê lên thẻ, đồng thời nhận hỗ trợ chặn YT Mobile tốt hơn.",
+    "highlights": [
+      "Lọc danh mục: chặn hoặc cho phép video theo danh mục YouTube (Âm nhạc, Trò chơi, Giáo dục, v.v.).",
+      "Quick Cross Block mặc định BẬT: `Show Quick Cross Block button` được bật sẵn trong v3.2.7 (người dùng vẫn có thể tắt).",
+      "Chặn trên mobile: hỗ trợ chặn YT Mobile tốt hơn qua UI 3 chấm và Quick Cross Block, hiện đang hoạt động trên Trang chủ."
+    ]
+  },
+  "3.2.6": {
+    "headline": "Làm đẹp UI/UX và lọc dựa trên nội dung",
+    "summary": "Cải thiện toàn diện kiểu chữ với thiết kế hiện đại, cùng ba bộ lọc nội dung mới: thời lượng, ngày tháng và chữ hoa.",
+    "bannerSummary": "Giao diện mới đẹp mắt với bộ lọc nội dung cho thời lượng, ngày tải lên và phát hiện clickbait.",
+    "highlights": [
+      "Cập nhật kiểu chữ: thang phông chữ hiện đại, tinh tế hơn để dễ đọc.",
+      "Bộ lọc dựa trên nội dung: thời lượng (dài hơn/ngắn hơn/trong khoảng), ngày tải lên (mới hơn/cũ hơn/trong khoảng) và phát hiện chữ hoa (tiêu đề câu view).",
+      "Hệ thống `videoMetaMap`: lưu siêu dữ liệu video bền vững với batching thông minh (cửa sổ 75ms, tối đa 1500 mục).",
+      "Cải thiện dashboard: thống kê theo từng bề mặt (Main so với Kids), thẻ thống kê nâng cấp và thẻ quảng bá quyên góp."
+    ]
+  },
+  "3.2.5": {
+    "headline": "Đề cao chế độ Whitelist và tăng độ ổn định",
+    "summary": "Chế độ whitelist giờ là luồng chính để chỉ cho phép nội dung được chọn, với trích xuất thông minh hơn, bảo vệ playlist và giảm mức dùng CPU.",
+    "bannerSummary": "Đưa whitelist lên vị trí chính với UI gọn hơn, playlist ổn định hơn và hỗ trợ Kids.",
+    "highlights": [
+      "Đề cao chế độ whitelist: câu chữ/UI không còn đánh dấu đây là tính năng thử nghiệm.",
+      "Dọn menu 3 chấm và xử lý tìm kiếm phụ cho các bề mặt whitelist.",
+      "Trích xuất kênh từ nhiều nguồn bằng neo thumbnail và container cha.",
+      "Theo dõi trạng thái theo chế độ với hộp thoại xác nhận và tối ưu cầu nối.",
+      "Playlist ổn định hơn: các hàng được chọn vẫn hiển thị; danh tính đang chờ không còn làm lộ hàng bị chặn.",
+      "Hỗ trợ whitelist trong chế độ Kids với kiến trúc không mạng."
+    ]
+  },
+  "3.2.4": {
+    "headline": "Chế độ Whitelist nâng cao và tối ưu hiệu năng",
+    "summary": "Cải tiến đáng kể chế độ whitelist thử nghiệm với UX tốt hơn, tối ưu hiệu năng và mở rộng hỗ trợ Kids.",
+    "bannerSummary": "Whitelist thông minh hơn với UI gọn, hiệu năng tốt và hỗ trợ Kids.",
+    "highlights": [
+      "THỬ NGHIỆM: chế độ whitelist nâng cao với dọn menu 3 chấm, xử lý tìm kiếm thông minh và theo dõi trạng thái theo chế độ.",
+      "Tăng hiệu năng: tối ưu ở tầng cầu nối và xử lý chọn lọc giúp giảm CPU.",
+      "Cải tiến UI: hộp thoại xác nhận ngăn mất dữ liệu ngoài ý muốn khi đổi chế độ.",
+      "Hỗ trợ Kids: chức năng whitelist giờ chạy trên YouTube Kids với kiến trúc không mạng.",
+      "Tối ưu tìm kiếm: xử lý thẻ Watch ở rail phải thông minh để tránh UI lộn xộn.",
+      "Trích xuất kênh: giải quyết danh tính từ nhiều nguồn với neo thumbnail và container cha.",
+      "Chuyển chế độ: chuyển đổi mượt giữa blocklist/whitelist với xử lý lại thông minh."
+    ]
+  },
+  "3.2.3": {
+    "headline": "Chế độ Whitelist thử nghiệm và cải tiến UI",
+    "summary": "Bản alpha của whitelist để lọc theo kiểu chỉ cho phép, cùng các cập nhật UI và hỗ trợ menu mobile tốt hơn.",
+    "bannerSummary": "Thử chế độ whitelist thử nghiệm — ẩn mọi thứ ngoại trừ các kênh được cho phép.",
+    "highlights": [
+      "THỬ NGHIỆM: whitelist ẩn mọi nội dung trừ các kênh/từ khóa được cho phép rõ ràng.",
+      "Hai chế độ lọc với khả năng chuyển dễ dàng giữa blocklist và whitelist trong popup và tab view.",
+      "Di chuyển theo từng bước: chuyển sang blocklist để thu thập kênh, sau đó nhập lại vào whitelist.",
+      "Bảo vệ trang Watch trong whitelist giữ cho chức năng phát video hoạt động.",
+      "Cập nhật UI lạc quan ẩn nội dung ngay lập tức và tự khôi phục nếu chặn thất bại.",
+      "Hỗ trợ menu mobile tốt hơn với cách xử lý renderer YouTube mobile chính xác.",
+      "Mọi log console giờ được kiểm soát bởi debug flag để giảm tiếng ồn production."
+    ]
+  },
+  "3.2.2": {
+    "headline": "Cải tiến UI/UX và kiểm soát Debug",
+    "summary": "Cập nhật lạc quan, hỗ trợ menu mobile, log chỉ bật khi debug, giữ vị trí cuộn và tinh chỉnh quản lý trạng thái.",
+    "bannerSummary": "UI phản hồi tức thì, menu mobile được trau chuốt và log theo debug với xử lý trạng thái ổn định.",
+    "highlights": [
+      "Cập nhật UI lạc quan: nội dung ẩn ngay và tự hiện lại nếu thao tác chặn thất bại.",
+      "Hỗ trợ menu mobile cho `ytm-menu-popup-renderer` tốt hơn với tag renderer chính xác.",
+      "Logging theo debug qua `window.__filtertubeDebug`.",
+      "Giữ vị trí cuộn trong DOM fallback để tránh nhảy khó chịu.",
+      "Giới hạn bổ sung dữ liệu kênh (10 mỗi phiên) để giảm yêu cầu nền.",
+      "Lên lịch render khi rảnh bằng `requestIdleCallback` và batching.",
+      "Debounce tải lại bên ngoài bằng so sánh signature để tránh render thừa.",
+      "Thông báo chọn lọc: chỉ `load` khi signature đổi; nếu không thì `externalUpdate`.",
+      "Quản lý trạng thái cầu nối qua state toàn cục dùng chung."
+    ]
+  },
+  "3.2.1": {
+    "headline": "Xử lý không giật lag và tăng hiệu năng",
+    "summary": "Các tối ưu hiệu năng lớn loại bỏ độ trễ UI, cho kết quả xuất sắc trên trình duyệt Chromium và cải thiện đáng kể trên Firefox.",
+    "bannerSummary": "Lọc không giật lag với xử lý bất đồng bộ, cache đã biên dịch và cập nhật theo lô.",
+    "highlights": [
+      "Xử lý DOM bất đồng bộ nhường thời gian cho luồng chính, ngăn trình duyệt treo khi lọc nặng.",
+      "Regex đã biên dịch và cache bộ lọc kênh cho tra cứu O(1), giảm dùng CPU 60–80%.",
+      "Cập nhật storage theo lô giảm thao tác I/O 70–90% với khoảng cách thông minh 250ms.",
+      "Làm mới settings có debounce để tránh xử lý lại DOM quá mức.",
+      "Quản lý trạng thái chạy ngăn các lần chạy chồng lấn và xếp hàng yêu cầu đúng cách.",
+      "Trình duyệt Chromium: giảm lag hơn 90%; Firefox: cải thiện đáng kể và tiếp tục tối ưu."
+    ]
+  },
+  "3.2.0": {
+    "headline": "Chặn tức thì và Kids không cần mạng",
+    "summary": "Menu 3 chấm hiển thị tên kênh ngay lập tức, yêu cầu mạng giảm mạnh và YouTube Kids hoạt động hoàn toàn ngoại tuyến.",
+    "bannerSummary": "Chặn không độ trễ với chặn bắt XHR chủ động; chế độ Kids hoạt động mà không cần tải dữ liệu qua mạng.",
+    "highlights": [
+      "Menu 3 chấm giờ hiện đúng tên kênh ngay lập tức — không còn chờ 'Fetching...'.",
+      "Danh tính kênh lấy từ phản hồi JSON YouTube được chặn bắt, giúp giảm cuộc gọi mạng.",
+      "YouTube Kids hoạt động hoàn toàn không cần tải dữ liệu mạng để chặn đáng tin cậy.",
+      "Siêu dữ liệu còn thiếu được bổ sung nền ở tốc độ có kiểm soát (thời gian chờ 6 giờ).",
+      "Kênh chủ đề (ví dụ 'Music - Topic') được xử lý riêng mà không cần `@handles`.",
+      "Tài liệu toàn diện mới với sơ đồ luồng ASCII và Mermaid."
+    ]
+  },
+  "3.1.9": {
+    "headline": "Sao lưu theo hồ sơ và điều khiển được khóa bảo vệ",
+    "summary": "Sao lưu tự động và điều khiển nội dung giờ tôn trọng khóa/PIN của hồ sơ, kế thừa cài đặt theo từng hồ sơ, và menu hồ sơ vẫn nhấp được phía trên lớp khóa.",
+    "bannerSummary": "Sao lưu tự động theo hồ sơ và khóa hồ sơ được bảo vệ; bộ chọn hồ sơ luôn nhấp được.",
+    "highlights": [
+      "Bộ chọn chế độ/định dạng sao lưu tự động bị tắt khi sao lưu tự động tắt hoặc hồ sơ bị khóa; hồ sơ mới kế thừa tùy chọn sao lưu tự động.",
+      "Lịch sao lưu tự động giờ kích hoạt khi tạo hồ sơ và khi đổi chế độ/định dạng, nhưng chỉ khi bật sao lưu tự động cho hồ sơ đó.",
+      "Nút bật/tắt điều khiển nội dung và sao lưu bị tắt/hoàn nguyên khi khóa; phạm vi xuất bị giới hạn chỉ ở hồ sơ hiện tại đối với hồ sơ không phải master.",
+      "Sửa z-index của menu hồ sơ để vẫn nhấp được ngay cả khi banner lớp khóa đang hiện.",
+      "Đã cập nhật tài liệu về mô hình hồ sơ/PIN, sao lưu theo từng hồ sơ và quy tắc khóa UI."
+    ]
+  },
+  "3.1.8": {
+    "headline": "Tab Support và sao lưu tự động đáng tin cậy",
+    "summary": "Thêm trang Support mới (Ko-fi) và sao lưu tự động giờ hoạt động đáng tin cậy trên cả Chrome lẫn Firefox.",
+    "bannerSummary": "Sao lưu tự động giờ tương thích đa trình duyệt và ghi đè một tệp sao lưu mới nhất duy nhất.",
+    "highlights": [
+      "Thêm trang Support vào dashboard với nội dung nhúng Ko-fi.",
+      "Sao lưu tự động giờ ghi đè một tệp luân phiên duy nhất: Downloads/FilterTube Backup/FilterTube-Backup-Latest.json.",
+      "Chiến lược tải xuống đa trình duyệt (Blob URL khi có; fallback data: URL cho Chrome MV3 service worker).",
+      "Tải xuống trên Firefox không còn lỗi do hạn chế data: URL."
+    ]
+  },
+  "3.1.7": {
+    "headline": "YT Kids và hỗ trợ sao lưu tự động",
+    "summary": "Có thể chặn nội dung theo kênh trên YT Kids và bật/tắt sao lưu tự động.",
+    "bannerSummary": "Cài đặt mới: bật/tắt sao lưu tự động. Bản xuất được lưu vào Downloads/FilterTube Export/.",
+    "highlights": [
+      "Thêm chặn hoàn chỉnh theo Channel và Keyword trên YT Kids; chặn kênh bằng cách nghe thụ động UI menu 3 chấm của YT Kids.",
+      "Thêm nút Settings để bật/tắt sao lưu tự động (cố gắng tối đa; không hiện lời nhắc Save As).",
+      "Sao lưu tự động được lưu vào Downloads/FilterTube Backup/ theo vòng xoay (giữ các tệp mới nhất).",
+      "Bản xuất thủ công giờ tải âm thầm vào Downloads/FilterTube Export/."
+    ]
+  },
+  "3.1.6": {
+    "headline": "Hỗ trợ nhập/xuất và banner phát hành",
+    "summary": "CTA của banner giờ mở thẳng What's New trên dashboard, các thẻ được chọn tải từ cùng JSON, và nhập dữ liệu xử lý c/ChannelName cùng quy tắc gộp tốt hơn.",
+    "bannerSummary": "Banner phát hành mở tab What's New trong extension và tài liệu nhập/xuất giờ mô tả toàn bộ luồng.",
+    "highlights": [
+      "JSON ghi chú phát hành cấp dữ liệu cho cả thẻ dashboard và banner YouTube từ một nguồn sự thật duy nhất.",
+      "CTA mở tab-view qua tin nhắn nền để blocker không chặn các liên kết chrome-extension://.",
+      "Tài liệu và mã nhập/xuất giải thích cách chuẩn hóa đầu vào UC/handle/c/ChannelName trước khi gộp."
+    ]
+  },
+  "3.1.5": {
+    "headline": "Shorts và nội dung chỉ dành cho thành viên thực sự đã bị ẩn",
+    "summary": "Trang Watch và sidebar giờ ẩn renderer Shorts cùng kệ nội dung chỉ dành cho thành viên trước khi chúng lóe lên, và trạng thái nút bật/tắt cuối cùng được lưu bền vững.",
+    "bannerSummary": "Gia cố việc ẩn nội dung chỉ dành cho thành viên và Shorts trên Watch cùng sidebar để các hàng bị chặn không xuất hiện lại.",
+    "highlights": [
+      "Sidebar kiểm tra href `/shorts/`, lớp phủ và aria-label trước khi thẻ được render.",
+      "Phát hiện nội dung chỉ dành cho thành viên bao phủ hàng compact, Watch và kệ với badge cùng heuristic playlist mới.",
+      "Sửa lỗi lưu trạng thái nút nội dung chỉ dành cho thành viên để trạng thái còn nguyên sau khi tải lại."
+    ]
+  },
+  "3.1.4": {
+    "headline": "Dashboard trở nên responsive",
+    "summary": "Điều hướng thu gọn gọn gàng trên mobile, ô nhập xuống dòng linh hoạt và điều khiển playlist/Mix có nút bật/tắt rõ hơn.",
+    "highlights": [
+      "Điều hướng hamburger và lớp phủ cho màn hình nhỏ với khoảng cách lưới được tinh chỉnh.",
+      "Nút bật/tắt có track nhẹ hơn, núm ở giữa và tương phản dark mode tốt hơn.",
+      "Chip Mix/Radio bị ẩn khi bật tùy chọn Mix; ẩn playlist bỏ qua các mục radio."
+    ]
+  },
+  "3.1.3": {
+    "headline": "Làm mới chú giải Help",
+    "summary": "Thẻ, pill và tooltip giải thích chính xác Exact / Comment / Filter All làm gì, đồng bộ với phong cách dashboard vừa làm mới.",
+    "highlights": [
+      "Tab Help hiển thị màu badge và nhãn cộng tác bằng màu tương ứng.",
+      "Thanh tìm kiếm popup và tab dùng cùng nhịp bố cục toàn chiều rộng.",
+      "Mô tả điều khiển nội dung được chuyển vào tooltip khi rê chuột để dễ hiểu hơn."
+    ]
+  },
+  "3.1.2": {
+    "headline": "Gia cố autoplay playlist",
+    "summary": "Autoplay bỏ qua hàng playlist bị chặn mà không lóe lên, và việc ẩn cố định vẫn còn sau khi YouTube xử lý lại trang.",
+    "highlights": [
+      "Chỉ kích hoạt Next-click khi hàng playlist tiếp theo thực sự hiển thị.",
+      "Các hàng trong bảng playlist Watch vẫn ẩn ngay cả khi danh tính chưa được giải quyết trong chốc lát.",
+      "Menu 3 chấm đóng gọn sau khi chặn để miniplayer tiếp tục phát."
+    ]
+  },
+  "3.1.1": {
+    "headline": "Tab Help và sửa lỗi nhận dạng",
+    "summary": "Dashboard có tab Help riêng, đồng thời ánh xạ UC ↔ handle ↔ URL tùy chỉnh đáng tin cậy hơn.",
+    "highlights": [
+      "Tài liệu tham khảo Help mô tả tất cả nút bật/tắt, badge và hành vi từ khóa.",
+      "Điều hướng playlist bỏ qua hàng bị chặn mà không làm nội dung nháy lên khi phát.",
+      "Fallback handle/URL tùy chỉnh xác định đúng UC ID đáng tin cậy hơn."
+    ]
+  },
+  "3.1.0": {
+    "headline": "Làm rõ tài liệu và bộ lọc lai",
+    "summary": "Ghi lại kiến trúc chặn bắt kết hợp DOM fallback bằng sơ đồ để giải thích cách FilterTube thực thi việc chặn.",
+    "highlights": [
+      "Ghi lại tính tương đương của menu 3 chấm trên Watch với cộng tác viên ở home/search.",
+      "Liệt kê các regression playlist còn tồn tại để các sửa lỗi luôn được theo dõi.",
+      "Đồng bộ manifest, công cụ build và chân trang UI với phiên bản 3.1.0."
+    ]
   }
 }
