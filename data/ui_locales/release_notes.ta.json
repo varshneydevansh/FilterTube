@@ -13,8 +13,7 @@
       "Advert Void இப்போது player-இல் `ad-showing` மற்றும் `ad-interrupting` ஆகிய இரு நிலைகளும் இருக்க வேண்டும் அல்லது விளம்பரம் தெரிவதற்கான தனித்த ஆதாரம் இருக்க வேண்டும் எனக் கோருகிறது. Sponsored-card கையாளுதல் இனி பொதுவான renderer mutation வேலையாகக் கணக்கிடப்படாது.",
       "GitHub வெளியீட்டு வெளியீடு GitHub CLI credentials-ஐப் பயன்படுத்துகிறது; பதிவேற்றத்திற்கு முன் drafts உருவாக்குகிறது; ஏற்கெனவே உள்ள tags-இலிருந்து தொடர்கிறது; இல்லாத assets-ஐ மட்டும் பதிவேற்றுகிறது; இறுதி asset தொகுப்பைச் சரிபார்த்து அதன் பிறகே வெளியிடுகிறது.",
       "Android போன்கள் மற்றும் டேப்லெட்டுகளுக்கான FilterTube செயலி இப்போது Google Play-இல் பொதுமக்களுக்குக் கிடைக்கிறது. [பொதுப் பக்கம்](https://play.google.com/store/apps/details?id=com.filtertube.app) வழியாக நிறுவவும் அல்லது Google Play-இல் FilterTube-ஐத் தேடவும்."
-    ],
-    "detailsUrl": "https://github.com/varshneydevansh/FilterTube/releases/tag/v3.3.7"
+    ]
   },
   "3.3.6": {
     "ctaLabel": "புதிய அம்சங்களைப் பார்க்கவும்",

@@ -13,8 +13,7 @@
       "Advert Void กำหนดให้ player อยู่ในสถานะ `ad-showing` และ `ad-interrupting` พร้อมกัน หรือมีหลักฐานอิสระว่ามองเห็นโฆษณา การจัดการการ์ดผู้สนับสนุนจะไม่นับเป็นงานเปลี่ยน renderer ทั่วไปอีกต่อไป",
       "การเผยแพร่รุ่นบน GitHub ใช้ข้อมูลรับรอง GitHub CLI สร้าง draft ก่อนอัปโหลด ทำต่อจาก tag ที่มีอยู่ อัปโหลดเฉพาะ asset ที่ขาด ตรวจสอบชุด asset สุดท้าย และเผยแพร่หลังตรวจสอบแล้วเท่านั้น",
       "แอป FilterTube สำหรับโทรศัพท์และแท็บเล็ต Android เปิดให้ทุกคนใช้บน Google Play แล้ว ติดตั้งได้จาก[หน้าสาธารณะ](https://play.google.com/store/apps/details?id=com.filtertube.app) หรือค้นหา FilterTube ใน Google Play"
-    ],
-    "detailsUrl": "https://github.com/varshneydevansh/FilterTube/releases/tag/v3.3.7"
+    ]
   },
   "3.3.6": {
     "ctaLabel": "ดูว่ามีอะไรใหม่",

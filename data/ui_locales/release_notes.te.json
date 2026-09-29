@@ -13,8 +13,7 @@
       "Advert Void ఇప్పుడు ప్లేయర్‌లో `ad-showing` మరియు `ad-interrupting` స్థితులు రెండూ ఉండాలి లేదా ప్రకటన కనిపిస్తోందనే స్వతంత్ర ఆధారం ఉండాలి. స్పాన్సర్ చేసిన కార్డుల నిర్వహణ ఇక సాధారణ renderer మార్పుల పనిగా లెక్కించబడదు.",
       "GitHub విడుదల ప్రచురణ GitHub CLI credentials ఉపయోగిస్తుంది, అప్‌లోడ్‌కు ముందు drafts సృష్టిస్తుంది, ఉన్న tags నుంచి కొనసాగిస్తుంది, లేని assets మాత్రమే అప్‌లోడ్ చేస్తుంది, చివరి asset సమాహారాన్ని ధృవీకరిస్తుంది, ధృవీకరణ తర్వాతే ప్రచురిస్తుంది.",
       "Android ఫోన్లు, టాబ్లెట్‌ల కోసం FilterTube యాప్ ఇప్పుడు Google Playలో అందరికీ అందుబాటులో ఉంది. దీన్ని [పబ్లిక్ పేజీ](https://play.google.com/store/apps/details?id=com.filtertube.app) నుంచి ఇన్‌స్టాల్ చేయండి లేదా Google Playలో FilterTube కోసం వెతకండి."
-    ],
-    "detailsUrl": "https://github.com/varshneydevansh/FilterTube/releases/tag/v3.3.7"
+    ]
   },
   "3.3.6": {
     "ctaLabel": "కొత్త విశేషాలు చూడండి",

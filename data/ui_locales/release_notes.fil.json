@@ -13,8 +13,7 @@
       "Nangangailangan na ngayon ang Advert Void ng magkasabay na player state na `ad-showing` at `ad-interrupting`, o ng hiwalay na patunay na may nakikitang ad. Hindi na binibilang na pangkalahatang renderer mutation work ang paghawak sa sponsored card.",
       "Gumagamit ang paglalathala ng GitHub release ng mga credential ng GitHub CLI, gumagawa ng draft bago mag-upload, nagpapatuloy mula sa mga umiiral na tag, ina-upload lang ang nawawalang asset, bineberipika ang huling set ng asset, at saka lang naglalathala kapag napatunayan na.",
       "Bukas na sa publiko sa Google Play ang FilterTube app para sa mga Android phone at tablet. I-install ito mula sa [pampublikong page](https://play.google.com/store/apps/details?id=com.filtertube.app) o hanapin ang FilterTube sa Google Play."
-    ],
-    "detailsUrl": "https://github.com/varshneydevansh/FilterTube/releases/tag/v3.3.7"
+    ]
   },
   "3.3.6": {
     "ctaLabel": "Tingnan ang mga bago",

@@ -13,8 +13,7 @@
       "Advert Void اکنون به هر دو وضعیت پخش‌کننده `ad-showing` و `ad-interrupting` یا شواهد مستقلی از نمایش آگهی نیاز دارد. رسیدگی به کارت‌های حمایت‌شده دیگر جزو کار عمومی تغییر renderer حساب نمی‌شود.",
       "انتشار نسخه‌های GitHub از اعتبارنامه‌های GitHub CLI استفاده می‌کند، پیش از بارگذاری پیش‌نویس می‌سازد، از tagهای موجود ادامه می‌دهد، فقط دارایی‌های جاافتاده را بارگذاری می‌کند، مجموعه نهایی دارایی‌ها را می‌سنجد و تنها پس از تأیید منتشر می‌کند.",
       "برنامه FilterTube برای تلفن‌ها و تبلت‌های Android اکنون به‌صورت عمومی در Google Play در دسترس است. آن را از [صفحه عمومی](https://play.google.com/store/apps/details?id=com.filtertube.app) نصب کنید یا FilterTube را در Google Play جست‌وجو کنید."
-    ],
-    "detailsUrl": "https://github.com/varshneydevansh/FilterTube/releases/tag/v3.3.7"
+    ]
   },
   "3.3.6": {
     "ctaLabel": "تازه‌ها را ببینید",
