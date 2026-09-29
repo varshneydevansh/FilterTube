@@ -255,7 +255,7 @@ or auto-selected as a completed language while these surfaces remain.
 
 The current 3.3.7 What's New entry has a draft in every target locale.
 The 27 older releases (3.3.6 through 3.1.0) remain English in the dashboard;
-the dashboard currently falls back silently. The current-version banner has
+at this checkpoint the dashboard fell back silently. The current-version banner has
 localized copy but will also fall back to English if a future release omits
 its localized entry. A future pass must give historical English-source cards
 an explicit localized label or translate the complete history. Preserve every
@@ -265,3 +265,35 @@ translated.
 Fluent-speaker review, RTL/long-text and keyboard/screen-reader QA, and
 Chrome/Firefox/Opera installed-extension verification remain required.
 The UI-copy audit is a lower-bound inventory, not a completion score.
+
+## Follow-on runtime inventory (2026-09-29)
+
+The next audit found substantially more generated copy than the 339-key
+checkpoint captured. The English catalog reached 610 keys in the core pass. New bounded source
+maps cover 80 rule-editor strings, 167 core family-control strings, and 18
+on-page quick-block/fallback-menu strings. The one-time refresh prompt has five
+keys, and historical What's New cards can explicitly identify English-source
+copy. These keys are not a claim that all target catalogs have translations:
+the 37-language parity gate must pass again after their translation batches
+are merged.
+
+The family command center alone contained 157 further generated English
+fallback strings outside the 167-key core tranche; these have since been
+extracted into a separate English source batch, bringing that catalog to 767
+keys. The deferred batch includes provider help,
+bulk-selection explanations, trust/channel details, and status histories.
+The 80-key rule-editor, 24-key on-page/refresh/source-label, 167-key core
+family, and 157-key deferred family batches have now been merged across all
+38 catalogs. Each target has 767 of 767 English keys, and the strict catalog
+and dashboard-static checks pass. This proves key/placeholder coverage, not
+fluent translation quality or complete runtime UI coverage. Arabic variants
+in the deferred family batch currently share Modern Standard Arabic phrasing.
+
+A source audit still finds unkeyed generated dashboard copy, especially toast
+messages and import/report views; content category and spoken-language labels
+also remain English. These are distinct follow-on localization tranches. The
+follow-on renderer now marks untranslated historical What's New cards as
+English source; that is an explicit fallback policy, not a translation of
+their text. Keep every non-English choice labeled as a preview until the
+remaining generated surfaces and fluent-speaker/RTL/installed-browser review
+have passed.

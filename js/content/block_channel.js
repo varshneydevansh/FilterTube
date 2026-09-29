@@ -1,3 +1,99 @@
+// Content-script menus use this packaged catalog lookup because the dashboard
+// localization runtime is not loaded on YouTube pages.
+(function installFilterTubeContentUiCopy(root) {
+    if (!root || root.__filterTubeContentUiCopy) return;
+
+    const api = root.browser || root.chrome || globalThis.browser || globalThis.chrome;
+    let catalog = null;
+
+    function interpolate(value, values) {
+        return String(value).replace(/\{([a-zA-Z][a-zA-Z0-9]*)\}/g, (match, name) =>
+            Object.prototype.hasOwnProperty.call(values || {}, name) ? String(values[name]) : match);
+    }
+
+    async function loadCatalog() {
+        if (!api?.storage?.local?.get || !api?.runtime?.getURL) return null;
+
+        let stored = {};
+        try {
+            stored = await new Promise(resolve => {
+                let settled = false;
+                const finish = value => {
+                    if (settled) return;
+                    settled = true;
+                    resolve(value || {});
+                };
+                const result = api.storage.local.get('ftUiLocalePreference', finish);
+                if (result?.then) result.then(finish, () => finish({}));
+            });
+        } catch (_) {
+            stored = {};
+        }
+
+        let requested = typeof stored?.ftUiLocalePreference === 'string'
+            ? stored.ftUiLocalePreference : 'en';
+        if (requested === 'auto') requested = root.navigator?.language || 'en';
+        requested = requested.trim().replace(/_/g, '-');
+        if (!/^[a-z]{2,3}(?:-[a-zA-Z0-9]{2,8})*$/.test(requested)) return null;
+
+        const candidates = [];
+        const addLocaleAndPrefixes = value => {
+            const parts = value.split('-');
+            while (parts.length) {
+                const candidate = parts.join('-');
+                if (!candidates.some(existing => existing.toLowerCase() === candidate.toLowerCase())) {
+                    candidates.push(candidate);
+                }
+                parts.pop();
+            }
+        };
+        addLocaleAndPrefixes(requested);
+        try {
+            addLocaleAndPrefixes(new Intl.Locale(requested).maximize().toString());
+        } catch (_) {
+        }
+
+        for (const locale of candidates) {
+            if (locale.toLowerCase() === 'en') return null;
+            try {
+                const response = await fetch(api.runtime.getURL(`data/ui_locales/${locale}.json`));
+                if (!response.ok) continue;
+                const value = await response.json();
+                if (value && typeof value === 'object' && !Array.isArray(value)) return value;
+            } catch (_) {
+            }
+        }
+        return null;
+    }
+
+    const ready = loadCatalog().then(value => {
+        catalog = value;
+        return catalog;
+    }).catch(() => null);
+
+    root.__filterTubeContentUiCopy = Object.freeze({
+        ready,
+        text(key, fallback, values = {}) {
+            try {
+                const inline = root.FilterTubeUiLocalization?.text?.(key, values);
+                if (typeof inline === 'string' && inline.trim()) return inline;
+            } catch (_) {
+            }
+            const localized = catalog?.[key];
+            return interpolate(typeof localized === 'string' && localized.trim() ? localized : fallback, values);
+        }
+    });
+})(window);
+
+function quickBlockLocalizedText(key, fallback, values = {}) {
+    try {
+        const value = window.__filterTubeContentUiCopy?.text?.(key, fallback, values);
+        return typeof value === 'string' && value.trim() ? value : fallback;
+    } catch (_) {
+        return fallback;
+    }
+}
+
 /**
  * Track the last clicked 3-dot button to find associated video card
  */
@@ -1975,8 +2071,12 @@ function ensureQuickBlockButton(card) {
     const trigger = document.createElement('button');
     trigger.className = 'filtertube-quick-block-btn';
     trigger.type = 'button';
-    trigger.setAttribute('aria-label', 'Quick block all channels on this card');
-    trigger.title = 'Quick block all channels on this card';
+    const triggerLabel = quickBlockLocalizedText(
+        'content.quickBlock.ariaLabel',
+        'Quick block all channels on this card'
+    );
+    trigger.setAttribute('aria-label', triggerLabel);
+    trigger.title = triggerLabel;
     trigger.textContent = '×';
 
     trigger.addEventListener('click', (event) => {

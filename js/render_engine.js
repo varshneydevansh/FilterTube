@@ -637,21 +637,34 @@ const RenderEngine = (() => {
         if (target !== 'allow' && target !== 'block') return null;
         const badge = document.createElement('span');
         badge.className = `ft-rule-entry-badge ft-rule-entry-badge--${target}`;
-        badge.textContent = target === 'allow' ? 'Always allowed' : 'Blocked';
-        badge.title = target === 'allow'
-            ? 'This individual rule keeps matching content visible.'
-            : 'This individual rule hides matching content.';
+        const allowed = target === 'allow';
+        setRendererCopy(
+            badge,
+            'textContent',
+            allowed ? 'render.ruleTargetAlwaysAllowed' : 'render.ruleTargetBlocked',
+            allowed ? 'Always allowed' : 'Blocked'
+        );
+        setRendererCopy(
+            badge,
+            'title',
+            allowed ? 'render.ruleTargetAlwaysAllowedTitle' : 'render.ruleTargetBlockedTitle',
+            allowed
+                ? 'This individual rule keeps matching content visible.'
+                : 'This individual rule hides matching content.'
+        );
         return badge;
     }
 
     function createMoveRuleButton(target, activate) {
         if ((target !== 'allow' && target !== 'block') || typeof activate !== 'function') return null;
-        const destination = target === 'allow' ? 'Block matches' : 'Always allow';
+        const destinationKey = target === 'allow' ? 'render.ruleTargetBlockMatches' : 'render.ruleTargetAlwaysAllow';
+        const destinationFallback = target === 'allow' ? 'Block matches' : 'Always allow';
+        const getDestination = () => rendererText(destinationKey, destinationFallback);
         const button = document.createElement('button');
         button.type = 'button';
         button.className = 'ft-rule-entry-move';
-        button.textContent = `Move to ${destination}`;
-        button.title = `Move this individual rule to ${destination}`;
+        setRendererCopy(button, 'textContent', 'render.moveRuleButton', 'Move to {destination}', () => ({ destination: getDestination() }));
+        setRendererCopy(button, 'title', 'render.moveRuleTitle', 'Move this individual rule to {destination}', () => ({ destination: getDestination() }));
         button.addEventListener('click', activate);
         return button;
     }
@@ -996,6 +1009,8 @@ const RenderEngine = (() => {
             const deleteBtn = UIComponents?.createDeleteButton ?
                 UIComponents.createDeleteButton(deleteHandler) :
                 createFallbackDeleteButton(deleteHandler);
+            setRendererCopy(deleteBtn, 'aria-label', 'render.deleteRule', 'Delete');
+            setRendererCopy(deleteBtn, 'title', 'render.deleteRule', 'Delete');
 
             if (commentsToggle) controls.appendChild(commentsToggle);
             if (exactToggle instanceof Node) controls.appendChild(exactToggle);
@@ -1005,8 +1020,13 @@ const RenderEngine = (() => {
             if (!minimal && profile !== 'kids') {
                 const semanticToggle = document.createElement('div');
                 semanticToggle.className = 'exact-toggle toggle-variant-purple is-disabled';
-                semanticToggle.textContent = 'Semantic ML (Future)';
-                semanticToggle.title = 'Semantic ML is disabled until runtime matching is implemented';
+                setRendererCopy(semanticToggle, 'textContent', 'render.semanticMlFuture', 'Semantic ML (Future)');
+                setRendererCopy(
+                    semanticToggle,
+                    'title',
+                    'render.semanticMlDisabledTitle',
+                    'Semantic ML is disabled until runtime matching is implemented'
+                );
                 semanticToggle.setAttribute('aria-disabled', 'true');
                 controls.appendChild(semanticToggle);
             }
@@ -1482,6 +1502,8 @@ const RenderEngine = (() => {
         const deleteBtn = UIComponents?.createDeleteButton
             ? UIComponents.createDeleteButton(deleteHandler)
             : createFallbackDeleteButton(deleteHandler);
+        setRendererCopy(deleteBtn, 'aria-label', 'render.deleteRule', 'Delete');
+        setRendererCopy(deleteBtn, 'title', 'render.deleteRule', 'Delete');
 
         controls.appendChild(deleteBtn);
 
@@ -1615,6 +1637,8 @@ const RenderEngine = (() => {
         const deleteBtn = document.createElement('button');
         deleteBtn.className = 'delete-btn';
         deleteBtn.innerHTML = '×';
+        setRendererCopy(deleteBtn, 'aria-label', 'render.deleteRule', 'Delete');
+        setRendererCopy(deleteBtn, 'title', 'render.deleteRule', 'Delete');
         deleteBtn.addEventListener('click', async () => {
             if (typeof onDelete === 'function') {
                 await onDelete(channel, index);
@@ -1727,14 +1751,17 @@ const RenderEngine = (() => {
             const spacer = document.createElement('div');
             spacer.className = 'filter-all-toggle disabled';
             spacer.style.visibility = 'hidden';
-            spacer.textContent = 'Filter All';
+            setRendererCopy(spacer, 'textContent', 'render.filterAll', 'Filter All');
             return spacer;
         }
 
+        const channelName = String(channel.name || channel.handle || channel.id || '');
+        const filterAllTitleKey = 'render.filterAllTitle';
+        const filterAllTitleFallback = 'Automatically adds "{channel}" as a channel-derived Exact keyword';
         // Use pill toggle with red variant (no label text)
         const pillToggle = UIComponents?.createToggleButton ?
             UIComponents.createToggleButton({
-                text: 'Filter All',
+                text: rendererText('render.filterAll', 'Filter All'),
                 active: channel.filterAll || false,
                 onToggle: async () => {
                     if (typeof onToggleFilterAll === 'function') {
@@ -1748,9 +1775,25 @@ const RenderEngine = (() => {
                     await StateManager?.toggleChannelFilterAll(index);
                 },
                 className: 'toggle-variant-red',
-                title: `Automatically adds "${channel.name || channel.handle || channel.id}" as a channel-derived Exact keyword`
+                title: rendererText(filterAllTitleKey, filterAllTitleFallback, { channel: channelName })
             }) :
             createFallbackFilterAllToggle(channel, index, profile);
+
+        setRendererCopy(pillToggle, 'textContent', 'render.filterAll', 'Filter All');
+        setRendererCopy(pillToggle, 'title', filterAllTitleKey, filterAllTitleFallback, () => ({
+            channel: String(channel.name || channel.handle || channel.id || '')
+        }));
+        setRendererCopy(
+            pillToggle,
+            'aria-label',
+            'render.filterAllAriaLabel',
+            'Filter All: {details}',
+            () => ({
+                details: rendererText(filterAllTitleKey, filterAllTitleFallback, {
+                    channel: String(channel.name || channel.handle || channel.id || '')
+                })
+            })
+        );
 
         return pillToggle;
     }
@@ -1772,13 +1815,28 @@ const RenderEngine = (() => {
             const spacer = document.createElement('div');
             spacer.className = 'exact-toggle toggle-variant-red disabled';
             spacer.style.visibility = 'hidden';
-            spacer.textContent = 'Filter All';
+            setRendererCopy(spacer, 'textContent', 'render.filterAll', 'Filter All');
             return spacer;
         }
         const toggle = document.createElement('div');
         toggle.className = `exact-toggle toggle-variant-red ${channel.filterAll ? 'active' : ''}`;
-        toggle.textContent = 'Filter All';
-        toggle.title = `Automatically adds "${channel.name || channel.handle || channel.id}" as a channel-derived Exact keyword`;
+        const filterAllTitleKey = 'render.filterAllTitle';
+        const filterAllTitleFallback = 'Automatically adds "{channel}" as a channel-derived Exact keyword';
+        setRendererCopy(toggle, 'textContent', 'render.filterAll', 'Filter All');
+        setRendererCopy(toggle, 'title', filterAllTitleKey, filterAllTitleFallback, () => ({
+            channel: String(channel.name || channel.handle || channel.id || '')
+        }));
+        setRendererCopy(
+            toggle,
+            'aria-label',
+            'render.filterAllAriaLabel',
+            'Filter All: {details}',
+            () => ({
+                details: rendererText(filterAllTitleKey, filterAllTitleFallback, {
+                    channel: String(channel.name || channel.handle || channel.id || '')
+                })
+            })
+        );
         toggle.addEventListener('click', async () => {
             if (profile === 'kids') {
                 await StateManager?.toggleKidsChannelFilterAll?.(index);

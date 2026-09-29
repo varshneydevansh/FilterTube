@@ -3,6 +3,17 @@
 
     const MANAGED_CHANNEL_LIST_STALE_AFTER_MS = 7 * 24 * 60 * 60 * 1000;
 
+    function familyUiText(key, fallback, values = {}) {
+        const interpolate = text => String(text ?? '').replace(/\{([a-zA-Z][a-zA-Z0-9]*)\}/g, (match, name) =>
+            Object.prototype.hasOwnProperty.call(values, name) ? String(values[name]) : match);
+        try {
+            const localized = global.FilterTubeUiLocalization?.text?.(key, values);
+            if (typeof localized === 'string' && localized.trim()) return localized;
+        } catch (_) {
+        }
+        return interpolate(fallback);
+    }
+
     function fallbackSafeObject(value) {
         return value && typeof value === 'object' && !Array.isArray(value) ? value : {};
     }
@@ -11,7 +22,9 @@
         const profile = fallbackSafeObject(fallbackSafeObject(root).profiles)[profileId];
         return typeof profile?.name === 'string' && profile.name.trim()
             ? profile.name.trim()
-            : (profileId === 'default' ? 'Default' : 'Profile');
+            : (profileId === 'default'
+                ? familyUiText('family.commandCenter.profile.defaultName', 'Default')
+                : familyUiText('family.commandCenter.profile.genericName', 'Profile'));
     }
 
     function makeHelpers(helpers = {}) {
@@ -28,12 +41,12 @@
             getProfileName: typeof helpers.getProfileName === 'function' ? helpers.getProfileName : fallbackGetProfileName,
             getProfileType: typeof helpers.getProfileType === 'function' ? helpers.getProfileType : () => 'account',
             isProfileLocked: typeof helpers.isProfileLocked === 'function' ? helpers.isProfileLocked : () => false,
-            viewingAccessLabel: typeof helpers.viewingAccessLabel === 'function' ? helpers.viewingAccessLabel : () => 'Main + Kids',
-            managedTimeLimitLabel: typeof helpers.managedTimeLimitLabel === 'function' ? helpers.managedTimeLimitLabel : () => 'No limit',
+            viewingAccessLabel: typeof helpers.viewingAccessLabel === 'function' ? helpers.viewingAccessLabel : () => familyUiText('family.commandCenter.access.mainKids', 'Main + Kids'),
+            managedTimeLimitLabel: typeof helpers.managedTimeLimitLabel === 'function' ? helpers.managedTimeLimitLabel : () => familyUiText('family.commandCenter.time.noLimit', 'No limit'),
             getManagedSyncTargetSummary: typeof helpers.getManagedSyncTargetSummary === 'function'
                 ? helpers.getManagedSyncTargetSummary
                 : () => ({
-                    label: 'Pair device',
+                    label: familyUiText('family.commandCenter.action.pairDevice', 'Pair device'),
                     targetCount: 0,
                     readyCount: 0,
                     openCheckCount: 0,
@@ -49,16 +62,16 @@
                 ? helpers.getManagedMailboxConfigSummary
                 : () => ({
                     configured: false,
-                    label: 'Saved updates off',
-                    detail: 'Send Update works when both devices are open. Saved updates are only for updates a protected device should collect after it opens.',
+                    label: familyUiText('family.commandCenter.savedUpdates.off', 'Saved updates off'),
+                    detail: familyUiText('family.commandCenter.savedUpdates.offDetail', 'Send Update works when both devices are open. Saved updates are only for updates a protected device should collect after it opens.'),
                     tone: 'warning'
                 }),
             getManagedLocalNetworkConfigSummary: typeof helpers.getManagedLocalNetworkConfigSummary === 'function'
                 ? helpers.getManagedLocalNetworkConfigSummary
                 : () => ({
                     configured: false,
-                    label: 'Home Pickup off',
-                    detail: 'Home Pickup needs a FilterTube-compatible pickup service you choose; Wi-Fi discovery is never authority.',
+                    label: familyUiText('family.commandCenter.homePickup.off', 'Home Pickup off'),
+                    detail: familyUiText('family.commandCenter.homePickup.offDetail', 'Home Pickup needs a FilterTube-compatible pickup service you choose; Wi-Fi discovery is never authority.'),
                     tone: 'warning'
                 }),
             onAction: typeof helpers.onAction === 'function' ? helpers.onAction : null
@@ -79,7 +92,7 @@
         const intents = [
             {
                 action: 'edit_rules',
-                label: 'Edit Rules',
+                label: familyUiText('family.commandCenter.action.editRules', 'Edit Rules'),
                 profileId: targetId,
                 scope: 'main_kids',
                 authority: 'delegated_runtime_gate',
@@ -87,7 +100,7 @@
             },
             {
                 action: 'manage_channel_lists',
-                label: 'Rule Lists',
+                label: familyUiText('family.commandCenter.action.ruleLists', 'Rule Lists'),
                 profileId: targetId,
                 scope: 'channels',
                 authority: 'delegated_runtime_gate',
@@ -95,7 +108,7 @@
             },
             ...(hasStaleManagedChannelList ? [{
                 action: 'check_stale_lists',
-                label: 'Check Lists',
+                label: familyUiText('family.commandCenter.action.checkLists', 'Check Lists'),
                 profileId: targetId,
                 scope: 'channels',
                 authority: 'delegated_runtime_gate',
@@ -103,7 +116,7 @@
             }] : []),
             {
                 action: 'view_history',
-                label: 'History',
+                label: familyUiText('family.commandCenter.action.history', 'History'),
                 profileId: targetId,
                 scope: 'admin_history',
                 authority: 'delegated_runtime_gate',
@@ -112,7 +125,7 @@
             ...(deviceAction ? [deviceAction] : []),
             ...(hasReadyDeliveryPath ? [{
                 action: 'send_managed_policy',
-                label: 'Send Update',
+                label: familyUiText('family.commandCenter.action.sendUpdate', 'Send Update'),
                 profileId: targetId,
                 scope: 'active',
                 authority: 'managed_policy_provider_delivery',
@@ -120,18 +133,22 @@
             }] : []),
             ...(hasSavedUpdateAction ? [{
                 action: syncOpenCheckCount > 0 ? 'disable_saved_updates' : 'enable_saved_updates',
-                label: syncOpenCheckCount > 0 ? 'Saved Updates Off' : 'Saved Updates On',
+                label: syncOpenCheckCount > 0
+                    ? familyUiText('family.commandCenter.action.savedUpdatesOff', 'Saved Updates Off')
+                    : familyUiText('family.commandCenter.action.savedUpdatesOn', 'Saved Updates On'),
                 profileId: targetId,
                 scope: 'trusted_link',
                 authority: 'managed_policy_provider_delivery',
                 sensitiveAction: true,
                 title: syncOpenCheckCount > 0
-                    ? 'Stop this verified device from checking Internet Pickup or Home Pickup when the protected profile opens.'
-                    : 'Allow this verified device to check Internet Pickup or Home Pickup when the protected profile opens.'
+                    ? familyUiText('family.commandCenter.action.savedUpdatesOffTitle', 'Stop this verified device from checking Internet Pickup or Home Pickup when the protected profile opens.')
+                    : familyUiText('family.commandCenter.action.savedUpdatesOnTitle', 'Allow this verified device to check Internet Pickup or Home Pickup when the protected profile opens.')
             }] : []),
             {
                 action: timeLimitActive ? 'change_time_limit' : 'set_time_limit',
-                label: timeLimitActive ? 'Change Time' : 'Set Time',
+                label: timeLimitActive
+                    ? familyUiText('family.commandCenter.action.changeTime', 'Change Time')
+                    : familyUiText('family.commandCenter.action.setTime', 'Set Time'),
                 profileId: targetId,
                 scope: 'time_limits',
                 authority: 'delegated_runtime_gate',
@@ -141,7 +158,9 @@
         if (timeLimitActive) {
             intents.push({
                 action: 'grant_extra_time',
-                label: hasPendingExtraTimeRequest ? 'Grant Time' : 'Add Time',
+                label: hasPendingExtraTimeRequest
+                    ? familyUiText('family.commandCenter.action.grantTime', 'Grant Time')
+                    : familyUiText('family.commandCenter.action.addTime', 'Add Time'),
                 profileId: targetId,
                 scope: 'time_limits',
                 authority: 'delegated_runtime_gate',
@@ -151,7 +170,7 @@
         if ((Number(policySummary.remoteConflictCount) || 0) > 0) {
             intents.splice(2, 0, {
                 action: 'review_conflicts',
-                label: 'Review Conflict',
+                label: familyUiText('family.commandCenter.action.reviewConflict', 'Review Conflict'),
                 profileId: targetId,
                 scope: 'admin_history',
                 authority: 'delegated_runtime_gate',
@@ -181,13 +200,15 @@
         const hasBrokenSavedLink = revokedCount > 0 || staleCount > 0;
         const hasKnownDevice = targetCount > 0 || totalCount > 0 || hasBrokenSavedLink;
         const label = hasBrokenSavedLink
-            ? 'Repair Pairing'
-            : (hasKnownDevice ? 'Open Devices' : 'Pair Device');
-        const title = hasBrokenSavedLink
-            ? 'Open Family Device Updates to refresh the trusted link before sending protected-profile updates.'
+            ? familyUiText('family.commandCenter.action.repairPairing', 'Repair Pairing')
             : (hasKnownDevice
-                ? 'Open Family Device Updates with both devices available, then send after the verified link is ready.'
-                : 'Open Family Device Updates to pair and verify another device before sending protected-profile updates.');
+                ? familyUiText('family.commandCenter.action.openDevices', 'Open Devices')
+                : familyUiText('family.commandCenter.action.pairDeviceTitleCase', 'Pair Device'));
+        const title = hasBrokenSavedLink
+            ? familyUiText('family.commandCenter.action.repairPairingTitle', 'Open Family Device Updates to refresh the trusted link before sending protected-profile updates.')
+            : (hasKnownDevice
+                ? familyUiText('family.commandCenter.action.openDevicesTitle', 'Open Family Device Updates with both devices available, then send after the verified link is ready.')
+                : familyUiText('family.commandCenter.action.pairDeviceTitle', 'Open Family Device Updates to pair and verify another device before sending protected-profile updates.'));
         return {
             action: 'pair_device',
             label,
@@ -206,12 +227,14 @@
 
     function formatCommandCenterMinutes(seconds) {
         const total = normalizeCommandCenterNumber(seconds);
-        if (total <= 0) return '0m';
+        if (total <= 0) return familyUiText('family.commandCenter.duration.zero', '0m');
         const minutes = Math.max(1, Math.ceil(total / 60));
-        if (minutes < 60) return `${minutes}m`;
+        if (minutes < 60) return familyUiText('family.commandCenter.duration.minutes', '{minutes}m', { minutes });
         const hours = Math.floor(minutes / 60);
         const remainder = minutes % 60;
-        return remainder ? `${hours}h ${remainder}m` : `${hours}h`;
+        return remainder
+            ? familyUiText('family.commandCenter.duration.hoursMinutes', '{hours}h {minutes}m', { hours, minutes: remainder })
+            : familyUiText('family.commandCenter.duration.hours', '{hours}h', { hours });
     }
 
     function getLatestPendingExtraTimeRequest(profile) {
@@ -225,13 +248,18 @@
             if (actionType !== 'policy.time_limit.request_extra') continue;
             if ((typeof row.result === 'string' ? row.result.trim() : '') !== 'requested') continue;
             const summary = fallbackSafeObject(row.summary);
-            const surface = typeof summary.surface === 'string' && summary.surface.trim() === 'kids' ? 'Kids' : 'Main';
+            const surface = typeof summary.surface === 'string' && summary.surface.trim() === 'kids'
+                ? familyUiText('family.commandCenter.surface.kids', 'Kids')
+                : familyUiText('family.commandCenter.surface.main', 'Main');
             const consumedSeconds = normalizeCommandCenterNumber(summary.consumedSeconds);
             const dailyBudgetSeconds = normalizeCommandCenterNumber(summary.dailyBudgetSeconds);
             return {
                 row,
-                label: `Time request: ${surface}`,
-                detail: `${formatCommandCenterMinutes(consumedSeconds)} used of ${formatCommandCenterMinutes(dailyBudgetSeconds)}`
+                label: familyUiText('family.commandCenter.timeRequest.label', 'Time request: {surface}', { surface }),
+                detail: familyUiText('family.commandCenter.timeRequest.detail', '{used} used of {budget}', {
+                    used: formatCommandCenterMinutes(consumedSeconds),
+                    budget: formatCommandCenterMinutes(dailyBudgetSeconds)
+                })
             };
         }
         return null;
@@ -249,7 +277,7 @@
                     id: listId,
                     name: typeof item.managedListName === 'string' && item.managedListName.trim()
                         ? item.managedListName.trim()
-                        : 'Imported rule list',
+                        : familyUiText('family.commandCenter.channelLists.importedRuleList', 'Imported rule list'),
                     rowCount: 0,
                     activeRowCount: 0,
                     pausedRowCount: 0,
@@ -290,14 +318,14 @@
         };
         const main = safeObject(profile?.main);
         const kids = safeObject(profile?.kids);
-        addRows(main.channels, 'Main');
-        addRows(main.whitelistChannels, 'Main');
-        addRows(main.keywords, 'Main');
-        addRows(main.whitelistKeywords, 'Main');
-        addRows(kids.blockedChannels, 'Kids');
-        addRows(kids.whitelistChannels, 'Kids');
-        addRows(kids.blockedKeywords, 'Kids');
-        addRows(kids.whitelistKeywords, 'Kids');
+        addRows(main.channels, familyUiText('family.commandCenter.surface.main', 'Main'));
+        addRows(main.whitelistChannels, familyUiText('family.commandCenter.surface.main', 'Main'));
+        addRows(main.keywords, familyUiText('family.commandCenter.surface.main', 'Main'));
+        addRows(main.whitelistKeywords, familyUiText('family.commandCenter.surface.main', 'Main'));
+        addRows(kids.blockedChannels, familyUiText('family.commandCenter.surface.kids', 'Kids'));
+        addRows(kids.whitelistChannels, familyUiText('family.commandCenter.surface.kids', 'Kids'));
+        addRows(kids.blockedKeywords, familyUiText('family.commandCenter.surface.kids', 'Kids'));
+        addRows(kids.whitelistKeywords, familyUiText('family.commandCenter.surface.kids', 'Kids'));
         const now = Date.now();
         const items = Array.from(lists.values()).map((item) => ({
             id: item.id,
@@ -341,11 +369,25 @@
         const activeRowCount = normalizeCommandCenterNumber(summary.activeRowCount);
         const pausedRowCount = normalizeCommandCenterNumber(summary.pausedRowCount);
         const staleListCount = normalizeCommandCenterNumber(summary.staleListCount);
-        const listLabel = listCount === 1 ? 'list' : 'lists';
-        if (staleListCount > 0) return `${staleListCount} ${staleListCount === 1 ? 'list' : 'lists'} need refresh`;
-        if (pausedRowCount > 0 && activeRowCount <= 0) return `${listCount} ${listLabel} paused`;
-        if (pausedRowCount > 0) return `${listCount} ${listLabel} (${activeRowCount} on)`;
-        return rowCount > 0 ? `${listCount} ${listLabel} (${rowCount})` : `${listCount} ${listLabel}`;
+        const listLabel = listCount === 1
+            ? familyUiText('family.commandCenter.channelLists.list', 'list')
+            : familyUiText('family.commandCenter.channelLists.lists', 'lists');
+        if (staleListCount > 0) {
+            return staleListCount === 1
+                ? familyUiText('family.commandCenter.channelLists.oneNeedsRefresh', '{count} list needs refresh', { count: staleListCount })
+                : familyUiText('family.commandCenter.channelLists.manyNeedRefresh', '{count} lists need refresh', { count: staleListCount });
+        }
+        if (pausedRowCount > 0 && activeRowCount <= 0) {
+            return familyUiText('family.commandCenter.channelLists.paused', '{count} {lists} paused', { count: listCount, lists: listLabel });
+        }
+        if (pausedRowCount > 0) {
+            return familyUiText('family.commandCenter.channelLists.someOn', '{count} {lists} ({activeCount} on)', {
+                count: listCount, lists: listLabel, activeCount: activeRowCount
+            });
+        }
+        return rowCount > 0
+            ? familyUiText('family.commandCenter.channelLists.withRows', '{count} {lists} ({rowCount})', { count: listCount, lists: listLabel, rowCount })
+            : familyUiText('family.commandCenter.channelLists.count', '{count} {lists}', { count: listCount, lists: listLabel });
     }
 
     function formatManagedChannelListDetail(summary = {}) {
@@ -355,21 +397,39 @@
             .map(item => typeof item?.name === 'string' ? item.name.trim() : '')
             .filter(Boolean)
             .slice(0, 2);
-        const more = listCount > names.length ? ` +${listCount - names.length} more` : '';
+        const more = listCount > names.length
+            ? familyUiText('family.commandCenter.channelLists.more', ' +{count} more', { count: listCount - names.length })
+            : '';
         const latestChecked = summary.items.reduce((latest, item) => Math.max(latest, Number(item?.lastCheckedAt) || 0), 0);
-        const checked = latestChecked ? `, checked ${new Date(latestChecked).toLocaleDateString(undefined, { month: 'short', day: 'numeric' })}` : '';
+        const checked = latestChecked
+            ? familyUiText('family.commandCenter.channelLists.checked', ', checked {date}', {
+                date: new Date(latestChecked).toLocaleDateString(undefined, { month: 'short', day: 'numeric' })
+            })
+            : '';
         const sourceVersion = summary.items
             .map((item) => {
                 const version = typeof item?.sourceVersion === 'string' ? item.sourceVersion.trim() : '';
-                if (version) return `version ${version}`;
+                if (version) return familyUiText('family.commandCenter.channelLists.version', 'version {version}', { version });
                 const updated = typeof item?.sourceUpdatedLabel === 'string' ? item.sourceUpdatedLabel.trim() : '';
-                return updated ? `updated ${updated}` : '';
+                return updated ? familyUiText('family.commandCenter.channelLists.updated', 'updated {date}', { date: updated }) : '';
             })
             .find(Boolean);
-        const version = sourceVersion ? `, ${sourceVersion}` : '';
+        const version = sourceVersion ? familyUiText('family.commandCenter.channelLists.versionSuffix', ', {version}', { version: sourceVersion }) : '';
         const staleListCount = normalizeCommandCenterNumber(summary.staleListCount);
-        const stale = staleListCount ? `, ${staleListCount} need refresh` : '';
-        return names.length ? `${names.join(', ')}${more}${checked}${version}${stale}` : `${listCount} parent-approved ${listCount === 1 ? 'list' : 'lists'}${checked}${version}${stale}`;
+        const stale = staleListCount
+            ? familyUiText('family.commandCenter.channelLists.staleSuffix', ', {count} need refresh', { count: staleListCount })
+            : '';
+        if (names.length) {
+            return familyUiText('family.commandCenter.channelLists.namedDetail', '{names}{more}{checked}{version}{stale}', {
+                names: names.join(', '), more, checked, version, stale
+            });
+        }
+        const listLabel = listCount === 1
+            ? familyUiText('family.commandCenter.channelLists.parentApprovedOne', '{count} parent-approved list', { count: listCount })
+            : familyUiText('family.commandCenter.channelLists.parentApprovedMany', '{count} parent-approved lists', { count: listCount });
+        return familyUiText('family.commandCenter.channelLists.unnamedDetail', '{lists}{checked}{version}{stale}', {
+            lists: listLabel, checked, version, stale
+        });
     }
 
     function resolveManagedCommandCenterSyncState(item = {}) {
@@ -377,7 +437,9 @@
         if (conflictCount > 0) {
             return {
                 key: 'conflict',
-                label: `${conflictCount} conflict${conflictCount === 1 ? '' : 's'}`,
+                label: conflictCount === 1
+                    ? familyUiText('family.commandCenter.sync.oneConflict', '{count} conflict', { count: conflictCount })
+                    : familyUiText('family.commandCenter.sync.manyConflicts', '{count} conflicts', { count: conflictCount }),
                 tone: 'danger'
             };
         }
@@ -388,69 +450,73 @@
         if (targetCount <= 0 && revokedCount > 0) {
             return {
                 key: 'repair',
-                label: `${revokedCount} need re-pairing`,
+                label: familyUiText('family.commandCenter.sync.needRepair', '{count} need re-pairing', { count: revokedCount }),
                 tone: 'warning'
             };
         }
         if (targetCount <= 0 && staleCount > 0) {
             return {
                 key: 'stale',
-                label: `${staleCount} stale link${staleCount === 1 ? '' : 's'}`,
+                label: staleCount === 1
+                    ? familyUiText('family.commandCenter.sync.oneStaleLink', '{count} stale link', { count: staleCount })
+                    : familyUiText('family.commandCenter.sync.manyStaleLinks', '{count} stale links', { count: staleCount }),
                 tone: 'warning'
             };
         }
         if (targetCount <= 0) {
             return {
                 key: 'no_device',
-                label: 'Pair to sync',
+                label: familyUiText('family.commandCenter.sync.pairToSync', 'Pair to sync'),
                 tone: 'muted'
             };
         }
         if (readyCount <= 0) {
             return {
                 key: 'provider_pending',
-                label: 'Open both devices',
+                label: familyUiText('family.commandCenter.sync.openBothDevices', 'Open both devices'),
                 tone: 'warning'
             };
         }
         if (item.syncLiveReady === true && (item.syncLocalNetworkReady === true || item.syncMailboxReady === true)) {
             return {
                 key: 'multi_path',
-                label: 'Live + pickup ready',
+                label: familyUiText('family.commandCenter.sync.livePickupReady', 'Live + pickup ready'),
                 tone: 'success'
             };
         }
         if (item.syncLocalNetworkReady === true && item.syncMailboxReady === true) {
             return {
                 key: 'home_and_internet',
-                label: 'Same-network + internet',
+                label: familyUiText('family.commandCenter.sync.sameNetworkInternet', 'Same-network + internet'),
                 tone: 'success'
             };
         }
         if (item.syncLiveReady === true) {
             return {
                 key: 'live',
-                label: readyCount > 1 ? `Send Update ready (${readyCount})` : 'Send Update ready',
+                label: readyCount > 1
+                    ? familyUiText('family.commandCenter.sync.sendUpdateReadyCount', 'Send Update ready ({count})', { count: readyCount })
+                    : familyUiText('family.commandCenter.sync.sendUpdateReady', 'Send Update ready'),
                 tone: 'success'
             };
         }
         if (item.syncLocalNetworkReady === true) {
             return {
                 key: 'local_network',
-                label: 'Home Pickup',
+                label: familyUiText('family.commandCenter.sync.homePickup', 'Home Pickup'),
                 tone: 'success'
             };
         }
         if (item.syncMailboxReady === true) {
             return {
                 key: 'mailbox',
-                label: 'Internet Pickup',
+                label: familyUiText('family.commandCenter.sync.internetPickup', 'Internet Pickup'),
                 tone: 'success'
             };
         }
         return {
             key: 'ready',
-            label: 'Ready',
+            label: familyUiText('family.commandCenter.sync.ready', 'Ready'),
             tone: 'success'
         };
     }
@@ -460,7 +526,7 @@
         if (conflictCount > 0) {
             return {
                 key: 'conflict',
-                label: 'Review conflict first',
+                label: familyUiText('family.commandCenter.delivery.reviewConflictFirst', 'Review conflict first'),
                 tone: 'danger'
             };
         }
@@ -472,69 +538,71 @@
         if (targetCount <= 0 && revokedCount > 0) {
             return {
                 key: 'repair',
-                label: 'Re-pair trusted device',
+                label: familyUiText('family.commandCenter.delivery.repairTrustedDevice', 'Re-pair trusted device'),
                 tone: 'warning'
             };
         }
         if (targetCount <= 0 && staleCount > 0) {
             return {
                 key: 'stale',
-                label: 'Refresh trusted device',
+                label: familyUiText('family.commandCenter.delivery.refreshTrustedDevice', 'Refresh trusted device'),
                 tone: 'warning'
             };
         }
         if (targetCount <= 0 || totalCount <= 0) {
             return {
                 key: 'pair_device',
-                label: 'Pair only for another device',
+                label: familyUiText('family.commandCenter.delivery.pairForAnotherDevice', 'Pair only for another device'),
                 tone: 'muted'
             };
         }
         if (readyCount <= 0) {
             return {
                 key: 'provider_needed',
-                label: 'Open both devices',
+                label: familyUiText('family.commandCenter.sync.openBothDevices', 'Open both devices'),
                 tone: 'warning'
             };
         }
         if (item.syncLiveReady === true && (item.syncLocalNetworkReady === true || item.syncMailboxReady === true)) {
             return {
                 key: 'multi_path',
-                label: 'Live + pickup ready',
+                label: familyUiText('family.commandCenter.sync.livePickupReady', 'Live + pickup ready'),
                 tone: 'success'
             };
         }
         if (item.syncLocalNetworkReady === true && item.syncMailboxReady === true) {
             return {
                 key: 'home_and_internet',
-                label: 'Same-network + internet set up',
+                label: familyUiText('family.commandCenter.delivery.sameNetworkInternetSetUp', 'Same-network + internet set up'),
                 tone: 'success'
             };
         }
         if (item.syncLiveReady === true) {
             return {
                 key: 'live',
-                label: readyCount > 1 ? `Send Update ready (${readyCount})` : 'Send Update ready',
+                label: readyCount > 1
+                    ? familyUiText('family.commandCenter.sync.sendUpdateReadyCount', 'Send Update ready ({count})', { count: readyCount })
+                    : familyUiText('family.commandCenter.sync.sendUpdateReady', 'Send Update ready'),
                 tone: 'success'
             };
         }
         if (item.syncLocalNetworkReady === true) {
             return {
                 key: 'local_network',
-                label: 'Home Pickup set up',
+                label: familyUiText('family.commandCenter.delivery.homePickupSetUp', 'Home Pickup set up'),
                 tone: 'success'
             };
         }
         if (item.syncMailboxReady === true) {
             return {
                 key: 'mailbox',
-                label: 'Internet Pickup set up',
+                label: familyUiText('family.commandCenter.delivery.internetPickupSetUp', 'Internet Pickup set up'),
                 tone: 'success'
             };
         }
         return {
             key: 'ready',
-            label: 'Ready',
+            label: familyUiText('family.commandCenter.sync.ready', 'Ready'),
             tone: 'success'
         };
     }
@@ -546,27 +614,35 @@
         const staleCount = Number(item.syncStaleCount) || 0;
         const totalCount = Number(item.syncTotalCount) || 0;
         if ((Number(item.remoteConflictCount) || 0) > 0) {
-            return 'Resolve protected history conflict before pushing new policy.';
+            return familyUiText('family.commandCenter.delivery.conflictDetail', 'Resolve protected history conflict before pushing new policy.');
         }
         if (targetCount <= 0 && revokedCount > 0) {
-            return 'This trusted link was revoked. Pair again before sending protected-profile updates.';
+            return familyUiText('family.commandCenter.delivery.revokedDetail', 'This trusted link was revoked. Pair again before sending protected-profile updates.');
         }
         if (targetCount <= 0 && staleCount > 0) {
-            return 'This trusted link is stale. Refresh pairing before sending protected-profile updates.';
+            return familyUiText('family.commandCenter.delivery.staleDetail', 'This trusted link is stale. Refresh pairing before sending protected-profile updates.');
         }
         if (targetCount <= 0 || totalCount <= 0) {
-            return 'Local rules and time limits work here. Pair only when this profile also needs to update another device.';
+            return familyUiText('family.commandCenter.delivery.localOnlyDetail', 'Local rules and time limits work here. Pair only when this profile also needs to update another device.');
         }
         if (readyCount <= 0) {
-            return `${targetCount} verified ${targetCount === 1 ? 'device is' : 'devices are'} paired. Open parent and protected devices together, then Send Update.`;
+            return targetCount === 1
+                ? familyUiText('family.commandCenter.delivery.pairedOneNotReady', '{count} verified device is paired. Open parent and protected devices together, then Send Update.', { count: targetCount })
+                : familyUiText('family.commandCenter.delivery.pairedManyNotReady', '{count} verified devices are paired. Open parent and protected devices together, then Send Update.', { count: targetCount });
         }
         const paths = [];
-        if (item.syncLiveReady === true) paths.push('live Send Update');
-        if (item.syncLocalNetworkReady === true) paths.push('Home Pickup');
-        if (item.syncMailboxReady === true) paths.push('Internet Pickup');
-        return paths.length
-            ? `${targetCount} verified ${targetCount === 1 ? 'device can' : 'devices can'} receive by ${paths.join(' + ')}.`
-            : `${readyCount} verified ${readyCount === 1 ? 'queue is' : 'queues are'} ready.`;
+        if (item.syncLiveReady === true) paths.push(familyUiText('family.commandCenter.delivery.path.liveSendUpdate', 'live Send Update'));
+        if (item.syncLocalNetworkReady === true) paths.push(familyUiText('family.commandCenter.sync.homePickup', 'Home Pickup'));
+        if (item.syncMailboxReady === true) paths.push(familyUiText('family.commandCenter.sync.internetPickup', 'Internet Pickup'));
+        if (paths.length) {
+            const values = { count: targetCount, paths: paths.join(' + ') };
+            return targetCount === 1
+                ? familyUiText('family.commandCenter.delivery.oneDeviceReady', '{count} verified device can receive by {paths}.', values)
+                : familyUiText('family.commandCenter.delivery.manyDevicesReady', '{count} verified devices can receive by {paths}.', values);
+        }
+        return readyCount === 1
+            ? familyUiText('family.commandCenter.delivery.oneQueueReady', '{count} verified queue is ready.', { count: readyCount })
+            : familyUiText('family.commandCenter.delivery.manyQueuesReady', '{count} verified queues are ready.', { count: readyCount });
     }
 
     function buildManagedCommandCenterBulkActionIntents(rows = []) {
@@ -577,7 +653,7 @@
         return [
             {
                 action: 'bulk_edit_rules',
-                label: 'Edit rules',
+                label: familyUiText('family.commandCenter.bulkAction.editRules', 'Edit rules'),
                 group: 'rules',
                 profileIds,
                 scope: 'main_kids',
@@ -586,7 +662,7 @@
             },
             {
                 action: 'bulk_add_keyword',
-                label: 'Add keyword',
+                label: familyUiText('family.commandCenter.bulkAction.addKeyword', 'Add keyword'),
                 group: 'rules',
                 profileIds,
                 scope: 'main_kids_rules',
@@ -595,7 +671,7 @@
             },
             {
                 action: 'bulk_add_channel',
-                label: 'Add channel',
+                label: familyUiText('family.commandCenter.bulkAction.addChannel', 'Add channel'),
                 group: 'rules',
                 profileIds,
                 scope: 'main_kids_rules',
@@ -604,7 +680,7 @@
             },
             {
                 action: 'bulk_manage_channel_lists',
-                label: 'Rule lists',
+                label: familyUiText('family.commandCenter.bulkAction.ruleLists', 'Rule lists'),
                 group: 'rules',
                 profileIds,
                 scope: 'channels',
@@ -613,7 +689,7 @@
             },
             {
                 action: 'bulk_add_video',
-                label: 'Add video ID',
+                label: familyUiText('family.commandCenter.bulkAction.addVideoId', 'Add video ID'),
                 group: 'rules',
                 profileIds,
                 scope: 'main_kids_rules',
@@ -622,7 +698,7 @@
             },
             {
                 action: 'bulk_send_managed_policy',
-                label: 'Send Update',
+                label: familyUiText('family.commandCenter.action.sendUpdate', 'Send Update'),
                 group: 'send',
                 profileIds,
                 scope: 'active',
@@ -631,7 +707,7 @@
             },
             {
                 action: 'bulk_set_time_limit',
-                label: 'Set selected limit',
+                label: familyUiText('family.commandCenter.bulkAction.setSelectedLimit', 'Set selected limit'),
                 group: 'time',
                 profileIds,
                 scope: 'time_limits',
@@ -640,7 +716,7 @@
             },
             {
                 action: 'bulk_disable_time_limit',
-                label: 'Disable selected limits',
+                label: familyUiText('family.commandCenter.bulkAction.disableSelectedLimits', 'Disable selected limits'),
                 group: 'time',
                 profileIds,
                 scope: 'time_limits',
@@ -649,7 +725,7 @@
             },
             {
                 action: 'bulk_grant_extra_time',
-                label: 'Add selected time',
+                label: familyUiText('family.commandCenter.bulkAction.addSelectedTime', 'Add selected time'),
                 group: 'time',
                 profileIds,
                 scope: 'time_limits',
@@ -658,7 +734,7 @@
             },
             {
                 action: 'bulk_allow_main_kids',
-                label: 'Allow Main + Kids',
+                label: familyUiText('family.commandCenter.bulkAction.allowMainKids', 'Allow Main + Kids'),
                 group: 'access',
                 profileIds,
                 scope: 'viewing_space',
@@ -668,7 +744,7 @@
             },
             {
                 action: 'bulk_kids_only',
-                label: 'Kids only',
+                label: familyUiText('family.commandCenter.bulkAction.kidsOnly', 'Kids only'),
                 group: 'access',
                 profileIds,
                 scope: 'viewing_space',
@@ -678,7 +754,7 @@
             },
             {
                 action: 'bulk_main_only',
-                label: 'Main only',
+                label: familyUiText('family.commandCenter.bulkAction.mainOnly', 'Main only'),
                 group: 'access',
                 profileIds,
                 scope: 'viewing_space',
@@ -725,10 +801,14 @@
             const managedChannelLists = getManagedChannelListSummary(profile, h.safeObject);
             const latestActionLabel = typeof summary.latestActionLabel === 'string' && summary.latestActionLabel.trim()
                 ? summary.latestActionLabel.trim()
-                : (summary.latestResult && summary.latestScope ? `${summary.latestResult}/${summary.latestScope}` : 'none');
+                : (summary.latestResult && summary.latestScope
+                    ? familyUiText('family.commandCenter.history.actionScope', '{action}/{scope}', { action: summary.latestResult, scope: summary.latestScope })
+                    : familyUiText('family.commandCenter.history.none', 'none'));
             const syncLabel = summary.remoteScopeCount
-                ? `Policy r${summary.latestRemoteRevision}`
-                : (summary.localLabels.length ? 'Local managed' : 'No policy yet');
+                ? familyUiText('family.commandCenter.policy.revision', 'Policy r{revision}', { revision: summary.latestRemoteRevision })
+                : (summary.localLabels.length
+                    ? familyUiText('family.commandCenter.policy.localManaged', 'Local managed')
+                    : familyUiText('family.commandCenter.policy.noneYet', 'No policy yet'));
             const remoteConflictCount = summary.remoteConflictCount || 0;
             const row = {
                 profileId,
@@ -842,14 +922,14 @@
         if (!rows.length || !global.document) return null;
         const map = document.createElement('div');
         map.className = 'ft-managed-command-center__trust-map';
-        map.setAttribute('aria-label', 'Trusted device overview');
+        map.setAttribute('aria-label', familyUiText('family.commandCenter.trustMap.ariaLabel', 'Trusted device overview'));
 
         const copy = document.createElement('div');
         copy.className = 'ft-managed-command-center__trust-map-copy';
         const title = document.createElement('strong');
-        title.textContent = 'Devices you control';
+        title.textContent = familyUiText('family.commandCenter.trustMap.title', 'Devices you control');
         const detail = document.createElement('span');
-        detail.textContent = 'After pairing, every trusted protected device stays on one family map. Send now when both devices are open; use pickup only when an approved update needs to wait.';
+        detail.textContent = familyUiText('family.commandCenter.trustMap.detail', 'After pairing, every trusted protected device stays on one family map. Send now when both devices are open; use pickup only when an approved update needs to wait.');
         copy.append(title, detail);
 
         const ring = document.createElement('div');
@@ -858,9 +938,9 @@
         const parentNode = document.createElement('div');
         parentNode.className = 'ft-managed-command-center__trust-parent';
         const parentLabel = document.createElement('strong');
-        parentLabel.textContent = 'This parent device';
+        parentLabel.textContent = familyUiText('family.commandCenter.trustMap.parentDevice', 'This parent device');
         const parentDetail = document.createElement('span');
-        parentDetail.textContent = 'Rules, time, and access are chosen here';
+        parentDetail.textContent = familyUiText('family.commandCenter.trustMap.parentDeviceDetail', 'Rules, time, and access are chosen here');
         parentNode.append(parentLabel, parentDetail);
         ring.appendChild(parentNode);
 
@@ -870,26 +950,28 @@
             const syncState = resolveManagedCommandCenterSyncState(item);
             const device = document.createElement('div');
             device.className = `ft-managed-command-center__trust-device is-${syncState.tone || 'neutral'}`;
-            device.title = item.deliveryPathDetail || 'Protected profile device status.';
+            device.title = item.deliveryPathDetail || familyUiText('family.commandCenter.trustMap.deviceStatus', 'Protected profile device status.');
 
             const name = document.createElement('strong');
-            name.textContent = item.profileName || 'Protected profile';
+            name.textContent = item.profileName || familyUiText('family.commandCenter.protectedProfile', 'Protected profile');
             const route = document.createElement('span');
             let routeLabel = syncState.label;
             if (item.syncLocalNetworkReady === true && item.syncMailboxReady === true) {
-                routeLabel = 'Home + Internet pickup';
+                routeLabel = familyUiText('family.commandCenter.route.homeInternetPickup', 'Home + Internet pickup');
             } else if (item.syncLocalNetworkReady === true) {
-                routeLabel = 'Home pickup';
+                routeLabel = familyUiText('family.commandCenter.route.homePickup', 'Home pickup');
             } else if (item.syncMailboxReady === true) {
-                routeLabel = 'Internet pickup';
+                routeLabel = familyUiText('family.commandCenter.route.internetPickup', 'Internet pickup');
             } else if (item.syncLiveReady === true) {
-                routeLabel = 'Open now';
+                routeLabel = familyUiText('family.commandCenter.route.openNow', 'Open now');
             }
             route.textContent = routeLabel;
             const target = document.createElement('small');
             target.textContent = item.syncTargetCount > 0
-                ? (item.syncTargetLabel || `${item.syncTargetCount} verified device${item.syncTargetCount === 1 ? '' : 's'}`)
-                : 'Pair only if this profile also lives on another device';
+                ? (item.syncTargetLabel || (item.syncTargetCount === 1
+                    ? familyUiText('family.commandCenter.trustMap.oneVerifiedDevice', '{count} verified device', { count: item.syncTargetCount })
+                    : familyUiText('family.commandCenter.trustMap.manyVerifiedDevices', '{count} verified devices', { count: item.syncTargetCount })))
+                : familyUiText('family.commandCenter.trustMap.pairOnlyForAnotherDevice', 'Pair only if this profile also lives on another device');
 
             device.append(name, route, target);
             devices.appendChild(device);
@@ -898,9 +980,9 @@
             const more = document.createElement('div');
             more.className = 'ft-managed-command-center__trust-device is-neutral';
             const moreTitle = document.createElement('strong');
-            moreTitle.textContent = `+${rows.length - 6} more`;
+            moreTitle.textContent = familyUiText('family.commandCenter.trustMap.moreDevices', '+{count} more', { count: rows.length - 6 });
             const moreRoute = document.createElement('span');
-            moreRoute.textContent = 'Shown below';
+            moreRoute.textContent = familyUiText('family.commandCenter.trustMap.shownBelow', 'Shown below');
             more.append(moreTitle, moreRoute);
             devices.appendChild(more);
         }
@@ -908,7 +990,7 @@
 
         const note = document.createElement('div');
         note.className = 'ft-managed-command-center__trust-note';
-        note.textContent = 'Pickup does not grant control. A protected device accepts only a signed newer update from its saved parent link.';
+        note.textContent = familyUiText('family.commandCenter.trustMap.securityNote', 'Pickup does not grant control. A protected device accepts only a signed newer update from its saved parent link.');
 
         map.append(copy, ring, note);
         return map;
@@ -921,6 +1003,10 @@
         const panel = document.createElement('section');
         panel.className = 'help-item ft-managed-command-center';
         panel.setAttribute('aria-label', 'Managed parent command center');
+        const localizedPanelLabel = familyUiText('family.commandCenter.ariaLabel', 'Managed parent command center');
+        if (localizedPanelLabel !== 'Managed parent command center') {
+            panel.setAttribute('aria-label', localizedPanelLabel);
+        }
 
         const heading = document.createElement('div');
         heading.className = 'ft-managed-command-center__heading';
@@ -928,12 +1014,12 @@
         titleWrap.className = 'ft-managed-command-center__title-wrap';
         const title = document.createElement('div');
         title.className = 'help-item-title';
-        title.textContent = 'Family Controls';
+        title.textContent = familyUiText('family.commandCenter.title', 'Family Controls');
         const body = document.createElement('div');
         body.className = 'help-item-body';
         body.textContent = summary.profileCount > 0
-            ? 'Pick a profile, set rules, daily time, and Main/Kids access. Send to another device only when that profile lives there too.'
-            : 'Create one protected profile first. Then set rules, daily time, Main/Kids access, and pair another device only if needed.';
+            ? familyUiText('family.commandCenter.descriptionExistingProfiles', 'Pick a profile, set what it can watch, set daily time, and send the update only when another verified device needs it.')
+            : familyUiText('family.commandCenter.descriptionNoProfiles', 'Create one protected profile first. Then set rules, daily time, Main/Kids access, and pair another device only if needed.');
         const meta = document.createElement('div');
         meta.className = 'ft-managed-command-center__meta';
         const setupNeeds = summary.noDeviceProfileCount
@@ -941,11 +1027,21 @@
             + summary.syncStaleProfileCount
             + summary.syncPendingProfileCount;
         meta.textContent = summary.profileCount > 0
-            ? `${summary.profileCount} ${summary.profileCount === 1 ? 'profile' : 'profiles'} | ${summary.syncReadyProfileCount} ready${setupNeeds ? ` | ${setupNeeds} need setup` : ''}${summary.pendingExtraTimeRequestCount ? ` | ${summary.pendingExtraTimeRequestCount} requests` : ''}`
-            : 'Setup needed';
+            ? familyUiText('family.commandCenter.metaSummary', '{profileCount} {profiles} | {readyCount} ready{setupPart}{requestPart}', {
+                profileCount: summary.profileCount,
+                profiles: summary.profileCount === 1
+                    ? familyUiText('family.commandCenter.profile.one', 'profile')
+                    : familyUiText('family.commandCenter.profile.many', 'profiles'),
+                readyCount: summary.syncReadyProfileCount,
+                setupPart: setupNeeds ? familyUiText('family.commandCenter.metaSetupNeeded', ' | {count} need setup', { count: setupNeeds }) : '',
+                requestPart: summary.pendingExtraTimeRequestCount
+                    ? familyUiText('family.commandCenter.metaRequests', ' | {count} requests', { count: summary.pendingExtraTimeRequestCount })
+                    : ''
+            })
+            : familyUiText('family.commandCenter.setupNeeded', 'Setup needed');
         meta.title = summary.profileCount > 0
-            ? 'Protected profiles shown here can be managed only by the current parent/account authority.'
-            : 'Create a protected profile first; verified-device update options appear after there is a profile to protect.';
+            ? familyUiText('family.commandCenter.metaAuthorityTitle', 'Protected profiles shown here can be managed only by the current parent/account authority.')
+            : familyUiText('family.commandCenter.metaCreateProfileTitle', 'Create a protected profile first; verified-device update options appear after there is a profile to protect.');
         titleWrap.append(title, body);
         heading.append(titleWrap, meta);
         panel.appendChild(heading);
@@ -956,31 +1052,31 @@
 
             const setupTitle = document.createElement('strong');
             setupTitle.className = 'ft-managed-command-center__setup-title';
-            setupTitle.textContent = 'First setup';
-            setupTitle.title = 'Use this from the parent/master profile. Protected profiles do not receive admin controls.';
+            setupTitle.textContent = familyUiText('family.commandCenter.firstSetup.title', 'First setup');
+            setupTitle.title = familyUiText('family.commandCenter.firstSetup.titleHelp', 'Use this from the parent/master profile. Protected profiles do not receive admin controls.');
 
             const setupCopy = document.createElement('div');
             setupCopy.className = 'help-item-body';
-            setupCopy.textContent = 'Create a protected profile, set what it can watch, then pair a verified device if updates need to reach another device.';
+            setupCopy.textContent = familyUiText('family.commandCenter.firstSetup.detail', 'Create a protected profile, set what it can watch, then pair a verified device if updates need to reach another device.');
 
             const steps = document.createElement('ol');
             steps.className = 'ft-managed-command-center__setup-steps';
             [
                 {
-                    text: 'Create a protected profile',
-                    title: 'The profile gets its own Main and Kids rules. The parent/account keeps policy authority.'
+                    text: familyUiText('family.commandCenter.firstSetup.step.createProfile', 'Create a protected profile'),
+                    title: familyUiText('family.commandCenter.firstSetup.step.createProfileHelp', 'The profile gets its own Main and Kids rules. The parent/account keeps policy authority.')
                 },
                 {
-                    text: 'Set Main/Kids access and daily YouTube time',
-                    title: 'The runtime gate enforces access and time limits on YouTube surfaces for that profile.'
+                    text: familyUiText('family.commandCenter.firstSetup.step.setAccessTime', 'Set Main/Kids access and daily YouTube time'),
+                    title: familyUiText('family.commandCenter.firstSetup.step.setAccessTimeHelp', 'The runtime gate enforces access and time limits on YouTube surfaces for that profile.')
                 },
                 {
-                    text: 'Add keywords, channels, whitelist, or blocklist rules',
-                    title: 'Rules are edited from the parent/account surface, not from the protected surface.'
+                    text: familyUiText('family.commandCenter.firstSetup.step.addRules', 'Add keywords, channels, whitelist, or blocklist rules'),
+                    title: familyUiText('family.commandCenter.firstSetup.step.addRulesHelp', 'Rules are edited from the parent/account surface, not from the protected surface.')
                 },
                 {
-                    text: 'Pair another device only when it also needs these rules',
-                    title: 'Send Update appears after a protected profile exists. Internet Pickup and Home Pickup stay optional.'
+                    text: familyUiText('family.commandCenter.firstSetup.step.pairDevice', 'Pair another device only when it also needs these rules'),
+                    title: familyUiText('family.commandCenter.firstSetup.step.pairDeviceHelp', 'Send Update appears after a protected profile exists. Internet Pickup and Home Pickup stay optional.')
                 }
             ].forEach((item) => {
                 const step = document.createElement('li');
@@ -1002,8 +1098,8 @@
                     const createChildBtn = document.createElement('button');
                     createChildBtn.className = 'btn-primary';
                     createChildBtn.type = 'button';
-                    createChildBtn.textContent = 'Create Protected Profile';
-                    createChildBtn.title = 'Creates a protected profile owned by the active parent/account profile.';
+                    createChildBtn.textContent = familyUiText('family.commandCenter.firstSetup.createProtectedProfile', 'Create Protected Profile');
+                    createChildBtn.title = familyUiText('family.commandCenter.firstSetup.createProtectedProfileHelp', 'Creates a protected profile owned by the active parent/account profile.');
                     createChildBtn.addEventListener('click', (event) => {
                         event.preventDefault();
                         Promise.resolve(h.onAction({
@@ -1019,8 +1115,8 @@
                     const createAccountBtn = document.createElement('button');
                     createAccountBtn.className = 'btn-secondary';
                     createAccountBtn.type = 'button';
-                    createAccountBtn.textContent = 'Create Account';
-                    createAccountBtn.title = 'Creates an independent account profile that Master can later manage.';
+                    createAccountBtn.textContent = familyUiText('family.commandCenter.firstSetup.createAccount', 'Create Account');
+                    createAccountBtn.title = familyUiText('family.commandCenter.firstSetup.createAccountHelp', 'Creates an independent account profile that Master can later manage.');
                     createAccountBtn.addEventListener('click', (event) => {
                         event.preventDefault();
                         Promise.resolve(h.onAction({
@@ -1037,8 +1133,8 @@
 
             const setupNote = document.createElement('div');
             setupNote.className = 'ft-managed-command-center__setup-note';
-            setupNote.textContent = 'If the protected profile stays on this device, no device pairing is needed. Pair only when another verified device should receive the same parent-approved rules.';
-            setupNote.title = 'Those options do not grant authority; a trusted profile link and local validation still decide whether an update applies.';
+            setupNote.textContent = familyUiText('family.commandCenter.firstSetup.note', 'If the protected profile stays on this device, no device pairing is needed. Pair only when another verified device should receive the same parent-approved rules.');
+            setupNote.title = familyUiText('family.commandCenter.firstSetup.noteHelp', 'Those options do not grant authority; a trusted profile link and local validation still decide whether an update applies.');
             setup.appendChild(setupNote);
             panel.appendChild(setup);
             return panel;
@@ -1047,12 +1143,12 @@
         const strip = document.createElement('div');
         strip.className = 'ft-managed-command-center__strip';
         [
-            { label: 'Profiles', value: summary.profileCount, tone: 'neutral', title: 'Profiles this parent/account can manage.', always: true },
-            { label: 'Ready devices', value: summary.syncReadyProfileCount, tone: summary.syncReadyProfileCount ? 'success' : 'neutral', title: 'Profiles with a verified device path available now.', always: true },
-            { label: 'Rule lists', value: summary.managedChannelListProfileCount, tone: 'success', title: 'Protected profiles with parent-approved channel or keyword lists.' },
-            { label: 'Needs pairing', value: summary.noDeviceProfileCount + summary.syncRepairProfileCount + summary.syncStaleProfileCount, tone: 'warning', title: 'Profiles that need a verified device, refreshed trust, or re-pairing before remote updates.' },
-            { label: 'Time requests', value: summary.pendingExtraTimeRequestCount, tone: 'warning', title: 'Protected profiles asking for more YouTube time.' },
-            { label: 'Conflicts', value: summary.remoteConflictCount, tone: 'danger', title: 'Rejected or conflicting remote-policy history rows that need parent review.' }
+            { label: familyUiText('family.commandCenter.stat.profiles', 'Profiles'), value: summary.profileCount, tone: 'neutral', title: familyUiText('family.commandCenter.stat.profilesHelp', 'Profiles this parent/account can manage.'), always: true },
+            { label: familyUiText('family.commandCenter.stat.readyDevices', 'Ready devices'), value: summary.syncReadyProfileCount, tone: summary.syncReadyProfileCount ? 'success' : 'neutral', title: familyUiText('family.commandCenter.stat.readyDevicesHelp', 'Profiles with a verified device path available now.'), always: true },
+            { label: familyUiText('family.commandCenter.stat.ruleLists', 'Rule lists'), value: summary.managedChannelListProfileCount, tone: 'success', title: familyUiText('family.commandCenter.stat.ruleListsHelp', 'Protected profiles with parent-approved channel or keyword lists.') },
+            { label: familyUiText('family.commandCenter.stat.needsPairing', 'Needs pairing'), value: summary.noDeviceProfileCount + summary.syncRepairProfileCount + summary.syncStaleProfileCount, tone: 'warning', title: familyUiText('family.commandCenter.stat.needsPairingHelp', 'Profiles that need a verified device, refreshed trust, or re-pairing before remote updates.') },
+            { label: familyUiText('family.commandCenter.stat.timeRequests', 'Time requests'), value: summary.pendingExtraTimeRequestCount, tone: 'warning', title: familyUiText('family.commandCenter.stat.timeRequestsHelp', 'Protected profiles asking for more YouTube time.') },
+            { label: familyUiText('family.commandCenter.stat.conflicts', 'Conflicts'), value: summary.remoteConflictCount, tone: 'danger', title: familyUiText('family.commandCenter.stat.conflictsHelp', 'Rejected or conflicting remote-policy history rows that need parent review.') }
         ].filter(item => item.always || (Number(item.value) || 0) > 0).forEach((item) => {
             const card = document.createElement('div');
             card.className = `ft-managed-command-center__strip-item is-${item.tone}`;
@@ -1068,32 +1164,36 @@
 
         const workflow = document.createElement('div');
         workflow.className = 'ft-managed-command-center__workflow';
-        workflow.setAttribute('aria-label', 'Family Controls workflow');
+        workflow.setAttribute('aria-label', familyUiText('family.commandCenter.workflow.ariaLabel', 'Family Controls workflow'));
         [
             {
                 step: '1',
-                label: 'Choose profile',
-                detail: `${summary.profileCount} protected ${summary.profileCount === 1 ? 'profile' : 'profiles'} available`,
+                label: familyUiText('family.commandCenter.workflow.chooseProfile', 'Choose profile'),
+                detail: summary.profileCount === 1
+                    ? familyUiText('family.commandCenter.workflow.oneProfileAvailable', '{count} protected profile available', { count: summary.profileCount })
+                    : familyUiText('family.commandCenter.workflow.manyProfilesAvailable', '{count} protected profiles available', { count: summary.profileCount }),
                 tone: 'neutral',
-                title: 'Choose the family member or other protected profile you want to manage.'
+                title: familyUiText('family.commandCenter.workflow.chooseProfileHelp', 'Choose the family member or other protected profile you want to manage.')
             },
             {
                 step: '2',
-                label: 'Set guardrails',
+                label: familyUiText('family.commandCenter.workflow.setGuardrails', 'Set guardrails'),
                 detail: summary.managedChannelListProfileCount > 0
-                    ? 'Rules, lists, access, and time are ready to review'
-                    : 'Use Rules, Lists, Set Time, and Main/Kids controls',
+                    ? familyUiText('family.commandCenter.workflow.guardrailsReady', 'Rules, lists, access, and time are ready to review')
+                    : familyUiText('family.commandCenter.workflow.guardrailsHelp', 'Use Rules, Lists, Set Time, and Main/Kids controls'),
                 tone: summary.managedChannelListProfileCount > 0 || summary.limitedCount > 0 ? 'success' : 'neutral',
-                title: 'These actions change the selected protected profile after parent/account approval.'
+                title: familyUiText('family.commandCenter.workflow.guardrailsTitle', 'These actions change the selected protected profile after parent/account approval.')
             },
             {
                 step: '3',
-                label: 'Sync if needed',
+                label: familyUiText('family.commandCenter.workflow.syncIfNeeded', 'Sync if needed'),
                 detail: summary.syncReadyProfileCount > 0
-                    ? `${summary.syncReadyProfileCount} ${summary.syncReadyProfileCount === 1 ? 'profile has' : 'profiles have'} a verified delivery path`
-                    : 'Pair only when this profile also lives on another device',
+                    ? (summary.syncReadyProfileCount === 1
+                        ? familyUiText('family.commandCenter.workflow.oneProfileDelivery', '{count} profile has a verified delivery path', { count: summary.syncReadyProfileCount })
+                        : familyUiText('family.commandCenter.workflow.manyProfilesDelivery', '{count} profiles have a verified delivery path', { count: summary.syncReadyProfileCount }))
+                    : familyUiText('family.commandCenter.workflow.syncHelp', 'Pair only when this profile also lives on another device'),
                 tone: summary.syncReadyProfileCount > 0 ? 'success' : 'warning',
-                title: 'Local control works without remote delivery. Pairing is only needed for another device.'
+                title: familyUiText('family.commandCenter.workflow.syncTitle', 'Local control works without remote delivery. Pairing is only needed for another device.')
             }
         ].forEach((item) => {
             const workflowItem = document.createElement('div');
@@ -1128,23 +1228,23 @@
         if (shouldShowConfiguredProviderSetup || shouldShowProviderPrompt) {
             const providerIntro = document.createElement('div');
             providerIntro.className = 'ft-managed-command-center__provider-intro';
-            providerIntro.textContent = 'Automatic saved updates';
-            providerIntro.title = 'Send Update is the normal path. Add this only when the other device cannot be open at the same time.';
+            providerIntro.textContent = familyUiText('family.commandCenter.providers.savedUpdatesTitle', 'Automatic saved updates');
+            providerIntro.title = familyUiText('family.commandCenter.providers.savedUpdatesHelp', 'Send Update is the normal path. Add this only when the other device cannot be open at the same time.');
             panel.appendChild(providerIntro);
         }
 
         if (shouldShowProviderPrompt) {
             const providerPrompt = document.createElement('details');
             providerPrompt.className = 'ft-managed-command-center__provider-prompt';
-            providerPrompt.title = 'Most parents can skip this. Use only when live Send Update is not enough.';
+            providerPrompt.title = familyUiText('family.commandCenter.providers.promptHelp', 'Most parents can skip this. Use only when live Send Update is not enough.');
             const providerSummary = document.createElement('summary');
             providerSummary.className = 'ft-managed-command-center__provider-summary';
             const promptCopy = document.createElement('div');
             promptCopy.className = 'ft-managed-command-center__provider-copy';
             const promptTitle = document.createElement('strong');
-            promptTitle.textContent = 'Need a device to pick up changes later?';
+            promptTitle.textContent = familyUiText('family.commandCenter.providers.promptTitle', 'Need a device to pick up changes later?');
             const promptDetail = document.createElement('span');
-            promptDetail.textContent = 'Optional. Use Send Update when both devices can be open together.';
+            promptDetail.textContent = familyUiText('family.commandCenter.providers.promptDetail', 'Optional. Use Send Update when both devices can be open together.');
             promptCopy.append(promptTitle, promptDetail);
             providerSummary.appendChild(promptCopy);
             const promptActions = document.createElement('div');
@@ -1152,17 +1252,17 @@
             const promptBody = document.createElement('div');
             promptBody.className = 'ft-managed-command-center__provider-prompt-body';
             const promptBodyText = document.createElement('span');
-            promptBodyText.textContent = 'Normal control is live: open both devices, pair, verify, send. Add pickup only if approved updates must wait for a protected device at home, school, or away.';
+            promptBodyText.textContent = familyUiText('family.commandCenter.providers.promptBody', 'Normal control is live: open both devices, pair, verify, send. Add pickup only if approved updates must wait for a protected device at home, school, or away.');
             [
                 {
-                    label: 'Internet Pickup',
-                    title: 'For protected devices that should collect waiting approved updates next time they open.',
+                    label: familyUiText('family.commandCenter.providers.internetPickup', 'Internet Pickup'),
+                    title: familyUiText('family.commandCenter.providers.internetPickupHelp', 'For protected devices that should collect waiting approved updates next time they open.'),
                     action: 'configure_mailbox',
                     scope: 'mailbox_provider'
                 },
                 {
-                    label: 'Home Pickup',
-                    title: 'For a same-network home, clinic, or school pickup path you explicitly set up. Wi-Fi alone never grants control.',
+                    label: familyUiText('family.commandCenter.providers.homePickup', 'Home Pickup'),
+                    title: familyUiText('family.commandCenter.providers.homePickupHelp', 'For a same-network home, clinic, or school pickup path you explicitly set up. Wi-Fi alone never grants control.'),
                     action: 'configure_local_network',
                     scope: 'local_network_provider'
                 }
@@ -1191,29 +1291,31 @@
         if (shouldShowConfiguredProviderSetup && mailbox.configured === true) {
             const mailboxPanel = document.createElement('div');
             mailboxPanel.className = `ft-managed-command-center__provider is-${mailbox.tone || (mailbox.configured ? 'success' : 'warning')}`;
-            mailboxPanel.title = 'Optional: use this only when parent updates must wait for an offline or away protected device to open later.';
+            mailboxPanel.title = familyUiText('family.commandCenter.providers.internetPickupPanelHelp', 'Optional: use this only when parent updates must wait for an offline or away protected device to open later.');
             const mailboxCopy = document.createElement('div');
             mailboxCopy.className = 'ft-managed-command-center__provider-copy';
             const mailboxTitle = document.createElement('strong');
             mailboxTitle.textContent = mailbox.configured
-                ? (mailbox.label || 'Internet Pickup is set up')
-                : 'Internet Pickup is off';
+                ? (mailbox.label || familyUiText('family.commandCenter.providers.internetPickupIsSetUp', 'Internet Pickup is set up'))
+                : familyUiText('family.commandCenter.providers.internetPickupIsOff', 'Internet Pickup is off');
             const mailboxDetail = document.createElement('span');
             mailboxDetail.textContent = summary.profileCount > 0
-                ? (mailbox.detail || 'Use this when a parent update should wait until the protected device opens later or away.')
-                : 'Create a protected profile first. Internet Pickup is optional and only useful after a protected device is paired.';
+                ? (mailbox.detail || familyUiText('family.commandCenter.providers.internetPickupDetail', 'Use this when a parent update should wait until the protected device opens later or away.'))
+                : familyUiText('family.commandCenter.providers.internetPickupNoProfileDetail', 'Create a protected profile first. Internet Pickup is optional and only useful after a protected device is paired.');
             const mailboxRoute = document.createElement('span');
             mailboxRoute.textContent = mailbox.configured
-                ? 'The protected device still accepts only trusted parent updates.'
-                : 'Leave this off when live Send Update is enough.';
+                ? familyUiText('family.commandCenter.providers.trustedUpdatesOnly', 'The protected device still accepts only trusted parent updates.')
+                : familyUiText('family.commandCenter.providers.internetPickupOffDetail', 'Leave this off when live Send Update is enough.');
             mailboxCopy.append(mailboxTitle, mailboxDetail, mailboxRoute);
             mailboxPanel.appendChild(mailboxCopy);
             if (h.onAction) {
                 const mailboxButton = document.createElement('button');
                 mailboxButton.className = 'btn-secondary';
                 mailboxButton.type = 'button';
-                mailboxButton.textContent = mailbox.configured ? 'Edit Internet Pickup' : 'Set Up Internet Pickup';
-                mailboxButton.title = 'Requires parent/account re-auth. Use only when updates must wait for the protected device to open later or away.';
+                mailboxButton.textContent = mailbox.configured
+                    ? familyUiText('family.commandCenter.providers.editInternetPickup', 'Edit Internet Pickup')
+                    : familyUiText('family.commandCenter.providers.setUpInternetPickup', 'Set Up Internet Pickup');
+                mailboxButton.title = familyUiText('family.commandCenter.providers.internetPickupReauthHelp', 'Requires parent/account re-auth. Use only when updates must wait for the protected device to open later or away.');
                 mailboxButton.addEventListener('click', (event) => {
                     event.preventDefault();
                     Promise.resolve(h.onAction({
@@ -1231,29 +1333,31 @@
         if (shouldShowConfiguredProviderSetup && localNetwork.configured === true) {
             const localPanel = document.createElement('div');
             localPanel.className = `ft-managed-command-center__provider is-${localNetwork.tone || (localNetwork.configured ? 'success' : 'warning')}`;
-            localPanel.title = 'Optional: use this only for explicitly configured Home Pickup. Being on the same network is not authority.';
+            localPanel.title = familyUiText('family.commandCenter.providers.homePickupPanelHelp', 'Optional: use this only for explicitly configured Home Pickup. Being on the same network is not authority.');
             const localCopy = document.createElement('div');
             localCopy.className = 'ft-managed-command-center__provider-copy';
             const localTitle = document.createElement('strong');
             localTitle.textContent = localNetwork.configured
-                ? (localNetwork.label || 'Home Pickup is set up')
-                : 'Home Pickup is off';
+                ? (localNetwork.label || familyUiText('family.commandCenter.providers.homePickupIsSetUp', 'Home Pickup is set up'))
+                : familyUiText('family.commandCenter.providers.homePickupIsOff', 'Home Pickup is off');
             const localDetail = document.createElement('span');
             localDetail.textContent = summary.profileCount > 0
-                ? (localNetwork.detail || 'Use this only with a trusted FilterTube-compatible pickup service on your home or school network.')
-                : 'Create a protected profile first. Home Pickup is optional and never replaces parent trust.';
+                ? (localNetwork.detail || familyUiText('family.commandCenter.providers.homePickupDetail', 'Use this only with a trusted FilterTube-compatible pickup service on your home or school network.'))
+                : familyUiText('family.commandCenter.providers.homePickupNoProfileDetail', 'Create a protected profile first. Home Pickup is optional and never replaces parent trust.');
             const localRoute = document.createElement('span');
             localRoute.textContent = localNetwork.configured
-                ? 'The protected device still accepts only trusted parent updates.'
-                : 'Leave this off unless you run a trusted Home Pickup service; Wi-Fi alone never grants control.';
+                ? familyUiText('family.commandCenter.providers.trustedUpdatesOnly', 'The protected device still accepts only trusted parent updates.')
+                : familyUiText('family.commandCenter.providers.homePickupOffDetail', 'Leave this off unless you run a trusted Home Pickup service; Wi-Fi alone never grants control.');
             localCopy.append(localTitle, localDetail, localRoute);
             localPanel.appendChild(localCopy);
             if (h.onAction) {
                 const localButton = document.createElement('button');
                 localButton.className = 'btn-secondary';
                 localButton.type = 'button';
-                localButton.textContent = localNetwork.configured ? 'Edit Home Pickup' : 'Set Up Home Pickup';
-                localButton.title = 'Requires parent/account re-auth. Being on the same network alone cannot change protected rules.';
+                localButton.textContent = localNetwork.configured
+                    ? familyUiText('family.commandCenter.providers.editHomePickup', 'Edit Home Pickup')
+                    : familyUiText('family.commandCenter.providers.setUpHomePickup', 'Set Up Home Pickup');
+                localButton.title = familyUiText('family.commandCenter.providers.homePickupReauthHelp', 'Requires parent/account re-auth. Being on the same network alone cannot change protected rules.');
                 localButton.addEventListener('click', (event) => {
                     event.preventDefault();
                     Promise.resolve(h.onAction({
@@ -1281,7 +1385,7 @@
             bulkSummary.className = 'ft-managed-command-center__bulk-summary';
             const bulkSummaryCopy = document.createElement('span');
             bulkSummaryCopy.className = 'ft-managed-command-center__bulk-summary-copy';
-            bulkSummaryCopy.textContent = 'Manage several profiles at once';
+            bulkSummaryCopy.textContent = familyUiText('family.commandCenter.bulk.title', 'Manage several profiles at once');
             const bulkStatus = document.createElement('span');
             bulkStatus.className = 'ft-managed-command-center__bulk-status';
             bulkSummary.append(bulkSummaryCopy, bulkStatus);
@@ -1292,28 +1396,28 @@
             const selectAllButton = document.createElement('button');
             selectAllButton.className = 'btn-secondary';
             selectAllButton.type = 'button';
-            selectAllButton.textContent = 'Select all';
-            selectAllButton.title = 'Select every protected profile shown in this command center.';
+            selectAllButton.textContent = familyUiText('family.commandCenter.bulk.selectAll', 'Select all');
+            selectAllButton.title = familyUiText('family.commandCenter.bulk.selectAllHelp', 'Select every protected profile shown in this command center.');
             const selectReadyButton = document.createElement('button');
             selectReadyButton.className = 'btn-secondary';
             selectReadyButton.type = 'button';
-            selectReadyButton.textContent = 'Select ready devices';
-            selectReadyButton.title = 'Select protected profiles that already have a verified delivery path.';
+            selectReadyButton.textContent = familyUiText('family.commandCenter.bulk.selectReady', 'Select ready devices');
+            selectReadyButton.title = familyUiText('family.commandCenter.bulk.selectReadyHelp', 'Select protected profiles that already have a verified delivery path.');
             const selectRequestsButton = document.createElement('button');
             selectRequestsButton.className = 'btn-secondary';
             selectRequestsButton.type = 'button';
-            selectRequestsButton.textContent = 'Select time requests';
-            selectRequestsButton.title = 'Select protected profiles with pending extra-time requests.';
+            selectRequestsButton.textContent = familyUiText('family.commandCenter.bulk.selectTimeRequests', 'Select time requests');
+            selectRequestsButton.title = familyUiText('family.commandCenter.bulk.selectTimeRequestsHelp', 'Select protected profiles with pending extra-time requests.');
             const clearSelectionButton = document.createElement('button');
             clearSelectionButton.className = 'btn-secondary';
             clearSelectionButton.type = 'button';
-            clearSelectionButton.textContent = 'Clear';
-            clearSelectionButton.title = 'Clear selected protected profiles.';
+            clearSelectionButton.textContent = familyUiText('family.commandCenter.bulk.clear', 'Clear');
+            clearSelectionButton.title = familyUiText('family.commandCenter.bulk.clearHelp', 'Clear selected protected profiles.');
             const bulkActionGroups = [
-                { key: 'rules', label: 'Rules' },
-                { key: 'send', label: 'Send' },
-                { key: 'time', label: 'Time' },
-                { key: 'access', label: 'Access' }
+                { key: 'rules', label: familyUiText('family.commandCenter.bulk.group.rules', 'Rules') },
+                { key: 'send', label: familyUiText('family.commandCenter.bulk.group.send', 'Send') },
+                { key: 'time', label: familyUiText('family.commandCenter.bulk.group.time', 'Time') },
+                { key: 'access', label: familyUiText('family.commandCenter.bulk.group.access', 'Access') }
             ];
             const bulkButtons = [];
             const createBulkButton = (intent) => {
@@ -1324,7 +1428,7 @@
                 button.dataset.filtertubeBulkAction = intent.action || '';
                 button.dataset.filtertubeDefaultLabel = intent.label || '';
                 button.disabled = true;
-                button.title = 'Select one or more protected profiles first. Requires parent/account re-auth.';
+                button.title = familyUiText('family.commandCenter.bulk.selectFirstHelp', 'Select one or more protected profiles first. Requires parent/account re-auth.');
                 button.addEventListener('click', (event) => {
                     event.preventDefault();
                     const profileIds = Array.from(selectedProfiles);
@@ -1355,21 +1459,33 @@
                 const requestInputs = selectedProfileInputs.filter(input => input.dataset.filtertubePendingTimeRequest === 'true');
                 const selectedRequestCount = requestInputs.filter(input => input.checked).length;
                 bulkStatus.textContent = count
-                    ? `${count} selected${selectedRequestCount ? ` | ${selectedRequestCount} time ${selectedRequestCount === 1 ? 'request' : 'requests'}` : ''}`
-                    : 'Optional: select profiles below to edit or send together';
+                    ? familyUiText('family.commandCenter.bulk.selectedStatus', '{count} selected{requests}', {
+                        count,
+                        requests: selectedRequestCount
+                            ? familyUiText('family.commandCenter.bulk.selectedTimeRequests', ' | {count} time {requests}', {
+                                count: selectedRequestCount,
+                                requests: selectedRequestCount === 1
+                                    ? familyUiText('family.commandCenter.bulk.requestOne', 'request')
+                                    : familyUiText('family.commandCenter.bulk.requestMany', 'requests')
+                            })
+                            : ''
+                    })
+                    : familyUiText('family.commandCenter.bulk.optionalHelp', 'Optional: select profiles below to edit or send together');
                 bulkBar.classList.toggle('has-selection', count > 0);
                 bulkButtons.forEach(button => {
                     button.disabled = count === 0;
                     if (button.dataset.filtertubeBulkAction === 'bulk_grant_extra_time') {
                         const label = selectedRequestCount
-                            ? 'Grant time requests'
-                            : 'Add extra time';
+                            ? familyUiText('family.commandCenter.bulk.grantTimeRequests', 'Grant time requests')
+                            : familyUiText('family.commandCenter.bulk.addExtraTime', 'Add extra time');
                         button.textContent = label;
                         button.title = count === 0
-                            ? 'Select one or more protected profiles first. Requires parent/account re-auth.'
+                            ? familyUiText('family.commandCenter.bulk.selectFirstHelp', 'Select one or more protected profiles first. Requires parent/account re-auth.')
                             : selectedRequestCount
-                                ? `Grant temporary parent-approved YouTube time to selected profiles. ${selectedRequestCount} selected ${selectedRequestCount === 1 ? 'profile has' : 'profiles have'} asked for more time. Requires parent/account re-auth.`
-                                : 'Add temporary parent-approved YouTube time to selected profiles with active limits. Requires parent/account re-auth.';
+                                ? (selectedRequestCount === 1
+                                    ? familyUiText('family.commandCenter.bulk.grantOneRequestHelp', 'Grant temporary parent-approved YouTube time to selected profiles. {count} selected profile has asked for more time. Requires parent/account re-auth.', { count: selectedRequestCount })
+                                    : familyUiText('family.commandCenter.bulk.grantManyRequestsHelp', 'Grant temporary parent-approved YouTube time to selected profiles. {count} selected profiles have asked for more time. Requires parent/account re-auth.', { count: selectedRequestCount }))
+                                : familyUiText('family.commandCenter.bulk.addExtraTimeHelp', 'Add temporary parent-approved YouTube time to selected profiles with active limits. Requires parent/account re-auth.');
                     }
                 });
                 clearSelectionButton.disabled = count === 0;
@@ -1446,7 +1562,7 @@
             const selector = document.createElement('input');
             selector.className = 'ft-managed-command-center__select';
             selector.type = 'checkbox';
-            selector.setAttribute('aria-label', `Select ${item.profileName} for bulk managed update`);
+            selector.setAttribute('aria-label', familyUiText('family.commandCenter.bulk.selectProfile', 'Select {profile} for bulk managed update', { profile: item.profileName }));
             selector.dataset.filtertubeProfileId = item.profileId;
             selector.dataset.filtertubeSyncReady = item.syncReadyCount > 0 ? 'true' : 'false';
             selector.dataset.filtertubePendingTimeRequest = item.pendingExtraTimeRequest ? 'true' : 'false';
@@ -1465,7 +1581,10 @@
             const name = document.createElement('strong');
             name.textContent = item.profileName;
             const owner = document.createElement('span');
-            owner.textContent = `Parent: ${item.parentName}${item.locked ? ' | profile PIN on' : ''}`;
+            owner.textContent = familyUiText('family.commandCenter.profile.owner', 'Parent: {name}{pinStatus}', {
+                name: item.parentName,
+                pinStatus: item.locked ? familyUiText('family.commandCenter.profile.pinOn', ' | profile PIN on') : ''
+            });
             const profileCell = document.createElement('div');
             profileCell.className = showBulkControls
                 ? 'ft-managed-command-center__profile'
@@ -1480,15 +1599,15 @@
             const statusCell = document.createElement('div');
             statusCell.className = 'ft-managed-command-center__status';
             [
-                { label: item.viewingAccess, tone: 'neutral', title: 'Allowed YouTube space for this protected profile.' },
-                { label: item.timeLimit, tone: item.timeLimited ? 'warning' : 'neutral', title: 'Daily YouTube time for this protected profile.' },
-                item.managedChannelListLabel ? { label: item.managedChannelListLabel, tone: 'success', title: item.managedChannelListDetail || 'Parent-approved lists attached to this profile.' } : null,
-                { label: syncState.label, tone: syncState.tone, title: item.deliveryPathDetail || 'Device delivery status.' },
-                item.syncTargetCount > 0 && item.syncOpenCheckCount > 0 ? { label: 'Automatic saved updates', tone: 'success', title: 'This verified device can check for newer signed parent updates when the protected profile opens.' } : null,
-                item.remoteScopeCount ? { label: item.syncLabel, tone: 'success', title: 'Latest accepted protected-profile policy revision.' } : null,
-                item.pendingExtraTimeRequestLabel ? { label: item.pendingExtraTimeRequestLabel, tone: 'warning', title: item.pendingExtraTimeRequestDetail || 'This profile asked for more time.' } : null,
-                item.syncTargetCount > 0 && item.latestDeliveryLabel ? { label: item.latestDeliveryLabel, tone: item.latestDeliveryTone || 'neutral', title: 'Latest protected delivery attempt.' } : null,
-                item.syncSourceAckLabel ? { label: `Ack: ${item.syncSourceAckLabel}`, tone: 'neutral', title: 'Latest redacted acknowledgement from a protected device.' } : null
+                { label: item.viewingAccess, tone: 'neutral', title: familyUiText('family.commandCenter.status.viewingAccessHelp', 'Allowed YouTube space for this protected profile.') },
+                { label: item.timeLimit, tone: item.timeLimited ? 'warning' : 'neutral', title: familyUiText('family.commandCenter.status.dailyTimeHelp', 'Daily YouTube time for this protected profile.') },
+                item.managedChannelListLabel ? { label: item.managedChannelListLabel, tone: 'success', title: item.managedChannelListDetail || familyUiText('family.commandCenter.status.parentApprovedListsHelp', 'Parent-approved lists attached to this profile.') } : null,
+                { label: syncState.label, tone: syncState.tone, title: item.deliveryPathDetail || familyUiText('family.commandCenter.status.deviceDeliveryHelp', 'Device delivery status.') },
+                item.syncTargetCount > 0 && item.syncOpenCheckCount > 0 ? { label: familyUiText('family.commandCenter.providers.savedUpdatesTitle', 'Automatic saved updates'), tone: 'success', title: familyUiText('family.commandCenter.status.automaticSavedUpdatesHelp', 'This verified device can check for newer signed parent updates when the protected profile opens.') } : null,
+                item.remoteScopeCount ? { label: item.syncLabel, tone: 'success', title: familyUiText('family.commandCenter.status.latestPolicyRevisionHelp', 'Latest accepted protected-profile policy revision.') } : null,
+                item.pendingExtraTimeRequestLabel ? { label: item.pendingExtraTimeRequestLabel, tone: 'warning', title: item.pendingExtraTimeRequestDetail || familyUiText('family.commandCenter.status.timeRequestHelp', 'This profile asked for more time.') } : null,
+                item.syncTargetCount > 0 && item.latestDeliveryLabel ? { label: item.latestDeliveryLabel, tone: item.latestDeliveryTone || 'neutral', title: familyUiText('family.commandCenter.status.latestDeliveryHelp', 'Latest protected delivery attempt.') } : null,
+                item.syncSourceAckLabel ? { label: familyUiText('family.commandCenter.status.acknowledgementLabel', `Ack: ${item.syncSourceAckLabel}`, { ack: item.syncSourceAckLabel }), tone: 'neutral', title: familyUiText('family.commandCenter.status.acknowledgementHelp', 'Latest redacted acknowledgement from a protected device.') } : null
             ].filter(Boolean).forEach((chip) => {
                 const status = document.createElement('span');
                 status.className = `ft-managed-command-center__chip is-${chip.tone}`;
@@ -1503,21 +1622,23 @@
             detailsWrap.className = 'ft-managed-command-center__details';
             [
                 hasVerifiedDevice
-                    ? { label: 'Device sync', value: item.deliveryPreview?.label || 'Send when ready', note: item.deliveryPathDetail }
-                    : { label: 'Device sync', value: 'Not paired', note: 'Local rules and time limits work here. Pair only when this profile must also update another device.' },
+                    ? { label: familyUiText('family.commandCenter.detail.deviceSync', 'Device sync'), value: item.deliveryPreview?.label || familyUiText('family.commandCenter.detail.sendWhenReady', 'Send when ready'), note: item.deliveryPathDetail }
+                    : { label: familyUiText('family.commandCenter.detail.deviceSync', 'Device sync'), value: familyUiText('family.commandCenter.detail.notPaired', 'Not paired'), note: familyUiText('family.commandCenter.detail.notPairedHelp', 'Local rules and time limits work here. Pair only when this profile must also update another device.') },
                 hasVerifiedDevice ? {
-                    label: 'Automatic saved updates',
+                    label: familyUiText('family.commandCenter.providers.savedUpdatesTitle', 'Automatic saved updates'),
                     value: item.syncOpenCheckCount > 0
-                        ? (item.syncOpenCheckCount >= item.syncTargetCount ? 'On' : `On for ${item.syncOpenCheckCount}/${item.syncTargetCount}`)
-                        : 'Off',
+                        ? (item.syncOpenCheckCount >= item.syncTargetCount
+                            ? familyUiText('family.commandCenter.detail.on', 'On')
+                            : familyUiText('family.commandCenter.detail.onForDevices', 'On for {enabled}/{total}', { enabled: item.syncOpenCheckCount, total: item.syncTargetCount }))
+                        : familyUiText('family.commandCenter.detail.off', 'Off'),
                     note: item.syncOpenCheckCount > 0
-                        ? 'When Internet Pickup or Home Pickup is set up, this protected profile checks for newer signed parent updates as it opens.'
-                        : 'Live Send Update still works. Turn this on only when this profile should collect Internet Pickup or Home Pickup updates later.'
+                        ? familyUiText('family.commandCenter.detail.savedUpdatesOnHelp', 'When Internet Pickup or Home Pickup is set up, this protected profile checks for newer signed parent updates as it opens.')
+                        : familyUiText('family.commandCenter.detail.savedUpdatesOffHelp', 'Live Send Update still works. Turn this on only when this profile should collect Internet Pickup or Home Pickup updates later.')
                 } : null,
-                item.managedChannelListDetail ? { label: 'Lists', value: item.managedChannelListDetail } : null,
-                hasVerifiedDevice ? { label: 'Verified device', value: item.syncTargetLabel } : null,
-                item.pendingExtraTimeRequestDetail ? { label: 'Request', value: item.pendingExtraTimeRequestDetail } : null,
-                item.remoteConflictCount > 0 ? { label: 'Conflict', value: `${item.remoteConflictCount} needs review` } : null
+                item.managedChannelListDetail ? { label: familyUiText('family.commandCenter.detail.lists', 'Lists'), value: item.managedChannelListDetail } : null,
+                hasVerifiedDevice ? { label: familyUiText('family.commandCenter.detail.verifiedDevice', 'Verified device'), value: item.syncTargetLabel } : null,
+                item.pendingExtraTimeRequestDetail ? { label: familyUiText('family.commandCenter.detail.request', 'Request'), value: item.pendingExtraTimeRequestDetail } : null,
+                item.remoteConflictCount > 0 ? { label: familyUiText('family.commandCenter.detail.conflict', 'Conflict'), value: familyUiText('family.commandCenter.detail.conflictNeedsReview', '{count} needs review', { count: item.remoteConflictCount }) } : null
             ].filter(Boolean).forEach((detail) => {
                 const cell = document.createElement('div');
                 cell.className = 'ft-managed-command-center__detail';
@@ -1548,8 +1669,8 @@
                     button.dataset.filtertubeManagedAction = intent.action;
                     button.dataset.filtertubeProfileId = intent.profileId;
                     button.title = intent.title || (intent.sensitiveAction
-                        ? 'Requires parent/account re-auth before protected details or policy changes.'
-                        : 'Uses the existing parent-managed runtime gate.');
+                        ? familyUiText('family.commandCenter.action.parentReauthHelp', 'Requires parent/account re-auth before protected details or policy changes.')
+                        : familyUiText('family.commandCenter.action.runtimeGateHelp', 'Uses the existing parent-managed runtime gate.'));
                     button.addEventListener('click', (event) => {
                         event.preventDefault();
                         Promise.resolve(h.onAction({ ...intent })).catch(() => {});

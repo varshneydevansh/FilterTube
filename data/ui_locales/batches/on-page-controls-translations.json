@@ -1,0 +1,252 @@
+{
+  "keys": [
+    "content.quickBlock.ariaLabel",
+    "content.menu.filterTubeMenu",
+    "content.menu.fallbackHint",
+    "content.menu.block",
+    "content.menu.filterAll",
+    "content.menu.filterAllContent",
+    "content.menu.channelBlocked",
+    "content.menu.fetchingCollaborators",
+    "content.menu.blockAllPending",
+    "content.menu.pleaseWait",
+    "content.menu.awaitingCollaborators",
+    "content.menu.bothChannels",
+    "content.menu.allCollaborators",
+    "content.menu.allCollaboratorsResolving",
+    "content.menu.done",
+    "content.menu.blockSelectedCount",
+    "content.menu.channelResolving",
+    "content.menu.channelFallback",
+    "firstRun.activeTitle",
+    "firstRun.reloadExplanation",
+    "firstRun.refreshNow",
+    "firstRun.notNow",
+    "firstRun.dismiss",
+    "release.englishSource"
+  ],
+  "translations": {
+    "zh-Hans": [
+      "快速屏蔽此卡片中的所有频道", "FilterTube 菜单", "备用菜单（此项目的 YouTube 三点菜单不可用。）", "屏蔽", "全部过滤", "过滤所有内容",
+      "✓ 频道已屏蔽", "正在获取协作者…", "全部屏蔽（待处理…）", "请稍候…", "正在等待协作者列表", "两个频道",
+      "全部 {count} 位协作者", "全部协作者（正在解析…）", "完成", "屏蔽已选的 {count} 项", "{name}（正在解析…）", "频道",
+      "FilterTube 已启用", "此标签页现在可以使用 FilterTube 控件。如果也想涵盖此已打开标签页中最早的 YouTube 数据，请重新加载一次。", "立即刷新", "暂不", "关闭", "英文来源"
+    ],
+    "hi": [
+      "इस कार्ड के सभी चैनलों को तुरंत ब्लॉक करें", "FilterTube मेनू", "वैकल्पिक मेनू (इस आइटम के लिए YouTube का 3-बिंदु मेनू उपलब्ध नहीं है।)", "ब्लॉक करें", "सब फ़िल्टर करें", "सभी सामग्री फ़िल्टर करें",
+      "✓ चैनल ब्लॉक किया गया", "सहयोगियों को प्राप्त किया जा रहा है…", "सबको ब्लॉक करें (लंबित…)", "कृपया प्रतीक्षा करें…", "सहयोगियों की सूची की प्रतीक्षा", "दोनों चैनल",
+      "सभी {count} सहयोगी", "सभी सहयोगी (हल किया जा रहा है…)", "हो गया", "{count} चयनित को ब्लॉक करें", "{name} (हल किया जा रहा है…)", "चैनल",
+      "FilterTube सक्रिय है", "यह टैब अब FilterTube नियंत्रणों का उपयोग कर सकता है। इस खुले टैब में सबसे पहले लोड हुआ YouTube डेटा भी शामिल करना हो, तो एक बार फिर लोड करें।", "अभी रीफ़्रेश करें", "अभी नहीं", "खारिज करें", "अंग्रेज़ी स्रोत"
+    ],
+    "es": [
+      "Bloqueo rápido de todos los canales de esta tarjeta", "Menú de FilterTube", "Menú alternativo (el menú de tres puntos de YouTube no está disponible para este elemento).", "Bloquear", "Filtrar todo", "Filtrar todo el contenido",
+      "✓ Canal bloqueado", "Obteniendo colaboradores…", "Bloquear todo (pendiente…)", "Espera…", "Esperando la lista de colaboradores", "Ambos canales",
+      "Los {count} colaboradores", "Todos los colaboradores (resolviendo…)", "Listo", "Bloquear los {count} seleccionados", "{name} (resolviendo…)", "Canal",
+      "FilterTube está activo", "Esta pestaña ya puede usar los controles de FilterTube. Recárgala una vez si también quieres incluir los primeros datos de YouTube de esta pestaña que ya estaba abierta.", "Actualizar ahora", "Ahora no", "Descartar", "Fuente en inglés"
+    ],
+    "ar": [
+      "حظر سريع لكل القنوات في هذه البطاقة", "قائمة FilterTube", "القائمة البديلة (قائمة النقاط الثلاث في YouTube غير متاحة لهذا العنصر).", "حظر", "تصفية الكل", "تصفية كل المحتوى",
+      "✓ تم حظر القناة", "جارٍ جلب المتعاونين…", "حظر الكل (قيد الانتظار…)", "يُرجى الانتظار…", "بانتظار قائمة المتعاونين", "كلتا القناتين",
+      "كل المتعاونين وعددهم {count}", "كل المتعاونين (جارٍ الحل…)", "تم", "حظر العناصر المحددة وعددها {count}", "{name} (جارٍ الحل…)", "قناة",
+      "FilterTube نشط", "يمكن لهذا التبويب الآن استخدام أدوات FilterTube. أعد التحميل مرة واحدة إذا أردت أيضًا تضمين بيانات YouTube الأقدم في هذا التبويب المفتوح.", "تحديث الآن", "ليس الآن", "تجاهل", "المصدر الإنجليزي"
+    ],
+    "fr": [
+      "Bloquer rapidement toutes les chaînes de cette carte", "Menu FilterTube", "Menu de secours (le menu YouTube à trois points est indisponible pour cet élément).", "Bloquer", "Tout filtrer", "Filtrer tout le contenu",
+      "✓ Chaîne bloquée", "Récupération des collaborateurs…", "Tout bloquer (en attente…)", "Veuillez patienter…", "En attente de la liste des collaborateurs", "Les deux chaînes",
+      "Les {count} collaborateurs", "Tous les collaborateurs (résolution…)", "Terminé", "Bloquer les {count} éléments sélectionnés", "{name} (résolution…)", "Chaîne",
+      "FilterTube est actif", "Cet onglet peut maintenant utiliser les commandes FilterTube. Rechargez-le une fois pour inclure aussi les premières données YouTube de cet onglet déjà ouvert.", "Actualiser maintenant", "Pas maintenant", "Ignorer", "Source anglaise"
+    ],
+    "bn": [
+      "এই কার্ডের সব চ্যানেল দ্রুত ব্লক করুন", "FilterTube মেনু", "বিকল্প মেনু (এই আইটেমের জন্য YouTube-এর তিন-বিন্দু মেনু পাওয়া যাচ্ছে না।)", "ব্লক করুন", "সব ফিল্টার করুন", "সব কনটেন্ট ফিল্টার করুন",
+      "✓ চ্যানেল ব্লক করা হয়েছে", "সহযোগীদের আনা হচ্ছে…", "সব ব্লক করুন (অপেক্ষমাণ…)", "অনুগ্রহ করে অপেক্ষা করুন…", "সহযোগীদের তালিকার জন্য অপেক্ষা করা হচ্ছে", "দুটি চ্যানেলই",
+      "সব {count} জন সহযোগী", "সব সহযোগী (সমাধান করা হচ্ছে…)", "সম্পন্ন", "নির্বাচিত {count}টি ব্লক করুন", "{name} (সমাধান করা হচ্ছে…)", "চ্যানেল",
+      "FilterTube সক্রিয়", "এই ট্যাবে এখন FilterTube নিয়ন্ত্রণ ব্যবহার করা যাবে। আগে থেকেই খোলা এই ট্যাবের প্রথম দিকের YouTube ডেটাও অন্তর্ভুক্ত করতে একবার রিলোড করুন।", "এখন রিফ্রেশ করুন", "এখন নয়", "বন্ধ করুন", "ইংরেজি উৎস"
+    ],
+    "pt": [
+      "Bloquear rapidamente todos os canais deste cartão", "Menu do FilterTube", "Menu alternativo (o menu de três pontos do YouTube não está disponível para este item).", "Bloquear", "Filtrar tudo", "Filtrar todo o conteúdo",
+      "✓ Canal bloqueado", "Buscando colaboradores…", "Bloquear tudo (pendente…)", "Aguarde…", "Aguardando a lista de colaboradores", "Ambos os canais",
+      "Todos os {count} colaboradores", "Todos os colaboradores (resolvendo…)", "Concluído", "Bloquear os {count} selecionados", "{name} (resolvendo…)", "Canal",
+      "O FilterTube está ativo", "Esta guia já pode usar os controles do FilterTube. Recarregue-a uma vez para incluir também os primeiros dados do YouTube nesta guia que já estava aberta.", "Atualizar agora", "Agora não", "Dispensar", "Fonte em inglês"
+    ],
+    "id": [
+      "Blokir semua channel di kartu ini dengan cepat", "Menu FilterTube", "Menu cadangan (menu tiga titik YouTube tidak tersedia untuk item ini).", "Blokir", "Filter Semua", "Filter Semua Konten",
+      "✓ Channel Diblokir", "Mengambil kolaborator…", "Blokir Semua (tertunda…)", "Harap tunggu…", "Menunggu daftar kolaborator", "Kedua Channel",
+      "Semua {count} Kolaborator", "Semua Kolaborator (sedang diproses…)", "Selesai", "Blokir {count} yang Dipilih", "{name} (sedang diproses…)", "Channel",
+      "FilterTube aktif", "Tab ini sekarang dapat menggunakan kontrol FilterTube. Muat ulang sekali jika data YouTube paling awal di tab yang sudah terbuka ini juga ingin dicakup.", "Muat ulang sekarang", "Nanti saja", "Abaikan", "Sumber bahasa Inggris"
+    ],
+    "ur": [
+      "اس کارڈ کے تمام چینلز کو فوراً بلاک کریں", "FilterTube مینو", "متبادل مینو (اس آئٹم کے لیے YouTube کا تین نقطوں والا مینو دستیاب نہیں ہے۔)", "بلاک کریں", "سب فلٹر کریں", "تمام مواد فلٹر کریں",
+      "✓ چینل بلاک ہو گیا", "معاونین حاصل کیے جا رہے ہیں…", "سب بلاک کریں (زیرِ انتظار…)", "براہِ کرم انتظار کریں…", "معاونین کی فہرست کا انتظار ہے", "دونوں چینلز",
+      "تمام {count} معاونین", "تمام معاونین (حل ہو رہا ہے…)", "مکمل", "منتخب کردہ {count} کو بلاک کریں", "{name} (حل ہو رہا ہے…)", "چینل",
+      "FilterTube فعال ہے", "یہ ٹیب اب FilterTube کے کنٹرول استعمال کر سکتا ہے۔ اگر اس پہلے سے کھلے ٹیب کا ابتدائی YouTube ڈیٹا بھی شامل کرنا ہے تو اسے ایک بار ریفریش کریں۔", "ابھی ریفریش کریں", "ابھی نہیں", "بند کریں", "انگریزی ماخذ"
+    ],
+    "ru": [
+      "Быстро заблокировать все каналы в этой карточке", "Меню FilterTube", "Запасное меню (меню YouTube с тремя точками недоступно для этого элемента).", "Заблокировать", "Фильтровать всё", "Фильтровать всё содержимое",
+      "✓ Канал заблокирован", "Загрузка списка соавторов…", "Заблокировать все (ожидание…)", "Подождите…", "Ожидание списка соавторов", "Оба канала",
+      "Все соавторы ({count})", "Все соавторы (идёт обработка…)", "Готово", "Заблокировать выбранные ({count})", "{name} (идёт обработка…)", "Канал",
+      "FilterTube включён", "В этой вкладке теперь доступны элементы управления FilterTube. Перезагрузите её один раз, чтобы применить фильтрацию и к уже загруженным данным YouTube.", "Обновить сейчас", "Не сейчас", "Закрыть", "Источник на английском"
+    ],
+    "de": [
+      "Alle Kanäle auf dieser Karte schnell blockieren", "FilterTube-Menü", "Ausweichmenü (das YouTube-Menü mit drei Punkten ist für dieses Element nicht verfügbar).", "Blockieren", "Alles filtern", "Alle Inhalte filtern",
+      "✓ Kanal blockiert", "Mitwirkende werden abgerufen…", "Alle blockieren (ausstehend…)", "Bitte warten…", "Warten auf die Liste der Mitwirkenden", "Beide Kanäle",
+      "Alle {count} Mitwirkenden", "Alle Mitwirkenden (wird aufgelöst…)", "Fertig", "Ausgewählte ({count}) blockieren", "{name} (wird aufgelöst…)", "Kanal",
+      "FilterTube ist aktiv", "Dieser Tab kann jetzt FilterTube-Steuerelemente verwenden. Lade ihn einmal neu, wenn auch die frühesten YouTube-Daten in diesem bereits geöffneten Tab erfasst werden sollen.", "Jetzt aktualisieren", "Nicht jetzt", "Schließen", "Englische Quelle"
+    ],
+    "ja": [
+      "このカードのすべてのチャンネルをすばやくブロック", "FilterTube メニュー", "代替メニュー（この項目では YouTube の三点メニューを利用できません。）", "ブロック", "すべてをフィルター", "すべてのコンテンツをフィルター",
+      "✓ チャンネルをブロックしました", "コラボレーターを取得中…", "すべてブロック（保留中…）", "お待ちください…", "コラボレーター一覧を待っています", "両方のチャンネル",
+      "すべてのコラボレーター（{count}人）", "すべてのコラボレーター（解決中…）", "完了", "選択した{count}件をブロック", "{name}（解決中…）", "チャンネル",
+      "FilterTube は有効です", "このタブで FilterTube の操作を使えるようになりました。すでに開いているこのタブの最初の YouTube データも対象にするには、一度再読み込みしてください。", "今すぐ更新", "後で", "閉じる", "英語のソース"
+    ],
+    "pcm": [
+      "Quick block all di channels for dis card", "FilterTube menu", "Backup menu (YouTube 3-dot menu no dey for dis item).", "Block", "Filter All", "Filter All Content",
+      "✓ Channel don block", "Dey fetch collaborators…", "Block All (e still dey wait…)", "Abeg wait…", "Dey wait for collaborator list", "Both channels",
+      "All {count} Collaborators", "All Collaborators (dem dey resolve am…)", "Don finish", "Block di {count} wey dem select", "{name} (dem dey resolve am…)", "Channel",
+      "FilterTube don active", "Dis tab fit use FilterTube controls now. Reload am once if you wan make di first YouTube data wey don load for dis tab enter too.", "Refresh now", "No be now", "Comot", "English source"
+    ],
+    "arz": [
+      "احظر بسرعة كل القنوات اللي في البطاقة دي", "قائمة FilterTube", "قائمة بديلة (قائمة التلات نقط بتاعة YouTube مش متاحة للعنصر ده).", "احظر", "فلتر الكل", "فلتر كل المحتوى",
+      "✓ القناة اتحظرت", "جاري تحميل المتعاونين…", "احظر الكل (معلّق…)", "استنى من فضلك…", "مستنيين قائمة المتعاونين", "القناتين",
+      "كل المتعاونين وعددهم {count}", "كل المتعاونين (جاري الحل…)", "تم", "احظر {count} من اللي اخترتهم", "{name} (جاري الحل…)", "قناة",
+      "FilterTube شغال", "التبويب ده يقدر يستخدم أدوات FilterTube دلوقتي. اعمل تحديث مرة واحدة لو عايز كمان بيانات YouTube الأولى في التبويب المفتوح ده تتغطى.", "حدّث دلوقتي", "مش دلوقتي", "تجاهل", "المصدر الإنجليزي"
+    ],
+    "mr": [
+      "या कार्डवरील सर्व चॅनेल पटकन ब्लॉक करा", "FilterTube मेनू", "पर्यायी मेनू (या आयटमसाठी YouTube चे तीन-बिंदू मेनू उपलब्ध नाही).", "ब्लॉक करा", "सर्व फिल्टर करा", "सर्व मजकूर फिल्टर करा",
+      "✓ चॅनेल ब्लॉक केले", "सहयोगी मिळवत आहे…", "सर्व ब्लॉक करा (प्रलंबित…)", "कृपया थांबा…", "सहयोगींच्या यादीची प्रतीक्षा", "दोन्ही चॅनेल",
+      "सर्व {count} सहयोगी", "सर्व सहयोगी (निराकरण सुरू आहे…)", "पूर्ण", "निवडलेले {count} ब्लॉक करा", "{name} (निराकरण सुरू आहे…)", "चॅनेल",
+      "FilterTube सक्रिय आहे", "हा टॅब आता FilterTube नियंत्रणे वापरू शकतो. आधीच उघडलेल्या या टॅबमधील सुरुवातीचा YouTube डेटाही समाविष्ट करायचा असल्यास एकदा रीलोड करा.", "आता रिफ्रेश करा", "आत्ता नको", "बंद करा", "इंग्रजी स्रोत"
+    ],
+    "vi": [
+      "Chặn nhanh tất cả kênh trên thẻ này", "Menu FilterTube", "Menu dự phòng (menu ba chấm của YouTube không khả dụng cho mục này).", "Chặn", "Lọc tất cả", "Lọc tất cả nội dung",
+      "✓ Đã chặn kênh", "Đang tải cộng tác viên…", "Chặn tất cả (đang chờ…)", "Vui lòng đợi…", "Đang chờ danh sách cộng tác viên", "Cả hai kênh",
+      "Tất cả {count} cộng tác viên", "Tất cả cộng tác viên (đang xử lý…)", "Xong", "Chặn {count} mục đã chọn", "{name} (đang xử lý…)", "Kênh",
+      "FilterTube đang hoạt động", "Thẻ này hiện có thể dùng các điều khiển của FilterTube. Hãy tải lại một lần nếu bạn cũng muốn áp dụng cho dữ liệu YouTube ban đầu của thẻ đang mở này.", "Làm mới ngay", "Để sau", "Bỏ qua", "Nguồn tiếng Anh"
+    ],
+    "te": [
+      "ఈ కార్డ్‌లోని అన్ని ఛానెల్‌లను త్వరగా బ్లాక్ చేయండి", "FilterTube మెను", "ప్రత్యామ్నాయ మెను (ఈ అంశానికి YouTube మూడు-చుక్కల మెను అందుబాటులో లేదు.)", "బ్లాక్ చేయండి", "అన్నింటినీ ఫిల్టర్ చేయండి", "మొత్తం కంటెంట్‌ను ఫిల్టర్ చేయండి",
+      "✓ ఛానెల్ బ్లాక్ చేయబడింది", "సహకారులను పొందుతోంది…", "అన్నింటినీ బ్లాక్ చేయండి (పెండింగ్…)", "దయచేసి వేచి ఉండండి…", "సహకారుల జాబితా కోసం వేచి ఉంది", "రెండు ఛానెల్‌లు",
+      "మొత్తం {count} మంది సహకారులు", "సహకారులందరూ (పరిష్కరిస్తోంది…)", "పూర్తయింది", "ఎంచుకున్న {count}ని బ్లాక్ చేయండి", "{name} (పరిష్కరిస్తోంది…)", "ఛానెల్",
+      "FilterTube సక్రియంగా ఉంది", "ఈ ట్యాబ్ ఇప్పుడు FilterTube నియంత్రణలను ఉపయోగించగలదు. ఇప్పటికే తెరిచి ఉన్న ఈ ట్యాబ్‌లోని ప్రారంభ YouTube డేటా కూడా వర్తించాలంటే ఒకసారి రీలోడ్ చేయండి.", "ఇప్పుడే రిఫ్రెష్ చేయండి", "ఇప్పుడు వద్దు", "మూసివేయండి", "ఆంగ్ల మూలం"
+    ],
+    "sw": [
+      "Zuia haraka chaneli zote kwenye kadi hii", "Menyu ya FilterTube", "Menyu mbadala (menyu ya nukta tatu ya YouTube haipatikani kwa kipengee hiki).", "Zuia", "Chuja Zote", "Chuja Maudhui Yote",
+      "✓ Chaneli Imezuiwa", "Inapata washiriki…", "Zuia Zote (inasubiri…)", "Tafadhali subiri…", "Inasubiri orodha ya washiriki", "Chaneli zote mbili",
+      "Washiriki wote {count}", "Washiriki wote (inatatua…)", "Imekamilika", "Zuia {count} zilizochaguliwa", "{name} (inatatua…)", "Chaneli",
+      "FilterTube inatumika", "Kichupo hiki sasa kinaweza kutumia vidhibiti vya FilterTube. Pakia upya mara moja ikiwa ungependa data ya mwanzo ya YouTube kwenye kichupo hiki kilicho wazi ihusishwe pia.", "Onyesha upya sasa", "Sio sasa", "Ondoa", "Chanzo cha Kiingereza"
+    ],
+    "ha": [
+      "Toshe dukkan tashoshi a katin wannan kati da sauri", "Menu na FilterTube", "Menu na madadin (menu mai ɗigo uku na YouTube ba ya samuwa ga wannan abu).", "Toshe", "Tace Duka", "Tace Duk Abun Ciki",
+      "✓ An toshe tasha", "Ana ɗauko masu haɗin gwiwa…", "Toshe Duka (na jira…)", "A jira kaɗan…", "Ana jiran jerin masu haɗin gwiwa", "Duk tashoshin biyu",
+      "Duk masu haɗin gwiwa {count}", "Duk masu haɗin gwiwa (ana warwarewa…)", "An gama", "Toshe {count} ɗin da aka zaɓa", "{name} (ana warwarewa…)", "Tasha",
+      "FilterTube yana aiki", "Wannan shafin yanzu zai iya amfani da sarrafawar FilterTube. Sake loda shi sau ɗaya idan kana son a shafi bayanan YouTube na farko a wannan shafin da aka riga aka buɗe ma.", "Sabunta yanzu", "Ba yanzu ba", "Rufe", "Tushen Turanci"
+    ],
+    "tr": [
+      "Bu karttaki tüm kanalları hızlıca engelle", "FilterTube menüsü", "Yedek menü (bu öğe için YouTube'un üç nokta menüsü kullanılamıyor).", "Engelle", "Tümünü Filtrele", "Tüm İçeriği Filtrele",
+      "✓ Kanal Engellendi", "Ortak çalışanlar alınıyor…", "Tümünü Engelle (beklemede…)", "Lütfen bekleyin…", "Ortak çalışan listesi bekleniyor", "Her iki kanal",
+      "Tüm {count} ortak çalışan", "Tüm ortak çalışanlar (çözümleniyor…)", "Tamam", "Seçilen {count} öğeyi engelle", "{name} (çözümleniyor…)", "Kanal",
+      "FilterTube etkin", "Bu sekme artık FilterTube kontrollerini kullanabilir. Zaten açık olan bu sekmedeki en eski YouTube verilerinin de kapsanması için sekmeyi bir kez yenileyin.", "Şimdi yenile", "Şimdi değil", "Kapat", "İngilizce kaynak"
+    ],
+    "pa-Arab": [
+      "ایس کارڈ دے سارے چینل فوراً بلاک کرو", "FilterTube مینیو", "متبادل مینیو (ایس آئٹم لئی YouTube دا تین نقطیاں والا مینیو دستیاب نئیں۔)", "بلاک کرو", "سارے فلٹر کرو", "سارا مواد فلٹر کرو",
+      "✓ چینل بلاک ہو گیا", "شراکت دار حاصل کیتے جا رہے نیں…", "سارے بلاک کرو (انتظار وچ…)", "مہربانی کرکے انتظار کرو…", "شراکت داراں دی فہرست دا انتظار اے", "دونوں چینل",
+      "سارے {count} شراکت دار", "سارے شراکت دار (حل ہو رہیا اے…)", "مکمل", "چنے ہوئے {count} بلاک کرو", "{name} (حل ہو رہیا اے…)", "چینل",
+      "FilterTube فعال اے", "ایہ ٹیب ہن FilterTube دے کنٹرول ورت سکدا اے۔ جے پہلے توں کھلے ایس ٹیب دا شروع دا YouTube ڈیٹا وی شامل کرنا اے تاں اک واری ریفریش کرو۔", "ہن ریفریش کرو", "ہن نئیں", "بند کرو", "انگریزی ماخذ"
+    ],
+    "fil": [
+      "Mabilis na i-block ang lahat ng channel sa card na ito", "Menu ng FilterTube", "Fallback na menu (hindi available ang 3-tuldok na menu ng YouTube para sa item na ito).", "I-block", "I-filter Lahat", "I-filter ang Lahat ng Content",
+      "✓ Naka-block ang Channel", "Kinukuha ang mga collaborator…", "I-block Lahat (nakabinbin…)", "Pakihintay…", "Naghihintay sa listahan ng mga collaborator", "Parehong Channel",
+      "Lahat ng {count} collaborator", "Lahat ng collaborator (nilulutas…)", "Tapos na", "I-block ang {count} napili", "{name} (nilulutas…)", "Channel",
+      "Aktibo ang FilterTube", "Magagamit na ng tab na ito ang mga kontrol ng FilterTube. I-reload ito nang isang beses kung gusto mo ring masaklaw ang pinakaunang data ng YouTube sa nakabukas nang tab na ito.", "I-refresh ngayon", "Huwag muna", "I-dismiss", "Pinagmulan sa English"
+    ],
+    "ta": [
+      "இந்த அட்டையிலுள்ள எல்லா சேனல்களையும் விரைவாகத் தடுக்கவும்", "FilterTube பட்டி", "மாற்றுப் பட்டி (இந்த உருப்படிக்கு YouTube மூன்று-புள்ளிப் பட்டி கிடைக்கவில்லை).", "தடு", "அனைத்தையும் வடிகட்டு", "எல்லா உள்ளடக்கத்தையும் வடிகட்டு",
+      "✓ சேனல் தடுக்கப்பட்டது", "கூட்டாளிகளைப் பெறுகிறது…", "அனைத்தையும் தடு (நிலுவையில்…)", "தயவுசெய்து காத்திருக்கவும்…", "கூட்டாளர் பட்டியலுக்காகக் காத்திருக்கிறது", "இரண்டு சேனல்களும்",
+      "அனைத்து {count} கூட்டாளிகள்", "அனைத்து கூட்டாளிகளும் (தீர்க்கப்படுகிறது…)", "முடிந்தது", "தேர்ந்தெடுத்த {count} உருப்படிகளைத் தடு", "{name} (தீர்க்கப்படுகிறது…)", "சேனல்",
+      "FilterTube செயல்பாட்டில் உள்ளது", "இந்தத் தாவல் இப்போது FilterTube கட்டுப்பாடுகளைப் பயன்படுத்தலாம். ஏற்கனவே திறந்திருக்கும் இந்தத் தாவலின் ஆரம்ப YouTube தரவையும் சேர்க்க ஒருமுறை மீளேற்றவும்.", "இப்போது புதுப்பி", "இப்போது வேண்டாம்", "நீக்கு", "ஆங்கில மூலம்"
+    ],
+    "yue-Hant": [
+      "快速封鎖呢張卡片入面嘅所有頻道", "FilterTube 選單", "後備選單（呢個項目用唔到 YouTube 三點選單。）", "封鎖", "篩選全部", "篩選所有內容",
+      "✓ 頻道已封鎖", "正在載入協作者…", "封鎖全部（處理中…）", "請等一等…", "等緊協作者清單", "兩個頻道",
+      "全部 {count} 位協作者", "全部協作者（解析中…）", "完成", "封鎖已選嘅 {count} 個", "{name}（解析中…）", "頻道",
+      "FilterTube 已啟用", "呢個分頁而家可以用 FilterTube 控制項。如果想連已開啟分頁最早載入嘅 YouTube 資料都一併處理，請重新載入一次。", "即刻重新整理", "遲啲先", "關閉", "英文來源"
+    ],
+    "wuu-Hans": [
+      "快点屏蔽这张卡片上所有频道", "FilterTube 菜单", "备用菜单（这个项目用不了 YouTube 三点菜单。）", "屏蔽", "全部过滤", "过滤所有内容",
+      "✓ 频道已屏蔽", "正在获取协作者…", "全部屏蔽（待处理…）", "请稍等…", "正在等协作者列表", "两个频道",
+      "全部 {count} 个协作者", "全部协作者（正在解析…）", "好了", "屏蔽选中的 {count} 个", "{name}（正在解析…）", "频道",
+      "FilterTube 已启用", "这个标签页现在能用 FilterTube 控件了。要是还想把这个已经打开的标签页最早的 YouTube 数据也算进去，就重新加载一趟。", "现在刷新", "现在不要", "关掉", "英文来源"
+    ],
+    "fa": [
+      "همه کانال‌های این کارت را سریع مسدود کنید", "منوی FilterTube", "منوی جایگزین (منوی سه‌نقطه‌ای YouTube برای این مورد در دسترس نیست.)", "مسدود کردن", "فیلتر کردن همه", "فیلتر کردن همه محتوا",
+      "✓ کانال مسدود شد", "در حال دریافت همکاران…", "مسدود کردن همه (در انتظار…)", "لطفاً صبر کنید…", "در انتظار فهرست همکاران", "هر دو کانال",
+      "همه {count} همکار", "همه همکاران (در حال بررسی…)", "انجام شد", "مسدود کردن {count} مورد انتخاب‌شده", "{name} (در حال بررسی…)", "کانال",
+      "FilterTube فعال است", "این زبانه اکنون می‌تواند از کنترل‌های FilterTube استفاده کند. اگر می‌خواهید داده‌های اولیهٔ YouTube در این زبانهٔ بازشده هم پوشش داده شوند، یک‌بار آن را بارگذاری مجدد کنید.", "اکنون تازه‌سازی کنید", "فعلاً نه", "بستن", "منبع انگلیسی"
+    ],
+    "ko": [
+      "이 카드의 모든 채널 빠르게 차단", "FilterTube 메뉴", "대체 메뉴(이 항목에서는 YouTube 점 3개 메뉴를 사용할 수 없습니다.)", "차단", "모두 필터링", "모든 콘텐츠 필터링",
+      "✓ 채널 차단됨", "공동작업자 가져오는 중…", "모두 차단(대기 중…)", "잠시 기다려 주세요…", "공동작업자 목록 대기 중", "두 채널 모두",
+      "공동작업자 {count}명 모두", "모든 공동작업자(확인 중…)", "완료", "선택한 {count}개 차단", "{name}(확인 중…)", "채널",
+      "FilterTube가 활성화되었습니다", "이 탭에서 이제 FilterTube 컨트롤을 사용할 수 있습니다. 이미 열려 있는 이 탭의 가장 처음 YouTube 데이터도 포함하려면 한 번 새로고침하세요.", "지금 새로고침", "나중에", "닫기", "영어 원문"
+    ],
+    "am": [
+      "በዚህ ካርድ ያሉትን ሁሉንም ቻናሎች በፍጥነት አግድ", "የFilterTube ምናሌ", "አማራጭ ምናሌ (የYouTube ባለሶስት ነጥብ ምናሌ ለዚህ ንጥል አይገኝም።)", "አግድ", "ሁሉንም አጣራ", "ሁሉንም ይዘት አጣራ",
+      "✓ ቻናሉ ታግዷል", "ተባባሪዎችን በማምጣት ላይ…", "ሁሉንም አግድ (በመጠባበቅ ላይ…)", "እባክዎ ይጠብቁ…", "የተባባሪዎችን ዝርዝር በመጠበቅ ላይ", "ሁለቱም ቻናሎች",
+      "ሁሉም {count} ተባባሪዎች", "ሁሉም ተባባሪዎች (በመፍታት ላይ…)", "ተጠናቋል", "የተመረጡትን {count} አግድ", "{name} (በመፍታት ላይ…)", "ቻናል",
+      "FilterTube ንቁ ነው", "ይህ ትር አሁን የFilterTube መቆጣጠሪያዎችን መጠቀም ይችላል። በዚህ አስቀድሞ በተከፈተ ትር ያለው የመጀመሪያ የYouTube ውሂብም እንዲካተት አንድ ጊዜ እንደገና ይጫኑ።", "አሁን አድስ", "አሁን አይደለም", "ዝጋ", "የእንግሊዝኛ ምንጭ"
+    ],
+    "th": [
+      "บล็อกทุกช่องในการ์ดนี้อย่างรวดเร็ว", "เมนู FilterTube", "เมนูสำรอง (เมนูจุดสามจุดของ YouTube ใช้ไม่ได้กับรายการนี้)", "บล็อก", "กรองทั้งหมด", "กรองเนื้อหาทั้งหมด",
+      "✓ บล็อกช่องแล้ว", "กำลังดึงข้อมูลผู้ร่วมงาน…", "บล็อกทั้งหมด (รอดำเนินการ…)", "โปรดรอสักครู่…", "กำลังรอรายชื่อผู้ร่วมงาน", "ทั้งสองช่อง",
+      "ผู้ร่วมงานทั้งหมด {count} คน", "ผู้ร่วมงานทั้งหมด (กำลังตรวจสอบ…)", "เสร็จแล้ว", "บล็อกรายการที่เลือก {count} รายการ", "{name} (กำลังตรวจสอบ…)", "ช่อง",
+      "FilterTube ทำงานอยู่", "แท็บนี้ใช้ตัวควบคุมของ FilterTube ได้แล้ว โหลดหน้าใหม่หนึ่งครั้งหากต้องการให้ครอบคลุมข้อมูล YouTube ชุดแรกในแท็บที่เปิดไว้นี้ด้วย", "รีเฟรชตอนนี้", "ไว้ทีหลัง", "ปิด", "แหล่งที่มาภาษาอังกฤษ"
+    ],
+    "jv": [
+      "Blokir kanthi cepet kabeh kanal ing kertu iki", "Menu FilterTube", "Menu alternatif (menu titik telu YouTube ora kasedhiya kanggo item iki).", "Blokir", "Saring Kabeh", "Saring Kabeh Konten",
+      "✓ Kanal diblokir", "Njupuk kolaborator…", "Blokir Kabeh (ngenteni…)", "Mangga enteni…", "Ngenteni dhaptar kolaborator", "Loro-lorone kanal",
+      "Kabeh kolaborator {count}", "Kabeh kolaborator (lagi diproses…)", "Rampung", "Blokir {count} sing dipilih", "{name} (lagi diproses…)", "Kanal",
+      "FilterTube aktif", "Tab iki saiki bisa nggunakake kontrol FilterTube. Muat ulang sepisan yen sampeyan uga pengin data YouTube paling awal ing tab sing wis kabukak iki kalebu.", "Muat ulang saiki", "Mengko wae", "Tutup", "Sumber basa Inggris"
+    ],
+    "it": [
+      "Blocca rapidamente tutti i canali in questa scheda", "Menu FilterTube", "Menu alternativo (il menu a tre punti di YouTube non è disponibile per questo elemento).", "Blocca", "Filtra tutto", "Filtra tutti i contenuti",
+      "✓ Canale bloccato", "Recupero dei collaboratori…", "Blocca tutto (in attesa…)", "Attendi…", "In attesa dell'elenco dei collaboratori", "Entrambi i canali",
+      "Tutti i {count} collaboratori", "Tutti i collaboratori (risoluzione in corso…)", "Fatto", "Blocca i {count} selezionati", "{name} (risoluzione in corso…)", "Canale",
+      "FilterTube è attivo", "Questa scheda ora può usare i controlli di FilterTube. Ricaricala una volta per includere anche i primi dati YouTube di questa scheda già aperta.", "Aggiorna ora", "Non ora", "Ignora", "Fonte inglese"
+    ],
+    "gu": [
+      "આ કાર્ડની બધી ચૅનલોને ઝડપથી બ્લૉક કરો", "FilterTube મેનૂ", "વૈકલ્પિક મેનૂ (આ આઇટમ માટે YouTubeનું ત્રણ-બિંદુ મેનૂ ઉપલબ્ધ નથી.)", "બ્લૉક કરો", "બધું ફિલ્ટર કરો", "બધી સામગ્રી ફિલ્ટર કરો",
+      "✓ ચૅનલ બ્લૉક થઈ", "સહયોગીઓ મેળવી રહ્યું છે…", "બધું બ્લૉક કરો (બાકી…)", "કૃપા કરીને રાહ જુઓ…", "સહયોગીઓની યાદીની રાહ જોઈ રહ્યું છે", "બંને ચૅનલો",
+      "બધા {count} સહયોગીઓ", "બધા સહયોગીઓ (ઉકેલાઈ રહ્યું છે…)", "થઈ ગયું", "પસંદ કરેલા {count} બ્લૉક કરો", "{name} (ઉકેલાઈ રહ્યું છે…)", "ચૅનલ",
+      "FilterTube સક્રિય છે", "આ ટૅબ હવે FilterTube નિયંત્રણોનો ઉપયોગ કરી શકે છે. આ પહેલેથી ખુલ્લા ટૅબનો શરૂઆતનો YouTube ડેટા પણ આવરી લેવો હોય તો એકવાર ફરી લોડ કરો.", "હમણાં રિફ્રેશ કરો", "હમણાં નહીં", "બંધ કરો", "અંગ્રેજી સ્રોત"
+    ],
+    "kn": [
+      "ಈ ಕಾರ್ಡ್‌ನಲ್ಲಿರುವ ಎಲ್ಲಾ ಚಾನಲ್‌ಗಳನ್ನು ತ್ವರಿತವಾಗಿ ನಿರ್ಬಂಧಿಸಿ", "FilterTube ಮೆನು", "ಪರ್ಯಾಯ ಮೆನು (ಈ ಐಟಂಗೆ YouTube ಮೂರು-ಚುಕ್ಕೆ ಮೆನು ಲಭ್ಯವಿಲ್ಲ.)", "ನಿರ್ಬಂಧಿಸಿ", "ಎಲ್ಲವನ್ನೂ ಫಿಲ್ಟರ್ ಮಾಡಿ", "ಎಲ್ಲಾ ವಿಷಯವನ್ನು ಫಿಲ್ಟರ್ ಮಾಡಿ",
+      "✓ ಚಾನಲ್ ನಿರ್ಬಂಧಿಸಲಾಗಿದೆ", "ಸಹಯೋಗಿಗಳನ್ನು ಪಡೆಯಲಾಗುತ್ತಿದೆ…", "ಎಲ್ಲವನ್ನೂ ನಿರ್ಬಂಧಿಸಿ (ಬಾಕಿ ಇದೆ…)", "ದಯವಿಟ್ಟು ಕಾಯಿರಿ…", "ಸಹಯೋಗಿಗಳ ಪಟ್ಟಿಗಾಗಿ ಕಾಯಲಾಗುತ್ತಿದೆ", "ಎರಡೂ ಚಾನಲ್‌ಗಳು",
+      "ಎಲ್ಲಾ {count} ಸಹಯೋಗಿಗಳು", "ಎಲ್ಲಾ ಸಹಯೋಗಿಗಳು (ಪರಿಹರಿಸಲಾಗುತ್ತಿದೆ…)", "ಮುಗಿದಿದೆ", "ಆಯ್ಕೆಮಾಡಿದ {count} ಅನ್ನು ನಿರ್ಬಂಧಿಸಿ", "{name} (ಪರಿಹರಿಸಲಾಗುತ್ತಿದೆ…)", "ಚಾನಲ್",
+      "FilterTube ಸಕ್ರಿಯವಾಗಿದೆ", "ಈ ಟ್ಯಾಬ್ ಈಗ FilterTube ನಿಯಂತ್ರಣಗಳನ್ನು ಬಳಸಬಹುದು. ಈಗಾಗಲೇ ತೆರೆದಿರುವ ಈ ಟ್ಯಾಬ್‌ನ ಮೊದಲ YouTube ಡೇಟಾವನ್ನೂ ಸೇರಿಸಲು ಒಮ್ಮೆ ಮರುಲೋಡ್ ಮಾಡಿ.", "ಈಗ ರಿಫ್ರೆಶ್ ಮಾಡಿ", "ಈಗ ಬೇಡ", "ಮುಚ್ಚಿ", "ಇಂಗ್ಲಿಷ್ ಮೂಲ"
+    ],
+    "apc": [
+      "احظر بسرعة كل القنوات بهالبطاقة", "قائمة FilterTube", "القائمة البديلة (قائمة النقاط الثلاث تبع YouTube مو متاحة لهالعنصر).", "احظر", "فلتر الكل", "فلتر كل المحتوى",
+      "✓ تم حظر القناة", "عم نجيب المتعاونين…", "احظر الكل (قيد الانتظار…)", "لو سمحت استنى…", "عم نستنى لستة المتعاونين", "القناتين",
+      "كل المتعاونين وعددهم {count}", "كل المتعاونين (عم نحل…)", "تم", "احظر {count} المحددين", "{name} (عم نحل…)", "قناة",
+      "FilterTube شغال", "هالتبويب صار بيقدر يستخدم أدوات FilterTube. اعمل إعادة تحميل مرة وحدة إذا بدك كمان تشمل بيانات YouTube الأولى بهالتبويب المفتوح.", "حدّث هلأ", "مو هلأ", "تجاهل", "المصدر الإنجليزي"
+    ],
+    "apd": [
+      "احظر بسرعة كل القنوات في البطاقة دي", "قائمة FilterTube", "القائمة البديلة (قائمة النقاط التلاتة بتاعة YouTube ما متاحة للعنصر دا).", "احظر", "فلتر الكل", "فلتر كل المحتوى",
+      "✓ القناة اتحظرت", "جاري جلب المتعاونين…", "احظر الكل (منتظر…)", "أرجو الانتظار…", "منتظرين قائمة المتعاونين", "القناتين الاتنين",
+      "كل المتعاونين وعددهم {count}", "كل المتعاونين (جاري الحل…)", "تم", "احظر {count} المحددين", "{name} (جاري الحل…)", "قناة",
+      "FilterTube شغال", "التبويب دا هسع بقدر يستخدم أدوات FilterTube. أعمل تحديث مرة واحدة لو داير تشمل كمان بيانات YouTube الأولى في التبويب المفتوح دا.", "حدّث هسع", "ما هسع", "تجاهل", "المصدر الإنجليزي"
+    ],
+    "yo": [
+      "Dènà gbogbo àwọn ikanni inú káàdì yìí kíákíá", "Àkójọ aṣàyàn FilterTube", "Àkójọ aṣàyàn àfidípò (àkójọ àmì mẹ́ta YouTube kò sí fún ohun yìí).", "Dènà", "Ṣàlẹ̀ gbogbo rẹ̀", "Ṣàlẹ̀ gbogbo àkóónú",
+      "✓ A ti dènà ikanni", "Ń gba àwọn alábáṣiṣẹ́pọ̀…", "Dènà gbogbo rẹ̀ (ń dúró…)", "Jọ̀wọ́ dúró…", "Ń dúró de àkójọ àwọn alábáṣiṣẹ́pọ̀", "Àwọn ikanni méjèèjì",
+      "Gbogbo àwọn alábáṣiṣẹ́pọ̀ {count}", "Gbogbo àwọn alábáṣiṣẹ́pọ̀ (ń yanjú…)", "Ó parí", "Dènà àwọn {count} tí a yàn", "{name} (ń yanjú…)", "Ikanni",
+      "FilterTube ti ṣiṣẹ́", "Taabu yìí lè lo àwọn ìṣàkóso FilterTube báyìí. Tun un gbé lẹ́ẹ̀kan bí o bá fẹ́ kí ó tún kan àwọn dátà YouTube àkọ́kọ́ tó wà nínú taabu yìí tó ṣí tẹ́lẹ̀.", "Tún ṣe àtúnṣe báyìí", "Kì í ṣe báyìí", "Pa dà", "Orísun Gẹ̀ẹ́sì"
+    ],
+    "bho": [
+      "एह कार्ड के सभ चैनल के जल्दी से ब्लॉक करीं", "FilterTube मेनू", "वैकल्पिक मेनू (एह आइटम खातिर YouTube के तीन-बिंदु मेनू उपलब्ध नइखे।)", "ब्लॉक करीं", "सब फिल्टर करीं", "सभ सामग्री फिल्टर करीं",
+      "✓ चैनल ब्लॉक हो गइल", "सहयोगियन के लावल जा रहल बा…", "सब ब्लॉक करीं (बाकी बा…)", "कृपया इंतजार करीं…", "सहयोगियन के सूची के इंतजार बा", "दूनो चैनल",
+      "सभ {count} सहयोगी", "सभ सहयोगी (सुलझावल जा रहल बा…)", "हो गइल", "चुनल {count} चीज ब्लॉक करीं", "{name} (सुलझावल जा रहल बा…)", "चैनल",
+      "FilterTube चालू बा", "ई टैब अब FilterTube के कंट्रोल इस्तेमाल कर सकेला। पहिले से खुलल एह टैब के सुरुआती YouTube डेटा भी शामिल करे खातिर एक बेर फेर से लोड करीं।", "अबही रिफ्रेश करीं", "अभी ना", "बंद करीं", "अंग्रेजी स्रोत"
+    ]
+  }
+}

@@ -8,6 +8,7 @@
 const FILTERTUBE_SEMANTIC_ML_ENABLED = false;
 const ANDROID_CLOSED_TESTING_INVITE_DISMISSED_KEY = 'filtertube_android_closed_testing_invite_dismissed_v1';
 const SHOW_UPDATE_REFRESH_PROMPT_KEY = 'showUpdateRefreshPrompt';
+const tabViewLocalizedNodes = new Set();
 
 function tabViewUiText(key, fallback, values = {}) {
     const interpolate = text => String(text ?? '').replace(/\{([a-zA-Z][a-zA-Z0-9]*)\}/g, (match, name) =>
@@ -19,6 +20,53 @@ function tabViewUiText(key, fallback, values = {}) {
     }
     return interpolate(fallback);
 }
+
+function setTabViewLocalizedCopy(element, property, key, fallback, values = {}) {
+    if (!element) return element;
+    const copies = element.__ftTabViewLocalizedCopy || (element.__ftTabViewLocalizedCopy = {});
+    copies[property] = { key, fallback, values };
+    tabViewLocalizedNodes.add(element);
+    const resolvedValues = typeof values === 'function' ? values() : values;
+    const text = tabViewUiText(key, fallback, resolvedValues);
+    if (property === 'textContent') element.textContent = text;
+    else element.setAttribute(property, text);
+    return element;
+}
+
+function bindTabViewLocalizedMarkup(root) {
+    if (!root) return;
+    const bindings = [
+        ['[data-ft-tabview-i18n]', 'textContent', 'data-ft-tabview-i18n'],
+        ['[data-ft-tabview-placeholder]', 'placeholder', 'data-ft-tabview-placeholder'],
+        ['[data-ft-tabview-title]', 'title', 'data-ft-tabview-title'],
+        ['[data-ft-tabview-aria-label]', 'aria-label', 'data-ft-tabview-aria-label']
+    ];
+    for (const [selector, property, keyAttribute] of bindings) {
+        for (const element of root.querySelectorAll(selector)) {
+            const key = element.getAttribute(keyAttribute);
+            if (!key) continue;
+            const fallback = property === 'textContent'
+                ? element.textContent
+                : element.getAttribute(property) || '';
+            setTabViewLocalizedCopy(element, property, key, fallback);
+        }
+    }
+}
+
+window.addEventListener?.('filtertube-ui-locale-changed', () => {
+    for (const element of tabViewLocalizedNodes) {
+        if (element?.isConnected === false) {
+            tabViewLocalizedNodes.delete(element);
+            continue;
+        }
+        for (const [property, copy] of Object.entries(element?.__ftTabViewLocalizedCopy || {})) {
+            const values = typeof copy.values === 'function' ? copy.values() : copy.values;
+            const text = tabViewUiText(copy.key, copy.fallback, values);
+            if (property === 'textContent') element.textContent = text;
+            else element.setAttribute(property, text);
+        }
+    }
+});
 
 function tabViewModalActionText(label) {
     const keys = {
@@ -657,83 +705,84 @@ function initializeFiltersTabs() {
     keywordsContent.innerHTML = `
         <section class="ft-rule-list-editor" aria-labelledby="keywordRuleListTitle">
             <div class="ft-rule-list-editor__copy">
-                <h3 id="keywordRuleListTitle">View keyword rules</h3>
+                <h3 id="keywordRuleListTitle" data-ft-tabview-i18n="dashboard.ruleEditor.viewKeywordRules">View keyword rules</h3>
                 <p id="keywordRuleTargetHelp">Showing blocked keyword rules. Changing this view does not change your Main filtering mode.</p>
             </div>
-            <div class="ft-rule-target-tabs" role="tablist" aria-label="Choose the keyword rule list to edit">
+            <div class="ft-rule-target-tabs" role="tablist" aria-label="Choose the keyword rule list to edit" data-ft-tabview-aria-label="dashboard.ruleEditor.chooseKeywordList">
                 <button type="button" class="ft-rule-target-tab is-active" role="tab" aria-selected="true" aria-controls="keywordListEl" data-rule-target-for="keyword" data-rule-target="block">Blocked rules</button>
                 <button type="button" class="ft-rule-target-tab" role="tab" aria-selected="false" aria-controls="keywordListEl" data-rule-target-for="keyword" data-rule-target="allow">Allowed rules</button>
             </div>
             <input id="keywordRuleTarget" type="hidden" value="block" />
         </section>
         <div class="input-row">
-            <input type="text" id="keywordInput" class="text-input" placeholder="Add a keyword that should hide matching videos..." />
+            <input type="text" id="keywordInput" class="text-input" placeholder="Add a keyword that should hide matching videos..." data-ft-tabview-placeholder="dashboard.ruleEditor.keywordBlockPlaceholder" />
             <button id="addKeywordBtn" class="btn-primary">Add blocked keyword</button>
         </div>
         <div id="managedChildFiltersBanner" class="ft-managed-child-editor" hidden></div>
 
         <div class="filter-controls">
-            <input type="text" id="searchKeywords" class="search-input" placeholder="Search keywords..." />
+            <input type="text" id="searchKeywords" class="search-input" placeholder="Search keywords..." data-ft-tabview-placeholder="dashboard.ruleEditor.searchKeywords" />
             <div class="sort-controls">
-                <span class="label">Sort by:</span>
+                <span class="label" data-ft-tabview-i18n="dashboard.ruleEditor.sortBy">Sort by:</span>
                 <select id="keywordSort" class="select-input">
-                    <option value="newest">Newest First</option>
-                    <option value="oldest">Oldest First</option>
-                    <option value="az">A-Z</option>
+                    <option value="newest" data-ft-tabview-i18n="dashboard.ruleEditor.newestFirst">Newest First</option>
+                    <option value="oldest" data-ft-tabview-i18n="dashboard.ruleEditor.oldestFirst">Oldest First</option>
+                    <option value="az" data-ft-tabview-i18n="dashboard.ruleEditor.alphabetical">A-Z</option>
                 </select>
             </div>
         </div>
 
         <div class="date-filter-controls">
             <div class="date-range-controls">
-                <span class="label">Date:</span>
+                <span class="label" data-ft-tabview-i18n="dashboard.ruleEditor.date">Date:</span>
                 <select id="keywordDatePreset" class="select-input">
-                    <option value="all">All time</option>
-                    <option value="today">Today</option>
-                    <option value="7d">Last 7 days</option>
-                    <option value="30d">Last 30 days</option>
-                    <option value="custom">Custom</option>
+                    <option value="all" data-ft-tabview-i18n="dashboard.ruleEditor.allTime">All time</option>
+                    <option value="today" data-ft-tabview-i18n="dashboard.ruleEditor.today">Today</option>
+                    <option value="7d" data-ft-tabview-i18n="dashboard.ruleEditor.last7Days">Last 7 days</option>
+                    <option value="30d" data-ft-tabview-i18n="dashboard.ruleEditor.last30Days">Last 30 days</option>
+                    <option value="custom" data-ft-tabview-i18n="dashboard.ruleEditor.custom">Custom</option>
                 </select>
             </div>
             <div class="date-inputs">
                 <input type="date" id="keywordDateFrom" class="select-input date-input custom-date-input" />
-                <span class="date-sep">to</span>
+                <span class="date-sep" data-ft-tabview-i18n="dashboard.ruleEditor.to">to</span>
                 <input type="date" id="keywordDateTo" class="select-input date-input custom-date-input" />
-                <button id="keywordDateClear" class="btn-secondary date-clear-btn" type="button">Clear</button>
+                <button id="keywordDateClear" class="btn-secondary date-clear-btn" type="button" data-ft-tabview-i18n="dashboard.ruleEditor.clear">Clear</button>
             </div>
         </div>
 
         <div id="keywordListEl" class="advanced-list"></div>
     `;
+    bindTabViewLocalizedMarkup(keywordsContent);
 
     // Channels tab content
     const channelsContent = document.createElement('div');
     channelsContent.innerHTML = `
         <section class="ft-rule-list-editor" aria-labelledby="channelRuleListTitle">
             <div class="ft-rule-list-editor__copy">
-                <h3 id="channelRuleListTitle">View channel rules</h3>
+                <h3 id="channelRuleListTitle" data-ft-tabview-i18n="dashboard.ruleEditor.viewChannelRules">View channel rules</h3>
                 <p id="channelRuleTargetHelp">Showing blocked channel rules. Changing this view does not change your Main filtering mode.</p>
             </div>
-            <div class="ft-rule-target-tabs" role="tablist" aria-label="Choose the channel rule list to edit">
+            <div class="ft-rule-target-tabs" role="tablist" aria-label="Choose the channel rule list to edit" data-ft-tabview-aria-label="dashboard.ruleEditor.chooseChannelList">
                 <button type="button" class="ft-rule-target-tab is-active" role="tab" aria-selected="true" aria-controls="channelListEl" data-rule-target-for="channel" data-rule-target="block">Blocked rules</button>
                 <button type="button" class="ft-rule-target-tab" role="tab" aria-selected="false" aria-controls="channelListEl" data-rule-target-for="channel" data-rule-target="allow">Allowed rules</button>
             </div>
             <input id="channelRuleTarget" type="hidden" value="block" />
         </section>
         <div class="input-row">
-            <input type="text" id="channelInput" class="text-input" placeholder="Add a channel whose videos should be hidden..." />
+            <input type="text" id="channelInput" class="text-input" placeholder="Add a channel whose videos should be hidden..." data-ft-tabview-placeholder="dashboard.ruleEditor.channelBlockPlaceholder" />
             <button id="addChannelBtn" class="btn-primary">Add blocked channel</button>
         </div>
         <div id="managedChildFiltersChannelBanner" class="ft-managed-child-editor" hidden></div>
 
         <div class="filter-controls">
-            <input type="text" id="searchChannels" class="search-input" placeholder="Search channels..." />
+            <input type="text" id="searchChannels" class="search-input" placeholder="Search channels..." data-ft-tabview-placeholder="dashboard.ruleEditor.searchChannels" />
             <div class="sort-controls">
-                <span class="label">Sort by:</span>
+                <span class="label" data-ft-tabview-i18n="dashboard.ruleEditor.sortBy">Sort by:</span>
                 <select id="channelSort" class="select-input">
-                    <option value="newest">Newest First</option>
-                    <option value="oldest">Oldest First</option>
-                    <option value="az">A-Z</option>
+                    <option value="newest" data-ft-tabview-i18n="dashboard.ruleEditor.newestFirst">Newest First</option>
+                    <option value="oldest" data-ft-tabview-i18n="dashboard.ruleEditor.oldestFirst">Oldest First</option>
+                    <option value="az" data-ft-tabview-i18n="dashboard.ruleEditor.alphabetical">A-Z</option>
                 </select>
                 <select id="channelSourceFilter" class="select-input channel-source-filter" title="Show manual channels, imported-list channels, or one saved list">
                     <option value="all">All sources</option>
@@ -745,20 +794,20 @@ function initializeFiltersTabs() {
 
         <div class="date-filter-controls">
             <div class="date-range-controls">
-                <span class="label">Date:</span>
+                <span class="label" data-ft-tabview-i18n="dashboard.ruleEditor.date">Date:</span>
                 <select id="channelDatePreset" class="select-input">
-                    <option value="all">All time</option>
-                    <option value="today">Today</option>
-                    <option value="7d">Last 7 days</option>
-                    <option value="30d">Last 30 days</option>
-                    <option value="custom">Custom</option>
+                    <option value="all" data-ft-tabview-i18n="dashboard.ruleEditor.allTime">All time</option>
+                    <option value="today" data-ft-tabview-i18n="dashboard.ruleEditor.today">Today</option>
+                    <option value="7d" data-ft-tabview-i18n="dashboard.ruleEditor.last7Days">Last 7 days</option>
+                    <option value="30d" data-ft-tabview-i18n="dashboard.ruleEditor.last30Days">Last 30 days</option>
+                    <option value="custom" data-ft-tabview-i18n="dashboard.ruleEditor.custom">Custom</option>
                 </select>
             </div>
             <div class="date-inputs">
                 <input type="date" id="channelDateFrom" class="select-input date-input custom-date-input" />
-                <span class="date-sep">to</span>
+                <span class="date-sep" data-ft-tabview-i18n="dashboard.ruleEditor.to">to</span>
                 <input type="date" id="channelDateTo" class="select-input date-input custom-date-input" />
-                <button id="channelDateClear" class="btn-secondary date-clear-btn" type="button">Clear</button>
+                <button id="channelDateClear" class="btn-secondary date-clear-btn" type="button" data-ft-tabview-i18n="dashboard.ruleEditor.clear">Clear</button>
                 <button id="importSubscriptionsBtn" class="btn-secondary date-clear-btn subscriptions-import-trigger" type="button">Import Subscribed Channels</button>
             </div>
         </div>
@@ -2332,6 +2381,7 @@ function initializeKidsTabs() {
 
         <div id="kidsChannelListEl" class="advanced-list"></div>
     `;
+    bindTabViewLocalizedMarkup(channelsContent);
 
     const kidsContentTab = document.createElement('div');
     kidsContentTab.id = 'kidsContentControlsSection';
@@ -3581,6 +3631,9 @@ async function loadReleaseNotesIntoDashboard() {
 
         const locale = window.FilterTubeUiLocalization?.locale || 'en';
         if (locale !== 'en') {
+            // Historical entries may not have a translation yet. Keep them visible,
+            // but label their English source so the fallback is explicit.
+            notes = notes.map(note => ({ ...note, hasEnglishSourceFallback: true }));
             try {
                 const localizedUrl = runtimeAPI?.runtime?.getURL
                     ? runtimeAPI.runtime.getURL(`data/ui_locales/release_notes.${locale}.json`)
@@ -3591,13 +3644,19 @@ async function loadReleaseNotesIntoDashboard() {
                     notes = notes.map(note => {
                         const translated = translations?.[note.version];
                         if (!translated) return note;
+                        const sourceHighlights = Array.isArray(note.highlights) ? note.highlights : [];
+                        const hasHeadlineTranslation = typeof translated.headline === 'string' && translated.headline.trim();
+                        const hasSummaryTranslation = typeof translated.summary === 'string' && translated.summary.trim();
+                        const hasHighlightsTranslation = Array.isArray(translated.highlights)
+                            && translated.highlights.length === sourceHighlights.length
+                            && translated.highlights.every(item => typeof item === 'string' && item.trim());
                         return {
                             ...note,
-                            headline: translated.headline || note.headline,
-                            summary: translated.summary || note.summary,
+                            hasEnglishSourceFallback: !hasHeadlineTranslation || !hasSummaryTranslation || !hasHighlightsTranslation,
+                            headline: hasHeadlineTranslation ? translated.headline : note.headline,
+                            summary: hasSummaryTranslation ? translated.summary : note.summary,
                             bannerSummary: translated.bannerSummary || note.bannerSummary,
-                            highlights: Array.isArray(translated.highlights) && translated.highlights.length === note.highlights?.length
-                                ? translated.highlights : note.highlights
+                            highlights: hasHighlightsTranslation ? translated.highlights : note.highlights
                         };
                     });
                 }
@@ -3636,6 +3695,14 @@ async function loadReleaseNotesIntoDashboard() {
                 status.className = 'release-note-card__status';
                 status.textContent = localizedCopy('release.current', 'Current');
                 header.appendChild(status);
+            }
+
+            if (note.hasEnglishSourceFallback) {
+                const sourceStatus = document.createElement('span');
+                sourceStatus.className = 'release-note-card__status release-note-card__source-status';
+                sourceStatus.lang = 'en';
+                sourceStatus.textContent = localizedCopy('release.englishSource', 'English source');
+                header.appendChild(sourceStatus);
             }
 
             const title = document.createElement('h4');
@@ -6339,24 +6406,36 @@ document.addEventListener('DOMContentLoaded', async () => {
         const locked = isProfileLocked(profilesV4, profileId);
         const type = getProfileType(profilesV4, profileId);
         if (profileId === 'default') {
-            return locked ? `${name} (Master, locked)` : `${name} (Master)`;
+            return locked
+                ? tabViewUiText('popup.profile.labelMasterLocked', '{name} (Master, locked)', { name })
+                : tabViewUiText('popup.profile.labelMaster', '{name} (Master)', { name });
         }
         if (type === 'account') {
-            return locked ? `${name} (Account, locked)` : `${name} (Account)`;
+            return locked
+                ? tabViewUiText('popup.profile.labelAccountLocked', '{name} (Account, locked)', { name })
+                : tabViewUiText('popup.profile.labelAccount', '{name} (Account)', { name });
         }
-        return locked ? `${name} (Child, locked)` : `${name} (Child)`;
+        return locked
+            ? tabViewUiText('popup.profile.labelChildLocked', '{name} (Child, locked)', { name })
+            : tabViewUiText('popup.profile.labelChild', '{name} (Child)', { name });
     }
 
     function buildProfileSubtitle(profilesV4, profileId) {
         const locked = isProfileLocked(profilesV4, profileId);
         if (profileId === 'default') {
-            return locked ? 'Master • Locked' : 'Master';
+            return locked
+                ? tabViewUiText('popup.profile.subtitleMasterLocked', 'Master • Locked')
+                : tabViewUiText('popup.profile.subtitleMaster', 'Master');
         }
         const type = getProfileType(profilesV4, profileId);
         if (type === 'account') {
-            return locked ? 'Account • Locked' : 'Account';
+            return locked
+                ? tabViewUiText('popup.profile.subtitleAccountLocked', 'Account • Locked')
+                : tabViewUiText('popup.profile.subtitleAccount', 'Account');
         }
-        return locked ? 'Child • Locked' : 'Child';
+        return locked
+            ? tabViewUiText('popup.profile.subtitleChildLocked', 'Child • Locked')
+            : tabViewUiText('popup.profile.subtitleChild', 'Child');
     }
 
     function getProfileViewingAccess(profile) {
@@ -6369,10 +6448,10 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     function viewingAccessLabel(profile) {
         const access = getProfileViewingAccess(profile);
-        if (access.main && access.kids) return 'Main + Kids';
-        if (access.main) return 'Main only';
-        if (access.kids) return 'Kids only';
-        return 'No viewing spaces';
+        if (access.main && access.kids) return tabViewUiText('family.profileManager.access.mainKids', 'Main + Kids');
+        if (access.main) return tabViewUiText('family.profileManager.access.mainOnly', 'Main only');
+        if (access.kids) return tabViewUiText('family.profileManager.access.kidsOnly', 'Kids only');
+        return tabViewUiText('family.profileManager.access.none', 'No viewing spaces');
     }
 
     function normalizeNonNegativeInteger(value) {
@@ -6506,13 +6585,13 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     function managedTimeLimitLabel(profile) {
         const policy = getManagedTimeLimitPolicy(profile);
-        if (!policy || policy.enabled !== true) return 'Off';
+        if (!policy || policy.enabled !== true) return tabViewUiText('family.profileManager.timeLimitOff', 'Off');
         const totalMinutes = Math.floor(policy.dailyBudgetSeconds / 60);
         const hours = Math.floor(totalMinutes / 60);
         const minutes = totalMinutes % 60;
-        if (hours && minutes) return `${hours}h ${minutes}m/day`;
-        if (hours) return `${hours}h/day`;
-        return `${minutes}m/day`;
+        if (hours && minutes) return tabViewUiText('family.profileManager.timeLimit.hoursMinutes', '{hours}h {minutes}m/day', { hours, minutes });
+        if (hours) return tabViewUiText('family.profileManager.timeLimit.hours', '{hours}h/day', { hours });
+        return tabViewUiText('family.profileManager.timeLimit.minutes', '{minutes}m/day', { minutes });
     }
 
     function canActiveProfileManageProfile(profilesV4, targetProfileId) {
@@ -7481,8 +7560,10 @@ document.addEventListener('DOMContentLoaded', async () => {
         const revision = normalizeNonNegativeInteger(root.policyRevision || root.revision);
         const updatedAt = normalizeNonNegativeInteger(root.updatedAt || root.receivedAt || root.issuedAt);
         if (!revision) return '';
-        const suffix = updatedAt ? `, ${new Date(updatedAt).toLocaleDateString()}` : '';
-        return `${label} r${revision}${suffix}`;
+        const suffix = updatedAt
+            ? tabViewUiText('family.profileManager.policyDateSuffix', ', {date}', { date: new Date(updatedAt).toLocaleDateString() })
+            : '';
+        return tabViewUiText('family.profileManager.policyRevision', '{label} r{revision}{dateSuffix}', { label, revision, dateSuffix: suffix });
     }
 
     function summarizeManagedPolicyStateForProfile(profile) {
@@ -7491,7 +7572,12 @@ document.addEventListener('DOMContentLoaded', async () => {
         const remotePolicies = safeObject(managedState.remoteManagedPolicies);
         const remotePolicyConflicts = safeObject(managedState.remotePolicyConflicts);
         const localLabels = ['main', 'kids']
-            .map(scope => managedPolicyRevisionLabel(localEdits[scope], scope === 'kids' ? 'Kids' : 'Main'))
+            .map(scope => managedPolicyRevisionLabel(
+                localEdits[scope],
+                scope === 'kids'
+                    ? tabViewUiText('family.commandCenter.surface.kids', 'Kids')
+                    : tabViewUiText('family.commandCenter.surface.main', 'Main')
+            ))
             .filter(Boolean);
         let remoteLinkCount = 0;
         let remoteScopeCount = 0;
@@ -7572,26 +7658,42 @@ document.addEventListener('DOMContentLoaded', async () => {
         const summary = summarizeManagedPolicyStateForProfile(profile);
         const parts = [];
         if (summary.localLabels.length) {
-            parts.push(`Local edits: ${summary.localLabels.join(', ')}`);
+            parts.push(tabViewUiText('family.profileManager.status.localEdits', 'Local edits: {edits}', { edits: summary.localLabels.join(', ') }));
         }
         if (summary.remoteScopeCount) {
-            const linkLabel = summary.remoteLinkCount === 1 ? 'link' : 'links';
-            const scopeLabel = summary.remoteScopeCount === 1 ? 'scope' : 'scopes';
-            parts.push(`Verified-device policy: ${summary.remoteScopeCount} ${scopeLabel} across ${summary.remoteLinkCount} ${linkLabel}, latest r${summary.latestRemoteRevision}`);
+            const values = { scopeCount: summary.remoteScopeCount, linkCount: summary.remoteLinkCount, revision: summary.latestRemoteRevision };
+            parts.push(summary.remoteScopeCount === 1
+                ? tabViewUiText('family.profileManager.status.oneScope', 'Verified-device policy: {scopeCount} scope across {linkCount} {links}, latest r{revision}', {
+                    ...values,
+                    links: summary.remoteLinkCount === 1
+                        ? tabViewUiText('family.profileManager.status.link', 'link')
+                        : tabViewUiText('family.profileManager.status.links', 'links')
+                })
+                : tabViewUiText('family.profileManager.status.manyScopes', 'Verified-device policy: {scopeCount} scopes across {linkCount} {links}, latest r{revision}', {
+                    ...values,
+                    links: summary.remoteLinkCount === 1
+                        ? tabViewUiText('family.profileManager.status.link', 'link')
+                        : tabViewUiText('family.profileManager.status.links', 'links')
+                }));
         }
         if (summary.historyRowCount) {
-            const rowLabel = summary.historyRowCount === 1 ? 'row' : 'rows';
-            const latest = summary.latestActionLabel
-                ? `, latest ${summary.latestActionLabel}`
-                : '';
-            parts.push(`History: ${summary.historyRowCount} ${rowLabel}, ${summary.protectedRowCount} protected${latest}`);
+            const values = {
+                rowCount: summary.historyRowCount,
+                protectedCount: summary.protectedRowCount,
+                latest: summary.latestActionLabel
+                    ? tabViewUiText('family.profileManager.status.latestAction', ', latest {action}', { action: summary.latestActionLabel })
+                    : ''
+            };
+            parts.push(summary.historyRowCount === 1
+                ? tabViewUiText('family.profileManager.status.oneHistoryRow', 'History: {rowCount} row, {protectedCount} protected{latest}', values)
+                : tabViewUiText('family.profileManager.status.manyHistoryRows', 'History: {rowCount} rows, {protectedCount} protected{latest}', values));
         }
         if (summary.remoteConflictCount) {
-            parts.push(`Policy conflicts: ${summary.remoteConflictCount}`);
+            parts.push(tabViewUiText('family.profileManager.status.conflicts', 'Policy conflicts: {count}', { count: summary.remoteConflictCount }));
         }
         return parts.length
-            ? `Managed status: ${parts.join(' | ')}`
-            : 'Managed status: no parent-managed policy revisions yet.';
+            ? tabViewUiText('family.profileManager.status.summary', 'Managed status: {details}', { details: parts.join(' | ') })
+            : tabViewUiText('family.profileManager.status.noPolicy', 'Managed status: no parent-managed policy revisions yet.');
     }
 
     async function showManagedActionHistory(profileId, options = {}) {
@@ -23836,7 +23938,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         if (activeProfileId !== 'default') {
             ftExportActiveOnly.checked = true;
             ftExportActiveOnly.disabled = true;
-            ftExportActiveOnly.title = 'Only the Default (Master) profile can export all profiles.';
+            ftExportActiveOnly.title = tabViewUiText('family.profileManager.exportAllProfilesHelp', 'Only the Default (Master) profile can export all profiles.');
         } else {
             ftExportActiveOnly.disabled = false;
             ftExportActiveOnly.title = '';
@@ -23908,7 +24010,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         const root = safeObject(profilesV4);
         const profiles = safeObject(root.profiles);
         const childAdminRestricted = isChildProfileAdminSurface();
-        const childAdminTitle = 'Protected profiles cannot manage profile names, deletion, PIN rules, viewing spaces, time limits, or profile switching PINs from this surface.';
+        const childAdminTitle = tabViewUiText('family.profileManager.childAdminRestrictedHelp', 'Protected profiles cannot manage profile names, deletion, PIN rules, viewing spaces, time limits, or profile switching PINs from this surface.');
 
         ftProfilesManager.innerHTML = '';
 
@@ -23943,13 +24045,13 @@ document.addEventListener('DOMContentLoaded', async () => {
                         if (ftCreateChildBtn && !ftCreateChildBtn.disabled) {
                             ftCreateChildBtn.click();
                         } else {
-                            UIComponents.showToast('Switch to a parent/account profile to create a protected profile', 'error');
+                            UIComponents.showToast(tabViewUiText('family.profileManager.switchParentToCreateProtected', 'Switch to a parent/account profile to create a protected profile'), 'error');
                         }
                     } else if (action === 'create_account') {
                         if (ftCreateAccountBtn && !ftCreateAccountBtn.disabled) {
                             ftCreateAccountBtn.click();
                         } else {
-                            UIComponents.showToast('Switch to Default to create an account profile', 'error');
+                            UIComponents.showToast(tabViewUiText('family.profileManager.switchDefaultToCreateAccount', 'Switch to Default to create an account profile'), 'error');
                         }
                     } else if (!targetId && !action.startsWith('bulk_')) {
                         return;
@@ -23965,7 +24067,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                         }
                         setNanahMode('parent_control', { persist: true, applyPreset: true });
                         focusFamilyDeviceUpdatesCard();
-                        UIComponents.showToast('Pair the protected device here, then save parent trust after both devices confirm the same phrase.', 'info');
+                        UIComponents.showToast(tabViewUiText('family.profileManager.pairDeviceToast', 'Pair the protected device here, then save parent trust after both devices confirm the same phrase.'), 'info');
                     } else if (action === 'set_time_limit' || action === 'change_time_limit') {
                         await updateProfileTimeLimitPolicy(targetId, 'set');
                     } else if (action === 'grant_extra_time') {
@@ -23982,7 +24084,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                             .map(id => normalizeString(id))
                             .filter(Boolean);
                         if (profileIds.length !== 1) {
-                            UIComponents.showToast('Select one protected profile to edit rules from the command center.', 'info');
+                            UIComponents.showToast(tabViewUiText('family.profileManager.selectOneToEditRules', 'Select one protected profile to edit rules from the command center.'), 'info');
                             return;
                         }
                         await startManagedChildEdit(profileIds[0]);
@@ -24042,7 +24144,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                 headerRow.className = 'help-item ft-profile-group-header';
                 const title = document.createElement('div');
                 title.className = 'help-item-title';
-                title.textContent = `Account: ${getProfileName(profilesV4, accountId)}`;
+                title.textContent = tabViewUiText('family.profileManager.accountHeading', 'Account: {name}', { name: getProfileName(profilesV4, accountId) });
                 headerRow.appendChild(title);
                 ftProfilesManager.appendChild(headerRow);
             }
@@ -24062,7 +24164,10 @@ document.addEventListener('DOMContentLoaded', async () => {
 
             const body = document.createElement('div');
             body.className = 'help-item-body';
-            body.textContent = `Viewing access: ${viewingAccessLabel(profiles[profileId])} | Time limit: ${managedTimeLimitLabel(profiles[profileId])}`;
+            body.textContent = tabViewUiText('family.profileManager.accessAndTime', 'Viewing access: {access} | Time limit: {limit}', {
+                access: viewingAccessLabel(profiles[profileId]),
+                limit: managedTimeLimitLabel(profiles[profileId])
+            });
             const canManageTarget = canActiveProfileManageProfile(profilesV4, profileId);
             const managedStatusText = profileId !== 'default'
                 ? buildManagedProfileStatusText(profiles[profileId], { revealDetails: canManageTarget && !childAdminRestricted })
@@ -24084,7 +24189,9 @@ document.addEventListener('DOMContentLoaded', async () => {
             const switchBtn = document.createElement('button');
             switchBtn.className = 'btn-secondary';
             switchBtn.type = 'button';
-            switchBtn.textContent = profileId === activeProfileId ? 'Active' : 'Switch';
+            switchBtn.textContent = profileId === activeProfileId
+                ? tabViewUiText('family.profileManager.active', 'Active')
+                : tabViewUiText('family.profileManager.switch', 'Switch');
             switchBtn.disabled = profileId === activeProfileId;
             switchBtn.addEventListener('click', async () => {
                 if (ftProfileSelector) {
@@ -24096,12 +24203,12 @@ document.addEventListener('DOMContentLoaded', async () => {
             const renameBtn = document.createElement('button');
             renameBtn.className = 'btn-secondary';
             renameBtn.type = 'button';
-            renameBtn.textContent = 'Rename';
+            renameBtn.textContent = tabViewUiText('family.profileManager.rename', 'Rename');
             renameBtn.disabled = childAdminRestricted;
             renameBtn.title = childAdminRestricted ? childAdminTitle : '';
             renameBtn.addEventListener('click', async () => {
                 if (childAdminRestricted) {
-                    UIComponents.showToast('Protected profiles cannot rename profiles here', 'error');
+                    UIComponents.showToast(tabViewUiText('family.profileManager.cannotRenameHere', 'Protected profiles cannot rename profiles here'), 'error');
                     return;
                 }
                 const io = window.FilterTubeIO || {};
@@ -24109,7 +24216,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                 const fresh = await io.loadProfilesV4();
                 const currentActive = normalizeString(fresh?.activeProfileId) || 'default';
                 if (currentActive !== 'default' && currentActive !== profileId) {
-                    UIComponents.showToast('Switch to this profile (or Default) to rename it', 'error');
+                    UIComponents.showToast(tabViewUiText('family.profileManager.switchToRename', 'Switch to this profile (or Default) to rename it'), 'error');
                     return;
                 }
                 if (currentActive === 'default') {
@@ -24122,11 +24229,11 @@ document.addEventListener('DOMContentLoaded', async () => {
 
                 const currentName = getProfileName(fresh, profileId);
                 const nextNameRaw = await showPromptModal({
-                    title: 'Rename Profile',
-                    message: 'Enter a new profile name.',
-                    placeholder: 'Profile name',
+                    title: tabViewUiText('family.profileManager.renameTitle', 'Rename Profile'),
+                    message: tabViewUiText('family.profileManager.renamePrompt', 'Enter a new profile name.'),
+                    placeholder: tabViewUiText('family.profileManager.profileNamePlaceholder', 'Profile name'),
                     inputType: 'text',
-                    confirmText: 'Save',
+                    confirmText: tabViewUiText('dashboard.modal.save', 'Save'),
                     initialValue: currentName
                 });
                 const nextName = normalizeString(nextNameRaw);
@@ -24141,18 +24248,18 @@ document.addEventListener('DOMContentLoaded', async () => {
                     profiles
                 });
                 await refreshProfilesUI();
-                UIComponents.showToast('Profile updated', 'success');
+                    UIComponents.showToast(tabViewUiText('family.profileManager.profileUpdated', 'Profile updated'), 'success');
             });
 
             const deleteBtn = document.createElement('button');
             deleteBtn.className = 'btn-secondary btn-danger';
             deleteBtn.type = 'button';
-            deleteBtn.textContent = 'Delete';
+            deleteBtn.textContent = tabViewUiText('family.profileManager.delete', 'Delete');
             deleteBtn.disabled = profileId === 'default' || childAdminRestricted;
             deleteBtn.title = childAdminRestricted ? childAdminTitle : '';
             deleteBtn.addEventListener('click', async () => {
                 if (childAdminRestricted) {
-                    UIComponents.showToast('Protected profiles cannot delete profiles here', 'error');
+                    UIComponents.showToast(tabViewUiText('family.profileManager.cannotDeleteHere', 'Protected profiles cannot delete profiles here'), 'error');
                     return;
                 }
                 if (profileId === 'default') return;
@@ -24161,7 +24268,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                 const fresh = await io.loadProfilesV4();
                 const currentActive = normalizeString(fresh?.activeProfileId) || 'default';
                 if (currentActive !== 'default' && currentActive !== profileId) {
-                    UIComponents.showToast('Switch to this profile (or Default) to delete it', 'error');
+                    UIComponents.showToast(tabViewUiText('family.profileManager.switchToDelete', 'Switch to this profile (or Default) to delete it'), 'error');
                     return;
                 }
                 if (currentActive === 'default') {
@@ -24171,7 +24278,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                     const okSelf = await ensureProfileUnlocked(fresh, profileId);
                     if (!okSelf) return;
                 }
-                const confirmed = window.confirm('Delete this profile? This cannot be undone.');
+                const confirmed = window.confirm(tabViewUiText('family.profileManager.deleteConfirm', 'Delete this profile? This cannot be undone.'));
                 if (!confirmed) return;
 
                 const profiles = safeObject(fresh.profiles);
@@ -24189,7 +24296,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                 await StateManager.loadSettings();
                 await refreshProfilesUI();
                 await applyLockGateIfNeeded();
-                UIComponents.showToast('Profile deleted', 'success');
+                UIComponents.showToast(tabViewUiText('family.profileManager.profileDeleted', 'Profile deleted'), 'success');
             });
 
             actions.appendChild(switchBtn);
@@ -24200,12 +24307,14 @@ document.addEventListener('DOMContentLoaded', async () => {
             const mainAccessBtn = document.createElement('button');
             mainAccessBtn.className = access.main ? 'btn-primary' : 'btn-secondary';
             mainAccessBtn.type = 'button';
-            mainAccessBtn.textContent = access.main ? 'Main allowed' : 'Main blocked';
+            mainAccessBtn.textContent = access.main
+                ? tabViewUiText('family.profileManager.mainAllowed', 'Main allowed')
+                : tabViewUiText('family.profileManager.mainBlocked', 'Main blocked');
             mainAccessBtn.disabled = childAdminRestricted;
-            mainAccessBtn.title = childAdminRestricted ? childAdminTitle : 'Toggle whether this profile can open Main YouTube.';
+            mainAccessBtn.title = childAdminRestricted ? childAdminTitle : tabViewUiText('family.profileManager.toggleMainHelp', 'Toggle whether this profile can open Main YouTube.');
             mainAccessBtn.addEventListener('click', async () => {
                 if (childAdminRestricted) {
-                    UIComponents.showToast('Protected profiles cannot change viewing access here', 'error');
+                    UIComponents.showToast(tabViewUiText('family.profileManager.cannotChangeAccessHere', 'Protected profiles cannot change viewing access here'), 'error');
                     return;
                 }
                 await updateProfileViewingAccess(profileId, { main: !access.main });
@@ -24214,12 +24323,14 @@ document.addEventListener('DOMContentLoaded', async () => {
             const kidsAccessBtn = document.createElement('button');
             kidsAccessBtn.className = access.kids ? 'btn-primary' : 'btn-secondary';
             kidsAccessBtn.type = 'button';
-            kidsAccessBtn.textContent = access.kids ? 'Kids allowed' : 'Kids blocked';
+            kidsAccessBtn.textContent = access.kids
+                ? tabViewUiText('family.profileManager.kidsAllowed', 'Kids allowed')
+                : tabViewUiText('family.profileManager.kidsBlocked', 'Kids blocked');
             kidsAccessBtn.disabled = childAdminRestricted;
-            kidsAccessBtn.title = childAdminRestricted ? childAdminTitle : 'Toggle whether this profile can open YouTube Kids.';
+            kidsAccessBtn.title = childAdminRestricted ? childAdminTitle : tabViewUiText('family.profileManager.toggleKidsHelp', 'Toggle whether this profile can open YouTube Kids.');
             kidsAccessBtn.addEventListener('click', async () => {
                 if (childAdminRestricted) {
-                    UIComponents.showToast('Protected profiles cannot change viewing access here', 'error');
+                    UIComponents.showToast(tabViewUiText('family.profileManager.cannotChangeAccessHere', 'Protected profiles cannot change viewing access here'), 'error');
                     return;
                 }
                 await updateProfileViewingAccess(profileId, { kids: !access.kids });
@@ -24232,12 +24343,14 @@ document.addEventListener('DOMContentLoaded', async () => {
             const timeLimitBtn = document.createElement('button');
             timeLimitBtn.className = timeLimitPolicy?.enabled ? 'btn-primary' : 'btn-secondary';
             timeLimitBtn.type = 'button';
-            timeLimitBtn.textContent = timeLimitPolicy?.enabled ? 'Change limit' : 'Set limit';
+            timeLimitBtn.textContent = timeLimitPolicy?.enabled
+                ? tabViewUiText('family.profileManager.changeLimit', 'Change limit')
+                : tabViewUiText('family.profileManager.setLimit', 'Set limit');
             timeLimitBtn.disabled = childAdminRestricted;
-            timeLimitBtn.title = childAdminRestricted ? childAdminTitle : 'Set the daily YouTube time limit for this profile.';
+            timeLimitBtn.title = childAdminRestricted ? childAdminTitle : tabViewUiText('family.profileManager.setDailyLimitHelp', 'Set the daily YouTube time limit for this profile.');
             timeLimitBtn.addEventListener('click', async () => {
                 if (childAdminRestricted) {
-                    UIComponents.showToast('Protected profiles cannot change time limits here', 'error');
+                    UIComponents.showToast(tabViewUiText('family.profileManager.cannotChangeTimeHere', 'Protected profiles cannot change time limits here'), 'error');
                     return;
                 }
                 await updateProfileTimeLimitPolicy(profileId, 'set');
@@ -24248,12 +24361,12 @@ document.addEventListener('DOMContentLoaded', async () => {
                 const disableTimeLimitBtn = document.createElement('button');
                 disableTimeLimitBtn.className = 'btn-secondary';
                 disableTimeLimitBtn.type = 'button';
-                disableTimeLimitBtn.textContent = 'Disable limit';
+                disableTimeLimitBtn.textContent = tabViewUiText('family.profileManager.disableLimit', 'Disable limit');
                 disableTimeLimitBtn.disabled = childAdminRestricted;
-                disableTimeLimitBtn.title = childAdminRestricted ? childAdminTitle : 'Disable the daily YouTube time limit for this profile.';
+                disableTimeLimitBtn.title = childAdminRestricted ? childAdminTitle : tabViewUiText('family.profileManager.disableDailyLimitHelp', 'Disable the daily YouTube time limit for this profile.');
                 disableTimeLimitBtn.addEventListener('click', async () => {
                     if (childAdminRestricted) {
-                        UIComponents.showToast('Protected profiles cannot change time limits here', 'error');
+                        UIComponents.showToast(tabViewUiText('family.profileManager.cannotChangeTimeHere', 'Protected profiles cannot change time limits here'), 'error');
                         return;
                     }
                     await updateProfileTimeLimitPolicy(profileId, 'disable');
@@ -24265,8 +24378,8 @@ document.addEventListener('DOMContentLoaded', async () => {
                 const editRulesBtn = document.createElement('button');
                 editRulesBtn.className = 'btn-secondary btn-profile-main';
                 editRulesBtn.type = 'button';
-                editRulesBtn.textContent = 'Edit Rules';
-                editRulesBtn.title = 'Enter parent-managed edit mode without switching into this protected profile.';
+                editRulesBtn.textContent = tabViewUiText('family.profileManager.editRules', 'Edit Rules');
+                editRulesBtn.title = tabViewUiText('family.profileManager.editRulesHelp', 'Enter parent-managed edit mode without switching into this protected profile.');
                 editRulesBtn.addEventListener('click', async () => {
                     await startManagedChildEdit(profileId);
                 });
@@ -24276,8 +24389,8 @@ document.addEventListener('DOMContentLoaded', async () => {
                 const historyBtn = document.createElement('button');
                 historyBtn.className = 'btn-secondary';
                 historyBtn.type = 'button';
-                historyBtn.textContent = 'History';
-                historyBtn.title = 'View protected parent-managed action history for this profile.';
+                historyBtn.textContent = tabViewUiText('family.profileManager.history', 'History');
+                historyBtn.title = tabViewUiText('family.profileManager.historyHelp', 'View protected parent-managed action history for this profile.');
                 historyBtn.addEventListener('click', async () => {
                     await showManagedActionHistory(profileId);
                 });
@@ -24295,10 +24408,10 @@ document.addEventListener('DOMContentLoaded', async () => {
                 pinBtn.disabled = childAdminRestricted;
                 pinBtn.title = childAdminRestricted
                     ? childAdminTitle
-                    : 'Set the profile switching PIN. This protects entry into this profile; it does not grant parent/admin authority.';
+                    : tabViewUiText('family.profileManager.setProfilePinHelp', 'Set the profile switching PIN. This protects entry into this profile; it does not grant parent/admin authority.');
                 pinBtn.addEventListener('click', async () => {
                     if (childAdminRestricted) {
-                        UIComponents.showToast('Protected profiles cannot manage profile switching PINs here', 'error');
+                        UIComponents.showToast(tabViewUiText('family.profileManager.cannotManagePinHere', 'Protected profiles cannot manage profile switching PINs here'), 'error');
                         return;
                     }
                     const io = window.FilterTubeIO || {};
@@ -24310,7 +24423,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                         || currentActive === profileId
                         || canActiveProfileManageProfile(fresh, profileId);
                     if (!canManagePin) {
-                        UIComponents.showToast('Switch to the parent/account profile to manage this profile PIN', 'error');
+                        UIComponents.showToast(tabViewUiText('family.profileManager.switchParentToManagePin', 'Switch to the parent/account profile to manage this profile PIN'), 'error');
                         return;
                     }
 
@@ -24330,7 +24443,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                         message: tabViewUiText('dashboard.pin.profilePrompt', 'Enter the PIN used only for switching into this profile. Parent/admin authority stays separate.'),
                         placeholder: tabViewUiText('dashboard.pin.profilePlaceholder', 'Profile switching PIN'),
                         inputType: 'password',
-                        confirmText: 'Continue'
+                        confirmText: tabViewUiText('dashboard.modal.continue', 'Continue')
                     });
                     if (pin1 === null) return;
                     const pin2 = await showPromptModal({
@@ -24338,7 +24451,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                         message: tabViewUiText('dashboard.pin.profileConfirmPrompt', 'Re-enter the profile switching PIN to confirm.'),
                         placeholder: tabViewUiText('dashboard.pin.profilePlaceholder', 'Profile switching PIN'),
                         inputType: 'password',
-                        confirmText: 'Save'
+                        confirmText: tabViewUiText('dashboard.modal.save', 'Save')
                     });
                     if (pin2 === null) return;
                     if (normalizeString(pin1) !== normalizeString(pin2) || !normalizeString(pin1)) {
@@ -24380,10 +24493,10 @@ document.addEventListener('DOMContentLoaded', async () => {
                 clearPinBtn.disabled = !isProfileLocked(profilesV4, profileId) || childAdminRestricted;
                 clearPinBtn.title = childAdminRestricted
                     ? childAdminTitle
-                    : 'Remove the profile switching PIN. Parent/admin authority is not changed.';
+                    : tabViewUiText('family.profileManager.removeProfilePinHelp', 'Remove the profile switching PIN. Parent/admin authority is not changed.');
                 clearPinBtn.addEventListener('click', async () => {
                     if (childAdminRestricted) {
-                        UIComponents.showToast('Protected profiles cannot manage profile switching PINs here', 'error');
+                        UIComponents.showToast(tabViewUiText('family.profileManager.cannotManagePinHere', 'Protected profiles cannot manage profile switching PINs here'), 'error');
                         return;
                     }
                     const io = window.FilterTubeIO || {};
@@ -24395,7 +24508,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                         || currentActive === profileId
                         || canActiveProfileManageProfile(fresh, profileId);
                     if (!canManagePin) {
-                        UIComponents.showToast('Switch to the parent/account profile to manage this profile PIN', 'error');
+                        UIComponents.showToast(tabViewUiText('family.profileManager.switchParentToManagePin', 'Switch to the parent/account profile to manage this profile PIN'), 'error');
                         return;
                     }
 
@@ -24409,7 +24522,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                         const okParent = await ensureProfileUnlocked(fresh, currentActive, { sensitiveAction: true });
                         if (!okParent) return;
                     }
-                    const confirmed = window.confirm('Remove the profile switching PIN?');
+                    const confirmed = window.confirm(tabViewUiText('family.profileManager.removePinConfirm', 'Remove the profile switching PIN?'));
                     if (!confirmed) return;
 
                     const profiles = safeObject(fresh.profiles);
@@ -24471,7 +24584,9 @@ document.addEventListener('DOMContentLoaded', async () => {
     async function switchToProfile(nextProfileId) {
         if (isHandlingProfileSwitch) return;
         if (isSelfControlSessionActive()) {
-            UIComponents.showToast(`Profile switching is locked for ${formatSelfControlRemaining(selfControlSessionState.remainingSeconds)}`, 'error');
+            UIComponents.showToast(tabViewUiText('family.profileManager.switchingLocked', 'Profile switching is locked for {remaining}', {
+                remaining: formatSelfControlRemaining(selfControlSessionState.remainingSeconds)
+            }), 'error');
             return;
         }
         const targetId = normalizeString(nextProfileId);
@@ -24481,13 +24596,13 @@ document.addEventListener('DOMContentLoaded', async () => {
         try {
             const io = window.FilterTubeIO || {};
             if (typeof io.loadProfilesV4 !== 'function' || typeof io.saveProfilesV4 !== 'function') {
-                UIComponents.showToast('Profiles unavailable', 'error');
+                UIComponents.showToast(tabViewUiText('popup.profile.unavailable', 'Profiles unavailable'), 'error');
                 return;
             }
             const profilesV4 = await io.loadProfilesV4();
             const profiles = safeObject(profilesV4?.profiles);
             if (!profiles[targetId]) {
-                UIComponents.showToast('Profile not found', 'error');
+                UIComponents.showToast(tabViewUiText('popup.profile.notFound', 'Profile not found'), 'error');
                 return;
             }
 
@@ -24510,10 +24625,10 @@ document.addEventListener('DOMContentLoaded', async () => {
             await refreshProfilesUI();
             void runNanahManagedBackgroundSync({ reason: 'profile_switch' });
             updateStats();
-            UIComponents.showToast('Profile switched', 'success');
+            UIComponents.showToast(tabViewUiText('popup.profile.switched', 'Profile switched'), 'success');
         } catch (e) {
             console.warn('Tab-View: profile switch failed', e);
-            UIComponents.showToast('Failed to switch profile', 'error');
+            UIComponents.showToast(tabViewUiText('popup.profile.switchFailed', 'Failed to switch profile'), 'error');
         } finally {
             isHandlingProfileSwitch = false;
         }
@@ -26719,14 +26834,25 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     function keywordDateFilterLabel(value) {
         const filter = normalizeKeywordDateFilterForEditor(value);
-        if (!filter.enabled) return 'No date limit';
-        if (filter.condition === 'before') return `On or before ${filter.toDate}`;
-        if (filter.condition === 'between') {
-            if (filter.fromDate && filter.toDate) return `${filter.fromDate} to ${filter.toDate}`;
-            if (filter.fromDate) return `On or after ${filter.fromDate}`;
-            if (filter.toDate) return `On or before ${filter.toDate}`;
+        if (!filter.enabled) return tabViewUiText('dashboard.ruleEditor.dateLimitNone', 'No date limit');
+        if (filter.condition === 'before') {
+            return tabViewUiText('dashboard.ruleEditor.dateLimitOnOrBefore', 'On or before {date}', { date: filter.toDate });
         }
-        return `On or after ${filter.fromDate}`;
+        if (filter.condition === 'between') {
+            if (filter.fromDate && filter.toDate) {
+                return tabViewUiText('dashboard.ruleEditor.dateLimitBetween', '{fromDate} to {toDate}', {
+                    fromDate: filter.fromDate,
+                    toDate: filter.toDate
+                });
+            }
+            if (filter.fromDate) {
+                return tabViewUiText('dashboard.ruleEditor.dateLimitOnOrAfter', 'On or after {date}', { date: filter.fromDate });
+            }
+            if (filter.toDate) {
+                return tabViewUiText('dashboard.ruleEditor.dateLimitOnOrBefore', 'On or before {date}', { date: filter.toDate });
+            }
+        }
+        return tabViewUiText('dashboard.ruleEditor.dateLimitOnOrAfter', 'On or after {date}', { date: filter.fromDate });
     }
 
     async function updateManagedKeywordDateFilter(surface, entry, dateFilter, targetList = '') {
@@ -26766,13 +26892,18 @@ document.addEventListener('DOMContentLoaded', async () => {
 
         if (ok) {
             UIComponents.showToast(normalized.enabled
-                ? `Date limit saved: ${keywordDateFilterLabel(normalized)}`
-                : 'Keyword date limit turned off', 'success');
+                ? tabViewUiText('dashboard.ruleEditor.dateLimitSaved', 'Date limit saved: {dateLimit}', {
+                    dateLimit: keywordDateFilterLabel(normalized)
+                })
+                : tabViewUiText('dashboard.ruleEditor.dateLimitTurnedOff', 'Keyword date limit turned off'), 'success');
             if (surface === 'kids') renderKidsKeywords();
             else renderKeywords();
             renderManagedChildEditorBanner();
         } else {
-            UIComponents.showToast('Could not update this keyword date limit', 'error');
+            UIComponents.showToast(tabViewUiText(
+                'dashboard.ruleEditor.dateLimitUpdateFailed',
+                'Could not update this keyword date limit'
+            ), 'error');
         }
         return ok;
     }
@@ -26792,7 +26923,13 @@ document.addEventListener('DOMContentLoaded', async () => {
             header.className = 'card-header';
             const title = document.createElement('h3');
             title.className = 'ft-modal-title';
-            title.textContent = `Date limit for "${normalizeString(entry.word)}"`;
+            setTabViewLocalizedCopy(
+                title,
+                'textContent',
+                'dashboard.ruleEditor.dateLimitTitle',
+                'Date limit for "{word}"',
+                { word: normalizeString(entry.word) }
+            );
             header.appendChild(title);
 
             const body = document.createElement('div');
@@ -26800,23 +26937,33 @@ document.addEventListener('DOMContentLoaded', async () => {
 
             const intro = document.createElement('p');
             intro.className = 'keyword-date-filter-modal__intro';
-            intro.textContent = 'Use this only when a word should affect videos from a certain upload date. If YouTube does not show a date for a video, this date-limited keyword will not hide it by itself.';
+            setTabViewLocalizedCopy(
+                intro,
+                'textContent',
+                'dashboard.ruleEditor.dateLimitIntro',
+                'Use this only when a word should affect videos from a certain upload date. If YouTube does not show a date for a video, this date-limited keyword will not hide it by itself.'
+            );
             body.appendChild(intro);
 
             const conditionLabel = document.createElement('label');
             conditionLabel.className = 'keyword-date-filter-modal__field';
             const conditionText = document.createElement('span');
-            conditionText.textContent = 'When should this keyword apply?';
+            setTabViewLocalizedCopy(
+                conditionText,
+                'textContent',
+                'dashboard.ruleEditor.dateLimitConditionLabel',
+                'When should this keyword apply?'
+            );
             const conditionSelect = document.createElement('select');
             conditionSelect.className = 'select-input';
             [
-                ['after', 'Released on or after'],
-                ['before', 'Released on or before'],
-                ['between', 'Released between']
-            ].forEach(([value, label]) => {
+                ['after', 'dashboard.ruleEditor.dateLimitReleasedAfter', 'Released on or after'],
+                ['before', 'dashboard.ruleEditor.dateLimitReleasedBefore', 'Released on or before'],
+                ['between', 'dashboard.ruleEditor.dateLimitReleasedBetween', 'Released between']
+            ].forEach(([value, key, label]) => {
                 const option = document.createElement('option');
                 option.value = value;
-                option.textContent = label;
+                setTabViewLocalizedCopy(option, 'textContent', key, label);
                 conditionSelect.appendChild(option);
             });
             conditionSelect.value = current.condition;
@@ -26829,7 +26976,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             const fromLabel = document.createElement('label');
             fromLabel.className = 'keyword-date-filter-modal__field';
             const fromText = document.createElement('span');
-            fromText.textContent = 'Start date';
+            setTabViewLocalizedCopy(fromText, 'textContent', 'dashboard.ruleEditor.dateLimitStartDate', 'Start date');
             const fromInput = document.createElement('input');
             fromInput.type = 'date';
             fromInput.className = 'input-field';
@@ -26840,7 +26987,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             const toLabel = document.createElement('label');
             toLabel.className = 'keyword-date-filter-modal__field';
             const toText = document.createElement('span');
-            toText.textContent = 'End date';
+            setTabViewLocalizedCopy(toText, 'textContent', 'dashboard.ruleEditor.dateLimitEndDate', 'End date');
             const toInput = document.createElement('input');
             toInput.type = 'date';
             toInput.className = 'input-field';
@@ -26860,15 +27007,15 @@ document.addEventListener('DOMContentLoaded', async () => {
             const offBtn = document.createElement('button');
             offBtn.type = 'button';
             offBtn.className = 'btn-secondary';
-            offBtn.textContent = 'Turn off';
+            setTabViewLocalizedCopy(offBtn, 'textContent', 'dashboard.ruleEditor.turnOff', 'Turn off');
             const cancelBtn = document.createElement('button');
             cancelBtn.type = 'button';
             cancelBtn.className = 'btn-secondary';
-            cancelBtn.textContent = 'Cancel';
+            setTabViewLocalizedCopy(cancelBtn, 'textContent', 'dashboard.ruleEditor.cancel', 'Cancel');
             const saveBtn = document.createElement('button');
             saveBtn.type = 'button';
             saveBtn.className = 'btn-primary';
-            saveBtn.textContent = 'Save Date Limit';
+            setTabViewLocalizedCopy(saveBtn, 'textContent', 'dashboard.ruleEditor.saveDateLimit', 'Save Date Limit');
             actions.appendChild(offBtn);
             actions.appendChild(cancelBtn);
             actions.appendChild(saveBtn);
@@ -26883,11 +27030,28 @@ document.addEventListener('DOMContentLoaded', async () => {
                 fromLabel.hidden = mode === 'before';
                 toLabel.hidden = mode === 'after';
                 dateGrid.classList.toggle('keyword-date-filter-modal__dates--single', mode !== 'between');
-                hint.textContent = mode === 'after'
-                    ? 'Example: Deltarune after 2025-06-10 blocks newer Deltarune videos only.'
-                    : (mode === 'before'
-                        ? 'Use this when only older videos should be affected by this keyword.'
-                        : 'Use this when only videos inside one release window should be affected.');
+                if (mode === 'after') {
+                    setTabViewLocalizedCopy(
+                        hint,
+                        'textContent',
+                        'dashboard.ruleEditor.dateLimitAfterHint',
+                        'Example: Deltarune after 2025-06-10 blocks newer Deltarune videos only.'
+                    );
+                } else if (mode === 'before') {
+                    setTabViewLocalizedCopy(
+                        hint,
+                        'textContent',
+                        'dashboard.ruleEditor.dateLimitBeforeHint',
+                        'Use this when only older videos should be affected by this keyword.'
+                    );
+                } else {
+                    setTabViewLocalizedCopy(
+                        hint,
+                        'textContent',
+                        'dashboard.ruleEditor.dateLimitBetweenHint',
+                        'Use this when only videos inside one release window should be affected.'
+                    );
+                }
             };
 
             conditionSelect.addEventListener('change', updateVisibility);
@@ -26907,7 +27071,10 @@ document.addEventListener('DOMContentLoaded', async () => {
                     toDate: toInput.value
                 });
                 if (!next.enabled) {
-                    UIComponents.showToast('Pick the date needed for this keyword limit', 'error');
+                    UIComponents.showToast(tabViewUiText(
+                        'dashboard.ruleEditor.dateLimitRequired',
+                        'Pick the date needed for this keyword limit'
+                    ), 'error');
                     return;
                 }
                 const ok = await saveKeywordDateFilter(surface, entry, next);
@@ -26930,7 +27097,10 @@ document.addEventListener('DOMContentLoaded', async () => {
             const list = Array.isArray(target[listKey]) ? target[listKey] : [];
             const channel = normalizeProfileChannel(input);
             if (!channel) {
-                UIComponents.showToast('Invalid format. Use @handle, Channel ID, c/ChannelName, or YouTube URL', 'error');
+                UIComponents.showToast(tabViewUiText(
+                    'dashboard.ruleEditor.invalidChannelFormat',
+                    'Invalid format. Use @handle, Channel ID, c/ChannelName, or YouTube URL'
+                ), 'error');
                 return false;
             }
             const key = normalizeString(channel.id || channel.handle || channel.customUrl || channel.name).toLowerCase();
@@ -26939,7 +27109,32 @@ document.addEventListener('DOMContentLoaded', async () => {
             target[listKey] = [channel, ...list];
             return true;
         });
-        return ok ? { success: true } : { success: false, error: 'Channel already exists or could not be added' };
+        return ok
+            ? { success: true }
+            : {
+                success: false,
+                error: tabViewUiText(
+                    'dashboard.ruleEditor.channelExistsOrAddFailed',
+                    'Channel already exists or could not be added'
+                )
+            };
+    }
+
+    function channelAddErrorText(error) {
+        const message = normalizeString(error);
+        if (message.startsWith('Invalid format. Use @handle, Channel ID,')) {
+            return tabViewUiText(
+                'dashboard.ruleEditor.invalidChannelFormat',
+                'Invalid format. Use @handle, Channel ID, c/ChannelName, or YouTube URL'
+            );
+        }
+        if (message === 'Channel already exists or could not be added') {
+            return tabViewUiText(
+                'dashboard.ruleEditor.channelExistsOrAddFailed',
+                'Channel already exists or could not be added'
+            );
+        }
+        return message || tabViewUiText('dashboard.ruleEditor.addChannelFailed', 'Failed to add channel');
     }
 
     async function removeManagedChannel(surface, channel, index, targetList = '') {
@@ -27013,29 +27208,76 @@ document.addEventListener('DOMContentLoaded', async () => {
         if (valueEl) valueEl.value = normalized;
         tabs.forEach(tab => {
             const active = tab.dataset.ruleTarget === normalized;
-            tab.textContent = tab.dataset.ruleTarget === 'allow'
-                ? `Allowed rules (${allowedCount})`
-                : `Blocked rules (${blockedCount})`;
+            const isAllowed = tab.dataset.ruleTarget === 'allow';
+            setTabViewLocalizedCopy(
+                tab,
+                'textContent',
+                isAllowed ? 'dashboard.ruleEditor.allowedRulesCount' : 'dashboard.ruleEditor.blockedRulesCount',
+                isAllowed ? 'Allowed rules ({count})' : 'Blocked rules ({count})',
+                { count: isAllowed ? allowedCount : blockedCount }
+            );
             tab.classList.toggle('is-active', active);
             tab.setAttribute('aria-selected', active ? 'true' : 'false');
             tab.tabIndex = active ? 0 : -1;
         });
         if (isKeyword) {
-            if (help) help.textContent = `Showing ${normalized === 'allow' ? 'allowed' : 'blocked'} keyword rules. Changing this view does not change your Main filtering mode.`;
-            if (input) input.placeholder = normalized === 'allow'
-                ? 'Add a keyword that should keep matching videos visible...'
-                : 'Add a keyword that should hide matching videos...';
+            setTabViewLocalizedCopy(
+                help,
+                'textContent',
+                'dashboard.ruleEditor.mainKeywordListHelp',
+                'Showing {target} keyword rules. Changing this view does not change your Main filtering mode.',
+                () => ({
+                    target: tabViewUiText(
+                        normalized === 'allow' ? 'dashboard.ruleEditor.allowed' : 'dashboard.ruleEditor.blocked',
+                        normalized === 'allow' ? 'allowed' : 'blocked'
+                    )
+                })
+            );
+            setTabViewLocalizedCopy(
+                input,
+                'placeholder',
+                normalized === 'allow' ? 'dashboard.ruleEditor.keywordAllowPlaceholder' : 'dashboard.ruleEditor.keywordBlockPlaceholder',
+                normalized === 'allow'
+                    ? 'Add a keyword that should keep matching videos visible...'
+                    : 'Add a keyword that should hide matching videos...'
+            );
             if (addButton) {
-                addButton.textContent = normalized === 'allow' ? 'Add allowed keyword' : 'Add blocked keyword';
+                setTabViewLocalizedCopy(
+                    addButton,
+                    'textContent',
+                    normalized === 'allow' ? 'dashboard.ruleEditor.addAllowedKeyword' : 'dashboard.ruleEditor.addBlockedKeyword',
+                    normalized === 'allow' ? 'Add allowed keyword' : 'Add blocked keyword'
+                );
                 addButton.dataset.originalText = addButton.textContent;
             }
         } else {
-            if (help) help.textContent = `Showing ${normalized === 'allow' ? 'allowed' : 'blocked'} channel rules. Changing this view does not change your Main filtering mode.`;
-            if (input) input.placeholder = normalized === 'allow'
-                ? 'Add a channel whose videos should remain visible...'
-                : 'Add a channel whose videos should be hidden...';
+            setTabViewLocalizedCopy(
+                help,
+                'textContent',
+                'dashboard.ruleEditor.mainChannelListHelp',
+                'Showing {target} channel rules. Changing this view does not change your Main filtering mode.',
+                () => ({
+                    target: tabViewUiText(
+                        normalized === 'allow' ? 'dashboard.ruleEditor.allowed' : 'dashboard.ruleEditor.blocked',
+                        normalized === 'allow' ? 'allowed' : 'blocked'
+                    )
+                })
+            );
+            setTabViewLocalizedCopy(
+                input,
+                'placeholder',
+                normalized === 'allow' ? 'dashboard.ruleEditor.channelAllowPlaceholder' : 'dashboard.ruleEditor.channelBlockPlaceholder',
+                normalized === 'allow'
+                    ? 'Add a channel whose videos should remain visible...'
+                    : 'Add a channel whose videos should be hidden...'
+            );
             if (addButton) {
-                addButton.textContent = normalized === 'allow' ? 'Add allowed channel' : 'Add blocked channel';
+                setTabViewLocalizedCopy(
+                    addButton,
+                    'textContent',
+                    normalized === 'allow' ? 'dashboard.ruleEditor.addAllowedChannel' : 'dashboard.ruleEditor.addBlockedChannel',
+                    normalized === 'allow' ? 'Add allowed channel' : 'Add blocked channel'
+                );
                 addButton.dataset.originalText = addButton.textContent;
             }
         }
@@ -27060,20 +27302,54 @@ document.addEventListener('DOMContentLoaded', async () => {
         if (valueEl) valueEl.value = normalized;
         tabs.forEach(tab => {
             const active = tab.dataset.ruleTarget === normalized;
-            tab.textContent = tab.dataset.ruleTarget === 'allow'
-                ? `Allowed rules (${allowedCount})`
-                : `Blocked rules (${blockedCount})`;
+            const isAllowed = tab.dataset.ruleTarget === 'allow';
+            setTabViewLocalizedCopy(
+                tab,
+                'textContent',
+                isAllowed ? 'dashboard.ruleEditor.allowedRulesCount' : 'dashboard.ruleEditor.blockedRulesCount',
+                isAllowed ? 'Allowed rules ({count})' : 'Blocked rules ({count})',
+                { count: isAllowed ? allowedCount : blockedCount }
+            );
             tab.classList.toggle('is-active', active);
             tab.setAttribute('aria-selected', active ? 'true' : 'false');
             tab.tabIndex = active ? 0 : -1;
         });
-        const noun = isKeyword ? 'keyword' : 'channel';
-        if (help) help.textContent = `Showing ${normalized === 'allow' ? 'allowed' : 'blocked'} Kids ${noun} rules. Changing this view does not change Kids filtering mode or Main rules.`;
-        if (input) input.placeholder = normalized === 'allow'
-            ? `Add a Kids ${noun} that should remain visible...`
-            : `Add a Kids ${noun} that should be hidden...`;
+        const nounKey = isKeyword ? 'dashboard.ruleEditor.keywordNoun' : 'dashboard.ruleEditor.channelNoun';
+        const noun = tabViewUiText(nounKey, isKeyword ? 'keyword' : 'channel');
+        const targetLabel = tabViewUiText(
+            normalized === 'allow' ? 'dashboard.ruleEditor.allowed' : 'dashboard.ruleEditor.blocked',
+            normalized === 'allow' ? 'allowed' : 'blocked'
+        );
+        setTabViewLocalizedCopy(
+            help,
+            'textContent',
+            'dashboard.ruleEditor.kidsRuleListHelp',
+            'Showing {target} Kids {noun} rules. Changing this view does not change Kids filtering mode or Main rules.',
+            () => ({
+                target: tabViewUiText(
+                    normalized === 'allow' ? 'dashboard.ruleEditor.allowed' : 'dashboard.ruleEditor.blocked',
+                    normalized === 'allow' ? 'allowed' : 'blocked'
+                ),
+                noun: tabViewUiText(nounKey, isKeyword ? 'keyword' : 'channel')
+            })
+        );
+        setTabViewLocalizedCopy(
+            input,
+            'placeholder',
+            isKeyword
+                ? (normalized === 'allow' ? 'dashboard.ruleEditor.kidsKeywordAllowPlaceholder' : 'dashboard.ruleEditor.kidsKeywordBlockPlaceholder')
+                : (normalized === 'allow' ? 'dashboard.ruleEditor.kidsChannelAllowPlaceholder' : 'dashboard.ruleEditor.kidsChannelBlockPlaceholder'),
+            `Add a Kids ${noun} that should ${normalized === 'allow' ? 'remain visible' : 'be hidden'}...`
+        );
         if (addButton) {
-            addButton.textContent = `Add ${normalized === 'allow' ? 'allowed' : 'blocked'} ${noun}`;
+            setTabViewLocalizedCopy(
+                addButton,
+                'textContent',
+                isKeyword
+                    ? (normalized === 'allow' ? 'dashboard.ruleEditor.addAllowedKeyword' : 'dashboard.ruleEditor.addBlockedKeyword')
+                    : (normalized === 'allow' ? 'dashboard.ruleEditor.addAllowedChannel' : 'dashboard.ruleEditor.addBlockedChannel'),
+                `Add ${targetLabel} ${noun}`
+            );
             addButton.dataset.originalText = addButton.textContent;
         }
     }
@@ -27979,7 +28255,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                 });
             if (success) {
                 if (keywordInput) keywordInput.value = '';
-                UIComponents.flashButtonSuccess(addKeywordBtn, 'Added!', 1200);
+                UIComponents.flashButtonSuccess(addKeywordBtn, tabViewUiText('popup.rule.added', 'Added!'), 1200);
             }
         });
     }
@@ -28083,7 +28359,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             if (!input) return;
 
             const originalText = addChannelBtn.textContent;
-            addChannelBtn.textContent = 'Fetching...';
+            setTabViewLocalizedCopy(addChannelBtn, 'textContent', 'dashboard.ruleEditor.fetchingChannel', 'Fetching...');
             addChannelBtn.disabled = true;
 
             try {
@@ -28098,16 +28374,20 @@ document.addEventListener('DOMContentLoaded', async () => {
                     // Reset button text BEFORE flashing success message
                     addChannelBtn.textContent = originalText;
                     addChannelBtn.disabled = false;
-                    UIComponents.flashButtonSuccess(addChannelBtn, 'Added!', 1200);
+                    UIComponents.flashButtonSuccess(addChannelBtn, tabViewUiText('popup.rule.added', 'Added!'), 1200);
                 } else {
                     addChannelBtn.textContent = originalText;
                     addChannelBtn.disabled = false;
-                    UIComponents.showToast(result.error || 'Failed to add channel', 'error');
+                    UIComponents.showToast(channelAddErrorText(result.error), 'error');
                 }
             } catch (error) {
                 addChannelBtn.textContent = originalText;
                 addChannelBtn.disabled = false;
-                UIComponents.showToast('Failed to add channel: ' + error.message, 'error');
+                UIComponents.showToast(tabViewUiText(
+                    'dashboard.ruleEditor.addChannelFailedWithReason',
+                    'Failed to add channel: {message}',
+                    { message: error.message }
+                ), 'error');
             }
         });
     }
@@ -28215,7 +28495,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                 });
             if (success) {
                 if (kidsKeywordInput) kidsKeywordInput.value = '';
-                UIComponents.flashButtonSuccess(kidsAddKeywordBtn, 'Added!', 1200);
+                UIComponents.flashButtonSuccess(kidsAddKeywordBtn, tabViewUiText('popup.rule.added', 'Added!'), 1200);
             }
         });
     }
@@ -28314,9 +28594,9 @@ document.addEventListener('DOMContentLoaded', async () => {
                 });
             if (result.success) {
                 if (kidsChannelInput) kidsChannelInput.value = '';
-                UIComponents.flashButtonSuccess(kidsAddChannelBtn, 'Added!', 1200);
+                UIComponents.flashButtonSuccess(kidsAddChannelBtn, tabViewUiText('popup.rule.added', 'Added!'), 1200);
             } else {
-                UIComponents.showToast(result.error || 'Failed to add channel', 'error');
+                UIComponents.showToast(channelAddErrorText(result.error), 'error');
             }
         });
     }

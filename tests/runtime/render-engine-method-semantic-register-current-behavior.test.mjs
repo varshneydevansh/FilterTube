@@ -530,14 +530,14 @@ test('render engine register pins source fingerprint and broad callable reconcil
   const text = doc();
 
   assert.deepEqual(stats, {
-    bytes: 89274,
-    sha256: 'e8b792200c6cac6afbf727b91172ea048dfff8e3276e3d45d0334c6f3a443ab8',
-    splitLines: 2006,
-    wcLines: 2005
+    bytes: 92333,
+    sha256: '14f7543bcdfe207a28bd389fc18ccfe61a350de1326beb420411c2b470358df9',
+    splitLines: 2064,
+    wcLines: 2063
   });
-  assert.equal(broadRows.length, 170);
+  assert.equal(broadRows.length, 171);
   assert.equal(controlArtifacts, 102);
-  assert.equal(heldOutsideRegister, 17);
+  assert.equal(heldOutsideRegister, 18);
   assert.deepEqual({
     if: broadCounts.if,
     while: broadCounts.while
@@ -547,15 +547,15 @@ test('render engine register pins source fingerprint and broad callable reconcil
   });
 
   for (const expected of [
-    'source split lines: 2006',
-    'source wc -l: 2005',
-    'source bytes: 89274',
-    'source sha256: e8b792200c6cac6afbf727b91172ea048dfff8e3276e3d45d0334c6f3a443ab8',
-    'broad lexical callable matches: 170',
+    'source split lines: 2064',
+    'source wc -l: 2063',
+    'source bytes: 92333',
+    'source sha256: 14f7543bcdfe207a28bd389fc18ccfe61a350de1326beb420411c2b470358df9',
+    'broad lexical callable matches: 171',
     'accepted IIFE-scoped declaration rows: 51',
     'semantic method rows promoted: 51',
     'control-flow lexical artifacts: 102 (`if`: 101, `while`: 1)',
-    'local/render callback declarations held outside this IIFE method register: 17',
+    'local/render callback declarations held outside this IIFE method register: 18',
     'executable current-behavior probes: 10'
   ]) {
     assert.ok(text.includes(expected), `missing source reconciliation line ${expected}`);

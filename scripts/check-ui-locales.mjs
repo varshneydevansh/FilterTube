@@ -93,6 +93,32 @@ const batchDirectory = path.join(directory, 'batches');
 if (fs.existsSync(batchDirectory)) {
     for (const name of fs.readdirSync(batchDirectory).filter(value => value.endsWith('.json'))) {
         const batch = JSON.parse(fs.readFileSync(path.join(batchDirectory, name), 'utf8'));
+        if (!batch.english || !batch.translations) {
+            const draftEnglish = batch.english || (batch.keys ? null : batch);
+            if (draftEnglish) {
+                for (const [key, value] of Object.entries(draftEnglish)) {
+                    if (english[key] !== value) errors.push(`${name}: English source differs for ${key}`);
+                }
+            }
+            if (batch.keys && batch.translations) {
+                for (const [locale, values] of Object.entries(batch.translations)) {
+                    if (!targets.some(target => target.code === locale) || locale === 'en') errors.push(`${name}: unexpected draft locale ${locale}`);
+                    if (!Array.isArray(values) || values.length !== batch.keys.length) {
+                        errors.push(`${name}: incomplete draft ${locale}`);
+                        continue;
+                    }
+                    batch.keys.forEach((key, index) => {
+                        if (!Object.hasOwn(english, key)) errors.push(`${name}: unknown draft key ${key}`);
+                        else if (typeof values[index] !== 'string' || !values[index].trim() ||
+                            placeholders(values[index]) !== placeholders(english[key])) {
+                            errors.push(`${name}: invalid draft ${locale} ${key}`);
+                        }
+                    });
+                }
+            }
+            process.stdout.write(`${name}: draft batch checked; not counted as complete locale coverage\n`);
+            continue;
+        }
         const keys = Object.keys(batch.english || {});
         const expected = targets.map(entry => entry.code).filter(code => code !== 'en').sort();
         if (JSON.stringify(Object.keys(batch.translations || {}).sort()) !== JSON.stringify(expected)) {

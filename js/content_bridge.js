@@ -13,6 +13,30 @@ function filterTubeDebugLog(...args) {
     console.log('FilterTube:', ...args);
 }
 
+function filterTubeContentMenuText(key, fallback, values = {}) {
+    try {
+        const value = window.__filterTubeContentUiCopy?.text?.(key, fallback, values);
+        if (typeof value === 'string' && value.trim()) return value;
+    } catch (_) {
+    }
+    return String(fallback).replace(/\{([a-zA-Z][a-zA-Z0-9]*)\}/g, (match, name) =>
+        Object.prototype.hasOwnProperty.call(values, name) ? String(values[name]) : match);
+}
+
+function filterTubeCollaboratorGroupLabel(count) {
+    return count === 2
+        ? filterTubeContentMenuText('content.menu.bothChannels', 'Both Channels')
+        : filterTubeContentMenuText('content.menu.allCollaborators', 'All {count} Collaborators', { count });
+}
+
+function filterTubeCollaboratorResolvingLabel(name) {
+    return filterTubeContentMenuText(
+        'content.menu.channelResolving',
+        '{name} (resolving…)',
+        { name: name || filterTubeContentMenuText('content.menu.channelFallback', 'Channel') }
+    );
+}
+
 function isFilterTubeNativeOverlayQuietMode() {
     try {
         if (window.__filterTubeNativeOverlayCovered === true) return true;
@@ -613,14 +637,21 @@ function waitForNextFrameDelay(delayMs = 0) {
     });
 }
 
-function injectCollaboratorPlaceholderMenu(newMenuList, oldMenuList, message = 'Fetching collaborators…') {
-    const blockAllMessage = 'Block All (pending…)';
+function injectCollaboratorPlaceholderMenu(
+    newMenuList,
+    oldMenuList,
+    message = filterTubeContentMenuText('content.menu.fetchingCollaborators', 'Fetching collaborators…')
+) {
+    const blockAllMessage = filterTubeContentMenuText('content.menu.blockAllPending', 'Block All (pending…)');
+    const blockLabel = filterTubeContentMenuText('content.menu.block', 'Block');
+    const waitMessage = filterTubeContentMenuText('content.menu.pleaseWait', 'Please wait…');
+    const awaitingMessage = filterTubeContentMenuText('content.menu.awaitingCollaborators', 'Awaiting collaborator list');
     const newStructure = Boolean(newMenuList);
 
     const buildPlaceholderContent = (primaryText, secondaryText) => `
         <div class="filtertube-menu-title-wrapper filtertube-menu-title-wrapper--placeholder">
             <span class="filtertube-menu-title" role="text" style="color:#475569;">
-                <span class="filtertube-menu-label">Block</span>
+                <span class="filtertube-menu-label">${escapeHtml(blockLabel)}</span>
                 <span class="filtertube-menu-separator">•</span>
                 <span class="filtertube-channel-name">${escapeHtml(primaryText)}</span>
                 ${secondaryText ? `<div style="font-size:12px;color:#64748b;margin-top:4px;">${escapeHtml(secondaryText)}</div>` : ''}
@@ -644,8 +675,8 @@ function injectCollaboratorPlaceholderMenu(newMenuList, oldMenuList, message = '
             return item;
         };
 
-        newMenuList.insertBefore(makeItem(message, 'Please wait…'), newMenuList.firstChild);
-        newMenuList.insertBefore(makeItem(blockAllMessage, 'Awaiting collaborator list'), newMenuList.firstChild.nextSibling);
+        newMenuList.insertBefore(makeItem(message, waitMessage), newMenuList.firstChild);
+        newMenuList.insertBefore(makeItem(blockAllMessage, awaitingMessage), newMenuList.firstChild.nextSibling);
     } else if (oldMenuList) {
         const menuList = oldMenuList.querySelector('tp-yt-paper-listbox#items') || oldMenuList.querySelector('tp-yt-paper-listbox') || oldMenuList;
         const isMobileMenu = Boolean(
@@ -673,8 +704,8 @@ function injectCollaboratorPlaceholderMenu(newMenuList, oldMenuList, message = '
             return item;
         };
 
-        menuList.insertBefore(makeItem(message, 'Please wait…'), menuList.firstChild);
-        menuList.insertBefore(makeItem(blockAllMessage, 'Awaiting collaborator list'), menuList.firstChild.nextSibling);
+        menuList.insertBefore(makeItem(message, waitMessage), menuList.firstChild);
+        menuList.insertBefore(makeItem(blockAllMessage, awaitingMessage), menuList.firstChild.nextSibling);
     }
 }
 
@@ -763,19 +794,20 @@ function renderFilterTubeMenuEntries({ dropdown, newMenuList, oldMenuList, chann
                     collaborationGroupId: groupId
                 }, {
                     disabled: !hasIdentifier(collaborator),
-                    displayName: hasIdentifier(collaborator) ? collaborator.name : `${collaborator.name || 'Channel'} (resolving…)`
+                    displayName: hasIdentifier(collaborator) ? collaborator.name : filterTubeCollaboratorResolvingLabel(collaborator.name)
                 });
             }
 
             injectIntoNewMenu(containers.newMenuList, {
-                name: collaboratorCount === 2 ? 'Both Channels' : `All ${collaboratorCount} Collaborators`,
+                name: filterTubeCollaboratorGroupLabel(collaboratorCount),
                 isBlockAllOption: true,
                 allCollaborators: collaborators.slice(0, collaboratorCount),
                 collaborationGroupId: groupId
             }, videoCard, null, {
                 disabled: anyMissingIdentifiers,
-                displayName: anyMissingIdentifiers ? 'All Collaborators (resolving…)'
-                    : (collaboratorCount === 2 ? 'Both Channels' : `All ${collaboratorCount} Collaborators`)
+                displayName: anyMissingIdentifiers
+                    ? filterTubeContentMenuText('content.menu.allCollaboratorsResolving', 'All Collaborators (resolving…)')
+                    : filterTubeCollaboratorGroupLabel(collaboratorCount)
             });
         } else if (containers.oldMenuList) {
             for (let i = 0; i < collaboratorCount; i++) {
@@ -789,19 +821,20 @@ function renderFilterTubeMenuEntries({ dropdown, newMenuList, oldMenuList, chann
                     collaborationGroupId: groupId
                 }, {
                     disabled: !hasIdentifier(collaborator),
-                    displayName: hasIdentifier(collaborator) ? collaborator.name : `${collaborator.name || 'Channel'} (resolving…)`
+                    displayName: hasIdentifier(collaborator) ? collaborator.name : filterTubeCollaboratorResolvingLabel(collaborator.name)
                 });
             }
 
             injectIntoOldMenu(containers.oldMenuList, {
-                name: collaboratorCount === 2 ? 'Both Channels' : `All ${collaboratorCount} Collaborators`,
+                name: filterTubeCollaboratorGroupLabel(collaboratorCount),
                 isBlockAllOption: true,
                 allCollaborators: collaborators.slice(0, collaboratorCount),
                 collaborationGroupId: groupId
             }, videoCard, null, {
                 disabled: anyMissingIdentifiers,
-                displayName: anyMissingIdentifiers ? 'All Collaborators (resolving…)'
-                    : (collaboratorCount === 2 ? 'Both Channels' : `All ${collaboratorCount} Collaborators`)
+                displayName: anyMissingIdentifiers
+                    ? filterTubeContentMenuText('content.menu.allCollaboratorsResolving', 'All Collaborators (resolving…)')
+                    : filterTubeCollaboratorGroupLabel(collaboratorCount)
             });
         }
         forceDropdownResize(dropdown);
@@ -2834,9 +2867,10 @@ function updateMultiStepActionLabel(state) {
     if (!state.blockAllItem || !state.blockAllItem.isConnected) {
         state.blockAllItem = state.dropdown?.querySelector(`.filtertube-block-channel-item[data-is-block-all="true"][data-collaboration-group-id="${state.groupId}"]`) || null;
         if (state.blockAllItem && (!state.defaultLabel || !state.defaultChannelName)) {
-            state.defaultLabel = state.defaultLabel || state.blockAllItem.querySelector('.filtertube-menu-label')?.textContent || 'Block';
+            state.defaultLabel = state.defaultLabel || state.blockAllItem.querySelector('.filtertube-menu-label')?.textContent ||
+                filterTubeContentMenuText('content.menu.block', 'Block');
             state.defaultChannelName = state.defaultChannelName || state.blockAllItem.querySelector('.filtertube-channel-name')?.textContent ||
-                `All ${state.total || 0} Collaborators`;
+                filterTubeCollaboratorGroupLabel(state.total || 0);
         }
     }
     if (!state.blockAllItem) return;
@@ -2860,12 +2894,17 @@ function updateMultiStepActionLabel(state) {
     };
 
     if (selectedCount > 0) {
-        setTitleParts('Done', `Block ${selectedCount} Selected`);
+        setTitleParts(
+            filterTubeContentMenuText('content.menu.done', 'Done'),
+            filterTubeContentMenuText('content.menu.blockSelectedCount', 'Block {count} Selected', { count: selectedCount })
+        );
         state.blockAllItem.setAttribute('data-is-done-button', 'true');
         state.blockAllItem.classList.add('filtertube-multistep-ready');
     } else {
-        setTitleParts(state.defaultLabel || 'Block',
-            state.defaultChannelName || `All ${state.total || 0} Collaborators`);
+        setTitleParts(
+            state.defaultLabel || filterTubeContentMenuText('content.menu.block', 'Block'),
+            state.defaultChannelName || filterTubeCollaboratorGroupLabel(state.total || 0)
+        );
         state.blockAllItem.removeAttribute('data-is-done-button');
         state.blockAllItem.classList.remove('filtertube-multistep-ready');
     }
@@ -2975,9 +3014,10 @@ function setupMultiStepMenu(dropdown, groupId, collaborators = [], blockAllItemR
         // ---------------------------------------
         blockAllItem,
         collaborators,
-        defaultLabel: blockAllItem?.querySelector('.filtertube-menu-label')?.textContent || 'Block',
+        defaultLabel: blockAllItem?.querySelector('.filtertube-menu-label')?.textContent ||
+            filterTubeContentMenuText('content.menu.block', 'Block'),
         defaultChannelName: blockAllItem?.querySelector('.filtertube-channel-name')?.textContent ||
-            `All ${collaborators.length} Collaborators`
+            filterTubeCollaboratorGroupLabel(collaborators.length)
     };
 
     multiStepSelectionState.set(groupId, state);
@@ -2990,9 +3030,10 @@ function setupMultiStepMenu(dropdown, groupId, collaborators = [], blockAllItemR
             if (!storedState.blockAllItem || !storedState.blockAllItem.isConnected) {
                 storedState.blockAllItem = storedState.dropdown?.querySelector(`.filtertube-block-channel-item[data-is-block-all="true"][data-collaboration-group-id="${groupId}"]`) || null;
                 if (storedState.blockAllItem) {
-                    storedState.defaultLabel = storedState.blockAllItem.querySelector('.filtertube-menu-label')?.textContent || storedState.defaultLabel || 'Block';
+                    storedState.defaultLabel = storedState.blockAllItem.querySelector('.filtertube-menu-label')?.textContent ||
+                        storedState.defaultLabel || filterTubeContentMenuText('content.menu.block', 'Block');
                     storedState.defaultChannelName = storedState.blockAllItem.querySelector('.filtertube-channel-name')?.textContent ||
-                        storedState.defaultChannelName || `All ${storedState.total || 0} Collaborators`;
+                        storedState.defaultChannelName || filterTubeCollaboratorGroupLabel(storedState.total || 0);
                     updateMultiStepActionLabel(storedState);
                 }
             }
@@ -3029,7 +3070,7 @@ function applyBlockedVisualState(menuItem, channelInfo) {
         if (channelInfo?.name) {
             titleSpan.textContent = `✓ ${channelInfo.name}`;
         } else {
-            titleSpan.textContent = '✓ Channel Blocked';
+            titleSpan.textContent = filterTubeContentMenuText('content.menu.channelBlocked', '✓ Channel Blocked');
         }
         titleSpan.style.color = '#10b981';
     }
@@ -8122,7 +8163,7 @@ function ensureFallbackMenuButtons() {
         const btn = document.createElement('button');
         btn.type = 'button';
         btn.className = 'filtertube-playlist-menu-fallback-btn';
-        btn.setAttribute('aria-label', 'FilterTube menu');
+        btn.setAttribute('aria-label', filterTubeContentMenuText('content.menu.filterTubeMenu', 'FilterTube menu'));
         btn.setAttribute('aria-haspopup', 'dialog');
         btn.setAttribute('aria-expanded', 'false');
         btn.setAttribute('data-filtertube-fallback-menu', 'true');
@@ -8587,7 +8628,7 @@ function openFilterTubePlaylistFallbackPopover(button, row) {
     const pop = document.createElement('div');
     pop.className = 'filtertube-playlist-menu-fallback-popover';
     pop.setAttribute('role', 'dialog');
-    pop.setAttribute('aria-label', 'FilterTube menu');
+    pop.setAttribute('aria-label', filterTubeContentMenuText('content.menu.filterTubeMenu', 'FilterTube menu'));
 
     try {
         ensureFilterTubeMenuStyles();
@@ -8645,7 +8686,10 @@ function openFilterTubePlaylistFallbackPopover(button, row) {
 
     const hint = document.createElement('div');
     hint.className = 'ft-hint';
-    hint.textContent = 'Fallback menu (YouTube 3-dot unavailable for this item).';
+    hint.textContent = filterTubeContentMenuText(
+        'content.menu.fallbackHint',
+        'Fallback menu (YouTube 3-dot unavailable for this item).'
+    );
 
     const hasIdentifier = (channel) => Boolean(channel?.handle || channel?.id || channel?.customUrl);
 
@@ -8703,7 +8747,7 @@ function openFilterTubePlaylistFallbackPopover(button, row) {
         title.setAttribute('role', 'text');
         const label = document.createElement('span');
         label.className = 'filtertube-menu-label';
-        label.textContent = 'Block';
+        label.textContent = filterTubeContentMenuText('content.menu.block', 'Block');
         const separator = document.createElement('span');
         separator.className = 'filtertube-menu-separator';
         separator.textContent = '•';
@@ -8714,7 +8758,7 @@ function openFilterTubePlaylistFallbackPopover(button, row) {
 
         const toggleEl = document.createElement('div');
         toggleEl.className = 'filtertube-filter-all-toggle exact-toggle toggle-variant-red';
-        toggleEl.textContent = 'Filter All';
+        toggleEl.textContent = filterTubeContentMenuText('content.menu.filterAll', 'Filter All');
 
         titleWrapper.append(title, toggleEl);
         textWrapper.appendChild(titleWrapper);
@@ -9028,7 +9072,7 @@ function openFilterTubePlaylistFallbackPopover(button, row) {
             const anyMissingIdentifiers = collaborators.some(collaborator => !hasIdentifier(collaborator));
 
             const blockAllInfo = {
-                name: collaborators.length === 2 ? 'Both Channels' : `All ${collaborators.length} Collaborators`,
+                name: filterTubeCollaboratorGroupLabel(collaborators.length),
                 isBlockAllOption: true,
                 allCollaborators: collaborators,
                 collaborationGroupId: groupId,
@@ -9038,8 +9082,8 @@ function openFilterTubePlaylistFallbackPopover(button, row) {
                 createFallbackMenuRow(blockAllInfo, {
                     disabled: anyMissingIdentifiers,
                     displayName: anyMissingIdentifiers
-                        ? 'All Collaborators (resolving...)'
-                        : (collaborators.length === 2 ? 'Both Channels' : `All ${collaborators.length} Collaborators`)
+                        ? filterTubeContentMenuText('content.menu.allCollaboratorsResolving', 'All Collaborators (resolving…)')
+                        : filterTubeCollaboratorGroupLabel(collaborators.length)
                 }),
                 blockAllInfo
             );
@@ -9060,7 +9104,7 @@ function openFilterTubePlaylistFallbackPopover(button, row) {
                         disabled: !hasIdentifier(collaborator),
                         displayName: hasIdentifier(collaborator)
                             ? collaborator.name
-                            : `${collaborator.name || 'Channel'} (resolving…)`
+                            : filterTubeCollaboratorResolvingLabel(collaborator.name)
                     }),
                     channelInfo
                 );
@@ -9157,8 +9201,14 @@ function openFilterTubePlaylistFallbackPopover(button, row) {
     document.addEventListener('click', playlistFallbackPopoverState.onDocClick, true);
 }
 
-function injectCollaboratorPlaceholderMenu(newMenuList, oldMenuList, message = 'Fetching collaborators…') {
-    const blockAllMessage = 'Block All (pending…)';
+function injectCollaboratorPlaceholderMenu(
+    newMenuList,
+    oldMenuList,
+    message = filterTubeContentMenuText('content.menu.fetchingCollaborators', 'Fetching collaborators…')
+) {
+    const blockAllMessage = filterTubeContentMenuText('content.menu.blockAllPending', 'Block All (pending…)');
+    const waitMessage = filterTubeContentMenuText('content.menu.pleaseWait', 'Please wait…');
+    const awaitingMessage = filterTubeContentMenuText('content.menu.awaitingCollaborators', 'Awaiting collaborator list');
     const newStructure = Boolean(newMenuList);
 
     const buildPlaceholderContent = (primaryText, secondaryText) => `
@@ -9188,8 +9238,8 @@ function injectCollaboratorPlaceholderMenu(newMenuList, oldMenuList, message = '
             return item;
         };
 
-        newMenuList.insertBefore(makeItem(message, 'Please wait…'), newMenuList.firstChild);
-        newMenuList.insertBefore(makeItem(blockAllMessage, 'Awaiting collaborator list'), newMenuList.firstChild?.nextSibling || null);
+        newMenuList.insertBefore(makeItem(message, waitMessage), newMenuList.firstChild);
+        newMenuList.insertBefore(makeItem(blockAllMessage, awaitingMessage), newMenuList.firstChild?.nextSibling || null);
     } else if (oldMenuList) {
         const menuList = oldMenuList.querySelector('tp-yt-paper-listbox') || oldMenuList;
         const makeItem = (primary, secondary) => {
@@ -9208,8 +9258,8 @@ function injectCollaboratorPlaceholderMenu(newMenuList, oldMenuList, message = '
             return item;
         };
 
-        menuList.insertBefore(makeItem(message, 'Please wait…'), menuList.firstChild);
-        menuList.insertBefore(makeItem(blockAllMessage, 'Awaiting collaborator list'), menuList.firstChild?.nextSibling || null);
+        menuList.insertBefore(makeItem(message, waitMessage), menuList.firstChild);
+        menuList.insertBefore(makeItem(blockAllMessage, awaitingMessage), menuList.firstChild?.nextSibling || null);
     }
 }
 
@@ -12907,7 +12957,7 @@ function createFilterTubeTitleElement(channelName) {
 
     const label = document.createElement('span');
     label.className = 'filtertube-menu-label';
-    label.textContent = 'Block';
+    label.textContent = filterTubeContentMenuText('content.menu.block', 'Block');
 
     const separator = document.createElement('span');
     separator.className = 'filtertube-menu-separator';
@@ -12932,7 +12982,7 @@ function createFilterTubePlaceholderContent(primaryText, secondaryText) {
 
     const label = document.createElement('span');
     label.className = 'filtertube-menu-label';
-    label.textContent = 'Block';
+    label.textContent = filterTubeContentMenuText('content.menu.block', 'Block');
 
     const separator = document.createElement('span');
     separator.className = 'filtertube-menu-separator';
@@ -12997,7 +13047,7 @@ function injectIntoNewMenu(menuList, channelInfo, videoCard, collaborationMetada
 
     const toggle = document.createElement('div');
     toggle.className = 'filtertube-filter-all-toggle exact-toggle toggle-variant-red';
-    toggle.textContent = 'Filter All';
+    toggle.textContent = filterTubeContentMenuText('content.menu.filterAll', 'Filter All');
 
     titleWrapper.append(title, toggle);
     textWrapper.appendChild(titleWrapper);
@@ -13153,7 +13203,7 @@ function injectIntoOldMenu(menuContainer, channelInfo, videoCard, collaborationM
 
         const label = document.createElement('span');
         label.className = 'filtertube-menu-label';
-        label.textContent = 'Block';
+        label.textContent = filterTubeContentMenuText('content.menu.block', 'Block');
         const separator = document.createElement('span');
         separator.className = 'filtertube-menu-separator';
         separator.textContent = '•';
@@ -13164,7 +13214,7 @@ function injectIntoOldMenu(menuContainer, channelInfo, videoCard, collaborationM
 
         const toggle = document.createElement('span');
         toggle.className = 'filtertube-filter-all-toggle exact-toggle toggle-variant-red';
-        toggle.textContent = 'Filter All';
+        toggle.textContent = filterTubeContentMenuText('content.menu.filterAll', 'Filter All');
 
         button.append(iconWrapper, title, toggle);
         menuItem.appendChild(button);
@@ -13249,7 +13299,7 @@ function injectIntoOldMenu(menuContainer, channelInfo, videoCard, collaborationM
 
     const toggle = document.createElement('div');
     toggle.className = 'filtertube-filter-all-toggle exact-toggle toggle-variant-red';
-    toggle.textContent = 'Filter All';
+    toggle.textContent = filterTubeContentMenuText('content.menu.filterAll', 'Filter All');
 
     paperItem.append(iconWrapper, title, toggle);
     filterTubeItem.appendChild(paperItem);
@@ -13365,7 +13415,7 @@ async function checkIfChannelBlocked(channelInfo, menuItem) {
             // Channel is already blocked - show success state
             const titleSpan = menuItem.querySelector('.filtertube-menu-title');
             if (titleSpan) {
-                titleSpan.textContent = '✓ Channel Blocked';
+                titleSpan.textContent = filterTubeContentMenuText('content.menu.channelBlocked', '✓ Channel Blocked');
                 titleSpan.style.color = '#10b981'; // green
                 menuItem.style.pointerEvents = 'none'; // Disable clicks
             }
@@ -14606,7 +14656,7 @@ async function handleBlockChannelClick(channelInfo, menuItem, filterAll = false,
                 // Multi-step: Show "✓ ChannelName" to indicate selection
                 titleSpan.textContent = `✓ ${channelInfo.name}`;
             } else {
-                titleSpan.textContent = '✓ Channel Blocked';
+                titleSpan.textContent = filterTubeContentMenuText('content.menu.channelBlocked', '✓ Channel Blocked');
             }
             titleSpan.style.color = '#10b981'; // green
         }
@@ -14754,7 +14804,7 @@ async function handleBlockChannelClick(channelInfo, menuItem, filterAll = false,
         } else {
             try {
                 if (titleSpan) {
-                    titleSpan.textContent = '✓ Channel Blocked';
+                    titleSpan.textContent = filterTubeContentMenuText('content.menu.channelBlocked', '✓ Channel Blocked');
                     titleSpan.style.color = '#10b981';
                 }
                 menuItem.classList.remove('filtertube-pending');
@@ -14855,11 +14905,12 @@ function addFilterAllContentCheckbox(menuItem, channelData) {
     const checkboxWrapper = document.createElement('div');
     checkboxWrapper.className = 'filtertube-filter-all-checkbox';
     checkboxWrapper.style.cssText = 'margin-top: 8px; padding-left: 4px; font-size: 12px; color: #aaa; cursor: pointer; user-select: none;';
+    const filterAllContentLabel = filterTubeContentMenuText('content.menu.filterAllContent', 'Filter All Content');
 
     checkboxWrapper.innerHTML = `
         <label style="display: flex; align-items: center; gap: 6px; cursor: pointer;">
             <input type="checkbox" class="filtertube-filter-all-toggle" style="cursor: pointer;" />
-            <span>Filter All Content</span>
+            <span>${escapeHtml(filterAllContentLabel)}</span>
         </label>
     `;
 

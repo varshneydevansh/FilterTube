@@ -108,6 +108,10 @@ test('staged keys still describe copy present on extension UI surfaces', () => {
     'js/popup.js',
     'js/tab-view.js',
     'js/render_engine.js',
+    'js/content/first_run_prompt.js',
+    'js/content/block_channel.js',
+    'js/content_bridge.js',
+    'js/managed_parent_command_center.js',
     'js/content/admission_overlay.js',
     'js/content/external_youtube_guard.js'
   ].map(file => fs.readFileSync(path.join(root, file), 'utf8')).join('\n');
@@ -124,7 +128,7 @@ test('staged keys still describe copy present on extension UI surfaces', () => {
       assert.equal(controls.get(key.slice('controls.description.'.length))?.description?.replace(/\s+/g, ' '), source, key);
       continue;
     }
-    if (key.startsWith('profileAccess.') || key.startsWith('dashboard.') || key.startsWith('popup.') || key.startsWith('render.') || key.startsWith('admission.')) {
+    if (key.startsWith('profileAccess.') || key.startsWith('dashboard.') || key.startsWith('popup.') || key.startsWith('render.') || key.startsWith('admission.') || key.startsWith('family.')) {
       assert.ok(surfaces.includes(key) || surfaces.includes(source), `${key} is wired to a runtime UI surface`);
       continue;
     }

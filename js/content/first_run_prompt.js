@@ -9,6 +9,34 @@
     const PROMPT_ID = 'ft-first-run-refresh-prompt';
     let dismissed = false;
 
+    async function localizePrompt(container) {
+        try {
+            const stored = await new Promise(resolve => {
+                if (!api.storage?.local?.get) return resolve({});
+                const result = api.storage.local.get('ftUiLocalePreference', resolve);
+                if (result?.then) result.then(resolve, () => resolve({}));
+            });
+            const locale = stored?.ftUiLocalePreference;
+            if (typeof locale !== 'string' || !/^[a-z]{2,3}(?:-[a-zA-Z0-9]{2,8})*$/.test(locale) || locale === 'en') return;
+            const response = await fetch(api.runtime.getURL(`data/ui_locales/${locale}.json`));
+            if (!response.ok || !container.isConnected) return;
+            const catalog = await response.json();
+            if (!container.isConnected) return;
+            for (const element of container.querySelectorAll('[data-ft-first-run-i18n]')) {
+                const value = catalog[element.dataset.ftFirstRunI18n];
+                if (typeof value === 'string' && value.trim()) element.textContent = value;
+            }
+            const close = container.querySelector('[data-ft-first-run-i18n-aria]');
+            const closeLabel = close && catalog[close.dataset.ftFirstRunI18nAria];
+            if (typeof closeLabel === 'string' && closeLabel.trim()) close.setAttribute('aria-label', closeLabel);
+            if (/^(ar|arz|apc|apd|fa|ur|pa-Arab)(-|$)/.test(locale)) {
+                container.dir = 'rtl';
+                container.style.right = 'auto';
+                container.style.left = '16px';
+            }
+        } catch (_) { /* The bundled English copy remains usable. */ }
+    }
+
     function getPalette() {
         const prefersDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
         if (prefersDark) {
@@ -76,6 +104,7 @@
         title.style.fontSize = '16px';
         title.style.letterSpacing = '-0.01em';
         title.textContent = 'FilterTube is active';
+        title.dataset.ftFirstRunI18n = 'firstRun.activeTitle';
         title.style.marginBottom = '8px';
         container.appendChild(title);
 
@@ -84,6 +113,7 @@
         desc.style.color = palette.subtext;
         desc.style.fontSize = '14px';
         desc.textContent = 'This tab can now use FilterTube controls. Reload once if you want the earliest YouTube data on this already-open tab covered too.';
+        desc.dataset.ftFirstRunI18n = 'firstRun.reloadExplanation';
         container.appendChild(desc);
 
         const actions = document.createElement('div');
@@ -93,6 +123,7 @@
 
         const refreshBtn = document.createElement('button');
         refreshBtn.textContent = 'Refresh now';
+        refreshBtn.dataset.ftFirstRunI18n = 'firstRun.refreshNow';
         refreshBtn.style.flex = '1 1 auto';
         refreshBtn.style.background = palette.accent;
         refreshBtn.style.color = palette.buttonText;
@@ -109,6 +140,7 @@
 
         const dismissBtn = document.createElement('button');
         dismissBtn.textContent = 'Not now';
+        dismissBtn.dataset.ftFirstRunI18n = 'firstRun.notNow';
         dismissBtn.style.flex = '0 0 auto';
         dismissBtn.style.border = `1px solid ${palette.border}`;
         dismissBtn.style.borderRadius = '999px';
@@ -129,6 +161,7 @@
         const closeBtn = document.createElement('button');
         closeBtn.type = 'button';
         closeBtn.setAttribute('aria-label', 'Dismiss');
+        closeBtn.dataset.ftFirstRunI18nAria = 'firstRun.dismiss';
         closeBtn.textContent = '×';
         closeBtn.style.position = 'absolute';
         closeBtn.style.top = '8px';
@@ -168,6 +201,7 @@
         container.appendChild(closeBtn);
         document.head.appendChild(style);
         document.body.appendChild(container);
+        void localizePrompt(container);
     }
 
     function markComplete() {
