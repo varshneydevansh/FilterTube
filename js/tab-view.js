@@ -28038,6 +28038,30 @@ document.addEventListener('DOMContentLoaded', async () => {
         };
     }
 
+    function ruleMoveSuccessToastText(kind, targetList) {
+        const destination = targetList === 'allow' ? 'blocked' : 'allowed';
+        const messages = {
+            keyword: {
+                blocked: ['dashboard.ruleEditor.move.keywordToBlocked', 'Keyword moved to Blocked rules'],
+                allowed: ['dashboard.ruleEditor.move.keywordToAllowed', 'Keyword moved to Allowed rules']
+            },
+            channel: {
+                blocked: ['dashboard.ruleEditor.move.channelToBlocked', 'Channel moved to Blocked rules'],
+                allowed: ['dashboard.ruleEditor.move.channelToAllowed', 'Channel moved to Allowed rules']
+            },
+            kidsKeyword: {
+                blocked: ['dashboard.ruleEditor.move.kidsKeywordToBlocked', 'Kids keyword moved to Blocked rules'],
+                allowed: ['dashboard.ruleEditor.move.kidsKeywordToAllowed', 'Kids keyword moved to Allowed rules']
+            },
+            kidsChannel: {
+                blocked: ['dashboard.ruleEditor.move.kidsChannelToBlocked', 'Kids channel moved to Blocked rules'],
+                allowed: ['dashboard.ruleEditor.move.kidsChannelToAllowed', 'Kids channel moved to Allowed rules']
+            }
+        };
+        const selected = messages[kind]?.[destination];
+        return selected ? tabViewUiText(selected[0], selected[1]) : '';
+    }
+
     function isAdvancedRuleListActive(listEl) {
         if (!listEl) return false;
         const view = listEl.closest('.view-section');
@@ -28067,7 +28091,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                     ? await moveManagedKeyword('main', entry, targetList)
                     : await StateManager.moveKeyword(entry.word, { fromList: targetList, toList: targetList === 'allow' ? 'block' : 'allow' });
                 if (moved) {
-                    UIComponents.showToast(`Keyword moved to ${targetList === 'allow' ? 'Blocked rules' : 'Allowed rules'}`, 'success');
+                    UIComponents.showToast(ruleMoveSuccessToastText('keyword', targetList), 'success');
                     renderKeywords();
                 }
             },
@@ -28217,7 +28241,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                     ? await moveManagedChannel('main', channel, index, targetList)
                     : await StateManager.moveChannel(index, { fromList: targetList, toList: targetList === 'allow' ? 'block' : 'allow' });
                 if (moved) {
-                    UIComponents.showToast(`Channel moved to ${targetList === 'allow' ? 'Blocked rules' : 'Allowed rules'}`, 'success');
+                    UIComponents.showToast(ruleMoveSuccessToastText('channel', targetList), 'success');
                     renderChannels();
                 }
             },
@@ -28255,7 +28279,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                     ? await moveManagedKeyword('kids', entry, targetList)
                     : await StateManager.moveKidsKeyword(entry.word, { fromList: targetList, toList: targetList === 'allow' ? 'block' : 'allow' });
                 if (moved) {
-                    UIComponents.showToast(`Kids keyword moved to ${targetList === 'allow' ? 'Blocked rules' : 'Allowed rules'}`, 'success');
+                    UIComponents.showToast(ruleMoveSuccessToastText('kidsKeyword', targetList), 'success');
                     renderKidsKeywords();
                 }
             },
@@ -28295,7 +28319,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                     ? await moveManagedChannel('kids', channel, index, targetList)
                     : await StateManager.moveKidsChannel(index, { fromList: targetList, toList: targetList === 'allow' ? 'block' : 'allow' });
                 if (moved) {
-                    UIComponents.showToast(`Kids channel moved to ${targetList === 'allow' ? 'Blocked rules' : 'Allowed rules'}`, 'success');
+                    UIComponents.showToast(ruleMoveSuccessToastText('kidsChannel', targetList), 'success');
                     renderKidsChannels();
                 }
             },
