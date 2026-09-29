@@ -1,6 +1,8 @@
 {
   "popup.blocklist": "List wey dey block",
   "popup.whitelist": "List wey dey allow",
+  "popup.listMode.whitelistTooltip": "List wey dey allow mode: show content wey match rules wey dey allow",
+  "popup.listMode.blocklistTooltip": "List wey dey block mode: hide content wey match rules wey dey block",
   "profileAccess.enterMasterPinTitle": "Put master PIN",
   "profileAccess.masterPinMessage": "Default profile get protection. Put master PIN to continue.",
   "profileAccess.masterPinPlaceholder": "Master PIN",

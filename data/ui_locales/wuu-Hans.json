@@ -1,6 +1,8 @@
 {
   "popup.blocklist": "屏蔽清单",
   "popup.whitelist": "允许清单",
+  "popup.listMode.whitelistTooltip": "允许清单模式：显示符合允许规则个内容",
+  "popup.listMode.blocklistTooltip": "屏蔽清单模式：隐藏符合屏蔽规则个内容",
   "profileAccess.enterMasterPinTitle": "输入主 PIN",
   "profileAccess.masterPinMessage": "默认档案受保护。输入主 PIN 接着弄。",
   "profileAccess.masterPinPlaceholder": "主 PIN",

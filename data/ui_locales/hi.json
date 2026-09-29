@@ -1,6 +1,8 @@
 {
   "popup.blocklist": "अवरोध सूची",
   "popup.whitelist": "अनुमति सूची",
+  "popup.listMode.whitelistTooltip": "अनुमति सूची मोड: अनुमति नियमों से मेल खाने वाली सामग्री दिखाएँ",
+  "popup.listMode.blocklistTooltip": "अवरोध सूची मोड: अवरोध नियमों से मेल खाने वाली सामग्री छिपाएँ",
   "popup.listMode.copyRulesConfirm": "मौजूदा अवरुद्ध नियमों को अनुमति नियमों में कॉपी करें? अवरुद्ध नियम बने रहेंगे।",
   "popup.listMode.copyKidsRulesConfirm": "YT Kids के मौजूदा अवरुद्ध नियमों को अनुमति नियमों में कॉपी करें? अवरुद्ध नियम बने रहेंगे।",
   "popup.listMode.emptyAllowedRules": "अनुमति नियमों की सूची खाली है — वीडियो की अनुमति देने वाले नियम जोड़ने तक वीडियो छिपे रहेंगे।",

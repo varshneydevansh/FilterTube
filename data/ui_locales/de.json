@@ -1,6 +1,8 @@
 {
   "popup.blocklist": "Sperrliste",
   "popup.whitelist": "Zulassungsliste",
+  "popup.listMode.whitelistTooltip": "Zulassungsliste-Modus: Inhalte anzeigen, die den zugelassenen Regeln entsprechen",
+  "popup.listMode.blocklistTooltip": "Sperrlisten-Modus: Inhalte ausblenden, die den gesperrten Regeln entsprechen",
   "popup.listMode.copyRulesConfirm": "Aktuell gesperrte Regeln in die erlaubten Regeln kopieren? Die gesperrten Regeln bleiben erhalten.",
   "popup.listMode.copyKidsRulesConfirm": "Aktuell gesperrte Regeln von YT Kids in die erlaubten Regeln kopieren? Die gesperrten Regeln bleiben erhalten.",
   "popup.listMode.emptyAllowedRules": "Die Liste erlaubter Regeln ist leer – Videos bleiben ausgeblendet, bis du Regeln hinzufügst, die sie freigeben.",

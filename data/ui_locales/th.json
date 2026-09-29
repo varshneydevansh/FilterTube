@@ -1,6 +1,8 @@
 {
   "popup.blocklist": "รายการบล็อก",
   "popup.whitelist": "รายการที่อนุญาต",
+  "popup.listMode.whitelistTooltip": "โหมดรายการอนุญาต: แสดงเนื้อหาที่ตรงกับกฎที่อนุญาต",
+  "popup.listMode.blocklistTooltip": "โหมดรายการบล็อก: ซ่อนเนื้อหาที่ตรงกับกฎที่บล็อก",
   "profileAccess.enterMasterPinTitle": "ป้อน PIN หลัก",
   "profileAccess.masterPinMessage": "โปรไฟล์เริ่มต้นได้รับการปกป้อง ป้อน PIN หลักเพื่อดำเนินการต่อ",
   "profileAccess.masterPinPlaceholder": "PIN หลัก",

@@ -1,6 +1,8 @@
 {
   "popup.blocklist": "Blocklist",
   "popup.whitelist": "Whitelist",
+  "popup.listMode.whitelistTooltip": "Whitelist mode: show content matching Allowed rules",
+  "popup.listMode.blocklistTooltip": "Blocklist mode: hide content matching Blocked rules",
   "popup.listMode.copyRulesConfirm": "Copy the current blocked rules into Allowed rules? Your blocked rules will be kept.",
   "popup.listMode.copyKidsRulesConfirm": "Copy your current YT Kids blocked rules into Allowed rules? Your blocked rules will be kept.",
   "popup.listMode.emptyAllowedRules": "Allowed rules are empty — videos will stay hidden until you add allow rules.",

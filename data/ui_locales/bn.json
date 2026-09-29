@@ -1,6 +1,8 @@
 {
   "popup.blocklist": "ব্লক তালিকা",
   "popup.whitelist": "অনুমতি তালিকা",
+  "popup.listMode.whitelistTooltip": "অনুমতি তালিকা মোড: অনুমতির নিয়মের সঙ্গে মেলে এমন কনটেন্ট দেখান",
+  "popup.listMode.blocklistTooltip": "ব্লক তালিকা মোড: ব্লকের নিয়মের সঙ্গে মেলে এমন কনটেন্ট লুকান",
   "popup.listMode.copyRulesConfirm": "বর্তমান ব্লক করা নিয়মগুলো অনুমোদিত নিয়মে কপি করবেন? ব্লক করা নিয়মগুলো অক্ষত থাকবে।",
   "popup.listMode.copyKidsRulesConfirm": "YT Kids-এর বর্তমান ব্লক করা নিয়মগুলো অনুমোদিত নিয়মে কপি করবেন? ব্লক করা নিয়মগুলো অক্ষত থাকবে।",
   "popup.listMode.emptyAllowedRules": "অনুমোদিত নিয়মের তালিকা খালি — অনুমতি দেওয়ার নিয়ম যোগ না করা পর্যন্ত ভিডিওগুলো লুকানো থাকবে।",

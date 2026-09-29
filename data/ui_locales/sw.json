@@ -1,6 +1,8 @@
 {
   "popup.blocklist": "Orodha ya kuzuia",
   "popup.whitelist": "Orodha ya kuruhusu",
+  "popup.listMode.whitelistTooltip": "Hali ya orodha ya kuruhusu: onyesha maudhui yanayolingana na sheria za kuruhusu",
+  "popup.listMode.blocklistTooltip": "Hali ya orodha ya kuzuia: ficha maudhui yanayolingana na sheria za kuzuia",
   "profileAccess.enterMasterPinTitle": "Weka PIN kuu",
   "profileAccess.masterPinMessage": "Wasifu chaguomsingi umelindwa. Weka PIN kuu ili uendelee.",
   "profileAccess.masterPinPlaceholder": "PIN kuu",

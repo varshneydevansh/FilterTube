@@ -1359,11 +1359,16 @@ document.addEventListener('DOMContentLoaded', async () => {
         ].filter(Boolean).join(' ');
         const modeKey = effectiveMode === 'whitelist' ? 'popup.whitelist' : 'popup.blocklist';
         const modeLabel = popupUiText(modeKey, effectiveMode === 'whitelist' ? 'Whitelist' : 'Blocklist');
+        const modeTooltipKey = effectiveMode === 'whitelist'
+            ? 'popup.listMode.whitelistTooltip'
+            : 'popup.listMode.blocklistTooltip';
+        const modeTooltip = popupUiText(modeTooltipKey, effectiveMode === 'whitelist'
+            ? 'Whitelist mode: show content matching Allowed rules'
+            : 'Blocklist mode: hide content matching Blocked rules');
         toggle.textContent = modeLabel;
         toggle.setAttribute('data-ft-i18n', modeKey);
-        toggle.title = effectiveMode === 'whitelist'
-            ? 'Whitelist mode: show content matching Allowed rules'
-            : 'Blocklist mode: hide content matching Blocked rules';
+        toggle.title = modeTooltip;
+        toggle.setAttribute('data-ft-i18n-title', modeTooltipKey);
         toggle.setAttribute('aria-label', modeLabel);
         toggle.setAttribute('data-ft-i18n-aria-label', modeKey);
         toggle.setAttribute('role', 'button');

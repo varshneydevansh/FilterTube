@@ -1,6 +1,8 @@
 {
   "popup.blocklist": "Àkójọ ìdènà",
   "popup.whitelist": "Àkójọ ìyọ̀nda",
+  "popup.listMode.whitelistTooltip": "Ìpo àkójọ ìyọ̀nda: fi akoonu tó bá àwọn òfin ìyọ̀nda hàn",
+  "popup.listMode.blocklistTooltip": "Ìpo àkójọ ìdènà: fi akoonu tó bá àwọn òfin dídènà pamọ́",
   "profileAccess.enterMasterPinTitle": "Tẹ PIN àkọ́kọ́ sí",
   "profileAccess.masterPinMessage": "A dáàbò bo àkọ́kọ́ profaili. Tẹ PIN àkọ́kọ́ sí láti tẹ̀síwájú.",
   "profileAccess.masterPinPlaceholder": "PIN àkọ́kọ́",

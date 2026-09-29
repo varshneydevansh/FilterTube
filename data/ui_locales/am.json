@@ -1,6 +1,8 @@
 {
   "popup.blocklist": "የማገጃ ዝርዝር",
   "popup.whitelist": "የፍቃድ ዝርዝር",
+  "popup.listMode.whitelistTooltip": "የፍቃድ ዝርዝር ሁነታ፦ ከፍቃድ ደንቦች ጋር የሚዛመድ ይዘትን አሳይ",
+  "popup.listMode.blocklistTooltip": "የማገጃ ዝርዝር ሁነታ፦ ከማገጃ ደንቦች ጋር የሚዛመድ ይዘትን ደብቅ",
   "profileAccess.enterMasterPinTitle": "ዋናውን PIN ያስገቡ",
   "profileAccess.masterPinMessage": "ነባሪው መገለጫ የተጠበቀ ነው። ለመቀጠል ዋናውን PIN ያስገቡ።",
   "profileAccess.masterPinPlaceholder": "ዋና PIN",

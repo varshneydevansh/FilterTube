@@ -1,6 +1,8 @@
 {
   "popup.blocklist": "ブロックリスト",
   "popup.whitelist": "許可リスト",
+  "popup.listMode.whitelistTooltip": "許可リストモード：許可ルールに一致するコンテンツを表示",
+  "popup.listMode.blocklistTooltip": "ブロックリストモード：ブロックルールに一致するコンテンツを非表示",
   "profileAccess.enterMasterPinTitle": "マスター PIN を入力",
   "profileAccess.masterPinMessage": "デフォルトのプロフィールは保護されています。続行するにはマスター PIN を入力してください。",
   "profileAccess.masterPinPlaceholder": "マスター PIN",

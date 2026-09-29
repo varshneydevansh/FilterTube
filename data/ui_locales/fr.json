@@ -1,6 +1,8 @@
 {
   "popup.blocklist": "Liste de blocage",
   "popup.whitelist": "Liste d’autorisation",
+  "popup.listMode.whitelistTooltip": "Mode liste d’autorisation : afficher le contenu correspondant aux règles autorisées",
+  "popup.listMode.blocklistTooltip": "Mode liste de blocage : masquer le contenu correspondant aux règles bloquées",
   "popup.listMode.copyRulesConfirm": "Copier les règles actuellement bloquées dans les règles autorisées ? Les règles bloquées seront conservées.",
   "popup.listMode.copyKidsRulesConfirm": "Copier les règles actuellement bloquées de YT Kids dans les règles autorisées ? Les règles bloquées seront conservées.",
   "popup.listMode.emptyAllowedRules": "La liste des règles autorisées est vide : les vidéos resteront masquées tant que vous n’ajouterez pas de règles d’autorisation.",

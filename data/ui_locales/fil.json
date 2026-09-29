@@ -1,6 +1,8 @@
 {
   "popup.blocklist": "Listahan ng mga bina-block",
   "popup.whitelist": "Listahan ng mga pinapayagan",
+  "popup.listMode.whitelistTooltip": "Mode ng listahan ng pinapayagan: ipakita ang content na tumutugma sa mga pinapayagang rule",
+  "popup.listMode.blocklistTooltip": "Mode ng listahan ng bina-block: itago ang content na tumutugma sa mga bina-block na rule",
   "profileAccess.enterMasterPinTitle": "Ilagay ang master PIN",
   "profileAccess.masterPinMessage": "Protektado ang default na profile. Ilagay ang master PIN para magpatuloy.",
   "profileAccess.masterPinPlaceholder": "Master PIN",

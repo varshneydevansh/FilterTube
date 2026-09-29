@@ -1,6 +1,8 @@
 {
   "popup.blocklist": "بلاک لسٹ",
   "popup.whitelist": "اجازت کی فہرست",
+  "popup.listMode.whitelistTooltip": "اجازت کی فہرست کا موڈ: اجازت والے قواعد سے ملتا مواد دکھائیں",
+  "popup.listMode.blocklistTooltip": "بلاک لسٹ موڈ: بلاک کیے گئے قواعد سے ملتا مواد چھپائیں",
   "popup.listMode.copyRulesConfirm": "کیا موجودہ مسدود قواعد کو اجازت والے قواعد میں نقل کریں؟ مسدود قواعد برقرار رہیں گے۔",
   "popup.listMode.copyKidsRulesConfirm": "کیا YT Kids کے موجودہ مسدود قواعد کو اجازت والے قواعد میں نقل کریں؟ مسدود قواعد برقرار رہیں گے۔",
   "popup.listMode.emptyAllowedRules": "اجازت والے قواعد کی فہرست خالی ہے — جب تک آپ اجازت دینے والے قواعد شامل نہیں کریں گے، ویڈیوز پوشیدہ رہیں گی۔",

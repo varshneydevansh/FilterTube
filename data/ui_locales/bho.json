@@ -1,6 +1,8 @@
 {
   "popup.blocklist": "रोक सूची",
   "popup.whitelist": "अनुमति सूची",
+  "popup.listMode.whitelistTooltip": "अनुमति सूची मोड: अनुमति नियम से मिले वाला सामग्री देखाईं",
+  "popup.listMode.blocklistTooltip": "रोक सूची मोड: रोक नियम से मिले वाला सामग्री छिपाईं",
   "profileAccess.enterMasterPinTitle": "मास्टर PIN डालीं",
   "profileAccess.masterPinMessage": "डिफॉल्ट प्रोफाइल सुरक्षित बा। आगे बढ़े खातिर मास्टर PIN डालीं।",
   "profileAccess.masterPinPlaceholder": "मास्टर PIN",

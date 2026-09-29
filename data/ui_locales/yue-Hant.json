@@ -1,6 +1,8 @@
 {
   "popup.blocklist": "封鎖清單",
   "popup.whitelist": "允許清單",
+  "popup.listMode.whitelistTooltip": "允許清單模式：顯示符合允許規則嘅內容",
+  "popup.listMode.blocklistTooltip": "封鎖清單模式：隱藏符合封鎖規則嘅內容",
   "profileAccess.enterMasterPinTitle": "輸入主 PIN",
   "profileAccess.masterPinMessage": "預設個人檔案已受保護。輸入主 PIN 以繼續。",
   "profileAccess.masterPinPlaceholder": "主 PIN",

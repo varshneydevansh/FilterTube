@@ -1,6 +1,8 @@
 {
   "popup.blocklist": "روک لسٹ",
   "popup.whitelist": "اجازت والی لسٹ",
+  "popup.listMode.whitelistTooltip": "اجازت والی لسٹ دا موڈ: اجازت والے اصولاں نال ملدا مواد وکھاؤ",
+  "popup.listMode.blocklistTooltip": "روک لسٹ دا موڈ: روکے ہوئے اصولاں نال ملدا مواد لُکاؤ",
   "profileAccess.enterMasterPinTitle": "ماسٹر PIN درج کرو",
   "profileAccess.masterPinMessage": "ڈیفالٹ پروفائل محفوظ اے۔ جاری رکھن لئی ماسٹر PIN درج کرو۔",
   "profileAccess.masterPinPlaceholder": "ماسٹر PIN",

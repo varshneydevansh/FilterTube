@@ -1,6 +1,8 @@
 {
   "popup.blocklist": "अवरोध सूची",
   "popup.whitelist": "परवानगीची सूची",
+  "popup.listMode.whitelistTooltip": "परवानगी सूची मोड: परवानगीच्या नियमांशी जुळणारा आशय दाखवा",
+  "popup.listMode.blocklistTooltip": "अवरोध सूची मोड: अवरोध नियमांशी जुळणारा आशय लपवा",
   "profileAccess.enterMasterPinTitle": "मास्टर PIN टाका",
   "profileAccess.masterPinMessage": "डीफॉल्ट प्रोफाइल सुरक्षित आहे. पुढे जाण्यासाठी मास्टर PIN टाका.",
   "profileAccess.masterPinPlaceholder": "मास्टर PIN",

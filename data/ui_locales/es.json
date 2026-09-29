@@ -1,6 +1,8 @@
 {
   "popup.blocklist": "Lista de bloqueo",
   "popup.whitelist": "Lista de permitidos",
+  "popup.listMode.whitelistTooltip": "Modo de lista de permitidos: muestra el contenido que coincide con las reglas permitidas",
+  "popup.listMode.blocklistTooltip": "Modo de lista de bloqueo: oculta el contenido que coincide con las reglas bloqueadas",
   "popup.listMode.copyRulesConfirm": "¿Copiar las reglas bloqueadas actuales a las reglas permitidas? Las reglas bloqueadas se conservarán.",
   "popup.listMode.copyKidsRulesConfirm": "¿Copiar las reglas bloqueadas actuales de YT Kids a las reglas permitidas? Las reglas bloqueadas se conservarán.",
   "popup.listMode.emptyAllowedRules": "La lista de reglas permitidas está vacía: los vídeos seguirán ocultos hasta que añadas reglas que los permitan.",

@@ -1,6 +1,8 @@
 {
   "popup.blocklist": "ನಿರ್ಬಂಧ ಪಟ್ಟಿ",
   "popup.whitelist": "ಅನುಮತಿ ಪಟ್ಟಿ",
+  "popup.listMode.whitelistTooltip": "ಅನುಮತಿ ಪಟ್ಟಿ ಮೋಡ್: ಅನುಮತಿ ನಿಯಮಗಳಿಗೆ ಹೊಂದುವ ವಿಷಯವನ್ನು ತೋರಿಸಿ",
+  "popup.listMode.blocklistTooltip": "ನಿರ್ಬಂಧ ಪಟ್ಟಿ ಮೋಡ್: ನಿರ್ಬಂಧ ನಿಯಮಗಳಿಗೆ ಹೊಂದುವ ವಿಷಯವನ್ನು ಮರೆಮಾಡಿ",
   "profileAccess.enterMasterPinTitle": "ಮುಖ್ಯ PIN ನಮೂದಿಸಿ",
   "profileAccess.masterPinMessage": "ಡೀಫಾಲ್ಟ್ ಪ್ರೊಫೈಲ್ ರಕ್ಷಿತವಾಗಿದೆ. ಮುಂದುವರಿಯಲು ಮುಖ್ಯ PIN ನಮೂದಿಸಿ.",
   "profileAccess.masterPinPlaceholder": "ಮುಖ್ಯ PIN",

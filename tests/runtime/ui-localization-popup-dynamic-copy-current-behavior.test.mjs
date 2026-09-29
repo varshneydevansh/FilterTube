@@ -43,6 +43,7 @@ test('all 38 bundled keyed catalogs already contain the runtime popup labels', (
   const keys = [
     'popup.enabled', 'popup.disabled', 'popup.youtubeTime',
     'popup.blocklist', 'popup.whitelist',
+    'popup.listMode.whitelistTooltip', 'popup.listMode.blocklistTooltip',
     'popup.limitReached', 'popup.timeHoursMinutesLeft', 'popup.timeMinutesSecondsLeft',
     'popup.timeSecondsLeft', 'popup.timeHoursMinutesCompact',
     'popup.timeMinutesSecondsCompact', 'popup.timeSecondsCompact',
@@ -131,7 +132,7 @@ test('popup timer formatter localizes zero, hours, minutes, and seconds in both 
   assert.match(popupSource, /popup\.selfControlPinnedHint/);
 });
 
-test('mode labels and exact ARIA labels use localized keys while explanations and behavior stay unchanged', () => {
+test('mode labels, tooltips, and ARIA labels use localized keys while behavior stays unchanged', () => {
   const translations = readCatalog('es');
   const helperSource = popupSource.match(
     /function popupUiText\(key, fallback, values = \{\}\) \{[\s\S]*?^\}/m
@@ -148,19 +149,42 @@ test('mode labels and exact ARIA labels use localized keys while explanations an
 
   assert.match(popupSource, /const modeKey = effectiveMode === 'whitelist' \? 'popup\.whitelist' : 'popup\.blocklist'/);
   assert.match(popupSource, /const modeLabel = popupUiText\(modeKey, effectiveMode === 'whitelist' \? 'Whitelist' : 'Blocklist'\)/);
+  assert.match(popupSource, /const modeTooltipKey = effectiveMode === 'whitelist'[\s\S]*?'popup\.listMode\.whitelistTooltip'[\s\S]*?:\s*'popup\.listMode\.blocklistTooltip'/);
+  assert.match(popupSource, /const modeTooltip = popupUiText\(modeTooltipKey, effectiveMode === 'whitelist'[\s\S]*?'Whitelist mode: show content matching Allowed rules'[\s\S]*?'Blocklist mode: hide content matching Blocked rules'/);
   assert.match(popupSource, /toggle\.textContent = modeLabel/);
   assert.match(popupSource, /toggle\.setAttribute\('data-ft-i18n', modeKey\)/);
+  assert.match(popupSource, /toggle\.title = modeTooltip/);
+  assert.match(popupSource, /toggle\.setAttribute\('data-ft-i18n-title', modeTooltipKey\)/);
   assert.match(popupSource, /toggle\.setAttribute\('aria-label', modeLabel\)/);
   assert.match(popupSource, /toggle\.setAttribute\('data-ft-i18n-aria-label', modeKey\)/);
   assert.equal(context.popupUiText('popup.whitelist', 'Whitelist'), translations['popup.whitelist']);
   assert.equal(context.popupUiText('popup.blocklist', 'Blocklist'), translations['popup.blocklist']);
+  assert.equal(context.popupUiText('popup.listMode.whitelistTooltip', 'English fallback'), translations['popup.listMode.whitelistTooltip']);
+  assert.equal(context.popupUiText('popup.listMode.blocklistTooltip', 'English fallback'), translations['popup.listMode.blocklistTooltip']);
 
-  assert.match(popupSource, /Whitelist mode: show content matching Allowed rules/);
-  assert.match(popupSource, /Blocklist mode: hide content matching Blocked rules/);
-  assert.doesNotMatch(popupSource, /toggle\.setAttribute\('aria-label', toggle\.title\)/);
+  assert.doesNotMatch(popupSource, /toggle\.title = effectiveMode ===/);
   assert.match(popupSource, /mode: nextState \? 'whitelist' : 'blocklist',[\s\S]*?copyBlocklist/);
   assert.match(popupSource, /const word = \(newKeywordInput\?\.value \|\| ''\)\.trim\(\)/);
   assert.match(popupSource, /const input = \(channelInput\?\.value \|\| ''\)\.trim\(\)/);
+});
+
+test('all target catalogs provide translated list-mode tooltip keys with placeholder parity', () => {
+  const english = readCatalog('en');
+  const keys = ['popup.listMode.whitelistTooltip', 'popup.listMode.blocklistTooltip'];
+  assert.equal(targets.locales.length, 38);
+  for (const { code } of targets.locales) {
+    const catalog = readCatalog(code);
+    for (const key of keys) {
+      assert.ok(typeof english[key] === 'string' && english[key].trim(), `English source: ${key}`);
+      assert.ok(typeof catalog[key] === 'string' && catalog[key].trim(), `${code}: ${key}`);
+      assert.deepEqual(
+        [...String(catalog[key]).matchAll(/\{([a-zA-Z][a-zA-Z0-9]*)\}/g)].map(match => match[1]).sort(),
+        [...String(english[key]).matchAll(/\{([a-zA-Z][a-zA-Z0-9]*)\}/g)].map(match => match[1]).sort(),
+        `${code}: ${key} placeholders`
+      );
+      if (code !== 'en') assert.notEqual(catalog[key], english[key], `${code}: ${key} should not be English fallback`);
+    }
+  }
 });
 
 test('popup profile, PIN, list-mode, and channel feedback uses localization fallbacks', () => {

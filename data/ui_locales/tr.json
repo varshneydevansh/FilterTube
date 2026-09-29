@@ -1,6 +1,8 @@
 {
   "popup.blocklist": "Engelleme listesi",
   "popup.whitelist": "İzin verilenler listesi",
+  "popup.listMode.whitelistTooltip": "İzin listesi modu: izin verilen kurallarla eşleşen içeriği göster",
+  "popup.listMode.blocklistTooltip": "Engelleme listesi modu: engellenen kurallarla eşleşen içeriği gizle",
   "profileAccess.enterMasterPinTitle": "Ana PIN'ini girin",
   "profileAccess.masterPinMessage": "Varsayılan profil korumalı. Devam etmek için ana PIN'i girin.",
   "profileAccess.masterPinPlaceholder": "Ana PIN",

@@ -1,6 +1,8 @@
 {
   "popup.blocklist": "Danh sách chặn",
   "popup.whitelist": "Danh sách cho phép",
+  "popup.listMode.whitelistTooltip": "Chế độ danh sách cho phép: hiển thị nội dung khớp với quy tắc cho phép",
+  "popup.listMode.blocklistTooltip": "Chế độ danh sách chặn: ẩn nội dung khớp với quy tắc chặn",
   "profileAccess.enterMasterPinTitle": "Nhập mã PIN chính",
   "profileAccess.masterPinMessage": "Hồ sơ mặc định được bảo vệ. Nhập mã PIN chính để tiếp tục.",
   "profileAccess.masterPinPlaceholder": "Mã PIN chính",

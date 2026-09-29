@@ -1,6 +1,8 @@
 {
   "popup.blocklist": "فهرست مسدودسازی",
   "popup.whitelist": "فهرست مجاز",
+  "popup.listMode.whitelistTooltip": "حالت فهرست مجاز: محتوای منطبق با قواعد مجاز را نمایش بده",
+  "popup.listMode.blocklistTooltip": "حالت فهرست مسدود: محتوای منطبق با قواعد مسدود را پنهان کن",
   "popup.listMode.copyRulesConfirm": "قواعد مسدودشدهٔ فعلی را در قواعد مجاز کپی می‌کنید؟ قواعد مسدودشده حفظ می‌شوند.",
   "popup.listMode.copyKidsRulesConfirm": "قواعد مسدودشدهٔ فعلی YT Kids را در قواعد مجاز کپی می‌کنید؟ قواعد مسدودشده حفظ می‌شوند.",
   "popup.listMode.emptyAllowedRules": "فهرست قواعد مجاز خالی است — تا وقتی قاعده‌هایی برای مجازکردن ویدیوها اضافه نکنید، ویدیوها پنهان می‌مانند.",

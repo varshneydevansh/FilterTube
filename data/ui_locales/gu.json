@@ -1,6 +1,8 @@
 {
   "popup.blocklist": "અવરોધ સૂચિ",
   "popup.whitelist": "મંજૂરી સૂચિ",
+  "popup.listMode.whitelistTooltip": "મંજૂરી સૂચિ મોડ: મંજૂરીના નિયમો સાથે મેળ ખાતી સામગ્રી બતાવો",
+  "popup.listMode.blocklistTooltip": "અવરોધ સૂચિ મોડ: અવરોધના નિયમો સાથે મેળ ખાતી સામગ્રી છુપાવો",
   "popup.listMode.copyRulesConfirm": "હાલના અવરોધિત નિયમોને મંજૂર નિયમોમાં નકલ કરશો? અવરોધિત નિયમો યથાવત્ રહેશે.",
   "popup.listMode.copyKidsRulesConfirm": "YT Kidsના હાલના અવરોધિત નિયમોને મંજૂર નિયમોમાં નકલ કરશો? અવરોધિત નિયમો યથાવત્ રહેશે.",
   "popup.listMode.emptyAllowedRules": "મંજૂર નિયમોની યાદી ખાલી છે — મંજૂરી આપતા નિયમો ઉમેરશો ત્યાં સુધી વિડિયો છુપાયેલા રહેશે.",

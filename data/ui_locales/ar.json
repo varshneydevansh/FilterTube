@@ -1,6 +1,8 @@
 {
   "popup.blocklist": "قائمة الحظر",
   "popup.whitelist": "قائمة السماح",
+  "popup.listMode.whitelistTooltip": "وضع قائمة السماح: عرض المحتوى المطابق للقواعد المسموح بها",
+  "popup.listMode.blocklistTooltip": "وضع قائمة الحظر: إخفاء المحتوى المطابق للقواعد المحظورة",
   "popup.listMode.copyRulesConfirm": "هل تريد نسخ القواعد المحظورة الحالية إلى القواعد المسموح بها؟ ستبقى القواعد المحظورة كما هي.",
   "popup.listMode.copyKidsRulesConfirm": "هل تريد نسخ القواعد المحظورة الحالية في YT Kids إلى القواعد المسموح بها؟ ستبقى القواعد المحظورة كما هي.",
   "popup.listMode.emptyAllowedRules": "قائمة القواعد المسموح بها فارغة — ستظل الفيديوهات مخفية حتى تضيف قواعد تسمح بها.",

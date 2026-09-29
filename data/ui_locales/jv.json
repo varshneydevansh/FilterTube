@@ -1,6 +1,8 @@
 {
   "popup.blocklist": "Dhaptar pamblokiran",
   "popup.whitelist": "Dhaptar sing diidinake",
+  "popup.listMode.whitelistTooltip": "Mode dhaptar idin: tuduhna konten sing cocog karo aturan sing diidinake",
+  "popup.listMode.blocklistTooltip": "Mode dhaptar pamblokiran: umpetna konten sing cocog karo aturan sing diblokir",
   "profileAccess.enterMasterPinTitle": "Lebokna PIN utama",
   "profileAccess.masterPinMessage": "Profil gawan dilindhungi. Lebokna PIN utama kanggo nerusake.",
   "profileAccess.masterPinPlaceholder": "PIN utama",

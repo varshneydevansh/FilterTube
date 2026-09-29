@@ -1,6 +1,8 @@
 {
   "popup.blocklist": "Daftar blokir",
   "popup.whitelist": "Daftar izin",
+  "popup.listMode.whitelistTooltip": "Mode daftar izin: tampilkan konten yang cocok dengan aturan yang diizinkan",
+  "popup.listMode.blocklistTooltip": "Mode daftar blokir: sembunyikan konten yang cocok dengan aturan yang diblokir",
   "profileAccess.enterMasterPinTitle": "Masukkan PIN utama",
   "profileAccess.masterPinMessage": "Profil default dilindungi. Masukkan PIN utama untuk melanjutkan.",
   "profileAccess.masterPinPlaceholder": "PIN utama",

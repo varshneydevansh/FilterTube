@@ -1,6 +1,8 @@
 {
   "popup.blocklist": "차단 목록",
   "popup.whitelist": "허용 목록",
+  "popup.listMode.whitelistTooltip": "허용 목록 모드: 허용 규칙과 일치하는 콘텐츠 표시",
+  "popup.listMode.blocklistTooltip": "차단 목록 모드: 차단 규칙과 일치하는 콘텐츠 숨기기",
   "profileAccess.enterMasterPinTitle": "마스터 PIN 입력",
   "profileAccess.masterPinMessage": "기본 프로필이 보호되어 있습니다. 계속하려면 마스터 PIN을 입력하세요.",
   "profileAccess.masterPinPlaceholder": "마스터 PIN",

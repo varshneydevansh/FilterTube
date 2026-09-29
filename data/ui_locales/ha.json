@@ -1,6 +1,8 @@
 {
   "popup.blocklist": "Jerin toshewa",
   "popup.whitelist": "Jerin izini",
+  "popup.listMode.whitelistTooltip": "Yanayin jerin izini: nuna abin da ya dace da dokokin izini",
+  "popup.listMode.blocklistTooltip": "Yanayin jerin toshewa: ɓoye abin da ya dace da dokokin toshewa",
   "profileAccess.enterMasterPinTitle": "Shigar da PIN na maigida",
   "profileAccess.masterPinMessage": "An kare bayanin tsoho. Shigar da PIN na maigida don ci gaba.",
   "profileAccess.masterPinPlaceholder": "PIN na maigida",

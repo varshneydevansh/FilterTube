@@ -1,6 +1,8 @@
 {
   "popup.blocklist": "Lista di blocco",
   "popup.whitelist": "Lista consentita",
+  "popup.listMode.whitelistTooltip": "Modalità lista consentita: mostra i contenuti che corrispondono alle regole consentite",
+  "popup.listMode.blocklistTooltip": "Modalità lista di blocco: nascondi i contenuti che corrispondono alle regole bloccate",
   "profileAccess.enterMasterPinTitle": "Inserisci il PIN principale",
   "profileAccess.masterPinMessage": "Il profilo predefinito è protetto. Inserisci il PIN principale per continuare.",
   "profileAccess.masterPinPlaceholder": "PIN principale",

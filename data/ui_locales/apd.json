@@ -1,6 +1,8 @@
 {
   "popup.blocklist": "لستة الحظر",
   "popup.whitelist": "لستة السماح",
+  "popup.listMode.whitelistTooltip": "وضع لستة السماح: ورّي المحتوى البوافق قواعد السماح",
+  "popup.listMode.blocklistTooltip": "وضع لستة الحظر: أخفي المحتوى البوافق قواعد الحظر",
   "profileAccess.enterMasterPinTitle": "أدخل رقم الـ PIN الرئيسي",
   "profileAccess.masterPinMessage": "الملف الافتراضي محمي. أدخل رقم الـ PIN الرئيسي عشان تواصل.",
   "profileAccess.masterPinPlaceholder": "رقم الـ PIN الرئيسي",

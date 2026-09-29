@@ -1,6 +1,8 @@
 {
   "popup.blocklist": "నిరోధ జాబితా",
   "popup.whitelist": "అనుమతి జాబితా",
+  "popup.listMode.whitelistTooltip": "అనుమతి జాబితా మోడ్: అనుమతి నియమాలకు సరిపోయే కంటెంట్‌ను చూపించు",
+  "popup.listMode.blocklistTooltip": "నిరోధ జాబితా మోడ్: నిరోధ నియమాలకు సరిపోయే కంటెంట్‌ను దాచు",
   "profileAccess.enterMasterPinTitle": "మాస్టర్ PIN నమోదు చేయండి",
   "profileAccess.masterPinMessage": "డిఫాల్ట్ ప్రొఫైల్ రక్షించబడింది. కొనసాగించడానికి మాస్టర్ PIN నమోదు చేయండి.",
   "profileAccess.masterPinPlaceholder": "మాస్టర్ PIN",
