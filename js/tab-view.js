@@ -139,13 +139,13 @@ async function initializeUpdateRefreshPromptSetting(setting) {
             });
             UIComponents.showToast(
                 disableReminders
-                    ? 'Update notifications disabled'
-                    : 'Update notifications enabled',
+                    ? tabViewUiText('dashboard.toast.updateNotificationsDisabled', 'Update notifications disabled')
+                    : tabViewUiText('dashboard.toast.updateNotificationsEnabled', 'Update notifications enabled'),
                 disableReminders ? 'info' : 'success'
             );
         } catch (e) {
             setting.checked = !disableReminders;
-            UIComponents.showToast('Could not update notification preference', 'error');
+            UIComponents.showToast(tabViewUiText('dashboard.toast.updateNotificationPreferenceFailed', 'Could not update notification preference'), 'error');
         }
     });
     setting.dataset.ftUpdateRefreshPromptBound = 'true';
@@ -162,7 +162,7 @@ function organizeHelpReadingOrder(helpView) {
     readingOrder = document.createElement('div');
     readingOrder.id = 'helpReadingOrder';
     readingOrder.className = 'help-reading-order';
-    readingOrder.setAttribute('aria-label', 'FilterTube help topics');
+    setTabViewLocalizedCopy(readingOrder, 'aria-label', 'dashboard.help.readingOrder', 'FilterTube help topics');
     toolbar.insertAdjacentElement('afterend', readingOrder);
 
     const visibleCards = Array.from(shell.querySelectorAll('.card'))
@@ -575,12 +575,12 @@ async function initializeAndroidClosedTestingInvite() {
 
     const eyebrow = document.createElement('div');
     eyebrow.className = 'ft-modal-eyebrow';
-    eyebrow.textContent = 'Android open testing';
+    setTabViewLocalizedCopy(eyebrow, 'textContent', 'dashboard.androidTesting.eyebrow', 'Android open testing');
 
     const title = document.createElement('h3');
     title.id = 'androidClosedTestingInviteTitle';
     title.className = 'ft-modal-title';
-    title.textContent = 'FilterTube for Android is open to testers';
+    setTabViewLocalizedCopy(title, 'textContent', 'dashboard.androidTesting.title', 'FilterTube for Android is open to testers');
 
     header.append(eyebrow, title);
 
@@ -589,15 +589,15 @@ async function initializeAndroidClosedTestingInvite() {
 
     const message = document.createElement('p');
     message.className = 'android-closed-testing-invite__message';
-    message.textContent = 'Anyone in a supported country can now join FilterTube\'s Google Play open test. No invitation or email is needed. Install the complete custom Main and Kids viewing app and send feedback when you spot a problem.';
+    setTabViewLocalizedCopy(message, 'textContent', 'dashboard.androidTesting.message', 'Anyone in a supported country can now join FilterTube\'s Google Play open test. No invitation or email is needed. Install the complete custom Main and Kids viewing app and send feedback when you spot a problem.');
 
     const address = document.createElement('div');
     address.className = 'android-closed-testing-invite__address';
-    address.textContent = 'Available through Google Play open testing in 177 countries and regions';
+    setTabViewLocalizedCopy(address, 'textContent', 'dashboard.androidTesting.availability', 'Available through Google Play open testing in 177 countries and regions');
 
     const note = document.createElement('p');
     note.className = 'android-closed-testing-invite__note';
-    note.textContent = 'You can close this once. It will not keep appearing after you dismiss it.';
+    setTabViewLocalizedCopy(note, 'textContent', 'dashboard.androidTesting.dismissNote', 'You can close this once. It will not keep appearing after you dismiss it.');
 
     const actions = document.createElement('div');
     actions.className = 'ft-modal-actions android-closed-testing-invite__actions';
@@ -605,7 +605,7 @@ async function initializeAndroidClosedTestingInvite() {
     const dismissBtn = document.createElement('button');
     dismissBtn.className = 'btn-secondary';
     dismissBtn.type = 'button';
-    dismissBtn.textContent = 'Got it';
+    setTabViewLocalizedCopy(dismissBtn, 'textContent', 'dashboard.androidTesting.dismiss', 'Got it');
 
     const mailBtn = document.createElement('a');
     mailBtn.className = 'btn-primary android-closed-testing-invite__mail';
@@ -613,7 +613,7 @@ async function initializeAndroidClosedTestingInvite() {
     mailBtn.href = testingHref;
     mailBtn.target = '_blank';
     mailBtn.rel = 'noreferrer';
-    mailBtn.textContent = 'Become a tester';
+    setTabViewLocalizedCopy(mailBtn, 'textContent', 'dashboard.androidTesting.join', 'Become a tester');
 
     const cleanup = async () => {
         await setDismissed();
@@ -669,9 +669,13 @@ function initializeFiltersTabs() {
         radio.id = `${name}_${value}`;
         radio.className = 'video-filter-compact-radio';
 
-        const label = document.createElement('label');
-        label.htmlFor = `${name}_${value}`;
+    const label = document.createElement('label');
+    label.htmlFor = `${name}_${value}`;
+    if (labelKey) {
+        setTabViewLocalizedCopy(label, 'textContent', labelKey, labelText);
+    } else {
         label.textContent = labelText;
+    }
         label.className = 'video-filter-compact-label';
 
         mainRow.appendChild(radio);
@@ -683,7 +687,8 @@ function initializeFiltersTabs() {
         fields.forEach((field) => {
             if (field.type === 'text') {
                 const span = document.createElement('span');
-                span.textContent = field.text;
+                if (field.textKey) setTabViewLocalizedCopy(span, 'textContent', field.textKey, field.text);
+                else span.textContent = field.text;
                 span.className = 'video-filter-compact-text';
                 fieldsWrap.appendChild(span);
                 return;
@@ -697,7 +702,8 @@ function initializeFiltersTabs() {
                 field.options.forEach(opt => {
                     const option = document.createElement('option');
                     option.value = opt.value;
-                    option.textContent = opt.label;
+                    if (opt.labelKey) setTabViewLocalizedCopy(option, 'textContent', opt.labelKey, opt.label);
+                    else option.textContent = opt.label;
                     select.appendChild(option);
                 });
                 fieldsWrap.appendChild(select);
@@ -729,7 +735,7 @@ function initializeFiltersTabs() {
         <section class="ft-rule-list-editor" aria-labelledby="keywordRuleListTitle">
             <div class="ft-rule-list-editor__copy">
                 <h3 id="keywordRuleListTitle" data-ft-tabview-i18n="dashboard.ruleEditor.viewKeywordRules">View keyword rules</h3>
-                <p id="keywordRuleTargetHelp">Showing blocked keyword rules. Changing this view does not change your Main filtering mode.</p>
+        <p id="keywordRuleTargetHelp">Showing blocked keyword rules. Changing this view does not change your Main filtering mode.</p>
             </div>
             <div class="ft-rule-target-tabs" role="tablist" aria-label="Choose the keyword rule list to edit" data-ft-tabview-aria-label="dashboard.ruleEditor.chooseKeywordList">
                 <button type="button" class="ft-rule-target-tab is-active" role="tab" aria-selected="true" aria-controls="keywordListEl" data-rule-target-for="keyword" data-rule-target="block">Blocked rules</button>
@@ -831,7 +837,7 @@ function initializeFiltersTabs() {
                 <span class="date-sep" data-ft-tabview-i18n="dashboard.ruleEditor.to">to</span>
                 <input type="date" id="channelDateTo" class="select-input date-input custom-date-input" />
                 <button id="channelDateClear" class="btn-secondary date-clear-btn" type="button" data-ft-tabview-i18n="dashboard.ruleEditor.clear">Clear</button>
-                <button id="importSubscriptionsBtn" class="btn-secondary date-clear-btn subscriptions-import-trigger" type="button">Import Subscribed Channels</button>
+                <button id="importSubscriptionsBtn" class="btn-secondary date-clear-btn subscriptions-import-trigger" type="button" data-ft-tabview-i18n="dashboard.import.buttonLabel">Import Subscribed Channels</button>
             </div>
         </div>
 
@@ -843,7 +849,7 @@ function initializeFiltersTabs() {
         <div id="importedChannelEnrichmentNotice" class="subscriptions-import-inline subscriptions-import-inline--info imported-channel-enrichment-inline" hidden>
             <div id="importedChannelEnrichmentStatus" class="subscriptions-import-status" role="status" aria-live="polite"></div>
             <div class="imported-channel-enrichment-actions">
-                <button id="viewChannelImportReports" class="btn-secondary imported-channel-enrichment-toggle" type="button">View import reports</button>
+                <button id="viewChannelImportReports" class="btn-secondary imported-channel-enrichment-toggle" type="button" data-ft-tabview-i18n="dashboard.import.viewReports">View import reports</button>
                 <button id="importedChannelEnrichmentToggle" class="btn-secondary imported-channel-enrichment-toggle" type="button" hidden></button>
             </div>
         </div>
@@ -861,7 +867,7 @@ function initializeFiltersTabs() {
     contentControlsSearch.type = 'text';
     contentControlsSearch.id = 'searchContentControls';
     contentControlsSearch.className = 'text-input search-input';
-    contentControlsSearch.placeholder = 'Search content controls...';
+    setTabViewLocalizedCopy(contentControlsSearch, 'placeholder', 'popup.searchContentControls', 'Search content controls...');
 
     contentSearchRow.appendChild(contentControlsSearch);
     contentTab.appendChild(contentSearchRow);
@@ -986,7 +992,7 @@ function initializeFiltersTabs() {
 
         const title = document.createElement('div');
         title.className = 'content-control-group__title';
-        title.textContent = 'Feeds';
+        setTabViewLocalizedCopy(title, 'textContent', 'popup.feeds', 'Feeds');
 
         header.appendChild(title);
         wrapper.appendChild(header);
@@ -1009,12 +1015,12 @@ function initializeFiltersTabs() {
 
     const durationTitle = document.createElement('div');
     durationTitle.className = 'toggle-title';
-    durationTitle.textContent = 'Duration Filter';
+    setTabViewLocalizedCopy(durationTitle, 'textContent', 'popup.durationFilter', 'Duration Filter');
 
     const durationDesc = document.createElement('div');
     durationDesc.className = 'toggle-description';
     durationDesc.textContent = '';
-    durationTitle.title = 'Filter videos by length (minutes)';
+    setTabViewLocalizedCopy(durationTitle, 'title', 'tabView.videoFilters.durationTitle', 'Filter videos by length (minutes)');
 
     durationInfo.appendChild(durationTitle);
     durationInfo.appendChild(durationDesc);
@@ -1050,29 +1056,32 @@ function initializeFiltersTabs() {
         name: 'videoFilter_duration_condition',
         value: 'longer',
         labelText: 'Block longer than',
+        labelKey: 'tabView.videoFilters.blockLongerThan',
         fields: [
             { id: 'videoFilter_duration_longer_value', type: 'number', placeholder: '60', min: 1, width: '50px' },
-            { type: 'text', text: 'min' }
+            { type: 'text', text: 'min', textKey: 'tabView.videoFilters.minuteAbbreviation' }
         ]
     });
     const shorterRadio = createCompactCondition({
         name: 'videoFilter_duration_condition',
         value: 'shorter',
         labelText: 'Block shorter than',
+        labelKey: 'tabView.videoFilters.blockShorterThan',
         fields: [
             { id: 'videoFilter_duration_shorter_value', type: 'number', placeholder: '5', min: 1, width: '50px' },
-            { type: 'text', text: 'min' }
+            { type: 'text', text: 'min', textKey: 'tabView.videoFilters.minuteAbbreviation' }
         ]
     });
     const betweenRadio = createCompactCondition({
         name: 'videoFilter_duration_condition',
         value: 'between',
         labelText: 'Only between',
+        labelKey: 'tabView.videoFilters.onlyBetween',
         fields: [
             { id: 'videoFilter_duration_between_min', type: 'number', placeholder: '10', min: 1, width: '50px' },
             { type: 'text', text: '-' },
             { id: 'videoFilter_duration_between_max', type: 'number', placeholder: '120', min: 1, width: '50px' },
-            { type: 'text', text: 'min' }
+            { type: 'text', text: 'min', textKey: 'tabView.videoFilters.minuteAbbreviation' }
         ]
     });
 
@@ -1093,12 +1102,12 @@ function initializeFiltersTabs() {
 
     const uploadDateTitle = document.createElement('div');
     uploadDateTitle.className = 'toggle-title';
-    uploadDateTitle.textContent = 'Upload Date Filter';
+    setTabViewLocalizedCopy(uploadDateTitle, 'textContent', 'popup.uploadDateFilter', 'Upload Date Filter');
 
     const uploadDateDesc = document.createElement('div');
     uploadDateDesc.className = 'toggle-description';
     uploadDateDesc.textContent = '';
-    uploadDateTitle.title = 'Filter by absolute date range';
+    setTabViewLocalizedCopy(uploadDateTitle, 'title', 'tabView.videoFilters.uploadDateTitle', 'Filter by absolute date range');
 
     uploadDateInfo.appendChild(uploadDateTitle);
     uploadDateInfo.appendChild(uploadDateDesc);
@@ -1131,16 +1140,17 @@ function initializeFiltersTabs() {
     uploadDateConditionsWrap.className = 'video-filter-conditions';
 
     const unitOptions = [
-        { value: 'days', label: 'days' },
-        { value: 'weeks', label: 'weeks' },
-        { value: 'months', label: 'months' },
-        { value: 'years', label: 'years' }
+        { value: 'days', label: 'days', labelKey: 'tabView.videoFilters.days' },
+        { value: 'weeks', label: 'weeks', labelKey: 'tabView.videoFilters.weeks' },
+        { value: 'months', label: 'months', labelKey: 'tabView.videoFilters.months' },
+        { value: 'years', label: 'years', labelKey: 'tabView.videoFilters.years' }
     ];
 
     const newerRadio = createCompactCondition({
         name: 'videoFilter_uploadDate_condition',
         value: 'newer',
         labelText: 'Only past',
+        labelKey: 'tabView.videoFilters.onlyPast',
         fields: [
             { id: 'videoFilter_age_newer_value', type: 'number', placeholder: '30', min: 1, width: '45px' },
             { type: 'select', id: 'videoFilter_age_newer_unit', options: unitOptions, width: '72px' }
@@ -1150,6 +1160,7 @@ function initializeFiltersTabs() {
         name: 'videoFilter_uploadDate_condition',
         value: 'older',
         labelText: 'Block older than',
+        labelKey: 'tabView.videoFilters.blockOlderThan',
         fields: [
             { id: 'videoFilter_age_older_value', type: 'number', placeholder: '5', min: 1, width: '45px' },
             { type: 'select', id: 'videoFilter_age_older_unit', options: unitOptions, width: '72px' }
@@ -1159,6 +1170,7 @@ function initializeFiltersTabs() {
         name: 'videoFilter_uploadDate_condition',
         value: 'between',
         labelText: 'Between',
+        labelKey: 'tabView.videoFilters.between',
         fields: [
             { id: 'videoFilter_age_between_min', type: 'number', placeholder: '1', min: 1, width: '45px' },
             { type: 'select', id: 'videoFilter_age_between_min_unit', options: unitOptions, width: '72px' },
@@ -1185,12 +1197,12 @@ function initializeFiltersTabs() {
 
     const uppercaseTitle = document.createElement('div');
     uppercaseTitle.className = 'toggle-title';
-    uppercaseTitle.textContent = 'UPPERCASE Title Filter';
+    setTabViewLocalizedCopy(uppercaseTitle, 'textContent', 'popup.uppercaseFilter', 'Uppercase Title Filter');
 
     const uppercaseDesc = document.createElement('div');
     uppercaseDesc.className = 'toggle-description';
     uppercaseDesc.textContent = '';
-    uppercaseTitle.title = 'Block AI slop with ALL CAPS titles';
+    setTabViewLocalizedCopy(uppercaseTitle, 'title', 'popup.uppercaseHint', 'Block AI slop with ALL CAPS titles');
 
     uppercaseInfo.appendChild(uppercaseTitle);
     uppercaseInfo.appendChild(uppercaseDesc);
@@ -1202,10 +1214,11 @@ function initializeFiltersTabs() {
     uppercaseModeSelect.id = 'videoFilter_uppercase_mode';
     uppercaseModeSelect.className = 'select-input video-filter-mode-select';
     uppercaseModeSelect.innerHTML = `
-        <option value="single_word">Single uppercase word</option>
-        <option value="all_caps">All caps title</option>
-        <option value="both">Both</option>
+        <option value="single_word" data-ft-tabview-i18n="tabView.videoFilters.singleUppercaseWord">Single uppercase word</option>
+        <option value="all_caps" data-ft-tabview-i18n="tabView.videoFilters.allCapsTitle">All caps title</option>
+        <option value="both" data-ft-tabview-i18n="tabView.videoFilters.bothModes">Both</option>
     `;
+    bindTabViewLocalizedMarkup(uppercaseModeSelect);
 
     const uppercaseToggle = document.createElement('label');
     uppercaseToggle.className = 'switch';
@@ -1246,7 +1259,7 @@ function initializeFiltersTabs() {
 
     const categoryFiltersTitle = document.createElement('div');
     categoryFiltersTitle.className = 'content-control-group__title';
-    categoryFiltersTitle.textContent = 'Category Filters';
+    setTabViewLocalizedCopy(categoryFiltersTitle, 'textContent', 'popup.categoryFilters', 'Category Filters');
     categoryFiltersHeader.appendChild(categoryFiltersTitle);
     categoryFiltersSection.appendChild(categoryFiltersHeader);
 
@@ -1268,12 +1281,12 @@ function initializeFiltersTabs() {
 
     const categoryMainTitle = document.createElement('div');
     categoryMainTitle.className = 'toggle-title';
-    categoryMainTitle.textContent = 'Category Filter';
-    categoryMainTitle.title = 'Filter videos by their YouTube category';
+    setTabViewLocalizedCopy(categoryMainTitle, 'textContent', 'popup.categoryFilter', 'Category Filter');
+    setTabViewLocalizedCopy(categoryMainTitle, 'title', 'tabView.categoryFilter.title', 'Filter videos by their YouTube category');
 
     const categoryMainDesc = document.createElement('div');
     categoryMainDesc.className = 'toggle-description';
-    categoryMainDesc.textContent = 'Uses the official YouTube category independently of the profile Blocklist or Whitelist mode.';
+    setTabViewLocalizedCopy(categoryMainDesc, 'textContent', 'tabView.categoryFilter.description', 'Uses the official YouTube category independently of the profile Blocklist or Whitelist mode.');
 
     categoryMainInfo.appendChild(categoryMainTitle);
     categoryMainInfo.appendChild(categoryMainDesc);
@@ -1317,7 +1330,7 @@ function initializeFiltersTabs() {
     categoryMainSearch.type = 'text';
     categoryMainSearch.className = 'search-input ft-category-search';
     categoryMainSearch.id = 'categoryFilter_search';
-    categoryMainSearch.placeholder = 'Search categories...';
+    setTabViewLocalizedCopy(categoryMainSearch, 'placeholder', 'popup.searchCategories', 'Search categories...');
     categoryMainPanel.appendChild(categoryMainSearch);
 
     const categoryMainSelectionBar = document.createElement('div');
@@ -1331,7 +1344,7 @@ function initializeFiltersTabs() {
     const categoryMainClear = document.createElement('button');
     categoryMainClear.type = 'button';
     categoryMainClear.className = 'ft-category-clear';
-    categoryMainClear.textContent = 'Clear selection';
+    setTabViewLocalizedCopy(categoryMainClear, 'textContent', 'popup.clear', 'Clear');
 
     categoryMainSelectionBar.appendChild(categoryMainSelectionCount);
     categoryMainSelectionBar.appendChild(categoryMainClear);
@@ -1587,12 +1600,12 @@ function initializeFiltersTabs() {
     languageFiltersSection.setAttribute('data-ft-control-group', 'true');
     languageFiltersSection.setAttribute('data-ft-group-title', 'Language Filters');
     languageFiltersSection.innerHTML = `
-        <div class="content-control-group__header"><div class="content-control-group__title">Language Filters <span class="ft-experimental-badge">Experimental</span></div></div>
+        <div class="content-control-group__header"><div class="content-control-group__title"><span data-ft-tabview-i18n="popup.languageFilters">Language Filters</span> <span class="ft-experimental-badge" data-ft-tabview-i18n="popup.experimental">Experimental</span></div></div>
         <div class="content-control-group__rows">
             <div class="toggle-row" data-ft-control-row="true" data-ft-search="language spoken audio filter">
                 <div class="toggle-info">
-                    <div class="toggle-title">Spoken Language Filter</div>
-                    <div class="toggle-description">Uses YouTube's original/default audio evidence; auto-dubbed alternatives do not change the source language.</div>
+                    <div class="toggle-title" data-ft-tabview-i18n="popup.spokenLanguage">Spoken Language Filter</div>
+                    <div class="toggle-description" data-ft-tabview-i18n="popup.languageDescription">Uses YouTube's original/default audio evidence; auto-dubbed alternatives do not change the source language.</div>
                 </div>
                 <div class="ft-category-controls">
                     <select id="languageFilter_mode" class="select-input"><option value="block" data-ft-i18n="popup.blockSelected">Block selected</option><option value="allow" data-ft-i18n="popup.allowOnlySelected">Allow only selected</option></select>
@@ -1600,11 +1613,12 @@ function initializeFiltersTabs() {
                 </div>
             </div>
             <div id="languageFilter_panel" class="language-filter-picker" style="display: none;">
-                <input id="languageFilter_search" type="text" class="search-input ft-category-search" placeholder="Search languages...">
-                <div class="ft-category-selection-bar"><span id="languageFilter_selectionCount" class="ft-category-selection-count" aria-live="polite"></span><button id="languageFilter_clear" type="button" class="ft-category-clear">Clear selection</button></div>
+                <input id="languageFilter_search" type="text" class="search-input ft-category-search" placeholder="Search languages..." data-ft-tabview-placeholder="popup.searchLanguages">
+                <div class="ft-category-selection-bar"><span id="languageFilter_selectionCount" class="ft-category-selection-count" aria-live="polite"></span><button id="languageFilter_clear" type="button" class="ft-category-clear" data-ft-tabview-i18n="popup.clear">Clear</button></div>
                 <div id="languageFilter_list" class="ft-category-options"></div>
             </div>
         </div>`;
+    bindTabViewLocalizedMarkup(languageFiltersSection);
     // Language filtering remains experimental and belongs after the stable
     // Content Controls groups instead of between Category Filters and Feeds.
     contentTab.appendChild(languageFiltersSection);
@@ -2217,6 +2231,16 @@ function initializeFiltersTabs() {
         }
     });
 
+    const mainTabLabels = {
+        keywords: ['dashboard.filterTabs.keywordManagement', 'Keyword Management'],
+        channels: ['dashboard.filterTabs.channelManagement', 'Channel Management'],
+        content: ['dashboard.filterTabs.contentControls', 'Content Controls']
+    };
+    tabs.container.querySelectorAll('.tab-button').forEach((button) => {
+        const copy = mainTabLabels[button.dataset.tabId];
+        if (copy) setTabViewLocalizedCopy(button, 'textContent', copy[0], copy[1]);
+    });
+
     container.appendChild(tabs.container);
 
     const sidebar = document.getElementById('sidebarNav');
@@ -2437,7 +2461,7 @@ function initializeKidsTabs() {
     kidsContentControlsSearch.type = 'text';
     kidsContentControlsSearch.id = 'searchKidsContentControls';
     kidsContentControlsSearch.className = 'text-input search-input';
-    kidsContentControlsSearch.placeholder = 'Search kids content controls...';
+    setTabViewLocalizedCopy(kidsContentControlsSearch, 'placeholder', 'tabView.kidsContentControls.searchPlaceholder', 'Search kids content controls...');
 
     kidsContentSearchRow.appendChild(kidsContentControlsSearch);
     kidsContentTab.appendChild(kidsContentSearchRow);
@@ -2457,7 +2481,7 @@ function initializeKidsTabs() {
 
     const kidsVideoFiltersTitle = document.createElement('div');
     kidsVideoFiltersTitle.className = 'content-control-group__title';
-    kidsVideoFiltersTitle.textContent = 'Content Controls';
+    setTabViewLocalizedCopy(kidsVideoFiltersTitle, 'textContent', 'dashboard.filterTabs.contentControls', 'Content Controls');
 
     kidsVideoFiltersHeader.appendChild(kidsVideoFiltersTitle);
     kidsVideoFiltersSection.appendChild(kidsVideoFiltersHeader);
@@ -2469,18 +2493,18 @@ function initializeKidsTabs() {
     kidsMainSyncRow.className = 'toggle-row';
     kidsMainSyncRow.setAttribute('data-ft-control-row', 'true');
     kidsMainSyncRow.setAttribute('data-ft-search', 'apply matching yt kids rules on youtube sync kids to main from kids badge');
-    kidsMainSyncRow.title = 'When enabled, matching-mode YouTube Kids rules are also applied on main YouTube for this profile. Kids blocklist syncs only into Main blocklist; Kids whitelist syncs only into Main whitelist.';
+    setTabViewLocalizedCopy(kidsMainSyncRow, 'title', 'tabView.kidsSync.title', 'When enabled, matching-mode YouTube Kids rules are also applied on main YouTube for this profile. Kids blocklist syncs only into Main blocklist; Kids whitelist syncs only into Main whitelist.');
 
     const kidsMainSyncInfo = document.createElement('div');
     kidsMainSyncInfo.className = 'toggle-info';
 
     const kidsMainSyncTitle = document.createElement('div');
     kidsMainSyncTitle.className = 'toggle-title';
-    kidsMainSyncTitle.textContent = 'Apply matching YT Kids rules on YouTube';
+    setTabViewLocalizedCopy(kidsMainSyncTitle, 'textContent', 'tabView.kidsSync.heading', 'Apply matching YT Kids rules on YouTube');
 
     const kidsMainSyncHint = document.createElement('div');
     kidsMainSyncHint.className = 'import-export-hint';
-    kidsMainSyncHint.textContent = 'Synced items show in your main list with a "From Kids" badge. Mismatched modes do not invert rules.';
+    setTabViewLocalizedCopy(kidsMainSyncHint, 'textContent', 'tabView.kidsSync.hint', 'Synced items show in your main list with a "From Kids" badge. Mismatched modes do not invert rules.');
 
     kidsMainSyncInfo.appendChild(kidsMainSyncTitle);
     kidsMainSyncInfo.appendChild(kidsMainSyncHint);
@@ -2513,7 +2537,7 @@ function initializeKidsTabs() {
 
     const kidsDurationTitle = document.createElement('div');
     kidsDurationTitle.className = 'toggle-title';
-    kidsDurationTitle.textContent = 'Duration Filter';
+    setTabViewLocalizedCopy(kidsDurationTitle, 'textContent', 'popup.durationFilter', 'Duration Filter');
 
     kidsDurationInfo.appendChild(kidsDurationTitle);
 
@@ -2589,7 +2613,7 @@ function initializeKidsTabs() {
 
     const kidsUploadDateTitle = document.createElement('div');
     kidsUploadDateTitle.className = 'toggle-title';
-    kidsUploadDateTitle.textContent = 'Upload Date Filter';
+    setTabViewLocalizedCopy(kidsUploadDateTitle, 'textContent', 'popup.uploadDateFilter', 'Upload Date Filter');
 
     kidsUploadDateInfo.appendChild(kidsUploadDateTitle);
 
@@ -2620,16 +2644,17 @@ function initializeKidsTabs() {
     kidsUploadDateConditionsWrap.className = 'video-filter-conditions';
 
     const unitOptions = [
-        { value: 'days', label: 'days' },
-        { value: 'weeks', label: 'weeks' },
-        { value: 'months', label: 'months' },
-        { value: 'years', label: 'years' }
+        { value: 'days', label: 'days', labelKey: 'tabView.videoFilters.days' },
+        { value: 'weeks', label: 'weeks', labelKey: 'tabView.videoFilters.weeks' },
+        { value: 'months', label: 'months', labelKey: 'tabView.videoFilters.months' },
+        { value: 'years', label: 'years', labelKey: 'tabView.videoFilters.years' }
     ];
 
     const kidsNewerRadio = createCompactCondition({
         name: 'kidsVideoFilter_uploadDate_condition',
         value: 'newer',
         labelText: 'Only past',
+        labelKey: 'tabView.videoFilters.onlyPast',
         fields: [
             { id: 'kidsVideoFilter_age_newer_value', type: 'number', placeholder: '30', min: 1, width: '45px' },
             { type: 'select', id: 'kidsVideoFilter_age_newer_unit', options: unitOptions, width: '72px' }
@@ -2639,6 +2664,7 @@ function initializeKidsTabs() {
         name: 'kidsVideoFilter_uploadDate_condition',
         value: 'older',
         labelText: 'Block older than',
+        labelKey: 'tabView.videoFilters.blockOlderThan',
         fields: [
             { id: 'kidsVideoFilter_age_older_value', type: 'number', placeholder: '5', min: 1, width: '45px' },
             { type: 'select', id: 'kidsVideoFilter_age_older_unit', options: unitOptions, width: '72px' }
@@ -2648,6 +2674,7 @@ function initializeKidsTabs() {
         name: 'kidsVideoFilter_uploadDate_condition',
         value: 'between',
         labelText: 'Between',
+        labelKey: 'tabView.videoFilters.between',
         fields: [
             { id: 'kidsVideoFilter_age_between_min', type: 'number', placeholder: '1', min: 1, width: '45px' },
             { type: 'select', id: 'kidsVideoFilter_age_between_min_unit', options: unitOptions, width: '72px' },
@@ -2673,7 +2700,7 @@ function initializeKidsTabs() {
 
     const kidsUppercaseTitle = document.createElement('div');
     kidsUppercaseTitle.className = 'toggle-title';
-    kidsUppercaseTitle.textContent = 'UPPERCASE Title Filter';
+    setTabViewLocalizedCopy(kidsUppercaseTitle, 'textContent', 'popup.uppercaseFilter', 'Uppercase Title Filter');
 
     kidsUppercaseInfo.appendChild(kidsUppercaseTitle);
 
@@ -2684,10 +2711,11 @@ function initializeKidsTabs() {
     kidsUppercaseModeSelect.id = 'kidsVideoFilter_uppercase_mode';
     kidsUppercaseModeSelect.className = 'select-input video-filter-mode-select';
     kidsUppercaseModeSelect.innerHTML = `
-        <option value="single_word">Single uppercase word</option>
-        <option value="all_caps">All caps title</option>
-        <option value="both">Both</option>
+        <option value="single_word" data-ft-tabview-i18n="tabView.videoFilters.singleUppercaseWord">Single uppercase word</option>
+        <option value="all_caps" data-ft-tabview-i18n="tabView.videoFilters.allCapsTitle">All caps title</option>
+        <option value="both" data-ft-tabview-i18n="tabView.videoFilters.bothModes">Both</option>
     `;
+    bindTabViewLocalizedMarkup(kidsUppercaseModeSelect);
 
     const kidsUppercaseToggle = document.createElement('label');
     kidsUppercaseToggle.className = 'switch';
@@ -2743,7 +2771,7 @@ function initializeKidsTabs() {
 
     const kidsCategoryTitle = document.createElement('div');
     kidsCategoryTitle.className = 'content-control-group__title';
-    kidsCategoryTitle.textContent = 'Category Filters';
+    setTabViewLocalizedCopy(kidsCategoryTitle, 'textContent', 'popup.categoryFilters', 'Category Filters');
 
     kidsCategoryHeader.appendChild(kidsCategoryTitle);
     kidsCategorySection.appendChild(kidsCategoryHeader);
@@ -2761,7 +2789,7 @@ function initializeKidsTabs() {
 
     const kidsCategoryInfoTitle = document.createElement('div');
     kidsCategoryInfoTitle.className = 'toggle-title';
-    kidsCategoryInfoTitle.textContent = 'Category Filter';
+    setTabViewLocalizedCopy(kidsCategoryInfoTitle, 'textContent', 'popup.categoryFilter', 'Category Filter');
 
     kidsCategoryInfo.appendChild(kidsCategoryInfoTitle);
 
@@ -2808,7 +2836,7 @@ function initializeKidsTabs() {
     kidsCategorySearch.type = 'text';
     kidsCategorySearch.className = 'search-input ft-category-search';
     kidsCategorySearch.id = 'kidsCategoryFilter_search';
-    kidsCategorySearch.placeholder = 'Search categories...';
+    setTabViewLocalizedCopy(kidsCategorySearch, 'placeholder', 'popup.searchCategories', 'Search categories...');
     kidsCategoryPanel.appendChild(kidsCategorySearch);
 
     const kidsCategorySelectionBar = document.createElement('div');
@@ -2821,7 +2849,7 @@ function initializeKidsTabs() {
     const kidsCategoryClear = document.createElement('button');
     kidsCategoryClear.type = 'button';
     kidsCategoryClear.className = 'ft-category-clear';
-    kidsCategoryClear.textContent = 'Clear selection';
+    setTabViewLocalizedCopy(kidsCategoryClear, 'textContent', 'popup.clear', 'Clear');
 
     kidsCategorySelectionBar.appendChild(kidsCategorySelectionCount);
     kidsCategorySelectionBar.appendChild(kidsCategoryClear);
@@ -3420,6 +3448,16 @@ function initializeKidsTabs() {
         }
     });
 
+    const kidsTabLabels = {
+        kidsKeywords: ['dashboard.filterTabs.keywordManagement', 'Keyword Management'],
+        kidsChannels: ['dashboard.filterTabs.channelManagement', 'Channel Management'],
+        kidsContent: ['dashboard.filterTabs.contentControls', 'Content Controls']
+    };
+    tabs.container.querySelectorAll('.tab-button').forEach((button) => {
+        const copy = kidsTabLabels[button.dataset.tabId];
+        if (copy) setTabViewLocalizedCopy(button, 'textContent', copy[0], copy[1]);
+    });
+
     container.appendChild(tabs.container);
 
     try {
@@ -3791,7 +3829,7 @@ async function loadReleaseNotesIntoDashboard() {
                 link.href = note.detailsUrl;
                 link.target = '_blank';
                 link.rel = 'noopener noreferrer';
-                link.textContent = 'View changelog';
+                setTabViewLocalizedCopy(link, 'textContent', 'dashboard.whatsNew.viewChangelog', 'View changelog');
                 actions.appendChild(link);
             }
 
@@ -4956,26 +4994,28 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     function formatImportedChannelEnrichmentWait(nextRunAt) {
         const remainingMs = Math.max(0, Number(nextRunAt) - Date.now());
-        if (!remainingMs) return 'Next lookup will start shortly.';
+        if (!remainingMs) return tabViewUiText('dashboard.importEnrichment.nextLookupShortly', 'Next lookup will start shortly.');
         // A pre-background build could persist a failed row's retry as a
         // queue-wide multi-hour wake. Do not surface that stale value while
         // the background worker migrates it to the per-row schedule.
         if (remainingMs > 30 * 60 * 1000) {
-            return 'The older queue timing is being corrected; fresh rows continue on the normal interval.';
+            return tabViewUiText('dashboard.importEnrichment.queueTimingCorrection', 'The older queue timing is being corrected; fresh rows continue on the normal interval.');
         }
         const remainingSeconds = Math.ceil(remainingMs / 1000);
-        if (remainingSeconds < 60) return `Next lookup in about ${remainingSeconds} seconds.`;
+        if (remainingSeconds < 60) return tabViewUiText('dashboard.importEnrichment.nextLookupSeconds', 'Next lookup in about {count} seconds.', { count: remainingSeconds });
         const remainingMinutes = Math.ceil(remainingSeconds / 60);
-        if (remainingMinutes < 60) return `Next lookup in about ${remainingMinutes} minutes.`;
-        return 'The next lookup is being rescheduled by the background worker.';
+        if (remainingMinutes < 60) return tabViewUiText('dashboard.importEnrichment.nextLookupMinutes', 'Next lookup in about {count} minutes.', { count: remainingMinutes });
+        return tabViewUiText('dashboard.importEnrichment.lookupRescheduled', 'The next lookup is being rescheduled by the background worker.');
     }
 
     function formatImportedChannelEnrichmentDuration(seconds) {
         const totalMinutes = Math.max(1, Math.ceil(Number(seconds) / 60));
-        if (totalMinutes < 60) return `${totalMinutes} min`;
+        if (totalMinutes < 60) return tabViewUiText('dashboard.importEnrichment.durationMinutes', '{count} min', { count: totalMinutes });
         const hours = Math.floor(totalMinutes / 60);
         const minutes = totalMinutes % 60;
-        return minutes ? `${hours} hr ${minutes} min` : `${hours} hr`;
+        return minutes
+            ? tabViewUiText('dashboard.importEnrichment.durationHoursMinutes', '{hours} hr {minutes} min', { hours, minutes })
+            : tabViewUiText('dashboard.importEnrichment.durationHours', '{hours} hr', { hours });
     }
 
     async function refreshImportedChannelEnrichmentStatus() {
@@ -5023,32 +5063,47 @@ document.addEventListener('DOMContentLoaded', async () => {
         const settled = Math.min(initialTotal, completed + attention);
         const progressPercent = initialTotal ? Math.round((settled / initialTotal) * 100) : 0;
         const eta = blockedReason || paused
-            ? 'Paused'
+            ? tabViewUiText('dashboard.importEnrichment.paused', 'Paused')
             : `${formatImportedChannelEnrichmentDuration(total * minDelaySeconds)}–${formatImportedChannelEnrichmentDuration(total * maxDelaySeconds)}`;
         const lifecycleMessage = blockedReason === 'profile_locked'
-            ? 'Metadata completion is waiting because this profile is locked. Unlock the profile to continue.'
+            ? tabViewUiText('dashboard.importEnrichment.waitingProfileLocked', 'Metadata completion is waiting because this profile is locked. Unlock the profile to continue.')
             : blockedReason
-                ? 'Metadata completion is waiting for the active profile context to be restored.'
+                ? tabViewUiText('dashboard.importEnrichment.waitingProfileContext', 'Metadata completion is waiting for the active profile context to be restored.')
                 : paused
-                    ? 'Metadata completion is paused by you. Resume it whenever you want the remaining details fetched.'
-                    : 'This queue runs in the FilterTube background, so closing this dashboard does not stop it. Browser shutdown or background wakeup limits can delay the next lookup.';
+                    ? tabViewUiText('dashboard.importEnrichment.pausedByUser', 'Metadata completion is paused by you. Resume it whenever you want the remaining details fetched.')
+                    : tabViewUiText('dashboard.importEnrichment.backgroundLifecycle', 'This queue runs in the FilterTube background, so closing this dashboard does not stop it. Browser shutdown or background wakeup limits can delay the next lookup.');
         const scheduleMessage = blockedReason || paused
             ? ''
-            : `While the background is awake, FilterTube spaces lookups randomly between ${minDelaySeconds} and ${maxDelaySeconds} seconds; it never sends the whole list as a burst. ${formatImportedChannelEnrichmentWait(status?.nextRunAt)}`;
+            : tabViewUiText('dashboard.importEnrichment.schedule', 'While the background is awake, FilterTube spaces lookups randomly between {minDelay} and {maxDelay} seconds; it never sends the whole list as a burst. {nextLookup}', {
+                minDelay: minDelaySeconds,
+                maxDelay: maxDelaySeconds,
+                nextLookup: formatImportedChannelEnrichmentWait(status?.nextRunAt)
+            });
+        const stateLabel = paused
+            ? tabViewUiText('dashboard.importEnrichment.paused', 'Paused')
+            : (blockedReason
+                ? tabViewUiText('dashboard.importEnrichment.waiting', 'Waiting')
+                : (inFlight
+                    ? tabViewUiText('dashboard.importEnrichment.fetchingNow', 'Fetching now')
+                    : tabViewUiText('dashboard.importEnrichment.running', 'Running')));
+        const completedLabel = initialTotal
+            ? tabViewUiText('dashboard.importEnrichment.completedOf', 'Completed of {total}', { total: initialTotal.toLocaleString() })
+            : tabViewUiText('dashboard.importEnrichment.completed', 'Completed');
+        const scheduleDetails = tabViewUiText('dashboard.importEnrichment.detailNote', 'Valid identifiers are filtering now; names, handles/custom URLs, and avatars fill in together. Temporary failures stay visible in Import Reports and retry without stopping fresh rows. Permanent not-found/deleted responses stop retrying and remain there with the exact reason for manual verification.');
         importedChannelEnrichmentStatus.innerHTML = `
             <div class="imported-enrichment-heading">
-                <strong>Completing imported channel details</strong>
-                <span>${paused ? 'Paused' : (blockedReason ? 'Waiting' : (inFlight ? 'Fetching now' : 'Running'))}</span>
+                <strong>${tabViewUiText('dashboard.importEnrichment.heading', 'Completing imported channel details')}</strong>
+                <span>${stateLabel}</span>
             </div>
             <div class="imported-enrichment-metrics">
-                <div><b>${completed.toLocaleString()}</b><span>Completed${initialTotal ? ` of ${initialTotal.toLocaleString()}` : ''}</span></div>
-                <div><b>${total.toLocaleString()}</b><span>Remaining</span></div>
-                <div><b>${attention.toLocaleString()}</b><span>Needs manual review</span></div>
-                <div><b>${eta}</b><span>Estimated active time</span></div>
+                <div><b>${completed.toLocaleString()}</b><span>${completedLabel}</span></div>
+                <div><b>${total.toLocaleString()}</b><span>${tabViewUiText('dashboard.importEnrichment.remaining', 'Remaining')}</span></div>
+                <div><b>${attention.toLocaleString()}</b><span>${tabViewUiText('dashboard.importEnrichment.needsManualReview', 'Needs manual review')}</span></div>
+                <div><b>${eta}</b><span>${tabViewUiText('dashboard.importEnrichment.estimatedActiveTime', 'Estimated active time')}</span></div>
             </div>
-            <div class="imported-enrichment-progress" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="${progressPercent}"><span style="width:${progressPercent}%"></span></div>
+            <div class="imported-enrichment-progress" role="progressbar" aria-label="${tabViewUiText('dashboard.importEnrichment.progressLabel', 'Imported channel detail progress')}" aria-valuemin="0" aria-valuemax="100" aria-valuenow="${progressPercent}"><span style="width:${progressPercent}%"></span></div>
             <p>${lifecycleMessage}</p>
-            <small>${scheduleMessage} Valid identifiers are filtering now; names, handles/custom URLs, and avatars fill in together. Temporary failures stay visible in Import Reports and retry without stopping fresh rows. Permanent not-found/deleted responses stop retrying and remain there with the exact reason for manual verification.</small>
+            <small>${scheduleMessage} ${scheduleDetails}</small>
         `;
         importedChannelEnrichmentNotice.hidden = false;
         importedChannelEnrichmentNotice.setAttribute('aria-busy', inFlight ? 'true' : 'false');
@@ -5056,10 +5111,22 @@ document.addEventListener('DOMContentLoaded', async () => {
             importedChannelEnrichmentToggle.hidden = false;
             importedChannelEnrichmentToggle.disabled = blockedReason === 'profile_locked';
             importedChannelEnrichmentToggle.dataset.paused = paused ? 'true' : 'false';
-            importedChannelEnrichmentToggle.textContent = paused ? 'Resume metadata completion' : 'Pause metadata completion';
-            importedChannelEnrichmentToggle.title = blockedReason === 'profile_locked'
-                ? 'Unlock this profile to continue metadata completion.'
-                : (paused ? 'Resume the background metadata queue.' : 'Pause the background metadata queue.');
+            setTabViewLocalizedCopy(
+                importedChannelEnrichmentToggle,
+                'textContent',
+                paused ? 'dashboard.importEnrichment.resume' : 'dashboard.importEnrichment.pause',
+                paused ? 'Resume metadata completion' : 'Pause metadata completion'
+            );
+            setTabViewLocalizedCopy(
+                importedChannelEnrichmentToggle,
+                'title',
+                blockedReason === 'profile_locked'
+                    ? 'dashboard.importEnrichment.unlockToContinue'
+                    : (paused ? 'dashboard.importEnrichment.resumeHelp' : 'dashboard.importEnrichment.pauseHelp'),
+                blockedReason === 'profile_locked'
+                    ? 'Unlock this profile to continue metadata completion.'
+                    : (paused ? 'Resume the background metadata queue.' : 'Pause the background metadata queue.')
+            );
         }
         return status;
     }
@@ -5228,8 +5295,8 @@ document.addEventListener('DOMContentLoaded', async () => {
     }
 
     async function showRuleListImportCompletion(report, {
-        title = 'Import Complete',
-        message = 'The reviewed rules were saved.',
+        title = tabViewUiText('dashboard.importReport.completeTitle', 'Import Complete'),
+        message = tabViewUiText('dashboard.importReport.reviewedRulesSaved', 'The reviewed rules were saved.'),
         details = []
     } = {}) {
         if (!report) {
@@ -5245,19 +5312,23 @@ document.addEventListener('DOMContentLoaded', async () => {
             message,
             details: [
                 ...safeArray(details),
-                `${summary.statuses.complete} channel rows complete · ${incomplete} completing in background · ${attention} need attention`,
+                tabViewUiText('dashboard.importReport.completionSummary', '{complete} channel rows complete · {incomplete} completing in background · {attention} need attention', {
+                    complete: summary.statuses.complete,
+                    incomplete,
+                    attention
+                }),
                 incomplete
-                    ? 'Rules with valid identifiers are active now. Names, handles/custom URLs, and avatars continue in the paced background queue.'
-                    : 'No channel metadata lookup is currently pending.',
+                    ? tabViewUiText('dashboard.importReport.backgroundCompletion', 'Rules with valid identifiers are active now. Names, handles/custom URLs, and avatars continue in the paced background queue.')
+                    : tabViewUiText('dashboard.importReport.noPendingLookup', 'No channel metadata lookup is currently pending.'),
                 attention
-                    ? 'Open the report to see exact source rows and reasons. Permanent lookup failures such as “This channel does not exist.” need manual verification or replacement with an exact channel URL/UC ID.'
-                    : 'No imported row currently needs manual correction.'
+                    ? tabViewUiText('dashboard.importReport.attentionGuidance', 'Open the report to see exact source rows and reasons. Permanent lookup failures such as “This channel does not exist.” need manual verification or replacement with an exact channel URL/UC ID.')
+                    : tabViewUiText('dashboard.importReport.noManualCorrection', 'No imported row currently needs manual correction.')
             ],
             choices: [
-                { value: 'report', label: 'View Import Report', className: 'btn-primary', recommended: attention > 0 },
-                { value: 'done', label: 'Done', className: 'btn-secondary', recommended: attention <= 0 }
+                { value: 'report', label: tabViewUiText('dashboard.importReport.viewImportReport', 'View Import Report'), className: 'btn-primary', recommended: attention > 0 },
+                { value: 'done', label: tabViewUiText('dashboard.modal.done', 'Done'), className: 'btn-secondary', recommended: attention <= 0 }
             ],
-            cancelText: 'Close'
+            cancelText: tabViewUiText('dashboard.modal.close', 'Close')
         });
         if (choice === 'report') await showRuleListImportReportsModal(report.id);
     }
@@ -5425,20 +5496,20 @@ document.addEventListener('DOMContentLoaded', async () => {
     async function removeRuleListImportReportChannel(reportValue, row) {
         const report = ruleListReportApi?.normalizeReport?.(reportValue);
         if (!report || row?.type !== 'channel' || !safeArray(row.identityKeys).length) {
-            UIComponents.showToast('This row has no unique channel identifier to remove safely', 'info');
+            UIComponents.showToast(tabViewUiText('dashboard.importReport.removeMissingIdentity', 'This row has no unique channel identifier to remove safely'), 'info');
             return false;
         }
 
         const io = window.FilterTubeIO || {};
         if (typeof io.loadProfilesV4 !== 'function' || typeof io.saveProfilesV4 !== 'function') {
-            UIComponents.showToast('Profiles unavailable', 'error');
+            UIComponents.showToast(tabViewUiText('popup.profile.unavailable', 'Profiles unavailable'), 'error');
             return false;
         }
 
         const fresh = await io.loadProfilesV4();
         const currentActive = normalizeString(fresh?.activeProfileId) || activeProfileId || 'default';
         if (getProfileType(fresh, currentActive) === 'child') {
-            UIComponents.showToast('Switch to the parent/account profile to remove this imported rule', 'error');
+            UIComponents.showToast(tabViewUiText('dashboard.importReport.switchParentToRemove', 'Switch to the parent/account profile to remove this imported rule'), 'error');
             return false;
         }
 
@@ -5449,19 +5520,23 @@ document.addEventListener('DOMContentLoaded', async () => {
             return !safeObject(profiles[targetId]) || !canActiveProfileManageProfile(fresh, targetId);
         });
         if (unavailableTargets.length) {
-            UIComponents.showToast('Open the parent/account profile to remove rules from every report target', 'error');
+            UIComponents.showToast(tabViewUiText('dashboard.importReport.openParentToRemoveAll', 'Open the parent/account profile to remove rules from every report target'), 'error');
             return false;
         }
 
         const confirmed = await showConfirmModal({
-            title: 'Remove imported channel rule?',
-            message: `This removes the imported channel rule from ${targets.length === 1 ? 'its recorded target' : 'all recorded targets'}. The rule will stop filtering there and its metadata lookup will stop.`,
+            title: tabViewUiText('dashboard.importReport.removeConfirmTitle', 'Remove imported channel rule?'),
+            message: tabViewUiText('dashboard.importReport.removeConfirmMessage', 'This removes the imported channel rule from {targets}. The rule will stop filtering there and its metadata lookup will stop.', {
+                targets: targets.length === 1
+                    ? tabViewUiText('dashboard.importReport.oneRecordedTarget', 'its recorded target')
+                    : tabViewUiText('dashboard.importReport.allRecordedTargets', 'all recorded targets')
+            }),
             details: [
-                row.name || row.originalValue || 'Imported channel',
-                'The import report stays available as a history record. You can import or add the channel again later if needed.'
+                row.name || row.originalValue || tabViewUiText('dashboard.importReport.importedChannel', 'Imported channel'),
+                tabViewUiText('dashboard.importReport.removeHistoryNote', 'The import report stays available as a history record. You can import or add the channel again later if needed.')
             ],
-            confirmText: 'Remove rule',
-            cancelText: 'Keep rule'
+            confirmText: tabViewUiText('dashboard.importReport.removeRule', 'Remove rule'),
+            cancelText: tabViewUiText('dashboard.importReport.keepRule', 'Keep rule')
         });
         if (!confirmed) return false;
 
@@ -5511,7 +5586,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         }
 
         if (!removedCount) {
-            UIComponents.showToast('This imported channel rule is already removed or only exists as a manual rule', 'info');
+            UIComponents.showToast(tabViewUiText('dashboard.importReport.ruleAlreadyRemoved', 'This imported channel rule is already removed or only exists as a manual rule'), 'info');
             return false;
         }
 
@@ -5531,7 +5606,12 @@ document.addEventListener('DOMContentLoaded', async () => {
         renderKeywords();
         renderKidsKeywords();
         UIComponents.showToast(
-            `Removed ${removedCount} imported channel ${removedCount === 1 ? 'rule' : 'rules'}; metadata lookup stopped`,
+            tabViewUiText('dashboard.importReport.removedRules', 'Removed {count} imported channel {ruleWord}; metadata lookup stopped', {
+                count: removedCount,
+                ruleWord: removedCount === 1
+                    ? tabViewUiText('dashboard.importReport.ruleSingular', 'rule')
+                    : tabViewUiText('dashboard.importReport.rulePlural', 'rules')
+            }),
             'success'
         );
         return true;
@@ -5539,12 +5619,12 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     async function showRuleListImportReportsModal(preferredReportId = '') {
         if (!ruleListReportApi || !ruleListReportStore) {
-            UIComponents.showToast('Import reports are unavailable', 'error');
+            UIComponents.showToast(tabViewUiText('dashboard.importReport.unavailable', 'Import reports are unavailable'), 'error');
             return;
         }
         let runtime = await loadRuleListReportRuntime();
         if (!runtime.reports.length) {
-            UIComponents.showToast('No saved rule-list import reports yet', 'info');
+            UIComponents.showToast(tabViewUiText('dashboard.importReport.noneSaved', 'No saved rule-list import reports yet'), 'info');
             return;
         }
 
@@ -5758,7 +5838,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                         const removed = await removeRuleListImportReportChannel(activeSummary.report, row);
                         if (removed) runtime = await loadRuleListReportRuntime();
                     } catch (error) {
-                        UIComponents.showToast(error?.message || 'Unable to remove this imported channel rule', 'error');
+                        UIComponents.showToast(error?.message || tabViewUiText('dashboard.importReport.removeFailed', 'Unable to remove this imported channel rule'), 'error');
                     }
                     render();
                 });
@@ -5823,7 +5903,12 @@ document.addEventListener('DOMContentLoaded', async () => {
             const affectsKids = latest.report.targets.some(target => target.surface === 'kids');
             kidsNotice.hidden = !affectsKids || (!incomplete && !attention);
             kidsStatus.textContent = affectsKids
-                ? `Latest import: ${incomplete} channel ${pluralize(incomplete, 'row')} still completing and ${attention} ${pluralize(attention, 'row')} need manual verification. Imported rules with valid identifiers are already active; permanent lookup failures remain in the report with their exact reason.`
+                ? tabViewUiText('dashboard.importReport.latestKidsNotice', 'Latest import: {incomplete} channel {incompleteRows} still completing and {attention} {attentionRows} need manual verification. Imported rules with valid identifiers are already active; permanent lookup failures remain in the report with their exact reason.', {
+                    incomplete,
+                    incompleteRows: pluralize(incomplete, tabViewUiText('dashboard.importReport.rowSingular', 'row'), tabViewUiText('dashboard.importReport.rowPlural', 'rows')),
+                    attention,
+                    attentionRows: pluralize(attention, tabViewUiText('dashboard.importReport.rowSingular', 'row'), tabViewUiText('dashboard.importReport.rowPlural', 'rows'))
+                })
                 : '';
         }
         if (viewChannelImportReports) viewChannelImportReports.hidden = false;
@@ -5832,7 +5917,12 @@ document.addEventListener('DOMContentLoaded', async () => {
             const shouldShow = incomplete > 0 || attention > 0;
             importedChannelEnrichmentNotice.hidden = !shouldShow;
             if (shouldShow) {
-                importedChannelEnrichmentStatus.textContent = `Latest import report: ${incomplete} channel ${pluralize(incomplete, 'row')} still completing and ${attention} ${pluralize(attention, 'row')} need manual verification. Valid saved identifiers are already filtering; permanent lookup failures remain in the report with their exact reason.`;
+                importedChannelEnrichmentStatus.textContent = tabViewUiText('dashboard.importReport.latestEnrichmentNotice', 'Latest import report: {incomplete} channel {incompleteRows} still completing and {attention} {attentionRows} need manual verification. Valid saved identifiers are already filtering; permanent lookup failures remain in the report with their exact reason.', {
+                    incomplete,
+                    incompleteRows: pluralize(incomplete, tabViewUiText('dashboard.importReport.rowSingular', 'row'), tabViewUiText('dashboard.importReport.rowPlural', 'rows')),
+                    attention,
+                    attentionRows: pluralize(attention, tabViewUiText('dashboard.importReport.rowSingular', 'row'), tabViewUiText('dashboard.importReport.rowPlural', 'rows'))
+                });
                 if (importedChannelEnrichmentToggle) importedChannelEnrichmentToggle.hidden = true;
             }
         }
@@ -6269,7 +6359,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             const type = getProfileType(profilesV4, id);
             const isChild = type === 'child';
             btn.disabled = isSelfControlSessionActive();
-            btn.title = btn.disabled ? 'Profile switching is locked until the Self-Control Session ends' : '';
+            btn.title = btn.disabled ? tabViewUiText('popup.profile.switchLocked', 'Profile switching is locked until the Self-Control Session ends') : '';
             btn.className = `ft-profile-dropdown-item${id === current ? ' is-active' : ''}${locked ? ' is-locked' : ''}${isChild ? ' is-child' : ''}`;
             btn.setAttribute('role', 'option');
             btn.setAttribute('aria-selected', id === current ? 'true' : 'false');
@@ -6317,9 +6407,13 @@ document.addEventListener('DOMContentLoaded', async () => {
             const header = document.createElement('div');
             header.className = 'ft-profile-dropdown-group';
             header.setAttribute('role', 'presentation');
-            header.textContent = accountId === 'default'
-                ? `${getProfileName(profilesV4, accountId)} (Master)`
-                : `${getProfileName(profilesV4, accountId)} (Account)`;
+            setTabViewLocalizedCopy(
+                header,
+                'textContent',
+                accountId === 'default' ? 'popup.profile.groupMaster' : 'popup.profile.groupAccount',
+                accountId === 'default' ? '{name} (Master)' : '{name} (Account)',
+                { name: getProfileName(profilesV4, accountId) }
+            );
             ftProfileDropdownTab.appendChild(header);
 
             appendProfileBtn(accountId);
@@ -6366,8 +6460,12 @@ document.addEventListener('DOMContentLoaded', async () => {
 
             ftAutoBackupMode.disabled = !canEdit;
             ftAutoBackupFormat.disabled = !canEdit;
-            ftAutoBackupMode.title = canEdit ? '' : (locked ? 'Unlock this profile to change auto-backup preferences.' : 'Enable Auto Backup to change mode.');
-            ftAutoBackupFormat.title = canEdit ? '' : (locked ? 'Unlock this profile to change auto-backup preferences.' : 'Enable Auto Backup to change format.');
+            ftAutoBackupMode.title = canEdit ? '' : (locked
+                ? tabViewUiText('family.profileManager.unlockToChangeAutoBackup', 'Unlock this profile to change auto-backup preferences.')
+                : tabViewUiText('family.profileManager.enableAutoBackupToChangeMode', 'Enable Auto Backup to change mode.'));
+            ftAutoBackupFormat.title = canEdit ? '' : (locked
+                ? tabViewUiText('family.profileManager.unlockToChangeAutoBackup', 'Unlock this profile to change auto-backup preferences.')
+                : tabViewUiText('family.profileManager.enableAutoBackupToChangeFormat', 'Enable Auto Backup to change format.'));
         } catch (e) {
         }
     }
@@ -6403,7 +6501,9 @@ document.addEventListener('DOMContentLoaded', async () => {
         const profile = safeObject(profiles[profileId]);
         const raw = normalizeString(profile.name);
         if (raw) return raw;
-        return profileId === 'default' ? 'Default' : 'Profile';
+        return profileId === 'default'
+            ? tabViewUiText('popup.profile.defaultName', 'Default')
+            : tabViewUiText('popup.profile.genericName', 'Profile');
     }
 
     function getProfileType(profilesV4, profileId) {
@@ -7833,13 +7933,13 @@ document.addEventListener('DOMContentLoaded', async () => {
         const mode = normalizeString(options?.mode);
         const io = window.FilterTubeIO || {};
         if (typeof io.loadProfilesV4 !== 'function' || typeof io.saveProfilesV4 !== 'function') {
-            UIComponents.showToast('Profiles unavailable', 'error');
+            UIComponents.showToast(tabViewUiText('popup.profile.unavailable', 'Profiles unavailable'), 'error');
             return;
         }
 
         const fresh = await io.loadProfilesV4();
         if (!canViewManagedActionHistory(fresh, targetId)) {
-            UIComponents.showToast('Switch to the parent account to view protected history', 'error');
+            UIComponents.showToast(tabViewUiText('dashboard.history.switchParentToView', 'Switch to the parent account to view protected history'), 'error');
             return;
         }
 
@@ -7864,26 +7964,30 @@ document.addEventListener('DOMContentLoaded', async () => {
             ? latestRows.map(formatManagedActionHistoryRow)
             : [
                 reviewConflicts
-                    ? 'No remote conflicts or rejected managed-policy rows are currently recorded for this profile.'
-                    : 'No parent-managed actions have been recorded for this profile yet.'
+                    ? tabViewUiText('dashboard.history.noConflicts', 'No remote conflicts or rejected managed-policy rows are currently recorded for this profile.')
+                    : tabViewUiText('dashboard.history.noActions', 'No parent-managed actions have been recorded for this profile yet.')
             ];
         const protectedCount = rows.filter(managedActionHistoryRowIsProtected).length;
         const choice = await showChoiceModal({
-            title: reviewConflicts ? `${profileName} Conflict Review` : `${profileName} History`,
+            title: reviewConflicts
+                ? tabViewUiText('dashboard.history.conflictReviewTitle', '{name} Conflict Review', { name: profileName })
+                : tabViewUiText('dashboard.history.title', '{name} History', { name: profileName }),
             message: reviewConflicts
-                ? `${conflictRows.length} conflict/rejected remote rows shown from ${rows.length} total history rows. Protected evidence remains read-only.`
+                ? tabViewUiText('dashboard.history.conflictSummary', '{shown} conflict/rejected remote rows shown from {total} total history rows. Protected evidence remains read-only.', { shown: conflictRows.length, total: rows.length })
                 : protectedCount
-                    ? `${rows.length} rows recorded. ${protectedCount} protected rows are retained until parent re-auth and retention rules allow clearing.`
-                    : `${rows.length} parent-managed rows recorded.`,
+                    ? tabViewUiText('dashboard.history.protectedSummary', '{total} rows recorded. {protected} protected rows are retained until parent re-auth and retention rules allow clearing.', { total: rows.length, protected: protectedCount })
+                    : tabViewUiText('dashboard.history.summary', '{total} parent-managed rows recorded.', { total: rows.length }),
             details,
             choices: (!reviewConflicts && rows.length) ? [
                 {
                     value: 'clear',
-                    label: protectedCount ? 'Clear Accepted Only' : 'Clear History',
+                    label: protectedCount
+                        ? tabViewUiText('dashboard.history.clearAcceptedOnly', 'Clear Accepted Only')
+                        : tabViewUiText('dashboard.history.clearHistory', 'Clear History'),
                     className: 'btn-secondary'
                 }
             ] : [],
-            cancelText: 'Close'
+            cancelText: tabViewUiText('dashboard.modal.close', 'Close')
         });
         if (choice !== 'clear') return;
         await clearManagedActionHistory(targetId);
@@ -7894,13 +7998,13 @@ document.addEventListener('DOMContentLoaded', async () => {
         if (!targetId) return false;
         const io = window.FilterTubeIO || {};
         if (typeof io.loadProfilesV4 !== 'function' || typeof io.saveProfilesV4 !== 'function') {
-            UIComponents.showToast('Profiles unavailable', 'error');
+            UIComponents.showToast(tabViewUiText('popup.profile.unavailable', 'Profiles unavailable'), 'error');
             return false;
         }
 
         const fresh = await io.loadProfilesV4();
         if (!canViewManagedActionHistory(fresh, targetId)) {
-            UIComponents.showToast('Switch to the parent account to clear protected history', 'error');
+            UIComponents.showToast(tabViewUiText('dashboard.history.switchParentToClear', 'Switch to the parent account to clear protected history'), 'error');
             return false;
         }
 
@@ -7955,8 +8059,8 @@ document.addEventListener('DOMContentLoaded', async () => {
         await refreshProfilesUI();
         UIComponents.showToast(
             protectedRows.length
-                ? `Cleared ${clearedRows} accepted rows; protected evidence retained`
-                : 'History cleared',
+                ? tabViewUiText('dashboard.history.clearedAccepted', 'Cleared {count} accepted rows; protected evidence retained', { count: clearedRows })
+                : tabViewUiText('dashboard.history.cleared', 'History cleared'),
             'success'
         );
         return true;
@@ -8336,7 +8440,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         if (!profileId) return false;
         const io = window.FilterTubeIO || {};
         if (typeof io.loadProfilesV4 !== 'function' || typeof io.saveProfilesV4 !== 'function') {
-            UIComponents.showToast('Profiles unavailable', 'error');
+            UIComponents.showToast(tabViewUiText('popup.profile.unavailable', 'Profiles unavailable'), 'error');
             return false;
         }
         const fresh = await io.loadProfilesV4();
@@ -8345,12 +8449,12 @@ document.addEventListener('DOMContentLoaded', async () => {
         const profile = safeObject(profiles[profileId]);
         if (!targetExists || profileId === 'default') {
             managedChildEdit = null;
-            UIComponents.showToast('Managed protected profile target is no longer available', 'error');
+            UIComponents.showToast(tabViewUiText('family.profileManager.managedTargetUnavailable', 'Managed protected profile target is no longer available'), 'error');
             return false;
         }
         if (!canActiveProfileManageProfile(fresh, profileId)) {
             managedChildEdit = null;
-            UIComponents.showToast('Switch to the master or parent account to edit this protected profile', 'error');
+            UIComponents.showToast(tabViewUiText('family.profileManager.switchParentToEdit', 'Switch to the master or parent account to edit this protected profile'), 'error');
             return false;
         }
         const nextSurface = getProfileSurface(profile, surface);
@@ -8458,18 +8562,27 @@ document.addEventListener('DOMContentLoaded', async () => {
         const copy = document.createElement('div');
         copy.className = 'ft-managed-child-global__copy';
         const title = document.createElement('strong');
-        title.textContent = `Editing protected profile: ${normalizeString(profile.name) || 'Profile'}`;
+        setTabViewLocalizedCopy(title, 'textContent', 'family.profileManager.editingProtectedProfile', 'Editing protected profile: {name}', {
+            name: normalizeString(profile.name) || tabViewUiText('popup.profile.genericName', 'Profile')
+        });
         const body = document.createElement('span');
-        body.textContent = currentViewId === 'sync'
-            ? 'Accounts & Sync stays under parent/account authority. Use Family Controls to pair devices, review history, and send approved updates for this protected profile.'
-            : 'Parent-managed profile edit mode. Dashboard, Filters, Kids Mode, Settings, and Semantic ML stay scoped to this protected profile where editing is supported.';
+        setTabViewLocalizedCopy(
+            body,
+            'textContent',
+            currentViewId === 'sync' ? 'family.profileManager.editingSyncScope' : 'family.profileManager.editingProfileScope',
+            currentViewId === 'sync'
+                ? 'Accounts & Sync stays under parent/account authority. Use Family Controls to pair devices, review history, and send approved updates for this protected profile.'
+                : 'Parent-managed profile edit mode. Dashboard, Filters, Kids Mode, Settings, and Semantic ML stay scoped to this protected profile where editing is supported.'
+        );
         copy.appendChild(title);
         copy.appendChild(body);
 
         const doneBtn = document.createElement('button');
         doneBtn.type = 'button';
         doneBtn.className = 'btn-primary';
-        doneBtn.textContent = `Done editing ${normalizeString(profile.name) || 'profile'}`;
+        setTabViewLocalizedCopy(doneBtn, 'textContent', 'family.profileManager.doneEditingProfile', 'Done editing {name}', {
+            name: normalizeString(profile.name) || tabViewUiText('popup.profile.genericName', 'profile')
+        });
         doneBtn.addEventListener('click', endManagedChildEdit);
 
         banner.appendChild(copy);
@@ -8488,9 +8601,9 @@ document.addEventListener('DOMContentLoaded', async () => {
         const copy = document.createElement('div');
         copy.className = 'ft-managed-child-sync-boundary__copy';
         const title = document.createElement('strong');
-        title.textContent = `Protected edit session: ${profileName}`;
+        setTabViewLocalizedCopy(title, 'textContent', 'family.profileManager.protectedEditSession', 'Protected edit session: {name}', { name: profileName });
         const body = document.createElement('span');
-        body.textContent = 'Family Controls targets this protected profile. Global account policy and Master PIN controls are paused until you finish editing, while device pairing and Send Update remain parent-owned.';
+        setTabViewLocalizedCopy(body, 'textContent', 'family.profileManager.protectedEditSessionHelp', 'Family Controls targets this protected profile. Global account policy and Master PIN controls are paused until you finish editing, while device pairing and Send Update remain parent-owned.');
         copy.append(title, body);
 
         const chips = document.createElement('div');
@@ -8498,20 +8611,26 @@ document.addEventListener('DOMContentLoaded', async () => {
         [
             {
                 label: 'Rules and time target protected profile',
-                title: 'Edit Rules, Set Limit, History, Lists, and Send Update act through parent-managed controls.'
+                labelKey: 'family.profileManager.syncChipRules',
+                title: 'Edit Rules, Set Limit, History, Lists, and Send Update act through parent-managed controls.',
+                titleKey: 'family.profileManager.syncChipRulesHelp'
             },
             {
                 label: 'Device trust stays parent-owned',
-                title: 'Pairing or sending still requires the current parent/account authority.'
+                labelKey: 'family.profileManager.syncChipDeviceTrust',
+                title: 'Pairing or sending still requires the current parent/account authority.',
+                titleKey: 'family.profileManager.syncChipDeviceTrustHelp'
             },
             {
                 label: 'Profile PIN is only a switch lock',
-                title: 'A profile switching PIN does not grant parent/admin authority.'
+                labelKey: 'family.profileManager.syncChipPin',
+                title: 'A profile switching PIN does not grant parent/admin authority.',
+                titleKey: 'family.profileManager.syncChipPinHelp'
             }
         ].forEach((item) => {
             const chip = document.createElement('span');
-            chip.textContent = item.label;
-            chip.title = item.title;
+            setTabViewLocalizedCopy(chip, 'textContent', item.labelKey, item.label);
+            setTabViewLocalizedCopy(chip, 'title', item.titleKey, item.title);
             chips.appendChild(chip);
         });
 
@@ -8546,11 +8665,11 @@ document.addEventListener('DOMContentLoaded', async () => {
         if (!targetId || typeof io.loadProfilesV4 !== 'function') return;
         const fresh = await io.loadProfilesV4();
         if (targetId === 'default' || !Object.prototype.hasOwnProperty.call(safeObject(fresh.profiles), targetId)) {
-            UIComponents.showToast('Managed editing is for protected profiles below the master account', 'error');
+            UIComponents.showToast(tabViewUiText('family.profileManager.managedEditTargetInvalid', 'Managed editing is for protected profiles below the master account'), 'error');
             return;
         }
         if (!canActiveProfileManageProfile(fresh, targetId)) {
-            UIComponents.showToast('Switch to the master or parent account to edit this protected profile', 'error');
+            UIComponents.showToast(tabViewUiText('family.profileManager.switchParentToEdit', 'Switch to the master or parent account to edit this protected profile'), 'error');
             return;
         }
         const currentActive = normalizeString(fresh?.activeProfileId) || 'default';
@@ -8589,11 +8708,11 @@ document.addEventListener('DOMContentLoaded', async () => {
         const profilesV4 = profilesV4Cache;
         const isAdmin = activeProfileId === 'default';
         const scopedProtectedEdit = isManagedChildEditActive();
-        const scopedTitle = 'Finish protected-profile editing before changing global account policy.';
+        const scopedTitle = tabViewUiText('family.profileManager.finishEditingBeforeGlobalPolicy', 'Finish protected-profile editing before changing global account policy.');
         ftAllowAccountCreation.disabled = !isAdmin || scopedProtectedEdit;
         ftMaxAccounts.disabled = !isAdmin || scopedProtectedEdit;
-        ftAllowAccountCreation.title = scopedProtectedEdit ? scopedTitle : (!isAdmin ? 'Switch to Default to change account policy.' : '');
-        ftMaxAccounts.title = scopedProtectedEdit ? scopedTitle : (!isAdmin ? 'Switch to Default to change account policy.' : '');
+        ftAllowAccountCreation.title = scopedProtectedEdit ? scopedTitle : (!isAdmin ? tabViewUiText('family.profileManager.switchDefaultToChangePolicy', 'Switch to Default to change account policy.') : '');
+        ftMaxAccounts.title = scopedProtectedEdit ? scopedTitle : (!isAdmin ? tabViewUiText('family.profileManager.switchDefaultToChangePolicy', 'Switch to Default to change account policy.') : '');
 
         if (!profilesV4) return;
         const policy = getAccountPolicy(profilesV4);
@@ -8603,7 +8722,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     function ensureNotScopedProtectedEditForGlobalAdmin(actionLabel = 'global account controls') {
         if (!isManagedChildEditActive()) return true;
-        UIComponents.showToast(`Finish protected-profile editing before changing ${actionLabel}.`, 'warning');
+        UIComponents.showToast(tabViewUiText('family.profileManager.finishEditingBeforeAction', 'Finish protected-profile editing before changing {action}.', { action: actionLabel }), 'warning');
         updateAdminPolicyControls();
         updateChildProfileCapabilityControls();
         return false;
@@ -8612,8 +8731,8 @@ document.addEventListener('DOMContentLoaded', async () => {
     function updateChildProfileCapabilityControls() {
         const isChild = getActiveProfileType() === 'child';
         const scopedProtectedEdit = isManagedChildEditActive();
-        const childTitle = 'Protected profiles cannot manage backup, import/export, or account-admin actions here.';
-        const scopedTitle = 'Finish protected-profile editing before changing global account, Master PIN, or create-profile controls.';
+        const childTitle = tabViewUiText('family.profileManager.childAdminRestrictedHelp', 'Protected profiles cannot manage profile names, deletion, PIN rules, viewing spaces, time limits, or profile switching PINs from this surface.');
+        const scopedTitle = tabViewUiText('family.profileManager.finishEditingBeforeGlobalControls', 'Finish protected-profile editing before changing global account, Master PIN, or create-profile controls.');
         const syncKidsToMainToggle = document.getElementById('setting_syncKidsToMain');
 
         if (ftExportV3Btn) {
@@ -8622,11 +8741,11 @@ document.addEventListener('DOMContentLoaded', async () => {
         }
         if (ftExportV3EncryptedBtn) {
             ftExportV3EncryptedBtn.disabled = isChild;
-            ftExportV3EncryptedBtn.title = isChild ? childTitle : 'Download an encrypted backup JSON (requires a password/PIN)';
+            ftExportV3EncryptedBtn.title = isChild ? childTitle : tabViewUiText('family.profileManager.encryptedBackupHelp', 'Download an encrypted backup JSON (requires a password/PIN)');
         }
         if (ftImportV3Btn) {
             ftImportV3Btn.disabled = isChild;
-            ftImportV3Btn.title = isChild ? childTitle : 'Import a full FilterTube backup JSON. Use Rule list imports for channel/keyword-only files.';
+            ftImportV3Btn.title = isChild ? childTitle : tabViewUiText('family.profileManager.importBackupHelp', 'Import a full FilterTube backup JSON. Use Rule list imports for channel/keyword-only files.');
         }
         if (ftImportV3File) {
             ftImportV3File.disabled = isChild;
@@ -8639,7 +8758,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             settingShowUpdateRefreshPrompt.disabled = isChild || isUiLocked();
             settingShowUpdateRefreshPrompt.title = isChild
                 ? childTitle
-                : (isUiLocked() ? 'Unlock this profile to change device-wide settings.' : '');
+                : (isUiLocked() ? tabViewUiText('family.profileManager.unlockToChangeDeviceSettings', 'Unlock this profile to change device-wide settings.') : '');
         }
         if (ftAutoBackupMode) {
             const autoBackupEnabled = StateManager.getState()?.autoBackupEnabled === true;
@@ -8647,7 +8766,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             ftAutoBackupMode.disabled = isChild || locked || !autoBackupEnabled;
             ftAutoBackupMode.title = isChild
                 ? childTitle
-                : (locked ? 'Unlock this profile to change auto-backup preferences.' : (autoBackupEnabled ? '' : 'Enable Auto Backup to change mode.'));
+                : (locked ? tabViewUiText('family.profileManager.unlockToChangeAutoBackup', 'Unlock this profile to change auto-backup preferences.') : (autoBackupEnabled ? '' : tabViewUiText('family.profileManager.enableAutoBackupToChangeMode', 'Enable Auto Backup to change mode.')));
         }
         if (ftAutoBackupFormat) {
             const autoBackupEnabled = StateManager.getState()?.autoBackupEnabled === true;
@@ -8655,7 +8774,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             ftAutoBackupFormat.disabled = isChild || locked || !autoBackupEnabled;
             ftAutoBackupFormat.title = isChild
                 ? childTitle
-                : (locked ? 'Unlock this profile to change auto-backup preferences.' : (autoBackupEnabled ? '' : 'Enable Auto Backup to change format.'));
+                : (locked ? tabViewUiText('family.profileManager.unlockToChangeAutoBackup', 'Unlock this profile to change auto-backup preferences.') : (autoBackupEnabled ? '' : tabViewUiText('family.profileManager.enableAutoBackupToChangeFormat', 'Enable Auto Backup to change format.')));
         }
         if (ftCreateAccountBtn) {
             ftCreateAccountBtn.disabled = isChild || scopedProtectedEdit;
@@ -8667,7 +8786,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         }
         if (ftNanahQuickCreateProtectedBtn) {
             ftNanahQuickCreateProtectedBtn.disabled = isChild || scopedProtectedEdit;
-            ftNanahQuickCreateProtectedBtn.title = isChild ? childTitle : (scopedProtectedEdit ? scopedTitle : 'Create a protected profile only for parent-managed family control.');
+            ftNanahQuickCreateProtectedBtn.title = isChild ? childTitle : (scopedProtectedEdit ? scopedTitle : tabViewUiText('family.profileManager.createProtectedProfileHelp', 'Create a protected profile only for parent-managed family control.'));
         }
         if (ftNanahQuickSyncDevicesBtn) {
             ftNanahQuickSyncDevicesBtn.disabled = isChild || scopedProtectedEdit;
@@ -8675,11 +8794,11 @@ document.addEventListener('DOMContentLoaded', async () => {
                 ? childTitle
                 : (scopedProtectedEdit
                     ? scopedTitle
-                    : 'Copy the currently open profile to your own device. No PIN or protected profile is required.');
+                    : tabViewUiText('family.profileManager.syncOwnProfileHelp', 'Copy the currently open profile to your own device. No PIN or protected profile is required.'));
         }
         if (ftNanahQuickSendUpdateBtn) {
             ftNanahQuickSendUpdateBtn.disabled = isChild;
-            ftNanahQuickSendUpdateBtn.title = isChild ? childTitle : 'Open both devices, pair, match the phrase, and send the selected protected-profile update.';
+            ftNanahQuickSendUpdateBtn.title = isChild ? childTitle : tabViewUiText('family.profileManager.sendProtectedUpdateHelp', 'Open both devices, pair, match the phrase, and send the selected protected-profile update.');
         }
         if (ftSetMasterPinBtn) {
             ftSetMasterPinBtn.disabled = isChild || scopedProtectedEdit;
@@ -8693,13 +8812,21 @@ document.addEventListener('DOMContentLoaded', async () => {
             ftLockAdminSessionBtn.disabled = isChild || scopedProtectedEdit;
             ftLockAdminSessionBtn.title = isChild
                 ? childTitle
-                : (scopedProtectedEdit ? scopedTitle : 'Immediately lock temporary parent/admin unlocks in this dashboard tab.');
+                : (scopedProtectedEdit ? scopedTitle : tabViewUiText('family.profileManager.lockAdminSessionHelp', 'Immediately lock temporary parent/admin unlocks in this dashboard tab.'));
         }
         if (syncKidsToMainToggle) {
             syncKidsToMainToggle.disabled = isChild;
             syncKidsToMainToggle.title = isChild ? childTitle : '';
         }
     }
+
+    window.addEventListener('filtertube-ui-locale-changed', () => {
+        updateAdminPolicyControls();
+        updateChildProfileCapabilityControls();
+        updateAutoBackupPolicyControls();
+        void refreshImportedChannelEnrichmentStatus();
+        void refreshRuleListReportNotices();
+    });
 
     function isChildProfileAdminSurface() {
         return getActiveProfileType() === 'child';
@@ -8719,7 +8846,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         return true;
     }
 
-    function ensureNonChildAdminAction(message = 'Protected profiles cannot manage this action here.') {
+    function ensureNonChildAdminAction(message = tabViewUiText('family.profileManager.childAdminRestrictedGeneric', 'Protected profiles cannot manage this action here.')) {
         if (!isChildProfileAdminSurface()) return true;
         UIComponents.showToast(message, 'error');
         return false;
@@ -8730,18 +8857,18 @@ document.addEventListener('DOMContentLoaded', async () => {
         if (!targetId) return;
         const io = window.FilterTubeIO || {};
         if (typeof io.loadProfilesV4 !== 'function' || typeof io.saveProfilesV4 !== 'function') {
-            UIComponents.showToast('Profiles unavailable', 'error');
+            UIComponents.showToast(tabViewUiText('popup.profile.unavailable', 'Profiles unavailable'), 'error');
             return;
         }
         const fresh = await io.loadProfilesV4();
         const currentActive = normalizeString(fresh?.activeProfileId) || 'default';
         if (getProfileType(fresh, currentActive) === 'child') {
-            UIComponents.showToast('Protected profiles cannot change viewing access', 'error');
+            UIComponents.showToast(tabViewUiText('family.profileManager.cannotChangeAccessHere', 'Protected profiles cannot change viewing access here'), 'error');
             return;
         }
         const allowedManager = currentActive === targetId || canActiveProfileManageProfile(fresh, targetId);
         if (!allowedManager) {
-            UIComponents.showToast('Switch to the parent account to change this profile', 'error');
+            UIComponents.showToast(tabViewUiText('family.profileManager.switchParentToManageProfile', 'Switch to the parent/account profile to change this profile'), 'error');
             return;
         }
         const okAdmin = await ensureProfileUnlocked(fresh, currentActive, { sensitiveAction: true });
@@ -8757,7 +8884,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         const nextMain = Object.prototype.hasOwnProperty.call(patch, 'main') ? patch.main === true : currentAccess.main;
         const nextKids = Object.prototype.hasOwnProperty.call(patch, 'kids') ? patch.kids === true : currentAccess.kids;
         if (!nextMain && !nextKids) {
-            UIComponents.showToast('A profile needs at least one viewing space', 'error');
+            UIComponents.showToast(tabViewUiText('family.profileManager.needsViewingSpace', 'A profile needs at least one viewing space'), 'error');
             return;
         }
         let nextProfile = {
@@ -8789,11 +8916,11 @@ document.addEventListener('DOMContentLoaded', async () => {
         });
         profilesV4Cache = { ...fresh, schemaVersion: 4, profiles };
         await refreshProfilesUI();
-        UIComponents.showToast('Viewing access updated', 'success');
+        UIComponents.showToast(tabViewUiText('family.profileManager.viewingAccessUpdated', 'Viewing access updated'), 'success');
         if (targetId !== 'default' && currentActive !== targetId && canActiveProfileManageProfile(fresh, targetId)) {
             await offerManagedPolicyPushForChangedProfiles([targetId], {
                 scope: 'viewing_space',
-                title: 'Send viewing access update now?',
+                title: tabViewUiText('family.profileManager.sendViewingAccessUpdate', 'Send viewing access update now?'),
                 label: 'viewing access'
             });
         }
@@ -8817,23 +8944,23 @@ document.addEventListener('DOMContentLoaded', async () => {
         const targetIds = [...new Set(safeArray(profileIds).map(normalizeString).filter(Boolean))];
         const patch = managedViewingAccessPatchForMode(accessMode);
         if (!targetIds.length) {
-            UIComponents.showToast('Select at least one protected profile', 'error');
+            UIComponents.showToast(tabViewUiText('family.profileManager.selectProtectedProfile', 'Select at least one protected profile'), 'error');
             return;
         }
         if (!patch) {
-            UIComponents.showToast('Choose a valid viewing-space policy', 'error');
+            UIComponents.showToast(tabViewUiText('family.profileManager.invalidViewingPolicy', 'Choose a valid viewing-space policy'), 'error');
             return;
         }
         const io = window.FilterTubeIO || {};
         if (typeof io.loadProfilesV4 !== 'function' || typeof io.saveProfilesV4 !== 'function') {
-            UIComponents.showToast('Profiles unavailable', 'error');
+            UIComponents.showToast(tabViewUiText('popup.profile.unavailable', 'Profiles unavailable'), 'error');
             return;
         }
 
         const fresh = await io.loadProfilesV4();
         const currentActive = normalizeString(fresh?.activeProfileId) || 'default';
         if (getProfileType(fresh, currentActive) === 'child') {
-            UIComponents.showToast('Protected profiles cannot change viewing access', 'error');
+            UIComponents.showToast(tabViewUiText('family.profileManager.cannotChangeAccessHere', 'Protected profiles cannot change viewing access here'), 'error');
             return;
         }
 
@@ -8844,7 +8971,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                 && canActiveProfileManageProfile(fresh, targetId);
         });
         if (!eligibleIds.length) {
-            UIComponents.showToast('No selected protected profiles can be managed by this account', 'error');
+            UIComponents.showToast(tabViewUiText('family.profileManager.noManagedSelection', 'No selected protected profiles can be managed by this account'), 'error');
             return;
         }
 
@@ -8891,7 +9018,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         }
 
         if (!changedCount) {
-            UIComponents.showToast('Selected profiles already use that viewing access', 'info');
+            UIComponents.showToast(tabViewUiText('family.profileManager.viewingAccessAlreadySet', 'Selected profiles already use that viewing access'), 'info');
             return;
         }
 
@@ -8902,10 +9029,10 @@ document.addEventListener('DOMContentLoaded', async () => {
         });
         profilesV4Cache = { ...fresh, schemaVersion: 4, profiles };
         await refreshProfilesUI();
-        UIComponents.showToast(`${changedCount} profiles set to ${patch.label}`, 'success');
+        UIComponents.showToast(tabViewUiText('family.profileManager.viewingAccessSetForCount', '{count} profiles set to {access}', { count: changedCount, access: patch.label }), 'success');
         await offerManagedPolicyPushForChangedProfiles(changedProfileIds, {
             scope: 'viewing_space',
-            title: 'Send viewing access update now?',
+            title: tabViewUiText('family.profileManager.sendViewingAccessUpdate', 'Send viewing access update now?'),
             label: 'viewing access'
         });
     }
@@ -8914,13 +9041,13 @@ document.addEventListener('DOMContentLoaded', async () => {
         title,
         message,
         presets = [],
-        customTitle = 'Custom YouTube Time Limit',
-        customMessage = 'Enter whole minutes for this daily YouTube budget.',
-        customPlaceholder = 'Minutes per day',
-        customConfirmText = 'Use Custom Limit',
+        customTitle = tabViewUiText('family.profileManager.customYouTubeTimeLimit', 'Custom YouTube Time Limit'),
+        customMessage = tabViewUiText('family.profileManager.customBudgetPrompt', 'Enter whole minutes for this daily YouTube budget.'),
+        customPlaceholder = tabViewUiText('family.profileManager.minutesPerDay', 'Minutes per day'),
+        customConfirmText = tabViewUiText('family.profileManager.useCustomLimit', 'Use Custom Limit'),
         initialMinutes = 120,
         allowZero = true,
-        errorMessage = 'Enter whole minutes, 0 or higher'
+        errorMessage = tabViewUiText('family.profileManager.invalidDailyMinutes', 'Enter whole minutes, 0 or higher')
     } = {}) {
         const presetChoices = safeArray(presets)
             .map((preset) => ({
@@ -8930,17 +9057,17 @@ document.addEventListener('DOMContentLoaded', async () => {
             }))
             .filter((preset) => preset.value && preset.label);
         const choice = await showChoiceModal({
-            title: title || 'Set YouTube Time Limit',
-            message: message || 'Choose a daily YouTube budget for this protected profile.',
+            title: title || tabViewUiText('family.profileManager.setYouTubeTimeLimit', 'Set YouTube Time Limit'),
+            message: message || tabViewUiText('family.profileManager.chooseDailyBudget', 'Choose a daily YouTube budget for this protected profile.'),
             choices: [
                 ...presetChoices,
                 {
                     value: 'custom',
-                    label: 'Custom minutes',
+                    label: tabViewUiText('family.profileManager.customMinutes', 'Custom minutes'),
                     className: 'btn-secondary'
                 }
             ],
-            cancelText: 'Cancel'
+            cancelText: tabViewUiText('dashboard.modal.cancel', 'Cancel')
         });
         if (choice === null) return null;
         if (choice !== 'custom') {
@@ -8971,25 +9098,29 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     async function promptManagedDailyTimeLimitMinutes({ selectedCount = 1, initialMinutes = 120 } = {}) {
         return promptManagedTimeLimitMinutes({
-            title: 'Set YouTube Time Limit',
+            title: tabViewUiText('family.profileManager.setYouTubeTimeLimit', 'Set YouTube Time Limit'),
             message: selectedCount > 1
-                ? 'Choose the same daily YouTube budget for the selected profiles. Use 0 minutes to require approval before viewing.'
-                : 'Choose the daily YouTube budget for this profile. Use 0 minutes to require approval before viewing.',
+                ? tabViewUiText('family.profileManager.chooseSameDailyBudget', 'Choose the same daily YouTube budget for the selected profiles. Use 0 minutes to require approval before viewing.')
+                : tabViewUiText('family.profileManager.chooseProfileDailyBudget', 'Choose the daily YouTube budget for this profile. Use 0 minutes to require approval before viewing.'),
             presets: [
-                { value: '30', label: '30 min', className: 'btn-secondary' },
-                { value: '60', label: '1 hour', className: 'btn-secondary' },
-                { value: '120', label: '2 hours', className: 'btn-primary' },
-                { value: '0', label: 'Require approval', className: 'btn-secondary' }
+                { value: '30', label: tabViewUiText('family.profileManager.minutesPreset', '{count} min', { count: 30 }), className: 'btn-secondary' },
+                { value: '60', label: tabViewUiText('family.profileManager.oneHourPreset', '1 hour'), className: 'btn-secondary' },
+                { value: '120', label: tabViewUiText('family.profileManager.hoursPreset', '{count} hours', { count: 2 }), className: 'btn-primary' },
+                { value: '0', label: tabViewUiText('family.profileManager.requireApproval', 'Require approval'), className: 'btn-secondary' }
             ],
-            customTitle: selectedCount > 1 ? 'Custom Selected Time Limit' : 'Custom YouTube Time Limit',
+            customTitle: selectedCount > 1
+                ? tabViewUiText('family.profileManager.customSelectedTimeLimit', 'Custom Selected Time Limit')
+                : tabViewUiText('family.profileManager.customYouTubeTimeLimit', 'Custom YouTube Time Limit'),
             customMessage: selectedCount > 1
-                ? 'Daily YouTube minutes for the selected profiles. Use 0 to require approval before viewing.'
-                : 'Daily YouTube minutes for this profile. Use 0 to require approval before viewing.',
-            customPlaceholder: 'Minutes per day',
-            customConfirmText: selectedCount > 1 ? 'Save Limits' : 'Save Limit',
+                ? tabViewUiText('family.profileManager.selectedDailyMinutesPrompt', 'Daily YouTube minutes for the selected profiles. Use 0 to require approval before viewing.')
+                : tabViewUiText('family.profileManager.profileDailyMinutesPrompt', 'Daily YouTube minutes for this profile. Use 0 to require approval before viewing.'),
+            customPlaceholder: tabViewUiText('family.profileManager.minutesPerDay', 'Minutes per day'),
+            customConfirmText: selectedCount > 1
+                ? tabViewUiText('family.profileManager.saveLimits', 'Save Limits')
+                : tabViewUiText('family.profileManager.saveLimit', 'Save Limit'),
             initialMinutes,
             allowZero: true,
-            errorMessage: 'Enter whole minutes, 0 or higher'
+            errorMessage: tabViewUiText('family.profileManager.invalidDailyMinutes', 'Enter whole minutes, 0 or higher')
         });
     }
 
@@ -8998,17 +9129,17 @@ document.addEventListener('DOMContentLoaded', async () => {
         if (!targetId) return;
         const io = window.FilterTubeIO || {};
         if (typeof io.loadProfilesV4 !== 'function' || typeof io.saveProfilesV4 !== 'function') {
-            UIComponents.showToast('Profiles unavailable', 'error');
+            UIComponents.showToast(tabViewUiText('popup.profile.unavailable', 'Profiles unavailable'), 'error');
             return;
         }
         const fresh = await io.loadProfilesV4();
         const currentActive = normalizeString(fresh?.activeProfileId) || 'default';
         if (getProfileType(fresh, currentActive) === 'child') {
-            UIComponents.showToast('Protected profiles cannot change time limits', 'error');
+            UIComponents.showToast(tabViewUiText('family.profileManager.cannotChangeTimeHere', 'Protected profiles cannot change time limits here'), 'error');
             return;
         }
         if (!canActiveProfileManageProfile(fresh, targetId)) {
-            UIComponents.showToast('Switch to the parent account to change this profile', 'error');
+            UIComponents.showToast(tabViewUiText('family.profileManager.switchParentToManageProfile', 'Switch to the parent/account profile to change this profile'), 'error');
             return;
         }
         const okAdmin = await ensureProfileUnlocked(fresh, currentActive, { sensitiveAction: true });
@@ -9042,7 +9173,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             dailyBudgetSeconds: budgetSeconds
         });
         if (!nextPolicy) {
-            UIComponents.showToast('Time limit policy could not be saved', 'error');
+            UIComponents.showToast(tabViewUiText('family.profileManager.timeLimitSaveFailed', 'Time limit policy could not be saved'), 'error');
             return;
         }
 
@@ -9066,26 +9197,31 @@ document.addEventListener('DOMContentLoaded', async () => {
         });
         profilesV4Cache = { ...fresh, schemaVersion: 4, profiles };
         await refreshProfilesUI();
-        UIComponents.showToast(enabled ? 'Time limit updated' : 'Time limit disabled', 'success');
+        UIComponents.showToast(
+            enabled
+                ? tabViewUiText('family.profileManager.timeLimitUpdated', 'Time limit updated')
+                : tabViewUiText('family.profileManager.timeLimitDisabled', 'Time limit disabled'),
+            'success'
+        );
         await offerManagedTimeLimitPushForChangedProfiles([targetId]);
     }
 
     async function updateMultipleProfileTimeLimitPolicies(profileIds, action) {
         const targetIds = [...new Set(safeArray(profileIds).map(normalizeString).filter(Boolean))];
         if (!targetIds.length) {
-            UIComponents.showToast('Select at least one protected profile', 'error');
+            UIComponents.showToast(tabViewUiText('family.profileManager.selectProtectedProfile', 'Select at least one protected profile'), 'error');
             return;
         }
         const io = window.FilterTubeIO || {};
         if (typeof io.loadProfilesV4 !== 'function' || typeof io.saveProfilesV4 !== 'function') {
-            UIComponents.showToast('Profiles unavailable', 'error');
+            UIComponents.showToast(tabViewUiText('popup.profile.unavailable', 'Profiles unavailable'), 'error');
             return;
         }
 
         const fresh = await io.loadProfilesV4();
         const currentActive = normalizeString(fresh?.activeProfileId) || 'default';
         if (getProfileType(fresh, currentActive) === 'child') {
-            UIComponents.showToast('Protected profiles cannot change time limits', 'error');
+            UIComponents.showToast(tabViewUiText('family.profileManager.cannotChangeTimeHere', 'Protected profiles cannot change time limits here'), 'error');
             return;
         }
 
@@ -9096,7 +9232,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                 && canActiveProfileManageProfile(fresh, targetId);
         });
         if (!eligibleIds.length) {
-            UIComponents.showToast('No selected protected profiles can be managed by this account', 'error');
+            UIComponents.showToast(tabViewUiText('family.profileManager.noManagedSelection', 'No selected protected profiles can be managed by this account'), 'error');
             return;
         }
 
@@ -9150,7 +9286,9 @@ document.addEventListener('DOMContentLoaded', async () => {
         }
 
         if (!changedCount) {
-            UIComponents.showToast(enabled ? 'No selected profiles changed' : 'No selected profiles had active limits', 'info');
+            UIComponents.showToast(enabled
+                ? tabViewUiText('family.profileManager.noSelectedProfileChanges', 'No selected profiles changed')
+                : tabViewUiText('family.profileManager.noSelectedActiveLimits', 'No selected profiles had active limits'), 'info');
             return;
         }
 
@@ -9163,8 +9301,8 @@ document.addEventListener('DOMContentLoaded', async () => {
         await refreshProfilesUI();
         UIComponents.showToast(
             enabled
-                ? `${changedCount} time limits updated`
-                : `${changedCount} time limits disabled`,
+                ? tabViewUiText('family.profileManager.timeLimitsUpdatedCount', '{count} time limits updated', { count: changedCount })
+                : tabViewUiText('family.profileManager.timeLimitsDisabledCount', '{count} time limits disabled', { count: changedCount }),
             'success'
         );
         await offerManagedTimeLimitPushForChangedProfiles(changedProfileIds);
@@ -9172,27 +9310,31 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     async function promptManagedExtraTimeMinutes({ selectedCount = 1 } = {}) {
         return promptManagedTimeLimitMinutes({
-            title: selectedCount > 1 ? 'Add Time To Selected Profiles' : 'Add Extra YouTube Time',
-            message: 'Choose temporary parent-approved YouTube time. The grant expires automatically in 2 hours.',
+            title: selectedCount > 1
+                ? tabViewUiText('family.profileManager.addTimeToSelectedProfiles', 'Add Time To Selected Profiles')
+                : tabViewUiText('family.profileManager.addExtraYoutubeTime', 'Add Extra YouTube Time'),
+            message: tabViewUiText('family.profileManager.extraTimePrompt', 'Choose temporary parent-approved YouTube time. The grant expires automatically in 2 hours.'),
             presets: [
-                { value: '15', label: '15 min', className: 'btn-primary' },
-                { value: '30', label: '30 min', className: 'btn-secondary' },
-                { value: '60', label: '1 hour', className: 'btn-secondary' }
+                { value: '15', label: tabViewUiText('family.profileManager.minutesPreset', '{count} min', { count: 15 }), className: 'btn-primary' },
+                { value: '30', label: tabViewUiText('family.profileManager.minutesPreset', '{count} min', { count: 30 }), className: 'btn-secondary' },
+                { value: '60', label: tabViewUiText('family.profileManager.oneHourPreset', '1 hour'), className: 'btn-secondary' }
             ],
-            customTitle: selectedCount > 1 ? 'Custom Extra Time For Selected Profiles' : 'Custom Extra YouTube Time',
-            customMessage: 'Extra parent-approved YouTube minutes. The grant expires automatically in 2 hours.',
-            customPlaceholder: 'Extra minutes',
-            customConfirmText: 'Add Time',
+            customTitle: selectedCount > 1
+                ? tabViewUiText('family.profileManager.customExtraTimeSelected', 'Custom Extra Time For Selected Profiles')
+                : tabViewUiText('family.profileManager.customExtraYoutubeTime', 'Custom Extra YouTube Time'),
+            customMessage: tabViewUiText('family.profileManager.customExtraTimePrompt', 'Extra parent-approved YouTube minutes. The grant expires automatically in 2 hours.'),
+            customPlaceholder: tabViewUiText('family.profileManager.extraMinutes', 'Extra minutes'),
+            customConfirmText: tabViewUiText('family.profileManager.addTime', 'Add Time'),
             initialMinutes: 15,
             allowZero: false,
-            errorMessage: 'Enter whole extra minutes greater than 0'
+            errorMessage: tabViewUiText('family.profileManager.invalidExtraMinutes', 'Enter whole extra minutes greater than 0')
         });
     }
 
     async function offerManagedTimeLimitPushForChangedProfiles(profileIds) {
         return offerManagedPolicyPushForChangedProfiles(profileIds, {
             scope: 'time_limits',
-            title: 'Send time-limit update now?',
+            title: tabViewUiText('family.profileManager.sendTimeLimitUpdate', 'Send time-limit update now?'),
             label: 'time-limit policy'
         });
     }
@@ -9213,10 +9355,16 @@ document.addEventListener('DOMContentLoaded', async () => {
         if (readyProfileCount <= 0) return;
 
         const sendNow = await showConfirmModal({
-            title: title || 'Send managed update now?',
-            message: `${readyProfileCount} changed ${readyProfileCount === 1 ? 'profile has' : 'profiles have'} a verified delivery path. Send this ${normalizeString(label) || normalizedScope} update to those devices now.`,
-            confirmText: 'Send Update',
-            cancelText: 'Not now'
+            title: title || tabViewUiText('family.profileManager.sendManagedUpdateNow', 'Send managed update now?'),
+            message: tabViewUiText('family.profileManager.managedUpdateDeliveryPrompt', '{count} changed {profileWord} a verified delivery path. Send this {label} update to those devices now.', {
+                count: readyProfileCount,
+                profileWord: readyProfileCount === 1
+                    ? tabViewUiText('family.profileManager.profileHas', 'profile has')
+                    : tabViewUiText('family.profileManager.profilesHave', 'profiles have'),
+                label: normalizeString(label) || normalizedScope
+            }),
+            confirmText: tabViewUiText('family.profileManager.sendUpdate', 'Send Update'),
+            cancelText: tabViewUiText('dashboard.modal.notNow', 'Not now')
         });
         if (sendNow) {
             await sendManagedParentPolicyToVerifiedDevices(changedProfileIds, { scope: normalizedScope });
@@ -9226,19 +9374,19 @@ document.addEventListener('DOMContentLoaded', async () => {
     async function grantExtraTimeToProfiles(profileIds) {
         const targetIds = [...new Set(safeArray(profileIds).map(normalizeString).filter(Boolean))];
         if (!targetIds.length) {
-            UIComponents.showToast('Select at least one protected profile', 'error');
+            UIComponents.showToast(tabViewUiText('family.profileManager.selectProtectedProfile', 'Select at least one protected profile'), 'error');
             return;
         }
         const io = window.FilterTubeIO || {};
         if (typeof io.loadProfilesV4 !== 'function' || typeof io.saveProfilesV4 !== 'function') {
-            UIComponents.showToast('Profiles unavailable', 'error');
+            UIComponents.showToast(tabViewUiText('popup.profile.unavailable', 'Profiles unavailable'), 'error');
             return;
         }
 
         const fresh = await io.loadProfilesV4();
         const currentActive = normalizeString(fresh?.activeProfileId) || 'default';
         if (getProfileType(fresh, currentActive) === 'child') {
-            UIComponents.showToast('Protected profiles cannot grant extra time', 'error');
+            UIComponents.showToast(tabViewUiText('family.profileManager.cannotGrantExtraTime', 'Protected profiles cannot grant extra time'), 'error');
             return;
         }
 
@@ -9250,7 +9398,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                 && getManagedTimeLimitPolicy(profile)?.enabled === true;
         });
         if (!eligibleIds.length) {
-            UIComponents.showToast('Select protected profiles with active time limits first', 'error');
+            UIComponents.showToast(tabViewUiText('family.profileManager.selectProfilesWithTimeLimits', 'Select protected profiles with active time limits first'), 'error');
             return;
         }
 
@@ -9258,10 +9406,17 @@ document.addEventListener('DOMContentLoaded', async () => {
         if (minutes == null) return;
 
         const confirmGrant = await showConfirmModal({
-            title: `Grant ${minutes} extra minute${minutes === 1 ? '' : 's'}?`,
-            message: `This will add temporary parent-approved YouTube time to ${eligibleIds.length} protected ${eligibleIds.length === 1 ? 'profile' : 'profiles'} after parent/account re-auth. The grant expires in 2 hours.`,
-            confirmText: 'Grant time',
-            cancelText: 'Cancel'
+            title: minutes === 1
+                ? tabViewUiText('family.profileManager.grantExtraMinuteTitle', 'Grant {minutes} extra minute?', { minutes })
+                : tabViewUiText('family.profileManager.grantExtraMinutesTitle', 'Grant {minutes} extra minutes?', { minutes }),
+            message: tabViewUiText('family.profileManager.grantExtraMinutesMessage', 'This will add temporary parent-approved YouTube time to {count} protected {profileWord} after parent/account re-auth. The grant expires in 2 hours.', {
+                count: eligibleIds.length,
+                profileWord: eligibleIds.length === 1
+                    ? tabViewUiText('family.profileManager.profileWord', 'profile')
+                    : tabViewUiText('family.profileManager.profilesWord', 'profiles')
+            }),
+            confirmText: tabViewUiText('family.profileManager.grantTime', 'Grant time'),
+            cancelText: tabViewUiText('dashboard.modal.cancel', 'Cancel')
         });
         if (!confirmGrant) return;
 
@@ -9312,7 +9467,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         }
 
         if (!changedProfileIds.length) {
-            UIComponents.showToast('No selected profiles changed', 'info');
+            UIComponents.showToast(tabViewUiText('family.profileManager.noSelectedProfileChanges', 'No selected profiles changed'), 'info');
             return;
         }
 
@@ -9323,7 +9478,12 @@ document.addEventListener('DOMContentLoaded', async () => {
         });
         profilesV4Cache = { ...fresh, schemaVersion: 4, profiles };
         await refreshProfilesUI();
-        UIComponents.showToast(`${changedProfileIds.length} extra-time ${changedProfileIds.length === 1 ? 'grant' : 'grants'} added`, 'success');
+        UIComponents.showToast(tabViewUiText('family.profileManager.extraTimeGrantsAdded', '{count} extra-time {grantWord} added', {
+            count: changedProfileIds.length,
+            grantWord: changedProfileIds.length === 1
+                ? tabViewUiText('family.profileManager.grantSingular', 'grant')
+                : tabViewUiText('family.profileManager.grantPlural', 'grants')
+        }), 'success');
         await offerManagedTimeLimitPushForChangedProfiles(changedProfileIds);
     }
 
@@ -9407,22 +9567,24 @@ document.addEventListener('DOMContentLoaded', async () => {
         const type = ruleType === 'video' ? 'video' : (ruleType === 'channel' ? 'channel' : 'keyword');
         const surface = await showChoiceModal({
             title: type === 'video'
-                ? 'Add Video ID To Selected Profiles'
-                : (type === 'channel' ? 'Add Channel To Selected Profiles' : 'Add Keyword To Selected Profiles'),
-            message: 'Choose where this rule should be applied. FilterTube will use each protected profile surface current Blocklist/Whitelist mode.',
+                ? tabViewUiText('family.profileManager.bulkAddVideoTitle', 'Add Video ID To Selected Profiles')
+                : (type === 'channel'
+                    ? tabViewUiText('family.profileManager.bulkAddChannelTitle', 'Add Channel To Selected Profiles')
+                    : tabViewUiText('family.profileManager.bulkAddKeywordTitle', 'Add Keyword To Selected Profiles')),
+            message: tabViewUiText('family.profileManager.bulkRuleSurfacePrompt', 'Choose where this rule should be applied. FilterTube will use each protected profile surface current Blocklist/Whitelist mode.'),
             choices: [
                 {
                     value: 'main',
-                    label: 'YouTube Main',
+                    label: tabViewUiText('family.profileManager.youtubeMain', 'YouTube Main'),
                     className: 'btn-primary'
                 },
                 {
                     value: 'kids',
-                    label: 'YouTube Kids',
+                    label: tabViewUiText('family.profileManager.youtubeKids', 'YouTube Kids'),
                     className: 'btn-secondary'
                 }
             ],
-            cancelText: 'Cancel'
+            cancelText: tabViewUiText('dashboard.modal.cancel', 'Cancel')
         });
         return surface === 'kids' ? 'kids' : (surface === 'main' ? 'main' : null);
     }
@@ -9430,14 +9592,26 @@ document.addEventListener('DOMContentLoaded', async () => {
     async function promptManagedBulkRuleValue(ruleType) {
         const type = ruleType === 'video' ? 'video' : (ruleType === 'channel' ? 'channel' : 'keyword');
         const rawValue = await showPromptModal({
-            title: type === 'video' ? 'Video ID To Add' : (type === 'channel' ? 'Channel To Add' : 'Keyword To Add'),
-            message: type === 'video'
-                ? 'Paste a YouTube watch/Shorts URL or an 11-character video ID.'
+            title: type === 'video'
+                ? tabViewUiText('family.profileManager.videoIdToAdd', 'Video ID To Add')
                 : (type === 'channel'
-                    ? 'Use @handle, Channel ID, c/ChannelName, user/ChannelName, or a YouTube URL.'
-                    : 'Enter the keyword to add to selected protected profiles.'),
-            placeholder: type === 'video' ? 'watch URL or video ID' : (type === 'channel' ? '@channel or UC...' : 'keyword'),
-            confirmText: type === 'video' ? 'Add Video' : (type === 'channel' ? 'Add Channel' : 'Add Keyword')
+                    ? tabViewUiText('family.profileManager.channelToAdd', 'Channel To Add')
+                    : tabViewUiText('family.profileManager.keywordToAdd', 'Keyword To Add')),
+            message: type === 'video'
+                ? tabViewUiText('family.profileManager.videoIdPrompt', 'Paste a YouTube watch/Shorts URL or an 11-character video ID.')
+                : (type === 'channel'
+                    ? tabViewUiText('family.profileManager.channelPrompt', 'Use @handle, Channel ID, c/ChannelName, user/ChannelName, or a YouTube URL.')
+                    : tabViewUiText('family.profileManager.keywordPrompt', 'Enter the keyword to add to selected protected profiles.')),
+            placeholder: type === 'video'
+                ? tabViewUiText('family.profileManager.videoIdPlaceholder', 'watch URL or video ID')
+                : (type === 'channel'
+                    ? tabViewUiText('family.profileManager.channelPlaceholder', '@channel or UC...')
+                    : tabViewUiText('dashboard.ruleEditor.keywordNoun', 'keyword')),
+            confirmText: type === 'video'
+                ? tabViewUiText('family.profileManager.addVideo', 'Add Video')
+                : (type === 'channel'
+                    ? tabViewUiText('dashboard.ruleEditor.addChannelNoun', 'Add Channel')
+                    : tabViewUiText('dashboard.ruleEditor.addKeywordNoun', 'Add Keyword'))
         });
         if (rawValue === null) return null;
         return normalizeString(rawValue);
@@ -9445,9 +9619,9 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     function managedBulkRuleTypeLabel(ruleType) {
         const type = ruleType === 'video' ? 'video' : (ruleType === 'channel' ? 'channel' : 'keyword');
-        if (type === 'video') return 'video ID';
-        if (type === 'channel') return 'channel';
-        return 'keyword';
+        if (type === 'video') return tabViewUiText('family.profileManager.videoIdLabel', 'video ID');
+        if (type === 'channel') return tabViewUiText('dashboard.ruleEditor.channelNoun', 'channel');
+        return tabViewUiText('dashboard.ruleEditor.keywordNoun', 'keyword');
     }
 
     function managedBulkRuleRemoteScope(ruleType) {
@@ -10478,9 +10652,19 @@ document.addEventListener('DOMContentLoaded', async () => {
         const channelCount = Number(counts.channels) || 0;
         const keywordCount = Number(counts.keywords) || 0;
         const parts = [];
-        if (channelCount) parts.push(`${channelCount} ${pluralize(channelCount, 'channel')}`);
-        if (keywordCount) parts.push(`${keywordCount} ${pluralize(keywordCount, 'keyword')}`);
-        return parts.length ? parts.join(' + ') : '0 rules';
+        if (channelCount) parts.push(tabViewUiText('dashboard.managedLists.count', '{count} {noun}', {
+            count: channelCount,
+            noun: tabViewUiText(channelCount === 1 ? 'dashboard.managedLists.channelSingular' : 'dashboard.managedLists.channelPlural', channelCount === 1 ? 'channel' : 'channels')
+        }));
+        if (keywordCount) parts.push(tabViewUiText('dashboard.managedLists.count', '{count} {noun}', {
+            count: keywordCount,
+            noun: tabViewUiText(keywordCount === 1 ? 'dashboard.managedLists.keywordSingular' : 'dashboard.managedLists.keywordPlural', keywordCount === 1 ? 'keyword' : 'keywords')
+        }));
+        return parts.length ? parts.join(' + ') : tabViewUiText('dashboard.managedLists.zeroRules', '0 rules');
+    }
+
+    function showManagedRuleListToast(key, fallback, type = 'info', values = {}) {
+        UIComponents.showToast(tabViewUiText(`dashboard.managedLists.toast.${key}`, fallback, values), type);
     }
 
     function downloadManagedRuleListCsvTemplate() {
@@ -10495,7 +10679,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             anchor.remove();
             setTimeout(() => URL.revokeObjectURL(url), 1000);
         } catch (error) {
-            UIComponents.showToast('Unable to download CSV template', 'error');
+            UIComponents.showToast(tabViewUiText('dashboard.managedLists.downloadCsvFailed', 'Unable to download CSV template'), 'error');
         }
     }
 
@@ -10511,7 +10695,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             anchor.remove();
             setTimeout(() => URL.revokeObjectURL(url), 1000);
         } catch (error) {
-            UIComponents.showToast('Unable to download JSON template', 'error');
+            UIComponents.showToast(tabViewUiText('dashboard.managedLists.downloadJsonFailed', 'Unable to download JSON template'), 'error');
         }
     }
 
@@ -10527,7 +10711,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             header.className = 'card-header';
             const titleEl = document.createElement('h3');
             titleEl.className = 'ft-modal-title';
-            titleEl.textContent = 'Import Rule List';
+            titleEl.textContent = tabViewUiText('dashboard.managedLists.importTitle', 'Import Rule List');
             header.appendChild(titleEl);
 
             const body = document.createElement('div');
@@ -10536,9 +10720,13 @@ document.addEventListener('DOMContentLoaded', async () => {
             const intro = document.createElement('div');
             intro.className = 'import-export-hint';
             const targetCopy = normalizeString(targetLabel) || (selectedCount > 1
-                ? `${selectedCount} selected protected profiles`
-                : 'this profile');
-            intro.textContent = `Import a channel/keyword list, review what FilterTube understood, then apply it to ${targetCopy}. Lists become ordinary profile rules first; they never change profiles, PINs, trusted devices, viewing access, or time limits.`;
+                ? tabViewUiText('dashboard.managedLists.selectedProfilesTarget', '{count} selected protected profiles', { count: selectedCount })
+                : tabViewUiText('dashboard.managedLists.thisProfileTarget', 'this profile'));
+            intro.textContent = tabViewUiText(
+                'dashboard.managedLists.importIntro',
+                'Import a channel/keyword list, review what FilterTube understood, then apply it to {target}. Lists become ordinary profile rules first; they never change profiles, PINs, trusted devices, viewing access, or time limits.',
+                { target: targetCopy }
+            );
             body.appendChild(intro);
 
             const modalLayout = document.createElement('div');
@@ -10639,19 +10827,19 @@ document.addEventListener('DOMContentLoaded', async () => {
             const nameGroup = document.createElement('label');
             nameGroup.className = 'managed-channel-list-modal__field';
             const nameLabel = document.createElement('span');
-            nameLabel.textContent = 'Parent label';
+            nameLabel.textContent = tabViewUiText('dashboard.managedLists.parentLabel', 'Parent label');
             const nameInput = document.createElement('input');
             nameInput.className = 'text-input';
             nameInput.type = 'text';
-            nameInput.placeholder = 'Family block list';
-            nameInput.value = 'Rule list import';
+            nameInput.placeholder = tabViewUiText('dashboard.managedLists.parentLabelPlaceholder', 'Family block list');
+            nameInput.value = tabViewUiText('dashboard.managedLists.defaultName', 'Rule list import');
             nameGroup.append(nameLabel, nameInput);
             formColumn.appendChild(nameGroup);
 
             const urlGroup = document.createElement('label');
             urlGroup.className = 'managed-channel-list-modal__field';
             const urlLabel = document.createElement('span');
-            urlLabel.textContent = 'Public list URL (optional)';
+            urlLabel.textContent = tabViewUiText('dashboard.managedLists.publicListUrlOptional', 'Public list URL (optional)');
             const urlRow = document.createElement('div');
             urlRow.className = 'managed-channel-list-modal__url-row';
             const urlInput = document.createElement('input');
@@ -10661,8 +10849,8 @@ document.addEventListener('DOMContentLoaded', async () => {
             const loadUrlBtn = document.createElement('button');
             loadUrlBtn.className = 'btn-secondary';
             loadUrlBtn.type = 'button';
-            loadUrlBtn.textContent = 'Load URL';
-            loadUrlBtn.title = 'Loads a public HTTPS text list into the preview box. If the host blocks browser fetches, download the file and choose it below.';
+            loadUrlBtn.textContent = tabViewUiText('dashboard.managedLists.loadUrl', 'Load URL');
+            loadUrlBtn.title = tabViewUiText('dashboard.managedLists.loadUrlHelp', 'Loads a public HTTPS text list into the preview box. If the host blocks browser fetches, download the file and choose it below.');
             urlRow.append(urlInput, loadUrlBtn);
             urlGroup.append(urlLabel, urlRow);
             formColumn.appendChild(urlGroup);
@@ -10670,7 +10858,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             const fileGroup = document.createElement('label');
             fileGroup.className = 'managed-channel-list-modal__field';
             const fileLabel = document.createElement('span');
-            fileLabel.textContent = 'List file (optional)';
+            fileLabel.textContent = tabViewUiText('dashboard.managedLists.listFileOptional', 'List file (optional)');
             const fileInput = document.createElement('input');
             fileInput.className = 'managed-channel-list-modal__file';
             fileInput.type = 'file';
@@ -10681,7 +10869,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             const listGroup = document.createElement('label');
             listGroup.className = 'managed-channel-list-modal__field';
             const listLabel = document.createElement('span');
-            listLabel.textContent = 'Paste list or edit template';
+            listLabel.textContent = tabViewUiText('dashboard.managedLists.pasteOrEditTemplate', 'Paste list or edit template');
             const textArea = document.createElement('textarea');
             textArea.className = 'text-input managed-channel-list-modal__textarea';
             textArea.placeholder = MANAGED_RULE_LIST_CSV_TEMPLATE;
@@ -10692,7 +10880,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             templateBox.className = 'managed-channel-list-modal__template';
             const templateTitle = document.createElement('div');
             templateTitle.className = 'managed-channel-list-modal__template-title';
-            templateTitle.textContent = 'CSV template';
+            templateTitle.textContent = tabViewUiText('dashboard.managedLists.csvTemplate', 'CSV template');
             const templateText = document.createElement('pre');
             templateText.textContent = MANAGED_RULE_LIST_CSV_TEMPLATE;
             const templateActions = document.createElement('div');
@@ -10700,35 +10888,35 @@ document.addEventListener('DOMContentLoaded', async () => {
             const useTemplateBtn = document.createElement('button');
             useTemplateBtn.className = 'btn-secondary';
             useTemplateBtn.type = 'button';
-            useTemplateBtn.textContent = 'Use CSV';
-            useTemplateBtn.title = 'Puts the CSV template into the preview box so you can edit it.';
+            useTemplateBtn.textContent = tabViewUiText('dashboard.managedLists.useCsv', 'Use CSV');
+            useTemplateBtn.title = tabViewUiText('dashboard.managedLists.useCsvHelp', 'Puts the CSV template into the preview box so you can edit it.');
             const useJsonTemplateBtn = document.createElement('button');
             useJsonTemplateBtn.className = 'btn-secondary';
             useJsonTemplateBtn.type = 'button';
-            useJsonTemplateBtn.textContent = 'Use JSON';
-            useJsonTemplateBtn.title = 'Puts the JSON rule-list template into the preview box so you can edit it.';
+            useJsonTemplateBtn.textContent = tabViewUiText('dashboard.managedLists.useJson', 'Use JSON');
+            useJsonTemplateBtn.title = tabViewUiText('dashboard.managedLists.useJsonHelp', 'Puts the JSON rule-list template into the preview box so you can edit it.');
             const useTxtTemplateBtn = document.createElement('button');
             useTxtTemplateBtn.className = 'btn-secondary';
             useTxtTemplateBtn.type = 'button';
-            useTxtTemplateBtn.textContent = 'Use TXT';
-            useTxtTemplateBtn.title = 'Puts the TXT rule-list template into the preview box so you can edit it.';
+            useTxtTemplateBtn.textContent = tabViewUiText('dashboard.managedLists.useTxt', 'Use TXT');
+            useTxtTemplateBtn.title = tabViewUiText('dashboard.managedLists.useTxtHelp', 'Puts the TXT rule-list template into the preview box so you can edit it.');
             const downloadTemplateBtn = document.createElement('button');
             downloadTemplateBtn.className = 'btn-secondary';
             downloadTemplateBtn.type = 'button';
-            downloadTemplateBtn.textContent = 'Download CSV';
-            downloadTemplateBtn.title = 'Downloads a CSV template for spreadsheet editing.';
+            downloadTemplateBtn.textContent = tabViewUiText('dashboard.managedLists.downloadCsv', 'Download CSV');
+            downloadTemplateBtn.title = tabViewUiText('dashboard.managedLists.downloadCsvHelp', 'Downloads a CSV template for spreadsheet editing.');
             const downloadJsonTemplateBtn = document.createElement('button');
             downloadJsonTemplateBtn.className = 'btn-secondary';
             downloadJsonTemplateBtn.type = 'button';
-            downloadJsonTemplateBtn.textContent = 'Download JSON';
-            downloadJsonTemplateBtn.title = 'Downloads a JSON rule-list template.';
+            downloadJsonTemplateBtn.textContent = tabViewUiText('dashboard.managedLists.downloadJson', 'Download JSON');
+            downloadJsonTemplateBtn.title = tabViewUiText('dashboard.managedLists.downloadJsonHelp', 'Downloads a JSON rule-list template.');
             templateActions.append(useTemplateBtn, useTxtTemplateBtn, useJsonTemplateBtn, downloadTemplateBtn, downloadJsonTemplateBtn);
             templateBox.append(templateTitle, templateText, templateActions);
             formColumn.appendChild(templateBox);
 
             const help = document.createElement('div');
             help.className = 'managed-channel-list-modal__help';
-            help.textContent = 'TXT bare rows stay channel-only; use keyword: for TXT keywords. CSV, TXT, FilterTube JSON, and BlockTube migration JSON all complete missing channel names, handles/custom URLs, and avatars after approval in a slow persisted queue. A large list can take time; this avoids a request burst. If this is a protected profile, send the updated policy from Family Controls when another verified device needs the same rules.';
+            help.textContent = tabViewUiText('dashboard.managedLists.importHelp', 'TXT bare rows stay channel-only; use keyword: for TXT keywords. CSV, TXT, FilterTube JSON, and BlockTube migration JSON all complete missing channel names, handles/custom URLs, and avatars after approval in a slow persisted queue. A large list can take time; this avoids a request burst. If this is a protected profile, send the updated policy from Family Controls when another verified device needs the same rules.');
             formColumn.appendChild(help);
 
             const previewEl = document.createElement('div');
@@ -10747,12 +10935,12 @@ document.addEventListener('DOMContentLoaded', async () => {
             const cancelBtn = document.createElement('button');
             cancelBtn.className = 'btn-secondary';
             cancelBtn.type = 'button';
-            cancelBtn.textContent = 'Cancel';
+            cancelBtn.textContent = tabViewUiText('dashboard.modal.cancel', 'Cancel');
 
             const okBtn = document.createElement('button');
             okBtn.className = 'btn-primary';
             okBtn.type = 'button';
-            okBtn.textContent = 'Preview List';
+            okBtn.textContent = tabViewUiText('dashboard.managedLists.previewList', 'Preview List');
 
             const cleanup = () => {
                 try {
@@ -10894,7 +11082,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                 }
                 const previousLabel = loadUrlBtn.textContent;
                 loadUrlBtn.disabled = true;
-                loadUrlBtn.textContent = 'Loading...';
+                loadUrlBtn.textContent = tabViewUiText('dashboard.managedLists.loading', 'Loading...');
                 setError('');
                 try {
                     const loaded = await fetchManagedChannelListSourceUrl(rawUrl);
@@ -10909,7 +11097,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                     if (!normalizeString(nameInput.value) || nameInput.value === 'Imported rule list') {
                         nameInput.value = loaded.sourceLabel || 'Imported rule list';
                     }
-                    help.textContent = 'URL loaded into the preview box. Parent/account unlock is still required before any protected profile changes.';
+                    help.textContent = tabViewUiText('dashboard.managedLists.urlLoadedHelp', 'URL loaded into the preview box. Parent/account unlock is still required before any protected profile changes.');
                     renderPreview();
                     textArea.focus();
                 } catch (error) {
@@ -10930,7 +11118,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                     if (!normalizeString(nameInput.value) || nameInput.value === 'Imported rule list') {
                         nameInput.value = file.name.replace(/\.[^.]+$/, '') || 'Imported rule list';
                     }
-                    help.textContent = 'File loaded into the preview box. Parent/account unlock is still required before any protected profile changes.';
+                    help.textContent = tabViewUiText('dashboard.managedLists.fileLoadedHelp', 'File loaded into the preview box. Parent/account unlock is still required before any protected profile changes.');
                     setError('');
                     renderPreview();
                     textArea.focus();
@@ -11210,11 +11398,13 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     function formatManagedChannelListCheckedAt(timestamp) {
         const value = Number(timestamp) || 0;
-        if (!value) return 'not checked yet';
+        if (!value) return tabViewUiText('dashboard.managedLists.notCheckedYet', 'not checked yet');
         try {
-            return `checked ${new Date(value).toLocaleDateString(undefined, { month: 'short', day: 'numeric', year: 'numeric' })}`;
+            return tabViewUiText('dashboard.managedLists.checkedAt', 'checked {date}', {
+                date: new Date(value).toLocaleDateString(undefined, { month: 'short', day: 'numeric', year: 'numeric' })
+            });
         } catch (e) {
-            return 'checked';
+            return tabViewUiText('dashboard.managedLists.checked', 'checked');
         }
     }
 
@@ -11266,24 +11456,28 @@ document.addEventListener('DOMContentLoaded', async () => {
     }
 
     function formatRuleListAutoCheckStatus() {
-        if (!isRuleListAutoCheckEnabled()) return 'Off. Manual checks only.';
+        if (!isRuleListAutoCheckEnabled()) return tabViewUiText('dashboard.managedLists.autoCheckOffStatus', 'Off. Manual checks only.');
         const lastRun = getRuleListAutoCheckLastRun();
-        if (!lastRun) return 'On. Will check stale URL lists when this dashboard opens.';
+        if (!lastRun) return tabViewUiText('dashboard.managedLists.autoCheckFirstRunStatus', 'On. Will check stale URL lists when this dashboard opens.');
         try {
-            return `On. Last checked ${new Date(lastRun).toLocaleDateString(undefined, { month: 'short', day: 'numeric' })}.`;
+            return tabViewUiText('dashboard.managedLists.autoCheckLastRunStatus', 'On. Last checked {date}.', {
+                date: new Date(lastRun).toLocaleDateString(undefined, { month: 'short', day: 'numeric' })
+            });
         } catch (_) {
-            return 'On. Stale URL lists are checked from this dashboard.';
+            return tabViewUiText('dashboard.managedLists.autoCheckFallbackStatus', 'On. Stale URL lists are checked from this dashboard.');
         }
     }
 
     function updateRuleListAutoCheckUi() {
         const enabled = isRuleListAutoCheckEnabled();
         if (ftToggleRuleListAutoCheckBtn) {
-            ftToggleRuleListAutoCheckBtn.textContent = enabled ? 'Auto-check: On' : 'Auto-check URL Lists';
+            ftToggleRuleListAutoCheckBtn.textContent = enabled
+                ? tabViewUiText('dashboard.managedLists.autoCheckOn', 'Auto-check: On')
+                : tabViewUiText('dashboard.managedLists.autoCheckButton', 'Auto-check URL Lists');
             ftToggleRuleListAutoCheckBtn.classList.toggle('is-rule-list-auto-check-on', enabled);
             ftToggleRuleListAutoCheckBtn.title = enabled
-                ? 'Turn off dashboard-open stale URL list checks. Existing imported rules stay unchanged.'
-                : 'Check stale URL-backed rule lists when this dashboard opens. FilterTube still asks before applying anything.';
+                ? tabViewUiText('dashboard.managedLists.autoCheckTurnOffHelp', 'Turn off dashboard-open stale URL list checks. Existing imported rules stay unchanged.')
+                : tabViewUiText('dashboard.managedLists.autoCheckHelp', 'Check stale URL-backed rule lists when this dashboard opens. FilterTube still asks before applying anything.');
         }
         if (ftRuleListAutoCheckStatus) {
             ftRuleListAutoCheckStatus.textContent = formatRuleListAutoCheckStatus();
@@ -11319,18 +11513,24 @@ document.addEventListener('DOMContentLoaded', async () => {
             return false;
         }
         const shouldReview = await showChoiceModal({
-            title: 'Review Stale URL Lists?',
-            message: `${staleCount} URL-backed ${pluralize(staleCount, 'rule list')} across ${targetProfileIds.length} managed ${pluralize(targetProfileIds.length, 'profile')} ${staleCount === 1 ? 'is' : 'are'} old enough to check.`,
+            title: tabViewUiText('dashboard.managedLists.reviewStaleTitle', 'Review Stale URL Lists?'),
+            message: tabViewUiText('dashboard.managedLists.reviewStaleMessage', '{listCount} URL-backed {listNoun} across {profileCount} managed {profileNoun} {verb} old enough to check.', {
+                listCount: staleCount,
+                listNoun: tabViewUiText(staleCount === 1 ? 'dashboard.managedLists.ruleListSingular' : 'dashboard.managedLists.ruleListPlural', staleCount === 1 ? 'rule list' : 'rule lists'),
+                profileCount: targetProfileIds.length,
+                profileNoun: tabViewUiText(targetProfileIds.length === 1 ? 'dashboard.managedLists.profileSingular' : 'dashboard.managedLists.profilePlural', targetProfileIds.length === 1 ? 'profile' : 'profiles'),
+                verb: staleCount === 1 ? 'is' : 'are'
+            }),
             details: [
-                'FilterTube will load the selected parent-approved URLs and preview the result.',
-                'Changed rows still require parent/account approval before anything applies.',
-                'This check runs only while the dashboard is open; it is not background sync.'
+                tabViewUiText('dashboard.managedLists.reviewStaleDetailLoad', 'FilterTube will load the selected parent-approved URLs and preview the result.'),
+                tabViewUiText('dashboard.managedLists.reviewStaleDetailApproval', 'Changed rows still require parent/account approval before anything applies.'),
+                tabViewUiText('dashboard.managedLists.reviewStaleDetailForeground', 'This check runs only while the dashboard is open; it is not background sync.')
             ],
             choices: [
-                { value: 'review', label: 'Review Now', className: 'btn-primary' },
-                { value: 'skip', label: 'Later', className: 'btn-secondary' }
+                { value: 'review', label: tabViewUiText('dashboard.managedLists.reviewNow', 'Review Now'), className: 'btn-primary' },
+                { value: 'skip', label: tabViewUiText('dashboard.managedLists.later', 'Later'), className: 'btn-secondary' }
             ],
-            cancelText: 'Later'
+            cancelText: tabViewUiText('dashboard.managedLists.later', 'Later')
         });
         if (shouldReview !== 'review') {
             updateRuleListAutoCheckUi();
@@ -11350,20 +11550,20 @@ document.addEventListener('DOMContentLoaded', async () => {
         const normalized = normalizeString(contentHash);
         if (!normalized) return '';
         const token = normalized.includes(':') ? normalized.split(':').pop() : normalized;
-        return token ? `hash ${token.slice(0, 8)}` : '';
+        return token ? tabViewUiText('dashboard.managedLists.hashPrefix', 'hash {hash}', { hash: token.slice(0, 8) }) : '';
     }
 
     function formatManagedChannelListSourceVersion(summary) {
         const version = normalizeString(summary?.sourceVersion);
-        if (version) return `version ${version}`;
+        if (version) return tabViewUiText('dashboard.managedLists.version', 'version {version}', { version });
         const updated = normalizeString(summary?.sourceUpdatedLabel);
-        return updated ? `updated ${updated}` : '';
+        return updated ? tabViewUiText('dashboard.managedLists.updated', 'updated {updated}', { updated }) : '';
     }
 
     async function showManagedChannelListLibraryModal(summaries) {
         const rows = safeArray(summaries);
         if (!rows.length) {
-            UIComponents.showToast('No rule lists found for the selected protected profiles', 'info');
+            UIComponents.showToast(tabViewUiText('dashboard.managedLists.noListsForProfiles', 'No rule lists found for the selected protected profiles'), 'info');
             return;
         }
         return new Promise((resolve) => {
@@ -11377,7 +11577,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             header.className = 'card-header';
             const titleEl = document.createElement('h3');
             titleEl.className = 'ft-modal-title';
-            titleEl.textContent = 'Parent-Approved Lists';
+            titleEl.textContent = tabViewUiText('dashboard.managedLists.libraryTitle', 'Parent-Approved Lists');
             header.appendChild(titleEl);
 
             const body = document.createElement('div');
@@ -11385,7 +11585,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 
             const intro = document.createElement('div');
             intro.className = 'import-export-hint';
-            intro.textContent = 'These lists are already materialized as channel and keyword rules on the selected protected profiles. View the source, surfaces, and refresh state here; use the Lists menu to pause, check, refresh, remove, or import more.';
+            intro.textContent = tabViewUiText('dashboard.managedLists.libraryIntro', 'These lists are already materialized as channel and keyword rules on the selected protected profiles. View the source, surfaces, and refresh state here; use the Lists menu to pause, check, refresh, remove, or import more.');
             body.appendChild(intro);
 
             const list = document.createElement('div');
@@ -11395,7 +11595,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                 item.className = 'managed-channel-list-modal__library-item';
 
                 const title = document.createElement('strong');
-                title.textContent = summary.listName || 'Imported rule list';
+                title.textContent = summary.listName || tabViewUiText('dashboard.managedLists.importedRuleList', 'Imported rule list');
 
                 const meta = document.createElement('div');
                 meta.className = 'managed-channel-list-modal__library-meta';
@@ -11405,21 +11605,32 @@ document.addEventListener('DOMContentLoaded', async () => {
                 const activeCount = Number(summary.activeRuleCount ?? summary.activeChannelCount) || 0;
                 const pausedCount = Number(summary.pausedRuleCount ?? summary.pausedChannelCount) || 0;
                 const stateBits = pausedCount
-                    ? `${activeCount} active, ${pausedCount} paused`
-                    : `${activeCount || summary.ruleCount || summary.channelCount || 0} active`;
+                    ? tabViewUiText('dashboard.managedLists.activePausedCounts', '{activeCount} active, {pausedCount} paused', { activeCount, pausedCount })
+                    : tabViewUiText('dashboard.managedLists.activeCount', '{count} active', {
+                        count: activeCount || summary.ruleCount || summary.channelCount || 0
+                    });
                 const ruleCount = Number(summary.ruleCount ?? summary.channelCount) || 0;
-                meta.textContent = `${ruleCount} ${pluralize(ruleCount, 'rule')} | ${stateBits} | ${summary.profileIds.length} ${pluralize(summary.profileIds.length, 'profile')} | ${surfaces}`;
+                meta.textContent = tabViewUiText('dashboard.managedLists.libraryMeta', '{ruleCount} {ruleNoun} | {state} | {profileCount} {profileNoun} | {surfaces}', {
+                    ruleCount,
+                    ruleNoun: tabViewUiText(ruleCount === 1 ? 'dashboard.managedLists.ruleSingular' : 'dashboard.managedLists.rulePlural', ruleCount === 1 ? 'rule' : 'rules'),
+                    state: stateBits,
+                    profileCount: summary.profileIds.length,
+                    profileNoun: tabViewUiText(summary.profileIds.length === 1 ? 'dashboard.managedLists.profileSingular' : 'dashboard.managedLists.profilePlural', summary.profileIds.length === 1 ? 'profile' : 'profiles'),
+                    surfaces
+                });
 
                 const source = document.createElement('small');
                 source.className = 'managed-channel-list-modal__library-source';
                 const sourceBits = [
-                    normalizeString(summary.sourceLabel) || 'Imported list',
+                    normalizeString(summary.sourceLabel) || tabViewUiText('dashboard.managedLists.importedList', 'Imported list'),
                     normalizeString(summary.sourceTitle),
                     formatManagedChannelListSourceFormat(summary.sourceFormat),
-                    isManagedChannelListSummaryUrlBacked(summary) ? 'URL-backed' : 'Local/pasted',
+                    isManagedChannelListSummaryUrlBacked(summary)
+                        ? tabViewUiText('dashboard.managedLists.urlBacked', 'URL-backed')
+                        : tabViewUiText('dashboard.managedLists.localOrPasted', 'Local/pasted'),
                     formatManagedChannelListCheckedAt(summary.lastCheckedAt),
                     formatManagedChannelListSourceVersion(summary),
-                    isManagedChannelListSummaryStale(summary) ? 'needs refresh' : '',
+                    isManagedChannelListSummaryStale(summary) ? tabViewUiText('dashboard.managedLists.needsRefresh', 'needs refresh') : '',
                     formatManagedChannelListShortHash(summary.contentHash)
                 ];
                 source.textContent = sourceBits.filter(Boolean).join(' | ');
@@ -11434,7 +11645,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             const closeBtn = document.createElement('button');
             closeBtn.className = 'btn-secondary';
             closeBtn.type = 'button';
-            closeBtn.textContent = 'Close';
+            closeBtn.textContent = tabViewUiText('dashboard.modal.close', 'Close');
             const cleanup = () => {
                 try {
                     overlay.remove();
@@ -11465,22 +11676,27 @@ document.addEventListener('DOMContentLoaded', async () => {
     async function promptManagedChannelListToRemove(summaries) {
         const choices = safeArray(summaries).slice(0, 10).map((summary) => ({
             value: summary.listId,
-            label: `${summary.listName} (${summary.ruleCount ?? summary.channelCount})`,
+            label: tabViewUiText('dashboard.managedLists.listChoiceLabel', '{listName} ({count})', { listName: summary.listName, count: summary.ruleCount ?? summary.channelCount }),
             className: 'btn-secondary'
         }));
         if (!choices.length) return null;
         const selected = await showChoiceModal({
-            title: 'Remove Parent-Approved List',
-            message: 'Choose the list-derived rules to remove from selected protected profiles. Manual rules are kept.',
+            title: tabViewUiText('dashboard.managedLists.removeParentApprovedListTitle', 'Remove Parent-Approved List'),
+            message: tabViewUiText('dashboard.managedLists.removeParentApprovedListMessage', 'Choose the list-derived rules to remove from selected protected profiles. Manual rules are kept.'),
             details: safeArray(summaries).slice(0, 5).map((summary) => {
-                const surfaces = summary.surfaces.includes('main') && summary.surfaces.includes('kids')
-                    ? 'Main + Kids'
-                    : (summary.surfaces.includes('kids') ? 'Kids' : 'Main');
+                const surfaces = formatRuleListSurfaceLabel(summary.surfaces);
                 const ruleCount = Number(summary.ruleCount ?? summary.channelCount) || 0;
-                return `${summary.listName}: ${ruleCount} list-derived ${pluralize(ruleCount, 'rule')} across ${summary.profileIds.length} ${pluralize(summary.profileIds.length, 'profile')} (${surfaces})`;
+                return tabViewUiText('dashboard.managedLists.removeListSummary', '{listName}: {ruleCount} list-derived {ruleNoun} across {profileCount} {profileNoun} ({surfaces})', {
+                    listName: summary.listName,
+                    ruleCount,
+                    ruleNoun: tabViewUiText(ruleCount === 1 ? 'dashboard.managedLists.ruleSingular' : 'dashboard.managedLists.rulePlural', ruleCount === 1 ? 'rule' : 'rules'),
+                    profileCount: summary.profileIds.length,
+                    profileNoun: tabViewUiText(summary.profileIds.length === 1 ? 'dashboard.managedLists.profileSingular' : 'dashboard.managedLists.profilePlural', summary.profileIds.length === 1 ? 'profile' : 'profiles'),
+                    surfaces
+                });
             }),
             choices,
-            cancelText: 'Cancel'
+            cancelText: tabViewUiText('dashboard.modal.cancel', 'Cancel')
         });
         return safeArray(summaries).find(summary => summary.listId === selected) || null;
     }
@@ -11489,22 +11705,27 @@ document.addEventListener('DOMContentLoaded', async () => {
         const urlBacked = safeArray(summaries).filter(summary => normalizeManagedChannelListSourceUrl(summary?.sourceUrl));
         const choices = urlBacked.slice(0, 10).map((summary) => ({
             value: summary.listId,
-            label: `${summary.listName} (${summary.ruleCount ?? summary.channelCount})`,
+            label: tabViewUiText('dashboard.managedLists.listChoiceLabel', '{listName} ({count})', { listName: summary.listName, count: summary.ruleCount ?? summary.channelCount }),
             className: 'btn-secondary'
         }));
         if (!choices.length) return null;
         const selected = await showChoiceModal({
-            title: 'Check List URL',
-            message: 'Choose the public URL-backed list to check. FilterTube previews changed content before replacing list-derived rules after parent/account unlock.',
+            title: tabViewUiText('dashboard.managedLists.checkListUrlTitle', 'Check List URL'),
+            message: tabViewUiText('dashboard.managedLists.checkListUrlMessage', 'Choose the public URL-backed list to check. FilterTube previews changed content before replacing list-derived rules after parent/account unlock.'),
             details: urlBacked.slice(0, 5).map((summary) => {
-                const surfaces = summary.surfaces.includes('main') && summary.surfaces.includes('kids')
-                    ? 'Main + Kids'
-                    : (summary.surfaces.includes('kids') ? 'Kids' : 'Main');
+                const surfaces = formatRuleListSurfaceLabel(summary.surfaces);
                 const ruleCount = Number(summary.ruleCount ?? summary.channelCount) || 0;
-                return `${summary.listName}: ${ruleCount} current ${pluralize(ruleCount, 'rule')} across ${summary.profileIds.length} ${pluralize(summary.profileIds.length, 'profile')} (${surfaces})`;
+                return tabViewUiText('dashboard.managedLists.refreshListSummary', '{listName}: {ruleCount} current {ruleNoun} across {profileCount} {profileNoun} ({surfaces})', {
+                    listName: summary.listName,
+                    ruleCount,
+                    ruleNoun: tabViewUiText(ruleCount === 1 ? 'dashboard.managedLists.ruleSingular' : 'dashboard.managedLists.rulePlural', ruleCount === 1 ? 'rule' : 'rules'),
+                    profileCount: summary.profileIds.length,
+                    profileNoun: tabViewUiText(summary.profileIds.length === 1 ? 'dashboard.managedLists.profileSingular' : 'dashboard.managedLists.profilePlural', summary.profileIds.length === 1 ? 'profile' : 'profiles'),
+                    surfaces
+                });
             }),
             choices,
-            cancelText: 'Cancel'
+            cancelText: tabViewUiText('dashboard.modal.cancel', 'Cancel')
         });
         return urlBacked.find(summary => summary.listId === selected) || null;
     }
@@ -11535,25 +11756,33 @@ document.addEventListener('DOMContentLoaded', async () => {
         });
         const choices = candidates.slice(0, 10).map((summary) => ({
             value: summary.listId,
-            label: `${summary.listName} (${paused ? (Number(summary.activeRuleCount ?? summary.activeChannelCount) || 0) : (Number(summary.pausedRuleCount ?? summary.pausedChannelCount) || 0)})`,
+            label: tabViewUiText('dashboard.managedLists.listChoiceLabel', '{listName} ({count})', {
+                listName: summary.listName,
+                count: paused ? (Number(summary.activeRuleCount ?? summary.activeChannelCount) || 0) : (Number(summary.pausedRuleCount ?? summary.pausedChannelCount) || 0)
+            }),
             className: paused ? 'btn-secondary' : 'btn-primary'
         }));
         if (!choices.length) return null;
         const selected = await showChoiceModal({
-            title: paused ? 'Pause Parent-Approved List' : 'Resume Parent-Approved List',
+            title: tabViewUiText(paused ? 'dashboard.managedLists.pauseParentApprovedListTitle' : 'dashboard.managedLists.resumeParentApprovedListTitle', paused ? 'Pause Parent-Approved List' : 'Resume Parent-Approved List'),
             message: paused
-                ? 'Choose the list to pause. It remains saved and visible, but its channels and keywords stop affecting protected profiles until resumed.'
-                : 'Choose the list to resume. Its saved channels and keywords become active again after parent/account unlock.',
+                ? tabViewUiText('dashboard.managedLists.pauseParentApprovedListMessage', 'Choose the list to pause. It remains saved and visible, but its channels and keywords stop affecting protected profiles until resumed.')
+                : tabViewUiText('dashboard.managedLists.resumeParentApprovedListMessage', 'Choose the list to resume. Its saved channels and keywords become active again after parent/account unlock.'),
             details: candidates.slice(0, 5).map((summary) => {
                 const activeCount = Number(summary.activeRuleCount ?? summary.activeChannelCount) || 0;
                 const pausedCount = Number(summary.pausedRuleCount ?? summary.pausedChannelCount) || 0;
-                const surfaces = summary.surfaces.includes('main') && summary.surfaces.includes('kids')
-                    ? 'Main + Kids'
-                    : (summary.surfaces.includes('kids') ? 'Kids' : 'Main');
-                return `${summary.listName}: ${activeCount} active, ${pausedCount} paused across ${summary.profileIds.length} ${pluralize(summary.profileIds.length, 'profile')} (${surfaces})`;
+                const surfaces = formatRuleListSurfaceLabel(summary.surfaces);
+                return tabViewUiText('dashboard.managedLists.pauseListSummary', '{listName}: {activeCount} active, {pausedCount} paused across {profileCount} {profileNoun} ({surfaces})', {
+                    listName: summary.listName,
+                    activeCount,
+                    pausedCount,
+                    profileCount: summary.profileIds.length,
+                    profileNoun: tabViewUiText(summary.profileIds.length === 1 ? 'dashboard.managedLists.profileSingular' : 'dashboard.managedLists.profilePlural', summary.profileIds.length === 1 ? 'profile' : 'profiles'),
+                    surfaces
+                });
             }),
             choices,
-            cancelText: 'Cancel'
+            cancelText: tabViewUiText('dashboard.modal.cancel', 'Cancel')
         });
         return candidates.find(summary => summary.listId === selected) || null;
     }
@@ -11829,19 +12058,19 @@ document.addEventListener('DOMContentLoaded', async () => {
         const targetIds = [...new Set(safeArray(profileIds).map(normalizeString).filter(Boolean))];
         const type = ruleType === 'video' ? 'video' : (ruleType === 'channel' ? 'channel' : 'keyword');
         if (!targetIds.length) {
-            UIComponents.showToast('Select at least one protected profile', 'error');
+            showManagedRuleListToast('selectProtectedProfile', 'Select at least one protected profile', 'error');
             return;
         }
         const io = window.FilterTubeIO || {};
         if (typeof io.loadProfilesV4 !== 'function' || typeof io.saveProfilesV4 !== 'function') {
-            UIComponents.showToast('Profiles unavailable', 'error');
+            UIComponents.showToast(tabViewUiText('popup.profile.unavailable', 'Profiles unavailable'), 'error');
             return;
         }
 
         const fresh = await io.loadProfilesV4();
         const currentActive = normalizeString(fresh?.activeProfileId) || 'default';
         if (getProfileType(fresh, currentActive) === 'child') {
-            UIComponents.showToast('Protected profiles cannot change managed rules', 'error');
+            showManagedRuleListToast('protectedProfileCannotChangeRules', 'Protected profiles cannot change managed rules', 'error');
             return;
         }
 
@@ -11852,7 +12081,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                 && canActiveProfileManageProfile(fresh, targetId);
         });
         if (!eligibleIds.length) {
-            UIComponents.showToast('No selected protected profiles can be managed by this account', 'error');
+            showManagedRuleListToast('noManageableProfiles', 'No selected protected profiles can be managed by this account', 'error');
             return;
         }
 
@@ -11860,30 +12089,39 @@ document.addEventListener('DOMContentLoaded', async () => {
         if (!surface) return;
         const value = await promptManagedBulkRuleValue(type);
         if (!value) {
-            UIComponents.showToast(
+            showManagedRuleListToast(
+                type === 'video' ? 'enterVideoToAdd' : (type === 'channel' ? 'enterChannelToAdd' : 'enterKeywordToAdd'),
                 type === 'video' ? 'Enter a video ID to add' : (type === 'channel' ? 'Enter a channel to add' : 'Enter a keyword to add'),
                 'error'
             );
             return;
         }
         if (type === 'channel' && !normalizeProfileChannel(value)) {
-            UIComponents.showToast('Invalid format. Use @handle, Channel ID, c/ChannelName, or YouTube URL', 'error');
+            showManagedRuleListToast('invalidChannelFormat', 'Invalid format. Use @handle, Channel ID, c/ChannelName, or YouTube URL', 'error');
             return;
         }
         if (type === 'video' && !normalizeManagedVideoIdInput(value)) {
-            UIComponents.showToast('Enter a valid YouTube watch/Shorts URL or 11-character video ID', 'error');
+            showManagedRuleListToast('invalidVideoInput', 'Enter a valid YouTube watch/Shorts URL or 11-character video ID', 'error');
             return;
         }
         if (type === 'keyword' && !normalizeProfileKeyword(value, { comments: surface !== 'kids' })) {
-            UIComponents.showToast('Enter a valid keyword', 'error');
+            showManagedRuleListToast('invalidKeyword', 'Enter a valid keyword', 'error');
             return;
         }
 
         const confirmBulk = await showConfirmModal({
-            title: `Add ${managedBulkRuleTypeLabel(type)} to selected profiles?`,
-            message: `This will add one ${managedBulkRuleTypeLabel(type)} to ${eligibleIds.length} protected ${eligibleIds.length === 1 ? 'profile' : 'profiles'} on ${surface === 'kids' ? 'YouTube Kids' : 'Main YouTube'} after parent/account re-auth.`,
-            confirmText: `Add to ${eligibleIds.length} ${eligibleIds.length === 1 ? 'profile' : 'profiles'}`,
-            cancelText: 'Cancel'
+            title: tabViewUiText('dashboard.managedLists.addRuleConfirmTitle', 'Add {ruleType} to selected profiles?', { ruleType: managedBulkRuleTypeLabel(type) }),
+            message: tabViewUiText('dashboard.managedLists.addRuleConfirmMessage', 'This will add one {ruleType} to {profileCount} protected {profileNoun} on {surface} after parent/account re-auth.', {
+                ruleType: managedBulkRuleTypeLabel(type),
+                profileCount: eligibleIds.length,
+                profileNoun: tabViewUiText(eligibleIds.length === 1 ? 'dashboard.managedLists.profileSingular' : 'dashboard.managedLists.profilePlural', eligibleIds.length === 1 ? 'profile' : 'profiles'),
+                surface: surface === 'kids' ? 'YouTube Kids' : 'Main YouTube'
+            }),
+            confirmText: tabViewUiText('dashboard.managedLists.addToProfiles', 'Add to {count} {profileNoun}', {
+                count: eligibleIds.length,
+                profileNoun: tabViewUiText(eligibleIds.length === 1 ? 'dashboard.managedLists.profileSingular' : 'dashboard.managedLists.profilePlural', eligibleIds.length === 1 ? 'profile' : 'profiles')
+            }),
+            cancelText: tabViewUiText('dashboard.modal.cancel', 'Cancel')
         });
         if (!confirmBulk) return;
 
@@ -11920,10 +12158,8 @@ document.addEventListener('DOMContentLoaded', async () => {
         }
 
         if (!changedCount) {
-            UIComponents.showToast(
-                duplicateCount ? 'Selected profiles already have that managed rule' : 'No selected profiles were changed',
-                'info'
-            );
+            showManagedRuleListToast(duplicateCount ? 'selectedProfilesAlreadyHaveRule' : 'noSelectedProfilesChanged',
+                duplicateCount ? 'Selected profiles already have that managed rule' : 'No selected profiles were changed', 'info');
             return;
         }
 
@@ -11935,7 +12171,11 @@ document.addEventListener('DOMContentLoaded', async () => {
         profilesV4Cache = { ...fresh, schemaVersion: 4, profiles };
         await StateManager.loadSettings({ notify: false, resetEnrichment: false, scheduleEnrichment: false });
         await refreshProfilesUI();
-        UIComponents.showToast(`${changedCount} ${changedCount === 1 ? 'profile' : 'profiles'} updated with managed ${managedBulkRuleTypeLabel(type)}`, 'success');
+        UIComponents.showToast(tabViewUiText('dashboard.managedLists.updatedManagedRules', '{count} {profileNoun} updated with managed {ruleType}', {
+            count: changedCount,
+            profileNoun: tabViewUiText(changedCount === 1 ? 'dashboard.managedLists.profileSingular' : 'dashboard.managedLists.profilePlural', changedCount === 1 ? 'profile' : 'profiles'),
+            ruleType: managedBulkRuleTypeLabel(type)
+        }), 'success');
 
         const remoteScope = managedBulkRuleRemoteScope(type);
         const mailboxReady = hasNanahManagedMailboxUploadWriter();
@@ -11948,10 +12188,15 @@ document.addEventListener('DOMContentLoaded', async () => {
         }).length;
         if (readyProfileCount > 0) {
             const sendNow = await showConfirmModal({
-                title: `Send ${managedBulkRuleTypeLabel(type)} update now?`,
-                message: `${readyProfileCount} changed ${readyProfileCount === 1 ? 'profile has' : 'profiles have'} a verified delivery path. Send the ${surface === 'kids' ? 'YouTube Kids' : 'Main YouTube'} ${managedBulkRuleTypeLabel(type)} rule update to those devices now.`,
-                confirmText: 'Send Update',
-                cancelText: 'Not now'
+                title: tabViewUiText('dashboard.managedLists.sendRuleUpdateTitle', 'Send {ruleType} update now?', { ruleType: managedBulkRuleTypeLabel(type) }),
+                message: tabViewUiText('dashboard.managedLists.sendRuleUpdateMessage', '{profileCount} changed {profileNoun} have a verified delivery path. Send the {surface} {ruleType} rule update to those devices now.', {
+                    profileCount: readyProfileCount,
+                    profileNoun: tabViewUiText(readyProfileCount === 1 ? 'dashboard.managedLists.profileHas' : 'dashboard.managedLists.profilesHave', readyProfileCount === 1 ? 'profile has' : 'profiles have'),
+                    surface: surface === 'kids' ? 'YouTube Kids' : 'Main YouTube',
+                    ruleType: managedBulkRuleTypeLabel(type)
+                }),
+                confirmText: tabViewUiText('dashboard.managedLists.sendUpdate', 'Send Update'),
+                cancelText: tabViewUiText('dashboard.modal.notNow', 'Not now')
             });
             if (sendNow) {
                 await sendManagedParentPolicyToVerifiedDevices(changedProfileIds, {
@@ -11965,19 +12210,19 @@ document.addEventListener('DOMContentLoaded', async () => {
     async function importManagedChannelListToProfiles(profileIds, options = {}) {
         const targetIds = [...new Set(safeArray(profileIds).map(normalizeString).filter(Boolean))];
         if (!targetIds.length) {
-            UIComponents.showToast('Select at least one protected profile', 'error');
+            showManagedRuleListToast('selectProtectedProfile', 'Select at least one protected profile', 'error');
             return;
         }
         const io = window.FilterTubeIO || {};
         if (typeof io.loadProfilesV4 !== 'function' || typeof io.saveProfilesV4 !== 'function') {
-            UIComponents.showToast('Profiles unavailable', 'error');
+            UIComponents.showToast(tabViewUiText('popup.profile.unavailable', 'Profiles unavailable'), 'error');
             return;
         }
 
         const fresh = await io.loadProfilesV4();
         const currentActive = normalizeString(fresh?.activeProfileId) || 'default';
         if (getProfileType(fresh, currentActive) === 'child') {
-            UIComponents.showToast('Protected profiles cannot import managed lists', 'error');
+            showManagedRuleListToast('protectedProfileCannotImportLists', 'Protected profiles cannot import managed lists', 'error');
             return;
         }
 
@@ -11988,7 +12233,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                 && canActiveProfileManageProfile(fresh, targetId);
         });
         if (!eligibleIds.length) {
-            UIComponents.showToast('No selected protected profiles can be managed by this account', 'error');
+            showManagedRuleListToast('noManageableProfiles', 'No selected protected profiles can be managed by this account', 'error');
             return;
         }
 
@@ -12001,7 +12246,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         const parsed = parseManagedChannelListText(importPayload.text, { listName: importPayload.name });
         const parsedCounts = countManagedRuleListRows(parsed);
         if (!parsedCounts.total) {
-            UIComponents.showToast('No valid channels or keywords found. CSV can use channel_id and keyword columns.', 'error');
+            showManagedRuleListToast('noValidRows', 'No valid channels or keywords found. CSV can use channel_id and keyword columns.', 'error');
             return;
         }
 
@@ -12012,17 +12257,24 @@ document.addEventListener('DOMContentLoaded', async () => {
         if (!surfaces.length) return;
         const surfaceLabel = surfaces.length > 1 ? 'Main + Kids' : (surfaces[0] === 'kids' ? 'YouTube Kids' : 'Main YouTube');
         const confirmImport = await showChoiceModal({
-            title: 'Apply Parent-Approved List?',
-            message: `${formatManagedRuleListCount(parsedCounts)} found. Apply this list to ${eligibleIds.length} protected ${eligibleIds.length === 1 ? 'profile' : 'profiles'} on ${surfaceLabel}.`,
+            title: tabViewUiText('dashboard.managedLists.applyApprovedListTitle', 'Apply Parent-Approved List?'),
+            message: tabViewUiText('dashboard.managedLists.applyApprovedListMessage', '{counts} found. Apply this list to {profileCount} protected {profileNoun} on {surface}.', {
+                counts: formatManagedRuleListCount(parsedCounts),
+                profileCount: eligibleIds.length,
+                profileNoun: tabViewUiText(eligibleIds.length === 1 ? 'dashboard.managedLists.profileSingular' : 'dashboard.managedLists.profilePlural', eligibleIds.length === 1 ? 'profile' : 'profiles'),
+                surface: surfaceLabel
+            }),
             details: [
-                `${formatManagedRuleListCount(parsedCounts)} ready`,
-                parsed.skippedCount ? `${parsed.skippedCount} ${parsed.skippedCount === 1 ? 'row was' : 'rows were'} skipped` : 'No rows skipped',
-                'Parent/account re-auth is required before anything changes.'
+                tabViewUiText('dashboard.managedLists.readyCount', '{counts} ready', { counts: formatManagedRuleListCount(parsedCounts) }),
+                parsed.skippedCount
+                    ? tabViewUiText('dashboard.managedLists.skippedRows', '{count} {rowNoun} skipped', { count: parsed.skippedCount, rowNoun: tabViewUiText(parsed.skippedCount === 1 ? 'dashboard.managedLists.rowSingular' : 'dashboard.managedLists.rowPlural', parsed.skippedCount === 1 ? 'row' : 'rows') })
+                    : tabViewUiText('dashboard.managedLists.noRowsSkipped', 'No rows skipped'),
+                tabViewUiText('dashboard.managedLists.reauthRequired', 'Parent/account re-auth is required before anything changes.')
             ],
             choices: [
-                { value: 'apply', label: 'Apply Approved List', className: 'btn-primary' }
+                { value: 'apply', label: tabViewUiText('dashboard.managedLists.applyApprovedList', 'Apply Approved List'), className: 'btn-primary' }
             ],
-            cancelText: 'Cancel'
+            cancelText: tabViewUiText('dashboard.modal.cancel', 'Cancel')
         });
         if (confirmImport !== 'apply') return;
 
@@ -12159,8 +12411,13 @@ document.addEventListener('DOMContentLoaded', async () => {
             duplicateCount
         });
         await showRuleListImportCompletion(importReport, {
-            title: 'Rule List Import Complete',
-            message: `Imported ${addedCount} list-derived ${pluralize(addedCount, 'rule')} into ${changedCount} protected ${changedCount === 1 ? 'profile' : 'profiles'}.`,
+            title: tabViewUiText('dashboard.managedLists.importCompleteTitle', 'Rule List Import Complete'),
+            message: tabViewUiText('dashboard.managedLists.importCompleteMessage', 'Imported {addedCount} list-derived {ruleNoun} into {profileCount} protected {profileNoun}.', {
+                addedCount,
+                ruleNoun: tabViewUiText(addedCount === 1 ? 'dashboard.managedLists.ruleSingular' : 'dashboard.managedLists.rulePlural', addedCount === 1 ? 'rule' : 'rules'),
+                profileCount: changedCount,
+                profileNoun: tabViewUiText(changedCount === 1 ? 'dashboard.managedLists.profileSingular' : 'dashboard.managedLists.profilePlural', changedCount === 1 ? 'profile' : 'profiles')
+            }),
             details: [metadataNotice.trim()]
         });
 
@@ -12177,10 +12434,13 @@ document.addEventListener('DOMContentLoaded', async () => {
         }).length;
         if (readyProfileCount > 0) {
             const sendNow = await showConfirmModal({
-                title: 'Send list update now?',
-                message: `${readyProfileCount} changed ${readyProfileCount === 1 ? 'profile has' : 'profiles have'} a verified delivery path. Send this rule-list update to those devices now.`,
-                confirmText: 'Send Update',
-                cancelText: 'Not now'
+                title: tabViewUiText('dashboard.managedLists.sendListUpdateTitle', 'Send list update now?'),
+                message: tabViewUiText('dashboard.managedLists.sendListUpdateMessage', '{profileCount} changed {profilePhrase} a verified delivery path. Send this rule-list update to those devices now.', {
+                    profileCount: readyProfileCount,
+                    profilePhrase: tabViewUiText(readyProfileCount === 1 ? 'dashboard.managedLists.profileHas' : 'dashboard.managedLists.profilesHave', readyProfileCount === 1 ? 'profile has' : 'profiles have')
+                }),
+                confirmText: tabViewUiText('dashboard.managedLists.sendUpdate', 'Send Update'),
+                cancelText: tabViewUiText('dashboard.modal.notNow', 'Not now')
             });
             if (sendNow) {
                 await sendManagedParentPolicyToVerifiedDevices(changedProfileIds, {
@@ -12193,8 +12453,10 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     function formatRuleListSurfaceLabel(surfaces) {
         const items = [...new Set(safeArray(surfaces).map(surface => surface === 'kids' ? 'kids' : (surface === 'main' ? 'main' : '')).filter(Boolean))];
-        if (items.length > 1) return 'Main YouTube + YouTube Kids';
-        return items[0] === 'kids' ? 'YouTube Kids' : 'Main YouTube';
+        if (items.length > 1) return tabViewUiText('dashboard.managedLists.surfaceMainAndKids', 'Main YouTube + YouTube Kids');
+        return items[0] === 'kids'
+            ? tabViewUiText('dashboard.managedLists.surfaceKids', 'YouTube Kids')
+            : tabViewUiText('dashboard.managedLists.surfaceMain', 'Main YouTube');
     }
 
     function getSettingsRuleListImportSurfaces() {
@@ -12208,7 +12470,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     async function applyManagedBlockTubeMigrationToActiveProfile(payload, freshProfiles = null, importContext = {}) {
         const io = window.FilterTubeIO || {};
         if (typeof io.importV3 !== 'function') {
-            UIComponents.showToast('BlockTube migration importer is unavailable', 'error');
+            showManagedRuleListToast('blockTubeImporterUnavailable', 'BlockTube migration importer is unavailable', 'error');
             return null;
         }
 
@@ -12216,7 +12478,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             const profilesV4 = freshProfiles || (typeof io.loadProfilesV4 === 'function' ? await io.loadProfilesV4() : null);
             const currentActive = normalizeString(profilesV4?.activeProfileId) || activeProfileId || 'default';
             if (getProfileType(profilesV4, currentActive) === 'child') {
-                UIComponents.showToast('Open the parent/account profile before importing BlockTube JSON', 'error');
+                showManagedRuleListToast('openParentBeforeBlockTubeImport', 'Open the parent/account profile before importing BlockTube JSON', 'error');
                 return null;
             }
 
@@ -12295,8 +12557,8 @@ document.addEventListener('DOMContentLoaded', async () => {
             }));
             if (receipt.verified === true) {
                 const choice = await showChoiceModal({
-                    title: 'BlockTube Import Verified',
-                    message: 'FilterTube saved the complete supported BlockTube migration and read it back before reporting success.',
+                    title: tabViewUiText('dashboard.managedLists.blockTubeImportVerifiedTitle', 'BlockTube Import Verified'),
+                    message: tabViewUiText('dashboard.managedLists.blockTubeImportVerifiedMessage', 'FilterTube saved the complete supported BlockTube migration and read it back before reporting success.'),
                     details: [
                         `Added ${Number(receipt.addedChannels) || 0} effective channels (${Number(receipt.channelIds) || 0} IDs + ${Number(receipt.channelNameRules) || 0} name rules) · ${Number(receipt.addedVideoIds) || 0} video IDs`,
                         `Added ${Number(receipt.addedKeywords) || 0} keyword/comment rules · ${Number(receipt.regex) || 0} regex rules reviewed`,
@@ -12309,21 +12571,23 @@ document.addEventListener('DOMContentLoaded', async () => {
                                 : 'All imported channel rows already have complete metadata; no metadata lookup is pending.')
                     ],
                     choices: [
-                        { value: 'report', label: 'View Import Report', className: 'btn-primary', recommended: blockTubeIssues.length > 0 },
-                        { value: 'done', label: 'Done', className: 'btn-secondary', recommended: blockTubeIssues.length === 0 }
+                        { value: 'report', label: tabViewUiText('dashboard.managedLists.viewImportReport', 'View Import Report'), className: 'btn-primary', recommended: blockTubeIssues.length > 0 },
+                        { value: 'done', label: tabViewUiText('dashboard.managedLists.done', 'Done'), className: 'btn-secondary', recommended: blockTubeIssues.length === 0 }
                     ],
-                    cancelText: 'Close'
+                    cancelText: tabViewUiText('dashboard.modal.close', 'Close')
                 });
                 if (choice === 'report' && importReport) {
                     await showRuleListImportReportsModal(importReport.id);
                 }
             } else {
-                UIComponents.showToast('BlockTube JSON imported', 'success');
+                showManagedRuleListToast('blockTubeImportSucceeded', 'BlockTube JSON imported', 'success');
             }
             return importResult;
         } catch (error) {
-            const message = normalizeString(error?.message) || 'The BlockTube file could not be imported';
-            UIComponents.showToast(`BlockTube import failed: ${message.slice(0, 180)}`, 'error');
+            const message = normalizeString(error?.message);
+            UIComponents.showToast(tabViewUiText('dashboard.managedLists.blockTubeImportFailed', 'BlockTube import failed: {message}', {
+                message: message.slice(0, 180) || tabViewUiText('dashboard.managedLists.blockTubeImportErrorFallback', 'The BlockTube file could not be imported')
+            }), 'error');
             console.error('Managed BlockTube import failed', error);
             return null;
         }
@@ -12346,21 +12610,21 @@ document.addEventListener('DOMContentLoaded', async () => {
 
         const io = window.FilterTubeIO || {};
         if (typeof io.loadProfilesV4 !== 'function' || typeof io.saveProfilesV4 !== 'function') {
-            UIComponents.showToast('Profiles unavailable', 'error');
+            UIComponents.showToast(tabViewUiText('popup.profile.unavailable', 'Profiles unavailable'), 'error');
             return;
         }
 
         const fresh = await io.loadProfilesV4();
         const currentActive = normalizeString(fresh?.activeProfileId) || activeProfileId || 'default';
         if (getProfileType(fresh, currentActive) === 'child') {
-            UIComponents.showToast('Open the parent/account profile to import rules for a protected profile', 'error');
+            showManagedRuleListToast('openParentToImportForProtectedProfile', 'Open the parent/account profile to import rules for a protected profile', 'error');
             return;
         }
 
         const profiles = { ...safeObject(fresh.profiles) };
         const profile = safeObject(profiles[currentActive]);
         if (!profile || Object.keys(profile).length === 0) {
-            UIComponents.showToast('Active profile is unavailable', 'error');
+            showManagedRuleListToast('activeProfileUnavailable', 'Active profile is unavailable', 'error');
             return;
         }
 
@@ -12373,18 +12637,18 @@ document.addEventListener('DOMContentLoaded', async () => {
         const parsed = parseManagedChannelListText(importPayload.text, { listName: importPayload.name });
         const blockTubeInspection = inspectManagedBlockTubeImport(importPayload.text);
         if (blockTubeInspection && !blockTubeInspection.preview?.ok) {
-            UIComponents.showToast(blockTubeInspection.preview?.error || 'BlockTube backup could not be read', 'error');
+            UIComponents.showToast(blockTubeInspection.preview?.error || tabViewUiText('dashboard.managedLists.blockTubeBackupUnreadable', 'BlockTube backup could not be read'), 'error');
             return;
         }
         const isBlockTubeImport = Boolean(blockTubeInspection?.preview?.ok === true);
         if (isBlockTubeImport && targetSurfaces.some(surface => surface !== 'main')) {
-            UIComponents.showToast('BlockTube Migration JSON applies to Main YouTube only. Select Main YouTube, then import it as a complete migration.', 'error');
+            showManagedRuleListToast('blockTubeMainOnly', 'BlockTube Migration JSON applies to Main YouTube only. Select Main YouTube, then import it as a complete migration.', 'error');
             return;
         }
         const parsedCounts = countManagedRuleListRows(parsed);
         const blockTubeCounts = safeObject(blockTubeInspection?.preview?.counts);
         if (!isBlockTubeImport && !parsedCounts.total) {
-            UIComponents.showToast('No valid channels or keywords found. CSV can use channel_id and keyword columns.', 'error');
+            showManagedRuleListToast('noValidRows', 'No valid channels or keywords found. CSV can use channel_id and keyword columns.', 'error');
             return;
         }
 
@@ -12395,31 +12659,43 @@ document.addEventListener('DOMContentLoaded', async () => {
                 .replace(/^TXT rules$|^text list$/, 'TXT');
         const blockTubeSkipped = getManagedBlockTubeSkippedCount(blockTubeInspection?.preview || {});
         const confirmImport = await showChoiceModal({
-            title: `Apply ${applyLabel} to ${surfaceLabel}?`,
+            title: tabViewUiText('dashboard.managedLists.applyFormatTitle', 'Apply {format} to {surface}?', { format: applyLabel, surface: surfaceLabel }),
             message: isBlockTubeImport
-                ? `BlockTube migration found ${Number(blockTubeCounts.channels) || 0} effective channels and ${Number(blockTubeCounts.videoIds) || 0} video IDs. Apply the complete supported migration to ${getProfileName(fresh, currentActive)} on Main YouTube.`
-                : `${formatManagedRuleListCount(parsedCounts)} found. Apply this list to ${getProfileName(fresh, currentActive)} on ${surfaceLabel}.`,
+                ? tabViewUiText('dashboard.managedLists.applyBlockTubeMessage', 'BlockTube migration found {channelCount} effective channels and {videoCount} video IDs. Apply the complete supported migration to {profileName} on Main YouTube.', {
+                    channelCount: Number(blockTubeCounts.channels) || 0,
+                    videoCount: Number(blockTubeCounts.videoIds) || 0,
+                    profileName: getProfileName(fresh, currentActive)
+                })
+                : tabViewUiText('dashboard.managedLists.applyListMessage', '{counts} found. Apply this list to {profileName} on {surface}.', {
+                    counts: formatManagedRuleListCount(parsedCounts),
+                    profileName: getProfileName(fresh, currentActive),
+                    surface: surfaceLabel
+                }),
             details: isBlockTubeImport
                 ? [
                     `${Number(blockTubeCounts.channels) || 0} effective channels (${Number(blockTubeCounts.channelIds) || 0} IDs + ${Number(blockTubeCounts.channelNameRules) || 0} name rules) · ${Number(blockTubeCounts.videoIds) || 0} video IDs`,
                     `${Number(blockTubeCounts.keywords) || 0} title rules · ${Number(blockTubeCounts.comments) || 0} comment rules · ${Number(blockTubeCounts.regex) || 0} validated regex rules`,
                     `${Number(blockTubeCounts.mappedOptions) || 0} mapped setting groups · ${Number(blockTubeCounts.durationFilters) || 0} duration filters · ${safeArray(blockTubeInspection.preview?.report?.inactive).length} inactive preserved`,
                     `${blockTubeSkipped} unsupported, invalid, or unknown outcomes`,
-                    'No per-channel YouTube requests are made while the list is being reviewed. After approval, imported channel identifiers use a separate persisted background queue: one serialized lookup at a randomized 7–15 second interval while awake. A failed row retries after about 2 minutes and backs off up to 30 minutes without pausing fresh rows; permanent not-found or terminated rows stop retrying and remain in Import Reports for manual verification. A large list can still take time. Nothing changes until you confirm.'
+                    tabViewUiText('dashboard.managedLists.blockTubeReviewDetail', 'No per-channel YouTube requests are made while the list is being reviewed. After approval, imported channel identifiers use a separate persisted background queue: one serialized lookup at a randomized 7–15 second interval while awake. A failed row retries after about 2 minutes and backs off up to 30 minutes without pausing fresh rows; permanent not-found or terminated rows stop retrying and remain in Import Reports for manual verification. A large list can still take time. Nothing changes until you confirm.')
                 ]
                 : [
-                    `${formatManagedRuleListCount(parsedCounts)} ready`,
-                    parsed.skippedCount ? `${parsed.skippedCount} ${parsed.skippedCount === 1 ? 'row was' : 'rows were'} skipped` : 'No rows skipped',
-                    'No per-channel YouTube requests are made while the list is being reviewed. After approval, incomplete channel identifiers are completed in a persisted one-at-a-time queue. A failed row retries after about 2 minutes and backs off up to 30 minutes without pausing fresh rows; permanent not-found or terminated rows stop retrying and remain in Import Reports for manual verification. A large list can still take time. Nothing changes until you confirm.'
+                    tabViewUiText('dashboard.managedLists.readyCount', '{counts} ready', { counts: formatManagedRuleListCount(parsedCounts) }),
+                    parsed.skippedCount
+                        ? tabViewUiText('dashboard.managedLists.skippedRows', '{count} {rowNoun} skipped', { count: parsed.skippedCount, rowNoun: tabViewUiText(parsed.skippedCount === 1 ? 'dashboard.managedLists.rowSingular' : 'dashboard.managedLists.rowPlural', parsed.skippedCount === 1 ? 'row' : 'rows') })
+                        : tabViewUiText('dashboard.managedLists.noRowsSkipped', 'No rows skipped'),
+                    tabViewUiText('dashboard.managedLists.importReviewDetail', 'No per-channel YouTube requests are made while the list is being reviewed. After approval, incomplete channel identifiers are completed in a persisted one-at-a-time queue. A failed row retries after about 2 minutes and backs off up to 30 minutes without pausing fresh rows; permanent not-found or terminated rows stop retrying and remain in Import Reports for manual verification. A large list can still take time. Nothing changes until you confirm.')
                 ],
             choices: [
                 {
                     value: 'apply',
-                    label: isBlockTubeImport ? 'Apply BlockTube JSON' : 'Apply List',
+                    label: isBlockTubeImport
+                        ? tabViewUiText('dashboard.managedLists.applyBlockTube', 'Apply BlockTube JSON')
+                        : tabViewUiText('dashboard.managedLists.applyList', 'Apply List'),
                     className: 'btn-primary'
                 }
             ],
-            cancelText: 'Cancel'
+            cancelText: tabViewUiText('dashboard.modal.cancel', 'Cancel')
         });
         if (confirmImport !== 'apply') return;
 
@@ -12532,19 +12808,19 @@ document.addEventListener('DOMContentLoaded', async () => {
     async function removeManagedChannelListFromProfiles(profileIds) {
         const targetIds = [...new Set(safeArray(profileIds).map(normalizeString).filter(Boolean))];
         if (!targetIds.length) {
-            UIComponents.showToast('Select at least one protected profile', 'error');
+            showManagedRuleListToast('selectProtectedProfile', 'Select at least one protected profile', 'error');
             return;
         }
         const io = window.FilterTubeIO || {};
         if (typeof io.loadProfilesV4 !== 'function' || typeof io.saveProfilesV4 !== 'function') {
-            UIComponents.showToast('Profiles unavailable', 'error');
+            UIComponents.showToast(tabViewUiText('popup.profile.unavailable', 'Profiles unavailable'), 'error');
             return;
         }
 
         const fresh = await io.loadProfilesV4();
         const currentActive = normalizeString(fresh?.activeProfileId) || 'default';
         if (getProfileType(fresh, currentActive) === 'child') {
-            UIComponents.showToast('Protected profiles cannot remove managed lists', 'error');
+            showManagedRuleListToast('protectedProfileCannotRemoveLists', 'Protected profiles cannot remove managed lists', 'error');
             return;
         }
 
@@ -12555,13 +12831,13 @@ document.addEventListener('DOMContentLoaded', async () => {
                 && canActiveProfileManageProfile(fresh, targetId);
         });
         if (!eligibleIds.length) {
-            UIComponents.showToast('No selected protected profiles can be managed by this account', 'error');
+            showManagedRuleListToast('noManageableProfiles', 'No selected protected profiles can be managed by this account', 'error');
             return;
         }
 
         const summaries = collectManagedChannelListSummaries(profiles, eligibleIds);
         if (!summaries.length) {
-            UIComponents.showToast('No rule lists found for the selected protected profiles', 'info');
+            showManagedRuleListToast('noListsForProfiles', 'No rule lists found for the selected protected profiles', 'info');
             return;
         }
 
@@ -12569,10 +12845,15 @@ document.addEventListener('DOMContentLoaded', async () => {
         if (!selectedList) return;
 
         const confirmRemove = await showConfirmModal({
-            title: `Remove ${selectedList.listName}?`,
-            message: `This removes ${selectedList.ruleCount || selectedList.channelCount} list-derived ${pluralize(selectedList.ruleCount || selectedList.channelCount, 'rule')} from ${selectedList.profileIds.length} selected ${pluralize(selectedList.profileIds.length, 'profile')}. Manual rules stay untouched.`,
-            confirmText: 'Remove List',
-            cancelText: 'Cancel'
+            title: tabViewUiText('dashboard.managedLists.removeListTitle', 'Remove {listName}?', { listName: selectedList.listName }),
+            message: tabViewUiText('dashboard.managedLists.removeListMessage', 'This removes {ruleCount} list-derived {ruleNoun} from {profileCount} selected {profileNoun}. Manual rules stay untouched.', {
+                ruleCount: selectedList.ruleCount || selectedList.channelCount,
+                ruleNoun: tabViewUiText((selectedList.ruleCount || selectedList.channelCount) === 1 ? 'dashboard.managedLists.ruleSingular' : 'dashboard.managedLists.rulePlural', (selectedList.ruleCount || selectedList.channelCount) === 1 ? 'rule' : 'rules'),
+                profileCount: selectedList.profileIds.length,
+                profileNoun: tabViewUiText(selectedList.profileIds.length === 1 ? 'dashboard.managedLists.profileSingular' : 'dashboard.managedLists.profilePlural', selectedList.profileIds.length === 1 ? 'profile' : 'profiles')
+            }),
+            confirmText: tabViewUiText('dashboard.managedLists.removeList', 'Remove List'),
+            cancelText: tabViewUiText('dashboard.modal.cancel', 'Cancel')
         });
         if (!confirmRemove) return;
 
@@ -12633,7 +12914,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         }
 
         if (!changedCount) {
-            UIComponents.showToast('No selected profiles had that rule list', 'info');
+            showManagedRuleListToast('noSelectedProfilesHadList', 'No selected profiles had that rule list');
             return;
         }
 
@@ -12649,10 +12930,12 @@ document.addEventListener('DOMContentLoaded', async () => {
         renderKidsChannels();
         renderKeywords();
         renderKidsKeywords();
-        UIComponents.showToast(
-            `Removed ${removedCount} list-derived ${pluralize(removedCount, 'rule')} from ${changedCount} protected ${pluralize(changedCount, 'profile')}`,
-            'success'
-        );
+        UIComponents.showToast(tabViewUiText('dashboard.managedLists.removedRulesToast', 'Removed {ruleCount} list-derived {ruleNoun} from {profileCount} protected {profileNoun}', {
+            ruleCount: removedCount,
+            ruleNoun: tabViewUiText(removedCount === 1 ? 'dashboard.managedLists.ruleSingular' : 'dashboard.managedLists.rulePlural', removedCount === 1 ? 'rule' : 'rules'),
+            profileCount: changedCount,
+            profileNoun: tabViewUiText(changedCount === 1 ? 'dashboard.managedLists.profileSingular' : 'dashboard.managedLists.profilePlural', changedCount === 1 ? 'profile' : 'profiles')
+        }), 'success');
 
         const remoteScope = 'rules_bundle';
         const surface = changedSurfaces.size === 1 ? Array.from(changedSurfaces)[0] : '';
@@ -12683,19 +12966,19 @@ document.addEventListener('DOMContentLoaded', async () => {
     async function setManagedChannelListPausedForProfiles(profileIds, paused) {
         const targetIds = [...new Set(safeArray(profileIds).map(normalizeString).filter(Boolean))];
         if (!targetIds.length) {
-            UIComponents.showToast('Select at least one protected profile', 'error');
+            showManagedRuleListToast('selectProtectedProfile', 'Select at least one protected profile', 'error');
             return;
         }
         const io = window.FilterTubeIO || {};
         if (typeof io.loadProfilesV4 !== 'function' || typeof io.saveProfilesV4 !== 'function') {
-            UIComponents.showToast('Profiles unavailable', 'error');
+            UIComponents.showToast(tabViewUiText('popup.profile.unavailable', 'Profiles unavailable'), 'error');
             return;
         }
 
         const fresh = await io.loadProfilesV4();
         const currentActive = normalizeString(fresh?.activeProfileId) || 'default';
         if (getProfileType(fresh, currentActive) === 'child') {
-            UIComponents.showToast('Protected profiles cannot change managed lists', 'error');
+            showManagedRuleListToast('protectedProfileCannotChangeLists', 'Protected profiles cannot change managed lists', 'error');
             return;
         }
 
@@ -12706,29 +12989,36 @@ document.addEventListener('DOMContentLoaded', async () => {
                 && canActiveProfileManageProfile(fresh, targetId);
         });
         if (!eligibleIds.length) {
-            UIComponents.showToast('No selected protected profiles can be managed by this account', 'error');
+            showManagedRuleListToast('noManageableProfiles', 'No selected protected profiles can be managed by this account', 'error');
             return;
         }
 
         const summaries = collectManagedChannelListSummaries(profiles, eligibleIds);
         const selectedList = await promptManagedChannelListToPauseState(summaries, paused);
         if (!selectedList) {
-            UIComponents.showToast(
-                paused
-                    ? 'No active rule lists found for the selected protected profiles'
-                    : 'No paused rule lists found for the selected protected profiles',
+            showManagedRuleListToast(
+                paused ? 'noActiveListsForProfiles' : 'noPausedListsForProfiles',
+                paused ? 'No active rule lists found for the selected protected profiles' : 'No paused rule lists found for the selected protected profiles',
                 'info'
             );
             return;
         }
 
         const confirmChange = await showConfirmModal({
-            title: `${paused ? 'Pause' : 'Resume'} ${selectedList.listName}?`,
+            title: tabViewUiText(paused ? 'dashboard.managedLists.pauseListTitle' : 'dashboard.managedLists.resumeListTitle', paused ? 'Pause {listName}?' : 'Resume {listName}?', { listName: selectedList.listName }),
             message: paused
-                ? `This keeps ${selectedList.listName} saved, but stops its list-derived rules from affecting ${selectedList.profileIds.length} selected ${pluralize(selectedList.profileIds.length, 'profile')}. Manual rules stay active.`
-                : `This turns ${selectedList.listName} back on for ${selectedList.profileIds.length} selected ${pluralize(selectedList.profileIds.length, 'profile')}.`,
-            confirmText: paused ? 'Pause List' : 'Resume List',
-            cancelText: 'Cancel'
+                ? tabViewUiText('dashboard.managedLists.pauseListMessage', 'This keeps {listName} saved, but stops its list-derived rules from affecting {profileCount} selected {profileNoun}. Manual rules stay active.', {
+                    listName: selectedList.listName,
+                    profileCount: selectedList.profileIds.length,
+                    profileNoun: tabViewUiText(selectedList.profileIds.length === 1 ? 'dashboard.managedLists.profileSingular' : 'dashboard.managedLists.profilePlural', selectedList.profileIds.length === 1 ? 'profile' : 'profiles')
+                })
+                : tabViewUiText('dashboard.managedLists.resumeListMessage', 'This turns {listName} back on for {profileCount} selected {profileNoun}.', {
+                    listName: selectedList.listName,
+                    profileCount: selectedList.profileIds.length,
+                    profileNoun: tabViewUiText(selectedList.profileIds.length === 1 ? 'dashboard.managedLists.profileSingular' : 'dashboard.managedLists.profilePlural', selectedList.profileIds.length === 1 ? 'profile' : 'profiles')
+                }),
+            confirmText: tabViewUiText(paused ? 'dashboard.managedLists.pauseList' : 'dashboard.managedLists.resumeList', paused ? 'Pause List' : 'Resume List'),
+            cancelText: tabViewUiText('dashboard.modal.cancel', 'Cancel')
         });
         if (!confirmChange) return;
 
@@ -12789,7 +13079,9 @@ document.addEventListener('DOMContentLoaded', async () => {
         }
 
         if (!changedProfileCount) {
-            UIComponents.showToast(`No selected profiles needed that list ${paused ? 'paused' : 'resumed'}`, 'info');
+            showManagedRuleListToast('noProfilesNeededListState', 'No selected profiles needed that list {state}', 'info', {
+                state: tabViewUiText(paused ? 'dashboard.managedLists.paused' : 'dashboard.managedLists.resumed', paused ? 'paused' : 'resumed')
+            });
             return;
         }
 
@@ -12805,10 +13097,12 @@ document.addEventListener('DOMContentLoaded', async () => {
         renderKidsChannels();
         renderKeywords();
         renderKidsKeywords();
-        UIComponents.showToast(
-            `${paused ? 'Paused' : 'Resumed'} ${changedRowCount} list-derived ${pluralize(changedRowCount, 'rule')} across ${changedProfileCount} protected ${pluralize(changedProfileCount, 'profile')}`,
-            'success'
-        );
+        UIComponents.showToast(tabViewUiText(paused ? 'dashboard.managedLists.listPausedToast' : 'dashboard.managedLists.listResumedToast', paused ? 'Paused {ruleCount} list-derived {ruleNoun} across {profileCount} protected {profileNoun}' : 'Resumed {ruleCount} list-derived {ruleNoun} across {profileCount} protected {profileNoun}', {
+            ruleCount: changedRowCount,
+            ruleNoun: tabViewUiText(changedRowCount === 1 ? 'dashboard.managedLists.ruleSingular' : 'dashboard.managedLists.rulePlural', changedRowCount === 1 ? 'rule' : 'rules'),
+            profileCount: changedProfileCount,
+            profileNoun: tabViewUiText(changedProfileCount === 1 ? 'dashboard.managedLists.profileSingular' : 'dashboard.managedLists.profilePlural', changedProfileCount === 1 ? 'profile' : 'profiles')
+        }), 'success');
 
         const remoteScope = 'rules_bundle';
         const surface = changedSurfaces.size === 1 ? Array.from(changedSurfaces)[0] : '';
@@ -12822,10 +13116,13 @@ document.addEventListener('DOMContentLoaded', async () => {
         }).length;
         if (readyProfileCount > 0) {
             const sendNow = await showConfirmModal({
-                title: `Send ${paused ? 'pause' : 'resume'} update now?`,
-                message: `${readyProfileCount} changed ${readyProfileCount === 1 ? 'profile has' : 'profiles have'} a verified delivery path. Send this list ${paused ? 'pause' : 'resume'} update to those devices now.`,
-                confirmText: 'Send Update',
-                cancelText: 'Not now'
+                title: tabViewUiText(paused ? 'dashboard.managedLists.sendPauseUpdateTitle' : 'dashboard.managedLists.sendResumeUpdateTitle', paused ? 'Send pause update now?' : 'Send resume update now?'),
+                message: tabViewUiText(paused ? 'dashboard.managedLists.sendPauseUpdateMessage' : 'dashboard.managedLists.sendResumeUpdateMessage', paused ? '{profileCount} changed {profilePhrase} a verified delivery path. Send this list pause update to those devices now.' : '{profileCount} changed {profilePhrase} a verified delivery path. Send this list resume update to those devices now.', {
+                    profileCount: readyProfileCount,
+                    profilePhrase: tabViewUiText(readyProfileCount === 1 ? 'dashboard.managedLists.profileHas' : 'dashboard.managedLists.profilesHave', readyProfileCount === 1 ? 'profile has' : 'profiles have')
+                }),
+                confirmText: tabViewUiText('dashboard.managedLists.sendUpdate', 'Send Update'),
+                cancelText: tabViewUiText('dashboard.modal.notNow', 'Not now')
             });
             if (sendNow) {
                 await sendManagedParentPolicyToVerifiedDevices(changedProfileIds, {
@@ -12839,19 +13136,19 @@ document.addEventListener('DOMContentLoaded', async () => {
     async function refreshManagedChannelListForProfiles(profileIds) {
         const targetIds = [...new Set(safeArray(profileIds).map(normalizeString).filter(Boolean))];
         if (!targetIds.length) {
-            UIComponents.showToast('Select at least one protected profile', 'error');
+            showManagedRuleListToast('selectProtectedProfile', 'Select at least one protected profile', 'error');
             return;
         }
         const io = window.FilterTubeIO || {};
         if (typeof io.loadProfilesV4 !== 'function' || typeof io.saveProfilesV4 !== 'function') {
-            UIComponents.showToast('Profiles unavailable', 'error');
+            UIComponents.showToast(tabViewUiText('popup.profile.unavailable', 'Profiles unavailable'), 'error');
             return;
         }
 
         const fresh = await io.loadProfilesV4();
         const currentActive = normalizeString(fresh?.activeProfileId) || 'default';
         if (getProfileType(fresh, currentActive) === 'child') {
-            UIComponents.showToast('Protected profiles cannot refresh managed lists', 'error');
+            showManagedRuleListToast('protectedProfileCannotRefreshLists', 'Protected profiles cannot refresh managed lists', 'error');
             return;
         }
 
@@ -12862,7 +13159,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                 && canActiveProfileManageProfile(fresh, targetId);
         });
         if (!eligibleIds.length) {
-            UIComponents.showToast('No selected protected profiles can be managed by this account', 'error');
+            showManagedRuleListToast('noManageableProfiles', 'No selected protected profiles can be managed by this account', 'error');
             return;
         }
 
@@ -12870,7 +13167,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         const selectedList = await promptManagedChannelListToRefresh(summaries);
         if (!selectedList) {
             if (!summaries.some(summary => normalizeManagedChannelListSourceUrl(summary?.sourceUrl))) {
-                UIComponents.showToast('No URL-backed rule lists found for the selected protected profiles', 'info');
+                showManagedRuleListToast('noUrlListsForProfiles', 'No URL-backed rule lists found for the selected protected profiles');
             }
             return;
         }
@@ -12879,7 +13176,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         try {
             refreshCandidate = await loadManagedChannelListRefreshCandidate(selectedList);
         } catch (error) {
-            UIComponents.showToast(error?.message || 'Unable to load this list URL', 'error');
+            UIComponents.showToast(error?.message || tabViewUiText('dashboard.managedLists.loadUrlFailed', 'Unable to load this list URL'), 'error');
             return;
         }
 
@@ -12889,23 +13186,41 @@ document.addEventListener('DOMContentLoaded', async () => {
             && normalizeString(selectedList.contentHash) === normalizeString(parsed.contentHash);
 
         const confirmRefresh = await showChoiceModal({
-            title: unchangedContentHash ? `Check ${selectedList.listName}?` : `Refresh ${selectedList.listName}?`,
+            title: tabViewUiText(unchangedContentHash ? 'dashboard.managedLists.checkOneListTitle' : 'dashboard.managedLists.refreshOneListTitle', unchangedContentHash ? 'Check {listName}?' : 'Refresh {listName}?', { listName: selectedList.listName }),
             message: unchangedContentHash
-                ? `The saved URL content matches the current source hash. FilterTube will update checked/source metadata only after parent/account unlock.`
-                : `This will replace the current list-derived rows for ${selectedList.profileIds.length} selected ${pluralize(selectedList.profileIds.length, 'profile')} with the latest rules from the saved URL.`,
+                ? tabViewUiText('dashboard.managedLists.checkOneListMessage', 'The saved URL content matches the current source hash. FilterTube will update checked/source metadata only after parent/account unlock.')
+                : tabViewUiText('dashboard.managedLists.refreshOneListMessage', 'This will replace the current list-derived rows for {profileCount} selected {profileNoun} with the latest rules from the saved URL.', {
+                    profileCount: selectedList.profileIds.length,
+                    profileNoun: tabViewUiText(selectedList.profileIds.length === 1 ? 'dashboard.managedLists.profileSingular' : 'dashboard.managedLists.profilePlural', selectedList.profileIds.length === 1 ? 'profile' : 'profiles')
+                }),
             details: [
                 unchangedContentHash
-                    ? `${selectedList.ruleCount || selectedList.channelCount} current ${pluralize(selectedList.ruleCount || selectedList.channelCount, 'rule')} stay unchanged`
-                    : `${selectedList.ruleCount || selectedList.channelCount} current ${pluralize(selectedList.ruleCount || selectedList.channelCount, 'rule')} will be replaced where this list is present`,
-                `${formatManagedRuleListCount(parsedCounts)} found in the latest URL content`,
-                unchangedContentHash ? 'No rule rows will be replaced because the source hash is unchanged' : 'Changed source content will replace matching list-derived rows',
-                parsed.skippedCount ? `${parsed.skippedCount} ${pluralize(parsed.skippedCount, 'row')} skipped for safety` : 'No rows skipped',
-                'Parent/account re-auth is required before anything changes.'
+                    ? tabViewUiText('dashboard.managedLists.currentRulesStayUnchanged', '{ruleCount} current {ruleNoun} stay unchanged', {
+                        ruleCount: selectedList.ruleCount || selectedList.channelCount,
+                        ruleNoun: tabViewUiText((selectedList.ruleCount || selectedList.channelCount) === 1 ? 'dashboard.managedLists.ruleSingular' : 'dashboard.managedLists.rulePlural', (selectedList.ruleCount || selectedList.channelCount) === 1 ? 'rule' : 'rules')
+                    })
+                    : tabViewUiText('dashboard.managedLists.currentRulesWillBeReplaced', '{ruleCount} current {ruleNoun} will be replaced where this list is present', {
+                        ruleCount: selectedList.ruleCount || selectedList.channelCount,
+                        ruleNoun: tabViewUiText((selectedList.ruleCount || selectedList.channelCount) === 1 ? 'dashboard.managedLists.ruleSingular' : 'dashboard.managedLists.rulePlural', (selectedList.ruleCount || selectedList.channelCount) === 1 ? 'rule' : 'rules')
+                    }),
+                tabViewUiText('dashboard.managedLists.rulesFoundInLatestUrl', '{counts} found in the latest URL content', { counts: formatManagedRuleListCount(parsedCounts) }),
+                unchangedContentHash
+                    ? tabViewUiText('dashboard.managedLists.noRowsReplacedHashUnchanged', 'No rule rows will be replaced because the source hash is unchanged')
+                    : tabViewUiText('dashboard.managedLists.changedSourceReplacesRows', 'Changed source content will replace matching list-derived rows'),
+                parsed.skippedCount
+                    ? tabViewUiText('dashboard.managedLists.skippedRowsForSafety', '{count} {rowNoun} skipped for safety', {
+                        count: parsed.skippedCount,
+                        rowNoun: tabViewUiText(parsed.skippedCount === 1 ? 'dashboard.managedLists.rowSingular' : 'dashboard.managedLists.rowPlural', parsed.skippedCount === 1 ? 'row' : 'rows')
+                    })
+                    : tabViewUiText('dashboard.managedLists.noRowsSkipped', 'No rows skipped'),
+                tabViewUiText('dashboard.managedLists.reauthRequired', 'Parent/account re-auth is required before anything changes.')
             ],
             choices: [
-                { value: 'refresh', label: unchangedContentHash ? 'Update Checked Time' : 'Refresh List', className: 'btn-primary' }
+                { value: 'refresh', label: unchangedContentHash
+                    ? tabViewUiText('dashboard.managedLists.updateCheckedTime', 'Update Checked Time')
+                    : tabViewUiText('dashboard.managedLists.refreshList', 'Refresh List'), className: 'btn-primary' }
             ],
-            cancelText: 'Cancel'
+            cancelText: tabViewUiText('dashboard.modal.cancel', 'Cancel')
         });
         if (confirmRefresh !== 'refresh') return;
 
@@ -12957,7 +13272,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         } = refreshResult;
 
         if (!changedCount && !refreshResult.checkedProfileIds?.length) {
-            UIComponents.showToast('No selected profiles had that URL-backed list', 'info');
+            showManagedRuleListToast('noSelectedProfilesHadUrlList', 'No selected profiles had that URL-backed list');
             return;
         }
 
@@ -12974,10 +13289,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         renderKeywords();
         renderKidsKeywords();
         if (unchangedContentHash) {
-            UIComponents.showToast(
-                `Checked ${selectedList.listName}: no rule changes`,
-                'success'
-            );
+            UIComponents.showToast(tabViewUiText('dashboard.managedLists.urlListCheckedToast', 'Checked {listName}: no rule changes', { listName: selectedList.listName }), 'success');
             const remoteScope = 'rules_bundle';
             const surface = checkedSurfaces.size === 1 ? Array.from(checkedSurfaces)[0] : '';
             const mailboxReady = hasNanahManagedMailboxUploadWriter();
@@ -12990,10 +13302,13 @@ document.addEventListener('DOMContentLoaded', async () => {
             }).length;
             if (readyProfileCount > 0) {
                 const sendNow = await showConfirmModal({
-                    title: 'Send checked list status now?',
-                    message: `${readyProfileCount} checked ${readyProfileCount === 1 ? 'profile has' : 'profiles have'} a verified delivery path. Send the updated list freshness/status to those devices now. Rule rows are unchanged.`,
-                    confirmText: 'Send Update',
-                    cancelText: 'Not now'
+                    title: tabViewUiText('dashboard.managedLists.sendCheckedStatusTitle', 'Send checked list status now?'),
+                    message: tabViewUiText('dashboard.managedLists.sendCheckedStatusMessage', '{profileCount} checked {profilePhrase} a verified delivery path. Send the updated list freshness/status to those devices now. Rule rows are unchanged.', {
+                        profileCount: readyProfileCount,
+                        profilePhrase: tabViewUiText(readyProfileCount === 1 ? 'dashboard.managedLists.profileHas' : 'dashboard.managedLists.profilesHave', readyProfileCount === 1 ? 'profile has' : 'profiles have')
+                    }),
+                    confirmText: tabViewUiText('dashboard.managedLists.sendUpdate', 'Send Update'),
+                    cancelText: tabViewUiText('dashboard.modal.notNow', 'Not now')
                 });
                 if (sendNow) {
                     await sendManagedParentPolicyToVerifiedDevices(checkedProfileIds, {
@@ -13004,10 +13319,12 @@ document.addEventListener('DOMContentLoaded', async () => {
             }
             return;
         }
-        UIComponents.showToast(
-            `Refreshed ${selectedList.listName}: ${addedCount} added, ${removedCount} replaced${duplicateCount ? `, ${duplicateCount} already present` : ''}`,
-            'success'
-        );
+        UIComponents.showToast(tabViewUiText('dashboard.managedLists.urlListRefreshedToast', 'Refreshed {listName}: {addedCount} added, {removedCount} replaced{duplicateNotice}', {
+            listName: selectedList.listName,
+            addedCount,
+            removedCount,
+            duplicateNotice: duplicateCount ? tabViewUiText('dashboard.managedLists.duplicatesPresentSuffix', ', {count} already present', { count: duplicateCount }) : ''
+        }), 'success');
 
         const remoteScope = 'rules_bundle';
         const surface = changedSurfaces.size === 1 ? Array.from(changedSurfaces)[0] : '';
@@ -13021,10 +13338,13 @@ document.addEventListener('DOMContentLoaded', async () => {
         }).length;
         if (readyProfileCount > 0) {
             const sendNow = await showConfirmModal({
-                title: 'Send refreshed list now?',
-                message: `${readyProfileCount} changed ${readyProfileCount === 1 ? 'profile has' : 'profiles have'} a verified delivery path. Send this refreshed list update to those devices now.`,
-                confirmText: 'Send Update',
-                cancelText: 'Not now'
+                title: tabViewUiText('dashboard.managedLists.sendRefreshedListTitle', 'Send refreshed list now?'),
+                message: tabViewUiText('dashboard.managedLists.sendRefreshedListMessage', '{profileCount} changed {profilePhrase} a verified delivery path. Send this refreshed list update to those devices now.', {
+                    profileCount: readyProfileCount,
+                    profilePhrase: tabViewUiText(readyProfileCount === 1 ? 'dashboard.managedLists.profileHas' : 'dashboard.managedLists.profilesHave', readyProfileCount === 1 ? 'profile has' : 'profiles have')
+                }),
+                confirmText: tabViewUiText('dashboard.managedLists.sendUpdate', 'Send Update'),
+                cancelText: tabViewUiText('dashboard.modal.notNow', 'Not now')
             });
             if (sendNow) {
                 await sendManagedParentPolicyToVerifiedDevices(changedProfileIds, {
@@ -13039,19 +13359,19 @@ document.addEventListener('DOMContentLoaded', async () => {
         const staleOnly = safeObject(options).staleOnly === true;
         const targetIds = [...new Set(safeArray(profileIds).map(normalizeString).filter(Boolean))];
         if (!targetIds.length) {
-            UIComponents.showToast('Select at least one protected profile', 'error');
+            showManagedRuleListToast('selectProtectedProfile', 'Select at least one protected profile', 'error');
             return;
         }
         const io = window.FilterTubeIO || {};
         if (typeof io.loadProfilesV4 !== 'function' || typeof io.saveProfilesV4 !== 'function') {
-            UIComponents.showToast('Profiles unavailable', 'error');
+            UIComponents.showToast(tabViewUiText('popup.profile.unavailable', 'Profiles unavailable'), 'error');
             return;
         }
 
         const fresh = await io.loadProfilesV4();
         const currentActive = normalizeString(fresh?.activeProfileId) || 'default';
         if (getProfileType(fresh, currentActive) === 'child') {
-            UIComponents.showToast('Protected profiles cannot refresh managed lists', 'error');
+            showManagedRuleListToast('protectedProfileCannotRefreshLists', 'Protected profiles cannot refresh managed lists', 'error');
             return;
         }
 
@@ -13062,7 +13382,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                 && canActiveProfileManageProfile(fresh, targetId);
         });
         if (!eligibleIds.length) {
-            UIComponents.showToast('No selected protected profiles can be managed by this account', 'error');
+            showManagedRuleListToast('noManageableProfiles', 'No selected protected profiles can be managed by this account', 'error');
             return;
         }
 
@@ -13072,11 +13392,11 @@ document.addEventListener('DOMContentLoaded', async () => {
             ? urlBacked.filter(summary => isManagedChannelListSummaryStale(summary))
             : urlBacked;
         if (!urlBacked.length) {
-            UIComponents.showToast('No URL-backed rule lists found for the selected protected profiles', 'info');
+            showManagedRuleListToast('noUrlListsForProfiles', 'No URL-backed rule lists found for the selected protected profiles');
             return;
         }
         if (!refreshTargets.length) {
-            UIComponents.showToast('No stale URL-backed lists found for the selected protected profiles', 'info');
+            showManagedRuleListToast('noStaleUrlListsForProfiles', 'No stale URL-backed lists found for the selected protected profiles');
             return;
         }
 
@@ -13093,7 +13413,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             }
         }
         if (!loadedCandidates.length) {
-            UIComponents.showToast('No URL-backed lists could be loaded for refresh', 'error');
+            showManagedRuleListToast('noUrlListsLoadedForRefresh', 'No URL-backed lists could be loaded for refresh', 'error');
             return;
         }
 
@@ -13107,20 +13427,51 @@ document.addEventListener('DOMContentLoaded', async () => {
         const totalSkippedRows = loadedCandidates.reduce((total, item) => total + (Number(item?.parsed?.skippedCount) || 0), 0);
         const confirmRefresh = await showChoiceModal({
             title: staleOnly
-                ? `Check ${loadedCandidates.length} stale URL ${pluralize(loadedCandidates.length, 'list')}?`
-                : `Check ${loadedCandidates.length} URL-backed ${pluralize(loadedCandidates.length, 'list')}?`,
-            message: `FilterTube loaded ${loadedCandidates.length} ${staleOnly ? 'stale ' : ''}URL-backed ${pluralize(loadedCandidates.length, 'list')} for ${eligibleIds.length} selected protected ${pluralize(eligibleIds.length, 'profile')}. Changed sources will refresh rule rows; unchanged sources only update checked metadata.`,
+                ? tabViewUiText('dashboard.managedLists.checkStaleListsTitle', 'Check {count} stale URL {listNoun}?', {
+                    count: loadedCandidates.length,
+                    listNoun: tabViewUiText(loadedCandidates.length === 1 ? 'dashboard.managedLists.listSingular' : 'dashboard.managedLists.listPlural', loadedCandidates.length === 1 ? 'list' : 'lists')
+                })
+                : tabViewUiText('dashboard.managedLists.checkUrlListsTitle', 'Check {count} URL-backed {listNoun}?', {
+                    count: loadedCandidates.length,
+                    listNoun: tabViewUiText(loadedCandidates.length === 1 ? 'dashboard.managedLists.listSingular' : 'dashboard.managedLists.listPlural', loadedCandidates.length === 1 ? 'list' : 'lists')
+                }),
+            message: tabViewUiText('dashboard.managedLists.checkMultipleListsMessage', 'FilterTube loaded {listCount} {stalePrefix}URL-backed {listNoun} for {profileCount} selected protected {profileNoun}. Changed sources will refresh rule rows; unchanged sources only update checked metadata.', {
+                listCount: loadedCandidates.length,
+                stalePrefix: staleOnly ? tabViewUiText('dashboard.managedLists.stalePrefix', 'stale ') : '',
+                listNoun: tabViewUiText(loadedCandidates.length === 1 ? 'dashboard.managedLists.listSingular' : 'dashboard.managedLists.listPlural', loadedCandidates.length === 1 ? 'list' : 'lists'),
+                profileCount: eligibleIds.length,
+                profileNoun: tabViewUiText(eligibleIds.length === 1 ? 'dashboard.managedLists.profileSingular' : 'dashboard.managedLists.profilePlural', eligibleIds.length === 1 ? 'profile' : 'profiles')
+            }),
             details: [
-                `${totalValidRules} valid ${pluralize(totalValidRules, 'rule')} found across loaded lists`,
-                `${contentChangedCandidates.length} ${pluralize(contentChangedCandidates.length, 'list')} changed | ${unchangedCandidates.length} unchanged`,
-                totalSkippedRows ? `${totalSkippedRows} ${pluralize(totalSkippedRows, 'row')} skipped for safety` : 'No rows skipped',
-                failedCandidates.length ? `${failedCandidates.length} ${pluralize(failedCandidates.length, 'list')} could not be loaded and will be left unchanged` : 'All URL-backed lists loaded',
-                'Parent/account re-auth is required before anything changes.'
+                tabViewUiText('dashboard.managedLists.validRulesAcrossLists', '{count} valid {ruleNoun} found across loaded lists', {
+                    count: totalValidRules,
+                    ruleNoun: tabViewUiText(totalValidRules === 1 ? 'dashboard.managedLists.ruleSingular' : 'dashboard.managedLists.rulePlural', totalValidRules === 1 ? 'rule' : 'rules')
+                }),
+                tabViewUiText('dashboard.managedLists.changedUnchangedLists', '{changedCount} {listNoun} changed | {unchangedCount} unchanged', {
+                    changedCount: contentChangedCandidates.length,
+                    listNoun: tabViewUiText(contentChangedCandidates.length === 1 ? 'dashboard.managedLists.listSingular' : 'dashboard.managedLists.listPlural', contentChangedCandidates.length === 1 ? 'list' : 'lists'),
+                    unchangedCount: unchangedCandidates.length
+                }),
+                totalSkippedRows
+                    ? tabViewUiText('dashboard.managedLists.skippedRowsForSafety', '{count} {rowNoun} skipped for safety', {
+                        count: totalSkippedRows,
+                        rowNoun: tabViewUiText(totalSkippedRows === 1 ? 'dashboard.managedLists.rowSingular' : 'dashboard.managedLists.rowPlural', totalSkippedRows === 1 ? 'row' : 'rows')
+                    })
+                    : tabViewUiText('dashboard.managedLists.noRowsSkipped', 'No rows skipped'),
+                failedCandidates.length
+                    ? tabViewUiText('dashboard.managedLists.failedListsLeftUnchanged', '{count} {listNoun} could not be loaded and will be left unchanged', {
+                        count: failedCandidates.length,
+                        listNoun: tabViewUiText(failedCandidates.length === 1 ? 'dashboard.managedLists.listSingular' : 'dashboard.managedLists.listPlural', failedCandidates.length === 1 ? 'list' : 'lists')
+                    })
+                    : tabViewUiText('dashboard.managedLists.allUrlListsLoaded', 'All URL-backed lists loaded'),
+                tabViewUiText('dashboard.managedLists.reauthRequired', 'Parent/account re-auth is required before anything changes.')
             ],
             choices: [
-                { value: 'refresh_all', label: contentChangedCandidates.length ? 'Refresh Changed Lists' : 'Update Checked Time', className: 'btn-primary' }
+                { value: 'refresh_all', label: contentChangedCandidates.length
+                    ? tabViewUiText('dashboard.managedLists.refreshChangedLists', 'Refresh Changed Lists')
+                    : tabViewUiText('dashboard.managedLists.updateCheckedTime', 'Update Checked Time'), className: 'btn-primary' }
             ],
-            cancelText: 'Cancel'
+            cancelText: tabViewUiText('dashboard.modal.cancel', 'Cancel')
         });
         if (confirmRefresh !== 'refresh_all') return;
 
@@ -13179,7 +13530,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         }
 
         if (!changedProfileIdsSet.size && !checkedProfileIdsSet.size) {
-            UIComponents.showToast('Loaded URL-backed lists were not present on selected protected profiles', 'info');
+            showManagedRuleListToast('loadedUrlListsNotPresent', 'Loaded URL-backed lists were not present on selected protected profiles');
             return;
         }
 
@@ -13196,15 +13547,20 @@ document.addEventListener('DOMContentLoaded', async () => {
         renderKeywords();
         renderKidsKeywords();
         if (changedListCount) {
-            UIComponents.showToast(
-                `Refreshed ${changedListCount} ${pluralize(changedListCount, 'list')}: ${addedCount} added, ${removedCount} replaced${duplicateCount ? `, ${duplicateCount} already present` : ''}${checkedListCount ? `; checked ${checkedListCount} unchanged` : ''}`,
-                'success'
-            );
+            UIComponents.showToast(tabViewUiText('dashboard.managedLists.allListsRefreshedToast', 'Refreshed {listCount} {listNoun}: {addedCount} added, {removedCount} replaced{duplicateSuffix}{checkedSuffix}', {
+                listCount: changedListCount,
+                listNoun: tabViewUiText(changedListCount === 1 ? 'dashboard.managedLists.listSingular' : 'dashboard.managedLists.listPlural', changedListCount === 1 ? 'list' : 'lists'),
+                addedCount,
+                removedCount,
+                duplicateSuffix: duplicateCount ? tabViewUiText('dashboard.managedLists.duplicatesPresentSuffix', ', {count} already present', { count: duplicateCount }) : '',
+                checkedSuffix: checkedListCount ? tabViewUiText('dashboard.managedLists.checkedUnchangedSuffix', '; checked {count} unchanged', { count: checkedListCount }) : ''
+            }), 'success');
         } else {
-            UIComponents.showToast(
-                `Checked ${checkedListCount} ${pluralize(checkedListCount, 'list')}: no rule changes${checkedRowCount ? ` across ${checkedRowCount} rows` : ''}`,
-                'success'
-            );
+            UIComponents.showToast(tabViewUiText('dashboard.managedLists.allListsCheckedToast', 'Checked {listCount} {listNoun}: no rule changes{rowsSuffix}', {
+                listCount: checkedListCount,
+                listNoun: tabViewUiText(checkedListCount === 1 ? 'dashboard.managedLists.listSingular' : 'dashboard.managedLists.listPlural', checkedListCount === 1 ? 'list' : 'lists'),
+                rowsSuffix: checkedRowCount ? tabViewUiText('dashboard.managedLists.acrossRowsSuffix', ' across {count} rows', { count: checkedRowCount }) : ''
+            }), 'success');
             const checkedProfileIds = Array.from(checkedProfileIdsSet);
             const remoteScope = 'rules_bundle';
             const mailboxReady = hasNanahManagedMailboxUploadWriter();
@@ -13217,10 +13573,13 @@ document.addEventListener('DOMContentLoaded', async () => {
             }).length;
             if (readyProfileCount > 0) {
                 const sendNow = await showConfirmModal({
-                    title: staleOnly ? 'Send checked stale-list status now?' : 'Send checked list status now?',
-                    message: `${readyProfileCount} checked ${readyProfileCount === 1 ? 'profile has' : 'profiles have'} a verified delivery path. Send the updated list freshness/status to those devices now. Rule rows are unchanged.`,
-                    confirmText: 'Send Update',
-                    cancelText: 'Not now'
+                    title: tabViewUiText(staleOnly ? 'dashboard.managedLists.sendCheckedStaleStatusTitle' : 'dashboard.managedLists.sendCheckedStatusTitle', staleOnly ? 'Send checked stale-list status now?' : 'Send checked list status now?'),
+                    message: tabViewUiText('dashboard.managedLists.sendCheckedStatusMessage', '{profileCount} checked {profilePhrase} a verified delivery path. Send the updated list freshness/status to those devices now. Rule rows are unchanged.', {
+                        profileCount: readyProfileCount,
+                        profilePhrase: tabViewUiText(readyProfileCount === 1 ? 'dashboard.managedLists.profileHas' : 'dashboard.managedLists.profilesHave', readyProfileCount === 1 ? 'profile has' : 'profiles have')
+                    }),
+                    confirmText: tabViewUiText('dashboard.managedLists.sendUpdate', 'Send Update'),
+                    cancelText: tabViewUiText('dashboard.modal.notNow', 'Not now')
                 });
                 if (sendNow) {
                     await sendManagedParentPolicyToVerifiedDevices(checkedProfileIds, {
@@ -13244,10 +13603,13 @@ document.addEventListener('DOMContentLoaded', async () => {
         }).length;
         if (readyProfileCount > 0) {
             const sendNow = await showConfirmModal({
-                title: staleOnly ? 'Send refreshed stale lists now?' : 'Send refreshed lists now?',
-                message: `${readyProfileCount} changed ${readyProfileCount === 1 ? 'profile has' : 'profiles have'} a verified delivery path. Send these refreshed list updates to those devices now.`,
-                confirmText: 'Send Update',
-                cancelText: 'Not now'
+                title: tabViewUiText(staleOnly ? 'dashboard.managedLists.sendRefreshedStaleListsTitle' : 'dashboard.managedLists.sendRefreshedListsTitle', staleOnly ? 'Send refreshed stale lists now?' : 'Send refreshed lists now?'),
+                message: tabViewUiText('dashboard.managedLists.sendRefreshedListsMessage', '{profileCount} changed {profilePhrase} a verified delivery path. Send these refreshed list updates to those devices now.', {
+                    profileCount: readyProfileCount,
+                    profilePhrase: tabViewUiText(readyProfileCount === 1 ? 'dashboard.managedLists.profileHas' : 'dashboard.managedLists.profilesHave', readyProfileCount === 1 ? 'profile has' : 'profiles have')
+                }),
+                confirmText: tabViewUiText('dashboard.managedLists.sendUpdate', 'Send Update'),
+                cancelText: tabViewUiText('dashboard.modal.notNow', 'Not now')
             });
             if (sendNow) {
                 await sendManagedParentPolicyToVerifiedDevices(changedProfileIds, {
@@ -13261,19 +13623,19 @@ document.addEventListener('DOMContentLoaded', async () => {
     async function manageManagedChannelListsForProfiles(profileIds) {
         const targetIds = [...new Set(safeArray(profileIds).map(normalizeString).filter(Boolean))];
         if (!targetIds.length) {
-            UIComponents.showToast('Select at least one protected profile', 'error');
+            showManagedRuleListToast('selectProtectedProfile', 'Select at least one protected profile', 'error');
             return;
         }
         const io = window.FilterTubeIO || {};
         if (typeof io.loadProfilesV4 !== 'function') {
-            UIComponents.showToast('Profiles unavailable', 'error');
+            UIComponents.showToast(tabViewUiText('popup.profile.unavailable', 'Profiles unavailable'), 'error');
             return;
         }
 
         const fresh = await io.loadProfilesV4();
         const currentActive = normalizeString(fresh?.activeProfileId) || 'default';
         if (getProfileType(fresh, currentActive) === 'child') {
-            UIComponents.showToast('Protected profiles cannot manage lists', 'error');
+            showManagedRuleListToast('protectedProfileCannotManageLists', 'Protected profiles cannot manage lists', 'error');
             return;
         }
 
@@ -13284,7 +13646,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                 && canActiveProfileManageProfile(fresh, targetId);
         });
         if (!eligibleIds.length) {
-            UIComponents.showToast('No selected protected profiles can be managed by this account', 'error');
+            showManagedRuleListToast('noManageableProfiles', 'No selected protected profiles can be managed by this account', 'error');
             return;
         }
 
@@ -13295,31 +13657,43 @@ document.addEventListener('DOMContentLoaded', async () => {
         const pausedListCount = summaries.filter(summary => (Number(summary.pausedRuleCount ?? summary.pausedChannelCount) || 0) > 0).length;
         const details = summaries.length
             ? [
-                `${summaries.length} rule ${pluralize(summaries.length, 'list')} across ${eligibleIds.length} selected ${pluralize(eligibleIds.length, 'profile')}`,
-                `${activeListCount} active | ${pausedListCount} paused`,
-                staleUrlBackedCount ? `${staleUrlBackedCount} URL-backed ${pluralize(staleUrlBackedCount, 'list')} need refresh` : 'No stale URL-backed lists',
-                urlBackedCount ? `${urlBackedCount} URL-backed ${pluralize(urlBackedCount, 'list')} can be refreshed` : 'No URL-backed lists to refresh yet'
+                tabViewUiText('dashboard.managedLists.listSummaryCount', '{listCount} rule {listNoun} across {profileCount} selected {profileNoun}', {
+                    listCount: summaries.length,
+                    listNoun: tabViewUiText(summaries.length === 1 ? 'dashboard.managedLists.listSingular' : 'dashboard.managedLists.listPlural', summaries.length === 1 ? 'list' : 'lists'),
+                    profileCount: eligibleIds.length,
+                    profileNoun: tabViewUiText(eligibleIds.length === 1 ? 'dashboard.managedLists.profileSingular' : 'dashboard.managedLists.profilePlural', eligibleIds.length === 1 ? 'profile' : 'profiles')
+                }),
+                tabViewUiText('dashboard.managedLists.activePausedSummary', '{activeCount} active | {pausedCount} paused', { activeCount: activeListCount, pausedCount: pausedListCount }),
+                staleUrlBackedCount
+                    ? tabViewUiText('dashboard.managedLists.staleUrlListCount', '{count} URL-backed {listNoun} need refresh', { count: staleUrlBackedCount, listNoun: tabViewUiText(staleUrlBackedCount === 1 ? 'dashboard.managedLists.listSingular' : 'dashboard.managedLists.listPlural', staleUrlBackedCount === 1 ? 'list' : 'lists') })
+                    : tabViewUiText('dashboard.managedLists.noStaleUrlLists', 'No stale URL-backed lists'),
+                urlBackedCount
+                    ? tabViewUiText('dashboard.managedLists.urlListRefreshCount', '{count} URL-backed {listNoun} can be refreshed', { count: urlBackedCount, listNoun: tabViewUiText(urlBackedCount === 1 ? 'dashboard.managedLists.listSingular' : 'dashboard.managedLists.listPlural', urlBackedCount === 1 ? 'list' : 'lists') })
+                    : tabViewUiText('dashboard.managedLists.noUrlListsYet', 'No URL-backed lists to refresh yet')
             ]
             : [
-                `No rule lists yet for ${eligibleIds.length} selected ${pluralize(eligibleIds.length, 'profile')}`,
-                'Start by importing a pasted list, a file, or a public HTTPS channel/keyword list.'
+                tabViewUiText('dashboard.managedLists.noListsYetForProfiles', 'No rule lists yet for {profileCount} selected {profileNoun}', {
+                    profileCount: eligibleIds.length,
+                    profileNoun: tabViewUiText(eligibleIds.length === 1 ? 'dashboard.managedLists.profileSingular' : 'dashboard.managedLists.profilePlural', eligibleIds.length === 1 ? 'profile' : 'profiles')
+                }),
+                tabViewUiText('dashboard.managedLists.startByImporting', 'Start by importing a pasted list, a file, or a public HTTPS channel/keyword list.')
             ];
         const choices = [
-            ...(summaries.length ? [{ value: 'view', label: 'View Lists', className: 'btn-secondary' }] : []),
-            { value: 'import', label: 'Import Rule List', className: 'btn-primary' },
-            ...(activeListCount ? [{ value: 'pause', label: 'Pause List', className: 'btn-secondary' }] : []),
-            ...(pausedListCount ? [{ value: 'resume', label: 'Resume List', className: 'btn-secondary' }] : []),
-            ...(urlBackedCount ? [{ value: 'refresh', label: 'Check URL', className: 'btn-secondary' }] : []),
-            ...(staleUrlBackedCount ? [{ value: 'refresh_stale', label: 'Check Stale URLs', className: 'btn-secondary' }] : []),
-            ...(urlBackedCount > 1 ? [{ value: 'refresh_all', label: 'Check All URLs', className: 'btn-secondary' }] : []),
-            ...(summaries.length ? [{ value: 'remove', label: 'Remove List', className: 'btn-secondary' }] : [])
+            ...(summaries.length ? [{ value: 'view', label: tabViewUiText('dashboard.managedLists.viewLists', 'View Lists'), className: 'btn-secondary' }] : []),
+            { value: 'import', label: tabViewUiText('dashboard.managedLists.importTitle', 'Import Rule List'), className: 'btn-primary' },
+            ...(activeListCount ? [{ value: 'pause', label: tabViewUiText('dashboard.managedLists.pauseList', 'Pause List'), className: 'btn-secondary' }] : []),
+            ...(pausedListCount ? [{ value: 'resume', label: tabViewUiText('dashboard.managedLists.resumeList', 'Resume List'), className: 'btn-secondary' }] : []),
+            ...(urlBackedCount ? [{ value: 'refresh', label: tabViewUiText('dashboard.managedLists.checkUrl', 'Check URL'), className: 'btn-secondary' }] : []),
+            ...(staleUrlBackedCount ? [{ value: 'refresh_stale', label: tabViewUiText('dashboard.managedLists.checkStaleUrls', 'Check Stale URLs'), className: 'btn-secondary' }] : []),
+            ...(urlBackedCount > 1 ? [{ value: 'refresh_all', label: tabViewUiText('dashboard.managedLists.checkAllUrls', 'Check All URLs'), className: 'btn-secondary' }] : []),
+            ...(summaries.length ? [{ value: 'remove', label: tabViewUiText('dashboard.managedLists.removeList', 'Remove List'), className: 'btn-secondary' }] : [])
         ];
         const selected = await showChoiceModal({
-            title: 'Parent-Approved Lists',
-            message: 'Choose what to do with channel/keyword lists for the selected protected profiles. List changes apply locally first; verified-device sending is offered after a protected profile changes.',
+            title: tabViewUiText('dashboard.managedLists.libraryTitle', 'Parent-Approved Lists'),
+            message: tabViewUiText('dashboard.managedLists.manageListsMessage', 'Choose what to do with channel/keyword lists for the selected protected profiles. List changes apply locally first; verified-device sending is offered after a protected profile changes.'),
             details,
             choices,
-            cancelText: 'Cancel'
+            cancelText: tabViewUiText('dashboard.modal.cancel', 'Cancel')
         });
         if (selected === 'view') {
             await showManagedChannelListLibraryModal(summaries);
@@ -20169,11 +20543,17 @@ document.addEventListener('DOMContentLoaded', async () => {
         }
         await refreshProfilesUI();
         if (summary.deliveredCount > 0) {
-            UIComponents.showToast(`Sent managed updates to ${summary.deliveredCount} verified policy queue${summary.deliveredCount === 1 ? '' : 's'}`, 'success');
+            UIComponents.showToast(tabViewUiText(
+                summary.deliveredCount === 1 ? 'dashboard.sync.toast.sentOneManagedUpdate' : 'dashboard.sync.toast.sentManyManagedUpdates',
+                summary.deliveredCount === 1
+                    ? 'Sent managed updates to {count} verified policy queue'
+                    : 'Sent managed updates to {count} verified policy queues',
+                { count: summary.deliveredCount }
+            ), 'success');
         } else if (summary.noLinkCount > 0) {
-            UIComponents.showToast('No selected protected profile has a verified device link yet', 'error');
+            UIComponents.showToast(tabViewUiText('dashboard.sync.toast.noSelectedProtectedLink', 'No selected protected profile has a verified device link yet'), 'error');
         } else {
-            UIComponents.showToast('No send path is available for verified-device updates yet', 'error');
+            UIComponents.showToast(tabViewUiText('dashboard.sync.toast.noVerifiedDeviceSendPath', 'No send path is available for verified-device updates yet'), 'error');
         }
         return summary;
     }
@@ -20242,24 +20622,24 @@ document.addEventListener('DOMContentLoaded', async () => {
     async function rotateNanahManagedSourceSigningKey() {
         const io = window.FilterTubeIO || {};
         if (typeof io.loadProfilesV4 !== 'function') {
-            UIComponents.showToast('Profiles unavailable', 'error');
+            UIComponents.showToast(tabViewUiText('popup.profile.unavailable', 'Profiles unavailable'), 'error');
             return null;
         }
         const fresh = await io.loadProfilesV4();
         const currentActive = normalizeString(fresh.activeProfileId) || activeProfileId || 'default';
         if (getProfileType(fresh, currentActive) === 'child') {
-            UIComponents.showToast('Switch to the master or parent account before rotating managed trust keys', 'error');
+            UIComponents.showToast(tabViewUiText('dashboard.sync.toast.switchParentToRotateTrustKey', 'Switch to the master or parent account before rotating managed trust keys'), 'error');
             return null;
         }
         const sourceLinks = safeArray(nanahTrustedLinks)
             .map((entry) => normalizeNanahTrustedLink(entry))
             .filter(isActiveNanahSourceManagedLink);
         if (!sourceLinks.length) {
-            UIComponents.showToast('No active managed child-device links need key rotation', 'info');
+            UIComponents.showToast(tabViewUiText('dashboard.sync.toast.noManagedLinksNeedKeyRotation', 'No active managed child-device links need key rotation'), 'info');
             return null;
         }
         const confirmed = window.confirm(
-            'Rotate the managed signing key for this parent device? This revokes existing managed child-device links and those devices must be paired again before they can receive new managed updates.'
+            tabViewUiText('dashboard.sync.confirm.rotateManagedSigningKey', 'Rotate the managed signing key for this parent device? This revokes existing managed child-device links and those devices must be paired again before they can receive new managed updates.')
         );
         if (!confirmed) return null;
         const okAdmin = await ensureProfileUnlocked(fresh, currentActive, { sensitiveAction: true });
@@ -20277,7 +20657,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         const previousKeyVersion = normalizeNonNegativeInteger(previousKey?.managedKeyVersion || previousKey?.keyVersion || previousKey?.sourceKeyVersion) || 0;
         const nextKey = await ensureNanahManagedSigningKeyPair({ required: true, rotate: true });
         if (!nextKey) {
-            UIComponents.showToast('Managed signing key rotation failed', 'error');
+            UIComponents.showToast(tabViewUiText('dashboard.sync.toast.managedSigningKeyRotationFailed', 'Managed signing key rotation failed'), 'error');
             return null;
         }
         const nextKeyVersion = normalizeNonNegativeInteger(nextKey.managedKeyVersion || nextKey.keyVersion || nextKey.sourceKeyVersion) || 0;
@@ -20338,7 +20718,13 @@ document.addEventListener('DOMContentLoaded', async () => {
         await loadNanahManagedSigningKeyDescriptor();
         await refreshProfilesUI();
         UIComponents.showToast(
-            `Managed signing key rotated. ${sourceLinks.length} child-device link${sourceLinks.length === 1 ? '' : 's'} must be paired again.`,
+            tabViewUiText(
+                sourceLinks.length === 1 ? 'dashboard.sync.toast.oneManagedLinkMustPairAgain' : 'dashboard.sync.toast.manyManagedLinksMustPairAgain',
+                sourceLinks.length === 1
+                    ? 'Managed signing key rotated. {count} child-device link must be paired again.'
+                    : 'Managed signing key rotated. {count} child-device links must be paired again.',
+                { count: sourceLinks.length }
+            ),
             'success'
         );
         return {
@@ -21298,8 +21684,8 @@ document.addEventListener('DOMContentLoaded', async () => {
             const latest = safeObject(result.latest);
             UIComponents.showToast(
                 normalizeString(latest.result) === 'accepted'
-                    ? 'Managed remote delivery ack recorded'
-                    : 'Managed remote delivery ack recorded with rejection status',
+                    ? tabViewUiText('dashboard.sync.toast.managedDeliveryReceiptRecorded', 'Managed remote delivery receipt recorded')
+                    : tabViewUiText('dashboard.sync.toast.managedDeliveryReceiptRecordedRejected', 'Managed remote delivery receipt recorded with rejection status'),
                 'info'
             );
         }
@@ -21464,7 +21850,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         if (!trusted) return;
 
         if (trusted.linkType !== 'managed_link') {
-            UIComponents.showToast('Peer links do not have managed policy settings yet', 'info');
+            UIComponents.showToast(tabViewUiText('dashboard.sync.toast.peerLinksNoManagedPolicy', 'Peer links do not have managed policy settings yet'), 'info');
             return;
         }
 
@@ -21507,7 +21893,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                 targetProfileName: nextPolicyDecision.policy.targetProfileName
             }
         });
-        UIComponents.showToast('Parent trust updated', 'success');
+        UIComponents.showToast(tabViewUiText('dashboard.sync.toast.parentTrustUpdated', 'Parent trust updated'), 'success');
     }
 
     async function startNanahTrustedReconnect(link) {
@@ -21522,7 +21908,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             && trustedRemoteRole === 'source';
 
         if (isNanahChildReplicaOnly() && trustedLocalRole !== 'replica') {
-            UIComponents.showToast('Locked protected profiles can only reconnect as protected receivers. Unlock the protected profile first to reconnect as a sender.', 'error');
+            UIComponents.showToast(tabViewUiText('dashboard.sync.toast.lockedProfileReconnectReceiverOnly', 'Locked protected profiles can only reconnect as protected receivers. Unlock the protected profile first to reconnect as a sender.'), 'error');
             return;
         }
 
@@ -21562,23 +21948,55 @@ document.addEventListener('DOMContentLoaded', async () => {
         const reconnectMode = getNanahReconnectMode(trustedPolicy.reconnectMode, trusted.linkType === 'managed_link' ? 'approval_needed' : 'fast');
         UIComponents.showToast(
             isManagedReplicaReceiver
-                ? `Receive session code ${nanahSessionState.code} is ready. Open Accounts & Sync on the parent device and send the approved update.`
+                ? tabViewUiText('dashboard.sync.toast.receiveSessionCodeReady', 'Receive session code {code} is ready. Open Accounts & Sync on the parent device and send the approved update.', { code: nanahSessionState.code })
                 : reconnectMode === 'approval_needed'
-                ? `Session code ${nanahSessionState.code} is ready. Open Accounts & Sync on the other device and approve the reconnect there.`
-                : `Session code ${nanahSessionState.code} is ready. Open Accounts & Sync on ${normalizeString(trusted.deviceLabel) || 'the trusted device'} and join this fresh session.`,
+                ? tabViewUiText('dashboard.sync.toast.sessionCodeReadyApproval', 'Session code {code} is ready. Open Accounts & Sync on the other device and approve the reconnect there.', { code: nanahSessionState.code })
+                : tabViewUiText('dashboard.sync.toast.sessionCodeReadyJoin', 'Session code {code} is ready. Open Accounts & Sync on {device} and join this fresh session.', {
+                    code: nanahSessionState.code,
+                    device: normalizeString(trusted.deviceLabel) || 'the trusted device'
+                }),
             'success'
         );
     }
 
     function renderNanahTrustedLinks() {
         if (!ftNanahTrustedLinks) return;
+        const scopeCopies = {
+            main: ['dashboard.sync.scope.main', 'Main'],
+            kids: ['dashboard.sync.scope.kids', 'Kids'],
+            full: ['dashboard.sync.scope.fullBackup', 'Full backup'],
+            videos: ['dashboard.sync.scope.videos', 'Videos'],
+            keywords: ['dashboard.sync.scope.keywords', 'Keywords'],
+            channels: ['dashboard.sync.scope.channels', 'Channels'],
+            rules_bundle: ['dashboard.sync.scope.ruleBundle', 'Rule bundle'],
+            viewing_space: ['dashboard.sync.scope.viewingSpace', 'Viewing space'],
+            time_limits: ['dashboard.sync.scope.timeLimits', 'Time limits']
+        };
+        const localizedScopeLabel = (scope) => {
+            const normalized = normalizeString(scope).toLowerCase();
+            const [key, fallback] = scopeCopies[normalized] || ['dashboard.sync.scope.activeProfile', 'Active profile'];
+            return tabViewUiText(key, fallback);
+        };
+        const localizedStrategyLabel = (strategy) => normalizeString(strategy).toLowerCase() === 'replace'
+            ? tabViewUiText('dashboard.sync.strategy.replace', 'Replace')
+            : tabViewUiText('dashboard.sync.strategy.merge', 'Merge');
+        const localizedReconnectModeLabel = (mode) => getNanahReconnectMode(mode) === 'approval_needed'
+            ? tabViewUiText('dashboard.sync.reconnect.askFirst', 'Ask first')
+            : tabViewUiText('dashboard.sync.reconnect.quickConnect', 'Quick connect');
+        const localizedLinkDirection = (entry) => {
+            const localRole = normalizeString(entry?.localRole).toLowerCase();
+            const remoteRole = normalizeString(entry?.remoteRole).toLowerCase();
+            if (localRole === 'source' && remoteRole === 'replica') return tabViewUiText('dashboard.sync.direction.sendsApprovedUpdates', 'This device sends approved updates');
+            if (localRole === 'replica' && remoteRole === 'source') return tabViewUiText('dashboard.sync.direction.receivesParentUpdates', 'This device receives parent updates');
+            return tabViewUiText('dashboard.sync.direction.twoWayCopy', 'Two-way device copy');
+        };
         ftNanahTrustedLinks.innerHTML = '';
 
         if (!Array.isArray(nanahTrustedLinks) || nanahTrustedLinks.length === 0) {
             const empty = document.createElement('div');
             empty.className = 'nanah-trusted-links__empty';
-            empty.textContent = 'No trusted devices yet.';
-            empty.dataset.filtertubeHelp = 'After you save parent trust, trusted devices appear here with reconnect, delivery-check, and policy controls.';
+            setTabViewLocalizedCopy(empty, 'textContent', 'dashboard.sync.copy.noTrustedDevices', 'No trusted devices yet.');
+            empty.dataset.filtertubeHelp = tabViewUiText('dashboard.sync.hint.noTrustedDevicesYet', 'After you save parent trust, trusted devices appear here with reconnect, delivery-check, and policy controls.');
             ftNanahTrustedLinks.appendChild(empty);
             syncNanahManagedTargetOptions();
             return;
@@ -21599,7 +22017,9 @@ document.addEventListener('DOMContentLoaded', async () => {
             const titleWrap = document.createElement('div');
             const title = document.createElement('h4');
             title.className = 'nanah-trusted-link__title';
-            title.textContent = normalizeString(entry?.deviceLabel) || 'Trusted device';
+            const deviceLabel = normalizeString(entry?.deviceLabel);
+            if (deviceLabel) title.textContent = deviceLabel;
+            else setTabViewLocalizedCopy(title, 'textContent', 'dashboard.sync.copy.trustedDevice', 'Trusted device');
             titleWrap.appendChild(title);
 
             const meta = document.createElement('div');
@@ -21607,32 +22027,41 @@ document.addEventListener('DOMContentLoaded', async () => {
 
             const rolePill = document.createElement('span');
             rolePill.className = 'nanah-trusted-link__pill';
-            rolePill.textContent = getNanahTrustedLinkTypePill(entry);
+            const isManagedLink = normalizeString(entry?.linkType || safeObject(entry?.policy).linkType) === 'managed_link';
+            setTabViewLocalizedCopy(rolePill, 'textContent', isManagedLink ? 'dashboard.sync.pill.parentLink' : 'dashboard.sync.pill.deviceLink', isManagedLink ? 'Parent link' : 'Device link');
             meta.appendChild(rolePill);
 
             const remoteRolePill = document.createElement('span');
             remoteRolePill.className = 'nanah-trusted-link__pill';
-            remoteRolePill.textContent = getNanahTrustedLinkRelationshipPill(entry);
+            const relationship = `${normalizeString(entry?.localRole).toLowerCase()}:${normalizeString(entry?.remoteRole).toLowerCase()}`;
+            const relationshipCopy = relationship === 'source:replica'
+                ? ['dashboard.sync.pill.sendsApprovedUpdates', 'Sends approved updates']
+                : relationship === 'replica:source'
+                    ? ['dashboard.sync.pill.receivesParentUpdates', 'Receives parent updates']
+                    : ['dashboard.sync.pill.copiesProfiles', 'Copies profiles'];
+            setTabViewLocalizedCopy(remoteRolePill, 'textContent', relationshipCopy[0], relationshipCopy[1]);
             meta.appendChild(remoteRolePill);
 
             if (safeObject(entry?.policy).linkType === 'managed_link') {
                 const policyPill = document.createElement('span');
                 policyPill.className = 'nanah-trusted-link__pill';
-                policyPill.textContent = `${getNanahStrategyLabel(safeObject(entry?.policy).applyMode)} rules`;
+                setTabViewLocalizedCopy(policyPill, 'textContent', 'dashboard.sync.copy.strategyRules', '{strategy} rules', {
+                    strategy: localizedStrategyLabel(safeObject(entry?.policy).applyMode)
+                });
                 meta.appendChild(policyPill);
             }
 
             if (entry?.keyRevoked === true || safeObject(entry?.policy).keyRevoked === true) {
                 const revokedPill = document.createElement('span');
                 revokedPill.className = 'nanah-trusted-link__pill';
-                revokedPill.textContent = 'key revoked';
+                setTabViewLocalizedCopy(revokedPill, 'textContent', 'dashboard.sync.copy.keyRevoked', 'key revoked');
                 meta.appendChild(revokedPill);
             }
 
             if (safeObject(entry?.policy).autoApplyControlProposals === true) {
                 const autoPill = document.createElement('span');
                 autoPill.className = 'nanah-trusted-link__pill';
-                autoPill.textContent = 'auto-apply';
+                setTabViewLocalizedCopy(autoPill, 'textContent', 'dashboard.sync.copy.autoApply', 'auto-apply');
                 meta.appendChild(autoPill);
             }
 
@@ -21640,7 +22069,9 @@ document.addEventListener('DOMContentLoaded', async () => {
             if (lastUsed) {
                 const usedPill = document.createElement('span');
                 usedPill.className = 'nanah-trusted-link__pill';
-                usedPill.textContent = `used ${new Date(lastUsed).toLocaleDateString()}`;
+                setTabViewLocalizedCopy(usedPill, 'textContent', 'dashboard.sync.copy.usedOnDate', 'used {date}', {
+                    date: new Date(lastUsed).toLocaleDateString()
+                });
                 meta.appendChild(usedPill);
             }
 
@@ -21661,45 +22092,53 @@ document.addEventListener('DOMContentLoaded', async () => {
             const reconnectBtn = document.createElement('button');
             reconnectBtn.type = 'button';
             reconnectBtn.className = 'btn-secondary';
-            reconnectBtn.textContent = managedReplicaReceiver
-                ? 'Open Receive Session'
+            const reconnectKey = managedReplicaReceiver
+                ? 'dashboard.sync.button.openReceiveSession'
                 : managedSourceSender
-                    ? 'Open Send Session'
-                    : 'Start New Session';
-            reconnectBtn.title = managedReplicaReceiver
-                ? 'Open a live receive session for the saved parent device. This profile still cannot send or change parent policy.'
-                : '';
+                    ? 'dashboard.sync.button.openSendSession'
+                    : 'dashboard.sync.button.startNewSession';
+            const reconnectLabel = managedReplicaReceiver
+                ? 'Open Receive Session'
+                : managedSourceSender ? 'Open Send Session' : 'Start New Session';
+            setTabViewLocalizedCopy(reconnectBtn, 'textContent', reconnectKey, reconnectLabel);
+            if (managedReplicaReceiver) {
+                setTabViewLocalizedCopy(reconnectBtn, 'title', 'dashboard.sync.title.openReceiveSession', 'Open a live receive session for the saved parent device. This profile still cannot send or change parent policy.');
+            }
             reconnectBtn.addEventListener('click', async () => {
                 try {
                     await startNanahTrustedReconnect(entry);
                 } catch (error) {
                     console.error('FilterTube: failed to start trusted reconnect', error);
-                    UIComponents.showToast(error?.message || 'Failed to start a new session', 'error');
+                    UIComponents.showToast(error?.message || tabViewUiText('dashboard.sync.toast.failedToStartNewSession', 'Failed to start a new session'), 'error');
                 }
             });
             actions.appendChild(reconnectBtn);
 
             const reconnectHint = document.createElement('small');
             reconnectHint.className = 'nanah-trusted-link__reconnect-hint';
-            reconnectHint.textContent = managedReplicaReceiver
-                ? 'Receive-only; parent sends changes'
+            const reconnectHintKey = managedReplicaReceiver
+                ? 'dashboard.sync.hint.receiveOnlyParentSends'
                 : managedSourceSender
-                    ? 'Use when both devices are open'
-                : 'Uses saved trust and policy';
+                    ? 'dashboard.sync.hint.bothDevicesOpen'
+                    : 'dashboard.sync.hint.savedTrustPolicy';
+            const reconnectHintFallback = managedReplicaReceiver
+                ? 'Receive-only; parent sends changes'
+                : managedSourceSender ? 'Use when both devices are open' : 'Uses saved trust and policy';
+            setTabViewLocalizedCopy(reconnectHint, 'textContent', reconnectHintKey, reconnectHintFallback);
             actions.appendChild(reconnectHint);
 
             if (managedLink) {
                 const editBtn = document.createElement('button');
                 editBtn.type = 'button';
                 editBtn.className = 'btn-secondary';
-                editBtn.textContent = 'Edit Trust';
+                setTabViewLocalizedCopy(editBtn, 'textContent', 'dashboard.sync.button.editTrust', 'Edit Trust');
                 editBtn.disabled = childManagedReplicaLink;
-                editBtn.title = childManagedReplicaLink
-                    ? 'Protected profiles cannot edit trusted parent policy from this surface.'
-                    : '';
+                if (childManagedReplicaLink) {
+                    setTabViewLocalizedCopy(editBtn, 'title', 'dashboard.sync.title.cannotEditParentPolicy', 'Protected profiles cannot edit trusted parent policy from this surface.');
+                }
                 editBtn.addEventListener('click', async () => {
                     if (childManagedReplicaLink) {
-                        UIComponents.showToast('Protected profiles cannot edit trusted parent link policy here', 'error');
+                        UIComponents.showToast(tabViewUiText('dashboard.sync.toast.protectedCannotEditParentPolicy', 'Protected profiles cannot edit trusted parent link policy here'), 'error');
                         return;
                     }
                     await configureNanahTrustedLink(entry);
@@ -21717,14 +22156,20 @@ document.addEventListener('DOMContentLoaded', async () => {
                 const checkSavedUpdatesBtn = document.createElement('button');
                 checkSavedUpdatesBtn.type = 'button';
                 checkSavedUpdatesBtn.className = 'btn-secondary';
-                checkSavedUpdatesBtn.textContent = savedUpdateReaderReady ? 'Check Saved Updates' : 'Set Up Pickup First';
+                setTabViewLocalizedCopy(checkSavedUpdatesBtn, 'textContent',
+                    savedUpdateReaderReady ? 'dashboard.sync.button.checkSavedUpdates' : 'dashboard.sync.button.setUpPickupFirst',
+                    savedUpdateReaderReady ? 'Check Saved Updates' : 'Set Up Pickup First');
                 checkSavedUpdatesBtn.disabled = !savedUpdateReaderReady;
-                checkSavedUpdatesBtn.title = savedUpdateReaderReady
-                    ? `Checks ${getNanahManagedSavedUpdateReaderLabel()} for newer signed parent updates. Trusted-link validation still decides what can apply.`
-                    : 'Set up Internet Pickup or Home Pickup before this protected device can check for waiting parent updates. Send Update still works when both devices are open.';
+                if (savedUpdateReaderReady) {
+                    setTabViewLocalizedCopy(checkSavedUpdatesBtn, 'title', 'dashboard.sync.title.checkSavedUpdates', 'Checks {pickup} for newer signed parent updates. Trusted-link validation still decides what can apply.', {
+                        pickup: getNanahManagedSavedUpdateReaderLabel()
+                    });
+                } else {
+                    setTabViewLocalizedCopy(checkSavedUpdatesBtn, 'title', 'dashboard.sync.title.setUpPickupBeforeChecking', 'Set up Internet Pickup or Home Pickup before this protected device can check for waiting parent updates. Send Update still works when both devices are open.');
+                }
                 checkSavedUpdatesBtn.addEventListener('click', async () => {
                     if (!hasNanahManagedSavedUpdateReader()) {
-                        UIComponents.showToast('Set up Internet Pickup or Home Pickup before checking waiting parent updates', 'warning');
+                        UIComponents.showToast(tabViewUiText('dashboard.sync.toast.setUpPickupBeforeCheckingUpdates', 'Set up Internet Pickup or Home Pickup before checking waiting parent updates'), 'warning');
                         renderNanahTrustedLinks();
                         return;
                     }
@@ -21735,10 +22180,10 @@ document.addEventListener('DOMContentLoaded', async () => {
                         if (hasNanahManagedLocalNetworkDiscoveryReader()) {
                             await runNanahManagedLocalNetworkSync({ reason: 'manual_saved_update_check' });
                         }
-                        UIComponents.showToast('Checked saved parent updates', 'info');
+                        UIComponents.showToast(tabViewUiText('dashboard.sync.toast.checkedSavedParentUpdates', 'Checked saved parent updates'), 'info');
                     } catch (error) {
                         console.error('FilterTube: saved parent update check failed', error);
-                        UIComponents.showToast(error?.message || 'Saved update check failed', 'error');
+                        UIComponents.showToast(error?.message || tabViewUiText('dashboard.sync.toast.savedUpdateCheckFailed', 'Saved update check failed'), 'error');
                     }
                 });
                 actions.appendChild(checkSavedUpdatesBtn);
@@ -21750,13 +22195,17 @@ document.addEventListener('DOMContentLoaded', async () => {
                 const checkReceiptsBtn = document.createElement('button');
                 checkReceiptsBtn.type = 'button';
                 checkReceiptsBtn.className = 'btn-secondary';
-                checkReceiptsBtn.textContent = ackReaderReady ? 'Check Delivery' : 'Delivery Check Off';
+                setTabViewLocalizedCopy(checkReceiptsBtn, 'textContent',
+                    ackReaderReady ? 'dashboard.sync.button.checkDelivery' : 'dashboard.sync.button.deliveryCheckOff',
+                    ackReaderReady ? 'Check Delivery' : 'Delivery Check Off');
                 checkReceiptsBtn.disabled = sentPolicyCount === 0 || !ackReaderReady;
-                checkReceiptsBtn.title = sentPolicyCount === 0
-                    ? 'Send a protected update before checking whether this device picked it up.'
-                    : (ackReaderReady
-                        ? 'Refresh whether this protected device reported accepting or rejecting saved parent updates.'
-                        : 'Set up Internet Pickup or Home Pickup receipt support before checking later-delivery receipts.');
+                if (sentPolicyCount === 0) {
+                    setTabViewLocalizedCopy(checkReceiptsBtn, 'title', 'dashboard.sync.title.sendUpdateBeforeCheckingDelivery', 'Send a protected update before checking whether this device picked it up.');
+                } else if (ackReaderReady) {
+                    setTabViewLocalizedCopy(checkReceiptsBtn, 'title', 'dashboard.sync.title.refreshDeliveryReceipts', 'Refresh whether this protected device reported accepting or rejecting saved parent updates.');
+                } else {
+                    setTabViewLocalizedCopy(checkReceiptsBtn, 'title', 'dashboard.sync.title.setUpPickupReceiptSupport', 'Set up Internet Pickup or Home Pickup receipt support before checking later-delivery receipts.');
+                }
                 checkReceiptsBtn.addEventListener('click', async () => {
                     if (checkReceiptsBtn.disabled) return;
                     checkReceiptsBtn.disabled = true;
@@ -21764,10 +22213,10 @@ document.addEventListener('DOMContentLoaded', async () => {
                         await runNanahManagedSourceAckSync({ reason: 'manual_parent_receipt_check' });
                         renderNanahDeliveryPathStrip();
                         renderNanahTrustedLinks();
-                        UIComponents.showToast('Checked protected-device receipts', 'info');
+                        UIComponents.showToast(tabViewUiText('dashboard.sync.toast.checkedProtectedDeviceReceipts', 'Checked protected-device receipts'), 'info');
                     } catch (error) {
                         console.error('FilterTube: protected-device receipt check failed', error);
-                        UIComponents.showToast(error?.message || 'Receipt check failed', 'error');
+                        UIComponents.showToast(error?.message || tabViewUiText('dashboard.sync.toast.receiptCheckFailed', 'Receipt check failed'), 'error');
                     }
                 });
                 actions.appendChild(checkReceiptsBtn);
@@ -21782,19 +22231,19 @@ document.addEventListener('DOMContentLoaded', async () => {
                 const rotateKeyBtn = document.createElement('button');
                 rotateKeyBtn.type = 'button';
                 rotateKeyBtn.className = 'btn-secondary';
-                rotateKeyBtn.textContent = 'Reset Trust Key';
-                rotateKeyBtn.title = 'Regenerate this parent device signing key and require managed child devices to pair again.';
+                setTabViewLocalizedCopy(rotateKeyBtn, 'textContent', 'dashboard.sync.button.resetTrustKey', 'Reset Trust Key');
+                setTabViewLocalizedCopy(rotateKeyBtn, 'title', 'dashboard.sync.title.resetTrustKey', 'Regenerate this parent device signing key and require managed child devices to pair again.');
                 rotateKeyBtn.disabled = childAdminRestricted;
                 rotateKeyBtn.addEventListener('click', async () => {
                     if (childAdminRestricted) {
-                        UIComponents.showToast('Protected profiles cannot rotate managed trust keys', 'error');
+                        UIComponents.showToast(tabViewUiText('dashboard.sync.toast.protectedCannotRotateTrustKey', 'Protected profiles cannot rotate managed trust keys'), 'error');
                         return;
                     }
                     try {
                         await rotateNanahManagedSourceSigningKey();
                     } catch (error) {
                         console.error('FilterTube: managed signing key rotation failed', error);
-                        UIComponents.showToast(error?.message || 'Managed signing key rotation failed', 'error');
+                        UIComponents.showToast(error?.message || tabViewUiText('dashboard.sync.toast.managedSigningKeyRotationFailed', 'Managed signing key rotation failed'), 'error');
                     }
                 });
                 actions.appendChild(rotateKeyBtn);
@@ -21803,18 +22252,18 @@ document.addEventListener('DOMContentLoaded', async () => {
             const removeBtn = document.createElement('button');
             removeBtn.type = 'button';
             removeBtn.className = 'btn-secondary';
-            removeBtn.textContent = 'Remove';
+            setTabViewLocalizedCopy(removeBtn, 'textContent', 'dashboard.sync.button.remove', 'Remove');
             removeBtn.disabled = childManagedReplicaLink;
-            removeBtn.title = childManagedReplicaLink
-                ? 'Protected profiles cannot remove a trusted parent link from this surface.'
-                : '';
+            if (childManagedReplicaLink) {
+                setTabViewLocalizedCopy(removeBtn, 'title', 'dashboard.sync.title.cannotRemoveParentLink', 'Protected profiles cannot remove a trusted parent link from this surface.');
+            }
             removeBtn.addEventListener('click', async () => {
                 if (childManagedReplicaLink) {
-                    UIComponents.showToast('Protected profiles cannot remove trusted parent links here', 'error');
+                    UIComponents.showToast(tabViewUiText('dashboard.sync.toast.protectedCannotRemoveParentLink', 'Protected profiles cannot remove trusted parent links here'), 'error');
                     return;
                 }
                 await removeNanahTrustedLink(entry?.linkId);
-                UIComponents.showToast('Trusted device removed', 'success');
+                UIComponents.showToast(tabViewUiText('dashboard.sync.toast.trustedDeviceRemoved', 'Trusted device removed'), 'success');
             });
             actions.appendChild(removeBtn);
 
@@ -21828,32 +22277,37 @@ document.addEventListener('DOMContentLoaded', async () => {
                 const overviewStatus = document.createElement('div');
                 overviewStatus.className = 'nanah-trusted-link__overview-status';
                 const overviewStatusLabel = document.createElement('span');
-                overviewStatusLabel.textContent = 'Control';
+                setTabViewLocalizedCopy(overviewStatusLabel, 'textContent', 'dashboard.sync.label.control', 'Control');
                 const overviewStatusValue = document.createElement('strong');
-                overviewStatusValue.textContent = getNanahTrustedLinkDirectionSummary(entry);
+                overviewStatusValue.textContent = localizedLinkDirection(entry);
                 overviewStatus.append(overviewStatusLabel, overviewStatusValue);
 
                 const overviewDetails = document.createElement('div');
                 overviewDetails.className = 'nanah-trusted-link__overview-details';
                 [
                     {
+                        labelKey: 'dashboard.sync.label.updates',
                         label: 'Updates',
-                        value: `${getNanahScopeLabel(policy.defaultScope)} · ${getNanahStrategyLabel(policy.applyMode)}`
+                        value: `${localizedScopeLabel(policy.defaultScope)} · ${localizedStrategyLabel(policy.applyMode)}`
                     },
                     {
+                        labelKey: 'dashboard.sync.label.nextStep',
                         label: 'Next step',
                         value: normalizeString(entry?.localRole) === 'replica' && normalizeString(entry?.remoteRole) === 'source'
                             ? formatNanahProtectedUpdateCheckStatus(entry)
-                            : getNanahReconnectModeLabel(policy.reconnectMode)
+                            : localizedReconnectModeLabel(policy.reconnectMode)
                     },
                     {
+                        labelKey: 'dashboard.sync.label.trust',
                         label: 'Trust',
-                        value: policy.autoApplyControlProposals === true ? 'Matching parent updates allowed' : 'Ask before applying'
+                        value: policy.autoApplyControlProposals === true
+                            ? tabViewUiText('dashboard.sync.value.matchingParentUpdatesAllowed', 'Matching parent updates allowed')
+                            : tabViewUiText('dashboard.sync.value.askBeforeApplying', 'Ask before applying')
                     }
                 ].forEach((item) => {
                     const detail = document.createElement('span');
                     const label = document.createElement('small');
-                    label.textContent = item.label;
+                    setTabViewLocalizedCopy(label, 'textContent', item.labelKey, item.label);
                     const value = document.createElement('b');
                     value.textContent = item.value;
                     detail.append(label, value);
@@ -21877,59 +22331,62 @@ document.addEventListener('DOMContentLoaded', async () => {
 
                 const roleRow = document.createElement('div');
                 roleRow.className = 'nanah-trusted-link__policy-row';
-                roleRow.innerHTML = `<span>Control</span><strong>${getNanahTrustedLinkDirectionSummary(entry)}</strong>`;
+                roleRow.innerHTML = `<span>${tabViewUiText('dashboard.sync.label.control', 'Control')}</span><strong>${localizedLinkDirection(entry)}</strong>`;
                 policyRows.appendChild(roleRow);
 
                 const allowedRow = document.createElement('div');
                 allowedRow.className = 'nanah-trusted-link__policy-row';
-                allowedRow.innerHTML = `<span>Allowed areas</span><strong>${describeNanahScopeList(safeObject(entry?.policy).allowedScopes)}</strong>`;
+                const allowedScopeText = getNanahManagedSendScopeList(safeObject(entry?.policy).allowedScopes).map(localizedScopeLabel).join(', ');
+                allowedRow.innerHTML = `<span>${tabViewUiText('dashboard.sync.label.allowedAreas', 'Allowed areas')}</span><strong>${allowedScopeText}</strong>`;
                 policyRows.appendChild(allowedRow);
 
                 const defaultRow = document.createElement('div');
                 defaultRow.className = 'nanah-trusted-link__policy-row';
-                defaultRow.innerHTML = `<span>Usual area</span><strong>${getNanahScopeLabel(safeObject(entry?.policy).defaultScope)}</strong>`;
+                defaultRow.innerHTML = `<span>${tabViewUiText('dashboard.sync.label.usualArea', 'Usual area')}</span><strong>${localizedScopeLabel(safeObject(entry?.policy).defaultScope)}</strong>`;
                 policyRows.appendChild(defaultRow);
 
                 const applyRow = document.createElement('div');
                 applyRow.className = 'nanah-trusted-link__policy-row';
-                applyRow.innerHTML = `<span>Update behavior</span><strong>${getNanahStrategyLabel(safeObject(entry?.policy).applyMode)}</strong>`;
+                applyRow.innerHTML = `<span>${tabViewUiText('dashboard.sync.label.updateBehavior', 'Update behavior')}</span><strong>${localizedStrategyLabel(safeObject(entry?.policy).applyMode)}</strong>`;
                 policyRows.appendChild(applyRow);
 
                 const autoRow = document.createElement('div');
                 autoRow.className = 'nanah-trusted-link__policy-row';
-                autoRow.innerHTML = `<span>Matching parent updates</span><strong>${safeObject(entry?.policy).autoApplyControlProposals === true ? 'Allowed' : 'Ask first'}</strong>`;
+                autoRow.innerHTML = `<span>${tabViewUiText('dashboard.sync.label.matchingParentUpdates', 'Matching parent updates')}</span><strong>${safeObject(entry?.policy).autoApplyControlProposals === true ? tabViewUiText('dashboard.sync.value.allowed', 'Allowed') : tabViewUiText('dashboard.sync.value.askFirst', 'Ask first')}</strong>`;
                 policyRows.appendChild(autoRow);
 
                 const reconnectRow = document.createElement('div');
                 reconnectRow.className = 'nanah-trusted-link__policy-row';
-                reconnectRow.innerHTML = `<span>Next connection</span><strong>${getNanahReconnectModeLabel(safeObject(entry?.policy).reconnectMode)}</strong>`;
+                reconnectRow.innerHTML = `<span>${tabViewUiText('dashboard.sync.label.nextConnection', 'Next connection')}</span><strong>${localizedReconnectModeLabel(safeObject(entry?.policy).reconnectMode)}</strong>`;
                 policyRows.appendChild(reconnectRow);
 
                 if (entry?.localRole === 'replica' && entry?.remoteRole === 'source') {
                     const childProtectionRow = document.createElement('div');
                     childProtectionRow.className = 'nanah-trusted-link__policy-row';
-                    childProtectionRow.innerHTML = `<span>Everyday protection</span><strong>${getNanahChildProtectionLevelLabel(safeObject(entry?.policy).childProtectionLevel)}</strong>`;
+                    childProtectionRow.innerHTML = `<span>${tabViewUiText('dashboard.sync.label.everydayProtection', 'Everyday protection')}</span><strong>${safeObject(entry?.policy).childProtectionLevel === 'strict' ? tabViewUiText('dashboard.sync.childProtection.reviewHere', 'Review here') : tabViewUiText('dashboard.sync.childProtection.parentManaged', 'Parent managed')}</strong>`;
                     policyRows.appendChild(childProtectionRow);
 
                     const targetProfileBehavior = getNanahTargetProfileBehavior(safeObject(entry?.policy).targetProfileBehavior, 'current_active');
                     const targetProfileLabel = targetProfileBehavior === 'fixed_profile'
-                        ? `Fixed: ${normalizeString(safeObject(entry?.policy).targetProfileName) || normalizeString(safeObject(entry?.policy).targetProfileId) || 'Saved profile'}`
-                        : 'Current active profile';
+                        ? tabViewUiText('dashboard.sync.value.fixedProfile', 'Fixed: {profile}', {
+                            profile: normalizeString(safeObject(entry?.policy).targetProfileName) || normalizeString(safeObject(entry?.policy).targetProfileId) || tabViewUiText('dashboard.sync.value.savedProfile', 'Saved profile')
+                        })
+                        : tabViewUiText('dashboard.sync.value.currentActiveProfile', 'Current active profile');
                     const targetRow = document.createElement('div');
                     targetRow.className = 'nanah-trusted-link__policy-row';
-                    targetRow.innerHTML = `<span>Where updates land</span><strong>${targetProfileLabel}</strong>`;
+                    targetRow.innerHTML = `<span>${tabViewUiText('dashboard.sync.label.whereUpdatesLand', 'Where updates land')}</span><strong>${targetProfileLabel}</strong>`;
                     policyRows.appendChild(targetRow);
 
                     const lockedChildRow = document.createElement('div');
                     lockedChildRow.className = 'nanah-trusted-link__policy-row';
-                    lockedChildRow.innerHTML = `<span>While locked</span><strong>${getNanahLockedChildModeLabel(safeObject(entry?.policy).lockedChildMode)}</strong>`;
+                    lockedChildRow.innerHTML = `<span>${tabViewUiText('dashboard.sync.label.whileLocked', 'While locked')}</span><strong>${safeObject(entry?.policy).lockedChildMode === 'allow_trusted_updates' || safeObject(entry?.policy).lockedChildMode === 'allow_locked_updates' ? tabViewUiText('dashboard.sync.lockedMode.parentUpdatesCanApply', 'Parent updates can apply') : tabViewUiText('dashboard.sync.lockedMode.askOnDeviceFirst', 'Ask on this device first')}</strong>`;
                     policyRows.appendChild(lockedChildRow);
 
                     const updateCheckRow = document.createElement('div');
                     updateCheckRow.className = 'nanah-trusted-link__policy-row';
-                    updateCheckRow.title = 'When enabled, this protected profile checks for newer signed parent updates as it opens.';
+                    setTabViewLocalizedCopy(updateCheckRow, 'title', 'dashboard.sync.title.automaticSavedUpdates', 'When enabled, this protected profile checks for newer signed parent updates as it opens.');
                     const updateCheckLabel = document.createElement('span');
-                    updateCheckLabel.textContent = 'Automatic saved updates';
+                    setTabViewLocalizedCopy(updateCheckLabel, 'textContent', 'dashboard.sync.label.automaticSavedUpdates', 'Automatic saved updates');
                     const updateCheckValue = document.createElement('strong');
                     updateCheckValue.textContent = formatNanahProtectedUpdateCheckStatus(entry);
                     updateCheckRow.appendChild(updateCheckLabel);
@@ -21940,9 +22397,9 @@ document.addEventListener('DOMContentLoaded', async () => {
                 if (entry?.localRole === 'source' && entry?.remoteRole === 'replica') {
                     const deliveryAckRow = document.createElement('div');
                     deliveryAckRow.className = 'nanah-trusted-link__policy-row';
-                    deliveryAckRow.title = 'Delivery receipts show whether a protected device reported back after receiving a saved parent update.';
+                    setTabViewLocalizedCopy(deliveryAckRow, 'title', 'dashboard.sync.title.deliveryReceipts', 'Delivery receipts show whether a protected device reported back after receiving a saved parent update.');
                     const deliveryAckLabel = document.createElement('span');
-                    deliveryAckLabel.textContent = 'Delivery receipts';
+                    setTabViewLocalizedCopy(deliveryAckLabel, 'textContent', 'dashboard.sync.label.deliveryReceipts', 'Delivery receipts');
                     const deliveryAckValue = document.createElement('strong');
                     deliveryAckValue.textContent = formatNanahManagedSourceAckSyncStatus(entry);
                     deliveryAckRow.appendChild(deliveryAckLabel);
@@ -21954,9 +22411,20 @@ document.addEventListener('DOMContentLoaded', async () => {
 
                 const note = document.createElement('div');
                 note.className = 'nanah-trusted-link__note';
-                note.textContent = `This saved parent link usually updates ${getNanahScopeLabel(safeObject(entry?.policy).defaultScope)} and will ${getNanahStrategyLabel(safeObject(entry?.policy).applyMode).toLowerCase()} matching allowed areas. ${entry?.localRole === 'replica' && entry?.remoteRole === 'source'
-                    ? `Updates land by ${getNanahTargetProfileBehaviorLabel(safeObject(entry?.policy).targetProfileBehavior).toLowerCase()}, the next connection is ${getNanahReconnectModeLabel(safeObject(entry?.policy).reconnectMode).toLowerCase()}, and locked behavior is ${getNanahLockedChildModeLabel(safeObject(entry?.policy).lockedChildMode).toLowerCase()}.`
-                    : `The next connection is ${getNanahReconnectModeLabel(safeObject(entry?.policy).reconnectMode).toLowerCase()}.`}`;
+                const noteValues = {
+                    scope: localizedScopeLabel(safeObject(entry?.policy).defaultScope),
+                    strategy: localizedStrategyLabel(safeObject(entry?.policy).applyMode).toLowerCase(),
+                    targetBehavior: getNanahTargetProfileBehavior(safeObject(entry?.policy).targetProfileBehavior) === 'fixed_profile'
+                        ? tabViewUiText('dashboard.sync.targetBehavior.fixed', 'always this local profile')
+                        : tabViewUiText('dashboard.sync.targetBehavior.currentActive', 'current active profile'),
+                    reconnect: localizedReconnectModeLabel(safeObject(entry?.policy).reconnectMode).toLowerCase(),
+                    lockedBehavior: safeObject(entry?.policy).lockedChildMode === 'allow_trusted_updates' || safeObject(entry?.policy).lockedChildMode === 'allow_locked_updates'
+                        ? tabViewUiText('dashboard.sync.lockedMode.parentUpdatesCanApply', 'parent updates can apply').toLowerCase()
+                        : tabViewUiText('dashboard.sync.lockedMode.askOnDeviceFirst', 'ask on this device first').toLowerCase()
+                };
+                note.textContent = entry?.localRole === 'replica' && entry?.remoteRole === 'source'
+                    ? tabViewUiText('dashboard.sync.note.managedReceiver', 'This saved parent link usually updates {scope} and will {strategy} matching allowed areas. Updates land by {targetBehavior}, the next connection is {reconnect}, and locked behavior is {lockedBehavior}.', noteValues)
+                    : tabViewUiText('dashboard.sync.note.managedSender', 'This saved parent link usually updates {scope} and will {strategy} matching allowed areas. The next connection is {reconnect}.', noteValues);
                 card.appendChild(note);
             }
 
@@ -22223,47 +22691,64 @@ document.addEventListener('DOMContentLoaded', async () => {
         }
         if (ftNanahGranularSurfaceHint) {
             const surfaceLabel = ftNanahGranularSurface?.value === 'kids' ? 'YouTube Kids' : 'YouTube Main';
-            ftNanahGranularSurfaceHint.textContent = `${getNanahScopeLabel(scope)} sends will use ${surfaceLabel} rules from this local profile.`;
+            setTabViewLocalizedCopy(ftNanahGranularSurfaceHint, 'textContent', 'dashboard.sync.hint.granularSurfaceSource', '{scope} sends will use {surface} rules from this local profile.', {
+                scope: getNanahScopeLabel(scope),
+                surface: surfaceLabel
+            });
         }
 
         if (ftNanahStrategyLabel) {
-            ftNanahStrategyLabel.textContent = (trustedManaged && linkType === 'managed_link' && localRole === 'source' && !childReplicaOnly)
-                ? 'Saved parent policy'
-                : (childReceiveOnly ? 'Receive policy' : 'Suggested action');
+            setTabViewLocalizedCopy(ftNanahStrategyLabel, 'textContent',
+                trustedManaged && linkType === 'managed_link' && localRole === 'source' && !childReplicaOnly
+                    ? 'dashboard.sync.label.savedParentPolicy'
+                    : childReceiveOnly ? 'dashboard.sync.label.receivePolicy' : 'dashboard.sync.label.suggestedAction',
+                trustedManaged && linkType === 'managed_link' && localRole === 'source' && !childReplicaOnly
+                    ? 'Saved parent policy'
+                    : childReceiveOnly ? 'Receive policy' : 'Suggested action');
         }
         if (ftNanahStrategyHint) {
             if (childReceiveOnly) {
-                ftNanahStrategyHint.textContent = 'Protected profiles stay receive-only here. Parent devices choose what to send, and this profile reviews or receives the allowed update.';
+                setTabViewLocalizedCopy(ftNanahStrategyHint, 'textContent', 'dashboard.sync.hint.protectedReceiveOnly', 'Protected profiles stay receive-only here. Parent devices choose what to send, and this profile reviews or receives the allowed update.');
             } else if (childReplicaOnly) {
-                ftNanahStrategyHint.textContent = 'This protected profile is still locked, so it can only receive updates here. Unlock it locally if you need to send from it.';
+                setTabViewLocalizedCopy(ftNanahStrategyHint, 'textContent', 'dashboard.sync.hint.lockedProtectedReceiveOnly', 'This protected profile is still locked, so it can only receive updates here. Unlock it locally if you need to send from it.');
             } else if (trustedManaged && linkType === 'managed_link' && localRole === 'source') {
-                ftNanahStrategyHint.textContent = 'Trusted protected devices follow this saved merge or replace behavior for allowed areas.';
+                setTabViewLocalizedCopy(ftNanahStrategyHint, 'textContent', 'dashboard.sync.hint.trustedPolicyBehavior', 'Trusted protected devices follow this saved merge or replace behavior for allowed areas.');
             } else if (linkType === 'managed_link') {
-                ftNanahStrategyHint.textContent = 'Until parent trust is saved, the receiving device still chooses merge or replace.';
+                setTabViewLocalizedCopy(ftNanahStrategyHint, 'textContent', 'dashboard.sync.hint.receiverChoosesStrategy', 'Until parent trust is saved, the receiving device still chooses merge or replace.');
             } else {
-                ftNanahStrategyHint.textContent = 'One-time device copies let the receiver choose merge or replace.';
+                setTabViewLocalizedCopy(ftNanahStrategyHint, 'textContent', 'dashboard.sync.hint.oneTimeCopyStrategy', 'One-time device copies let the receiver choose merge or replace.');
             }
         }
         if (ftNanahTrustBtn) {
-            ftNanahTrustBtn.textContent = childReceiveOnly
-                ? 'Parent Managed'
-                : ((childReplicaOnly || linkType === 'managed_link') ? 'Save Parent Trust' : 'Trust Connected Device');
+            setTabViewLocalizedCopy(ftNanahTrustBtn, 'textContent',
+                childReceiveOnly ? 'dashboard.sync.button.parentManaged'
+                    : ((childReplicaOnly || linkType === 'managed_link') ? 'dashboard.sync.button.saveParentTrust' : 'dashboard.sync.button.trustConnectedDevice'),
+                childReceiveOnly ? 'Parent Managed'
+                    : ((childReplicaOnly || linkType === 'managed_link') ? 'Save Parent Trust' : 'Trust Connected Device'));
         }
         if (ftNanahScope) {
             ftNanahScope.disabled = childReceiveOnly || childReplicaOnly || !!nanahClient;
-            ftNanahScope.title = childReceiveOnly
+            const scopeTitle = childReceiveOnly
                 ? 'Protected profiles receive updates here; they do not choose an outgoing send scope.'
-                : (childReplicaOnly
+                : childReplicaOnly
                     ? 'This protected profile is locked, so scope sending is unavailable until you unlock it locally.'
-                    : (nanahClient ? 'Scope is locked for the current Nanah session.' : ''));
+                    : nanahClient ? 'Scope is locked for the current Nanah session.' : '';
+            if (scopeTitle) setTabViewLocalizedCopy(ftNanahScope, 'title',
+                childReceiveOnly ? 'dashboard.sync.title.scopeReceiveOnly'
+                    : childReplicaOnly ? 'dashboard.sync.title.scopeLockedProfile' : 'dashboard.sync.title.scopeLockedSession', scopeTitle);
+            else ftNanahScope.title = '';
         }
         if (ftNanahStrategy) {
             ftNanahStrategy.disabled = childReceiveOnly || childReplicaOnly || !!nanahClient;
-            ftNanahStrategy.title = childReceiveOnly
+            const strategyTitle = childReceiveOnly
                 ? 'Protected profiles receive parent updates here; trust policy stays parent-managed.'
-                : (childReplicaOnly
+                : childReplicaOnly
                     ? 'This protected profile is locked, so outgoing merge/replace behavior stays unavailable until you unlock it locally.'
-                    : (nanahClient ? 'Suggested action is locked for the current Nanah session.' : ''));
+                    : nanahClient ? 'Suggested action is locked for the current Nanah session.' : '';
+            if (strategyTitle) setTabViewLocalizedCopy(ftNanahStrategy, 'title',
+                childReceiveOnly ? 'dashboard.sync.title.strategyReceiveOnly'
+                    : childReplicaOnly ? 'dashboard.sync.title.strategyLockedProfile' : 'dashboard.sync.title.strategyLockedSession', strategyTitle);
+            else ftNanahStrategy.title = '';
         }
         if (ftNanahRemoteTarget) {
             const canTargetRemoteProfiles = !childReceiveOnly
@@ -22274,20 +22759,22 @@ document.addEventListener('DOMContentLoaded', async () => {
                 && normalizeString(nanahSessionState.remoteRole) === 'replica'
                 && normalizeNanahProfileInventory(nanahSessionState.remoteProfileInventory).length > 0;
             ftNanahRemoteTarget.disabled = !canTargetRemoteProfiles;
-            ftNanahRemoteTarget.title = canTargetRemoteProfiles
-                ? ''
-                : 'Connect to the protected device first to choose a specific remote profile.';
+            if (canTargetRemoteProfiles) ftNanahRemoteTarget.title = '';
+            else setTabViewLocalizedCopy(ftNanahRemoteTarget, 'title', 'dashboard.sync.title.connectBeforeChoosingRemoteProfile', 'Connect to the protected device first to choose a specific remote profile.');
         }
         if (ftNanahRemoteTargetHint) {
             const selectedTarget = getNanahSelectedRemoteTargetProfile();
             if (getNanahUiMode() === 'send_once') {
-                ftNanahRemoteTargetHint.textContent = 'The copy follows the profile currently open on your other device.';
+                setTabViewLocalizedCopy(ftNanahRemoteTargetHint, 'textContent', 'dashboard.sync.hint.copyFollowsOpenProfile', 'The copy follows the profile currently open on your other device.');
             } else if (selectedTarget) {
-                ftNanahRemoteTargetHint.textContent = `This session will target ${selectedTarget.profileName} on ${getNanahRemoteLabel()} instead of following whichever profile is open there.`;
+                setTabViewLocalizedCopy(ftNanahRemoteTargetHint, 'textContent', 'dashboard.sync.hint.sessionTargetsNamedProfile', 'This session will target {profile} on {device} instead of following whichever profile is open there.', {
+                    profile: selectedTarget.profileName,
+                    device: getNanahRemoteLabel()
+                });
             } else if (getNanahRole() === 'source' && normalizeString(nanahSessionState.remoteRole) === 'replica') {
-                ftNanahRemoteTargetHint.textContent = 'No protected profile is selected yet, so updates will follow the profile currently open on the other device unless you choose one here.';
+                setTabViewLocalizedCopy(ftNanahRemoteTargetHint, 'textContent', 'dashboard.sync.hint.noRemoteProfileSelected', 'No protected profile is selected yet, so updates will follow the profile currently open on the other device unless you choose one here.');
             } else {
-                ftNanahRemoteTargetHint.textContent = 'After pairing, choose the protected profile on the other device that should receive this update.';
+                setTabViewLocalizedCopy(ftNanahRemoteTargetHint, 'textContent', 'dashboard.sync.hint.chooseRemoteProfileAfterPairing', 'After pairing, choose the protected profile on the other device that should receive this update.');
             }
         }
         syncNanahManagedTargetOptions(scope);
@@ -22312,15 +22799,15 @@ document.addEventListener('DOMContentLoaded', async () => {
         }
         if (ftNanahStatusSignal) {
             if (!nanahClient) {
-                ftNanahStatusSignal.textContent = nanahLastSessionNotice ? 'Retry available' : 'Secure handshake';
+                setTabViewLocalizedCopy(ftNanahStatusSignal, 'textContent', nanahLastSessionNotice ? 'dashboard.sync.status.retryAvailable' : 'dashboard.sync.status.secureHandshake', nanahLastSessionNotice ? 'Retry available' : 'Secure handshake');
             } else if (nanahSessionState.connected && nanahSessionState.sasConfirmed) {
-                ftNanahStatusSignal.textContent = getNanahCurrentTrustedLink() ? 'Trusted device' : 'Verified session';
+                setTabViewLocalizedCopy(ftNanahStatusSignal, 'textContent', getNanahCurrentTrustedLink() ? 'dashboard.sync.status.trustedDevice' : 'dashboard.sync.status.verifiedSession', getNanahCurrentTrustedLink() ? 'Trusted device' : 'Verified session');
             } else if (normalizeString(nanahSessionState.sasPhrase)) {
-                ftNanahStatusSignal.textContent = 'Match phrase';
+                setTabViewLocalizedCopy(ftNanahStatusSignal, 'textContent', 'dashboard.sync.status.matchPhrase', 'Match phrase');
             } else if (normalizeString(nanahSessionState.code)) {
-                ftNanahStatusSignal.textContent = 'Pairing code';
+                setTabViewLocalizedCopy(ftNanahStatusSignal, 'textContent', 'dashboard.sync.status.pairingCode', 'Pairing code');
             } else {
-                ftNanahStatusSignal.textContent = 'Secure handshake';
+                setTabViewLocalizedCopy(ftNanahStatusSignal, 'textContent', 'dashboard.sync.status.secureHandshake', 'Secure handshake');
             }
         }
         if (ftNanahStage) {
@@ -22335,12 +22822,12 @@ document.addEventListener('DOMContentLoaded', async () => {
         if (ftNanahRemoteLabel) {
             ftNanahRemoteLabel.textContent = nanahSessionState.connected
                 ? formatNanahEndpointContext(nanahSessionState.remoteProfile, getNanahRemoteLabel())
-                : 'Not connected';
+                : tabViewUiText('dashboard.sync.status.notConnected', 'Not connected');
         }
         if (ftNanahRemoteProfile) {
             ftNanahRemoteProfile.textContent = nanahSessionState.connected && nanahSessionState.remoteProfile
                 ? formatNanahProfileContext(nanahSessionState.remoteProfile)
-                : 'Unknown';
+                : tabViewUiText('dashboard.sync.status.unknown', 'Unknown');
         }
         if (ftNanahPairCodeRow) {
             ftNanahPairCodeRow.hidden = !normalizeString(nanahSessionState.code);
@@ -22349,7 +22836,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             ftNanahPairCode.textContent = normalizeNanahCode(nanahSessionState.code) || '----';
         }
         if (ftNanahSasPhrase) {
-            ftNanahSasPhrase.textContent = normalizeString(nanahSessionState.sasPhrase) || 'Waiting';
+            ftNanahSasPhrase.textContent = normalizeString(nanahSessionState.sasPhrase) || tabViewUiText('dashboard.sync.status.waiting', 'Waiting');
         }
         if (ftNanahPairUri) {
             ftNanahPairUri.value = normalizeString(nanahSessionState.pairUri);
@@ -22362,9 +22849,8 @@ document.addEventListener('DOMContentLoaded', async () => {
         }
         if (ftNanahDeviceLabel) {
             ftNanahDeviceLabel.disabled = !!nanahClient;
-            ftNanahDeviceLabel.title = nanahClient
-                ? 'Device label is locked for the current Nanah session. End the session to change it.'
-                : '';
+            if (nanahClient) setTabViewLocalizedCopy(ftNanahDeviceLabel, 'title', 'dashboard.sync.title.deviceLabelLocked', 'Device label is locked for the current Nanah session. End the session to change it.');
+            else ftNanahDeviceLabel.title = '';
         }
         if (ftNanahRole) {
             const childReceiveOnly = isNanahChildReceiveOnly();
@@ -22373,13 +22859,17 @@ document.addEventListener('DOMContentLoaded', async () => {
                 ftNanahRole.value = 'replica';
             }
             ftNanahRole.disabled = !!nanahClient || childReceiveOnly || childReplicaOnly;
-            ftNanahRole.title = childReceiveOnly
+            const roleTitle = childReceiveOnly
                 ? 'Protected profiles stay receive-only in Nanah.'
                 : (childReplicaOnly
                     ? 'This protected profile is locked, so it is receive-only in Nanah until you unlock it locally.'
                     : (nanahClient
                         ? 'Relationship is locked for the current Nanah session. End the session to change it.'
                         : ''));
+            if (roleTitle) setTabViewLocalizedCopy(ftNanahRole, 'title', childReceiveOnly
+                ? 'dashboard.sync.title.roleReceiveOnly'
+                : childReplicaOnly ? 'dashboard.sync.title.roleLockedProfile' : 'dashboard.sync.title.relationshipLockedSession', roleTitle);
+            else ftNanahRole.title = '';
         }
         if (ftNanahSendBtn) {
             ftNanahSendBtn.disabled = isNanahChildReceiveOnly() || !(nanahSessionState.connected && nanahSessionState.sasConfirmed && nanahClient);
@@ -22394,31 +22884,31 @@ document.addEventListener('DOMContentLoaded', async () => {
             if (!nanahClient && nanahLastSessionNotice) {
                 ftNanahStatusHint.textContent = nanahLastSessionNotice.message;
             } else if (!nanahClient) {
-                ftNanahStatusHint.textContent = 'Create a pairing code on one device, then join from the other device using the same 4-character code.';
+                setTabViewLocalizedCopy(ftNanahStatusHint, 'textContent', 'dashboard.sync.hint.createOrJoinPairingCode', 'Create a pairing code on one device, then join from the other device using the same 4-character code.');
             } else if (!nanahSessionState.sasConfirmed && normalizeString(nanahSessionState.sasPhrase)) {
-                ftNanahStatusHint.textContent = 'Compare the safety phrase on both devices and confirm only if they match exactly.';
+                setTabViewLocalizedCopy(ftNanahStatusHint, 'textContent', 'dashboard.sync.hint.compareSafetyPhrase', 'Compare the safety phrase on both devices and confirm only if they match exactly.');
             } else if (nanahSessionState.connected) {
                 const trusted = getNanahCurrentTrustedLink();
                 const trustedPolicy = safeObject(trusted?.policy);
                 ftNanahStatusHint.textContent = isNanahChildReplicaOnly()
                     ? (trusted
-                        ? 'Protected profile connected as a receiver. Saved parent links can keep this device aligned without turning the protected profile into a sender.'
+                        ? tabViewUiText('dashboard.sync.hint.protectedReceiverConnectedTrusted', 'Protected profile connected as a receiver. Saved parent links can keep this device aligned without turning the protected profile into a sender.')
                         : (nanahSessionState.sasConfirmed
-                            ? 'Verified for this session as a protected receiver. This profile can receive approved parent updates, but it cannot save parent policy from here.'
-                            : 'Locked protected profile connected. This device stays receive-only until the local protected profile is unlocked.'))
+                            ? tabViewUiText('dashboard.sync.hint.protectedReceiverSessionVerified', 'Verified for this session as a protected receiver. This profile can receive approved parent updates, but it cannot save parent policy from here.')
+                            : tabViewUiText('dashboard.sync.hint.lockedProtectedReceiverConnected', 'Locked protected profile connected. This device stays receive-only until the local protected profile is unlocked.')))
                     : trusted
                     ? (trustedPolicy.linkType === 'managed_link'
-                        ? 'Parent trust connected. Protected-device updates now follow the saved trusted behavior for allowed areas.'
-                        : 'Trusted peer connected. New proposals still stay reviewable on the receiving device.')
+                        ? tabViewUiText('dashboard.sync.hint.parentTrustConnected', 'Parent trust connected. Protected-device updates now follow the saved trusted behavior for allowed areas.')
+                        : tabViewUiText('dashboard.sync.hint.trustedPeerConnected', 'Trusted peer connected. New proposals still stay reviewable on the receiving device.'))
                     : nanahSessionState.sasConfirmed
                     ? (classifyNanahTrustedLink(getNanahRole(), normalizeString(nanahSessionState.remoteRole) || 'peer') === 'managed_link'
-                        ? 'Verified for this session. Send the reviewed update now, or save parent trust only if this protected device should keep receiving approved updates.'
-                        : 'Verified for this session. You can send settings now or save this device as trusted.')
+                        ? tabViewUiText('dashboard.sync.hint.sessionVerifiedManaged', 'Verified for this session. Send the reviewed update now, or save parent trust only if this protected device should keep receiving approved updates.')
+                        : tabViewUiText('dashboard.sync.hint.sessionVerifiedPeer', 'Verified for this session. You can send settings now or save this device as trusted.'))
                     : (classifyNanahTrustedLink(getNanahRole(), normalizeString(nanahSessionState.remoteRole) || 'peer') === 'managed_link'
-                        ? 'Connected as a parent-to-protected-device pair. Match the safety phrase before sending or saving trust.'
-                        : 'Connected. Match the safety phrase before sending settings or saving trust.');
+                        ? tabViewUiText('dashboard.sync.hint.connectedManagedNeedsPhrase', 'Connected as a parent-to-protected-device pair. Match the safety phrase before sending or saving trust.')
+                        : tabViewUiText('dashboard.sync.hint.connectedNeedsPhrase', 'Connected. Match the safety phrase before sending settings or saving trust.'));
             } else {
-                ftNanahStatusHint.textContent = 'Waiting for the second device to join and complete the secure handshake.';
+                setTabViewLocalizedCopy(ftNanahStatusHint, 'textContent', 'dashboard.sync.hint.waitingForSecondDevice', 'Waiting for the second device to join and complete the secure handshake.');
             }
         }
         renderNanahFamilyDeviceIntent();
