@@ -14,5 +14,361 @@
       "Penerbitan rilis GitHub migunakaké kredensial GitHub CLI, nggawé draf sadurungé ngunggah, nerusaké tag sing wis ana, mung ngunggah aset sing durung ana, mriksa kumpulan aset pungkasan, lan mung nerbitaké sawisé dipriksa.",
       "App FilterTube kanggo telpon lan tablet Android saiki wis kabuka kanggo umum ing Google Play. Pasang saka [kaca umum](https://play.google.com/store/apps/details?id=com.filtertube.app) utawa goleki FilterTube ing Google Play."
     ]
+  },
+  "3.3.6": {
+    "ctaLabel": "Deleng Sing Anyar",
+    "headline": "Nyaring luwih kuwat, wektu luwih kajaga, lan pamuteran tanpa iklan luwih tentrem",
+    "summary": "FilterTube 3.3.6 nggawa penegakan akses langsung, wektu kajaga lan sesi Self-Control saben profil, kumpulan aturan Blocked lan Allowed sing bisa dipercaya, nyaring kategori resmi, Advert Void aktif minangka gawan, lan akèh pakaryan kompatibilitas karo YouTube saiki.",
+    "bannerSummary": "Nyaring akses langsung, wektu kajaga, impor dhaptar aturan lan BlockTube, kategori resmi, Advert Void, lan kompatibilitas YouTube saiki.",
+    "highlights": [
+      "Kunjungan YouTube langsung, pindhah playlist, autoplay, lan embed sing didhukung saiki ngliwati aturan idin video lan saluran sing padha karo nyaring feed, ora bisa ngliwati nyaring maneh.",
+      "Wates wektu YouTube saben dina saiki ditrapake kanggo profil aktif, nuduhake wektu sing isih ana, tetep sawisé restart, lan nggunakake layar timeout sakaca kebak sing ngidini pindhah profil nganggo PIN. Sesi Self-Control sing dipilih kanthi sukarela ngunci aturan sing dipilih nganti hitung mundur rampung.",
+      "Aturan Blocked lan Allowed tetep dadi kumpulan kapisah kanggo Main lan Kids; kabijakan Blocklist utawa Whitelist tingkat ndhuwur sing milih kumpulan endi kanggo ngatur tontonan.",
+      "Impor gedhé saka BlockTube lan dhaptar aturan sing dikelola nggunakake pratinjau, pamriksa kapasitas, rollback transaksional lan verifikasi maca-balik, kanthi cacah added, duplicate, skipped, channel, keyword, regex lan video-ID sing luwih cetha.",
+      "Nyaring kategori nggunakake `microformat.playerMicroformatRenderer.category` resmi saka YouTube, hydration metadata Player asal sing padha kanthi watesan, pilihan sing cetha kanggo Block selected utawa Allow only selected, lan kepemilikan Watch, rail, Mix, komentar lan renderer sing luwih aman.",
+      "Advert Void dadi aktif minangka gawan kanggo profil anyar lan sing dianyari ing YouTube Main lan Kids. Web runtime bebarengan mbusak field ad-plan Player sing katon tanpa request tambahan; native playback mbuwang data ad-plan sing ora dimodelake utawa normalake raw Reel response nalika katon, dene fallback sing dijaga nangani gangguan sing isih bisa lolos.",
+      "Nyaring basa pocapan eksperimental lan pilihan original-audio nggunakake bukti saka YouTube Player yen ana, lan ora ngalangi nalika metadata rekomendasi ora kasedhiya.",
+      "Uga klebu ndhelikake YouTube Playables, nangani renderer camelCase lan collaboration saiki, Help lan search sing luwih gampang diwaca, kontrol popup lan dashboard sing luwih cetha, lan tampilan umum app Android ing Google Play sarta status iOS.",
+      "Settings nambah pilihan opt-out sakpiranti sing ora dicenthang minangka gawan kanggo pangeling reload otomatis lan banner What's New ing YouTube lan YouTube Kids. Kaca What's New ing dashboard tetep bisa dibukak kanthi manual."
+    ]
+  },
+  "3.3.5": {
+    "ctaLabel": "Deleng Sing Anyar",
+    "headline": "Ndandani gangguan YouTube lan ngalangi saluran Shorts luwih awal",
+    "summary": "Rilis iki ndandani content runtime sing kapacak kaping pindho ing tab YouTube sing wis kabukak lan ngrampungake resolusi identitas saluran Shorts sing katon luwih awal nalika aturan saluran utawa mode whitelist aktif.",
+    "bannerSummary": "Ndandani injeksi runtime bola-bali lan nemtokake identitas saluran Shorts luwih awal.",
+    "highlights": [
+      "Install/update/profile refresh ora masang maneh manifest content scripts menyang tab YouTube sing wis kabukak, mula nyegah kesalahan syntax bola-bali `Identifier ... has already been declared`.",
+      "Tab YouTube sing wis kabukak isih bisa nampa pamriksa wates wektu lan runtime sing dikelola tanpa deklarasi script kaping pindho.",
+      "Shorts sing katon utawa meh katon saiki nggunakake owner resolver background `/shorts/<videoId>` sing ana lan diwatesi nalika aturan channel blocklist utawa mode whitelist aktif.",
+      "Peta video-menyang-saluran Shorts sing disinaoni disimpen lan langsung diproses maneh, mula Shorts saka saluran sing diblokir didhelikake tanpa kudu hover utawa mbukak menu dhisik.",
+      "Desktop Shorts host kaya `.shortsLockupViewModelHost` lan `.ytGridShelfViewModelGridShelfItem` dilebokake ing dalan fallback/enrichment Shorts khusus.",
+      "Mode Blocklist ora ndhelikake Shorts sing durung dingerteni nganti identitasé kasil ditemtokake; mode whitelist tetep luwih ketat liwat dalan pending sing wis ana.",
+      "v3.3.4 kacathet minangka rollback store menyang paket v3.3.2 nalika laporan gangguan YouTube diselidiki."
+    ]
+  },
+  "3.3.4": {
+    "ctaLabel": "Deleng Sing Anyar",
+    "headline": "Store bali menyang paket v3.3.2",
+    "summary": "v3.3.4 minangka versi rollback browser-store sing nggunakake paket v3.3.2 sadurungé nalika laporan gangguan YouTube saka v3.3.3 diselidiki.",
+    "bannerSummary": "Versi rollback: v3.3.4 nggunakake paket v3.3.2 nalika laporan gangguan YouTube diselidiki.",
+    "highlights": [
+      "Ora ana karya fitur anyar saka sumber kode sing diklaim kanggo v3.3.4.",
+      "Rollback iki digunakake kanggo mindhah store saka paket v3.3.3 sing dicurigai nalika masalah #64 diselidiki.",
+      "Rilis sumber sabanjuré, v3.3.5, nggawa ndandani injeksi runtime bola-bali lan resolusi identitas Shorts."
+    ]
+  },
+  "3.3.3": {
+    "ctaLabel": "Deleng Sing Anyar",
+    "headline": "Nganyari piranti kulawarga, dhaptar aturan, keyword miturut tanggal, lan refresh DOM YouTube",
+    "summary": "Rilis iki nggawé kontrol wong tuwa/pangreksa luwih gampang dimangertèni, nambah impor dhaptar aturan sing wis ditliti, aturan keyword winates tanggal, dokumentasi model Home/Internet Pickup, lan nganyari nyaring kanggo markup YouTube/YTM saiki.",
+    "bannerSummary": "Nganyari piranti kulawarga, impor dhaptar aturan sing ditliti, keyword adhedhasar tanggal, Help sing ngutamakake wong tuwa, lan kompatibilitas DOM YouTube/YTM saiki.",
+    "highlights": [
+      "Profil wong tuwa/pangreksa bisa ngatur profil kajaga, nyunting aturan bocah/profil kajaga saka dashboard wong tuwa, lan ngirim update sing disetujoni menyang piranti kajaga sing wis diverifikasi.",
+      "Family Device Updates saiki nerangake Send Update langsung, Home Pickup sing dipilih kanthi cetha, lan Internet Pickup sing uga dipilih kanthi cetha; layanan pickup ora dianggep minangka sumber wewenang.",
+      "Wates wektu profil kajaga saiki mriksa tab YouTube lawas lan anyar, nuduhake layar timeout sing tentrem, lan nyathet panjaluk wektu tambahan supaya bisa ditliti wong tuwa.",
+      "Impor dhaptar aturan ndhukung CSV, TXT, JSON prasaja, JSON gaya BlockTube, lan URL HTTPS mentah; ana pratinjau sadurunge diterapake, target Main/Kids/Both, template, manajemen dhaptar, pause/resume/remove, pamriksa kadaluwarsa, lan refresh.",
+      "Nyaring keyword adhedhasar tanggal bisa mung ngetrapake keyword wiwit, nganti, utawa ing antarane tanggal upload. Nyaring komentar nggunakake tanggal upload video induk yen YouTube nyedhiyakake.",
+      "Help lan kontrol dashboard saiki nganggo tembung sing luwih prasaja lan ngutamakake wong tuwa, help bubble luwih cepet, lan katrangan luwih gamblang ngenani Exact, Comment, Date, PIN, dhaptar aturan, lan nganyari piranti.",
+      "Dashboard saiki ngajak pangguna Android closed-testing aktif kanggo ngirim email menyang hello@filtertube.in lan njaga pangeling sing katon supaya nglaporake rusake nyaring nalika struktur kaca YouTube owah.",
+      "Selector YouTube desktop lockup lan DOM YTM mobile camelCase didokumentasikake supaya kertu video nyata tetep disaring, dene chip bar kaca Watch ora miwiti fallback utawa njalari kaca mlumpat nalika digulung.",
+      "Isih kapisah: panemuan peer LAN otomatis, layanan FilterTube Internet Pickup sing di-host, katalog auto-subscribe umum tanpa tumindak katon, kesetaraan native Android/iOS, lan bukti smoke test manual ing rong piranti sing wis dipasang."
+    ]
+  },
+  "3.3.2": {
+    "ctaLabel": "Deleng Sing Anyar",
+    "headline": "MVP app mobile/tablet, YouTube luwih lancar, lan whitelist luwih aman",
+    "summary": "Lumahing rilis app umum wis siyap kanggo tes pungkasan Android telpon/tablet lan status iOS/iPad; dashboard extension saiki nuduhake dalan app mau, karya YouTube SPA luwih sepi nalika ora ana aturan aktif, lan ndandani whitelist/end-screen klebu ing rilis iki.",
+    "bannerSummary": "Status app Android/iOS, pangolahan YouTube SPA luwih entheng, lan ndandani whitelist/end-screen.",
+    "highlights": [
+      "Website downloads hub lan dashboard extension saiki nuduhake dalan tes pungkasan Android telpon/tablet lan dalan status iOS/iPad TestFlight/App Store.",
+      "Persiapan rilis Android telpon/tablet didokumentasikake adhedhasar FilterTube runtime bebarengan, YouTube Main, akses YouTube Kids umum, profil, aturan PIN, lan sink Nanah.",
+      "Karya kinerja YouTube SPA saiki luwih kerep ngliwati JSON clone/parse/replay, DOM fallback, quick-block, fallback-menu, lan whitelist-pending nalika ora ana aturan aktif utawa ora dibutuhake rute.",
+      "Konteks extension production matesi console logging rutin mung nalika debug mode kanthi cetha diuripake, supaya browsing lumrah ora nanggung overhead console ing hot path YouTube.",
+      "Ndandani whitelist kanggo rilis nyakup Shorts creator fallback, penerusan target dhaptar, lan nyaring endpoint autoplay/watch-next kompak kanggo kontrol end-screen.",
+      "Atribut state DOM FilterTube dikuatake kanggo nyuda fingerprint `data-filtertube-*` sing katon jembar nanging tetep njaga state runtime sing dibutuhake.",
+      "Accounts & Sync saiki nerangake Family Device Updates liwat Send Update, Home Pickup opsional, lan Internet Pickup nalika adoh utawa dibukak mengko, supaya wong tuwa ngerti endi sink langsung, pickup omah, pickup online, lan endi sing dudu wewenang.",
+      "Wates wektu profil kajaga saiki nduwèni dokumentasi sing katon ing rilis ngenani anggaran YouTube saben dina, layar timeout, riwayat panjaluk wektu tambahan, lan persetujuan wong tuwa/pangreksa.",
+      "Dalan Nanah/impor njaga kepemilikan keyword Filter All sing asalé saka saluran ing payload extension lan app native, kalebu warna baris, metadata source-badge, lan konteks pasangan."
+    ]
+  },
+  "3.3.1": {
+    "ctaLabel": "Deleng Sing Anyar",
+    "headline": "Sink aman antar piranti liwat P2P tanpa server pihak katelu",
+    "summary": "Accounts & Sync saiki nampilake Nanah minangka telung dalan sing luwih prasaja, target wong tuwa/anak luwih kuwat, aturan sambung manèh luwih cetha, lan dokumentasi panggunaan nyata luwih jembar.",
+    "bannerSummary": "Telung dalan Nanah sing cetha, target sing luwih kuwat, lan aturan sambung manèh sing gamblang.",
+    "highlights": [
+      "Accounts & Sync saiki diwiwiti nganggo telung dalan sing luwih cetha: Kirim profil iki sapisan, Wong tuwa ngontrol anak, lan Pindhah akun kabèh.",
+      "Kontrol Nanah Advanced isih ana, nanging didhelikake ing bagean Advanced tinimbang dadi pambuka kanggo kabeh alur.",
+      "Sesi wong tuwa/sumber bisa luwih gampang milih profil target remot, lan simpenan managed-link uga disalin menyang pangirim supaya piranti loro-loroné nyimpen cathetan kapercayan sing padha.",
+      "Link dipercaya tetep kasimpen sawisé refresh, nanging sambung manèh tetep sesi langsung sing anyar, dudu sink latar mburi sing didhelikake.",
+      "Update anak sing dikunci, aturan reconnect, panyimpenan label piranti, lan perlindungan self-join/session-burn dikuwatake kanggo kontrol wong tuwa sing luwih aman.",
+      "README, Architecture, Technical, Functionality, Profiles & PIN, project plan, user guide, lan concern tracker saiki njlentrehake checkpoint desktop Nanah saiki kanthi luwih rinci."
+    ]
+  },
+  "3.3.0": {
+    "ctaLabel": "Deleng Sing Anyar",
+    "headline": "Recovery collaboration + impor lintas-browser luwih kuwat",
+    "summary": "Menu collaboration Watch/YTM luwih bisa dipercaya mbalekake roster lengkap, impor subscriptions luwih kuwat ing antarané browser, lan sawetara ndandani whitelist lan Quick Block khusus lumahing saiki wis klebu ing 3.3.0.",
+    "bannerSummary": "Pemulihan roster collaborator lengkap, impor subscription sing luwih kuwat, lan ndandani whitelist/Quick Block.",
+    "highlights": [
+      "Kertu YouTube mobile home/watch-next/gaya Mix saiki melu alur pemulihan 3-dot lan collaborator sing padha, ora bali menyang menu siji-saluran sing ora jangkep.",
+      "Rail tengen kaca Watch, baris playlist, lan lockup mirip Watch saiki bisa mbalekake roster collaborator lengkap lan refresh menu 3-dot aktif ing panggonan.",
+      "Pemulihan Mix/Watch luwih aman: kertu collaboration nyata dianyari kanthi bener, dene jeneng biasa sing ngemot '&' utawa 'and' ora maneh salah dianggep menu collaboration.",
+      "Quick Block luwih stabil ing lumahing rumit: tetep katon ing ndhuwur luwih akèh kertu desktop, nyingkiri dropdown saran panelusuran mobile, lan luwih trep dipasang ing layout watch-next mobile.",
+      "Impor whitelist saluran sing disubscribe saiki njaga tanggapan browse kaca paling anyar, ngutamakake tuwuhé /feed/channels nyata, lan njaga /feed/channels minangka lumahing manajemen sing katon.",
+      "Nyaring whitelist luwih ketat lan aman ing renderer YouTube desktop/mobile, kalebu nangani kaca kreator luwih apik lan kontrol ndhelikake Mixes/subscriptions sing luwih apik.",
+      "Kontrol lan polesan anyar: baris Channel Management nyambung menyang kaca saluran nyata, item block menu 3-dot bisa dipateni, lan ekspor Firefox sing dienkripsi nganggo jalur fallback luwih aman."
+    ]
+  },
+  "3.2.9": {
+    "ctaLabel": "Deleng Sing Anyar",
+    "headline": "Impor Saluran sing Disubscribe + Whitelist + ndandani proteksi PIN",
+    "summary": "Impor subscriptions akun YouTube sing aktif menyang whitelist kanthi katrangan semantik ganti mode sing luwih cetha lan alur wiwitan /feed/channels sing luwih bisa dipercaya.",
+    "bannerSummary": "Impor saluran sing disubscribe saka akun YouTube aktif menyang whitelist kanthi wiwitan sing luwih becik.",
+    "highlights": [
+      "Ing New Tab View, saluran sing disubscribe bisa diimpor saka akun YouTube aktif sing wis mlebu menyang whitelist.",
+      "Startup impor saiki nganggo manèh tab YouTube langsung sing wis ana, mindhah menyang /feed/channels, lan ngenteni FilterTube bridge sadurunge miwiti.",
+      "Tembung whitelist luwih cetha: Import Only ora ngowahi blocklist, déné Import + Turn On Whitelist ngetutake jalur migrasi blocklist-kanggo-whitelist sing wis ana.",
+      "Dokumentasi saiki luwih rinci ngenani arsitektur impor, alur request FEchannels, sumber renderer, lan semantik whitelist."
+    ]
+  },
+  "3.2.8": {
+    "ctaLabel": "Deleng Sing Anyar",
+    "headline": "Refresh Tema + panyetelan cangkang UI scenic",
+    "summary": "Lumahing popup lan dashboard saiki nggunakake sistem tema scenic sing luwih tentrem, tata letak luwih rapet, tint state luwih cetha, lan imbangan mode padhang/peteng luwih apik.",
+    "bannerSummary": "Tema scenic sing tenang, tata letak luwih rapet, lan imbangan mode padhang/peteng luwih apik.",
+    "highlights": [
+      "Refresh Scenic UI: popup lan dashboard saiki bareng nggunakake cangkang produk sing luwih tentrem kanthi video hero lokal minangka media latar sing alus.",
+      "Panyetelan tema padhang lan peteng: mode peteng njaga latar scenic katon tanpa padhang tengah sing pucet, déné mode padhang nganggo transparansi sing luwih resik.",
+      "Reresik responsif: jarak popup luwih rapet, profile dropdown luwih cilik, tata letak kartu Help/Support luwih apik, lan pas ing mobile kanggo kabeh lumahing filter.",
+      "Ndandani tint kontrol: state aktif/nonaktif, warna pill, field search, lan tumindak impor/ekspor saiki luwih gampang diwaca ing tema loro-loroné."
+    ]
+  },
+  "3.2.7": {
+    "ctaLabel": "Deleng Sing Anyar",
+    "headline": "Filter kategori + Quick Block hover cross + UI 3 Dot mobile",
+    "summary": "Nyaring kategori anyar lan tombol quick cross block siji-tutul aktif minangka gawan.",
+    "bannerSummary": "Nyaring kategori YouTube kanthi quick cross block siji-tutul sing aktif minangka gawan.",
+    "highlights": [
+      "Category Filtering: blokir utawa parengake video adhedhasar kategori YouTube (Music, Gaming, Education, lan sapituruté).",
+      "Quick Cross Block gawan ON: `Show Quick Cross Block button` diuripake minangka gawan ing v3.2.7 (pangguna isih bisa mateni).",
+      "Pamblokiran mobile: dhukungan YT Mobile luwih apik kanggo 3 Dot UI lan Quick Cross Block; saiki bisa digunakake ing Home Page."
+    ]
+  },
+  "3.2.6": {
+    "ctaLabel": "Deleng Sing Anyar",
+    "headline": "Nggawé UI/UX luwih apik lan nyaring adhedhasar isi",
+    "summary": "Peningkatan tipografi lengkap nganggo desain modern lan telung filter isi anyar (durasi, tanggal, huruf gedhé).",
+    "bannerSummary": "Tipografi luwih apik, filter durasi/tanggal/huruf gedhé, lan dashboard sing disampurnakaké.",
+    "highlights": [
+      "Pembaruan tipografi: skala font modern lan alus supaya luwih gampang diwaca.",
+      "Filter adhedhasar isi: durasi (luwih suwe/luwih cendhak/antarane), tanggal unggah (luwih anyar/luwih lawas/antarane), lan deteksi huruf gedhé (judhul clickbait).",
+      "Sistem videoMetaMap: panyimpenan metadata video sing awet kanthi batching cerdas (jendhela 75ms, wates 1500 entri).",
+      "Peningkatan dashboard: statistik saben lumahing (Main lan Kids), kartu statistik sing luwih apik, lan kartu promosi donasi."
+    ]
+  },
+  "3.2.5": {
+    "ctaLabel": "Deleng Sing Anyar",
+    "headline": "Mode Whitelist dadi utama + luwih stabil",
+    "summary": "Mode whitelist saiki dadi dalan utama kanggo mung marengake sing dipilih, kanthi ekstraksi luwih cerdas, pangreksan playlist, lan panggunaan CPU luwih sithik.",
+    "bannerSummary": "Whitelist dadi fitur utama kanthi identifikasi saluran luwih apik, playlist luwih kajaga, lan panggunaan CPU luwih sithik.",
+    "highlights": [
+      "Mode whitelist dipromosikake: istilah/UI ora maneh diwènèhi tandha eksperimental.",
+      "Reresik menu 3-dot lan pangolahan search-sekunder kanggo lumahing whitelist.",
+      "Ekstraksi saluran saka pirang-pirang sumber, nganggo anchor thumbnail lan parent container.",
+      "Pelacakan state sing paham mode, dialog konfirmasi, lan optimasi bridge.",
+      "Stabilitas playlist: baris sing dipilih tetep katon; identitas pending ora maneh mbukak baris sing diblokir.",
+      "Dhukungan whitelist mode Kids nganggo arsitektur tanpa jaringan."
+    ]
+  },
+  "3.2.4": {
+    "ctaLabel": "Deleng Sing Anyar",
+    "headline": "Mode Whitelist luwih apik + optimasi kinerja",
+    "summary": "Peningkatan gedhé kanggo mode whitelist eksperimental kanthi UX luwih apik, optimasi kinerja, lan dhukungan mode Kids sing ditambahi.",
+    "bannerSummary": "Pengalaman whitelist, kinerja, nyegah data ilang, lan dhukungan Kids wis luwih apik.",
+    "highlights": [
+      "EKSPERIMENTAL: Mode whitelist luwih apik nganggo reresik menu 3-dot, pangolahan search cerdas, lan pelacakan state sing paham mode.",
+      "Kinerja mundhak: optimasi tingkat Bridge lan pangolahan pilihan nyuda panggunaan CPU.",
+      "Peningkatan UI: dialog konfirmasi nyegah data ilang tanpa disengaja nalika ngganti mode.",
+      "Dhukungan mode Kids: fungsi whitelist saiki mlaku ing YouTube Kids kanthi arsitektur tanpa jaringan.",
+      "Optimasi search: kartu Watch ing rail sisih tengen ditangani kanthi cerdas supaya UI ora kebak.",
+      "Ekstraksi saluran: resolusi identitas saka pirang-pirang sumber kanthi anchor thumbnail lan parent container.",
+      "Ganti mode: transisi alus antarane blocklist/whitelist kanthi pangolahan maneh sing cerdas."
+    ]
+  },
+  "3.2.3": {
+    "ctaLabel": "Deleng Sing Anyar",
+    "headline": "Mode Whitelist eksperimental + peningkatan UI",
+    "summary": "Rilis alpha mode whitelist kanggo filter 'mung sing diidini', bebarengan karo nganyari UI lan dhukungan menu mobile sing luwih apik.",
+    "bannerSummary": "Mode whitelist alpha, ganti mode sing gampang ing popup/tab view, lan dhukungan menu mobile.",
+    "highlights": [
+      "EKSPERIMENTAL: mode whitelist ndhelikake kabeh konten kajaba saluran/keyword sing diidini kanthi cetha.",
+      "Rong mode filter kanthi toggle gampang antarane blocklist lan whitelist ing popup lan tab view.",
+      "Migrasi staging — pindhah menyang blocklist kanggo nglumpukake saluran, banjur gabungake bali menyang whitelist.",
+      "Pangreksan kaca Watch ing mode whitelist njaga fungsi pamuteran video.",
+      "Nganyari UI optimistis ndhelikake konten langsung lan mulihake otomatis yen pemblokiran gagal.",
+      "Dhukungan menu mobile luwih apik nganggo pangolahan renderer mobile YouTube sing bener.",
+      "Kabeh console log saiki mung ditampilake nalika debug flag urip kanggo nyuda swara ing production."
+    ]
+  },
+  "3.2.2": {
+    "ctaLabel": "Deleng Sing Anyar",
+    "headline": "Peningkatan UI/UX & kontrol debug",
+    "summary": "Update optimistis, dhukungan menu mobile, logging sing dikontrol debug, njaga posisi scroll, lan perbaikan manajemen state.",
+    "bannerSummary": "Nyaring katon cepet, menu mobile, debug gating, lan njaga posisi scroll.",
+    "highlights": [
+      "Pembaruan UI optimistis: konten didhelikake langsung lan dibalekake otomatis yen pamblokiran gagal.",
+      "Dhukungan menu mobile luwih apik kanggo ytm-menu-popup-renderer kanthi tag renderer sing bener.",
+      "Logging sing dikontrol debug liwat `window.__filtertubeDebug`.",
+      "Posisi scroll dijaga nalika DOM fallback supaya kaca ora mlumpat ngagetake.",
+      "Wates enrichment saluran (10 saben session) kanggo nyuda request background.",
+      "Rendering dijadwalake nalika idle nganggo requestIdleCallback lan batching.",
+      "Debounce external reload nganggo mbandhingake signature supaya render ora dibaleni tanpa perlu.",
+      "Notifikasi pilihan: `load` mung nalika signature owah; yen ora, gunakake `externalUpdate`.",
+      "Manajemen state Bridge liwat state global bebarengan."
+    ]
+  },
+  "3.2.1": {
+    "ctaLabel": "Deleng Sing Anyar",
+    "headline": "Pangolahan tanpa lag + peningkatan kinerja",
+    "summary": "Optimasi kinerja utama ngilangake lag UI, kanthi asil apik ing browser Chromium lan peningkatan gedhé ing Firefox.",
+    "bannerSummary": "Peningkatan kinerja gedhé nyuda UI macet nalika nyaring abot.",
+    "highlights": [
+      "Pangolahan DOM async sing menehi giliran marang main thread nyegah browser beku nalika nyaring abot.",
+      "Regex sing wis dikompilasi lan cache filter saluran nyedhiyakake lookup O(1), nyuda panggunaan CPU nganti 60–80%.",
+      "Pembaruan storage batch nyuda operasi I/O nganti 70–90% nganggo sela cerdas 250ms.",
+      "Refresh settings sing didebounce nyegah pangolahan DOM bola-bali sing ora perlu.",
+      "Manajemen state run nyegah eksekusi tumpang tindih lan ngatur request menyang antrian kanthi bener.",
+      "Browser Chromium: lag mudhun luwih saka 90%; Firefox: peningkatan gedhé lan optimasi isih diterusake."
+    ]
+  },
+  "3.2.0": {
+    "ctaLabel": "Deleng Sing Anyar",
+    "headline": "Blokir langsung + Kids tanpa jaringan",
+    "summary": "Menu 3-dot langsung nuduhake jeneng saluran, request jaringan mudhun akèh, lan YouTube Kids bisa mlaku rampung offline.",
+    "bannerSummary": "Jeneng saluran langsung katon, request jaringan luwih sithik, lan pamblokiran Kids offline.",
+    "highlights": [
+      "Menu 3-dot saiki langsung nuduhake jeneng saluran sing bener — ora ana wektu ngenteni 'Fetching...'.",
+      "Identitas saluran dijupuk saka tanggapan JSON YouTube sing dicegat, nyuda panggilan jaringan.",
+      "YouTube Kids mlaku tanpa network fetch kanggo pamblokiran sing bisa dipercaya.",
+      "Metadata sing ilang diisi ing background kanthi laju sing dikontrol (cooldown 6 jam).",
+      "Topic channels (umpamané 'Music - Topic') ditangani khusus tanpa @handles.",
+      "Dokumentasi lengkap anyar nganggo diagram alur ASCII lan Mermaid."
+    ]
+  },
+  "3.1.9": {
+    "ctaLabel": "Deleng Sing Anyar",
+    "headline": "Backup sing ngerti profil + kontrol sing dikunci",
+    "summary": "Auto-backup lan kontrol konten saiki manut kunci/PIN profil, marisi setelan saben profil, lan dropdown profil tetep bisa diklik sanajan banner lock gate katon.",
+    "bannerSummary": "Backup lan kontrol manut kunci profil; dropdown profil tetep bisa diklik.",
+    "highlights": [
+      "Pamilih mode/format auto-backup mati nalika auto-backup nonaktif utawa profil dikunci; profil anyar marisi pilihan auto-backup.",
+      "Jadwal auto-backup saiki mlaku nalika profil digawe utawa mode/format diganti mung yen auto-backup aktif kanggo profil kuwi.",
+      "Toggle kontrol konten lan kontrol backup tetep mati utawa dibalekake nalika dikunci; scope ekspor kanggo profil dudu master mung nganggo profil aktif.",
+      "Ndandani z-index dropdown profil njaga supaya tetep bisa diklik sanajan banner lock gate katon.",
+      "Dokumentasi dianyari ngenani model profil/PIN, backup saben profil, lan aturan UI gating."
+    ]
+  },
+  "3.1.8": {
+    "ctaLabel": "Deleng Sing Anyar",
+    "headline": "Tab Support + auto-backup sing bisa dipercaya",
+    "summary": "Kaca Support anyar (Ko-fi) lan auto-backup saiki bisa mlaku kanthi mantep ing Chrome lan Firefox.",
+    "bannerSummary": "Kaca Support Ko-fi anyar lan auto-backup sing bisa digunakake ing Chrome/Firefox.",
+    "highlights": [
+      "Kaca Support kanthi Ko-fi embed ditambahake menyang dashboard.",
+      "Auto-backup saiki nimpa siji file sing muter terus: Downloads/FilterTube Backup/FilterTube-Backup-Latest.json.",
+      "Strategi download lintas-browser: Blob URL yen kasedhiya; fallback data: URL kanggo Chrome MV3 service worker.",
+      "Download Firefox ora maneh gagal amarga watesan data: URL."
+    ]
+  },
+  "3.1.7": {
+    "ctaLabel": "Deleng Sing Anyar",
+    "headline": "Dhukungan YT Kids + auto-backup",
+    "summary": "Konten adhedhasar saluran saiki bisa diblokir ing YT Kids lan auto-backup bisa diuripake utawa dipateni.",
+    "bannerSummary": "Pamblokiran saluran ing YouTube Kids lan auto-backup sing bisa diowahi.",
+    "highlights": [
+      "Pamblokiran kanthi dhasar saluran lan keyword rampung ditambahake ing YT Kids; saluran diblokir kanthi ngrungokake meneng-meneng UI menu 3-dot ing YT Kids.",
+      "Toggle Settings ditambahake kanggo nguripake/mateni auto-backup (best-effort; ora ana pituduh Save As).",
+      "Auto-backup disimpen ing Downloads/FilterTube Backup/ nganggo rotasi (file paling anyar tetep disimpen).",
+      "Ekspor manual saiki diundhuh meneng-meneng menyang Downloads/FilterTube Export/."
+    ]
+  },
+  "3.1.6": {
+    "ctaLabel": "Deleng Sing Anyar",
+    "headline": "Dhukungan Impor/Ekspor + banner rilis",
+    "summary": "CTA banner saiki langsung mbukak What's New ing dashboard, kartu pilihan dimuat saka JSON sing padha, lan impor luwih manut input c/ChannelName lan aturan merge.",
+    "bannerSummary": "Link langsung menyang What's New, kartu saka siji JSON, lan impor luwih apik.",
+    "highlights": [
+      "Release notes JSON saiki nyedhiyakake kartu dashboard lan banner YouTube saka siji sumber bebener.",
+      "CTA mbukak tab-view liwat pesen background supaya blocker ora ngalangi link chrome-extension://.",
+      "Dokumen lan kode impor/ekspor nerangake cara input UC/handle/c/ChannelName dinormalake sadurunge digabung."
+    ]
+  },
+  "3.1.5": {
+    "ctaLabel": "Deleng Sing Anyar",
+    "headline": "Shorts + konten Members-only pancèn wis didhelikake",
+    "summary": "Kaca Watch lan sidebar saiki ndhelikake renderer Shorts lan rak members-only sadurunge katon, lan state toggle pungkasane tetep kasimpen.",
+    "bannerSummary": "Shorts lan rak members-only didhelikake sadurunge katon; setelan toggle tetep.",
+    "highlights": [
+      "Pamriksa sidebar mriksa href /shorts/, overlay, lan aria-label sadurunge kartu dirender.",
+      "Deteksi members-only nyakup baris compact, watch, lan shelf nganggo badge anyar lan heuristik playlist.",
+      "Bug panyimpenan toggle members-only didandani supaya state tetep ana sawisé reload."
+    ]
+  },
+  "3.1.4": {
+    "ctaLabel": "Deleng Sing Anyar",
+    "headline": "Dashboard responsif",
+    "summary": "Navigasi ambruk kanthi rapi ing mobile, input bisa mbungkus kanthi alami, lan kontrol playlist/mix nduwèni toggle luwih gamblang.",
+    "bannerSummary": "Navigasi mobile sing resik, input responsif, lan kontrol playlist/Mix sing cetha.",
+    "highlights": [
+      "Hamburger nav lan overlay kanggo layar cilik nganggo jarak grid sing disampurnakake.",
+      "Toggle nganggo track luwih alus, thumb ing tengah, lan kontras mode peteng luwih apik.",
+      "Chip Mix/Radio didhelikake nalika toggle Mix urip; ndhelikake playlist ngliwati item radio."
+    ]
+  },
+  "3.1.3": {
+    "ctaLabel": "Deleng Sing Anyar",
+    "headline": "Owah-owahan gedhé ing pandhuan Help",
+    "summary": "Kartu, pill, lan tooltip nerangake kanthi pas apa sing ditindakake Exact / Comment / Filter All lan cocog karo gaya dashboard sing dianyari.",
+    "bannerSummary": "Kartu Help anyar nerangake fungsi Exact, Comment, lan Filter All.",
+    "highlights": [
+      "Tab Help nuduhake tint badge lan label collaboration kanthi warna sing cocog.",
+      "Bar search popup lan tab selaras karo tata letak ambane lengkap sing padha.",
+      "Katrangan kontrol konten dipindhah menyang tooltip hover supaya luwih cetha."
+    ]
+  },
+  "3.1.2": {
+    "ctaLabel": "Deleng Sing Anyar",
+    "headline": "Autoplay playlist luwih kuwat",
+    "summary": "Autoplay saiki ngliwati baris playlist sing diblokir tanpa madhangi, lan ndhelikake kanthi kukuh tetep awet nalika YouTube ngolah kaca maneh.",
+    "bannerSummary": "Autoplay ngliwati baris sing diblokir tanpa kedhip; ndhelikake playlist tetep awet.",
+    "highlights": [
+      "Next-click mung ditindakake nalika baris playlist sabanjuré pancèn katon.",
+      "Baris panel playlist Watch tetep didhelikake sanajan identitase durung kasil dipesthekake sedhela.",
+      "Menu 3-dot nutup kanthi resik sawisé pamblokiran supaya miniplayer tetep muter."
+    ]
+  },
+  "3.1.1": {
+    "ctaLabel": "Deleng Sing Anyar",
+    "headline": "Tab Help + ndandani identitas",
+    "summary": "Tab Help khusus mlebu ing dashboard, lan pemetaan UC ↔ handle ↔ custom URL dadi luwih bisa dipercaya.",
+    "bannerSummary": "Referensi Help anyar lan resolusi identitas saluran sing luwih apik.",
+    "highlights": [
+      "Referensi Help nyathet kabeh toggle, badge, lan prilaku keyword.",
+      "Navigasi playlist ngliwati baris sing diblokir tanpa kedhip pamuteran.",
+      "Fallback handle/custom URL luwih bisa dipercaya milih UC ID sing bener."
+    ]
+  },
+  "3.1.0": {
+    "ctaLabel": "Deleng Sing Anyar",
+    "headline": "Dokumentasi + gamblangé nyaring hibrida",
+    "summary": "Arsitektur hybrid interception + DOM fallback dicathet nganggo diagram supaya ngerti kepriye FilterTube ngetrapake pamblokiran.",
+    "bannerSummary": "Arsitektur hybrid interception lan DOM fallback diterangake kanthi cetha.",
+    "highlights": [
+      "Paritas 3-dot kaca Watch karo collaborator home/search didokumentasikake.",
+      "Regresi playlist sing durung rampung didaftar supaya perbaikane tetep bisa dipantau.",
+      "Manifest, build tooling, lan UI footer diselarasake karo bump versi 3.1.0."
+    ]
   }
 }
