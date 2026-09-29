@@ -1581,5 +1581,13 @@
   "dashboard.selfControl.hardWhitelist.error.startFailed": "ಕಠಿಣ ಟೈಮರ್ ಅನುಮತಿ ಪಟ್ಟಿಯನ್ನು ಪ್ರಾರಂಭಿಸಲಾಗಲಿಲ್ಲ",
   "dashboard.selfControl.hardWhitelist.started": "ಕಠಿಣ ಟೈಮರ್ ಅನುಮತಿ ಪಟ್ಟಿ ಪ್ರಾರಂಭವಾಗಿದೆ",
   "dashboard.selfControl.lockGate.hint": "ಕೌಂಟ್‌ಡೌನ್ ಮುಗಿಯುವವರೆಗೆ ಈ ಪ್ರೊಫೈಲ್ ಮತ್ತು ಅದರ ಪ್ರಸ್ತುತ ಫಿಲ್ಟರಿಂಗ್ ನೀತಿ ಸ್ಥಿರವಾಗಿರುತ್ತದೆ. ಪ್ರೊಫೈಲ್ ಬದಲಾವಣೆ ಮತ್ತು ಸೆಟ್ಟಿಂಗ್‌ಗಳ ಬದಲಾವಣೆ ಲಭ್ಯವಿರುವುದಿಲ್ಲ.",
-  "dashboard.selfControl.lockGate.unlocksAt": "{dateTime}ಕ್ಕೆ ಸ್ವಯಂಚಾಲಿತವಾಗಿ ಅನ್‌ಲಾಕ್ ಆಗುತ್ತದೆ."
+  "dashboard.selfControl.lockGate.unlocksAt": "{dateTime}ಕ್ಕೆ ಸ್ವಯಂಚಾಲಿತವಾಗಿ ಅನ್‌ಲಾಕ್ ಆಗುತ್ತದೆ.",
+  "dashboard.ruleEditor.move.keywordToBlocked": "ಕೀವರ್ಡ್ ಅನ್ನು ನಿರ್ಬಂಧಿತ ನಿಯಮಗಳಿಗೆ ಸರಿಸಲಾಗಿದೆ",
+  "dashboard.ruleEditor.move.keywordToAllowed": "ಕೀವರ್ಡ್ ಅನ್ನು ಅನುಮತಿಸಲಾದ ನಿಯಮಗಳಿಗೆ ಸರಿಸಲಾಗಿದೆ",
+  "dashboard.ruleEditor.move.channelToBlocked": "ಚಾನಲ್ ಅನ್ನು ನಿರ್ಬಂಧಿತ ನಿಯಮಗಳಿಗೆ ಸರಿಸಲಾಗಿದೆ",
+  "dashboard.ruleEditor.move.channelToAllowed": "ಚಾನಲ್ ಅನ್ನು ಅನುಮತಿಸಲಾದ ನಿಯಮಗಳಿಗೆ ಸರಿಸಲಾಗಿದೆ",
+  "dashboard.ruleEditor.move.kidsKeywordToBlocked": "Kids ಕೀವರ್ಡ್ ಅನ್ನು ನಿರ್ಬಂಧಿತ ನಿಯಮಗಳಿಗೆ ಸರಿಸಲಾಗಿದೆ",
+  "dashboard.ruleEditor.move.kidsKeywordToAllowed": "Kids ಕೀವರ್ಡ್ ಅನ್ನು ಅನುಮತಿಸಲಾದ ನಿಯಮಗಳಿಗೆ ಸರಿಸಲಾಗಿದೆ",
+  "dashboard.ruleEditor.move.kidsChannelToBlocked": "Kids ಚಾನಲ್ ಅನ್ನು ನಿರ್ಬಂಧಿತ ನಿಯಮಗಳಿಗೆ ಸರಿಸಲಾಗಿದೆ",
+  "dashboard.ruleEditor.move.kidsChannelToAllowed": "Kids ಚಾನಲ್ ಅನ್ನು ಅನುಮತಿಸಲಾದ ನಿಯಮಗಳಿಗೆ ಸರಿಸಲಾಗಿದೆ"
 }

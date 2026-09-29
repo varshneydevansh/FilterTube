@@ -1581,5 +1581,13 @@
   "dashboard.selfControl.hardWhitelist.error.startFailed": "ما قدرناش نبدأ القائمة البيضا الصارمة بالمؤقت",
   "dashboard.selfControl.hardWhitelist.started": "القائمة البيضا الصارمة بالمؤقت بدأت",
   "dashboard.selfControl.lockGate.hint": "البروفايل ده وسياسة الفلترة الحالية هيفضلوا ثابتين لحد ما العد التنازلي يخلص. مش هتقدر تغيّر البروفايل أو الإعدادات.",
-  "dashboard.selfControl.lockGate.unlocksAt": "هيتفك القفل تلقائيًا في {dateTime}."
+  "dashboard.selfControl.lockGate.unlocksAt": "هيتفك القفل تلقائيًا في {dateTime}.",
+  "dashboard.ruleEditor.move.keywordToBlocked": "اتنقلت الكلمة المفتاحية لقواعد الحظر",
+  "dashboard.ruleEditor.move.keywordToAllowed": "اتنقلت الكلمة المفتاحية لقواعد السماح",
+  "dashboard.ruleEditor.move.channelToBlocked": "اتنقلت القناة لقواعد الحظر",
+  "dashboard.ruleEditor.move.channelToAllowed": "اتنقلت القناة لقواعد السماح",
+  "dashboard.ruleEditor.move.kidsKeywordToBlocked": "اتنقلت كلمة Kids المفتاحية لقواعد الحظر",
+  "dashboard.ruleEditor.move.kidsKeywordToAllowed": "اتنقلت كلمة Kids المفتاحية لقواعد السماح",
+  "dashboard.ruleEditor.move.kidsChannelToBlocked": "اتنقلت قناة Kids لقواعد الحظر",
+  "dashboard.ruleEditor.move.kidsChannelToAllowed": "اتنقلت قناة Kids لقواعد السماح"
 }

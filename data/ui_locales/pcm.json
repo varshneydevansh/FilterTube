@@ -1581,5 +1581,13 @@
   "dashboard.selfControl.hardWhitelist.error.startFailed": "Hard Timer Whitelist no fit start",
   "dashboard.selfControl.hardWhitelist.started": "Hard Timer Whitelist don start",
   "dashboard.selfControl.lockGate.hint": "Dis profile and im current filtering policy go stay fixed until countdown finish. You no fit switch profile or change settings.",
-  "dashboard.selfControl.lockGate.unlocksAt": "E go unlock by itself for {dateTime}."
+  "dashboard.selfControl.lockGate.unlocksAt": "E go unlock by itself for {dateTime}.",
+  "dashboard.ruleEditor.move.keywordToBlocked": "Keyword don move go blocked rules",
+  "dashboard.ruleEditor.move.keywordToAllowed": "Keyword don move go allowed rules",
+  "dashboard.ruleEditor.move.channelToBlocked": "Channel don move go blocked rules",
+  "dashboard.ruleEditor.move.channelToAllowed": "Channel don move go allowed rules",
+  "dashboard.ruleEditor.move.kidsKeywordToBlocked": "Kids keyword don move go blocked rules",
+  "dashboard.ruleEditor.move.kidsKeywordToAllowed": "Kids keyword don move go allowed rules",
+  "dashboard.ruleEditor.move.kidsChannelToBlocked": "Kids channel don move go blocked rules",
+  "dashboard.ruleEditor.move.kidsChannelToAllowed": "Kids channel don move go allowed rules"
 }

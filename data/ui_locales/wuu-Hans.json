@@ -1581,5 +1581,13 @@
   "dashboard.selfControl.hardWhitelist.error.startFailed": "严格限时允许清单启动勿成",
   "dashboard.selfControl.hardWhitelist.started": "严格限时允许清单已经开始哉",
   "dashboard.selfControl.lockGate.hint": "搿个个人档案搭现在个筛选政策会一直固定到倒计时结束。勿好换档案或者改设置。",
-  "dashboard.selfControl.lockGate.unlocksAt": "到{dateTime}会自动解锁。"
+  "dashboard.selfControl.lockGate.unlocksAt": "到{dateTime}会自动解锁。",
+  "dashboard.ruleEditor.move.keywordToBlocked": "关键词挪到拦阻规则里哉",
+  "dashboard.ruleEditor.move.keywordToAllowed": "关键词挪到放行规则里哉",
+  "dashboard.ruleEditor.move.channelToBlocked": "频道挪到拦阻规则里哉",
+  "dashboard.ruleEditor.move.channelToAllowed": "频道挪到放行规则里哉",
+  "dashboard.ruleEditor.move.kidsKeywordToBlocked": "Kids关键词挪到拦阻规则里哉",
+  "dashboard.ruleEditor.move.kidsKeywordToAllowed": "Kids关键词挪到放行规则里哉",
+  "dashboard.ruleEditor.move.kidsChannelToBlocked": "Kids频道挪到拦阻规则里哉",
+  "dashboard.ruleEditor.move.kidsChannelToAllowed": "Kids频道挪到放行规则里哉"
 }

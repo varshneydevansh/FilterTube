@@ -1581,5 +1581,13 @@
   "dashboard.selfControl.hardWhitelist.error.startFailed": "Imeshindwa kuanza Orodha Kali ya Ruhusa ya Kipima-muda",
   "dashboard.selfControl.hardWhitelist.started": "Orodha Kali ya Ruhusa ya Kipima-muda imeanza",
   "dashboard.selfControl.lockGate.hint": "Wasifu huu na sera yake ya sasa ya uchujaji vitabaki vilevile hadi hesabu imalizike. Kubadilisha wasifu au mipangilio hakutawezekana.",
-  "dashboard.selfControl.lockGate.unlocksAt": "Itajifungua yenyewe saa {dateTime}."
+  "dashboard.selfControl.lockGate.unlocksAt": "Itajifungua yenyewe saa {dateTime}.",
+  "dashboard.ruleEditor.move.keywordToBlocked": "Neno kuu limehamishiwa kwenye sheria zilizozuiwa",
+  "dashboard.ruleEditor.move.keywordToAllowed": "Neno kuu limehamishiwa kwenye sheria zinazoruhusiwa",
+  "dashboard.ruleEditor.move.channelToBlocked": "Kituo kimehamishiwa kwenye sheria zilizozuiwa",
+  "dashboard.ruleEditor.move.channelToAllowed": "Kituo kimehamishiwa kwenye sheria zinazoruhusiwa",
+  "dashboard.ruleEditor.move.kidsKeywordToBlocked": "Neno kuu la Kids limehamishiwa kwenye sheria zilizozuiwa",
+  "dashboard.ruleEditor.move.kidsKeywordToAllowed": "Neno kuu la Kids limehamishiwa kwenye sheria zinazoruhusiwa",
+  "dashboard.ruleEditor.move.kidsChannelToBlocked": "Kituo cha Kids kimehamishiwa kwenye sheria zilizozuiwa",
+  "dashboard.ruleEditor.move.kidsChannelToAllowed": "Kituo cha Kids kimehamishiwa kwenye sheria zinazoruhusiwa"
 }

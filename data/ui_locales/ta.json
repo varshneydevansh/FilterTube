@@ -1581,5 +1581,13 @@
   "dashboard.selfControl.hardWhitelist.error.startFailed": "கடுமையான டைமர் அனுமதிப் பட்டியலைத் தொடங்க முடியவில்லை",
   "dashboard.selfControl.hardWhitelist.started": "கடுமையான டைமர் அனுமதிப் பட்டியல் தொடங்கியது",
   "dashboard.selfControl.lockGate.hint": "கவுண்ட்டவுன் முடியும் வரை இந்தச் சுயவிவரமும் அதன் தற்போதைய வடிகட்டல் கொள்கையும் மாற்றமின்றி இருக்கும். சுயவிவரத்தை மாற்றவோ அமைப்புகளை மாற்றவோ முடியாது.",
-  "dashboard.selfControl.lockGate.unlocksAt": "{dateTime}-இல் தானாகத் திறக்கப்படும்."
+  "dashboard.selfControl.lockGate.unlocksAt": "{dateTime}-இல் தானாகத் திறக்கப்படும்.",
+  "dashboard.ruleEditor.move.keywordToBlocked": "முக்கியச் சொல்லைத் தடுக்கப்பட்ட விதிகளுக்கு நகர்த்தியது",
+  "dashboard.ruleEditor.move.keywordToAllowed": "முக்கியச் சொல்லை அனுமதிக்கப்பட்ட விதிகளுக்கு நகர்த்தியது",
+  "dashboard.ruleEditor.move.channelToBlocked": "சேனலைத் தடுக்கப்பட்ட விதிகளுக்கு நகர்த்தியது",
+  "dashboard.ruleEditor.move.channelToAllowed": "சேனலை அனுமதிக்கப்பட்ட விதிகளுக்கு நகர்த்தியது",
+  "dashboard.ruleEditor.move.kidsKeywordToBlocked": "Kids முக்கியச் சொல்லைத் தடுக்கப்பட்ட விதிகளுக்கு நகர்த்தியது",
+  "dashboard.ruleEditor.move.kidsKeywordToAllowed": "Kids முக்கியச் சொல்லை அனுமதிக்கப்பட்ட விதிகளுக்கு நகர்த்தியது",
+  "dashboard.ruleEditor.move.kidsChannelToBlocked": "Kids சேனலைத் தடுக்கப்பட்ட விதிகளுக்கு நகர்த்தியது",
+  "dashboard.ruleEditor.move.kidsChannelToAllowed": "Kids சேனலை அனுமதிக்கப்பட்ட விதிகளுக்கு நகர்த்தியது"
 }

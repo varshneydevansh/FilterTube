@@ -1581,5 +1581,13 @@
   "dashboard.selfControl.hardWhitelist.error.startFailed": "কঠোর টাইমার অনুমতি-তালিকা শুরু করা যায়নি",
   "dashboard.selfControl.hardWhitelist.started": "কঠোর টাইমার অনুমতি-তালিকা শুরু হয়েছে",
   "dashboard.selfControl.lockGate.hint": "কাউন্টডাউন শেষ না হওয়া পর্যন্ত এই প্রোফাইল ও এর বর্তমান ফিল্টার নীতি স্থির থাকবে। প্রোফাইল বা সেটিংস বদলানো যাবে না।",
-  "dashboard.selfControl.lockGate.unlocksAt": "{dateTime}-এ স্বয়ংক্রিয়ভাবে আনলক হবে।"
+  "dashboard.selfControl.lockGate.unlocksAt": "{dateTime}-এ স্বয়ংক্রিয়ভাবে আনলক হবে।",
+  "dashboard.ruleEditor.move.keywordToBlocked": "কীওয়ার্ডটি ব্লক করা নিয়মে সরানো হয়েছে",
+  "dashboard.ruleEditor.move.keywordToAllowed": "কীওয়ার্ডটি অনুমোদিত নিয়মে সরানো হয়েছে",
+  "dashboard.ruleEditor.move.channelToBlocked": "চ্যানেলটি ব্লক করা নিয়মে সরানো হয়েছে",
+  "dashboard.ruleEditor.move.channelToAllowed": "চ্যানেলটি অনুমোদিত নিয়মে সরানো হয়েছে",
+  "dashboard.ruleEditor.move.kidsKeywordToBlocked": "Kids কীওয়ার্ডটি ব্লক করা নিয়মে সরানো হয়েছে",
+  "dashboard.ruleEditor.move.kidsKeywordToAllowed": "Kids কীওয়ার্ডটি অনুমোদিত নিয়মে সরানো হয়েছে",
+  "dashboard.ruleEditor.move.kidsChannelToBlocked": "Kids চ্যানেলটি ব্লক করা নিয়মে সরানো হয়েছে",
+  "dashboard.ruleEditor.move.kidsChannelToAllowed": "Kids চ্যানেলটি অনুমোদিত নিয়মে সরানো হয়েছে"
 }

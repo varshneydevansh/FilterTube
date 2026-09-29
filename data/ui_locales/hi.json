@@ -1581,5 +1581,13 @@
   "dashboard.selfControl.hardWhitelist.error.startFailed": "कठोर टाइमर व्हाइटलिस्ट शुरू नहीं हो सकी",
   "dashboard.selfControl.hardWhitelist.started": "कठोर टाइमर व्हाइटलिस्ट शुरू हो गई",
   "dashboard.selfControl.lockGate.hint": "उलटी गिनती पूरी होने तक यह प्रोफ़ाइल और इसकी मौजूदा फ़िल्टर नीति स्थिर रहेगी। प्रोफ़ाइल बदलना और सेटिंग बदलना उपलब्ध नहीं होगा।",
-  "dashboard.selfControl.lockGate.unlocksAt": "{dateTime} पर अपने-आप अनलॉक होगा।"
+  "dashboard.selfControl.lockGate.unlocksAt": "{dateTime} पर अपने-आप अनलॉक होगा।",
+  "dashboard.ruleEditor.move.keywordToBlocked": "कीवर्ड को अवरुद्ध नियमों में ले जाया गया",
+  "dashboard.ruleEditor.move.keywordToAllowed": "कीवर्ड को अनुमति वाले नियमों में ले जाया गया",
+  "dashboard.ruleEditor.move.channelToBlocked": "चैनल को अवरुद्ध नियमों में ले जाया गया",
+  "dashboard.ruleEditor.move.channelToAllowed": "चैनल को अनुमति वाले नियमों में ले जाया गया",
+  "dashboard.ruleEditor.move.kidsKeywordToBlocked": "Kids कीवर्ड को अवरुद्ध नियमों में ले जाया गया",
+  "dashboard.ruleEditor.move.kidsKeywordToAllowed": "Kids कीवर्ड को अनुमति वाले नियमों में ले जाया गया",
+  "dashboard.ruleEditor.move.kidsChannelToBlocked": "Kids चैनल को अवरुद्ध नियमों में ले जाया गया",
+  "dashboard.ruleEditor.move.kidsChannelToAllowed": "Kids चैनल को अनुमति वाले नियमों में ले जाया गया"
 }

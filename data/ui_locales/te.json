@@ -1581,5 +1581,13 @@
   "dashboard.selfControl.hardWhitelist.error.startFailed": "కఠిన టైమర్ అనుమతి జాబితా ప్రారంభం కాలేదు",
   "dashboard.selfControl.hardWhitelist.started": "కఠిన టైమర్ అనుమతి జాబితా ప్రారంభమైంది",
   "dashboard.selfControl.lockGate.hint": "కౌంట్‌డౌన్ ముగిసే వరకు ఈ ప్రొఫైల్, ప్రస్తుత ఫిల్టరింగ్ విధానం స్థిరంగా ఉంటాయి. ప్రొఫైల్ మార్పు, సెట్టింగ్‌ల మార్పు అందుబాటులో ఉండవు.",
-  "dashboard.selfControl.lockGate.unlocksAt": "{dateTime}కు ఆటోమేటిక్‌గా అన్‌లాక్ అవుతుంది."
+  "dashboard.selfControl.lockGate.unlocksAt": "{dateTime}కు ఆటోమేటిక్‌గా అన్‌లాక్ అవుతుంది.",
+  "dashboard.ruleEditor.move.keywordToBlocked": "కీవర్డ్‌ను నిరోధిత నియమాలకు తరలించారు",
+  "dashboard.ruleEditor.move.keywordToAllowed": "కీవర్డ్‌ను అనుమతించిన నియమాలకు తరలించారు",
+  "dashboard.ruleEditor.move.channelToBlocked": "ఛానెల్‌ను నిరోధిత నియమాలకు తరలించారు",
+  "dashboard.ruleEditor.move.channelToAllowed": "ఛానెల్‌ను అనుమతించిన నియమాలకు తరలించారు",
+  "dashboard.ruleEditor.move.kidsKeywordToBlocked": "Kids కీవర్డ్‌ను నిరోధిత నియమాలకు తరలించారు",
+  "dashboard.ruleEditor.move.kidsKeywordToAllowed": "Kids కీవర్డ్‌ను అనుమతించిన నియమాలకు తరలించారు",
+  "dashboard.ruleEditor.move.kidsChannelToBlocked": "Kids ఛానెల్‌ను నిరోధిత నియమాలకు తరలించారు",
+  "dashboard.ruleEditor.move.kidsChannelToAllowed": "Kids ఛానెల్‌ను అనుమతించిన నియమాలకు తరలించారు"
 }

@@ -1581,5 +1581,13 @@
   "dashboard.selfControl.hardWhitelist.error.startFailed": "Could not start Hard Timer Whitelist",
   "dashboard.selfControl.hardWhitelist.started": "Hard Timer Whitelist started",
   "dashboard.selfControl.lockGate.hint": "This profile and its current filtering policy are fixed until the countdown finishes. Profile switching and settings changes are unavailable.",
-  "dashboard.selfControl.lockGate.unlocksAt": "Unlocks automatically {dateTime}."
+  "dashboard.selfControl.lockGate.unlocksAt": "Unlocks automatically {dateTime}.",
+  "dashboard.ruleEditor.move.keywordToBlocked": "Keyword moved to Blocked rules",
+  "dashboard.ruleEditor.move.keywordToAllowed": "Keyword moved to Allowed rules",
+  "dashboard.ruleEditor.move.channelToBlocked": "Channel moved to Blocked rules",
+  "dashboard.ruleEditor.move.channelToAllowed": "Channel moved to Allowed rules",
+  "dashboard.ruleEditor.move.kidsKeywordToBlocked": "Kids keyword moved to Blocked rules",
+  "dashboard.ruleEditor.move.kidsKeywordToAllowed": "Kids keyword moved to Allowed rules",
+  "dashboard.ruleEditor.move.kidsChannelToBlocked": "Kids channel moved to Blocked rules",
+  "dashboard.ruleEditor.move.kidsChannelToAllowed": "Kids channel moved to Allowed rules"
 }

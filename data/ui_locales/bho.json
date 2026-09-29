@@ -1581,5 +1581,13 @@
   "dashboard.selfControl.hardWhitelist.error.startFailed": "कड़ा टाइमर अनुमति सूची शुरू ना हो सकल",
   "dashboard.selfControl.hardWhitelist.started": "कड़ा टाइमर अनुमति सूची शुरू भइल",
   "dashboard.selfControl.lockGate.hint": "उलटी गिनती पूरा होखे तक ई प्रोफाइल आ एकर मौजूदा फ़िल्टरिंग नीति स्थिर रही। प्रोफाइल बदलल आ सेटिंग बदलल उपलब्ध ना होई।",
-  "dashboard.selfControl.lockGate.unlocksAt": "{dateTime} पर अपने-आप अनलॉक होई।"
+  "dashboard.selfControl.lockGate.unlocksAt": "{dateTime} पर अपने-आप अनलॉक होई।",
+  "dashboard.ruleEditor.move.keywordToBlocked": "कीवर्ड के रोकल नियम में सरका दिहल गइल",
+  "dashboard.ruleEditor.move.keywordToAllowed": "कीवर्ड के मंजूर नियम में सरका दिहल गइल",
+  "dashboard.ruleEditor.move.channelToBlocked": "चैनल के रोकल नियम में सरका दिहल गइल",
+  "dashboard.ruleEditor.move.channelToAllowed": "चैनल के मंजूर नियम में सरका दिहल गइल",
+  "dashboard.ruleEditor.move.kidsKeywordToBlocked": "Kids कीवर्ड के रोकल नियम में सरका दिहल गइल",
+  "dashboard.ruleEditor.move.kidsKeywordToAllowed": "Kids कीवर्ड के मंजूर नियम में सरका दिहल गइल",
+  "dashboard.ruleEditor.move.kidsChannelToBlocked": "Kids चैनल के रोकल नियम में सरका दिहल गइल",
+  "dashboard.ruleEditor.move.kidsChannelToAllowed": "Kids चैनल के मंजूर नियम में सरका दिहल गइल"
 }

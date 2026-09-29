@@ -1581,5 +1581,13 @@
   "dashboard.selfControl.hardWhitelist.error.startFailed": "ጥብቅ የሰዓት ቆጣሪ የፍቃድ ዝርዝር መጀመር አልተቻለም",
   "dashboard.selfControl.hardWhitelist.started": "ጥብቅ የሰዓት ቆጣሪ የፍቃድ ዝርዝር ተጀምሯል",
   "dashboard.selfControl.lockGate.hint": "ቆጠራው እስኪያበቃ ድረስ ይህ መገለጫና የአሁኑ የማጣሪያ ፖሊሲ እንዳሉ ይቆያሉ። መገለጫ መቀየርና ቅንብሮችን መቀየር አይቻልም።",
-  "dashboard.selfControl.lockGate.unlocksAt": "በ{dateTime} በራስ-ሰር ይከፈታል።"
+  "dashboard.selfControl.lockGate.unlocksAt": "በ{dateTime} በራስ-ሰር ይከፈታል።",
+  "dashboard.ruleEditor.move.keywordToBlocked": "ቁልፍ ቃሉ ወደ የታገዱ ደንቦች ተዛወረ",
+  "dashboard.ruleEditor.move.keywordToAllowed": "ቁልፍ ቃሉ ወደ የተፈቀዱ ደንቦች ተዛወረ",
+  "dashboard.ruleEditor.move.channelToBlocked": "ቻናሉ ወደ የታገዱ ደንቦች ተዛወረ",
+  "dashboard.ruleEditor.move.channelToAllowed": "ቻናሉ ወደ የተፈቀዱ ደንቦች ተዛወረ",
+  "dashboard.ruleEditor.move.kidsKeywordToBlocked": "የKids ቁልፍ ቃል ወደ የታገዱ ደንቦች ተዛወረ",
+  "dashboard.ruleEditor.move.kidsKeywordToAllowed": "የKids ቁልፍ ቃል ወደ የተፈቀዱ ደንቦች ተዛወረ",
+  "dashboard.ruleEditor.move.kidsChannelToBlocked": "የKids ቻናል ወደ የታገዱ ደንቦች ተዛወረ",
+  "dashboard.ruleEditor.move.kidsChannelToAllowed": "የKids ቻናል ወደ የተፈቀዱ ደንቦች ተዛወረ"
 }

@@ -1581,5 +1581,13 @@
   "dashboard.selfControl.hardWhitelist.error.startFailed": "Daftar Idin Timer Keras ora bisa diwiwiti",
   "dashboard.selfControl.hardWhitelist.started": "Daftar Idin Timer Keras diwiwiti",
   "dashboard.selfControl.lockGate.hint": "Profil iki lan kabijakan nyaring saiki tetep nganti hitung mundur rampung. Pindhah profil lan owah-owahan setelan ora kasedhiya.",
-  "dashboard.selfControl.lockGate.unlocksAt": "Kunci bakal mbukak otomatis {dateTime}."
+  "dashboard.selfControl.lockGate.unlocksAt": "Kunci bakal mbukak otomatis {dateTime}.",
+  "dashboard.ruleEditor.move.keywordToBlocked": "Tembung kunci dipindhah menyang aturan sing diblokir",
+  "dashboard.ruleEditor.move.keywordToAllowed": "Tembung kunci dipindhah menyang aturan sing diidinake",
+  "dashboard.ruleEditor.move.channelToBlocked": "Kanal dipindhah menyang aturan sing diblokir",
+  "dashboard.ruleEditor.move.channelToAllowed": "Kanal dipindhah menyang aturan sing diidinake",
+  "dashboard.ruleEditor.move.kidsKeywordToBlocked": "Tembung kunci Kids dipindhah menyang aturan sing diblokir",
+  "dashboard.ruleEditor.move.kidsKeywordToAllowed": "Tembung kunci Kids dipindhah menyang aturan sing diidinake",
+  "dashboard.ruleEditor.move.kidsChannelToBlocked": "Kanal Kids dipindhah menyang aturan sing diblokir",
+  "dashboard.ruleEditor.move.kidsChannelToAllowed": "Kanal Kids dipindhah menyang aturan sing diidinake"
 }

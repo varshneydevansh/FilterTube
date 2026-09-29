@@ -1581,5 +1581,13 @@
   "dashboard.selfControl.hardWhitelist.error.startFailed": "شروع فهرست مجاز زمان‌دار سخت‌گیرانه ممکن نشد",
   "dashboard.selfControl.hardWhitelist.started": "فهرست مجاز زمان‌دار سخت‌گیرانه آغاز شد",
   "dashboard.selfControl.lockGate.hint": "این نمایه و سیاست فعلی فیلتر آن تا پایان شمارش معکوس ثابت می‌مانند. جابه‌جایی نمایه و تغییر تنظیمات در دسترس نیست.",
-  "dashboard.selfControl.lockGate.unlocksAt": "قفل در {dateTime} به‌طور خودکار باز می‌شود."
+  "dashboard.selfControl.lockGate.unlocksAt": "قفل در {dateTime} به‌طور خودکار باز می‌شود.",
+  "dashboard.ruleEditor.move.keywordToBlocked": "واژهٔ کلیدی به قواعد مسدودشده منتقل شد",
+  "dashboard.ruleEditor.move.keywordToAllowed": "واژهٔ کلیدی به قواعد مجاز منتقل شد",
+  "dashboard.ruleEditor.move.channelToBlocked": "کانال به قواعد مسدودشده منتقل شد",
+  "dashboard.ruleEditor.move.channelToAllowed": "کانال به قواعد مجاز منتقل شد",
+  "dashboard.ruleEditor.move.kidsKeywordToBlocked": "واژهٔ کلیدی Kids به قواعد مسدودشده منتقل شد",
+  "dashboard.ruleEditor.move.kidsKeywordToAllowed": "واژهٔ کلیدی Kids به قواعد مجاز منتقل شد",
+  "dashboard.ruleEditor.move.kidsChannelToBlocked": "کانال Kids به قواعد مسدودشده منتقل شد",
+  "dashboard.ruleEditor.move.kidsChannelToAllowed": "کانال Kids به قواعد مجاز منتقل شد"
 }

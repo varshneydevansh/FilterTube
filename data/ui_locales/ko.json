@@ -1581,5 +1581,13 @@
   "dashboard.selfControl.hardWhitelist.error.startFailed": "엄격 타이머 허용 목록을 시작하지 못했습니다",
   "dashboard.selfControl.hardWhitelist.started": "엄격 타이머 허용 목록이 시작되었습니다",
   "dashboard.selfControl.lockGate.hint": "카운트다운이 끝날 때까지 이 프로필과 현재 필터링 정책은 고정됩니다. 프로필 전환과 설정 변경은 사용할 수 없습니다.",
-  "dashboard.selfControl.lockGate.unlocksAt": "{dateTime}에 자동으로 잠금이 해제됩니다."
+  "dashboard.selfControl.lockGate.unlocksAt": "{dateTime}에 자동으로 잠금이 해제됩니다.",
+  "dashboard.ruleEditor.move.keywordToBlocked": "키워드가 차단 규칙으로 이동했습니다",
+  "dashboard.ruleEditor.move.keywordToAllowed": "키워드가 허용 규칙으로 이동했습니다",
+  "dashboard.ruleEditor.move.channelToBlocked": "채널이 차단 규칙으로 이동했습니다",
+  "dashboard.ruleEditor.move.channelToAllowed": "채널이 허용 규칙으로 이동했습니다",
+  "dashboard.ruleEditor.move.kidsKeywordToBlocked": "Kids 키워드가 차단 규칙으로 이동했습니다",
+  "dashboard.ruleEditor.move.kidsKeywordToAllowed": "Kids 키워드가 허용 규칙으로 이동했습니다",
+  "dashboard.ruleEditor.move.kidsChannelToBlocked": "Kids 채널이 차단 규칙으로 이동했습니다",
+  "dashboard.ruleEditor.move.kidsChannelToAllowed": "Kids 채널이 허용 규칙으로 이동했습니다"
 }

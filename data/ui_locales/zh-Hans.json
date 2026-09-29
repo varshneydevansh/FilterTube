@@ -1581,5 +1581,13 @@
   "dashboard.selfControl.hardWhitelist.error.startFailed": "无法启动硬性计时白名单",
   "dashboard.selfControl.hardWhitelist.started": "硬性计时白名单已开始",
   "dashboard.selfControl.lockGate.hint": "倒计时结束前，此个人资料及其当前过滤策略将保持固定。无法切换个人资料或更改设置。",
-  "dashboard.selfControl.lockGate.unlocksAt": "将于{dateTime}自动解锁。"
+  "dashboard.selfControl.lockGate.unlocksAt": "将于{dateTime}自动解锁。",
+  "dashboard.ruleEditor.move.keywordToBlocked": "关键词已移至屏蔽规则",
+  "dashboard.ruleEditor.move.keywordToAllowed": "关键词已移至允许规则",
+  "dashboard.ruleEditor.move.channelToBlocked": "频道已移至屏蔽规则",
+  "dashboard.ruleEditor.move.channelToAllowed": "频道已移至允许规则",
+  "dashboard.ruleEditor.move.kidsKeywordToBlocked": "Kids 关键词已移至屏蔽规则",
+  "dashboard.ruleEditor.move.kidsKeywordToAllowed": "Kids 关键词已移至允许规则",
+  "dashboard.ruleEditor.move.kidsChannelToBlocked": "Kids 频道已移至屏蔽规则",
+  "dashboard.ruleEditor.move.kidsChannelToAllowed": "Kids 频道已移至允许规则"
 }

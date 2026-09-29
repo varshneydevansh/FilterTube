@@ -1581,5 +1581,13 @@
   "dashboard.selfControl.hardWhitelist.error.startFailed": "سخت ٹائمر اجازت فہرست شروع نہیں ہو سکی",
   "dashboard.selfControl.hardWhitelist.started": "سخت ٹائمر اجازت فہرست شروع ہو گئی",
   "dashboard.selfControl.lockGate.hint": "الٹی گنتی ختم ہونے تک یہ پروفائل اور اس کی موجودہ فلٹر پالیسی مقرر رہیں گے۔ پروفائل یا ترتیبات تبدیل نہیں ہو سکیں گی۔",
-  "dashboard.selfControl.lockGate.unlocksAt": "{dateTime} پر خودکار طور پر ان لاک ہوگا۔"
+  "dashboard.selfControl.lockGate.unlocksAt": "{dateTime} پر خودکار طور پر ان لاک ہوگا۔",
+  "dashboard.ruleEditor.move.keywordToBlocked": "کلیدی لفظ کو مسدود قواعد میں منتقل کر دیا گیا",
+  "dashboard.ruleEditor.move.keywordToAllowed": "کلیدی لفظ کو اجازت یافتہ قواعد میں منتقل کر دیا گیا",
+  "dashboard.ruleEditor.move.channelToBlocked": "چینل کو مسدود قواعد میں منتقل کر دیا گیا",
+  "dashboard.ruleEditor.move.channelToAllowed": "چینل کو اجازت یافتہ قواعد میں منتقل کر دیا گیا",
+  "dashboard.ruleEditor.move.kidsKeywordToBlocked": "Kids کے کلیدی لفظ کو مسدود قواعد میں منتقل کر دیا گیا",
+  "dashboard.ruleEditor.move.kidsKeywordToAllowed": "Kids کے کلیدی لفظ کو اجازت یافتہ قواعد میں منتقل کر دیا گیا",
+  "dashboard.ruleEditor.move.kidsChannelToBlocked": "Kids چینل کو مسدود قواعد میں منتقل کر دیا گیا",
+  "dashboard.ruleEditor.move.kidsChannelToAllowed": "Kids چینل کو اجازت یافتہ قواعد میں منتقل کر دیا گیا"
 }

@@ -1581,5 +1581,13 @@
   "dashboard.selfControl.hardWhitelist.error.startFailed": "A kò lè bẹ̀rẹ̀ Àtòjọ Ìyọ̀nda Aago Líle",
   "dashboard.selfControl.hardWhitelist.started": "Àtòjọ Ìyọ̀nda Aago Líle ti bẹ̀rẹ̀",
   "dashboard.selfControl.lockGate.hint": "A ó pa profaili yìí àti ìlànà àlẹ̀mọ́ rẹ̀ lọ́wọ́lọ́wọ́ mọ́ títí ìkànsí àkókò yóò fi parí. Yíyí profaili padà àti àwọn àyípadà ètò kò sí.",
-  "dashboard.selfControl.lockGate.unlocksAt": "Yóò ṣí sílẹ̀ fúnra rẹ̀ ní {dateTime}."
+  "dashboard.selfControl.lockGate.unlocksAt": "Yóò ṣí sílẹ̀ fúnra rẹ̀ ní {dateTime}.",
+  "dashboard.ruleEditor.move.keywordToBlocked": "A gbe ọ̀rọ̀ pàtàkì lọ sí àwọn òfin ìdènà",
+  "dashboard.ruleEditor.move.keywordToAllowed": "A gbe ọ̀rọ̀ pàtàkì lọ sí àwọn òfin ìyọ̀nda",
+  "dashboard.ruleEditor.move.channelToBlocked": "A gbe ikanni lọ sí àwọn òfin ìdènà",
+  "dashboard.ruleEditor.move.channelToAllowed": "A gbe ikanni lọ sí àwọn òfin ìyọ̀nda",
+  "dashboard.ruleEditor.move.kidsKeywordToBlocked": "A gbe ọ̀rọ̀ pàtàkì Kids lọ sí àwọn òfin ìdènà",
+  "dashboard.ruleEditor.move.kidsKeywordToAllowed": "A gbe ọ̀rọ̀ pàtàkì Kids lọ sí àwọn òfin ìyọ̀nda",
+  "dashboard.ruleEditor.move.kidsChannelToBlocked": "A gbe ikanni Kids lọ sí àwọn òfin ìdènà",
+  "dashboard.ruleEditor.move.kidsChannelToAllowed": "A gbe ikanni Kids lọ sí àwọn òfin ìyọ̀nda"
 }

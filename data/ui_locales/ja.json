@@ -1581,5 +1581,13 @@
   "dashboard.selfControl.hardWhitelist.error.startFailed": "ハードタイマー許可リストを開始できませんでした",
   "dashboard.selfControl.hardWhitelist.started": "ハードタイマー許可リストを開始しました",
   "dashboard.selfControl.lockGate.hint": "カウントダウンが終わるまで、このプロフィールと現在のフィルタリング方針は固定されます。プロフィールの切り替えと設定の変更はできません。",
-  "dashboard.selfControl.lockGate.unlocksAt": "{dateTime}に自動でロック解除されます。"
+  "dashboard.selfControl.lockGate.unlocksAt": "{dateTime}に自動でロック解除されます。",
+  "dashboard.ruleEditor.move.keywordToBlocked": "キーワードをブロックルールに移動しました",
+  "dashboard.ruleEditor.move.keywordToAllowed": "キーワードを許可ルールに移動しました",
+  "dashboard.ruleEditor.move.channelToBlocked": "チャンネルをブロックルールに移動しました",
+  "dashboard.ruleEditor.move.channelToAllowed": "チャンネルを許可ルールに移動しました",
+  "dashboard.ruleEditor.move.kidsKeywordToBlocked": "Kids のキーワードをブロックルールに移動しました",
+  "dashboard.ruleEditor.move.kidsKeywordToAllowed": "Kids のキーワードを許可ルールに移動しました",
+  "dashboard.ruleEditor.move.kidsChannelToBlocked": "Kids のチャンネルをブロックルールに移動しました",
+  "dashboard.ruleEditor.move.kidsChannelToAllowed": "Kids のチャンネルを許可ルールに移動しました"
 }

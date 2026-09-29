@@ -1581,5 +1581,13 @@
   "dashboard.selfControl.hardWhitelist.error.startFailed": "เริ่มรายการอนุญาตแบบตั้งเวลาเข้มงวดไม่ได้",
   "dashboard.selfControl.hardWhitelist.started": "เริ่มรายการอนุญาตแบบตั้งเวลาเข้มงวดแล้ว",
   "dashboard.selfControl.lockGate.hint": "โปรไฟล์นี้และนโยบายการกรองปัจจุบันจะถูกตรึงไว้จนกว่าตัวนับถอยหลังจะหมด จะสลับโปรไฟล์หรือเปลี่ยนการตั้งค่าไม่ได้",
-  "dashboard.selfControl.lockGate.unlocksAt": "ปลดล็อกอัตโนมัติเมื่อ {dateTime}"
+  "dashboard.selfControl.lockGate.unlocksAt": "ปลดล็อกอัตโนมัติเมื่อ {dateTime}",
+  "dashboard.ruleEditor.move.keywordToBlocked": "ย้ายคำสำคัญไปยังกฎที่บล็อกแล้ว",
+  "dashboard.ruleEditor.move.keywordToAllowed": "ย้ายคำสำคัญไปยังกฎที่อนุญาตแล้ว",
+  "dashboard.ruleEditor.move.channelToBlocked": "ย้ายช่องไปยังกฎที่บล็อกแล้ว",
+  "dashboard.ruleEditor.move.channelToAllowed": "ย้ายช่องไปยังกฎที่อนุญาตแล้ว",
+  "dashboard.ruleEditor.move.kidsKeywordToBlocked": "ย้ายคำสำคัญ Kids ไปยังกฎที่บล็อกแล้ว",
+  "dashboard.ruleEditor.move.kidsKeywordToAllowed": "ย้ายคำสำคัญ Kids ไปยังกฎที่อนุญาตแล้ว",
+  "dashboard.ruleEditor.move.kidsChannelToBlocked": "ย้ายช่อง Kids ไปยังกฎที่บล็อกแล้ว",
+  "dashboard.ruleEditor.move.kidsChannelToAllowed": "ย้ายช่อง Kids ไปยังกฎที่อนุญาตแล้ว"
 }

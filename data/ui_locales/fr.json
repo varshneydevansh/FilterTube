@@ -1581,5 +1581,13 @@
   "dashboard.selfControl.hardWhitelist.error.startFailed": "Impossible de démarrer la liste stricte avec minuterie",
   "dashboard.selfControl.hardWhitelist.started": "Liste stricte avec minuterie démarrée",
   "dashboard.selfControl.lockGate.hint": "Ce profil et sa politique de filtrage actuelle resteront figés jusqu’à la fin du compte à rebours. Le changement de profil et des paramètres sera impossible.",
-  "dashboard.selfControl.lockGate.unlocksAt": "Déverrouillage automatique le {dateTime}."
+  "dashboard.selfControl.lockGate.unlocksAt": "Déverrouillage automatique le {dateTime}.",
+  "dashboard.ruleEditor.move.keywordToBlocked": "Mot-clé déplacé vers les règles bloquées",
+  "dashboard.ruleEditor.move.keywordToAllowed": "Mot-clé déplacé vers les règles autorisées",
+  "dashboard.ruleEditor.move.channelToBlocked": "Chaîne déplacée vers les règles bloquées",
+  "dashboard.ruleEditor.move.channelToAllowed": "Chaîne déplacée vers les règles autorisées",
+  "dashboard.ruleEditor.move.kidsKeywordToBlocked": "Mot-clé Kids déplacé vers les règles bloquées",
+  "dashboard.ruleEditor.move.kidsKeywordToAllowed": "Mot-clé Kids déplacé vers les règles autorisées",
+  "dashboard.ruleEditor.move.kidsChannelToBlocked": "Chaîne Kids déplacée vers les règles bloquées",
+  "dashboard.ruleEditor.move.kidsChannelToAllowed": "Chaîne Kids déplacée vers les règles autorisées"
 }

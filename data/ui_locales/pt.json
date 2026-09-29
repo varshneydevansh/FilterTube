@@ -1581,5 +1581,13 @@
   "dashboard.selfControl.hardWhitelist.error.startFailed": "Não foi possível iniciar a lista rígida com temporizador",
   "dashboard.selfControl.hardWhitelist.started": "Lista rígida com temporizador iniciada",
   "dashboard.selfControl.lockGate.hint": "Este perfil e a política de filtragem atual ficarão fixos até o fim da contagem regressiva. Não será possível trocar de perfil nem alterar configurações.",
-  "dashboard.selfControl.lockGate.unlocksAt": "Desbloqueio automático em {dateTime}."
+  "dashboard.selfControl.lockGate.unlocksAt": "Desbloqueio automático em {dateTime}.",
+  "dashboard.ruleEditor.move.keywordToBlocked": "Palavra-chave movida para as regras bloqueadas",
+  "dashboard.ruleEditor.move.keywordToAllowed": "Palavra-chave movida para as regras permitidas",
+  "dashboard.ruleEditor.move.channelToBlocked": "Canal movido para as regras bloqueadas",
+  "dashboard.ruleEditor.move.channelToAllowed": "Canal movido para as regras permitidas",
+  "dashboard.ruleEditor.move.kidsKeywordToBlocked": "Palavra-chave do Kids movida para as regras bloqueadas",
+  "dashboard.ruleEditor.move.kidsKeywordToAllowed": "Palavra-chave do Kids movida para as regras permitidas",
+  "dashboard.ruleEditor.move.kidsChannelToBlocked": "Canal do Kids movido para as regras bloqueadas",
+  "dashboard.ruleEditor.move.kidsChannelToAllowed": "Canal do Kids movido para as regras permitidas"
 }

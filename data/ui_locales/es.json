@@ -1581,5 +1581,13 @@
   "dashboard.selfControl.hardWhitelist.error.startFailed": "No se pudo iniciar la lista estricta con temporizador",
   "dashboard.selfControl.hardWhitelist.started": "Se inició la lista estricta con temporizador",
   "dashboard.selfControl.lockGate.hint": "Este perfil y su política de filtrado actual quedarán fijos hasta que termine la cuenta atrás. No se podrá cambiar de perfil ni modificar los ajustes.",
-  "dashboard.selfControl.lockGate.unlocksAt": "Se desbloqueará automáticamente el {dateTime}."
+  "dashboard.selfControl.lockGate.unlocksAt": "Se desbloqueará automáticamente el {dateTime}.",
+  "dashboard.ruleEditor.move.keywordToBlocked": "Palabra clave movida a las reglas bloqueadas",
+  "dashboard.ruleEditor.move.keywordToAllowed": "Palabra clave movida a las reglas permitidas",
+  "dashboard.ruleEditor.move.channelToBlocked": "Canal movido a las reglas bloqueadas",
+  "dashboard.ruleEditor.move.channelToAllowed": "Canal movido a las reglas permitidas",
+  "dashboard.ruleEditor.move.kidsKeywordToBlocked": "Palabra clave de Kids movida a las reglas bloqueadas",
+  "dashboard.ruleEditor.move.kidsKeywordToAllowed": "Palabra clave de Kids movida a las reglas permitidas",
+  "dashboard.ruleEditor.move.kidsChannelToBlocked": "Canal de Kids movido a las reglas bloqueadas",
+  "dashboard.ruleEditor.move.kidsChannelToAllowed": "Canal de Kids movido a las reglas permitidas"
 }

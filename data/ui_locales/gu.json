@@ -1581,5 +1581,13 @@
   "dashboard.selfControl.hardWhitelist.error.startFailed": "કડક ટાઈમર મંજૂરી સૂચિ શરૂ થઈ શકી નહીં",
   "dashboard.selfControl.hardWhitelist.started": "કડક ટાઈમર મંજૂરી સૂચિ શરૂ થઈ",
   "dashboard.selfControl.lockGate.hint": "કાઉન્ટડાઉન પૂરું થાય ત્યાં સુધી આ પ્રોફાઇલ અને તેની હાલની ફિલ્ટરિંગ નીતિ સ્થિર રહેશે. પ્રોફાઇલ બદલવી અને સેટિંગ્સમાં ફેરફાર ઉપલબ્ધ નથી.",
-  "dashboard.selfControl.lockGate.unlocksAt": "{dateTime}એ આપમેળે અનલૉક થશે."
+  "dashboard.selfControl.lockGate.unlocksAt": "{dateTime}એ આપમેળે અનલૉક થશે.",
+  "dashboard.ruleEditor.move.keywordToBlocked": "કીવર્ડને અવરોધિત નિયમોમાં ખસેડ્યું",
+  "dashboard.ruleEditor.move.keywordToAllowed": "કીવર્ડને મંજૂર નિયમોમાં ખસેડ્યું",
+  "dashboard.ruleEditor.move.channelToBlocked": "ચૅનલને અવરોધિત નિયમોમાં ખસેડી",
+  "dashboard.ruleEditor.move.channelToAllowed": "ચૅનલને મંજૂર નિયમોમાં ખસેડી",
+  "dashboard.ruleEditor.move.kidsKeywordToBlocked": "Kids કીવર્ડને અવરોધિત નિયમોમાં ખસેડ્યું",
+  "dashboard.ruleEditor.move.kidsKeywordToAllowed": "Kids કીવર્ડને મંજૂર નિયમોમાં ખસેડ્યું",
+  "dashboard.ruleEditor.move.kidsChannelToBlocked": "Kids ચૅનલને અવરોધિત નિયમોમાં ખસેડી",
+  "dashboard.ruleEditor.move.kidsChannelToAllowed": "Kids ચૅનલને મંજૂર નિયમોમાં ખસેડી"
 }

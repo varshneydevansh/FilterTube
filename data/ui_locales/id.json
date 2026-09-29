@@ -1581,5 +1581,13 @@
   "dashboard.selfControl.hardWhitelist.error.startFailed": "Daftar Izin Timer Ketat tidak dapat dimulai",
   "dashboard.selfControl.hardWhitelist.started": "Daftar Izin Timer Ketat dimulai",
   "dashboard.selfControl.lockGate.hint": "Profil ini dan kebijakan pemfilterannya saat ini akan tetap terkunci sampai hitung mundur selesai. Pergantian profil dan perubahan pengaturan tidak tersedia.",
-  "dashboard.selfControl.lockGate.unlocksAt": "Akan terbuka otomatis pada {dateTime}."
+  "dashboard.selfControl.lockGate.unlocksAt": "Akan terbuka otomatis pada {dateTime}.",
+  "dashboard.ruleEditor.move.keywordToBlocked": "Kata kunci dipindahkan ke aturan yang diblokir",
+  "dashboard.ruleEditor.move.keywordToAllowed": "Kata kunci dipindahkan ke aturan yang diizinkan",
+  "dashboard.ruleEditor.move.channelToBlocked": "Channel dipindahkan ke aturan yang diblokir",
+  "dashboard.ruleEditor.move.channelToAllowed": "Channel dipindahkan ke aturan yang diizinkan",
+  "dashboard.ruleEditor.move.kidsKeywordToBlocked": "Kata kunci Kids dipindahkan ke aturan yang diblokir",
+  "dashboard.ruleEditor.move.kidsKeywordToAllowed": "Kata kunci Kids dipindahkan ke aturan yang diizinkan",
+  "dashboard.ruleEditor.move.kidsChannelToBlocked": "Channel Kids dipindahkan ke aturan yang diblokir",
+  "dashboard.ruleEditor.move.kidsChannelToAllowed": "Channel Kids dipindahkan ke aturan yang diizinkan"
 }

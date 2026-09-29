@@ -1581,5 +1581,13 @@
   "dashboard.selfControl.hardWhitelist.error.startFailed": "Không thể bắt đầu danh sách cho phép hẹn giờ nghiêm ngặt",
   "dashboard.selfControl.hardWhitelist.started": "Đã bắt đầu danh sách cho phép hẹn giờ nghiêm ngặt",
   "dashboard.selfControl.lockGate.hint": "Hồ sơ này và chính sách lọc hiện tại sẽ được giữ cố định cho đến khi hết giờ. Không thể chuyển hồ sơ hoặc thay đổi cài đặt.",
-  "dashboard.selfControl.lockGate.unlocksAt": "Tự động mở khóa lúc {dateTime}."
+  "dashboard.selfControl.lockGate.unlocksAt": "Tự động mở khóa lúc {dateTime}.",
+  "dashboard.ruleEditor.move.keywordToBlocked": "Đã chuyển từ khóa sang quy tắc bị chặn",
+  "dashboard.ruleEditor.move.keywordToAllowed": "Đã chuyển từ khóa sang quy tắc được phép",
+  "dashboard.ruleEditor.move.channelToBlocked": "Đã chuyển kênh sang quy tắc bị chặn",
+  "dashboard.ruleEditor.move.channelToAllowed": "Đã chuyển kênh sang quy tắc được phép",
+  "dashboard.ruleEditor.move.kidsKeywordToBlocked": "Đã chuyển từ khóa Kids sang quy tắc bị chặn",
+  "dashboard.ruleEditor.move.kidsKeywordToAllowed": "Đã chuyển từ khóa Kids sang quy tắc được phép",
+  "dashboard.ruleEditor.move.kidsChannelToBlocked": "Đã chuyển kênh Kids sang quy tắc bị chặn",
+  "dashboard.ruleEditor.move.kidsChannelToAllowed": "Đã chuyển kênh Kids sang quy tắc được phép"
 }

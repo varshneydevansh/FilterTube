@@ -1581,5 +1581,13 @@
   "dashboard.selfControl.hardWhitelist.error.startFailed": "कठोर टाइमर अनुमती यादी सुरू करता आली नाही",
   "dashboard.selfControl.hardWhitelist.started": "कठोर टाइमर अनुमती यादी सुरू झाली",
   "dashboard.selfControl.lockGate.hint": "उलटी गणना पूर्ण होईपर्यंत हे प्रोफाइल आणि त्याची सध्याची फिल्टर धोरणे स्थिर राहतील. प्रोफाइल बदलणे किंवा सेटिंग्ज बदलणे शक्य नसेल.",
-  "dashboard.selfControl.lockGate.unlocksAt": "{dateTime} ला आपोआप अनलॉक होईल."
+  "dashboard.selfControl.lockGate.unlocksAt": "{dateTime} ला आपोआप अनलॉक होईल.",
+  "dashboard.ruleEditor.move.keywordToBlocked": "कीवर्ड अवरोधित नियमांमध्ये हलवला",
+  "dashboard.ruleEditor.move.keywordToAllowed": "कीवर्ड अनुमत नियमांमध्ये हलवला",
+  "dashboard.ruleEditor.move.channelToBlocked": "चॅनेल अवरोधित नियमांमध्ये हलवले",
+  "dashboard.ruleEditor.move.channelToAllowed": "चॅनेल अनुमत नियमांमध्ये हलवले",
+  "dashboard.ruleEditor.move.kidsKeywordToBlocked": "Kids कीवर्ड अवरोधित नियमांमध्ये हलवला",
+  "dashboard.ruleEditor.move.kidsKeywordToAllowed": "Kids कीवर्ड अनुमत नियमांमध्ये हलवला",
+  "dashboard.ruleEditor.move.kidsChannelToBlocked": "Kids चॅनेल अवरोधित नियमांमध्ये हलवले",
+  "dashboard.ruleEditor.move.kidsChannelToAllowed": "Kids चॅनेल अनुमत नियमांमध्ये हलवले"
 }

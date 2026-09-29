@@ -1581,5 +1581,13 @@
   "dashboard.selfControl.hardWhitelist.error.startFailed": "Не удалось начать жёсткий таймерный белый список",
   "dashboard.selfControl.hardWhitelist.started": "Жёсткий таймерный белый список запущен",
   "dashboard.selfControl.lockGate.hint": "Этот профиль и его текущая политика фильтрации останутся неизменными до конца обратного отсчёта. Переключение профилей и изменение настроек недоступны.",
-  "dashboard.selfControl.lockGate.unlocksAt": "Автоматическая разблокировка: {dateTime}."
+  "dashboard.selfControl.lockGate.unlocksAt": "Автоматическая разблокировка: {dateTime}.",
+  "dashboard.ruleEditor.move.keywordToBlocked": "Ключевое слово перемещено в заблокированные правила",
+  "dashboard.ruleEditor.move.keywordToAllowed": "Ключевое слово перемещено в разрешённые правила",
+  "dashboard.ruleEditor.move.channelToBlocked": "Канал перемещён в заблокированные правила",
+  "dashboard.ruleEditor.move.channelToAllowed": "Канал перемещён в разрешённые правила",
+  "dashboard.ruleEditor.move.kidsKeywordToBlocked": "Ключевое слово Kids перемещено в заблокированные правила",
+  "dashboard.ruleEditor.move.kidsKeywordToAllowed": "Ключевое слово Kids перемещено в разрешённые правила",
+  "dashboard.ruleEditor.move.kidsChannelToBlocked": "Канал Kids перемещён в заблокированные правила",
+  "dashboard.ruleEditor.move.kidsChannelToAllowed": "Канал Kids перемещён в разрешённые правила"
 }

@@ -1581,5 +1581,13 @@
   "dashboard.selfControl.hardWhitelist.error.startFailed": "تعذّر بدء قائمة السماح الصارمة بالمؤقت",
   "dashboard.selfControl.hardWhitelist.started": "بدأت قائمة السماح الصارمة بالمؤقت",
   "dashboard.selfControl.lockGate.hint": "سيظل هذا الملف الشخصي وسياسة التصفية الحالية ثابتين حتى انتهاء العد التنازلي. لن يتاح تبديل الملف الشخصي أو تغيير الإعدادات.",
-  "dashboard.selfControl.lockGate.unlocksAt": "سيُفتح القفل تلقائيًا في {dateTime}."
+  "dashboard.selfControl.lockGate.unlocksAt": "سيُفتح القفل تلقائيًا في {dateTime}.",
+  "dashboard.ruleEditor.move.keywordToBlocked": "تم نقل الكلمة المفتاحية إلى القواعد المحظورة",
+  "dashboard.ruleEditor.move.keywordToAllowed": "تم نقل الكلمة المفتاحية إلى القواعد المسموح بها",
+  "dashboard.ruleEditor.move.channelToBlocked": "تم نقل القناة إلى القواعد المحظورة",
+  "dashboard.ruleEditor.move.channelToAllowed": "تم نقل القناة إلى القواعد المسموح بها",
+  "dashboard.ruleEditor.move.kidsKeywordToBlocked": "تم نقل كلمة Kids المفتاحية إلى القواعد المحظورة",
+  "dashboard.ruleEditor.move.kidsKeywordToAllowed": "تم نقل كلمة Kids المفتاحية إلى القواعد المسموح بها",
+  "dashboard.ruleEditor.move.kidsChannelToBlocked": "تم نقل قناة Kids إلى القواعد المحظورة",
+  "dashboard.ruleEditor.move.kidsChannelToAllowed": "تم نقل قناة Kids إلى القواعد المسموح بها"
 }

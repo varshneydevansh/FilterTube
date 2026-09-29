@@ -1581,5 +1581,13 @@
   "dashboard.selfControl.hardWhitelist.error.startFailed": "سخت ٹائمر اجازت فہرست شروع نہیں ہو سکّی",
   "dashboard.selfControl.hardWhitelist.started": "سخت ٹائمر اجازت فہرست شروع ہو گئی",
   "dashboard.selfControl.lockGate.hint": "الٹی گنتی مُکن تک ایہ پروفائل تے اوہدی موجودہ فلٹر پالیسی اوہو جیہی رہے گی۔ پروفائل بدلنا تے سیٹنگاں بدلنا ممکن نہیں ہووے گا۔",
-  "dashboard.selfControl.lockGate.unlocksAt": "{dateTime} تے آپے کھُل جاوے گا۔"
+  "dashboard.selfControl.lockGate.unlocksAt": "{dateTime} تے آپے کھُل جاوے گا۔",
+  "dashboard.ruleEditor.move.keywordToBlocked": "کی ورڈ نوں بلاک کیتے گئے اصولاں وچ لے گیا",
+  "dashboard.ruleEditor.move.keywordToAllowed": "کی ورڈ نوں اجازت والے اصولاں وچ لے گیا",
+  "dashboard.ruleEditor.move.channelToBlocked": "چینل نوں بلاک کیتے گئے اصولاں وچ لے گیا",
+  "dashboard.ruleEditor.move.channelToAllowed": "چینل نوں اجازت والے اصولاں وچ لے گیا",
+  "dashboard.ruleEditor.move.kidsKeywordToBlocked": "Kids کی ورڈ نوں بلاک کیتے گئے اصولاں وچ لے گیا",
+  "dashboard.ruleEditor.move.kidsKeywordToAllowed": "Kids کی ورڈ نوں اجازت والے اصولاں وچ لے گیا",
+  "dashboard.ruleEditor.move.kidsChannelToBlocked": "Kids چینل نوں بلاک کیتے گئے اصولاں وچ لے گیا",
+  "dashboard.ruleEditor.move.kidsChannelToAllowed": "Kids چینل نوں اجازت والے اصولاں وچ لے گیا"
 }

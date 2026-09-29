@@ -1581,5 +1581,13 @@
   "dashboard.selfControl.hardWhitelist.error.startFailed": "Hindi masimulan ang Mahigpit na Allowlist na may Timer",
   "dashboard.selfControl.hardWhitelist.started": "Nagsimula na ang Mahigpit na Allowlist na may Timer",
   "dashboard.selfControl.lockGate.hint": "Mananatiling naka-pin ang profile na ito at ang kasalukuyang patakaran nito sa pag-filter hanggang matapos ang countdown. Hindi maaaring magpalit ng profile o magbago ng setting.",
-  "dashboard.selfControl.lockGate.unlocksAt": "Awtomatikong maa-unlock sa {dateTime}."
+  "dashboard.selfControl.lockGate.unlocksAt": "Awtomatikong maa-unlock sa {dateTime}.",
+  "dashboard.ruleEditor.move.keywordToBlocked": "Inilipat ang keyword sa mga naka-block na panuntunan",
+  "dashboard.ruleEditor.move.keywordToAllowed": "Inilipat ang keyword sa mga pinapayagang panuntunan",
+  "dashboard.ruleEditor.move.channelToBlocked": "Inilipat ang channel sa mga naka-block na panuntunan",
+  "dashboard.ruleEditor.move.channelToAllowed": "Inilipat ang channel sa mga pinapayagang panuntunan",
+  "dashboard.ruleEditor.move.kidsKeywordToBlocked": "Inilipat ang Kids keyword sa mga naka-block na panuntunan",
+  "dashboard.ruleEditor.move.kidsKeywordToAllowed": "Inilipat ang Kids keyword sa mga pinapayagang panuntunan",
+  "dashboard.ruleEditor.move.kidsChannelToBlocked": "Inilipat ang Kids channel sa mga naka-block na panuntunan",
+  "dashboard.ruleEditor.move.kidsChannelToAllowed": "Inilipat ang Kids channel sa mga pinapayagang panuntunan"
 }

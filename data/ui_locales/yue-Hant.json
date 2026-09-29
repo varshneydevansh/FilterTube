@@ -1581,5 +1581,13 @@
   "dashboard.selfControl.hardWhitelist.error.startFailed": "無法開始嚴格計時允許清單",
   "dashboard.selfControl.hardWhitelist.started": "嚴格計時允許清單已開始",
   "dashboard.selfControl.lockGate.hint": "倒數完結之前，呢個個人檔案同目前過濾政策都會保持固定。期間無法切換個人檔案或更改設定。",
-  "dashboard.selfControl.lockGate.unlocksAt": "會喺{dateTime}自動解鎖。"
+  "dashboard.selfControl.lockGate.unlocksAt": "會喺{dateTime}自動解鎖。",
+  "dashboard.ruleEditor.move.keywordToBlocked": "關鍵字已移到封鎖規則",
+  "dashboard.ruleEditor.move.keywordToAllowed": "關鍵字已移到允許規則",
+  "dashboard.ruleEditor.move.channelToBlocked": "頻道已移到封鎖規則",
+  "dashboard.ruleEditor.move.channelToAllowed": "頻道已移到允許規則",
+  "dashboard.ruleEditor.move.kidsKeywordToBlocked": "Kids 關鍵字已移到封鎖規則",
+  "dashboard.ruleEditor.move.kidsKeywordToAllowed": "Kids 關鍵字已移到允許規則",
+  "dashboard.ruleEditor.move.kidsChannelToBlocked": "Kids 頻道已移到封鎖規則",
+  "dashboard.ruleEditor.move.kidsChannelToAllowed": "Kids 頻道已移到允許規則"
 }

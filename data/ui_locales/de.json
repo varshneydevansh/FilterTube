@@ -1581,5 +1581,13 @@
   "dashboard.selfControl.hardWhitelist.error.startFailed": "Strikte Timer-Erlaubnisliste konnte nicht gestartet werden",
   "dashboard.selfControl.hardWhitelist.started": "Strikte Timer-Erlaubnisliste gestartet",
   "dashboard.selfControl.lockGate.hint": "Dieses Profil und seine aktuelle Filterrichtlinie bleiben bis zum Ende des Countdowns unverändert. Profilwechsel und Einstellungsänderungen sind nicht möglich.",
-  "dashboard.selfControl.lockGate.unlocksAt": "Automatische Entsperrung am {dateTime}."
+  "dashboard.selfControl.lockGate.unlocksAt": "Automatische Entsperrung am {dateTime}.",
+  "dashboard.ruleEditor.move.keywordToBlocked": "Keyword in blockierte Regeln verschoben",
+  "dashboard.ruleEditor.move.keywordToAllowed": "Keyword in erlaubte Regeln verschoben",
+  "dashboard.ruleEditor.move.channelToBlocked": "Kanal in blockierte Regeln verschoben",
+  "dashboard.ruleEditor.move.channelToAllowed": "Kanal in erlaubte Regeln verschoben",
+  "dashboard.ruleEditor.move.kidsKeywordToBlocked": "Kids-Keyword in blockierte Regeln verschoben",
+  "dashboard.ruleEditor.move.kidsKeywordToAllowed": "Kids-Keyword in erlaubte Regeln verschoben",
+  "dashboard.ruleEditor.move.kidsChannelToBlocked": "Kids-Kanal in blockierte Regeln verschoben",
+  "dashboard.ruleEditor.move.kidsChannelToAllowed": "Kids-Kanal in erlaubte Regeln verschoben"
 }

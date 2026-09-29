@@ -1581,5 +1581,13 @@
   "dashboard.selfControl.hardWhitelist.error.startFailed": "Katı Zamanlayıcılı İzin Listesi başlatılamadı",
   "dashboard.selfControl.hardWhitelist.started": "Katı Zamanlayıcılı İzin Listesi başladı",
   "dashboard.selfControl.lockGate.hint": "Geri sayım bitene kadar bu profil ve mevcut filtreleme ilkesi sabit kalacak. Profil değiştirme ve ayarları düzenleme kullanılamayacak.",
-  "dashboard.selfControl.lockGate.unlocksAt": "{dateTime} tarihinde otomatik olarak kilidi açılır."
+  "dashboard.selfControl.lockGate.unlocksAt": "{dateTime} tarihinde otomatik olarak kilidi açılır.",
+  "dashboard.ruleEditor.move.keywordToBlocked": "Anahtar kelime engellenen kurallara taşındı",
+  "dashboard.ruleEditor.move.keywordToAllowed": "Anahtar kelime izin verilen kurallara taşındı",
+  "dashboard.ruleEditor.move.channelToBlocked": "Kanal engellenen kurallara taşındı",
+  "dashboard.ruleEditor.move.channelToAllowed": "Kanal izin verilen kurallara taşındı",
+  "dashboard.ruleEditor.move.kidsKeywordToBlocked": "Kids anahtar kelimesi engellenen kurallara taşındı",
+  "dashboard.ruleEditor.move.kidsKeywordToAllowed": "Kids anahtar kelimesi izin verilen kurallara taşındı",
+  "dashboard.ruleEditor.move.kidsChannelToBlocked": "Kids kanalı engellenen kurallara taşındı",
+  "dashboard.ruleEditor.move.kidsChannelToAllowed": "Kids kanalı izin verilen kurallara taşındı"
 }

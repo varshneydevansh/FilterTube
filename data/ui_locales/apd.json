@@ -1581,5 +1581,13 @@
   "dashboard.selfControl.hardWhitelist.error.startFailed": "ما قدرنا نبدأ قائمة السماح بالمؤقت المشدد",
   "dashboard.selfControl.hardWhitelist.started": "بدأت قائمة السماح بالمؤقت المشدد",
   "dashboard.selfControl.lockGate.hint": "الملف ده وسياسة التصفية الحالية حيفضلوا ثابتين لحدي ما العد التنازلي يخلص. تبديل الملفات وتغيير الإعدادات ما متاح.",
-  "dashboard.selfControl.lockGate.unlocksAt": "حينفتح القفل تلقائي في {dateTime}."
+  "dashboard.selfControl.lockGate.unlocksAt": "حينفتح القفل تلقائي في {dateTime}.",
+  "dashboard.ruleEditor.move.keywordToBlocked": "الكلمة المفتاحية اتحولت لقواعد الحظر",
+  "dashboard.ruleEditor.move.keywordToAllowed": "الكلمة المفتاحية اتحولت لقواعد السماح",
+  "dashboard.ruleEditor.move.channelToBlocked": "القناة اتحولت لقواعد الحظر",
+  "dashboard.ruleEditor.move.channelToAllowed": "القناة اتحولت لقواعد السماح",
+  "dashboard.ruleEditor.move.kidsKeywordToBlocked": "كلمة Kids المفتاحية اتحولت لقواعد الحظر",
+  "dashboard.ruleEditor.move.kidsKeywordToAllowed": "كلمة Kids المفتاحية اتحولت لقواعد السماح",
+  "dashboard.ruleEditor.move.kidsChannelToBlocked": "قناة Kids اتحولت لقواعد الحظر",
+  "dashboard.ruleEditor.move.kidsChannelToAllowed": "قناة Kids اتحولت لقواعد السماح"
 }

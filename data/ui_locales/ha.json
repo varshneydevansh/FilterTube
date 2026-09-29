@@ -1581,5 +1581,13 @@
   "dashboard.selfControl.hardWhitelist.error.startFailed": "Ba a iya fara Tsauraran Jerin Izini na Mai ƙidayar lokaci ba",
   "dashboard.selfControl.hardWhitelist.started": "An fara Tsauraran Jerin Izini na Mai ƙidayar lokaci",
   "dashboard.selfControl.lockGate.hint": "Wannan bayanin martaba da tsarin tacewarsa na yanzu za su tsaya yadda suke har sai ƙidayar lokaci ta ƙare. Ba za a iya sauya bayanin martaba ko saituna ba.",
-  "dashboard.selfControl.lockGate.unlocksAt": "Za a buɗe shi kai tsaye a {dateTime}."
+  "dashboard.selfControl.lockGate.unlocksAt": "Za a buɗe shi kai tsaye a {dateTime}.",
+  "dashboard.ruleEditor.move.keywordToBlocked": "An matsar da kalmar maɓalli zuwa ƙa'idodin da aka toshe",
+  "dashboard.ruleEditor.move.keywordToAllowed": "An matsar da kalmar maɓalli zuwa ƙa'idodin da aka yarda",
+  "dashboard.ruleEditor.move.channelToBlocked": "An matsar da tashar zuwa ƙa'idodin da aka toshe",
+  "dashboard.ruleEditor.move.channelToAllowed": "An matsar da tashar zuwa ƙa'idodin da aka yarda",
+  "dashboard.ruleEditor.move.kidsKeywordToBlocked": "An matsar da kalmar maɓalli ta Kids zuwa ƙa'idodin da aka toshe",
+  "dashboard.ruleEditor.move.kidsKeywordToAllowed": "An matsar da kalmar maɓalli ta Kids zuwa ƙa'idodin da aka yarda",
+  "dashboard.ruleEditor.move.kidsChannelToBlocked": "An matsar da tashar Kids zuwa ƙa'idodin da aka toshe",
+  "dashboard.ruleEditor.move.kidsChannelToAllowed": "An matsar da tashar Kids zuwa ƙa'idodin da aka yarda"
 }

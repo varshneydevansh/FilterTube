@@ -1581,5 +1581,13 @@
   "dashboard.selfControl.hardWhitelist.error.startFailed": "Impossibile avviare la whitelist rigida con timer",
   "dashboard.selfControl.hardWhitelist.started": "Whitelist rigida con timer avviata",
   "dashboard.selfControl.lockGate.hint": "Questo profilo e le sue regole di filtraggio attuali restano fissi fino al termine del conto alla rovescia. Il cambio profilo e le modifiche alle impostazioni non sono disponibili.",
-  "dashboard.selfControl.lockGate.unlocksAt": "Si sblocca automaticamente {dateTime}."
+  "dashboard.selfControl.lockGate.unlocksAt": "Si sblocca automaticamente {dateTime}.",
+  "dashboard.ruleEditor.move.keywordToBlocked": "Parola chiave spostata nelle regole bloccate",
+  "dashboard.ruleEditor.move.keywordToAllowed": "Parola chiave spostata nelle regole consentite",
+  "dashboard.ruleEditor.move.channelToBlocked": "Canale spostato nelle regole bloccate",
+  "dashboard.ruleEditor.move.channelToAllowed": "Canale spostato nelle regole consentite",
+  "dashboard.ruleEditor.move.kidsKeywordToBlocked": "Parola chiave Kids spostata nelle regole bloccate",
+  "dashboard.ruleEditor.move.kidsKeywordToAllowed": "Parola chiave Kids spostata nelle regole consentite",
+  "dashboard.ruleEditor.move.kidsChannelToBlocked": "Canale Kids spostato nelle regole bloccate",
+  "dashboard.ruleEditor.move.kidsChannelToAllowed": "Canale Kids spostato nelle regole consentite"
 }
