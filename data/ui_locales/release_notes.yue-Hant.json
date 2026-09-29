@@ -14,5 +14,329 @@
       "GitHub 發佈會用 GitHub CLI 憑證，上載之前先建立草稿，接續已有 tag，只上載欠缺嘅 assets，檢查最後嘅 assets 清單，確認無誤之後先發佈。",
       "Android 手機同平板用嘅 FilterTube App 而家已經喺 Google Play 公開。可以喺[公開頁面](https://play.google.com/store/apps/details?id=com.filtertube.app)安裝，或者喺 Google Play 搜尋 FilterTube。"
     ]
+  },
+  "3.3.6": {
+    "headline": "過濾更強、時間有保障，無廣告播放更穩定",
+    "summary": "FilterTube 3.3.6 加入直接存取嘅規則執行、每個 profile 嘅受保護時間同 Self-Control 時段、可靠嘅封鎖同允許規則清單、官方分類過濾、預設開啟嘅 Advert Void，同埋大量配合現時 YouTube 嘅相容性改進。",
+    "bannerSummary": "3.3.6 有直接存取過濾、受保護時間、規則清單同 BlockTube 匯入、官方分類、Advert Void，以及同現時 YouTube 嘅相容性改進。",
+    "highlights": [
+      "直接開 YouTube、切換 playlist、自動播放同受支援嘅內嵌影片，而家都要經過同 feed filtering 一樣嘅影片同頻道准入規則，唔可以再繞過過濾。",
+      "每日 YouTube 時限而家按啟用中嘅 profile 計，會顯示剩餘時間、重新啟動後仍然保留，亦會用全螢幕 timeout 頁面，並透過 PIN 切換 profile。自願開始嘅 Self-Control 時段會鎖住所選規則，直到倒數完結。",
+      "Main 同 Kids 嘅封鎖規則同允許規則仍然係分開嘅清單；最上層嘅 Blocklist 或 Whitelist 政策會決定由邊份清單控制觀看內容。",
+      "大型 BlockTube 同受管理規則清單匯入而家有預覽、容量檢查、交易回復、讀回驗證，亦會更清楚列出新增、重複、略過項目、頻道、關鍵字、regex 同影片 ID 數量。",
+      "分類過濾會用 YouTube 官方嘅 `microformat.playerMicroformatRenderer.category` 欄位、同一 origin 嘅有限 Player metadata 載入、清楚嘅「封鎖所選分類」或「只允許所選分類」選項，亦會更安全咁處理 Watch、側邊 rail、Mix、留言同 renderer 嘅歸屬。",
+      "YouTube Main 同 Kids 嘅新 profile 同已升級 profile 預設會開啟 Advert Void。共用 Web runtime 會喺唔額外發出請求嘅情況下，移除 Player 入面偵測到嘅廣告計劃欄位；native playback 會丟棄未有建模嘅廣告計劃資料，或者喺有提供時正規化原始 Reel response；受保護嘅 fallback 就會處理漏網嘅中斷。",
+      "實驗性口語語言過濾同優先使用原音，會喺有資料時用 YouTube Player 嘅證據；如果冇推薦 metadata，就會放行內容。",
+      "呢個版本亦有隱藏 YouTube Playables、處理現有 camelCase renderer 同 collaboration、改善 Help 同搜尋嘅易讀性、令 popup 同 dashboard 控制更清楚，以及公開嘅 Android Google Play 同 iOS 狀態頁面。",
+      "Settings 有一個全裝置 opt-out 選項，預設冇剔選，用嚟關閉 YouTube 同 YouTube Kids 嘅自動重新載入提示同 What's New 橫額。Dashboard 入面嘅 What's New 頁面仍然可以手動開啟。"
+    ]
+  },
+  "3.3.5": {
+    "headline": "修復 YouTube 問題，同埋提早封鎖 Shorts 頻道",
+    "summary": "呢個版本修正已開啟嘅 YouTube 分頁重複注入 content runtime 嘅問題，亦會喺頻道封鎖規則或 whitelist mode 開啟時，提早判斷畫面上 Shorts 嘅頻道身份。",
+    "bannerSummary": "修正重複 runtime 注入、改善被封鎖 Shorts 頻道嘅身份判斷，並記錄 v3.3.4 rollback 嘅界線。",
+    "highlights": [
+      "Install/update/profile refresh 唔會再向已開啟嘅 YouTube 分頁重複注入 manifest content scripts，避免反覆出現 `Identifier ... has already been declared` 語法錯誤。",
+      "已開啟嘅 YouTube 分頁仍然可以收到受管理嘅 time-limit/runtime 檢查，唔使重複宣告 scripts。",
+      "頻道 blocklist 規則或 whitelist mode 開啟時，畫面上同即將出現嘅 Shorts 而家會用現有、有限制嘅背景 `/shorts/<videoId>` owner resolver。",
+      "學到嘅 Shorts 影片對頻道配對會保存並即時重新處理，所以封鎖頻道嘅 Shorts 唔使先 hover 或開 menu 就會隱藏。",
+      "`.shortsLockupViewModelHost` 同 `.ytGridShelfViewModelGridShelfItem` 等桌面 Shorts host，而家會行專用嘅 Shorts fallback/enrichment 路徑。",
+      "Blocklist mode 唔會喺身份未確認前隱藏未知 Shorts；透過現有 pending 路徑，whitelist mode 仍然較嚴格。",
+      "調查 YouTube 故障報告期間，v3.3.4 被記錄為商店回退到 v3.3.2 套件嘅版本。"
+    ]
+  },
+  "3.3.4": {
+    "headline": "商店回退到 v3.3.2 套件",
+    "summary": "v3.3.4 係瀏覽器商店嘅回退版本；調查 v3.3.3 嘅 YouTube 故障報告期間，佢用返較早嘅 v3.3.2 套件。",
+    "bannerSummary": "回退版本：調查 YouTube 故障報告期間，v3.3.4 使用 v3.3.2 套件。",
+    "highlights": [
+      "冇聲稱 v3.3.4 有任何由 source code 衍生嘅新功能工作。",
+      "調查 issue #64 期間，透過 rollback 將有問題嫌疑嘅 v3.3.3 套件撤出商店。",
+      "下一個 source release v3.3.5 會帶有修正重複 runtime 注入同 Shorts 身份嘅改進。"
+    ]
+  },
+  "3.3.3": {
+    "headline": "家庭裝置更新、規則清單、日期關鍵字，同 YouTube DOM 更新",
+    "summary": "呢個版本令家長／照顧者控制更容易明白，加入經審核嘅規則清單匯入同日期限制關鍵字規則，記錄 Home/Internet Pickup 模型，並按現時 YouTube/YTM markup 更新過濾。",
+    "bannerSummary": "呢個版本有 Family Device Updates、經審核嘅規則清單匯入、日期限制關鍵字、以家長為先嘅 Help，同現時 YouTube/YTM DOM 相容。",
+    "highlights": [
+      "家長／照顧者 profile 可以管理受保護 profile、喺家長 dashboard 修改兒童／受保護 profile 嘅規則，並將已批准嘅更新傳送到已驗證嘅受保護裝置。",
+      "Family Device Updates 而家會解釋即時 Send Update、明確嘅 Home Pickup 同明確嘅 Internet Pickup，唔會將 pickup 服務當成權限來源。",
+      "受保護 profile 嘅時間限制而家會檢查新舊 YouTube 分頁、顯示平靜嘅 timeout 畫面，並記錄額外時間申請畀家長審閱。",
+      "規則清單匯入支援 CSV、TXT、簡單 JSON、BlockTube 格式 JSON 同原始 HTTPS URL；亦有套用前預覽、Main/Kids/Both 目標、範本、清單管理、暫停／繼續／移除、過期檢查同更新。",
+      "日期過濾可以喺上載日期之後、之前或兩個日期之間套用關鍵字。YouTube 有提供時，留言過濾會用主影片嘅上載日期。",
+      "Help 同 dashboard 控制而家用更簡單、以家長為先嘅文字、更快嘅 help bubble，並更清楚解釋 Exact、Comment、Date、PIN、規則清單同裝置更新。",
+      "Dashboard 而家會邀請活躍嘅 Android 封閉測試用戶電郵到 hello@filtertube.in，亦會繼續明顯提醒用戶，YouTube 改變頁面結構時要回報過濾問題。",
+      "YouTube 桌面 lockup selectors 同 YTM 手機版 camelCase DOM 已有文件記錄，令真正嘅影片卡繼續受到過濾，而 Watch 頁面嘅 chip bar 唔會觸發 fallback 工作或造成捲動跳動。",
+      "仍然分開處理：自動 LAN peer discovery、代管嘅 FilterTube Internet Pickup 服務、靜默公開自動訂閱目錄、native Android/iOS parity，以及兩部已安裝裝置嘅手動 smoke test 證據。"
+    ]
+  },
+  "3.3.2": {
+    "headline": "手機／平板 App MVP、YouTube 更順，同 whitelist 更安全",
+    "summary": "公開 App 發佈頁面已準備好 Android 手機／平板最後測試同 iOS/iPad 狀態更新；extension dashboard 而家會連去相關 App 路徑，冇啟用規則時 YouTube SPA 做少啲工作，呢個版本亦修正 whitelist/end-screen 正確性。",
+    "bannerSummary": "呢個版本有手機／平板 App 發佈路徑、較順暢嘅 YouTube runtime、production 安靜 logs，同 whitelist/end-screen 外漏修正。",
+    "highlights": [
+      "網站下載中心同 extension dashboard 而家會顯示 Android 手機／平板最後測試路徑，同 iOS/iPad TestFlight/App Store 狀態路徑。",
+      "Android 手機／平板發佈設定以共用 FilterTube runtime、YouTube Main、公開 YouTube Kids 存取、profiles、PIN 規則同 Nanah sync 為基礎記錄。",
+      "冇啟用規則或 route 需要時，YouTube SPA 效能改進會跳過更多 JSON clone/parse/replay、DOM fallback、quick-block、fallback-menu 同 whitelist-pending 工作。",
+      "Production extension contexts 只有喺明確開啟 debug mode 時先會做一般 console logging，避免正常瀏覽時為 YouTube hot paths 帶來 console 負擔。",
+      "Whitelist release fixes 包括 Shorts creator fallback、轉送 list-target，同埋為 end-screen controls 精簡 autoplay/watch-next endpoint filtering。",
+      "FilterTube DOM state attributes 已加強，減少廣泛可見嘅 `data-filtertube-*` 指紋，同時保留必要 runtime state。",
+      "Accounts & Sync 而家會記錄 Family Device Updates 入面嘅 Send Update、可選 Home Pickup，同離家／遲啲開啟時用嘅 Internet Pickup，令家長明白即時同步、家中取件、網上取件，同邊啲唔係權限。",
+      "受保護 profile 時間限制而家有發佈文件，介紹每日 YouTube 時數、timeout 畫面、額外時間申請紀錄，同家長／照顧者批准。",
+      "Nanah/import 路徑會喺 extension 同 native app payload 之間保留由頻道衍生嘅 Filter All keyword 擁有權，包括行顏色、來源 badge metadata 同配對資料。"
+    ]
+  },
+  "3.3.1": {
+    "headline": "唔使第三方 server 嘅安全 P2P 裝置同步",
+    "summary": "Accounts & Sync 而家將 Nanah 分成三條更簡單嘅路徑，改善家長／兒童目標指定、講清楚重新連線規則，並大幅擴充實際使用文件。",
+    "bannerSummary": "Nanah 同步、更好嘅家長／兒童控制、更安全嘅重新連線規則，同新 Accounts & Sync 流程嘅完整文件。",
+    "highlights": [
+      "Accounts & Sync 而家由三條更清楚嘅路徑開始：Send this profile once、Parent controls child，同 Move full account。",
+      "Nanah 進階控制仍然可用，但收埋喺 Advanced 區域，唔再帶領成個流程。",
+      "Parent/source sessions 可以更清楚揀遠端 target profile，而 managed-link 保存內容而家會同步返畀 sender，令兩部裝置保留同一份 trust record。",
+      "Trusted links 更新後仍會保存，但 reconnect 仍然係新嘅 live session，唔係隱藏背景同步。",
+      "為咗令家長控制更安全，已加強 locked child updates、reconnect rules、device-label persistence，同 self-join/session-burn protection。",
+      "README、Architecture、Technical、Functionality、Profiles & PIN、project plan、user guide 同 concern tracker，而家更詳盡記錄目前 Nanah 桌面版進度。"
+    ]
+  },
+  "3.3.0": {
+    "headline": "修復 collaboration，同加強跨瀏覽器匯入",
+    "summary": "Watch/YTM collaboration menus 更可靠咁還原完整名單，跨瀏覽器 subscription 匯入更穩定，幾項按畫面區域處理嘅 whitelist 同 Quick Block 修正亦加入 3.3.0。",
+    "bannerSummary": "更好嘅 collab menus、更強 whitelist 匯入、更安全 Quick Block surfaces、頻道直接連結，同 3-dot block item 新開關。",
+    "highlights": [
+      "手機 YouTube home/watch-next/Mix 類型卡片而家都參與同一個 3-dot 同 collaborator recovery 流程，唔會再退回資料唔完整嘅單一頻道 menu。",
+      "Watch 頁面右側 rail、playlist rows 同類似 Watch 嘅 lockups 而家可以還原完整 collaborator roster，並即場更新目前開啟嘅 3-dot menu。",
+      "Mix/watch recovery 更安全：真正嘅 collaboration cards 會正確升級，普通名稱入面有「&」或「and」就唔會再變成假 collaboration menu。",
+      "Quick Block 喺複雜畫面更加穩定：會顯示喺更多桌面卡片上方、避開手機搜尋建議 dropdown，亦會更好咁固定喺手機 watch-next layout。",
+      "Subscribed-channel whitelist 匯入而家會保留近期 page browse responses、優先採用真正嘅 /feed/channels 增長，並令 /feed/channels 繼續係可見嘅管理畫面。",
+      "Whitelist filtering 喺 YouTube 桌面／手機 renderers 上更嚴格同安全，包括改善 creator page 處理同 Mixes/subscriptions 隱藏控制。",
+      "新增控制同修飾：Channel Management rows 連到真正頻道頁面、可以停用 3-dot block item，而 Firefox 加密匯出會用更安全嘅 fallback。"
+    ]
+  },
+  "3.2.9": {
+    "headline": "匯入已訂閱頻道、whitelist 同 PIN 保護修正",
+    "summary": "將目前啟用嘅 YouTube account 訂閱匯入 whitelist，模式切換意思更清楚，/feed/channels 啟動流程亦更可靠。",
+    "bannerSummary": "用你而家嘅 YouTube 訂閱建立 whitelist，並即時顯示進度，令啟用 whitelist 嘅方式更清楚。",
+    "highlights": [
+      "新嘅 Tab View 匯入功能可以將目前已登入 YouTube account 訂閱嘅頻道匯入 whitelist。",
+      "匯入開始時而家會重用一個 live YouTube 分頁，帶佢去 /feed/channels，並等 FilterTube bridge 就緒先開始。",
+      "Whitelist 文案更清楚：Import Only 唔會改動 blocklist；Import + Turn On Whitelist 就沿用現有由 blocklist 遷移到 whitelist 嘅路徑。",
+      "文件而家更詳細咁介紹匯入架構、FEchannels request flow、renderer sources 同 whitelist 意義。"
+    ]
+  },
+  "3.2.8": {
+    "headline": "更新主題，同埋微調 Scenic UI 外殼",
+    "summary": "Popup 同 dashboard 畫面而家用更平靜嘅 Scenic 主題系統，版面更緊湊、色調狀態更明顯，深色同淺色之間亦平衡得更好。",
+    "bannerSummary": "Popup 同 dashboard 主題更新咗，透明效果更柔和、pills 更清楚，responsive 版面亦改善咗。",
+    "highlights": [
+      "Scenic UI 更新：popup 同 dashboard 共用更平靜嘅產品外殼，並用本機 hero video 做氣氛背景。",
+      "調整淺色同深色主題：深色模式保留 scenic 背景，但唔會有中間一團褪色光；淺色模式就用更乾淨嘅透明效果。",
+      "Responsive 整理：popup 間距收緊、profile dropdown 縮細、Help/Support 卡片排版更好，filter 畫面喺手機上亦更合適。",
+      "修正控制項色調：兩種主題入面，啟用／停用狀態、pill 顏色、搜尋欄同匯入／匯出操作都更清楚。"
+    ]
+  },
+  "3.2.7": {
+    "headline": "分類篩選、hover 時嘅 Quick Block 叉號，同手機 3 點選單 UI",
+    "summary": "加入分類篩選，並預設開啟一下就用到嘅 Quick Cross Block。",
+    "bannerSummary": "將滑鼠移到卡片上就可以用新分類篩選同 Quick Cross Block；YT Mobile 封鎖支援亦更好。",
+    "highlights": [
+      "分類篩選：按 YouTube 分類（音樂、遊戲、教育等）封鎖或允許影片。",
+      "Quick Cross Block 預設開啟：v3.2.7 預設啟用 `Show Quick Cross Block button`，但用戶仍然可以關閉。",
+      "手機封鎖：透過 3 點選單 UI 同 Quick Cross Block 改善 YT Mobile 封鎖支援，而家喺 Home Page 已經可以用。"
+    ]
+  },
+  "3.2.6": {
+    "headline": "美化 UI/UX，同埋加入按內容篩選",
+    "summary": "全面改善字體同現代化設計，亦加入三種新內容篩選：長度、日期同大楷。",
+    "bannerSummary": "新介面更靚，亦有按影片長度、上載日期同 clickbait 偵測嘅內容篩選。",
+    "highlights": [
+      "字體更新：用更現代同精緻嘅字體比例，令內容更易睇。",
+      "按內容篩選：長度（較長／較短／範圍內）、上載日期（較新／較舊／範圍內），同大楷偵測（clickbait 標題）。",
+      "`videoMetaMap` 系統：持續保存影片 metadata，並用智能 batching（75ms 時段、最多 1500 筆）。",
+      "Dashboard 改進：按畫面分開統計（Main 同 Kids）、更好嘅統計卡片，同捐款宣傳卡片。"
+    ]
+  },
+  "3.2.5": {
+    "headline": "提升 Whitelist mode 嘅地位，同埋加強穩定性",
+    "summary": "Whitelist mode 而家係主要嘅「只允許」路徑，頻道擷取更聰明、playlist 有更多保護，CPU 用量亦更低。",
+    "bannerSummary": "Whitelist mode 獲提升，介面更簡潔、playlist 更穩定，亦支援 Kids。",
+    "highlights": [
+      "提升 Whitelist mode：文字同 UI 唔再標示佢係實驗功能。",
+      "整理 whitelist 畫面嘅 3 點選單，改善次要搜尋處理。",
+      "透過縮圖錨點同父層容器，由多個來源擷取頻道。",
+      "按模式追蹤狀態，並加入確認對話框同 bridge 最佳化。",
+      "Playlist 更穩定：已選嘅行會繼續顯示；身份待確認時唔會再令封鎖嘅行重新出現。",
+      "Kids mode 支援 whitelist，而且唔需要網絡連線。"
+    ]
+  },
+  "3.2.4": {
+    "headline": "加強 Whitelist mode 同效能最佳化",
+    "summary": "大幅改善實驗性 whitelist mode，帶來更好 UX、效能最佳化，同擴大 Kids mode 支援。",
+    "bannerSummary": "Whitelist mode 變得更聰明：介面更清楚、效能更好，亦支援 Kids。",
+    "highlights": [
+      "實驗功能：加強 whitelist mode，包括整理 3 點選單、智能搜尋處理，同按模式追蹤狀態。",
+      "效能提升：bridge 層最佳化同選擇性處理可以減少 CPU 用量。",
+      "UI 改善：切換模式時用確認對話框避免意外遺失資料。",
+      "Kids mode 支援：whitelist 功能而家喺 YouTube Kids 都可以用，而且唔需要網絡連線。",
+      "搜尋最佳化：智能處理右邊 rail 嘅觀看卡片，避免 UI 太迫。",
+      "頻道擷取：用縮圖錨點同父層容器，從多個來源解決身份。",
+      "切換模式：喺 blocklist 同 whitelist 之間順暢切換，並智能重新處理。"
+    ]
+  },
+  "3.2.3": {
+    "headline": "實驗性 Whitelist mode 同 UI 改進",
+    "summary": "Whitelist mode 嘅 alpha 版本，可以只顯示允許嘅內容，亦改善咗 UI 同手機選單支援。",
+    "bannerSummary": "試用實驗性 whitelist mode——除咗允許嘅頻道，其他全部隱藏。",
+    "highlights": [
+      "實驗功能：Whitelist mode 會隱藏所有內容，只保留明確允許嘅頻道／關鍵字。",
+      "Popup 同 tab view 入面有兩種篩選模式，可以輕鬆喺 blocklist 同 whitelist 之間切換。",
+      "分階段遷移：先轉去 blocklist 收集頻道，再將佢哋合併返入 whitelist。",
+      "Whitelist mode 嘅 Watch 頁面保護會保留影片播放功能。",
+      "樂觀式 UI 更新會即時隱藏內容；如果封鎖失敗，就會自動還原。",
+      "改善手機選單支援，正確處理 YouTube 手機版 renderer。",
+      "所有 console logs 而家都由 debug flag 控制，減少 production 雜音。"
+    ]
+  },
+  "3.2.2": {
+    "headline": "UI/UX 改進，同埋 Debug 控制",
+    "summary": "加入樂觀式更新、手機選單支援、debug 控制嘅 logs、保留捲動位置，同埋改善狀態管理。",
+    "bannerSummary": "即時 UI 回應、改善手機選單、debug 控制 logs，同更穩定嘅狀態管理。",
+    "highlights": [
+      "樂觀式 UI 更新：內容即時隱藏；封鎖失敗時會自動還原。",
+      "改善 `ytm-menu-popup-renderer` 手機選單支援，並使用正確 renderer tags。",
+      "透過 `window.__filtertubeDebug` 控制 debug logs。",
+      "DOM fallback 過程保留捲動位置，避免突然跳動。",
+      "限制頻道資料補充（每個 session 10 個），減少背景請求。",
+      "用 `requestIdleCallback` 同 batching，安排系統閒置時先做 rendering。",
+      "比較 signature 以 debounce 外部重新載入，避免重複 rendering。",
+      "選擇性通知：signature 有變先送 `load`；否則送 `externalUpdate`。",
+      "透過共用 global state 管理 bridge 狀態。"
+    ]
+  },
+  "3.2.1": {
+    "headline": "處理更流暢，效能提升",
+    "summary": "大型效能最佳化消除 UI 延遲；Chromium 瀏覽器表現非常好，Firefox 亦有明顯改善。",
+    "bannerSummary": "用非同步處理、編譯快取同批次更新，令過濾更流暢。",
+    "highlights": [
+      "非同步 DOM 處理會讓主執行緒繼續工作，避免重度過濾時瀏覽器凍結。",
+      "編譯 regex 同頻道過濾器快取提供 O(1) 查詢，CPU 用量減少 60–80%。",
+      "每隔智能 250ms 批次更新儲存，I/O 操作減少 70–90%。",
+      "延遲合併設定更新，避免過度重新處理 DOM。",
+      "執行狀態管理會避免多個工作重疊，亦會妥善排隊處理請求。",
+      "Chromium 瀏覽器：延遲減少超過 90%；Firefox：明顯改善，仍會繼續最佳化。"
+    ]
+  },
+  "3.2.0": {
+    "headline": "即時封鎖，Kids 唔使上網",
+    "summary": "3 點選單即時顯示頻道名、網絡請求大幅減少，YouTube Kids 仲可以完全離線運作。",
+    "bannerSummary": "透過主動攔截 XHR 即時封鎖；Kids mode 唔使任何網絡讀取都可以運作。",
+    "highlights": [
+      "3 點選單而家即時顯示正確頻道名，唔使再等「Fetching...」。",
+      "頻道身份來自攔截到嘅 YouTube JSON responses，減少網絡呼叫。",
+      "YouTube Kids 完全唔使網絡讀取，都可以可靠咁封鎖。",
+      "缺少嘅 metadata 會喺背景以受控速度補上（6 小時冷卻時間）。",
+      "主題頻道（例如「Music - Topic」）會特別處理，唔使 `@handles`。",
+      "新增完整文件，並附有 ASCII 同 Mermaid 流程圖。"
+    ]
+  },
+  "3.1.9": {
+    "headline": "按 profile 保存備份，同埋用鎖定保護控制項",
+    "summary": "自動備份同內容控制而家會遵守 profile lock/PIN、繼承每個 profile 嘅設定，而 profile dropdown 喺鎖定畫面上面仍然可以撳。",
+    "bannerSummary": "每個 profile 都有自動備份同鎖定保護；profile selector 一直都可以撳。",
+    "highlights": [
+      "自動備份關閉或者 profile 鎖定時，mode/format 選擇器會停用；新 profile 會繼承自動備份偏好。",
+      "自動備份排程而家會喺建立 profile 同改 mode/format 時觸發，但只限嗰個 profile 已經開咗自動備份。",
+      "鎖定時，內容控制同備份控制會停用或者還原；非 master profile 嘅匯出範圍只會包括啟用中嘅 profile。",
+      "修正 profile dropdown 嘅 z-index，令鎖定橫額出現時都可以撳。",
+      "更新 profile/PIN model、按 profile 保存備份，同 UI 鎖定規則嘅文件。"
+    ]
+  },
+  "3.1.8": {
+    "headline": "Support 分頁，同埋可靠嘅自動備份",
+    "summary": "新增 Support 頁面（Ko-fi），而家自動備份喺 Chrome 同 Firefox 都可靠運作。",
+    "bannerSummary": "自動備份而家支援唔同瀏覽器，並會覆寫同一個最新備份檔案。",
+    "highlights": [
+      "喺 dashboard 加入有 Ko-fi embed 嘅 Support 頁面。",
+      "自動備份而家只會覆寫一個輪替檔案：Downloads/FilterTube Backup/FilterTube-Backup-Latest.json。",
+      "下載方式支援唔同瀏覽器（有 Blob URL 就用；Chrome MV3 service worker 就用 data: URL 作後備）。",
+      "Firefox 下載唔會再因為 data: URL 限制而失敗。"
+    ]
+  },
+  "3.1.7": {
+    "headline": "YT Kids，同自動備份支援",
+    "summary": "而家可以喺 YT Kids 按頻道封鎖內容，亦可以開關自動備份。",
+    "bannerSummary": "新增設定去開關自動備份。匯出檔案而家會保存到 Downloads/FilterTube Export/。",
+    "highlights": [
+      "喺 YT Kids 加入完整嘅 Channel 同 Keyword 封鎖；透過被動監聽 YT Kids 3 點選單 UI 去封鎖頻道。",
+      "喺 Settings 加入自動備份開關（盡力支援；唔會彈出 Save As 視窗）。",
+      "自動備份會輪替保存喺 Downloads/FilterTube Backup/（保留最新檔案）。",
+      "手動匯出而家會靜靜地下載到 Downloads/FilterTube Export/。"
+    ]
+  },
+  "3.1.6": {
+    "headline": "支援匯入／匯出，同埋版本橫額",
+    "summary": "橫額 CTA 而家會直接連去 dashboard 嘅 What's New，精選卡片由同一份 JSON 載入，匯入亦更好咁處理 c/ChannelName 同合併規則。",
+    "bannerSummary": "版本橫額會開啟 extension 入面嘅 What's New 分頁，匯入／匯出文件亦會講解成個流程。",
+    "highlights": [
+      "Release notes JSON 由單一真確來源同時填入 dashboard 卡片同 YouTube 橫額。",
+      "CTA 透過背景訊息開啟 tab-view，令 blocker 唔會攔截 chrome-extension:// 連結。",
+      "匯入／匯出文件同程式碼會講解 UC/handle/c/ChannelName 輸入點樣喺合併前正規化。"
+    ]
+  },
+  "3.1.5": {
+    "headline": "Shorts 同會員專屬內容終於真係隱藏",
+    "summary": "Watch 頁面同 sidebar 而家會喺 Shorts renderer 同會員專屬 shelf 閃出嚟之前先隱藏，toggle 狀態亦終於會保存。",
+    "bannerSummary": "加強喺 Watch 同 sidebar 隱藏會員專屬內容同 Shorts，避免封鎖咗嘅行再出現。",
+    "highlights": [
+      "Sidebar 會喺卡片 render 之前檢查 `/shorts/` href、overlay 同 aria-label。",
+      "會員專屬內容偵測而家涵蓋 compact、Watch 同 shelf rows，並加入新 badge 同 playlist heuristics。",
+      "修正會員專屬 toggle 保存問題，重新載入之後狀態都會保留。"
+    ]
+  },
+  "3.1.4": {
+    "headline": "Dashboard 變得 responsive",
+    "summary": "手機版導覽可以順暢收埋、輸入欄會自然換行，playlist/Mix 控制亦有更清楚嘅 toggle。",
+    "highlights": [
+      "細螢幕加入 hamburger nav 同 overlay，亦調整咗 grid 間距。",
+      "Toggle 有更輕嘅軌道、置中嘅滑鈕，同更好嘅 dark mode 對比。",
+      "Mix toggle 開啟時會隱藏 Mix/Radio chip；隱藏 playlist 時會略過 radio 項目。"
+    ]
+  },
+  "3.1.3": {
+    "headline": "翻新 Help 圖例",
+    "summary": "卡片、pills 同工具提示會準確講明 Exact / Comment / Filter All 嘅作用，亦配合翻新後嘅 dashboard 樣式。",
+    "highlights": [
+      "Help 分頁會用相應顏色顯示 badge tint 同 collaboration label。",
+      "Popup 同 tab 搜尋欄統一採用全闊度排版。",
+      "將內容控制描述移到 hover 工具提示，令意思更清楚。"
+    ]
+  },
+  "3.1.2": {
+    "headline": "加強 playlist autoplay",
+    "summary": "Autoplay 會跳過被封鎖嘅 playlist rows，唔會短暫顯示出嚟；即使 YouTube 重新處理頁面，持續隱藏都會保留。",
+    "highlights": [
+      "只有下一個 playlist row 真係可見時，先會觸發 Next-click。",
+      "就算身份有一陣未解決，Watch playlist panel 嘅 rows 都會繼續隱藏。",
+      "封鎖之後 3 點 menu 會妥善關閉，令 miniplayer 繼續播放。"
+    ]
+  },
+  "3.1.1": {
+    "headline": "Help 分頁同身份修正",
+    "summary": "Dashboard 加入專用 Help 分頁，同時令 UC ↔ handle ↔ 自訂 URL 配對更可靠。",
+    "highlights": [
+      "Help reference 會記錄所有 toggles、badges 同 keyword behavior。",
+      "Playlist navigation 會跳過被封鎖嘅 rows，唔會短暫閃出播放內容。",
+      "Handle／自訂 URL fallback 更可靠咁鎖定正確 UC ID。"
+    ]
+  },
+  "3.1.0": {
+    "headline": "文件同混合式過濾更清楚",
+    "summary": "用流程圖記錄 hybrid interception + DOM fallback 架構，講清楚 FilterTube 點樣執行封鎖。",
+    "highlights": [
+      "記錄 Watch 頁面 3 點 menu 同 home/search collaborators 嘅一致性。",
+      "列出未解決嘅 playlist regressions，令修正進度保持清楚。",
+      "配合 3.1.0 版本更新同步 manifests、build tooling 同 UI footer。"
+    ]
   }
 }
