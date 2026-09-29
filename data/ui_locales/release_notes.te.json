@@ -13,6 +13,385 @@
       "Advert Void ఇప్పుడు ప్లేయర్‌లో `ad-showing` మరియు `ad-interrupting` స్థితులు రెండూ ఉండాలి లేదా ప్రకటన కనిపిస్తోందనే స్వతంత్ర ఆధారం ఉండాలి. స్పాన్సర్ చేసిన కార్డుల నిర్వహణ ఇక సాధారణ renderer మార్పుల పనిగా లెక్కించబడదు.",
       "GitHub విడుదల ప్రచురణ GitHub CLI credentials ఉపయోగిస్తుంది, అప్‌లోడ్‌కు ముందు drafts సృష్టిస్తుంది, ఉన్న tags నుంచి కొనసాగిస్తుంది, లేని assets మాత్రమే అప్‌లోడ్ చేస్తుంది, చివరి asset సమాహారాన్ని ధృవీకరిస్తుంది, ధృవీకరణ తర్వాతే ప్రచురిస్తుంది.",
       "Android ఫోన్లు, టాబ్లెట్‌ల కోసం FilterTube యాప్ ఇప్పుడు Google Playలో అందరికీ అందుబాటులో ఉంది. దీన్ని [పబ్లిక్ పేజీ](https://play.google.com/store/apps/details?id=com.filtertube.app) నుంచి ఇన్‌స్టాల్ చేయండి లేదా Google Playలో FilterTube కోసం వెతకండి."
-    ]
+    ],
+    "detailsUrl": "https://github.com/varshneydevansh/FilterTube/releases/tag/v3.3.7"
+  },
+  "3.3.6": {
+    "ctaLabel": "కొత్త విశేషాలు చూడండి",
+    "headline": "బలమైన ఫిల్టరింగ్, రక్షిత సమయం, ప్రకటనలేని సాఫీ ప్లేబ్యాక్",
+    "summary": "FilterTube 3.3.6 నేరుగా యాక్సెస్ చేసినప్పుడు కూడా నియమాల అమలు, ప్రతి ప్రొఫైల్‌కు రక్షిత సమయం మరియు Self-Control సెషన్‌లు, నమ్మదగిన బ్లాక్/అనుమతి నియమాల జాబితాలు, అధికారిక కేటగిరీ ఫిల్టరింగ్, డిఫాల్ట్‌గా ఆన్ అయిన Advert Void, ప్రస్తుత YouTube‌తో విస్తృత అనుకూలతను అందిస్తుంది.",
+    "bannerSummary": "3.3.6లో నేరుగా యాక్సెస్ ఫిల్టరింగ్, రక్షిత సమయం, నియమాల జాబితా మరియు BlockTube దిగుమతి, అధికారిక కేటగిరీలు, Advert Void, ప్రస్తుత YouTube అనుకూలత ఉన్నాయి.",
+    "highlights": [
+      "YouTubeకి నేరుగా వెళ్లడం, playlist మార్పులు, autoplay, మద్దతున్న embedలు ఇప్పుడు feed filteringని దాటకుండా అదే video మరియు channel అనుమతి నియమాల గుండా వెళ్తాయి.",
+      "రోజువారీ YouTube పరిమితులు ఇప్పుడు క్రియాశీల ప్రొఫైల్‌కు వర్తిస్తాయి, మిగిలిన సమయాన్ని చూపుతాయి, restart తర్వాత కూడా నిలుస్తాయి, PIN ఆధారిత profile switchingతో full-page timeoutను ఉపయోగిస్తాయి; స్వచ్ఛంద Self-Control సెషన్‌లు countdown ముగిసేవరకు ఎంచుకున్న నియమాలను lock చేస్తాయి.",
+      "Main మరియు Kids కోసం Blocked Rules, Allowed Rules వేర్వేరు జాబితాలుగానే ఉంటాయి; పైస్థాయి Blocklist లేదా Whitelist policy ఏ జాబితా వీక్షణను నియంత్రించాలో నిర్ణయిస్తుంది.",
+      "పెద్ద BlockTube మరియు managed rule-list importsలో preview, capacity checks, transactional rollback, read-back verification, జోడించినవి, duplicates, skipped, channel, keyword, regex, video-ID లెక్కల స్పష్టమైన వివరాలు ఉంటాయి.",
+      "Category filtering YouTube అధికారిక `microformat.playerMicroformatRenderer.category`, పరిమిత same-origin Player metadata hydration, Block selected లేదా Allow only selected అనే స్పష్టమైన ఉద్దేశం, Watch, rail, Mix, comment, renderer ownershipను మరింత సురక్షితంగా నిర్వహించడం వాడుతుంది.",
+      "YouTube Main మరియు Kidsలో కొత్త, upgrade చేసిన profilesకు Advert Void డిఫాల్ట్‌గా on అవుతుంది. Shared Web runtime అదనపు requests లేకుండా గుర్తించిన Player ad-plan fieldsను తొలగిస్తుంది; native playbackకు నమూనాలో లేని ad-plan dataను విస్మరిస్తుంది లేదా అందుబాటులో ఉన్నప్పుడు raw Reel responseను normalize చేస్తుంది; ప్రకటనల అంతరాయాల కోసం guarded fallback ఉంటుంది.",
+      "ప్రయోగాత్మక spoken-language filtering మరియు original-audio preference అందుబాటులో ఉన్నప్పుడు YouTube Player ఆధారాలను వాడతాయి; recommendation metadata లేనప్పుడు fail open అవుతాయి.",
+      "YouTube Playablesను దాచడం, ప్రస్తుత camelCase renderer మరియు collaboration handling, మెరుగైన Help readability మరియు search, స్పష్టమైన popup మరియు dashboard controls, public Android Google Play మరియు iOS status surfaces కూడా ఉన్నాయి.",
+      "YouTube మరియు YouTube Kidsలో automatic reload reminders, What's New bannersను మొత్తం deviceలో opt out చేసే unchecked-by-default ఎంపిక Settingsలో ఉంది. Dashboardలోని What's New పేజీని ఇంకా manualగా తెరవవచ్చు."
+    ],
+    "detailsUrl": "https://github.com/varshneydevansh/FilterTube/releases/tag/v3.3.6"
+  },
+  "3.3.5": {
+    "ctaLabel": "కొత్త విశేషాలు చూడండి",
+    "headline": "YouTube లోపాల నుంచి రికవరీ, Shorts ఛానల్‌ను ముందుగానే బ్లాక్ చేయడం",
+    "summary": "ఇప్పటికే తెరిచి ఉన్న YouTube tabsలో content runtime రెండుసార్లు inject కావడాన్ని ఈ release సరిచేస్తుంది; channel rules లేదా whitelist mode ఉన్నప్పుడు కనిపిస్తున్న Shorts channel identityని ఇంకా త్వరగా గుర్తిస్తుంది.",
+    "bannerSummary": "Duplicate runtime injectionను సరిచేస్తుంది, blocked-channel Shorts గుర్తింపును మెరుగుపరుస్తుంది, v3.3.4 rollback పరిమితిని డాక్యుమెంట్ చేస్తుంది.",
+    "highlights": [
+      "Install/update/profile refresh ఇప్పుడు తెరిచి ఉన్న YouTube tabsలో manifest content scriptsను మళ్లీ inject చేయదు; దీంతో `Identifier ... has already been declared` syntax errors పునరావృతం కావు.",
+      "ఇప్పటికే తెరిచి ఉన్న YouTube tabsకు managed time-limit/runtime checks వస్తూనే ఉంటాయి; script declarations duplicate కావు.",
+      "Channel blocklist rules లేదా whitelist mode ఉన్నప్పుడు కనిపిస్తున్న, త్వరలో కనిపించబోయే Shortsకు ఇప్పటికే ఉన్న bounded background `/shorts/<videoId>` owner resolver ఉపయోగించబడుతుంది.",
+      "తెలుసుకున్న Shorts video-to-channel mappingsను నిల్వ చేసి వెంటనే మళ్లీ process చేస్తారు; కాబట్టి blocked channel Shorts దాచడానికి hover లేదా menu interaction అవసరం ఉండదు.",
+      "`.shortsLockupViewModelHost`, `.ytGridShelfViewModelGridShelfItem` వంటి desktop Shorts hosts ప్రత్యేక Shorts fallback/enrichment pathsలో ఉన్నాయి.",
+      "Identity పరిష్కారమయ్యే వరకు Blocklist mode తెలియని Shortsను దాచదు; whitelist mode పాత pending path ద్వారా మరింత కఠినంగా ఉంటుంది.",
+      "YouTube సమస్య నివేదికను పరిశీలించే సమయంలో v3.3.4 store rollbackగా v3.3.2 package ఉపయోగించిందని డాక్యుమెంట్ చేశారు."
+    ],
+    "detailsUrl": "https://github.com/varshneydevansh/FilterTube/releases/tag/v3.3.5"
+  },
+  "3.3.4": {
+    "ctaLabel": "కొత్త విశేషాలు చూడండి",
+    "headline": "Storeలో v3.3.2 packageకు rollback",
+    "summary": "v3.3.4 browser-store rollback release; v3.3.3కు సంబంధించిన YouTube సమస్య నివేదికను పరిశీలించే సమయంలో పాత v3.3.2 packageనే ఉపయోగించింది.",
+    "bannerSummary": "Rollback release: YouTube సమస్య నివేదికలను పరిశీలించే సమయంలో v3.3.4, v3.3.2 packageను ఉపయోగించింది.",
+    "highlights": [
+      "v3.3.4 కోసం కొత్త source-based feature work ఉందని చెప్పడం లేదు.",
+      "Issue #64ను పరిశీలించే సమయంలో అనుమానిత v3.3.3 package నుంచి storeలను మార్చడానికి ఈ rollbackను వాడారు.",
+      "Duplicate runtime injection, Shorts identity సవరణలతో వచ్చిన తదుపరి source release v3.3.5."
+    ],
+    "detailsUrl": "https://github.com/varshneydevansh/FilterTube/releases/tag/v3.3.4"
+  },
+  "3.3.3": {
+    "ctaLabel": "కొత్త విశేషాలు చూడండి",
+    "headline": "కుటుంబ పరికరాల నవీకరణలు, నియమాల జాబితాలు, తేదీ keywords, YouTube DOM refresh",
+    "summary": "తల్లిదండ్రులు/సంరక్షకుల నియంత్రణను ఈ release సులభంగా అర్థమయ్యేలా చేస్తుంది; review చేసిన rule-list imports, తేదీ పరిమిత keyword rules, Home/Internet Pickup model documentation, ప్రస్తుత YouTube/YTM markupకు filter refreshను జోడిస్తుంది.",
+    "bannerSummary": "Family Device Updates, review చేసిన rule-list imports, date-limited keywords, parent-first Help, ప్రస్తుత YouTube/YTM DOM compatibility ఈ releaseలో ఉన్నాయి.",
+    "highlights": [
+      "Parent/caregiver profiles protected profilesను నిర్వహించగలవు, parent dashboard నుంచి child/protected rulesను సవరించగలవు, verified protected devicesకు ఆమోదించిన updatesను పంపగలవు.",
+      "Family Device Updates live Send Update, స్పష్టంగా ప్రారంభించే Home Pickup, స్పష్టంగా ప్రారంభించే Internet Pickupను వివరిస్తుంది; pickup servicesను authorityగా పరిగణించదు.",
+      "Protected-profile time limits పాత, కొత్త YouTube tabsను తనిఖీ చేస్తాయి, ప్రశాంతమైన timeout screen చూపిస్తాయి, extra-time requestsను parent review కోసం నమోదు చేస్తాయి.",
+      "Rule-list imports CSV, TXT, simple JSON, BlockTube-style JSON, raw HTTPS URLsను preview-before-apply, Main/Kids/Both targeting, templates, list management, pause/resume/remove, stale checks, refreshతో మద్దతిస్తాయి.",
+      "Date-based keyword filtering keywordను upload date తర్వాత/ముందు లేదా రెండు తేదీల మధ్య మాత్రమే వర్తింపజేస్తుంది. YouTube అందించినప్పుడు comment filtering parent video upload dateను వాడుతుంది.",
+      "Help మరియు dashboard controls parent-first సులభమైన పదాలు, వేగమైన help bubbles, Exact, Comment, Date, PINs, rule lists, device updatesకు స్పష్టమైన వివరణలను వాడతాయి.",
+      "YouTube page structure మారినప్పుడు filtering breakలను report చేయాలనే visible reminderను dashboard ఉంచుతుంది; active Android closed-testing usersను hello@filtertube.inకు email చేయమని ఆహ్వానిస్తుంది.",
+      "YouTube desktop lockup selectors మరియు YTM mobile camelCase DOM డాక్యుమెంట్ అయ్యాయి; నిజమైన video cards filter అవుతూనే ఉంటాయి, Watch-page chip bars fallback workను trigger చేయవు లేదా scroll jumps కలిగించవు.",
+      "ఇంకా వేరుగా ఉంచినవి: automatic LAN peer discovery, hosted FilterTube Internet Pickup service, silent public auto-subscribe catalogs, native Android/iOS parity, installed రెండు పరికరాల manual smoke-test evidence."
+    ],
+    "detailsUrl": "https://github.com/varshneydevansh/FilterTube/releases/tag/v3.3.3"
+  },
+  "3.3.2": {
+    "ctaLabel": "కొత్త విశేషాలు చూడండి",
+    "headline": "Mobile/tablet app MVP, మెరుగైన YouTube, మరింత సురక్షిత whitelist",
+    "summary": "Android phone/tablet final testing మరియు iOS/iPad status కోసం public app release surface సిద్ధంగా ఉంది; extension dashboard ఆ app pathsను చూపుతుంది. Active rules లేనప్పుడు YouTube SPA work తగ్గుతుంది; whitelist/end-screen correctness fixes కూడా ఈ releaseలో ఉన్నాయి.",
+    "bannerSummary": "Mobile/tablet app release surfaces, మెరుగైన YouTube runtime, productionలో నిశ్శబ్ద logs, whitelist/end-screen leak fixes ఈ releaseలో ఉన్నాయి.",
+    "highlights": [
+      "Website downloads hub మరియు extension dashboard ఇప్పుడు Android phone/tablet final-testing pathను, iOS/iPad TestFlight/App Store status pathను చూపిస్తాయి.",
+      "Shared FilterTube runtime, YouTube Main, public YouTube Kids access, profiles, PIN rules, Nanah sync చుట్టూ Android phone/tablet release setup డాక్యుమెంట్ అయింది.",
+      "Active rules లేకపోతే లేదా route అవసరం లేకపోతే YouTube SPA performance work మరిన్ని JSON clone/parse/replay, DOM fallback, quick-block, fallback-menu, whitelist-pending పనులను దాటవేస్తుంది.",
+      "సాధారణ browsingలో YouTube hot pathsపై console overhead రాకుండా production extension contextsలో routine console logging explicit debug mode ఉన్నప్పుడే ఉంటుంది.",
+      "Whitelist release fixesలో Shorts creator fallback, list-target forwarding, end-screen controls కోసం compact autoplay/watch-next endpoint filtering ఉన్నాయి.",
+      "అవసరమైన runtime stateను నిలుపుకుంటూ, విస్తృతంగా కనిపించే `data-filtertube-*` fingerprints తగ్గించడానికి FilterTube DOM state attributesను బలపరిచారు.",
+      "Accounts & Sync, Send Update, optional Home Pickup, away/later-open Internet Pickup ద్వారా Family Device Updatesను వివరిస్తుంది; ఏది live sync, home pickup, online pickup, ఏది authority కాదో తల్లిదండ్రులు అర్థం చేసుకోగలరు.",
+      "Protected-profile time limitsకు daily YouTube budgets, timeout screens, request-more-time history, parent/caregiver approvalపై release-facing documentation ఉంది.",
+      "Extension, native app payloadల మధ్య channel-derived Filter All keyword ownershipను Nanah/import paths కాపాడతాయి; row color, source-badge metadata, pairing context కూడా ఉంటాయి."
+    ],
+    "detailsUrl": "https://github.com/varshneydevansh/FilterTube/releases/tag/v3.3.2"
+  },
+  "3.3.1": {
+    "ctaLabel": "కొత్త విశేషాలు చూడండి",
+    "headline": "మూడో పక్ష server లేకుండా p2pతో పరికరాల మధ్య సురక్షిత sync",
+    "summary": "Accounts & Sync ఇప్పుడు Nanahను మూడు సులభమైన మార్గాలుగా చూపిస్తుంది; parent/child targeting బలపడింది, reconnect rules స్పష్టమయ్యాయి, నిజజీవిత వినియోగానికి documentation విస్తరించింది.",
+    "bannerSummary": "Nanah sync, మెరుగైన parent/child control, సురక్షిత reconnect rules, కొత్త Accounts & Sync flowకు పూర్తి docs.",
+    "highlights": [
+      "Accounts & Sync ఇప్పుడు మూడు స్పష్టమైన మార్గాలతో మొదలవుతుంది: ఈ profileను ఒకసారి పంపు, parent childను నియంత్రించు, పూర్తి accountను తరలించు.",
+      "Advanced Nanah controls ఇంకా అందుబాటులో ఉన్నాయి; కానీ మొత్తం flowకి అవే ప్రధానంగా కనిపించకుండా Advanced sectionలో దాచబడ్డాయి.",
+      "Parent/source sessions remote target profileను మరింత స్పష్టంగా ఎంచుకోగలవు; managed-link saves senderకూ mirror అవుతాయి, దీంతో రెండు devicesలో ఒకే trust record ఉంటుంది.",
+      "Trusted links refresh తర్వాత కూడా నిలుస్తాయి; reconnect మాత్రం దాచిన background sync కాకుండా కొత్త live sessionగానే ఉంటుంది.",
+      "Locked-child updates, reconnect rules, device-label persistence, self-join/session-burn protectionలను సురక్షితమైన parent control కోసం బలోపేతం చేశారు.",
+      "README, Architecture, Technical, Functionality, Profiles & PIN, project plan, user guide, concern tracker ప్రస్తుత Nanah desktop checkpointను మరింత వివరంగా నమోదు చేస్తాయి."
+    ],
+    "detailsUrl": "https://github.com/varshneydevansh/FilterTube/releases/tag/v3.3.1"
+  },
+  "3.3.0": {
+    "ctaLabel": "కొత్త విశేషాలు చూడండి",
+    "headline": "Collaboration recovery + cross-browser import బలోపేతం",
+    "summary": "Watch/YTM collaboration menus పూర్తి rostersను మరింత నమ్మకంగా తిరిగి పొందుతాయి, subscriptions import అనేక browsersలో మెరుగైంది, surface-specific whitelist మరియు Quick Block fixes 3.3.0లో కలిశాయి.",
+    "bannerSummary": "మెరుగైన collab menus, బలమైన whitelist import, సురక్షిత Quick Block surfaces, direct channel links, 3-dot block itemకు కొత్త toggle.",
+    "highlights": [
+      "Mobile YouTube home/watch-next/Mix-style cards ఇప్పుడు అసంపూర్ణ single-channel menusకు fallback కాకుండా అదే 3-dot మరియు collaborator recovery flowలో పాల్గొంటాయి.",
+      "Watch-page right rail, playlist rows, watch-like lockups పూర్తి collaborator rosterను తిరిగి పొందగలవు; active 3-dot menuను అక్కడికక్కడే refresh చేస్తాయి.",
+      "Mix/watch recovery సురక్షితమైంది: నిజమైన collaboration cards సరిగా upgrade అవుతాయి; '&' లేదా 'and' ఉన్న సాధారణ పేర్లు ఇక తప్పుడు collaboration menus కావు.",
+      "సంక్లిష్ట surfacesపై Quick Block స్థిరంగా ఉంటుంది: మరిన్ని desktop cardsపై కనిపిస్తుంది, mobile search-suggestion dropdownలను తప్పిస్తుంది, mobile watch-next layoutsలో మెరుగ్గా anchor అవుతుంది.",
+      "Subscribed-channel whitelist import తాజా page browse responsesను ఉంచుతుంది, నిజమైన `/feed/channels` growthకు ప్రాధాన్యం ఇస్తుంది, `/feed/channels`ను కనిపించే management surfaceగా ఉంచుతుంది.",
+      "YouTube desktop/mobile renderersలో whitelist filtering మరింత కఠినంగా, సురక్షితంగా ఉంటుంది; creator-page handling, Mixes/subscriptions hide controls మెరుగయ్యాయి.",
+      "కొత్త controls మరియు polish: Channel Management rows నిజమైన channel pagesకు link అవుతాయి, 3-dot block itemను disable చేయవచ్చు, encrypted Firefox exportకు సురక్షిత fallback ఉంది."
+    ],
+    "detailsUrl": "https://github.com/varshneydevansh/FilterTube/releases/tag/v3.3.0"
+  },
+  "3.2.9": {
+    "ctaLabel": "కొత్త విశేషాలు చూడండి",
+    "headline": "సబ్‌స్క్రైబ్ చేసిన ఛానళ్ల దిగుమతి + వైట్‌లిస్ట్ + PIN రక్షణ బగ్ పరిష్కారం",
+    "summary": "ప్రస్తుత YouTube account subscriptionsను whitelistలోకి import చేయండి; mode switching అర్థం మరింత స్పష్టంగా ఉంది, `/feed/channels` startup మరింత నమ్మదగినది.",
+    "bannerSummary": "Inline progress, స్పష్టమైన whitelist activationతో మీ ప్రస్తుత YouTube subscriptions నుంచి whitelist నిర్మించండి.",
+    "highlights": [
+      "కొత్త Tab View import: active signed-in YouTube account నుంచి subscribed channelsను whitelistలోకి import చేయవచ్చు.",
+      "Import startup live YouTube tabను తిరిగి వాడుతుంది, దాన్ని `/feed/channels`కు పంపుతుంది, మొదలుపెట్టే ముందు FilterTube bridge కోసం వేచి ఉంటుంది.",
+      "Whitelist copy స్పష్టమైంది: Import Only blocklistను మార్చదు; Import + Turn On Whitelist పాత blocklist-to-whitelist migration pathను అనుసరిస్తుంది.",
+      "Import architecture, FEchannels request flow, renderer sources, whitelist semantics గురించి docs మరింత వివరంగా చెబుతాయి."
+    ],
+    "detailsUrl": "https://github.com/varshneydevansh/FilterTube/releases/tag/v3.2.9"
+  },
+  "3.2.8": {
+    "ctaLabel": "కొత్త విశేషాలు చూడండి",
+    "headline": "Theme refresh + Scenic UI shell tuning",
+    "summary": "Popup మరియు dashboard ఇప్పుడు ప్రశాంతమైన Scenic theme systemను వాడుతున్నాయి; layout మరింత కుదించబడింది, tint states స్పష్టమయ్యాయి, light/dark balance మెరుగైంది.",
+    "bannerSummary": "ప్రశాంతమైన transparency, స్పష్టమైన pills, మెరుగైన responsive layoutతో refined popup + dashboard theme.",
+    "highlights": [
+      "Scenic UI refresh: popup మరియు dashboard ఒకే ప్రశాంత product shellను పంచుకుంటాయి; local hero video ambient background mediaగా ఉంటుంది.",
+      "Light మరియు dark theme tuning: dark modeలో scenic background వెలిసిన మధ్య glow లేకుండా కనిపిస్తుంది; light mode మరింత శుభ్రమైన transparency వాడుతుంది.",
+      "Responsive cleanup: popup spacing కుదించబడింది, profile dropdown చిన్నదైంది, Help/Support card layout మెరుగైంది, filter surfaces mobileలో బాగా సరిపోతాయి.",
+      "Control tint fixes: enabled/disabled states, pill colors, search fields, import/export actions రెండు themesలో స్పష్టంగా కనిపిస్తాయి."
+    ],
+    "detailsUrl": "https://github.com/varshneydevansh/FilterTube/releases/tag/v3.2.8"
+  },
+  "3.2.7": {
+    "ctaLabel": "కొత్త విశేషాలు చూడండి",
+    "headline": "Category Filters + Quick Block Hover + Mobile 3 Dot UI",
+    "summary": "కొత్త category filtering మరియు ఒక్క tapతో quick cross block డిఫాల్ట్‌గా enabled.",
+    "bannerSummary": "Card hover నుంచి కొత్త category filters, quick cross block వాడండి; YT Mobile blockingకు మెరుగైన support కూడా ఉంది.",
+    "highlights": [
+      "Category Filtering: Music, Gaming, Education వంటి YouTube categories ఆధారంగా videosను block లేదా allow చేయండి.",
+      "Quick Cross Block Default ON: `Show Quick Cross Block button` v3.2.7లో డిఫాల్ట్‌గా enabled (users దీన్ని ఇంకా disable చేయవచ్చు).",
+      "Mobile Blocking: 3 Dot UI మరియు Quick Cross Block కోసం YT Mobile blocking support మెరుగైంది; ప్రస్తుతం Home Pageలో పనిచేస్తోంది."
+    ],
+    "detailsUrl": "https://github.com/varshneydevansh/FilterTube/releases/tag/v3.2.7"
+  },
+  "3.2.6": {
+    "ctaLabel": "కొత్త విశేషాలు చూడండి",
+    "headline": "UI/UX మెరుగుదలలు మరియు content-based filtering",
+    "summary": "ఆధునిక రూపకల్పనతో typography మెరుగుదలలు పూర్తయ్యాయి; duration, date, uppercase అనే మూడు కొత్త content filters జోడించబడ్డాయి.",
+    "bannerSummary": "Duration, upload date, clickbait detection కోసం content filtersతో అందమైన కొత్త UI.",
+    "highlights": [
+      "Typography updates: చదవడానికి సులభంగా ఉండే modern, refined font scale.",
+      "Content-based filters: duration (longer/shorter/between), upload date (newer/older/between), uppercase detection (clickbait titles).",
+      "videoMetaMap system: తెలివైన batchingతో persistent video metadata storage (75ms window, 1500 entry cap).",
+      "Dashboard improvements: surface-specific stats (Main vs Kids), మెరుగైన stat cards, donate promo card."
+    ],
+    "detailsUrl": "https://github.com/varshneydevansh/FilterTube/releases/tag/v3.2.6"
+  },
+  "3.2.5": {
+    "ctaLabel": "కొత్త విశేషాలు చూడండి",
+    "headline": "Whitelist Modeకు ప్రాధాన్యం + స్థిరత్వం",
+    "summary": "Whitelist mode ఇప్పుడు allow-only మార్గంలో ప్రధానమైనది; తెలివైన extraction, playlist safeguards, తగ్గిన CPU వినియోగంతో.",
+    "bannerSummary": "శుభ్రమైన UI, మెరుగైన playlist స్థిరత్వం, Kids supportతో whitelist modeకు ప్రాధాన్యం.",
+    "highlights": [
+      "Promoted whitelist mode: wording/UI ఇక experimentalగా గుర్తించబడదు.",
+      "Whitelist surfaces కోసం 3-dot menu cleanup మరియు search-secondary handling.",
+      "Thumbnail anchors, parent containersతో multi-source channel extraction.",
+      "Mode-aware state trackingతో పాటు confirmation dialogs, bridge optimizations.",
+      "Playlist stability: selected rows కనిపిస్తూనే ఉంటాయి; pending identities blocked rowsను మళ్లీ చూపించవు.",
+      "Zero-network architectureతో Kids mode whitelist support."
+    ],
+    "detailsUrl": "https://github.com/varshneydevansh/FilterTube/releases/tag/v3.2.5"
+  },
+  "3.2.4": {
+    "ctaLabel": "కొత్త విశేషాలు చూడండి",
+    "headline": "మెరుగైన Whitelist Mode + Performance optimizations",
+    "summary": "Experimental whitelist modeలో గణనీయమైన మెరుగుదలలు: మంచి UX, performance optimizations, విస్తృత Kids mode support.",
+    "bannerSummary": "మెరుగైన UI, performance, Kids supportతో whitelist mode మరింత తెలివైనది.",
+    "highlights": [
+      "EXPERIMENTAL: 3-dot menu cleanup, తెలివైన search processing, mode-aware state trackingతో enhanced whitelist mode.",
+      "Performance boost: bridge-level optimizations, selective processing CPU వినియోగాన్ని తగ్గిస్తాయి.",
+      "UI improvements: mode మార్చేటప్పుడు data అనుకోకుండా పోకుండా confirmation dialogs కాపాడతాయి.",
+      "Kids mode support: zero-network architectureతో YouTube Kidsలో whitelist పనిచేస్తుంది.",
+      "Search optimizations: UI clutterను నివారించేందుకు right-rail watch cardsను తెలివిగా handle చేస్తుంది.",
+      "Channel extraction: thumbnail anchors, parent containersతో multi-source identity resolution.",
+      "Mode switching: తెలివైన reprocessingతో blocklist/whitelist మధ్య సాఫీ మార్పు."
+    ],
+    "detailsUrl": "https://github.com/varshneydevansh/FilterTube/releases/tag/v3.2.4"
+  },
+  "3.2.3": {
+    "ctaLabel": "కొత్త విశేషాలు చూడండి",
+    "headline": "Experimental Whitelist Mode + UI improvements",
+    "summary": "'allow-only' filtering కోసం whitelist mode alpha release, మెరుగైన UI updates, mobile menu supportతో.",
+    "bannerSummary": "Experimental whitelist modeను ప్రయత్నించండి — అనుమతించిన channels మినహా మిగతావన్నీ దాచండి.",
+    "highlights": [
+      "EXPERIMENTAL: స్పష్టంగా allow చేసిన channels/keywords మినహా అన్నీ whitelist mode దాచుతుంది.",
+      "Popup మరియు tab viewలో blocklist/whitelist మధ్య సులభంగా మారగల dual filtering modes.",
+      "Staging migration — channels సేకరించడానికి blocklistకు మారి, తర్వాత వాటిని whitelistలోకి merge చేయండి.",
+      "Whitelist modeలో Watch page protection video playback పనితీరును కొనసాగిస్తుంది.",
+      "Optimistic UI updates contentను వెంటనే దాచుతాయి; blocking విఫలమైతే ఆటోమేటిక్‌గా restore చేస్తాయి.",
+      "సరైన YouTube mobile renderer handlingతో మెరుగైన mobile menu support.",
+      "Production noise తగ్గించేందుకు console logs అన్నీ debug flag వెనుక ఉంచబడ్డాయి."
+    ],
+    "detailsUrl": "https://github.com/varshneydevansh/FilterTube/releases/tag/v3.2.3"
+  },
+  "3.2.2": {
+    "ctaLabel": "కొత్త విశేషాలు చూడండి",
+    "headline": "UI/UX మెరుగుదలలు + Debug నియంత్రణ",
+    "summary": "Optimistic updates, mobile menu support, debug-gated logging, scroll preservation, state management refinements.",
+    "bannerSummary": "తక్షణ UI feedback, మెరుగైన mobile menu, స్థిరమైన state handlingతో debug-gated logs.",
+    "highlights": [
+      "Optimistic UI updates: content వెంటనే దాగుతుంది; blocking విఫలమైతే ఆటో-restore అవుతుంది.",
+      "సరైన renderer tagsతో `ytm-menu-popup-renderer` కోసం మెరుగైన mobile menu support.",
+      "`window.__filtertubeDebug` ద్వారా debug-gated logging.",
+      "DOM fallback సమయంలో ఇబ్బందికరమైన jumps రాకుండా scrollను అలాగే ఉంచుతుంది.",
+      "Background requests తగ్గించేందుకు channel enrichmentను ఒక్కో sessionకు 10కు పరిమితం చేస్తుంది.",
+      "requestIdleCallback మరియు batchingతో idle-scheduled rendering.",
+      "Signature comparisonతో external reload debounce చేసి అవసరం లేని rendersను తప్పిస్తుంది.",
+      "Selective notifications: signature మారినప్పుడే 'load'; లేకపోతే 'externalUpdate'.",
+      "Shared global state ద్వారా bridge state management."
+    ],
+    "detailsUrl": "https://github.com/varshneydevansh/FilterTube/releases/tag/v3.2.2"
+  },
+  "3.2.1": {
+    "ctaLabel": "కొత్త విశేషాలు చూడండి",
+    "headline": "ల్యాగ్‌లేని ప్రాసెసింగ్ + పనితీరు పెంపు",
+    "summary": "పెద్ద performance optimizations UI lagను తొలగిస్తాయి; Chromium browsersలో అద్భుతమైన ఫలితాలు, Firefoxలో గణనీయమైన మెరుగుదలలు.",
+    "bannerSummary": "Async processing, compiled caching, batched updatesతో lag-free filtering.",
+    "highlights": [
+      "భారీ filtering సమయంలో browser freeze కాకుండా main threadకు విరామం ఇచ్చే async DOM processing.",
+      "Compiled regex, channel-filter caching O(1) lookupsను అందించి CPU వినియోగాన్ని 60–80% తగ్గిస్తాయి.",
+      "Batched storage updates తెలివైన 250ms intervalsతో I/O operationsను 70–90% తగ్గిస్తాయి.",
+      "Debounced settings refresh అధికంగా DOM reprocessing జరగకుండా చేస్తుంది.",
+      "Run-state management overlapping executionsను నివారించి requestsను క్రమంగా queue చేస్తుంది.",
+      "Chromium browsers: 90%+ lag reduction; Firefox: గణనీయమైన మెరుగుదలలు, optimization కొనసాగుతోంది."
+    ],
+    "detailsUrl": "https://github.com/varshneydevansh/FilterTube/releases/tag/v3.2.1"
+  },
+  "3.2.0": {
+    "ctaLabel": "కొత్త విశేషాలు చూడండి",
+    "headline": "తక్షణ blocking + network లేని Kids",
+    "summary": "3-dot menus channel పేర్లను వెంటనే చూపిస్తాయి, network requests గణనీయంగా తగ్గుతాయి, YouTube Kids పూర్తిగా offlineగా పనిచేస్తుంది.",
+    "bannerSummary": "Proactive XHR interceptionతో ఆలస్యం లేని blocking; Kids mode ఎలాంటి network fetchలూ లేకుండా పనిచేస్తుంది.",
+    "highlights": [
+      "3-dot menus సరైన channel పేర్లను వెంటనే చూపిస్తాయి — ఇక 'Fetching...' ఆలస్యం లేదు.",
+      "Intercept చేసిన YouTube JSON responses నుంచి channel identity వస్తుంది, network calls తగ్గుతాయి.",
+      "నమ్మదగిన blocking కోసం YouTube Kids network fetchలు లేకుండానే పూర్తిగా పనిచేస్తుంది.",
+      "లేని metadataను నియంత్రిత వేగంతో backgroundలో నింపుతుంది (6-hour cooldown).",
+      "Topic channels (ఉదా., 'Music - Topic')ను @handles లేకుండా ప్రత్యేకంగా handle చేస్తుంది.",
+      "ASCII, Mermaid flow diagramsతో సమగ్ర documentation జోడించబడింది."
+    ],
+    "detailsUrl": "https://github.com/varshneydevansh/FilterTube/releases/tag/v3.2.0"
+  },
+  "3.1.9": {
+    "ctaLabel": "కొత్త విశేషాలు చూడండి",
+    "headline": "ప్రొఫైల్‌కు అనుగుణమైన బ్యాకప్‌లు + లాక్ నియంత్రణలు",
+    "summary": "Auto-backup మరియు content controls profile locks/PINలను గౌరవిస్తాయి, profile-specific settingsను పొందుతాయి; lock gate ఉన్నప్పటికీ profile dropdown click చేయగలిగేలా ఉంటుంది.",
+    "bannerSummary": "Profile-specific auto-backup + locked-profile gating; profile selector ఎప్పుడూ click చేయవచ్చు.",
+    "highlights": [
+      "Auto-backup offలో ఉన్నా లేదా profile lock అయినా auto-backup mode/format selectors disable అవుతాయి; కొత్త profiles auto-backup preferencesను inherit చేస్తాయి.",
+      "Profile creation, mode/format మార్పులప్పుడు ఆ profileలో auto-backup enabled ఉంటేనే scheduling జరుగుతుంది.",
+      "Lock అయినప్పుడు content-control toggles, backup controls disable అవుతాయి లేదా revert అవుతాయి; non-master profilesకు export scope active profileకే పరిమితం.",
+      "Lock gate banner కనిపిస్తున్నప్పటికీ profile dropdown click చేయగలిగేలా z-index fix చేస్తుంది.",
+      "Profile/PIN model, profile-scoped backups, UI gating rulesకు docs update అయ్యాయి."
+    ],
+    "detailsUrl": "https://github.com/varshneydevansh/FilterTube/releases/tag/v3.1.9"
+  },
+  "3.1.8": {
+    "ctaLabel": "కొత్త విశేషాలు చూడండి",
+    "headline": "సహాయ ట్యాబ్ + నమ్మదగిన ఆటో బ్యాకప్‌లు",
+    "summary": "కొత్త Support page (Ko-fi) ఉంది; auto-backups ఇప్పుడు Chrome, Firefox రెండింటిలోనూ నమ్మకంగా పనిచేస్తాయి.",
+    "bannerSummary": "Auto-backups ఇప్పుడు cross-browserగా పనిచేస్తాయి, ఒకే latest backup fileను overwrite చేస్తాయి.",
+    "highlights": [
+      "Dashboardలో Ko-fi embedతో Support page జోడించబడింది.",
+      "Auto-backups ఒకే rolling fileను overwrite చేస్తాయి: Downloads/FilterTube Backup/FilterTube-Backup-Latest.json.",
+      "Download strategy cross-browserగా పనిచేస్తుంది (అందుబాటులో ఉంటే Blob URL; Chrome MV3 service workerకు data: URL fallback).",
+      "data: URL restrictions వల్ల Firefox downloads ఇక fail కావు."
+    ],
+    "detailsUrl": "https://github.com/varshneydevansh/FilterTube/releases/tag/v3.1.8"
+  },
+  "3.1.7": {
+    "ctaLabel": "కొత్త విశేషాలు చూడండి",
+    "headline": "YT Kids + ఆటో బ్యాకప్ మద్దతు",
+    "summary": "YT Kidsలో channel ఆధారంగా contentను block చేయవచ్చు; Auto-backupsను ఇప్పుడు on/off చేయవచ్చు.",
+    "bannerSummary": "కొత్త setting: auto backupsను enable/disable చేయండి. Exports ఇప్పుడు Downloads/FilterTube Export/లో save అవుతాయి.",
+    "highlights": [
+      "YT Kidsలో 3-dot menu UIను passiveగా వినడం ద్వారా పూర్తి Channel మరియు Keyword ఆధారిత blocking జోడించబడింది.",
+      "Auto backupsను enable/disable చేయడానికి Settings toggle జోడించబడింది (best-effort; Save As prompts లేవు).",
+      "Auto backups rotationతో Downloads/FilterTube Backup/లో save అవుతాయి (latest files మాత్రమే ఉంచబడతాయి).",
+      "Manual exports నిశ్శబ్దంగా Downloads/FilterTube Export/లో download అవుతాయి."
+    ],
+    "detailsUrl": "https://github.com/varshneydevansh/FilterTube/releases/tag/v3.1.7"
+  },
+  "3.1.6": {
+    "ctaLabel": "కొత్త విశేషాలు చూడండి",
+    "headline": "దిగుమతి/ఎగుమతి మద్దతు + విడుదల బ్యానర్",
+    "summary": "Banner CTA నేరుగా What's New dashboardకు వెళ్తుంది, curated cards అదే JSON నుంచి load అవుతాయి, c/ChannelName మరియు rule mergingను import మెరుగ్గా handle చేస్తుంది.",
+    "bannerSummary": "Release banner extensionలోని What's New tabను తెరుస్తుంది; import/export ఇప్పుడు పూర్తి flowను docsలో వివరిస్తుంది.",
+    "highlights": [
+      "Release notes JSON dashboard cardsను, YouTube bannerను ఒకే source of truthగా populate చేస్తుంది.",
+      "Blockers `chrome-extension://` linksను అడ్డుకోకుండా background messaging ద్వారా CTA tab-viewను తెరుస్తుంది.",
+      "UC/handle/c/ChannelName inputs mergeకు ముందు ఎలా normalize అవుతాయో import/export docs మరియు code స్పష్టం చేస్తాయి."
+    ],
+    "detailsUrl": "https://github.com/varshneydevansh/FilterTube/releases/tag/v3.1.6"
+  },
+  "3.1.5": {
+    "ctaLabel": "కొత్త విశేషాలు చూడండి",
+    "headline": "Shorts మరియు Members-only కంటెంట్ నిజంగా దాచబడింది",
+    "summary": "Watch page మరియు sidebar Shorts renderers, members-only shelvesను కనిపించేలోపే దాచేస్తాయి; toggle state కూడా ఇప్పుడు నిలుస్తుంది.",
+    "bannerSummary": "Watch మరియు sidebar అంతటా Members-only + Shorts hiding బలపడింది; blocked rows మళ్లీ కనిపించకుండా.",
+    "highlights": [
+      "Cards render కాకముందే sidebar `/shorts/` hrefలు, overlays, aria-labelలను తనిఖీ చేస్తుంది.",
+      "Members-only detection compact, Watch, shelf rowsను కవర్ చేస్తుంది; కొత్త badges మరియు playlist heuristicsతో.",
+      "Members-only toggle persistence bug సరిచేయబడింది; reload తర్వాత కూడా state నిలుస్తుంది."
+    ],
+    "detailsUrl": "https://github.com/varshneydevansh/FilterTube/releases/tag/v3.1.5"
+  },
+  "3.1.4": {
+    "ctaLabel": "కొత్త విశేషాలు చూడండి",
+    "headline": "Dashboard అన్ని తెరలకు అనుకూలమైంది",
+    "summary": "Mobileలో navigation సాఫీగా collapse అవుతుంది, inputs చక్కగా wrap అవుతాయి, playlist/mix controlsకు మరింత స్పష్టమైన toggles ఉన్నాయి.",
+    "highlights": [
+      "చిన్న screens కోసం hamburger navigation + overlay, మెరుగైన grid spacingతో.",
+      "Toggle tracks తేలికగా, thumbs మధ్యలో, dark-mode contrast మెరుగ్గా.",
+      "Mix toggle onలో ఉంటే Mix/Radio chip దాగుతుంది; playlist hiding radio itemsను skip చేస్తుంది."
+    ],
+    "detailsUrl": "https://github.com/varshneydevansh/FilterTube/releases/tag/v3.1.4"
+  },
+  "3.1.3": {
+    "ctaLabel": "కొత్త విశేషాలు చూడండి",
+    "headline": "Help సూచికకు కొత్త రూపం",
+    "summary": "Cards, pills, tooltips Exact / Comment / Filter All ఏమి చేస్తాయో స్పష్టంగా వివరిస్తాయి; refresh చేసిన dashboard stylingతో సరిపోతాయి.",
+    "highlights": [
+      "Help tab badge tints, collaboration labelsను సరిపడే colorsతో చూపిస్తుంది.",
+      "Popup మరియు tab search bars ఒకే full-width rhythmలో align అవుతాయి.",
+      "స్పష్టత కోసం content-control descriptions hover tooltipsకు మార్చబడ్డాయి."
+    ],
+    "detailsUrl": "https://github.com/varshneydevansh/FilterTube/releases/tag/v3.1.3"
+  },
+  "3.1.2": {
+    "ctaLabel": "కొత్త విశేషాలు చూడండి",
+    "headline": "Playlist autoplay బలోపేతం",
+    "summary": "Autoplay blocked playlist rowsను క్షణమైనా చూపకుండా దాటుతుంది; YouTube reprocessing తర్వాత కూడా sticky hiding కొనసాగుతుంది.",
+    "highlights": [
+      "తర్వాతి playlist row నిజంగా కనిపిస్తేనే next-click పనిచేస్తుంది.",
+      "Identity తాత్కాలికంగా resolve కాకపోయినా Watch playlist panel rows దాగి ఉంటాయి.",
+      "Blocking తర్వాత 3-dot menu సరిగ్గా మూసుకుపోతుంది; miniplayer ప్లే అవుతూనే ఉంటుంది."
+    ],
+    "detailsUrl": "https://github.com/varshneydevansh/FilterTube/commit/1224715a84c48ee6d3ddd93b13cc62e487574a31"
+  },
+  "3.1.1": {
+    "ctaLabel": "కొత్త విశేషాలు చూడండి",
+    "headline": "Help ట్యాబ్ + గుర్తింపు సవరణలు",
+    "summary": "Dashboardలో ప్రత్యేక Help tab వచ్చింది; UC ↔ handle ↔ custom URL mapping మరింత నమ్మదగినదైంది.",
+    "highlights": [
+      "Help reference అన్ని toggles, badges, keyword behaviorలను డాక్యుమెంట్ చేస్తుంది.",
+      "Playlist navigation blocked rowsను playback flashes లేకుండా దాటుతుంది.",
+      "Handle/custom URL fallback సరైన UC IDను మరింత నమ్మకంగా గుర్తిస్తుంది."
+    ],
+    "detailsUrl": "https://github.com/varshneydevansh/FilterTube/commit/1b2e442831a40c52148bc9ff830c70c2e6aa909c"
+  },
+  "3.1.0": {
+    "ctaLabel": "కొత్త విశేషాలు చూడండి",
+    "headline": "డాక్యుమెంటేషన్ + హైబ్రిడ్ ఫిల్టరింగ్ స్పష్టత",
+    "summary": "FilterTube blocksను ఎలా enforce చేస్తుందో వివరించడానికి hybrid interception + DOM fallback architectureను diagramsతో నమోదు చేశారు.",
+    "highlights": [
+      "Watch-page 3-dot parityను Home/search collaboratorsతో డాక్యుమెంట్ చేశారు.",
+      "మిగిలిన playlist regressionsను జాబితా చేశారు; fixesను సులభంగా track చేయవచ్చు.",
+      "3.1.0 bumpకు అనుగుణంగా manifests, build tooling, UI footer sync చేశారు."
+    ],
+    "detailsUrl": "https://github.com/varshneydevansh/FilterTube/commit/076baa2ecb14a3e8f5bdf420caa1af7096548f15"
   }
 }
