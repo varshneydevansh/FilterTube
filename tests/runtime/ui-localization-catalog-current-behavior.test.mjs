@@ -112,6 +112,7 @@ test('staged keys still describe copy present on extension UI surfaces', () => {
     'js/render_engine.js',
     'js/content/first_run_prompt.js',
     'js/content/block_channel.js',
+    'js/content/bridge_settings.js',
     'js/content_bridge.js',
     'js/managed_parent_command_center.js',
     'js/content/admission_overlay.js',
