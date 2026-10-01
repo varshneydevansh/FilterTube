@@ -4,9 +4,9 @@
 
 No additional changes recorded after the 3.4.0 preparation checkpoint.
 
-## 3.4.0 — release preparation (2026-10-01)
+## Version 3.4.0 — 38 Interface Languages And Playback Fixes
 
-Changes since v3.3.7, released August 29, 2026 (`70cdb405`). This is a prepared source version, not a published release. See the [complete post-release audit and validation boundaries](docs/POST_3_3_7_RELEASE_AUDIT_2026-10-01.md).
+Changes since v3.3.7, released August 29, 2026 (`70cdb405`). Version 3.4.0 was published on October 1, 2026; the original generated release body omitted these notes because its heading was not recognized. See the [complete post-release audit and validation boundaries](docs/POST_3_3_7_RELEASE_AUDIT_2026-10-01.md).
 
 - **38 bundled interface languages**: device-local language selection in Settings, including Russian, Tamil and Gujarati; popup, dashboard, generated rules, import/backup dialogs, family controls, help, overlays and release history use bundled catalogs. Added locale-aware dates/counts and RTL layout. User rules, IDs and video-language filters are unchanged; no runtime translation API is used. Fluent-speaker and installed-layout review remain quality gates.
 - **Dashboard startup fixes**: corrected the missing compact-condition `labelKey` parameter and a Main-channel localization call incorrectly placed in Kids initialization.

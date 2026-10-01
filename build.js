@@ -463,6 +463,9 @@ async function maybePromptRelease(version, zipPaths, mobileArtifactPaths = []) {
     console.log(`🔐 Using ${githubAuth.source} for GitHub release publishing.`);
 
     const changelogInfo = extractLatestChangelogEntry(version);
+    if (!changelogInfo?.section?.trim()) {
+        throw new Error(`Refusing to publish v${version}: CHANGELOG.md has no non-empty release section for this version.`);
+    }
     const body = buildReleaseBody({
         version,
         section: changelogInfo?.section,
@@ -521,7 +524,7 @@ async function maybePromptRelease(version, zipPaths, mobileArtifactPaths = []) {
 function extractLatestChangelogEntry(version) {
     try {
         const raw = fs.readFileSync('CHANGELOG.md', 'utf8');
-        const regex = /##\s+Version\s+([0-9.]+)/g;
+        const regex = /^##[ \t]+(?:Version[ \t]+)?(\d+\.\d+\.\d+)\b[^\r\n]*/gm;
         const matches = [...raw.matchAll(regex)];
         const idx = matches.findIndex(m => m[1] === version);
         if (idx === -1) return null;
@@ -530,7 +533,8 @@ function extractLatestChangelogEntry(version) {
         const next = matches[idx + 1];
 
         const sectionStart = current.index + current[0].length;
-        const sectionEnd = next ? next.index : raw.length;
+        const followingHeading = /^##[ \t]+/m.exec(raw.slice(sectionStart));
+        const sectionEnd = followingHeading ? sectionStart + followingHeading.index : raw.length;
         const section = raw.slice(sectionStart, sectionEnd).trim();
 
         const subtitle = deriveSubtitle(section);
@@ -557,6 +561,9 @@ function buildReleaseTitle({ version }) {
 }
 
 function buildReleaseBody({ version, section, previousVersion, mobileArtifactPaths = [] }) {
+    if (typeof section !== 'string' || !section.trim()) {
+        throw new Error(`Missing release details for v${version}; refusing to generate placeholder notes.`);
+    }
     const tag = `v${version}`;
     const compareFrom = previousVersion ? `v${previousVersion}` : null;
     const compareLine = compareFrom
@@ -568,9 +575,7 @@ function buildReleaseBody({ version, section, previousVersion, mobileArtifactPat
     const releaseAssetLink = (fileName) =>
         `https://github.com/${REPO_OWNER}/${REPO_NAME}/releases/download/${tag}/${encodeURIComponent(fileName)}`;
 
-    const whatsNew = section
-        ? `## What's New in v${version}\n\n${section.trim()}`
-        : `## What's New in v${version}\n\n- Release details unavailable (ensure CHANGELOG.md has a "## Version ${version}" section).`;
+    const whatsNew = `## What's New in v${version}\n\n${section.trim()}`;
 
     const androidApkNames = mobileArtifactPaths
         .map(assetPath => path.basename(assetPath))

@@ -1,5 +1,9 @@
 # Post-3.3.7 release audit: 3.4.0 preparation
 
+**Publication follow-up:** v3.4.0 was subsequently published on October 1, 2026 at commit `c9f070af`. Its initial GitHub body contained a missing-changelog placeholder: this document's preparation-era statements below describe what this agent had done at that checkpoint, not the current publication state. The published tag/assets have not been renamed, deleted or replaced by this follow-up.
+
+The local changelog now uses the canonical `## Version 3.4.0` heading. Release extraction also accepts bare semantic-version headings, stops at any next level-two heading (rather than including historical audit tables), and refuses publication/body generation when details are absent. Eight extraction/version/build-lock regressions pass. Updating local source does not update the existing GitHub release body; that remote edit requires explicit user direction. The version remains 3.4.0 pending a decision about the already-published release; no silent downgrade to 3.3.8 is made.
+
 Baseline: August 29, 2026 release commit `70cdb405` (v3.3.7). Prepared version: **3.4.0**, October 1, 2026. The version bump does not publish a GitHub release, upload store packages or update Android/iOS apps.
 
 ## Product and runtime changes
