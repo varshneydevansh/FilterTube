@@ -21,6 +21,21 @@ function tabViewUiText(key, fallback, values = {}) {
     return interpolate(fallback);
 }
 
+const tabViewIntlLocales = new Map();
+function tabViewIntlLocale() {
+    const selected = window.FilterTubeUiLocalization?.locale || 'en';
+    if (tabViewIntlLocales.has(selected)) return tabViewIntlLocales.get(selected);
+    const fallbacks = { pcm: 'en-NG', arz: 'ar-EG', apc: 'ar', apd: 'ar-SD',
+        'wuu-Hans': 'zh-Hans', 'yue-Hant': 'zh-Hant-HK', 'pa-Arab': 'ur', bho: 'hi', jv: 'id' };
+    let locale = 'en';
+    try {
+        locale = Intl.DateTimeFormat.supportedLocalesOf([selected, fallbacks[selected] || 'en'])[0] || 'en';
+    } catch (_) {
+    }
+    tabViewIntlLocales.set(selected, locale);
+    return locale;
+}
+
 function tabViewTaxonomyDisplayLabel(option) {
     if (option?.labelKey) return tabViewUiText(option.labelKey, option.label);
     if (option?.code && typeof Intl?.DisplayNames === 'function') {
@@ -5087,7 +5102,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                     ? tabViewUiText('dashboard.importEnrichment.fetchingNow', 'Fetching now')
                     : tabViewUiText('dashboard.importEnrichment.running', 'Running')));
         const completedLabel = initialTotal
-            ? tabViewUiText('dashboard.importEnrichment.completedOf', 'Completed of {total}', { total: initialTotal.toLocaleString() })
+            ? tabViewUiText('dashboard.importEnrichment.completedOf', 'Completed of {total}', { total: initialTotal.toLocaleString(tabViewIntlLocale()) })
             : tabViewUiText('dashboard.importEnrichment.completed', 'Completed');
         const scheduleDetails = tabViewUiText('dashboard.importEnrichment.detailNote', 'Valid identifiers are filtering now; names, handles/custom URLs, and avatars fill in together. Temporary failures stay visible in Import Reports and retry without stopping fresh rows. Permanent not-found/deleted responses stop retrying and remain there with the exact reason for manual verification.');
         importedChannelEnrichmentStatus.innerHTML = `
@@ -5096,9 +5111,9 @@ document.addEventListener('DOMContentLoaded', async () => {
                 <span>${stateLabel}</span>
             </div>
             <div class="imported-enrichment-metrics">
-                <div><b>${completed.toLocaleString()}</b><span>${completedLabel}</span></div>
-                <div><b>${total.toLocaleString()}</b><span>${tabViewUiText('dashboard.importEnrichment.remaining', 'Remaining')}</span></div>
-                <div><b>${attention.toLocaleString()}</b><span>${tabViewUiText('dashboard.importEnrichment.needsManualReview', 'Needs manual review')}</span></div>
+                <div><b>${completed.toLocaleString(tabViewIntlLocale())}</b><span>${completedLabel}</span></div>
+                <div><b>${total.toLocaleString(tabViewIntlLocale())}</b><span>${tabViewUiText('dashboard.importEnrichment.remaining', 'Remaining')}</span></div>
+                <div><b>${attention.toLocaleString(tabViewIntlLocale())}</b><span>${tabViewUiText('dashboard.importEnrichment.needsManualReview', 'Needs manual review')}</span></div>
                 <div><b>${eta}</b><span>${tabViewUiText('dashboard.importEnrichment.estimatedActiveTime', 'Estimated active time')}</span></div>
             </div>
             <div class="imported-enrichment-progress" role="progressbar" aria-label="${tabViewUiText('dashboard.importEnrichment.progressLabel', 'Imported channel detail progress')}" aria-valuemin="0" aria-valuemax="100" aria-valuenow="${progressPercent}"><span style="width:${progressPercent}%"></span></div>
@@ -5654,7 +5669,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         runtime.reports.forEach((report) => {
             const option = document.createElement('option');
             option.value = report.id;
-            option.textContent = `${report.label} · ${new Date(report.createdAt).toLocaleString()}`;
+            option.textContent = `${report.label} · ${new Date(report.createdAt).toLocaleString(tabViewIntlLocale())}`;
             reportSelect.appendChild(option);
         });
         reportSelect.value = runtime.reports.some(report => report.id === preferredReportId)
@@ -5797,7 +5812,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                             })
                             : '';
                         const retryTiming = row.nextAttemptAt > Date.now()
-                            ? ruleListImportReportText('row.retryTiming', 'Next retry {date}.', { date: new Date(row.nextAttemptAt).toLocaleString() })
+                            ? ruleListImportReportText('row.retryTiming', 'Next retry {date}.', { date: new Date(row.nextAttemptAt).toLocaleString(tabViewIntlLocale()) })
                             : '';
                         const resultReason = row.reason
                             || (row.status === 'complete'
@@ -7588,7 +7603,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         const item = safeObject(row);
         const summary = safeObject(item.summary);
         const date = Number.isFinite(Number(item.receivedAt))
-            ? new Date(Number(item.receivedAt)).toLocaleString()
+            ? new Date(Number(item.receivedAt)).toLocaleString(tabViewIntlLocale())
             : 'Unknown time';
         const scope = normalizeString(item.scope)
             .toLowerCase()
@@ -7792,7 +7807,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         const updatedAt = normalizeNonNegativeInteger(root.updatedAt || root.receivedAt || root.issuedAt);
         if (!revision) return '';
         const suffix = updatedAt
-            ? tabViewUiText('family.profileManager.policyDateSuffix', ', {date}', { date: new Date(updatedAt).toLocaleDateString() })
+            ? tabViewUiText('family.profileManager.policyDateSuffix', ', {date}', { date: new Date(updatedAt).toLocaleDateString(tabViewIntlLocale()) })
             : '';
         return tabViewUiText('family.profileManager.policyRevision', '{label} r{revision}{dateSuffix}', { label, revision, dateSuffix: suffix });
     }
@@ -11401,7 +11416,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         if (!value) return tabViewUiText('dashboard.managedLists.notCheckedYet', 'not checked yet');
         try {
             return tabViewUiText('dashboard.managedLists.checkedAt', 'checked {date}', {
-                date: new Date(value).toLocaleDateString(undefined, { month: 'short', day: 'numeric', year: 'numeric' })
+                date: new Date(value).toLocaleDateString(tabViewIntlLocale(), { month: 'short', day: 'numeric', year: 'numeric' })
             });
         } catch (e) {
             return tabViewUiText('dashboard.managedLists.checked', 'checked');
@@ -11461,7 +11476,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         if (!lastRun) return tabViewUiText('dashboard.managedLists.autoCheckFirstRunStatus', 'On. Will check stale URL lists when this dashboard opens.');
         try {
             return tabViewUiText('dashboard.managedLists.autoCheckLastRunStatus', 'On. Last checked {date}.', {
-                date: new Date(lastRun).toLocaleDateString(undefined, { month: 'short', day: 'numeric' })
+                date: new Date(lastRun).toLocaleDateString(tabViewIntlLocale(), { month: 'short', day: 'numeric' })
             });
         } catch (_) {
             return tabViewUiText('dashboard.managedLists.autoCheckFallbackStatus', 'On. Stale URL lists are checked from this dashboard.');
@@ -13760,7 +13775,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                 : tabViewUiText('dashboard.selfControl.sessionName.selfControl', 'Self-Control');
             ftSelfControlEndsAt.textContent = tabViewUiText('dashboard.selfControl.endsAt', '{sessionLabel} ends {dateTime} · Profile: {profileName}', {
                 sessionLabel,
-                dateTime: new Date(Number(selfControlSessionState.lockedUntil)).toLocaleString(),
+                dateTime: new Date(Number(selfControlSessionState.lockedUntil)).toLocaleString(tabViewIntlLocale()),
                 profileName: selfControlSessionState.profileName || tabViewUiText('dashboard.selfControl.activeProfileFallback', 'Active profile')
             });
         }
@@ -14466,7 +14481,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             const end = document.createElement('span');
             end.className = 'import-export-hint';
             end.textContent = tabViewUiText('dashboard.selfControl.lockGate.unlocksAt', 'Unlocks automatically {dateTime}.', {
-                dateTime: new Date(Number(selfControlSessionState?.lockedUntil)).toLocaleString()
+                dateTime: new Date(Number(selfControlSessionState?.lockedUntil)).toLocaleString(tabViewIntlLocale())
             });
             actions.appendChild(end);
         } else {
@@ -22146,7 +22161,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                 const usedPill = document.createElement('span');
                 usedPill.className = 'nanah-trusted-link__pill';
                 setTabViewLocalizedCopy(usedPill, 'textContent', 'dashboard.sync.copy.usedOnDate', 'used {date}', {
-                    date: new Date(lastUsed).toLocaleDateString()
+                    date: new Date(lastUsed).toLocaleDateString(tabViewIntlLocale())
                 });
                 meta.appendChild(usedPill);
             }
