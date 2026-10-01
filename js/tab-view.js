@@ -19461,27 +19461,27 @@ document.addEventListener('DOMContentLoaded', async () => {
         if (ftNanahCompassLiveBtn) {
             ftNanahCompassLiveBtn.dataset.tone = liveReady ? 'success' : (hasProtectedProfiles ? 'optional' : 'neutral');
             ftNanahCompassLiveBtn.title = liveReady
-                ? 'Ready to send now after reviewing the selected profile and allowed area.'
+                ? tabViewUiText("dashboard.sync.deliveryStrip.readyToSendNowAfterReviewingTheSelectedAndAllowedArea", 'Ready to send now after reviewing the selected profile and allowed area.')
                 : (personalSyncOpen
-                    ? 'Open FilterTube on your other device, then pair with the code or QR and match the safety phrase.'
+                    ? tabViewUiText("dashboard.sync.deliveryStrip.openFilterTubeOnYourOtherDeviceThenPairTheSafetyPhrase", 'Open FilterTube on your other device, then pair with the code or QR and match the safety phrase.')
                     : (hasProtectedProfiles
-                    ? 'Open both devices, pair, verify the phrase, then send the update.'
-                    : 'Create one protected profile before pairing another device.'));
-            ftNanahCompassLiveBtn.setAttribute('aria-label', `Open now. Status: ${normalizeString(ftNanahCompassLiveBtn.dataset.statusLabel) || 'not ready'}. ${ftNanahCompassLiveBtn.title}`);
+                    ? tabViewUiText("dashboard.sync.deliveryStrip.openBothDevicesPairVerifyThePhraseThenSendTheUpdate", 'Open both devices, pair, verify the phrase, then send the update.')
+                    : tabViewUiText("dashboard.sync.deliveryStrip.createOneProtectedProfileBeforePairingAnotherDevice", 'Create one protected profile before pairing another device.')));
+            ftNanahCompassLiveBtn.setAttribute('aria-label', tabViewUiText("dashboard.sync.deliveryStrip.openNowStatus", "Open now. Status: {status}. {detail}", { status: normalizeString(ftNanahCompassLiveBtn.dataset.statusLabel) || tabViewUiText("dashboard.sync.deliveryStrip.notReady", "not ready"), detail: ftNanahCompassLiveBtn.title }));
         }
         if (ftNanahDeliveryLiveLabel) {
             ftNanahDeliveryLiveLabel.textContent = liveReady
-                ? 'Ready to send now'
-                : (personalSyncOpen ? 'Open your other device' : (hasProtectedProfiles ? 'Open both devices' : 'Create a protected profile'));
+                ? tabViewUiText("dashboard.sync.deliveryStrip.readyToSendNow", 'Ready to send now')
+                : (personalSyncOpen ? tabViewUiText("dashboard.sync.deliveryStrip.openYourOtherDevice", 'Open your other device') : (hasProtectedProfiles ? tabViewUiText("dashboard.sync.deliveryStrip.openBothDevices", 'Open both devices') : tabViewUiText("dashboard.sync.deliveryStrip.createAProtectedProfile", 'Create a protected profile')));
         }
         if (ftNanahDeliveryLiveDetail) {
             ftNanahDeliveryLiveDetail.textContent = liveReady
-                ? 'Use Send Update after reviewing the selected profile and allowed area.'
+                ? tabViewUiText("dashboard.sync.deliveryStrip.useSendUpdateAfterReviewingTheSelectedProfileAndAllowedArea", 'Use Send Update after reviewing the selected profile and allowed area.')
                 : (personalSyncOpen
-                    ? 'Use the code or QR from the same room or across the internet. No PIN is required.'
+                    ? tabViewUiText("dashboard.sync.deliveryStrip.useTheCodeOrQRFromTheSamePINIsRequired", 'Use the code or QR from the same room or across the internet. No PIN is required.')
                     : (hasProtectedProfiles
-                    ? 'Best default for parents: pair, match the phrase, then send while both devices are open.'
-                    : 'Start with one protected profile, then pair only if another device needs the same rules.'));
+                    ? tabViewUiText("dashboard.sync.deliveryStrip.bestDefaultForParentsPairMatchThePhraseDevicesAreOpen", 'Best default for parents: pair, match the phrase, then send while both devices are open.')
+                    : tabViewUiText("dashboard.sync.deliveryStrip.startWithOneProtectedProfileThenPairOnlyTheSameRules", 'Start with one protected profile, then pair only if another device needs the same rules.')));
         }
 
         const mailbox = summarizeManagedMailboxServerConfig();
@@ -19489,40 +19489,40 @@ document.addEventListener('DOMContentLoaded', async () => {
         if (ftNanahCompassLaterBtn) {
             ftNanahCompassLaterBtn.dataset.tone = mailbox.configured ? 'success' : (mailboxCanConfigure ? 'optional' : 'neutral');
             ftNanahCompassLaterBtn.title = mailbox.configured
-                ? mailbox.detail
+                ? familyDeviceMapCopy(mailbox.detail)
                 : (!hasProtectedProfiles
-                    ? 'Create a protected profile before setting up Internet Pickup.'
+                    ? tabViewUiText("dashboard.sync.deliveryStrip.createAProtectedProfileBeforeSettingUpInternetPickup", 'Create a protected profile before setting up Internet Pickup.')
                     : (!hasVerifiedDevice
-                        ? 'Pair a verified protected device before setting up Internet Pickup.'
-                        : 'Optional: set this up only when a verified device on the same family map must collect an update later, including away over the internet.'));
-            ftNanahCompassLaterBtn.setAttribute('aria-label', `Open later. Status: ${normalizeString(ftNanahCompassLaterBtn.dataset.statusLabel) || 'not ready'}. ${ftNanahCompassLaterBtn.title}`);
+                        ? tabViewUiText("dashboard.sync.deliveryStrip.pairAVerifiedProtectedDeviceBeforeSettingUpInternetPickup", 'Pair a verified protected device before setting up Internet Pickup.')
+                        : tabViewUiText("dashboard.sync.deliveryStrip.optionalSetThisUpOnlyWhenAVerifiedOverTheInternet", 'Optional: set this up only when a verified device on the same family map must collect an update later, including away over the internet.')));
+            ftNanahCompassLaterBtn.setAttribute('aria-label', tabViewUiText("dashboard.sync.deliveryStrip.openLaterStatus", "Open later. Status: {status}. {detail}", { status: normalizeString(ftNanahCompassLaterBtn.dataset.statusLabel) || tabViewUiText("dashboard.sync.deliveryStrip.notReady", "not ready"), detail: ftNanahCompassLaterBtn.title }));
         }
         if (ftNanahDeliveryMailboxCard) {
             ftNanahDeliveryMailboxCard.dataset.tone = mailbox.configured ? 'success' : (mailboxCanConfigure ? 'optional' : 'neutral');
         }
-        if (ftNanahDeliveryMailboxLabel) ftNanahDeliveryMailboxLabel.textContent = mailbox.label;
+        if (ftNanahDeliveryMailboxLabel) ftNanahDeliveryMailboxLabel.textContent = familyDeviceMapCopy(mailbox.label);
         if (ftNanahDeliveryMailboxDetail) {
             ftNanahDeliveryMailboxDetail.textContent = mailbox.configured
-                ? mailbox.detail
+                ? familyDeviceMapCopy(mailbox.detail)
                 : (!hasProtectedProfiles
-                    ? 'Create a protected profile first. Later updates are only for verified protected devices.'
+                    ? tabViewUiText("dashboard.sync.deliveryStrip.createAProtectedProfileFirstLaterUpdatesAreVerifiedProtectedDevices", 'Create a protected profile first. Later updates are only for verified protected devices.')
                     : (!hasVerifiedDevice
-                        ? 'Pair a verified device first. Most families can use Send Update.'
-                        : mailbox.detail));
+                        ? tabViewUiText("dashboard.sync.deliveryStrip.pairAVerifiedDeviceFirstMostFamiliesCanUseSendUpdate", 'Pair a verified device first. Most families can use Send Update.')
+                        : familyDeviceMapCopy(mailbox.detail)));
         }
         if (ftNanahDeliveryMailboxBtn) {
-            ftNanahDeliveryMailboxBtn.textContent = mailbox.configured ? 'Edit' : 'Set Up';
+            ftNanahDeliveryMailboxBtn.textContent = mailbox.configured ? tabViewUiText("dashboard.sync.deliveryStrip.edit", 'Edit') : tabViewUiText("dashboard.sync.deliveryStrip.setUp", 'Set Up');
             ftNanahDeliveryMailboxBtn.disabled = !mailboxCanConfigure;
             ftNanahDeliveryMailboxBtn.title = mailboxCanConfigure
-                ? 'Optional advanced path for signed parent updates that protected devices collect after opening later.'
-                : 'Create a protected profile and pair a verified device before setting up later updates.';
+                ? tabViewUiText("dashboard.sync.deliveryStrip.optionalAdvancedPathForSignedParentUpdatesThatAfterOpeningLater", 'Optional advanced path for signed parent updates that protected devices collect after opening later.')
+                : tabViewUiText("dashboard.sync.deliveryStrip.createAProtectedProfileAndPairAVerifiedUpLaterUpdates", 'Create a protected profile and pair a verified device before setting up later updates.');
         }
         if (ftNanahDeliveryMailboxCheckBtn) {
             ftNanahDeliveryMailboxCheckBtn.hidden = mailbox.configured !== true;
             ftNanahDeliveryMailboxCheckBtn.disabled = mailbox.configured !== true;
             ftNanahDeliveryMailboxCheckBtn.title = mailbox.configured
-                ? 'Check whether the configured Internet Pickup service answers now. This does not grant authority.'
-                : 'Set up Internet Pickup before checking readiness.';
+                ? tabViewUiText("dashboard.sync.deliveryStrip.checkWhetherTheConfiguredInternetPickupServiceAnswersNotGrantAuthority", 'Check whether the configured Internet Pickup service answers now. This does not grant authority.')
+                : tabViewUiText("dashboard.sync.deliveryStrip.setUpInternetPickupBeforeCheckingReadiness", 'Set up Internet Pickup before checking readiness.');
         }
 
         const local = summarizeManagedLocalNetworkProviderConfig();
@@ -19536,15 +19536,15 @@ document.addEventListener('DOMContentLoaded', async () => {
         if (ftNanahCompassHomeBtn) {
             ftNanahCompassHomeBtn.dataset.tone = local.configured ? 'success' : (localCanConfigure ? 'optional' : 'neutral');
             ftNanahCompassHomeBtn.title = local.configured
-                ? local.detail
+                ? familyDeviceMapCopy(local.detail)
                 : (personalSyncOpen
-                    ? 'Optional: configure your own Home Bridge to find another FilterTube device nearby. Pairing and phrase verification are still required.'
+                    ? tabViewUiText("dashboard.sync.deliveryStrip.optionalConfigureYourOwnHomeBridgeToFindAreStillRequired", 'Optional: configure your own Home Bridge to find another FilterTube device nearby. Pairing and phrase verification are still required.')
                     : (!hasProtectedProfiles
-                    ? 'Create a protected profile before setting up Home Pickup.'
+                    ? tabViewUiText("dashboard.sync.deliveryStrip.createAProtectedProfileBeforeSettingUpHomePickup", 'Create a protected profile before setting up Home Pickup.')
                     : (!hasVerifiedDevice
-                        ? 'Pair a verified protected device before setting up Home Pickup.'
-                        : 'Optional: set this up only if a verified device on the same family map should use a trusted Home Pickup service on your own network.')));
-            ftNanahCompassHomeBtn.setAttribute('aria-label', `Home or school. Status: ${normalizeString(ftNanahCompassHomeBtn.dataset.statusLabel) || 'not ready'}. ${ftNanahCompassHomeBtn.title}`);
+                        ? tabViewUiText("dashboard.sync.deliveryStrip.pairAVerifiedProtectedDeviceBeforeSettingUpHomePickup", 'Pair a verified protected device before setting up Home Pickup.')
+                        : tabViewUiText("dashboard.sync.deliveryStrip.optionalSetThisUpOnlyIfAVerifiedYourOwnNetwork", 'Optional: set this up only if a verified device on the same family map should use a trusted Home Pickup service on your own network.'))));
+            ftNanahCompassHomeBtn.setAttribute('aria-label', tabViewUiText("dashboard.sync.deliveryStrip.homeStatus", "Home or school. Status: {status}. {detail}", { status: normalizeString(ftNanahCompassHomeBtn.dataset.statusLabel) || tabViewUiText("dashboard.sync.deliveryStrip.notReady", "not ready"), detail: ftNanahCompassHomeBtn.title }));
         }
         if (ftNanahDeliveryAdvanced && (mailbox.configured === true || local.pickupConfigured === true)) {
             ftNanahDeliveryAdvanced.open = true;
@@ -19552,39 +19552,39 @@ document.addEventListener('DOMContentLoaded', async () => {
         if (ftNanahDeliveryLocalCard) {
             ftNanahDeliveryLocalCard.dataset.tone = local.configured ? 'success' : (localCanConfigure ? 'optional' : 'neutral');
         }
-        if (ftNanahDeliveryLocalLabel) ftNanahDeliveryLocalLabel.textContent = local.label;
+        if (ftNanahDeliveryLocalLabel) ftNanahDeliveryLocalLabel.textContent = familyDeviceMapCopy(local.label);
         if (ftNanahDeliveryLocalDetail) {
             ftNanahDeliveryLocalDetail.textContent = local.configured
-                ? local.detail
+                ? familyDeviceMapCopy(local.detail)
                 : (personalSyncOpen
-                    ? 'Optional nearby-device finding through your own Home Bridge. Finding never creates trust.'
+                    ? tabViewUiText("dashboard.sync.deliveryStrip.optionalNearbyDeviceFindingThroughYourOwnHomeNeverCreatesTrust", 'Optional nearby-device finding through your own Home Bridge. Finding never creates trust.')
                     : (!hasProtectedProfiles
-                    ? 'Create a protected profile first. Home Pickup only helps verified protected devices.'
+                    ? tabViewUiText("dashboard.sync.deliveryStrip.createAProtectedProfileFirstHomePickupOnlyVerifiedProtectedDevices", 'Create a protected profile first. Home Pickup only helps verified protected devices.')
                     : (!hasVerifiedDevice
-                        ? 'Pair a verified device first. Being on the same network is never authority.'
-                        : local.detail)));
+                        ? tabViewUiText("dashboard.sync.deliveryStrip.pairAVerifiedDeviceFirstBeingOnTheIsNeverAuthority", 'Pair a verified device first. Being on the same network is never authority.')
+                        : familyDeviceMapCopy(local.detail))));
         }
         if (ftNanahDeliveryLocalBtn) {
             ftNanahDeliveryLocalBtn.textContent = local.nearbyDiscoveryOnly === true
-                ? 'Pickup Options'
-                : (local.configured ? 'Edit' : 'Set Up');
+                ? tabViewUiText("dashboard.sync.deliveryStrip.pickupOptions", 'Pickup Options')
+                : (local.configured ? tabViewUiText("dashboard.sync.deliveryStrip.edit", 'Edit') : tabViewUiText("dashboard.sync.deliveryStrip.setUp", 'Set Up'));
             ftNanahDeliveryLocalBtn.disabled = !localCanConfigure;
             ftNanahDeliveryLocalBtn.title = localCanConfigure
                 ? (local.nearbyDiscoveryOnly === true
-                    ? 'Nearby selection is ready. Open this only if you also want an advanced Home Pickup service for saved family updates.'
+                    ? tabViewUiText("dashboard.sync.deliveryStrip.nearbySelectionIsReadyOpenThisOnlyIfSavedFamilyUpdates", 'Nearby selection is ready. Open this only if you also want an advanced Home Pickup service for saved family updates.')
                     : (personalSyncOpen
-                    ? 'Optional setup for finding your own nearby FilterTube device. Pairing and phrase verification are still required.'
-                    : 'Optional advanced path for a trusted Home Pickup service used by verified devices on the same family map.'))
-                : 'Create a protected profile and pair a verified device before setting up Home Pickup.';
+                    ? tabViewUiText("dashboard.sync.deliveryStrip.optionalSetupForFindingYourOwnNearbyFilterTubeAreStillRequired", 'Optional setup for finding your own nearby FilterTube device. Pairing and phrase verification are still required.')
+                    : tabViewUiText("dashboard.sync.deliveryStrip.optionalAdvancedPathForATrustedHomePickupSameFamilyMap", 'Optional advanced path for a trusted Home Pickup service used by verified devices on the same family map.')))
+                : tabViewUiText("dashboard.sync.deliveryStrip.createAProtectedProfileAndPairAVerifiedUpHomePickup", 'Create a protected profile and pair a verified device before setting up Home Pickup.');
         }
         if (ftNanahDeliveryLocalCheckBtn) {
             ftNanahDeliveryLocalCheckBtn.hidden = local.configured !== true;
             ftNanahDeliveryLocalCheckBtn.disabled = local.configured !== true;
             ftNanahDeliveryLocalCheckBtn.title = local.configured
                 ? (local.nearbyDiscoveryOnly === true
-                    ? 'Check whether the local nearby helper is running. This does not discover or trust a device by itself.'
-                    : 'Check whether the configured Home Pickup service answers now. This does not discover or trust devices.')
-                : 'Set up Home Pickup before checking readiness.';
+                    ? tabViewUiText("dashboard.sync.deliveryStrip.checkWhetherTheLocalNearbyHelperIsRunningDeviceByItself", 'Check whether the local nearby helper is running. This does not discover or trust a device by itself.')
+                    : tabViewUiText("dashboard.sync.deliveryStrip.checkWhetherTheConfiguredHomePickupServiceAnswersOrTrustDevices", 'Check whether the configured Home Pickup service answers now. This does not discover or trust devices.'))
+                : tabViewUiText("dashboard.sync.deliveryStrip.setUpHomePickupBeforeCheckingReadiness", 'Set up Home Pickup before checking readiness.');
         }
 
         const hasSavedUpdateReader = hasNanahManagedSavedUpdateReader();
@@ -19595,14 +19595,14 @@ document.addEventListener('DOMContentLoaded', async () => {
         if (ftNanahDeliveryCheckDetail) {
             const readerLabel = getNanahManagedSavedUpdateReaderLabel();
             ftNanahDeliveryCheckDetail.textContent = canCheckSavedUpdates
-                ? `Checks ${readerLabel} now. Signed parent-link validation still decides what can apply.`
-                : 'Use this on the protected device after it saves a trusted parent link and a pickup path is set up.';
+                ? tabViewUiText("dashboard.sync.deliveryStrip.checkReaderNow", "Checks {reader} now. Signed parent-link validation still decides what can apply.", { reader: readerLabel })
+                : tabViewUiText("dashboard.sync.deliveryStrip.useThisOnTheProtectedDeviceAfterItIsSetUp", 'Use this on the protected device after it saves a trusted parent link and a pickup path is set up.');
         }
         if (ftNanahDeliveryCheckBtn) {
             ftNanahDeliveryCheckBtn.disabled = !canCheckSavedUpdates;
             ftNanahDeliveryCheckBtn.title = canCheckSavedUpdates
-                ? 'Run the saved-update check now for this protected profile.'
-                : 'Available on a protected device with a saved trusted parent link and a set-up Internet Pickup or Home Pickup path.';
+                ? tabViewUiText("dashboard.sync.deliveryStrip.runTheSavedUpdateCheckNowForThisProtectedProfile", 'Run the saved-update check now for this protected profile.')
+                : tabViewUiText("dashboard.sync.deliveryStrip.availableOnAProtectedDeviceWithASavedHomePickupPath", 'Available on a protected device with a saved trusted parent link and a set-up Internet Pickup or Home Pickup path.');
         }
 
         const hasReceiptTarget = hasNanahManagedSourceAckSyncTarget();
@@ -19613,18 +19613,18 @@ document.addEventListener('DOMContentLoaded', async () => {
         if (ftNanahDeliveryReceiptDetail) {
             ftNanahDeliveryReceiptDetail.textContent = hasReceiptTarget
                 ? (hasReceiptReader
-                    ? 'Refresh whether a protected device accepted, rejected, or has not yet picked up the latest saved parent update.'
-                    : 'Set up Internet Pickup or Home Pickup receipt support before checking later-delivery status.')
-                : 'Send a protected update first. Receipts only summarize already-sent parent updates.';
+                    ? tabViewUiText("dashboard.sync.deliveryStrip.refreshWhetherAProtectedDeviceAcceptedRejectedOrSavedParentUpdate", 'Refresh whether a protected device accepted, rejected, or has not yet picked up the latest saved parent update.')
+                    : tabViewUiText("dashboard.sync.deliveryStrip.setUpInternetPickupOrHomePickupReceiptLaterDeliveryStatus", 'Set up Internet Pickup or Home Pickup receipt support before checking later-delivery status.'))
+                : tabViewUiText("dashboard.sync.deliveryStrip.sendAProtectedUpdateFirstReceiptsOnlySummarizeSentParentUpdates", 'Send a protected update first. Receipts only summarize already-sent parent updates.');
         }
         if (ftNanahDeliveryReceiptBtn) {
-            ftNanahDeliveryReceiptBtn.textContent = hasReceiptReader ? 'Check Delivery' : 'Delivery Check Off';
+            ftNanahDeliveryReceiptBtn.textContent = hasReceiptReader ? tabViewUiText("dashboard.sync.deliveryStrip.checkDelivery", 'Check Delivery') : tabViewUiText("dashboard.sync.deliveryStrip.deliveryCheckOff", 'Delivery Check Off');
             ftNanahDeliveryReceiptBtn.disabled = !hasReceiptTarget || !hasReceiptReader;
             ftNanahDeliveryReceiptBtn.title = hasReceiptTarget
                 ? (hasReceiptReader
-                    ? 'Check redacted accepted/rejected delivery receipts for protected devices.'
-                    : 'Set up Internet Pickup or Home Pickup receipt support before checking saved-update delivery.')
-                : 'Send a protected update before checking whether a protected device picked it up.';
+                    ? tabViewUiText("dashboard.sync.deliveryStrip.checkRedactedAcceptedRejectedDeliveryReceiptsForProtectedDevices", 'Check redacted accepted/rejected delivery receipts for protected devices.')
+                    : tabViewUiText("dashboard.sync.deliveryStrip.setUpInternetPickupOrHomePickupReceiptSavedUpdateDelivery", 'Set up Internet Pickup or Home Pickup receipt support before checking saved-update delivery.'))
+                : tabViewUiText("dashboard.sync.deliveryStrip.sendAProtectedUpdateBeforeCheckingWhetherAPickedItUp", 'Send a protected update before checking whether a protected device picked it up.');
         }
     }
 
