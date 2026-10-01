@@ -1,11 +1,33 @@
 {
+  "3.4.1": {
+    "headline": "38 idiomas de interface e verificações de reprodução mais seguras",
+    "summary": "O FilterTube 3.4.1 adiciona 38 idiomas de interface incluídos e melhora as verificações de vídeos no YouTube e em players incorporados compatíveis. Também corrige a inicialização do painel e a correspondência de palavras-chave de comentários salvas. Corrigidas as entradas duplicadas em coreano e bengali rejeitadas pela Mozilla. A compilação verifica chaves JSON duplicadas antes de empacotar.",
+    "bannerSummary": "38 idiomas de interface e verificações de reprodução mais seguras",
+    "ctaLabel": "Ver novidades",
+    "highlights": [
+      "Escolha entre 38 idiomas integrados nas Configurações, incluindo russo, tâmil e guzerate. Datas, números e layouts da direita para a esquerda seguem sua escolha; suas regras não mudam.",
+      "Desativar o FilterTube libera as verificações de reprodução. O vídeo bloqueado permanece pausado sem abrir outro nem avançar a playlist.",
+      "As verificações reutilizam dados confirmados e evitam varreduras desnecessárias de toda a página. No Google Search, verificam o player selecionado, não prévias ao passar o cursor ou vídeos pré-carregados.",
+      "Os canais de Shorts são identificados pelo proprietário do vídeo. Palavras-chave de comentários correspondem dentro de frases; o conteúdo para membros é filtrado por cartão, não por seção.",
+      "Erros de inicialização do painel foram corrigidos. Advert Void distingue melhor o conteúdo do player selecionado de anúncios e outras mídias.",
+      "Hard Timer Whitelist oferece uma sessão protegida e temporizada somente com conteúdo permitido, restaurando as configurações anteriores ao terminar.",
+      "Alguns problemas de reprodução incorporada e tela branca no Firefox Android continuam pendentes. A revisão de traduções e dispositivos continua; isto não atualiza o app móvel nem adiciona ML semântico.",
+      "Corrigidas as entradas duplicadas em coreano e bengali rejeitadas pela Mozilla. A compilação verifica chaves JSON duplicadas antes de empacotar."
+    ]
+  },
   "3.4.0": {
     "headline": "38 idiomas de interface e verificações de reprodução mais seguras",
     "summary": "O FilterTube 3.4.0 adiciona 38 idiomas de interface incluídos e melhora as verificações de vídeos no YouTube e em players incorporados compatíveis. Também corrige a inicialização do painel e a correspondência de palavras-chave de comentários salvas.",
     "bannerSummary": "38 idiomas de interface e verificações de reprodução mais seguras",
     "ctaLabel": "Ver novidades",
     "highlights": [
-      "As configurações agora oferecem 38 idiomas de interface locais. Vídeos bloqueados permanecem pausados sem navegação automática. Os relatos de tela branca no Firefox Android continuam sob investigação."
+      "Escolha entre 38 idiomas integrados nas Configurações, incluindo russo, tâmil e guzerate. Datas, números e layouts da direita para a esquerda seguem sua escolha; suas regras não mudam.",
+      "Desativar o FilterTube libera as verificações de reprodução. O vídeo bloqueado permanece pausado sem abrir outro nem avançar a playlist.",
+      "As verificações reutilizam dados confirmados e evitam varreduras desnecessárias de toda a página. No Google Search, verificam o player selecionado, não prévias ao passar o cursor ou vídeos pré-carregados.",
+      "Os canais de Shorts são identificados pelo proprietário do vídeo. Palavras-chave de comentários correspondem dentro de frases; o conteúdo para membros é filtrado por cartão, não por seção.",
+      "Erros de inicialização do painel foram corrigidos. Advert Void distingue melhor o conteúdo do player selecionado de anúncios e outras mídias.",
+      "Hard Timer Whitelist oferece uma sessão protegida e temporizada somente com conteúdo permitido, restaurando as configurações anteriores ao terminar.",
+      "Alguns problemas de reprodução incorporada e tela branca no Firefox Android continuam pendentes. A revisão de traduções e dispositivos continua; isto não atualiza o app móvel nem adiciona ML semântico."
     ]
   },
   "3.3.7": {

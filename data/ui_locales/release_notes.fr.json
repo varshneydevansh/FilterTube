@@ -1,11 +1,33 @@
 {
+  "3.4.1": {
+    "headline": "38 langues d’interface et des contrôles de lecture plus sûrs",
+    "summary": "FilterTube 3.4.1 ajoute 38 langues d’interface intégrées et améliore les contrôles des vidéos sur YouTube et les lecteurs intégrés compatibles. Il corrige aussi le démarrage du tableau de bord et la correspondance des mots-clés de commentaires enregistrés. Les doublons des traductions coréennes et bengalies refusés par Mozilla sont corrigés. La compilation vérifie désormais les clés JSON en double avant l’empaquetage.",
+    "bannerSummary": "38 langues d’interface et des contrôles de lecture plus sûrs",
+    "ctaLabel": "Voir les nouveautés",
+    "highlights": [
+      "Choisissez parmi 38 langues intégrées dans les paramètres, dont le russe, le tamoul et le gujarati. Dates, nombres et disposition de droite à gauche suivent votre choix ; vos règles restent inchangées.",
+      "Désactiver FilterTube libère les contrôles de lecture. Une vidéo bloquée reste en pause sans ouvrir une autre vidéo ni avancer dans la playlist.",
+      "Les contrôles réutilisent les informations vérifiées et évitent les analyses inutiles de toute la page. Dans Google Search, seul le lecteur sélectionné est contrôlé, pas les aperçus au survol ou les vidéos préchargées.",
+      "Les chaînes Shorts sont identifiées par le propriétaire de la vidéo. Les mots-clés des commentaires correspondent dans les phrases ; le contenu réservé aux membres est filtré par carte, pas par section.",
+      "Les erreurs de démarrage du tableau de bord sont corrigées. Advert Void distingue mieux le contenu du lecteur sélectionné des publicités et des autres médias.",
+      "Hard Timer Whitelist propose une session protégée et limitée dans le temps pour le contenu autorisé, puis restaure vos paramètres précédents.",
+      "Certains problèmes de lecture intégrée et d’écran blanc dans Firefox Android restent ouverts. La révision des traductions et des appareils continue ; ceci ne met pas à jour l’application mobile et n’ajoute pas de ML sémantique.",
+      "Les doublons des traductions coréennes et bengalies refusés par Mozilla sont corrigés. La compilation vérifie désormais les clés JSON en double avant l’empaquetage."
+    ]
+  },
   "3.4.0": {
     "headline": "38 langues d’interface et des contrôles de lecture plus sûrs",
     "summary": "FilterTube 3.4.0 ajoute 38 langues d’interface intégrées et améliore les contrôles des vidéos sur YouTube et les lecteurs intégrés compatibles. Il corrige aussi le démarrage du tableau de bord et la correspondance des mots-clés de commentaires enregistrés.",
     "bannerSummary": "38 langues d’interface et des contrôles de lecture plus sûrs",
     "ctaLabel": "Voir les nouveautés",
     "highlights": [
-      "Les paramètres proposent désormais 38 langues d’interface locales. Les vidéos bloquées restent en pause sans navigation automatique. Les signalements d’écran blanc sur Firefox Android sont toujours en cours d’analyse."
+      "Choisissez parmi 38 langues intégrées dans les paramètres, dont le russe, le tamoul et le gujarati. Dates, nombres et disposition de droite à gauche suivent votre choix ; vos règles restent inchangées.",
+      "Désactiver FilterTube libère les contrôles de lecture. Une vidéo bloquée reste en pause sans ouvrir une autre vidéo ni avancer dans la playlist.",
+      "Les contrôles réutilisent les informations vérifiées et évitent les analyses inutiles de toute la page. Dans Google Search, seul le lecteur sélectionné est contrôlé, pas les aperçus au survol ou les vidéos préchargées.",
+      "Les chaînes Shorts sont identifiées par le propriétaire de la vidéo. Les mots-clés des commentaires correspondent dans les phrases ; le contenu réservé aux membres est filtré par carte, pas par section.",
+      "Les erreurs de démarrage du tableau de bord sont corrigées. Advert Void distingue mieux le contenu du lecteur sélectionné des publicités et des autres médias.",
+      "Hard Timer Whitelist propose une session protégée et limitée dans le temps pour le contenu autorisé, puis restaure vos paramètres précédents.",
+      "Certains problèmes de lecture intégrée et d’écran blanc dans Firefox Android restent ouverts. La révision des traductions et des appareils continue ; ceci ne met pas à jour l’application mobile et n’ajoute pas de ML sémantique."
     ]
   },
   "3.3.7": {

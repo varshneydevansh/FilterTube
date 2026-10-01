@@ -3,12 +3,35 @@
     "_comment": "Shared release notes source for the dashboard What's New tab and the YouTube release banner. Keep entries sorted newest-first by version."
   },
   {
+    "version": "3.4.1",
+    "headline": "38 interface languages and safer playback checks",
+    "summary": "FilterTube 3.4.1 includes the full 3.4.0 update: 38 bundled interface languages, improved YouTube and embedded playback checks, dashboard and comment-filter fixes. It also repairs the duplicate translation entries rejected by Mozilla and expands these release notes.",
+    "bannerSummary": "38 interface languages, playback and filtering improvements, plus the Firefox submission fix.",
+    "highlights": [
+      "Choose from 38 bundled interface languages in Settings, including Russian, Tamil and Gujarati. Dates, counts and right-to-left layouts follow your selection; your saved rules remain unchanged.",
+      "Turning FilterTube off releases playback checks. Blocking the current video keeps it paused without opening another video or advancing the playlist.",
+      "Playback checks reuse verified video information and avoid unnecessary full-page scans. Google Search checks target the selected player, not hover previews or prefetched videos.",
+      "Shorts channel matching uses the video's owner. Comment keywords match within sentences, and members-only filtering targets individual cards rather than whole sections.",
+      "Dashboard startup errors are fixed, and Advert Void handling better separates the selected player's content from adverts and unrelated media.",
+      "Hard Timer Whitelist offers a protected, timed allow-only session and restores your previous settings when it ends.",
+      "Some embedded playback and Firefox Android white-screen reports remain unresolved. Translation and device review continue; this is an extension update, not a new mobile app or semantic ML release.",
+      "Fixed the duplicate Korean and Bengali translation entries rejected by Mozilla. Builds now check for duplicate JSON keys before packaging."
+    ],
+    "detailsUrl": "https://github.com/varshneydevansh/FilterTube/releases/tag/v3.4.1"
+  },
+  {
     "version": "3.4.0",
     "headline": "38 interface languages and safer playback checks",
     "summary": "FilterTube 3.4.0 adds 38 bundled interface languages and improves video checks on YouTube and supported embedded players. It also fixes dashboard startup and saved comment keyword matching.",
     "bannerSummary": "38 interface languages, safer playback checks, and dashboard and comment-filter fixes.",
     "highlights": [
-      "Settings now offers 38 local interface languages. Blocked videos stay paused without automatic navigation. Firefox Android white-screen reports remain under investigation."
+      "Choose from 38 bundled interface languages in Settings, including Russian, Tamil and Gujarati. Dates, counts and right-to-left layouts follow your selection; your saved rules remain unchanged.",
+      "Turning FilterTube off releases playback checks. Blocking the current video keeps it paused without opening another video or advancing the playlist.",
+      "Playback checks reuse verified video information and avoid unnecessary full-page scans. Google Search checks target the selected player, not hover previews or prefetched videos.",
+      "Shorts channel matching uses the video's owner. Comment keywords match within sentences, and members-only filtering targets individual cards rather than whole sections.",
+      "Dashboard startup errors are fixed, and Advert Void handling better separates the selected player's content from adverts and unrelated media.",
+      "Hard Timer Whitelist offers a protected, timed allow-only session and restores your previous settings when it ends.",
+      "Some embedded playback and Firefox Android white-screen reports remain unresolved. Translation and device review continue; this is an extension update, not a new mobile app or semantic ML release."
     ],
     "detailsUrl": "https://github.com/varshneydevansh/FilterTube/releases/tag/v3.4.0"
   },

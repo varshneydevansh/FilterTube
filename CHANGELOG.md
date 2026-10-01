@@ -2,9 +2,52 @@
 
 ## Unreleased
 
-- **Firefox submission fix**: remove duplicate entries in the Korean and Bengali interface files that caused Mozilla validation to reject 3.4.0. Builds and locale checks now reject duplicate JSON keys before packaging.
-- **Release-note extraction repair**: normalize the 3.4.0 heading, accept both supported version-heading styles, bound extraction at the next level-two section, and refuse placeholder publication. This source fix follows the published `c9f070af` release; the existing GitHub body is not changed by editing this file.
-- **Changelog structure**: restore the per-release commit-history subsection and separate the older post-3.3.5 source index from the 3.4.0 delta.
+No additional changes recorded after the 3.4.1 preparation checkpoint.
+
+## Version 3.4.1 — 38 Interface Languages, Playback Fixes And Firefox Packaging
+
+Prepared October 2, 2026. Includes the full 3.4.0 feature update since v3.3.7, plus the Firefox submission repair.
+
+### Use FilterTube in your language
+
+- **38 bundled interface languages**, including Russian, Tamil and Gujarati. Choose your interface language in Settings.
+- Translated popup and dashboard controls, rule editors, backup/import dialogs, family controls, Help, playback messages and What's New.
+- Dates and counts follow your selected language, with improved right-to-left layout.
+- Translations work locally—no translation API, account or model download is required. Your saved rules, channel IDs and video-language filters do not change.
+
+### Playback and filtering improvements
+
+- **Turning FilterTube off releases playback checks.** Disabled mode removes filtering overlays and pending pauses on Watch and Shorts pages.
+- **Blocking the current video keeps you on that video.** FilterTube no longer opens another video or automatically advances through a playlist.
+- **Less repeated checking.** Playback checks reuse verified video information and avoid repeatedly rescanning the whole Watch page. Video-ID-only rules skip metadata they do not need.
+- **Better Google Search playback handling.** Checks target the selected YouTube player; hover previews and prefetched videos should not produce a page-wide checking banner.
+- **More accurate channel matching for Shorts.** Mobile reels and search results use the video's owner identity rather than a name mentioned in its title.
+- **More targeted page updates.** Individual card changes no longer trigger unnecessary full-page scans; members-only filtering targets the matching card instead of its surrounding section.
+- **Comment keyword matching restored** for saved comment-only rules, including keywords inside sentences.
+- **Advert Void handling improved** to distinguish the selected player's content from adverts and avoid treating unrelated media as the main video.
+
+### Interface and self-control
+
+- **Dashboard startup fixes** address the blank dashboard caused by localization errors.
+- **Hard Timer Whitelist** lets you start a protected, timed allow-only session using selected Main Allowed channels, then restores your previous settings when the session ends.
+
+### Firefox submission and release notes
+
+- Removed duplicate Korean and Bengali translation entries that caused Mozilla to reject the 3.4.0 package. Translation values are unchanged.
+- Builds and language checks now reject duplicate JSON keys before packaging.
+- Expanded What's New into separate, translated release highlights rather than a single compressed bullet.
+- Fixed release-note extraction so future generated release descriptions contain the actual notes instead of a missing-details placeholder.
+
+### Known limitations
+
+- Some embedded videos can still remain paused when the information required by an active rule cannot be verified.
+- The Firefox Android white-screen report is not confirmed resolved. Some reported filtering and advert problems still need device-specific verification; Advert Void does not guarantee avoidance of YouTube's ad-block detection.
+- Translation accuracy and layouts still benefit from native-speaker and device review.
+- This release updates the browser extension. It does not introduce semantic ML filtering or a new Android/iOS app version.
+
+### Commit history after the last release
+
+For the feature history, see the [3.4.0 release audit](docs/POST_3_3_7_RELEASE_AUDIT_2026-10-01.md#commit-inventory). The follow-up fixes and package checks are in the [3.4.1 verification record](docs/RELEASE_3_4_1_PREPARATION_2026-10-02.md).
 
 ## Version 3.4.0 — 38 Interface Languages And Playback Fixes
 

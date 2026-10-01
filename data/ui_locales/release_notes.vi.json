@@ -1,11 +1,33 @@
 {
+  "3.4.1": {
+    "headline": "38 ngôn ngữ giao diện và kiểm tra phát video an toàn hơn",
+    "summary": "FilterTube 3.4.1 bổ sung 38 ngôn ngữ giao diện tích hợp và cải thiện kiểm tra video trên YouTube cùng các trình phát nhúng được hỗ trợ. Bản cập nhật cũng sửa lỗi khởi động bảng điều khiển và khớp từ khóa bình luận đã lưu. Đã sửa các mục dịch tiếng Hàn và Bengali trùng lặp bị Mozilla từ chối. Quá trình dựng hiện kiểm tra khóa JSON trùng trước khi đóng gói.",
+    "bannerSummary": "38 ngôn ngữ giao diện và kiểm tra phát video an toàn hơn",
+    "ctaLabel": "Xem điểm mới",
+    "highlights": [
+      "Chọn 38 ngôn ngữ giao diện tích hợp trong Cài đặt, gồm tiếng Nga, Tamil và Gujarati. Ngày, số và bố cục từ phải sang trái theo lựa chọn của bạn; quy tắc đã lưu không đổi.",
+      "Tắt FilterTube sẽ gỡ kiểm tra phát. Video bị chặn vẫn tạm dừng, không mở video khác hay chuyển tiếp danh sách phát.",
+      "Kiểm tra dùng lại thông tin video đã xác minh và tránh quét toàn trang không cần thiết. Google Search kiểm tra trình phát đã chọn, không phải xem trước khi di chuột hay video tải trước.",
+      "Kênh Shorts được nhận dạng theo chủ video. Từ khóa bình luận khớp trong câu; bộ lọc nội dung dành cho thành viên nhắm từng thẻ thay vì cả mục.",
+      "Đã sửa lỗi khởi động bảng điều khiển. Advert Void phân biệt tốt hơn nội dung trình phát đã chọn với quảng cáo và phương tiện không liên quan.",
+      "Hard Timer Whitelist cung cấp phiên được bảo vệ, có giới hạn thời gian, chỉ cho nội dung được phép và khôi phục cài đặt trước khi kết thúc.",
+      "Một số lỗi phát nhúng và màn hình trắng Firefox Android chưa được giải quyết. Việc rà soát bản dịch và thiết bị vẫn tiếp tục; đây không phải bản mới của ứng dụng di động hay ML ngữ nghĩa.",
+      "Đã sửa các mục dịch tiếng Hàn và Bengali trùng lặp bị Mozilla từ chối. Quá trình dựng hiện kiểm tra khóa JSON trùng trước khi đóng gói."
+    ]
+  },
   "3.4.0": {
     "headline": "38 ngôn ngữ giao diện và kiểm tra phát video an toàn hơn",
     "summary": "FilterTube 3.4.0 bổ sung 38 ngôn ngữ giao diện tích hợp và cải thiện kiểm tra video trên YouTube cùng các trình phát nhúng được hỗ trợ. Bản cập nhật cũng sửa lỗi khởi động bảng điều khiển và khớp từ khóa bình luận đã lưu.",
     "bannerSummary": "38 ngôn ngữ giao diện và kiểm tra phát video an toàn hơn",
     "ctaLabel": "Xem điểm mới",
     "highlights": [
-      "Cài đặt hiện có 38 ngôn ngữ giao diện cục bộ. Video bị chặn vẫn tạm dừng, không tự chuyển sang video khác. Các báo cáo màn hình trắng trên Firefox Android vẫn đang được điều tra."
+      "Chọn 38 ngôn ngữ giao diện tích hợp trong Cài đặt, gồm tiếng Nga, Tamil và Gujarati. Ngày, số và bố cục từ phải sang trái theo lựa chọn của bạn; quy tắc đã lưu không đổi.",
+      "Tắt FilterTube sẽ gỡ kiểm tra phát. Video bị chặn vẫn tạm dừng, không mở video khác hay chuyển tiếp danh sách phát.",
+      "Kiểm tra dùng lại thông tin video đã xác minh và tránh quét toàn trang không cần thiết. Google Search kiểm tra trình phát đã chọn, không phải xem trước khi di chuột hay video tải trước.",
+      "Kênh Shorts được nhận dạng theo chủ video. Từ khóa bình luận khớp trong câu; bộ lọc nội dung dành cho thành viên nhắm từng thẻ thay vì cả mục.",
+      "Đã sửa lỗi khởi động bảng điều khiển. Advert Void phân biệt tốt hơn nội dung trình phát đã chọn với quảng cáo và phương tiện không liên quan.",
+      "Hard Timer Whitelist cung cấp phiên được bảo vệ, có giới hạn thời gian, chỉ cho nội dung được phép và khôi phục cài đặt trước khi kết thúc.",
+      "Một số lỗi phát nhúng và màn hình trắng Firefox Android chưa được giải quyết. Việc rà soát bản dịch và thiết bị vẫn tiếp tục; đây không phải bản mới của ứng dụng di động hay ML ngữ nghĩa."
     ]
   },
   "3.3.7": {

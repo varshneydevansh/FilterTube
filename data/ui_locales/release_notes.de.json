@@ -1,11 +1,33 @@
 {
+  "3.4.1": {
+    "headline": "38 Oberflächensprachen und sicherere Wiedergabeprüfungen",
+    "summary": "FilterTube 3.4.1 bietet 38 mitgelieferte Oberflächensprachen und verbessert die Videoprüfung auf YouTube und in unterstützten eingebetteten Playern. Außerdem wurden der Dashboard-Start und die Erkennung gespeicherter Kommentar-Schlüsselwörter korrigiert. Die von Mozilla beanstandeten doppelten koreanischen und bengalischen Übersetzungseinträge sind entfernt. Builds prüfen JSON-Schlüssel vor dem Packen auf Duplikate.",
+    "bannerSummary": "38 Oberflächensprachen und sicherere Wiedergabeprüfungen",
+    "ctaLabel": "Neuigkeiten ansehen",
+    "highlights": [
+      "Wähle in den Einstellungen aus 38 integrierten Sprachen, darunter Russisch, Tamil und Gujarati. Datumsangaben, Zahlen und Rechts-nach-links-Layouts folgen deiner Auswahl; gespeicherte Regeln bleiben unverändert.",
+      "Das Ausschalten von FilterTube gibt die Wiedergabeprüfungen frei. Ein blockiertes Video bleibt pausiert, ohne ein anderes Video zu öffnen oder die Playlist weiterzuschalten.",
+      "Prüfungen verwenden bestätigte Videodaten erneut und vermeiden unnötige vollständige Seitenscans. In Google Search wird der ausgewählte Player geprüft, nicht die Vorschau beim Darüberfahren oder vorgeladene Videos.",
+      "Shorts-Kanäle werden anhand des Videoeigentümers erkannt. Kommentar-Schlüsselwörter werden innerhalb von Sätzen gefunden; Mitgliederinhalte werden pro Karte statt pro Abschnitt gefiltert.",
+      "Startfehler des Dashboards sind behoben. Advert Void trennt den Inhalt des ausgewählten Players besser von Werbung und anderen Medien.",
+      "Hard Timer Whitelist bietet eine geschützte, zeitlich begrenzte Sitzung nur mit erlaubten Inhalten und stellt danach deine vorherigen Einstellungen wieder her.",
+      "Einige Probleme mit eingebetteter Wiedergabe und weißen Seiten in Firefox Android bleiben offen. Sprach- und Geräteprüfungen laufen weiter; dies ist kein Update der mobilen App und führt kein semantisches ML ein.",
+      "Die von Mozilla beanstandeten doppelten koreanischen und bengalischen Übersetzungseinträge sind entfernt. Builds prüfen JSON-Schlüssel vor dem Packen auf Duplikate."
+    ]
+  },
   "3.4.0": {
     "headline": "38 Oberflächensprachen und sicherere Wiedergabeprüfungen",
     "summary": "FilterTube 3.4.0 bietet 38 mitgelieferte Oberflächensprachen und verbessert die Videoprüfung auf YouTube und in unterstützten eingebetteten Playern. Außerdem wurden der Dashboard-Start und die Erkennung gespeicherter Kommentar-Schlüsselwörter korrigiert.",
     "bannerSummary": "38 Oberflächensprachen und sicherere Wiedergabeprüfungen",
     "ctaLabel": "Neuigkeiten ansehen",
     "highlights": [
-      "Die Einstellungen bieten jetzt 38 lokale Oberflächensprachen. Gesperrte Videos bleiben ohne automatische Navigation pausiert. Berichte über weiße Bildschirme in Firefox Android werden weiterhin untersucht."
+      "Wähle in den Einstellungen aus 38 integrierten Sprachen, darunter Russisch, Tamil und Gujarati. Datumsangaben, Zahlen und Rechts-nach-links-Layouts folgen deiner Auswahl; gespeicherte Regeln bleiben unverändert.",
+      "Das Ausschalten von FilterTube gibt die Wiedergabeprüfungen frei. Ein blockiertes Video bleibt pausiert, ohne ein anderes Video zu öffnen oder die Playlist weiterzuschalten.",
+      "Prüfungen verwenden bestätigte Videodaten erneut und vermeiden unnötige vollständige Seitenscans. In Google Search wird der ausgewählte Player geprüft, nicht die Vorschau beim Darüberfahren oder vorgeladene Videos.",
+      "Shorts-Kanäle werden anhand des Videoeigentümers erkannt. Kommentar-Schlüsselwörter werden innerhalb von Sätzen gefunden; Mitgliederinhalte werden pro Karte statt pro Abschnitt gefiltert.",
+      "Startfehler des Dashboards sind behoben. Advert Void trennt den Inhalt des ausgewählten Players besser von Werbung und anderen Medien.",
+      "Hard Timer Whitelist bietet eine geschützte, zeitlich begrenzte Sitzung nur mit erlaubten Inhalten und stellt danach deine vorherigen Einstellungen wieder her.",
+      "Einige Probleme mit eingebetteter Wiedergabe und weißen Seiten in Firefox Android bleiben offen. Sprach- und Geräteprüfungen laufen weiter; dies ist kein Update der mobilen App und führt kein semantisches ML ein."
     ]
   },
   "3.3.7": {

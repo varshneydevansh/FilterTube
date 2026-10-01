@@ -1,11 +1,33 @@
 {
+  "3.4.1": {
+    "headline": "Lugha 38 za kiolesura na ukaguzi salama zaidi wa uchezaji",
+    "summary": "FilterTube 3.4.1 inaongeza lugha 38 za kiolesura zilizojumuishwa na kuboresha ukaguzi wa video kwenye YouTube na vichezaji vilivyopachikwa vinavyotumika. Pia inarekebisha kuanza kwa dashibodi na ulinganishaji wa maneno muhimu ya maoni yaliyohifadhiwa. Maingizo rudufu ya tafsiri za Kikorea na Kibengali yaliyokataliwa na Mozilla yamerekebishwa. Ujenzi sasa hukagua funguo rudufu za JSON kabla ya kufungasha.",
+    "bannerSummary": "Lugha 38 za kiolesura na ukaguzi salama zaidi wa uchezaji",
+    "ctaLabel": "Angalia mapya",
+    "highlights": [
+      "Chagua kati ya lugha 38 zilizojumuishwa katika Mipangilio, zikiwemo Kirusi, Kitamil na Kigujarati. Tarehe, namba na mpangilio wa kulia kwenda kushoto hufuata chaguo lako; sheria zilizohifadhiwa hazibadiliki.",
+      "Kuzima FilterTube huondoa ukaguzi wa uchezaji. Video iliyozuiwa hubaki imesitishwa bila kufungua nyingine au kuendeleza orodha ya kucheza.",
+      "Ukaguzi hutumia tena taarifa zilizothibitishwa na huepuka kuchanganua ukurasa mzima bila haja. Google Search hukagua kichezaji kilichochaguliwa, si hakikisho la kielekezi au video zilizopakiwa mapema.",
+      "Vituo vya Shorts hutambuliwa kwa mmiliki wa video. Maneno muhimu ya maoni hulingana ndani ya sentensi; kichujio cha wanachama hulenga kadi moja moja badala ya sehemu nzima.",
+      "Hitilafu za kuanza dashibodi zimerekebishwa. Advert Void hutenganisha vizuri zaidi maudhui ya kichezaji kilichochaguliwa na matangazo au midia nyingine.",
+      "Hard Timer Whitelist hutoa kipindi kilicholindwa chenye muda maalumu kwa maudhui yanayoruhusiwa pekee, kisha hurejesha mipangilio ya awali.",
+      "Baadhi ya matatizo ya uchezaji uliopachikwa na skrini nyeupe ya Firefox Android bado hayajatatuliwa. Ukaguzi wa lugha na vifaa unaendelea; hili si toleo jipya la programu ya simu au ML ya kisemantiki.",
+      "Maingizo rudufu ya tafsiri za Kikorea na Kibengali yaliyokataliwa na Mozilla yamerekebishwa. Ujenzi sasa hukagua funguo rudufu za JSON kabla ya kufungasha."
+    ]
+  },
   "3.4.0": {
     "headline": "Lugha 38 za kiolesura na ukaguzi salama zaidi wa uchezaji",
     "summary": "FilterTube 3.4.0 inaongeza lugha 38 za kiolesura zilizojumuishwa na kuboresha ukaguzi wa video kwenye YouTube na vichezaji vilivyopachikwa vinavyotumika. Pia inarekebisha kuanza kwa dashibodi na ulinganishaji wa maneno muhimu ya maoni yaliyohifadhiwa.",
     "bannerSummary": "Lugha 38 za kiolesura na ukaguzi salama zaidi wa uchezaji",
     "ctaLabel": "Angalia mapya",
     "highlights": [
-      "Mipangilio sasa ina lugha 38 za kiolesura za ndani. Video zilizozuiwa hubaki zimesitishwa bila kufungua video nyingine kiotomatiki. Ripoti za skrini nyeupe kwenye Firefox Android bado zinachunguzwa."
+      "Chagua kati ya lugha 38 zilizojumuishwa katika Mipangilio, zikiwemo Kirusi, Kitamil na Kigujarati. Tarehe, namba na mpangilio wa kulia kwenda kushoto hufuata chaguo lako; sheria zilizohifadhiwa hazibadiliki.",
+      "Kuzima FilterTube huondoa ukaguzi wa uchezaji. Video iliyozuiwa hubaki imesitishwa bila kufungua nyingine au kuendeleza orodha ya kucheza.",
+      "Ukaguzi hutumia tena taarifa zilizothibitishwa na huepuka kuchanganua ukurasa mzima bila haja. Google Search hukagua kichezaji kilichochaguliwa, si hakikisho la kielekezi au video zilizopakiwa mapema.",
+      "Vituo vya Shorts hutambuliwa kwa mmiliki wa video. Maneno muhimu ya maoni hulingana ndani ya sentensi; kichujio cha wanachama hulenga kadi moja moja badala ya sehemu nzima.",
+      "Hitilafu za kuanza dashibodi zimerekebishwa. Advert Void hutenganisha vizuri zaidi maudhui ya kichezaji kilichochaguliwa na matangazo au midia nyingine.",
+      "Hard Timer Whitelist hutoa kipindi kilicholindwa chenye muda maalumu kwa maudhui yanayoruhusiwa pekee, kisha hurejesha mipangilio ya awali.",
+      "Baadhi ya matatizo ya uchezaji uliopachikwa na skrini nyeupe ya Firefox Android bado hayajatatuliwa. Ukaguzi wa lugha na vifaa unaendelea; hili si toleo jipya la programu ya simu au ML ya kisemantiki."
     ]
   },
   "3.3.7": {

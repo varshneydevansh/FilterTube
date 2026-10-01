@@ -1,11 +1,33 @@
 {
+  "3.4.1": {
+    "headline": "38 basa antarmuka lan pamriksa puter video sing luwih aman",
+    "summary": "FilterTube 3.4.1 nambah 38 basa antarmuka bawaan lan ningkatake pamriksa video ing YouTube lan pamuter sematan sing didhukung. Uga ndandani wiwitan dasbor lan pencocokan tembung kunci komentar sing disimpen. Entri terjemahan Korea lan Bengali sing dobel lan ditolak Mozilla wis didandani. Build saiki mriksa kunci JSON dobel sadurunge dikemas.",
+    "bannerSummary": "38 basa antarmuka lan pamriksa puter video sing luwih aman",
+    "ctaLabel": "Deleng Sing Anyar",
+    "highlights": [
+      "Pilih saka 38 basa antarmuka bawaan ing Setelan, kalebu Rusia, Tamil lan Gujarati. Tanggal, angka lan tata letak tengen-menyang-kiwa manut pilihan sampeyan; aturan sing disimpen ora owah.",
+      "Mateni FilterTube ngeculake pamriksa puter maneh. Video sing diblokir tetep mandheg tanpa mbukak video liya utawa nerusake dhaptar puter.",
+      "Pamriksa nganggo maneh informasi video sing wis diverifikasi lan nyuda pindai kaca sakabehe sing ora perlu. Google Search mriksa pamuter sing dipilih, dudu pratinjau nalika kursor ana ing ndhuwur utawa video sing dimuat sadurunge.",
+      "Kanal Shorts dikenali saka pamilik video. Tembung kunci komentar cocog ing ukara; panyaring konten anggota ngarahake kertu siji-siji, dudu bagean sakabehe.",
+      "Kesalahan wiwitan dasbor wis didandani. Advert Void luwih becik misahake konten pamuter sing dipilih saka iklan lan media liyane.",
+      "Hard Timer Whitelist nyedhiyakake sesi dilindhungi kanthi wektu winates kanggo konten sing diidinake lan mulihake setelan sadurunge nalika rampung.",
+      "Sawetara masalah puter sematan lan layar putih Firefox Android durung rampung. Tinjauan basa lan piranti isih lumaku; iki dudu rilis aplikasi seluler utawa ML semantik anyar.",
+      "Entri terjemahan Korea lan Bengali sing dobel lan ditolak Mozilla wis didandani. Build saiki mriksa kunci JSON dobel sadurunge dikemas."
+    ]
+  },
   "3.4.0": {
     "headline": "38 basa antarmuka lan pamriksa puter video sing luwih aman",
     "summary": "FilterTube 3.4.0 nambah 38 basa antarmuka bawaan lan ningkatake pamriksa video ing YouTube lan pamuter sematan sing didhukung. Uga ndandani wiwitan dasbor lan pencocokan tembung kunci komentar sing disimpen.",
     "bannerSummary": "38 basa antarmuka lan pamriksa puter video sing luwih aman",
     "ctaLabel": "Deleng Sing Anyar",
     "highlights": [
-      "Setelan saiki nyedhiyakake 38 basa antarmuka lokal. Video sing diblokir tetep mandheg tanpa pindhah otomatis. Laporan layar putih ing Firefox Android isih ditliti."
+      "Pilih saka 38 basa antarmuka bawaan ing Setelan, kalebu Rusia, Tamil lan Gujarati. Tanggal, angka lan tata letak tengen-menyang-kiwa manut pilihan sampeyan; aturan sing disimpen ora owah.",
+      "Mateni FilterTube ngeculake pamriksa puter maneh. Video sing diblokir tetep mandheg tanpa mbukak video liya utawa nerusake dhaptar puter.",
+      "Pamriksa nganggo maneh informasi video sing wis diverifikasi lan nyuda pindai kaca sakabehe sing ora perlu. Google Search mriksa pamuter sing dipilih, dudu pratinjau nalika kursor ana ing ndhuwur utawa video sing dimuat sadurunge.",
+      "Kanal Shorts dikenali saka pamilik video. Tembung kunci komentar cocog ing ukara; panyaring konten anggota ngarahake kertu siji-siji, dudu bagean sakabehe.",
+      "Kesalahan wiwitan dasbor wis didandani. Advert Void luwih becik misahake konten pamuter sing dipilih saka iklan lan media liyane.",
+      "Hard Timer Whitelist nyedhiyakake sesi dilindhungi kanthi wektu winates kanggo konten sing diidinake lan mulihake setelan sadurunge nalika rampung.",
+      "Sawetara masalah puter sematan lan layar putih Firefox Android durung rampung. Tinjauan basa lan piranti isih lumaku; iki dudu rilis aplikasi seluler utawa ML semantik anyar."
     ]
   },
   "3.3.7": {

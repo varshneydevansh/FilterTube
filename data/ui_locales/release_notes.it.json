@@ -1,11 +1,33 @@
 {
+  "3.4.1": {
+    "headline": "38 lingue dell’interfaccia e controlli di riproduzione più sicuri",
+    "summary": "FilterTube 3.4.1 aggiunge 38 lingue dell’interfaccia integrate e migliora i controlli dei video su YouTube e nei lettori incorporati supportati. Corregge inoltre l’avvio della dashboard e il riconoscimento delle parole chiave dei commenti salvate. Corrette le voci duplicate in coreano e bengalese rifiutate da Mozilla. La compilazione controlla le chiavi JSON duplicate prima di creare il pacchetto.",
+    "bannerSummary": "38 lingue dell’interfaccia e controlli di riproduzione più sicuri",
+    "ctaLabel": "Scopri le novità",
+    "highlights": [
+      "Scegli tra 38 lingue integrate nelle Impostazioni, tra cui russo, tamil e gujarati. Date, numeri e layout da destra a sinistra seguono la scelta; le regole salvate non cambiano.",
+      "Disattivare FilterTube libera i controlli di riproduzione. Un video bloccato resta in pausa senza aprirne un altro o avanzare nella playlist.",
+      "I controlli riutilizzano dati verificati ed evitano scansioni inutili dell’intera pagina. In Google Search riguardano il lettore selezionato, non le anteprime al passaggio del mouse o i video precaricati.",
+      "I canali Shorts sono identificati dal proprietario del video. Le parole chiave dei commenti corrispondono nelle frasi; i contenuti per membri sono filtrati per scheda, non per sezione.",
+      "Corretti gli errori di avvio del pannello. Advert Void distingue meglio il contenuto del lettore selezionato da annunci e altri media.",
+      "Hard Timer Whitelist offre una sessione protetta e temporizzata con soli contenuti consentiti, ripristinando poi le impostazioni precedenti.",
+      "Restano alcuni problemi di riproduzione incorporata e schermata bianca su Firefox Android. Le revisioni linguistiche e sui dispositivi continuano; questo non aggiorna l’app mobile né aggiunge ML semantico.",
+      "Corrette le voci duplicate in coreano e bengalese rifiutate da Mozilla. La compilazione controlla le chiavi JSON duplicate prima di creare il pacchetto."
+    ]
+  },
   "3.4.0": {
     "headline": "38 lingue dell’interfaccia e controlli di riproduzione più sicuri",
     "summary": "FilterTube 3.4.0 aggiunge 38 lingue dell’interfaccia integrate e migliora i controlli dei video su YouTube e nei lettori incorporati supportati. Corregge inoltre l’avvio della dashboard e il riconoscimento delle parole chiave dei commenti salvate.",
     "bannerSummary": "38 lingue dell’interfaccia e controlli di riproduzione più sicuri",
     "ctaLabel": "Scopri le novità",
     "highlights": [
-      "Le impostazioni ora offrono 38 lingue dell’interfaccia locali. I video bloccati rimangono in pausa senza navigazione automatica. Le segnalazioni di schermata bianca su Firefox Android sono ancora in esame."
+      "Scegli tra 38 lingue integrate nelle Impostazioni, tra cui russo, tamil e gujarati. Date, numeri e layout da destra a sinistra seguono la scelta; le regole salvate non cambiano.",
+      "Disattivare FilterTube libera i controlli di riproduzione. Un video bloccato resta in pausa senza aprirne un altro o avanzare nella playlist.",
+      "I controlli riutilizzano dati verificati ed evitano scansioni inutili dell’intera pagina. In Google Search riguardano il lettore selezionato, non le anteprime al passaggio del mouse o i video precaricati.",
+      "I canali Shorts sono identificati dal proprietario del video. Le parole chiave dei commenti corrispondono nelle frasi; i contenuti per membri sono filtrati per scheda, non per sezione.",
+      "Corretti gli errori di avvio del pannello. Advert Void distingue meglio il contenuto del lettore selezionato da annunci e altri media.",
+      "Hard Timer Whitelist offre una sessione protetta e temporizzata con soli contenuti consentiti, ripristinando poi le impostazioni precedenti.",
+      "Restano alcuni problemi di riproduzione incorporata e schermata bianca su Firefox Android. Le revisioni linguistiche e sui dispositivi continuano; questo non aggiorna l’app mobile né aggiunge ML semantico."
     ]
   },
   "3.3.7": {

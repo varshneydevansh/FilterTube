@@ -1,11 +1,33 @@
 {
+  "3.4.1": {
+    "headline": "38 wika ng interface at mas ligtas na pagsusuri ng pag-play",
+    "summary": "Nagdaragdag ang FilterTube 3.4.1 ng 38 kasamang wika ng interface at pinapahusay ang pagsusuri ng video sa YouTube at mga suportadong naka-embed na player. Inaayos din nito ang pagsisimula ng dashboard at pagtutugma ng naka-save na keyword ng komento. Naayos ang duplicate na Korean at Bengali translation entry na tinanggihan ng Mozilla. Sinusuri na ng build ang duplicate na JSON key bago mag-package.",
+    "bannerSummary": "38 wika ng interface at mas ligtas na pagsusuri ng pag-play",
+    "ctaLabel": "Tingnan ang mga bago",
+    "highlights": [
+      "Pumili sa 38 kasamang wika ng interface sa Mga Setting, kabilang ang Russian, Tamil at Gujarati. Susunod ang petsa, bilang at kanang-pakaliwang layout sa pinili mo; hindi magbabago ang naka-save na mga tuntunin.",
+      "Inaalis ng pag-off ng FilterTube ang mga pagsusuri sa playback. Nananatiling naka-pause ang naka-block na video nang hindi nagbubukas ng iba o sumusulong sa playlist.",
+      "Ginagamit muli ng pagsusuri ang napatunayang impormasyon at iniiwasan ang hindi kailangang pag-scan ng buong pahina. Sa Google Search, ang napiling player lang ang sinusuri, hindi hover preview o paunang na-load na video.",
+      "Nakikilala ang Shorts channel batay sa may-ari ng video. Tinutugma ang mga keyword ng komento sa loob ng pangungusap; indibidwal na card ang target ng filter para sa mga miyembro, hindi buong seksiyon.",
+      "Naayos ang mga error sa pagsisimula ng dashboard. Mas mahusay nang pinag-iiba ng Advert Void ang nilalaman ng napiling player, mga ad at ibang media.",
+      "Nagbibigay ang Hard Timer Whitelist ng protektado at may takdang oras na sesyon para sa pinapayagang nilalaman lamang, at ibinabalik ang dating setting pagkatapos.",
+      "Hindi pa nalulutas ang ilang embedded playback at puting screen sa Firefox Android. Tuloy ang pagsusuri ng wika at device; hindi ito bagong mobile app o semantic ML release.",
+      "Naayos ang duplicate na Korean at Bengali translation entry na tinanggihan ng Mozilla. Sinusuri na ng build ang duplicate na JSON key bago mag-package."
+    ]
+  },
   "3.4.0": {
     "headline": "38 wika ng interface at mas ligtas na pagsusuri ng pag-play",
     "summary": "Nagdaragdag ang FilterTube 3.4.0 ng 38 kasamang wika ng interface at pinapahusay ang pagsusuri ng video sa YouTube at mga suportadong naka-embed na player. Inaayos din nito ang pagsisimula ng dashboard at pagtutugma ng naka-save na keyword ng komento.",
     "bannerSummary": "38 wika ng interface at mas ligtas na pagsusuri ng pag-play",
     "ctaLabel": "Tingnan ang mga bago",
     "highlights": [
-      "May 38 lokal na wika ng interface na ngayon sa Mga Setting. Nananatiling naka-pause ang mga naka-block na video nang walang awtomatikong paglipat. Iniimbestigahan pa ang mga ulat ng puting screen sa Firefox Android."
+      "Pumili sa 38 kasamang wika ng interface sa Mga Setting, kabilang ang Russian, Tamil at Gujarati. Susunod ang petsa, bilang at kanang-pakaliwang layout sa pinili mo; hindi magbabago ang naka-save na mga tuntunin.",
+      "Inaalis ng pag-off ng FilterTube ang mga pagsusuri sa playback. Nananatiling naka-pause ang naka-block na video nang hindi nagbubukas ng iba o sumusulong sa playlist.",
+      "Ginagamit muli ng pagsusuri ang napatunayang impormasyon at iniiwasan ang hindi kailangang pag-scan ng buong pahina. Sa Google Search, ang napiling player lang ang sinusuri, hindi hover preview o paunang na-load na video.",
+      "Nakikilala ang Shorts channel batay sa may-ari ng video. Tinutugma ang mga keyword ng komento sa loob ng pangungusap; indibidwal na card ang target ng filter para sa mga miyembro, hindi buong seksiyon.",
+      "Naayos ang mga error sa pagsisimula ng dashboard. Mas mahusay nang pinag-iiba ng Advert Void ang nilalaman ng napiling player, mga ad at ibang media.",
+      "Nagbibigay ang Hard Timer Whitelist ng protektado at may takdang oras na sesyon para sa pinapayagang nilalaman lamang, at ibinabalik ang dating setting pagkatapos.",
+      "Hindi pa nalulutas ang ilang embedded playback at puting screen sa Firefox Android. Tuloy ang pagsusuri ng wika at device; hindi ito bagong mobile app o semantic ML release."
     ]
   },
   "3.3.7": {

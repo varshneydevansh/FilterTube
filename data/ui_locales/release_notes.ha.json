@@ -1,11 +1,33 @@
 {
+  "3.4.1": {
+    "headline": "Harsunan mu’amala 38 da ingantaccen binciken kunna bidiyo",
+    "summary": "FilterTube 3.4.1 ya ƙara harsunan mu’amala 38 da aka haɗa, kuma ya inganta binciken bidiyo a YouTube da masu kunna bidiyo da aka saka waɗanda ake tallafawa. Ya kuma gyara farawar dashboard da daidaita kalmomin sharhi da aka ajiye. An gyara maimaitattun bayanan fassarar Koriya da Bengali da Mozilla ta ƙi. Ginawa yanzu yana bincika maimaitattun maɓallan JSON kafin tattara kunshin.",
+    "bannerSummary": "Harsunan mu’amala 38 da ingantaccen binciken kunna bidiyo",
+    "ctaLabel": "Duba sababbin abubuwa",
+    "highlights": [
+      "Zaɓi daga harsunan mu'amala 38 a Saituna, ciki har da Rashanci, Tamil da Gujarati. Kwanaki, lambobi da tsarin dama zuwa hagu suna bin zaɓinka; dokokin da aka ajiye ba sa canzawa.",
+      "Kashe FilterTube yana cire binciken kunnawa. Bidiyon da aka toshe yana tsayawa ba tare da buɗe wani ko matsawa a jerin kunnawa ba.",
+      "Bincike yana sake amfani da bayanan bidiyo da aka tabbatar, yana rage duba shafi gaba ɗaya ba tare da buƙata ba. Google Search yana duba na'urar kunnawa da aka zaɓa, ba samfotin nuna linzamin kwamfuta ko bidiyon da aka loda da wuri ba.",
+      "Ana gane tashoshin Shorts ta mai bidiyo. Kalmomin sharhi suna dacewa cikin jimloli; tace abubuwan mambobi yana nufin katunan daban, ba sashe gaba ɗaya ba.",
+      "An gyara kurakuran fara allon sarrafawa. Advert Void ya fi raba abun na'urar kunnawa da aka zaɓa daga talla da sauran kafofin watsa labarai.",
+      "Hard Timer Whitelist yana ba da zama mai kariya na wani lokaci don abubuwan da aka yarda kawai, sannan ya dawo da saitunan baya.",
+      "Wasu matsalolin kunna bidiyo a cikin shafi da farin allo na Firefox Android ba su warware ba. Bitar harshe da na'urori tana ci gaba; wannan ba sabuwar manhajar waya ko ML na ma'ana ba ne.",
+      "An gyara maimaitattun bayanan fassarar Koriya da Bengali da Mozilla ta ƙi. Ginawa yanzu yana bincika maimaitattun maɓallan JSON kafin tattara kunshin."
+    ]
+  },
   "3.4.0": {
     "headline": "Harsunan mu’amala 38 da ingantaccen binciken kunna bidiyo",
     "summary": "FilterTube 3.4.0 ya ƙara harsunan mu’amala 38 da aka haɗa, kuma ya inganta binciken bidiyo a YouTube da masu kunna bidiyo da aka saka waɗanda ake tallafawa. Ya kuma gyara farawar dashboard da daidaita kalmomin sharhi da aka ajiye.",
     "bannerSummary": "Harsunan mu’amala 38 da ingantaccen binciken kunna bidiyo",
     "ctaLabel": "Duba sababbin abubuwa",
     "highlights": [
-      "Saituna yanzu suna da harsunan mu’amala 38 na cikin na’ura. Bidiyoyin da aka toshe suna tsayawa ba tare da buɗe wani bidiyo kai tsaye ba. Ana ci gaba da binciken rahotannin farin allo a Firefox Android."
+      "Zaɓi daga harsunan mu'amala 38 a Saituna, ciki har da Rashanci, Tamil da Gujarati. Kwanaki, lambobi da tsarin dama zuwa hagu suna bin zaɓinka; dokokin da aka ajiye ba sa canzawa.",
+      "Kashe FilterTube yana cire binciken kunnawa. Bidiyon da aka toshe yana tsayawa ba tare da buɗe wani ko matsawa a jerin kunnawa ba.",
+      "Bincike yana sake amfani da bayanan bidiyo da aka tabbatar, yana rage duba shafi gaba ɗaya ba tare da buƙata ba. Google Search yana duba na'urar kunnawa da aka zaɓa, ba samfotin nuna linzamin kwamfuta ko bidiyon da aka loda da wuri ba.",
+      "Ana gane tashoshin Shorts ta mai bidiyo. Kalmomin sharhi suna dacewa cikin jimloli; tace abubuwan mambobi yana nufin katunan daban, ba sashe gaba ɗaya ba.",
+      "An gyara kurakuran fara allon sarrafawa. Advert Void ya fi raba abun na'urar kunnawa da aka zaɓa daga talla da sauran kafofin watsa labarai.",
+      "Hard Timer Whitelist yana ba da zama mai kariya na wani lokaci don abubuwan da aka yarda kawai, sannan ya dawo da saitunan baya.",
+      "Wasu matsalolin kunna bidiyo a cikin shafi da farin allo na Firefox Android ba su warware ba. Bitar harshe da na'urori tana ci gaba; wannan ba sabuwar manhajar waya ko ML na ma'ana ba ne."
     ]
   },
   "3.3.7": {

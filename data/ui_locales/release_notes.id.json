@@ -1,11 +1,33 @@
 {
+  "3.4.1": {
+    "headline": "38 bahasa antarmuka dan pemeriksaan pemutaran yang lebih aman",
+    "summary": "FilterTube 3.4.1 menambahkan 38 bahasa antarmuka bawaan dan meningkatkan pemeriksaan video di YouTube serta pemutar sematan yang didukung. Pembaruan ini juga memperbaiki awal pemuatan dasbor dan pencocokan kata kunci komentar tersimpan. Entri terjemahan Korea dan Bengali duplikat yang ditolak Mozilla diperbaiki. Build kini memeriksa kunci JSON duplikat sebelum pengemasan.",
+    "bannerSummary": "38 bahasa antarmuka dan pemeriksaan pemutaran yang lebih aman",
+    "ctaLabel": "Lihat Yang Baru",
+    "highlights": [
+      "Pilih 38 bahasa antarmuka bawaan di Pengaturan, termasuk Rusia, Tamil dan Gujarati. Tanggal, angka dan tata letak kanan-ke-kiri mengikuti pilihan Anda; aturan tersimpan tidak berubah.",
+      "Mematikan FilterTube melepaskan pemeriksaan pemutaran. Video yang diblokir tetap dijeda tanpa membuka video lain atau melanjutkan daftar putar.",
+      "Pemeriksaan memakai kembali informasi video terverifikasi dan menghindari pemindaian seluruh halaman yang tidak perlu. Google Search memeriksa pemutar terpilih, bukan pratinjau saat disorot atau video pramuat.",
+      "Kanal Shorts dikenali dari pemilik video. Kata kunci komentar cocok di dalam kalimat; filter konten anggota menargetkan kartu, bukan seluruh bagian.",
+      "Kesalahan saat dasbor dimulai diperbaiki. Advert Void lebih baik membedakan konten pemutar terpilih dari iklan dan media lain.",
+      "Hard Timer Whitelist menawarkan sesi terlindungi berbatas waktu hanya untuk konten yang diizinkan, lalu memulihkan pengaturan sebelumnya.",
+      "Sebagian masalah pemutaran tertanam dan layar putih Firefox Android belum teratasi. Peninjauan bahasa dan perangkat berlanjut; ini bukan rilis aplikasi seluler atau ML semantik baru.",
+      "Entri terjemahan Korea dan Bengali duplikat yang ditolak Mozilla diperbaiki. Build kini memeriksa kunci JSON duplikat sebelum pengemasan."
+    ]
+  },
   "3.4.0": {
     "headline": "38 bahasa antarmuka dan pemeriksaan pemutaran yang lebih aman",
     "summary": "FilterTube 3.4.0 menambahkan 38 bahasa antarmuka bawaan dan meningkatkan pemeriksaan video di YouTube serta pemutar sematan yang didukung. Pembaruan ini juga memperbaiki awal pemuatan dasbor dan pencocokan kata kunci komentar tersimpan.",
     "bannerSummary": "38 bahasa antarmuka dan pemeriksaan pemutaran yang lebih aman",
     "ctaLabel": "Lihat Yang Baru",
     "highlights": [
-      "Setelan kini menyediakan 38 bahasa antarmuka lokal. Video yang diblokir tetap dijeda tanpa navigasi otomatis. Laporan layar putih di Firefox Android masih diselidiki."
+      "Pilih 38 bahasa antarmuka bawaan di Pengaturan, termasuk Rusia, Tamil dan Gujarati. Tanggal, angka dan tata letak kanan-ke-kiri mengikuti pilihan Anda; aturan tersimpan tidak berubah.",
+      "Mematikan FilterTube melepaskan pemeriksaan pemutaran. Video yang diblokir tetap dijeda tanpa membuka video lain atau melanjutkan daftar putar.",
+      "Pemeriksaan memakai kembali informasi video terverifikasi dan menghindari pemindaian seluruh halaman yang tidak perlu. Google Search memeriksa pemutar terpilih, bukan pratinjau saat disorot atau video pramuat.",
+      "Kanal Shorts dikenali dari pemilik video. Kata kunci komentar cocok di dalam kalimat; filter konten anggota menargetkan kartu, bukan seluruh bagian.",
+      "Kesalahan saat dasbor dimulai diperbaiki. Advert Void lebih baik membedakan konten pemutar terpilih dari iklan dan media lain.",
+      "Hard Timer Whitelist menawarkan sesi terlindungi berbatas waktu hanya untuk konten yang diizinkan, lalu memulihkan pengaturan sebelumnya.",
+      "Sebagian masalah pemutaran tertanam dan layar putih Firefox Android belum teratasi. Peninjauan bahasa dan perangkat berlanjut; ini bukan rilis aplikasi seluler atau ML semantik baru."
     ]
   },
   "3.3.7": {

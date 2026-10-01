@@ -1,11 +1,33 @@
 {
+  "3.4.1": {
+    "headline": "Èdè ìṣàfihàn 38 àti àyẹ̀wò ìṣiṣẹ́ fídíò tó dára síi",
+    "summary": "FilterTube 3.4.1 fi èdè ìṣàfihàn 38 tí a kó sínú àfikún náà kún un, ó sì mú àyẹ̀wò fídíò lórí YouTube àti àwọn ẹ̀rọ ìṣiṣẹ́ tí a fi sínú ojúewé tí a ṣe àtìlẹ́yìn fún dára síi. Ó tún ṣàtúnṣe ìbẹ̀rẹ̀ dashboard àti ìbámu àwọn kókó ọ̀rọ̀ àsọyé tí a fipamọ́. A ṣàtúnṣe àwọn àkọsílẹ̀ ìtumọ̀ Korea àti Bengali tó tún ara wọn ṣe tí Mozilla kọ̀. Bí a ṣe ń kọ́ ètò náà báyìí ṣàyẹ̀wò kọ́kọ́rọ́ JSON tí ó tún ara rẹ̀ ṣe kí a tó dì í.",
+    "bannerSummary": "Èdè ìṣàfihàn 38 àti àyẹ̀wò ìṣiṣẹ́ fídíò tó dára síi",
+    "ctaLabel": "Wo ohun tuntun",
+    "highlights": [
+      "Yan lára èdè ojú-ọ̀nà 38 ní Ètò, pẹ̀lú Rọ́ṣíà, Tamil àti Gujarati. Ọjọ́, nọ́mbà àti ìtòlẹ́sẹẹsẹ láti ọ̀tún sí òsì tẹ̀lé àṣàyàn rẹ; àwọn òfin tí a fi pamọ́ kò yí padà.",
+      "Pípa FilterTube yọ àyẹ̀wò ìṣeré kúrò. Fídíò tí a dí dúró ní ìsinmi láì ṣí òmíràn tàbí tẹ̀ síwájú nínú àtòjọ ìṣeré.",
+      "Àyẹ̀wò tún lo ìsọfúnni fídíò tí a ti jẹ́rìí sí, ó sì dín àyẹ̀wò gbogbo ojú-ìwé tí kò pọn dandan kù. Google Search ṣàyẹ̀wò ẹ̀rọ ìṣeré tí a yan, kì í ṣe àwòtẹ́lẹ̀ ìtọ́ka tàbí fídíò tí a ti kó sílẹ̀.",
+      "A mọ ikanni Shorts nípasẹ̀ oní fídíò. Àwọn ọ̀rọ̀ kókó àlàyé bá ara mu nínú gbólóhùn; àlẹ̀mọ́ àkóónú ọmọ ẹgbẹ́ dojú kọ káàdì kọ̀ọ̀kan dípò gbogbo apá.",
+      "A ti ṣàtúnṣe àṣìṣe ìbẹ̀rẹ̀ pátákó ìṣàkóso. Advert Void dá àkóónú ẹ̀rọ ìṣeré tí a yan sọ́tọ̀ dáadáa kúrò nínú ìpolówó àti mídíà mìíràn.",
+      "Hard Timer Whitelist fúnni ní àkókò tí a dáàbò bo fún àkóónú tí a gbà láàyè nìkan, ó sì dá ètò àtijọ́ padà ní òpin.",
+      "Àwọn ìṣòro ìṣeré inú ojú-ìwé àti ojú-ìwé funfun Firefox Android kan kò tíì yanjú. Àtúnyẹ̀wò èdè àti ẹ̀rọ ń tẹ̀síwájú; èyí kì í ṣe ẹ̀yà tuntun app fóònù tàbí ML ìtumọ̀.",
+      "A ṣàtúnṣe àwọn àkọsílẹ̀ ìtumọ̀ Korea àti Bengali tó tún ara wọn ṣe tí Mozilla kọ̀. Bí a ṣe ń kọ́ ètò náà báyìí ṣàyẹ̀wò kọ́kọ́rọ́ JSON tí ó tún ara rẹ̀ ṣe kí a tó dì í."
+    ]
+  },
   "3.4.0": {
     "headline": "Èdè ìṣàfihàn 38 àti àyẹ̀wò ìṣiṣẹ́ fídíò tó dára síi",
     "summary": "FilterTube 3.4.0 fi èdè ìṣàfihàn 38 tí a kó sínú àfikún náà kún un, ó sì mú àyẹ̀wò fídíò lórí YouTube àti àwọn ẹ̀rọ ìṣiṣẹ́ tí a fi sínú ojúewé tí a ṣe àtìlẹ́yìn fún dára síi. Ó tún ṣàtúnṣe ìbẹ̀rẹ̀ dashboard àti ìbámu àwọn kókó ọ̀rọ̀ àsọyé tí a fipamọ́.",
     "bannerSummary": "Èdè ìṣàfihàn 38 àti àyẹ̀wò ìṣiṣẹ́ fídíò tó dára síi",
     "ctaLabel": "Wo ohun tuntun",
     "highlights": [
-      "Ètò ní èdè ìṣàfihàn agbègbè 38 báyìí. Àwọn fídíò tí a dí dúró láì ṣí fídíò míì fúnra wọn. A ṣì ń ṣèwádìí àwọn ìròyìn ojúewé funfun lórí Firefox Android."
+      "Yan lára èdè ojú-ọ̀nà 38 ní Ètò, pẹ̀lú Rọ́ṣíà, Tamil àti Gujarati. Ọjọ́, nọ́mbà àti ìtòlẹ́sẹẹsẹ láti ọ̀tún sí òsì tẹ̀lé àṣàyàn rẹ; àwọn òfin tí a fi pamọ́ kò yí padà.",
+      "Pípa FilterTube yọ àyẹ̀wò ìṣeré kúrò. Fídíò tí a dí dúró ní ìsinmi láì ṣí òmíràn tàbí tẹ̀ síwájú nínú àtòjọ ìṣeré.",
+      "Àyẹ̀wò tún lo ìsọfúnni fídíò tí a ti jẹ́rìí sí, ó sì dín àyẹ̀wò gbogbo ojú-ìwé tí kò pọn dandan kù. Google Search ṣàyẹ̀wò ẹ̀rọ ìṣeré tí a yan, kì í ṣe àwòtẹ́lẹ̀ ìtọ́ka tàbí fídíò tí a ti kó sílẹ̀.",
+      "A mọ ikanni Shorts nípasẹ̀ oní fídíò. Àwọn ọ̀rọ̀ kókó àlàyé bá ara mu nínú gbólóhùn; àlẹ̀mọ́ àkóónú ọmọ ẹgbẹ́ dojú kọ káàdì kọ̀ọ̀kan dípò gbogbo apá.",
+      "A ti ṣàtúnṣe àṣìṣe ìbẹ̀rẹ̀ pátákó ìṣàkóso. Advert Void dá àkóónú ẹ̀rọ ìṣeré tí a yan sọ́tọ̀ dáadáa kúrò nínú ìpolówó àti mídíà mìíràn.",
+      "Hard Timer Whitelist fúnni ní àkókò tí a dáàbò bo fún àkóónú tí a gbà láàyè nìkan, ó sì dá ètò àtijọ́ padà ní òpin.",
+      "Àwọn ìṣòro ìṣeré inú ojú-ìwé àti ojú-ìwé funfun Firefox Android kan kò tíì yanjú. Àtúnyẹ̀wò èdè àti ẹ̀rọ ń tẹ̀síwájú; èyí kì í ṣe ẹ̀yà tuntun app fóònù tàbí ML ìtumọ̀."
     ]
   },
   "3.3.7": {

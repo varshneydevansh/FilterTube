@@ -1,11 +1,33 @@
 {
+  "3.4.1": {
+    "headline": "38 arayüz dili ve daha güvenli oynatma kontrolleri",
+    "summary": "FilterTube 3.4.1, 38 yerleşik arayüz dili ekler ve YouTube ile desteklenen gömülü oynatıcılarda video kontrollerini iyileştirir. Ayrıca panelin açılışını ve kayıtlı yorum anahtar sözcüklerinin eşleşmesini düzeltir. Mozilla'nın reddettiği yinelenen Korece ve Bengalce çeviri girdileri düzeltildi. Derleme artık paketlemeden önce yinelenen JSON anahtarlarını kontrol ediyor.",
+    "bannerSummary": "38 arayüz dili ve daha güvenli oynatma kontrolleri",
+    "ctaLabel": "Yenilikleri Gör",
+    "highlights": [
+      "Ayarlar'da Rusça, Tamilce ve Guceratça dahil 38 yerleşik arayüz dilinden birini seçin. Tarihler, sayılar ve sağdan sola düzen seçiminizi izler; kayıtlı kurallarınız değişmez.",
+      "FilterTube'u kapatmak oynatma kontrollerini kaldırır. Engellenen video başka bir video açılmadan veya oynatma listesi ilerletilmeden duraklatılmış kalır.",
+      "Kontroller doğrulanmış bilgileri yeniden kullanır ve gereksiz tam sayfa taramalarını önler. Google Search seçili oynatıcıyı kontrol eder; üzerine gelme önizlemelerini veya önceden yüklenen videoları değil.",
+      "Shorts kanalları video sahibine göre tanınır. Yorum anahtar sözcükleri cümle içinde eşleşir; üyelere özel içerik filtresi tüm bölüm yerine tek tek kartları hedefler.",
+      "Pano başlangıç hataları düzeltildi. Advert Void seçili oynatıcının içeriğini reklamlardan ve ilgisiz medyadan daha iyi ayırır.",
+      "Hard Timer Whitelist korumalı, süreli, yalnızca izin verilen içeriğe açık bir oturum sunar ve bitince önceki ayarlarınızı geri yükler.",
+      "Bazı gömülü oynatma ve Firefox Android beyaz ekran sorunları çözülmedi. Dil ve cihaz incelemesi sürüyor; bu yeni bir mobil uygulama veya anlamsal ML sürümü değildir.",
+      "Mozilla'nın reddettiği yinelenen Korece ve Bengalce çeviri girdileri düzeltildi. Derleme artık paketlemeden önce yinelenen JSON anahtarlarını kontrol ediyor."
+    ]
+  },
   "3.4.0": {
     "headline": "38 arayüz dili ve daha güvenli oynatma kontrolleri",
     "summary": "FilterTube 3.4.0, 38 yerleşik arayüz dili ekler ve YouTube ile desteklenen gömülü oynatıcılarda video kontrollerini iyileştirir. Ayrıca panelin açılışını ve kayıtlı yorum anahtar sözcüklerinin eşleşmesini düzeltir.",
     "bannerSummary": "38 arayüz dili ve daha güvenli oynatma kontrolleri",
     "ctaLabel": "Yenilikleri Gör",
     "highlights": [
-      "Ayarlar artık 38 yerel arayüz dili sunuyor. Engellenen videolar otomatik yönlendirme olmadan duraklatılmış kalır. Firefox Android’deki beyaz ekran bildirimleri hâlâ inceleniyor."
+      "Ayarlar'da Rusça, Tamilce ve Guceratça dahil 38 yerleşik arayüz dilinden birini seçin. Tarihler, sayılar ve sağdan sola düzen seçiminizi izler; kayıtlı kurallarınız değişmez.",
+      "FilterTube'u kapatmak oynatma kontrollerini kaldırır. Engellenen video başka bir video açılmadan veya oynatma listesi ilerletilmeden duraklatılmış kalır.",
+      "Kontroller doğrulanmış bilgileri yeniden kullanır ve gereksiz tam sayfa taramalarını önler. Google Search seçili oynatıcıyı kontrol eder; üzerine gelme önizlemelerini veya önceden yüklenen videoları değil.",
+      "Shorts kanalları video sahibine göre tanınır. Yorum anahtar sözcükleri cümle içinde eşleşir; üyelere özel içerik filtresi tüm bölüm yerine tek tek kartları hedefler.",
+      "Pano başlangıç hataları düzeltildi. Advert Void seçili oynatıcının içeriğini reklamlardan ve ilgisiz medyadan daha iyi ayırır.",
+      "Hard Timer Whitelist korumalı, süreli, yalnızca izin verilen içeriğe açık bir oturum sunar ve bitince önceki ayarlarınızı geri yükler.",
+      "Bazı gömülü oynatma ve Firefox Android beyaz ekran sorunları çözülmedi. Dil ve cihaz incelemesi sürüyor; bu yeni bir mobil uygulama veya anlamsal ML sürümü değildir."
     ]
   },
   "3.3.7": {

@@ -25,7 +25,8 @@ test('current release produces real notes and excludes the history index', () =>
   assert.ok(!entry.section.includes('| Date | Commit |'));
   assert.ok(!entry.section.includes('`4a658584`'));
   assert.ok(!entry.section.includes('Post-v3.3.5 source-history index'));
-  assert.equal(entry.previousVersion, '3.3.7');
+  assert.ok(entry.section.includes('### Firefox submission and release notes'));
+  assert.equal(entry.previousVersion, '3.4.0');
 });
 
 test('canonical and bare version headings are recognized and bounded by any next section', () => {

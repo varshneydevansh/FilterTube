@@ -3,7 +3,7 @@
   <h1>FilterTube</h1>
   <p>Peace of Mind for your Digital Space</p>
   
-[![Ask DeepWiki](https://deepwiki.com/badge.svg)](https://deepwiki.com/varshneydevansh/FilterTube) ![Version](https://img.shields.io/badge/version-3.4.0-blue.svg) ![License](https://img.shields.io/badge/license-MIT-green.svg) ![Lines of Code](https://img.shields.io/badge/total%20lines-858.5k-brightgreen.svg) ![JavaScript LoC](https://img.shields.io/badge/javascript-117.5k%20lines-yellow.svg) ![Top Language](https://img.shields.io/github/languages/top/varshneydevansh/FilterTube?color=f1e05a) ![Repo Size](https://img.shields.io/github/repo-size/varshneydevansh/FilterTube?color=orange)
+[![Ask DeepWiki](https://deepwiki.com/badge.svg)](https://deepwiki.com/varshneydevansh/FilterTube) ![Version](https://img.shields.io/badge/version-3.4.1-blue.svg) ![License](https://img.shields.io/badge/license-MIT-green.svg) ![Lines of Code](https://img.shields.io/badge/total%20lines-858.5k-brightgreen.svg) ![JavaScript LoC](https://img.shields.io/badge/javascript-117.5k%20lines-yellow.svg) ![Top Language](https://img.shields.io/github/languages/top/varshneydevansh/FilterTube?color=f1e05a) ![Repo Size](https://img.shields.io/github/repo-size/varshneydevansh/FilterTube?color=orange)
   
 </div>
 
@@ -15,11 +15,18 @@ The public website now also acts as the download hub for browser releases, Andro
 
 👉 **[filtertube.in/downloads](https://filtertube.in/downloads)**
 
-The current v3.4.0 release-preparation checkpoint is documented in the
-[changelog history index](CHANGELOG.md), with the runtime, category, language,
-Nanah, app-sync, and website contracts kept in the existing [documentation
-map](docs/CODEMAP.md). Native Android/iOS parity and installed-device behavior
-remain evidence-gated; the extension is still the runtime source of truth.
+The current v3.4.1 preparation includes the full multilingual and playback update
+from 3.4.0 plus the Firefox submission repair. See the [user-facing changelog](CHANGELOG.md)
+and [3.4.1 verification record](docs/RELEASE_3_4_1_PREPARATION_2026-10-02.md).
+The extension remains the runtime source of truth; native Android/iOS updates
+and installed-device verification are separate.
+
+## What's New in v3.4.1
+
+- **The full 3.4.0 feature update**: 38 interface languages, improved playback checks, targeted filtering, dashboard fixes and protected timed allow-only sessions.
+- **Firefox submission repair**: removed duplicate Korean and Bengali translation entries rejected by Mozilla; builds now check all packaged JSON for duplicate keys.
+- **Clearer release notes**: detailed What's New highlights in all 38 interface languages, with the same feature summary and limitations as the changelog.
+- **Scope**: no new mobile app version or semantic ML feature. Known embedded-playback and Firefox Android white-screen cases still need verification.
 
 ## What's New in v3.4.0
 

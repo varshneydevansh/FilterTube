@@ -1,11 +1,33 @@
 {
+  "3.4.1": {
+    "headline": "38 interface languages and playback checks wey safer",
+    "summary": "FilterTube 3.4.1 bring 38 interface languages wey dey inside the extension and improve video checks for YouTube and supported embedded players. E also fix dashboard startup and how saved comment keywords dey match. Duplicate Korean and Bengali translation entries wey Mozilla reject don fix. Build go now check duplicate JSON keys before packaging.",
+    "bannerSummary": "38 interface languages and safer playback checks",
+    "ctaLabel": "See Wetin New",
+    "highlights": [
+      "Choose from 38 interface languages wey come with FilterTube for Settings, including Russian, Tamil and Gujarati. Dates, numbers and right-to-left layout go follow your choice; your saved rules no go change.",
+      "When you off FilterTube, playback checks go release. Blocked video go remain paused without opening another video or moving playlist forward.",
+      "Checks go reuse verified video information and avoid scanning the whole page when e no need. Google Search go check the player you select, no be hover preview or video wey preload.",
+      "Shorts channel matching go use the video owner. Comment keywords go match inside sentences, and members-only filter go target each card instead of the whole section.",
+      "Dashboard startup errors don fix. Advert Void go better separate the selected player content from adverts and other media wey no relate.",
+      "Hard Timer Whitelist give protected, timed session for only allowed content, then restore your old settings when e finish.",
+      "Some embedded playback and Firefox Android white-screen reports never resolve. Translation and device review still dey continue; this no be new mobile app or semantic ML release.",
+      "Duplicate Korean and Bengali translation entries wey Mozilla reject don fix. Build go now check duplicate JSON keys before packaging."
+    ]
+  },
   "3.4.0": {
     "headline": "38 interface languages and playback checks wey safer",
     "summary": "FilterTube 3.4.0 bring 38 interface languages wey dey inside the extension and improve video checks for YouTube and supported embedded players. E also fix dashboard startup and how saved comment keywords dey match.",
     "bannerSummary": "38 interface languages and safer playback checks",
     "ctaLabel": "See Wetin New",
     "highlights": [
-      "Settings now get 38 local interface languages. Blocked videos go remain paused; another video no go open by itself. We still dey investigate white-screen reports for Firefox Android."
+      "Choose from 38 interface languages wey come with FilterTube for Settings, including Russian, Tamil and Gujarati. Dates, numbers and right-to-left layout go follow your choice; your saved rules no go change.",
+      "When you off FilterTube, playback checks go release. Blocked video go remain paused without opening another video or moving playlist forward.",
+      "Checks go reuse verified video information and avoid scanning the whole page when e no need. Google Search go check the player you select, no be hover preview or video wey preload.",
+      "Shorts channel matching go use the video owner. Comment keywords go match inside sentences, and members-only filter go target each card instead of the whole section.",
+      "Dashboard startup errors don fix. Advert Void go better separate the selected player content from adverts and other media wey no relate.",
+      "Hard Timer Whitelist give protected, timed session for only allowed content, then restore your old settings when e finish.",
+      "Some embedded playback and Firefox Android white-screen reports never resolve. Translation and device review still dey continue; this no be new mobile app or semantic ML release."
     ]
   },
   "3.3.7": {
