@@ -11179,12 +11179,12 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     async function promptManagedChannelListSurface() {
         const surface = await showChoiceModal({
-            title: 'Where Should This List Apply?',
-            message: 'Choose the YouTube space for these rules. FilterTube will respect each protected profile current Blocklist/Whitelist mode.',
+            title: tabViewUiText("dashboard.modal.remaining.whereShouldThisListApply", "Where Should This List Apply?"),
+            message: tabViewUiText("dashboard.modal.remaining.chooseTheYouTubeSpaceForTheseRulesFilterTubeWillRespectEachProtectedProfileCurrentBlocklistWhitelistMode", "Choose the YouTube space for these rules. FilterTube will respect each protected profile current Blocklist/Whitelist mode."),
             choices: [
-                { value: 'main', label: 'Main YouTube', className: 'btn-primary' },
-                { value: 'kids', label: 'YouTube Kids', className: 'btn-secondary' },
-                { value: 'both', label: 'Main + Kids', className: 'btn-secondary' }
+                { value: 'main', label: tabViewUiText("dashboard.managedLists.surfaceMain", "Main YouTube"), className: 'btn-primary' },
+                { value: 'kids', label: tabViewUiText("dashboard.managedLists.surfaceKids", "YouTube Kids"), className: 'btn-secondary' },
+                { value: 'both', label: tabViewUiText("family.profileManager.access.mainKids", "Main + Kids"), className: 'btn-secondary' }
             ],
             cancelText: tabViewUiText("dashboard.modal.cancel", "Cancel")
         });
@@ -12964,8 +12964,8 @@ document.addEventListener('DOMContentLoaded', async () => {
         }).length;
         if (readyProfileCount > 0) {
             const sendNow = await showConfirmModal({
-                title: 'Send removal update now?',
-                message: `${readyProfileCount} changed ${readyProfileCount === 1 ? 'profile has' : 'profiles have'} a verified delivery path. Send this list-removal update to those devices now.`,
+                title: tabViewUiText("dashboard.modal.remaining.sendRemovalUpdateNow", "Send removal update now?"),
+                message: tabViewUiText(readyProfileCount === 1 ? 'dashboard.modal.remaining.removalReadyOne' : 'dashboard.modal.remaining.removalReadyOther', readyProfileCount === 1 ? '{count} changed profile has a verified delivery path. Send this list-removal update to those devices now.' : '{count} changed profiles have a verified delivery path. Send this list-removal update to those devices now.', { count: readyProfileCount }),
                 confirmText: tabViewUiText("family.commandCenter.action.sendUpdate", "Send Update"),
                 cancelText: tabViewUiText("firstRun.notNow", "Not now")
             });
@@ -14952,6 +14952,16 @@ document.addEventListener('DOMContentLoaded', async () => {
         return normalizeString(strategy).toLowerCase() === 'replace' ? 'Replace' : 'Merge';
     }
 
+    // Display-only scope labels: do not translate scope values in payloads or policy.
+    function nanahModalScopeLabel(scope) {
+        const key = {
+            main: 'main', kids: 'kids', full: 'fullBackup', videos: 'videos',
+            keywords: 'keywords', channels: 'channels', rules_bundle: 'ruleBundle',
+            viewing_space: 'viewingSpace', time_limits: 'timeLimits', active: 'activeProfile'
+        }[normalizeString(scope).toLowerCase()] || 'activeProfile';
+        return tabViewUiText(`dashboard.sync.scope.${key}`, getNanahScopeLabel(scope));
+    }
+
     function getNanahReconnectMode(mode, fallback = 'fast') {
         const normalized = normalizeString(mode).toLowerCase();
         if (normalized === 'approval_needed' || normalized === 'approval') return 'approval_needed';
@@ -16452,17 +16462,17 @@ document.addEventListener('DOMContentLoaded', async () => {
 
         if (localProfile.profileType === 'child') {
             await showChoiceModal({
-                title: 'Managed protected target required',
-                message: `You are sending ${getNanahScopeLabel(normalizedScope).toLowerCase()} from ${formatNanahProfileContext(localProfile)}, but ${getNanahRemoteLabel()} currently has ${formatNanahProfileContext(remoteProfile)} active.`,
+                title: tabViewUiText("dashboard.modal.remaining.managedProtectedTargetRequired", "Managed protected target required"),
+                message: tabViewUiText('dashboard.modal.remaining.remoteTargetMismatch', 'You are sending {scope} from {localProfile}, but {remoteDevice} currently has {remoteProfile} active.', { scope: nanahModalScopeLabel(normalizedScope), localProfile: formatNanahProfileContext(localProfile), remoteDevice: getNanahRemoteLabel(), remoteProfile: formatNanahProfileContext(remoteProfile) }),
                 details: [
-                    'For protected profiles, FilterTube blocks "send anyway" in this situation so the update does not land in the wrong remote profile.',
-                    'To manage that protected profile reliably, save parent trust on the other device while that protected profile is active once.',
-                    'After that, choose "Always this local profile" on the receiving device so future parent updates can land there without switching profiles each time.'
+                    tabViewUiText("dashboard.modal.remaining.forProtectedProfilesFilterTubeBlocksSendAnywayInThisSituationSoTheUpdateDoesNotLandInTheWrongRemoteProfile", "For protected profiles, FilterTube blocks \"send anyway\" in this situation so the update does not land in the wrong remote profile."),
+                    tabViewUiText("dashboard.modal.remaining.toManageThatProtectedProfileReliablySaveParentTrustOnTheOtherDeviceWhileThatProtectedProfileIsActiveOnce", "To manage that protected profile reliably, save parent trust on the other device while that protected profile is active once."),
+                    tabViewUiText("dashboard.modal.remaining.afterThatChooseAlwaysThisLocalProfileOnTheReceivingDeviceSoFutureParentUpdatesCanLandThereWithoutSwitchingProfilesEachTime", "After that, choose \"Always this local profile\" on the receiving device so future parent updates can land there without switching profiles each time.")
                 ],
                 choices: [
                     {
                         value: 'ok',
-                        label: 'Got It',
+                        label: tabViewUiText("dashboard.modal.remaining.gotIt", "Got It"),
                         recommended: true
                     }
                 ],
@@ -16472,21 +16482,21 @@ document.addEventListener('DOMContentLoaded', async () => {
         }
 
         const response = await showChoiceModal({
-            title: 'Other device has a different profile open',
-            message: `You are sending ${getNanahScopeLabel(normalizedScope).toLowerCase()} from ${formatNanahProfileContext(localProfile)}, but ${getNanahRemoteLabel()} currently has ${formatNanahProfileContext(remoteProfile)} active.`,
+            title: tabViewUiText("dashboard.modal.remaining.otherDeviceHasADifferentProfileOpen", "Other device has a different profile open"),
+            message: tabViewUiText('dashboard.modal.remaining.remoteTargetMismatch', 'You are sending {scope} from {localProfile}, but {remoteDevice} currently has {remoteProfile} active.', { scope: nanahModalScopeLabel(normalizedScope), localProfile: formatNanahProfileContext(localProfile), remoteDevice: getNanahRemoteLabel(), remoteProfile: formatNanahProfileContext(remoteProfile) }),
             details: [
-                'This update follows the profile currently open on the other device unless you choose a protected target or the receiving device already saved a fixed target.',
-                `${getNanahScopeLabel(normalizedScope)} will apply to the other device's currently open profile, not to an inactive matching profile.`,
-                'Switch the other device to the intended profile first, or use Full backup only if you really want the wider account tree.'
+                tabViewUiText("dashboard.modal.remaining.thisUpdateFollowsTheProfileCurrentlyOpenOnTheOtherDeviceUnlessYouChooseAProtectedTargetOrTheReceivingDeviceAlreadySavedAFixedTarget", "This update follows the profile currently open on the other device unless you choose a protected target or the receiving device already saved a fixed target."),
+                tabViewUiText('dashboard.modal.remaining.currentRemoteTarget', '{scope} will apply to the other device’s currently open profile, not to an inactive matching profile.', { scope: nanahModalScopeLabel(normalizedScope) }),
+                tabViewUiText("dashboard.modal.remaining.switchTheOtherDeviceToTheIntendedProfileFirstOrUseFullBackupOnlyIfYouReallyWantTheWiderAccountTree", "Switch the other device to the intended profile first, or use Full backup only if you really want the wider account tree.")
             ],
             choices: [
                 {
                     value: 'continue',
-                    label: 'Send Anyway'
+                    label: tabViewUiText("dashboard.modal.remaining.sendAnyway", "Send Anyway")
                 },
                 {
                     value: 'cancel',
-                    label: 'Cancel',
+                    label: tabViewUiText("dashboard.sync.managedPolicy.caller.action.cancelDefault", "Cancel"),
                     className: 'btn-secondary',
                     recommended: true
                 }
@@ -17103,16 +17113,16 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     async function showNanahNearbyHelperChoice() {
         const choice = await showChoiceModal({
-            title: 'Find devices nearby',
-            message: 'Code or QR works without setup. Automatic nearby selection needs the small FilterTube helper running on each computer.',
+            title: tabViewUiText("dashboard.sync.providerModal.findDevicesNearby", "Find devices nearby"),
+            message: tabViewUiText("dashboard.sync.providerModal.codeOrQRWorksWithoutSetupAutomaticNearbySelectionNeedsTheSmallFilterTubeHelperRunningOnEachComputer", "Code or QR works without setup. Automatic nearby selection needs the small FilterTube helper running on each computer."),
             details: [
-                'The helper shows only devices that choose Let this device appear.',
-                'Finding a device does not grant permission; both screens must still show the same safety phrase.',
-                'No rules, PINs, profile IDs, or private keys are broadcast on the network.'
+                tabViewUiText("dashboard.sync.providerModal.theHelperShowsOnlyDevicesThatChooseLetThisDeviceAppear", "The helper shows only devices that choose Let this device appear."),
+                tabViewUiText("dashboard.sync.providerModal.findingADeviceDoesNotGrantPermissionBothScreensMustStillShowTheSameSafetyPhrase", "Finding a device does not grant permission; both screens must still show the same safety phrase."),
+                tabViewUiText("dashboard.sync.providerModal.noRulesPINsProfileIDsOrPrivateKeysAreBroadcastOnTheNetwork", "No rules, PINs, profile IDs, or private keys are broadcast on the network.")
             ],
             choices: [
-                { value: 'use_code', label: 'Use Code or QR', className: 'btn-primary' },
-                { value: 'copy_helper', label: 'Copy Helper Command', className: 'btn-secondary' }
+                { value: 'use_code', label: tabViewUiText("dashboard.sync.providerModal.useCodeOrQR", "Use Code or QR"), className: 'btn-primary' },
+                { value: 'copy_helper', label: tabViewUiText("dashboard.sync.providerModal.copyHelperCommand", "Copy Helper Command"), className: 'btn-secondary' }
             ],
             cancelText: tabViewUiText("firstRun.notNow", "Not now")
         });
@@ -19646,7 +19656,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         const choices = [
             {
                 value: 'configure',
-                label: configureLabel || (configured ? 'Edit Send Path' : 'Set Up Send Path'),
+                label: configureLabel || (configured ? tabViewUiText("dashboard.sync.providerModal.editSendPath", "Edit Send Path") : tabViewUiText("dashboard.sync.providerModal.setUpSendPath", "Set Up Send Path")),
                 className: configured ? 'btn-secondary' : 'btn-primary'
             }
         ];
@@ -19663,17 +19673,17 @@ document.addEventListener('DOMContentLoaded', async () => {
         if (configured) {
             choices.push({
                 value: 'disable',
-                label: disableLabel || 'Turn Off Send Path',
+                label: disableLabel || tabViewUiText("dashboard.sync.providerModal.turnOffSendPath", "Turn Off Send Path"),
                 className: 'btn-secondary'
             });
         }
         return showChoiceModal({
-            title: title || 'Send Updates Later',
-            message: message || 'Choose whether parent-approved updates need an optional waiting path for another device.',
+            title: title || tabViewUiText("dashboard.sync.providerModal.sendUpdatesLater", "Send Updates Later"),
+            message: message || tabViewUiText("dashboard.sync.providerModal.chooseWhetherParentApprovedUpdatesNeedAnOptionalWaitingPathForAnotherDevice", "Choose whether parent-approved updates need an optional waiting path for another device."),
             details: Array.isArray(details) ? details : [
-                'Use Send Update for normal parent control.',
-                'Add an optional send path only when both devices cannot be open together.',
-                'Protected profiles still cannot change parent rules from their own surface.'
+                tabViewUiText("dashboard.sync.providerModal.useSendUpdateForNormalParentControl", "Use Send Update for normal parent control."),
+                tabViewUiText("dashboard.sync.providerModal.addAnOptionalSendPathOnlyWhenBothDevicesCannotBeOpenTogether", "Add an optional send path only when both devices cannot be open together."),
+                tabViewUiText("dashboard.sync.providerModal.protectedProfilesStillCannotChangeParentRulesFromTheirOwnSurface", "Protected profiles still cannot change parent rules from their own surface.")
             ],
             choices,
             cancelText: tabViewUiText("dashboard.modal.cancel", "Cancel")
@@ -19810,20 +19820,20 @@ document.addEventListener('DOMContentLoaded', async () => {
         const current = readNanahManagedMailboxServerConfig();
         const currentEndpoint = normalizeString(current.endpointUrl || current.url || current.baseUrl);
         const action = await promptManagedProviderSetupAction({
-            title: 'Internet Pickup (away or opens later)',
-            message: 'Use this only when Send Update is not practical because the verified protected device will open later or away from this parent device.',
+            title: tabViewUiText("dashboard.sync.providerModal.internetPickupAwayOrOpensLater", "Internet Pickup (away or opens later)"),
+            message: tabViewUiText("dashboard.sync.providerModal.useThisOnlyWhenSendUpdateIsNotPracticalBecauseTheVerifiedProtectedDeviceWillOpenLaterOrAwayFromThisParentDevice", "Use this only when Send Update is not practical because the verified protected device will open later or away from this parent device."),
             details: [
-                'Default path: open both devices and use Send Update.',
-                'Internet Pickup needs a compatible pickup address. It can hold unreadable waiting updates, not PINs or plaintext rules.',
-                'The protected device still applies only newer signed updates from its saved parent link.',
-                'Use Copy Setup Command if you want to run the included provider behind your own trusted HTTPS address.'
+                tabViewUiText("dashboard.sync.providerModal.defaultPathOpenBothDevicesAndUseSendUpdate", "Default path: open both devices and use Send Update."),
+                tabViewUiText("dashboard.sync.providerModal.internetPickupNeedsACompatiblePickupAddressItCanHoldUnreadableWaitingUpdatesNotPINsOrPlaintextRules", "Internet Pickup needs a compatible pickup address. It can hold unreadable waiting updates, not PINs or plaintext rules."),
+                tabViewUiText("dashboard.sync.providerModal.theProtectedDeviceStillAppliesOnlyNewerSignedUpdatesFromItsSavedParentLink", "The protected device still applies only newer signed updates from its saved parent link."),
+                tabViewUiText("dashboard.sync.providerModal.useCopySetupCommandIfYouWantToRunTheIncludedProviderBehindYourOwnTrustedHTTPSAddress", "Use Copy Setup Command if you want to run the included provider behind your own trusted HTTPS address.")
             ],
             configured: !!currentEndpoint,
-            configureLabel: currentEndpoint ? 'Edit Internet Pickup' : 'Set Up Internet Pickup',
-            disableLabel: 'Turn Off Internet Pickup',
+            configureLabel: currentEndpoint ? tabViewUiText("family.commandCenter.providers.editInternetPickup", "Edit Internet Pickup") : tabViewUiText("family.commandCenter.providers.setUpInternetPickup", "Set Up Internet Pickup"),
+            disableLabel: tabViewUiText("dashboard.sync.providerModal.turnOffInternetPickup", "Turn Off Internet Pickup"),
             extraChoices: [
-                { value: 'copy_setup', label: 'Copy Setup Command', className: 'btn-secondary' },
-                ...(currentEndpoint ? [{ value: 'check', label: 'Check Pickup', className: 'btn-secondary' }] : [])
+                { value: 'copy_setup', label: tabViewUiText("dashboard.sync.providerModal.copySetupCommand", "Copy Setup Command"), className: 'btn-secondary' },
+                ...(currentEndpoint ? [{ value: 'check', label: tabViewUiText("dashboard.sync.providerModal.checkPickup", "Check Pickup"), className: 'btn-secondary' }] : [])
             ]
         });
         if (action === null) return;
@@ -19847,11 +19857,11 @@ document.addEventListener('DOMContentLoaded', async () => {
             return;
         }
         const endpoint = await showPromptModal({
-            title: 'Internet Pickup Address',
-            message: 'Enter the trusted HTTPS address that will hold unreadable parent-approved updates until the verified protected device opens later or away. Leave blank to use Send Update only.',
+            title: tabViewUiText("dashboard.sync.providerModal.internetPickupAddress", "Internet Pickup Address"),
+            message: tabViewUiText("dashboard.sync.providerModal.enterTheTrustedHTTPSAddressThatWillHoldUnreadableParentApprovedUpdatesUntilTheVerifiedProtectedDeviceOpensLaterOrAwayLeaveBlankToUseSendUpdateOnly", "Enter the trusted HTTPS address that will hold unreadable parent-approved updates until the verified protected device opens later or away. Leave blank to use Send Update only."),
             placeholder: 'https://your-filtertube-pickup-service',
             inputType: 'url',
-            confirmText: currentEndpoint ? 'Save Internet Pickup' : 'Enable Internet Pickup',
+            confirmText: currentEndpoint ? tabViewUiText("dashboard.sync.providerModal.saveInternetPickup", "Save Internet Pickup") : tabViewUiText("dashboard.sync.providerModal.enableInternetPickup", "Enable Internet Pickup"),
             initialValue: currentEndpoint
         });
         if (endpoint === null) return;
@@ -19867,9 +19877,9 @@ document.addEventListener('DOMContentLoaded', async () => {
             return;
         }
         const token = await showPromptModal({
-            title: 'Internet Pickup Key',
-            message: 'Optional key for that pickup address. This is not the parent PIN. Leave blank to keep the saved key; enter a single dash to clear it.',
-            placeholder: 'Optional pickup key',
+            title: tabViewUiText("dashboard.sync.providerModal.internetPickupKey", "Internet Pickup Key"),
+            message: tabViewUiText("dashboard.sync.providerModal.optionalKeyForThatPickupAddressThisIsNotTheParentPINLeaveBlankToKeepTheSavedKeyEnterASingleDashToClearIt", "Optional key for that pickup address. This is not the parent PIN. Leave blank to keep the saved key; enter a single dash to clear it."),
+            placeholder: tabViewUiText("dashboard.sync.providerModal.optionalPickupKey", "Optional pickup key"),
             inputType: 'password',
             confirmText: tabViewUiText("dashboard.modal.save", "Save"),
             initialValue: ''
@@ -20066,20 +20076,20 @@ document.addEventListener('DOMContentLoaded', async () => {
         const currentEndpoint = normalizeString(current.endpointUrl || current.url || current.baseUrl);
         const action = await promptManagedProviderSetupAction({
             title: tabViewUiText("family.commandCenter.sync.homePickup", "Home Pickup"),
-            message: 'Use this only when Send Update is not practical and you run a FilterTube-compatible Home Pickup service for verified devices on your home, clinic, or school network.',
+            message: tabViewUiText("dashboard.sync.providerModal.useThisOnlyWhenSendUpdateIsNotPracticalAndYouRunAFilterTubeCompatibleHomePickupServiceForVerifiedDevicesOnYourHomeClinicOrSchoolNetwork", "Use this only when Send Update is not practical and you run a FilterTube-compatible Home Pickup service for verified devices on your home, clinic, or school network."),
             details: [
-                'Default path: open both devices and use Send Update.',
-                'Home Pickup can help a verified protected device pick up waiting updates on the same network.',
-                'It is not automatic Wi-Fi discovery; being nearby never grants control.',
-                'The protected device still accepts only newer signed updates from its saved parent link.',
-                'Use Copy Setup Command if you want to run the included self-hosted pickup provider.'
+                tabViewUiText("dashboard.sync.providerModal.defaultPathOpenBothDevicesAndUseSendUpdate", "Default path: open both devices and use Send Update."),
+                tabViewUiText("dashboard.sync.providerModal.homePickupCanHelpAVerifiedProtectedDevicePickUpWaitingUpdatesOnTheSameNetwork", "Home Pickup can help a verified protected device pick up waiting updates on the same network."),
+                tabViewUiText("dashboard.sync.providerModal.itIsNotAutomaticWiFiDiscoveryBeingNearbyNeverGrantsControl", "It is not automatic Wi-Fi discovery; being nearby never grants control."),
+                tabViewUiText("dashboard.sync.providerModal.theProtectedDeviceStillAcceptsOnlyNewerSignedUpdatesFromItsSavedParentLink", "The protected device still accepts only newer signed updates from its saved parent link."),
+                tabViewUiText("dashboard.sync.providerModal.useCopySetupCommandIfYouWantToRunTheIncludedSelfHostedPickupProvider", "Use Copy Setup Command if you want to run the included self-hosted pickup provider.")
             ],
             configured: !!currentEndpoint,
-            configureLabel: currentEndpoint ? 'Edit Home Pickup' : 'Set Up Home Pickup',
-            disableLabel: 'Turn Off Home Pickup',
+            configureLabel: currentEndpoint ? tabViewUiText("family.commandCenter.providers.editHomePickup", "Edit Home Pickup") : tabViewUiText("family.commandCenter.providers.setUpHomePickup", "Set Up Home Pickup"),
+            disableLabel: tabViewUiText("dashboard.sync.providerModal.turnOffHomePickup", "Turn Off Home Pickup"),
             extraChoices: [
-                { value: 'copy_setup', label: 'Copy Setup Command', className: 'btn-secondary' },
-                ...(currentEndpoint ? [{ value: 'check', label: 'Check Pickup', className: 'btn-secondary' }] : [])
+                { value: 'copy_setup', label: tabViewUiText("dashboard.sync.providerModal.copySetupCommand", "Copy Setup Command"), className: 'btn-secondary' },
+                ...(currentEndpoint ? [{ value: 'check', label: tabViewUiText("dashboard.sync.providerModal.checkPickup", "Check Pickup"), className: 'btn-secondary' }] : [])
             ]
         });
         if (action === null) return;
@@ -20103,11 +20113,11 @@ document.addEventListener('DOMContentLoaded', async () => {
             return;
         }
         const endpoint = await showPromptModal({
-            title: 'Home Pickup Address',
-            message: 'Enter the Home Pickup service address only if you run one for verified devices on this family map. This is not device scanning; Send Update remains the normal path.',
+            title: tabViewUiText("dashboard.sync.providerModal.homePickupAddress", "Home Pickup Address"),
+            message: tabViewUiText("dashboard.sync.providerModal.enterTheHomePickupServiceAddressOnlyIfYouRunOneForVerifiedDevicesOnThisFamilyMapThisIsNotDeviceScanningSendUpdateRemainsTheNormalPath", "Enter the Home Pickup service address only if you run one for verified devices on this family map. This is not device scanning; Send Update remains the normal path."),
             placeholder: 'http://192.168.1.10:8787/filtertube',
             inputType: 'url',
-            confirmText: currentEndpoint ? 'Save Home Pickup' : 'Enable Home Pickup',
+            confirmText: currentEndpoint ? tabViewUiText("dashboard.sync.providerModal.saveHomePickup", "Save Home Pickup") : tabViewUiText("dashboard.sync.providerModal.enableHomePickup", "Enable Home Pickup"),
             initialValue: currentEndpoint
         });
         if (endpoint === null) return;
@@ -20117,9 +20127,9 @@ document.addEventListener('DOMContentLoaded', async () => {
             return;
         }
         const token = await showPromptModal({
-            title: 'Home Pickup Key',
-            message: 'Optional service key for that Home Pickup service. This is not the parent PIN. Leave blank to keep the saved key; enter a single dash to clear it.',
-            placeholder: 'Optional service key',
+            title: tabViewUiText("dashboard.sync.providerModal.homePickupKey", "Home Pickup Key"),
+            message: tabViewUiText("dashboard.sync.providerModal.optionalServiceKeyForThatHomePickupServiceThisIsNotTheParentPINLeaveBlankToKeepTheSavedKeyEnterASingleDashToClearIt", "Optional service key for that Home Pickup service. This is not the parent PIN. Leave blank to keep the saved key; enter a single dash to clear it."),
+            placeholder: tabViewUiText("dashboard.sync.providerModal.optionalServiceKey", "Optional service key"),
             inputType: 'password',
             confirmText: tabViewUiText("dashboard.modal.save", "Save"),
             initialValue: ''
@@ -23785,9 +23795,9 @@ document.addEventListener('DOMContentLoaded', async () => {
 
         if (localTargetId === 'default' && incomingVerifier) {
             const incomingPin = await showPromptModal({
-                title: 'Incoming Backup PIN',
-                message: 'This incoming FilterTube payload comes from a Master-protected profile. Enter that PIN to continue.',
-                placeholder: 'Master PIN',
+                title: tabViewUiText("dashboard.modal.remaining.incomingBackupPIN", "Incoming Backup PIN"),
+                message: tabViewUiText("dashboard.modal.remaining.thisIncomingFilterTubePayloadComesFromAMasterProtectedProfileEnterThatPINToContinue", "This incoming FilterTube payload comes from a Master-protected profile. Enter that PIN to continue."),
+                placeholder: tabViewUiText("dashboard.backup.prompt.masterPin.placeholder", "Master PIN"),
                 inputType: 'password',
                 confirmText: tabViewUiText("dashboard.backup.action.authorize", "Authorize")
             });
@@ -24373,22 +24383,22 @@ document.addEventListener('DOMContentLoaded', async () => {
         nanahTrustedReconnectApprovalPromise = (async () => {
             const policy = safeObject(trusted.policy);
             const response = await showChoiceModal({
-                title: 'Approve Parent Connection',
-                message: `${getNanahRemoteLabel()} is reconnecting as a saved managed source for ${formatNanahProfileContext(getNanahLocalProfileContext())}.`,
+                title: tabViewUiText("dashboard.modal.remaining.approveParentConnection", "Approve Parent Connection"),
+                message: tabViewUiText('dashboard.modal.remaining.parentReconnecting', '{device} is reconnecting as a saved managed source for {profile}.', { device: getNanahRemoteLabel(), profile: formatNanahProfileContext(getNanahLocalProfileContext()) }),
                 details: [
-                    `Allowed areas: ${describeNanahScopeList(policy.allowedScopes || policy.defaultScope || 'active')}`,
-                    `Saved update behavior: ${getNanahStrategyLabel(policy.applyMode || 'merge')}`,
-                    'No updates from this parent link will be accepted in this session until you approve this connection.'
+                    tabViewUiText('dashboard.modal.remaining.allowedAreas', 'Allowed areas: {areas}', { areas: getNanahManagedSendScopeList(policy.allowedScopes || policy.defaultScope || 'active').map(nanahModalScopeLabel).join(', ') }),
+                    tabViewUiText('dashboard.modal.remaining.savedUpdateBehavior', 'Saved update behavior: {strategy}', { strategy: tabViewUiText(policy.applyMode === 'replace' ? 'dashboard.sync.strategy.replace' : 'dashboard.sync.strategy.merge', getNanahStrategyLabel(policy.applyMode || 'merge')) }),
+                    tabViewUiText("dashboard.modal.remaining.noUpdatesFromThisParentLinkWillBeAcceptedInThisSessionUntilYouApproveThisConnection", "No updates from this parent link will be accepted in this session until you approve this connection.")
                 ],
                 choices: [
                     {
                         value: 'approve',
-                        label: 'Approve Connection',
+                        label: tabViewUiText("dashboard.modal.remaining.approveConnection", "Approve Connection"),
                         recommended: true
                     },
                     {
                         value: 'decline',
-                        label: 'Decline',
+                        label: tabViewUiText("dashboard.sync.managedPolicy.caller.action.decline", "Decline"),
                         className: 'btn-secondary'
                     }
                 ],
@@ -24527,22 +24537,22 @@ document.addEventListener('DOMContentLoaded', async () => {
             }
 
             const response = await showChoiceModal({
-                title: 'Managed FilterTube Update',
-                message: `${getNanahRemoteLabel()} wants to apply ${details.scope} settings into ${formatNanahProfileContext(resolveNanahDisplayTargetProfile(details, trustedLink))} using the saved managed policy for this device.`,
+                title: tabViewUiText("dashboard.modal.remaining.managedFilterTubeUpdate", "Managed FilterTube Update"),
+                message: tabViewUiText('dashboard.modal.remaining.managedUpdateMessage', '{device} wants to apply {scope} settings into {profile} using the saved managed policy for this device.', { device: getNanahRemoteLabel(), scope: nanahModalScopeLabel(details.scope), profile: formatNanahProfileContext(resolveNanahDisplayTargetProfile(details, trustedLink)) }),
                 details: [
-                    `Saved policy: ${getNanahStrategyLabel(trustedDecision.strategy)} ${getNanahScopeLabel(details.scope)}`,
-                    `Remote role: ${remoteRole}`,
-                    details.summary || 'FilterTube settings'
+                    tabViewUiText('dashboard.modal.remaining.savedPolicy', 'Saved policy: {strategy} {scope}', { strategy: tabViewUiText(trustedDecision.strategy === 'replace' ? 'dashboard.sync.strategy.replace' : 'dashboard.sync.strategy.merge', getNanahStrategyLabel(trustedDecision.strategy)), scope: nanahModalScopeLabel(details.scope) }),
+                    tabViewUiText('dashboard.modal.remaining.remoteRole', 'Remote role: {role}', { role: remoteRole }),
+                    details.summary || tabViewUiText("dashboard.modal.remaining.filterTubeSettings", "FilterTube settings")
                 ],
                 choices: [
                     {
                         value: 'approve',
-                        label: `Approve ${getNanahStrategyLabel(trustedDecision.strategy)}`,
+                        label: tabViewUiText('dashboard.modal.remaining.approveStrategy', 'Approve {strategy}', { strategy: tabViewUiText(trustedDecision.strategy === 'replace' ? 'dashboard.sync.strategy.replace' : 'dashboard.sync.strategy.merge', getNanahStrategyLabel(trustedDecision.strategy)) }),
                         recommended: true
                     },
                     {
                         value: 'decline',
-                        label: 'Decline',
+                        label: tabViewUiText("dashboard.sync.managedPolicy.caller.action.decline", "Decline"),
                         className: 'btn-secondary'
                     }
                 ],
@@ -24684,30 +24694,30 @@ document.addEventListener('DOMContentLoaded', async () => {
         }
 
         const response = await showChoiceModal({
-            title: 'Incoming FilterTube Sync',
-            message: `${getNanahRemoteLabel()} wants to apply ${details.scope} settings into ${formatNanahProfileContext(resolveNanahDisplayTargetProfile(details, trustedLink))}.`,
+            title: tabViewUiText("dashboard.modal.remaining.incomingFilterTubeSync", "Incoming FilterTube Sync"),
+            message: tabViewUiText('dashboard.modal.remaining.incomingUpdateMessage', '{device} wants to apply {scope} settings into {profile}.', { device: getNanahRemoteLabel(), scope: nanahModalScopeLabel(details.scope), profile: formatNanahProfileContext(resolveNanahDisplayTargetProfile(details, trustedLink)) }),
             details: [
-                `${details.senderStrategySuggested ? 'Suggested action' : 'Managed policy'}: ${details.strategy === 'replace' ? 'Replace this scope' : 'Merge into this scope'}`,
-                `Remote role: ${normalizeString(nanahSessionState.remoteRole) || 'peer'}`,
+                tabViewUiText('dashboard.modal.remaining.updateStrategySummary', '{label}: {strategy}', { label: details.senderStrategySuggested ? tabViewUiText('dashboard.sync.label.suggestedAction', 'Suggested action') : tabViewUiText('dashboard.modal.remaining.managedPolicy', 'Managed policy'), strategy: details.strategy === 'replace' ? tabViewUiText('dashboard.modal.remaining.replaceScope', 'Replace this scope') : tabViewUiText('dashboard.modal.remaining.mergeScope', 'Merge into this scope') }),
+                tabViewUiText('dashboard.modal.remaining.remoteRole', 'Remote role: {role}', { role: normalizeString(nanahSessionState.remoteRole) || 'peer' }),
                 ...(classifyNanahTrustedLink(getNanahRole(), normalizeString(nanahSessionState.remoteRole) || 'peer') === 'managed_link'
-                    ? ['This parent-to-protected-device pairing is not trusted yet, so this device still decides how to apply the update.']
+                    ? [tabViewUiText("dashboard.modal.remaining.thisParentToProtectedDevicePairingIsNotTrustedYetSoThisDeviceStillDecidesHowToApplyTheUpdate", "This parent-to-protected-device pairing is not trusted yet, so this device still decides how to apply the update.")]
                     : []),
-                details.summary || 'FilterTube settings'
+                details.summary || tabViewUiText("dashboard.modal.remaining.filterTubeSettings", "FilterTube settings")
             ],
             choices: [
                 {
                     value: 'merge',
-                    label: 'Apply as Merge',
+                    label: tabViewUiText("dashboard.modal.remaining.applyAsMerge", "Apply as Merge"),
                     recommended: details.strategy !== 'replace'
                 },
                 {
                     value: 'replace',
-                    label: 'Apply as Replace',
+                    label: tabViewUiText("dashboard.modal.remaining.applyAsReplace", "Apply as Replace"),
                     recommended: details.strategy === 'replace'
                 },
                 {
                     value: 'decline',
-                    label: 'Decline',
+                    label: tabViewUiText("dashboard.sync.managedPolicy.caller.action.decline", "Decline"),
                     className: 'btn-secondary'
                 }
             ],
@@ -26917,13 +26927,13 @@ document.addEventListener('DOMContentLoaded', async () => {
                 const laterReady = savedUpdateReady && hasNanahManagedMailboxUploadWriter();
                 const choices = [];
                 if (liveReady) {
-                    choices.push({ value: 'live', label: 'Send Now', recommended: true });
+                    choices.push({ value: 'live', label: tabViewUiText('dashboard.modal.remaining.sendNow', 'Send Now'), recommended: true });
                 }
                 if (homeReady) {
-                    choices.push({ value: 'home', label: 'Home Pickup', recommended: !liveReady && !laterReady });
+                    choices.push({ value: 'home', label: tabViewUiText('family.commandCenter.sync.homePickup', 'Home Pickup'), recommended: !liveReady && !laterReady });
                 }
                 if (laterReady) {
-                    choices.push({ value: 'later', label: 'Send for Later', recommended: !liveReady });
+                    choices.push({ value: 'later', label: tabViewUiText('dashboard.modal.remaining.sendForLater', 'Send for Later'), recommended: !liveReady });
                 }
                 if (!choices.length) {
                     openNanahPairingDetails();
@@ -26933,13 +26943,13 @@ document.addEventListener('DOMContentLoaded', async () => {
                     return;
                 }
                 const deliveryMode = await showChoiceModal({
-                    title: 'How should this update travel?',
-                    message: `Choose one delivery path for ${targetLabel}.`,
+                    title: tabViewUiText("dashboard.modal.remaining.howShouldThisUpdateTravel", "How should this update travel?"),
+                    message: tabViewUiText('dashboard.modal.remaining.chooseDeliveryPath', 'Choose one delivery path for {target}.', { target: targetLabel }),
                     details: [
-                        liveReady ? 'Send Now transfers directly while both verified devices are open.' : '',
-                        homeReady ? 'Home Pickup leaves it on your configured local-network service.' : '',
-                        laterReady ? 'Send for Later leaves an encrypted signed envelope for the device to collect over the internet.' : '',
-                        'Only this verified device link is targeted. The receiver still checks the signature, bound profile, and revision.'
+                        liveReady ? tabViewUiText("dashboard.modal.remaining.sendNowTransfersDirectlyWhileBothVerifiedDevicesAreOpen", "Send Now transfers directly while both verified devices are open.") : '',
+                        homeReady ? tabViewUiText("dashboard.modal.remaining.homePickupLeavesItOnYourConfiguredLocalNetworkService", "Home Pickup leaves it on your configured local-network service.") : '',
+                        laterReady ? tabViewUiText("dashboard.modal.remaining.sendForLaterLeavesAnEncryptedSignedEnvelopeForTheDeviceToCollectOverTheInternet", "Send for Later leaves an encrypted signed envelope for the device to collect over the internet.") : '',
+                        tabViewUiText("dashboard.modal.remaining.onlyThisVerifiedDeviceLinkIsTargetedTheReceiverStillChecksTheSignatureBoundProfileAndRevision", "Only this verified device link is targeted. The receiver still checks the signature, bound profile, and revision.")
                     ].filter(Boolean),
                     choices,
                     cancelText: tabViewUiText("dashboard.modal.cancel", "Cancel")
@@ -27341,20 +27351,20 @@ document.addEventListener('DOMContentLoaded', async () => {
                 if (!nanahClient || !normalizeString(nanahSessionState.sasPhrase)) return;
                 try {
                     const confirmed = await showChoiceModal({
-                        title: 'Confirm Safety Phrase',
-                        message: 'Only continue if both devices show the exact same phrase.',
+                        title: tabViewUiText("dashboard.modal.remaining.confirmSafetyPhrase", "Confirm Safety Phrase"),
+                        message: tabViewUiText("dashboard.modal.remaining.onlyContinueIfBothDevicesShowTheExactSamePhrase", "Only continue if both devices show the exact same phrase."),
                         details: [
-                            `Phrase: ${nanahSessionState.sasPhrase}`,
-                            'This prevents the signaling relay from silently impersonating one side of the session.'
+                            tabViewUiText('dashboard.modal.remaining.safetyPhrase', 'Phrase: {phrase}', { phrase: nanahSessionState.sasPhrase }),
+                            tabViewUiText("dashboard.modal.remaining.thisPreventsTheSignalingRelayFromSilentlyImpersonatingOneSideOfTheSession", "This prevents the signaling relay from silently impersonating one side of the session.")
                         ],
                         choices: [
                             {
                                 value: 'confirm',
-                                label: 'Phrase Matches',
+                                label: tabViewUiText("dashboard.modal.remaining.phraseMatches", "Phrase Matches"),
                                 recommended: true
                             }
                         ],
-                        cancelText: 'Not Yet'
+                        cancelText: tabViewUiText("dashboard.modal.remaining.notYet", "Not Yet")
                     });
                     if (confirmed !== 'confirm') return;
                     await nanahClient.confirmSas();
@@ -27589,10 +27599,10 @@ document.addEventListener('DOMContentLoaded', async () => {
 
             const nameRaw = await showPromptModal({
                 title: tabViewUiText("family.commandCenter.firstSetup.createAccount", "Create Account"),
-                message: 'Enter a name for the new account.',
-                placeholder: 'Profile name',
+                message: tabViewUiText("dashboard.modal.remaining.enterANameForTheNewAccount", "Enter a name for the new account."),
+                placeholder: tabViewUiText("family.profileManager.profileNamePlaceholder", "Profile name"),
                 inputType: 'text',
-                confirmText: 'Create'
+                confirmText: tabViewUiText("dashboard.modal.remaining.create", "Create")
             });
             const name = normalizeString(nameRaw);
             if (!name) return;
@@ -27700,10 +27710,10 @@ document.addEventListener('DOMContentLoaded', async () => {
 
             const nameRaw = await showPromptModal({
                 title: tabViewUiText("family.commandCenter.firstSetup.createProtectedProfile", "Create Protected Profile"),
-                message: 'Enter a name for the protected profile.',
-                placeholder: 'Profile name',
+                message: tabViewUiText("dashboard.modal.remaining.enterANameForTheProtectedProfile", "Enter a name for the protected profile."),
+                placeholder: tabViewUiText("family.profileManager.profileNamePlaceholder", "Profile name"),
                 inputType: 'text',
-                confirmText: 'Create'
+                confirmText: tabViewUiText("dashboard.modal.remaining.create", "Create")
             });
             const name = normalizeString(nameRaw);
             if (!name) return;
@@ -29653,18 +29663,18 @@ document.addEventListener('DOMContentLoaded', async () => {
     if (ftRuleListFormatsBtn) {
         ftRuleListFormatsBtn.addEventListener('click', async () => {
             const action = await showChoiceModal({
-                title: 'Supported Rule List Formats',
-                message: 'Rule list imports add ordinary channels and keywords. BlockTube migration JSON also carries its supported video IDs and safe setting mappings. Full FilterTube backups belong under Choose JSON; channel/title list files belong here.',
+                title: tabViewUiText("dashboard.modal.remaining.supportedRuleListFormats", "Supported Rule List Formats"),
+                message: tabViewUiText("dashboard.modal.remaining.ruleListImportsAddOrdinaryChannelsAndKeywordsBlockTubeMigrationJSONAlsoCarriesItsSupportedVideoIDsAndSafeSettingMappingsFullFilterTubeBackupsBelongUnderChooseJSONChannelTitleListFilesBelongHere", "Rule list imports add ordinary channels and keywords. BlockTube migration JSON also carries its supported video IDs and safe setting mappings. Full FilterTube backups belong under Choose JSON; channel/title list files belong here."),
                 details: [
-                    'CSV: channel_id,keyword,notes or type,value,notes.',
-                    'Text: bare rows are channels; typed rows can use channel: @SomeChannel or keyword: brainrot.',
-                    'Rule-list JSON: channels and keywords arrays.',
-                    'BlockTube JSON: filterData channel/title arrays are previewed here, and supported video IDs/settings are applied by the migration importer. Missing channel metadata is enriched one ID at a time after approval.',
-                    'Public URLs: raw HTTPS CSV, text, or JSON files can be loaded into the preview.'
+                    tabViewUiText("dashboard.modal.remaining.cSVChannelIdKeywordNotesOrTypeValueNotes", "CSV: channel_id,keyword,notes or type,value,notes."),
+                    tabViewUiText("dashboard.modal.remaining.textBareRowsAreChannelsTypedRowsCanUseChannelSomeChannelOrKeywordBrainrot", "Text: bare rows are channels; typed rows can use channel: @SomeChannel or keyword: brainrot."),
+                    tabViewUiText("dashboard.modal.remaining.ruleListJSONChannelsAndKeywordsArrays", "Rule-list JSON: channels and keywords arrays."),
+                    tabViewUiText("dashboard.modal.remaining.blockTubeJSONFilterDataChannelTitleArraysArePreviewedHereAndSupportedVideoIDsSettingsAreAppliedByTheMigrationImporterMissingChannelMetadataIsEnrichedOneIDAtATimeAfterApproval", "BlockTube JSON: filterData channel/title arrays are previewed here, and supported video IDs/settings are applied by the migration importer. Missing channel metadata is enriched one ID at a time after approval."),
+                    tabViewUiText("dashboard.modal.remaining.publicURLsRawHTTPSCSVTextOrJSONFilesCanBeLoadedIntoThePreview", "Public URLs: raw HTTPS CSV, text, or JSON files can be loaded into the preview.")
                 ],
                 choices: [
-                    { value: 'csv-template', label: 'Download CSV Template', className: 'btn-primary' },
-                    { value: 'json-template', label: 'Download JSON Template', className: 'btn-secondary' }
+                    { value: 'csv-template', label: tabViewUiText("dashboard.modal.remaining.downloadCSVTemplate", "Download CSV Template"), className: 'btn-primary' },
+                    { value: 'json-template', label: tabViewUiText("dashboard.modal.remaining.downloadJSONTemplate", "Download JSON Template"), className: 'btn-secondary' }
                 ],
                 cancelText: tabViewUiText("dashboard.modal.close", "Close")
             });
