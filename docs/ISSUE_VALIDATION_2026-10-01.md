@@ -2,6 +2,12 @@
 
 Scope: #69, #75, #76, #77, #65, #62, and #60. Public issue bodies/comments were read; no issue status or comments were changed.
 
+## Final verification boundary
+
+The focused thirteen-file issue suite was rerun on October 1 and passes 128/128. Broader existing lanes were also rerun: blocking passes 147/208 (61 failures); smoke passes 264/302 (38 failures). Those are not passing release gates. Examples include pinned source line/count audits, missing extraction needles, an obsolete assertion that reel owner extraction is absent, and fixture/source contract mismatches. They have not been blindly rebaselined. Each remaining failure needs source-aware triage independently of the focused issue suite.
+
+The affected filter export/search reproduction for #75/#76 remains unavailable. Installed Firefox Android validation for #65 and two-device remote delivery for #60 remain unverified. The currently available Chrome inventory has no open FilterTube dashboard or the previously supplied Google reproduction tab; no installed-state or language-setting change was made as part of this check. Local code/catalog/package verification must not be presented as installed-browser proof or as grounds to close all seven reports.
+
 | Report | Current work / evidence | Still required |
 | --- | --- | --- |
 | #69 unwanted navigation | Removed three additional autonomous playlist transitions outside admission in `6f50a7ee`. Explicit user navigation remains. | Installed playlist smoke. |
