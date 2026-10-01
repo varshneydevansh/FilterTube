@@ -104,6 +104,25 @@ function playerMetadata(overrides = {}) {
   };
 }
 
+test('an explicitly blocked selected ID does not wait for unrelated owner or content metadata', () => {
+  const id = 'gVRlg4BXKVo';
+  const settings = activeSettings({ blockedVideoIds: [id], contentFilters: { duration: { enabled: true, maxMinutes: 10 } } });
+  const { guard } = loadGuard(settings);
+  const decision = guard.evaluateAdmission(settings, null, id);
+  assert.equal(decision.state, 'blocked');
+  assert.equal(decision.kind, 'video');
+  assert.equal(decision.videoId, id);
+  assert.equal(guard.evaluateAdmission(settings, null, '0CCwuWQiLTA').state, 'pending', 'another ID cannot inherit the rejection');
+});
+
+test('explicit ID allowance does not bypass required metadata and Disabled stays inert', () => {
+  const id = 'gVRlg4BXKVo';
+  const settings = activeSettings({ blockedVideoIds: [id], allowedVideoIds: [id] });
+  const { guard } = loadGuard(settings);
+  assert.equal(guard.evaluateAdmission(settings, null, id).state, 'pending', 'existing equal-specificity allow semantics remain');
+  assert.equal(guard.evaluateAdmission({ ...settings, enabled: false }, null, id).state, 'inactive');
+});
+
 function loadGuard(settings, href = 'https://www.google.com/search?q=shakira#fpstate=ive&vld=cid:abc,vid:fcnDmrtj6Sk,st:0') {
   const documentListeners = new Map();
   const windowListeners = new Map();

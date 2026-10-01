@@ -361,6 +361,11 @@
 
     function evaluateAdmission(settings, metadata, videoId) {
         if (!hasActiveVideoAdmissionRules(settings)) return { state: 'inactive' };
+        const explicitlyBlocked = !!videoId && hasEntries(settings.blockedVideoIds) && settings.blockedVideoIds.includes(videoId);
+        const explicitlyAllowed = !!videoId && hasEntries(settings.allowedVideoIds) && settings.allowedVideoIds.includes(videoId);
+        // The selected video ID already verifies this rule. No lower-specificity
+        // channel/keyword match can override it; an explicit allow can still tie.
+        if (explicitlyBlocked && !explicitlyAllowed) return { state: 'blocked', kind: 'video', videoId };
         if (!metadata || metadata.videoId !== videoId) return { state: 'pending', missing: 'player metadata' };
         const needsIdentity = hasEntries(settings.filterChannels) || hasEntries(settings.whitelistChannels) || settings.listMode === 'whitelist';
         const needsText = hasEntries(settings.filterKeywords) || hasEntries(settings.whitelistKeywords) || settings.contentFilters?.uppercase?.enabled === true;
@@ -374,8 +379,6 @@
         const blockedKeyword = keywordMatch(settings.filterKeywords, fields, metadata);
         const allowedKeyword = keywordMatch(settings.whitelistKeywords, fields, metadata);
         if (blockedKeyword.pending || allowedKeyword.pending) return { state: 'pending', missing: 'upload date' };
-        const explicitlyBlocked = hasEntries(settings.blockedVideoIds) && settings.blockedVideoIds.includes(videoId);
-        const explicitlyAllowed = hasEntries(settings.allowedVideoIds) && settings.allowedVideoIds.includes(videoId);
         const blockedChannel = channelMatch(settings.filterChannels, metadata, settings);
         const allowedChannel = channelMatch(settings.whitelistChannels, metadata, settings);
         const blockSpecificity = explicitlyBlocked ? 3 : (blockedChannel ? 2 : (blockedKeyword.matched ? 1 : 0));
