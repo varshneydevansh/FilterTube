@@ -3,7 +3,7 @@
   <h1>FilterTube</h1>
   <p>Peace of Mind for your Digital Space</p>
   
-  [![Ask DeepWiki](https://deepwiki.com/badge.svg)](https://deepwiki.com/varshneydevansh/FilterTube) ![Version](https://img.shields.io/badge/version-3.3.7-blue.svg) ![License](https://img.shields.io/badge/license-MIT-green.svg) ![Lines of Code](https://img.shields.io/badge/total%20lines-782.9k-brightgreen.svg) ![JavaScript LoC](https://img.shields.io/badge/javascript-116.2k%20lines-yellow.svg) ![Top Language](https://img.shields.io/github/languages/top/varshneydevansh/FilterTube?color=f1e05a) ![Repo Size](https://img.shields.io/github/repo-size/varshneydevansh/FilterTube?color=orange)
+[![Ask DeepWiki](https://deepwiki.com/badge.svg)](https://deepwiki.com/varshneydevansh/FilterTube) ![Version](https://img.shields.io/badge/version-3.4.0-blue.svg) ![License](https://img.shields.io/badge/license-MIT-green.svg) ![Lines of Code](https://img.shields.io/badge/total%20lines-858.3k-brightgreen.svg) ![JavaScript LoC](https://img.shields.io/badge/javascript-117.5k%20lines-yellow.svg) ![Top Language](https://img.shields.io/github/languages/top/varshneydevansh/FilterTube?color=f1e05a) ![Repo Size](https://img.shields.io/github/repo-size/varshneydevansh/FilterTube?color=orange)
   
 </div>
 
@@ -15,11 +15,19 @@ The public website now also acts as the download hub for browser releases, Andro
 
 👉 **[filtertube.in/downloads](https://filtertube.in/downloads)**
 
-The current v3.3.7 post-v3.3.5 source checkpoint is documented in the
+The current v3.4.0 release-preparation checkpoint is documented in the
 [changelog history index](CHANGELOG.md), with the runtime, category, language,
 Nanah, app-sync, and website contracts kept in the existing [documentation
 map](docs/CODEMAP.md). Native Android/iOS parity and installed-device behavior
 remain evidence-gated; the extension is still the runtime source of truth.
+
+## What's New in v3.4.0
+
+- **38 bundled interface languages**: choose a language in Settings, including Russian, Tamil and Gujarati. Interface translation stays local and does not change your saved rules or video-language settings.
+- **Safer playback admission**: exact selected-video rules govern direct links, YouTube navigation and supported embedded players. Improved metadata recovery reduces unnecessary checking; blocked playback no longer opens another video automatically.
+- **More targeted filtering**: mobile Shorts use verified owner identity; comments reconstruct saved keyword matchers; membership hiding and Advert Void stay scoped to their intended media/cards.
+- **Dashboard repairs**: fixed two localization startup exceptions that could leave dashboard content blank.
+- **Release boundaries**: Firefox Android white-screen investigation, reporter-specific reproductions, installed-language review and broader test failures remain open. This is source preparation, not a published store release. See the [complete post-3.3.7 audit](docs/POST_3_3_7_RELEASE_AUDIT_2026-10-01.md).
 
 ## What's New in v3.3.7
 

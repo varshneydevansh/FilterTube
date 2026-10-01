@@ -1,4 +1,13 @@
 {
+  "3.4.0": {
+    "headline": "38 wika ng interface at mas ligtas na pagsusuri ng pag-play",
+    "summary": "Nagdaragdag ang FilterTube 3.4.0 ng 38 kasamang wika ng interface at pinapahusay ang pagsusuri ng video sa YouTube at mga suportadong naka-embed na player. Inaayos din nito ang pagsisimula ng dashboard at pagtutugma ng naka-save na keyword ng komento.",
+    "bannerSummary": "38 wika ng interface at mas ligtas na pagsusuri ng pag-play",
+    "ctaLabel": "Tingnan ang mga bago",
+    "highlights": [
+      "May 38 lokal na wika ng interface na ngayon sa Mga Setting. Nananatiling naka-pause ang mga naka-block na video nang walang awtomatikong paglipat. Iniimbestigahan pa ang mga ulat ng puting screen sa Firefox Android."
+    ]
+  },
   "3.3.7": {
     "ctaLabel": "Tingnan ang mga bago",
     "headline": "Mas mabilis na malalaking listahan, tuloy-tuloy na pag-import, bukas na sa publiko ang Android",

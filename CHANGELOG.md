@@ -2,6 +2,19 @@
 
 ## Unreleased
 
+No additional changes recorded after the 3.4.0 preparation checkpoint.
+
+## 3.4.0 — release preparation (2026-10-01)
+
+Changes since v3.3.7, released August 29, 2026 (`70cdb405`). This is a prepared source version, not a published release. See the [complete post-release audit and validation boundaries](docs/POST_3_3_7_RELEASE_AUDIT_2026-10-01.md).
+
+- **38 bundled interface languages**: device-local language selection in Settings, including Russian, Tamil and Gujarati; popup, dashboard, generated rules, import/backup dialogs, family controls, help, overlays and release history use bundled catalogs. Added locale-aware dates/counts and RTL layout. User rules, IDs and video-language filters are unchanged; no runtime translation API is used. Fluent-speaker and installed-layout review remain quality gates.
+- **Dashboard startup fixes**: corrected the missing compact-condition `labelKey` parameter and a Main-channel localization call incorrectly placed in Kids initialization.
+- **Comment keyword matching (#79)**: reconstruct serialized comment-only matchers so keywords can match within sentences; preserve exact Unicode word boundaries, Disabled behavior and video/comment separation. This does not resolve the separate Firefox Android white-area report.
+- **Exact selected-player recovery**: retain verified metadata across settings snapshots without retaining stale allow decisions; recover loaded Google Player metadata only for selected media, not hover previews or unrelated thumbnails. Explicit blocked IDs reject immediately; ID-only allowed rules do not wait for unnecessary metadata.
+- **Mobile Shorts identity**: read nested reel owner IDs/handles and wrapped Player metadata so channel filters use the actual owner rather than a title mention.
+- **Supporting work**: regression fixtures, import and managed-policy localization, packaging exclusions for translation drafts, FundingJSON/institutional funding documentation and a local-only semantic-filtering design. Semantic ML remains disabled. Native app parity and store publication are not included in this bump.
+
 - **SPA playback intent and external prefetch**: preserve a held play attempt across navigation finish so verified allowed playback resumes; metadata prefetch alone no longer displays an external-player banner, and the early external pause check reuses verified metadata from settings.
 
 - **Card-scoped Watch/Search refresh**: non-structural card mutations now retain their candidate list instead of forcing a full Watch/Search card scan; structural mutations still request a full pass.
@@ -11,9 +24,9 @@
 
 - **[Advert Void media ownership](docs/ADVERT_VOID_MEDIA_OWNERSHIP_2026-09-22.md)**: correct content/advert role selection during parallel playback, remove arbitrary second-video promotion, and scope quarantine to the selected player's non-decorative media. Focused regressions pass; installed-browser acceptance and escaped-ad reports remain open. This is not a guarantee against YouTube ad-block detection.
 
-- **Hard Timer Whitelist**: Chrome, Firefox, Android, and iOS now offer an explicit non-cancellable Main YouTube allow-only session. It requires at least one selected Main Allowed channel, forces filtering and Whitelist mode, blocks policy/profile changes until expiry, restores the complete pre-session profile afterward, and retains its recovery snapshot if restoration must be retried.
+- **Hard Timer Whitelist**: the extension offers an explicit non-cancellable Main YouTube allow-only session. It requires at least one selected Main Allowed channel, forces filtering and Whitelist mode, blocks policy/profile changes until expiry, restores the complete pre-session profile afterward, and retains its recovery snapshot if restoration must be retried. Downstream native installed parity is a separate gate.
 - **Global Disabled direct-access cleanup (#77)**: the master Disabled state now releases pending/blocked Watch and Shorts admission guards, removes direct-access overlays and markers, restores hidden current-watch elements, and clears channel-page redirect state before any retained channel, video, or keyword rule can run.
-- **Verified playlist successor only (#69)**: blocking the currently playing video or channel may advance to a playlist row only after that row is confirmed allowed. If no verified allowed successor exists, FilterTube keeps the current player blocked instead of clicking YouTube's generic Next button or hiding the whole Watch shell.
+- **Superseded development behavior (#69)**: early post-3.3.7 work allowed verified playlist successors instead of generic Next. That behavior was subsequently removed: final 3.4.0 source keeps blocked playback paused without autonomous navigation.
 - **[Verified current-video admission](docs/CURRENT_VIDEO_ADMISSION_BEHAVIOR_2026-09-02.md)**: direct Watch, Shorts, and embed playback now evaluates every active video-admission rule—video, channel, keyword, Allow only, duration, upload date, uppercase title, category, and language—using route-bound Player metadata. Cached verified decisions remain synchronous for normal YouTube SPA playback; unresolved decisions pause without failing open, delay the neutral checking UI to avoid flicker, and show a blocked banner only after an exact rule is verified. Layout-only toggles never produce a blocked-video banner.
 - **Admission-only pending retries**: a pending current video now rechecks only its route-bound admission decision instead of forcing the entire Watch page through repeated 15k+ channel-list scans. Browser Back/Forward playback is re-guarded when YouTube restores a buffered video whose route ID differs from the last admitted item, and streamed `get_watch` arrays now supply their exact wrapped Player metadata directly.
 - **Current-player admission race fix**: cold direct Watch entry establishes admission before DOM hydration; browser Back and SPA navigation synchronously invalidate the previous video's blocked receipt; intercepted Player and streamed `get_watch` metadata settle the current route immediately; current-player metadata bypasses the card scheduler and its one-minute cooldown; verified allow-list matches still pass independent content rules; unavailable metadata remains neutral; and an older enabled DOM pass cannot re-block playback after Global Disabled.

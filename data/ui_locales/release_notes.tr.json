@@ -1,4 +1,13 @@
 {
+  "3.4.0": {
+    "headline": "38 arayüz dili ve daha güvenli oynatma kontrolleri",
+    "summary": "FilterTube 3.4.0, 38 yerleşik arayüz dili ekler ve YouTube ile desteklenen gömülü oynatıcılarda video kontrollerini iyileştirir. Ayrıca panelin açılışını ve kayıtlı yorum anahtar sözcüklerinin eşleşmesini düzeltir.",
+    "bannerSummary": "38 arayüz dili ve daha güvenli oynatma kontrolleri",
+    "ctaLabel": "Yenilikleri Gör",
+    "highlights": [
+      "Ayarlar artık 38 yerel arayüz dili sunuyor. Engellenen videolar otomatik yönlendirme olmadan duraklatılmış kalır. Firefox Android’deki beyaz ekran bildirimleri hâlâ inceleniyor."
+    ]
+  },
   "3.3.7": {
     "ctaLabel": "Yenilikleri Gör",
     "headline": "Büyük listeler daha hızlı, içe aktarımlar kalıcı, Android herkese açık",

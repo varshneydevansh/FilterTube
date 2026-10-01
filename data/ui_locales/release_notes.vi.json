@@ -1,4 +1,13 @@
 {
+  "3.4.0": {
+    "headline": "38 ngôn ngữ giao diện và kiểm tra phát video an toàn hơn",
+    "summary": "FilterTube 3.4.0 bổ sung 38 ngôn ngữ giao diện tích hợp và cải thiện kiểm tra video trên YouTube cùng các trình phát nhúng được hỗ trợ. Bản cập nhật cũng sửa lỗi khởi động bảng điều khiển và khớp từ khóa bình luận đã lưu.",
+    "bannerSummary": "38 ngôn ngữ giao diện và kiểm tra phát video an toàn hơn",
+    "ctaLabel": "Xem điểm mới",
+    "highlights": [
+      "Cài đặt hiện có 38 ngôn ngữ giao diện cục bộ. Video bị chặn vẫn tạm dừng, không tự chuyển sang video khác. Các báo cáo màn hình trắng trên Firefox Android vẫn đang được điều tra."
+    ]
+  },
   "3.3.7": {
     "ctaLabel": "Xem điểm mới",
     "headline": "Danh sách lớn nhanh hơn, nhập dữ liệu được lưu bền vững và Android đã mở công khai",

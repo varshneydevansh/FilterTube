@@ -1,4 +1,13 @@
 {
+  "3.4.0": {
+    "headline": "38 basa antarmuka lan pamriksa puter video sing luwih aman",
+    "summary": "FilterTube 3.4.0 nambah 38 basa antarmuka bawaan lan ningkatake pamriksa video ing YouTube lan pamuter sematan sing didhukung. Uga ndandani wiwitan dasbor lan pencocokan tembung kunci komentar sing disimpen.",
+    "bannerSummary": "38 basa antarmuka lan pamriksa puter video sing luwih aman",
+    "ctaLabel": "Deleng Sing Anyar",
+    "highlights": [
+      "Setelan saiki nyedhiyakake 38 basa antarmuka lokal. Video sing diblokir tetep mandheg tanpa pindhah otomatis. Laporan layar putih ing Firefox Android isih ditliti."
+    ]
+  },
   "3.3.7": {
     "ctaLabel": "Deleng Sing Anyar",
     "headline": "Dhaptar gedhé luwih cepet, impor tetep kasimpen, Android wis kabuka kanggo umum",

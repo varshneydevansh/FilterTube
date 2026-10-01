@@ -1,4 +1,13 @@
 {
+  "3.4.0": {
+    "headline": "38 bahasa antarmuka dan pemeriksaan pemutaran yang lebih aman",
+    "summary": "FilterTube 3.4.0 menambahkan 38 bahasa antarmuka bawaan dan meningkatkan pemeriksaan video di YouTube serta pemutar sematan yang didukung. Pembaruan ini juga memperbaiki awal pemuatan dasbor dan pencocokan kata kunci komentar tersimpan.",
+    "bannerSummary": "38 bahasa antarmuka dan pemeriksaan pemutaran yang lebih aman",
+    "ctaLabel": "Lihat Yang Baru",
+    "highlights": [
+      "Setelan kini menyediakan 38 bahasa antarmuka lokal. Video yang diblokir tetap dijeda tanpa navigasi otomatis. Laporan layar putih di Firefox Android masih diselidiki."
+    ]
+  },
   "3.3.7": {
     "ctaLabel": "Lihat Yang Baru",
     "headline": "Daftar besar lebih cepat, impor tersimpan, dan Android tersedia untuk umum",

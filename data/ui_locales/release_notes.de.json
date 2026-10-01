@@ -1,4 +1,13 @@
 {
+  "3.4.0": {
+    "headline": "38 Oberflächensprachen und sicherere Wiedergabeprüfungen",
+    "summary": "FilterTube 3.4.0 bietet 38 mitgelieferte Oberflächensprachen und verbessert die Videoprüfung auf YouTube und in unterstützten eingebetteten Playern. Außerdem wurden der Dashboard-Start und die Erkennung gespeicherter Kommentar-Schlüsselwörter korrigiert.",
+    "bannerSummary": "38 Oberflächensprachen und sicherere Wiedergabeprüfungen",
+    "ctaLabel": "Neuigkeiten ansehen",
+    "highlights": [
+      "Die Einstellungen bieten jetzt 38 lokale Oberflächensprachen. Gesperrte Videos bleiben ohne automatische Navigation pausiert. Berichte über weiße Bildschirme in Firefox Android werden weiterhin untersucht."
+    ]
+  },
   "3.3.7": {
     "ctaLabel": "Neuigkeiten ansehen",
     "headline": "Große Listen schneller, dauerhafte Importe und Android öffentlich verfügbar",

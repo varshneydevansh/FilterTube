@@ -1,4 +1,13 @@
 {
+  "3.4.0": {
+    "headline": "Harsunan mu’amala 38 da ingantaccen binciken kunna bidiyo",
+    "summary": "FilterTube 3.4.0 ya ƙara harsunan mu’amala 38 da aka haɗa, kuma ya inganta binciken bidiyo a YouTube da masu kunna bidiyo da aka saka waɗanda ake tallafawa. Ya kuma gyara farawar dashboard da daidaita kalmomin sharhi da aka ajiye.",
+    "bannerSummary": "Harsunan mu’amala 38 da ingantaccen binciken kunna bidiyo",
+    "ctaLabel": "Duba sababbin abubuwa",
+    "highlights": [
+      "Saituna yanzu suna da harsunan mu’amala 38 na cikin na’ura. Bidiyoyin da aka toshe suna tsayawa ba tare da buɗe wani bidiyo kai tsaye ba. Ana ci gaba da binciken rahotannin farin allo a Firefox Android."
+    ]
+  },
   "3.3.7": {
     "ctaLabel": "Duba sababbin abubuwa",
     "headline": "Manyan jerin sun fi sauri, shigo da bayanai yana dawwama, Android ya buɗe ga jama'a",

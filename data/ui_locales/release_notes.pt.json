@@ -1,4 +1,13 @@
 {
+  "3.4.0": {
+    "headline": "38 idiomas de interface e verificações de reprodução mais seguras",
+    "summary": "O FilterTube 3.4.0 adiciona 38 idiomas de interface incluídos e melhora as verificações de vídeos no YouTube e em players incorporados compatíveis. Também corrige a inicialização do painel e a correspondência de palavras-chave de comentários salvas.",
+    "bannerSummary": "38 idiomas de interface e verificações de reprodução mais seguras",
+    "ctaLabel": "Ver novidades",
+    "highlights": [
+      "As configurações agora oferecem 38 idiomas de interface locais. Vídeos bloqueados permanecem pausados sem navegação automática. Os relatos de tela branca no Firefox Android continuam sob investigação."
+    ]
+  },
   "3.3.7": {
     "ctaLabel": "Ver novidades",
     "headline": "Listas grandes mais rápidas, importações persistentes e Android disponível ao público",

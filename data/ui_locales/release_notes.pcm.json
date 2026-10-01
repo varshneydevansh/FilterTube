@@ -1,4 +1,13 @@
 {
+  "3.4.0": {
+    "headline": "38 interface languages and playback checks wey safer",
+    "summary": "FilterTube 3.4.0 bring 38 interface languages wey dey inside the extension and improve video checks for YouTube and supported embedded players. E also fix dashboard startup and how saved comment keywords dey match.",
+    "bannerSummary": "38 interface languages and safer playback checks",
+    "ctaLabel": "See Wetin New",
+    "highlights": [
+      "Settings now get 38 local interface languages. Blocked videos go remain paused; another video no go open by itself. We still dey investigate white-screen reports for Firefox Android."
+    ]
+  },
   "3.3.7": {
     "ctaLabel": "See Wetin New",
     "headline": "Big lists dey faster, imports dey stay, Android don open to everybody",

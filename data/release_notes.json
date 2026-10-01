@@ -3,6 +3,16 @@
     "_comment": "Shared release notes source for the dashboard What's New tab and the YouTube release banner. Keep entries sorted newest-first by version."
   },
   {
+    "version": "3.4.0",
+    "headline": "38 interface languages and safer playback checks",
+    "summary": "FilterTube 3.4.0 adds 38 bundled interface languages and improves video checks on YouTube and supported embedded players. It also fixes dashboard startup and saved comment keyword matching.",
+    "bannerSummary": "38 interface languages, safer playback checks, and dashboard and comment-filter fixes.",
+    "highlights": [
+      "Settings now offers 38 local interface languages. Blocked videos stay paused without automatic navigation. Firefox Android white-screen reports remain under investigation."
+    ],
+    "detailsUrl": "https://github.com/varshneydevansh/FilterTube/releases/tag/v3.4.0"
+  },
+  {
     "version": "3.3.7",
     "headline": "Faster large lists, persistent imports, and public Android",
     "summary": "FilterTube 3.3.7 reduces repeated work on large rule lists, moves imported channel completion into a persistent background queue, adds bounded import reports, hardens Home and Advert Void behavior, makes GitHub release uploads resumable, and announces the public Android Google Play app.",

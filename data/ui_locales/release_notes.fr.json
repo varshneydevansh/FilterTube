@@ -1,4 +1,13 @@
 {
+  "3.4.0": {
+    "headline": "38 langues d’interface et des contrôles de lecture plus sûrs",
+    "summary": "FilterTube 3.4.0 ajoute 38 langues d’interface intégrées et améliore les contrôles des vidéos sur YouTube et les lecteurs intégrés compatibles. Il corrige aussi le démarrage du tableau de bord et la correspondance des mots-clés de commentaires enregistrés.",
+    "bannerSummary": "38 langues d’interface et des contrôles de lecture plus sûrs",
+    "ctaLabel": "Voir les nouveautés",
+    "highlights": [
+      "Les paramètres proposent désormais 38 langues d’interface locales. Les vidéos bloquées restent en pause sans navigation automatique. Les signalements d’écran blanc sur Firefox Android sont toujours en cours d’analyse."
+    ]
+  },
   "3.3.7": {
     "ctaLabel": "Voir les nouveautés",
     "headline": "De grandes listes plus rapides, des imports persistants et Android accessible au public",

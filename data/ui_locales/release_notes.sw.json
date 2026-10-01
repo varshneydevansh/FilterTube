@@ -1,4 +1,13 @@
 {
+  "3.4.0": {
+    "headline": "Lugha 38 za kiolesura na ukaguzi salama zaidi wa uchezaji",
+    "summary": "FilterTube 3.4.0 inaongeza lugha 38 za kiolesura zilizojumuishwa na kuboresha ukaguzi wa video kwenye YouTube na vichezaji vilivyopachikwa vinavyotumika. Pia inarekebisha kuanza kwa dashibodi na ulinganishaji wa maneno muhimu ya maoni yaliyohifadhiwa.",
+    "bannerSummary": "Lugha 38 za kiolesura na ukaguzi salama zaidi wa uchezaji",
+    "ctaLabel": "Angalia mapya",
+    "highlights": [
+      "Mipangilio sasa ina lugha 38 za kiolesura za ndani. Video zilizozuiwa hubaki zimesitishwa bila kufungua video nyingine kiotomatiki. Ripoti za skrini nyeupe kwenye Firefox Android bado zinachunguzwa."
+    ]
+  },
   "3.3.7": {
     "ctaLabel": "Angalia mapya",
     "headline": "Orodha kubwa ni za haraka zaidi, uingizaji huhifadhiwa, Android iko wazi kwa umma",
