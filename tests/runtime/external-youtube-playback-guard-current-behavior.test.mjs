@@ -123,6 +123,27 @@ test('explicit ID allowance does not bypass required metadata and Disabled stays
   assert.equal(guard.evaluateAdmission({ ...settings, enabled: false }, null, id).state, 'inactive');
 });
 
+test('ID-only rules admit an unrelated selected video without Player metadata', () => {
+  const blocked = 'gVRlg4BXKVo';
+  const selected = '0CCwuWQiLTA';
+  const settings = activeSettings({ filterChannels: [], blockedVideoIds: [blocked] });
+  const { guard } = loadGuard(settings);
+  assert.equal(guard.evaluateAdmission(settings, null, selected).state, 'allowed');
+  assert.equal(guard.evaluateAdmission(settings, null, blocked).kind, 'video');
+  assert.equal(guard.evaluateAdmission(settings, null, '').state, 'pending', 'a selected ID must be known');
+  assert.equal(guard.evaluateAdmission({ ...settings, allowedVideoIds: [blocked] }, null, blocked).state, 'allowed', 'equal-specificity ID exceptions are preserved');
+  for (const extra of [
+    { filterChannels: [{ id: 'UCdifferent' }] },
+    { filterKeywords: [{ pattern: 'Shakira' }] },
+    { listMode: 'whitelist' },
+    { contentFilters: { duration: { enabled: true } } },
+    { contentFilters: { uploadDate: { enabled: true } } },
+    { contentFilters: { uppercase: { enabled: true } } },
+    { categoryFilters: { enabled: true, selected: ['Music'] } },
+    { languageFilters: { enabled: true, selected: ['ru'] } }
+  ]) assert.equal(guard.evaluateAdmission({ ...settings, ...extra }, null, selected).state, 'pending', 'every metadata rule retains its checking boundary');
+});
+
 function loadGuard(settings, href = 'https://www.google.com/search?q=shakira#fpstate=ive&vld=cid:abc,vid:fcnDmrtj6Sk,st:0') {
   const documentListeners = new Map();
   const windowListeners = new Map();
@@ -299,6 +320,20 @@ test('verified settings metadata is used before pausing allowed playback', async
   const video = makeVideo();
   loaded.documentListeners.get('play')({ target: video });
   assert.equal(video.pauseCount, 0);
+  assert.equal(loaded.overlays.size, 0);
+});
+
+test('ID-only admission never pauses allowed play events or invents a resume', async () => {
+  const loaded = loadGuard(activeSettings({ filterChannels: [], blockedVideoIds: ['gVRlg4BXKVo'] }));
+  await new Promise(resolve => setTimeout(resolve, 0));
+  const video = makeVideo();
+  for (let attempt = 0; attempt < 3; attempt++) {
+    loaded.documentListeners.get('play')({ target: video });
+    loaded.documentListeners.get('playing')({ target: video });
+  }
+  assert.equal(video.pauseCount, 0);
+  assert.equal(video.playCount, 0, 'native playback stays in charge');
+  assert.equal(video.paused, false);
   assert.equal(loaded.overlays.size, 0);
 });
 

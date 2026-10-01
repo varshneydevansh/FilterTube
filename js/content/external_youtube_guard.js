@@ -128,10 +128,14 @@
 
     function hasActiveVideoAdmissionRules(settings) {
         if (!settings || typeof settings !== 'object' || settings.enabled === false) return false;
+        return hasEntries(settings.blockedVideoIds) || hasEntries(settings.allowedVideoIds) || hasActiveMetadataAdmissionRules(settings);
+    }
+
+    function hasActiveMetadataAdmissionRules(settings) {
+        if (!settings || typeof settings !== 'object' || settings.enabled === false) return false;
         const content = settings.contentFilters && typeof settings.contentFilters === 'object' ? settings.contentFilters : {};
         return Boolean(
             settings.listMode === 'whitelist' ||
-            hasEntries(settings.blockedVideoIds) || hasEntries(settings.allowedVideoIds) ||
             hasEntries(settings.filterChannels) || hasEntries(settings.whitelistChannels) ||
             hasEntries(settings.filterKeywords) || hasEntries(settings.whitelistKeywords) ||
             content.duration?.enabled === true || content.uploadDate?.enabled === true || content.uppercase?.enabled === true ||
@@ -366,6 +370,9 @@
         // The selected video ID already verifies this rule. No lower-specificity
         // channel/keyword match can override it; an explicit allow can still tie.
         if (explicitlyBlocked && !explicitlyAllowed) return { state: 'blocked', kind: 'video', videoId };
+        // ID-only rules need only the selected ID. Waiting for Player JSON here
+        // would hold an unrelated allowed video for metadata no rule requires.
+        if (videoId && !hasActiveMetadataAdmissionRules(settings)) return { state: 'allowed', kind: 'none' };
         if (!metadata || metadata.videoId !== videoId) return { state: 'pending', missing: 'player metadata' };
         const needsIdentity = hasEntries(settings.filterChannels) || hasEntries(settings.whitelistChannels) || settings.listMode === 'whitelist';
         const needsText = hasEntries(settings.filterKeywords) || hasEntries(settings.whitelistKeywords) || settings.contentFilters?.uppercase?.enabled === true;
