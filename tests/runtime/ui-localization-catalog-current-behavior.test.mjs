@@ -115,6 +115,7 @@ test('staged keys still describe copy present on extension UI surfaces', () => {
     'js/tab-view.js',
     'js/render_engine.js',
     'js/ui_components.js',
+    'js/ui_localization_boot.js',
     'js/content/first_run_prompt.js',
     'js/content/block_channel.js',
     'js/content/bridge_settings.js',
@@ -142,6 +143,10 @@ test('staged keys still describe copy present on extension UI surfaces', () => {
     }
     if (key.startsWith('profileAccess.') || key.startsWith('dashboard.') || key.startsWith('popup.') || key.startsWith('render.') || key.startsWith('admission.') || key.startsWith('family.')) {
       assert.ok(surfaces.includes(key) || surfaces.includes(source), `${key} is wired to a runtime UI surface`);
+      continue;
+    }
+    if (key === 'settings.previewLanguage') {
+      assert.ok(surfaces.includes("ui.text('settings.previewLanguage', { language: option.dataset.languageName })"), `${key} is wired after catalog activation`);
       continue;
     }
     assert.ok(surfaces.includes(source), `${key} no longer matches current UI copy`);

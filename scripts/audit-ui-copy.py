@@ -21,7 +21,7 @@ SCRIPT_SURFACES = (
     "js/ui_components.js", "js/background.js",
     "js/content/admission_overlay.js", "js/content/external_youtube_guard.js",
 )
-COPY_ATTRIBUTES = ("title", "placeholder", "aria-label", "alt")
+COPY_ATTRIBUTES = ("title", "placeholder", "aria-label", "alt", "data-filtertube-help")
 IGNORED_TAGS = {"script", "style", "svg", "path", "noscript"}
 VOID_TAGS = {
     "area", "base", "br", "col", "embed", "hr", "img", "input", "link",
@@ -82,19 +82,29 @@ def main():
 
     entries = []
     static_covered = 0
+    help_covered = 0
     dashboard = (ROOT / "html/tab-view.html").read_text(encoding="utf-8")
     # Do not treat a catalog entry as runtime wiring if capture is absent or
     # runs after the controller can insert user-written text.
     capture = dashboard.find('src="../js/ui_static_copy_capture.js"')
     controller = dashboard.find('src="../js/tab-view.js"')
     static_copy = {}
+    help_copy = {}
+    controller_source = (ROOT / "js/tab-view.js").read_text(encoding="utf-8")
+    helper = re.search(r"const DASHBOARD_HELP_BUBBLE_COPY = tabViewCompileDisplayCopy\((\[[\s\S]*?\])\);", controller_source)
+    if helper and "tabViewDisplayCopy(explicit.trim(), DASHBOARD_HELP_BUBBLE_COPY)" in controller_source:
+        english = json.loads((ROOT / "data/ui_locales/en.json").read_text(encoding="utf-8"))
+        help_copy = {entry["fallback"]: entry["key"] for entry in json.loads(helper.group(1))
+                     if english.get(entry["key"]) == entry["fallback"]}
     if 0 <= capture < controller:
         static_copy = json.loads((ROOT / "data/ui_locales/en_static.json").read_text(encoding="utf-8"))
     for filename in SURFACES:
         inventory = CopyInventory(filename)
         inventory.feed((ROOT / filename).read_text(encoding="utf-8"))
         for entry in inventory.entries:
-            if filename == "html/tab-view.html" and entry["text"] in static_copy:
+            if filename == "html/tab-view.html" and entry["kind"] == "data-filtertube-help" and entry["text"] in help_copy:
+                help_covered += 1
+            elif filename == "html/tab-view.html" and entry["kind"] != "data-filtertube-help" and entry["text"] in static_copy:
                 static_covered += 1
             else:
                 entries.append(entry)
@@ -118,6 +128,7 @@ def main():
         print(json.dumps(entries, ensure_ascii=False, indent=2))
     else:
         print(f"html/tab-view.html: {static_covered} exact packaged fragments covered by early static capture")
+        print(f"html/tab-view.html: {help_covered} explicit help tooltips covered by catalog-backed display lookup")
         for filename in (*SURFACES, *SCRIPT_SURFACES):
             source = [entry for entry in entries if entry["file"] == filename]
             print(f"{filename}: {len(source)} candidate unkeyed fragments")

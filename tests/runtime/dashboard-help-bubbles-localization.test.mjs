@@ -32,3 +32,46 @@ test('release banner receives localized action and accessibility text from the s
   assert.ok(prompt.includes("closeBtn.setAttribute('aria-label', payload.dismissAriaLabel || 'Dismiss')"));
   assert.ok(prompt.includes("container.dir = payload.direction === 'rtl' ? 'rtl' : 'ltr'"));
 });
+
+test('actual hover handler displays selected-language help and removes stale bubbles on language change', () => {
+  const listeners = {};
+  let bubble;
+  let language = 'one';
+  const tip = Object.values(batch.english)[0];
+  class Element {
+    getAttribute(name) { return name === 'data-filtertube-help' ? tip : ''; }
+    closest(selector) { return selector === '[data-filtertube-help], [title]' ? this : null; }
+    getBoundingClientRect() { return { left: 100, width: 200, top: 100, bottom: 140 }; }
+    contains(value) { return value === this; }
+  }
+  const target = new Element();
+  const body = {
+    contains(value) { return value === target; },
+    appendChild(value) { bubble = value; value.parentNode = body; },
+    removeChild(value) { assert.equal(value, bubble); bubble = null; }
+  };
+  const document = {
+    documentElement: { dataset: {}, clientWidth: 1000, clientHeight: 800 }, body,
+    addEventListener(name, callback) { listeners[name] = callback; },
+    createElement() { return { style: {}, classList: { toggle() {} }, setAttribute() {}, getBoundingClientRect: () => ({ width: 200, height: 50 }) }; }
+  };
+  const context = vm.createContext({ Element, Node: Element, document, clearTimeout, setTimeout,
+    window: { innerWidth: 1000, innerHeight: 800,
+      addEventListener(name, callback) { listeners[name] = callback; },
+      FilterTubeUiLocalization: { text: key => `${language}: ${key}` }
+    }
+  });
+  const helperStart = source.indexOf('function tabViewUiText(');
+  const helperEnd = source.indexOf('\nfunction tabViewTaxonomyDisplayLabel', helperStart);
+  const start = source.indexOf('const DASHBOARD_HELP_BUBBLE_COPY =');
+  const end = source.indexOf('async function initializeAndroidClosedTestingInvite', start);
+  vm.runInContext(`${source.slice(helperStart, helperEnd)}\n${source.slice(start, end)}\ninitializeDashboardHelpBubbles();`, context);
+  listeners.mouseover({ target });
+  assert.equal(bubble.textContent, 'one: dashboard.helpBubble.tip01');
+  language = 'two';
+  listeners['filtertube-ui-locale-changed']();
+  assert.equal(bubble, null);
+  listeners.mouseover({ target });
+  assert.equal(bubble.textContent, 'two: dashboard.helpBubble.tip01');
+  assert.equal(target.getAttribute('data-filtertube-help'), tip, 'source tooltip is not rewritten');
+});
