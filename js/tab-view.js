@@ -25301,6 +25301,8 @@ document.addEventListener('DOMContentLoaded', async () => {
     }
 
     window.addEventListener('filtertube-ui-locale-changed', () => {
+        renderListModeControls();
+        renderNanahDeliveryPathStrip();
         if (!profilesV4Cache) return;
         renderProfileSelector(profilesV4Cache);
         renderProfilesManager(profilesV4Cache);

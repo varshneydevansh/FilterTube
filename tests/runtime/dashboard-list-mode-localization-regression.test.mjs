@@ -9,6 +9,23 @@ const end = source.indexOf('\n    try {\n        window.__filtertubeRenderTopBar
 const render = source.slice(start, end);
 const english = JSON.parse(fs.readFileSync('data/ui_locales/en.json', 'utf8'));
 
+test('language switching refreshes generated list-mode and Family Devices controls without network work', () => {
+    const marker = "    window.addEventListener('filtertube-ui-locale-changed', () => {\n        renderListModeControls();";
+    const eventStart = source.indexOf(marker);
+    assert.ok(eventStart >= 0);
+    const eventEnd = source.indexOf('\n    });', eventStart) + '\n    });'.length;
+    const calls = [];
+    let refresh;
+    vm.runInNewContext(source.slice(eventStart, eventEnd), {
+        window: { addEventListener(name, callback) { assert.equal(name, 'filtertube-ui-locale-changed'); refresh = callback; } },
+        renderListModeControls() { calls.push('listMode'); },
+        renderNanahDeliveryPathStrip() { calls.push('familyDevices'); },
+        profilesV4Cache: null
+    });
+    refresh();
+    assert.deepEqual(calls, ['listMode', 'familyDevices']);
+});
+
 test('dashboard profile availability errors share the existing popup translation', () => {
     assert.doesNotMatch(source, /UIComponents\.showToast\('Profiles unavailable'/);
     assert.ok([...source.matchAll(/tabViewUiText\('popup\.profile\.unavailable', 'Profiles unavailable'\)/g)].length >= 6);
