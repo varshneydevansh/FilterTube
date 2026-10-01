@@ -5,6 +5,19 @@ const root = process.cwd();
 const batchPath = process.argv[2];
 if (!batchPath) throw new Error('Usage: node scripts/merge-ui-locale-batch.mjs <batch.json>');
 const batch = JSON.parse(fs.readFileSync(path.resolve(root, batchPath), 'utf8'));
+// Independently owned locale drafts can be validated and merged without
+// copying their translations into another large intermediate artifact.
+batch.translations ||= {};
+for (const draftPath of process.argv.slice(3)) {
+    const draft = JSON.parse(fs.readFileSync(path.resolve(root, draftPath), 'utf8'));
+    if (JSON.stringify(draft.keys) !== JSON.stringify(Object.keys(batch.english))) {
+        throw new Error(`${draftPath}: key order differs from English source`);
+    }
+    for (const [locale, values] of Object.entries(draft.translations || {})) {
+        if (Object.hasOwn(batch.translations, locale)) throw new Error(`${draftPath}: duplicate locale ${locale}`);
+        batch.translations[locale] = values;
+    }
+}
 const targets = JSON.parse(fs.readFileSync(path.join(root, 'data/ui_locales/targets.json'), 'utf8')).locales;
 const expected = targets.map(item => item.code).sort();
 const translated = expected.filter(locale => locale !== 'en');
@@ -12,11 +25,18 @@ if (JSON.stringify(Object.keys(batch.translations).sort()) !== JSON.stringify(tr
     throw new Error('Translation batch must include every non-English target locale exactly once');
 }
 const keys = Object.keys(batch.english);
+const placeholders = value => [...value.matchAll(/\{([a-zA-Z][a-zA-Z0-9]*)\}/g)].map(match => match[1]).sort().join(',');
 for (const locale of translated) {
     const values = batch.translations[locale];
     if (!Array.isArray(values) || values.length !== keys.length || values.some(value => typeof value !== 'string' || !value.trim())) {
         throw new Error(`${locale}: missing or empty batch translation`);
     }
+    keys.forEach((key, index) => {
+        if (placeholders(values[index]) !== placeholders(batch.english[key])) throw new Error(`${locale}: changed placeholders for ${key}`);
+        for (const term of ['FilterTube', 'YouTube', 'Advert Void']) {
+            if (batch.english[key].includes(term) && !values[index].includes(term)) throw new Error(`${locale}: changed protected term ${term} for ${key}`);
+        }
+    });
 }
 for (const locale of expected) {
     const file = path.join(root, 'data/ui_locales', `${locale}.json`);
