@@ -1669,5 +1669,6 @@
   "dashboard.managedLists.error.tooLarge": "યાદી ખૂબ મોટી છે. નાની ટેક્સ્ટ ફાઇલ વાપરો.",
   "dashboard.managedLists.error.timeout": "યાદીના URLનો જવાબ આવવામાં ઘણો સમય લાગ્યો.",
   "dashboard.managedLists.error.invalidJson": "આ JSON જેવું લાગે છે, પરંતુ માન્ય JSON નથી. JSONનું સિન્ટેક્સ ઠીક કરીને ફરી પૂર્વાવલોકન કરો.",
-  "dashboard.managedLists.error.noValidRows": "કોઈ માન્ય ચૅનલ અથવા કીવર્ડ મળ્યાં નથી"
+  "dashboard.managedLists.error.noValidRows": "કોઈ માન્ય ચૅનલ અથવા કીવર્ડ મળ્યાં નથી",
+  "render.saved": "સાચવી લીધું!"
 }

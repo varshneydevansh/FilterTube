@@ -1669,5 +1669,6 @@
   "dashboard.managedLists.error.tooLarge": "Die Liste ist zu groß. Verwende eine kleinere Textdatei.",
   "dashboard.managedLists.error.timeout": "Die Listen-URL hat zu lange für eine Antwort gebraucht.",
   "dashboard.managedLists.error.invalidJson": "Das sieht nach JSON aus, ist aber kein gültiges JSON. Korrigiere die JSON-Syntax und öffne die Vorschau erneut.",
-  "dashboard.managedLists.error.noValidRows": "Keine gültigen Kanäle oder Schlüsselwörter gefunden"
+  "dashboard.managedLists.error.noValidRows": "Keine gültigen Kanäle oder Schlüsselwörter gefunden",
+  "render.saved": "Gespeichert!"
 }

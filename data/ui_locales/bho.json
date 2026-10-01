@@ -1669,5 +1669,6 @@
   "dashboard.managedLists.error.tooLarge": "सूची बहुत बड़ बा। छोट टेक्स्ट फाइल इस्तेमाल करीं।",
   "dashboard.managedLists.error.timeout": "सूची URL से जवाब आवे में बहुत समय लागल।",
   "dashboard.managedLists.error.invalidJson": "ई JSON लागत बा, बाकिर सही JSON नइखे। JSON के सिंटैक्स ठीक करके फेर प्रीव्यू करीं।",
-  "dashboard.managedLists.error.noValidRows": "कवनो सही चैनल भा कीवर्ड ना मिलल"
+  "dashboard.managedLists.error.noValidRows": "कवनो सही चैनल भा कीवर्ड ना मिलल",
+  "render.saved": "सहेज दिहल गइल!"
 }

@@ -1669,5 +1669,6 @@
   "dashboard.managedLists.error.tooLarge": "Daftar terlalu besar. Gunakan file teks yang lebih kecil.",
   "dashboard.managedLists.error.timeout": "URL daftar terlalu lama untuk merespons.",
   "dashboard.managedLists.error.invalidJson": "Ini tampaknya JSON, tetapi format JSON-nya tidak valid. Perbaiki sintaks JSON lalu pratinjau lagi.",
-  "dashboard.managedLists.error.noValidRows": "Tidak ditemukan channel atau kata kunci yang valid"
+  "dashboard.managedLists.error.noValidRows": "Tidak ditemukan channel atau kata kunci yang valid",
+  "render.saved": "Tersimpan!"
 }

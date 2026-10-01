@@ -1669,5 +1669,6 @@
   "dashboard.managedLists.error.tooLarge": "목록이 너무 큽니다. 더 작은 텍스트 파일을 사용하세요.",
   "dashboard.managedLists.error.timeout": "목록 URL의 응답이 너무 오래 걸립니다.",
   "dashboard.managedLists.error.invalidJson": "JSON처럼 보이지만 올바른 JSON이 아닙니다. JSON 구문을 수정한 뒤 다시 미리 보세요.",
-  "dashboard.managedLists.error.noValidRows": "유효한 채널이나 키워드를 찾을 수 없습니다"
+  "dashboard.managedLists.error.noValidRows": "유효한 채널이나 키워드를 찾을 수 없습니다",
+  "render.saved": "저장됐어요!"
 }

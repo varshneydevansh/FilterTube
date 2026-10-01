@@ -1669,5 +1669,6 @@
   "dashboard.managedLists.error.tooLarge": "L’elenco è troppo grande. Usa un file di testo più piccolo.",
   "dashboard.managedLists.error.timeout": "L’URL dell’elenco ha impiegato troppo tempo a rispondere.",
   "dashboard.managedLists.error.invalidJson": "Sembra JSON, ma non è JSON valido. Correggi la sintassi JSON e visualizza di nuovo l’anteprima.",
-  "dashboard.managedLists.error.noValidRows": "Nessun canale o parola chiave valido trovato"
+  "dashboard.managedLists.error.noValidRows": "Nessun canale o parola chiave valido trovato",
+  "render.saved": "Salvato!"
 }

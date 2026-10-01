@@ -1669,5 +1669,6 @@
   "dashboard.managedLists.error.tooLarge": "Dhaptar kegedhen. Gunakna file teks sing luwih cilik.",
   "dashboard.managedLists.error.timeout": "URL dhaptar suwe banget anggone mangsuli.",
   "dashboard.managedLists.error.invalidJson": "Iki katon kaya JSON, nanging dudu JSON sing bener. Benerna sintaks JSON banjur delengen pratinjau maneh.",
-  "dashboard.managedLists.error.noValidRows": "Ora ana saluran utawa tembung kunci sing bener"
+  "dashboard.managedLists.error.noValidRows": "Ora ana saluran utawa tembung kunci sing bener",
+  "render.saved": "Wis disimpen!"
 }

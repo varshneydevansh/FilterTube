@@ -1669,5 +1669,6 @@
   "dashboard.managedLists.error.tooLarge": "Masyadong malaki ang listahan. Gumamit ng mas maliit na text file.",
   "dashboard.managedLists.error.timeout": "Masyadong matagal bago sumagot ang URL ng listahan.",
   "dashboard.managedLists.error.invalidJson": "Mukhang JSON ito, pero hindi ito wastong JSON. Ayusin ang syntax ng JSON at i-preview muli.",
-  "dashboard.managedLists.error.noValidRows": "Walang nahanap na wastong channel o keyword"
+  "dashboard.managedLists.error.noValidRows": "Walang nahanap na wastong channel o keyword",
+  "render.saved": "Na-save na!"
 }

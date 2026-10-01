@@ -1669,5 +1669,6 @@
   "dashboard.managedLists.error.tooLarge": "รายการใหญ่เกินไป โปรดใช้ไฟล์ข้อความที่เล็กกว่า",
   "dashboard.managedLists.error.timeout": "URL ของรายการใช้เวลาตอบสนองนานเกินไป",
   "dashboard.managedLists.error.invalidJson": "ดูเหมือนเป็น JSON แต่ไม่ใช่ JSON ที่ถูกต้อง แก้ไวยากรณ์ JSON แล้วดูตัวอย่างอีกครั้ง",
-  "dashboard.managedLists.error.noValidRows": "ไม่พบช่องหรือคีย์เวิร์ดที่ถูกต้อง"
+  "dashboard.managedLists.error.noValidRows": "ไม่พบช่องหรือคีย์เวิร์ดที่ถูกต้อง",
+  "render.saved": "บันทึกแล้ว!"
 }

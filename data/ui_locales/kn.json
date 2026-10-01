@@ -1669,5 +1669,6 @@
   "dashboard.managedLists.error.tooLarge": "ಪಟ್ಟಿ ತುಂಬಾ ದೊಡ್ಡದಾಗಿದೆ. ಚಿಕ್ಕ ಪಠ್ಯ ಫೈಲ್ ಬಳಸಿ.",
   "dashboard.managedLists.error.timeout": "ಪಟ್ಟಿಯ URL ಪ್ರತಿಕ್ರಿಯಿಸಲು ತುಂಬಾ ಸಮಯ ತೆಗೆದುಕೊಂಡಿತು.",
   "dashboard.managedLists.error.invalidJson": "ಇದು JSONನಂತೆ ಕಾಣುತ್ತದೆ, ಆದರೆ ಮಾನ್ಯ JSON ಅಲ್ಲ. JSON ಸಿಂಟ್ಯಾಕ್ಸ್ ಸರಿಪಡಿಸಿ ಮತ್ತೆ ಪೂರ್ವವೀಕ್ಷಿಸಿ.",
-  "dashboard.managedLists.error.noValidRows": "ಮಾನ್ಯ ಚಾನಲ್‌ಗಳು ಅಥವಾ ಕೀವರ್ಡ್‌ಗಳು ಕಂಡುಬಂದಿಲ್ಲ"
+  "dashboard.managedLists.error.noValidRows": "ಮಾನ್ಯ ಚಾನಲ್‌ಗಳು ಅಥವಾ ಕೀವರ್ಡ್‌ಗಳು ಕಂಡುಬಂದಿಲ್ಲ",
+  "render.saved": "ಉಳಿಸಲಾಗಿದೆ!"
 }

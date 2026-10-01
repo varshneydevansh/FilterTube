@@ -1669,5 +1669,6 @@
   "dashboard.managedLists.error.tooLarge": "A lista é grande demais. Use um arquivo de texto menor.",
   "dashboard.managedLists.error.timeout": "O URL da lista demorou demais para responder.",
   "dashboard.managedLists.error.invalidJson": "Isto parece JSON, mas não é um JSON válido. Corrija a sintaxe do JSON e faça a prévia novamente.",
-  "dashboard.managedLists.error.noValidRows": "Nenhum canal ou palavra-chave válido foi encontrado"
+  "dashboard.managedLists.error.noValidRows": "Nenhum canal ou palavra-chave válido foi encontrado",
+  "render.saved": "Salvo!"
 }

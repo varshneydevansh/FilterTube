@@ -1669,5 +1669,6 @@
   "dashboard.managedLists.error.tooLarge": "لسٹ بوہتی وڈی اے۔ چھوٹی ٹیکسٹ فائل ورتو۔",
   "dashboard.managedLists.error.timeout": "لسٹ URL نوں جواب دین وچ بوہتا ویلا لگیا۔",
   "dashboard.managedLists.error.invalidJson": "ایہہ JSON لگدا اے، پر درست JSON نہیں۔ JSON دی بناوٹ ٹھیک کرکے پیش منظر فیر ویکھو۔",
-  "dashboard.managedLists.error.noValidRows": "کوئی درست چینل یا کلیدی لفظ نہیں لبھیا"
+  "dashboard.managedLists.error.noValidRows": "کوئی درست چینل یا کلیدی لفظ نہیں لبھیا",
+  "render.saved": "محفوظ ہو گیا!"
 }

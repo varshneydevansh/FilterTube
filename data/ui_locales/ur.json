@@ -1669,5 +1669,6 @@
   "dashboard.managedLists.error.tooLarge": "فہرست بہت بڑی ہے۔ چھوٹی ٹیکسٹ فائل استعمال کریں۔",
   "dashboard.managedLists.error.timeout": "فہرست کے URL سے جواب آنے میں بہت وقت لگا۔",
   "dashboard.managedLists.error.invalidJson": "یہ JSON لگتا ہے، مگر درست JSON نہیں ہے۔ JSON کی ساخت درست کریں اور دوبارہ پیش منظر دیکھیں۔",
-  "dashboard.managedLists.error.noValidRows": "کوئی درست چینل یا کلیدی لفظ نہیں ملا"
+  "dashboard.managedLists.error.noValidRows": "کوئی درست چینل یا کلیدی لفظ نہیں ملا",
+  "render.saved": "محفوظ ہو گیا!"
 }

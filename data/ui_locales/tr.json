@@ -1669,5 +1669,6 @@
   "dashboard.managedLists.error.tooLarge": "Liste çok büyük. Daha küçük bir metin dosyası kullanın.",
   "dashboard.managedLists.error.timeout": "Liste URL'sinin yanıt vermesi çok uzun sürdü.",
   "dashboard.managedLists.error.invalidJson": "Bu JSON gibi görünüyor ancak geçerli JSON değil. JSON sözdizimini düzeltip önizlemeyi yeniden açın.",
-  "dashboard.managedLists.error.noValidRows": "Geçerli kanal veya anahtar kelime bulunamadı"
+  "dashboard.managedLists.error.noValidRows": "Geçerli kanal veya anahtar kelime bulunamadı",
+  "render.saved": "Kaydedildi!"
 }

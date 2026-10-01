@@ -1669,5 +1669,6 @@
   "dashboard.managedLists.error.tooLarge": "فهرست خیلی بزرگ است. از فایل متنی کوچک‌تری استفاده کنید.",
   "dashboard.managedLists.error.timeout": "پاسخ‌گویی نشانی فهرست بیش از حد طول کشید.",
   "dashboard.managedLists.error.invalidJson": "این شبیه JSON است، اما JSON معتبری نیست. دستور زبان JSON را اصلاح کنید و دوباره پیش‌نمایش بگیرید.",
-  "dashboard.managedLists.error.noValidRows": "هیچ کانال یا کلیدواژهٔ معتبری پیدا نشد"
+  "dashboard.managedLists.error.noValidRows": "هیچ کانال یا کلیدواژهٔ معتبری پیدا نشد",
+  "render.saved": "ذخیره شد!"
 }

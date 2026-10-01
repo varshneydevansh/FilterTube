@@ -1669,5 +1669,6 @@
   "dashboard.managedLists.error.tooLarge": "यादी खूप मोठी आहे. छोटी मजकूर फाइल वापरा.",
   "dashboard.managedLists.error.timeout": "यादीच्या URL कडून प्रतिसाद यायला खूप वेळ लागला.",
   "dashboard.managedLists.error.invalidJson": "हे JSON दिसते, पण वैध JSON नाही. JSON ची मांडणी दुरुस्त करून पुन्हा पूर्वावलोकन करा.",
-  "dashboard.managedLists.error.noValidRows": "वैध चॅनेल किंवा कीवर्ड सापडले नाहीत"
+  "dashboard.managedLists.error.noValidRows": "वैध चॅनेल किंवा कीवर्ड सापडले नाहीत",
+  "render.saved": "जतन केले!"
 }

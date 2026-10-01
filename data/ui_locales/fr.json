@@ -1669,5 +1669,6 @@
   "dashboard.managedLists.error.tooLarge": "La liste est trop volumineuse. Utilisez un fichier texte plus petit.",
   "dashboard.managedLists.error.timeout": "L’URL de la liste a mis trop de temps à répondre.",
   "dashboard.managedLists.error.invalidJson": "Cela ressemble à du JSON, mais le JSON n’est pas valide. Corrigez sa syntaxe puis relancez l’aperçu.",
-  "dashboard.managedLists.error.noValidRows": "Aucune chaîne ni aucun mot-clé valide trouvé"
+  "dashboard.managedLists.error.noValidRows": "Aucune chaîne ni aucun mot-clé valide trouvé",
+  "render.saved": "Enregistré !"
 }

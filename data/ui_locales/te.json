@@ -1669,5 +1669,6 @@
   "dashboard.managedLists.error.tooLarge": "జాబితా చాలా పెద్దది. చిన్న టెక్స్ట్ ఫైల్‌ను ఉపయోగించండి.",
   "dashboard.managedLists.error.timeout": "జాబితా URL స్పందించడానికి చాలా సమయం పట్టింది.",
   "dashboard.managedLists.error.invalidJson": "ఇది JSONలా కనిపిస్తోంది, కానీ చెల్లుబాటు అయ్యే JSON కాదు. JSON సింటాక్స్‌ను సరిచేసి మళ్లీ ప్రివ్యూ చేయండి.",
-  "dashboard.managedLists.error.noValidRows": "చెల్లుబాటు అయ్యే ఛానెల్‌లు లేదా కీవర్డ్‌లు ఏవీ కనబడలేదు"
+  "dashboard.managedLists.error.noValidRows": "చెల్లుబాటు అయ్యే ఛానెల్‌లు లేదా కీవర్డ్‌లు ఏవీ కనబడలేదు",
+  "render.saved": "సేవ్ అయింది!"
 }

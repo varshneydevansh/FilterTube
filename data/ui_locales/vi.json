@@ -1669,5 +1669,6 @@
   "dashboard.managedLists.error.tooLarge": "Danh sách quá lớn. Hãy dùng tệp văn bản nhỏ hơn.",
   "dashboard.managedLists.error.timeout": "URL danh sách phản hồi quá lâu.",
   "dashboard.managedLists.error.invalidJson": "Nội dung này có vẻ là JSON nhưng JSON không hợp lệ. Hãy sửa cú pháp JSON rồi xem trước lại.",
-  "dashboard.managedLists.error.noValidRows": "Không tìm thấy kênh hoặc từ khóa hợp lệ"
+  "dashboard.managedLists.error.noValidRows": "Không tìm thấy kênh hoặc từ khóa hợp lệ",
+  "render.saved": "Đã lưu!"
 }

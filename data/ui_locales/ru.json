@@ -1669,5 +1669,6 @@
   "dashboard.managedLists.error.tooLarge": "Список слишком большой. Используйте текстовый файл поменьше.",
   "dashboard.managedLists.error.timeout": "Сервер списка слишком долго не отвечает.",
   "dashboard.managedLists.error.invalidJson": "Похоже на JSON, но это некорректный JSON. Исправьте синтаксис и снова откройте предварительный просмотр.",
-  "dashboard.managedLists.error.noValidRows": "Не найдено допустимых каналов или ключевых слов"
+  "dashboard.managedLists.error.noValidRows": "Не найдено допустимых каналов или ключевых слов",
+  "render.saved": "Сохранено!"
 }

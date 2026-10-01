@@ -23,6 +23,16 @@ const UIComponents = (() => {
         bgPanel: '#F0EFEA'
     };
 
+    function localizedComponentText(key, fallback, values = {}) {
+        try {
+            const localized = window.FilterTubeUiLocalization?.text?.(key, values);
+            if (typeof localized === 'string' && localized.trim()) return localized;
+        } catch (e) {
+        }
+        return String(fallback).replace(/\{([a-zA-Z][a-zA-Z0-9]*)\}/g, (match, name) =>
+            Object.prototype.hasOwnProperty.call(values, name) ? String(values[name]) : match);
+    }
+
     function isDarkTheme() {
         try {
             return document.documentElement.getAttribute('data-theme') === 'dark';
@@ -94,7 +104,7 @@ const UIComponents = (() => {
      * @param {string} successText - Text to show on success (default: "Saved!")
      * @param {number} duration - Duration in ms (default: 1500)
      */
-    function flashButtonSuccess(button, successText = 'Saved!', duration = 1500) {
+    function flashButtonSuccess(button, successText = localizedComponentText('render.saved', 'Saved!'), duration = 1500) {
         if (!button) return;
 
         // Store original text in dataset if not already stored
@@ -168,7 +178,11 @@ const UIComponents = (() => {
     function createDeleteButton(onClick) {
         const btn = document.createElement('button');
         btn.className = 'delete-btn';
-        btn.setAttribute('aria-label', 'Delete');
+        const deleteLabel = localizedComponentText('render.deleteRule', 'Delete');
+        btn.setAttribute('aria-label', deleteLabel);
+        btn.setAttribute('title', deleteLabel);
+        btn.setAttribute('data-ft-i18n-aria-label', 'render.deleteRule');
+        btn.setAttribute('data-ft-i18n-title', 'render.deleteRule');
         btn.innerHTML = `
             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                 <line x1="18" y1="6" x2="6" y2="18"></line>
@@ -859,16 +873,19 @@ const UIComponents = (() => {
      * Create an icon button
      * @param {Object} options - Icon button options
      * @param {string} options.icon - SVG icon HTML
-     * @param {string} options.title - Tooltip title
+     * @param {string} options.title - Tooltip title and accessible name fallback
+     * @param {string} options.ariaLabel - Optional accessible name
      * @param {Function} options.onClick - Click handler
      * @param {string} options.className - Additional classes
      * @returns {HTMLButtonElement}
      */
-    function createIconButton({ icon, title, onClick, className = '' }) {
+    function createIconButton({ icon, title, ariaLabel = '', onClick, className = '' }) {
         const btn = document.createElement('button');
         btn.className = `icon-btn ${className}`.trim();
         btn.innerHTML = icon;
         if (title) btn.title = title;
+        const accessibleLabel = ariaLabel || title;
+        if (accessibleLabel) btn.setAttribute('aria-label', accessibleLabel);
         if (onClick) btn.addEventListener('click', onClick);
         return btn;
     }

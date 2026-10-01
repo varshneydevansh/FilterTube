@@ -1669,5 +1669,6 @@
   "dashboard.managedLists.error.tooLarge": "La lista es demasiado grande. Usa un archivo de texto más pequeño.",
   "dashboard.managedLists.error.timeout": "La URL de la lista tardó demasiado en responder.",
   "dashboard.managedLists.error.invalidJson": "Parece JSON, pero no es válido. Corrige la sintaxis JSON y vuelve a previsualizarlo.",
-  "dashboard.managedLists.error.noValidRows": "No se encontraron canales ni palabras clave válidos"
+  "dashboard.managedLists.error.noValidRows": "No se encontraron canales ni palabras clave válidos",
+  "render.saved": "¡Guardado!"
 }

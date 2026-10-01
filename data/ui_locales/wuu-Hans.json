@@ -1669,5 +1669,6 @@
   "dashboard.managedLists.error.tooLarge": "列表忒大。换个小点个文本文件用。",
   "dashboard.managedLists.error.timeout": "列表网址等忒久还勿回应。",
   "dashboard.managedLists.error.invalidJson": "迭个看上去像 JSON，不过 JSON 格式勿对。改好 JSON 语法再预览一趟。",
-  "dashboard.managedLists.error.noValidRows": "呒没寻着有效个频道或关键词"
+  "dashboard.managedLists.error.noValidRows": "呒没寻着有效个频道或关键词",
+  "render.saved": "保存好了！"
 }

@@ -1669,5 +1669,6 @@
   "dashboard.managedLists.error.tooLarge": "Orodha ni kubwa mno. Tumia faili ndogo ya maandishi.",
   "dashboard.managedLists.error.timeout": "URL ya orodha imechelewa sana kujibu.",
   "dashboard.managedLists.error.invalidJson": "Hii inaonekana kuwa JSON, lakini si JSON halali. Rekebisha sintaksia ya JSON kisha uone hakikisho tena.",
-  "dashboard.managedLists.error.noValidRows": "Hakuna chaneli au maneno muhimu halali yaliyopatikana"
+  "dashboard.managedLists.error.noValidRows": "Hakuna chaneli au maneno muhimu halali yaliyopatikana",
+  "render.saved": "Imehifadhiwa!"
 }

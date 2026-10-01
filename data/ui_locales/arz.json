@@ -1669,5 +1669,6 @@
   "dashboard.managedLists.error.tooLarge": "القائمة كبيرة أوي. استخدم ملف نصي أصغر.",
   "dashboard.managedLists.error.timeout": "رابط القائمة اتأخر أوي في الرد.",
   "dashboard.managedLists.error.invalidJson": "ده باين إنه JSON، بس مش JSON صحيح. صلّح صيغة JSON واعرض المعاينة تاني.",
-  "dashboard.managedLists.error.noValidRows": "ملقيناش قنوات أو كلمات مفتاحية صالحة"
+  "dashboard.managedLists.error.noValidRows": "ملقيناش قنوات أو كلمات مفتاحية صالحة",
+  "render.saved": "اتحفظ!"
 }

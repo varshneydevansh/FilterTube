@@ -1669,5 +1669,6 @@
   "dashboard.managedLists.error.tooLarge": "सूची बहुत बड़ी है। छोटी टेक्स्ट फ़ाइल इस्तेमाल करें।",
   "dashboard.managedLists.error.timeout": "सूची URL से जवाब आने में बहुत समय लगा।",
   "dashboard.managedLists.error.invalidJson": "यह JSON जैसा दिखता है, लेकिन मान्य JSON नहीं है। JSON सिंटैक्स ठीक करके फिर से पूर्वावलोकन करें।",
-  "dashboard.managedLists.error.noValidRows": "कोई मान्य चैनल या कीवर्ड नहीं मिला"
+  "dashboard.managedLists.error.noValidRows": "कोई मान्य चैनल या कीवर्ड नहीं मिला",
+  "render.saved": "सहेज लिया गया!"
 }

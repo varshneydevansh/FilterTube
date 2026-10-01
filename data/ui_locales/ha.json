@@ -1669,5 +1669,6 @@
   "dashboard.managedLists.error.tooLarge": "Jerin ya yi girma sosai. Yi amfani da ƙaramin fayil ɗin rubutu.",
   "dashboard.managedLists.error.timeout": "Adireshin jerin ya ɗauki lokaci mai tsawo kafin ya amsa.",
   "dashboard.managedLists.error.invalidJson": "Wannan yana kama da JSON, amma ba ingantaccen JSON ba ne. Gyara tsarin JSON sannan ka sake duba samfoti.",
-  "dashboard.managedLists.error.noValidRows": "Ba a sami ingantattun tashoshi ko kalmomin nema ba"
+  "dashboard.managedLists.error.noValidRows": "Ba a sami ingantattun tashoshi ko kalmomin nema ba",
+  "render.saved": "An adana!"
 }

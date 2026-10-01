@@ -1669,5 +1669,6 @@
   "dashboard.managedLists.error.tooLarge": "清單太大，請改用細啲嘅文字檔。",
   "dashboard.managedLists.error.timeout": "清單網址等咗好耐都冇回應。",
   "dashboard.managedLists.error.invalidJson": "呢個似乎係 JSON，但格式唔正確。請修正 JSON 語法，再重新預覽。",
-  "dashboard.managedLists.error.noValidRows": "搵唔到有效嘅頻道或關鍵字"
+  "dashboard.managedLists.error.noValidRows": "搵唔到有效嘅頻道或關鍵字",
+  "render.saved": "已儲存！"
 }

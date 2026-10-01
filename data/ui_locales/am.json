@@ -1669,5 +1669,6 @@
   "dashboard.managedLists.error.tooLarge": "ዝርዝሩ በጣም ትልቅ ነው። አነስ ያለ የጽሑፍ ፋይል ይጠቀሙ።",
   "dashboard.managedLists.error.timeout": "የዝርዝሩ URL ምላሽ ለመስጠት በጣም ዘገየ።",
   "dashboard.managedLists.error.invalidJson": "ይህ JSON ይመስላል፣ ግን ትክክለኛ JSON አይደለም። የJSON አገባብን አስተካክለው እንደገና ቅድመ እይታ ያድርጉ።",
-  "dashboard.managedLists.error.noValidRows": "ምንም ትክክለኛ ቻናል ወይም ቁልፍ ቃል አልተገኘም"
+  "dashboard.managedLists.error.noValidRows": "ምንም ትክክለኛ ቻናል ወይም ቁልፍ ቃል አልተገኘም",
+  "render.saved": "ተቀምጧል!"
 }

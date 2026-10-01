@@ -1669,5 +1669,6 @@
   "dashboard.managedLists.error.tooLarge": "リストが大きすぎます。より小さいテキストファイルを使用してください。",
   "dashboard.managedLists.error.timeout": "リストの URL から応答が返るまでに時間がかかりすぎました。",
   "dashboard.managedLists.error.invalidJson": "JSON のようですが、有効な JSON ではありません。構文を修正して、もう一度プレビューしてください。",
-  "dashboard.managedLists.error.noValidRows": "有効なチャンネルまたはキーワードが見つかりません"
+  "dashboard.managedLists.error.noValidRows": "有効なチャンネルまたはキーワードが見つかりません",
+  "render.saved": "保存しました！"
 }

@@ -1,0 +1,19 @@
+{
+  "english": { "render.saved": "Saved!" },
+  "keys": ["render.saved"],
+  "translations": {
+    "zh-Hans": ["已保存！"], "hi": ["सहेज लिया गया!"], "es": ["¡Guardado!"],
+    "ar": ["تم الحفظ!"], "fr": ["Enregistré !"], "bn": ["সংরক্ষিত হয়েছে!"],
+    "pt": ["Salvo!"], "id": ["Tersimpan!"], "ur": ["محفوظ ہو گیا!"],
+    "ru": ["Сохранено!"], "de": ["Gespeichert!"], "ja": ["保存しました！"],
+    "pcm": ["E don save!"], "arz": ["اتحفظ!"], "mr": ["जतन केले!"],
+    "vi": ["Đã lưu!"], "te": ["సేవ్ అయింది!"], "sw": ["Imehifadhiwa!"],
+    "ha": ["An adana!"], "tr": ["Kaydedildi!"], "pa-Arab": ["محفوظ ہو گیا!"],
+    "fil": ["Na-save na!"], "ta": ["சேமிக்கப்பட்டது!"], "yue-Hant": ["已儲存！"],
+    "wuu-Hans": ["保存好了！"], "fa": ["ذخیره شد!"], "ko": ["저장됐어요!"],
+    "am": ["ተቀምጧል!"], "th": ["บันทึกแล้ว!"], "jv": ["Wis disimpen!"],
+    "it": ["Salvato!"], "gu": ["સાચવી લીધું!"], "kn": ["ಉಳಿಸಲಾಗಿದೆ!"],
+    "apc": ["تم الحفظ!"], "apd": ["تم الحفظ!"], "yo": ["A ti fi pamọ́!"],
+    "bho": ["सहेज दिहल गइल!" ]
+  }
+}
