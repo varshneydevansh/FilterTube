@@ -14019,7 +14019,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         });
 
         if (!resp || resp.ok !== true) {
-            UIComponents.showToast('Failed to enable whitelist mode', 'error');
+            UIComponents.showToast(tabViewUiText('dashboard.toast.enableWhitelistModeFailed', 'Failed to enable whitelist mode'), 'error');
             return;
         }
 
@@ -14047,7 +14047,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             inProgress: false,
             canEnableWhitelist: false
         });
-        UIComponents.showToast('Whitelist mode enabled', 'success');
+        UIComponents.showToast(tabViewUiText('dashboard.toast.whitelistModeEnabled', 'Whitelist mode enabled'), 'success');
     }
 
     function handleSubscriptionsImportProgress(progress = {}) {
@@ -15049,7 +15049,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         const parentId = getParentAccountId(profilesV4, childId) || 'default';
         const ok = await ensureProfileUnlocked(profilesV4, parentId);
         if (!ok) {
-            UIComponents.showToast('Parent approval is required before this protected profile can trust or apply a new sync source.', 'error');
+            UIComponents.showToast(tabViewUiText('dashboard.sync.toast.parentApprovalRequiredForNewSource', 'Parent approval is required before this protected profile can trust or apply a new sync source.'), 'error');
             return false;
         }
         return true;
@@ -16097,7 +16097,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         const activeId = normalizeString(profilesV4?.activeProfileId) || activeProfileId || 'default';
         const unlocked = await ensureProfileUnlocked(profilesV4, activeId);
         if (!unlocked) {
-            UIComponents.showToast('Unlock this protected profile to allow trusted parent updates while it is locked later.', 'error');
+            UIComponents.showToast(tabViewUiText('dashboard.sync.toast.unlockProtectedProfileForSavedUpdates', 'Unlock this protected profile to allow trusted parent updates while it is locked later.'), 'error');
             return false;
         }
         return true;
@@ -17092,11 +17092,11 @@ document.addEventListener('DOMContentLoaded', async () => {
         const command = 'npm run managed:nearby';
         try {
             await navigator.clipboard.writeText(command);
-            UIComponents.showToast('Nearby helper command copied', 'success');
+            UIComponents.showToast(tabViewUiText('dashboard.sync.toast.nearbyHelperCommandCopied', 'Nearby helper command copied'), 'success');
             return true;
         } catch (error) {
             console.error('FilterTube: failed to copy nearby helper command', error);
-            UIComponents.showToast('Could not copy the nearby helper command', 'error');
+            UIComponents.showToast(tabViewUiText('dashboard.sync.toast.nearbyHelperCommandCopyFailed', 'Could not copy the nearby helper command'), 'error');
             return false;
         }
     }
@@ -17221,7 +17221,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                 await showNanahNearbyHelperChoice();
                 return discoverNanahNearbyDevices({ reason });
             }
-            UIComponents.showToast('Nearby helper found', 'success');
+            UIComponents.showToast(tabViewUiText('dashboard.sync.toast.nearbyHelperFound', 'Nearby helper found'), 'success');
         }
         if (safeObject(nanahNearbyDiscoverySession).active === true) {
             return safeObject(nanahNearbyDiscoveryState);
@@ -17348,7 +17348,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     async function startNanahNearbyVisibility() {
         if (safeObject(nanahNearbyVisibilityState).active === true) {
             await stopNanahNearbyVisibility({ withdraw: true, reason: 'manual_stop' });
-            UIComponents.showToast('This device is no longer visible nearby', 'info');
+            UIComponents.showToast(tabViewUiText('dashboard.sync.toast.deviceNoLongerVisibleNearby', 'This device is no longer visible nearby'), 'info');
             return;
         }
         let provider = getNanahManagedLocalNetworkProvider();
@@ -17359,7 +17359,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                 await showNanahNearbyHelperChoice();
                 return;
             }
-            UIComponents.showToast('Nearby helper found', 'success');
+            UIComponents.showToast(tabViewUiText('dashboard.sync.toast.nearbyHelperFound', 'Nearby helper found'), 'success');
         }
         const candidateId = crypto.randomUUID ? crypto.randomUUID() : createNanahNearbyEphemeralValue(16);
         nanahNearbyVisibilityState = {
@@ -17375,7 +17375,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             await announceNanahNearbyVisibility();
         } catch (error) {
             nanahNearbyVisibilityState = null;
-            UIComponents.showToast('This device could not appear nearby. Check Home Pickup.', 'warning');
+            UIComponents.showToast(tabViewUiText('dashboard.sync.toast.deviceCouldNotAppearNearby', 'This device could not appear nearby. Check Home Pickup.'), 'warning');
             renderNanahDeliveryPathStrip();
             return;
         }
@@ -17389,7 +17389,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             void stopNanahNearbyVisibility({ withdraw: true, reason: 'visibility_timeout' });
         }, NANAH_NEARBY_SESSION_MAX_MS);
         renderNanahDeliveryPathStrip();
-        UIComponents.showToast('This device is visible nearby for three minutes', 'success');
+        UIComponents.showToast(tabViewUiText('dashboard.sync.toast.deviceVisibleNearbyThreeMinutes', 'This device is visible nearby for three minutes'), 'success');
         void pollNanahNearbyPairingInvitations();
     }
 
@@ -17469,6 +17469,424 @@ document.addEventListener('DOMContentLoaded', async () => {
         nanahHomeBridgePreviewState = nextState;
         renderNanahDeliveryPathStrip();
         return nextState;
+    }
+
+    const FAMILY_DEVICE_MAP_COPY = Object.freeze({
+        'action.chooseProfileAndPair': 'Choose profile and pair',
+        'action.receiveParentUpdate': 'Receive parent update',
+        'action.createProtectedProfile': 'Create protected profile',
+        'action.sendBeforeProfileExists': 'Send before profile exists',
+        'action.reviewAndSend': 'Review and send',
+        'action.skipParentReview': 'Skip parent review',
+        'action.matchSafetyPhrase': 'Match safety phrase',
+        'action.saveTrustBeforePhraseMatch': 'Save trust before phrase match',
+        'action.checkSavedDelivery': 'Check saved delivery',
+        'action.treatPickupAsPermission': 'Treat pickup as permission',
+        'action.pairProtectedDevice': 'Pair protected device',
+        'action.sendBeforePairing': 'Send before pairing',
+        'action.removeOrPairAgain': 'Remove or pair again',
+        'action.sendThroughRevokedTrust': 'Send through revoked trust',
+        'action.sendUpdate': 'Send update',
+        'action.trustNewDeviceFromVisibility': 'Trust a new device from visibility',
+        'action.openTrustedDeviceControls': 'Open trusted-device controls',
+        'action.pairNearbyDevice': 'Pair nearby device',
+        'action.changeTargetWithoutParentUnlock': 'Change target without parent unlock',
+        'action.checkOrSendLaterUpdate': 'Check or send later update',
+        'action.claimPickupBeforeReceipt': 'Claim pickup before receipt',
+        'action.sendThroughHomePickup': 'Send through Home Pickup',
+        'action.bypassTrustedLink': 'Bypass trusted link',
+        'action.useTrustedDeviceControls': 'Use trusted-device controls',
+        'action.checkReceivedUpdate': 'Check received update',
+        'action.editParentPolicyFromChild': 'Edit parent policy from child',
+        'action.useCodeOrQr': 'Use code or QR',
+        'action.trustFromVisibility': 'Trust from visibility',
+        'device.protectedProfile': 'Protected profile',
+        'device.thisProfile': 'This profile',
+        'device.profileCopy': 'Profile copy',
+        'device.ready': 'Ready',
+        'device.readyOnHomeSetup': 'Ready on home setup',
+        'device.canPickUpLater': 'Can pick up later',
+        'device.foundNearby': 'Found nearby',
+        'device.seenThroughHomeBridge': 'Seen through Home Bridge',
+        'device.trustedDevice': 'Trusted device',
+        'device.remoteProfile': 'Remote profile',
+        'device.openNow': 'open now',
+        'device.pairMyOtherDevice': 'Pair my other device',
+        'device.pairProtectedDevice': 'Pair a protected device',
+        'device.createProtectedProfile': 'Create a protected profile',
+        'device.profileDefault': 'Default',
+        'device.profileTitle': '{device} - {profile}',
+        'device.usedDate': 'used {date}',
+        'device.status.off': 'Off',
+        'device.status.needsPickupSetup': 'Needs pickup setup',
+        'device.status.internetPickupNotReady': 'Internet Pickup not ready',
+        'device.status.cannotApplyHere': 'Cannot apply here',
+        'device.status.waitingHomePickup': 'Waiting for Home Pickup',
+        'device.status.noMatchingParentLink': 'No matching parent link',
+        'device.status.checked': 'Checked',
+        'device.status.noUpdates': 'No updates',
+        'device.status.homePickupRejected': 'Home Pickup rejected',
+        'device.status.noSentPolicy': 'No sent policy',
+        'device.status.waitingForSendReceipt': 'Waiting for send receipt',
+        'device.status.waitingForPickup': 'Waiting for pickup',
+        'device.status.checkDelivery': 'Check delivery',
+        'device.status.pickedUp': 'Picked up',
+        'device.status.checkDeliveryFailed': 'Check delivery failed',
+        'device.status.updateCheckRejected': 'Update check rejected',
+        'device.status.appliedRejectedAckFailed': '{applied} applied, {rejected} rejected, {failed} ack failed',
+        'device.status.appliedRejected': '{applied} applied, {rejected} rejected',
+        'device.status.acceptedRejectedAckFailed': '{accepted} accepted, {rejected} rejected, {failed} ack failed',
+        'device.status.acceptedRejected': '{accepted} accepted, {rejected} rejected',
+        'device.status.receiptIgnoredOne': '{count} receipt ignored',
+        'device.status.receiptIgnoredMany': '{count} receipts ignored',
+        'device.status.internetPickupPrefix': 'Internet Pickup: {status}',
+        'device.status.homePickupPrefix': 'Home Pickup: {status}',
+        'device.status.checkedAge': '{status} ({age})',
+        'device.status.ageJustNow': 'just now',
+        'device.status.ageMinutes': '{count}m ago',
+        'device.status.ageHours': '{count}h ago',
+        'device.status.ageDays': '{count}d ago',
+        'preview.nextStep': 'Next step',
+        'preview.chooseVerifiedDevice': 'Choose a verified device or pair one first',
+        'preview.parentApprovedAccess': 'Only parent-approved rules, time, and access can be sent.',
+        'preview.nextAction': 'Next: {action}',
+        'preview.willNotAction': 'Will not: {action}',
+        'preview.continue': 'Continue',
+        'preview.continueTitle': 'Continue to: {action}. This does not skip parent review or device verification.',
+        'preview.continueHelp': 'Continue to the selected safe action: {action}. This button does not send, trust, or apply anything by itself.',
+        'intent.verifiedEyebrow': 'Verified for this session',
+        'intent.verifiedDetail': 'Review the profile update, then send it or save parent trust only for this verified device.',
+        'intent.matchPhraseEyebrow': 'Match the phrase',
+        'intent.matchPhraseDetail': 'Do not send yet. Confirm only when both devices show the same safety phrase.',
+        'intent.connectedEyebrow': 'Connected',
+        'intent.connectedDetail': 'Waiting for the safety phrase before this selection can be trusted.',
+        'intent.waitingPairingEyebrow': 'Waiting for pairing',
+        'intent.waitingPairingDetail': 'Use the code or QR on the other device. This selection is still not trusted.',
+        'intent.startingPairingEyebrow': 'Starting pairing',
+        'intent.startingPairingDetail': 'Keep both devices open. Nothing applies until the safety phrase is confirmed.',
+        'intent.selectedEyebrow': 'Selected intent',
+        'intent.selectedDetail': 'Start pairing with code or QR. Nothing is trusted until both devices show the same phrase.',
+        'selection.sendUpdateDetail': 'Press Send update. FilterTube will use one available path for this verified device.',
+        'selection.receiveUpdateDetail': 'Use the trusted-device controls below to open a receive session or check waiting parent updates.',
+        'selection.manageDeviceDetail': 'Use the trusted-device controls below to reconnect, edit, or remove this device link.',
+        'selection.homeBridgeVerifiedDetail': 'Home Bridge found this already verified saved device. Review the destination, then send.',
+        'selection.reviewVerifiedDetail': 'Review the destination, then choose one available verified path.',
+        'selection.foundNearbyDetail': 'Found on your Home Bridge. Pairing still needs the matching safety phrase before any update can be sent.',
+        'selection.pairNearbyDetail': 'Tap Pair nearby device. The other device will receive only the short pairing code, then both screens must show the same phrase.',
+        'selection.homeBridgePreview': 'Home Bridge preview',
+        'selection.selectedPath': 'Selected path',
+        'selection.savedDevice': 'Saved device',
+        'selection.trustedDevice': 'Trusted device',
+        'selection.readyHome': 'Ready on home setup',
+        'selection.canOpenLater': 'Can open later',
+        'selection.verifiedDevice': 'Verified device',
+        'selection.homeBridgeSendDetail': 'Use trusted-device controls below before sending.',
+        'selection.savedDeviceDetail': 'Saved device selection is only a shortcut to the trusted-device controls below.',
+        'selection.sendApprovedUpdate': 'Send parent-approved update now',
+        'selection.bothVerifiedDetail': 'Both devices are open and verified for this session.',
+        'selection.copyProfile': 'Copy this profile',
+        'selection.openOtherDevice': 'Open FilterTube on your other device',
+        'selection.copyCodeOrQrDetail': 'Use the short code or QR from anywhere. No protected profile or PIN is required.',
+        'selection.afterCreateProfileDetail': 'After that, pair the protected device and send reviewed rules.',
+        'selection.pairProtectedDevice': 'Pair a protected device',
+        'selection.enterCodeAndMatchPhrase': 'Open FilterTube on the other device, enter the code or scan QR, then match the safety phrase.',
+        'selection.verifiedDeviceCountOne': '{count} verified device can receive updates',
+        'selection.verifiedDeviceCountMany': '{count} verified devices can receive updates',
+        'selection.readyDeviceCountOne': '{count} verified device is ready now. Later delivery remains optional under Advanced.',
+        'selection.readyDeviceCountMany': '{count} verified devices are ready now. Later delivery remains optional under Advanced.',
+        'selection.sendUpdateWhenOpenDetail': 'Use Send Update when a device is open; same-place and open-later delivery stay optional under Advanced.',
+        'presence.samePlace': 'Same place',
+        'presence.defaultTitle': 'Use Open now unless you set up Home Pickup',
+        'presence.permissionDetail': 'Home or school is optional. Finding a device never gives permission by itself.',
+        'presence.optionalSetup': 'Optional setup',
+        'presence.helperNotRunning': 'Nearby helper is not running',
+        'presence.homePickupOff': 'Home Pickup is off',
+        'presence.pairFirst': 'Pair a device first',
+        'presence.personalSetupDetail': 'Use code or QR now, or start the optional helper to select an opted-in device nearby.',
+        'presence.homeSetupDetail': 'You can use Open now. Set up Home Pickup only if this family device should collect updates from your own setup.',
+        'presence.createAndPairDetail': 'Create and pair a protected device before using same-place pickup.',
+        'presence.nearby': 'Nearby',
+        'presence.oneDeviceReadyToPair': '{count} device ready to pair',
+        'presence.manyDevicesReadyToPair': '{count} devices ready to pair',
+        'presence.matchPhraseDetail': 'Choose a device. It is not trusted until both screens show the same safety phrase.',
+        'presence.visibleNearby': 'Visible nearby',
+        'presence.waitingOtherDevice': 'Waiting for your other device',
+        'presence.waitingParentDevice': 'Waiting for a parent device',
+        'presence.keepOtherOpenDetail': 'Keep this page open. Your other device can select this one, then both screens must match the safety phrase.',
+        'presence.keepParentOpenDetail': 'Keep this page open. A nearby parent can invite this device to the normal phrase-verified pairing flow.',
+        'presence.lookingNearby': 'Looking nearby',
+        'presence.waitingFamilyDevice': 'Waiting for a family device',
+        'presence.appearChoiceDetail': 'Devices appear here after they choose Let this device appear.',
+        'presence.found': 'Found',
+        'presence.oneVerifiedOnHome': '{count} verified device on Home Pickup',
+        'presence.manyVerifiedOnHome': '{count} verified devices on Home Pickup',
+        'presence.newDevicePhraseDetail': 'Choose a found device above. New or unpaired devices still need the code, QR, and matching phrase first.',
+        'presence.checkSetup': 'Check setup',
+        'presence.homePickupNoAnswer': 'Home Pickup did not answer',
+        'presence.homePickupCheckDetail': 'Use Open now while both devices are available, or check the Home Pickup setup in Advanced.',
+        'presence.noneFound': 'None found',
+        'presence.noNearbyDevice': 'No nearby device found',
+        'presence.findMyDeviceDetail': 'On the other device, open My Devices & Family and choose Let this device appear, or use the short code instead.',
+        'presence.findFamilyDeviceDetail': 'On the other device, open Family Devices and choose Let this device appear, or use the short code instead.',
+        'presence.readyToCheck': 'Ready to check',
+        'presence.findOtherDevice': 'Find your other device',
+        'presence.findFamilyDevice': 'Find a family device',
+        'presence.findOtherDeviceDetail': 'Tap Find nearby, or let this device appear so your other device can find it.',
+        'presence.findFamilyDeviceDetail': 'Tap Find nearby, or let this device appear so another family device can find it.',
+        'presence.stopFinding': 'Stop finding',
+        'presence.findNearby': 'Find nearby',
+        'presence.stopSearchHelp': 'Stops this short nearby search. No device trust is changed.',
+        'presence.findNearbyHelp': 'Looks through the local nearby helper for two minutes. A found device is not trusted until the safety phrase matches.',
+        'presence.stopShowing': 'Stop showing',
+        'presence.letDeviceAppear': 'Let this device appear',
+        'presence.stopVisibilityHelp': 'Stops the short-lived nearby session now.',
+        'presence.visibilityHelp': 'Makes this device visible through the local nearby helper for three minutes. Visibility never grants trust or parent control.',
+        'presence.stopLookingToast': 'Stopped looking for nearby devices',
+        'presence.foundNearbyToast': 'Found {count} nearby device',
+        'presence.foundNearbyToastPlural': 'Found {count} nearby devices',
+        'presence.lookNearbyToast': 'Looking nearby. Let the other device appear within two minutes.',
+        'presence.oneFoundNearby': 'Found nearby - pair first',
+        'presence.nearbyCandidateAria': '{label}. Found nearby. Pair with code and matching safety phrase.',
+        'map.status.pairNeeded': 'Pair needed',
+        'map.status.profileFirst': 'Profile first',
+        'map.status.checkSetup': 'Check setup',
+        'map.status.visible': 'Visible',
+        'map.status.looking': 'Looking',
+        'map.status.optional': 'Optional',
+        'map.status.pairFirst': 'Pair first',
+        'map.oneReady': '{count} ready',
+        'map.manyReady': '{count} ready',
+        'map.homeCheckDidNotFinish': 'Home check did not finish',
+        'map.nearbyDevice': 'Nearby device',
+        'evidence.openBeforeCopy': 'Open Family Devices first, then copy evidence',
+        'evidence.copied': 'Copied redacted Family Devices evidence',
+        'evidence.copyFailed': 'Could not copy Family Devices evidence',
+        'evidence.openBeforeDownload': 'Open Family Devices first, then download evidence',
+        'evidence.downloaded': 'Downloaded redacted Family Devices evidence',
+        'evidence.downloadFailed': 'Could not download Family Devices evidence',
+        'action.nextInline': 'Next: {action}',
+        'action.blockedInline': 'Will not: {action}',
+        'action.pairWithCodeOrQr': 'Pair with code or QR',
+        'action.setUpHomePickup': 'Set up Home Pickup',
+        'action.pairProtectedDeviceBare': 'Pair protected device',
+        'action.setUpOpenLater': 'Set up Open Later',
+        'action.useOpenLaterPickup': 'Use open-later pickup',
+        'action.treatSameNetworkAsTrust': 'Treat same network as trust',
+        'trusted.homeBridgeCandidate': 'Home Bridge candidate {label}',
+        'trusted.savedDevice': 'Saved device {label}',
+        'trusted.nextAction': 'Next action {action}',
+        'trusted.blockedAction': 'Blocked action {action}',
+        'trusted.controlsBelow': 'Use trusted-device controls below.',
+        'trusted.homeBridgeHelp': 'This is a verified saved device surfaced by Home Bridge preview. It is not a new unpaired device.',
+        'trusted.savedHelp': 'Choose this saved device, review its bound profile, then select one available delivery path.',
+        'map.myDevices': 'My device map',
+        'map.familyDevices': 'Family device map',
+        'map.personalTitle': 'Choose how to connect your other device',
+        'map.familyTitle': 'Choose how to reach the protected device',
+        'map.personalDetail': 'Use a code or QR from anywhere, or find the device through your configured home setup.',
+        'map.familyDetail': 'Tap a path. FilterTube will show the next safe step and what it will not do.',
+        'map.personalRuleTitle': 'Both devices can be ordinary profiles.',
+        'map.familyRuleTitle': 'Open now is the normal setup.',
+        'map.personalRuleDetail': 'No PIN is required. Match the safety phrase before copying the open profile.',
+        'map.familyRuleDetail': 'Same-place and open-later delivery only work after the protected device is already paired and trusted.',
+        'map.thisDevice': 'This device',
+        'map.parentDevice': 'Parent device',
+        'map.currentProfile': 'the current profile',
+        'map.currentProfileStartsHere': 'Current profile starts here',
+        'map.controlsStayHere': 'Controls stay here',
+        'map.personalCenterDetail': 'Switch profiles first to copy a different one.',
+        'map.familyCenterDetail': 'Pick rules, time, and Main/Kids access.',
+        'map.personalStageAria': 'Choose how to connect another personal device',
+        'map.familyStageAria': 'Choose how this parent device reaches a protected device',
+        'map.personalCenterHelp': 'This is the profile being copied. No PIN or protected profile is required; switch profiles first to copy another one.',
+        'map.familyCenterHelp': 'The parent device chooses the rules, time limits, and Main/Kids access. The protected device only receives approved updates.',
+        'map.startHere': 'Start here',
+        'map.firstStep': 'First step',
+        'map.readyToSendNow': 'Ready to send now',
+        'map.codeOrQrAnyLocation': 'Code or QR - any location',
+        'map.openNow': 'Open now',
+        'map.createProtectedProfile': 'Create protected profile',
+        'map.reviewCopyCurrent': 'Review, then copy the current profile.',
+        'map.reviewAndSend': 'Review the selected profile, then Send Update.',
+        'map.useCodeOrQrBothOpen': 'Use code or QR while both devices are open.',
+        'map.makeProfileBeforePairing': 'Make one protected profile before pairing.',
+        'map.findMyNearbyDevice': 'Find my nearby device',
+        'map.noPairedDevice': 'No paired device yet',
+        'map.optionalHomeBridge': 'Optional: use your configured Home Bridge for nearby selection.',
+        'map.pairFirstAdvanced': 'Pair first; same-place setup is Advanced.',
+        'map.choosePairMatchPhrase': 'Choose a device, then pair and match the phrase.',
+        'map.waitingOtherFind': 'Waiting for another device to find this one.',
+        'map.devicesAppearOptIn': 'Devices appear here after they choose Let this device appear.',
+        'map.verifiedDevicesVisible': 'Already verified devices are visible here.',
+        'map.checkHomeSetup': 'Check home setup',
+        'map.samePlaceNeedsCheck': 'Same-place pickup needs a check.',
+        'map.noDeviceFound': 'No device found',
+        'map.letOtherAppearOrCode': 'Let the other device appear, or use the short code.',
+        'map.verifiedCollectSetup': 'A verified device can collect on this setup.',
+        'map.noVerifiedSavedDevice': 'No verified saved device found yet.',
+        'map.tapFindHomeBridge': 'Tap to find through Home Bridge.',
+        'map.optionalSamePlaceAdvanced': 'Optional same-place setup stays Advanced.',
+        'map.awayOrLater': 'Away or later',
+        'map.openLater': 'Open later',
+        'map.laterPickupNeedsCheck': 'Later pickup needs a check.',
+        'map.oneVerifiedCollectLater': 'A verified device can collect later.',
+        'map.verifiedDevicesCollectLater': 'Verified devices can collect later.',
+        'map.forVerifiedDevicesLater': 'For verified devices that open later.',
+        'map.oneNearby': '{count} nearby',
+        'map.manyNearby': '{count} nearby',
+        'map.oneVerified': '{count} verified',
+        'map.manyVerified': '{count} verified',
+        'map.oneVerifiedAtHome': '{count} verified at home',
+        'map.manyVerifiedAtHome': '{count} verified at home',
+        'map.oneReadyNearby': '{count} ready nearby',
+        'map.manyReadyNearby': '{count} ready nearby',
+        'map.oneCanOpenLater': '{count} can open later',
+        'map.manyCanOpenLater': '{count} can open later',
+        'map.onePickupPath': '{count} pickup path',
+        'map.manyPickupPaths': '{count} pickup paths',
+        'map.onePairedDevice': '{count} paired device',
+        'map.manyPairedDevices': '{count} paired devices',
+        'map.oneVerifiedDeviceFound': '{count} verified device found',
+        'map.manyVerifiedDevicesFound': '{count} verified devices found',
+        'map.homeBridgePreview': 'Home Bridge preview',
+        'map.homeSetupNeedsCheck': 'Home setup needs a check',
+        'map.findThroughHomeBridge': 'Find through Home Bridge',
+        'map.setUpHomePickupIfNeeded': 'Set up Home Pickup only if needed',
+        'map.chooseSavedVerifiedDevice': 'Choose a verified saved device, then use the trusted-device controls before sending.',
+        'map.checkHomePickupBeforeSamePlace': 'Use Open now, or check the Home Pickup setup before trying same-place delivery.',
+        'map.checkHomePickupInAdvanced': 'Use Open now while both devices are available, or check Home Pickup setup in Advanced.',
+        'map.pairAndSaveTrustFirst': 'Pair and save trust first, or keep using Open now when both devices are available.',
+        'map.checkHomeBridgeNoTrust': 'Tap Home or school to check your configured Home Bridge. This does not create trust.',
+        'map.mostFamiliesHomePickup': 'Most families can use Open now. Home Pickup is only for a trusted home, school, or clinic setup.',
+        'map.openLaterVerifiedDevice': 'Open later for a verified device',
+        'map.setUpLaterPickupIfNeeded': 'Set up later pickup only if needed',
+        'map.checkInternetPickupLater': 'Use Open now, or check the Internet Pickup setup before relying on later delivery.',
+        'map.signedParentUpdateLater': 'A verified device can collect a signed parent update after it opens later.',
+        'map.mostFamiliesLaterPickup': 'Most families can use Open now. Later pickup is only for verified devices that are often away or offline.',
+        'map.foundNearby': 'Found nearby',
+        'map.confirmPhraseBeforeTrust': 'Start pairing, then confirm the exact same safety phrase on both devices before saving trust or sending an update.',
+        'map.sendParentApprovedNow': 'Send parent-approved update now',
+        'map.bothDevicesOpenVerified': 'Both devices are open and verified for this session.',
+        'map.copyThisProfile': 'Copy this profile',
+        'map.openFilterTubeOtherDevice': 'Open FilterTube on your other device',
+        'map.codeQrAnywhereNoPin': 'Use the short code or QR from anywhere. No protected profile or PIN is required.',
+        'map.afterPairReviewedRules': 'After that, pair the protected device and send reviewed rules.',
+        'map.enterCodeScanQrMatch': 'Open FilterTube on the other device, enter the code or scan QR, then match the safety phrase.',
+        'map.oneVerifiedDeviceCanReceive': '{count} verified device can receive updates',
+        'map.manyVerifiedDevicesCanReceive': '{count} verified devices can receive updates',
+        'map.oneVerifiedReadyNow': '{count} verified device is ready now. Later delivery remains optional under Advanced.',
+        'map.manyVerifiedReadyNow': '{count} verified devices are ready now. Later delivery remains optional under Advanced.',
+        'map.sendWhenOpenAdvancedOptional': 'Use Send Update when a device is open; same-place and open-later delivery stay optional under Advanced.',
+        'map.compassRuleLive': 'Both devices are verified for this session. Review the profile, then send the parent-approved update.',
+        'map.compassRulePersonal': 'Personal sync copies only the profile open here. Pair and match the phrase first; switch profiles to copy another one.',
+        'map.compassRuleCreateProfile': 'Create one protected profile first. Seeing a device never gives it permission.',
+        'map.compassRulePairFirst': 'Pair a protected device first. Permission starts only after both screens show the same phrase.',
+        'map.compassRuleVerified': 'Verified devices can receive signed parent updates. Open now, same-place, and open-later only describe delivery.',
+        'map.aria.personal': 'My Devices map. Copying {profileName}. Nearby pairing candidates: {nearbyCount}. Trusted devices: {trustedCount}.',
+        'map.aria.family': 'Family Devices map. Protected profiles: {profileCount}. Nearby pairing candidates: {nearbyCount}. Verified devices: {verifiedCount}. Ready on the home setup: {homeReadyCount}. Ready for later pickup: {awayReadyCount}.',
+        'map.actionStatus': 'Status: {status}.',
+        'map.actionNext': 'Next: {action}.',
+        'map.actionBlocked': 'Will not: {action}.'
+    });
+
+    const FAMILY_DEVICE_MAP_REUSED_COPY = Object.freeze({
+        'Protected profile': 'managedOverlay.profile.protected',
+        'This profile': 'managedOverlay.profile.this',
+        'Ready': 'dashboard.selfControl.state.ready',
+        'Trusted device': 'dashboard.sync.status.trustedDevice',
+        'Create a protected profile': 'family.commandCenter.firstSetup.step.createProfile',
+        'Default': 'popup.profile.defaultName',
+        'used {date}': 'dashboard.sync.copy.usedOnDate',
+        'Off': 'family.commandCenter.detail.off',
+        'Next step': 'dashboard.sync.label.nextStep',
+        'Continue': 'dashboard.modal.continue',
+        'Verified device': 'family.commandCenter.detail.verifiedDevice',
+        'Home Pickup is off': 'family.commandCenter.providers.homePickupIsOff',
+        'Open now': 'family.commandCenter.route.openNow'
+    });
+
+    const FAMILY_DEVICE_MAP_COPY_LOOKUP = (() => {
+        const exact = new Map();
+        const templates = [];
+        const entries = [
+            ...Object.entries(FAMILY_DEVICE_MAP_REUSED_COPY).map(([fallback, key]) => ({ key, fallback })),
+            ...Object.entries(FAMILY_DEVICE_MAP_COPY)
+                .filter(([, fallback]) => !Object.prototype.hasOwnProperty.call(FAMILY_DEVICE_MAP_REUSED_COPY, fallback))
+                .map(([key, fallback]) => ({ key: `dashboard.sync.familyDeviceMap.${key}`, fallback }))
+        ];
+        for (const { key, fallback } of entries) {
+            const names = [];
+            const pattern = fallback.split(/\{([a-zA-Z][a-zA-Z0-9]*)\}/g).map((part, index) => {
+                if (index % 2 === 1) {
+                    names.push(part);
+                    return '([\\s\\S]+?)';
+                }
+                return part.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+            }).join('');
+            if (names.length) {
+                templates.push({ key, fallback, names, matcher: new RegExp(`^${pattern}$`) });
+            } else if (!exact.has(fallback)) {
+                exact.set(fallback, { key, fallback });
+            }
+        }
+        return { exact, templates };
+    })();
+
+    function familyDeviceMapText(key, fallback, values = {}) {
+        return tabViewUiText(`dashboard.sync.familyDeviceMap.${key}`, fallback, values);
+    }
+
+    function familyDeviceMapCount(count, oneKey, manyKey, oneFallback, manyFallback, values = {}) {
+        const numericCount = normalizeNonNegativeInteger(count);
+        const one = numericCount === 1;
+        return familyDeviceMapText(one ? oneKey : manyKey, one ? oneFallback : manyFallback, {
+            ...values,
+            count: numericCount
+        });
+    }
+
+    function familyDeviceMapCopy(value) {
+        if (typeof value !== 'string' || !value) return value;
+        const exact = FAMILY_DEVICE_MAP_COPY_LOOKUP.exact.get(value);
+        if (exact) return tabViewUiText(exact.key, exact.fallback);
+        for (const template of FAMILY_DEVICE_MAP_COPY_LOOKUP.templates) {
+            const match = value.match(template.matcher);
+            if (!match) continue;
+            const values = Object.fromEntries(template.names.map((name, index) => [name, match[index + 1]]));
+            return tabViewUiText(template.key, template.fallback, values);
+        }
+        return value;
+    }
+
+    function familyDeviceMapDeliveryStatus(value) {
+        const source = normalizeString(value);
+        if (!source) return '';
+        return source.split(' | ').map((part) => {
+            let status = part;
+            let age = '';
+            const ageMatch = status.match(/ \((just now|\d+[mhd] ago)\)$/);
+            if (ageMatch) {
+                age = ageMatch[1];
+                status = status.slice(0, ageMatch.index);
+            }
+            let transport = '';
+            const transportMatch = status.match(/^(Internet Pickup|Home Pickup): (.*)$/);
+            if (transportMatch) {
+                transport = transportMatch[1];
+                status = transportMatch[2];
+            }
+            let localized = familyDeviceMapCopy(status);
+            if (age) localized = familyDeviceMapText('device.status.checkedAge', '{status} ({age})', {
+                status: localized,
+                age: familyDeviceMapCopy(age)
+            });
+            if (transport === 'Internet Pickup') {
+                localized = familyDeviceMapText('device.status.internetPickupPrefix', 'Internet Pickup: {status}', { status: localized });
+            } else if (transport === 'Home Pickup') {
+                localized = familyDeviceMapText('device.status.homePickupPrefix', 'Home Pickup: {status}', { status: localized });
+            }
+            return localized;
+        }).join(' | ');
     }
 
     function getNanahFamilyDeviceMapActionContract(device) {
@@ -17965,23 +18383,23 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     async function copyNanahFamilyDeviceMapEvidence() {
         if (!ftNanahDeviceCompass || !nanahFamilyDeviceMapSnapshot) {
-            UIComponents.showToast('Open Family Devices first, then copy evidence', 'info');
+            UIComponents.showToast(familyDeviceMapText('evidence.openBeforeCopy', 'Open Family Devices first, then copy evidence'), 'info');
             return;
         }
         try {
             const evidence = getNanahFamilyDeviceMapEvidencePayload();
             const copied = await copyTextToClipboardWithFallback(JSON.stringify(evidence, null, 2));
             if (!copied) throw new Error('clipboard_copy_failed');
-            UIComponents.showToast('Copied redacted Family Devices evidence', 'success');
+            UIComponents.showToast(familyDeviceMapText('evidence.copied', 'Copied redacted Family Devices evidence'), 'success');
         } catch (error) {
             console.warn('FilterTube: failed to copy Family Devices evidence', error);
-            UIComponents.showToast('Could not copy Family Devices evidence', 'error');
+            UIComponents.showToast(familyDeviceMapText('evidence.copyFailed', 'Could not copy Family Devices evidence'), 'error');
         }
     }
 
     async function downloadNanahFamilyDeviceMapEvidence() {
         if (!ftNanahDeviceCompass || !nanahFamilyDeviceMapSnapshot) {
-            UIComponents.showToast('Open Family Devices first, then download evidence', 'info');
+            UIComponents.showToast(familyDeviceMapText('evidence.openBeforeDownload', 'Open Family Devices first, then download evidence'), 'info');
             return;
         }
         try {
@@ -17994,10 +18412,10 @@ document.addEventListener('DOMContentLoaded', async () => {
                 evidence,
                 { preferAnchor: IS_FIREFOX_TAB_VIEW }
             );
-            UIComponents.showToast('Downloaded redacted Family Devices evidence', 'success');
+            UIComponents.showToast(familyDeviceMapText('evidence.downloaded', 'Downloaded redacted Family Devices evidence'), 'success');
         } catch (error) {
             console.warn('FilterTube: failed to download Family Devices evidence', error);
-            UIComponents.showToast('Could not download Family Devices evidence', 'error');
+            UIComponents.showToast(familyDeviceMapText('evidence.downloadFailed', 'Could not download Family Devices evidence'), 'error');
         }
     }
 
@@ -18012,21 +18430,27 @@ document.addEventListener('DOMContentLoaded', async () => {
         statusTone = ''
     } = {}) {
         if (!button) return;
+        const localizedEyebrow = familyDeviceMapCopy(eyebrow);
+        const localizedTitle = familyDeviceMapCopy(title);
+        const localizedDetail = familyDeviceMapCopy(detail);
+        const localizedPrimary = familyDeviceMapCopy(normalizeString(primaryAction));
+        const localizedBlocked = familyDeviceMapCopy(normalizeString(blockedAction));
+        const localizedStatus = familyDeviceMapCopy(normalizeString(statusLabel));
         const eyebrowNode = button.querySelector('span');
         const titleNode = button.querySelector('strong');
         const detailNode = button.querySelector('small');
-        if (eyebrowNode && eyebrow) eyebrowNode.textContent = eyebrow;
-        if (titleNode && title) titleNode.textContent = title;
-        if (detailNode && detail) detailNode.textContent = detail;
+        if (eyebrowNode && eyebrow) eyebrowNode.textContent = localizedEyebrow;
+        if (titleNode && title) titleNode.textContent = localizedTitle;
+        if (detailNode && detail) detailNode.textContent = localizedDetail;
         const primary = normalizeString(primaryAction);
         const blocked = normalizeString(blockedAction);
         if (primary) button.dataset.primaryAction = primary;
         if (blocked) button.dataset.blockedAction = blocked;
         if (primary || blocked) {
             const helpParts = [
-                detail,
-                primary ? `Next: ${primary}.` : '',
-                blocked ? `Will not: ${blocked}.` : ''
+                localizedDetail,
+                primary ? familyDeviceMapText('map.actionNext', 'Next: {action}.', { action: localizedPrimary }) : '',
+                blocked ? familyDeviceMapText('map.actionBlocked', 'Will not: {action}.', { action: localizedBlocked }) : ''
             ].filter(Boolean);
             button.dataset.filtertubeHelp = helpParts.join(' ');
         }
@@ -18041,19 +18465,19 @@ document.addEventListener('DOMContentLoaded', async () => {
             if (primary) {
                 const primaryNode = document.createElement('span');
                 primaryNode.className = 'nanah-device-compass__action nanah-device-compass__action--primary';
-                primaryNode.textContent = `Next: ${primary}`;
+                primaryNode.textContent = familyDeviceMapText('action.nextInline', 'Next: {action}', { action: localizedPrimary });
                 actionRow.appendChild(primaryNode);
             }
             if (blocked) {
                 const blockedNode = document.createElement('span');
                 blockedNode.className = 'nanah-device-compass__action nanah-device-compass__action--blocked';
-                blockedNode.textContent = `Will not: ${blocked}`;
+                blockedNode.textContent = familyDeviceMapText('action.blockedInline', 'Will not: {action}', { action: localizedBlocked });
                 actionRow.appendChild(blockedNode);
             }
         } else if (actionRow) {
             actionRow.remove();
         }
-        const normalizedStatus = normalizeString(statusLabel);
+        const normalizedStatus = normalizeString(localizedStatus);
         const normalizedStatusTone = normalizeString(statusTone);
         let statusNode = button.querySelector('.nanah-device-compass__status-pill');
         if (normalizedStatus) {
@@ -18073,29 +18497,38 @@ document.addEventListener('DOMContentLoaded', async () => {
             delete button.dataset.statusTone;
         }
         const labelParts = [
-            eyebrow,
-            title,
-            detail,
-            normalizedStatus ? `Status: ${normalizedStatus}.` : '',
-            primary ? `Next: ${primary}.` : '',
-            blocked ? `Will not: ${blocked}.` : ''
+            localizedEyebrow,
+            localizedTitle,
+            localizedDetail,
+            normalizedStatus ? familyDeviceMapText('map.actionStatus', 'Status: {status}.', { status: normalizedStatus }) : '',
+            primary ? familyDeviceMapText('map.actionNext', 'Next: {action}.', { action: localizedPrimary }) : '',
+            blocked ? familyDeviceMapText('map.actionBlocked', 'Will not: {action}.', { action: localizedBlocked }) : ''
         ].filter(Boolean);
         if (labelParts.length) button.setAttribute('aria-label', labelParts.join(' '));
         button.dataset.selected = selected ? 'true' : 'false';
         button.setAttribute('aria-pressed', selected ? 'true' : 'false');
     }
 
-    function renderNanahDeviceSelectionPreview({ eyebrow = 'Next step', title = '', detail = '', primaryAction = '', blockedAction = '' } = {}) {
+    function renderNanahDeviceSelectionPreview({ eyebrow = 'Next step', title = '', titleIsUserData = false, detail = '', primaryAction = '', blockedAction = '' } = {}) {
         if (!ftNanahDeviceSelectionPreview) return;
+        const localizedEyebrow = familyDeviceMapCopy(eyebrow);
+        const fallbackTitle = familyDeviceMapCopy('Choose a verified device or pair one first');
+        const fallbackDetail = familyDeviceMapCopy('Only parent-approved rules, time, and access can be sent.');
+        const localizedTitle = title
+            ? (titleIsUserData ? title : familyDeviceMapCopy(title))
+            : fallbackTitle;
+        const localizedDetail = familyDeviceMapCopy(detail) || fallbackDetail;
         const eyebrowNode = ftNanahDeviceSelectionPreview.querySelector('span');
         const titleNode = ftNanahDeviceSelectionPreview.querySelector('strong');
         const detailNode = ftNanahDeviceSelectionPreview.querySelector('small');
-        if (eyebrowNode) eyebrowNode.textContent = eyebrow;
-        if (titleNode) titleNode.textContent = title || 'Choose a verified device or pair one first';
-        if (detailNode) detailNode.textContent = detail || 'Only parent-approved rules, time, and access can be sent.';
+        if (eyebrowNode) eyebrowNode.textContent = localizedEyebrow;
+        if (titleNode) titleNode.textContent = localizedTitle;
+        if (detailNode) detailNode.textContent = localizedDetail;
         const selectedActionSource = ftNanahDeviceCompass?.querySelector('[data-selected="true"][data-primary-action], [data-selected="true"][data-blocked-action]');
         const primary = normalizeString(primaryAction) || normalizeString(selectedActionSource?.dataset.primaryAction);
         const blocked = normalizeString(blockedAction) || normalizeString(selectedActionSource?.dataset.blockedAction);
+        const localizedPrimary = familyDeviceMapCopy(primary);
+        const localizedBlocked = familyDeviceMapCopy(blocked);
         ftNanahDeviceSelectionPreview.dataset.hasPrimaryAction = primary ? 'true' : 'false';
         ftNanahDeviceSelectionPreview.dataset.hasBlockedAction = blocked ? 'true' : 'false';
         ftNanahDeviceSelectionPreview.dataset.primaryAction = primary;
@@ -18103,11 +18536,11 @@ document.addEventListener('DOMContentLoaded', async () => {
         ftNanahDeviceSelectionPreview.setAttribute(
             'aria-label',
             [
-                eyebrow,
-                title || 'Choose a verified device or pair one first',
-                detail || 'Only parent-approved rules, time, and access can be sent.',
-                primary ? `Next: ${primary}.` : '',
-                blocked ? `Will not: ${blocked}.` : ''
+                localizedEyebrow,
+                localizedTitle,
+                localizedDetail,
+                primary ? familyDeviceMapText('map.actionNext', 'Next: {action}.', { action: localizedPrimary }) : '',
+                blocked ? familyDeviceMapText('map.actionBlocked', 'Will not: {action}.', { action: localizedBlocked }) : ''
             ].filter(Boolean).join(' ')
         );
         let actionRow = ftNanahDeviceSelectionPreview.querySelector('.nanah-device-compass__selection-actions');
@@ -18121,13 +18554,13 @@ document.addEventListener('DOMContentLoaded', async () => {
             if (primary) {
                 const primaryNode = document.createElement('span');
                 primaryNode.className = 'nanah-device-compass__selection-action nanah-device-compass__selection-action--primary';
-                primaryNode.textContent = `Next: ${primary}`;
+                primaryNode.textContent = familyDeviceMapText('action.nextInline', 'Next: {action}', { action: localizedPrimary });
                 actionRow.appendChild(primaryNode);
             }
             if (blocked) {
                 const blockedNode = document.createElement('span');
                 blockedNode.className = 'nanah-device-compass__selection-action nanah-device-compass__selection-action--blocked';
-                blockedNode.textContent = `Will not: ${blocked}`;
+                blockedNode.textContent = familyDeviceMapText('action.blockedInline', 'Will not: {action}', { action: localizedBlocked });
                 actionRow.appendChild(blockedNode);
             }
         } else if (actionRow) {
@@ -18136,16 +18569,16 @@ document.addEventListener('DOMContentLoaded', async () => {
         if (ftNanahDeviceSelectionActionBtn) {
             ftNanahDeviceSelectionActionBtn.hidden = !primary;
             ftNanahDeviceSelectionActionBtn.disabled = !primary;
-            ftNanahDeviceSelectionActionBtn.textContent = primary || 'Continue';
+            ftNanahDeviceSelectionActionBtn.textContent = localizedPrimary || familyDeviceMapCopy('Continue');
             ftNanahDeviceSelectionActionBtn.dataset.actionSource = normalizeString(selectedActionSource?.id)
                 || normalizeString(selectedActionSource?.dataset.source)
                 || normalizeString(selectedActionSource?.dataset.familyDeviceId)
                 || '';
             ftNanahDeviceSelectionActionBtn.title = primary
-                ? `Continue to: ${primary}. This does not skip parent review or device verification.`
+                ? familyDeviceMapText('preview.continueTitle', 'Continue to: {action}. This does not skip parent review or device verification.', { action: localizedPrimary })
                 : '';
             ftNanahDeviceSelectionActionBtn.dataset.filtertubeHelp = primary
-                ? `Continue to the selected safe action: ${primary}. This button does not send, trust, or apply anything by itself.`
+                ? familyDeviceMapText('preview.continueHelp', 'Continue to the selected safe action: {action}. This button does not send, trust, or apply anything by itself.', { action: localizedPrimary })
                 : '';
         }
     }
@@ -18231,13 +18664,15 @@ document.addEventListener('DOMContentLoaded', async () => {
         const eyebrowNode = ftNanahSelectedIntent.querySelector('span');
         const titleNode = ftNanahSelectedIntent.querySelector('strong');
         const detailNode = ftNanahSelectedIntent.querySelector('small');
-        if (eyebrowNode) eyebrowNode.textContent = stageCopy.eyebrow;
+        if (eyebrowNode) eyebrowNode.textContent = familyDeviceMapCopy(stageCopy.eyebrow);
         if (titleNode) titleNode.textContent = title;
         if (detailNode) {
             const intentDetail = normalizeString(intent.detail);
+            const localizedStageDetail = familyDeviceMapCopy(stageCopy.detail);
+            const localizedIntentDetail = familyDeviceMapCopy(intentDetail);
             detailNode.textContent = intentDetail
-                ? `${stageCopy.detail} ${intentDetail}`
-                : stageCopy.detail;
+                ? `${localizedStageDetail} ${localizedIntentDetail}`
+                : localizedStageDetail;
         }
     }
 
@@ -18271,7 +18706,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         if (!raw) return '';
         const date = new Date(raw);
         if (Number.isNaN(date.getTime())) return raw;
-        return `used ${date.toLocaleDateString()}`;
+        return familyDeviceMapText('device.usedDate', 'used {date}', { date: date.toLocaleDateString(tabViewIntlLocale()) });
     }
 
     function selectNanahTrustedMapDevice(device, button) {
@@ -18288,21 +18723,21 @@ document.addEventListener('DOMContentLoaded', async () => {
                 ? 'same-network'
                 : (route || 'verified');
         }
-        const label = normalizeString(row.label) || 'Trusted device';
+        const label = normalizeString(row.label) || familyDeviceMapCopy('Trusted device');
         const profile = normalizeString(row.profileName);
-        const routeLabel = normalizeString(row.routeLabel);
-        const state = normalizeString(row.deliveryState);
+        const routeLabel = familyDeviceMapCopy(normalizeString(row.routeLabel));
+        const state = familyDeviceMapDeliveryStatus(row.deliveryState);
         const fromHomeBridgePreview = normalizeString(row.source) === 'home-bridge-preview';
         const action = row.canSend
-            ? 'Press Send update. FilterTube will use one available path for this verified device.'
+            ? familyDeviceMapCopy('Press Send update. FilterTube will use one available path for this verified device.')
             : (row.canReceive
-                ? 'Use the trusted-device controls below to open a receive session or check waiting parent updates.'
-                : 'Use the trusted-device controls below to reconnect, edit, or remove this device link.');
+                ? familyDeviceMapCopy('Use the trusted-device controls below to open a receive session or check waiting parent updates.')
+                : familyDeviceMapCopy('Use the trusted-device controls below to reconnect, edit, or remove this device link.'));
         setNanahFamilyDeviceIntent({
-            title: profile ? `${label} - ${profile}` : label,
+            title: profile ? familyDeviceMapText('device.profileTitle', '{device} - {profile}', { device: label, profile }) : label,
             detail: fromHomeBridgePreview
-                ? 'Home Bridge found this already verified saved device. Review the destination, then send.'
-                : 'Review the destination, then choose one available verified path.',
+                ? familyDeviceMapCopy('Home Bridge found this already verified saved device. Review the destination, then send.')
+                : familyDeviceMapCopy('Review the destination, then choose one available verified path.'),
             source: fromHomeBridgePreview ? 'home-bridge-preview' : 'trusted-link',
             deviceId: row.id,
             linkId: row.linkId,
@@ -18310,7 +18745,8 @@ document.addEventListener('DOMContentLoaded', async () => {
         });
         renderNanahDeviceSelectionPreview({
             eyebrow: fromHomeBridgePreview ? 'Home Bridge preview' : 'Saved device',
-            title: profile ? `${label} - ${profile}` : label,
+            title: profile ? familyDeviceMapText('device.profileTitle', '{device} - {profile}', { device: label, profile }) : label,
+            titleIsUserData: true,
             detail: `${routeLabel ? `${routeLabel}. ` : ''}${state ? `${state}. ` : ''}${action}`,
             primaryAction: row.canSend ? 'Send update' : normalizeString(row.primaryAction),
             blockedAction: normalizeString(row.blockedAction)
@@ -18361,31 +18797,38 @@ document.addEventListener('DOMContentLoaded', async () => {
             button.dataset.deliveryState = normalizeString(row.deliveryState) || 'ready';
             button.dataset.selected = rowSelected ? 'true' : 'false';
             button.setAttribute('aria-pressed', rowSelected ? 'true' : 'false');
-            const routeCopy = normalizeString(row.routeLabel)
+            const routeCopy = familyDeviceMapCopy(normalizeString(row.routeLabel))
                 || (normalizeString(row.route) === 'away'
-                    ? 'Can open later'
-                    : (normalizeString(row.route) === 'same-network' ? 'Ready on home setup' : 'Verified device'));
+                    ? familyDeviceMapCopy('Can open later')
+                    : (normalizeString(row.route) === 'same-network' ? familyDeviceMapCopy('Ready on home setup') : familyDeviceMapCopy('Verified device')));
             const profileCopy = normalizeString(row.profileName);
-            const deliveryCopy = normalizeString(row.deliveryState);
-            const primaryAction = normalizeString(row.primaryAction);
-            const blockedAction = normalizeString(row.blockedAction);
-            if (primaryAction) button.dataset.primaryAction = primaryAction;
-            if (blockedAction) button.dataset.blockedAction = blockedAction;
-            button.dataset.hasPrimaryAction = primaryAction ? 'true' : 'false';
-            button.dataset.hasBlockedAction = blockedAction ? 'true' : 'false';
+            const deliveryCopy = familyDeviceMapDeliveryStatus(row.deliveryState);
+            const primaryActionRaw = normalizeString(row.primaryAction);
+            const blockedActionRaw = normalizeString(row.blockedAction);
+            const primaryAction = familyDeviceMapCopy(primaryActionRaw);
+            const blockedAction = familyDeviceMapCopy(blockedActionRaw);
+            if (primaryActionRaw) button.dataset.primaryAction = primaryActionRaw;
+            if (blockedActionRaw) button.dataset.blockedAction = blockedActionRaw;
+            button.dataset.hasPrimaryAction = primaryActionRaw ? 'true' : 'false';
+            button.dataset.hasBlockedAction = blockedActionRaw ? 'true' : 'false';
+            const deviceLabel = normalizeString(row.label) || familyDeviceMapCopy('Trusted device');
             const accessibleParts = [
-                `${normalizeString(row.source) === 'home-bridge-preview' ? 'Home Bridge candidate' : 'Saved device'} ${normalizeString(row.label) || 'Trusted device'}`,
+                familyDeviceMapText(
+                    normalizeString(row.source) === 'home-bridge-preview' ? 'trusted.homeBridgeCandidate' : 'trusted.savedDevice',
+                    normalizeString(row.source) === 'home-bridge-preview' ? 'Home Bridge candidate {label}' : 'Saved device {label}',
+                    { label: deviceLabel }
+                ),
                 profileCopy,
                 routeCopy,
                 deliveryCopy,
-                primaryAction ? `Next action ${primaryAction}` : '',
-                blockedAction ? `Blocked action ${blockedAction}` : ''
+                primaryAction ? familyDeviceMapText('trusted.nextAction', 'Next action {action}', { action: primaryAction }) : '',
+                blockedAction ? familyDeviceMapText('trusted.blockedAction', 'Blocked action {action}', { action: blockedAction }) : ''
             ].filter(Boolean);
             button.setAttribute('aria-label', accessibleParts.join('. '));
-            button.title = `${routeCopy}. ${deliveryCopy || 'Use trusted-device controls below.'}`;
+            button.title = `${routeCopy}. ${deliveryCopy || familyDeviceMapCopy('Use trusted-device controls below.')}`;
             button.dataset.filtertubeHelp = normalizeString(row.source) === 'home-bridge-preview'
-                ? `${routeCopy}. ${primaryAction ? `Next: ${primaryAction}. ` : ''}${blockedAction ? `Blocked: ${blockedAction}. ` : ''}This is a verified saved device surfaced by Home Bridge preview. It is not a new unpaired device.`
-                : `${routeCopy}. ${primaryAction ? `Next: ${primaryAction}. ` : ''}${blockedAction ? `Blocked: ${blockedAction}. ` : ''}Choose this saved device, review its bound profile, then select one available delivery path.`;
+                ? [routeCopy, primaryAction ? familyDeviceMapText('map.actionNext', 'Next: {action}.', { action: primaryAction }) : '', blockedAction ? familyDeviceMapText('map.actionBlocked', 'Will not: {action}.', { action: blockedAction }) : '', familyDeviceMapCopy('This is a verified saved device surfaced by Home Bridge preview. It is not a new unpaired device.')].filter(Boolean).join(' ')
+                : [routeCopy, primaryAction ? familyDeviceMapText('map.actionNext', 'Next: {action}.', { action: primaryAction }) : '', blockedAction ? familyDeviceMapText('map.actionBlocked', 'Will not: {action}.', { action: blockedAction }) : '', familyDeviceMapCopy('Choose this saved device, review its bound profile, then select one available delivery path.')].filter(Boolean).join(' ');
 
             const mark = document.createElement('span');
             mark.className = 'nanah-device-compass__trusted-mark';
@@ -18394,16 +18837,16 @@ document.addEventListener('DOMContentLoaded', async () => {
             const copy = document.createElement('span');
             copy.className = 'nanah-device-compass__trusted-copy';
             const title = document.createElement('strong');
-            title.textContent = normalizeString(row.label) || 'Trusted device';
+            title.textContent = deviceLabel;
             const detail = document.createElement('small');
             const parts = [
                 normalizeString(row.profileName),
-                normalizeString(row.routeLabel),
-                normalizeString(row.deliveryState),
+                familyDeviceMapCopy(normalizeString(row.routeLabel)),
+                familyDeviceMapDeliveryStatus(row.deliveryState),
                 primaryAction,
                 formatNanahFamilyDeviceLastSeen(row.lastSeen)
             ].filter(Boolean);
-            detail.textContent = parts.length ? parts.join(' | ') : 'Saved parent link';
+            detail.textContent = parts.length ? parts.join(' | ') : familyDeviceMapCopy('Saved parent link');
             copy.append(title, detail);
 
             button.append(mark, copy);
@@ -18428,14 +18871,15 @@ document.addEventListener('DOMContentLoaded', async () => {
         }
         setNanahFamilyDeviceIntent({
             title: row.label,
-            detail: 'Found on your Home Bridge. Pairing still needs the matching safety phrase before any update can be sent.',
+            detail: familyDeviceMapCopy('Found on your Home Bridge. Pairing still needs the matching safety phrase before any update can be sent.'),
             source: 'nearby-presence',
             deviceId: row.candidateId
         });
         renderNanahDeviceSelectionPreview({
             eyebrow: 'Found nearby',
             title: row.label,
-            detail: 'Tap Pair nearby device. The other device will receive only the short pairing code, then both screens must show the same phrase.',
+            titleIsUserData: true,
+            detail: familyDeviceMapCopy('Tap Pair nearby device. The other device will receive only the short pairing code, then both screens must show the same phrase.'),
             primaryAction: 'Pair nearby device',
             blockedAction: 'Send before phrase match'
         });
@@ -18495,7 +18939,13 @@ document.addEventListener('DOMContentLoaded', async () => {
         } else if (normalizedNearbyCandidates.length > 0) {
             tone = 'success';
             eyebrow = 'Nearby';
-            title = `${normalizedNearbyCandidates.length} device${normalizedNearbyCandidates.length === 1 ? '' : 's'} ready to pair`;
+            title = familyDeviceMapCount(
+                normalizedNearbyCandidates.length,
+                'presence.oneDeviceReadyToPair',
+                'presence.manyDevicesReadyToPair',
+                '{count} device ready to pair',
+                '{count} devices ready to pair'
+            );
             detail = 'Choose a device. It is not trusted until both screens show the same safety phrase.';
         } else if (nearbyVisibilityActive) {
             tone = 'success';
@@ -18512,7 +18962,13 @@ document.addEventListener('DOMContentLoaded', async () => {
         } else if (homeBridgeCandidateCount > 0) {
             tone = 'success';
             eyebrow = 'Found';
-            title = `${homeBridgeCandidateCount} verified device${homeBridgeCandidateCount === 1 ? '' : 's'} on Home Pickup`;
+            title = familyDeviceMapCount(
+                homeBridgeCandidateCount,
+                'presence.oneVerifiedOnHome',
+                'presence.manyVerifiedOnHome',
+                '{count} verified device on Home Pickup',
+                '{count} verified devices on Home Pickup'
+            );
             detail = 'Choose a found device above. New or unpaired devices still need the code, QR, and matching phrase first.';
         } else if (homeOffline || homeBridgePreviewHealthOk === false) {
             tone = 'warning';
@@ -18544,11 +19000,11 @@ document.addEventListener('DOMContentLoaded', async () => {
         copy.className = 'nanah-device-compass__presence-copy';
 
         const eyebrowNode = document.createElement('span');
-        eyebrowNode.textContent = eyebrow;
+        eyebrowNode.textContent = familyDeviceMapCopy(eyebrow);
         const titleNode = document.createElement('strong');
-        titleNode.textContent = title;
+        titleNode.textContent = familyDeviceMapCopy(title);
         const detailNode = document.createElement('small');
-        detailNode.textContent = detail;
+        detailNode.textContent = familyDeviceMapCopy(detail);
 
         copy.append(eyebrowNode, titleNode, detailNode);
         ftNanahHomeBridgePresenceRow.append(mark, copy);
@@ -18560,23 +19016,23 @@ document.addEventListener('DOMContentLoaded', async () => {
             const findButton = document.createElement('button');
             findButton.type = 'button';
             findButton.className = 'btn-secondary nanah-device-compass__presence-button';
-            findButton.textContent = nearbyDiscoveryActive ? 'Stop finding' : 'Find nearby';
+            findButton.textContent = familyDeviceMapCopy(nearbyDiscoveryActive ? 'Stop finding' : 'Find nearby');
             findButton.dataset.filtertubeHelp = nearbyDiscoveryActive
-                ? 'Stops this short nearby search. No device trust is changed.'
-                : 'Looks through the local nearby helper for two minutes. A found device is not trusted until the safety phrase matches.';
+                ? familyDeviceMapCopy('Stops this short nearby search. No device trust is changed.')
+                : familyDeviceMapCopy('Looks through the local nearby helper for two minutes. A found device is not trusted until the safety phrase matches.');
             findButton.addEventListener('click', async () => {
                 findButton.disabled = true;
                 try {
                     if (nearbyDiscoveryActive) {
                         stopNanahNearbyDiscoverySession({ reason: 'manual_stop' });
-                        UIComponents.showToast('Stopped looking for nearby devices', 'info');
+                        UIComponents.showToast(familyDeviceMapCopy('Stopped looking for nearby devices'), 'info');
                         return;
                     }
                     const result = await startNanahNearbyDiscoverySession({ reason: 'family_devices_find_nearby' });
                     UIComponents.showToast(
                         result.candidateCount > 0
-                            ? `Found ${result.candidateCount} nearby device${result.candidateCount === 1 ? '' : 's'}`
-                            : 'Looking nearby. Let the other device appear within two minutes.',
+                            ? familyDeviceMapCopy(`Found ${result.candidateCount} nearby device${result.candidateCount === 1 ? '' : 's'}`)
+                            : familyDeviceMapCopy('Looking nearby. Let the other device appear within two minutes.'),
                         result.candidateCount > 0 ? 'success' : 'info'
                     );
                 } finally {
@@ -18587,10 +19043,10 @@ document.addEventListener('DOMContentLoaded', async () => {
             const visibilityButton = document.createElement('button');
             visibilityButton.type = 'button';
             visibilityButton.className = 'btn-secondary nanah-device-compass__presence-button';
-            visibilityButton.textContent = nearbyVisibilityActive ? 'Stop showing' : 'Let this device appear';
+            visibilityButton.textContent = familyDeviceMapCopy(nearbyVisibilityActive ? 'Stop showing' : 'Let this device appear');
             visibilityButton.dataset.filtertubeHelp = nearbyVisibilityActive
-                ? 'Stops the short-lived nearby session now.'
-                : 'Makes this device visible through the local nearby helper for three minutes. Visibility never grants trust or parent control.';
+                ? familyDeviceMapCopy('Stops the short-lived nearby session now.')
+                : familyDeviceMapCopy('Makes this device visible through the local nearby helper for three minutes. Visibility never grants trust or parent control.');
             visibilityButton.addEventListener('click', () => {
                 void startNanahNearbyVisibility();
             });
@@ -18612,14 +19068,14 @@ document.addEventListener('DOMContentLoaded', async () => {
                 button.dataset.blockedAction = 'Send before phrase match';
                 button.dataset.selected = selected ? 'true' : 'false';
                 button.setAttribute('aria-pressed', selected ? 'true' : 'false');
-                button.setAttribute('aria-label', `${candidate.label}. Found nearby. Pair with code and matching safety phrase.`);
+                button.setAttribute('aria-label', familyDeviceMapText('presence.nearbyCandidateAria', '{label}. Found nearby. Pair with code and matching safety phrase.', { label: candidate.label }));
 
                 const dot = document.createElement('i');
                 dot.setAttribute('aria-hidden', 'true');
                 const label = document.createElement('strong');
                 label.textContent = candidate.label;
                 const state = document.createElement('small');
-                state.textContent = 'Found nearby - pair first';
+                state.textContent = familyDeviceMapCopy('Found nearby - pair first');
                 button.append(dot, label, state);
                 button.addEventListener('click', () => selectNanahNearbyCandidate(candidate, button));
                 list.appendChild(button);
@@ -18655,30 +19111,35 @@ document.addEventListener('DOMContentLoaded', async () => {
         const homeOffline = homeConfigured && homePath.healthOk === false;
         const awayOffline = awayConfigured && awayPath.healthOk === false;
         const liveStatusLabel = liveReady
-            ? 'Ready'
-            : (protectedCount > 0 || personalSyncOpen ? 'Pair needed' : 'Profile first');
+            ? familyDeviceMapCopy('Ready')
+            : (protectedCount > 0 || personalSyncOpen ? familyDeviceMapCopy('Pair needed') : familyDeviceMapCopy('Profile first'));
         const liveStatusTone = liveReady
             ? 'success'
             : (protectedCount > 0 || personalSyncOpen ? 'attention' : 'neutral');
-        const homeStatusLabel = nearbyCandidateCount > 0
-            ? `${nearbyCandidateCount} nearby`
-            : (nearbyVisibilityActive
-                ? 'Visible'
-                : (nearbyDiscoveryActive
-                    ? 'Looking'
-                : (homeBridgeCandidateCount > 0
-            ? `${homeBridgeCandidateCount} verified`
-            : (homeConfigured
-                ? (homeOffline || homeBridgePreviewHealthOk === false ? 'Check setup' : (homeBridgePreviewChecked ? 'Checked' : 'Ready'))
-                : (verifiedCount > 0 || personalSyncOpen ? 'Optional' : 'Pair first')))));
+        let homeStatusLabel = familyDeviceMapCopy('Pair first');
+        if (nearbyCandidateCount > 0) {
+            homeStatusLabel = familyDeviceMapCount(nearbyCandidateCount, 'map.oneNearby', 'map.manyNearby', '{count} nearby', '{count} nearby');
+        } else if (nearbyVisibilityActive) {
+            homeStatusLabel = familyDeviceMapCopy('Visible');
+        } else if (nearbyDiscoveryActive) {
+            homeStatusLabel = familyDeviceMapCopy('Looking');
+        } else if (homeBridgeCandidateCount > 0) {
+            homeStatusLabel = familyDeviceMapCount(homeBridgeCandidateCount, 'map.oneVerified', 'map.manyVerified', '{count} verified', '{count} verified');
+        } else if (homeConfigured) {
+            homeStatusLabel = homeOffline || homeBridgePreviewHealthOk === false
+                ? familyDeviceMapCopy('Check setup')
+                : (homeBridgePreviewChecked ? familyDeviceMapCopy('Checked') : familyDeviceMapCopy('Ready'));
+        } else if (verifiedCount > 0 || personalSyncOpen) {
+            homeStatusLabel = familyDeviceMapCopy('Optional');
+        }
         const homeStatusTone = nearbyCandidateCount > 0 || nearbyVisibilityActive || nearbyDiscoveryActive || homeBridgeCandidateCount > 0
             ? 'success'
             : (homeOffline || homeBridgePreviewHealthOk === false ? 'warning' : (homeConfigured ? 'home' : 'neutral'));
         const awayStatusLabel = awayReadyCount > 0
-            ? `${awayReadyCount} ready`
+            ? familyDeviceMapCount(awayReadyCount, 'map.oneReady', 'map.manyReady', '{count} ready', '{count} ready')
             : (awayConfigured
-                ? (awayOffline ? 'Check setup' : 'Ready')
-                : (verifiedCount > 0 || personalSyncOpen ? 'Optional' : 'Pair first'));
+                ? (awayOffline ? familyDeviceMapCopy('Check setup') : familyDeviceMapCopy('Ready'))
+                : (verifiedCount > 0 || personalSyncOpen ? familyDeviceMapCopy('Optional') : familyDeviceMapCopy('Pair first')));
         const awayStatusTone = awayOffline
             ? 'warning'
             : (awayReadyCount > 0 ? 'success' : (awayConfigured ? 'away' : 'neutral'));
@@ -18748,40 +19209,50 @@ document.addEventListener('DOMContentLoaded', async () => {
             ftNanahDeviceCompass.setAttribute(
                 'aria-label',
                 personalSyncOpen
-                    ? `My Devices map. Copying ${normalizeString(safeObject(profilesV4Cache).profiles?.[normalizeString(safeObject(profilesV4Cache).activeProfileId) || 'default']?.name) || 'the current profile'}, with ${nearbyCandidateCount} nearby pairing candidate${nearbyCandidateCount === 1 ? '' : 's'} and ${model.trustedDeviceCount || 0} trusted device${model.trustedDeviceCount === 1 ? '' : 's'}.`
-                    : `Family Devices map. ${protectedCount} protected profile${protectedCount === 1 ? '' : 's'}, ${nearbyCandidateCount} nearby pairing candidate${nearbyCandidateCount === 1 ? '' : 's'}, ${verifiedCount} verified device${verifiedCount === 1 ? '' : 's'}, ${sameNetworkReadyCount} ready on the home setup, ${awayReadyCount} ready for later pickup.`
+                    ? familyDeviceMapText('map.aria.personal', 'My Devices map. Copying {profileName}. Nearby pairing candidates: {nearbyCount}. Trusted devices: {trustedCount}.', {
+                        profileName: normalizeString(safeObject(profilesV4Cache).profiles?.[normalizeString(safeObject(profilesV4Cache).activeProfileId) || 'default']?.name) || familyDeviceMapCopy('the current profile'),
+                        nearbyCount: nearbyCandidateCount,
+                        trustedCount: normalizeNonNegativeInteger(model.trustedDeviceCount)
+                    })
+                    : familyDeviceMapText('map.aria.family', 'Family Devices map. Protected profiles: {profileCount}. Nearby pairing candidates: {nearbyCount}. Verified devices: {verifiedCount}. Ready on the home setup: {homeReadyCount}. Ready for later pickup: {awayReadyCount}.', {
+                        profileCount: protectedCount,
+                        nearbyCount: nearbyCandidateCount,
+                        verifiedCount,
+                        homeReadyCount: sameNetworkReadyCount,
+                        awayReadyCount
+                    })
             );
         }
-        if (ftNanahMapEyebrow) ftNanahMapEyebrow.textContent = personalSyncOpen ? 'My device map' : 'Family device map';
+        if (ftNanahMapEyebrow) ftNanahMapEyebrow.textContent = familyDeviceMapCopy(personalSyncOpen ? 'My device map' : 'Family device map');
         if (ftNanahMapTitle) ftNanahMapTitle.textContent = personalSyncOpen
-            ? 'Choose how to connect your other device'
-            : 'Choose how to reach the protected device';
+            ? familyDeviceMapCopy('Choose how to connect your other device')
+            : familyDeviceMapCopy('Choose how to reach the protected device');
         if (ftNanahMapDetail) ftNanahMapDetail.textContent = personalSyncOpen
-            ? 'Use a code or QR from anywhere, or find the device through your configured home setup.'
-            : 'Tap a path. FilterTube will show the next safe step and what it will not do.';
+            ? familyDeviceMapCopy('Use a code or QR from anywhere, or find the device through your configured home setup.')
+            : familyDeviceMapCopy('Tap a path. FilterTube will show the next safe step and what it will not do.');
         if (ftNanahMapRuleTitle) ftNanahMapRuleTitle.textContent = personalSyncOpen
-            ? 'Both devices can be ordinary profiles.'
-            : 'Open now is the normal setup.';
+            ? familyDeviceMapCopy('Both devices can be ordinary profiles.')
+            : familyDeviceMapCopy('Open now is the normal setup.');
         if (ftNanahMapRuleDetail) ftNanahMapRuleDetail.textContent = personalSyncOpen
-            ? 'No PIN is required. Match the safety phrase before copying the open profile.'
-            : 'Same-place and open-later delivery only work after the protected device is already paired and trusted.';
-        if (ftNanahMapCenterEyebrow) ftNanahMapCenterEyebrow.textContent = personalSyncOpen ? 'This device' : 'Parent device';
-        if (ftNanahMapCenterTitle) ftNanahMapCenterTitle.textContent = personalSyncOpen ? 'Current profile starts here' : 'Controls stay here';
+            ? familyDeviceMapCopy('No PIN is required. Match the safety phrase before copying the open profile.')
+            : familyDeviceMapCopy('Same-place and open-later delivery only work after the protected device is already paired and trusted.');
+        if (ftNanahMapCenterEyebrow) ftNanahMapCenterEyebrow.textContent = familyDeviceMapCopy(personalSyncOpen ? 'This device' : 'Parent device');
+        if (ftNanahMapCenterTitle) ftNanahMapCenterTitle.textContent = familyDeviceMapCopy(personalSyncOpen ? 'Current profile starts here' : 'Controls stay here');
         if (ftNanahMapCenterDetail) ftNanahMapCenterDetail.textContent = personalSyncOpen
-            ? 'Switch profiles first to copy a different one.'
-            : 'Pick rules, time, and Main/Kids access.';
+            ? familyDeviceMapCopy('Switch profiles first to copy a different one.')
+            : familyDeviceMapCopy('Pick rules, time, and Main/Kids access.');
         const mapStage = ftNanahMapTitle?.closest('.nanah-device-compass-stage');
         if (mapStage) {
             mapStage.setAttribute(
                 'aria-label',
-                personalSyncOpen ? 'Choose how to connect another personal device' : 'Choose how this parent device reaches a protected device'
+                familyDeviceMapCopy(personalSyncOpen ? 'Choose how to connect another personal device' : 'Choose how this parent device reaches a protected device')
             );
         }
         const mapCenter = ftNanahMapCenterTitle?.closest('.nanah-device-compass__center');
         if (mapCenter) {
             mapCenter.dataset.filtertubeHelp = personalSyncOpen
-                ? 'This is the profile being copied. No PIN or protected profile is required; switch profiles first to copy another one.'
-                : 'The parent device chooses the rules, time limits, and Main/Kids access. The protected device only receives approved updates.';
+                ? familyDeviceMapCopy('This is the profile being copied. No PIN or protected profile is required; switch profiles first to copy another one.')
+                : familyDeviceMapCopy('The parent device chooses the rules, time limits, and Main/Kids access. The protected device only receives approved updates.');
         }
         setNanahCompassChoiceCopy(ftNanahCompassLiveBtn, {
             eyebrow: protectedCount > 0 || personalSyncOpen ? 'Start here' : 'First step',
@@ -18804,7 +19275,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             ? 'Optional: use your configured Home Bridge for nearby selection.'
             : 'Pair first; same-place setup is Advanced.';
         if (nearbyCandidateCount > 0) {
-            homeChoiceTitle = `${nearbyCandidateCount} nearby`;
+            homeChoiceTitle = familyDeviceMapCount(nearbyCandidateCount, 'map.oneNearby', 'map.manyNearby', '{count} nearby', '{count} nearby');
             homeChoiceDetail = 'Choose a device, then pair and match the phrase.';
         } else if (nearbyVisibilityActive) {
             homeChoiceTitle = 'Visible nearby';
@@ -18813,7 +19284,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             homeChoiceTitle = 'Looking nearby';
             homeChoiceDetail = 'Devices appear here after they choose Let this device appear.';
         } else if (homeBridgeCandidateCount > 0) {
-            homeChoiceTitle = `${homeBridgeCandidateCount} verified at home`;
+            homeChoiceTitle = familyDeviceMapCount(homeBridgeCandidateCount, 'map.oneVerifiedAtHome', 'map.manyVerifiedAtHome', '{count} verified at home', '{count} verified at home');
             homeChoiceDetail = 'Already verified devices are visible here.';
         } else if (homeOffline || homeBridgePreviewHealthOk === false) {
             homeChoiceTitle = 'Check home setup';
@@ -18830,10 +19301,10 @@ document.addEventListener('DOMContentLoaded', async () => {
                 homeChoiceDetail = 'Tap to find through Home Bridge.';
             }
         } else if (sameNetworkReadyCount > 0) {
-            homeChoiceTitle = `${sameNetworkReadyCount} ready nearby`;
+            homeChoiceTitle = familyDeviceMapCount(sameNetworkReadyCount, 'map.oneReadyNearby', 'map.manyReadyNearby', '{count} ready nearby', '{count} ready nearby');
             homeChoiceDetail = 'A verified device can collect on this setup.';
         } else if (verifiedCount > 0) {
-            homeChoiceTitle = `${verifiedCount} paired device${verifiedCount === 1 ? '' : 's'}`;
+            homeChoiceTitle = familyDeviceMapCount(verifiedCount, 'map.onePairedDevice', 'map.manyPairedDevices', '{count} paired device', '{count} paired devices');
             homeChoiceDetail = 'Optional same-place setup stays Advanced.';
         }
         setNanahCompassChoiceCopy(ftNanahCompassHomeBtn, {
@@ -18849,8 +19320,10 @@ document.addEventListener('DOMContentLoaded', async () => {
         setNanahCompassChoiceCopy(ftNanahCompassLaterBtn, {
             eyebrow: 'Away or later',
             title: awayReadyCount > 0
-                ? `${awayReadyCount} can open later`
-                : (pickupCheckCount > 0 ? `${pickupCheckCount} pickup path${pickupCheckCount === 1 ? '' : 's'}` : 'Open later'),
+                ? familyDeviceMapCount(awayReadyCount, 'map.oneCanOpenLater', 'map.manyCanOpenLater', '{count} can open later', '{count} can open later')
+                : (pickupCheckCount > 0
+                    ? familyDeviceMapCount(pickupCheckCount, 'map.onePickupPath', 'map.manyPickupPaths', '{count} pickup path', '{count} pickup paths')
+                    : 'Open later'),
             detail: awayOffline
                 ? 'Later pickup needs a check.'
                 : (awayConfigured
@@ -18866,12 +19339,12 @@ document.addEventListener('DOMContentLoaded', async () => {
             renderNanahDeviceSelectionPreview({
                 eyebrow: homeBridgePreviewChecked ? 'Home Bridge preview' : 'Selected path',
                 title: homeBridgeCandidateCount > 0
-                    ? `${homeBridgeCandidateCount} verified device${homeBridgeCandidateCount === 1 ? '' : 's'} found`
+                    ? familyDeviceMapCount(homeBridgeCandidateCount, 'map.oneVerifiedDeviceFound', 'map.manyVerifiedDevicesFound', '{count} verified device found', '{count} verified devices found')
                     : (homeOffline
                         ? 'Home setup needs a check'
                         : (homeConfigured
                             ? (homeBridgePreviewChecked
-                                ? (homeBridgePreviewHealthOk === false ? 'Home check did not finish' : 'No verified saved device found')
+                                ? (homeBridgePreviewHealthOk === false ? 'Home check did not finish' : 'No verified saved device found yet.')
                                 : 'Find through Home Bridge')
                             : 'Set up Home Pickup only if needed')),
                 detail: homeBridgeCandidateCount > 0
@@ -18899,79 +19372,81 @@ document.addEventListener('DOMContentLoaded', async () => {
         } else if (selectedNearby && selectedNearbyDevice) {
             renderNanahDeviceSelectionPreview({
                 eyebrow: 'Found nearby',
-                title: normalizeString(selectedNearbyDevice.label) || 'Nearby device',
+                title: normalizeString(selectedNearbyDevice.label) || familyDeviceMapCopy('Nearby device'),
+                titleIsUserData: true,
                 detail: 'Start pairing, then confirm the exact same safety phrase on both devices before saving trust or sending an update.',
                 primaryAction: 'Pair nearby device',
                 blockedAction: 'Send before phrase match'
             });
         } else if (selectedTrusted && selectedTrustedDevice) {
             const row = safeObject(selectedTrustedDevice);
-            const label = normalizeString(row.label) || 'Trusted device';
+            const label = normalizeString(row.label) || familyDeviceMapCopy('Trusted device');
             const profile = normalizeString(row.profileName);
-            const routeLabel = normalizeString(row.routeLabel)
+            const routeLabel = familyDeviceMapCopy(normalizeString(row.routeLabel))
                 || (normalizeString(row.route) === 'same-network'
                     ? 'Ready on home setup'
                     : (normalizeString(row.route) === 'away' ? 'Can open later' : 'Verified device'));
-            const state = normalizeString(row.deliveryState);
+            const state = familyDeviceMapDeliveryStatus(row.deliveryState);
             const fromHomeBridgePreview = normalizeString(row.source) === 'home-bridge-preview';
             renderNanahDeviceSelectionPreview({
                 eyebrow: fromHomeBridgePreview ? 'Home Bridge preview' : 'Saved device',
-                title: profile ? `${label} - ${profile}` : label,
+                title: profile ? familyDeviceMapText('device.profileTitle', '{device} - {profile}', { device: label, profile }) : label,
+                titleIsUserData: true,
                 detail: `${routeLabel ? `${routeLabel}. ` : ''}${state ? `${state}. ` : ''}${fromHomeBridgePreview
-                    ? 'Use trusted-device controls below before sending.'
-                    : 'Saved device selection is only a shortcut to the trusted-device controls below.'}`
+                    ? familyDeviceMapCopy('Use trusted-device controls below before sending.')
+                    : familyDeviceMapCopy('Saved device selection is only a shortcut to the trusted-device controls below.')}`
             });
         } else if (liveReady) {
             renderNanahDeviceSelectionPreview({
                 eyebrow: 'Selected path',
-                title: 'Send parent-approved update now',
-                detail: 'Both devices are open and verified for this session.'
+                title: familyDeviceMapCopy('Send parent-approved update now'),
+                detail: familyDeviceMapCopy('Both devices are open and verified for this session.')
             });
         } else if (personalSyncOpen) {
             renderNanahDeviceSelectionPreview({
                 eyebrow: 'Copy this profile',
-                title: 'Open FilterTube on your other device',
-                detail: 'Use the short code or QR from anywhere. No protected profile or PIN is required.'
+                title: familyDeviceMapCopy('Open FilterTube on your other device'),
+                detail: familyDeviceMapCopy('Use the short code or QR from anywhere. No protected profile or PIN is required.')
             });
         } else if (protectedCount < 1) {
             renderNanahDeviceSelectionPreview({
                 eyebrow: 'Next step',
-                title: 'Create a protected profile',
-                detail: 'After that, pair the protected device and send reviewed rules.'
+                title: familyDeviceMapCopy('Create a protected profile'),
+                detail: familyDeviceMapCopy('After that, pair the protected device and send reviewed rules.')
             });
         } else if (verifiedCount < 1) {
             renderNanahDeviceSelectionPreview({
                 eyebrow: 'Selected path',
-                title: 'Pair a protected device',
-                detail: 'Open FilterTube on the other device, enter the code or scan QR, then match the safety phrase.'
+                title: familyDeviceMapCopy('Pair a protected device'),
+                detail: familyDeviceMapCopy('Open FilterTube on the other device, enter the code or scan QR, then match the safety phrase.')
             });
         } else {
             renderNanahDeviceSelectionPreview({
                 eyebrow: 'Selected path',
-                title: `${verifiedCount} verified device${verifiedCount === 1 ? '' : 's'} can receive updates`,
+                title: familyDeviceMapCount(verifiedCount, 'map.oneVerifiedDeviceCanReceive', 'map.manyVerifiedDevicesCanReceive', '{count} verified device can receive updates', '{count} verified devices can receive updates'),
                 detail: readyCount > 0
-                    ? `${readyCount} verified device${readyCount === 1 ? ' is' : 's are'} ready now. Later delivery remains optional under Advanced.`
-                    : 'Use Send Update when a device is open; same-place and open-later delivery stay optional under Advanced.'
+                    ? familyDeviceMapCount(readyCount, 'map.oneVerifiedReadyNow', 'map.manyVerifiedReadyNow', '{count} verified device is ready now. Later delivery remains optional under Advanced.', '{count} verified devices are ready now. Later delivery remains optional under Advanced.')
+                    : familyDeviceMapCopy('Use Send Update when a device is open; same-place and open-later delivery stay optional under Advanced.')
             });
         }
         if (!ftNanahDeviceCompassRule) return;
         if (liveReady) {
-            ftNanahDeviceCompassRule.textContent = 'Both devices are verified for this session. Review the profile, then send the parent-approved update.';
+            ftNanahDeviceCompassRule.textContent = familyDeviceMapCopy('Both devices are verified for this session. Review the profile, then send the parent-approved update.');
             return;
         }
         if (personalSyncOpen) {
-            ftNanahDeviceCompassRule.textContent = 'Personal sync copies only the profile open here. Pair and match the phrase first; switch profiles to copy another one.';
+            ftNanahDeviceCompassRule.textContent = familyDeviceMapCopy('Personal sync copies only the profile open here. Pair and match the phrase first; switch profiles to copy another one.');
             return;
         }
         if (protectedCount < 1) {
-            ftNanahDeviceCompassRule.textContent = 'Create one protected profile first. Seeing a device never gives it permission.';
+            ftNanahDeviceCompassRule.textContent = familyDeviceMapCopy('Create one protected profile first. Seeing a device never gives it permission.');
             return;
         }
         if (verifiedCount < 1) {
-            ftNanahDeviceCompassRule.textContent = 'Pair a protected device first. Permission starts only after both screens show the same phrase.';
+            ftNanahDeviceCompassRule.textContent = familyDeviceMapCopy('Pair a protected device first. Permission starts only after both screens show the same phrase.');
             return;
         }
-            ftNanahDeviceCompassRule.textContent = 'Verified devices can receive signed parent updates. Open now, same-place, and open-later only describe delivery.';
+            ftNanahDeviceCompassRule.textContent = familyDeviceMapCopy('Verified devices can receive signed parent updates. Open now, same-place, and open-later only describe delivery.');
     }
 
     function renderNanahDeliveryPathStrip() {
@@ -19220,7 +19695,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                 ok: false,
                 reason: 'health_check_unavailable'
             });
-            if (!silent) UIComponents.showToast('Internet Pickup saved, but readiness could not be checked', 'warning');
+            if (!silent) UIComponents.showToast(tabViewUiText('dashboard.sync.toast.pickupReadinessCheckUnavailable', '{pickup} Pickup saved, but readiness could not be checked', { pickup: 'Internet' }), 'warning');
             return { ok: false, reason: 'health_check_unavailable' };
         }
         try {
@@ -19242,7 +19717,9 @@ document.addEventListener('DOMContentLoaded', async () => {
             });
             if (!silent) {
                 UIComponents.showToast(
-                    ok ? 'Internet Pickup saved and reachable' : 'Internet Pickup saved, but it did not answer the readiness check',
+                    ok
+                        ? tabViewUiText('dashboard.sync.toast.pickupSavedAndReachable', '{pickup} Pickup saved and reachable', { pickup: 'Internet' })
+                        : tabViewUiText('dashboard.sync.toast.pickupSavedButUnreachable', '{pickup} Pickup saved, but it did not answer the readiness check', { pickup: 'Internet' }),
                     ok ? 'success' : 'warning'
                 );
             }
@@ -19254,7 +19731,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                 ok: false,
                 reason: normalizeString(error?.message) || 'health_check_failed'
             });
-            if (!silent) UIComponents.showToast('Internet Pickup saved, but readiness could not be checked', 'warning');
+            if (!silent) UIComponents.showToast(tabViewUiText('dashboard.sync.toast.pickupReadinessCheckUnavailable', '{pickup} Pickup saved, but readiness could not be checked', { pickup: 'Internet' }), 'warning');
             return { ok: false, reason: normalizeString(error?.message) || 'health_check_failed' };
         }
     }
@@ -19308,12 +19785,12 @@ document.addEventListener('DOMContentLoaded', async () => {
             }
             const granted = await callBrowserPermissionMethod(permissions.request.bind(permissions), { origins: [pattern] });
             if (!granted) {
-                UIComponents.showToast(`${label} was not enabled because endpoint permission was not granted`, 'warning');
+                UIComponents.showToast(tabViewUiText('dashboard.sync.toast.pickupEndpointPermissionDenied', '{label} was not enabled because endpoint permission was not granted', { label }), 'warning');
             }
             return granted === true;
         } catch (error) {
             console.error(`FilterTube: failed to request ${label} endpoint permission`, error);
-            UIComponents.showToast(`${label} needs browser permission for that pickup address`, 'error');
+            UIComponents.showToast(tabViewUiText('dashboard.sync.toast.pickupAddressPermissionRequired', '{label} needs browser permission for that pickup address', { label }), 'error');
             return false;
         }
     }
@@ -19322,7 +19799,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         const root = safeObject(profilesV4Cache);
         const activeProfileId = normalizeString(root.activeProfileId) || 'default';
         if (getProfileType(root, activeProfileId) === 'child') {
-            UIComponents.showToast('Protected profiles cannot configure update delivery', 'error');
+            UIComponents.showToast(tabViewUiText('dashboard.sync.toast.protectedProfilesCannotConfigureUpdateDelivery', 'Protected profiles cannot configure update delivery'), 'error');
             return;
         }
         const okAdmin = await ensureProfileUnlocked(root, activeProfileId, { sensitiveAction: true });
@@ -19366,7 +19843,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                 endpointHost: ''
             });
             await refreshProfilesUI();
-            UIComponents.showToast('Internet Pickup disabled', 'success');
+            UIComponents.showToast(tabViewUiText('dashboard.sync.toast.internetPickupDisabled', 'Internet Pickup disabled'), 'success');
             return;
         }
         const endpoint = await showPromptModal({
@@ -19386,7 +19863,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                 endpointHost: ''
             });
             await refreshProfilesUI();
-            UIComponents.showToast('Internet Pickup disabled', 'success');
+            UIComponents.showToast(tabViewUiText('dashboard.sync.toast.internetPickupDisabled', 'Internet Pickup disabled'), 'success');
             return;
         }
         const token = await showPromptModal({
@@ -19413,7 +19890,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             ? client.createProvider(nextConfig)
             : null;
         if (!provider || provider.configured !== true || !hasNanahManagedMailboxUploadWriter(provider)) {
-            UIComponents.showToast('Internet Pickup address must be public HTTPS and supported by FilterTube', 'error');
+            UIComponents.showToast(tabViewUiText('dashboard.sync.toast.internetPickupAddressUnsupported', 'Internet Pickup address must be public HTTPS and supported by FilterTube'), 'error');
             return;
         }
         const permissionGranted = await ensureManagedPickupEndpointPermission(endpointUrl, 'Internet Pickup');
@@ -19473,10 +19950,10 @@ document.addEventListener('DOMContentLoaded', async () => {
         ].join('\n');
         try {
             await navigator.clipboard.writeText(text);
-            UIComponents.showToast('Internet Pickup setup command copied', 'success');
+            UIComponents.showToast(tabViewUiText('dashboard.sync.toast.pickupSetupCommandCopied', '{pickup} Pickup setup command copied', { pickup: 'Internet' }), 'success');
         } catch (error) {
             console.error('FilterTube: failed to copy Internet Pickup setup command', error);
-            UIComponents.showToast('Could not copy setup command', 'error');
+            UIComponents.showToast(tabViewUiText('dashboard.sync.toast.pickupSetupCommandCopyFailed', 'Could not copy setup command'), 'error');
         }
     }
 
@@ -19502,10 +19979,10 @@ document.addEventListener('DOMContentLoaded', async () => {
         ].join('\n');
         try {
             await navigator.clipboard.writeText(text);
-            UIComponents.showToast('Home Pickup setup command copied', 'success');
+            UIComponents.showToast(tabViewUiText('dashboard.sync.toast.pickupSetupCommandCopied', '{pickup} Pickup setup command copied', { pickup: 'Home' }), 'success');
         } catch (error) {
             console.error('FilterTube: failed to copy Home Pickup setup command', error);
-            UIComponents.showToast('Could not copy setup command', 'error');
+            UIComponents.showToast(tabViewUiText('dashboard.sync.toast.pickupSetupCommandCopyFailed', 'Could not copy setup command'), 'error');
         }
     }
 
@@ -19524,7 +20001,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                 ok: false,
                 reason: 'health_check_unavailable'
             });
-            if (!silent) UIComponents.showToast('Home Pickup saved, but readiness could not be checked', 'warning');
+            if (!silent) UIComponents.showToast(tabViewUiText('dashboard.sync.toast.pickupReadinessCheckUnavailable', '{pickup} Pickup saved, but readiness could not be checked', { pickup: 'Home' }), 'warning');
             return { ok: false, reason: 'health_check_unavailable' };
         }
         try {
@@ -19550,7 +20027,9 @@ document.addEventListener('DOMContentLoaded', async () => {
             });
             if (!silent) {
                 UIComponents.showToast(
-                    ok ? 'Home Pickup saved and reachable' : 'Home Pickup saved, but it did not answer the readiness check',
+                    ok
+                        ? tabViewUiText('dashboard.sync.toast.pickupSavedAndReachable', '{pickup} Pickup saved and reachable', { pickup: 'Home' })
+                        : tabViewUiText('dashboard.sync.toast.pickupSavedButUnreachable', '{pickup} Pickup saved, but it did not answer the readiness check', { pickup: 'Home' }),
                     ok ? 'success' : 'warning'
                 );
             }
@@ -19566,7 +20045,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                 ok: false,
                 reason: normalizeString(error?.message) || 'health_check_failed'
             });
-            if (!silent) UIComponents.showToast('Home Pickup saved, but readiness could not be checked', 'warning');
+            if (!silent) UIComponents.showToast(tabViewUiText('dashboard.sync.toast.pickupReadinessCheckUnavailable', '{pickup} Pickup saved, but readiness could not be checked', { pickup: 'Home' }), 'warning');
             return { ok: false, reason: normalizeString(error?.message) || 'health_check_failed' };
         }
     }
@@ -19575,7 +20054,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         const root = safeObject(profilesV4Cache);
         const currentActiveProfileId = normalizeString(root.activeProfileId) || 'default';
         if (getProfileType(root, currentActiveProfileId) === 'child') {
-            UIComponents.showToast('Protected profiles cannot configure update delivery', 'error');
+            UIComponents.showToast(tabViewUiText('dashboard.sync.toast.protectedProfilesCannotConfigureUpdateDelivery', 'Protected profiles cannot configure update delivery'), 'error');
             return;
         }
         const okAdmin = await ensureProfileUnlocked(root, currentActiveProfileId, { sensitiveAction: true });
@@ -19620,7 +20099,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                 endpointHost: ''
             });
             await refreshProfilesUI();
-            UIComponents.showToast('Home Pickup disabled', 'success');
+            UIComponents.showToast(tabViewUiText('dashboard.sync.toast.homePickupDisabled', 'Home Pickup disabled'), 'success');
             return;
         }
         const endpoint = await showPromptModal({
@@ -19634,7 +20113,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         if (endpoint === null) return;
         const endpointUrl = normalizeString(endpoint);
         if (!endpointUrl) {
-            UIComponents.showToast('Enter a pickup address or turn off Home Pickup', 'error');
+            UIComponents.showToast(tabViewUiText('dashboard.sync.toast.homePickupAddressRequired', 'Enter a pickup address or turn off Home Pickup'), 'error');
             return;
         }
         const token = await showPromptModal({
@@ -19663,7 +20142,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             ? client.createProvider(nextConfig)
             : null;
         if (!provider || provider.configured !== true || !hasNanahManagedLocalNetworkDeliveryWriter(provider)) {
-            UIComponents.showToast('Home Pickup address must be HTTPS or private/local HTTP and supported by FilterTube', 'error');
+            UIComponents.showToast(tabViewUiText('dashboard.sync.toast.homePickupAddressUnsupported', 'Home Pickup address must be HTTPS or private/local HTTP and supported by FilterTube'), 'error');
             return;
         }
         const permissionGranted = await ensureManagedPickupEndpointPermission(endpointUrl, 'Home Pickup');
@@ -20296,11 +20775,11 @@ document.addEventListener('DOMContentLoaded', async () => {
         const fresh = await io.loadProfilesV4();
         const actorId = normalizeString(fresh.activeProfileId) || activeProfileId || 'default';
         if (getProfileType(fresh, actorId) === 'child') {
-            UIComponents.showToast('Switch to a parent/account profile to change saved updates', 'error');
+            UIComponents.showToast(tabViewUiText('dashboard.sync.toast.switchParentToChangeSavedUpdates', 'Switch to a parent/account profile to change saved updates'), 'error');
             return false;
         }
         if (!canActiveProfileManageProfile(fresh, targetId)) {
-            UIComponents.showToast('This account cannot manage that protected profile', 'error');
+            UIComponents.showToast(tabViewUiText('dashboard.sync.toast.accountCannotManageProtectedProfile', 'This account cannot manage that protected profile'), 'error');
             return false;
         }
         const okAdmin = await ensureProfileUnlocked(fresh, actorId, { sensitiveAction: true });
@@ -20311,7 +20790,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         const inventory = getNanahSourceManagedLinkInventoryForTargetProfile(targetId);
         const activeLinks = safeArray(inventory.activeLinks);
         if (!activeLinks.length) {
-            UIComponents.showToast('Pair a verified protected device before changing saved updates', 'warning');
+            UIComponents.showToast(tabViewUiText('dashboard.sync.toast.pairVerifiedDeviceBeforeSavedUpdates', 'Pair a verified protected device before changing saved updates'), 'warning');
             return false;
         }
         let changedCount = 0;
@@ -20330,18 +20809,20 @@ document.addEventListener('DOMContentLoaded', async () => {
             if (!firstLinkId) firstLinkId = linkId;
         }
         if (changedCount <= 0) {
-            UIComponents.showToast('No verified device link was changed', 'warning');
+            UIComponents.showToast(tabViewUiText('dashboard.sync.toast.noVerifiedDeviceLinkChanged', 'No verified device link was changed'), 'warning');
             return false;
         }
         await recordManagedSavedUpdatesPolicyHistory(targetId, { enabled: enabled === true, changedCount, firstLinkId });
         await refreshProfilesUI();
         renderNanahTrustedLinks();
-        UIComponents.showToast(
-            enabled
-                ? `Saved updates enabled for ${changedCount} verified ${pluralize(changedCount, 'device')}`
-                : `Saved updates disabled for ${changedCount} verified ${pluralize(changedCount, 'device')}`,
-            'success'
-        );
+        const savedUpdateToast = enabled
+            ? (changedCount === 1
+                ? tabViewUiText('dashboard.sync.toast.savedUpdatesEnabledForOneDevice', 'Saved updates enabled for {count} verified device', { count: changedCount })
+                : tabViewUiText('dashboard.sync.toast.savedUpdatesEnabledForManyDevices', 'Saved updates enabled for {count} verified devices', { count: changedCount }))
+            : (changedCount === 1
+                ? tabViewUiText('dashboard.sync.toast.savedUpdatesDisabledForOneDevice', 'Saved updates disabled for {count} verified device', { count: changedCount })
+                : tabViewUiText('dashboard.sync.toast.savedUpdatesDisabledForManyDevices', 'Saved updates disabled for {count} verified devices', { count: changedCount }));
+        UIComponents.showToast(savedUpdateToast, 'success');
         return true;
     }
 
@@ -20414,7 +20895,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             ? requestedDeliveryMode
             : 'all';
         if (!targetIds.length) {
-            UIComponents.showToast('Select at least one protected profile first', 'info');
+            UIComponents.showToast(tabViewUiText('family.profileManager.selectProtectedProfile', 'Select at least one protected profile first'), 'info');
             return null;
         }
         const io = window.FilterTubeIO || {};
@@ -20423,14 +20904,14 @@ document.addEventListener('DOMContentLoaded', async () => {
             return null;
         }
         if (!nanahManagedLivePolicy) {
-            UIComponents.showToast('Managed policy delivery helpers are unavailable', 'error');
+            UIComponents.showToast(tabViewUiText('dashboard.sync.toast.managedPolicyDeliveryHelpersUnavailable', 'Managed policy delivery helpers are unavailable'), 'error');
             return null;
         }
 
         const fresh = await io.loadProfilesV4();
         const currentActive = normalizeString(fresh.activeProfileId) || activeProfileId || 'default';
         if (getProfileType(fresh, currentActive) === 'child') {
-            UIComponents.showToast('Switch to the master or parent account before sending managed updates', 'error');
+            UIComponents.showToast(tabViewUiText('dashboard.sync.toast.switchToParentBeforeManagedUpdates', 'Switch to the master or parent account before sending managed updates'), 'error');
             return null;
         }
         const okAdmin = await ensureProfileUnlocked(fresh, currentActive, { sensitiveAction: true });
@@ -20457,7 +20938,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             return Object.keys(profile).length > 0 && canActiveProfileManageProfile(fresh, targetId);
         });
         if (!allowedTargets.length) {
-            UIComponents.showToast('No selected protected profile is manageable from this account', 'error');
+            UIComponents.showToast(tabViewUiText('family.profileManager.noManagedSelection', 'No selected protected profile is manageable from this account'), 'error');
             return null;
         }
 
@@ -23068,7 +23549,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     async function hostNanahSession({ source = 'host-button', intentTitle = '', intentDetail = '' } = {}) {
         if (isNanahChildReceiveOnly()) {
-            UIComponents.showToast('Start pairing from a parent profile, then join the code here.', 'info');
+            UIComponents.showToast(tabViewUiText('dashboard.sync.toast.startPairingFromParentProfile', 'Start pairing from a parent profile, then join the code here.'), 'info');
             return null;
         }
         if (nanahClient) await resetNanahSession(true);
@@ -23144,12 +23625,12 @@ document.addEventListener('DOMContentLoaded', async () => {
             .map(normalizeNanahNearbyCandidate)
             .find(row => row && row.candidateId === normalizeString(candidateId));
         if (!candidate) {
-            UIComponents.showToast('That nearby device is no longer available. Find nearby again.', 'warning');
+            UIComponents.showToast(tabViewUiText('dashboard.sync.toast.nearbyPairingDeviceUnavailable', 'That nearby device is no longer available. Find nearby again.'), 'warning');
             return;
         }
         const deliverySummary = getNanahFamilyDeliveryReadinessSummary();
         if (normalizeNonNegativeInteger(deliverySummary.protectedProfileCount) < 1) {
-            UIComponents.showToast('Create a protected profile before pairing another device', 'warning');
+            UIComponents.showToast(tabViewUiText('dashboard.sync.toast.createProtectedProfileBeforePairing', 'Create a protected profile before pairing another device'), 'warning');
             ftNanahQuickCreateProtectedBtn?.click();
             return;
         }
@@ -23176,14 +23657,14 @@ document.addEventListener('DOMContentLoaded', async () => {
                 expiresAtMs: Date.now() + 2 * 60 * 1000
             });
             if (result?.ok === false) throw new Error(normalizeString(result.reason) || 'nearby_invitation_failed');
-            UIComponents.showToast(`Pairing invitation sent to ${candidate.label}`, 'success');
+            UIComponents.showToast(tabViewUiText('dashboard.sync.toast.nearbyPairingInvitationSent', 'Pairing invitation sent to {deviceLabel}', { deviceLabel: candidate.label }), 'success');
             focusNanahElement(ftNanahStatusCard || ftNanahPairCode);
         })();
         try {
             await nanahNearbyActionPromise;
         } catch (error) {
             console.warn('FilterTube: nearby pairing invitation failed', error);
-            UIComponents.showToast('Nearby invitation failed. Use the visible short code instead.', 'warning');
+            UIComponents.showToast(tabViewUiText('dashboard.sync.toast.nearbyPairingInvitationFailed', 'Nearby invitation failed. Use the visible short code instead.'), 'warning');
         } finally {
             nanahNearbyActionPromise = null;
         }
@@ -23532,7 +24013,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         if (validation.accepted === true && validation.decision === 'idempotent_same_hash') {
             await recordManagedNanahPolicyValidationHistory(envelope, validation, context);
             await sendNanahManagedLivePolicyAck(envelope, validation);
-            UIComponents.showToast('Managed policy already matches the last accepted revision', 'info');
+            UIComponents.showToast(tabViewUiText('dashboard.sync.toast.managedPolicyAlreadyAccepted', 'Managed policy already matches the last accepted revision'), 'info');
             return;
         }
         if (validation.accepted === true) {
@@ -23544,7 +24025,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                 };
                 await recordManagedNanahPolicyValidationHistory(envelope, decision, context);
                 await sendNanahManagedLivePolicyAck(envelope, decision);
-                UIComponents.showToast('Managed policy apply is unavailable', 'error');
+                UIComponents.showToast(tabViewUiText('dashboard.sync.toast.managedPolicyApplyUnavailable', 'Managed policy apply is unavailable'), 'error');
                 return;
             }
             const result = await adapter.applyManagedPolicyEnvelope(envelope, context);
@@ -23552,19 +24033,19 @@ document.addEventListener('DOMContentLoaded', async () => {
             await sendNanahManagedLivePolicyAck(envelope, result.accepted === true ? validation : result);
             if (result.accepted === true && result.applied !== false) {
                 await refreshFilterTubeUiAfterNanahImport();
-                UIComponents.showToast(`Applied managed ${normalizeString(validation.scope) || 'policy'} update`, 'success');
+                UIComponents.showToast(tabViewUiText('dashboard.sync.toast.managedPolicyApplied', 'Applied managed {scope} update', { scope: normalizeString(validation.scope) || 'policy' }), 'success');
                 return;
             }
             if (result.accepted === true && result.decision === 'idempotent_same_hash') {
-                UIComponents.showToast('Managed policy already matches the last accepted revision', 'info');
+                UIComponents.showToast(tabViewUiText('dashboard.sync.toast.managedPolicyAlreadyAccepted', 'Managed policy already matches the last accepted revision'), 'info');
                 return;
             }
-            UIComponents.showToast(`Managed policy rejected: ${formatManagedNanahBlockedReason(result.reason, 'apply failed')}`, 'error');
+            UIComponents.showToast(tabViewUiText('dashboard.sync.toast.managedPolicyRejected', 'Managed policy rejected: {reason}', { reason: formatManagedNanahBlockedReason(result.reason, 'apply failed') }), 'error');
             return;
         }
         await recordManagedNanahPolicyValidationHistory(envelope, validation, context);
         await sendNanahManagedLivePolicyAck(envelope, validation);
-        UIComponents.showToast(`Managed policy rejected: ${formatManagedNanahBlockedReason(validation.reason)}`, 'error');
+        UIComponents.showToast(tabViewUiText('dashboard.sync.toast.managedPolicyRejected', 'Managed policy rejected: {reason}', { reason: formatManagedNanahBlockedReason(validation.reason) }), 'error');
     }
 
     async function handleNanahIncomingManagedMailboxItem(item) {
@@ -23596,7 +24077,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         const validation = adapter.validateManagedMailboxItem(item, context);
         if (validation.accepted === true && validation.decision === 'idempotent_same_hash') {
             await recordManagedNanahPolicyValidationHistory(envelope, validation, context);
-            UIComponents.showToast('Internet Pickup update already matches the last accepted revision', 'info');
+            UIComponents.showToast(tabViewUiText('dashboard.sync.toast.internetPickupUpdateAlreadyAccepted', 'Internet Pickup update already matches the last accepted revision'), 'info');
             return validation;
         }
         if (validation.accepted === true) {
@@ -23607,25 +24088,25 @@ document.addEventListener('DOMContentLoaded', async () => {
                     mailboxItemId: validation.mailboxItemId
                 };
                 await recordManagedNanahPolicyValidationHistory(envelope, decision, context);
-                UIComponents.showToast('Internet Pickup apply is unavailable', 'error');
+                UIComponents.showToast(tabViewUiText('dashboard.sync.toast.internetPickupApplyUnavailable', 'Internet Pickup apply is unavailable'), 'error');
                 return decision;
             }
             const result = await adapter.applyManagedMailboxItem(item, context);
             await recordManagedNanahPolicyValidationHistory(envelope, result.accepted === true ? validation : result, context);
             if (result.accepted === true && result.applied !== false) {
                 await refreshFilterTubeUiAfterNanahImport();
-                UIComponents.showToast(`Applied Internet Pickup ${normalizeString(validation.scope) || 'policy'} update`, 'success');
+                UIComponents.showToast(tabViewUiText('dashboard.sync.toast.internetPickupApplied', 'Applied Internet Pickup {scope} update', { scope: normalizeString(validation.scope) || 'policy' }), 'success');
                 return result;
             }
             if (result.accepted === true && result.decision === 'idempotent_same_hash') {
-                UIComponents.showToast('Internet Pickup update already matches the last accepted revision', 'info');
+                UIComponents.showToast(tabViewUiText('dashboard.sync.toast.internetPickupUpdateAlreadyAccepted', 'Internet Pickup update already matches the last accepted revision'), 'info');
                 return result;
             }
-            UIComponents.showToast(`Internet Pickup update rejected: ${formatManagedNanahBlockedReason(result.reason, 'apply failed')}`, 'error');
+            UIComponents.showToast(tabViewUiText('dashboard.sync.toast.internetPickupUpdateRejected', 'Internet Pickup update rejected: {reason}', { reason: formatManagedNanahBlockedReason(result.reason, 'apply failed') }), 'error');
             return result;
         }
         await recordManagedNanahPolicyValidationHistory(envelope, validation, context);
-        UIComponents.showToast(`Internet Pickup update rejected: ${formatManagedNanahBlockedReason(validation.reason)}`, 'error');
+        UIComponents.showToast(tabViewUiText('dashboard.sync.toast.internetPickupUpdateRejected', 'Internet Pickup update rejected: {reason}', { reason: formatManagedNanahBlockedReason(validation.reason) }), 'error');
         return validation;
     }
 
@@ -23665,7 +24146,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         const validation = adapter.validateManagedLocalNetworkCandidate(sanitizedCandidate, context);
         if (validation.accepted === true && validation.decision === 'idempotent_same_hash') {
             await recordManagedNanahPolicyValidationHistory(envelope, validation, context);
-            UIComponents.showToast('Home Pickup update already matches the last accepted revision', 'info');
+            UIComponents.showToast(tabViewUiText('dashboard.sync.toast.homePickupUpdateAlreadyAccepted', 'Home Pickup update already matches the last accepted revision'), 'info');
             return validation;
         }
         if (validation.accepted === true) {
@@ -23676,25 +24157,25 @@ document.addEventListener('DOMContentLoaded', async () => {
                     validationDecision: validation.decision
                 };
                 await recordManagedNanahPolicyValidationHistory(envelope, decision, context);
-                UIComponents.showToast('Home Pickup apply is unavailable', 'error');
+                UIComponents.showToast(tabViewUiText('dashboard.sync.toast.homePickupApplyUnavailable', 'Home Pickup apply is unavailable'), 'error');
                 return decision;
             }
             const result = await adapter.applyManagedPolicyEnvelope(envelope, context);
             await recordManagedNanahPolicyValidationHistory(envelope, result.accepted === true ? validation : result, context);
             if (result.accepted === true && result.applied !== false) {
                 await refreshFilterTubeUiAfterNanahImport();
-                UIComponents.showToast(`Applied Home Pickup ${normalizeString(validation.scope) || 'policy'} update`, 'success');
+                UIComponents.showToast(tabViewUiText('dashboard.sync.toast.homePickupApplied', 'Applied Home Pickup {scope} update', { scope: normalizeString(validation.scope) || 'policy' }), 'success');
                 return result;
             }
             if (result.accepted === true && result.decision === 'idempotent_same_hash') {
-                UIComponents.showToast('Home Pickup update already matches the last accepted revision', 'info');
+                UIComponents.showToast(tabViewUiText('dashboard.sync.toast.homePickupUpdateAlreadyAccepted', 'Home Pickup update already matches the last accepted revision'), 'info');
                 return result;
             }
-            UIComponents.showToast(`Home Pickup update rejected: ${formatManagedNanahBlockedReason(result.reason, 'apply failed')}`, 'error');
+            UIComponents.showToast(tabViewUiText('dashboard.sync.toast.homePickupUpdateRejected', 'Home Pickup update rejected: {reason}', { reason: formatManagedNanahBlockedReason(result.reason, 'apply failed') }), 'error');
             return result;
         }
         await recordManagedNanahPolicyValidationHistory(envelope, validation, context);
-        UIComponents.showToast(`Home Pickup update rejected: ${formatManagedNanahBlockedReason(validation.reason)}`, 'error');
+        UIComponents.showToast(tabViewUiText('dashboard.sync.toast.homePickupUpdateRejected', 'Home Pickup update rejected: {reason}', { reason: formatManagedNanahBlockedReason(validation.reason) }), 'error');
         return validation;
     }
 
@@ -23918,14 +24399,14 @@ document.addEventListener('DOMContentLoaded', async () => {
                 nanahSessionState.trustedReconnectApproved = true;
                 nanahSessionState.trustedReconnectDeviceId = remoteDeviceId;
                 updateNanahUi();
-                UIComponents.showToast('Trusted reconnect approved for this session', 'success');
+                UIComponents.showToast(tabViewUiText('dashboard.sync.toast.trustedReconnectApproved', 'Trusted reconnect approved for this session'), 'success');
                 return true;
             }
 
             nanahSessionState.trustedReconnectApproved = false;
             nanahSessionState.trustedReconnectDeviceId = '';
             updateNanahUi();
-            UIComponents.showToast('Trusted reconnect declined', 'info');
+            UIComponents.showToast(tabViewUiText('dashboard.sync.toast.trustedReconnectDeclined', 'Trusted reconnect declined'), 'info');
             if (closeOnDecline && nanahClient) {
                 try {
                     await nanahClient.close();
@@ -24032,7 +24513,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             if (trustedDecision?.ok) {
                 await applyNanahEnvelope(envelope, trustedDecision.strategy);
                 await sendNanahDecision(envelope.id, true, 'auto-applied');
-                UIComponents.showToast(`Applied ${details.scope} settings from trusted source`, 'success');
+                UIComponents.showToast(tabViewUiText('dashboard.sync.toast.trustedSourceSettingsApplied', 'Applied {scope} settings from trusted source', { scope: details.scope }), 'success');
                 return;
             }
         }
@@ -24041,7 +24522,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             const trustedDecision = resolveTrustedNanahManagedApply(details, trustedLink);
             if (!trustedDecision?.ok) {
                 await sendNanahDecision(envelope.id, false, trustedDecision?.reason || 'blocked by trusted link policy');
-                UIComponents.showToast(trustedDecision?.reason || 'Managed update does not match this trusted link policy', 'error');
+                UIComponents.showToast(trustedDecision?.reason || tabViewUiText('dashboard.sync.toast.managedUpdateDoesNotMatchTrustedPolicy', 'Managed update does not match this trusted link policy'), 'error');
                 return;
             }
 
@@ -24070,13 +24551,13 @@ document.addEventListener('DOMContentLoaded', async () => {
 
             if (response !== 'approve') {
                 await sendNanahDecision(envelope.id, false, 'declined');
-                UIComponents.showToast('Incoming managed sync declined', 'info');
+                UIComponents.showToast(tabViewUiText('dashboard.sync.toast.incomingManagedSyncDeclined', 'Incoming managed sync declined'), 'info');
                 return;
             }
 
             await applyNanahEnvelope(envelope, trustedDecision.strategy);
             await sendNanahDecision(envelope.id, true, trustedDecision.strategy);
-            UIComponents.showToast(`Applied ${details.scope} settings`, 'success');
+            UIComponents.showToast(tabViewUiText('dashboard.sync.toast.settingsApplied', 'Applied {scope} settings', { scope: details.scope }), 'success');
             return;
         }
 
@@ -24118,7 +24599,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 
             if (!managedApproval?.policy) {
                 await sendNanahDecision(envelope.id, false, 'declined');
-                UIComponents.showToast('Incoming managed sync declined', 'info');
+                UIComponents.showToast(tabViewUiText('dashboard.sync.toast.incomingManagedSyncDeclined', 'Incoming managed sync declined'), 'info');
                 return;
             }
 
@@ -24235,13 +24716,13 @@ document.addEventListener('DOMContentLoaded', async () => {
 
         if (!response || response === 'decline') {
             await sendNanahDecision(envelope.id, false, 'declined');
-            UIComponents.showToast('Incoming sync declined', 'info');
+            UIComponents.showToast(tabViewUiText('dashboard.sync.toast.incomingSyncDeclined', 'Incoming sync declined'), 'info');
             return;
         }
 
         await applyNanahEnvelope(envelope, response);
         await sendNanahDecision(envelope.id, true, response);
-        UIComponents.showToast(`Applied ${details.scope} settings`, 'success');
+        UIComponents.showToast(tabViewUiText('dashboard.sync.toast.settingsApplied', 'Applied {scope} settings', { scope: details.scope }), 'success');
     }
 
     async function handleNanahIncomingEnvelope(envelope) {
@@ -24390,7 +24871,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             if (nanahClient !== currentClient) return;
             nanahSessionState.sasPhrase = normalizeString(payload?.phrase);
             updateNanahUi();
-            UIComponents.showToast('Compare the safety phrase on both devices', 'info');
+            UIComponents.showToast(tabViewUiText('dashboard.sync.toast.compareSafetyPhraseOnBothDevices', 'Compare the safety phrase on both devices'), 'info');
         });
         client.on('connected', async () => {
             if (nanahClient !== currentClient) return;
@@ -24406,13 +24887,13 @@ document.addEventListener('DOMContentLoaded', async () => {
             if (nanahClient !== currentClient) return;
             Promise.resolve(handleNanahIncomingEnvelope(envelope)).catch((error) => {
                 console.error('FilterTube: failed to handle Nanah envelope', error);
-                UIComponents.showToast('Failed to process incoming Nanah sync', 'error');
+                UIComponents.showToast(tabViewUiText('dashboard.sync.toast.incomingNanahSyncFailed', 'Failed to process incoming Nanah sync'), 'error');
             });
         });
         client.on('error', (error) => {
             if (nanahClient !== currentClient) return;
             console.error('FilterTube: Nanah session error', error);
-            UIComponents.showToast(error?.message || 'Nanah session failed', 'error');
+            UIComponents.showToast(error?.message || tabViewUiText('dashboard.sync.toast.nanahSessionFailed', 'Nanah session failed'), 'error');
             setNanahSessionNotice({
                 message: 'Pairing could not finish. Check that both devices are open, then start pairing again.',
                 tone: 'retry'
@@ -24435,17 +24916,17 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     async function trustConnectedNanahDevice() {
         if (isNanahChildReceiveOnly()) {
-            UIComponents.showToast('Protected profiles can receive parent updates, but trusted-link policy is parent-controlled.', 'error');
+            UIComponents.showToast(tabViewUiText('dashboard.sync.toast.protectedProfileTrustPolicyParentControlled', 'Protected profiles can receive parent updates, but trusted-link policy is parent-controlled.'), 'error');
             return;
         }
         if (!nanahClient || !nanahSessionState.connected || !nanahSessionState.sasConfirmed) {
-            UIComponents.showToast('Confirm the matching safety phrase before saving trust.', 'error');
+            UIComponents.showToast(tabViewUiText('dashboard.sync.toast.confirmSafetyPhraseBeforeTrust', 'Confirm the matching safety phrase before saving trust.'), 'error');
             return;
         }
         const remote = safeObject(nanahSessionState.remoteDevice);
         const remoteDeviceId = normalizeString(remote.deviceId);
         if (!remoteDeviceId) {
-            UIComponents.showToast('No connected device to trust yet', 'error');
+            UIComponents.showToast(tabViewUiText('dashboard.sync.toast.noConnectedDeviceToTrust', 'No connected device to trust yet'), 'error');
             return;
         }
 
@@ -24454,25 +24935,28 @@ document.addEventListener('DOMContentLoaded', async () => {
         const linkType = classifyNanahTrustedLink(localRole, remoteRole);
         if (!linkType) {
             UIComponents.showToast(
-                `${getNanahRoleLabel(localRole)} + ${getNanahRoleLabel(remoteRole)} can pair temporarily, but only matching device-copy or parent/protected roles can be saved as a trusted link.`,
+                tabViewUiText('dashboard.sync.toast.unsupportedTrustedRolePair', '{localRole} + {remoteRole} can pair temporarily, but only matching device-copy or parent/protected roles can be saved as a trusted link.', {
+                    localRole: getNanahRoleLabel(localRole),
+                    remoteRole: getNanahRoleLabel(remoteRole)
+                }),
                 'error'
             );
             return;
         }
         if (isNanahChildReplicaOnly() && (localRole !== 'replica' || remoteRole !== 'source' || linkType !== 'managed_link')) {
-            UIComponents.showToast('Locked protected profiles can only save parent trust links. Unlock the protected profile first to send from it.', 'error');
+            UIComponents.showToast(tabViewUiText('dashboard.sync.toast.lockedProtectedProfileTrustRestriction', 'Locked protected profiles can only save parent trust links. Unlock the protected profile first to send from it.'), 'error');
             return;
         }
         if (linkType === 'managed_link' && localRole === 'source') {
             try {
                 const keyPair = await ensureNanahManagedSigningKeyPair({ required: true });
                 if (!keyPair) {
-                    UIComponents.showToast('Managed source links require a local signing key before they can be saved.', 'error');
+                    UIComponents.showToast(tabViewUiText('dashboard.sync.toast.managedSourceSigningKeyRequired', 'Managed source links require a local signing key before they can be saved.'), 'error');
                     return;
                 }
             } catch (error) {
                 // The toast below is the user-facing required-key failure report.
-                UIComponents.showToast(error?.message || 'Managed signing key is unavailable', 'error');
+                UIComponents.showToast(error?.message || tabViewUiText('dashboard.sync.toast.managedSigningKeyUnavailable', 'Managed signing key is unavailable'), 'error');
                 return;
             }
         }
@@ -26333,7 +26817,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     if (ftNanahQuickCreateProtectedBtn) {
         ftNanahQuickCreateProtectedBtn.addEventListener('click', () => {
             if (ftNanahQuickCreateProtectedBtn.disabled) {
-                UIComponents.showToast(ftNanahQuickCreateProtectedBtn.title || 'Protected profile creation is unavailable here', 'warning');
+                UIComponents.showToast(ftNanahQuickCreateProtectedBtn.title || tabViewUiText('dashboard.sync.toast.protectedProfileCreationUnavailable', 'Protected profile creation is unavailable here'), 'warning');
                 return;
             }
             setNanahPersonalSyncOpen(false);
@@ -26341,14 +26825,14 @@ document.addEventListener('DOMContentLoaded', async () => {
                 ftCreateChildBtn.click();
                 return;
             }
-            UIComponents.showToast(ftCreateChildBtn?.title || 'Create a protected profile from the Profiles section first', 'warning');
+            UIComponents.showToast(ftCreateChildBtn?.title || tabViewUiText('dashboard.sync.toast.createProtectedProfileFromProfilesFirst', 'Create a protected profile from the Profiles section first'), 'warning');
         });
     }
 
     if (ftNanahQuickSyncDevicesBtn) {
         ftNanahQuickSyncDevicesBtn.addEventListener('click', () => {
             if (ftNanahQuickSyncDevicesBtn.disabled) {
-                UIComponents.showToast(ftNanahQuickSyncDevicesBtn.title || 'Personal device sync is unavailable here', 'warning');
+                UIComponents.showToast(ftNanahQuickSyncDevicesBtn.title || tabViewUiText('dashboard.sync.toast.personalDeviceSyncUnavailable', 'Personal device sync is unavailable here'), 'warning');
                 return;
             }
             setNanahPersonalSyncOpen(true);
@@ -26361,14 +26845,14 @@ document.addEventListener('DOMContentLoaded', async () => {
             updateNanahUi();
             openNanahPairingDetails();
             focusNanahElement(ftNanahHostBtn || ftNanahStatusCard);
-            UIComponents.showToast('Pair your other device, match the phrase, then copy this profile', 'info');
+                UIComponents.showToast(tabViewUiText('dashboard.sync.toast.pairOtherDeviceAndCopyProfile', 'Pair your other device, match the phrase, then copy this profile'), 'info');
         });
     }
 
     if (ftNanahQuickSendUpdateBtn) {
         ftNanahQuickSendUpdateBtn.addEventListener('click', () => {
             if (ftNanahQuickSendUpdateBtn.disabled) {
-                UIComponents.showToast(ftNanahQuickSendUpdateBtn.title || 'Send Update is unavailable here', 'warning');
+                UIComponents.showToast(ftNanahQuickSendUpdateBtn.title || tabViewUiText('dashboard.sync.toast.sendUpdateUnavailable', 'Send Update is unavailable here'), 'warning');
                 return;
             }
             setNanahPersonalSyncOpen(false);
@@ -26381,7 +26865,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             updateNanahUi();
             openNanahPairingDetails();
             focusNanahElement(ftNanahHostBtn || ftNanahStatusCard || ftNanahDeliveryLiveCard);
-            UIComponents.showToast('Start pairing, then match the phrase on both devices', 'info');
+            UIComponents.showToast(tabViewUiText('dashboard.sync.toast.startPairingAndMatchPhrase', 'Start pairing, then match the phrase on both devices'), 'info');
         });
     }
 
@@ -26423,7 +26907,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                 if (!canSend || !selectedProfileId) {
                     openNanahPairingDetails();
                     focusNanahElement(ftNanahTrustedLinks);
-                    UIComponents.showToast('Open the verified-device controls to reconnect or review this link', 'info');
+                    UIComponents.showToast(tabViewUiText('dashboard.sync.toast.openVerifiedDeviceControlsForLink', 'Open the verified-device controls to reconnect or review this link'), 'info');
                     return;
                 }
                 const targetLabel = normalizeString(selectedIntent.title) || 'this verified device';
@@ -26445,7 +26929,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                     openNanahPairingDetails();
                     if (ftNanahDeliveryAdvanced) ftNanahDeliveryAdvanced.open = true;
                     focusNanahElement(ftNanahHostBtn || ftNanahDeliveryAdvanced || ftNanahTrustedLinks);
-                    UIComponents.showToast('Open the device now, or set up Home/Internet Pickup for later delivery', 'warning');
+                    UIComponents.showToast(tabViewUiText('dashboard.sync.toast.openNowOrSetUpPickupForLater', 'Open the device now, or set up Home/Internet Pickup for later delivery'), 'warning');
                     return;
                 }
                 const deliveryMode = await showChoiceModal({
@@ -26484,7 +26968,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                 ftNanahQuickCreateProtectedBtn.click();
                 return;
             }
-            UIComponents.showToast('Choose a path or create a protected profile first', 'warning');
+            UIComponents.showToast(tabViewUiText('dashboard.sync.toast.choosePathOrCreateProtectedProfile', 'Choose a path or create a protected profile first'), 'warning');
         });
     }
 
@@ -26545,7 +27029,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                     renderNanahDeliveryPathStrip();
                     return;
                 }
-                UIComponents.showToast('Nearby helper found', 'success');
+                UIComponents.showToast(tabViewUiText('dashboard.sync.toast.nearbyHelperFound', 'Nearby helper found'), 'success');
                 renderNanahDeliveryPathStrip();
             }
             const localOffline = local.configured === true && local.healthOk === false;
@@ -26608,7 +27092,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                         title: 'Home check did not finish',
                         detail: 'Use Open now while both devices are available, or check Home Pickup setup in Advanced.'
                     });
-                    UIComponents.showToast('Home check did not finish. Try Open now or check setup.', 'warning');
+                    UIComponents.showToast(tabViewUiText('dashboard.sync.toast.homeCheckIncomplete', 'Home check did not finish. Try Open now or check setup.'), 'warning');
                 } finally {
                     ftNanahCompassHomeBtn.disabled = false;
                     renderNanahDeliveryPathStrip();
@@ -26690,10 +27174,10 @@ document.addEventListener('DOMContentLoaded', async () => {
                     await runNanahManagedLocalNetworkSync({ reason: 'manual_saved_update_check' });
                 }
                 renderNanahDeliveryPathStrip();
-                UIComponents.showToast('Checked waiting parent updates', 'info');
+                UIComponents.showToast(tabViewUiText('dashboard.sync.toast.checkedWaitingParentUpdates', 'Checked waiting parent updates'), 'info');
             } catch (error) {
                 console.error('FilterTube: waiting parent update check failed', error);
-                UIComponents.showToast(error?.message || 'Waiting update check failed', 'error');
+                UIComponents.showToast(error?.message || tabViewUiText('dashboard.sync.toast.waitingUpdateCheckFailed', 'Waiting update check failed'), 'error');
             } finally {
                 renderNanahDeliveryPathStrip();
             }
@@ -26708,10 +27192,10 @@ document.addEventListener('DOMContentLoaded', async () => {
                 await runNanahManagedSourceAckSync({ reason: 'manual_parent_receipt_check' });
                 renderNanahDeliveryPathStrip();
                 renderNanahTrustedLinks();
-                UIComponents.showToast('Checked protected-device delivery', 'info');
+                UIComponents.showToast(tabViewUiText('dashboard.sync.toast.checkedProtectedDeviceDelivery', 'Checked protected-device delivery'), 'info');
             } catch (error) {
                 console.error('FilterTube: protected-device delivery check failed', error);
-                UIComponents.showToast(error?.message || 'Delivery check failed', 'error');
+                UIComponents.showToast(error?.message || tabViewUiText('dashboard.sync.toast.deliveryCheckFailed', 'Delivery check failed'), 'error');
             } finally {
                 renderNanahDeliveryPathStrip();
             }
@@ -26827,10 +27311,10 @@ document.addEventListener('DOMContentLoaded', async () => {
             ftNanahHostBtn.addEventListener('click', async () => {
                 try {
                     const code = await hostNanahSession({ source: 'host-button' });
-                    if (code) UIComponents.showToast(`Pairing code ${code} is ready`, 'success');
+                    if (code) UIComponents.showToast(tabViewUiText('dashboard.sync.toast.pairingCodeReady', 'Pairing code {code} is ready', { code }), 'success');
                 } catch (error) {
                     console.error('FilterTube: failed to host Nanah session', error);
-                    UIComponents.showToast(error?.message || 'Failed to create pairing code', 'error');
+                    UIComponents.showToast(error?.message || tabViewUiText('dashboard.sync.toast.createPairingCodeFailed', 'Failed to create pairing code'), 'error');
                 }
             });
         }
@@ -26839,15 +27323,15 @@ document.addEventListener('DOMContentLoaded', async () => {
             ftNanahJoinBtn.addEventListener('click', async () => {
                 const code = extractNanahCodeFromInput(ftNanahJoinCode.value);
                 if (code.length < 4) {
-                    UIComponents.showToast('Enter the 4-character pairing code first', 'error');
+                    UIComponents.showToast(tabViewUiText('dashboard.sync.toast.enterPairingCodeFirst', 'Enter the 4-character pairing code first'), 'error');
                     return;
                 }
                 try {
                     await joinNanahSessionWithCode(code, { source: 'join-button' });
-                    UIComponents.showToast(`Joining code ${code}`, 'info');
+                    UIComponents.showToast(tabViewUiText('dashboard.sync.toast.joiningPairingCode', 'Joining code {code}', { code }), 'info');
                 } catch (error) {
                     console.error('FilterTube: failed to join Nanah session', error);
-                    UIComponents.showToast(error?.message || 'Failed to join pairing code', 'error');
+                    UIComponents.showToast(error?.message || tabViewUiText('dashboard.sync.toast.joinPairingCodeFailed', 'Failed to join pairing code'), 'error');
                 }
             });
         }
@@ -26877,10 +27361,10 @@ document.addEventListener('DOMContentLoaded', async () => {
                     nanahSessionState.sasConfirmed = true;
                     updateNanahUi();
                     await sendNanahHelloEnvelope();
-                    UIComponents.showToast('Secure session confirmed', 'success');
+                    UIComponents.showToast(tabViewUiText('dashboard.sync.toast.secureSessionConfirmed', 'Secure session confirmed'), 'success');
                 } catch (error) {
                     console.error('FilterTube: failed to confirm SAS', error);
-                    UIComponents.showToast('Failed to confirm safety phrase', 'error');
+                    UIComponents.showToast(tabViewUiText('dashboard.sync.toast.safetyPhraseConfirmationFailed', 'Failed to confirm safety phrase'), 'error');
                 }
             });
         }
@@ -26891,10 +27375,10 @@ document.addEventListener('DOMContentLoaded', async () => {
                 if (!pairUri) return;
                 try {
                     await navigator.clipboard.writeText(pairUri);
-                    UIComponents.showToast('Pairing link copied', 'success');
+                    UIComponents.showToast(tabViewUiText('dashboard.sync.toast.pairingLinkCopied', 'Pairing link copied'), 'success');
                 } catch (error) {
                     console.error('FilterTube: failed to copy Nanah pair URI', error);
-                    UIComponents.showToast('Could not copy pairing link', 'error');
+                    UIComponents.showToast(tabViewUiText('dashboard.sync.toast.pairingLinkCopyFailed', 'Could not copy pairing link'), 'error');
                 }
             });
         }
@@ -26902,11 +27386,11 @@ document.addEventListener('DOMContentLoaded', async () => {
         if (ftNanahSendBtn) {
             ftNanahSendBtn.addEventListener('click', async () => {
                 if (isNanahChildReceiveOnly()) {
-                    UIComponents.showToast('Protected profiles are receive-only in Accounts & Sync.', 'error');
+                    UIComponents.showToast(tabViewUiText('dashboard.sync.toast.protectedProfilesReceiveOnlyInAccountsSync', 'Protected profiles are receive-only in Accounts & Sync.'), 'error');
                     return;
                 }
                 if (!nanahClient || !nanahSessionState.connected || !nanahSessionState.sasConfirmed) {
-                    UIComponents.showToast('Finish pairing and confirm the safety phrase first', 'error');
+                    UIComponents.showToast(tabViewUiText('dashboard.sync.toast.finishPairingAndConfirmSafetyPhrase', 'Finish pairing and confirm the safety phrase first'), 'error');
                     return;
                 }
                 try {
@@ -26961,16 +27445,16 @@ document.addEventListener('DOMContentLoaded', async () => {
                         const targetLabel = targetCount > 1
                             ? `${targetCount} target profiles on ${getNanahRemoteLabel()}`
                             : getNanahRemoteLabel();
-                        UIComponents.showToast(`Sent signed managed ${sentScopes} policy to ${targetLabel}`, 'success');
+                        UIComponents.showToast(tabViewUiText('dashboard.sync.toast.signedManagedPolicySent', 'Sent signed managed {scopes} policy to {target}', { scopes: sentScopes, target: targetLabel }), 'success');
                         return;
                     }
                     let envelope = await adapter.buildControlProposal({ scope: policy.scope, strategy: policy.strategy, auth });
                     envelope = attachNanahProposalPolicy(envelope, policy);
                     await nanahClient.send(envelope);
-                    UIComponents.showToast(`Sent ${policy.scope} settings to ${getNanahRemoteLabel()}`, 'success');
+                    UIComponents.showToast(tabViewUiText('dashboard.sync.toast.settingsSentToDevice', 'Sent {scope} settings to {target}', { scope: policy.scope, target: getNanahRemoteLabel() }), 'success');
                 } catch (error) {
                     console.error('FilterTube: failed to send Nanah settings', error);
-                    UIComponents.showToast(error?.message || 'Failed to send settings', 'error');
+                    UIComponents.showToast(error?.message || tabViewUiText('dashboard.sync.toast.sendSettingsFailed', 'Failed to send settings'), 'error');
                 }
             });
         }
@@ -26978,14 +27462,14 @@ document.addEventListener('DOMContentLoaded', async () => {
         if (ftNanahTrustBtn) {
             ftNanahTrustBtn.addEventListener('click', async () => {
                 if (isNanahChildReceiveOnly()) {
-                    UIComponents.showToast('Trusted-link policy is parent-controlled for protected profiles.', 'error');
+                    UIComponents.showToast(tabViewUiText('dashboard.sync.toast.trustedLinkPolicyParentControlled', 'Trusted-link policy is parent-controlled for protected profiles.'), 'error');
                     return;
                 }
                 try {
                     await trustConnectedNanahDevice();
                 } catch (error) {
                     console.error('FilterTube: failed to trust Nanah device', error);
-                    UIComponents.showToast(error?.message || 'Failed to trust device', 'error');
+                    UIComponents.showToast(error?.message || tabViewUiText('dashboard.sync.toast.trustDeviceFailed', 'Failed to trust device'), 'error');
                 }
             });
         }
@@ -26993,7 +27477,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         if (ftNanahEndSessionBtn) {
             ftNanahEndSessionBtn.addEventListener('click', async () => {
                 await resetNanahSession(true);
-                UIComponents.showToast('Nanah session ended', 'success');
+                UIComponents.showToast(tabViewUiText('dashboard.sync.toast.nanahSessionEnded', 'Nanah session ended'), 'success');
             });
         }
     }
@@ -27005,7 +27489,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             if (!ensureNotScopedProtectedEditForGlobalAdmin('global account policy')) return;
             const fresh = await io.loadProfilesV4();
             if (normalizeString(fresh?.activeProfileId) !== 'default') {
-                UIComponents.showToast('Switch to Default to change account policy', 'error');
+                UIComponents.showToast(tabViewUiText('family.profileManager.switchDefaultToChangePolicy', 'Switch to Default to change account policy'), 'error');
                 updateAdminPolicyControls();
                 return;
             }
@@ -27030,7 +27514,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                 profiles
             });
             await refreshProfilesUI();
-            UIComponents.showToast('Account policy updated', 'success');
+            UIComponents.showToast(tabViewUiText('family.profileManager.accountPolicyUpdated', 'Account policy updated'), 'success');
             await scheduleAutoBackup('setting_updated');
         };
 
@@ -27041,7 +27525,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             }
             if (!ensureNotScopedProtectedEditForGlobalAdmin('global account policy')) return;
             if (activeProfileId !== 'default') {
-                UIComponents.showToast('Switch to Default to change account policy', 'error');
+                UIComponents.showToast(tabViewUiText('family.profileManager.switchDefaultToChangePolicy', 'Switch to Default to change account policy'), 'error');
                 updateAdminPolicyControls();
                 return;
             }
@@ -27057,7 +27541,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             }
             if (!ensureNotScopedProtectedEditForGlobalAdmin('global account policy')) return;
             if (activeProfileId !== 'default') {
-                UIComponents.showToast('Switch to Default to change account policy', 'error');
+                UIComponents.showToast(tabViewUiText('family.profileManager.switchDefaultToChangePolicy', 'Switch to Default to change account policy'), 'error');
                 updateAdminPolicyControls();
                 return;
             }
@@ -27082,7 +27566,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 
             const profilesV4 = await io.loadProfilesV4();
             if (normalizeString(profilesV4?.activeProfileId) !== 'default') {
-                UIComponents.showToast('Switch to Default to create an account', 'error');
+                UIComponents.showToast(tabViewUiText('family.profileManager.switchDefaultToCreateAccount', 'Switch to Default to create an account'), 'error');
                 return;
             }
 
@@ -27091,14 +27575,14 @@ document.addEventListener('DOMContentLoaded', async () => {
 
             const policy = getAccountPolicy(profilesV4);
             if (!policy.allowAccountCreation) {
-                UIComponents.showToast('Account creation is disabled in Master policy', 'error');
+                UIComponents.showToast(tabViewUiText('family.profileManager.accountCreationDisabledInMasterPolicy', 'Account creation is disabled in Master policy'), 'error');
                 return;
             }
 
             if (policy.maxAccounts > 0) {
                 const existingCount = countNonDefaultAccounts(profilesV4);
                 if (existingCount >= policy.maxAccounts) {
-                    UIComponents.showToast('Account limit reached', 'error');
+                    UIComponents.showToast(tabViewUiText('family.profileManager.accountLimitReached', 'Account limit reached'), 'error');
                     return;
                 }
             }
@@ -27176,7 +27660,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             });
 
             await refreshProfilesUI();
-            UIComponents.showToast('Account created. Current profile remains active.', 'success');
+            UIComponents.showToast(tabViewUiText('family.profileManager.accountCreatedCurrentProfileActive', 'Account created. Current profile remains active.'), 'success');
             try {
                 const fresh = profilesV4Cache;
                 const root = safeObject(fresh);
@@ -27207,7 +27691,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             const currentActive = normalizeString(profilesV4?.activeProfileId) || 'default';
             const currentType = getProfileType(profilesV4, currentActive);
             if (currentType !== 'account') {
-                UIComponents.showToast('Switch to the parent account to create a protected profile', 'error');
+                UIComponents.showToast(tabViewUiText('family.profileManager.switchParentToCreateProtected', 'Switch to the parent account to create a protected profile'), 'error');
                 return;
             }
 
@@ -27286,7 +27770,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             });
 
             await refreshProfilesUI();
-            UIComponents.showToast('Protected profile created. Parent profile remains active so you can finish setup.', 'success');
+            UIComponents.showToast(tabViewUiText('family.profileManager.protectedProfileCreatedParentRemainsActive', 'Protected profile created. Parent profile remains active so you can finish setup.'), 'success');
             try {
                 const fresh = profilesV4Cache;
                 const root = safeObject(fresh);
@@ -27314,7 +27798,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             }
             const profilesV4 = await io.loadProfilesV4();
             if (normalizeString(profilesV4?.activeProfileId) !== 'default') {
-                UIComponents.showToast('Switch to Default (Master) to manage Master PIN', 'error');
+                UIComponents.showToast(tabViewUiText('family.profileManager.switchDefaultToManageMasterPin', 'Switch to Default (Master) to manage Master PIN'), 'error');
                 return;
             }
 
@@ -27392,13 +27876,13 @@ document.addEventListener('DOMContentLoaded', async () => {
             }
             const profilesV4 = await io.loadProfilesV4();
             if (normalizeString(profilesV4?.activeProfileId) !== 'default') {
-                UIComponents.showToast('Switch to Default (Master) to manage Master PIN', 'error');
+                UIComponents.showToast(tabViewUiText('family.profileManager.switchDefaultToManageMasterPin', 'Switch to Default (Master) to manage Master PIN'), 'error');
                 return;
             }
 
             const hasExisting = !!extractMasterPinVerifier(profilesV4);
             if (!hasExisting) {
-                UIComponents.showToast('No Master PIN is set', 'info');
+                UIComponents.showToast(tabViewUiText('family.profileManager.noMasterPinSet', 'No Master PIN is set'), 'info');
                 return;
             }
 
@@ -27446,7 +27930,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             sessionMasterPin = '';
             await refreshProfilesUI();
             await applyLockGateIfNeeded();
-            UIComponents.showToast('Admin session locked', 'success');
+            UIComponents.showToast(tabViewUiText('family.profileManager.adminSessionLocked', 'Admin session locked'), 'success');
         });
     }
 
@@ -27488,7 +27972,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                     activeProfileId: activeId
                 };
                 await refreshProfilesUI();
-                UIComponents.showToast('Backup settings updated', 'success');
+                UIComponents.showToast(tabViewUiText('dashboard.toast.backupSettingsUpdated', 'Backup settings updated'), 'success');
                 await scheduleAutoBackup('setting_updated');
             } catch (e) {
             }
@@ -29092,10 +29576,10 @@ document.addEventListener('DOMContentLoaded', async () => {
             try {
                 const result = await action();
                 if (result?.ok === false) {
-                    UIComponents.showToast(result.error || 'Could not update metadata completion', 'error');
+                    UIComponents.showToast(result.error || tabViewUiText('dashboard.importEnrichment.updateMetadataCompletionFailed', 'Could not update metadata completion'), 'error');
                 }
             } catch (error) {
-                UIComponents.showToast('Could not update metadata completion', 'error');
+                UIComponents.showToast(tabViewUiText('dashboard.importEnrichment.updateMetadataCompletionFailed', 'Could not update metadata completion'), 'error');
             } finally {
                 await refreshImportedChannelEnrichmentStatus();
             }
@@ -29157,10 +29641,10 @@ document.addEventListener('DOMContentLoaded', async () => {
             const nextEnabled = !isRuleListAutoCheckEnabled();
             setRuleListAutoCheckEnabled(nextEnabled);
             if (nextEnabled) {
-                UIComponents.showToast('URL list auto-check enabled for this dashboard', 'success');
+                UIComponents.showToast(tabViewUiText('dashboard.managedLists.autoCheckEnabled', 'URL list auto-check enabled for this dashboard'), 'success');
                 await runRuleListAutoCheckIfDue({ force: true, reason: 'manual_enable' });
             } else {
-                UIComponents.showToast('URL list auto-check disabled', 'info');
+                UIComponents.showToast(tabViewUiText('dashboard.managedLists.autoCheckDisabled', 'URL list auto-check disabled'), 'info');
             }
         });
     }
