@@ -2,11 +2,58 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import vm from 'node:vm';
+import { loadFilterTubeEngine } from './harness/load-filter-engine.mjs';
 
 const dom = fs.readFileSync('js/content/dom_fallback.js', 'utf8');
 const injector = fs.readFileSync('js/injector.js', 'utf8');
+const seed = fs.readFileSync('js/seed.js', 'utf8');
 const slice = (source, start, end) => source.slice(source.indexOf(start), source.indexOf(end, source.indexOf(start)));
 const videoId = 'Ptng0VmOt-c';
+
+test('nested mobile reel channel identity blocks only the actual owner', () => {
+    const channelId = 'UC1234567890123456789012';
+    const card = (id, handle) => ({ reelItemRenderer: { videoId,
+        headline: { runs: [{ text: 'A video mentioning Duck Shorts' }] },
+        navigationEndpoint: { reelWatchEndpoint: { overlay: { reelPlayerOverlayRenderer: {
+            reelPlayerHeaderSupportedRenderers: { reelPlayerHeaderRenderer: {
+                channelTitleText: { runs: [{ text: 'Creator' }] },
+                channelNavigationEndpoint: { browseEndpoint: { browseId: id, canonicalBaseUrl: `/@${handle}` } }
+            } }
+        } } } }
+    } });
+    const settings = (rule, enabled = true) => ({ enabled, listMode: 'blocklist',
+        filterChannels: [rule], filterKeywords: [], whitelistKeywords: [], whitelistChannels: [],
+        blockedVideoIds: [], allowedVideoIds: [], channelMap: {} });
+    for (const rule of [{ id: channelId }, { handle: '@duckshort2' }]) {
+        const { engine } = loadFilterTubeEngine({ pathname: '/shorts/' + videoId });
+        const blocked = engine.processData({ contents: [card(channelId, 'duckshort2')] }, settings(rule), 'mobile-reel');
+        assert.equal(blocked.contents.length, 0, `actual owner must match ${JSON.stringify(rule)}`);
+        const allowed = engine.processData({ contents: [card('UC9999999999999999999999', 'othercreator')] }, settings(rule), 'unrelated-reel');
+        assert.equal(allowed.contents.length, 1, 'title mentions must not become channel matches');
+        const disabled = engine.processData({ contents: [card(channelId, 'duckshort2')] }, settings(rule, false), 'disabled-reel');
+        assert.equal(disabled.contents.length, 1);
+    }
+});
+
+test('mobile reel Player responses enter the existing metadata pipeline without changing the response', async () => {
+    const payload = { playerResponse: { videoDetails: { videoId, author: 'Duck Shorts' } } };
+    const original = new Response(JSON.stringify(payload), { status: 200 });
+    const received = [];
+    const context = vm.createContext({ window: { fetch: async () => original }, Request, Response, URL,
+        document: { location: { origin: 'https://m.youtube.com' } }, cachedSettings: { enabled: true },
+        shouldBypassYouTubeiNetworkResponse: () => false,
+        processWithEngine(data, name) { received.push({ data, name }); return data; },
+        hasNetworkJsonWork: () => false, seedDebugLog() {} });
+    vm.runInContext(slice(seed, '    function setupFetchInterception() {', '    function setupXhrInterception() {'), context);
+    context.setupFetchInterception();
+    const response = await context.window.fetch('https://m.youtube.com/youtubei/v1/reel/reel_item_watch?prettyPrint=false');
+    assert.equal(response, original);
+    assert.equal(received.length, 1);
+    assert.equal(received[0].data.playerResponse.videoDetails.videoId, videoId);
+    assert.equal(received[0].name, 'fetch:/youtubei/v1/reel/reel_item_watch');
+    assert.match(slice(seed, '    function setupXhrInterception() {', '    // ============================================================================'), /reel\/reel_item_watch/);
+    assert.match(seed, /name\.includes\('\/youtubei\/v1\/player'\) \|\| name\.includes\('\/youtubei\/v1\/reel\/reel_item_watch'\)/);
+});
 
 test('mobile Shorts route and exact player owner use the same admission identity as Watch', () => {
     const context = vm.createContext({

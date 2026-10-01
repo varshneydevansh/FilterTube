@@ -1107,7 +1107,7 @@
                 window.filterTube.recentYtBrowseResponses = recentBrowseResponses.slice(-12);
                 return;
             }
-            if (name.includes('/youtubei/v1/player')) {
+            if (name.includes('/youtubei/v1/player') || name.includes('/youtubei/v1/reel/reel_item_watch')) {
                 window.filterTube.lastYtPlayerResponse = data;
                 window.filterTube.lastYtPlayerResponseName = name;
                 window.filterTube.lastYtPlayerResponseTs = ts;
@@ -1729,6 +1729,7 @@
             '/youtubei/v1/browse',
             '/youtubei/v1/next',
             '/youtubei/v1/player',
+            '/youtubei/v1/reel/reel_item_watch',
             '/youtubei/v1/get_watch'
         ];
 
@@ -1828,6 +1829,7 @@
                 '/youtubei/v1/browse',
                 '/youtubei/v1/next',
                 '/youtubei/v1/player',
+                '/youtubei/v1/reel/reel_item_watch',
                 '/youtubei/v1/get_watch'
             ];
 

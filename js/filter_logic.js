@@ -1089,8 +1089,13 @@
         // Shorts surfaces
         reelItemRenderer: {
             videoId: 'videoId',
-            title: ['headline.simpleText'],
-            channelName: ['navigationEndpoint.reelWatchEndpoint.overlay.reelPlayerOverlayRenderer.reelPlayerHeaderSupportedRenderers.reelPlayerHeaderRenderer.channelTitleText.simpleText']
+            title: ['headline.simpleText', 'headline.runs'],
+            channelName: [
+                'navigationEndpoint.reelWatchEndpoint.overlay.reelPlayerOverlayRenderer.reelPlayerHeaderSupportedRenderers.reelPlayerHeaderRenderer.channelTitleText.simpleText',
+                'navigationEndpoint.reelWatchEndpoint.overlay.reelPlayerOverlayRenderer.reelPlayerHeaderSupportedRenderers.reelPlayerHeaderRenderer.channelTitleText.runs'
+            ],
+            channelId: ['navigationEndpoint.reelWatchEndpoint.overlay.reelPlayerOverlayRenderer.reelPlayerHeaderSupportedRenderers.reelPlayerHeaderRenderer.channelNavigationEndpoint.browseEndpoint.browseId'],
+            channelHandle: ['navigationEndpoint.reelWatchEndpoint.overlay.reelPlayerOverlayRenderer.reelPlayerHeaderSupportedRenderers.reelPlayerHeaderRenderer.channelNavigationEndpoint.browseEndpoint.canonicalBaseUrl']
         },
         shortsLockupViewModel: {
             videoId: ['onTap.innertubeCommand.reelWatchEndpoint.videoId'],
