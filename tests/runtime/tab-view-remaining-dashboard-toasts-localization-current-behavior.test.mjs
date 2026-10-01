@@ -2,6 +2,7 @@ import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import path from 'node:path';
 import test from 'node:test';
+import vm from 'node:vm';
 
 const root = process.cwd();
 const batchText = fs.readFileSync(path.join(root, 'data/ui_locales/batches/remaining-dashboard-toasts.json'), 'utf8');
@@ -9,6 +10,31 @@ const batch = JSON.parse(batchText);
 const source = fs.readFileSync(path.join(root, 'js/tab-view.js'), 'utf8');
 const english = batch.english;
 const keys = Object.keys(english);
+
+test('every merged toast catalog renders through the actual dashboard helper', () => {
+  const start = source.indexOf('function tabViewUiText(');
+  const end = source.indexOf('\nfunction tabViewTaxonomyDisplayLabel', start);
+  const targets = JSON.parse(fs.readFileSync('data/ui_locales/targets.json', 'utf8')).locales;
+  assert.equal(targets.length, 38);
+  for (const { code } of targets) {
+    const catalog = JSON.parse(fs.readFileSync(`data/ui_locales/${code}.json`, 'utf8'));
+    const context = vm.createContext({ window: { FilterTubeUiLocalization: {
+      text(key, values = {}) {
+        return catalog[key]?.replace(/\{([a-zA-Z][a-zA-Z0-9]*)\}/g, (_, name) => String(values[name]));
+      }
+    } } });
+    vm.runInContext(`${source.slice(start, end)}\nthis.render = tabViewUiText;`, context);
+    for (const key of keys) {
+      assert.equal(typeof catalog[key], 'string', `${code}: ${key}`);
+      assert.deepEqual(placeholderNames(catalog[key]), placeholderNames(english[key]), `${code}: ${key} placeholders`);
+      for (const count of [0, 1, 2, 5]) {
+        const values = Object.fromEntries(placeholderNames(english[key]).map(name => [name, name === 'count' ? count : `private-${name}-🙂`]));
+        const expected = catalog[key].replace(/\{([a-zA-Z][a-zA-Z0-9]*)\}/g, (_, name) => String(values[name]));
+        assert.equal(context.render(key, english[key], values), expected, `${code}: ${key}`);
+      }
+    }
+  }
+});
 
 const placeholderNames = value => [...String(value).matchAll(/\{([a-zA-Z][a-zA-Z0-9]*)\}/g)]
   .map(match => match[1]).sort();
