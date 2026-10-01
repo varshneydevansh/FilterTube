@@ -2,6 +2,7 @@
 
 ## Unreleased
 
+- **Firefox submission fix**: remove duplicate entries in the Korean and Bengali interface files that caused Mozilla validation to reject 3.4.0. Builds and locale checks now reject duplicate JSON keys before packaging.
 - **Release-note extraction repair**: normalize the 3.4.0 heading, accept both supported version-heading styles, bound extraction at the next level-two section, and refuse placeholder publication. This source fix follows the published `c9f070af` release; the existing GitHub body is not changed by editing this file.
 - **Changelog structure**: restore the per-release commit-history subsection and separate the older post-3.3.5 source index from the 3.4.0 delta.
 

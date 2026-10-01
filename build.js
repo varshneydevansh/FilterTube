@@ -23,6 +23,7 @@ const readline = require('readline');
 const { execFileSync, execSync } = require('child_process');
 const { version: PACKAGE_VERSION } = require('./package.json');
 const { acquireBuildLock } = require('./scripts/build-lock.cjs');
+const { validateJsonPaths } = require('./scripts/check-json-keys.cjs');
 
 // Configuration
 const ALL_BROWSER_TARGETS = ['chrome', 'firefox', 'opera'];
@@ -108,6 +109,8 @@ async function main() {
 }
 
 async function buildTargets() {
+    // Fail before cleanup or archive creation, using the same draft exclusions as copying.
+    validateJsonPaths(COMMON_DIRS.concat(BROWSER_TARGETS.map(browser => `manifest.${browser}.json`)), filterFunc);
     console.log('\n🎨 Building extension UI shells...');
     execSync('node scripts/build-extension-ui.mjs', { stdio: 'inherit' });
 
@@ -167,6 +170,7 @@ async function buildTargets() {
                 continue;
             }
 
+            validateJsonPaths([targetDir]);
             const versionForZip = typeof manifestJSON?.version === 'string' && manifestJSON.version.trim()
                 ? manifestJSON.version.trim()
                 : VERSION;

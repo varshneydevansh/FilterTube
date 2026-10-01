@@ -7,6 +7,7 @@
     "build:nanah-vendor": "node scripts/build-nanah-vendor.mjs",
     "build:ui": "node scripts/build-extension-ui.mjs",
     "check:ui-locales": "node scripts/check-ui-locales.mjs",
+    "check:json-keys": "node scripts/check-json-keys.cjs",
     "check:ui-locales:targets": "node scripts/check-ui-locales.mjs --require-all",
     "check:release-note-locales": "node scripts/check-release-note-locales.mjs",
     "check:release-note-locales:complete": "node scripts/check-release-note-locales.mjs --require-all",

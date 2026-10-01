@@ -1,8 +1,10 @@
 import fs from 'node:fs';
 import path from 'node:path';
+import jsonKeys from './check-json-keys.cjs';
 
 const root = process.cwd();
 const directory = path.join(root, 'data/ui_locales');
+jsonKeys.validateJsonPaths([directory], filename => !filename.split(path.sep).includes('batches'));
 const english = JSON.parse(fs.readFileSync(path.join(directory, 'en.json'), 'utf8'));
 const sourceKeys = Object.keys(english).sort();
 const targets = JSON.parse(fs.readFileSync(path.join(directory, 'targets.json'), 'utf8')).locales;
