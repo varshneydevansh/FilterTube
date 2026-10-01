@@ -23,7 +23,6 @@
   "settings.interfaceLanguage": "انٹرفیس دی بولی",
   "settings.interfaceLanguageHint": "ایہ صرف FilterTube دے انٹرفیس دی بولی بدلدا اے۔ ویڈیو دی بولی دے قاعدے، YouTube تے تہاڈے محفوظ کیتے فلٹر نہیں بدلدا۔",
   "settings.languageAuto": "براؤزر دی بولی ورتو",
-  "settings.moreLanguages": "ہن صرف انگریزی انٹرفیس پورا اے۔ ہور بولیاں دے ترجمے تے کم جاری اے۔",
   "popup.enabled": "چالو",
   "popup.disabled": "بند",
   "popup.toggleFiltering": "فلٹرنگ چالو یا بند کرو",
@@ -2246,5 +2245,14 @@
   "dashboard.sync.providerModal.enableHomePickup": "Home Pickup چالو کرو",
   "dashboard.sync.providerModal.homePickupKey": "Home Pickup کنجی",
   "dashboard.sync.providerModal.optionalServiceKeyForThatHomePickupServiceThisIsNotTheParentPINLeaveBlankToKeepTheSavedKeyEnterASingleDashToClearIt": "اِس Home Pickup سروس لئی اختیاری سروس کنجی۔ ایہہ والدین دا PIN نئیں۔ محفوظ کنجی رکھن لئی خالی چھڈو؛ مٹاؤن لئی اک ڈیش (-) پاؤ۔",
-  "dashboard.sync.providerModal.optionalServiceKey": "اختیاری سروس کنجی"
+  "dashboard.sync.providerModal.optionalServiceKey": "اختیاری سروس کنجی",
+  "settings.translationAvailability": "انٹرفیس دیاں 38 زباناں موجود نیں۔ ترجمے پیش نظارہ نیں تے انہاں وچ اصلاح دی لوڑ پے سکدی اے۔",
+  "settings.previewLanguage": "{language} (پیش نظارہ)",
+  "dashboard.importReport.reviewedTitle": "درآمد دا جائزہ لیا گیا",
+  "dashboard.importReport.profilesAlreadyContainRules": "چنے ہوئے پروفائلز وچ ایہہ قاعدے پہلے توں موجود نیں۔",
+  "dashboard.importReport.profileAlreadyContainsRules": "ایس پروفائل وچ ایہہ قاعدے پہلے توں موجود نیں۔",
+  "dashboard.importReport.noRulesChanged": "پروفائل دے قاعدیاں وچ کوئی تبدیلی نہیں ہوئی۔",
+  "dashboard.importReport.importedIntoSurfaceOne": "{surface} وچ {count} قاعدہ درآمد کیتا گیا۔",
+  "dashboard.importReport.importedIntoSurfaceOther": "{surface} وچ {count} قاعدے درآمد کیتے گئے۔",
+  "dashboard.importReport.metadataQueuePacing": "چینل میٹاڈیٹا قطار: درآمد کیتیاں {count} قطاراں ہن وی انتظار وچ نیں۔ پس منظر والا عمل جاگدا ہووے تاں بےترتیب 7–15 سیکنڈ دے وقفے نال اک واری اک تلاش کردا اے۔ ناکام قطار دا تقریباً 2 منٹ بعد دوبارہ تجربہ ہوندا اے، فیر وقفہ ودھدا ودھدا زیادہ توں زیادہ 30 منٹ ہو جاندا اے؛ ایہہ دوبارہ کوشش نویاں قطاراں نوں نہیں روکدی۔ جیہڑیاں قطاراں ہمیشہ لئی نہیں لبھدیاں یا ختم کر دتیاں جاندیاں نیں، اوہناں دی دوبارہ کوشش رک جاندی اے تے اوہ ہتھ نال تصدیق لئی درآمد رپورٹاں وچ رہندیاں نیں۔ درآمد دوران درخواستاں دا کوئی اچانک ہجوم نہیں ہویا۔ ایہہ ڈیش بورڈ بند کرن نال قطار نہیں رکدی، پر براؤزر بند ہون یا جاگن دیاں حدّاں نال دیر ہو سکدی اے۔"
 }

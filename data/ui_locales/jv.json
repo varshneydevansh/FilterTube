@@ -23,7 +23,6 @@
   "settings.interfaceLanguage": "Basa antarmuka",
   "settings.interfaceLanguageHint": "Iki mung ngowahi basa antarmuka FilterTube. Aturan basa video, YouTube, lan saringan sing wis disimpen ora owah.",
   "settings.languageAuto": "Gunakake basa browser",
-  "settings.moreLanguages": "Saiki mung antarmuka basa Inggris sing wis rampung. Basa liyane isih diterjemahake.",
   "popup.enabled": "Urip",
   "popup.disabled": "Mati",
   "popup.toggleFiltering": "Uripake utawa pateni panyaringan",
@@ -2246,5 +2245,14 @@
   "dashboard.sync.providerModal.enableHomePickup": "Aktifake Home Pickup",
   "dashboard.sync.providerModal.homePickupKey": "Kunci Home Pickup",
   "dashboard.sync.providerModal.optionalServiceKeyForThatHomePickupServiceThisIsNotTheParentPINLeaveBlankToKeepTheSavedKeyEnterASingleDashToClearIt": "Kunci layanan pilihan kanggo layanan Home Pickup kasebut. Iki dudu PIN wong tuwa. Kosongna supaya kunci sing wis disimpen tetep ana; lebokna siji tandha minus kanggo mbusak.",
-  "dashboard.sync.providerModal.optionalServiceKey": "Kunci layanan pilihan"
+  "dashboard.sync.providerModal.optionalServiceKey": "Kunci layanan pilihan",
+  "settings.translationAvailability": "Ana 38 basa antarmuka sing kasedhiya. Terjemahan isih versi pratinjau lan bisa uga perlu dibenerake.",
+  "settings.previewLanguage": "{language} (pratinjau)",
+  "dashboard.importReport.reviewedTitle": "Impor wis ditinjau",
+  "dashboard.importReport.profilesAlreadyContainRules": "Profil sing dipilih wis ngemot aturan iki.",
+  "dashboard.importReport.profileAlreadyContainsRules": "Profil iki wis ngemot aturan iki.",
+  "dashboard.importReport.noRulesChanged": "Ora ana aturan profil sing diowahi.",
+  "dashboard.importReport.importedIntoSurfaceOne": "Aturan {count} wis diimpor menyang {surface}.",
+  "dashboard.importReport.importedIntoSurfaceOther": "Aturan {count} wis diimpor menyang {surface}.",
+  "dashboard.importReport.metadataQueuePacing": "Antrean metadata kanal: ana {count} larik impor sing isih ngenteni. Nalika worker latar mburi aktif, worker nindakake siji pamriksan saben wektu kanthi sela acak 7–15 detik. Larik sing gagal dicoba maneh sawisé kira-kira 2 menit, banjur selane saya dawa nganti maksimal 30 menit; upaya maneh iki ora tau ngendhegake larik anyar. Larik sing permanen ora ketemu utawa wis mandheg ora dicoba maneh lan tetep ana ing Laporan Impor kanggo dipriksa kanthi manual. Ora ana lonjakan panjaluk nalika impor. Nutup dasbor iki ora ngendhegake antrean, nanging browser sing dipateni utawa watesan nalika diuripake bisa nundha."
 }

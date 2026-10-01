@@ -23,7 +23,6 @@
   "settings.interfaceLanguage": "ఇంటర్‌ఫేస్ భాష",
   "settings.interfaceLanguageHint": "ఇది FilterTube ఇంటర్‌ఫేస్ భాషను మాత్రమే మారుస్తుంది. వీడియో భాష నియమాలు, YouTube లేదా మీరు సేవ్ చేసిన ఫిల్టర్లు మారవు.",
   "settings.languageAuto": "బ్రౌజర్ భాషను ఉపయోగించండి",
-  "settings.moreLanguages": "ప్రస్తుతం ఇంగ్లీష్ ఇంటర్‌ఫేస్ మాత్రమే పూర్తిగా అందుబాటులో ఉంది. ఇతర భాషల అనువాదం జరుగుతోంది.",
   "popup.enabled": "ఆన్‌లో ఉంది",
   "popup.disabled": "ఆఫ్‌లో ఉంది",
   "popup.toggleFiltering": "ఫిల్టరింగ్‌ను ఆన్ లేదా ఆఫ్ చేయండి",
@@ -2246,5 +2245,14 @@
   "dashboard.sync.providerModal.enableHomePickup": "Home Pickup ప్రారంభించండి",
   "dashboard.sync.providerModal.homePickupKey": "Home Pickup కీ",
   "dashboard.sync.providerModal.optionalServiceKeyForThatHomePickupServiceThisIsNotTheParentPINLeaveBlankToKeepTheSavedKeyEnterASingleDashToClearIt": "ఆ Home Pickup సేవ కోసం ఐచ్ఛిక సేవా కీ. ఇది తల్లిదండ్రుల PIN కాదు. భద్రపరిచిన కీని ఉంచేందుకు ఖాళీగా ఉంచండి; తొలగించడానికి ఒక హైఫన్ (-) నమోదు చేయండి.",
-  "dashboard.sync.providerModal.optionalServiceKey": "ఐచ్ఛిక సేవా కీ"
+  "dashboard.sync.providerModal.optionalServiceKey": "ఐచ్ఛిక సేవా కీ",
+  "settings.translationAvailability": "38 ఇంటర్‌ఫేస్ భాషలు అందుబాటులో ఉన్నాయి. అనువాదాలు ప్రివ్యూ రూపంలో ఉన్నాయి; సవరణలు అవసరం కావచ్చు.",
+  "settings.previewLanguage": "{language} (ప్రివ్యూ)",
+  "dashboard.importReport.reviewedTitle": "దిగుమతిని సమీక్షించారు",
+  "dashboard.importReport.profilesAlreadyContainRules": "ఎంచుకున్న ప్రొఫైళ్లలో ఈ నియమాలు ఇప్పటికే ఉన్నాయి.",
+  "dashboard.importReport.profileAlreadyContainsRules": "ఈ ప్రొఫైల్‌లో ఈ నియమాలు ఇప్పటికే ఉన్నాయి.",
+  "dashboard.importReport.noRulesChanged": "ప్రొఫైల్ నియమాల్లో ఏ మార్పూ జరగలేదు.",
+  "dashboard.importReport.importedIntoSurfaceOne": "{surface}లో {count} నియమం దిగుమతి చేయబడింది.",
+  "dashboard.importReport.importedIntoSurfaceOther": "{surface}లో {count} నియమాలు దిగుమతి చేయబడ్డాయి.",
+  "dashboard.importReport.metadataQueuePacing": "ఛానెల్ మెటాడేటా క్యూ: దిగుమతి చేసిన {count} వరుసలు ఇంకా పెండింగ్‌లో ఉన్నాయి. బ్యాక్‌గ్రౌండ్ వర్కర్ మేల్కొని ఉన్నప్పుడు యాదృచ్ఛికంగా 7–15 సెకన్ల విరామంతో ఒక్కోసారి ఒక శోధన మాత్రమే చేస్తుంది. విఫలమైన వరుసను సుమారు 2 నిమిషాల తర్వాత మళ్లీ ప్రయత్నించి, ఆపై విరామాన్ని క్రమంగా గరిష్ఠంగా 30 నిమిషాల వరకు పెంచుతుంది; ఆ మళ్లీ ప్రయత్నం కొత్త వరుసలను ఆపదు. శాశ్వతంగా కనుగొనలేని లేదా ముగిసిన వరుసలకు మళ్లీ ప్రయత్నించడం ఆగిపోతుంది; అవి చేతితో ధృవీకరించడానికి దిగుమతి నివేదికల్లో ఉంటాయి. దిగుమతి సమయంలో అభ్యర్థనలు ఒక్కసారిగా వెల్లువెత్తలేదు. ఈ డ్యాష్‌బోర్డ్‌ను మూసినా క్యూ ఆగదు, అయితే బ్రౌజర్ మూసివేత లేదా మేల్కొలుపు పరిమితులు ఆలస్యం చేయవచ్చు."
 }

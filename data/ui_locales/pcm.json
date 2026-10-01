@@ -23,7 +23,6 @@
   "settings.interfaceLanguage": "Language wey app dey show",
   "settings.interfaceLanguageHint": "Na only FilterTube app language e go change. E no go change video language rules, YouTube, or filter dem wey you don save.",
   "settings.languageAuto": "Use browser language",
-  "settings.moreLanguages": "Na English interface complete for now. We still dey translate oda languages.",
   "popup.enabled": "E dey on",
   "popup.disabled": "E dey off",
   "popup.toggleFiltering": "Put filtering on or off",
@@ -2246,5 +2245,14 @@
   "dashboard.sync.providerModal.enableHomePickup": "Turn on Home Pickup",
   "dashboard.sync.providerModal.homePickupKey": "Home Pickup key",
   "dashboard.sync.providerModal.optionalServiceKeyForThatHomePickupServiceThisIsNotTheParentPINLeaveBlankToKeepTheSavedKeyEnterASingleDashToClearIt": "Optional service key for that Home Pickup service. E no be parent PIN. Leave am blank make e keep the saved key; put only one dash to clear am.",
-  "dashboard.sync.providerModal.optionalServiceKey": "Optional service key"
+  "dashboard.sync.providerModal.optionalServiceKey": "Optional service key",
+  "settings.translationAvailability": "38 interface language dey available. The translations still dey preview, so dem fit need correction.",
+  "settings.previewLanguage": "{language} (dem still dey test am)",
+  "dashboard.importReport.reviewedTitle": "Dem don check the import",
+  "dashboard.importReport.profilesAlreadyContainRules": "The profiles wey you choose don get these rules already.",
+  "dashboard.importReport.profileAlreadyContainsRules": "This profile don get these rules already.",
+  "dashboard.importReport.noRulesChanged": "No profile rule change.",
+  "dashboard.importReport.importedIntoSurfaceOne": "Dem don import {count} rule enter {surface}.",
+  "dashboard.importReport.importedIntoSurfaceOther": "Dem don import {count} rule enter {surface}.",
+  "dashboard.importReport.metadataQueuePacing": "Channel metadata queue: {count} rows wey dem import still dey wait. As long as background worker dey awake, e dey do one lookup at a time, with random 7–15 second space between them. If one row fail, e try again after about 2 minutes, then the wait fit increase reach 30 minutes; this retry no dey stop fresh rows. Rows wey no fit show permanently or don terminate no go try again, and dem go remain for Import Reports make person check am by hand. No burst of requests happen during import. To close this dashboard no go stop the queue, but browser shutdown or wakeup limits fit delay am."
 }

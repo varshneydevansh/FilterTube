@@ -23,7 +23,6 @@
   "settings.interfaceLanguage": "ภาษาของอินเทอร์เฟซ",
   "settings.interfaceLanguageHint": "เปลี่ยนเฉพาะภาษาของอินเทอร์เฟซ FilterTube ไม่เปลี่ยนกฎเกี่ยวกับภาษาของวิดีโอ YouTube หรือตัวกรองที่บันทึกไว้",
   "settings.languageAuto": "ใช้ภาษาของเบราว์เซอร์",
-  "settings.moreLanguages": "ขณะนี้มีเพียงอินเทอร์เฟซภาษาอังกฤษที่แปลครบ ภาษาอื่นอยู่ระหว่างการแปล",
   "popup.enabled": "เปิดใช้งาน",
   "popup.disabled": "ปิดใช้งาน",
   "popup.toggleFiltering": "เปิดหรือปิดการกรอง",
@@ -2246,5 +2245,14 @@
   "dashboard.sync.providerModal.enableHomePickup": "เปิดใช้ Home Pickup",
   "dashboard.sync.providerModal.homePickupKey": "คีย์ Home Pickup",
   "dashboard.sync.providerModal.optionalServiceKeyForThatHomePickupServiceThisIsNotTheParentPINLeaveBlankToKeepTheSavedKeyEnterASingleDashToClearIt": "คีย์บริการเสริมสำหรับบริการ Home Pickup นี้ ไม่ใช่ PIN ของผู้ปกครอง เว้นว่างไว้เพื่อเก็บคีย์เดิม หรือป้อนขีดกลางหนึ่งตัวเพื่อล้างคีย์",
-  "dashboard.sync.providerModal.optionalServiceKey": "คีย์บริการเสริม"
+  "dashboard.sync.providerModal.optionalServiceKey": "คีย์บริการเสริม",
+  "settings.translationAvailability": "มีภาษาอินเทอร์เฟซให้เลือก 38 ภาษา คำแปลยังเป็นฉบับตัวอย่างและอาจต้องแก้ไข",
+  "settings.previewLanguage": "{language} (ตัวอย่าง)",
+  "dashboard.importReport.reviewedTitle": "ตรวจสอบการนำเข้าแล้ว",
+  "dashboard.importReport.profilesAlreadyContainRules": "โปรไฟล์ที่เลือกมีกฎเหล่านี้อยู่แล้ว",
+  "dashboard.importReport.profileAlreadyContainsRules": "โปรไฟล์นี้มีกฎเหล่านี้อยู่แล้ว",
+  "dashboard.importReport.noRulesChanged": "ไม่มีการเปลี่ยนแปลงกฎของโปรไฟล์",
+  "dashboard.importReport.importedIntoSurfaceOne": "นำเข้ากฎ {count} ข้อไปยัง {surface} แล้ว",
+  "dashboard.importReport.importedIntoSurfaceOther": "นำเข้ากฎ {count} ข้อไปยัง {surface} แล้ว",
+  "dashboard.importReport.metadataQueuePacing": "คิวข้อมูลเมทาดาทาของช่อง: มีรายการที่นำเข้าแล้ว {count} รายการรอดำเนินการ ขณะที่ตัวทำงานเบื้องหลังยังทำงานอยู่ ระบบจะค้นหาทีละรายการโดยเว้นช่วงแบบสุ่ม 7–15 วินาที รายการที่ล้มเหลวจะลองอีกครั้งหลังประมาณ 2 นาที จากนั้นจะเพิ่มช่วงเวลารอทีละน้อยจนถึง 30 นาที การลองซ้ำจะไม่หยุดรายการใหม่ รายการที่หาไม่พบอย่างถาวรหรือสิ้นสุดแล้วจะหยุดลองซ้ำ และยังอยู่ในรายงานการนำเข้าเพื่อให้ตรวจสอบด้วยตนเอง ระหว่างการนำเข้าไม่มีการส่งคำขอถี่เป็นชุด การปิดแดชบอร์ดนี้ไม่ทำให้คิวหยุด แต่การปิดเบราว์เซอร์หรือข้อจำกัดการปลุกเบราว์เซอร์อาจทำให้ล่าช้า"
 }

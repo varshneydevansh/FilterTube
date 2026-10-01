@@ -23,7 +23,6 @@
   "settings.interfaceLanguage": "Arayüz dili",
   "settings.interfaceLanguageHint": "Yalnızca FilterTube arayüzünün dilini değiştirir. Video dili kurallarını, YouTube'u veya kayıtlı filtrelerinizi değiştirmez.",
   "settings.languageAuto": "Tarayıcı dilini kullan",
-  "settings.moreLanguages": "Şu anda yalnızca İngilizce arayüz tamamlanmıştır. Diğer dillerin çevirisi sürüyor.",
   "popup.enabled": "Etkin",
   "popup.disabled": "Devre dışı",
   "popup.toggleFiltering": "Filtrelemeyi aç veya kapat",
@@ -2246,5 +2245,14 @@
   "dashboard.sync.providerModal.enableHomePickup": "Home Pickup'ı etkinleştir",
   "dashboard.sync.providerModal.homePickupKey": "Home Pickup anahtarı",
   "dashboard.sync.providerModal.optionalServiceKeyForThatHomePickupServiceThisIsNotTheParentPINLeaveBlankToKeepTheSavedKeyEnterASingleDashToClearIt": "Bu Home Pickup hizmeti için isteğe bağlı hizmet anahtarı. Bu, ebeveyn PIN'i değildir. Kayıtlı anahtarı korumak için boş bırakın; silmek için tek bir kısa çizgi (-) girin.",
-  "dashboard.sync.providerModal.optionalServiceKey": "İsteğe bağlı hizmet anahtarı"
+  "dashboard.sync.providerModal.optionalServiceKey": "İsteğe bağlı hizmet anahtarı",
+  "settings.translationAvailability": "38 arayüz dili kullanılabilir. Çeviriler önizleme niteliğindedir ve düzeltme gerekebilir.",
+  "settings.previewLanguage": "{language} (önizleme)",
+  "dashboard.importReport.reviewedTitle": "İçe aktarma incelendi",
+  "dashboard.importReport.profilesAlreadyContainRules": "Seçilen profiller bu kuralları zaten içeriyor.",
+  "dashboard.importReport.profileAlreadyContainsRules": "Bu profil bu kuralları zaten içeriyor.",
+  "dashboard.importReport.noRulesChanged": "Profil kurallarında hiçbir değişiklik yapılmadı.",
+  "dashboard.importReport.importedIntoSurfaceOne": "{surface} içine {count} kural aktarıldı.",
+  "dashboard.importReport.importedIntoSurfaceOther": "{surface} içine {count} kural aktarıldı.",
+  "dashboard.importReport.metadataQueuePacing": "Kanal meta veri kuyruğu: içe aktarılan {count} satır bekliyor. Arka plan işçisi uyanıkken rastgele 7–15 saniyelik aralıklarla sırayla tek bir arama yapar. Başarısız bir satır yaklaşık 2 dakika sonra yeniden denenir; ardından bekleme süresi kademeli olarak en fazla 30 dakikaya çıkar. Bu yeniden deneme yeni satırları duraklatmaz. Kalıcı olarak bulunamayan veya sonlandırılan satırlar yeniden denenmez ve elle doğrulama için İçe Aktarma Raporları'nda kalır. İçe aktarma sırasında ani bir istek artışı olmadı. Bu kontrol panelini kapatmak kuyruğu durdurmaz; ancak tarayıcının kapanması veya uyandırma sınırları gecikmeye yol açabilir."
 }

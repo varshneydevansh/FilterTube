@@ -23,7 +23,6 @@
   "settings.interfaceLanguage": "Harshen manhaja",
   "settings.interfaceLanguageHint": "Wannan yana sauya harshen manhajar FilterTube ne kawai. Ba ya sauya dokokin harshen bidiyo, YouTube ko matatun da ka adana.",
   "settings.languageAuto": "Yi amfani da harshen burauza",
-  "settings.moreLanguages": "A yanzu harshen Ingilishi ne kawai ke da cikakkiyar manhaja. Ana fassara sauran harsuna.",
   "popup.enabled": "A kunne",
   "popup.disabled": "A kashe",
   "popup.toggleFiltering": "Kunna ko kashe tacewa",
@@ -2246,5 +2245,14 @@
   "dashboard.sync.providerModal.enableHomePickup": "Kunna Home Pickup",
   "dashboard.sync.providerModal.homePickupKey": "Maɓallin Home Pickup",
   "dashboard.sync.providerModal.optionalServiceKeyForThatHomePickupServiceThisIsNotTheParentPINLeaveBlankToKeepTheSavedKeyEnterASingleDashToClearIt": "Maɓallin sabis na zaɓi na wannan Home Pickup. Wannan ba PIN na iyaye ba ne. Bar shi babu komai don riƙe maɓallin da aka ajiye; shigar da jan layi guda (-) don sharewa.",
-  "dashboard.sync.providerModal.optionalServiceKey": "Maɓallin sabis na zaɓi"
+  "dashboard.sync.providerModal.optionalServiceKey": "Maɓallin sabis na zaɓi",
+  "settings.translationAvailability": "Akwai harsunan fuska 38. Fassarar nan samfoti ce kuma tana iya buƙatar gyara.",
+  "settings.previewLanguage": "{language} (samfoti)",
+  "dashboard.importReport.reviewedTitle": "An duba shigo da bayanai",
+  "dashboard.importReport.profilesAlreadyContainRules": "Fayilolin bayanan da aka zaɓa sun riga sun ƙunshi waɗannan ƙa'idodi.",
+  "dashboard.importReport.profileAlreadyContainsRules": "Wannan fayil ɗin bayanan ya riga ya ƙunshi waɗannan ƙa'idodi.",
+  "dashboard.importReport.noRulesChanged": "Babu wata ƙa'ida ta fayil ɗin bayanan da ta canza.",
+  "dashboard.importReport.importedIntoSurfaceOne": "An shigo da ƙa'ida {count} cikin {surface}.",
+  "dashboard.importReport.importedIntoSurfaceOther": "An shigo da ƙa'idodi {count} cikin {surface}.",
+  "dashboard.importReport.metadataQueuePacing": "Jerin jiran metadata na tashoshi: layuka {count} da aka shigo da su suna jira. Ma'aikacin baya yana yin bincike ɗaya bayan ɗaya a tazarar sakan 7–15 bazuwar yayin da yake aiki. Layin da ya gaza ana sake gwada shi bayan kusan minti 2, sannan lokacin jira yana ƙaruwa a hankali har zuwa minti 30; wannan sake gwajin ba ya dakatar da sabbin layuka. Layukan da ba za a iya samunsu ba har abada ko waɗanda aka dakatar suna daina sake gwadawa, amma suna nan a Rahotannin Shigo don a bincika da hannu. Ba a yi tarin buƙatu kwatsam yayin shigo da bayanai ba. Rufe wannan dashboard ba ya dakatar da jerin, sai dai rufe burauza ko iyakokin tada ta na iya kawo jinkiri."
 }

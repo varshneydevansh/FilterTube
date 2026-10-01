@@ -1,0 +1,148 @@
+{
+  "keys": ["settings.translationAvailability","settings.previewLanguage","dashboard.importReport.reviewedTitle","dashboard.importReport.profilesAlreadyContainRules","dashboard.importReport.profileAlreadyContainsRules","dashboard.importReport.noRulesChanged","dashboard.importReport.importedIntoSurfaceOne","dashboard.importReport.importedIntoSurfaceOther","dashboard.importReport.metadataQueuePacing"],
+  "translations": {
+    "zh-Hans": [
+      "提供 38 种界面语言。翻译目前为预览版本，可能需要修正。",
+      "{language}（预览）",
+      "已审核导入",
+      "所选个人资料已包含这些规则。",
+      "此个人资料已包含这些规则。",
+      "个人资料规则未发生更改。",
+      "已将 {count} 条规则导入 {surface}。",
+      "已将 {count} 条规则导入 {surface}。",
+      "频道元数据队列：还有 {count} 条已导入记录待处理。后台工作程序运行时，会以随机的 7–15 秒间隔逐条查询。失败的记录约 2 分钟后重试，之后逐渐延长间隔，最长可达 30 分钟；重试不会暂停新记录。永久未找到或已终止的记录将停止重试，并保留在“导入报告”中供手动核实。导入期间没有突发请求。关闭此仪表板不会停止队列，但浏览器关闭或唤醒限制可能会延迟处理。"
+    ],
+    "hi": [
+      "38 इंटरफ़ेस भाषाएँ उपलब्ध हैं। अनुवाद अभी पूर्वावलोकन में हैं और उनमें सुधार की आवश्यकता हो सकती है।",
+      "{language} (पूर्वावलोकन)",
+      "आयात की समीक्षा की गई",
+      "चयनित प्रोफ़ाइलों में ये नियम पहले से मौजूद हैं।",
+      "इस प्रोफ़ाइल में ये नियम पहले से मौजूद हैं।",
+      "प्रोफ़ाइल के नियमों में कोई बदलाव नहीं हुआ।",
+      "{surface} में {count} नियम आयात किया गया।",
+      "{surface} में {count} नियम आयात किए गए।",
+      "चैनल मेटाडेटा कतार: {count} आयातित पंक्तियाँ लंबित हैं। बैकग्राउंड वर्कर चालू रहने पर, हर 7–15 सेकंड के यादृच्छिक अंतराल पर एक-एक करके खोज करता है। विफल पंक्ति लगभग 2 मिनट बाद फिर कोशिश करती है, फिर अंतराल बढ़ाकर अधिकतम 30 मिनट तक किया जाता है; इससे नई पंक्तियाँ रुकती नहीं हैं। स्थायी रूप से न मिलने वाली या समाप्त की गई पंक्तियों की पुनः कोशिश बंद हो जाती है और वे मैन्युअल जाँच के लिए आयात रिपोर्ट में रहती हैं। आयात के दौरान अनुरोधों की कोई बौछार नहीं हुई। यह डैशबोर्ड बंद करने से कतार नहीं रुकती, हालाँकि ब्राउज़र बंद होने या जागने की सीमाओं से देरी हो सकती है।"
+    ],
+    "es": [
+      "Hay 38 idiomas de interfaz disponibles. Las traducciones son versiones preliminares y pueden necesitar correcciones.",
+      "{language} (vista previa)",
+      "Importación revisada",
+      "Los perfiles seleccionados ya contienen estas reglas.",
+      "Este perfil ya contiene estas reglas.",
+      "No se modificaron las reglas del perfil.",
+      "Se importó {count} regla en {surface}.",
+      "Se importaron {count} reglas en {surface}.",
+      "Cola de metadatos de canales: hay {count} filas importadas pendientes. Mientras el trabajador en segundo plano está activo, realiza una consulta cada vez en intervalos aleatorios de 7–15 segundos. Si una fila falla, se vuelve a intentar al cabo de unos 2 minutos y después el intervalo aumenta gradualmente hasta un máximo de 30 minutos; esos reintentos nunca detienen las filas nuevas. Las filas que no se encuentran de forma permanente o están terminadas dejan de reintentarse y permanecen en Informes de importación para verificarlas manualmente. Durante la importación no se produjo ningún pico de solicitudes. Cerrar este panel no detiene la cola, aunque el cierre del navegador o sus límites de activación pueden retrasarla."
+    ],
+    "ar": [
+      "تتوفر 38 لغة للواجهة. الترجمات في مرحلة المعاينة وقد تحتاج إلى تصحيحات.",
+      "{language} (معاينة)",
+      "تمت مراجعة الاستيراد",
+      "تحتوي الملفات الشخصية المحددة على هذه القواعد بالفعل.",
+      "يحتوي هذا الملف الشخصي على هذه القواعد بالفعل.",
+      "لم تتغير أي قواعد في الملف الشخصي.",
+      "تم استيراد {count} قاعدة إلى {surface}.",
+      "تم استيراد قواعد بعدد {count} إلى {surface}.",
+      "قائمة انتظار بيانات القنوات الوصفية: هناك {count} صفًا مستوردًا قيد الانتظار. ينفّذ عامل الخلفية عملية بحث واحدة بالتتابع كل 7–15 ثانية بفاصل عشوائي أثناء عمله. تُعاد محاولة الصف الفاشل بعد نحو دقيقتين، ثم تزداد مدة الانتظار تدريجيًا حتى 30 دقيقة؛ ولا توقف هذه الإعادة معالجة الصفوف الجديدة. تتوقف إعادة المحاولة للصفوف التي تعذّر العثور عليها نهائيًا أو انتهى مصدرها، وتبقى في تقارير الاستيراد للتحقق اليدوي. لم تحدث دفعة مفاجئة من الطلبات أثناء الاستيراد. لا يؤدي إغلاق لوحة التحكم هذه إلى إيقاف قائمة الانتظار، لكن إغلاق المتصفح أو قيود إيقاظه قد تؤخرها."
+    ],
+    "fr": [
+      "38 langues d’interface sont disponibles. Les traductions sont des aperçus et peuvent nécessiter des corrections.",
+      "{language} (aperçu)",
+      "Importation vérifiée",
+      "Les profils sélectionnés contiennent déjà ces règles.",
+      "Ce profil contient déjà ces règles.",
+      "Aucune règle du profil n’a été modifiée.",
+      "{count} règle a été importée dans {surface}.",
+      "{count} règles ont été importées dans {surface}.",
+      "File d’attente des métadonnées de chaîne : {count} lignes importées sont en attente. Lorsque le processus d’arrière-plan est actif, il effectue une seule recherche à la fois, à un intervalle aléatoire de 7 à 15 secondes. Une ligne en échec est réessayée après environ 2 minutes, puis le délai augmente progressivement jusqu’à 30 minutes ; ces nouvelles tentatives ne suspendent jamais les nouvelles lignes. Les lignes introuvables de façon permanente ou dont la source est terminée ne sont plus réessayées et restent dans les rapports d’importation pour vérification manuelle. Aucun pic de requêtes n’a eu lieu pendant l’importation. Fermer ce tableau de bord n’arrête pas la file, mais la fermeture du navigateur ou ses limites de réveil peut la retarder."
+    ],
+    "bn": [
+      "৩৮টি ইন্টারফেস ভাষা উপলভ্য। অনুবাদগুলো প্রিভিউ পর্যায়ে আছে এবং সংশোধনের প্রয়োজন হতে পারে।",
+      "{language} (প্রিভিউ)",
+      "আমদানি পর্যালোচনা সম্পন্ন",
+      "নির্বাচিত প্রোফাইলগুলোতে এই নিয়মগুলো আগে থেকেই আছে।",
+      "এই প্রোফাইলে এই নিয়মগুলো আগে থেকেই আছে।",
+      "প্রোফাইলের কোনো নিয়ম পরিবর্তন করা হয়নি।",
+      "{surface}-এ {count}টি নিয়ম আমদানি হয়েছে।",
+      "{surface}-এ {count}টি নিয়ম আমদানি হয়েছে।",
+      "চ্যানেল মেটাডেটা সারিতে {count}টি আমদানি করা সারি অপেক্ষমাণ। ব্যাকগ্রাউন্ড কর্মী চালু থাকলে এলোমেলো ৭–১৫ সেকেন্ড বিরতিতে একবারে একটি করে তথ্য খোঁজে। কোনো সারিতে ব্যর্থ হলে প্রায় ২ মিনিট পর আবার চেষ্টা করা হয়, পরে বিরতি বাড়িয়ে সর্বোচ্চ ৩০ মিনিট করা হয়; এই পুনঃচেষ্টা নতুন সারিগুলোকে থামায় না। স্থায়ীভাবে খুঁজে না পাওয়া বা বন্ধ হয়ে যাওয়া সারিতে আর চেষ্টা করা হয় না; সেগুলো ম্যানুয়াল যাচাইয়ের জন্য আমদানি প্রতিবেদনে থাকে। আমদানির সময় একসঙ্গে অনেক অনুরোধ পাঠানো হয়নি। এই ড্যাশবোর্ড বন্ধ করলেও সারি থামে না, তবে ব্রাউজার বন্ধ হওয়া বা জাগানোর সীমাবদ্ধতায় দেরি হতে পারে।"
+    ],
+    "pt": [
+      "Há 38 idiomas de interface disponíveis. As traduções estão em pré-visualização e podem precisar de correções.",
+      "{language} (pré-visualização)",
+      "Importação revisada",
+      "Os perfis selecionados já contêm estas regras.",
+      "Este perfil já contém estas regras.",
+      "Nenhuma regra do perfil foi alterada.",
+      "{count} regra foi importada para {surface}.",
+      "{count} regras foram importadas para {surface}.",
+      "Fila de metadados dos canais: {count} linhas importadas estão pendentes. Enquanto o processo em segundo plano estiver ativo, ele faz uma consulta de cada vez em intervalos aleatórios de 7 a 15 segundos. Uma linha com falha é tentada novamente após cerca de 2 minutos; depois, o intervalo aumenta gradualmente até 30 minutos. Essas tentativas nunca pausam linhas novas. Linhas permanentemente não encontradas ou encerradas deixam de ser tentadas e permanecem nos Relatórios de importação para verificação manual. Não houve pico de solicitações durante a importação. Fechar este painel não interrompe a fila, embora o encerramento do navegador ou seus limites para reativação possam atrasá-la."
+    ],
+    "id": [
+      "Tersedia 38 bahasa antarmuka. Terjemahan masih berupa pratinjau dan mungkin perlu diperbaiki.",
+      "{language} (pratinjau)",
+      "Impor telah ditinjau",
+      "Profil yang dipilih sudah berisi aturan ini.",
+      "Profil ini sudah berisi aturan ini.",
+      "Tidak ada aturan profil yang berubah.",
+      "{count} aturan diimpor ke {surface}.",
+      "{count} aturan diimpor ke {surface}.",
+      "Antrean metadata kanal: {count} baris hasil impor masih menunggu. Saat pekerja latar belakang aktif, satu pencarian dilakukan setiap kali dengan jeda acak 7–15 detik. Baris yang gagal dicoba lagi setelah sekitar 2 menit, lalu jedanya bertambah bertahap hingga 30 menit; percobaan ulang itu tidak pernah menghentikan baris baru. Baris yang permanen tidak ditemukan atau sudah dihentikan tidak dicoba lagi dan tetap ada di Laporan Impor untuk diperiksa secara manual. Tidak ada lonjakan permintaan saat impor. Menutup dasbor ini tidak menghentikan antrean, tetapi browser yang ditutup atau batas aktivasi browser dapat menundanya."
+    ],
+    "ur": [
+      "انٹرفیس کی 38 زبانیں دستیاب ہیں۔ تراجم پیش نظارہ ہیں اور ان میں اصلاح کی ضرورت ہو سکتی ہے۔",
+      "{language} (پیش نظارہ)",
+      "درآمد کا جائزہ مکمل",
+      "منتخب پروفائلز میں یہ قواعد پہلے سے موجود ہیں۔",
+      "اس پروفائل میں یہ قواعد پہلے سے موجود ہیں۔",
+      "پروفائل کے قواعد میں کوئی تبدیلی نہیں ہوئی۔",
+      "{surface} میں {count} قاعدہ درآمد کیا گیا۔",
+      "{surface} میں قواعد کی تعداد {count} درآمد کی گئی۔",
+      "چینل میٹاڈیٹا قطار: درآمد شدہ {count} قطاریں زیرِ انتظار ہیں۔ بیک گراؤنڈ ورکر فعال ہو تو وہ ہر 7–15 سیکنڈ کے بے ترتیب وقفے پر ایک وقت میں ایک تلاش کرتا ہے۔ ناکام قطار تقریباً 2 منٹ بعد دوبارہ آزمائی جاتی ہے، پھر وقفہ بڑھ کر زیادہ سے زیادہ 30 منٹ ہو جاتا ہے؛ یہ دوبارہ کوشش نئی قطاروں کو کبھی نہیں روکتی۔ مستقل طور پر نہ ملنے والی یا ختم شدہ قطاروں کی دوبارہ کوشش بند ہو جاتی ہے اور وہ دستی تصدیق کے لیے درآمدی رپورٹس میں رہتی ہیں۔ درآمد کے دوران درخواستوں کا کوئی اچانک بوجھ نہیں پڑا۔ یہ ڈیش بورڈ بند کرنے سے قطار نہیں رکتی، البتہ براؤزر بند ہونے یا اسے بیدار کرنے کی حدود سے تاخیر ہو سکتی ہے۔"
+    ],
+    "ru": [
+      "Доступно 38 языков интерфейса. Переводы пока представлены в режиме предварительного просмотра и могут нуждаться в исправлениях.",
+      "{language} (предварительный просмотр)",
+      "Импорт проверен",
+      "Выбранные профили уже содержат эти правила.",
+      "В этом профиле эти правила уже есть.",
+      "Правила профиля не изменились.",
+      "В {surface} импортировано {count} правило.",
+      "В {surface} импортировано правил: {count}.",
+      "Очередь метаданных каналов: ожидают обработки {count} импортированных строк. Пока фоновый обработчик активен, он выполняет по одному запросу с случайным интервалом 7–15 секунд. Неудачная строка повторно обрабатывается примерно через 2 минуты, затем задержка постепенно увеличивается максимум до 30 минут; эти повторы никогда не приостанавливают новые строки. Для окончательно не найденных или завершённых строк повторы прекращаются, а сами строки остаются в отчётах об импорте для ручной проверки. Во время импорта всплеска запросов не было. Закрытие этой панели не останавливает очередь, хотя завершение работы браузера или ограничения пробуждения могут её задержать."
+    ],
+    "de": [
+      "38 Oberflächensprachen sind verfügbar. Die Übersetzungen sind Vorschauen und müssen möglicherweise korrigiert werden.",
+      "{language} (Vorschau)",
+      "Import geprüft",
+      "Die ausgewählten Profile enthalten diese Regeln bereits.",
+      "Dieses Profil enthält diese Regeln bereits.",
+      "Es wurden keine Profilregeln geändert.",
+      "{count} Regel wurde in {surface} importiert.",
+      "{count} Regeln wurden in {surface} importiert.",
+      "Warteschlange für Kanalmetadaten: {count} importierte Zeilen stehen noch aus. Solange der Hintergrunddienst aktiv ist, führt er jeweils eine einzelne Abfrage in zufälligen Abständen von 7–15 Sekunden aus. Eine fehlgeschlagene Zeile wird nach etwa 2 Minuten erneut versucht; anschließend verlängert sich der Abstand schrittweise auf bis zu 30 Minuten. Diese Wiederholungen halten neue Zeilen niemals auf. Dauerhaft nicht gefundene oder beendete Zeilen werden nicht erneut versucht und bleiben zur manuellen Prüfung in den Importberichten. Während des Imports gab es keine Anfragespitze. Das Schließen dieses Dashboards stoppt die Warteschlange nicht, aber das Schließen des Browsers oder Einschränkungen beim Aufwecken können sie verzögern."
+    ],
+    "ja": [
+      "38 種類のインターフェース言語を利用できます。翻訳はプレビュー版のため、修正が必要な場合があります。",
+      "{language}（プレビュー）",
+      "インポートを確認しました",
+      "選択したプロフィールには、これらのルールがすでに含まれています。",
+      "このプロフィールには、これらのルールがすでに含まれています。",
+      "プロフィールのルールに変更はありませんでした。",
+      "{surface}にルールを{count}件インポートしました。",
+      "{surface}にルールを{count}件インポートしました。",
+      "チャンネルメタデータのキュー：インポートした{count}件の行が処理待ちです。バックグラウンドワーカーが動作中は、ランダムな7～15秒間隔で1件ずつ検索します。失敗した行は約2分後に再試行され、その後は間隔が最大30分まで段階的に長くなります。この再試行によって新しい行の処理が止まることはありません。恒久的に見つからない行や終了した行は再試行されず、手動確認のためインポートレポートに残ります。インポート中にリクエストが集中することはありませんでした。このダッシュボードを閉じてもキューは停止しませんが、ブラウザーの終了や起動制限によって遅れる場合があります。"
+    ],
+    "pcm": [
+      "38 interface language dey available. The translations still dey preview, so dem fit need correction.",
+      "{language} (dem still dey test am)",
+      "Dem don check the import",
+      "The profiles wey you choose don get these rules already.",
+      "This profile don get these rules already.",
+      "No profile rule change.",
+      "Dem don import {count} rule enter {surface}.",
+      "Dem don import {count} rule enter {surface}.",
+      "Channel metadata queue: {count} rows wey dem import still dey wait. As long as background worker dey awake, e dey do one lookup at a time, with random 7–15 second space between them. If one row fail, e try again after about 2 minutes, then the wait fit increase reach 30 minutes; this retry no dey stop fresh rows. Rows wey no fit show permanently or don terminate no go try again, and dem go remain for Import Reports make person check am by hand. No burst of requests happen during import. To close this dashboard no go stop the queue, but browser shutdown or wakeup limits fit delay am."
+    ]
+  }
+}

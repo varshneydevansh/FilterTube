@@ -23,7 +23,6 @@
   "settings.interfaceLanguage": "Èdè ìfihàn",
   "settings.interfaceLanguageHint": "Ó ń yí èdè ìfihàn FilterTube nìkan padà. Kò yí àwọn òfin èdè fídíò, YouTube tàbí àwọn àlẹmọ́ tí o ti fi pamọ́ padà.",
   "settings.languageAuto": "Lo èdè aṣàwákiri",
-  "settings.moreLanguages": "Ní báyìí, èdè Gẹ̀ẹ́sì nìkan ni ìfihàn rẹ̀ pé. À ń túmọ̀ àwọn èdè míì.",
   "popup.enabled": "Ti ṣiṣẹ́",
   "popup.disabled": "Ti dáwọ́ dúró",
   "popup.toggleFiltering": "Tan tàbí pa àlẹmọ́",
@@ -2246,5 +2245,14 @@
   "dashboard.sync.providerModal.enableHomePickup": "Ṣe Home Pickup ṣiṣẹ́",
   "dashboard.sync.providerModal.homePickupKey": "Kọ́kọ́rọ́ Home Pickup",
   "dashboard.sync.providerModal.optionalServiceKeyForThatHomePickupServiceThisIsNotTheParentPINLeaveBlankToKeepTheSavedKeyEnterASingleDashToClearIt": "Kọ́kọ́rọ́ iṣẹ́ àṣàyàn fún iṣẹ́ Home Pickup yìí. Èyí kì í ṣe PIN òbí. Fi sílẹ̀ ní òfo láti pa kọ́kọ́rọ́ tí a fipamọ́ mọ́; tẹ àmì ìyọkúrò kan láti pa á rẹ́.",
-  "dashboard.sync.providerModal.optionalServiceKey": "Kọ́kọ́rọ́ iṣẹ́ àṣàyàn"
+  "dashboard.sync.providerModal.optionalServiceKey": "Kọ́kọ́rọ́ iṣẹ́ àṣàyàn",
+  "settings.translationAvailability": "Èdè ojú ìfihàn 38 wà. Àwọn ìtumọ̀ ṣì wà ní ìpele àyẹ̀wò, wọ́n sì lè nílò àtúnṣe.",
+  "settings.previewLanguage": "{language} (ẹ̀dà ìdánwò)",
+  "dashboard.importReport.reviewedTitle": "A ti ṣe àyẹ̀wò ìgbéwọlé",
+  "dashboard.importReport.profilesAlreadyContainRules": "Àwọn profaili tí o yan ti ní àwọn òfin wọ̀nyí tẹ́lẹ̀.",
+  "dashboard.importReport.profileAlreadyContainsRules": "Profaili yìí ti ní àwọn òfin wọ̀nyí tẹ́lẹ̀.",
+  "dashboard.importReport.noRulesChanged": "A kò yí àwọn òfin profaili padà.",
+  "dashboard.importReport.importedIntoSurfaceOne": "A gbé òfin {count} wọlé sí {surface}.",
+  "dashboard.importReport.importedIntoSurfaceOther": "A gbé òfin {count} wọlé sí {surface}.",
+  "dashboard.importReport.metadataQueuePacing": "Lẹ́sẹ̀ ìlà metadata ikanni: àwọn ìlà {count} tí a gbé wọlé ṣì ń dúró. Nígbà tí iṣẹ́ abẹ́lẹ̀ bá ń ṣiṣẹ́, ó máa ń ṣe ìwádìí kan ṣoṣo lẹ́ẹ̀kan, ní àárín àkókò àìròtẹ́lẹ̀ ti ìṣẹ́jú-àáyá 7–15. A tún máa ń gbìyànjú ìlà tó kùnà lẹ́yìn bí ìṣẹ́jú 2, lẹ́yìn náà àárín àkókò náà máa ń gùn díẹ̀díẹ̀ dé ìṣẹ́jú 30; ìgbìyànjú yìí kì í dá àwọn ìlà tuntun dúró. A kò tún gbìyànjú àwọn ìlà tí a kò rí rárá tàbí tí iṣẹ́ wọn ti dópin, wọ́n sì máa ń wà nínú Àwọn Ìròyìn Ìgbéwọlé fún ìjẹ́rìí ọwọ́. Kò sí ìlọ́po ìbéèrè lójijì nígbà ìgbéwọlé. Títì dasibodu yìí kì í dá lẹ́sẹ̀ dúró, ṣùgbọ́n pípa aṣàwákiri tàbí ààlà jíjí rẹ̀ lè fa ìdádúró."
 }

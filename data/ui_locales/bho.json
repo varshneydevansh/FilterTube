@@ -23,7 +23,6 @@
   "settings.interfaceLanguage": "इंटरफेस के भाषा",
   "settings.interfaceLanguageHint": "एहसे खाली FilterTube के इंटरफेस के भाषा बदली। वीडियो के भाषा वाला नियम, YouTube आ रउरा सहेजल फिल्टर ना बदली।",
   "settings.languageAuto": "ब्राउजर के भाषा इस्तेमाल करीं",
-  "settings.moreLanguages": "अभी खाली अंगरेजी इंटरफेस पूरा बा। दोसर भाषा के अनुवाद चल रहल बा।",
   "popup.enabled": "चालू बा",
   "popup.disabled": "बंद बा",
   "popup.toggleFiltering": "फिल्टरिंग चालू भा बंद करीं",
@@ -2246,5 +2245,14 @@
   "dashboard.sync.providerModal.enableHomePickup": "Home Pickup चालू करीं",
   "dashboard.sync.providerModal.homePickupKey": "Home Pickup कुंजी",
   "dashboard.sync.providerModal.optionalServiceKeyForThatHomePickupServiceThisIsNotTheParentPINLeaveBlankToKeepTheSavedKeyEnterASingleDashToClearIt": "एह Home Pickup सेवा खातिर वैकल्पिक सेवा कुंजी। ई माता-पिता के PIN नइखे। सहेजल कुंजी रखे खातिर खाली छोड़ीं; मेटावे खातिर एगो डैश डालीं।",
-  "dashboard.sync.providerModal.optionalServiceKey": "वैकल्पिक सेवा कुंजी"
+  "dashboard.sync.providerModal.optionalServiceKey": "वैकल्पिक सेवा कुंजी",
+  "settings.translationAvailability": "इंटरफेस के 38 भाषा उपलब्ध बा। अनुवाद अभी झलक रूप में बा आ ओह में सुधार के जरूरत पड़ सकेला।",
+  "settings.previewLanguage": "{language} (झलक)",
+  "dashboard.importReport.reviewedTitle": "आयात के समीक्षा पूरा भइल",
+  "dashboard.importReport.profilesAlreadyContainRules": "चुनल प्रोफाइल सभ में ई नियम पहिले से मौजूद बा।",
+  "dashboard.importReport.profileAlreadyContainsRules": "एह प्रोफाइल में ई नियम पहिले से मौजूद बा।",
+  "dashboard.importReport.noRulesChanged": "प्रोफाइल के नियम में कवनो बदलाव ना भइल।",
+  "dashboard.importReport.importedIntoSurfaceOne": "{surface} में {count} नियम आयात भइल।",
+  "dashboard.importReport.importedIntoSurfaceOther": "{surface} में {count} नियम आयात भइल।",
+  "dashboard.importReport.metadataQueuePacing": "चैनल मेटाडेटा कतार: आयात भइल {count} पंक्ति अबहियो बाकी बा। बैकग्राउंड वर्कर जागल रहेला त ऊ हर बेर एके गो खोजेला, बीच में 7–15 सेकेंड के अनियमित अंतर रखेला। जे पंक्ति ना सफल होखे, ओकरा लगभग 2 मिनट बाद फेर कोशिश होला, फेर अंतर धीरे-धीरे बढ़ के 30 मिनट तक हो सकेला; एह फेर कोशिश से नया पंक्ति कबो ना रुकेला। जे पंक्ति हमेशा खातिर ना मिले या बंद हो गइल होखे, ओकरा फेर कोशिश बंद हो जाला आ हाथ से जाँच खातिर आयात रिपोर्ट में रहेला। आयात के समय अनुरोध के अचानक भीड़ ना भइल। एह डैशबोर्ड के बंद करे से कतार ना रुकेला, बाकिर ब्राउजर बंद होखे या जागे के सीमा से देरी हो सकेला।"
 }

@@ -188,7 +188,6 @@
   "settings.interfaceLanguage": "Interface language",
   "settings.interfaceLanguageHint": "Changes FilterTube’s interface only. It does not change video-language rules, YouTube, or your saved filters.",
   "settings.languageAuto": "Use browser language",
-  "settings.moreLanguages": "English is the only complete interface language today. More translations are in progress.",
   "popup.enabled": "Enabled",
   "popup.disabled": "Disabled",
   "popup.toggleFiltering": "Toggle Filtering",
@@ -2246,5 +2245,14 @@
   "dashboard.sync.providerModal.enableHomePickup": "Enable Home Pickup",
   "dashboard.sync.providerModal.homePickupKey": "Home Pickup Key",
   "dashboard.sync.providerModal.optionalServiceKeyForThatHomePickupServiceThisIsNotTheParentPINLeaveBlankToKeepTheSavedKeyEnterASingleDashToClearIt": "Optional service key for that Home Pickup service. This is not the parent PIN. Leave blank to keep the saved key; enter a single dash to clear it.",
-  "dashboard.sync.providerModal.optionalServiceKey": "Optional service key"
+  "dashboard.sync.providerModal.optionalServiceKey": "Optional service key",
+  "settings.translationAvailability": "38 interface languages are available. Translations are previews and may need corrections.",
+  "settings.previewLanguage": "{language} (preview)",
+  "dashboard.importReport.reviewedTitle": "Import Reviewed",
+  "dashboard.importReport.profilesAlreadyContainRules": "The selected profiles already contain these rules.",
+  "dashboard.importReport.profileAlreadyContainsRules": "This profile already contains these rules.",
+  "dashboard.importReport.noRulesChanged": "No profile rules changed.",
+  "dashboard.importReport.importedIntoSurfaceOne": "Imported {count} rule into {surface}.",
+  "dashboard.importReport.importedIntoSurfaceOther": "Imported {count} rules into {surface}.",
+  "dashboard.importReport.metadataQueuePacing": "Channel metadata queue: {count} imported rows pending. The background worker performs one serialized lookup at a randomized 7–15 second interval while awake. A failed row retries after about 2 minutes, then backs off up to 30 minutes; that retry never pauses fresh rows. Permanent not-found or terminated rows stop retrying and remain in Import Reports for manual verification. No burst of requests was made during import. Closing this dashboard does not stop the queue, although browser shutdown or wakeup limits can delay it."
 }

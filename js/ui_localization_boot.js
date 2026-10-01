@@ -54,7 +54,9 @@
             const option = root.document.createElement('option');
             option.value = locale;
             const name = entry?.name || displayNames?.of(locale) || locale;
-            option.textContent = ui.releasedLocales.includes(locale) ? name : `${name} (preview)`;
+            option.dataset.languageName = name;
+            // Catalogs load during activate(); labels are localized afterwards.
+            option.textContent = name;
             selector.appendChild(option);
         }
         const progress = root.document.getElementById('ftInterfaceLanguageProgress');
@@ -70,6 +72,11 @@
     }
 
     function announceLocale() {
+        if (selector) for (const option of selector.options) {
+            if (option.dataset?.languageName && !ui.releasedLocales.includes(option.value)) {
+                option.textContent = ui.text('settings.previewLanguage', { language: option.dataset.languageName });
+            }
+        }
         if (typeof root.CustomEvent === 'function') {
             root.dispatchEvent?.(new root.CustomEvent('filtertube-ui-locale-changed', { detail: { locale: ui.locale } }));
         }

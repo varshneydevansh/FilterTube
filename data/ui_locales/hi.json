@@ -70,7 +70,6 @@
   "settings.interfaceLanguage": "इंटरफ़ेस की भाषा",
   "settings.interfaceLanguageHint": "यह केवल FilterTube के इंटरफ़ेस की भाषा बदलता है। इससे वीडियो की भाषा संबंधी नियम, YouTube या आपके सहेजे गए फ़िल्टर नहीं बदलते।",
   "settings.languageAuto": "ब्राउज़र की भाषा इस्तेमाल करें",
-  "settings.moreLanguages": "अभी केवल अंग्रेज़ी में पूरा इंटरफ़ेस उपलब्ध है। अन्य भाषाओं के अनुवाद पर काम चल रहा है।",
   "popup.enabled": "चालू",
   "popup.disabled": "बंद",
   "popup.toggleFiltering": "फ़िल्टरिंग चालू या बंद करें",
@@ -2246,5 +2245,14 @@
   "dashboard.sync.providerModal.enableHomePickup": "Home Pickup चालू करें",
   "dashboard.sync.providerModal.homePickupKey": "Home Pickup कुंजी",
   "dashboard.sync.providerModal.optionalServiceKeyForThatHomePickupServiceThisIsNotTheParentPINLeaveBlankToKeepTheSavedKeyEnterASingleDashToClearIt": "उस Home Pickup सेवा की वैकल्पिक कुंजी। यह अभिभावक PIN नहीं है। सहेजी कुंजी रखने के लिए खाली छोड़ें; मिटाने के लिए एक अकेला डैश दर्ज करें।",
-  "dashboard.sync.providerModal.optionalServiceKey": "वैकल्पिक सेवा कुंजी"
+  "dashboard.sync.providerModal.optionalServiceKey": "वैकल्पिक सेवा कुंजी",
+  "settings.translationAvailability": "38 इंटरफ़ेस भाषाएँ उपलब्ध हैं। अनुवाद अभी पूर्वावलोकन में हैं और उनमें सुधार की आवश्यकता हो सकती है।",
+  "settings.previewLanguage": "{language} (पूर्वावलोकन)",
+  "dashboard.importReport.reviewedTitle": "आयात की समीक्षा की गई",
+  "dashboard.importReport.profilesAlreadyContainRules": "चयनित प्रोफ़ाइलों में ये नियम पहले से मौजूद हैं।",
+  "dashboard.importReport.profileAlreadyContainsRules": "इस प्रोफ़ाइल में ये नियम पहले से मौजूद हैं।",
+  "dashboard.importReport.noRulesChanged": "प्रोफ़ाइल के नियमों में कोई बदलाव नहीं हुआ।",
+  "dashboard.importReport.importedIntoSurfaceOne": "{surface} में {count} नियम आयात किया गया।",
+  "dashboard.importReport.importedIntoSurfaceOther": "{surface} में {count} नियम आयात किए गए।",
+  "dashboard.importReport.metadataQueuePacing": "चैनल मेटाडेटा कतार: {count} आयातित पंक्तियाँ लंबित हैं। बैकग्राउंड वर्कर चालू रहने पर, हर 7–15 सेकंड के यादृच्छिक अंतराल पर एक-एक करके खोज करता है। विफल पंक्ति लगभग 2 मिनट बाद फिर कोशिश करती है, फिर अंतराल बढ़ाकर अधिकतम 30 मिनट तक किया जाता है; इससे नई पंक्तियाँ रुकती नहीं हैं। स्थायी रूप से न मिलने वाली या समाप्त की गई पंक्तियों की पुनः कोशिश बंद हो जाती है और वे मैन्युअल जाँच के लिए आयात रिपोर्ट में रहती हैं। आयात के दौरान अनुरोधों की कोई बौछार नहीं हुई। यह डैशबोर्ड बंद करने से कतार नहीं रुकती, हालाँकि ब्राउज़र बंद होने या जागने की सीमाओं से देरी हो सकती है।"
 }

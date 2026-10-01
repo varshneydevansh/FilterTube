@@ -23,7 +23,6 @@
   "settings.interfaceLanguage": "የበይነገጽ ቋንቋ",
   "settings.interfaceLanguageHint": "የFilterTube በይነገጽ ቋንቋን ብቻ ይቀይራል። የቪዲዮ ቋንቋ ደንቦችን፣ YouTubeን ወይም የተቀመጡ ማጣሪያዎችን አይቀይርም።",
   "settings.languageAuto": "የአሳሽ ቋንቋን ይጠቀሙ",
-  "settings.moreLanguages": "አሁን የተሟላው የእንግሊዝኛ በይነገጽ ብቻ ነው። ሌሎች ቋንቋዎች እየተተረጎሙ ናቸው።",
   "popup.enabled": "ነቅቷል",
   "popup.disabled": "ጠፍቷል",
   "popup.toggleFiltering": "ማጣራትን አብራ ወይም አጥፋ",
@@ -2246,5 +2245,14 @@
   "dashboard.sync.providerModal.enableHomePickup": "Home Pickupን አንቃ",
   "dashboard.sync.providerModal.homePickupKey": "የHome Pickup ቁልፍ",
   "dashboard.sync.providerModal.optionalServiceKeyForThatHomePickupServiceThisIsNotTheParentPINLeaveBlankToKeepTheSavedKeyEnterASingleDashToClearIt": "ለዚያ Home Pickup አገልግሎት አማራጭ ቁልፍ ነው። ይህ የወላጅ PIN አይደለም። የተቀመጠውን ቁልፍ ለማቆየት ባዶ ይተዉ፤ ለማጥፋት አንድ ሰረዝ ብቻ ያስገቡ።",
-  "dashboard.sync.providerModal.optionalServiceKey": "አማራጭ የአገልግሎት ቁልፍ"
+  "dashboard.sync.providerModal.optionalServiceKey": "አማራጭ የአገልግሎት ቁልፍ",
+  "settings.translationAvailability": "38 የበይነገጽ ቋንቋዎች ይገኛሉ። ትርጉሞቹ በቅድመ እይታ ላይ ናቸው እና ማስተካከያ ሊያስፈልጋቸው ይችላል።",
+  "settings.previewLanguage": "{language} (ቅድመ እይታ)",
+  "dashboard.importReport.reviewedTitle": "የማስመጣት ግምገማ ተጠናቋል",
+  "dashboard.importReport.profilesAlreadyContainRules": "የተመረጡት ፕሮፋይሎች እነዚህን ደንቦች አስቀድመው ይይዛሉ።",
+  "dashboard.importReport.profileAlreadyContainsRules": "ይህ ፕሮፋይል እነዚህን ደንቦች አስቀድሞ ይዟል።",
+  "dashboard.importReport.noRulesChanged": "በፕሮፋይሉ ደንቦች ላይ ምንም ለውጥ አልተደረገም።",
+  "dashboard.importReport.importedIntoSurfaceOne": "{count} ደንብ ወደ {surface} ገብቷል።",
+  "dashboard.importReport.importedIntoSurfaceOther": "{count} ደንብ ወደ {surface} ገብቷል።",
+  "dashboard.importReport.metadataQueuePacing": "የቻናል ሜታዳታ ወረፋ፦ {count} የገቡ ረድፎች በመጠባበቅ ላይ ናቸው። የጀርባ ሥራ አስኪያጁ ንቁ ሲሆን በዘፈቀደ ከ7 እስከ 15 ሰከንድ ልዩነት በአንድ ጊዜ አንድ ፍለጋ ያካሂዳል። ያልተሳካ ረድፍ ከ2 ደቂቃ ገደማ በኋላ እንደገና ይሞከራል፤ ከዚያም ልዩነቱ እስከ 30 ደቂቃ ድረስ ቀስ በቀስ ይጨምራል። ይህ ድጋሚ ሙከራ አዲስ ረድፎችን ፈጽሞ አያቆምም። በቋሚነት ያልተገኙ ወይም የተቋረጡ ረድፎች ድጋሚ አይሞከሩም፤ ለእጅ ማረጋገጫ በማስመጣት ሪፖርቶች ውስጥ ይቆያሉ። በማስመጣት ጊዜ የጥያቄዎች ጭማሪ አልተፈጠረም። ይህን ዳሽቦርድ መዝጋት ወረፋውን አያቆምም፤ ሆኖም አሳሹ መዘጋቱ ወይም የማንቃት ገደቦች ሊያዘገዩት ይችላሉ።"
 }

@@ -23,7 +23,6 @@
   "settings.interfaceLanguage": "Lingua dell’interfaccia",
   "settings.interfaceLanguageHint": "Cambia solo la lingua dell’interfaccia di FilterTube. Non modifica le regole sulla lingua dei video, YouTube o i filtri salvati.",
   "settings.languageAuto": "Usa la lingua del browser",
-  "settings.moreLanguages": "Al momento solo l’interfaccia in inglese è completa. Stiamo traducendo altre lingue.",
   "popup.enabled": "Attivo",
   "popup.disabled": "Disattivato",
   "popup.toggleFiltering": "Attiva o disattiva i filtri",
@@ -2246,5 +2245,14 @@
   "dashboard.sync.providerModal.enableHomePickup": "Attiva Home Pickup",
   "dashboard.sync.providerModal.homePickupKey": "Chiave Home Pickup",
   "dashboard.sync.providerModal.optionalServiceKeyForThatHomePickupServiceThisIsNotTheParentPINLeaveBlankToKeepTheSavedKeyEnterASingleDashToClearIt": "Chiave di servizio facoltativa per questo servizio Home Pickup. Non è il PIN del genitore. Lascia vuoto per mantenere la chiave salvata; inserisci un solo trattino per cancellarla.",
-  "dashboard.sync.providerModal.optionalServiceKey": "Chiave di servizio facoltativa"
+  "dashboard.sync.providerModal.optionalServiceKey": "Chiave di servizio facoltativa",
+  "settings.translationAvailability": "Sono disponibili 38 lingue dell’interfaccia. Le traduzioni sono in anteprima e potrebbero richiedere correzioni.",
+  "settings.previewLanguage": "{language} (anteprima)",
+  "dashboard.importReport.reviewedTitle": "Importazione verificata",
+  "dashboard.importReport.profilesAlreadyContainRules": "I profili selezionati contengono già queste regole.",
+  "dashboard.importReport.profileAlreadyContainsRules": "Questo profilo contiene già queste regole.",
+  "dashboard.importReport.noRulesChanged": "Nessuna regola del profilo è stata modificata.",
+  "dashboard.importReport.importedIntoSurfaceOne": "È stata importata {count} regola in {surface}.",
+  "dashboard.importReport.importedIntoSurfaceOther": "Sono state importate {count} regole in {surface}.",
+  "dashboard.importReport.metadataQueuePacing": "Coda dei metadati dei canali: {count} righe importate sono in attesa. Quando il processo in background è attivo, esegue una sola ricerca alla volta a intervalli casuali di 7–15 secondi. Una riga non riuscita viene ritentata dopo circa 2 minuti; poi l’intervallo aumenta gradualmente fino a 30 minuti. Questi nuovi tentativi non fermano mai le righe nuove. Le righe non trovate in modo permanente o terminate non vengono più ritentate e restano nei Rapporti di importazione per la verifica manuale. Durante l’importazione non c’è stato alcun picco di richieste. Chiudere questa dashboard non interrompe la coda, ma la chiusura del browser o i limiti di riattivazione possono causare ritardi."
 }

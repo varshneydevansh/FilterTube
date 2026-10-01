@@ -70,7 +70,6 @@
   "settings.interfaceLanguage": "Idioma de la interfaz",
   "settings.interfaceLanguageHint": "Solo cambia el idioma de la interfaz de FilterTube. No modifica las reglas de idioma de los videos, YouTube ni los filtros guardados.",
   "settings.languageAuto": "Usar el idioma del navegador",
-  "settings.moreLanguages": "Por ahora, el inglés es el único idioma con la interfaz completa. Estamos traduciendo más idiomas.",
   "popup.enabled": "Activado",
   "popup.disabled": "Desactivado",
   "popup.toggleFiltering": "Activar o desactivar los filtros",
@@ -2246,5 +2245,14 @@
   "dashboard.sync.providerModal.enableHomePickup": "Activar Home Pickup",
   "dashboard.sync.providerModal.homePickupKey": "Clave de Home Pickup",
   "dashboard.sync.providerModal.optionalServiceKeyForThatHomePickupServiceThisIsNotTheParentPINLeaveBlankToKeepTheSavedKeyEnterASingleDashToClearIt": "Clave opcional para ese servicio Home Pickup. No es el PIN del progenitor. Déjalo en blanco para conservar la clave guardada; introduce un solo guion para borrarla.",
-  "dashboard.sync.providerModal.optionalServiceKey": "Clave de servicio opcional"
+  "dashboard.sync.providerModal.optionalServiceKey": "Clave de servicio opcional",
+  "settings.translationAvailability": "Hay 38 idiomas de interfaz disponibles. Las traducciones son versiones preliminares y pueden necesitar correcciones.",
+  "settings.previewLanguage": "{language} (vista previa)",
+  "dashboard.importReport.reviewedTitle": "Importación revisada",
+  "dashboard.importReport.profilesAlreadyContainRules": "Los perfiles seleccionados ya contienen estas reglas.",
+  "dashboard.importReport.profileAlreadyContainsRules": "Este perfil ya contiene estas reglas.",
+  "dashboard.importReport.noRulesChanged": "No se modificaron las reglas del perfil.",
+  "dashboard.importReport.importedIntoSurfaceOne": "Se importó {count} regla en {surface}.",
+  "dashboard.importReport.importedIntoSurfaceOther": "Se importaron {count} reglas en {surface}.",
+  "dashboard.importReport.metadataQueuePacing": "Cola de metadatos de canales: hay {count} filas importadas pendientes. Mientras el trabajador en segundo plano está activo, realiza una consulta cada vez en intervalos aleatorios de 7–15 segundos. Si una fila falla, se vuelve a intentar al cabo de unos 2 minutos y después el intervalo aumenta gradualmente hasta un máximo de 30 minutos; esos reintentos nunca detienen las filas nuevas. Las filas que no se encuentran de forma permanente o están terminadas dejan de reintentarse y permanecen en Informes de importación para verificarlas manualmente. Durante la importación no se produjo ningún pico de solicitudes. Cerrar este panel no detiene la cola, aunque el cierre del navegador o sus límites de activación pueden retrasarla."
 }

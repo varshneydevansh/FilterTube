@@ -23,7 +23,6 @@
   "settings.interfaceLanguage": "界面语言",
   "settings.interfaceLanguageHint": "仅更改 FilterTube 的界面语言，不会更改视频语言规则、YouTube 或已保存的过滤规则。",
   "settings.languageAuto": "使用浏览器语言",
-  "settings.moreLanguages": "目前只有英语界面已完整翻译。其他语言的翻译正在进行中。",
   "popup.enabled": "已启用",
   "popup.disabled": "已停用",
   "popup.toggleFiltering": "切换过滤功能",
@@ -2246,5 +2245,14 @@
   "dashboard.sync.providerModal.enableHomePickup": "启用 Home Pickup",
   "dashboard.sync.providerModal.homePickupKey": "Home Pickup 密钥",
   "dashboard.sync.providerModal.optionalServiceKeyForThatHomePickupServiceThisIsNotTheParentPINLeaveBlankToKeepTheSavedKeyEnterASingleDashToClearIt": "该 Home Pickup 服务的可选密钥。这不是家长 PIN。留空以保留已保存密钥；输入单个短横线可清除密钥。",
-  "dashboard.sync.providerModal.optionalServiceKey": "可选服务密钥"
+  "dashboard.sync.providerModal.optionalServiceKey": "可选服务密钥",
+  "settings.translationAvailability": "提供 38 种界面语言。翻译目前为预览版本，可能需要修正。",
+  "settings.previewLanguage": "{language}（预览）",
+  "dashboard.importReport.reviewedTitle": "已审核导入",
+  "dashboard.importReport.profilesAlreadyContainRules": "所选个人资料已包含这些规则。",
+  "dashboard.importReport.profileAlreadyContainsRules": "此个人资料已包含这些规则。",
+  "dashboard.importReport.noRulesChanged": "个人资料规则未发生更改。",
+  "dashboard.importReport.importedIntoSurfaceOne": "已将 {count} 条规则导入 {surface}。",
+  "dashboard.importReport.importedIntoSurfaceOther": "已将 {count} 条规则导入 {surface}。",
+  "dashboard.importReport.metadataQueuePacing": "频道元数据队列：还有 {count} 条已导入记录待处理。后台工作程序运行时，会以随机的 7–15 秒间隔逐条查询。失败的记录约 2 分钟后重试，之后逐渐延长间隔，最长可达 30 分钟；重试不会暂停新记录。永久未找到或已终止的记录将停止重试，并保留在“导入报告”中供手动核实。导入期间没有突发请求。关闭此仪表板不会停止队列，但浏览器关闭或唤醒限制可能会延迟处理。"
 }

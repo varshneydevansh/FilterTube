@@ -23,7 +23,6 @@
   "settings.interfaceLanguage": "表示言語",
   "settings.interfaceLanguageHint": "FilterTube の表示言語のみを変更します。動画の言語ルール、YouTube、保存済みのフィルターは変更されません。",
   "settings.languageAuto": "ブラウザーの言語を使用",
-  "settings.moreLanguages": "現在、インターフェース全体に対応しているのは英語のみです。他の言語は翻訳中です。",
   "popup.enabled": "有効",
   "popup.disabled": "無効",
   "popup.toggleFiltering": "フィルタリングの切り替え",
@@ -2246,5 +2245,14 @@
   "dashboard.sync.providerModal.enableHomePickup": "Home Pickup を有効にする",
   "dashboard.sync.providerModal.homePickupKey": "Home Pickup キー",
   "dashboard.sync.providerModal.optionalServiceKeyForThatHomePickupServiceThisIsNotTheParentPINLeaveBlankToKeepTheSavedKeyEnterASingleDashToClearIt": "この Home Pickup サービス用の任意のキーです。保護者の PIN ではありません。保存済みのキーを維持するには空欄のままにし、消去するにはハイフンを1つ入力してください。",
-  "dashboard.sync.providerModal.optionalServiceKey": "任意のサービスキー"
+  "dashboard.sync.providerModal.optionalServiceKey": "任意のサービスキー",
+  "settings.translationAvailability": "38 種類のインターフェース言語を利用できます。翻訳はプレビュー版のため、修正が必要な場合があります。",
+  "settings.previewLanguage": "{language}（プレビュー）",
+  "dashboard.importReport.reviewedTitle": "インポートを確認しました",
+  "dashboard.importReport.profilesAlreadyContainRules": "選択したプロフィールには、これらのルールがすでに含まれています。",
+  "dashboard.importReport.profileAlreadyContainsRules": "このプロフィールには、これらのルールがすでに含まれています。",
+  "dashboard.importReport.noRulesChanged": "プロフィールのルールに変更はありませんでした。",
+  "dashboard.importReport.importedIntoSurfaceOne": "{surface}にルールを{count}件インポートしました。",
+  "dashboard.importReport.importedIntoSurfaceOther": "{surface}にルールを{count}件インポートしました。",
+  "dashboard.importReport.metadataQueuePacing": "チャンネルメタデータのキュー：インポートした{count}件の行が処理待ちです。バックグラウンドワーカーが動作中は、ランダムな7～15秒間隔で1件ずつ検索します。失敗した行は約2分後に再試行され、その後は間隔が最大30分まで段階的に長くなります。この再試行によって新しい行の処理が止まることはありません。恒久的に見つからない行や終了した行は再試行されず、手動確認のためインポートレポートに残ります。インポート中にリクエストが集中することはありませんでした。このダッシュボードを閉じてもキューは停止しませんが、ブラウザーの終了や起動制限によって遅れる場合があります。"
 }

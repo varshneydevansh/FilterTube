@@ -70,7 +70,6 @@
   "settings.interfaceLanguage": "زبان رابط کاربری",
   "settings.interfaceLanguageHint": "فقط زبان رابط کاربری FilterTube را تغییر می‌دهد. قوانین زبان ویدیو، YouTube و فیلترهای ذخیره‌شده تغییر نمی‌کنند.",
   "settings.languageAuto": "استفاده از زبان مرورگر",
-  "settings.moreLanguages": "در حال حاضر فقط رابط کاربری انگلیسی کامل است. ترجمهٔ زبان‌های دیگر در دست انجام است.",
   "popup.enabled": "فعال",
   "popup.disabled": "غیرفعال",
   "popup.toggleFiltering": "روشن یا خاموش کردن فیلترها",
@@ -2246,5 +2245,14 @@
   "dashboard.sync.providerModal.enableHomePickup": "فعال کردن Home Pickup",
   "dashboard.sync.providerModal.homePickupKey": "کلید Home Pickup",
   "dashboard.sync.providerModal.optionalServiceKeyForThatHomePickupServiceThisIsNotTheParentPINLeaveBlankToKeepTheSavedKeyEnterASingleDashToClearIt": "کلید اختیاری برای این سرویس Home Pickup. این PIN والد نیست. برای نگه‌داشتن کلید ذخیره‌شده خالی بگذارید؛ برای پاک کردن آن فقط یک خط تیره وارد کنید.",
-  "dashboard.sync.providerModal.optionalServiceKey": "کلید اختیاری سرویس"
+  "dashboard.sync.providerModal.optionalServiceKey": "کلید اختیاری سرویس",
+  "settings.translationAvailability": "۳۸ زبان رابط در دسترس است. ترجمه‌ها نسخهٔ پیش‌نمایش هستند و ممکن است به اصلاح نیاز داشته باشند.",
+  "settings.previewLanguage": "{language} (پیش‌نمایش)",
+  "dashboard.importReport.reviewedTitle": "واردسازی بررسی شد",
+  "dashboard.importReport.profilesAlreadyContainRules": "این قوانین از قبل در نمایه‌های انتخاب‌شده وجود دارند.",
+  "dashboard.importReport.profileAlreadyContainsRules": "این قوانین از قبل در این نمایه وجود دارند.",
+  "dashboard.importReport.noRulesChanged": "قوانین نمایه تغییری نکردند.",
+  "dashboard.importReport.importedIntoSurfaceOne": "{count} قانون به {surface} وارد شد.",
+  "dashboard.importReport.importedIntoSurfaceOther": "{count} قانون به {surface} وارد شد.",
+  "dashboard.importReport.metadataQueuePacing": "صف متادیتای کانال: {count} ردیف واردشده در انتظار پردازش است. تا وقتی کارگر پس‌زمینه فعال باشد، در فاصله‌های تصادفی ۷ تا ۱۵ ثانیه‌ای، هر بار فقط یک جست‌وجو انجام می‌دهد. ردیف ناموفق پس از حدود ۲ دقیقه دوباره امتحان می‌شود و سپس فاصله به‌تدریج تا ۳۰ دقیقه افزایش می‌یابد؛ این تلاش دوباره هرگز ردیف‌های تازه را متوقف نمی‌کند. تلاش برای ردیف‌هایی که به‌طور دائمی پیدا نشده‌اند یا منبعشان پایان یافته متوقف می‌شود و آن‌ها برای بررسی دستی در گزارش‌های واردسازی می‌مانند. هنگام واردسازی جهش ناگهانی درخواست‌ها رخ نداد. بستن این داشبورد صف را متوقف نمی‌کند، هرچند خاموش شدن مرورگر یا محدودیت‌های بیدارشدن آن ممکن است باعث تأخیر شود."
 }

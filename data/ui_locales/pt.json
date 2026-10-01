@@ -70,7 +70,6 @@
   "settings.interfaceLanguage": "Idioma da interface",
   "settings.interfaceLanguageHint": "Altera apenas o idioma da interface do FilterTube. Não altera as regras de idioma dos vídeos, o YouTube nem os filtros salvos.",
   "settings.languageAuto": "Usar o idioma do navegador",
-  "settings.moreLanguages": "Por enquanto, o inglês é o único idioma com a interface completa. Outras traduções estão em andamento.",
   "popup.enabled": "Ativado",
   "popup.disabled": "Desativado",
   "popup.toggleFiltering": "Ativar ou desativar a filtragem",
@@ -2246,5 +2245,14 @@
   "dashboard.sync.providerModal.enableHomePickup": "Ativar Home Pickup",
   "dashboard.sync.providerModal.homePickupKey": "Chave de Home Pickup",
   "dashboard.sync.providerModal.optionalServiceKeyForThatHomePickupServiceThisIsNotTheParentPINLeaveBlankToKeepTheSavedKeyEnterASingleDashToClearIt": "Chave de serviço opcional para esse serviço Home Pickup. Não é o PIN dos responsáveis. Deixe em branco para manter a chave salva; digite apenas um hífen para apagá-la.",
-  "dashboard.sync.providerModal.optionalServiceKey": "Chave de serviço opcional"
+  "dashboard.sync.providerModal.optionalServiceKey": "Chave de serviço opcional",
+  "settings.translationAvailability": "Há 38 idiomas de interface disponíveis. As traduções estão em pré-visualização e podem precisar de correções.",
+  "settings.previewLanguage": "{language} (pré-visualização)",
+  "dashboard.importReport.reviewedTitle": "Importação revisada",
+  "dashboard.importReport.profilesAlreadyContainRules": "Os perfis selecionados já contêm estas regras.",
+  "dashboard.importReport.profileAlreadyContainsRules": "Este perfil já contém estas regras.",
+  "dashboard.importReport.noRulesChanged": "Nenhuma regra do perfil foi alterada.",
+  "dashboard.importReport.importedIntoSurfaceOne": "{count} regra foi importada para {surface}.",
+  "dashboard.importReport.importedIntoSurfaceOther": "{count} regras foram importadas para {surface}.",
+  "dashboard.importReport.metadataQueuePacing": "Fila de metadados dos canais: {count} linhas importadas estão pendentes. Enquanto o processo em segundo plano estiver ativo, ele faz uma consulta de cada vez em intervalos aleatórios de 7 a 15 segundos. Uma linha com falha é tentada novamente após cerca de 2 minutos; depois, o intervalo aumenta gradualmente até 30 minutos. Essas tentativas nunca pausam linhas novas. Linhas permanentemente não encontradas ou encerradas deixam de ser tentadas e permanecem nos Relatórios de importação para verificação manual. Não houve pico de solicitações durante a importação. Fechar este painel não interrompe a fila, embora o encerramento do navegador ou seus limites para reativação possam atrasá-la."
 }

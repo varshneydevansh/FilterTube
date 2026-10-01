@@ -70,7 +70,6 @@
   "settings.interfaceLanguage": "இடைமுக மொழி",
   "settings.interfaceLanguageHint": "FilterTube இடைமுகத்தின் மொழியை மட்டுமே மாற்றும். வீடியோ மொழி விதிகள், YouTube அல்லது நீங்கள் சேமித்த வடிகட்டிகள் மாறாது.",
   "settings.languageAuto": "உலாவியின் மொழியைப் பயன்படுத்தவும்",
-  "settings.moreLanguages": "தற்போது முழுமையாகக் கிடைக்கும் இடைமுக மொழி ஆங்கிலம் மட்டுமே. பிற மொழிபெயர்ப்புகள் தயாராகி வருகின்றன.",
   "popup.enabled": "இயக்கத்தில் உள்ளது",
   "popup.disabled": "முடக்கப்பட்டுள்ளது",
   "popup.toggleFiltering": "வடிகட்டலை மாற்றவும்",
@@ -2246,5 +2245,14 @@
   "dashboard.sync.providerModal.enableHomePickup": "Home Pickup-ஐ இயக்கு",
   "dashboard.sync.providerModal.homePickupKey": "Home Pickup விசை",
   "dashboard.sync.providerModal.optionalServiceKeyForThatHomePickupServiceThisIsNotTheParentPINLeaveBlankToKeepTheSavedKeyEnterASingleDashToClearIt": "அந்த Home Pickup சேவைக்கான விருப்பச் சேவை விசை. இது பெற்றோர் PIN அல்ல. சேமித்த விசையை வைத்திருக்க வெறுமையாக விடவும்; அழிக்க ஒரே கோடு (-) உள்ளிடவும்.",
-  "dashboard.sync.providerModal.optionalServiceKey": "விருப்பச் சேவை விசை"
+  "dashboard.sync.providerModal.optionalServiceKey": "விருப்பச் சேவை விசை",
+  "settings.translationAvailability": "38 இடைமுக மொழிகள் உள்ளன. மொழிபெயர்ப்புகள் முன்னோட்ட நிலையில் உள்ளன; திருத்தங்கள் தேவைப்படலாம்.",
+  "settings.previewLanguage": "{language} (முன்னோட்டம்)",
+  "dashboard.importReport.reviewedTitle": "இறக்குமதி மதிப்பாய்வு செய்யப்பட்டது",
+  "dashboard.importReport.profilesAlreadyContainRules": "தேர்ந்தெடுத்த சுயவிவரங்களில் இந்த விதிகள் ஏற்கனவே உள்ளன.",
+  "dashboard.importReport.profileAlreadyContainsRules": "இந்தச் சுயவிவரத்தில் இந்த விதிகள் ஏற்கனவே உள்ளன.",
+  "dashboard.importReport.noRulesChanged": "சுயவிவர விதிகள் எதுவும் மாறவில்லை.",
+  "dashboard.importReport.importedIntoSurfaceOne": "{surface}இல் {count} விதி இறக்குமதி செய்யப்பட்டது.",
+  "dashboard.importReport.importedIntoSurfaceOther": "{surface}இல் {count} விதிகள் இறக்குமதி செய்யப்பட்டன.",
+  "dashboard.importReport.metadataQueuePacing": "சேனல் மெட்டாடேட்டா வரிசை: இறக்குமதி செய்யப்பட்ட {count} வரிசைகள் நிலுவையில் உள்ளன. பின்னணி செயலி விழித்திருக்கும்போது சீரற்ற 7–15 விநாடி இடைவெளியில் ஒவ்வொரு முறையும் ஒரு தேடலைத் தொடர்ச்சியாகச் செய்கிறது. தோல்வியடைந்த வரிசை சுமார் 2 நிமிடங்களுக்குப் பிறகு மீண்டும் முயற்சிக்கப்படும்; பின்னர் இடைவெளி படிப்படியாக அதிகபட்சம் 30 நிமிடங்கள் வரை நீளும். அந்த மறுமுயற்சி புதிய வரிசைகளை நிறுத்தாது. நிரந்தரமாகக் கண்டுபிடிக்க முடியாத அல்லது முடிக்கப்பட்ட வரிசைகளுக்கு மறுமுயற்சி நிறுத்தப்பட்டு, கைமுறை சரிபார்ப்புக்காக இறக்குமதி அறிக்கைகளில் வைக்கப்படும். இறக்குமதியின்போது கோரிக்கைகள் திடீரென குவியவில்லை. இந்த டாஷ்போர்டை மூடுவது வரிசையை நிறுத்தாது; ஆனால் உலாவி மூடப்படுதல் அல்லது விழிப்பூட்டல் வரம்புகள் தாமதத்தை ஏற்படுத்தலாம்."
 }

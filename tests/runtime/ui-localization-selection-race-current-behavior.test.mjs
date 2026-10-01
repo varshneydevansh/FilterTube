@@ -25,7 +25,7 @@ function createHarness({ deferFrenchFetch = false, deferFirstPreferenceWrite = f
     readyState: 'complete',
     documentElement: { lang: 'en', dir: 'ltr' },
     getElementById(id) { return id === 'ftInterfaceLanguage' ? selector : null; },
-    createElement() { return { value: '', textContent: '' }; },
+    createElement() { return { value: '', textContent: '', dataset: {} }; },
     querySelectorAll(name) { return name === '[data-ft-i18n]' ? [label] : []; }
   };
 
@@ -35,9 +35,9 @@ function createHarness({ deferFrenchFetch = false, deferFirstPreferenceWrite = f
   let releaseFirstWrite;
   let firstWriteStarted = false;
   const catalogs = {
-    en: { 'navigation.settings': 'Settings' },
-    fr: { 'navigation.settings': 'Paramètres' },
-    hi: { 'navigation.settings': 'सेटिंग्स' }
+    en: { 'navigation.settings': 'Settings', 'settings.previewLanguage': '{language} (preview)' },
+    fr: { 'navigation.settings': 'Paramètres', 'settings.previewLanguage': '{language} (aperçu)' },
+    hi: { 'navigation.settings': 'सेटिंग्स', 'settings.previewLanguage': '{language} (पूर्वावलोकन)' }
   };
   const context = {
     document,
@@ -118,6 +118,7 @@ test('latest locale intent wins when catalog fetches finish out of order', async
   assert.equal(harness.locale, 'hi');
   assert.equal(harness.label.textContent, 'सेटिंग्स');
   assert.equal(harness.document.documentElement.lang, 'hi');
+  assert.ok(harness.selector.options.filter(option => option.dataset?.languageName).every(option => option.textContent.endsWith('(पूर्वावलोकन)')), 'preview labels follow the selected locale');
   assert.deepEqual(harness.announcements, ['en', 'hi']);
 
   harness.releaseFrenchFetch();
@@ -127,6 +128,7 @@ test('latest locale intent wins when catalog fetches finish out of order', async
   assert.equal(harness.document.documentElement.lang, 'hi');
   assert.deepEqual(harness.announcements, ['en', 'hi'], 'stale activation must not apply or announce');
   assert.equal(harness.storedPreference, 'hi');
+  assert.ok(harness.selector.options.filter(option => option.dataset?.languageName).every(option => option.textContent.endsWith('(पूर्वावलोकन)')), 'stale activation cannot restore older preview labels');
 });
 
 test('queued preference writes preserve the latest choice if an earlier write is delayed', async () => {

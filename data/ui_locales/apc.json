@@ -23,7 +23,6 @@
   "settings.interfaceLanguage": "لغة الواجهة",
   "settings.interfaceLanguageHint": "هالشي بيغيّر لغة واجهة FilterTube بس. ما بيغيّر قواعد لغة الفيديو أو YouTube أو الفلاتر اللي حفظتها.",
   "settings.languageAuto": "استعمل لغة المتصفّح",
-  "settings.moreLanguages": "هلّق واجهة الإنجليزي بس مكتملة. عم نترجم لغات تانية.",
   "popup.enabled": "شغّال",
   "popup.disabled": "مطفي",
   "popup.toggleFiltering": "شغّل الفلترة أو طفيها",
@@ -2246,5 +2245,14 @@
   "dashboard.sync.providerModal.enableHomePickup": "فعّل Home Pickup",
   "dashboard.sync.providerModal.homePickupKey": "مفتاح Home Pickup",
   "dashboard.sync.providerModal.optionalServiceKeyForThatHomePickupServiceThisIsNotTheParentPINLeaveBlankToKeepTheSavedKeyEnterASingleDashToClearIt": "مفتاح خدمة اختياري لخدمة Home Pickup هاي. هاد مش PIN الوالد. اتركه فاضي لتحتفظ بالمفتاح المحفوظ؛ أدخل شرطة واحدة لمَسحه.",
-  "dashboard.sync.providerModal.optionalServiceKey": "مفتاح خدمة اختياري"
+  "dashboard.sync.providerModal.optionalServiceKey": "مفتاح خدمة اختياري",
+  "settings.translationAvailability": "في ٣٨ لغة للواجهة متاحة. الترجمات بنسخة معاينة وممكن تحتاج تصحيح.",
+  "settings.previewLanguage": "{language} (معاينة)",
+  "dashboard.importReport.reviewedTitle": "تمت مراجعة الاستيراد",
+  "dashboard.importReport.profilesAlreadyContainRules": "الملفات الشخصية اللي اخترتها فيها هالقواعد من قبل.",
+  "dashboard.importReport.profileAlreadyContainsRules": "هالملف الشخصي فيه هالقواعد من قبل.",
+  "dashboard.importReport.noRulesChanged": "ما تغيّرت قواعد الملف الشخصي.",
+  "dashboard.importReport.importedIntoSurfaceOne": "استوردنا {count} قاعدة على {surface}.",
+  "dashboard.importReport.importedIntoSurfaceOther": "استوردنا قواعد عددها {count} على {surface}.",
+  "dashboard.importReport.metadataQueuePacing": "طابور بيانات القنوات: في {count} صف مستورد ناطر المعالجة. طول ما عامل الخلفية شغّال، بيعمل بحث واحد كل مرة بفاصل عشوائي من ٧ لـ١٥ ثانية. الصف اللي بيفشل منعيد المحاولة بعد حوالي دقيقتين، وبعدين منزيد الفاصل شوي شوي لحد ٣٠ دقيقة؛ هالمحاولة ما بتوقف الصفوف الجديدة أبداً. الصفوف اللي ما بتنلاقى نهائياً أو انتهى مصدرها بتوقف محاولاتها وبتضل بتقارير الاستيراد لحتى تنفحص يدوياً. ما صار في دفعة طلبات وقت الاستيراد. تسكير لوحة التحكم ما بيوقف الطابور، بس تسكير المتصفح أو قيود تشغيله من جديد ممكن تأخره."
 }

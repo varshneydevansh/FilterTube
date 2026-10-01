@@ -70,7 +70,6 @@
   "settings.interfaceLanguage": "لغة الواجهة",
   "settings.interfaceLanguageHint": "يغيّر هذا لغة واجهة FilterTube فقط، ولا يغيّر قواعد لغة الفيديو أو YouTube أو الفلاتر المحفوظة.",
   "settings.languageAuto": "استخدام لغة المتصفح",
-  "settings.moreLanguages": "الإنجليزية هي لغة الواجهة المكتملة الوحيدة حاليًا. نعمل على ترجمة لغات أخرى.",
   "popup.enabled": "مفعّل",
   "popup.disabled": "معطّل",
   "popup.toggleFiltering": "تفعيل التصفية أو تعطيلها",
@@ -2246,5 +2245,14 @@
   "dashboard.sync.providerModal.enableHomePickup": "فعّل Home Pickup",
   "dashboard.sync.providerModal.homePickupKey": "مفتاح Home Pickup",
   "dashboard.sync.providerModal.optionalServiceKeyForThatHomePickupServiceThisIsNotTheParentPINLeaveBlankToKeepTheSavedKeyEnterASingleDashToClearIt": "مفتاح خدمة اختياري لخدمة Home Pickup هذه. ليس PIN الوالد. اتركه فارغًا للإبقاء على المفتاح المحفوظ؛ أدخل شرطة واحدة لمسحه.",
-  "dashboard.sync.providerModal.optionalServiceKey": "مفتاح خدمة اختياري"
+  "dashboard.sync.providerModal.optionalServiceKey": "مفتاح خدمة اختياري",
+  "settings.translationAvailability": "تتوفر 38 لغة للواجهة. الترجمات في مرحلة المعاينة وقد تحتاج إلى تصحيحات.",
+  "settings.previewLanguage": "{language} (معاينة)",
+  "dashboard.importReport.reviewedTitle": "تمت مراجعة الاستيراد",
+  "dashboard.importReport.profilesAlreadyContainRules": "تحتوي الملفات الشخصية المحددة على هذه القواعد بالفعل.",
+  "dashboard.importReport.profileAlreadyContainsRules": "يحتوي هذا الملف الشخصي على هذه القواعد بالفعل.",
+  "dashboard.importReport.noRulesChanged": "لم تتغير أي قواعد في الملف الشخصي.",
+  "dashboard.importReport.importedIntoSurfaceOne": "تم استيراد {count} قاعدة إلى {surface}.",
+  "dashboard.importReport.importedIntoSurfaceOther": "تم استيراد قواعد بعدد {count} إلى {surface}.",
+  "dashboard.importReport.metadataQueuePacing": "قائمة انتظار بيانات القنوات الوصفية: هناك {count} صفًا مستوردًا قيد الانتظار. ينفّذ عامل الخلفية عملية بحث واحدة بالتتابع كل 7–15 ثانية بفاصل عشوائي أثناء عمله. تُعاد محاولة الصف الفاشل بعد نحو دقيقتين، ثم تزداد مدة الانتظار تدريجيًا حتى 30 دقيقة؛ ولا توقف هذه الإعادة معالجة الصفوف الجديدة. تتوقف إعادة المحاولة للصفوف التي تعذّر العثور عليها نهائيًا أو انتهى مصدرها، وتبقى في تقارير الاستيراد للتحقق اليدوي. لم تحدث دفعة مفاجئة من الطلبات أثناء الاستيراد. لا يؤدي إغلاق لوحة التحكم هذه إلى إيقاف قائمة الانتظار، لكن إغلاق المتصفح أو قيود إيقاظه قد تؤخرها."
 }

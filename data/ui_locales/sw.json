@@ -23,7 +23,6 @@
   "settings.interfaceLanguage": "Lugha ya kiolesura",
   "settings.interfaceLanguageHint": "Hubadilisha lugha ya kiolesura cha FilterTube pekee. Haibadilishi kanuni za lugha ya video, YouTube au vichujio ulivyohifadhi.",
   "settings.languageAuto": "Tumia lugha ya kivinjari",
-  "settings.moreLanguages": "Kwa sasa, kiolesura cha Kiingereza pekee ndicho kilichokamilika. Tafsiri za lugha nyingine zinaendelea.",
   "popup.enabled": "Imewashwa",
   "popup.disabled": "Imezimwa",
   "popup.toggleFiltering": "Washa au zima uchujaji",
@@ -2246,5 +2245,14 @@
   "dashboard.sync.providerModal.enableHomePickup": "Washa Home Pickup",
   "dashboard.sync.providerModal.homePickupKey": "Ufunguo wa Home Pickup",
   "dashboard.sync.providerModal.optionalServiceKeyForThatHomePickupServiceThisIsNotTheParentPINLeaveBlankToKeepTheSavedKeyEnterASingleDashToClearIt": "Ufunguo wa hiari wa huduma hiyo ya Home Pickup. Hii si PIN ya mzazi. Acha wazi ili kuhifadhi ufunguo uliopo; weka kistari kimoja (-) ili kuufuta.",
-  "dashboard.sync.providerModal.optionalServiceKey": "Ufunguo wa hiari wa huduma"
+  "dashboard.sync.providerModal.optionalServiceKey": "Ufunguo wa hiari wa huduma",
+  "settings.translationAvailability": "Lugha 38 za kiolesura zinapatikana. Tafsiri hizi ni za onyesho la awali na huenda zikahitaji marekebisho.",
+  "settings.previewLanguage": "{language} (hakiki ya awali)",
+  "dashboard.importReport.reviewedTitle": "Uingizaji umekaguliwa",
+  "dashboard.importReport.profilesAlreadyContainRules": "Wasifu uliochaguliwa tayari una sheria hizi.",
+  "dashboard.importReport.profileAlreadyContainsRules": "Wasifu huu tayari una sheria hizi.",
+  "dashboard.importReport.noRulesChanged": "Hakuna sheria za wasifu zilizobadilika.",
+  "dashboard.importReport.importedIntoSurfaceOne": "Sheria {count} imeingizwa kwenye {surface}.",
+  "dashboard.importReport.importedIntoSurfaceOther": "Sheria {count} zimeingizwa kwenye {surface}.",
+  "dashboard.importReport.metadataQueuePacing": "Foleni ya metadata ya chaneli: safu {count} zilizoingizwa zinasubiri. Mchakato wa chinichini unapokuwa hai hufanya utafutaji mmoja baada ya mwingine kwa vipindi nasibu vya sekunde 7–15. Safu ikishindwa, hujaribiwa tena baada ya takriban dakika 2, kisha muda wa kusubiri huongezeka hatua kwa hatua hadi dakika 30; jaribio hilo halisimamishi safu mpya. Safu ambazo hazipatikani kabisa au zimekatishwa huacha kujaribiwa tena na hubaki kwenye Ripoti za Uingizaji ili zikaguliwe kwa mkono. Hakukuwa na ongezeko la ghafla la maombi wakati wa uingizaji. Kufunga dashibodi hii hakusimamishi foleni, ingawa kufungwa kwa kivinjari au mipaka ya kukiwasha inaweza kuichelewesha."
 }

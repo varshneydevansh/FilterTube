@@ -23,7 +23,6 @@
   "settings.interfaceLanguage": "界面语言",
   "settings.interfaceLanguageHint": "只改 FilterTube 个界面语言，勿会改视频语言规则、YouTube，或者侬保存个过滤条件。",
   "settings.languageAuto": "用浏览器个语言",
-  "settings.moreLanguages": "眼下只有英语界面是完整个，别个语言还勒翻译。",
   "popup.enabled": "开牢",
   "popup.disabled": "关脱",
   "popup.toggleFiltering": "开或者关过滤",
@@ -2246,5 +2245,14 @@
   "dashboard.sync.providerModal.enableHomePickup": "启用 Home Pickup",
   "dashboard.sync.providerModal.homePickupKey": "Home Pickup 密钥",
   "dashboard.sync.providerModal.optionalServiceKeyForThatHomePickupServiceThisIsNotTheParentPINLeaveBlankToKeepTheSavedKeyEnterASingleDashToClearIt": "搿个 Home Pickup 服务的可选服务密钥。搿勿是家长 PIN。留空保留存好的密钥；输入一根短横线 (-) 清掉。",
-  "dashboard.sync.providerModal.optionalServiceKey": "可选服务密钥"
+  "dashboard.sync.providerModal.optionalServiceKey": "可选服务密钥",
+  "settings.translationAvailability": "有 38 种界面语言可以用。翻译现在是预览版，可能还要修改。",
+  "settings.previewLanguage": "{language}（预览）",
+  "dashboard.importReport.reviewedTitle": "导入已审核",
+  "dashboard.importReport.profilesAlreadyContainRules": "选中的配置文件里已经有这些规则了。",
+  "dashboard.importReport.profileAlreadyContainsRules": "这个配置文件里已经有这些规则了。",
+  "dashboard.importReport.noRulesChanged": "配置文件里的规则没有更改。",
+  "dashboard.importReport.importedIntoSurfaceOne": "已把 {count} 条规则导入 {surface}。",
+  "dashboard.importReport.importedIntoSurfaceOther": "已把 {count} 条规则导入 {surface}。",
+  "dashboard.importReport.metadataQueuePacing": "频道元数据队列：还有 {count} 行导入的数据在等处理。后台工作程序运行时，会按随机的 7–15 秒间隔一次查一条。失败的行大约 2 分钟后重试，之后等待时间逐步增加，最多到 30 分钟；重试不会暂停新行。永久找不到或已经终止的行会停止重试，并留在导入报告里供手动核实。导入时没有突然大量发请求。关掉这个仪表板不会停掉队列，不过浏览器关闭或唤醒限制可能会让处理延迟。"
 }

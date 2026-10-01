@@ -23,7 +23,6 @@
   "settings.interfaceLanguage": "لغة الواجهة",
   "settings.interfaceLanguageHint": "ده بيغيّر لغة واجهة FilterTube بس. مش بيغيّر قواعد لغة الفيديو، ولا YouTube، ولا الفلاتر اللي حفظتها.",
   "settings.languageAuto": "استخدم لغة المتصفح",
-  "settings.moreLanguages": "دلوقتي واجهة الإنجليزي بس هي اللي مكتملة. بنشتغل على ترجمة لغات تانية.",
   "popup.enabled": "شغّال",
   "popup.disabled": "مقفول",
   "popup.toggleFiltering": "شغّل الفلترة أو اقفلها",
@@ -2246,5 +2245,14 @@
   "dashboard.sync.providerModal.enableHomePickup": "فعّل Home Pickup",
   "dashboard.sync.providerModal.homePickupKey": "مفتاح Home Pickup",
   "dashboard.sync.providerModal.optionalServiceKeyForThatHomePickupServiceThisIsNotTheParentPINLeaveBlankToKeepTheSavedKeyEnterASingleDashToClearIt": "مفتاح خدمة اختياري لخدمة Home Pickup دي. ده مش PIN ولي الأمر. اتركه فارغًا للاحتفاظ بالمفتاح المحفوظ؛ أدخل شرطة واحدة (-) لمسحه.",
-  "dashboard.sync.providerModal.optionalServiceKey": "مفتاح خدمة اختياري"
+  "dashboard.sync.providerModal.optionalServiceKey": "مفتاح خدمة اختياري",
+  "settings.translationAvailability": "في 38 لغة للواجهة متاحة. الترجمات دي نسخ معاينة وممكن تحتاج تصحيحات.",
+  "settings.previewLanguage": "{language} (معاينة)",
+  "dashboard.importReport.reviewedTitle": "مراجعة الاستيراد",
+  "dashboard.importReport.profilesAlreadyContainRules": "الملفات الشخصية اللي اخترتها فيها القواعد دي من قبل.",
+  "dashboard.importReport.profileAlreadyContainsRules": "الملف الشخصي ده فيه القواعد دي من قبل.",
+  "dashboard.importReport.noRulesChanged": "ما اتغيرتش أي قواعد في الملف الشخصي.",
+  "dashboard.importReport.importedIntoSurfaceOne": "تم استيراد {count} قاعدة واحدة إلى {surface}.",
+  "dashboard.importReport.importedIntoSurfaceOther": "تم استيراد {count} قواعد إلى {surface}.",
+  "dashboard.importReport.metadataQueuePacing": "قائمة انتظار بيانات القنوات: فيه {count} صف مستورد لسه مستني. عامل الخلفية بينفذ عملية بحث واحدة بالتتابع كل 7–15 ثانية بفاصل عشوائي وهو شغال. الصف اللي يفشل بيتعاد بعد حوالي دقيقتين، وبعدها فترة الانتظار بتزيد تدريجيًا لحد 30 دقيقة؛ وإعادة المحاولة دي ما بتوقفش الصفوف الجديدة. الصفوف اللي مش ممكن العثور عليها نهائيًا أو انتهت بتوقف إعادة محاولتها وبتفضل في تقارير الاستيراد للمراجعة اليدوية. ما حصلش اندفاع طلبات أثناء الاستيراد. قفل لوحة التحكم دي ما بيوقفش القائمة، لكن إغلاق المتصفح أو قيود إيقاظه ممكن تأخرها."
 }

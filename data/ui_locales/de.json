@@ -70,7 +70,6 @@
   "settings.interfaceLanguage": "Sprache der Benutzeroberfläche",
   "settings.interfaceLanguageHint": "Ändert nur die Sprache der FilterTube-Oberfläche. Regeln zur Videosprache, YouTube und gespeicherte Filter bleiben unverändert.",
   "settings.languageAuto": "Browsersprache verwenden",
-  "settings.moreLanguages": "Derzeit ist nur die englische Benutzeroberfläche vollständig. Weitere Übersetzungen sind in Arbeit.",
   "popup.enabled": "Aktiviert",
   "popup.disabled": "Deaktiviert",
   "popup.toggleFiltering": "Filterung ein- oder ausschalten",
@@ -2246,5 +2245,14 @@
   "dashboard.sync.providerModal.enableHomePickup": "Home Pickup aktivieren",
   "dashboard.sync.providerModal.homePickupKey": "Home Pickup-Schlüssel",
   "dashboard.sync.providerModal.optionalServiceKeyForThatHomePickupServiceThisIsNotTheParentPINLeaveBlankToKeepTheSavedKeyEnterASingleDashToClearIt": "Optionaler Dienstschlüssel für diesen Home Pickup-Dienst. Dies ist nicht die Eltern-PIN. Lass das Feld leer, um den gespeicherten Schlüssel beizubehalten; gib einen einzelnen Bindestrich ein, um ihn zu löschen.",
-  "dashboard.sync.providerModal.optionalServiceKey": "Optionaler Dienstschlüssel"
+  "dashboard.sync.providerModal.optionalServiceKey": "Optionaler Dienstschlüssel",
+  "settings.translationAvailability": "38 Oberflächensprachen sind verfügbar. Die Übersetzungen sind Vorschauen und müssen möglicherweise korrigiert werden.",
+  "settings.previewLanguage": "{language} (Vorschau)",
+  "dashboard.importReport.reviewedTitle": "Import geprüft",
+  "dashboard.importReport.profilesAlreadyContainRules": "Die ausgewählten Profile enthalten diese Regeln bereits.",
+  "dashboard.importReport.profileAlreadyContainsRules": "Dieses Profil enthält diese Regeln bereits.",
+  "dashboard.importReport.noRulesChanged": "Es wurden keine Profilregeln geändert.",
+  "dashboard.importReport.importedIntoSurfaceOne": "{count} Regel wurde in {surface} importiert.",
+  "dashboard.importReport.importedIntoSurfaceOther": "{count} Regeln wurden in {surface} importiert.",
+  "dashboard.importReport.metadataQueuePacing": "Warteschlange für Kanalmetadaten: {count} importierte Zeilen stehen noch aus. Solange der Hintergrunddienst aktiv ist, führt er jeweils eine einzelne Abfrage in zufälligen Abständen von 7–15 Sekunden aus. Eine fehlgeschlagene Zeile wird nach etwa 2 Minuten erneut versucht; anschließend verlängert sich der Abstand schrittweise auf bis zu 30 Minuten. Diese Wiederholungen halten neue Zeilen niemals auf. Dauerhaft nicht gefundene oder beendete Zeilen werden nicht erneut versucht und bleiben zur manuellen Prüfung in den Importberichten. Während des Imports gab es keine Anfragespitze. Das Schließen dieses Dashboards stoppt die Warteschlange nicht, aber das Schließen des Browsers oder Einschränkungen beim Aufwecken können sie verzögern."
 }

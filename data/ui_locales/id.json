@@ -23,7 +23,6 @@
   "settings.interfaceLanguage": "Bahasa antarmuka",
   "settings.interfaceLanguageHint": "Hanya mengubah bahasa antarmuka FilterTube. Aturan bahasa video, YouTube, dan filter yang tersimpan tidak berubah.",
   "settings.languageAuto": "Gunakan bahasa browser",
-  "settings.moreLanguages": "Saat ini, hanya antarmuka bahasa Inggris yang lengkap. Terjemahan bahasa lain sedang dikerjakan.",
   "popup.enabled": "Aktif",
   "popup.disabled": "Nonaktif",
   "popup.toggleFiltering": "Aktifkan atau nonaktifkan pemfilteran",
@@ -2246,5 +2245,14 @@
   "dashboard.sync.providerModal.enableHomePickup": "Aktifkan Home Pickup",
   "dashboard.sync.providerModal.homePickupKey": "Kunci Home Pickup",
   "dashboard.sync.providerModal.optionalServiceKeyForThatHomePickupServiceThisIsNotTheParentPINLeaveBlankToKeepTheSavedKeyEnterASingleDashToClearIt": "Kunci layanan opsional untuk Home Pickup itu. Ini bukan PIN orang tua. Kosongkan untuk mempertahankan kunci tersimpan; masukkan satu tanda hubung untuk menghapusnya.",
-  "dashboard.sync.providerModal.optionalServiceKey": "Kunci layanan opsional"
+  "dashboard.sync.providerModal.optionalServiceKey": "Kunci layanan opsional",
+  "settings.translationAvailability": "Tersedia 38 bahasa antarmuka. Terjemahan masih berupa pratinjau dan mungkin perlu diperbaiki.",
+  "settings.previewLanguage": "{language} (pratinjau)",
+  "dashboard.importReport.reviewedTitle": "Impor telah ditinjau",
+  "dashboard.importReport.profilesAlreadyContainRules": "Profil yang dipilih sudah berisi aturan ini.",
+  "dashboard.importReport.profileAlreadyContainsRules": "Profil ini sudah berisi aturan ini.",
+  "dashboard.importReport.noRulesChanged": "Tidak ada aturan profil yang berubah.",
+  "dashboard.importReport.importedIntoSurfaceOne": "{count} aturan diimpor ke {surface}.",
+  "dashboard.importReport.importedIntoSurfaceOther": "{count} aturan diimpor ke {surface}.",
+  "dashboard.importReport.metadataQueuePacing": "Antrean metadata kanal: {count} baris hasil impor masih menunggu. Saat pekerja latar belakang aktif, satu pencarian dilakukan setiap kali dengan jeda acak 7–15 detik. Baris yang gagal dicoba lagi setelah sekitar 2 menit, lalu jedanya bertambah bertahap hingga 30 menit; percobaan ulang itu tidak pernah menghentikan baris baru. Baris yang permanen tidak ditemukan atau sudah dihentikan tidak dicoba lagi dan tetap ada di Laporan Impor untuk diperiksa secara manual. Tidak ada lonjakan permintaan saat impor. Menutup dasbor ini tidak menghentikan antrean, tetapi browser yang ditutup atau batas aktivasi browser dapat menundanya."
 }

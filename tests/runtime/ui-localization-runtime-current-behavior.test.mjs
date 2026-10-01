@@ -223,7 +223,7 @@ test('Settings offers draft-language previews while keeping the completion notic
   const field = { hidden: false };
   const document = {
     getElementById(id) { return id === 'ftInterfaceLanguage' ? selector : id === 'ftInterfaceLanguageField' ? field : { hidden: false }; },
-    createElement() { return { value: '', textContent: '' }; }
+    createElement() { return { value: '', textContent: '', dataset: {} }; }
   };
   const context = {
     document, navigator: { language: 'ru-RU' },
@@ -231,7 +231,8 @@ test('Settings offers draft-language previews while keeping the completion notic
       releasedLocales: ['en'],
       stagedLocales: targets.map(entry => entry.code).filter(code => code !== 'en'),
       async select(value, options) { selected.push([value, options?.allowStaged]); return value; },
-      apply() {}
+      apply() {},
+      text(key, values) { return `${values.language} (preview)`; }
     },
     browser: {
       runtime: { getURL(file) { return `extension://filtertube/${file}`; } },
@@ -291,12 +292,12 @@ test('Settings still offers preview locales if target-name metadata is unavailab
   const context = {
     document: {
       getElementById(id) { return id === 'ftInterfaceLanguage' ? selector : { hidden: false }; },
-      createElement() { return { value: '', textContent: '' }; }
+      createElement() { return { value: '', textContent: '', dataset: {} }; }
     },
     navigator: { language: 'en' },
     FilterTubeUiLocalization: {
       releasedLocales: ['en'], stagedLocales: ['ru', 'ta', 'gu'],
-      async select() {}, apply() {}
+      async select() {}, apply() {}, text(key, values) { return `${values.language} (preview)`; }
     },
     browser: {
       runtime: { getURL(file) { return `extension://filtertube/${file}`; } },

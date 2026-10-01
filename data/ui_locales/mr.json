@@ -23,7 +23,6 @@
   "settings.interfaceLanguage": "इंटरफेसची भाषा",
   "settings.interfaceLanguageHint": "यामुळे फक्त FilterTube च्या इंटरफेसची भाषा बदलते. व्हिडिओच्या भाषेचे नियम, YouTube किंवा जतन केलेले फिल्टर बदलत नाहीत.",
   "settings.languageAuto": "ब्राउझरची भाषा वापरा",
-  "settings.moreLanguages": "सध्या फक्त इंग्रजी इंटरफेस पूर्ण आहे. इतर भाषांचे भाषांतर सुरू आहे.",
   "popup.enabled": "सुरू",
   "popup.disabled": "बंद",
   "popup.toggleFiltering": "फिल्टरिंग सुरू किंवा बंद करा",
@@ -2246,5 +2245,14 @@
   "dashboard.sync.providerModal.enableHomePickup": "Home Pickup सुरू करा",
   "dashboard.sync.providerModal.homePickupKey": "Home Pickup कळ",
   "dashboard.sync.providerModal.optionalServiceKeyForThatHomePickupServiceThisIsNotTheParentPINLeaveBlankToKeepTheSavedKeyEnterASingleDashToClearIt": "त्या Home Pickup सेवेसाठी ऐच्छिक सेवा कळ. ही पालकांची PIN नाही. जतन केलेली कळ ठेवण्यासाठी रिकामी ठेवा; काढण्यासाठी एक हायफन (-) भरा.",
-  "dashboard.sync.providerModal.optionalServiceKey": "ऐच्छिक सेवा कळ"
+  "dashboard.sync.providerModal.optionalServiceKey": "ऐच्छिक सेवा कळ",
+  "settings.translationAvailability": "38 इंटरफेस भाषा उपलब्ध आहेत. भाषांतरे पूर्वावलोकन स्वरूपात आहेत आणि त्यांत दुरुस्तीची गरज असू शकते.",
+  "settings.previewLanguage": "{language} (पूर्वावलोकन)",
+  "dashboard.importReport.reviewedTitle": "आयात तपासले",
+  "dashboard.importReport.profilesAlreadyContainRules": "निवडलेल्या प्रोफाइलमध्ये हे नियम आधीपासून आहेत.",
+  "dashboard.importReport.profileAlreadyContainsRules": "या प्रोफाइलमध्ये हे नियम आधीपासून आहेत.",
+  "dashboard.importReport.noRulesChanged": "प्रोफाइलच्या कोणत्याही नियमात बदल झाला नाही.",
+  "dashboard.importReport.importedIntoSurfaceOne": "{surface} मध्ये {count} नियम आयात केला.",
+  "dashboard.importReport.importedIntoSurfaceOther": "{surface} मध्ये {count} नियम आयात केले.",
+  "dashboard.importReport.metadataQueuePacing": "चॅनेल मेटाडेटा रांग: आयात केलेल्या {count} नोंदी प्रलंबित आहेत. पार्श्वभूमीतील कार्यकर्ता चालू असताना यादृच्छिक 7–15 सेकंदांच्या अंतराने एकावेळी एकच शोध करतो. अयशस्वी नोंदीसाठी सुमारे 2 मिनिटांनी पुन्हा प्रयत्न होतो, नंतर प्रतीक्षा वाढवत कमाल 30 मिनिटांपर्यंत नेली जाते; या पुनःप्रयत्नांमुळे नवीन नोंदी थांबत नाहीत. कायमची न सापडलेली किंवा संपुष्टात आलेली नोंद पुन्हा प्रयत्नातून काढली जाते आणि हाताने पडताळणीसाठी आयात अहवालात राहते. आयातीदरम्यान विनंत्यांचा अचानक मारा झाला नाही. हे डॅशबोर्ड बंद केल्याने रांग थांबत नाही, मात्र ब्राउझर बंद होणे किंवा जागे होण्याच्या मर्यादा विलंब करू शकतात."
 }

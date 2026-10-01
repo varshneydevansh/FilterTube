@@ -70,7 +70,6 @@
   "settings.interfaceLanguage": "Язык интерфейса",
   "settings.interfaceLanguageHint": "Меняет только язык интерфейса FilterTube. Не влияет на языковые фильтры видео, YouTube или сохранённые правила.",
   "settings.languageAuto": "Использовать язык браузера",
-  "settings.moreLanguages": "Пока полностью поддерживается только английский язык интерфейса. Переводы на другие языки готовятся.",
   "popup.enabled": "Включено",
   "popup.disabled": "Отключено",
   "popup.toggleFiltering": "Включить или отключить фильтрацию",
@@ -2246,5 +2245,14 @@
   "dashboard.sync.providerModal.enableHomePickup": "Включить Home Pickup",
   "dashboard.sync.providerModal.homePickupKey": "Ключ Home Pickup",
   "dashboard.sync.providerModal.optionalServiceKeyForThatHomePickupServiceThisIsNotTheParentPINLeaveBlankToKeepTheSavedKeyEnterASingleDashToClearIt": "Необязательный ключ этой службы Home Pickup. Это не родительский PIN. Оставьте поле пустым, чтобы сохранить прежний ключ; введите один дефис, чтобы удалить его.",
-  "dashboard.sync.providerModal.optionalServiceKey": "Необязательный ключ службы"
+  "dashboard.sync.providerModal.optionalServiceKey": "Необязательный ключ службы",
+  "settings.translationAvailability": "Доступно 38 языков интерфейса. Переводы пока представлены в режиме предварительного просмотра и могут нуждаться в исправлениях.",
+  "settings.previewLanguage": "{language} (предварительный просмотр)",
+  "dashboard.importReport.reviewedTitle": "Импорт проверен",
+  "dashboard.importReport.profilesAlreadyContainRules": "Выбранные профили уже содержат эти правила.",
+  "dashboard.importReport.profileAlreadyContainsRules": "В этом профиле эти правила уже есть.",
+  "dashboard.importReport.noRulesChanged": "Правила профиля не изменились.",
+  "dashboard.importReport.importedIntoSurfaceOne": "В {surface} импортировано {count} правило.",
+  "dashboard.importReport.importedIntoSurfaceOther": "В {surface} импортировано правил: {count}.",
+  "dashboard.importReport.metadataQueuePacing": "Очередь метаданных каналов: ожидают обработки {count} импортированных строк. Пока фоновый обработчик активен, он выполняет по одному запросу с случайным интервалом 7–15 секунд. Неудачная строка повторно обрабатывается примерно через 2 минуты, затем задержка постепенно увеличивается максимум до 30 минут; эти повторы никогда не приостанавливают новые строки. Для окончательно не найденных или завершённых строк повторы прекращаются, а сами строки остаются в отчётах об импорте для ручной проверки. Во время импорта всплеска запросов не было. Закрытие этой панели не останавливает очередь, хотя завершение работы браузера или ограничения пробуждения могут её задержать."
 }

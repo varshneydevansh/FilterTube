@@ -416,6 +416,229 @@ function initializeResponsiveNav() {
     navToggle.dataset.ftNavBound = 'true';
 }
 
+const DASHBOARD_HELP_BUBBLE_COPY = tabViewCompileDisplayCopy([
+    {
+        "key": "dashboard.helpBubble.tip01",
+        "fallback": "YouTube changes its page structure often. A quick report helps FilterTube update the matching logic before more families are affected."
+    },
+    {
+        "key": "dashboard.helpBubble.tip02",
+        "fallback": "Copy the profile currently open to your own second device. No protected profile or PIN is required. Switch profiles first if you want to copy a different profile."
+    },
+    {
+        "key": "dashboard.helpBubble.tip03",
+        "fallback": "Create a protected child/user profile only when you want parent-managed rules, time limits, or viewing access."
+    },
+    {
+        "key": "dashboard.helpBubble.tip04",
+        "fallback": "Send parent-approved rules, time, and viewing access to an existing protected profile. Use this when both devices are open together."
+    },
+    {
+        "key": "dashboard.helpBubble.tip05",
+        "fallback": "Best default. Keep both devices open, pair with the code or QR, verify the phrase, then send the update."
+    },
+    {
+        "key": "dashboard.helpBubble.tip06",
+        "fallback": "Optional advanced path for a trusted home, school, or clinic pickup service. Wi-Fi discovery alone never grants control."
+    },
+    {
+        "key": "dashboard.helpBubble.tip07",
+        "fallback": "Optional advanced path for a verified device that opens later or is away. The device still validates signed parent updates locally."
+    },
+    {
+        "key": "dashboard.helpBubble.tip08",
+        "fallback": "Copies a redacted Family Devices map snapshot for a bug report or manual check. It does not include device names, profile IDs, rules, PINs, or update payloads."
+    },
+    {
+        "key": "dashboard.helpBubble.tip09",
+        "fallback": "Downloads the same redacted Family Devices evidence JSON. Use this when clipboard access is blocked or you want to attach a file to an audit row."
+    },
+    {
+        "key": "dashboard.helpBubble.tip10",
+        "fallback": "Use live Send Update first. It is the simplest path and does not require a pickup provider."
+    },
+    {
+        "key": "dashboard.helpBubble.tip11",
+        "fallback": "Advanced delivery is only for verified protected devices that cannot stay open while the parent sends an update."
+    },
+    {
+        "key": "dashboard.helpBubble.tip12",
+        "fallback": "Configure Internet Pickup for signed updates a verified protected device can collect later. This is not parent authority by itself."
+    },
+    {
+        "key": "dashboard.helpBubble.tip13",
+        "fallback": "Check whether the configured Internet Pickup provider is reachable."
+    },
+    {
+        "key": "dashboard.helpBubble.tip14",
+        "fallback": "Configure Home Pickup for a trusted same-network service. The protected device still validates every update."
+    },
+    {
+        "key": "dashboard.helpBubble.tip15",
+        "fallback": "Check whether the configured Home Pickup service is reachable from this browser."
+    },
+    {
+        "key": "dashboard.helpBubble.tip16",
+        "fallback": "Protected device check: look for waiting signed parent updates from Internet Pickup or Home Pickup."
+    },
+    {
+        "key": "dashboard.helpBubble.tip17",
+        "fallback": "Parent device check: see whether a protected device accepted or rejected a saved parent update."
+    },
+    {
+        "key": "dashboard.helpBubble.tip18",
+        "fallback": "Open this when you are ready to pair a device, type a code, scan a QR, send the reviewed update, or inspect trusted-device details."
+    },
+    {
+        "key": "dashboard.helpBubble.tip19",
+        "fallback": "Choose what kind of update you want to send: family controls, this profile once, or a full account move."
+    },
+    {
+        "key": "dashboard.helpBubble.tip20",
+        "fallback": "Choose whether to copy this profile, manage a protected profile, or move a full account."
+    },
+    {
+        "key": "dashboard.helpBubble.tip21",
+        "fallback": "The wording and controls below follow the update type you select."
+    },
+    {
+        "key": "dashboard.helpBubble.tip22",
+        "fallback": "The sending device chooses what is offered. Nothing applies before pairing and phrase verification."
+    },
+    {
+        "key": "dashboard.helpBubble.tip23",
+        "fallback": "Use this for a child, family member, or protected device. It sends parent-approved rules, time limits, and viewing access."
+    },
+    {
+        "key": "dashboard.helpBubble.tip24",
+        "fallback": "Use this for your own second device. It copies this profile once and does not create parent control."
+    },
+    {
+        "key": "dashboard.helpBubble.tip25",
+        "fallback": "Use only for reinstall, migration, or full recovery. This sends the wider account backup after verification."
+    },
+    {
+        "key": "dashboard.helpBubble.tip26",
+        "fallback": "A friendly name shown to the other device during pairing and in trusted-device history."
+    },
+    {
+        "key": "dashboard.helpBubble.tip27",
+        "fallback": "Choose where this update should land. If left blank, it follows the profile currently open on the other device."
+    },
+    {
+        "key": "dashboard.helpBubble.tip28",
+        "fallback": "Advanced controls for role, scope, rule source, and merge/replace behavior. Most families can leave this closed."
+    },
+    {
+        "key": "dashboard.helpBubble.tip29",
+        "fallback": "Open only when you need to repair a link, choose a smaller rule scope, or change merge versus replace behavior."
+    },
+    {
+        "key": "dashboard.helpBubble.tip30",
+        "fallback": "Relationship decides whether this device sends, receives, or just copies settings once. Family control uses parent-to-protected defaults."
+    },
+    {
+        "key": "dashboard.helpBubble.tip31",
+        "fallback": "Scope decides what is sent: current profile, Main rules, Kids rules, keywords, channels, time limits, or full backup."
+    },
+    {
+        "key": "dashboard.helpBubble.tip32",
+        "fallback": "For keyword, channel, and video rule sends, choose whether the local Main YouTube or YouTube Kids rules are used."
+    },
+    {
+        "key": "dashboard.helpBubble.tip33",
+        "fallback": "Saved protected profiles from the connected device appear here when they can be targeted directly."
+    },
+    {
+        "key": "dashboard.helpBubble.tip34",
+        "fallback": "Merge adds the selected rules. Replace overwrites only the selected scope for managed protected devices."
+    },
+    {
+        "key": "dashboard.helpBubble.tip35",
+        "fallback": "Create a pairing code or QR on this device. The other device must join and show the same safety phrase."
+    },
+    {
+        "key": "dashboard.helpBubble.tip36",
+        "fallback": "Send the selected update after both devices connect and the safety phrase is confirmed."
+    },
+    {
+        "key": "dashboard.helpBubble.tip37",
+        "fallback": "Save parent trust only for devices that should keep receiving approved updates for a protected profile."
+    },
+    {
+        "key": "dashboard.helpBubble.tip38",
+        "fallback": "Close this pairing session. It does not remove existing rules or saved trusted-device links."
+    },
+    {
+        "key": "dashboard.helpBubble.tip39",
+        "fallback": "Shows whether this device is idle, hosting, joining, connected, verified, or ready to send."
+    },
+    {
+        "key": "dashboard.helpBubble.tip40",
+        "fallback": "Both devices must show the same safety phrase before anything is trusted."
+    },
+    {
+        "key": "dashboard.helpBubble.tip41",
+        "fallback": "Click only if both devices display the same safety phrase. This prevents sending to the wrong device."
+    },
+    {
+        "key": "dashboard.helpBubble.tip42",
+        "fallback": "Use this side when another device already created a pairing code or QR."
+    },
+    {
+        "key": "dashboard.helpBubble.tip43",
+        "fallback": "Join the code from the other device. Rules do not apply until the safety phrase is confirmed."
+    },
+    {
+        "key": "dashboard.helpBubble.tip44",
+        "fallback": "The code only connects devices. It does not give permission to change rules until both sides verify the same phrase."
+    },
+    {
+        "key": "dashboard.helpBubble.tip45",
+        "fallback": "This device is joining a session started somewhere else."
+    },
+    {
+        "key": "dashboard.helpBubble.tip46",
+        "fallback": "The meeting service helps devices find each other. After the handshake, signed settings move between devices and still need local validation."
+    },
+    {
+        "key": "dashboard.helpBubble.tip47",
+        "fallback": "Advanced link for the public meeting service. It helps with pairing, but it should not read your private settings payload."
+    },
+    {
+        "key": "dashboard.helpBubble.tip48",
+        "fallback": "Type the short code shown on the other device, then verify the same safety phrase on both screens."
+    },
+    {
+        "key": "dashboard.helpBubble.tip49",
+        "fallback": "Join the live pairing session from the other device. Nothing applies until the phrase is confirmed."
+    },
+    {
+        "key": "dashboard.helpBubble.tip50",
+        "fallback": "This link contains pairing information only. The other device still has to verify the same safety phrase."
+    },
+    {
+        "key": "dashboard.helpBubble.tip51",
+        "fallback": "Copy the pairing link for another device. The receiving device still has to verify the same safety phrase."
+    },
+    {
+        "key": "dashboard.helpBubble.tip52",
+        "fallback": "Start pairing first, then this area shows a QR or status message for the other device."
+    },
+    {
+        "key": "dashboard.helpBubble.tip53",
+        "fallback": "Trusted devices remember a verified relationship so future sends are easier."
+    },
+    {
+        "key": "dashboard.helpBubble.tip54",
+        "fallback": "Saved trust is not a live connection and never skips local validation."
+    },
+    {
+        "key": "dashboard.sync.familyDeviceMap.map.familyCenterHelp",
+        "fallback": "The parent device chooses the rules, time limits, and Main/Kids access. The protected device only receives approved updates."
+    }
+]);
+
 function initializeDashboardHelpBubbles() {
     if (document.documentElement.dataset.ftHelpBubblesBound === 'true') return;
 
@@ -439,7 +662,9 @@ function initializeDashboardHelpBubbles() {
         const explicit = target.getAttribute('data-filtertube-help') || '';
         const nativeTitle = target.getAttribute('title') || '';
         const storedTitle = target.getAttribute('data-filtertube-title') || '';
-        return (explicit || nativeTitle || storedTitle).trim();
+        return explicit
+            ? tabViewDisplayCopy(explicit.trim(), DASHBOARD_HELP_BUBBLE_COPY)
+            : (nativeTitle || storedTitle).trim();
     };
 
     const suppressNativeTitle = (target) => {
@@ -542,6 +767,7 @@ function initializeDashboardHelpBubbles() {
         hideTimer = setTimeout(hideBubble, 1400);
     }, { passive: true });
     document.addEventListener('touchcancel', hideBubble, { passive: true });
+    window.addEventListener('filtertube-ui-locale-changed', hideBubble);
     document.addEventListener('scroll', hideBubble, true);
     document.addEventListener('keydown', (event) => {
         if (event.key === 'Escape') hideBubble();
@@ -5383,11 +5609,44 @@ document.addEventListener('DOMContentLoaded', async () => {
         }));
     }
 
+    const IMPORT_COMPLETION_DISPLAY_COPY = tabViewCompileDisplayCopy(Object.entries({
+        'dashboard.importReport.reviewedTitle': 'Import Reviewed',
+        'dashboard.importReport.profilesAlreadyContainRules': 'The selected profiles already contain these rules.',
+        'dashboard.importReport.profileAlreadyContainsRules': 'This profile already contains these rules.',
+        'dashboard.importReport.noRulesChanged': 'No profile rules changed.',
+        'dashboard.importReport.importedIntoSurfaceOne': 'Imported {count} rule into {surface}.',
+        'dashboard.importReport.importedIntoSurfaceOther': 'Imported {count} rules into {surface}.',
+        'dashboard.importReport.metadataQueuePacing': 'Channel metadata queue: {count} imported rows pending. The background worker performs one serialized lookup at a randomized 7–15 second interval while awake. A failed row retries after about 2 minutes, then backs off up to 30 minutes; that retry never pauses fresh rows. Permanent not-found or terminated rows stop retrying and remain in Import Reports for manual verification. No burst of requests was made during import. Closing this dashboard does not stop the queue, although browser shutdown or wakeup limits can delay it.',
+        'dashboard.backup.blockTube.verified.channelCounts': 'Added {channels} effective channels ({channelIds} IDs + {channelNameRules} name rules) · {videoIds} video IDs',
+        'dashboard.backup.blockTube.verified.ruleCounts': 'Added {keywords} keyword/comment rules · {regex} regex rules reviewed',
+        'dashboard.backup.blockTube.verified.alreadyPresent': 'Already present: {channels} channels · {keywords} keyword/comment rules · {videoIds} video IDs',
+        'dashboard.backup.blockTube.verified.skipped': 'Skipped or unsupported outcomes: {count}',
+        'dashboard.backup.blockTube.verified.metadataReviewSingular': '{count} imported channel row needs manual verification in Import Reports; the exact YouTube reason is retained.',
+        'dashboard.backup.blockTube.verified.metadataReviewPlural': '{count} imported channel rows need manual verification in Import Reports; the exact YouTube reason is retained.',
+        'dashboard.backup.import.metadataReviewSingular': '{count} imported channel row needs manual verification; see Import Reports for the exact YouTube reason.',
+        'dashboard.backup.import.metadataReviewPlural': '{count} imported channel rows need manual verification; see Import Reports for the exact YouTube reason.',
+        'dashboard.backup.import.metadataCompleteToast': 'Channel details are already complete.'
+    }).map(([key, fallback]) => ({ key, fallback })));
+
+    function importCompletionDisplayCopy(value) {
+        const text = normalizeString(value);
+        // These two historical writers describe the same paced queue. Reuse
+        // the shared import copy without changing stored reports or retries.
+        const pending = text.match(/^Channel details continue in the background \((\d+) pending\), one row at a time (?:at|with) a randomized 7–15 second interval while the worker is awake; large lists can take time\. Closing this dashboard does not stop the queue\. Permanent not-found or terminated rows stop retrying and remain in Import Reports for manual verification\.$/);
+        if (pending) return tabViewUiText('dashboard.backup.import.metadataPendingToast', 'Channel details continue in the extension background ({count} pending), one row at a time at a randomized 7–15 second interval while the worker is awake; large lists can take time. Closing this dashboard does not stop the queue. Permanent not-found or terminated rows stop retrying and remain in Import Reports for manual verification.', { count: pending[1] });
+        if (text === 'No channel metadata lookup is pending.') return tabViewUiText('dashboard.importReport.noPendingLookup', 'No channel metadata lookup is currently pending.');
+        if (text === 'All imported channel rows already have complete metadata; no metadata lookup is pending.') return tabViewUiText('dashboard.backup.blockTube.verified.metadataComplete', 'All imported channel metadata is already complete; no background lookup is pending.');
+        return tabViewDisplayCopy(text, IMPORT_COMPLETION_DISPLAY_COPY);
+    }
+
     async function showRuleListImportCompletion(report, {
         title = tabViewUiText('dashboard.importReport.completeTitle', 'Import Complete'),
         message = tabViewUiText('dashboard.importReport.reviewedRulesSaved', 'The reviewed rules were saved.'),
         details = []
     } = {}) {
+        title = importCompletionDisplayCopy(title);
+        message = importCompletionDisplayCopy(message);
+        details = safeArray(details).map(importCompletionDisplayCopy);
         if (!report) {
             UIComponents.showToast(message, 'success');
             return;
@@ -12344,7 +12603,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             .filter(Boolean))];
         const surfaces = fixedSurfaces.length ? fixedSurfaces : await promptManagedChannelListSurface();
         if (!surfaces.length) return;
-        const surfaceLabel = surfaces.length > 1 ? 'Main + Kids' : (surfaces[0] === 'kids' ? 'YouTube Kids' : 'Main YouTube');
+        const surfaceLabel = formatRuleListSurfaceLabel(surfaces);
         const confirmImport = await showChoiceModal({
             title: tabViewUiText('dashboard.managedLists.applyApprovedListTitle', 'Apply Parent-Approved List?'),
             message: tabViewUiText('dashboard.managedLists.applyApprovedListMessage', '{counts} found. Apply this list to {profileCount} protected {profileNoun} on {surface}.', {
@@ -12658,7 +12917,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                             : (enrichment?.attention
                                 ? `${Number(enrichment.attention) || 0} imported channel ${Number(enrichment.attention) === 1 ? 'row needs' : 'rows need'} manual verification in Import Reports; the exact YouTube reason is retained.`
                                 : 'All imported channel rows already have complete metadata; no metadata lookup is pending.')
-                    ],
+                    ].map(importCompletionDisplayCopy),
                     choices: [
                         { value: 'report', label: tabViewUiText('dashboard.managedLists.viewImportReport', 'View Import Report'), className: 'btn-primary', recommended: blockTubeIssues.length > 0 },
                         { value: 'done', label: tabViewUiText('dashboard.managedLists.done', 'Done'), className: 'btn-secondary', recommended: blockTubeIssues.length === 0 }

@@ -75,13 +75,14 @@ test('background What’s New banner uses local release copy without changing it
   const end = source.indexOf('function getBackgroundRuntimeLabel()', start);
   assert.ok(start >= 0 && end > start);
   const localized = JSON.parse(fs.readFileSync(path.join(localesDir, 'release_notes.ru.json'), 'utf8'));
+  const catalog = readCatalog('ru');
   const requests = [];
   const context = {
     Map,
     browserAPI: { runtime: { getURL(file) { return `extension://filtertube/${file}`; } } },
     async storageGet() { return { ftUiLocalePreference: 'ru' }; },
     async loadReleaseNotesData() { return [{ version: '3.3.7', headline: 'English headline', bannerSummary: 'English summary', ctaLabel: 'Open What’s New' }]; },
-    fetch(url) { requests.push(url); return Promise.resolve({ ok: true, json: () => Promise.resolve(localized) }); },
+    fetch(url) { requests.push(url); return Promise.resolve({ ok: true, json: () => Promise.resolve(url.endsWith('/ru.json') ? catalog : localized) }); },
     RELEASE_NOTES_TEMPLATE: { headline: 'Fallback headline', body: 'Fallback body', ctaLabel: 'Fallback CTA' },
     WHATS_NEW_PAGE_URL: 'extension://filtertube/html/tab-view.html#whats-new',
     console
@@ -93,7 +94,10 @@ test('background What’s New banner uses local release copy without changing it
   assert.equal(payload.body, localized['3.3.7'].bannerSummary);
   assert.equal(payload.ctaLabel, localized['3.3.7'].ctaLabel);
   assert.equal(payload.link, context.WHATS_NEW_PAGE_URL);
-  assert.deepEqual(requests, ['extension://filtertube/data/ui_locales/release_notes.ru.json']);
+  assert.equal(payload.dismissLabel, catalog['dashboard.androidTesting.dismiss']);
+  assert.equal(payload.dismissAriaLabel, catalog['firstRun.dismiss']);
+  assert.equal(payload.direction, 'ltr');
+  assert.deepEqual(requests, ['extension://filtertube/data/ui_locales/release_notes.ru.json', 'extension://filtertube/data/ui_locales/ru.json']);
 });
 
 test('staged keys still describe copy present on extension UI surfaces', () => {

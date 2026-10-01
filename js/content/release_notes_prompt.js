@@ -96,6 +96,7 @@
         container.id = PROMPT_ID;
         container.setAttribute('role', 'status');
         container.setAttribute('aria-live', 'polite');
+        container.dir = payload.direction === 'rtl' ? 'rtl' : 'ltr';
         container.style.position = 'fixed';
         container.style.zIndex = '2147483646';
         container.style.top = '16px';
@@ -179,7 +180,7 @@
 
         const dismissBtn = document.createElement('button');
         dismissBtn.type = 'button';
-        dismissBtn.textContent = 'Got it';
+        dismissBtn.textContent = payload.dismissLabel || 'Got it';
         dismissBtn.style.flex = targetLink ? '0 0 auto' : '1 1 auto';
         dismissBtn.style.border = '1px solid ' + palette.border;
         dismissBtn.style.borderRadius = '999px';
@@ -193,7 +194,7 @@
 
         const closeBtn = document.createElement('button');
         closeBtn.type = 'button';
-        closeBtn.setAttribute('aria-label', 'Dismiss');
+        closeBtn.setAttribute('aria-label', payload.dismissAriaLabel || 'Dismiss');
         closeBtn.textContent = '×';
         closeBtn.style.position = 'absolute';
         closeBtn.style.top = '8px';

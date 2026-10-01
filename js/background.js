@@ -3275,10 +3275,18 @@ async function loadLocalizedReleaseNote(version) {
         if (typeof locale !== 'string' || !/^[a-z]{2,3}(?:-[a-zA-Z0-9]{2,8})*$/.test(locale) || locale === 'en') return null;
         if (!localizedReleaseNotesCache.has(locale)) {
             const resource = browserAPI.runtime.getURL(`data/ui_locales/release_notes.${locale}.json`);
-            const pending = fetch(resource).then(response => response.ok ? response.json() : null).catch(() => null);
+            const catalogResource = browserAPI.runtime.getURL(`data/ui_locales/${locale}.json`);
+            const read = url => fetch(url).then(response => response.ok ? response.json() : null).catch(() => null);
+            const pending = Promise.all([read(resource), read(catalogResource)]).then(([notes, catalog]) => ({ notes, catalog }));
             localizedReleaseNotesCache.set(locale, pending);
         }
-        return (await localizedReleaseNotesCache.get(locale))?.[version] || null;
+        const { notes, catalog } = await localizedReleaseNotesCache.get(locale);
+        return {
+            ...notes?.[version],
+            dismissLabel: catalog?.['dashboard.androidTesting.dismiss'],
+            dismissAriaLabel: catalog?.['firstRun.dismiss'],
+            direction: /^(ar|arz|apc|apd|fa|ur|pa-Arab)(-|$)/.test(locale) ? 'rtl' : 'ltr'
+        };
     } catch (_) {
         return null;
     }
@@ -3300,7 +3308,10 @@ async function buildReleaseNotesPayload(version) {
                     headline: localized?.headline || entry.headline || RELEASE_NOTES_TEMPLATE.headline,
                     body: localized?.bannerSummary || localized?.summary || entry.bannerSummary || entry.summary || entry.body || RELEASE_NOTES_TEMPLATE.body,
                     link: WHATS_NEW_PAGE_URL,
-                    ctaLabel: localized?.ctaLabel || entry.ctaLabel || RELEASE_NOTES_TEMPLATE.ctaLabel
+                    ctaLabel: localized?.ctaLabel || entry.ctaLabel || RELEASE_NOTES_TEMPLATE.ctaLabel,
+                    dismissLabel: localized?.dismissLabel || 'Got it',
+                    dismissAriaLabel: localized?.dismissAriaLabel || 'Dismiss',
+                    direction: localized?.direction || 'ltr'
                 };
             }
         }

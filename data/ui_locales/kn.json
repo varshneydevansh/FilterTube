@@ -23,7 +23,6 @@
   "settings.interfaceLanguage": "ಇಂಟರ್‌ಫೇಸ್ ಭಾಷೆ",
   "settings.interfaceLanguageHint": "ಇದು FilterTube ಇಂಟರ್‌ಫೇಸ್‌ನ ಭಾಷೆಯನ್ನು ಮಾತ್ರ ಬದಲಿಸುತ್ತದೆ. ವೀಡಿಯೊ ಭಾಷೆಯ ನಿಯಮಗಳು, YouTube ಅಥವಾ ಉಳಿಸಿದ ಫಿಲ್ಟರ್‌ಗಳು ಬದಲಾಗುವುದಿಲ್ಲ.",
   "settings.languageAuto": "ಬ್ರೌಸರ್ ಭಾಷೆಯನ್ನು ಬಳಸಿ",
-  "settings.moreLanguages": "ಈಗ ಇಂಗ್ಲಿಷ್ ಇಂಟರ್‌ಫೇಸ್ ಮಾತ್ರ ಪೂರ್ಣವಾಗಿದೆ. ಇತರ ಭಾಷೆಗಳ ಅನುವಾದ ನಡೆಯುತ್ತಿದೆ.",
   "popup.enabled": "ಸಕ್ರಿಯ",
   "popup.disabled": "ನಿಷ್ಕ್ರಿಯ",
   "popup.toggleFiltering": "ಫಿಲ್ಟರಿಂಗ್ ಆನ್ ಅಥವಾ ಆಫ್ ಮಾಡಿ",
@@ -2246,5 +2245,14 @@
   "dashboard.sync.providerModal.enableHomePickup": "Home Pickup ಸಕ್ರಿಯಗೊಳಿಸಿ",
   "dashboard.sync.providerModal.homePickupKey": "Home Pickup ಕೀ",
   "dashboard.sync.providerModal.optionalServiceKeyForThatHomePickupServiceThisIsNotTheParentPINLeaveBlankToKeepTheSavedKeyEnterASingleDashToClearIt": "ಈ Home Pickup ಸೇವೆಗೆ ಐಚ್ಛಿಕ ಸೇವಾ ಕೀ. ಇದು ಪೋಷಕರ PIN ಅಲ್ಲ. ಉಳಿಸಿದ ಕೀಯನ್ನು ಉಳಿಸಲು ಖಾಲಿ ಬಿಡಿ; ಅಳಿಸಲು ಒಂದೇ ಹೈಫನ್ ನಮೂದಿಸಿ.",
-  "dashboard.sync.providerModal.optionalServiceKey": "ಐಚ್ಛಿಕ ಸೇವಾ ಕೀ"
+  "dashboard.sync.providerModal.optionalServiceKey": "ಐಚ್ಛಿಕ ಸೇವಾ ಕೀ",
+  "settings.translationAvailability": "38 ಇಂಟರ್ಫೇಸ್ ಭಾಷೆಗಳು ಲಭ್ಯವಿವೆ. ಅನುವಾದಗಳು ಪೂರ್ವವೀಕ್ಷಣೆಯಲ್ಲಿವೆ ಮತ್ತು ತಿದ್ದುಪಡಿ ಬೇಕಾಗಬಹುದು.",
+  "settings.previewLanguage": "{language} (ಪೂರ್ವವೀಕ್ಷಣೆ)",
+  "dashboard.importReport.reviewedTitle": "ಆಮದು ಪರಿಶೀಲಿಸಲಾಗಿದೆ",
+  "dashboard.importReport.profilesAlreadyContainRules": "ಆಯ್ಕೆಮಾಡಿದ ಪ್ರೊಫೈಲ್‌ಗಳಲ್ಲಿ ಈ ನಿಯಮಗಳು ಈಗಾಗಲೇ ಇವೆ.",
+  "dashboard.importReport.profileAlreadyContainsRules": "ಈ ಪ್ರೊಫೈಲ್‌ನಲ್ಲಿ ಈ ನಿಯಮಗಳು ಈಗಾಗಲೇ ಇವೆ.",
+  "dashboard.importReport.noRulesChanged": "ಪ್ರೊಫೈಲ್ ನಿಯಮಗಳಲ್ಲಿ ಯಾವುದೇ ಬದಲಾವಣೆ ಆಗಿಲ್ಲ.",
+  "dashboard.importReport.importedIntoSurfaceOne": "{surface}ಗೆ {count} ನಿಯಮ ಆಮದು ಮಾಡಲಾಗಿದೆ.",
+  "dashboard.importReport.importedIntoSurfaceOther": "{surface}ಗೆ {count} ನಿಯಮ ಆಮದು ಮಾಡಲಾಗಿದೆ.",
+  "dashboard.importReport.metadataQueuePacing": "ಚಾನೆಲ್ ಮೆಟಾಡೇಟಾ ಸರತಿ: ಆಮದು ಮಾಡಿದ {count} ಸಾಲುಗಳು ಕಾಯುತ್ತಿವೆ. ಹಿನ್ನೆಲೆ ಕಾರ್ಯಕರ್ತ ಸಕ್ರಿಯವಾಗಿರುವಾಗ ಯಾದೃಚ್ಛಿಕ 7–15 ಸೆಕೆಂಡುಗಳ ಅಂತರದಲ್ಲಿ ಒಂದೊಂದೇ ಹುಡುಕಾಟ ನಡೆಸುತ್ತದೆ. ವಿಫಲವಾದ ಸಾಲನ್ನು ಸುಮಾರು 2 ನಿಮಿಷಗಳ ನಂತರ ಮತ್ತೆ ಪ್ರಯತ್ನಿಸಲಾಗುತ್ತದೆ; ಬಳಿಕ ವಿರಾಮವು ಹಂತಹಂತವಾಗಿ ಗರಿಷ್ಠ 30 ನಿಮಿಷಗಳವರೆಗೆ ಹೆಚ್ಚುತ್ತದೆ. ಈ ಮರುಪ್ರಯತ್ನ ಹೊಸ ಸಾಲುಗಳನ್ನು ಎಂದಿಗೂ ನಿಲ್ಲಿಸುವುದಿಲ್ಲ. ಶಾಶ್ವತವಾಗಿ ಸಿಗದ ಅಥವಾ ಮುಕ್ತಾಯಗೊಂಡ ಸಾಲುಗಳಿಗೆ ಮರುಪ್ರಯತ್ನ ನಿಲ್ಲುತ್ತದೆ ಮತ್ತು ಅವು ಕೈಯಾರೆ ಪರಿಶೀಲಿಸಲು ಆಮದು ವರದಿಗಳಲ್ಲಿ ಉಳಿಯುತ್ತವೆ. ಆಮದು ಮಾಡುವಾಗ ವಿನಂತಿಗಳ ದಿಢೀರ್ ಹೆಚ್ಚಳವಾಗಲಿಲ್ಲ. ಈ ಡ್ಯಾಶ್‌ಬೋರ್ಡ್ ಮುಚ್ಚಿದರೂ ಸರತಿ ನಿಲ್ಲುವುದಿಲ್ಲ, ಆದರೆ ಬ್ರೌಸರ್ ಮುಚ್ಚುವಿಕೆ ಅಥವಾ ಎಚ್ಚರಗೊಳಿಸುವ ಮಿತಿಗಳು ವಿಳಂಬಗೊಳಿಸಬಹುದು."
 }

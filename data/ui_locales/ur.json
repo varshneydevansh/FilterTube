@@ -70,7 +70,6 @@
   "settings.interfaceLanguage": "انٹرفیس کی زبان",
   "settings.interfaceLanguageHint": "یہ صرف FilterTube کے انٹرفیس کی زبان بدلتا ہے۔ ویڈیو کی زبان کے قواعد، YouTube اور آپ کے محفوظ کردہ فلٹرز نہیں بدلتے۔",
   "settings.languageAuto": "براؤزر کی زبان استعمال کریں",
-  "settings.moreLanguages": "فی الحال صرف انگریزی انٹرفیس مکمل ہے۔ دوسری زبانوں کے تراجم پر کام جاری ہے۔",
   "popup.enabled": "فعال",
   "popup.disabled": "غیر فعال",
   "popup.toggleFiltering": "فلٹرنگ فعال یا غیر فعال کریں",
@@ -2246,5 +2245,14 @@
   "dashboard.sync.providerModal.enableHomePickup": "Home Pickup فعال کریں",
   "dashboard.sync.providerModal.homePickupKey": "Home Pickup کلید",
   "dashboard.sync.providerModal.optionalServiceKeyForThatHomePickupServiceThisIsNotTheParentPINLeaveBlankToKeepTheSavedKeyEnterASingleDashToClearIt": "اس Home Pickup سروس کی اختیاری سروس کلید۔ یہ والدین کا PIN نہیں۔ محفوظ شدہ کلید برقرار رکھنے کے لیے خالی چھوڑیں؛ مٹانے کے لیے ایک اکیلا ڈیش درج کریں۔",
-  "dashboard.sync.providerModal.optionalServiceKey": "اختیاری سروس کلید"
+  "dashboard.sync.providerModal.optionalServiceKey": "اختیاری سروس کلید",
+  "settings.translationAvailability": "انٹرفیس کی 38 زبانیں دستیاب ہیں۔ تراجم پیش نظارہ ہیں اور ان میں اصلاح کی ضرورت ہو سکتی ہے۔",
+  "settings.previewLanguage": "{language} (پیش نظارہ)",
+  "dashboard.importReport.reviewedTitle": "درآمد کا جائزہ مکمل",
+  "dashboard.importReport.profilesAlreadyContainRules": "منتخب پروفائلز میں یہ قواعد پہلے سے موجود ہیں۔",
+  "dashboard.importReport.profileAlreadyContainsRules": "اس پروفائل میں یہ قواعد پہلے سے موجود ہیں۔",
+  "dashboard.importReport.noRulesChanged": "پروفائل کے قواعد میں کوئی تبدیلی نہیں ہوئی۔",
+  "dashboard.importReport.importedIntoSurfaceOne": "{surface} میں {count} قاعدہ درآمد کیا گیا۔",
+  "dashboard.importReport.importedIntoSurfaceOther": "{surface} میں قواعد کی تعداد {count} درآمد کی گئی۔",
+  "dashboard.importReport.metadataQueuePacing": "چینل میٹاڈیٹا قطار: درآمد شدہ {count} قطاریں زیرِ انتظار ہیں۔ بیک گراؤنڈ ورکر فعال ہو تو وہ ہر 7–15 سیکنڈ کے بے ترتیب وقفے پر ایک وقت میں ایک تلاش کرتا ہے۔ ناکام قطار تقریباً 2 منٹ بعد دوبارہ آزمائی جاتی ہے، پھر وقفہ بڑھ کر زیادہ سے زیادہ 30 منٹ ہو جاتا ہے؛ یہ دوبارہ کوشش نئی قطاروں کو کبھی نہیں روکتی۔ مستقل طور پر نہ ملنے والی یا ختم شدہ قطاروں کی دوبارہ کوشش بند ہو جاتی ہے اور وہ دستی تصدیق کے لیے درآمدی رپورٹس میں رہتی ہیں۔ درآمد کے دوران درخواستوں کا کوئی اچانک بوجھ نہیں پڑا۔ یہ ڈیش بورڈ بند کرنے سے قطار نہیں رکتی، البتہ براؤزر بند ہونے یا اسے بیدار کرنے کی حدود سے تاخیر ہو سکتی ہے۔"
 }

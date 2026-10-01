@@ -1,0 +1,147 @@
+{
+  "keys": [
+    "settings.translationAvailability",
+    "settings.previewLanguage",
+    "dashboard.importReport.reviewedTitle",
+    "dashboard.importReport.profilesAlreadyContainRules",
+    "dashboard.importReport.profileAlreadyContainsRules",
+    "dashboard.importReport.noRulesChanged",
+    "dashboard.importReport.importedIntoSurfaceOne",
+    "dashboard.importReport.importedIntoSurfaceOther",
+    "dashboard.importReport.metadataQueuePacing"
+  ],
+  "translations": {
+    "arz": [
+      "في 38 لغة للواجهة متاحة. الترجمات دي نسخ معاينة وممكن تحتاج تصحيحات.",
+      "{language} (معاينة)",
+      "مراجعة الاستيراد",
+      "الملفات الشخصية اللي اخترتها فيها القواعد دي من قبل.",
+      "الملف الشخصي ده فيه القواعد دي من قبل.",
+      "ما اتغيرتش أي قواعد في الملف الشخصي.",
+      "تم استيراد {count} قاعدة واحدة إلى {surface}.",
+      "تم استيراد {count} قواعد إلى {surface}.",
+      "قائمة انتظار بيانات القنوات: فيه {count} صف مستورد لسه مستني. عامل الخلفية بينفذ عملية بحث واحدة بالتتابع كل 7–15 ثانية بفاصل عشوائي وهو شغال. الصف اللي يفشل بيتعاد بعد حوالي دقيقتين، وبعدها فترة الانتظار بتزيد تدريجيًا لحد 30 دقيقة؛ وإعادة المحاولة دي ما بتوقفش الصفوف الجديدة. الصفوف اللي مش ممكن العثور عليها نهائيًا أو انتهت بتوقف إعادة محاولتها وبتفضل في تقارير الاستيراد للمراجعة اليدوية. ما حصلش اندفاع طلبات أثناء الاستيراد. قفل لوحة التحكم دي ما بيوقفش القائمة، لكن إغلاق المتصفح أو قيود إيقاظه ممكن تأخرها."
+    ],
+    "mr": [
+      "38 इंटरफेस भाषा उपलब्ध आहेत. भाषांतरे पूर्वावलोकन स्वरूपात आहेत आणि त्यांत दुरुस्तीची गरज असू शकते.",
+      "{language} (पूर्वावलोकन)",
+      "आयात तपासले",
+      "निवडलेल्या प्रोफाइलमध्ये हे नियम आधीपासून आहेत.",
+      "या प्रोफाइलमध्ये हे नियम आधीपासून आहेत.",
+      "प्रोफाइलच्या कोणत्याही नियमात बदल झाला नाही.",
+      "{surface} मध्ये {count} नियम आयात केला.",
+      "{surface} मध्ये {count} नियम आयात केले.",
+      "चॅनेल मेटाडेटा रांग: आयात केलेल्या {count} नोंदी प्रलंबित आहेत. पार्श्वभूमीतील कार्यकर्ता चालू असताना यादृच्छिक 7–15 सेकंदांच्या अंतराने एकावेळी एकच शोध करतो. अयशस्वी नोंदीसाठी सुमारे 2 मिनिटांनी पुन्हा प्रयत्न होतो, नंतर प्रतीक्षा वाढवत कमाल 30 मिनिटांपर्यंत नेली जाते; या पुनःप्रयत्नांमुळे नवीन नोंदी थांबत नाहीत. कायमची न सापडलेली किंवा संपुष्टात आलेली नोंद पुन्हा प्रयत्नातून काढली जाते आणि हाताने पडताळणीसाठी आयात अहवालात राहते. आयातीदरम्यान विनंत्यांचा अचानक मारा झाला नाही. हे डॅशबोर्ड बंद केल्याने रांग थांबत नाही, मात्र ब्राउझर बंद होणे किंवा जागे होण्याच्या मर्यादा विलंब करू शकतात."
+    ],
+    "vi": [
+      "Có 38 ngôn ngữ giao diện. Bản dịch hiện là bản xem trước và có thể cần chỉnh sửa.",
+      "{language} (bản xem trước)",
+      "Đã xem xét mục nhập",
+      "Các hồ sơ đã chọn đã có những quy tắc này.",
+      "Hồ sơ này đã có những quy tắc này.",
+      "Không có quy tắc nào trong hồ sơ thay đổi.",
+      "Đã nhập {count} quy tắc vào {surface}.",
+      "Đã nhập {count} quy tắc vào {surface}.",
+      "Hàng đợi siêu dữ liệu kênh: còn {count} hàng đã nhập đang chờ. Khi hoạt động, tiến trình nền thực hiện từng lượt tra cứu nối tiếp với khoảng ngẫu nhiên 7–15 giây. Hàng bị lỗi sẽ được thử lại sau khoảng 2 phút, rồi thời gian chờ tăng dần tối đa 30 phút; việc thử lại không làm tạm dừng các hàng mới. Hàng không thể tìm thấy vĩnh viễn hoặc đã kết thúc sẽ ngừng được thử lại và vẫn nằm trong Báo cáo nhập để kiểm tra thủ công. Không có đợt yêu cầu dồn dập nào trong lúc nhập. Đóng trang tổng quan này không dừng hàng đợi, nhưng việc tắt trình duyệt hoặc giới hạn đánh thức có thể làm chậm hàng đợi."
+    ],
+    "te": [
+      "38 ఇంటర్‌ఫేస్ భాషలు అందుబాటులో ఉన్నాయి. అనువాదాలు ప్రివ్యూ రూపంలో ఉన్నాయి; సవరణలు అవసరం కావచ్చు.",
+      "{language} (ప్రివ్యూ)",
+      "దిగుమతిని సమీక్షించారు",
+      "ఎంచుకున్న ప్రొఫైళ్లలో ఈ నియమాలు ఇప్పటికే ఉన్నాయి.",
+      "ఈ ప్రొఫైల్‌లో ఈ నియమాలు ఇప్పటికే ఉన్నాయి.",
+      "ప్రొఫైల్ నియమాల్లో ఏ మార్పూ జరగలేదు.",
+      "{surface}లో {count} నియమం దిగుమతి చేయబడింది.",
+      "{surface}లో {count} నియమాలు దిగుమతి చేయబడ్డాయి.",
+      "ఛానెల్ మెటాడేటా క్యూ: దిగుమతి చేసిన {count} వరుసలు ఇంకా పెండింగ్‌లో ఉన్నాయి. బ్యాక్‌గ్రౌండ్ వర్కర్ మేల్కొని ఉన్నప్పుడు యాదృచ్ఛికంగా 7–15 సెకన్ల విరామంతో ఒక్కోసారి ఒక శోధన మాత్రమే చేస్తుంది. విఫలమైన వరుసను సుమారు 2 నిమిషాల తర్వాత మళ్లీ ప్రయత్నించి, ఆపై విరామాన్ని క్రమంగా గరిష్ఠంగా 30 నిమిషాల వరకు పెంచుతుంది; ఆ మళ్లీ ప్రయత్నం కొత్త వరుసలను ఆపదు. శాశ్వతంగా కనుగొనలేని లేదా ముగిసిన వరుసలకు మళ్లీ ప్రయత్నించడం ఆగిపోతుంది; అవి చేతితో ధృవీకరించడానికి దిగుమతి నివేదికల్లో ఉంటాయి. దిగుమతి సమయంలో అభ్యర్థనలు ఒక్కసారిగా వెల్లువెత్తలేదు. ఈ డ్యాష్‌బోర్డ్‌ను మూసినా క్యూ ఆగదు, అయితే బ్రౌజర్ మూసివేత లేదా మేల్కొలుపు పరిమితులు ఆలస్యం చేయవచ్చు."
+    ],
+    "sw": [
+      "Lugha 38 za kiolesura zinapatikana. Tafsiri hizi ni za onyesho la awali na huenda zikahitaji marekebisho.",
+      "{language} (hakiki ya awali)",
+      "Uingizaji umekaguliwa",
+      "Wasifu uliochaguliwa tayari una sheria hizi.",
+      "Wasifu huu tayari una sheria hizi.",
+      "Hakuna sheria za wasifu zilizobadilika.",
+      "Sheria {count} imeingizwa kwenye {surface}.",
+      "Sheria {count} zimeingizwa kwenye {surface}.",
+      "Foleni ya metadata ya chaneli: safu {count} zilizoingizwa zinasubiri. Mchakato wa chinichini unapokuwa hai hufanya utafutaji mmoja baada ya mwingine kwa vipindi nasibu vya sekunde 7–15. Safu ikishindwa, hujaribiwa tena baada ya takriban dakika 2, kisha muda wa kusubiri huongezeka hatua kwa hatua hadi dakika 30; jaribio hilo halisimamishi safu mpya. Safu ambazo hazipatikani kabisa au zimekatishwa huacha kujaribiwa tena na hubaki kwenye Ripoti za Uingizaji ili zikaguliwe kwa mkono. Hakukuwa na ongezeko la ghafla la maombi wakati wa uingizaji. Kufunga dashibodi hii hakusimamishi foleni, ingawa kufungwa kwa kivinjari au mipaka ya kukiwasha inaweza kuichelewesha."
+    ],
+    "ha": [
+      "Akwai harsunan fuska 38. Fassarar nan samfoti ce kuma tana iya buƙatar gyara.",
+      "{language} (samfoti)",
+      "An duba shigo da bayanai",
+      "Fayilolin bayanan da aka zaɓa sun riga sun ƙunshi waɗannan ƙa'idodi.",
+      "Wannan fayil ɗin bayanan ya riga ya ƙunshi waɗannan ƙa'idodi.",
+      "Babu wata ƙa'ida ta fayil ɗin bayanan da ta canza.",
+      "An shigo da ƙa'ida {count} cikin {surface}.",
+      "An shigo da ƙa'idodi {count} cikin {surface}.",
+      "Jerin jiran metadata na tashoshi: layuka {count} da aka shigo da su suna jira. Ma'aikacin baya yana yin bincike ɗaya bayan ɗaya a tazarar sakan 7–15 bazuwar yayin da yake aiki. Layin da ya gaza ana sake gwada shi bayan kusan minti 2, sannan lokacin jira yana ƙaruwa a hankali har zuwa minti 30; wannan sake gwajin ba ya dakatar da sabbin layuka. Layukan da ba za a iya samunsu ba har abada ko waɗanda aka dakatar suna daina sake gwadawa, amma suna nan a Rahotannin Shigo don a bincika da hannu. Ba a yi tarin buƙatu kwatsam yayin shigo da bayanai ba. Rufe wannan dashboard ba ya dakatar da jerin, sai dai rufe burauza ko iyakokin tada ta na iya kawo jinkiri."
+    ],
+    "tr": [
+      "38 arayüz dili kullanılabilir. Çeviriler önizleme niteliğindedir ve düzeltme gerekebilir.",
+      "{language} (önizleme)",
+      "İçe aktarma incelendi",
+      "Seçilen profiller bu kuralları zaten içeriyor.",
+      "Bu profil bu kuralları zaten içeriyor.",
+      "Profil kurallarında hiçbir değişiklik yapılmadı.",
+      "{surface} içine {count} kural aktarıldı.",
+      "{surface} içine {count} kural aktarıldı.",
+      "Kanal meta veri kuyruğu: içe aktarılan {count} satır bekliyor. Arka plan işçisi uyanıkken rastgele 7–15 saniyelik aralıklarla sırayla tek bir arama yapar. Başarısız bir satır yaklaşık 2 dakika sonra yeniden denenir; ardından bekleme süresi kademeli olarak en fazla 30 dakikaya çıkar. Bu yeniden deneme yeni satırları duraklatmaz. Kalıcı olarak bulunamayan veya sonlandırılan satırlar yeniden denenmez ve elle doğrulama için İçe Aktarma Raporları'nda kalır. İçe aktarma sırasında ani bir istek artışı olmadı. Bu kontrol panelini kapatmak kuyruğu durdurmaz; ancak tarayıcının kapanması veya uyandırma sınırları gecikmeye yol açabilir."
+    ],
+    "pa-Arab": [
+      "انٹرفیس دیاں 38 زباناں موجود نیں۔ ترجمے پیش نظارہ نیں تے انہاں وچ اصلاح دی لوڑ پے سکدی اے۔",
+      "{language} (پیش نظارہ)",
+      "درآمد دا جائزہ لیا گیا",
+      "چنے ہوئے پروفائلز وچ ایہہ قاعدے پہلے توں موجود نیں۔",
+      "ایس پروفائل وچ ایہہ قاعدے پہلے توں موجود نیں۔",
+      "پروفائل دے قاعدیاں وچ کوئی تبدیلی نہیں ہوئی۔",
+      "{surface} وچ {count} قاعدہ درآمد کیتا گیا۔",
+      "{surface} وچ {count} قاعدے درآمد کیتے گئے۔",
+      "چینل میٹاڈیٹا قطار: درآمد کیتیاں {count} قطاراں ہن وی انتظار وچ نیں۔ پس منظر والا عمل جاگدا ہووے تاں بےترتیب 7–15 سیکنڈ دے وقفے نال اک واری اک تلاش کردا اے۔ ناکام قطار دا تقریباً 2 منٹ بعد دوبارہ تجربہ ہوندا اے، فیر وقفہ ودھدا ودھدا زیادہ توں زیادہ 30 منٹ ہو جاندا اے؛ ایہہ دوبارہ کوشش نویاں قطاراں نوں نہیں روکدی۔ جیہڑیاں قطاراں ہمیشہ لئی نہیں لبھدیاں یا ختم کر دتیاں جاندیاں نیں، اوہناں دی دوبارہ کوشش رک جاندی اے تے اوہ ہتھ نال تصدیق لئی درآمد رپورٹاں وچ رہندیاں نیں۔ درآمد دوران درخواستاں دا کوئی اچانک ہجوم نہیں ہویا۔ ایہہ ڈیش بورڈ بند کرن نال قطار نہیں رکدی، پر براؤزر بند ہون یا جاگن دیاں حدّاں نال دیر ہو سکدی اے۔"
+    ],
+    "fil": [
+      "May 38 wika ng interface na magagamit. Mga preview ang mga salin at maaaring kailanganing itama.",
+      "{language} (preview)",
+      "Nasuri ang pag-import",
+      "Nasa mga napiling profile na ang mga panuntunang ito.",
+      "Nasa profile na ito ang mga panuntunang ito.",
+      "Walang binagong panuntunan sa profile.",
+      "Na-import ang {count} panuntunan sa {surface}.",
+      "Na-import ang {count} panuntunan sa {surface}.",
+      "Pila ng metadata ng channel: naghihintay pa ang {count} na-import na row. Habang aktibo, nagsasagawa ang background worker ng tig-iisang lookup nang sunod-sunod sa random na pagitan na 7–15 segundo. Susubukang muli ang pumalyang row pagkalipas ng humigit-kumulang 2 minuto, at unti-unting hahaba ang pagitan hanggang 30 minuto; hindi nito ihihinto ang mga bagong row. Hihinto ang muling pagsubok sa mga row na tuluyang hindi makita o winakasan, at mananatili ang mga ito sa Mga Ulat sa Pag-import para sa manu-manong beripikasyon. Walang biglaang dagsa ng mga request habang nag-i-import. Hindi ihihinto ng pagsasara sa dashboard na ito ang pila, pero maaaring maantala ito kapag isinara ang browser o dahil sa mga limitasyon sa paggising nito."
+    ],
+    "ta": [
+      "38 இடைமுக மொழிகள் உள்ளன. மொழிபெயர்ப்புகள் முன்னோட்ட நிலையில் உள்ளன; திருத்தங்கள் தேவைப்படலாம்.",
+      "{language} (முன்னோட்டம்)",
+      "இறக்குமதி மதிப்பாய்வு செய்யப்பட்டது",
+      "தேர்ந்தெடுத்த சுயவிவரங்களில் இந்த விதிகள் ஏற்கனவே உள்ளன.",
+      "இந்தச் சுயவிவரத்தில் இந்த விதிகள் ஏற்கனவே உள்ளன.",
+      "சுயவிவர விதிகள் எதுவும் மாறவில்லை.",
+      "{surface}இல் {count} விதி இறக்குமதி செய்யப்பட்டது.",
+      "{surface}இல் {count} விதிகள் இறக்குமதி செய்யப்பட்டன.",
+      "சேனல் மெட்டாடேட்டா வரிசை: இறக்குமதி செய்யப்பட்ட {count} வரிசைகள் நிலுவையில் உள்ளன. பின்னணி செயலி விழித்திருக்கும்போது சீரற்ற 7–15 விநாடி இடைவெளியில் ஒவ்வொரு முறையும் ஒரு தேடலைத் தொடர்ச்சியாகச் செய்கிறது. தோல்வியடைந்த வரிசை சுமார் 2 நிமிடங்களுக்குப் பிறகு மீண்டும் முயற்சிக்கப்படும்; பின்னர் இடைவெளி படிப்படியாக அதிகபட்சம் 30 நிமிடங்கள் வரை நீளும். அந்த மறுமுயற்சி புதிய வரிசைகளை நிறுத்தாது. நிரந்தரமாகக் கண்டுபிடிக்க முடியாத அல்லது முடிக்கப்பட்ட வரிசைகளுக்கு மறுமுயற்சி நிறுத்தப்பட்டு, கைமுறை சரிபார்ப்புக்காக இறக்குமதி அறிக்கைகளில் வைக்கப்படும். இறக்குமதியின்போது கோரிக்கைகள் திடீரென குவியவில்லை. இந்த டாஷ்போர்டை மூடுவது வரிசையை நிறுத்தாது; ஆனால் உலாவி மூடப்படுதல் அல்லது விழிப்பூட்டல் வரம்புகள் தாமதத்தை ஏற்படுத்தலாம்."
+    ],
+    "yue-Hant": [
+      "有 38 種介面語言可以用。翻譯而家係預覽版，可能仲要修正。",
+      "{language}（預覽）",
+      "已檢視匯入內容",
+      "你揀嘅設定檔已經有呢啲規則。",
+      "呢個設定檔已經有呢啲規則。",
+      "設定檔規則冇改動。",
+      "已將 {count} 條規則匯入 {surface}。",
+      "已將 {count} 條規則匯入 {surface}。",
+      "頻道中繼資料佇列：仲有 {count} 行已匯入資料等緊處理。背景工作程序運作時，會以隨機 7–15 秒間隔逐次做一個查詢。失敗嘅資料行大約 2 分鐘後會重試，之後等待時間逐步加長，最多 30 分鐘；重試唔會暫停新資料行。永久搵唔到或已終止嘅資料行會停止重試，並保留喺匯入報告入面畀人手核實。匯入期間冇突然大量發出請求。關閉呢個儀表板唔會停止佇列，但關閉瀏覽器或者喚醒限制可能會令處理延遲。"
+    ],
+    "wuu-Hans": [
+      "有 38 种界面语言可以用。翻译现在是预览版，可能还要修改。",
+      "{language}（预览）",
+      "导入已审核",
+      "选中的配置文件里已经有这些规则了。",
+      "这个配置文件里已经有这些规则了。",
+      "配置文件里的规则没有更改。",
+      "已把 {count} 条规则导入 {surface}。",
+      "已把 {count} 条规则导入 {surface}。",
+      "频道元数据队列：还有 {count} 行导入的数据在等处理。后台工作程序运行时，会按随机的 7–15 秒间隔一次查一条。失败的行大约 2 分钟后重试，之后等待时间逐步增加，最多到 30 分钟；重试不会暂停新行。永久找不到或已经终止的行会停止重试，并留在导入报告里供手动核实。导入时没有突然大量发请求。关掉这个仪表板不会停掉队列，不过浏览器关闭或唤醒限制可能会让处理延迟。"
+    ]
+  }
+}

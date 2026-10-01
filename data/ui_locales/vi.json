@@ -23,7 +23,6 @@
   "settings.interfaceLanguage": "Ngôn ngữ giao diện",
   "settings.interfaceLanguageHint": "Chỉ thay đổi ngôn ngữ giao diện FilterTube. Quy tắc ngôn ngữ video, YouTube và các bộ lọc đã lưu không thay đổi.",
   "settings.languageAuto": "Dùng ngôn ngữ trình duyệt",
-  "settings.moreLanguages": "Hiện chỉ có giao diện tiếng Anh là đầy đủ. Các ngôn ngữ khác đang được dịch.",
   "popup.enabled": "Đã bật",
   "popup.disabled": "Đã tắt",
   "popup.toggleFiltering": "Bật hoặc tắt bộ lọc",
@@ -2246,5 +2245,14 @@
   "dashboard.sync.providerModal.enableHomePickup": "Bật Home Pickup",
   "dashboard.sync.providerModal.homePickupKey": "Khóa Home Pickup",
   "dashboard.sync.providerModal.optionalServiceKeyForThatHomePickupServiceThisIsNotTheParentPINLeaveBlankToKeepTheSavedKeyEnterASingleDashToClearIt": "Khóa dịch vụ tùy chọn cho dịch vụ Home Pickup đó. Đây không phải PIN của phụ huynh. Để trống để giữ khóa đã lưu; nhập một dấu gạch ngang để xóa.",
-  "dashboard.sync.providerModal.optionalServiceKey": "Khóa dịch vụ tùy chọn"
+  "dashboard.sync.providerModal.optionalServiceKey": "Khóa dịch vụ tùy chọn",
+  "settings.translationAvailability": "Có 38 ngôn ngữ giao diện. Bản dịch hiện là bản xem trước và có thể cần chỉnh sửa.",
+  "settings.previewLanguage": "{language} (bản xem trước)",
+  "dashboard.importReport.reviewedTitle": "Đã xem xét mục nhập",
+  "dashboard.importReport.profilesAlreadyContainRules": "Các hồ sơ đã chọn đã có những quy tắc này.",
+  "dashboard.importReport.profileAlreadyContainsRules": "Hồ sơ này đã có những quy tắc này.",
+  "dashboard.importReport.noRulesChanged": "Không có quy tắc nào trong hồ sơ thay đổi.",
+  "dashboard.importReport.importedIntoSurfaceOne": "Đã nhập {count} quy tắc vào {surface}.",
+  "dashboard.importReport.importedIntoSurfaceOther": "Đã nhập {count} quy tắc vào {surface}.",
+  "dashboard.importReport.metadataQueuePacing": "Hàng đợi siêu dữ liệu kênh: còn {count} hàng đã nhập đang chờ. Khi hoạt động, tiến trình nền thực hiện từng lượt tra cứu nối tiếp với khoảng ngẫu nhiên 7–15 giây. Hàng bị lỗi sẽ được thử lại sau khoảng 2 phút, rồi thời gian chờ tăng dần tối đa 30 phút; việc thử lại không làm tạm dừng các hàng mới. Hàng không thể tìm thấy vĩnh viễn hoặc đã kết thúc sẽ ngừng được thử lại và vẫn nằm trong Báo cáo nhập để kiểm tra thủ công. Không có đợt yêu cầu dồn dập nào trong lúc nhập. Đóng trang tổng quan này không dừng hàng đợi, nhưng việc tắt trình duyệt hoặc giới hạn đánh thức có thể làm chậm hàng đợi."
 }

@@ -23,7 +23,6 @@
   "settings.interfaceLanguage": "Wika ng interface",
   "settings.interfaceLanguageHint": "Wika lang ng interface ng FilterTube ang binabago nito. Hindi nito binabago ang mga panuntunan sa wika ng video, ang YouTube, o ang mga naka-save mong filter.",
   "settings.languageAuto": "Gamitin ang wika ng browser",
-  "settings.moreLanguages": "Sa ngayon, Ingles lang ang may kumpletong interface. Isinasalin pa ang ibang mga wika.",
   "popup.enabled": "Naka-on",
   "popup.disabled": "Naka-off",
   "popup.toggleFiltering": "I-on o i-off ang pag-filter",
@@ -2246,5 +2245,14 @@
   "dashboard.sync.providerModal.enableHomePickup": "I-enable ang Home Pickup",
   "dashboard.sync.providerModal.homePickupKey": "Key ng Home Pickup",
   "dashboard.sync.providerModal.optionalServiceKeyForThatHomePickupServiceThisIsNotTheParentPINLeaveBlankToKeepTheSavedKeyEnterASingleDashToClearIt": "Opsyonal na service key para sa serbisyong Home Pickup na iyon. Hindi ito PIN ng magulang. Iwanang blangko para panatilihin ang naka-save na key; maglagay ng iisang gitling (-) para burahin.",
-  "dashboard.sync.providerModal.optionalServiceKey": "Opsyonal na service key"
+  "dashboard.sync.providerModal.optionalServiceKey": "Opsyonal na service key",
+  "settings.translationAvailability": "May 38 wika ng interface na magagamit. Mga preview ang mga salin at maaaring kailanganing itama.",
+  "settings.previewLanguage": "{language} (preview)",
+  "dashboard.importReport.reviewedTitle": "Nasuri ang pag-import",
+  "dashboard.importReport.profilesAlreadyContainRules": "Nasa mga napiling profile na ang mga panuntunang ito.",
+  "dashboard.importReport.profileAlreadyContainsRules": "Nasa profile na ito ang mga panuntunang ito.",
+  "dashboard.importReport.noRulesChanged": "Walang binagong panuntunan sa profile.",
+  "dashboard.importReport.importedIntoSurfaceOne": "Na-import ang {count} panuntunan sa {surface}.",
+  "dashboard.importReport.importedIntoSurfaceOther": "Na-import ang {count} panuntunan sa {surface}.",
+  "dashboard.importReport.metadataQueuePacing": "Pila ng metadata ng channel: naghihintay pa ang {count} na-import na row. Habang aktibo, nagsasagawa ang background worker ng tig-iisang lookup nang sunod-sunod sa random na pagitan na 7–15 segundo. Susubukang muli ang pumalyang row pagkalipas ng humigit-kumulang 2 minuto, at unti-unting hahaba ang pagitan hanggang 30 minuto; hindi nito ihihinto ang mga bagong row. Hihinto ang muling pagsubok sa mga row na tuluyang hindi makita o winakasan, at mananatili ang mga ito sa Mga Ulat sa Pag-import para sa manu-manong beripikasyon. Walang biglaang dagsa ng mga request habang nag-i-import. Hindi ihihinto ng pagsasara sa dashboard na ito ang pila, pero maaaring maantala ito kapag isinara ang browser o dahil sa mga limitasyon sa paggising nito."
 }

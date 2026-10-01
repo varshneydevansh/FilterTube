@@ -23,7 +23,6 @@
   "settings.interfaceLanguage": "介面語言",
   "settings.interfaceLanguageHint": "只會改 FilterTube 嘅介面語言，唔會改影片語言規則、YouTube 或你儲存咗嘅篩選規則。",
   "settings.languageAuto": "使用瀏覽器語言",
-  "settings.moreLanguages": "而家只有英文介面係完整嘅，其他語言仲喺度翻譯緊。",
   "popup.enabled": "已啟用",
   "popup.disabled": "已停用",
   "popup.toggleFiltering": "開啟或關閉篩選",
@@ -2246,5 +2245,14 @@
   "dashboard.sync.providerModal.enableHomePickup": "啟用 Home Pickup",
   "dashboard.sync.providerModal.homePickupKey": "Home Pickup 金鑰",
   "dashboard.sync.providerModal.optionalServiceKeyForThatHomePickupServiceThisIsNotTheParentPINLeaveBlankToKeepTheSavedKeyEnterASingleDashToClearIt": "呢個 Home Pickup 服務嘅可選服務金鑰。佢唔係家長 PIN。留空會保留已儲存金鑰；輸入一個連字號 (-) 就會清除。",
-  "dashboard.sync.providerModal.optionalServiceKey": "可選服務金鑰"
+  "dashboard.sync.providerModal.optionalServiceKey": "可選服務金鑰",
+  "settings.translationAvailability": "有 38 種介面語言可以用。翻譯而家係預覽版，可能仲要修正。",
+  "settings.previewLanguage": "{language}（預覽）",
+  "dashboard.importReport.reviewedTitle": "已檢視匯入內容",
+  "dashboard.importReport.profilesAlreadyContainRules": "你揀嘅設定檔已經有呢啲規則。",
+  "dashboard.importReport.profileAlreadyContainsRules": "呢個設定檔已經有呢啲規則。",
+  "dashboard.importReport.noRulesChanged": "設定檔規則冇改動。",
+  "dashboard.importReport.importedIntoSurfaceOne": "已將 {count} 條規則匯入 {surface}。",
+  "dashboard.importReport.importedIntoSurfaceOther": "已將 {count} 條規則匯入 {surface}。",
+  "dashboard.importReport.metadataQueuePacing": "頻道中繼資料佇列：仲有 {count} 行已匯入資料等緊處理。背景工作程序運作時，會以隨機 7–15 秒間隔逐次做一個查詢。失敗嘅資料行大約 2 分鐘後會重試，之後等待時間逐步加長，最多 30 分鐘；重試唔會暫停新資料行。永久搵唔到或已終止嘅資料行會停止重試，並保留喺匯入報告入面畀人手核實。匯入期間冇突然大量發出請求。關閉呢個儀表板唔會停止佇列，但關閉瀏覽器或者喚醒限制可能會令處理延遲。"
 }

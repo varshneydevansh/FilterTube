@@ -70,7 +70,6 @@
   "settings.interfaceLanguage": "ઇન્ટરફેસની ભાષા",
   "settings.interfaceLanguageHint": "આ ફક્ત FilterTube ઇન્ટરફેસની ભાષા બદલે છે. વિડિયોની ભાષાના નિયમો, YouTube અથવા તમારા સાચવેલા ફિલ્ટર્સ બદલાતા નથી.",
   "settings.languageAuto": "બ્રાઉઝરની ભાષા વાપરો",
-  "settings.moreLanguages": "હાલમાં ફક્ત અંગ્રેજી જ સંપૂર્ણ ઇન્ટરફેસ ભાષા છે. અન્ય ભાષાઓના અનુવાદ પર કામ ચાલુ છે.",
   "popup.enabled": "ચાલુ છે",
   "popup.disabled": "બંધ છે",
   "popup.toggleFiltering": "ફિલ્ટરિંગ ચાલુ અથવા બંધ કરો",
@@ -2246,5 +2245,14 @@
   "dashboard.sync.providerModal.enableHomePickup": "Home Pickup ચાલુ કરો",
   "dashboard.sync.providerModal.homePickupKey": "Home Pickup કી",
   "dashboard.sync.providerModal.optionalServiceKeyForThatHomePickupServiceThisIsNotTheParentPINLeaveBlankToKeepTheSavedKeyEnterASingleDashToClearIt": "આ Home Pickup સેવા માટે વૈકલ્પિક કી. આ માતા-પિતાનો PIN નથી. સાચવેલી કી રાખવા ખાલી રાખો; તેને કાઢવા એક હાઇફન દાખલ કરો.",
-  "dashboard.sync.providerModal.optionalServiceKey": "વૈકલ્પિક સેવા કી"
+  "dashboard.sync.providerModal.optionalServiceKey": "વૈકલ્પિક સેવા કી",
+  "settings.translationAvailability": "38 ઇન્ટરફેસ ભાષાઓ ઉપલબ્ધ છે. અનુવાદો પૂર્વાવલોકન સ્વરૂપે છે અને તેમાં સુધારાની જરૂર પડી શકે છે.",
+  "settings.previewLanguage": "{language} (પૂર્વાવલોકન)",
+  "dashboard.importReport.reviewedTitle": "આયાતની સમીક્ષા થઈ",
+  "dashboard.importReport.profilesAlreadyContainRules": "પસંદ કરેલી પ્રોફાઇલોમાં આ નિયમો પહેલેથી છે.",
+  "dashboard.importReport.profileAlreadyContainsRules": "આ પ્રોફાઇલમાં આ નિયમો પહેલેથી છે.",
+  "dashboard.importReport.noRulesChanged": "પ્રોફાઇલના નિયમોમાં કોઈ ફેરફાર થયો નથી.",
+  "dashboard.importReport.importedIntoSurfaceOne": "{surface}માં {count} નિયમ આયાત થયો.",
+  "dashboard.importReport.importedIntoSurfaceOther": "{surface}માં {count} નિયમો આયાત થયા.",
+  "dashboard.importReport.metadataQueuePacing": "ચેનલ મેટાડેટા કતાર: આયાત કરેલી {count} પંક્તિઓ પ્રક્રિયાની રાહ જોઈ રહી છે. બૅકગ્રાઉન્ડ વર્કર સક્રિય હોય ત્યારે તે દર 7–15 સેકન્ડે અનિયમિત અંતરે એક સમયે એક શોધ કરે છે. નિષ્ફળ પંક્તિનો આશરે 2 મિનિટ પછી ફરી પ્રયાસ થાય છે, ત્યારબાદ અંતર ધીમે ધીમે વધીને વધુમાં વધુ 30 મિનિટ થાય છે; આ ફરી પ્રયાસ નવી પંક્તિઓને અટકાવતો નથી. કાયમ માટે ન મળેલી અથવા સમાપ્ત થયેલી પંક્તિઓના ફરી પ્રયાસ બંધ થાય છે અને તે હાથથી ચકાસવા માટે આયાત અહેવાલોમાં રહે છે. આયાત દરમિયાન વિનંતીઓનો અચાનક ધસારો થયો નહોતો. આ ડૅશબોર્ડ બંધ કરવાથી કતાર બંધ થતી નથી, જોકે બ્રાઉઝર બંધ થવાથી અથવા તેને જગાડવાની મર્યાદાઓને કારણે વિલંબ થઈ શકે છે."
 }

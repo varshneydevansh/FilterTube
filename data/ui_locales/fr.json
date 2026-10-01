@@ -70,7 +70,6 @@
   "settings.interfaceLanguage": "Langue de l’interface",
   "settings.interfaceLanguageHint": "Ce réglage ne change que la langue de l’interface de FilterTube. Il ne modifie ni les règles sur la langue des vidéos, ni YouTube, ni vos filtres enregistrés.",
   "settings.languageAuto": "Utiliser la langue du navigateur",
-  "settings.moreLanguages": "L’anglais est actuellement la seule langue dont l’interface est complète. D’autres traductions sont en cours.",
   "popup.enabled": "Activé",
   "popup.disabled": "Désactivé",
   "popup.toggleFiltering": "Activer ou désactiver le filtrage",
@@ -2246,5 +2245,14 @@
   "dashboard.sync.providerModal.enableHomePickup": "Activer Home Pickup",
   "dashboard.sync.providerModal.homePickupKey": "Clé Home Pickup",
   "dashboard.sync.providerModal.optionalServiceKeyForThatHomePickupServiceThisIsNotTheParentPINLeaveBlankToKeepTheSavedKeyEnterASingleDashToClearIt": "Clé de service facultative pour ce service Home Pickup. Ce n’est pas le PIN parent. Laissez vide pour conserver la clé enregistrée ; saisissez un tiret seul pour l’effacer.",
-  "dashboard.sync.providerModal.optionalServiceKey": "Clé de service facultative"
+  "dashboard.sync.providerModal.optionalServiceKey": "Clé de service facultative",
+  "settings.translationAvailability": "38 langues d’interface sont disponibles. Les traductions sont des aperçus et peuvent nécessiter des corrections.",
+  "settings.previewLanguage": "{language} (aperçu)",
+  "dashboard.importReport.reviewedTitle": "Importation vérifiée",
+  "dashboard.importReport.profilesAlreadyContainRules": "Les profils sélectionnés contiennent déjà ces règles.",
+  "dashboard.importReport.profileAlreadyContainsRules": "Ce profil contient déjà ces règles.",
+  "dashboard.importReport.noRulesChanged": "Aucune règle du profil n’a été modifiée.",
+  "dashboard.importReport.importedIntoSurfaceOne": "{count} règle a été importée dans {surface}.",
+  "dashboard.importReport.importedIntoSurfaceOther": "{count} règles ont été importées dans {surface}.",
+  "dashboard.importReport.metadataQueuePacing": "File d’attente des métadonnées de chaîne : {count} lignes importées sont en attente. Lorsque le processus d’arrière-plan est actif, il effectue une seule recherche à la fois, à un intervalle aléatoire de 7 à 15 secondes. Une ligne en échec est réessayée après environ 2 minutes, puis le délai augmente progressivement jusqu’à 30 minutes ; ces nouvelles tentatives ne suspendent jamais les nouvelles lignes. Les lignes introuvables de façon permanente ou dont la source est terminée ne sont plus réessayées et restent dans les rapports d’importation pour vérification manuelle. Aucun pic de requêtes n’a eu lieu pendant l’importation. Fermer ce tableau de bord n’arrête pas la file, mais la fermeture du navigateur ou ses limites de réveil peut la retarder."
 }

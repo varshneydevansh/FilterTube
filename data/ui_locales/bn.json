@@ -70,7 +70,6 @@
   "settings.interfaceLanguage": "ইন্টারফেসের ভাষা",
   "settings.interfaceLanguageHint": "এটি শুধু FilterTube-এর ইন্টারফেসের ভাষা বদলায়। ভিডিওর ভাষা-সংক্রান্ত নিয়ম, YouTube বা সংরক্ষিত ফিল্টার বদলায় না।",
   "settings.languageAuto": "ব্রাউজারের ভাষা ব্যবহার করুন",
-  "settings.moreLanguages": "এখন শুধু ইংরেজি ইন্টারফেস সম্পূর্ণ। অন্য ভাষার অনুবাদের কাজ চলছে।",
   "popup.enabled": "চালু",
   "popup.disabled": "বন্ধ",
   "popup.toggleFiltering": "ফিল্টারিং চালু বা বন্ধ করুন",
@@ -2246,5 +2245,14 @@
   "dashboard.sync.providerModal.enableHomePickup": "Home Pickup চালু করুন",
   "dashboard.sync.providerModal.homePickupKey": "Home Pickup কী",
   "dashboard.sync.providerModal.optionalServiceKeyForThatHomePickupServiceThisIsNotTheParentPINLeaveBlankToKeepTheSavedKeyEnterASingleDashToClearIt": "এই Home Pickup পরিষেবার ঐচ্ছিক সার্ভিস কী। এটি অভিভাবকের PIN নয়। সংরক্ষিত কী রাখতে ফাঁকা রাখুন; মুছতে একটি ড্যাশ লিখুন।",
-  "dashboard.sync.providerModal.optionalServiceKey": "ঐচ্ছিক সার্ভিস কী"
+  "dashboard.sync.providerModal.optionalServiceKey": "ঐচ্ছিক সার্ভিস কী",
+  "settings.translationAvailability": "৩৮টি ইন্টারফেস ভাষা উপলভ্য। অনুবাদগুলো প্রিভিউ পর্যায়ে আছে এবং সংশোধনের প্রয়োজন হতে পারে।",
+  "settings.previewLanguage": "{language} (প্রিভিউ)",
+  "dashboard.importReport.reviewedTitle": "আমদানি পর্যালোচনা সম্পন্ন",
+  "dashboard.importReport.profilesAlreadyContainRules": "নির্বাচিত প্রোফাইলগুলোতে এই নিয়মগুলো আগে থেকেই আছে।",
+  "dashboard.importReport.profileAlreadyContainsRules": "এই প্রোফাইলে এই নিয়মগুলো আগে থেকেই আছে।",
+  "dashboard.importReport.noRulesChanged": "প্রোফাইলের কোনো নিয়ম পরিবর্তন করা হয়নি।",
+  "dashboard.importReport.importedIntoSurfaceOne": "{surface}-এ {count}টি নিয়ম আমদানি হয়েছে।",
+  "dashboard.importReport.importedIntoSurfaceOther": "{surface}-এ {count}টি নিয়ম আমদানি হয়েছে।",
+  "dashboard.importReport.metadataQueuePacing": "চ্যানেল মেটাডেটা সারিতে {count}টি আমদানি করা সারি অপেক্ষমাণ। ব্যাকগ্রাউন্ড কর্মী চালু থাকলে এলোমেলো ৭–১৫ সেকেন্ড বিরতিতে একবারে একটি করে তথ্য খোঁজে। কোনো সারিতে ব্যর্থ হলে প্রায় ২ মিনিট পর আবার চেষ্টা করা হয়, পরে বিরতি বাড়িয়ে সর্বোচ্চ ৩০ মিনিট করা হয়; এই পুনঃচেষ্টা নতুন সারিগুলোকে থামায় না। স্থায়ীভাবে খুঁজে না পাওয়া বা বন্ধ হয়ে যাওয়া সারিতে আর চেষ্টা করা হয় না; সেগুলো ম্যানুয়াল যাচাইয়ের জন্য আমদানি প্রতিবেদনে থাকে। আমদানির সময় একসঙ্গে অনেক অনুরোধ পাঠানো হয়নি। এই ড্যাশবোর্ড বন্ধ করলেও সারি থামে না, তবে ব্রাউজার বন্ধ হওয়া বা জাগানোর সীমাবদ্ধতায় দেরি হতে পারে।"
 }
