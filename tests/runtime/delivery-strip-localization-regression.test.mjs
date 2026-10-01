@@ -22,6 +22,9 @@ function render({ configured = false, verified = false, protectedProfile = verif
   const before = JSON.stringify({ mailbox, local });
   let captured;
   const used = new Set();
+  const localeValues = localized === 'ru'
+    ? Object.fromEntries(Object.keys(batch.english).map((key, index) => [key, batch.translations.ru[index]]))
+    : null;
   const context = {
     ...nodes,
     normalizeString: value => String(value ?? '').trim(),
@@ -35,7 +38,7 @@ function render({ configured = false, verified = false, protectedProfile = verif
     tabViewUiText(key, fallback, values) {
       assert.equal(batch.english[key], fallback, `runtime source matches ${key}`);
       used.add(key);
-      return interpolate(localized ? `Translated: ${fallback}` : fallback, values);
+      return interpolate(localeValues?.[key] || (localized ? `Translated: ${fallback}` : fallback), values);
     },
     hasNanahManagedSavedUpdateReader: () => configured,
     hasNanahManagedSavedUpdateCheckTarget: () => verified,
@@ -63,6 +66,24 @@ test('delivery text and accessible names resolve through the same keyed source',
     }
   }
   assert.deepEqual([...used].sort(), Object.keys(batch.english).sort(), 'all frozen copy branches are exercised');
+});
+
+test('Russian delivery draft preserves placeholders and required feature names', () => {
+  const keys = Object.keys(batch.english);
+  assert.equal(batch.translations.ru.length, keys.length);
+  const placeholders = value => [...value.matchAll(/\{(\w+)\}/g)].map(match => match[1]).sort();
+  keys.forEach((key, index) => {
+    const value = batch.translations.ru[index];
+    assert.ok(value.trim());
+    assert.deepEqual(placeholders(value), placeholders(batch.english[key]));
+    for (const name of ['FilterTube', 'Home Pickup', 'Internet Pickup', 'Home Bridge']) {
+      if (batch.english[key].includes(name)) assert.ok(value.includes(name), name);
+    }
+  });
+  const result = render({ localized: 'ru', verified: true, configured: true });
+  assert.match(result.nodes.ftNanahCompassLiveBtn['aria-label'], /^Открыть сейчас\. Статус:/);
+  assert.doesNotMatch(result.nodes.ftNanahCompassLiveBtn['aria-label'], /\{status\}|\{detail\}/);
+  assert.equal(result.nodes.ftNanahDeliveryReceiptBtn.textContent, 'Проверить доставку');
 });
 
 test('language changes do not alter visibility, readiness, disabled state or provider models', () => {
