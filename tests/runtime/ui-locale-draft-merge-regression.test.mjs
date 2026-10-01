@@ -1,0 +1,34 @@
+import test from 'node:test';
+import assert from 'node:assert/strict';
+import fs from 'node:fs';
+import os from 'node:os';
+import path from 'node:path';
+import { spawnSync } from 'node:child_process';
+
+const script = path.resolve('scripts/merge-ui-locale-batch.mjs');
+test('locale draft merge validates all conflicts before mutating catalogs', t => {
+    const cwd = fs.mkdtempSync(path.join(os.tmpdir(), 'filtertube-locale-merge-'));
+    t.after(() => fs.rmSync(cwd, { recursive: true, force: true }));
+    const dir = path.join(cwd, 'data/ui_locales');
+    fs.mkdirSync(dir, { recursive: true });
+    const write = (name, value) => fs.writeFileSync(path.join(dir, name), JSON.stringify(value));
+    write('targets.json', { locales: [{ code: 'en' }, { code: 'es' }] });
+    write('en.json', {});
+    write('es.json', { key: 'Conflict' });
+    write('batch.json', { english: { key: 'Hello {name}' } });
+    write('draft.json', { keys: ['key'], translations: { es: ['Hola {name}'] } });
+    const args = [script, 'data/ui_locales/batch.json', 'data/ui_locales/draft.json'];
+    let result = spawnSync(process.execPath, args, { cwd, encoding: 'utf8' });
+    assert.notEqual(result.status, 0);
+    assert.match(result.stderr, /conflicting key/);
+    assert.deepEqual(JSON.parse(fs.readFileSync(path.join(dir, 'en.json'))), {});
+    write('es.json', {});
+    write('draft.json', { keys: ['key'], translations: { es: ['Hola'] } });
+    result = spawnSync(process.execPath, args, { cwd, encoding: 'utf8' });
+    assert.notEqual(result.status, 0);
+    assert.match(result.stderr, /changed placeholders/);
+    write('draft.json', { keys: ['key'], translations: { es: ['Hola {name}'] } });
+    result = spawnSync(process.execPath, args, { cwd, encoding: 'utf8' });
+    assert.equal(result.status, 0, result.stderr);
+    assert.equal(JSON.parse(fs.readFileSync(path.join(dir, 'es.json'))).key, 'Hola {name}');
+});

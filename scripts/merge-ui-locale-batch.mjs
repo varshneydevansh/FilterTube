@@ -38,6 +38,7 @@ for (const locale of translated) {
         }
     });
 }
+const prepared = [];
 for (const locale of expected) {
     const file = path.join(root, 'data/ui_locales', `${locale}.json`);
     const catalog = JSON.parse(fs.readFileSync(file, 'utf8'));
@@ -46,6 +47,8 @@ for (const locale of expected) {
         if (catalog[key] !== undefined && catalog[key] !== value) throw new Error(`${locale}: conflicting ${key}`);
         catalog[key] = value;
     });
-    fs.writeFileSync(file, `${JSON.stringify(catalog, null, 2)}\n`);
+    prepared.push([file, `${JSON.stringify(catalog, null, 2)}\n`]);
 }
+// Validate every catalog conflict before changing even the English catalog.
+for (const [file, contents] of prepared) fs.writeFileSync(file, contents);
 process.stdout.write(`Merged ${keys.length} English keys and translations into ${expected.length} locale catalogs.\n`);
