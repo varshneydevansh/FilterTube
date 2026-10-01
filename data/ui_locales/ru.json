@@ -1703,7 +1703,7 @@
   "dashboard.backup.blockTube.reportDownloaded": "Отчёт о миграции скачан; выберите резервную копию ещё раз, когда будете готовы к импорту",
   "dashboard.backup.prompt.masterPin.title": "Master PIN резервной копии",
   "dashboard.backup.prompt.masterPin.message": "Эта резервная копия защищена Master PIN. Введите его для импорта.",
-  "dashboard.backup.prompt.masterPin.placeholder": "Master PIN",
+  "dashboard.backup.prompt.masterPin.placeholder": "Главный PIN-код",
   "dashboard.backup.action.authorize": "Разрешить",
   "dashboard.backup.restoreTrusted.title": "Восстановить также доверенные устройства?",
   "dashboard.backup.restoreTrusted.message": "Эта полная зашифрованная копия также содержит данные восстановления доверенных устройств Nanah.",

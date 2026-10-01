@@ -1703,7 +1703,7 @@
   "dashboard.backup.blockTube.reportDownloaded": "মাইগ্রেশন রিপোর্ট ডাউনলোড হয়েছে; আমদানির জন্য প্রস্তুত হলে ব্যাকআপটি আবার বেছে নিন",
   "dashboard.backup.prompt.masterPin.title": "ব্যাকআপ Master PIN",
   "dashboard.backup.prompt.masterPin.message": "এই ব্যাকআপটি Master PIN দিয়ে সুরক্ষিত। আমদানি করতে PIN লিখুন।",
-  "dashboard.backup.prompt.masterPin.placeholder": "Master PIN",
+  "dashboard.backup.prompt.masterPin.placeholder": "মাস্টার PIN",
   "dashboard.backup.action.authorize": "অনুমোদন করুন",
   "dashboard.backup.restoreTrusted.title": "বিশ্বস্ত ডিভাইসও পুনরুদ্ধার করবেন?",
   "dashboard.backup.restoreTrusted.message": "এই এনক্রিপ্ট করা পূর্ণ ব্যাকআপে Nanah বিশ্বস্ত-ডিভাইস পুনরুদ্ধার ডেটাও রয়েছে।",

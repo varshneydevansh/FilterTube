@@ -1703,7 +1703,7 @@
   "dashboard.backup.blockTube.reportDownloaded": "Laporan migrasi diunduh; pilih cadangan lagi saat siap mengimpor",
   "dashboard.backup.prompt.masterPin.title": "PIN Master Cadangan",
   "dashboard.backup.prompt.masterPin.message": "Cadangan ini dilindungi oleh Master PIN. Masukkan PIN untuk mengimpor.",
-  "dashboard.backup.prompt.masterPin.placeholder": "Master PIN",
+  "dashboard.backup.prompt.masterPin.placeholder": "PIN utama",
   "dashboard.backup.action.authorize": "Izinkan",
   "dashboard.backup.restoreTrusted.title": "Pulihkan Perangkat Tepercaya Juga?",
   "dashboard.backup.restoreTrusted.message": "Cadangan lengkap terenkripsi ini juga berisi data pemulihan perangkat tepercaya Nanah.",

@@ -1703,7 +1703,7 @@
   "dashboard.backup.blockTube.reportDownloaded": "迁移报告已下载；准备导入时请再次选择备份",
   "dashboard.backup.prompt.masterPin.title": "备份 Master PIN",
   "dashboard.backup.prompt.masterPin.message": "此备份受 Master PIN 保护。输入 PIN 以导入。",
-  "dashboard.backup.prompt.masterPin.placeholder": "Master PIN",
+  "dashboard.backup.prompt.masterPin.placeholder": "主 PIN",
   "dashboard.backup.action.authorize": "授权",
   "dashboard.backup.restoreTrusted.title": "也要恢复可信设备吗？",
   "dashboard.backup.restoreTrusted.message": "此加密完整备份还包含 Nanah 可信设备恢复数据。",

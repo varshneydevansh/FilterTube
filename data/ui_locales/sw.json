@@ -1703,7 +1703,7 @@
   "dashboard.backup.blockTube.reportDownloaded": "Ripoti ya uhamishaji imepakuliwa; chagua nakala rudufu tena ukiwa tayari kuiingiza",
   "dashboard.backup.prompt.masterPin.title": "PIN Kuu ya nakala rudufu",
   "dashboard.backup.prompt.masterPin.message": "Nakala rudufu hii imelindwa na Master PIN. Weka PIN ili kuiingiza.",
-  "dashboard.backup.prompt.masterPin.placeholder": "Master PIN",
+  "dashboard.backup.prompt.masterPin.placeholder": "PIN kuu",
   "dashboard.backup.action.authorize": "Idhinisha",
   "dashboard.backup.restoreTrusted.title": "Rejesha vifaa vinavyoaminika pia?",
   "dashboard.backup.restoreTrusted.message": "Nakala rudufu hii kamili iliyosimbwa pia ina data ya urejeshaji wa vifaa vinavyoaminika vya Nanah.",

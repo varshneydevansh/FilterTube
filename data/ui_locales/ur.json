@@ -1703,7 +1703,7 @@
   "dashboard.backup.blockTube.reportDownloaded": "منتقلی کی رپورٹ ڈاؤن لوڈ ہوگئی؛ درآمد کے لیے تیار ہوں تو بیک اپ دوبارہ منتخب کریں",
   "dashboard.backup.prompt.masterPin.title": "بیک اپ Master PIN",
   "dashboard.backup.prompt.masterPin.message": "یہ بیک اپ Master PIN سے محفوظ ہے۔ درآمد کے لیے PIN درج کریں۔",
-  "dashboard.backup.prompt.masterPin.placeholder": "Master PIN",
+  "dashboard.backup.prompt.masterPin.placeholder": "ماسٹر PIN",
   "dashboard.backup.action.authorize": "اجازت دیں",
   "dashboard.backup.restoreTrusted.title": "قابلِ اعتماد ڈیوائسز بھی بحال کریں؟",
   "dashboard.backup.restoreTrusted.message": "اس مکمل خفیہ کردہ بیک اپ میں Nanah قابلِ اعتماد ڈیوائس کی بحالی کا ڈیٹا بھی ہے۔",

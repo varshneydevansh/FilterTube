@@ -1703,7 +1703,7 @@
   "dashboard.backup.blockTube.reportDownloaded": "منتقلی رپورٹ ڈاؤن لوڈ ہو گئی؛ درآمد کرن لئی تیار ہوو تے بیک اپ فیر چنو",
   "dashboard.backup.prompt.masterPin.title": "بیک اپ ماسٹر PIN",
   "dashboard.backup.prompt.masterPin.message": "ایہہ بیک اپ Master PIN نال محفوظ اے۔ درآمد لئی PIN درج کرو۔",
-  "dashboard.backup.prompt.masterPin.placeholder": "Master PIN",
+  "dashboard.backup.prompt.masterPin.placeholder": "ماسٹر PIN",
   "dashboard.backup.action.authorize": "اجازت دیو",
   "dashboard.backup.restoreTrusted.title": "بھروسے والیاں ڈیوائسز وی بحال کرنی نیں؟",
   "dashboard.backup.restoreTrusted.message": "ایس مکمل خفیہ بیک اپ وچ Nanah بھروسے والی ڈیوائس دی بحالی ڈیٹا وی اے۔",

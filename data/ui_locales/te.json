@@ -1703,7 +1703,7 @@
   "dashboard.backup.blockTube.reportDownloaded": "మార్పిడి నివేదిక డౌన్‌లోడ్ అయింది; దిగుమతికి సిద్ధమైనప్పుడు బ్యాకప్‌ను మళ్లీ ఎంచుకోండి",
   "dashboard.backup.prompt.masterPin.title": "బ్యాకప్ Master PIN",
   "dashboard.backup.prompt.masterPin.message": "ఈ బ్యాకప్ Master PINతో రక్షించబడింది. దిగుమతి చేయడానికి PIN నమోదు చేయండి.",
-  "dashboard.backup.prompt.masterPin.placeholder": "Master PIN",
+  "dashboard.backup.prompt.masterPin.placeholder": "మాస్టర్ PIN",
   "dashboard.backup.action.authorize": "అనుమతించండి",
   "dashboard.backup.restoreTrusted.title": "విశ్వసనీయ పరికరాలను కూడా పునరుద్ధరించాలా?",
   "dashboard.backup.restoreTrusted.message": "ఈ పూర్తి ఎన్‌క్రిప్ట్ చేసిన బ్యాకప్‌లో Nanah విశ్వసనీయ పరికర పునరుద్ధరణ డేటా కూడా ఉంది.",

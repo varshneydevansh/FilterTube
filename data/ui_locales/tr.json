@@ -1703,7 +1703,7 @@
   "dashboard.backup.blockTube.reportDownloaded": "Geçiş raporu indirildi; içe aktarmaya hazır olduğunuzda yedeği yeniden seçin",
   "dashboard.backup.prompt.masterPin.title": "Yedekleme Master PIN'i",
   "dashboard.backup.prompt.masterPin.message": "Bu yedek Master PIN ile korunuyor. İçe aktarmak için PIN'i girin.",
-  "dashboard.backup.prompt.masterPin.placeholder": "Master PIN",
+  "dashboard.backup.prompt.masterPin.placeholder": "Ana PIN",
   "dashboard.backup.action.authorize": "Yetkilendir",
   "dashboard.backup.restoreTrusted.title": "Güvenilir Cihazlar da Geri Yüklensin mi?",
   "dashboard.backup.restoreTrusted.message": "Bu şifreli tam yedek, Nanah güvenilir cihaz kurtarma verilerini de içeriyor.",

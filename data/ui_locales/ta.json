@@ -1703,7 +1703,7 @@
   "dashboard.backup.blockTube.reportDownloaded": "இடமாற்ற அறிக்கை பதிவிறக்கப்பட்டது; இறக்குமதிக்குத் தயாரானதும் காப்புப்பிரதியை மீண்டும் தேர்ந்தெடுங்கள்",
   "dashboard.backup.prompt.masterPin.title": "காப்புப்பிரதி Master PIN",
   "dashboard.backup.prompt.masterPin.message": "இந்தக் காப்புப்பிரதி Master PIN மூலம் பாதுகாக்கப்படுகிறது. இறக்குமதிக்காக அதை உள்ளிடுங்கள்.",
-  "dashboard.backup.prompt.masterPin.placeholder": "Master PIN",
+  "dashboard.backup.prompt.masterPin.placeholder": "முதன்மை PIN",
   "dashboard.backup.action.authorize": "அனுமதி அளி",
   "dashboard.backup.restoreTrusted.title": "நம்பகமான சாதனங்களையும் மீட்டெடுக்கவா?",
   "dashboard.backup.restoreTrusted.message": "இந்த முழுக் குறியாக்கப்பட்ட காப்புப்பிரதியில் Nanah நம்பகமான சாதன மீட்புத் தரவும் உள்ளது.",

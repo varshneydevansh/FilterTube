@@ -1703,7 +1703,7 @@
   "dashboard.backup.blockTube.reportDownloaded": "Laporan migrasi wis diundhuh; pilih serepan maneh yen wis siyap diimpor",
   "dashboard.backup.prompt.masterPin.title": "PIN Master Serepan",
   "dashboard.backup.prompt.masterPin.message": "Serepan iki dilindhungi PIN Master. Lebokna PIN kanggo ngimpor.",
-  "dashboard.backup.prompt.masterPin.placeholder": "PIN Master",
+  "dashboard.backup.prompt.masterPin.placeholder": "PIN utama",
   "dashboard.backup.action.authorize": "Wenehi wewenang",
   "dashboard.backup.restoreTrusted.title": "Pulihake Piranti Dipercaya Uga?",
   "dashboard.backup.restoreTrusted.message": "Serepan lengkap enkripsi iki uga ngemot data pamulihan piranti dipercaya Nanah.",

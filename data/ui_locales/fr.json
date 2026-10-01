@@ -1703,7 +1703,7 @@
   "dashboard.backup.blockTube.reportDownloaded": "Rapport de migration téléchargé ; sélectionnez de nouveau la sauvegarde lorsque vous serez prêt à l’importer",
   "dashboard.backup.prompt.masterPin.title": "PIN principal de la sauvegarde",
   "dashboard.backup.prompt.masterPin.message": "Cette sauvegarde est protégée par un Master PIN. Saisissez-le pour l’importer.",
-  "dashboard.backup.prompt.masterPin.placeholder": "Master PIN",
+  "dashboard.backup.prompt.masterPin.placeholder": "Code PIN principal",
   "dashboard.backup.action.authorize": "Autoriser",
   "dashboard.backup.restoreTrusted.title": "Restaurer aussi les appareils de confiance ?",
   "dashboard.backup.restoreTrusted.message": "Cette sauvegarde complète chiffrée contient également les données de récupération des appareils de confiance Nanah.",

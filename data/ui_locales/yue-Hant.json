@@ -1703,7 +1703,7 @@
   "dashboard.backup.blockTube.reportDownloaded": "移轉報告已下載；準備匯入時請再揀一次備份",
   "dashboard.backup.prompt.masterPin.title": "備份 Master PIN",
   "dashboard.backup.prompt.masterPin.message": "呢個備份受 Master PIN 保護。輸入 PIN 先可以匯入。",
-  "dashboard.backup.prompt.masterPin.placeholder": "Master PIN",
+  "dashboard.backup.prompt.masterPin.placeholder": "主 PIN",
   "dashboard.backup.action.authorize": "授權",
   "dashboard.backup.restoreTrusted.title": "都要還原可信任裝置嗎？",
   "dashboard.backup.restoreTrusted.message": "呢個加密完整備份亦包含 Nanah 可信任裝置復原資料。",

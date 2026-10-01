@@ -1703,7 +1703,7 @@
   "dashboard.backup.blockTube.reportDownloaded": "移行レポートをダウンロードしました。インポートする準備ができたら、バックアップをもう一度選択してください",
   "dashboard.backup.prompt.masterPin.title": "バックアップの Master PIN",
   "dashboard.backup.prompt.masterPin.message": "このバックアップは Master PIN で保護されています。インポートするには PIN を入力してください。",
-  "dashboard.backup.prompt.masterPin.placeholder": "Master PIN",
+  "dashboard.backup.prompt.masterPin.placeholder": "マスター PIN",
   "dashboard.backup.action.authorize": "許可",
   "dashboard.backup.restoreTrusted.title": "信頼済みデバイスも復元しますか？",
   "dashboard.backup.restoreTrusted.message": "この暗号化された完全バックアップには、Nanah の信頼済みデバイス復元データも含まれています。",

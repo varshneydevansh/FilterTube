@@ -1703,7 +1703,7 @@
   "dashboard.backup.blockTube.reportDownloaded": "An sauke rahoton ƙaura; sake zaɓar madadin idan kana shirye don shigo da shi",
   "dashboard.backup.prompt.masterPin.title": "Backup Master PIN",
   "dashboard.backup.prompt.masterPin.message": "Master PIN ne ya kare wannan madadin. Shigar da PIN don shigo da shi.",
-  "dashboard.backup.prompt.masterPin.placeholder": "Master PIN",
+  "dashboard.backup.prompt.masterPin.placeholder": "PIN na maigida",
   "dashboard.backup.action.authorize": "Ba da izini",
   "dashboard.backup.restoreTrusted.title": "A maido da na'urori amintattu ma?",
   "dashboard.backup.restoreTrusted.message": "Wannan cikakken madadin mai ɓoye yana kuma ɗauke da bayanan dawo da na'urori amintattu na Nanah.",

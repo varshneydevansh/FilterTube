@@ -1703,7 +1703,7 @@
   "dashboard.backup.blockTube.reportDownloaded": "ವಲಸೆ ವರದಿ ಡೌನ್‌ಲೋಡ್ ಆಗಿದೆ; ಆಮದು ಮಾಡಲು ಸಿದ್ಧರಾದಾಗ ಬ್ಯಾಕಪ್ ಅನ್ನು ಮತ್ತೆ ಆಯ್ಕೆಮಾಡಿ",
   "dashboard.backup.prompt.masterPin.title": "ಬ್ಯಾಕಪ್ ಮಾಸ್ಟರ್ PIN",
   "dashboard.backup.prompt.masterPin.message": "ಈ ಬ್ಯಾಕಪ್ ಮಾಸ್ಟರ್ PIN ನಿಂದ ರಕ್ಷಿಸಲಾಗಿದೆ. ಆಮದು ಮಾಡಲು PIN ನಮೂದಿಸಿ.",
-  "dashboard.backup.prompt.masterPin.placeholder": "ಮಾಸ್ಟರ್ PIN",
+  "dashboard.backup.prompt.masterPin.placeholder": "ಮುಖ್ಯ PIN",
   "dashboard.backup.action.authorize": "ಅಧಿಕೃತಗೊಳಿಸಿ",
   "dashboard.backup.restoreTrusted.title": "ವಿಶ್ವಾಸಾರ್ಹ ಸಾಧನಗಳನ್ನೂ ಮರುಸ್ಥಾಪಿಸಬೇಕೇ?",
   "dashboard.backup.restoreTrusted.message": "ಈ ಎನ್‌ಕ್ರಿಪ್ಟ್ ಮಾಡಿದ ಪೂರ್ಣ ಬ್ಯಾಕಪ್‌ನಲ್ಲಿ Nanah ವಿಶ್ವಾಸಾರ್ಹ ಸಾಧನ ಮರುಪಡೆಯುವಿಕೆ ಡೇಟಾವೂ ಇದೆ.",

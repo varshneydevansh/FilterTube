@@ -1703,7 +1703,7 @@
   "dashboard.backup.blockTube.reportDownloaded": "माइग्रेशन रिपोर्ट डाउनलोड हो गई; आयात के लिए तैयार होने पर बैकअप फिर चुनें",
   "dashboard.backup.prompt.masterPin.title": "बैकअप Master PIN",
   "dashboard.backup.prompt.masterPin.message": "यह बैकअप Master PIN से सुरक्षित है। आयात करने के लिए PIN दर्ज करें।",
-  "dashboard.backup.prompt.masterPin.placeholder": "Master PIN",
+  "dashboard.backup.prompt.masterPin.placeholder": "मास्टर PIN",
   "dashboard.backup.action.authorize": "अनुमति दें",
   "dashboard.backup.restoreTrusted.title": "विश्वसनीय डिवाइस भी बहाल करें?",
   "dashboard.backup.restoreTrusted.message": "इस एन्क्रिप्टेड पूर्ण बैकअप में Nanah विश्वसनीय-डिवाइस रिकवरी डेटा भी है।",

@@ -1703,7 +1703,7 @@
   "dashboard.backup.blockTube.reportDownloaded": "نزل تقرير الترحيل؛ اختَر النسخة الاحتياطيّة من جديد لما تكون جاهز للاستيراد",
   "dashboard.backup.prompt.masterPin.title": "PIN الرئيسي للنسخة الاحتياطيّة",
   "dashboard.backup.prompt.masterPin.message": "هالنسخة الاحتياطيّة محميّة بـ PIN رئيسي. أدخل الـ PIN لاستيرادها.",
-  "dashboard.backup.prompt.masterPin.placeholder": "PIN رئيسي",
+  "dashboard.backup.prompt.masterPin.placeholder": "رمز الـ PIN الرئيسي",
   "dashboard.backup.action.authorize": "خوّل",
   "dashboard.backup.restoreTrusted.title": "بدك تستعيد الأجهزة الموثوقة كمان؟",
   "dashboard.backup.restoreTrusted.message": "هالنسخة الكاملة المشفّرة فيها كمان بيانات استعادة أجهزة Nanah الموثوقة.",

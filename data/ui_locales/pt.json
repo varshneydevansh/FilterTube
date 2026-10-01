@@ -1703,7 +1703,7 @@
   "dashboard.backup.blockTube.reportDownloaded": "Relatório de migração baixado; selecione o backup novamente quando estiver pronto para importar",
   "dashboard.backup.prompt.masterPin.title": "PIN mestre do backup",
   "dashboard.backup.prompt.masterPin.message": "Este backup está protegido por um Master PIN. Digite-o para importar.",
-  "dashboard.backup.prompt.masterPin.placeholder": "Master PIN",
+  "dashboard.backup.prompt.masterPin.placeholder": "PIN mestre",
   "dashboard.backup.action.authorize": "Autorizar",
   "dashboard.backup.restoreTrusted.title": "Restaurar também os dispositivos confiáveis?",
   "dashboard.backup.restoreTrusted.message": "Este backup completo criptografado também contém dados de recuperação de dispositivos confiáveis do Nanah.",

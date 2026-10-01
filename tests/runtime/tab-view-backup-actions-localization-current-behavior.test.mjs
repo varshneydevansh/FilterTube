@@ -15,6 +15,14 @@ const flowEnd = source.indexOf('\n    if (ftImportSyncDeviceBtn) {', flowStart);
 assert.ok(flowStart >= 0 && flowEnd > flowStart, 'V3 backup export/import flow is available');
 const flow = source.slice(flowStart, flowEnd);
 
+test('backup master PIN placeholder agrees with the shared profile-access translation in every locale', () => {
+  const targets = JSON.parse(fs.readFileSync('data/ui_locales/targets.json', 'utf8')).locales;
+  for (const { code } of targets) {
+    const catalog = JSON.parse(fs.readFileSync(`data/ui_locales/${code}.json`, 'utf8'));
+    assert.equal(catalog['dashboard.backup.prompt.masterPin.placeholder'], catalog['profileAccess.masterPinPlaceholder'], code);
+  }
+});
+
 function placeholders(value) {
   return [...new Set([...String(value).matchAll(/\{([a-zA-Z][a-zA-Z0-9]*)\}/g)]
     .map(match => match[1]))].sort();

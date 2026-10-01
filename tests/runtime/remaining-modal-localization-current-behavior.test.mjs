@@ -67,3 +67,14 @@ test('scope display uses existing keys without changing canonical scope helpers'
   assert.equal(context.display('full'), 'dashboard.sync.scope.fullBackup');
   assert.equal(context.display('unknown'), 'dashboard.sync.scope.activeProfile');
 });
+
+test('delivery action labels are translated rather than mistaken for protected brand names', () => {
+  const draft = JSON.parse(fs.readFileSync('data/ui_locales/batches/remaining-modal-translations-d.json', 'utf8'));
+  for (const [locale, values] of Object.entries(draft.translations)) {
+    const catalog = JSON.parse(fs.readFileSync(`data/ui_locales/${locale}.json`, 'utf8'));
+    for (const key of ['dashboard.modal.remaining.sendNow', 'dashboard.modal.remaining.sendForLater']) {
+      assert.notEqual(catalog[key], batch.english[key], `${locale}: action label is not a brand`);
+      assert.equal(catalog[key], values[draft.keys.indexOf(key)], `${locale}: draft and shipped copy agree`);
+    }
+  }
+});

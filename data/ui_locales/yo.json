@@ -1703,7 +1703,7 @@
   "dashboard.backup.blockTube.reportDownloaded": "A ti ṣe igbasilẹ ìròyìn ìṣípadà; tún yan afẹ́yinti nígbà tí o bá múra láti gbé e wọlé",
   "dashboard.backup.prompt.masterPin.title": "PIN Olùdarí Afẹ́yinti",
   "dashboard.backup.prompt.masterPin.message": "PIN Olùdarí dáàbò bo afẹ́yinti yìí. Tẹ PIN náà láti gbé e wọlé.",
-  "dashboard.backup.prompt.masterPin.placeholder": "PIN Olùdarí",
+  "dashboard.backup.prompt.masterPin.placeholder": "PIN àkọ́kọ́",
   "dashboard.backup.action.authorize": "Fún ní àṣẹ",
   "dashboard.backup.restoreTrusted.title": "Ṣé kí a tún mú àwọn Ẹ̀rọ Tí A Gbẹ́kẹ̀ Lé padà?",
   "dashboard.backup.restoreTrusted.message": "Afẹ́yinti kíkún tí a ṣípayá yìí tún ní dátà ìmúpadàbọ̀ ẹ̀rọ Nanah tí a gbẹ́kẹ̀ lé.",

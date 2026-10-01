@@ -1703,7 +1703,7 @@
   "dashboard.backup.blockTube.reportDownloaded": "Đã tải báo cáo chuyển đổi; hãy chọn lại bản sao lưu khi sẵn sàng nhập",
   "dashboard.backup.prompt.masterPin.title": "PIN chính của bản sao lưu",
   "dashboard.backup.prompt.masterPin.message": "Bản sao lưu này được bảo vệ bằng Master PIN. Nhập PIN để nhập.",
-  "dashboard.backup.prompt.masterPin.placeholder": "Master PIN",
+  "dashboard.backup.prompt.masterPin.placeholder": "Mã PIN chính",
   "dashboard.backup.action.authorize": "Ủy quyền",
   "dashboard.backup.restoreTrusted.title": "Khôi phục cả thiết bị đáng tin cậy?",
   "dashboard.backup.restoreTrusted.message": "Bản sao lưu đầy đủ đã mã hóa này cũng chứa dữ liệu khôi phục thiết bị đáng tin cậy Nanah.",
