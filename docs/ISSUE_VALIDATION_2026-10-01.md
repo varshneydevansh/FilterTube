@@ -1,0 +1,17 @@
+# Linked issue validation
+
+Scope: #69, #75, #76, #77, #65, #62, and #60. Public issue bodies/comments were read; no issue status or comments were changed.
+
+| Report | Current work / evidence | Still required |
+| --- | --- | --- |
+| #69 unwanted navigation | Removed three additional autonomous playlist transitions outside admission in `6f50a7ee`. Explicit user navigation remains. | Installed playlist smoke. |
+| #77 Disabled / repeated checking | Installed playlist navigation listener now checks current Disabled. `b1108ec6` preserves exact-video verified metadata across settings snapshots without preserving admission decisions. | Installed Firefox tab return, disable-during-transition and playlist smoke. |
+| #75 unrelated content rejected | Unverified identity/text hints can no longer overwrite verified fields while inheriting verification flags. Existing membership-card scope fixes remain separate dirty work. | Reporter rules and installed reproduction; do not claim every false positive resolved. |
+| #76 search stall / imported channels visible | Existing candidate-scoped Watch/Search work and large-rule tests address repeated full scans. Import parser/report tests passed 10/10. | Failing imported-list/search configuration and installed Chrome reproduction. |
+| #65 Firefox mobile Shorts | Actual route/parser/owner functions accept the reported mobile Shorts ID, retain `@duckshort2` from player metadata, reject other-video/stale identity, and target a mobile player host. New tests passed 2/2. Firefox manifest matches mobile YouTube. | Firefox Android installed smoke; no connected Android device was available. |
+| #62 subscribable/importable lists | URL-backed lists, CSV/TXT/JSON parsing, persistent reports, stale checks and parent-approved preview exist. Automatic checks run on dashboard open, not unattended background rule replacement. Parser/report tests passed 10/10. | Installed URL-list preview/update flow; unattended subscription sync must not be claimed. |
+| #60 remote parental controls | Signed live Nanah updates, local protected-profile authority and optional configured pickup clients exist. Live-send/open-sync/signing tests passed 35/35. | Two-device installed smoke and downstream native parity. Automatic LAN discovery or hosted delivery is not implemented. |
+
+Direct admission plus metadata tests passed 30/30 before the playlist source assertion was added; the expanded metadata/playlist suite passed 4/4. A broad blocking lane passed 148/208 and failed 60 tests, including stale source-line/count/needle audits. It is not an all-green release lane and was not rewritten to manufacture success.
+
+All installed/reporter boundaries above remain explicit. Local tests and code fixes are not evidence that a reporter's old installed package has changed.
