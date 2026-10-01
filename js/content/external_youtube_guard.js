@@ -11,6 +11,7 @@
     const METADATA_TIMEOUT_MS = 6000;
     let currentSettings = null;
     let currentVideoId = '';
+    let playbackRequestedVideoId = '';
     let settingsRefreshTimer = 0;
     let pendingStartedAt = 0;
     let pendingTimer = 0;
@@ -76,6 +77,19 @@
         let hash = url.hash || '';
         try { hash = decodeURIComponent(hash); } catch (e) {}
         return hash.match(/(?:^|[,:;&])vid[:=]([A-Za-z0-9_-]{11})(?=$|[,:;&])/i)?.[1] || '';
+    }
+
+    function selectedGooglePlayerVideoId() {
+        const url = safeUrl(root.location?.href || '');
+        if (!url || !/(^|\.)google\.com$/i.test(url.hostname) || url.pathname !== '/search') return '';
+        const fragment = new URLSearchParams(url.hash.slice(1));
+        if (fragment.get('fpstate') !== 'ive') return '';
+        return extractGooglePlayerVideoId(url.href);
+    }
+
+    function isGoogleSearch() {
+        const url = safeUrl(root.location?.href || '');
+        return Boolean(url && /(^|\.)google\.com$/i.test(url.hostname) && url.pathname === '/search');
     }
 
     function extractYouTubeCandidate(rawUrl, depth = 0) {
@@ -160,6 +174,9 @@
     function candidateFromElement(target) {
         let element = elementFromTarget(target);
         for (let depth = 0; element && depth < 8; depth += 1, element = element.parentElement) {
+            // A result preview must never inherit an arbitrary link elsewhere on
+            // the search page (or inside the admission overlay).
+            if (element === document.body || element === document.documentElement) break;
             for (const value of [
                 element.getAttribute?.('href') || element.href || '',
                 element.getAttribute?.('poster') || element.poster || '',
@@ -182,6 +199,8 @@
         if (!candidate?.videoId) return;
         if (currentVideoId !== candidate.videoId) {
             currentVideoId = candidate.videoId;
+            playbackRequestedVideoId = '';
+            clearOverlay();
             pendingStartedAt = Date.now();
             clearTimeout(pendingTimer);
             pendingTimer = 0;
@@ -189,6 +208,25 @@
     }
 
     function currentCandidate(target = null) {
+        const url = safeUrl(root.location?.href || '');
+        const isEmbed = url && YOUTUBE_HOST_PATTERN.test(url.hostname) && url.pathname.startsWith('/embed/');
+        if (isEmbed) {
+            // Nearby thumbnails belong to recommendations, not this media.
+            // ID-less embeds receive their selected identity from the MAIN bridge.
+            return extractYouTubeCandidate(root.location?.href || '')
+                || (currentVideoId ? canonicalCandidate(currentVideoId) : null);
+        }
+        if (isGoogleSearch()) {
+            const selectedId = selectedGooglePlayerVideoId();
+            if (!selectedId || !target) return null;
+            const nearby = candidateFromElement(target);
+            return nearby?.videoId === selectedId ? nearby : null;
+        }
+        if (target) {
+            // A cached result or Google's route fragment does not establish
+            // ownership of an unrelated video in the parent document.
+            if (!isEmbed) return candidateFromElement(target);
+        }
         return candidateFromElement(target)
             || extractYouTubeCandidate(root.location?.href || '')
             || (currentVideoId ? canonicalCandidate(currentVideoId) : null);
@@ -373,201 +411,13 @@
         return 'Blocked by an active FilterTube rule';
     }
 
-    function admissionOverlayPrefersReducedMotion() {
-        try { return root.matchMedia?.('(prefers-reduced-motion: reduce)')?.matches === true; } catch (e) { return false; }
-    }
-
-    function admissionOverlayUsesDarkTheme() {
-        try {
-            const rootElement = document.documentElement;
-            const theme = rootElement?.getAttribute?.('data-theme') || rootElement?.dataset?.theme || '';
-            return theme === 'dark' || (theme !== 'light' && root.matchMedia?.('(prefers-color-scheme: dark)')?.matches === true);
-        } catch (e) { return false; }
-    }
-
-    function admissionOverlayHeroUrl() {
-        try {
-            const getURL = runtimeAPI?.runtime?.getURL;
-            return typeof getURL === 'function' ? getURL.call(runtimeAPI.runtime, 'assets/images/homepage_hero_day.mp4') : '';
-        } catch (e) { return ''; }
-    }
-
-    function admissionOverlayStyle(element, styles) {
-        try { if (element?.style) Object.assign(element.style, styles); } catch (e) {}
+    function ensureAdmissionOverlayVisuals(overlay, state, message) {
+        if (root.FilterTubeAdmissionOverlay) root.FilterTubeAdmissionOverlay.render(overlay, state, message);
+        else overlay.textContent = String(message || '');
     }
 
     function removeAdmissionOverlayBackground(overlay) {
-        const background = overlay?.__filtertubeAdmissionBackground || null;
-        if (!background) return;
-        try { background.pause?.(); } catch (e) {}
-        try { background.remove?.(); } catch (e) {}
-        try { overlay.__filtertubeAdmissionBackground = null; } catch (e) {}
-    }
-
-    function ensureAdmissionOverlayVisuals(overlay, state, message) {
-        const blocked = state === 'blocked';
-        const reducedMotion = admissionOverlayPrefersReducedMotion();
-        const darkTheme = admissionOverlayUsesDarkTheme();
-        const canCompose = typeof overlay?.appendChild === 'function' && typeof document.createElement === 'function';
-        const blockedBackground = darkTheme ? '#172329' : '#304c4e';
-        const pendingBackground = darkTheme ? '#0b1016' : '#f6f2eb';
-        const blockedText = darkTheme ? '#fffaf4' : '#fffaf4';
-        const pendingText = darkTheme ? '#f3f6fa' : '#1b1a18';
-
-        admissionOverlayStyle(overlay, {
-            position: 'fixed', inset: '0', zIndex: '2147483647', width: '100vw', height: '100vh',
-            boxSizing: 'border-box', display: 'flex', alignItems: 'center', justifyContent: 'center',
-            padding: 'clamp(16px, 4vw, 56px)', overflow: 'hidden', isolation: 'isolate',
-            pointerEvents: 'auto', userSelect: 'text', whiteSpace: 'normal',
-            background: blocked ? blockedBackground : pendingBackground,
-            color: blocked ? blockedText : pendingText,
-            font: '400 15px/1.55 "Plus Jakarta Sans", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif'
-        });
-
-        if (!canCompose) {
-            // The small test/runtime DOMs may expose only textContent. Keep the
-            // exact admission reason observable there without requiring child nodes.
-            try { overlay.textContent = String(message || ''); } catch (e) {}
-            return;
-        }
-
-        let panel = overlay.__filtertubeAdmissionPanel || null;
-        let brand = overlay.__filtertubeAdmissionBrand || null;
-        let brandMark = overlay.__filtertubeAdmissionBrandMark || null;
-        let brandName = overlay.__filtertubeAdmissionBrandName || null;
-        let status = overlay.__filtertubeAdmissionStatus || null;
-        let title = overlay.__filtertubeAdmissionTitle || null;
-        let reason = overlay.__filtertubeAdmissionReason || null;
-        let scrim = overlay.__filtertubeAdmissionScrim || null;
-
-        if (!panel) {
-            panel = document.createElement('section');
-            panel.setAttribute('aria-live', 'polite');
-            panel.setAttribute('data-filtertube-admission-panel', 'true');
-            admissionOverlayStyle(panel, {
-                position: 'relative', zIndex: '2', display: 'flex', flexDirection: 'column', gap: '18px',
-                width: 'min(540px, 100%)', maxHeight: 'calc(100vh - 32px)', overflow: 'auto', boxSizing: 'border-box',
-                padding: 'clamp(24px, 5vw, 44px)', border: '1px solid rgba(255,255,255,.28)', borderRadius: '28px',
-                boxShadow: '0 28px 90px rgba(0,0,0,.42), inset 0 1px 0 rgba(255,255,255,.08)',
-                backdropFilter: 'blur(18px)', WebkitBackdropFilter: 'blur(18px)'
-            });
-
-            brand = document.createElement('div');
-            brand.setAttribute('data-filtertube-admission-brand', 'true');
-            admissionOverlayStyle(brand, { display: 'flex', alignItems: 'center', gap: '10px', minHeight: '36px' });
-            brandMark = document.createElement('span');
-            brandMark.setAttribute('aria-hidden', 'true');
-            admissionOverlayStyle(brandMark, {
-                display: 'grid', placeItems: 'center', width: '34px', height: '34px', borderRadius: '12px',
-                background: darkTheme ? '#c35a4b' : '#ab4438', color: '#fffaf4', font: '800 16px/1 "Outfit", sans-serif',
-                boxShadow: '0 8px 20px rgba(60,42,33,.22)'
-            });
-            brandMark.textContent = 'F';
-            brandName = document.createElement('span');
-            admissionOverlayStyle(brandName, { color: darkTheme ? '#f3f6fa' : '#1b1a18', font: '750 16px/1 "Outfit", sans-serif', letterSpacing: '.01em' });
-            brandName.textContent = 'FilterTube';
-            brand.appendChild(brandMark);
-            brand.appendChild(brandName);
-
-            status = document.createElement('p');
-            status.setAttribute('data-filtertube-admission-status', 'true');
-            admissionOverlayStyle(status, {
-                margin: '12px 0 0', color: blocked ? '#cfe2d2' : (darkTheme ? '#9aa6b4' : '#827b73'),
-                font: '700 12px/1.35 "Plus Jakarta Sans", sans-serif', letterSpacing: '.08em', textTransform: 'uppercase'
-            });
-
-            title = document.createElement('h1');
-            title.setAttribute('data-filtertube-admission-title', 'true');
-            admissionOverlayStyle(title, {
-                margin: '0', color: blocked ? '#fffaf4' : pendingText,
-                font: '700 clamp(24px, 4vw, 38px)/1.12 "Outfit", "Plus Jakarta Sans", sans-serif', letterSpacing: '-.02em'
-            });
-
-            reason = document.createElement('p');
-            reason.setAttribute('data-filtertube-admission-reason', 'true');
-            admissionOverlayStyle(reason, {
-                margin: '0', padding: '15px 16px', borderLeft: `3px solid ${darkTheme ? '#c35a4b' : '#ab4438'}`,
-                borderRadius: '4px 14px 14px 4px', background: blocked ? 'rgba(255,255,255,.1)' : (darkTheme ? 'rgba(255,255,255,.06)' : 'rgba(171,68,56,.07)'),
-                color: blocked ? '#fffaf4' : pendingText, font: '650 14px/1.55 "Plus Jakarta Sans", sans-serif',
-                whiteSpace: 'pre-line', overflowWrap: 'anywhere'
-            });
-
-            panel.appendChild(brand);
-            panel.appendChild(status);
-            panel.appendChild(title);
-            panel.appendChild(reason);
-            overlay.appendChild(panel);
-            overlay.__filtertubeAdmissionPanel = panel;
-            overlay.__filtertubeAdmissionBrand = brand;
-            overlay.__filtertubeAdmissionBrandMark = brandMark;
-            overlay.__filtertubeAdmissionBrandName = brandName;
-            overlay.__filtertubeAdmissionStatus = status;
-            overlay.__filtertubeAdmissionTitle = title;
-            overlay.__filtertubeAdmissionReason = reason;
-        }
-
-        if (!scrim) {
-            scrim = document.createElement('div');
-            scrim.setAttribute('aria-hidden', 'true');
-            scrim.setAttribute('data-filtertube-admission-scrim', 'true');
-            admissionOverlayStyle(scrim, { position: 'absolute', inset: '0', zIndex: '1', pointerEvents: 'none' });
-            overlay.insertBefore?.(scrim, panel);
-            if (!scrim.parentNode) overlay.appendChild(scrim);
-            overlay.__filtertubeAdmissionScrim = scrim;
-        }
-
-        let background = overlay.__filtertubeAdmissionBackground || null;
-        if (blocked && !reducedMotion && !background && admissionOverlayHeroUrl()) {
-            background = document.createElement('video');
-            background.setAttribute('aria-hidden', 'true');
-            background.setAttribute('data-filtertube-admission-background', 'true');
-            background.setAttribute('muted', '');
-            background.setAttribute('autoplay', '');
-            background.setAttribute('loop', '');
-            background.setAttribute('playsinline', '');
-            background.muted = true;
-            background.defaultMuted = true;
-            background.autoplay = true;
-            background.loop = true;
-            background.playsInline = true;
-            background.preload = 'metadata';
-            background.src = admissionOverlayHeroUrl();
-            admissionOverlayStyle(background, {
-                position: 'absolute', inset: '0', zIndex: '0', width: '100%', height: '100%', objectFit: 'cover',
-                opacity: '.58', filter: 'saturate(.82) brightness(.8)', pointerEvents: 'none'
-            });
-            overlay.appendChild(background);
-            overlay.__filtertubeAdmissionBackground = background;
-        } else if (!blocked || reducedMotion) {
-            removeAdmissionOverlayBackground(overlay);
-            background = null;
-        }
-
-        admissionOverlayStyle(scrim, {
-            display: blocked ? 'block' : 'none',
-            background: blocked
-                ? 'linear-gradient(135deg, rgba(8,13,18,.78), rgba(15,23,42,.62) 45%, rgba(27,38,48,.72))'
-                : 'transparent'
-        });
-        admissionOverlayStyle(panel, {
-            background: blocked ? 'rgba(12,18,25,.82)' : (darkTheme ? 'rgba(18,24,33,.96)' : 'rgba(255,255,255,.84)'),
-            color: blocked ? blockedText : pendingText
-        });
-        admissionOverlayStyle(brandMark, { background: darkTheme ? '#c35a4b' : '#ab4438' });
-        admissionOverlayStyle(brandName, { color: darkTheme ? '#f3f6fa' : '#1b1a18' });
-        admissionOverlayStyle(status, { color: blocked ? '#cfe2d2' : (darkTheme ? '#9aa6b4' : '#827b73') });
-        admissionOverlayStyle(title, { color: blocked ? '#fffaf4' : pendingText });
-        admissionOverlayStyle(reason, {
-            borderLeftColor: darkTheme ? '#c35a4b' : '#ab4438',
-            background: blocked ? 'rgba(255,255,255,.1)' : (darkTheme ? 'rgba(255,255,255,.06)' : 'rgba(171,68,56,.07)'),
-            color: blocked ? '#fffaf4' : pendingText
-        });
-        status.textContent = blocked ? 'Playback blocked' : 'Checking playback';
-        title.textContent = blocked ? 'This video is blocked' : 'Checking before playback';
-        reason.textContent = String(message || '');
-        if (blocked && background?.play && background.paused !== false) {
-            try { background.play()?.catch?.(() => {}); } catch (e) {}
-        }
+        root.FilterTubeAdmissionOverlay?.clear(overlay);
     }
 
     function showOverlay(state, message) {
@@ -616,6 +466,9 @@
             clearTimeout(pendingTimer);
             pendingTimer = 0;
         }
+        // Metadata may be prefetched while merely browsing results. Warm the
+        // decision above, but never present a playback banner until play is attempted.
+        if (playbackRequestedVideoId !== videoId) return;
         showOverlay(decision.state === 'blocked' ? 'blocked' : 'pending', decisionMessage(decision, metadata || {}));
         if (decision.state === 'pending' && !pendingTimer && Date.now() - pendingStartedAt < METADATA_TIMEOUT_MS) {
             pendingTimer = setTimeout(() => { pendingTimer = 0; applyDecision(videoId); }, Math.max(0, METADATA_TIMEOUT_MS - (Date.now() - pendingStartedAt)));
@@ -625,9 +478,11 @@
     function pauseForAdmission(media, candidate) {
         if (media?.getAttribute?.('data-filtertube-admission-background') === 'true') return false;
         if (!candidate || !hasActiveVideoAdmissionRules(currentSettings)) return false;
-        const metadata = metadataByVideoId.get(candidate.videoId);
+        const metadata = metadataByVideoId.get(candidate.videoId) || currentSettings?.videoMetaMap?.[candidate.videoId] || null;
         if (evaluateAdmission(currentSettings, metadata, candidate.videoId).state === 'allowed') return false;
-        setCurrentCandidate(candidate); guardedMedia.add(media);
+        setCurrentCandidate(candidate);
+        playbackRequestedVideoId = candidate.videoId;
+        guardedMedia.add(media);
         try { media?.pause?.(); } catch (e) {}
         applyDecision(candidate.videoId);
         return true;
@@ -639,18 +494,29 @@
         if (!active) {
             clearTimeout(pendingTimer); pendingTimer = 0; clearOverlay(); resumeGuardedMedia(); return;
         }
+        if (isGoogleSearch() && !selectedGooglePlayerVideoId()) {
+            // Google can leave a hover-preview video alive after the inline
+            // viewer closes. Drop its stale admission without replaying it.
+            clearTimeout(pendingTimer); pendingTimer = 0;
+            clearOverlay(); guardedMedia.clear();
+            playbackRequestedVideoId = ''; currentVideoId = '';
+            return;
+        }
+        if (isGoogleSearch()) setCurrentCandidate(canonicalCandidate(selectedGooglePlayerVideoId()));
         const candidate = currentCandidate();
         if (candidate) setCurrentCandidate(candidate);
         for (const media of document.querySelectorAll?.('video') || []) {
-            if (!media.paused) pauseForAdmission(media, candidate || currentCandidate(media));
+            if (!media.paused) pauseForAdmission(media, currentCandidate(media));
         }
     }
 
     function handlePotentialYouTubeActivation(event) {
         if (!hasActiveVideoAdmissionRules(currentSettings)) return;
+        const url = safeUrl(root.location?.href || '');
+        if (url && YOUTUBE_HOST_PATTERN.test(url.hostname) && url.pathname.startsWith('/embed/')) return;
         const target = elementFromTarget(event?.target);
         const anchor = target?.closest?.('a[href]');
-        const candidate = anchor ? extractYouTubeCandidate(anchor.getAttribute('href') || anchor.href || '') : candidateFromElement(target);
+        const candidate = anchor ? extractYouTubeCandidate(anchor.getAttribute('href') || anchor.href || '') : null;
         if (!candidate) return;
         setCurrentCandidate(candidate);
     }
@@ -666,6 +532,7 @@
         const videoId = String(metadata?.videoId || '');
         if (!VIDEO_ID_PATTERN.test(videoId)) return false;
         if (metadata.identityVerified === true || metadata.textVerified === true) metadataByVideoId.set(videoId, metadata);
+        if (isGoogleSearch() && selectedGooglePlayerVideoId() !== videoId) return true;
         setCurrentCandidate(canonicalCandidate(videoId));
         if (hasActiveVideoAdmissionRules(currentSettings)) applyDecision(videoId);
         return true;
@@ -680,7 +547,9 @@
         if (event.data?.type === 'FilterTube_ExternalYouTubePlaybackAttempt') {
             const videoId = String(event.data?.payload?.videoId || '');
             if (!VIDEO_ID_PATTERN.test(videoId) || !hasActiveVideoAdmissionRules(currentSettings)) return;
+            if (isGoogleSearch() && selectedGooglePlayerVideoId() !== videoId) return;
             setCurrentCandidate(canonicalCandidate(videoId));
+            playbackRequestedVideoId = videoId;
             applyDecision(videoId);
         }
     });

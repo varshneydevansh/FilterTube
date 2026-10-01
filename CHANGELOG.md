@@ -2,6 +2,13 @@
 
 ## Unreleased
 
+- **SPA playback intent and external prefetch**: preserve a held play attempt across navigation finish so verified allowed playback resumes; metadata prefetch alone no longer displays an external-player banner, and the early external pause check reuses verified metadata from settings.
+
+- **Card-scoped Watch/Search refresh**: non-structural card mutations now retain their candidate list instead of forcing a full Watch/Search card scan; structural mutations still request a full pass.
+- **Members-only false-hide correction**: a membership badge hides its matching card, not its enclosing search section or the entire Watch page. Explicit members-only shelf/playlist controls remain separate.
+
+- **Stay on blocked playback (#69)**: current-video rejection no longer advances even to a verified playlist successor, opens the playlist panel, or schedules navigation retries. The blocked video remains paused for the user to choose what to open next. This supersedes the earlier verified-successor behavior below.
+
 - **[Advert Void media ownership](docs/ADVERT_VOID_MEDIA_OWNERSHIP_2026-09-22.md)**: correct content/advert role selection during parallel playback, remove arbitrary second-video promotion, and scope quarantine to the selected player's non-decorative media. Focused regressions pass; installed-browser acceptance and escaped-ad reports remain open. This is not a guarantee against YouTube ad-block detection.
 
 - **Hard Timer Whitelist**: Chrome, Firefox, Android, and iOS now offer an explicit non-cancellable Main YouTube allow-only session. It requires at least one selected Main Allowed channel, forces filtering and Whitelist mode, blocks policy/profile changes until expiry, restores the complete pre-session profile afterward, and retains its recovery snapshot if restoration must be retried.

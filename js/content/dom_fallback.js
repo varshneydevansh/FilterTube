@@ -1179,6 +1179,53 @@ function getCurrentShortPlayerHost() {
     }
 }
 
+function setLocalizedAdmissionOverlayMessage(overlay, state, message) {
+    const sourceMessage = String(message || '');
+    overlay.__filtertubeAdmissionSourceMessage = sourceMessage;
+    overlay.__filtertubeAdmissionSourceState = state;
+
+    const localizer = window.FilterTubeAdmissionOverlay;
+    const renderMessage = localized => {
+        if (typeof localizer?.render === 'function') {
+            localizer.render(overlay, state, localized);
+            Object.assign(overlay.style, { position: 'absolute', width: '100%', height: '100%' });
+        } else if (overlay.textContent !== localized) overlay.textContent = localized;
+    };
+    const applyDirection = () => {
+        try {
+            const direction = localizer?.getDirection?.();
+            if ((direction === 'ltr' || direction === 'rtl') && overlay.setAttribute) {
+                overlay.setAttribute('dir', direction);
+            }
+        } catch (e) {
+        }
+    };
+    applyDirection();
+
+    let initialMessage = sourceMessage;
+    try {
+        const localized = localizer?.localizeMessage?.(sourceMessage);
+        if (typeof localized === 'string') initialMessage = localized;
+    } catch (e) {
+    }
+    renderMessage(initialMessage);
+
+    try {
+        const pending = localizer?.resolveMessage?.(sourceMessage);
+        if (pending?.then) {
+            pending.then(localized => {
+                if (!overlay.isConnected ||
+                    overlay.__filtertubeAdmissionSourceMessage !== sourceMessage ||
+                    overlay.__filtertubeAdmissionSourceState !== state ||
+                    overlay.getAttribute('data-state') !== state) return;
+                applyDirection();
+                if (typeof localized === 'string') renderMessage(localized);
+            }).catch(() => {});
+        }
+    } catch (e) {
+    }
+}
+
 function setCurrentShortAdmissionOverlay(state, message) {
     const host = getCurrentShortPlayerHost();
     if (!host) return false;
@@ -1193,7 +1240,10 @@ function setCurrentShortAdmissionOverlay(state, message) {
     const nextState = state === 'blocked' ? 'blocked' : 'pending';
     const nextMessage = String(message || '');
     if (overlay.getAttribute('data-state') !== nextState) overlay.setAttribute('data-state', nextState);
-    if (overlay.textContent !== nextMessage) overlay.textContent = nextMessage;
+    if (overlay.__filtertubeAdmissionSourceMessage !== nextMessage ||
+        overlay.__filtertubeAdmissionSourceState !== nextState) {
+        setLocalizedAdmissionOverlayMessage(overlay, nextState, nextMessage);
+    }
     host.setAttribute('data-filtertube-current-short-admission-host', 'true');
     return true;
 }
@@ -1202,6 +1252,7 @@ function clearCurrentShortAdmissionOverlay() {
     try {
         const overlay = document.getElementById('filtertube-current-short-admission-overlay');
         const host = overlay?.parentElement || document.querySelector('[data-filtertube-current-short-admission-host="true"]');
+        window.FilterTubeAdmissionOverlay?.clear?.(overlay);
         overlay?.remove();
         host?.removeAttribute?.('data-filtertube-current-short-admission-host');
     } catch (e) {
@@ -1451,12 +1502,18 @@ function enforceCurrentVideoAdmissionForRoute(settings = currentSettings) {
         releaseDisabledDirectAccessState();
         return;
     }
-    if (!getCurrentWatchVideoId()) {
+    const routeVideoId = getCurrentWatchVideoId();
+    if (!routeVideoId) {
         releaseDirectAccessGuard('', false);
         clearCurrentVideoAdmissionPresentation();
         return;
     }
-    getDirectAccessState().routeTransitionPending = false;
+    const state = getDirectAccessState();
+    // Bind a play attempt held during navigation to the now-established route.
+    // Otherwise both pending and allowed paths discard its resume authority
+    // because navigation-start deliberately cleared the previous video ID.
+    if (state.routeTransitionPending && !state.videoId) state.videoId = routeVideoId;
+    state.routeTransitionPending = false;
     enforceCurrentWatchOwnerBlock(settings);
 }
 
@@ -1473,6 +1530,7 @@ function installDirectAccessPlayGuard() {
             }
             const media = event?.target;
             if (String(media?.tagName || '').toLowerCase() !== 'video') return;
+            if (media?.getAttribute?.('data-filtertube-admission-background') === 'true') return;
             // Between navigation-start/popstate and yt-navigate-finish, the URL
             // and recycled player can still describe the route we are leaving.
             // Keep playback closed without granting that stale route a receipt.
@@ -1544,7 +1602,10 @@ function setDirectAccessOverlay(stateValue, message) {
     const nextState = stateValue === 'blocked' ? 'blocked' : 'pending';
     const nextMessage = String(message || (stateValue === 'blocked' ? 'Blocked by FilterTube' : 'Checking FilterTube rules…'));
     if (overlay.getAttribute('data-state') !== nextState) overlay.setAttribute('data-state', nextState);
-    if (overlay.textContent !== nextMessage) overlay.textContent = nextMessage;
+    if (overlay.__filtertubeAdmissionSourceMessage !== nextMessage ||
+        overlay.__filtertubeAdmissionSourceState !== nextState) {
+        setLocalizedAdmissionOverlayMessage(overlay, nextState, nextMessage);
+    }
     return true;
 }
 
@@ -1552,6 +1613,7 @@ function clearDirectAccessOverlay() {
     try {
         const overlay = document.getElementById('filtertube-direct-access-overlay');
         const host = overlay?.parentElement || document.querySelector('[data-filtertube-direct-access-overlay-host="true"]');
+        window.FilterTubeAdmissionOverlay?.clear?.(overlay);
         overlay?.remove();
         host?.removeAttribute?.('data-filtertube-direct-access-overlay-host');
     } catch (e) {
@@ -2245,51 +2307,9 @@ function enforceCurrentWatchOwnerBlock(settings) {
 
         if (isEmbedRoute) return;
 
-        const targetLink = findNextAllowedWatchPlaylistLink(settings, ownerMeta.videoId);
-        if (targetLink) {
-            setTimeout(() => {
-                try {
-                    targetLink.click();
-                } catch (e) {
-                }
-            }, 60);
-            return;
-        }
-
-        if (openWatchPlaylistPanelIfCollapsed()) {
-            setTimeout(() => {
-                try {
-                    if (typeof applyDOMFallback === 'function') {
-                        applyDOMFallback(settings, { preserveScroll: true, forceReprocess: true });
-                    }
-                } catch (e) {
-                }
-            }, 260);
-            return;
-        }
-
-        state.retryVideoId = state.retryVideoId || '';
-        state.retryCount = Number.isFinite(Number(state.retryCount)) ? Number(state.retryCount) : 0;
-        if (state.retryVideoId !== ownerMeta.videoId) {
-            state.retryVideoId = ownerMeta.videoId;
-            state.retryCount = 0;
-        }
-        if (state.retryCount < 3) {
-            state.retryCount += 1;
-            setTimeout(() => {
-                try {
-                    if (typeof applyDOMFallback === 'function') {
-                        applyDOMFallback(settings, { preserveScroll: true, forceReprocess: true });
-                    }
-                } catch (e) {
-                }
-            }, 1300);
-            return;
-        }
-
-        // No verified allowed successor exists. Keep the current player blocked
-        // instead of delegating to YouTube's generic Next button, whose target
-        // has not been checked against the active FilterTube rules.
+        // A rejection owns only this video's admission, not navigation. Stay
+        // on the blocked video even when an allowed playlist successor exists.
+        // This also leaves no delayed Next action that can fire after Disable.
         const shell = document.querySelector('ytm-watch, ytd-watch-flexy');
         if (shell) {
             shell.setAttribute('data-filtertube-current-watch-blocked', 'true');
@@ -2364,13 +2384,18 @@ function setCurrentWatchCategoryOverlay(state, message) {
         ? 'blocked'
         : (state === 'unavailable' ? 'unavailable' : 'pending');
     overlay.setAttribute('data-state', normalizedState);
-    overlay.textContent = message || (state === 'blocked' ? 'Blocked by Category Filter' : 'Checking category…');
+    const overlayMessage = message || (state === 'blocked' ? 'Blocked by Category Filter' : 'Checking category…');
+    if (window.FilterTubeAdmissionOverlay) {
+        window.FilterTubeAdmissionOverlay.render(overlay, normalizedState, overlayMessage);
+        Object.assign(overlay.style, { position: 'absolute', width: '100%', height: '100%' });
+    } else overlay.textContent = overlayMessage;
     return true;
 }
 
 function clearCurrentWatchCategoryOverlay() {
     try {
         const overlay = document.getElementById('filtertube-current-watch-category-overlay');
+        window.FilterTubeAdmissionOverlay?.clear(overlay);
         const host = overlay?.parentElement || document.querySelector('[data-filtertube-current-category-overlay-host="true"]');
         overlay?.remove();
         host?.removeAttribute?.('data-filtertube-current-category-overlay-host');
@@ -3074,14 +3099,7 @@ function ensureContentControlStyles(settings) {
             /* Metadata block fallback */
             ytd-video-meta-block:has([aria-label*="Members only"]),
             ytd-video-meta-block:has([aria-label*="Member-only"]),
-            /* Watch page containers with Members-only badge */
-            ytd-watch-flexy:has(.yt-badge-shape--membership),
-            ytd-watch-metadata:has(.yt-badge-shape--membership),
-            ytd-video-primary-info-renderer:has(.yt-badge-shape--membership),
-            /* Members-only shelves/playlists */
-            ytd-shelf-renderer:has(.yt-badge-shape--membership),
-            ytd-shelf-renderer:has([aria-label*="Members only"]),
-            ytd-shelf-renderer:has([aria-label*="Member-only"]),
+            /* Only explicit members-only playlist evidence, not one child badge */
             ytd-shelf-renderer:has(a[href*="list=UUMO"]),
             ytd-playlist-video-renderer:has(a[href*="list=UUMO"]) {
                 display: none !important;
@@ -4931,8 +4949,8 @@ async function applyDOMFallback(settings, options = {}) {
     runState.latestSettings = effectiveSettings;
     if (runState.running) {
         const priorOptions = runState.latestOptions || {};
-        const priorIncremental = priorOptions.incrementalHomeCards === true;
-        const nextIncremental = options.incrementalHomeCards === true;
+        const priorIncremental = priorOptions.incrementalHomeCards === true || priorOptions.incrementalVideoCards === true;
+        const nextIncremental = options.incrementalHomeCards === true || options.incrementalVideoCards === true;
         if (priorIncremental && nextIncremental) {
             runState.latestOptions = {
                 ...priorOptions,
@@ -4976,6 +4994,7 @@ async function applyDOMFallback(settings, options = {}) {
         preserveScroll = true,
         onlyWhitelistPending = false,
         incrementalHomeCards = false,
+        incrementalVideoCards = false,
         candidateElements = null
     } = options;
     const useIncrementalHomeCards = Boolean(
@@ -4983,6 +5002,11 @@ async function applyDOMFallback(settings, options = {}) {
         isFilterTubeHomeRoute() &&
         Array.isArray(candidateElements) &&
         candidateElements.length > 0
+    );
+    const useIncrementalVideoCards = useIncrementalHomeCards || Boolean(
+        incrementalVideoCards === true &&
+        ['/watch', '/results'].includes(document.location?.pathname || '') &&
+        Array.isArray(candidateElements) && candidateElements.length > 0
     );
     if (enforceCurrentChannelPageDirectAccess(effectiveSettings)) return;
     enforceCurrentWatchOwnerBlock(effectiveSettings);
@@ -5118,19 +5142,15 @@ async function applyDOMFallback(settings, options = {}) {
                 if (!isMembership) return;
 
                 const host = badge.closest(
-                    'ytd-grid-video-renderer, ytd-rich-grid-media, ytd-rich-item-renderer, ytd-video-renderer, ytd-compact-video-renderer, yt-lockup-view-model, ytd-playlist-video-renderer, ytd-watch-flexy, ytd-watch-metadata, ytd-video-primary-info-renderer'
+                    'ytd-grid-video-renderer, ytd-rich-grid-media, ytd-rich-item-renderer, ytd-video-renderer, ytd-compact-video-renderer, yt-lockup-view-model, ytd-playlist-video-renderer'
                 );
                 if (host) {
                     host.style.setProperty('display', 'none', 'important');
                     host.setAttribute('data-filtertube-hidden', 'true');
                     host.setAttribute('data-filtertube-members-only-hidden', 'true');
 
-                    const shelf = host.closest('ytd-shelf-renderer, ytd-horizontal-list-renderer, ytd-rich-section-renderer, ytd-item-section-renderer');
-                    if (shelf) {
-                        shelf.style.setProperty('display', 'none', 'important');
-                        shelf.setAttribute('data-filtertube-hidden', 'true');
-                        shelf.setAttribute('data-filtertube-members-only-hidden', 'true');
-                    }
+                    // A badge proves only this card is members-only, not the
+                    // surrounding search section or other cards in its shelf.
                 }
             });
 
@@ -5245,10 +5265,10 @@ async function applyDOMFallback(settings, options = {}) {
     const videoSelector = (onlyWhitelistPending && listMode === 'whitelist')
         ? `${VIDEO_CARD_SELECTORS}[data-filtertube-whitelist-pending="true"]`
         : VIDEO_CARD_SELECTORS;
-    const videoElements = useIncrementalHomeCards
+    const videoElements = useIncrementalVideoCards
         ? collectFilterTubeVisualCardOwnersFromCandidates(candidateElements, videoSelector)
         : collectFilterTubeVisualCardOwners(videoSelector);
-    perfRun.mode = useIncrementalHomeCards ? 'incremental-home' : 'full';
+    perfRun.mode = useIncrementalHomeCards ? 'incremental-home' : (useIncrementalVideoCards ? 'incremental-video' : 'full');
     perfRun.cards = videoElements.length;
     const categoryPolicySignature = getCategoryPolicySignature(effectiveSettings);
     const languagePolicySignature = getLanguagePolicySignature(effectiveSettings);
@@ -7072,7 +7092,7 @@ async function applyDOMFallback(settings, options = {}) {
         scheduleFilterTubeContinuationNudge(`hidden rows: ${filterTubeHiddenRowsThisRun}`);
     }
 
-    if (useIncrementalHomeCards) {
+    if (useIncrementalVideoCards) {
         return;
     }
 

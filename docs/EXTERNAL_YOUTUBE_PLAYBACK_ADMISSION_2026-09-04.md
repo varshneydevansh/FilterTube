@@ -66,6 +66,8 @@ Other sites that use an actual YouTube embed share the iframe-local admission gu
 
 ## Presentation and repeated-check safeguards
 
+2026-09-22 follow-up: metadata arrival alone warms an admission decision without displaying a banner. Presentation requires an actual media play event or the iframe MAIN-world playback-attempt message. Parent-document media needs its own YouTube identity evidence; a previously cached result or Google route fragment cannot assign that identity to unrelated media. The pre-pause check now uses verified settings metadata as well as the local network cache, matching the later decision path and avoiding an unnecessary pause/resume for cached allowed media. This does not claim arbitrary proxy-player coverage or installed-browser proof. The focused external/overlay/direct-admission set passes 44/44 after this follow-up; prior package builds predate it.
+
 Verified rejection uses FilterTube's themed overlay and muted looping background asset, with a static reduced-motion alternative. Checking and unavailable-metadata states remain neutral. Decorative overlay media is excluded from admission. Unchanged policy revisions are not repeatedly published, stale video decisions are ignored, and the metadata deadline does not schedule an immediate retry loop after expiry.
 
 This staged checkpoint also includes the first Advert Void role-selection correction in `seed.js`: identify a unique expected-duration content candidate before selecting advert media, exclude decorative media, and remove the arbitrary second-video fallback. The remaining quarantine safeguards and executable role regressions are recorded in a separate follow-up commit. Duration matching is a heuristic, not proof of video identity or immunity from ad-block detection.
@@ -92,3 +94,41 @@ Reload the built extension and verify on Google Search's Videos tab and full-scr
 8. Result overflow/menu actions: Google UI remains usable and does not navigate unexpectedly.
 
 Automated source checks are not installed-browser proof.
+# Live regression: recommendation identity mistaken for selected media (2026-09-22)
+
+Read-only inspection of the failing Google embed confirmed that the MAIN bridge
+held verified metadata for `gVRlg4BXKVo` (English Speeches), but pending admission
+targeted `EC5L1MSlqtg`. Calling the isolated guard's candidate extractor on the
+actual video reproduced that wrong ID from a nearby recommendation thumbnail.
+This was not a channel match or missing Player identity.
+
+Embedded media now uses the embed URL identity or the identity supplied by the
+MAIN bridge, never ancestor-scanned links/artwork. Embed clicks also leave identity
+selection to that bridge. A regression fixture verifies that recommendation
+artwork cannot pause allowed selected media, while a selected blocked channel
+still pauses. Installed-browser verification after extension reload remains open.
+
+## Google result hover-preview regression (2026-09-24)
+
+An ordinary Google Search result can start a muted thumbnail preview on hover.
+That preview is not an opened YouTube player. Previously the parent-page guard
+treated any such `video` play event as an admission attempt: it could infer a
+YouTube ID from nearby result links, pause the preview, and cover the entire
+search page with the checking or unavailable-metadata banner. Clicking the
+banner could then change the inferred candidate because click handling scanned
+non-link ancestors.
+
+The Google parent guard now admits top-document media only while Google's
+`fpstate=ive` inline viewer is open **and** the media's nearby identity matches
+the viewer's selected `vld` video ID. An ordinary search page or unrelated
+preview cannot acquire admission from cached Player metadata or a result link.
+Closing the viewer clears its pending banner without restarting stale media;
+non-link clicks do not select a video. The YouTube iframe guard remains
+independent and fail-closed for actual embedded playback. Google is also
+permitted to load only the FilterTube icon used by its admission overlay, and
+the icon has the branded red backing.
+
+Focused hover-preview, selected-player, embed, Disabled, and overlay source
+tests pass. This is source/test evidence only; reload the extension and check
+hover-only search results, a blocked opened inline video, and an allowed opened
+inline video before marking installed-browser behavior verified.

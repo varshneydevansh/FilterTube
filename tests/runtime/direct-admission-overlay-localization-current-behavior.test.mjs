@@ -201,14 +201,16 @@ test('direct Watch and Shorts overlays localize only keyed reason lines and keep
   const watchOverlay = runtime.document.getElementById('filtertube-direct-access-overlay');
   const shortOverlay = runtime.document.getElementById('filtertube-current-short-admission-overlay');
 
-  assert.equal(watchOverlay.textContent, 'Blocked channel\nUCGnjeahCJW1AF34HBmQTJ-Q\nDuration: 240 seconds');
-  assert.equal(shortOverlay.textContent, 'Checking FilterTube rules…\nVideo ID: currentVideoId');
+  assert.equal(watchOverlay.__filtertubeAdmissionReason.textContent, 'Blocked channel\nUCGnjeahCJW1AF34HBmQTJ-Q\nDuration: 240 seconds');
+  assert.equal(shortOverlay.__filtertubeAdmissionReason.textContent, 'Checking FilterTube rules…\nVideo ID: currentVideoId');
+  assert.equal(watchOverlay.style.position, 'absolute');
+  assert.equal(watchOverlay.style.width, '100%');
   await flushLocaleLoad();
 
   assert.equal(watchOverlay.getAttribute('dir'), 'rtl');
-  assert.equal(watchOverlay.textContent, `${arabicCatalog['admission.blockedChannel']}\nUCGnjeahCJW1AF34HBmQTJ-Q\nDuration: 240 seconds`);
+  assert.equal(watchOverlay.__filtertubeAdmissionReason.textContent, `${arabicCatalog['admission.blockedChannel']}\nUCGnjeahCJW1AF34HBmQTJ-Q\nDuration: 240 seconds`);
   assert.equal(shortOverlay.getAttribute('dir'), 'rtl');
-  assert.equal(shortOverlay.textContent, `${arabicCatalog['admission.checkingRules']}\nVideo ID: currentVideoId`);
+  assert.equal(shortOverlay.__filtertubeAdmissionReason.textContent, `${arabicCatalog['admission.checkingRules']}\nVideo ID: currentVideoId`);
   assert.equal(shortOverlay.getAttribute('data-state'), 'pending');
   assert.deepEqual(runtime.requested, ['extension://filtertube/data/ui_locales/ar.json']);
 });

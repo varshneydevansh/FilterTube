@@ -232,8 +232,10 @@ test('pending current-video admission rechecks only the player and never forces 
     'function setCurrentShortAdmissionOverlay(state, message) {',
     'function clearCurrentShortAdmissionOverlay() {'
   );
-  assert.match(directOverlay, /if \(overlay\.textContent !== nextMessage\) overlay\.textContent = nextMessage/);
-  assert.match(shortOverlay, /if \(overlay\.textContent !== nextMessage\) overlay\.textContent = nextMessage/);
+  for (const overlay of [directOverlay, shortOverlay]) {
+    assert.match(overlay, /overlay\.__filtertubeAdmissionSourceMessage !== nextMessage/);
+    assert.match(overlay, /setLocalizedAdmissionOverlayMessage\(overlay, nextState, nextMessage\)/);
+  }
 });
 
 test('streamed get_watch arrays provide exact current-video metadata without a second Player request', () => {
@@ -355,6 +357,34 @@ test('blocked-video presentation loses authority immediately when browser Back o
   assert.equal(cleared, 1, 'the previous blocked receipt must disappear synchronously');
   assert.equal(guardInstalled, 1);
   assert.equal(pauses, 1);
+});
+
+test('navigation finish preserves held play intent but never invents autoplay', () => {
+  const source = read('js/content/dom_fallback.js');
+  const finish = sliceBetween(source, 'function enforceCurrentVideoAdmissionForRoute(settings = currentSettings) {',
+    'function installDirectAccessPlayGuard() {');
+  const release = sliceBetween(source, 'function releaseDirectAccessGuard(videoId, resumePlayback = true) {',
+    'function isFilterTubeFilteringEnabled(settings) {');
+  for (const attemptedPlay of [true, false]) {
+    const state = { videoId: '', routeTransitionPending: true, pausedByGuard: true, wasPlaying: attemptedPlay };
+    let plays = 0;
+    const context = {
+      currentSettings: { enabled: true },
+      getDirectAccessState: () => state,
+      getCurrentWatchVideoId: () => 'NEWVIDEO001',
+      isFilterTubeFilteringEnabled: () => true,
+      clearDirectAccessOverlay() {},
+      document: { getElementById: () => null, querySelector: () => ({ play() { plays++; } }) }
+    };
+    vm.createContext(context);
+    vm.runInContext(`${release}\n${finish}\nfunction enforceCurrentWatchOwnerBlock() {
+      releaseDirectAccessGuard('NEWVIDEO001', true);
+    }\nthis.finish = enforceCurrentVideoAdmissionForRoute;`, context);
+    context.finish(context.currentSettings);
+    assert.equal(state.videoId, 'NEWVIDEO001');
+    assert.equal(state.decision, 'allowed');
+    assert.equal(plays, attemptedPlay ? 1 : 0);
+  }
 });
 
 test('a recycled player cannot bind the old URL while navigation is in progress', () => {
@@ -623,6 +653,29 @@ test('Disabled reaches the play guard and cleanup before an older DOM pass can r
   );
 });
 
+test('Disabled Watch enforcement executes cleanup without evaluating retained rules', () => {
+  const source = read('js/content/dom_fallback.js');
+  const body = sliceBetween(source, 'function enforceCurrentWatchOwnerBlock(settings) {',
+    'const FILTERTUBE_CATEGORY_PENDING_TTL_MS');
+  for (const staleEnabledArgument of [false, true]) {
+    let released = 0;
+    let evaluated = 0;
+    const disabled = { enabled: false, filterKeywords: ['podcast'], filterChannels: [{ id: 'blocked' }] };
+    const context = {
+      currentSettings: disabled,
+      isFilterTubeFilteringEnabled: settings => settings?.enabled !== false,
+      releaseDisabledDirectAccessState: () => { released += 1; },
+      getDirectAccessState: () => { evaluated += 1; throw new Error('Disabled evaluated rules'); }
+    };
+    vm.createContext(context);
+    vm.runInContext(`${body}; this.enforce = enforceCurrentWatchOwnerBlock;`, context);
+    context.enforce(staleEnabledArgument ? { ...disabled, enabled: true } : disabled);
+    assert.equal(released, 1);
+    assert.equal(evaluated, 0);
+    assert.deepEqual(disabled.filterKeywords, ['podcast']);
+  }
+});
+
 test('metadata bridge carries exact needs so text-only admission does not wait for category', () => {
   const bridge = read('js/content_bridge.js');
   const injector = read('js/injector.js');
@@ -674,7 +727,7 @@ test('YouTube embeds run in matching frames while search-engine pages stay out o
   assert.match(read('js/content/first_run_prompt.js'), /window\.top !== window/);
 });
 
-test('blocked playlist playback advances only to a verified allowed queue item and otherwise stays blocked', () => {
+test('blocked playback stays on the current video even with an allowed playlist successor', () => {
   const dom = read('js/content/dom_fallback.js');
   const help = read('html/tab-view.html');
   const spec = read('docs/USER_FEEDBACK_RULES_AND_GUIDANCE_SPEC_2026-08-08.md');
@@ -684,12 +737,10 @@ test('blocked playlist playback advances only to a verified allowed queue item a
     'const FILTERTUBE_CATEGORY_PENDING_TTL_MS'
   );
 
-  assert.match(admission, /findNextAllowedWatchPlaylistLink\(settings, ownerMeta\.videoId\)/);
-  assert.match(admission, /targetLink\.click\(\)/);
-  assert.doesNotMatch(admission, /nextButton\.click\(\)/);
+  assert.doesNotMatch(admission, /findNextAllowedWatchPlaylistLink\(|\.click\(|openWatchPlaylistPanelIfCollapsed\(/);
   assert.doesNotMatch(admission, /toggleVisibility\(shell, true/);
-  assert.match(admission, /No verified allowed successor exists/);
-  assert.match(help, /automatically moves to the next allowed video/);
+  assert.match(admission, /rejection owns only this video's admission/);
+  assert.match(help, /does not automatically choose another video/);
   assert.match(help, /does not read or remove ordinary YouTube links on Google Search or other websites/);
   assert.match(spec, /external search-result links remain visible/);
   assert.match(spec, /youtube-nocookie\.com\/embed\//);

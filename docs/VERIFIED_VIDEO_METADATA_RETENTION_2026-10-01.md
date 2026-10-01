@@ -23,3 +23,11 @@ The direct-admission executable suite and metadata suite passed 30/30 before the
 The network bridge now recovers an already-loaded `movie_player.getPlayerResponse()` on explicitly selected Google Search playback, not only a YouTube iframe. Recovery requires the Google `/search` selected-player fragment and exact matching video ID; ordinary search and hover previews do not create candidates. This extends the existing uncommitted iframe/late-metadata recovery and navigation `resolve_url` support, committed together because they share the recovery lifecycle.
 
 The external playback and new selected-Google recovery suites passed 23/23. This removes a demonstrated missing recovery path, not a promise that every external site's player or metadata failure is resolved.
+
+## Consolidated admission presentation and pending work
+
+Watch and Shorts now call the shared banner renderer, keeping the logo/red mark, reason, localization and background visuals consistent with external playback. Player-attached banners override the renderer's document-wide geometry with absolute player-sized geometry. Decorative background video is excluded from the direct play guard and cleaned up on release.
+
+The related pre-existing pending source work is retained and committed with its tests: held SPA playback intent binds to the new route at navigation finish, Google metadata prefetch/hover does not invoke admission, Watch/Search card mutations keep candidate-scoped scans, and membership badges hide the matching card rather than the containing section/Watch page.
+
+Latest combined focused admission, localization, external-player, metadata, mobile identity, large-list and membership suites passed 79/79. The broad historical blocking lane is still not green; see `ISSUE_VALIDATION_2026-10-01.md`. No installed-browser release claim is made.

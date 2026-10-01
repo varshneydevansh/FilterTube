@@ -7,6 +7,43 @@ import vm from 'node:vm';
 const root = process.cwd();
 const guardSource = fs.readFileSync(path.join(root, 'js/content/external_youtube_guard.js'), 'utf8');
 
+test('bundled locale catalogs are readable by YouTube and Google player frames', () => {
+  for (const name of ['manifest.json', 'manifest.chrome.json', 'manifest.opera.json', 'manifest.firefox.json']) {
+    const manifest = JSON.parse(fs.readFileSync(path.join(root, name), 'utf8'));
+    const resources = manifest.web_accessible_resources || [];
+    assert.ok(resources.some(entry => entry.resources.includes('data/ui_locales/*.json') &&
+      entry.matches.some(match => match.includes('youtube.com'))), `${name}: YouTube catalog access`);
+    assert.ok(resources.some(entry => entry.resources.includes('data/ui_locales/*.json') &&
+      entry.matches.some(match => match.includes('google.com'))), `${name}: Google player catalog access`);
+  }
+});
+
+test('admission copy loads the chosen local catalog without delaying the rule decision', async () => {
+  const overlay = { style: {}, isConnected: true, textContent: '' };
+  const requests = [];
+  const context = {
+    document: { documentElement: {}, createElement: undefined },
+    chrome: {
+      runtime: { getURL(file) { return `extension://filtertube/${file}`; } },
+      storage: { local: { get(_key, callback) { callback({ ftUiLocalePreference: 'ru' }); } } }
+    },
+    fetch(url) {
+      requests.push(url);
+      return Promise.resolve({ ok: true, json: () => Promise.resolve({ 'admission.blockedChannel': 'Заблокированный канал' }) });
+    },
+    matchMedia() { return { matches: false }; }
+  };
+  context.window = context;
+  context.globalThis = context;
+  vm.createContext(context);
+  vm.runInContext(fs.readFileSync(path.join(root, 'js/content/admission_overlay.js'), 'utf8'), context);
+  context.FilterTubeAdmissionOverlay.render(overlay, 'blocked', 'Blocked channel\nshakiraVEVO');
+  assert.equal(overlay.textContent, 'Blocked channel\nshakiraVEVO');
+  await new Promise(resolve => setImmediate(resolve));
+  assert.equal(overlay.textContent, 'Заблокированный канал\nshakiraVEVO');
+  assert.deepEqual(requests, ['extension://filtertube/data/ui_locales/ru.json']);
+});
+
 function activeSettings(overrides = {}) {
   return {
     enabled: true,
@@ -163,7 +200,7 @@ function loadGuard(settings, { reducedMotion = false } = {}) {
   const context = {
     URL, Promise, Date, Map, Set, WeakSet, RegExp,
     setTimeout, clearTimeout, document,
-    location: { href: 'https://www.google.com/search?q=shakira#fpstate=ive&vld=cid:abc,vid:fcnDmrtj6Sk,st:0' },
+    location: { href: 'https://www.youtube.com/embed/fcnDmrtj6Sk' },
     addEventListener(type, listener) { windowListeners.set(type, listener); },
     matchMedia(query) { return { matches: reducedMotion && query === '(prefers-reduced-motion: reduce)' }; },
     postMessage() {},
@@ -184,6 +221,7 @@ function loadGuard(settings, { reducedMotion = false } = {}) {
   context.window = context;
   context.globalThis = context;
   vm.createContext(context);
+  vm.runInContext(fs.readFileSync(path.join(root, 'js/content/admission_overlay.js'), 'utf8'), context);
   vm.runInContext(guardSource, context);
   return { context, guard: context.FilterTubeExternalYouTubeGuard, document, documentListeners, createdTags };
 }

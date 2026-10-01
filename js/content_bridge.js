@@ -7373,6 +7373,15 @@ async function initializeDOMFallback(settings) {
                 });
                 return;
             }
+            const route = document.location?.pathname || '';
+            if ((route === '/watch' || route === '/results') && !needsFullPass && candidates.length > 0) {
+                applyDOMFallback(null, {
+                    preserveScroll: true,
+                    incrementalVideoCards: true,
+                    candidateElements: candidates
+                });
+                return;
+            }
             applyDOMFallback(null);
         }
 

@@ -345,7 +345,36 @@ test('Home mutation fallback queues affected cards while structural mutations re
   assert.match(fallback, /function collectFilterTubeVisualCardOwnersFromCandidates\(candidates, selector\)/);
   assert.match(fallback, /const useIncrementalHomeCards = Boolean\(/);
   assert.match(fallback, /collectFilterTubeVisualCardOwnersFromCandidates\(candidateElements, videoSelector\)/);
-  assert.match(fallback, /if \(useIncrementalHomeCards\) \{\s*return;\s*\}/);
+  assert.match(fallback, /if \(useIncrementalVideoCards\) \{\s*return;\s*\}/);
+});
+
+test('Watch and Search card mutations keep their candidate scope while structural changes stay full', () => {
+  const bridge = read('js/content_bridge.js');
+  const start = bridge.indexOf('        function runPendingFallbackRequest() {');
+  const end = bridge.indexOf('        const whitelistPendingRefreshState', start);
+  assert.ok(start >= 0 && end > start);
+  const source = bridge.slice(start, end);
+  for (const route of ['/watch', '/results']) {
+    for (const full of [false, true]) {
+      const card = {};
+      const calls = [];
+      const run = Function('document', 'window', 'applyDOMFallback', 'pendingFallbackCandidates',
+        'pendingFallbackNeedsFullPass', 'pendingFallbackQueuedAt',
+        `${source}; return runPendingFallbackRequest;`)(
+        { location: { pathname: route } }, {}, (...args) => calls.push(args), new Set([card]), full, 0);
+      run();
+      assert.equal(calls.length, 1);
+      if (full) assert.equal(calls[0].length, 1);
+      else {
+        assert.equal(calls[0][1].incrementalVideoCards, true);
+        assert.deepEqual(calls[0][1].candidateElements, [card]);
+      }
+    }
+  }
+  const fallback = read('js/content/dom_fallback.js');
+  assert.match(fallback, /priorOptions\.incrementalVideoCards === true/);
+  assert.match(fallback, /options\.incrementalVideoCards === true/);
+  assert.match(fallback, /const videoElements = useIncrementalVideoCards/);
 });
 
 test('temporary performance diagnostics are opt-in and aggregate expensive stages', () => {
