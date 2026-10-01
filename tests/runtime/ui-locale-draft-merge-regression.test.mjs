@@ -51,3 +51,24 @@ test('draft merge protects delivery feature names before any catalog write', t =
         for (const locale of ['en', 'de']) assert.deepEqual(JSON.parse(fs.readFileSync(path.join(dir, `${locale}.json`))), {});
     }
 });
+
+test('draft merge preserves source-specific parser examples before writing catalogs', t => {
+    const cwd = fs.mkdtempSync(path.join(os.tmpdir(), 'filtertube-parser-example-merge-'));
+    t.after(() => fs.rmSync(cwd, { recursive: true, force: true }));
+    const dir = path.join(cwd, 'data/ui_locales');
+    fs.mkdirSync(dir, { recursive: true });
+    const write = (name, value) => fs.writeFileSync(path.join(dir, name), JSON.stringify(value));
+    write('targets.json', { locales: [{ code: 'en' }, { code: 'es' }] });
+    write('en.json', {});
+    write('es.json', {});
+    write('batch.json', { english: { key: 'Use channel_id,keyword,notes columns.' }, protectedLiterals: { key: ['channel_id,keyword,notes'] } });
+    write('draft.json', { keys: ['key'], translations: { es: ['Usa columnas identificador,palabra,notas.'] } });
+    const args = [script, 'data/ui_locales/batch.json', 'data/ui_locales/draft.json'];
+    let result = spawnSync(process.execPath, args, { cwd, encoding: 'utf8' });
+    assert.notEqual(result.status, 0);
+    assert.match(result.stderr, /changed protected literal/);
+    for (const locale of ['en', 'es']) assert.deepEqual(JSON.parse(fs.readFileSync(path.join(dir, `${locale}.json`))), {});
+    write('draft.json', { keys: ['key'], translations: { es: ['Usa las columnas channel_id,keyword,notes.'] } });
+    result = spawnSync(process.execPath, args, { cwd, encoding: 'utf8' });
+    assert.equal(result.status, 0, result.stderr);
+});

@@ -25,6 +25,11 @@ if (JSON.stringify(Object.keys(batch.translations).sort()) !== JSON.stringify(tr
     throw new Error('Translation batch must include every non-English target locale exactly once');
 }
 const keys = Object.keys(batch.english);
+for (const [key, terms] of Object.entries(batch.protectedLiterals || {})) {
+    if (!Object.hasOwn(batch.english, key) || !Array.isArray(terms) || terms.some(term => typeof term !== 'string' || !term || !batch.english[key].includes(term))) {
+        throw new Error(`Invalid protected literals for ${key}`);
+    }
+}
 const placeholders = value => [...value.matchAll(/\{([a-zA-Z][a-zA-Z0-9]*)\}/g)].map(match => match[1]).sort().join(',');
 for (const locale of translated) {
     const values = batch.translations[locale];
@@ -35,6 +40,9 @@ for (const locale of translated) {
         if (placeholders(values[index]) !== placeholders(batch.english[key])) throw new Error(`${locale}: changed placeholders for ${key}`);
         for (const term of ['FilterTube', 'YouTube', 'Advert Void', 'Home Bridge', 'Home Pickup', 'Internet Pickup']) {
             if (batch.english[key].includes(term) && !values[index].includes(term)) throw new Error(`${locale}: changed protected term ${term} for ${key}`);
+        }
+        for (const term of batch.protectedLiterals?.[key] || []) {
+            if (!values[index].includes(term)) throw new Error(`${locale}: changed protected literal ${term} for ${key}`);
         }
     });
 }

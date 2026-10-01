@@ -65,5 +65,11 @@
     "dashboard.modal.remaining.sendForLater": "Send for Later",
     "dashboard.modal.remaining.chooseDeliveryPath": "Choose one delivery path for {target}.",
     "dashboard.modal.remaining.safetyPhrase": "Phrase: {phrase}"
+  },
+  "protectedLiterals": {
+    "dashboard.modal.remaining.cSVChannelIdKeywordNotesOrTypeValueNotes": ["channel_id,keyword,notes", "type,value,notes"],
+    "dashboard.modal.remaining.textBareRowsAreChannelsTypedRowsCanUseChannelSomeChannelOrKeywordBrainrot": ["channel: @SomeChannel", "keyword: brainrot"],
+    "dashboard.modal.remaining.ruleListJSONChannelsAndKeywordsArrays": ["channels", "keywords"],
+    "dashboard.modal.remaining.blockTubeJSONFilterDataChannelTitleArraysArePreviewedHereAndSupportedVideoIDsSettingsAreAppliedByTheMigrationImporterMissingChannelMetadataIsEnrichedOneIDAtATimeAfterApproval": ["BlockTube", "filterData"]
   }
 }

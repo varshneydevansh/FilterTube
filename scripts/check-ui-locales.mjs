@@ -93,6 +93,19 @@ const batchDirectory = path.join(directory, 'batches');
 if (fs.existsSync(batchDirectory)) {
     for (const name of fs.readdirSync(batchDirectory).filter(value => value.endsWith('.json'))) {
         const batch = JSON.parse(fs.readFileSync(path.join(batchDirectory, name), 'utf8'));
+        for (const [key, terms] of Object.entries(batch.protectedLiterals || {})) {
+            if (!Array.isArray(terms) || terms.some(term => typeof term !== 'string' || !term || !batch.english?.[key]?.includes(term))) {
+                errors.push(`${name}: invalid protected literals for ${key}`);
+                continue;
+            }
+            for (const target of targets) {
+                const catalogFile = path.join(directory, `${target.code}.json`);
+                if (!fs.existsSync(catalogFile)) continue;
+                const value = JSON.parse(fs.readFileSync(catalogFile, 'utf8'))[key];
+                if (typeof value !== 'string') continue; // Missing keys are reported below.
+                for (const term of terms) if (!value.includes(term)) errors.push(`${name}: ${target.code} changed protected literal ${term} for ${key}`);
+            }
+        }
         if (!batch.english || !batch.translations) {
             const draftEnglish = batch.english || (batch.keys ? null : batch);
             if (draftEnglish) {
