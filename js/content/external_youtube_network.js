@@ -13,7 +13,7 @@
     root.__filtertubeExternalYouTubeNetworkInstalled = true;
 
     const VIDEO_ID_PATTERN = /^[A-Za-z0-9_-]{11}$/;
-    const ENDPOINT_PATTERN = /\/(?:youtubei\/v1\/(?:resolve_url|player|next))(?:\?|$)/;
+    const ENDPOINT_PATTERN = /\/youtubei\/v1\/(?:(?:navigation\/)?resolve_url|player|next)(?:\?|$)/;
     const CONTROL_SOURCE = 'filtertube-external-guard';
     const NETWORK_SOURCE = 'filtertube-external-network';
     let admissionActive = false;
@@ -23,12 +23,64 @@
     const isDecorativeMedia = media => media?.getAttribute?.('data-filtertube-admission-background') === 'true';
     const decisionsByVideoId = new Map();
     const heldMedia = new Map();
+    let recoveryTimer = null;
+    let recoveryAttempts = 0;
+    let pendingRecoveryVideoId = '';
+    let replayedPendingMetadata = '';
+
+    // Embedded Shorts can receive their Player response without a new fetch/XHR.
+    // Read only the selected player's response, never recommendation metadata.
+    function recoverLoadedMetadata(replayPending = false) {
+        if (!admissionActive || (!isYouTubeEmbedDocument() && !isSelectedGooglePlayerDocument())) return;
+        try {
+            const player = root.document?.getElementById?.('movie_player');
+            const response = player?.getPlayerResponse?.();
+            const metadata = sanitizePlayerMetadata(response);
+            const selectedId = player?.getVideoData?.()?.video_id;
+            const expectedId = extractLocationVideoId() || selectedId || currentVideoId;
+            if (!metadata || !VIDEO_ID_PATTERN.test(expectedId)
+                || metadata.videoId !== expectedId) return;
+            const signature = JSON.stringify(metadata);
+            if (signature === JSON.stringify(latestMetadata)) {
+                // A response may precede the isolated listener. Replay once on
+                // its pending request, but do not loop on genuinely missing fields.
+                if (!replayPending || replayedPendingMetadata === signature) return;
+                replayedPendingMetadata = signature;
+            }
+            relayPayload('loaded-player', response);
+        } catch (e) {}
+    }
+
+    function scheduleMetadataRecovery() {
+        if (recoveryTimer || typeof root.setTimeout !== 'function') return;
+        recoveryTimer = root.setTimeout(() => {
+            recoveryTimer = null;
+            if (!admissionActive || (!pendingRecoveryVideoId && heldMedia.size === 0)) return;
+            recoveryAttempts += 1;
+            recoverLoadedMetadata();
+            if (pendingRecoveryVideoId) scheduleMetadataRecovery();
+        }, recoveryAttempts < 24 ? 250 : 1000);
+    }
 
     function isYouTubeEmbedDocument() {
         try {
             const url = new URL(String(root.location?.href || ''));
             return /(^|\.)(youtube\.com|youtube-nocookie\.com)$/i.test(url.hostname)
                 && url.pathname.startsWith('/embed/');
+        } catch (e) {
+            return false;
+        }
+    }
+
+    function isSelectedGooglePlayerDocument() {
+        try {
+            const url = new URL(String(root.location?.href || ''));
+            let hash = url.hash || '';
+            try { hash = decodeURIComponent(hash); } catch (e) {}
+            return /(^|\.)google\.com$/i.test(url.hostname)
+                && url.pathname === '/search'
+                && /(?:^|[&#])fpstate=ive(?:[&;]|$)/.test(hash)
+                && VIDEO_ID_PATTERN.test(extractLocationVideoId());
         } catch (e) {
             return false;
         }
@@ -77,6 +129,7 @@
             else media.pause?.();
         } catch (e) {}
         postPlaybackAttempt(videoId);
+        scheduleMetadataRecovery();
         return true;
     }
 
@@ -100,6 +153,7 @@
     if (mediaPrototype && typeof originalMediaPlay === 'function') {
         mediaPrototype.play = function filterTubeExternalMediaPlay() {
             if (isDecorativeMedia(this)) return originalMediaPlay.apply(this, arguments);
+            recoverLoadedMetadata();
             const videoId = playbackVideoId();
             if (shouldHold(videoId)) {
                 pauseMedia(this, videoId);
@@ -119,6 +173,8 @@
     try {
         root.document?.addEventListener?.('play', holdPlayingMedia, true);
         root.document?.addEventListener?.('playing', holdPlayingMedia, true);
+        root.document?.addEventListener?.('loadedmetadata', () => recoverLoadedMetadata(true), true);
+        root.document?.addEventListener?.('loadeddata', () => recoverLoadedMetadata(true), true);
     } catch (e) {}
 
     function acceptControlMessage(data) {
@@ -127,13 +183,19 @@
             if (data.revision !== undefined && policyRevision === data.revision) return;
             policyRevision = data.revision;
             admissionActive = data.active === true;
+            recoveryAttempts = 0;
+            replayedPendingMetadata = '';
             if (!admissionActive) {
+                pendingRecoveryVideoId = '';
+                root.clearTimeout?.(recoveryTimer);
+                recoveryTimer = null;
                 decisionsByVideoId.clear();
                 resumeHeldMedia();
             } else {
                 // A settings refresh revokes every older allow decision until the
                 // isolated owner re-evaluates the current Player metadata.
                 decisionsByVideoId.clear();
+                recoverLoadedMetadata();
                 for (const media of root.document?.querySelectorAll?.('video') || []) {
                     if (isYouTubeEmbedDocument() && !media.paused) pauseMedia(media, playbackVideoId());
                 }
@@ -152,6 +214,16 @@
         const decision = String(data.decision || '');
         if (!VIDEO_ID_PATTERN.test(videoId) || !['pending', 'allowed', 'blocked'].includes(decision)) return;
         decisionsByVideoId.set(videoId, decision);
+        if (decision === 'pending') {
+            if (pendingRecoveryVideoId !== videoId) recoveryAttempts = 0;
+            pendingRecoveryVideoId = videoId;
+            recoverLoadedMetadata(true);
+            scheduleMetadataRecovery();
+        } else if (pendingRecoveryVideoId === videoId) {
+            pendingRecoveryVideoId = '';
+            root.clearTimeout?.(recoveryTimer);
+            recoveryTimer = null;
+        }
         if (decision === 'allowed') resumeHeldMedia(videoId);
     }
     function handleControlMessage(event) {

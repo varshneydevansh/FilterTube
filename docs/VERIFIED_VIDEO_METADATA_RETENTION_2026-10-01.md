@@ -17,3 +17,9 @@ This addresses concrete mechanisms relevant to #75 and repeated checking reporte
 Removed three autonomous playlist transitions outside the admission evaluator: the ended-event Next scheduler, selected-row delayed Next click, and hidden-selected-row successor retry. A blocked current video stays in place. Explicit user Next/Previous navigation remains, and its installed listener now checks current Disabled state before interception. Selected playlist rows remain visible rather than prompting YouTube to move away from them.
 
 The direct-admission executable suite and metadata suite passed 30/30 before the additional playlist source guard; the expanded metadata/playlist guard suite passed 4/4. Browser-installed playlist behavior still needs live confirmation.
+
+## External selected-player recovery
+
+The network bridge now recovers an already-loaded `movie_player.getPlayerResponse()` on explicitly selected Google Search playback, not only a YouTube iframe. Recovery requires the Google `/search` selected-player fragment and exact matching video ID; ordinary search and hover previews do not create candidates. This extends the existing uncommitted iframe/late-metadata recovery and navigation `resolve_url` support, committed together because they share the recovery lifecycle.
+
+The external playback and new selected-Google recovery suites passed 23/23. This removes a demonstrated missing recovery path, not a promise that every external site's player or metadata failure is resolved.

@@ -8,6 +8,73 @@ const root = process.cwd();
 const guardSource = fs.readFileSync(path.join(root, 'js/content/external_youtube_guard.js'), 'utf8');
 const networkSource = fs.readFileSync(path.join(root, 'js/content/external_youtube_network.js'), 'utf8');
 
+test('isolated pending admission recovers late metadata without a MAIN-owned paused media', () => {
+  const timers = new Map();
+  const posted = [];
+  let nextTimer = 0;
+  let response = null;
+  const context = { URL, Promise,
+    location: { href: 'https://www.youtube.com/embed/?enablejsapi=1' },
+    document: { addEventListener() {}, querySelectorAll() { return []; }, getElementById() {
+      return { getPlayerResponse: () => response, getVideoData: () => ({video_id: 'gVRlg4BXKVo'}) };
+    } },
+    setTimeout(callback) { timers.set(++nextTimer, callback); return nextTimer; },
+    clearTimeout(id) { timers.delete(id); },
+    postMessage(message) { posted.push(message); }, addEventListener() {} };
+  context.window = context;
+  vm.runInNewContext(networkSource, context);
+  const bridge = context.FilterTubeExternalYouTubeNetwork;
+  const control = {source: 'filtertube-external-guard', type: 'FilterTube_ExternalYouTubeAdmissionControl', active: true, revision: 1};
+  const pending = {source: control.source, type: 'FilterTube_ExternalYouTubeAdmissionDecision', videoId: 'gVRlg4BXKVo', decision: 'pending'};
+  bridge.acceptControlMessage(control);
+  bridge.acceptControlMessage(pending);
+  for (let i = 0; i < 30; i++) {
+    const [id, callback] = timers.entries().next().value;
+    timers.delete(id); callback();
+  }
+  assert.equal(posted.length, 0, 'late metadata must not cause timeout-based allowance');
+  response = {videoDetails: {videoId: 'gVRlg4BXKVo', channelId: 'UCLyr-hfWVCKHcZjV5fg3jbw', author: 'English Speeches', title: 'Shakira: Education Changes Everything'}};
+  const [id, callback] = timers.entries().next().value;
+  timers.delete(id); callback();
+  assert.equal(posted.at(-1).payload.channelName, 'English Speeches');
+  bridge.acceptControlMessage({...pending, decision: 'allowed'});
+  assert.equal(timers.size, 0, 'verified decisions stop recovery');
+  bridge.acceptControlMessage(pending);
+  bridge.acceptControlMessage({...control, active: false, revision: 2});
+  assert.equal(timers.size, 0, 'Disabled stops recovery');
+});
+
+test('loaded embedded Shorts metadata resolves channel-only admission without another network request', async () => {
+  const posted = [];
+  let selectedId = '0CCwuWQiLTA';
+  const response = { videoDetails: { videoId: selectedId, title: 'Una noche inolvidable con Shakira',
+    channelId: 'UCfgn1AVa96Rye5DRETetq6g', author: 'Karina & Marina', lengthSeconds: '58' } };
+  class Media {
+    play() { return Promise.resolve(); }
+    pause() {}
+  }
+  const context = { URL, Promise, HTMLMediaElement: Media,
+    location: { href: 'https://www.youtube.com/embed/?enablejsapi=1' },
+    document: { addEventListener() {}, querySelectorAll() { return []; },
+      getElementById() { return { getPlayerResponse: () => response, getVideoData: () => ({ video_id: selectedId }) }; } },
+    postMessage(message) { posted.push(message); }, addEventListener() {} };
+  context.window = context;
+  vm.runInNewContext(networkSource, context);
+  const bridge = context.FilterTubeExternalYouTubeNetwork;
+  bridge.acceptControlMessage({ type: 'FilterTube_ExternalYouTubeAdmissionControl', source: 'filtertube-external-guard', active: false, revision: 0 });
+  assert.equal(posted.length, 0, 'Disabled must not recover or relay metadata');
+  selectedId = 'fcnDmrtj6Sk';
+  bridge.acceptControlMessage({ type: 'FilterTube_ExternalYouTubeAdmissionControl', source: 'filtertube-external-guard', active: true, revision: 1 });
+  assert.equal(posted.length, 0, 'stale response for another selected video must not be used');
+  selectedId = '0CCwuWQiLTA';
+  await new context.HTMLMediaElement().play();
+  const metadata = posted.find(message => message.type === 'FilterTube_ExternalYouTubeMetadata')?.payload;
+  assert.equal(metadata?.channelId, response.videoDetails.channelId);
+  const { guard } = loadGuard(activeSettings());
+  assert.equal(guard.evaluateAdmission(activeSettings(), metadata, selectedId).state, 'allowed');
+  assert.equal(guard.evaluateAdmission(activeSettings({filterChannels: [{id: metadata.channelId}]}), metadata, selectedId).state, 'blocked');
+});
+
 function activeSettings(overrides = {}) {
   return {
     enabled: true,
@@ -57,7 +124,7 @@ function loadGuard(settings, href = 'https://www.google.com/search?q=shakira#fps
     }
   };
   const context = {
-    URL, Promise, Date, Map, Set, WeakSet, RegExp,
+    URL, URLSearchParams, Promise, Date, Map, Set, WeakSet, RegExp,
     setTimeout, clearTimeout, document,
     location: { href },
     addEventListener(type, listener) { windowListeners.set(type, listener); },
@@ -89,12 +156,30 @@ function makeVideo() {
     parentElement: null,
     pauseCount: 0,
     playCount: 0,
-    getAttribute() { return null; },
+    getAttribute(key) { return key === 'poster' ? 'https://i.ytimg.com/vi/fcnDmrtj6Sk/hqdefault.jpg' : null; },
     querySelectorAll() { return []; },
     pause() { this.pauseCount += 1; this.paused = true; },
     play() { this.playCount += 1; this.paused = false; return Promise.resolve(); }
   };
 }
+
+test('embedded media never adopts a recommendation thumbnail as its selected identity', async () => {
+  const loaded = loadGuard(activeSettings(), 'https://www.youtube.com/embed/?enablejsapi=1');
+  await new Promise(resolve => setTimeout(resolve, 0));
+  const video = makeVideo();
+  video.getAttribute = () => null;
+  video.parentElement = { nodeType: 1, getAttribute() { return null; }, querySelectorAll() {
+    return [{ getAttribute() { return 'https://i.ytimg.com/vi_webp/EC5L1MSlqtg/hqdefault.webp'; } }];
+  } };
+  assert.equal(loaded.guard.candidateFromElement(video).videoId, 'EC5L1MSlqtg', 'fixture reproduces the misleading recommendation');
+  loaded.guard.acceptExternalMetadata(playerMetadata({videoId: 'gVRlg4BXKVo', channelId: 'UCLyr-hfWVCKHcZjV5fg3jbw', channelName: 'English Speeches'}));
+  loaded.documentListeners.get('play')({target: video});
+  assert.equal(video.pauseCount, 0, 'allowed selected media must not be paused for a recommendation');
+  assert.equal(loaded.overlays.size, 0);
+  loaded.guard.acceptExternalMetadata(playerMetadata());
+  loaded.documentListeners.get('play')({target: video});
+  assert.equal(video.pauseCount, 1, 'selected blocked channel still pauses even with unrelated nearby artwork');
+});
 
 test('Google Search registers a MAIN-world metadata bridge and an isolated in-place guard', () => {
   for (const name of ['manifest.json', 'manifest.chrome.json', 'manifest.opera.json', 'manifest.firefox.json']) {
@@ -135,6 +220,67 @@ test('the supplied Player identity produces an exact blocked-channel decision in
   const decision = loaded.guard.evaluateAdmission(activeSettings(), playerMetadata(), 'fcnDmrtj6Sk');
   assert.equal(decision.state, 'blocked');
   assert.equal(decision.kind, 'channel');
+});
+
+test('prefetched blocked metadata on ordinary Google Search never creates a banner', async () => {
+  const loaded = loadGuard(activeSettings(), 'https://www.google.com/search?q=shakira');
+  await new Promise(resolve => setTimeout(resolve, 0));
+  loaded.guard.acceptExternalMetadata(playerMetadata());
+  assert.equal(loaded.overlays.size, 0);
+  const unrelated = makeVideo();
+  unrelated.getAttribute = () => null;
+  loaded.documentListeners.get('play')({ target: unrelated });
+  assert.equal(unrelated.pauseCount, 0);
+  assert.equal(loaded.overlays.size, 0);
+});
+
+test('hover-preview playback on ordinary Google Search never enters admission', async () => {
+  const loaded = loadGuard(activeSettings(), 'https://www.google.com/search?q=libreoffice+histogram');
+  await new Promise(resolve => setTimeout(resolve, 0));
+  const preview = makeVideo();
+  loaded.videos.push(preview);
+  loaded.documentListeners.get('play')({ target: preview });
+  assert.equal(preview.pauseCount, 0, 'a result-card preview is not the selected inline player');
+  assert.equal(loaded.overlays.size, 0);
+  loaded.windowListeners.get('hashchange')();
+  assert.equal(preview.pauseCount, 0, 'settings and route refreshes must not catch the preview later');
+  assert.equal(loaded.overlays.size, 0);
+  loaded.documentListeners.get('click')({ target: {
+    nodeType: 1, getAttribute() { return null; }, closest() { return null; },
+    querySelectorAll() { return [{getAttribute() { return 'https://www.youtube.com/watch?v=fcnDmrtj6Sk'; }}]; }
+  } });
+  assert.equal(loaded.overlays.size, 0, 'a non-link click cannot select a result from an ancestor');
+});
+
+test('Google inline admission only owns media matching its selected route', async () => {
+  const loaded = loadGuard(activeSettings());
+  await new Promise(resolve => setTimeout(resolve, 0));
+  const recommendationPreview = makeVideo();
+  recommendationPreview.getAttribute = key => key === 'poster'
+    ? 'https://i.ytimg.com/vi/EC5L1MSlqtg/hqdefault.jpg' : null;
+  loaded.documentListeners.get('play')({ target: recommendationPreview });
+  assert.equal(recommendationPreview.pauseCount, 0);
+  assert.equal(loaded.overlays.size, 0);
+
+  const selected = makeVideo();
+  loaded.documentListeners.get('play')({ target: selected });
+  assert.equal(selected.pauseCount, 1, 'selected inline media remains protected');
+  assert.equal(loaded.overlays.size, 1);
+  loaded.context.location.href = 'https://www.google.com/search?q=shakira';
+  loaded.windowListeners.get('hashchange')();
+  assert.equal(loaded.overlays.size, 0, 'closing the inline player clears its admission banner');
+  assert.equal(selected.playCount, 0, 'closing the player must not restart stale media');
+});
+
+test('verified settings metadata is used before pausing allowed playback', async () => {
+  const loaded = loadGuard(activeSettings({
+    filterChannels: [{ id: 'UC-other' }], videoMetaMap: { fcnDmrtj6Sk: playerMetadata() }
+  }));
+  await new Promise(resolve => setTimeout(resolve, 0));
+  const video = makeVideo();
+  loaded.documentListeners.get('play')({ target: video });
+  assert.equal(video.pauseCount, 0);
+  assert.equal(loaded.overlays.size, 0);
 });
 
 test('allowed Player metadata resumes the Google media without navigating away', async () => {
