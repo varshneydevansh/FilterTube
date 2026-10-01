@@ -1351,6 +1351,14 @@
                 processed.filterKeywords = settings.filterKeywords.map(buildKeywordRegex).filter(regex => regex !== null);
             }
 
+            if (Array.isArray(settings.filterKeywordsComments)) {
+                // Storage and the content bridge serialize comment patterns too.
+                // Keep already-compiled matchers compatible with in-page callers.
+                processed.filterKeywordsComments = settings.filterKeywordsComments
+                    .map(item => item && typeof item.test === 'function' ? item : buildKeywordRegex(item))
+                    .filter(regex => regex !== null);
+            }
+
             if (settings.whitelistKeywords && Array.isArray(settings.whitelistKeywords)) {
                 processed.whitelistKeywords = settings.whitelistKeywords.map(buildKeywordRegex).filter(regex => regex !== null);
             }

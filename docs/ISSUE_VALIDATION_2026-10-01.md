@@ -1,6 +1,20 @@
 # Linked issue validation
 
-Scope: #69, #75, #76, #77, #65, #62, and #60. Public issue bodies/comments were read; no issue status or comments were changed.
+Scope: #79, #69, #75, #76, #77, #65, #62, and #60. Public issue bodies/comments were read; no issue status or comments were changed.
+
+## Issue #79 — imported comment patterns
+
+The public reporter export contains 1,408 channel rules and 529 keyword rules, including 226 comment-enabled/comment-only rules. The export was inspected locally; it is not copied into this repository.
+
+A reproducible JSON-filtering defect was found: `settings_shared.js` and the background bridge serialize comment matchers as `{pattern, flags}`, but `filter_logic.js` reconstructed only video and whitelist matchers. Comment-only serialized patterns therefore had no `.test()` method and silently did not match comment bodies. The existing engine test explicitly recorded that broken behavior. This explains a comment-filter failure independently of sentence position; it does **not** establish the cause of the white-screen symptom.
+
+The engine now reconstructs the explicit comment keyword list through the existing matcher/date-condition compiler, preserving already-compiled matchers and leaving absent-list legacy fallback unchanged. Tests cover matching inside sentences, Unicode exact-word boundaries, unrelated comments, video-title isolation, Disabled and already-compiled matchers. The three-file engine/admission/mobile-owner group passes **91/91**. A separate local check using the reporter export exercises its 28 literal, non-date-restricted comment rules within sentences: **28/28 match**. The other 198 comment rules are regex/date-conditioned and were not validated by that literal-sentence check.
+
+The Firefox Android white-screen cause remains unconfirmed. No installed Firefox Android reproduction or white-screen fix is claimed, and #79 must not be treated as completely resolved. Modern `yt-comment-*` DOM-selector coverage is a separate candidate gap, not changed by this matcher fix.
+
+## Historical review correction — before September 27
+
+The earlier #60 statement that automatic LAN discovery is absent was too broad. `fdd98db8` (July 11) already adds provider-side nearby-device discovery and configured browser discovery clients, alongside the signed-policy delivery workflow. This is not proof of setup-free extension discovery, hosted delivery, or installed two-device/native parity. Likewise, pre-translation history already includes import-list workflows, mobile filtering and admission guards; later translation commits are not their origin. The remaining device/reporter gates below still apply.
 
 ## Follow-up test triage — October 1
 
@@ -24,7 +38,7 @@ The affected filter export/search reproduction for #75/#76 remains unavailable. 
 | #76 search stall / imported channels visible | Existing candidate-scoped Watch/Search work and large-rule tests address repeated full scans. Import parser/report tests passed 10/10. | Failing imported-list/search configuration and installed Chrome reproduction. |
 | #65 Firefox mobile Shorts | Fixed missing channel-ID/handle extraction from nested reel headers, including runs-based titles/channel names. Added reel Player responses to the existing fetch/XHR metadata path and retained wrapped Player snapshots. Five focused tests cover actual owner ID/handle rejection, unrelated title mentions, Disabled, metadata interception, exact route identity, and mobile overlay scope. Firefox manifest matches mobile YouTube. | Firefox Android installed smoke; no connected Android device was available. |
 | #62 subscribable/importable lists | URL-backed lists, CSV/TXT/JSON parsing, persistent reports, stale checks and parent-approved preview exist. Automatic checks run on dashboard open, not unattended background rule replacement. Parser/report tests passed 10/10. | Installed URL-list preview/update flow; unattended subscription sync must not be claimed. |
-| #60 remote parental controls | Signed live Nanah updates, local protected-profile authority and optional configured pickup clients exist. Live-send/open-sync/signing tests passed 35/35. | Two-device installed smoke and downstream native parity. Automatic LAN discovery or hosted delivery is not implemented. |
+| #60 remote parental controls | Signed live Nanah updates, local protected-profile authority, configured pickup clients and provider/configured-client nearby discovery exist. Live-send/open-sync/signing tests passed 35/35. | Two-device installed smoke and downstream native parity. Setup-free extension discovery and hosted delivery must not be claimed. |
 
 Direct admission plus metadata tests passed 30/30 before the playlist source assertion was added; the expanded metadata/playlist suite passed 4/4. A broad blocking lane passed 148/208 and failed 60 tests, including stale source-line/count/needle audits. It is not an all-green release lane and was not rewritten to manufacture success.
 

@@ -837,7 +837,7 @@ function commentRenderer(overrides = {}) {
   };
 }
 
-test('commentRenderer currently ignores serialized comment keyword list', () => {
+test('commentRenderer reconstructs serialized comment keywords and matches inside sentences', () => {
   const input = {
     contents: [{
       commentRenderer: commentRenderer({
@@ -849,7 +849,44 @@ test('commentRenderer currently ignores serialized comment keyword list', () => 
     filterKeywordsComments: [keyword('spider')]
   }));
 
-  assert.deepEqual(plain(output), plain(input));
+  assert.deepEqual(plain(output), { contents: [] });
+});
+
+test('serialized comment-only keywords leave unrelated comments and video titles intact', () => {
+  const input = {
+    contents: [
+      { commentRenderer: commentRenderer() },
+      { videoRenderer: videoRenderer({ title: { simpleText: 'spider video' } }) }
+    ]
+  };
+  const output = runEngine(plain(input), baseSettings({
+    filterKeywordsComments: [keyword('spider')]
+  }));
+  assert.deepEqual(plain(output), input);
+});
+
+test('disabled filtering leaves matching serialized comment keywords untouched', () => {
+  const input = { contents: [{ commentRenderer: commentRenderer({
+    contentText: { simpleText: 'This is an example sentence.' }
+  }) }] };
+  const output = runEngine(plain(input), baseSettings({
+    enabled: false,
+    filterKeywordsComments: [keyword('example')]
+  }));
+  assert.deepEqual(plain(output), input);
+});
+
+test('serialized exact comment keywords preserve Unicode word boundaries', () => {
+  const input = { contents: ['An example sentence.', 'examples', 'пример слова', 'примеры'].map(text => ({
+    commentRenderer: commentRenderer({ contentText: { simpleText: text } })
+  })) };
+  const output = runEngine(input, baseSettings({
+    filterKeywordsComments: [
+      keyword('(^|[^\\p{L}\\p{N}_])example(?=$|[^\\p{L}\\p{N}_])', 'iu'),
+      keyword('(^|[^\\p{L}\\p{N}_])пример(?=$|[^\\p{L}\\p{N}_])', 'iu')
+    ]
+  }));
+  assert.deepEqual(plain(output).contents.map(item => item.commentRenderer.contentText.simpleText), ['examples', 'примеры']);
 });
 
 test('commentRenderer currently blocks when comment keyword list already contains RegExp objects', () => {
