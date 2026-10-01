@@ -11,7 +11,7 @@ const docPath = 'docs/audit/FILTERTUBE_MAIN_FILTER_ALL_COMMENTS_SCOPE_CURRENT_BE
 
 const sourceFingerprints = {
   'js/state_manager.js': [2491, 99780, '509c559e35989c13cdded17c01eeaca8115addcd3848dbcda41514422e5bc7b6'],
-  'js/render_engine.js': [1389, 59073, 'ceb77f3e50a17affb726f099b15b52fdce311cd027b8f0903174b8d1433cbfa0'],
+  'js/render_engine.js': [2006, 89274, 'e8b792200c6cac6afbf727b91172ea048dfff8e3276e3d45d0334c6f3a443ab8'],
   'js/background.js': [6803, 306710, '57ddc6c3e31112c30734ede78c9b37b01bd31533fc8a1d16856b13d2b295f0d7'],
   'js/settings_shared.js': [1181, 57535, '9710ebb445ba11cc45fc98aced765d298226a8cd4a003600e106f908abc2162c'],
   'js/filter_logic.js': [3652, 172174, '953ef0f14970e6cfbc11215fe9eaa078ced34f001908e1c6d5903a8fd2d9a1f5']
@@ -31,16 +31,16 @@ const blockSpecs = {
     file: 'js/render_engine.js',
     start: 'const shouldShowToggles = includeToggles;',
     end: "        if (isChannelDerived && shouldShowToggles && profile === 'kids')",
-    startLine: 370,
-    lines: 64,
-    bytes: 3192,
-    hash: '6b0c019df85e4af542a4bbacedcc2c6d3a2a38a8ea00227fcd3e805351d0aa8b'
+    startLine: 729,
+    lines: 77,
+    bytes: 4313,
+    hash: '6996000ba143422d81809b44ea09fccbd8f392fe105d179241217dfecbf6953f'
   },
   renderEngineFindChannelByRef: {
     file: 'js/render_engine.js',
     start: 'function findChannelByRef(channelRef) {',
     end: '    /**\n     * Derive channel mapping for visualization',
-    startLine: 1222,
+    startLine: 1815,
     lines: 16,
     bytes: 669,
     hash: '99f016287c15dc172db5d82e74739ee0059a7490e855ac302409fd733c851701'

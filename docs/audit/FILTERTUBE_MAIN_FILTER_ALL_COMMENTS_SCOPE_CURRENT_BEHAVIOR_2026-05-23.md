@@ -24,7 +24,7 @@ runtime Main Filter All comments scope fixtures: 10
 | File | Lines | Bytes | SHA-256 |
 | --- | ---: | ---: | --- |
 | `js/state_manager.js` | 2491 | 99780 | `509c559e35989c13cdded17c01eeaca8115addcd3848dbcda41514422e5bc7b6` |
-| `js/render_engine.js` | 1389 | 59073 | `ceb77f3e50a17affb726f099b15b52fdce311cd027b8f0903174b8d1433cbfa0` |
+| `js/render_engine.js` | 2006 | 89274 | `e8b792200c6cac6afbf727b91172ea048dfff8e3276e3d45d0334c6f3a443ab8` |
 | `js/background.js` | 6803 | 306710 | `57ddc6c3e31112c30734ede78c9b37b01bd31533fc8a1d16856b13d2b295f0d7` |
 | `js/settings_shared.js` | 1181 | 57535 | `9710ebb445ba11cc45fc98aced765d298226a8cd4a003600e106f908abc2162c` |
 | `js/filter_logic.js` | 3652 | 172174 | `953ef0f14970e6cfbc11215fe9eaa078ced34f001908e1c6d5903a8fd2d9a1f5` |
@@ -34,8 +34,8 @@ runtime Main Filter All comments scope fixtures: 10
 | Block | Anchor | Lines | Bytes | SHA-256 |
 | --- | --- | ---: | ---: | --- |
 | `stateManagerToggleChannelFilterAllCommentsByRef` | `js/state_manager.js:1925` | 45 | 1434 | `13c85642e028eee9bb5dbd5b5f334c464539e8422a7d856632a58dfe98ebced3` |
-| `renderEngineKeywordCommentsToggle` | `js/render_engine.js:370` | 64 | 3192 | `6b0c019df85e4af542a4bbacedcc2c6d3a2a38a8ea00227fcd3e805351d0aa8b` |
-| `renderEngineFindChannelByRef` | `js/render_engine.js:1222` | 16 | 669 | `99f016287c15dc172db5d82e74739ee0059a7490e855ac302409fd733c851701` |
+| `renderEngineKeywordCommentsToggle` | `js/render_engine.js:729` | 77 | 4313 | `6996000ba143422d81809b44ea09fccbd8f392fe105d179241217dfecbf6953f` |
+| `renderEngineFindChannelByRef` | `js/render_engine.js:1815` | 16 | 669 | `99f016287c15dc172db5d82e74739ee0059a7490e855ac302409fd733c851701` |
 | `settingsSharedSyncFilterAllKeywords` | `js/settings_shared.js:412` | 72 | 2967 | `ce4e49c6055252ab9a6db6a30be91ddfb50efead1c1ef76bf736c38717febd25` |
 | `backgroundSyncStoredMainKeywordsWithChannels` | `js/background.js:1196` | 82 | 2534 | `11ab05bc86763b098b430c9545feefdcab8efa58b4fa59ff7770717bdf081a3d` |
 | `filterLogicCommentDecision` | `js/filter_logic.js:2214` | 33 | 1902 | `690889872bba60727d30a9544c2f3340e6df04631d970064869f641c4589a43d` |

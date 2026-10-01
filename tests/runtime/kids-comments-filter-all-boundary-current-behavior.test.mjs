@@ -258,7 +258,7 @@ test('Kids comments Filter All source counts remain pinned', () => {
   const rows = [
     ['StateManager toggleKidsKeywordComments block', blocks.stateKidsKeywordComments, 33, 1187],
     ['StateManager toggleKidsChannelFilterAll block', blocks.stateKidsChannelFilterAll, 35, 1184],
-    ['RenderEngine keyword comments gate block', blocks.renderKeywordCommentsGate, 64, 3192],
+    ['RenderEngine keyword comments gate block', blocks.renderKeywordCommentsGate, 77, 4313],
     ['RenderEngine channel Filter All toggle block', blocks.renderChannelFilterAllToggle, 44, 2100],
     ['background Kids compile block', blocks.backgroundKidsCompile, 47, 2401],
     ['background compiled channel object block', blocks.backgroundCompiledChannelObject, 27, 1850],
