@@ -25625,12 +25625,18 @@ document.addEventListener('DOMContentLoaded', async () => {
 
 
     async function runExportV3() {
-        if (!ensureNonChildAdminAction('Protected profiles cannot export backups from this surface.')) {
+        if (!ensureNonChildAdminAction(tabViewUiText(
+            'dashboard.backup.protected.exportBlocked',
+            'Protected profiles cannot export backups from this surface.'
+        ))) {
             return;
         }
         const io = window.FilterTubeIO;
         if (!io || typeof io.exportV3 !== 'function') {
-            UIComponents.showToast('Export unavailable (FilterTubeIO not loaded)', 'error');
+            UIComponents.showToast(tabViewUiText(
+                'dashboard.backup.toast.exportUnavailable',
+                'Export unavailable (FilterTubeIO not loaded)'
+            ), 'error');
             return;
         }
         try {
@@ -25678,33 +25684,36 @@ document.addEventListener('DOMContentLoaded', async () => {
             });
             UIComponents.showToast(
                 downloadResult?.method === 'anchor'
-                    ? 'Exported JSON to Downloads'
-                    : 'Exported JSON to Downloads/FilterTube Export/',
+                    ? tabViewUiText('dashboard.backup.toast.exportedToDownloads', 'Exported JSON to Downloads')
+                    : tabViewUiText('dashboard.backup.toast.exportedToDownloadsFolder', 'Exported JSON to Downloads/FilterTube Export/'),
                 'success'
             );
         } catch (e) {
-            UIComponents.showToast('Export failed', 'error');
+            UIComponents.showToast(tabViewUiText('dashboard.backup.toast.exportFailed', 'Export failed'), 'error');
             console.error('Export V3 failed', e);
         }
     }
 
     async function runExportV3Encrypted() {
-        if (!ensureNonChildAdminAction('Protected profiles cannot export encrypted backups from this surface.')) {
+        if (!ensureNonChildAdminAction(tabViewUiText(
+            'dashboard.backup.protected.exportEncryptedBlocked',
+            'Protected profiles cannot export encrypted backups from this surface.'
+        ))) {
             return;
         }
         const io = window.FilterTubeIO;
         if (!io || typeof io.exportV3Encrypted !== 'function') {
-            UIComponents.showToast('Encrypted export unavailable', 'error');
+            UIComponents.showToast(tabViewUiText('dashboard.backup.toast.encryptedExportUnavailable', 'Encrypted export unavailable'), 'error');
             return;
         }
 
         try {
             const passwordRaw = await showPromptModal({
-                title: 'Encrypted Export Password',
-                message: 'Enter a password/PIN to encrypt this export.',
-                placeholder: 'Password / PIN',
+                title: tabViewUiText('dashboard.backup.prompt.encrypt.title', 'Encrypted Export Password'),
+                message: tabViewUiText('dashboard.backup.prompt.encrypt.message', 'Enter a password/PIN to encrypt this export.'),
+                placeholder: tabViewUiText('dashboard.backup.prompt.passwordPlaceholder', 'Password / PIN'),
                 inputType: 'password',
-                confirmText: 'Encrypt'
+                confirmText: tabViewUiText('dashboard.backup.action.encrypt', 'Encrypt')
             });
             const password = normalizeString(passwordRaw);
             if (!password) return;
@@ -25759,24 +25768,32 @@ document.addEventListener('DOMContentLoaded', async () => {
             });
             UIComponents.showToast(
                 payload?.meta?.containsNanahTrustedState === true
-                    ? 'Exported encrypted backup with trusted-device recovery data'
-                    : (downloadResult?.method === 'anchor' ? 'Exported encrypted JSON to Downloads' : 'Exported encrypted JSON to Downloads/FilterTube Export/'),
+                    ? tabViewUiText('dashboard.backup.toast.encryptedExportedWithTrustedRecovery', 'Exported encrypted backup with trusted-device recovery data')
+                    : (downloadResult?.method === 'anchor'
+                        ? tabViewUiText('dashboard.backup.toast.encryptedExportedToDownloads', 'Exported encrypted JSON to Downloads')
+                        : tabViewUiText('dashboard.backup.toast.encryptedExportedToDownloadsFolder', 'Exported encrypted JSON to Downloads/FilterTube Export/')),
                 'success'
             );
         } catch (e) {
-            UIComponents.showToast('Encrypted export failed', 'error');
+            UIComponents.showToast(tabViewUiText('dashboard.backup.toast.encryptedExportFailed', 'Encrypted export failed'), 'error');
             console.error('Export encrypted failed', e);
         }
     }
 
     async function runImportV3FromFile(file) {
         if (!file) return;
-        if (!ensureNonChildAdminAction('Protected profiles cannot import backups from this surface.')) {
+        if (!ensureNonChildAdminAction(tabViewUiText(
+            'dashboard.backup.protected.importBlocked',
+            'Protected profiles cannot import backups from this surface.'
+        ))) {
             return;
         }
         const io = window.FilterTubeIO;
         if (!io || typeof io.importV3 !== 'function') {
-            UIComponents.showToast('Import unavailable (FilterTubeIO not loaded)', 'error');
+            UIComponents.showToast(tabViewUiText(
+                'dashboard.backup.toast.importUnavailable',
+                'Import unavailable (FilterTubeIO not loaded)'
+            ), 'error');
             return;
         }
 
@@ -25784,7 +25801,10 @@ document.addEventListener('DOMContentLoaded', async () => {
             const profilesV4 = profilesV4Cache || (typeof io.loadProfilesV4 === 'function' ? await io.loadProfilesV4() : null);
             const activeId = normalizeString(profilesV4?.activeProfileId) || 'default';
             if (activeId !== 'default') {
-                UIComponents.showToast('Switch to Default (Master) to import backups', 'error');
+                UIComponents.showToast(tabViewUiText(
+                    'dashboard.backup.toast.switchToDefaultForImport',
+                    'Switch to Default (Master) to import backups'
+                ), 'error');
                 return;
             }
 
@@ -25803,11 +25823,11 @@ document.addEventListener('DOMContentLoaded', async () => {
             let payload = parsed;
             if (safeObject(parsed?.meta).encrypted === true && parsed?.encrypted) {
                 const passwordRaw = await showPromptModal({
-                    title: 'Decrypt Backup',
-                    message: 'Enter the password/PIN used to encrypt this backup.',
-                    placeholder: 'Password / PIN',
+                    title: tabViewUiText('dashboard.backup.prompt.decrypt.title', 'Decrypt Backup'),
+                    message: tabViewUiText('dashboard.backup.prompt.decrypt.message', 'Enter the password/PIN used to encrypt this backup.'),
+                    placeholder: tabViewUiText('dashboard.backup.prompt.passwordPlaceholder', 'Password / PIN'),
                     inputType: 'password',
-                    confirmText: 'Decrypt'
+                    confirmText: tabViewUiText('dashboard.backup.action.decrypt', 'Decrypt')
                 });
                 const password = normalizeString(passwordRaw);
                 if (!password) return;
@@ -25845,7 +25865,10 @@ document.addEventListener('DOMContentLoaded', async () => {
             if (blockTubePayloadCandidate && typeof io.previewBlockTubeMigration === 'function') {
                 const preview = io.previewBlockTubeMigration(blockTubePayloadCandidate);
                 if (!preview?.ok) {
-                    UIComponents.showToast(preview?.error || 'BlockTube backup could not be read', 'error');
+                    UIComponents.showToast(preview?.error || tabViewUiText(
+                        'dashboard.managedLists.blockTubeBackupUnreadable',
+                        'BlockTube backup could not be read'
+                    ), 'error');
                     return;
                 }
                 const counts = safeObject(preview.counts);
@@ -25855,18 +25878,53 @@ document.addEventListener('DOMContentLoaded', async () => {
                 const invalidCount = safeArray(report.invalid).length;
                 const unknownCount = safeArray(report.unknown).length;
                 const choice = await showChoiceModal({
-                    title: 'Review BlockTube Migration',
-                    message: 'FilterTube will merge safe supported rules into the Default Main profile. Imported JavaScript is never run and uiPass is never used as a FilterTube PIN.',
+                    title: tabViewUiText('dashboard.backup.blockTube.review.title', 'Review BlockTube Migration'),
+                    message: tabViewUiText(
+                        'dashboard.backup.blockTube.review.message',
+                        'FilterTube will merge safe supported rules into the Default Main profile. Imported JavaScript is never run and uiPass is never used as a FilterTube PIN.'
+                    ),
                     details: [
-                        `${counts.channels || 0} effective channels (${counts.channelIds || 0} IDs + ${counts.channelNameRules || 0} name rules) · ${counts.videoIds || 0} video IDs`,
-                        `${counts.keywords || 0} title rules · ${counts.comments || 0} comment rules · ${counts.regex || 0} validated regex rules`,
-                        `${counts.mappedOptions || 0} mapped setting groups · ${counts.durationFilters || 0} duration filters`,
-                        `${inactiveCount} preserved inactive · ${unsupportedCount} unsupported · ${invalidCount} invalid · ${unknownCount} unknown`,
-                        'The original backup is unchanged. No per-channel YouTube requests are made during import.'
+                        tabViewUiText(
+                            'dashboard.backup.blockTube.review.channelCounts',
+                            '{channels} effective channels ({channelIds} IDs + {channelNameRules} name rules) · {videoIds} video IDs',
+                            {
+                                channels: counts.channels || 0,
+                                channelIds: counts.channelIds || 0,
+                                channelNameRules: counts.channelNameRules || 0,
+                                videoIds: counts.videoIds || 0
+                            }
+                        ),
+                        tabViewUiText(
+                            'dashboard.backup.blockTube.review.ruleCounts',
+                            '{keywords} title rules · {comments} comment rules · {regex} validated regex rules',
+                            { keywords: counts.keywords || 0, comments: counts.comments || 0, regex: counts.regex || 0 }
+                        ),
+                        tabViewUiText(
+                            'dashboard.backup.blockTube.review.settingCounts',
+                            '{mappedOptions} mapped setting groups · {durationFilters} duration filters',
+                            { mappedOptions: counts.mappedOptions || 0, durationFilters: counts.durationFilters || 0 }
+                        ),
+                        tabViewUiText(
+                            'dashboard.backup.blockTube.review.statusCounts',
+                            '{inactive} preserved inactive · {unsupported} unsupported · {invalid} invalid · {unknown} unknown',
+                            { inactive: inactiveCount, unsupported: unsupportedCount, invalid: invalidCount, unknown: unknownCount }
+                        ),
+                        tabViewUiText(
+                            'dashboard.backup.blockTube.review.privacy',
+                            'The original backup is unchanged. No per-channel YouTube requests are made during import.'
+                        )
                     ],
                     choices: [
-                        { value: 'import', label: 'Import Reviewed Rules', recommended: true },
-                        { value: 'download_report', label: 'Download Migration Report', className: 'btn-secondary' }
+                        {
+                            value: 'import',
+                            label: tabViewUiText('dashboard.backup.blockTube.review.importAction', 'Import Reviewed Rules'),
+                            recommended: true
+                        },
+                        {
+                            value: 'download_report',
+                            label: tabViewUiText('dashboard.backup.blockTube.review.downloadReportAction', 'Download Migration Report'),
+                            className: 'btn-secondary'
+                        }
                     ],
                     cancelText: 'Cancel'
                 });
@@ -25877,7 +25935,10 @@ document.addEventListener('DOMContentLoaded', async () => {
                         { generatedAt: new Date().toISOString(), counts, report },
                         { preferAnchor: IS_FIREFOX_TAB_VIEW }
                     );
-                    UIComponents.showToast('Migration report downloaded; choose the backup again when ready to import', 'success');
+                    UIComponents.showToast(tabViewUiText(
+                        'dashboard.backup.blockTube.reportDownloaded',
+                        'Migration report downloaded; choose the backup again when ready to import'
+                    ), 'success');
                     return;
                 }
                 if (choice !== 'import') return;
@@ -25903,11 +25964,11 @@ document.addEventListener('DOMContentLoaded', async () => {
 
                 if (localActive === 'default' && effectiveScope === 'full' && incomingVerifier) {
                     const backupPinRaw = await showPromptModal({
-                        title: 'Backup Master PIN',
-                        message: 'This backup is protected by a Master PIN. Enter it to import.',
-                        placeholder: 'Master PIN',
+                        title: tabViewUiText('dashboard.backup.prompt.masterPin.title', 'Backup Master PIN'),
+                        message: tabViewUiText('dashboard.backup.prompt.masterPin.message', 'This backup is protected by a Master PIN. Enter it to import.'),
+                        placeholder: tabViewUiText('dashboard.backup.prompt.masterPin.placeholder', 'Master PIN'),
                         inputType: 'password',
-                        confirmText: 'Authorize'
+                        confirmText: tabViewUiText('dashboard.backup.action.authorize', 'Authorize')
                     });
                     const backupPin = normalizeString(backupPinRaw);
                     if (!backupPin) return;
@@ -25924,22 +25985,31 @@ document.addEventListener('DOMContentLoaded', async () => {
                     && effectiveScope === 'full'
                 ) {
                     const restoreChoice = await showChoiceModal({
-                        title: 'Restore Trusted Devices Too?',
-                        message: 'This encrypted full backup also contains Nanah trusted-device recovery data.',
+                        title: tabViewUiText('dashboard.backup.restoreTrusted.title', 'Restore Trusted Devices Too?'),
+                        message: tabViewUiText('dashboard.backup.restoreTrusted.message', 'This encrypted full backup also contains Nanah trusted-device recovery data.'),
                         details: [
-                            'Use this only when restoring the same device after reinstall or local data loss.',
-                            'Restoring it on a different device can clone the saved Nanah device identity.',
-                            'Choose Settings Only to restore profiles, filters, and rules without restoring trusted-device identity.'
+                            tabViewUiText(
+                                'dashboard.backup.restoreTrusted.sameDevice',
+                                'Use this only when restoring the same device after reinstall or local data loss.'
+                            ),
+                            tabViewUiText(
+                                'dashboard.backup.restoreTrusted.cloneWarning',
+                                'Restoring it on a different device can clone the saved Nanah device identity.'
+                            ),
+                            tabViewUiText(
+                                'dashboard.backup.restoreTrusted.settingsOnlyHelp',
+                                'Choose Settings Only to restore profiles, filters, and rules without restoring trusted-device identity.'
+                            )
                         ],
                         choices: [
                             {
                                 value: 'settings_only',
-                                label: 'Settings Only',
+                                label: tabViewUiText('dashboard.backup.restoreTrusted.settingsOnly', 'Settings Only'),
                                 recommended: true
                             },
                             {
                                 value: 'restore_trust',
-                                label: 'Restore Trusted Devices',
+                                label: tabViewUiText('dashboard.backup.restoreTrusted.restoreDevices', 'Restore Trusted Devices'),
                                 className: 'btn-secondary'
                             }
                         ],
@@ -25986,44 +26056,130 @@ document.addEventListener('DOMContentLoaded', async () => {
             const receipt = safeObject(importResult?.receipt);
             if (blockTubeMigrationApproved && receipt.verified === true) {
                 await showChoiceModal({
-                    title: 'BlockTube Import Verified',
-                    message: 'FilterTube saved the reviewed rules and read them back from the active profile before reporting success.',
+                    title: tabViewUiText(
+                        'dashboard.managedLists.blockTubeImportVerifiedTitle',
+                        'BlockTube Import Verified'
+                    ),
+                    message: tabViewUiText(
+                        'dashboard.backup.blockTube.verified.message',
+                        'FilterTube saved the reviewed rules and read them back from the active profile before reporting success.'
+                    ),
                     details: [
-                        `Added ${Number(receipt.addedChannels) || 0} effective channels (${Number(receipt.channelIds) || 0} IDs + ${Number(receipt.channelNameRules) || 0} name rules) · ${Number(receipt.addedVideoIds) || 0} video IDs`,
-                        `Added ${Number(receipt.addedKeywords) || 0} keyword/comment rules · ${Number(receipt.regex) || 0} regex rules reviewed`,
-                        `Already present: ${Number(receipt.duplicateChannels) || 0} channels · ${Number(receipt.duplicateKeywords) || 0} keyword/comment rules · ${Number(receipt.duplicateVideoIds) || 0} video IDs`,
-                        `Skipped or unsupported outcomes: ${Number(receipt.skippedRows) || 0}`,
-                        `Target profile: ${normalizeString(receipt.targetProfileId) || 'default'}`,
+                        tabViewUiText(
+                            'dashboard.backup.blockTube.verified.channelCounts',
+                            'Added {channels} effective channels ({channelIds} IDs + {channelNameRules} name rules) · {videoIds} video IDs',
+                            {
+                                channels: Number(receipt.addedChannels) || 0,
+                                channelIds: Number(receipt.channelIds) || 0,
+                                channelNameRules: Number(receipt.channelNameRules) || 0,
+                                videoIds: Number(receipt.addedVideoIds) || 0
+                            }
+                        ),
+                        tabViewUiText(
+                            'dashboard.backup.blockTube.verified.ruleCounts',
+                            'Added {keywords} keyword/comment rules · {regex} regex rules reviewed',
+                            { keywords: Number(receipt.addedKeywords) || 0, regex: Number(receipt.regex) || 0 }
+                        ),
+                        tabViewUiText(
+                            'dashboard.backup.blockTube.verified.alreadyPresent',
+                            'Already present: {channels} channels · {keywords} keyword/comment rules · {videoIds} video IDs',
+                            {
+                                channels: Number(receipt.duplicateChannels) || 0,
+                                keywords: Number(receipt.duplicateKeywords) || 0,
+                                videoIds: Number(receipt.duplicateVideoIds) || 0
+                            }
+                        ),
+                        tabViewUiText(
+                            'dashboard.backup.blockTube.verified.skipped',
+                            'Skipped or unsupported outcomes: {count}',
+                            { count: Number(receipt.skippedRows) || 0 }
+                        ),
+                        tabViewUiText(
+                            'dashboard.backup.blockTube.verified.targetProfile',
+                            'Target profile: {profile}',
+                            { profile: normalizeString(receipt.targetProfileId) || 'default' }
+                        ),
                         importResult?.restoredNanahState
-                            ? 'Trusted-device recovery data was also restored.'
-                            : 'No trusted-device identity was changed.',
+                            ? tabViewUiText(
+                                'dashboard.backup.blockTube.verified.recoveryRestored',
+                                'Trusted-device recovery data was also restored.'
+                            )
+                            : tabViewUiText(
+                                'dashboard.backup.blockTube.verified.identityUnchanged',
+                                'No trusted-device identity was changed.'
+                            ),
                         importedChannelEnrichment?.pending
-                            ? `Imported channel metadata will be completed in the extension background one row at a time at a randomized 7–15 second interval while the worker is awake (${Number(importedChannelEnrichment.pending) || 0} pending). Large lists can take time; this pacing avoids a burst of YouTube requests. Permanent not-found or terminated rows stop retrying and remain in Import Reports for manual verification. Closing this dashboard does not stop the queue, although browser shutdown or wakeup limits can delay it.`
+                            ? tabViewUiText(
+                                'dashboard.backup.blockTube.verified.metadataPending',
+                                'Imported channel metadata will be completed in the extension background one row at a time at a randomized 7–15 second interval while the worker is awake ({count} pending). Large lists can take time; this pacing avoids a burst of YouTube requests. Permanent not-found or terminated rows stop retrying and remain in Import Reports for manual verification. Closing this dashboard does not stop the queue, although browser shutdown or wakeup limits can delay it.',
+                                { count: Number(importedChannelEnrichment.pending) || 0 }
+                            )
                             : (importedChannelEnrichment?.attention
-                                ? `${Number(importedChannelEnrichment.attention) || 0} imported channel ${Number(importedChannelEnrichment.attention) === 1 ? 'row needs' : 'rows need'} manual verification in Import Reports; the exact YouTube reason is retained.`
-                                : 'All imported channel metadata is already complete; no background lookup is pending.')
+                                ? tabViewUiText(
+                                    Number(importedChannelEnrichment.attention) === 1
+                                        ? 'dashboard.backup.blockTube.verified.metadataReviewSingular'
+                                        : 'dashboard.backup.blockTube.verified.metadataReviewPlural',
+                                    Number(importedChannelEnrichment.attention) === 1
+                                        ? '{count} imported channel row needs manual verification in Import Reports; the exact YouTube reason is retained.'
+                                        : '{count} imported channel rows need manual verification in Import Reports; the exact YouTube reason is retained.',
+                                    { count: Number(importedChannelEnrichment.attention) || 0 }
+                                )
+                                : tabViewUiText(
+                                    'dashboard.backup.blockTube.verified.metadataComplete',
+                                    'All imported channel metadata is already complete; no background lookup is pending.'
+                                ))
                     ],
                     choices: [
-                        { value: 'done', label: 'Done', recommended: true }
+                        {
+                            value: 'done',
+                            label: tabViewUiText('dashboard.backup.action.done', 'Done'),
+                            recommended: true
+                        }
                     ],
-                    cancelText: 'Close'
+                    cancelText: tabViewUiText('dashboard.backup.action.close', 'Close')
                 });
             } else {
                 const metadataNotice = importedChannelEnrichment?.pending
-                    ? ` Channel details continue in the extension background (${Number(importedChannelEnrichment.pending) || 0} pending), one row at a time at a randomized 7–15 second interval while the worker is awake; large lists can take time. Closing this dashboard does not stop the queue. Permanent not-found or terminated rows stop retrying and remain in Import Reports for manual verification.`
+                    ? tabViewUiText(
+                        'dashboard.backup.import.metadataPendingToast',
+                        'Channel details continue in the extension background ({count} pending), one row at a time at a randomized 7–15 second interval while the worker is awake; large lists can take time. Closing this dashboard does not stop the queue. Permanent not-found or terminated rows stop retrying and remain in Import Reports for manual verification.',
+                        { count: Number(importedChannelEnrichment.pending) || 0 }
+                    )
                     : (importedChannelEnrichment?.attention
-                        ? ` ${Number(importedChannelEnrichment.attention) || 0} imported channel ${Number(importedChannelEnrichment.attention) === 1 ? 'row needs' : 'rows need'} manual verification; see Import Reports for the exact YouTube reason.`
-                        : ' Channel details are already complete.');
+                        ? tabViewUiText(
+                            Number(importedChannelEnrichment.attention) === 1
+                                ? 'dashboard.backup.import.metadataReviewSingular'
+                                : 'dashboard.backup.import.metadataReviewPlural',
+                            Number(importedChannelEnrichment.attention) === 1
+                                ? '{count} imported channel row needs manual verification; see Import Reports for the exact YouTube reason.'
+                                : '{count} imported channel rows need manual verification; see Import Reports for the exact YouTube reason.',
+                            { count: Number(importedChannelEnrichment.attention) || 0 }
+                        )
+                        : tabViewUiText(
+                            'dashboard.backup.import.metadataCompleteToast',
+                            'Channel details are already complete.'
+                        ));
+                const importStatus = importResult?.restoredNanahState
+                    ? tabViewUiText(
+                        'dashboard.backup.import.verifiedWithTrustedRecovery',
+                        'Import verified and trusted-device recovery data restored'
+                    )
+                    : tabViewUiText('dashboard.backup.import.verified', 'Import verified');
                 UIComponents.showToast(
-                    `${importResult?.restoredNanahState
-                        ? 'Import verified and trusted-device recovery data restored'
-                        : 'Import verified'}.${metadataNotice}`,
+                    `${importStatus}. ${metadataNotice}`,
                     'success'
                 );
             }
         } catch (e) {
-            const message = normalizeString(e?.message) || 'The file could not be imported';
-            UIComponents.showToast(`Import failed: ${message.slice(0, 180)}`, 'error');
+            const message = normalizeString(e?.message) || tabViewUiText(
+                'dashboard.backup.import.failedFallback',
+                'The file could not be imported'
+            );
+            UIComponents.showToast(tabViewUiText(
+                'dashboard.backup.import.failed',
+                'Import failed: {message}',
+                { message: message.slice(0, 180) }
+            ), 'error');
             console.error('Import V3 failed', e);
         }
     }
@@ -26031,7 +26187,10 @@ document.addEventListener('DOMContentLoaded', async () => {
     if (ftExportV3Btn) {
         ftExportV3Btn.addEventListener('click', () => {
             if (getActiveProfileType() === 'child') {
-                UIComponents.showToast('Protected profiles cannot export backups here', 'error');
+                UIComponents.showToast(tabViewUiText(
+                    'dashboard.backup.protected.exportButtonBlocked',
+                    'Protected profiles cannot export backups here'
+                ), 'error');
                 return;
             }
             runExportV3();
@@ -26041,7 +26200,10 @@ document.addEventListener('DOMContentLoaded', async () => {
     if (ftExportV3EncryptedBtn) {
         ftExportV3EncryptedBtn.addEventListener('click', () => {
             if (getActiveProfileType() === 'child') {
-                UIComponents.showToast('Protected profiles cannot export encrypted backups here', 'error');
+                UIComponents.showToast(tabViewUiText(
+                    'dashboard.backup.protected.exportEncryptedButtonBlocked',
+                    'Protected profiles cannot export encrypted backups here'
+                ), 'error');
                 return;
             }
             runExportV3Encrypted();
@@ -26051,7 +26213,10 @@ document.addEventListener('DOMContentLoaded', async () => {
     if (ftImportV3Btn && ftImportV3File) {
         ftImportV3Btn.addEventListener('click', () => {
             if (getActiveProfileType() === 'child') {
-                UIComponents.showToast('Protected profiles cannot import backups here', 'error');
+                UIComponents.showToast(tabViewUiText(
+                    'dashboard.backup.protected.importButtonBlocked',
+                    'Protected profiles cannot import backups here'
+                ), 'error');
                 return;
             }
             ftImportV3File.click();
