@@ -10,6 +10,26 @@ const seed = fs.readFileSync('js/seed.js', 'utf8');
 const slice = (source, start, end) => source.slice(source.indexOf(start), source.indexOf(end, source.indexOf(start)));
 const videoId = 'Ptng0VmOt-c';
 
+test('wrapped reel Player metadata reaches exact-video verified owner cache', () => {
+    const runtime = loadFilterTubeEngine();
+    const channelId = 'UC1234567890123456789012';
+    const input = { playerResponse: {
+        videoDetails: { videoId, channelId, title: 'Ordinary short', author: 'Duck Shorts', lengthSeconds: '30' },
+        microformat: { playerMicroformatRenderer: { ownerProfileUrl: 'https://www.youtube.com/@duckshort2' } }
+    } };
+    runtime.engine.processData(input, { enabled: true, listMode: 'blocklist', filterChannels: [],
+        filterKeywords: [], whitelistKeywords: [], whitelistChannels: [], blockedVideoIds: [],
+        allowedVideoIds: [], channelMap: {} }, 'reel/reel_item_watch');
+    runtime.flushTimers();
+    const meta = runtime.messages.filter(message => message.type === 'FilterTube_UpdateVideoMetaMap')
+        .flatMap(message => message.payload).find(meta => meta.videoId === videoId);
+    assert.ok(meta);
+    assert.equal(meta.channelId, channelId);
+    assert.equal(meta.channelHandle, '@duckshort2');
+    assert.equal(meta.identityVerified, true);
+    assert.equal(meta.title, 'Ordinary short');
+});
+
 test('nested mobile reel channel identity blocks only the actual owner', () => {
     const channelId = 'UC1234567890123456789012';
     const card = (id, handle) => ({ reelItemRenderer: { videoId,
