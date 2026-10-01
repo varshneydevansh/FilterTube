@@ -929,7 +929,7 @@ async function initializeAndroidClosedTestingInvite() {
 
 function initializeFiltersTabs() {
     // Helper function to create compact inline condition rows
-    function createCompactCondition({ name, value, labelText, fields }) {
+    function createCompactCondition({ name, value, labelText, labelKey, fields }) {
         const wrapper = document.createElement('div');
         wrapper.className = 'video-filter-compact-option';
 
@@ -943,13 +943,13 @@ function initializeFiltersTabs() {
         radio.id = `${name}_${value}`;
         radio.className = 'video-filter-compact-radio';
 
-    const label = document.createElement('label');
-    label.htmlFor = `${name}_${value}`;
-    if (labelKey) {
-        setTabViewLocalizedCopy(label, 'textContent', labelKey, labelText);
-    } else {
-        label.textContent = labelText;
-    }
+        const label = document.createElement('label');
+        label.htmlFor = `${name}_${value}`;
+        if (labelKey) {
+            setTabViewLocalizedCopy(label, 'textContent', labelKey, labelText);
+        } else {
+            label.textContent = labelText;
+        }
         label.className = 'video-filter-compact-label';
 
         mainRow.appendChild(radio);
@@ -1130,6 +1130,7 @@ function initializeFiltersTabs() {
 
         <div id="channelListEl" class="advanced-list"></div>
     `;
+    bindTabViewLocalizedMarkup(channelsContent);
 
     // Content tab with checkboxes
     const contentTab = document.createElement('div');
@@ -2721,7 +2722,6 @@ function initializeKidsTabs() {
 
         <div id="kidsChannelListEl" class="advanced-list"></div>
     `;
-    bindTabViewLocalizedMarkup(channelsContent);
     bindTabViewLocalizedMarkup(kidsKeywordsContent);
     bindTabViewLocalizedMarkup(kidsChannelsContent);
 
