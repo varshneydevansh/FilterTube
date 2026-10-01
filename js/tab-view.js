@@ -20270,7 +20270,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         if (!targetId) return false;
         const io = window.FilterTubeIO || {};
         if (typeof io.loadProfilesV4 !== 'function') {
-            UIComponents.showToast('Profiles unavailable', 'error');
+            UIComponents.showToast(tabViewUiText('popup.profile.unavailable', 'Profiles unavailable'), 'error');
             return false;
         }
         const fresh = await io.loadProfilesV4();
@@ -20399,7 +20399,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         }
         const io = window.FilterTubeIO || {};
         if (typeof io.loadProfilesV4 !== 'function') {
-            UIComponents.showToast('Profiles unavailable', 'error');
+            UIComponents.showToast(tabViewUiText('popup.profile.unavailable', 'Profiles unavailable'), 'error');
             return null;
         }
         if (!nanahManagedLivePolicy) {
@@ -26888,7 +26888,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             if (!ensureNotScopedProtectedEditForGlobalAdmin('account creation')) return;
             const io = window.FilterTubeIO || {};
             if (typeof io.loadProfilesV4 !== 'function' || typeof io.saveProfilesV4 !== 'function') {
-                UIComponents.showToast('Profiles unavailable', 'error');
+                UIComponents.showToast(tabViewUiText('popup.profile.unavailable', 'Profiles unavailable'), 'error');
                 return;
             }
 
@@ -27011,7 +27011,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             if (!ensureNotScopedProtectedEditForGlobalAdmin('protected profile creation')) return;
             const io = window.FilterTubeIO || {};
             if (typeof io.loadProfilesV4 !== 'function' || typeof io.saveProfilesV4 !== 'function') {
-                UIComponents.showToast('Profiles unavailable', 'error');
+                UIComponents.showToast(tabViewUiText('popup.profile.unavailable', 'Profiles unavailable'), 'error');
                 return;
             }
 
@@ -27121,7 +27121,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             if (!ensureNotScopedProtectedEditForGlobalAdmin('Master PIN controls')) return;
             const io = window.FilterTubeIO || {};
             if (typeof io.loadProfilesV4 !== 'function' || typeof io.saveProfilesV4 !== 'function') {
-                UIComponents.showToast('Profiles unavailable', 'error');
+                UIComponents.showToast(tabViewUiText('popup.profile.unavailable', 'Profiles unavailable'), 'error');
                 return;
             }
             const profilesV4 = await io.loadProfilesV4();
@@ -27199,7 +27199,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             if (!ensureNotScopedProtectedEditForGlobalAdmin('Master PIN controls')) return;
             const io = window.FilterTubeIO || {};
             if (typeof io.loadProfilesV4 !== 'function' || typeof io.saveProfilesV4 !== 'function') {
-                UIComponents.showToast('Profiles unavailable', 'error');
+                UIComponents.showToast(tabViewUiText('popup.profile.unavailable', 'Profiles unavailable'), 'error');
                 return;
             }
             const profilesV4 = await io.loadProfilesV4();
