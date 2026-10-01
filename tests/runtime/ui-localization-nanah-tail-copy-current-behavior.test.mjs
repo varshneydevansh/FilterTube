@@ -6,8 +6,11 @@ import vm from 'node:vm';
 
 const root = process.cwd();
 const source = fs.readFileSync(path.join(root, 'js/tab-view.js'), 'utf8');
-const tailSource = source.split('\n').slice(20000).join('\n');
+const tailStart = source.indexOf('async function configureNanahManagedMailboxServer(');
+assert.ok(tailStart > 0, 'Nanah tail begins at its stable provider-setup boundary');
+const tailSource = source.slice(tailStart);
 const batch = JSON.parse(fs.readFileSync(path.join(root, 'data/ui_locales/batches/toasts-c.json'), 'utf8'));
+const english = JSON.parse(fs.readFileSync(path.join(root, 'data/ui_locales/en.json'), 'utf8'));
 
 function buildTextHelper(translations = {}) {
   const start = source.indexOf('function tabViewUiText(');
@@ -28,14 +31,14 @@ function buildTextHelper(translations = {}) {
   return vm.runInNewContext(`${source.slice(start, end)}\ntabViewUiText`, context);
 }
 
-test('Nanah tail localization keys are present in the flat English source batch', () => {
+test('Nanah tail localization keys are present in the merged English catalog', () => {
   const referenced = new Set([...tailSource.matchAll(/['"](dashboard\.sync\.[^'"]+)['"]/g)].map(match => match[1]));
   assert.equal(Object.keys(batch).length, 1, 'source batch contains no translations or catalog metadata');
   assert.ok(batch.english && typeof batch.english === 'object' && !Array.isArray(batch.english));
   assert.ok(referenced.size >= 150, 'bounded Nanah pass includes the expected set of stable keys');
   for (const key of referenced) {
-    assert.equal(typeof batch.english[key], 'string', `English source exists for ${key}`);
-    assert.ok(batch.english[key].trim(), `English source is nonempty for ${key}`);
+    assert.equal(typeof english[key], 'string', `Merged English source exists for ${key}`);
+    assert.ok(english[key].trim(), `Merged English source is nonempty for ${key}`);
   }
 });
 test('Nanah English fallbacks and translations interpolate values without rewriting user data', () => {
