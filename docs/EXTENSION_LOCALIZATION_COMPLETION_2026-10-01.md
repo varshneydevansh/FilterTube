@@ -34,3 +34,11 @@ Existing unrelated README, comment-boundary audit/test, and semantic-design work
 - Chrome and Firefox packages both built from committed snapshot `1ab44cac` in an isolated temporary checkout. Each package was checked for 38 catalogs × 2,415 keys, 38 static catalogs × 1,135 fragments, 37 release-note catalogs × 28 entries, and absence of the translation-draft directory. Both ZIP integrity checks pass. The snapshot lacks Git metadata, so the build's README-stat badge step warns and skips; packaging succeeds and the user's dirty README remains untouched.
 
 The final translation/runtime checkpoint is `1ab44cac`. Related grouped commits include `6bfe6a8f` (import/help/release wiring), `306af313` (package boundary), `6d109320` (approval/import dialogs), `5db09a1b` (generated statuses), `7b3ab813` (translated delivery actions), and `dd8c1600` (shared PIN copy). These are local commits, not published releases.
+
+## Follow-up layout and accessibility review
+
+The October 1 follow-up corrects left-only collaboration borders, category alignment, and nested rule spacing in popup/dashboard CSS to use logical inline properties. Existing compact breakpoints are retained. Playback overlays now carry their own selected `lang` and `dir`, without changing the host Google/YouTube document. A failed catalog load labels the English fallback as English/LTR rather than incorrectly retaining the requested language.
+
+The expanded localization suite passes **140/140**. It checks actual blocked-banner text and language/direction across all 38 bundled catalogs, private owner-text preservation, English fallback, and targeted logical layout declarations. Strict catalog/static and historical-release checks pass again. These are source/runtime-harness checks, not screenshots, keyboard testing, a full WCAG audit, or fluent-speaker approval.
+
+Installed review was attempted but remains incomplete: the Chrome connector could not load its request-header policy; native controls then refused actions because the user changed the active window. No language setting was changed. ADB listed no connected Android device. Preview status is therefore retained. The newly changed layout/overlay code has not yet been rebuilt into the previously checked browser packages.

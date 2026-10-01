@@ -4638,19 +4638,19 @@ padding: var(--ft-space-xs) var(--ft-space-sm);
 
 /* Collaboration Entries */
 .channel-item.collaboration-entry {
-    border-left: 4px solid var(--ft-color-collab-border, #facc15);
-    padding-left: calc(16px - 4px);
+    border-inline-start: 4px solid var(--ft-color-collab-border, #facc15);
+    padding-inline-start: calc(16px - 4px);
     position: relative;
     background: rgba(250, 204, 21, 0.12);
 }
 
 .channel-item.collaboration-entry.collaboration-partial {
-    border-left-style: dashed;
+    border-inline-start-style: dashed;
     background: rgba(250, 204, 21, 0.18);
 }
 
 :root[data-theme="dark"] .channel-item.collaboration-entry {
-    border-left-color: #facc15;
+    border-inline-start-color: #facc15;
     background: rgba(250, 204, 21, 0.16);
 }
 
@@ -4878,7 +4878,7 @@ padding: var(--ft-space-xs) var(--ft-space-sm);
     align-items: flex-start;
     gap: 10px 16px;
     flex-wrap: wrap;
-    padding-left: 52px;
+    padding-inline-start: 3.25rem;
     padding-top: 4px;
     /* Indent to align with name (32px logo + 12px gap) */
     min-width: 0;
@@ -5150,7 +5150,7 @@ padding: var(--ft-space-xs) var(--ft-space-sm);
     display: flex;
     align-items: center;
     gap: 8px;
-    margin-left: 28px;
+    margin-inline-start: 1.75rem;
     padding-top: 4px;
     border-top: 1px dashed var(--ft-color-sem-neutral-border);
 }
@@ -5387,7 +5387,7 @@ html[data-theme="dark"] .video-filter-conditions-row {
     font-weight: 500;
     transition: all 0.2s;
     user-select: none;
-    text-align: left;
+    text-align: start;
     min-height: 32px;
 }
 
@@ -5433,7 +5433,7 @@ html[data-theme="dark"] .video-filter-conditions-row {
     justify-content: center;
     width: 18px;
     height: 18px;
-    margin-left: 2px;
+    margin-inline-start: 2px;
     border: 1px solid var(--ft-color-sem-neutral-border);
     border-radius: 999px;
     background: transparent;
@@ -5540,7 +5540,7 @@ html[data-theme="dark"] .video-filter-compact-option:has(.video-filter-compact-r
 
     .video-filter-compact-fields {
         flex-wrap: wrap;
-        margin-left: 0;
+        margin-inline-start: 0;
         padding-top: 0.45rem;
     }
 

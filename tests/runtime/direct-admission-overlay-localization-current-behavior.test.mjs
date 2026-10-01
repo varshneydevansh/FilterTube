@@ -108,7 +108,9 @@ function loadAdmissionRuntime(locale = 'ar', browserLocale = 'en-US') {
     },
     fetch(url) {
       requested.push(url);
-      return Promise.resolve({ ok: true, json: () => Promise.resolve(arabicCatalog) });
+      const code = url.match(/\/([^/]+)\.json$/)?.[1];
+      const catalog = JSON.parse(fs.readFileSync(path.join(root, `data/ui_locales/${code}.json`), 'utf8'));
+      return Promise.resolve({ ok: true, json: () => Promise.resolve(catalog) });
     },
     matchMedia() { return { matches: false }; }
   };
@@ -162,6 +164,8 @@ test('Google player admission overlay owns RTL direction, mirrored accent, and l
   await flushLocaleLoad();
 
   assert.equal(overlay.getAttribute('dir'), 'rtl', 'the extension overlay must not inherit Google page direction');
+  assert.equal(overlay.getAttribute('lang'), 'ar', 'assistive technology must use the overlay language, not Google language');
+  assert.equal(runtime.document.documentElement.getAttribute('lang'), null, 'never change the host page language');
   assert.equal(overlay.getAttribute('aria-label'), `${arabicCatalog['admission.blockedChannel']}\nUCGnjeahCJW1AF34HBmQTJ-Q\nDuration: 240 seconds`);
   assert.equal(overlay.__filtertubeAdmissionReason.textContent, `${arabicCatalog['admission.blockedChannel']}\nUCGnjeahCJW1AF34HBmQTJ-Q\nDuration: 240 seconds`);
   assert.equal(overlay.__filtertubeAdmissionReason.style.borderLeft, 'none');
@@ -183,8 +187,39 @@ test('automatic admission locale stays on the released English fallback without 
   await flushLocaleLoad();
 
   assert.equal(overlay.getAttribute('dir'), 'ltr', 'an unreleased browser locale must resolve to English');
+  assert.equal(overlay.getAttribute('lang'), 'en');
   assert.equal(overlay.getAttribute('aria-label'), 'Blocked channel');
   assert.deepEqual(runtime.requested, [], 'auto must not fetch a staged Arabic catalog');
+});
+
+test('failed preview catalog loads label the English overlay as English without affecting the host', async () => {
+  const runtime = loadAdmissionRuntime('ar');
+  runtime.context.fetch = () => Promise.reject(new Error('catalog unavailable'));
+  const overlay = runtime.document.createElement('div');
+  runtime.document.body.appendChild(overlay);
+  runtime.context.FilterTubeAdmissionOverlay.render(overlay, 'blocked', 'Blocked channel');
+  await flushLocaleLoad();
+  assert.equal(overlay.getAttribute('lang'), 'en');
+  assert.equal(overlay.getAttribute('dir'), 'ltr');
+  assert.equal(overlay.getAttribute('aria-label'), 'Blocked channel');
+  assert.equal(runtime.document.documentElement.getAttribute('lang'), null);
+});
+
+test('all 38 selected languages render their real admission copy with local language and direction metadata', async () => {
+  const targets = JSON.parse(fs.readFileSync(path.join(root, 'data/ui_locales/targets.json'), 'utf8')).locales;
+  for (const { code } of targets) {
+    const runtime = loadAdmissionRuntime(code);
+    const overlay = runtime.document.createElement('div');
+    runtime.document.body.appendChild(overlay);
+    runtime.context.FilterTubeAdmissionOverlay.render(overlay, 'blocked', 'Blocked channel\n@privateOwner');
+    await flushLocaleLoad();
+    const catalog = JSON.parse(fs.readFileSync(path.join(root, `data/ui_locales/${code}.json`), 'utf8'));
+    assert.equal(overlay.getAttribute('lang'), code, code);
+    assert.equal(overlay.getAttribute('dir'), /^(ar|arz|apc|apd|fa|ur|pa-Arab)$/.test(code) ? 'rtl' : 'ltr', code);
+    assert.equal(overlay.__filtertubeAdmissionReason.textContent, `${catalog['admission.blockedChannel']}\n@privateOwner`, code);
+    assert.equal(overlay.__filtertubeAdmissionTitle.textContent, catalog['admission.blockedTitle'], code);
+    assert.equal(runtime.document.documentElement.getAttribute('lang'), null, `${code}: host untouched`);
+  }
 });
 
 test('direct Watch and Shorts overlays localize only keyed reason lines and keep newest state', async () => {

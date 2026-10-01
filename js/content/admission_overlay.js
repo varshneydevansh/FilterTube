@@ -4,6 +4,7 @@
     let localeCatalog = null;
     let localeCatalogLoading = null;
     let localeDirection = 'ltr';
+    let localeLanguage = 'en';
     const pendingLocaleOverlays = new Set();
     const RTL_LANGUAGES = new Set(['apc', 'apd', 'ar', 'arz', 'fa', 'he', 'ur', 'yi']);
     const RTL_SCRIPTS = new Set(['Adlm', 'Arab', 'Hebr', 'Nkoo', 'Rohg', 'Thaa']);
@@ -47,6 +48,7 @@
     function applyAdmissionDirection(overlay) {
         if (!overlay || typeof overlay.setAttribute !== 'function') return;
         try { overlay.setAttribute('dir', localeDirection); } catch (e) {}
+        try { overlay.setAttribute('lang', localeLanguage); } catch (e) {}
     }
 
     function localizedAdmissionText(key, fallback) {
@@ -96,11 +98,16 @@
                 ? resolveAutomaticAdmissionLocale(root.navigator?.language)
                 : preference;
             localeDirection = admissionTextDirection(locale);
+            localeLanguage = typeof locale === 'string' ? locale : 'en';
             if (typeof locale !== 'string' || !/^[a-z]{2,3}(?:-[a-zA-Z0-9]{2,8})*$/.test(locale) || locale === 'en') return null;
             return fetch(runtimeAPI.runtime.getURL(`data/ui_locales/${locale}.json`))
                 .then(response => response.ok ? response.json() : null).catch(() => null);
         }).then(catalog => {
             localeCatalog = catalog && typeof catalog === 'object' && !Array.isArray(catalog) ? catalog : null;
+            if (!localeCatalog) {
+                localeLanguage = 'en';
+                localeDirection = 'ltr';
+            }
             for (const pendingOverlay of pendingLocaleOverlays) {
                 if (pendingOverlay?.isConnected && pendingOverlay.__filtertubeAdmissionState) {
                     ensureAdmissionOverlayVisuals(pendingOverlay, pendingOverlay.__filtertubeAdmissionState, pendingOverlay.__filtertubeAdmissionMessage);

@@ -500,13 +500,13 @@ html[data-theme="dark"] .keyword-item.source-collab {
 }
 
 .keyword-item.collaboration-member {
-    border-left: 4px solid var(--ft-color-collab-border, #facc15);
-    padding-left: calc(var(--ft-space-sm) - 4px);
+    border-inline-start: 4px solid var(--ft-color-collab-border, #facc15);
+    padding-inline-start: calc(var(--ft-space-sm) - 4px);
     background: rgba(250, 204, 21, 0.12);
 }
 
 html[data-theme="dark"] .keyword-item.collaboration-member {
-    border-left-color: #facc15;
+    border-inline-start-color: #facc15;
     background: rgba(250, 204, 21, 0.16);
 }
 
@@ -1139,7 +1139,7 @@ html[data-theme="dark"] .stat-card {
     font-weight: 500;
     transition: all 0.2s;
     user-select: none;
-    text-align: left;
+    text-align: start;
     min-height: 32px;
 }
 
@@ -1185,7 +1185,7 @@ html[data-theme="dark"] .stat-card {
     justify-content: center;
     width: 18px;
     height: 18px;
-    margin-left: 2px;
+    margin-inline-start: 2px;
     border: 1px solid var(--ft-color-sem-neutral-border);
     border-radius: 999px;
     background: transparent;
