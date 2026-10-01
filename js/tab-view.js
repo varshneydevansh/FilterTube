@@ -16140,7 +16140,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             name.textContent = getNanahManagedTargetLabel(link);
             const meta = document.createElement('span');
             meta.className = 'nanah-managed-target__meta';
-            meta.textContent = `${getNanahRemoteLabel()} · ${describeNanahScopeList(policy.allowedScopes)}`;
+            meta.textContent = `${getNanahRemoteLabel()} · ${describeNanahManagedModalScopeList(policy.allowedScopes)}`;
 
             body.appendChild(name);
             body.appendChild(meta);

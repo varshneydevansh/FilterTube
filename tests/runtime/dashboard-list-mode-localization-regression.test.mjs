@@ -21,10 +21,11 @@ test('language switching refreshes generated list-mode and Family Devices contro
         renderListModeControls() { calls.push('listMode'); },
         renderNanahDeliveryPathStrip() { calls.push('familyDevices'); },
         syncNanahRemoteTargetOptions() { calls.push('remoteTargets'); },
+        renderSubscriptionsImportState() { calls.push('subscriptionStatus'); },
         profilesV4Cache: null
     });
     refresh();
-    assert.deepEqual(calls, ['listMode', 'familyDevices', 'remoteTargets']);
+    assert.deepEqual(calls, ['listMode', 'familyDevices', 'remoteTargets', 'subscriptionStatus']);
 });
 
 test('dashboard profile availability errors share the existing popup translation', () => {

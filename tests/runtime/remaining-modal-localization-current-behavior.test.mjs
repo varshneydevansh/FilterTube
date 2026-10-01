@@ -59,6 +59,7 @@ test('actual remote-target confirmation keeps protected rejection and account ch
 });
 
 test('scope display uses existing keys without changing canonical scope helpers', () => {
+  assert.ok(source.includes('meta.textContent = `${getNanahRemoteLabel()} · ${describeNanahManagedModalScopeList(policy.allowedScopes)}`;'), 'target list uses localized display scopes');
   const context = vm.createContext({ normalizeString: value => String(value || '').trim(), tabViewUiText: key => key });
   vm.runInContext(`${functionSource('getNanahScopeLabel')}\n${functionSource('nanahModalScopeLabel')}\nthis.display = nanahModalScopeLabel; this.raw = getNanahScopeLabel;`, context);
   assert.equal(context.display('rules_bundle'), 'dashboard.sync.scope.ruleBundle');
