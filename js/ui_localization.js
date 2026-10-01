@@ -5,13 +5,14 @@
 
     const runtimeAPI = globalThis.browser || globalThis.chrome;
     const CATALOG_PATH = 'data/ui_locales/';
-    const RELEASED_LOCALES = Object.freeze(['en']);
-    const STAGED_LOCALES = Object.freeze([
-        'zh-Hans', 'hi', 'es', 'ar', 'fr', 'bn', 'pt', 'id', 'ur', 'ru',
+    // Supported locally; publication and fluent-speaker review are separate gates.
+    const RELEASED_LOCALES = Object.freeze([
+        'en', 'zh-Hans', 'hi', 'es', 'ar', 'fr', 'bn', 'pt', 'id', 'ur', 'ru',
         'de', 'ja', 'pcm', 'arz', 'mr', 'vi', 'te', 'sw', 'ha', 'tr',
         'pa-Arab', 'fil', 'ta', 'yue-Hant', 'wuu-Hans', 'fa', 'ko',
         'am', 'th', 'jv', 'it', 'gu', 'kn', 'apc', 'apd', 'yo', 'bho'
     ]);
+    const STAGED_LOCALES = Object.freeze([]);
     const RTL_LANGUAGES = new Set(['ar', 'arz', 'apc', 'apd', 'fa', 'ur', 'pa']);
     const catalogs = new Map();
     const inFlight = new Map();

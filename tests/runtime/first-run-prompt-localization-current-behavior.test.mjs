@@ -99,6 +99,6 @@ test('first-run auto locale ignores staged browser languages and keeps bundled E
   await localizePrompt(container);
 
   assert.equal(title.textContent, 'FilterTube is active');
-  assert.equal(container.dir, undefined, 'unreleased auto locales must not apply RTL preview direction');
-  assert.equal(fetchCount, 0, 'auto must not fetch a staged Arabic catalog');
+  assert.equal(container.dir, 'rtl', 'supported Arabic browser language uses RTL');
+  assert.equal(fetchCount, 1, 'auto loads the locally bundled Arabic catalog');
 });

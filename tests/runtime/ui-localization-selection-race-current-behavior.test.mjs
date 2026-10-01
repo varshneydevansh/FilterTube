@@ -118,7 +118,7 @@ test('latest locale intent wins when catalog fetches finish out of order', async
   assert.equal(harness.locale, 'hi');
   assert.equal(harness.label.textContent, 'सेटिंग्स');
   assert.equal(harness.document.documentElement.lang, 'hi');
-  assert.ok(harness.selector.options.filter(option => option.dataset?.languageName).every(option => option.textContent.endsWith('(पूर्वावलोकन)')), 'preview labels follow the selected locale');
+  assert.ok(harness.selector.options.filter(option => option.dataset?.languageName).every(option => option.textContent === option.dataset.languageName), 'supported language names have no preview suffix');
   assert.deepEqual(harness.announcements, ['en', 'hi']);
 
   harness.releaseFrenchFetch();
@@ -128,7 +128,7 @@ test('latest locale intent wins when catalog fetches finish out of order', async
   assert.equal(harness.document.documentElement.lang, 'hi');
   assert.deepEqual(harness.announcements, ['en', 'hi'], 'stale activation must not apply or announce');
   assert.equal(harness.storedPreference, 'hi');
-  assert.ok(harness.selector.options.filter(option => option.dataset?.languageName).every(option => option.textContent.endsWith('(पूर्वावलोकन)')), 'stale activation cannot restore older preview labels');
+  assert.ok(harness.selector.options.filter(option => option.dataset?.languageName).every(option => option.textContent === option.dataset.languageName), 'stale activation cannot change supported language names');
 });
 
 test('queued preference writes preserve the latest choice if an earlier write is delayed', async () => {

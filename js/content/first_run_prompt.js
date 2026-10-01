@@ -16,7 +16,7 @@
                 const result = api.storage.local.get('ftUiLocalePreference', resolve);
                 if (result?.then) result.then(resolve, () => resolve({}));
             });
-            const preference = stored?.ftUiLocalePreference;
+            const preference = typeof stored?.ftUiLocalePreference === 'string' ? stored.ftUiLocalePreference : 'auto';
             const locale = preference === 'auto'
                 ? resolveAutomaticPromptLocale(window.navigator?.language)
                 : preference;
@@ -40,10 +40,10 @@
         } catch (_) { /* The bundled English copy remains usable. */ }
 
         function resolveAutomaticPromptLocale(requestedLocale) {
-            // Match the released-only gate in js/ui_localization.js. Explicitly
-            // selected preview locales bypass this resolver and keep working.
+            // Match the supported catalog list in js/ui_localization.js.
+            // The standalone fallback is parity-tested with that runtime.
             const configured = window.FilterTubeUiLocalization?.releasedLocales;
-            const releasedLocales = Array.isArray(configured) ? configured : ['en'];
+            const releasedLocales = Array.isArray(configured) ? configured : ['en', 'zh-Hans', 'hi', 'es', 'ar', 'fr', 'bn', 'pt', 'id', 'ur', 'ru', 'de', 'ja', 'pcm', 'arz', 'mr', 'vi', 'te', 'sw', 'ha', 'tr', 'pa-Arab', 'fil', 'ta', 'yue-Hant', 'wuu-Hans', 'fa', 'ko', 'am', 'th', 'jv', 'it', 'gu', 'kn', 'apc', 'apd', 'yo', 'bho'];
             const available = releasedLocales.filter(value => typeof value === 'string'
                 && /^[a-z]{2,3}(?:-[a-zA-Z0-9]{2,8})*$/.test(value));
             if (!available.includes('en')) available.unshift('en');

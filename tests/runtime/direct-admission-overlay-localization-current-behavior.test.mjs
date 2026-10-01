@@ -175,7 +175,7 @@ test('Google player admission overlay owns RTL direction, mirrored accent, and l
   assert.deepEqual(runtime.requested, ['extension://filtertube/data/ui_locales/ar.json']);
 });
 
-test('automatic admission locale stays on the released English fallback without delaying overlay presentation', async () => {
+test('automatic admission locale loads the supported browser language without delaying overlay presentation', async () => {
   const runtime = loadAdmissionRuntime('auto', 'ar-EG');
   const overlay = runtime.document.createElement('div');
   runtime.document.body.appendChild(overlay);
@@ -186,10 +186,10 @@ test('automatic admission locale stays on the released English fallback without 
   assert.equal(overlay.getAttribute('aria-label'), 'Blocked channel');
   await flushLocaleLoad();
 
-  assert.equal(overlay.getAttribute('dir'), 'ltr', 'an unreleased browser locale must resolve to English');
-  assert.equal(overlay.getAttribute('lang'), 'en');
-  assert.equal(overlay.getAttribute('aria-label'), 'Blocked channel');
-  assert.deepEqual(runtime.requested, [], 'auto must not fetch a staged Arabic catalog');
+  assert.equal(overlay.getAttribute('dir'), 'rtl');
+  assert.equal(overlay.getAttribute('lang'), 'ar');
+  assert.equal(overlay.getAttribute('aria-label'), arabicCatalog['admission.blockedChannel']);
+  assert.deepEqual(runtime.requested, ['extension://filtertube/data/ui_locales/ar.json']);
 });
 
 test('failed preview catalog loads label the English overlay as English without affecting the host', async () => {
@@ -205,10 +205,10 @@ test('failed preview catalog loads label the English overlay as English without 
   assert.equal(runtime.document.documentElement.getAttribute('lang'), null);
 });
 
-test('all 38 selected languages render their real admission copy with local language and direction metadata', async () => {
+test('all 38 explicit and automatic languages render their real admission copy with local language and direction metadata', async () => {
   const targets = JSON.parse(fs.readFileSync(path.join(root, 'data/ui_locales/targets.json'), 'utf8')).locales;
-  for (const { code } of targets) {
-    const runtime = loadAdmissionRuntime(code);
+  for (const preference of ['explicit', 'auto']) for (const { code } of targets) {
+    const runtime = loadAdmissionRuntime(preference === 'auto' ? 'auto' : code, code);
     const overlay = runtime.document.createElement('div');
     runtime.document.body.appendChild(overlay);
     runtime.context.FilterTubeAdmissionOverlay.render(overlay, 'blocked', 'Blocked channel\n@privateOwner');

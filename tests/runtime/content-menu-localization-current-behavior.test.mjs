@@ -33,7 +33,7 @@ async function loadContentCopy({ locale, localeCatalog = {}, browserLanguage = '
     fetch: async url => {
       requests.push(url);
       assert.match(url, /^chrome-extension:\/\/filtertube\/data\/ui_locales\//);
-      if (!url.endsWith(`/${locale}.json`)) return { ok: false };
+      if (!url.endsWith(`/${locale === 'auto' ? 'ar' : locale}.json`)) return { ok: false };
       return { ok: true, json: async () => localeCatalog };
     }
   };
@@ -77,13 +77,13 @@ test('English preference uses the English fallback without requesting a catalog'
   assert.deepEqual(requests, []);
 });
 
-test('automatic browser language does not activate an unreleased content-menu preview', async () => {
+test('automatic browser language activates the supported content-menu catalog', async () => {
   const { copy, requests } = await loadContentCopy({
     locale: 'auto',
     browserLanguage: 'ar-EG',
     localeCatalog: { 'content.menu.block': 'حظر' }
   });
 
-  assert.equal(copy.text('content.menu.block', 'Block'), 'Block');
-  assert.deepEqual(requests, []);
+  assert.equal(copy.text('content.menu.block', 'Block'), 'حظر');
+  assert.ok(requests.some(url => url.endsWith('/ar.json')));
 });

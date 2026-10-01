@@ -11,10 +11,10 @@
 
     function resolveAutomaticAdmissionLocale(requestedLocale) {
         // Keep the fallback aligned with RELEASED_LOCALES in js/ui_localization.js.
-        // Content scripts do not load the dashboard localization runtime, so only
-        // its released allowlist (never its preview/staged list) may opt in here.
+        // Content scripts do not load the dashboard localization runtime.
+        // The fallback is parity-tested against all supported bundled catalogs.
         const configured = root.FilterTubeUiLocalization?.releasedLocales;
-        const releasedLocales = Array.isArray(configured) ? configured : ['en'];
+        const releasedLocales = Array.isArray(configured) ? configured : ['en', 'zh-Hans', 'hi', 'es', 'ar', 'fr', 'bn', 'pt', 'id', 'ur', 'ru', 'de', 'ja', 'pcm', 'arz', 'mr', 'vi', 'te', 'sw', 'ha', 'tr', 'pa-Arab', 'fil', 'ta', 'yue-Hant', 'wuu-Hans', 'fa', 'ko', 'am', 'th', 'jv', 'it', 'gu', 'kn', 'apc', 'apd', 'yo', 'bho'];
         const available = releasedLocales.filter(locale => typeof locale === 'string'
             && /^[a-z]{2,3}(?:-[a-zA-Z0-9]{2,8})*$/.test(locale));
         if (!available.includes('en')) available.unshift('en');
@@ -93,7 +93,7 @@
                 } catch (_) { resolve({}); }
             }
         }).then(saved => {
-            const preference = saved?.ftUiLocalePreference;
+            const preference = typeof saved?.ftUiLocalePreference === 'string' ? saved.ftUiLocalePreference : 'auto';
             const locale = preference === 'auto'
                 ? resolveAutomaticAdmissionLocale(root.navigator?.language)
                 : preference;

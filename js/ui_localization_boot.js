@@ -60,7 +60,7 @@
             selector.appendChild(option);
         }
         const progress = root.document.getElementById('ftInterfaceLanguageProgress');
-        if (progress && ui.releasedLocales.length === 1 + ui.stagedLocales.length) progress.hidden = true;
+        if (progress) progress.hidden = ui.stagedLocales.length === 0;
     }
 
     async function activate(preference, revision = ++activationRevision) {

@@ -32,11 +32,10 @@ function loadRuntime() {
   return { api: context.FilterTubeUiLocalization, fetched, document };
 }
 
-test('only completed interface locales are released and all catalogs stay bundled', async () => {
+test('all supported interface locales are available and catalogs stay bundled', async () => {
   const { api, fetched } = loadRuntime();
-  assert.equal(JSON.stringify(api.releasedLocales), '["en"]');
-  assert.equal(await api.select('ru-RU'), 'en', 'staged Russian must not silently become a released locale');
-  assert.equal(api.text('navigation.settings'), 'Settings');
+  assert.equal(api.releasedLocales.length, 38);
+  assert.equal(await api.select('ru-RU'), 'ru');
   assert.equal(await api.select('ru-RU', { allowStaged: true }), 'ru');
   assert.equal(api.text('navigation.settings'), 'Настройки');
   await assert.rejects(api.loadCatalog('xx'), /not released/);
@@ -45,8 +44,7 @@ test('only completed interface locales are released and all catalogs stay bundle
   assert.ok(fetched.every(url => url.startsWith('extension://filtertube/data/ui_locales/')));
 });
 
-test('script-aware browser locales resolve to an exact released catalog', async () => {
-  const withChinese = source.replace("Object.freeze(['en'])", "Object.freeze(['en', 'zh-Hans'])");
+test('script-aware browser locales resolve to an exact supported catalog', async () => {
   const fetched = [];
   const context = {
     browser: { runtime: { getURL(file) { return `extension://filtertube/${file}`; } } },
@@ -57,15 +55,26 @@ test('script-aware browser locales resolve to an exact released catalog', async 
   };
   context.window = context;
   context.globalThis = context;
-  vm.runInNewContext(withChinese, context);
+  vm.runInNewContext(source, context);
   assert.equal(await context.FilterTubeUiLocalization.select('zh-CN'), 'zh-Hans');
   assert.ok(fetched.some(url => url.endsWith('/zh-Hans.json')));
   assert.equal(await context.FilterTubeUiLocalization.select('zh-TW'), 'en', 'Traditional Chinese must not silently use Simplified');
 });
 
-test('Tamil and Gujarati drafts can be previewed without being released', async () => {
+test('standalone content locale lists match the dashboard supported catalog set', () => {
   const { api } = loadRuntime();
-  assert.equal(await api.select('ta-IN'), 'en');
+  for (const file of ['js/content/admission_overlay.js', 'js/content/first_run_prompt.js']) {
+    const content = fs.readFileSync(path.join(root, file), 'utf8');
+    const fallback = content.match(/const releasedLocales = Array\.isArray\(configured\) \? configured : (\[[^;]+\]);/);
+    assert.ok(fallback, file);
+    const codes = vm.runInNewContext(fallback[1]);
+    assert.deepEqual(new Set(codes), new Set(api.releasedLocales), file);
+  }
+});
+
+test('Tamil and Gujarati are available without preview opt-in', async () => {
+  const { api } = loadRuntime();
+  assert.equal(await api.select('ta-IN'), 'ta');
   assert.equal(await api.select('ta-IN', { allowStaged: true }), 'ta');
   assert.equal(api.text('navigation.settings'), 'அமைப்புகள்');
   assert.equal(await api.select('gu-IN', { allowStaged: true }), 'gu');
@@ -144,9 +153,9 @@ test('dashboard static-copy capture never translates text inserted or changed by
   assert.equal(titled.attributes.title, 'Settings');
 });
 
-test('all staged catalogs load from bundled URLs and right-to-left previews set direction', async () => {
+test('all supported catalogs load from bundled URLs and right-to-left languages set direction', async () => {
   const { api, fetched, document } = loadRuntime();
-  for (const locale of api.stagedLocales) {
+  for (const locale of api.releasedLocales) {
     assert.equal(await api.select(locale, { allowStaged: true }), locale);
     assert.ok(api.text('navigation.settings'));
   }
@@ -185,7 +194,7 @@ test('popup and dashboard load local catalogs after their shells and before appl
   }
 });
 
-test('the 38-language target set is explicit and drafts are previewable without being called complete', () => {
+test('the 38-language target set matches every supported runtime locale', () => {
   const targets = JSON.parse(fs.readFileSync(path.join(root, 'data/ui_locales/targets.json'), 'utf8'));
   assert.equal(targets.locales.length, 38);
   const codes = targets.locales.map(entry => entry.code);
@@ -194,10 +203,10 @@ test('the 38-language target set is explicit and drafts are previewable without 
   for (const code of codes) assert.equal(Intl.getCanonicalLocales(code)[0], code);
   const { api } = loadRuntime();
   for (const locale of api.releasedLocales) assert.ok(codes.includes(locale));
-  assert.equal(api.stagedLocales.length, 37);
+  assert.equal(api.stagedLocales.length, 0);
   assert.deepEqual(new Set([...api.releasedLocales, ...api.stagedLocales]), new Set(codes));
-  assert.ok(!api.releasedLocales.includes('ru'), 'partial Russian copy must not be presented as complete');
-  assert.ok(!api.releasedLocales.includes('ta') && !api.releasedLocales.includes('gu'), 'partial Tamil and Gujarati copy must not be presented as complete');
+  assert.ok(api.releasedLocales.includes('ru'));
+  assert.ok(api.releasedLocales.includes('ta') && api.releasedLocales.includes('gu'));
   const html = fs.readFileSync(path.join(root, 'html/tab-view.html'), 'utf8');
   const settings = html.slice(html.indexOf('id="settingsView"'), html.indexOf('id="syncView"'));
   assert.match(settings, /id="ftInterfaceLanguage"/);
@@ -208,7 +217,7 @@ test('the 38-language target set is explicit and drafts are previewable without 
   assert.match(css, /\.ft-interface-language-field\[hidden\]\s*\{\s*display:\s*none/);
 });
 
-test('Settings offers draft-language previews while keeping the completion notice', async () => {
+test('Settings offers all languages without preview labels or the obsolete preview notice', async () => {
   const boot = fs.readFileSync(path.join(root, 'js/ui_localization_boot.js'), 'utf8');
   const targets = JSON.parse(fs.readFileSync(path.join(root, 'data/ui_locales/targets.json'), 'utf8')).locales;
   const options = [{ value: 'auto' }, { value: 'en' }];
@@ -221,15 +230,16 @@ test('Settings offers draft-language previews while keeping the completion notic
     addEventListener(event, listener) { listeners[event] = listener; }
   };
   const field = { hidden: false };
+  const progress = { hidden: false };
   const document = {
-    getElementById(id) { return id === 'ftInterfaceLanguage' ? selector : id === 'ftInterfaceLanguageField' ? field : { hidden: false }; },
+    getElementById(id) { return id === 'ftInterfaceLanguage' ? selector : id === 'ftInterfaceLanguageField' ? field : progress; },
     createElement() { return { value: '', textContent: '', dataset: {} }; }
   };
   const context = {
     document, navigator: { language: 'ru-RU' },
     FilterTubeUiLocalization: {
-      releasedLocales: ['en'],
-      stagedLocales: targets.map(entry => entry.code).filter(code => code !== 'en'),
+      releasedLocales: targets.map(entry => entry.code),
+      stagedLocales: [],
       async select(value, options) { selected.push([value, options?.allowStaged]); return value; },
       apply() {},
       text(key, values) { return `${values.language} (preview)`; }
@@ -252,8 +262,10 @@ test('Settings offers draft-language previews while keeping the completion notic
   vm.runInNewContext(boot, context);
   await new Promise(resolve => setImmediate(resolve));
   assert.equal(selector.value, 'ru');
+  assert.equal(progress.hidden, true, 'obsolete preview notice is hidden');
   assert.equal(field.hidden, false, 'draft languages must be visible as previews');
   assert.equal(options.length, 39, 'browser-language choice plus all 38 targets');
+  assert.ok(options.slice(2).every(option => !option.textContent.includes('(preview)')));
   assert.deepEqual(new Set(options.map(option => option.value)), new Set(['auto', ...targets.map(entry => entry.code)]));
   assert.equal(JSON.stringify(selected), '[["ru",true]]');
   selector.value = 'en';
@@ -262,15 +274,15 @@ test('Settings offers draft-language previews while keeping the completion notic
   assert.equal(JSON.stringify(selected), '[["ru",true],["en",true]]');
 });
 
-test('automatic browser language does not silently activate an incomplete preview', async () => {
+test('automatic browser language uses supported catalogs without staged opt-in', async () => {
   const boot = fs.readFileSync(path.join(root, 'js/ui_localization_boot.js'), 'utf8');
   const selected = [];
   const context = {
     document: { getElementById() { return null; } },
     navigator: { language: 'ta-IN' },
     FilterTubeUiLocalization: {
-      releasedLocales: ['en'], stagedLocales: ['ta'],
-      async select(value, options) { selected.push([value, options?.allowStaged]); return 'en'; },
+      releasedLocales: ['en', 'ta'], stagedLocales: [],
+      async select(value, options) { selected.push([value, options?.allowStaged]); return 'ta'; },
       apply() {}
     },
     browser: { storage: { local: { async get() { return { ftUiLocalePreference: 'auto' }; } } } }
@@ -281,7 +293,7 @@ test('automatic browser language does not silently activate an incomplete previe
   assert.equal(JSON.stringify(selected), '[["ta-IN",false]]');
 });
 
-test('Settings still offers preview locales if target-name metadata is unavailable', async () => {
+test('Settings still offers supported locales if target-name metadata is unavailable', async () => {
   const boot = fs.readFileSync(path.join(root, 'js/ui_localization_boot.js'), 'utf8');
   const options = [{ value: 'auto' }, { value: 'en' }];
   const selector = {
@@ -296,7 +308,7 @@ test('Settings still offers preview locales if target-name metadata is unavailab
     },
     navigator: { language: 'en' },
     FilterTubeUiLocalization: {
-      releasedLocales: ['en'], stagedLocales: ['ru', 'ta', 'gu'],
+      releasedLocales: ['en', 'ru', 'ta', 'gu'], stagedLocales: [],
       async select() {}, apply() {}, text(key, values) { return `${values.language} (preview)`; }
     },
     browser: {
@@ -309,7 +321,7 @@ test('Settings still offers preview locales if target-name metadata is unavailab
   vm.runInNewContext(boot, context);
   await new Promise(resolve => setImmediate(resolve));
   assert.deepEqual(options.map(option => option.value), ['auto', 'en', 'ru', 'ta', 'gu']);
-  assert.ok(options.slice(2).every(option => option.textContent.includes('(preview)')));
+  assert.ok(options.slice(2).every(option => !option.textContent.includes('(preview)')));
 });
 
 test('popup copy is reapplied after dynamically created controls exist', async () => {

@@ -1,6 +1,6 @@
 {
   "basis": "2026 Ethnologue total speakers (L1 + L2), as summarized at https://en.wikipedia.org/wiki/List_of_languages_by_total_number_of_speakers",
-  "note": "These are the 38 languages with at least 50 million total speakers in the cited 2026 table, not released interface locales. Arabic and Chinese varieties remain distinct where ranked separately. Only complete, reviewed catalogs appear in the selector.",
+  "note": "All 38 listed languages have bundled interface catalogs and are selectable without preview labels. Arabic and Chinese varieties remain distinct where ranked separately. Fluent-speaker and installed-layout review remain quality checks, not language-selection gates.",
   "locales": [
     { "code": "en", "name": "English", "language": "English" },
     { "code": "zh-Hans", "name": "简体中文", "language": "Mandarin Chinese" },
