@@ -31,10 +31,10 @@ for (const match of source.matchAll(new RegExp(String.raw`\btabViewUiText\(\s*($
 }
 
 test('remaining dashboard-toast English batch matches tab-view runtime fallbacks', () => {
-  assert.deepEqual(Object.keys(batch), ['english']);
+  assert.ok(Object.keys(batch).every(key => ['english', 'translations'].includes(key)));
   assert.ok(english && typeof english === 'object' && !Array.isArray(english));
 
-  const englishBlock = batchText.match(/"english"\s*:\s*\{([\s\S]*)\n\s{2}\}/)?.[1];
+  const englishBlock = batchText.match(/"english"\s*:\s*\{([\s\S]*?)\n\s{2}\}/)?.[1];
   assert.ok(englishBlock, 'English source batch is a flat object');
   const writtenKeys = [...englishBlock.matchAll(/^\s*"([^"]+)"\s*:/gm)].map(match => match[1]);
   assert.equal(writtenKeys.length, keys.length, 'English source keys are unique');
@@ -53,14 +53,31 @@ test('owned toast call sites use keyed copy and leave V3 backup status untouched
   assert.ok(backupImportStatusText >= 0 && backupImportStatusToast >= 0, 'the already-wired V3 backup status toast is present');
 
   const rawToastStarts = [];
+  const familyStart = source.indexOf('const FAMILY_DEVICE_MAP_COPY = Object.freeze({');
+  const familyEnd = source.indexOf('function renderNanahDeliveryPathStrip', familyStart);
+  assert.ok(familyStart >= 0 && familyEnd > familyStart);
   const matcher = /UIComponents\.showToast\(\s*(['"`])/g;
   for (const match of source.matchAll(matcher)) {
     const line = source.slice(0, match.index).split('\n').length;
-    const inFamilyDeviceOwnerRange = line >= 17454 && line <= 19499;
+    const inFamilyDeviceOwnerRange = match.index >= familyStart && match.index < familyEnd;
     const isV3BackupStatusToast = match.index === backupImportStatusToast;
     if (line > 10000 && !inFamilyDeviceOwnerRange && !isV3BackupStatusToast) rawToastStarts.push(line);
   }
   assert.deepEqual(rawToastStarts, [], 'no unkeyed string/template starts remain in the owned toast ranges');
+});
+
+test('available toast translations preserve placeholders and product names without claiming all locales', () => {
+  assert.ok(batch.translations?.ru, 'Russian draft is present');
+  for (const [locale, values] of Object.entries(batch.translations || {})) {
+    assert.equal(values.length, keys.length, `${locale}: exact message count`);
+    keys.forEach((key, index) => {
+      assert.ok(typeof values[index] === 'string' && values[index].trim());
+      assert.deepEqual(placeholderNames(values[index]), placeholderNames(english[key]), `${locale}: ${key}`);
+      for (const name of ['FilterTube', 'Home Pickup', 'Internet Pickup', 'Nanah']) {
+        if (english[key].includes(name)) assert.ok(values[index].includes(name), `${locale}: preserves ${name}`);
+      }
+    });
+  }
 });
 
 test('error details retain precedence over localized toast fallbacks', () => {
