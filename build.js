@@ -22,6 +22,7 @@ const crypto = require('crypto');
 const readline = require('readline');
 const { execFileSync, execSync } = require('child_process');
 const { version: PACKAGE_VERSION } = require('./package.json');
+const { acquireBuildLock } = require('./scripts/build-lock.cjs');
 
 // Configuration
 const ALL_BROWSER_TARGETS = ['chrome', 'firefox', 'opera'];
@@ -89,6 +90,24 @@ main().catch(err => {
 });
 
 async function main() {
+    const releaseLock = acquireBuildLock(path.join(__dirname, '.filtertube-build.lock'));
+    const onExit = () => releaseLock();
+    const onInterrupt = () => { releaseLock(); process.exit(130); };
+    const onTerminate = () => { releaseLock(); process.exit(143); };
+    process.once('exit', onExit);
+    process.once('SIGINT', onInterrupt);
+    process.once('SIGTERM', onTerminate);
+    try {
+        await buildTargets();
+    } finally {
+        releaseLock();
+        process.removeListener('exit', onExit);
+        process.removeListener('SIGINT', onInterrupt);
+        process.removeListener('SIGTERM', onTerminate);
+    }
+}
+
+async function buildTargets() {
     console.log('\n🎨 Building extension UI shells...');
     execSync('node scripts/build-extension-ui.mjs', { stdio: 'inherit' });
 

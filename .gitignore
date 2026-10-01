@@ -153,4 +153,5 @@ temp/
 /local/
 /private/
 /scratch/
+.filtertube-build.lock
 /YTM Channel Page JSON

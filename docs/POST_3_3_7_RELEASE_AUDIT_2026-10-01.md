@@ -192,3 +192,11 @@ October 1 final preparation results:
 - `git diff --check` passes. No push, tag, publication, installed settings change or native app bump was performed.
 
 The worktree was checkpointed before this release preparation: `8ff79e23` repairs dashboard startup and `6bb434e7` records the remaining audit/semantic design work. The four historical comments audit failures described above remain open; committing their partial reconciliation does not certify their completion.
+
+## Build follow-up: concurrent cleanup protection
+
+The user reported an ENOENT for `dist/chrome/data/ui_locales/ko_static.json` during `npm run build`. The source Korean catalog and copied file were present on inspection. Copying is synchronous, but ZIP reading is asynchronous; another full/browser build can remove the shared target directory while the first archive reads it. Overlap is a supported causal explanation, not a retrospective proof of which process removed that exact file.
+
+All build targets now acquire one exclusive `.filtertube-build.lock` outside `dist` before UI generation, badge updates or cleanup. Competing processes fail clearly before touching build outputs. Normal completion, failure and SIGINT/SIGTERM release the lock. A forcibly killed process may leave a lock; the error requires checking no build remains before manual removal. Stale locks are not silently overwritten and missing files are not ignored.
+
+After the change, full `npm run build` succeeds for Chrome, Firefox and Opera. Five build-lock/version consistency tests pass. A real overlapping Chrome/Firefox invocation confirms that the second build exits with the lock error before cleanup. Archive compressed-data checks pass for Firefox and Opera; Chrome is checked after the final owner build completes. No release is published by these checks.
