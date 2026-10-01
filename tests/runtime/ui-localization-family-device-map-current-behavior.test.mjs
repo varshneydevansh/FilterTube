@@ -127,6 +127,26 @@ test('Family Devices counts choose translated singular and non-singular messages
   }
 });
 
+test('all 38 catalog languages resolve Family Devices copy and preserve named data', () => {
+  const locales = JSON.parse(fs.readFileSync(path.join(root, 'data/ui_locales/targets.json'), 'utf8')).locales;
+  assert.equal(locales.length, 38);
+  for (const { code } of locales) {
+    const catalog = JSON.parse(fs.readFileSync(path.join(root, 'data/ui_locales', `${code}.json`), 'utf8'));
+    for (const [key, english] of Object.entries(batch.english)) {
+      assert.ok(typeof catalog[key] === 'string' && catalog[key].trim(), `${code}: ${key}`);
+      assert.deepEqual(placeholders(catalog[key]), placeholders(english), `${code}: ${key}`);
+    }
+    const helpers = buildFamilyDeviceMapHelpers(catalog);
+    assert.equal(helpers.copy('Review and send'), catalog['dashboard.sync.familyDeviceMap.action.reviewAndSend']);
+    assert.equal(helpers.copy('Karina & Marina'), 'Karina & Marina');
+    for (const count of [0, 1, 2, 5]) {
+      const key = count === 1 ? 'map.oneReady' : 'map.manyReady';
+      assert.equal(helpers.count(count, 'map.oneReady', 'map.manyReady', '{count} ready', '{count} ready'),
+        catalog[`dashboard.sync.familyDeviceMap.${key}`].replace('{count}', String(count)));
+    }
+  }
+});
+
 test('render-copy lookup does not mutate the policy model or localize redacted evidence fields', () => {
   const helpers = buildFamilyDeviceMapHelpers({
     'dashboard.sync.familyDeviceMap.action.reviewAndSend': 'Review, then send',
