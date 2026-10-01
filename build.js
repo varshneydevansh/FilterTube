@@ -72,6 +72,10 @@ const BROWSER_TARGETS = targetBrowser && ALL_BROWSER_TARGETS.includes(targetBrow
 
 // Stronger filter function for fs.copySync
 const filterFunc = (src) => {
+    // Translation drafts are build-time sources, not runtime dependencies.
+    const localeDraftsDir = path.resolve(__dirname, 'data/ui_locales/batches');
+    const resolved = path.resolve(src);
+    if (resolved === localeDraftsDir || resolved.startsWith(localeDraftsDir + path.sep)) return false;
     const basename = path.basename(src);
     return basename !== '.DS_Store' &&
         basename !== 'Thumbs.db' &&
