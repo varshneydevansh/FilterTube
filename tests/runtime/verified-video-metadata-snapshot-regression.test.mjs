@@ -12,6 +12,13 @@ const verified = { channelId: 'UCabcdefghijklmnopqrstuv', channelName: 'English 
 const retentionSource = extract('../../js/content/bridge_settings.js', 'function retainVerifiedVideoMetadata(', 'function sendSettingsToMainWorld(');
 const ingestionSource = extract('../../js/content_bridge.js', 'function persistVideoMetaMapping(', 'let pendingVideoMetaDomRerunTimer');
 
+test('playlist filtering has no autonomous skip scheduler and retains explicit navigation', () => {
+    const source = fs.readFileSync(new URL('../../js/content/dom_fallback.js', import.meta.url), 'utf8');
+    assert.doesNotMatch(source, /__filtertubePlaylistAutoplayGuardInstalled|__filtertubeLastPlaylistSkipTs/);
+    assert.doesNotMatch(source, /nextBtn\.click\(\)|target\.click\(\)/);
+    assert.match(source, /event\.preventDefault\(\);[\s\S]*targetLink\.click\(\)/);
+});
+
 test('settings refresh retains exact-video verification without changing disabled state or rules', () => {
     const context = vm.createContext({ window: {}, currentSettings: { videoMetaMap: { [id]: verified } } });
     vm.runInContext(retentionSource, context);

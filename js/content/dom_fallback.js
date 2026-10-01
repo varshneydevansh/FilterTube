@@ -5264,6 +5264,7 @@ async function applyDOMFallback(settings, options = {}) {
         window.__filtertubePlaylistNavGuardInstalled = true;
         document.addEventListener('click', (event) => {
             try {
+                if (currentSettings?.enabled === false) return;
                 const target = event?.target;
                 if (!(target instanceof Element)) return;
                 const btn = target.closest('.ytp-next-button, .ytp-prev-button');
@@ -5324,47 +5325,6 @@ async function applyDOMFallback(settings, options = {}) {
             }
         }, true);
 
-        if (!window.__filtertubePlaylistAutoplayGuardInstalled) {
-            window.__filtertubePlaylistAutoplayGuardInstalled = true;
-            document.addEventListener('ended', (event) => {
-                try {
-                    const target = event?.target;
-                    if (!(target instanceof HTMLVideoElement)) return;
-
-                    const isWatch = (document.location?.pathname || '').startsWith('/watch');
-                    const params = new URLSearchParams(document.location?.search || '');
-                    const isPlaylistWatch = params.has('list');
-                    if (!isWatch || !isPlaylistWatch) return;
-                    if (currentSettings?.listMode === 'whitelist') return;
-
-                    // Let YouTube handle normal autoplay, but when the immediate next playlist item
-                    // is hidden, force a Next click so our click-guard can skip deterministically.
-                    const playlistPanel = getPlaylistPanelContainer() || document;
-                    const items = getPlaylistPanelRows(playlistPanel);
-                    if (items.length === 0) return;
-                    const selected = items.find(el => isSelectedPlaylistPanelRow(el)) || null;
-                    if (!selected) return;
-                    const idx = items.indexOf(selected);
-                    if (idx < 0) return;
-
-                    const nextItem = items[idx + 1];
-                    const nextHidden = nextItem && isExplicitlyHiddenByFilterTube(nextItem);
-                    if (!nextHidden) return;
-
-                    const nextBtn = document.querySelector('.ytp-next-button');
-                    if (!nextBtn) return;
-
-                    // Defer to avoid racing YouTube's internal end-of-video transition.
-                    setTimeout(() => {
-                        try {
-                            nextBtn.click();
-                        } catch (e) {
-                        }
-                    }, 0);
-                } catch (e) {
-                }
-            }, true);
-        }
     }
 
     let filterTubeHiddenRowsThisRun = 0;
@@ -6976,49 +6936,11 @@ async function applyDOMFallback(settings, options = {}) {
                 }
 
                 if (isSelectedRow) {
-                    const hasExplicitBlockMarker = (() => {
-                        try {
-                            return Boolean(
-                                targetToHide.getAttribute('data-filtertube-blocked-channel-id')
-                                || targetToHide.getAttribute('data-filtertube-blocked-channel-handle')
-                                || targetToHide.getAttribute('data-filtertube-blocked-channel-custom')
-                                || targetToHide.getAttribute('data-filtertube-hidden-by-channel')
-                                || targetToHide.getAttribute('data-filtertube-hidden-by-keyword')
-                            );
-                        } catch (e) {
-                            return false;
-                        }
-                    })();
-                    const shouldHideSelectedRow = shouldHide && (hasExplicitBlockMarker || (hasActiveBlockRules && matchesFilters));
-                    if (shouldHideSelectedRow && listMode !== 'whitelist') {
-                        try {
-                            const now = Date.now();
-                            const last = Number(window.__filtertubeLastPlaylistSkipTs || 0);
-                            if (now - last > 1500) {
-                                window.__filtertubeLastPlaylistSkipTs = now;
-                                setTimeout(() => {
-                                    try {
-                                        const nextBtn = document.querySelector('.ytp-next-button:not([disabled])');
-                                        if (nextBtn) nextBtn.click();
-                                    } catch (e) {
-                                    }
-                                }, 80);
-                            }
-                        } catch (e) {
-                        }
-                    } else {
-                        shouldHide = false;
-                        try {
-                            targetToHide.removeAttribute('data-filtertube-hidden-by-keyword');
-                            targetToHide.removeAttribute('data-filtertube-hidden-by-hide-all-shorts');
-                            targetToHide.removeAttribute('data-filtertube-hidden-by-duration');
-                            targetToHide.removeAttribute('data-filtertube-hidden-by-upload-date');
-                            targetToHide.removeAttribute('data-filtertube-pending-category');
-                            targetToHide.removeAttribute('data-filtertube-pending-upload-date');
-                            targetToHide.removeAttribute('data-filtertube-pending-category-ts');
-                            targetToHide.removeAttribute('data-filtertube-pending-upload-date-ts');
-                        } catch (e) {
-                        }
+                    // Admission owns the current video's pause/banner. Never hide
+                    // its selected row or advance playback as a filtering side effect.
+                    shouldHide = false;
+                    for (const marker of ['data-filtertube-hidden-by-keyword', 'data-filtertube-hidden-by-hide-all-shorts', 'data-filtertube-hidden-by-duration', 'data-filtertube-hidden-by-upload-date', 'data-filtertube-pending-category', 'data-filtertube-pending-upload-date', 'data-filtertube-pending-category-ts', 'data-filtertube-pending-upload-date-ts']) {
+                        targetToHide.removeAttribute(marker);
                     }
                 } else {
                     // Sticky-hide for watch-playlist panel rows:
@@ -7716,66 +7638,6 @@ async function applyDOMFallback(settings, options = {}) {
     } catch (e) {
     }
 
-    try {
-        if (!window.__filtertubePlaylistSkipState) {
-            window.__filtertubePlaylistSkipState = { lastAttemptTs: 0, lastSelectedVideoId: '', lastDirection: 1 };
-        }
-        const state = window.__filtertubePlaylistSkipState;
-        const now = Date.now();
-        if (now - (state.lastAttemptTs || 0) > 700) {
-            const isWatch = (document.location?.pathname || '').startsWith('/watch');
-            const params = new URLSearchParams(document.location?.search || '');
-            const isPlaylistWatch = params.has('list');
-            const playlistPanel = getPlaylistPanelContainer() || document;
-            if (listMode !== 'whitelist' && isWatch && isPlaylistWatch && playlistPanel) {
-                const items = getPlaylistPanelRows(playlistPanel);
-                if (items.length > 0) {
-                    const selected = items.find(el => isSelectedPlaylistPanelRow(el)) || null;
-                    const isHidden = selected && isExplicitlyHiddenByFilterTube(selected);
-                    if (selected && isHidden) {
-                        const selectedHref = selected.querySelector('a[href*="watch?v="]')?.getAttribute('href') || '';
-                        const selectedVid = (selectedHref.match(/[?&]v=([a-zA-Z0-9_-]{11})/) || [])[1] || '';
-                        if (!selectedVid || state.lastSelectedVideoId !== selectedVid) {
-                            const idx = items.indexOf(selected);
-                            const pickNext = (start, step) => {
-                                for (let i = start; i >= 0 && i < items.length; i += step) {
-                                    const cand = items[i];
-                                    if (!cand) continue;
-                                    const candHidden = isExplicitlyHiddenByFilterTube(cand);
-                                    if (candHidden) continue;
-                                    const link = cand.querySelector('a[href*="watch?v="]');
-                                    if (link) return link;
-                                }
-                                return null;
-                            };
-
-                            const direction = state.lastDirection === -1 ? -1 : 1;
-                            const preferred = pickNext(idx + direction, direction);
-                            const fallback = preferred ? null : pickNext(idx - direction, -direction);
-                            const target = preferred || fallback;
-                            if (target) {
-                                try {
-                                    const video = document.querySelector('video.html5-main-video');
-                                    if (video && typeof video.pause === 'function') {
-                                        video.pause();
-                                        if (typeof video.currentTime === 'number') {
-                                            video.currentTime = 0;
-                                        }
-                                    }
-                                } catch (e) {
-                                }
-                                state.lastAttemptTs = now;
-                                state.lastSelectedVideoId = selectedVid;
-                                target.click();
-                            }
-                        }
-                    }
-                }
-            }
-        }
-    } catch (e) {
-        // ignore
-    }
     } finally {
         if (perfEnabled) {
             const durationMs = perf.now() - perfStartedAt;
