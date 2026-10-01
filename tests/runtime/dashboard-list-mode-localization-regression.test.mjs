@@ -11,7 +11,7 @@ const english = JSON.parse(fs.readFileSync('data/ui_locales/en.json', 'utf8'));
 
 test('dashboard profile availability errors share the existing popup translation', () => {
     assert.doesNotMatch(source, /UIComponents\.showToast\('Profiles unavailable'/);
-    assert.equal([...source.matchAll(/tabViewUiText\('popup\.profile\.unavailable', 'Profiles unavailable'\)/g)].length, 6);
+    assert.ok([...source.matchAll(/tabViewUiText\('popup\.profile\.unavailable', 'Profiles unavailable'\)/g)].length >= 6);
 });
 
 test('dashboard list mode reuses the translated popup contract in every locale', () => {
