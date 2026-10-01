@@ -28395,10 +28395,12 @@ document.addEventListener('DOMContentLoaded', async () => {
             'ft-list-mode-pill',
             currentMode === 'blocklist' ? 'toggle-variant-red' : ''
         ].filter(Boolean).join(' ');
-        toggle.textContent = currentMode === 'whitelist' ? 'Whitelist' : 'Blocklist';
+        toggle.textContent = currentMode === 'whitelist'
+            ? tabViewUiText('popup.whitelist', 'Whitelist')
+            : tabViewUiText('popup.blocklist', 'Blocklist');
         toggle.title = currentMode === 'whitelist'
-            ? 'Whitelist mode: show content matching Allowed rules'
-            : 'Blocklist mode: hide content matching Blocked rules';
+            ? tabViewUiText('popup.listMode.whitelistTooltip', 'Whitelist mode: show content matching Allowed rules')
+            : tabViewUiText('popup.listMode.blocklistTooltip', 'Blocklist mode: hide content matching Blocked rules');
         toggle.setAttribute('aria-label', toggle.title);
         toggle.setAttribute('role', 'button');
         toggle.setAttribute('aria-pressed', 'true');
@@ -28423,17 +28425,17 @@ document.addEventListener('DOMContentLoaded', async () => {
                 let copyBlocklist = false;
                 if (nextState && whitelistEmpty && blocklistHasRules) {
                     copyBlocklist = window.confirm(profileType === 'kids'
-                        ? 'Copy your current YT Kids blocked rules into Allowed rules? Your blocked rules will be kept.'
-                        : 'Copy your current blocked rules into Allowed rules? Your blocked rules will be kept.');
+                        ? tabViewUiText('popup.listMode.copyKidsRulesConfirm', 'Copy your current YT Kids blocked rules into Allowed rules? Your blocked rules will be kept.')
+                        : tabViewUiText('popup.listMode.copyRulesConfirm', 'Copy the current blocked rules into Allowed rules? Your blocked rules will be kept.'));
                     if (!copyBlocklist) {
                         UIComponents.showToast(profileType === 'kids'
-                            ? 'YT Kids Allowed rules are empty — videos will stay hidden until you add allow rules.'
-                            : 'Allowed rules are empty — videos will stay hidden until you add allow rules.', 'info');
+                            ? tabViewUiText('popup.listMode.emptyKidsAllowedRules', 'YT Kids Allowed rules are empty — videos will stay hidden until you add allow rules.')
+                            : tabViewUiText('popup.listMode.emptyAllowedRules', 'Allowed rules are empty — videos will stay hidden until you add allow rules.'), 'info');
                     }
                 } else if (nextState && whitelistEmpty) {
                     UIComponents.showToast(profileType === 'kids'
-                        ? 'YT Kids Allowed rules are empty — videos will stay hidden until you add allow rules.'
-                        : 'Allowed rules are empty — videos will stay hidden until you add allow rules.', 'info');
+                        ? tabViewUiText('popup.listMode.emptyKidsAllowedRules', 'YT Kids Allowed rules are empty — videos will stay hidden until you add allow rules.')
+                        : tabViewUiText('popup.listMode.emptyAllowedRules', 'Allowed rules are empty — videos will stay hidden until you add allow rules.'), 'info');
                 }
                 let resp = null;
                 if (managedState) {
@@ -28474,7 +28476,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                         return true;
                     });
                     if (!saved) {
-                        UIComponents.showToast('Failed to update list mode', 'error');
+                        UIComponents.showToast(tabViewUiText('popup.listMode.updateFailed', 'Failed to update list mode'), 'error');
                     }
                     renderListModeControls();
                     return;
@@ -28489,14 +28491,18 @@ document.addEventListener('DOMContentLoaded', async () => {
                 }
 
                 if (!resp || resp.ok !== true) {
-                    UIComponents.showToast('Failed to update list mode', 'error');
+                    UIComponents.showToast(tabViewUiText('popup.listMode.updateFailed', 'Failed to update list mode'), 'error');
                     renderListModeControls();
                     return;
                 }
 
                 if (resp.copiedBlocklist) {
                     const copiedCount = (Number(resp.copiedChannels) || 0) + (Number(resp.copiedKeywords) || 0);
-                    UIComponents.showToast(`Copied ${copiedCount} blocked ${pluralize(copiedCount, 'rule')} into Allowed rules. Blocked rules were kept.`, 'success');
+                    UIComponents.showToast(tabViewUiText(
+                        copiedCount === 1 ? 'popup.listMode.copiedRule' : 'popup.listMode.copiedRules',
+                        copiedCount === 1 ? 'Copied {count} blocked rule into Allowed rules. Blocked rules were kept.' : 'Copied {count} blocked rules into Allowed rules. Blocked rules were kept.',
+                        { count: copiedCount }
+                    ), 'success');
                 }
 
                 await StateManager.loadSettings();
