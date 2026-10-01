@@ -1737,5 +1737,6 @@
   "dashboard.backup.import.failed": "ورود ناموفق بود: {message}",
   "dashboard.backup.protected.exportButtonBlocked": "نمایه‌های محافظت‌شده نمی‌توانند اینجا نسخهٔ پشتیبان صادر کنند",
   "dashboard.backup.protected.exportEncryptedButtonBlocked": "نمایه‌های محافظت‌شده نمی‌توانند اینجا نسخهٔ پشتیبان رمزگذاری‌شده صادر کنند",
-  "dashboard.backup.protected.importButtonBlocked": "نمایه‌های محافظت‌شده نمی‌توانند اینجا نسخهٔ پشتیبان وارد کنند"
+  "dashboard.backup.protected.importButtonBlocked": "نمایه‌های محافظت‌شده نمی‌توانند اینجا نسخهٔ پشتیبان وارد کنند",
+  "dashboard.sync.remoteTarget.default": "از نمایهٔ بازشده در دستگاه دیگر استفاده کنید"
 }

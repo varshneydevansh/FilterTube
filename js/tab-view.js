@@ -13940,8 +13940,10 @@ document.addEventListener('DOMContentLoaded', async () => {
     }
 
     function getNanahProfileTypeLabel(profileType, profileId = '') {
-        if (normalizeString(profileId) === 'default') return 'master account';
-        return normalizeString(profileType).toLowerCase() === 'child' ? 'protected profile' : 'account profile';
+        if (normalizeString(profileId) === 'default') return tabViewUiText('popup.profile.subtitleMaster', 'Master');
+        return normalizeString(profileType).toLowerCase() === 'child'
+            ? tabViewUiText('managedOverlay.profile.protected', 'Protected profile')
+            : tabViewUiText('managedOverlay.profile.account', 'Account profile');
     }
 
     function getNanahLocalProfileContext() {
@@ -15926,13 +15928,16 @@ document.addEventListener('DOMContentLoaded', async () => {
 
         const defaultOption = document.createElement('option');
         defaultOption.value = '';
-        defaultOption.textContent = 'Use the profile open there';
+        defaultOption.textContent = tabViewUiText('dashboard.sync.remoteTarget.default', 'Use the profile open there');
         ftNanahRemoteTarget.appendChild(defaultOption);
 
         inventory.forEach((entry) => {
             const option = document.createElement('option');
             option.value = entry.profileId;
-            option.textContent = `${entry.profileName} (${getNanahProfileTypeLabel(entry.profileType, entry.profileId)})${entry.locked ? ' · locked' : ''}`;
+            const lockedSuffix = entry.locked
+                ? ` · ${tabViewUiText('dashboard.selfControl.state.locked', 'Locked')}`
+                : '';
+            option.textContent = `${entry.profileName} (${getNanahProfileTypeLabel(entry.profileType, entry.profileId)})${lockedSuffix}`;
             ftNanahRemoteTarget.appendChild(option);
         });
 
@@ -25303,6 +25308,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     window.addEventListener('filtertube-ui-locale-changed', () => {
         renderListModeControls();
         renderNanahDeliveryPathStrip();
+        syncNanahRemoteTargetOptions();
         if (!profilesV4Cache) return;
         renderProfileSelector(profilesV4Cache);
         renderProfilesManager(profilesV4Cache);

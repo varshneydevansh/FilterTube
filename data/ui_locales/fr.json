@@ -1737,5 +1737,6 @@
   "dashboard.backup.import.failed": "Échec de l’importation : {message}",
   "dashboard.backup.protected.exportButtonBlocked": "Les profils protégés ne peuvent pas exporter de sauvegardes ici",
   "dashboard.backup.protected.exportEncryptedButtonBlocked": "Les profils protégés ne peuvent pas exporter de sauvegardes chiffrées ici",
-  "dashboard.backup.protected.importButtonBlocked": "Les profils protégés ne peuvent pas importer de sauvegardes ici"
+  "dashboard.backup.protected.importButtonBlocked": "Les profils protégés ne peuvent pas importer de sauvegardes ici",
+  "dashboard.sync.remoteTarget.default": "Utiliser le profil ouvert sur l’autre appareil"
 }

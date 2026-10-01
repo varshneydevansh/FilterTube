@@ -1737,5 +1737,6 @@
   "dashboard.backup.import.failed": "Uingizaji umeshindwa: {message}",
   "dashboard.backup.protected.exportButtonBlocked": "Wasifu zinazolindwa haziwezi kuhamisha nakala rudufu hapa",
   "dashboard.backup.protected.exportEncryptedButtonBlocked": "Wasifu zinazolindwa haziwezi kuhamisha nakala rudufu zilizosimbwa hapa",
-  "dashboard.backup.protected.importButtonBlocked": "Wasifu zinazolindwa haziwezi kuleta nakala rudufu hapa"
+  "dashboard.backup.protected.importButtonBlocked": "Wasifu zinazolindwa haziwezi kuleta nakala rudufu hapa",
+  "dashboard.sync.remoteTarget.default": "Tumia wasifu uliofunguliwa kwenye kifaa kingine"
 }

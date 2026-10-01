@@ -1737,5 +1737,6 @@
   "dashboard.backup.import.failed": "فشل الاستيراد: {message}",
   "dashboard.backup.protected.exportButtonBlocked": "البروفايلات المحمية ماينفعش تصدّر نسخ احتياطية من هنا",
   "dashboard.backup.protected.exportEncryptedButtonBlocked": "البروفايلات المحمية ماينفعش تصدّر نسخ احتياطية مشفّرة من هنا",
-  "dashboard.backup.protected.importButtonBlocked": "البروفايلات المحمية ماينفعش تستورد نسخ احتياطية من هنا"
+  "dashboard.backup.protected.importButtonBlocked": "البروفايلات المحمية ماينفعش تستورد نسخ احتياطية من هنا",
+  "dashboard.sync.remoteTarget.default": "استخدم البروفايل المفتوح على الجهاز التاني"
 }

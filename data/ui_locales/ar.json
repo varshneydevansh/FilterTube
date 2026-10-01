@@ -1737,5 +1737,6 @@
   "dashboard.backup.import.failed": "فشل الاستيراد: {message}",
   "dashboard.backup.protected.exportButtonBlocked": "لا يمكن للملفات الشخصية المحمية تصدير النسخ الاحتياطية هنا",
   "dashboard.backup.protected.exportEncryptedButtonBlocked": "لا يمكن للملفات الشخصية المحمية تصدير النسخ الاحتياطية المشفّرة هنا",
-  "dashboard.backup.protected.importButtonBlocked": "لا يمكن للملفات الشخصية المحمية استيراد النسخ الاحتياطية هنا"
+  "dashboard.backup.protected.importButtonBlocked": "لا يمكن للملفات الشخصية المحمية استيراد النسخ الاحتياطية هنا",
+  "dashboard.sync.remoteTarget.default": "استخدم الملف الشخصي المفتوح على الجهاز الآخر"
 }

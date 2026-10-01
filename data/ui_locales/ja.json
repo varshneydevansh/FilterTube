@@ -1737,5 +1737,6 @@
   "dashboard.backup.import.failed": "インポートに失敗しました：{message}",
   "dashboard.backup.protected.exportButtonBlocked": "保護されたプロフィールはここからバックアップをエクスポートできません",
   "dashboard.backup.protected.exportEncryptedButtonBlocked": "保護されたプロフィールはここから暗号化バックアップをエクスポートできません",
-  "dashboard.backup.protected.importButtonBlocked": "保護されたプロフィールはここからバックアップをインポートできません"
+  "dashboard.backup.protected.importButtonBlocked": "保護されたプロフィールはここからバックアップをインポートできません",
+  "dashboard.sync.remoteTarget.default": "もう一方のデバイスで開いているプロフィールを使用"
 }

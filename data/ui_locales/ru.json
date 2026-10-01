@@ -1737,5 +1737,6 @@
   "dashboard.backup.import.failed": "Ошибка импорта: {message}",
   "dashboard.backup.protected.exportButtonBlocked": "Защищённые профили не могут экспортировать резервные копии здесь",
   "dashboard.backup.protected.exportEncryptedButtonBlocked": "Защищённые профили не могут экспортировать зашифрованные резервные копии здесь",
-  "dashboard.backup.protected.importButtonBlocked": "Защищённые профили не могут импортировать резервные копии здесь"
+  "dashboard.backup.protected.importButtonBlocked": "Защищённые профили не могут импортировать резервные копии здесь",
+  "dashboard.sync.remoteTarget.default": "Использовать профиль, открытый на другом устройстве"
 }

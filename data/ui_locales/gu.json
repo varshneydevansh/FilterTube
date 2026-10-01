@@ -1737,5 +1737,6 @@
   "dashboard.backup.import.failed": "આયાત નિષ્ફળ: {message}",
   "dashboard.backup.protected.exportButtonBlocked": "સુરક્ષિત પ્રોફાઇલ અહીં બૅકઅપ નિકાસ કરી શકતી નથી",
   "dashboard.backup.protected.exportEncryptedButtonBlocked": "સુરક્ષિત પ્રોફાઇલ અહીં એન્ક્રિપ્ટેડ બૅકઅપ નિકાસ કરી શકતી નથી",
-  "dashboard.backup.protected.importButtonBlocked": "સુરક્ષિત પ્રોફાઇલ અહીં બૅકઅપ આયાત કરી શકતી નથી"
+  "dashboard.backup.protected.importButtonBlocked": "સુરક્ષિત પ્રોફાઇલ અહીં બૅકઅપ આયાત કરી શકતી નથી",
+  "dashboard.sync.remoteTarget.default": "બીજા ઉપકરણ પર ખુલેલી પ્રોફાઇલ વાપરો"
 }

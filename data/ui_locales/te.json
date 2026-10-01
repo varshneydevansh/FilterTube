@@ -1737,5 +1737,6 @@
   "dashboard.backup.import.failed": "దిగుమతి విఫలమైంది: {message}",
   "dashboard.backup.protected.exportButtonBlocked": "రక్షిత ప్రొఫైల్‌లు ఇక్కడ బ్యాకప్‌లను ఎగుమతి చేయలేవు",
   "dashboard.backup.protected.exportEncryptedButtonBlocked": "రక్షిత ప్రొఫైల్‌లు ఇక్కడ ఎన్‌క్రిప్ట్ చేసిన బ్యాకప్‌లను ఎగుమతి చేయలేవు",
-  "dashboard.backup.protected.importButtonBlocked": "రక్షిత ప్రొఫైల్‌లు ఇక్కడ బ్యాకప్‌లను దిగుమతి చేయలేవు"
+  "dashboard.backup.protected.importButtonBlocked": "రక్షిత ప్రొఫైల్‌లు ఇక్కడ బ్యాకప్‌లను దిగుమతి చేయలేవు",
+  "dashboard.sync.remoteTarget.default": "మరో పరికరంలో తెరిచి ఉన్న ప్రొఫైల్‌ను ఉపయోగించండి"
 }

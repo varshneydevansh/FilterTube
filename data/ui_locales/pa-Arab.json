@@ -1737,5 +1737,6 @@
   "dashboard.backup.import.failed": "درآمد ناکام ہو گئی: {message}",
   "dashboard.backup.protected.exportButtonBlocked": "محفوظ پروفائل ایتھے بیک اپ برآمد نہیں کر سکدے",
   "dashboard.backup.protected.exportEncryptedButtonBlocked": "محفوظ پروفائل ایتھے خفیہ بیک اپ برآمد نہیں کر سکدے",
-  "dashboard.backup.protected.importButtonBlocked": "محفوظ پروفائل ایتھے بیک اپ درآمد نہیں کر سکدے"
+  "dashboard.backup.protected.importButtonBlocked": "محفوظ پروفائل ایتھے بیک اپ درآمد نہیں کر سکدے",
+  "dashboard.sync.remoteTarget.default": "دوجے آلے اُتے کھلی ہوئی پروفائل ورتو"
 }

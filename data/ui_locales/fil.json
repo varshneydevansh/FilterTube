@@ -1737,5 +1737,6 @@
   "dashboard.backup.import.failed": "Nabigo ang pag-import: {message}",
   "dashboard.backup.protected.exportButtonBlocked": "Hindi makakapag-export ng backup ang mga protektadong profile dito",
   "dashboard.backup.protected.exportEncryptedButtonBlocked": "Hindi makakapag-export ng naka-encrypt na backup ang mga protektadong profile dito",
-  "dashboard.backup.protected.importButtonBlocked": "Hindi makakapag-import ng backup ang mga protektadong profile dito"
+  "dashboard.backup.protected.importButtonBlocked": "Hindi makakapag-import ng backup ang mga protektadong profile dito",
+  "dashboard.sync.remoteTarget.default": "Gamitin ang profile na nakabukas sa kabilang device"
 }

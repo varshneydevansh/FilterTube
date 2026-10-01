@@ -1737,5 +1737,6 @@
   "dashboard.backup.import.failed": "ማስገባት አልተሳካም፦ {message}",
   "dashboard.backup.protected.exportButtonBlocked": "የተጠበቁ መገለጫዎች እዚህ ምትኬ ማውጣት አይችሉም",
   "dashboard.backup.protected.exportEncryptedButtonBlocked": "የተጠበቁ መገለጫዎች እዚህ የተመሰጠረ ምትኬ ማውጣት አይችሉም",
-  "dashboard.backup.protected.importButtonBlocked": "የተጠበቁ መገለጫዎች እዚህ ምትኬ ማስገባት አይችሉም"
+  "dashboard.backup.protected.importButtonBlocked": "የተጠበቁ መገለጫዎች እዚህ ምትኬ ማስገባት አይችሉም",
+  "dashboard.sync.remoteTarget.default": "በሌላው መሣሪያ ላይ የተከፈተውን መገለጫ ይጠቀሙ"
 }

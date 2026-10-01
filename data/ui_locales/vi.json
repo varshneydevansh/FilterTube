@@ -1737,5 +1737,6 @@
   "dashboard.backup.import.failed": "Nhập thất bại: {message}",
   "dashboard.backup.protected.exportButtonBlocked": "Hồ sơ được bảo vệ không thể xuất bản sao lưu tại đây",
   "dashboard.backup.protected.exportEncryptedButtonBlocked": "Hồ sơ được bảo vệ không thể xuất bản sao lưu mã hóa tại đây",
-  "dashboard.backup.protected.importButtonBlocked": "Hồ sơ được bảo vệ không thể nhập bản sao lưu tại đây"
+  "dashboard.backup.protected.importButtonBlocked": "Hồ sơ được bảo vệ không thể nhập bản sao lưu tại đây",
+  "dashboard.sync.remoteTarget.default": "Dùng hồ sơ đang mở trên thiết bị kia"
 }

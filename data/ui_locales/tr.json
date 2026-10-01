@@ -1737,5 +1737,6 @@
   "dashboard.backup.import.failed": "İçe aktarma başarısız: {message}",
   "dashboard.backup.protected.exportButtonBlocked": "Korumalı profiller burada yedek dışa aktaramaz",
   "dashboard.backup.protected.exportEncryptedButtonBlocked": "Korumalı profiller burada şifreli yedek dışa aktaramaz",
-  "dashboard.backup.protected.importButtonBlocked": "Korumalı profiller burada yedek içe aktaramaz"
+  "dashboard.backup.protected.importButtonBlocked": "Korumalı profiller burada yedek içe aktaramaz",
+  "dashboard.sync.remoteTarget.default": "Diğer cihazda açık olan profili kullan"
 }

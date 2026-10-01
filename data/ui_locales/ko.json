@@ -1737,5 +1737,6 @@
   "dashboard.backup.import.failed": "가져오기에 실패했습니다: {message}",
   "dashboard.backup.protected.exportButtonBlocked": "보호된 프로필은 여기서 백업을 내보낼 수 없습니다",
   "dashboard.backup.protected.exportEncryptedButtonBlocked": "보호된 프로필은 여기서 암호화된 백업을 내보낼 수 없습니다",
-  "dashboard.backup.protected.importButtonBlocked": "보호된 프로필은 여기서 백업을 가져올 수 없습니다"
+  "dashboard.backup.protected.importButtonBlocked": "보호된 프로필은 여기서 백업을 가져올 수 없습니다",
+  "dashboard.sync.remoteTarget.default": "다른 기기에서 열려 있는 프로필 사용"
 }

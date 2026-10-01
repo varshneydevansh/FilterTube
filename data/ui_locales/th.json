@@ -1737,5 +1737,6 @@
   "dashboard.backup.import.failed": "นำเข้าไม่สำเร็จ: {message}",
   "dashboard.backup.protected.exportButtonBlocked": "โปรไฟล์ที่ได้รับการปกป้องไม่สามารถส่งออกข้อมูลสำรองที่นี่ได้",
   "dashboard.backup.protected.exportEncryptedButtonBlocked": "โปรไฟล์ที่ได้รับการปกป้องไม่สามารถส่งออกข้อมูลสำรองที่เข้ารหัสที่นี่ได้",
-  "dashboard.backup.protected.importButtonBlocked": "โปรไฟล์ที่ได้รับการปกป้องไม่สามารถนำเข้าข้อมูลสำรองที่นี่ได้"
+  "dashboard.backup.protected.importButtonBlocked": "โปรไฟล์ที่ได้รับการปกป้องไม่สามารถนำเข้าข้อมูลสำรองที่นี่ได้",
+  "dashboard.sync.remoteTarget.default": "ใช้โปรไฟล์ที่เปิดอยู่บนอุปกรณ์อีกเครื่อง"
 }

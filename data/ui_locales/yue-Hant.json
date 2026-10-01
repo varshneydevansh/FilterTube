@@ -1737,5 +1737,6 @@
   "dashboard.backup.import.failed": "匯入失敗：{message}",
   "dashboard.backup.protected.exportButtonBlocked": "受保護設定檔唔可以喺呢度匯出備份",
   "dashboard.backup.protected.exportEncryptedButtonBlocked": "受保護設定檔唔可以喺呢度匯出加密備份",
-  "dashboard.backup.protected.importButtonBlocked": "受保護設定檔唔可以喺呢度匯入備份"
+  "dashboard.backup.protected.importButtonBlocked": "受保護設定檔唔可以喺呢度匯入備份",
+  "dashboard.sync.remoteTarget.default": "使用另一部裝置而家開緊嘅設定檔"
 }

@@ -1737,5 +1737,6 @@
   "dashboard.backup.import.failed": "Import no work: {message}",
   "dashboard.backup.protected.exportButtonBlocked": "Protected profiles no fit export backup here",
   "dashboard.backup.protected.exportEncryptedButtonBlocked": "Protected profiles no fit export encrypted backup here",
-  "dashboard.backup.protected.importButtonBlocked": "Protected profiles no fit import backup here"
+  "dashboard.backup.protected.importButtonBlocked": "Protected profiles no fit import backup here",
+  "dashboard.sync.remoteTarget.default": "Use di profile wey dey open for di other device"
 }

@@ -1737,5 +1737,6 @@
   "dashboard.backup.import.failed": "আমদানি ব্যর্থ: {message}",
   "dashboard.backup.protected.exportButtonBlocked": "সুরক্ষিত প্রোফাইল এখানে ব্যাকআপ রপ্তানি করতে পারে না",
   "dashboard.backup.protected.exportEncryptedButtonBlocked": "সুরক্ষিত প্রোফাইল এখানে এনক্রিপ্ট করা ব্যাকআপ রপ্তানি করতে পারে না",
-  "dashboard.backup.protected.importButtonBlocked": "সুরক্ষিত প্রোফাইল এখানে ব্যাকআপ আমদানি করতে পারে না"
+  "dashboard.backup.protected.importButtonBlocked": "সুরক্ষিত প্রোফাইল এখানে ব্যাকআপ আমদানি করতে পারে না",
+  "dashboard.sync.remoteTarget.default": "অন্য ডিভাইসে খোলা প্রোফাইলটি ব্যবহার করুন"
 }

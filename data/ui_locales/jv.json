@@ -1737,5 +1737,6 @@
   "dashboard.backup.import.failed": "Impor gagal: {message}",
   "dashboard.backup.protected.exportButtonBlocked": "Profil sing dilindhungi ora bisa ngekspor serepan ing kene",
   "dashboard.backup.protected.exportEncryptedButtonBlocked": "Profil sing dilindhungi ora bisa ngekspor serepan enkripsi ing kene",
-  "dashboard.backup.protected.importButtonBlocked": "Profil sing dilindhungi ora bisa ngimpor serepan ing kene"
+  "dashboard.backup.protected.importButtonBlocked": "Profil sing dilindhungi ora bisa ngimpor serepan ing kene",
+  "dashboard.sync.remoteTarget.default": "Gunakake profil sing lagi dibukak ing piranti liyane"
 }

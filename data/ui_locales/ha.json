@@ -1737,5 +1737,6 @@
   "dashboard.backup.import.failed": "Shigo da kaya ya gaza: {message}",
   "dashboard.backup.protected.exportButtonBlocked": "Bayanan martaba masu kariya ba za su iya fitar da madadin a nan ba",
   "dashboard.backup.protected.exportEncryptedButtonBlocked": "Bayanan martaba masu kariya ba za su iya fitar da madadin mai ɓoye a nan ba",
-  "dashboard.backup.protected.importButtonBlocked": "Bayanan martaba masu kariya ba za su iya shigo da madadin a nan ba"
+  "dashboard.backup.protected.importButtonBlocked": "Bayanan martaba masu kariya ba za su iya shigo da madadin a nan ba",
+  "dashboard.sync.remoteTarget.default": "Yi amfani da bayanin da yake buɗe a ɗayan na’urar"
 }

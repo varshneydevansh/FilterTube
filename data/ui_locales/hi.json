@@ -1737,5 +1737,6 @@
   "dashboard.backup.import.failed": "आयात विफल: {message}",
   "dashboard.backup.protected.exportButtonBlocked": "सुरक्षित प्रोफ़ाइल यहाँ बैकअप निर्यात नहीं कर सकतीं",
   "dashboard.backup.protected.exportEncryptedButtonBlocked": "सुरक्षित प्रोफ़ाइल यहाँ एन्क्रिप्टेड बैकअप निर्यात नहीं कर सकतीं",
-  "dashboard.backup.protected.importButtonBlocked": "सुरक्षित प्रोफ़ाइल यहाँ बैकअप आयात नहीं कर सकतीं"
+  "dashboard.backup.protected.importButtonBlocked": "सुरक्षित प्रोफ़ाइल यहाँ बैकअप आयात नहीं कर सकतीं",
+  "dashboard.sync.remoteTarget.default": "दूसरे डिवाइस पर खुली प्रोफ़ाइल का इस्तेमाल करें"
 }

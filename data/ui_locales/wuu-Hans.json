@@ -1737,5 +1737,6 @@
   "dashboard.backup.import.failed": "导入失败：{message}",
   "dashboard.backup.protected.exportButtonBlocked": "受保护档案到迭搭勿能导出备份",
   "dashboard.backup.protected.exportEncryptedButtonBlocked": "受保护档案到迭搭勿能导出加密备份",
-  "dashboard.backup.protected.importButtonBlocked": "受保护档案到迭搭勿能导入备份"
+  "dashboard.backup.protected.importButtonBlocked": "受保护档案到迭搭勿能导入备份",
+  "dashboard.sync.remoteTarget.default": "用另一台设备浪正开着个配置"
 }

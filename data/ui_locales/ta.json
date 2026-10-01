@@ -1737,5 +1737,6 @@
   "dashboard.backup.import.failed": "இறக்குமதி தோல்வியடைந்தது: {message}",
   "dashboard.backup.protected.exportButtonBlocked": "பாதுகாக்கப்பட்ட சுயவிவரங்கள் இங்கே காப்புப்பிரதிகளை ஏற்றுமதி செய்ய முடியாது",
   "dashboard.backup.protected.exportEncryptedButtonBlocked": "பாதுகாக்கப்பட்ட சுயவிவரங்கள் இங்கே குறியாக்கப்பட்ட காப்புப்பிரதிகளை ஏற்றுமதி செய்ய முடியாது",
-  "dashboard.backup.protected.importButtonBlocked": "பாதுகாக்கப்பட்ட சுயவிவரங்கள் இங்கே காப்புப்பிரதிகளை இறக்குமதி செய்ய முடியாது"
+  "dashboard.backup.protected.importButtonBlocked": "பாதுகாக்கப்பட்ட சுயவிவரங்கள் இங்கே காப்புப்பிரதிகளை இறக்குமதி செய்ய முடியாது",
+  "dashboard.sync.remoteTarget.default": "மற்ற சாதனத்தில் திறந்திருக்கும் சுயவிவரத்தைப் பயன்படுத்தவும்"
 }

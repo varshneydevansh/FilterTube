@@ -1737,5 +1737,6 @@
   "dashboard.backup.import.failed": "Gbígbewọlé kùnà: {message}",
   "dashboard.backup.protected.exportButtonBlocked": "Àwọn profaili tó ní ààbò kò lè kó afẹ́yinti jáde níbí",
   "dashboard.backup.protected.exportEncryptedButtonBlocked": "Àwọn profaili tó ní ààbò kò lè kó afẹ́yinti ìṣípayá jáde níbí",
-  "dashboard.backup.protected.importButtonBlocked": "Àwọn profaili tó ní ààbò kò lè kó afẹ́yinti wọlé níbí"
+  "dashboard.backup.protected.importButtonBlocked": "Àwọn profaili tó ní ààbò kò lè kó afẹ́yinti wọlé níbí",
+  "dashboard.sync.remoteTarget.default": "Lo àkọọlẹ̀ tó ṣí lórí ẹ̀rọ kejì"
 }

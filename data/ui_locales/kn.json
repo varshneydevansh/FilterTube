@@ -1737,5 +1737,6 @@
   "dashboard.backup.import.failed": "ಆಮದು ವಿಫಲವಾಗಿದೆ: {message}",
   "dashboard.backup.protected.exportButtonBlocked": "ರಕ್ಷಿತ ಪ್ರೊಫೈಲ್‌ಗಳು ಇಲ್ಲಿ ಬ್ಯಾಕಪ್ ರಫ್ತು ಮಾಡಲಾಗುವುದಿಲ್ಲ",
   "dashboard.backup.protected.exportEncryptedButtonBlocked": "ರಕ್ಷಿತ ಪ್ರೊಫೈಲ್‌ಗಳು ಇಲ್ಲಿ ಎನ್‌ಕ್ರಿಪ್ಟ್ ಮಾಡಿದ ಬ್ಯಾಕಪ್ ರಫ್ತು ಮಾಡಲಾಗುವುದಿಲ್ಲ",
-  "dashboard.backup.protected.importButtonBlocked": "ರಕ್ಷಿತ ಪ್ರೊಫೈಲ್‌ಗಳು ಇಲ್ಲಿ ಬ್ಯಾಕಪ್ ಆಮದು ಮಾಡಲಾಗುವುದಿಲ್ಲ"
+  "dashboard.backup.protected.importButtonBlocked": "ರಕ್ಷಿತ ಪ್ರೊಫೈಲ್‌ಗಳು ಇಲ್ಲಿ ಬ್ಯಾಕಪ್ ಆಮದು ಮಾಡಲಾಗುವುದಿಲ್ಲ",
+  "dashboard.sync.remoteTarget.default": "ಮತ್ತೊಂದು ಸಾಧನದಲ್ಲಿ ತೆರೆದಿರುವ ಪ್ರೊಫೈಲ್ ಬಳಸಿ"
 }
