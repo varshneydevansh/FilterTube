@@ -36,6 +36,39 @@ function tabViewIntlLocale() {
     return locale;
 }
 
+// Compile only explicitly inventoried UI copy. Unknown text and placeholder
+// values are never treated as new translation instructions or catalog keys.
+function tabViewCompileDisplayCopy(entries) {
+    const exact = new Map();
+    const templates = [];
+    for (const { key, fallback } of entries) {
+        const names = [];
+        const pattern = fallback.split(/\{([a-zA-Z][a-zA-Z0-9]*)\}/g).map((part, index) => {
+            if (index % 2 === 1) {
+                names.push(part);
+                return '([\\s\\S]+?)';
+            }
+            return part.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+        }).join('');
+        if (names.length) templates.push({ key, fallback, names, matcher: new RegExp(`^${pattern}$`) });
+        else if (!exact.has(fallback)) exact.set(fallback, { key, fallback });
+    }
+    return { exact, templates };
+}
+
+function tabViewDisplayCopy(value, lookup) {
+    if (typeof value !== 'string' || !value) return value;
+    const exact = lookup.exact.get(value);
+    if (exact) return tabViewUiText(exact.key, exact.fallback);
+    for (const template of lookup.templates) {
+        const match = value.match(template.matcher);
+        if (!match) continue;
+        const values = Object.fromEntries(template.names.map((name, index) => [name, match[index + 1]]));
+        return tabViewUiText(template.key, template.fallback, values);
+    }
+    return value;
+}
+
 function tabViewTaxonomyDisplayLabel(option) {
     if (option?.labelKey) return tabViewUiText(option.labelKey, option.label);
     if (option?.code && typeof Intl?.DisplayNames === 'function') {
@@ -4956,6 +4989,46 @@ document.addEventListener('DOMContentLoaded', async () => {
         return 'https://m.youtube.com/feed/channels';
     }
 
+    const SUBSCRIPTION_IMPORT_DISPLAY_COPY = Object.freeze({
+        "dashboard.subscriptionStatus.preparing": "Preparing the subscribed channels import for this whitelist.",
+        "dashboard.subscriptionStatus.signIn": "Sign in to YouTube in the selected tab, then retry the subscriptions import.",
+        "dashboard.subscriptionStatus.tabNotReady": "The selected YouTube tab is still loading or has not finished starting FilterTube.",
+        "dashboard.subscriptionStatus.noSubscriptions": "No subscribed channels were found for the selected YouTube account.",
+        "dashboard.subscriptionStatus.openedTab": "FilterTube opened a YouTube tab because no usable signed-in session was ready.",
+        "dashboard.subscriptionStatus.signInRouting": "The selected YouTube tab is still on a sign-in or account-routing page.",
+        "dashboard.subscriptionStatus.keepTabOpen": "Keep a signed-in YouTube tab open for a moment, then retry.",
+        "dashboard.subscriptionStatus.reading": "Reading subscribed channels from {tab}…",
+        "dashboard.subscriptionStatus.readingAccount": "Reading the subscribed channel list for the active YouTube account.",
+        "dashboard.subscriptionStatus.collectedOne": "Collected {count} subscribed channel so far.",
+        "dashboard.subscriptionStatus.collectedOther": "Collected {count} subscribed channels so far.",
+        "dashboard.subscriptionStatus.enabled": "Allow only selected is now active. Your Blocked rules were kept unchanged.",
+        "dashboard.subscriptionStatus.importedEnabledOne": "Imported {count} subscribed channel into Allowed rules and turned on Allow only selected. Your Blocked rules were kept unchanged.",
+        "dashboard.subscriptionStatus.importedEnabledOther": "Imported {count} subscribed channels into Allowed rules and turned on Allow only selected. Your Blocked rules were kept unchanged.",
+        "dashboard.subscriptionStatus.addedInactiveOne": "Added {count} subscribed channel to whitelist. Your blocklist channels and keywords were left unchanged.",
+        "dashboard.subscriptionStatus.addedInactiveOther": "Added {count} subscribed channels to whitelist. Your blocklist channels and keywords were left unchanged.",
+        "dashboard.subscriptionStatus.addedActiveOne": "Added {count} subscribed channel to the active whitelist.",
+        "dashboard.subscriptionStatus.addedActiveOther": "Added {count} subscribed channels to the active whitelist.",
+        "dashboard.subscriptionStatus.alreadyInactive": "All subscribed channels were already present in whitelist. Your blocklist channels and keywords were left unchanged.",
+        "dashboard.subscriptionStatus.alreadyActive": "All subscribed channels were already present in whitelist.",
+        "dashboard.subscriptionStatus.active": "Imported subscribed channels are now active in whitelist mode.",
+        "dashboard.subscriptionStatus.new": "{count} new",
+        "dashboard.subscriptionStatus.repaired": "{count} repaired",
+        "dashboard.subscriptionStatus.alreadyPresent": "{count} already present",
+        "dashboard.subscriptionStatus.skipped": "{count} skipped",
+        "dashboard.subscriptionStatus.foundTotal": "{found} / {total} found",
+        "dashboard.subscriptionStatus.pageCheckedOne": "{count} page checked",
+        "dashboard.subscriptionStatus.pageCheckedOther": "{count} pages checked",
+        "dashboard.subscriptionStatus.pageReadOne": "{count} page read",
+        "dashboard.subscriptionStatus.pageReadOther": "{count} pages read",
+        "dashboard.subscriptionStatus.channelFoundOne": "{count} channel found",
+        "dashboard.subscriptionStatus.channelFoundOther": "{count} channels found",
+        "dashboard.subscriptionStatus.stoppedEarly": "import stopped early",
+        "dashboard.subscriptionStatus.loadingMore": "Loading more…"
+    });
+    const SUBSCRIPTION_IMPORT_COPY_LOOKUP = tabViewCompileDisplayCopy(
+        Object.entries(SUBSCRIPTION_IMPORT_DISPLAY_COPY).map(([key, fallback]) => ({ key, fallback }))
+    );
+
     function renderSubscriptionsImportState() {
         if (!importSubscriptionsNotice || !importSubscriptionsStatus || !importSubscriptionsActions) return;
 
@@ -4971,8 +5044,9 @@ document.addEventListener('DOMContentLoaded', async () => {
         importSubscriptionsNotice.classList.toggle('is-loading', subscriptionsImportState.inProgress === true);
         importSubscriptionsNotice.setAttribute('aria-busy', subscriptionsImportState.inProgress === true ? 'true' : 'false');
 
-        const message = normalizeString(subscriptionsImportState.message);
-        const meta = normalizeString(subscriptionsImportState.meta);
+        const message = tabViewDisplayCopy(normalizeString(subscriptionsImportState.message), SUBSCRIPTION_IMPORT_COPY_LOOKUP);
+        const meta = normalizeString(subscriptionsImportState.meta).split(' • ')
+            .map(part => tabViewDisplayCopy(part, SUBSCRIPTION_IMPORT_COPY_LOOKUP)).join(' • ');
         const statusText = meta ? `${message} ${meta}`.trim() : message;
         importSubscriptionsStatus.textContent = statusText;
 
@@ -16084,7 +16158,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         }
 
         if (ftNanahManagedTargetsHint) {
-            ftNanahManagedTargetsHint.textContent = `Choose which saved protected profiles on ${getNanahRemoteLabel()} receive this live update. Offline devices still need optional Internet Pickup or Home Pickup setup.`;
+            ftNanahManagedTargetsHint.textContent = tabViewUiText('dashboard.generatedStatus.selectedRemoteTargets', 'Choose which saved protected profiles on {device} receive this live update. Offline devices still need optional Internet Pickup or Home Pickup setup.', { device: getNanahRemoteLabel() });
         }
         return eligibleLinks;
     }
@@ -16351,8 +16425,8 @@ document.addEventListener('DOMContentLoaded', async () => {
                 ftNanahModeSendOnce.hidden = false;
                 ftNanahModeSendOnce.disabled = true;
             }
-            ftNanahChildBannerTitle.textContent = "Protected profile receive-only";
-            ftNanahChildBannerBody.textContent = "This protected profile can join a parent pairing code and receive updates for its own rules. Sending, backups, trusted-link policy, and profile management stay parent-controlled.";
+            ftNanahChildBannerTitle.textContent = tabViewUiText('dashboard.generatedStatus.protectedReceiveOnly', 'Protected profile receive-only');
+            ftNanahChildBannerBody.textContent = tabViewUiText('dashboard.generatedStatus.protectedReceiveDetail', 'This protected profile can join a parent pairing code and receive updates for its own rules. Sending, backups, trusted-link policy, and profile management stay parent-controlled.');
             if (ftNanahHostBtn) ftNanahHostBtn.disabled = true;
             if (ftNanahSendBtn) ftNanahSendBtn.disabled = true;
             if (ftNanahTrustBtn) ftNanahTrustBtn.disabled = true;
@@ -17816,30 +17890,13 @@ document.addEventListener('DOMContentLoaded', async () => {
     });
 
     const FAMILY_DEVICE_MAP_COPY_LOOKUP = (() => {
-        const exact = new Map();
-        const templates = [];
         const entries = [
             ...Object.entries(FAMILY_DEVICE_MAP_REUSED_COPY).map(([fallback, key]) => ({ key, fallback })),
             ...Object.entries(FAMILY_DEVICE_MAP_COPY)
                 .filter(([, fallback]) => !Object.prototype.hasOwnProperty.call(FAMILY_DEVICE_MAP_REUSED_COPY, fallback))
                 .map(([key, fallback]) => ({ key: `dashboard.sync.familyDeviceMap.${key}`, fallback }))
         ];
-        for (const { key, fallback } of entries) {
-            const names = [];
-            const pattern = fallback.split(/\{([a-zA-Z][a-zA-Z0-9]*)\}/g).map((part, index) => {
-                if (index % 2 === 1) {
-                    names.push(part);
-                    return '([\\s\\S]+?)';
-                }
-                return part.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
-            }).join('');
-            if (names.length) {
-                templates.push({ key, fallback, names, matcher: new RegExp(`^${pattern}$`) });
-            } else if (!exact.has(fallback)) {
-                exact.set(fallback, { key, fallback });
-            }
-        }
-        return { exact, templates };
+        return tabViewCompileDisplayCopy(entries);
     })();
 
     function familyDeviceMapText(key, fallback, values = {}) {
@@ -17856,16 +17913,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     }
 
     function familyDeviceMapCopy(value) {
-        if (typeof value !== 'string' || !value) return value;
-        const exact = FAMILY_DEVICE_MAP_COPY_LOOKUP.exact.get(value);
-        if (exact) return tabViewUiText(exact.key, exact.fallback);
-        for (const template of FAMILY_DEVICE_MAP_COPY_LOOKUP.templates) {
-            const match = value.match(template.matcher);
-            if (!match) continue;
-            const values = Object.fromEntries(template.names.map((name, index) => [name, match[index + 1]]));
-            return tabViewUiText(template.key, template.fallback, values);
-        }
-        return value;
+        return tabViewDisplayCopy(value, FAMILY_DEVICE_MAP_COPY_LOOKUP);
     }
 
     function familyDeviceMapDeliveryStatus(value) {
@@ -23054,7 +23102,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         });
 
         if (ftNanahQrCaption) {
-            ftNanahQrCaption.textContent = 'Scan in a Nanah-enabled app, or type the same code on the other device.';
+            ftNanahQrCaption.textContent = tabViewUiText('dashboard.generatedStatus.scanApp', 'Scan in a Nanah-enabled app, or type the same code on the other device.');
         }
     }
 
@@ -25803,6 +25851,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         renderListModeControls();
         renderNanahDeliveryPathStrip();
         syncNanahRemoteTargetOptions();
+        renderSubscriptionsImportState();
         if (!profilesV4Cache) return;
         renderProfileSelector(profilesV4Cache);
         renderProfilesManager(profilesV4Cache);
@@ -26957,7 +27006,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                 if (!['live', 'home', 'later'].includes(deliveryMode)) return;
                 ftNanahDeviceSelectionActionBtn.disabled = true;
                 const previousLabel = ftNanahDeviceSelectionActionBtn.textContent;
-                ftNanahDeviceSelectionActionBtn.textContent = 'Sending...';
+                ftNanahDeviceSelectionActionBtn.textContent = tabViewUiText('dashboard.generatedStatus.sending', 'Sending...');
                 try {
                     await sendManagedParentPolicyToVerifiedDevices([selectedProfileId], {
                         scope: 'active',
@@ -26966,7 +27015,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                     });
                 } finally {
                     ftNanahDeviceSelectionActionBtn.disabled = false;
-                    ftNanahDeviceSelectionActionBtn.textContent = previousLabel || 'Send update';
+                    ftNanahDeviceSelectionActionBtn.textContent = previousLabel || tabViewUiText('dashboard.sync.familyDeviceMap.action.sendUpdate', 'Send update');
                 }
                 return;
             }
@@ -27314,7 +27363,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             if (button) button.disabled = true;
         });
         if (ftNanahStatusHint) {
-            ftNanahStatusHint.textContent = 'Nanah runtime is not available in this build yet.';
+            ftNanahStatusHint.textContent = tabViewUiText('dashboard.generatedStatus.runtimeUnavailable', 'Nanah runtime is not available in this build yet.');
         }
     } else {
         if (ftNanahHostBtn) {
