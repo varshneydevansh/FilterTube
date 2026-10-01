@@ -8627,19 +8627,19 @@ document.addEventListener('DOMContentLoaded', async () => {
             {
                 label: 'Rules and time target protected profile',
                 labelKey: 'family.profileManager.syncChipRules',
-                title: 'Edit Rules, Set Limit, History, Lists, and Send Update act through parent-managed controls.',
+                title: tabViewUiText("family.profileManager.syncChipRulesHelp", "Edit Rules, Set Limit, History, Lists, and Send Update act through parent-managed controls."),
                 titleKey: 'family.profileManager.syncChipRulesHelp'
             },
             {
                 label: 'Device trust stays parent-owned',
                 labelKey: 'family.profileManager.syncChipDeviceTrust',
-                title: 'Pairing or sending still requires the current parent/account authority.',
+                title: tabViewUiText("family.profileManager.syncChipDeviceTrustHelp", "Pairing or sending still requires the current parent/account authority."),
                 titleKey: 'family.profileManager.syncChipDeviceTrustHelp'
             },
             {
                 label: 'Profile PIN is only a switch lock',
                 labelKey: 'family.profileManager.syncChipPin',
-                title: 'A profile switching PIN does not grant parent/admin authority.',
+                title: tabViewUiText("family.profileManager.syncChipPinHelp", "A profile switching PIN does not grant parent/admin authority."),
                 titleKey: 'family.profileManager.syncChipPinHelp'
             }
         ].forEach((item) => {
@@ -11186,7 +11186,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                 { value: 'kids', label: 'YouTube Kids', className: 'btn-secondary' },
                 { value: 'both', label: 'Main + Kids', className: 'btn-secondary' }
             ],
-            cancelText: 'Cancel'
+            cancelText: tabViewUiText("dashboard.modal.cancel", "Cancel")
         });
         if (surface === 'both') return ['main', 'kids'];
         if (surface === 'kids') return ['kids'];
@@ -12814,7 +12814,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             duplicateCount
         });
         await showRuleListImportCompletion(importReport, {
-            title: 'Rule List Import Complete',
+            title: tabViewUiText("dashboard.managedLists.importCompleteTitle", "Rule List Import Complete"),
             message: `Imported ${addedCount} ${pluralize(addedCount, 'rule')} into ${surfaceLabel}.`,
             details: [metadataNotice.trim()]
         });
@@ -12966,8 +12966,8 @@ document.addEventListener('DOMContentLoaded', async () => {
             const sendNow = await showConfirmModal({
                 title: 'Send removal update now?',
                 message: `${readyProfileCount} changed ${readyProfileCount === 1 ? 'profile has' : 'profiles have'} a verified delivery path. Send this list-removal update to those devices now.`,
-                confirmText: 'Send Update',
-                cancelText: 'Not now'
+                confirmText: tabViewUiText("family.commandCenter.action.sendUpdate", "Send Update"),
+                cancelText: tabViewUiText("firstRun.notNow", "Not now")
             });
             if (sendNow) {
                 await sendManagedParentPolicyToVerifiedDevices(changedProfileIds, {
@@ -16466,7 +16466,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                         recommended: true
                     }
                 ],
-                cancelText: 'Cancel'
+                cancelText: tabViewUiText("dashboard.modal.cancel", "Cancel")
             });
             return false;
         }
@@ -16491,7 +16491,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                     recommended: true
                 }
             ],
-            cancelText: 'Cancel'
+            cancelText: tabViewUiText("dashboard.modal.cancel", "Cancel")
         });
 
         return response === 'continue';
@@ -17114,7 +17114,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                 { value: 'use_code', label: 'Use Code or QR', className: 'btn-primary' },
                 { value: 'copy_helper', label: 'Copy Helper Command', className: 'btn-secondary' }
             ],
-            cancelText: 'Not now'
+            cancelText: tabViewUiText("firstRun.notNow", "Not now")
         });
         if (choice === 'copy_helper') {
             await copyNanahNearbyHelperCommand();
@@ -19676,7 +19676,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                 'Protected profiles still cannot change parent rules from their own surface.'
             ],
             choices,
-            cancelText: 'Cancel'
+            cancelText: tabViewUiText("dashboard.modal.cancel", "Cancel")
         });
     }
 
@@ -19871,7 +19871,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             message: 'Optional key for that pickup address. This is not the parent PIN. Leave blank to keep the saved key; enter a single dash to clear it.',
             placeholder: 'Optional pickup key',
             inputType: 'password',
-            confirmText: 'Save',
+            confirmText: tabViewUiText("dashboard.modal.save", "Save"),
             initialValue: ''
         });
         if (token === null) return;
@@ -20065,7 +20065,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         const current = readNanahManagedLocalNetworkProviderConfig();
         const currentEndpoint = normalizeString(current.endpointUrl || current.url || current.baseUrl);
         const action = await promptManagedProviderSetupAction({
-            title: 'Home Pickup',
+            title: tabViewUiText("family.commandCenter.sync.homePickup", "Home Pickup"),
             message: 'Use this only when Send Update is not practical and you run a FilterTube-compatible Home Pickup service for verified devices on your home, clinic, or school network.',
             details: [
                 'Default path: open both devices and use Send Update.',
@@ -20121,7 +20121,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             message: 'Optional service key for that Home Pickup service. This is not the parent PIN. Leave blank to keep the saved key; enter a single dash to clear it.',
             placeholder: 'Optional service key',
             inputType: 'password',
-            confirmText: 'Save',
+            confirmText: tabViewUiText("dashboard.modal.save", "Save"),
             initialValue: ''
         });
         if (token === null) return;
@@ -23065,7 +23065,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         const configs = {
             send_once: {
                 eyebrow: 'Copy once',
-                title: 'This profile',
+                title: tabViewUiText("managedOverlay.profile.this", "This profile"),
                 body: 'Copy the current profile to your own device once. Pair, verify the phrase, then send.',
                 help: 'Copy this profile to your own second device. This does not create parent authority or background control.',
                 steps: [
@@ -23789,7 +23789,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                 message: 'This incoming FilterTube payload comes from a Master-protected profile. Enter that PIN to continue.',
                 placeholder: 'Master PIN',
                 inputType: 'password',
-                confirmText: 'Authorize'
+                confirmText: tabViewUiText("dashboard.backup.action.authorize", "Authorize")
             });
             const normalizedPin = normalizeString(incomingPin);
             if (!normalizedPin) {
@@ -24392,7 +24392,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                         className: 'btn-secondary'
                     }
                 ],
-                cancelText: 'Decline'
+                cancelText: tabViewUiText("dashboard.sync.managedPolicy.caller.action.decline", "Decline")
             });
 
             if (response === 'approve') {
@@ -24546,7 +24546,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                         className: 'btn-secondary'
                     }
                 ],
-                cancelText: 'Cancel'
+                cancelText: tabViewUiText("dashboard.modal.cancel", "Cancel")
             });
 
             if (response !== 'approve') {
@@ -24711,7 +24711,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                     className: 'btn-secondary'
                 }
             ],
-            cancelText: 'Cancel'
+            cancelText: tabViewUiText("dashboard.modal.cancel", "Cancel")
         });
 
         if (!response || response === 'decline') {
@@ -25076,7 +25076,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                     className: 'btn-secondary btn-import'
                 }
             ],
-            cancelText: 'Cancel'
+            cancelText: tabViewUiText("dashboard.modal.cancel", "Cancel")
         });
     }
 
@@ -26433,7 +26433,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                             className: 'btn-secondary'
                         }
                     ],
-                    cancelText: 'Cancel'
+                    cancelText: tabViewUiText("dashboard.modal.cancel", "Cancel")
                 });
                 if (choice === 'download_report') {
                     await downloadJsonToDownloadsFolder(
@@ -26520,7 +26520,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                                 className: 'btn-secondary'
                             }
                         ],
-                        cancelText: 'Cancel'
+                        cancelText: tabViewUiText("dashboard.modal.cancel", "Cancel")
                     });
                     if (!restoreChoice) return;
                     restoreTrustedNanahState = restoreChoice === 'restore_trust';
@@ -26942,7 +26942,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                         'Only this verified device link is targeted. The receiver still checks the signature, bound profile, and revision.'
                     ].filter(Boolean),
                     choices,
-                    cancelText: 'Cancel'
+                    cancelText: tabViewUiText("dashboard.modal.cancel", "Cancel")
                 });
                 if (!['live', 'home', 'later'].includes(deliveryMode)) return;
                 ftNanahDeviceSelectionActionBtn.disabled = true;
@@ -27588,7 +27588,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             }
 
             const nameRaw = await showPromptModal({
-                title: 'Create Account',
+                title: tabViewUiText("family.commandCenter.firstSetup.createAccount", "Create Account"),
                 message: 'Enter a name for the new account.',
                 placeholder: 'Profile name',
                 inputType: 'text',
@@ -27699,7 +27699,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             if (!okUnlocked) return;
 
             const nameRaw = await showPromptModal({
-                title: 'Create Protected Profile',
+                title: tabViewUiText("family.commandCenter.firstSetup.createProtectedProfile", "Create Protected Profile"),
                 message: 'Enter a name for the protected profile.',
                 placeholder: 'Profile name',
                 inputType: 'text',
@@ -27815,7 +27815,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                 message: tabViewUiText('dashboard.pin.masterPrompt', 'Enter a new Master PIN.'),
                 placeholder: tabViewUiText('profileAccess.masterPinPlaceholder', 'Master PIN'),
                 inputType: 'password',
-                confirmText: 'Continue'
+                confirmText: tabViewUiText("dashboard.modal.continue", "Continue")
             });
             if (pin1 === null) return;
             const pin2 = await showPromptModal({
@@ -27823,7 +27823,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                 message: tabViewUiText('dashboard.pin.masterConfirmPrompt', 'Re-enter the Master PIN to confirm.'),
                 placeholder: tabViewUiText('profileAccess.masterPinPlaceholder', 'Master PIN'),
                 inputType: 'password',
-                confirmText: 'Save'
+                confirmText: tabViewUiText("dashboard.modal.save", "Save")
             });
             if (pin2 === null) return;
             if (normalizeString(pin1) !== normalizeString(pin2) || !normalizeString(pin1)) {
@@ -29666,7 +29666,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                     { value: 'csv-template', label: 'Download CSV Template', className: 'btn-primary' },
                     { value: 'json-template', label: 'Download JSON Template', className: 'btn-secondary' }
                 ],
-                cancelText: 'Close'
+                cancelText: tabViewUiText("dashboard.modal.close", "Close")
             });
             if (action === 'csv-template') downloadManagedRuleListCsvTemplate();
             if (action === 'json-template') downloadManagedRuleListJsonTemplate();

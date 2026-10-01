@@ -73,6 +73,7 @@ test('backup action dynamic copy uses matching named placeholders', () => {
 test('V3 backup prompts, modal copy, and toast copy have no raw English literals', () => {
   assert.doesNotMatch(flow, /UIComponents\.showToast\(\s*['"]/);
   assert.doesNotMatch(flow, /\b(?:title|message|placeholder|confirmText|label):\s*['"]/);
-  assert.match(flow, /cancelText: 'Cancel'/,
-    'generic Cancel uses tabViewModalActionText and the existing dashboard.modal.cancel key');
+  assert.match(flow, /cancelText: tabViewUiText\("dashboard\.modal\.cancel", "Cancel"\)/,
+    'Cancel uses the shared dashboard.modal.cancel key directly');
+  assert.doesNotMatch(flow, /cancelText: 'Cancel'/);
 });
