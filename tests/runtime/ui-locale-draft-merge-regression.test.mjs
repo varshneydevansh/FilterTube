@@ -32,3 +32,22 @@ test('locale draft merge validates all conflicts before mutating catalogs', t =>
     assert.equal(result.status, 0, result.stderr);
     assert.equal(JSON.parse(fs.readFileSync(path.join(dir, 'es.json'))).key, 'Hola {name}');
 });
+
+test('draft merge protects delivery feature names before any catalog write', t => {
+    const cwd = fs.mkdtempSync(path.join(os.tmpdir(), 'filtertube-feature-name-merge-'));
+    t.after(() => fs.rmSync(cwd, { recursive: true, force: true }));
+    const dir = path.join(cwd, 'data/ui_locales');
+    fs.mkdirSync(dir, { recursive: true });
+    const write = (name, value) => fs.writeFileSync(path.join(dir, name), JSON.stringify(value));
+    write('targets.json', { locales: [{ code: 'en' }, { code: 'de' }] });
+    write('en.json', {});
+    write('de.json', {});
+    for (const term of ['Home Bridge', 'Home Pickup', 'Internet Pickup']) {
+        write('batch.json', { english: { key: `${term} setup` } });
+        write('draft.json', { keys: ['key'], translations: { de: [`${term.replace(' ', '-')} Einrichtung`] } });
+        const result = spawnSync(process.execPath, [script, 'data/ui_locales/batch.json', 'data/ui_locales/draft.json'], { cwd, encoding: 'utf8' });
+        assert.notEqual(result.status, 0);
+        assert.ok(result.stderr.includes(`changed protected term ${term}`));
+        for (const locale of ['en', 'de']) assert.deepEqual(JSON.parse(fs.readFileSync(path.join(dir, `${locale}.json`))), {});
+    }
+});

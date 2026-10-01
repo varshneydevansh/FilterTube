@@ -33,7 +33,7 @@ for (const locale of translated) {
     }
     keys.forEach((key, index) => {
         if (placeholders(values[index]) !== placeholders(batch.english[key])) throw new Error(`${locale}: changed placeholders for ${key}`);
-        for (const term of ['FilterTube', 'YouTube', 'Advert Void']) {
+        for (const term of ['FilterTube', 'YouTube', 'Advert Void', 'Home Bridge', 'Home Pickup', 'Internet Pickup']) {
             if (batch.english[key].includes(term) && !values[index].includes(term)) throw new Error(`${locale}: changed protected term ${term} for ${key}`);
         }
     });
