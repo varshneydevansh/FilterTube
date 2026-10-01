@@ -7,171 +7,41 @@
 
 ## Version 3.4.0 — 38 Interface Languages And Playback Fixes
 
-Changes since v3.3.7, released August 29, 2026 (`70cdb405`). Version 3.4.0 was published on October 1, 2026; the original generated release body omitted these notes because its heading was not recognized. See the [complete post-release audit and validation boundaries](docs/POST_3_3_7_RELEASE_AUDIT_2026-10-01.md).
+Released October 1, 2026. Changes since v3.3.7.
+
+### Use FilterTube in your language
+
+- **38 bundled interface languages**, including Russian, Tamil and Gujarati. Choose your interface language in Settings.
+- Translated popup and dashboard controls, rule editors, backup/import dialogs, family controls, Help, playback messages and What's New.
+- Dates and counts follow your selected language, with improved right-to-left layout.
+- Translations work locally—no translation API, account or model download is required. Your saved rules, channel IDs and video-language filters do not change.
+
+### Playback and filtering improvements
+
+- **Turning FilterTube off releases playback checks.** Disabled mode removes filtering overlays and pending pauses on Watch and Shorts pages.
+- **Blocking the current video keeps you on that video.** FilterTube no longer opens another video or automatically advances through a playlist.
+- **Less repeated checking.** Playback checks reuse verified video information and avoid repeatedly rescanning the whole Watch page. Video-ID-only rules skip metadata they do not need.
+- **Better Google Search playback handling.** Checks target the selected YouTube player; hover previews and prefetched videos should not produce a page-wide checking banner.
+- **More accurate channel matching for Shorts.** Mobile reels and search results use the video's owner identity rather than a name mentioned in its title.
+- **More targeted page updates.** Individual card changes no longer trigger unnecessary full-page scans; members-only filtering targets the matching card instead of its surrounding section.
+- **Comment keyword matching restored** for saved comment-only rules, including keywords inside sentences.
+- **Advert Void handling improved** to distinguish the selected player's content from adverts and avoid treating unrelated media as the main video.
+
+### Interface and self-control
+
+- **Dashboard startup fixes** address the blank dashboard caused by localization errors.
+- **Hard Timer Whitelist** lets you start a protected, timed allow-only session using selected Main Allowed channels, then restores your previous settings when the session ends.
+
+### Known limitations
+
+- Some embedded videos can still remain paused when the information required by an active rule cannot be verified.
+- The Firefox Android white-screen report is not confirmed resolved. Some reported filtering and advert problems still need device-specific verification; Advert Void does not guarantee avoidance of YouTube's ad-block detection.
+- Translation accuracy and layouts still benefit from native-speaker and device review.
+- This release updates the browser extension. It does not introduce semantic ML filtering or a new Android/iOS app version.
 
 ### Commit history after the last release
 
-Release baseline: `70cdb405` (v3.3.7). Published endpoint: `c9f070af` (v3.4.0). The first-parent inventory below records the published delta, including draft/superseded development steps; final behavior is summarized afterwards. The immediate merge incorporates the earlier-authored `9e1c4243` optimization. The older v3.3.5–v3.3.6 source train is preserved in a [separate historical index](docs/POST_3_3_5_SOURCE_HISTORY_INDEX.md), not counted as new 3.4.0 work.
-
-| Date | Commit | Change | Canonical detail |
-| --- | --- | --- | --- |
-| 2026-08-29 | `cdb956d1` | Merge remote-tracking branch 'origin/master' | [Commit](https://github.com/varshneydevansh/FilterTube/commit/cdb956d1) |
-| 2026-09-02 | `006a61b5` | Fix direct access admission and add hard whitelist timer | [Commit](https://github.com/varshneydevansh/FilterTube/commit/006a61b5) |
-| 2026-09-02 | `b5a9668c` | Align late identity and channel surface filtering | [Commit](https://github.com/varshneydevansh/FilterTube/commit/b5a9668c) |
-| 2026-09-02 | `8501582b` | Filter modern Search Shorts by owner identity | [Commit](https://github.com/varshneydevansh/FilterTube/commit/8501582b) |
-| 2026-09-02 | `7e85404a` | Enforce verified current-video admission | [Commit](https://github.com/varshneydevansh/FilterTube/commit/7e85404a) |
-| 2026-09-02 | `794efba0` | Document current-video admission contract | [Commit](https://github.com/varshneydevansh/FilterTube/commit/794efba0) |
-| 2026-09-02 | `bb66fca2` | Isolate current-video admission retries | [Commit](https://github.com/varshneydevansh/FilterTube/commit/bb66fca2) |
-| 2026-09-04 | `6f7f608c` | Align current-video admission state | [Commit](https://github.com/varshneydevansh/FilterTube/commit/6f7f608c) |
-| 2026-09-21 | `dc6efa2d` | Add FundingJSON manifest | [Commit](https://github.com/varshneydevansh/FilterTube/commit/dc6efa2d) |
-| 2026-09-21 | `1bddea9f` | Add institutional funding plan | [Commit](https://github.com/varshneydevansh/FilterTube/commit/1bddea9f) |
-| 2026-09-22 | `4edfc734` | Document and checkpoint external YouTube playback admission | [Commit](https://github.com/varshneydevansh/FilterTube/commit/4edfc734) |
-| 2026-09-22 | `09bd05e9` | Constrain Advert Void quarantine to selected player media | [Commit](https://github.com/varshneydevansh/FilterTube/commit/09bd05e9) |
-| 2026-09-29 | `8e5c87df` | Add bundled multilingual interface catalogs and preview controls | [Commit](https://github.com/varshneydevansh/FilterTube/commit/8e5c87df) |
-| 2026-09-29 | `446cd24f` | Expand extension localization across generated controls | [Commit](https://github.com/varshneydevansh/FilterTube/commit/446cd24f) |
-| 2026-09-29 | `f50f3b4f` | Localize generated rule and import-report controls | [Commit](https://github.com/varshneydevansh/FilterTube/commit/f50f3b4f) |
-| 2026-09-29 | `9926b960` | Localize device-sync messages and Russian release history | [Commit](https://github.com/varshneydevansh/FilterTube/commit/9926b960) |
-| 2026-09-29 | `a71246d5` | Translate historical release notes into Chinese and Hindi | [Commit](https://github.com/varshneydevansh/FilterTube/commit/a71246d5) |
-| 2026-09-29 | `081b1720` | Translate historical release notes into Spanish and Arabic | [Commit](https://github.com/varshneydevansh/FilterTube/commit/081b1720) |
-| 2026-09-29 | `49c64de4` | Translate historical release notes into French | [Commit](https://github.com/varshneydevansh/FilterTube/commit/49c64de4) |
-| 2026-09-29 | `7422fe16` | Translate historical release notes into Bengali | [Commit](https://github.com/varshneydevansh/FilterTube/commit/7422fe16) |
-| 2026-09-29 | `72ea1239` | Translate historical release notes into Portuguese | [Commit](https://github.com/varshneydevansh/FilterTube/commit/72ea1239) |
-| 2026-09-29 | `ec62bf23` | Translate historical release notes into Indonesian | [Commit](https://github.com/varshneydevansh/FilterTube/commit/ec62bf23) |
-| 2026-09-29 | `d970d899` | Translate historical release notes into Urdu | [Commit](https://github.com/varshneydevansh/FilterTube/commit/d970d899) |
-| 2026-09-29 | `7f3943ee` | Translate historical release notes into German | [Commit](https://github.com/varshneydevansh/FilterTube/commit/7f3943ee) |
-| 2026-09-29 | `f31e5351` | Translate historical release notes into Japanese | [Commit](https://github.com/varshneydevansh/FilterTube/commit/f31e5351) |
-| 2026-09-29 | `03447e74` | Translate historical release notes into Marathi and Italian | [Commit](https://github.com/varshneydevansh/FilterTube/commit/03447e74) |
-| 2026-09-29 | `6aa7355e` | Translate historical release notes into Vietnamese | [Commit](https://github.com/varshneydevansh/FilterTube/commit/6aa7355e) |
-| 2026-09-29 | `97c7dddd` | Translate historical release notes into Korean | [Commit](https://github.com/varshneydevansh/FilterTube/commit/97c7dddd) |
-| 2026-09-29 | `0352aca9` | Translate historical release notes into Swahili | [Commit](https://github.com/varshneydevansh/FilterTube/commit/0352aca9) |
-| 2026-09-29 | `f2c0518d` | Translate historical release notes into Persian | [Commit](https://github.com/varshneydevansh/FilterTube/commit/f2c0518d) |
-| 2026-09-29 | `d9f395de` | Translate historical release notes into Hausa | [Commit](https://github.com/varshneydevansh/FilterTube/commit/d9f395de) |
-| 2026-09-29 | `87b568bb` | Translate historical release notes into Thai and Turkish | [Commit](https://github.com/varshneydevansh/FilterTube/commit/87b568bb) |
-| 2026-09-29 | `a20349b7` | Translate historical release notes into Western Punjabi | [Commit](https://github.com/varshneydevansh/FilterTube/commit/a20349b7) |
-| 2026-09-29 | `e5620812` | Translate historical release notes into Filipino | [Commit](https://github.com/varshneydevansh/FilterTube/commit/e5620812) |
-| 2026-09-29 | `6f9a55a0` | Translate historical release notes into Cantonese | [Commit](https://github.com/varshneydevansh/FilterTube/commit/6f9a55a0) |
-| 2026-09-29 | `e24f4811` | Translate historical release notes into Tamil | [Commit](https://github.com/varshneydevansh/FilterTube/commit/e24f4811) |
-| 2026-09-29 | `4dace02a` | Translate historical release notes into Wu Chinese | [Commit](https://github.com/varshneydevansh/FilterTube/commit/4dace02a) |
-| 2026-09-29 | `befeb20d` | Translate historical release notes into Telugu | [Commit](https://github.com/varshneydevansh/FilterTube/commit/befeb20d) |
-| 2026-09-29 | `c416e7fb` | Translate historical release notes into Nigerian Pidgin | [Commit](https://github.com/varshneydevansh/FilterTube/commit/c416e7fb) |
-| 2026-09-29 | `2d66a6df` | Keep current release links canonical across translations | [Commit](https://github.com/varshneydevansh/FilterTube/commit/2d66a6df) |
-| 2026-09-29 | `23077fab` | Translate historical release notes into Amharic | [Commit](https://github.com/varshneydevansh/FilterTube/commit/23077fab) |
-| 2026-09-29 | `d1df5dfd` | Translate historical release notes into Egyptian Arabic | [Commit](https://github.com/varshneydevansh/FilterTube/commit/d1df5dfd) |
-| 2026-09-29 | `e6fc65e0` | Translate historical release notes into Javanese | [Commit](https://github.com/varshneydevansh/FilterTube/commit/e6fc65e0) |
-| 2026-09-29 | `905b70d0` | Translate historical release notes into Gujarati | [Commit](https://github.com/varshneydevansh/FilterTube/commit/905b70d0) |
-| 2026-09-29 | `ed9cddf0` | Translate historical release notes into Kannada | [Commit](https://github.com/varshneydevansh/FilterTube/commit/ed9cddf0) |
-| 2026-09-29 | `5d1dee5d` | Translate historical release notes into Levantine Arabic | [Commit](https://github.com/varshneydevansh/FilterTube/commit/5d1dee5d) |
-| 2026-09-29 | `0307619f` | Localize dashboard dynamic messages across 38 catalogs | [Commit](https://github.com/varshneydevansh/FilterTube/commit/0307619f) |
-| 2026-09-29 | `bdfae97f` | Translate historical release notes into Sudanese Arabic | [Commit](https://github.com/varshneydevansh/FilterTube/commit/bdfae97f) |
-| 2026-09-29 | `5a6f6c8f` | Localize popup list-mode tooltips across 38 catalogs | [Commit](https://github.com/varshneydevansh/FilterTube/commit/5a6f6c8f) |
-| 2026-09-29 | `afd4a44e` | Translate historical release notes into Yoruba | [Commit](https://github.com/varshneydevansh/FilterTube/commit/afd4a44e) |
-| 2026-09-29 | `7381d342` | Translate historical release notes into Bhojpuri | [Commit](https://github.com/varshneydevansh/FilterTube/commit/7381d342) |
-| 2026-09-29 | `71aea0e6` | Document localization coverage and remaining runtime gaps | [Commit](https://github.com/varshneydevansh/FilterTube/commit/71aea0e6) |
-| 2026-09-29 | `a8821cf9` | Resolve automatic locale safely in content overlays | [Commit](https://github.com/varshneydevansh/FilterTube/commit/a8821cf9) |
-| 2026-09-29 | `ceb624b5` | Update localization audit for popup tooltip coverage | [Commit](https://github.com/varshneydevansh/FilterTube/commit/ceb624b5) |
-| 2026-09-29 | `6f2ef716` | Localize content-menu action status | [Commit](https://github.com/varshneydevansh/FilterTube/commit/6f2ef716) |
-| 2026-09-29 | `7a7b40b8` | Wire self-control messages for localization | [Commit](https://github.com/varshneydevansh/FilterTube/commit/7a7b40b8) |
-| 2026-09-29 | `e4fd8a6a` | Wire managed viewing overlays for localization | [Commit](https://github.com/varshneydevansh/FilterTube/commit/e4fd8a6a) |
-| 2026-09-29 | `97515f20` | Keep content-menu auto locale on released language | [Commit](https://github.com/varshneydevansh/FilterTube/commit/97515f20) |
-| 2026-09-29 | `a1128877` | Add managed overlay translation draft | [Commit](https://github.com/varshneydevansh/FilterTube/commit/a1128877) |
-| 2026-09-29 | `da466421` | Add managed overlay locale translation draft A | [Commit](https://github.com/varshneydevansh/FilterTube/commit/da466421) |
-| 2026-09-29 | `2f29699d` | Add hard whitelist translation draft subset | [Commit](https://github.com/varshneydevansh/FilterTube/commit/2f29699d) |
-| 2026-09-30 | `35a35aae` | Add managed overlay translations to locale catalogs | [Commit](https://github.com/varshneydevansh/FilterTube/commit/35a35aae) |
-| 2026-09-30 | `6828bf68` | Add self-control translation draft for 29 locales | [Commit](https://github.com/varshneydevansh/FilterTube/commit/6828bf68) |
-| 2026-09-30 | `f4247ad8` | Preserve YouTube brand in Egyptian Arabic draft | [Commit](https://github.com/varshneydevansh/FilterTube/commit/f4247ad8) |
-| 2026-09-30 | `332b00d8` | Localize rule-list move status toasts | [Commit](https://github.com/varshneydevansh/FilterTube/commit/332b00d8) |
-| 2026-09-30 | `e62ad9a6` | Add self-control and hard whitelist translations | [Commit](https://github.com/varshneydevansh/FilterTube/commit/e62ad9a6) |
-| 2026-09-30 | `e869e5ed` | Include managed overlay source in localization audit | [Commit](https://github.com/varshneydevansh/FilterTube/commit/e869e5ed) |
-| 2026-09-30 | `7f9c5c1d` | Translate rule-list move status toasts | [Commit](https://github.com/varshneydevansh/FilterTube/commit/7f9c5c1d) |
-| 2026-09-30 | `e7865169` | Localize managed link policy dialog | [Commit](https://github.com/varshneydevansh/FilterTube/commit/e7865169) |
-| 2026-09-30 | `0cbf12df` | Complete Pidgin managed overlay labels | [Commit](https://github.com/varshneydevansh/FilterTube/commit/0cbf12df) |
-| 2026-09-30 | `b7d495a7` | Localize popup language choice labels | [Commit](https://github.com/varshneydevansh/FilterTube/commit/b7d495a7) |
-| 2026-09-30 | `92b9ca55` | Translate popup language choice labels | [Commit](https://github.com/varshneydevansh/FilterTube/commit/92b9ca55) |
-| 2026-10-01 | `b1108ec6` | fix(admission): retain verified video metadata across settings refreshes | [Commit](https://github.com/varshneydevansh/FilterTube/commit/b1108ec6) |
-| 2026-10-01 | `6f50a7ee` | fix(playlists): stop autonomous navigation when filtering current video | [Commit](https://github.com/varshneydevansh/FilterTube/commit/6f50a7ee) |
-| 2026-10-01 | `b7e5c1f8` | feat(i18n): complete managed link policy translations for all 38 locales | [Commit](https://github.com/varshneydevansh/FilterTube/commit/b7e5c1f8) |
-| 2026-10-01 | `c5d9d294` | test(issues): validate mobile Shorts identity and record issue evidence | [Commit](https://github.com/varshneydevansh/FilterTube/commit/c5d9d294) |
-| 2026-10-01 | `6b3a84d9` | fix(embeds): recover exact loaded player metadata on selected Google playback | [Commit](https://github.com/varshneydevansh/FilterTube/commit/6b3a84d9) |
-| 2026-10-01 | `c34d3a02` | test(i18n): preflight draft conflicts before catalog writes | [Commit](https://github.com/varshneydevansh/FilterTube/commit/c34d3a02) |
-| 2026-10-01 | `21b31972` | fix(admission): consolidate player banners and scoped playback refreshes | [Commit](https://github.com/varshneydevansh/FilterTube/commit/21b31972) |
-| 2026-10-01 | `c2de14ee` | feat(i18n): translate managed list loading and validation errors | [Commit](https://github.com/varshneydevansh/FilterTube/commit/c2de14ee) |
-| 2026-10-01 | `02f9d564` | fix(shorts): read nested mobile reel channel identity and player metadata | [Commit](https://github.com/varshneydevansh/FilterTube/commit/02f9d564) |
-| 2026-10-01 | `06ecda1e` | fix(i18n): share translated list mode controls across popup and dashboard | [Commit](https://github.com/varshneydevansh/FilterTube/commit/06ecda1e) |
-| 2026-10-01 | `db8e0d75` | fix(i18n): localize shared component feedback and accessible names | [Commit](https://github.com/varshneydevansh/FilterTube/commit/db8e0d75) |
-| 2026-10-01 | `3fa3ca4f` | fix(i18n): reuse profile availability copy across dashboard actions | [Commit](https://github.com/varshneydevansh/FilterTube/commit/3fa3ca4f) |
-| 2026-10-01 | `b7d23288` | test(i18n): avoid brittle count for reused profile messages | [Commit](https://github.com/varshneydevansh/FilterTube/commit/b7d23288) |
-| 2026-10-01 | `37f54e40` | docs(help): describe staying on blocked playlist videos | [Commit](https://github.com/varshneydevansh/FilterTube/commit/37f54e40) |
-| 2026-10-01 | `b160b1b2` | docs: record focused issue fixes and localization validation boundaries | [Commit](https://github.com/varshneydevansh/FilterTube/commit/b160b1b2) |
-| 2026-10-01 | `c82d3e57` | test(shorts): validate wrapped reel metadata through the actual engine | [Commit](https://github.com/varshneydevansh/FilterTube/commit/c82d3e57) |
-| 2026-10-01 | `8f3a6789` | feat(i18n): translate backup import and export flows across all 38 languages | [Commit](https://github.com/varshneydevansh/FilterTube/commit/8f3a6789) |
-| 2026-10-01 | `b54c9b0c` | fix(i18n): format dashboard dates and counts in the selected language | [Commit](https://github.com/varshneydevansh/FilterTube/commit/b54c9b0c) |
-| 2026-10-01 | `5792778d` | docs(i18n): record selected locale formatting and remaining frozen batches | [Commit](https://github.com/varshneydevansh/FilterTube/commit/5792778d) |
-| 2026-10-01 | `ee4ba75a` | fix(i18n): refresh generated controls when interface language changes | [Commit](https://github.com/varshneydevansh/FilterTube/commit/ee4ba75a) |
-| 2026-10-01 | `46be21b4` | fix(i18n): localize remote target options without changing profile identity | [Commit](https://github.com/varshneydevansh/FilterTube/commit/46be21b4) |
-| 2026-10-01 | `94c48a27` | refactor(i18n): wire Family Devices and remaining dashboard messages | [Commit](https://github.com/varshneydevansh/FilterTube/commit/94c48a27) |
-| 2026-10-01 | `bafb36b4` | docs: record current linked issue regression evidence and limits | [Commit](https://github.com/varshneydevansh/FilterTube/commit/bafb36b4) |
-| 2026-10-01 | `430e6739` | fix(i18n): distinguish captured dashboard text in copy audit | [Commit](https://github.com/varshneydevansh/FilterTube/commit/430e6739) |
-| 2026-10-01 | `4aa0b665` | feat(i18n): draft Russian translations for remaining dashboard actions | [Commit](https://github.com/varshneydevansh/FilterTube/commit/4aa0b665) |
-| 2026-10-01 | `51ea0a3b` | refactor(i18n): key delivery readiness copy without changing policy state | [Commit](https://github.com/varshneydevansh/FilterTube/commit/51ea0a3b) |
-| 2026-10-01 | `af0262f3` | feat(i18n): draft Russian delivery control translations | [Commit](https://github.com/varshneydevansh/FilterTube/commit/af0262f3) |
-| 2026-10-01 | `1d776369` | fix(i18n): reuse existing keys for dashboard modal labels | [Commit](https://github.com/varshneydevansh/FilterTube/commit/1d776369) |
-| 2026-10-01 | `e46d2649` | test(i18n): preserve delivery feature names during translation merges | [Commit](https://github.com/varshneydevansh/FilterTube/commit/e46d2649) |
-| 2026-10-01 | `5ada1ff0` | docs(i18n): track translation batches and remaining release gates | [Commit](https://github.com/varshneydevansh/FilterTube/commit/5ada1ff0) |
-| 2026-10-01 | `ce31c790` | fix(admission): reject explicit selected video IDs without metadata delay | [Commit](https://github.com/varshneydevansh/FilterTube/commit/ce31c790) |
-| 2026-10-01 | `40697a9b` | feat(i18n): translate Family Devices across all 38 interface languages | [Commit](https://github.com/varshneydevansh/FilterTube/commit/40697a9b) |
-| 2026-10-01 | `ac05ef4a` | perf(admission): skip unnecessary metadata for verified ID-only decisions | [Commit](https://github.com/varshneydevansh/FilterTube/commit/ac05ef4a) |
-| 2026-10-01 | `849c1ba1` | refactor(i18n): wire setup and approval dialog messages | [Commit](https://github.com/varshneydevansh/FilterTube/commit/849c1ba1) |
-| 2026-10-01 | `bbdf4747` | test(i18n): protect import syntax in translated help | [Commit](https://github.com/varshneydevansh/FilterTube/commit/bbdf4747) |
-| 2026-10-01 | `b38c6f56` | test(i18n): audit shared components and current Nanah catalog | [Commit](https://github.com/varshneydevansh/FilterTube/commit/b38c6f56) |
-| 2026-10-01 | `fbbfb218` | feat(i18n): complete dashboard status messages in 38 locales | [Commit](https://github.com/varshneydevansh/FilterTube/commit/fbbfb218) |
-| 2026-10-01 | `42a7e535` | refactor(i18n): share render-time status localization | [Commit](https://github.com/varshneydevansh/FilterTube/commit/42a7e535) |
-| 2026-10-01 | `bd7360d5` | feat(i18n): complete delivery controls in 38 locales | [Commit](https://github.com/varshneydevansh/FilterTube/commit/bd7360d5) |
-| 2026-10-01 | `83be997d` | fix(i18n): localize managed target scope display | [Commit](https://github.com/varshneydevansh/FilterTube/commit/83be997d) |
-| 2026-10-01 | `e8262bc3` | feat(i18n): complete provider setup dialogs in 38 locales | [Commit](https://github.com/varshneydevansh/FilterTube/commit/e8262bc3) |
-| 2026-10-01 | `f8b2cb13` | docs: record focused issue checks and remaining release gates | [Commit](https://github.com/varshneydevansh/FilterTube/commit/f8b2cb13) |
-| 2026-10-01 | `6bfe6a8f` | feat(i18n): finish import copy and localize remaining help surfaces | [Commit](https://github.com/varshneydevansh/FilterTube/commit/6bfe6a8f) |
-| 2026-10-01 | `306af313` | build: exclude translation drafts from extension packages | [Commit](https://github.com/varshneydevansh/FilterTube/commit/306af313) |
-| 2026-10-01 | `6d109320` | feat(i18n): complete approval and import dialogs in 38 locales | [Commit](https://github.com/varshneydevansh/FilterTube/commit/6d109320) |
-| 2026-10-01 | `5db09a1b` | feat(i18n): complete generated statuses in 38 locales | [Commit](https://github.com/varshneydevansh/FilterTube/commit/5db09a1b) |
-| 2026-10-01 | `7b3ab813` | fix(i18n): translate delivery action labels instead of treating them as brands | [Commit](https://github.com/varshneydevansh/FilterTube/commit/7b3ab813) |
-| 2026-10-01 | `dd8c1600` | fix(i18n): align shared PIN copy and validate translated action labels | [Commit](https://github.com/varshneydevansh/FilterTube/commit/dd8c1600) |
-| 2026-10-01 | `1ab44cac` | feat(i18n): complete help tooltips in all 38 interface languages | [Commit](https://github.com/varshneydevansh/FilterTube/commit/1ab44cac) |
-| 2026-10-01 | `a76fc45d` | docs: record completed localization and browser package verification | [Commit](https://github.com/varshneydevansh/FilterTube/commit/a76fc45d) |
-| 2026-10-01 | `abaf9e5b` | fix(i18n): align RTL spacing and overlay language metadata | [Commit](https://github.com/varshneydevansh/FilterTube/commit/abaf9e5b) |
-| 2026-10-01 | `29b53cc3` | test: reconcile current rule and metadata fixtures | [Commit](https://github.com/varshneydevansh/FilterTube/commit/29b53cc3) |
-| 2026-10-01 | `500dee3d` | feat(i18n): enable all 38 bundled languages without preview gates | [Commit](https://github.com/varshneydevansh/FilterTube/commit/500dee3d) |
-| 2026-10-01 | `6a2e6ade` | Fix serialized comment keyword matchers and document issue 79 evidence | [Commit](https://github.com/varshneydevansh/FilterTube/commit/6a2e6ade) |
-| 2026-10-01 | `8ff79e23` | Fix dashboard localization startup scope errors | [Commit](https://github.com/varshneydevansh/FilterTube/commit/8ff79e23) |
-| 2026-10-01 | `6bb434e7` | Checkpoint remaining audit reconciliation and local semantic design | [Commit](https://github.com/varshneydevansh/FilterTube/commit/6bb434e7) |
-| 2026-10-01 | `0ee2aa29` | Prepare 3.4.0 release notes and audit post-3.3.7 changes | [Commit](https://github.com/varshneydevansh/FilterTube/commit/0ee2aa29) |
-| 2026-10-01 | `c9f070af` | Prevent concurrent builds from deleting archive inputs | [Commit](https://github.com/varshneydevansh/FilterTube/commit/c9f070af) |
-
-### Release changes
-
-- **38 bundled interface languages**: device-local language selection in Settings, including Russian, Tamil and Gujarati; popup, dashboard, generated rules, import/backup dialogs, family controls, help, overlays and release history use bundled catalogs. Added locale-aware dates/counts and RTL layout. User rules, IDs and video-language filters are unchanged; no runtime translation API is used. Fluent-speaker and installed-layout review remain quality gates.
-- **Dashboard startup fixes**: corrected the missing compact-condition `labelKey` parameter and a Main-channel localization call incorrectly placed in Kids initialization.
-- **Build concurrency protection**: full and browser-specific builds now share a lock outside `dist`, preventing overlapping cleanup from deleting locale files while ZIP packaging reads them. Missing-file errors remain fatal; interrupted builds release the lock on ordinary termination.
-- **Comment keyword matching (#79)**: reconstruct serialized comment-only matchers so keywords can match within sentences; preserve exact Unicode word boundaries, Disabled behavior and video/comment separation. This does not resolve the separate Firefox Android white-area report.
-- **Exact selected-player recovery**: retain verified metadata across settings snapshots without retaining stale allow decisions; recover loaded Google Player metadata only for selected media, not hover previews or unrelated thumbnails. Explicit blocked IDs reject immediately; ID-only allowed rules do not wait for unnecessary metadata.
-- **Mobile Shorts identity**: read nested reel owner IDs/handles and wrapped Player metadata so channel filters use the actual owner rather than a title mention.
-- **Supporting work**: regression fixtures, import and managed-policy localization, packaging exclusions for translation drafts, FundingJSON/institutional funding documentation and a local-only semantic-filtering design. Semantic ML remains disabled. Native app parity and store publication are not included in this bump.
-
-- **SPA playback intent and external prefetch**: preserve a held play attempt across navigation finish so verified allowed playback resumes; metadata prefetch alone no longer displays an external-player banner, and the early external pause check reuses verified metadata from settings.
-
-- **Card-scoped Watch/Search refresh**: non-structural card mutations now retain their candidate list instead of forcing a full Watch/Search card scan; structural mutations still request a full pass.
-- **Members-only false-hide correction**: a membership badge hides its matching card, not its enclosing search section or the entire Watch page. Explicit members-only shelf/playlist controls remain separate.
-
-- **Stay on blocked playback (#69)**: current-video rejection no longer advances even to a verified playlist successor, opens the playlist panel, or schedules navigation retries. The blocked video remains paused for the user to choose what to open next. This supersedes the earlier verified-successor behavior below.
-
-- **[Advert Void media ownership](docs/ADVERT_VOID_MEDIA_OWNERSHIP_2026-09-22.md)**: correct content/advert role selection during parallel playback, remove arbitrary second-video promotion, and scope quarantine to the selected player's non-decorative media. Focused regressions pass; installed-browser acceptance and escaped-ad reports remain open. This is not a guarantee against YouTube ad-block detection.
-
-- **Hard Timer Whitelist**: the extension offers an explicit non-cancellable Main YouTube allow-only session. It requires at least one selected Main Allowed channel, forces filtering and Whitelist mode, blocks policy/profile changes until expiry, restores the complete pre-session profile afterward, and retains its recovery snapshot if restoration must be retried. Downstream native installed parity is a separate gate.
-- **Global Disabled direct-access cleanup (#77)**: the master Disabled state now releases pending/blocked Watch and Shorts admission guards, removes direct-access overlays and markers, restores hidden current-watch elements, and clears channel-page redirect state before any retained channel, video, or keyword rule can run.
-- **Superseded development behavior (#69)**: early post-3.3.7 work allowed verified playlist successors instead of generic Next. That behavior was subsequently removed: final 3.4.0 source keeps blocked playback paused without autonomous navigation.
-- **[Verified current-video admission](docs/CURRENT_VIDEO_ADMISSION_BEHAVIOR_2026-09-02.md)**: direct Watch, Shorts, and embed playback now evaluates every active video-admission rule—video, channel, keyword, Allow only, duration, upload date, uppercase title, category, and language—using route-bound Player metadata. Cached verified decisions remain synchronous for normal YouTube SPA playback; unresolved decisions pause without failing open, delay the neutral checking UI to avoid flicker, and show a blocked banner only after an exact rule is verified. Layout-only toggles never produce a blocked-video banner.
-- **Admission-only pending retries**: a pending current video now rechecks only its route-bound admission decision instead of forcing the entire Watch page through repeated 15k+ channel-list scans. Browser Back/Forward playback is re-guarded when YouTube restores a buffered video whose route ID differs from the last admitted item, and streamed `get_watch` arrays now supply their exact wrapped Player metadata directly.
-- **Current-player admission race fix**: cold direct Watch entry establishes admission before DOM hydration; browser Back and SPA navigation synchronously invalidate the previous video's blocked receipt; intercepted Player and streamed `get_watch` metadata settle the current route immediately; current-player metadata bypasses the card scheduler and its one-minute cooldown; verified allow-list matches still pass independent content rules; unavailable metadata remains neutral; and an older enabled DOM pass cannot re-block playback after Global Disabled.
-- **Google Search YouTube playback boundary**: Google-owned inline YouTube playback now stays on the Search page while FilterTube holds the media, reads the exact video ID from Google's player route and sanitized YouTube Player JSON, and resolves it as allowed, exact-rule blocked, or unable to verify. Global Disabled, presentation-only settings, unrelated media, and Google result menus remain untouched.
+For the full development history and test results, see the [3.4.0 release audit](docs/POST_3_3_7_RELEASE_AUDIT_2026-10-01.md#commit-inventory).
 
 
 ## Version 3.3.7 — Faster Large Lists, Persistent Imports, And Public Android
