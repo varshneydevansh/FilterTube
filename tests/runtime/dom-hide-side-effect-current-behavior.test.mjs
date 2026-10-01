@@ -112,7 +112,7 @@ test('current watch and members-only fallback paths include broad hide and playb
   assert.match(currentWatch, /video\.pause\(\)/);
   assert.match(currentWatch, /toggleVisibility\(selected, true/);
   assert.match(currentWatch, /targetLink\.click\(\)/);
-  assert.match(currentWatch, /applyDOMFallback\(settings, \{ preserveScroll: true, forceReprocess: true \}\)/);
+  assert.match(currentWatch, /applyDOMFallback\(null, \{ preserveScroll: true, forceReprocess: true \}\)/);
 
   assert.match(membersOnly, /ytd-watch-flexy:has\(\.yt-badge-shape--membership\)/);
   assert.match(membersOnly, /ytd-watch-metadata:has\(\.yt-badge-shape--membership\)/);
