@@ -19,6 +19,9 @@ test('current release produces real notes and excludes the history index', () =>
   const entry = extract(changelog, version);
   assert.ok(entry.section.includes('38 bundled interface languages'));
   assert.ok(entry.section.includes('Dashboard startup fixes'));
+  assert.ok(entry.section.includes('### Commit history after the last release'));
+  assert.ok(entry.section.includes('`c9f070af`'));
+  assert.ok(!entry.section.includes('`4a658584`'));
   assert.ok(!entry.section.includes('Post-v3.3.5 source-history index'));
   assert.equal(entry.previousVersion, '3.3.7');
 });
