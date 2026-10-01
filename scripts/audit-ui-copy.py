@@ -1,6 +1,8 @@
 #!/usr/bin/env python3
 """Inventory literal extension HTML copy before declaring a locale complete.
 
+Packaged dashboard text is covered by the early static-copy capture and its
+English inventory. This audit subtracts only those exact known fragments.
 This is a source audit, not a translator. Dynamic JavaScript copy, release
 notes, manifests, and installed-browser checks are separate release gates.
 """
@@ -79,10 +81,23 @@ def main():
     args = parser.parse_args()
 
     entries = []
+    static_covered = 0
+    dashboard = (ROOT / "html/tab-view.html").read_text(encoding="utf-8")
+    # Do not treat a catalog entry as runtime wiring if capture is absent or
+    # runs after the controller can insert user-written text.
+    capture = dashboard.find('src="../js/ui_static_copy_capture.js"')
+    controller = dashboard.find('src="../js/tab-view.js"')
+    static_copy = {}
+    if 0 <= capture < controller:
+        static_copy = json.loads((ROOT / "data/ui_locales/en_static.json").read_text(encoding="utf-8"))
     for filename in SURFACES:
         inventory = CopyInventory(filename)
         inventory.feed((ROOT / filename).read_text(encoding="utf-8"))
-        entries.extend(inventory.entries)
+        for entry in inventory.entries:
+            if filename == "html/tab-view.html" and entry["text"] in static_copy:
+                static_covered += 1
+            else:
+                entries.append(entry)
     # Heuristic lower bound only: template HTML, ternaries and function calls
     # require a source-aware migration, so these findings are not auto-keyed.
     literal_assignment = re.compile(
@@ -102,6 +117,7 @@ def main():
     if args.json:
         print(json.dumps(entries, ensure_ascii=False, indent=2))
     else:
+        print(f"html/tab-view.html: {static_covered} exact packaged fragments covered by early static capture")
         for filename in (*SURFACES, *SCRIPT_SURFACES):
             source = [entry for entry in entries if entry["file"] == filename]
             print(f"{filename}: {len(source)} candidate unkeyed fragments")
