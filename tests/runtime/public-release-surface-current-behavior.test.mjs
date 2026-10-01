@@ -22,7 +22,7 @@ test('extension package and browser manifest versions currently match', () => {
   const packageVersion = readJson('package.json').version;
   const manifestFiles = ['manifest.json', 'manifest.chrome.json', 'manifest.firefox.json', 'manifest.opera.json'];
 
-  assert.equal(packageVersion, '3.3.2');
+  assert.match(packageVersion, /^\d+\.\d+\.\d+$/);
   for (const file of manifestFiles) {
     assert.equal(readJson(file).version, packageVersion, `${file} should match package version`);
   }
@@ -32,10 +32,10 @@ test('release notes now align with the packaged extension version', () => {
   const packageVersion = readJson('package.json').version;
   const firstEntry = firstReleaseNoteEntry();
 
-  assert.equal(packageVersion, '3.3.2');
+  assert.match(packageVersion, /^\d+\.\d+\.\d+$/);
   assert.equal(firstEntry.version, packageVersion);
   assert.doesNotMatch(firstEntry.headline, /Upcoming:/);
-  assert.equal(firstEntry.detailsUrl, 'https://github.com/varshneydevansh/FilterTube/releases/tag/v3.3.2');
+  assert.equal(firstEntry.detailsUrl, `https://github.com/varshneydevansh/FilterTube/releases/tag/v${packageVersion}`);
 });
 
 test('website analytics are website-only in code and privacy copy', () => {

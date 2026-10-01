@@ -2,6 +2,14 @@
 
 Scope: #69, #75, #76, #77, #65, #62, and #60. Public issue bodies/comments were read; no issue status or comments were changed.
 
+## Follow-up test triage — October 1
+
+Latest broad rerun after source-aware fixture repairs: **149/208 blocking checks pass (59 failures)** and **273/302 smoke checks pass (29 failures)**. Neither lane is a passing release gate.
+
+Repairs cover nested reel-owner rejection versus unrelated owners, storage-refresh settings globals, the comment-surface helper required by pending-hide extraction, and channel-page metadata supplied in the actual JSON payload rather than injected into state that is intentionally reset per payload. Shorts hiding still preserves page metadata while removing the media card. Release version checks now require matching package/manifests/release notes instead of pinning an obsolete version. List-mode checks verify preservation of saved blocklist rules and optional explicit copying, not the former merge-and-clear behavior. No production filtering rule was weakened to make these tests pass.
+
+Remaining failures include historical source hashes/line counts/token counts, extraction contracts, public release/download contracts, and other behavior assertions requiring further source-aware review. They were not deleted, blanket-rebaselined, or moved out of a lane. Reporter exports/search cases for #75/#76, installed playlist/Disabled checks for #69/#77, Firefox Android for #65, and two-device/native checks remain missing. Chrome live-review attempts failed at connector policy loading and then at the native user-window-change guard; no Android device was connected. No reporter issue is newly declared resolved by this follow-up.
+
 ## Final verification boundary
 
 The focused thirteen-file issue suite was rerun on October 1 and passes 128/128. Broader existing lanes were also rerun: blocking passes 147/208 (61 failures); smoke passes 264/302 (38 failures). Those are not passing release gates. Examples include pinned source line/count audits, missing extraction needles, an obsolete assertion that reel owner extraction is absent, and fixture/source contract mismatches. They have not been blindly rebaselined. Each remaining failure needs source-aware triage independently of the focused issue suite.

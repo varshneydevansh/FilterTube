@@ -24,6 +24,10 @@ function createBridgeRuntime({ now = 0, runtimeResponses = [] } = {}) {
   let timerId = 0;
   const context = {
     console,
+    // bridge_settings runs after content_bridge in the installed extension.
+    // Include its shared state instead of testing an invalid isolated context.
+    currentSettings: null,
+    latestSettings: null,
     Map,
     Set,
     Promise,

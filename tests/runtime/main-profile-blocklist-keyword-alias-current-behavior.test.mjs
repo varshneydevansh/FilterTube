@@ -47,16 +47,18 @@ test('settings save keeps the main blocklist alias in sync while blocklist mode 
   assert.match(block, /nextMainProfile\.blockedKeywords = sanitizedKeywords;/);
 });
 
-test('mode switches clear or rehydrate the main blocklist alias with the canonical keyword list', () => {
+test('mode switches preserve canonical blocklist rows and explicit transfers rehydrate their aliases', () => {
   const background = read('js/background.js');
   const toWhitelist = sliceBetween(
     background,
-    'const blockedChannels = Array.isArray(nextMain.channels)',
-    'if (requestedMode === \'whitelist\')'
+    "} else if (action === 'FilterTube_SetListMode') {",
+    "} else if (action === 'FilterTube_BatchImportWhitelistChannels') {"
   );
 
   assert.match(toWhitelist, /Array\.isArray\(nextMain\.blockedKeywords\)/);
-  assert.match(toWhitelist, /nextMain\.blockedKeywords = \[\];/);
+  assert.match(toWhitelist, /if \(requestedMode === 'whitelist' && shouldCopyBlocklist\)/);
+  assert.doesNotMatch(toWhitelist, /nextMain\.(?:keywords|blockedKeywords) = \[\];/);
+  assert.match(toWhitelist, /writePayload\.uiKeywords = retainedKeywords;/);
   assert.match(background, /const blockedKeywords = Array\.isArray\(nextMain\.keywords\)[\s\S]*Array\.isArray\(nextMain\.blockedKeywords\)/);
   assert.match(background, /nextMain\.blockedKeywords = nextMain\.keywords;/);
 });

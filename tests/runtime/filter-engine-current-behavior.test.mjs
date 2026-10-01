@@ -1005,7 +1005,7 @@ test('shortsLockupViewModel applies belowThumbnailMetadata owner identity to cha
   assert.deepEqual(plain(output), { contents: [] });
 });
 
-test('reelItemRenderer currently blocks by title keyword but has no UC or handle extraction path', () => {
+test('reelItemRenderer blocks the verified nested owner and title keywords independently', () => {
   const input = {
     contents: [{
       reelItemRenderer: {
@@ -1037,7 +1037,12 @@ test('reelItemRenderer currently blocks by title keyword but has no UC or handle
     filterChannels: [{ handle: '@blockedreel' }]
   }));
 
-  assert.deepEqual(plain(output), plain(input));
+  assert.deepEqual(plain(output), { contents: [] });
+
+  const unrelatedOwner = runEngine(input, baseSettings({
+    filterChannels: [{ handle: '@differentowner' }]
+  }));
+  assert.deepEqual(plain(unrelatedOwner), plain(input));
 
   const keywordOutput = runEngine({
     contents: [{

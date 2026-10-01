@@ -346,6 +346,10 @@ function loadWhitelistPendingRuntime({ listMode = 'whitelist', pathname = '/feed
   vm.createContext(context);
   vm.runInContext(
     [
+      sliceBetween(read('js/content_bridge.js'), {
+        start: 'function isFilterTubeCommentSurfaceElement(',
+        end: 'function resolvePrefetchObserverCard('
+      }).block,
       blockMetric(blockSpecs.contentBridgeWhitelistPendingQueue).block,
       blockMetric(blockSpecs.contentBridgeWhitelistPendingApply).block,
       'globalThis.__exports = {',

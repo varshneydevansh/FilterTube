@@ -147,8 +147,13 @@ function run(data, overrides = {}, options = {}) {
 function runWithPageChannelMeta(data, overrides = {}, pageChannelMeta = {}, options = {}) {
   const harness = loadFilterTubeEngine(options);
   const filter = new harness.engine.YouTubeDataFilter(settings(overrides));
-  filter.pageChannelMeta = pageChannelMeta;
-  const result = filter.processData(data, options.dataName || 'whitelist-page-meta-fixture');
+  // Supply actual payload metadata. processData intentionally clears stale
+  // per-route state before harvesting; pre-setting an internal field is invalid.
+  const result = filter.processData({ ...data, metadata: { channelMetadataRenderer: {
+    externalId: pageChannelMeta.id,
+    vanityChannelUrl: pageChannelMeta.handle,
+    title: pageChannelMeta.name
+  } } }, options.dataName || 'whitelist-page-meta-fixture');
   return { ...harness, filter, result };
 }
 
@@ -328,7 +333,8 @@ test('whitelisted channel Shorts page preserves Shorts when hideAllShorts is dis
     withPageMeta.result.contents[0].shortsLockupViewModel.onTap.innertubeCommand.reelWatchEndpoint.videoId,
     'shortwl0001'
   );
-  assert.deepEqual(plain(hideAllShorts.result), { contents: [] });
+  assert.deepEqual(plain(hideAllShorts.result.contents), []);
+  assert.equal(hideAllShorts.result.metadata.channelMetadataRenderer.externalId, 'UCpagecreator000000000000');
 });
 
 test('channel-rule whitelist blocks unresolved identity when creator fallback is unavailable', () => {
