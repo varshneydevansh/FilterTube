@@ -1802,8 +1802,51 @@ function scheduleSeedRetry() {
     }, 250);
 }
 
+function retainVerifiedVideoMetadata(settings) {
+    // Player verification belongs to this page's video IDs, not to a replaceable
+    // settings snapshot. A storage refresh must not send an already checked
+    // player back through the pending state merely because persistence omits it.
+    const cache = window.__filtertubeVerifiedVideoMetadata instanceof Map
+        ? window.__filtertubeVerifiedVideoMetadata
+        : (window.__filtertubeVerifiedVideoMetadata = new Map());
+    const remember = (map) => {
+        for (const [id, meta] of Object.entries(map || {})) {
+            if (!/^[a-zA-Z0-9_-]{11}$/.test(id) || !meta || typeof meta !== 'object') continue;
+            if (meta.identityVerified !== true && meta.textVerified !== true) continue;
+            const previous = cache.get(id) || {};
+            const merged = { ...previous, ...meta };
+            if (previous.identityVerified === true && meta.identityVerified !== true) {
+                for (const field of ['channelId', 'channelName', 'channelHandle', 'identityVerified']) merged[field] = previous[field];
+            }
+            if (previous.textVerified === true && meta.textVerified !== true) {
+                for (const field of ['title', 'shortDescription', 'keywords', 'textVerified']) merged[field] = previous[field];
+            }
+            cache.delete(id);
+            cache.set(id, merged);
+        }
+    };
+    remember(currentSettings?.videoMetaMap);
+    remember(settings?.videoMetaMap);
+    while (cache.size > 256) cache.delete(cache.keys().next().value);
+    if (!settings || typeof settings !== 'object' || cache.size === 0) return;
+    const nextMap = { ...(settings.videoMetaMap || {}) };
+    for (const [id, verified] of cache) {
+        const incoming = nextMap[id] || {};
+        const merged = { ...verified, ...incoming };
+        if (incoming.identityVerified !== true && verified.identityVerified === true) {
+            for (const field of ['channelId', 'channelName', 'channelHandle', 'identityVerified']) merged[field] = verified[field];
+        }
+        if (incoming.textVerified !== true && verified.textVerified === true) {
+            for (const field of ['title', 'shortDescription', 'keywords', 'textVerified']) merged[field] = verified[field];
+        }
+        nextMap[id] = merged;
+    }
+    settings.videoMetaMap = nextMap;
+}
+
 function sendSettingsToMainWorld(settings) {
     const dispatchRevision = ++mainWorldSettingsDispatchRevision;
+    retainVerifiedVideoMetadata(settings);
     latestSettings = settings;
     currentSettings = settings;
 

@@ -2023,6 +2023,8 @@ function persistVideoMetaMapping(entries = []) {
             ? keywordsRaw.map(value => typeof value === 'string' ? value.trim() : '').filter(Boolean)
             : [];
 
+        const mayReplaceIdentity = identityVerified || existing.identityVerified !== true;
+        const mayReplaceText = textVerified || existing.textVerified !== true;
         const meta = {
             lengthSeconds: incomingLengthSeconds !== null ? incomingLengthSeconds : (existing.lengthSeconds ?? null),
             publishDate: incomingPublishDate || (typeof existing.publishDate === 'string' ? existing.publishDate.trim() : ''),
@@ -2031,16 +2033,16 @@ function persistVideoMetaMapping(entries = []) {
             languageCode: incomingLanguageCode || (typeof existing.languageCode === 'string' ? existing.languageCode.trim() : ''),
             languageSource: incomingLanguageSource || (typeof existing.languageSource === 'string' ? existing.languageSource.trim() : ''),
             languageConfidence: incomingLanguageConfidence || (typeof existing.languageConfidence === 'string' ? existing.languageConfidence.trim() : ''),
-            title: incomingTitle || (typeof existing.title === 'string' ? existing.title : ''),
-            channelId: incomingChannelId || (typeof existing.channelId === 'string' ? existing.channelId.trim() : ''),
-            channelName: incomingChannelName || (typeof existing.channelName === 'string' ? existing.channelName : ''),
-            channelHandle: incomingChannelHandle || (typeof existing.channelHandle === 'string' ? existing.channelHandle : ''),
+            title: (mayReplaceText && incomingTitle) || (typeof existing.title === 'string' ? existing.title : ''),
+            channelId: (mayReplaceIdentity && incomingChannelId) || (typeof existing.channelId === 'string' ? existing.channelId.trim() : ''),
+            channelName: (mayReplaceIdentity && incomingChannelName) || (typeof existing.channelName === 'string' ? existing.channelName : ''),
+            channelHandle: (mayReplaceIdentity && incomingChannelHandle) || (typeof existing.channelHandle === 'string' ? existing.channelHandle : ''),
             identityVerified: identityVerified || existing.identityVerified === true,
             textVerified: textVerified || existing.textVerified === true,
             // Keep creator text in the page session so keyword matching can reuse
             // Player responses without expanding persistent extension storage.
-            shortDescription: incomingShortDescription || (typeof existing.shortDescription === 'string' ? existing.shortDescription : ''),
-            keywords: incomingKeywords.length > 0
+            shortDescription: (mayReplaceText && incomingShortDescription) || (typeof existing.shortDescription === 'string' ? existing.shortDescription : ''),
+            keywords: mayReplaceText && incomingKeywords.length > 0
                 ? incomingKeywords
                 : (Array.isArray(existing.keywords) ? existing.keywords : [])
         };
