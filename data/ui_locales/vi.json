@@ -1663,5 +1663,11 @@
   "dashboard.sync.managedPolicy.locked.allowUpdates.title": "Cho phép áp dụng cập nhật của phụ huynh",
   "dashboard.sync.managedPolicy.locked.allowUpdates.body": "Cập nhật có chữ ký khớp từ liên kết phụ huynh đã lưu này có thể được áp dụng mà không cần mở khóa hồ sơ mỗi lần.",
   "dashboard.sync.managedPolicy.error.noAllowedScopes": "Chọn ít nhất một khu vực được phép trước khi lưu liên kết phụ huynh này.",
-  "dashboard.sync.managedPolicy.error.lockedScopes": "{scopes} phải luôn được bật để phê duyệt này."
+  "dashboard.sync.managedPolicy.error.lockedScopes": "{scopes} phải luôn được bật để phê duyệt này.",
+  "dashboard.managedLists.error.publicHttps": "Nhập URL HTTPS công khai của tệp văn bản.",
+  "dashboard.managedLists.error.http": "Không thể tải danh sách ({status})",
+  "dashboard.managedLists.error.tooLarge": "Danh sách quá lớn. Hãy dùng tệp văn bản nhỏ hơn.",
+  "dashboard.managedLists.error.timeout": "URL danh sách phản hồi quá lâu.",
+  "dashboard.managedLists.error.invalidJson": "Nội dung này có vẻ là JSON nhưng JSON không hợp lệ. Hãy sửa cú pháp JSON rồi xem trước lại.",
+  "dashboard.managedLists.error.noValidRows": "Không tìm thấy kênh hoặc từ khóa hợp lệ"
 }

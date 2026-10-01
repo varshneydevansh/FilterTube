@@ -1663,5 +1663,11 @@
   "dashboard.sync.managedPolicy.locked.allowUpdates.title": "माता-पिता अपडेट लागू होने दें",
   "dashboard.sync.managedPolicy.locked.allowUpdates.body": "इस सहेजे गए माता-पिता लिंक के मिलते-जुलते हस्ताक्षरित अपडेट हर बार प्रोफ़ाइल अनलॉक किए बिना लागू हो सकते हैं।",
   "dashboard.sync.managedPolicy.error.noAllowedScopes": "यह माता-पिता लिंक सहेजने से पहले कम-से-कम एक अनुमत क्षेत्र चुनें।",
-  "dashboard.sync.managedPolicy.error.lockedScopes": "इस स्वीकृति के लिए {scopes} चालू रहना ज़रूरी है।"
+  "dashboard.sync.managedPolicy.error.lockedScopes": "इस स्वीकृति के लिए {scopes} चालू रहना ज़रूरी है।",
+  "dashboard.managedLists.error.publicHttps": "कोई सार्वजनिक HTTPS टेक्स्ट URL डालें।",
+  "dashboard.managedLists.error.http": "सूची लोड नहीं हो सकी ({status})",
+  "dashboard.managedLists.error.tooLarge": "सूची बहुत बड़ी है। छोटी टेक्स्ट फ़ाइल इस्तेमाल करें।",
+  "dashboard.managedLists.error.timeout": "सूची URL से जवाब आने में बहुत समय लगा।",
+  "dashboard.managedLists.error.invalidJson": "यह JSON जैसा दिखता है, लेकिन मान्य JSON नहीं है। JSON सिंटैक्स ठीक करके फिर से पूर्वावलोकन करें।",
+  "dashboard.managedLists.error.noValidRows": "कोई मान्य चैनल या कीवर्ड नहीं मिला"
 }

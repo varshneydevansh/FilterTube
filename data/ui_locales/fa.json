@@ -1663,5 +1663,11 @@
   "dashboard.sync.managedPolicy.locked.allowUpdates.title": "اجازه اعمال به‌روزرسانی‌های والد",
   "dashboard.sync.managedPolicy.locked.allowUpdates.body": "به‌روزرسانی‌های امضاشده منطبق از این پیوند ذخیره‌شده والد می‌توانند بدون بازکردن قفل نمایه در هر بار اعمال شوند.",
   "dashboard.sync.managedPolicy.error.noAllowedScopes": "پیش از ذخیره این پیوند والد، دست‌کم یک بخش مجاز انتخاب کنید.",
-  "dashboard.sync.managedPolicy.error.lockedScopes": "برای این تأیید، {scopes} باید فعال بماند."
+  "dashboard.sync.managedPolicy.error.lockedScopes": "برای این تأیید، {scopes} باید فعال بماند.",
+  "dashboard.managedLists.error.publicHttps": "نشانی عمومی HTTPS برای یک فایل متنی وارد کنید.",
+  "dashboard.managedLists.error.http": "بارگیری فهرست ممکن نشد ({status})",
+  "dashboard.managedLists.error.tooLarge": "فهرست خیلی بزرگ است. از فایل متنی کوچک‌تری استفاده کنید.",
+  "dashboard.managedLists.error.timeout": "پاسخ‌گویی نشانی فهرست بیش از حد طول کشید.",
+  "dashboard.managedLists.error.invalidJson": "این شبیه JSON است، اما JSON معتبری نیست. دستور زبان JSON را اصلاح کنید و دوباره پیش‌نمایش بگیرید.",
+  "dashboard.managedLists.error.noValidRows": "هیچ کانال یا کلیدواژهٔ معتبری پیدا نشد"
 }

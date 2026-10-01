@@ -1663,5 +1663,11 @@
   "dashboard.sync.managedPolicy.locked.allowUpdates.title": "पालक अपडेट्स लागू करू द्या",
   "dashboard.sync.managedPolicy.locked.allowUpdates.body": "या जतन केलेल्या पालक लिंकवरील जुळणारी स्वाक्षरी केलेली अपडेट्स प्रत्येक वेळी प्रोफाइल अनलॉक न करता लागू होऊ शकतात.",
   "dashboard.sync.managedPolicy.error.noAllowedScopes": "ही पालक लिंक जतन करण्यापूर्वी किमान एक अनुमत व्याप्ती निवडा.",
-  "dashboard.sync.managedPolicy.error.lockedScopes": "या मंजुरीसाठी {scopes} सुरू ठेवणे आवश्यक आहे."
+  "dashboard.sync.managedPolicy.error.lockedScopes": "या मंजुरीसाठी {scopes} सुरू ठेवणे आवश्यक आहे.",
+  "dashboard.managedLists.error.publicHttps": "सार्वजनिक HTTPS मजकूर URL द्या.",
+  "dashboard.managedLists.error.http": "यादी लोड करता आली नाही ({status})",
+  "dashboard.managedLists.error.tooLarge": "यादी खूप मोठी आहे. छोटी मजकूर फाइल वापरा.",
+  "dashboard.managedLists.error.timeout": "यादीच्या URL कडून प्रतिसाद यायला खूप वेळ लागला.",
+  "dashboard.managedLists.error.invalidJson": "हे JSON दिसते, पण वैध JSON नाही. JSON ची मांडणी दुरुस्त करून पुन्हा पूर्वावलोकन करा.",
+  "dashboard.managedLists.error.noValidRows": "वैध चॅनेल किंवा कीवर्ड सापडले नाहीत"
 }

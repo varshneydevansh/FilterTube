@@ -9688,7 +9688,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     async function fetchManagedChannelListSourceUrl(rawUrl) {
         const url = normalizeManagedChannelListSourceUrl(rawUrl);
         if (!url) {
-            throw new Error('Enter a public HTTPS text URL.');
+            throw new Error(tabViewUiText('dashboard.managedLists.error.publicHttps', 'Enter a public HTTPS text URL.'));
         }
         const controller = typeof AbortController === 'function' ? new AbortController() : null;
         const timeout = controller ? setTimeout(() => controller.abort(), 15000) : null;
@@ -9699,15 +9699,15 @@ document.addEventListener('DOMContentLoaded', async () => {
                 signal: controller?.signal
             });
             if (!response.ok) {
-                throw new Error(`Unable to load list (${response.status})`);
+                throw new Error(tabViewUiText('dashboard.managedLists.error.http', 'Unable to load list ({status})', { status: response.status }));
             }
             const length = Number(response.headers.get('content-length')) || 0;
             if (length > 1024 * 1024) {
-                throw new Error('List is too large. Use a smaller text file.');
+                throw new Error(tabViewUiText('dashboard.managedLists.error.tooLarge', 'List is too large. Use a smaller text file.'));
             }
             const text = await response.text();
             if (text.length > 1024 * 1024) {
-                throw new Error('List is too large. Use a smaller text file.');
+                throw new Error(tabViewUiText('dashboard.managedLists.error.tooLarge', 'List is too large. Use a smaller text file.'));
             }
             return {
                 url,
@@ -9716,7 +9716,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             };
         } catch (error) {
             if (error?.name === 'AbortError') {
-                throw new Error('List URL took too long to respond.');
+                throw new Error(tabViewUiText('dashboard.managedLists.error.timeout', 'List URL took too long to respond.'));
             }
             throw error;
         } finally {
@@ -10278,7 +10278,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                     return parsedJson;
                 }
             } catch (e) {
-                throw new Error('This looks like JSON, but it is not valid JSON. Fix the JSON syntax and preview it again.');
+                throw new Error(tabViewUiText('dashboard.managedLists.error.invalidJson', 'This looks like JSON, but it is not valid JSON. Fix the JSON syntax and preview it again.'));
             }
         }
         const parsedCsv = parseManagedChannelKeywordCsv(text, { listName });
@@ -11736,7 +11736,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         const parsedRaw = parseManagedChannelListText(loaded.text, { listName: selectedList.listName });
         const counts = countManagedRuleListRows(parsedRaw);
         if (!counts.total) {
-            throw new Error('No valid channels or keywords found');
+            throw new Error(tabViewUiText('dashboard.managedLists.error.noValidRows', 'No valid channels or keywords found'));
         }
         return {
             selectedList,

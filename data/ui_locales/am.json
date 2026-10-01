@@ -1663,5 +1663,11 @@
   "dashboard.sync.managedPolicy.locked.allowUpdates.title": "የወላጅ ማዘመኛዎች እንዲተገበሩ ፍቀድ",
   "dashboard.sync.managedPolicy.locked.allowUpdates.body": "ከዚህ የተቀመጠ የወላጅ አገናኝ የሚመጡ ተዛማጅ በፊርማ የተረጋገጡ ማዘመኛዎች ፕሮፋይሉን በየጊዜው ሳይከፍቱ ሊተገበሩ ይችላሉ።",
   "dashboard.sync.managedPolicy.error.noAllowedScopes": "ይህን የወላጅ አገናኝ ከማስቀመጥዎ በፊት ቢያንስ አንድ የተፈቀደ ክፍል ይምረጡ።",
-  "dashboard.sync.managedPolicy.error.lockedScopes": "ለዚህ ፈቃድ {scopes} ንቁ መቆየት አለበት።"
+  "dashboard.sync.managedPolicy.error.lockedScopes": "ለዚህ ፈቃድ {scopes} ንቁ መቆየት አለበት።",
+  "dashboard.managedLists.error.publicHttps": "ይፋዊ የHTTPS ጽሑፍ URL ያስገቡ።",
+  "dashboard.managedLists.error.http": "ዝርዝሩን መጫን አልተቻለም ({status})",
+  "dashboard.managedLists.error.tooLarge": "ዝርዝሩ በጣም ትልቅ ነው። አነስ ያለ የጽሑፍ ፋይል ይጠቀሙ።",
+  "dashboard.managedLists.error.timeout": "የዝርዝሩ URL ምላሽ ለመስጠት በጣም ዘገየ።",
+  "dashboard.managedLists.error.invalidJson": "ይህ JSON ይመስላል፣ ግን ትክክለኛ JSON አይደለም። የJSON አገባብን አስተካክለው እንደገና ቅድመ እይታ ያድርጉ።",
+  "dashboard.managedLists.error.noValidRows": "ምንም ትክክለኛ ቻናል ወይም ቁልፍ ቃል አልተገኘም"
 }

@@ -1663,5 +1663,11 @@
   "dashboard.sync.managedPolicy.locked.allowUpdates.title": "Bari a yi amfani da sabuntawar iyaye",
   "dashboard.sync.managedPolicy.locked.allowUpdates.body": "Sabuntawar sa hannu da suka dace daga wannan mahadar iyaye da aka ajiye za su iya aiki ba tare da buɗe bayanin martaba a kowane lokaci ba.",
   "dashboard.sync.managedPolicy.error.noAllowedScopes": "Zaɓi aƙalla yanki guda da aka yarda kafin ka ajiye wannan mahadar iyaye.",
-  "dashboard.sync.managedPolicy.error.lockedScopes": "{scopes} dole ne su ci gaba da aiki domin wannan amincewa."
+  "dashboard.sync.managedPolicy.error.lockedScopes": "{scopes} dole ne su ci gaba da aiki domin wannan amincewa.",
+  "dashboard.managedLists.error.publicHttps": "Shigar da adireshin HTTPS na fayil ɗin rubutu na jama'a.",
+  "dashboard.managedLists.error.http": "An kasa loda jerin ({status})",
+  "dashboard.managedLists.error.tooLarge": "Jerin ya yi girma sosai. Yi amfani da ƙaramin fayil ɗin rubutu.",
+  "dashboard.managedLists.error.timeout": "Adireshin jerin ya ɗauki lokaci mai tsawo kafin ya amsa.",
+  "dashboard.managedLists.error.invalidJson": "Wannan yana kama da JSON, amma ba ingantaccen JSON ba ne. Gyara tsarin JSON sannan ka sake duba samfoti.",
+  "dashboard.managedLists.error.noValidRows": "Ba a sami ingantattun tashoshi ko kalmomin nema ba"
 }

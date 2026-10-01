@@ -1663,5 +1663,11 @@
   "dashboard.sync.managedPolicy.locked.allowUpdates.title": "माई-बाबू अपडेट लागू होखे दीं",
   "dashboard.sync.managedPolicy.locked.allowUpdates.body": "एह सहेजल माई-बाबू लिंक से मेल खाए वाला हस्ताक्षरित अपडेट हर बेर प्रोफाइल अनलॉक कइले बिना लागू हो सकेला।",
   "dashboard.sync.managedPolicy.error.noAllowedScopes": "एह माई-बाबू लिंक के सहेजे से पहिले कम से कम एगो मंजूर इलाका चुनीं।",
-  "dashboard.sync.managedPolicy.error.lockedScopes": "एह मंजूरी खातिर {scopes} चालू रहे के चाहीं।"
+  "dashboard.sync.managedPolicy.error.lockedScopes": "एह मंजूरी खातिर {scopes} चालू रहे के चाहीं।",
+  "dashboard.managedLists.error.publicHttps": "सार्वजनिक HTTPS टेक्स्ट URL डालीं।",
+  "dashboard.managedLists.error.http": "सूची लोड ना भइल ({status})",
+  "dashboard.managedLists.error.tooLarge": "सूची बहुत बड़ बा। छोट टेक्स्ट फाइल इस्तेमाल करीं।",
+  "dashboard.managedLists.error.timeout": "सूची URL से जवाब आवे में बहुत समय लागल।",
+  "dashboard.managedLists.error.invalidJson": "ई JSON लागत बा, बाकिर सही JSON नइखे। JSON के सिंटैक्स ठीक करके फेर प्रीव्यू करीं।",
+  "dashboard.managedLists.error.noValidRows": "कवनो सही चैनल भा कीवर्ड ना मिलल"
 }

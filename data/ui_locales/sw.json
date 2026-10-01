@@ -1663,5 +1663,11 @@
   "dashboard.sync.managedPolicy.locked.allowUpdates.title": "Ruhusu kutumia sasisho za mzazi",
   "dashboard.sync.managedPolicy.locked.allowUpdates.body": "Sasisho zilizosainiwa zinazolingana kutoka kwenye kiungo hiki cha mzazi kilichohifadhiwa zinaweza kutumika bila kufungua wasifu kila mara.",
   "dashboard.sync.managedPolicy.error.noAllowedScopes": "Chagua angalau eneo moja linaloruhusiwa kabla ya kuhifadhi kiungo hiki cha mzazi.",
-  "dashboard.sync.managedPolicy.error.lockedScopes": "{scopes} lazima ibaki imewashwa kwa idhini hii."
+  "dashboard.sync.managedPolicy.error.lockedScopes": "{scopes} lazima ibaki imewashwa kwa idhini hii.",
+  "dashboard.managedLists.error.publicHttps": "Weka URL ya HTTPS ya maandishi inayopatikana hadharani.",
+  "dashboard.managedLists.error.http": "Imeshindwa kupakia orodha ({status})",
+  "dashboard.managedLists.error.tooLarge": "Orodha ni kubwa mno. Tumia faili ndogo ya maandishi.",
+  "dashboard.managedLists.error.timeout": "URL ya orodha imechelewa sana kujibu.",
+  "dashboard.managedLists.error.invalidJson": "Hii inaonekana kuwa JSON, lakini si JSON halali. Rekebisha sintaksia ya JSON kisha uone hakikisho tena.",
+  "dashboard.managedLists.error.noValidRows": "Hakuna chaneli au maneno muhimu halali yaliyopatikana"
 }

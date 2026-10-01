@@ -1663,5 +1663,11 @@
   "dashboard.sync.managedPolicy.locked.allowUpdates.title": "允許套用家長更新",
   "dashboard.sync.managedPolicy.locked.allowUpdates.body": "呢條已儲存家長連結送來嘅相符簽署更新，可以唔使每次解鎖設定檔就套用。",
   "dashboard.sync.managedPolicy.error.noAllowedScopes": "儲存呢條家長連結之前，至少揀一個允許嘅區域。",
-  "dashboard.sync.managedPolicy.error.lockedScopes": "呢次批准必須保持 {scopes} 已啟用。"
+  "dashboard.sync.managedPolicy.error.lockedScopes": "呢次批准必須保持 {scopes} 已啟用。",
+  "dashboard.managedLists.error.publicHttps": "請輸入公開嘅 HTTPS 文字檔網址。",
+  "dashboard.managedLists.error.http": "載入清單失敗（{status}）",
+  "dashboard.managedLists.error.tooLarge": "清單太大，請改用細啲嘅文字檔。",
+  "dashboard.managedLists.error.timeout": "清單網址等咗好耐都冇回應。",
+  "dashboard.managedLists.error.invalidJson": "呢個似乎係 JSON，但格式唔正確。請修正 JSON 語法，再重新預覽。",
+  "dashboard.managedLists.error.noValidRows": "搵唔到有效嘅頻道或關鍵字"
 }

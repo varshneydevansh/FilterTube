@@ -1,0 +1,308 @@
+{
+  "keys": [
+    "dashboard.managedLists.error.publicHttps",
+    "dashboard.managedLists.error.http",
+    "dashboard.managedLists.error.tooLarge",
+    "dashboard.managedLists.error.timeout",
+    "dashboard.managedLists.error.invalidJson",
+    "dashboard.managedLists.error.noValidRows"
+  ],
+  "translations": {
+    "zh-Hans": [
+      "请输入公开的 HTTPS 文本列表网址。",
+      "无法加载列表（{status}）",
+      "列表太大。请使用较小的文本文件。",
+      "列表网址响应超时。",
+      "这看起来是 JSON，但格式无效。请修正 JSON 语法后重新预览。",
+      "未找到有效的频道或关键词"
+    ],
+    "hi": [
+      "कोई सार्वजनिक HTTPS टेक्स्ट URL डालें।",
+      "सूची लोड नहीं हो सकी ({status})",
+      "सूची बहुत बड़ी है। छोटी टेक्स्ट फ़ाइल इस्तेमाल करें।",
+      "सूची URL से जवाब आने में बहुत समय लगा।",
+      "यह JSON जैसा दिखता है, लेकिन मान्य JSON नहीं है। JSON सिंटैक्स ठीक करके फिर से पूर्वावलोकन करें।",
+      "कोई मान्य चैनल या कीवर्ड नहीं मिला"
+    ],
+    "es": [
+      "Introduce una URL HTTPS pública para el archivo de texto.",
+      "No se pudo cargar la lista ({status})",
+      "La lista es demasiado grande. Usa un archivo de texto más pequeño.",
+      "La URL de la lista tardó demasiado en responder.",
+      "Parece JSON, pero no es válido. Corrige la sintaxis JSON y vuelve a previsualizarlo.",
+      "No se encontraron canales ni palabras clave válidos"
+    ],
+    "ar": [
+      "أدخل عنوان HTTPS عامًا لملف نصي.",
+      "تعذّر تحميل القائمة ({status})",
+      "القائمة كبيرة جدًا. استخدم ملفًا نصيًا أصغر.",
+      "استغرق عنوان القائمة وقتًا طويلًا للرد.",
+      "يبدو هذا كأنه JSON، لكنه ليس JSON صالحًا. أصلح صياغة JSON ثم اعرض المعاينة مجددًا.",
+      "لم يتم العثور على قنوات أو كلمات مفتاحية صالحة"
+    ],
+    "fr": [
+      "Saisissez l’URL HTTPS publique d’un fichier texte.",
+      "Impossible de charger la liste ({status})",
+      "La liste est trop volumineuse. Utilisez un fichier texte plus petit.",
+      "L’URL de la liste a mis trop de temps à répondre.",
+      "Cela ressemble à du JSON, mais le JSON n’est pas valide. Corrigez sa syntaxe puis relancez l’aperçu.",
+      "Aucune chaîne ni aucun mot-clé valide trouvé"
+    ],
+    "bn": [
+      "একটি সর্বজনীন HTTPS টেক্সট URL দিন।",
+      "তালিকাটি লোড করা যায়নি ({status})",
+      "তালিকাটি খুব বড়। ছোট টেক্সট ফাইল ব্যবহার করুন।",
+      "তালিকার URL থেকে উত্তর পেতে খুব বেশি সময় লেগেছে।",
+      "এটি JSON বলে মনে হচ্ছে, কিন্তু বৈধ JSON নয়। JSON-এর বাক্যগঠন ঠিক করে আবার প্রিভিউ করুন।",
+      "কোনো বৈধ চ্যানেল বা কীওয়ার্ড পাওয়া যায়নি"
+    ],
+    "pt": [
+      "Insira o URL HTTPS público de um arquivo de texto.",
+      "Não foi possível carregar a lista ({status})",
+      "A lista é grande demais. Use um arquivo de texto menor.",
+      "O URL da lista demorou demais para responder.",
+      "Isto parece JSON, mas não é um JSON válido. Corrija a sintaxe do JSON e faça a prévia novamente.",
+      "Nenhum canal ou palavra-chave válido foi encontrado"
+    ],
+    "id": [
+      "Masukkan URL HTTPS publik untuk file teks.",
+      "Daftar tidak dapat dimuat ({status})",
+      "Daftar terlalu besar. Gunakan file teks yang lebih kecil.",
+      "URL daftar terlalu lama untuk merespons.",
+      "Ini tampaknya JSON, tetapi format JSON-nya tidak valid. Perbaiki sintaks JSON lalu pratinjau lagi.",
+      "Tidak ditemukan channel atau kata kunci yang valid"
+    ],
+    "ur": [
+      "عوامی HTTPS ٹیکسٹ URL درج کریں۔",
+      "فہرست لوڈ نہیں ہو سکی ({status})",
+      "فہرست بہت بڑی ہے۔ چھوٹی ٹیکسٹ فائل استعمال کریں۔",
+      "فہرست کے URL سے جواب آنے میں بہت وقت لگا۔",
+      "یہ JSON لگتا ہے، مگر درست JSON نہیں ہے۔ JSON کی ساخت درست کریں اور دوبارہ پیش منظر دیکھیں۔",
+      "کوئی درست چینل یا کلیدی لفظ نہیں ملا"
+    ],
+    "ru": [
+      "Введите общедоступный HTTPS-адрес текстового файла.",
+      "Не удалось загрузить список ({status})",
+      "Список слишком большой. Используйте текстовый файл поменьше.",
+      "Сервер списка слишком долго не отвечает.",
+      "Похоже на JSON, но это некорректный JSON. Исправьте синтаксис и снова откройте предварительный просмотр.",
+      "Не найдено допустимых каналов или ключевых слов"
+    ],
+    "de": [
+      "Gib eine öffentliche HTTPS-URL zu einer Textdatei ein.",
+      "Liste konnte nicht geladen werden ({status})",
+      "Die Liste ist zu groß. Verwende eine kleinere Textdatei.",
+      "Die Listen-URL hat zu lange für eine Antwort gebraucht.",
+      "Das sieht nach JSON aus, ist aber kein gültiges JSON. Korrigiere die JSON-Syntax und öffne die Vorschau erneut.",
+      "Keine gültigen Kanäle oder Schlüsselwörter gefunden"
+    ],
+    "ja": [
+      "公開 HTTPS のテキスト URL を入力してください。",
+      "リストを読み込めませんでした（{status}）",
+      "リストが大きすぎます。より小さいテキストファイルを使用してください。",
+      "リストの URL から応答が返るまでに時間がかかりすぎました。",
+      "JSON のようですが、有効な JSON ではありません。構文を修正して、もう一度プレビューしてください。",
+      "有効なチャンネルまたはキーワードが見つかりません"
+    ],
+    "pcm": [
+      "Abeg enter public HTTPS URL for one text file.",
+      "E no fit load the list ({status})",
+      "The list too big. Use one smaller text file.",
+      "The list URL take too long to answer.",
+      "E look like JSON, but the JSON no correct. Fix the JSON syntax and preview am again.",
+      "No correct channels or keywords dey inside"
+    ],
+    "arz": [
+      "اكتب رابط HTTPS عام لملف نصي.",
+      "مش قادر يحمل القائمة ({status})",
+      "القائمة كبيرة أوي. استخدم ملف نصي أصغر.",
+      "رابط القائمة اتأخر أوي في الرد.",
+      "ده باين إنه JSON، بس مش JSON صحيح. صلّح صيغة JSON واعرض المعاينة تاني.",
+      "ملقيناش قنوات أو كلمات مفتاحية صالحة"
+    ],
+    "mr": [
+      "सार्वजनिक HTTPS मजकूर URL द्या.",
+      "यादी लोड करता आली नाही ({status})",
+      "यादी खूप मोठी आहे. छोटी मजकूर फाइल वापरा.",
+      "यादीच्या URL कडून प्रतिसाद यायला खूप वेळ लागला.",
+      "हे JSON दिसते, पण वैध JSON नाही. JSON ची मांडणी दुरुस्त करून पुन्हा पूर्वावलोकन करा.",
+      "वैध चॅनेल किंवा कीवर्ड सापडले नाहीत"
+    ],
+    "vi": [
+      "Nhập URL HTTPS công khai của tệp văn bản.",
+      "Không thể tải danh sách ({status})",
+      "Danh sách quá lớn. Hãy dùng tệp văn bản nhỏ hơn.",
+      "URL danh sách phản hồi quá lâu.",
+      "Nội dung này có vẻ là JSON nhưng JSON không hợp lệ. Hãy sửa cú pháp JSON rồi xem trước lại.",
+      "Không tìm thấy kênh hoặc từ khóa hợp lệ"
+    ],
+    "te": [
+      "పబ్లిక్ HTTPS టెక్స్ట్ URLను నమోదు చేయండి.",
+      "జాబితాను లోడ్ చేయలేకపోయాం ({status})",
+      "జాబితా చాలా పెద్దది. చిన్న టెక్స్ట్ ఫైల్‌ను ఉపయోగించండి.",
+      "జాబితా URL స్పందించడానికి చాలా సమయం పట్టింది.",
+      "ఇది JSONలా కనిపిస్తోంది, కానీ చెల్లుబాటు అయ్యే JSON కాదు. JSON సింటాక్స్‌ను సరిచేసి మళ్లీ ప్రివ్యూ చేయండి.",
+      "చెల్లుబాటు అయ్యే ఛానెల్‌లు లేదా కీవర్డ్‌లు ఏవీ కనబడలేదు"
+    ],
+    "sw": [
+      "Weka URL ya HTTPS ya maandishi inayopatikana hadharani.",
+      "Imeshindwa kupakia orodha ({status})",
+      "Orodha ni kubwa mno. Tumia faili ndogo ya maandishi.",
+      "URL ya orodha imechelewa sana kujibu.",
+      "Hii inaonekana kuwa JSON, lakini si JSON halali. Rekebisha sintaksia ya JSON kisha uone hakikisho tena.",
+      "Hakuna chaneli au maneno muhimu halali yaliyopatikana"
+    ],
+    "ha": [
+      "Shigar da adireshin HTTPS na fayil ɗin rubutu na jama'a.",
+      "An kasa loda jerin ({status})",
+      "Jerin ya yi girma sosai. Yi amfani da ƙaramin fayil ɗin rubutu.",
+      "Adireshin jerin ya ɗauki lokaci mai tsawo kafin ya amsa.",
+      "Wannan yana kama da JSON, amma ba ingantaccen JSON ba ne. Gyara tsarin JSON sannan ka sake duba samfoti.",
+      "Ba a sami ingantattun tashoshi ko kalmomin nema ba"
+    ],
+    "tr": [
+      "Herkese açık bir HTTPS metin URL'si girin.",
+      "Liste yüklenemedi ({status})",
+      "Liste çok büyük. Daha küçük bir metin dosyası kullanın.",
+      "Liste URL'sinin yanıt vermesi çok uzun sürdü.",
+      "Bu JSON gibi görünüyor ancak geçerli JSON değil. JSON sözdizimini düzeltip önizlemeyi yeniden açın.",
+      "Geçerli kanal veya anahtar kelime bulunamadı"
+    ],
+    "pa-Arab": [
+      "عوامی HTTPS ٹیکسٹ URL درج کرو۔",
+      "لسٹ لوڈ نہیں ہو سکیا ({status})",
+      "لسٹ بوہتی وڈی اے۔ چھوٹی ٹیکسٹ فائل ورتو۔",
+      "لسٹ URL نوں جواب دین وچ بوہتا ویلا لگیا۔",
+      "ایہہ JSON لگدا اے، پر درست JSON نہیں۔ JSON دی بناوٹ ٹھیک کرکے پیش منظر فیر ویکھو۔",
+      "کوئی درست چینل یا کلیدی لفظ نہیں لبھیا"
+    ],
+    "fil": [
+      "Maglagay ng pampublikong HTTPS URL ng text file.",
+      "Hindi ma-load ang listahan ({status})",
+      "Masyadong malaki ang listahan. Gumamit ng mas maliit na text file.",
+      "Masyadong matagal bago sumagot ang URL ng listahan.",
+      "Mukhang JSON ito, pero hindi ito wastong JSON. Ayusin ang syntax ng JSON at i-preview muli.",
+      "Walang nahanap na wastong channel o keyword"
+    ],
+    "ta": [
+      "பொதுவில் அணுகக்கூடிய HTTPS உரை URL-ஐ உள்ளிடுங்கள்.",
+      "பட்டியலை ஏற்ற முடியவில்லை ({status})",
+      "பட்டியல் மிகப் பெரியது. சிறிய உரைக் கோப்பைப் பயன்படுத்துங்கள்.",
+      "பட்டியல் URL பதிலளிக்க அதிக நேரம் எடுத்தது.",
+      "இது JSON போலத் தெரிகிறது, ஆனால் சரியான JSON அல்ல. JSON தொடரியலைச் சரிசெய்து மீண்டும் முன்னோட்டமிடுங்கள்.",
+      "சரியான சேனல்களோ முக்கியச் சொற்களோ எதுவும் இல்லை"
+    ],
+    "yue-Hant": [
+      "請輸入公開嘅 HTTPS 文字檔網址。",
+      "載入清單失敗（{status}）",
+      "清單太大，請改用細啲嘅文字檔。",
+      "清單網址等咗好耐都冇回應。",
+      "呢個似乎係 JSON，但格式唔正確。請修正 JSON 語法，再重新預覽。",
+      "搵唔到有效嘅頻道或關鍵字"
+    ],
+    "wuu-Hans": [
+      "输进一个公开个 HTTPS 文本网址。",
+      "列表加载勿成功（{status}）",
+      "列表忒大。换个小点个文本文件用。",
+      "列表网址等忒久还勿回应。",
+      "迭个看上去像 JSON，不过 JSON 格式勿对。改好 JSON 语法再预览一趟。",
+      "呒没寻着有效个频道或关键词"
+    ],
+    "fa": [
+      "نشانی عمومی HTTPS برای یک فایل متنی وارد کنید.",
+      "بارگیری فهرست ممکن نشد ({status})",
+      "فهرست خیلی بزرگ است. از فایل متنی کوچک‌تری استفاده کنید.",
+      "پاسخ‌گویی نشانی فهرست بیش از حد طول کشید.",
+      "این شبیه JSON است، اما JSON معتبری نیست. دستور زبان JSON را اصلاح کنید و دوباره پیش‌نمایش بگیرید.",
+      "هیچ کانال یا کلیدواژهٔ معتبری پیدا نشد"
+    ],
+    "ko": [
+      "공개 HTTPS 텍스트 URL을 입력하세요.",
+      "목록을 불러오지 못했습니다 ({status})",
+      "목록이 너무 큽니다. 더 작은 텍스트 파일을 사용하세요.",
+      "목록 URL의 응답이 너무 오래 걸립니다.",
+      "JSON처럼 보이지만 올바른 JSON이 아닙니다. JSON 구문을 수정한 뒤 다시 미리 보세요.",
+      "유효한 채널이나 키워드를 찾을 수 없습니다"
+    ],
+    "am": [
+      "ይፋዊ የHTTPS ጽሑፍ URL ያስገቡ።",
+      "ዝርዝሩን መጫን አልተቻለም ({status})",
+      "ዝርዝሩ በጣም ትልቅ ነው። አነስ ያለ የጽሑፍ ፋይል ይጠቀሙ።",
+      "የዝርዝሩ URL ምላሽ ለመስጠት በጣም ዘገየ።",
+      "ይህ JSON ይመስላል፣ ግን ትክክለኛ JSON አይደለም። የJSON አገባብን አስተካክለው እንደገና ቅድመ እይታ ያድርጉ።",
+      "ምንም ትክክለኛ ቻናል ወይም ቁልፍ ቃል አልተገኘም"
+    ],
+    "th": [
+      "ป้อน URL HTTPS สาธารณะของไฟล์ข้อความ",
+      "โหลดรายการไม่ได้ ({status})",
+      "รายการใหญ่เกินไป โปรดใช้ไฟล์ข้อความที่เล็กกว่า",
+      "URL ของรายการใช้เวลาตอบสนองนานเกินไป",
+      "ดูเหมือนเป็น JSON แต่ไม่ใช่ JSON ที่ถูกต้อง แก้ไวยากรณ์ JSON แล้วดูตัวอย่างอีกครั้ง",
+      "ไม่พบช่องหรือคีย์เวิร์ดที่ถูกต้อง"
+    ],
+    "jv": [
+      "Lebokna URL HTTPS umum kanggo file teks.",
+      "Ora bisa mbukak dhaptar ({status})",
+      "Dhaptar kegedhen. Gunakna file teks sing luwih cilik.",
+      "URL dhaptar suwe banget anggone mangsuli.",
+      "Iki katon kaya JSON, nanging dudu JSON sing bener. Benerna sintaks JSON banjur delengen pratinjau maneh.",
+      "Ora ana saluran utawa tembung kunci sing bener"
+    ],
+    "it": [
+      "Inserisci l’URL HTTPS pubblico di un file di testo.",
+      "Impossibile caricare l’elenco ({status})",
+      "L’elenco è troppo grande. Usa un file di testo più piccolo.",
+      "L’URL dell’elenco ha impiegato troppo tempo a rispondere.",
+      "Sembra JSON, ma non è JSON valido. Correggi la sintassi JSON e visualizza di nuovo l’anteprima.",
+      "Nessun canale o parola chiave valido trovato"
+    ],
+    "gu": [
+      "સાર્વજનિક HTTPS ટેક્સ્ટ URL દાખલ કરો.",
+      "યાદી લોડ થઈ શકી નથી ({status})",
+      "યાદી ખૂબ મોટી છે. નાની ટેક્સ્ટ ફાઇલ વાપરો.",
+      "યાદીના URLનો જવાબ આવવામાં ઘણો સમય લાગ્યો.",
+      "આ JSON જેવું લાગે છે, પરંતુ માન્ય JSON નથી. JSONનું સિન્ટેક્સ ઠીક કરીને ફરી પૂર્વાવલોકન કરો.",
+      "કોઈ માન્ય ચૅનલ અથવા કીવર્ડ મળ્યાં નથી"
+    ],
+    "kn": [
+      "ಸಾರ್ವಜನಿಕ HTTPS ಪಠ್ಯ URL ನಮೂದಿಸಿ.",
+      "ಪಟ್ಟಿಯನ್ನು ಲೋಡ್ ಮಾಡಲು ಸಾಧ್ಯವಾಗಲಿಲ್ಲ ({status})",
+      "ಪಟ್ಟಿ ತುಂಬಾ ದೊಡ್ಡದಾಗಿದೆ. ಚಿಕ್ಕ ಪಠ್ಯ ಫೈಲ್ ಬಳಸಿ.",
+      "ಪಟ್ಟಿಯ URL ಪ್ರತಿಕ್ರಿಯಿಸಲು ತುಂಬಾ ಸಮಯ ತೆಗೆದುಕೊಂಡಿತು.",
+      "ಇದು JSONನಂತೆ ಕಾಣುತ್ತದೆ, ಆದರೆ ಮಾನ್ಯ JSON ಅಲ್ಲ. JSON ಸಿಂಟ್ಯಾಕ್ಸ್ ಸರಿಪಡಿಸಿ ಮತ್ತೆ ಪೂರ್ವವೀಕ್ಷಿಸಿ.",
+      "ಮಾನ್ಯ ಚಾನಲ್‌ಗಳು ಅಥವಾ ಕೀವರ್ಡ್‌ಗಳು ಕಂಡುಬಂದಿಲ್ಲ"
+    ],
+    "apc": [
+      "حط رابط HTTPS عام لملف نصّي.",
+      "ما قدرنا نحمّل اللائحة ({status})",
+      "اللائحة كبيرة كتير. استعمل ملف نصّي أصغر.",
+      "رابط اللائحة تأخّر كتير ليردّ.",
+      "هالشي بيشبه JSON، بس مو JSON صالح. صلّح صياغة JSON وعاين من جديد.",
+      "ما لقينا قنوات أو كلمات مفتاحية صالحة"
+    ],
+    "apd": [
+      "أدخل رابط HTTPS عام لملف نصي.",
+      "ما قدرنا نحمل القائمة ({status})",
+      "القائمة كبيرة شديد. استخدم ملف نصي أصغر.",
+      "رابط القائمة اتأخر شديد في الرد.",
+      "دا شكله JSON، لكن ما JSON صحيح. صلّح صياغة JSON وعاين تاني.",
+      "ما لقينا قنوات أو كلمات مفتاحية صالحة"
+    ],
+    "yo": [
+      "Tẹ URL HTTPS gbogbo ènìyàn lè wọ̀ fún fáìlì ọ̀rọ̀.",
+      "A kò lè ṣí àkójọ náà ({status})",
+      "Àkójọ náà tóbi jù. Lo fáìlì ọ̀rọ̀ kékeré sí i.",
+      "URL àkójọ náà pé jù láti dáhùn.",
+      "Ó dà bí JSON, ṣùgbọ́n JSON náà kò tọ́. Ṣàtúnṣe ọ̀nà ìkọ̀wé JSON kí o sì tún wo àwòrán àkọ́kọ́.",
+      "A kò rí ikanni tàbí ọ̀rọ̀-àṣàyàn tó tọ́"
+    ],
+    "bho": [
+      "सार्वजनिक HTTPS टेक्स्ट URL डालीं।",
+      "सूची लोड ना भइल ({status})",
+      "सूची बहुत बड़ बा। छोट टेक्स्ट फाइल इस्तेमाल करीं।",
+      "सूची URL से जवाब आवे में बहुत समय लागल।",
+      "ई JSON लागत बा, बाकिर सही JSON नइखे। JSON के सिंटैक्स ठीक करके फेर प्रीव्यू करीं।",
+      "कवनो सही चैनल भा कीवर्ड ना मिलल"
+    ]
+  }
+}

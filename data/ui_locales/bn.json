@@ -1663,5 +1663,11 @@
   "dashboard.sync.managedPolicy.locked.allowUpdates.title": "অভিভাবকীয় আপডেট প্রয়োগ করতে দিন",
   "dashboard.sync.managedPolicy.locked.allowUpdates.body": "এই সংরক্ষিত অভিভাবকীয় লিংকের মিলে যাওয়া স্বাক্ষরিত আপডেট প্রতিবার প্রোফাইল আনলক না করেও প্রয়োগ হতে পারে।",
   "dashboard.sync.managedPolicy.error.noAllowedScopes": "এই অভিভাবকীয় লিংক সংরক্ষণের আগে অন্তত একটি অনুমোদিত পরিসর বেছে নিন।",
-  "dashboard.sync.managedPolicy.error.lockedScopes": "এই অনুমোদনের জন্য {scopes} চালু থাকতে হবে।"
+  "dashboard.sync.managedPolicy.error.lockedScopes": "এই অনুমোদনের জন্য {scopes} চালু থাকতে হবে।",
+  "dashboard.managedLists.error.publicHttps": "একটি সর্বজনীন HTTPS টেক্সট URL দিন।",
+  "dashboard.managedLists.error.http": "তালিকাটি লোড করা যায়নি ({status})",
+  "dashboard.managedLists.error.tooLarge": "তালিকাটি খুব বড়। ছোট টেক্সট ফাইল ব্যবহার করুন।",
+  "dashboard.managedLists.error.timeout": "তালিকার URL থেকে উত্তর পেতে খুব বেশি সময় লেগেছে।",
+  "dashboard.managedLists.error.invalidJson": "এটি JSON বলে মনে হচ্ছে, কিন্তু বৈধ JSON নয়। JSON-এর বাক্যগঠন ঠিক করে আবার প্রিভিউ করুন।",
+  "dashboard.managedLists.error.noValidRows": "কোনো বৈধ চ্যানেল বা কীওয়ার্ড পাওয়া যায়নি"
 }

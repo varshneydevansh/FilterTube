@@ -1663,5 +1663,11 @@
   "dashboard.sync.managedPolicy.locked.allowUpdates.title": "Payagan ang mga update ng magulang",
   "dashboard.sync.managedPolicy.locked.allowUpdates.body": "Maaaring mailapat ang mga katugmang nilagdaang update mula sa naka-save na link ng magulang nang hindi ina-unlock ang profile sa bawat pagkakataon.",
   "dashboard.sync.managedPolicy.error.noAllowedScopes": "Pumili ng kahit isang pinapayagang bahagi bago i-save ang link ng magulang na ito.",
-  "dashboard.sync.managedPolicy.error.lockedScopes": "Dapat manatiling naka-enable ang {scopes} para sa pag-apruba na ito."
+  "dashboard.sync.managedPolicy.error.lockedScopes": "Dapat manatiling naka-enable ang {scopes} para sa pag-apruba na ito.",
+  "dashboard.managedLists.error.publicHttps": "Maglagay ng pampublikong HTTPS URL ng text file.",
+  "dashboard.managedLists.error.http": "Hindi ma-load ang listahan ({status})",
+  "dashboard.managedLists.error.tooLarge": "Masyadong malaki ang listahan. Gumamit ng mas maliit na text file.",
+  "dashboard.managedLists.error.timeout": "Masyadong matagal bago sumagot ang URL ng listahan.",
+  "dashboard.managedLists.error.invalidJson": "Mukhang JSON ito, pero hindi ito wastong JSON. Ayusin ang syntax ng JSON at i-preview muli.",
+  "dashboard.managedLists.error.noValidRows": "Walang nahanap na wastong channel o keyword"
 }

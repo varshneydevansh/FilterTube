@@ -1663,5 +1663,11 @@
   "dashboard.sync.managedPolicy.locked.allowUpdates.title": "والدینی اپ ڈیٹس لاگو ہون دی اجازت دیو",
   "dashboard.sync.managedPolicy.locked.allowUpdates.body": "ایس محفوظ والدین دے لنک دیاں میل کھاندیاں دستخط شدہ اپ ڈیٹس ہر واری پروفائل اَن لاک کیتے بغیر لاگو ہو سکدیاں نیں۔",
   "dashboard.sync.managedPolicy.error.noAllowedScopes": "ایہہ والدین دا لنک محفوظ کرن توں پہلاں گھٹ توں گھٹ اک اجازت یافتہ علاقہ چنو۔",
-  "dashboard.sync.managedPolicy.error.lockedScopes": "ایس منظوری لئی {scopes} دا فعال رہنا ضروری اے۔"
+  "dashboard.sync.managedPolicy.error.lockedScopes": "ایس منظوری لئی {scopes} دا فعال رہنا ضروری اے۔",
+  "dashboard.managedLists.error.publicHttps": "عوامی HTTPS ٹیکسٹ URL درج کرو۔",
+  "dashboard.managedLists.error.http": "لسٹ لوڈ نہیں ہو سکیا ({status})",
+  "dashboard.managedLists.error.tooLarge": "لسٹ بوہتی وڈی اے۔ چھوٹی ٹیکسٹ فائل ورتو۔",
+  "dashboard.managedLists.error.timeout": "لسٹ URL نوں جواب دین وچ بوہتا ویلا لگیا۔",
+  "dashboard.managedLists.error.invalidJson": "ایہہ JSON لگدا اے، پر درست JSON نہیں۔ JSON دی بناوٹ ٹھیک کرکے پیش منظر فیر ویکھو۔",
+  "dashboard.managedLists.error.noValidRows": "کوئی درست چینل یا کلیدی لفظ نہیں لبھیا"
 }

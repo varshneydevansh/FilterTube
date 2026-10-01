@@ -1663,5 +1663,11 @@
   "dashboard.sync.managedPolicy.locked.allowUpdates.title": "Allow parent updates to apply",
   "dashboard.sync.managedPolicy.locked.allowUpdates.body": "Matching signed updates from dis saved parent link fit apply without unlocking the profile every time.",
   "dashboard.sync.managedPolicy.error.noAllowedScopes": "Choose at least one allowed area before you save dis parent link.",
-  "dashboard.sync.managedPolicy.error.lockedScopes": "{scopes} must stay on for dis approval."
+  "dashboard.sync.managedPolicy.error.lockedScopes": "{scopes} must stay on for dis approval.",
+  "dashboard.managedLists.error.publicHttps": "Abeg enter public HTTPS URL for one text file.",
+  "dashboard.managedLists.error.http": "E no fit load the list ({status})",
+  "dashboard.managedLists.error.tooLarge": "The list too big. Use one smaller text file.",
+  "dashboard.managedLists.error.timeout": "The list URL take too long to answer.",
+  "dashboard.managedLists.error.invalidJson": "E look like JSON, but the JSON no correct. Fix the JSON syntax and preview am again.",
+  "dashboard.managedLists.error.noValidRows": "No correct channels or keywords dey inside"
 }

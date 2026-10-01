@@ -1663,5 +1663,11 @@
   "dashboard.sync.managedPolicy.locked.allowUpdates.title": "Idinana nganyari wong tuwa ditrapake",
   "dashboard.sync.managedPolicy.locked.allowUpdates.body": "Nganyari ditandatangani sing cocog saka pranala wong tuwa sing disimpen iki bisa ditrapake tanpa mbukak kunci profil saben wektu.",
   "dashboard.sync.managedPolicy.error.noAllowedScopes": "Pilih paling ora siji area sing diidinake sadurunge nyimpen pranala wong tuwa iki.",
-  "dashboard.sync.managedPolicy.error.lockedScopes": "{scopes} kudu tetep aktif kanggo persetujuan iki."
+  "dashboard.sync.managedPolicy.error.lockedScopes": "{scopes} kudu tetep aktif kanggo persetujuan iki.",
+  "dashboard.managedLists.error.publicHttps": "Lebokna URL HTTPS umum kanggo file teks.",
+  "dashboard.managedLists.error.http": "Ora bisa mbukak dhaptar ({status})",
+  "dashboard.managedLists.error.tooLarge": "Dhaptar kegedhen. Gunakna file teks sing luwih cilik.",
+  "dashboard.managedLists.error.timeout": "URL dhaptar suwe banget anggone mangsuli.",
+  "dashboard.managedLists.error.invalidJson": "Iki katon kaya JSON, nanging dudu JSON sing bener. Benerna sintaks JSON banjur delengen pratinjau maneh.",
+  "dashboard.managedLists.error.noValidRows": "Ora ana saluran utawa tembung kunci sing bener"
 }

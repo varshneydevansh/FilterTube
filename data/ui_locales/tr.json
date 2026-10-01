@@ -1663,5 +1663,11 @@
   "dashboard.sync.managedPolicy.locked.allowUpdates.title": "Ebeveyn güncellemelerinin uygulanmasına izin ver",
   "dashboard.sync.managedPolicy.locked.allowUpdates.body": "Bu kayıtlı ebeveyn bağlantısından eşleşen imzalı güncellemeler, profili her seferinde açmadan uygulanabilir.",
   "dashboard.sync.managedPolicy.error.noAllowedScopes": "Bu ebeveyn bağlantısını kaydetmeden önce en az bir izin verilen alan seçin.",
-  "dashboard.sync.managedPolicy.error.lockedScopes": "Bu onay için {scopes} etkin kalmalıdır."
+  "dashboard.sync.managedPolicy.error.lockedScopes": "Bu onay için {scopes} etkin kalmalıdır.",
+  "dashboard.managedLists.error.publicHttps": "Herkese açık bir HTTPS metin URL'si girin.",
+  "dashboard.managedLists.error.http": "Liste yüklenemedi ({status})",
+  "dashboard.managedLists.error.tooLarge": "Liste çok büyük. Daha küçük bir metin dosyası kullanın.",
+  "dashboard.managedLists.error.timeout": "Liste URL'sinin yanıt vermesi çok uzun sürdü.",
+  "dashboard.managedLists.error.invalidJson": "Bu JSON gibi görünüyor ancak geçerli JSON değil. JSON sözdizimini düzeltip önizlemeyi yeniden açın.",
+  "dashboard.managedLists.error.noValidRows": "Geçerli kanal veya anahtar kelime bulunamadı"
 }

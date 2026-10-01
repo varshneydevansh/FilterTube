@@ -1663,5 +1663,11 @@
   "dashboard.sync.managedPolicy.locked.allowUpdates.title": "保護者更新の適用を許可",
   "dashboard.sync.managedPolicy.locked.allowUpdates.body": "この保存済み保護者リンクからの一致する署名付き更新は、毎回プロフィールをロック解除しなくても適用できます。",
   "dashboard.sync.managedPolicy.error.noAllowedScopes": "この保護者リンクを保存する前に、少なくとも 1 つの許可範囲を選んでください。",
-  "dashboard.sync.managedPolicy.error.lockedScopes": "この承認では {scopes} を有効のままにする必要があります。"
+  "dashboard.sync.managedPolicy.error.lockedScopes": "この承認では {scopes} を有効のままにする必要があります。",
+  "dashboard.managedLists.error.publicHttps": "公開 HTTPS のテキスト URL を入力してください。",
+  "dashboard.managedLists.error.http": "リストを読み込めませんでした（{status}）",
+  "dashboard.managedLists.error.tooLarge": "リストが大きすぎます。より小さいテキストファイルを使用してください。",
+  "dashboard.managedLists.error.timeout": "リストの URL から応答が返るまでに時間がかかりすぎました。",
+  "dashboard.managedLists.error.invalidJson": "JSON のようですが、有効な JSON ではありません。構文を修正して、もう一度プレビューしてください。",
+  "dashboard.managedLists.error.noValidRows": "有効なチャンネルまたはキーワードが見つかりません"
 }

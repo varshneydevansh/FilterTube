@@ -1,0 +1,10 @@
+{
+  "english": {
+    "dashboard.managedLists.error.publicHttps": "Enter a public HTTPS text URL.",
+    "dashboard.managedLists.error.http": "Unable to load list ({status})",
+    "dashboard.managedLists.error.tooLarge": "List is too large. Use a smaller text file.",
+    "dashboard.managedLists.error.timeout": "List URL took too long to respond.",
+    "dashboard.managedLists.error.invalidJson": "This looks like JSON, but it is not valid JSON. Fix the JSON syntax and preview it again.",
+    "dashboard.managedLists.error.noValidRows": "No valid channels or keywords found"
+  }
+}

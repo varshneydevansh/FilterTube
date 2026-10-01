@@ -1663,5 +1663,11 @@
   "dashboard.sync.managedPolicy.locked.allowUpdates.title": "允许应用家长更新",
   "dashboard.sync.managedPolicy.locked.allowUpdates.body": "迭条保存的家长链接送来的匹配签名更新，可以不用每趟都解锁迭个档案就应用。",
   "dashboard.sync.managedPolicy.error.noAllowedScopes": "保存迭条家长链接前，至少选一个允许的区域。",
-  "dashboard.sync.managedPolicy.error.lockedScopes": "迭趟批准要保持 {scopes} 开着。"
+  "dashboard.sync.managedPolicy.error.lockedScopes": "迭趟批准要保持 {scopes} 开着。",
+  "dashboard.managedLists.error.publicHttps": "输进一个公开个 HTTPS 文本网址。",
+  "dashboard.managedLists.error.http": "列表加载勿成功（{status}）",
+  "dashboard.managedLists.error.tooLarge": "列表忒大。换个小点个文本文件用。",
+  "dashboard.managedLists.error.timeout": "列表网址等忒久还勿回应。",
+  "dashboard.managedLists.error.invalidJson": "迭个看上去像 JSON，不过 JSON 格式勿对。改好 JSON 语法再预览一趟。",
+  "dashboard.managedLists.error.noValidRows": "呒没寻着有效个频道或关键词"
 }

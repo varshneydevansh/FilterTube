@@ -1663,5 +1663,11 @@
   "dashboard.sync.managedPolicy.locked.allowUpdates.title": "Разрешить применение обновлений родителя",
   "dashboard.sync.managedPolicy.locked.allowUpdates.body": "Подходящие подписанные обновления по этой сохранённой ссылке родителя могут применяться без разблокировки профиля каждый раз.",
   "dashboard.sync.managedPolicy.error.noAllowedScopes": "Перед сохранением этой ссылки родителя выберите хотя бы одну разрешённую область.",
-  "dashboard.sync.managedPolicy.error.lockedScopes": "Для этого разрешения область {scopes} должна оставаться включённой."
+  "dashboard.sync.managedPolicy.error.lockedScopes": "Для этого разрешения область {scopes} должна оставаться включённой.",
+  "dashboard.managedLists.error.publicHttps": "Введите общедоступный HTTPS-адрес текстового файла.",
+  "dashboard.managedLists.error.http": "Не удалось загрузить список ({status})",
+  "dashboard.managedLists.error.tooLarge": "Список слишком большой. Используйте текстовый файл поменьше.",
+  "dashboard.managedLists.error.timeout": "Сервер списка слишком долго не отвечает.",
+  "dashboard.managedLists.error.invalidJson": "Похоже на JSON, но это некорректный JSON. Исправьте синтаксис и снова откройте предварительный просмотр.",
+  "dashboard.managedLists.error.noValidRows": "Не найдено допустимых каналов или ключевых слов"
 }

@@ -1663,5 +1663,11 @@
   "dashboard.sync.managedPolicy.locked.allowUpdates.title": "允许应用家长更新",
   "dashboard.sync.managedPolicy.locked.allowUpdates.body": "来自此已保存家长链接的匹配签名更新可在不每次解锁个人资料的情况下应用。",
   "dashboard.sync.managedPolicy.error.noAllowedScopes": "保存此家长链接前，至少选择一个允许区域。",
-  "dashboard.sync.managedPolicy.error.lockedScopes": "此审批必须保持启用 {scopes}。"
+  "dashboard.sync.managedPolicy.error.lockedScopes": "此审批必须保持启用 {scopes}。",
+  "dashboard.managedLists.error.publicHttps": "请输入公开的 HTTPS 文本列表网址。",
+  "dashboard.managedLists.error.http": "无法加载列表（{status}）",
+  "dashboard.managedLists.error.tooLarge": "列表太大。请使用较小的文本文件。",
+  "dashboard.managedLists.error.timeout": "列表网址响应超时。",
+  "dashboard.managedLists.error.invalidJson": "这看起来是 JSON，但格式无效。请修正 JSON 语法后重新预览。",
+  "dashboard.managedLists.error.noValidRows": "未找到有效的频道或关键词"
 }

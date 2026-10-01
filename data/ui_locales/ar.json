@@ -1663,5 +1663,11 @@
   "dashboard.sync.managedPolicy.locked.allowUpdates.title": "السماح بتطبيق تحديثات الوالد",
   "dashboard.sync.managedPolicy.locked.allowUpdates.body": "يمكن تطبيق التحديثات الموقعة المطابقة من رابط الوالد المحفوظ هذا دون إلغاء قفل الملف في كل مرة.",
   "dashboard.sync.managedPolicy.error.noAllowedScopes": "اختر نطاقًا مسموحًا واحدًا على الأقل قبل حفظ رابط الوالد هذا.",
-  "dashboard.sync.managedPolicy.error.lockedScopes": "يجب أن تظل {scopes} مفعّلة لهذه الموافقة."
+  "dashboard.sync.managedPolicy.error.lockedScopes": "يجب أن تظل {scopes} مفعّلة لهذه الموافقة.",
+  "dashboard.managedLists.error.publicHttps": "أدخل عنوان HTTPS عامًا لملف نصي.",
+  "dashboard.managedLists.error.http": "تعذّر تحميل القائمة ({status})",
+  "dashboard.managedLists.error.tooLarge": "القائمة كبيرة جدًا. استخدم ملفًا نصيًا أصغر.",
+  "dashboard.managedLists.error.timeout": "استغرق عنوان القائمة وقتًا طويلًا للرد.",
+  "dashboard.managedLists.error.invalidJson": "يبدو هذا كأنه JSON، لكنه ليس JSON صالحًا. أصلح صياغة JSON ثم اعرض المعاينة مجددًا.",
+  "dashboard.managedLists.error.noValidRows": "لم يتم العثور على قنوات أو كلمات مفتاحية صالحة"
 }

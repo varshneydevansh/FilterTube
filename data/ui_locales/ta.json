@@ -1663,5 +1663,11 @@
   "dashboard.sync.managedPolicy.locked.allowUpdates.title": "பெற்றோர் புதுப்பிப்புகளைப் பயன்படுத்து",
   "dashboard.sync.managedPolicy.locked.allowUpdates.body": "சேமித்த பெற்றோர் இணைப்பிலிருந்து வரும் பொருந்தும் கையொப்பமிட்ட புதுப்பிப்புகள் ஒவ்வொரு முறையும் சுயவிவரத்தைத் திறக்காமல் பயன்படுத்தப்படலாம்.",
   "dashboard.sync.managedPolicy.error.noAllowedScopes": "இந்தப் பெற்றோர் இணைப்பைச் சேமிப்பதற்கு முன் குறைந்தது ஒரு அனுமதிக்கப்பட்ட பகுதியையாவது தேர்ந்தெடுக்கவும்.",
-  "dashboard.sync.managedPolicy.error.lockedScopes": "இந்த ஒப்புதலுக்காக {scopes} இயக்கத்தில் இருக்க வேண்டும்."
+  "dashboard.sync.managedPolicy.error.lockedScopes": "இந்த ஒப்புதலுக்காக {scopes} இயக்கத்தில் இருக்க வேண்டும்.",
+  "dashboard.managedLists.error.publicHttps": "பொதுவில் அணுகக்கூடிய HTTPS உரை URL-ஐ உள்ளிடுங்கள்.",
+  "dashboard.managedLists.error.http": "பட்டியலை ஏற்ற முடியவில்லை ({status})",
+  "dashboard.managedLists.error.tooLarge": "பட்டியல் மிகப் பெரியது. சிறிய உரைக் கோப்பைப் பயன்படுத்துங்கள்.",
+  "dashboard.managedLists.error.timeout": "பட்டியல் URL பதிலளிக்க அதிக நேரம் எடுத்தது.",
+  "dashboard.managedLists.error.invalidJson": "இது JSON போலத் தெரிகிறது, ஆனால் சரியான JSON அல்ல. JSON தொடரியலைச் சரிசெய்து மீண்டும் முன்னோட்டமிடுங்கள்.",
+  "dashboard.managedLists.error.noValidRows": "சரியான சேனல்களோ முக்கியச் சொற்களோ எதுவும் இல்லை"
 }

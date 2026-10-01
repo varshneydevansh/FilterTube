@@ -1663,5 +1663,11 @@
   "dashboard.sync.managedPolicy.locked.allowUpdates.title": "Fàyè gba àwọn àtúnṣe òbí láti ṣiṣẹ́",
   "dashboard.sync.managedPolicy.locked.allowUpdates.body": "Àwọn àtúnṣe tí a fọwọ́ sí tó bá mu láti inú ìjápọ̀ òbí tí a fipamọ́ yìí lè ṣiṣẹ́ láìsí ṣíṣí profaili ní gbogbo ìgbà.",
   "dashboard.sync.managedPolicy.error.noAllowedScopes": "Yan ó kéré tán agbègbè kan tí a yọ̀ǹda kí o tó fi ìjápọ̀ òbí yìí pamọ́.",
-  "dashboard.sync.managedPolicy.error.lockedScopes": "{scopes} gbọ́dọ̀ wà ní títan fún ìfọwọ́sí yìí."
+  "dashboard.sync.managedPolicy.error.lockedScopes": "{scopes} gbọ́dọ̀ wà ní títan fún ìfọwọ́sí yìí.",
+  "dashboard.managedLists.error.publicHttps": "Tẹ URL HTTPS gbogbo ènìyàn lè wọ̀ fún fáìlì ọ̀rọ̀.",
+  "dashboard.managedLists.error.http": "A kò lè ṣí àkójọ náà ({status})",
+  "dashboard.managedLists.error.tooLarge": "Àkójọ náà tóbi jù. Lo fáìlì ọ̀rọ̀ kékeré sí i.",
+  "dashboard.managedLists.error.timeout": "URL àkójọ náà pé jù láti dáhùn.",
+  "dashboard.managedLists.error.invalidJson": "Ó dà bí JSON, ṣùgbọ́n JSON náà kò tọ́. Ṣàtúnṣe ọ̀nà ìkọ̀wé JSON kí o sì tún wo àwòrán àkọ́kọ́.",
+  "dashboard.managedLists.error.noValidRows": "A kò rí ikanni tàbí ọ̀rọ̀-àṣàyàn tó tọ́"
 }

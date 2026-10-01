@@ -1663,5 +1663,11 @@
   "dashboard.sync.managedPolicy.locked.allowUpdates.title": "อนุญาตให้ใช้การอัปเดตของผู้ปกครอง",
   "dashboard.sync.managedPolicy.locked.allowUpdates.body": "การอัปเดตที่ลงนามและตรงกันจากลิงก์ของผู้ปกครองที่บันทึกไว้นี้อาจใช้ได้โดยไม่ต้องปลดล็อกโปรไฟล์ทุกครั้ง",
   "dashboard.sync.managedPolicy.error.noAllowedScopes": "เลือกพื้นที่ที่อนุญาตอย่างน้อยหนึ่งรายการก่อนบันทึกลิงก์ของผู้ปกครองนี้",
-  "dashboard.sync.managedPolicy.error.lockedScopes": "ต้องเปิด {scopes} ไว้สำหรับการอนุมัตินี้"
+  "dashboard.sync.managedPolicy.error.lockedScopes": "ต้องเปิด {scopes} ไว้สำหรับการอนุมัตินี้",
+  "dashboard.managedLists.error.publicHttps": "ป้อน URL HTTPS สาธารณะของไฟล์ข้อความ",
+  "dashboard.managedLists.error.http": "โหลดรายการไม่ได้ ({status})",
+  "dashboard.managedLists.error.tooLarge": "รายการใหญ่เกินไป โปรดใช้ไฟล์ข้อความที่เล็กกว่า",
+  "dashboard.managedLists.error.timeout": "URL ของรายการใช้เวลาตอบสนองนานเกินไป",
+  "dashboard.managedLists.error.invalidJson": "ดูเหมือนเป็น JSON แต่ไม่ใช่ JSON ที่ถูกต้อง แก้ไวยากรณ์ JSON แล้วดูตัวอย่างอีกครั้ง",
+  "dashboard.managedLists.error.noValidRows": "ไม่พบช่องหรือคีย์เวิร์ดที่ถูกต้อง"
 }

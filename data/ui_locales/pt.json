@@ -1663,5 +1663,11 @@
   "dashboard.sync.managedPolicy.locked.allowUpdates.title": "Permitir a aplicação de atualizações parentais",
   "dashboard.sync.managedPolicy.locked.allowUpdates.body": "Atualizações assinadas correspondentes deste link parental salvo podem ser aplicadas sem desbloquear este perfil todas as vezes.",
   "dashboard.sync.managedPolicy.error.noAllowedScopes": "Escolha pelo menos um escopo permitido antes de salvar este link parental.",
-  "dashboard.sync.managedPolicy.error.lockedScopes": "{scopes} precisa continuar ativado para esta aprovação."
+  "dashboard.sync.managedPolicy.error.lockedScopes": "{scopes} precisa continuar ativado para esta aprovação.",
+  "dashboard.managedLists.error.publicHttps": "Insira o URL HTTPS público de um arquivo de texto.",
+  "dashboard.managedLists.error.http": "Não foi possível carregar a lista ({status})",
+  "dashboard.managedLists.error.tooLarge": "A lista é grande demais. Use um arquivo de texto menor.",
+  "dashboard.managedLists.error.timeout": "O URL da lista demorou demais para responder.",
+  "dashboard.managedLists.error.invalidJson": "Isto parece JSON, mas não é um JSON válido. Corrija a sintaxe do JSON e faça a prévia novamente.",
+  "dashboard.managedLists.error.noValidRows": "Nenhum canal ou palavra-chave válido foi encontrado"
 }

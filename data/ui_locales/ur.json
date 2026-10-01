@@ -1663,5 +1663,11 @@
   "dashboard.sync.managedPolicy.locked.allowUpdates.title": "والدین کی اپ ڈیٹس لاگو ہونے دیں",
   "dashboard.sync.managedPolicy.locked.allowUpdates.body": "اس محفوظ والدین کے لنک کی ملتی جلتی دستخط شدہ اپ ڈیٹس ہر بار پروفائل ان لاک کیے بغیر لاگو ہو سکتی ہیں۔",
   "dashboard.sync.managedPolicy.error.noAllowedScopes": "والدین کا یہ لنک محفوظ کرنے سے پہلے کم از کم ایک اجازت یافتہ دائرہ منتخب کریں۔",
-  "dashboard.sync.managedPolicy.error.lockedScopes": "اس منظوری کے لیے {scopes} فعال رہنا ضروری ہے۔"
+  "dashboard.sync.managedPolicy.error.lockedScopes": "اس منظوری کے لیے {scopes} فعال رہنا ضروری ہے۔",
+  "dashboard.managedLists.error.publicHttps": "عوامی HTTPS ٹیکسٹ URL درج کریں۔",
+  "dashboard.managedLists.error.http": "فہرست لوڈ نہیں ہو سکی ({status})",
+  "dashboard.managedLists.error.tooLarge": "فہرست بہت بڑی ہے۔ چھوٹی ٹیکسٹ فائل استعمال کریں۔",
+  "dashboard.managedLists.error.timeout": "فہرست کے URL سے جواب آنے میں بہت وقت لگا۔",
+  "dashboard.managedLists.error.invalidJson": "یہ JSON لگتا ہے، مگر درست JSON نہیں ہے۔ JSON کی ساخت درست کریں اور دوبارہ پیش منظر دیکھیں۔",
+  "dashboard.managedLists.error.noValidRows": "کوئی درست چینل یا کلیدی لفظ نہیں ملا"
 }

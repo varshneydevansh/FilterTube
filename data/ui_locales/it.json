@@ -1663,5 +1663,11 @@
   "dashboard.sync.managedPolicy.locked.allowUpdates.title": "Consenti l'applicazione degli aggiornamenti del genitore",
   "dashboard.sync.managedPolicy.locked.allowUpdates.body": "Gli aggiornamenti firmati corrispondenti da questo collegamento salvato del genitore possono essere applicati senza sbloccare ogni volta questo profilo.",
   "dashboard.sync.managedPolicy.error.noAllowedScopes": "Scegli almeno un ambito consentito prima di salvare questo collegamento del genitore.",
-  "dashboard.sync.managedPolicy.error.lockedScopes": "{scopes} deve restare attivo per questa approvazione."
+  "dashboard.sync.managedPolicy.error.lockedScopes": "{scopes} deve restare attivo per questa approvazione.",
+  "dashboard.managedLists.error.publicHttps": "Inserisci l’URL HTTPS pubblico di un file di testo.",
+  "dashboard.managedLists.error.http": "Impossibile caricare l’elenco ({status})",
+  "dashboard.managedLists.error.tooLarge": "L’elenco è troppo grande. Usa un file di testo più piccolo.",
+  "dashboard.managedLists.error.timeout": "L’URL dell’elenco ha impiegato troppo tempo a rispondere.",
+  "dashboard.managedLists.error.invalidJson": "Sembra JSON, ma non è JSON valido. Correggi la sintassi JSON e visualizza di nuovo l’anteprima.",
+  "dashboard.managedLists.error.noValidRows": "Nessun canale o parola chiave valido trovato"
 }

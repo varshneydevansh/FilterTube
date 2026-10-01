@@ -1663,5 +1663,11 @@
   "dashboard.sync.managedPolicy.locked.allowUpdates.title": "માતાપિતાના અપડેટ્સ લાગુ થવા દો",
   "dashboard.sync.managedPolicy.locked.allowUpdates.body": "આ સાચવેલી માતાપિતા લિંકમાંથી આવેલા મેળ ખાતા હસ્તાક્ષરિત અપડેટ્સ દર વખતે પ્રોફાઇલ અનલૉક કર્યા વિના લાગુ થઈ શકે છે.",
   "dashboard.sync.managedPolicy.error.noAllowedScopes": "આ માતાપિતા લિંક સાચવતાં પહેલાં ઓછામાં ઓછો એક મંજૂર વિસ્તાર પસંદ કરો.",
-  "dashboard.sync.managedPolicy.error.lockedScopes": "આ મંજૂરી માટે {scopes} સક્રિય રહેવું જોઈએ."
+  "dashboard.sync.managedPolicy.error.lockedScopes": "આ મંજૂરી માટે {scopes} સક્રિય રહેવું જોઈએ.",
+  "dashboard.managedLists.error.publicHttps": "સાર્વજનિક HTTPS ટેક્સ્ટ URL દાખલ કરો.",
+  "dashboard.managedLists.error.http": "યાદી લોડ થઈ શકી નથી ({status})",
+  "dashboard.managedLists.error.tooLarge": "યાદી ખૂબ મોટી છે. નાની ટેક્સ્ટ ફાઇલ વાપરો.",
+  "dashboard.managedLists.error.timeout": "યાદીના URLનો જવાબ આવવામાં ઘણો સમય લાગ્યો.",
+  "dashboard.managedLists.error.invalidJson": "આ JSON જેવું લાગે છે, પરંતુ માન્ય JSON નથી. JSONનું સિન્ટેક્સ ઠીક કરીને ફરી પૂર્વાવલોકન કરો.",
+  "dashboard.managedLists.error.noValidRows": "કોઈ માન્ય ચૅનલ અથવા કીવર્ડ મળ્યાં નથી"
 }

@@ -1663,5 +1663,11 @@
   "dashboard.sync.managedPolicy.locked.allowUpdates.title": "Autoriser l’application des mises à jour parentales",
   "dashboard.sync.managedPolicy.locked.allowUpdates.body": "Les mises à jour signées correspondantes de ce lien parental enregistré peuvent s’appliquer sans déverrouiller ce profil à chaque fois.",
   "dashboard.sync.managedPolicy.error.noAllowedScopes": "Choisissez au moins une portée autorisée avant d’enregistrer ce lien parental.",
-  "dashboard.sync.managedPolicy.error.lockedScopes": "{scopes} doit rester activé pour cette approbation."
+  "dashboard.sync.managedPolicy.error.lockedScopes": "{scopes} doit rester activé pour cette approbation.",
+  "dashboard.managedLists.error.publicHttps": "Saisissez l’URL HTTPS publique d’un fichier texte.",
+  "dashboard.managedLists.error.http": "Impossible de charger la liste ({status})",
+  "dashboard.managedLists.error.tooLarge": "La liste est trop volumineuse. Utilisez un fichier texte plus petit.",
+  "dashboard.managedLists.error.timeout": "L’URL de la liste a mis trop de temps à répondre.",
+  "dashboard.managedLists.error.invalidJson": "Cela ressemble à du JSON, mais le JSON n’est pas valide. Corrigez sa syntaxe puis relancez l’aperçu.",
+  "dashboard.managedLists.error.noValidRows": "Aucune chaîne ni aucun mot-clé valide trouvé"
 }

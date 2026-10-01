@@ -22,6 +22,7 @@ function loadParser() {
     setTimeout,
     clearTimeout,
     fetch: async () => { throw new Error('not used'); },
+    tabViewUiText: (_key, fallback) => fallback,
     normalizeString,
     safeObject: (value) => value && typeof value === 'object' && !Array.isArray(value) ? value : {},
     safeArray: (value) => Array.isArray(value) ? value : [],

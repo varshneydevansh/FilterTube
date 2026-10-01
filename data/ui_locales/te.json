@@ -1663,5 +1663,11 @@
   "dashboard.sync.managedPolicy.locked.allowUpdates.title": "తల్లిదండ్రి అప్‌డేట్‌లను వర్తింపజేయనివ్వండి",
   "dashboard.sync.managedPolicy.locked.allowUpdates.body": "ఈ సేవ్ చేసిన తల్లిదండ్రి లింక్ నుంచి వచ్చిన సరిపోలిన సంతకం అప్‌డేట్‌లు ప్రతిసారీ ప్రొఫైల్‌ను అన్‌లాక్ చేయకుండానే వర్తించవచ్చు.",
   "dashboard.sync.managedPolicy.error.noAllowedScopes": "ఈ తల్లిదండ్రి లింక్‌ను సేవ్ చేసే ముందు కనీసం ఒక అనుమతించిన ప్రాంతాన్ని ఎంచుకోండి.",
-  "dashboard.sync.managedPolicy.error.lockedScopes": "ఈ ఆమోదం కోసం {scopes} ఎల్లప్పుడూ ప్రారంభించి ఉండాలి."
+  "dashboard.sync.managedPolicy.error.lockedScopes": "ఈ ఆమోదం కోసం {scopes} ఎల్లప్పుడూ ప్రారంభించి ఉండాలి.",
+  "dashboard.managedLists.error.publicHttps": "పబ్లిక్ HTTPS టెక్స్ట్ URLను నమోదు చేయండి.",
+  "dashboard.managedLists.error.http": "జాబితాను లోడ్ చేయలేకపోయాం ({status})",
+  "dashboard.managedLists.error.tooLarge": "జాబితా చాలా పెద్దది. చిన్న టెక్స్ట్ ఫైల్‌ను ఉపయోగించండి.",
+  "dashboard.managedLists.error.timeout": "జాబితా URL స్పందించడానికి చాలా సమయం పట్టింది.",
+  "dashboard.managedLists.error.invalidJson": "ఇది JSONలా కనిపిస్తోంది, కానీ చెల్లుబాటు అయ్యే JSON కాదు. JSON సింటాక్స్‌ను సరిచేసి మళ్లీ ప్రివ్యూ చేయండి.",
+  "dashboard.managedLists.error.noValidRows": "చెల్లుబాటు అయ్యే ఛానెల్‌లు లేదా కీవర్డ్‌లు ఏవీ కనబడలేదు"
 }

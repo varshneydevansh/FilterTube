@@ -1663,5 +1663,11 @@
   "dashboard.sync.managedPolicy.locked.allowUpdates.title": "اسمح بتطبيق تحديثات الوالد",
   "dashboard.sync.managedPolicy.locked.allowUpdates.body": "ممكن تنطبق التحديثات الموقّعة المطابقة من رابط الوالد المحفوظ هاد من دون فتح قفل الملف الشخصي كل مرة.",
   "dashboard.sync.managedPolicy.error.noAllowedScopes": "اختار منطقة مسموح فيها وحدة عالأقل قبل ما تحفظ رابط الوالد هاد.",
-  "dashboard.sync.managedPolicy.error.lockedScopes": "لازم يضلّ {scopes} مفعّل لهالموافقة."
+  "dashboard.sync.managedPolicy.error.lockedScopes": "لازم يضلّ {scopes} مفعّل لهالموافقة.",
+  "dashboard.managedLists.error.publicHttps": "حط رابط HTTPS عام لملف نصّي.",
+  "dashboard.managedLists.error.http": "ما قدرنا نحمّل اللائحة ({status})",
+  "dashboard.managedLists.error.tooLarge": "اللائحة كبيرة كتير. استعمل ملف نصّي أصغر.",
+  "dashboard.managedLists.error.timeout": "رابط اللائحة تأخّر كتير ليردّ.",
+  "dashboard.managedLists.error.invalidJson": "هالشي بيشبه JSON، بس مو JSON صالح. صلّح صياغة JSON وعاين من جديد.",
+  "dashboard.managedLists.error.noValidRows": "ما لقينا قنوات أو كلمات مفتاحية صالحة"
 }
