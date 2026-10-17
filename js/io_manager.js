@@ -2000,6 +2000,207 @@
         };
     }
 
+    // BlockTube is a separate, single-profile rule format. Never add these
+    // compatibility fields to a complete FilterTube backup.
+    function buildBlockTubeExport(profile, { profileId, surface }) {
+        const selected = safeObject(profile[surface]);
+        const settings = safeObject(profile.settings);
+        const unsupported = [];
+        const omit = (field, reason, index = null, value = null) => unsupported.push({
+            field, reason, ...(index == null ? {} : { index }),
+            ...(typeof value === 'string' ? { value } : {})
+        });
+        const filterData = { title: [], channelName: [], channelId: [], videoId: [], comment: [], vidLength: [null, null], javascript: '' };
+        const options = { enable_javascript: false };
+        const seen = new Map(['title', 'channelName', 'channelId', 'videoId', 'comment'].map(field => [field, new Set()]));
+        const add = (field, value) => {
+            if (seen.get(field).has(value)) return;
+            seen.get(field).add(value);
+            filterData[field].push(value);
+        };
+        const regexRow = (word, entry, field, index, defaultFlags = 'i') => {
+            const flags = entry.matchMode === 'regex' ? (entry.regexFlags || defaultFlags) : (entry.exact ? 'iu' : 'i');
+            if (typeof flags !== 'string' || !/^[imsu]*$/.test(flags)) {
+                omit(field, 'unsupported_regex_flags', index, word); return null;
+            }
+            const escaped = word.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+            const pattern = entry.matchMode === 'regex' ? word
+                : (entry.exact ? `(^|[^\\p{L}\\p{N}_])${escaped}(?=$|[^\\p{L}\\p{N}_])` : escaped);
+            try {
+                // .source escapes slashes and line breaks for BlockTube's
+                // one-rule-per-line /pattern/flags syntax without ASCII loss.
+                return `/${new RegExp(pattern, flags).source}/${flags}`;
+            } catch (error) {
+                omit(field, 'invalid_regex', index, word); return null;
+            }
+        };
+        const keyword = (entry, field, index) => {
+            const row = typeof entry === 'string' ? { word: entry } : safeObject(entry);
+            const word = typeof row.word === 'string' ? row.word.trim() : '';
+            if (!word.trim()) { omit(field, 'empty_or_invalid_keyword', index); return; }
+            if (row.managedListPaused === true) { omit(field, 'paused_rule_not_exported', index, word); return; }
+            if (row.semantic === true) { omit(field, 'semantic_matching_not_supported', index, word); return; }
+            if (safeObject(row.dateFilter).enabled === true) { omit(field, 'date_constraint_not_supported', index, word); return; }
+            if (row.scope && !['title', 'comment', 'channel_name'].includes(row.scope)) {
+                omit(field, 'unknown_keyword_scope', index, word); return;
+            }
+            const value = regexRow(word, row, field, index);
+            if (!value) return;
+            if (row.scope === 'channel_name') add('channelName', value);
+            else if (row.scope !== 'comment') add('title', value);
+            if (row.scope === 'comment' || row.comments === true) add('comment', value);
+        };
+        const channelsKey = surface === 'kids' ? 'blockedChannels' : 'channels';
+        const keywordsKey = surface === 'kids' ? 'blockedKeywords' : 'keywords';
+        for (const field of [channelsKey, keywordsKey, 'videoIds']) {
+            if (selected[field] != null && !Array.isArray(selected[field])) omit(`${surface}.${field}`, 'invalid_rule_list');
+        }
+        const channels = safeArray(selected[channelsKey] || selected.blockedChannels);
+        const keywords = safeArray(selected[keywordsKey] || selected.blockedKeywords);
+        channels.forEach((raw, index) => {
+            const row = typeof raw === 'string' ? { id: raw } : safeObject(raw);
+            const field = `${surface}.${channelsKey}`;
+            if (row.managedListPaused === true) { omit(field, 'paused_rule_not_exported', index); return; }
+            if (row.source === 'blocktube-channel-name') {
+                const name = normalizeString(row.originalInput || row.name);
+                const parsed = /^\/(.*)\/([a-z]*)$/s.exec(name);
+                if (parsed) {
+                    const value = regexRow(parsed[1], { matchMode: 'regex', regexFlags: parsed[2] }, field, index, '');
+                    if (value) add('channelName', value);
+                } else if (name && !name.startsWith('//') && !/[\r\n]/.test(name)) add('channelName', name);
+                else omit(field, 'invalid_channel_name_rule', index, name);
+            } else {
+                const ids = [row.id, ...safeArray(row.alternateIds)].filter(value => typeof value === 'string' && /^UC[\w-]{22}$/.test(value));
+                if (!ids.length) omit(field, 'unresolved_channel_id', index, normalizeString(row.handle || row.customUrl || row.name || row.originalInput));
+                ids.forEach(value => add('channelId', value));
+                if (row.collaborationGroupId || safeArray(row.collaborationWith).length || safeArray(row.allCollaborators).length) {
+                    omit(field, 'collaboration_metadata_not_supported', index);
+                }
+            }
+            if (row.filterAll === true) {
+                const word = row.name && row.name !== row.id ? row.name : (row.handle || row.id || row.originalInput || '');
+                keyword({ word, exact: true, comments: row.filterAllComments !== false }, `${field}.filterAll`, index);
+            }
+        });
+        keywords.forEach((row, index) => {
+            // Channel-derived keywords are regenerated above from current
+            // channel rows, so paused or deleted channels cannot reappear.
+            if (row?.source === 'channel' || parsePackedChannelKeywordSource(row?.source)) return;
+            keyword(row, `${surface}.${keywordsKey}`, index);
+        });
+        safeArray(selected.videoIds || selected.blockedVideoIds).forEach((value, index) => {
+            if (typeof value === 'string' && /^[\w-]{11}$/.test(value)) add('videoId', value);
+            else omit(`${surface}.videoIds`, 'invalid_video_id', index, typeof value === 'string' ? value : null);
+        });
+        for (const field of ['whitelistChannels', 'whitelistedChannels', 'whitelistKeywords', 'whitelistedKeywords', 'allowedVideoIds']) {
+            if (safeArray(selected[field]).length) omit(`${surface}.${field}`, 'allow_rules_not_supported');
+        }
+        if (safeArray(selected.subscriptions).length) omit(`${surface}.subscriptions`, 'subscription_metadata_not_supported');
+        if (selected.mode === 'whitelist') omit(`${surface}.mode`, 'whitelist_mode_not_supported');
+        if (selected.mode && !['blocklist', 'whitelist'].includes(selected.mode)) omit(`${surface}.mode`, 'unknown_list_mode');
+        const reportFilterSettings = (filters, prefix) => {
+            for (const [name, rule] of Object.entries(safeObject(filters))) {
+                if (rule === true || safeObject(rule).enabled === true) omit(`${prefix}.${name}`, 'setting_not_supported');
+            }
+        };
+        for (const field of ['contentFilters', 'categoryFilters', 'languageFilters']) {
+            reportFilterSettings(selected[field], `${surface}.${field}`);
+        }
+        const mappedSettings = new Set(['hideShorts', 'hideMixPlaylists', 'hideExploreTrending']);
+        if (surface === 'main') {
+            for (const [source, destination] of [['hideShorts', 'shorts'], ['hideMixPlaylists', 'mixes'], ['hideExploreTrending', 'trending']]) {
+                options[destination] = settings[source] === true;
+            }
+        }
+        for (const [field, value] of Object.entries(settings)) {
+            if ((surface === 'main' && mappedSettings.has(field)) || value == null || value === false || value === '' || value === 0) continue;
+            if (field === 'contentFilters' || field === 'categoryFilters' || field === 'languageFilters') {
+                reportFilterSettings(value, `settings.${field}`);
+            } else if (typeof value === 'boolean' && value === true && !['allowMainViewing', 'allowKidsViewing'].includes(field)) {
+                omit(`settings.${field}`, 'setting_not_supported');
+            } else if (field === 'timeLimitPolicy' && safeObject(value).enabled === true) omit(`settings.${field}`, 'parental_time_policy_not_supported');
+        }
+        if (settings.enabled === false) omit('settings.enabled', 'disabled_filtering_not_transferred');
+        for (const field of ['allowMainViewing', 'allowKidsViewing']) {
+            if (settings[field] === false) omit(`settings.${field}`, 'profile_access_restriction_not_supported');
+        }
+        const counts = Object.fromEntries(['title', 'channelName', 'channelId', 'videoId', 'comment'].map(field => [field, filterData[field].length]));
+        const ruleCount = Object.values(counts).reduce((sum, count) => sum + count, 0);
+        const warnings = [
+            'BlockTube import replaces its current rules and settings, including its options-page password. Back up BlockTube first and configure its password again after import.',
+            'This file contains one profile and one selected rule space. Keep a complete FilterTube backup for profiles, PINs, devices and settings.',
+            'BlockTube applies these rules to supported YouTube fields, including playlist names and chat; FilterTube description matching and renderer coverage may differ.'
+        ];
+        if (surface === 'kids') warnings.push('These are the selected YouTube Kids rules, but BlockTube does not provide a separate YouTube Kids profile or protection context.');
+        if (settings.syncKidsToMain === true && surface === 'main') omit('settings.syncKidsToMain', 'kids_rules_not_merged_into_main_export');
+        return {
+            payload: { filterData, options, uiPass: '' },
+            report: {
+                format: 'blocktube', compatibilityVersion: '0.4.8', profileId,
+                profileName: normalizeString(profile.name) || profileId, surface, counts, unsupported, warnings,
+                canExport: (!selected.mode || selected.mode === 'blocklist') && (ruleCount > 0 || Object.values(options).some(value => value === true))
+            }
+        };
+    }
+
+    function getBlockTubeExportAuthority(root, profileId) {
+        const profiles = safeObject(root.profiles), actorId = normalizeString(root.activeProfileId);
+        const actor = safeObject(profiles[actorId]), target = safeObject(profiles[profileId]);
+        const type = (profile, id) => id === DEFAULT_PROFILE_ID ? 'account'
+            : (['child', 'account'].includes(normalizeString(profile.type).toLowerCase()) ? normalizeString(profile.type).toLowerCase()
+                : (normalizeString(profile.parentProfileId) ? 'child' : 'account'));
+        if (!actorId || !profiles[actorId] || !profiles[profileId] || type(actor, actorId) === 'child'
+            || (actorId !== DEFAULT_PROFILE_ID && actorId !== profileId
+                && !(type(target, profileId) === 'child' && normalizeString(target.parentProfileId) === actorId))) {
+            throw new Error('Open the parent/account profile that manages the selected export profile.');
+        }
+        const security = safeObject(actor.security);
+        const verifier = actorId === DEFAULT_PROFILE_ID ? extractMasterPinVerifier(root)
+            : (security.profilePinVerifier || security.pinVerifier || null);
+        return { actorId, verifier, binding: JSON.stringify([actorId, type(actor, actorId), actor.parentProfileId || null,
+            profileId, type(target, profileId), target.parentProfileId || null, verifier]) };
+    }
+
+    async function prepareBlockTubeExport({ profileId, surface, auth = null } = {}) {
+        const id = normalizeString(profileId);
+        if (!id || !['main', 'kids'].includes(surface)) throw new Error('Choose one profile and Main YouTube or YouTube Kids.');
+        const load = async () => {
+            const data = await readStorage([FT_PROFILES_V4_KEY], { required: true });
+            if (!isValidProfilesV4(data[FT_PROFILES_V4_KEY])) throw new Error('Open Account & sync to initialize profiles before exporting.');
+            return JSON.parse(JSON.stringify(data[FT_PROFILES_V4_KEY]));
+        };
+        const first = await load(), authority = getBlockTubeExportAuthority(first, id);
+        if (authority.verifier) await requirePinOrThrow(
+            normalizeString(authority.actorId === DEFAULT_PROFILE_ID ? auth?.localMasterPin : auth?.localProfilePin),
+            authority.verifier, 'Parent/account PIN required for this export'
+        );
+        const root = await load();
+        if (getBlockTubeExportAuthority(root, id).binding !== authority.binding) throw new Error('Profile authority changed. Review the export again.');
+        const snapshot = JSON.stringify(root.profiles[id]);
+        const result = buildBlockTubeExport(root.profiles[id], { profileId: id, surface });
+        if (!global.crypto?.subtle || typeof TextEncoder === 'undefined') throw new Error('Secure export review is unavailable in this browser.');
+        const reviewed = JSON.stringify([authority.binding, result]);
+        const digest = await global.crypto.subtle.digest('SHA-256', new TextEncoder().encode(reviewed));
+        result.report.reviewToken = Array.from(new Uint8Array(digest), byte => byte.toString(16).padStart(2, '0')).join('');
+        const latest = await load();
+        if (getBlockTubeExportAuthority(latest, id).binding !== authority.binding || JSON.stringify(latest.profiles[id]) !== snapshot) {
+            throw new Error('Profile or rules changed. Review the export again.');
+        }
+        return result;
+    }
+
+    async function previewBlockTubeExport(options = {}) {
+        return (await prepareBlockTubeExport(options)).report;
+    }
+
+    async function exportBlockTube({ reviewToken = '', acceptUnsupported = false, ...options } = {}) {
+        const result = await prepareBlockTubeExport(options);
+        if (!reviewToken || result.report.reviewToken !== reviewToken) throw new Error('Review the current BlockTube export before downloading.');
+        if (!result.report.canExport) throw new Error('The selected rules cannot be safely exported to BlockTube. Keep a complete FilterTube backup.');
+        if (result.report.unsupported.length && acceptUnsupported !== true) throw new Error('Review and explicitly accept the omitted BlockTube items before downloading.');
+        return result;
+    }
+
     async function exportV3({ scope = 'auto', auth = null } = {}) {
         const SettingsAPI = global.FilterTubeSettings || {};
         if (typeof SettingsAPI.loadSettings !== 'function') {
@@ -2983,6 +3184,8 @@
     // ============================================================================
 
     global.FilterTubeIO = {
+        previewBlockTubeExport,
+        exportBlockTube,
         exportV3,
         exportV3Encrypted,
         importV3,

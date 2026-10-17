@@ -1,0 +1,21 @@
+{
+  "repository": "https://github.com/amitbl/blocktube",
+  "commit": "d8a1bdba062ab603726b0ac3ea06c229d61fd710",
+  "version": "0.4.8",
+  "license": "GPL-3.0-only",
+  "purpose": "Unmodified upstream source fixtures for compatibility tests; no upstream code is shipped by the FilterTube runtime exporter.",
+  "files": {
+    "options.js": {
+      "path": "src/ui/options.js",
+      "sha256": "af1017a5079222b77889cba93589b7e49f20ec9de36f11ee89b96777bc9479d9"
+    },
+    "background.js": {
+      "path": "src/scripts/background.js",
+      "sha256": "8f3d07517b81d5c7d06b1aee89cfa6afb2d3c8f9bcc9b4940583b05b7b8ff6dd"
+    },
+    "LICENSE": {
+      "path": "LICENSE",
+      "sha256": "8ceb4b9ee5adedde47b31e975c1d90c73ad27b6b165a1dcd80c7c545eb65b903"
+    }
+  }
+}

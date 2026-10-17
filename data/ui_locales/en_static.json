@@ -4622,5 +4622,25 @@
   "Close scanner": {
     "kind": "text",
     "line": 1438
+  },
+  "Export for BlockTube": {
+    "kind": "text",
+    "line": 567
+  },
+  "Copy compatible rules from one profile. This is not a complete FilterTube backup. Review anything that cannot be transferred before downloading.": {
+    "kind": "text",
+    "line": 568
+  },
+  "Profile": {
+    "kind": "text",
+    "line": 168
+  },
+  "Rule space": {
+    "kind": "text",
+    "line": 572
+  },
+  "Review BlockTube export": {
+    "kind": "text",
+    "line": 577
   }
 }

@@ -5077,6 +5077,11 @@ padding: var(--ft-space-xs) var(--ft-space-sm);
     border-left: 3px solid var(--ft-color-primary);
 }
 
+#ftBlockTubeExportDetails select {
+    max-width: 100%;
+    min-width: 0;
+    min-height: 40px;
+}
 
 .video-filter-conditions {
     display: flex;

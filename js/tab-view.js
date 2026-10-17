@@ -4222,6 +4222,10 @@ document.addEventListener('DOMContentLoaded', async () => {
     const ftTopBarListModeControlsTab = document.getElementById('ftTopBarListModeControlsTab');
 
     const ftExportV3Btn = document.getElementById('ftExportV3Btn');
+    const ftBlockTubeExportDetails = document.getElementById('ftBlockTubeExportDetails');
+    const ftBlockTubeExportProfile = document.getElementById('ftBlockTubeExportProfile');
+    const ftBlockTubeExportSurface = document.getElementById('ftBlockTubeExportSurface');
+    const ftBlockTubeExportBtn = document.getElementById('ftBlockTubeExportBtn');
     const ftExportV3EncryptedBtn = document.getElementById('ftExportV3EncryptedBtn');
     const ftExportActiveOnly = document.getElementById('ftExportActiveOnly');
     const ftImportV3Btn = document.getElementById('ftImportV3Btn');
@@ -9220,6 +9224,10 @@ document.addEventListener('DOMContentLoaded', async () => {
         const scopedTitle = tabViewUiText('family.profileManager.finishEditingBeforeGlobalControls', 'Finish protected-profile editing before changing global account, Master PIN, or create-profile controls.');
         const syncKidsToMainToggle = document.getElementById('setting_syncKidsToMain');
 
+        if (ftBlockTubeExportBtn) {
+            ftBlockTubeExportBtn.disabled = isChild;
+            ftBlockTubeExportBtn.title = isChild ? childTitle : '';
+        }
         if (ftExportV3Btn) {
             ftExportV3Btn.disabled = isChild;
             ftExportV3Btn.title = isChild ? childTitle : '';
@@ -15205,7 +15213,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         });
     }
 
-    async function showChoiceModal({ title, message = '', details = [], choices = [], cancelText = 'Cancel' }) {
+    async function showChoiceModal({ title, message = '', details = [], choices = [], cancelText = 'Cancel', focusCancel = false }) {
         return new Promise((resolve) => {
             const overlay = document.createElement('div');
             overlay.className = 'ft-modal-overlay';
@@ -15265,6 +15273,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             cancelBtn.addEventListener('click', () => closeWith(null));
 
             actions.appendChild(cancelBtn);
+            if (focusCancel) requestAnimationFrame(() => cancelBtn.focus());
 
             choices.forEach((choice, index) => {
                 if (!choice || !choice.value || !choice.label) return;
@@ -15275,7 +15284,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                 btn.addEventListener('click', () => closeWith(choice.value));
                 actions.appendChild(btn);
 
-                if (index === 0) {
+                if (index === 0 && !focusCancel) {
                     requestAnimationFrame(() => {
                         try {
                             btn.focus();
@@ -15298,6 +15307,21 @@ document.addEventListener('DOMContentLoaded', async () => {
                 }
             };
             overlay.addEventListener('keydown', handleEscape);
+            if (focusCancel) {
+                card.setAttribute('role', 'dialog');
+                card.setAttribute('aria-modal', 'true');
+                card.setAttribute('aria-label', title);
+                overlay.addEventListener('keydown', event => {
+                    if (event.key !== 'Tab') return;
+                    const buttons = [...actions.querySelectorAll('button:not([disabled])')];
+                    const first = buttons[0], last = buttons[buttons.length - 1];
+                    if (event.shiftKey && document.activeElement === first) {
+                        event.preventDefault(); last?.focus();
+                    } else if (!event.shiftKey && document.activeElement === last) {
+                        event.preventDefault(); first?.focus();
+                    }
+                });
+            }
 
             body.appendChild(actions);
             card.appendChild(header);
@@ -27742,6 +27766,138 @@ document.addEventListener('DOMContentLoaded', async () => {
         });
     }
 
+
+    async function refreshBlockTubeExportProfiles() {
+        const root = await window.FilterTubeIO?.loadProfilesV4?.();
+        if (!root || !ftBlockTubeExportProfile) return;
+        const actorId = normalizeString(root.activeProfileId);
+        const profiles = safeObject(root.profiles);
+        const previous = ftBlockTubeExportProfile.value;
+        ftBlockTubeExportProfile.replaceChildren();
+        if (getProfileType(root, actorId) === 'child') return;
+        for (const [id, profile] of Object.entries(profiles)) {
+            if (actorId !== 'default' && id !== actorId
+                && !(getProfileType(root, id) === 'child' && normalizeString(profile.parentProfileId) === actorId)) continue;
+            const option = document.createElement('option');
+            option.value = id;
+            option.textContent = getProfileName(root, id);
+            ftBlockTubeExportProfile.appendChild(option);
+        }
+        const allowed = [...ftBlockTubeExportProfile.options].map(option => option.value);
+        ftBlockTubeExportProfile.value = allowed.includes(previous) ? previous : actorId;
+    }
+
+    function blockTubeOmissionLabel(item) {
+        const reasons = {
+            unsupported_regex_flags: 'Regex flags that BlockTube cannot safely preserve',
+            invalid_regex: 'Invalid regular expressions',
+            empty_or_invalid_keyword: 'Empty or invalid keyword rules',
+            paused_rule_not_exported: 'Paused rules',
+            semantic_matching_not_supported: 'Semantic matching rules',
+            date_constraint_not_supported: 'Rules limited to particular dates',
+            unknown_keyword_scope: 'Rules with an unsupported matching area',
+            invalid_rule_list: 'Invalid rule lists',
+            invalid_channel_name_rule: 'Channel-name rules that cannot be preserved',
+            unresolved_channel_id: 'Channels without a verified YouTube channel ID',
+            collaboration_metadata_not_supported: 'Channel collaboration settings',
+            invalid_video_id: 'Invalid video identifiers',
+            allow_rules_not_supported: 'Allowed rules (BlockTube only supports blocked rules)',
+            subscription_metadata_not_supported: 'Saved subscriptions',
+            whitelist_mode_not_supported: 'Allow-only mode (this profile cannot be exported to BlockTube)',
+            unknown_list_mode: 'An unsupported filtering mode',
+            setting_not_supported: 'FilterTube-only filtering settings',
+            parental_time_policy_not_supported: 'Parental time limits',
+            disabled_filtering_not_transferred: 'The paused filtering state',
+            profile_access_restriction_not_supported: 'Profile access restrictions',
+            kids_rules_not_merged_into_main_export: 'Extra Kids rules applied on Main YouTube (export Kids rules separately)'
+        };
+        const reason = tabViewUiText(`blockTubeExport.reason.${item.reason}`, reasons[item.reason] || 'Other FilterTube-only data');
+        if (item.reason !== 'setting_not_supported') return reason;
+        const key = String(item.field || '').split('.').pop();
+        const control = window.FilterTubeContentControlsCatalog?.getControlByKey?.(key);
+        const labels = { views: 'Minimum views', duration: 'Duration Filter', uploadDate: 'Upload Date Filter',
+            uppercase: 'Uppercase Title Filter', enabled: 'FilterTube on/off state' };
+        const label = control?.title || labels[key]
+            || (String(item.field).includes('categoryFilters') ? 'Category Filter' : '')
+            || (String(item.field).includes('languageFilters') ? 'Spoken Language' : '')
+            || key?.replace(/([a-z])([A-Z])/g, '$1 $2');
+        return label ? `${reason}: ${label}` : reason;
+    }
+
+    async function runBlockTubeExport() {
+        if (!ensureNonChildAdminAction(tabViewUiText('blockTubeExport.protected', 'Switch to a parent/account profile to export rules.'))) return;
+        const io = window.FilterTubeIO;
+        if (!io?.previewBlockTubeExport || !io?.exportBlockTube) return;
+        const profileId = ftBlockTubeExportProfile?.value;
+        const surface = ftBlockTubeExportSurface?.value;
+        if (!profileId || !['main', 'kids'].includes(surface)) return;
+        ftBlockTubeExportBtn.disabled = true;
+        try {
+            const root = await io.loadProfilesV4();
+            const actorId = normalizeString(root?.activeProfileId);
+            const verifier = actorId === 'default' ? extractMasterPinVerifier(root) : extractProfilePinVerifier(root, actorId);
+            let auth = null;
+            if (verifier) {
+                if (actorId === 'default') {
+                    if (!await ensureAdminUnlocked(root, { sensitiveAction: true })) return;
+                    auth = { localMasterPin: sessionMasterPin };
+                } else {
+                    const pin = await showPromptModal({
+                        title: tabViewUiText('blockTubeExport.pinTitle', 'Confirm account PIN'),
+                        message: tabViewUiText('blockTubeExport.pinHelp', 'Enter the current parent/account PIN to export these rules.'),
+                        inputType: 'password',
+                        placeholder: tabViewUiText('profileAccess.profilePinPlaceholder', 'Profile PIN'),
+                        confirmText: tabViewUiText('dashboard.modal.continue', 'Continue')
+                    });
+                    if (!normalizeString(pin)) return;
+                    auth = { localProfilePin: normalizeString(pin) };
+                }
+            }
+            const report = await io.previewBlockTubeExport({ profileId, surface, auth });
+            const omitted = new Map();
+            for (const item of report.unsupported || []) {
+                const reason = blockTubeOmissionLabel({ ...item, field: '' });
+                const bucket = omitted.get(item.reason) || { reason, count: 0, fields: new Set() };
+                bucket.count++;
+                const fullLabel = blockTubeOmissionLabel(item);
+                if (fullLabel.startsWith(`${reason}: `)) bucket.fields.add(fullLabel.slice(reason.length + 2));
+                omitted.set(item.reason, bucket);
+            }
+            const details = [
+                ...(!report.canExport ? [tabViewUiText('blockTubeExport.nothingCompatible', 'No compatible rules can be downloaded for this selection. Choose another profile or rule space, or use a complete FilterTube backup.')] : []),
+                Object.entries(report.counts || {}).map(([field, count]) => `${tabViewUiText(`blockTubeExport.count.${field}`, ({ title: 'Title rules', channelName: 'Channel-name rules', channelId: 'Channels', videoId: 'Videos', comment: 'Comment rules' })[field] || field)}: ${count}`).join(' · '),
+                ...(report.warnings || []),
+                ...[...omitted.values()].map(({ reason, count, fields }) => `${tabViewUiText('blockTubeExport.omitted', 'Not transferred')}: ${reason} (${count})${fields.size ? ` — ${[...fields].join(', ')}` : ''}`)
+            ];
+            const choice = await showChoiceModal({
+                title: tabViewUiText('blockTubeExport.reviewTitle', 'Review BlockTube export'),
+                focusCancel: true,
+                message: `${report.profileName} · ${surface === 'kids' ? 'YouTube Kids' : 'Main YouTube'}`,
+                details,
+                choices: report.canExport ? [{ value: 'download', label: omitted.size
+                    ? tabViewUiText('blockTubeExport.acceptOmissions', 'Download compatible rules; leave listed items out')
+                    : tabViewUiText('blockTubeExport.download', 'Download BlockTube JSON'), recommended: true }] : [],
+                cancelText: tabViewUiText('dashboard.modal.cancel', 'Cancel')
+            });
+            if (choice !== 'download') return;
+            const result = await io.exportBlockTube({ profileId, surface, auth,
+                reviewToken: report.reviewToken, acceptUnsupported: omitted.size > 0 });
+            await downloadJsonToDownloadsFolder('FilterTube Export', `filtertube_for_blocktube_${surface}.json`, result.payload, { preferAnchor: IS_FIREFOX_TAB_VIEW });
+            UIComponents.showToast(tabViewUiText('blockTubeExport.saved', 'BlockTube file saved. Import it in BlockTube, not as a FilterTube backup.'), 'success');
+        } catch (error) {
+            UIComponents.showToast(error?.message || tabViewUiText('dashboard.backup.toast.exportFailed', 'Export failed'), 'error');
+        } finally {
+            ftBlockTubeExportBtn.disabled = false;
+            ftBlockTubeExportBtn.focus();
+        }
+    }
+
+    ftBlockTubeExportDetails?.addEventListener('toggle', () => {
+        if (ftBlockTubeExportDetails.open) refreshBlockTubeExportProfiles().catch(() => {
+            UIComponents.showToast(tabViewUiText('dashboard.backup.toast.exportFailed', 'Export failed'), 'error');
+        });
+    });
+    ftBlockTubeExportBtn?.addEventListener('click', runBlockTubeExport);
 
     async function runExportV3() {
         if (!ensureNonChildAdminAction(tabViewUiText(
