@@ -1,0 +1,46 @@
+{
+  "kind": "bounded abstract safety checks; not implementation refinement",
+  "tool_sha256": "936a262061c914694dfd669a543be24573c45d5aa0ff20a8b96b23d01e050e88",
+  "model_sha256": "48f8e7887eb1c1645b6fbc5253b66261f9531801e8cf656e28f6ae3bf8dc133b",
+  "java_version": "openjdk version \"17.0.15\" 2025-04-15",
+  "checks": [
+    {
+      "configuration": "Safe",
+      "accepted": true,
+      "expected_invariant_failure": null,
+      "exit_code": 0,
+      "generated": 472,
+      "distinct": 249,
+      "counterexample_actions": []
+    },
+    {
+      "configuration": "UnsafeInit",
+      "accepted": true,
+      "expected_invariant_failure": "FreshInitialization",
+      "exit_code": 12,
+      "generated": 82,
+      "distinct": 58,
+      "counterexample_actions": [
+        "Initial predicate",
+        "BeginInit line 17, col 14 to line 20, col 48 of module IssueSafety",
+        "PublishSettings line 11, col 20 to line 13, col 73 of module IssueSafety",
+        "FinishInit line 21, col 15 to line 24, col 59 of module IssueSafety"
+      ]
+    },
+    {
+      "configuration": "UnsafeExport",
+      "accepted": true,
+      "expected_invariant_failure": "FreshExportReview",
+      "exit_code": 12,
+      "generated": 95,
+      "distinct": 62,
+      "counterexample_actions": [
+        "Initial predicate",
+        "Review line 25, col 11 to line 27, col 87 of module IssueSafety",
+        "PublishSettings line 11, col 20 to line 13, col 73 of module IssueSafety",
+        "ConfirmExport line 28, col 18 to line 32, col 60 of module IssueSafety"
+      ]
+    }
+  ],
+  "tlc_version": "TLC2 Version 2.19 of 08 August 2024 (rev: 5a47802)"
+}
