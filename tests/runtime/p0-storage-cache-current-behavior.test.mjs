@@ -261,12 +261,12 @@ test('import and Nanah profile writes lack shared target-profile revision report
   const nanah = read('js/nanah_sync_adapter.js');
   const importBlock = sliceBetween(
     ioManager,
-    "async function importV3(json, { strategy = 'merge', scope = 'auto', auth = null, targetProfileId = null } = {})",
+    "async function importV3(json, { strategy = 'merge', scope = 'auto', auth = null, targetProfileId = null, beforeProfileWrite = null } = {})",
     'if (Object.keys(nextChannelMap).length > 0) {'
   );
   const nanahApply = sliceBetween(
     nanah,
-    'async function applyScopedPortablePayload(io, portable, { strategy = \'merge\', targetProfileId = null } = {})',
+    'async function applyScopedPortablePayload(io, portable, { strategy = \'merge\', targetProfileId = null, beforeProfileWrite = null } = {})',
     'function generateId() {'
   );
 

@@ -1,4 +1,9 @@
 {
+  "dashboard.sync.picker.receiveConfirmed": "Kisemo kimehakikiwa hapa. Weka vifaa vyote wazi. Inasubiri sasisho la mzazi.",
+  "dashboard.sync.picker.receivePermissions": "Masasisho yanafuata ruhusa zilizoidhinishwa na mzazi kwenye kifaa hiki.",
+  "dashboard.sync.picker.receiveModeEyebrow": "Pokea tu",
+  "dashboard.sync.picker.receiveModeTitle": "Wasifu huu uliolindwa",
+  "dashboard.sync.picker.receiveModeBody": "Mzazi anatuma mabadiliko.",
   "popup.blocklist": "Orodha ya kuzuia",
   "popup.whitelist": "Orodha ya kuruhusu",
   "popup.listMode.whitelistTooltip": "Hali ya orodha ya kuruhusu: onyesha maudhui yanayolingana na sheria za kuruhusu",
@@ -2413,5 +2418,9 @@
   "dashboard.helpBubble.tip51": "Nakili kiungo cha uoanishaji kwa kifaa kingine. Kifaa kinachopokea bado lazima kithibitishe kauli ileile ya usalama.",
   "dashboard.helpBubble.tip52": "Anza uoanishaji kwanza, kisha eneo hili litaonyesha QR au ujumbe wa hali kwa kifaa kingine.",
   "dashboard.helpBubble.tip53": "Vifaa vinavyoaminika hukumbuka uhusiano uliothibitishwa ili kurahisisha utumaji ujao.",
-  "dashboard.helpBubble.tip54": "Uaminifu uliohifadhiwa si muunganisho wa moja kwa moja na hauwahi kuruka ukaguzi wa ndani."
+  "dashboard.helpBubble.tip54": "Uaminifu uliohifadhiwa si muunganisho wa moja kwa moja na hauwahi kuruka ukaguzi wa ndani.",
+  "dashboard.sync.familyDeviceMap.selection.localPhraseConfirmedDetail": "Phrase confirmed here. Confirm it on the other device before sending.",
+  "dashboard.sync.familyDeviceMap.map.localPhraseConfirmedDetail": "Phrase confirmed here. Confirm it on the other device before sending.",
+  "dashboard.sync.familyDeviceMap.map.compassRuleLocalConfirmed": "Phrase confirmed here. Confirm it on the other device, then review and send the update.",
+  "dashboard.sync.familyDeviceMap.trusted.sessionDevice": "Session device {label}"
 }

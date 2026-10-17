@@ -1,4 +1,9 @@
 {
+  "dashboard.sync.picker.receiveConfirmed": "ยืนยันวลีที่อุปกรณ์นี้แล้ว เปิด FilterTube ไว้บนอุปกรณ์ทั้งสอง กำลังรอการอัปเดตจากผู้ปกครอง",
+  "dashboard.sync.picker.receivePermissions": "การอัปเดตเป็นไปตามสิทธิ์ที่ผู้ปกครองอนุมัติบนอุปกรณ์นี้",
+  "dashboard.sync.picker.receiveModeEyebrow": "รับเท่านั้น",
+  "dashboard.sync.picker.receiveModeTitle": "โปรไฟล์ที่ได้รับการปกป้องนี้",
+  "dashboard.sync.picker.receiveModeBody": "ผู้ปกครองส่งการเปลี่ยนแปลง",
   "popup.blocklist": "รายการบล็อก",
   "popup.whitelist": "รายการที่อนุญาต",
   "popup.listMode.whitelistTooltip": "โหมดรายการอนุญาต: แสดงเนื้อหาที่ตรงกับกฎที่อนุญาต",
@@ -2413,5 +2418,9 @@
   "dashboard.helpBubble.tip51": "คัดลอกลิงก์จับคู่สำหรับอุปกรณ์อีกเครื่อง อุปกรณ์รับยังต้องตรวจสอบข้อความความปลอดภัยเดียวกัน",
   "dashboard.helpBubble.tip52": "เริ่มจับคู่ก่อน จากนั้นส่วนนี้จะแสดง QR หรือข้อความสถานะสำหรับอุปกรณ์อีกเครื่อง",
   "dashboard.helpBubble.tip53": "อุปกรณ์ที่เชื่อถือจะจดจำความสัมพันธ์ที่ยืนยันแล้ว เพื่อให้ส่งครั้งต่อไปได้ง่ายขึ้น",
-  "dashboard.helpBubble.tip54": "ความเชื่อถือที่บันทึกไว้ไม่ใช่การเชื่อมต่อสด และไม่ข้ามการตรวจสอบในเครื่อง"
+  "dashboard.helpBubble.tip54": "ความเชื่อถือที่บันทึกไว้ไม่ใช่การเชื่อมต่อสด และไม่ข้ามการตรวจสอบในเครื่อง",
+  "dashboard.sync.familyDeviceMap.selection.localPhraseConfirmedDetail": "Phrase confirmed here. Confirm it on the other device before sending.",
+  "dashboard.sync.familyDeviceMap.map.localPhraseConfirmedDetail": "Phrase confirmed here. Confirm it on the other device before sending.",
+  "dashboard.sync.familyDeviceMap.map.compassRuleLocalConfirmed": "Phrase confirmed here. Confirm it on the other device, then review and send the update.",
+  "dashboard.sync.familyDeviceMap.trusted.sessionDevice": "Session device {label}"
 }

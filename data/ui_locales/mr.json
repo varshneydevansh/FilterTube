@@ -1,4 +1,9 @@
 {
+  "dashboard.sync.picker.receiveConfirmed": "येथे वाक्यांशाची पुष्टी झाली आहे. दोन्ही उपकरणांवर FilterTube उघडे ठेवा. पालकांकडून अपडेटची प्रतीक्षा आहे.",
+  "dashboard.sync.picker.receivePermissions": "अद्यतने या उपकरणावर पालकाने मंजूर केलेल्या परवानग्यांनुसार लागू होतात.",
+  "dashboard.sync.picker.receiveModeEyebrow": "फक्त प्राप्त",
+  "dashboard.sync.picker.receiveModeTitle": "हे संरक्षित प्रोफाइल",
+  "dashboard.sync.picker.receiveModeBody": "पालक बदल पाठवतो.",
   "popup.blocklist": "अवरोध सूची",
   "popup.whitelist": "परवानगीची सूची",
   "popup.listMode.whitelistTooltip": "परवानगी सूची मोड: परवानगीच्या नियमांशी जुळणारा आशय दाखवा",
@@ -2413,5 +2418,9 @@
   "dashboard.helpBubble.tip51": "दुसऱ्या डिव्हाइससाठी जोडणी लिंक कॉपी करा. स्वीकारणाऱ्या डिव्हाइसने तरीही तेच सुरक्षितता-वाक्य पडताळले पाहिजे.",
   "dashboard.helpBubble.tip52": "आधी जोडणी सुरू करा; मग येथे दुसऱ्या डिव्हाइससाठी QR किंवा स्थिती-संदेश दिसेल.",
   "dashboard.helpBubble.tip53": "विश्वसनीय डिव्हाइस भविष्यात पाठवणे सोपे व्हावे म्हणून पडताळलेले नाते लक्षात ठेवतात.",
-  "dashboard.helpBubble.tip54": "जतन केलेला विश्वास म्हणजे थेट कनेक्शन नाही आणि तो स्थानिक पडताळणी कधीही टाळत नाही."
+  "dashboard.helpBubble.tip54": "जतन केलेला विश्वास म्हणजे थेट कनेक्शन नाही आणि तो स्थानिक पडताळणी कधीही टाळत नाही.",
+  "dashboard.sync.familyDeviceMap.selection.localPhraseConfirmedDetail": "Phrase confirmed here. Confirm it on the other device before sending.",
+  "dashboard.sync.familyDeviceMap.map.localPhraseConfirmedDetail": "Phrase confirmed here. Confirm it on the other device before sending.",
+  "dashboard.sync.familyDeviceMap.map.compassRuleLocalConfirmed": "Phrase confirmed here. Confirm it on the other device, then review and send the update.",
+  "dashboard.sync.familyDeviceMap.trusted.sessionDevice": "Session device {label}"
 }

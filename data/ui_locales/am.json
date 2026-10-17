@@ -1,4 +1,9 @@
 {
+  "dashboard.sync.picker.receiveConfirmed": "ሐረጉ እዚህ ተረጋግጧል። ሁለቱንም መሣሪያዎች ክፍት ያድርጉ። ከወላጅ ዝማኔ በመጠባበቅ ላይ።",
+  "dashboard.sync.picker.receivePermissions": "ዝማኔዎች በዚህ መሣሪያ ላይ በወላጅ የተፈቀዱ ፈቃዶችን ይከተላሉ።",
+  "dashboard.sync.picker.receiveModeEyebrow": "መቀበል ብቻ",
+  "dashboard.sync.picker.receiveModeTitle": "ይህ የተጠበቀ መገለጫ",
+  "dashboard.sync.picker.receiveModeBody": "ወላጅ ለውጦችን ይልካል።",
   "popup.blocklist": "የማገጃ ዝርዝር",
   "popup.whitelist": "የፍቃድ ዝርዝር",
   "popup.listMode.whitelistTooltip": "የፍቃድ ዝርዝር ሁነታ፦ ከፍቃድ ደንቦች ጋር የሚዛመድ ይዘትን አሳይ",
@@ -2413,5 +2418,9 @@
   "dashboard.helpBubble.tip51": "የማጣመሪያ አገናኙን ለሌላ መሣሪያ ይቅዱ። የሚቀበለው መሣሪያ አሁንም ተመሳሳይ የደህንነት ሐረግ ማረጋገጥ አለበት።",
   "dashboard.helpBubble.tip52": "መጀመሪያ ማጣመርን ይጀምሩ፤ ከዚያ ይህ ክፍል QR ወይም የሁኔታ መልእክት ለሌላው መሣሪያ ያሳያል።",
   "dashboard.helpBubble.tip53": "የታመኑ መሣሪያዎች ለወደፊት መላክ ቀላል እንዲሆን የተረጋገጠ ግንኙነትን ያስታውሳሉ።",
-  "dashboard.helpBubble.tip54": "የተቀመጠ እምነት ቀጥታ ግንኙነት አይደለም፤ የአካባቢ ማረጋገጫንም ፈጽሞ አያስቀርም።"
+  "dashboard.helpBubble.tip54": "የተቀመጠ እምነት ቀጥታ ግንኙነት አይደለም፤ የአካባቢ ማረጋገጫንም ፈጽሞ አያስቀርም።",
+  "dashboard.sync.familyDeviceMap.selection.localPhraseConfirmedDetail": "Phrase confirmed here. Confirm it on the other device before sending.",
+  "dashboard.sync.familyDeviceMap.map.localPhraseConfirmedDetail": "Phrase confirmed here. Confirm it on the other device before sending.",
+  "dashboard.sync.familyDeviceMap.map.compassRuleLocalConfirmed": "Phrase confirmed here. Confirm it on the other device, then review and send the update.",
+  "dashboard.sync.familyDeviceMap.trusted.sessionDevice": "Session device {label}"
 }

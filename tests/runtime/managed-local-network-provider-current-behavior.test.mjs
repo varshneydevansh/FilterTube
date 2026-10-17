@@ -2,6 +2,7 @@ import fs from 'node:fs';
 import path from 'node:path';
 import test from 'node:test';
 import assert from 'node:assert/strict';
+import vm from 'node:vm';
 
 const repoRoot = process.cwd();
 const docPath = 'docs/audit/FILTERTUBE_LOCAL_NETWORK_MANAGED_PROVIDER_HOOK_2026-06-05.md';
@@ -14,6 +15,41 @@ const tabViewPath = 'js/tab-view.js';
 function read(relativePath) {
   return fs.readFileSync(path.join(repoRoot, relativePath), 'utf8');
 }
+
+test('actual Home Pickup summary separates saved setup from observed health', () => {
+  const source = read(tabViewPath);
+  const start = source.indexOf('    function summarizeManagedLocalNetworkProviderConfig() {');
+  const end = source.indexOf('    function resolveNanahManagedLocalNetworkTargetProfileId(', start);
+  assert.ok(start > 0 && end > start);
+  let health = {};
+  let config = { endpointUrl: 'http://home.test' };
+  const context = vm.createContext({
+    normalizeString: value => typeof value === 'string' ? value.trim() : '',
+    normalizeNonNegativeInteger: value => Math.max(0, Number(value) || 0),
+    readNanahManagedLocalNetworkProviderConfig: () => config,
+    getNanahManagedLocalNetworkProvider: () => ({ configured: true, endpointHost: 'home.test' }),
+    hasNanahManagedLocalNetworkDeliveryWriter: () => true,
+    readNanahManagedLocalNetworkProviderHealthState: () => health,
+    getManagedLocalNetworkEndpointHostFromConfig: () => 'home.test',
+    formatManagedProviderCheckedAge: value => value ? 'just now' : '',
+    formatManagedPickupDurabilityDetail: () => '',
+    formatManagedPickupQueueDetail: () => ''
+  });
+  vm.runInContext(source.slice(start, end), context);
+  const summary = () => context.summarizeManagedLocalNetworkProviderConfig();
+  assert.equal(summary().healthOk, null);
+  assert.match(summary().detail, /Run Check\/Edit/);
+  health = { checkedAt: 100, endpointHost: 'home.test', ok: false };
+  assert.equal(summary().healthOk, false);
+  assert.match(summary().detail, /Last Home Pickup check did not pass/);
+  health.ok = true;
+  assert.equal(summary().healthOk, true);
+  assert.match(summary().detail, /Last Home Pickup check passed/);
+  health.endpointHost = 'different-home.test';
+  assert.equal(summary().healthOk, null);
+  config = {};
+  assert.equal(summary().label, 'Home Pickup off');
+});
 
 function managedLink(overrides = {}) {
   return {
@@ -240,8 +276,8 @@ test('dashboard source wires provider-gated local-network discovery without YouT
   assert.match(source, /Check Pickup/);
   assert.match(source, /Last Home Pickup check passed/);
   assert.match(source, /Last Home Pickup check did not pass/);
-  assert.match(source, /Home Pickup saved and reachable/);
-  assert.match(source, /Home Pickup saved, but it did not answer the readiness check/);
+  assert.match(source, /Home Pickup set up:/);
+  assert.match(source, /Home Pickup needs review/);
   assert.match(source, /filtertube_managed_local_network_candidate_ack/);
   assert.match(source, /ackManagedPolicyCandidates/);
   assert.match(source, /ackLocalNetworkCandidates/);

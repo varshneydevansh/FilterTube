@@ -51,7 +51,7 @@ const blockSpecs = {
   ioExportV3: {
     file: 'js/io_manager.js',
     start: "async function exportV3({ scope = 'auto', auth = null } = {}) {",
-    end: "async function importV3(json, { strategy = 'merge', scope = 'auto', auth = null, targetProfileId = null } = {}) {",
+    end: "async function importV3(json, { strategy = 'merge', scope = 'auto', auth = null, targetProfileId = null, beforeProfileWrite = null } = {}) {",
     startLine: 1146,
     lines: 96,
     bytes: 3941
@@ -82,7 +82,7 @@ const blockSpecs = {
   },
   nanahBuildPortablePayload: {
     file: 'js/nanah_sync_adapter.js',
-    start: "async function buildPortablePayload({ scope = 'active', auth = null } = {}) {",
+    start: "async function buildPortablePayload({ scope = 'active', auth = null, managedSourceProfileSnapshot = null } = {}) {",
     end: 'async function buildSyncEnvelope',
     startLine: 307,
     lines: 16,
@@ -98,7 +98,7 @@ const blockSpecs = {
   },
   nanahBuildControlProposal: {
     file: 'js/nanah_sync_adapter.js',
-    start: "async function buildControlProposal({ scope = 'active', strategy = 'merge', auth = null } = {}) {",
+    start: "async function buildControlProposal({ scope = 'active', strategy = 'merge', auth = null, managedSourceProfileSnapshot = null } = {}) {",
     end: 'function extractPortableFromEnvelope',
     startLine: 334,
     lines: 20,

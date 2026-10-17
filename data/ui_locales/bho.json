@@ -1,4 +1,9 @@
 {
+  "dashboard.sync.picker.receiveConfirmed": "इहाँ सुरक्षा वाक्यांश के पुष्टि हो गइल बा। दुनो डिवाइस पर FilterTube खुलल राखीं। अभिभावक के अपडेट के इंतजार बा।",
+  "dashboard.sync.picker.receivePermissions": "अपडेट एह डिवाइस पर अभिभावक के मंजूर कइल अनुमति के मुताबिक लागू होखेला।",
+  "dashboard.sync.picker.receiveModeEyebrow": "खाली प्राप्त करीं",
+  "dashboard.sync.picker.receiveModeTitle": "ई सुरक्षित प्रोफ़ाइल",
+  "dashboard.sync.picker.receiveModeBody": "अभिभावक बदलाव भेजेलें।",
   "popup.blocklist": "रोक सूची",
   "popup.whitelist": "अनुमति सूची",
   "popup.listMode.whitelistTooltip": "अनुमति सूची मोड: अनुमति नियम से मिले वाला सामग्री देखाईं",
@@ -2413,5 +2418,9 @@
   "dashboard.helpBubble.tip51": "दूसर डिवाइस खातिर जोड़ाई लिंक कॉपी करीं। पावे वाला डिवाइस के ओही सुरक्षा वाक्य जाँचे के पड़ी।",
   "dashboard.helpBubble.tip52": "पहिले जोड़ाई शुरू करीं, फेर ई जगह दोसरा डिवाइस खातिर QR भा स्थिति संदेश देखाई।",
   "dashboard.helpBubble.tip53": "भरोसेमंद डिवाइस जाँचल रिश्ता याद रखेला ताकि अगिला बेर भेजल आसान होखे।",
-  "dashboard.helpBubble.tip54": "सहेजल भरोसा लाइव कनेक्शन नइखे आ लोकल जाँच के कबो ना टारेला।"
+  "dashboard.helpBubble.tip54": "सहेजल भरोसा लाइव कनेक्शन नइखे आ लोकल जाँच के कबो ना टारेला।",
+  "dashboard.sync.familyDeviceMap.selection.localPhraseConfirmedDetail": "Phrase confirmed here. Confirm it on the other device before sending.",
+  "dashboard.sync.familyDeviceMap.map.localPhraseConfirmedDetail": "Phrase confirmed here. Confirm it on the other device before sending.",
+  "dashboard.sync.familyDeviceMap.map.compassRuleLocalConfirmed": "Phrase confirmed here. Confirm it on the other device, then review and send the update.",
+  "dashboard.sync.familyDeviceMap.trusted.sessionDevice": "Session device {label}"
 }

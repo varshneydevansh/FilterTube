@@ -1,4 +1,9 @@
 {
+  "dashboard.sync.picker.receiveConfirmed": "ಇಲ್ಲಿ ಸುರಕ್ಷತಾ ಪದಗುಚ್ಛವನ್ನು ದೃಢೀಕರಿಸಲಾಗಿದೆ. ಎರಡೂ ಸಾಧನಗಳಲ್ಲಿ FilterTube ತೆರೆದಿಡಿ. ಪೋಷಕರ ನವೀಕರಣಕ್ಕಾಗಿ ಕಾಯಲಾಗುತ್ತಿದೆ.",
+  "dashboard.sync.picker.receivePermissions": "ಈ ಸಾಧನದಲ್ಲಿ ಪೋಷಕರು ಅನುಮೋದಿಸಿದ ಅನುಮತಿಗಳ ಪ್ರಕಾರ ನವೀಕರಣಗಳು ಬರುತ್ತವೆ.",
+  "dashboard.sync.picker.receiveModeEyebrow": "ಮಾತ್ರ ಸ್ವೀಕರಿಸಿ",
+  "dashboard.sync.picker.receiveModeTitle": "ಈ ರಕ್ಷಿತ ಪ್ರೊಫೈಲ್",
+  "dashboard.sync.picker.receiveModeBody": "ಪೋಷಕರು ಬದಲಾವಣೆಗಳನ್ನು ಕಳುಹಿಸುತ್ತಾರೆ.",
   "popup.blocklist": "ನಿರ್ಬಂಧ ಪಟ್ಟಿ",
   "popup.whitelist": "ಅನುಮತಿ ಪಟ್ಟಿ",
   "popup.listMode.whitelistTooltip": "ಅನುಮತಿ ಪಟ್ಟಿ ಮೋಡ್: ಅನುಮತಿ ನಿಯಮಗಳಿಗೆ ಹೊಂದುವ ವಿಷಯವನ್ನು ತೋರಿಸಿ",
@@ -2413,5 +2418,9 @@
   "dashboard.helpBubble.tip51": "ಇನ್ನೊಂದು ಸಾಧನಕ್ಕಾಗಿ ಜೋಡಣೆ ಲಿಂಕ್ ನಕಲಿಸಿ. ಸ್ವೀಕರಿಸುವ ಸಾಧನವು ಅದೇ ಸುರಕ್ಷತಾ ವಾಕ್ಯ ಪರಿಶೀಲಿಸಬೇಕು.",
   "dashboard.helpBubble.tip52": "ಮೊದಲು ಜೋಡಣೆ ಪ್ರಾರಂಭಿಸಿ; ನಂತರ ಈ ಭಾಗವು ಇನ್ನೊಂದು ಸಾಧನಕ್ಕಾಗಿ QR ಅಥವಾ ಸ್ಥಿತಿ ಸಂದೇಶ ತೋರಿಸುತ್ತದೆ.",
   "dashboard.helpBubble.tip53": "ವಿಶ್ವಾಸಾರ್ಹ ಸಾಧನಗಳು ಪರಿಶೀಲಿತ ಸಂಬಂಧವನ್ನು ನೆನಪಿಡುತ್ತವೆ, ಹೀಗಾಗಿ ಮುಂದಿನ ಕಳುಹಿಸುವಿಕೆ ಸುಲಭವಾಗುತ್ತದೆ.",
-  "dashboard.helpBubble.tip54": "ಉಳಿಸಿದ ವಿಶ್ವಾಸವು ಲೈವ್ ಸಂಪರ್ಕವಲ್ಲ ಮತ್ತು ಸ್ಥಳೀಯ ಪರಿಶೀಲನೆಯನ್ನು ಎಂದಿಗೂ ಬಿಟ್ಟುಹೋಗುವುದಿಲ್ಲ."
+  "dashboard.helpBubble.tip54": "ಉಳಿಸಿದ ವಿಶ್ವಾಸವು ಲೈವ್ ಸಂಪರ್ಕವಲ್ಲ ಮತ್ತು ಸ್ಥಳೀಯ ಪರಿಶೀಲನೆಯನ್ನು ಎಂದಿಗೂ ಬಿಟ್ಟುಹೋಗುವುದಿಲ್ಲ.",
+  "dashboard.sync.familyDeviceMap.selection.localPhraseConfirmedDetail": "Phrase confirmed here. Confirm it on the other device before sending.",
+  "dashboard.sync.familyDeviceMap.map.localPhraseConfirmedDetail": "Phrase confirmed here. Confirm it on the other device before sending.",
+  "dashboard.sync.familyDeviceMap.map.compassRuleLocalConfirmed": "Phrase confirmed here. Confirm it on the other device, then review and send the update.",
+  "dashboard.sync.familyDeviceMap.trusted.sessionDevice": "Session device {label}"
 }

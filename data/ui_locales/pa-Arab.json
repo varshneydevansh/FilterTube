@@ -1,4 +1,9 @@
 {
+  "dashboard.sync.picker.receiveConfirmed": "ایتھے حفاظتی فقرے دی تصدیق ہو گئی اے۔ دوواں ڈیوائساں اُتے FilterTube کھلا رکھو۔ والدین دی اپ ڈیٹ دی اُڈیک اے۔",
+  "dashboard.sync.picker.receivePermissions": "اپ ڈیٹاں ایس ڈیوائس اُتے والدین دیاں منظور کیتیاں اجازتاں دے مطابق ہوندیاں نیں۔",
+  "dashboard.sync.picker.receiveModeEyebrow": "صرف وصول کرو",
+  "dashboard.sync.picker.receiveModeTitle": "ایہ محفوظ پروفائل",
+  "dashboard.sync.picker.receiveModeBody": "والدین تبدیلیاں بھیجدے نیں۔",
   "popup.blocklist": "روک لسٹ",
   "popup.whitelist": "اجازت والی لسٹ",
   "popup.listMode.whitelistTooltip": "اجازت والی لسٹ دا موڈ: اجازت والے اصولاں نال ملدا مواد وکھاؤ",
@@ -2413,5 +2418,9 @@
   "dashboard.helpBubble.tip51": "دوجے ڈیوائس لئی جوڑن والا لنک نقل کرو۔ وصول کرن والے ڈیوائس نوں فیر وی اوہی حفاظت والا فقرہ چیک کرنا پئے گا۔",
   "dashboard.helpBubble.tip52": "پہلاں جوڑنا شروع کرو، فیر ایتھے دوجے ڈیوائس لئی QR یا حالت دا پیغام وکھے گا۔",
   "dashboard.helpBubble.tip53": "بھروسے والے ڈیوائس تصدیق شدہ رشتہ یاد رکھدے نیں، ایس لئی اگلی واری بھیجنا سوکھا ہوندا اے۔",
-  "dashboard.helpBubble.tip54": "سنبھالیا بھروسہ لائیو کنکشن نئیں ہوندا تے مقامی جانچ کدی نئیں ٹپدا۔"
+  "dashboard.helpBubble.tip54": "سنبھالیا بھروسہ لائیو کنکشن نئیں ہوندا تے مقامی جانچ کدی نئیں ٹپدا۔",
+  "dashboard.sync.familyDeviceMap.selection.localPhraseConfirmedDetail": "Phrase confirmed here. Confirm it on the other device before sending.",
+  "dashboard.sync.familyDeviceMap.map.localPhraseConfirmedDetail": "Phrase confirmed here. Confirm it on the other device before sending.",
+  "dashboard.sync.familyDeviceMap.map.compassRuleLocalConfirmed": "Phrase confirmed here. Confirm it on the other device, then review and send the update.",
+  "dashboard.sync.familyDeviceMap.trusted.sessionDevice": "Session device {label}"
 }

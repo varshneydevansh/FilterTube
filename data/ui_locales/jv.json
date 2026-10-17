@@ -1,4 +1,9 @@
 {
+  "dashboard.sync.picker.receiveConfirmed": "Ukara wis dikonfirmasi kene. Tetep mbukak loro piranti. Nunggu pembaruan saka wong tuwa.",
+  "dashboard.sync.picker.receivePermissions": "Pembaruan manut ijin sing disetujoni wong tuwa ing piranti iki.",
+  "dashboard.sync.picker.receiveModeEyebrow": "Mung nampa",
+  "dashboard.sync.picker.receiveModeTitle": "Profil sing dilindhungi iki",
+  "dashboard.sync.picker.receiveModeBody": "Wong tuwa ngirim perubahan.",
   "popup.blocklist": "Dhaptar pamblokiran",
   "popup.whitelist": "Dhaptar sing diidinake",
   "popup.listMode.whitelistTooltip": "Mode dhaptar idin: tuduhna konten sing cocog karo aturan sing diidinake",
@@ -2413,5 +2418,9 @@
   "dashboard.helpBubble.tip51": "Salin pranala pasangan kanggo piranti liyane. Piranti panampa isih kudu verifikasi ukara keamanan sing padha.",
   "dashboard.helpBubble.tip52": "Mulai pasangan dhisik, banjur area iki nuduhake QR utawa pesen status kanggo piranti liyane.",
   "dashboard.helpBubble.tip53": "Piranti dipercaya ngelingi sesambungan sing wis diverifikasi supaya kiriman sabanjuré luwih gampang.",
-  "dashboard.helpBubble.tip54": "Kapercayan sing disimpen dudu sambungan langsung lan ora tau ngliwati validasi lokal."
+  "dashboard.helpBubble.tip54": "Kapercayan sing disimpen dudu sambungan langsung lan ora tau ngliwati validasi lokal.",
+  "dashboard.sync.familyDeviceMap.selection.localPhraseConfirmedDetail": "Phrase confirmed here. Confirm it on the other device before sending.",
+  "dashboard.sync.familyDeviceMap.map.localPhraseConfirmedDetail": "Phrase confirmed here. Confirm it on the other device before sending.",
+  "dashboard.sync.familyDeviceMap.map.compassRuleLocalConfirmed": "Phrase confirmed here. Confirm it on the other device, then review and send the update.",
+  "dashboard.sync.familyDeviceMap.trusted.sessionDevice": "Session device {label}"
 }

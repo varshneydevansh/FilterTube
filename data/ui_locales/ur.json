@@ -1,4 +1,9 @@
 {
+  "dashboard.sync.picker.receiveConfirmed": "یہاں فقرہ تصدیق شدہ ہے۔ دونوں آلات کھلے رکھیں۔ والدین کی تازہ کاری کا انتظار ہے۔",
+  "dashboard.sync.picker.receivePermissions": "تازہ کاریاں اس ڈیوائس پر والدین کی منظور شدہ اجازتوں کے مطابق ہیں۔",
+  "dashboard.sync.picker.receiveModeEyebrow": "صرف وصول کریں",
+  "dashboard.sync.picker.receiveModeTitle": "یہ محفوظ پروفائل",
+  "dashboard.sync.picker.receiveModeBody": "والدین تبدیلیاں بھیجتے ہیں۔",
   "popup.blocklist": "بلاک لسٹ",
   "popup.whitelist": "اجازت کی فہرست",
   "popup.listMode.whitelistTooltip": "اجازت کی فہرست کا موڈ: اجازت والے قواعد سے ملتا مواد دکھائیں",
@@ -2413,5 +2418,9 @@
   "dashboard.helpBubble.tip51": "دوسرے آلے کے لیے جوڑنے کا رابطہ نقل کریں۔ وصول کنندہ آلے کو پھر بھی وہی حفاظتی فقرہ تصدیق کرنا ہوگا۔",
   "dashboard.helpBubble.tip52": "پہلے جوڑنا شروع کریں، پھر اس جگہ دوسرے آلے کے لیے QR یا حالت کا پیغام دکھائی دے گا۔",
   "dashboard.helpBubble.tip53": "قابلِ اعتماد آلات تصدیق شدہ تعلق یاد رکھتے ہیں تاکہ آئندہ بھیجنا آسان ہو۔",
-  "dashboard.helpBubble.tip54": "محفوظ شدہ اعتماد براہِ راست رابطہ نہیں ہے اور مقامی تصدیق کو کبھی نہیں چھوڑتا۔"
+  "dashboard.helpBubble.tip54": "محفوظ شدہ اعتماد براہِ راست رابطہ نہیں ہے اور مقامی تصدیق کو کبھی نہیں چھوڑتا۔",
+  "dashboard.sync.familyDeviceMap.selection.localPhraseConfirmedDetail": "Phrase confirmed here. Confirm it on the other device before sending.",
+  "dashboard.sync.familyDeviceMap.map.localPhraseConfirmedDetail": "Phrase confirmed here. Confirm it on the other device before sending.",
+  "dashboard.sync.familyDeviceMap.map.compassRuleLocalConfirmed": "Phrase confirmed here. Confirm it on the other device, then review and send the update.",
+  "dashboard.sync.familyDeviceMap.trusted.sessionDevice": "Session device {label}"
 }

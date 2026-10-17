@@ -1,4 +1,9 @@
 {
+  "dashboard.sync.picker.receiveConfirmed": "İfade burada onaylandı. İki cihazı açık tutun. Ebeveyn güncellemesi bekleniyor.",
+  "dashboard.sync.picker.receivePermissions": "Güncellemeler, bu cihazda ebeveyn onaylı izinlere göre gerçekleşir.",
+  "dashboard.sync.picker.receiveModeEyebrow": "Sadece al",
+  "dashboard.sync.picker.receiveModeTitle": "Bu korumalı profil",
+  "dashboard.sync.picker.receiveModeBody": "Ebeveyn değişiklikleri gönderir.",
   "popup.blocklist": "Engelleme listesi",
   "popup.whitelist": "İzin verilenler listesi",
   "popup.listMode.whitelistTooltip": "İzin listesi modu: izin verilen kurallarla eşleşen içeriği göster",
@@ -2413,5 +2418,9 @@
   "dashboard.helpBubble.tip51": "Başka bir cihaz için eşleştirme bağlantısını kopyalayın. Alıcı cihaz da aynı güvenlik ifadesini doğrulamalıdır.",
   "dashboard.helpBubble.tip52": "Önce eşleştirmeyi başlatın; ardından bu alan diğer cihaz için bir QR veya durum iletisi gösterir.",
   "dashboard.helpBubble.tip53": "Güvenilir cihazlar doğrulanmış ilişkiyi hatırlar, böylece sonraki gönderimler kolaylaşır.",
-  "dashboard.helpBubble.tip54": "Kaydedilmiş güven ilişkisi canlı bağlantı değildir ve yerel doğrulamayı asla atlamaz."
+  "dashboard.helpBubble.tip54": "Kaydedilmiş güven ilişkisi canlı bağlantı değildir ve yerel doğrulamayı asla atlamaz.",
+  "dashboard.sync.familyDeviceMap.selection.localPhraseConfirmedDetail": "Phrase confirmed here. Confirm it on the other device before sending.",
+  "dashboard.sync.familyDeviceMap.map.localPhraseConfirmedDetail": "Phrase confirmed here. Confirm it on the other device before sending.",
+  "dashboard.sync.familyDeviceMap.map.compassRuleLocalConfirmed": "Phrase confirmed here. Confirm it on the other device, then review and send the update.",
+  "dashboard.sync.familyDeviceMap.trusted.sessionDevice": "Session device {label}"
 }

@@ -59,7 +59,7 @@ function blocks() {
     ),
     importV3: sliceBetween(
       sources.ioManager,
-      "async function importV3(json, { strategy = 'merge', scope = 'auto', auth = null, targetProfileId = null } = {}) {",
+      "async function importV3(json, { strategy = 'merge', scope = 'auto', auth = null, targetProfileId = null, beforeProfileWrite = null } = {}) {",
       'async function exportV3Encrypted'
     ),
     nanahRestoreWrite: sliceBetween(
@@ -89,7 +89,7 @@ function blocks() {
     ),
     nanahPortableApply: sliceBetween(
       sources.nanahAdapter,
-      "async function buildPortablePayload({ scope = 'active', auth = null } = {}) {",
+      "async function buildPortablePayload({ scope = 'active', auth = null, managedSourceProfileSnapshot = null } = {}) {",
       'function getDeviceDescriptor'
     )
   };

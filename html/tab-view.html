@@ -1015,71 +1015,10 @@
                     <div class="view-shell view-shell--settings sync-shell">
                         <section class="view-hero settings-hero sync-hero">
                             <div class="view-hero__copy">
-                                <p class="view-hero__eyebrow">Profiles, PINs, and device sync</p>
-                                <h2 class="view-hero__title">Sync your devices or manage family access.</h2>
-                                <p class="view-hero__body">Copy the profile open here to your own device, or create protected profiles with Main/Kids access, daily time, and parent-approved updates.</p>
-                            </div>
-                            <div class="view-hero__meta">
-                                <span class="view-meta-pill">Profiles</span>
-                                <span class="view-meta-pill">PIN policy</span>
-                                <span class="view-meta-pill">4-character code</span>
-                                <span class="view-meta-pill">Trusted source devices</span>
+                                <h2 class="view-hero__title">Account &amp; sync</h2>
+                                <p class="view-hero__body">Share rules with your devices and manage family profiles.</p>
                             </div>
                         </section>
-
-                        <div class="settings-grid">
-                            <div class="settings-core">
-                                <div class="card settings-card">
-                                    <div class="card-header">
-                                        <h3>Profiles</h3>
-                                    </div>
-                                    <div class="card-body settings-card__body settings-card__body--profiles">
-                                        <div id="managedChildSyncBoundary" class="ft-managed-child-sync-boundary" hidden></div>
-                                        <div class="import-export-hint" style="margin-bottom:10px;">
-                                            Profiles are independent. The <code>Default</code> profile acts as admin for full backups, account policy, and trusted device governance.
-                                        </div>
-                                        <div id="ftProfilesManager" class="help-list"></div>
-                                        <div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:12px;">
-                                            <button id="ftCreateAccountBtn" class="btn-secondary" type="button">Create Account</button>
-                                            <button id="ftCreateChildBtn" class="btn-secondary" type="button">Create Protected Profile</button>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-
-                            <div class="settings-system">
-                                <div class="card settings-card">
-                                    <div class="card-header">
-                                        <h3>Security</h3>
-                                    </div>
-                                    <div class="card-body settings-card__body">
-                                        <div class="import-export-hint" style="margin-bottom:10px;">
-                                            Master PIN locks the Default profile and controls admin actions like account policy, full backups, and trusted-link management rules.
-                                        </div>
-                                        <div class="toggle-row" title="When enabled, the Default (Master) profile can create new independent accounts.">
-                                            <div class="toggle-info">
-                                                <div class="toggle-title">Allow independent account creation</div>
-                                            </div>
-                                            <label class="switch">
-                                                <input id="ftAllowAccountCreation" type="checkbox" />
-                                                <span class="slider round"></span>
-                                            </label>
-                                        </div>
-                                        <div class="toggle-row" title="Limits how many independent accounts can exist (excluding Default).">
-                                            <div class="toggle-info">
-                                                <div class="toggle-title">Max independent accounts</div>
-                                            </div>
-                                            <input id="ftMaxAccounts" class="text-input" type="number" min="0" step="1" style="max-width:120px;" />
-                                        </div>
-                                        <div style="display:flex;gap:8px;flex-wrap:wrap;">
-                                            <button id="ftSetMasterPinBtn" class="btn-secondary" type="button">Set / Change Master PIN</button>
-                                            <button id="ftClearMasterPinBtn" class="btn-secondary" type="button">Remove Master PIN</button>
-                                            <button id="ftLockAdminSessionBtn" class="btn-secondary" type="button" title="Immediately lock temporary parent/admin unlocks in this dashboard tab.">Lock Admin Session</button>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
 
                         <div id="familyDeviceUpdatesCard" class="card settings-card settings-card--featured nanah-sync-card" tabindex="-1">
                             <div class="card-header">
@@ -1088,39 +1027,44 @@
                             <div class="card-body settings-card__body">
                                 <div class="nanah-sync-shell">
                                     <div class="nanah-sync-intro">
-                                        <div class="nanah-sync-intro__copy">
-                                            <span class="nanah-sync-intro__eyebrow">Device sync and family control</span>
-                                            <p class="nanah-sync-intro__title">Choose what you want to move.</p>
-                                            <p class="nanah-sync-intro__body">Copy the profile open here to your own device without creating a PIN. Create a protected profile only when you want parent-managed rules, time, or Main/Kids access.</p>
-                                            <div class="nanah-sync-intro__actions" aria-label="Personal device sync and family control actions">
-                                                <button id="ftNanahQuickSyncDevicesBtn" class="btn-primary" type="button" data-filtertube-help="Copy the profile currently open to your own second device. No protected profile or PIN is required. Switch profiles first if you want to copy a different profile.">Sync My Devices</button>
-                                                <button id="ftNanahQuickCreateProtectedBtn" class="btn-secondary" type="button" data-filtertube-help="Create a protected child/user profile only when you want parent-managed rules, time limits, or viewing access.">Set Up Family Control</button>
-                                                <button id="ftNanahQuickSendUpdateBtn" class="btn-secondary" type="button" data-filtertube-help="Send parent-approved rules, time, and viewing access to an existing protected profile. Use this when both devices are open together.">Send Protected Update</button>
-                                            </div>
-                                        </div>
-                                        <div class="nanah-device-compass-stage" aria-label="Choose how this parent device reaches another device">
+                                        <div class="nanah-device-compass-stage" aria-label="Choose a device">
                                             <div class="nanah-device-compass-stage__heading">
-                                                <span id="ftNanahMapEyebrow">Family device map</span>
-                                                <strong id="ftNanahMapTitle">Choose how to reach the protected device</strong>
-                                                <small id="ftNanahMapDetail">Tap a path. FilterTube will show the next safe step and what it will not do.</small>
-                                            </div>
-                                            <div class="nanah-device-compass-stage__steps" aria-label="Family device safety path">
-                                                <span><strong>Find</strong><small>Choose path</small></span>
-                                                <span><strong>Pair</strong><small>Code or QR</small></span>
-                                                <span><strong>Trust</strong><small>Match phrase</small></span>
-                                                <span><strong>Send</strong><small>Reviewed update</small></span>
-                                            </div>
-                                            <div class="nanah-device-compass-stage__plain-rule">
-                                                <strong id="ftNanahMapRuleTitle">Open now is the normal setup.</strong>
-                                                <span id="ftNanahMapRuleDetail">Same-place and open-later delivery only work after the protected device is already paired and trusted.</span>
+                                                <span id="ftNanahMapEyebrow" hidden>Family device map</span>
+                                                <strong id="ftNanahMapTitle">Choose a device to update</strong>
+                                                <small id="ftNanahMapDetail">Choose a device, review its profile, then send.</small>
                                             </div>
                                             <div class="nanah-device-compass" aria-label="Family Devices map for pairing and verified updates">
-                                                <div class="nanah-device-compass__center" data-filtertube-help="The parent device chooses the rules, time limits, and Main/Kids access. The protected device only receives approved updates.">
-                                                    <div class="nanah-device-compass__hub-mark" aria-hidden="true"><i></i></div>
-                                                    <span id="ftNanahMapCenterEyebrow">Parent device</span>
-                                                    <strong id="ftNanahMapCenterTitle">Controls stay here</strong>
-                                                    <small id="ftNanahMapCenterDetail">Pick rules, time, and Main/Kids access.</small>
+                                                <div class="nanah-device-toolbar" aria-label="Connect a device">
+                                                    <button id="ftNanahAddDeviceBtn" class="btn-primary" type="button" data-family-device-focus-fallback>Add with code or QR</button>
+                                                    <button id="ftNanahShowNearbyBtn" class="btn-secondary" type="button" aria-pressed="false">Receive nearby</button>
+                                                    <button id="ftNanahFindNearbyBtn" class="btn-secondary" type="button">Find nearby</button>
                                                 </div>
+                                                <p class="nanah-device-discovery-note">Nearby needs the optional helper on both computers. Code or QR works across the internet while both devices are open.</p>
+                                                <div class="nanah-device-radar">
+                                                    <div class="nanah-device-radar__rings" aria-hidden="true"><i></i><i></i><i></i></div>
+                                                    <div class="nanah-device-compass__center">
+                                                        <div class="nanah-device-compass__hub-mark" aria-hidden="true"><i></i></div>
+                                                        <span id="ftNanahMapCenterEyebrow">This device</span>
+                                                        <strong id="ftNanahMapCenterTitle">This device</strong>
+                                                        <small id="ftNanahMapCenterDetail">Choose rules here, then send.</small>
+                                                    </div>
+                                                    <p id="ftNanahDeviceEmpty" class="nanah-device-empty">No saved devices yet. Find a nearby device or add one with a code.</p>
+                                                    <div id="ftNanahTrustedDeviceStrip" class="nanah-device-compass__trusted-strip" aria-label="Verified devices" hidden></div>
+                                                    <div id="ftNanahHomeBridgePresenceRow" class="nanah-device-compass__presence-row" aria-live="polite" hidden></div>
+                                                </div>
+                                                <div id="ftNanahDeviceCompassRule" class="nanah-device-compass__rule">Pair a new device with a code or QR, then match the safety phrase.</div>
+                                                <div id="ftNanahDeviceSelectionPreview" class="nanah-device-compass__selection-preview" aria-live="polite" hidden>
+                                                    <span>Next step</span>
+                                                    <strong>Choose a device</strong>
+                                                    <small>Choose a saved device, or pair a new one.</small>
+                                                    <p id="ftNanahDeviceTransferSummary" class="nanah-transfer-summary" hidden></p>
+                                                    <div class="nanah-device-compass__selection-buttons">
+                                                        <button id="ftNanahDeviceSelectionActionBtn" class="btn-primary nanah-device-compass__selection-button" type="button" hidden>Continue</button>
+                                                        <button id="ftNanahDeviceSourceBtn" class="btn-secondary" type="button" hidden>Choose rules profile</button>
+                                                    </div>
+                                                </div>
+                                                <details class="nanah-device-help">
+                                                    <summary>Connection options and help</summary>
                                                 <div class="nanah-device-compass__grid">
                                                     <button id="ftNanahCompassLiveBtn" class="nanah-device-compass__choice" type="button" data-filtertube-help="Best default. Keep both devices open, pair with the code or QR, verify the phrase, then send the update.">
                                                         <div class="nanah-device-compass__device" aria-hidden="true"><i></i></div>
@@ -1141,64 +1085,10 @@
                                                         <small>For a verified device that checks in later.</small>
                                                     </button>
                                                 </div>
-                                                <div id="ftNanahTrustedDeviceStrip" class="nanah-device-compass__trusted-strip" aria-label="Choose a verified device to send to" hidden></div>
-                                                <div id="ftNanahHomeBridgePresenceRow" class="nanah-device-compass__presence-row" aria-live="polite" hidden></div>
-                                                <div id="ftNanahDeviceCompassRule" class="nanah-device-compass__rule">Finding a device is not permission. A device can receive updates only after pairing and phrase verification.</div>
-                                                <div id="ftNanahDeviceSelectionPreview" class="nanah-device-compass__selection-preview" aria-live="polite">
-                                                    <span>Next step</span>
-                                                    <strong>Create a protected profile</strong>
-                                                    <small>After that, pair the protected device and send reviewed rules.</small>
-                                                    <div class="nanah-device-compass__selection-buttons">
-                                                        <button id="ftNanahDeviceSelectionActionBtn" class="btn-secondary nanah-device-compass__selection-button" type="button" hidden>Continue</button>
+                                                    <div class="nanah-device-compass-stage__plain-rule">
+                                                        <strong id="ftNanahMapRuleTitle">Open now is the normal setup.</strong>
+                                                        <span id="ftNanahMapRuleDetail">Same-place and open-later delivery only work after the protected device is already paired and trusted.</span>
                                                     </div>
-                                                </div>
-                                                <div class="nanah-device-compass__evidence-row" aria-label="Family Devices evidence tools">
-                                                    <div>
-                                                        <span>Need support?</span>
-                                                        <small>Share a redacted Family Devices snapshot without rules, PINs, profile IDs, or device names.</small>
-                                                    </div>
-                                                    <div class="nanah-device-compass__evidence-actions">
-                                                        <button id="ftNanahCopyMapEvidenceBtn" class="btn-secondary nanah-device-compass__evidence-button" type="button" data-filtertube-help="Copies a redacted Family Devices map snapshot for a bug report or manual check. It does not include device names, profile IDs, rules, PINs, or update payloads.">Copy evidence</button>
-                                                        <button id="ftNanahDownloadMapEvidenceBtn" class="btn-secondary nanah-device-compass__evidence-button" type="button" data-filtertube-help="Downloads the same redacted Family Devices evidence JSON. Use this when clipboard access is blocked or you want to attach a file to an audit row.">Download evidence</button>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        </div>
-                                        <div class="nanah-parent-edit-model" aria-label="How parent editing reaches a protected device">
-                                            <article>
-                                                <span>1</span>
-                                                <strong>Edit here</strong>
-                                                <small>Open the child/protected row and choose Edit Rules. You are editing that profile from the parent side.</small>
-                                            </article>
-                                            <article>
-                                                <span>2</span>
-                                                <strong>Child PIN is different</strong>
-                                                <small>The child PIN only protects switching into that profile. It does not unlock parent controls.</small>
-                                            </article>
-                                            <article>
-                                                <span>3</span>
-                                                <strong>Deliver when ready</strong>
-                                                <small>Send now when both devices are open, or let the verified device pick up the signed update later.</small>
-                                            </article>
-                                        </div>
-                                        <div class="nanah-sync-simple-path" aria-label="Family device update path">
-                                            <article class="nanah-sync-simple-path__item">
-                                                <span>1</span>
-                                                <strong>Choose profile</strong>
-                                                <small>Protected profile, this profile, or full backup.</small>
-                                            </article>
-                                            <article class="nanah-sync-simple-path__item">
-                                                <span>2</span>
-                                                <strong>Pair and verify</strong>
-                                                <small>Use the short code or QR, then match the phrase.</small>
-                                            </article>
-                                            <article class="nanah-sync-simple-path__item">
-                                                <span>3</span>
-                                                <strong>Send update</strong>
-                                                <small>Only reviewed rules, access, or time limits apply.</small>
-                                            </article>
-                                            <div class="nanah-sync-simple-path__note">Files, saved links, and pickup paths cannot change PINs, trust, profiles, or time limits on their own.</div>
-                                        </div>
                                         <div class="nanah-delivery-strip" aria-label="How parent updates can reach verified devices">
                                             <article class="nanah-delivery-card nanah-delivery-card--live" id="ftNanahDeliveryLiveCard" data-filtertube-help="Use live Send Update first. It is the simplest path and does not require a pickup provider.">
                                                 <div>
@@ -1257,6 +1147,55 @@
                                                 </div>
                                             </details>
                                         </div>
+                                        <div class="nanah-parent-edit-model" aria-label="How parent editing reaches a protected device">
+                                            <article>
+                                                <span>1</span>
+                                                <strong>Edit here</strong>
+                                                <small>Open the child/protected row and choose Edit Rules. You are editing that profile from the parent side.</small>
+                                            </article>
+                                            <article>
+                                                <span>2</span>
+                                                <strong>Child PIN is different</strong>
+                                                <small>The child PIN only protects switching into that profile. It does not unlock parent controls.</small>
+                                            </article>
+                                            <article>
+                                                <span>3</span>
+                                                <strong>Deliver when ready</strong>
+                                                <small>Send now when both devices are open, or let the verified device pick up the signed update later.</small>
+                                            </article>
+                                        </div>
+                                        <div class="nanah-sync-simple-path" aria-label="Family device update path">
+                                            <article class="nanah-sync-simple-path__item">
+                                                <span>1</span>
+                                                <strong>Choose profile</strong>
+                                                <small>Protected profile, this profile, or full backup.</small>
+                                            </article>
+                                            <article class="nanah-sync-simple-path__item">
+                                                <span>2</span>
+                                                <strong>Pair and verify</strong>
+                                                <small>Use the short code or QR, then match the phrase.</small>
+                                            </article>
+                                            <article class="nanah-sync-simple-path__item">
+                                                <span>3</span>
+                                                <strong>Send update</strong>
+                                                <small>Only reviewed rules, access, or time limits apply.</small>
+                                            </article>
+                                            <div class="nanah-sync-simple-path__note">Files, saved links, and pickup paths cannot change PINs, trust, profiles, or time limits on their own.</div>
+                                        </div>
+                                                <div class="nanah-device-compass__evidence-row" aria-label="Family Devices evidence tools">
+                                                    <div>
+                                                        <span>Need support?</span>
+                                                        <small>Share a redacted Family Devices snapshot without rules, PINs, profile IDs, or device names.</small>
+                                                    </div>
+                                                    <div class="nanah-device-compass__evidence-actions">
+                                                        <button id="ftNanahCopyMapEvidenceBtn" class="btn-secondary nanah-device-compass__evidence-button" type="button" data-filtertube-help="Copies a redacted Family Devices map snapshot for a bug report or manual check. It does not include device names, profile IDs, rules, PINs, or update payloads.">Copy evidence</button>
+                                                        <button id="ftNanahDownloadMapEvidenceBtn" class="btn-secondary nanah-device-compass__evidence-button" type="button" data-filtertube-help="Downloads the same redacted Family Devices evidence JSON. Use this when clipboard access is blocked or you want to attach a file to an audit row.">Download evidence</button>
+                                                    </div>
+                                                </div>
+                                                </details>
+                                            </div>
+                                        </div>
+
                                     </div>
 
                                     <div id="ftNanahChildBanner" class="nanah-sync-child-banner" hidden>
@@ -1272,6 +1211,13 @@
                                             </span>
                                             <code>Open controls</code>
                                         </summary>
+                                    <div class="nanah-device-setup">
+                                            <div class="nanah-sync-intro__actions" aria-label="Personal device sync and family control actions">
+                                                <button id="ftNanahQuickSyncDevicesBtn" class="btn-primary" type="button" data-filtertube-help="Copy the profile currently open to your own second device. No protected profile or PIN is required. Switch profiles first if you want to copy a different profile.">Sync My Devices</button>
+                                                <button id="ftNanahQuickCreateProtectedBtn" class="btn-secondary" type="button" data-filtertube-help="Create a protected child/user profile only when you want parent-managed rules, time limits, or viewing access.">Set Up Family Control</button>
+                                                <button id="ftNanahQuickSendUpdateBtn" class="btn-secondary" type="button" data-filtertube-help="Send parent-approved rules, time, and viewing access to an existing protected profile. Use this when both devices are open together.">Send Protected Update</button>
+                                            </div>
+                                    </div>
                                     <div class="nanah-sync-grid nanah-sync-grid--featured">
                                         <div class="nanah-sync-panel nanah-sync-panel--setup">
                                             <div class="nanah-sync-panel__header">
@@ -1311,7 +1257,7 @@
                                                         <p id="ftNanahModeBody" class="nanah-sync-mode-spotlight__body">Use this to send parent-approved rules, time limits, and viewing access to a protected profile or family device.</p>
                                                         <ol id="ftNanahModeSteps" class="nanah-sync-guide__list">
                                                             <li>Choose or create the protected profile you manage.</li>
-                                                            <li>Open FilterTube on the other device, then use the code or QR.</li>
+                                                            <li>On the receiving device, create or switch to the intended protected profile before entering the code or scanning QR.</li>
                                                             <li>Match the safety phrase before sending anything.</li>
                                                             <li>Send update. Save parent trust only for devices that should keep receiving approved updates.</li>
                                                         </ol>
@@ -1387,6 +1333,7 @@
                                                         </div>
                                                     </details>
 
+                                                    <p id="ftNanahSendTransferSummary" class="nanah-transfer-summary" hidden></p>
                                                     <div class="nanah-sync-actions">
                                                         <button id="ftNanahHostBtn" class="btn-primary" type="button" data-filtertube-help="Create a pairing code or QR on this device. The other device must join and show the same safety phrase.">Start Pairing</button>
                                                         <button id="ftNanahSendBtn" class="btn-secondary" type="button" disabled data-filtertube-help="Send the selected update after both devices connect and the safety phrase is confirmed.">Send Update</button>
@@ -1470,6 +1417,18 @@
                                                     </div>
                                                 </label>
 
+                                                <div class="nanah-qr-actions">
+                                                    <button id="ftNanahScanQrBtn" class="btn-secondary" type="button">Scan QR</button>
+                                                    <button id="ftNanahReadQrImageBtn" class="btn-secondary" type="button">Read QR image</button>
+                                                    <input id="ftNanahQrImageInput" type="file" accept="image/png,image/jpeg,image/webp" hidden />
+                                                </div>
+                                                <div id="ftNanahQrReader" class="nanah-qr-reader" hidden>
+                                                    <video id="ftNanahQrVideo" hidden autoplay muted playsinline aria-label="Pairing QR camera preview"></video>
+                                                    <canvas id="ftNanahQrReaderCanvas" hidden></canvas>
+                                                    <p id="ftNanahQrReaderStatus" role="status">Point the camera at the pairing QR on your other device.</p>
+                                                    <button id="ftNanahQrStopBtn" class="btn-secondary" type="button">Close scanner</button>
+                                                </div>
+
                                                 <div class="nanah-sync-link-row">
                                                     <input id="ftNanahPairUri" class="text-input" type="text" readonly placeholder="Pairing URI will appear here" data-filtertube-help="This link contains pairing information only. The other device still has to verify the same safety phrase." />
                                                     <button id="ftNanahCopyPairUriBtn" class="btn-secondary" type="button" disabled data-filtertube-help="Copy the pairing link for another device. The receiving device still has to verify the same safety phrase.">Copy Link</button>
@@ -1496,6 +1455,62 @@
                                 </div>
                             </div>
                         </div>
+
+                        <div class="settings-grid">
+                            <div class="settings-core">
+                                <div class="card settings-card">
+                                    <div class="card-header">
+                                        <h3>Profiles</h3>
+                                    </div>
+                                    <div class="card-body settings-card__body settings-card__body--profiles">
+                                        <div id="managedChildSyncBoundary" class="ft-managed-child-sync-boundary" hidden></div>
+                                        <div class="import-export-hint" style="margin-bottom:10px;">
+                                            Each device can have several profiles. Choose whose rules you want to edit or send. <code>Default</code> is the master account; each parent manages their own child profiles.
+                                        </div>
+                                        <div id="ftProfilesManager" class="help-list"></div>
+                                        <div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:12px;">
+                                            <button id="ftCreateAccountBtn" class="btn-secondary" type="button">Create Account</button>
+                                            <button id="ftCreateChildBtn" class="btn-secondary" type="button">Create Protected Profile</button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="settings-system">
+                                <div class="card settings-card">
+                                    <div class="card-header">
+                                        <h3>Security</h3>
+                                    </div>
+                                    <div class="card-body settings-card__body">
+                                        <div class="import-export-hint" style="margin-bottom:10px;">
+                                            The Master PIN protects Default and its admin controls. Set a PIN on each parent account too. A child switching PIN protects entry to that child profile; it does not protect an unlocked parent account.
+                                        </div>
+                                        <div class="toggle-row" title="When enabled, the Default (Master) profile can create new independent accounts.">
+                                            <div class="toggle-info">
+                                                <div class="toggle-title">Allow independent account creation</div>
+                                            </div>
+                                            <label class="switch">
+                                                <input id="ftAllowAccountCreation" type="checkbox" />
+                                                <span class="slider round"></span>
+                                            </label>
+                                        </div>
+                                        <div class="toggle-row" title="Limits how many independent accounts can exist (excluding Default).">
+                                            <div class="toggle-info">
+                                                <div class="toggle-title">Max independent accounts</div>
+                                            </div>
+                                            <input id="ftMaxAccounts" class="text-input" type="number" min="0" step="1" style="max-width:120px;" />
+                                        </div>
+                                        <div style="display:flex;gap:8px;flex-wrap:wrap;">
+                                            <button id="ftSetMasterPinBtn" class="btn-secondary" type="button">Set / Change Master PIN</button>
+                                            <button id="ftClearMasterPinBtn" class="btn-secondary" type="button">Remove Master PIN</button>
+                                            <button id="ftLockAdminSessionBtn" class="btn-secondary" type="button" title="Immediately lock temporary parent/admin unlocks in this dashboard tab.">Lock Admin Session</button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+
                     </div>
                 </div>
 
@@ -1680,7 +1695,7 @@
                             </div>
                             <div class="card-body">
                                 <p class="help-family-devices-card__intro"><strong>Your own device:</strong> choose <strong>Sync My Devices</strong> to copy the profile currently open. No protected profile or PIN is required. Switch profiles first when you want to copy a different independent profile.</p>
-                                <p class="help-family-devices-card__intro"><strong>Choose a device:</strong> code or QR works from the same room or across the internet while both devices are open. For a nearby picker, run the optional FilterTube helper on both computers, then use <strong>Find nearby</strong> and <strong>Let this device appear</strong>.</p>
+                                <p class="help-family-devices-card__intro"><strong>Choose a device:</strong> code or QR works from the same room or across the internet while both devices are open. For a nearby picker, run the optional FilterTube helper on both computers, then use <strong>Find nearby</strong> and <strong>Receive nearby</strong>.</p>
                                 <p class="help-family-devices-card__intro"><strong>Family control:</strong> use the steps below when a child, family member, or protected device should receive rules managed from the parent side.</p>
                                 <div class="help-family-devices-steps" aria-label="Family device control steps">
                                     <article>
@@ -2672,8 +2687,11 @@
     <script src="../js/settings_shared.js"></script>
     <script src="../js/security_manager.js"></script>
     <script src="../js/managed_admin_authority.js"></script>
+    <script src="../js/nanah_storage_lock.js"></script>
     <script src="../js/io_manager.js"></script>
     <script src="../js/vendor/qrcode.bundle.js"></script>
+    <script src="../js/vendor/jsqr.bundle.js"></script>
+    <script src="../js/nanah_qr_scanner.js"></script>
     <script src="../js/vendor/nanah.bundle.js"></script>
     <script src="../js/nanah_sync_adapter.js"></script>
     <script src="../js/nanah_managed_mailbox_client.js"></script>
@@ -2689,6 +2707,7 @@
     <script src="../js/ui_static_copy_capture.js"></script>
     <script src="../js/ui-shell/tab-view-decor.js"></script>
     <script src="../js/managed_parent_command_center.js"></script>
+    <script src="../js/family_device_navigation.js"></script>
     <script src="../js/tab-view.js"></script>
     <script src="../js/ui_localization_boot.js"></script>
 </body>

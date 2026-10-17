@@ -1,4 +1,9 @@
 {
+  "dashboard.sync.picker.receiveConfirmed": "句子已经在这确认。两只设备都保持打开。等家长更新。",
+  "dashboard.sync.picker.receivePermissions": "更新会遵照这只设备上家长批准的权限。",
+  "dashboard.sync.picker.receiveModeEyebrow": "只收",
+  "dashboard.sync.picker.receiveModeTitle": "这个受保护的档案",
+  "dashboard.sync.picker.receiveModeBody": "家长发送更改。",
   "popup.blocklist": "屏蔽清单",
   "popup.whitelist": "允许清单",
   "popup.listMode.whitelistTooltip": "允许清单模式：显示符合允许规则个内容",
@@ -2413,5 +2418,9 @@
   "dashboard.helpBubble.tip51": "把配对链接拷给另一部设备。接收设备还是要验证相同个安全短句。",
   "dashboard.helpBubble.tip52": "先开始配对，之后这个区域会给另一部设备显示 QR 或者状态消息。",
   "dashboard.helpBubble.tip53": "可信设备会记住已经验证个关系，让以后发送方便点。",
-  "dashboard.helpBubble.tip54": "保存个信任勿是实时连接，也永远勿会跳过本地验证。"
+  "dashboard.helpBubble.tip54": "保存个信任勿是实时连接，也永远勿会跳过本地验证。",
+  "dashboard.sync.familyDeviceMap.selection.localPhraseConfirmedDetail": "Phrase confirmed here. Confirm it on the other device before sending.",
+  "dashboard.sync.familyDeviceMap.map.localPhraseConfirmedDetail": "Phrase confirmed here. Confirm it on the other device before sending.",
+  "dashboard.sync.familyDeviceMap.map.compassRuleLocalConfirmed": "Phrase confirmed here. Confirm it on the other device, then review and send the update.",
+  "dashboard.sync.familyDeviceMap.trusted.sessionDevice": "Session device {label}"
 }

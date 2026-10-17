@@ -1,4 +1,9 @@
 {
+  "dashboard.sync.picker.receiveConfirmed": "Frasa dikonfirmasi di sini. Biarkan kedua perangkat terbuka. Menunggu pembaruan orang tua.",
+  "dashboard.sync.picker.receivePermissions": "Pembaruan mengikuti izin yang disetujui orang tua pada perangkat ini.",
+  "dashboard.sync.picker.receiveModeEyebrow": "Hanya terima",
+  "dashboard.sync.picker.receiveModeTitle": "Profil terlindungi ini",
+  "dashboard.sync.picker.receiveModeBody": "Orang tua mengirim perubahan.",
   "popup.blocklist": "Daftar blokir",
   "popup.whitelist": "Daftar izin",
   "popup.listMode.whitelistTooltip": "Mode daftar izin: tampilkan konten yang cocok dengan aturan yang diizinkan",
@@ -2413,5 +2418,9 @@
   "dashboard.helpBubble.tip51": "Salin tautan pemasangan untuk perangkat lain. Perangkat penerima tetap harus memastikan frasa keamanan yang sama.",
   "dashboard.helpBubble.tip52": "Mulai pemasangan terlebih dahulu, lalu area ini akan menampilkan QR atau pesan status untuk perangkat lain.",
   "dashboard.helpBubble.tip53": "Perangkat tepercaya mengingat hubungan yang sudah diverifikasi agar pengiriman berikutnya lebih mudah.",
-  "dashboard.helpBubble.tip54": "Kepercayaan yang tersimpan bukan koneksi langsung dan tidak pernah melewati validasi lokal."
+  "dashboard.helpBubble.tip54": "Kepercayaan yang tersimpan bukan koneksi langsung dan tidak pernah melewati validasi lokal.",
+  "dashboard.sync.familyDeviceMap.selection.localPhraseConfirmedDetail": "Phrase confirmed here. Confirm it on the other device before sending.",
+  "dashboard.sync.familyDeviceMap.map.localPhraseConfirmedDetail": "Phrase confirmed here. Confirm it on the other device before sending.",
+  "dashboard.sync.familyDeviceMap.map.compassRuleLocalConfirmed": "Phrase confirmed here. Confirm it on the other device, then review and send the update.",
+  "dashboard.sync.familyDeviceMap.trusted.sessionDevice": "Session device {label}"
 }

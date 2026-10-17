@@ -193,6 +193,7 @@
                 linkId: candidate.linkId,
                 mailboxItemId: normalizeString(root.mailboxItemId || result.mailboxItemId),
                 targetProfileId: candidate.targetProfileId,
+                targetDeviceId: candidate.targetDeviceId,
                 sourceDeviceId: candidate.sourceDeviceId,
                 sourceProfileId: candidate.sourceProfileId,
                 scope: normalizeString(root.scope || result.scope).toLowerCase(),

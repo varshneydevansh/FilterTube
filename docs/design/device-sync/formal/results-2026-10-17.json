@@ -1,0 +1,94 @@
+{
+  "tool_sha256": "936a262061c914694dfd669a543be24573c45d5aa0ff20a8b96b23d01e050e88",
+  "java_version": "openjdk version \"17.0.15\" 2025-04-15",
+  "kind": "bounded model checks; no implementation refinement or crypto proof",
+  "checks": [
+    {
+      "config": "DeviceSync",
+      "accepted": true,
+      "expected_invariant_failure": null,
+      "exit_code": 0,
+      "generated": 7404385,
+      "distinct": 946560,
+      "depth": 23
+    },
+    {
+      "config": "ProfileBinding",
+      "accepted": true,
+      "expected_invariant_failure": null,
+      "exit_code": 0,
+      "generated": 12865,
+      "distinct": 1408,
+      "depth": 17
+    },
+    {
+      "config": "UnsafeApply",
+      "accepted": true,
+      "expected_invariant_failure": "FreshWriteAuthority",
+      "exit_code": 12,
+      "generated": 44809,
+      "distinct": 16444,
+      "depth": 7,
+      "counterexample_actions": [
+        "Initial predicate",
+        "Begin line 66, col 5 to line 73, col 50 of module DeviceSync",
+        "Approve line 75, col 12 to line 83, col 57 of module DeviceSync",
+        "ChangeActor line 37, col 19 to line 39, col 63 of module DeviceSync",
+        "Send line 85, col 9 to line 92, col 34 of module DeviceSync",
+        "Apply line 102, col 10 to line 108, col 35 of module DeviceSync"
+      ]
+    },
+    {
+      "config": "UnsafeReceipt",
+      "accepted": true,
+      "expected_invariant_failure": "AppliedMeansLatest",
+      "exit_code": 12,
+      "generated": 888954,
+      "distinct": 177891,
+      "depth": 11,
+      "counterexample_actions": [
+        "Initial predicate",
+        "Begin line 66, col 5 to line 73, col 50 of module DeviceSync",
+        "Approve line 75, col 12 to line 83, col 57 of module DeviceSync",
+        "Send line 85, col 9 to line 92, col 34 of module DeviceSync",
+        "Apply line 102, col 10 to line 108, col 35 of module DeviceSync",
+        "Reset line 118, col 10 to line 120, col 55 of module DeviceSync",
+        "Begin line 66, col 5 to line 73, col 50 of module DeviceSync",
+        "Approve line 75, col 12 to line 83, col 57 of module DeviceSync",
+        "Send line 85, col 9 to line 92, col 34 of module DeviceSync",
+        "ReceiveReceipt line 113, col 5 to line 116, col 44 of module DeviceSync"
+      ]
+    },
+    {
+      "config": "UnsafePair",
+      "accepted": true,
+      "expected_invariant_failure": "PresenceIsNotTrust",
+      "exit_code": 12,
+      "generated": 232,
+      "distinct": 190,
+      "depth": 4,
+      "counterexample_actions": [
+        "Initial predicate",
+        "OfferPair line 43, col 14 to line 47, col 57 of module DeviceSync",
+        "SaveTrust line 51, col 14 to line 58, col 47 of module DeviceSync"
+      ]
+    },
+    {
+      "config": "UnsafeProfileBinding",
+      "accepted": true,
+      "expected_invariant_failure": "NoCrossProfileWrite",
+      "exit_code": 12,
+      "generated": 663,
+      "distinct": 172,
+      "depth": 6,
+      "counterexample_actions": [
+        "Initial predicate",
+        "Begin line 25, col 10 to line 28, col 62 of module ProfileBinding",
+        "Select line 19, col 17 to line 21, col 72 of module ProfileBinding",
+        "Approve line 29, col 12 to line 33, col 64 of module ProfileBinding",
+        "Write line 36, col 13 to line 43, col 43 of module ProfileBinding"
+      ]
+    }
+  ],
+  "tlc_version": "TLC2 Version 2.19 of 08 August 2024 (rev: 5a47802)"
+}

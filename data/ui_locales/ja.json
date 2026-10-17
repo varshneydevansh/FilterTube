@@ -1,4 +1,9 @@
 {
+  "dashboard.sync.picker.receiveConfirmed": "フレーズはここで確認済み。両デバイスを開いたままに。保護者の更新待ち。",
+  "dashboard.sync.picker.receivePermissions": "更新はこのデバイスで保護者が承認した権限に従います。",
+  "dashboard.sync.picker.receiveModeEyebrow": "受信のみ",
+  "dashboard.sync.picker.receiveModeTitle": "この保護されたプロファイル",
+  "dashboard.sync.picker.receiveModeBody": "保護者が変更を送信",
   "popup.blocklist": "ブロックリスト",
   "popup.whitelist": "許可リスト",
   "popup.listMode.whitelistTooltip": "許可リストモード：許可ルールに一致するコンテンツを表示",
@@ -2413,5 +2418,9 @@
   "dashboard.helpBubble.tip51": "別のデバイス用にペアリングリンクをコピーします。受信側でも同じ安全フレーズの確認が必要です。",
   "dashboard.helpBubble.tip52": "まずペアリングを開始すると、この領域に相手のデバイス用 QR または状態メッセージが表示されます。",
   "dashboard.helpBubble.tip53": "信頼済みデバイスは検証済みの関係を記憶するため、次回から簡単に送信できます。",
-  "dashboard.helpBubble.tip54": "保存済みの信頼関係はライブ接続ではなく、ローカル検証を省略することもありません。"
+  "dashboard.helpBubble.tip54": "保存済みの信頼関係はライブ接続ではなく、ローカル検証を省略することもありません。",
+  "dashboard.sync.familyDeviceMap.selection.localPhraseConfirmedDetail": "Phrase confirmed here. Confirm it on the other device before sending.",
+  "dashboard.sync.familyDeviceMap.map.localPhraseConfirmedDetail": "Phrase confirmed here. Confirm it on the other device before sending.",
+  "dashboard.sync.familyDeviceMap.map.compassRuleLocalConfirmed": "Phrase confirmed here. Confirm it on the other device, then review and send the update.",
+  "dashboard.sync.familyDeviceMap.trusted.sessionDevice": "Session device {label}"
 }

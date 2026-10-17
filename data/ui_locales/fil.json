@@ -1,4 +1,9 @@
 {
+  "dashboard.sync.picker.receiveConfirmed": "Nakumpirma ang parirala dito. Panatilihing bukas ang parehong aparato. Naghihintay ng pag-update mula sa magulang.",
+  "dashboard.sync.picker.receivePermissions": "Ang mga pag-update ay sumusunod sa mga pahintulot na inaprubahan ng magulang sa aparatong ito.",
+  "dashboard.sync.picker.receiveModeEyebrow": "Tanggapin lamang",
+  "dashboard.sync.picker.receiveModeTitle": "Ang protektadong profile na ito",
+  "dashboard.sync.picker.receiveModeBody": "Nagpapadala ng mga pagbabago ang magulang.",
   "popup.blocklist": "Listahan ng mga bina-block",
   "popup.whitelist": "Listahan ng mga pinapayagan",
   "popup.listMode.whitelistTooltip": "Mode ng listahan ng pinapayagan: ipakita ang content na tumutugma sa mga pinapayagang rule",
@@ -2413,5 +2418,9 @@
   "dashboard.helpBubble.tip51": "Kopyahin ang pairing link para sa ibang device. Kailangan pa ring beripikahin ng tatanggap na device ang kaparehong safety phrase.",
   "dashboard.helpBubble.tip52": "Simulan muna ang pagpapares; pagkatapos ay magpapakita ang bahaging ito ng QR o mensahe ng status para sa kabilang device.",
   "dashboard.helpBubble.tip53": "Tinatandaan ng mga pinagkakatiwalaang device ang napatunayang ugnayan para mas madali ang mga susunod na pagpapadala.",
-  "dashboard.helpBubble.tip54": "Ang naka-save na tiwala ay hindi live na koneksyon at hindi kailanman lumalaktaw sa lokal na pagpapatunay."
+  "dashboard.helpBubble.tip54": "Ang naka-save na tiwala ay hindi live na koneksyon at hindi kailanman lumalaktaw sa lokal na pagpapatunay.",
+  "dashboard.sync.familyDeviceMap.selection.localPhraseConfirmedDetail": "Phrase confirmed here. Confirm it on the other device before sending.",
+  "dashboard.sync.familyDeviceMap.map.localPhraseConfirmedDetail": "Phrase confirmed here. Confirm it on the other device before sending.",
+  "dashboard.sync.familyDeviceMap.map.compassRuleLocalConfirmed": "Phrase confirmed here. Confirm it on the other device, then review and send the update.",
+  "dashboard.sync.familyDeviceMap.trusted.sessionDevice": "Session device {label}"
 }

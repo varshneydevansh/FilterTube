@@ -1,4 +1,9 @@
 {
+  "dashboard.sync.picker.receiveConfirmed": "A ti jẹ́rìí sí gbólóhùn náà níbí. Jẹ́ kí FilterTube ṣí sílẹ̀ lórí ẹ̀rọ méjèèjì. A ń dúró de ìmúdójúìwọ̀n láti ọ̀dọ̀ òbí.",
+  "dashboard.sync.picker.receivePermissions": "Awọn imudojuiwọn tẹle awọn igbanilaaye ti obi fọwọsi lori ẹrọ yii.",
+  "dashboard.sync.picker.receiveModeEyebrow": "Gba nikan",
+  "dashboard.sync.picker.receiveModeTitle": "Prófáìlì tí a dáàbò bò yìí",
+  "dashboard.sync.picker.receiveModeBody": "Obi n fi ayipada ranṣẹ.",
   "popup.blocklist": "Àkójọ ìdènà",
   "popup.whitelist": "Àkójọ ìyọ̀nda",
   "popup.listMode.whitelistTooltip": "Ìpo àkójọ ìyọ̀nda: fi akoonu tó bá àwọn òfin ìyọ̀nda hàn",
@@ -2413,5 +2418,9 @@
   "dashboard.helpBubble.tip51": "Da ìjápọ̀ ìsopọ̀ kọ fún ẹ̀rọ kejì. Ẹ̀rọ tó ń gbà á ṣì gbọ́dọ̀ ṣàyẹ̀wò gbólóhùn ààbò kan náà.",
   "dashboard.helpBubble.tip52": "Bẹ̀rẹ̀ ìsopọ̀ kọ́kọ́, lẹ́yìn náà agbègbè yìí yóò fi QR tàbí ìfiránṣẹ́ ipò hàn fún ẹ̀rọ kejì.",
   "dashboard.helpBubble.tip53": "Àwọn ẹ̀rọ tí a gbẹ́kẹ̀lé ń rántí ìbáṣepọ̀ tí a ti jẹ́rìí kí fífi ránṣẹ́ ọjọ́ iwájú lè rọrùn.",
-  "dashboard.helpBubble.tip54": "Ìgbẹ́kẹ̀lé tí a fipamọ́ kì í ṣe ìsopọ̀ alààyè, kò sì fo ìjẹ́rìí agbègbè kọjá láéláé."
+  "dashboard.helpBubble.tip54": "Ìgbẹ́kẹ̀lé tí a fipamọ́ kì í ṣe ìsopọ̀ alààyè, kò sì fo ìjẹ́rìí agbègbè kọjá láéláé.",
+  "dashboard.sync.familyDeviceMap.selection.localPhraseConfirmedDetail": "Phrase confirmed here. Confirm it on the other device before sending.",
+  "dashboard.sync.familyDeviceMap.map.localPhraseConfirmedDetail": "Phrase confirmed here. Confirm it on the other device before sending.",
+  "dashboard.sync.familyDeviceMap.map.compassRuleLocalConfirmed": "Phrase confirmed here. Confirm it on the other device, then review and send the update.",
+  "dashboard.sync.familyDeviceMap.trusted.sessionDevice": "Session device {label}"
 }

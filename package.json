@@ -5,6 +5,7 @@
   "main": "js/background.js",
   "scripts": {
     "build:nanah-vendor": "node scripts/build-nanah-vendor.mjs",
+    "build:qr-scanner-vendor": "node scripts/build-qr-scanner-vendor.mjs",
     "build:ui": "node scripts/build-extension-ui.mjs",
     "check:ui-locales": "node scripts/check-ui-locales.mjs",
     "check:json-keys": "node scripts/check-json-keys.cjs",
@@ -78,6 +79,7 @@
     "fs-extra": "^11.1.1"
   },
   "dependencies": {
+    "jsqr": "1.4.0",
     "preact": "^10.29.0",
     "qrcode": "^1.5.4"
   }

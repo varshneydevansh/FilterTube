@@ -16,11 +16,12 @@
     const MANAGED_OUTBOUND_HISTORY_LIMIT = 50;
     const MANAGED_LIVE_ACK_HISTORY_LIMIT = 50;
 
-    function create(deps = {}) {
+    function create(deps = {}, sendContext = null, liveSendRegistry = null) {
         const normalizeString = deps.normalizeString;
         const safeObject = deps.safeObject;
         const normalizeNonNegativeInteger = deps.normalizeNonNegativeInteger;
         const providerDeliveryAuthMarker = Object.freeze({ purpose: 'filtertube-managed-provider-delivery-auth' });
+        const pendingLiveSends = liveSendRegistry || new Map();
 
         function normalizeScope(scope) {
             const normalized = normalizeString(scope).toLowerCase();
@@ -48,6 +49,7 @@
         }
 
         function resolvePolicySourceProfile() {
+            if (sendContext) return sendContext.source;
             const explicitSource = typeof deps.getPolicySourceProfile === 'function'
                 ? safeObject(deps.getPolicySourceProfile())
                 : {};
@@ -67,10 +69,26 @@
         function resolvePayloadSurface(scope) {
             if (scope === 'kids') return 'kids';
             if (scope === 'main') return 'main';
+            if (sendContext) return sendContext.surface;
             const activeSurface = normalizeString(typeof deps.getActiveManagedSurface === 'function'
                 ? deps.getActiveManagedSurface()
                 : '').toLowerCase();
             return activeSurface === 'kids' ? 'kids' : 'main';
+        }
+
+        function createSendOperation() {
+            if (sendContext) return api;
+            const snapshot = JSON.parse(JSON.stringify({
+                source: resolvePolicySourceProfile(),
+                actor: deps.getLocalProfileContext(),
+                surface: resolvePayloadSurface('keywords')
+            }));
+            const freeze = (value) => {
+                if (!value || typeof value !== 'object' || Object.isFrozen(value)) return value;
+                Object.values(value).forEach(freeze);
+                return Object.freeze(value);
+            };
+            return create(deps, freeze(snapshot), pendingLiveSends);
         }
 
         function buildListPayload(scope, profile, surface) {
@@ -265,6 +283,14 @@
             if (trustedLink.localRole !== 'source' || trustedLink.remoteRole !== 'replica') {
                 throw new Error('Signed managed sends require Source -> Replica roles.');
             }
+            const sourceProfile = sendContext ? sendContext.actor : deps.getLocalProfileContext();
+            if (normalizeString(sourceProfile.profileType).toLowerCase() === 'child') {
+                throw new Error('Switch to the parent account that paired this device before sending managed updates.');
+            }
+            const pinnedSourceProfileId = normalizeString(trustedLink.sourceProfileId || safeObject(trustedLink.policy).sourceProfileId);
+            if (pinnedSourceProfileId && pinnedSourceProfileId !== normalizeString(sourceProfile.profileId)) {
+                throw new Error('Switch to the parent account that paired this device before sending managed updates.');
+            }
 
             const normalizedScope = normalizeScope(scope);
             if (!normalizedScope) {
@@ -291,7 +317,6 @@
                 throw new Error('Managed source signing key is incomplete.');
             }
 
-            const sourceProfile = deps.getLocalProfileContext();
             const payload = buildPayload(normalizedScope);
             const policyHash = buildPolicyHash({
                 linkId: trustedLink.linkId,
@@ -328,6 +353,7 @@
         }
 
         async function buildEnvelopeForLiveSend(policy) {
+            if (!sendContext) return createSendOperation().buildEnvelopeForLiveSend(policy);
             const scope = normalizeScope(policy.scope);
             if (MANAGED_LIVE_BUNDLE_SCOPES[scope]) {
                 throw new Error('Managed bundle sends must use buildEnvelopeBatchForLiveSend.');
@@ -336,6 +362,7 @@
         }
 
         async function buildEnvelopeBatchForLiveSend(policy) {
+            if (!sendContext) return createSendOperation().buildEnvelopeBatchForLiveSend(policy);
             const scopes = resolveConcreteSendScopes(policy.scope);
             if (scopes.length === 0) {
                 throw new Error('Signed managed sends require Main, Kids, keyword, channel, video, viewing-space, or time-limit scope.');
@@ -348,6 +375,7 @@
         }
 
         async function buildEnvelopeBatchForTrustedLinks(policy, trustedLinks) {
+            if (!sendContext) return createSendOperation().buildEnvelopeBatchForTrustedLinks(policy, trustedLinks);
             const links = Array.isArray(trustedLinks)
                 ? trustedLinks.map((link) => deps.normalizeTrustedLink(link)).filter(Boolean)
                 : [];
@@ -571,6 +599,7 @@
         }
 
         async function deliverLocalNetworkPolicyBatch(policy, trustedLinks, provider, options = {}) {
+            if (!sendContext) return createSendOperation().deliverLocalNetworkPolicyBatch(policy, trustedLinks, provider, options);
             const auth = await ensureProviderDeliveryAuthorized('local_network', options, { policy, trustedLinkCount: safeArray(trustedLinks).length });
             if (!auth.ok) return { ok: false, reason: auth.reason, candidateCount: 0, deliveredCandidateCount: 0, failedCandidateCount: 0, markedSentCount: 0, request: null };
             const candidates = await buildLocalNetworkCandidateBatchForTrustedLinks(policy, trustedLinks, options);
@@ -736,6 +765,7 @@
         }
 
         async function uploadMailboxPolicyBatch(policy, trustedLinks, provider, options = {}) {
+            if (!sendContext) return createSendOperation().uploadMailboxPolicyBatch(policy, trustedLinks, provider, options);
             const auth = await ensureProviderDeliveryAuthorized('encrypted_mailbox', options, { policy, trustedLinkCount: safeArray(trustedLinks).length });
             if (!auth.ok) return { ok: false, reason: auth.reason, mailboxItemCount: 0, uploadedMailboxItemCount: 0, failedMailboxItemCount: 0, markedSentCount: 0, request: null };
             const uploadOptions = {
@@ -1012,33 +1042,106 @@
             return schema === MANAGED_LIVE_ACK_HISTORY_SCHEMA || schema === MANAGED_REMOTE_DELIVERY_ACK_HISTORY_SCHEMA;
         }
 
-        async function recordInboundAckPayload(ackPayload, allowedSchemas) {
+        function expectedReceiptIdentity(trustedLink) {
+            const trusted = safeObject(trustedLink);
+            const policy = safeObject(trusted.policy);
+            return {
+                sourceDeviceId: normalizeString(trusted.sourceDeviceId || policy.sourceDeviceId) || normalizeString(deps.getStableDeviceId()),
+                sourceProfileId: normalizeString(trusted.sourceProfileId || policy.sourceProfileId),
+                targetDeviceId: normalizeString(trusted.targetDeviceId || policy.targetDeviceId || trusted.remoteDeviceId),
+                targetProfileId: normalizeString(trusted.targetProfileId || policy.targetProfileId)
+            };
+        }
+
+        function receiptIdentityError(value, expectedIdentity, requireAll = true) {
+            const identityFields = [
+                ['sourceDeviceId', 'source_device'], ['sourceProfileId', 'source_profile'],
+                ['targetDeviceId', 'target_device'], ['targetProfileId', 'target_profile']
+            ];
+            for (const [field, reason] of identityFields) {
+                const expected = expectedIdentity[field];
+                const actual = normalizeString(value[field]);
+                if (!expected) return `missing_trusted_${reason}`;
+                if (!actual && requireAll) return `missing_${reason}`;
+                if (actual && actual !== expected) return `${reason}_mismatch`;
+            }
+            return '';
+        }
+
+        function receiptTrustError(trustedLink) {
+            const trusted = safeObject(trustedLink);
+            const policy = safeObject(trusted.policy);
+            if (!trustedLink) return 'unknown_trusted_link';
+            if (trusted.revoked || policy.revoked || trusted.keyRevoked || policy.keyRevoked
+                || trusted.stalePairing || policy.stalePairing) return 'link_revoked';
+            return '';
+        }
+
+        function liveSendKey(linkId, scope) {
+            return JSON.stringify([normalizeString(linkId), normalizeScope(scope)]);
+        }
+
+        function cancelPendingLiveReceipts(linkId) {
+            for (const pending of pendingLiveSends.values()) {
+                if (pending.linkId === linkId) {
+                    pending.cancelled = true;
+                    pending.receipts.clear();
+                }
+            }
+        }
+
+        async function recordInboundAckPayload(ackPayload, allowedSchemas, drainingPending = false) {
             const root = safeObject(ackPayload);
             const schema = normalizeString(root.schema);
             if (!allowedSchemas.includes(schema)) return { ok: false, reason: 'wrong_ack_schema', recordedCount: 0 };
             const normalizedLinkId = normalizeString(root.linkId);
             if (!normalizedLinkId) return { ok: false, reason: 'missing_link_id', recordedCount: 0 };
             const trusted = deps.normalizeTrustedLink(deps.findTrustedLinkById(normalizedLinkId));
-            if (!trusted) return { ok: false, reason: 'unknown_trusted_link', recordedCount: 0 };
+            const trustError = receiptTrustError(trusted);
+            if (trustError) {
+                cancelPendingLiveReceipts(normalizedLinkId);
+                return { ok: false, reason: trustError, recordedCount: 0 };
+            }
 
             const policy = safeObject(trusted.policy);
             const localSourceDeviceId = normalizeString(deps.getStableDeviceId());
-            const ackSourceDeviceId = normalizeString(root.sourceDeviceId);
-            if (localSourceDeviceId && ackSourceDeviceId && localSourceDeviceId !== ackSourceDeviceId) {
+            const expectedIdentity = expectedReceiptIdentity(trusted);
+            if (localSourceDeviceId && expectedIdentity.sourceDeviceId !== localSourceDeviceId) {
                 return { ok: false, reason: 'source_device_mismatch', recordedCount: 0 };
             }
-            const policyTargetProfileId = normalizeString(policy.targetProfileId);
-            const ackTargetProfileId = normalizeString(root.targetProfileId);
-            if (policyTargetProfileId && ackTargetProfileId && policyTargetProfileId !== ackTargetProfileId) {
-                return { ok: false, reason: 'target_profile_mismatch', recordedCount: 0 };
+            // A receipt must identify the paired sender and its fixed recipient.
+            // Missing transport metadata is not evidence that an update applied.
+            const rootIdentityError = receiptIdentityError(root, expectedIdentity);
+            if (rootIdentityError) {
+                return { ok: false, reason: rootIdentityError, recordedCount: 0 };
             }
 
             const outgoing = safeObject(policy.outgoingManagedPolicies);
             const validRows = [];
             const nextOutgoing = { ...outgoing };
+            let recordIdentityError = '';
+            let queuedCount = 0;
             for (const ackRecord of safeArray(root.records)) {
+                const reason = receiptIdentityError(safeObject(ackRecord), expectedIdentity, false);
+                if (reason) {
+                    recordIdentityError = reason;
+                    continue;
+                }
                 const row = buildInboundAckHistoryRow(trusted, root, ackRecord);
                 if (!row.scope || !Number.isInteger(row.revision) || !row.policyHash) continue;
+                const pending = pendingLiveSends.get(liveSendKey(normalizedLinkId, row.scope));
+                if (!drainingPending && schema === MANAGED_LIVE_ACK_SCHEMA && pending
+                    && !pending.cancelled && pending.revision === row.revision && pending.policyHash === row.policyHash
+                    && !receiptIdentityError(root, pending.identity)) {
+                    // At most one receipt per terminal state for this exact pending
+                    // revision. Unknown future receipts never enter the registry.
+                    if (!pending.seenReceipts.has(row.ackState)) {
+                        pending.seenReceipts.add(row.ackState);
+                        pending.receipts.set(row.ackState, JSON.parse(JSON.stringify({ ...root, records: [ackRecord] })));
+                    }
+                    queuedCount += 1;
+                    continue;
+                }
                 const currentState = safeObject(outgoing[row.scope]);
                 if (currentState.revision !== row.revision || normalizeString(currentState.policyHash) !== row.policyHash) continue;
                 validRows.push(row);
@@ -1052,7 +1155,7 @@
                 };
             }
             if (validRows.length === 0) {
-                return { ok: false, reason: 'no_matching_ack_records', recordedCount: 0 };
+                return { ok: false, reason: recordIdentityError || (queuedCount ? 'live_send_bookkeeping_pending' : 'no_matching_ack_records'), recordedCount: 0, ...(queuedCount ? { queuedCount } : {}) };
             }
 
             const historyRows = Array.isArray(policy.inboundManagedAckHistory)
@@ -1110,7 +1213,64 @@
             });
         }
 
-        return {
+        async function sendLiveEnvelope(envelope, sender, options = {}) {
+            const outbound = JSON.parse(JSON.stringify(envelope));
+            const linkId = normalizeString(outbound.linkId);
+            const scope = normalizeScope(outbound.scope);
+            const revision = normalizeNonNegativeInteger(outbound.revision);
+            const policyHash = normalizeString(outbound.policyHash);
+            if (typeof sender !== 'function' || outbound.type !== 'filtertube_managed_policy'
+                || !linkId || !scope || !revision || !policyHash) {
+                throw new Error('A live managed send requires a policy envelope and sender.');
+            }
+            const trusted = deps.normalizeTrustedLink(deps.findTrustedLinkById(linkId));
+            const identity = expectedReceiptIdentity(trusted);
+            const assertCurrentLink = () => {
+                const current = deps.normalizeTrustedLink(deps.findTrustedLinkById(linkId));
+                const reason = receiptTrustError(current)
+                    || receiptIdentityError(outbound, expectedReceiptIdentity(current));
+                if (reason || identity.sourceDeviceId !== normalizeString(deps.getStableDeviceId())) {
+                    throw new Error(`The paired device changed before send bookkeeping: ${reason || 'source_device_mismatch'}`);
+                }
+            };
+            assertCurrentLink();
+            const key = liveSendKey(linkId, scope);
+            if (pendingLiveSends.has(key)) throw new Error('An update for this profile and area is already being sent.');
+            const pending = { linkId, revision, policyHash, identity, receipts: new Map(), seenReceipts: new Set(), cancelled: false };
+            pendingLiveSends.set(key, pending);
+            try {
+                await sender(outbound);
+                assertCurrentLink();
+                if (pending.cancelled) throw new Error('The pending device update was revoked.');
+                const marked = await markSent(linkId, scope, revision, policyHash, {
+                    targetProfileId: outbound.targetProfileId,
+                    targetProfileName: outbound.targetProfileName,
+                    sourceProfileId: outbound.sourceProfileId,
+                    sourceDeviceId: outbound.sourceDeviceId,
+                    issuedAt: outbound.issuedAt,
+                    ...safeObject(options)
+                });
+                if (!marked) throw new Error('The sent update could not be recorded.');
+                assertCurrentLink();
+                if (pending.cancelled) throw new Error('The pending device update was revoked.');
+                let recordedAckCount = 0;
+                while (pending.receipts.size) {
+                    const receipts = Array.from(pending.receipts.values());
+                    pending.receipts.clear();
+                    for (const receipt of receipts) {
+                        const result = await recordInboundAckPayload(receipt, [MANAGED_LIVE_ACK_SCHEMA], true);
+                        recordedAckCount += Number(result.recordedCount) || 0;
+                    }
+                }
+                return { ok: true, recordedAckCount };
+            } finally {
+                pending.receipts.clear();
+                pendingLiveSends.delete(key);
+            }
+        }
+
+        const api = {
+            createSendOperation,
             normalizeScope,
             expandScope,
             resolveConcreteSendScopes,
@@ -1134,8 +1294,10 @@
             buildLiveAckPayload,
             recordLiveAckPayload,
             recordRemoteDeliveryAckPayload,
-            markSent
+            markSent,
+            sendLiveEnvelope
         };
+        return api;
     }
 
     global.FilterTubeNanahManagedLivePolicy = { create };

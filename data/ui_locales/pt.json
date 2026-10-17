@@ -1,4 +1,9 @@
 {
+  "dashboard.sync.picker.receiveConfirmed": "Frase confirmada aqui. Mantenha os dois dispositivos abertos. Aguardando atualização do responsável.",
+  "dashboard.sync.picker.receivePermissions": "As atualizações seguem as permissões aprovadas por um responsável neste dispositivo.",
+  "dashboard.sync.picker.receiveModeEyebrow": "Somente receber",
+  "dashboard.sync.picker.receiveModeTitle": "Este perfil protegido",
+  "dashboard.sync.picker.receiveModeBody": "Responsável envia alterações.",
   "popup.blocklist": "Lista de bloqueio",
   "popup.whitelist": "Lista de permissões",
   "popup.listMode.whitelistTooltip": "Modo de lista de permissões: mostrar o conteúdo que corresponde às regras permitidas",
@@ -2413,5 +2418,9 @@
   "dashboard.helpBubble.tip51": "Copie o link de pareamento para outro dispositivo. O dispositivo receptor ainda precisa confirmar a mesma frase de segurança.",
   "dashboard.helpBubble.tip52": "Inicie o pareamento primeiro; depois esta área exibirá um QR ou uma mensagem de status para o outro dispositivo.",
   "dashboard.helpBubble.tip53": "Dispositivos confiáveis lembram uma relação verificada para facilitar os próximos envios.",
-  "dashboard.helpBubble.tip54": "A confiança salva não é uma conexão ao vivo e nunca ignora a validação local."
+  "dashboard.helpBubble.tip54": "A confiança salva não é uma conexão ao vivo e nunca ignora a validação local.",
+  "dashboard.sync.familyDeviceMap.selection.localPhraseConfirmedDetail": "Phrase confirmed here. Confirm it on the other device before sending.",
+  "dashboard.sync.familyDeviceMap.map.localPhraseConfirmedDetail": "Phrase confirmed here. Confirm it on the other device before sending.",
+  "dashboard.sync.familyDeviceMap.map.compassRuleLocalConfirmed": "Phrase confirmed here. Confirm it on the other device, then review and send the update.",
+  "dashboard.sync.familyDeviceMap.trusted.sessionDevice": "Session device {label}"
 }

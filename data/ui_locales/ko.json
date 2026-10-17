@@ -1,4 +1,9 @@
 {
+  "dashboard.sync.picker.receiveConfirmed": "여기에서 문구가 확인되었습니다. 두 기기를 모두 켜 두세요. 부모님의 업데이트를 기다리는 중입니다.",
+  "dashboard.sync.picker.receivePermissions": "업데이트는 이 기기에서 부모님이 승인한 권한에 따라 진행됩니다.",
+  "dashboard.sync.picker.receiveModeEyebrow": "수신 전용",
+  "dashboard.sync.picker.receiveModeTitle": "이 보호된 프로필",
+  "dashboard.sync.picker.receiveModeBody": "부모님이 변경 사항을 보냅니다.",
   "popup.blocklist": "차단 목록",
   "popup.whitelist": "허용 목록",
   "popup.listMode.whitelistTooltip": "허용 목록 모드: 허용 규칙과 일치하는 콘텐츠 표시",
@@ -2413,5 +2418,9 @@
   "dashboard.helpBubble.tip51": "다른 기기를 위해 페어링 링크를 복사하세요. 받는 기기도 같은 안전 문구를 확인해야 합니다.",
   "dashboard.helpBubble.tip52": "먼저 페어링을 시작하세요. 그러면 이 영역에 다른 기기를 위한 QR 또는 상태 메시지가 표시됩니다.",
   "dashboard.helpBubble.tip53": "신뢰 기기는 확인된 관계를 기억하므로 다음에 더 쉽게 보낼 수 있습니다.",
-  "dashboard.helpBubble.tip54": "저장된 신뢰는 실시간 연결이 아니며 로컬 검증을 건너뛰지 않습니다."
+  "dashboard.helpBubble.tip54": "저장된 신뢰는 실시간 연결이 아니며 로컬 검증을 건너뛰지 않습니다.",
+  "dashboard.sync.familyDeviceMap.selection.localPhraseConfirmedDetail": "Phrase confirmed here. Confirm it on the other device before sending.",
+  "dashboard.sync.familyDeviceMap.map.localPhraseConfirmedDetail": "Phrase confirmed here. Confirm it on the other device before sending.",
+  "dashboard.sync.familyDeviceMap.map.compassRuleLocalConfirmed": "Phrase confirmed here. Confirm it on the other device, then review and send the update.",
+  "dashboard.sync.familyDeviceMap.trusted.sessionDevice": "Session device {label}"
 }

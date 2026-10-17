@@ -1,4 +1,9 @@
 {
+  "dashboard.sync.picker.receiveConfirmed": "An tabbatar da jimlar a nan. A bar FilterTube a buɗe a kan na’urori biyun. Ana jiran sabuntawa daga mahaifi.",
+  "dashboard.sync.picker.receivePermissions": "Sabuntawa suna bin izinin da mahaifi ya amince da shi a wannan na’ura.",
+  "dashboard.sync.picker.receiveModeEyebrow": "Karɓa kawai",
+  "dashboard.sync.picker.receiveModeTitle": "Wannan bayanin martaba mai kariya",
+  "dashboard.sync.picker.receiveModeBody": "Mahaifi yana aika canje-canje.",
   "popup.blocklist": "Jerin toshewa",
   "popup.whitelist": "Jerin izini",
   "popup.listMode.whitelistTooltip": "Yanayin jerin izini: nuna abin da ya dace da dokokin izini",
@@ -2413,5 +2418,9 @@
   "dashboard.helpBubble.tip51": "Kwafi hanyar haɗawar domin wata na'ura. Na'urar da za ta karɓa har yanzu dole ta tabbatar da jimlar tsaro iri ɗaya.",
   "dashboard.helpBubble.tip52": "Fara haɗawa tukuna, sannan wannan wuri zai nuna QR ko saƙon matsayi ga ɗayar na'urar.",
   "dashboard.helpBubble.tip53": "Na'urorin amintattu suna tuna dangantakar da aka tantance domin sauƙaƙa aikawa a nan gaba.",
-  "dashboard.helpBubble.tip54": "Amincewar da aka adana ba haɗin kai tsaye ba ce kuma ba ta tsallake tantancewar gida."
+  "dashboard.helpBubble.tip54": "Amincewar da aka adana ba haɗin kai tsaye ba ce kuma ba ta tsallake tantancewar gida.",
+  "dashboard.sync.familyDeviceMap.selection.localPhraseConfirmedDetail": "Phrase confirmed here. Confirm it on the other device before sending.",
+  "dashboard.sync.familyDeviceMap.map.localPhraseConfirmedDetail": "Phrase confirmed here. Confirm it on the other device before sending.",
+  "dashboard.sync.familyDeviceMap.map.compassRuleLocalConfirmed": "Phrase confirmed here. Confirm it on the other device, then review and send the update.",
+  "dashboard.sync.familyDeviceMap.trusted.sessionDevice": "Session device {label}"
 }

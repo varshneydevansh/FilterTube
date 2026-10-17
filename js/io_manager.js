@@ -671,14 +671,32 @@
     }
 
     /** Thin promise wrapper around chrome.storage.local.get */
-    async function readStorage(keys) {
-        return new Promise((resolve) => {
-            if (!STORAGE_NAMESPACE) return resolve({});
-            try {
-                STORAGE_NAMESPACE.get(keys, (items) => resolve(items || {}));
-            } catch (e) {
-                resolve({});
+    async function readStorage(keys, { required = false } = {}) {
+        return new Promise((resolve, reject) => {
+            let settled = false;
+            const succeeded = items => {
+                if (settled) return;
+                settled = true;
+                resolve(items || {});
+            };
+            const failed = error => {
+                if (settled) return;
+                settled = true;
+                if (required) reject(error instanceof Error ? error : new Error(normalizeString(error?.message) || 'Extension storage could not be read. Try again.'));
+                else resolve({});
+            };
+            if (!STORAGE_NAMESPACE || typeof STORAGE_NAMESPACE.get !== 'function') {
+                failed(new Error('Extension storage read is unavailable.'));
+                return;
             }
+            try {
+                const pending = STORAGE_NAMESPACE.get(keys, items => {
+                    const error = runtimeAPI?.runtime?.lastError;
+                    if (error) failed(error);
+                    else succeeded(items);
+                });
+                if (pending && typeof pending.then === 'function') pending.then(succeeded, failed);
+            } catch (error) { failed(error); }
         });
     }
 
@@ -809,7 +827,7 @@
 
     async function restoreStorageSnapshot(snapshot) {
         const safeSnapshot = safeObject(snapshot);
-        const current = await readStorage(null);
+        const current = await readStorage(null, { required: true });
         const extraKeys = Object.keys(safeObject(current)).filter(
             key => !Object.prototype.hasOwnProperty.call(safeSnapshot, key)
         );
@@ -1824,6 +1842,59 @@
         };
     }
 
+    function mergeNanahTrustedBackupLinks(existingLinks, incomingLinks, strategy) {
+        const describe = value => {
+            const raw = safeObject(value), policy = safeObject(raw.policy);
+            const role = value => ['source', 'replica', 'peer'].includes(normalizeString(value).toLowerCase())
+                ? normalizeString(value).toLowerCase() : 'peer';
+            const localRole = role(raw.localRole), remoteRole = role(raw.remoteRole || raw.role);
+            const requestedType = normalizeString(raw.linkType || policy.linkType);
+            const managedRoles = (localRole === 'source' && remoteRole === 'replica')
+                || (localRole === 'replica' && remoteRole === 'source');
+            const linkType = ['managed_link', 'peer_link'].includes(requestedType)
+                ? requestedType : (managedRoles ? 'managed_link' : 'peer_link');
+            const sourceDeviceId = normalizeString(raw.sourceDeviceId || policy.sourceDeviceId);
+            const targetDeviceId = normalizeString(raw.targetDeviceId || policy.targetDeviceId);
+            const sourceProfileId = normalizeString(raw.sourceProfileId || policy.sourceProfileId);
+            const targetProfileBehavior = normalizeString(policy.targetProfileBehavior || raw.targetProfileBehavior).toLowerCase() === 'fixed_profile'
+                ? 'fixed_profile' : 'current_active';
+            const targetProfileId = normalizeString(policy.targetProfileId || raw.targetProfileId);
+            return {
+                id: normalizeString(raw.linkId),
+                binding: JSON.stringify([normalizeString(raw.remoteDeviceId), localRole, remoteRole, linkType,
+                    sourceDeviceId, targetDeviceId, sourceProfileId, targetProfileBehavior, targetProfileId]),
+                hasLegacyBinding: !!(normalizeString(raw.localRole) || normalizeString(raw.remoteRole || raw.role)
+                    || sourceDeviceId || targetDeviceId || sourceProfileId || targetProfileId)
+            };
+        };
+        const explicitIds = new Map();
+        const validate = row => {
+            const identity = describe(row);
+            if (identity.id) {
+                if (explicitIds.has(identity.id) && explicitIds.get(identity.id) !== identity.binding) {
+                    throw new Error('Trusted-device recovery contains a link ID bound to another device, parent, or receiving profile. Review the backup before restoring.');
+                }
+                explicitIds.set(identity.id, identity.binding);
+            }
+            return identity;
+        };
+        // Validate the whole approved restore before any settings/profile writes,
+        // including collisions in a replace backup and against existing IDs.
+        safeArray(existingLinks).forEach(validate);
+        safeArray(incomingLinks).forEach(validate);
+        const merged = new Map();
+        let unknownLegacy = 0;
+        const add = row => {
+            const identity = describe(row);
+            const key = identity.id ? `id:${identity.id}`
+                : (identity.hasLegacyBinding ? `legacy:${identity.binding}` : `unknown:${unknownLegacy++}`);
+            merged.set(key, row);
+        };
+        if (strategy !== 'replace') safeArray(existingLinks).forEach(add);
+        safeArray(incomingLinks).forEach(add);
+        return Array.from(merged.values());
+    }
+
     /**
      * Entry point for imports: auto-detect format and convert to canonical v3
      * structure so downstream merging logic doesn’t care about origin.
@@ -2024,10 +2095,36 @@
         });
     }
 
-    async function importV3(json, { strategy = 'merge', scope = 'auto', auth = null, targetProfileId = null } = {}) {
+    async function importV3(json, options = {}) {
+        const coordinator = global.FilterTubeNanahStorageLock;
+        if (typeof coordinator?.run !== 'function') {
+            throw new Error('Secure device storage locking is unavailable. Reload this page before importing settings.');
+        }
+        return coordinator.run(() => importV3Unlocked(json, options), options.nanahStorageLockToken ?? null);
+    }
+
+    async function importV3Unlocked(json, { strategy = 'merge', scope = 'auto', auth = null, targetProfileId = null, beforeProfileWrite = null } = {}) {
         const parsed = normalizeIncomingV3(json);
         if (!parsed.ok) {
             throw new Error(parsed.error || 'Invalid file');
+        }
+
+        // Snapshot before any settings/profile loader can initialize storage.
+        const storageSnapshot = JSON.parse(JSON.stringify(await readStorage(null, { required: true })));
+        const rawRoot = safeObject(json);
+        const incomingNanahState = normalizeNanahBackupState(rawRoot.nanahState);
+        let trustedNanahRestorePayload = null;
+        let trustedRestoreActiveId = null;
+        if (incomingNanahState && auth?.restoreTrustedNanahState === true) {
+            const stored = await readStorage([FT_PROFILES_V4_KEY, NANAH_TRUSTED_LINKS_KEY, NANAH_DEVICE_ID_KEY], { required: true });
+            trustedRestoreActiveId = normalizeString(safeObject(stored[FT_PROFILES_V4_KEY]).activeProfileId) || DEFAULT_PROFILE_ID;
+            if (resolveProfileScope(scope, trustedRestoreActiveId) === 'full' && trustedRestoreActiveId === DEFAULT_PROFILE_ID) {
+                trustedNanahRestorePayload = {
+                    [NANAH_TRUSTED_LINKS_KEY]: mergeNanahTrustedBackupLinks(
+                        stored[NANAH_TRUSTED_LINKS_KEY], incomingNanahState.trustedLinks, strategy)
+                };
+                if (incomingNanahState.deviceId) trustedNanahRestorePayload[NANAH_DEVICE_ID_KEY] = incomingNanahState.deviceId;
+            }
         }
 
         const SettingsAPI = global.FilterTubeSettings || {};
@@ -2075,9 +2172,10 @@
             );
         }
 
-        const rawRoot = safeObject(json);
         const rawMeta = safeObject(rawRoot.meta);
-        const incomingNanahState = normalizeNanahBackupState(rawRoot.nanahState);
+        if (trustedRestoreActiveId !== null && trustedRestoreActiveId !== localActiveId) {
+            throw new Error('The active profile changed before trusted-device recovery. Review the backup again.');
+        }
         const incomingExportType = normalizeString(rawMeta.exportType);
         const incomingExportProfileId = normalizeString(rawMeta.profileId);
 
@@ -2220,18 +2318,18 @@
                 : current.contentFilters
         };
 
-        const storageSnapshot = JSON.parse(JSON.stringify(await readStorage(null)));
         const storagePreflight = await buildImportStoragePreflight(json, parsed);
         let importMutationStarted = false;
         let importedTargetProfileId = effectiveLocalTargetId;
         let result = null;
         let restoredNanahState = false;
+        if (typeof beforeProfileWrite === 'function') await beforeProfileWrite(effectiveLocalTargetId);
 
         try {
-            importMutationStarted = true;
-            result = shouldImportIntoSeparateProfile
-                ? { compiledSettings: null, error: null, skipped: true }
-                : await SettingsAPI.saveSettings(payload);
+            importMutationStarted = shouldTouchLegacyV3;
+            result = shouldTouchLegacyV3
+                ? await SettingsAPI.saveSettings(payload)
+                : { compiledSettings: null, error: null, skipped: true };
             if (result?.error) {
                 throw new Error(storageErrorMessage({ ok: false, error: result.error }, 'Compiled settings write'));
             }
@@ -2486,6 +2584,8 @@
                 }
             };
 
+            if (typeof beforeProfileWrite === 'function') await beforeProfileWrite(targetProfileId);
+            importMutationStarted = true;
             requireStorageSuccess(await saveProfilesV4({
                 ...nextV4,
                 schemaVersion: 4,
@@ -2505,37 +2605,8 @@
             requireStorageSuccess(await writeStorage({ channelMap: nextChannelMap }), 'Channel identity map write');
         }
 
-        if (
-            incomingNanahState
-            && auth?.restoreTrustedNanahState === true
-            && effectiveScope === 'full'
-            && effectiveLocalTargetId === DEFAULT_PROFILE_ID
-        ) {
-            const existingNanah = await readStorage([NANAH_TRUSTED_LINKS_KEY, NANAH_DEVICE_ID_KEY]);
-            const existingTrustedLinks = safeArray(existingNanah?.[NANAH_TRUSTED_LINKS_KEY]);
-            const incomingTrustedLinks = safeArray(incomingNanahState.trustedLinks);
-            const mergedTrustedLinks = strategy === 'replace'
-                ? incomingTrustedLinks
-                : (() => {
-                    const merged = new Map();
-                    existingTrustedLinks.forEach((entry) => {
-                        const key = normalizeString(safeObject(entry).remoteDeviceId) || normalizeString(safeObject(entry).linkId);
-                        if (key) merged.set(key, entry);
-                    });
-                    incomingTrustedLinks.forEach((entry) => {
-                        const key = normalizeString(safeObject(entry).remoteDeviceId) || normalizeString(safeObject(entry).linkId);
-                        if (key) merged.set(key, entry);
-                    });
-                    return Array.from(merged.values());
-                })();
-
-            const nanahPayload = {
-                [NANAH_TRUSTED_LINKS_KEY]: mergedTrustedLinks
-            };
-            if (incomingNanahState.deviceId) {
-                nanahPayload[NANAH_DEVICE_ID_KEY] = incomingNanahState.deviceId;
-            }
-            requireStorageSuccess(await writeStorage(nanahPayload), 'Trusted-device recovery write');
+        if (trustedNanahRestorePayload && effectiveScope === 'full' && effectiveLocalTargetId === DEFAULT_PROFILE_ID) {
+            requireStorageSuccess(await writeStorage(trustedNanahRestorePayload), 'Trusted-device recovery write');
             restoredNanahState = true;
         }
 
@@ -2654,7 +2725,7 @@
         };
     }
 
-    async function importV3Encrypted(container, { password = '', strategy = 'merge', scope = 'auto', auth = null } = {}) {
+    async function importV3Encrypted(container, { password = '', strategy = 'merge', scope = 'auto', auth = null, nanahStorageLockToken = null } = {}) {
         const Security = global.FilterTubeSecurity || null;
         if (!Security || typeof Security.decryptJson !== 'function') {
             throw new Error('Security manager unavailable');
@@ -2665,7 +2736,7 @@
             throw new Error('Invalid encrypted backup');
         }
         const decrypted = await Security.decryptJson(root.encrypted, password);
-        return importV3(decrypted, { strategy, scope, auth });
+        return importV3(decrypted, { strategy, scope, auth, nanahStorageLockToken });
     }
 
     // ============================================================================

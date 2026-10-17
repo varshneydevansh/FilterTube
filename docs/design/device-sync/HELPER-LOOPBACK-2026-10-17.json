@@ -1,0 +1,16 @@
+{
+  "kind": "two helpers on one computer; real HTTP and loopback UDP; synthetic data only",
+  "checkedAt": "2026-10-16T19:45:31.953Z",
+  "milestones": [
+    "HTTP helper requires configured bearer token",
+    "opted-in receiver crosses helper boundaries",
+    "pairing invitation reaches receiver with its local token",
+    "withdrawal removes the discovered receiver",
+    "UDP packets exclude receive token; discovery creates no settings delivery"
+  ],
+  "physicalLanVerified": false,
+  "browserPairingVerified": false,
+  "persistentStoreDisabled": true,
+  "inheritedTlsDisabled": true,
+  "ok": true
+}

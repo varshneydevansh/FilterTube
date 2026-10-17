@@ -1,4 +1,9 @@
 {
+  "dashboard.sync.picker.receiveConfirmed": "இங்கே உரை உறுதிப்படுத்தப்பட்டது. இரு சாதனங்களையும் திறந்தவையாக வைத்திருங்கள். பெற்றோர் புதுப்பிப்பை எதிர்நோக்குகிறோம்.",
+  "dashboard.sync.picker.receivePermissions": "இந்த சாதனத்தில் பெற்றோர் அங்கீகரித்த அனுமதிகளின் அடிப்படையில் புதுப்பிப்புகள் நடைபெறும்.",
+  "dashboard.sync.picker.receiveModeEyebrow": "பெற மட்டும்",
+  "dashboard.sync.picker.receiveModeTitle": "இந்த பாதுகாக்கப்பட்ட சுயவிவரம்",
+  "dashboard.sync.picker.receiveModeBody": "பெற்றோர் மாற்றங்களை அனுப்புகிறார்.",
   "popup.blocklist": "தடுப்புப் பட்டியல்",
   "popup.whitelist": "அனுமதிப் பட்டியல்",
   "popup.listMode.whitelistTooltip": "அனுமதிப் பட்டியல் பயன்முறை: அனுமதி விதிகளுடன் பொருந்தும் உள்ளடக்கத்தைக் காட்டு",
@@ -2413,5 +2418,9 @@
   "dashboard.helpBubble.tip51": "மற்றொரு சாதனத்திற்கான இணைப்பு இணைப்பை நகலெடுக்கவும். பெறும் சாதனமும் அதே பாதுகாப்புச் சொற்றொடரைச் சரிபார்க்க வேண்டும்.",
   "dashboard.helpBubble.tip52": "முதலில் இணைப்பைத் தொடங்கவும்; பிறகு இந்தப் பகுதி மற்ற சாதனத்திற்கான QR அல்லது நிலைச் செய்தியைக் காட்டும்.",
   "dashboard.helpBubble.tip53": "நம்பகமான சாதனங்கள் சரிபார்க்கப்பட்ட உறவை நினைவில் வைத்திருப்பதால் அடுத்தடுத்த அனுப்பல்கள் எளிதாகும்.",
-  "dashboard.helpBubble.tip54": "சேமிக்கப்பட்ட நம்பிக்கை நேரடி இணைப்பு அல்ல; உள்ளூர் சரிபார்ப்பை ஒருபோதும் தவிர்க்காது."
+  "dashboard.helpBubble.tip54": "சேமிக்கப்பட்ட நம்பிக்கை நேரடி இணைப்பு அல்ல; உள்ளூர் சரிபார்ப்பை ஒருபோதும் தவிர்க்காது.",
+  "dashboard.sync.familyDeviceMap.selection.localPhraseConfirmedDetail": "Phrase confirmed here. Confirm it on the other device before sending.",
+  "dashboard.sync.familyDeviceMap.map.localPhraseConfirmedDetail": "Phrase confirmed here. Confirm it on the other device before sending.",
+  "dashboard.sync.familyDeviceMap.map.compassRuleLocalConfirmed": "Phrase confirmed here. Confirm it on the other device, then review and send the update.",
+  "dashboard.sync.familyDeviceMap.trusted.sessionDevice": "Session device {label}"
 }

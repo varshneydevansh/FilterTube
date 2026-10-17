@@ -1,4 +1,9 @@
 {
+  "dashboard.sync.picker.receiveConfirmed": "Cụm từ đã được xác nhận tại đây. Giữ cả hai thiết bị mở. Đang chờ cập nhật của phụ huynh.",
+  "dashboard.sync.picker.receivePermissions": "Cập nhật tuân theo quyền được phụ huynh phê duyệt trên thiết bị này.",
+  "dashboard.sync.picker.receiveModeEyebrow": "Chỉ nhận",
+  "dashboard.sync.picker.receiveModeTitle": "Hồ sơ được bảo vệ này",
+  "dashboard.sync.picker.receiveModeBody": "Phụ huynh gửi thay đổi.",
   "popup.blocklist": "Danh sách chặn",
   "popup.whitelist": "Danh sách cho phép",
   "popup.listMode.whitelistTooltip": "Chế độ danh sách cho phép: hiển thị nội dung khớp với quy tắc cho phép",
@@ -2413,5 +2418,9 @@
   "dashboard.helpBubble.tip51": "Sao chép liên kết ghép nối cho thiết bị khác. Thiết bị nhận vẫn phải xác minh cùng cụm từ an toàn.",
   "dashboard.helpBubble.tip52": "Trước tiên hãy bắt đầu ghép nối, sau đó khu vực này sẽ hiện QR hoặc thông báo trạng thái cho thiết bị kia.",
   "dashboard.helpBubble.tip53": "Thiết bị đáng tin cậy ghi nhớ mối quan hệ đã xác minh để những lần gửi sau dễ dàng hơn.",
-  "dashboard.helpBubble.tip54": "Niềm tin đã lưu không phải kết nối trực tiếp và không bao giờ bỏ qua bước xác thực cục bộ."
+  "dashboard.helpBubble.tip54": "Niềm tin đã lưu không phải kết nối trực tiếp và không bao giờ bỏ qua bước xác thực cục bộ.",
+  "dashboard.sync.familyDeviceMap.selection.localPhraseConfirmedDetail": "Phrase confirmed here. Confirm it on the other device before sending.",
+  "dashboard.sync.familyDeviceMap.map.localPhraseConfirmedDetail": "Phrase confirmed here. Confirm it on the other device before sending.",
+  "dashboard.sync.familyDeviceMap.map.compassRuleLocalConfirmed": "Phrase confirmed here. Confirm it on the other device, then review and send the update.",
+  "dashboard.sync.familyDeviceMap.trusted.sessionDevice": "Session device {label}"
 }

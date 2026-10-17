@@ -286,10 +286,21 @@ test('reference provider supports short-lived nearby pairing without exposing th
     assert.equal(Object.hasOwn(announce.body.candidate, 'receiveToken'), false);
     assert.equal(Object.hasOwn(announce.body.candidate, 'receiveTokenHash'), false);
 
+    const replacement = await postJson(`${baseUrl}/managed-local-network/presence/announce`, {
+      candidateId: 'nearby-child-1', receiveToken: 'different-token', label: 'Impersonated laptop'
+    });
+    assert.equal(replacement.response.status, 403);
+    assert.equal(replacement.body.reason, 'nearby_receive_token_mismatch');
+    const refresh = await postJson(`${baseUrl}/managed-local-network/presence/announce`, {
+      candidateId: 'nearby-child-1', receiveToken: 'ephemeral-receive-token', label: 'Study laptop'
+    });
+    assert.equal(refresh.body.ok, true);
+
     const discovered = await postJson(`${baseUrl}/managed-local-network/presence/discover`, {});
     assert.equal(discovered.body.ok, true);
     assert.equal(discovered.body.candidates.length, 1);
     assert.equal(discovered.body.candidates[0].candidateId, 'nearby-child-1');
+    assert.equal(discovered.body.candidates[0].label, 'Study laptop');
     assert.equal(discovered.body.candidates[0].state, 'nearby-unpaired');
     assert.equal(Object.hasOwn(discovered.body.candidates[0], 'receiveToken'), false);
 

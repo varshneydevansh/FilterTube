@@ -2,7 +2,7 @@
   "english": {
     "dashboard.sync.providerModal.findDevicesNearby": "Find devices nearby",
     "dashboard.sync.providerModal.codeOrQRWorksWithoutSetupAutomaticNearbySelectionNeedsTheSmallFilterTubeHelperRunningOnEachComputer": "Code or QR works without setup. Automatic nearby selection needs the small FilterTube helper running on each computer.",
-    "dashboard.sync.providerModal.theHelperShowsOnlyDevicesThatChooseLetThisDeviceAppear": "The helper shows only devices that choose Let this device appear.",
+    "dashboard.sync.providerModal.theHelperShowsOnlyDevicesThatChooseLetThisDeviceAppear": "The helper shows only devices that choose Receive nearby.",
     "dashboard.sync.providerModal.findingADeviceDoesNotGrantPermissionBothScreensMustStillShowTheSameSafetyPhrase": "Finding a device does not grant permission; both screens must still show the same safety phrase.",
     "dashboard.sync.providerModal.noRulesPINsProfileIDsOrPrivateKeysAreBroadcastOnTheNetwork": "No rules, PINs, profile IDs, or private keys are broadcast on the network.",
     "dashboard.sync.providerModal.useCodeOrQR": "Use Code or QR",

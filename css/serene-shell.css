@@ -2547,12 +2547,12 @@ html[data-theme="dark"] .btn-secondary:hover {
 }
 
 .sync-shell #familyDeviceUpdatesCard {
-    order: 2;
+    order: 1;
     margin-top: 0;
 }
 
 .sync-shell .settings-grid {
-    order: 1;
+    order: 2;
 }
 
 .view-hero {
@@ -3993,134 +3993,6 @@ html[data-theme="dark"] .dashboard-app-preview__player {
     background:
         radial-gradient(circle at 50% 44%, rgba(var(--nanah-map-accent), 0.11), transparent 24%),
         linear-gradient(180deg, rgba(255, 255, 255, 0.7), rgba(248, 244, 238, 0.46));
-}
-
-.nanah-device-compass-stage:has(.nanah-device-compass[data-protected-count="0"]) .nanah-device-compass-stage__steps,
-.nanah-device-compass[data-protected-count="0"] .nanah-device-compass__center,
-.nanah-device-compass[data-protected-count="0"] .nanah-device-compass__choice:nth-child(2),
-.nanah-device-compass[data-protected-count="0"] .nanah-device-compass__choice:nth-child(3),
-.nanah-device-compass[data-protected-count="0"] .nanah-device-compass__trusted-strip,
-.nanah-device-compass[data-protected-count="0"] .nanah-device-compass__presence-row,
-.nanah-device-compass[data-protected-count="0"] .nanah-device-compass__selection-preview,
-.nanah-device-compass[data-protected-count="0"] .nanah-device-compass__evidence-row {
-    display: none;
-}
-
-#familyDeviceUpdatesCard:has(.nanah-device-compass[data-protected-count="0"]) .nanah-parent-edit-model,
-#familyDeviceUpdatesCard:has(.nanah-device-compass[data-protected-count="0"]) .nanah-sync-simple-path,
-#familyDeviceUpdatesCard:has(.nanah-device-compass[data-protected-count="0"]) .nanah-delivery-strip,
-#familyDeviceUpdatesCard:has(.nanah-device-compass[data-protected-count="0"]) .nanah-pairing-details {
-    display: none;
-}
-
-#familyDeviceUpdatesCard:has(.nanah-device-compass[data-protected-count="0"]) .nanah-device-compass-stage,
-#familyDeviceUpdatesCard:has(.nanah-device-compass[data-protected-count="0"]) #ftNanahQuickSendUpdateBtn {
-    display: none;
-}
-
-#familyDeviceUpdatesCard:has(.nanah-device-compass[data-protected-count="0"]) .nanah-sync-shell[data-personal-sync-open="true"] .nanah-pairing-details {
-    display: block;
-}
-
-#familyDeviceUpdatesCard:has(.nanah-device-compass[data-protected-count="0"]) .nanah-sync-shell[data-personal-sync-open="true"] .nanah-device-compass-stage {
-    display: grid;
-}
-
-#familyDeviceUpdatesCard .nanah-sync-shell[data-personal-sync-open="true"] .nanah-device-compass[data-protected-count="0"] {
-    grid-template-columns: minmax(10rem, 0.72fr) repeat(2, minmax(13rem, 1fr));
-    grid-template-rows: auto auto auto;
-    gap: clamp(0.62rem, 1.2vw, 0.82rem);
-    padding: clamp(0.82rem, 1.35vw, 1rem);
-}
-
-#familyDeviceUpdatesCard .nanah-sync-shell[data-personal-sync-open="true"] .nanah-device-compass[data-protected-count="0"] .nanah-device-compass__grid {
-    display: contents;
-}
-
-#familyDeviceUpdatesCard .nanah-sync-shell[data-personal-sync-open="true"] .nanah-device-compass[data-protected-count="0"] .nanah-device-compass__center,
-#familyDeviceUpdatesCard .nanah-sync-shell[data-personal-sync-open="true"] .nanah-device-compass[data-protected-count="0"] .nanah-device-compass__choice:nth-child(2),
-#familyDeviceUpdatesCard .nanah-sync-shell[data-personal-sync-open="true"] .nanah-device-compass[data-protected-count="0"] .nanah-device-compass__selection-preview {
-    display: grid;
-}
-
-#familyDeviceUpdatesCard .nanah-sync-shell[data-personal-sync-open="true"] .nanah-device-compass[data-protected-count="0"] .nanah-device-compass__choice:nth-child(1) {
-    grid-column: 2;
-    grid-row: 1;
-    width: 100%;
-    max-width: none;
-    min-height: 8.4rem;
-}
-
-#familyDeviceUpdatesCard .nanah-sync-shell[data-personal-sync-open="true"] .nanah-device-compass[data-protected-count="0"] .nanah-device-compass__choice:nth-child(2) {
-    grid-column: 3;
-    grid-row: 1;
-    opacity: 1;
-    border-style: solid;
-    background: rgba(255, 255, 255, 0.66);
-    box-shadow: 0 16px 34px -32px rgba(20, 33, 45, 0.55);
-}
-
-#familyDeviceUpdatesCard .nanah-sync-shell[data-personal-sync-open="true"] .nanah-device-compass[data-protected-count="0"] .nanah-device-compass__choice:nth-child(3) {
-    display: none;
-}
-
-#familyDeviceUpdatesCard .nanah-sync-shell[data-personal-sync-open="true"] .nanah-device-compass[data-protected-count="0"] .nanah-device-compass__trusted-strip:not([hidden]),
-#familyDeviceUpdatesCard .nanah-sync-shell[data-personal-sync-open="true"] .nanah-device-compass[data-protected-count="0"] .nanah-device-compass__presence-row:not([hidden]) {
-    display: grid;
-}
-
-#familyDeviceUpdatesCard .nanah-sync-shell[data-personal-sync-open="true"] .nanah-device-compass[data-protected-count="0"] .nanah-device-compass__rule {
-    grid-column: 1 / -1;
-    grid-row: 2;
-}
-
-#familyDeviceUpdatesCard .nanah-sync-shell[data-personal-sync-open="true"] .nanah-device-compass[data-protected-count="0"] .nanah-device-compass__center {
-    grid-column: 1;
-    grid-row: 1;
-    width: min(8.4rem, 100%);
-}
-
-#familyDeviceUpdatesCard .nanah-sync-shell[data-personal-sync-open="true"] .nanah-device-compass[data-protected-count="0"] .nanah-device-compass__selection-preview {
-    grid-column: 1 / -1;
-    grid-row: 3;
-}
-
-#familyDeviceUpdatesCard .nanah-sync-shell[data-personal-sync-open="true"] .nanah-device-compass[data-protected-count="0"]::before,
-#familyDeviceUpdatesCard .nanah-sync-shell[data-personal-sync-open="true"] .nanah-device-compass[data-protected-count="0"]::after {
-    display: none;
-}
-
-#familyDeviceUpdatesCard:has(.nanah-device-compass[data-protected-count="0"]) .nanah-sync-intro {
-    grid-template-columns: minmax(0, 1fr);
-    min-height: 0;
-}
-
-#familyDeviceUpdatesCard:has(.nanah-device-compass[data-protected-count="0"]) .nanah-sync-intro__copy {
-    max-width: 48rem;
-}
-
-.nanah-device-compass[data-protected-count="0"] {
-    grid-template-columns: minmax(0, 1fr);
-    grid-template-rows: auto auto;
-    min-height: 0;
-    padding: 0.82rem;
-}
-
-.nanah-device-compass[data-protected-count="0"] .nanah-device-compass__grid {
-    display: block;
-    grid-column: 1;
-    grid-row: 1;
-}
-
-.nanah-device-compass[data-protected-count="0"] .nanah-device-compass__choice:nth-child(1) {
-    width: 100%;
-    max-width: none;
-    min-height: 5.5rem;
-}
-
-.nanah-device-compass[data-protected-count="0"] .nanah-device-compass__rule {
-    grid-column: 1;
-    grid-row: 2;
 }
 
 .nanah-device-compass::before {
@@ -6450,6 +6322,18 @@ html[data-theme="dark"] .dashboard-app-preview__player {
     font-size: 0.96rem;
     line-height: 1.65;
     color: var(--ft-color-text-secondary);
+}
+
+.nanah-managed-modal__options > summary {
+    min-height: 44px;
+    padding: 12px 0;
+    cursor: pointer;
+}
+
+.nanah-managed-modal__options > summary:focus-visible {
+    outline: 2px solid var(--ft-color-brand-primary);
+    outline-offset: 3px;
+    border-radius: 6px;
 }
 
 .nanah-managed-modal__section {
@@ -9294,4 +9178,291 @@ html[data-theme="dark"] body.ft-extension-surface[data-surface="tab-view"] .ft-a
     border-color: #c96254;
     background: #a93e31;
     color: #fff8f1;
+}
+/* Device-first picker. Rings show discovery activity, never distance or trust. */
+#familyDeviceUpdatesCard .nanah-sync-intro {
+    padding: 0;
+    border: 0;
+    background: transparent;
+    box-shadow: none;
+}
+
+#familyDeviceUpdatesCard .nanah-device-compass {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+    padding: 0;
+    border: 0;
+    background: transparent;
+    box-shadow: none;
+}
+
+#familyDeviceUpdatesCard .nanah-device-compass::before,
+#familyDeviceUpdatesCard .nanah-device-compass::after {
+    content: none;
+}
+
+#familyDeviceUpdatesCard .nanah-device-compass-stage {
+    display: grid;
+    width: 100%;
+    padding: 0;
+    border: 0;
+    background: transparent;
+    box-shadow: none;
+    border-color: var(--ft-color-sem-neutral-border);
+}
+
+.nanah-device-toolbar {
+    display: flex;
+    flex-wrap: wrap;
+    gap: .65rem;
+}
+
+.nanah-device-toolbar button {
+    flex: 1 1 10rem;
+    min-height: 3.5rem;
+}
+
+.nanah-device-discovery-note {
+    margin: 0;
+    max-width: 64ch;
+    font-size: .85rem;
+    line-height: 1.5;
+    color: var(--ft-color-text-secondary);
+}
+
+.nanah-device-radar {
+    position: relative;
+    isolation: isolate;
+    display: grid;
+    gap: 1rem;
+    padding: 1rem .5rem;
+    overflow: hidden;
+    border-radius: .8rem;
+}
+
+.nanah-device-radar__rings {
+    position: absolute;
+    inset: 0;
+    z-index: -1;
+    pointer-events: none;
+}
+
+.nanah-device-radar__rings i {
+    position: absolute;
+    left: 50%;
+    top: 2.75rem;
+    width: 14rem;
+    aspect-ratio: 1;
+    border: 1px solid rgba(var(--nanah-map-accent), .18);
+    border-radius: 50%;
+    transform: translate(-50%, -50%);
+}
+
+.nanah-device-radar__rings i:nth-child(2) { width: 26rem; }
+.nanah-device-radar__rings i:nth-child(3) { width: 38rem; }
+
+.nanah-device-compass[data-nearby-discovery-active="true"] .nanah-device-radar__rings i {
+    animation: nanah-device-search 2.4s cubic-bezier(.22, 1, .36, 1) 50;
+}
+
+@keyframes nanah-device-search {
+    0%, 100% { opacity: .35; transform: translate(-50%, -50%) scale(.96); }
+    50% { opacity: 1; transform: translate(-50%, -50%) scale(1.04); }
+}
+
+.nanah-qr-actions { display: flex; flex-wrap: wrap; gap: .6rem; }
+.nanah-transfer-summary { margin: .5rem 0; color: var(--ft-color-text-primary); line-height: 1.5; overflow-wrap: anywhere; }
+.nanah-qr-reader { display: grid; gap: .65rem; }
+.nanah-qr-reader[hidden] { display: none; }
+.nanah-qr-reader video {
+    width: 100%;
+    max-height: 18rem;
+    object-fit: contain;
+    border-radius: .75rem;
+    background: var(--ft-color-bg-base);
+}
+.nanah-qr-reader p { color: var(--ft-color-text-secondary); }
+.nanah-qr-actions button, .nanah-qr-reader button { min-height: 2.75rem; }
+
+.ft-modal-overlay:has(.nanah-managed-modal) { padding: 1rem; }
+.ft-modal.nanah-managed-modal {
+    display: flex;
+    flex-direction: column;
+    max-height: calc(100dvh - 2rem);
+    overflow: hidden;
+}
+.nanah-managed-modal > .card-header { flex: 0 0 auto; }
+.nanah-managed-modal > .ft-modal-body {
+    flex: 1 1 auto;
+    min-height: 0;
+    overflow-y: auto;
+    overscroll-behavior: contain;
+}
+.nanah-managed-modal > .nanah-managed-modal__actions {
+    flex: 0 0 auto;
+    padding: .8rem 1rem;
+    margin: 0;
+    background: var(--ft-color-bg-surface);
+}
+
+#familyDeviceUpdatesCard .nanah-device-radar .nanah-device-compass__center {
+    display: grid;
+    grid-column: auto;
+    grid-row: auto;
+    margin: 0 auto;
+    width: min(100%, 24rem);
+    min-height: 0;
+    aspect-ratio: auto;
+    padding: .65rem 1rem;
+    overflow-wrap: anywhere;
+    border-radius: .8rem;
+    background: var(--ft-color-bg-surface);
+    box-shadow: none;
+}
+
+#familyDeviceUpdatesCard .nanah-device-compass__hub-mark { display: none; }
+
+#familyDeviceUpdatesCard .nanah-device-setup .nanah-sync-intro__actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: .65rem;
+    padding-block: .5rem;
+}
+
+#familyDeviceUpdatesCard .nanah-device-setup .nanah-sync-intro__actions button { min-height: 2.75rem; }
+
+#familyDeviceUpdatesCard .nanah-device-compass__rule {
+    color: var(--ft-color-text-secondary);
+    background: var(--ft-color-bg-panel);
+}
+
+#familyDeviceUpdatesCard .nanah-sync-intro__actions [hidden] { display: none; }
+
+.nanah-device-empty {
+    max-width: 34rem;
+    margin: .75rem auto;
+    text-align: center;
+    color: var(--ft-color-text-secondary);
+    line-height: 1.6;
+}
+
+#familyDeviceUpdatesCard .nanah-device-compass__trusted-strip,
+#familyDeviceUpdatesCard .nanah-device-compass__nearby-list {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(min(100%, 15rem), 1fr));
+    grid-auto-flow: row;
+    grid-auto-columns: auto;
+    gap: .75rem;
+    overflow: visible;
+}
+
+#familyDeviceUpdatesCard .nanah-device-compass__trusted-device,
+#familyDeviceUpdatesCard .nanah-device-compass__nearby-device {
+    min-height: 5.5rem;
+    width: 100%;
+    min-width: 0;
+    text-align: start;
+    background: var(--ft-color-bg-surface);
+    transition: border-color 140ms ease-out, background-color 140ms ease-out;
+}
+
+#familyDeviceUpdatesCard .nanah-device-compass__presence-row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: .75rem;
+    background: var(--ft-color-bg-surface);
+}
+
+#familyDeviceUpdatesCard .nanah-device-compass__presence-copy {
+    flex: 1 1 16rem;
+}
+
+#familyDeviceUpdatesCard .nanah-device-compass__nearby-list {
+    flex-basis: 100%;
+}
+
+#familyDeviceUpdatesCard .nanah-device-compass__selection-preview {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: .35rem;
+    padding: 1rem;
+    background: var(--ft-color-bg-surface);
+}
+
+#familyDeviceUpdatesCard .nanah-device-compass__selection-buttons {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: flex-start;
+    gap: .65rem;
+    margin-top: .5rem;
+    grid-column: 1 / -1;
+    justify-self: start;
+}
+#familyDeviceUpdatesCard .nanah-device-compass__selection-buttons button {
+    min-height: 2.75rem;
+    max-width: 100%;
+    white-space: normal;
+}
+#familyDeviceUpdatesCard .nanah-device-compass__selection-button { min-height: 3.5rem; }
+#familyDeviceUpdatesCard .nanah-device-compass__selection-actions { display: none; }
+
+.nanah-device-help { width: 100%; }
+.nanah-device-help > summary {
+    cursor: pointer;
+    min-height: 2.75rem;
+    padding: .75rem .25rem;
+    font-weight: 600;
+    color: var(--ft-color-text-secondary);
+}
+
+#familyDeviceUpdatesCard .nanah-device-help .nanah-device-compass__grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(min(100%, 13rem), 1fr));
+    margin: .5rem 0;
+}
+
+#familyDeviceUpdatesCard .nanah-device-help .nanah-device-compass__choice {
+    grid-column: auto;
+    grid-row: auto;
+}
+
+#familyDeviceUpdatesCard .nanah-device-compass :is(button, summary):focus-visible {
+    outline: 3px solid var(--ft-color-brand-primary);
+    outline-offset: 3px;
+}
+
+#familyDeviceUpdatesCard [hidden] { display: none !important; }
+
+@media (prefers-reduced-motion: reduce) {
+    #familyDeviceUpdatesCard .nanah-device-radar__rings i { animation: none; }
+    #familyDeviceUpdatesCard .nanah-device-compass * { transition: none; }
+}
+
+/* Profile maintenance remains available without competing with device selection. */
+.ft-profile-options { margin-top: .65rem; }
+.ft-profile-options > summary {
+    min-height: 2.75rem;
+    padding: .6rem .2rem;
+    cursor: pointer;
+    color: var(--ft-color-text-secondary);
+    font-weight: 600;
+}
+.ft-profile-options__actions { display: flex; flex-wrap: wrap; gap: .5rem; padding-block: .5rem; }
+.ft-profile-options__actions button { min-height: 2.75rem; }
+.ft-profile-options > summary:focus-visible {
+    outline: 3px solid var(--ft-color-brand-primary);
+    outline-offset: 3px;
+}
+
+.ft-family-profile-tools { margin-top: 1rem; }
+.ft-family-profile-tools > summary {
+    padding: .75rem .2rem;
+    min-height: 2.75rem;
+    cursor: pointer;
+    font-weight: 600;
+}
+.ft-family-profile-tools > summary:focus-visible {
+    outline: 3px solid var(--ft-color-brand-primary);
+    outline-offset: 3px;
 }

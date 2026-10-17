@@ -1,4 +1,9 @@
 {
+  "dashboard.sync.picker.receiveConfirmed": "Phrase confirmée ici. Gardez les deux appareils ouverts. En attente d’une mise à jour parentale.",
+  "dashboard.sync.picker.receivePermissions": "Les mises à jour suivent les autorisations approuvées par un parent sur cet appareil.",
+  "dashboard.sync.picker.receiveModeEyebrow": "Réception uniquement",
+  "dashboard.sync.picker.receiveModeTitle": "Ce profil protégé",
+  "dashboard.sync.picker.receiveModeBody": "Le parent envoie les modifications.",
   "popup.blocklist": "Liste de blocage",
   "popup.whitelist": "Liste d’autorisation",
   "popup.listMode.whitelistTooltip": "Mode liste d’autorisation : afficher le contenu correspondant aux règles autorisées",
@@ -2413,5 +2418,9 @@
   "dashboard.helpBubble.tip51": "Copiez le lien d’association pour un autre appareil. L’appareil récepteur doit toujours vérifier la même phrase de sécurité.",
   "dashboard.helpBubble.tip52": "Commencez d’abord l’association ; cette zone affichera ensuite un QR ou un message d’état pour l’autre appareil.",
   "dashboard.helpBubble.tip53": "Les appareils de confiance mémorisent une relation vérifiée pour simplifier les prochains envois.",
-  "dashboard.helpBubble.tip54": "La confiance enregistrée n’est pas une connexion en direct et ne contourne jamais la validation locale."
+  "dashboard.helpBubble.tip54": "La confiance enregistrée n’est pas une connexion en direct et ne contourne jamais la validation locale.",
+  "dashboard.sync.familyDeviceMap.selection.localPhraseConfirmedDetail": "Phrase confirmed here. Confirm it on the other device before sending.",
+  "dashboard.sync.familyDeviceMap.map.localPhraseConfirmedDetail": "Phrase confirmed here. Confirm it on the other device before sending.",
+  "dashboard.sync.familyDeviceMap.map.compassRuleLocalConfirmed": "Phrase confirmed here. Confirm it on the other device, then review and send the update.",
+  "dashboard.sync.familyDeviceMap.trusted.sessionDevice": "Session device {label}"
 }

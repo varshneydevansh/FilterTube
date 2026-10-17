@@ -1,4 +1,9 @@
 {
+  "dashboard.sync.picker.receiveConfirmed": "यहाँ सुरक्षा वाक्यांश की पुष्टि हो गई है। दोनों डिवाइस पर FilterTube खुला रखें। अभिभावक के अपडेट की प्रतीक्षा है।",
+  "dashboard.sync.picker.receivePermissions": "अपडेट इस डिवाइस पर अभिभावक द्वारा स्वीकृत अनुमतियों के अनुसार लागू होते हैं।",
+  "dashboard.sync.picker.receiveModeEyebrow": "केवल प्राप्त करें",
+  "dashboard.sync.picker.receiveModeTitle": "यह संरक्षित प्रोफ़ाइल",
+  "dashboard.sync.picker.receiveModeBody": "माता‑पिता परिवर्तन भेजते हैं",
   "popup.blocklist": "अवरोध सूची",
   "popup.whitelist": "अनुमति सूची",
   "popup.listMode.whitelistTooltip": "अनुमति सूची मोड: अनुमति नियमों से मेल खाने वाली सामग्री दिखाएँ",
@@ -2413,5 +2418,9 @@
   "dashboard.helpBubble.tip51": "दूसरी डिवाइस के लिए जोड़ने वाला लिंक कॉपी करें। प्राप्त करने वाली डिवाइस को फिर भी वही सुरक्षा वाक्य सत्यापित करना होगा।",
   "dashboard.helpBubble.tip52": "पहले जोड़ना शुरू करें, फिर इस जगह पर दूसरी डिवाइस के लिए QR या स्थिति संदेश दिखेगा।",
   "dashboard.helpBubble.tip53": "विश्वसनीय डिवाइस सत्यापित संबंध याद रखते हैं, जिससे अगली बार भेजना आसान होता है।",
-  "dashboard.helpBubble.tip54": "सहेजा हुआ भरोसा लाइव कनेक्शन नहीं है और स्थानीय सत्यापन को कभी छोड़ता नहीं है।"
+  "dashboard.helpBubble.tip54": "सहेजा हुआ भरोसा लाइव कनेक्शन नहीं है और स्थानीय सत्यापन को कभी छोड़ता नहीं है।",
+  "dashboard.sync.familyDeviceMap.selection.localPhraseConfirmedDetail": "Phrase confirmed here. Confirm it on the other device before sending.",
+  "dashboard.sync.familyDeviceMap.map.localPhraseConfirmedDetail": "Phrase confirmed here. Confirm it on the other device before sending.",
+  "dashboard.sync.familyDeviceMap.map.compassRuleLocalConfirmed": "Phrase confirmed here. Confirm it on the other device, then review and send the update.",
+  "dashboard.sync.familyDeviceMap.trusted.sessionDevice": "Session device {label}"
 }

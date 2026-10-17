@@ -87,6 +87,8 @@ export function createManagedDeliveryLanDiscoveryMesh(options = {}) {
   const remoteCandidates = new Map();
   let socket = null;
   let heartbeatTimer = null;
+  let startPromise = null;
+  let finishStart = null;
   let started = false;
   let lastError = '';
   let lastBroadcastAtMs = 0;
@@ -233,31 +235,52 @@ export function createManagedDeliveryLanDiscoveryMesh(options = {}) {
 
   function start() {
     if (started) return Promise.resolve(true);
-    return new Promise((resolve) => {
-      const nextSocket = socketFactory();
+    if (startPromise) return startPromise;
+    const pending = new Promise((resolve) => {
+      finishStart = (result) => {
+        startPromise = null;
+        finishStart = null;
+        resolve(result);
+      };
+    });
+    startPromise = pending;
+    let nextSocket;
+    function fail(error) {
+      lastError = normalizeString(error?.message) || 'lan_discovery_start_failed';
+      try { nextSocket?.close(); } catch (_) {}
+      if (socket === nextSocket) socket = null;
+      finishStart?.(false);
+    }
+    try {
+      nextSocket = socketFactory();
       socket = nextSocket;
       nextSocket.on('message', receive);
       nextSocket.on('error', (error) => {
+        if (socket !== nextSocket) return;
         lastError = normalizeString(error.message) || 'lan_discovery_socket_error';
+        if (!started) fail(error);
       });
       nextSocket.bind(multicastPort, '0.0.0.0', () => {
+        if (socket !== nextSocket || !finishStart) return;
         try {
           nextSocket.addMembership(multicastAddress);
           nextSocket.setMulticastTTL(1);
           nextSocket.setMulticastLoopback(true);
+          lastError = '';
           started = true;
           broadcastPresence();
           heartbeatTimer = setInterval(broadcastPresence, HEARTBEAT_MS);
           heartbeatTimer.unref?.();
-          resolve(true);
+          finishStart(true);
         } catch (error) {
-          lastError = normalizeString(error.message) || 'lan_discovery_start_failed';
-          try { nextSocket.close(); } catch (_) {}
-          socket = null;
-          resolve(false);
+          started = false;
+          fail(error);
         }
       });
-    });
+    } catch (error) {
+      fail(error);
+    }
+    return pending;
   }
 
   function stop() {
@@ -266,6 +289,7 @@ export function createManagedDeliveryLanDiscoveryMesh(options = {}) {
     started = false;
     try { socket?.close(); } catch (_) {}
     socket = null;
+    finishStart?.(false);
     remoteCandidates.clear();
   }
 

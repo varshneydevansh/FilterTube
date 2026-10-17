@@ -48,6 +48,73 @@
         return Array.isArray(value) ? value : [];
     }
 
+    const relayHostTasks = new WeakMap();
+
+    function hostSessionWhenReady(client, { timeoutMs = 15000 } = {}) {
+        if (!client || typeof client.host !== 'function' || typeof client.on !== 'function') {
+            return Promise.reject(new Error('nanah_host_client_unavailable'));
+        }
+        if (relayHostTasks.has(client)) return relayHostTasks.get(client);
+        const transport = client.transport;
+        if (!transport || typeof transport.connectSocket !== 'function') {
+            return Promise.reject(new Error('nanah_host_readiness_unavailable'));
+        }
+        const originalConnectSocket = transport.connectSocket;
+        let expected = {};
+        let socket = null;
+        let hostingActive = true;
+        let resolveReady;
+        let rejectReady;
+        const ready = new Promise((resolve, reject) => { resolveReady = resolve; rejectReady = reject; });
+        const onMessage = event => {
+            let message;
+            try { message = safeObject(JSON.parse(String(event.data))); } catch (_) { return; }
+            if (message.type === 'session_ready'
+                && message.code === expected.code && message.sessionId === expected.sessionId) {
+                resolveReady();
+            } else if (message.type === 'error') {
+                rejectReady(new Error(normalizeString(message.error) || 'nanah_host_registration_failed'));
+            }
+        };
+        const onClose = () => rejectReady(new Error('nanah_host_registration_closed'));
+        const onError = () => rejectReady(new Error('nanah_host_registration_failed'));
+        const unsubscribe = client.on('code', result => { expected = safeObject(result); });
+        const connectWithReadiness = async function (...args) {
+            socket = await originalConnectSocket.apply(this, args);
+            if (!hostingActive) {
+                try { socket.close(); } catch (_) {}
+                throw new Error('nanah_host_registration_cancelled');
+            }
+            socket.addEventListener('message', onMessage);
+            socket.addEventListener('close', onClose);
+            socket.addEventListener('error', onError);
+            return socket;
+        };
+        transport.connectSocket = connectWithReadiness;
+        const timeout = global.setTimeout(() => rejectReady(new Error('nanah_host_registration_timeout')),
+            Math.max(1000, Math.min(30000, Number(timeoutMs) || 15000)));
+        const task = (async () => {
+            try {
+                const [result] = await Promise.all([Promise.resolve().then(() => client.host()), ready]);
+                return result;
+            } catch (error) {
+                try { await client.close(); } catch (_) {}
+                throw error;
+            } finally {
+                hostingActive = false;
+                global.clearTimeout(timeout);
+                if (typeof unsubscribe === 'function') unsubscribe();
+                socket?.removeEventListener('message', onMessage);
+                socket?.removeEventListener('close', onClose);
+                socket?.removeEventListener('error', onError);
+                if (transport.connectSocket === connectWithReadiness) transport.connectSocket = originalConnectSocket;
+                relayHostTasks.delete(client);
+            }
+        })();
+        relayHostTasks.set(client, task);
+        return task;
+    }
+
     function normalizeNonNegativeInteger(value) {
         const num = typeof value === 'number' ? value : Number(value);
         if (!Number.isInteger(num)) return null;
@@ -481,6 +548,30 @@
         return diff === 0;
     }
 
+    function validateManagedReceiverLocalOwnership(envelope, trustedLink, profiles) {
+        // Remote sourceProfileId stays pinned to the signer. A receiver-local grant
+        // separately records which local account approved control of this child.
+        // Older links retain their original same-ID authority requirement.
+        const trusted = safeObject(trustedLink);
+        const grantedParentId = normalizeString(trusted.localParentProfileId || safeObject(trusted.policy).localParentProfileId);
+        const localParentId = grantedParentId || normalizeString(envelope.sourceProfileId);
+        const parent = safeObject(profiles[localParentId]);
+        const parentType = normalizeString(parent.type).toLowerCase();
+        const grantOwnerIsChild = parentType === 'child'
+            || (parentType !== 'account' && !!normalizeString(parent.parentProfileId));
+        if (!Object.keys(parent).length || (grantedParentId ? grantOwnerIsChild : parent.type === 'child')) {
+            return validationResult('source_not_parent_authority');
+        }
+        const target = safeObject(profiles[envelope.targetProfileId]);
+        if (!Object.keys(target).length || target.type !== 'child') {
+            return validationResult('target_not_protected_child');
+        }
+        if (normalizeString(target.parentProfileId) !== localParentId) {
+            return validationResult('source_not_bound_to_target');
+        }
+        return null;
+    }
+
     function validateManagedPolicyEnvelope(envelope, context = {}) {
         const root = safeObject(envelope);
         const trustedLink = safeObject(context.trustedLink);
@@ -539,17 +630,8 @@
         if (root.keyVersion !== trustedLink.keyVersion) return validationResult('wrong_key_version');
 
         const profiles = managedPolicyProfileMap(context);
-        const sourceProfile = safeObject(profiles[root.sourceProfileId]);
-        const targetProfile = safeObject(profiles[root.targetProfileId]);
-        if (!sourceProfile || Object.keys(sourceProfile).length === 0 || sourceProfile.type === 'child') {
-            return validationResult('source_not_parent_authority');
-        }
-        if (!targetProfile || Object.keys(targetProfile).length === 0 || targetProfile.type !== 'child') {
-            return validationResult('target_not_protected_child');
-        }
-        if (normalizeString(targetProfile.parentProfileId) !== root.sourceProfileId) {
-            return validationResult('source_not_bound_to_target');
-        }
+        const ownershipDecision = validateManagedReceiverLocalOwnership(root, trustedLink, profiles);
+        if (ownershipDecision) return ownershipDecision;
 
         if (context.signatureVerified !== true && context.integrityVerified !== true) {
             const verifier = context.verifyIntegritySignature || context.verifyManagedPolicySignature;
@@ -1154,7 +1236,7 @@
         throw new Error(`Unsupported scoped payload: ${scope}`);
     }
 
-    async function applyScopedPortablePayload(io, portable, { strategy = 'merge', targetProfileId = null } = {}) {
+    async function applyScopedPortablePayload(io, portable, { strategy = 'merge', targetProfileId = null, beforeProfileWrite = null } = {}) {
         if (typeof io.loadProfilesV4 !== 'function' || typeof io.saveProfilesV4 !== 'function') {
             throw new Error('Profile-scoped Nanah sync requires load/saveProfilesV4');
         }
@@ -1191,6 +1273,7 @@
             };
         }
 
+        if (typeof beforeProfileWrite === 'function') await beforeProfileWrite(resolvedTargetProfileId);
         await io.saveProfilesV4({
             ...profilesV4,
             profiles
@@ -1630,6 +1713,7 @@
 
     async function applyManagedPolicyEnvelope(envelope, context = {}) {
         const root = safeObject(envelope);
+        const verifiedPublicKey = stableManagedNanahJson(getManagedNanahSourcePublicKeyJwk(context?.trustedLink));
         if (!context || Object.keys(safeObject(context)).length === 0) {
             return validationResult('missing_managed_validation_context');
         }
@@ -1638,7 +1722,7 @@
             await recordManagedPolicyDecisionHistory(root, validation, context);
             return validation;
         }
-        if (validation.decision === 'idempotent_same_hash') {
+        if (validation.decision === 'idempotent_same_hash' && typeof context.loadFreshManagedValidationContext !== 'function') {
             const result = {
                 ok: true,
                 accepted: true,
@@ -1657,24 +1741,51 @@
         if (typeof io.loadProfilesV4 !== 'function' || typeof io.saveProfilesV4 !== 'function') {
             throw new Error('Managed policy apply requires load/saveProfilesV4');
         }
+        // Browser receivers resolve current persisted and in-memory trust after
+        // signature verification. Standalone callers retain their supplied context.
+        let applyContext = context;
+        if (typeof context.loadFreshManagedValidationContext === 'function') {
+            try {
+                applyContext = await context.loadFreshManagedValidationContext(root);
+            } catch (error) {
+                return validationResult('fresh_trust_unavailable');
+            }
+            if (!applyContext || Object.keys(safeObject(applyContext)).length === 0) return validationResult('missing_trusted_link');
+        }
         const profilesV4 = safeObject(await io.loadProfilesV4());
         const profiles = { ...safeObject(profilesV4.profiles) };
+        if (typeof context.loadFreshManagedValidationContext === 'function') {
+            try {
+                if (typeof applyContext.getCurrentManagedValidationContext === 'function') {
+                    applyContext = applyContext.getCurrentManagedValidationContext(root);
+                }
+            } catch (error) {
+                return validationResult('fresh_trust_unavailable');
+            }
+            if (!applyContext || typeof applyContext.then === 'function') return validationResult('fresh_trust_unavailable');
+            const freshTrustedLink = safeObject(applyContext.trustedLink);
+            if (Object.keys(freshTrustedLink).length === 0) return validationResult('missing_trusted_link');
+            if (verifiedPublicKey !== stableManagedNanahJson(getManagedNanahSourcePublicKeyJwk(freshTrustedLink))) {
+                return validationResult('wrong_public_key');
+            }
+            applyContext = {
+                ...context,
+                ...applyContext,
+                profilesV4,
+                profiles,
+                signatureVerified: context.signatureVerified,
+                integrityVerified: context.integrityVerified,
+                verifyIntegritySignature: context.verifyIntegritySignature,
+                verifyManagedPolicySignature: context.verifyManagedPolicySignature
+            };
+            const freshValidation = validateManagedPolicyEnvelope(root, applyContext);
+            if (freshValidation.accepted !== true) return freshValidation;
+        }
         const targetProfile = safeObject(profiles[root.targetProfileId]);
-        const sourceProfile = safeObject(profiles[root.sourceProfileId]);
-        if (!targetProfile || Object.keys(targetProfile).length === 0 || targetProfile.type !== 'child') {
-            const result = validationResult('target_not_protected_child');
-            await recordManagedPolicyDecisionHistory(root, result, context);
-            return result;
-        }
-        if (!sourceProfile || Object.keys(sourceProfile).length === 0 || sourceProfile.type === 'child') {
-            const result = validationResult('source_not_parent_authority');
-            await recordManagedPolicyDecisionHistory(root, result, context);
-            return result;
-        }
-        if (normalizeString(targetProfile.parentProfileId) !== root.sourceProfileId) {
-            const result = validationResult('source_not_bound_to_target');
-            await recordManagedPolicyDecisionHistory(root, result, context);
-            return result;
+        const freshOwnershipDecision = validateManagedReceiverLocalOwnership(root, applyContext.trustedLink, profiles);
+        if (freshOwnershipDecision) {
+            await recordManagedPolicyDecisionHistory(root, freshOwnershipDecision, context);
+            return freshOwnershipDecision;
         }
         const latestAccepted = safeObject(safeObject(safeObject(targetProfile.managedPolicyState).remoteManagedPolicies)[root.linkId])[
             normalizeManagedPolicyScope(root.scope)
@@ -1794,12 +1905,67 @@
         return io;
     }
 
-    async function buildPortablePayload({ scope = 'active', auth = null } = {}) {
+    async function buildPortablePayload({ scope = 'active', auth = null, managedSourceProfileSnapshot = null } = {}) {
+        // Only the parent-authorized first managed send may provide a child rules
+        // snapshot. Personal copies and full backups retain their active-profile export.
+        let managedPortable = null;
+        if (managedSourceProfileSnapshot) {
+            const snapshot = cloneJson(managedSourceProfileSnapshot);
+            const profileId = normalizeString(snapshot.profileId);
+            const sourceProfile = safeObject(snapshot.profile);
+            const requestedScope = normalizeString(scope).toLowerCase();
+            if (!profileId || profileId === 'default' || sourceProfile.type !== 'child'
+                || !normalizeString(sourceProfile.parentProfileId)
+                || !['active', 'main', 'kids'].includes(requestedScope)) {
+                throw new Error('A managed first update requires a selected protected profile and active, Main, or Kids scope.');
+            }
+            const profileName = normalizeString(sourceProfile.name) || profileId;
+            if (requestedScope === 'main' || requestedScope === 'kids') {
+                managedPortable = {
+                    version: PAYLOAD_VERSION,
+                    meta: { exportType: 'nanah-scope', scope: requestedScope, profileId, profileName },
+                    section: requestedScope,
+                    profileId,
+                    profileName,
+                    data: safeObject(sourceProfile[requestedScope])
+                };
+            } else {
+                const main = safeObject(sourceProfile.main);
+                const kids = safeObject(sourceProfile.kids);
+                // Existing v3 profile format, containing this child's rules only.
+                // Local PIN verifiers, history and saved trust are not rule settings.
+                const profile = {
+                    type: 'child', parentProfileId: sourceProfile.parentProfileId, name: profileName,
+                    settings: safeObject(sourceProfile.settings), main, kids
+                };
+                managedPortable = {
+                    meta: { version: 3, application: 'FilterTube', exportType: 'profile', profileId, profileName },
+                    profilesV4: { schemaVersion: 4, activeProfileId: profileId, profiles: { [profileId]: profile } },
+                    settings: {
+                        main: { ...safeObject(profile.settings), mode: main.mode, applyKidsRulesOnMain: profile.settings.syncKidsToMain === true },
+                        kids: { mode: kids.mode, strictMode: kids.strictMode !== false }
+                    },
+                    profiles: {
+                        main: {
+                            channels: safeArray(main.channels || main.blockedChannels), keywords: safeArray(main.keywords || main.blockedKeywords),
+                            videoIds: safeArray(main.videoIds || main.blockedVideoIds),
+                            whitelistedChannels: safeArray(main.whitelistChannels), whitelistedKeywords: safeArray(main.whitelistKeywords),
+                            subscriptions: safeArray(main.subscriptions)
+                        },
+                        kids: {
+                            blockedChannels: safeArray(kids.blockedChannels), blockedKeywords: safeArray(kids.blockedKeywords), videoIds: safeArray(kids.videoIds),
+                            whitelistedChannels: safeArray(kids.whitelistChannels), whitelistedKeywords: safeArray(kids.whitelistKeywords), subscriptions: safeArray(kids.subscriptions)
+                        }
+                    },
+                    maps: { channelMap: {} }
+                };
+            }
+        }
         const io = await getIO();
         const normalizedScope = normalizeScope(scope);
         const payload = (normalizedScope === 'main' || normalizedScope === 'kids')
-            ? await buildScopedPortablePayload(io, normalizedScope)
-            : await io.exportV3({ scope: normalizedScope, auth });
+            ? (managedPortable || await buildScopedPortablePayload(io, normalizedScope))
+            : (managedPortable || await io.exportV3({ scope: normalizedScope, auth }));
         return {
             app: APP_ID,
             scope: normalizedScope,
@@ -1821,8 +1987,8 @@
         };
     }
 
-    async function buildControlProposal({ scope = 'active', strategy = 'merge', auth = null } = {}) {
-        const built = await buildPortablePayload({ scope, auth });
+    async function buildControlProposal({ scope = 'active', strategy = 'merge', auth = null, managedSourceProfileSnapshot = null } = {}) {
+        const built = await buildPortablePayload({ scope, auth, managedSourceProfileSnapshot });
         return {
             t: 'control_proposal',
             id: generateId(),
@@ -1875,17 +2041,53 @@
                 summary: summarizePortablePayload(extracted.portable, effectiveScope)
             };
         }
+        const binding = { ...safeObject(safeObject(auth).localManagedApplyBinding) };
+        const requestedTargetId = normalizeString(targetProfileId);
+        async function beforeProfileWrite(actualTargetProfileId) {
+            if (typeof io.loadProfilesV4 !== 'function') {
+                if (Object.keys(binding).length) throw new Error('Protected-profile authorization cannot be checked.');
+                return;
+            }
+            const latest = safeObject(await io.loadProfilesV4());
+            const profiles = safeObject(latest.profiles);
+            const actualTargetId = normalizeString(actualTargetProfileId)
+                || requestedTargetId || normalizeString(latest.activeProfileId) || 'default';
+            const target = safeObject(profiles[actualTargetId]);
+            const targetType = normalizeString(target.type).toLowerCase();
+            const protectedTarget = targetType === 'child'
+                || (targetType !== 'account' && !!normalizeString(target.parentProfileId));
+            if (!protectedTarget && !Object.keys(binding).length) return;
+            const actorId = normalizeString(latest.activeProfileId) || 'default';
+            const ownerId = normalizeString(binding.localParentProfileId);
+            const owner = safeObject(profiles[ownerId]);
+            const ownerType = normalizeString(owner.type).toLowerCase();
+            const actor = safeObject(profiles[actorId]);
+            const actorType = normalizeString(actor.type).toLowerCase();
+            const actorIsChild = actorType === 'child' || (actorType !== 'account' && !!normalizeString(actor.parentProfileId));
+            if (!protectedTarget || actualTargetId !== normalizeString(binding.targetProfileId)
+                || (requestedTargetId && actualTargetId !== requestedTargetId)
+                || normalizeString(target.parentProfileId) !== ownerId
+                || !Object.keys(owner).length || ownerType === 'child'
+                || (ownerType !== 'account' && normalizeString(owner.parentProfileId))
+                || actorId !== normalizeString(binding.actorProfileId)
+                || (actorIsChild ? actorId !== actualTargetId : actorId !== 'default' && actorId !== ownerId)) {
+                throw new Error('Parent approval is required or the protected profile changed. Review the update again.');
+            }
+        }
+        await beforeProfileWrite(requestedTargetId);
         if (effectiveScope === 'main' || effectiveScope === 'kids') {
             return applyScopedPortablePayload(io, extracted.portable, {
                 strategy: effectiveStrategy,
-                targetProfileId
+                targetProfileId,
+                beforeProfileWrite
             });
         }
         return io.importV3(extracted.portable, {
             strategy: effectiveStrategy,
             scope: effectiveScope,
             auth,
-            targetProfileId
+            targetProfileId,
+            beforeProfileWrite
         });
     }
 
@@ -1927,6 +2129,7 @@
         appId: APP_ID,
         payloadVersion: PAYLOAD_VERSION,
         supportedScopes: ['main', 'kids', 'active', 'full'],
+        hostSessionWhenReady,
         getDeviceDescriptor,
         summarizePortablePayload,
         buildPortablePayload,

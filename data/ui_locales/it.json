@@ -1,4 +1,9 @@
 {
+  "dashboard.sync.picker.receiveConfirmed": "Frase confermata qui. Tieni FilterTube aperto su entrambi i dispositivi. In attesa di un aggiornamento dal genitore.",
+  "dashboard.sync.picker.receivePermissions": "Gli aggiornamenti rispettano le autorizzazioni approvate da un genitore su questo dispositivo.",
+  "dashboard.sync.picker.receiveModeEyebrow": "Solo ricezione",
+  "dashboard.sync.picker.receiveModeTitle": "Questo profilo protetto",
+  "dashboard.sync.picker.receiveModeBody": "Il genitore invia le modifiche.",
   "popup.blocklist": "Lista di blocco",
   "popup.whitelist": "Lista consentita",
   "popup.listMode.whitelistTooltip": "Modalità lista consentita: mostra i contenuti che corrispondono alle regole consentite",
@@ -2413,5 +2418,9 @@
   "dashboard.helpBubble.tip51": "Copia il link di abbinamento per un altro dispositivo. Il dispositivo ricevente deve comunque verificare la stessa frase di sicurezza.",
   "dashboard.helpBubble.tip52": "Avvia prima l'abbinamento; poi quest'area mostrerà un QR o un messaggio di stato per l'altro dispositivo.",
   "dashboard.helpBubble.tip53": "I dispositivi attendibili ricordano una relazione verificata per rendere più semplici gli invii futuri.",
-  "dashboard.helpBubble.tip54": "La fiducia salvata non è una connessione attiva e non salta mai la convalida locale."
+  "dashboard.helpBubble.tip54": "La fiducia salvata non è una connessione attiva e non salta mai la convalida locale.",
+  "dashboard.sync.familyDeviceMap.selection.localPhraseConfirmedDetail": "Phrase confirmed here. Confirm it on the other device before sending.",
+  "dashboard.sync.familyDeviceMap.map.localPhraseConfirmedDetail": "Phrase confirmed here. Confirm it on the other device before sending.",
+  "dashboard.sync.familyDeviceMap.map.compassRuleLocalConfirmed": "Phrase confirmed here. Confirm it on the other device, then review and send the update.",
+  "dashboard.sync.familyDeviceMap.trusted.sessionDevice": "Session device {label}"
 }

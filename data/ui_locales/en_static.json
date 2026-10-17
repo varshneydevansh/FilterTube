@@ -2535,6 +2535,10 @@
     "kind": "text",
     "line": 1683
   },
+  "Receive nearby": {
+    "kind": "text",
+    "line": 1040
+  },
   "Let this device appear": {
     "kind": "text",
     "line": 1683
@@ -4538,5 +4542,85 @@
   "Support is optional and there are no features locked behind a paywall. The goal is to keep the product sustainable while continuing to ship calm, privacy-first control surfaces.": {
     "kind": "text",
     "line": 2655
+  },
+  "Your devices, together.": {
+    "kind": "text",
+    "line": 1039
+  },
+  "Choose a device to update its filter rules. Use family control for a child’s device, or copy this profile to your own device.": {
+    "kind": "text",
+    "line": 1040
+  },
+  "Choose a device": {
+    "kind": "aria-label",
+    "line": 1047
+  },
+  "Choose a device to update": {
+    "kind": "text",
+    "line": 1050
+  },
+  "Choose a saved device, or pair a new one. Review the profile before sending.": {
+    "kind": "text",
+    "line": 1051
+  },
+  "Connect a device": {
+    "kind": "aria-label",
+    "line": 1054
+  },
+  "Add with code or QR": {
+    "kind": "text",
+    "line": 1057
+  },
+  "This device": {
+    "kind": "text",
+    "line": 1063
+  },
+  "Choose rules here, then send.": {
+    "kind": "text",
+    "line": 1065
+  },
+  "No saved devices yet. Find a nearby device or add one with a code.": {
+    "kind": "text",
+    "line": 1067
+  },
+  "Pair a new device with a code or QR, then match the safety phrase.": {
+    "kind": "text",
+    "line": 1071
+  },
+  "Choose a saved device, or pair a new one.": {
+    "kind": "text",
+    "line": 1075
+  },
+  "Choose rules profile": {
+    "kind": "text",
+    "line": 1078
+  },
+  "Connection options and help": {
+    "kind": "text",
+    "line": 1082
+  },
+  "How family updates work": {
+    "kind": "text",
+    "line": 1121
+  },
+  "Scan QR": {
+    "kind": "text",
+    "line": 1430
+  },
+  "Read QR image": {
+    "kind": "text",
+    "line": 1431
+  },
+  "Pairing QR camera preview": {
+    "kind": "aria-label",
+    "line": 1435
+  },
+  "Point the camera at the pairing QR on your other device.": {
+    "kind": "text",
+    "line": 1437
+  },
+  "Close scanner": {
+    "kind": "text",
+    "line": 1438
   }
 }

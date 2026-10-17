@@ -1,4 +1,9 @@
 {
+  "dashboard.sync.picker.receiveConfirmed": "અહીં વાક્યની પુષ્ટિ થઈ છે. બંને ઉપકરણો ખોલી રાખો. પેરેંટ અપડેટની રાહ જોઈ રહ્યા છીએ.",
+  "dashboard.sync.picker.receivePermissions": "અપડેટ્સ આ ઉપકરણ પર પેરેંટ દ્વારા મંજૂર થયેલ પરવાનગીઓનું પાલન કરે છે.",
+  "dashboard.sync.picker.receiveModeEyebrow": "માત્ર પ્રાપ્ત કરો",
+  "dashboard.sync.picker.receiveModeTitle": "આ સુરક્ષિત પ્રોફાઇલ",
+  "dashboard.sync.picker.receiveModeBody": "પેરેંટ ફેરફારો મોકલે છે.",
   "popup.blocklist": "અવરોધ સૂચિ",
   "popup.whitelist": "મંજૂરી સૂચિ",
   "popup.listMode.whitelistTooltip": "મંજૂરી સૂચિ મોડ: મંજૂરીના નિયમો સાથે મેળ ખાતી સામગ્રી બતાવો",
@@ -2413,5 +2418,9 @@
   "dashboard.helpBubble.tip51": "બીજા ઉપકરણ માટે જોડાણ લિંક નકલ કરો. મેળવનારા ઉપકરણે એ જ સુરક્ષા વાક્ય ચકાસવું પડશે.",
   "dashboard.helpBubble.tip52": "પહેલાં જોડાણ શરૂ કરો, પછી આ વિભાગ બીજા ઉપકરણ માટે QR અથવા સ્થિતિ સંદેશ બતાવશે.",
   "dashboard.helpBubble.tip53": "વિશ્વસનીય ઉપકરણો ચકાસાયેલ સંબંધ યાદ રાખે છે, જેથી પછી મોકલવું સરળ બને.",
-  "dashboard.helpBubble.tip54": "સાચવેલો વિશ્વાસ લાઇવ જોડાણ નથી અને સ્થાનિક ચકાસણી ક્યારેય છોડતો નથી."
+  "dashboard.helpBubble.tip54": "સાચવેલો વિશ્વાસ લાઇવ જોડાણ નથી અને સ્થાનિક ચકાસણી ક્યારેય છોડતો નથી.",
+  "dashboard.sync.familyDeviceMap.selection.localPhraseConfirmedDetail": "Phrase confirmed here. Confirm it on the other device before sending.",
+  "dashboard.sync.familyDeviceMap.map.localPhraseConfirmedDetail": "Phrase confirmed here. Confirm it on the other device before sending.",
+  "dashboard.sync.familyDeviceMap.map.compassRuleLocalConfirmed": "Phrase confirmed here. Confirm it on the other device, then review and send the update.",
+  "dashboard.sync.familyDeviceMap.trusted.sessionDevice": "Session device {label}"
 }

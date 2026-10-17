@@ -105,6 +105,8 @@ function createManagedLivePolicyHarness({
     remoteRole: 'replica',
     linkId: 'link-parent-child-1',
     remoteDeviceId: 'child-device-1',
+    sourceDeviceId: 'parent-device-1',
+    sourceProfileId: 'parent-profile-1',
     policy: {
       allowedScopes,
       targetProfileBehavior: 'fixed_profile',
@@ -284,10 +286,15 @@ test('managed trusted links are profile scoped and connected target fanout is bo
   assert.match(tabView, /function findNanahTrustedLink\(remoteDeviceId, options = \{\}\)/);
   assert.match(tabView, /const requestedTargetProfileId = normalizeString\(filters\.targetProfileId\)/);
   assert.match(tabView, /getNanahTrustedLinkTargetProfileId\(entry\) === requestedTargetProfileId/);
-  assert.match(tabView, /const existingIndex = nanahTrustedLinks\.findIndex\(\(item\) => \{/);
-  assert.match(tabView, /currentIdentityKey === nextIdentityKey/);
-  assert.match(tabView, /function getNanahManagedDuplicateDeviceIds\(sourceDeviceId, trustedLinkId, targetProfileId = ''\)/);
-  assert.match(tabView, /candidateTargetProfileId === currentTargetProfileId/);
+  // Real first-save/manual-save/collision behavior is exercised by
+  // nanah-managed-shared-link-handshake-current-behavior.test.mjs.
+  assert.match(tabView, /const existingIndex = rows\.findIndex\(item => \{/);
+  assert.match(tabView, /return current && sameLogicalLink\(current\)/);
+  assert.match(tabView, /nanahManagedLinkBindingKey\(current\) === bindingKey/);
+  assert.match(tabView, /if \(requestedCollision\) throw new Error/);
+  assert.match(tabView, /function getNanahManagedDuplicateDeviceIds\(sourceDeviceId, trustedLinkId, targetProfileId = '', sourceProfileId = ''\)/);
+  assert.match(tabView, /if \(candidateTargetProfileId !== currentTargetProfileId\) return false/);
+  assert.match(tabView, /pinnedParentId === candidateParentId/);
   assert.match(tabView, /function findNanahTrustedLinkForManagedEnvelope\(envelope\)[\s\S]*targetProfileId/);
   assert.match(tabView, /function getNanahEligibleManagedTargetLinks\(scope = getNanahScope\(\)\)/);
   assert.match(tabView, /normalizeString\(entry\.remoteDeviceId\) === remoteDeviceId/);
@@ -373,15 +380,17 @@ test('managed source send uses signed envelope before proposal fallback and reco
   assert.match(source, /ensureAdminUnlocked\(profilesV4, \{ sensitiveAction \}\)/);
   assert.match(source, /ensureManagedProviderDeliveryAuthorized: async \(context = \{\}\)/);
   assert.match(source, /ensureNanahOutgoingAuth\(scope, \{ sensitiveAction: true \}\)/);
-  assert.match(sendButtonBlock, /const requiresManagedAdminReauth = policy\.linkType === 'managed_link' && policy\.authorityMode === 'managed'/);
+  assert.match(sendButtonBlock, /const requiresManagedAdminReauth = policy\.linkType === 'managed_link'\s*&& \(policy\.authorityMode === 'managed' \|\| firstManagedProposal\)/);
   assert.match(sendButtonBlock, /ensureNanahOutgoingAuth\(policy\.scope, \{ sensitiveAction: requiresManagedAdminReauth \}\)/);
   assert.match(sendButtonBlock, /policy\.linkType === 'managed_link' && policy\.authorityMode === 'managed' && getNanahRole\(\) === 'source'/);
   assert.match(sendButtonBlock, /const selectedTargetLinks = getNanahSelectedManagedTargetLinks\(policy\.scope\)/);
   assert.match(sendButtonBlock, /buildEnvelopeBatchForTrustedLinks\(policy, selectedTargetLinks\)/);
   assert.match(sendButtonBlock, /buildEnvelopeBatchForLiveSend/);
   assert.match(sendButtonBlock, /for \(const signedEnvelope of signedEnvelopes\)/);
-  assert.match(sendButtonBlock, /await nanahClient\.send\(signedEnvelope\)/);
-  assert.match(sendButtonBlock, /await nanahManagedLivePolicy\.markSent\(/);
+  assert.match(sendButtonBlock, /const liveClient = nanahClient/);
+  assert.match(sendButtonBlock, /if \(nanahClient !== liveClient\) throw new Error/);
+  assert.match(sendButtonBlock, /await nanahManagedLivePolicy\.sendLiveEnvelope\(/);
+  assert.match(sendButtonBlock, /\(envelope\) => liveClient\.send\(envelope\)/);
   assert.match(sendButtonBlock, /targetProfileId: signedEnvelope\.targetProfileId/);
   assert.match(sendButtonBlock, /issuedAt: signedEnvelope\.issuedAt/);
   assert.match(sendButtonBlock, /return;\s+\}\s+let envelope = await adapter\.buildControlProposal/);
@@ -916,6 +925,8 @@ test('managed live signed-send helper records matching live ack history without 
     applied: true,
     decision: 'accept_newer_revision'
   });
+  // This harness helper identifies the source; the real replica emits its own device ID.
+  ackPayload.targetDeviceId = 'child-device-1';
 
   assert.equal(ackPayload.schema, 'filtertube_nanah_managed_live_ack');
   assert.equal(ackPayload.linkId, envelope.linkId);
@@ -982,6 +993,7 @@ test('managed live signed-send helper records provider mailbox and local-network
     linkId: envelope.linkId,
     sourceDeviceId: 'parent-device-1',
     sourceProfileId: 'parent-profile-1',
+    targetDeviceId: 'child-device-1',
     targetProfileId: 'child-profile-1',
     records: [{
       mailboxItemId: 'mbx-child-keywords-1',
@@ -1018,6 +1030,7 @@ test('managed live signed-send helper records provider mailbox and local-network
     linkId: envelope.linkId,
     sourceDeviceId: 'parent-device-1',
     sourceProfileId: 'parent-profile-1',
+    targetDeviceId: 'child-device-1',
     targetProfileId: 'child-profile-1',
     records: [{
       localNetworkCandidateId: 'lan-candidate-1',

@@ -1,4 +1,9 @@
 {
+  "dashboard.sync.picker.receiveConfirmed": "Фраза подтверждена здесь. Оставьте оба устройства открытыми. Ожидание обновления от родителя.",
+  "dashboard.sync.picker.receivePermissions": "Обновления соответствуют разрешениям, одобренным родителем на этом устройстве.",
+  "dashboard.sync.picker.receiveModeEyebrow": "Только получение",
+  "dashboard.sync.picker.receiveModeTitle": "Этот защищённый профиль",
+  "dashboard.sync.picker.receiveModeBody": "Родитель отправляет изменения.",
   "popup.blocklist": "Список блокировки",
   "popup.whitelist": "Список разрешённых",
   "popup.listMode.whitelistTooltip": "Режим списка разрешённых: показывать контент, соответствующий разрешённым правилам",
@@ -2413,5 +2418,9 @@
   "dashboard.helpBubble.tip51": "Скопируйте ссылку для связывания на другое устройство. Получатель всё равно должен сверить ту же фразу безопасности.",
   "dashboard.helpBubble.tip52": "Сначала начните связывание, затем здесь появится QR или сообщение о состоянии для другого устройства.",
   "dashboard.helpBubble.tip53": "Доверенные устройства запоминают проверенную связь, чтобы упростить будущие отправки.",
-  "dashboard.helpBubble.tip54": "Сохранённое доверие не является активным подключением и никогда не отменяет локальную проверку."
+  "dashboard.helpBubble.tip54": "Сохранённое доверие не является активным подключением и никогда не отменяет локальную проверку.",
+  "dashboard.sync.familyDeviceMap.selection.localPhraseConfirmedDetail": "Phrase confirmed here. Confirm it on the other device before sending.",
+  "dashboard.sync.familyDeviceMap.map.localPhraseConfirmedDetail": "Phrase confirmed here. Confirm it on the other device before sending.",
+  "dashboard.sync.familyDeviceMap.map.compassRuleLocalConfirmed": "Phrase confirmed here. Confirm it on the other device, then review and send the update.",
+  "dashboard.sync.familyDeviceMap.trusted.sessionDevice": "Session device {label}"
 }

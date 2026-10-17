@@ -1,4 +1,9 @@
 {
+  "dashboard.sync.picker.receiveConfirmed": "عبارت در اینجا تأیید شد. هر دو دستگاه را باز نگه دارید. در انتظار به‌روزرسانی والدین.",
+  "dashboard.sync.picker.receivePermissions": "به‌روزرسانی‌ها بر اساس مجوزهای تأیید شده توسط والدین در این دستگاه انجام می‌شوند.",
+  "dashboard.sync.picker.receiveModeEyebrow": "فقط دریافت",
+  "dashboard.sync.picker.receiveModeTitle": "این پروفایل محافظت‌شده",
+  "dashboard.sync.picker.receiveModeBody": "والدین تغییرات را می‌فرستند",
   "popup.blocklist": "فهرست مسدودسازی",
   "popup.whitelist": "فهرست مجاز",
   "popup.listMode.whitelistTooltip": "حالت فهرست مجاز: محتوای منطبق با قواعد مجاز را نمایش بده",
@@ -2413,5 +2418,9 @@
   "dashboard.helpBubble.tip51": "پیوند جفت‌سازی را برای دستگاه دیگر کپی کنید. دستگاه گیرنده همچنان باید همان عبارت ایمنی را تأیید کند.",
   "dashboard.helpBubble.tip52": "ابتدا جفت‌سازی را شروع کنید؛ سپس این بخش QR یا پیام وضعیت را برای دستگاه دیگر نشان می‌دهد.",
   "dashboard.helpBubble.tip53": "دستگاه‌های مورداعتماد رابطهٔ تأییدشده را به خاطر می‌سپارند تا ارسال‌های بعدی آسان‌تر شود.",
-  "dashboard.helpBubble.tip54": "اعتماد ذخیره‌شده اتصال زنده نیست و هرگز اعتبارسنجی محلی را رد نمی‌کند."
+  "dashboard.helpBubble.tip54": "اعتماد ذخیره‌شده اتصال زنده نیست و هرگز اعتبارسنجی محلی را رد نمی‌کند.",
+  "dashboard.sync.familyDeviceMap.selection.localPhraseConfirmedDetail": "Phrase confirmed here. Confirm it on the other device before sending.",
+  "dashboard.sync.familyDeviceMap.map.localPhraseConfirmedDetail": "Phrase confirmed here. Confirm it on the other device before sending.",
+  "dashboard.sync.familyDeviceMap.map.compassRuleLocalConfirmed": "Phrase confirmed here. Confirm it on the other device, then review and send the update.",
+  "dashboard.sync.familyDeviceMap.trusted.sessionDevice": "Session device {label}"
 }

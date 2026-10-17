@@ -1,4 +1,9 @@
 {
+  "dashboard.sync.picker.receiveConfirmed": "వాక్యం ఇక్కడ నిర్ధారించబడింది. రెండు పరికరాలు తెరిచి ఉంచండి. తల్లిదండ్రి నవీకరణ కోసం వేచివుంది.",
+  "dashboard.sync.picker.receivePermissions": "ఈ పరికరంలో తల్లిదండ్రి ఆమోదించిన అనుమతుల ప్రకారం నవీకరణలు జరుగుతాయి.",
+  "dashboard.sync.picker.receiveModeEyebrow": "స్వీకరణ మాత్రమే",
+  "dashboard.sync.picker.receiveModeTitle": "ఈ రక్షిత ప్రొఫైల్",
+  "dashboard.sync.picker.receiveModeBody": "తల్లిదండ్రి మార్పులను పంపుతారు.",
   "popup.blocklist": "నిరోధ జాబితా",
   "popup.whitelist": "అనుమతి జాబితా",
   "popup.listMode.whitelistTooltip": "అనుమతి జాబితా మోడ్: అనుమతి నియమాలకు సరిపోయే కంటెంట్‌ను చూపించు",
@@ -2413,5 +2418,9 @@
   "dashboard.helpBubble.tip51": "ఇతర పరికరం కోసం జత లింక్‌ను కాపీ చేయండి. స్వీకరించే పరికరం అదే భద్రతా పదబంధాన్ని ఇంకా ధృవీకరించాలి.",
   "dashboard.helpBubble.tip52": "ముందుగా జతచేయడం ప్రారంభించండి; తర్వాత ఈ ప్రాంతం ఇతర పరికరం కోసం QR లేదా స్థితి సందేశాన్ని చూపుతుంది.",
   "dashboard.helpBubble.tip53": "నమ్మకమైన పరికరాలు భవిష్యత్తులో పంపడం సులభం కావడానికి ధృవీకరించిన సంబంధాన్ని గుర్తుంచుకుంటాయి.",
-  "dashboard.helpBubble.tip54": "సేవ్ చేసిన విశ్వాసం ప్రత్యక్ష కనెక్షన్ కాదు; ఇది స్థానిక ధృవీకరణను ఎప్పుడూ దాటవేయదు."
+  "dashboard.helpBubble.tip54": "సేవ్ చేసిన విశ్వాసం ప్రత్యక్ష కనెక్షన్ కాదు; ఇది స్థానిక ధృవీకరణను ఎప్పుడూ దాటవేయదు.",
+  "dashboard.sync.familyDeviceMap.selection.localPhraseConfirmedDetail": "Phrase confirmed here. Confirm it on the other device before sending.",
+  "dashboard.sync.familyDeviceMap.map.localPhraseConfirmedDetail": "Phrase confirmed here. Confirm it on the other device before sending.",
+  "dashboard.sync.familyDeviceMap.map.compassRuleLocalConfirmed": "Phrase confirmed here. Confirm it on the other device, then review and send the update.",
+  "dashboard.sync.familyDeviceMap.trusted.sessionDevice": "Session device {label}"
 }

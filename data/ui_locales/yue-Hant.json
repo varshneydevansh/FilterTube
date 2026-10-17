@@ -1,4 +1,9 @@
 {
+  "dashboard.sync.picker.receiveConfirmed": "安全短語已喺呢度確認。請喺兩部裝置上保持 FilterTube 開啟。等候家長更新。",
+  "dashboard.sync.picker.receivePermissions": "更新會根據此裝置上家長批准的權限進行。",
+  "dashboard.sync.picker.receiveModeEyebrow": "僅接收",
+  "dashboard.sync.picker.receiveModeTitle": "此受保護的設定檔",
+  "dashboard.sync.picker.receiveModeBody": "家長發送更改。",
   "popup.blocklist": "封鎖清單",
   "popup.whitelist": "允許清單",
   "popup.listMode.whitelistTooltip": "允許清單模式：顯示符合允許規則嘅內容",
@@ -2413,5 +2418,9 @@
   "dashboard.helpBubble.tip51": "複製配對連結畀另一部裝置。接收裝置仍然要驗證相同安全短句。",
   "dashboard.helpBubble.tip52": "先開始配對，之後呢個區域會為另一部裝置顯示 QR 或狀態訊息。",
   "dashboard.helpBubble.tip53": "可信任裝置會記住已驗證嘅關係，令之後傳送更方便。",
-  "dashboard.helpBubble.tip54": "已儲存嘅信任唔係即時連線，亦永遠唔會略過本機驗證。"
+  "dashboard.helpBubble.tip54": "已儲存嘅信任唔係即時連線，亦永遠唔會略過本機驗證。",
+  "dashboard.sync.familyDeviceMap.selection.localPhraseConfirmedDetail": "Phrase confirmed here. Confirm it on the other device before sending.",
+  "dashboard.sync.familyDeviceMap.map.localPhraseConfirmedDetail": "Phrase confirmed here. Confirm it on the other device before sending.",
+  "dashboard.sync.familyDeviceMap.map.compassRuleLocalConfirmed": "Phrase confirmed here. Confirm it on the other device, then review and send the update.",
+  "dashboard.sync.familyDeviceMap.trusted.sessionDevice": "Session device {label}"
 }

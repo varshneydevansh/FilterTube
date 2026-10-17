@@ -1,4 +1,9 @@
 {
+  "dashboard.sync.picker.receiveConfirmed": "العبارة اتأكدت هنا. خليك فاتح FilterTube في الجهازين. مستني تحديث من ولي الأمر.",
+  "dashboard.sync.picker.receivePermissions": "التحديثات بتتبع الصلاحيات اللي وافق عليها ولي الأمر في الجهاز دا.",
+  "dashboard.sync.picker.receiveModeEyebrow": "استقبل بس",
+  "dashboard.sync.picker.receiveModeTitle": "الملف الشخصي المحمي دا",
+  "dashboard.sync.picker.receiveModeBody": "الوالد يرسل تغييرات",
   "popup.blocklist": "لستة الحظر",
   "popup.whitelist": "لستة السماح",
   "popup.listMode.whitelistTooltip": "وضع لستة السماح: ورّي المحتوى البوافق قواعد السماح",
@@ -2413,5 +2418,9 @@
   "dashboard.helpBubble.tip51": "انسخ رابط الربط لجهاز تاني. الجهاز المستقبل لازم برضو يتحقق من نفس عبارة الأمان.",
   "dashboard.helpBubble.tip52": "ابدأ الربط أول، بعد داك المنطقة دي بتعرض QR أو رسالة حالة للجهاز التاني.",
   "dashboard.helpBubble.tip53": "الأجهزة الموثوقة بتتذكر العلاقة المؤكدة عشان الإرسال الجاي يكون أسهل.",
-  "dashboard.helpBubble.tip54": "الثقة المحفوظة ما اتصال مباشر وما بتتجاوز التحقق المحلي أبدًا."
+  "dashboard.helpBubble.tip54": "الثقة المحفوظة ما اتصال مباشر وما بتتجاوز التحقق المحلي أبدًا.",
+  "dashboard.sync.familyDeviceMap.selection.localPhraseConfirmedDetail": "Phrase confirmed here. Confirm it on the other device before sending.",
+  "dashboard.sync.familyDeviceMap.map.localPhraseConfirmedDetail": "Phrase confirmed here. Confirm it on the other device before sending.",
+  "dashboard.sync.familyDeviceMap.map.compassRuleLocalConfirmed": "Phrase confirmed here. Confirm it on the other device, then review and send the update.",
+  "dashboard.sync.familyDeviceMap.trusted.sessionDevice": "Session device {label}"
 }

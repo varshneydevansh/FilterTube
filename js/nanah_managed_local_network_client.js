@@ -48,18 +48,16 @@
     }
 
     function isPrivateHostname(hostname) {
-        const host = normalizeString(hostname).toLowerCase();
+        const host = normalizeString(hostname).toLowerCase().replace(/^\[|\]$/g, '');
         if (!host) return false;
         if (host === 'localhost' || host.endsWith('.localhost') || host.endsWith('.local')) return true;
-        if (host === '127.0.0.1' || host === '::1' || host.startsWith('127.')) return true;
-        if (/^10\./.test(host)) return true;
-        if (/^192\.168\./.test(host)) return true;
-        const private172 = host.match(/^172\.(\d+)\./);
-        if (private172) {
-            const octet = Number(private172[1]);
-            if (octet >= 16 && octet <= 31) return true;
-        }
-        return false;
+        if (host === '::1') return true;
+        const octets = host.split('.');
+        if (octets.length !== 4 || !octets.every(part => /^\d{1,3}$/.test(part) && Number(part) <= 255)) return false;
+        const [first, second] = octets.map(Number);
+        return first === 127 || first === 10
+            || (first === 192 && second === 168)
+            || (first === 172 && second >= 16 && second <= 31);
     }
 
     function resolveEndpointUrl(endpointUrl) {
@@ -169,6 +167,7 @@
             localNetworkCandidateId: normalizeString(root.localNetworkCandidateId || root.candidateId),
             linkId: normalizeString(root.linkId),
             targetProfileId: normalizeString(root.targetProfileId),
+            targetDeviceId: normalizeString(root.targetDeviceId),
             sourceDeviceId: normalizeString(root.sourceDeviceId),
             sourceProfileId: normalizeString(root.sourceProfileId),
             scope: normalizeString(root.scope).toLowerCase(),
@@ -236,6 +235,7 @@
                     localNetworkCandidateId: normalizeString(row.localNetworkCandidateId || row.candidateId),
                     candidateId: normalizeString(row.candidateId || row.localNetworkCandidateId),
                     targetProfileId: normalizeString(row.targetProfileId),
+                    targetDeviceId: normalizeString(row.targetDeviceId),
                     sourceDeviceId: normalizeString(row.sourceDeviceId),
                     sourceProfileId: normalizeString(row.sourceProfileId),
                     scope: normalizeString(row.scope).toLowerCase(),
@@ -394,6 +394,7 @@
             localNetworkCandidateId: normalizeString(root.localNetworkCandidateId || root.candidateId),
             candidateId: normalizeString(root.candidateId || root.localNetworkCandidateId),
             targetProfileId: normalizeString(root.targetProfileId),
+            targetDeviceId: normalizeString(root.targetDeviceId),
             sourceDeviceId: normalizeString(root.sourceDeviceId),
             sourceProfileId: normalizeString(root.sourceProfileId),
             scope: normalizeString(root.scope).toLowerCase(),
@@ -412,6 +413,10 @@
         const endpointUrl = resolveEndpointUrl(parsed.endpointUrl || parsed.url || parsed.baseUrl);
         const fetchImpl = deps.fetch || global.fetch;
         const token = normalizeString(parsed.authToken || parsed.token || parsed.bearerToken);
+        const requestTimeoutMs = Math.max(1000, Math.min(30000, Number(parsed.requestTimeoutMs) || 8000));
+        const AbortControllerImpl = deps.AbortController || global.AbortController;
+        const scheduleTimeout = deps.setTimeout || global.setTimeout?.bind(global);
+        const cancelTimeout = deps.clearTimeout || global.clearTimeout?.bind(global);
         const publishPath = parsed.publishPath || 'managed-local-network/publish';
         const discoverPath = parsed.discoverPath || 'managed-local-network/discover';
         const ackPath = parsed.ackPath || 'managed-local-network/ack';
@@ -431,31 +436,41 @@
             if (!endpointUrl) return unavailable('local_network_endpoint_unconfigured');
             if (typeof fetchImpl !== 'function') return unavailable('local_network_fetch_unavailable');
             if (containsPrivateKey(body)) return unavailable('local_network_private_secret_refused');
-            const response = await fetchImpl(joinEndpoint(endpointUrl, pathName), {
-                method: 'POST',
-                headers: {
-                    'content-type': 'application/json',
-                    ...(token ? { authorization: `Bearer ${token}` } : {})
-                },
-                credentials: 'omit',
-                cache: 'no-store',
-                body: JSON.stringify(body)
-            });
-            let payload = {};
+            const controller = typeof AbortControllerImpl === 'function' ? new AbortControllerImpl() : null;
+            let timedOut = false;
+            const timeout = controller && scheduleTimeout && cancelTimeout ? scheduleTimeout(() => {
+                timedOut = true;
+                controller.abort();
+            }, requestTimeoutMs) : null;
             try {
-                payload = await response.json();
-            } catch (_) {
-                payload = {};
+                const response = await fetchImpl(joinEndpoint(endpointUrl, pathName), {
+                    method: 'POST',
+                    headers: {
+                        'content-type': 'application/json',
+                        ...(token ? { authorization: `Bearer ${token}` } : {})
+                    },
+                    credentials: 'omit',
+                    cache: 'no-store',
+                    ...(controller ? { signal: controller.signal } : {}),
+                    body: JSON.stringify(body)
+                });
+                let payload = {};
+                try {
+                    payload = await response.json();
+                } catch (_) {
+                    payload = {};
+                }
+                if (timedOut) return unavailable('local_network_request_timeout');
+                if (!response.ok) {
+                    return unavailable(normalizeString(payload.reason || payload.error) || `local_network_http_${response.status}`);
+                }
+                return normalizeServerResult(payload);
+            } catch (error) {
+                if (timedOut) return unavailable('local_network_request_timeout');
+                throw error;
+            } finally {
+                if (timeout !== null) cancelTimeout(timeout);
             }
-            if (!response.ok) {
-                return {
-                    schema: PROVIDER_SCHEMA,
-                    version: 1,
-                    ok: false,
-                    reason: normalizeString(payload.reason || payload.error) || `local_network_http_${response.status}`
-                };
-            }
-            return normalizeServerResult(payload);
         }
 
         async function publishManagedPolicyCandidates(request) {

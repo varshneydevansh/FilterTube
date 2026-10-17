@@ -78,6 +78,7 @@ const LOCAL_CANDIDATE_KEYS = [
   'localNetworkCandidateId',
   'linkId',
   'targetProfileId',
+  'targetDeviceId',
   'sourceDeviceId',
   'sourceProfileId',
   'scope',
@@ -103,6 +104,7 @@ const ACK_KEYS = [
   'candidateId',
   'localNetworkCandidateId',
   'targetProfileId',
+  'targetDeviceId',
   'sourceDeviceId',
   'sourceProfileId',
   'scope',
@@ -206,6 +208,7 @@ function normalizeCandidate(candidate, now = Date.now()) {
   clean.localNetworkCandidateId = normalizeString(clean.localNetworkCandidateId || clean.candidateId);
   clean.linkId = normalizeString(clean.linkId);
   clean.targetProfileId = normalizeString(clean.targetProfileId);
+  clean.targetDeviceId = normalizeString(clean.targetDeviceId);
   clean.sourceDeviceId = normalizeString(clean.sourceDeviceId);
   clean.sourceProfileId = normalizeString(clean.sourceProfileId);
   clean.scope = normalizeScope(clean.scope);
@@ -235,6 +238,7 @@ function normalizeAck(record, kind, now = Date.now()) {
   clean.candidateId = normalizeString(clean.candidateId || clean.localNetworkCandidateId);
   clean.localNetworkCandidateId = normalizeString(clean.localNetworkCandidateId || clean.candidateId);
   clean.targetProfileId = normalizeString(clean.targetProfileId);
+  clean.targetDeviceId = normalizeString(clean.targetDeviceId);
   clean.sourceDeviceId = normalizeString(clean.sourceDeviceId);
   clean.sourceProfileId = normalizeString(clean.sourceProfileId);
   clean.scope = normalizeScope(clean.scope);
@@ -866,6 +870,11 @@ code{background:#f3efe9;border:1px solid rgba(70,83,95,.12);border-radius:8px;pa
         writeJson(res, 400, { ok: false, reason: 'invalid_nearby_presence' });
         return;
       }
+      const existingPresence = nearbyPresence.get(presence.candidateId);
+      if (existingPresence && !nearbyReceiveTokenMatches(existingPresence, body.receiveToken)) {
+        writeJson(res, 403, { ok: false, reason: 'nearby_receive_token_mismatch' });
+        return;
+      }
       if (!nearbyPresence.has(presence.candidateId) && nearbyPresence.size >= MAX_NEARBY_PRESENCE) {
         const oldest = Array.from(nearbyPresence.values())
           .sort((a, b) => Number(a.lastSeenAtMs) - Number(b.lastSeenAtMs))[0];
@@ -1151,8 +1160,9 @@ if (import.meta.url === `file://${process.argv[1]}`) {
       '                   or run this provider with trusted TLS key/cert paths.',
       '  Open one printed address in a browser first to confirm the safe status page.',
       '',
-      'This provider is transport only. It stores unreadable waiting updates and redacted receipts;',
-      'protected devices still validate saved parent link, target profile, scope, revision, hash, and signature.',
+      'This provider is transport only. Home Pickup stores signed rule contents that this service can read.',
+      'Internet Pickup stores encrypted signed envelopes. Delivery receipts contain redacted metadata.',
+      'Protected devices still validate saved parent link, target profile, scope, revision, hash, and signature.',
       ''
     ].join('\n'));
     process.exit(0);

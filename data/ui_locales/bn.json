@@ -1,4 +1,9 @@
 {
+  "dashboard.sync.picker.receiveConfirmed": "এখানে নিরাপত্তা বাক্যাংশ নিশ্চিত করা হয়েছে। দুই ডিভাইসেই FilterTube খোলা রাখুন। অভিভাবকের আপডেটের অপেক্ষায়।",
+  "dashboard.sync.picker.receivePermissions": "আপডেটগুলি এই ডিভাইসে পিতামাতার অনুমোদিত অনুমতিগুলি অনুসরণ করে।",
+  "dashboard.sync.picker.receiveModeEyebrow": "শুধু গ্রহণ",
+  "dashboard.sync.picker.receiveModeTitle": "এই সুরক্ষিত প্রোফাইল",
+  "dashboard.sync.picker.receiveModeBody": "পিতামাতা পরিবর্তন পাঠায়।",
   "popup.blocklist": "ব্লক তালিকা",
   "popup.whitelist": "অনুমতি তালিকা",
   "popup.listMode.whitelistTooltip": "অনুমতি তালিকা মোড: অনুমতির নিয়মের সঙ্গে মেলে এমন কনটেন্ট দেখান",
@@ -2413,5 +2418,9 @@
   "dashboard.helpBubble.tip51": "অন্য ডিভাইসের জন্য জোড়া লাগানোর লিংক কপি করুন। গ্রহণকারী ডিভাইসকেও একই নিরাপত্তা বাক্য যাচাই করতে হবে।",
   "dashboard.helpBubble.tip52": "আগে জোড়া লাগানো শুরু করুন, তারপর এই অংশে অন্য ডিভাইসের জন্য QR বা অবস্থা বার্তা দেখা যাবে।",
   "dashboard.helpBubble.tip53": "বিশ্বস্ত ডিভাইসগুলো যাচাইকৃত সম্পর্ক মনে রাখে, তাই পরের বার পাঠানো সহজ হয়।",
-  "dashboard.helpBubble.tip54": "সংরক্ষিত বিশ্বাস সরাসরি সংযোগ নয় এবং স্থানীয় যাচাই কখনো এড়িয়ে যায় না।"
+  "dashboard.helpBubble.tip54": "সংরক্ষিত বিশ্বাস সরাসরি সংযোগ নয় এবং স্থানীয় যাচাই কখনো এড়িয়ে যায় না।",
+  "dashboard.sync.familyDeviceMap.selection.localPhraseConfirmedDetail": "Phrase confirmed here. Confirm it on the other device before sending.",
+  "dashboard.sync.familyDeviceMap.map.localPhraseConfirmedDetail": "Phrase confirmed here. Confirm it on the other device before sending.",
+  "dashboard.sync.familyDeviceMap.map.compassRuleLocalConfirmed": "Phrase confirmed here. Confirm it on the other device, then review and send the update.",
+  "dashboard.sync.familyDeviceMap.trusted.sessionDevice": "Session device {label}"
 }

@@ -1,4 +1,9 @@
 {
+  "dashboard.sync.picker.receiveConfirmed": "العبارة اتأكدت هنا. خلى الجهازين مفتوحين. مستني تحديث من ولي الأمر.",
+  "dashboard.sync.picker.receivePermissions": "التحديثات بتتبع الصلاحيات اللي وافق عليها ولي الأمر على الجهاز ده.",
+  "dashboard.sync.picker.receiveModeEyebrow": "استلام فقط",
+  "dashboard.sync.picker.receiveModeTitle": "البروفايل المحمي ده",
+  "dashboard.sync.picker.receiveModeBody": "ولي الأمر بيبعت التغييرات.",
   "popup.blocklist": "قايمة الحظر",
   "popup.whitelist": "قايمة السماح",
   "popup.listMode.whitelistTooltip": "وضع قايمة السماح: اعرض المحتوى اللي بيطابق قواعد السماح",
@@ -2413,5 +2418,9 @@
   "dashboard.helpBubble.tip51": "انسخ رابط الاقتران لجهاز تاني. الجهاز المستقبِل لسه لازم يتحقق من نفس عبارة الأمان.",
   "dashboard.helpBubble.tip52": "ابدأ الاقتران الأول، وبعدها المنطقة دي هتعرض QR أو رسالة حالة للجهاز التاني.",
   "dashboard.helpBubble.tip53": "الأجهزة الموثوقة بتحتفظ بعلاقة تم التحقق منها عشان الإرسال في المرات الجاية يبقى أسهل.",
-  "dashboard.helpBubble.tip54": "الثقة المحفوظة مش اتصال مباشر ومش بتتخطى التحقق المحلي أبدًا."
+  "dashboard.helpBubble.tip54": "الثقة المحفوظة مش اتصال مباشر ومش بتتخطى التحقق المحلي أبدًا.",
+  "dashboard.sync.familyDeviceMap.selection.localPhraseConfirmedDetail": "Phrase confirmed here. Confirm it on the other device before sending.",
+  "dashboard.sync.familyDeviceMap.map.localPhraseConfirmedDetail": "Phrase confirmed here. Confirm it on the other device before sending.",
+  "dashboard.sync.familyDeviceMap.map.compassRuleLocalConfirmed": "Phrase confirmed here. Confirm it on the other device, then review and send the update.",
+  "dashboard.sync.familyDeviceMap.trusted.sessionDevice": "Session device {label}"
 }

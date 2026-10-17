@@ -1,4 +1,9 @@
 {
+  "dashboard.sync.picker.receiveConfirmed": "Sicherheitsphrase hier bestätigt. FilterTube auf beiden Geräten geöffnet lassen. Warten auf ein Update vom Elternprofil.",
+  "dashboard.sync.picker.receivePermissions": "Updates folgen den von einem Elternteil auf diesem Gerät genehmigten Berechtigungen.",
+  "dashboard.sync.picker.receiveModeEyebrow": "Nur empfangen",
+  "dashboard.sync.picker.receiveModeTitle": "Dieses geschützte Profil",
+  "dashboard.sync.picker.receiveModeBody": "Eltern senden Änderungen.",
   "popup.blocklist": "Sperrliste",
   "popup.whitelist": "Zulassungsliste",
   "popup.listMode.whitelistTooltip": "Zulassungsliste-Modus: Inhalte anzeigen, die den zugelassenen Regeln entsprechen",
@@ -2413,5 +2418,9 @@
   "dashboard.helpBubble.tip51": "Kopiere den Kopplungslink für ein anderes Gerät. Auch das Empfangsgerät muss denselben Sicherheitssatz prüfen.",
   "dashboard.helpBubble.tip52": "Starte zuerst die Kopplung. Danach zeigt dieser Bereich einen QR oder eine Statusmeldung für das andere Gerät.",
   "dashboard.helpBubble.tip53": "Vertrauenswürdige Geräte merken sich eine verifizierte Beziehung, damit künftiges Senden einfacher ist.",
-  "dashboard.helpBubble.tip54": "Gespeichertes Vertrauen ist keine aktive Verbindung und überspringt niemals die lokale Prüfung."
+  "dashboard.helpBubble.tip54": "Gespeichertes Vertrauen ist keine aktive Verbindung und überspringt niemals die lokale Prüfung.",
+  "dashboard.sync.familyDeviceMap.selection.localPhraseConfirmedDetail": "Phrase confirmed here. Confirm it on the other device before sending.",
+  "dashboard.sync.familyDeviceMap.map.localPhraseConfirmedDetail": "Phrase confirmed here. Confirm it on the other device before sending.",
+  "dashboard.sync.familyDeviceMap.map.compassRuleLocalConfirmed": "Phrase confirmed here. Confirm it on the other device, then review and send the update.",
+  "dashboard.sync.familyDeviceMap.trusted.sessionDevice": "Session device {label}"
 }

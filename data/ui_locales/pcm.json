@@ -1,4 +1,9 @@
 {
+  "dashboard.sync.picker.receiveConfirmed": "Phrase don confirm for here. Keep both device dem open. Await parent update.",
+  "dashboard.sync.picker.receivePermissions": "Updates follow permission wey parent approve for this device.",
+  "dashboard.sync.picker.receiveModeEyebrow": "Only receive",
+  "dashboard.sync.picker.receiveModeTitle": "Dis protected profile",
+  "dashboard.sync.picker.receiveModeBody": "Parent send changes.",
   "popup.blocklist": "List wey dey block",
   "popup.whitelist": "List wey dey allow",
   "popup.listMode.whitelistTooltip": "List wey dey allow mode: show content wey match rules wey dey allow",
@@ -2413,5 +2418,9 @@
   "dashboard.helpBubble.tip51": "Copy the pairing link for another device. The receiving device still need to check the same safety phrase.",
   "dashboard.helpBubble.tip52": "Start pairing first, then this area go show QR or status message for the other device.",
   "dashboard.helpBubble.tip53": "Trusted devices remember one verified relationship so future sends go easier.",
-  "dashboard.helpBubble.tip54": "Saved trust no be live connection and e never skip local check."
+  "dashboard.helpBubble.tip54": "Saved trust no be live connection and e never skip local check.",
+  "dashboard.sync.familyDeviceMap.selection.localPhraseConfirmedDetail": "Phrase confirmed here. Confirm it on the other device before sending.",
+  "dashboard.sync.familyDeviceMap.map.localPhraseConfirmedDetail": "Phrase confirmed here. Confirm it on the other device before sending.",
+  "dashboard.sync.familyDeviceMap.map.compassRuleLocalConfirmed": "Phrase confirmed here. Confirm it on the other device, then review and send the update.",
+  "dashboard.sync.familyDeviceMap.trusted.sessionDevice": "Session device {label}"
 }

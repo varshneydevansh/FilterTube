@@ -2,6 +2,7 @@ import fs from 'node:fs';
 import vm from 'node:vm';
 import test from 'node:test';
 import assert from 'node:assert/strict';
+import { installNanahStorageLock } from './helpers/nanah-storage-lock-fixture.mjs';
 
 const ioSource = fs.readFileSync('js/io_manager.js', 'utf8');
 
@@ -143,6 +144,7 @@ function createContext({ failActiveProfileWrite = false } = {}) {
   };
   context.__getSavedSettingsPayload = () => savedSettingsPayload;
 
+  installNanahStorageLock(context);
   vm.runInNewContext(ioSource, context, { filename: 'js/io_manager.js' });
   return context;
 }

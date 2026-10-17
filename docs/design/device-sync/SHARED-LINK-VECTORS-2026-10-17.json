@@ -1,0 +1,37 @@
+{
+  "kind": "deterministic compatibility vectors from current production shared-link functions; not network or cryptographic-security proof",
+  "source": "js/tab-view.js:getNanahManagedLinkBinding/nanahManagedLinkBindingKey/buildNanahManagedSharedLinkId",
+  "sectionSha256": "5761359b742ddfea77753ce39a03448b61da8727bc5edc205357e74dec27ea7e",
+  "vectors": [
+    {
+      "binding": {
+        "sourceDeviceId": "desktop-parent-a",
+        "targetDeviceId": "living-room-tv",
+        "sourceProfileId": "parent-a",
+        "targetProfileId": "child-kids"
+      },
+      "utf8Json": "[\"filtertube-managed-link-v1\",[\"desktop-parent-a\",\"living-room-tv\",\"parent-a\",\"child-kids\"]]",
+      "linkId": "nm1-raERymXB_oMJ0wYXeF1cJTqd5lSVXGOceZ8Pp-t3fyo"
+    },
+    {
+      "binding": {
+        "sourceDeviceId": "desktop-parent-a",
+        "targetDeviceId": "living-room-tv",
+        "sourceProfileId": "parent-b",
+        "targetProfileId": "child-kids"
+      },
+      "utf8Json": "[\"filtertube-managed-link-v1\",[\"desktop-parent-a\",\"living-room-tv\",\"parent-b\",\"child-kids\"]]",
+      "linkId": "nm1-ytFfum5XWXDZpKhyrnITi7z29sS6SSNCSHKbDA57npQ"
+    },
+    {
+      "binding": {
+        "sourceDeviceId": "desktop-parent-a",
+        "targetDeviceId": "living-room-tv",
+        "sourceProfileId": "parent-a",
+        "targetProfileId": "child-other"
+      },
+      "utf8Json": "[\"filtertube-managed-link-v1\",[\"desktop-parent-a\",\"living-room-tv\",\"parent-a\",\"child-other\"]]",
+      "linkId": "nm1-87wx-45r8cRNsjroYntrVv5O9rq2-yCazRuTYHlnKBo"
+    }
+  ]
+}

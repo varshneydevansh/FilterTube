@@ -489,3 +489,47 @@ test('local-network client refuses private outbound secrets and public http endp
   assert.equal(unavailable.reason, 'local_network_endpoint_unconfigured');
   assert.equal(unavailable.candidates.length, 0);
 });
+
+test('HTTP Home Pickup accepts private address literals but rejects public domains that resemble them', () => {
+  const window = loadClient('js/nanah_managed_local_network_client.js');
+  const configured = endpointUrl => window.FilterTubeManagedLocalNetworkClient.createProvider({ endpointUrl }).configured;
+  for (const host of ['127.0.0.1', '10.0.0.12', '192.168.1.2', '172.16.0.2', '172.31.255.2', '[::1]', 'localhost', 'helper.local']) {
+    assert.equal(configured(`http://${host}:8787/filtertube`), true, host);
+  }
+  for (const host of ['127.attacker.example', '10.attacker.example', '192.168.attacker.example', '172.16.attacker.example', '172.32.0.2', '8.8.8.8']) {
+    assert.equal(configured(`http://${host}:8787/filtertube`), false, host);
+  }
+});
+
+test('stalled Home Pickup discovery expires and a subsequent scan can succeed', async () => {
+  const window = loadClient('js/nanah_managed_local_network_client.js');
+  let expire;
+  let cleared = 0;
+  let calls = 0;
+  const provider = window.FilterTubeManagedLocalNetworkClient.createProvider({
+    endpointUrl: 'http://127.0.0.1:8787/filtertube'
+  }, {
+    AbortController,
+    setTimeout(callback, delay) {
+      assert.equal(delay, 8000);
+      expire = callback;
+      return 1;
+    },
+    clearTimeout() { cleared += 1; },
+    fetch: async (_url, options) => {
+      calls += 1;
+      if (calls > 1) return jsonResponse({ ok: true, candidates: [{ candidateId: 'candidate-1', label: 'Kid tablet' }] });
+      return new Promise((_resolve, reject) => options.signal.addEventListener('abort', () => reject(new Error('aborted')), { once: true }));
+    }
+  });
+  const stalled = provider.discoverNearbyDevices();
+  expire();
+  const timeout = await stalled;
+  assert.equal(timeout.ok, false);
+  assert.equal(timeout.reason, 'local_network_request_timeout');
+  assert.equal(timeout.candidates.length, 0);
+  const retry = await provider.discoverNearbyDevices();
+  assert.equal(retry.ok, true);
+  assert.equal(retry.candidates[0].label, 'Kid tablet');
+  assert.equal(cleared, 2);
+});
