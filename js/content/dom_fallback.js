@@ -3868,10 +3868,34 @@ function handleCommentsFallback(settings) {
         'ytm-comments-entry-point-renderer, ytm-comments-entry-point-teaser-renderer, ' +
         'ytm-comments-header-renderer, ytm-item-section-renderer[section-identifier*="comment"]'
     );
-    const commentThreads = document.querySelectorAll('ytd-comment-thread-renderer, ytm-comment-thread-renderer');
-    const commentRenderers = document.querySelectorAll('ytd-comment-renderer, ytm-comment-renderer');
-    const commentViewModels = document.querySelectorAll('ytd-comment-view-model, ytm-comment-view-model');
+    const commentThreads = document.querySelectorAll('ytd-comment-thread-renderer, ytm-comment-thread-renderer, yt-comment-thread-renderer');
+    const commentRenderers = document.querySelectorAll('ytd-comment-renderer, ytm-comment-renderer, yt-comment-renderer');
+    const commentViewModels = document.querySelectorAll('ytd-comment-view-model, ytm-comment-view-model, yt-comment-view-model');
     const mobileCommentCards = collectMobileCommentEntryCards();
+    const threadSelector = 'ytd-comment-thread-renderer, ytm-comment-thread-renderer, yt-comment-thread-renderer';
+    const replySelector = 'ytd-comment-replies-renderer, ytm-comment-replies-renderer, yt-comment-replies-renderer, #replies';
+    const rootComments = new Map();
+    const getThreadRootComment = thread => {
+        if (rootComments.has(thread)) return rootComments.get(thread);
+        const candidates = Array.from(thread.querySelectorAll?.(
+            'ytd-comment-renderer, ytm-comment-renderer, yt-comment-renderer, ' +
+            'ytd-comment-view-model, ytm-comment-view-model, yt-comment-view-model'
+        ) || []);
+        const root = candidates.find(comment => {
+            if (comment.closest(threadSelector) !== thread) return false;
+            const replies = comment.closest(replySelector);
+            return !replies || !thread.contains(replies);
+        }) || (candidates.length === 0 && !thread.querySelector(replySelector) ? thread : null);
+        rootComments.set(thread, root);
+        return root;
+    };
+    const isThreadRootComment = (comment, thread) => {
+        if (!thread) return false;
+        const replies = comment.closest(replySelector);
+        if (replies && thread.contains(replies)) return false;
+        const root = getThreadRootComment(thread);
+        return root === comment || (root && root !== thread && root.contains(comment));
+    };
 
     try {
         const listMode = (settings && settings.listMode === 'whitelist') ? 'whitelist' : 'blocklist';
@@ -3943,17 +3967,21 @@ function handleCommentsFallback(settings) {
 
     // 3. Per-thread filtering
     commentThreads.forEach(thread => {
-        const authorAnchor = thread.querySelector(
+        // A thread's aggregate text includes every reply. Only its own root
+        // comment may decide whether the entire conversation is hidden.
+        const rootComment = getThreadRootComment(thread);
+        if (!rootComment) return;
+        const authorAnchor = rootComment.querySelector(
             '#author-text.yt-simple-endpoint, ' +
             'a#author-text, ' +
             '#author-text a'
         );
 
-        const channelName = authorAnchor?.textContent?.trim() || thread.querySelector('#author-text')?.textContent?.trim() || '';
+        const channelName = authorAnchor?.textContent?.trim() || rootComment.querySelector('#author-text')?.textContent?.trim() || '';
         const channelHref = authorAnchor?.getAttribute?.('href') || authorAnchor?.href || '';
         const channelMeta = (typeof extractChannelMetadataFromElement === 'function')
-            ? extractChannelMetadataFromElement(thread, channelName, channelHref, {
-                cacheTarget: authorAnchor || thread,
+            ? extractChannelMetadataFromElement(rootComment, channelName, channelHref, {
+                cacheTarget: authorAnchor || rootComment,
                 relatedElements: [authorAnchor].filter(Boolean)
             })
             : buildChannelMetadata(channelName, channelHref);
@@ -3995,7 +4023,7 @@ function handleCommentsFallback(settings) {
             return;
         }
 
-        const commentText = thread.textContent || '';
+        const commentText = rootComment.textContent || '';
         const shouldHide = shouldHideContent(commentText, channelName, {
             ...settings,
             filterKeywords: commentKeywordList
@@ -4022,8 +4050,8 @@ function handleCommentsFallback(settings) {
         try {
             if (!commentEl || !(commentEl instanceof Element)) return;
 
-            const parentThread = commentEl.closest('ytd-comment-thread-renderer, ytm-comment-thread-renderer');
-            const isRootOfThread = parentThread && parentThread.querySelector(':scope > ytd-comment-renderer, :scope > ytm-comment-renderer') === commentEl;
+            const parentThread = commentEl.closest(threadSelector);
+            const isRootOfThread = isThreadRootComment(commentEl, parentThread);
             if (isRootOfThread) return;
 
             const blockedChannelId = commentEl.getAttribute('data-filtertube-blocked-channel-id') || '';
@@ -4094,13 +4122,14 @@ function handleCommentsFallback(settings) {
         }
     });
 
-    // 5. Modern YouTube comments use ytd-comment-view-model for both top-level and reply nodes.
+    // 5. Modern YouTube comments use ytd-comment-view-model and yt-comment-view-model for both top-level and reply nodes.
     commentViewModels.forEach(commentVm => {
         try {
             if (!commentVm || !(commentVm instanceof Element)) return;
-            if (commentVm.closest('ytd-comment-simplebox-renderer, ytm-comment-simplebox-renderer, #simple-box')) return;
+            if (commentVm.closest('ytd-comment-simplebox-renderer, ytm-comment-simplebox-renderer, yt-comment-simplebox-renderer, #simple-box')) return;
 
-            const containerToHide = commentVm.closest('ytd-comment-thread-renderer, ytm-comment-thread-renderer') || commentVm;
+            const parentThread = commentVm.closest(threadSelector);
+            const containerToHide = isThreadRootComment(commentVm, parentThread) ? parentThread : commentVm;
 
             const readBlocked = (el) => {
                 if (!el) return { id: '', handle: '', customUrl: '', state: '', ts: 0 };
