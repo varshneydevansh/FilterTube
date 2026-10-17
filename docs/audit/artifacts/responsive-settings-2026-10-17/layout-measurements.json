@@ -1,0 +1,235 @@
+{
+  "kind": "source DOM and CSS layout fixture; extension storage and runtime behavior excluded",
+  "settings": [
+    {
+      "clipped": [],
+      "core": 260,
+      "pageOverflow": false,
+      "viewOverflow": 0,
+      "width": 320
+    },
+    {
+      "clipped": [],
+      "core": 300,
+      "pageOverflow": false,
+      "viewOverflow": 0,
+      "width": 360
+    },
+    {
+      "clipped": [],
+      "core": 580,
+      "pageOverflow": false,
+      "viewOverflow": 0,
+      "width": 640
+    },
+    {
+      "clipped": [],
+      "core": 708,
+      "pageOverflow": false,
+      "viewOverflow": 0,
+      "width": 768
+    },
+    {
+      "clipped": [],
+      "core": 547,
+      "pageOverflow": false,
+      "viewOverflow": 0,
+      "width": 930
+    },
+    {
+      "clipped": [],
+      "core": 696,
+      "pageOverflow": false,
+      "viewOverflow": 0,
+      "width": 1085
+    },
+    {
+      "clipped": [],
+      "core": 785,
+      "pageOverflow": false,
+      "viewOverflow": 0,
+      "width": 1180
+    },
+    {
+      "clipped": [],
+      "core": 952,
+      "pageOverflow": false,
+      "viewOverflow": 0,
+      "width": 1360
+    },
+    {
+      "clipped": [],
+      "core": 1029,
+      "pageOverflow": false,
+      "viewOverflow": 0,
+      "width": 1440
+    }
+  ],
+  "popup": [
+    {
+      "body": 320,
+      "framePadding": "4.2px 4.2px 3.6px",
+      "overflow": false,
+      "root": 320,
+      "width": 320
+    },
+    {
+      "body": 360,
+      "framePadding": "4.2px 4.2px 3.6px",
+      "overflow": false,
+      "root": 360,
+      "width": 360
+    },
+    {
+      "body": 392,
+      "framePadding": "4.2px 4.2px 3.6px",
+      "overflow": false,
+      "root": 392,
+      "width": 392
+    },
+    {
+      "body": 392,
+      "framePadding": "4.2px 4.2px 3.6px",
+      "overflow": false,
+      "root": 392,
+      "width": 640
+    }
+  ],
+  "otherStaticSurfaces": [
+    {
+      "mode": "/dashboard",
+      "pageOverflow": false,
+      "viewOverflow": 0,
+      "width": 320
+    },
+    {
+      "mode": "/dashboard",
+      "pageOverflow": false,
+      "viewOverflow": 0,
+      "width": 360
+    },
+    {
+      "mode": "/dashboard",
+      "pageOverflow": false,
+      "viewOverflow": 0,
+      "width": 768
+    },
+    {
+      "mode": "/dashboard",
+      "pageOverflow": false,
+      "viewOverflow": 0,
+      "width": 1180
+    },
+    {
+      "mode": "/dashboard",
+      "pageOverflow": false,
+      "viewOverflow": 0,
+      "width": 1440
+    },
+    {
+      "mode": "/filters",
+      "pageOverflow": false,
+      "viewOverflow": 0,
+      "width": 320
+    },
+    {
+      "mode": "/filters",
+      "pageOverflow": false,
+      "viewOverflow": 0,
+      "width": 360
+    },
+    {
+      "mode": "/filters",
+      "pageOverflow": false,
+      "viewOverflow": 0,
+      "width": 768
+    },
+    {
+      "mode": "/filters",
+      "pageOverflow": false,
+      "viewOverflow": 0,
+      "width": 1180
+    },
+    {
+      "mode": "/filters",
+      "pageOverflow": false,
+      "viewOverflow": 0,
+      "width": 1440
+    },
+    {
+      "mode": "/kids",
+      "pageOverflow": false,
+      "viewOverflow": 0,
+      "width": 320
+    },
+    {
+      "mode": "/kids",
+      "pageOverflow": false,
+      "viewOverflow": 0,
+      "width": 360
+    },
+    {
+      "mode": "/kids",
+      "pageOverflow": false,
+      "viewOverflow": 0,
+      "width": 768
+    },
+    {
+      "mode": "/kids",
+      "pageOverflow": false,
+      "viewOverflow": 0,
+      "width": 1180
+    },
+    {
+      "mode": "/kids",
+      "pageOverflow": false,
+      "viewOverflow": 0,
+      "width": 1440
+    },
+    {
+      "mode": "/sync",
+      "pageOverflow": false,
+      "viewOverflow": 0,
+      "width": 320
+    },
+    {
+      "mode": "/sync",
+      "pageOverflow": false,
+      "viewOverflow": 0,
+      "width": 360
+    },
+    {
+      "mode": "/sync",
+      "pageOverflow": false,
+      "viewOverflow": 0,
+      "width": 768
+    },
+    {
+      "mode": "/sync",
+      "pageOverflow": false,
+      "viewOverflow": 0,
+      "width": 1180
+    },
+    {
+      "mode": "/sync",
+      "pageOverflow": false,
+      "viewOverflow": 0,
+      "width": 1440
+    }
+  ],
+  "pairingFields360": {
+    "before": {
+      "fieldWidth": 214,
+      "inputWidth": 248
+    },
+    "after": {
+      "fieldWidth": 214,
+      "inputWidth": 214
+    },
+    "boxSizing": "border-box"
+  },
+  "keyboard": {
+    "formatArrowRightSelectsJson": true,
+    "csvTableArrowRightScrollLeft": 40
+  }
+}

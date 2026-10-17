@@ -284,17 +284,17 @@
     if (surface === "popup" && root && body) {
       const popupWidth = "392px";
       root.style.width = popupWidth;
-      root.style.minWidth = popupWidth;
-      root.style.maxWidth = popupWidth;
+      root.style.minWidth = "0";
+      root.style.maxWidth = "100vw";
       body.style.width = popupWidth;
-      body.style.minWidth = popupWidth;
-      body.style.maxWidth = popupWidth;
+      body.style.minWidth = "0";
+      body.style.maxWidth = "100%";
       body.style.overflowX = "hidden";
       const popupRoot = document.getElementById("popupRoot");
       if (popupRoot) {
         popupRoot.style.width = popupWidth;
-        popupRoot.style.minWidth = popupWidth;
-        popupRoot.style.maxWidth = popupWidth;
+        popupRoot.style.minWidth = "0";
+        popupRoot.style.maxWidth = "100%";
         popupRoot.style.display = "block";
       }
     }

@@ -2769,7 +2769,8 @@ html[data-theme="dark"] .btn-secondary:hover {
 
 .dashboard-app-release__grid {
     display: grid;
-    grid-template-columns: repeat(2, minmax(19rem, 1fr));
+    grid-template-columns: repeat(auto-fit, minmax(min(100%, 19rem), 1fr));
+    min-width: 0;
     gap: 0.75rem;
 }
 
@@ -3444,6 +3445,134 @@ html[data-theme="dark"] .dashboard-app-preview__player {
 .help-cluster--support {
     display: grid;
     gap: 1.2rem;
+}
+
+/* Settings contains long import previews: give them the available content width
+   instead of reserving a mostly empty second column beside them. */
+#settingsView .settings-grid {
+    grid-template-columns: minmax(0, 1fr);
+}
+
+.settings-shell .settings-system {
+    grid-template-columns: repeat(auto-fit, minmax(min(100%, 20rem), 1fr));
+}
+
+.settings-shell .settings-core,
+.settings-shell .settings-system,
+.settings-shell .settings-card,
+.settings-shell .import-export-text {
+    min-width: 0;
+}
+
+.settings-shell .import-export-row {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(min(100%, 18rem), 1fr));
+    align-items: start;
+}
+
+.settings-shell .import-export-text {
+    max-width: 100%;
+    overflow-wrap: anywhere;
+}
+
+.settings-shell .import-export-actions {
+    min-width: 0;
+    max-width: 100%;
+    align-items: stretch;
+}
+
+.settings-shell .import-export-actions button {
+    width: 100%;
+    min-width: 0;
+    white-space: normal;
+}
+
+.settings-shell .import-export-rule-list .import-export-row {
+    grid-template-columns: minmax(0, 1fr);
+    align-items: stretch;
+}
+
+.settings-shell .import-export-rule-list .import-export-text,
+.settings-shell .import-export-rule-list .import-export-actions {
+    width: 100%;
+}
+
+.settings-shell .rule-list-format-disclosure {
+    container-type: inline-size;
+}
+
+.settings-shell .rule-list-import-flow,
+.settings-shell .rule-list-format-trust-strip {
+    grid-template-columns: repeat(auto-fit, minmax(min(100%, 10rem), 1fr));
+}
+
+.settings-shell .rule-list-format-trust-strip span {
+    white-space: normal;
+    overflow: visible;
+}
+
+.settings-shell .rule-list-format-switcher {
+    grid-template-columns: repeat(auto-fit, minmax(min(100%, 7rem), 1fr));
+}
+
+.settings-shell .rule-list-format-switcher label strong,
+.settings-shell .rule-list-format-switcher label span {
+    white-space: normal;
+    overflow-wrap: anywhere;
+}
+
+.settings-shell .rule-list-format-disclosure > summary {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
+}
+
+.settings-shell .rule-list-format-disclosure > summary code {
+    grid-column: 1;
+    grid-row: 2;
+    width: fit-content;
+    max-width: 100%;
+    box-sizing: border-box;
+    white-space: normal;
+    overflow-wrap: anywhere;
+}
+
+.settings-shell .rule-list-format-disclosure > summary::after {
+    grid-column: 2;
+    grid-row: 1 / 3;
+}
+
+.settings-shell .rule-list-format-showcase__header {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(min(100%, 16rem), 1fr));
+}
+
+.settings-shell .rule-list-format-showcase__header code {
+    width: fit-content;
+}
+
+/* Container width includes the sidebar and card padding, unlike viewport rules. */
+@container (max-width: 980px) {
+    .settings-shell .rule-list-format-panel {
+        grid-template-columns: minmax(0, 1fr);
+    }
+}
+
+@container (max-width: 640px) {
+    .settings-shell .rule-list-preview-sheet {
+        overflow-x: auto;
+    }
+
+    .settings-shell .rule-list-preview-sheet__letters,
+    .settings-shell .rule-list-preview-sheet__row {
+        grid-template-columns: 2.4rem minmax(7.5rem, 1fr) minmax(6.5rem, 0.86fr) minmax(6rem, 0.7fr);
+    }
+
+    .settings-shell .rule-list-preview-sheet__letters span:nth-child(n),
+    .settings-shell .rule-list-preview-sheet__row span:nth-child(n) {
+        display: block;
+        grid-column: auto;
+        grid-row: auto;
+    }
 }
 
 .nanah-sync-shell {
@@ -5758,6 +5887,7 @@ html[data-theme="dark"] .dashboard-app-preview__player {
 .nanah-sync-join-row .text-input {
     width: 100%;
     min-width: 0;
+    box-sizing: border-box;
 }
 
 .nanah-select-menu {
@@ -7349,7 +7479,7 @@ html[data-theme="dark"] .ft-rule-entry-badge--allow {
 }
 
 @media (max-width: 768px) {
-    .app-container {
+    body[data-surface="tab-view"] .app-container {
         grid-template-columns: 1fr !important;
         gap: 0.72rem !important;
         min-height: 100dvh;
@@ -8322,6 +8452,19 @@ html[data-theme="dark"] body.ft-extension-surface[data-surface="tab-view"] input
     body.ft-extension-surface[data-surface="tab-view"] .settings-card__body,
     body.ft-extension-surface[data-surface="tab-view"] .import-export-row {
         padding: 0.92rem;
+    }
+
+    /* Avoid spending most of a phone's width on nested import-card gutters. */
+    body.ft-extension-surface[data-surface="tab-view"] .settings-shell .help-item {
+        padding: 0.65rem;
+    }
+
+    body.ft-extension-surface[data-surface="tab-view"] .settings-shell .import-export-row {
+        padding: 0.65rem;
+    }
+
+    .settings-shell .rule-list-format-panel {
+        padding: 0.45rem;
     }
 
     body.ft-extension-surface[data-surface="tab-view"] .view-hero {
