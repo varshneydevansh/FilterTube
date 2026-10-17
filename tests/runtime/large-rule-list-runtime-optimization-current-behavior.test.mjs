@@ -275,7 +275,7 @@ test('DOM fallback caches compiled rule lists by immutable snapshot identity', (
 
 test('recursive JSON traversal only constructs diagnostic paths when debugging is enabled', () => {
   const filterLogic = read('js/filter_logic.js');
-  const start = filterLogic.indexOf("filter(obj, path = 'root') {");
+  const start = filterLogic.indexOf("filter(obj, path = 'root', channelShelfScope = null) {");
   const end = filterLogic.indexOf("processData(data, dataName = 'unknown') {", start);
   const traversal = filterLogic.slice(start, end);
 

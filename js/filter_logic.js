@@ -665,6 +665,11 @@
         'gridChannelRenderer'
     ]);
 
+    const CHANNEL_SHELF_VIDEO_RENDERERS = new Set([
+        'videoRenderer', 'compactVideoRenderer', 'gridVideoRenderer',
+        'videoWithContextRenderer', 'richGridMedia', 'lockupViewModel'
+    ]);
+
     const CHIP_RENDERERS = new Set([
         'relatedChipCloudRenderer',
         'chipCloudRenderer',
@@ -2514,7 +2519,7 @@
         /**
          * Check if an item should be blocked based on filter rules
          */
-        _shouldBlock(item, rendererType) {
+        _shouldBlock(item, rendererType, channelShelfOwner = null) {
             if (!item || typeof item !== 'object') return false;
 
             const originalRendererType = rendererType;
@@ -2561,6 +2566,18 @@
                 this.settings.videoChannelMap[videoId]
             ) {
                 channelInfo.id = this.settings.videoChannelMap[videoId];
+                candidate.channel = channelInfo;
+                candidate.collaborators = [channelInfo];
+            }
+
+            // A channel's own upload shelf can omit bylines on its immediate
+            // video cards. Its explicit channel browse endpoint is a scoped
+            // fallback, never a replacement for a card's own known owner.
+            if (needsChannelIdentity && channelShelfOwner && CHANNEL_SHELF_VIDEO_RENDERERS.has(rendererType)
+                && videoId && !candidate.isPlaylist && !candidate.isComment && !candidate.isShort
+                && !Array.isArray(channelInfo)
+                && !this._hasChannelShelfCardOwner(item, channelInfo)) {
+                channelInfo = { ...this._emptyChannelInfo(), id: channelShelfOwner.id };
                 candidate.channel = channelInfo;
                 candidate.collaborators = [channelInfo];
             }
@@ -4263,10 +4280,52 @@
             return false;
         }
 
-        /**
-         * Recursively filter a YouTube data object
-         */
-        filter(obj, path = 'root') {
+        _hasChannelShelfCardOwner(item, channelInfo) {
+            const populated = (value, depth = 0) => {
+                if (value == null) return false;
+                if (typeof value === 'string') return value.trim().length > 0;
+                if (typeof value !== 'object') return true;
+                const values = Object.values(value);
+                if (!values.length) return false;
+                // Unknown or deeply nested partial owner data is retained,
+                // rather than guessing that it belongs to the shelf owner.
+                if (depth >= 6) return true;
+                return values.some(child => populated(child, depth + 1));
+            };
+            return ['name', 'id', 'handle', 'customUrl'].some(field => populated(channelInfo?.[field]))
+                || ['shortBylineText', 'longBylineText', 'ownerText', 'authorText', 'authorEndpoint', 'channelId']
+                .some(field => populated(item[field]));
+        }
+
+        // Only explicit, mutually consistent channel endpoints can scope an
+        // upload shelf. Text labels and arbitrary descendants are not owners.
+        _getChannelShelfOwner(shelf) {
+            if (!shelf || typeof shelf !== 'object') return null;
+            const header = shelf.header?.shelfHeaderRenderer;
+            const endpoints = [shelf.endpoint, shelf.navigationEndpoint, header?.navigationEndpoint,
+                ...((Array.isArray(shelf.title?.runs) ? shelf.title.runs : []).map(run => run?.navigationEndpoint)),
+                ...((Array.isArray(header?.title?.runs) ? header.title.runs : []).map(run => run?.navigationEndpoint))];
+            const ids = endpoints.map(endpoint => endpoint?.browseEndpoint?.browseId).filter(id => typeof id === 'string' && id);
+            if (!ids.length || ids.some(id => !/^UC[\w-]{22}$/.test(id)) || new Set(ids).size !== 1) return null;
+            return { id: ids[0] };
+        }
+
+        _getChannelShelfChildScope(obj, key, scope) {
+            if (key === 'shelfRenderer' && this._hasChannelPolicyRules(this.settings.listMode)) {
+                const owner = this._getChannelShelfOwner(obj[key]);
+                return owner ? { owner, stage: 'shelf' } : null;
+            }
+            if (!scope) return null;
+            if (scope.stage === 'shelf' && key === 'content') return { owner: scope.owner, stage: 'content' };
+            if (scope.stage === 'content' && ['horizontalListRenderer', 'verticalListRenderer', 'expandedShelfContentsRenderer'].includes(key)) {
+                return { owner: scope.owner, stage: 'list' };
+            }
+            if (scope.stage === 'list' && key === 'items') return { owner: scope.owner, stage: 'cards' };
+            return null;
+        }
+
+        /** Recursively filter a YouTube data object without persisting shelf context. */
+        filter(obj, path = 'root', channelShelfScope = null) {
             if (!obj || typeof obj !== 'object') {
                 return obj;
             }
@@ -4276,7 +4335,7 @@
                 const filtered = [];
                 for (let i = 0; i < obj.length; i++) {
                     const childPath = this.debugEnabled ? `${path}[${i}]` : path;
-                    const item = this.filter(obj[i], childPath);
+                    const item = this.filter(obj[i], childPath, channelShelfScope?.stage === 'cards' ? channelShelfScope : null);
                     if (item !== null) {
                         filtered.push(item);
                     }
@@ -4300,7 +4359,7 @@
             ));
 
             for (const rendererType of rendererTypes) {
-                if (this._shouldBlock(obj[rendererType], rendererType)) {
+                if (this._shouldBlock(obj[rendererType], rendererType, channelShelfScope?.stage === 'cards' ? channelShelfScope.owner : null)) {
                     this.blockedCount++;
                     this._log(`✂️ Removed ${rendererType} at ${path}`);
                     return null; // Remove this entire object
@@ -4317,7 +4376,7 @@
                     continue;
                 }
                 const childPath = this.debugEnabled ? `${path}.${key}` : path;
-                const filteredValue = this.filter(value, childPath);
+                const filteredValue = this.filter(value, childPath, this._getChannelShelfChildScope(obj, key, channelShelfScope));
                 if (filteredValue !== null) {
                     result[key] = filteredValue;
                 }
