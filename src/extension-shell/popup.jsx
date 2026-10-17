@@ -115,6 +115,20 @@ function PopupShell() {
             <div id="popupFiltersTabsContainer" />
           </section>
         </main>
+
+        <a
+          id="androidAppLinkPopup"
+          className="ft-popup-android-link"
+          href="https://play.google.com/store/apps/details?id=com.filtertube.app"
+          target="_blank"
+          rel="noopener noreferrer"
+        >
+          <img src="../assets/images/Android_icon.png" alt="" width="48" height="36" />
+          <span data-ft-i18n="dashboard.androidTesting.join">Open FilterTube on Google Play</span>
+          <svg aria-hidden="true" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+            <path d="M7 17L17 7M7 7h10v10" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" />
+          </svg>
+        </a>
       </div>
     </div>
   );

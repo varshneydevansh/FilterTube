@@ -849,12 +849,12 @@ async function initializeAndroidClosedTestingInvite() {
 
     const eyebrow = document.createElement('div');
     eyebrow.className = 'ft-modal-eyebrow';
-    setTabViewLocalizedCopy(eyebrow, 'textContent', 'dashboard.androidTesting.eyebrow', 'Android open testing');
+    setTabViewLocalizedCopy(eyebrow, 'textContent', 'dashboard.androidTesting.eyebrow', 'Android');
 
     const title = document.createElement('h3');
     title.id = 'androidClosedTestingInviteTitle';
     title.className = 'ft-modal-title';
-    setTabViewLocalizedCopy(title, 'textContent', 'dashboard.androidTesting.title', 'FilterTube for Android is open to testers');
+    setTabViewLocalizedCopy(title, 'textContent', 'dashboard.androidTesting.title', 'The Android app is now public on Google Play.');
 
     header.append(eyebrow, title);
 
@@ -863,11 +863,11 @@ async function initializeAndroidClosedTestingInvite() {
 
     const message = document.createElement('p');
     message.className = 'android-closed-testing-invite__message';
-    setTabViewLocalizedCopy(message, 'textContent', 'dashboard.androidTesting.message', 'Anyone in a supported country can now join FilterTube\'s Google Play open test. No invitation or email is needed. Install the complete custom Main and Kids viewing app and send feedback when you spot a problem.');
+    setTabViewLocalizedCopy(message, 'textContent', 'dashboard.androidTesting.message', 'Install from Google Play. No invitation or email needed.');
 
     const address = document.createElement('div');
     address.className = 'android-closed-testing-invite__address';
-    setTabViewLocalizedCopy(address, 'textContent', 'dashboard.androidTesting.availability', 'Available through Google Play open testing in 177 countries and regions');
+    setTabViewLocalizedCopy(address, 'textContent', 'dashboard.androidTesting.availability', 'Available on Google Play');
 
     const note = document.createElement('p');
     note.className = 'android-closed-testing-invite__note';
@@ -883,11 +883,11 @@ async function initializeAndroidClosedTestingInvite() {
 
     const mailBtn = document.createElement('a');
     mailBtn.className = 'btn-primary android-closed-testing-invite__mail';
-    const testingHref = 'https://play.google.com/apps/testing/com.filtertube.app';
+    const testingHref = 'https://play.google.com/store/apps/details?id=com.filtertube.app';
     mailBtn.href = testingHref;
     mailBtn.target = '_blank';
     mailBtn.rel = 'noreferrer';
-    setTabViewLocalizedCopy(mailBtn, 'textContent', 'dashboard.androidTesting.join', 'Become a tester');
+    setTabViewLocalizedCopy(mailBtn, 'textContent', 'dashboard.androidTesting.join', 'Open FilterTube on Google Play');
 
     const cleanup = async () => {
         await setDismissed();

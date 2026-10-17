@@ -1,0 +1,101 @@
+Take back control of your YouTube and YouTube Kids experience.
+
+FilterTube helps you reduce unwanted recommendations, all advertisments, distracting content, channels, Shorts, comments, sponsored cards. You decide what appears in your viewing space—not an engagement algorithm.
+
+FilterTube is now available on Android phones and tablets, alongside the browser extension.
+
+### Why use FilterTube?
+
+• Block videos using keywords, topics and dates  
+• Block channels by handle or channel ID  
+• Create allow-only feeds with Whitelist Mode  
+• Hide Shorts, comments, live chat and other distractions  
+• Get rid of all advertisements across YT Main and YT Kids.
+• Create separate Default, Account and Child profiles  
+• Protect profiles and sensitive controls with PINs, with Multi Languge support  
+• Browse and play videos and audio stored on your device  
+• Synchronise selected settings directly between your own devices with Nanah  
+• Continue playback in the background, picture-in-picture or from system media controls  
+
+Install FilterTube for Android from Google Play—no invitation or email needed.
+https://play.google.com/store/apps/details?id=com.filtertube.app
+
+### Private and local-first
+
+FilterTube does not require a FilterTube account.
+
+Your filtering rules, profiles, PIN configuration, local-media favourites and viewing controls remain on your device. FilterTube does not upload your local videos or audio.
+
+Optional Google sign-in is used only when you choose account-backed features such as your YouTube feed, subscriptions, playlists and history.
+
+Notification permission is used only to display active media-player controls. FilterTube does not send promotional notifications.
+
+### Main and Kids viewing spaces
+
+Create the right environment for every profile:
+
+• Main viewing for a fully customisable video experience  
+• Kids viewing with parent-managed rules  
+• Whitelist Mode for approved-only channels and content  
+• Independent rules for Default, Account and Child profiles  
+• PIN protection for parent controls and sensitive settings  
+• Protected viewing-time limits and voluntary Self-Control sessions  
+
+### Filtering and feed controls
+
+FilterTube can:
+
+• Block videos containing selected keywords  
+• Apply date limits to keyword rules  
+• Block or allow specific channels  
+• Hide content that references a blocked channel  
+• Keep separate Blocked and Allowed collections  
+• Hide Shorts across supported feeds and recommendations  
+• Hide comments or filter comments using keywords  
+• Reduce autoplay chains, recommendation noise and live-chat clutter  
+• Hide supported sponsored cards, promotions and observed advertising placements  
+
+Filtering availability may vary as YouTube changes its pages and playback systems.
+
+### Private local media library
+
+FilterTube includes an on-device media library and player.
+
+Browse device videos and audio by recency, folder, album or artist. View thumbnails and metadata, maintain favourites and playback queues, rescan when files change, and continue playback using background and notification controls.
+
+Local media is processed on your device and is never uploaded.
+
+### Profiles and parental controls
+
+• Default profile for primary administration  
+• Independent Account profiles with separate rules  
+• Parent-managed Child profiles  
+• Master PIN and profile PIN protection  
+• Protected exports, imports and profile-management actions  
+• Viewing-time limits with a visible lock screen when time expires  
+• Self-Control sessions that temporarily freeze selected rules and settings  
+
+### Backup and device synchronisation
+
+• Import and export profile-aware JSON backups  
+• Use encrypted backups for protected profiles  
+• Pair your own devices with Nanah  
+• Verify a safety phrase before transferring settings  
+• Select exactly which profiles and settings to send  
+• Save trusted parent-to-child links for future managed updates  
+
+Nanah uses a small signalling relay to help paired devices meet. Supported transfers are designed to occur directly between the paired devices after verification.
+
+### Dashboard and transparency
+
+• Filtering controls and profile management  
+• Accounts & Sync and local-media access  
+• Help, About and built-in release notes  
+• Hidden-item counters and filtering statistics  
+• Optional Google Play support subscriptions for eligible non-Kids profiles  
+
+FilterTube began after repeated frustration with the limited controls available to parents and viewers who wanted to block content more precisely.
+
+It is designed for parents creating safer viewing spaces, students trying to stay focused, and anyone who wants greater control over recommendations and distractions.
+
+FilterTube is an independent open-source project and is not affiliated with, endorsed by or sponsored by YouTube or Google. YouTube is a trademark of Google LLC.

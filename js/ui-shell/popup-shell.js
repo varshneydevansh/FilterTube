@@ -379,7 +379,19 @@
       },
       /* @__PURE__ */ _("span", { className: "ft-popup-time-status__label", "data-ft-i18n": "popup.youtubeTime" }, "YouTube time"),
       /* @__PURE__ */ _("strong", { id: "ftManagedTimeStatusValuePopup", className: "ft-popup-time-status__value" })
-    ), /* @__PURE__ */ _("main", { className: "app-content ft-popup-content" }, /* @__PURE__ */ _("section", { className: "ft-popup-filter-card" }, /* @__PURE__ */ _("div", { className: "ft-popup-filter-card__header" }, /* @__PURE__ */ _("div", null, /* @__PURE__ */ _("p", { className: "ft-popup-filter-card__eyebrow", "data-ft-i18n": "popup.quickControl" }, "Quick control"), /* @__PURE__ */ _("h3", { className: "ft-popup-filter-card__title", "data-ft-i18n": "popup.updateProfile" }, "Update this profile fast")), /* @__PURE__ */ _("span", { className: "ft-popup-filter-card__badge", "data-ft-i18n": "popup.localFirst" }, "Local-first")), /* @__PURE__ */ _("div", { id: "popupFiltersTabsContainer" })))));
+    ), /* @__PURE__ */ _("main", { className: "app-content ft-popup-content" }, /* @__PURE__ */ _("section", { className: "ft-popup-filter-card" }, /* @__PURE__ */ _("div", { className: "ft-popup-filter-card__header" }, /* @__PURE__ */ _("div", null, /* @__PURE__ */ _("p", { className: "ft-popup-filter-card__eyebrow", "data-ft-i18n": "popup.quickControl" }, "Quick control"), /* @__PURE__ */ _("h3", { className: "ft-popup-filter-card__title", "data-ft-i18n": "popup.updateProfile" }, "Update this profile fast")), /* @__PURE__ */ _("span", { className: "ft-popup-filter-card__badge", "data-ft-i18n": "popup.localFirst" }, "Local-first")), /* @__PURE__ */ _("div", { id: "popupFiltersTabsContainer" }))), /* @__PURE__ */ _(
+      "a",
+      {
+        id: "androidAppLinkPopup",
+        className: "ft-popup-android-link",
+        href: "https://play.google.com/store/apps/details?id=com.filtertube.app",
+        target: "_blank",
+        rel: "noopener noreferrer"
+      },
+      /* @__PURE__ */ _("img", { src: "../assets/images/Android_icon.png", alt: "", width: "48", height: "36" }),
+      /* @__PURE__ */ _("span", { "data-ft-i18n": "dashboard.androidTesting.join" }, "Open FilterTube on Google Play"),
+      /* @__PURE__ */ _("svg", { "aria-hidden": "true", width: "16", height: "16", viewBox: "0 0 24 24", fill: "none", stroke: "currentColor" }, /* @__PURE__ */ _("path", { d: "M7 17L17 7M7 7h10v10", strokeWidth: "1.8", strokeLinecap: "round", strokeLinejoin: "round" }))
+    )));
   }
   applyExtensionEnvironment("popup");
   var mountNode = document.getElementById("popupRoot");

@@ -237,6 +237,51 @@ body[data-surface="popup"] .ft-popup-shell {
     backdrop-filter: blur(10px) saturate(116%);
 }
 
+.ft-popup-android-link {
+    display: flex;
+    flex: 0 0 auto;
+    align-items: center;
+    gap: 0.65rem;
+    min-height: 44px;
+    margin: 0.35rem 0.12rem 0;
+    padding: 0.3rem 0.65rem 0.3rem 0.3rem;
+    border: 1px solid var(--ft-color-sem-neutral-border);
+    border-radius: 0.85rem;
+    background: var(--ft-color-bg-surface);
+    color: var(--ft-color-text-primary);
+    font-size: 0.78rem;
+    font-weight: 600;
+    line-height: 1.4;
+    text-decoration: none;
+}
+
+.ft-popup-android-link img {
+    flex: 0 0 48px;
+    width: 48px;
+    height: 36px;
+    object-fit: cover;
+    border-radius: 0.55rem;
+}
+
+.ft-popup-android-link span {
+    flex: 1;
+    min-width: 0;
+    overflow-wrap: anywhere;
+}
+
+.ft-popup-android-link svg {
+    flex: 0 0 16px;
+}
+
+.ft-popup-android-link:hover {
+    border-color: var(--ft-color-brand-primary);
+}
+
+.ft-popup-android-link:focus-visible {
+    outline: 2px solid var(--ft-color-brand-primary);
+    outline-offset: 2px;
+}
+
 .ft-popup-time-status[hidden] {
     display: none;
 }
