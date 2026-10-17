@@ -4979,7 +4979,11 @@ function applyFilterTubeHomeFeedPolish() {
 
 // DOM fallback function that processes already-rendered content
 async function applyDOMFallback(settings, options = {}) {
-    const effectiveSettings = settings || currentSettings;
+    // Settings delivery publishes currentSettings before requesting a DOM pass.
+    // Delayed hydration, enrichment and queued passes may still hold an older
+    // snapshot; they must not restore its rules or discard verified metadata.
+    const effectiveSettings = currentSettings && typeof currentSettings === 'object'
+        ? currentSettings : settings;
     if (!effectiveSettings || typeof effectiveSettings !== 'object') return;
 
     currentSettings = effectiveSettings;
