@@ -138,7 +138,8 @@ const StateManager = (() => {
                     enabled: false,
                     mode: 'single_word',
                     minWordLength: 2
-                }
+                },
+                views: { enabled: false, minViews: 500 }
             },
             categoryFilters: {
                 enabled: false,
@@ -165,7 +166,8 @@ const StateManager = (() => {
                 enabled: false,
                 mode: 'single_word',
                 minWordLength: 2
-            }
+            },
+            views: { enabled: false, minViews: 500 }
         },
         categoryFilters: {
             enabled: false,
@@ -279,7 +281,8 @@ const StateManager = (() => {
         state.contentFilters = data.contentFilters ? JSON.parse(JSON.stringify(data.contentFilters)) : {
             duration: { enabled: false, minMinutes: 0, maxMinutes: 0, condition: 'between' },
             uploadDate: { enabled: false, fromDate: '', toDate: '' },
-            uppercase: { enabled: false, mode: 'single_word', minWordLength: 2 }
+            uppercase: { enabled: false, mode: 'single_word', minWordLength: 2 },
+            views: { enabled: false, minViews: 500 }
         };
 
         state.categoryFilters = data.categoryFilters ? JSON.parse(JSON.stringify(data.categoryFilters)) : {
@@ -437,13 +440,15 @@ const StateManager = (() => {
                 const defaults = {
                     duration: { enabled: false, condition: 'between', value: '', minMinutes: 0, maxMinutes: 0 },
                     uploadDate: { enabled: false, condition: 'newer', value: '', fromDate: '', toDate: '' },
-                    uppercase: { enabled: false, mode: 'single_word', minWordLength: 2 }
+                    uppercase: { enabled: false, mode: 'single_word', minWordLength: 2 },
+                    views: { enabled: false, minViews: 500 }
                 };
                 const loaded = state.kids.contentFilters && typeof state.kids.contentFilters === 'object' ? state.kids.contentFilters : {};
                 state.kids.contentFilters = {
                     duration: { ...defaults.duration, ...(loaded.duration || {}) },
                     uploadDate: { ...defaults.uploadDate, ...(loaded.uploadDate || {}) },
-                    uppercase: { ...defaults.uppercase, ...(loaded.uppercase || {}) }
+                    uppercase: { ...defaults.uppercase, ...(loaded.uppercase || {}) },
+                    views: { ...defaults.views, ...(loaded.views || {}) }
                 };
             } catch (e) {
             }
@@ -501,13 +506,15 @@ const StateManager = (() => {
                 const defaults = {
                     duration: { enabled: false, condition: 'between', value: '', minMinutes: 0, maxMinutes: 0 },
                     uploadDate: { enabled: false, condition: 'newer', value: '', fromDate: '', toDate: '' },
-                    uppercase: { enabled: false, mode: 'single_word', minWordLength: 2 }
+                    uppercase: { enabled: false, mode: 'single_word', minWordLength: 2 },
+                    views: { enabled: false, minViews: 500 }
                 };
                 const loaded = state.kids.contentFilters && typeof state.kids.contentFilters === 'object' ? state.kids.contentFilters : {};
                 state.kids.contentFilters = {
                     duration: { ...defaults.duration, ...(loaded.duration || {}) },
                     uploadDate: { ...defaults.uploadDate, ...(loaded.uploadDate || {}) },
-                    uppercase: { ...defaults.uppercase, ...(loaded.uppercase || {}) }
+                    uppercase: { ...defaults.uppercase, ...(loaded.uppercase || {}) },
+                    views: { ...defaults.views, ...(loaded.views || {}) }
                 };
             } catch (e) {
             }
@@ -643,7 +650,8 @@ const StateManager = (() => {
                 contentFilters: {
                     duration: { enabled: false, condition: 'between', value: '', minMinutes: 0, maxMinutes: 0 },
                     uploadDate: { enabled: false, condition: 'newer', value: '', fromDate: '', toDate: '' },
-                    uppercase: { enabled: false, mode: 'single_word', minWordLength: 2 }
+                    uppercase: { enabled: false, mode: 'single_word', minWordLength: 2 },
+                    views: { enabled: false, minViews: 500 }
                 }
             };
         }
@@ -2559,7 +2567,8 @@ const StateManager = (() => {
         state.contentFilters = {
             duration: { ...state.contentFilters.duration, ...(nextContentFilters.duration || {}) },
             uploadDate: { ...state.contentFilters.uploadDate, ...(nextContentFilters.uploadDate || {}) },
-            uppercase: { ...state.contentFilters.uppercase, ...(nextContentFilters.uppercase || {}) }
+            uppercase: { ...state.contentFilters.uppercase, ...(nextContentFilters.uppercase || {}) },
+            views: { enabled: false, minViews: 500, ...(state.contentFilters.views || {}), ...(nextContentFilters.views || {}) }
         };
 
         await saveSettings();
@@ -2583,7 +2592,8 @@ const StateManager = (() => {
         kids.contentFilters = {
             duration: { ...(current.duration || {}), ...(nextContentFilters.duration || {}) },
             uploadDate: { ...(current.uploadDate || {}), ...(nextContentFilters.uploadDate || {}) },
-            uppercase: { ...(current.uppercase || {}), ...(nextContentFilters.uppercase || {}) }
+            uppercase: { ...(current.uppercase || {}), ...(nextContentFilters.uppercase || {}) },
+            views: { enabled: false, minViews: 500, ...(current.views || {}), ...(nextContentFilters.views || {}) }
         };
         state.kids = { ...kids };
 

@@ -131,7 +131,7 @@
         return hasEntries(settings.blockedVideoIds) || hasEntries(settings.allowedVideoIds) || hasActiveMetadataAdmissionRules(settings);
     }
 
-    function hasActiveMetadataAdmissionRules(settings) {
+    function hasActiveMetadataAdmissionRules(settings, includeOptionalViews = true) {
         if (!settings || typeof settings !== 'object' || settings.enabled === false) return false;
         const content = settings.contentFilters && typeof settings.contentFilters === 'object' ? settings.contentFilters : {};
         return Boolean(
@@ -139,6 +139,7 @@
             hasEntries(settings.filterChannels) || hasEntries(settings.whitelistChannels) ||
             hasEntries(settings.filterKeywords) || hasEntries(settings.whitelistKeywords) ||
             content.duration?.enabled === true || content.uploadDate?.enabled === true || content.uppercase?.enabled === true ||
+            (includeOptionalViews && content.views?.enabled === true) ||
             (settings.categoryFilters?.enabled === true && hasEntries(settings.categoryFilters.selected)) ||
             (settings.languageFilters?.enabled === true && hasEntries(settings.languageFilters.selected))
         );
@@ -293,6 +294,9 @@
 
     function evaluateContentRules(settings, metadata) {
         const filters = settings.contentFilters || {};
+        if (root.FilterTubeViewCount?.shouldBlock(metadata.viewCount, filters.views, { isLive: metadata.isLive === true })) {
+            return { state: 'blocked', kind: 'views' };
+        }
         if (filters.duration?.enabled === true) {
             const seconds = Number(metadata.lengthSeconds);
             if (!Number.isFinite(seconds) || seconds <= 0) return { state: 'pending', missing: 'duration' };
@@ -373,7 +377,10 @@
         // ID-only rules need only the selected ID. Waiting for Player JSON here
         // would hold an unrelated allowed video for metadata no rule requires.
         if (videoId && !hasActiveMetadataAdmissionRules(settings)) return { state: 'allowed', kind: 'none' };
-        if (!metadata || metadata.videoId !== videoId) return { state: 'pending', missing: 'player metadata' };
+        if (!metadata || metadata.videoId !== videoId) {
+            return videoId && settings.contentFilters?.views?.enabled === true && !hasActiveMetadataAdmissionRules(settings, false)
+                ? { state: 'allowed', kind: 'unknown-views' } : { state: 'pending', missing: 'player metadata' };
+        }
         const needsIdentity = hasEntries(settings.filterChannels) || hasEntries(settings.whitelistChannels) || settings.listMode === 'whitelist';
         const needsText = hasEntries(settings.filterKeywords) || hasEntries(settings.whitelistKeywords) || settings.contentFilters?.uppercase?.enabled === true;
         if (needsIdentity && !metadata.channelId && !metadata.channelHandle && !metadata.channelName) return { state: 'pending', missing: 'channel identity' };
@@ -414,6 +421,7 @@
         if (decision.kind === 'keyword') return `Blocked keyword\nMatched: ${decision.pattern || 'matched rule'}\nSource: ${decision.source || 'video metadata'}`;
         if (decision.kind === 'allow-only') return `Not in Allow only selected\n${metadata.channelName || decision.videoId || ''}`.trim();
         if (decision.kind === 'duration') return `Blocked by Duration Filter\nDuration: ${Math.round(Number(decision.durationSeconds) || 0)} seconds`;
+        if (decision.kind === 'views') return 'Blocked by Minimum Views Filter';
         if (decision.kind === 'upload-date') return `Blocked by Upload Date Filter\nPublished: ${decision.publishDate}`;
         if (decision.kind === 'uppercase') return 'Blocked by Uppercase Title Filter';
         if (decision.kind === 'category') return `Blocked by Category Filter\nCategory: ${decision.category}`;

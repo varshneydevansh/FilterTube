@@ -278,6 +278,9 @@
                 ? details.keywords.map(value => String(value || '').trim()).filter(Boolean)
                 : [],
             lengthSeconds: details?.lengthSeconds || microformat?.lengthSeconds || null,
+            ...((typeof details?.viewCount === 'string' || typeof details?.viewCount === 'number')
+                && /^\d+$/.test(String(details.viewCount)) && Number.isSafeInteger(Number(details.viewCount))
+                ? { viewCount: String(details.viewCount), isLive: details.isLive === true || details.isLiveContent === true } : {}),
             channelId: String(details?.channelId || microformat?.externalChannelId || '').trim(),
             channelName: String(details?.author || microformat?.ownerChannelName || '').trim(),
             channelHandle: handleMatch?.[1] ? `@${handleMatch[1]}` : '',

@@ -64,6 +64,14 @@
         return value && typeof value === 'object' && !Array.isArray(value) ? value : {};
     }
 
+    function normalizeContentFilters(value) {
+        const filters = safeObject(value), views = safeObject(filters.views);
+        const minimum = typeof views.minViews === 'number' ? views.minViews
+            : (typeof views.minViews === 'string' && /^\d+$/.test(views.minViews.trim()) ? Number(views.minViews) : NaN);
+        const valid = Number.isSafeInteger(minimum) && minimum >= 0;
+        return { ...filters, views: { ...views, enabled: views.enabled === true && valid, minViews: valid ? minimum : 500 } };
+    }
+
     function safeArray(value) {
         return Array.isArray(value) ? value : [];
     }
@@ -175,7 +183,7 @@
                         showQuickBlockButton: storage?.showQuickBlockButton !== false,
                         showBlockMenuItem: storage?.showBlockMenuItem !== false,
                         hideSearchShelves: !!storage?.hideSearchShelves,
-                        contentFilters: safeObject(storage?.contentFilters),
+                        contentFilters: normalizeContentFilters(storage?.contentFilters),
                         categoryFilters: safeObject(storage?.categoryFilters),
                         languageFilters: safeObject(storage?.languageFilters)
                     },
@@ -598,7 +606,7 @@
     }) {
         const sanitizedChannels = sanitizeChannelsList(channels);
         const sanitizedKeywords = syncFilterAllKeywords(keywords, sanitizedChannels);
-        const sanitizedContentFilters = safeObject(contentFilters);
+        const sanitizedContentFilters = normalizeContentFilters(contentFilters);
         const sanitizedCategoryFilters = safeObject(categoryFilters);
         const sanitizedLanguageFilters = safeObject(languageFilters);
         return {
@@ -778,7 +786,7 @@
                     }
                 }
 
-                const contentFilters = safeObject(profileSettings.contentFilters);
+                const contentFilters = normalizeContentFilters(profileSettings.contentFilters);
                 const categoryFilters = safeObject(profileSettings.categoryFilters);
                 const languageFilters = safeObject(profileSettings.languageFilters);
 
@@ -881,7 +889,7 @@
 
         const sanitizedChannels = sanitizeChannelsList(channels);
         const sanitizedKeywords = syncFilterAllKeywords(keywords, sanitizedChannels);
-        const sanitizedContentFilters = safeObject(contentFilters);
+        const sanitizedContentFilters = normalizeContentFilters(contentFilters);
 
         return new Promise(resolve => {
             STORAGE_NAMESPACE?.get([FT_PROFILES_V4_KEY, FT_PROFILES_V3_KEY], (existing) => {

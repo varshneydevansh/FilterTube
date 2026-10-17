@@ -5077,6 +5077,18 @@ padding: var(--ft-space-xs) var(--ft-space-sm);
     border-left: 3px solid var(--ft-color-primary);
 }
 
+.minimum-views-controls:not([hidden]) {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 12px;
+}
+
+.minimum-views-controls input {
+    width: min(100%, 12rem);
+    min-height: 40px;
+}
+
 #ftBlockTubeExportDetails select {
     max-width: 100%;
     min-width: 0;

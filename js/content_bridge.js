@@ -1125,6 +1125,7 @@ function hasBridgeEnabledContentFilters(settings) {
             settings.contentFilters.duration?.enabled === true ||
             settings.contentFilters.uploadDate?.enabled === true ||
             settings.contentFilters.uppercase?.enabled === true
+                || settings.contentFilters.views?.enabled === true
         )
     );
 }
@@ -2026,6 +2027,10 @@ function persistVideoMetaMapping(entries = []) {
         const mayReplaceIdentity = identityVerified || existing.identityVerified !== true;
         const mayReplaceText = textVerified || existing.textVerified !== true;
         const meta = {
+            ...((typeof entry?.viewCount === 'string' || typeof entry?.viewCount === 'number')
+                && /^\d+$/.test(String(entry.viewCount)) && Number.isSafeInteger(Number(entry.viewCount))
+                ? { viewCount: String(entry.viewCount), isLive: entry.isLive === true }
+                : (existing.viewCount !== undefined ? { viewCount: existing.viewCount, isLive: existing.isLive === true } : {})),
             lengthSeconds: incomingLengthSeconds !== null ? incomingLengthSeconds : (existing.lengthSeconds ?? null),
             publishDate: incomingPublishDate || (typeof existing.publishDate === 'string' ? existing.publishDate.trim() : ''),
             uploadDate: incomingUploadDate || (typeof existing.uploadDate === 'string' ? existing.uploadDate.trim() : ''),
@@ -2047,13 +2052,13 @@ function persistVideoMetaMapping(entries = []) {
                 : (Array.isArray(existing.keywords) ? existing.keywords : [])
         };
 
-        if (!meta.lengthSeconds && !meta.publishDate && !meta.uploadDate && !meta.category && !meta.languageCode && !meta.identityVerified && !meta.textVerified && !meta.shortDescription && meta.keywords.length === 0) continue;
+        if (meta.viewCount === undefined && !meta.lengthSeconds && !meta.publishDate && !meta.uploadDate && !meta.category && !meta.languageCode && !meta.identityVerified && !meta.textVerified && !meta.shortDescription && meta.keywords.length === 0) continue;
         if (meta.identityVerified === true && /^UC[a-zA-Z0-9_-]{22}$/.test(meta.channelId || '')) {
             // Exact Player metadata repairs any older video -> channel mapping
             // even when the session metadata itself was already up to date.
             persistVideoChannelMapping(videoId, meta.channelId);
         }
-        if (existing && typeof existing === 'object' && String(existing.lengthSeconds ?? '').trim() === String(meta.lengthSeconds ?? '').trim() && String(existing.publishDate ?? '').trim() === String(meta.publishDate ?? '').trim() && String(existing.uploadDate ?? '').trim() === String(meta.uploadDate ?? '').trim() && String(existing.category ?? '').trim() === String(meta.category ?? '').trim() && String(existing.languageCode ?? '').trim() === String(meta.languageCode ?? '').trim() && String(existing.languageSource ?? '').trim() === String(meta.languageSource ?? '').trim() && String(existing.languageConfidence ?? '').trim() === String(meta.languageConfidence ?? '').trim() && String(existing.title ?? '').trim() === String(meta.title ?? '').trim() && String(existing.channelId ?? '').trim() === String(meta.channelId ?? '').trim() && String(existing.channelName ?? '').trim() === String(meta.channelName ?? '').trim() && String(existing.channelHandle ?? '').trim() === String(meta.channelHandle ?? '').trim() && existing.identityVerified === meta.identityVerified && existing.textVerified === meta.textVerified && String(existing.shortDescription ?? '').trim() === String(meta.shortDescription ?? '').trim() && JSON.stringify(existing.keywords || []) === JSON.stringify(meta.keywords || [])) continue;
+        if (existing && typeof existing === 'object' && existing.viewCount === meta.viewCount && existing.isLive === meta.isLive && String(existing.lengthSeconds ?? '').trim() === String(meta.lengthSeconds ?? '').trim() && String(existing.publishDate ?? '').trim() === String(meta.publishDate ?? '').trim() && String(existing.uploadDate ?? '').trim() === String(meta.uploadDate ?? '').trim() && String(existing.category ?? '').trim() === String(meta.category ?? '').trim() && String(existing.languageCode ?? '').trim() === String(meta.languageCode ?? '').trim() && String(existing.languageSource ?? '').trim() === String(meta.languageSource ?? '').trim() && String(existing.languageConfidence ?? '').trim() === String(meta.languageConfidence ?? '').trim() && String(existing.title ?? '').trim() === String(meta.title ?? '').trim() && String(existing.channelId ?? '').trim() === String(meta.channelId ?? '').trim() && String(existing.channelName ?? '').trim() === String(meta.channelName ?? '').trim() && String(existing.channelHandle ?? '').trim() === String(meta.channelHandle ?? '').trim() && existing.identityVerified === meta.identityVerified && existing.textVerified === meta.textVerified && String(existing.shortDescription ?? '').trim() === String(meta.shortDescription ?? '').trim() && JSON.stringify(existing.keywords || []) === JSON.stringify(meta.keywords || [])) continue;
         try {
             if (Object.prototype.hasOwnProperty.call(currentSettings.videoMetaMap, videoId)) {
                 delete currentSettings.videoMetaMap[videoId];
@@ -2084,6 +2089,9 @@ function persistVideoMetaMapping(entries = []) {
     browserAPI_BRIDGE.runtime.sendMessage({
         action: 'updateVideoMetaMap',
         entries: cleaned.map(({
+            // Popularity changes are session evidence, not persistent rules.
+            viewCount,
+            isLive,
             title,
             channelId,
             channelName,

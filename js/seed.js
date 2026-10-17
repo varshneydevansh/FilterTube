@@ -1229,6 +1229,7 @@
                 settings.contentFilters.duration?.enabled === true
                 || settings.contentFilters.uploadDate?.enabled === true
                 || settings.contentFilters.uppercase?.enabled === true
+                || settings.contentFilters.views?.enabled === true
             )
         );
     }

@@ -53,10 +53,11 @@ function loadContentFilterDecision() {
   const source = read('js/content/dom_fallback.js');
   const block = sliceBetween(
     source,
-    'function getCurrentWatchContentFilterDecision(settings, metadata = {}) {',
+    'function getCurrentWatchViewCountDecision(settings, metadata = {}) {',
     'function getCurrentWatchDescriptionText() {'
   );
   const context = {
+    window: {},
     getActiveCategoryPolicy(settings) {
       return settings.categoryFilters?.enabled ? settings.categoryFilters : null;
     },

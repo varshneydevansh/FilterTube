@@ -927,6 +927,68 @@ async function initializeAndroidClosedTestingInvite() {
     });
 }
 
+// Shared Main/Kids view filter controls use the existing profile save paths.
+function appendMinimumViewsControls(rows, prefix, scheduleSave) {
+    const row = document.createElement('div');
+    row.className = 'toggle-row';
+    row.setAttribute('data-ft-control-row', 'true');
+    row.setAttribute('data-ft-search', 'minimum views video popularity filter');
+    const info = document.createElement('div');
+    info.className = 'toggle-info';
+    const title = document.createElement('label');
+    title.className = 'toggle-title';
+    title.htmlFor = `${prefix}_views_enabled`;
+    setTabViewLocalizedCopy(title, 'textContent', 'videoFilters.views.title', 'Hide videos with fewer views');
+    const hint = document.createElement('div');
+    hint.className = 'toggle-description';
+    hint.id = `${prefix}_views_hint`;
+    setTabViewLocalizedCopy(hint, 'textContent', 'videoFilters.views.hint', 'Hide only when the view count is clearly below your minimum. Missing counts and live streams stay visible.');
+    info.appendChild(title);
+    info.appendChild(hint);
+    const toggle = document.createElement('label');
+    toggle.className = 'switch';
+    const enabled = document.createElement('input');
+    enabled.type = 'checkbox';
+    enabled.id = `${prefix}_views_enabled`;
+    enabled.setAttribute('aria-describedby', hint.id);
+    setTabViewLocalizedCopy(enabled, 'aria-label', 'videoFilters.views.title', 'Hide videos with fewer views');
+    const slider = document.createElement('span');
+    slider.className = 'slider round';
+    toggle.appendChild(enabled);
+    toggle.appendChild(slider);
+    row.appendChild(info);
+    row.appendChild(toggle);
+    rows.appendChild(row);
+    const panel = document.createElement('div');
+    panel.className = 'video-filter-conditions-row minimum-views-controls';
+    panel.id = `${prefix}_views_controls`;
+    panel.hidden = true;
+    const label = document.createElement('label');
+    label.htmlFor = `${prefix}_views_min`;
+    setTabViewLocalizedCopy(label, 'textContent', 'videoFilters.views.minimum', 'Minimum views');
+    const input = document.createElement('input');
+    input.type = 'number';
+    input.id = label.htmlFor;
+    input.min = '1';
+    input.max = String(Number.MAX_SAFE_INTEGER);
+    input.step = '1';
+    input.required = true;
+    input.value = '500';
+    input.inputMode = 'numeric';
+    input.setAttribute('aria-describedby', hint.id);
+    panel.appendChild(label);
+    panel.appendChild(input);
+    rows.appendChild(panel);
+    const update = () => {
+        panel.hidden = !enabled.checked;
+        input.disabled = !enabled.checked;
+    };
+    enabled.addEventListener('change', () => { update(); scheduleSave({ showToast: true }); });
+    input.addEventListener('input', () => { if (input.validity.valid) scheduleSave({ showToast: false }); });
+    input.addEventListener('change', () => { if (input.reportValidity()) scheduleSave({ showToast: true }); });
+    update();
+}
+
 function initializeFiltersTabs() {
     // Helper function to create compact inline condition rows
     function createCompactCondition({ name, value, labelText, labelKey, fields }) {
@@ -1514,6 +1576,7 @@ function initializeFiltersTabs() {
     uppercaseRow.appendChild(uppercaseInfo);
     uppercaseRow.appendChild(uppercaseControls);
     videoFiltersRows.appendChild(uppercaseRow);
+    appendMinimumViewsControls(videoFiltersRows, 'videoFilter', scheduleSaveVideoFilters);
 
     const categoryOptions = window.FilterTubeContentControlsCatalog?.getCategoryOptions?.() || [];
     const categoryDisplayLabel = value => {
@@ -2081,6 +2144,16 @@ function initializeFiltersTabs() {
         if (uploadEnabled) uploadEnabled.checked = !!contentFilters.uploadDate?.enabled;
         if (uppercaseEnabled) uppercaseEnabled.checked = !!contentFilters.uppercase?.enabled;
 
+        const viewsEnabled = document.getElementById('videoFilter_views_enabled');
+        const viewsMinimum = document.getElementById('videoFilter_views_min');
+        const viewsPanel = document.getElementById('videoFilter_views_controls');
+        if (viewsEnabled) viewsEnabled.checked = contentFilters.views?.enabled === true;
+        if (viewsMinimum) {
+            viewsMinimum.value = Number.isSafeInteger(contentFilters.views?.minViews) && contentFilters.views.minViews >= 0 ? contentFilters.views.minViews : 500;
+            viewsMinimum.disabled = !viewsEnabled?.checked;
+        }
+        if (viewsPanel) viewsPanel.hidden = !viewsEnabled?.checked;
+
         const durationCondition = contentFilters.duration?.condition || 'between';
         const durationRadio = document.getElementById(`videoFilter_duration_condition_${durationCondition}`);
         if (durationRadio) durationRadio.checked = true;
@@ -2294,7 +2367,22 @@ function initializeFiltersTabs() {
             }
         }
 
+        const viewsToggle = document.getElementById('videoFilter_views_enabled');
+        const viewsInput = document.getElementById('videoFilter_views_min');
+        const viewsValue = viewsInput?.value?.trim();
+        const minViews = viewsValue ? Number(viewsValue) : NaN;
+        if (viewsToggle?.checked && (!Number.isSafeInteger(minViews) || minViews < 1)) {
+            viewsInput?.reportValidity?.();
+            return false;
+        }
+        const nextViews = {
+            ...(prior.views || {}),
+            enabled: viewsToggle ? viewsToggle.checked : prior.views?.enabled === true,
+            minViews: Number.isSafeInteger(minViews) && minViews >= 0 ? minViews : (prior.views?.minViews ?? 500)
+        };
+
         const next = {
+            views: nextViews,
             duration: nextDuration,
             uploadDate: nextUpload,
             uppercase: { ...(prior.uppercase || {}), enabled: uppercaseEnabled, mode: uppercaseMode, minWordLength: 2 }
@@ -3013,6 +3101,7 @@ function initializeKidsTabs() {
     kidsUppercaseRow.appendChild(kidsUppercaseInfo);
     kidsUppercaseRow.appendChild(kidsUppercaseControls);
     kidsVideoFiltersRows.appendChild(kidsUppercaseRow);
+    appendMinimumViewsControls(kidsVideoFiltersRows, 'kidsVideoFilter', scheduleSaveKidsVideoFilters);
 
     kidsVideoFiltersSection.appendChild(kidsVideoFiltersRows);
     kidsContentTab.appendChild(kidsVideoFiltersSection);
@@ -3514,7 +3603,22 @@ function initializeKidsTabs() {
             }
         }
 
+        const viewsToggle = document.getElementById('kidsVideoFilter_views_enabled');
+        const viewsInput = document.getElementById('kidsVideoFilter_views_min');
+        const viewsValue = viewsInput?.value?.trim();
+        const minViews = viewsValue ? Number(viewsValue) : NaN;
+        if (viewsToggle?.checked && (!Number.isSafeInteger(minViews) || minViews < 1)) {
+            viewsInput?.reportValidity?.();
+            return false;
+        }
+        const nextViews = {
+            ...(prior.views || {}),
+            enabled: viewsToggle ? viewsToggle.checked : prior.views?.enabled === true,
+            minViews: Number.isSafeInteger(minViews) && minViews >= 0 ? minViews : (prior.views?.minViews ?? 500)
+        };
+
         const next = {
+            views: nextViews,
             duration: nextDuration,
             uploadDate: nextUpload,
             uppercase: { ...(prior.uppercase || {}), enabled: uppercaseEnabled, mode: uppercaseMode, minWordLength: 2 }
@@ -3559,6 +3663,16 @@ function initializeKidsTabs() {
         if (durationEnabled) durationEnabled.checked = !!contentFilters.duration?.enabled;
         if (uploadEnabled) uploadEnabled.checked = !!contentFilters.uploadDate?.enabled;
         if (uppercaseEnabled) uppercaseEnabled.checked = !!contentFilters.uppercase?.enabled;
+
+        const viewsEnabled = document.getElementById('kidsVideoFilter_views_enabled');
+        const viewsMinimum = document.getElementById('kidsVideoFilter_views_min');
+        const viewsPanel = document.getElementById('kidsVideoFilter_views_controls');
+        if (viewsEnabled) viewsEnabled.checked = contentFilters.views?.enabled === true;
+        if (viewsMinimum) {
+            viewsMinimum.value = Number.isSafeInteger(contentFilters.views?.minViews) && contentFilters.views.minViews >= 0 ? contentFilters.views.minViews : 500;
+            viewsMinimum.disabled = !viewsEnabled?.checked;
+        }
+        if (viewsPanel) viewsPanel.hidden = !viewsEnabled?.checked;
 
         const durationCondition = contentFilters.duration?.condition || 'between';
         const durationRadio = document.getElementById(`kidsVideoFilter_duration_condition_${durationCondition}`);

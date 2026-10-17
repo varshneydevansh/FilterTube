@@ -295,6 +295,8 @@
         if (!meta || typeof meta !== 'object') return;
 
         const lengthSeconds = meta.lengthSeconds;
+        const viewCount = (typeof meta.viewCount === 'string' || typeof meta.viewCount === 'number')
+            && /^\d+$/.test(String(meta.viewCount)) && Number.isSafeInteger(Number(meta.viewCount)) ? String(meta.viewCount) : null;
         const publishDate = meta.publishDate;
         const uploadDate = meta.uploadDate;
         const category = meta.category;
@@ -316,7 +318,8 @@
             ? meta.keywords.map(value => typeof value === 'string' ? value.trim() : '').filter(Boolean)
             : [];
         const hasAny = Boolean(
-            (typeof lengthSeconds === 'number' && Number.isFinite(lengthSeconds) && lengthSeconds > 0)
+            viewCount !== null
+            || (typeof lengthSeconds === 'number' && Number.isFinite(lengthSeconds) && lengthSeconds > 0)
             || (typeof lengthSeconds === 'string' && /^\d+$/.test(lengthSeconds.trim()))
             || (typeof publishDate === 'string' && publishDate.trim())
             || (typeof uploadDate === 'string' && uploadDate.trim())
@@ -331,6 +334,8 @@
 
         const signature = [
             videoId,
+            viewCount ?? '',
+            typeof meta.isLive === 'boolean' ? String(meta.isLive) : '',
             (typeof lengthSeconds === 'number' ? String(lengthSeconds) : (typeof lengthSeconds === 'string' ? lengthSeconds.trim() : '')),
             (typeof publishDate === 'string' ? publishDate.trim() : ''),
             (typeof uploadDate === 'string' ? uploadDate.trim() : ''),
@@ -357,6 +362,8 @@
 
         pendingVideoMetaUpdates.push({
             videoId,
+            ...(viewCount !== null ? { viewCount } : {}),
+            ...(typeof meta.isLive === 'boolean' ? { isLive: meta.isLive } : {}),
             lengthSeconds,
             publishDate,
             uploadDate,
@@ -678,7 +685,8 @@
     // Renderer/ViewModel suffix convention. Keep this explicit so arbitrary
     // layout objects never become filtering authorities.
     const NON_SUFFIX_POLICY_RENDERERS = new Set([
-        'richGridMedia'
+        'richGridMedia',
+        'shortsLockupViewModelV2'
     ]);
 
     // Comprehensive filter rules for all YouTube renderer types
@@ -1262,7 +1270,8 @@
             const contentFilterDefaults = {
                 duration: { enabled: false, condition: 'between', minMinutes: 0, maxMinutes: 0, value: '' },
                 uploadDate: { enabled: false, condition: 'newer', fromDate: '', toDate: '', value: '', unit: '', valueMax: 0, unitMax: '' },
-                uppercase: { enabled: false, mode: 'single_word', minWordLength: 2 }
+                uppercase: { enabled: false, mode: 'single_word', minWordLength: 2 },
+                views: { enabled: false, minViews: 500 }
             };
 
             const categoryFilterDefaults = {
@@ -1302,6 +1311,10 @@
                 uppercase: {
                     ...contentFilterDefaults.uppercase,
                     ...(incomingContentFilters.uppercase && typeof incomingContentFilters.uppercase === 'object' ? incomingContentFilters.uppercase : {})
+                },
+                views: {
+                    ...contentFilterDefaults.views,
+                    ...(incomingContentFilters.views && typeof incomingContentFilters.views === 'object' ? incomingContentFilters.views : {})
                 }
             };
 
@@ -1578,6 +1591,10 @@
                     null;
 
                 const publishDate = (playerMicroformat && playerMicroformat.publishDate) ? String(playerMicroformat.publishDate) : '';
+                const rawViewCount = videoDetails?.viewCount;
+                const viewCount = (typeof rawViewCount === 'string' || typeof rawViewCount === 'number')
+                    && /^\d+$/.test(String(rawViewCount)) && Number.isSafeInteger(Number(rawViewCount)) ? String(rawViewCount) : null;
+                const isLive = videoDetails?.isLive === true || videoDetails?.isLiveContent === true;
                 const uploadDate = (playerMicroformat && playerMicroformat.uploadDate) ? String(playerMicroformat.uploadDate) : '';
                 const category = (playerMicroformat && (playerMicroformat.category || playerMicroformat.genre))
                     ? String(playerMicroformat.category || playerMicroformat.genre)
@@ -1597,8 +1614,9 @@
                     ? videoDetails.keywords.map(value => typeof value === 'string' ? value.trim() : '').filter(Boolean)
                     : [];
 
-                if (lengthSeconds || publishDate || uploadDate || category || language.languageCode || title || ownerId || ownerHandle || channelName || shortDescription || keywords.length > 0) {
+                if (viewCount !== null || lengthSeconds || publishDate || uploadDate || category || language.languageCode || title || ownerId || ownerHandle || channelName || shortDescription || keywords.length > 0) {
                     this._registerVideoMetaMapping(videoId, {
+                        ...(viewCount !== null ? { viewCount, isLive } : {}),
                         lengthSeconds,
                         publishDate,
                         uploadDate,
@@ -1777,6 +1795,11 @@
                 : {};
             const merged = { ...existing };
             const incomingLengthSeconds = meta.lengthSeconds;
+            if ((typeof meta.viewCount === 'string' || typeof meta.viewCount === 'number')
+                && /^\d+$/.test(String(meta.viewCount)) && Number.isSafeInteger(Number(meta.viewCount))) {
+                merged.viewCount = String(meta.viewCount);
+                merged.isLive = meta.isLive === true;
+            }
             const incomingPublishDate = typeof meta.publishDate === 'string' ? meta.publishDate.trim() : '';
             const incomingUploadDate = typeof meta.uploadDate === 'string' ? meta.uploadDate.trim() : '';
             const incomingCategory = typeof meta.category === 'string' ? meta.category.trim() : '';
@@ -1813,7 +1836,9 @@
             if (incomingShortDescription) merged.shortDescription = incomingShortDescription;
             if (incomingKeywords.length > 0) merged.keywords = incomingKeywords;
             const same =
-                (existing.lengthSeconds === merged.lengthSeconds)
+                (existing.viewCount === merged.viewCount)
+                && (existing.isLive === merged.isLive)
+                && (existing.lengthSeconds === merged.lengthSeconds)
                 && (existing.publishDate === merged.publishDate)
                 && (existing.uploadDate === merged.uploadDate)
                 && (existing.category === merged.category)
@@ -3500,6 +3525,44 @@
         /**
          * Check content filters (duration, upload date)
          */
+        _extractViewCount(item, rules, rendererType) {
+            const parser = window.FilterTubeViewCount;
+            if (!parser || !item || /^(?:playlistRenderer|gridPlaylistRenderer|radioRenderer|compactRadioRenderer)$/.test(rendererType)
+                || /PLAYLIST|ALBUM|PODCAST/.test(String(item.contentType || ''))) return null;
+            const overlays = Array.isArray(item.thumbnailOverlays) ? item.thumbnailOverlays : [];
+            const badges = Array.isArray(item.badges) ? item.badges : [];
+            const isLive = item.isLive === true || item.isLiveContent === true || !!item.upcomingEventData
+                || item.videoDetails?.isLive === true || item.videoDetails?.isLiveContent === true
+                || overlays.some(row => /LIVE|UPCOMING/.test(String(row?.thumbnailOverlayTimeStatusRenderer?.style || '')))
+                || badges.some(row => /LIVE|UPCOMING/.test(String(row?.metadataBadgeRenderer?.style || '')));
+            if (isLive) return null;
+            const paths = [
+                'viewCount', 'videoDetails.viewCount', 'playerResponse.videoDetails.viewCount',
+                'viewCountText.simpleText', 'viewCountText.runs.0.text',
+                'viewCountText.accessibility.accessibilityData.label',
+                'shortViewCountText.simpleText', 'shortViewCountText.runs.0.text',
+                'shortViewCountText.accessibility.accessibilityData.label',
+                'content.videoRenderer.viewCountText.simpleText', 'content.videoRenderer.shortViewCountText.simpleText'
+            ];
+            for (const path of paths) {
+                const value = path.split('.').reduce((node, key) => node?.[key], item);
+                const parsed = parser.parse(value);
+                if (parsed) return parsed;
+            }
+            // Modern card rows and Shorts captions can also contain dates and
+            // creator names. Each part must explicitly identify lifetime views.
+            const parts = [item.overlayMetadata?.secondaryText?.content, item.belowThumbnailMetadata?.secondaryText?.content];
+            const rows = item.metadata?.lockupMetadataViewModel?.metadata?.contentMetadataViewModel?.metadataRows;
+            for (const row of Array.isArray(rows) ? rows : []) {
+                for (const part of Array.isArray(row.metadataParts) ? row.metadataParts : []) parts.push(part?.text?.content);
+            }
+            for (const value of parts) {
+                const parsed = parser.parse(value, { requireLabel: true });
+                if (parsed) return parsed;
+            }
+            return null;
+        }
+
         _checkContentFilters(item, rules, rendererType) {
             const cf = this.settings.contentFilters;
 
@@ -3521,6 +3584,11 @@
             ].includes(rendererType);
 
             if (!isVideoRenderer) return false;
+
+            if (cf.views?.enabled === true && window.FilterTubeViewCount?.shouldBlock(this._extractViewCount(item, rules, rendererType), cf.views)) {
+                this._log('🚫 Blocking by minimum views filter');
+                return true;
+            }
 
             // Duration filter
             if (cf.duration && cf.duration.enabled) {
@@ -4323,6 +4391,7 @@
                             duration: this.settings.contentFilters?.duration?.enabled === true,
                             uploadDate: this.settings.contentFilters?.uploadDate?.enabled === true,
                             uppercase: this.settings.contentFilters?.uppercase?.enabled === true,
+                            views: this.settings.contentFilters?.views?.enabled === true,
                             category: this.settings.categoryFilters?.enabled === true,
                             language: this.settings.languageFilters?.enabled === true
                         }

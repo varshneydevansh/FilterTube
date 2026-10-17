@@ -1435,7 +1435,8 @@ function hasActiveQuickBlockRuleContext(settings) {
         if (
             contentFilters?.duration?.enabled === true ||
             contentFilters?.uploadDate?.enabled === true ||
-            contentFilters?.uppercase?.enabled === true
+            contentFilters?.uppercase?.enabled === true ||
+            contentFilters?.views?.enabled === true
         ) {
             return true;
         }

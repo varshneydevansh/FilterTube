@@ -1772,7 +1772,64 @@ function scheduleCurrentVideoAdmissionMetadata(videoId, requirements, listMode) 
     return false;
 }
 
+function getCurrentWatchViewCountDecision(settings, metadata = {}) {
+    const rule = settings?.contentFilters?.views;
+    const isLive = metadata.isLive === true || metadata.isLiveContent === true || metadata.isUpcoming === true;
+    if (window.FilterTubeViewCount?.shouldBlock?.(metadata.viewCount, rule, { isLive, kind: 'total' })) {
+        return { blocked: true, kind: 'views', viewCount: metadata.viewCount };
+    }
+    return { blocked: false, kind: 'none' };
+}
+
+function shouldHideElementByViewCount(element, settings, metadata = {}) {
+    const helper = window.FilterTubeViewCount;
+    const rule = settings?.contentFilters?.views;
+    if (settings?.enabled === false || rule?.enabled !== true || !helper?.parse || !helper?.shouldBlock || !element) return false;
+    try {
+        const tag = String(element.tagName || '').toLowerCase();
+        if (/(?:^|-)(?:channel|playlist|radio|post|backstage)(?:-|$)/.test(tag)) return false;
+        const owner = getFilterTubeVisualCardOwner(element);
+        const belongsToOwner = node => {
+            const nearest = node?.closest?.(VIDEO_CARD_SELECTORS);
+            return nearest && getFilterTubeVisualCardOwner(nearest) === owner;
+        };
+        const liveNodes = element.querySelectorAll(
+            '[overlay-style="LIVE"], [overlay-style="UPCOMING"], .badge-style-type-live-now, .yt-badge-shape--live'
+        );
+        if (metadata.isLive === true || metadata.isLiveContent === true || metadata.isUpcoming === true
+            || Array.from(liveNodes).some(belongsToOwner)) return false;
+
+        // Exact video-keyed Player totals take precedence over rounded DOM text.
+        const exact = helper.parse(metadata.viewCount, { kind: 'total' });
+        if (exact) return helper.shouldBlock(exact, rule);
+
+        const dedicated = element.querySelectorAll('.view-count, .view-count-text, #view-count, yt-view-count-renderer, ytd-video-view-count-renderer');
+        for (const node of dedicated) {
+            if (!belongsToOwner(node)) continue;
+            const evidence = helper.parse(node.textContent, { kind: 'total' });
+            if (evidence) return helper.shouldBlock(evidence, rule);
+        }
+        // Generic metadata can also contain age, subscribers or duration. Only
+        // an explicit localized views label is evidence; never parse card text.
+        const labels = element.querySelectorAll(
+            '#metadata-line .inline-metadata-item, ' +
+            '.ytContentMetadataViewModelMetadataRow .yt-core-attributed-string, ' +
+            '.yt-content-metadata-view-model__metadata-row .yt-core-attributed-string, ' +
+            '.YtmVideoMetaBlockMetadata > span, .compact-media-item-stats'
+        );
+        for (const node of labels) {
+            if (!belongsToOwner(node)) continue;
+            const evidence = helper.parse(node.textContent, { kind: 'total', requireLabel: true });
+            if (evidence) return helper.shouldBlock(evidence, rule);
+        }
+    } catch (e) {
+    }
+    return false;
+}
+
 function getCurrentWatchContentFilterDecision(settings, metadata = {}) {
+    const viewCountDecision = getCurrentWatchViewCountDecision(settings, metadata);
+    if (viewCountDecision.blocked) return viewCountDecision;
     const filters = settings?.contentFilters && typeof settings.contentFilters === 'object' ? settings.contentFilters : {};
     if (filters.duration?.enabled === true) {
         const seconds = Number(metadata.lengthSeconds);
@@ -1964,6 +2021,9 @@ function formatCurrentWatchAdmissionMessage(decision, ownerMeta = {}) {
     if (decision?.kind === 'channel') {
         return `Blocked channel${ownerName ? `\n${trimForOverlay(ownerName)}` : ''}`;
     }
+    if (decision?.kind === 'views') {
+        return `Blocked by View Count Filter\nViews: ${trimForOverlay(decision.viewCount)}`;
+    }
     if (decision?.kind === 'keyword') {
         const raw = decision.pattern || 'matched rule';
         const source = trimForOverlay(decision.source || 'video metadata');
@@ -2053,6 +2113,20 @@ function enforceCurrentWatchOwnerBlock(settings) {
 
         const routeVideoId = getCurrentWatchVideoId();
         if (!routeVideoId) return;
+        // Views are optional evidence: a known low total can block immediately,
+        // but missing totals never request metadata or create a pending state.
+        const viewCountDecision = getCurrentWatchViewCountDecision(settings, settings?.videoMetaMap?.[routeVideoId] || {});
+        if (viewCountDecision.blocked) {
+            pauseCurrentWatchForDirectAccess(routeVideoId, 'blocked');
+            const message = formatCurrentWatchAdmissionMessage(viewCountDecision);
+            if (isShortRoute) {
+                pauseCurrentShortPlayer();
+                setCurrentShortAdmissionOverlay('blocked', message);
+            } else {
+                setDirectAccessOverlay('blocked', message);
+            }
+            return;
+        }
         const requirements = getDirectAccessRuleRequirements(settings);
         if (!requirements.hasExplicitVideoRules && !requirements.needsIdentity && !requirements.needsText &&
             !requirements.needsDuration && !requirements.needsDates && !requirements.needsCategory &&
@@ -4225,7 +4299,8 @@ function hasActiveDOMFallbackWork(settings) {
         if (
             contentFilters?.duration?.enabled === true ||
             contentFilters?.uploadDate?.enabled === true ||
-            contentFilters?.uppercase?.enabled === true
+            contentFilters?.uppercase?.enabled === true ||
+            contentFilters?.views?.enabled === true
         ) {
             return true;
         }
@@ -5530,7 +5605,11 @@ async function applyDOMFallback(settings, options = {}) {
                     effectiveSettings.videoMetaMap?.[categoryVideoId]?.category || ''
                 ).trim();
             }
-            const categoryStateSignature = `${categoryPolicySignature}:${resolvedCategoryForState.toLowerCase()}:${languagePolicySignature}:${resolvedLanguageForState.toLowerCase()}`;
+            const hideByViews = Boolean(
+                /^[a-zA-Z0-9_-]{11}$/.test(categoryVideoId || '')
+                && shouldHideElementByViewCount(element, effectiveSettings, effectiveSettings.videoMetaMap?.[categoryVideoId] || {})
+            );
+            const categoryStateSignature = `${categoryPolicySignature}:${resolvedCategoryForState.toLowerCase()}:${languagePolicySignature}:${resolvedLanguageForState.toLowerCase()}:views:${hideByViews ? 'blocked' : 'visible'}`;
             const lastCategoryStateSignature = element.getAttribute('data-filtertube-last-category-state') || '';
             const contentChanged = alreadyProcessed && uniqueId && lastProcessedId && uniqueId !== lastProcessedId;
             const currentPageMetaForState = getCurrentPageChannelMeta();
@@ -6725,7 +6804,8 @@ async function applyDOMFallback(settings, options = {}) {
                     const hasContent = Boolean(
                         cf.duration?.enabled ||
                         cf.uploadDate?.enabled ||
-                        cf.uppercase?.enabled
+                        cf.uppercase?.enabled ||
+                        cf.views?.enabled
                     );
 
                     const cat = effectiveSettings && typeof effectiveSettings === 'object' ? effectiveSettings.categoryFilters : null;
@@ -6793,7 +6873,7 @@ async function applyDOMFallback(settings, options = {}) {
             }
 
             let hideReason = `Content: ${title}`;
-            let shouldHide = matchesFilters || hideByDuration || hideByUploadDate || hideByCategory || hideByLanguage;
+            let shouldHide = matchesFilters || hideByDuration || hideByUploadDate || hideByCategory || hideByLanguage || hideByViews;
             if (listMode === 'whitelist' && isWatchRightRailCard && matchesFilters) {
                 const hasCardIdentity = Boolean(
                     channelMeta?.id ||
@@ -6819,6 +6899,9 @@ async function applyDOMFallback(settings, options = {}) {
             }
             if (hideByLanguage) {
                 hideReason = `Language filter: ${title}`;
+            }
+            if (hideByViews) {
+                hideReason = `View count filter: ${title}`;
             }
 
             if (effectiveSettings.hideMixPlaylists && isFilterTubeMixOrRadioElement(element)) {

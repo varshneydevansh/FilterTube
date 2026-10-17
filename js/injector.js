@@ -227,6 +227,7 @@
                 settings.contentFilters.duration?.enabled === true
                 || settings.contentFilters.uploadDate?.enabled === true
                 || settings.contentFilters.uppercase?.enabled === true
+                || settings.contentFilters.views?.enabled === true
             )
         );
     }
@@ -825,6 +826,9 @@
                 ? details.title.trim()
                 : (typeof microformat?.title?.simpleText === 'string' ? microformat.title.simpleText.trim() : ''),
             lengthSeconds: microformat?.lengthSeconds || details?.lengthSeconds || null,
+            ...((typeof details?.viewCount === 'string' || typeof details?.viewCount === 'number')
+                && /^\d+$/.test(String(details.viewCount)) && Number.isSafeInteger(Number(details.viewCount))
+                ? { viewCount: String(details.viewCount), isLive: details.isLive === true || details.isLiveContent === true } : {}),
             publishDate: typeof microformat?.publishDate === 'string' ? microformat.publishDate : '',
             uploadDate: typeof microformat?.uploadDate === 'string' ? microformat.uploadDate : '',
             category: typeof (microformat?.category || microformat?.genre) === 'string'

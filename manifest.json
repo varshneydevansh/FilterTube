@@ -33,6 +33,7 @@
             ],
             "exclude_matches": ["*://*.youtube.com/embed/*"],
             "js": [
+                "js/shared/view_count.js",
                 "js/seed.js"
             ],
             "run_at": "document_start",
@@ -45,7 +46,7 @@
             ],
             "exclude_matches": ["*://*.youtube.com/embed/*"],
             "js": [
-                "js/shared/identity.js", "js/content/admission_overlay.js",
+                "js/shared/identity.js", "js/shared/view_count.js", "js/content/admission_overlay.js",
                 "js/content/dom_state.js",
                 "js/content/menu.js",
                 "js/content/dom_helpers.js",
@@ -68,7 +69,7 @@
                 "*://*.youtube.com/embed/*",
                 "*://*.youtube-nocookie.com/embed/*"
             ],
-            "js": ["js/content/external_youtube_network.js", "js/seed.js"],
+            "js": ["js/content/external_youtube_network.js", "js/shared/view_count.js", "js/seed.js"],
             "run_at": "document_start",
             "all_frames": true,
             "world": "MAIN"
@@ -79,7 +80,7 @@
                 "*://*.youtube-nocookie.com/embed/*"
             ],
             "js": [
-                "js/shared/identity.js", "js/content/admission_overlay.js",
+                "js/shared/identity.js", "js/shared/view_count.js", "js/content/admission_overlay.js",
                 "js/content/external_youtube_guard.js",
                 "js/content/dom_state.js",
                 "js/content/menu.js",
@@ -107,7 +108,7 @@
         },
         {
             "matches": ["https://*.google.com/search*"],
-            "js": ["js/shared/identity.js", "js/content/admission_overlay.js", "js/content/external_youtube_guard.js"],
+            "js": ["js/shared/identity.js", "js/shared/view_count.js", "js/content/admission_overlay.js", "js/content/external_youtube_guard.js"],
             "run_at": "document_start",
             "world": "ISOLATED"
         }
@@ -118,7 +119,7 @@
                 "js/injector.js",
                 "js/filter_logic.js",
                 "js/seed.js",
-                "js/shared/identity.js", "js/content/admission_overlay.js",
+                "js/shared/identity.js", "js/shared/view_count.js", "js/content/admission_overlay.js",
                 "data/ui_locales/*.json",
                 "assets/images/homepage_hero_day.mp4",
                 "icons/icon-48.png",
