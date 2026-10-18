@@ -153,13 +153,13 @@ test('quick-block default migration source counts remain pinned', () => {
   const doc = read(docPath);
   const blocks = sourceBlocks();
   const rows = [
-    ['quick-block migration constants block', blocks.constants, 7, 379],
+    ['quick-block migration constants block', blocks.constants, 380, 15965],
     ['compareSemver block', blocks.compareSemver, 18, 513],
     ['isVersionAtLeast block', blocks.isVersionAtLeast, 4, 98],
     ['applyQuickBlockDefaultMigrationOnce block', blocks.quickMigration, 53, 2485],
-    ['onInstalled handler block', blocks.onInstalled, 93, 4239],
-    ['install branch block', blocks.installBranch, 47, 2072],
-    ['update branch block', blocks.updateBranch, 41, 2010]
+    ['onInstalled handler block', blocks.onInstalled, 46, 1955],
+    ['install branch block', blocks.installBranch, 25, 992],
+    ['update branch block', blocks.updateBranch, 16, 806]
   ];
 
   for (const [label, block, expectedLines, expectedBytes] of rows) {

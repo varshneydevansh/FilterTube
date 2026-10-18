@@ -381,10 +381,10 @@ test('filter logic rule path register is audit-only and source scoped', () => {
   assert.match(text, /source file: js\/filter_logic\.js/);
   assert.match(text, /path owner object: FILTER_RULES/);
   assert.match(text, /shared alias object: BASE_VIDEO_RULES/);
-  assert.equal(sourceLineCount(source), 3652);
-  assert.equal(fs.statSync(path.join(repoRoot, sourcePath)).size, 172174);
-  assert.match(text, /source line count: 3652/);
-  assert.match(text, /source bytes: 172174/);
+  assert.equal(sourceLineCount(source), 4534);
+  assert.equal(fs.statSync(path.join(repoRoot, sourcePath)).size, 221980);
+  assert.match(text, /source line count: 4534/);
+  assert.match(text, /source bytes: 221980/);
   assert.match(text, new RegExp(`source sha256: ${sha256(sourcePath)}`));
 });
 
@@ -397,37 +397,37 @@ test('filter logic rule path register pins source and effective path counts', ()
 
   assert.equal(baseFields.length, 9);
   assert.equal(baseRows.length, 27);
-  assert.equal(ruleEntries.length, 45);
-  assert.equal(sourceRows.length, 467);
-  assert.equal(baseRows.length + sourceRows.length, 494);
-  assert.equal(effectiveEntries.length, 44);
+  assert.equal(ruleEntries.length, 46);
+  assert.equal(sourceRows.length, 494);
+  assert.equal(baseRows.length + sourceRows.length, 521);
+  assert.equal(effectiveEntries.length, 45);
   assert.equal(effectiveEntries.filter((entry) => entry.valueShape === 'BASE_VIDEO_RULES').length, 6);
-  assert.equal(effectiveEntries.filter((entry) => entry.valueShape === 'objectLiteral').length, 38);
-  assert.equal(effectiveRows.length, 440);
-  assert.equal(uniquePaths.size, 174);
-  assert.equal(rendererFields.size, 177);
+  assert.equal(effectiveEntries.filter((entry) => entry.valueShape === 'objectLiteral').length, 39);
+  assert.equal(effectiveRows.length, 467);
+  assert.equal(uniquePaths.size, 184);
+  assert.equal(rendererFields.size, 189);
   assert.deepEqual(syntax, {
-    dotIndex: 157,
-    bracketIndex: 0,
-    bareOrDotNoIndex: 283,
-    template: 0
+    "dotIndex": 159,
+    "bracketIndex": 0,
+    "bareOrDotNoIndex": 308,
+    "template": 0
   });
 
   for (const [label, value] of [
     ['BASE_VIDEO_RULES field rows', 9],
     ['BASE_VIDEO_RULES authored path rows', 27],
-    ['FILTER_RULES source declarations', 45],
-    ['FILTER_RULES source path rows before duplicate override', 467],
-    ['source-authored path rows including BASE_VIDEO_RULES', 494],
-    ['effective runtime renderer keys after duplicate override', 44],
+    ['FILTER_RULES source declarations', 46],
+    ['FILTER_RULES source path rows before duplicate override', 494],
+    ['source-authored path rows including BASE_VIDEO_RULES', 521],
+    ['effective runtime renderer keys after duplicate override', 45],
     ['effective BASE_VIDEO_RULES aliases after duplicate override', 6],
-    ['effective object literal rules after duplicate override', 38],
-    ['effective runtime path rows after duplicate override', 440],
-    ['effective unique path literals', 174],
-    ['effective renderer-field pairs', 177],
-    ['path syntax with dot numeric indexes', 157],
+    ['effective object literal rules after duplicate override', 39],
+    ['effective runtime path rows after duplicate override', 467],
+    ['effective unique path literals', 184],
+    ['effective renderer-field pairs', 189],
+    ['path syntax with dot numeric indexes', 159],
     ['path syntax with bracket numeric indexes', 0],
-    ['path syntax without numeric indexes', 283],
+    ['path syntax without numeric indexes', 308],
     ['template path literals', 0]
   ]) {
     assert.match(text, new RegExp(`${escapeRegExp(label)}: ${value}`));
@@ -445,23 +445,23 @@ test('filter logic rule path register preserves effective field and semantic gro
   }
 
   assert.deepEqual(fieldCounts, {
-    channelHandle: 49,
-    channelId: 48,
-    channelName: 55,
-    commentText: 2,
-    description: 63,
-    duration: 48,
-    metadataRows: 3,
-    publishedTime: 38,
-    title: 86,
-    videoId: 34,
-    viewCount: 14
+    "channelHandle": 57,
+    "channelId": 53,
+    "channelName": 64,
+    "commentText": 2,
+    "description": 67,
+    "duration": 48,
+    "metadataRows": 3,
+    "publishedTime": 38,
+    "title": 87,
+    "videoId": 34,
+    "viewCount": 14
   });
   assert.deepEqual(Object.fromEntries(Object.entries(groupCounts).sort()), {
-    channelIdentityPath: 152,
-    metadataPredicatePath: 103,
-    textMatchPath: 151,
-    videoIdentityPath: 34
+    "channelIdentityPath": 174,
+    "metadataPredicatePath": 103,
+    "textMatchPath": 156,
+    "videoIdentityPath": 34
   });
 
   for (const [field, count] of Object.entries(fieldCounts)) {
@@ -477,10 +477,23 @@ test('filter logic rule path register lists every unique effective runtime path 
   const { effectiveRows } = rulePathState();
   const uniquePaths = [...new Set(effectiveRows.map((row) => row.path))].sort();
 
-  assert.equal(uniquePaths.length, 174);
+  assert.equal(uniquePaths.length, 184);
   for (const pathLiteral of uniquePaths) {
     assert.ok(text.includes(`\`${pathLiteral}\``), `missing effective path literal ${pathLiteral}`);
   }
+  const groups = new Map();
+  for (const row of effectiveRows) {
+    const key = `${row.field}:${row.path}`;
+    if (!groups.has(key)) groups.set(key, { path: row.path, count: 0, lines: new Set() });
+    const group = groups.get(key);
+    group.count++;
+    group.lines.add(row.pathLine);
+  }
+  for (const group of groups.values()) {
+    const lines = [...group.lines].sort((a, b) => a - b).join(', ');
+    assert.ok(text.includes(`| \`${group.path}\` | ${group.count} | ${lines} |`), `missing current path accounting ${group.path}`);
+  }
+
 });
 
 test('filter logic rule path register pins duplicate syntax documentation and future proof fields', () => {
@@ -488,10 +501,10 @@ test('filter logic rule path register pins duplicate syntax documentation and fu
 
   for (const token of [
     'gridVideoRenderer is declared twice in source',
-    'BASE_VIDEO_RULES at line 440',
-    'object literal at line 613',
-    'source FILTER_RULES path rows before duplicate override: 467',
-    'effective runtime path rows after duplicate override: 440',
+    'BASE_VIDEO_RULES at line 703',
+    'object literal at line 876',
+    'source FILTER_RULES path rows before duplicate override: 494',
+    'effective runtime path rows after duplicate override: 467',
     'all current runtime paths use dot-index syntax',
     'no current runtime path uses bracket-index syntax',
     'docs/json_paths_encyclopedia.md uses documented field text',

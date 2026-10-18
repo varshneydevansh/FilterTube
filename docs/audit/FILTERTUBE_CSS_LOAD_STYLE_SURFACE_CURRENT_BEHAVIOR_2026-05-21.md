@@ -141,3 +141,20 @@ optimization, JSON-first behavior, asset optimization, generated-output
 cleanup, package pruning, CSS activation/deletion, whitelist behavior, metric
 collectors, artifact creation, native sync, release package changes, or public
 claims.
+
+
+## October 18, 2026 current source inventory
+
+The older measurements are historical. Current totals: 9 CSS files, 20,734 counted source lines; 566,053 bytes, 2,877 lexical rule blocks; 615 `!important` declarations, 76 `display:none` declarations. Selector counts are lexical only; responsive visual evidence is separately recorded in RESPONSIVE_UI_2026-10-17.md. `_locales` now ships alongside the existing common roots; the three quarantined CSS files remain unreferenced by active manifests/HTML.
+
+| File | Classification | Lines | Bytes | SHA256 |
+|---|---|---:|---:|---|
+| css/components.css | active extension UI shared CSS | 1966 | 52694 | f7aefe9b0400f0427bbbd8dc52c9dfc7ccd675847d28e6555c564426a29e5036 |
+| css/content.css | packaged quarantined content CSS | 385 | 12890 | 442c6ad823ebed5075099036b057c29914b218b0bea9e823e9e0b216d771141b |
+| css/design_tokens.css | active extension UI token CSS | 301 | 10361 | 7da73da79df23e6325c921e45fd786270488ee8ad212b57b7e634b63898c27dc |
+| css/filter.css | packaged quarantined content CSS | 74 | 2412 | e2462d446b1a3738d937945eabf013ec05173224970b0c877593901aba5a5032 |
+| css/layout.css | packaged quarantined content CSS | 803 | 28581 | 9ae38491aeb2dc3a58027d4a005c6136042c66dc438786483285fdbd91cb1941 |
+| css/popup.css | active extension popup CSS | 1259 | 32376 | c388d39fab962528365711baa0bfe953ed84ca660ac6123571f79b2c4be820c5 |
+| css/serene-shell.css | active extension shell CSS | 9656 | 267377 | 53608a364e8e62a326a0a7b98daa0ef2f6762cff272730f24a33c425690ee75b |
+| css/tab-view.css | active extension dashboard CSS | 5749 | 144577 | 8fbfff1804e96aefe5d211ff633be081233361ed551fff55e45496b9206648b2 |
+| website/app/globals.css | website-only global CSS | 541 | 14785 | 2341d3570c01f4ac118fa8587937d60c2a1ccf750163e74f90428c56fe5d7d06 |

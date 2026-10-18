@@ -53,13 +53,14 @@ function assertSameWindowStateChangingMessageSnapshot(doc) {
     ['FilterTube_CollaboratorInfoResponse', 'js/content_bridge.js', "type === 'FilterTube_CollaboratorInfoResponse'"],
     ['FilterTube_SubscriptionsImportProgress', 'js/content_bridge.js', "type === 'FilterTube_SubscriptionsImportProgress'"],
     ['FilterTube_SubscriptionsImportResponse', 'js/content_bridge.js', "type === 'FilterTube_SubscriptionsImportResponse'"],
+    ['FilterTube_VideoMetaResponse', 'js/content_bridge.js', "type === 'FilterTube_VideoMetaResponse'"],
     ['FilterTube_CacheCollaboratorInfo', 'js/content_bridge.js', "type === 'FilterTube_CacheCollaboratorInfo'"],
     ['FilterTube_ChannelInfoResponse', 'js/content_bridge.js', "type === 'FilterTube_ChannelInfoResponse'"],
     ['FilterTube_CollabDialogData', 'js/content_bridge.js', "type === 'FilterTube_CollabDialogData'"]
   ];
 
   assert.match(doc, /Same-Window State-Changing Message Snapshot - 2026-05-27/);
-  assert.match(doc, /content_bridge accepted FilterTube message rows: 12/);
+  assert.match(doc, /content_bridge accepted FilterTube message rows: 13/);
   assert.match(doc, /state-changing rows without required pending request ownership: 8/);
   assert.match(doc, /content_bridge pending request maps: 3/);
   assert.match(doc, /injector string-source message listener rows: 1/);
@@ -67,7 +68,7 @@ function assertSameWindowStateChangingMessageSnapshot(doc) {
   assert.match(doc, /wildcard collab dialog broadcaster rows: 1/);
   assert.match(doc, /page-message trust behavior approval from this addendum: NO-GO/);
   assert.match(doc, /runtime behavior changed by this addendum: no/);
-  assert.equal(acceptedTypes.length, 12);
+  assert.equal(acceptedTypes.length, 13);
 
   for (const type of stateChangingWithoutRequiredPending) {
     assert.ok(acceptedTypes.includes(type), `missing state-changing type ${type}`);

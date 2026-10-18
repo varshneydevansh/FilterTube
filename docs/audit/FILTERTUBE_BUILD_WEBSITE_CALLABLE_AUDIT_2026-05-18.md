@@ -22,27 +22,49 @@ surfaces even when they do not contain callables.
 
 | Family | Files | Lexical callables | Public authority |
 | --- | ---: | ---: | --- |
-| Build and sync scripts | 7 | 70 | Extension ZIPs, generated UI shell, vendor Nanah/QR bundles, native app runtime sync, GitHub release body/assets, focused test-lane runner, declarative test-lane config, lane-owned audit proof drift guard |
-| Website app routes | 9 | 19 | Public metadata, downloads page, privacy/terms policy, sitemap, robots, platform detail pages |
+| Build and sync scripts | 29 | 341 | Extension ZIPs, generated UI shell, vendor Nanah/QR bundles, native app runtime sync, GitHub release body/assets, focused test-lane runner, declarative test-lane config, lane-owned audit proof drift guard |
+| Website app routes | 9 | 22 | Public metadata, downloads page, privacy/terms policy, sitemap, robots, platform detail pages |
 | Website components | 15 | 54 | Public platform copy, browser links, footer/header/navigation, theme/scene runtime, animation/reveal behavior, hero media control |
-| Total | 31 | 143 | Public release and website truth boundary |
+| Total | 53 | 417 | Public release and website truth boundary |
 
 ## Accounted Files
 
 | File | Count | Important callable / surface |
 | --- | ---: | --- |
-| `build.js` | 29 | `main`, `maybeCollectMobileArtifacts`, `resolveMobileArtifactPromptDir`, `resolveDefaultMobileArtifactsDir`, `parseMobileArtifactName`, `summarizeMobileArtifacts`, `buildReleaseBody`, `createGitHubRelease`, `uploadReleaseAsset`, `updateReadmeBadges` |
+| `build.js` | 38 | `main`, `maybeCollectMobileArtifacts`, `resolveMobileArtifactPromptDir`, `resolveDefaultMobileArtifactsDir`, `parseMobileArtifactName`, `summarizeMobileArtifacts`, `buildReleaseBody`, `createDraftGitHubRelease`, `uploadGitHubReleaseAssets`, `publishDraftGitHubRelease`, `updateReadmeBadges` |
 | `scripts/audit-proof-drift.mjs` | 12 | `currentSourceProofs`, `laneOwnedProofFiles`, `defaultAuditProofFiles`, `collectProofDrift`, `main` |
 | `scripts/build-extension-ui.mjs` | 2 | `ensureOutputDirectories`, `bundleAll` |
 | `scripts/build-nanah-vendor.mjs` | 4 | `buildQrcodeBundle`, `buildNanahBundle`, `main` |
+| `scripts/build-qr-scanner-vendor.mjs` | 0 | Lexical inventory only; this row does not assert complete semantic or installed proof. |
+| `scripts/check-release-note-locales.mjs` | 1 | Lexical inventory only; this row does not assert complete semantic or installed proof. |
+| `scripts/check-ui-locales.mjs` | 1 | Lexical inventory only; this row does not assert complete semantic or installed proof. |
+| `scripts/create-family-device-capture-checklist.mjs` | 12 | Lexical inventory only; this row does not assert complete semantic or installed proof. |
+| `scripts/create-family-device-evidence-packet.mjs` | 7 | Lexical inventory only; this row does not assert complete semantic or installed proof. |
+| `scripts/create-managed-app-parity-smoke-artifact.mjs` | 25 | Lexical inventory only; this row does not assert complete semantic or installed proof. |
+| `scripts/create-managed-extension-installed-smoke-artifact.mjs` | 20 | Lexical inventory only; this row does not assert complete semantic or installed proof. |
+| `scripts/create-managed-native-runtime-sync-handoff.mjs` | 18 | Lexical inventory only; this row does not assert complete semantic or installed proof. |
+| `scripts/create-managed-pickup-provider-ownership-artifact.mjs` | 21 | Lexical inventory only; this row does not assert complete semantic or installed proof. |
+| `scripts/extract-family-ui-fallbacks.mjs` | 0 | Lexical inventory only; this row does not assert complete semantic or installed proof. |
+| `scripts/import-family-device-downloaded-evidence.mjs` | 18 | Lexical inventory only; this row does not assert complete semantic or installed proof. |
+| `scripts/managed-delivery-lan-discovery.mjs` | 21 | Lexical inventory only; this row does not assert complete semantic or installed proof. |
+| `scripts/managed-delivery-provider.mjs` | 44 | Lexical inventory only; this row does not assert complete semantic or installed proof. |
+| `scripts/merge-ui-locale-batch.mjs` | 1 | Lexical inventory only; this row does not assert complete semantic or installed proof. |
+| `scripts/merge-ui-locale-drafts.mjs` | 2 | Lexical inventory only; this row does not assert complete semantic or installed proof. |
+| `scripts/report-family-device-phase11-status.mjs` | 16 | Lexical inventory only; this row does not assert complete semantic or installed proof. |
+| `scripts/report-family-device-phase12-status.mjs` | 11 | Lexical inventory only; this row does not assert complete semantic or installed proof. |
+| `scripts/report-family-device-provider-surface.mjs` | 7 | Lexical inventory only; this row does not assert complete semantic or installed proof. |
+| `scripts/report-family-device-release-readiness.mjs` | 3 | Lexical inventory only; this row does not assert complete semantic or installed proof. |
 | `scripts/run-test-lane.mjs` | 23 | `classifyPaths`, `auditProofRequirement`, `runtimeFixtureRequirement`, `changedPathsFromGit`, `newChangedPaths`, `changedPathContentSnapshot`, `changedPathsWithSnapshotDrift`, `snapshotFileContent`, `formatLaneList`, `requiresManagedRemoteDeliveryHandoff`, `requiresManagedAppParityHandoff`, `laneNames`, `validateLaneFiles`, `runNode`, `runLane`, `runAuditDrift`, `printClassification`, `printList`, `main` |
 | `scripts/sync-native-runtime.mjs` | 0 | top-level native repo sync authority |
 | `scripts/test-lane-config.mjs` | 0 | declarative lane matrix and file classification data |
+| `scripts/update-family-device-evidence-log.mjs` | 13 | Lexical inventory only; this row does not assert complete semantic or installed proof. |
+| `scripts/validate-family-device-evidence.mjs` | 14 | Lexical inventory only; this row does not assert complete semantic or installed proof. |
+| `scripts/verify-managed-app-policy-contract.mjs` | 7 | Lexical inventory only; this row does not assert complete semantic or installed proof. |
 | `website/app/[slug]/page.js` | 3 | `generateStaticParams`, `generateMetadata`, `DetailPage` |
 | `website/app/downloads/page.js` | 3 | `ExternalTextLink`, `DownloadCard`, `DownloadsPage` |
 | `website/app/layout.js` | 1 | `RootLayout` |
 | `website/app/not-found.js` | 1 | `NotFound` |
-| `website/app/page.js` | 3 | `FeaturedPlatformCard`, `ShortcutCard`, `HomePage` |
+| `website/app/page.js` | 6 | `FeaturedPlatformCard`, `ShortcutCard`, `HomePage` |
 | `website/app/privacy/page.js` | 5 | `PolicyLink`, `BulletList`, `CardGrid`, `PolicySection`, `PrivacyPage` |
 | `website/app/robots.js` | 1 | `robots` |
 | `website/app/sitemap.js` | 1 | `sitemap` |
@@ -67,11 +89,11 @@ surfaces even when they do not contain callables.
 
 | Surface | Current authority | Proof | Risk |
 | --- | --- | --- | --- |
-| Extension package contents | `build.js` copies `js`, `css`, `html`, `icons`, `data`, and `assets`, then writes browser-specific `manifest.json` and zips each target. | `build.js:30`, `108`, `122`, `133`, `147`, `183` | Release ZIP content is broad; quarantined or generated files must stay classified before packaging. |
+| Extension package contents | `build.js` copies `_locales`, `js`, `css`, `html`, `icons`, `data`, and `assets`, then writes browser-specific `manifest.json` and zips each target. | `build.js:30`, `108`, `122`, `133`, `147`, `183` | Release ZIP content is broad; quarantined or generated files must stay classified before packaging. |
 | Generated UI shell freshness | Normal `build.js` invokes `node scripts/build-extension-ui.mjs`; that script writes `js/ui-shell/popup-shell.js` and `js/ui-shell/tab-view-decor.js`. | `build.js:82`, `scripts/build-extension-ui.mjs:8`, `23`, `28` | Generated shell files should not be hand-audited as source truth unless freshness is proven. |
 | README mutation during build | `build.js` always calls `updateReadmeBadges(VERSION)`, then rewrites `README.md`. | `build.js:86`, `656`, `690`, `711` | A normal package build mutates public docs, so release automation can create unrelated dirty changes or publish badge-only drift. |
 | Mobile artifact staging | Android artifacts are opt-in via CLI/env/prompt, filtered by filename and current package version, copied to `dist/mobile`, and checksummed. The artifact directory prompt treats blank, `y`, `yes`, and `default` as the displayed default directory. | `build.js:34`, `56`, `216`, `239`, `258`, `263`, `267`, `283`, `295`, `304` | Good checksum baseline and safer version selection, but no release manifest proves signing fingerprint, Play/internal state, or website CTA readiness. |
-| GitHub release creation | The script creates a non-draft, non-prerelease GitHub release before uploading assets. | `build.js:365`, `378`, `536`, `541`, `561` | If asset upload fails after release creation, users can see a public release missing ZIP/APK/checksum assets. |
+| GitHub release creation | The script creates a draft, uploads missing assets, verifies expected names and publishes only the draft it created; existing release visibility is preserved. | `build.js:365`, `378`, `536`, `541`, `561` | New draft upload failures stay unpublished; existing releases retain their visibility. Asset names are checked, not byte hashes. |
 | Non-interactive release path | Non-TTY builds skip release publishing instead of offering dry-run/CI publish semantics. | `build.js:343` | CI cannot currently be the release authority without another wrapper. |
 | Vendor Nanah bundle | `scripts/build-nanah-vendor.mjs` resolves `../nanah` and exposes merged Core/Client on `window.FilterTubeNanah`. | `scripts/build-nanah-vendor.mjs:9`, `30`, `33`, `38`, `50` | The public repo does not prove the committed vendor bundle matches the intended Nanah source revision. |
 | Native app runtime sync | `scripts/sync-native-runtime.mjs` delegates to a sibling/private app repo script via `FILTERTUBE_APP_REPO` or `../FilterTubeApp`. | `scripts/sync-native-runtime.mjs:6`, `9`, `21` | Native apps can ship stale extension runtime if this sync is not run and hash-verified before app release. |
@@ -98,14 +120,15 @@ build.js main()
         +--> optionally copy APK/AAB + sha256
         +--> maybe create GitHub release
                  |
-                 +--> create public release first
-                 +--> upload assets one by one
+                 +--> create new draft or resume existing release
+                 +--> upload missing assets, verify expected names
+                 +--> publish only the newly created draft
 ```
 
 Risk center:
 
 ```text
-public release page can exist before every expected asset upload succeeds
+existing public releases can receive missing assets; new draft publication follows expected-name verification
 ```
 
 Safer future shape:
@@ -152,9 +175,9 @@ proof: separate package/listing exists; not bundled into mobile app
 ## High-Confidence Findings
 
 1. **Release publishing is not atomic.**
-   `createGitHubRelease()` publishes `draft: false` before
-   `uploadReleaseAsset()` has uploaded the expected files. A failed upload can
-   leave a public release with missing ZIP/APK/checksum artifacts.
+   A new release stays draft until missing assets are uploaded and expected names
+   are verified. Existing release visibility remains unchanged. Publication is
+   still not a byte-verified artifact transaction: names do not prove content or signing.
 
 2. **Normal builds mutate README.**
    Badge mutation runs as part of `main()`. That makes every build a potential
@@ -216,8 +239,8 @@ tests/runtime/build-website-callable-current-behavior.test.mjs
 
 They pin:
 
-- 31 accounted build/website files.
-- 143 lexical build/website callables.
+- 53 accounted build/website files.
+- 417 lexical build/website callables.
 - public surfaces for release scripts, vendor/native sync, website app routes,
   website components, and public claim data.
 - high-risk source patterns for README mutation, non-atomic GitHub release,
@@ -229,7 +252,7 @@ They pin:
 
 `docs/audit/FILTERTUBE_BUILD_SCRIPT_METHOD_SEMANTIC_REGISTER_2026-05-27.md`
 extends this broad build/website callable audit for `build.js` specifically.
-It pins 29 lexical callable rows across 9 semantic method groups: package copy,
+It pins 38 lexical callable rows across 9 semantic method groups: package copy,
 build orchestration, manifest rewrite, ZIP artifact creation, mobile artifact
 staging, release body generation, release publication, interactive prompts, and
 README badge mutation.
@@ -259,3 +282,7 @@ optimization, JSON-first behavior, website route behavior, website public copy,
 deployment claims, remote request changes, whitelist behavior, metric
 collectors, artifact creation, native sync, release package changes, or public
 claims.
+
+## 2026-10-18 Scope Refresh
+
+The file table now accounts for all current JS/MJS files in the existing build/scripts/website roots. This is lexical inventory, not semantic review of every newly listed helper. New-release draft/upload/name-verification/publish behavior is exercised through the actual build orchestrator with stubbed command boundaries. Existing draft visibility is deliberately preserved; no public release operation was executed. The public Android copy distinguishes the complete Google Play application from the simpler direct APK. Installed/store/physical-device gates remain separate.

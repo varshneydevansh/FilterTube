@@ -179,3 +179,46 @@ optimization, JSON-first behavior, settings behavior, background message
 behavior, storage behavior, cache invalidation behavior, whitelist behavior,
 metric collectors, artifact creation, native sync, release package changes, or
 public claims.
+
+
+## October18,2026 source review
+
+Previous measurements and subscriptions injection behavior are historical. The current subscriptions branch only pings an existing receiver and reports receiver_unavailable; it never injects a caller-selected script list. General MAIN-world injectScripts retains its separately documented missing-allowlist/trust gate; no security-completion claim is made. The view-count helper now precedes the engine in fallback injection.
+
+sha256: `cc89bb4a0375145e1c811b7cf5953729c39c409b6b24cacdc65c80f9f6ff44d0`
+sha256: `6097691b4c6f4d2ede943014694aec4f6cc1ef0134945e576ca9c6c94dd9c669`
+background lines: 8538
+background bytes: 386043
+bridge_injection lines: 152
+bridge_injection bytes: 6064
+injectScripts block lines: 47
+injectScripts block bytes: 1612
+subscriptions bridge block lines: 40
+subscriptions bridge block bytes: 1469
+injectViaScriptingAPI block lines: 14
+injectViaScriptingAPI block bytes: 505
+injectViaFallback block lines: 23
+injectViaFallback block bytes: 904
+injectMainWorldScripts block lines: 46
+injectMainWorldScripts block bytes: 1773
+selected injectScripts tokens: 4
+selected request.scripts tokens: 1
+selected sender tab tokens: 1
+selected sender frame tokens: 1
+selected executeScript tokens: 3
+selected world MAIN tokens: 1
+selected world ISOLATED tokens: 0
+selected isTrustedUiSender tokens: 0
+selected allowlist tokens: 0
+selected sender url tokens: 0
+selected tabs.get tokens: 0
+selected tabs.query tokens: 0
+selected youtube host tokens: 0
+selected sendResponse success tokens: 2
+selected sendResponse failure tokens: 5
+selected return true tokens: 2
+selected return false tokens: 5
+selected frameIds tokens: 1
+selected tabId tokens: 8
+selected files tokens: 3
+selected setTimeout tokens: 2

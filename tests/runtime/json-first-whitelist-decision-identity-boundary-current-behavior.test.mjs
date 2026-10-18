@@ -166,9 +166,9 @@ test('JSON-first whitelist decision identity audit is audit-only and source pinn
   assert.match(doc, /not completion proof for JSON-first whitelist decision authority/);
 
   const source = read('js/filter_logic.js');
-  assert.equal(lineCount(source), 3652);
-  assert.equal(Buffer.byteLength(source), 172174);
-  assert.equal(sha256('js/filter_logic.js'), '953ef0f14970e6cfbc11215fe9eaa078ced34f001908e1c6d5903a8fd2d9a1f5');
+  assert.equal(lineCount(source), 4534);
+  assert.equal(Buffer.byteLength(source), 221980);
+  assert.equal(sha256('js/filter_logic.js'), 'f7021a053af96a4cd31a577f56e900ffb1a5d990fe55a838af64a6dba867afc4');
   assert.ok(doc.includes('`js/filter_logic.js`'));
 
   for (const artifact of [
@@ -187,7 +187,7 @@ test('whitelist decision source counts remain pinned', () => {
   const doc = read(docPath);
   const filterLogic = read('js/filter_logic.js');
 
-  const shouldBlockBlock = sliceBetween(filterLogic, '_shouldBlock(item, rendererType) {', '        _checkCategoryFilters(item, rules, rendererType) {');
+  const shouldBlockBlock = sliceBetween(filterLogic, '_shouldBlock(item, rendererType, channelShelfOwner = null) {', '        _checkCategoryFilters(item, rules, rendererType) {');
   const whitelistBlock = sliceBetween(filterLogic, "            if (listMode === 'whitelist' && !isCommentRenderer) {", '            // Channel filtering with comprehensive matching');
   const noRuleBlock = sliceBetween(whitelistBlock, '                if (!hasChannelRules && !hasKeywordRules) {', '                if (hasChannelRules) {');
   const channelLoop = sliceBetween(whitelistBlock, '                if (hasChannelRules) {', '                if (hasKeywordRules) {');
@@ -195,16 +195,16 @@ test('whitelist decision source counts remain pinned', () => {
   const unresolvedBlock = sliceBetween(whitelistBlock, '                const shouldTryCreatorPageFallback = hasChannelRules', "                this._logWhitelistDecision('block:no_whitelist_match',");
   const noMatchTail = sliceBetween(whitelistBlock, "                this._logWhitelistDecision('block:no_whitelist_match',", '            }\n');
 
-  assert.equal(lineCount(shouldBlockBlock), 306);
-  assert.equal(Buffer.byteLength(shouldBlockBlock), 15523);
+  assert.equal(lineCount(shouldBlockBlock), 388);
+  assert.equal(Buffer.byteLength(shouldBlockBlock), 20224);
   assert.equal(lineCount(whitelistBlock), 110);
-  assert.equal(Buffer.byteLength(whitelistBlock), 5535);
+  assert.equal(Buffer.byteLength(whitelistBlock), 5620);
   assert.equal(lineCount(noRuleBlock), 9);
   assert.equal(Buffer.byteLength(noRuleBlock), 327);
   assert.equal(lineCount(channelLoop), 17);
   assert.equal(Buffer.byteLength(channelLoop), 961);
   assert.equal(lineCount(keywordLoop), 15);
-  assert.equal(Buffer.byteLength(keywordLoop), 687);
+  assert.equal(Buffer.byteLength(keywordLoop), 772);
   assert.equal(lineCount(unresolvedBlock), 32);
   assert.equal(Buffer.byteLength(unresolvedBlock), 1522);
   assert.equal(lineCount(noMatchTail), 8);
@@ -357,7 +357,7 @@ test('comments bypass empty whitelist fail-closed but still honor comment keywor
   const neutralWhitelist = run(neutralData, { listMode: 'whitelist' });
   const keywordBlocked = run(matchingData, {
     listMode: 'whitelist',
-    filterKeywords: [keyword('blocked phrase')]
+    filterKeywordsComments: [keyword('blocked phrase')]
   });
 
   assert.equal(neutralWhitelist.result.contents.length, 1);

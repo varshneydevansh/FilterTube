@@ -44,13 +44,13 @@ quick-block/block-menu affordance source/effect blocks: 16
 
 | File | Lines | Bytes | SHA-256 |
 | --- | ---: | ---: | --- |
-| `js/content_controls_catalog.js` | 222 | 7822 | `780b35c8aa33161ccd6e489b0843f01d805620409715a50aaca0a0bf6cff7e10` |
-| `js/settings_shared.js` | 1181 | 57535 | `9710ebb445ba11cc45fc98aced765d298226a8cd4a003600e106f908abc2162c` |
-| `js/background.js` | 6803 | 306710 | `57ddc6c3e31112c30734ede78c9b37b01bd31533fc8a1d16856b13d2b295f0d7` |
-| `js/content/bridge_settings.js` | 1127 | 44545 | `fad07aba48391021d5e42096b34f32c58a6337a1a4d303a8706927c541d47f71` |
-| `js/state_manager.js` | 2491 | 99780 | `509c559e35989c13cdded17c01eeaca8115addcd3848dbcda41514422e5bc7b6` |
-| `js/content/block_channel.js` | 3189 | 127857 | `c040b57e0b107fd7b6fb0a18bc4ca014e5a22fbb82755f81e51a497eee387dba` |
-| `js/content_bridge.js` | 13636 | 604184 | `8d55d0c8995e5b68bb9142c41f95046a676f5af2b83f8545b00f91a6a5a3776d` |
+| `js/content_controls_catalog.js` | 299 | 12438 | `a4fd4543ffa17e203d416223b972b130add1ebb559cf491e6282d96329ee07b0` |
+| `js/settings_shared.js` | 1313 | 66857 | `19f0a1fb3cd512494481b7eb39169bf84feeda4a0a6a20cf58ebaf1c18ff7ba9` |
+| `js/background.js` | 8538 | 386043 | `cc89bb4a0375145e1c811b7cf5953729c39c409b6b24cacdc65c80f9f6ff44d0` |
+| `js/content/bridge_settings.js` | 2110 | 93234 | `0a42241fd8a9b6559995895ef7174745d7e4a7b21e0644ef6940eadd66162723` |
+| `js/state_manager.js` | 2979 | 124009 | `04879b5b1dcac9229c70d0ea14241667755682649865ad1d52030c1ce21950d3` |
+| `js/content/block_channel.js` | 3361 | 135050 | `f2a02886a83d64d93186cd1f0c1f300683ae49754b928d2e0329fd1a88d8f2c9` |
+| `js/content_bridge.js` | 15053 | 678250 | `c653324d1f042c0473cf2102d81bcd161bfaa26f8c7ee545e250226594dc9618` |
 
 ## Pinned Source Counts
 
@@ -58,41 +58,41 @@ catalog feed affordance controls block lines: 10
 
 catalog feed affordance controls block bytes: 488
 
-settings_shared settings keys block lines: 38
+settings_shared settings keys block lines: 43
 
-settings_shared settings keys block bytes: 1031
+settings_shared settings keys block bytes: 1170
 
 settings_shared affordance compile block lines: 2
 
 settings_shared affordance compile block bytes: 126
 
-background boolean pass-through block lines: 35
+background boolean pass-through block lines: 37
 
-background boolean pass-through block bytes: 3596
+background boolean pass-through block bytes: 3832
 
-background storage refresh keys block lines: 16
+background storage refresh keys block lines: 19
 
-background storage refresh keys block bytes: 461
+background storage refresh keys block bytes: 559
 
-content bridge storage refresh keys block lines: 44
+content bridge storage refresh keys block lines: 46
 
-content bridge storage refresh keys block bytes: 1263
+content bridge storage refresh keys block bytes: 1322
 
-state manager valid setting keys block lines: 33
+state manager valid setting keys block lines: 35
 
-state manager valid setting keys block bytes: 1063
+state manager valid setting keys block bytes: 1130
 
-state manager external reload keys block lines: 41
+state manager external reload keys block lines: 46
 
-state manager external reload keys block bytes: 1604
+state manager external reload keys block bytes: 1803
 
-quick block card selectors block lines: 44
+quick block card selectors block lines: 60
 
-quick block card selectors block bytes: 1519
+quick block card selectors block bytes: 2088
 
-quick block enabled gate block lines: 89
+quick block enabled gate block lines: 91
 
-quick block enabled gate block bytes: 2941
+quick block enabled gate block bytes: 3025
 
 quick block setup lifecycle block lines: 320
 
@@ -104,19 +104,19 @@ normal menu injection gate block bytes: 411
 
 fallback menu button creation block lines: 31
 
-fallback menu button creation block bytes: 1533
+fallback menu button creation block bytes: 1591
 
-fallback menu scan lifecycle block lines: 279
+fallback menu scan lifecycle block lines: 293
 
-fallback menu scan lifecycle block bytes: 9837
+fallback menu scan lifecycle block bytes: 10382
 
-fallback popover open block lines: 104
+fallback popover open block lines: 107
 
-fallback popover open block bytes: 3500
+fallback popover open block bytes: 3636
 
 fallback perform block action block lines: 212
 
-fallback perform block action block bytes: 9930
+fallback perform block action block bytes: 10098
 
 content_controls_catalog total showQuickBlockButton tokens: 1
 

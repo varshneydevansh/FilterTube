@@ -8,13 +8,13 @@ import assert from 'node:assert/strict';
 const repoRoot = process.cwd();
 const docPath = 'docs/audit/FILTERTUBE_ROOT_PACKAGE_METADATA_SCRIPT_SURFACE_CURRENT_BEHAVIOR_2026-05-21.md';
 const rootMetadataRows = [
-  ['.gitignore', 153, 2197, 'c90a7834297cf0a7b65493f41a21947fd5d85d1e14740b902cb3a3664028e3ca'],
-  ['CHANGELOG.md', 591, 40124, 'e22a87ce7eeb88d171587d4b0f4676881a2c3081a7fbf15978d7e8d8582cdfdd'],
+  ['.gitignore', 157, 2275, 'f3033e094938bb4fc6ecf30aad468286f1dccd8d18db1c136e348ab087208bcd'],
+  ['CHANGELOG.md', 938, 75511, 'e57906dca95911874ef251aa45d8c3a76df00df576b36277d9c0e9b9654c3036'],
   ['LICENSE', 21, 1073, 'd0739cbb6232b0fb9ea59347feaf412bab5042768aa02856b16af24bb35e9d9d'],
-  ['README.md', 423, 24171, '222883578482b2d594d43f29bbe4778b7404a640bb5f2ca9e9a67a1858bf49cb'],
+  ['README.md', 456, 28669, 'bb4374abbe82478e01a6653f26be3149824c0efd6aaf75c2095d4611b1ee67d6'],
   ['channel-identity-watch-mix-collab-recovery-plan.md', 262, 16023, '01f82169b06d3752e318b20b956c8a4284ae80166686e5c40aeee66c957d108a'],
-  ['package.json', 67, 2954, '6f0b5dc130399998ad5435ef3b273573234e80561ceba32e0da078b91851e229'],
-  ['package-lock.json', 1461, 49916, 'f52d6482693be9cd4edacdc1f1491b4d2cda796522bfd0e4dcf86e0c879ad974'],
+  ['package.json', 86, 4580, 'c9cb2c3c4fea302fa3946f462dbfbb474381a78946ca59adb653814d06a4de51'],
+  ['package-lock.json', 1468, 50219, '84e60039228a76c10550d2e3922706ef2b7dd3671ef218a1d6e9263598cef33d'],
 ];
 
 function filePath(file) {
@@ -91,9 +91,9 @@ test('root package metadata script surface doc is audit-only and fingerprint pin
   assert.match(doc, /optimization, release, dependency, JSON-first, or cleanup implementation work/);
   assert.deepEqual(trackedRootMetadata.sort(), rootMetadataRows.map(([file]) => file).sort());
 
-  assert.equal(rootMetadataRows.reduce((sum, [, lines]) => sum + lines, 0), 2978);
-  assert.equal(rootMetadataRows.reduce((sum, [, , bytes]) => sum + bytes, 0), 136458);
-  assert.match(doc, /7 files, 2,978 newline counts, and\s+136,458 bytes/);
+  assert.equal(rootMetadataRows.reduce((sum, [, lines]) => sum + lines, 0), 3388);
+  assert.equal(rootMetadataRows.reduce((sum, [, , bytes]) => sum + bytes, 0), 178350);
+  assert.match(doc, /7 files, 3,388 newline counts, and\s+178,350 bytes/);
 
   for (const [file, lines, bytes, hash] of rootMetadataRows) {
     assert.equal(newlineCount(file), lines, `${file} newline count drifted`);
@@ -109,46 +109,64 @@ test('package scripts and dependency metadata are pinned before release or optim
   const doc = read(docPath);
 
   assert.equal(pkg.name, 'filtertube');
-  assert.equal(pkg.version, '3.3.2');
+  assert.equal(pkg.version, '3.4.1');
   assert.equal(pkg.license, 'MIT');
   assert.equal(pkg.repository.url, 'git+https://github.com/varshneydevansh/FilterTube.git');
   assert.equal(pkg.homepage, 'https://github.com/varshneydevansh/FilterTube');
   assert.deepEqual(Object.keys(pkg.scripts), [
-    'build:nanah-vendor',
-    'build:ui',
-    'dev',
-    'build',
-    'build:chrome',
-    'build:firefox',
-    'build:opera',
-    'sync:native-runtime',
-    'managed:extension-smoke',
-    'managed:native-handoff',
-    'managed:provider-ownership',
-    'managed:app-parity-smoke',
-    'managed:provider',
-    'test',
-    'audit:runtime',
-    'test:release',
-    'test:whitelist',
-    'test:blocking',
-    'test:json',
-    'test:dom',
-    'test:menu',
-    'test:performance',
-    'test:settings',
-    'test:smoke',
-    'lanes:changed',
-    'test:changed',
-    'test:audit-drift',
-    'verify:managed-app-policy',
-    'smoke:youtube',
-    'smoke:youtube:verify',
-    'dev:chrome',
-    'dev:firefox',
-    'dev:opera',
-  ]);
-  assert.equal(Object.keys(pkg.scripts).length, 33);
+  "build:nanah-vendor",
+  "build:qr-scanner-vendor",
+  "build:ui",
+  "check:ui-locales",
+  "check:json-keys",
+  "check:ui-locales:targets",
+  "check:release-note-locales",
+  "check:release-note-locales:complete",
+  "audit:ui-copy",
+  "audit:ui-copy:complete",
+  "dev",
+  "build",
+  "build:chrome",
+  "build:firefox",
+  "build:opera",
+  "sync:native-runtime",
+  "managed:extension-smoke",
+  "managed:native-handoff",
+  "managed:provider-ownership",
+  "managed:app-parity-smoke",
+  "managed:provider",
+  "managed:nearby",
+  "test",
+  "audit:runtime",
+  "test:release",
+  "test:whitelist",
+  "test:blocking",
+  "test:json",
+  "test:dom",
+  "test:menu",
+  "test:performance",
+  "test:settings",
+  "test:smoke",
+  "lanes:changed",
+  "test:changed",
+  "test:audit-drift",
+  "audit:family-devices:phase11",
+  "audit:family-devices:phase11:strict",
+  "audit:family-devices:phase12",
+  "audit:family-devices:phase12:strict",
+  "audit:family-devices:provider",
+  "audit:family-devices:import",
+  "audit:family-devices:log",
+  "audit:family-devices:release",
+  "audit:family-devices:checklist",
+  "verify:managed-app-policy",
+  "smoke:youtube",
+  "smoke:youtube:verify",
+  "dev:chrome",
+  "dev:firefox",
+  "dev:opera"
+]);
+  assert.equal(Object.keys(pkg.scripts).length, 51);
   assert.equal(pkg.scripts['managed:extension-smoke'], 'node scripts/create-managed-extension-installed-smoke-artifact.mjs');
   assert.equal(pkg.scripts['managed:native-handoff'], 'node scripts/create-managed-native-runtime-sync-handoff.mjs');
   assert.equal(pkg.scripts['managed:provider-ownership'], 'node scripts/create-managed-pickup-provider-ownership-artifact.mjs');
@@ -168,6 +186,7 @@ test('package scripts and dependency metadata are pinned before release or optim
   assert.equal(Object.hasOwn(pkg, 'engines'), false);
   assert.equal(Object.hasOwn(pkg, 'packageManager'), false);
   assert.deepEqual(pkg.dependencies, {
+    jsqr: '1.4.0',
     preact: '^10.29.0',
     qrcode: '^1.5.4',
   });
@@ -177,7 +196,7 @@ test('package scripts and dependency metadata are pinned before release or optim
     'fs-extra': '^11.1.1',
   });
 
-  assert.match(doc, /33 scripts/);
+  assert.match(doc, /51 scripts/);
   assert.match(doc, /managed:extension-smoke -> node scripts\/create-managed-extension-installed-smoke-artifact\.mjs/);
   assert.match(doc, /managed:native-handoff -> node scripts\/create-managed-native-runtime-sync-handoff\.mjs/);
   assert.match(doc, /managed:provider-ownership -> node scripts\/create-managed-pickup-provider-ownership-artifact\.mjs/);
@@ -213,11 +232,12 @@ test('package lock reproducibility surface records package count integrity licen
   }
 
   assert.equal(lock.name, 'filtertube');
-  assert.equal(lock.version, '3.3.2');
+  assert.equal(lock.version, '3.4.1');
   assert.equal(lock.lockfileVersion, 3);
-  assert.equal(Object.keys(lock.packages).length, 112);
-  assert.equal(nonRootPackages.length, 111);
+  assert.equal(Object.keys(lock.packages).length, 113);
+  assert.equal(nonRootPackages.length, 112);
   assert.deepEqual(lock.packages[''].dependencies, {
+    jsqr: '1.4.0',
     preact: '^10.29.0',
     qrcode: '^1.5.4',
   });
@@ -229,7 +249,7 @@ test('package lock reproducibility surface records package count integrity licen
   assert.deepEqual(licenseCounts, {
     MIT: 92,
     ISC: 16,
-    'Apache-2.0': 2,
+    'Apache-2.0': 3,
     'BSD-3-Clause': 1,
   });
   assert.deepEqual(deprecated.map(([name]) => name).sort(), [
@@ -237,7 +257,7 @@ test('package lock reproducibility surface records package count integrity licen
     'node_modules/inflight',
   ]);
 
-  assert.match(doc, /112 `packages` entries/);
+  assert.match(doc, /113 `packages` entries/);
   assert.match(doc, /All non-root package entries currently have an integrity value/);
   assert.match(doc, /node_modules\/glob/);
   assert.match(doc, /node_modules\/inflight/);
@@ -252,16 +272,17 @@ test('root public docs expose release and JSON-first claims that still need pari
   const build = read('build.js');
   const doc = read(docPath);
 
-  assert.match(readme, /version-3\.3\.2-blue\.svg/);
+  assert.match(readme, /version-3\.4\.1-blue\.svg/);
   assert.match(readme, /license-MIT-green\.svg/);
-  assert.match(readme, /total%20lines-553\.9k-brightgreen\.svg/);
-  assert.match(readme, /javascript-92\.2k%20lines-yellow\.svg/);
+  assert.match(readme, /total%20lines-[\d.]+k-brightgreen\.svg/);
+  assert.match(readme, /javascript-[\d.]+k%20lines-yellow\.svg/);
   assert.match(readme, /filtertube\.in\/downloads/);
   assert.match(readme, /Large Blocklist Matching \(v3\.3\.1\)/);
   assert.match(readme, /200\+ saved channels do not create renderer-by-renderer scan costs/);
   assert.match(readme, /JSON-backed surfaces can be filtered before paint/);
   assert.match(readme, /Current audit work is tightening no-rule, route, lifecycle, and resolver budgets/);
-  assert.equal(changelog.startsWith('# Changelog\n\n## Version 3.3.2'), true);
+  assert.equal(changelog.startsWith('# Changelog\n\n## Unreleased'), true);
+  assert.match(changelog, /\n## Version 3\.4\.1(?:\s|$)/);
   assert.match(license, /MIT License/);
   assert.match(license, /THE SOFTWARE IS PROVIDED "AS IS"/);
 
@@ -270,7 +291,7 @@ test('root public docs expose release and JSON-first claims that still need pari
   assert.doesNotMatch(build, /package-lock\.json/);
 
   assert.match(doc, /README\.md` is public release copy/);
-  assert.match(doc, /`CHANGELOG\.md` currently starts with `## Version 3\.3\.2`/);
+  assert.match(doc, /`CHANGELOG\.md` currently starts with `## Unreleased` and retains `## Version 3\.4\.1`/);
   assert.match(doc, /The historical planning file\s+`channel-identity-watch-mix-collab-recovery-plan\.md` is tracked/);
   assert.match(doc, /`rootDocClaimParityReport`/);
 });

@@ -37,7 +37,7 @@ index, not a replacement for those documents. The v3.3.7 delta after release com
 | 2026-07-25 | `77fc9ed4` | Map dismissible Home rich-shelf feedback | [Renderer inventory](youtube_renderer_inventory.md) |
 | 2026-07-25 | `9b5168c0` | Add the independent Hide YouTube Playables control | [Playables audit](audit/FILTERTUBE_HIDE_YOUTUBE_PLAYABLES_CONTROL_2026-07-25.md) |
 | 2026-07-25 | `c550c04e` | Record optional rich-shelf feedback boundaries | [Renderer inventory](youtube_renderer_inventory.md) |
-| 2026-08-08 | `0f2f7349` | Improve JSON-first category filtering and document its scheduler/ownership contract | [Category behavior](CATEGORY_FILTER_CURRENT_BEHAVIOR_2026-08-08.md) |
+| 2026-08-08 | `0f2f7349` | Improve JSON-first category filtering and document its scheduler/ownership contract | [Category behavior](audit/CATEGORY_FILTER_CURRENT_BEHAVIOR_2026-08-08.md) |
 | 2026-08-23 | `0920969b` | Checkpoint direct access, time/self-control, rule collections, BlockTube migration, Advert Void, experimental language/audio, UI/help, and focused proof | [Functionality](FUNCTIONALITY.md) |
 | 2026-08-23 | `8c73613a` | Distribute the post-v3.3.5 work across canonical product, runtime, website, renderer, sync, and audit documentation | [Documentation index](../README.md) |
 | 2026-08-23 | `73d4386c` | Add the reviewed device-wide update-refresh-reminder opt-out | [Update reminder audit](audit/FILTERTUBE_UPDATE_REFRESH_NOTIFICATION_RELEASE_SETTING_2026-08-23.md) |
@@ -48,5 +48,5 @@ index, not a replacement for those documents. The v3.3.7 delta after release com
 The `0920969b` checkpoint and its subsequent documentation and PR #66 review
 commits form the v3.3.6 source train. Website edits are tracked in the
 [website surface changelog](WEBSITE_APP_RELEASE_SURFACE_CHANGELOG.md), and
-the [post-v3.3.5 ledger](POST_3_3_5_CHANGE_LEDGER_2026-08-23.md) retains the
+the [post-v3.3.5 ledger](audit/POST_3_3_5_CHANGE_LEDGER_2026-08-23.md) retains the
 file-level cross-check behind the canonical topic documentation.

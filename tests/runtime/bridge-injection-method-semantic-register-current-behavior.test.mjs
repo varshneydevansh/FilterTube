@@ -67,7 +67,7 @@ function sliceBetween(text, startNeedle, endNeedle) {
 }
 
 function groupForName(name) {
-  if (name === 'debugLog') return 'bridgeInjectionDebugGlobalState';
+  if (['debugLog', 'isFilterTubeContentDebugEnabled', 'installFilterTubeContentConsoleGate'].includes(name)) return 'bridgeInjectionDebugGlobalState';
   if (name === 'injectViaScriptingAPI') return 'bridgeInjectionBackgroundScripting';
   if (['injectViaFallback', 'injectNext'].includes(name)) return 'bridgeInjectionFallbackScriptDom';
   if (name === 'injectMainWorldScripts') return 'bridgeInjectionMainWorldOrchestration';
@@ -210,6 +210,7 @@ function runBridgeInjection(options = {}) {
   }
 
   const context = {
+    console: options.console || { log() {}, info() {}, debug() {}, warn() {}, error() {} },
     document,
     setTimeout(callback, delay) {
       timers.push({ callback, delay });
@@ -238,36 +239,36 @@ test('bridge injection method semantic register is audit-only and source scoped'
   assert.match(text, /Status: audit-only current-behavior register/);
   assert.match(text, /Runtime behavior is unchanged/);
   assert.match(text, /source file: js\/content\/bridge_injection\.js/);
-  assert.equal(sourceLineCount(bridge), 127);
-  assert.match(text, /line count: 127/);
-  assert.equal(readBuffer(sourcePath).length, 4741);
-  assert.match(text, /source bytes: 4741/);
-  assert.equal(sha256(sourcePath), 'd1b84cf4c43ec5ff5cdc3bd607d8f3d3bf448c12829780b0d05fb9fc14fb5d3e');
-  assert.match(text, /source sha256: d1b84cf4c43ec5ff5cdc3bd607d8f3d3bf448c12829780b0d05fb9fc14fb5d3e/);
-  assert.match(text, /repo-wide broad parser lexical callable matches: 12/);
-  assert.match(text, /runtime method\/helper declarations in scope: 5/);
-  assert.match(text, /broad-parser runtime declarations in scope: 3/);
+  assert.equal(sourceLineCount(bridge), 152);
+  assert.match(text, /line count: 152/);
+  assert.equal(readBuffer(sourcePath).length, 6064);
+  assert.match(text, /source bytes: 6064/);
+  assert.equal(sha256(sourcePath), '6097691b4c6f4d2ede943014694aec4f6cc1ef0134945e576ca9c6c94dd9c669');
+  assert.match(text, /source sha256: 6097691b4c6f4d2ede943014694aec4f6cc1ef0134945e576ca9c6c94dd9c669/);
+  assert.match(text, /repo-wide broad parser lexical callable matches: 14/);
+  assert.match(text, /runtime method\/helper declarations in scope: 7/);
+  assert.match(text, /broad-parser runtime declarations in scope: 5/);
   assert.match(text, /assignment-expression method declarations outside broad parser: 2/);
   assert.match(text, /control-flow lexical artifacts: 9/);
-  assert.match(text, /file-local executable behavior rows: 4/);
+  assert.match(text, /file-local executable behavior rows: 5/);
   assert.match(text, /global method proof count promoted: 0/);
-  assert.match(text, /named method\/helper declarations in scope: 5/);
-  assert.match(text, /plain function declarations: 1/);
+  assert.match(text, /named method\/helper declarations in scope: 7/);
+  assert.match(text, /plain function declarations: 3/);
   assert.match(text, /async function declarations: 2/);
   assert.match(text, /named function expression declarations: 1/);
   assert.match(text, /async named function expression declarations: 1/);
   assert.match(text, /const helper\/callback declarations: 0/);
   assert.match(text, /const arrow helper\/callback declarations: 0/);
-  assert.match(text, /arrow callback sites in scope: 8/);
+  assert.match(text, /arrow callback sites in scope: 11/);
   assert.match(text, /semantic method groups: 4/);
   assert.match(text, /runtime behavior changed: no/);
   assert.match(text, /not completion proof for script injection trust/);
 
-  assert.equal(count(bridge, /^\s*function\s+[A-Za-z_$][\w$]*\s*\(/gm), 1);
+  assert.equal(count(bridge, /^\s*function\s+[A-Za-z_$][\w$]*\s*\(/gm), 3);
   assert.equal(count(bridge, /^\s*async\s+function\s+[A-Za-z_$][\w$]*\s*\(/gm), 2);
   assert.equal(count(bridge, /globalThis\.debugLog\s*=\s*function\s+debugLog\s*\(/g), 1);
   assert.equal(count(bridge, /globalThis\.injectMainWorldScripts\s*=\s*async\s+function\s+injectMainWorldScripts\s*\(/g), 1);
-  assert.equal(count(bridge, /=>/g), 8);
+  assert.equal(count(bridge, /=>/g), 11);
 });
 
 test('bridge injection register accounts for every current method row', () => {
@@ -275,30 +276,17 @@ test('bridge injection register accounts for every current method row', () => {
   const rows = methodRows();
   const broadRows = broadCallableRows();
 
-  assert.equal(rows.length, 5);
-  assert.deepEqual(broadRows.map((row) => row.name), [
-    'if',
-    'if',
-    'injectViaScriptingAPI',
-    'if',
-    'injectViaFallback',
-    'injectNext',
-    'if',
-    'if',
-    'if',
-    'if',
-    'if',
-    'if'
-  ]);
+  assert.equal(rows.length, 7);
+  assert.deepEqual(broadRows.map((row) => row.name), ["isFilterTubeContentDebugEnabled", "installFilterTubeContentConsoleGate", "if", "if", "injectViaScriptingAPI", "if", "injectViaFallback", "injectNext", "if", "if", "if", "if", "if", "if"]);
   assert.deepEqual(countBy(rows, 'kind'), {
     asyncFunction: 2,
     asyncFunctionExpression: 1,
-    function: 1,
+    function: 3,
     functionExpression: 1
   });
   assert.deepEqual(countBy(rows, 'group'), {
     bridgeInjectionBackgroundScripting: 1,
-    bridgeInjectionDebugGlobalState: 1,
+    bridgeInjectionDebugGlobalState: 3,
     bridgeInjectionFallbackScriptDom: 2,
     bridgeInjectionMainWorldOrchestration: 1
   });
@@ -312,25 +300,14 @@ test('bridge injection register accounts for every current method row', () => {
   }
 
   assert.match(text, /## Lexical Callable Reconciliation/);
-  assert.match(text, /the 12 broad-parser matches reconcile to\s+3 runtime declarations and 9 control-flow artifacts/i);
+  assert.match(text, /the 14 broad-parser matches reconcile to\s+5 runtime declarations and 9 control-flow artifacts/i);
   assert.match(text, /`debugLog` and\s+`injectMainWorldScripts` are real assignment-expression method declarations/);
   assert.match(text, /it does not promote the global method\s+proof count/);
   assert.match(text, /0 complete per-callable semantic files/);
-  for (const token of [
-    '| 25 | `if` | no | `if (typeof globalThis.currentSettings ===',
-    '| 29 | `if` | no | `if (typeof globalThis.debugLog !==',
-    '| 36 | `injectViaScriptingAPI` | yes | `async function injectViaScriptingAPI(scripts) {`',
-    '| 42 | `if` | no | `if (api.runtime.lastError || !response?.success) {`',
-    '| 51 | `injectViaFallback` | yes | `async function injectViaFallback(scripts) {`',
-    '| 54 | `injectNext` | yes | `function injectNext() {`',
-    '| 55 | `if` | no | `if (currentIndex >= scripts.length) {`',
-    '| 76 | `if` | no | `if (bridgeState.scriptsInjected) {`',
-    '| 79 | `if` | no | `if (bridgeState.injectionPromise) {`',
-    '| 90 | `if` | no | `if (!isFirefox && api.scripting?.executeScript) {`',
-    "| 98 | `if` | no | `if (typeof requestSettingsFromBackground === 'function') {`",
-    '| 113 | `if` | no | `if (!bridgeState.scriptsInjected) {`'
-  ]) {
-    assert.ok(text.includes(token), `missing broad callable reconciliation token ${token}`);
+  const runtimeNames = new Set(rows.map(row => row.name));
+  for (const row of broadRows) {
+    assert.ok(text.includes(`| ${row.line} | \`${row.name}\` | ${runtimeNames.has(row.name) ? 'yes' : 'no'} | \`${row.sourceLine}\``),
+      `missing current lexical row ${row.name}:${row.line}`);
   }
 });
 
@@ -338,15 +315,62 @@ test('bridge injection register pins callback inventory and primitive counts', (
   const text = doc();
   const bridge = source();
   const expectedCallbacks = [
-    [11, '(() =>', 'bridge bootstrap immediately'],
-    [37, 'new Promise((resolve, reject) =>', 'background scripting request lifetime'],
-    [41, 'sendMessage(..., (response) =>', 'runtime.lastError'],
-    [52, 'new Promise((resolve, reject) =>', 'fallback sequential script tag injection lifetime'],
-    [62, 'script.onload = () =>', 'setTimeout(injectNext, 50)'],
-    [66, 'script.onerror = () =>', 'Failed to inject'],
-    [84, '(async () =>', 'resets bridge state on failure'],
-    [96, 'setTimeout(() =>', 'requestSettingsFromBackground()']
-  ];
+  [
+    11,
+    "(() =>",
+    "bridge bootstrap immediately"
+  ],
+  [
+    40,
+    "console.log = (...args) =>",
+    "debug-gated logging"
+  ],
+  [
+    41,
+    "console.info = (...args) =>",
+    "debug-gated info"
+  ],
+  [
+    42,
+    "console.debug = (...args) =>",
+    "debug-gated debug"
+  ],
+  [
+    62,
+    "new Promise((resolve, reject) =>",
+    "background scripting request lifetime"
+  ],
+  [
+    66,
+    "sendMessage(..., (response) =>",
+    "runtime.lastError"
+  ],
+  [
+    77,
+    "new Promise((resolve, reject) =>",
+    "fallback sequential script tag injection lifetime"
+  ],
+  [
+    87,
+    "script.onload = () =>",
+    "setTimeout(injectNext, 50)"
+  ],
+  [
+    91,
+    "script.onerror = () =>",
+    "Failed to inject"
+  ],
+  [
+    109,
+    "(async () =>",
+    "resets bridge state on failure"
+  ],
+  [
+    121,
+    "setTimeout(() =>",
+    "requestSettingsFromBackground()"
+  ]
+];
 
   for (const [line, callback, effectToken] of expectedCallbacks) {
     assert.ok(text.includes(`| ${line} | \`${callback}\` |`), `missing callback row ${line}`);
@@ -430,17 +454,17 @@ test('bridge injection register preserves manifest background and fallback entry
       scripts.indexOf('js/content/bridge_injection.js') < scripts.indexOf('js/content_bridge.js'),
       `${manifestFile} should load bridge_injection before content_bridge`
     );
-    for (const resource of ['js/injector.js', 'js/filter_logic.js', 'js/seed.js', 'js/shared/identity.js']) {
+    for (const resource of ['js/injector.js', 'js/filter_logic.js', 'js/seed.js', 'js/shared/identity.js', 'js/shared/view_count.js']) {
       assert.ok(webAccessibleResources(manifestFile).includes(resource), `${manifestFile} missing ${resource}`);
     }
   }
 
-  assert.equal(readJson('manifest.json').content_scripts[0].js[0], 'js/seed.js');
+  assert.deepEqual(readJson('manifest.json').content_scripts[0].js, ['js/shared/view_count.js', 'js/seed.js']);
   assert.equal(readJson('manifest.json').content_scripts[0].world, 'MAIN');
-  assert.equal(readJson('manifest.chrome.json').content_scripts[0].js[0], 'js/seed.js');
+  assert.deepEqual(readJson('manifest.chrome.json').content_scripts[0].js, ['js/shared/view_count.js', 'js/seed.js']);
   assert.equal(readJson('manifest.chrome.json').content_scripts[0].world, 'MAIN');
-  assert.equal(readJson('manifest.opera.json').content_scripts[0].js[0], 'js/seed.js');
-  assert.equal(readJson('manifest.firefox.json').content_scripts.length, 1);
+  assert.deepEqual(readJson('manifest.opera.json').content_scripts[0].js, ['js/shared/view_count.js', 'js/seed.js']);
+  assert.equal(readJson('manifest.firefox.json').content_scripts.some(entry => entry.js?.includes('js/seed.js')), false, 'Firefox seed is supplied by the ordered fallback injection');
 
   assert.match(injectScriptsBlock, /const tabId = Number\(sender\?\.tab\?\.id\)/);
   assert.match(injectScriptsBlock, /const frameId = Number\(sender\?\.frameId\)/);
@@ -451,10 +475,10 @@ test('bridge injection register preserves manifest background and fallback entry
   const requiredDocTokens = [
     'manifest order: block_channel.js before bridge_injection.js before bridge_settings.js before content_bridge.js',
     'Chromium content script world: ISOLATED for bridge_injection.js',
-    'default/chrome seed content script: js/seed.js in MAIN world before isolated bridge scripts',
+    'default/chrome first MAIN-world content entry: shared/view_count before seed, before isolated bridge scripts',
     'Firefox seed behavior: seed is not a separate MAIN-world manifest entry',
-    'Opera seed behavior: js/seed.js is a separate first content script without an explicit world declaration',
-    'web-accessible scripts required by fallback: js/shared/identity.js, js/filter_logic.js, js/seed.js, js/injector.js',
+    'Opera seed behavior: shared/view_count precedes seed in a separate first content entry without an explicit world declaration',
+    'web-accessible scripts required by fallback: js/shared/identity.js, js/shared/view_count.js, js/filter_logic.js, js/seed.js, js/injector.js',
     'background injectScripts path: maps request.scripts to js/*.js files and calls browserAPI.scripting.executeScript',
     'fallback script cleanup path: none',
     'fallback load spacing: setTimeout(injectNext, 50)',
@@ -484,7 +508,7 @@ test('bridge injection register pins current behavior boundaries and missing aut
   assert.match(fallbackPath, /\(document\.head \|\| document\.documentElement\)\.appendChild\(script\)/);
   assert.doesNotMatch(fallbackPath, /\.remove\(/);
 
-  assert.match(orchestrationPath, /const scriptsToInject = \['shared\/identity', 'filter_logic'\]/);
+  assert.match(orchestrationPath, /const scriptsToInject = \['shared\/identity', 'shared\/view_count', 'filter_logic'\]/);
   assert.match(orchestrationPath, /if \(isFirefox\) scriptsToInject\.push\('seed'\)/);
   assert.match(orchestrationPath, /scriptsToInject\.push\('injector'\)/);
   assert.match(orchestrationPath, /if \(!isFirefox && api\.scripting\?\.executeScript\)/);
@@ -523,7 +547,7 @@ test('bridge injection register pins current behavior boundaries and missing aut
   await Promise.all([firstPromise, secondPromise]);
   assert.equal(chromiumSuccess.messages.length, 1);
   assert.equal(chromiumSuccess.messages[0].action, 'injectScripts');
-  assert.deepEqual([...chromiumSuccess.messages[0].scripts], ['shared/identity', 'filter_logic', 'injector']);
+  assert.deepEqual([...chromiumSuccess.messages[0].scripts], ['shared/identity', 'shared/view_count', 'filter_logic', 'injector']);
   assert.equal(chromiumSuccess.context.__filtertubeBridgeState.scriptsInjected, true);
   assert.equal(chromiumSuccess.context.__filtertubeBridgeState.injectionInProgress, false);
   assert.equal(chromiumSuccess.timers.length, 1);
@@ -547,6 +571,7 @@ test('bridge injection register pins current behavior boundaries and missing aut
   const fallbackPromise = firefoxFallback.context.injectMainWorldScripts();
   const expectedFallbackScripts = [
     'shared/identity',
+    'shared/view_count',
     'filter_logic',
     'seed',
     'injector'
@@ -564,18 +589,18 @@ test('bridge injection register pins current behavior boundaries and missing aut
   await fallbackPromise;
   assert.equal(firefoxFallback.context.IS_FIREFOX_BRIDGE, true);
   assert.equal(firefoxFallback.context.__filtertubeBridgeState.scriptsInjected, true);
-  assert.equal(firefoxFallback.appended.length, 4);
+  assert.equal(firefoxFallback.appended.length, 5);
   assert.equal(firefoxFallback.appended.every(({ node }) => node.removed === false), true);
-  assert.equal(firefoxFallback.timers.filter((timer) => timer.delay === 50).length, 4);
+  assert.equal(firefoxFallback.timers.filter((timer) => timer.delay === 50).length, 5);
   assert.equal(firefoxFallback.timers.at(-1).delay, 100);
   firefoxFallback.timers.at(-1).callback();
   assert.equal(firefoxFallback.settingsRequests.length, 1);
 
   for (const token of [
-    'Chromium executable proof: one successful injectMainWorldScripts() call sends injectScripts for shared/identity, filter_logic, and injector',
+    'Chromium executable proof: one successful injectMainWorldScripts() call sends injectScripts for shared/identity, shared/view_count, filter_logic, and injector',
     'Chromium executable proof: a duplicate in-progress injectMainWorldScripts() call reuses the same promise and sends no second injectScripts message',
     'Chromium executable proof: failed background injection rejects, clears injectionPromise, leaves scriptsInjected false, and calls debugLog once',
-    'Firefox fallback executable proof: appends shared/identity, filter_logic, seed, and injector script tags in order with 50ms load spacing',
+    'Firefox fallback executable proof: appends shared/identity, shared/view_count, filter_logic, seed, and injector script tags in order with 50ms load spacing',
     'Firefox fallback executable proof: fallback script tags are not removed after load and successful injection schedules the same 100ms settings request timer'
   ]) {
     assert.ok(text.includes(token), `missing executable proof token ${token}`);
@@ -596,4 +621,35 @@ test('bridge injection register pins current behavior boundaries and missing aut
     assert.match(text, new RegExp(missingAuthority));
     assert.doesNotMatch(runtime, new RegExp(missingAuthority));
   }
+});
+
+
+test('actual bridge console gate follows explicit local debug state and remains idempotent', () => {
+  const calls = [];
+  const runtime = runBridgeInjection({ console: Object.fromEntries(
+    ['log', 'info', 'debug', 'warn', 'error'].map(name => [name, (...args) => calls.push([name, ...args])])
+  ) });
+  const { context } = runtime;
+  for (const method of ['log', 'info', 'debug']) context.console[method]('hidden');
+  assert.deepEqual(calls, []);
+  context.console.warn('visible warning');
+  assert.deepEqual(calls, [['warn', 'visible warning']]);
+  calls.length = 0;
+  context.__filtertubeDebug = true;
+  for (const method of ['log', 'info', 'debug']) context.console[method]('enabled');
+  assert.equal(calls.length, 3);
+  context.__filtertubeDebug = false;
+  let attribute = 'true';
+  context.document.documentElement.getAttribute = name => name === 'data-filtertube-debug' ? attribute : null;
+  context.console.log('attribute enabled');
+  assert.deepEqual(calls.at(-1), ['log', 'attribute enabled']);
+  attribute = 'false';
+  context.console.log('hidden again');
+  assert.equal(calls.length, 4);
+  const firstWrapper = context.console.log;
+  vm.runInContext(source(), context, { filename: sourcePath });
+  assert.equal(context.console.log, firstWrapper);
+  context.__filtertubeDebug = true;
+  context.console.log('once after repeat load');
+  assert.equal(calls.length, 5);
 });

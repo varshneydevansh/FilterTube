@@ -179,11 +179,11 @@ function sourceBlocks() {
     regexMatches: sliceBetween(
       filterLogic,
       '        _regexMatches(regex, text) {',
-      '        _shouldBlock(item, rendererType) {'
+      '        _parseKeywordDateBoundary(value, endOfDay = false) {'
     ),
     whitelistKeyword: sliceBetween(
-      filterLogic,
-      "                if (hasKeywordRules) {\n                    const textToSearch = this._candidateSearchText(candidate);\n                    for (const keywordRegex of whitelistKeywords) {\n                        if (this._regexMatches(keywordRegex, textToSearch)) {\n                            this._logWhitelistDecision('allow:matched_keyword'",
+      filterLogic.slice(filterLogic.indexOf('_shouldBlock(item, rendererType, channelShelfOwner = null) {')),
+      '                if (hasKeywordRules) {',
       '                const shouldTryCreatorPageFallback = hasChannelRules && !hasStableChannelIdentity && ('
     ),
     blockKeyword: sliceBetween(
@@ -225,27 +225,27 @@ test('JSON-first keyword match boundary audit is audit-only and source pinned', 
   assert.match(doc, /Status: current-behavior proof slice/);
   assert.match(doc, /not an implementation patch/);
   assert.match(doc, /proof chain/);
-  assert.match(doc, /keyword match boundary source files: 4/);
-  assert.match(doc, /runtime keyword match fixtures: 8/);
+  assert.match(doc, /keyword match boundary source files: 8/);
+  assert.match(doc, /runtime keyword match fixtures: 9/);
 
-  assert.ok(doc.includes(`| \`js/filter_logic.js\` | 3652 | 172174 | \`${sha256('js/filter_logic.js')}\` |`));
-  assert.ok(doc.includes(`| \`js/settings_shared.js\` | 1181 | 57535 | \`${sha256('js/settings_shared.js')}\` |`));
-  assert.ok(doc.includes(`| \`js/background.js\` | 6803 | 306710 | \`${sha256('js/background.js')}\` |`));
-  assert.ok(doc.includes(`| \`js/content/dom_fallback.js\` | 5,030 | 235,555 | \`${sha256('js/content/dom_fallback.js')}\` |`));
+  assert.ok(doc.includes(`| \`js/filter_logic.js\` | 4534 | 221980 | \`${sha256('js/filter_logic.js')}\` |`));
+  assert.ok(doc.includes(`| \`js/settings_shared.js\` | 1313 | 66857 | \`${sha256('js/settings_shared.js')}\` |`));
+  assert.ok(doc.includes(`| \`js/background.js\` | 8538 | 386043 | \`${sha256('js/background.js')}\` |`));
+  assert.ok(doc.includes(`| \`js/content/dom_fallback.js\` | 8,172 | 380,506 | \`${sha256('js/content/dom_fallback.js')}\` |`));
 });
 
 test('keyword match boundary source counts remain pinned', () => {
   const doc = read(docPath);
   const blocks = sourceBlocks();
   const countRows = [
-    ['filter_logic keyword regex reconstruction block', blocks.processRegex, 29, 1445],
+    ['filter_logic keyword regex reconstruction block', blocks.processRegex, 45, 2550],
     ['filter_logic candidate search text block', blocks.candidateSearch, 15, 663],
-    ['filter_logic _regexMatches block', blocks.regexMatches, 18, 488],
-    ['filter_logic whitelist keyword block', blocks.whitelistKeyword, 15, 687],
-    ['filter_logic blocklist keyword block', blocks.blockKeyword, 21, 1123],
-    ['filter_logic comment keyword block', blocks.commentKeyword, 34, 1947],
-    ['settings_shared compileKeywords block', blocks.sharedCompile, 15, 740],
-    ['background compileKeywordEntries block', blocks.backgroundCompile, 23, 1040],
+    ['filter_logic _regexMatches block', blocks.regexMatches, 15, 396],
+    ['filter_logic whitelist keyword block', blocks.whitelistKeyword, 15, 772],
+    ['filter_logic blocklist keyword block', blocks.blockKeyword, 21, 1230],
+    ['filter_logic comment keyword block', blocks.commentKeyword, 34, 2032],
+    ['settings_shared compileKeywords block', blocks.sharedCompile, 19, 1020],
+    ['background compileKeywordEntries block', blocks.backgroundCompile, 45, 2213],
     ['background comments keyword fallback block', blocks.backgroundComments, 35, 1961],
     ['DOM fallback matchesKeyword block', blocks.domMatches, 36, 1278]
   ];
@@ -257,17 +257,17 @@ test('keyword match boundary source counts remain pinned', () => {
     assert.match(doc, new RegExp(`${label} bytes: ${expectedBytes}`));
   }
 
-  assert.equal(countLiteral(blocks.filterLogic, '_regexMatches'), 8);
-  assert.equal(countLiteral(blocks.filterLogic, 'filterKeywordsComments'), 2);
+  assert.equal(countLiteral(blocks.filterLogic, '_regexMatches'), 9);
+  assert.equal(countLiteral(blocks.filterLogic, 'filterKeywordsComments'), 6);
   assert.equal(countLiteral(blocks.settingsShared, 'compileKeywords'), 4);
   assert.equal(countLiteral(blocks.background, 'compileKeywordEntries'), 4);
-  assert.equal(countLiteral(blocks.domFallback, 'matchesKeyword'), 4);
+  assert.equal(countLiteral(blocks.domFallback, 'matchesKeyword'), 8);
 
-  assert.match(doc, /filter_logic total _regexMatches tokens: 8/);
-  assert.match(doc, /filter_logic total filterKeywordsComments tokens: 2/);
-  assert.match(doc, /settings_shared compileKeywords tokens: 4/);
-  assert.match(doc, /background compileKeywordEntries tokens: 4/);
-  assert.match(doc, /DOM fallback matchesKeyword tokens: 4/);
+  assert.match(doc, /filter_logic total _regexMatches tokens: 9/);
+  assert.match(doc, /filter_logic total filterKeywordsComments tokens: 6/);
+  assert.match(doc, /settings_shared compileKeywords tokens: 8/);
+  assert.match(doc, /background compileKeywordEntries tokens: 8/);
+  assert.match(doc, /DOM fallback matchesKeyword tokens: 8/);
 });
 
 test('substring and exact JSON keyword matching remain distinct current behavior', () => {
@@ -327,7 +327,7 @@ test('candidate search text can match title description tags metadata and channe
   }
 });
 
-test('comment keyword handling differs for serialized direct and global keyword paths', () => {
+test('comment keyword scope reconstructs serialized rules and respects explicit empty list', () => {
   const input = contents(commentRenderer('spider appears in comment body'));
   const serializedCommentOnly = run(input, {
     filterKeywordsComments: [keyword('spider')]
@@ -340,9 +340,9 @@ test('comment keyword handling differs for serialized direct and global keyword 
     filterKeywordsComments: []
   });
 
-  assert.deepEqual(plain(serializedCommentOnly), plain(input));
+  assert.deepEqual(plain(serializedCommentOnly), { contents: [] });
   assert.deepEqual(plain(directCommentRegex), { contents: [] });
-  assert.deepEqual(plain(explicitEmptyCommentListWithGlobal), { contents: [] });
+  assert.deepEqual(plain(explicitEmptyCommentListWithGlobal), plain(input));
 });
 
 test('whitelist keyword match allows while whitelist keyword miss fails closed', () => {
@@ -372,8 +372,8 @@ test('channel-only renderers skip JSON keyword matching', () => {
 test('keyword match boundary doc records current risks and missing authority symbols', () => {
   const doc = read(docPath);
 
-  assert.match(doc, /serialized `filterKeywordsComments` is ignored by the engine/);
-  assert.match(doc, /global keywords can still hide comments through candidate metadata/);
+  assert.match(doc, /serialized `filterKeywordsComments` is reconstructed by the engine/);
+  assert.match(doc, /explicit empty comment list excludes global keyword matching/);
   assert.match(doc, /whitelist keyword matches allow content/);
   assert.match(doc, /channel-only renderers skip keyword matching/);
   assert.match(doc, /DOM fallback/);

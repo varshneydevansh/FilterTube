@@ -170,9 +170,9 @@ test('Shorts reel overlay owner audit doc and fixture provenance are pinned', ()
   assert.equal(countLiteral(fixtureText, owner.id), 4);
   assert.equal(countLiteral(fixtureText, owner.handle), 7);
 
-  assert.equal(lineCount(filterLogic), 3652);
-  assert.equal(Buffer.byteLength(filterLogic), 172174);
-  assert.equal(sha256('js/filter_logic.js'), '953ef0f14970e6cfbc11215fe9eaa078ced34f001908e1c6d5903a8fd2d9a1f5');
+  assert.equal(lineCount(filterLogic), 4534);
+  assert.equal(Buffer.byteLength(filterLogic), 221980);
+  assert.equal(sha256('js/filter_logic.js'), 'f7021a053af96a4cd31a577f56e900ffb1a5d990fe55a838af64a6dba867afc4');
 });
 
 test('captured active overlay carries owner UC, handle, subscribe, and avatar evidence without video id', () => {

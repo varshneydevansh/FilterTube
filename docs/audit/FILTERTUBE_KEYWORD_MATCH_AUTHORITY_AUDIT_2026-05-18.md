@@ -94,19 +94,9 @@ Source references:
 - `js/background.js:2071-2075`
 - `js/settings_shared.js:526-527`
 
-Background and shared settings compile a separate `filterKeywordsComments` list
-from keywords whose `comments === true`. But the JSON engine reconstructs
-serialized `filterKeywords` and `whitelistKeywords`; it does not reconstruct
-serialized `filterKeywordsComments` inside `processSettings()`.
+Background and shared settings compile a separate `filterKeywordsComments` list from comments-enabled rules. Revalidated on 2026-10-18: the JSON engine reconstructs serialized comment patterns and retains direct RegExp compatibility. An explicit list, including `[]`, owns comment body matching; the generic keyword branch excludes comments. An absent list retains the legacy global-list body fallback. Independent author-channel and hide-all rules remain effective.
 
-Current behavior already has fixtures showing:
-
-- direct `RegExp` comment keyword lists work,
-- serialized comment keyword lists can be ignored in direct engine calls,
-- global keywords can still remove comments even when the explicit comment list
-  is empty.
-
-That means comment keyword behavior depends on how settings reached the engine.
+This closes the old serialized-list and global-overrides-empty-list defects for the bounded compiler/engine fixtures. It does not establish one keyword authority or exhaustive JSON/DOM/profile/import parity.
 
 ## Channel-Derived Keyword Drift
 

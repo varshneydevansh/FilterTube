@@ -181,3 +181,15 @@ contents, changing JSON-first startup behavior, adding/removing permissions, or
 shipping browser ZIPs, future work still needs browser package artifacts,
 startup readiness reports, host classification, resource reasons, permission to
 feature mapping, package quarantine proof, and browser-specific smoke fixtures.
+
+
+## October 18, 2026 source review
+
+The May inventory above is historical. Current manifests use localized names, version3.4.1, view-count/admission dependencies, a dedicated embed path and Google Search preview guards. These source checks do not prove installed browser execution or native parity. CSS remains absent from all content-script entries. Firefox has5 entries, Chrome6, Opera7; their world declarations are tested separately. The existing missing-authority and release gates remain open.
+
+| File | Newlines | Bytes | SHA-256 |
+| --- | ---: | ---: | --- |
+| manifest.json | 154 | 5204 | d8dea8d10e715d01bab25ea12ff6fc3055d403f2486654fcb6907f94bd4f4627 |
+| manifest.chrome.json | 154 | 5204 | d8dea8d10e715d01bab25ea12ff6fc3055d403f2486654fcb6907f94bd4f4627 |
+| manifest.firefox.json | 128 | 4138 | 2c0fe680fe1d204250ce687ef29c00767d3ff6269024a410da5c9fccff4ebf79 |
+| manifest.opera.json | 162 | 5393 | a7c541876ed54303d3a21613f5eaacbef536d694bf6061da207456eca476fce1 |

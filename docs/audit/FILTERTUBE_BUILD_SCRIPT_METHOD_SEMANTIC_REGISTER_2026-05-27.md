@@ -27,29 +27,29 @@ The verifier changes no build or runtime behavior.
 
 ```text
 build script: build.js
-build script line count: 740
-build script bytes: 26978
-build script sha256: c8485cb2600aad89f44015cd7e49ebe4746ebcc35c91c1ff2bf29aec2f087a04
-lexical callable rows in this semantic slice: 29
-plain function declarations: 21
-async function declarations: 4
-arrow callable rows: 4
+build script line count: 861
+build script bytes: 33225
+build script sha256: a198cc1d0bf98e410deb8f66ced0e56a046bbf987a0a5b878e1278577622fb2e
+lexical callable rows in this semantic slice: 38
+plain function declarations: 26
+async function declarations: 5
+arrow callable rows: 7
 semantic method groups: 9
-arrow token sites in build script: 42
-require calls: 8
+arrow token sites in build script: 55
+require calls: 9
 await expressions: 9
-execSync occurrences: 3
+execSync occurrences: 4
 fs.copySync occurrences: 3
 fs.copyFileSync occurrences: 1
 fs.rmSync occurrences: 2
 fs.writeJsonSync occurrences: 1
 fs.writeFileSync occurrences: 2
-https.request occurrences: 2
+https.request occurrences: 0
 readline.createInterface occurrences: 2
-process.stdout.isTTY occurrences: 2
-draft false occurrences: 1
+process.stdout.isTTY occurrences: 3
+draft false occurrences: 0
 MOBILE_ARTIFACT_FILE_RE occurrences: 3
-console callsites: 28
+console callsites: 34
 runtime behavior changed: no
 build behavior changed: yes
 ```
@@ -59,12 +59,12 @@ build behavior changed: yes
 ```text
 interactivePromptSurface: 2
 manifestRewriteSurface: 1
-mobileArtifactStaging: 8
-packageBuildOrchestration: 1
+mobileArtifactStaging: 9
+packageBuildOrchestration: 5
 packageCopySurface: 1
 readmeBadgeMutation: 4
 releaseBodyGeneration: 6
-releasePublication: 5
+releasePublication: 9
 zipArtifactCreation: 1
 ```
 
@@ -73,12 +73,12 @@ zipArtifactCreation: 1
 | Semantic group | Declarations | Current owner/effect shape | Missing proof before behavior changes |
 | --- | ---: | --- | --- |
 | `packageCopySurface` | 1 | Filters copied package files to exclude filesystem junk while still copying whole source directories. | Package manifest, quarantine policy, per-target package diff, and deletion-readiness proof. |
-| `packageBuildOrchestration` | 1 | Runs generated UI build, mutates README badges, cleans target dist directories, copies package roots, rewrites target manifests, zips targets, stages optional mobile artifacts, and optionally prompts for release. | Dry-run contract, dirty-worktree policy, public doc mutation gate, artifact manifest, rollback plan, and CI/non-TTY publish contract. |
+| `packageBuildOrchestration` | 5 | Runs generated UI build, mutates README badges, cleans target dist directories, copies package roots, rewrites target manifests, zips targets, stages optional mobile artifacts, and optionally prompts for release. | Dry-run contract, dirty-worktree policy, public doc mutation gate, artifact manifest, rollback plan, and CI/non-TTY publish contract. |
 | `manifestRewriteSurface` | 1 | Mutates target manifest JSON to place `js/content/collab_dialog.js` before `js/content_bridge.js` in content-script arrays. | Full manifest validation for permissions, hosts, worlds, web-accessible resources, content script order, and target drift. |
 | `zipArtifactCreation` | 1 | Streams each target directory into an archive with junk-file ignores and resolves after output close. | ZIP checksum manifest, expected file manifest, package size budget, and failed-archive cleanup proof. |
-| `mobileArtifactStaging` | 8 | Optionally copies APK/AAB files matching the naming regex and package version into `dist/mobile`, treats blank/y/yes/default directory-prompt answers as the displayed default, prefers the sibling app artifact directory when present, selects latest versionCode artifacts, warns on missing APK/AAB pairs, and writes `.sha256` files. | Signing fingerprint manifest, package/versionCode proof, selected-artifact policy, release URL proof, and stale artifact cleanup. |
+| `mobileArtifactStaging` | 9 | Optionally copies APK/AAB files matching the naming regex and package version into `dist/mobile`, treats blank/y/yes/default directory-prompt answers as the displayed default, prefers the sibling app artifact directory when present, selects latest versionCode artifacts, warns on missing APK/AAB pairs, and writes `.sha256` files. | Signing fingerprint manifest, package/versionCode proof, selected-artifact policy, release URL proof, and stale artifact cleanup. |
 | `releaseBodyGeneration` | 6 | Reads changelog sections, builds release title/body, and constructs browser/mobile asset URLs. | Public-claim proof, artifact-exists preflight, markdown snapshot fixture, mobile store/direct APK gate, and rollback wording policy. |
-| `releasePublication` | 5 | Creates a non-draft GitHub release, then uploads assets one by one over HTTPS. | Draft-first or preflight-all-assets contract, upload verification, rollback/delete-on-failure plan, asset list manifest, and API fixture provenance. |
+| `releasePublication` | 9 | Creates a new draft through GitHub CLI, uploads missing assets, verifies expected names and publishes only its newly created draft; resuming an existing release preserves visibility. | Byte/checksum verification, rollback/delete-on-failure policy, asset manifest, and GitHub CLI fixture provenance. |
 | `interactivePromptSurface` | 2 | Creates readline prompts for yes/no and free-text input when stdout is a TTY. | Non-interactive release authority, prompt timeout/cancel behavior, CI flag contract, and accidental publish prevention. |
 | `readmeBadgeMutation` | 4 | Reads `git ls-files`, counts tracked text/JS lines, rewrites README shields, and tolerates read/count failures with warnings. | Public doc mutation policy, reproducible line-count fixture, separate explicit badge command, dirty-worktree gate, and release-note parity. |
 
@@ -86,35 +86,44 @@ zipArtifactCreation: 1
 
 | Source file | Source line | Kind | Method or function | Semantic group |
 | --- | ---: | --- | --- | --- |
-| `build.js` | 69 | `arrowFunction` | `filterFunc` | `packageCopySurface` |
-| `build.js` | 82 | `asyncFunction` | `main` | `packageBuildOrchestration` |
-| `build.js` | 161 | `function` | `ensureCollabDialogScriptOrder` | `manifestRewriteSurface` |
-| `build.js` | 183 | `function` | `createZip` | `zipArtifactCreation` |
-| `build.js` | 216 | `asyncFunction` | `maybeCollectMobileArtifacts` | `mobileArtifactStaging` |
-| `build.js` | 283 | `function` | `resolveMobileArtifactPromptDir` | `mobileArtifactStaging` |
-| `build.js` | 295 | `function` | `resolveDefaultMobileArtifactsDir` | `mobileArtifactStaging` |
-| `build.js` | 304 | `function` | `parseMobileArtifactName` | `mobileArtifactStaging` |
-| `build.js` | 315 | `function` | `summarizeMobileArtifacts` | `mobileArtifactStaging` |
-| `build.js` | 326 | `function` | `selectLatestMobileArtifacts` | `mobileArtifactStaging` |
-| `build.js` | 332 | `function` | `extractAndroidVersionCode` | `mobileArtifactStaging` |
-| `build.js` | 336 | `function` | `sha256File` | `mobileArtifactStaging` |
-| `build.js` | 342 | `asyncFunction` | `maybePromptRelease` | `releasePublication` |
-| `build.js` | 400 | `function` | `extractLatestChangelogEntry` | `releaseBodyGeneration` |
-| `build.js` | 425 | `function` | `deriveSubtitle` | `releaseBodyGeneration` |
-| `build.js` | 434 | `function` | `buildReleaseTitle` | `releaseBodyGeneration` |
-| `build.js` | 438 | `function` | `buildReleaseBody` | `releaseBodyGeneration` |
-| `build.js` | 445 | `arrowFunction` | `assetLink` | `releaseBodyGeneration` |
-| `build.js` | 447 | `arrowFunction` | `releaseAssetLink` | `releaseBodyGeneration` |
-| `build.js` | 536 | `function` | `createGitHubRelease` | `releasePublication` |
-| `build.js` | 561 | `function` | `uploadReleaseAsset` | `releasePublication` |
-| `build.js` | 596 | `function` | `contentTypeForAsset` | `releasePublication` |
-| `build.js` | 604 | `function` | `httpRequest` | `releasePublication` |
-| `build.js` | 630 | `function` | `promptYesNo` | `interactivePromptSurface` |
-| `build.js` | 643 | `function` | `promptText` | `interactivePromptSurface` |
-| `build.js` | 656 | `asyncFunction` | `updateReadmeBadges` | `readmeBadgeMutation` |
-| `build.js` | 675 | `arrowFunction` | `formatLoC` | `readmeBadgeMutation` |
-| `build.js` | 719 | `function` | `shouldCountInTotalLoC` | `readmeBadgeMutation` |
-| `build.js` | 725 | `function` | `sumFileLines` | `readmeBadgeMutation` |
+| `build.js` | 76 | `arrowFunction` | `filterFunc` | `packageCopySurface` |
+| `build.js` | 93 | `asyncFunction` | `main` | `packageBuildOrchestration` |
+| `build.js` | 95 | `arrowFunction` | `onExit` | `packageBuildOrchestration` |
+| `build.js` | 96 | `arrowFunction` | `onInterrupt` | `packageBuildOrchestration` |
+| `build.js` | 97 | `arrowFunction` | `onTerminate` | `packageBuildOrchestration` |
+| `build.js` | 111 | `asyncFunction` | `buildTargets` | `packageBuildOrchestration` |
+| `build.js` | 193 | `function` | `ensureCollabDialogScriptOrder` | `manifestRewriteSurface` |
+| `build.js` | 215 | `function` | `createZip` | `zipArtifactCreation` |
+| `build.js` | 248 | `asyncFunction` | `maybeCollectMobileArtifacts` | `mobileArtifactStaging` |
+| `build.js` | 338 | `function` | `resolveMobileArtifactPromptDir` | `mobileArtifactStaging` |
+| `build.js` | 350 | `function` | `resolveDefaultMobileArtifactsDir` | `mobileArtifactStaging` |
+| `build.js` | 359 | `function` | `parseMobileArtifactName` | `mobileArtifactStaging` |
+| `build.js` | 370 | `function` | `summarizeMobileArtifacts` | `mobileArtifactStaging` |
+| `build.js` | 381 | `function` | `describeAvailableMobileArtifacts` | `mobileArtifactStaging` |
+| `build.js` | 405 | `function` | `selectLatestMobileArtifacts` | `mobileArtifactStaging` |
+| `build.js` | 411 | `function` | `extractAndroidVersionCode` | `mobileArtifactStaging` |
+| `build.js` | 415 | `function` | `sha256File` | `mobileArtifactStaging` |
+| `build.js` | 421 | `function` | `resolveGitHubToken` | `releasePublication` |
+| `build.js` | 445 | `asyncFunction` | `maybePromptRelease` | `releasePublication` |
+| `build.js` | 530 | `function` | `extractLatestChangelogEntry` | `releaseBodyGeneration` |
+| `build.js` | 556 | `function` | `deriveSubtitle` | `releaseBodyGeneration` |
+| `build.js` | 565 | `function` | `buildReleaseTitle` | `releaseBodyGeneration` |
+| `build.js` | 569 | `function` | `buildReleaseBody` | `releaseBodyGeneration` |
+| `build.js` | 579 | `arrowFunction` | `assetLink` | `releaseBodyGeneration` |
+| `build.js` | 581 | `arrowFunction` | `releaseAssetLink` | `releaseBodyGeneration` |
+| `build.js` | 678 | `function` | `githubCliEnv` | `releasePublication` |
+| `build.js` | 688 | `function` | `runGitHubCli` | `releasePublication` |
+| `build.js` | 696 | `function` | `githubReleaseExists` | `releasePublication` |
+| `build.js` | 712 | `function` | `createDraftGitHubRelease` | `releasePublication` |
+| `build.js` | 722 | `function` | `listGitHubReleaseAssetNames` | `releasePublication` |
+| `build.js` | 732 | `function` | `uploadGitHubReleaseAssets` | `releasePublication` |
+| `build.js` | 743 | `function` | `publishDraftGitHubRelease` | `releasePublication` |
+| `build.js` | 751 | `function` | `promptYesNo` | `interactivePromptSurface` |
+| `build.js` | 764 | `function` | `promptText` | `interactivePromptSurface` |
+| `build.js` | 777 | `asyncFunction` | `updateReadmeBadges` | `readmeBadgeMutation` |
+| `build.js` | 796 | `arrowFunction` | `formatLoC` | `readmeBadgeMutation` |
+| `build.js` | 840 | `function` | `shouldCountInTotalLoC` | `readmeBadgeMutation` |
+| `build.js` | 846 | `function` | `sumFileLines` | `readmeBadgeMutation` |
 
 ## Current Entrypoints And Dependencies
 
@@ -125,11 +134,11 @@ single-target args: chrome, firefox, opera
 mobile artifact args: --mobile-artifacts, --mobile-artifacts=<dir>, --all-mobile-artifacts
 mobile artifact env: FILTERTUBE_MOBILE_ARTIFACTS_DIR
 mobile artifact prompt directory answers treated as default: blank, y, yes, default
-release token env: GITHUB_TOKEN
+release credentials: gh keyring, GH_TOKEN or GITHUB_TOKEN
 normal package build invokes: node scripts/build-extension-ui.mjs
 normal package build does not invoke: scripts/build-nanah-vendor.mjs
 normal package build does not invoke: scripts/sync-native-runtime.mjs
-common copied directories: js, css, html, icons, data, assets
+common copied directories: _locales, js, css, html, icons, data, assets
 common copied files: README.md, CHANGELOG.md, LICENSE
 manifest source files: manifest.chrome.json, manifest.firefox.json, manifest.opera.json
 manifest output path: dist/<browser>/manifest.json
@@ -138,7 +147,7 @@ mobile output directory: dist/mobile
 mobile checksum output pattern: <artifact>.sha256
 mobile default source: sibling ../FilterTubeApp/release-artifacts/android-mobile-tablet when present, otherwise release-artifacts/mobile
 GitHub release endpoint: /repos/varshneydevansh/FilterTube/releases
-GitHub release draft state: false
+GitHub release draft state: new releases start draft; existing visibility is preserved
 README mutation: updateReadmeBadges(VERSION) runs during main()
 runtime behavior changed: no
 build behavior changed: yes
@@ -151,11 +160,11 @@ build prompt behavior changed: yes
 normal npm run build mutates README.md badge URLs
 normal npm run build regenerates generated UI shell output before package copy
 normal npm run build packages tracked vendor bundles without rebuilding Nanah or QR vendor output
-normal npm run build packages whole js/css/html/icons/data/assets roots
+normal npm run build packages whole _locales/js/css/html/icons/data/assets roots
 normal npm run build can package quarantined-but-unloaded files unless separate audits keep them classified
 non-TTY builds skip release publication instead of providing a CI release contract
-TTY release publication creates a public non-draft GitHub release before uploading assets
-asset upload happens one file at a time after public release creation
+TTY release publication creates a draft, uploads missing assets, verifies expected names, then publishes only its new draft
+asset upload precedes expected-name verification and publication of a newly created draft
 mobile APK/AAB files are copied only when requested or prompted and must match the current package version
 mobile artifact directory prompt treats blank, y, yes, and default as the displayed default directory
 mobile APK/AAB staging warns when the selected versionCode lacks either APK or AAB output
@@ -169,9 +178,9 @@ build failure sets process.exitCode but does not rollback README, dist, staged m
 
 ## Risk Notes
 
-Reliability risk is concentrated in release atomicity. A public GitHub release
-can be visible before every ZIP, APK, AAB, and checksum upload has succeeded.
-The build script also mutates README before package and release steps complete.
+New drafts publish after expected-name verification; existing releases retain
+their visibility. Name-only checks do not prove asset bytes or signing. The build
+script also mutates README before package and release steps complete.
 
 False-hide/leak risk is indirect but still release-relevant. Build packaging
 copies broad directories, including generated, vendor, quarantined, and
@@ -260,3 +269,7 @@ These counts are audit-only blockers. They do not approve runtime
 optimization, JSON-first behavior, method deletion, build package cleanup,
 README mutation changes, GitHub release changes, mobile artifact publication,
 native sync rollout, or public availability claims.
+
+## 2026-10-18 Source Review
+
+Current counters and method rows above were re-extracted from the reviewed build source. New releases use draft → upload missing assets → verify expected asset names → publish. Existing releases retain their visibility, including intentional review drafts. Name verification is not byte/checksum, signing or physical-device proof. The workflow VM tests execute the actual orchestrator with synthetic command boundaries; no network release action was performed. Normal builds also hold the build lock, validate copied JSON before mutation, include `_locales`, and still mutate README badges. Historical proof-gap counts below remain dated audit inventory, not current behavioral completeness.

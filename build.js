@@ -518,8 +518,10 @@ async function maybePromptRelease(version, zipPaths, mobileArtifactPaths = []) {
 
         if (createdDraft) {
             publishDraftGitHubRelease(githubAuth, tagName);
+            console.log('🚀 Release published successfully.');
+        } else {
+            console.log('✅ Expected release assets verified; existing release visibility unchanged.');
         }
-        console.log('🚀 Release published successfully.');
     } catch (err) {
         console.error('❌ Failed to publish release:', err);
     }

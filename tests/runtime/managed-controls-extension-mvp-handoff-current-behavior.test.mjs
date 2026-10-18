@@ -38,7 +38,7 @@ test('managed controls handoff keeps implemented extension scope separate from r
     'extension policy authority: implemented',
     'parent/caregiver Family Controls UI: implemented',
     'live Nanah Send Update: implemented for eligible connected verified devices',
-    'Internet Pickup/Home Pickup hooks: implemented behind explicit provider setup',
+    'Internet Pickup/Home Pickup clients: implemented behind explicit provider setup',
     'Home Pickup visible readiness Check: required by release smoke artifact',
     'reference provider: implemented as self-hosted proof only'
   ]) {

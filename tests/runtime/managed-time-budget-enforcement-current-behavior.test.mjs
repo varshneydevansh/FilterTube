@@ -1,5 +1,6 @@
 import fs from 'node:fs';
 import path from 'node:path';
+import vm from 'node:vm';
 import test from 'node:test';
 import assert from 'node:assert/strict';
 
@@ -272,7 +273,7 @@ test('popup exposes the active profile exact remaining time', () => {
   assert.match(popupShell, /ftManagedTimeStatusValuePopup/);
   assert.match(popup, /FilterTube_GetManagedTimeLimitState/);
   assert.match(popup, /formatPopupManagedTimeRemaining/);
-  assert.match(popup, /\$\{minutes\}m \$\{remainder\}s left/);
+  assert.match(popup, /popupUiText\('popup\.timeMinutesSecondsLeft', '\{minutes\}m \{seconds\}s left', \{ minutes, seconds: remainder \}\)/);
   assert.match(popup, /setInterval\(\(\) => \{[\s\S]*refreshPopupManagedTimeStatus/);
   assert.match(popupCss, /\.ft-popup-time-status/);
 });
@@ -402,4 +403,25 @@ test('competing heartbeat cannot keep a stale owner alive forever', () => {
   });
   assert.equal(takeover.countDecision, 'first_active_heartbeat');
   assert.equal(takeover.state.active['child-1:2026-06-04'].tabId, 2);
+});
+
+
+test('actual popup remaining-time formatter forwards bounded values through localized templates', () => {
+  const popup = read('js/popup.js');
+  const start = popup.indexOf('function formatPopupManagedTimeRemaining(');
+  const end = popup.indexOf('async function refreshPopupManagedTimeStatus(', start);
+  assert.ok(start >= 0 && end > start);
+  const calls = [];
+  const context = vm.createContext({ popupUiText(key, fallback, values = {}) {
+    calls.push({ key, values: JSON.parse(JSON.stringify(values)) });
+    return fallback.replace(/\{(\w+)\}/g, (_, name) => String(values[name]));
+  } });
+  vm.runInContext(popup.slice(start, end), context);
+  assert.equal(context.formatPopupManagedTimeRemaining(75), '1m 15s left');
+  assert.deepEqual(calls.at(-1), { key: 'popup.timeMinutesSecondsLeft', values: { minutes: 1, seconds: 15 } });
+  assert.equal(context.formatPopupManagedTimeRemaining(75, true), '1m 15s');
+  assert.equal(context.formatPopupManagedTimeRemaining(31), '31s left');
+  assert.equal(context.formatPopupManagedTimeRemaining(3601), '1h 0m left');
+  assert.equal(context.formatPopupManagedTimeRemaining(-4), 'Limit reached');
+  assert.equal(context.formatPopupManagedTimeRemaining(Number.NaN), 'Limit reached');
 });

@@ -10,19 +10,19 @@ This slice covers the content bridge menu action path where the visible three-do
 
 | Source file | Lines | Bytes | SHA-256 |
 | --- | ---: | ---: | --- |
-| `js/content_bridge.js` | 13,636 | 604,184 | `8d55d0c8995e5b68bb9142c41f95046a676f5af2b83f8545b00f91a6a5a3776d` |
+| `js/content_bridge.js` | 15,053 | 678,250 | `c653324d1f042c0473cf2102d81bcd161bfaa26f8c7ee545e250226594dc9618` |
 
 ## Pinned Source And Effect Blocks
 
 | Block | Source lines | Lines | Bytes | SHA-256 |
 | --- | ---: | ---: | ---: | --- |
-| `contentBridgeFallbackPerformBlock` | `js/content_bridge.js:7494` | 213 | 9930 | `5340e2307068efb0b3b60b32222a83780905964a8d41a81457a7e5ceaa8e00f1` |
-| `contentBridgeRenderFilterTubeMenuEntries` | `js/content_bridge.js:697` | 123 | 6374 | `8ad65b76a720f0ed82a6a2f1664e5d5e078cc887840f8a4d487fb20684c3b3e6` |
-| `contentBridgeInjectFilterTubeMenuItem` | `js/content_bridge.js:10738` | 738 | 34747 | `bd888fd13303b3b65439b38886c671fa46d87330730efab17e0f11c5eefe6831` |
-| `contentBridgeAttachFilterTubeMenuHandlers` | `js/content_bridge.js:11476` | 71 | 2490 | `07e0e72b5c4c4a7f95615c0e752bd1ea987fd4851f31e23e3569e8d3bcadd540` |
-| `contentBridgeHandleBlockChannelClick` | `js/content_bridge.js:12206` | 1226 | 60722 | `459943dd5f26638ac63bc413a7cee220e862225929aaf2a4a0b6e068cd32ef9f` |
-| `contentBridgeAddChannelDirectly` | `js/content_bridge.js:13440` | 54 | 2662 | `4eb280573a5611b695c8284a8e6b85d17b2a97c459143a3054d02374cdf7c2ca` |
-| `contentBridgeAmpersandTopicSingleChannelMenuGuard` | `js/content_bridge.js:13565` | 31 | 1223 | `735cefcc42c64e33cd8ff6842c64f0348b70893bbc4a526e3008a37d782753b6` |
+| `contentBridgeFallbackPerformBlock` | `js/content_bridge.js:8807` | 213 | 10098 | `5be9da457c71dbac81c2528bdfe32819e004ab1342101670395b8e914898c54c` |
+| `contentBridgeRenderFilterTubeMenuEntries` | `js/content_bridge.js:737` | 125 | 6426 | `5302af35a20ef44c3f24b2ad0cc3c5ebccb16b0dd198ddafc5509aacbc4a956b` |
+| `contentBridgeInjectFilterTubeMenuItem` | `js/content_bridge.js:12132` | 749 | 35705 | `f65508646d50dff95d24a96f423fac757fcdc08dc3c955f05aba936cdb649906` |
+| `contentBridgeAttachFilterTubeMenuHandlers` | `js/content_bridge.js:12881` | 71 | 2490 | `07e0e72b5c4c4a7f95615c0e752bd1ea987fd4851f31e23e3569e8d3bcadd540` |
+| `contentBridgeHandleBlockChannelClick` | `js/content_bridge.js:13611` | 1236 | 62040 | `956364e43600997d84cbdd5c5c9d9ffe7183eab86565ccd6882cce2dfe14f8d9` |
+| `contentBridgeAddChannelDirectly` | `js/content_bridge.js:14855` | 55 | 2759 | `de0b0304a2269331926856153492eae471d385455e5548c45b11f8cf01e4582d` |
+| `contentBridgeAmpersandTopicSingleChannelMenuGuard` | `js/content_bridge.js:14982` | 31 | 1223 | `735cefcc42c64e33cd8ff6842c64f0348b70893bbc4a526e3008a37d782753b6` |
 
 ## Selected Token Counts
 
@@ -42,7 +42,7 @@ The reduced source blocks contain:
 | `filterChannels` | 0 |
 | `browserAPI_BRIDGE.runtime.sendMessage` | 3 |
 | `profile` | 2 |
-| `metadata` | 13 |
+| `metadata` | 15 |
 | `filterAll` | 32 |
 | `currentSettings` | 9 |
 | `handleBlockChannelClick` | 9 |
@@ -285,3 +285,7 @@ optimization, JSON-first behavior, menu action behavior, dialog lifecycle
 behavior, injector behavior, quick-block behavior, whitelist behavior, metric
 collectors, artifact creation, native sync, release package changes, or public
 claims.
+
+## Revalidation - 2026-10-18
+
+Source fingerprints and bounded extraction inventories were refreshed against the current checkout after source review. These are drift detectors, not exhaustive semantic proof, installed-browser evidence, or approval of the broader missing-authority gates. Executable fixtures below remain the behavior checks.

@@ -208,13 +208,13 @@ test('quick-block/block-menu affordance audit is audit-only and source pinned', 
   assert.match(doc, /quick-block\/block-menu affordance boundary source files: 7/);
   assert.match(doc, /runtime quick-block\/block-menu affordance fixtures: 7/);
 
-  assert.ok(doc.includes(`| \`js/content_controls_catalog.js\` | 222 | 7822 | \`${sha256('js/content_controls_catalog.js')}\` |`));
-  assert.ok(doc.includes(`| \`js/settings_shared.js\` | 1181 | 57535 | \`${sha256('js/settings_shared.js')}\` |`));
-  assert.ok(doc.includes(`| \`js/background.js\` | 6803 | 306710 | \`${sha256('js/background.js')}\` |`));
-  assert.ok(doc.includes(`| \`js/content/bridge_settings.js\` | 1127 | 44545 | \`${sha256('js/content/bridge_settings.js')}\` |`));
-  assert.ok(doc.includes(`| \`js/state_manager.js\` | 2491 | 99780 | \`${sha256('js/state_manager.js')}\` |`));
-  assert.ok(doc.includes(`| \`js/content/block_channel.js\` | 3189 | 127857 | \`${sha256('js/content/block_channel.js')}\` |`));
-  assert.ok(doc.includes(`| \`js/content_bridge.js\` | 13636 | 604184 | \`${sha256('js/content_bridge.js')}\` |`));
+  assert.ok(doc.includes(`| \`js/content_controls_catalog.js\` | 299 | 12438 | \`${sha256('js/content_controls_catalog.js')}\` |`));
+  assert.ok(doc.includes(`| \`js/settings_shared.js\` | 1313 | 66857 | \`${sha256('js/settings_shared.js')}\` |`));
+  assert.ok(doc.includes(`| \`js/background.js\` | 8538 | 386043 | \`${sha256('js/background.js')}\` |`));
+  assert.ok(doc.includes(`| \`js/content/bridge_settings.js\` | 2110 | 93234 | \`${sha256('js/content/bridge_settings.js')}\` |`));
+  assert.ok(doc.includes(`| \`js/state_manager.js\` | 2979 | 124009 | \`${sha256('js/state_manager.js')}\` |`));
+  assert.ok(doc.includes(`| \`js/content/block_channel.js\` | 3361 | 135050 | \`${sha256('js/content/block_channel.js')}\` |`));
+  assert.ok(doc.includes(`| \`js/content_bridge.js\` | 15053 | 678250 | \`${sha256('js/content_bridge.js')}\` |`));
 
   for (const token of [
     'Collaborator Grammar Action Handoff Addendum - 2026-05-27',
@@ -285,21 +285,21 @@ test('quick-block/block-menu source counts remain pinned', () => {
   const blocks = sourceBlocks();
   const countRows = [
     ['catalog feed affordance controls block', blocks.catalogFeedAffordanceControls, 10, 488],
-    ['settings_shared settings keys block', blocks.sharedSettingsKeys, 38, 1031],
+    ['settings_shared settings keys block', blocks.sharedSettingsKeys, 43, 1170],
     ['settings_shared affordance compile block', blocks.sharedAffordanceCompile, 2, 126],
-    ['background boolean pass-through block', blocks.bgBooleanPassThrough, 35, 3596],
-    ['background storage refresh keys block', blocks.bgRefreshKeys, 16, 461],
-    ['content bridge storage refresh keys block', blocks.bridgeRefreshKeys, 44, 1263],
-    ['state manager valid setting keys block', blocks.stateValidKeys, 33, 1063],
-    ['state manager external reload keys block', blocks.stateExternalReloadKeys, 41, 1604],
-    ['quick block card selectors block', blocks.quickBlockSelectors, 44, 1519],
-    ['quick block enabled gate block', blocks.quickBlockEnabledGate, 89, 2941],
+    ['background boolean pass-through block', blocks.bgBooleanPassThrough, 37, 3832],
+    ['background storage refresh keys block', blocks.bgRefreshKeys, 19, 559],
+    ['content bridge storage refresh keys block', blocks.bridgeRefreshKeys, 46, 1322],
+    ['state manager valid setting keys block', blocks.stateValidKeys, 35, 1130],
+    ['state manager external reload keys block', blocks.stateExternalReloadKeys, 46, 1803],
+    ['quick block card selectors block', blocks.quickBlockSelectors, 60, 2088],
+    ['quick block enabled gate block', blocks.quickBlockEnabledGate, 91, 3025],
     ['quick block setup lifecycle block', blocks.quickBlockSetupLifecycle, 320, 13892],
     ['normal menu injection gate block', blocks.normalMenuGate, 14, 411],
-    ['fallback menu button creation block', blocks.fallbackButtonCreate, 31, 1533],
-    ['fallback menu scan lifecycle block', blocks.fallbackScanLifecycle, 279, 9837],
-    ['fallback popover open block', blocks.fallbackPopoverOpenStart, 104, 3500],
-    ['fallback perform block action block', blocks.fallbackPerformBlock, 212, 9930]
+    ['fallback menu button creation block', blocks.fallbackButtonCreate, 31, 1591],
+    ['fallback menu scan lifecycle block', blocks.fallbackScanLifecycle, 293, 10382],
+    ['fallback popover open block', blocks.fallbackPopoverOpenStart, 107, 3636],
+    ['fallback perform block action block', blocks.fallbackPerformBlock, 212, 10098]
   ];
 
   for (const [label, block, expectedLines, expectedBytes] of countRows) {
@@ -373,7 +373,7 @@ test('quick-block action gate exists but setup lifecycle work is broader than th
   assert.equal(countLiteral(blocks.quickBlockSetupLifecycle, 'setTimeout'), 3);
   assert.equal(countLiteral(blocks.quickBlockSetupLifecycle, 'setInterval'), 0);
   assert.equal(countLiteral(blocks.quickBlockSetupLifecycle, 'requestAnimationFrame'), 1);
-  assert.equal((blocks.quickBlockSelectors.match(/'[^']+'/g) || []).length, 43);
+  assert.equal((blocks.quickBlockSelectors.match(/'[^']+'/g) || []).length, 59);
 
   assert.match(blocks.blockChannel, /function buildQuickBlockContext\(videoCard\)/);
   assert.match(blocks.blockChannel, /FilterTube_prefetchCollaboratorsForCard\?\.\(videoCard, \{\s+timeoutMs: 1200,\s+reason: 'quick-block-action'\s+\}\)/);
@@ -461,7 +461,7 @@ test('primary menu and fallback menu action gates diverge today', () => {
   assert.equal(countLiteral(blocks.fallbackScanLifecycle, 'setTimeout'), 4);
   assert.equal(countLiteral(blocks.fallbackScanLifecycle, 'setInterval'), 1);
   assert.equal(countLiteral(blocks.fallbackScanLifecycle, 'requestAnimationFrame'), 2);
-  assert.equal((blocks.fallbackScanLifecycle.match(/'[^']+'/g) || []).length, 25);
+  assert.equal((blocks.fallbackScanLifecycle.match(/'[^']+'/g) || []).length, 39);
 });
 
 test('fallback block action can hide rows refresh settings and rerun DOM fallback without a local menu gate', () => {
@@ -472,7 +472,7 @@ test('fallback block action can hide rows refresh settings and rerun DOM fallbac
   assert.match(blocks.fallbackPerformBlock, /row\.setAttribute\('data-filtertube-hidden', 'true'\)/);
   assert.match(blocks.fallbackPerformBlock, /addChannelDirectly\(/);
   assert.match(blocks.fallbackPerformBlock, /handleBlockChannelClick\(/);
-  assert.match(blocks.fallbackPerformBlock, /requestSettingsFromBackground\(\)/);
+  assert.match(blocks.fallbackPerformBlock, /requestSettingsFromBackground\(\{ forceRefresh: true \}\)/);
   assert.match(blocks.fallbackPerformBlock, /applyDOMFallback\(null, \{ forceReprocess: true, preserveScroll: true \}\)/);
   assert.match(blocks.fallbackPerformBlock, /source: 'playlist_fallback_menu'/);
   assert.doesNotMatch(blocks.fallbackPerformBlock, /currentSettings\?\.showBlockMenuItem/);

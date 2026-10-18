@@ -213,7 +213,7 @@ test('local parent UI writes time-limit policy through profile settings and admi
   assert.match(tabView, /timeLimitPolicy: nextPolicy/);
   assert.match(tabView, /recordManagedChildLocalEditHistory\(nextProfile, report\)/);
   assert.match(tabView, /Time limit:/);
-  assert.match(tabView, /Child profiles cannot change time limits here/);
+  assert.match(tabView, /tabViewUiText\('family\.profileManager\.cannotChangeTimeHere', 'Protected profiles cannot change time limits here'\)/);
 
   assert.match(ioManager, /function normalizeManagedTimeLimitPolicy\(value\)/);
   assert.match(ioManager, /delete sanitizedSettings\.timeLimitPolicy/);

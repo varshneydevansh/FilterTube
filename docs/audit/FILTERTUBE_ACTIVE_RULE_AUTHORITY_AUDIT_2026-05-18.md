@@ -40,10 +40,12 @@ Current issue:
 | Fallback 3-dot menu | The fallback scan is now eager only on mobile/coarse surfaces; desktop is not an eager fallback scan path. | `js/content_bridge.js:6289-6303`, `js/content_bridge.js:7012-7022` | Mobile/coarse fallback action surfaces still need the same shared menu gate and live observer budget proof. |
 | Settings compile | Background compilation passes through raw `contentFilters` and raw `categoryFilters` objects without producing a normalized active report. | `js/background.js:2498-2558` | Runtime surfaces must each reinterpret validity. |
 | Settings invalidation | Background reads more compiler dependencies than storage invalidation watches; shared settings keys also omit several runtime dependencies. | `js/background.js:2059-1800`, `js/background.js:4484-4520`, `js/settings_shared.js:17-42` | A change can miss cache refresh or leave a stale runtime active state. |
-| List-mode transition | `FilterTube_SetListMode` reads `copyBlocklist`, but switching to whitelist always merges and clears blocklist data. | `js/background.js:3304`, `js/background.js:3451-3453` | UI intent and actual mode transition can diverge. |
+| List-mode transition | `FilterTube_SetListMode` now copies only on explicit opt-in and retains saved blocklist data. See the 2026-10-18 revalidation below. | `js/background.js:3304`, `js/background.js:3451-3453` | Mode activation and rule copying remain separate intentions; both lists must survive mode changes. |
 | V4 list aliases | Background now prefers canonical Main `keywords` and `channels` before the `blockedKeywords` / `blockedChannels` migration aliases, while shared save mirrors the aliases only for blocklist mode. | `js/background.js:2057-2066`, `js/background.js:2214-2224`, `js/settings_shared.js:918-927` | Alias drift can still recur if future writers bypass shared save or write only one side without a mutation/revision report. |
 
-## Post-Release List-Mode And Alias Snapshot - 2026-05-27
+## Historical Post-Release List-Mode And Alias Snapshot - 2026-05-27
+
+The copy-flag observations in this historical snapshot are superseded by the 2026-10-18 revalidation; they do not describe current mode-write behavior.
 
 This addendum records the current source state after the release-lag/blocklist
 repair. It is audit-only. It does not approve list-mode transition changes,
@@ -260,3 +262,13 @@ runtime behavior changed: no
 These counts are audit-only blockers. They do not approve runtime
 optimization, JSON-first behavior, active-rule predicate changes, list-mode
 changes, whitelist behavior changes, or selector/renderer authority changes.
+
+## List-Mode Revalidation - 2026-10-18
+
+The actual background message-action fixture now verifies Main and Kids separately:
+copyBlocklist:false preserves both saved lists; copyBlocklist:true merges deduplicated copies into the allowlist and retains the original blocklist.
+Existing allowlist rows and the other profile surface survive both operations. Main legacy blocklist mirrors retain their rows. The actual authorization helper still rejects a locked profile with zero writes.
+
+The current branch has three `shouldCopyBlocklist` references (read, explicit gate, response); the old unconditional merge-and-clear helper is absent. Canonical Main keyword/channel precedence and shared-save blocklist aliases remain independently checked.
+
+This revalidation does not establish a shared mutation authority, cross-context atomicity, or exhaustive writer parity. The historical proof limits and NO-GO decisions above remain applicable to those broader claims.

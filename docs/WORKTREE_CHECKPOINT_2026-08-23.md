@@ -7,7 +7,7 @@ upstream state instead of treating generated app assets as a second source of
 truth.
 
 For the commit-by-commit cross-check from the v3.3.5 baseline through this
-checkpoint, see [the post-v3.3.5 change ledger](POST_3_3_5_CHANGE_LEDGER_2026-08-23.md).
+checkpoint, see [the post-v3.3.5 change ledger](audit/POST_3_3_5_CHANGE_LEDGER_2026-08-23.md).
 The canonical behavior is distributed through the existing
 [CHANGELOG](../CHANGELOG.md), [Functionality](FUNCTIONALITY.md), [Technical
 Documentation](TECHNICAL.md), Nanah, app-release, website, and renderer docs;

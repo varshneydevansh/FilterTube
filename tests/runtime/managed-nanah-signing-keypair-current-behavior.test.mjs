@@ -183,11 +183,15 @@ test('dashboard provisions source keypairs and keeps private material out of pub
   assert.match(tabView, /const NANAH_MANAGED_SIGNING_KEYPAIR_KEY = 'ftNanahManagedSigningKeyPair'/);
   assert.match(tabView, /const NANAH_MANAGED_SIGNING_PUBLIC_KEY_KEY = 'ftNanahManagedSigningPublicKey'/);
   assert.match(tabView, /function normalizeNanahManagedSigningKeyPair\(value\)/);
-  assert.match(tabView, /async function persistNanahManagedSigningKeyPair\(keyPair\)/);
+  assert.match(tabView, /async function persistNanahManagedSigningKeyPair\(keyPair, activeToken = null\)/);
   assert.match(tabView, /writeNanahStorage\(NANAH_MANAGED_SIGNING_KEYPAIR_KEY, privateStored\)/);
   assert.match(tabView, /writeNanahStorage\(NANAH_MANAGED_SIGNING_PUBLIC_KEY_KEY, publicDescriptor\)/);
-  assert.match(tabView, /async function loadNanahManagedSigningKeyDescriptor\(\)/);
+  assert.match(tabView, /async function loadNanahManagedSigningKeyDescriptor\(activeToken = null\)/);
   assert.match(tabView, /adapter\.createManagedNanahSigningKeyPair/);
+  const ensureBlock = tabView.slice(tabView.indexOf('async function ensureNanahManagedSigningKeyPair('), tabView.indexOf('async function loadNanahTrustedLinks('));
+  assert.match(ensureBlock, /FilterTubeNanahStorageLock\.run\(async token/);
+  assert.match(ensureBlock, /readNanahStorage\(NANAH_MANAGED_SIGNING_KEYPAIR_KEY, \{ required: true \}\)/);
+  assert.match(ensureBlock, /persistNanahManagedSigningKeyPair\(generated, token\)/);
   assert.match(tabView, /if \(getNanahRole\(\) === 'source'\) \{\s+try \{\s+await ensureNanahManagedSigningKeyPair\(\)/);
   assert.match(tabView, /if \(linkType === 'managed_link' && localRole === 'source'\) \{/);
   assert.match(tabView, /ensureNanahManagedSigningKeyPair\(\{ required: true \}\)/);

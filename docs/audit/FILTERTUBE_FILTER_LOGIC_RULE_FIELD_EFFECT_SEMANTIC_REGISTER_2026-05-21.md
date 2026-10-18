@@ -13,21 +13,23 @@ settings-mode, identity-confidence, fixture-proven effect, DOM parity, native
 runtime parity, and no-rule budget proof before it can become a first-class
 filtering authority.
 
+Current-source register reviewed on 2026-10-18. This refresh changes no runtime behavior or broad proof approval.
+
 ## Source-Derived Summary
 
 ```text
 source file: js/filter_logic.js
-source line count: 3652
-source bytes: 172174
-source sha256: 953ef0f14970e6cfbc11215fe9eaa078ced34f001908e1c6d5903a8fd2d9a1f5
+source line count: 4534
+source bytes: 221980
+source sha256: f7021a053af96a4cd31a577f56e900ffb1a5d990fe55a838af64a6dba867afc4
 upstream path register: docs/audit/FILTERTUBE_FILTER_LOGIC_RULE_PATH_SEMANTIC_REGISTER_2026-05-21.md
 rule fields with runtime consumers: 11
-consumer methods with rules.<field> references: 9
-method-field consumer pairs: 20
-rules.<field> token references: 63
-effective runtime path rows inherited from path register: 440
-effective unique path literals inherited from path register: 174
-effective renderer-field pairs inherited from path register: 177
+consumer methods with rules.<field> references: 10
+method-field consumer pairs: 21
+rules.<field> token references: 64
+effective runtime path rows inherited from path register: 467
+effective unique path literals inherited from path register: 184
+effective renderer-field pairs inherited from path register: 189
 runtime behavior changed: no
 ```
 
@@ -41,25 +43,31 @@ runtime behavior changed: no
 | `channelName` | 5 | `_buildCandidate`, `_extractChannelInfo` | Adds display channel text to metadata search and can provide channel identity for blocklist/whitelist matching. | Display-name confidence, handle/id fallback priority, whitelist fail-closed proof, and collaboration false-hide fixtures. |
 | `channelId` | 2 | `_extractChannelInfo` | Reads stable browse ids for channel matching when present. | UC-id provenance, non-UC browse id policy, channel-map cross-match proof, and stale-map handling. |
 | `channelHandle` | 4 | `_extractChannelInfo` | Reads canonical URL or handle-like paths for channel matching and mapping. | Handle/custom URL normalization proof, percent-encoding policy, canonical URL precedence, and channel-map rollback fixtures. |
-| `videoId` | 14 | `_extractVideoId`, `_checkCategoryFilters`, `_extractDuration`, `_extractPublishedTime` | Supplies renderer video ids for joins, category lookup/fetch scheduling, duration fallback, upload-date fallback, and Shorts video-channel map recovery. | Join provenance, map staleness policy, category fetch budget, no-map behavior, and route ownership proof. |
-| `duration` | 6 | `_buildCandidate`, `_extractDuration` | Adds duration text to metadata search and parses duration for content filtering. | Localized duration parsing, zero/blank duration policy, threshold mode fixtures, and no-rule duration work budget. |
-| `publishedTime` | 6 | `_buildCandidate`, `_extractPublishedTime` | Adds published-time text to metadata search and parses relative time for upload-date filtering. | Clock/timezone fixture policy, localized relative text, blank-date policy, and learned-map fallback proof. |
-| `viewCount` | 2 | `_buildCandidate` | Adds view-count text to metadata search and `candidate.viewCountText`; there is no current view-count threshold predicate. | Whether view count is allowed to affect filtering, localized/abbreviated count parsing, and negative keyword false-hide proof. |
+| `videoId` | 18 | `_extractVideoId`, `_checkCategoryFilters`, `_checkLanguageFilters`, `_extractDuration`, `_extractPublishedTime` | Supplies renderer video ids for exact metadata joins, category/language lookup, duration/date fallback and Shorts owner-map recovery. Unknown JSON category schedules no fetch. | Join provenance, map staleness policy, category fetch budget, no-map behavior, and route ownership proof. |
+| `duration` | 5 | `_buildCandidate`, `_extractDuration` | Adds duration text to metadata search and parses duration for content filtering. | Localized duration parsing, zero/blank duration policy, threshold mode fixtures, and no-rule duration work budget. |
+| `publishedTime` | 5 | `_buildCandidate`, `_extractPublishedTime` | Adds published-time text to metadata search and parses relative time for upload-date filtering. | Clock/timezone fixture policy, localized relative text, blank-date policy, and learned-map fallback proof. |
+| `viewCount` | 1 | `_buildCandidate` | Adds view-count text to metadata search and `candidate.viewCountText`; an optional conservative minimum-view predicate now reads dedicated own count fields through `_extractViewCount()`. | Known total threshold/boundary tests exist; installed localized-card coverage and native parity remain separate gates. |
 | `metadataRows` | 10 | `_buildCandidate`, `_extractDescription`, `_extractPublishedTime` | Flattens metadata rows for keyword/description text and relative-time extraction. | Row order provenance, metadata-part semantics, duration/date/category ambiguity, and DOM parity fixtures. |
+
+Direct `rules.field` counts below are lexical and do not include `_extractViewCount()`
+which consumes dedicated total-view fields and explicitly labeled metadata parts.
+Unknown, concurrent/live or ambiguous totals remain visible; views add no fetch
+or pending state. Main/Kids rules remain independent.
 
 ## Consumer Method Counts
 
 | Consumer method | Rule fields consumed | `rules.<field>` references | Current effect boundary |
 | --- | --- | ---: | --- |
-| `_extractVideoId` | `videoId` | 2 | Builds the candidate video id before `_shouldBlock()` can use it for Shorts map recovery and downstream decisions. |
-| `_buildCandidate` | `channelName`, `duration`, `publishedTime`, `viewCount`, `metadataRows`, `commentText` | 9 | Stages searchable metadata and display fields; staging alone is not an effect decision. |
-| `_shouldBlock` | `commentText` | 4 | Owns the final JSON removal decision and has a separate comment keyword path. |
-| `_checkCategoryFilters` | `videoId` | 4 | Uses video ids to read `videoMetaMap`; missing category can schedule `scheduleVideoMetaFetch()` and return no block. |
-| `_extractTitle` | `title` | 4 | Extracts title text for candidate search and uppercase-title filter inputs. |
-| `_extractDescription` | `description`, `metadataRows` | 10 | Extracts description text from explicit description paths before metadata row fallback. |
-| `_extractDuration` | `duration`, `videoId` | 8 | Reads rule duration paths, nested fallbacks, and `videoMetaMap` by resolved video id. |
-| `_extractPublishedTime` | `publishedTime`, `metadataRows`, `videoId` | 12 | Reads rule published-time paths, metadata rows, nested fallbacks, and `videoMetaMap` by resolved video id. |
-| `_extractChannelInfo` | `channelName`, `channelId`, `channelHandle` | 11 | Reads channel identity fields for channel block/allow matching after collaboration-specific extraction paths run. |
+| `_extractVideoId` | `videoId` | 2 | Extracts declared rule fields; route, mode and effect guards remain required. |
+| `_buildCandidate` | `channelName`, `duration`, `publishedTime`, `viewCount`, `metadataRows`, `commentText` | 6 | Stages searchable metadata; staging alone is not a hide decision. |
+| `_shouldBlock` | `commentText` | 4 | Extracts declared rule fields; route, mode and effect guards remain required. |
+| `_checkCategoryFilters` | `videoId` | 4 | Reads exact video metadata; unknown category returns no block and schedules no JSON-wide fetch. |
+| `_checkLanguageFilters` | `videoId` | 4 | Reads loaded language evidence by exact video ID; unknown evidence stays visible. |
+| `_extractTitle` | `title` | 4 | Extracts declared rule fields; route, mode and effect guards remain required. |
+| `_extractDescription` | `description`, `metadataRows` | 10 | Extracts declared rule fields; route, mode and effect guards remain required. |
+| `_extractDuration` | `duration`, `videoId` | 8 | Extracts declared rule fields; route, mode and effect guards remain required. |
+| `_extractPublishedTime` | `publishedTime`, `metadataRows`, `videoId` | 12 | Extracts declared rule fields; route, mode and effect guards remain required. |
+| `_extractChannelInfo` | `channelName`, `channelId`, `channelHandle` | 10 | Extracts declared rule fields; route, mode and effect guards remain required. |
 
 ## Effect Boundaries
 
@@ -78,11 +86,12 @@ Field availability is not equivalent to an allowed effect:
   whitelist allow.
 - `duration` and `publishedTime` can directly feed content-filter hide
   decisions only through `_checkContentFilters()`.
-- `viewCount` has no current view-count threshold predicate; today it is
-  metadata/search text only.
-- `_checkCategoryFilters()` can schedule `scheduleVideoMetaFetch(videoId, {
-  needDuration: false, needDates: false, needCategory: true })` when category
-  is missing, so category JSON-first work must include fetch-budget proof.
+- `viewCount` feeds an optional conservative minimum-view threshold. Dedicated
+  total fields and explicit view labels are parsed; missing/ambiguous evidence
+  stays visible. The feature adds neither requests nor pending admission.
+- `_checkCategoryFilters()` does not schedule metadata fetches for missing category.
+  The separate DOM viewport observer owns bounded hydration; JSON traversal
+  does not fan out Player requests for every renderer.
 - `processData()` harvests channel mappings before the `settings.enabled ===
   false` filtering skip, so field-effect proof must separate harvest work from
   hide/allow mutation work.

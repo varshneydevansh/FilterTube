@@ -52,6 +52,19 @@ test('startup injection readiness audit documents current behavior and future au
   }
 });
 
+test('dated startup source review distinguishes historical ordering from current early DOM work', () => {
+  const doc = read(docPath);
+  assert.ok(doc.includes('Current Boot Path — historical May snapshot'));
+  const current = doc.split('## October 18, 2026 source review')[1];
+  assert.ok(current, 'current sequence needs a dated correction');
+  assert.match(current, /shared\/identity -> shared\/view_count -> filter_logic/);
+  assert.ok(current.indexOf('initializeDOMFallback(response.settings) (started without awaiting)')
+    < current.indexOf('await ensureMainWorldRuntimeForSettings(response.settings)'));
+  assert.match(current, /retains its 1000ms/);
+  assert.match(current, /does not imply that the entire/);
+  assert.match(current, /not an installed-browser timing or native/);
+});
+
 test('bridge injection idempotence is isolated-world state without startup authority report', () => {
   const bridge = read('js/content/bridge_injection.js');
 
@@ -80,7 +93,7 @@ test('injectMainWorldScripts injects seed only for firefox fallback and requests
   const bridge = read('js/content/bridge_injection.js');
   const injector = functionBody(bridge, 'injectMainWorldScripts');
 
-  assert.match(injector, /const scriptsToInject = \['shared\/identity', 'filter_logic'\]/);
+  assert.match(injector, /const scriptsToInject = \['shared\/identity', 'shared\/view_count', 'filter_logic'\]/);
   assert.match(injector, /if \(isFirefox\) scriptsToInject\.push\('seed'\)/);
   assert.match(injector, /scriptsToInject\.push\('injector'\)/);
   assert.match(injector, /if \(!isFirefox && api\.scripting\?\.executeScript\)/);
@@ -95,7 +108,7 @@ test('content bridge starts initialization from a fixed timer then settings-gate
 
   assert.match(contentBridge, /window\.addEventListener\('message', handleMainWorldMessages, false\)/);
   assert.match(contentBridge, /setTimeout\(\(\) => initialize\(\), 50\)/);
-  assert.match(contentBridge, /async function initialize\(\) \{[\s\S]*const response = await requestSettingsFromBackground\(\);[\s\S]*await ensureMainWorldRuntimeForSettings\(response\.settings\);[\s\S]*initializeDOMFallback\(response\.settings\)/);
+  assert.match(contentBridge, /async function initialize\(\) \{[\s\S]*const response = await requestSettingsFromBackground\(\);[\s\S]*initializeDOMFallback\(response\.settings\);[\s\S]*await ensureMainWorldRuntimeForSettings\(response\.settings\)/);
   assert.match(contentBridge, /function needsMainWorldRuntimeWork\(settings\) \{[\s\S]*if \(settings\.enabled === false\) return false;[\s\S]*if \(settings\.listMode === 'whitelist'\) return true;[\s\S]*return hasBridgeEnabledContentFilters\(settings\) \|\| hasBridgeActiveJsonFilterRules\(settings\);/);
   assert.match(contentBridge, /async function initializeDOMFallback\(settings\) \{[\s\S]*await new Promise\(resolve => setTimeout\(resolve, 1000\)\)/);
   assert.doesNotMatch(contentBridge, /async function initialize\(\) \{[\s\S]{0,300}await injectMainWorldScripts\(\);/);

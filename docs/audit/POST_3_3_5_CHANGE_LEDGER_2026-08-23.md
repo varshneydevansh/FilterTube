@@ -374,7 +374,7 @@ category ownership. CamelCase comment hosts and merged metadata preserve the
 collaborator and comment fixes.
 
 **Proof/docs:**
-`docs/CATEGORY_FILTER_CURRENT_BEHAVIOR_2026-08-08.md`, updates to
+`docs/audit/CATEGORY_FILTER_CURRENT_BEHAVIOR_2026-08-08.md`, updates to
 `docs/FUNCTIONALITY.md`, `docs/json_paths_encyclopedia.md`, and
 `docs/youtube_renderer_inventory.md`; tests include
 `category-filter-user-intent-current-behavior.test.mjs`,
@@ -559,15 +559,15 @@ ledger as a replacement for their contracts:
 
 - [Category filter current behavior](CATEGORY_FILTER_CURRENT_BEHAVIOR_2026-08-08.md)
 - [Language filter current behavior](LANGUAGE_FILTER_CURRENT_BEHAVIOR_2026-08-18.md)
-- [Original audio preference](ORIGINAL_AUDIO_PREFERENCE_2026-08-18.md)
-- [Self-Control Session specification](SELF_CONTROL_SESSION_SPEC_2026-08-17.md)
-- [Self-Control implementation proof](audit/SELF_CONTROL_SESSION_IMPLEMENTATION_PROOF_2026-08-17.md)
-- [Parent-friendly guidance and rule exceptions](USER_FEEDBACK_RULES_AND_GUIDANCE_SPEC_2026-08-08.md)
-- [Nanah user guide](NANAH_USER_GUIDE.md) and [Nanah project plan](NANAH_P2P_PROJECT_PLAN.md)
-- [Subscribed channel import](SUBSCRIBED_CHANNELS_IMPORT.md)
-- [Hide YouTube Playables audit](audit/FILTERTUBE_HIDE_YOUTUBE_PLAYABLES_CONTROL_2026-07-25.md)
-- [Current worktree checkpoint](WORKTREE_CHECKPOINT_2026-08-23.md)
-- [JSON path encyclopedia](json_paths_encyclopedia.md) and [renderer inventory](youtube_renderer_inventory.md)
+- [Original audio preference](../ORIGINAL_AUDIO_PREFERENCE_2026-08-18.md)
+- [Self-Control Session specification](../SELF_CONTROL_SESSION_SPEC_2026-08-17.md)
+- [Self-Control implementation proof](SELF_CONTROL_SESSION_IMPLEMENTATION_PROOF_2026-08-17.md)
+- [Parent-friendly guidance and rule exceptions](../USER_FEEDBACK_RULES_AND_GUIDANCE_SPEC_2026-08-08.md)
+- [Nanah user guide](../NANAH_USER_GUIDE.md) and [Nanah project plan](../NANAH_P2P_PROJECT_PLAN.md)
+- [Subscribed channel import](../SUBSCRIBED_CHANNELS_IMPORT.md)
+- [Hide YouTube Playables audit](FILTERTUBE_HIDE_YOUTUBE_PLAYABLES_CONTROL_2026-07-25.md)
+- [Current worktree checkpoint](../WORKTREE_CHECKPOINT_2026-08-23.md)
+- [JSON path encyclopedia](../json_paths_encyclopedia.md) and [renderer inventory](../youtube_renderer_inventory.md)
 
 ## Verification boundary
 

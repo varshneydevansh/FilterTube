@@ -78,8 +78,8 @@ test('hide_decision_pipeline_seed_splits_no_work_harvest_and_mutation', () => {
 
 test('hide_decision_pipeline_json_renderer_path_removes_objects_and_fails_closed_in_whitelist', () => {
   const filter = read('js/filter_logic.js');
-  const shouldBlock = sliceBetween(filter, '_shouldBlock(item, rendererType) {', '_checkCategoryFilters(item, rules, rendererType) {');
-  const filterRecursive = sliceBetween(filter, 'filter(obj, path = \'root\') {', 'processData(data, dataName = \'unknown\') {');
+  const shouldBlock = sliceBetween(filter, '_shouldBlock(item, rendererType, channelShelfOwner = null) {', '_checkCategoryFilters(item, rules, rendererType) {');
+  const filterRecursive = sliceBetween(filter, 'filter(obj, path = \'root\', channelShelfScope = null) {', 'processData(data, dataName = \'unknown\') {');
   const processData = sliceBetween(filter, 'processData(data, dataName = \'unknown\') {', '// ============================================================================');
 
   assert.match(shouldBlock, /const listMode = \(this\.settings\.listMode === 'whitelist'\) \? 'whitelist' : 'blocklist'/);
@@ -127,7 +127,8 @@ test('hide_decision_pipeline_dom_loop_combines_identity_metadata_predicates_and_
   const dom = read('js/content/dom_fallback.js');
   const loop = sliceBetween(dom, '// 1. Video/Content Filtering', 'const pendingMetaTtlMs = 8000;');
 
-  assert.match(loop, /document\.querySelectorAll\(VIDEO_CARD_SELECTORS\)/);
+  assert.match(loop, /collectFilterTubeVisualCardOwners\(videoSelector\)/);
+  assert.match(loop, /collectFilterTubeVisualCardOwnersFromCandidates\(candidateElements, videoSelector\)/);
   assert.match(loop, /hasChannelLinkNow/);
   assert.match(loop, /effectiveSettings\.videoChannelMap\[videoId\]/);
   assert.match(loop, /titleElement/);

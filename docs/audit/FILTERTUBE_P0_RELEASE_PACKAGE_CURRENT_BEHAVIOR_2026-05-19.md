@@ -20,7 +20,7 @@ P0 release package parity is not green:
 - Generated shell source/output freshness has no committed hash manifest.
 - Browser manifest handling only selects the target manifest and repairs
   collaborator script order; there is no full permission/resource/package gate.
-- GitHub release creation uses `draft: false` before asset upload proof.
+- New releases start draft and verify expected asset names before publication; byte/signing verification remains a separate gate.
 - Mobile APK/AAB staging writes checksums but does not tie those artifacts to a
   public claim manifest.
 - Ignored raw captures remain outside package roots today, but that boundary is
@@ -773,7 +773,7 @@ npm/build caller
 | `release_package_parity_generated_shells_have_source_output_freshness_manifest` | Source and output shell files exist, and build regenerates outputs, but no freshness manifest ties them together. | `scripts/build-extension-ui.mjs`; `src/extension-shell/*`; `js/ui-shell/*`; P0 test | Record source/output hashes before release packaging. |
 | `release_package_parity_build_does_not_mutate_readme_during_package_dry_run` | Not satisfied. `build.js` calls `updateReadmeBadges()` and writes `README.md`. | `build.js`; P0 test | Split release packaging from tracked-file mutation or require an explicit dirty-worktree gate. |
 | `release_package_parity_browser_manifest_validation_covers_permissions_and_resources` | Not satisfied. Build writes the selected manifest and repairs collaborator script order, but has no full manifest permission/resource validation gate. | `build.js`; manifests; P0 test | Validate permissions, hosts, content worlds, web-accessible resources, and packaged file references. |
-| `release_package_parity_github_release_is_draft_until_all_assets_upload` | Not satisfied. The GitHub release payload has `draft: false`, and asset upload happens afterward. | `build.js`; P0 test | Create draft releases first, upload/check assets, then publish. |
+| `release_package_parity_github_release_is_draft_until_all_assets_upload` | New draft ordering is satisfied: upload missing assets, verify names, publish only the new draft. Existing visibility is preserved. | `build.js`; actual workflow VM regression; P0 source check | Add byte/hash and signing provenance before treating matching names as complete artifact proof. |
 | `release_package_parity_mobile_artifacts_have_checksum_and_claim_gate` | Partially represented. Mobile artifacts are selected by deterministic name and `.sha256` is written, but no public claim manifest links them to website/store claims. | `build.js`; P0 test | Add artifact checksum, signing, source, store state, and public-claim records. |
 | `release_package_parity_raw_captures_never_enter_package_contents` | Locally true today. Raw root captures are ignored and not included by `COMMON_DIRS` or `COMMON_FILES`. | `.gitignore`; `build.js`; P0 test | Keep raw captures evidence-only; extract minimal fixtures instead of package inputs. |
 
@@ -841,3 +841,20 @@ These counts are audit-only blockers. They do not approve runtime
 optimization, JSON-first behavior, release package behavior, public release
 claims, prompt release overlays, raw-capture packaging, whitelist behavior,
 metric collectors, artifact creation, native sync, or release publication.
+
+## 2026-10-18 Current Source And Historical Evidence Boundary
+
+Historical profile and dist observations remain dated. The routine release lane does not read personal browser profiles, refresh old installed snapshots from private Preferences, or interpret the historical 3.3.2 package hashes as current artifacts. Current source closure does not establish installed or incognito access.
+
+| Manifest | References | Unique paths | Script entries | Script JS references | Web-accessible references |
+| --- | ---: | ---: | ---: | ---: | ---: |
+| `manifest.json` | 64 | 30 | 6 | 43 | 12 |
+| `manifest.chrome.json` | 64 | 30 | 6 | 43 | 12 |
+| `manifest.firefox.json` | 63 | 31 | 5 | 39 | 12 |
+| `manifest.opera.json` | 63 | 29 | 7 | 43 | 11 |
+
+Current copied roots include `_locales`. Exact permissions include storage, unlimitedStorage, activeTab, scripting, tabs, downloads and alarms. Explicit YouTube/NoCookie embed and selected Google Search entries exist; the old host-only NoCookie gap is historical. There are still no explicit incognito declarations or installed-incognito proof.
+
+The current ZIP, staged tree and source bytes are compared for all three browser targets. ZIP paths must match the staged tree exactly without duplicate paths, every archived/staged byte hash must match, source-backed files must match current source, and browser manifest JSON must agree semantically. Missing/stale outputs fail and require a build. This is not reproducible-build, installed-browser or physical-device proof.
+
+New GitHub releases start as draft, upload missing assets, verify expected names, then publish only the newly created draft. Existing release visibility is preserved, including intentional review drafts. Name checks do not authenticate bytes or replace signing/artifact provenance. The actual orchestrator's four workflow regressions live in build-release-method-semantic-register-current-behavior.test.mjs; no GitHub release action was performed for this review.

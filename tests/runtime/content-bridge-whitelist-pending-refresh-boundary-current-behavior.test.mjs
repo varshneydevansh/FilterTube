@@ -10,8 +10,8 @@ const repoRoot = process.cwd();
 const docPath = 'docs/audit/FILTERTUBE_CONTENT_BRIDGE_WHITELIST_PENDING_REFRESH_BOUNDARY_CURRENT_BEHAVIOR_2026-05-23.md';
 
 const sourceFingerprints = {
-  'js/content_bridge.js': [13636, 604184, '8d55d0c8995e5b68bb9142c41f95046a676f5af2b83f8545b00f91a6a5a3776d'],
-  'js/content/dom_fallback.js': [5030, 235555, 'fdc4391aed06849c1ba0a9afbb5b05e5e115b0929639e7014738d1462bf13ec5']
+  'js/content_bridge.js': [15053, 678250, 'c653324d1f042c0473cf2102d81bcd161bfaa26f8c7ee545e250226594dc9618'],
+  'js/content/dom_fallback.js': [8172, 380506, 'df11dc69db7f7b8818c8dceb1d237d1794c8687af161dc2b9ae9d12acaed9e16']
 };
 
 const blockSpecs = {
@@ -19,34 +19,34 @@ const blockSpecs = {
     file: 'js/content_bridge.js',
     start: 'function installRightRailWhitelistObserver() {',
     end: 'function queuePrefetchForCard(card) {',
-    startLine: 1219,
+    startLine: 1437,
     lines: 98,
-    bytes: 3091,
-    hash: '86779f97ba7a65ebe61da86d414b1b3027b916fdc75163053b9dd3b58bcf4976'
+    bytes: 3094,
+    hash: 'f657ce4b4b8ba815a4149d3508ebec0445450bf49c74478c0e2169da4c679bc4'
   },
   contentBridgeInitializeFallbackThrottle: {
     file: 'js/content_bridge.js',
     start: 'async function initializeDOMFallback(settings) {',
     end: '        const whitelistPendingRefreshState = {',
-    startLine: 6150,
-    lines: 61,
-    bytes: 2530,
-    hash: '60dd75d21580e8c390faed79594521478442789f7e0f3dd5195a1cb9c22fa926'
+    startLine: 7141,
+    lines: 255,
+    bytes: 12647,
+    hash: 'f7ffef2af0d96ca65b0166b8940b15d46f8fd7a222940ae856fad8ee68562a52'
   },
   contentBridgeWhitelistPendingQueue: {
     file: 'js/content_bridge.js',
     start: '        const whitelistPendingRefreshState = {',
     end: '        function applyWhitelistPendingHide(candidates) {',
-    startLine: 6211,
-    lines: 69,
-    bytes: 4081,
-    hash: '9b0cbad3e54891d06ef96a1c9d8010e4f3dbc3ca9b5c595865d7b86fec31ee74'
+    startLine: 7396,
+    lines: 70,
+    bytes: 4159,
+    hash: '3181b672c5d3a1a558baa5b0dbb175c05f7d966b908b835ae7c216ebc7eaa86b'
   },
   contentBridgeWhitelistPendingApply: {
     file: 'js/content_bridge.js',
     start: '        function applyWhitelistPendingHide(candidates) {',
     end: '        function fallbackRelevantSelector() {',
-    startLine: 6280,
+    startLine: 7466,
     lines: 112,
     bytes: 5829,
     hash: '2ff0a4ef33bdaf0acde1b27bf31d8d026f675702adae2bbc03692c213c266ad8'
@@ -55,43 +55,43 @@ const blockSpecs = {
     file: 'js/content_bridge.js',
     start: '        function fallbackRelevantSelector() {',
     end: '        refreshDOMFallbackMutationObserver();',
-    startLine: 6392,
-    lines: 138,
-    bytes: 5567,
-    hash: 'dab8f75188fa2468fca2add028355f0ba1b70d45ed133c37fd2affe02c028df8'
+    startLine: 7578,
+    lines: 217,
+    bytes: 9542,
+    hash: '644e542cd718856d5a3d447c3ecce919cf66cbad4bb0373efc61da62b3df09b9'
   },
   domFallbackOnlyWhitelistPendingSelector: {
     file: 'js/content/dom_fallback.js',
     start: '    // 1. Video/Content Filtering',
     end: '    if (!window.__filtertubePlaylistNavGuardInstalled) {',
-    startLine: 2505,
-    lines: 12,
-    bytes: 468,
-    hash: '29ac6ab76923722538fb7004f088bda03416d9da1a80c88ef8698f0c96e5e16d'
+    startLine: 5403,
+    lines: 19,
+    bytes: 950,
+    hash: '7235b5ea6e0689ab98e3e2e21e02e37d95b52675bc16a7c5bffa56b50c905894'
   },
   domFallbackWhitelistPendingStateReset: {
     file: 'js/content/dom_fallback.js',
     start: "            const alreadyProcessed = element.hasAttribute('data-filtertube-processed');",
     end: "            const cachedVideoId = element.getAttribute('data-filtertube-video-id') || '';",
-    startLine: 2686,
-    lines: 54,
-    bytes: 3079,
-    hash: '1f4523c7359119a8c375614e4fb739f5656ad8186573ea20e6de21ca492f4402'
+    startLine: 5666,
+    lines: 74,
+    bytes: 4342,
+    hash: '7f374fecc191fc37bbef5af4e05b040ff3b3b2e0585baec5f8036b1d4f4c7c6f'
   },
   domFallbackWhitelistPendingIdentityHide: {
     file: 'js/content/dom_fallback.js',
     start: '            let hideReason = `Content: ${title}`;',
     end: '            if (hideByDuration) {',
-    startLine: 3841,
+    startLine: 6949,
     lines: 16,
-    bytes: 960,
-    hash: 'db535d5bb1b6d0f6c2e3913e008ab1d67479982ec3155788821410a66b2eb7c1'
+    bytes: 993,
+    hash: '2352973b418feb0a4da5f8b71c11940d6a0292b6bdb5db511262db89889c1f17'
   },
   domFallbackOnlyWhitelistPendingReturn: {
     file: 'js/content/dom_fallback.js',
     start: "    if (onlyWhitelistPending && listMode === 'whitelist') {",
     end: '    // Inline survey containers',
-    startLine: 4139,
+    startLine: 7244,
     lines: 4,
     bytes: 83,
     hash: '438296f1dbec1d892317f6177e74323886b6830fd0697eb1b1c12e4779776ad0'
@@ -110,8 +110,8 @@ const selectedCounts = {
   'data-filtertube-whitelist-pending': 6,
   'filtertube-hidden': 10,
   'data-filtertube-hidden': 4,
-  'forceReprocess: true': 1,
-  'preserveScroll: true': 2,
+  'forceReprocess: true': 2,
+  'preserveScroll: true': 3,
   setTimeout: 6,
   requestAnimationFrame: 1,
   MutationObserver: 11,
@@ -121,15 +121,15 @@ const selectedCounts = {
   isFilterTubeNativeOverlayQuietMode: 8,
   'currentSettings?.listMode': 6,
   "listMode !== 'whitelist'": 5,
-  "path === '/'": 2,
-  "path === '/results'": 2,
+  "path === '/'": 3,
+  "path === '/results'": 3,
   "path === '/feed/channels'": 2,
-  "path.startsWith('/watch')": 2,
-  VIDEO_CARD_SELECTORS: 7,
+  "path.startsWith('/watch')": 3,
+  VIDEO_CARD_SELECTORS: 15,
   queuePrefetchForCard: 1,
-  'data-filtertube-processed': 6,
-  'data-filtertube-last-processed-id': 5,
-  clearCachedChannelMetadata: 4,
+  'data-filtertube-processed': 7,
+  'data-filtertube-last-processed-id': 6,
+  clearCachedChannelMetadata: 5,
   hasExplicitHideReasonMarker: 1,
   'applyDOMFallback(null, { preserveScroll: true, onlyWhitelistPending: true })': 1,
   hasActiveFallbackLifecycleWork: 3,

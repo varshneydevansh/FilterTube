@@ -10,9 +10,9 @@ const repoRoot = process.cwd();
 const docPath = 'docs/audit/FILTERTUBE_JSON_COMMENT_AUTHOR_CHANNEL_PROVENANCE_BOUNDARY_CURRENT_BEHAVIOR_2026-05-23.md';
 
 const sourceFingerprints = {
-  'js/filter_logic.js': [3652, 172174, '953ef0f14970e6cfbc11215fe9eaa078ced34f001908e1c6d5903a8fd2d9a1f5'],
-  'js/settings_shared.js': [1181, 57535, '9710ebb445ba11cc45fc98aced765d298226a8cd4a003600e106f908abc2162c'],
-  'js/background.js': [6803, 306710, '57ddc6c3e31112c30734ede78c9b37b01bd31533fc8a1d16856b13d2b295f0d7']
+  'js/filter_logic.js': [4534, 221980, 'f7021a053af96a4cd31a577f56e900ffb1a5d990fe55a838af64a6dba867afc4'],
+  'js/settings_shared.js': [1313, 66857, '19f0a1fb3cd512494481b7eb39169bf84feeda4a0a6a20cf58ebaf1c18ff7ba9'],
+  'js/background.js': [8538, 386043, 'cc89bb4a0375145e1c811b7cf5953729c39c409b6b24cacdc65c80f9f6ff44d0']
 };
 
 const blockSpecs = {
@@ -32,17 +32,17 @@ const blockSpecs = {
   },
   filterLogicShouldBlockSetup: {
     file: 'js/filter_logic.js',
-    start: '        _shouldBlock(item, rendererType) {',
+    start: '        _shouldBlock(item, rendererType, channelShelfOwner = null) {',
     end: '            // Handle collaboration videos (channelInfo is an array)',
-    lines: 45,
-    bytes: 2191
+    lines: 63,
+    bytes: 3323
   },
   filterLogicWhitelistCommentBypass: {
     file: 'js/filter_logic.js',
     start: "            if (listMode === 'whitelist' && !isCommentRenderer) {",
     end: '            // Channel filtering with comprehensive matching',
     lines: 110,
-    bytes: 5535
+    bytes: 5620
   },
   filterLogicGlobalChannelBranch: {
     file: 'js/filter_logic.js',
@@ -56,21 +56,21 @@ const blockSpecs = {
     start: '            // Comment filtering',
     end: '            // Content filters (duration, upload date)',
     lines: 34,
-    bytes: 1947
+    bytes: 2032
   },
   settingsSharedSanitizeChannelEntry: {
     file: 'js/settings_shared.js',
     start: '    function sanitizeChannelEntry(entry, overrides = {}) {',
     end: '    function normalizeChannels(rawChannels) {',
-    lines: 82,
-    bytes: 3619
+    lines: 113,
+    bytes: 7021
   },
   backgroundCompiledChannelObject: {
     file: 'js/background.js',
     start: "                    } else if (ch && typeof ch === 'object') {",
     end: '                    return null;',
-    lines: 40,
-    bytes: 2893
+    lines: 41,
+    bytes: 2965
   }
 };
 
@@ -341,7 +341,7 @@ test('whitelist channel row alone does not route comment author through whitelis
 
 test('source order exposes global channel branch before comment-author branch without comments-scope checks', () => {
   const shouldBlock = read('js/filter_logic.js').slice(
-    read('js/filter_logic.js').indexOf('        _shouldBlock(item, rendererType) {'),
+    read('js/filter_logic.js').indexOf('        _shouldBlock(item, rendererType, channelShelfOwner = null) {'),
     read('js/filter_logic.js').indexOf('        _checkCategoryFilters(item, rules, rendererType) {')
   );
   const globalChannel = blockMetric(blockSpecs.filterLogicGlobalChannelBranch).block;

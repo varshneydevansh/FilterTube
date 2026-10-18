@@ -1,5 +1,6 @@
 import fs from 'node:fs';
 import path from 'node:path';
+import vm from 'node:vm';
 import test from 'node:test';
 import assert from 'node:assert/strict';
 
@@ -61,13 +62,15 @@ test('README privacy language is now scoped to local-first extension runtime', (
   assert.match(readme, /Nanah Device Trust & Sync/);
 });
 
-test('downloads page exposes direct APK CTA before an artifact manifest gate exists', () => {
+test('downloads page distinguishes the complete Play app from the simpler direct APK', () => {
   const downloads = read('website/app/downloads/page.js');
 
   assert.match(downloads, /const latestReleaseHref = `\$\{githubHref\}\/releases\/latest`/);
-  assert.match(downloads, /label: "Direct APK releases"/);
+  assert.match(downloads, /label: "Open on Google Play"/);
+  assert.match(downloads, /label: "Simpler direct APK"/);
   assert.match(downloads, /href: latestReleaseHref/);
-  assert.match(downloads, /signed release APK can be attached/);
+  assert.match(downloads, /direct APK is a separate, simpler build/);
+  assert.match(downloads, /does not include the complete custom frontend/);
   assert.equal(fs.existsSync(path.join(repoRoot, 'release-artifacts/manifest.json')), false);
 });
 
@@ -89,20 +92,63 @@ test('build script currently mutates README badges as part of normal build', () 
   assert.match(build, /fs\.writeFileSync\(readmePath, readme, 'utf8'\)/);
 });
 
-test('release publishing currently creates a public release before asset uploads complete', () => {
+// Execute only the production release orchestration/helpers with an inert CLI spy.
+// No build, credentials, network operation or external release is performed.
+async function releaseFixture({ existing = false, missingAfterUpload = false, uploadError = false, tty = true, approve = true } = {}) {
   const build = read('build.js');
-  const publishBlock = build.slice(
-    build.indexOf('async function maybePromptRelease'),
-    build.indexOf('function extractLatestChangelogEntry')
-  );
-  const createReleaseBlock = build.slice(
-    build.indexOf('function createGitHubRelease'),
-    build.indexOf('function uploadReleaseAsset')
-  );
+  const release = build.slice(build.indexOf('async function maybePromptRelease('), build.indexOf('function extractLatestChangelogEntry('));
+  const cliHelpers = build.slice(build.indexOf('function createDraftGitHubRelease('), build.indexOf('function promptYesNo('));
+  const events = [];
+  const logs = [];
+  let viewCount = 0;
+  const context = vm.createContext({
+    path, REPO_OWNER: 'fixture', REPO_NAME: 'fixture',
+    process: { stdout: { isTTY: tty } },
+    console: { log: value => logs.push(value), error: value => logs.push(value) },
+    promptYesNo: async () => { events.push('prompt'); return approve; },
+    resolveGitHubToken: () => ({ source: 'inert fixture' }),
+    extractLatestChangelogEntry: () => ({ section: 'Fixture release notes' }),
+    buildReleaseBody: () => 'Fixture body', buildReleaseTitle: () => 'Fixture title',
+    githubReleaseExists: () => existing,
+    runGitHubCli: (_auth, args) => {
+      if (args[1] === 'create') { assert.ok(args.includes('--draft')); events.push('draft'); }
+      if (args[1] === 'view') {
+        events.push('verify-assets');
+        return viewCount++ === 0 || missingAfterUpload ? '' : 'chrome.zip\nfirefox.zip';
+      }
+      if (args[1] === 'upload') { events.push('upload'); if (uploadError) throw new Error('fixture upload rejected'); }
+      if (args[1] === 'edit') { assert.ok(args.includes('--draft=false')); events.push('publish'); }
+      return '';
+    }
+  });
+  vm.runInContext(`${release}\n${cliHelpers}\nglobalThis.invoke = maybePromptRelease;`, context);
+  await context.invoke('3.4.1', ['/fixture/chrome.zip', '/fixture/firefox.zip']);
+  return { events, logs };
+}
 
-  assert.ok(publishBlock.indexOf('await createGitHubRelease') < publishBlock.indexOf('await uploadReleaseAsset'));
-  assert.match(createReleaseBlock, /draft:\s*false/);
-  assert.match(createReleaseBlock, /prerelease:\s*false/);
+test('release publication creates a draft, uploads and verifies all assets before publishing', async () => {
+  const { events } = await releaseFixture();
+  assert.deepEqual(events, ['prompt', 'draft', 'verify-assets', 'upload', 'verify-assets', 'publish']);
+});
+
+test('missing or failed release assets never reach the publish operation', async () => {
+  for (const options of [{ missingAfterUpload: true }, { uploadError: true }]) {
+    const { events, logs } = await releaseFixture(options);
+    assert.ok(events.includes('draft'));
+    assert.ok(events.includes('upload'));
+    assert.ok(!events.includes('publish'));
+    assert.ok(logs.some(value => String(value).includes('Failed to publish release')));
+  }
+});
+
+test('noninteractive or declined release prompts perform no release CLI operation', async () => {
+  assert.deepEqual((await releaseFixture({ tty: false })).events, []);
+  assert.deepEqual((await releaseFixture({ approve: false })).events, ['prompt']);
+});
+
+test('resuming an existing release does not create or publish a new release', async () => {
+  const { events } = await releaseFixture({ existing: true });
+  assert.deepEqual(events, ['prompt', 'verify-assets', 'upload', 'verify-assets']);
 });
 
 test('website home and browser-logo surfaces currently carry public performance and remote-request risks', () => {

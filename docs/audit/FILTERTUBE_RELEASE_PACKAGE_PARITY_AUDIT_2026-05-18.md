@@ -221,3 +221,8 @@ These counts are audit-only blockers. They do not approve runtime
 optimization, JSON-first behavior, release package behavior, public release
 claims, prompt release overlays, raw-capture packaging, whitelist behavior,
 metric collectors, artifact creation, native sync, or release publication.
+
+
+## October 18, 2026 release workflow review
+
+The earlier public-before-upload observation is historical and superseded. Current source creates a draft, uploads missing assets, re-reads all expected asset names and only publishes a draft created by this invocation after verification. Existing release visibility is preserved. `_locales` is now included among common package roots. These checks never invoke GitHub or publish a release; installed browser/native acceptance remains separate.

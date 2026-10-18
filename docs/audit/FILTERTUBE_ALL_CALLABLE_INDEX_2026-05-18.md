@@ -211,3 +211,144 @@ That fixture pins:
 - documented callable counts match current lexical source,
 - documented family totals sum to 6,315,
 - no ignored raw captures or generated package output are part of this index.
+
+
+## Current Lexical Inventory - 2026-10-18
+
+The preceding dated sections retain their historical evidence and NO-GO limits.
+This current-source refresh expands lexical accounting to newly tracked files;
+it does not promote any callable to complete semantic proof. The parser remains
+lexical and its scope remains tracked JS/JSX/MJS: CJS/Python tooling requires its
+separate release/workflow review and is not silently counted as JavaScript here.
+
+```text
+current tracked JS/JSX/MJS files: 110
+current repo-wide lexical callables: 9164
+current complete per-callable semantic proofs: 0
+current callable behavior-change approval: NO-GO
+runtime behavior changed by inventory refresh: no
+```
+
+| Family | Files | Lexical callables |
+| --- | ---: | ---: |
+| Build/sync scripts | 5 | 75 |
+| Hot page/background runtime | 9 | 3817 |
+| Content helper runtime | 13 | 491 |
+| UI/settings runtime | 24 | 3712 |
+| Generated/quarantined UI | 6 | 147 |
+| Vendor bundles | 3 | 279 |
+| Audit/test lane scripts | 24 | 517 |
+| Website routes/components/config | 26 | 126 |
+
+| File | Family | Lexical callables | Audit status |
+| --- | --- | ---: | --- |
+| `build.js` | Build/sync scripts | 68 | release-audited first pass |
+| `js/background.js` | Hot page/background runtime | 568 | hot runtime mapped |
+| `js/content/admission_overlay.js` | Content helper runtime | 25 | helper counted; semantic proof incomplete |
+| `js/content/block_channel.js` | Hot page/background runtime | 234 | hot runtime mapped |
+| `js/content/bridge_injection.js` | Content helper runtime | 14 | helper counted |
+| `js/content/bridge_settings.js` | Hot page/background runtime | 140 | hot runtime mapped |
+| `js/content/collab_dialog.js` | Content helper runtime | 42 | helper counted |
+| `js/content/dom_extractors.js` | Content helper runtime | 117 | helper counted |
+| `js/content/dom_fallback.js` | Hot page/background runtime | 669 | hot runtime mapped |
+| `js/content/dom_helpers.js` | Content helper runtime | 21 | helper counted |
+| `js/content/dom_state.js` | Content helper runtime | 42 | helper counted |
+| `js/content/external_youtube_guard.js` | Content helper runtime | 62 | helper counted; semantic proof incomplete |
+| `js/content/external_youtube_network.js` | Content helper runtime | 28 | helper counted; semantic proof incomplete |
+| `js/content/first_run_prompt.js` | Content helper runtime | 11 | helper counted |
+| `js/content/handle_resolver.js` | Hot page/background runtime | 23 | hot runtime mapped |
+| `js/content/menu.js` | Content helper runtime | 3 | helper counted |
+| `js/content/release_notes_prompt.js` | Content helper runtime | 12 | helper counted |
+| `js/content_bridge.js` | Hot page/background runtime | 1286 | hot runtime mapped |
+| `js/content_controls_catalog.js` | UI/settings runtime | 5 | UI/settings counted |
+| `js/family_device_navigation.js` | UI/settings runtime | 10 | UI/settings counted; semantic proof incomplete |
+| `js/filter_logic.js` | Hot page/background runtime | 375 | hot runtime mapped |
+| `js/imported_channel_enrichment.js` | UI/settings runtime | 81 | UI/settings counted; semantic proof incomplete |
+| `js/injector.js` | Hot page/background runtime | 352 | hot runtime mapped |
+| `js/io_manager.js` | UI/settings runtime | 213 | UI/settings counted |
+| `js/layout.js` | Generated/quarantined UI | 52 | quarantined/generated boundary |
+| `js/managed_admin_authority.js` | UI/settings runtime | 18 | UI/settings counted |
+| `js/managed_parent_command_center.js` | UI/settings runtime | 78 | UI/settings counted |
+| `js/nanah_managed_live_policy.js` | UI/settings runtime | 115 | UI/settings counted |
+| `js/nanah_managed_local_network_client.js` | UI/settings runtime | 48 | UI/settings counted; semantic proof incomplete |
+| `js/nanah_managed_mailbox_client.js` | UI/settings runtime | 37 | UI/settings counted; semantic proof incomplete |
+| `js/nanah_managed_open_sync.js` | UI/settings runtime | 35 | UI/settings counted |
+| `js/nanah_qr_scanner.js` | UI/settings runtime | 15 | UI/settings counted; semantic proof incomplete |
+| `js/nanah_storage_lock.js` | UI/settings runtime | 3 | UI/settings counted; semantic proof incomplete |
+| `js/nanah_sync_adapter.js` | UI/settings runtime | 204 | UI/settings counted |
+| `js/popup.js` | UI/settings runtime | 170 | UI/settings counted |
+| `js/render_engine.js` | UI/settings runtime | 171 | UI/settings counted |
+| `js/rule_list_import_reports.js` | UI/settings runtime | 38 | UI/settings counted; semantic proof incomplete |
+| `js/security_manager.js` | UI/settings runtime | 18 | UI/settings counted |
+| `js/seed.js` | Hot page/background runtime | 170 | hot runtime mapped |
+| `js/settings_shared.js` | UI/settings runtime | 45 | UI/settings counted |
+| `js/shared/identity.js` | Content helper runtime | 110 | helper counted |
+| `js/shared/view_count.js` | Content helper runtime | 4 | helper counted; semantic proof incomplete |
+| `js/state_manager.js` | UI/settings runtime | 180 | UI/settings counted |
+| `js/tab-view.js` | UI/settings runtime | 2133 | UI/settings counted |
+| `js/ui-shell/popup-shell.js` | Generated/quarantined UI | 42 | generated output boundary |
+| `js/ui-shell/tab-view-decor.js` | Generated/quarantined UI | 41 | generated output boundary |
+| `js/ui_components.js` | UI/settings runtime | 65 | UI/settings counted |
+| `js/ui_localization.js` | UI/settings runtime | 20 | UI/settings counted; semantic proof incomplete |
+| `js/ui_localization_boot.js` | UI/settings runtime | 10 | UI/settings counted; semantic proof incomplete |
+| `js/ui_static_copy_capture.js` | UI/settings runtime | 0 | UI/settings counted; semantic proof incomplete |
+| `js/vendor/jsqr.bundle.js` | Vendor bundles | 0 | vendor API/provenance boundary |
+| `js/vendor/nanah.bundle.js` | Vendor bundles | 107 | vendor API/provenance boundary |
+| `js/vendor/qrcode.bundle.js` | Vendor bundles | 172 | vendor API/provenance boundary |
+| `scripts/audit-proof-drift.mjs` | Audit/test lane scripts | 19 | audit lane counted |
+| `scripts/build-extension-ui.mjs` | Build/sync scripts | 2 | build/website counted |
+| `scripts/build-nanah-vendor.mjs` | Build/sync scripts | 4 | build/website counted |
+| `scripts/build-qr-scanner-vendor.mjs` | Build/sync scripts | 0 | build provenance counted; semantic proof incomplete |
+| `scripts/check-release-note-locales.mjs` | Audit/test lane scripts | 4 | workflow/evidence tooling counted; semantic proof incomplete |
+| `scripts/check-ui-locales.mjs` | Audit/test lane scripts | 16 | workflow/evidence tooling counted; semantic proof incomplete |
+| `scripts/create-family-device-capture-checklist.mjs` | Audit/test lane scripts | 17 | workflow/evidence tooling counted; semantic proof incomplete |
+| `scripts/create-family-device-evidence-packet.mjs` | Audit/test lane scripts | 12 | workflow/evidence tooling counted; semantic proof incomplete |
+| `scripts/create-managed-app-parity-smoke-artifact.mjs` | Audit/test lane scripts | 35 | workflow/evidence tooling counted; semantic proof incomplete |
+| `scripts/create-managed-extension-installed-smoke-artifact.mjs` | Audit/test lane scripts | 24 | workflow/evidence tooling counted; semantic proof incomplete |
+| `scripts/create-managed-native-runtime-sync-handoff.mjs` | Audit/test lane scripts | 27 | workflow/evidence tooling counted; semantic proof incomplete |
+| `scripts/create-managed-pickup-provider-ownership-artifact.mjs` | Audit/test lane scripts | 28 | workflow/evidence tooling counted; semantic proof incomplete |
+| `scripts/extract-family-ui-fallbacks.mjs` | Audit/test lane scripts | 1 | workflow/evidence tooling counted; semantic proof incomplete |
+| `scripts/import-family-device-downloaded-evidence.mjs` | Audit/test lane scripts | 34 | workflow/evidence tooling counted; semantic proof incomplete |
+| `scripts/managed-delivery-lan-discovery.mjs` | Audit/test lane scripts | 25 | workflow/evidence tooling counted; semantic proof incomplete |
+| `scripts/managed-delivery-provider.mjs` | Audit/test lane scripts | 66 | workflow/evidence tooling counted; semantic proof incomplete |
+| `scripts/merge-ui-locale-batch.mjs` | Audit/test lane scripts | 5 | workflow/evidence tooling counted; semantic proof incomplete |
+| `scripts/merge-ui-locale-drafts.mjs` | Audit/test lane scripts | 5 | workflow/evidence tooling counted; semantic proof incomplete |
+| `scripts/report-family-device-phase11-status.mjs` | Audit/test lane scripts | 30 | workflow/evidence tooling counted; semantic proof incomplete |
+| `scripts/report-family-device-phase12-status.mjs` | Audit/test lane scripts | 26 | workflow/evidence tooling counted; semantic proof incomplete |
+| `scripts/report-family-device-provider-surface.mjs` | Audit/test lane scripts | 14 | workflow/evidence tooling counted; semantic proof incomplete |
+| `scripts/report-family-device-release-readiness.mjs` | Audit/test lane scripts | 7 | workflow/evidence tooling counted; semantic proof incomplete |
+| `scripts/run-test-lane.mjs` | Audit/test lane scripts | 61 | audit lane counted |
+| `scripts/sync-native-runtime.mjs` | Build/sync scripts | 1 | build/website counted |
+| `scripts/test-lane-config.mjs` | Audit/test lane scripts | 0 | audit lane counted |
+| `scripts/update-family-device-evidence-log.mjs` | Audit/test lane scripts | 23 | workflow/evidence tooling counted; semantic proof incomplete |
+| `scripts/validate-family-device-evidence.mjs` | Audit/test lane scripts | 24 | workflow/evidence tooling counted; semantic proof incomplete |
+| `scripts/verify-managed-app-policy-contract.mjs` | Audit/test lane scripts | 14 | workflow/evidence tooling counted; semantic proof incomplete |
+| `src/extension-shell/popup.jsx` | Generated/quarantined UI | 3 | generated source boundary |
+| `src/extension-shell/shared/runtime.js` | Generated/quarantined UI | 7 | generated source boundary |
+| `src/extension-shell/tab-view-decor.jsx` | Generated/quarantined UI | 2 | generated source boundary |
+| `website/app/[slug]/page.js` | Website routes/components/config | 4 | website counted |
+| `website/app/downloads/page.js` | Website routes/components/config | 2 | website counted |
+| `website/app/layout.js` | Website routes/components/config | 0 | website counted |
+| `website/app/not-found.js` | Website routes/components/config | 0 | website counted |
+| `website/app/page.js` | Website routes/components/config | 5 | website counted |
+| `website/app/privacy/page.js` | Website routes/components/config | 4 | website counted |
+| `website/app/robots.js` | Website routes/components/config | 0 | website counted |
+| `website/app/sitemap.js` | Website routes/components/config | 0 | website counted |
+| `website/app/terms/page.js` | Website routes/components/config | 0 | website counted |
+| `website/components/browser-logo-rail.js` | Website routes/components/config | 1 | website counted |
+| `website/components/footer-signal-art.js` | Website routes/components/config | 63 | website counted |
+| `website/components/hero-video.js` | Website routes/components/config | 4 | website counted |
+| `website/components/marketing-ui.js` | Website routes/components/config | 6 | website counted |
+| `website/components/reveal.js` | Website routes/components/config | 1 | website counted |
+| `website/components/route-content.js` | Website routes/components/config | 0 | website counted |
+| `website/components/scene-controller.js` | Website routes/components/config | 10 | website counted |
+| `website/components/scenic-detail-page.js` | Website routes/components/config | 6 | website counted |
+| `website/components/scenic-illustration.js` | Website routes/components/config | 3 | website counted |
+| `website/components/scenic-tones.js` | Website routes/components/config | 1 | website counted |
+| `website/components/site-data.js` | Website routes/components/config | 0 | website counted |
+| `website/components/site-footer.js` | Website routes/components/config | 3 | website counted |
+| `website/components/site-header.js` | Website routes/components/config | 3 | website counted |
+| `website/components/site-shell-data.js` | Website routes/components/config | 0 | website counted |
+| `website/components/theme-toggle.js` | Website routes/components/config | 10 | website counted |
+| `website/next.config.mjs` | Website routes/components/config | 0 | website counted |
+| `website/postcss.config.mjs` | Website routes/components/config | 0 | website counted |

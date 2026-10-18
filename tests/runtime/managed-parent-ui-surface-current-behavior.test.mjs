@@ -489,8 +489,8 @@ test('managed parent UI surface docs and runtime binding are linked', () => {
   assert.match(helperSource, /filtertubeManagedAction/);
   assert.match(helperSource, /delegated_runtime_gate/);
   assert.match(tabViewHtml, /id="managedChildSyncBoundary"/);
-  assert.match(tabViewHtml, /Family device updates/);
-  assert.match(tabViewHtml, /<h3>Family Device Updates<\/h3>/);
+  assert.match(tabViewHtml, /id="familyDeviceUpdatesCard"/);
+  assert.match(tabViewHtml, /<h3>My Devices &amp; Family<\/h3>/);
   assert.match(tabViewHtml, />\s*Device Updates\s*</);
   assert.doesNotMatch(tabViewHtml, />\s*Send to Device\s*</);
   assert.match(tabViewHtml, /Choose profile/);
@@ -498,7 +498,7 @@ test('managed parent UI surface docs and runtime binding are linked', () => {
   assert.match(tabViewHtml, /id="ftNanahModeParent"[\s\S]*aria-pressed="true"/);
   assert.match(tabViewHtml, /id="ftNanahModeSendOnce"[\s\S]*aria-pressed="false"/);
   assert.match(source, /let nanahUiMode = 'parent_control'/);
-  assert.match(source, /return storedMode \? normalizeNanahUiMode\(storedMode\) : 'parent_control'/);
+  assert.match(source, /return storedMode \? normalizeNanahUiMode\(storedMode\)\s*: \(getNanahFamilyDeliveryReadinessSummary\(\)\.protectedProfileCount > 0 \? 'parent_control' : 'send_once'\)/);
   assert.match(tabViewHtml, /<span id="ftNanahModeEyebrow" class="nanah-sync-guide__title">Family control<\/span>/);
   assert.match(tabViewHtml, /<strong id="ftNanahModeTitle" class="nanah-sync-mode-spotlight__title">Protected device<\/strong>/);
   assert.match(tabViewHtml, /send parent-approved rules, time limits, and viewing access to a protected profile or family device/);
@@ -516,15 +516,15 @@ test('managed parent UI surface docs and runtime binding are linked', () => {
   assert.match(tabViewHtml, /Home Pickup off/);
   assert.match(tabViewHtml, /Wi-Fi alone never grants control/);
   assert.match(tabViewHtml, /id="ftNanahDeliveryLocalCheckBtn"[\s\S]*>Check<\/button>/);
-  assert.match(tabViewHtml, /Home Pickup is for homes, clinics, or schools that run their own FilterTube-compatible pickup service on the local network/);
+  assert.match(tabViewHtml, /Home Pickup is different: it is an advanced waiting-update service for already verified protected devices/);
   assert.match(tabViewHtml, /id="ftNanahDeliveryAdvanced"/);
-  assert.match(tabViewHtml, /Set up only when a verified device must collect an approved update later/);
+  assert.match(tabViewHtml, /Use only if the protected device cannot stay open for Send Update/);
   assert.match(tabViewHtml, /id="ftNanahDeliveryCheckRow"/);
   assert.match(tabViewHtml, /Check waiting parent updates/);
   assert.match(tabViewHtml, /Available after this protected profile saves a trusted parent link/);
   assert.match(tabViewHtml, /Profiles, PINs, and Protected Profiles/);
-  assert.match(tabViewHtml, /Protected profile authority/);
-  assert.match(tabViewHtml, /Profile PIN vs parent PIN/);
+  assert.match(tabViewHtml, /What protected users cannot change/);
+  assert.match(tabViewHtml, /The child\/profile PIN is only a switching guard for that profile/);
   assert.match(tabViewHtml, /Who sets a protected profile PIN/);
   assert.match(tabViewHtml, /Where parents edit protected rules/);
   assert.match(tabViewHtml, /Independent profile; can manage protected profiles/);
@@ -536,7 +536,7 @@ test('managed parent UI surface docs and runtime binding are linked', () => {
   assert.match(source, /It is not automatic Wi-Fi discovery; being nearby never grants control/);
   assert.match(source, /This is not device scanning; Send Update remains the normal path/);
   assert.match(source, /Home Pickup set up: \$\{host\}/);
-  assert.match(source, /Home Pickup saved and reachable/);
+  assert.match(source, /tabViewUiText\('dashboard\.sync\.toast\.pickupSavedAndReachable', '\{pickup\} Pickup saved and reachable', \{ pickup: 'Home' \}\)/);
   assert.match(source, /ftNanahDeliveryLocalCheckBtn\.hidden = local\.configured !== true/);
   assert.match(source, /delivery_card_check/);
   assert.match(source, /This does not discover or trust devices/);
@@ -632,7 +632,7 @@ test('managed parent UI surface docs and runtime binding are linked', () => {
   assert.match(source, /RULE_LIST_AUTO_CHECK_ENABLED_KEY = 'ftRuleListUrlAutoCheckEnabled'/);
   assert.match(source, /async function runRuleListAutoCheckIfDue/);
   assert.match(source, /runRuleListAutoCheckIfDue\(\{ reason: 'dashboard_open' \}\)/);
-  assert.match(source, /refreshAllManagedChannelListsForProfiles\(\[currentProfileId\], \{\s+staleOnly: true,\s+scheduledCheck: true,\s+reason\s+\}\)/);
+  assert.match(source, /refreshAllManagedChannelListsForProfiles\(targetProfileIds, \{\s+staleOnly: true,\s+scheduledCheck: true,\s+reason\s+\}\)/);
   assert.match(source, /This check runs only while the dashboard is open; it is not background sync/);
   assert.match(plan, /dashboard-open scheduled list review slice/);
   assert.match(plan, /never silently\s+applies rows, sends device updates, runs on YouTube pages, or creates\s+background policy sync/);
@@ -644,14 +644,14 @@ test('managed parent UI surface docs and runtime binding are linked', () => {
   assert.match(source, /managed-channel-list-modal__mini-sheet/);
   assert.match(source, /managed-channel-list-modal__mini-code/);
   assert.match(source, /managed-channel-list-modal__mini-lines/);
-  assert.match(source, /Files only add channel and keyword rules/);
+  assert.match(source, /CSV, TXT, and FilterTube rule-list files add channel and keyword rules/);
   assert.match(tabViewHtml, /Where should this list work\?/);
   assert.match(tabViewHtml, /The file can add rules here, but it cannot choose profiles, PINs, time limits, trusted devices, or sync destinations/);
   assert.doesNotMatch(tabViewHtml, /<h3>Device Trust &amp; Sync<\/h3>/);
   assert.doesNotMatch(tabViewHtml, /Completely P2P after handshake/);
   assert.match(source, /function renderManagedChildSyncBoundary\(\)/);
   assert.match(source, /function ensureNotScopedProtectedEditForGlobalAdmin\(actionLabel = 'global account controls'\)/);
-  assert.match(source, /Finish protected-profile editing before changing \$\{actionLabel\}/);
+  assert.match(source, /tabViewUiText\('family\.profileManager\.finishEditingBeforeAction', 'Finish protected-profile editing before changing \{action\}\.', \{ action: actionLabel \}\)/);
   assert.match(source, /Global account policy and Master PIN controls are paused until you finish editing/);
   assert.match(source, /Finish protected-profile editing before changing global account policy/);
   assert.match(source, /Finish protected-profile editing before changing global account, Master PIN, or create-profile controls/);
@@ -672,7 +672,7 @@ test('managed parent UI surface docs and runtime binding are linked', () => {
   assert.match(source, /async function configureNanahManagedMailboxServer\(\)/);
   assert.match(source, /function renderNanahDeliveryPathStrip\(\)/);
   assert.match(source, /function getNanahFamilyDeliveryReadinessSummary\(/);
-  assert.match(source, /ftNanahDeliveryAdvanced && \(mailbox\.configured === true \|\| local\.configured === true\)/);
+  assert.match(source, /ftNanahDeliveryAdvanced && \(mailbox\.configured === true \|\| local\.pickupConfigured === true\)/);
   assert.match(doc, /runtime Family Device Updates later-delivery disclosure: present and auto-opens only for configured Internet Pickup\/Home Pickup providers/);
   assert.match(plan, /Family Device Updates optional delivery collapse/);
   assert.match(plan, /Family Device Updates later-delivery wording slice/);
@@ -697,7 +697,7 @@ test('managed parent UI surface docs and runtime binding are linked', () => {
   assert.match(source, /const confirmBulk = await showConfirmModal\(/);
   assert.match(source, /function managedBulkRuleTypeLabel\(ruleType\)/);
   assert.match(source, /function managedBulkRuleRemoteScope\(ruleType\)/);
-  assert.match(source, /Send \$\{managedBulkRuleTypeLabel\(type\)\} update now\?/);
+  assert.match(source, /tabViewUiText\('dashboard\.managedLists\.sendRuleUpdateTitle', 'Send \{ruleType\} update now\?', \{ ruleType: managedBulkRuleTypeLabel\(type\) \}\)/);
   assert.match(source, /const remoteScope = managedBulkRuleRemoteScope\(type\)/);
   assert.match(source, /getNanahSourceManagedLinksForTargetProfile\(targetId, remoteScope, profile\)/);
   assert.match(source, /sendManagedParentPolicyToVerifiedDevices\(changedProfileIds, \{\s+scope: remoteScope,\s+surface\s+\}\)/);
@@ -714,11 +714,11 @@ test('managed parent UI surface docs and runtime binding are linked', () => {
   assert.match(source, /offerManagedPolicyPushForChangedProfiles\(changedProfileIds, \{\s+scope: 'viewing_space'/);
   assert.match(source, /offerManagedTimeLimitPushForChangedProfiles\(\[targetId\]\)/);
   assert.match(source, /bulk_viewing_space_unlock_failed/);
-  assert.match(source, /customConfirmText: selectedCount > 1 \? 'Save Limits' : 'Save Limit'/);
+  assert.match(source, /customConfirmText: selectedCount > 1\s*\? tabViewUiText\('family\.profileManager\.saveLimits', 'Save Limits'\)\s*: tabViewUiText\('family\.profileManager\.saveLimit', 'Save Limit'\)/);
   assert.match(source, /ft-managed-profile-status/);
   assert.match(source, /hasUnresolvedManagedExtraTimeRequest\(profile\)/);
   assert.match(source, /answered \$\{resolvedRequestCount\} time/);
-  assert.match(source, /historyBtn\.textContent = 'History'/);
+  assert.match(source, /historyBtn\.textContent = tabViewUiText\('family\.profileManager\.history', 'History'\)/);
   assert.match(source, /ensureProfileUnlocked\(fresh, currentActive, \{ sensitiveAction: true \}\)/);
 });
 
@@ -1319,6 +1319,15 @@ test('managed command-center helper emits delegated action intents without polic
       scope: 'active',
       authority: 'managed_policy_provider_delivery',
       sensitiveAction: true
+    },
+    {
+      action: 'enable_saved_updates',
+      label: 'Saved Updates On',
+      profileId: 'childA',
+      scope: 'trusted_link',
+      authority: 'managed_policy_provider_delivery',
+      sensitiveAction: true,
+      title: 'Allow this verified device to check Internet Pickup or Home Pickup when the protected profile opens.'
     },
     {
       action: 'change_time_limit',

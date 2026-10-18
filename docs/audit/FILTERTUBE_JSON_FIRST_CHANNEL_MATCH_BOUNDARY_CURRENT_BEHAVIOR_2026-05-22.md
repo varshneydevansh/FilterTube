@@ -28,8 +28,8 @@ identity is not present.
 
 | Source | Lines | Bytes | SHA-256 |
 | --- | ---: | ---: | --- |
-| `js/filter_logic.js` | 3652 | 172174 | `953ef0f14970e6cfbc11215fe9eaa078ced34f001908e1c6d5903a8fd2d9a1f5` |
-| `js/shared/identity.js` | 808 | 30599 | `41f26baf0eef27994666430e2b8b490c893eed90abd67f47d562926d94155958` |
+| `js/filter_logic.js` | 4534 | 221980 | `f7021a053af96a4cd31a577f56e900ffb1a5d990fe55a838af64a6dba867afc4` |
+| `js/shared/identity.js` | 1016 | 39123 | `fafcbe72d9807a487ecc11d2252f2363e5b8a741eacc740307b1ebd378ebbecb` |
 
 Related proof layers:
 
@@ -177,3 +177,7 @@ These counts are audit-only blockers. They do not approve runtime
 optimization, JSON-first behavior, channel-match changes, channelMap
 dependence changes, whitelist behavior changes, or selector/renderer authority
 changes.
+
+## Revalidation - 2026-10-18
+
+Source fingerprints and bounded extraction inventories were refreshed against the current checkout after source review. These are drift detectors, not exhaustive semantic proof, installed-browser evidence, or approval of the broader missing-authority gates. Executable fixtures below remain the behavior checks.

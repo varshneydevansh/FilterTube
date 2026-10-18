@@ -45,16 +45,16 @@ test('downloads page exposes available browser claims with fixed store URLs', ()
   assert.match(page, /href: releaseHref/);
 });
 
-test('android direct apk claim points to latest release before artifact claim authority exists', () => {
+test('Android public Play install and simpler direct APK remain clearly distinguished', () => {
   const page = read('website/app/downloads/page.js');
 
   assert.match(page, /title: "Android phone\/tablet"/);
-  assert.match(page, /label: "Final release testing"/);
-  assert.match(page, /label: "Direct APK releases"/);
+  assert.match(page, /label: "Available on Google Play"/);
+  assert.match(page, /label: "Simpler direct APK"/);
   assert.match(page, /href: latestReleaseHref/);
-  assert.match(page, /signed release APK can be attached/);
-  assert.match(page, /SHA-256 checksum and signing fingerprint/);
-  assert.match(page, /Direct APK distribution will\s+use GitHub release assets and checksums when the signed release\s+APK is attached/);
+  assert.match(page, /href: androidPlayStoreHref/);
+  assert.match(page, /publicly available on Google Play/);
+  assert.match(page, /direct APK is a separate, simpler build/);
   assert.doesNotMatch(page, /\bpublicReleaseClaimAuthority\b/);
   assert.doesNotMatch(page, /\bartifactManifest\b/);
   assert.doesNotMatch(page, /\breleaseClaimIds\b/);
@@ -64,9 +64,9 @@ test('ios claim is status-only and does not expose public IPA install path', () 
   const page = read('website/app/downloads/page.js');
 
   assert.match(page, /title: "iPhone and iPad"/);
-  assert.match(page, /label: "Final release testing"/);
-  assert.match(page, /TestFlight and App Store review/);
-  assert.match(page, /Public IPA downloads are not the normal install path/);
+  assert.match(page, /label: "Final testing alignment"/);
+  assert.match(page, /Apple Developer account access is delaying TestFlight availability/);
+  assert.doesNotMatch(page, /href: .*\.ipa/);
   assert.match(page, /label: "iOS status"/);
   assert.match(page, /href: "#ios-status"/);
   assert.doesNotMatch(page, /href: .*\.ipa/);
@@ -99,15 +99,15 @@ test('release notes align with package and browser manifest versions', () => {
   const packageJson = readJson('package.json');
   const releaseNotes = readJson('data/release_notes.json');
 
-  assert.equal(packageJson.version, '3.3.2');
+  assert.equal(packageJson.version, '3.4.1');
   for (const manifest of ['manifest.json', 'manifest.chrome.json', 'manifest.firefox.json', 'manifest.opera.json']) {
     assert.equal(readJson(manifest).version, packageJson.version, `${manifest} should match package version today`);
   }
 
-  assert.equal(releaseNotes[1].version, '3.3.2');
+  assert.equal(releaseNotes[1].version, packageJson.version);
   assert.doesNotMatch(releaseNotes[1].headline, /Upcoming:/);
-  assert.match(releaseNotes[1].summary, /included in this release/);
-  assert.equal(releaseNotes[1].detailsUrl, 'https://github.com/varshneydevansh/FilterTube/releases/tag/v3.3.2');
+  assert.ok(releaseNotes[1].summary.trim());
+  assert.equal(releaseNotes[1].detailsUrl, `https://github.com/varshneydevansh/FilterTube/releases/tag/v${packageJson.version}`);
 });
 
 test('public release and android distribution docs require direct apk proof before claim', () => {

@@ -11,9 +11,9 @@ const repoRoot = process.cwd();
 const docPath = 'docs/audit/FILTERTUBE_JSON_COMMENT_KEYWORD_PROVENANCE_BOUNDARY_CURRENT_BEHAVIOR_2026-05-23.md';
 
 const sourceFingerprints = {
-  'js/filter_logic.js': [3652, 172174, '953ef0f14970e6cfbc11215fe9eaa078ced34f001908e1c6d5903a8fd2d9a1f5'],
-  'js/settings_shared.js': [1181, 57535, '9710ebb445ba11cc45fc98aced765d298226a8cd4a003600e106f908abc2162c'],
-  'js/background.js': [6803, 306710, '57ddc6c3e31112c30734ede78c9b37b01bd31533fc8a1d16856b13d2b295f0d7']
+  'js/filter_logic.js': [4534, 221980, 'f7021a053af96a4cd31a577f56e900ffb1a5d990fe55a838af64a6dba867afc4'],
+  'js/settings_shared.js': [1313, 66857, '19f0a1fb3cd512494481b7eb39169bf84feeda4a0a6a20cf58ebaf1c18ff7ba9'],
+  'js/background.js': [8538, 386043, 'cc89bb4a0375145e1c811b7cf5953729c39c409b6b24cacdc65c80f9f6ff44d0']
 };
 
 const blockSpecs = {
@@ -21,50 +21,50 @@ const blockSpecs = {
     file: 'js/settings_shared.js',
     start: '    function compileKeywords(keywords, predicate = null) {',
     end: '    function getChannelDerivedKey(channel) {',
-    lines: 15,
-    bytes: 740
+    lines: 19,
+    bytes: 1020
   },
   sharedSyncFilterAllKeywords: {
     file: 'js/settings_shared.js',
     start: '    function syncFilterAllKeywords(keywords, channels) {',
     end: '    function buildCompiledSettings({',
-    lines: 72,
-    bytes: 2971
+    lines: 75,
+    bytes: 3142
   },
   sharedBuildCompiledComments: {
     file: 'js/settings_shared.js',
-    start: '            filterKeywords: compileKeywords(sanitizedKeywords),',
+    start: "            filterKeywords: compileKeywords(sanitizedKeywords, entry => entry.scope !== 'comment'),",
     end: '            filterChannels: sanitizedChannels,',
     lines: 2,
-    bytes: 170
+    bytes: 206
   },
   filterLogicProcessSettingsRegex: {
     file: 'js/filter_logic.js',
     start: '            // Reconstruct RegExp objects from serialized patterns',
     end: '            // Ensure filterChannels are objects',
-    lines: 29,
-    bytes: 1445
+    lines: 45,
+    bytes: 2550
   },
   filterLogicCandidateMetadataSearch: {
     file: 'js/filter_logic.js',
     start: '        _buildCandidate(item, rendererType, wrapperRendererType = null, options = {}) {',
     end: '        _regexMatches(regex, text) {',
-    lines: 218,
-    bytes: 10724
+    lines: 243,
+    bytes: 12438
   },
   filterLogicGlobalCommentKeywordBranch: {
     file: 'js/filter_logic.js',
     start: '            // Keyword filtering (check title AND description)',
     end: '            // Content filters (duration, upload date)',
     lines: 55,
-    bytes: 3070
+    bytes: 3262
   },
   backgroundV4CommentCompile: {
     file: 'js/background.js',
     start: '            if (v4KeywordEntries) {',
     end: '            // Persist any migrations we calculated',
-    lines: 7,
-    bytes: 370
+    lines: 9,
+    bytes: 487
   },
   backgroundLegacyCommentsFallback: {
     file: 'js/background.js',
@@ -283,8 +283,8 @@ test('JSON comment keyword provenance selected token counts remain pinned', () =
   assert.equal(countLiteral(blocks.sharedSyncFilterAllKeywords, 'filterAllComments'), 2);
   assert.equal(countLiteral(blocks.sharedSyncFilterAllKeywords, 'channelRef'), 7);
   assert.equal(countLiteral(blocks.sharedBuildCompiledComments, 'filterKeywordsComments'), 1);
-  assert.equal(countLiteral(blocks.filterLogicProcessSettingsRegex, 'RegExp'), 5);
-  assert.equal(countLiteral(blocks.filterLogicCandidateMetadataSearch, 'commentText'), 1);
+  assert.equal(countLiteral(blocks.filterLogicProcessSettingsRegex, 'RegExp'), 3);
+  assert.equal(countLiteral(blocks.filterLogicCandidateMetadataSearch, 'commentText'), 3);
   assert.equal(countLiteral(blocks.filterLogicCandidateMetadataSearch, 'metadataText'), 5);
   assert.equal(countLiteral(blocks.filterLogicGlobalCommentKeywordBranch, 'filterKeywords'), 5);
   assert.equal(countLiteral(blocks.filterLogicGlobalCommentKeywordBranch, 'filterKeywordsComments'), 2);
@@ -297,16 +297,16 @@ test('JSON comment keyword provenance selected token counts remain pinned', () =
   assert.match(audit, /settings_shared compileKeywords channelRef tokens: 2/);
   assert.match(audit, /settings_shared syncFilterAllKeywords filterAllComments tokens: 2/);
   assert.match(audit, /settings_shared syncFilterAllKeywords channelRef tokens: 7/);
-  assert.match(audit, /settings_shared buildCompiledSettings filterKeywordsComments tokens: 1/);
-  assert.match(audit, /filter_logic processSettings RegExp tokens: 5/);
-  assert.match(audit, /filter_logic candidate metadata\/search commentText tokens: 1/);
-  assert.match(audit, /filter_logic candidate metadata\/search metadataText tokens: 5/);
-  assert.match(audit, /filter_logic global\/comment keyword branch filterKeywords tokens: 5/);
+  assert.match(audit, /settings_shared buildCompiledSettings filterKeywordsComments tokens: 3/);
+  assert.match(audit, /filter_logic processSettings RegExp tokens: 3/);
+  assert.match(audit, /filter_logic candidate metadata\/search commentText tokens: 3/);
+  assert.match(audit, /filter_logic candidate metadata\/search metadataText tokens: 3/);
+  assert.match(audit, /filter_logic global\/comment keyword branch filterKeywords tokens: 3/);
   assert.match(audit, /filter_logic global\/comment keyword branch filterKeywordsComments tokens: 2/);
   assert.match(audit, /filter_logic global\/comment keyword branch commentText tokens: 8/);
-  assert.match(audit, /filter_logic global\/comment keyword branch _regexMatches tokens: 5/);
-  assert.match(audit, /background V4 comment compile filterKeywordsComments tokens: 1/);
-  assert.match(audit, /background legacy comments fallback filterKeywordsComments tokens: 5/);
+  assert.match(audit, /filter_logic global\/comment keyword branch _regexMatches tokens: 3/);
+  assert.match(audit, /background V4 comment compile filterKeywordsComments tokens: 3/);
+  assert.match(audit, /background legacy comments fallback filterKeywordsComments tokens: 3/);
 });
 
 test('JSON comment keyword provenance missing future symbols remain absent from product runtime', () => {
@@ -322,7 +322,7 @@ test('settings_shared keeps comments-false channel-derived keywords global while
 
   assert.equal(compiled.filterKeywords.length, 1);
   assert.equal(compiled.filterKeywordsComments.length, 0);
-  assert.deepEqual(Object.keys(compiled.filterKeywords[0]).sort(), ['flags', 'pattern']);
+  assert.deepEqual(Object.keys(plain(compiled.filterKeywords[0])).sort(), ['flags', 'pattern']);
   assert.match(compiled.filterKeywords[0].pattern, /Muted Channel/);
   assert.equal(Object.hasOwn(compiled.filterKeywords[0], 'source'), false);
   assert.equal(Object.hasOwn(compiled.filterKeywords[0], 'channelRef'), false);
@@ -334,18 +334,18 @@ test('settings_shared comments-true channel-derived comments keyword still has n
 
   assert.equal(compiled.filterKeywords.length, 1);
   assert.equal(compiled.filterKeywordsComments.length, 1);
-  assert.deepEqual(Object.keys(compiled.filterKeywordsComments[0]).sort(), ['flags', 'pattern']);
+  assert.deepEqual(Object.keys(plain(compiled.filterKeywordsComments[0])).sort(), ['flags', 'pattern']);
   assert.match(compiled.filterKeywordsComments[0].pattern, /Muted Channel/);
   assert.equal(Object.hasOwn(compiled.filterKeywordsComments[0], 'source'), false);
   assert.equal(Object.hasOwn(compiled.filterKeywordsComments[0], 'channelRef'), false);
   assert.equal(Object.hasOwn(compiled.filterKeywordsComments[0], 'comments'), false);
 });
 
-test('JSON engine removes a comment through global channel-derived keyword despite filterAllComments false', () => {
+test('JSON engine preserves unrelated-author comment when channel-derived comments scope is disabled', () => {
   const compiled = buildCompiledSettings({ filterAllComments: false });
   const result = processComment(compiled);
 
-  assert.equal(result.contents.length, 0);
+  assert.equal(result.contents.length, 1);
 });
 
 test('same JSON comment survives when global keyword list is absent and comments-only list is empty', () => {
@@ -360,7 +360,7 @@ test('same JSON comment survives when global keyword list is absent and comments
   assert.equal(result.contents[0].commentRenderer.contentText.simpleText, 'I mention Muted Channel here');
 });
 
-test('serialized comments-only pattern is ignored while direct RegExp comment keyword blocks', () => {
+test('serialized and direct RegExp comment keywords both block matching comment bodies', () => {
   const serialized = processComment({
     filterKeywords: [],
     filterKeywordsComments: [{ pattern: 'Muted Channel', flags: 'i' }]
@@ -370,19 +370,20 @@ test('serialized comments-only pattern is ignored while direct RegExp comment ke
     filterKeywordsComments: [/Muted Channel/i]
   });
 
-  assert.equal(serialized.contents.length, 1);
+  assert.equal(serialized.contents.length, 0);
   assert.equal(direct.contents.length, 0);
 });
 
-test('source order and candidate metadata expose global-before-comment provenance gap', () => {
+test('source separates generic candidate matching from comment body matching', () => {
   const candidateBlock = blockMetric(blockSpecs.filterLogicCandidateMetadataSearch).block;
   const keywordBlock = blockMetric(blockSpecs.filterLogicGlobalCommentKeywordBranch).block;
 
-  assert.match(candidateBlock, /\.\.\.this\._collectTextFromPaths\(item, rules\.commentText\)/);
+  assert.match(candidateBlock, /this\._collectTextFromPaths\(item, rules\.commentText\)/);
   assert.match(candidateBlock, /candidate\.metadataText/);
   assert.ok(keywordBlock.indexOf('this.settings.filterKeywords.length > 0') < keywordBlock.indexOf('const commentKeywords = Array.isArray(this.settings.filterKeywordsComments)'));
   assert.ok(keywordBlock.indexOf('this._candidateSearchText(candidate)') < keywordBlock.indexOf('const commentText = rules.commentText'));
-  assert.match(doc(), /global keyword branch runs before the comment-specific\s+branch/);
-  assert.match(doc(), /A comment mentioning a Filter All channel can be removed by the global keyword branch even when that channel row has `filterAllComments: false`/);
+  assert.match(keywordBlock, /if \(!isCommentRenderer && !skipKeywordFiltering/);
+  assert.match(doc(), /2026-10-18 comment-scope revalidation/);
+  assert.match(doc(), /explicit empty comment list preserves unrelated-author comments/);
   assert.match(doc(), /JSON comment keyword provenance\s+gates/);
 });

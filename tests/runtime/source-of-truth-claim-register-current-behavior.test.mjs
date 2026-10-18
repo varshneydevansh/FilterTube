@@ -61,12 +61,16 @@ test('source of truth claim register accounts for every current exact wording oc
   const source = read(docPath);
   const refs = occurrenceRefs();
 
-  assert.equal(refs.length, 95);
-  assert.match(source, /exact source-of-truth wording occurrences: 95/);
+  assert.equal(refs.length, 101);
+  assert.match(source, /current exact wording occurrences: 101/);
 
-  for (const ref of refs) {
-    assert.ok(source.includes(ref), `missing source-of-truth claim ref ${ref}`);
+  const current = source.slice(source.indexOf('## Current Exact Wording Register - 2026-10-18'));
+  const rows = [...current.matchAll(/\| `([^`]+:\d+)` \| `([^`]+)` \|/g)];
+  assert.deepEqual(rows.map(row => row[1]).sort(), refs);
+  for (const row of rows) {
+    assert.ok(['narrow-local-owner', 'release-sync-owner', 'misleading-identity-effect-risk', 'audit-boundary', 'historical-plan'].includes(row[2]));
   }
+  assert.match(current, /current broad behavior approval from wording: NO-GO/);
 });
 
 test('source of truth claim register separates narrow owners from effect authority', () => {

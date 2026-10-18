@@ -132,7 +132,7 @@ function groupForRule(entry) {
     ['playlistRenderer', 'gridPlaylistRenderer'].includes(entry.name)
   ) return 'playlistAndGridSpecificRules';
   if (['radioRenderer', 'compactRadioRenderer', 'ticketShelfRenderer', 'podcastRenderer'].includes(entry.name)) return 'mixRadioPodcastAndTicketRules';
-  if (['channelRenderer', 'gridChannelRenderer'].includes(entry.name)) return 'channelSurfaceRules';
+  if (['channelRenderer', 'gridChannelRenderer', 'compactChannelRenderer'].includes(entry.name)) return 'channelSurfaceRules';
   if (['backstagePostThreadRenderer', 'backstagePostRenderer', 'backstagePollRenderer', 'backstageQuizRenderer'].includes(entry.name)) return 'backstagePostRules';
   if ([
     'notificationRenderer',
@@ -240,11 +240,11 @@ test('filter logic direct renderer rule register is audit-only and scoped to cur
   assert.match(text, /Runtime behavior is unchanged/);
   assert.match(text, /source file: js\/filter_logic\.js/);
   assert.match(text, /rule object: FILTER_RULES/);
-  assert.match(text, /direct rule declarations: 45/);
-  assert.match(text, /unique direct rule names: 44/);
-  assert.match(text, /duplicate direct rule name: gridVideoRenderer at lines 440 and 613/);
+  assert.match(text, /direct rule declarations: 46/);
+  assert.match(text, /unique direct rule names: 45/);
+  assert.match(text, /duplicate direct rule name: gridVideoRenderer at lines 703 and 876/);
   assert.match(text, /BASE_VIDEO_RULES alias declarations: 7/);
-  assert.match(text, /object literal rule declarations: 38/);
+  assert.match(text, /object literal rule declarations: 39/);
   assert.match(text, /semantic rule groups: 11/);
   assert.match(text, /not completion proof for every JSON path/);
 });
@@ -254,18 +254,18 @@ test('filter logic direct renderer rule register accounts for every current FILT
   const names = rows.map(row => row.name);
   const uniqueNames = new Set(names);
 
-  assert.equal(rows.length, 45);
-  assert.equal(uniqueNames.size, 44);
+  assert.equal(rows.length, 46);
+  assert.equal(uniqueNames.size, 45);
   assert.deepEqual(names.filter(name => name === 'gridVideoRenderer'), ['gridVideoRenderer', 'gridVideoRenderer']);
   assert.deepEqual(countBy(rows, 'valueShape'), {
     BASE_VIDEO_RULES: 7,
-    objectLiteral: 38
+    objectLiteral: 39
   });
   assert.deepEqual(countBy(rows, 'group'), {
     backstagePostRules: 4,
     baseVideoSharedRules: 7,
     channelContextAndLockupRules: 2,
-    channelSurfaceRules: 2,
+    channelSurfaceRules: 3,
     commentRules: 2,
     mixRadioPodcastAndTicketRules: 4,
     notificationAndOverlayRules: 6,
@@ -339,7 +339,6 @@ test('filter logic source still proves direct-rule boundaries and unsupported ga
     'watchCardRHPanelVideoRenderer',
     'watchCardRichHeaderRenderer',
     'searchRefinementCardRenderer',
-    'compactChannelRenderer',
     'sharedPostRenderer',
     'reelPlayerOverlayRenderer'
   ]) {

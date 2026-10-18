@@ -15,9 +15,9 @@ and whether a later JSON decision sees a blocklist or whitelist row.
 
 | File | Lines | Bytes | SHA-256 |
 | --- | ---: | ---: | --- |
-| `js/background.js` | 6803 | 306710 | `57ddc6c3e31112c30734ede78c9b37b01bd31533fc8a1d16856b13d2b295f0d7` |
-| `js/state_manager.js` | 2,491 | 99,780 | `509c559e35989c13cdded17c01eeaca8115addcd3848dbcda41514422e5bc7b6` |
-| `js/content_bridge.js` | 13,636 | 604,184 | `8d55d0c8995e5b68bb9142c41f95046a676f5af2b83f8545b00f91a6a5a3776d` |
+| `js/background.js` | 8538 | 386043 | `cc89bb4a0375145e1c811b7cf5953729c39c409b6b24cacdc65c80f9f6ff44d0` |
+| `js/state_manager.js` | 2,979 | 124,009 | `04879b5b1dcac9229c70d0ea14241667755682649865ad1d52030c1ce21950d3` |
+| `js/content_bridge.js` | 15,053 | 678,250 | `c653324d1f042c0473cf2102d81bcd161bfaa26f8c7ee545e250226594dc9618` |
 
 ## Source/Effect Blocks Pinned
 
@@ -25,30 +25,30 @@ and whether a later JSON decision sees a blocklist or whitelist row.
 3 single-channel rule mutation persistence source files
 9 source/effect blocks
 
-StateManager addChannel block: 75 lines, 3276 bytes
-StateManager addKidsChannel block: 79 lines, 3400 bytes
+StateManager addChannel block: 76 lines, 3393 bytes
+StateManager addKidsChannel block: 80 lines, 3450 bytes
 background addWhitelistChannelPersistent block: 40 lines, 1329 bytes
 background FilterTube_KidsWhitelistChannel block: 54 lines, 2107 bytes
 background FilterTube_KidsBlockChannel block: 43 lines, 1769 bytes
-background addChannelPersistent action block: 287 lines, 13345 bytes
-background secondary addFilteredChannel receiver block: 39 lines, 1579 bytes
-background handleAddFilteredChannel block: 894 lines, 45226 bytes
-content_bridge addChannelDirectly block: 55 lines, 2662 bytes
+background addChannelPersistent action block: 311 lines, 14558 bytes
+background secondary addFilteredChannel receiver block: 58 lines, 2408 bytes
+background handleAddFilteredChannel block: 1104 lines, 56174 bytes
+content_bridge addChannelDirectly block: 56 lines, 2759 bytes
 
 selected background mutation tokens:
   isTrustedUiSender: 2
-  isProfileSessionAuthorized: 0
+  isProfileSessionAuthorized: 3
   handleAddFilteredChannel: 5
   addChannelPersistent: 1
   addFilteredChannel: 1
   storage.local.set: 5
   browserAPI.storage.local.set: 5
-  compiledSettingsCache: 2
+  compiledSettingsCache: 4
   scheduleAutoBackupInBackground: 5
   FilterTube_RefreshNow: 1
   tabs.query: 1
   sendMessageToTabQuietly: 1
-  channelMap: 39
+  channelMap: 41
   fetchChannelInfo: 6
   performWatchIdentityFetch: 7
   performKidsWatchIdentityFetch: 3
@@ -56,13 +56,13 @@ selected background mutation tokens:
   enqueueChannelMapUpdate: 2
   enqueueVideoChannelMapUpdate: 1
   schedulePostBlockEnrichment: 1
-  targetListType: 17
+  targetListType: 18
   whitelistChannels: 12
   blockedChannels: 8
-  filterChannels: 7
+  filterChannels: 8
   ftProfilesV3: 5
-  FT_PROFILES_V4_KEY: 6
-  sendResponse: 20
+  FT_PROFILES_V4_KEY: 9
+  sendResponse: 22
 ```
 
 ## Runtime Fixtures Pinned
@@ -85,10 +85,10 @@ content_bridge_addChannelDirectly_schedules_a_second_backup_request_after_succes
 | --- | --- | --- | --- |
 | Main UI channel add | `StateManager.addChannel()` chooses `addWhitelistChannelPersistent` when `state.mode === 'whitelist'`; otherwise it sends `addChannelPersistent`. | `tests/runtime/single-channel-rule-mutation-persistence-boundary-current-behavior.test.mjs` | List target is inferred from current UI state, not from one shared mutation authority. |
 | Kids UI channel add | `StateManager.addKidsChannel()` chooses `FilterTube_KidsWhitelistChannel` when Kids mode is whitelist; otherwise it sends `FilterTube_KidsBlockChannel`. | Same runtime test. | Kids Main parity is split across separate action names and sender gates. |
-| Main whitelist single add | `addWhitelistChannelPersistent` checks `isTrustedUiSender(sender)`, validates input, then calls `handleAddFilteredChannel(..., 'main', '', 'whitelist')` and schedules `whitelist_channel_added` backup on success. | Same runtime test. | It has trusted UI sender gating, but the pinned block has no session authorization check or mutation report. |
-| Kids whitelist single add | `FilterTube_KidsWhitelistChannel` checks `isTrustedUiSender(sender)`, builds input from channel identity or `watch:<videoId>`, calls the helper with profile `kids` and list type `whitelist`, and schedules `kids_whitelist_channel_added`. | Same runtime test. | It is sender-gated but still not profile-session gated in the pinned block. |
+| Main whitelist single add | `addWhitelistChannelPersistent` checks `isTrustedUiSender(sender)`, validates input, then calls `handleAddFilteredChannel(..., 'main', '', 'whitelist')` and schedules `whitelist_channel_added` backup on success. | Same runtime test. | The trusted UI receiver delegates profile-session authorization to the shared writer. A unified mutation report remains absent. |
+| Kids whitelist single add | `FilterTube_KidsWhitelistChannel` checks `isTrustedUiSender(sender)`, builds input from channel identity or `watch:<videoId>`, calls the helper with profile `kids` and list type `whitelist`, and schedules `kids_whitelist_channel_added`. | Same runtime test. | The sender-gated receiver delegates profile-session authorization to the shared writer; the local branch alone is not the complete authorization boundary. |
 | Kids block single add | `FilterTube_KidsBlockChannel` calls `handleAddFilteredChannel(..., 'kids', rawVideoId)` and relies on the helper default `listType = 'blocklist'`. The pinned block has no local `isTrustedUiSender(sender)` token. | Same runtime test. | Kids block and Kids whitelist do not share the same sender policy. |
-| Legacy Main block add | `addChannelPersistent` is a separate inline background implementation. It normalizes input, reads root storage, fetches channel info, writes `filterChannels`, may write V4, may write `channelMap`, schedules `channel_added`, and does not call `handleAddFilteredChannel()`. | Same runtime test. | Main blocklist single-add behavior is not the same code path as whitelist, Kids, or content quick-block additions. |
+| Legacy Main block add | `addChannelPersistent` is a separate inline background implementation. It normalizes input, reads root storage, checks active-profile session authorization before fetching channel info, writes `filterChannels`, may write V4, may write `channelMap`, schedules `channel_added`, and does not call `handleAddFilteredChannel()`. | Same runtime test. | Main blocklist single-add behavior is not the same code path as whitelist, Kids, or content quick-block additions. |
 | Content quick-block add | `content_bridge.addChannelDirectly()` sends `type: 'addFilteredChannel'` with profile inferred from hostname. The secondary background receiver now normalizes `message.listType` and forwards explicit `whitelist` requests to `handleAddFilteredChannel()`; callers that omit `listType` still default to blocklist. | Same runtime test. | Content quick-block remains blocklist-shaped today, but the receiver no longer drops an explicit list target from list-aware callers. |
 | Shared helper persistence | `handleAddFilteredChannel()` normalizes URL/handle/UC/custom URL input, can call channel page fetch and watch/Shorts/Kids identity fetches, updates channel/video maps, writes V4, V3, root blocklist mirrors, or whitelist rows depending on `profile` and `targetListType`, invalidates both compiled caches, and may schedule post-block enrichment. | Same runtime test. | This helper mixes network identity repair, schema writes, cache invalidation, and future enrichment; optimization changes need side-effect budgets. |
 | Backup duplication | The secondary background receiver schedules backup after success, and `content_bridge.addChannelDirectly()` can also send `FilterTube_ScheduleAutoBackup` after the same success response. | Same runtime test. | Backup scheduling is not owned by one mutation report, so side-effect counts can drift. |
@@ -223,3 +223,13 @@ runtime behavior changed: no
 These counts are audit-only blockers. They do not approve runtime
 optimization, JSON-first behavior, method deletion, method merging, lifecycle
 cleanup, no-work changes, or whitelist behavior changes.
+
+## Revalidation - 2026-10-18
+
+Source fingerprints and bounded extraction inventories were refreshed against the current checkout after source review. These are drift detectors, not exhaustive semantic proof, installed-browser evidence, or approval of the broader missing-authority gates. Executable fixtures below remain the behavior checks.
+
+## Authorization And Target Revalidation - 2026-10-18
+
+The original May fixture identifiers containing `not_session_locked` describe receiver-local source observations, not a current end-to-end authorization result. Current receivers delegate to `handleAddFilteredChannel`, whose session check is separately asserted. The separate legacy `addChannelPersistent` writer now performs its own active-profile session check and invalidates compiled caches. A new actual-function VM fixture verifies a locked profile receives `profile_locked` before any network fetch or storage write.
+
+Main and Kids state-manager additions honor explicit target-list options before using the current mode as a default. This inventory does not establish one sender policy, unified profile-target authority, fresh authorization at every later asynchronous commit, or cross-context atomicity. Those broader proof limits remain open; no new runtime authority was added by these audit repairs.

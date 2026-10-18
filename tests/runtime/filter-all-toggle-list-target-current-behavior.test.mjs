@@ -10,9 +10,9 @@ const repoRoot = process.cwd();
 const docPath = 'docs/audit/FILTERTUBE_FILTER_ALL_TOGGLE_LIST_TARGET_CURRENT_BEHAVIOR_2026-05-23.md';
 
 const sourceFingerprints = {
-  'js/background.js': [6803, 306710, '57ddc6c3e31112c30734ede78c9b37b01bd31533fc8a1d16856b13d2b295f0d7'],
-  'js/content_bridge.js': [13636, 604184, '8d55d0c8995e5b68bb9142c41f95046a676f5af2b83f8545b00f91a6a5a3776d'],
-  'js/state_manager.js': [2491, 99780, '509c559e35989c13cdded17c01eeaca8115addcd3848dbcda41514422e5bc7b6']
+  'js/background.js': [8538, 386043, 'cc89bb4a0375145e1c811b7cf5953729c39c409b6b24cacdc65c80f9f6ff44d0'],
+  'js/content_bridge.js': [15053, 678250, 'c653324d1f042c0473cf2102d81bcd161bfaa26f8c7ee545e250226594dc9618'],
+  'js/state_manager.js': [2979, 124009, '04879b5b1dcac9229c70d0ea14241667755682649865ad1d52030c1ce21950d3']
 };
 
 const blockSpecs = {
@@ -20,7 +20,7 @@ const blockSpecs = {
     file: 'js/background.js',
     start: "if (message.type === 'toggleChannelFilterAll')",
     end: 'return false;\n});',
-    startLine: 5765,
+    startLine: 7129,
     lines: 14,
     bytes: 413,
     hash: '7e15cc800cdde69487959513b30d2cfab29c55f9b1caa566f96b99bcb844c94e'
@@ -28,26 +28,26 @@ const blockSpecs = {
   backgroundHandleToggleChannelFilterAll: {
     file: 'js/background.js',
     start: 'async function handleToggleChannelFilterAll(channelId, value) {',
-    end: "console.log(`FilterTube Background ${IS_FIREFOX ? 'Script' : 'Service Worker'} loaded and ready to serve filtered content.`);",
-    startLine: 6691,
-    lines: 95,
-    bytes: 3435,
-    hash: '84afd60fbb6c140a1a20880b7cb2b81a7ce33fe95c89b4278c1d00e1b1756dd4'
+    end: 'async function loadImportedChannelEnrichmentProfiles() {',
+    startLine: 8265,
+    lines: 115,
+    bytes: 4346,
+    hash: 'fb6605fa4f172708f0eceacbbc21f9cf99ba0c3c9ca8ee2177e60bb1dab65ee6'
   },
   contentBridgeAddFilterAllContentCheckbox: {
     file: 'js/content_bridge.js',
     start: 'function addFilterAllContentCheckbox(menuItem, channelData) {',
     end: 'function contentBridgeAmpersandTopicSingleChannelMenuGuard(channelInfo, videoCard) {',
-    startLine: 13499,
-    lines: 66,
-    bytes: 2391,
-    hash: '03861f56c173757f479e0863d16fab83df5ba180e5d21d8adb37cdf0b5fcb490'
+    startLine: 14915,
+    lines: 67,
+    bytes: 2525,
+    hash: 'a9c6c874a5e2a8b527d4ba3fcbb7e6957cc3d6210fdd61af5ad6d1d7102a8cb1'
   },
   stateManagerToggleChannelFilterAll: {
     file: 'js/state_manager.js',
     start: 'async function toggleChannelFilterAll(index) {',
     end: 'async function toggleChannelFilterAllCommentsByRef(channelRef) {',
-    startLine: 1892,
+    startLine: 2310,
     lines: 34,
     bytes: 988,
     hash: 'b7028d96e93e5b89cfcf68d83d09256c9b06888a3b5b0ee181e6165f74318298'
@@ -56,10 +56,10 @@ const blockSpecs = {
     file: 'js/state_manager.js',
     start: 'async function toggleKidsChannelFilterAll(index) {',
     end: '/**\n     * Save current state to storage',
-    startLine: 968,
-    lines: 36,
-    bytes: 1188,
-    hash: 'f798f6b4a379f1101dea3b1777b046e2631ea1ab032b01b56716dc09878b72ac'
+    startLine: 1254,
+    lines: 40,
+    bytes: 1419,
+    hash: '768f37c9efb5ad5071f5ce96b965c402edb9622001368a0be48b59a5a49069a2'
   }
 };
 
@@ -70,16 +70,16 @@ const selectedCounts = {
   whitelistChannels: 0,
   blockedChannels: 8,
   ftProfilesV3: 1,
-  FT_PROFILES_V4_KEY: 3,
+  FT_PROFILES_V4_KEY: 4,
   currentSettings: 0,
-  filterAll: 18,
+  filterAll: 21,
   filterAllComments: 1,
   channelId: 6,
   channelData: 4,
   'message.channelId': 1,
   'message.value': 1,
   isTrustedUiSender: 0,
-  isProfileSessionAuthorized: 0,
+  isProfileSessionAuthorized: 1,
   'storage.local.get': 1,
   'storage.local.set': 1,
   'compiledSettingsCache.main = null': 1,
@@ -93,7 +93,7 @@ const selectedCounts = {
   persistKidsProfiles: 1,
   notifyListeners: 2,
   isUiLocked: 2,
-  profile: 10,
+  profile: 22,
   kids: 20,
   main: 8,
   querySelector: 4,
@@ -260,6 +260,17 @@ function loadBackgroundToggleRuntime(storageState) {
     Boolean
   };
   vm.createContext(context);
+  context.sessionPinCache = new Map();
+  context.Date = Date;
+  const background = read('js/background.js');
+  const authHelpers = ['normalizeString', 'extractPinVerifierFromProfilesV4', 'isSessionPinCacheEntryFresh', 'isProfileSessionAuthorized']
+    .map(name => {
+      const start = background.indexOf(`function ${name}(`);
+      const end = background.indexOf('\n}', start);
+      assert.ok(start >= 0 && end > start, `current authorization helper ${name}`);
+      return background.slice(start, end + 2);
+    }).join('\n');
+  vm.runInContext(authHelpers, context);
   vm.runInContext(`${blockMetric(blockSpecs.backgroundHandleToggleChannelFilterAll).block}\nthis.handleToggleChannelFilterAll = handleToggleChannelFilterAll;`, context);
   return { context, getCalls, setPayloads };
 }
@@ -419,6 +430,17 @@ test('background helper returns not found for whitelist-only row and writes noth
   assert.deepEqual(runtime.context.compiledSettingsCache, { main: { cached: true }, kids: { cached: true } });
 });
 
+test('background Filter All toggle preserves the actual locked-profile authorization boundary', async () => {
+  const channel = { id: 'UCfilteralltoggle0000001', handle: '@filterall', filterAll: false };
+  const profiles = fixtureProfilesV4(channel);
+  profiles.profiles.active.security = { profilePinVerifier: { hash: 'synthetic-locked-verifier' } };
+  const runtime = loadBackgroundToggleRuntime({ filterChannels: [channel], ftProfilesV4: profiles });
+  const result = await runtime.context.handleToggleChannelFilterAll(channel.id, true);
+  assert.equal(result.success, false);
+  assert.equal(result.errorCode, 'profile_locked');
+  assert.equal(runtime.setPayloads.length, 0);
+});
+
 test('StateManager Main and Kids Filter All UI paths guard whitelist mode', () => {
   const mainBlock = blockMetric(blockSpecs.stateManagerToggleChannelFilterAll).block;
   const kidsBlock = blockMetric(blockSpecs.stateManagerToggleKidsChannelFilterAll).block;
@@ -432,7 +454,9 @@ test('StateManager Main and Kids Filter All UI paths guard whitelist mode', () =
   assert.match(mainBlock, /scheduleAutoBackup\('filter_all_toggled'\);/);
 
   assert.match(kidsBlock, /if \(isUiLocked\(\)\) \{/);
-  assert.match(kidsBlock, /if \(kids\.mode === 'whitelist'\) \{/);
+  assert.match(kidsBlock, /options\?\.targetList === 'block'/);
+  assert.match(kidsBlock, /kids\.mode === 'whitelist' \? 'allow' : 'block'/);
+  assert.match(kidsBlock, /if \(targetList !== 'block'\) \{/);
   assert.match(kidsBlock, /existing\.filterAll = !existing\.filterAll;/);
   assert.match(kidsBlock, /await persistKidsProfiles\(state\.kids\);/);
   assert.match(kidsBlock, /await requestRefresh\('kids'\);/);

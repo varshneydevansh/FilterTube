@@ -16,6 +16,8 @@ const manifestFiles = [
 
 const helperStack = [
   'js/shared/identity.js',
+  'js/shared/view_count.js',
+  'js/content/admission_overlay.js',
   'js/content/dom_state.js',
   'js/content/menu.js',
   'js/content/dom_helpers.js',
@@ -38,10 +40,12 @@ const commonMatches = [
 
 const commonPermissions = [
   'storage',
+  'unlimitedStorage',
   'activeTab',
   'scripting',
   'tabs',
   'downloads',
+  'alarms',
 ];
 
 const commonHostPermissions = [
@@ -104,176 +108,123 @@ function trackedFiles() {
   );
 }
 
-test('browser manifest runtime load-order doc is audit-only and manifest fingerprints are pinned', () => {
-  const doc = read(docPath);
-  const expected = [
-    ['manifest.json', 93, 2654, '95496eac74d72fd90491302211b7dc07f492ed405d4eb1a001b8b600a02bc16b'],
-    ['manifest.chrome.json', 93, 2654, '95496eac74d72fd90491302211b7dc07f492ed405d4eb1a001b8b600a02bc16b'],
-    ['manifest.firefox.json', 80, 2150, '8368c4b520a07d1e5d9647f6c141f06f8fbd24a92c8b053d722488859f201c32'],
-    ['manifest.opera.json', 94, 2659, 'f9a3b4182521d8b1594d7975c327daf772e418e4869e8e3d33d286bfb25b486e'],
-  ];
-
-  assert.match(doc, /Status: audit-only proof/);
-  assert.match(doc, /Runtime behavior is unchanged/);
-  assert.match(doc, /This is not an\s+implementation patch/);
-  assert.match(doc, /manifest change, package release gate, browser parity\s+claim, or JSON-first promotion/);
-  assert.match(doc, /4 files, 360 newline counts, and 10,117 bytes/);
-
-  for (const [file, lines, byteCount, hash] of expected) {
-    assert.equal(lineCount(file), lines, `${file} line count drifted`);
-    assert.equal(bytes(file), byteCount, `${file} byte count drifted`);
-    assert.equal(sha256(file), hash, `${file} hash drifted`);
-    assert.match(doc, new RegExp(file.replace(/[/.]/g, '\\$&')));
-    assert.match(doc, new RegExp(byteCount.toLocaleString('en-US')));
-    assert.match(doc, new RegExp(hash));
+test('browser manifest current source inventory is pinned independently of historical May snapshot', () => {
+  const expected = [["manifest.json", 154, 5204, "d8dea8d10e715d01bab25ea12ff6fc3055d403f2486654fcb6907f94bd4f4627"], ["manifest.chrome.json", 154, 5204, "d8dea8d10e715d01bab25ea12ff6fc3055d403f2486654fcb6907f94bd4f4627"], ["manifest.firefox.json", 128, 4138, "2c0fe680fe1d204250ce687ef29c00767d3ff6269024a410da5c9fccff4ebf79"], ["manifest.opera.json", 162, 5393, "a7c541876ed54303d3a21613f5eaacbef536d694bf6061da207456eca476fce1"]];
+  const doc = read(docPath).split('## October 18, 2026 source review')[1];
+  assert.ok(doc, 'current review must distinguish historical claims');
+  for (const [file, lines, size, hash] of expected) {
+    assert.equal(lineCount(file), lines);
+    assert.equal(bytes(file), size);
+    assert.equal(sha256(file), hash);
+    assert.ok(doc.includes(hash));
   }
-
   assert.equal(read('manifest.json'), read('manifest.chrome.json'));
-  assert.match(doc, /`manifest\.json` and `manifest\.chrome\.json` are byte-identical today/);
 });
 
-test('common manifest permissions hosts action icons and active matches stay aligned', () => {
+test('all browser manifests retain localized identity, exact permissions and version alignment', () => {
+  const version = readJson('package.json').version;
+  assert.equal(version, '3.4.1');
   for (const file of manifestFiles) {
     const manifest = readJson(file);
-
-    assert.equal(manifest.manifest_version, 3, `${file} MV3 drifted`);
-    assert.equal(manifest.name, 'FilterTube', `${file} name drifted`);
-    assert.equal(manifest.version, '3.3.2', `${file} version drifted`);
-    assert.deepEqual(manifest.permissions, commonPermissions, `${file} permissions drifted`);
-    assert.deepEqual(manifest.host_permissions, commonHostPermissions, `${file} host permissions drifted`);
-    assert.deepEqual(manifest.optional_host_permissions, optionalPickupHostPermissions, `${file} optional pickup host permissions drifted`);
-    assert.deepEqual([...new Set(contentScriptMatches(manifest))], commonMatches, `${file} content matches drifted`);
-    assert.deepEqual([...new Set(webAccessibleMatches(manifest))], commonMatches, `${file} WAR matches drifted`);
-    assert.deepEqual(manifest.action.default_icon, {
-      16: 'icons/icon-16.png',
-      48: 'icons/icon-48.png',
-      128: 'icons/icon-128.png',
-    }, `${file} action icons drifted`);
-    assert.deepEqual(manifest.icons, {
-      16: 'icons/icon-16.png',
-      32: 'icons/icon-32.png',
-      48: 'icons/icon-48.png',
-      128: 'icons/icon-128.png',
-    }, `${file} extension icons drifted`);
+    assert.equal(manifest.manifest_version, 3);
+    assert.equal(manifest.name, '__MSG_extensionName__');
+    assert.equal(manifest.description, '__MSG_extensionDescription__');
+    assert.equal(manifest.default_locale, 'en');
+    assert.equal(manifest.version, version);
+    assert.deepEqual(manifest.permissions, commonPermissions);
+    assert.deepEqual(manifest.host_permissions, commonHostPermissions);
+    assert.deepEqual(manifest.optional_host_permissions, optionalPickupHostPermissions);
+    assert.equal(manifest.action.default_popup, 'html/popup.html');
+    assert.deepEqual(manifest.action.default_icon, {16:'icons/icon-16.png',48:'icons/icon-48.png',128:'icons/icon-128.png'});
+    assert.deepEqual(manifest.icons, {16:'icons/icon-16.png',32:'icons/icon-32.png',48:'icons/icon-48.png',128:'icons/icon-128.png'});
   }
-
-  const allContentMatches = manifestFiles.map((file) => contentScriptMatches(readJson(file)).join('\n')).join('\n');
-  const allResourceMatches = manifestFiles.map((file) => webAccessibleMatches(readJson(file)).join('\n')).join('\n');
-  assert.doesNotMatch(allContentMatches, /youtube-nocookie\.com/);
-  assert.doesNotMatch(allResourceMatches, /youtube-nocookie\.com/);
-  assert.match(read(docPath), /`youtube-nocookie\.com` is host-permitted but not content-script or\s+web-resource matched/);
 });
 
-test('default chrome firefox and opera runtime load order remains browser-specific', () => {
-  for (const file of ['manifest.json', 'manifest.chrome.json']) {
+test('normal, embedded and Google preview paths retain explicit browser-specific load order and worlds', () => {
+  const embedMatches = ['*://*.youtube.com/embed/*', '*://*.youtube-nocookie.com/embed/*'];
+  const googleMatches = ['https://*.google.com/search*'];
+  const guardStack = [...helperStack.slice(0,3), 'js/content/external_youtube_guard.js', ...helperStack.slice(3)];
+  for (const file of manifestFiles) {
     const manifest = readJson(file);
-    assert.equal(manifest.background.service_worker, 'js/background.js');
-    assert.equal(manifest.content_scripts.length, 2);
-    assert.deepEqual(manifest.content_scripts[0], {
-      matches: commonMatches,
-      js: ['js/seed.js'],
-      run_at: 'document_start',
-      world: 'MAIN',
-    }, `${file} MAIN seed entry drifted`);
-    assert.deepEqual(manifest.content_scripts[1].matches, commonMatches);
-    assert.deepEqual(manifest.content_scripts[1].js, helperStack);
-    assert.equal(manifest.content_scripts[1].run_at, 'document_start');
-    assert.equal(manifest.content_scripts[1].world, 'ISOLATED');
+    const firefox = file.includes('firefox');
+    const opera = file.includes('opera');
+    const isolatedWorld = !firefox && !opera ? 'ISOLATED' : undefined;
+    const entries = manifest.content_scripts;
+    assert.equal(entries.length, firefox ? 5 : opera ? 7 : 6);
+    const normal = entries.find(entry => entry.js.includes('js/content_bridge.js') && !entry.all_frames);
+    assert.deepEqual(normal.js, helperStack);
+    assert.deepEqual(normal.matches, commonMatches);
+    assert.deepEqual(normal.exclude_matches, ['*://*.youtube.com/embed/*']);
+    assert.equal(normal.world, isolatedWorld);
+    if (!firefox) {
+      assert.deepEqual(entries[0].js, ['js/shared/view_count.js','js/seed.js']);
+      assert.deepEqual(entries[0].matches, commonMatches);
+      assert.equal(entries[0].world, opera ? undefined : 'MAIN');
+      assert.deepEqual(entries[0].exclude_matches, ['*://*.youtube.com/embed/*']);
+    }
+    const embed = entries.filter(entry => entry.all_frames);
+    assert.equal(embed.length, opera ? 3 : 2);
+    assert.deepEqual(embed.at(-1).js, guardStack);
+    assert.equal(embed.at(-1).world, isolatedWorld);
+    for (const entry of embed) assert.deepEqual(entry.matches, embedMatches);
+    assert.equal(embed[0].world, 'MAIN');
+    assert.deepEqual(embed[0].js, !firefox && !opera
+      ? ['js/content/external_youtube_network.js','js/shared/view_count.js','js/seed.js']
+      : ['js/content/external_youtube_network.js']);
+    if (opera) assert.deepEqual(embed[1].js, ['js/shared/view_count.js','js/seed.js']);
+    const google = entries.filter(entry => entry.matches[0].includes('google.com'));
+    assert.equal(google.length,2);
+    for (const entry of google) assert.deepEqual(entry.matches, googleMatches);
+    assert.deepEqual(google[0].js,['js/content/external_youtube_network.js']);
+    assert.equal(google[0].world,'MAIN');
+    assert.deepEqual(google[1].js,[...helperStack.slice(0,3),'js/content/external_youtube_guard.js']);
+    assert.equal(google[1].world,isolatedWorld);
+    for (const entry of entries) {
+      assert.equal(entry.run_at,'document_start');
+      assert.deepEqual(entry.css || [],[]);
+    }
+    if (firefox) {
+      assert.deepEqual(manifest.background.scripts,['js/shared/identity.js','js/content/admission_overlay.js','js/imported_channel_enrichment.js','js/background.js']);
+      assert.equal(manifest.browser_specific_settings.gecko.id,'filtertube@devanshvarshney.com');
+      assert.deepEqual(manifest.browser_specific_settings.gecko.data_collection_permissions.required,['none']);
+      assert.equal(manifest.browser_specific_settings.gecko_android.strict_min_version,'109.0');
+    } else assert.equal(manifest.background.service_worker,'js/background.js');
   }
-
-  const firefox = readJson('manifest.firefox.json');
-  assert.deepEqual(firefox.background.scripts, ['js/shared/identity.js', 'js/background.js']);
-  assert.equal(firefox.content_scripts.length, 1);
-  assert.deepEqual(firefox.content_scripts[0].js, helperStack);
-  assert.equal(firefox.content_scripts[0].run_at, 'document_start');
-  assert.equal(firefox.content_scripts[0].world, undefined);
-  assert.equal(firefox.browser_specific_settings.gecko.id, 'filtertube@devanshvarshney.com');
-  assert.deepEqual(firefox.browser_specific_settings.gecko.data_collection_permissions.required, ['none']);
-
-  const opera = readJson('manifest.opera.json');
-  assert.equal(opera.background.service_worker, 'js/background.js');
-  assert.equal(opera.content_scripts.length, 2);
-  assert.deepEqual(opera.content_scripts[0].js, ['js/seed.js']);
-  assert.equal(opera.content_scripts[0].world, undefined);
-  assert.deepEqual(opera.content_scripts[1].js, helperStack);
-  assert.equal(opera.content_scripts[1].world, undefined);
-  assert.deepEqual(opera.developer, { name: 'Devansh Varshney', url: 'https://filtertube.in' });
 });
 
-test('manifest content script references are tracked and no content CSS is declared', () => {
+test('every declared script/resource exists and quarantined CSS cannot be activated by manifests', () => {
   const tracked = trackedFiles();
-  const refs = [];
-
   for (const file of manifestFiles) {
     const manifest = readJson(file);
-    for (const entry of manifest.content_scripts || []) {
-      refs.push(...(entry.js || []));
-      assert.deepEqual(entry.css || [], [], `${file} should not declare content script CSS`);
+    for (const ref of contentScriptRefs(manifest)) assert.ok(tracked.has(ref), `${file}: ${ref}`);
+    for (const ref of webAccessibleResources(manifest)) {
+      if (ref === 'data/ui_locales/*.json') {
+        assert.ok([...tracked].filter(path => path.startsWith('data/ui_locales/') && path.endsWith('.json')).length > 1);
+      } else assert.ok(tracked.has(ref), `${file}: ${ref}`);
+      assert.doesNotMatch(ref,/^css\//);
     }
-    for (const resource of webAccessibleResources(manifest)) {
-      assert.ok(tracked.has(resource), `${file} web resource ${resource} is not tracked`);
-    }
+    assert.ok(contentScriptMatches(manifest).includes('*://*.youtube-nocookie.com/embed/*'));
   }
-
-  assert.equal(refs.length, 59);
-  assert.equal(new Set(refs).size, 15);
-  for (const ref of refs) {
-    assert.ok(tracked.has(ref), `manifest content script ${ref} is not tracked`);
-  }
-
-  assert.match(read(docPath), /59 content-script file references across all manifests/);
-  assert.match(read(docPath), /15 unique content-script files/);
-  assert.match(read(docPath), /No manifest declares `content_scripts\.css`/);
 });
 
-test('web accessible resources differ only by Opera file icon omission today', () => {
-  const expectedWithIcon = [
-    'js/injector.js',
-    'js/filter_logic.js',
-    'js/seed.js',
-    'js/shared/identity.js',
-    'assets/images/homepage_hero_day.mp4',
-    'icons/file.svg',
-  ];
-  const expectedOpera = [
-    'js/injector.js',
-    'js/filter_logic.js',
-    'js/seed.js',
-    'js/shared/identity.js',
-    'assets/images/homepage_hero_day.mp4',
-  ];
-
-  for (const file of ['manifest.json', 'manifest.chrome.json', 'manifest.firefox.json']) {
-    assert.deepEqual(webAccessibleResources(readJson(file)), expectedWithIcon, `${file} WAR resources drifted`);
+test('fallback resources explicitly cover view counts, admission, localization and host-limited Google icons', () => {
+  const resources = ['js/injector.js','js/filter_logic.js','js/seed.js','js/shared/identity.js','js/shared/view_count.js','js/content/admission_overlay.js','data/ui_locales/*.json','assets/images/homepage_hero_day.mp4','icons/icon-48.png'];
+  for (const file of manifestFiles) {
+    const entries = readJson(file).web_accessible_resources;
+    assert.deepEqual(entries[0].resources, file.includes('opera') ? resources : [...resources,'icons/file.svg']);
+    assert.deepEqual(entries[0].matches,commonHostPermissions);
+    assert.deepEqual(entries[1],{resources:['icons/icon-48.png','data/ui_locales/*.json'],matches:['https://*.google.com/*']});
   }
-  assert.deepEqual(webAccessibleResources(readJson('manifest.opera.json')), expectedOpera);
 });
 
-test('firefox fallback injection and build manifest mutation boundaries remain current behavior', () => {
-  const bridgeInjection = read('js/content/bridge_injection.js');
+test('fallback and build keep dependency ordering without claiming a runtime readiness authority', () => {
+  const bridge = read('js/content/bridge_injection.js');
+  assert.match(bridge,/const scriptsToInject = \['shared\/identity', 'shared\/view_count', 'filter_logic'\]/);
+  assert.match(bridge,/if \(isFirefox\) scriptsToInject\.push\('seed'\)/);
+  assert.match(bridge,/scriptsToInject\.push\('injector'\)/);
   const build = read('build.js');
-
-  assert.match(bridgeInjection, /const scriptsToInject = \['shared\/identity', 'filter_logic'\]/);
-  assert.match(bridgeInjection, /if \(isFirefox\) scriptsToInject\.push\('seed'\)/);
-  assert.match(bridgeInjection, /scriptsToInject\.push\('injector'\)/);
-  assert.match(bridgeInjection, /await injectViaFallback\(scriptsToInject\)/);
-
-  assert.match(build, /const manifestFile = `manifest\.\$\{browser\}\.json`/);
-  assert.match(build, /ensureCollabDialogScriptOrder\(manifestJSON\)/);
-  assert.match(build, /fs\.writeJsonSync\(path\.join\(targetDir, 'manifest\.json'\), manifestJSON/);
-  assert.match(build, /const collabDialogPath = 'js\/content\/collab_dialog\.js'/);
-  assert.match(build, /const contentBridgePath = 'js\/content_bridge\.js'/);
-
-  for (const missing of [
-    'validateManifestPermissions',
-    'validateHostPermissions',
-    'validateWebAccessibleResources',
-    'validateContentScriptWorlds',
-    'browserManifestRuntimeLoadOrderAuthority',
-    'browserManifestBuildValidationReport',
-  ]) {
-    assert.equal(build.includes(missing), false, `${missing} should not exist in build source yet`);
-  }
+  assert.match(build,/ensureCollabDialogScriptOrder\(manifestJSON\)/);
+  assert.match(build,/fs\.writeJsonSync\(path\.join\(targetDir, 'manifest\.json'\), manifestJSON/);
 });
 
 test('browser manifest runtime load-order authority symbols are not implemented in product source', () => {

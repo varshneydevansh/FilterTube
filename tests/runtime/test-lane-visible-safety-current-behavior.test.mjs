@@ -395,7 +395,7 @@ test('done criteria keep the active change-safety objective release gates intact
   const requiredCriteria = [
     'A change is not release-ready until:',
     '- the relevant lane command passes;',
-    '- `npm run test:audit-drift` passes when lane-owned source fingerprints changed;',
+    '- `npm run test:audit-drift` passes when lane-workflow source fingerprints changed;',
     '- a fixture or runtime test proves any behavior change;',
     '- the relevant proof doc under `docs/audit/` is updated;',
     '- visible YouTube behavior gets a manual smoke pass when user-facing;',

@@ -13,26 +13,28 @@ This is not completion proof for every nested local callback, local arrow
 function, JSON field path, or every repository method. It is a current-behavior
 boundary for the filter-logic engine file.
 
+Current-source register reviewed on 2026-10-18. This refresh changes no runtime behavior or broad proof approval.
+
 ## Source-Derived Summary
 
 ```text
 source file: js/filter_logic.js
-split source lines: 3653
-wc line count: 3652
-source bytes: 172174
-source sha256: 953ef0f14970e6cfbc11215fe9eaa078ced34f001908e1c6d5903a8fd2d9a1f5
+split source lines: 4535
+wc line count: 4534
+source bytes: 221980
+source sha256: f7021a053af96a4cd31a577f56e900ffb1a5d990fe55a838af64a6dba867afc4
 source object/class: YouTubeDataFilter
 global interface: window.FilterTubeEngine
-method and entrypoint rows: 60
-top-level helper function declarations: 13
-YouTubeDataFilter class methods: 45
+method and entrypoint rows: 79
+top-level helper function declarations: 21
+YouTubeDataFilter class methods: 56
 FilterTubeEngine global interface functions: 2
 semantic method groups: 12
-repo-wide broad parser lexical callable matches: 313
-broad parser declaration/inventory matches: 73
-semantic method rows promoted: 60
-local callable tokens held below method authority: 13
-control-flow lexical artifacts: 240
+repo-wide broad parser lexical callable matches: 375
+broad parser declaration/inventory matches: 101
+semantic method rows promoted: 79
+local callable tokens held below method authority: 19
+control-flow lexical artifacts: 274
 file-local executable proof probes: 7
 global method proof count promoted: 0
 runtime behavior changed: no
@@ -42,17 +44,17 @@ runtime behavior changed: no
 
 ```text
 autoplayEndpointFiltering: 5
-blockDecisionPipeline: 4
+blockDecisionPipeline: 6
 candidateAndRendererUnwrap: 8
 channelHandleExtractionHelpers: 3
-channelMatchPolicy: 4
-constructionAndSettings: 3
+channelMatchPolicy: 9
+constructionAndSettings: 5
 debugBridgeAndBatchQueues: 3
-fieldExtractionAndParsing: 8
+fieldExtractionAndParsing: 17
 harvestAndMapWrites: 10
 loggingAndDecisionTelemetry: 2
 pathTextAndMetadataHelpers: 6
-recursionAndEntrypoints: 4
+recursionAndEntrypoints: 5
 ```
 
 ## Lexical Callable Reconciliation
@@ -62,88 +64,112 @@ interface functions, local arrow helpers, and control-flow blocks in
 `js/filter_logic.js`. Reconciliation for this source is:
 
 ```text
-js/filter_logic.js broad callable matches: 313
-accepted top-level helper function rows: 13
-accepted YouTubeDataFilter class method rows: 45
+js/filter_logic.js broad callable matches: 375
+accepted top-level helper function rows: 21
+accepted YouTubeDataFilter class method rows: 56
 accepted FilterTubeEngine global interface function rows: 2
-accepted local arrow callable tokens: 13
-accepted declaration/inventory rows total: 73
-accepted semantic method rows promoted: 60
-rejected control-flow artifacts total: 240
-rejected if artifacts: 181
-rejected for artifacts: 59
+accepted local arrow callable tokens: 19
+accepted declaration/inventory rows total: 101
+accepted semantic method rows promoted: 79
+rejected control-flow artifacts total: 274
+rejected if artifacts: 208
+rejected for artifacts: 66
 global method proof count promoted: 0
 runtime behavior changed: no
 ```
 
-The 13 accepted local callable tokens remain implementation details below the
-60 promoted semantic method rows. They do not authorize JSON renderer expansion,
+The 19 accepted local callable tokens remain implementation details below the
+79 promoted semantic method rows. They do not authorize JSON renderer expansion,
 method extraction, no-work pruning, or map-write behavior changes.
+
+The named `FilterTubePerfDebug.enabled`, `.now`, and `.log` object members add three
+explicit diagnostic inventory rows below method authority. Together with 79
+method rows and 19 local arrows, they reconcile the 101 non-control matches;
+none of these lexical counts establishes complete behavioral proof.
 
 ## Current Method Inventory
 
 | Source line | Scope | Method or function | Semantic group |
 | --- | --- | --- | --- |
-| 21 | `topLevelFunction` | `postLogToBridge` | `debugBridgeAndBatchQueues` |
-| 50 | `topLevelFunction` | `hasAutoplayEndpointKey` | `autoplayEndpointFiltering` |
-| 58 | `topLevelFunction` | `queueVideoChannelMapping` | `debugBridgeAndBatchQueues` |
-| 94 | `topLevelFunction` | `queueVideoMetaMapping` | `debugBridgeAndBatchQueues` |
-| 163 | `topLevelFunction` | `getByPath` | `pathTextAndMetadataHelpers` |
-| 184 | `topLevelFunction` | `flattenText` | `pathTextAndMetadataHelpers` |
-| 221 | `topLevelFunction` | `getTextFromPaths` | `pathTextAndMetadataHelpers` |
-| 235 | `topLevelFunction` | `normalizeChannelHandle` | `channelHandleExtractionHelpers` |
-| 271 | `topLevelFunction` | `findHandleInValue` | `channelHandleExtractionHelpers` |
-| 305 | `topLevelFunction` | `extractChannelHandleFromPaths` | `channelHandleExtractionHelpers` |
-| 314 | `topLevelFunction` | `flattenMetadataRow` | `pathTextAndMetadataHelpers` |
-| 345 | `topLevelFunction` | `flattenMetadataRowsContainer` | `pathTextAndMetadataHelpers` |
-| 364 | `topLevelFunction` | `getMetadataRowsText` | `pathTextAndMetadataHelpers` |
-| 854 | `classMethod` | `constructor` | `constructionAndSettings` |
-| 865 | `classMethod` | `_buildChannelFilterIndex` | `constructionAndSettings` |
-| 876 | `classMethod` | `_matchesAnyChannel` | `channelMatchPolicy` |
-| 895 | `classMethod` | `_harvestBrowseEndpoint` | `harvestAndMapWrites` |
-| 947 | `classMethod` | `_processSettings` | `constructionAndSettings` |
-| 1076 | `classMethod` | `_harvestChannelData` | `harvestAndMapWrites` |
-| 1183 | `classMethod` | `_harvestPlayerOwnerData` | `harvestAndMapWrites` |
-| 1290 | `classMethod` | `_harvestRendererChannelMappings` | `harvestAndMapWrites` |
-| 1344 | `classMethod` | `_harvestVideoOwnerFromRenderer` | `harvestAndMapWrites` |
-| 1379 | `classMethod` | `_registerVideoChannelMapping` | `harvestAndMapWrites` |
-| 1395 | `classMethod` | `_registerVideoMetaMapping` | `harvestAndMapWrites` |
-| 1429 | `classMethod` | `_harvestFromRendererByline` | `harvestAndMapWrites` |
-| 1485 | `classMethod` | `_registerMapping` | `harvestAndMapWrites` |
-| 1525 | `classMethod` | `_registerCustomUrlMapping` | `harvestAndMapWrites` |
-| 1566 | `classMethod` | `_log` | `loggingAndDecisionTelemetry` |
-| 1579 | `classMethod` | `_logWhitelistDecision` | `loggingAndDecisionTelemetry` |
-| 1598 | `classMethod` | `_unwrapRendererForFiltering` | `candidateAndRendererUnwrap` |
-| 1642 | `classMethod` | `_paths` | `candidateAndRendererUnwrap` |
-| 1647 | `classMethod` | `_collectTextFromPaths` | `candidateAndRendererUnwrap` |
-| 1672 | `classMethod` | `_extractVideoId` | `candidateAndRendererUnwrap` |
-| 1695 | `classMethod` | `_extractPlaylistId` | `candidateAndRendererUnwrap` |
-| 1711 | `classMethod` | `_emptyChannelInfo` | `channelMatchPolicy` |
-| 1715 | `classMethod` | `_hasChannelPolicyRules` | `channelMatchPolicy` |
-| 1721 | `classMethod` | `_buildCandidate` | `candidateAndRendererUnwrap` |
-| 1801 | `classMethod` | `_candidateSearchText` | `candidateAndRendererUnwrap` |
-| 1816 | `classMethod` | `_extractAutoplayEndpointVideoId` | `autoplayEndpointFiltering` |
-| 1830 | `classMethod` | `_autoplayEndpointCandidate` | `autoplayEndpointFiltering` |
-| 1862 | `classMethod` | `_shouldBlockAutoplayEndpoint` | `autoplayEndpointFiltering` |
-| 1929 | `classMethod` | `_shouldDropAutoplayEndpointSet` | `autoplayEndpointFiltering` |
-| 1939 | `classMethod` | `_regexMatches` | `candidateAndRendererUnwrap` |
-| 1957 | `classMethod` | `_shouldBlock` | `blockDecisionPipeline` |
-| 2263 | `classMethod` | `_checkCategoryFilters` | `blockDecisionPipeline` |
-| 2324 | `classMethod` | `_extractTitle` | `fieldExtractionAndParsing` |
-| 2348 | `classMethod` | `_extractDescription` | `fieldExtractionAndParsing` |
-| 2385 | `classMethod` | `_parseDurationToSeconds` | `fieldExtractionAndParsing` |
-| 2416 | `classMethod` | `_parseAriaLabelDurationSeconds` | `fieldExtractionAndParsing` |
-| 2431 | `classMethod` | `_parseRelativeTimeToTimestamp` | `fieldExtractionAndParsing` |
-| 2470 | `classMethod` | `_extractDuration` | `fieldExtractionAndParsing` |
-| 2708 | `classMethod` | `_extractPublishedTime` | `fieldExtractionAndParsing` |
-| 2838 | `classMethod` | `_checkContentFilters` | `blockDecisionPipeline` |
-| 2997 | `classMethod` | `_checkUppercaseTitle` | `blockDecisionPipeline` |
-| 3033 | `classMethod` | `_extractChannelInfo` | `fieldExtractionAndParsing` |
-| 3355 | `classMethod` | `_matchesChannel` | `channelMatchPolicy` |
-| 3528 | `classMethod` | `filter` | `recursionAndEntrypoints` |
-| 3588 | `classMethod` | `processData` | `recursionAndEntrypoints` |
-| 3631 | `globalInterfaceFunction` | `FilterTubeEngine.processData` | `recursionAndEntrypoints` |
-| 3639 | `globalInterfaceFunction` | `FilterTubeEngine.harvestOnly` | `recursionAndEntrypoints` |
+| 44 | `topLevelFunction` | `postLogToBridge` | `debugBridgeAndBatchQueues` |
+| 77 | `topLevelFunction` | `isBlockTubeChannelNameRule` | `channelMatchPolicy` |
+| 81 | `topLevelFunction` | `getBlockTubeChannelNameRegex` | `channelMatchPolicy` |
+| 113 | `topLevelFunction` | `matchesBlockTubeChannelNameRule` | `channelMatchPolicy` |
+| 130 | `topLevelFunction` | `hasAutoplayEndpointKey` | `autoplayEndpointFiltering` |
+| 138 | `topLevelFunction` | `queueVideoChannelMapping` | `debugBridgeAndBatchQueues` |
+| 175 | `topLevelFunction` | `normalizeVideoLanguageCode` | `fieldExtractionAndParsing` |
+| 185 | `topLevelFunction` | `inferVideoLanguageFromPlayerMetadata` | `fieldExtractionAndParsing` |
+| 225 | `topLevelFunction` | `extractDefaultAudioFormatLanguage` | `fieldExtractionAndParsing` |
+| 240 | `topLevelFunction` | `extractVideoLanguageFromPlayerResponse` | `fieldExtractionAndParsing` |
+| 293 | `topLevelFunction` | `queueVideoMetaMapping` | `debugBridgeAndBatchQueues` |
+| 413 | `topLevelFunction` | `getByPath` | `pathTextAndMetadataHelpers` |
+| 434 | `topLevelFunction` | `flattenText` | `pathTextAndMetadataHelpers` |
+| 471 | `topLevelFunction` | `getTextFromPaths` | `pathTextAndMetadataHelpers` |
+| 485 | `topLevelFunction` | `normalizeChannelHandle` | `channelHandleExtractionHelpers` |
+| 521 | `topLevelFunction` | `findHandleInValue` | `channelHandleExtractionHelpers` |
+| 555 | `topLevelFunction` | `extractChannelHandleFromPaths` | `channelHandleExtractionHelpers` |
+| 564 | `topLevelFunction` | `flattenMetadataRow` | `pathTextAndMetadataHelpers` |
+| 595 | `topLevelFunction` | `flattenMetadataRowsContainer` | `pathTextAndMetadataHelpers` |
+| 614 | `topLevelFunction` | `getMetadataRowsText` | `pathTextAndMetadataHelpers` |
+| 1164 | `classMethod` | `constructor` | `constructionAndSettings` |
+| 1178 | `classMethod` | `_buildChannelFilterIndex` | `constructionAndSettings` |
+| 1193 | `classMethod` | `_refreshChannelFilterIndexesIfNeeded` | `constructionAndSettings` |
+| 1200 | `classMethod` | `_matchesAnyChannel` | `channelMatchPolicy` |
+| 1222 | `classMethod` | `_harvestBrowseEndpoint` | `harvestAndMapWrites` |
+| 1274 | `classMethod` | `_processSettings` | `constructionAndSettings` |
+| 1426 | `classMethod` | `_harvestChannelData` | `harvestAndMapWrites` |
+| 1543 | `classMethod` | `_harvestPlayerOwnerData` | `harvestAndMapWrites` |
+| 1683 | `classMethod` | `_harvestRendererChannelMappings` | `harvestAndMapWrites` |
+| 1737 | `classMethod` | `_harvestVideoOwnerFromRenderer` | `harvestAndMapWrites` |
+| 1772 | `classMethod` | `_registerVideoChannelMapping` | `harvestAndMapWrites` |
+| 1788 | `classMethod` | `_registerVideoMetaMapping` | `harvestAndMapWrites` |
+| 1872 | `classMethod` | `_harvestFromRendererByline` | `harvestAndMapWrites` |
+| 1928 | `classMethod` | `_registerMapping` | `harvestAndMapWrites` |
+| 1969 | `classMethod` | `_registerCustomUrlMapping` | `harvestAndMapWrites` |
+| 2011 | `classMethod` | `_log` | `loggingAndDecisionTelemetry` |
+| 2024 | `classMethod` | `_logWhitelistDecision` | `loggingAndDecisionTelemetry` |
+| 2043 | `classMethod` | `_unwrapRendererForFiltering` | `candidateAndRendererUnwrap` |
+| 2087 | `classMethod` | `_paths` | `candidateAndRendererUnwrap` |
+| 2092 | `classMethod` | `_collectTextFromPaths` | `candidateAndRendererUnwrap` |
+| 2117 | `classMethod` | `_extractVideoId` | `candidateAndRendererUnwrap` |
+| 2140 | `classMethod` | `_extractPlaylistId` | `candidateAndRendererUnwrap` |
+| 2156 | `classMethod` | `_emptyChannelInfo` | `channelMatchPolicy` |
+| 2160 | `classMethod` | `_hasChannelPolicyRules` | `channelMatchPolicy` |
+| 2166 | `classMethod` | `_buildCandidate` | `candidateAndRendererUnwrap` |
+| 2271 | `classMethod` | `_candidateSearchText` | `candidateAndRendererUnwrap` |
+| 2286 | `classMethod` | `_extractAutoplayEndpointVideoId` | `autoplayEndpointFiltering` |
+| 2300 | `classMethod` | `_autoplayEndpointCandidate` | `autoplayEndpointFiltering` |
+| 2332 | `classMethod` | `_shouldBlockAutoplayEndpoint` | `autoplayEndpointFiltering` |
+| 2399 | `classMethod` | `_shouldDropAutoplayEndpointSet` | `autoplayEndpointFiltering` |
+| 2409 | `classMethod` | `_regexMatches` | `candidateAndRendererUnwrap` |
+| 2424 | `classMethod` | `_parseKeywordDateBoundary` | `fieldExtractionAndParsing` |
+| 2442 | `classMethod` | `_getCurrentWatchVideoId` | `fieldExtractionAndParsing` |
+| 2455 | `classMethod` | `_extractKeywordTimestampFromVideoMeta` | `fieldExtractionAndParsing` |
+| 2469 | `classMethod` | `_extractKeywordPublishTimestamp` | `fieldExtractionAndParsing` |
+| 2499 | `classMethod` | `_keywordDateFilterAllows` | `blockDecisionPipeline` |
+| 2522 | `classMethod` | `_shouldBlock` | `blockDecisionPipeline` |
+| 2910 | `classMethod` | `_checkCategoryFilters` | `blockDecisionPipeline` |
+| 2972 | `classMethod` | `_checkLanguageFilters` | `blockDecisionPipeline` |
+| 3031 | `classMethod` | `_extractTitle` | `fieldExtractionAndParsing` |
+| 3055 | `classMethod` | `_extractDescription` | `fieldExtractionAndParsing` |
+| 3092 | `classMethod` | `_parseDurationToSeconds` | `fieldExtractionAndParsing` |
+| 3123 | `classMethod` | `_parseAriaLabelDurationSeconds` | `fieldExtractionAndParsing` |
+| 3138 | `classMethod` | `_parseRelativeTimeToTimestamp` | `fieldExtractionAndParsing` |
+| 3177 | `classMethod` | `_extractDuration` | `fieldExtractionAndParsing` |
+| 3415 | `classMethod` | `_extractPublishedTime` | `fieldExtractionAndParsing` |
+| 3545 | `classMethod` | `_extractViewCount` | `fieldExtractionAndParsing` |
+| 3583 | `classMethod` | `_checkContentFilters` | `blockDecisionPipeline` |
+| 3752 | `classMethod` | `_checkUppercaseTitle` | `blockDecisionPipeline` |
+| 3788 | `classMethod` | `_extractChannelInfo` | `fieldExtractionAndParsing` |
+| 4110 | `classMethod` | `_matchesChannel` | `channelMatchPolicy` |
+| 4283 | `classMethod` | `_hasChannelShelfCardOwner` | `channelMatchPolicy` |
+| 4302 | `classMethod` | `_getChannelShelfOwner` | `channelMatchPolicy` |
+| 4313 | `classMethod` | `_getChannelShelfChildScope` | `recursionAndEntrypoints` |
+| 4328 | `classMethod` | `filter` | `recursionAndEntrypoints` |
+| 4395 | `classMethod` | `processData` | `recursionAndEntrypoints` |
+| 4476 | `topLevelFunction` | `getReusableFilter` | `constructionAndSettings` |
+| 4513 | `globalInterfaceFunction` | `FilterTubeEngine.processData` | `recursionAndEntrypoints` |
+| 4521 | `globalInterfaceFunction` | `FilterTubeEngine.harvestOnly` | `recursionAndEntrypoints` |
 
 ## Current Behavior Boundaries
 
@@ -248,3 +274,16 @@ runtime behavior changed: no
 These counts are audit-only blockers. They do not approve runtime
 optimization, JSON-first behavior, renderer expansion, identity trust changes,
 map-write pruning, no-work optimization, or lifecycle cleanup.
+
+
+## Reviewed additions - 2026-10-18
+
+BlockTube channel-name helpers use declared imported rule semantics. Language
+helpers extract/normalize loaded Player evidence. Keyword-date helpers join
+publication evidence and evaluate per-rule bounds. View totals use the shared
+conservative parser and an optional off-by-default threshold. Index reuse only
+rebuilds derived channel indexes. Shelf helpers accept consistent explicit UC
+endpoints and propagate scope only down the known shelf/list/card chain; mixed
+or explicitly owned children do not acquire a guessed owner. None creates trust,
+loads the encyclopedia, or proves native/installed parity. Diagnostics remain
+below method authority. Existing global semantic completion remains zero/NO-GO.

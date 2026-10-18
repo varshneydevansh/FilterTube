@@ -904,7 +904,7 @@ test('commentRenderer currently blocks when comment keyword list already contain
   assert.deepEqual(plain(output), { contents: [] });
 });
 
-test('commentRenderer currently still blocks by global keyword even when comment keyword list is empty', () => {
+test('commentRenderer preserves body when explicit comment keyword list excludes global rules', () => {
   const input = {
     contents: [{
       commentRenderer: commentRenderer({
@@ -917,7 +917,8 @@ test('commentRenderer currently still blocks by global keyword even when comment
     filterKeywordsComments: []
   }));
 
-  assert.deepEqual(plain(output), { contents: [] });
+  assert.deepEqual(plain(output), plain(input));
+  assert.equal(output.contents[0].commentRenderer.contentText.runs[0].text, 'spider appears in comment body');
 });
 
 test('commentRenderer currently blocks by author channel rule', () => {

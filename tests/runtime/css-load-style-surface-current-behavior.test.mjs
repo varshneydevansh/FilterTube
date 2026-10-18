@@ -9,15 +9,150 @@ const repoRoot = process.cwd();
 const docPath = 'docs/audit/FILTERTUBE_CSS_LOAD_STYLE_SURFACE_CURRENT_BEHAVIOR_2026-05-21.md';
 
 const cssRows = [
-  ['css/components.css', 'active extension UI shared CSS', 1686, 45567, 'db01d30c717e34c108e48d92807ce3df4bcafccace62a1808d86d03ed7047ebc', 240, 47, 1, 0, 0, 0, 5, 1, 0],
-  ['css/content.css', 'packaged quarantined content CSS', 385, 12890, '442c6ad823ebed5075099036b057c29914b218b0bea9e823e9e0b216d771141b', 45, 113, 6, 5, 35, 0, 0, 0, 0],
-  ['css/design_tokens.css', 'active extension UI token CSS', 301, 10361, '7da73da79df23e6325c921e45fd786270488ee8ad212b57b7e634b63898c27dc', 12, 0, 0, 0, 0, 0, 1, 0, 0],
-  ['css/filter.css', 'packaged quarantined content CSS', 74, 2412, 'e2462d446b1a3738d937945eabf013ec05173224970b0c877593901aba5a5032', 6, 12, 5, 5, 6, 0, 0, 0, 0],
-  ['css/layout.css', 'packaged quarantined content CSS', 803, 28581, '9ae38491aeb2dc3a58027d4a005c6136042c66dc438786483285fdbd91cb1941', 86, 353, 11, 62, 126, 6, 0, 0, 0],
-  ['css/popup.css', 'active extension popup CSS', 1151, 29731, '812cb4ba8b4c9be732bd8a2a6f7b06b5d8d0a8c3fb7416f391f475ae627d45fa', 182, 5, 3, 0, 0, 0, 2, 0, 1],
-  ['css/serene-shell.css', 'active extension shell CSS', 3414, 87230, '785e988dd0176b16defcc08f77925de8eaa60ea831d53cd57147eb601c490f0a', 494, 39, 7, 0, 0, 0, 16, 1, 0],
-  ['css/tab-view.css', 'active extension dashboard CSS', 2986, 72211, '3d07057381c63e2d3d117b6be466eb31eeb35df80f00747403f79fb0f28efdce', 444, 24, 14, 0, 0, 0, 12, 4, 2],
-  ['website/app/globals.css', 'website-only global CSS', 486, 12528, '2b583fc11e8f5a3a6fa5113daebf71b91d46bf685b02c544727167cf9ed7f760', 69, 0, 0, 0, 0, 0, 1, 1, 0]
+  [
+    "css/components.css",
+    "active extension UI shared CSS",
+    1966,
+    52694,
+    "f7aefe9b0400f0427bbbd8dc52c9dfc7ccd675847d28e6555c564426a29e5036",
+    283,
+    48,
+    2,
+    0,
+    0,
+    0,
+    7,
+    1,
+    1
+  ],
+  [
+    "css/content.css",
+    "packaged quarantined content CSS",
+    385,
+    12890,
+    "442c6ad823ebed5075099036b057c29914b218b0bea9e823e9e0b216d771141b",
+    45,
+    113,
+    6,
+    5,
+    35,
+    0,
+    0,
+    0,
+    0
+  ],
+  [
+    "css/design_tokens.css",
+    "active extension UI token CSS",
+    301,
+    10361,
+    "7da73da79df23e6325c921e45fd786270488ee8ad212b57b7e634b63898c27dc",
+    12,
+    0,
+    0,
+    0,
+    0,
+    0,
+    1,
+    0,
+    0
+  ],
+  [
+    "css/filter.css",
+    "packaged quarantined content CSS",
+    74,
+    2412,
+    "e2462d446b1a3738d937945eabf013ec05173224970b0c877593901aba5a5032",
+    6,
+    12,
+    5,
+    5,
+    6,
+    0,
+    0,
+    0,
+    0
+  ],
+  [
+    "css/layout.css",
+    "packaged quarantined content CSS",
+    803,
+    28581,
+    "9ae38491aeb2dc3a58027d4a005c6136042c66dc438786483285fdbd91cb1941",
+    86,
+    353,
+    11,
+    62,
+    126,
+    6,
+    0,
+    0,
+    0
+  ],
+  [
+    "css/popup.css",
+    "active extension popup CSS",
+    1259,
+    32376,
+    "c388d39fab962528365711baa0bfe953ed84ca660ac6123571f79b2c4be820c5",
+    197,
+    5,
+    3,
+    0,
+    0,
+    0,
+    2,
+    0,
+    1
+  ],
+  [
+    "css/serene-shell.css",
+    "active extension shell CSS",
+    9656,
+    267377,
+    "53608a364e8e62a326a0a7b98daa0ef2f6762cff272730f24a33c425690ee75b",
+    1328,
+    59,
+    27,
+    0,
+    0,
+    0,
+    28,
+    2,
+    8
+  ],
+  [
+    "css/tab-view.css",
+    "active extension dashboard CSS",
+    5749,
+    144577,
+    "8fbfff1804e96aefe5d211ff633be081233361ed551fff55e45496b9206648b2",
+    844,
+    25,
+    22,
+    0,
+    0,
+    0,
+    21,
+    5,
+    6
+  ],
+  [
+    "website/app/globals.css",
+    "website-only global CSS",
+    541,
+    14785,
+    "2341d3570c01f4ac118fa8587937d60c2a1ccf750163e74f90428c56fe5d7d06",
+    76,
+    0,
+    0,
+    0,
+    0,
+    0,
+    1,
+    1,
+    0
+  ]
 ];
 
 function read(file) {
@@ -55,6 +190,7 @@ function productSource() {
   return git(['ls-files', '*.js', '*.mjs', '*.jsx', '*.css', '*.html', '*.json'])
     .filter((file) => !file.startsWith('tests/'))
     .filter((file) => !file.startsWith('docs/audit/'))
+    .filter(file => fs.existsSync(path.join(repoRoot, file)))
     .map(read)
     .join('\n');
 }
@@ -90,21 +226,21 @@ test('CSS load style surface register is audit-only and covers every tracked CSS
   }
 
   assert.deepEqual(totals, {
-    lines: 11286,
-    bytes: 301511,
-    rules: 1578,
-    important: 593,
-    displayNone: 47,
-    notVisible: 72,
-    visible: 167,
-    hidden: 6,
-    media: 37,
-    keyframes: 7,
-    hiddenAttr: 3
-  });
-  assert.match(doc, /9 CSS files, 11,286 counted source lines/);
-  assert.match(doc, /301,511 bytes, 1,578 lexical rule blocks/);
-  assert.match(doc, /593 `!important` declarations, 47\s+`display:none` declarations/);
+  "lines": 20734,
+  "bytes": 566053,
+  "rules": 2877,
+  "important": 615,
+  "displayNone": 76,
+  "notVisible": 72,
+  "visible": 167,
+  "hidden": 6,
+  "media": 60,
+  "keyframes": 9,
+  "hiddenAttr": 16
+});
+  assert.match(doc, /9 CSS files, 20,734 counted source lines/);
+  assert.match(doc, /566,053 bytes, 2,877 lexical rule blocks/);
+  assert.match(doc, /615 `!important` declarations, 76\s+`display:none` declarations/);
 });
 
 test('CSS selector and hide counters match current source', () => {
@@ -143,7 +279,7 @@ test('CSS load topology separates extension pages website and quarantined conten
   }
 
   const build = read('build.js');
-  assert.match(build, /const COMMON_DIRS = \['js', 'css', 'html', 'icons', 'data', 'assets'\]/);
+  assert.match(build, /const COMMON_DIRS = \['_locales', 'js', 'css', 'html', 'icons', 'data', 'assets'\]/);
   assert.match(build, /fs\.copySync\(dir, path\.join\(targetDir, dir\), \{ filter: filterFunc \}\)/);
 
   assert.match(doc, /Active extension UI CSS/);

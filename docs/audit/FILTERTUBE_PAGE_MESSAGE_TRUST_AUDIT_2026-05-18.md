@@ -177,3 +177,30 @@ runtime behavior changed: no
 These counts are audit-only blockers. They do not approve runtime
 optimization, JSON-first behavior, method deletion, method merging, lifecycle
 cleanup, no-work changes, or whitelist behavior changes.
+
+
+## October 18, 2026 receiver inventory
+
+The May source loci above are historical. Current content_bridge accepted FilterTube message rows: 13. The added VideoMetaResponse path is correlated through its existing pending request; this count refresh does not fix the separately documented same-window ownership/trust gaps or promote their NO-GO status.
+
+| Message/map | Source |
+| --- | --- |
+| `FilterTube_InjectorToBridge_Ready` | `js/content_bridge.js:6865` |
+| `FilterTube_Refresh` | `js/content_bridge.js:6867` |
+| `FilterTube_UpdateChannelMap` | `js/content_bridge.js:6872` |
+| `FilterTube_UpdateVideoChannelMap` | `js/content_bridge.js:6875` |
+| `FilterTube_UpdateVideoMetaMap` | `js/content_bridge.js:6924` |
+| `FilterTube_UpdateCustomUrlMap` | `js/content_bridge.js:6958` |
+| `FilterTube_CollaboratorInfoResponse` | `js/content_bridge.js:6971` |
+| `FilterTube_SubscriptionsImportProgress` | `js/content_bridge.js:6998` |
+| `FilterTube_SubscriptionsImportResponse` | `js/content_bridge.js:7017` |
+| `FilterTube_VideoMetaResponse` | `js/content_bridge.js:7025` |
+| `FilterTube_CacheCollaboratorInfo` | `js/content_bridge.js:7033` |
+| `FilterTube_ChannelInfoResponse` | `js/content_bridge.js:7054` |
+| `FilterTube_CollabDialogData` | `js/content_bridge.js:7065` |
+| `pendingCollaboratorRequests` | `js/content_bridge.js:6351` |
+| `pendingChannelInfoRequests` | `js/content_bridge.js:6359` |
+| `pendingSubscriptionImportRequests` | `js/content_bridge.js:6367` |
+| `injector_message_listener` | `js/injector.js:2328` |
+| `subscription_import_listener` | `js/content/bridge_settings.js:167` |
+| `collab_dialog_broadcast` | `js/content/collab_dialog.js:244-247` |

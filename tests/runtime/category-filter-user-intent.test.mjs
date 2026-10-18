@@ -115,7 +115,8 @@ test('extension surfaces consume one shared official category registry', () => {
   assert.equal((tabView.match(/getCategoryOptions\?\.\(\)/g) || []).length, 2);
   assert.equal((popup.match(/getCategoryOptions\?\.\(\)/g) || []).length, 1);
   assert.match(tabView, /No categories selected — filter is inactive/);
-  assert.match(tabView, /Clear selection/);
+  assert.match(tabView, /setTabViewLocalizedCopy\(categoryMainClear, 'textContent', 'popup\.clear', 'Clear'\)/);
+  assert.match(tabView, /categoryMainClear\.addEventListener\('click'/);
 });
 
 test('category selection is visibly and programmatically explicit in full and popup UI', () => {
@@ -141,7 +142,7 @@ test('category selection is visibly and programmatically explicit in full and po
 test('Help and product docs clearly describe the working independent category filter', () => {
   const help = read('html/tab-view.html');
   const functionality = read('docs/FUNCTIONALITY.md');
-  const currentBehavior = read('docs/CATEGORY_FILTER_CURRENT_BEHAVIOR_2026-08-08.md');
+  const currentBehavior = read('docs/audit/CATEGORY_FILTER_CURRENT_BEHAVIOR_2026-08-08.md');
   const changelog = read('CHANGELOG.md');
 
   assert.match(help, /Category Filters Are Working/);
@@ -455,11 +456,11 @@ test('category hydration uses structured Player JSON and never background-fetche
   const injector = read('js/injector.js');
   const fetcher = sliceBetween(
     source,
-    'async function fetchVideoMetaFromWatchUrl(videoId)',
+    'async function fetchVideoMetaFromWatchUrl(videoId, needs = null)',
     'function generateCollaborationGroupId'
   );
 
-  assert.match(fetcher, /requestVideoMetaFromMainWorld\(videoId\)/);
+  assert.match(fetcher, /requestVideoMetaFromMainWorld\(videoId, needs\)/);
   assert.doesNotMatch(fetcher, /fetch\s*\(/);
   assert.doesNotMatch(fetcher, /\/watch\?v=/);
   assert.match(injector, /\/youtubei\/v1\/player\?prettyPrint=false/);
@@ -470,11 +471,12 @@ test('MAIN-world Player bridge returns normalized category and seed-owner identi
   const injector = read('js/injector.js');
   const fetchBlock = sliceBetween(
     injector,
-    'async function fetchVideoMetaFromYoutubeiPlayer(videoId) {',
+    'function normalizeVideoLanguageCode(value) {',
     '\n\n    function isYoutubeChannelsFeedPath'
   );
   const calls = [];
   const context = {
+    window: {},
     buildSubscriptionImportRequestProfiles() {
       return {
         apiKey: 'test-key',
@@ -492,6 +494,7 @@ test('MAIN-world Player bridge returns normalized category and seed-owner identi
         ok: true,
         json: () => Promise.resolve({
           videoDetails: {
+            videoId: 'rbUXNNagtbI',
             lengthSeconds: '1573',
             channelId: 'UCTXqDy7RTOoi_p2JyySAa_A',
             author: 'Mande'
@@ -529,13 +532,16 @@ test('MAIN-world Player bridge returns normalized category and seed-owner identi
     success: true,
     metadata: {
       videoId: 'rbUXNNagtbI',
+      title: '',
       lengthSeconds: '1573',
       publishDate: '2026-08-06',
       uploadDate: '2026-08-06',
       category: 'Gaming',
       channelId: 'UCTXqDy7RTOoi_p2JyySAa_A',
       channelName: 'Mande',
-      channelHandle: '@Mande_'
+      channelHandle: '@Mande_',
+      shortDescription: '', keywords: [], identityVerified: true, textVerified: true,
+      languageCode: 'und', languageSource: 'player-unavailable-v2', languageConfidence: 'unknown'
     },
     errorCode: ''
   });
@@ -559,7 +565,7 @@ test('current Watch category guard pauses and overlays without navigating or mut
   assert.match(guard, /pauseCurrentWatchForCategory\(videoId\)/);
   assert.match(guard, /setCurrentWatchCategoryOverlay/);
   assert.match(guard, /'unavailable'/);
-  assert.match(guard, /Category unavailable/);
+  assert.match(guard, /Video metadata unavailable/);
   assert.doesNotMatch(guard, /\.click\(/);
   assert.doesNotMatch(guard, /getPlaylistPanelRows/);
   assert.doesNotMatch(guard, /toggleVisibility/);
@@ -606,14 +612,15 @@ test('new allow-only cards are synchronously veiled before the debounced fallbac
   assert.notEqual(observerEnd, -1);
   const observer = source.slice(observerStart, observerEnd);
 
-  assert.match(prime, /categoryFilters\?\.mode !== 'allow'/);
+  assert.match(prime, /const needsCategory = categoryFilters\?\.enabled === true && categoryFilters\?\.mode === 'allow' && selected\.length > 0/);
+  assert.match(prime, /if \(!needsCategory && !needsLanguage\) return/);
   assert.match(prime, /isCategoryPolicyEligibleVideoElement\(card, videoId\)/);
   assert.match(prime, /data-filtertube-pending-category/);
   assert.match(prime, /setWatchRailCategoryState\(card, 'pending'/);
   assert.match(prime, /scheduleVideoMetaFetch\(videoId/);
   assert.match(observer, /primeAllowOnlyCategoryCards\(mutations\)/);
   assert.ok(
-    observer.indexOf('primeAllowOnlyCategoryCards(mutations)') < observer.indexOf('scheduleImmediateFallback()'),
+    observer.indexOf('primeAllowOnlyCategoryCards(mutations)') < observer.indexOf('scheduleImmediateFallback('),
     'the click-blocking veil must be attached before the debounced full fallback pass'
   );
 });
@@ -622,9 +629,10 @@ test('Allow-only unknown cards collapse after their bounded pending window inste
   const source = read('js/content/dom_fallback.js');
   const css = read('js/content/dom_helpers.js');
 
-  assert.match(source, /categoryAllowOnlyUnknown/);
-  assert.match(source, /categoryUnavailableMeta = categoryAllowOnlyUnknown/);
-  assert.match(source, /!categoryFetchScheduled && prev/);
+  assert.match(source, /const categoryWaitState = getCategoryMetadataWaitState\(/);
+  assert.match(source, /const categoryUnavailableMeta = categoryWaitState\.unavailable/);
+  assert.match(source, /pendingCategoryMeta = categoryWaitState\.pending/);
+  assert.match(source, /categoryWaitState\.remainingMs \+ 120/);
   assert.match(source, /targetToHide\.setAttribute\('data-filtertube-category-unavailable', 'true'\)/);
   assert.match(source, /pendingMetaOnly \|\| categoryUnavailableOnly/);
   assert.match(css, /\[data-filtertube-category-unavailable\] \{[\s\S]*display: none !important/);
@@ -672,7 +680,7 @@ test('Mix seed category hydration also warms the three-dot menu owner without an
   const source = read('js/content_bridge.js');
   const fetcher = sliceBetween(
     source,
-    'async function fetchVideoMetaFromWatchUrl(videoId)',
+    'async function fetchVideoMetaFromWatchUrl(videoId, needs = null)',
     '\n\n// =========================================='
   );
 
@@ -865,7 +873,7 @@ test('category hydration queue is idle-paced, rate-capped, and discards stale of
   assert.match(scheduler, /canJoinActiveBatch/);
   assert.match(scheduler, /while \([\s\S]*activeWatchMetaFetches < WATCH_META_FETCH_CONCURRENCY/);
   assert.match(scheduler, /watchMetaFetchStartTimes\.length >= WATCH_META_FETCH_MAX_PER_WINDOW/);
-  assert.match(scheduler, /isCategoryOnlyMetaFetch\(needs\) && !isVideoNearCategoryViewport\(nextVideoId\)/);
+  assert.match(scheduler, /isCategoryOrLanguageOnlyMetaFetch\(needs\) && !isVideoNearCategoryViewport\(nextVideoId\)/);
   assert.match(scheduler, /areWatchMetaFetchNeedsSatisfied\(nextVideoId, needs\)/);
 
   const fetches = [];
@@ -1030,7 +1038,7 @@ test('successful player response without category is negative-cached for categor
   );
   const fetchBlock = sliceBetween(
     bridge,
-    'async function fetchVideoMetaFromWatchUrl(videoId) {',
+    'async function fetchVideoMetaFromWatchUrl(videoId, needs = null) {',
     '\n\n// =========================================='
   );
   let playerRequestCount = 0;
@@ -1066,7 +1074,7 @@ test('successful player response without category is negative-cached for categor
     'globalThis.exports = { scheduleVideoMetaFetch, fetchVideoMetaFromWatchUrl, categoryMetaFetchMisses, watchMetaFetchQueue };'
   ].join('\n'), context);
 
-  await context.exports.fetchVideoMetaFromWatchUrl('NOCATEGORY1');
+  await context.exports.fetchVideoMetaFromWatchUrl('NOCATEGORY1', { needCategory: true });
   assert.equal(context.exports.categoryMetaFetchMisses.has('NOCATEGORY1'), true);
 
   context.exports.scheduleVideoMetaFetch('NOCATEGORY1', {

@@ -37,7 +37,7 @@ test('release package parity audit documents package roots and future gate', () 
 test('build script copies whole common directories and top-level common files', () => {
   const build = read('build.js');
 
-  assert.match(build, /const COMMON_DIRS = \['js', 'css', 'html', 'icons', 'data', 'assets'\]/);
+  assert.match(build, /const COMMON_DIRS = \['_locales', 'js', 'css', 'html', 'icons', 'data', 'assets'\]/);
   assert.match(build, /const COMMON_FILES = \['README\.md', 'CHANGELOG\.md', 'LICENSE'\]/);
   assert.match(build, /fs\.copySync\(dir, path\.join\(targetDir, dir\), \{ filter: filterFunc \}\)/);
   assert.match(build, /fs\.copySync\(file, path\.join\(targetDir, file\), \{ filter: filterFunc \}\)/);
@@ -113,18 +113,20 @@ test('zip packaging has only junk-file ignores and no committed package content 
   }
 });
 
-test('GitHub release is public before asset upload proof in the current script', () => {
+test('new releases are drafts until every expected asset is verified, while existing visibility is preserved', () => {
   const build = read('build.js');
-  const createIndex = build.indexOf('const release = await createGitHubRelease');
-  const uploadIndex = build.indexOf('for (const assetPath of releaseAssetPaths)');
-
-  assert.notEqual(createIndex, -1);
-  assert.notEqual(uploadIndex, -1);
-  assert.ok(createIndex < uploadIndex, 'release is created before asset upload loop');
-  assert.match(build, /draft:\s*false/);
-  assert.match(build, /prerelease:\s*false/);
+  const start = build.indexOf('        if (!releaseExists) {');
+  const create = build.indexOf('createDraftGitHubRelease(githubAuth', start);
+  const upload = build.indexOf('uploadGitHubReleaseAssets(githubAuth', create);
+  const verify = build.indexOf('const stillMissing = releaseAssetPaths', upload);
+  const publish = build.indexOf('publishDraftGitHubRelease(githubAuth', verify);
+  assert.ok(start >= 0 && create > start && upload > create && verify > upload && publish > verify);
+  assert.match(build.slice(verify, publish), /throw new Error\(`Release upload incomplete/);
+  assert.match(build.slice(verify, publish), /if \(createdDraft\)/);
+  assert.match(build, /'--draft'/);
+  assert.match(build, /'--draft=false'/);
+  assert.match(build, /existing release visibility unchanged/);
   assert.match(build, /Non-interactive terminal detected; skipping release prompt/);
-  assert.match(read(auditDocPath), /GitHub release publishing is public before upload proof/);
 });
 
 test('mobile artifact staging has naming and checksum mechanics but no public claim gate', () => {

@@ -101,19 +101,19 @@ extension-dashboard changes in the working tree.
 | --- | --- | --- | --- |
 | 2026-08-25 | `1a6a4440` | Make GitHub release uploads resumable | [Release upload test](tests/runtime/release-upload-resume-current-behavior.test.mjs) |
 | 2026-08-26 | `809019b8` | Harden Advert Void observer boundaries | [Advert Void boundary](docs/audit/FILTERTUBE_AD_VOID_PLAYER_STATE_AND_DOM_WORK_BOUNDARY_2026-08-26.md) |
-| 2026-08-26 | `a4212f22` | Fix Home feed stability and imported channel enrichment | [Home/import stability](docs/FILTERTUBE_IMPORT_HOME_STABILITY_CURRENT_BEHAVIOR_2026-08-26.md) |
-| 2026-08-27 | `64342c21` | Persist imported enrichment and virtualize large rule lists | [Imported enrichment](docs/FILTERTUBE_IMPORTED_ENRICHMENT_BACKGROUND_CURRENT_BEHAVIOR_2026-08-27.md) |
-| 2026-08-27 | `b7edbd7a` | Add persistent rule-list import reports | [Import reports](docs/FILTERTUBE_RULE_LIST_IMPORT_REPORTS_CURRENT_BEHAVIOR_2026-08-27.md) |
-| 2026-08-27 | `00252f02` | Improve imported metadata reporting and list responsiveness | [Import reports](docs/FILTERTUBE_RULE_LIST_IMPORT_REPORTS_CURRENT_BEHAVIOR_2026-08-27.md) |
-| 2026-08-27 | `0180b429` | Handle permanent imported channel lookup failures | [Imported enrichment](docs/FILTERTUBE_IMPORTED_ENRICHMENT_BACKGROUND_CURRENT_BEHAVIOR_2026-08-27.md) |
-| 2026-08-27 | `595a5cd2` | Clarify import report states and removal actions | [Import reports](docs/FILTERTUBE_RULE_LIST_IMPORT_REPORTS_CURRENT_BEHAVIOR_2026-08-27.md) |
+| 2026-08-26 | `a4212f22` | Fix Home feed stability and imported channel enrichment | [Home/import stability](docs/audit/FILTERTUBE_IMPORT_HOME_STABILITY_CURRENT_BEHAVIOR_2026-08-26.md) |
+| 2026-08-27 | `64342c21` | Persist imported enrichment and virtualize large rule lists | [Imported enrichment](docs/audit/FILTERTUBE_IMPORTED_ENRICHMENT_BACKGROUND_CURRENT_BEHAVIOR_2026-08-27.md) |
+| 2026-08-27 | `b7edbd7a` | Add persistent rule-list import reports | [Import reports](docs/audit/FILTERTUBE_RULE_LIST_IMPORT_REPORTS_CURRENT_BEHAVIOR_2026-08-27.md) |
+| 2026-08-27 | `00252f02` | Improve imported metadata reporting and list responsiveness | [Import reports](docs/audit/FILTERTUBE_RULE_LIST_IMPORT_REPORTS_CURRENT_BEHAVIOR_2026-08-27.md) |
+| 2026-08-27 | `0180b429` | Handle permanent imported channel lookup failures | [Imported enrichment](docs/audit/FILTERTUBE_IMPORTED_ENRICHMENT_BACKGROUND_CURRENT_BEHAVIOR_2026-08-27.md) |
+| 2026-08-27 | `595a5cd2` | Clarify import report states and removal actions | [Import reports](docs/audit/FILTERTUBE_RULE_LIST_IMPORT_REPORTS_CURRENT_BEHAVIOR_2026-08-27.md) |
 | 2026-08-27 | `56d1af60` | Improve import report review sheet UX | [Import reporting](docs/FILTERTUBE_RULE_LIST_IMPORT_REPORTING_CURRENT_BEHAVIOR_2026-08-27.md) |
-| 2026-08-27 | `1c8f0f42` | Optimize large rule-list filtering runtime | [Large-list optimization](docs/FILTERTUBE_LARGE_RULE_LIST_RUNTIME_OPTIMIZATION_2026-08-27.md) |
-| 2026-08-27 | `0a316e88` | Target Home fallback to changed cards | [Large-list optimization](docs/FILTERTUBE_LARGE_RULE_LIST_RUNTIME_OPTIMIZATION_2026-08-27.md) |
-| 2026-08-27 | `1836b665` | Avoid repeated large-list metadata scans | [Large-list optimization](docs/FILTERTUBE_LARGE_RULE_LIST_RUNTIME_OPTIMIZATION_2026-08-27.md) |
-| 2026-08-28 | `a7f12be0` | Add opt-in filtering performance diagnostics | [Large-list optimization](docs/FILTERTUBE_LARGE_RULE_LIST_RUNTIME_OPTIMIZATION_2026-08-27.md) |
-| 2026-08-28 | `f38a5262` | Target Home identity fallback updates | [Large-list optimization](docs/FILTERTUBE_LARGE_RULE_LIST_RUNTIME_OPTIMIZATION_2026-08-27.md) |
-| 2026-08-28 | `2cf9db06` | Avoid duplicate large-list filtering passes | [Large-list optimization](docs/FILTERTUBE_LARGE_RULE_LIST_RUNTIME_OPTIMIZATION_2026-08-27.md) |
+| 2026-08-27 | `1c8f0f42` | Optimize large rule-list filtering runtime | [Large-list optimization](docs/audit/FILTERTUBE_LARGE_RULE_LIST_RUNTIME_OPTIMIZATION_2026-08-27.md) |
+| 2026-08-27 | `0a316e88` | Target Home fallback to changed cards | [Large-list optimization](docs/audit/FILTERTUBE_LARGE_RULE_LIST_RUNTIME_OPTIMIZATION_2026-08-27.md) |
+| 2026-08-27 | `1836b665` | Avoid repeated large-list metadata scans | [Large-list optimization](docs/audit/FILTERTUBE_LARGE_RULE_LIST_RUNTIME_OPTIMIZATION_2026-08-27.md) |
+| 2026-08-28 | `a7f12be0` | Add opt-in filtering performance diagnostics | [Large-list optimization](docs/audit/FILTERTUBE_LARGE_RULE_LIST_RUNTIME_OPTIMIZATION_2026-08-27.md) |
+| 2026-08-28 | `f38a5262` | Target Home identity fallback updates | [Large-list optimization](docs/audit/FILTERTUBE_LARGE_RULE_LIST_RUNTIME_OPTIMIZATION_2026-08-27.md) |
+| 2026-08-28 | `2cf9db06` | Avoid duplicate large-list filtering passes | [Large-list optimization](docs/audit/FILTERTUBE_LARGE_RULE_LIST_RUNTIME_OPTIMIZATION_2026-08-27.md) |
 
 ### Release transport
 
@@ -264,7 +264,7 @@ release.
 
 ### Documentation and proof
 
-- **Current behavior record**: `docs/CATEGORY_FILTER_CURRENT_BEHAVIOR_2026-08-08.md` documents settings, sources, enforcement, scheduling, UI, ownership boundaries, and validation.
+- **Current behavior record**: `docs/audit/CATEGORY_FILTER_CURRENT_BEHAVIOR_2026-08-08.md` documents settings, sources, enforcement, scheduling, UI, ownership boundaries, and validation.
 - **YouTube renderer inventory**: documentation now includes the global Home chip bar and the separate “Explore more topics” horizontal chip/video shelf, whose chips are navigation refinements rather than official video categories.
 - **YouTube Kids capture ledger**: the JSON encyclopedia and renderer inventory record the available onboarding, persona, browse, Search, Watch, subscription, settings, parent-gate, and DOM capture files and their evidence boundaries.
 

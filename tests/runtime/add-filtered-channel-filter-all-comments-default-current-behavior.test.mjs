@@ -10,10 +10,10 @@ const repoRoot = process.cwd();
 const docPath = 'docs/audit/FILTERTUBE_ADD_FILTERED_CHANNEL_FILTER_ALL_COMMENTS_DEFAULT_CURRENT_BEHAVIOR_2026-05-23.md';
 
 const sourceFingerprints = {
-  'js/content_bridge.js': [13636, 604184, '8d55d0c8995e5b68bb9142c41f95046a676f5af2b83f8545b00f91a6a5a3776d'],
-  'js/background.js': [6803, 306710, '57ddc6c3e31112c30734ede78c9b37b01bd31533fc8a1d16856b13d2b295f0d7'],
-  'js/state_manager.js': [2491, 99780, '509c559e35989c13cdded17c01eeaca8115addcd3848dbcda41514422e5bc7b6'],
-  'js/settings_shared.js': [1181, 57535, '9710ebb445ba11cc45fc98aced765d298226a8cd4a003600e106f908abc2162c']
+  'js/content_bridge.js': [15053, 678250, 'c653324d1f042c0473cf2102d81bcd161bfaa26f8c7ee545e250226594dc9618'],
+  'js/background.js': [8538, 386043, 'cc89bb4a0375145e1c811b7cf5953729c39c409b6b24cacdc65c80f9f6ff44d0'],
+  'js/state_manager.js': [2979, 124009, '04879b5b1dcac9229c70d0ea14241667755682649865ad1d52030c1ce21950d3'],
+  'js/settings_shared.js': [1313, 66857, '19f0a1fb3cd512494481b7eb39169bf84feeda4a0a6a20cf58ebaf1c18ff7ba9']
 };
 
 const blockSpecs = {
@@ -21,25 +21,25 @@ const blockSpecs = {
     file: 'js/content_bridge.js',
     start: 'async function addChannelDirectly(input, filterAll = false, collaborationWith = null, collaborationGroupId = null, metadata = {}) {',
     end: '/**\n * Add "Filter All Content" checkbox below the blocked channel',
-    startLine: 13440,
-    lines: 54,
-    bytes: 2662,
-    hash: '4eb280573a5611b695c8284a8e6b85d17b2a97c459143a3054d02374cdf7c2ca'
+    startLine: 14855,
+    lines: 55,
+    bytes: 2759,
+    hash: 'de0b0304a2269331926856153492eae471d385455e5548c45b11f8cf01e4582d'
   },
   backgroundAddFilteredChannelReceiver: {
     file: 'js/background.js',
     start: "if (message.type === 'addFilteredChannel')",
     end: "if (message.type === 'toggleChannelFilterAll')",
-    startLine: 5727,
-    lines: 39,
-    bytes: 1579,
-    hash: 'f681057e88e4c6aef657464bca124f8d3ae4d59f4d11ca5f05e1135dcf1615f2'
+    startLine: 7072,
+    lines: 58,
+    bytes: 2408,
+    hash: '3a506e117b2d2a79bc9156c5dcb782077c69bc63a3b3a3fe982d25d7f2f5553c'
   },
   backgroundHandleAddFilteredChannelSignature: {
     file: 'js/background.js',
     start: 'async function handleAddFilteredChannel(input, filterAll = false',
     end: '        const isHandleLike = (value) => {',
-    startLine: 5792,
+    startLine: 7156,
     lines: 2,
     bytes: 204,
     hash: 'ce94174aa1b2f302e1e89a75b463271aa13d1c95f62cb89ee34364fb9c3ab603'
@@ -48,25 +48,25 @@ const blockSpecs = {
     file: 'js/background.js',
     start: 'const updated = {\n                ...existing,',
     end: '            if (Array.isArray(collaborationWith) && collaborationWith.length > 0) {',
-    startLine: 6435,
-    lines: 21,
-    bytes: 1247,
-    hash: '9ac97ce884e9c319e0267a60bbbacbdb26b0a3ea6f1f0cca416615ad234e96dd'
+    startLine: 7974,
+    lines: 22,
+    bytes: 1331,
+    hash: 'ccc5b7c341685ced769a8bab9846303ca1b3028fe0ee71a768993c1c8bdc35cb'
   },
   backgroundNewChannelObject: {
     file: 'js/background.js',
     start: 'const newChannel = {\n                id: channelInfo.id,',
     end: '            channels.unshift(newChannel);',
-    startLine: 6485,
-    lines: 20,
-    bytes: 1081,
-    hash: '5fa1776809d1d10187ead655c7b8a566c15935b2667f95e8cd5f7875c28f4be4'
+    startLine: 8025,
+    lines: 21,
+    bytes: 1181,
+    hash: '2502df79c0fb8aecc76228aee6d237d09930e56f75edf58b8effd4f15495b692'
   },
   backgroundChannelDerivedKeywordHelpersAndSync: {
     file: 'js/background.js',
     start: 'function getChannelDerivedKeywordRef(channel) {',
     end: '// Deep link into the tab-view dashboard',
-    startLine: 1386,
+    startLine: 1891,
     lines: 106,
     bytes: 3482,
     hash: '22f1f880c4b67f0b366020641f94e988d19a4e0312b073c20048c4f2bcd0a455'
@@ -75,7 +75,7 @@ const blockSpecs = {
     file: 'js/state_manager.js',
     start: "chrome.runtime.sendMessage({\n            type: 'addFilteredChannel',",
     end: '        }, () => {\n            channelEnrichmentProcessedThisSession++;',
-    startLine: 665,
+    startLine: 850,
     lines: 12,
     bytes: 460,
     hash: '1f802c946742b856d5c4f6aea62777de9e1e3fcebae08085d632259d1bac0132'
@@ -84,10 +84,10 @@ const blockSpecs = {
     file: 'js/settings_shared.js',
     start: 'function syncFilterAllKeywords',
     end: '    function buildCompiledSettings',
-    startLine: 412,
-    lines: 72,
-    bytes: 2967,
-    hash: 'ce4e49c6055252ab9a6db6a30be91ddfb50efead1c1ef76bf736c38717febd25'
+    startLine: 493,
+    lines: 75,
+    bytes: 3138,
+    hash: 'e53763406df6485ad16125eeba30be1bd1e10688f211d4541915bc9f8063c91b'
   }
 };
 
@@ -105,7 +105,7 @@ const selectedCounts = {
   filterKeywordsComments: 0,
   profile: 6,
   listType: 2,
-  metadata: 18,
+  metadata: 20,
   comment_filter_toggled: 0,
   channel_added: 6,
   kids_channel_added: 1,

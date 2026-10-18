@@ -24,40 +24,41 @@ const fields = [
 ];
 
 const expectedFieldCounts = {
-  title: 4,
-  description: 5,
-  commentText: 5,
-  channelName: 5,
-  channelId: 2,
-  channelHandle: 4,
-  videoId: 14,
-  duration: 6,
-  publishedTime: 6,
-  viewCount: 2,
-  metadataRows: 10
+  "videoId": 18,
+  "channelName": 5,
+  "duration": 5,
+  "publishedTime": 5,
+  "viewCount": 1,
+  "metadataRows": 10,
+  "commentText": 5,
+  "title": 4,
+  "description": 5,
+  "channelId": 2,
+  "channelHandle": 4
 };
 
 const expectedMethodFieldCounts = {
-  '_extractVideoId:videoId': 2,
-  '_buildCandidate:channelName': 1,
-  '_buildCandidate:duration': 2,
-  '_buildCandidate:publishedTime': 2,
-  '_buildCandidate:viewCount': 2,
-  '_buildCandidate:metadataRows': 1,
-  '_buildCandidate:commentText': 1,
-  '_shouldBlock:commentText': 4,
-  '_checkCategoryFilters:videoId': 4,
-  '_extractTitle:title': 4,
-  '_extractDescription:description': 5,
-  '_extractDescription:metadataRows': 5,
-  '_extractDuration:duration': 4,
-  '_extractDuration:videoId': 4,
-  '_extractPublishedTime:publishedTime': 4,
-  '_extractPublishedTime:metadataRows': 4,
-  '_extractPublishedTime:videoId': 4,
-  '_extractChannelInfo:channelName': 4,
-  '_extractChannelInfo:channelId': 2,
-  '_extractChannelInfo:channelHandle': 4
+  "_extractVideoId:videoId": 2,
+  "_buildCandidate:channelName": 1,
+  "_buildCandidate:duration": 1,
+  "_buildCandidate:publishedTime": 1,
+  "_buildCandidate:viewCount": 1,
+  "_buildCandidate:metadataRows": 1,
+  "_buildCandidate:commentText": 1,
+  "_shouldBlock:commentText": 4,
+  "_checkCategoryFilters:videoId": 4,
+  "_checkLanguageFilters:videoId": 4,
+  "_extractTitle:title": 4,
+  "_extractDescription:description": 5,
+  "_extractDescription:metadataRows": 5,
+  "_extractDuration:videoId": 4,
+  "_extractDuration:duration": 4,
+  "_extractPublishedTime:videoId": 4,
+  "_extractPublishedTime:publishedTime": 4,
+  "_extractPublishedTime:metadataRows": 4,
+  "_extractChannelInfo:channelName": 4,
+  "_extractChannelInfo:channelId": 2,
+  "_extractChannelInfo:channelHandle": 4
 };
 
 function read(file) {
@@ -151,12 +152,12 @@ test('filter logic rule field effect register is audit-only and source scoped', 
   assert.match(text, /field-effect coverage/);
   assert.match(text, /JSON-first filtering work does not confuse/);
   assert.match(text, /source file: js\/filter_logic\.js/);
-  assert.match(text, /source line count: 3652/);
-  assert.match(text, /source bytes: 172174/);
-  assert.match(text, /source sha256: 953ef0f14970e6cfbc11215fe9eaa078ced34f001908e1c6d5903a8fd2d9a1f5/);
-  assert.equal(sourceLineCount(sourceText), 3652);
-  assert.equal(Buffer.byteLength(sourceText), 172174);
-  assert.equal(sha256(sourcePath), '953ef0f14970e6cfbc11215fe9eaa078ced34f001908e1c6d5903a8fd2d9a1f5');
+  assert.match(text, /source line count: 4534/);
+  assert.match(text, /source bytes: 221980/);
+  assert.match(text, /source sha256: f7021a053af96a4cd31a577f56e900ffb1a5d990fe55a838af64a6dba867afc4/);
+  assert.equal(sourceLineCount(sourceText), 4534);
+  assert.equal(Buffer.byteLength(sourceText), 221980);
+  assert.equal(sha256(sourcePath), 'f7021a053af96a4cd31a577f56e900ffb1a5d990fe55a838af64a6dba867afc4');
   assert.match(text, /docs\/audit\/FILTERTUBE_FILTER_LOGIC_RULE_PATH_SEMANTIC_REGISTER_2026-05-21\.md/);
 });
 
@@ -166,9 +167,9 @@ test('filter logic rule field effect register pins current rules field consumers
 
   assert.deepEqual(summary.fieldCounts, expectedFieldCounts);
   assert.deepEqual(summary.methodFieldCounts, expectedMethodFieldCounts);
-  assert.equal(summary.totalReferences, 63);
-  assert.equal(summary.consumerMethods.size, 9);
-  assert.equal(Object.keys(summary.methodFieldCounts).length, 20);
+  assert.equal(summary.totalReferences, 64);
+  assert.equal(summary.consumerMethods.size, 10);
+  assert.equal(Object.keys(summary.methodFieldCounts).length, 21);
 
   for (const [field, count] of Object.entries(expectedFieldCounts)) {
     assert.ok(text.includes(`| \`${field}\` | ${count} |`), `missing field count for ${field}`);
@@ -176,21 +177,21 @@ test('filter logic rule field effect register pins current rules field consumers
 
   for (const token of [
     'rule fields with runtime consumers: 11',
-    'consumer methods with rules.<field> references: 9',
-    'method-field consumer pairs: 20',
-    'rules.<field> token references: 63',
-    'effective runtime path rows inherited from path register: 440',
-    'effective unique path literals inherited from path register: 174',
-    'effective renderer-field pairs inherited from path register: 177',
+    'consumer methods with rules.<field> references: 10',
+    'method-field consumer pairs: 21',
+    'rules.<field> token references: 64',
+    'effective runtime path rows inherited from path register: 467',
+    'effective unique path literals inherited from path register: 184',
+    'effective renderer-field pairs inherited from path register: 189',
     '| `_extractVideoId` | `videoId` | 2 |',
-    '| `_buildCandidate` | `channelName`, `duration`, `publishedTime`, `viewCount`, `metadataRows`, `commentText` | 9 |',
+    '| `_buildCandidate` | `channelName`, `duration`, `publishedTime`, `viewCount`, `metadataRows`, `commentText` | 6 |',
     '| `_shouldBlock` | `commentText` | 4 |',
     '| `_checkCategoryFilters` | `videoId` | 4 |',
     '| `_extractTitle` | `title` | 4 |',
     '| `_extractDescription` | `description`, `metadataRows` | 10 |',
     '| `_extractDuration` | `duration`, `videoId` | 8 |',
     '| `_extractPublishedTime` | `publishedTime`, `metadataRows`, `videoId` | 12 |',
-    '| `_extractChannelInfo` | `channelName`, `channelId`, `channelHandle` | 11 |'
+    '| `_extractChannelInfo` | `channelName`, `channelId`, `channelHandle` | 10 |'
   ]) {
     assert.ok(text.includes(token), `missing consumer token ${token}`);
   }
@@ -206,7 +207,6 @@ test('filter logic rule field effect register pins current behavior boundaries f
     'extractChannelIdentity: needsChannelIdentity',
     'const textToSearch = this._candidateSearchText(candidate);',
     'const commentText = rules.commentText ? getTextFromPaths',
-    'scheduleVideoMetaFetch(videoId, { needDuration: false, needDates: false, needCategory: true });',
     'const durationSeconds = this._extractDuration(item, rules, rendererType);',
     'const publishTimestamp = this._extractPublishedTime(item, rules, rendererType);',
     'const title = this._extractTitle(item, rules);',
@@ -216,14 +216,18 @@ test('filter logic rule field effect register pins current behavior boundaries f
     assert.ok(sourceText.includes(token), `missing source token ${token}`);
   }
 
+  const categoryBranch = sourceText.slice(sourceText.indexOf('        _checkCategoryFilters('), sourceText.indexOf('        _checkLanguageFilters('));
+  assert.doesNotMatch(categoryBranch, /scheduleVideoMetaFetch/);
+  assert.match(categoryBranch, /if \(!categoryRaw\) \{[\s\S]*?return false;/);
+
   for (const token of [
     '`title`, `description`, `commentText`, `channelName`, `duration`,',
     '`publishedTime`, `viewCount`, and `metadataRows` can enter',
     '`channelName`, `channelId`, and `channelHandle` only become channel-policy',
     '`videoId` is a join key, not channel identity',
     '`duration` and `publishedTime` can directly feed content-filter hide',
-    '`viewCount` has no current view-count threshold predicate',
-    '_checkCategoryFilters()` can schedule `scheduleVideoMetaFetch(videoId, {',
+    '`viewCount` feeds an optional conservative minimum-view threshold',
+    '_checkCategoryFilters()` does not schedule metadata fetches',
     '`processData()` harvests channel mappings before the `settings.enabled ===',
     'hide/allow mutation work',
     'changing view-count semantics',

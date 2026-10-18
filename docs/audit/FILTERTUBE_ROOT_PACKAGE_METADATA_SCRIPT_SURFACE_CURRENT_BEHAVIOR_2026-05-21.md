@@ -26,34 +26,42 @@ first-class JSON filter work look safer than the runtime proof actually allows.
 
 ## File Fingerprints
 
-Current tracked root metadata inventory: 7 files, 2,978 newline counts, and
-136,458 bytes.
+Current tracked root metadata inventory: 7 files, 3,388 newline counts, and
+178,350 bytes.
 
 | File | Newline count | Bytes | SHA-256 |
 |---|---:|---:|---|
-| `.gitignore` | 153 | 2,197 | `c90a7834297cf0a7b65493f41a21947fd5d85d1e14740b902cb3a3664028e3ca` |
-| `CHANGELOG.md` | 591 | 40,124 | `e22a87ce7eeb88d171587d4b0f4676881a2c3081a7fbf15978d7e8d8582cdfdd` |
+| `.gitignore` | 157 | 2,275 | `f3033e094938bb4fc6ecf30aad468286f1dccd8d18db1c136e348ab087208bcd` |
+| `CHANGELOG.md` | 938 | 75,511 | `e57906dca95911874ef251aa45d8c3a76df00df576b36277d9c0e9b9654c3036` |
 | `LICENSE` | 21 | 1,073 | `d0739cbb6232b0fb9ea59347feaf412bab5042768aa02856b16af24bb35e9d9d` |
-| `README.md` | 423 | 24,171 | `222883578482b2d594d43f29bbe4778b7404a640bb5f2ca9e9a67a1858bf49cb` |
+| `README.md` | 456 | 28,669 | `bb4374abbe82478e01a6653f26be3149824c0efd6aaf75c2095d4611b1ee67d6` |
 | `channel-identity-watch-mix-collab-recovery-plan.md` | 262 | 16,023 | `01f82169b06d3752e318b20b956c8a4284ae80166686e5c40aeee66c957d108a` |
-| `package.json` | 67 | 2,954 | `6f0b5dc130399998ad5435ef3b273573234e80561ceba32e0da078b91851e229` |
-| `package-lock.json` | 1,461 | 49,916 | `f52d6482693be9cd4edacdc1f1491b4d2cda796522bfd0e4dcf86e0c879ad974` |
+| `package.json` | 86 | 4,580 | `c9cb2c3c4fea302fa3946f462dbfbb474381a78946ca59adb653814d06a4de51` |
+| `package-lock.json` | 1,468 | 50,219 | `84e60039228a76c10550d2e3922706ef2b7dd3671ef218a1d6e9263598cef33d` |
 
 Any release, package, or optimization claim that uses these files should cite
 the exact current file state or an updated fingerprint.
 
 ## Package Script Surface
 
-`package.json` currently declares package version `3.3.2`, license `MIT`,
+`package.json` currently declares package version `3.4.1`, license `MIT`,
 repository `git+https://github.com/varshneydevansh/FilterTube.git`, homepage
-`https://github.com/varshneydevansh/FilterTube`, 2 runtime dependencies, 3
-development dependencies, and 33 scripts.
+`https://github.com/varshneydevansh/FilterTube`, 3 runtime dependencies, 3
+development dependencies, and 51 scripts.
 
 Current scripts:
 
 ```text
 build:nanah-vendor -> node scripts/build-nanah-vendor.mjs
+build:qr-scanner-vendor -> node scripts/build-qr-scanner-vendor.mjs
 build:ui -> node scripts/build-extension-ui.mjs
+check:ui-locales -> node scripts/check-ui-locales.mjs
+check:json-keys -> node scripts/check-json-keys.cjs
+check:ui-locales:targets -> node scripts/check-ui-locales.mjs --require-all
+check:release-note-locales -> node scripts/check-release-note-locales.mjs
+check:release-note-locales:complete -> node scripts/check-release-note-locales.mjs --require-all
+audit:ui-copy -> python3 scripts/audit-ui-copy.py
+audit:ui-copy:complete -> python3 scripts/audit-ui-copy.py --require-complete
 dev -> node build.js
 build -> node build.js
 build:chrome -> node build.js chrome
@@ -65,6 +73,7 @@ managed:native-handoff -> node scripts/create-managed-native-runtime-sync-handof
 managed:provider-ownership -> node scripts/create-managed-pickup-provider-ownership-artifact.mjs
 managed:app-parity-smoke -> node scripts/create-managed-app-parity-smoke-artifact.mjs
 managed:provider -> node scripts/managed-delivery-provider.mjs
+managed:nearby -> node scripts/managed-delivery-provider.mjs --lan-discovery
 test -> node scripts/run-test-lane.mjs smoke
 audit:runtime -> node --test tests/runtime/*.test.mjs
 test:release -> node scripts/run-test-lane.mjs release
@@ -79,6 +88,15 @@ test:smoke -> node scripts/run-test-lane.mjs smoke
 lanes:changed -> node scripts/run-test-lane.mjs --changed
 test:changed -> node scripts/run-test-lane.mjs --run-changed
 test:audit-drift -> node scripts/audit-proof-drift.mjs --lane-owned
+audit:family-devices:phase11 -> node scripts/report-family-device-phase11-status.mjs --next
+audit:family-devices:phase11:strict -> node scripts/report-family-device-phase11-status.mjs --require-minimum-pass
+audit:family-devices:phase12 -> node scripts/report-family-device-phase12-status.mjs --next
+audit:family-devices:phase12:strict -> node scripts/report-family-device-phase12-status.mjs --require-complete
+audit:family-devices:provider -> node scripts/report-family-device-provider-surface.mjs --strict
+audit:family-devices:import -> node scripts/import-family-device-downloaded-evidence.mjs
+audit:family-devices:log -> node scripts/update-family-device-evidence-log.mjs
+audit:family-devices:release -> node scripts/report-family-device-release-readiness.mjs
+audit:family-devices:checklist -> node scripts/create-family-device-capture-checklist.mjs
 verify:managed-app-policy -> node scripts/verify-managed-app-policy-contract.mjs
 smoke:youtube -> node docs/audit/artifacts/release-live-youtube-spa-smoke/run-live-smoke.mjs
 smoke:youtube:verify -> node docs/audit/artifacts/release-live-youtube-spa-smoke/verify-live-smoke-artifact.mjs
@@ -103,7 +121,7 @@ Risk classification:
 
 | Risk | Current behavior | Missing gate |
 |---|---|---|
-| Release drift | `package.json`, `package-lock.json`, README badges, browser manifests, changelog, and release notes currently point at `3.3.2`; app-store/direct APK availability still depends on artifact proof. | `rootReleaseClaimGate` linking package version, manifest versions, changelog section, README badge, release notes row, website copy, and package artifact. |
+| Release drift | `package.json`, `package-lock.json`, README badges, browser manifests, changelog, and release notes currently point at `3.4.1`; app-store/direct APK availability still depends on artifact proof. | `rootReleaseClaimGate` linking package version, manifest versions, changelog section, README badge, release notes row, website copy, and package artifact. |
 | Audit discoverability | `audit:runtime`, focused `test:*` lanes, `npm test`, `lanes:changed`, `test:changed`, and live-smoke helper scripts exist. | `packageScriptExecutionGate` for release and local verification commands. |
 | Dev manifest mutation | `dev:chrome`, `dev:firefox`, and `dev:opera` overwrite tracked `manifest.json`. | Dirty-worktree and manifest-parity gate before release or implementation review. |
 | Native parity | `sync:native-runtime` delegates to a sibling app repo; normal `npm run build` does not invoke it. | Runtime sync freshness and app-boundary proof before claiming extension/app parity. |
@@ -128,8 +146,8 @@ native parity until separate provider/app evidence exists.
 
 ## Lockfile Surface
 
-`package-lock.json` is lockfile version 3 with 112 `packages` entries, including
-the root package, 111 non-root packages, and 0 top-level `dependencies` entries.
+`package-lock.json` is lockfile version 3 with 113 `packages` entries, including
+the root package, 112 non-root packages, and 0 top-level `dependencies` entries.
 All non-root package entries currently have an integrity value.
 
 License counts across non-root package entries:
@@ -137,7 +155,7 @@ License counts across non-root package entries:
 ```text
 MIT: 92
 ISC: 16
-Apache-2.0: 2
+Apache-2.0: 3
 BSD-3-Clause: 1
 ```
 
@@ -158,7 +176,7 @@ vendor-bundle freshness, generated UI freshness, and release ZIP contents.
 
 ## Public Root Documents
 
-`README.md` is public release copy. It currently displays version `3.3.2`,
+`README.md` is public release copy. It currently displays version `3.4.1`,
 license `MIT`, total line count `534.5k`, JavaScript line count `81.9k`, and
 links the download hub `https://filtertube.in/downloads`.
 
@@ -173,7 +191,7 @@ Current README claims relevant to optimization and JSON-first filtering:
 - Current audit work is tightening no-rule, route, lifecycle, and resolver
   budgets.
 
-`CHANGELOG.md` currently starts with `## Version 3.3.2`; `README.md` also links
+`CHANGELOG.md` currently starts with `## Unreleased` and retains `## Version 3.4.1`; `README.md` also links
 to it as the detailed change history. `LICENSE` is the MIT license file.
 
 `build.js` packages only these root common files into browser release outputs:
@@ -295,3 +313,7 @@ optimization, JSON-first behavior, asset optimization, generated-output
 cleanup, package pruning, CSS activation/deletion, whitelist behavior, metric
 collectors, artifact creation, native sync, release package changes, or public
 claims.
+
+## 2026-10-18 Source Refresh
+
+Current fingerprints, package version, 51 script entrypoints, jsqr dependency and 113 lockfile package entries were checked against source. The dated July close-out above remains historical, not current version proof. README aggregate LoC badges are generated estimates and change with tracked source; their numerical value is not a runtime guarantee. Public platform availability and installed/browser/native acceptance require their separate evidence.

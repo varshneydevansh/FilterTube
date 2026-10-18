@@ -169,7 +169,7 @@ test('manifests carry scripting permission and bridge asks background to inject 
 
   assert.match(scriptingApi, /api\.runtime\.sendMessage\(\{\s*action: "injectScripts",\s*scripts: scripts/s);
   assert.match(scriptingApi, /api\.runtime\.lastError \|\| !response\?\.success/);
-  assert.match(orchestrator, /const scriptsToInject = \['shared\/identity', 'filter_logic'\]/);
+  assert.match(orchestrator, /const scriptsToInject = \['shared\/identity', 'shared\/view_count', 'filter_logic'\]/);
   assert.match(orchestrator, /if \(isFirefox\) scriptsToInject\.push\('seed'\)/);
   assert.match(orchestrator, /scriptsToInject\.push\('injector'\)/);
   assert.match(orchestrator, /if \(!isFirefox && api\.scripting\?\.executeScript\)/);
@@ -209,25 +209,15 @@ test('background injectScripts executes MAIN world asynchronously without trust 
   assert.doesNotMatch(injectScripts, /isTrustedUiSender|trustedUi|allowedScripts|scriptAllowlist|sender\.tab\.url|tabs\.get|tabs\.query|youtube\.com|youtubekids\.com/);
 });
 
-test('subscriptions bridge injection uses caller tab id with fixed isolated script list', () => {
+test('subscriptions bridge checks an existing receiver without injecting scripts into a caller-selected tab', () => {
   const { subscriptionsBridge } = blocks();
-
   assert.match(subscriptionsBridge, /const tabId = Number\(request\?\.tabId\);/);
-  assert.match(subscriptionsBridge, /target: \{ tabId \}/);
-  assert.match(subscriptionsBridge, /world: 'ISOLATED'/);
-
-  for (const file of [
-    'js/shared/identity.js',
-    'js/content/dom_helpers.js',
-    'js/content/dom_extractors.js',
-    'js/content/dom_fallback.js',
-    'js/content/bridge_injection.js',
-    'js/content/bridge_settings.js'
-  ]) {
-    assert.ok(subscriptionsBridge.includes(`'${file}'`), `missing subscription bridge file ${file}`);
-  }
-
-  assert.doesNotMatch(subscriptionsBridge, /isTrustedUiSender|sender\?\.tab\?\.id|sender\?\.frameId|sender\.tab\.url|tabs\.get|tabs\.query|youtube\.com|youtubekids\.com|pendingSubscriptionImport/);
+  assert.match(subscriptionsBridge, /Number\.isFinite\(tabId\)/);
+  assert.match(subscriptionsBridge, /browserAPI\.tabs\.sendMessage\(tabId,/);
+  assert.match(subscriptionsBridge, /action: 'FilterTube_Ping'/);
+  assert.match(subscriptionsBridge, /feature: 'subscriptions_import'/);
+  assert.match(subscriptionsBridge, /errorCode: 'receiver_unavailable'/);
+  assert.doesNotMatch(subscriptionsBridge, /executeScript|world:|files:|target:/);
 });
 
 test('current script name mapping allows unclassified path shape before browser executeScript result', () => {

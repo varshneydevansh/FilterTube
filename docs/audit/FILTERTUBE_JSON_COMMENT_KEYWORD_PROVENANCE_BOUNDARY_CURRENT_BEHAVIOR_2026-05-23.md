@@ -14,26 +14,24 @@ default slices. It pins how channel-derived Filter All keywords with
 from the comments-only compiled list, then consumed by `js/filter_logic.js`
 without row provenance.
 
-The current boundary is:
+The current boundary, revalidated on 2026-10-18, is:
 
 ```text
-settings_shared keeps channel-derived Filter All keywords in global
-filterKeywords regardless of filterAllComments, excludes them from
-filterKeywordsComments when comments are false, compiles regex payloads as
-pattern/flags only, and filter_logic reconstructs global filterKeywords but not
-serialized filterKeywordsComments. Because comment text is part of JSON
-candidate metadata and the global keyword branch runs before the comment-specific
-branch, a channel-derived global keyword can remove a comment mentioning that
-channel even when the channel row has filterAllComments:false.
+settings_shared retains channel-derived video rules in filterKeywords and only
+comments-enabled rules in filterKeywordsComments. The engine reconstructs both
+serialized lists, excludes comments from the generic candidate-keyword branch,
+and matches the explicit comment list only against comment body text. An
+explicit empty comment list preserves unrelated-author comments. If the list is
+absent, the legacy global-list fallback still applies to comment bodies.
 ```
 
 ## Source Scope
 
 | File | Lines | Bytes | SHA-256 |
 | --- | ---: | ---: | --- |
-| `js/filter_logic.js` | 3652 | 172174 | `953ef0f14970e6cfbc11215fe9eaa078ced34f001908e1c6d5903a8fd2d9a1f5` |
-| `js/settings_shared.js` | 1181 | 57535 | `9710ebb445ba11cc45fc98aced765d298226a8cd4a003600e106f908abc2162c` |
-| `js/background.js` | 6803 | 306710 | `57ddc6c3e31112c30734ede78c9b37b01bd31533fc8a1d16856b13d2b295f0d7` |
+| `js/filter_logic.js` | 4534 | 221980 | `f7021a053af96a4cd31a577f56e900ffb1a5d990fe55a838af64a6dba867afc4` |
+| `js/settings_shared.js` | 1313 | 66857 | `19f0a1fb3cd512494481b7eb39169bf84feeda4a0a6a20cf58ebaf1c18ff7ba9` |
+| `js/background.js` | 8538 | 386043 | `cc89bb4a0375145e1c811b7cf5953729c39c409b6b24cacdc65c80f9f6ff44d0` |
 
 Related proof layers:
 
@@ -67,16 +65,16 @@ settings_shared compileKeywords source tokens: 2
 settings_shared compileKeywords channelRef tokens: 2
 settings_shared syncFilterAllKeywords filterAllComments tokens: 2
 settings_shared syncFilterAllKeywords channelRef tokens: 7
-settings_shared buildCompiledSettings filterKeywordsComments tokens: 1
-filter_logic processSettings RegExp tokens: 5
-filter_logic candidate metadata/search commentText tokens: 1
-filter_logic candidate metadata/search metadataText tokens: 5
-filter_logic global/comment keyword branch filterKeywords tokens: 5
+settings_shared buildCompiledSettings filterKeywordsComments tokens: 3
+filter_logic processSettings RegExp tokens: 3
+filter_logic candidate metadata/search commentText tokens: 3
+filter_logic candidate metadata/search metadataText tokens: 3
+filter_logic global/comment keyword branch filterKeywords tokens: 3
 filter_logic global/comment keyword branch filterKeywordsComments tokens: 2
 filter_logic global/comment keyword branch commentText tokens: 8
-filter_logic global/comment keyword branch _regexMatches tokens: 5
-background V4 comment compile filterKeywordsComments tokens: 1
-background legacy comments fallback filterKeywordsComments tokens: 5
+filter_logic global/comment keyword branch _regexMatches tokens: 3
+background V4 comment compile filterKeywordsComments tokens: 3
+background legacy comments fallback filterKeywordsComments tokens: 3
 runtime JSON comment keyword provenance fixtures: 10
 runtime behavior changed: no
 not completion proof for JSON comment keyword provenance authority
@@ -87,51 +85,34 @@ not completion proof for JSON comment keyword provenance authority
 | Boundary | Current behavior | Missing proof gate |
 | --- | --- | --- |
 | Channel-derived global compile | `syncFilterAllKeywords()` creates a channel-derived keyword for every `filterAll: true` channel and stores the row comments flag on the keyword. | A channel-derived keyword comments policy that says which surfaces may consume the global row. |
-| Comments-only compile | `buildCompiledSettings()` compiles all synchronized keywords into `filterKeywords` and only `comments === true` rows into `filterKeywordsComments`. | A report that proves comments-false rows cannot still affect comments through another branch. |
-| Compiled metadata | `compileKeywords()` returns only `{ pattern, flags }`, dropping `source`, `channelRef`, `comments`, `word`, and `addedAt`. | A compiled keyword metadata/provenance report. |
-| Filter logic reconstruction | `_processSettings()` reconstructs `filterKeywords` and `whitelistKeywords` from serialized `{ pattern, flags }`, but not `filterKeywordsComments`. | A serialized comment keyword reconstruction contract. |
+| Comments-only compile | `buildCompiledSettings()` excludes comment-only rows from video keywords and compiles `comments === true` rows into `filterKeywordsComments`. | A report that proves comments-false rows cannot still affect comments through another branch. |
+| Compiled metadata | `compileKeywords()` serializes `{ pattern, flags }` plus an optional enabled date filter, dropping `source`, `channelRef`, `comments`, `word`, and `addedAt`. | A compiled keyword metadata/provenance report. |
+| Filter logic reconstruction | `_processSettings()` reconstructs serialized video, allowlist, and explicit comment patterns; direct comment RegExp objects remain supported. | A serialized comment keyword reconstruction contract. |
 | Candidate metadata | `_buildCandidate()` includes `rules.commentText` inside `candidate.metadataText`; `_candidateSearchText()` includes `metadataText`. | A field-level candidate provenance report. |
-| Decision order | The global blocklist keyword branch runs before the comment-specific branch. | A comment decision order report with allowed effects and short-circuit reasons. |
-| Comments-false channel keyword | A comment mentioning a Filter All channel can be removed by the global keyword branch even when that channel row has `filterAllComments: false`. | A false-hide budget and rollback/restore policy for channel-derived comment effects. |
+| Decision order | The generic blocklist keyword branch explicitly excludes comment renderers; the comment-specific branch owns body matching. | A comment decision order report with allowed effects and short-circuit reasons. |
+| Comments-false channel keyword | An unrelated-author comment mentioning a Filter All channel survives when that row has `filterAllComments: false`; author-channel blocking remains independent. | A false-hide budget and rollback/restore policy for channel-derived comment effects. |
 | Background parity | Background V4 and legacy comment compilers also produce comments lists without row provenance in the compiled regex entries. | Background/shared compiler parity report with profile, list mode, and row identity. |
 
 ## Runtime Fixture Summary
 
 The runtime guard proves:
 
-1. `settings_shared.buildCompiledSettings()` keeps a channel-derived
-   `filterAllComments:false` keyword in global `filterKeywords`.
-2. The same compiled settings excludes that keyword from
-   `filterKeywordsComments`.
-3. The compiled global keyword object contains only `pattern` and `flags`.
-4. A comment mentioning that channel is removed by the JSON engine through the
-   global keyword branch even though the channel row has
-   `filterAllComments:false`.
-5. The same comment survives when the global compiled keyword list is removed
-   and no comment-specific regex exists.
-6. Serialized `{ pattern, flags }` entries in `filterKeywordsComments` are not
-   reconstructed by `filter_logic.js`, so they do not block comments unless they
-   arrive as direct `RegExp` instances.
-7. Direct `RegExp` comment keywords still remove comments.
-8. The source order keeps global keyword matching before the comment-specific
-   branch.
-9. The candidate builder puts comment text into metadata searched by global
-   keywords.
-10. Product runtime still lacks first-class JSON comment keyword provenance
-    gates.
+1. A comments-disabled channel-derived keyword remains a video rule and is excluded from the comment list.
+2. Serialized compiled entries retain pattern and flags; optional date-filter metadata is tested separately from row provenance.
+3. An unrelated-author comment survives the video-only channel-derived rule.
+4. An explicit empty comment list excludes global keyword matching.
+5. Serialized and direct RegExp comment rules both remove matching comment bodies.
+6. Author-channel blocking and hide-all-comments remain independent decisions.
+7. An absent comment list retains legacy body-only fallback.
+8. Product runtime still lacks a unified JSON comment keyword provenance report.
 
 ## Risks Identified
 
-- Reliability: comments-scope state is carried during synchronization but
-  discarded by compiled regex payloads before JSON decisions run.
-- False-hide/leak: `filterAllComments:false` does not fully prevent
-  channel-derived global keywords from hiding comments that mention that
-  channel.
-- Performance: comment renderers can evaluate global keyword regexes over
-  candidate metadata before reaching the comment-specific keyword list.
-- Code burden: comments-scope decisions are split across settings sync,
-  compiler output, filter settings reconstruction, candidate construction,
-  global keyword matching, and comment keyword matching.
+Compiled regex payloads still omit row source/channel identity, and the compiler, author-channel policy, JSON body matcher, and DOM matcher remain separate authorities. The corrected explicit-list behavior is not proof of exhaustive compiler/import/profile parity, DOM boundary equivalence, or an installed-browser false-hide budget.
+
+## 2026-10-18 comment-scope revalidation
+
+The actual shared compiler and JSON engine fixtures now verify that an explicit empty comment list preserves unrelated-author comments, while opted-in comment rules and independent author blocking still work. This supersedes the old global-before-comment defect recorded by the original May audit. JSON comment keyword provenance gates remain incomplete beyond this bounded correction.
 
 ## Missing Authority Symbols
 
@@ -183,3 +164,7 @@ These counts are audit-only blockers. They do not approve runtime
 optimization, JSON-first behavior, comment filtering behavior, whitelist
 behavior, metric collectors, artifact creation, native sync, release package
 changes, or public claims.
+
+## Revalidation - 2026-10-18
+
+Source fingerprints and bounded extraction inventories were refreshed against the current checkout after source review. These are drift detectors, not exhaustive semantic proof, installed-browser evidence, or approval of the broader missing-authority gates. Executable fixtures below remain the behavior checks.

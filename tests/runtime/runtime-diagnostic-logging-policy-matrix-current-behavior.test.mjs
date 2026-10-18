@@ -8,48 +8,48 @@ const repoRoot = process.cwd();
 const docPath = 'docs/audit/FILTERTUBE_RUNTIME_DIAGNOSTIC_LOGGING_POLICY_MATRIX_CURRENT_BEHAVIOR_2026-05-24.md';
 
 const sourceFingerprints = {
-  'build.js': [740, 26978, 'c8485cb2600aad89f44015cd7e49ebe4746ebcc35c91c1ff2bf29aec2f087a04'],
-  'js/background.js': [6803, 306710, '57ddc6c3e31112c30734ede78c9b37b01bd31533fc8a1d16856b13d2b295f0d7'],
-  'js/content/block_channel.js': [3189, 127857, 'c040b57e0b107fd7b6fb0a18bc4ca014e5a22fbb82755f81e51a497eee387dba'],
-  'js/content/bridge_settings.js': [1127, 44545, 'fad07aba48391021d5e42096b34f32c58a6337a1a4d303a8706927c541d47f71'],
-  'js/content/collab_dialog.js': [393, 14623, 'dc34bba556b310da8b7516d106e9d67addea59d8a707a02f21607ac97af1f72a'],
-  'js/content/dom_extractors.js': [1137, 46896, 'adf2c04f14f0f3bb44556e216af25aca8ff182dfa569c248ddb150d0cca38a4e'],
-  'js/content/dom_fallback.js': [5030, 235555, 'fdc4391aed06849c1ba0a9afbb5b05e5e115b0929639e7014738d1462bf13ec5'],
-  'js/content/handle_resolver.js': [282, 9785, '67cc877a0a97e4c4c5aaf5a0d1c37c15000af5238f8f37d7c5dc6efee27e34ff'],
-  'js/content_bridge.js': [13636, 604184, '8d55d0c8995e5b68bb9142c41f95046a676f5af2b83f8545b00f91a6a5a3776d'],
-  'js/filter_logic.js': [3652, 172174, '953ef0f14970e6cfbc11215fe9eaa078ced34f001908e1c6d5903a8fd2d9a1f5'],
-  'js/injector.js': [3593, 155830, '634041581ec84db2edd4f07d46f4bfb9d3a7d97036a0fb83db7739856bdc3e04'],
-  'js/io_manager.js': [2111, 101002, 'bed520852b47c0c36994017414d721f0a5baa2c375387098379ab88cc3138669'],
-  'js/layout.js': [680, 30604, '48831ccdc2d62c75818d9c6a153d7bfacec9d7be9f2408485f74b1a7c13c57c7'],
-  'js/popup.js': [1841, 75587, 'cb2b30a8d22b08cbd538fdce4ae195b006405d0ceb02a91d92ed53c877aa402a'],
-  'js/seed.js': [1136, 50026, 'a9d86cd973b998ffbd58faf316ca679267ce7267af36969683f32b760f49054d'],
-  'js/settings_shared.js': [1181, 57535, '9710ebb445ba11cc45fc98aced765d298226a8cd4a003600e106f908abc2162c'],
-  'js/state_manager.js': [2491, 99780, '509c559e35989c13cdded17c01eeaca8115addcd3848dbcda41514422e5bc7b6'],
-  'js/tab-view.js': [14984, 698493, '82345bda27253dc5c5644c36dd97c2cfafb442d2ecb391818c38f6ea5dad5c65'],
-  'scripts/build-extension-ui.mjs': [50, 1188, '6326362ebf90f448ccdbf68945b3fb522b7b215edaf9b3e28589a4e166239cf3'],
-  'scripts/build-nanah-vendor.mjs': [65, 1818, 'dae8d3ef29c4cd44b0bf975090e9d53f3bb05b523355f5038930fc03b27e921c'],
-  'scripts/sync-native-runtime.mjs': [34, 1070, '4f46c13bf6099092193712790d231ff4809b00b1b0061d04af71ac3ba6bf21c6']
+  'build.js': [861, 33225, "a198cc1d0bf98e410deb8f66ced0e56a046bbf987a0a5b878e1278577622fb2e"],
+  'js/background.js': [8538, 386043, "cc89bb4a0375145e1c811b7cf5953729c39c409b6b24cacdc65c80f9f6ff44d0"],
+  'js/content/block_channel.js': [3361, 135050, "f2a02886a83d64d93186cd1f0c1f300683ae49754b928d2e0329fd1a88d8f2c9"],
+  'js/content/bridge_settings.js': [2110, 93234, "0a42241fd8a9b6559995895ef7174745d7e4a7b21e0644ef6940eadd66162723"],
+  'js/content/collab_dialog.js': [393, 14623, "dc34bba556b310da8b7516d106e9d67addea59d8a707a02f21607ac97af1f72a"],
+  'js/content/dom_extractors.js': [1166, 48221, "ddb421e018c6e9a1ef92c7cd8dc4d91d201da814c6f25a3b63d771795cdd9e19"],
+  'js/content/dom_fallback.js': [8172, 380506, "df11dc69db7f7b8818c8dceb1d237d1794c8687af161dc2b9ae9d12acaed9e16"],
+  'js/content/handle_resolver.js': [291, 10230, "fab995e0e5c85c8ba4e9d342bc452d297ea4dc99220bb94fee4c490ff4a98b47"],
+  'js/content_bridge.js': [15053, 678250, "c653324d1f042c0473cf2102d81bcd161bfaa26f8c7ee545e250226594dc9618"],
+  'js/filter_logic.js': [4534, 221980, "f7021a053af96a4cd31a577f56e900ffb1a5d990fe55a838af64a6dba867afc4"],
+  'js/injector.js': [4148, 183860, "62bd7222e7ea8c7fc51cbffd63b894a2f03509b4cc09ddf7525b8a748f91eb60"],
+  'js/io_manager.js': [3203, 162604, "ca73f44abb4d2d4e57a81470cfcb2447b1e62ef8680ef0457b81dcdc6734e4c3"],
+  'js/layout.js': [680, 30604, "48831ccdc2d62c75818d9c6a153d7bfacec9d7be9f2408485f74b1a7c13c57c7"],
+  'js/popup.js': [2553, 117093, "645fab83d4b665796f5b2fe1be262ca336df6a4cf3ffb1daebc588a50c091aa7"],
+  'js/seed.js': [2261, 97497, "ae45137438c5a19610855b443fbeae0d6fc34931f62a5346a0849005078f7250"],
+  'js/settings_shared.js': [1313, 66857, "19f0a1fb3cd512494481b7eb39169bf84feeda4a0a6a20cf58ebaf1c18ff7ba9"],
+  'js/state_manager.js': [2979, 124009, "04879b5b1dcac9229c70d0ea14241667755682649865ad1d52030c1ce21950d3"],
+  'js/tab-view.js': [32531, 1760504, "6da5a37b9018368588ff9c7091aca30c22a4398a038f681bad2ba2a1be4a4eca"],
+  'scripts/build-extension-ui.mjs': [50, 1188, "6326362ebf90f448ccdbf68945b3fb522b7b215edaf9b3e28589a4e166239cf3"],
+  'scripts/build-nanah-vendor.mjs': [65, 1818, "dae8d3ef29c4cd44b0bf975090e9d53f3bb05b523355f5038930fc03b27e921c"],
+  'scripts/sync-native-runtime.mjs': [34, 1070, "4f46c13bf6099092193712790d231ff4809b00b1b0061d04af71ac3ba6bf21c6"]
 };
 
 const expectedConsoleRows = {
-  'build.js': { log: 14, warn: 6, error: 8, debug: 0, info: 0, total: 28 },
-  'js/background.js': { log: 49, warn: 28, error: 12, debug: 13, info: 0, total: 102 },
+  'build.js': { log: 19, warn: 8, error: 7, debug: 0, info: 0, total: 34 },
+  'js/background.js': { log: 49, warn: 29, error: 12, debug: 13, info: 0, total: 103 },
   'js/content/block_channel.js': { log: 1, warn: 3, error: 5, debug: 0, info: 0, total: 9 },
   'js/content/bridge_settings.js': { log: 3, warn: 3, error: 0, debug: 0, info: 0, total: 6 },
   'js/content/collab_dialog.js': { log: 1, warn: 3, error: 0, debug: 0, info: 0, total: 4 },
   'js/content/dom_extractors.js': { log: 0, warn: 0, error: 1, debug: 0, info: 0, total: 1 },
-  'js/content/dom_fallback.js': { log: 2, warn: 1, error: 0, debug: 0, info: 0, total: 3 },
+  'js/content/dom_fallback.js': { log: 2, warn: 2, error: 0, debug: 0, info: 0, total: 4 },
   'js/content/handle_resolver.js': { log: 2, warn: 3, error: 0, debug: 0, info: 0, total: 5 },
   'js/content_bridge.js': { log: 114, warn: 46, error: 14, debug: 8, info: 0, total: 182 },
-  'js/filter_logic.js': { log: 2, warn: 5, error: 2, debug: 1, info: 0, total: 10 },
+  'js/filter_logic.js': { log: 2, warn: 6, error: 1, debug: 1, info: 0, total: 10 },
   'js/injector.js': { log: 0, warn: 0, error: 0, debug: 1, info: 0, total: 1 },
-  'js/io_manager.js': { log: 3, warn: 5, error: 0, debug: 0, info: 0, total: 8 },
+  'js/io_manager.js': { log: 3, warn: 4, error: 0, debug: 0, info: 0, total: 7 },
   'js/layout.js': { log: 4, warn: 0, error: 0, debug: 0, info: 0, total: 4 },
   'js/popup.js': { log: 1, warn: 1, error: 0, debug: 0, info: 0, total: 2 },
-  'js/seed.js': { log: 2, warn: 0, error: 0, debug: 1, info: 0, total: 3 },
+  'js/seed.js': { log: 2, warn: 0, error: 0, debug: 1, info: 1, total: 4 },
   'js/settings_shared.js': { log: 0, warn: 1, error: 0, debug: 0, info: 0, total: 1 },
   'js/state_manager.js': { log: 3, warn: 14, error: 3, debug: 0, info: 0, total: 20 },
-  'js/tab-view.js': { log: 1, warn: 5, error: 14, debug: 0, info: 0, total: 20 },
+  'js/tab-view.js': { log: 1, warn: 13, error: 25, debug: 0, info: 0, total: 39 },
   'scripts/build-extension-ui.mjs': { log: 0, warn: 0, error: 2, debug: 0, info: 0, total: 2 },
   'scripts/build-nanah-vendor.mjs': { log: 0, warn: 0, error: 2, debug: 0, info: 0, total: 2 },
   'scripts/sync-native-runtime.mjs': { log: 1, warn: 0, error: 5, debug: 0, info: 0, total: 6 }
@@ -334,7 +334,7 @@ function assertProductionConsoleGateLoadOrderAddendum(doc) {
   const routineTotal = routineConsoleSourceFiles
     .map((file) => routineConsoleSites(file).length)
     .reduce((sum, value) => sum + value, 0);
-  assert.equal(routineTotal, 210);
+  assert.equal(routineTotal, 211);
   assert.equal(routineConsoleSites('js/background.js').length, 62);
   assert.equal(routineConsoleSites('js/content_bridge.js').length, 126);
 
@@ -382,7 +382,10 @@ function assertProductionConsoleGateLoadOrderAddendum(doc) {
     for (const entry of manifest.content_scripts || []) {
       if (!entry.js?.includes('js/content/dom_fallback.js')) continue;
       const domIndex = entry.js.indexOf('js/content/dom_fallback.js');
-      assert.equal(domIndex, 5, `${manifestFile} dom_fallback isolated order drifted`);
+      assert.ok(domIndex > entry.js.indexOf('js/shared/view_count.js'));
+      assert.ok(entry.js.indexOf('js/shared/view_count.js') >= 0);
+      assert.ok(domIndex > entry.js.indexOf('js/content/admission_overlay.js'));
+      assert.ok(entry.js.indexOf('js/content/admission_overlay.js') >= 0);
       assert.ok(entry.js.indexOf('js/content/block_channel.js') > domIndex);
       assert.ok(entry.js.indexOf('js/content/bridge_settings.js') > domIndex);
       assert.ok(entry.js.indexOf('js/content/handle_resolver.js') > domIndex);
@@ -396,13 +399,13 @@ function assertProductionConsoleGateLoadOrderAddendum(doc) {
   assert.equal(preGateRoutineConsoleSites, 0);
   assert.equal(layoutRefs, 0);
 
-  assert.deepEqual(routineConsoleSites('js/seed.js'), [11, 33, 153]);
+  assert.deepEqual(routineConsoleSites('js/seed.js'), [11, 33, 124, 1176]);
   assert.match(read('js/seed.js'), /if \(filterTubeSeedDebugEnabled\) \{\s*console\.log\('FilterTube: seed\.js initializing \(MAIN world\)'\);/s);
   assert.match(read('js/seed.js'), /function seedDebugLog\(message, \.\.\.args\) \{\s*if \(!isSeedDebugEnabled\(\)\) return;/s);
-  assert.deepEqual(routineConsoleSites('js/filter_logic.js'), [11, 1575, 1590]);
+  assert.deepEqual(routineConsoleSites('js/filter_logic.js'), [11, 2020, 2035]);
   assert.match(read('js/filter_logic.js'), /if \(level === 'log' && !window\.__filtertubeDebug\) \{\s*return;/s);
   assert.match(read('js/filter_logic.js'), /if \(enabled\) \{\s*console\.log\(`FilterTube \(Filter\):`, message, \.\.\.args\);/s);
-  assert.deepEqual(routineConsoleSites('js/injector.js'), [97]);
+  assert.deepEqual(routineConsoleSites('js/injector.js'), [166]);
   assert.match(read('js/injector.js'), /if \(window\.__filtertubeDebug \|\| document\.documentElement\?\.getAttribute\('data-filtertube-debug'\) === 'true'\) \{\s*console\.debug\('FilterTube \(Injector\): Already initialized, skipping'\);/s);
 
   assert.equal(routineConsoleSites('js/layout.js').length, 4);
@@ -480,8 +483,10 @@ function assertProductionConsoleResidualHotPathPreflight(doc) {
   const bridgeSites = routineConsoleSites('js/content_bridge.js');
   assert.equal(bridgeSites.length, 126);
   assert.equal(bridgeSites.filter((line) => line < backupInstallLine).length, 126);
-  assert.deepEqual(bridgeSites.filter((line) => line < 55), [13, 36]);
-  assert.equal(bridgeSites.filter((line) => line > 55 && line < backupInstallLine).length, 124);
+  const startupLogLine = lineNumberForToken(contentBridge, 'console.log("FilterTube: content_bridge.js loaded (Isolated World)");');
+  const debugHelperLogLine = lineNumberForToken(contentBridge, "console.log('FilterTube:', ...args);");
+  assert.deepEqual(bridgeSites.filter((line) => line <= startupLogLine), [debugHelperLogLine, startupLogLine]);
+  assert.equal(bridgeSites.filter((line) => line > startupLogLine && line < backupInstallLine).length, 124);
   assert.match(contentBridge, /function filterTubeDebugLog\(\.\.\.args\) \{\s*if \(!isFilterTubeDebugEnabled\(\)\) return;\s*console\.log\('FilterTube:', \.\.\.args\);/s);
   assert.match(contentBridge, /if \(isFilterTubeDebugEnabled\(\)\) \{\s*console\.log\("FilterTube: content_bridge\.js loaded \(Isolated World\)"\);/s);
   assert.ok(backupInstallLine < lineNumberForToken(contentBridge, "window.addEventListener('message'"));
@@ -489,7 +494,7 @@ function assertProductionConsoleResidualHotPathPreflight(doc) {
 
   assert.equal(routineConsoleSites('js/background.js').length, 62);
   assert.equal(lineNumberForToken(read('js/background.js'), 'installFilterTubeBackgroundConsoleGate();'), 12);
-  assert.equal(routineConsoleSites('js/background.js')[0], 2217);
+  assert.equal(routineConsoleSites('js/background.js')[0], 3336);
 
   const isolatedGateFiles = new Set();
   for (const manifestFile of activeManifestFiles) {
@@ -508,7 +513,8 @@ function assertProductionConsoleResidualHotPathPreflight(doc) {
   const mainWorldRoutineRows = ['js/seed.js', 'js/filter_logic.js', 'js/injector.js']
     .map((file) => routineConsoleSites(file).length)
     .reduce((sum, value) => sum + value, 0);
-  assert.equal(mainWorldRoutineRows, 7);
+  assert.equal(mainWorldRoutineRows, 8);
+  assert.ok(read('js/seed.js').includes("console.info('[FilterTube][Advert Void]', entry)"));
 
   const extensionUiLayoutRows = ['js/popup.js', 'js/tab-view.js', 'js/layout.js']
     .map((file) => routineConsoleSites(file).length)
@@ -539,7 +545,7 @@ test('runtime diagnostic logging policy matrix is audit-only and source pinned',
   assert.match(doc, /The original 2026-05-24 inventory was audit-only and changed no runtime\s+behavior/);
   assert.match(doc, /2026-05-30 addendum adds a `content_bridge\.js` bootstrap gate\s+for isolated content-script-world `console\.log` and `console\.debug` calls/);
   assert.match(doc, /diagnostic logging policy matrix source files: 21/);
-  assert.match(doc, /active console callsites: 419/);
+  assert.match(doc, /current active console callsites: 446/);
   assert.match(doc, /runtime behavior changed by original 2026-05-24 inventory: no/);
   assert.match(doc, /runtime behavior changed by 2026-05-30 content bridge console gate: yes/);
   assert.match(doc, /not completion proof for diagnostic logging policy authority/);
@@ -577,12 +583,12 @@ test('active console callsite counts stay source-derived', () => {
     );
   }
 
-  assert.deepEqual(totals, { log: 203, warn: 124, error: 68, debug: 24, info: 0, total: 419 });
-  assert.match(doc, /console\.log callsites: 203/);
-  assert.match(doc, /console\.warn callsites: 124/);
-  assert.match(doc, /console\.error callsites: 68/);
+  assert.deepEqual(totals, {"log": 208, "warn": 136, "error": 77, "debug": 24, "info": 1, "total": 446});
+  assert.match(doc, /console\.log callsites: 208/);
+  assert.match(doc, /console\.warn callsites: 136/);
+  assert.match(doc, /console\.error callsites: 77/);
   assert.match(doc, /console\.debug callsites: 24/);
-  assert.match(doc, /console\.info callsites: 0/);
+  assert.match(doc, /console\.info callsites: 1/);
 });
 
 test('diagnostic owner family totals and hot files remain pinned', () => {
@@ -594,23 +600,16 @@ test('diagnostic owner family totals and hot files remain pinned', () => {
     familyTotals[family] = (familyTotals[family] || 0) + row.total;
   }
 
-  assert.deepEqual(familyTotals, {
-    'build-release-sync-scripts': 38,
-    'background-storage-state': 131,
-    'content-helper': 28,
-    'page-runtime-core': 196,
-    'quarantined-legacy': 4,
-    'extension-ui': 22
-  });
+  assert.deepEqual(familyTotals, {"build-release-sync-scripts": 44, "background-storage-state": 131, "content-helper": 29, "page-runtime-core": 197, "quarantined-legacy": 4, "extension-ui": 41});
   assert.equal(expectedConsoleRows['js/content_bridge.js'].total, 182);
-  assert.equal(expectedConsoleRows['js/background.js'].total, 102);
+  assert.equal(expectedConsoleRows['js/background.js'].total, 103);
 
   for (const phrase of [
-    '| `page-runtime-core` | 196 |',
+    '| `page-runtime-core` | 197 |',
     '| `background-storage-state` | 131 |',
-    '| `build-release-sync-scripts` | 38 |',
-    '| `content-helper` | 28 |',
-    '| `extension-ui` | 22 |',
+    '| `build-release-sync-scripts` | 44 |',
+    '| `content-helper` | 29 |',
+    '| `extension-ui` | 41 |',
     '| `quarantined-legacy` | 4 |'
   ]) {
     assert.ok(doc.includes(phrase), `missing family row ${phrase}`);

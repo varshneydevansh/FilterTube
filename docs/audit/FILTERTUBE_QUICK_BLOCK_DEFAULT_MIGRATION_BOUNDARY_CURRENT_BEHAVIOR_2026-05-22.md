@@ -21,13 +21,13 @@ runtime quick-block default migration fixtures: 6
 
 | File | Lines | Bytes | SHA-256 |
 | --- | ---: | ---: | --- |
-| `js/background.js` | 6803 | 306710 | `57ddc6c3e31112c30734ede78c9b37b01bd31533fc8a1d16856b13d2b295f0d7` |
+| `js/background.js` | 8538 | 386043 | `cc89bb4a0375145e1c811b7cf5953729c39c409b6b24cacdc65c80f9f6ff44d0` |
 
 ## Pinned Source Counts
 
-quick-block migration constants block lines: 7
+quick-block migration constants block lines: 380
 
-quick-block migration constants block bytes: 379
+quick-block migration constants block bytes: 15965
 
 compareSemver block lines: 18
 
@@ -41,17 +41,17 @@ applyQuickBlockDefaultMigrationOnce block lines: 53
 
 applyQuickBlockDefaultMigrationOnce block bytes: 2485
 
-onInstalled handler block lines: 93
+onInstalled handler block lines: 46
 
-onInstalled handler block bytes: 4239
+onInstalled handler block bytes: 1955
 
-install branch block lines: 47
+install branch block lines: 25
 
-install branch block bytes: 2072
+install branch block bytes: 992
 
-update branch block lines: 41
+update branch block lines: 16
 
-update branch block bytes: 2010
+update branch block bytes: 806
 
 applyQuickBlockDefaultMigrationOnce showQuickBlockButton tokens: 3
 

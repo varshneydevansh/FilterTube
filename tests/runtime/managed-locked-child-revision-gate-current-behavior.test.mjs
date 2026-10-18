@@ -1,5 +1,6 @@
 import fs from 'node:fs';
 import path from 'node:path';
+import vm from 'node:vm';
 import test from 'node:test';
 import assert from 'node:assert/strict';
 
@@ -40,6 +41,8 @@ function hasRevisionBoundManagedPolicyDetails(details) {
     && signedFields.policyHash === envelope.policyHash;
 }
 
+// This retained May predicate is an abstract historical model. The actual
+// portable authorization regression below exercises today's parent-only gate.
 function shouldBypassLockedChildUnlock({
   requiresWholeAccount = false,
   localTargetType = 'child',
@@ -101,7 +104,7 @@ function signedManagedPolicyDetails(overrides = {}) {
   };
 }
 
-test('locked child trusted-update bypass accepts only revision-bound managed-policy details', () => {
+test('historical locked-child predicate model requires revision-bound managed-policy details', () => {
   const trusted = trustedManagedReplicaLink();
 
   assert.equal(shouldBypassLockedChildUnlock({
@@ -151,7 +154,15 @@ test('runtime source keeps signed managed-policy path separate from legacy propo
   const adapter = read('js/nanah_sync_adapter.js');
 
   assert.match(tabView, /function hasRevisionBoundManagedPolicyDetails\(details\)/);
-  assert.match(tabView, /&& hasRevisionBoundManagedPolicyDetails\(details\)/);
+  const portableAuth = tabView.slice(tabView.indexOf('async function ensureNanahIncomingAuth('), tabView.indexOf('function parseNanahEnvelopeDetails('));
+  assert.match(portableAuth, /await authorizeNanahManagedReceiverParentBinding\(/);
+  assert.match(portableAuth, /targetProfileBehavior: 'fixed_profile'/);
+  assert.match(portableAuth, /approvedChild\.parentProfileId\) !== ownerId/);
+  assert.doesNotMatch(portableAuth, /hasRevisionBoundManagedPolicyDetails/);
+  const signedApply = tabView.slice(tabView.indexOf('async function handleNanahIncomingManagedPolicyEnvelope('), tabView.indexOf('async function handleNanahIncomingManagedPolicyEnvelope(') + 4000);
+  assert.match(signedApply, /await verifyManagedSignature\(envelope, context\.trustedLink\)/);
+  assert.match(signedApply, /adapter\.validateManagedPolicyEnvelope\(envelope, context\)/);
+  assert.match(signedApply, /await adapter\.applyManagedPolicyEnvelope\(envelope, context\)/);
   assert.match(tabView, /async function ensureNanahIncomingAuth\(portable, scope, \{ trustedLink = null, details = null, targetProfile = null \} = \{\}\)/);
   assert.match(tabView, /async function applyNanahEnvelope\(envelope, strategyOverride = null, targetPolicyOverride = null\)/);
   assert.match(tabView, /await ensureNanahIncomingAuth\(details\.portable, details\.scope, \{/);
@@ -175,4 +186,27 @@ test('audit docs record the locked-child revision gate and no YouTube hot-path w
   assert.match(inventory, /FILTERTUBE_LOCKED_CHILD_MANAGED_UPDATE_REVISION_GATE_2026-06-05\.md/);
   assert.match(inventory, /Locked-child legacy proposal bypass is revision-gated/);
   assert.match(inventory, /only signed revision-bound `filtertube_managed_policy` details can satisfy the bypass predicate/);
+});
+
+
+test('actual portable child approval never treats signed-looking details or the child PIN as parent approval', async () => {
+  const text = read('js/tab-view.js');
+  const start = text.indexOf('async function ensureNanahIncomingAuth(');
+  const end = text.indexOf('function parseNanahEnvelopeDetails(', start);
+  assert.ok(start >= 0 && end > start);
+  const calls = [];
+  const root = { activeProfileId: 'child', profiles: { child: { type: 'child', parentProfileId: 'parent' } } };
+  const context = vm.createContext({
+    safeObject, normalizeString,
+    getProfileType: (value, id) => value.profiles[id]?.type,
+    extractMasterPinVerifier: () => null,
+    window: { FilterTubeIO: { loadProfilesV4: async () => structuredClone(root) } },
+    authorizeNanahManagedReceiverParentBinding: async policy => { calls.push(JSON.parse(JSON.stringify(policy))); return null; },
+    ensureProfileUnlocked: async () => { throw new Error('child PIN must not authorize protected rules'); }
+  });
+  vm.runInContext(text.slice(start, end), context);
+  await assert.rejects(context.ensureNanahIncomingAuth({}, 'kids', {
+    trustedLink: trustedManagedReplicaLink(), details: signedManagedPolicyDetails(), targetProfile: { profileId: 'child' }
+  }), /Parent approval is required/);
+  assert.deepEqual(calls, [{ targetProfileBehavior: 'fixed_profile', targetProfileId: 'child' }]);
 });

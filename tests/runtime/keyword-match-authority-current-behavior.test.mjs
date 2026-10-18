@@ -93,7 +93,7 @@ test('shared settings and background compile exact keywords with the same Unicod
   const backgroundCompile = sliceBetween(background, 'const escapeRegex = (value) =>', '// Helper to validate compiled keyword entries');
 
   assert.match(sharedCompile, /const exactPattern = `\(\^\|\[\^\\\\p\{L\}\\\\p\{N\}_\]\)\$\{escaped\}\(\?=\$\|\[\^\\\\p\{L\}\\\\p\{N\}_\]\)`/);
-  assert.match(sharedCompile, /flags: entry\.exact \? 'iu' : 'i'/);
+  assert.match(sharedCompile, /flags: rawRegex \? \(entry\.regexFlags \|\| 'i'\) : \(entry\.exact \? 'iu' : 'i'\)/);
   assert.match(backgroundCompile, /const exactKeywordPattern = \(escaped\) => `\(\^\|\[\^\\\\p\{L\}\\\\p\{N\}_\]\)\$\{escaped\}\(\?=\$\|\[\^\\\\p\{L\}\\\\p\{N\}_\]\)`/);
   assert.match(backgroundCompile, /flags: exact \? 'iu' : 'i'/);
 });
@@ -133,7 +133,7 @@ test('DOM fallback normalized keyword fallback currently uses either-side bounda
   assert.doesNotMatch(block, /hasLeftBoundary && hasRightBoundary/);
 });
 
-test('filter logic reconstructs serialized block and allow keywords but not serialized comment keywords', () => {
+test('filter logic reconstructs serialized block allow and explicit comment keywords', () => {
   const text = read('js/filter_logic.js');
   const processSettings = sliceBetween(
     text,
@@ -148,7 +148,7 @@ test('filter logic reconstructs serialized block and allow keywords but not seri
 
   assert.match(processSettings, /settings\.filterKeywords/);
   assert.match(processSettings, /settings\.whitelistKeywords/);
-  assert.doesNotMatch(processSettings, /filterKeywordsComments/);
+  assert.match(processSettings, /processed\.filterKeywordsComments = settings\.filterKeywordsComments/);
   assert.match(commentBlock, /const commentKeywords = Array\.isArray\(this\.settings\.filterKeywordsComments\)/);
   assert.match(commentBlock, /: this\.settings\.filterKeywords/);
 });

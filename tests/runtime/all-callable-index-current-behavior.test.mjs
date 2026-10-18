@@ -32,14 +32,14 @@ const releaseFixStatusDoc = fs.readFileSync(
   'utf8'
 );
 const expectedFamilyTotals = new Map([
-  ['Hot page/background runtime', { files: 9, count: 3177 }],
-  ['Content helper runtime', { files: 9, count: 348 }],
-  ['UI/settings runtime', { files: 14, count: 2103 }],
+  ['Build/sync scripts', { files: 5, count: 75 }],
+  ['Hot page/background runtime', { files: 9, count: 3817 }],
+  ['Content helper runtime', { files: 13, count: 491 }],
+  ['UI/settings runtime', { files: 24, count: 3712 }],
   ['Generated/quarantined UI', { files: 6, count: 147 }],
-  ['Vendor bundles', { files: 2, count: 279 }],
-  ['Build/sync scripts', { files: 4, count: 58 }],
-  ['Audit/test lane scripts', { files: 3, count: 80 }],
-  ['Website routes/components/config', { files: 26, count: 123 }]
+  ['Vendor bundles', { files: 3, count: 279 }],
+  ['Audit/test lane scripts', { files: 24, count: 517 }],
+  ['Website routes/components/config', { files: 26, count: 126 }],
 ]);
 
 const callableRe = /(?:^|\n)\s*(?:export\s+)?(?:async\s+)?function\s+([A-Za-z_$][\w$]*)\s*\(|(?:^|\n)\s*(?:export\s+)?(?:const|let|var)\s+([A-Za-z_$][\w$]*)\s*=\s*(?:async\s*)?\([^)]*\)\s*=>|(?:^|\n)\s*(?:export\s+)?(?:const|let|var)\s+([A-Za-z_$][\w$]*)\s*=\s*(?:async\s*)?[A-Za-z_$][\w$]*\s*=>|(?:^|\n)\s*([A-Za-z_$][\w$]*)\s*:\s*(?:async\s*)?function\s*\(|(?:^|\n)\s*(?:async\s+)?([A-Za-z_$][\w$]*)\s*\([^)]*\)\s*\{/g;
@@ -131,7 +131,7 @@ function lineOf(file, needle, occurrence = 0) {
 
 function docRow(file) {
   const escaped = file.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
-  const row = indexDoc.match(new RegExp('\\| `' + escaped + '` \\| ([^|]+) \\| (\\d+) \\| ([^|]+) \\|'));
+  const row = indexDoc.slice(indexDoc.indexOf('## Current Lexical Inventory - 2026-10-18')).match(new RegExp('\\| `' + escaped + '` \\| ([^|]+) \\| (\\d+) \\| ([^|]+) \\|'));
   assert.ok(row, `${file} should have a row in the all-callable index`);
   return {
     family: row[1].trim(),
@@ -142,7 +142,7 @@ function docRow(file) {
 
 function methodGapRow(file) {
   const escaped = file.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
-  const row = methodSemanticGapDoc.match(new RegExp('\\| `' + escaped + '` \\| ([^|]+) \\| (\\d+) \\| `semantic proof incomplete` \\|'));
+  const row = methodSemanticGapDoc.slice(methodSemanticGapDoc.indexOf('## Current Lexical Inventory - 2026-10-18')).match(new RegExp('\\| `' + escaped + '` \\| ([^|]+) \\| (\\d+) \\| `semantic proof incomplete` \\|'));
   assert.ok(row, `${file} should have a row in the method semantic proof gap index`);
   return {
     family: row[1].trim(),
@@ -254,8 +254,8 @@ test('audit meta index docs carry the method proof gap blocker', () => {
 
 test('all-callable index accounts for every tracked JS JSX and MJS source file', () => {
   const files = trackedJsFiles();
-  assert.equal(files.length, 73);
-  assert.match(indexDoc, /tracked JS\/JSX\/MJS files: 73/);
+  assert.equal(files.length, 110);
+  assert.match(indexDoc, /current tracked JS\/JSX\/MJS files: 110/);
 
   for (const file of files) {
     docRow(file);
@@ -272,8 +272,8 @@ test('all-callable index counts match current lexical callable source', () => {
     assert.equal(documented, actual, `${file} callable count should match current source`);
   }
 
-  assert.equal(total, 6315);
-  assert.match(indexDoc, /repo-wide lexical callables: 6315/);
+  assert.equal(total, 9164);
+  assert.match(indexDoc, /current repo-wide lexical callables: 9164/);
 });
 
 test('all-callable family totals match the documented file rows', () => {
@@ -417,12 +417,12 @@ test('all-callable index documents semantic method proof boundary', () => {
   }
 
   assert.equal(buildWebsiteParserComparisonFiles.length, 30);
-  assert.equal(broadBuildWebsiteTotal, 181);
-  assert.equal(routeParserTotal, 108);
-  assert.equal(broadBuildWebsiteTotal - routeParserTotal, 73);
+  assert.equal(broadBuildWebsiteTotal, 201);
+  assert.equal(routeParserTotal, 120);
+  assert.equal(broadBuildWebsiteTotal - routeParserTotal, 81);
 
   for (const [file, broadCount, routeCount] of [
-    ['build.js', 51, 29],
+    ['build.js', 68, 38],
     ['scripts/sync-native-runtime.mjs', 1, 0],
     ['website/app/layout.js', 0, 1],
     ['website/app/robots.js', 0, 1],
@@ -461,7 +461,7 @@ test('all-callable index documents semantic method proof boundary', () => {
     });
   }
 
-  assert.equal(total, 6315);
+  assert.equal(total, 9164);
   assert.deepEqual(methodTotals, expectedFamilyTotals);
 
   for (const authority of [
@@ -544,7 +544,7 @@ test('all-callable index documents semantic method proof boundary', () => {
     ['filter_logic_processData_harvest_then_mutate', 'js/filter_logic.js', "processData(data, dataName = 'unknown')"],
     ['state_manager_addKeyword_mode_split_persistence', 'js/state_manager.js', 'async function addKeyword(word, options = {})'],
     ['state_manager_persistMainProfiles_dual_schema_alias_writer', 'js/state_manager.js', 'async function persistMainProfiles(nextMain)'],
-    ['state_manager_addChannel_background_action_branch', 'js/state_manager.js', 'async function addChannel(input)'],
+    ['state_manager_addChannel_background_action_branch', 'js/state_manager.js', 'async function addChannel(input, options = {})'],
     ['state_manager_importSubscribedChannelsToWhitelist_batch_handoff', 'js/state_manager.js', 'async function importSubscribedChannelsToWhitelist(options = {})'],
     ['settings_shared_loadSettings_read_path_v4_writer', 'js/settings_shared.js', 'function loadSettings()'],
     ['settings_shared_saveSettings_v4_root_mirror_writer', 'js/settings_shared.js', 'function saveSettings(options = {})'],
@@ -554,14 +554,14 @@ test('all-callable index documents semantic method proof boundary', () => {
     ['background_addFilteredChannel_secondary_default_blocklist', 'js/background.js', "if (message.type === 'addFilteredChannel') {"],
     ['background_handleAddFilteredChannel_multi_surface_writer', 'js/background.js', 'async function handleAddFilteredChannel(input, filterAll = false'],
     ['content_bridge_addChannelDirectly_content_payload', 'js/content_bridge.js', 'async function addChannelDirectly(input, filterAll = false'],
-    ['io_manager_importV3_multi_profile_import_writer', 'js/io_manager.js', 'async function importV3(json, { strategy ='],
+    ['io_manager_importV3_multi_profile_import_writer', 'js/io_manager.js', 'async function importV3Unlocked(json, { strategy ='],
     ['dom_fallback_hasActiveDOMFallbackWork_admission', 'js/content/dom_fallback.js', 'function hasActiveDOMFallbackWork(settings)'],
     ['dom_fallback_clearStaleDOMFallbackVisibility_cleanup', 'js/content/dom_fallback.js', 'function clearStaleDOMFallbackVisibility()'],
     ['dom_fallback_applyDOMFallback_run_state_gate', 'js/content/dom_fallback.js', 'async function applyDOMFallback(settings, options = {})'],
     ['dom_fallback_applyDOMFallback_no_work_cleanup_return', 'js/content/dom_fallback.js', 'const hasActiveFallbackWork = hasActiveDOMFallbackWork(effectiveSettings);'],
     ['dom_fallback_feed_channels_cleanup_return', 'js/content/dom_fallback.js', "document.querySelectorAll('[data-filtertube-whitelist-pending=\"true\"], [data-filtertube-hidden], .filtertube-hidden, .filtertube-hidden-shelf').forEach(el => {"],
     ['dom_fallback_whitelist_watch_scaffolding_restore', 'js/content/dom_fallback.js', "if (listMode === 'whitelist') {", 1],
-    ['dom_fallback_videoElements_selector_scope', 'js/content/dom_fallback.js', 'const videoElements = (onlyWhitelistPending && listMode === '],
+    ['dom_fallback_videoElements_selector_scope', 'js/content/dom_fallback.js', 'const videoSelector = (onlyWhitelistPending && listMode === '],
     ['dom_fallback_processed_identity_skip_gate', 'js/content/dom_fallback.js', "const alreadyProcessed = element.hasAttribute('data-filtertube-processed');"],
     ['dom_fallback_channel_identity_selector_waterfall', 'js/content/dom_fallback.js', 'const titleElement = element.querySelector('],
     ['dom_fallback_pending_meta_recheck_timer', 'js/content/dom_fallback.js', 'const pendingTimerState = window.__filtertubePendingMetaRecheck'],
@@ -672,7 +672,8 @@ test('all-callable index documents semantic method proof boundary', () => {
   assert.match(background, /Main profile blocklist keywords are written by the dashboard\/popup under\s+\/\/ `keywords`;/);
   assert.match(background, /const mainKeywords = Array\.isArray\(activeMain\.keywords\)\s+\? activeMain\.keywords\s+: \(Array\.isArray\(activeMain\.blockedKeywords\) \? activeMain\.blockedKeywords : null\);/);
   assert.match(background, /const shouldCopyBlocklist = request\?\.copyBlocklist === true;/);
-  assert.match(background, /if \(requestedMode === 'whitelist'\) \{\s+mergeAndClearBlocklistIntoWhitelist\(requestedProfile\);/);
+  assert.match(background, /if \(requestedMode === 'whitelist' && shouldCopyBlocklist\) \{/);
+  assert.doesNotMatch(background, /mergeAndClearBlocklistIntoWhitelist/);
   assert.match(background, /handleAddFilteredChannel\([\s\S]*\{ source: 'user' \}[\s\S]*'main'[\s\S]*'whitelist'/);
   assert.match(background, /\} else if \(request\.action === "addChannelPersistent"\) \{/);
   assert.match(background, /if \(message\.type === 'addFilteredChannel'\) \{/);
@@ -803,11 +804,11 @@ test('all-callable index documents semantic method proof boundary', () => {
   const stateManager = source('js/state_manager.js');
   assert.match(stateManager, /async function addKeyword\(word, options = \{\}\) \{/);
   assert.match(stateManager, /if \(state\.mode === 'whitelist'\) \{/);
-  assert.match(stateManager, /await persistMainProfiles\(\{\s+mode: 'whitelist',\s+whitelistChannels:/);
+  assert.match(stateManager, /await persistMainProfiles\(\{\s+mode: state\.mode,\s+whitelistChannels:/);
   assert.match(stateManager, /await saveSettings\(\);/);
   assert.match(stateManager, /async function persistMainProfiles\(nextMain\) \{/);
   assert.match(stateManager, /out\.blockedKeywords = out\.keywords;/);
-  assert.match(stateManager, /const action = state\.mode === 'whitelist' \? 'addWhitelistChannelPersistent' : 'addChannelPersistent';/);
+  assert.match(stateManager, /const action = useAllowList \? 'addWhitelistChannelPersistent' : 'addChannelPersistent';/);
   assert.match(stateManager, /action: 'FilterTube_BatchImportWhitelistChannels'/);
   assert.match(stateManager, /if \(latestProfileContext\.activeId !== targetProfileId\) \{/);
 
@@ -822,12 +823,14 @@ test('all-callable index documents semantic method proof boundary', () => {
   assert.match(settingsShared, /STORAGE_NAMESPACE\?\.set\(payload, \(\) => \{/);
 
   const ioManager = source('js/io_manager.js');
-  assert.match(ioManager, /async function importV3\(json, \{ strategy = 'merge', scope = 'auto', auth = null, targetProfileId = null \} = \{\}\) \{/);
-  assert.match(ioManager, /const result = shouldImportIntoSeparateProfile[\s\S]*: await SettingsAPI\.saveSettings\(payload\);/);
-  assert.match(ioManager, /await saveProfilesV3\(nextProfiles\);/);
+  assert.match(ioManager, /async function importV3\(json, options = \{\}\) \{/);
+  assert.match(ioManager, /return coordinator\.run\(\(\) => importV3Unlocked\(json, options\), options\.nanahStorageLockToken \?\? null\);/);
+  assert.match(ioManager, /async function importV3Unlocked\(json, \{ strategy = 'merge', scope = 'auto', auth = null, targetProfileId = null, beforeProfileWrite = null \} = \{\}\) \{/);
+  assert.match(ioManager, /result = shouldTouchLegacyV3\s*\? await SettingsAPI\.saveSettings\(payload\)/);
+  assert.match(ioManager, /await saveProfilesV3\(nextProfiles\)/);
   assert.match(ioManager, /await saveProfilesV4\(\{/);
-  assert.match(ioManager, /await writeStorage\(\{ channelMap: nextChannelMap \}\);/);
-  assert.match(ioManager, /await writeStorage\(nanahPayload\);/);
+  assert.match(ioManager, /await writeStorage\(\{ channelMap: nextChannelMap \}\)/);
+  assert.match(ioManager, /await writeStorage\(trustedNanahRestorePayload\)/);
 
   const domFallback = source('js/content/dom_fallback.js');
   assert.match(domFallback, /function hasActiveDOMFallbackWork\(settings\) \{/);
@@ -835,26 +838,26 @@ test('all-callable index documents semantic method proof boundary', () => {
   assert.match(domFallback, /function clearStaleDOMFallbackVisibility\(\) \{/);
   assert.match(domFallback, /const hidden = document\.querySelectorAll\(hiddenSelector\);/);
   assert.match(domFallback, /async function applyDOMFallback\(settings, options = \{\}\) \{/);
-  assert.match(domFallback, /if \(runState\.running\) \{\s+runState\.pending = true;/);
+  assert.match(domFallback, /if \(runState\.running\) \{[\s\S]*?runState\.pending = true;/);
   assert.match(domFallback, /const hasActiveFallbackWork = hasActiveDOMFallbackWork\(effectiveSettings\);/);
   assert.match(domFallback, /clearStaleDOMFallbackVisibility\(\);\s+state\.lastCleanupTs = Date\.now\(\);/);
   assert.match(domFallback, /path === '\/feed\/channels'/);
   assert.match(domFallback, /const watchTargets = \[/);
-  assert.match(domFallback, /const videoElements = \(onlyWhitelistPending && listMode === 'whitelist'\)/);
+  assert.match(domFallback, /const videoSelector = \(onlyWhitelistPending && listMode === 'whitelist'\)/);
   assert.match(domFallback, /const alreadyProcessed = element\.hasAttribute\('data-filtertube-processed'\);/);
-  assert.match(domFallback, /if \(alreadyProcessed && !forceReprocess && !contentChanged\) \{/);
+  assert.match(domFallback, /if \(alreadyProcessed && !forceReprocess && !contentChanged &&\s*!pendingCategoryMeta && !categoryWaitState\.unavailable &&\s*!element\.hasAttribute\('data-filtertube-pending-category'\) &&\s*!element\.closest\?\.\('\[data-filtertube-pending-category\]'\)\) \{/);
   assert.match(domFallback, /const titleElement = element\.querySelector\(/);
   assert.match(domFallback, /const pendingTimerState = window\.__filtertubePendingMetaRecheck/);
   assert.match(domFallback, /applyDOMFallback\(null, \{ preserveScroll: true \}\);/);
   assert.match(domFallback, /Never hide the currently-selected playlist row/);
-  assert.match(domFallback, /const shouldHideSelectedRow = shouldHide && \(hasExplicitBlockMarker \|\| \(hasActiveBlockRules && matchesFilters\)\);/);
+  assert.match(domFallback, /if \(isSelectedRow\) \{[\s\S]*?shouldHide = false;/);
   assert.match(domFallback, /setTimeout\(\(\) => applyDOMFallback\(runState\.latestSettings, runState\.latestOptions\), 0\);/);
   assert.match(methodSemanticGapDoc, /DOM fallback run admission optimization approved: NO-GO/);
   assert.match(methodSemanticGapDoc, /DOM selector traversal narrowing approved: NO-GO/);
   assert.match(methodSemanticGapDoc, /DOM fallback hide\/restore behavior change approved: NO-GO/);
 
   assert.match(contentBridge, /function schedulePrefetchScan\(\) \{/);
-  assert.match(contentBridge, /if \(!needsIdentityPrefetchWork\(currentSettings\)\) return;/);
+  assert.match(contentBridge, /if \(!needsAnyPrefetchObserverWork\(currentSettings\)\) return;/);
   assert.match(contentBridge, /requestAnimationFrame\(\(\) => \{\s+prefetchScanScheduled = false;\s+attachPrefetchObservers\(\);/);
   assert.match(contentBridge, /function attachPrefetchObservers\(\) \{/);
   assert.match(contentBridge, /const maxAttach = 120;/);

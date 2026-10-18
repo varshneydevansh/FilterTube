@@ -166,3 +166,26 @@ optimization, JSON-first behavior, asset optimization, generated-output
 cleanup, package pruning, CSS activation/deletion, whitelist behavior, metric
 collectors, artifact creation, native sync, release package changes, or public
 claims.
+
+
+## October 18, 2026 manifest scope review
+
+The prior manifest-count snapshot is historical. Source and currently built manifests include new embed and Google preview paths; all three quarantined stylesheets remain outside content scripts and web resources. Packaged copies must still hash-match source. `_locales` is an additional build root. This is a load-topology check, not FirefoxAndroid visual proof.
+
+- active manifest files checked: 4
+- active manifest content_script entries checked: 24
+- active manifest content script JS refs checked: 168
+- active manifest content script CSS refs checked: 0
+- active manifest web_accessible_resources entries checked: 8
+- active manifest web-accessible resource refs checked: 47
+- active manifest quarantined CSS content script refs: 0
+- active manifest quarantined CSS web-accessible refs: 0
+- dist manifest files checked: 3
+- dist manifest content_script entries checked: 18
+- dist manifest content script JS refs checked: 125
+- dist manifest content script CSS refs checked: 0
+- dist manifest web_accessible_resources entries checked: 6
+- dist manifest web-accessible resource refs checked: 35
+- dist manifest quarantined CSS content script refs: 0
+- dist manifest quarantined CSS web-accessible refs: 0
+- extension HTML link tags checked: 10

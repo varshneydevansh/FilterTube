@@ -10,7 +10,7 @@ const repoRoot = process.cwd();
 const docPath = 'docs/audit/FILTERTUBE_BACKGROUND_ADD_FILTERED_CHANNEL_LIST_TARGET_CURRENT_BEHAVIOR_2026-05-23.md';
 
 const sourceFingerprints = {
-  'js/background.js': [6803, 306710, '57ddc6c3e31112c30734ede78c9b37b01bd31533fc8a1d16856b13d2b295f0d7']
+  'js/background.js': [8538, 386043, 'cc89bb4a0375145e1c811b7cf5953729c39c409b6b24cacdc65c80f9f6ff44d0']
 };
 
 const blockSpecs = {
@@ -18,64 +18,64 @@ const blockSpecs = {
     file: 'js/background.js',
     start: "if (message.type === 'addFilteredChannel')",
     end: "if (message.type === 'toggleChannelFilterAll')",
-    startLine: 5727,
-    lines: 39,
-    bytes: 1579,
-    hash: 'f681057e88e4c6aef657464bca124f8d3ae4d59f4d11ca5f05e1135dcf1615f2'
+    startLine: 7072,
+    lines: 58,
+    bytes: 2408,
+    hash: '3a506e117b2d2a79bc9156c5dcb782077c69bc63a3b3a3fe982d25d7f2f5553c'
   },
   backgroundHandleAddFilteredChannelFull: {
     file: 'js/background.js',
     start: 'async function handleAddFilteredChannel(input, filterAll = false',
     end: '/**\n * Handle toggling Filter All Content for a channel',
-    startLine: 5792,
-    lines: 893,
-    bytes: 45226,
-    hash: 'e69e660d0af0dd0d523932f733a5de04108cbfb69ef99a155be4466a7527ce25'
+    startLine: 7156,
+    lines: 1103,
+    bytes: 56174,
+    hash: '0813495a9a573714752a0c646b0cf6c716e83df39c3f678f1de45a4ffbdbf81c'
   },
   backgroundHandleAddFilteredChannelSignatureAndInput: {
     file: 'js/background.js',
     start: 'async function handleAddFilteredChannel(input, filterAll = false',
     end: '// Prefer canonical UC IDs via channelMap when available',
-    startLine: 5792,
-    lines: 158,
-    bytes: 6464,
-    hash: '60f9b6d40d808f02f822e74a0a9f967844a1d1ef4c956e911ad2ee5265891b80'
+    startLine: 7156,
+    lines: 219,
+    bytes: 8827,
+    hash: '4866592e320f225dc019d34b92bb5e8d2aa70dbc726fe3cdbc67f1e9896d72f0'
   },
   backgroundHandleAddFilteredChannelIdentityRepair: {
     file: 'js/background.js',
     start: '// Prefer canonical UC IDs via channelMap when available',
     end: '// Check if channel already exists; if so, upgrade instead of rejecting.',
-    startLine: 5949,
-    lines: 358,
-    bytes: 19385,
-    hash: 'dc7ccd71be5cb375ac50245617889449621246504390a4a0162c59c3cef6740d'
+    startLine: 7374,
+    lines: 378,
+    bytes: 20938,
+    hash: '839fbf2df32d71bde14965ee5bcd6fd428303030a299c5725375d26b0ac04488'
   },
   backgroundHandleAddFilteredChannelExistingAndWrite: {
     file: 'js/background.js',
     start: '// Check if channel already exists; if so, upgrade instead of rejecting.',
     end: 'if (didMutateChannelList && Object.keys(storageWritePayload).length > 0) {',
-    startLine: 6306,
-    lines: 352,
-    bytes: 18483,
-    hash: '0f2661d0a32990528ebf6704aa4cfb90cab8f55dcf4567e37852910704966027'
+    startLine: 7751,
+    lines: 476,
+    bytes: 25264,
+    hash: '0b460310c480b77d27b5da33a1a54ec29cc3ccb15e84d401b5fc387987985646'
   },
   backgroundHandleAddFilteredChannelCommitAndReturn: {
     file: 'js/background.js',
     start: 'if (didMutateChannelList && Object.keys(storageWritePayload).length > 0) {',
     end: '/**\n * Handle toggling Filter All Content for a channel',
-    startLine: 6657,
-    lines: 28,
-    bytes: 894,
-    hash: 'ba67796a03d083bf072ac4ef971365f165f0c836dd2eae56c64912729a45be66'
+    startLine: 8226,
+    lines: 33,
+    bytes: 1145,
+    hash: '09b31bd149e54402745971ae2b65b0f9f28f8810803c7107a173de201164fbea'
   }
 };
 
 const selectedCounts = {
   isTrustedUiSender: 0,
-  isProfileSessionAuthorized: 0,
+  isProfileSessionAuthorized: 2,
   handleAddFilteredChannel: 2,
-  listType: 3,
-  targetListType: 17,
+  listType: 4,
+  targetListType: 18,
   blocklist: 10,
   whitelist: 41,
   'message.listType': 1,
@@ -83,15 +83,15 @@ const selectedCounts = {
   'message.videoId': 1,
   filterAll: 12,
   collaborationWith: 16,
-  metadata: 70,
-  storageWritePayload: 8,
-  FT_PROFILES_V4_KEY: 3,
+  metadata: 92,
+  storageWritePayload: 9,
+  FT_PROFILES_V4_KEY: 5,
   ftProfilesV3: 4,
-  filterChannels: 4,
+  filterChannels: 5,
   uiChannels: 1,
   whitelistChannels: 12,
   blockedChannels: 8,
-  channelMap: 25,
+  channelMap: 27,
   enqueueChannelMapUpdate: 2,
   enqueueVideoChannelMapUpdate: 1,
   'browserAPI.storage.local.set': 3,
@@ -382,7 +382,8 @@ test('handleAddFilteredChannel commit invalidates both compiled caches and queue
   assert.match(block, /compiledSettingsCache\.main = null;/);
   assert.match(block, /compiledSettingsCache\.kids = null;/);
   assert.match(block, /schedulePostBlockEnrichment\(finalChannelData, profile/);
-  assert.match(block, /return \{\s+success: true,\s+channelData: finalChannelData,\s+updated: existingIndex !== -1\s+\};/);
+  assert.match(block, /const result = \{\s+success: true,\s+channelData: finalChannelData,\s+updated: existingIndex !== -1\s+\};/);
+  assert.match(block, /return result;/);
 });
 
 test('background addFilteredChannel audit doc records list-target behavior and open gates', () => {

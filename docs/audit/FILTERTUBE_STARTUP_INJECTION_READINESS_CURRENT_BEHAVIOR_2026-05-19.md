@@ -2,6 +2,11 @@
 
 Status: current-behavior proof. This is not an implementation patch.
 
+The original diagrams, inventory counts, and implementation boundaries below
+record the May 19 snapshot. The dated October source review at the end supersedes
+its dependency list and initialization order; those historical sections are not
+a description of the current startup sequence.
+
 This slice is narrower than the manifest/permission audit. The manifest audit
 proves which browser package starts which scripts. This page pins what happens
 after that package startup: isolated-world bridge injection, Firefox fallback
@@ -33,7 +38,7 @@ These counts are audit-only blockers. They do not approve runtime optimization,
 JSON-first behavior, method deletion, method merging, lifecycle cleanup, no-work
 changes, or whitelist behavior changes.
 
-## Current Boot Path
+## Current Boot Path — historical May snapshot
 
 ```text
 manifest content script
@@ -62,7 +67,7 @@ js/injector.js
         +--> posts FilterTube_InjectorToBridge_Ready only when engine exists
 ```
 
-## Current Behavior Matrix
+## Current Behavior Matrix — historical May snapshot
 
 | Surface | Current behavior | Risk |
 | --- | --- | --- |
@@ -146,3 +151,46 @@ Blocked now:
 - changing Firefox fallback script insertion,
 - moving first DOM fallback earlier or later,
 - treating manifest readiness as proof of page-world engine readiness.
+
+
+## October 18, 2026 source review
+
+This is a source-code ordering review, not an installed-browser timing or native
+startup acceptance result. It does not establish a shared startup authority or
+complete per-callable semantic proof. The historical May ordering above is
+preserved as evidence of the earlier snapshot.
+
+The current `js/content/bridge_injection.js` dependency sequence is:
+
+```text
+shared/identity -> shared/view_count -> filter_logic
+    -> seed (Firefox fallback only) -> injector
+```
+
+The fallback still inserts scripts sequentially and schedules the next load
+50ms after `onload`. The bridge still schedules a settings request after a
+100ms timer. Browser manifest paths and their worlds are reviewed separately in
+`FILTERTUBE_BROWSER_MANIFEST_RUNTIME_LOAD_ORDER_CURRENT_BEHAVIOR_2026-05-21.md`.
+
+The current `js/content_bridge.js` initialization sequence is:
+
+```text
+50ms initialization timer
+    -> requestSettingsFromBackground()
+    -> successful settings response: synchronize category policy shell state
+    -> initializeDOMFallback(response.settings) (started without awaiting)
+    -> await ensureMainWorldRuntimeForSettings(response.settings)
+```
+
+`initializeDOMFallback()` installs navigation listeners and establishes direct
+video admission before the general DOM hydration delay. On the Home path `/`,
+it also starts `applyDOMFallback()` before that delay. It retains its 1000ms
+wait before the later DOM setup. Therefore the May statement that MAIN-world
+injection finishes before the first DOM fallback work is stale: DOM startup and
+optional MAIN-world injection now overlap. This does not imply that the entire
+DOM fallback or the Home pass completes before MAIN-world injection.
+
+The readiness messages, duplicate-run guard, Firefox sequential loading, and
+absence of a `startupInjectionAuthority` remain covered by the existing runtime
+source checks. This correction grants no browser, mobile, TV, or native parity
+claim and does not alter the runtime.

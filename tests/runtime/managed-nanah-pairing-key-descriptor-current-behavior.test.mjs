@@ -93,7 +93,7 @@ test('dashboard Nanah pairing preserves source key fields on managed trusted lin
 
   assert.match(tabView, /const NANAH_MANAGED_SIGNING_PUBLIC_KEY_KEY = 'ftNanahManagedSigningPublicKey'/);
   assert.match(tabView, /let nanahManagedSigningKeyDescriptor = null/);
-  assert.match(tabView, /async function loadNanahManagedSigningKeyDescriptor\(\)/);
+  assert.match(tabView, /async function loadNanahManagedSigningKeyDescriptor\(activeToken = null\)/);
   assert.match(tabView, /await loadNanahManagedSigningKeyDescriptor\(\)/);
   assert.match(tabView, /managedPublicKeyId: normalizeString\(managedKey\.managedPublicKeyId \|\| managedKey\.sourcePublicKeyId \|\| managedKey\.publicKeyId\)/);
   assert.match(tabView, /managedPublicKeyJwk: safeObject\(managedKey\.managedPublicKeyJwk \|\| managedKey\.sourcePublicKeyJwk \|\| managedKey\.publicKeyJwk\)/);
@@ -107,7 +107,8 @@ test('dashboard Nanah pairing preserves source key fields on managed trusted lin
   assert.match(tabView, /sourceDeviceId: remoteRole === 'source' \? remoteId : ''/);
   assert.match(tabView, /sourcePublicKeyId: remoteRole === 'source' \? remoteManagedPublicKeyId : ''/);
   assert.match(tabView, /sourceDeviceId: normalizeString\(nanahStableDeviceId\)/);
-  assert.match(tabView, /sourcePublicKeyId: localManagedPublicKeyId/);
+  assert.match(tabView, /const managedSourcePublicKeyId = localRole === 'source' \? localManagedPublicKeyId : remoteManagedPublicKeyId/);
+  assert.match(tabView, /sourcePublicKeyId: managedSourcePublicKeyId/);
   assert.doesNotMatch(tabView, /keyVersion: [^\n]*undefined/);
   assert.doesNotMatch(tabView, /sourcePublicKeyJwk: [^\n]*undefined/);
 });

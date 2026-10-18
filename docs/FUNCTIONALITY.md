@@ -8,7 +8,7 @@ FilterTube implements a **hybrid filtering system** with dual filtering modes:
 - A secondary **DOM fallback layer** hides/restores already-rendered elements for SPA navigation, DOM recycling, and edge cases.
 - **Whitelist Mode**: Hide all content except explicitly allowed channels and keywords.
 - **Category Filtering**: Filter videos by YouTube category (e.g., Music, Gaming, Education) (v3.2.7).
-- **Spoken-Language Filtering**: Independently block or allow Main YouTube videos using YouTube's default-audio evidence, with a strong creator-metadata script fallback for captionless videos. Unknown language does not blank or pause a page. Category and language metadata share the paced Player-response cache; see [Language Filter: Current Behavior](LANGUAGE_FILTER_CURRENT_BEHAVIOR_2026-08-18.md).
+- **Spoken-Language Filtering**: Independently block or allow Main YouTube videos using YouTube's default-audio evidence, with a strong creator-metadata script fallback for captionless videos. Unknown language does not blank or pause a page. Category and language metadata share the paced Player-response cache; see [Language Filter: Current Behavior](audit/LANGUAGE_FILTER_CURRENT_BEHAVIOR_2026-08-18.md).
 
 It also now includes `Accounts & Sync`, powered by Nanah, for device-to-device settings transfer.
 

@@ -440,6 +440,23 @@ cross-feature hub, but it must include at least these lanes.
 | `manifest*.json`, `build.js` | `test:release` | `release-build-surface` |
 | `README.md`, `data/release_notes.json` | `test:release` | `public-release-copy`; also keeps `test:smoke` for public release claim drift. |
 
+## Current Feature Ownership Refresh - 2026-10-18
+
+New source is assigned by effect, rather than hidden behind an unmatched-file exception:
+
+| Surface | Lanes and proof |
+| --- | --- |
+| `js/shared/view_count.js` | Blocking, whitelist, JSON, DOM, settings and performance; the minimum-view behavior fixture runs in blocking/JSON/settings and controls-save proof runs in settings. |
+| Category pending helper and full DOM pipeline; explicit comment keyword scope | DOM/blocking run both category lifetime fixtures; JSON/blocking run the explicit comment-scope fixture. Reused cards and comment replies cannot inherit unrelated hidden state. |
+| External YouTube network capture, admission guard and overlay | Release, blocking, whitelist, JSON, DOM, performance and settings; real playback decisions run in blocking/JSON and overlay lifecycle in DOM. |
+| Family navigation, QR scanner, shared storage lock and its fixture helper | Release/settings ownership; settings runs the navigation, scanner and lock behavior fixtures. Nearby helper remains release/settings, and network presence creates no trust. |
+| Localization runtime, both catalog trees and their validation/merge tools | Release/settings ownership; settings runs runtime and catalog proof. Translated copy does not establish installed-browser or native proof. |
+| Device evidence generators, formal models, screenshots, design handoffs and store drafts | Explicit release/settings or release ownership. Classification records review obligations; it does not turn evidence into product authority or declare hardware acceptance complete. |
+| `funding.json`, vendor licence and build lock | Release/public-copy or vendor/build provenance ownership. No publication or donation is performed by classification. |
+
+The seven proof records formerly at the top level of `docs/` now live under
+`docs/audit/`, with their filenames and historical evidence preserved.
+
 ## Done Criteria
 
 A change is not release-ready until:

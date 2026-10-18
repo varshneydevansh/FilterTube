@@ -17,8 +17,8 @@ that every provider field is stable or available on every client:
   feedback receipts.
 
 For the extension's current category and language authority, use the dated
-[category behavior](CATEGORY_FILTER_CURRENT_BEHAVIOR_2026-08-08.md) and
-[language behavior](LANGUAGE_FILTER_CURRENT_BEHAVIOR_2026-08-18.md) contracts:
+[category behavior](audit/CATEGORY_FILTER_CURRENT_BEHAVIOR_2026-08-08.md) and
+[language behavior](audit/LANGUAGE_FILTER_CURRENT_BEHAVIOR_2026-08-18.md) contracts:
 the official category lives in
 `microformat.playerMicroformatRenderer.category`, while spoken-language
 evidence is experimental and must not be inferred from subtitle translation

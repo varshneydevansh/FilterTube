@@ -1,5 +1,6 @@
 import fs from 'node:fs';
 import path from 'node:path';
+import vm from 'node:vm';
 import crypto from 'node:crypto';
 import test from 'node:test';
 import assert from 'node:assert/strict';
@@ -53,7 +54,7 @@ function blocks() {
   return {
     stateManagerAddChannel: sliceBetween(
       sources.stateManager,
-      'async function addChannel(input)',
+      'async function addChannel(input, options = {})',
       'async function fetchSubscribedChannelsFromImportTab'
     ),
     stateManagerAddKidsChannel: sliceBetween(
@@ -196,9 +197,9 @@ test('single-channel rule mutation persistence audit document records current bo
 test('single-channel rule mutation source fingerprints stay pinned', () => {
   const doc = read(auditDocPath);
   const expected = [
-    ['js/background.js', 6803, 306710, '57ddc6c3e31112c30734ede78c9b37b01bd31533fc8a1d16856b13d2b295f0d7'],
-    ['js/state_manager.js', 2491, 99780, '509c559e35989c13cdded17c01eeaca8115addcd3848dbcda41514422e5bc7b6'],
-    ['js/content_bridge.js', 13636, 604184, '8d55d0c8995e5b68bb9142c41f95046a676f5af2b83f8545b00f91a6a5a3776d']
+    ['js/background.js', 8538, 386043, 'cc89bb4a0375145e1c811b7cf5953729c39c409b6b24cacdc65c80f9f6ff44d0'],
+    ['js/state_manager.js', 2979, 124009, '04879b5b1dcac9229c70d0ea14241667755682649865ad1d52030c1ce21950d3'],
+    ['js/content_bridge.js', 15053, 678250, 'c653324d1f042c0473cf2102d81bcd161bfaa26f8c7ee545e250226594dc9618']
   ];
 
   for (const [file, lines, bytes, hash] of expected) {
@@ -217,15 +218,15 @@ test('single-channel rule mutation source/effect block metrics stay pinned in th
   const doc = read(auditDocPath);
   const currentBlocks = blocks();
   const expected = {
-    stateManagerAddChannel: ['StateManager addChannel block', 75, 3276],
-    stateManagerAddKidsChannel: ['StateManager addKidsChannel block', 79, 3400],
+    stateManagerAddChannel: ['StateManager addChannel block', 76, 3393],
+    stateManagerAddKidsChannel: ['StateManager addKidsChannel block', 80, 3450],
     backgroundAddWhitelistChannelPersistent: ['background addWhitelistChannelPersistent block', 40, 1329],
     backgroundKidsWhitelistChannel: ['background FilterTube_KidsWhitelistChannel block', 54, 2107],
     backgroundKidsBlockChannel: ['background FilterTube_KidsBlockChannel block', 43, 1769],
-    backgroundAddChannelPersistentAction: ['background addChannelPersistent action block', 287, 13345],
-    backgroundSecondaryAddFilteredChannel: ['background secondary addFilteredChannel receiver block', 39, 1579],
-    backgroundHandleAddFilteredChannel: ['background handleAddFilteredChannel block', 894, 45226],
-    contentBridgeAddChannelDirectly: ['content_bridge addChannelDirectly block', 55, 2662]
+    backgroundAddChannelPersistentAction: ['background addChannelPersistent action block', 311, 14558],
+    backgroundSecondaryAddFilteredChannel: ['background secondary addFilteredChannel receiver block', 58, 2408],
+    backgroundHandleAddFilteredChannel: ['background handleAddFilteredChannel block', 1104, 56174],
+    contentBridgeAddChannelDirectly: ['content_bridge addChannelDirectly block', 56, 2759]
   };
 
   for (const [key, [label, lines, bytes]] of Object.entries(expected)) {
@@ -237,12 +238,12 @@ test('single-channel rule mutation source/effect block metrics stay pinned in th
 test('StateManager channel additions choose background actions from Main and Kids modes', () => {
   const currentBlocks = blocks();
 
-  assert.match(currentBlocks.stateManagerAddChannel, /const action = state\.mode === 'whitelist' \? 'addWhitelistChannelPersistent' : 'addChannelPersistent'/);
+  assert.match(currentBlocks.stateManagerAddChannel, /const action = useAllowList \? 'addWhitelistChannelPersistent' : 'addChannelPersistent'/);
   assert.match(currentBlocks.stateManagerAddChannel, /chrome\.runtime\.sendMessage\(\{/);
   assert.match(currentBlocks.stateManagerAddChannel, /action,/);
   assert.match(currentBlocks.stateManagerAddChannel, /await loadSettings\(\)/);
 
-  assert.match(currentBlocks.stateManagerAddKidsChannel, /const action = kids\.mode === 'whitelist' \? 'FilterTube_KidsWhitelistChannel' : 'FilterTube_KidsBlockChannel'/);
+  assert.match(currentBlocks.stateManagerAddKidsChannel, /const action = listKey === 'whitelistChannels' \? 'FilterTube_KidsWhitelistChannel' : 'FilterTube_KidsBlockChannel'/);
   assert.match(currentBlocks.stateManagerAddKidsChannel, /chrome\.runtime\.sendMessage\(\{/);
   assert.match(currentBlocks.stateManagerAddKidsChannel, /source: 'user'/);
   assert.match(currentBlocks.stateManagerAddKidsChannel, /await loadSettings\(\)/);
@@ -261,11 +262,13 @@ test('single-channel background sender and lock gates remain split across siblin
     currentBlocks.backgroundAddWhitelistChannelPersistent,
     currentBlocks.backgroundKidsWhitelistChannel,
     currentBlocks.backgroundKidsBlockChannel,
-    currentBlocks.backgroundAddChannelPersistentAction,
     currentBlocks.backgroundSecondaryAddFilteredChannel
   ]) {
     assert.doesNotMatch(block, /isProfileSessionAuthorized|profile_locked|sessionPinCache|lockAuthority/);
+    assert.match(block, /handleAddFilteredChannel\(/, 'receiver delegates to the shared authorized writer');
   }
+  assert.match(currentBlocks.backgroundAddChannelPersistentAction, /isProfileSessionAuthorized\(profilesV4ForMutation, activeProfileIdForMutation\)/);
+  assert.match(currentBlocks.backgroundHandleAddFilteredChannel, /isProfileSessionAuthorized/);
 });
 
 test('single-channel list target routing forwards explicit secondary addFilteredChannel listType', () => {
@@ -291,7 +294,7 @@ test('legacy addChannelPersistent remains a separate inline persistence path fro
   assert.match(block, /browserAPI\.storage\.local\.set\(writePayload/);
   assert.match(block, /scheduleAutoBackupInBackground\('channel_added'\)/);
   assert.doesNotMatch(block, /handleAddFilteredChannel\(/);
-  assert.doesNotMatch(block, /compiledSettingsCache\.main = null/);
+  assert.match(block, /compiledSettingsCache\.main = null/);
 });
 
 test('shared handleAddFilteredChannel currently mixes network identity repair storage writes cache invalidation and post-block enrichment', () => {
@@ -334,18 +337,18 @@ test('selected background mutation token counts stay pinned', () => {
   ].join('\n');
   const expectedCounts = {
     isTrustedUiSender: 2,
-    isProfileSessionAuthorized: 0,
+    isProfileSessionAuthorized: 3,
     handleAddFilteredChannel: 5,
     addChannelPersistent: 1,
     addFilteredChannel: 1,
     'storage.local.set': 5,
     'browserAPI.storage.local.set': 5,
-    compiledSettingsCache: 2,
+    compiledSettingsCache: 4,
     scheduleAutoBackupInBackground: 5,
     FilterTube_RefreshNow: 1,
     'tabs.query': 1,
     sendMessageToTabQuietly: 1,
-    channelMap: 39,
+    channelMap: 41,
     fetchChannelInfo: 6,
     performWatchIdentityFetch: 7,
     performKidsWatchIdentityFetch: 3,
@@ -353,13 +356,13 @@ test('selected background mutation token counts stay pinned', () => {
     enqueueChannelMapUpdate: 2,
     enqueueVideoChannelMapUpdate: 1,
     schedulePostBlockEnrichment: 1,
-    targetListType: 17,
+    targetListType: 18,
     whitelistChannels: 12,
     blockedChannels: 8,
-    filterChannels: 7,
+    filterChannels: 8,
     ftProfilesV3: 5,
-    FT_PROFILES_V4_KEY: 6,
-    sendResponse: 20
+    FT_PROFILES_V4_KEY: 9,
+    sendResponse: 22
   };
 
   for (const [token, expected] of Object.entries(expectedCounts)) {
@@ -406,4 +409,33 @@ test('future single-channel rule mutation authority symbols are not present in p
     assert.doesNotMatch(runtimeSource, new RegExp(symbol), `${symbol} unexpectedly exists in runtime source`);
     assert.match(doc, new RegExp(symbol), `${symbol} should be named as missing future authority`);
   }
+});
+
+
+test('actual legacy single-channel writer rejects a locked active profile before network or storage writes', async () => {
+  const root = { schemaVersion: 4, activeProfileId: 'locked', profiles: { locked: {
+    security: { profilePinVerifier: { hash: 'fixture-only-verifier' } }, main: {}, kids: {}
+  } } };
+  let writes = 0;
+  let fetches = 0;
+  let respond;
+  const response = new Promise(resolve => { respond = resolve; });
+  const context = vm.createContext({
+    console: { log() {}, warn() {}, error() {} }, URL, Date, Map, decodeURIComponent,
+    DEFAULT_PROFILE_ID: 'default', FT_PROFILES_V4_KEY: 'ftProfilesV4', sessionPinCache: new Map(),
+    request: { action: 'addChannelPersistent', input: '@example' }, sendResponse: respond,
+    isValidProfilesV4: value => value?.schemaVersion === 4,
+    browserAPI: { storage: { local: { get(_, callback) { callback({ ftProfilesV4: structuredClone(root), filterChannels: [] }); }, set() { writes++; } } } },
+    fetchChannelInfo() { fetches++; throw new Error('network must not run'); }
+  });
+  for (const name of ['safeObject', 'normalizeString', 'extractPinVerifierFromProfilesV4', 'isSessionPinCacheEntryFresh', 'isProfileSessionAuthorized']) {
+    const start = sources.background.indexOf(`function ${name}(`);
+    const end = sources.background.indexOf('\n}', start) + 2;
+    assert.ok(start >= 0 && end > start);
+    vm.runInContext(sources.background.slice(start, end), context);
+  }
+  vm.runInContext(`(function(){ if(false){ ${blocks().backgroundAddChannelPersistentAction} } })()`, context);
+  assert.equal((await response).errorCode, 'profile_locked');
+  assert.equal(writes, 0);
+  assert.equal(fetches, 0);
 });

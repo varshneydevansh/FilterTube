@@ -7,6 +7,11 @@ for isolated content-script-world `console.log` and `console.debug` calls; it
 is not a whitelist patch, JSON-first promotion, collector patch, or
 release-claim proof.
 
+
+The 2026-05/06 sections below are retained historical snapshots. The current
+21-file scoped counts and source fingerprints appear in the 2026-10-18 addendum;
+neither snapshot proves all newly added runtime has complete diagnostic policy.
+
 ## Purpose
 
 This slice records the current diagnostic logging surface before optimization
@@ -724,3 +729,89 @@ This recheck narrows the blocker from "browser connector unknown" to "no
 relevant live target available through the connected inventory." It still does
 not prove that production YouTube tabs are quiet with debug disabled, and it
 does not approve removal of diagnostic calls.
+
+
+## Current Scoped Diagnostic Inventory - 2026-10-18
+
+This refresh counts the same 21 source files as the historical inventory.
+It changes no console behavior, grants no cleanup permission, and does not claim
+complete diagnostic coverage of newly added modules or installed browsers.
+Old source-flow references and sampled Chrome statements remain historical.
+
+```text
+current scoped diagnostic source files: 21
+current active console callsites: 446
+console.log callsites: 208
+console.warn callsites: 136
+console.error callsites: 77
+console.debug callsites: 24
+console.info callsites: 1
+current selected routine log/debug/info token rows: 211
+current MAIN-world routine lexical rows: 8
+current diagnostic policy completion: NO-GO
+runtime behavior changed by inventory refresh: no
+```
+
+The extra MAIN-world routine row is the explicit structured Advert Void
+`console.info` event, outside the debug-only seed relay. It is event-driven,
+with an in-memory history capped at 100 entries; the history cap is not a rate
+limit and does not prove console silence. Its privacy/work budget and installed
+sampling remain separate review gates. The other seed/debug relay guards and
+relative isolated-world production console-gate ordering are checked in source.
+
+| File | Lines | Bytes | SHA-256 |
+| --- | ---: | ---: | --- |
+| `build.js` | 861 | 33225 | `a198cc1d0bf98e410deb8f66ced0e56a046bbf987a0a5b878e1278577622fb2e` |
+| `js/background.js` | 8538 | 386043 | `cc89bb4a0375145e1c811b7cf5953729c39c409b6b24cacdc65c80f9f6ff44d0` |
+| `js/content/block_channel.js` | 3361 | 135050 | `f2a02886a83d64d93186cd1f0c1f300683ae49754b928d2e0329fd1a88d8f2c9` |
+| `js/content/bridge_settings.js` | 2110 | 93234 | `0a42241fd8a9b6559995895ef7174745d7e4a7b21e0644ef6940eadd66162723` |
+| `js/content/collab_dialog.js` | 393 | 14623 | `dc34bba556b310da8b7516d106e9d67addea59d8a707a02f21607ac97af1f72a` |
+| `js/content/dom_extractors.js` | 1166 | 48221 | `ddb421e018c6e9a1ef92c7cd8dc4d91d201da814c6f25a3b63d771795cdd9e19` |
+| `js/content/dom_fallback.js` | 8172 | 380506 | `df11dc69db7f7b8818c8dceb1d237d1794c8687af161dc2b9ae9d12acaed9e16` |
+| `js/content/handle_resolver.js` | 291 | 10230 | `fab995e0e5c85c8ba4e9d342bc452d297ea4dc99220bb94fee4c490ff4a98b47` |
+| `js/content_bridge.js` | 15053 | 678250 | `c653324d1f042c0473cf2102d81bcd161bfaa26f8c7ee545e250226594dc9618` |
+| `js/filter_logic.js` | 4534 | 221980 | `f7021a053af96a4cd31a577f56e900ffb1a5d990fe55a838af64a6dba867afc4` |
+| `js/injector.js` | 4148 | 183860 | `62bd7222e7ea8c7fc51cbffd63b894a2f03509b4cc09ddf7525b8a748f91eb60` |
+| `js/io_manager.js` | 3203 | 162604 | `ca73f44abb4d2d4e57a81470cfcb2447b1e62ef8680ef0457b81dcdc6734e4c3` |
+| `js/layout.js` | 680 | 30604 | `48831ccdc2d62c75818d9c6a153d7bfacec9d7be9f2408485f74b1a7c13c57c7` |
+| `js/popup.js` | 2553 | 117093 | `645fab83d4b665796f5b2fe1be262ca336df6a4cf3ffb1daebc588a50c091aa7` |
+| `js/seed.js` | 2261 | 97497 | `ae45137438c5a19610855b443fbeae0d6fc34931f62a5346a0849005078f7250` |
+| `js/settings_shared.js` | 1313 | 66857 | `19f0a1fb3cd512494481b7eb39169bf84feeda4a0a6a20cf58ebaf1c18ff7ba9` |
+| `js/state_manager.js` | 2979 | 124009 | `04879b5b1dcac9229c70d0ea14241667755682649865ad1d52030c1ce21950d3` |
+| `js/tab-view.js` | 32531 | 1760504 | `6da5a37b9018368588ff9c7091aca30c22a4398a038f681bad2ba2a1be4a4eca` |
+| `scripts/build-extension-ui.mjs` | 50 | 1188 | `6326362ebf90f448ccdbf68945b3fb522b7b215edaf9b3e28589a4e166239cf3` |
+| `scripts/build-nanah-vendor.mjs` | 65 | 1818 | `dae8d3ef29c4cd44b0bf975090e9d53f3bb05b523355f5038930fc03b27e921c` |
+| `scripts/sync-native-runtime.mjs` | 34 | 1070 | `4f46c13bf6099092193712790d231ff4809b00b1b0061d04af71ac3ba6bf21c6` |
+
+| File | log | warn | error | debug | info | Total |
+| --- | ---: | ---: | ---: | ---: | ---: | ---: |
+| `build.js` | 19 | 8 | 7 | 0 | 0 | 34 |
+| `js/background.js` | 49 | 29 | 12 | 13 | 0 | 103 |
+| `js/content/block_channel.js` | 1 | 3 | 5 | 0 | 0 | 9 |
+| `js/content/bridge_settings.js` | 3 | 3 | 0 | 0 | 0 | 6 |
+| `js/content/collab_dialog.js` | 1 | 3 | 0 | 0 | 0 | 4 |
+| `js/content/dom_extractors.js` | 0 | 0 | 1 | 0 | 0 | 1 |
+| `js/content/dom_fallback.js` | 2 | 2 | 0 | 0 | 0 | 4 |
+| `js/content/handle_resolver.js` | 2 | 3 | 0 | 0 | 0 | 5 |
+| `js/content_bridge.js` | 114 | 46 | 14 | 8 | 0 | 182 |
+| `js/filter_logic.js` | 2 | 6 | 1 | 1 | 0 | 10 |
+| `js/injector.js` | 0 | 0 | 0 | 1 | 0 | 1 |
+| `js/io_manager.js` | 3 | 4 | 0 | 0 | 0 | 7 |
+| `js/layout.js` | 4 | 0 | 0 | 0 | 0 | 4 |
+| `js/popup.js` | 1 | 1 | 0 | 0 | 0 | 2 |
+| `js/seed.js` | 2 | 0 | 0 | 1 | 1 | 4 |
+| `js/settings_shared.js` | 0 | 1 | 0 | 0 | 0 | 1 |
+| `js/state_manager.js` | 3 | 14 | 3 | 0 | 0 | 20 |
+| `js/tab-view.js` | 1 | 13 | 25 | 0 | 0 | 39 |
+| `scripts/build-extension-ui.mjs` | 0 | 0 | 2 | 0 | 0 | 2 |
+| `scripts/build-nanah-vendor.mjs` | 0 | 0 | 2 | 0 | 0 | 2 |
+| `scripts/sync-native-runtime.mjs` | 1 | 0 | 5 | 0 | 0 | 6 |
+
+| Owner family | Current callsites |
+| --- | ---: |
+| `build-release-sync-scripts` | 44 |
+| `background-storage-state` | 131 |
+| `content-helper` | 29 |
+| `page-runtime-core` | 197 |
+| `quarantined-legacy` | 4 |
+| `extension-ui` | 41 |

@@ -3,17 +3,15 @@ import path from 'node:path';
 import crypto from 'node:crypto';
 import test from 'node:test';
 import assert from 'node:assert/strict';
+import { execFileSync } from 'node:child_process';
 
 const repoRoot = process.cwd();
 const auditDocPath = 'docs/audit/FILTERTUBE_P0_RELEASE_PACKAGE_CURRENT_BEHAVIOR_2026-05-19.md';
 const methodGapPath = 'docs/audit/FILTERTUBE_METHOD_SEMANTIC_PROOF_GAP_INDEX_CURRENT_BEHAVIOR_2026-05-25.md';
-const chromeDefaultProfileRoot = '/Users/devanshvarshney/Library/Application Support/Google/Chrome/Default';
-const chromeLiveSpaProfileRoot = '/private/tmp/filtertube-live-spa-chrome-profile/Default';
-const chromeExtensionId = 'gkgjigdfdccckblmglboobikfcpeelio';
 const manifestFiles = ['manifest.json', 'manifest.chrome.json', 'manifest.firefox.json', 'manifest.opera.json'];
 const distBrowserTargets = ['chrome', 'firefox', 'opera'];
-const packageCopiedDirectoryRoots = ['js', 'css', 'html', 'icons', 'data', 'assets'];
-const expectedManifestPermissions = ['storage', 'activeTab', 'scripting', 'tabs', 'downloads'];
+const packageCopiedDirectoryRoots = ['_locales', 'js', 'css', 'html', 'icons', 'data', 'assets'];
+const expectedManifestPermissions = ['storage', 'unlimitedStorage', 'activeTab', 'scripting', 'tabs', 'downloads', 'alarms'];
 const expectedManifestHostPermissions = [
   '*://*.youtube.com/*',
   '*://*.youtube-nocookie.com/*',
@@ -23,7 +21,8 @@ const expectedManifestOptionalHostPermissions = [
   'http://*/*',
   'https://*/*'
 ];
-const expectedActiveManifestMatches = ['*://*.youtube.com/*', '*://*.youtubekids.com/*'];
+const expectedActiveManifestMatches = ['*://*.youtube.com/*', '*://*.youtubekids.com/*', '*://*.youtube.com/embed/*', '*://*.youtube-nocookie.com/embed/*', 'https://*.google.com/search*'];
+const expectedResourceMatches = ['*://*.youtube.com/*', '*://*.youtube-nocookie.com/*', '*://*.youtubekids.com/*', 'https://*.google.com/*'];
 const releasePackageFamilyDocs = [
   'docs/audit/FILTERTUBE_BUILD_RELEASE_METHOD_SEMANTIC_REGISTER_2026-05-21.md',
   'docs/audit/FILTERTUBE_P0_RELEASE_PACKAGE_CURRENT_BEHAVIOR_2026-05-19.md',
@@ -42,10 +41,6 @@ function read(file) {
 
 function readJson(file) {
   return JSON.parse(read(file));
-}
-
-function readJsonAbs(file) {
-  return JSON.parse(fs.readFileSync(file, 'utf8'));
 }
 
 function sha256(file) {
@@ -74,53 +69,11 @@ function contentScriptCss(file) {
   return (readJson(file).content_scripts || []).flatMap(script => script.css || []);
 }
 
-function chromeDefaultUnpackedWorkspaceByteStats() {
-  const preferences = readJsonAbs(path.join(chromeDefaultProfileRoot, 'Preferences'));
-  const securePreferences = readJsonAbs(path.join(chromeDefaultProfileRoot, 'Secure Preferences'));
-  const preferencesSetting = preferences.extensions?.settings?.[chromeExtensionId] || null;
-  const secureSetting = securePreferences.extensions?.settings?.[chromeExtensionId] || null;
-  const activePermissions = secureSetting?.active_permissions || {};
-  const grantedPermissions = secureSetting?.granted_permissions || {};
-  const localExtensionSettingsPath = path.join(chromeDefaultProfileRoot, 'Local Extension Settings', chromeExtensionId);
-  const packedExtensionPath = path.join(chromeDefaultProfileRoot, 'Extensions', chromeExtensionId);
-  const contentBridge = read('js/content_bridge.js');
-
-  return {
-    securePath: secureSetting?.path || '',
-    pathMatchesWorkspace: secureSetting?.path === repoRoot,
-    preferencesSettingPresent: !!preferencesSetting,
-    secureSettingPresent: !!secureSetting,
-    location: secureSetting?.location,
-    fromWebstore: secureSetting?.from_webstore,
-    wasInstalledByDefault: secureSetting?.was_installed_by_default,
-    disableReasons: secureSetting?.disable_reasons || [],
-    withholdingPermissions: secureSetting?.withholding_permissions,
-    activeApiPermissions: [...(activePermissions.api || [])].sort(),
-    grantedApiPermissions: [...(grantedPermissions.api || [])].sort(),
-    activeExplicitHosts: [...(activePermissions.explicit_host || [])].sort(),
-    grantedExplicitHosts: [...(grantedPermissions.explicit_host || [])].sort(),
-    activeScriptableHosts: [...(activePermissions.scriptable_host || [])].sort(),
-    grantedScriptableHosts: [...(grantedPermissions.scriptable_host || [])].sort(),
-    version: secureSetting?.manifest?.version || secureSetting?.service_worker_registration_info?.version || '',
-    localExtensionSettingsExists: fs.existsSync(localExtensionSettingsPath),
-    packedExtensionDirExists: fs.existsSync(packedExtensionPath),
-    manifestHash: sha256('manifest.json'),
-    packageHash: sha256('package.json'),
-    contentBridgeHash: sha256('js/content_bridge.js'),
-    ampersandTopicFixTokenPresent: contentBridge.includes('const tokens = normalizedText.split(/\\s*(?:,|\\band\\b)\\s*/i);')
-  };
-}
-
-function chromeLiveSpaProfileStatsIfPresent() {
-  const securePreferencesPath = path.join(chromeLiveSpaProfileRoot, 'Secure Preferences');
-  if (!fs.existsSync(securePreferencesPath)) return null;
-  const securePreferences = readJsonAbs(securePreferencesPath);
-  const secureSetting = securePreferences.extensions?.settings?.[chromeExtensionId] || null;
-  return {
-    settingPresent: !!secureSetting,
-    path: secureSetting?.path || '',
-    location: secureSetting?.location
-  };
+function referencedPathExists(ref) {
+  if (!ref.includes('*')) return fs.existsSync(path.join(repoRoot, ref));
+  const directory = path.dirname(ref.slice(0, ref.indexOf('*')));
+  const pattern = new RegExp(`^${ref.replace(/[.+?^${}()|[\]\\]/g, '\\$&').replaceAll('*', '[^/]*')}$`);
+  return walkFiles(directory).some(file => pattern.test(file));
 }
 
 function manifestReferenceEntries(file) {
@@ -161,7 +114,7 @@ function manifestReferenceClosureStats() {
       if (entry.type === 'content_scripts.css') contentScriptCssRefs += 1;
     }
     for (const ref of unique) {
-      if (!fs.existsSync(path.join(repoRoot, ref))) missing.push(`${file}:${ref}`);
+      if (!referencedPathExists(ref)) missing.push(`${file}:${ref}`);
       const root = ref.split('/')[0];
       if (!packageCopiedDirectoryRoots.includes(root)) outsideCopiedRoots.push(`${file}:${ref}`);
     }
@@ -236,437 +189,131 @@ function manifestIncognitoBoundaryStats() {
   };
 }
 
-function currentLocalDistPackageSnapshotStats() {
-  const distFiles = walkFiles('dist').sort();
-  const zipFiles = distFiles.filter(file => file.endsWith('.zip'));
-  const browserStats = new Map();
-  const groupCountsByBrowser = new Map();
-
-  for (const browser of distBrowserTargets) {
-    const browserPrefix = `dist/${browser}/`;
-    const browserFiles = distFiles.filter(file => file.startsWith(browserPrefix));
-    const manifestPath = `dist/${browser}/manifest.json`;
-    const manifest = readJson(manifestPath);
-    const contentScripts = manifest.content_scripts || [];
-    const webAccessibleResources = manifest.web_accessible_resources || [];
-    const sourceBackedFiles = [];
-    const byteIdenticalSourceBackedFiles = [];
-    const groupCounts = new Map();
-
-    for (const file of browserFiles) {
-      const stagedRelativePath = file.slice(browserPrefix.length);
-      const firstSegment = stagedRelativePath.includes('/')
-        ? stagedRelativePath.split('/')[0]
-        : stagedRelativePath === 'manifest.json'
-          ? 'manifest'
-          : 'top-level-common';
-      groupCounts.set(firstSegment, (groupCounts.get(firstSegment) || 0) + 1);
-
-      if (stagedRelativePath === 'manifest.json') continue;
-      if (fs.existsSync(path.join(repoRoot, stagedRelativePath))) {
-        sourceBackedFiles.push(file);
-        if (sha256(file) === sha256(stagedRelativePath)) {
-          byteIdenticalSourceBackedFiles.push(file);
-        }
-      }
-    }
-
-    groupCountsByBrowser.set(browser, Object.fromEntries([...groupCounts.entries()].sort()));
-    browserStats.set(browser, {
-      stagedFiles: browserFiles.length,
-      manifestBytes: fileSize(manifestPath),
-      manifestSha256: sha256(manifestPath),
-      version: manifest.version,
-      contentScriptEntries: contentScripts.length,
-      contentScriptJsRefs: contentScripts.flatMap(script => script.js || []).length,
-      webAccessibleResourceRefs: webAccessibleResources.flatMap(resource => resource.resources || []).length,
-      sourceBackedFiles: sourceBackedFiles.length,
-      byteIdenticalSourceBackedFiles: byteIdenticalSourceBackedFiles.length,
-      zipPath: `dist/filtertube-${browser}-v3.3.2.zip`,
-      zipBytes: fileSize(`dist/filtertube-${browser}-v3.3.2.zip`),
-      zipSha256: sha256(`dist/filtertube-${browser}-v3.3.2.zip`)
-    });
+// Current source closure is checked independently of dated installed-profile
+// observations. Routine release tests never inspect a personal browser profile.
+const currentManifestSnapshot = {
+  "manifest.json": {
+    "references": 64,
+    "unique": 30,
+    "entries": 6,
+    "js": 43,
+    "worlds": [
+      "MAIN",
+      "ISOLATED"
+    ],
+    "resources": 12
+  },
+  "manifest.chrome.json": {
+    "references": 64,
+    "unique": 30,
+    "entries": 6,
+    "js": 43,
+    "worlds": [
+      "MAIN",
+      "ISOLATED"
+    ],
+    "resources": 12
+  },
+  "manifest.firefox.json": {
+    "references": 63,
+    "unique": 31,
+    "entries": 5,
+    "js": 39,
+    "worlds": [
+      "MAIN"
+    ],
+    "resources": 12
+  },
+  "manifest.opera.json": {
+    "references": 63,
+    "unique": 29,
+    "entries": 7,
+    "js": 43,
+    "worlds": [
+      "MAIN"
+    ],
+    "resources": 11
   }
-
-  return {
-    distFiles,
-    zipFiles,
-    browserStats,
-    groupCountsByBrowser
-  };
-}
+};
 
 function assertBrowserManifestReferenceClosureAddendum(doc) {
   const stats = manifestReferenceClosureStats();
-  const expected = new Map([
-    ['manifest.json', { references: 30, unique: 25 }],
-    ['manifest.chrome.json', { references: 30, unique: 25 }],
-    ['manifest.firefox.json', { references: 30, unique: 25 }],
-    ['manifest.opera.json', { references: 29, unique: 24 }]
-  ]);
-
-  assert.match(doc, /Browser Manifest Package Reference Closure Addendum - 2026-05-27/);
-  assert.match(doc, /combined unique referenced paths across browser manifests: 25/);
-  assert.match(doc, /unresolved manifest file references: 0/);
-  assert.match(doc, /manifest referenced roots outside COMMON_DIRS: 0/);
-  assert.match(doc, /manifest content-script CSS references: 0/);
-  assert.match(doc, /build-time manifest reference validation: absent/);
-  assert.match(doc, /ASCII boundary:/);
-  assert.match(doc, /flowchart TD/);
-  assert.match(doc, /Release package parity authority remains NO-GO/);
-
-  assert.deepEqual([...stats.perManifest.keys()], manifestFiles);
-  for (const [file, value] of expected) {
-    assert.deepEqual(stats.perManifest.get(file), value, `${file} manifest reference stats drifted`);
-    assert.ok(
-      doc.includes(`| \`${file}\` | ${value.references} | ${value.unique} | 0 |`),
-      `${file} manifest reference row missing from doc`
-    );
-  }
-  assert.equal(stats.combinedUnique.size, 25);
+  assert.match(doc, /2026-10-18 Current Source And Historical Evidence Boundary/);
+  assert.equal(stats.combinedUnique.size, 31);
   assert.deepEqual(stats.missing, []);
   assert.deepEqual(stats.outsideCopiedRoots, []);
   assert.equal(stats.contentScriptCssRefs, 0);
-
-  const referencedRoots = [...new Set([...stats.combinedUnique].map(ref => ref.split('/')[0]))].sort();
-  assert.deepEqual(referencedRoots, ['assets', 'html', 'icons', 'js']);
-  assert.match(read('build.js'), /const COMMON_DIRS = \['js', 'css', 'html', 'icons', 'data', 'assets'\]/);
-  assert.doesNotMatch(read('build.js'), /validatePackagedReferences|releasePackageParity\.record|manifestReferenceClosureReport/);
+  for (const file of manifestFiles) {
+    const expected = currentManifestSnapshot[file];
+    assert.deepEqual(stats.perManifest.get(file), { references: expected.references, unique: expected.unique });
+    assert.ok(doc.includes(`| \`${file}\` | ${expected.references} | ${expected.unique} | ${expected.entries} | ${expected.js} | ${expected.resources} |`));
+  }
 }
 
 function assertBrowserManifestPermissionAndResourceValidationSnapshot(doc) {
   const stats = manifestPermissionResourceValidationStats();
-  const expected = new Map([
-    ['manifest.json', { contentScriptEntries: 2, contentScriptJsRefs: 15, explicitWorlds: ['MAIN', 'ISOLATED'], webAccessibleResourceRefs: 6 }],
-    ['manifest.chrome.json', { contentScriptEntries: 2, contentScriptJsRefs: 15, explicitWorlds: ['MAIN', 'ISOLATED'], webAccessibleResourceRefs: 6 }],
-    ['manifest.firefox.json', { contentScriptEntries: 1, contentScriptJsRefs: 14, explicitWorlds: [], webAccessibleResourceRefs: 6 }],
-    ['manifest.opera.json', { contentScriptEntries: 2, contentScriptJsRefs: 15, explicitWorlds: [], webAccessibleResourceRefs: 5 }]
-  ]);
-
-  assert.match(doc, /Browser Manifest Permission And Resource Validation Snapshot - 2026-05-27/);
-  assert.match(doc, /exact permission list per manifest: storage, activeTab, scripting, tabs, downloads/);
-  assert.match(doc, /exact host permission list per manifest: youtube\.com, youtube-nocookie\.com, youtubekids\.com/);
-  assert.match(doc, /content-script active match hosts per manifest: youtube\.com, youtubekids\.com/);
-  assert.match(doc, /web-accessible-resource active match hosts per manifest: youtube\.com, youtubekids\.com/);
-  assert.match(doc, /host-only youtube-nocookie gap manifests: 4/);
-  assert.match(doc, /content-script CSS references: 0/);
-  assert.match(doc, /build-time permission\/resource\/world validation: absent/);
-  assert.match(doc, /flowchart TD/);
-  assert.match(doc, /Release package parity authority remains NO-GO/);
-
-  for (const [file, expectedStats] of expected) {
+  for (const file of manifestFiles) {
     const actual = stats.perManifest.get(file);
-    assert.deepEqual(actual.permissions, expectedManifestPermissions, `${file} permissions drifted`);
-    assert.deepEqual(actual.hostPermissions, expectedManifestHostPermissions, `${file} host permissions drifted`);
-    assert.deepEqual(actual.optionalHostPermissions, expectedManifestOptionalHostPermissions, `${file} optional pickup host permissions drifted`);
-    assert.deepEqual(actual.contentMatches, expectedActiveManifestMatches, `${file} content matches drifted`);
-    assert.deepEqual(actual.resourceMatches, expectedActiveManifestMatches, `${file} resource matches drifted`);
-    assert.equal(actual.hostOnlyNocookieGap, true, `${file} youtube-nocookie host-only gap drifted`);
-    assert.deepEqual(
-      {
-        contentScriptEntries: actual.contentScriptEntries,
-        contentScriptJsRefs: actual.contentScriptJsRefs,
-        explicitWorlds: actual.explicitWorlds,
-        webAccessibleResourceRefs: actual.webAccessibleResourceRefs
-      },
-      expectedStats,
-      `${file} manifest validation stats drifted`
-    );
-
-    const worlds = expectedStats.explicitWorlds.length ? expectedStats.explicitWorlds.map(world => `\`${world}\``).join(', ') : 'none';
-    assert.ok(
-      doc.includes(`| \`${file}\` | ${expectedStats.contentScriptEntries} | ${expectedStats.contentScriptJsRefs} | ${worlds} | ${expectedStats.webAccessibleResourceRefs} | yes |`),
-      `${file} permission/resource row missing from doc`
-    );
+    const expected = currentManifestSnapshot[file];
+    assert.deepEqual(actual.permissions, expectedManifestPermissions);
+    assert.deepEqual(actual.hostPermissions, expectedManifestHostPermissions);
+    assert.deepEqual(actual.optionalHostPermissions, expectedManifestOptionalHostPermissions);
+    assert.deepEqual(actual.contentMatches, expectedActiveManifestMatches);
+    assert.deepEqual(actual.resourceMatches, expectedResourceMatches);
+    assert.deepEqual(actual.explicitWorlds, expected.worlds);
+    assert.equal(actual.contentScriptEntries, expected.entries);
+    assert.equal(actual.contentScriptJsRefs, expected.js);
+    assert.equal(actual.webAccessibleResourceRefs, expected.resources);
+    assert.equal(actual.hostOnlyNocookieGap, false);
   }
-
   assert.equal(stats.contentScriptCssRefs, 0);
-  assert.doesNotMatch(
-    read('build.js'),
-    /validateManifestPermissions|validateHostPermissions|validateWebAccessibleResources|validateContentScriptWorlds|manifestPermissionBuildValidationReport/
-  );
-  assert.match(read('build.js'), /ensureCollabDialogScriptOrder\(manifestJSON\)/);
-}
-
-function assertCurrentLocalDistPackageSnapshot(doc) {
-  const stats = currentLocalDistPackageSnapshotStats();
-  const expectedGroupCounts = {
-    assets: 3,
-    css: 8,
-    data: 1,
-    html: 3,
-    icons: 7,
-    js: 39,
-    manifest: 1,
-    'top-level-common': 3
-  };
-  const expectedBrowserStats = new Map([
-    ['chrome', {
-      manifestBytes: 2568,
-      manifestSha256: 'a46f25890de6ee568bb9cd62b22c466fda2f3d1570b3b0480cd453a65515e94d',
-      contentScriptEntries: 2,
-      contentScriptJsRefs: 15,
-      webAccessibleResourceRefs: 6,
-      zipBytes: 8849225,
-      zipSha256: 'ddc8fa42468afa68281138a0fe9b9f8ce5e69c6dce3a7888e7847c92d9d74990'
-    }],
-    ['firefox', {
-      manifestBytes: 2658,
-      manifestSha256: '5e6ec80ba9aad98f47758ab8d5f7b9be304262c95f6d1000162a40df6961e227',
-      contentScriptEntries: 1,
-      contentScriptJsRefs: 14,
-      webAccessibleResourceRefs: 6,
-      zipBytes: 8849283,
-      zipSha256: '4b7c2648abce0b220f41b08ec4cb7bd8f1f074578df670e81b69d06aafa8f4fa'
-    }],
-    ['opera', {
-      manifestBytes: 2573,
-      manifestSha256: '4bdaa0eb26fae91ff31a754645ae872d93119d8162a8231d5be312874f61f8d8',
-      contentScriptEntries: 2,
-      contentScriptJsRefs: 15,
-      webAccessibleResourceRefs: 5,
-      zipBytes: 8849225,
-      zipSha256: '4223939d73f5f69ef50033b3ecb20d6cf2e7fcbb1b03a5dd8ddb098d280db838'
-    }]
-  ]);
-
-  assert.match(doc, /Current Local Dist Package Snapshot - 2026-06-05/);
-  assert.match(doc, /dist snapshot source: existing ignored local dist tree/);
-  assert.match(doc, /browser staged directories: 3/);
-  assert.match(doc, /browser staged files per directory: 65/);
-  assert.match(doc, /dist zip artifacts: 3/);
-  assert.match(doc, /total dist files including zips: 198/);
-  assert.match(doc, /source-backed staged files per browser excluding manifest: 64/);
-  assert.match(doc, /byte-identical source-backed staged files per browser excluding manifest: 50/);
-  assert.match(doc, /committed package manifest: absent/);
-  assert.match(doc, /zip checksum manifest: absent/);
-  assert.match(doc, /reproducible build proof: absent/);
-  assert.match(doc, /runtime behavior changed by this snapshot: no/);
-  assert.match(doc, /ASCII boundary:/);
-  assert.match(doc, /flowchart TD/);
-  assert.match(doc, /Release package parity authority remains NO-GO/);
-  assert.match(doc, /local dist snapshot proof: PARTIAL/);
-  assert.match(doc, /source-backed staged byte parity: local partial, release authority partial/);
-  assert.match(doc, /zip checksum snapshot: yes/);
-  assert.match(doc, /committed release package manifest authority: NO-GO/);
-  assert.match(doc, /reproducible package build authority: NO-GO/);
-  assert.match(doc, /loaded-browser package\/runtime parity authority: NO-GO/);
-
-  assert.equal(stats.distFiles.length, 198);
-  assert.deepEqual(stats.zipFiles, [
-    'dist/filtertube-chrome-v3.3.2.zip',
-    'dist/filtertube-firefox-v3.3.2.zip',
-    'dist/filtertube-opera-v3.3.2.zip'
-  ]);
-
-  for (const browser of distBrowserTargets) {
-    assert.deepEqual(stats.groupCountsByBrowser.get(browser), expectedGroupCounts);
-    const actual = stats.browserStats.get(browser);
-    const expected = expectedBrowserStats.get(browser);
-    assert.equal(actual.stagedFiles, 65);
-    assert.equal(actual.version, '3.3.2');
-    assert.equal(actual.sourceBackedFiles, 64);
-    assert.equal(actual.byteIdenticalSourceBackedFiles, 50);
-    assert.equal(actual.manifestBytes, expected.manifestBytes);
-    assert.equal(actual.manifestSha256, expected.manifestSha256);
-    assert.equal(actual.contentScriptEntries, expected.contentScriptEntries);
-    assert.equal(actual.contentScriptJsRefs, expected.contentScriptJsRefs);
-    assert.equal(actual.webAccessibleResourceRefs, expected.webAccessibleResourceRefs);
-    assert.equal(actual.zipBytes, expected.zipBytes);
-    assert.equal(actual.zipSha256, expected.zipSha256);
-    assert.ok(
-      doc.includes(`| \`${browser}\` | ${actual.stagedFiles} | ${expected.manifestBytes} | \`${expected.manifestSha256}\` | \`3.3.2\` | ${expected.contentScriptEntries} | ${expected.contentScriptJsRefs} | ${expected.webAccessibleResourceRefs} | ${expected.zipBytes} | \`${expected.zipSha256}\` |`),
-      `${browser} dist snapshot row missing from doc`
-    );
-  }
-
-  assert.doesNotMatch(read('build.js'), /releasePackageParity|packageManifest|reproducibleBuildReport|zipContentAttestation/);
+  assert.match(doc, /source closure does not establish installed or incognito access/);
 }
 
 function assertInstalledRuntimeProvenanceSnapshot(doc) {
-  const incognitoStats = manifestIncognitoBoundaryStats();
-
   assert.match(doc, /Installed Runtime Provenance Snapshot - 2026-05-27/);
-  assert.match(doc, /workspace source tree/);
-  assert.match(doc, /installed extension id \+ loaded path \+ manifest version \+ source hash/);
-  assert.match(doc, /flowchart TD/);
-  assert.match(doc, /Installed Chrome runtime/);
-  assert.match(doc, /\| Package command\/version surface \| `package\.json:3-18` \|/);
-  assert.match(doc, /\| Default Chrome manifest load order \| `manifest\.json:1-88`, `manifest\.json:42-56` \|/);
-  assert.match(doc, /\| Build package roots and manifest copy \| `build\.js:29-33`, `build\.js:82-158` \|/);
-  assert.match(doc, /\| Manifest order repair \| `build\.js:161-181` \|/);
-  assert.match(doc, /\| ZIP\/release output \| `build\.js:183-192`, `build\.js:644-700` \|/);
-  assert.match(doc, /\| Current Topic ampersand and bare-`and` source proof \| `js\/content_bridge\.js:2759-2814`, `js\/content_bridge\.js:4784-4812`, `js\/content_bridge\.js:4902-4928`, `tests\/runtime\/content-bridge-collaborator-identity-promotion-handoff-current-behavior\.test\.mjs:510-544` \|/);
-  assert.match(doc, /Kully B & Gussy G - Topic/);
-  assert.match(doc, /installed extension provenance authority: NO-GO/);
-  assert.match(doc, /workspace-to-loaded-runtime parity authority: NO-GO/);
-  assert.match(doc, /reload\/package attestation gate: NO-GO/);
-  assert.match(doc, /runtime behavior changed by this addendum: no/);
-  assert.match(doc, /Chrome Default Profile Secure Preferences Probe - 2026-05-27/);
-  assert.match(doc, /"extension_id": "gkgjigdfdccckblmglboobikfcpeelio"/);
-  assert.match(doc, /"preferences_settings_object": "absent"/);
-  assert.match(doc, /"preferences_pinned_extension": "present"/);
-  assert.match(doc, /"secure_preferences_settings_object": "present"/);
-  assert.match(doc, /"secure_preferences_path": "\$WORKSPACE_ROOT"/);
-  assert.match(doc, /"service_worker_registration_info": \{\s+"version": "3\.3\.2"\s+\}/);
-  assert.match(doc, /"withholding_permissions": false/);
-  assert.match(doc, /Default\/Secure Preferences[\s\S]*proves Chrome is configured to load it from \$WORKSPACE_ROOT/);
-  assert.match(doc, /incognito allow\/deny proof from the active incognito profile\/session/);
-  assert.match(doc, /installed extension path proof: PARTIAL/);
-  assert.match(doc, /running-tab content-script byte authority: NO-GO/);
-  assert.match(doc, /incognito runtime availability authority: NO-GO/);
-  assert.match(doc, /runtime behavior changed by this probe: no/);
-  assert.match(doc, /Chrome Profile And Incognito Availability Boundary - 2026-05-27/);
-  assert.match(doc, /Default\/Local Extension Settings\/<extension id>\/LOG/);
-  assert.match(doc, /positive incognito-enabled flag under the extension settings object/);
-  assert.match(doc, /"incognito_content_settings": \[\]/);
-  assert.match(doc, /"incognito_preferences": \{\}/);
-  assert.match(doc, /"regular_only_preferences": \{\}/);
-  assert.match(doc, /"explicit_incognito_enabled_flag": "absent"/);
-  assert.match(doc, /must use the same visible Chrome profile\/window where the extension icon/);
-  assert.match(doc, /must reload YouTube tabs after source edits or extension reloads/);
-  assert.match(doc, /Default profile path evidence: PARTIAL/);
-  assert.match(doc, /alternate Chrome profile availability authority: NO-GO/);
-  assert.match(doc, /active-tab content-script parity authority: NO-GO/);
-  assert.match(doc, /runtime behavior changed by this boundary: no/);
-
-  assert.equal(incognitoStats.files, 4);
-  assert.equal(incognitoStats.explicitIncognitoKeys, 0);
-  assert.equal(incognitoStats.youtubeHostPermissionFiles, 4);
-  assert.equal(incognitoStats.youtubeContentMatchFiles, 4);
-  assert.equal(incognitoStats.youtubeKidsContentMatchFiles, 4);
-  assert.equal(incognitoStats.hostOnlyNocookieGapFiles, 4);
-  for (const row of incognitoStats.rows) {
-    assert.equal(row.hasExplicitIncognitoKey, false, `${row.file} should not declare incognito`);
-    assert.equal(row.hasYoutubeContentMatch, true, `${row.file} should match YouTube`);
-    assert.equal(row.hasYoutubeKidsContentMatch, true, `${row.file} should match YouTube Kids`);
-    assert.equal(row.hostOnlyNocookieGap, true, `${row.file} should keep NoCookie host-only gap`);
-  }
-
-  assert.match(doc, /Manifest Incognito Static Boundary - 2026-05-30/);
-  assert.match(doc, /manifest files scanned: 4/);
-  assert.match(doc, /manifest files with explicit incognito key: 0/);
-  assert.match(doc, /manifest files with YouTube host permissions: 4/);
-  assert.match(doc, /manifest files with YouTube content-script matches: 4/);
-  assert.match(doc, /manifest files with YouTube Kids content-script matches: 4/);
-  assert.match(doc, /manifest files with youtube-nocookie host permission but no content-script match: 4/);
-  for (const file of manifestFiles) {
-    assert.match(doc, new RegExp(`\\| \`${file.replace('.', '\\.')}\` \\| absent \\| YouTube, YouTube Kids \\| yes \\|`));
-  }
-  assert.match(doc, /source manifest incognito declaration\s+-> absent across all browser manifests/);
-  assert.match(doc, /cannot prove that a private\/incognito browser session loaded FilterTube/);
-  assert.match(doc, /must prove the active incognito window has extension runtime access/);
-  assert.match(doc, /Keep incognito runtime authority NO-GO/);
-  assert.match(doc, /manifest incognito declaration proof: absent/);
-  assert.match(doc, /source manifest incognito runtime authority: NO-GO/);
-  assert.match(doc, /active incognito session runtime authority: NO-GO/);
-  assert.match(doc, /runtime behavior changed by this boundary: no/);
-
   assert.match(doc, /Chrome Default Unpacked Workspace Byte Snapshot - 2026-05-27/);
-  assert.match(doc, /Chrome Default Secure Preferences extension id: gkgjigdfdccckblmglboobikfcpeelio/);
-  assert.match(doc, /secure preferences extension path: \/Users\/devanshvarshney\/FilterTube/);
-  assert.match(doc, /secure preferences path matches workspace root: yes/);
-  assert.match(doc, /Default\/Preferences extension settings object present: no/);
-  assert.match(doc, /Default\/Secure Preferences extension settings object present: yes/);
-  assert.match(doc, /stored extension\/service-worker version: 3\.3\.2/);
-  assert.match(doc, /Default Local Extension Settings directory exists: yes/);
-  assert.match(doc, /Default packed Extensions directory for this id exists: no/);
-  assert.match(doc, /workspace content_bridge ampersand Topic fix token present: yes/);
-  assert.match(doc, /PARTIAL installed-profile path and byte snapshot/);
-  assert.match(doc, /Running-tab parity remains NO-GO/);
-  assert.match(doc, /Default profile unpacked workspace path proof: yes/);
-  assert.match(doc, /workspace byte hash snapshot: yes/);
-  assert.match(doc, /extension reload timestamp authority: NO-GO/);
-  assert.match(doc, /runtime behavior changed by this addendum: no/);
-  assert.match(doc, /Default Installed Permission Parity Crosscheck - 2026-05-30/);
-  assert.match(doc, /installed active API permissions: activeTab, downloads, scripting, storage, tabs/);
-  assert.match(doc, /installed granted API permissions: activeTab, downloads, scripting, storage, tabs/);
-  assert.match(doc, /installed active explicit hosts: youtube-nocookie\.com, youtube\.com, youtubekids\.com/);
-  assert.match(doc, /installed granted explicit hosts: youtube-nocookie\.com, youtube\.com, youtubekids\.com/);
-  assert.match(doc, /installed active scriptable hosts: youtube\.com, youtubekids\.com/);
-  assert.match(doc, /installed granted scriptable hosts: youtube\.com, youtubekids\.com/);
-  assert.match(doc, /installed scriptable youtube-nocookie gap: yes/);
-  assert.match(doc, /installed permission parity authority: PARTIAL/);
-  assert.match(doc, /active-tab permission use proof: NO-GO/);
-  assert.match(doc, /runtime behavior changed by this crosscheck: no/);
-  assert.match(doc, /Live Chrome Process Attestation Boundary - 2026-05-27/);
-  assert.match(doc, /Default Chrome explicit --user-data-dir flag observed: no/);
-  assert.match(doc, /Default Chrome --remote-debugging-port flag observed: no/);
-  assert.match(doc, /Default profile DevToolsActivePort file observed: absent/);
-  assert.match(doc, /automation Chrome process observed: \/Applications\/Google Chrome\.app\/Contents\/MacOS\/Google Chrome --user-data-dir=\/private\/tmp\/filtertube-live-spa-chrome-profile --remote-debugging-port=9222 --load-extension=\/Users\/devanshvarshney\/FilterTube/);
-  assert.match(doc, /automation profile extension id: gkgjigdfdccckblmglboobikfcpeelio/);
-  assert.match(doc, /automation profile extension path: \/Users\/devanshvarshney\/FilterTube/);
-  assert.match(doc, /automation profile extension location: 4/);
-  assert.match(doc, /automation CDP \/json\/version Browser: Chrome\/148\.0\.7778\.179/);
-  assert.match(doc, /automation CDP \/json\/version Protocol-Version: 1\.3/);
-  assert.match(doc, /automation CDP webSocketDebuggerUrl present: yes/);
-  assert.match(doc, /automation CDP \/json\/list target count observed: 0/);
-  assert.match(doc, /visible Default Chrome CDP target list authority: NO-GO/);
-  assert.match(doc, /visible YouTube tab content-script byte parity authority: NO-GO/);
-  assert.match(doc, /visible YouTube tab extension reload timestamp authority: NO-GO/);
-  assert.match(doc, /Not the visible Default profile session used for manual lag reports/);
-  assert.match(doc, /Automation proof cannot replace visible-tab proof/);
-  assert.match(doc, /runtime behavior changed by this boundary: no/);
+  assert.match(doc, /running-tab content-script byte authority: NO-GO/);
+  assert.match(doc, /Historical profile and dist observations remain dated/);
+  assert.match(doc, /routine release lane does not read personal browser profiles/);
+  const stats = manifestIncognitoBoundaryStats();
+  assert.equal(stats.files, 4);
+  assert.equal(stats.explicitIncognitoKeys, 0);
+  assert.equal(stats.youtubeContentMatchFiles, 4);
+  assert.equal(stats.youtubeKidsContentMatchFiles, 4);
+  assert.equal(stats.hostOnlyNocookieGapFiles, 0);
+}
 
-  assert.match(read('package.json'), /"version": "3\.3\.2"/);
-  assert.match(read('package.json'), /"build:chrome": "node build\.js chrome"/);
-  assert.match(read('manifest.json'), /"version": "3\.3\.2"/);
-  assert.match(read('manifest.json'), /"js\/content\/collab_dialog\.js"[\s\S]*"js\/content_bridge\.js"/);
-  assert.equal(read('manifest.json'), read('manifest.chrome.json'));
-  assert.match(read('build.js'), /const COMMON_DIRS = \['js', 'css', 'html', 'icons', 'data', 'assets'\]/);
-  assert.match(read('build.js'), /ensureCollabDialogScriptOrder\(manifestJSON\)/);
-  assert.match(read('build.js'), /fs\.writeJsonSync\(path\.join\(targetDir, 'manifest\.json'\), manifestJSON/);
-  assert.match(read('build.js'), /const zipName = `filtertube-\$\{browser\}-v\$\{version\}\.zip`/);
-  assert.match(read('build.js'), /fs\.writeFileSync\(readmePath, readme, 'utf8'\)/);
-  assert.ok(read('js/content_bridge.js').includes('const tokens = normalizedText.split(/\\s*(?:,|\\band\\b)\\s*/i);'));
-  assert.match(read('tests/runtime/content-bridge-collaborator-identity-promotion-handoff-current-behavior.test.mjs'), /watch-like collaboration warmup does not split ampersand Topic bylines/);
-
-  const chromeStats = chromeDefaultUnpackedWorkspaceByteStats();
-  assert.equal(chromeStats.securePath, repoRoot);
-  assert.equal(chromeStats.pathMatchesWorkspace, true);
-  assert.equal(chromeStats.preferencesSettingPresent, false);
-  assert.equal(chromeStats.secureSettingPresent, true);
-  assert.equal(chromeStats.location, 4);
-  assert.equal(chromeStats.fromWebstore, false);
-  assert.equal(chromeStats.wasInstalledByDefault, false);
-  assert.deepEqual(chromeStats.disableReasons, []);
-  assert.equal(chromeStats.withholdingPermissions, false);
-  assert.deepEqual(chromeStats.activeApiPermissions, [...expectedManifestPermissions].sort());
-  assert.deepEqual(chromeStats.grantedApiPermissions, [...expectedManifestPermissions].sort());
-  assert.deepEqual(chromeStats.activeExplicitHosts, [...expectedManifestHostPermissions].sort());
-  assert.deepEqual(chromeStats.grantedExplicitHosts, [...expectedManifestHostPermissions].sort());
-  assert.deepEqual(chromeStats.activeScriptableHosts, [...expectedActiveManifestMatches].sort());
-  assert.deepEqual(chromeStats.grantedScriptableHosts, [...expectedActiveManifestMatches].sort());
-  assert.equal(chromeStats.version, '3.3.2');
-  assert.equal(chromeStats.localExtensionSettingsExists, true);
-  assert.equal(chromeStats.packedExtensionDirExists, false);
-  assert.equal(chromeStats.ampersandTopicFixTokenPresent, true);
-  assert.ok(doc.includes(`workspace manifest.json sha256: ${chromeStats.manifestHash}`));
-  assert.ok(doc.includes(`workspace package.json sha256: ${chromeStats.packageHash}`));
-  assert.ok(doc.includes(`workspace js/content_bridge.js sha256: ${chromeStats.contentBridgeHash}`));
-
-  const liveSpaProfileStats = chromeLiveSpaProfileStatsIfPresent();
-  if (liveSpaProfileStats) {
-    assert.equal(liveSpaProfileStats.settingPresent, true);
-    assert.equal(liveSpaProfileStats.path, repoRoot);
-    assert.equal(liveSpaProfileStats.location, 4);
+function assertCurrentLocalDistPackageSnapshot(doc) {
+  // Byte checks bind existing local packages to current source; historical
+  // ZIP hashes in the document are not reinterpreted as current artifacts.
+  const version = readJson('package.json').version;
+  const archiveScript = `import hashlib,json,sys,zipfile
+with zipfile.ZipFile(sys.argv[1]) as archive:
+ rows=[item for item in archive.infolist() if not item.is_dir()]
+ if len({item.filename for item in rows}) != len(rows): raise ValueError('duplicate ZIP paths')
+ print(json.dumps({item.filename:hashlib.sha256(archive.read(item)).hexdigest() for item in rows}))`;
+  for (const browser of distBrowserTargets) {
+    const prefix = `dist/${browser}/`;
+    const staged = walkFiles(`dist/${browser}`).sort();
+    assert.ok(staged.length > 0, `build ${browser} before the release package lane`);
+    const archivePath = `dist/filtertube-${browser}-v${version}.zip`;
+    assert.ok(fs.existsSync(archivePath), `missing current archive ${archivePath}`);
+    const archivedHashes = JSON.parse(execFileSync('python3', ['-c', archiveScript, archivePath], {
+      encoding: 'utf8', maxBuffer: 5 * 1024 * 1024
+    }));
+    assert.deepEqual(Object.keys(archivedHashes).sort(), staged.map(file => file.slice(prefix.length)).sort());
+    for (const file of staged) {
+      const relative = file.slice(prefix.length);
+      assert.equal(archivedHashes[relative], sha256(file), `${browser} ZIP/staged mismatch: ${relative}`);
+      if (relative === 'manifest.json') continue;
+      assert.ok(fs.existsSync(path.join(repoRoot, relative)), `unexpected staged file ${relative}`);
+      assert.equal(sha256(file), sha256(relative), `${browser} stale packaged source: ${relative}; rebuild packages`);
+    }
+    assert.deepEqual(readJson(`${prefix}manifest.json`), readJson(`manifest.${browser}.json`));
   }
-
-  const productRuntime = [
-    'manifest.json',
-    'manifest.chrome.json',
-    'build.js',
-    'package.json',
-    'js/content_bridge.js'
-  ].map(read).join('\n');
-  for (const missing of [
-    'installedRuntimeSourceAttestation',
-    'loadedExtensionSourceHash',
-    'workspaceToLoadedRuntimeParityReport',
-    'reloadPackageAttestationGate'
-  ]) {
-    assert.equal(productRuntime.includes(missing), false, `${missing} should not exist in product runtime today`);
-  }
+  assert.match(doc, /current ZIP, staged tree and source bytes are compared/);
+  assert.match(doc, /not reproducible-build, installed-browser or physical-device proof/);
 }
 
 test('P0 release package audit documents blocked verdict and all named gates', () => {
@@ -717,9 +364,9 @@ test('P0 release package audit documents blocked verdict and all named gates', (
 
 test('release_package_parity_build_common_dirs_are_explicit', () => {
   const build = read('build.js');
-  const dirs = ['js', 'css', 'html', 'icons', 'data', 'assets'];
+  const dirs = ['_locales', 'js', 'css', 'html', 'icons', 'data', 'assets'];
 
-  assert.match(build, /const COMMON_DIRS = \['js', 'css', 'html', 'icons', 'data', 'assets'\]/);
+  assert.match(build, /const COMMON_DIRS = \['_locales', 'js', 'css', 'html', 'icons', 'data', 'assets'\]/);
   assert.match(build, /COMMON_DIRS\.forEach\(dir =>/);
   assert.match(build, /fs\.copySync\(dir, path\.join\(targetDir, dir\), \{ filter: filterFunc \}\)/);
 
@@ -822,17 +469,17 @@ test('release_package_parity_browser_manifest_validation_covers_permissions_and_
   assert.ok(manifests.every(manifest => Array.isArray(manifest.web_accessible_resources)));
 });
 
-test('release_package_parity_github_release_is_draft_until_all_assets_upload is not satisfied today', () => {
+test('release_package_parity_github_release_new_draft_waits_for_expected_asset_names', () => {
   const build = read('build.js');
-  const createIndex = build.indexOf('const release = await createGitHubRelease');
-  const uploadIndex = build.indexOf('for (const assetPath of releaseAssetPaths)');
-
-  assert.notEqual(createIndex, -1);
-  assert.notEqual(uploadIndex, -1);
-  assert.ok(createIndex < uploadIndex, 'release creation happens before asset upload loop');
-  assert.match(build, /draft:\s*false/);
-  assert.match(build, /prerelease:\s*false/);
-  assert.doesNotMatch(build, /draft:\s*true/);
+  const create = build.indexOf('createDraftGitHubRelease(githubAuth, {');
+  const upload = build.indexOf('uploadGitHubReleaseAssets(githubAuth, tagName, missingAssetPaths)');
+  const verify = build.indexOf('const stillMissing = releaseAssetPaths');
+  const publish = build.indexOf('publishDraftGitHubRelease(githubAuth, tagName);');
+  assert.ok(create >= 0 && create < upload && upload < verify && verify < publish);
+  assert.match(build, /Release upload incomplete/);
+  assert.match(build, /if \(createdDraft\) \{\s*publishDraftGitHubRelease/);
+  assert.match(build, /'--draft'/);
+  assert.match(build, /'--draft=false'/);
 });
 
 test('release_package_parity_mobile_artifacts_have_checksum_and_claim_gate is only partial today', () => {
@@ -850,7 +497,7 @@ test('release_package_parity_raw_captures_never_enter_package_contents is locall
   const build = read('build.js');
   const gitignore = read('.gitignore');
 
-  assert.match(build, /const COMMON_DIRS = \['js', 'css', 'html', 'icons', 'data', 'assets'\]/);
+  assert.match(build, /const COMMON_DIRS = \['_locales', 'js', 'css', 'html', 'icons', 'data', 'assets'\]/);
   assert.match(build, /const COMMON_FILES = \['README\.md', 'CHANGELOG\.md', 'LICENSE'\]/);
 
   for (const capture of [

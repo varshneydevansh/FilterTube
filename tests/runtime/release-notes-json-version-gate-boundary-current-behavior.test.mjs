@@ -2,6 +2,7 @@ import fs from 'node:fs';
 import path from 'node:path';
 import crypto from 'node:crypto';
 import test from 'node:test';
+import vm from 'node:vm';
 import assert from 'node:assert/strict';
 
 const repoRoot = process.cwd();
@@ -73,199 +74,210 @@ test('release notes JSON version gate doc is audit-only and scoped to current be
   assert.match(source, /does\s+not approve any first-class JSON filter expansion/);
 });
 
-test('release notes JSON data shape and package version boundary remain pinned', () => {
-  const releaseBytes = fs.readFileSync(path.join(repoRoot, 'data/release_notes.json'));
-  const releaseText = releaseBytes.toString('utf8');
-  const releaseNotes = JSON.parse(releaseText);
-  const versionRows = releaseNotes.filter((entry) => entry && typeof entry.version === 'string');
-  const packageVersion = readJson('package.json').version;
-  const keySet = [...new Set(releaseNotes.flatMap((entry) => Object.keys(entry)))].sort();
-
-  assert.equal(releaseText.split('\n').length, 318);
-  assert.equal(releaseBytes.length, 23020);
-  assert.equal(sha256(releaseBytes), 'a8d59b18e9bffd1c828538ee58b3b8e9be7c641fea3ff064220311485a3b1c6b');
-  assert.equal(releaseNotes.length, 24);
-  assert.equal(releaseNotes.filter((entry) => entry._comment).length, 1);
-  assert.equal(versionRows.length, 23);
-  assert.deepEqual(keySet, ['_comment', 'bannerSummary', 'detailsUrl', 'headline', 'highlights', 'summary', 'version']);
-
-  assert.equal(versionRows[0].version, '3.3.2');
-  assert.equal(packageVersion, '3.3.2');
-  assert.ok(versionRows.some((entry) => entry.version === packageVersion), 'current package version needs a release-note entry');
-  assert.deepEqual(versionRows.filter((entry) => !entry.detailsUrl).map((entry) => entry.version), []);
-  assert.equal(versionRows.filter((entry) => /releases\/tag\//.test(entry.detailsUrl || '')).length, 20);
-  assert.equal(versionRows.filter((entry) => /\/commit\//.test(entry.detailsUrl || '')).length, 3);
-  assert.equal(versionRows.filter((entry) => typeof entry.bannerSummary === 'string' && entry.bannerSummary.trim()).length, 18);
-  assert.equal(versionRows.filter((entry) => typeof entry.headline === 'string' && entry.headline.trim()).length, 23);
-  assert.equal(versionRows.filter((entry) => typeof entry.summary === 'string' && entry.summary.trim()).length, 23);
-  assert.ok(versionRows.every((entry) => Array.isArray(entry.highlights)), 'every version row needs highlights today');
-  assert.equal(versionRows.reduce((total, entry) => total + entry.highlights.length, 0), 110);
-  assert.equal(Math.min(...versionRows.map((entry) => entry.highlights.length)), 3);
-  assert.equal(Math.max(...versionRows.map((entry) => entry.highlights.length)), 9);
-  assert.equal(count(releaseText, /detailsUrl/g), 23);
-
-  for (const manifest of ['manifest.json', 'manifest.chrome.json', 'manifest.firefox.json', 'manifest.opera.json']) {
-    assert.equal(readJson(manifest).version, packageVersion, `${manifest} version drifted from package.json`);
+function assertReleaseNotesSchema(notes, current) {
+  assert.ok(Array.isArray(notes) && notes.length > 0, 'release notes must be a nonempty array');
+  const versions = [];
+  for (const note of notes) {
+    assert.ok(note && typeof note === 'object' && !Array.isArray(note), 'release note must be an object');
+    if (Object.hasOwn(note, '_comment')) {
+      assert.deepEqual(Object.keys(note), ['_comment'], 'metadata record may contain only _comment');
+      assert.ok(typeof note._comment === 'string' && note._comment.trim(), 'metadata comment must be nonempty');
+      continue;
+    }
+    assert.ok(typeof note.version === 'string' && note.version.trim(), 'every release record needs a version');
+    assert.ok(typeof note.headline === 'string' && note.headline.trim());
+    assert.ok(typeof note.summary === 'string' && note.summary.trim());
+    assert.ok(Array.isArray(note.highlights) && note.highlights.every(value => typeof value === 'string' && value.trim()));
+    const url = new URL(note.detailsUrl);
+    assert.equal(url.protocol, 'https:');
+    assert.equal(url.hostname, 'github.com');
+    assert.ok(url.pathname.startsWith('/varshneydevansh/FilterTube/'));
+    versions.push(note);
   }
+  assert.ok(versions.length > 0, 'at least one versioned release is required');
+  assert.equal(new Set(versions.map(note => note.version)).size, versions.length);
+  assert.equal(versions[0].version, current);
+}
 
-  const audit = doc();
-  for (const expected of [
-    '318 split lines, 23,020 bytes',
-    '24 array rows, 1 comment row, and 23 version rows',
-    'newest version row is `3.3.2`',
-    'all 23 version rows have `detailsUrl`',
-    'Version `3.3.2` exists in the JSON',
-    '20 version rows use GitHub release-tag URLs',
-    '3 use GitHub commit URLs',
-    '110 total highlight strings',
-  ]) {
-    assert.ok(audit.includes(expected), `doc missing ${expected}`);
+test('release notes schema validates every non-metadata record and matches every browser package', () => {
+  const notes = readJson('data/release_notes.json');
+  const current = readJson('package.json').version;
+  assertReleaseNotesSchema(notes, current);
+  for (const file of ['manifest.json','manifest.chrome.json','manifest.firefox.json','manifest.opera.json']) {
+    assert.equal(readJson(file).version,current);
   }
 });
 
-test('background release-note loader payload and message gates remain current', () => {
+test('release notes schema cannot silently discard malformed version records as metadata', () => {
+  const current = readJson('package.json').version;
+  const valid = readJson('data/release_notes.json').find(note => note.version === current);
+  for (const invalid of [{}, {...valid, version: undefined}, {...valid, version: 34}, {...valid, version: ''},
+    {_comment: 'not a release', version: current}, {_comment: ''}]) {
+    assert.throws(() => assertReleaseNotesSchema([valid, invalid], current));
+  }
+  assert.doesNotThrow(() => assertReleaseNotesSchema([{_comment: 'Shared release notes'}, valid], current));
+});
+
+function releaseMessageFixture(initial = {}) {
+  const state = {...initial};
+  const writes = [];
+  const builds = [];
+  const current = readJson('package.json').version;
+  const generated = {version: current, headline: 'Generated release'};
+  const source = read('js/background.js');
+  const branch = sliceBetween(source, "    if (action === 'FilterTube_ReleaseNotesCheck') {", "    } else if (action === 'FilterTube_FirstRunCheck')");
+  const context = vm.createContext({
+    CURRENT_VERSION: current,
+    SHOW_UPDATE_REFRESH_PROMPT_KEY: 'showUpdateRefreshPrompt',
+    storageGet: async () => ({...state}),
+    buildReleaseNotesPayload: async version => { builds.push(version); return generated; },
+    browserAPI: {storage: {local: {set: async values => { writes.push(values); Object.assign(state, values); }}}},
+    console: {warn() {}}
+  });
+  vm.runInContext(`function handle(request, sendResponse) { const action = request.action; ${branch}\n} }`, context);
+  return {state, writes, builds, current, generated, request(action, fields = {}) {
+    return new Promise(resolve => {
+      assert.equal(context.handle({action, ...fields}, resolve), true, 'async response channel stays open');
+    });
+  }};
+}
+
+test('actual release Check honors opt-out and already-seen state without building or writing', async () => {
+  const current = readJson('package.json').version;
+  for (const state of [
+    {showUpdateRefreshPrompt: false, releaseNotesPayload: {version: current}},
+    {releaseNotesSeenVersion: current, releaseNotesPayload: {version: current}}
+  ]) {
+    const fixture = releaseMessageFixture(state);
+    const response = await fixture.request('FilterTube_ReleaseNotesCheck');
+    assert.equal(response.needed, false);
+    assert.equal(response.payload, undefined);
+    assert.equal(fixture.builds.length, 0);
+    assert.equal(fixture.writes.length, 0);
+  }
+});
+
+test('actual release Check reuses unseen cached payload and only builds when no unseen cache exists', async () => {
+  const cached = {version: readJson('package.json').version, headline: 'Already prepared'};
+  const reuse = releaseMessageFixture({releaseNotesSeenVersion: 'older', releaseNotesPayload: cached});
+  const response = await reuse.request('FilterTube_ReleaseNotesCheck');
+  assert.equal(response.needed, true);
+  assert.equal(response.payload, cached);
+  assert.equal(reuse.builds.length, 0);
+  assert.equal(reuse.writes.length, 0);
+  const fresh = releaseMessageFixture();
+  const built = await fresh.request('FilterTube_ReleaseNotesCheck');
+  assert.equal(built.needed, true);
+  assert.equal(built.payload, fresh.generated);
+  assert.deepEqual(fresh.builds, [fresh.current]);
+  assert.equal(fresh.writes.length, 1);
+  assert.equal(fresh.state.releaseNotesPayload, fresh.generated);
+});
+
+test('actual release Ack persists the acknowledged version and clears cached payload', async () => {
+  for (const version of [undefined, '  acknowledged-version  ']) {
+    const fixture = releaseMessageFixture({releaseNotesPayload: {version: 'cached'}});
+    const response = await fixture.request('FilterTube_ReleaseNotesAck', {version});
+    assert.equal(response.ok, true);
+    assert.equal(fixture.state.releaseNotesSeenVersion, version?.trim() || fixture.current);
+    assert.equal(fixture.state.releaseNotesPayload, null);
+    assert.equal(fixture.writes.length, 1);
+    assert.equal(fixture.builds.length, 0);
+  }
+});
+
+test('actual install initializes seen state while update prepares the current release payload', async () => {
+  const source = read('js/background.js');
+  const handler = sliceBetween(source, 'browserAPI.runtime.onInstalled.addListener(function (details) {', 'function handleFetchShortsIdentityMessage');
+  const current = readJson('package.json').version;
+  for (const reason of ['install', 'update']) {
+    const writes = [];
+    const builds = [];
+    const payload = {version: current, headline: 'Prepared update'};
+    let listener;
+    const context = vm.createContext({
+      CURRENT_VERSION: current,
+      SHOW_UPDATE_REFRESH_PROMPT_KEY: 'showUpdateRefreshPrompt',
+      browserAPI: {runtime: {onInstalled: {addListener(callback) { listener = callback; }}},
+        storage: {local: {set(values, callback) { writes.push(values); callback?.(); return Promise.resolve(); }}}},
+      applyQuickBlockDefaultMigrationOnce: async () => {},
+      applyKeywordCommentsScopeMigrationOnce: async () => {},
+      applyAdvertVoidDefaultMigrationOnce: async () => {},
+      refreshYouTubeTabs() {},
+      buildReleaseNotesPayload: async version => { builds.push(version); return payload; },
+      console: {log() {}, warn() {}}
+    });
+    vm.runInContext(handler, context);
+    listener({reason, previousVersion: 'older'});
+    await new Promise(resolve => setImmediate(resolve));
+    assert.equal(writes.length, 1);
+    assert.equal(writes[0].firstRunRefreshNeeded, true);
+    if (reason === 'install') {
+      assert.equal(writes[0].releaseNotesSeenVersion, current);
+      assert.equal(writes[0].releaseNotesPayload, null);
+      assert.equal(builds.length, 0);
+    } else {
+      assert.deepEqual(builds, [current]);
+      assert.equal(writes[0].releaseNotesPayload, payload);
+      assert.equal(Object.hasOwn(writes[0], 'releaseNotesSeenVersion'), false, 'update must not mark its prompt seen');
+    }
+  }
+});
+
+test('actual release payload chooses localized fields, English fallback and internal details destination', async () => {
+  const source = read('js/background.js');
+  const body = sliceBetween(source,'async function buildReleaseNotesPayload(version)','function getBackgroundRuntimeLabel()');
+  let localized = null;
+  let fail = false;
+  const entry = readJson('data/release_notes.json').find(note => note.version === readJson('package.json').version);
+  const context = vm.createContext({
+    loadReleaseNotesData: async () => { if (fail) throw new Error('fixture failure'); return [entry]; },
+    loadLocalizedReleaseNote: async () => localized,
+    RELEASE_NOTES_TEMPLATE: {headline:'Fallback title',body:'Fallback body',ctaLabel:'Read'},
+    WHATS_NEW_PAGE_URL: 'moz-extension://fixture/html/tab-view.html?view=whatsnew',
+    console: {warn() {}}
+  });
+  vm.runInContext(body,context);
+  let payload = await context.buildReleaseNotesPayload(entry.version);
+  assert.equal(payload.headline,entry.headline);
+  assert.equal(payload.body,entry.bannerSummary || entry.summary);
+  assert.equal(payload.direction,'ltr');
+  localized = {headline:'Localized title',summary:'Localized body',direction:'rtl',dismissLabel:'Close'};
+  payload = await context.buildReleaseNotesPayload(entry.version);
+  assert.equal(payload.headline,'Localized title');
+  assert.equal(payload.body,'Localized body');
+  assert.equal(payload.direction,'rtl');
+  assert.equal(payload.dismissLabel,'Close');
+  assert.equal(payload.link,context.WHATS_NEW_PAGE_URL);
+  localized = {};
+  assert.equal((await context.buildReleaseNotesPayload(entry.version)).headline,entry.headline);
+  assert.equal((await context.buildReleaseNotesPayload('missing')).headline,'Fallback title');
+  fail = true;
+  assert.equal((await context.buildReleaseNotesPayload(entry.version)).body,'Fallback body');
+});
+
+test('release prompt retains opt-out, acknowledgement and ordered dashboard consumers', () => {
   const background = read('js/background.js');
-  const onInstalledStart = background.indexOf('browserAPI.runtime.onInstalled.addListener');
-  assert.notEqual(onInstalledStart, -1);
-
-  const loadBlock = sliceBetween(
-    background,
-    'async function loadReleaseNotesData()',
-    '/**\n * Looks up the given version'
-  );
-  assert.deepEqual(blockMetrics(loadBlock), {
-    lines: 13,
-    bytes: 521,
-    sha256: 'f0aba19f88ff0384f9d1626d09cd5a755246721ad1cf1d6b5ca8a8c667b29889',
-  });
-  assert.match(loadBlock, /browserAPI\.runtime\.getURL\('data\/release_notes\.json'\)/);
-  assert.match(loadBlock, /releaseNotesCache = await response\.json\(\)/);
-  assert.match(loadBlock, /releaseNotesCache = \[\]/);
-
-  const payloadBlock = sliceBetween(
-    background,
-    'async function buildReleaseNotesPayload(version)',
-    'function getBackgroundRuntimeLabel()'
-  );
-  assert.deepEqual(blockMetrics(payloadBlock), {
-    lines: 20,
-    bytes: 862,
-    sha256: '4d9e0174a81bfd937a32e578badff3f8cbe529585672776081c403bfd3da5385',
-  });
-  assert.match(payloadBlock, /data\.find\(note => note\?\.version === version\)/);
-  assert.match(payloadBlock, /body: entry\.bannerSummary \|\| entry\.summary \|\| entry\.body \|\| RELEASE_NOTES_TEMPLATE\.body/);
-  assert.match(payloadBlock, /link: WHATS_NEW_PAGE_URL/);
-
-  const installStateBlock = sliceBetween(
-    background,
-    '            firstRunRefreshNeeded: true,',
-    '        });',
-    onInstalledStart
-  );
-  assert.deepEqual(blockMetrics(installStateBlock), {
-    lines: 3,
-    bytes: 132,
-    sha256: 'c99db7b1bf9ff50d953670dc0a26fbaa2d03b8dffb19d6a5727b948e4b2e6ce4',
-  });
-  assert.match(installStateBlock, /releaseNotesSeenVersion: CURRENT_VERSION/);
-  assert.match(installStateBlock, /releaseNotesPayload: null/);
-
-  const updateBlock = sliceBetween(
-    background,
-    "    } else if (details.reason === 'update') {",
-    '        // Show refresh prompt in already-open YouTube tabs after update.',
-    onInstalledStart
-  );
-  assert.deepEqual(blockMetrics(updateBlock), {
-    lines: 14,
-    bytes: 693,
-    sha256: '9161b6a98d47fb175a79c2e6334b27318a48def266b0fd6641ece63a1432e2b8',
-  });
-  assert.match(updateBlock, /buildReleaseNotesPayload\(CURRENT_VERSION\)/);
-  assert.match(updateBlock, /releaseNotesPayload: payload/);
-  assert.match(updateBlock, /firstRunRefreshNeeded: true/);
-
-  const messageBranch = sliceBetween(
-    background,
-    "    if (action === 'FilterTube_ReleaseNotesCheck') {",
-    "    } else if (action === 'FilterTube_SubscriptionsImportProgress')"
-  );
-  assert.deepEqual(blockMetrics(messageBranch), {
-    lines: 64,
-    bytes: 3063,
-    sha256: '1ddbd866050fe9dc52b74d8f613c898b9e21c5c32b9f891b75ca009d49edd4e5',
-  });
-  assert.match(messageBranch, /storageGet\(\['releaseNotesSeenVersion', 'releaseNotesPayload'\]\)/);
-  assert.match(messageBranch, /cachedPayload\?\.version && cachedPayload\.version !== seenVersion/);
-  assert.match(messageBranch, /seenVersion && seenVersion === CURRENT_VERSION/);
-  assert.match(messageBranch, /buildReleaseNotesPayload\(CURRENT_VERSION\)/);
-  assert.match(messageBranch, /releaseNotesSeenVersion: version \|\| CURRENT_VERSION/);
-  assert.match(messageBranch, /const url = request\?\.url \|\| WHATS_NEW_PAGE_URL/);
-
-  assert.equal(count(background, /data\/release_notes\.json/g), 2);
-  assert.equal(count(background, /releaseNotesSeenVersion/g), 5);
-  assert.equal(count(background, /releaseNotesPayload/g), 8);
-  assert.equal(count(background, /FilterTube_ReleaseNotesCheck/g), 1);
-  assert.equal(count(background, /FilterTube_ReleaseNotesAck/g), 1);
-  assert.equal(count(background, /FilterTube_OpenWhatsNew/g), 1);
-});
-
-test('dashboard and prompt release-note consumers remain pinned to current JSON flow', () => {
-  const tabView = read('js/tab-view.js');
+  const branch = sliceBetween(background,"    if (action === 'FilterTube_ReleaseNotesCheck') {","    } else if (action === 'FilterTube_FirstRunCheck')");
+  assert.match(branch,/data\?\.\[SHOW_UPDATE_REFRESH_PROMPT_KEY\] === false/);
+  assert.match(branch,/seenVersion && seenVersion === CURRENT_VERSION/);
+  assert.match(branch,/releaseNotesSeenVersion: version \|\| CURRENT_VERSION/);
+  assert.match(branch,/releaseNotesPayload: null/);
+  const dashboard = read('js/tab-view.js');
+  assert.match(dashboard,/async function loadReleaseNotesIntoDashboard\(\)/);
+  assert.match(dashboard,/data\/release_notes\.json/);
+  assert.match(dashboard,/link\.rel = 'noopener noreferrer'/);
   const prompt = read('js/content/release_notes_prompt.js');
-
-  const dashboardBlock = sliceBetween(
-    tabView,
-    'async function loadReleaseNotesIntoDashboard()',
-    "document.addEventListener('DOMContentLoaded'"
-  );
-  assert.deepEqual(blockMetrics(dashboardBlock), {
-    lines: 104,
-    bytes: 4045,
-    sha256: '4d47f8e357695199c604c581064f03228ddad8ae4dc8f6b3d665a45008151b81',
-  });
-  assert.match(dashboardBlock, /document\.getElementById\('releaseNotesList'\)/);
-  assert.match(dashboardBlock, /runtimeAPI\.runtime\.getURL\('data\/release_notes\.json'\)/);
-  assert.match(dashboardBlock, /: 'data\/release_notes\.json'/);
-  assert.match(dashboardBlock, /const validNotes = notes\.filter\(note => note && typeof note\.version === 'string' && note\.version\.trim\(\)\)/);
-  assert.match(dashboardBlock, /const isCurrent = note\.version === manifestVersion/);
-  assert.match(dashboardBlock, /highlights\.slice\(0, 4\)/);
-  assert.match(dashboardBlock, /if \(note\.detailsUrl\)/);
-  assert.match(dashboardBlock, /link\.rel = 'noopener noreferrer'/);
-
-  assert.deepEqual(blockMetrics(prompt.trimEnd()), {
-    lines: 250,
-    bytes: 9865,
-    sha256: '52ba9b4088fe8dc0d3b69843bdba28c59f4151fa7009c72c502787deae39777a',
-  });
-  assert.match(prompt, /const PROMPT_ID = 'ft-release-notes-banner'/);
-  assert.match(prompt, /api\.runtime\.getURL\('html\/tab-view\.html\?view=whatsnew'\)/);
-  assert.match(prompt, /action: 'FilterTube_ReleaseNotesCheck'/);
-  assert.match(prompt, /action: 'FilterTube_ReleaseNotesAck'/);
-  assert.match(prompt, /action: 'FilterTube_OpenWhatsNew', url: targetLink/);
-  assert.match(prompt, /window\.open\(targetLink, '_blank', 'noopener'\)/);
-  assert.match(prompt, /location\.href = targetLink/);
-  assert.match(prompt, /document\.addEventListener\('DOMContentLoaded', ready, \{ once: true \}\)/);
-  assert.match(prompt, /setTimeout\(\(\) => existing\.remove\(\), 180\)/);
-
-  assert.equal(count(tabView, /data\/release_notes\.json/g), 3);
-  assert.equal(count(tabView, /detailsUrl/g), 2);
-  assert.equal(count(tabView, /fetch\(/g), 1);
-  assert.equal(count(prompt, /FilterTube_ReleaseNotesCheck/g), 1);
-  assert.equal(count(prompt, /FilterTube_ReleaseNotesAck/g), 1);
-  assert.equal(count(prompt, /FilterTube_OpenWhatsNew/g), 1);
-  assert.equal(count(prompt, /addEventListener/g), 1);
-  assert.equal(count(prompt, /setTimeout/g), 1);
-
-  for (const [manifest, expectedIndex] of [
-    ['manifest.json', 12],
-    ['manifest.chrome.json', 12],
-    ['manifest.firefox.json', 11],
-    ['manifest.opera.json', 12],
-  ]) {
-    const scripts = readJson(manifest).content_scripts.flatMap((entry) => entry.js || []);
-    assert.equal(scripts.includes('js/content/release_notes_prompt.js'), true, `${manifest} missing release prompt`);
-    assert.equal(scripts.indexOf('js/content/release_notes_prompt.js'), expectedIndex, `${manifest} prompt index changed`);
+  for (const action of ['FilterTube_ReleaseNotesCheck','FilterTube_ReleaseNotesAck','FilterTube_OpenWhatsNew']) {
+    assert.ok(prompt.includes(action));
+  }
+  for (const file of ['manifest.json','manifest.chrome.json','manifest.firefox.json','manifest.opera.json']) {
+    const entries = readJson(file).content_scripts.filter(entry => entry.js.includes('js/content_bridge.js'));
+    assert.ok(entries.length > 0);
+    for (const entry of entries) {
+      assert.ok(entry.js.indexOf('js/content/release_notes_prompt.js') < entry.js.indexOf('js/content_bridge.js'));
+      assert.ok(entry.js.indexOf('js/content/release_notes_prompt.js') >= 0);
+    }
   }
 });
 

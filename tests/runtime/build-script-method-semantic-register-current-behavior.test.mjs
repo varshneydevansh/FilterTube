@@ -12,35 +12,158 @@ const packagePath = 'package.json';
 const methodGapPath = 'docs/audit/FILTERTUBE_METHOD_SEMANTIC_PROOF_GAP_INDEX_CURRENT_BEHAVIOR_2026-05-25.md';
 
 const methodGroups = new Map([
-  ['filterFunc', 'packageCopySurface'],
-  ['main', 'packageBuildOrchestration'],
-  ['ensureCollabDialogScriptOrder', 'manifestRewriteSurface'],
-  ['createZip', 'zipArtifactCreation'],
-  ['maybeCollectMobileArtifacts', 'mobileArtifactStaging'],
-  ['resolveMobileArtifactPromptDir', 'mobileArtifactStaging'],
-  ['resolveDefaultMobileArtifactsDir', 'mobileArtifactStaging'],
-  ['parseMobileArtifactName', 'mobileArtifactStaging'],
-  ['summarizeMobileArtifacts', 'mobileArtifactStaging'],
-  ['selectLatestMobileArtifacts', 'mobileArtifactStaging'],
-  ['extractAndroidVersionCode', 'mobileArtifactStaging'],
-  ['sha256File', 'mobileArtifactStaging'],
-  ['maybePromptRelease', 'releasePublication'],
-  ['extractLatestChangelogEntry', 'releaseBodyGeneration'],
-  ['deriveSubtitle', 'releaseBodyGeneration'],
-  ['buildReleaseTitle', 'releaseBodyGeneration'],
-  ['buildReleaseBody', 'releaseBodyGeneration'],
-  ['assetLink', 'releaseBodyGeneration'],
-  ['releaseAssetLink', 'releaseBodyGeneration'],
-  ['createGitHubRelease', 'releasePublication'],
-  ['uploadReleaseAsset', 'releasePublication'],
-  ['contentTypeForAsset', 'releasePublication'],
-  ['httpRequest', 'releasePublication'],
-  ['promptYesNo', 'interactivePromptSurface'],
-  ['promptText', 'interactivePromptSurface'],
-  ['updateReadmeBadges', 'readmeBadgeMutation'],
-  ['formatLoC', 'readmeBadgeMutation'],
-  ['shouldCountInTotalLoC', 'readmeBadgeMutation'],
-  ['sumFileLines', 'readmeBadgeMutation']
+  [
+    "filterFunc",
+    "packageCopySurface"
+  ],
+  [
+    "main",
+    "packageBuildOrchestration"
+  ],
+  [
+    "buildTargets",
+    "packageBuildOrchestration"
+  ],
+  [
+    "onExit",
+    "packageBuildOrchestration"
+  ],
+  [
+    "onInterrupt",
+    "packageBuildOrchestration"
+  ],
+  [
+    "onTerminate",
+    "packageBuildOrchestration"
+  ],
+  [
+    "ensureCollabDialogScriptOrder",
+    "manifestRewriteSurface"
+  ],
+  [
+    "createZip",
+    "zipArtifactCreation"
+  ],
+  [
+    "maybeCollectMobileArtifacts",
+    "mobileArtifactStaging"
+  ],
+  [
+    "resolveMobileArtifactPromptDir",
+    "mobileArtifactStaging"
+  ],
+  [
+    "resolveDefaultMobileArtifactsDir",
+    "mobileArtifactStaging"
+  ],
+  [
+    "parseMobileArtifactName",
+    "mobileArtifactStaging"
+  ],
+  [
+    "summarizeMobileArtifacts",
+    "mobileArtifactStaging"
+  ],
+  [
+    "describeAvailableMobileArtifacts",
+    "mobileArtifactStaging"
+  ],
+  [
+    "selectLatestMobileArtifacts",
+    "mobileArtifactStaging"
+  ],
+  [
+    "extractAndroidVersionCode",
+    "mobileArtifactStaging"
+  ],
+  [
+    "sha256File",
+    "mobileArtifactStaging"
+  ],
+  [
+    "maybePromptRelease",
+    "releasePublication"
+  ],
+  [
+    "extractLatestChangelogEntry",
+    "releaseBodyGeneration"
+  ],
+  [
+    "deriveSubtitle",
+    "releaseBodyGeneration"
+  ],
+  [
+    "buildReleaseTitle",
+    "releaseBodyGeneration"
+  ],
+  [
+    "buildReleaseBody",
+    "releaseBodyGeneration"
+  ],
+  [
+    "assetLink",
+    "releaseBodyGeneration"
+  ],
+  [
+    "releaseAssetLink",
+    "releaseBodyGeneration"
+  ],
+  [
+    "resolveGitHubToken",
+    "releasePublication"
+  ],
+  [
+    "githubCliEnv",
+    "releasePublication"
+  ],
+  [
+    "runGitHubCli",
+    "releasePublication"
+  ],
+  [
+    "githubReleaseExists",
+    "releasePublication"
+  ],
+  [
+    "createDraftGitHubRelease",
+    "releasePublication"
+  ],
+  [
+    "listGitHubReleaseAssetNames",
+    "releasePublication"
+  ],
+  [
+    "uploadGitHubReleaseAssets",
+    "releasePublication"
+  ],
+  [
+    "publishDraftGitHubRelease",
+    "releasePublication"
+  ],
+  [
+    "promptYesNo",
+    "interactivePromptSurface"
+  ],
+  [
+    "promptText",
+    "interactivePromptSurface"
+  ],
+  [
+    "updateReadmeBadges",
+    "readmeBadgeMutation"
+  ],
+  [
+    "formatLoC",
+    "readmeBadgeMutation"
+  ],
+  [
+    "shouldCountInTotalLoC",
+    "readmeBadgeMutation"
+  ],
+  [
+    "sumFileLines",
+    "readmeBadgeMutation"
+  ]
 ]);
 
 function read(file) {
@@ -117,7 +240,7 @@ function currentPackageScripts() {
 
 function trackedSearchCorpus() {
   const files = git(['ls-files', 'build.js', 'package.json', 'manifest*.json', 'js/*.js', 'js/**/*.js', 'src/**/*.js', 'src/**/*.jsx', 'scripts/*.mjs', 'docs/*.md'])
-    .filter((file) => !file.startsWith('tests/') && !file.startsWith('docs/audit/'));
+    .filter((file) => !file.startsWith('tests/') && !file.startsWith('docs/audit/') && fs.existsSync(path.join(repoRoot, file)));
   return files.map((file) => read(file)).join('\n');
 }
 
@@ -142,12 +265,12 @@ test('build script method semantic register is audit-only and source fingerprint
   assert.match(text, /runtime behavior changed: no/);
   assert.match(text, /build behavior changed: yes/);
 
-  assert.equal(sourceLineCount(), 740);
-  assert.equal(readBuffer(sourcePath).byteLength, 26978);
-  assert.equal(sha256(sourcePath), 'c8485cb2600aad89f44015cd7e49ebe4746ebcc35c91c1ff2bf29aec2f087a04');
-  assert.match(text, /build script line count: 740/);
-  assert.match(text, /build script bytes: 26978/);
-  assert.match(text, /build script sha256: c8485cb2600aad89f44015cd7e49ebe4746ebcc35c91c1ff2bf29aec2f087a04/);
+  assert.equal(sourceLineCount(), 861);
+  assert.equal(readBuffer(sourcePath).byteLength, 33225);
+  assert.equal(sha256(sourcePath), 'a198cc1d0bf98e410deb8f66ced0e56a046bbf987a0a5b878e1278577622fb2e');
+  assert.match(text, /build script line count: 861/);
+  assert.match(text, /build script bytes: 33225/);
+  assert.match(text, /build script sha256: a198cc1d0bf98e410deb8f66ced0e56a046bbf987a0a5b878e1278577622fb2e/);
   assert.equal(countLiteral(source, 'main().catch'), 1);
   assert.match(text, /npm script entrypoint: npm run build -> node build\.js/);
 });
@@ -156,28 +279,28 @@ test('build script register accounts for every current semantic method row', () 
   const text = doc();
   const rows = methodRows();
 
-  assert.equal(rows.length, 29);
+  assert.equal(rows.length, 38);
   assert.deepEqual(countBy(rows, 'kind'), {
-    arrowFunction: 4,
-    asyncFunction: 4,
-    function: 21
-  });
+  "arrowFunction": 7,
+  "asyncFunction": 5,
+  "function": 26
+});
   assert.deepEqual(countBy(rows, 'group'), {
-    interactivePromptSurface: 2,
-    manifestRewriteSurface: 1,
-    mobileArtifactStaging: 8,
-    packageBuildOrchestration: 1,
-    packageCopySurface: 1,
-    readmeBadgeMutation: 4,
-    releaseBodyGeneration: 6,
-    releasePublication: 5,
-    zipArtifactCreation: 1
-  });
+  "interactivePromptSurface": 2,
+  "manifestRewriteSurface": 1,
+  "mobileArtifactStaging": 9,
+  "packageBuildOrchestration": 5,
+  "packageCopySurface": 1,
+  "readmeBadgeMutation": 4,
+  "releaseBodyGeneration": 6,
+  "releasePublication": 9,
+  "zipArtifactCreation": 1
+});
 
-  assert.match(text, /lexical callable rows in this semantic slice: 29/);
-  assert.match(text, /plain function declarations: 21/);
-  assert.match(text, /async function declarations: 4/);
-  assert.match(text, /arrow callable rows: 4/);
+  assert.match(text, /lexical callable rows in this semantic slice: 38/);
+  assert.match(text, /plain function declarations: 26/);
+  assert.match(text, /async function declarations: 5/);
+  assert.match(text, /arrow callable rows: 7/);
   assert.match(text, /semantic method groups: 9/);
   assertDocIncludesMethodRows(text, rows);
 });
@@ -187,21 +310,21 @@ test('build script register pins current side-effect and release-publication tok
   const source = read(sourcePath);
 
   const pairs = [
-    ['arrow token sites in build script', countRegex(source, /=>/g), 42],
-    ['require calls', countRegex(source, /\brequire\(/g), 8],
+    ['arrow token sites in build script', countRegex(source, /=>/g), 55],
+    ['require calls', countRegex(source, /\brequire\(/g), 9],
     ['await expressions', countRegex(source, /\bawait\b/g), 9],
-    ['execSync occurrences', countLiteral(source, 'execSync'), 3],
+    ['execSync occurrences', countLiteral(source, 'execSync'), 4],
     ['fs.copySync occurrences', countLiteral(source, 'fs.copySync'), 3],
     ['fs.copyFileSync occurrences', countLiteral(source, 'fs.copyFileSync'), 1],
     ['fs.rmSync occurrences', countLiteral(source, 'fs.rmSync'), 2],
     ['fs.writeJsonSync occurrences', countLiteral(source, 'fs.writeJsonSync'), 1],
     ['fs.writeFileSync occurrences', countLiteral(source, 'fs.writeFileSync'), 2],
-    ['https.request occurrences', countLiteral(source, 'https.request'), 2],
+    ['https.request occurrences', countLiteral(source, 'https.request'), 0],
     ['readline.createInterface occurrences', countLiteral(source, 'readline.createInterface'), 2],
-    ['process.stdout.isTTY occurrences', countLiteral(source, 'process.stdout.isTTY'), 2],
-    ['draft false occurrences', countLiteral(source, 'draft: false'), 1],
+    ['process.stdout.isTTY occurrences', countLiteral(source, 'process.stdout.isTTY'), 3],
+    ['draft false occurrences', countLiteral(source, 'draft: false'), 0],
     ['MOBILE_ARTIFACT_FILE_RE occurrences', countLiteral(source, 'MOBILE_ARTIFACT_FILE_RE'), 3],
-    ['console callsites', countRegex(source, /\bconsole\./g), 28]
+    ['console callsites', countRegex(source, /\bconsole\./g), 34]
   ];
 
   for (const [label, actual, expected] of pairs) {
@@ -211,8 +334,8 @@ test('build script register pins current side-effect and release-publication tok
 
   for (const phrase of [
     'normal npm run build mutates README.md badge URLs',
-    'TTY release publication creates a public non-draft GitHub release before uploading assets',
-    'asset upload happens one file at a time after public release creation',
+    'TTY release publication creates a draft, uploads missing assets, verifies expected names, then publishes only its new draft',
+    'asset upload precedes expected-name verification and publication of a newly created draft',
     'manifest rewrite repairs collab_dialog load order but does not validate permission',
     'build failure sets process.exitCode but does not rollback README'
   ]) {
@@ -230,7 +353,7 @@ test('build script register pins package scripts and copied release roots', () =
   assert.equal(scripts['build:firefox'], 'node build.js firefox');
   assert.equal(scripts['build:opera'], 'node build.js opera');
   assert.match(source, /const ALL_BROWSER_TARGETS = \['chrome', 'firefox', 'opera'\]/);
-  assert.match(source, /const COMMON_DIRS = \['js', 'css', 'html', 'icons', 'data', 'assets'\]/);
+  assert.match(source, /const COMMON_DIRS = \['_locales', 'js', 'css', 'html', 'icons', 'data', 'assets'\]/);
   assert.match(source, /const COMMON_FILES = \['README\.md', 'CHANGELOG\.md', 'LICENSE'\]/);
   assert.match(source, /execSync\('node scripts\/build-extension-ui\.mjs'/);
   assert.doesNotMatch(source, /scripts\/build-nanah-vendor\.mjs/);
@@ -238,13 +361,13 @@ test('build script register pins package scripts and copied release roots', () =
 
   for (const phrase of [
     'target browsers: chrome, firefox, opera',
-    'common copied directories: js, css, html, icons, data, assets',
+    'common copied directories: _locales, js, css, html, icons, data, assets',
     'common copied files: README.md, CHANGELOG.md, LICENSE',
     'normal package build invokes: node scripts/build-extension-ui.mjs',
     'normal package build does not invoke: scripts/build-nanah-vendor.mjs',
     'normal package build does not invoke: scripts/sync-native-runtime.mjs',
     'ZIP output pattern: dist/filtertube-<browser>-v<version>.zip',
-    'GitHub release draft state: false',
+    'GitHub release draft state: new releases start draft; existing visibility is preserved',
     'README mutation: updateReadmeBadges(VERSION) runs during main()'
   ]) {
     assert.ok(text.includes(phrase), `missing package/release phrase: ${phrase}`);

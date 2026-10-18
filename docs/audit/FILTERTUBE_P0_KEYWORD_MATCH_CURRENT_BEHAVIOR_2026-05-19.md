@@ -56,8 +56,8 @@ keyword row / channel Filter All / import / sync
 | `keyword_non_exact_substring_policy_is_explicit` | Non-exact keywords compile as substring regexes and can match inside larger words. | UI/runtime report explicitly states substring policy or changes behavior behind fixtures. |
 | `keyword_exact_unicode_boundary_matches_json_and_dom` | JSON exact matching honors the compiled Unicode boundary regex; DOM has extra normalized fallback authority. | JSON and DOM share the same boundary model or record a route-specific divergence reason. |
 | `keyword_dom_normalized_fallback_requires_both_boundaries` | DOM fallback currently accepts either a left or right boundary after normalized includes matching. | DOM normalized fallback requires the intended boundary policy and is fixture-proven. |
-| `keyword_comment_serialized_rules_are_reconstructed` | The engine reconstructs serialized `filterKeywords` and `whitelistKeywords`, but not serialized `filterKeywordsComments`. | Serialized comment keyword lists are reconstructed through the same authority as main keywords. |
-| `keyword_global_rules_do_not_affect_comments_unless_enabled` | Comment filtering falls back to global `filterKeywords` when `filterKeywordsComments` is absent or not an array; an empty array is currently explicit. | Global keyword-to-comment behavior is an explicit policy, not a fallback accident. |
+| `keyword_comment_serialized_rules_are_reconstructed` | Revalidated 2026-10-18: the engine reconstructs serialized video, allowlist, and explicit comment patterns. | Serialized comment keyword lists are reconstructed through the same authority as main keywords. |
+| `keyword_global_rules_do_not_affect_comments_unless_enabled` | An explicit comment list, including empty, owns body matching; absent or non-array lists retain legacy global-list body fallback. Generic candidate matching excludes comments. | Global keyword-to-comment behavior is an explicit policy, not a fallback accident. |
 | `keyword_channel_derived_metadata_round_trips` | Shared settings preserves channel-derived `source/channelRef/exact`; background persistence can convert source to `filterAll_channel`, exact to false, and drop `channelRef`. | Channel-derived keyword metadata round-trips across shared settings, background, import, and UI. |
 | `keyword_channel_derived_comments_policy_round_trips` | Shared settings preserves `filterAllComments`; background persistence writes `comments: false` for channel-derived persisted keywords. | Channel-derived comments policy round-trips without drift. |
 | `keyword_kids_to_main_sync_preserves_source_and_action` | Kids-to-Main sync can merge Kids channels into Main channel-derived keyword recomputation when modes match, but no keyword source/action report exists. | Sync reports surface/source/action so Main rows can distinguish user, Main channel, and Kids-derived keyword origins. |
@@ -105,3 +105,7 @@ runtime behavior changed: no
 These counts are audit-only blockers. They do not approve runtime
 optimization, JSON-first behavior, keyword semantics changes, exact-match
 policy changes, comment keyword changes, or whitelist behavior changes.
+
+## Comment Scope Revalidation - 2026-10-18
+
+Actual compiler-to-engine fixtures verify serialized comment matching and explicit empty-list isolation. The two comment rows above are locally corrected; the broader P0 gate stays closed because the remaining metadata, normalized-boundary, parity, and reporting requirements are not established by these fixtures.

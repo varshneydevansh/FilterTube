@@ -123,8 +123,8 @@ test('JSON-first channel match boundary audit is audit-only and source pinned', 
   assert.match(doc, /not completion proof for JSON-first channel match authority/);
 
   for (const [file, lines, bytes, hash] of [
-    ['js/filter_logic.js', 3652, 172174, '953ef0f14970e6cfbc11215fe9eaa078ced34f001908e1c6d5903a8fd2d9a1f5'],
-    ['js/shared/identity.js', 808, 30599, '41f26baf0eef27994666430e2b8b490c893eed90abd67f47d562926d94155958']
+    ['js/filter_logic.js', 4534, 221980, 'f7021a053af96a4cd31a577f56e900ffb1a5d990fe55a838af64a6dba867afc4'],
+    ['js/shared/identity.js', 1016, 39123, 'fafcbe72d9807a487ecc11d2252f2363e5b8a741eacc740307b1ebd378ebbecb']
   ]) {
     const source = read(file);
     assert.equal(lineCount(source), lines, `${file} line count changed`);
@@ -152,31 +152,31 @@ test('channel match source counts remain pinned', () => {
 
   const filterBuildBlock = sliceBetween(filterLogic, '_buildChannelFilterIndex(filterChannels) {', '        _matchesAnyChannel(channelInfo, filterChannels, index = null) {');
   const filterAnyBlock = sliceBetween(filterLogic, '_matchesAnyChannel(channelInfo, filterChannels, index = null) {', '        _harvestBrowseEndpoint(node) {');
-  const filterMatchBlock = sliceBetween(filterLogic, '_matchesChannel(filterChannel, channelInfo) {', '        /**\n         * Recursively filter');
+  const filterMatchBlock = sliceBetween(filterLogic, '_matchesChannel(filterChannel, channelInfo) {', '        /** Recursively filter');
   const sharedBuildBlock = sliceBetween(identity, 'function buildChannelFilterIndex(filterChannels = [], channelMap = {}) {', '    function channelMetaMatchesIndex(meta, index, channelMap = {}) {');
   const sharedIndexBlock = sliceBetween(identity, 'function channelMetaMatchesIndex(meta, index, channelMap = {}) {', '    /**\n     * Core matching primitive');
   const sharedDirectBlock = sliceBetween(identity, 'function channelMatchesFilter(meta, filterChannel, channelMap = {}) {', '    function extractCustomUrlFromPath');
   const sharedBlockedBlock = sliceBetween(identity, 'function isChannelBlocked(filterChannels, channelInfo, channelMap = {}) {', '    const api = {');
 
-  assert.equal(lineCount(filterBuildBlock), 11);
-  assert.equal(Buffer.byteLength(filterBuildBlock), 370);
-  assert.equal(lineCount(filterAnyBlock), 19);
-  assert.equal(Buffer.byteLength(filterAnyBlock), 719);
-  assert.equal(lineCount(filterMatchBlock), 170);
-  assert.equal(Buffer.byteLength(filterMatchBlock), 7880);
-  assert.equal(lineCount(sharedBuildBlock), 118);
-  assert.equal(Buffer.byteLength(sharedBuildBlock), 4624);
-  assert.equal(lineCount(sharedIndexBlock), 48);
-  assert.equal(Buffer.byteLength(sharedIndexBlock), 1937);
-  assert.equal(lineCount(sharedDirectBlock), 164);
-  assert.equal(Buffer.byteLength(sharedDirectBlock), 6948);
+  assert.equal(lineCount(filterBuildBlock), 22);
+  assert.equal(Buffer.byteLength(filterBuildBlock), 1024);
+  assert.equal(lineCount(filterAnyBlock), 22);
+  assert.equal(Buffer.byteLength(filterAnyBlock), 876);
+  assert.equal(lineCount(filterMatchBlock), 217);
+  assert.equal(Buffer.byteLength(filterMatchBlock), 10737);
+  assert.equal(lineCount(sharedBuildBlock), 127);
+  assert.equal(Buffer.byteLength(sharedBuildBlock), 5015);
+  assert.equal(lineCount(sharedIndexBlock), 60);
+  assert.equal(Buffer.byteLength(sharedIndexBlock), 2484);
+  assert.equal(lineCount(sharedDirectBlock), 170);
+  assert.equal(Buffer.byteLength(sharedDirectBlock), 7211);
   assert.equal(lineCount(sharedBlockedBlock), 9);
   assert.equal(Buffer.byteLength(sharedBlockedBlock), 467);
 
-  assert.equal(countLiteral(filterMatchBlock, 'return true'), 17);
-  assert.equal(countLiteral(filterMatchBlock, 'return false'), 2);
+  assert.equal(countLiteral(filterMatchBlock, 'return true'), 20);
+  assert.equal(countLiteral(filterMatchBlock, 'return false'), 4);
   assert.equal(countLiteral(filterMatchBlock, 'channelMap'), 17);
-  assert.equal(countLiteral(sharedIndexBlock, 'return true'), 11);
+  assert.equal(countLiteral(sharedIndexBlock, 'return true'), 13);
   assert.equal(countLiteral(sharedIndexBlock, 'return false'), 2);
   assert.equal(countLiteral(sharedDirectBlock, 'return true'), 18);
   assert.equal(countLiteral(sharedDirectBlock, 'return false'), 7);

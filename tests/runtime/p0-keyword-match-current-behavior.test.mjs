@@ -143,7 +143,7 @@ test('keyword_non_exact_substring_policy_is_explicit is not centrally reported t
   const compileBlock = sliceBetween(settingsShared, 'function compileKeywords(keywords, predicate = null) {', 'function getChannelDerivedKey(channel) {');
 
   assert.deepEqual(plain(output), { contents: [] });
-  assert.match(compileBlock, /pattern: entry\.exact \? exactPattern : escaped/);
+  assert.match(compileBlock, /pattern: rawRegex \? escaped : \(entry\.exact \? exactPattern : escaped\)/);
   assert.doesNotMatch(productSource(), /\bkeywordMatchAuthority\b/);
 });
 
@@ -171,7 +171,7 @@ test('keyword_dom_normalized_fallback_requires_both_boundaries is not satisfied 
   assert.doesNotMatch(block, /hasLeftBoundary && hasRightBoundary/);
 });
 
-test('keyword_comment_serialized_rules_are_reconstructed is not satisfied today', () => {
+test('keyword_comment_serialized_rules_are_reconstructed is satisfied for current JSON fixtures', () => {
   const input = commentRenderer('spider appears in comment body');
   const output = runEngine(input, baseSettings({
     filterKeywordsComments: [keyword('spider')]
@@ -179,13 +179,13 @@ test('keyword_comment_serialized_rules_are_reconstructed is not satisfied today'
   const filterLogic = read('js/filter_logic.js');
   const processSettings = sliceBetween(filterLogic, '// Reconstruct RegExp objects from serialized patterns', '// Ensure filterChannels are objects');
 
-  assert.deepEqual(plain(output), plain(input));
+  assert.deepEqual(plain(output), { contents: [] });
   assert.match(processSettings, /settings\.filterKeywords/);
   assert.match(processSettings, /settings\.whitelistKeywords/);
-  assert.doesNotMatch(processSettings, /filterKeywordsComments/);
+  assert.match(processSettings, /processed\.filterKeywordsComments = settings\.filterKeywordsComments/);
 });
 
-test('keyword_global_rules_do_not_affect_comments_unless_enabled is only implicit today', () => {
+test('keyword_global_rules_do_not_affect_comments_unless_enabled honors explicit empty scope', () => {
   const input = commentRenderer('spider appears in comment body');
   const globalOutput = runEngine(input, baseSettings({
     filterKeywords: [keyword('spider')]
@@ -198,7 +198,7 @@ test('keyword_global_rules_do_not_affect_comments_unless_enabled is only implici
   const commentBlock = sliceBetween(filterLogic, '// Comment filtering', '// Content filters (duration, upload date)');
 
   assert.deepEqual(plain(globalOutput), { contents: [] });
-  assert.deepEqual(plain(explicitEmptyCommentOutput), { contents: [] });
+  assert.deepEqual(plain(explicitEmptyCommentOutput), plain(input));
   assert.match(commentBlock, /const commentKeywords = Array\.isArray\(this\.settings\.filterKeywordsComments\)/);
   assert.match(commentBlock, /: this\.settings\.filterKeywords/);
   assert.doesNotMatch(commentBlock, /globalCommentPolicy|keywordMatchAuthority/);

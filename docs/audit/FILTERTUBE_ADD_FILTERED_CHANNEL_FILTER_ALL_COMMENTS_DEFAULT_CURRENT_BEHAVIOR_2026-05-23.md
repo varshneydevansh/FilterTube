@@ -23,23 +23,23 @@ runtime addFilteredChannel Filter All comments default fixtures: 11
 
 | File | Lines | Bytes | SHA-256 |
 | --- | ---: | ---: | --- |
-| `js/content_bridge.js` | 13,636 | 604,184 | `8d55d0c8995e5b68bb9142c41f95046a676f5af2b83f8545b00f91a6a5a3776d` |
-| `js/background.js` | 6803 | 306710 | `57ddc6c3e31112c30734ede78c9b37b01bd31533fc8a1d16856b13d2b295f0d7` |
-| `js/state_manager.js` | 2,491 | 99,780 | `509c559e35989c13cdded17c01eeaca8115addcd3848dbcda41514422e5bc7b6` |
-| `js/settings_shared.js` | 1,181 | 57,535 | `9710ebb445ba11cc45fc98aced765d298226a8cd4a003600e106f908abc2162c` |
+| `js/content_bridge.js` | 15,053 | 678,250 | `c653324d1f042c0473cf2102d81bcd161bfaa26f8c7ee545e250226594dc9618` |
+| `js/background.js` | 8538 | 386043 | `cc89bb4a0375145e1c811b7cf5953729c39c409b6b24cacdc65c80f9f6ff44d0` |
+| `js/state_manager.js` | 2,979 | 124,009 | `04879b5b1dcac9229c70d0ea14241667755682649865ad1d52030c1ce21950d3` |
+| `js/settings_shared.js` | 1,313 | 66,857 | `19f0a1fb3cd512494481b7eb39169bf84feeda4a0a6a20cf58ebaf1c18ff7ba9` |
 
 ## Pinned Source Blocks
 
 | Block | Anchor | Lines | Bytes | SHA-256 |
 | --- | --- | ---: | ---: | --- |
-| `contentBridgeAddChannelDirectly` | `js/content_bridge.js:13440` | 54 | 2662 | `4eb280573a5611b695c8284a8e6b85d17b2a97c459143a3054d02374cdf7c2ca` |
-| `backgroundAddFilteredChannelReceiver` | `js/background.js:5727` | 39 | 1579 | `f681057e88e4c6aef657464bca124f8d3ae4d59f4d11ca5f05e1135dcf1615f2` |
-| `backgroundHandleAddFilteredChannelSignature` | `js/background.js:5792` | 2 | 204 | `ce94174aa1b2f302e1e89a75b463271aa13d1c95f62cb89ee34364fb9c3ab603` |
-| `backgroundExistingChannelUpdate` | `js/background.js:6435` | 21 | 1247 | `9ac97ce884e9c319e0267a60bbbacbdb26b0a3ea6f1f0cca416615ad234e96dd` |
-| `backgroundNewChannelObject` | `js/background.js:6485` | 20 | 1081 | `5fa1776809d1d10187ead655c7b8a566c15935b2667f95e8cd5f7875c28f4be4` |
-| `backgroundChannelDerivedKeywordHelpersAndSync` | `js/background.js:1386` | 106 | 3482 | `22f1f880c4b67f0b366020641f94e988d19a4e0312b073c20048c4f2bcd0a455` |
-| `stateManagerChannelEnrichmentMessage` | `js/state_manager.js:665` | 12 | 460 | `1f802c946742b856d5c4f6aea62777de9e1e3fcebae08085d632259d1bac0132` |
-| `settingsSharedSyncFilterAllKeywords` | `js/settings_shared.js:412` | 72 | 2967 | `ce4e49c6055252ab9a6db6a30be91ddfb50efead1c1ef76bf736c38717febd25` |
+| `contentBridgeAddChannelDirectly` | `js/content_bridge.js:14855` | 55 | 2759 | `de0b0304a2269331926856153492eae471d385455e5548c45b11f8cf01e4582d` |
+| `backgroundAddFilteredChannelReceiver` | `js/background.js:7072` | 58 | 2408 | `3a506e117b2d2a79bc9156c5dcb782077c69bc63a3b3a3fe982d25d7f2f5553c` |
+| `backgroundHandleAddFilteredChannelSignature` | `js/background.js:7156` | 2 | 204 | `ce94174aa1b2f302e1e89a75b463271aa13d1c95f62cb89ee34364fb9c3ab603` |
+| `backgroundExistingChannelUpdate` | `js/background.js:7974` | 22 | 1331 | `ccc5b7c341685ced769a8bab9846303ca1b3028fe0ee71a768993c1c8bdc35cb` |
+| `backgroundNewChannelObject` | `js/background.js:8025` | 21 | 1181 | `2502df79c0fb8aecc76228aee6d237d09930e56f75edf58b8effd4f15495b692` |
+| `backgroundChannelDerivedKeywordHelpersAndSync` | `js/background.js:1891` | 106 | 3482 | `22f1f880c4b67f0b366020641f94e988d19a4e0312b073c20048c4f2bcd0a455` |
+| `stateManagerChannelEnrichmentMessage` | `js/state_manager.js:850` | 12 | 460 | `1f802c946742b856d5c4f6aea62777de9e1e3fcebae08085d632259d1bac0132` |
+| `settingsSharedSyncFilterAllKeywords` | `js/settings_shared.js:493` | 75 | 3138 | `e53763406df6485ad16125eeba30be1bd1e10688f211d4541915bc9f8063c91b` |
 
 ## Selected Token Counts
 
@@ -58,7 +58,7 @@ runtime addFilteredChannel Filter All comments default fixtures: 11
 | `filterKeywordsComments` | 0 |
 | `profile` | 6 |
 | `listType` | 2 |
-| `metadata` | 18 |
+| `metadata` | 20 |
 | `comment_filter_toggled` | 0 |
 | `channel_added` | 6 |
 | `kids_channel_added` | 1 |
@@ -152,3 +152,7 @@ These counts are audit-only blockers. They do not approve runtime
 optimization, JSON-first behavior, comment filtering behavior, whitelist
 behavior, metric collectors, artifact creation, native sync, release package
 changes, or public claims.
+
+## Revalidation - 2026-10-18
+
+Source fingerprints and bounded extraction inventories were refreshed against the current checkout after source review. These are drift detectors, not exhaustive semantic proof, installed-browser evidence, or approval of the broader missing-authority gates. Executable fixtures below remain the behavior checks.

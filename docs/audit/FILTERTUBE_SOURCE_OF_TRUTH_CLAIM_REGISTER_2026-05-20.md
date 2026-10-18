@@ -130,3 +130,120 @@ This register is a wording and authority-boundary layer only. It does not
 permit renderer expansion, selector cleanup, DOM fallback deletion, network
 fallback deletion, whitelist/blocklist mode changes, app sync changes, or public
 release claims.
+
+
+## Current Exact Wording Register - 2026-10-18
+
+The earlier classified references retain the dated historical audit. This
+current location register records every present exact occurrence without
+converting ownership language into permission to change runtime behavior.
+
+```text
+current exact wording occurrences: 101
+current broad behavior approval from wording: NO-GO
+runtime behavior changed by this register refresh: no
+```
+
+| Current reference | Claim class | Current review boundary |
+| --- | --- | --- |
+| `README.md:21` | `release-sync-owner` | Repository/runtime or release-note ownership; native parity still requires source provenance and installed proof. |
+| `docs/APP_RELEASE_AND_RUNTIME_SYNC_WORKFLOW.md:5` | `release-sync-owner` | Repository/runtime or release-note ownership; native parity still requires source provenance and installed proof. |
+| `docs/ARCHITECTURE.md:27` | `release-sync-owner` | Repository/runtime or release-note ownership; native parity still requires source provenance and installed proof. |
+| `docs/ARCHITECTURE.md:41` | `release-sync-owner` | Repository/runtime or release-note ownership; native parity still requires source provenance and installed proof. |
+| `docs/CODEMAP.md:122` | `release-sync-owner` | Repository/runtime or release-note ownership; native parity still requires source provenance and installed proof. |
+| `docs/CODEMAP.md:48` | `release-sync-owner` | Repository/runtime or release-note ownership; native parity still requires source provenance and installed proof. |
+| `docs/FUNCTIONALITY.md:306` | `narrow-local-owner` | Parsing, current-video identity or stored channel state only; no general hide/action authority. |
+| `docs/JSON_FIRST_FILTERING_PLAN.md:205` | `misleading-identity-effect-risk` | Field/roster guidance requires route, owner, mode and effect proof; wording alone cannot authorize hiding. |
+| `docs/MOBILE_APP_UI_SPEC.md:43` | `historical-plan` | Planning, checkpoint or downstream proposal; not current runtime, installed-device or store proof. |
+| `docs/MOBILE_APP_UI_SPEC.md:6` | `historical-plan` | Planning, checkpoint or downstream proposal; not current runtime, installed-device or store proof. |
+| `docs/NANAH_POST_IMPLEMENTATION_CONCERNS_TRACKER.md:148` | `historical-plan` | Planning, checkpoint or downstream proposal; not current runtime, installed-device or store proof. |
+| `docs/NETWORK_REQUEST_PIPELINE.md:6` | `audit-boundary` | Audit/test/workflow wording records evidence or a gate, not runtime permission or completed broad proof. |
+| `docs/TECHNICAL.md:108` | `release-sync-owner` | Repository/runtime or release-note ownership; native parity still requires source provenance and installed proof. |
+| `docs/THREE_DOT_MENU_IMPROVEMENTS.md:58` | `misleading-identity-effect-risk` | Field/roster guidance requires route, owner, mode and effect proof; wording alone cannot authorize hiding. |
+| `docs/WORKTREE_CHECKPOINT_2026-08-23.md:45` | `historical-plan` | Planning, checkpoint or downstream proposal; not current runtime, installed-device or store proof. |
+| `docs/audit/FILTERTUBE_ACTIVE_GOAL_COMPLETION_AUDIT_2026-05-21.md:3152` | `audit-boundary` | Audit/test/workflow wording records evidence or a gate, not runtime permission or completed broad proof. |
+| `docs/audit/FILTERTUBE_ACTIVE_GOAL_COMPLETION_AUDIT_2026-05-21.md:3171` | `audit-boundary` | Audit/test/workflow wording records evidence or a gate, not runtime permission or completed broad proof. |
+| `docs/audit/FILTERTUBE_AUDIT_CONVERGENCE_2026-05-17.md:205` | `audit-boundary` | Audit/test/workflow wording records evidence or a gate, not runtime permission or completed broad proof. |
+| `docs/audit/FILTERTUBE_CHANGE_SAFETY_RUNTIME_AUDIT_BACKLOG_2026-06-01.md:393` | `audit-boundary` | Audit/test/workflow wording records evidence or a gate, not runtime permission or completed broad proof. |
+| `docs/audit/FILTERTUBE_FIRST_OPTIMIZATION_SOURCE_LOCUS_PARITY_RELEASE_VERIFICATION_OWNERSHIP_BOUNDARY_CURRENT_BEHAVIOR_2026-05-24.md:141` | `audit-boundary` | Audit/test/workflow wording records evidence or a gate, not runtime permission or completed broad proof. |
+| `docs/audit/FILTERTUBE_FIRST_OPTIMIZATION_VERIFICATION_OUTPUT_CONTRACT_CURRENT_BEHAVIOR_2026-05-24.md:180` | `audit-boundary` | Audit/test/workflow wording records evidence or a gate, not runtime permission or completed broad proof. |
+| `docs/audit/FILTERTUBE_FIRST_OPTIMIZATION_VERIFICATION_OUTPUT_CONTRACT_CURRENT_BEHAVIOR_2026-05-24.md:239` | `audit-boundary` | Audit/test/workflow wording records evidence or a gate, not runtime permission or completed broad proof. |
+| `docs/audit/FILTERTUBE_FIRST_OPTIMIZATION_VERIFICATION_OUTPUT_CONTRACT_CURRENT_BEHAVIOR_2026-05-24.md:273` | `audit-boundary` | Audit/test/workflow wording records evidence or a gate, not runtime permission or completed broad proof. |
+| `docs/audit/FILTERTUBE_FIRST_OPTIMIZATION_VERIFICATION_OUTPUT_CONTRACT_CURRENT_BEHAVIOR_2026-05-24.md:296` | `audit-boundary` | Audit/test/workflow wording records evidence or a gate, not runtime permission or completed broad proof. |
+| `docs/audit/FILTERTUBE_JSON_FIRST_LIST_MODE_MATRIX_BOUNDARY_CURRENT_BEHAVIOR_2026-05-22.md:161` | `audit-boundary` | Audit/test/workflow wording records evidence or a gate, not runtime permission or completed broad proof. |
+| `docs/audit/FILTERTUBE_LINKED_CREATOR_CHANNEL_ALIAS_2026-07-11.md:92` | `misleading-identity-effect-risk` | Field/roster guidance requires route, owner, mode and effect proof; wording alone cannot authorize hiding. |
+| `docs/audit/FILTERTUBE_MANAGED_PARENT_RELEASE_SMOKE_CHECKLIST_2026-06-19.md:65` | `audit-boundary` | Audit/test/workflow wording records evidence or a gate, not runtime permission or completed broad proof. |
+| `docs/audit/FILTERTUBE_OBJECTIVE_COVERAGE_LEDGER_2026-05-18.md:243` | `audit-boundary` | Audit/test/workflow wording records evidence or a gate, not runtime permission or completed broad proof. |
+| `docs/audit/FILTERTUBE_OBJECTIVE_COVERAGE_LEDGER_2026-05-18.md:245` | `audit-boundary` | Audit/test/workflow wording records evidence or a gate, not runtime permission or completed broad proof. |
+| `docs/audit/FILTERTUBE_P0_COMPILED_RULE_STATE_CURRENT_BEHAVIOR_2026-05-19.md:50` | `audit-boundary` | Audit/test/workflow wording records evidence or a gate, not runtime permission or completed broad proof. |
+| `docs/audit/FILTERTUBE_P0_OBLIGATION_INDEX_2026-05-20.md:7` | `audit-boundary` | Audit/test/workflow wording records evidence or a gate, not runtime permission or completed broad proof. |
+| `docs/audit/FILTERTUBE_RAW_CAPTURE_EXTRACTION_OBLIGATION_INDEX_2026-05-20.md:9` | `audit-boundary` | Audit/test/workflow wording records evidence or a gate, not runtime permission or completed broad proof. |
+| `docs/audit/FILTERTUBE_REFERENCE_DOC_CLAIM_DRIFT_CURRENT_BEHAVIOR_2026-05-19.md:57` | `audit-boundary` | Audit/test/workflow wording records evidence or a gate, not runtime permission or completed broad proof. |
+| `docs/audit/FILTERTUBE_REFERENCE_DOC_CLAIM_DRIFT_CURRENT_BEHAVIOR_2026-05-19.md:8` | `audit-boundary` | Audit/test/workflow wording records evidence or a gate, not runtime permission or completed broad proof. |
+| `docs/audit/FILTERTUBE_RELEASE_FIX_AUDIT_STATUS_2026-05-26.md:245` | `audit-boundary` | Audit/test/workflow wording records evidence or a gate, not runtime permission or completed broad proof. |
+| `docs/audit/FILTERTUBE_RELEASE_FIX_AUDIT_STATUS_2026-05-26.md:263` | `audit-boundary` | Audit/test/workflow wording records evidence or a gate, not runtime permission or completed broad proof. |
+| `docs/audit/FILTERTUBE_RELEASE_FIX_AUDIT_STATUS_2026-05-26.md:555` | `audit-boundary` | Audit/test/workflow wording records evidence or a gate, not runtime permission or completed broad proof. |
+| `docs/audit/FILTERTUBE_RELEASE_FIX_AUDIT_STATUS_2026-05-26.md:557` | `audit-boundary` | Audit/test/workflow wording records evidence or a gate, not runtime permission or completed broad proof. |
+| `docs/audit/FILTERTUBE_RELEASE_FIX_AUDIT_STATUS_2026-05-26.md:712` | `audit-boundary` | Audit/test/workflow wording records evidence or a gate, not runtime permission or completed broad proof. |
+| `docs/audit/FILTERTUBE_RELEASE_FIX_AUDIT_STATUS_2026-05-26.md:714` | `audit-boundary` | Audit/test/workflow wording records evidence or a gate, not runtime permission or completed broad proof. |
+| `docs/audit/FILTERTUBE_RELEASE_REGRESSION_LAG_AND_BLOCKLIST_FIX_2026-05-26.md:216` | `audit-boundary` | Audit/test/workflow wording records evidence or a gate, not runtime permission or completed broad proof. |
+| `docs/audit/FILTERTUBE_RELEASE_REGRESSION_LAG_AND_BLOCKLIST_FIX_2026-05-26.md:232` | `audit-boundary` | Audit/test/workflow wording records evidence or a gate, not runtime permission or completed broad proof. |
+| `docs/audit/FILTERTUBE_RELEASE_REGRESSION_LAG_AND_BLOCKLIST_FIX_2026-05-26.md:233` | `audit-boundary` | Audit/test/workflow wording records evidence or a gate, not runtime permission or completed broad proof. |
+| `docs/audit/FILTERTUBE_RELEASE_REGRESSION_LAG_AND_BLOCKLIST_FIX_2026-05-26.md:76` | `audit-boundary` | Audit/test/workflow wording records evidence or a gate, not runtime permission or completed broad proof. |
+| `docs/audit/FILTERTUBE_RELEASE_REGRESSION_LAG_AND_BLOCKLIST_FIX_2026-05-26.md:99` | `audit-boundary` | Audit/test/workflow wording records evidence or a gate, not runtime permission or completed broad proof. |
+| `docs/audit/FILTERTUBE_RUNTIME_AUDIT_2026-05-17.md:113` | `audit-boundary` | Audit/test/workflow wording records evidence or a gate, not runtime permission or completed broad proof. |
+| `docs/audit/FILTERTUBE_RUNTIME_AUDIT_2026-05-17.md:1406` | `audit-boundary` | Audit/test/workflow wording records evidence or a gate, not runtime permission or completed broad proof. |
+| `docs/audit/FILTERTUBE_RUNTIME_AUDIT_2026-05-17.md:1598` | `audit-boundary` | Audit/test/workflow wording records evidence or a gate, not runtime permission or completed broad proof. |
+| `docs/audit/FILTERTUBE_RUNTIME_AUDIT_2026-05-17.md:1726` | `audit-boundary` | Audit/test/workflow wording records evidence or a gate, not runtime permission or completed broad proof. |
+| `docs/audit/FILTERTUBE_RUNTIME_AUDIT_2026-05-17.md:176` | `audit-boundary` | Audit/test/workflow wording records evidence or a gate, not runtime permission or completed broad proof. |
+| `docs/audit/FILTERTUBE_RUNTIME_AUDIT_2026-05-17.md:1817` | `audit-boundary` | Audit/test/workflow wording records evidence or a gate, not runtime permission or completed broad proof. |
+| `docs/audit/FILTERTUBE_RUNTIME_AUDIT_2026-05-17.md:1850` | `audit-boundary` | Audit/test/workflow wording records evidence or a gate, not runtime permission or completed broad proof. |
+| `docs/audit/FILTERTUBE_RUNTIME_AUDIT_2026-05-17.md:1984` | `audit-boundary` | Audit/test/workflow wording records evidence or a gate, not runtime permission or completed broad proof. |
+| `docs/audit/FILTERTUBE_RUNTIME_AUDIT_2026-05-17.md:2547` | `audit-boundary` | Audit/test/workflow wording records evidence or a gate, not runtime permission or completed broad proof. |
+| `docs/audit/FILTERTUBE_RUNTIME_AUDIT_2026-05-17.md:4022` | `audit-boundary` | Audit/test/workflow wording records evidence or a gate, not runtime permission or completed broad proof. |
+| `docs/audit/FILTERTUBE_RUNTIME_AUDIT_2026-05-17.md:4074` | `audit-boundary` | Audit/test/workflow wording records evidence or a gate, not runtime permission or completed broad proof. |
+| `docs/audit/FILTERTUBE_RUNTIME_AUDIT_2026-05-17.md:44` | `audit-boundary` | Audit/test/workflow wording records evidence or a gate, not runtime permission or completed broad proof. |
+| `docs/audit/FILTERTUBE_RUNTIME_AUDIT_2026-05-17.md:4711` | `audit-boundary` | Audit/test/workflow wording records evidence or a gate, not runtime permission or completed broad proof. |
+| `docs/audit/FILTERTUBE_RUNTIME_AUDIT_2026-05-17.md:4723` | `audit-boundary` | Audit/test/workflow wording records evidence or a gate, not runtime permission or completed broad proof. |
+| `docs/audit/FILTERTUBE_RUNTIME_AUDIT_2026-05-17.md:5005` | `audit-boundary` | Audit/test/workflow wording records evidence or a gate, not runtime permission or completed broad proof. |
+| `docs/audit/FILTERTUBE_RUNTIME_AUDIT_2026-05-17.md:5371` | `audit-boundary` | Audit/test/workflow wording records evidence or a gate, not runtime permission or completed broad proof. |
+| `docs/audit/FILTERTUBE_RUNTIME_AUDIT_2026-05-17.md:5955` | `audit-boundary` | Audit/test/workflow wording records evidence or a gate, not runtime permission or completed broad proof. |
+| `docs/audit/FILTERTUBE_RUNTIME_AUDIT_2026-05-17.md:7217` | `audit-boundary` | Audit/test/workflow wording records evidence or a gate, not runtime permission or completed broad proof. |
+| `docs/audit/FILTERTUBE_RUNTIME_FIXTURE_RESULTS_2026-05-17.md:1248` | `audit-boundary` | Audit/test/workflow wording records evidence or a gate, not runtime permission or completed broad proof. |
+| `docs/audit/FILTERTUBE_RUNTIME_FIXTURE_RESULTS_2026-05-17.md:2127` | `audit-boundary` | Audit/test/workflow wording records evidence or a gate, not runtime permission or completed broad proof. |
+| `docs/audit/FILTERTUBE_RUNTIME_FIXTURE_RESULTS_2026-05-17.md:2128` | `audit-boundary` | Audit/test/workflow wording records evidence or a gate, not runtime permission or completed broad proof. |
+| `docs/audit/FILTERTUBE_RUNTIME_FIXTURE_RESULTS_2026-05-17.md:2129` | `audit-boundary` | Audit/test/workflow wording records evidence or a gate, not runtime permission or completed broad proof. |
+| `docs/audit/FILTERTUBE_RUNTIME_TEST_FILE_PROVENANCE_INDEX_CURRENT_BEHAVIOR_2026-05-25.md:538` | `audit-boundary` | Audit/test/workflow wording records evidence or a gate, not runtime permission or completed broad proof. |
+| `docs/audit/FILTERTUBE_RUNTIME_TEST_FILE_PROVENANCE_INDEX_CURRENT_BEHAVIOR_2026-05-25.md:625` | `audit-boundary` | Audit/test/workflow wording records evidence or a gate, not runtime permission or completed broad proof. |
+| `docs/audit/FILTERTUBE_SOURCE_BOUNDARY_AUDIT_2026-05-18.md:133` | `audit-boundary` | Audit/test/workflow wording records evidence or a gate, not runtime permission or completed broad proof. |
+| `docs/audit/FILTERTUBE_STABILIZATION_FIX_ORDER_2026-05-19.md:119` | `audit-boundary` | Audit/test/workflow wording records evidence or a gate, not runtime permission or completed broad proof. |
+| `docs/audit/FILTERTUBE_STABILIZATION_FIX_ORDER_2026-05-19.md:120` | `audit-boundary` | Audit/test/workflow wording records evidence or a gate, not runtime permission or completed broad proof. |
+| `docs/audit/FILTERTUBE_TRACKED_FILE_OBLIGATION_INDEX_2026-05-20.md:707` | `audit-boundary` | Audit/test/workflow wording records evidence or a gate, not runtime permission or completed broad proof. |
+| `docs/audit/POST_3_3_5_CHANGE_LEDGER_2026-08-23.md:39` | `release-sync-owner` | Repository/runtime or release-note ownership; native parity still requires source provenance and installed proof. |
+| `docs/audit/TEST_LANE_MATRIX.md:27` | `audit-boundary` | Audit/test/workflow wording records evidence or a gate, not runtime permission or completed broad proof. |
+| `docs/audit/TEST_LANE_MATRIX.md:47` | `audit-boundary` | Audit/test/workflow wording records evidence or a gate, not runtime permission or completed broad proof. |
+| `docs/collab_three_dot_ui_google_aistudio.md:10` | `historical-plan` | Planning, checkpoint or downstream proposal; not current runtime, installed-device or store proof. |
+| `docs/collab_three_dot_ui_google_aistudio.md:275` | `historical-plan` | Planning, checkpoint or downstream proposal; not current runtime, installed-device or store proof. |
+| `docs/filtertube_mobile_runtime_adapter_plan.md:18` | `historical-plan` | Planning, checkpoint or downstream proposal; not current runtime, installed-device or store proof. |
+| `docs/filtertube_mobile_runtime_adapter_plan.md:205` | `historical-plan` | Planning, checkpoint or downstream proposal; not current runtime, installed-device or store proof. |
+| `docs/filtertube_mobile_tv_architecture_plan.md:272` | `historical-plan` | Planning, checkpoint or downstream proposal; not current runtime, installed-device or store proof. |
+| `js/content_bridge.js:3429` | `narrow-local-owner` | Parsing, current-video identity or stored channel state only; no general hide/action authority. |
+| `js/shared/identity.js:12` | `narrow-local-owner` | Parsing, current-video identity or stored channel state only; no general hide/action authority. |
+| `tests/runtime/active-goal-completion-audit-current-behavior.test.mjs:12131` | `audit-boundary` | Audit/test/workflow wording records evidence or a gate, not runtime permission or completed broad proof. |
+| `tests/runtime/audit-completion-gap-register-current-behavior.test.mjs:323` | `audit-boundary` | Audit/test/workflow wording records evidence or a gate, not runtime permission or completed broad proof. |
+| `tests/runtime/first-optimization-source-locus-parity-release-verification-ownership-boundary-current-behavior.test.mjs:98` | `audit-boundary` | Audit/test/workflow wording records evidence or a gate, not runtime permission or completed broad proof. |
+| `tests/runtime/first-optimization-verification-output-contract-current-behavior.test.mjs:42` | `audit-boundary` | Audit/test/workflow wording records evidence or a gate, not runtime permission or completed broad proof. |
+| `tests/runtime/first-optimization-verification-output-contract-current-behavior.test.mjs:57` | `audit-boundary` | Audit/test/workflow wording records evidence or a gate, not runtime permission or completed broad proof. |
+| `tests/runtime/identity-information-waterfall-current-behavior.test.mjs:41` | `audit-boundary` | Audit/test/workflow wording records evidence or a gate, not runtime permission or completed broad proof. |
+| `tests/runtime/objective-coverage-ledger-current-behavior.test.mjs:1022` | `audit-boundary` | Audit/test/workflow wording records evidence or a gate, not runtime permission or completed broad proof. |
+| `tests/runtime/objective-coverage-ledger-current-behavior.test.mjs:1406` | `audit-boundary` | Audit/test/workflow wording records evidence or a gate, not runtime permission or completed broad proof. |
+| `tests/runtime/objective-coverage-ledger-current-behavior.test.mjs:1411` | `audit-boundary` | Audit/test/workflow wording records evidence or a gate, not runtime permission or completed broad proof. |
+| `tests/runtime/objective-coverage-ledger-current-behavior.test.mjs:1414` | `audit-boundary` | Audit/test/workflow wording records evidence or a gate, not runtime permission or completed broad proof. |
+| `tests/runtime/objective-coverage-ledger-current-behavior.test.mjs:1416` | `audit-boundary` | Audit/test/workflow wording records evidence or a gate, not runtime permission or completed broad proof. |
+| `tests/runtime/objective-coverage-ledger-current-behavior.test.mjs:1417` | `audit-boundary` | Audit/test/workflow wording records evidence or a gate, not runtime permission or completed broad proof. |
+| `tests/runtime/p0-obligation-index-current-behavior.test.mjs:61` | `audit-boundary` | Audit/test/workflow wording records evidence or a gate, not runtime permission or completed broad proof. |
+| `tests/runtime/raw-capture-extraction-obligation-index-current-behavior.test.mjs:80` | `audit-boundary` | Audit/test/workflow wording records evidence or a gate, not runtime permission or completed broad proof. |
+| `tests/runtime/reference-doc-claim-drift-current-behavior.test.mjs:200` | `audit-boundary` | Audit/test/workflow wording records evidence or a gate, not runtime permission or completed broad proof. |
+| `tests/runtime/reference-doc-claim-drift-current-behavior.test.mjs:212` | `audit-boundary` | Audit/test/workflow wording records evidence or a gate, not runtime permission or completed broad proof. |
+| `tests/runtime/stabilization-fix-order-current-behavior.test.mjs:121` | `audit-boundary` | Audit/test/workflow wording records evidence or a gate, not runtime permission or completed broad proof. |
+| `tests/runtime/test-lane-visible-safety-current-behavior.test.mjs:97` | `audit-boundary` | Audit/test/workflow wording records evidence or a gate, not runtime permission or completed broad proof. |

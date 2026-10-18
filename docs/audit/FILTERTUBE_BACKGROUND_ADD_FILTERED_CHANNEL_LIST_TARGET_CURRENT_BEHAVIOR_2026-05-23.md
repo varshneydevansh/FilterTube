@@ -10,18 +10,18 @@ This slice covers the background-side receiver for `message.type === 'addFiltere
 
 | Source file | Lines | Bytes | SHA-256 |
 | --- | ---: | ---: | --- |
-| `js/background.js` | 6803 | 306710 | `57ddc6c3e31112c30734ede78c9b37b01bd31533fc8a1d16856b13d2b295f0d7` |
+| `js/background.js` | 8538 | 386043 | `cc89bb4a0375145e1c811b7cf5953729c39c409b6b24cacdc65c80f9f6ff44d0` |
 
 ## Pinned Source And Effect Blocks
 
 | Block | Source lines | Lines | Bytes | SHA-256 |
 | --- | ---: | ---: | ---: | --- |
-| `backgroundAddFilteredChannelReceiver` | `js/background.js:5727` | 39 | 1579 | `f681057e88e4c6aef657464bca124f8d3ae4d59f4d11ca5f05e1135dcf1615f2` |
-| `backgroundHandleAddFilteredChannelFull` | `js/background.js:5792` | 893 | 45226 | `e69e660d0af0dd0d523932f733a5de04108cbfb69ef99a155be4466a7527ce25` |
-| `backgroundHandleAddFilteredChannelSignatureAndInput` | `js/background.js:5792` | 158 | 6464 | `60f9b6d40d808f02f822e74a0a9f967844a1d1ef4c956e911ad2ee5265891b80` |
-| `backgroundHandleAddFilteredChannelIdentityRepair` | `js/background.js:5949` | 358 | 19385 | `dc7ccd71be5cb375ac50245617889449621246504390a4a0162c59c3cef6740d` |
-| `backgroundHandleAddFilteredChannelExistingAndWrite` | `js/background.js:6306` | 352 | 18483 | `0f2661d0a32990528ebf6704aa4cfb90cab8f55dcf4567e37852910704966027` |
-| `backgroundHandleAddFilteredChannelCommitAndReturn` | `js/background.js:6657` | 28 | 894 | `ba67796a03d083bf072ac4ef971365f165f0c836dd2eae56c64912729a45be66` |
+| `backgroundAddFilteredChannelReceiver` | `js/background.js:7072` | 58 | 2408 | `3a506e117b2d2a79bc9156c5dcb782077c69bc63a3b3a3fe982d25d7f2f5553c` |
+| `backgroundHandleAddFilteredChannelFull` | `js/background.js:7156` | 1103 | 56174 | `0813495a9a573714752a0c646b0cf6c716e83df39c3f678f1de45a4ffbdbf81c` |
+| `backgroundHandleAddFilteredChannelSignatureAndInput` | `js/background.js:7156` | 219 | 8827 | `4866592e320f225dc019d34b92bb5e8d2aa70dbc726fe3cdbc67f1e9896d72f0` |
+| `backgroundHandleAddFilteredChannelIdentityRepair` | `js/background.js:7374` | 378 | 20938 | `839fbf2df32d71bde14965ee5bcd6fd428303030a299c5725375d26b0ac04488` |
+| `backgroundHandleAddFilteredChannelExistingAndWrite` | `js/background.js:7751` | 476 | 25264 | `0b460310c480b77d27b5da33a1a54ec29cc3ccb15e84d401b5fc387987985646` |
+| `backgroundHandleAddFilteredChannelCommitAndReturn` | `js/background.js:8226` | 33 | 1145 | `09b31bd149e54402745971ae2b65b0f9f28f8810803c7107a173de201164fbea` |
 
 ## Selected Token Counts
 
@@ -30,10 +30,10 @@ The receiver plus full helper blocks contain:
 | Token | Count |
 | --- | ---: |
 | `isTrustedUiSender` | 0 |
-| `isProfileSessionAuthorized` | 0 |
+| `isProfileSessionAuthorized` | 2 |
 | `handleAddFilteredChannel` | 2 |
-| `listType` | 3 |
-| `targetListType` | 17 |
+| `listType` | 4 |
+| `targetListType` | 18 |
 | `blocklist` | 10 |
 | `whitelist` | 41 |
 | `message.listType` | 1 |
@@ -41,15 +41,15 @@ The receiver plus full helper blocks contain:
 | `message.videoId` | 1 |
 | `filterAll` | 12 |
 | `collaborationWith` | 16 |
-| `metadata` | 70 |
-| `storageWritePayload` | 8 |
-| `FT_PROFILES_V4_KEY` | 3 |
+| `metadata` | 92 |
+| `storageWritePayload` | 9 |
+| `FT_PROFILES_V4_KEY` | 5 |
 | `ftProfilesV3` | 4 |
-| `filterChannels` | 4 |
+| `filterChannels` | 5 |
 | `uiChannels` | 1 |
 | `whitelistChannels` | 12 |
 | `blockedChannels` | 8 |
-| `channelMap` | 25 |
+| `channelMap` | 27 |
 | `enqueueChannelMapUpdate` | 2 |
 | `enqueueVideoChannelMapUpdate` | 1 |
 | `browserAPI.storage.local.set` | 3 |
@@ -77,7 +77,7 @@ For reliability and false-hide/leak risk, the secondary receiver and helper now 
 
 For performance, the receiver looks like a single add operation but the helper can perform network identity repair, channelMap writes, V4/V3/root storage writes, compiled-cache invalidation, tab refresh, backup scheduling, and post-block enrichment. Any optimization that treats `addFilteredChannel` as a cheap local mutation would be undercounting the fanout.
 
-For code burden, the list target is still split across action-specific callers, message payloads, and helper defaults. The secondary receiver now forwards a list-target field, but it still has no explicit sender policy, no session-lock check, and no structured mutation report that records actor, profile, list, storage keys, cache invalidation, backup, refresh, and enrichment side effects.
+For code burden, the list target is still split across action-specific callers, message payloads, and helper defaults. The secondary receiver now forwards a list-target field, and its shared writer checks profile-session authorization before mutation. It still lacks a unified sender policy or structured report covering actor, profile, list, storage keys, cache invalidation, backup, refresh, and enrichment side effects.
 
 ## Still Missing
 
@@ -126,3 +126,11 @@ optimization, JSON-first behavior, settings behavior, background message
 behavior, storage behavior, cache invalidation behavior, whitelist behavior,
 metric collectors, artifact creation, native sync, release package changes, or
 public claims.
+
+## Revalidation - 2026-10-18
+
+Source fingerprints and bounded extraction inventories were refreshed against the current checkout after source review. These are drift detectors, not exhaustive semantic proof, installed-browser evidence, or approval of the broader missing-authority gates. Executable fixtures below remain the behavior checks.
+
+## Session Revalidation - 2026-10-18
+
+The secondary receiver itself has no local session-check token; that is not evidence of an unguarded write. The shared `handleAddFilteredChannel` writer now checks active-profile session authorization. Receiver and writer remain separate, and this source inventory does not prove a unified actor/target report or every asynchronous authorization boundary.

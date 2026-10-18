@@ -29,19 +29,19 @@ changes, or whitelist behavior changes.
 
 | Source file | Lines | Bytes | SHA-256 |
 | --- | ---: | ---: | --- |
-| `js/background.js` | 6803 | 306710 | `57ddc6c3e31112c30734ede78c9b37b01bd31533fc8a1d16856b13d2b295f0d7` |
-| `js/content_bridge.js` | 13,636 | 604,184 | `8d55d0c8995e5b68bb9142c41f95046a676f5af2b83f8545b00f91a6a5a3776d` |
-| `js/state_manager.js` | 2,491 | 99,780 | `509c559e35989c13cdded17c01eeaca8115addcd3848dbcda41514422e5bc7b6` |
+| `js/background.js` | 8538 | 386043 | `cc89bb4a0375145e1c811b7cf5953729c39c409b6b24cacdc65c80f9f6ff44d0` |
+| `js/content_bridge.js` | 15,053 | 678,250 | `c653324d1f042c0473cf2102d81bcd161bfaa26f8c7ee545e250226594dc9618` |
+| `js/state_manager.js` | 2,979 | 124,009 | `04879b5b1dcac9229c70d0ea14241667755682649865ad1d52030c1ce21950d3` |
 
 ## Pinned Source And Effect Blocks
 
 | Block | Source lines | Lines | Bytes | SHA-256 |
 | --- | ---: | ---: | ---: | --- |
-| `backgroundToggleChannelFilterAllReceiver` | `js/background.js:5765` | 14 | 413 | `7e15cc800cdde69487959513b30d2cfab29c55f9b1caa566f96b99bcb844c94e` |
-| `backgroundHandleToggleChannelFilterAll` | `js/background.js:6691` | 95 | 3435 | `84afd60fbb6c140a1a20880b7cb2b81a7ce33fe95c89b4278c1d00e1b1756dd4` |
-| `contentBridgeAddFilterAllContentCheckbox` | `js/content_bridge.js:13499` | 66 | 2391 | `03861f56c173757f479e0863d16fab83df5ba180e5d21d8adb37cdf0b5fcb490` |
-| `stateManagerToggleChannelFilterAll` | `js/state_manager.js:1892` | 34 | 988 | `b7028d96e93e5b89cfcf68d83d09256c9b06888a3b5b0ee181e6165f74318298` |
-| `stateManagerToggleKidsChannelFilterAll` | `js/state_manager.js:968` | 36 | 1188 | `f798f6b4a379f1101dea3b1777b046e2631ea1ab032b01b56716dc09878b72ac` |
+| `backgroundToggleChannelFilterAllReceiver` | `js/background.js:7129` | 14 | 413 | `7e15cc800cdde69487959513b30d2cfab29c55f9b1caa566f96b99bcb844c94e` |
+| `backgroundHandleToggleChannelFilterAll` | `js/background.js:8265` | 115 | 4346 | `fb6605fa4f172708f0eceacbbc21f9cf99ba0c3c9ca8ee2177e60bb1dab65ee6` |
+| `contentBridgeAddFilterAllContentCheckbox` | `js/content_bridge.js:14915` | 67 | 2525 | `a9c6c874a5e2a8b527d4ba3fcbb7e6957cc3d6210fdd61af5ad6d1d7102a8cb1` |
+| `stateManagerToggleChannelFilterAll` | `js/state_manager.js:2310` | 34 | 988 | `b7028d96e93e5b89cfcf68d83d09256c9b06888a3b5b0ee181e6165f74318298` |
+| `stateManagerToggleKidsChannelFilterAll` | `js/state_manager.js:1254` | 40 | 1419 | `768f37c9efb5ad5071f5ce96b965c402edb9622001368a0be48b59a5a49069a2` |
 
 ## Selected Token Counts
 
@@ -55,16 +55,16 @@ The reduced source blocks contain:
 | `whitelistChannels` | 0 |
 | `blockedChannels` | 8 |
 | `ftProfilesV3` | 1 |
-| `FT_PROFILES_V4_KEY` | 3 |
+| `FT_PROFILES_V4_KEY` | 4 |
 | `currentSettings` | 0 |
-| `filterAll` | 18 |
+| `filterAll` | 21 |
 | `filterAllComments` | 1 |
 | `channelId` | 6 |
 | `channelData` | 4 |
 | `message.channelId` | 1 |
 | `message.value` | 1 |
 | `isTrustedUiSender` | 0 |
-| `isProfileSessionAuthorized` | 0 |
+| `isProfileSessionAuthorized` | 1 |
 | `storage.local.get` | 1 |
 | `storage.local.set` | 1 |
 | `compiledSettingsCache.main = null` | 1 |
@@ -78,7 +78,7 @@ The reduced source blocks contain:
 | `persistKidsProfiles` | 1 |
 | `notifyListeners` | 2 |
 | `isUiLocked` | 2 |
-| `profile` | 10 |
+| `profile` | 22 |
 | `kids` | 20 |
 | `main` | 8 |
 | `querySelector` | 4 |
@@ -133,3 +133,11 @@ Focused command:
 ```bash
 node --test tests/runtime/filter-all-toggle-list-target-current-behavior.test.mjs --test-reporter=spec
 ```
+
+## Revalidation - 2026-10-18
+
+Source fingerprints and bounded extraction inventories were refreshed against the current checkout after source review. These are drift detectors, not exhaustive semantic proof, installed-browser evidence, or approval of the broader missing-authority gates. Executable fixtures below remain the behavior checks.
+
+## Authorization Revalidation - 2026-10-18
+
+The current background helper checks the active profile session before mutation. The runtime fixture loads the actual verifier/session helper chain and verifies `profile_locked` with zero storage writes, alongside the unlocked positive and missing-channel controls. This does not resolve the separately documented absence of an explicit profile/list target in the checkbox message.

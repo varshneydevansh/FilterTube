@@ -1,5 +1,6 @@
 import fs from 'node:fs';
 import path from 'node:path';
+import vm from 'node:vm';
 import test from 'node:test';
 import assert from 'node:assert/strict';
 
@@ -45,22 +46,13 @@ function assertPostReleaseListModeAliasSnapshot(doc) {
     'kids: {'
   );
 
-  assert.match(doc, /Post-Release List-Mode And Alias Snapshot - 2026-05-27/);
-  assert.match(doc, /background list-mode copy flag read tokens: 1/);
-  assert.match(doc, /background list-mode copy flag behavior branches: 0/);
-  assert.match(doc, /canonical Main keyword precedence rows: 1/);
-  assert.match(doc, /canonical Main channel precedence rows: 1/);
-  assert.match(doc, /shared save blocklist alias mirror rows: 2/);
-  assert.match(doc, /blocklist\/whitelist behavior approval from this addendum: NO-GO/);
-  assert.match(doc, /runtime behavior changed by this addendum: no/);
-  assert.match(doc, /\| `list_mode_copy_flag_read` \| `js\/background\.js:3304` \|/);
-  assert.match(doc, /\| `list_mode_whitelist_merge` \| `js\/background\.js:3451-3453` \|/);
-  assert.match(doc, /\| `main_keyword_canonical_before_alias` \| `js\/background\.js:2057-2066` \|/);
-  assert.match(doc, /\| `main_channel_canonical_before_alias` \| `js\/background\.js:2214-2224` \|/);
-  assert.match(doc, /\| `shared_save_blocklist_alias_mirror` \| `js\/settings_shared\.js:922-927` \|/);
-
-  assert.equal(countLiteral(setMode, 'shouldCopyBlocklist'), 1);
-  assert.equal(countLiteral(setMode, 'if (shouldCopyBlocklist'), 0);
+  assert.match(doc, /List-Mode Revalidation - 2026-10-18/);
+  assert.match(doc, /copyBlocklist:false preserves both saved lists/);
+  assert.match(doc, /copyBlocklist:true merges deduplicated copies into the allowlist/);
+  assert.match(doc, /This revalidation does not establish a shared mutation authority/);
+  assert.equal(countLiteral(setMode, 'shouldCopyBlocklist'), 3);
+  assert.match(setMode, /if \(requestedMode === 'whitelist' && shouldCopyBlocklist\)/);
+  assert.doesNotMatch(setMode, /mergeAndClearBlocklistIntoWhitelist/);
   assert.ok(keywordAlias.indexOf('activeMain.keywords') < keywordAlias.indexOf('activeMain.blockedKeywords'));
   assert.ok(channelAlias.indexOf('activeMain.channels') < channelAlias.indexOf('activeMain.blockedChannels'));
   assert.match(sharedSave, /channels: sanitizedChannels/);
@@ -312,7 +304,7 @@ test('settings compile currently passes raw content and category objects without
   const compiler = sliceBetween(
     text,
     'async function getCompiledSettings(sender = null, profileType = null, forceRefresh = false)',
-    'function shouldSuppressFirstRunPromptInjectionError'
+    'function shouldShowUpdateRefreshPrompt'
   );
   const contentCategoryBlock = sliceBetween(
     compiler,
@@ -353,7 +345,8 @@ test('list-mode and alias behavior prefers canonical Main keyword and channel ro
   );
 
   assert.match(setMode, /const shouldCopyBlocklist = request\?\.copyBlocklist === true/);
-  assert.match(setMode, /if \(requestedMode === 'whitelist'\) \{\s*mergeAndClearBlocklistIntoWhitelist\(requestedProfile\);/);
+  assert.match(setMode, /if \(requestedMode === 'whitelist' && shouldCopyBlocklist\) \{/);
+  assert.doesNotMatch(setMode, /mergeAndClearBlocklistIntoWhitelist/);
   assert.match(keywordAlias, /Array\.isArray\(activeMain\.keywords\)/);
   assert.match(keywordAlias, /Array\.isArray\(activeMain\.blockedKeywords\)/);
   assert.ok(keywordAlias.indexOf('activeMain.keywords') < keywordAlias.indexOf('activeMain.blockedKeywords'));
@@ -364,4 +357,69 @@ test('list-mode and alias behavior prefers canonical Main keyword and channel ro
   assert.match(sharedSave, /keywords: sanitizedKeywords/);
   assert.match(settingsShared, /nextMainProfile\.blockedChannels = sanitizedChannels;/);
   assert.match(settingsShared, /nextMainProfile\.blockedKeywords = sanitizedKeywords;/);
+});
+
+// Execute the actual message-action branch and actual PIN authorization helpers.
+async function setListModeFixture(profileType, copyBlocklist, { locked = false } = {}) {
+  const background = source('js/background.js');
+  const branch = sliceBetween(background,
+    "} else if (action === 'FilterTube_SetListMode')",
+    "} else if (action === 'addWhitelistChannelPersistent')");
+  const blocked = { channels: [{ id: 'UCblocked', name: 'Blocked' }], keywords: [{ word: 'blocked' }] };
+  const allowed = { whitelistChannels: [{ id: 'UCallowed', name: 'Allowed' }], whitelistKeywords: [{ word: 'allowed' }] };
+  const profile = {
+    name: 'Parent', type: 'parent', settings: {},
+    main: { mode: 'blocklist', ...blocked, ...allowed },
+    kids: { mode: 'blocklist', blockedChannels: blocked.channels, blockedKeywords: blocked.keywords, ...allowed },
+    ...(locked ? { security: { masterPinVerifier: { salt: 'salt', hash: 'hash' } } } : {})
+  };
+  const root = { schemaVersion: 4, activeProfileId: 'parent', profiles: { parent: profile } };
+  const writes = [];
+  let resolveResponse;
+  const response = new Promise(resolve => { resolveResponse = resolve; });
+  const context = vm.createContext({
+    console, Date, Map, Set, action: 'FilterTube_SetListMode', DEFAULT_PROFILE_ID: 'parent', FT_PROFILES_V4_KEY: 'ftProfilesV4',
+    sessionPinCache: new Map(), request: { mode: 'whitelist', profileType, copyBlocklist }, sender: {},
+    sendResponse: resolveResponse, isTrustedUiSender: () => true,
+    getActiveSelfControlSession: async () => null,
+    storageGet: async () => ({ ftProfilesV4: structuredClone(root) }),
+    isValidProfilesV4: value => value?.schemaVersion === 4,
+    compiledSettingsCache: { main: {}, kids: {} }, scheduleAutoBackupInBackground() {},
+    browserAPI: { storage: { local: { async set(value) { writes.push(structuredClone(value)); } } }, tabs: { query(_, callback) { callback([]); } } }
+  });
+  for (const name of ['safeObject', 'safeArray', 'normalizeString', 'extractPinVerifierFromProfilesV4', 'isSessionPinCacheEntryFresh', 'isProfileSessionAuthorized']) {
+    const start = background.indexOf(`function ${name}(`);
+    const end = background.indexOf('\n}', start) + 2;
+    assert.ok(start >= 0 && end > start, `actual helper ${name}`);
+    vm.runInContext(background.slice(start, end), context);
+  }
+  vm.runInContext(`(function(){ if(false){ ${branch} } })()`, context);
+  return { result: await response, writes, root };
+}
+
+for (const profileType of ['main', 'kids']) {
+  for (const copy of [false, true]) {
+    test(`actual ${profileType} mode transition copies only on opt-in (${copy}) and retains block rules`, async () => {
+      const { result, writes, root } = await setListModeFixture(profileType, copy);
+      assert.equal(result.ok, true);
+      assert.equal(result.copiedBlocklist, copy);
+      assert.equal(writes.length, 1);
+      const saved = writes[0].ftProfilesV4.profiles.parent;
+      const scope = saved[profileType];
+      assert.equal(scope.mode, 'whitelist');
+      assert.deepEqual(scope[profileType === 'main' ? 'channels' : 'blockedChannels'], root.profiles.parent[profileType][profileType === 'main' ? 'channels' : 'blockedChannels']);
+      assert.deepEqual(scope[profileType === 'main' ? 'keywords' : 'blockedKeywords'], root.profiles.parent[profileType][profileType === 'main' ? 'keywords' : 'blockedKeywords']);
+      assert.equal(scope.whitelistChannels.length, copy ? 2 : 1);
+      assert.equal(scope.whitelistKeywords.length, copy ? 2 : 1);
+      assert.equal(scope.whitelistChannels[0].id, 'UCallowed');
+      if (copy) assert.equal(scope.whitelistChannels[1].modeBootstrapCopy, true);
+      assert.deepEqual(saved[profileType === 'main' ? 'kids' : 'main'], root.profiles.parent[profileType === 'main' ? 'kids' : 'main']);
+      if (profileType === 'main') assert.deepEqual(writes[0].filterChannels, root.profiles.parent.main.channels);
+    });
+  }
+}
+test('actual mode transition still rejects a locked profile without writing', async () => {
+  const { result, writes } = await setListModeFixture('main', true, { locked: true });
+  assert.equal(result.errorCode, 'profile_locked');
+  assert.equal(writes.length, 0);
 });

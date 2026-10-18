@@ -25,8 +25,8 @@ This boundary matters for whitelist optimization and first-class JSON filtering 
 
 | Source file | Lines | Bytes | SHA-256 |
 | --- | ---: | ---: | --- |
-| `js/content_bridge.js` | 13,636 | 604,184 | `8d55d0c8995e5b68bb9142c41f95046a676f5af2b83f8545b00f91a6a5a3776d` |
-| `js/content/dom_fallback.js` | 5,030 | 235,555 | `fdc4391aed06849c1ba0a9afbb5b05e5e115b0929639e7014738d1462bf13ec5` |
+| `js/content_bridge.js` | 15,053 | 678,250 | `c653324d1f042c0473cf2102d81bcd161bfaa26f8c7ee545e250226594dc9618` |
+| `js/content/dom_fallback.js` | 8,172 | 380,506 | `df11dc69db7f7b8818c8dceb1d237d1794c8687af161dc2b9ae9d12acaed9e16` |
 
 content bridge whitelist pending refresh source files pinned: 2
 
@@ -34,15 +34,15 @@ content bridge whitelist pending refresh source files pinned: 2
 
 | Block | Source | Start line | Lines | Bytes | SHA-256 |
 | --- | --- | ---: | ---: | ---: | --- |
-| `contentBridgeRightRailWhitelistObserver` | `js/content_bridge.js:1219` | 1,219 | 98 | 3,091 | `86779f97ba7a65ebe61da86d414b1b3027b916fdc75163053b9dd3b58bcf4976` |
-| `contentBridgeInitializeFallbackThrottle` | `js/content_bridge.js:6150` | 6,150 | 61 | 2,530 | `60dd75d21580e8c390faed79594521478442789f7e0f3dd5195a1cb9c22fa926` |
-| `contentBridgeWhitelistPendingQueue` | `js/content_bridge.js:6211` | 6,211 | 69 | 4,081 | `9b0cbad3e54891d06ef96a1c9d8010e4f3dbc3ca9b5c595865d7b86fec31ee74` |
-| `contentBridgeWhitelistPendingApply` | `js/content_bridge.js:6280` | 6,280 | 112 | 5,829 | `2ff0a4ef33bdaf0acde1b27bf31d8d026f675702adae2bbc03692c213c266ad8` |
-| `contentBridgeFallbackMutationObserver` | `js/content_bridge.js:6392` | 6,392 | 138 | 5,567 | `dab8f75188fa2468fca2add028355f0ba1b70d45ed133c37fd2affe02c028df8` |
-| `domFallbackOnlyWhitelistPendingSelector` | `js/content/dom_fallback.js:2505` | 2,505 | 12 | 468 | `29ac6ab76923722538fb7004f088bda03416d9da1a80c88ef8698f0c96e5e16d` |
-| `domFallbackWhitelistPendingStateReset` | `js/content/dom_fallback.js:2686` | 2,686 | 54 | 3,079 | `1f4523c7359119a8c375614e4fb739f5656ad8186573ea20e6de21ca492f4402` |
-| `domFallbackWhitelistPendingIdentityHide` | `js/content/dom_fallback.js:3841` | 3,841 | 16 | 960 | `db535d5bb1b6d0f6c2e3913e008ab1d67479982ec3155788821410a66b2eb7c1` |
-| `domFallbackOnlyWhitelistPendingReturn` | `js/content/dom_fallback.js:4139` | 4,139 | 4 | 83 | `438296f1dbec1d892317f6177e74323886b6830fd0697eb1b1c12e4779776ad0` |
+| `contentBridgeRightRailWhitelistObserver` | `js/content_bridge.js:1437` | 1,437 | 98 | 3,094 | `f657ce4b4b8ba815a4149d3508ebec0445450bf49c74478c0e2169da4c679bc4` |
+| `contentBridgeInitializeFallbackThrottle` | `js/content_bridge.js:7141` | 7,141 | 255 | 12,647 | `f7ffef2af0d96ca65b0166b8940b15d46f8fd7a222940ae856fad8ee68562a52` |
+| `contentBridgeWhitelistPendingQueue` | `js/content_bridge.js:7396` | 7,396 | 70 | 4,159 | `3181b672c5d3a1a558baa5b0dbb175c05f7d966b908b835ae7c216ebc7eaa86b` |
+| `contentBridgeWhitelistPendingApply` | `js/content_bridge.js:7466` | 7,466 | 112 | 5,829 | `2ff0a4ef33bdaf0acde1b27bf31d8d026f675702adae2bbc03692c213c266ad8` |
+| `contentBridgeFallbackMutationObserver` | `js/content_bridge.js:7578` | 7,578 | 217 | 9,542 | `644e542cd718856d5a3d447c3ecce919cf66cbad4bb0373efc61da62b3df09b9` |
+| `domFallbackOnlyWhitelistPendingSelector` | `js/content/dom_fallback.js:5403` | 5,403 | 19 | 950 | `7235b5ea6e0689ab98e3e2e21e02e37d95b52675bc16a7c5bffa56b50c905894` |
+| `domFallbackWhitelistPendingStateReset` | `js/content/dom_fallback.js:5666` | 5,666 | 74 | 4,342 | `7f374fecc191fc37bbef5af4e05b040ff3b3b2e0585baec5f8036b1d4f4c7c6f` |
+| `domFallbackWhitelistPendingIdentityHide` | `js/content/dom_fallback.js:6949` | 6,949 | 16 | 993 | `2352973b418feb0a4da5f8b71c11940d6a0292b6bdb5db511262db89889c1f17` |
+| `domFallbackOnlyWhitelistPendingReturn` | `js/content/dom_fallback.js:7244` | 7,244 | 4 | 83 | `438296f1dbec1d892317f6177e74323886b6830fd0697eb1b1c12e4779776ad0` |
 
 content bridge whitelist pending refresh source/effect blocks pinned: 9
 
@@ -63,8 +63,8 @@ Counts below are over the pinned source/effect blocks, not whole files.
 | `data-filtertube-whitelist-pending` | 6 |
 | `filtertube-hidden` | 10 |
 | `data-filtertube-hidden` | 4 |
-| `forceReprocess: true` | 1 |
-| `preserveScroll: true` | 2 |
+| `forceReprocess: true` | 2 |
+| `preserveScroll: true` | 3 |
 | `setTimeout` | 6 |
 | `requestAnimationFrame` | 1 |
 | `MutationObserver` | 11 |
@@ -74,15 +74,15 @@ Counts below are over the pinned source/effect blocks, not whole files.
 | `isFilterTubeNativeOverlayQuietMode` | 8 |
 | `currentSettings?.listMode` | 6 |
 | `listMode !== 'whitelist'` | 5 |
-| `path === '/'` | 2 |
-| `path === '/results'` | 2 |
+| `path === '/'` | 3 |
+| `path === '/results'` | 3 |
 | `path === '/feed/channels'` | 2 |
-| `path.startsWith('/watch')` | 2 |
-| `VIDEO_CARD_SELECTORS` | 7 |
+| `path.startsWith('/watch')` | 3 |
+| `VIDEO_CARD_SELECTORS` | 15 |
 | `queuePrefetchForCard` | 1 |
-| `data-filtertube-processed` | 6 |
-| `data-filtertube-last-processed-id` | 5 |
-| `clearCachedChannelMetadata` | 4 |
+| `data-filtertube-processed` | 7 |
+| `data-filtertube-last-processed-id` | 6 |
+| `clearCachedChannelMetadata` | 5 |
 | `hasExplicitHideReasonMarker` | 1 |
 | `applyDOMFallback(null, { preserveScroll: true, onlyWhitelistPending: true })` | 1 |
 | `hasActiveFallbackLifecycleWork` | 3 |
@@ -256,3 +256,7 @@ This file does not close the implementation gate. Content bridge whitelist pendi
 - fixture provenance for pending identity, selected playlist rows, nested card containers, and route exclusions.
 
 No `contentBridgeWhitelistPendingRefreshContract`, `contentBridgeWhitelistPendingRefreshReport`, `whitelistPendingHideQueueBudget`, `whitelistPendingPlaceholderPolicy`, `whitelistPendingObserverOwnerReport`, `whitelistPendingRouteExclusionPolicy`, `whitelistPendingRerunBudgetReport`, `whitelistPendingDomFallbackConsumerParity`, `whitelistPendingFixtureProvenance`, or `whitelistPendingMetricArtifact` exists in product runtime source yet.
+
+## Revalidation - 2026-10-18
+
+Source fingerprints and bounded extraction inventories were refreshed against the current checkout after source review. These are drift detectors, not exhaustive semantic proof, installed-browser evidence, or approval of the broader missing-authority gates. Executable fixtures below remain the behavior checks.

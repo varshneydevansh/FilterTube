@@ -131,3 +131,24 @@ These counts are audit-only blockers. They do not approve runtime
 optimization, JSON-first behavior, release package behavior, public release
 claims, prompt release overlays, raw-capture packaging, whitelist behavior,
 metric collectors, artifact creation, native sync, or release publication.
+
+
+## October 18, 2026 consumer review
+
+The May byte/count snapshot above is historical. Current checks validate unique version entries and package/manifest equality, then execute the actual payload builder for localized text, partial-catalog English fallback, absent versions and loader failure. Opt-out and acknowledgement paths remain required. Relative consumer ordering replaces obsolete fixed manifest indices. This is not installed-browser, native, translation-completeness or release-publishing proof.
+
+
+The schema check treats only a standalone, nonempty `_comment` object as
+metadata; every other record must have a nonempty string version and the
+required release fields. Negative fixtures reject missing, blank, non-string,
+and disguised metadata versions rather than silently filtering them out.
+
+The consumer fixture also executes the actual background Check/Ack branches
+with storage and payload-building dependencies stubbed. It verifies opt-out
+and already-seen responses without writes, reuse of an unseen cached payload
+without rebuilding, preparation and caching when needed, and acknowledgement
+that stores the trimmed requested/current version while clearing the payload.
+The actual `onInstalled` listener is executed separately: install marks the
+current version seen with no payload, whereas update prepares its payload and
+does not mark it seen. These are local VM behavior checks, not browser startup,
+storage-provider, visual prompt, or publication acceptance.

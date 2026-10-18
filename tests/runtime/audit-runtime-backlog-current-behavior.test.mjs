@@ -181,7 +181,7 @@ test('audit runtime backlog remains explicit and outside release-lane completion
   assert.match(matrix, new RegExp(backlogPath.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')));
   assert.match(matrix, /full historical runtime audit/);
   assert.match(matrix, /broad backlog suite, not the default per-change release lane/);
-  assert.match(matrix, /audit:runtime` stays the inventory to retire or refresh/);
+  assert.match(matrix, /audit:runtime` stays the inventory to retire or\s+refresh/);
 });
 
 test('audit runtime backlog names the broad failure clusters that still require smaller proof batches', () => {

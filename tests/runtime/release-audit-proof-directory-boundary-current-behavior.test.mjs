@@ -23,7 +23,9 @@ function git(args) {
 }
 
 function trackedMarkdownFiles() {
-  return git(['ls-files'])
+  // Validate the reviewable working tree before staging, including newly moved proof.
+  return git(['ls-files', '--cached', '--others', '--exclude-standard'])
+    .filter(file => fs.existsSync(path.join(repoRoot, file)))
     .filter(file => file.endsWith('.md'))
     .sort();
 }

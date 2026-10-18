@@ -2,6 +2,7 @@ import fs from 'node:fs';
 import path from 'node:path';
 import test from 'node:test';
 import assert from 'node:assert/strict';
+import vm from 'node:vm';
 
 const repoRoot = process.cwd();
 const docPath = 'docs/audit/FILTERTUBE_BUILD_RELEASE_METHOD_SEMANTIC_REGISTER_2026-05-21.md';
@@ -40,34 +41,46 @@ function escapeRegExp(text) {
 }
 
 function groupForName(name) {
-  if (['filterFunc', 'main', 'ensureCollabDialogScriptOrder', 'createZip'].includes(name)) {
-    return 'buildPackageAssembly';
-  }
-  if ([
-    'maybeCollectMobileArtifacts',
-    'resolveMobileArtifactPromptDir',
-    'resolveDefaultMobileArtifactsDir',
-    'parseMobileArtifactName',
-    'summarizeMobileArtifacts',
-    'selectLatestMobileArtifacts',
-    'extractAndroidVersionCode',
-    'sha256File'
-  ].includes(name)) {
-    return 'buildMobileArtifactStaging';
-  }
-  if (['maybePromptRelease', 'extractLatestChangelogEntry', 'deriveSubtitle', 'buildReleaseTitle', 'buildReleaseBody', 'assetLink', 'releaseAssetLink'].includes(name)) {
-    return 'buildReleasePromptAndBody';
-  }
-  if (['createGitHubRelease', 'uploadReleaseAsset', 'contentTypeForAsset', 'httpRequest'].includes(name)) {
-    return 'buildGitHubReleaseTransport';
-  }
-  if (['promptYesNo', 'promptText'].includes(name)) {
-    return 'buildInteractivePromptHelpers';
-  }
-  if (['updateReadmeBadges', 'formatLoC', 'shouldCountInTotalLoC', 'sumFileLines'].includes(name)) {
-    return 'buildReadmeBadgeAndLocMutation';
-  }
-  return 'UNCLASSIFIED';
+  return {
+  "filterFunc": "buildPackageAssembly",
+  "main": "buildPackageAssembly",
+  "buildTargets": "buildPackageAssembly",
+  "onExit": "buildPackageAssembly",
+  "onInterrupt": "buildPackageAssembly",
+  "onTerminate": "buildPackageAssembly",
+  "ensureCollabDialogScriptOrder": "buildPackageAssembly",
+  "createZip": "buildPackageAssembly",
+  "maybeCollectMobileArtifacts": "buildMobileArtifactStaging",
+  "resolveMobileArtifactPromptDir": "buildMobileArtifactStaging",
+  "resolveDefaultMobileArtifactsDir": "buildMobileArtifactStaging",
+  "parseMobileArtifactName": "buildMobileArtifactStaging",
+  "summarizeMobileArtifacts": "buildMobileArtifactStaging",
+  "describeAvailableMobileArtifacts": "buildMobileArtifactStaging",
+  "selectLatestMobileArtifacts": "buildMobileArtifactStaging",
+  "extractAndroidVersionCode": "buildMobileArtifactStaging",
+  "sha256File": "buildMobileArtifactStaging",
+  "maybePromptRelease": "buildReleasePromptAndBody",
+  "extractLatestChangelogEntry": "buildReleasePromptAndBody",
+  "deriveSubtitle": "buildReleasePromptAndBody",
+  "buildReleaseTitle": "buildReleasePromptAndBody",
+  "buildReleaseBody": "buildReleasePromptAndBody",
+  "assetLink": "buildReleasePromptAndBody",
+  "releaseAssetLink": "buildReleasePromptAndBody",
+  "resolveGitHubToken": "buildGitHubReleaseTransport",
+  "githubCliEnv": "buildGitHubReleaseTransport",
+  "runGitHubCli": "buildGitHubReleaseTransport",
+  "githubReleaseExists": "buildGitHubReleaseTransport",
+  "createDraftGitHubRelease": "buildGitHubReleaseTransport",
+  "listGitHubReleaseAssetNames": "buildGitHubReleaseTransport",
+  "uploadGitHubReleaseAssets": "buildGitHubReleaseTransport",
+  "publishDraftGitHubRelease": "buildGitHubReleaseTransport",
+  "promptYesNo": "buildInteractivePromptHelpers",
+  "promptText": "buildInteractivePromptHelpers",
+  "updateReadmeBadges": "buildReadmeBadgeAndLocMutation",
+  "formatLoC": "buildReadmeBadgeAndLocMutation",
+  "shouldCountInTotalLoC": "buildReadmeBadgeAndLocMutation",
+  "sumFileLines": "buildReadmeBadgeAndLocMutation"
+}[name] || 'UNCLASSIFIED';
 }
 
 function methodRows() {
@@ -111,6 +124,58 @@ function sliceBetween(text, startNeedle, endNeedle) {
   return text.slice(start, end);
 }
 
+async function runReleaseFixture({ exists = false, incomplete = false, accept = true } = {}) {
+  const expected = ['browser.zip', 'mobile.apk'];
+  const calls = [];
+  const logs = [];
+  let uploaded = [];
+  const context = {
+    process: { stdout: { isTTY: true } }, path,
+    console: { log: (...args) => logs.push(args.join(' ')), error: (...args) => logs.push(args.join(' ')) },
+    promptYesNo: async () => accept,
+    resolveGitHubToken: () => ({ source: 'synthetic fixture' }),
+    extractLatestChangelogEntry: () => ({ section: 'Reviewed release changes' }),
+    buildReleaseBody: () => 'Synthetic release body', buildReleaseTitle: () => 'Synthetic release',
+    githubReleaseExists: () => exists,
+    createDraftGitHubRelease() { calls.push('create-draft'); },
+    listGitHubReleaseAssetNames() { calls.push('list-assets'); return uploaded; },
+    uploadGitHubReleaseAssets(_auth, _tag, assets) {
+      calls.push('upload-assets');
+      uploaded = incomplete ? [expected[0]] : assets.map(file => path.basename(file));
+    },
+    publishDraftGitHubRelease() { calls.push('publish-draft'); }
+  };
+  vm.runInContext(sliceBetween(source(), 'async function maybePromptRelease(', '\nfunction extractLatestChangelogEntry('),
+    vm.createContext(context));
+  await context.maybePromptRelease('0.0.0-fixture', ['/tmp/browser.zip'], ['/tmp/mobile.apk']);
+  return { calls, logs };
+}
+
+test('release workflow publishes a new draft only after upload and asset-name verification', async () => {
+  const result = await runReleaseFixture();
+  assert.deepEqual(result.calls, ['create-draft', 'list-assets', 'upload-assets', 'list-assets', 'publish-draft']);
+  assert.ok(result.logs.some(line => line.includes('Release published successfully')));
+});
+
+test('release workflow leaves an existing release visibility unchanged and does not claim publication', async () => {
+  const result = await runReleaseFixture({ exists: true });
+  assert.deepEqual(result.calls, ['list-assets', 'upload-assets', 'list-assets']);
+  assert.ok(result.logs.some(line => line.includes('visibility unchanged')));
+  assert.ok(result.logs.every(line => !line.includes('Release published successfully')));
+});
+
+test('release workflow incomplete uploads never publish or claim success', async () => {
+  const result = await runReleaseFixture({ incomplete: true });
+  assert.ok(!result.calls.includes('publish-draft'));
+  assert.ok(result.logs.some(line => line.includes('Release upload incomplete')));
+  assert.ok(result.logs.every(line => !line.includes('Release published successfully')));
+});
+
+test('release workflow cancellation performs no release operations', async () => {
+  const result = await runReleaseFixture({ accept: false });
+  assert.deepEqual(result.calls, []);
+});
+
 test('build release method semantic register is audit-only and source scoped', () => {
   const text = doc();
   const build = source();
@@ -119,15 +184,15 @@ test('build release method semantic register is audit-only and source scoped', (
   assert.match(text, /Extension runtime behavior is unchanged/);
   assert.match(text, /build prompt behavior changed/);
   assert.match(text, /source file: build\.js/);
-  assert.equal(sourceLineCount(build), 740);
-  assert.match(text, /line count: 740/);
-  assert.match(text, /named method\/helper\/callback declarations in scope: 29/);
-  assert.match(text, /plain function declarations: 21/);
-  assert.match(text, /async function declarations: 4/);
-  assert.match(text, /const arrow helper\/callback declarations: 4/);
+  assert.equal(sourceLineCount(build), 861);
+  assert.match(text, /line count: 861/);
+  assert.match(text, /named method\/helper\/callback declarations in scope: 38/);
+  assert.match(text, /plain function declarations: 26/);
+  assert.match(text, /async function declarations: 5/);
+  assert.match(text, /const arrow helper\/callback declarations: 7/);
   assert.match(text, /semantic method groups: 6/);
-  assert.match(text, /arrow token sites: 42/);
-  assert.match(text, /callback-like sites: 40/);
+  assert.match(text, /arrow token sites: 55/);
+  assert.match(text, /callback-like sites: 55/);
   assert.match(text, /runtime behavior changed: no/);
   assert.match(text, /build prompt behavior changed: yes/);
   assert.match(text, /not completion proof for package manifest authority/);
@@ -137,20 +202,20 @@ test('build release register accounts for every current method row', () => {
   const text = doc();
   const rows = methodRows();
 
-  assert.equal(rows.length, 29);
+  assert.equal(rows.length, 38);
   assert.deepEqual(countBy(rows, 'kind'), {
-    asyncFunction: 4,
-    constArrow: 4,
-    function: 21
-  });
+  "asyncFunction": 5,
+  "constArrow": 7,
+  "function": 26
+});
   assert.deepEqual(countBy(rows, 'group'), {
-    buildGitHubReleaseTransport: 4,
-    buildInteractivePromptHelpers: 2,
-    buildMobileArtifactStaging: 8,
-    buildPackageAssembly: 4,
-    buildReadmeBadgeAndLocMutation: 4,
-    buildReleasePromptAndBody: 7
-  });
+  "buildGitHubReleaseTransport": 8,
+  "buildInteractivePromptHelpers": 2,
+  "buildMobileArtifactStaging": 9,
+  "buildPackageAssembly": 8,
+  "buildReadmeBadgeAndLocMutation": 4,
+  "buildReleasePromptAndBody": 7
+});
 
   for (const row of rows) {
     assert.notEqual(row.group, 'UNCLASSIFIED', `${row.kind}:${row.name}:${row.line} should be classified`);
@@ -248,7 +313,7 @@ test('build release register preserves package release mobile and README behavio
   const main = sliceBetween(build, 'async function main()', 'function ensureCollabDialogScriptOrder');
   const mobile = sliceBetween(build, 'async function maybeCollectMobileArtifacts', 'function selectLatestMobileArtifacts');
   const release = sliceBetween(build, 'async function maybePromptRelease', 'function extractLatestChangelogEntry');
-  const github = sliceBetween(build, 'function createGitHubRelease', 'function promptYesNo');
+  const github = sliceBetween(build, 'function githubCliEnv', 'function promptYesNo');
   const readme = sliceBetween(build, 'async function updateReadmeBadges', 'function shouldCountInTotalLoC');
   const packageJson = readJson('package.json');
 
@@ -275,19 +340,19 @@ test('build release register preserves package release mobile and README behavio
 
   assert.match(release, /Non-interactive terminal detected; skipping release prompt/);
   assert.match(release, /No release assets produced; skipping release prompt/);
-  assert.match(release, /process\.env\.GITHUB_TOKEN/);
-  assert.match(release, /await createGitHubRelease\(token/);
-  assert.match(release, /for \(const assetPath of releaseAssetPaths\)/);
-  assert.match(release, /await uploadReleaseAsset\(token, uploadUrl, assetPath\)/);
+  assert.match(release, /resolveGitHubToken\(\)/);
+  assert.match(release, /createDraftGitHubRelease\(githubAuth/);
+  assert.match(release, /uploadGitHubReleaseAssets\(githubAuth, tagName, missingAssetPaths\)/);
+  assert.match(release, /const stillMissing = releaseAssetPaths/);
+  assert.match(release, /Release upload incomplete/);
+  assert.match(release, /if \(createdDraft\) \{\s*publishDraftGitHubRelease/);
   assert.match(release, /Failed to publish release/);
 
-  assert.match(github, /draft: false/);
-  assert.match(github, /prerelease: false/);
-  assert.match(github, /hostname: 'api\.github\.com'/);
-  assert.match(github, /path: `\/repos\/\$\{REPO_OWNER\}\/\$\{REPO_NAME\}\/releases`/);
-  assert.match(github, /https\.request\(uploadUrl, options, res =>/);
-  assert.match(github, /fs\.createReadStream\(filePath\)\.pipe\(req\)/);
-  assert.match(github, /new Error\(`Upload failed/);
+  assert.match(github, /'--draft'/);
+  assert.match(github, /'--draft=false'/);
+  assert.match(github, /'release', 'upload', tagName/);
+  assert.match(github, /'--json', 'assets'/);
+  assert.match(github, /execFileSync\('gh', args/);
 
   assert.match(readme, /execSync\('git ls-files'/);
   assert.match(readme, /readme\.replace\(/);
@@ -295,17 +360,17 @@ test('build release register preserves package release mobile and README behavio
   assert.match(readme, /Failed to update README badges/);
 
   for (const token of [
-    'package source directories: js, css, html, icons, data, assets',
+    'package source directories: _locales, js, css, html, icons, data, assets',
     'manifest repair scope: collab_dialog.js before content_bridge.js only',
-    'GitHub release mode: draft false and prerelease false',
-    'asset upload behavior: after public release creation, upload each path sequentially',
+    'GitHub release mode: new draft, verify asset names, publish only the newly created draft',
+    'asset upload behavior: upload missing paths, verify expected names, then publish only the newly created draft',
     'normal build mutates README badges before copying packages',
     'package roots are broad directories, not only manifest-referenced files',
     'ZIP creation is archive-glob based and does not emit a checksum manifest',
     'mobile checksum files are staged but not bound to signing fingerprint or package name proof',
     'non-interactive terminal skips release prompt and has no CI publish path',
-    'GitHub release is created as public before asset uploads start',
-    'asset upload failures are caught after public release creation and no rollback/delete path is present',
+    'GitHub release starts as draft before asset uploads start',
+    'asset upload failures leave a new draft unpublished; no rollback/delete path is present',
     'README badge mutation failures warn and continue'
   ]) {
     assert.ok(text.includes(token), `missing build release boundary token ${token}`);

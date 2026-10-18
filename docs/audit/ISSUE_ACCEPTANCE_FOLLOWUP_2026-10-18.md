@@ -17,4 +17,112 @@ The new regression group contains **34 passing checks**: five category-lifetime 
 - Post-deadline card tap followed by current-video admission, actual Firefox Android mobile/desktop rendering, installed BlockTube import/save/reopen and native/physical-device parity must not be inferred from VM tests or successful builds.
 - Argon Medium challenged deadline/tap behavior and recycled-card identity. The identity reset and explicit comment-list boundaries have executable coverage; the installed tap/admission scenario remains a device check. API proposals that truncated or misstated the contracts were rejected as validation.
 
-Broader audit-lane repairs and final package checks are recorded separately after their complete rerun. Historical source inventories remain historical; current source reviews do not promote missing security, semantic or physical-device proof.
+## Final source and package validation
+
+| Check | Passing/total | Reproduction |
+| --- | ---: | --- |
+| Smoke | 314/314 | `node scripts/run-test-lane.mjs smoke` |
+| Blocking | 299/299 | `node scripts/run-test-lane.mjs blocking` |
+| Release/package | 252/252 | `node scripts/run-test-lane.mjs release` |
+| New bug regressions | 34/34 | `Four new regression files listed below` |
+| Selected account/sync regression | 785/787 | `72 files listed below` |
+
+The smoke, blocking and release lanes now pass. Repairs classify previously unowned files, preserve seven relocated proof documents under `docs/audit`, correct source-extraction fixtures and obsolete contracts, and retain the distinction between lexical inventories and semantic/security proof. Independent review restored actual release-note Check/Ack/install/update behavior tests and malformed-record negative cases. No failure was converted into installed-device or security-completion evidence.
+
+All three local3.4.1 browser packages build. The package tests compare every ZIP entry with staged files and current source, compare manifests semantically, and reject duplicate/path errors. JSON duplicate-key validation (142files), UI catalog structure and release-note locale validation pass; catalog validity does not certify complete translation quality. The only production build-script change corrects a misleading success message when resuming an existing release: existing visibility stays unchanged, and no publication is claimed. The real workflow is tested with a stubbed GitHub command boundary; no release command was executed against GitHub.
+
+### Native boundary remains open
+
+The two remaining selected account/sync failures are in `managed-app-policy-contract-parity-current-behavior.test.mjs`. One expects an older Activity time-budget call chain, while the external app now delegates to `ManagedAppTimeBudgetSession`. The other detects stale native mirrors. Five of six checked managed helper mirrors differ from extension sources; all six extension helper sources are byte-identical to their task-start versions at `920ec56b`. These are separate downstream integration gates, not failures introduced by the three issue fixes. The native repository and existing TV emulator were not changed. The failing checks remain visible; their assertions were not suppressed or relabeled as passing.
+
+### Repeatable focused commands
+
+```sh
+node --test tests/runtime/category-pending-lifetime.test.mjs tests/runtime/category-pending-dom-pipeline.test.mjs tests/runtime/json-comment-explicit-keyword-scope-current-behavior.test.mjs tests/runtime/watch-selected-playlist-row-admission.test.mjs
+node scripts/check-json-keys.cjs
+node scripts/check-ui-locales.mjs
+node scripts/check-release-note-locales.mjs
+node build.js
+```
+
+Local logs are in `/tmp/filtertube-release-2026-10-18/`; the reporter's rules remain transient and are not committed. Historical source inventories remain historical; current source reviews do not promote missing security, semantic or physical-device proof.
+
+<details>
+<summary>Selected account/sync regression file list (72 files)</summary>
+
+```text
+tests/runtime/account-sync-initial-navigation-current-behavior.test.mjs
+tests/runtime/family-device-child-receive-copy-current-behavior.test.mjs
+tests/runtime/family-device-explicit-mode-transition-current-behavior.test.mjs
+tests/runtime/family-device-live-saved-coalescing-current-behavior.test.mjs
+tests/runtime/family-device-multiple-recipient-focus-current-behavior.test.mjs
+tests/runtime/family-device-navigation-current-behavior.test.mjs
+tests/runtime/family-device-personal-pairing-current-behavior.test.mjs
+tests/runtime/family-device-picker-actions-current-behavior.test.mjs
+tests/runtime/family-device-receiver-setup-guide-current-behavior.test.mjs
+tests/runtime/family-device-selection-preview-current-behavior.test.mjs
+tests/runtime/family-device-session-labels-current-behavior.test.mjs
+tests/runtime/family-device-tile-feedback-current-behavior.test.mjs
+tests/runtime/family-device-transfer-summary-current-behavior.test.mjs
+tests/runtime/managed-admin-authority-helper-current-behavior.test.mjs
+tests/runtime/managed-app-policy-contract-parity-current-behavior.test.mjs
+tests/runtime/managed-child-edit-initial-view-current-behavior.test.mjs
+tests/runtime/managed-child-edit-save-authorization-current-behavior.test.mjs
+tests/runtime/managed-child-local-authority-current-behavior.test.mjs
+tests/runtime/managed-child-time-limit-schema-current-behavior.test.mjs
+tests/runtime/managed-controls-extension-mvp-handoff-current-behavior.test.mjs
+tests/runtime/managed-delivery-provider-reference-current-behavior.test.mjs
+tests/runtime/managed-delivery-receipt-identity-roundtrip-current-behavior.test.mjs
+tests/runtime/managed-device-picker-delivery-current-behavior.test.mjs
+tests/runtime/managed-filter-save-feedback-current-behavior.test.mjs
+tests/runtime/managed-lan-discovery-lifecycle.test.mjs
+tests/runtime/managed-link-modal-disclosure-current-behavior.test.mjs
+tests/runtime/managed-local-network-provider-current-behavior.test.mjs
+tests/runtime/managed-locked-child-revision-gate-current-behavior.test.mjs
+tests/runtime/managed-nanah-live-signed-send-current-behavior.test.mjs
+tests/runtime/managed-nanah-open-sync-current-behavior.test.mjs
+tests/runtime/managed-nanah-pairing-key-descriptor-current-behavior.test.mjs
+tests/runtime/managed-nanah-signing-keypair-current-behavior.test.mjs
+tests/runtime/managed-overlays-localization-current-behavior.test.mjs
+tests/runtime/managed-parent-render-regression.test.mjs
+tests/runtime/managed-parent-ui-surface-current-behavior.test.mjs
+tests/runtime/managed-picker-actor-freshness-current-behavior.test.mjs
+tests/runtime/managed-pickup-provider-ownership-gate-current-behavior.test.mjs
+tests/runtime/managed-pickup-provider-ownership-generator-current-behavior.test.mjs
+tests/runtime/managed-policy-action-history-model-current-behavior.test.mjs
+tests/runtime/managed-policy-apply-current-behavior.test.mjs
+tests/runtime/managed-policy-encrypted-mailbox-protocol-current-behavior.test.mjs
+tests/runtime/managed-policy-schema-revision-contract-current-behavior.test.mjs
+tests/runtime/managed-policy-source-snapshot-current-behavior.test.mjs
+tests/runtime/managed-policy-sync-remote-delivery-readiness-gate-current-behavior.test.mjs
+tests/runtime/managed-policy-trust-freshness-current-behavior.test.mjs
+tests/runtime/managed-receipt-identity-current-behavior.test.mjs
+tests/runtime/managed-receiver-parent-namespace-current-behavior.test.mjs
+tests/runtime/managed-remote-transport-app-parity-gate-current-behavior.test.mjs
+tests/runtime/managed-saved-link-storage-journey-current-behavior.test.mjs
+tests/runtime/managed-time-budget-enforcement-current-behavior.test.mjs
+tests/runtime/managed-transport-provider-clients-current-behavior.test.mjs
+tests/runtime/managed-trust-revocation-cleanup-current-behavior.test.mjs
+tests/runtime/managed-validation-fresh-trust-context-current-behavior.test.mjs
+tests/runtime/managed-viewing-space-route-gate-current-behavior.test.mjs
+tests/runtime/nanah-child-receiver-session-copy-current-behavior.test.mjs
+tests/runtime/nanah-device-identity-persistence-current-behavior.test.mjs
+tests/runtime/nanah-device-policy-source-current-behavior.test.mjs
+tests/runtime/nanah-device-receipt-feedback-current-behavior.test.mjs
+tests/runtime/nanah-first-managed-source-current-behavior.test.mjs
+tests/runtime/nanah-first-update-parent-authorization-current-behavior.test.mjs
+tests/runtime/nanah-host-relay-readiness-current-behavior.test.mjs
+tests/runtime/nanah-live-receipt-concurrency-current-behavior.test.mjs
+tests/runtime/nanah-live-send-ui-callers-current-behavior.test.mjs
+tests/runtime/nanah-managed-shared-link-handshake-current-behavior.test.mjs
+tests/runtime/nanah-qr-scanner-current-behavior.test.mjs
+tests/runtime/nanah-storage-lock-current-behavior.test.mjs
+tests/runtime/nanah-trusted-backup-multiple-profile-current-behavior.test.mjs
+tests/runtime/nanah-trusted-link-persistence-current-behavior.test.mjs
+tests/runtime/profile-control-fresh-authorization-current-behavior.test.mjs
+tests/runtime/profile-maintenance-authorization-current-behavior.test.mjs
+tests/runtime/profile-options-render-current-behavior.test.mjs
+tests/runtime/profile-pin-row-save-authorization-current-behavior.test.mjs
+```
+
+</details>

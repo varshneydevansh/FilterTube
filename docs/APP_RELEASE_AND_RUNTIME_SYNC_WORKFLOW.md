@@ -16,8 +16,8 @@ parity.
 The 28-commit history from the v3.3.5 baseline is indexed in the public
 [changelog](../CHANGELOG.md), while the dated runtime contracts remain in
 [Functionality](FUNCTIONALITY.md), [Technical Documentation](TECHNICAL.md),
-[Category behavior](CATEGORY_FILTER_CURRENT_BEHAVIOR_2026-08-08.md),
-[Language behavior](LANGUAGE_FILTER_CURRENT_BEHAVIOR_2026-08-18.md), and the
+[Category behavior](audit/CATEGORY_FILTER_CURRENT_BEHAVIOR_2026-08-08.md),
+[Language behavior](audit/LANGUAGE_FILTER_CURRENT_BEHAVIOR_2026-08-18.md), and the
 [Self-Control audit](SELF_CONTROL_SESSION_SPEC_2026-08-17.md).
 
 ### Native synchronization boundary

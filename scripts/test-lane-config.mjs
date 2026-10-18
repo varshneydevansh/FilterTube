@@ -1,6 +1,5 @@
 // Static lane data for scripts/run-test-lane.mjs.
 // Keep this file declarative; execution belongs in the runner.
-
 export const MANUAL_YOUTUBE_SMOKE_LANE_REASONS = Object.freeze({
   release: 'release packaging, public claims, installed-extension parity, and artifact handoff behavior',
   whitelist: 'whitelist-only leaks, Shorts, watch/end-screen, Kids/YTM allow behavior',
@@ -11,7 +10,6 @@ export const MANUAL_YOUTUBE_SMOKE_LANE_REASONS = Object.freeze({
   performance: 'empty-rule/no-work and repeated YouTube SPA navigation responsiveness',
   settings: 'profile/mode/storage changes reprocessing already-rendered cards'
 });
-
 export const LIVE_SMOKE_ARTIFACT_TEMPLATE = 'docs/audit/artifacts/release-live-youtube-spa-smoke/template.json';
 export const LIVE_SMOKE_RUNNER_COMMAND = 'npm run smoke:youtube';
 export const LIVE_SMOKE_VERIFY_COMMAND =
@@ -138,7 +136,6 @@ export const MANAGED_NATIVE_RUNTIME_SYNC_HANDOFF_REQUIRED_ROWS = Object.freeze([
   'FT-NATIVE-SYNC-03-no-native-claim',
   'FT-NATIVE-SYNC-04-app-smoke-pending'
 ]);
-
 export const RUNTIME_FIXTURE_LANE_REASONS = Object.freeze({
   whitelist: 'whitelist allow/leak fixtures for touched YouTube surfaces',
   blocking: 'keyword/channel/comment hide-decision fixtures',
@@ -148,19 +145,16 @@ export const RUNTIME_FIXTURE_LANE_REASONS = Object.freeze({
   performance: 'empty-rule/no-work, SPA, timer, observer, or cache fixtures',
   settings: 'profile, storage, import/export, or compiled-mode fixtures'
 });
-
 export const AUDIT_PROOF_PATH_PATTERN = /^docs\/audit\//;
 export const RUNTIME_TEST_PROOF_PATH_PATTERN = /^tests\/runtime\/.*\.test\.mjs$/;
 export const RUNTIME_FIXTURE_PROOF_PATH_PATTERN = /^tests\/runtime\/(?:fixtures\/|harness\/|.*\.test\.mjs$)/;
 export const NON_PROOF_LANE = 'smoke';
-
 const FILTER_LOGIC_AUDIT_PROOF_TESTS = Object.freeze([
   'tests/runtime/filter-logic-direct-renderer-rule-semantic-register-current-behavior.test.mjs',
   'tests/runtime/filter-logic-method-semantic-register-current-behavior.test.mjs',
   'tests/runtime/filter-logic-rule-field-effect-semantic-register-current-behavior.test.mjs',
   'tests/runtime/filter-logic-rule-path-semantic-register-current-behavior.test.mjs'
 ]);
-
 export const LANES = Object.freeze({
   release: {
     description: 'Build, package, release docs, public claims, and artifact boundaries.',
@@ -232,6 +226,12 @@ export const LANES = Object.freeze({
   blocking: {
     description: 'Keyword, channel, comment, blocklist, list-target, and hide-decision behavior.',
     tests: [
+      'tests/runtime/watch-selected-playlist-row-admission.test.mjs',
+      'tests/runtime/category-pending-lifetime.test.mjs',
+      'tests/runtime/category-pending-dom-pipeline.test.mjs',
+      'tests/runtime/json-comment-explicit-keyword-scope-current-behavior.test.mjs',
+      'tests/runtime/minimum-view-count-current-behavior.test.mjs',
+      'tests/runtime/external-youtube-playback-guard-current-behavior.test.mjs',
       ...FILTER_LOGIC_AUDIT_PROOF_TESTS,
       'tests/runtime/filter-engine-current-behavior.test.mjs',
       'tests/runtime/keyword-match-authority-current-behavior.test.mjs',
@@ -253,6 +253,9 @@ export const LANES = Object.freeze({
   json: {
     description: 'JSON-first filtering, network interception, response mutation, list mode, and endpoint work gates.',
     tests: [
+      'tests/runtime/json-comment-explicit-keyword-scope-current-behavior.test.mjs',
+      'tests/runtime/minimum-view-count-current-behavior.test.mjs',
+      'tests/runtime/external-youtube-playback-guard-current-behavior.test.mjs',
       ...FILTER_LOGIC_AUDIT_PROOF_TESTS,
       'tests/runtime/seed-network-current-behavior.test.mjs',
       'tests/runtime/seed-fetch-no-work-list-mode-boundary-current-behavior.test.mjs',
@@ -316,6 +319,10 @@ export const LANES = Object.freeze({
   dom: {
     description: 'DOM fallback selectors, hide/restore state, cleanup passes, and recycled node behavior.',
     tests: [
+      'tests/runtime/watch-selected-playlist-row-admission.test.mjs',
+      'tests/runtime/category-pending-lifetime.test.mjs',
+      'tests/runtime/category-pending-dom-pipeline.test.mjs',
+      'tests/runtime/external-youtube-admission-overlay-current-behavior.test.mjs',
       ...FILTER_LOGIC_AUDIT_PROOF_TESTS,
       'tests/runtime/dom-fallback-method-semantic-register-current-behavior.test.mjs',
       'tests/runtime/dom-fallback-selector-semantic-register-current-behavior.test.mjs',
@@ -387,6 +394,13 @@ export const LANES = Object.freeze({
   settings: {
     description: 'Settings compile, profiles, storage refresh, migrations, import/export, backups, and sync boundaries.',
     tests: [
+      'tests/runtime/minimum-view-count-current-behavior.test.mjs',
+      'tests/runtime/minimum-views-controls-current-behavior.test.mjs',
+      'tests/runtime/nanah-storage-lock-current-behavior.test.mjs',
+      'tests/runtime/nanah-qr-scanner-current-behavior.test.mjs',
+      'tests/runtime/family-device-navigation-current-behavior.test.mjs',
+      'tests/runtime/ui-localization-runtime-current-behavior.test.mjs',
+      'tests/runtime/ui-localization-catalog-current-behavior.test.mjs',
       'tests/runtime/settings-shared-method-semantic-register-current-behavior.test.mjs',
       'tests/runtime/settings-mode-coverage-matrix-current-behavior.test.mjs',
       'tests/runtime/settings-mode-source-effect-current-behavior.test.mjs',
@@ -496,8 +510,15 @@ export const LANES = Object.freeze({
     ]
   }
 });
-
 export const FILE_LANE_RULES = Object.freeze([
+  { id: 'minimum-view-count-runtime', patterns: [/^js\/shared\/view_count\.js$/], lanes: ['blocking', 'whitelist', 'json', 'dom', 'settings', 'performance'] },
+  { id: 'external-playback-admission-runtime', patterns: [/^js\/content\/(?:external_youtube_guard|external_youtube_network|admission_overlay)\.js$/], lanes: ['release', 'blocking', 'whitelist', 'json', 'dom', 'performance', 'settings'] },
+  { id: 'ui-localization-catalogs', patterns: [/^(?:data\/ui_locales|_locales)\//], lanes: ['release', 'settings', 'smoke'] },
+  { id: 'localization-validation-tools', patterns: [/^scripts\/(?:audit-ui-copy\.py|(?:check|extract|merge)-(?:json-keys|ui-locales|release-note-locales|family-ui-fallbacks|static-ui-copy|ui-locale-batch|ui-locale-drafts)\.(?:mjs|cjs|py))$/], lanes: ['release', 'settings', 'smoke'] },
+  { id: 'family-device-evidence-tools', patterns: [/^scripts\/(?:create-family-device-(?:capture-checklist|evidence-packet)|import-family-device-downloaded-evidence|report-family-device-(?:phase11-status|phase12-status|provider-surface|release-readiness)|update-family-device-evidence-log|validate-family-device-evidence)\.mjs$/], lanes: ['release', 'settings', 'smoke'] },
+  { id: 'family-device-review-evidence', patterns: [/^docs\/design\/device-sync\//, /^docs\/audit\/(?:issue-safety-formal|artifacts\/responsive-settings-[^/]+|evidence\/family-devices-[^/]+)\//], lanes: ['release', 'settings', 'smoke'] },
+  { id: 'release-design-evidence', patterns: [/^docs\/design\/(?:ANDROID-PLAY-STORE-CTA-[^/]+\.md|store-listing-drafts\/)/, /^funding\.json$/], lanes: ['release', 'smoke'] },
+  { id: 'nanah-storage-lock-fixture', patterns: [/^tests\/runtime\/helpers\/nanah-storage-lock-fixture\.mjs$/], lanes: ['release', 'settings', 'smoke'] },
   {
     id: 'seed-json-runtime',
     patterns: [/^js\/seed\.js$/],
@@ -575,7 +596,7 @@ export const FILE_LANE_RULES = Object.freeze([
   },
   {
     id: 'extension-ui-runtime',
-    patterns: [/^js\/(?:popup|tab-view|render_engine|ui_components|managed_parent_command_center|rule_list_import_reports)\.js$/],
+    patterns: [/^js\/(?:popup|tab-view|render_engine|ui_components|managed_parent_command_center|rule_list_import_reports|family_device_navigation|ui_localization|ui_localization_boot|ui_static_copy_capture)\.js$/],
     lanes: ['release', 'whitelist', 'blocking', 'menu', 'settings', 'smoke']
   },
   {
@@ -583,36 +604,16 @@ export const FILE_LANE_RULES = Object.freeze([
     patterns: [/^js\/content_controls_catalog\.js$/],
     lanes: ['whitelist', 'blocking', 'json', 'dom', 'menu', 'performance', 'settings']
   },
-  {
-    id: 'nanah-sync-runtime',
-    patterns: [/^js\/nanah_sync_adapter\.js$/],
-    lanes: ['release', 'settings', 'smoke']
-  },
+  { id: 'nanah-sync-runtime', patterns: [/^js\/(?:nanah_sync_adapter|nanah_qr_scanner|nanah_storage_lock)\.js$/], lanes: ['release', 'settings', 'smoke'] },
   {
     id: 'nanah-managed-policy-runtime',
     patterns: [/^js\/nanah_managed_(?:live_policy|open_sync|mailbox_client|local_network_client)\.js$/],
     lanes: ['release', 'settings', 'smoke']
   },
-  {
-    id: 'managed-admin-authority-runtime',
-    patterns: [/^js\/managed_admin_authority\.js$/],
-    lanes: ['release', 'settings', 'smoke']
-  },
-  {
-    id: 'security-crypto-runtime',
-    patterns: [/^js\/security_manager\.js$/],
-    lanes: ['release', 'settings', 'smoke']
-  },
-  {
-    id: 'legacy-layout-quarantine',
-    patterns: [/^js\/layout\.js$/],
-    lanes: ['release', 'dom', 'smoke']
-  },
-  {
-    id: 'identity-runtime',
-    patterns: [/^js\/shared\/identity\.js$/, /^js\/content\/(?:dom_extractors|handle_resolver)\.js$/],
-    lanes: ['blocking', 'menu', 'whitelist']
-  },
+  { id: 'managed-admin-authority-runtime', patterns: [/^js\/managed_admin_authority\.js$/], lanes: ['release', 'settings', 'smoke'] },
+  { id: 'security-crypto-runtime', patterns: [/^js\/security_manager\.js$/], lanes: ['release', 'settings', 'smoke'] },
+  { id: 'legacy-layout-quarantine', patterns: [/^js\/layout\.js$/], lanes: ['release', 'dom', 'smoke'] },
+  { id: 'identity-runtime', patterns: [/^js\/shared\/identity\.js$/, /^js\/content\/(?:dom_extractors|handle_resolver)\.js$/], lanes: ['blocking', 'menu', 'whitelist'] },
   {
     id: 'extension-ui-build-helper-surface',
     patterns: [/^scripts\/build-extension-ui\.mjs$/, /^scripts\/verify-managed-app-policy-contract\.mjs$/],
@@ -620,12 +621,12 @@ export const FILE_LANE_RULES = Object.freeze([
   },
   {
     id: 'vendor-sync-build-helper-surface',
-    patterns: [/^scripts\/build-nanah-vendor\.mjs$/],
+    patterns: [/^scripts\/(?:build-nanah-vendor\.mjs|build-lock\.cjs)$/],
     lanes: ['release', 'settings', 'smoke']
   },
   {
     id: 'managed-delivery-reference-provider-surface',
-    patterns: [/^scripts\/managed-delivery-provider\.mjs$/],
+    patterns: [/^scripts\/managed-delivery-(?:provider|lan-discovery)\.mjs$/],
     lanes: ['release', 'settings', 'smoke']
   },
   {
@@ -633,11 +634,7 @@ export const FILE_LANE_RULES = Object.freeze([
     patterns: [/^manifest(?:\.[a-z]+)?\.json$/, /^build\.js$/, /^scripts\/build-.*\.mjs$/],
     lanes: ['release']
   },
-  {
-    id: 'root-metadata-surface',
-    patterns: [/^package(?:-lock)?\.json$/, /^\.gitignore$/],
-    lanes: ['release', 'smoke']
-  },
+  { id: 'root-metadata-surface', patterns: [/^package(?:-lock)?\.json$/, /^\.gitignore$/], lanes: ['release', 'smoke'] },
   {
     id: 'root-legal-doc-surface',
     patterns: [/^LICENSE$/],
@@ -753,7 +750,7 @@ export const FILE_LANE_RULES = Object.freeze([
   },
   {
     id: 'vendor-bundle-surface',
-    patterns: [/^js\/vendor\/.*\.bundle\.js$/],
+    patterns: [/^js\/vendor\/.*(?:\.bundle\.js|\.LICENSE\.txt)$/],
     lanes: ['release', 'settings', 'smoke']
   },
   {

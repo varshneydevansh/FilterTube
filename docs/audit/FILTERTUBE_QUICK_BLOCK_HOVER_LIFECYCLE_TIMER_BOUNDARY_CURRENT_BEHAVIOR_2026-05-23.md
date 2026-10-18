@@ -16,24 +16,24 @@ quick-block hover lifecycle timer source/effect blocks: 12
 
 | File | Lines | Bytes | SHA-256 |
 | --- | ---: | ---: | --- |
-| `js/content/block_channel.js` | 3189 | 127857 | `c040b57e0b107fd7b6fb0a18bc4ca014e5a22fbb82755f81e51a497eee387dba` |
+| `js/content/block_channel.js` | 3361 | 135050 | `f2a02886a83d64d93186cd1f0c1f300683ae49754b928d2e0329fd1a88d8f2c9` |
 
 ## Pinned Blocks
 
 | Block | Start Line | Lines | Bytes | SHA-256 |
 | --- | ---: | ---: | ---: | --- |
-| `quickBlockGlobals` | 80 | 22 | 1055 | `5c9dbc252a94d17b25e29e5c35233d551deeef0d8e1ee0e52c67c5065be9651d` |
-| `quickBlockSurfacePredicates` | 121 | 31 | 974 | `b0319db9efb0cb16f6dac8b450949df41542075f1eb4cd11be20db4e786d8dcf` |
-| `quickBlockOcclusionCache` | 237 | 73 | 2579 | `0a257411a4f81964972bfe4e340a65761e21e7548c325783ad8821072f74aa44` |
-| `quickBlockViewportPruning` | 310 | 150 | 4982 | `aa4a222d8d8c3fb28e25045189abc6682dd40427f61d5813d4a773f8c96b2fdf` |
-| `quickBlockViewportRefresh` | 932 | 97 | 3961 | `b136e450414bb439083d8dc505c6b92b70ceebbf600395d2523b22d5e59e67d2` |
-| `quickBlockHoverState` | 1029 | 67 | 2162 | `58f5cc099c0e78d55405794747e669a110d6f3f54425d91853f9e92058069dcc` |
-| `quickBlockCardTargetFastPath` | 1096 | 116 | 3885 | `1912076cdad42fd711131fadfe294de91970d226e08784b83f2c72fa42137500` |
-| `quickBlockActionFallback` | 1747 | 41 | 1668 | `155082c97c19e455c37dfca135618a0f88eaf2165493f1a5fbee86a92d0c60fe` |
-| `quickBlockWrapHoverEvents` | 1788 | 14 | 888 | `44533bcceeb20e45528a041e9a1770bd264c393f1872a458efc3ccea6fc8509c` |
-| `quickBlockEnsureButton` | 1802 | 150 | 6556 | `fc46ee05e9bfb3e63f057563c7c4a50d73dc43792f6b8da4b67fe62e460af78c` |
-| `quickBlockSweepSchedule` | 1952 | 41 | 1342 | `931331c0e6890d9a364b586463a46b255d17a7b7d5610de81dcf754bb96f2103` |
-| `quickBlockObserverSetup` | 1993 | 322 | 13896 | `cf6b14c4d67b40cdc33a0126b920c224ef184a60c361481b22c025c9328dffc5` |
+| `quickBlockGlobals` | 177 | 22 | 1055 | `5c9dbc252a94d17b25e29e5c35233d551deeef0d8e1ee0e52c67c5065be9651d` |
+| `quickBlockSurfacePredicates` | 218 | 31 | 974 | `b0319db9efb0cb16f6dac8b450949df41542075f1eb4cd11be20db4e786d8dcf` |
+| `quickBlockOcclusionCache` | 334 | 73 | 2579 | `0a257411a4f81964972bfe4e340a65761e21e7548c325783ad8821072f74aa44` |
+| `quickBlockViewportPruning` | 407 | 150 | 4982 | `aa4a222d8d8c3fb28e25045189abc6682dd40427f61d5813d4a773f8c96b2fdf` |
+| `quickBlockViewportRefresh` | 1054 | 97 | 3961 | `b136e450414bb439083d8dc505c6b92b70ceebbf600395d2523b22d5e59e67d2` |
+| `quickBlockHoverState` | 1151 | 67 | 2162 | `58f5cc099c0e78d55405794747e669a110d6f3f54425d91853f9e92058069dcc` |
+| `quickBlockCardTargetFastPath` | 1218 | 147 | 4983 | `90efbb1caa2fee3dba280f2adf5d65bf5b2b8ddb8bb213417d0bc41cb8f2b916` |
+| `quickBlockActionFallback` | 1904 | 41 | 1668 | `155082c97c19e455c37dfca135618a0f88eaf2165493f1a5fbee86a92d0c60fe` |
+| `quickBlockWrapHoverEvents` | 1945 | 14 | 888 | `44533bcceeb20e45528a041e9a1770bd264c393f1872a458efc3ccea6fc8509c` |
+| `quickBlockEnsureButton` | 1959 | 154 | 6647 | `4db14cfd089bf06df963e4b301b36df068f6c0e3eda47eec113fc7338185ac80` |
+| `quickBlockSweepSchedule` | 2113 | 41 | 1342 | `931331c0e6890d9a364b586463a46b255d17a7b7d5610de81dcf754bb96f2103` |
+| `quickBlockObserverSetup` | 2154 | 322 | 13896 | `cf6b14c4d67b40cdc33a0126b920c224ef184a60c361481b22c025c9328dffc5` |
 
 
 ## Selected Token Counts
@@ -388,3 +388,7 @@ optimization, JSON-first behavior, menu action behavior, dialog lifecycle
 behavior, injector behavior, quick-block behavior, whitelist behavior, metric
 collectors, artifact creation, native sync, release package changes, or public
 claims.
+
+## Revalidation - 2026-10-18
+
+Source fingerprints and bounded extraction inventories were refreshed against the current checkout after source review. These are drift detectors, not exhaustive semantic proof, installed-browser evidence, or approval of the broader missing-authority gates. Executable fixtures below remain the behavior checks.

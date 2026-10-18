@@ -5,11 +5,11 @@ This document provides a detailed reference of the key files and functions in th
 ## 2026-08-23 source-history map
 
 The complete post-v3.3.5 history is indexed in the [public changelog](../CHANGELOG.md),
-and the file-level evidence remains in the temporary [change ledger](POST_3_3_5_CHANGE_LEDGER_2026-08-23.md).
+and the file-level evidence remains in the temporary [change ledger](audit/POST_3_3_5_CHANGE_LEDGER_2026-08-23.md).
 The canonical implementation maps are distributed as follows:
 
-- filtering/admission and metadata scheduler: [FUNCTIONALITY.md](FUNCTIONALITY.md), [TECHNICAL.md](TECHNICAL.md), and [CATEGORY_FILTER_CURRENT_BEHAVIOR_2026-08-08.md](CATEGORY_FILTER_CURRENT_BEHAVIOR_2026-08-08.md);
-- spoken-language/original-audio experiments: [LANGUAGE_FILTER_CURRENT_BEHAVIOR_2026-08-18.md](LANGUAGE_FILTER_CURRENT_BEHAVIOR_2026-08-18.md) and [ORIGINAL_AUDIO_PREFERENCE_2026-08-18.md](ORIGINAL_AUDIO_PREFERENCE_2026-08-18.md);
+- filtering/admission and metadata scheduler: [FUNCTIONALITY.md](FUNCTIONALITY.md), [TECHNICAL.md](TECHNICAL.md), and [CATEGORY_FILTER_CURRENT_BEHAVIOR_2026-08-08.md](audit/CATEGORY_FILTER_CURRENT_BEHAVIOR_2026-08-08.md);
+- spoken-language/original-audio experiments: [LANGUAGE_FILTER_CURRENT_BEHAVIOR_2026-08-18.md](audit/LANGUAGE_FILTER_CURRENT_BEHAVIOR_2026-08-18.md) and [ORIGINAL_AUDIO_PREFERENCE_2026-08-18.md](ORIGINAL_AUDIO_PREFERENCE_2026-08-18.md);
 - current-player/direct-access admission: [CURRENT_VIDEO_ADMISSION_BEHAVIOR_2026-09-02.md](CURRENT_VIDEO_ADMISSION_BEHAVIOR_2026-09-02.md); user feedback, rule exceptions, and complete BlockTube migration: [USER_FEEDBACK_RULES_AND_GUIDANCE_SPEC_2026-08-08.md](USER_FEEDBACK_RULES_AND_GUIDANCE_SPEC_2026-08-08.md) and [SUBSCRIBED_CHANNELS_IMPORT.md](SUBSCRIBED_CHANNELS_IMPORT.md);
 - managed device/Pickup behavior: [NANAH_P2P_PROJECT_PLAN.md](NANAH_P2P_PROJECT_PLAN.md), [NANAH_USER_GUIDE.md](NANAH_USER_GUIDE.md), and [NANAH_MANAGED_LINK_QA.md](NANAH_MANAGED_LINK_QA.md);
 - website/app release surfaces and generated-runtime ownership: [WEBSITE_APP_RELEASE_SURFACE_CHANGELOG.md](WEBSITE_APP_RELEASE_SURFACE_CHANGELOG.md) and [APP_RELEASE_AND_RUNTIME_SYNC_WORKFLOW.md](APP_RELEASE_AND_RUNTIME_SYNC_WORKFLOW.md).

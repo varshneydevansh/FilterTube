@@ -457,7 +457,7 @@ test('managed policy action-history model is linked from plan and has protected 
   assert.match(read('js/nanah_managed_live_policy.js'), /filtertube_nanah_managed_live_ack/);
   assert.match(read('js/nanah_managed_live_policy.js'), /inboundManagedAckHistory/);
   assert.match(source, /function getNanahManagedPolicyScopeList\(value\)/);
-  assert.match(source, /historyBtn\.textContent = 'History'/);
+  assert.match(source, /historyBtn\.textContent = tabViewUiText\('family\.profileManager\.history', 'History'\)/);
   assert.doesNotMatch(source, /managedActionHistoryStore/);
 });
 

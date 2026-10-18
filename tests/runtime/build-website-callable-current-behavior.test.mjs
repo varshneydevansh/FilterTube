@@ -10,71 +10,274 @@ const buildSemanticDocPath = path.join(repoRoot, 'docs/audit/FILTERTUBE_BUILD_SC
 const buildSemanticDoc = fs.readFileSync(buildSemanticDocPath, 'utf8');
 
 const accountedFiles = [
-  'build.js',
-  'scripts/audit-proof-drift.mjs',
-  'scripts/build-extension-ui.mjs',
-  'scripts/build-nanah-vendor.mjs',
-  'scripts/run-test-lane.mjs',
-  'scripts/sync-native-runtime.mjs',
-  'scripts/test-lane-config.mjs',
-  'website/app/[slug]/page.js',
-  'website/app/downloads/page.js',
-  'website/app/layout.js',
-  'website/app/not-found.js',
-  'website/app/page.js',
-  'website/app/privacy/page.js',
-  'website/app/robots.js',
-  'website/app/sitemap.js',
-  'website/app/terms/page.js',
-  'website/components/browser-logo-rail.js',
-  'website/components/footer-signal-art.js',
-  'website/components/hero-video.js',
-  'website/components/marketing-ui.js',
-  'website/components/reveal.js',
-  'website/components/route-content.js',
-  'website/components/scene-controller.js',
-  'website/components/scenic-detail-page.js',
-  'website/components/scenic-illustration.js',
-  'website/components/scenic-tones.js',
-  'website/components/site-data.js',
-  'website/components/site-footer.js',
-  'website/components/site-header.js',
-  'website/components/site-shell-data.js',
-  'website/components/theme-toggle.js'
+  "build.js",
+  "scripts/audit-proof-drift.mjs",
+  "scripts/build-extension-ui.mjs",
+  "scripts/build-nanah-vendor.mjs",
+  "scripts/build-qr-scanner-vendor.mjs",
+  "scripts/check-release-note-locales.mjs",
+  "scripts/check-ui-locales.mjs",
+  "scripts/create-family-device-capture-checklist.mjs",
+  "scripts/create-family-device-evidence-packet.mjs",
+  "scripts/create-managed-app-parity-smoke-artifact.mjs",
+  "scripts/create-managed-extension-installed-smoke-artifact.mjs",
+  "scripts/create-managed-native-runtime-sync-handoff.mjs",
+  "scripts/create-managed-pickup-provider-ownership-artifact.mjs",
+  "scripts/extract-family-ui-fallbacks.mjs",
+  "scripts/import-family-device-downloaded-evidence.mjs",
+  "scripts/managed-delivery-lan-discovery.mjs",
+  "scripts/managed-delivery-provider.mjs",
+  "scripts/merge-ui-locale-batch.mjs",
+  "scripts/merge-ui-locale-drafts.mjs",
+  "scripts/report-family-device-phase11-status.mjs",
+  "scripts/report-family-device-phase12-status.mjs",
+  "scripts/report-family-device-provider-surface.mjs",
+  "scripts/report-family-device-release-readiness.mjs",
+  "scripts/run-test-lane.mjs",
+  "scripts/sync-native-runtime.mjs",
+  "scripts/test-lane-config.mjs",
+  "scripts/update-family-device-evidence-log.mjs",
+  "scripts/validate-family-device-evidence.mjs",
+  "scripts/verify-managed-app-policy-contract.mjs",
+  "website/app/[slug]/page.js",
+  "website/app/downloads/page.js",
+  "website/app/layout.js",
+  "website/app/not-found.js",
+  "website/app/page.js",
+  "website/app/privacy/page.js",
+  "website/app/robots.js",
+  "website/app/sitemap.js",
+  "website/app/terms/page.js",
+  "website/components/browser-logo-rail.js",
+  "website/components/footer-signal-art.js",
+  "website/components/hero-video.js",
+  "website/components/marketing-ui.js",
+  "website/components/reveal.js",
+  "website/components/route-content.js",
+  "website/components/scene-controller.js",
+  "website/components/scenic-detail-page.js",
+  "website/components/scenic-illustration.js",
+  "website/components/scenic-tones.js",
+  "website/components/site-data.js",
+  "website/components/site-footer.js",
+  "website/components/site-header.js",
+  "website/components/site-shell-data.js",
+  "website/components/theme-toggle.js"
 ];
 
 const expectedCounts = new Map([
-  ['build.js', 29],
-  ['scripts/audit-proof-drift.mjs', 12],
-  ['scripts/build-extension-ui.mjs', 2],
-  ['scripts/build-nanah-vendor.mjs', 4],
-  ['scripts/run-test-lane.mjs', 23],
-  ['scripts/sync-native-runtime.mjs', 0],
-  ['scripts/test-lane-config.mjs', 0],
-  ['website/app/[slug]/page.js', 3],
-  ['website/app/downloads/page.js', 3],
-  ['website/app/layout.js', 1],
-  ['website/app/not-found.js', 1],
-  ['website/app/page.js', 3],
-  ['website/app/privacy/page.js', 5],
-  ['website/app/robots.js', 1],
-  ['website/app/sitemap.js', 1],
-  ['website/app/terms/page.js', 1],
-  ['website/components/browser-logo-rail.js', 1],
-  ['website/components/footer-signal-art.js', 20],
-  ['website/components/hero-video.js', 2],
-  ['website/components/marketing-ui.js', 5],
-  ['website/components/reveal.js', 1],
-  ['website/components/route-content.js', 0],
-  ['website/components/scene-controller.js', 5],
-  ['website/components/scenic-detail-page.js', 3],
-  ['website/components/scenic-illustration.js', 3],
-  ['website/components/scenic-tones.js', 1],
-  ['website/components/site-data.js', 0],
-  ['website/components/site-footer.js', 2],
-  ['website/components/site-header.js', 3],
-  ['website/components/site-shell-data.js', 0],
-  ['website/components/theme-toggle.js', 8]
+  [
+    "build.js",
+    38
+  ],
+  [
+    "scripts/audit-proof-drift.mjs",
+    12
+  ],
+  [
+    "scripts/build-extension-ui.mjs",
+    2
+  ],
+  [
+    "scripts/build-nanah-vendor.mjs",
+    4
+  ],
+  [
+    "scripts/build-qr-scanner-vendor.mjs",
+    0
+  ],
+  [
+    "scripts/check-release-note-locales.mjs",
+    1
+  ],
+  [
+    "scripts/check-ui-locales.mjs",
+    1
+  ],
+  [
+    "scripts/create-family-device-capture-checklist.mjs",
+    12
+  ],
+  [
+    "scripts/create-family-device-evidence-packet.mjs",
+    7
+  ],
+  [
+    "scripts/create-managed-app-parity-smoke-artifact.mjs",
+    25
+  ],
+  [
+    "scripts/create-managed-extension-installed-smoke-artifact.mjs",
+    20
+  ],
+  [
+    "scripts/create-managed-native-runtime-sync-handoff.mjs",
+    18
+  ],
+  [
+    "scripts/create-managed-pickup-provider-ownership-artifact.mjs",
+    21
+  ],
+  [
+    "scripts/extract-family-ui-fallbacks.mjs",
+    0
+  ],
+  [
+    "scripts/import-family-device-downloaded-evidence.mjs",
+    18
+  ],
+  [
+    "scripts/managed-delivery-lan-discovery.mjs",
+    21
+  ],
+  [
+    "scripts/managed-delivery-provider.mjs",
+    44
+  ],
+  [
+    "scripts/merge-ui-locale-batch.mjs",
+    1
+  ],
+  [
+    "scripts/merge-ui-locale-drafts.mjs",
+    2
+  ],
+  [
+    "scripts/report-family-device-phase11-status.mjs",
+    16
+  ],
+  [
+    "scripts/report-family-device-phase12-status.mjs",
+    11
+  ],
+  [
+    "scripts/report-family-device-provider-surface.mjs",
+    7
+  ],
+  [
+    "scripts/report-family-device-release-readiness.mjs",
+    3
+  ],
+  [
+    "scripts/run-test-lane.mjs",
+    23
+  ],
+  [
+    "scripts/sync-native-runtime.mjs",
+    0
+  ],
+  [
+    "scripts/test-lane-config.mjs",
+    0
+  ],
+  [
+    "scripts/update-family-device-evidence-log.mjs",
+    13
+  ],
+  [
+    "scripts/validate-family-device-evidence.mjs",
+    14
+  ],
+  [
+    "scripts/verify-managed-app-policy-contract.mjs",
+    7
+  ],
+  [
+    "website/app/[slug]/page.js",
+    3
+  ],
+  [
+    "website/app/downloads/page.js",
+    3
+  ],
+  [
+    "website/app/layout.js",
+    1
+  ],
+  [
+    "website/app/not-found.js",
+    1
+  ],
+  [
+    "website/app/page.js",
+    6
+  ],
+  [
+    "website/app/privacy/page.js",
+    5
+  ],
+  [
+    "website/app/robots.js",
+    1
+  ],
+  [
+    "website/app/sitemap.js",
+    1
+  ],
+  [
+    "website/app/terms/page.js",
+    1
+  ],
+  [
+    "website/components/browser-logo-rail.js",
+    1
+  ],
+  [
+    "website/components/footer-signal-art.js",
+    20
+  ],
+  [
+    "website/components/hero-video.js",
+    2
+  ],
+  [
+    "website/components/marketing-ui.js",
+    5
+  ],
+  [
+    "website/components/reveal.js",
+    1
+  ],
+  [
+    "website/components/route-content.js",
+    0
+  ],
+  [
+    "website/components/scene-controller.js",
+    5
+  ],
+  [
+    "website/components/scenic-detail-page.js",
+    3
+  ],
+  [
+    "website/components/scenic-illustration.js",
+    3
+  ],
+  [
+    "website/components/scenic-tones.js",
+    1
+  ],
+  [
+    "website/components/site-data.js",
+    0
+  ],
+  [
+    "website/components/site-footer.js",
+    2
+  ],
+  [
+    "website/components/site-header.js",
+    3
+  ],
+  [
+    "website/components/site-shell-data.js",
+    0
+  ],
+  [
+    "website/components/theme-toggle.js",
+    8
+  ]
 ]);
 
 function read(file) {
@@ -112,25 +315,46 @@ function countLiteral(source, token) {
 }
 
 function groupForBuildMethod(name) {
-  if (name === 'filterFunc') return 'packageCopySurface';
-  if (name === 'main') return 'packageBuildOrchestration';
-  if (name === 'ensureCollabDialogScriptOrder') return 'manifestRewriteSurface';
-  if (name === 'createZip') return 'zipArtifactCreation';
-  if ([
-    'maybeCollectMobileArtifacts',
-    'resolveMobileArtifactPromptDir',
-    'resolveDefaultMobileArtifactsDir',
-    'parseMobileArtifactName',
-    'summarizeMobileArtifacts',
-    'selectLatestMobileArtifacts',
-    'extractAndroidVersionCode',
-    'sha256File'
-  ].includes(name)) return 'mobileArtifactStaging';
-  if (['extractLatestChangelogEntry', 'deriveSubtitle', 'buildReleaseTitle', 'buildReleaseBody', 'assetLink', 'releaseAssetLink'].includes(name)) return 'releaseBodyGeneration';
-  if (['maybePromptRelease', 'createGitHubRelease', 'uploadReleaseAsset', 'contentTypeForAsset', 'httpRequest'].includes(name)) return 'releasePublication';
-  if (['promptYesNo', 'promptText'].includes(name)) return 'interactivePromptSurface';
-  if (['updateReadmeBadges', 'formatLoC', 'shouldCountInTotalLoC', 'sumFileLines'].includes(name)) return 'readmeBadgeMutation';
-  return 'UNCLASSIFIED';
+  return {
+  "filterFunc": "packageCopySurface",
+  "main": "packageBuildOrchestration",
+  "buildTargets": "packageBuildOrchestration",
+  "onExit": "packageBuildOrchestration",
+  "onInterrupt": "packageBuildOrchestration",
+  "onTerminate": "packageBuildOrchestration",
+  "ensureCollabDialogScriptOrder": "manifestRewriteSurface",
+  "createZip": "zipArtifactCreation",
+  "maybeCollectMobileArtifacts": "mobileArtifactStaging",
+  "resolveMobileArtifactPromptDir": "mobileArtifactStaging",
+  "resolveDefaultMobileArtifactsDir": "mobileArtifactStaging",
+  "parseMobileArtifactName": "mobileArtifactStaging",
+  "summarizeMobileArtifacts": "mobileArtifactStaging",
+  "describeAvailableMobileArtifacts": "mobileArtifactStaging",
+  "selectLatestMobileArtifacts": "mobileArtifactStaging",
+  "extractAndroidVersionCode": "mobileArtifactStaging",
+  "sha256File": "mobileArtifactStaging",
+  "maybePromptRelease": "releasePublication",
+  "extractLatestChangelogEntry": "releaseBodyGeneration",
+  "deriveSubtitle": "releaseBodyGeneration",
+  "buildReleaseTitle": "releaseBodyGeneration",
+  "buildReleaseBody": "releaseBodyGeneration",
+  "assetLink": "releaseBodyGeneration",
+  "releaseAssetLink": "releaseBodyGeneration",
+  "resolveGitHubToken": "releasePublication",
+  "githubCliEnv": "releasePublication",
+  "runGitHubCli": "releasePublication",
+  "githubReleaseExists": "releasePublication",
+  "createDraftGitHubRelease": "releasePublication",
+  "listGitHubReleaseAssetNames": "releasePublication",
+  "uploadGitHubReleaseAssets": "releasePublication",
+  "publishDraftGitHubRelease": "releasePublication",
+  "promptYesNo": "interactivePromptSurface",
+  "promptText": "interactivePromptSurface",
+  "updateReadmeBadges": "readmeBadgeMutation",
+  "formatLoC": "readmeBadgeMutation",
+  "shouldCountInTotalLoC": "readmeBadgeMutation",
+  "sumFileLines": "readmeBadgeMutation"
+}[name] || 'UNCLASSIFIED';
 }
 
 function buildMethodRows() {
@@ -192,7 +416,7 @@ test('build/website callable audit accounts for every current build and website 
   assert.match(buildSemanticDoc, /This is not completion proof/);
   assert.match(auditDoc, /Build Script Method Semantic Addendum - 2026-05-27/);
   assert.match(auditDoc, /FILTERTUBE_BUILD_SCRIPT_METHOD_SEMANTIC_REGISTER_2026-05-27\.md/);
-  assert.match(auditDoc, /29 lexical callable rows across 9 semantic method groups/);
+  assert.match(auditDoc, /38 lexical callable rows across 9 semantic method groups/);
 });
 
 test('build/website callable counts match the current lexical source surface', () => {
@@ -203,32 +427,32 @@ test('build/website callable counts match the current lexical source surface', (
     assert.equal(count, expectedCounts.get(file), `${file} callable count drifted`);
   }
 
-  assert.equal(total, 143);
-  assert.match(auditDoc, /\| Build and sync scripts \| 7 \| 70 \|/);
-  assert.match(auditDoc, /\| Total \| 31 \| 143 \|/);
+  assert.equal(total, 417);
+  assert.match(auditDoc, /\| Build and sync scripts \| 29 \| 341 \|/);
+  assert.match(auditDoc, /\| Total \| 53 \| 417 \|/);
 
   const build = read('build.js');
   const buildRows = buildMethodRows();
-  assert.equal(lineCount(build), 740);
-  assert.equal(Buffer.byteLength(build), 26978);
-  assert.equal(lexicalCallableCount(build), 29);
-  assert.equal(buildRows.length, 29);
+  assert.equal(lineCount(build), 861);
+  assert.equal(Buffer.byteLength(build), 33225);
+  assert.equal(lexicalCallableCount(build), 38);
+  assert.equal(buildRows.length, 38);
   assert.deepEqual(countBy(buildRows, 'kind'), {
-    arrowFunction: 4,
-    asyncFunction: 4,
-    function: 21
-  });
+  "arrowFunction": 7,
+  "asyncFunction": 5,
+  "function": 26
+});
   assert.deepEqual(countBy(buildRows, 'group'), {
-    interactivePromptSurface: 2,
-    manifestRewriteSurface: 1,
-    mobileArtifactStaging: 8,
-    packageBuildOrchestration: 1,
-    packageCopySurface: 1,
-    readmeBadgeMutation: 4,
-    releaseBodyGeneration: 6,
-    releasePublication: 5,
-    zipArtifactCreation: 1
-  });
+  "interactivePromptSurface": 2,
+  "manifestRewriteSurface": 1,
+  "mobileArtifactStaging": 9,
+  "packageBuildOrchestration": 5,
+  "packageCopySurface": 1,
+  "readmeBadgeMutation": 4,
+  "releaseBodyGeneration": 6,
+  "releasePublication": 9,
+  "zipArtifactCreation": 1
+});
 
   for (const row of buildRows) {
     assert.notEqual(row.group, 'UNCLASSIFIED', `${row.name} should be grouped`);
@@ -253,8 +477,10 @@ test('build/website audit pins high-risk release and public claim patterns to cu
 
   assert.match(build, /await updateReadmeBadges\(VERSION\)/);
   assert.match(build, /fs\.writeFileSync\(readmePath, readme, 'utf8'\)/);
-  assert.match(build, /draft: false/);
-  assert.match(build, /for \(const assetPath of releaseAssetPaths\)/);
+  assert.match(build, /createDraftGitHubRelease\(githubAuth/);
+  assert.match(build, /Release upload incomplete/);
+  assert.match(build, /publishDraftGitHubRelease\(githubAuth, tagName\)/);
+  assert.match(build, /const missingAssetPaths = releaseAssetPaths\.filter/);
   assert.match(build, /fs\.writeFileSync\(checksumPath, `\$\{sha256File\(targetPath\)\}  \$\{fileName\}\\n`/);
   assert.match(build, /Non-interactive terminal detected; skipping release prompt/);
 
@@ -267,9 +493,10 @@ test('build/website audit pins high-risk release and public claim patterns to cu
   assert.match(layout, /<Analytics \/>/);
   assert.match(privacy, /Vercel Analytics is not\s+included in the FilterTube browser extension, Android app,\s+iOS\/iPad app, or TV app path/);
 
-  assert.match(downloads, /label: "Direct APK releases"/);
+  assert.match(downloads, /label: "Simpler direct APK"/);
   assert.match(downloads, /href: latestReleaseHref/);
-  assert.match(downloads, /signed release APK can be attached/);
+  assert.match(downloads, /Separate simpler build/);
+  assert.match(downloads, /href: androidPlayStoreHref/);
 
   assert.match(routeContent, /cdnjs\.cloudflare\.com\/ajax\/libs\/browser-logos/);
   assert.match(browserRail, /src=\{browser\.logo\}/);
@@ -294,12 +521,12 @@ test('build/website audit pins high-risk release and public claim patterns to cu
     assert.match(auditDoc, new RegExp(escapeRegex(finding)));
   }
 
-  assert.match(buildSemanticDoc, /build script line count: 740/);
-  assert.match(buildSemanticDoc, /build script bytes: 26978/);
-  assert.match(buildSemanticDoc, /lexical callable rows in this semantic slice: 29/);
-  assert.match(buildSemanticDoc, /plain function declarations: 21/);
-  assert.match(buildSemanticDoc, /async function declarations: 4/);
-  assert.match(buildSemanticDoc, /arrow callable rows: 4/);
+  assert.match(buildSemanticDoc, /build script line count: 861/);
+  assert.match(buildSemanticDoc, /build script bytes: 33225/);
+  assert.match(buildSemanticDoc, /lexical callable rows in this semantic slice: 38/);
+  assert.match(buildSemanticDoc, /plain function declarations: 26/);
+  assert.match(buildSemanticDoc, /async function declarations: 5/);
+  assert.match(buildSemanticDoc, /arrow callable rows: 7/);
   assert.match(buildSemanticDoc, /semantic method groups: 9/);
 
   for (const [label, value] of [
@@ -324,9 +551,9 @@ test('build/website audit pins high-risk release and public claim patterns to cu
 
   for (const token of [
     'normal npm run build mutates README.md badge URLs',
-    'normal npm run build packages whole js/css/html/icons/data/assets roots',
+    'normal npm run build packages whole _locales/js/css/html/icons/data/assets roots',
     'non-TTY builds skip release publication instead of providing a CI release contract',
-    'TTY release publication creates a public non-draft GitHub release before uploading assets',
+    'TTY release publication creates a draft, uploads missing assets, verifies expected names, then publishes only its new draft',
     'manifest rewrite repairs collab_dialog load order but does not validate permission, host, world, or web-accessible drift',
     'ZIP creation ignores filesystem junk but does not write a checksum or expected-file manifest',
     'build failure sets process.exitCode but does not rollback README, dist, staged mobile artifacts, or created releases'

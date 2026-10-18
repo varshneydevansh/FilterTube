@@ -20,26 +20,26 @@ tags, settings handoff timing, or injector readiness behavior changes.
 
 ```text
 source file: js/content/bridge_injection.js
-line count: 127
-source bytes: 4741
-source sha256: d1b84cf4c43ec5ff5cdc3bd607d8f3d3bf448c12829780b0d05fb9fc14fb5d3e
-repo-wide broad parser lexical callable matches: 12
-runtime method/helper declarations in scope: 5
-broad-parser runtime declarations in scope: 3
+line count: 152
+source bytes: 6064
+source sha256: 6097691b4c6f4d2ede943014694aec4f6cc1ef0134945e576ca9c6c94dd9c669
+repo-wide broad parser lexical callable matches: 14
+runtime method/helper declarations in scope: 7
+broad-parser runtime declarations in scope: 5
 assignment-expression method declarations outside broad parser: 2
 control-flow lexical artifacts: 9
-file-local executable behavior rows: 4
+file-local executable behavior rows: 5
 global method proof count promoted: 0
-named method/helper declarations in scope: 5
-plain function declarations: 1
+named method/helper declarations in scope: 7
+plain function declarations: 3
 async function declarations: 2
 named function expression declarations: 1
 async named function expression declarations: 1
 const helper/callback declarations: 0
 const arrow helper/callback declarations: 0
-arrow callback sites in scope: 8
+arrow callback sites in scope: 11
 semantic method groups: 4
-globalThis literal occurrences: 15
+globalThis literal occurrences: 19
 bridgeState references: 15
 scriptsInjected references: 5
 injectionInProgress references: 3
@@ -53,10 +53,10 @@ requestSettingsFromBackground references: 2
 api.runtime.sendMessage calls: 1
 api.runtime.getURL calls: 1
 api.scripting?.executeScript references: 1
-document literal occurrences: 4
+document literal occurrences: 6
 document.createElement calls: 1
 document.head references: 1
-document.documentElement references: 1
+document.documentElement references: 2
 appendChild calls: 1
 setTimeout calls: 2
 addEventListener calls: 0
@@ -66,8 +66,8 @@ postMessage calls: 0
 new Promise calls: 2
 Promise.resolve references: 1
 new Error calls: 2
-try blocks: 3
-catch blocks: 3
+try blocks: 5
+catch blocks: 5
 finally blocks: 1
 await expressions: 2
 script.onload assignments: 1
@@ -87,7 +87,7 @@ runtime behavior changed: no
 ## Method Group Counts
 
 ```text
-bridgeInjectionDebugGlobalState: 1
+bridgeInjectionDebugGlobalState: 3
 bridgeInjectionBackgroundScripting: 1
 bridgeInjectionFallbackScriptDom: 2
 bridgeInjectionMainWorldOrchestration: 1
@@ -97,26 +97,28 @@ bridgeInjectionMainWorldOrchestration: 1
 
 | Semantic group | Declarations | Current owner/effect shape | Missing proof before behavior changes |
 | --- | ---: | --- | --- |
-| `bridgeInjectionDebugGlobalState` | 1 | Initializes `globalThis.__filtertubeBridgeState`, exports `IS_FIREFOX_BRIDGE`, `browserAPI_BRIDGE`, `currentSettings`, and `debugLog`, and increments a local debug sequence while console logging is commented out. | Global alias freshness, duplicate content-script execution proof, debug privacy policy, and cross-file owner contract. |
+| `bridgeInjectionDebugGlobalState` | 3 | Initializes `globalThis.__filtertubeBridgeState`, exports `IS_FIREFOX_BRIDGE`, `browserAPI_BRIDGE`, `currentSettings`, and `debugLog`, and increments a local debug sequence while console logging is commented out. The two additional named helpers gate log/info/debug by the explicit local debug switch or DOM debug attribute; warnings/errors remain available. | Global alias freshness, duplicate content-script execution proof, debug privacy policy, and cross-file owner contract. |
 | `bridgeInjectionBackgroundScripting` | 1 | Sends `{ action: "injectScripts", scripts }` to background, then resolves only when the response has `success` and no `api.runtime.lastError`. | Sender-class trust, fixed script allowlist, target tab/frame proof, background action ownership, and failure provenance. |
 | `bridgeInjectionFallbackScriptDom` | 2 | Creates web-accessible `<script>` tags one at a time, sets `src` with `api.runtime.getURL("js/...")`, waits for `onload`, spaces loads by 50ms, and rejects on `onerror`. | DOM script lifecycle, script removal/cleanup, ordered load proof, browser parity, retry budget, and failure fixture provenance. |
-| `bridgeInjectionMainWorldOrchestration` | 1 | Guards injection with `scriptsInjected` and `injectionPromise`, injects `shared/identity`, `filter_logic`, optional Firefox `seed`, and `injector`, marks success, then schedules `requestSettingsFromBackground()` after 100ms. | MAIN-world readiness signal, settings replay contract, retry/backoff budget, seed parity, duplicate readiness metrics, and no-rule startup budget. |
+| `bridgeInjectionMainWorldOrchestration` | 1 | Guards injection with `scriptsInjected` and `injectionPromise`, injects `shared/identity`, `shared/view_count`, `filter_logic`, optional Firefox `seed`, and `injector`, marks success, then schedules `requestSettingsFromBackground()` after 100ms. | MAIN-world readiness signal, settings replay contract, retry/backoff budget, seed parity, duplicate readiness metrics, and no-rule startup budget. |
 
 ## Current Method Inventory
 
 | Source line | Kind | Method or function | Semantic group |
 | ---: | --- | --- | --- |
-| 30 | `functionExpression` | `debugLog` | `bridgeInjectionDebugGlobalState` |
-| 36 | `asyncFunction` | `injectViaScriptingAPI` | `bridgeInjectionBackgroundScripting` |
-| 51 | `asyncFunction` | `injectViaFallback` | `bridgeInjectionFallbackScriptDom` |
-| 54 | `function` | `injectNext` | `bridgeInjectionFallbackScriptDom` |
-| 75 | `asyncFunctionExpression` | `injectMainWorldScripts` | `bridgeInjectionMainWorldOrchestration` |
+| 25 | `function` | `isFilterTubeContentDebugEnabled` | `bridgeInjectionDebugGlobalState` |
+| 34 | `function` | `installFilterTubeContentConsoleGate` | `bridgeInjectionDebugGlobalState` |
+| 55 | `functionExpression` | `debugLog` | `bridgeInjectionDebugGlobalState` |
+| 61 | `asyncFunction` | `injectViaScriptingAPI` | `bridgeInjectionBackgroundScripting` |
+| 76 | `asyncFunction` | `injectViaFallback` | `bridgeInjectionFallbackScriptDom` |
+| 79 | `function` | `injectNext` | `bridgeInjectionFallbackScriptDom` |
+| 100 | `asyncFunctionExpression` | `injectMainWorldScripts` | `bridgeInjectionMainWorldOrchestration` |
 
 ## Lexical Callable Reconciliation
 
 The repo-wide broad callable parser is intentionally permissive and line-based.
-For `js/content/bridge_injection.js`, the 12 broad-parser matches reconcile to
-3 runtime declarations and 9 control-flow artifacts. `debugLog` and
+For `js/content/bridge_injection.js`, the 14 broad-parser matches reconcile to
+5 runtime declarations and 9 control-flow artifacts. `debugLog` and
 `injectMainWorldScripts` are real assignment-expression method declarations
 that the broad parser does not count as ordinary declarations. This file-local
 reconciliation documents the mismatch; it does not promote the global method
@@ -125,31 +127,36 @@ boundary.
 
 | Source line | Lexical token | Runtime callable? | Evidence |
 | ---: | --- | --- | --- |
-| 25 | `if` | no | `if (typeof globalThis.currentSettings === 'undefined') {` is bootstrap control flow. |
-| 29 | `if` | no | `if (typeof globalThis.debugLog !== 'function') {` is bootstrap control flow. |
-| 36 | `injectViaScriptingAPI` | yes | `async function injectViaScriptingAPI(scripts) {` is a runtime helper. |
-| 42 | `if` | no | `if (api.runtime.lastError || !response?.success) {` is callback control flow. |
-| 51 | `injectViaFallback` | yes | `async function injectViaFallback(scripts) {` is a runtime helper. |
-| 54 | `injectNext` | yes | `function injectNext() {` is a local fallback script loader. |
-| 55 | `if` | no | `if (currentIndex >= scripts.length) {` is fallback loader control flow. |
-| 76 | `if` | no | `if (bridgeState.scriptsInjected) {` is idempotence control flow. |
-| 79 | `if` | no | `if (bridgeState.injectionPromise) {` is duplicate in-progress control flow. |
-| 90 | `if` | no | `if (!isFirefox && api.scripting?.executeScript) {` selects Chromium/background versus fallback injection. |
-| 98 | `if` | no | `if (typeof requestSettingsFromBackground === 'function') {` is timer callback guard logic. |
-| 113 | `if` | no | `if (!bridgeState.scriptsInjected) {` is failure cleanup control flow. |
+| 25 | `isFilterTubeContentDebugEnabled` | yes | `function isFilterTubeContentDebugEnabled() {` is a named runtime helper. |
+| 34 | `installFilterTubeContentConsoleGate` | yes | `function installFilterTubeContentConsoleGate() {` is a named runtime helper. |
+| 50 | `if` | no | `if (typeof globalThis.currentSettings === 'undefined') {` is control flow. |
+| 54 | `if` | no | `if (typeof globalThis.debugLog !== 'function') {` is control flow. |
+| 61 | `injectViaScriptingAPI` | yes | `async function injectViaScriptingAPI(scripts) {` is a named runtime helper. |
+| 67 | `if` | no | `if (api.runtime.lastError || !response?.success) {` is control flow. |
+| 76 | `injectViaFallback` | yes | `async function injectViaFallback(scripts) {` is a named runtime helper. |
+| 79 | `injectNext` | yes | `function injectNext() {` is a named runtime helper. |
+| 80 | `if` | no | `if (currentIndex >= scripts.length) {` is control flow. |
+| 101 | `if` | no | `if (bridgeState.scriptsInjected) {` is control flow. |
+| 104 | `if` | no | `if (bridgeState.injectionPromise) {` is control flow. |
+| 115 | `if` | no | `if (!isFirefox && api.scripting?.executeScript) {` is control flow. |
+| 123 | `if` | no | `if (typeof requestSettingsFromBackground === 'function') {` is control flow. |
+| 138 | `if` | no | `if (!bridgeState.scriptsInjected) {` is control flow. |
 
 ## Local Callback Inventory
 
 | Source line | Callback | Owner/effect |
 | ---: | --- | --- |
-| 11 | `(() =>` | Runs bridge bootstrap immediately in the isolated world and writes global bridge aliases. |
-| 37 | `new Promise((resolve, reject) =>` | Owns the background scripting request lifetime. |
-| 41 | `sendMessage(..., (response) =>` | Converts `runtime.lastError` or missing `response.success` into a rejected promise. |
-| 52 | `new Promise((resolve, reject) =>` | Owns fallback sequential script tag injection lifetime. |
-| 62 | `script.onload = () =>` | Advances to the next fallback script and schedules `setTimeout(injectNext, 50)`. |
-| 66 | `script.onerror = () =>` | Rejects fallback injection with `Failed to inject ${scriptName}`. |
-| 84 | `(async () =>` | Builds the script list, chooses background or fallback injection, and resets bridge state on failure. |
-| 96 | `setTimeout(() =>` | Calls `requestSettingsFromBackground()` after successful injection if that function exists. |
+| 11 | `(() =>` | bridge bootstrap immediately. |
+| 40 | `console.log = (...args) =>` | debug-gated logging. |
+| 41 | `console.info = (...args) =>` | debug-gated info. |
+| 42 | `console.debug = (...args) =>` | debug-gated debug. |
+| 62 | `new Promise((resolve, reject) =>` | background scripting request lifetime. |
+| 66 | `sendMessage(..., (response) =>` | runtime.lastError. |
+| 77 | `new Promise((resolve, reject) =>` | fallback sequential script tag injection lifetime. |
+| 87 | `script.onload = () =>` | setTimeout(injectNext, 50). |
+| 91 | `script.onerror = () =>` | Failed to inject. |
+| 109 | `(async () =>` | resets bridge state on failure. |
+| 121 | `setTimeout(() =>` | requestSettingsFromBackground(). |
 
 ## Current Entrypoints And Dependencies
 
@@ -157,10 +164,10 @@ boundary.
 module entrypoint: manifest-loaded isolated-world content script before bridge_settings.js and content_bridge.js
 manifest order: block_channel.js before bridge_injection.js before bridge_settings.js before content_bridge.js
 Chromium content script world: ISOLATED for bridge_injection.js
-default/chrome seed content script: js/seed.js in MAIN world before isolated bridge scripts
+default/chrome first MAIN-world content entry: shared/view_count before seed, before isolated bridge scripts
 Firefox seed behavior: seed is not a separate MAIN-world manifest entry; fallback injection pushes seed when isFirefox is true
-Opera seed behavior: js/seed.js is a separate first content script without an explicit world declaration
-web-accessible scripts required by fallback: js/shared/identity.js, js/filter_logic.js, js/seed.js, js/injector.js
+Opera seed behavior: shared/view_count precedes seed in a separate first content entry without an explicit world declaration
+web-accessible scripts required by fallback: js/shared/identity.js, js/shared/view_count.js, js/filter_logic.js, js/seed.js, js/injector.js
 browser API selection: browser when browser.runtime exists, otherwise chrome
 global exports: globalThis.IS_FIREFOX_BRIDGE, globalThis.browserAPI_BRIDGE, globalThis.debugLog, globalThis.currentSettings, globalThis.injectMainWorldScripts
 local aliases: var IS_FIREFOX_BRIDGE, browserAPI_BRIDGE, debugLog, currentSettings, injectMainWorldScripts
@@ -187,7 +194,7 @@ not declare the branch safe for future expansion or public caller reuse.
 ## Current Behavior Boundaries
 
 ```text
-script list base: ['shared/identity', 'filter_logic']
+script list base: ['shared/identity', 'shared/view_count', 'filter_logic']
 Firefox-only script addition: seed
 final script addition: injector
 Chromium path error source: api.runtime.lastError?.message || response?.error
@@ -214,10 +221,10 @@ MAIN-world execution, or YouTube page readiness.
 
 | Probe | Current behavior proved | Boundary still open |
 | --- | --- | --- |
-| Chromium executable proof: one successful injectMainWorldScripts() call sends injectScripts for shared/identity, filter_logic, and injector | In Chromium mode with `api.scripting.executeScript`, `injectMainWorldScripts()` posts `{ action: "injectScripts", scripts: ["shared/identity", "filter_logic", "injector"] }`, marks `scriptsInjected = true`, clears `injectionInProgress`, and schedules a `100` ms settings request timer. | Background allowlist, sender class, frame targeting, and real MAIN-world execution are still unproved. |
+| Chromium executable proof: one successful injectMainWorldScripts() call sends injectScripts for shared/identity, shared/view_count, filter_logic, and injector | In Chromium mode with `api.scripting.executeScript`, `injectMainWorldScripts()` posts `{ action: "injectScripts", scripts: ["shared/identity", "shared/view_count", "filter_logic", "injector"] }`, marks `scriptsInjected = true`, clears `injectionInProgress`, and schedules a `100` ms settings request timer. | Background allowlist, sender class, frame targeting, and real MAIN-world execution are still unproved. |
 | Chromium executable proof: a duplicate in-progress injectMainWorldScripts() call reuses the same promise and sends no second injectScripts message | A second call before the first promise settles returns the same `injectionPromise`; the message array still contains one `injectScripts` request. | No metric or owner report records the dedupe decision. |
 | Chromium executable proof: failed background injection rejects, clears injectionPromise, leaves scriptsInjected false, and calls debugLog once | A `{ success: false, error }` background response rejects, sets `scriptsInjected = false`, clears `injectionPromise`, clears `injectionInProgress`, and increments `debugSequence` through `debugLog`. | Retry/backoff, failure provenance, and user-visible recovery remain absent. |
-| Firefox fallback executable proof: appends shared/identity, filter_logic, seed, and injector script tags in order with 50ms load spacing | In Firefox mode, fallback injection appends `js/shared/identity.js`, `js/filter_logic.js`, `js/seed.js`, and `js/injector.js` under extension URLs, using one `50` ms timer after each script `onload`. | Real browser load/error ordering and script execution readiness remain unproved. |
+| Firefox fallback executable proof: appends shared/identity, shared/view_count, filter_logic, seed, and injector script tags in order with 50ms load spacing | In Firefox mode, fallback injection appends `js/shared/identity.js`, `js/shared/view_count.js`, `js/filter_logic.js`, `js/seed.js`, and `js/injector.js` under extension URLs, using one `50` ms timer after each script `onload`. | Real browser load/error ordering and script execution readiness remain unproved. |
 | Firefox fallback executable proof: fallback script tags are not removed after load and successful injection schedules the same 100ms settings request timer | Loaded fallback script nodes remain present, and successful fallback injection schedules the same `100` ms `requestSettingsFromBackground()` timer as Chromium. | DOM lifecycle cleanup and injector-ready synchronization remain absent. |
 
 ## Risk Notes
@@ -314,3 +321,9 @@ runtime behavior changed: no
 These counts are audit-only blockers. They do not approve runtime
 optimization, JSON-first behavior, bridge injection changes, settings replay
 changes, fallback lifecycle changes, or selector/message authority changes.
+
+## Revalidation - 2026-10-18
+
+The two added named helpers detect the local debug switch and install console log/info/debug gates. They belong to debug/global setup; warnings and errors remain available. A VM fixture verifies disabled logging, explicit debug logging, DOM-attribute debug logging, and idempotent reinstallation. Three console wrapper arrows are counted as callbacks rather than additional named methods.
+
+The Chromium duplicate/failure and Firefox sequential fixtures execute the actual source. They now include `shared/view_count` before the engine, with Firefox seed before injector. Five executable scenarios are exercised (success, duplicate in progress, failure, Firefox fallback, debug console gating); the separate fallback cleanup row shares the Firefox scenario. Current counts are inventories and file-local evidence, not real-browser injection, sender authentication, load readiness, or exhaustive semantic proof. The global semantic proof count remains zero.

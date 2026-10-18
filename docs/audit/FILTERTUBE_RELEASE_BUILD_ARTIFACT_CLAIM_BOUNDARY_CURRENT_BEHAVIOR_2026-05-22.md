@@ -16,47 +16,47 @@ changes.
 
 | File | Lines | Bytes | SHA-256 |
 | --- | ---: | ---: | --- |
-| `build.js` | 740 | 26978 | `c8485cb2600aad89f44015cd7e49ebe4746ebcc35c91c1ff2bf29aec2f087a04` |
-| `package.json` | 67 | 2954 | `6f0b5dc130399998ad5435ef3b273573234e80561ceba32e0da078b91851e229` |
-| `README.md` | 423 | 24171 | `222883578482b2d594d43f29bbe4778b7404a640bb5f2ca9e9a67a1858bf49cb` |
-| `CHANGELOG.md` | 591 | 40124 | `e22a87ce7eeb88d171587d4b0f4676881a2c3081a7fbf15978d7e8d8582cdfdd` |
-| `manifest.json` | 93 | 2654 | `95496eac74d72fd90491302211b7dc07f492ed405d4eb1a001b8b600a02bc16b` |
-| `manifest.chrome.json` | 93 | 2654 | `95496eac74d72fd90491302211b7dc07f492ed405d4eb1a001b8b600a02bc16b` |
-| `manifest.firefox.json` | 80 | 2150 | `8368c4b520a07d1e5d9647f6c141f06f8fbd24a92c8b053d722488859f201c32` |
-| `manifest.opera.json` | 94 | 2659 | `f9a3b4182521d8b1594d7975c327daf772e418e4869e8e3d33d286bfb25b486e` |
-| `data/release_notes.json` | 319 | 23455 | `7a2fdb97743c695a7167a151ec0bcef419ca9973e1a66db6a48ab1c228c4220f` |
+| `build.js` | 861 | 33225 | `a198cc1d0bf98e410deb8f66ced0e56a046bbf987a0a5b878e1278577622fb2e` |
+| `package.json` | 86 | 4580 | `c9cb2c3c4fea302fa3946f462dbfbb474381a78946ca59adb653814d06a4de51` |
+| `README.md` | 456 | 28669 | `bb4374abbe82478e01a6653f26be3149824c0efd6aaf75c2095d4611b1ee67d6` |
+| `CHANGELOG.md` | 938 | 75511 | `e57906dca95911874ef251aa45d8c3a76df00df576b36277d9c0e9b9654c3036` |
+| `manifest.json` | 154 | 5204 | `d8dea8d10e715d01bab25ea12ff6fc3055d403f2486654fcb6907f94bd4f4627` |
+| `manifest.chrome.json` | 154 | 5204 | `d8dea8d10e715d01bab25ea12ff6fc3055d403f2486654fcb6907f94bd4f4627` |
+| `manifest.firefox.json` | 128 | 4138 | `2c0fe680fe1d204250ce687ef29c00767d3ff6269024a410da5c9fccff4ebf79` |
+| `manifest.opera.json` | 162 | 5393 | `a7c541876ed54303d3a21613f5eaacbef536d694bf6061da207456eca476fce1` |
+| `data/release_notes.json` | 433 | 37594 | `9132b2e8809c5e1f01bf5715a115105f62387318b422ad681c0ef6a1be63c7f9` |
 
 ## Source And Effect Blocks
 
 | Block | Start line | Lines | Bytes | Current boundary |
 | --- | ---: | ---: | ---: | --- |
-| `buildConfig` | 28 | 40 | 1688 | Build targets, package roots, common files, mobile artifact regex, mobile artifact source directories, and text LoC file families are local constants. |
-| `mainBuildFlow` | 82 | 79 | 2790 | Normal build regenerates extension UI shells, mutates README badges, optionally cleans `dist`, copies broad package roots, writes browser manifest output, creates ZIPs, and then enters optional mobile/release paths. |
-| `manifestOrderRepair` | 161 | 22 | 858 | Manifest repair only enforces `js/content/collab_dialog.js` before `js/content_bridge.js`; it does not validate permissions, hosts, web-accessible resources, versions, or JSON-first startup readiness. |
-| `createZip` | 183 | 33 | 981 | ZIP creation archives all target-directory files except OS junk and does not emit a browser ZIP checksum or package manifest. |
-| `mobileArtifacts` | 216 | 67 | 2783 | Android APK/AAB staging is opt-in through CLI/env/prompt, filters by filename regex and package version, copies artifacts into `dist/mobile`, and writes per-file `.sha256` outputs. |
-| `mobileArtifactPromptDir` | 283 | 12 | 314 | The interactive artifact directory answer now treats blank, `y`, `yes`, and `default` as the displayed default directory instead of a literal relative path. |
-| `mobileArtifactDefaults` | 295 | 9 | 376 | Default mobile artifact source prefers the sibling app repo artifact directory when present, with local `release-artifacts/mobile` as fallback. |
-| `mobileArtifactParsing` | 304 | 11 | 291 | Mobile artifact filenames are parsed into version, versionCode, variant, and extension fields. |
-| `mobileArtifactSummary` | 315 | 11 | 376 | Selected mobile artifacts are summarized for APK/AAB pair warnings. |
-| `mobileSelectionChecksum` | 326 | 16 | 568 | Latest mobile artifact selection is Android versionCode based, and checksum calculation reads the staged artifact bytes. |
-| `releasePromptPublish` | 342 | 58 | 1805 | Interactive release publication requires `GITHUB_TOKEN`, creates release body/title text, creates the GitHub release, then uploads assets sequentially. |
-| `releaseBody` | 438 | 98 | 4491 | Release copy constructs browser ZIP links and optional Android links from naming conventions, not from verified uploaded assets. |
-| `githubReleaseCreate` | 536 | 25 | 699 | GitHub release creation posts `draft: false` and `prerelease: false`. |
-| `githubAssetUpload` | 561 | 35 | 1350 | Asset upload is sequential after public release creation; upload failure rejects without a rollback/delete path. |
-| `readmeBadges` | 656 | 63 | 2355 | README badge mutation uses `git ls-files`, counts text-like and JavaScript files, rewrites version/LoC badges, and treats failures as warnings. |
+| `buildConfig` | 29 | 46 | 2153 | Build targets, package roots, common files, mobile artifact regex, mobile artifact source directories, and text LoC file families are local constants. |
+| `mainBuildFlow` | 93 | 100 | 3705 | Normal build regenerates extension UI shells, mutates README badges, optionally cleans `dist`, copies broad package roots, writes browser manifest output, creates ZIPs, and then enters optional mobile/release paths. |
+| `manifestOrderRepair` | 193 | 22 | 858 | Manifest repair only enforces `js/content/collab_dialog.js` before `js/content_bridge.js`; it does not validate permissions, hosts, web-accessible resources, versions, or JSON-first startup readiness. |
+| `createZip` | 215 | 33 | 981 | ZIP creation archives all target-directory files except OS junk and does not emit a browser ZIP checksum or package manifest. |
+| `mobileArtifacts` | 248 | 90 | 4332 | Android APK/AAB staging is opt-in through CLI/env/prompt, filters by filename regex and package version, copies artifacts into `dist/mobile`, and writes per-file `.sha256` outputs. |
+| `mobileArtifactPromptDir` | 338 | 12 | 314 | The interactive artifact directory answer now treats blank, `y`, `yes`, and `default` as the displayed default directory instead of a literal relative path. |
+| `mobileArtifactDefaults` | 350 | 9 | 376 | Default mobile artifact source prefers the sibling app repo artifact directory when present, with local `release-artifacts/mobile` as fallback. |
+| `mobileArtifactParsing` | 359 | 11 | 291 | Mobile artifact filenames are parsed into version, versionCode, variant, and extension fields. |
+| `mobileArtifactSummary` | 370 | 35 | 1174 | Selected mobile artifacts are summarized for APK/AAB pair warnings. |
+| `mobileSelectionChecksum` | 405 | 16 | 568 | Latest mobile artifact selection is Android versionCode based, and checksum calculation reads the staged artifact bytes. |
+| `releasePromptPublish` | 445 | 85 | 3235 | Interactive release publication resolves GitHub CLI or environment credentials, creates a new draft or resumes an existing release, uploads missing assets and verifies all expected names before publishing only its own new draft. |
+| `releaseBody` | 569 | 109 | 5480 | Release copy constructs browser ZIP links and optional Android links from naming conventions, not from verified uploaded assets. |
+| `githubReleaseCreate` | 712 | 10 | 269 | GitHub CLI release creation uses `--draft`; this function does not publish. |
+| `githubAssetUpload` | 732 | 11 | 353 | GitHub CLI uploads missing paths before final expected-name verification. Upload failure leaves a new draft unpublished; no delete/rollback path exists. |
+| `readmeBadges` | 777 | 63 | 2355 | README badge mutation uses `git ls-files`, counts text-like and JavaScript files, rewrites version/LoC badges, and treats failures as warnings. |
 
 ## Current Cross-Surface Facts
 
 ```text
 release build artifact boundary source files: 9
 release build artifact source/effect blocks: 15
-browser package version: 3.3.2
-package.json version: 3.3.2
-newest release-note version: 3.3.2
-release note data entries: 24
-release note version rows: 23
-package source directories: js, css, html, icons, data, assets
+browser package version: 3.4.1
+package.json version: 3.4.1
+newest release-note version: 3.4.1
+release note data entries: 31
+release note version rows: 30
+package source directories: _locales, js, css, html, icons, data, assets
 package common files: README.md, CHANGELOG.md, LICENSE
 npm build scripts: build, build:chrome, build:firefox, build:opera
 browser ZIP checksum writer: absent
@@ -133,9 +133,7 @@ are unchanged.
 
 ## Current Risk Notes
 
-Reliability risk is concentrated in publication ordering. The script creates a
-non-draft public GitHub release before upload proof exists, and release body
-links are built from expected names rather than confirmed uploaded assets.
+New-release publication follows draft creation, upload and expected-name verification. Existing releases preserve visibility. Reliability risk remains in name-only verification: matching names do not establish matching bytes, signatures or an artifact manifest.
 
 False-hide/leak risk is indirect. Broad directory packaging can ship inactive,
 quarantined, generated, or stale files. That is not a live hide/restore effect
@@ -234,3 +232,7 @@ These counts are audit-only blockers. They do not approve runtime
 optimization, JSON-first behavior, release package behavior, public release
 claims, prompt release overlays, raw-capture packaging, whitelist behavior,
 metric collectors, artifact creation, native sync, or release publication.
+
+## 2026-10-18 Workflow Review
+
+The source/effect blocks and fingerprints above now describe the reviewed current workflow. Actual-orchestrator VM tests cover new draft creation/upload/verification/publication, preserved existing visibility, incomplete uploads and cancellation. No GitHub command or release was executed. The former public-before-upload behavior is historical, not the current contract. Expected asset names are verified; byte hashes, signing and native-device compatibility are separate gates.

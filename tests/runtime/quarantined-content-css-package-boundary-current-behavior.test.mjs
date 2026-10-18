@@ -121,6 +121,7 @@ function productSource() {
   return git(['ls-files', '*.js', '*.mjs', '*.jsx', '*.css', '*.html', '*.json', '*.md'])
     .filter(file => !file.startsWith('tests/'))
     .filter(file => !file.startsWith('docs/audit/'))
+    .filter(file => fs.existsSync(path.join(repoRoot, file)))
     .map(read)
     .join('\n');
 }
@@ -219,32 +220,32 @@ test('quarantined content CSS is packaged but not manifest or extension HTML loa
   const htmlStats = extensionHtmlLinkStats();
 
   assert.deepEqual(activeStats, {
-    manifestFiles: 4,
-    contentScriptEntries: 7,
-    contentScriptJsRefs: 59,
-    contentScriptCssRefs: 0,
-    webAccessibleEntries: 4,
-    webAccessibleResourceRefs: 19,
-    quarantinedCssContentScriptRefs: 0,
-    quarantinedCssWebAccessibleRefs: 0
-  });
+  "manifestFiles": 4,
+  "contentScriptEntries": 24,
+  "contentScriptJsRefs": 168,
+  "contentScriptCssRefs": 0,
+  "webAccessibleEntries": 8,
+  "webAccessibleResourceRefs": 47,
+  "quarantinedCssContentScriptRefs": 0,
+  "quarantinedCssWebAccessibleRefs": 0
+});
   assert.deepEqual(distStats, {
-    manifestFiles: 3,
-    contentScriptEntries: 5,
-    contentScriptJsRefs: 44,
-    contentScriptCssRefs: 0,
-    webAccessibleEntries: 3,
-    webAccessibleResourceRefs: 14,
-    quarantinedCssContentScriptRefs: 0,
-    quarantinedCssWebAccessibleRefs: 0
-  });
+  "manifestFiles": 3,
+  "contentScriptEntries": 18,
+  "contentScriptJsRefs": 125,
+  "contentScriptCssRefs": 0,
+  "webAccessibleEntries": 6,
+  "webAccessibleResourceRefs": 35,
+  "quarantinedCssContentScriptRefs": 0,
+  "quarantinedCssWebAccessibleRefs": 0
+});
   assert.deepEqual(htmlStats, {
-    htmlFiles: 3,
-    linkTags: 10,
-    quarantinedCssLinks: 0
-  });
+  "htmlFiles": 3,
+  "linkTags": 10,
+  "quarantinedCssLinks": 0
+});
 
-  assert.match(build, /const COMMON_DIRS = \['js', 'css', 'html', 'icons', 'data', 'assets'\]/);
+  assert.match(build, /const COMMON_DIRS = \['_locales', 'js', 'css', 'html', 'icons', 'data', 'assets'\]/);
   assert.match(build, /fs\.copySync\(dir, path\.join\(targetDir, dir\), \{ filter: filterFunc \}\)/);
 
   for (const browser of ['chrome', 'firefox', 'opera']) {
@@ -257,19 +258,19 @@ test('quarantined content CSS is packaged but not manifest or extension HTML loa
 
   for (const token of [
     'active manifest files checked: 4',
-    'active manifest content_script entries checked: 7',
-    'active manifest content script JS refs checked: 59',
+    'active manifest content_script entries checked: 24',
+    'active manifest content script JS refs checked: 168',
     'active manifest content script CSS refs checked: 0',
-    'active manifest web_accessible_resources entries checked: 4',
-    'active manifest web-accessible resource refs checked: 19',
+    'active manifest web_accessible_resources entries checked: 8',
+    'active manifest web-accessible resource refs checked: 47',
     'active manifest quarantined CSS content script refs: 0',
     'active manifest quarantined CSS web-accessible refs: 0',
     'dist manifest files checked: 3',
-    'dist manifest content_script entries checked: 5',
-    'dist manifest content script JS refs checked: 44',
+    'dist manifest content_script entries checked: 18',
+    'dist manifest content script JS refs checked: 125',
     'dist manifest content script CSS refs checked: 0',
-    'dist manifest web_accessible_resources entries checked: 3',
-    'dist manifest web-accessible resource refs checked: 14',
+    'dist manifest web_accessible_resources entries checked: 6',
+    'dist manifest web-accessible resource refs checked: 35',
     'dist manifest quarantined CSS content script refs: 0',
     'dist manifest quarantined CSS web-accessible refs: 0',
     'extension HTML files checked: 3',
