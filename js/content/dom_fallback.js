@@ -6,6 +6,7 @@ installFilterTubeRoutineConsoleGate();
 const CHANNEL_ONLY_TAGS = new Set([]);
 
 const compiledKeywordRegexCache = new WeakMap();
+const categoryMetadataWaitByCard = new WeakMap();
 const compiledChannelFilterIndexCacheByList = new WeakMap();
 const currentPageChannelMetaCache = {
     path: '',
@@ -464,6 +465,33 @@ function getCategoryPolicySignature(settings) {
     return `${enabled ? '1' : '0'}:${mode}:${selected.join(',')}`;
 }
 
+// A queued lookup is not a reason to veil a card indefinitely. Remember the
+// first wait for this video/policy even after its visual placeholder expires.
+function getCategoryMetadataWaitState(card, videoId, policySignature, unresolved, allowOnly, scheduled, now = Date.now(), canStartWait = true) {
+    if (!unresolved || !videoId) {
+        categoryMetadataWaitByCard.delete(card);
+        return { pending: false, unavailable: false, remainingMs: 0 };
+    }
+    const key = `${videoId}:${policySignature}`;
+    let state = categoryMetadataWaitByCard.get(card);
+    if (!state || state.key !== key) {
+        // Offscreen cards have not requested metadata yet. Their deadline starts
+        // when they first become visible; an existing wait keeps its deadline.
+        if (!canStartWait || (!allowOnly && !scheduled)) {
+            categoryMetadataWaitByCard.delete(card);
+            return { pending: false, unavailable: false, remainingMs: 0 };
+        }
+        state = { key, startedAt: now };
+        categoryMetadataWaitByCard.set(card, state);
+    }
+    const remainingMs = Math.max(0, 8000 - (now - state.startedAt));
+    return {
+        pending: remainingMs > 0 && (allowOnly || scheduled),
+        unavailable: remainingMs === 0 && allowOnly,
+        remainingMs
+    };
+}
+
 function getLanguagePolicySignature(settings) {
     const filters = settings && typeof settings === 'object' ? settings.languageFilters : null;
     const enabled = filters?.enabled === true;
@@ -603,7 +631,8 @@ function getPlaylistPanelRows(root = document) {
         return Array.from(root.querySelectorAll(
             'ytd-playlist-panel-video-renderer, ' +
             'ytm-playlist-panel-video-renderer, ' +
-            'ytm-playlist-video-renderer'
+            'ytm-playlist-video-renderer, ' +
+            '.ytmPlaylistPanelVideoRendererV2Host'
         ));
     } catch (e) {
         return [];
@@ -2363,10 +2392,12 @@ function enforceCurrentWatchOwnerBlock(settings) {
             const selected = getPlaylistPanelRows(getPlaylistPanelContainer() || document)
                 .find(row => isSelectedPlaylistPanelRow(row));
             if (selected) {
-                selected.setAttribute('data-filtertube-hidden-by-channel', 'true');
+                // Admission pauses the current player; hiding its selected row
+                // can make YouTube move the playlist to another video.
+                selected.removeAttribute('data-filtertube-hidden-by-channel');
                 selected.setAttribute('data-filtertube-current-watch-blocked', 'true');
                 if (ownerMeta.id) selected.setAttribute('data-filtertube-channel-id', ownerMeta.id);
-                toggleVisibility(selected, true, `Current watch blocked: ${ownerName}`, true);
+                toggleVisibility(selected, false, `Current watch blocked: ${ownerName}`, true);
             }
         } catch (e) {
         }
@@ -5514,6 +5545,7 @@ async function applyDOMFallback(settings, options = {}) {
             let pendingCategoryMeta = false;
             let categoryAllowOnlyUnknown = false;
             let categoryFetchScheduled = false;
+            let categoryUnknown = false;
             let categoryVideoId = '';
             let resolvedCategoryForState = '';
             try {
@@ -5556,7 +5588,8 @@ async function applyDOMFallback(settings, options = {}) {
                         }
                     }
 
-                    categoryAllowOnlyUnknown = isCategoryEligible && mode === 'allow' && !categoryRaw;
+                    categoryUnknown = isCategoryEligible && !categoryRaw;
+                    categoryAllowOnlyUnknown = categoryUnknown && mode === 'allow';
 
                     if (categoryRaw) {
                         resolvedCategoryForState = categoryRaw;
@@ -5569,6 +5602,11 @@ async function applyDOMFallback(settings, options = {}) {
                 }
             } catch (e) {
             }
+            const categoryWaitState = getCategoryMetadataWaitState(
+                element, categoryVideoId, categoryPolicySignature, categoryUnknown,
+                categoryAllowOnlyUnknown, categoryFetchScheduled, Date.now(), pendingCategoryMeta
+            );
+            pendingCategoryMeta = categoryWaitState.pending;
             let hideByLanguage = false;
             let pendingLanguageMeta = false;
             let languageFetchScheduled = false;
@@ -5739,7 +5777,10 @@ async function applyDOMFallback(settings, options = {}) {
                 clearCachedChannelMetadata(element);
             }
 
-            if (alreadyProcessed && !forceReprocess && !contentChanged) {
+            if (alreadyProcessed && !forceReprocess && !contentChanged &&
+                !pendingCategoryMeta && !categoryWaitState.unavailable &&
+                !element.hasAttribute('data-filtertube-pending-category') &&
+                !element.closest?.('[data-filtertube-pending-category]')) {
                 const hasIdentityAttr =
                     element.hasAttribute('data-filtertube-channel-id') ||
                     element.hasAttribute('data-filtertube-channel-handle') ||
@@ -6953,18 +6994,7 @@ async function applyDOMFallback(settings, options = {}) {
 
             const pendingMetaTtlMs = 8000;
             const nowMetaTs = Date.now();
-            let categoryUnavailableMeta = false;
-            try {
-                if (pendingCategoryMeta) {
-                    const raw = targetToHide.getAttribute('data-filtertube-pending-category-ts') || '';
-                    const prev = raw && /^\d+$/.test(raw) ? parseInt(raw, 10) : 0;
-                    if (!categoryFetchScheduled && prev && (nowMetaTs - prev > pendingMetaTtlMs)) {
-                        pendingCategoryMeta = false;
-                        categoryUnavailableMeta = categoryAllowOnlyUnknown;
-                    }
-                }
-            } catch (e) {
-            }
+            const categoryUnavailableMeta = categoryWaitState.unavailable;
             try {
                 if (pendingUploadDateMeta) {
                     const raw = targetToHide.getAttribute('data-filtertube-pending-upload-date-ts') || '';
@@ -6981,21 +7011,20 @@ async function applyDOMFallback(settings, options = {}) {
             try {
                 if (pendingMetaOnly && pendingCategoryMeta) {
                     targetToHide.setAttribute('data-filtertube-pending-category', 'true');
-                    const hadTs = targetToHide.hasAttribute('data-filtertube-pending-category-ts');
-                    if (!hadTs) {
+                    if (!targetToHide.hasAttribute('data-filtertube-pending-category-ts')) {
                         targetToHide.setAttribute('data-filtertube-pending-category-ts', String(nowMetaTs));
-                        const pendingTimerState = window.__filtertubePendingMetaRecheck || (window.__filtertubePendingMetaRecheck = { timer: 0 });
-                        if (!pendingTimerState.timer) {
-                            pendingTimerState.timer = setTimeout(() => {
-                                pendingTimerState.timer = 0;
-                                try {
-                                    if (typeof applyDOMFallback === 'function') {
-                                        applyDOMFallback(null, { preserveScroll: true });
-                                    }
-                                } catch (e) {
+                    }
+                    const pendingTimerState = window.__filtertubePendingMetaRecheck || (window.__filtertubePendingMetaRecheck = { timer: 0 });
+                    if (!pendingTimerState.timer) {
+                        pendingTimerState.timer = setTimeout(() => {
+                            pendingTimerState.timer = 0;
+                            try {
+                                if (typeof applyDOMFallback === 'function') {
+                                    applyDOMFallback(null, { preserveScroll: true, forceReprocess: true });
                                 }
-                            }, pendingMetaTtlMs + 120);
-                        }
+                            } catch (e) {
+                            }
+                        }, categoryWaitState.remainingMs + 120);
                     }
                 } else {
                     targetToHide.removeAttribute('data-filtertube-pending-category');

@@ -2832,7 +2832,7 @@
             }
 
             // Keyword filtering (check title AND description)
-            if (!skipKeywordFiltering && this.settings.filterKeywords.length > 0) {
+            if (!isCommentRenderer && !skipKeywordFiltering && this.settings.filterKeywords.length > 0) {
                 const textToSearch = this._candidateSearchText(candidate);
 
                 for (const keywordRegex of this.settings.filterKeywords) {
