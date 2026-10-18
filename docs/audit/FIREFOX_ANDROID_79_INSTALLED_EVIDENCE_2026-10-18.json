@@ -1,0 +1,111 @@
+{
+  "date": "2026-10-18",
+  "kind": "installed_emulator_observations_not_physical_device_certification",
+  "runtime_commit": "f20861a7",
+  "audit_commit": "71e1e6dd",
+  "firefox_version": "158.0",
+  "firefox_version_code": 2016189050,
+  "android_api": 37,
+  "avd": "FilterTube_Firefox_Acceptance_20261018",
+  "adb_serial": "emulator-5556",
+  "ram_runs_mb": [
+    2048,
+    4096
+  ],
+  "extension_version": "3.4.1",
+  "reporter_input_sha256": "54ea7fdb1fef2eb202fcff02435e9daae9e9c7635994bf182c4f2650c923b99e",
+  "observed_counts_after_import": {
+    "blocked_keywords": 529,
+    "blocked_channels": 1408
+  },
+  "observed_counts_after_probe_cleanup": {
+    "blocked_keywords": 529,
+    "blocked_channels": 1408
+  },
+  "temporary_keyword_probe": "half yearly",
+  "probe_removed": true,
+  "final_observed_filtering_state": "ENABLED",
+  "screenshot_directory_local_only": "/tmp/filtertube-release-2026-10-18",
+  "screenshots": [
+    {
+      "file": "android-baseline-mobile-page.png",
+      "sha256": "f93063c89de4d16673dc8b769464730f673aa36393ac2adb30cba033e8505ba4",
+      "bytes": 1153629
+    },
+    {
+      "file": "android-baseline-desktop-page.png",
+      "sha256": "558bb661c15223f16fc7dfd4107bcd120a75c942870324bd9c4f59c09e2303b5",
+      "bytes": 1081278
+    },
+    {
+      "file": "android-imported-channel-count.png",
+      "sha256": "6956dc534d90f412b2bc9aef5c9a7063a05a6f0608183fa187d378a3662be43c",
+      "bytes": 952425
+    },
+    {
+      "file": "android-4gb-enabled-mobile-search.png",
+      "sha256": "0cd30794d7493ae6f1253370c7c383b5836841dec3d5799304eecf5e6ac094c7",
+      "bytes": 456377
+    },
+    {
+      "file": "android-4gb-enabled-mobile-after-deadline.png",
+      "sha256": "5729518fba6fefd90b2b3874970895ebd5af025233bf8552224041a2efbaafd7",
+      "bytes": 1071323
+    },
+    {
+      "file": "android-imported-desktop-after-wait.png",
+      "sha256": "d393b80ddb31c1e448138f70d84836ff9f9138ace0af527e7161bf811b66bb99",
+      "bytes": 1015214
+    },
+    {
+      "file": "android-imported-mobile-channel.png",
+      "sha256": "631827ccd09dce0488d5b773e37db95a0322fb4c0456bb5ce760ad229d5cb375",
+      "bytes": 1353510
+    },
+    {
+      "file": "android-imported-desktop-channel-ready.png",
+      "sha256": "472ba8a23f707196f036d54534c9246fae7c272b4f0653a996aa2478efbab65e",
+      "bytes": 1071746
+    },
+    {
+      "file": "android-enabled-mobile-regular-watch.png",
+      "sha256": "a8ffdded2077794418108b5cc6e06520eef2ccdc0d311b3a04a3a736f36f8348",
+      "bytes": 1725687
+    },
+    {
+      "file": "android-imported-home.png",
+      "sha256": "63ebba66187d3b1cb3d05b5bc2e670c153da2ed6b119f17cd989bf09b1d40d27",
+      "bytes": 1162617
+    },
+    {
+      "file": "android-imported-desktop-home-later.png",
+      "sha256": "739225745faa0705ba9c56c2f87776a364f3d1ed086e66296619b406345e9ef1",
+      "bytes": 1552131
+    },
+    {
+      "file": "android-enabled-watch-block-later.png",
+      "sha256": "86c1b905694c5cba39036cc5f1d2a7ff4f068502e405ce107cc2666e840e97f5",
+      "bytes": 1031140
+    },
+    {
+      "file": "android-confirmed-disabled-probe-watch.png",
+      "sha256": "829c5655e5f33137ccd25dd463cf5d0e4080bc6a7d93bfe5cffdd0750d7c6e61",
+      "bytes": 1454017
+    }
+  ],
+  "source_hashes": {
+    "js/content/dom_fallback.js": "df11dc69db7f7b8818c8dceb1d237d1794c8687af161dc2b9ae9d12acaed9e16",
+    "js/filter_logic.js": "f7021a053af96a4cd31a577f56e900ffb1a5d990fe55a838af64a6dba867afc4",
+    "js/content_bridge.js": "c653324d1f042c0473cf2102d81bcd161bfaa26f8c7ee545e250226594dc9618",
+    "js/state_manager.js": "04879b5b1dcac9229c70d0ea14241667755682649865ad1d52030c1ce21950d3"
+  },
+  "limits": [
+    "No pre-fix installed A/B comparison",
+    "No exact eight-second compositor timing measurement",
+    "No physical reporter device",
+    "2GB emulator process exited with code137; cause unestablished",
+    "Desktop Home retained empty grid slots; one sampled empty slot did not navigate",
+    "No installed BlockTube acceptance",
+    "No physical network trust or native parity acceptance"
+  ]
+}
