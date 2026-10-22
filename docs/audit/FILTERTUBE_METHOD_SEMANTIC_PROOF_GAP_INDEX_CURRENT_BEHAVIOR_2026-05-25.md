@@ -960,7 +960,7 @@ separate release/workflow review and is not silently counted as JavaScript here.
 
 ```text
 current tracked JS/JSX/MJS files: 111
-current repo-wide lexical callables: 9167
+current repo-wide lexical callables: 9187
 current complete per-callable semantic proofs: 0
 current callable behavior-change approval: NO-GO
 runtime behavior changed by inventory refresh: no
@@ -969,7 +969,7 @@ runtime behavior changed by inventory refresh: no
 | Family | Files | Lexical callables |
 | --- | ---: | ---: |
 | Build/sync scripts | 5 | 75 |
-| Hot page/background runtime | 9 | 3820 |
+| Hot page/background runtime | 9 | 3840 |
 | Content helper runtime | 13 | 491 |
 | UI/settings runtime | 24 | 3712 |
 | Generated/quarantined UI | 6 | 147 |
@@ -1017,7 +1017,7 @@ runtime behavior changed by inventory refresh: no
 | `js/render_engine.js` | UI/settings runtime | 171 | `semantic proof incomplete` | Lexical accounting only; no complete per-callable closure claimed. |
 | `js/rule_list_import_reports.js` | UI/settings runtime | 38 | `semantic proof incomplete` | Lexical accounting only; no complete per-callable closure claimed. |
 | `js/security_manager.js` | UI/settings runtime | 18 | `semantic proof incomplete` | Lexical accounting only; no complete per-callable closure claimed. |
-| `js/seed.js` | Hot page/background runtime | 173 | `semantic proof incomplete` | Lexical accounting only; no complete per-callable closure claimed. |
+| `js/seed.js` | Hot page/background runtime | 193 | `semantic proof incomplete` | Lexical accounting only; no complete per-callable closure claimed. |
 | `js/settings_shared.js` | UI/settings runtime | 45 | `semantic proof incomplete` | Lexical accounting only; no complete per-callable closure claimed. |
 | `js/shared/identity.js` | Content helper runtime | 110 | `semantic proof incomplete` | Lexical accounting only; no complete per-callable closure claimed. |
 | `js/shared/view_count.js` | Content helper runtime | 4 | `semantic proof incomplete` | Lexical accounting only; no complete per-callable closure claimed. |
@@ -1153,8 +1153,8 @@ The import writer remains behind the shared-lock importV3 wrapper.
 | `seed_hasActiveJsonFilterRules_rule_branches` | `js/seed.js:1297` | Semantic proof incomplete; location only. |
 | `seed_shouldSkipEngineProcessing_harvest_only_scope` | `js/seed.js:1352` | Semantic proof incomplete; location only. |
 | `seed_processWithEngine_transport_dispatcher` | `js/seed.js:1472` | Semantic proof incomplete; location only. |
-| `seed_setupFetchInterception_clone_parse_gate` | `js/seed.js:1772` | Semantic proof incomplete; location only. |
-| `seed_setupXhrInterception_parse_override_gate` | `js/seed.js:1868` | Semantic proof incomplete; location only. |
+| `seed_setupFetchInterception_clone_parse_gate` | `js/seed.js:1901` | Semantic proof incomplete; location only. |
+| `seed_setupXhrInterception_parse_override_gate` | `js/seed.js:2001` | Semantic proof incomplete; location only. |
 | `injector_processDataWithFilterLogic_active_gate` | `js/injector.js:3960` | Semantic proof incomplete; location only. |
 | `injector_processInitialDataQueue_no_work_clear` | `js/injector.js:3982` | Semantic proof incomplete; location only. |
 | `bridge_needsIdentityPrefetchWork_non_json_branch` | `js/content_bridge.js:1058` | Semantic proof incomplete; location only. |
@@ -1239,3 +1239,9 @@ The import writer remains behind the shared-lock importV3 wrapper.
 The same lexical parser now measures 111 tracked files and 9,167 matches. The seed change adds `isAdVoidContentPayload` plus two control-flow matches, moving its lexical count from 170 to 173; this is not three new semantic method proofs. Moving the declarative lane rules into `scripts/test-lane-file-rules.mjs` adds one tracked audit/workflow file with zero matches and leaves that family's 517 matches unchanged. Zero lexical matches do not establish absence of runtime effects or complete review. The hot runtime family now totals 3,820 matches.
 
 This dated refresh changes only inventories. All callable completeness, affected-method review, runtime behavior, and installed-browser proof boundaries remain separate; complete per-callable semantic proofs remain zero.
+
+### Streaming Response And Popup Inventory Revalidation - 2026-10-22
+
+After the frozen streaming `get_watch` response helper and popup intrinsic-width fix, the unchanged lexical parser measures 111 tracked source files and 9,187 matches. Only `js/seed.js` changes its count, from 173 to 193, bringing the hot runtime family to 3,840. The 20 added matches include nested callbacks and control-flow syntax; they are not 20 newly proved semantic methods. The source UI helper and both generated bundles retain their callable counts. Current seed fetch/XHR locations were measured from the frozen source where listed. Earlier dated measurements remain historical.
+
+This is bookkeeping only. The dedicated streaming tests cover record boundaries, early player delivery, settings guards and stream cleanup; they do not establish installed playback timing, complete per-callable proof, or a published release.

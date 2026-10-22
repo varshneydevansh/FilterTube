@@ -34,7 +34,7 @@ Current tracked root metadata inventory: 7 files, 3,388 newline counts, and
 | `.gitignore` | 157 | 2,275 | `f3033e094938bb4fc6ecf30aad468286f1dccd8d18db1c136e348ab087208bcd` |
 | `CHANGELOG.md` | 938 | 75,511 | `e57906dca95911874ef251aa45d8c3a76df00df576b36277d9c0e9b9654c3036` |
 | `LICENSE` | 21 | 1,073 | `d0739cbb6232b0fb9ea59347feaf412bab5042768aa02856b16af24bb35e9d9d` |
-| `README.md` | 456 | 28,669 | `b184e8e1d79cd4767c66a1c12ff3222ad2eb998a54891767182542e8d68430db` |
+| `README.md` | 456 | 28,669 | `0ff873be1e7df7d2dccaffb8cdedbce55239bb3a1cfac415efc262465d452cc4` |
 | `channel-identity-watch-mix-collab-recovery-plan.md` | 262 | 16,023 | `01f82169b06d3752e318b20b956c8a4284ae80166686e5c40aeee66c957d108a` |
 | `package.json` | 86 | 4,580 | `c9cb2c3c4fea302fa3946f462dbfbb474381a78946ca59adb653814d06a4de51` |
 | `package-lock.json` | 1,468 | 50,219 | `84e60039228a76c10550d2e3922706ef2b7dd3671ef218a1d6e9263598cef33d` |
@@ -321,3 +321,7 @@ Current fingerprints, package version, 51 script entrypoints, jsqr dependency an
 ## README Fingerprint Revalidation - 2026-10-22
 
 The build-generated total-lines badge changed from 879.2k to 881.0k. The README remains 456 lines and 28,669 bytes; its SHA-256 above was recomputed from the current bytes. This refresh does not establish a published release, installed package parity, native build proof, or code coverage from a line-count badge.
+
+## Popup And Streaming Build Fingerprint Revalidation - 2026-10-22
+
+The frozen build refreshed only README badges: total lines changed from 881.0k to 881.9k and JavaScript lines from 121.3k to 121.5k. README remains 456 lines and 28,669 bytes; the current SHA-256 above was measured after the completed build. This pin refresh is not release publication, installed-package verification, or a code-coverage claim.

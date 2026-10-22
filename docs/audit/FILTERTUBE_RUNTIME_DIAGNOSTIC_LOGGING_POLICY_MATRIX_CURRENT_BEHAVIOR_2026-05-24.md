@@ -775,7 +775,7 @@ relative isolated-world production console-gate ordering are checked in source.
 | `js/io_manager.js` | 3203 | 162604 | `ca73f44abb4d2d4e57a81470cfcb2447b1e62ef8680ef0457b81dcdc6734e4c3` |
 | `js/layout.js` | 680 | 30604 | `48831ccdc2d62c75818d9c6a153d7bfacec9d7be9f2408485f74b1a7c13c57c7` |
 | `js/popup.js` | 2553 | 117093 | `645fab83d4b665796f5b2fe1be262ca336df6a4cf3ffb1daebc588a50c091aa7` |
-| `js/seed.js` | 2307 | 99988 | `8b5d08f600868aac65d111e549836dd3f47c0f679ff1811f27c3a03d804656e9` |
+| `js/seed.js` | 2440 | 106743 | `5c54148fb8635ed7ce8ef8eaa1be5012eabfbc90f73b0bb87c44e2410c45c8f4` |
 | `js/settings_shared.js` | 1313 | 66857 | `19f0a1fb3cd512494481b7eb39169bf84feeda4a0a6a20cf58ebaf1c18ff7ba9` |
 | `js/state_manager.js` | 2979 | 124009 | `04879b5b1dcac9229c70d0ea14241667755682649865ad1d52030c1ce21950d3` |
 | `js/tab-view.js` | 32531 | 1760504 | `6da5a37b9018368588ff9c7091aca30c22a4398a038f681bad2ba2a1be4a4eca` |
@@ -821,3 +821,7 @@ relative isolated-world production console-gate ordering are checked in source.
 The sponsored-renderer pass now calls the existing `adVoidTrace` helper with event `sponsored-content-removed`, `dataName`, and `removedRenderers`. This adds a helper invocation, not a console callsite: the scoped console total remains 446. The helper is not debug-gated; it appends to the page-local history capped at 100 entries and emits `console.info` with the event and existing current-video/session metadata. This is a source observation, not an installed-console sample or a completed privacy/performance budget. Historical debug-gate claims above do not establish a guard for this trace path.
 
 Source fingerprints and the relocated seed routine console line were measured again for this diff. The existing global logging authority and installed-browser proof limits remain open.
+
+## Streaming Response Fingerprint Revalidation - 2026-10-22
+
+The exact-path `get_watch` stream transformer adds 133 seed source lines. The current seed fingerprint above was recomputed after source freeze. The transformer adds no console callsite: seed remains at four and the scoped logging inventory remains 446. The existing trace guard/privacy limitations and historical source snapshots remain unchanged; this fingerprint refresh is not installed-console or playback-timing proof.
