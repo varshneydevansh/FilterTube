@@ -36,6 +36,7 @@ const accountedFiles = [
   "scripts/run-test-lane.mjs",
   "scripts/sync-native-runtime.mjs",
   "scripts/test-lane-config.mjs",
+  "scripts/test-lane-file-rules.mjs",
   "scripts/update-family-device-evidence-log.mjs",
   "scripts/validate-family-device-evidence.mjs",
   "scripts/verify-managed-app-policy-contract.mjs",
@@ -168,6 +169,10 @@ const expectedCounts = new Map([
   ],
   [
     "scripts/test-lane-config.mjs",
+    0
+  ],
+  [
+    "scripts/test-lane-file-rules.mjs",
     0
   ],
   [
@@ -428,8 +433,8 @@ test('build/website callable counts match the current lexical source surface', (
   }
 
   assert.equal(total, 417);
-  assert.match(auditDoc, /\| Build and sync scripts \| 29 \| 341 \|/);
-  assert.match(auditDoc, /\| Total \| 53 \| 417 \|/);
+  assert.match(auditDoc, /\| Build and sync scripts \| 30 \| 341 \|/);
+  assert.match(auditDoc, /\| Total \| 54 \| 417 \|/);
 
   const build = read('build.js');
   const buildRows = buildMethodRows();

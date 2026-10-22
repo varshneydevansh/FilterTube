@@ -120,7 +120,8 @@ test('test lane matrix defines every required lane and npm script', () => {
   assert.match(driftScript, /function laneOwnedProofFiles\(\)/);
   assert.match(driftScript, /test-lane-classifier-workflow-current-behavior\.test\.mjs/);
   assert.match(config, /export const LANES = Object\.freeze/);
-  assert.match(config, /export const FILE_LANE_RULES = Object\.freeze/);
+  assert.match(config, /export \{ FILE_LANE_RULES \} from '\.\/test-lane-file-rules\.mjs'/);
+  assert.match(read('scripts/test-lane-file-rules.mjs'), /export const FILE_LANE_RULES = Object\.freeze/);
   assert.match(matrix, /npm run test:audit-drift/);
   assert.match(matrix, /npm run lanes:changed/);
   assert.match(matrix, /npm run test:changed/);

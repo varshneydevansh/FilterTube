@@ -16,7 +16,7 @@ and DOM fallback matching before any first-class JSON filter authority is added.
 | `js/filter_logic.js` | 4534 | 221980 | `f7021a053af96a4cd31a577f56e900ffb1a5d990fe55a838af64a6dba867afc4` |
 | `js/settings_shared.js` | 1313 | 66857 | `19f0a1fb3cd512494481b7eb39169bf84feeda4a0a6a20cf58ebaf1c18ff7ba9` |
 | `js/background.js` | 8538 | 386043 | `cc89bb4a0375145e1c811b7cf5953729c39c409b6b24cacdc65c80f9f6ff44d0` |
-| `js/content/dom_fallback.js` | 8,172 | 380,506 | `df11dc69db7f7b8818c8dceb1d237d1794c8687af161dc2b9ae9d12acaed9e16` |
+| `js/content/dom_fallback.js` | 8,177 | 380,719 | `bc072cfd232c1b19fc02c38de008fd84c52de774752f802aef9dac8b560d4851` |
 
 ## Boundary Counts
 
@@ -139,3 +139,21 @@ runtime behavior changed: no
 These counts are audit-only blockers. They do not approve runtime
 optimization, JSON-first behavior, keyword-match changes, DOM parity changes,
 channel-derived keyword provenance changes, or whitelist behavior changes.
+
+
+## Advert source-pin revalidation - 2026-10-22
+
+The earlier dated runtime-change statements describe their historical slices.
+The DOM fallback fingerprint now includes exact mobile ad-slot, promoted-video,
+and video-masthead-ad CSS selectors from the separate advert correction. The
+keyword engine, keyword matching source/effect blocks, and their assertions
+were not changed by this refresh.
+
+Affected whole-file fingerprints and shifted source anchors were recomputed
+from the current files. Selected source/effect block bytes, hashes, counts and
+semantic assertions were retained. The five affected blocking audit suites
+passed at pre-advert HEAD `14f08c4b` before these pin updates; their current
+fixtures also pass after the bounded refresh. This is source/VM regression
+evidence, not installed ad coverage, physical-device acceptance, or completion
+of the wider semantic/security proof gates. This audit refresh changes no
+product runtime.

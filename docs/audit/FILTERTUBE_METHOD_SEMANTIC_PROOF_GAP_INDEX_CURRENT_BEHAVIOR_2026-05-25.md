@@ -959,8 +959,8 @@ lexical and its scope remains tracked JS/JSX/MJS: CJS/Python tooling requires it
 separate release/workflow review and is not silently counted as JavaScript here.
 
 ```text
-current tracked JS/JSX/MJS files: 110
-current repo-wide lexical callables: 9164
+current tracked JS/JSX/MJS files: 111
+current repo-wide lexical callables: 9167
 current complete per-callable semantic proofs: 0
 current callable behavior-change approval: NO-GO
 runtime behavior changed by inventory refresh: no
@@ -969,12 +969,12 @@ runtime behavior changed by inventory refresh: no
 | Family | Files | Lexical callables |
 | --- | ---: | ---: |
 | Build/sync scripts | 5 | 75 |
-| Hot page/background runtime | 9 | 3817 |
+| Hot page/background runtime | 9 | 3820 |
 | Content helper runtime | 13 | 491 |
 | UI/settings runtime | 24 | 3712 |
 | Generated/quarantined UI | 6 | 147 |
 | Vendor bundles | 3 | 279 |
-| Audit/test lane scripts | 24 | 517 |
+| Audit/test lane scripts | 25 | 517 |
 | Website routes/components/config | 26 | 126 |
 
 | File | Family | Lexical callables | Semantic proof | Boundary |
@@ -1017,7 +1017,7 @@ runtime behavior changed by inventory refresh: no
 | `js/render_engine.js` | UI/settings runtime | 171 | `semantic proof incomplete` | Lexical accounting only; no complete per-callable closure claimed. |
 | `js/rule_list_import_reports.js` | UI/settings runtime | 38 | `semantic proof incomplete` | Lexical accounting only; no complete per-callable closure claimed. |
 | `js/security_manager.js` | UI/settings runtime | 18 | `semantic proof incomplete` | Lexical accounting only; no complete per-callable closure claimed. |
-| `js/seed.js` | Hot page/background runtime | 170 | `semantic proof incomplete` | Lexical accounting only; no complete per-callable closure claimed. |
+| `js/seed.js` | Hot page/background runtime | 173 | `semantic proof incomplete` | Lexical accounting only; no complete per-callable closure claimed. |
 | `js/settings_shared.js` | UI/settings runtime | 45 | `semantic proof incomplete` | Lexical accounting only; no complete per-callable closure claimed. |
 | `js/shared/identity.js` | Content helper runtime | 110 | `semantic proof incomplete` | Lexical accounting only; no complete per-callable closure claimed. |
 | `js/shared/view_count.js` | Content helper runtime | 4 | `semantic proof incomplete` | Lexical accounting only; no complete per-callable closure claimed. |
@@ -1057,6 +1057,7 @@ runtime behavior changed by inventory refresh: no
 | `scripts/run-test-lane.mjs` | Audit/test lane scripts | 61 | `semantic proof incomplete` | Lexical accounting only; no complete per-callable closure claimed. |
 | `scripts/sync-native-runtime.mjs` | Build/sync scripts | 1 | `semantic proof incomplete` | Lexical accounting only; no complete per-callable closure claimed. |
 | `scripts/test-lane-config.mjs` | Audit/test lane scripts | 0 | `semantic proof incomplete` | Lexical accounting only; no complete per-callable closure claimed. |
+| `scripts/test-lane-file-rules.mjs` | Audit/test lane scripts | 0 | `semantic proof incomplete` | Lexical accounting only; no complete per-callable closure claimed. |
 | `scripts/update-family-device-evidence-log.mjs` | Audit/test lane scripts | 23 | `semantic proof incomplete` | Lexical accounting only; no complete per-callable closure claimed. |
 | `scripts/validate-family-device-evidence.mjs` | Audit/test lane scripts | 24 | `semantic proof incomplete` | Lexical accounting only; no complete per-callable closure claimed. |
 | `scripts/verify-managed-app-policy-contract.mjs` | Audit/test lane scripts | 14 | `semantic proof incomplete` | Lexical accounting only; no complete per-callable closure claimed. |
@@ -1098,14 +1099,14 @@ The import writer remains behind the shared-lock importV3 wrapper.
 
 | Row | Current source | Boundary |
 | --- | --- | --- |
-| `seed_hasNetworkJsonWork` | `js/seed.js:1266` | Semantic proof incomplete; location only. |
-| `seed_shouldBypassYouTubeiNetworkResponse` | `js/seed.js:1292` | Semantic proof incomplete; location only. |
+| `seed_hasNetworkJsonWork` | `js/seed.js:1312` | Semantic proof incomplete; location only. |
+| `seed_shouldBypassYouTubeiNetworkResponse` | `js/seed.js:1338` | Semantic proof incomplete; location only. |
 | `injector_hasNetworkJsonWork` | `js/injector.js:256` | Semantic proof incomplete; location only. |
 | `bridge_settings_refreshRuntimeObserversAfterSettingsUpdate` | `js/content/bridge_settings.js:1883` | Semantic proof incomplete; location only. |
 | `bridge_settings_scheduleSettingsRefreshFromStorage` | `js/content/bridge_settings.js:1916` | Semantic proof incomplete; location only. |
 | `background_v4KeywordEntries` | `js/background.js:3725` | Semantic proof incomplete; location only. |
 | `content_bridge_forceCloseDropdown` | `js/content_bridge.js:538` | Semantic proof incomplete; location only. |
-| `content_bridge_parseCollaboratorNames` | `js/content_bridge.js:3528` | Semantic proof incomplete; location only. |
+| `content_bridge_parseCollaboratorNames` | `js/content_bridge.js:3529` | Semantic proof incomplete; location only. |
 | `block_refreshQuickBlockRuntimeState` | `js/content/block_channel.js:455` | Semantic proof incomplete; location only. |
 | `block_refreshQuickBlockAvailability` | `js/content/block_channel.js:466` | Semantic proof incomplete; location only. |
 | `block_resolveOutermostShortsQuickBlockHost` | `js/content/block_channel.js:665` | Semantic proof incomplete; location only. |
@@ -1119,28 +1120,28 @@ The import writer remains behind the shared-lock importV3 wrapper.
 | `dom_helper_updateContainerVisibility` | `js/content/dom_helpers.js:254` | Semantic proof incomplete; location only. |
 | `dom_helper_containerRestoreGap` | `js/content/dom_helpers.js:297` | Semantic proof incomplete; location only. |
 | `dom_helper_externalGlobalDependencies` | `js/content/dom_helpers.js:176` | Semantic proof incomplete; location only. |
-| `content_bridge_getValidatedCachedCollaborators_ampersand_topic_guard` | `js/content_bridge.js:3426` | Semantic proof incomplete; location only. |
-| `content_bridge_ampersandTopicNameOnlyCollaboratorState_guard` | `js/content_bridge.js:5866` | Semantic proof incomplete; location only. |
-| `content_bridge_applyResolvedCollaborators_card_stamp_provenance` | `js/content_bridge.js:4343` | Semantic proof incomplete; location only. |
-| `content_bridge_applyCollaboratorsByVideoId_unstamped_cache` | `js/content_bridge.js:4439` | Semantic proof incomplete; location only. |
-| `content_bridge_prefetchCollaboratorsForCard_single_card_warmup` | `js/content_bridge.js:6786` | Semantic proof incomplete; location only. |
-| `content_bridge_normalizeCollaboratorCache_before_fresh_parser` | `js/content_bridge.js:5934` | Semantic proof incomplete; location only. |
-| `content_bridge_menu_enrichment_list_only_cache` | `js/content_bridge.js:12645` | Semantic proof incomplete; location only. |
-| `content_bridge_block_all_stale_delete_no_op` | `js/content_bridge.js:14025` | Semantic proof incomplete; location only. |
-| `content_bridge_rejectAmpersandTopicCollaboratorWrite_topic_writer_guard` | `js/content_bridge.js:5888` | Semantic proof incomplete; location only. |
-| `content_bridge_applyResolvedCollaborators_writer_guard` | `js/content_bridge.js:4343` | Semantic proof incomplete; location only. |
-| `content_bridge_applyCollaboratorsByVideoId_writer_guard` | `js/content_bridge.js:4439` | Semantic proof incomplete; location only. |
-| `content_bridge_renderer_hydration_writer_guard` | `js/content_bridge.js:5209` | Semantic proof incomplete; location only. |
-| `content_bridge_cacheResult_writer_guard` | `js/content_bridge.js:5284` | Semantic proof incomplete; location only. |
+| `content_bridge_getValidatedCachedCollaborators_ampersand_topic_guard` | `js/content_bridge.js:3427` | Semantic proof incomplete; location only. |
+| `content_bridge_ampersandTopicNameOnlyCollaboratorState_guard` | `js/content_bridge.js:5867` | Semantic proof incomplete; location only. |
+| `content_bridge_applyResolvedCollaborators_card_stamp_provenance` | `js/content_bridge.js:4344` | Semantic proof incomplete; location only. |
+| `content_bridge_applyCollaboratorsByVideoId_unstamped_cache` | `js/content_bridge.js:4440` | Semantic proof incomplete; location only. |
+| `content_bridge_prefetchCollaboratorsForCard_single_card_warmup` | `js/content_bridge.js:6787` | Semantic proof incomplete; location only. |
+| `content_bridge_normalizeCollaboratorCache_before_fresh_parser` | `js/content_bridge.js:5935` | Semantic proof incomplete; location only. |
+| `content_bridge_menu_enrichment_list_only_cache` | `js/content_bridge.js:12646` | Semantic proof incomplete; location only. |
+| `content_bridge_block_all_stale_delete_no_op` | `js/content_bridge.js:14026` | Semantic proof incomplete; location only. |
+| `content_bridge_rejectAmpersandTopicCollaboratorWrite_topic_writer_guard` | `js/content_bridge.js:5889` | Semantic proof incomplete; location only. |
+| `content_bridge_applyResolvedCollaborators_writer_guard` | `js/content_bridge.js:4344` | Semantic proof incomplete; location only. |
+| `content_bridge_applyCollaboratorsByVideoId_writer_guard` | `js/content_bridge.js:4440` | Semantic proof incomplete; location only. |
+| `content_bridge_renderer_hydration_writer_guard` | `js/content_bridge.js:5210` | Semantic proof incomplete; location only. |
+| `content_bridge_cacheResult_writer_guard` | `js/content_bridge.js:5285` | Semantic proof incomplete; location only. |
 | `content_bridge_active_menu_refresh_writer_partial_guard` | `js/content_bridge.js:917` | Semantic proof incomplete; location only. |
 | `block_quick_collectCollaborators_action_trust_boundary` | `js/content/block_channel.js:1590` | Semantic proof incomplete; location only. |
 | `content_bridge_menu_renderer_action_trust_boundary` | `js/content_bridge.js:737` | Semantic proof incomplete; location only. |
-| `content_bridge_ampersandTopic_menu_renderer_guard` | `js/content_bridge.js:14982` | Semantic proof incomplete; location only. |
+| `content_bridge_ampersandTopic_menu_renderer_guard` | `js/content_bridge.js:14983` | Semantic proof incomplete; location only. |
 | `content_bridge_cleanupDropdownState_native_menu_state` | `js/content_bridge.js:512` | Semantic proof incomplete; location only. |
 | `content_bridge_getReusableNativeDropdownRoot_close_target` | `js/content_bridge.js:529` | Semantic proof incomplete; location only. |
 | `content_bridge_forceCloseDropdown_native_close_policy` | `js/content_bridge.js:538` | Semantic proof incomplete; location only. |
 | `content_bridge_renderFilterTubeMenuEntries_dropdown_writer` | `js/content_bridge.js:737` | Semantic proof incomplete; location only. |
-| `content_bridge_injectFilterTubeMenuItem_async_open_wait` | `js/content_bridge.js:12132` | Semantic proof incomplete; location only. |
+| `content_bridge_injectFilterTubeMenuItem_async_open_wait` | `js/content_bridge.js:12133` | Semantic proof incomplete; location only. |
 | `block_setupMenuObserver_page_lifetime_owner` | `js/content/block_channel.js:2479` | Semantic proof incomplete; location only. |
 | `block_ensureDropdownVisibilityObserver_attribute_scope` | `js/content/block_channel.js:2549` | Semantic proof incomplete; location only. |
 | `block_scheduleDropdownInjection_deferred_dedupe` | `js/content/block_channel.js:2595` | Semantic proof incomplete; location only. |
@@ -1148,17 +1149,17 @@ The import writer remains behind the shared-lock importV3 wrapper.
 | `block_closeFilterTubeInjectedDropdownsOnOutsidePointer_owned_close` | `js/content/block_channel.js:2644` | Semantic proof incomplete; location only. |
 | `block_armDropdownDiscoveryObserver_short_lived_body_observer` | `js/content/block_channel.js:2706` | Semantic proof incomplete; location only. |
 | `block_handleDropdownAppearedInternal_reusable_node_identity_cleanup` | `js/content/block_channel.js:3088` | Semantic proof incomplete; location only. |
-| `seed_hasEnabledContentFilters_strict_boolean` | `js/seed.js:1224` | Semantic proof incomplete; location only. |
-| `seed_hasActiveJsonFilterRules_rule_branches` | `js/seed.js:1251` | Semantic proof incomplete; location only. |
-| `seed_shouldSkipEngineProcessing_harvest_only_scope` | `js/seed.js:1306` | Semantic proof incomplete; location only. |
-| `seed_processWithEngine_transport_dispatcher` | `js/seed.js:1426` | Semantic proof incomplete; location only. |
-| `seed_setupFetchInterception_clone_parse_gate` | `js/seed.js:1726` | Semantic proof incomplete; location only. |
-| `seed_setupXhrInterception_parse_override_gate` | `js/seed.js:1822` | Semantic proof incomplete; location only. |
+| `seed_hasEnabledContentFilters_strict_boolean` | `js/seed.js:1270` | Semantic proof incomplete; location only. |
+| `seed_hasActiveJsonFilterRules_rule_branches` | `js/seed.js:1297` | Semantic proof incomplete; location only. |
+| `seed_shouldSkipEngineProcessing_harvest_only_scope` | `js/seed.js:1352` | Semantic proof incomplete; location only. |
+| `seed_processWithEngine_transport_dispatcher` | `js/seed.js:1472` | Semantic proof incomplete; location only. |
+| `seed_setupFetchInterception_clone_parse_gate` | `js/seed.js:1772` | Semantic proof incomplete; location only. |
+| `seed_setupXhrInterception_parse_override_gate` | `js/seed.js:1868` | Semantic proof incomplete; location only. |
 | `injector_processDataWithFilterLogic_active_gate` | `js/injector.js:3960` | Semantic proof incomplete; location only. |
 | `injector_processInitialDataQueue_no_work_clear` | `js/injector.js:3982` | Semantic proof incomplete; location only. |
 | `bridge_needsIdentityPrefetchWork_non_json_branch` | `js/content_bridge.js:1058` | Semantic proof incomplete; location only. |
 | `bridge_needsMainWorldRuntimeWork_admission` | `js/content_bridge.js:1162` | Semantic proof incomplete; location only. |
-| `bridge_ensureMainWorldRuntimeForSettings_injection_gate` | `js/content_bridge.js:1174` | Semantic proof incomplete; location only. |
+| `bridge_ensureMainWorldRuntimeForSettings_injection_gate` | `js/content_bridge.js:1175` | Semantic proof incomplete; location only. |
 | `filter_logic_processData_harvest_then_mutate` | `js/filter_logic.js:4395` | Semantic proof incomplete; location only. |
 | `state_manager_addKeyword_mode_split_persistence` | `js/state_manager.js:1653` | Semantic proof incomplete; location only. |
 | `state_manager_persistMainProfiles_dual_schema_alias_writer` | `js/state_manager.js:1392` | Semantic proof incomplete; location only. |
@@ -1171,33 +1172,33 @@ The import writer remains behind the shared-lock importV3 wrapper.
 | `background_addChannelPersistent_legacy_block_writer` | `js/background.js:5858` | Semantic proof incomplete; location only. |
 | `background_addFilteredChannel_secondary_default_blocklist` | `js/background.js:7072` | Semantic proof incomplete; location only. |
 | `background_handleAddFilteredChannel_multi_surface_writer` | `js/background.js:7156` | Semantic proof incomplete; location only. |
-| `content_bridge_addChannelDirectly_content_payload` | `js/content_bridge.js:14855` | Semantic proof incomplete; location only. |
+| `content_bridge_addChannelDirectly_content_payload` | `js/content_bridge.js:14856` | Semantic proof incomplete; location only. |
 | `io_manager_importV3_multi_profile_import_writer` | `js/io_manager.js:2307` | Semantic proof incomplete; location only. |
-| `dom_fallback_hasActiveDOMFallbackWork_admission` | `js/content/dom_fallback.js:4301` | Semantic proof incomplete; location only. |
-| `dom_fallback_clearStaleDOMFallbackVisibility_cleanup` | `js/content/dom_fallback.js:4375` | Semantic proof incomplete; location only. |
-| `dom_fallback_applyDOMFallback_run_state_gate` | `js/content/dom_fallback.js:5039` | Semantic proof incomplete; location only. |
-| `dom_fallback_applyDOMFallback_no_work_cleanup_return` | `js/content/dom_fallback.js:5153` | Semantic proof incomplete; location only. |
-| `dom_fallback_feed_channels_cleanup_return` | `js/content/dom_fallback.js:5209` | Semantic proof incomplete; location only. |
-| `dom_fallback_whitelist_watch_scaffolding_restore` | `js/content/dom_fallback.js:3931` | Semantic proof incomplete; location only. |
-| `dom_fallback_videoElements_selector_scope` | `js/content/dom_fallback.js:5402` | Semantic proof incomplete; location only. |
-| `dom_fallback_processed_identity_skip_gate` | `js/content/dom_fallback.js:5664` | Semantic proof incomplete; location only. |
-| `dom_fallback_channel_identity_selector_waterfall` | `js/content/dom_fallback.js:5846` | Semantic proof incomplete; location only. |
-| `dom_fallback_pending_meta_recheck_timer` | `js/content/dom_fallback.js:7015` | Semantic proof incomplete; location only. |
-| `dom_fallback_playlist_selected_row_safeguard` | `js/content/dom_fallback.js:7092` | Semantic proof incomplete; location only. |
-| `dom_fallback_run_state_pending_rerun_timer` | `js/content/dom_fallback.js:7819` | Semantic proof incomplete; location only. |
-| `content_bridge_schedulePrefetchScan_frame_gate` | `js/content_bridge.js:1200` | Semantic proof incomplete; location only. |
-| `content_bridge_attachPrefetchObservers_card_cap` | `js/content_bridge.js:1319` | Semantic proof incomplete; location only. |
-| `content_bridge_startCardPrefetchObserver_visibility_listener` | `js/content_bridge.js:1361` | Semantic proof incomplete; location only. |
-| `content_bridge_installPlaylistPanelPrefetchHook_scroll_observer` | `js/content_bridge.js:1392` | Semantic proof incomplete; location only. |
-| `content_bridge_installRightRailWhitelistObserver_mode_route_timers` | `js/content_bridge.js:1437` | Semantic proof incomplete; location only. |
-| `content_bridge_refreshFilterTubeRuntimeObservers_fanout` | `js/content_bridge.js:1499` | Semantic proof incomplete; location only. |
-| `content_bridge_scheduleVideoMetaDomRerun_debounce` | `js/content_bridge.js:2113` | Semantic proof incomplete; location only. |
-| `content_bridge_initializeDOMFallback_delayed_boot` | `js/content_bridge.js:7141` | Semantic proof incomplete; location only. |
-| `content_bridge_scheduleWhitelistPendingRecheck_timer` | `js/content_bridge.js:7403` | Semantic proof incomplete; location only. |
-| `content_bridge_queueWhitelistPendingHide_pending_timer` | `js/content_bridge.js:7418` | Semantic proof incomplete; location only. |
-| `content_bridge_refreshDOMFallbackMutationObserver_active_gate` | `js/content_bridge.js:7770` | Semantic proof incomplete; location only. |
-| `content_bridge_ensureFallbackMenuButtons_lifecycle_scan` | `js/content_bridge.js:7819` | Semantic proof incomplete; location only. |
-| `content_bridge_tail_message_listener_initialize_timer` | `js/content_bridge.js:15049` | Semantic proof incomplete; location only. |
+| `dom_fallback_hasActiveDOMFallbackWork_admission` | `js/content/dom_fallback.js:4308` | Semantic proof incomplete; location only. |
+| `dom_fallback_clearStaleDOMFallbackVisibility_cleanup` | `js/content/dom_fallback.js:4382` | Semantic proof incomplete; location only. |
+| `dom_fallback_applyDOMFallback_run_state_gate` | `js/content/dom_fallback.js:5046` | Semantic proof incomplete; location only. |
+| `dom_fallback_applyDOMFallback_no_work_cleanup_return` | `js/content/dom_fallback.js:5160` | Semantic proof incomplete; location only. |
+| `dom_fallback_feed_channels_cleanup_return` | `js/content/dom_fallback.js:5216` | Semantic proof incomplete; location only. |
+| `dom_fallback_whitelist_watch_scaffolding_restore` | `js/content/dom_fallback.js:3938` | Semantic proof incomplete; location only. |
+| `dom_fallback_videoElements_selector_scope` | `js/content/dom_fallback.js:5409` | Semantic proof incomplete; location only. |
+| `dom_fallback_processed_identity_skip_gate` | `js/content/dom_fallback.js:5671` | Semantic proof incomplete; location only. |
+| `dom_fallback_channel_identity_selector_waterfall` | `js/content/dom_fallback.js:5853` | Semantic proof incomplete; location only. |
+| `dom_fallback_pending_meta_recheck_timer` | `js/content/dom_fallback.js:7022` | Semantic proof incomplete; location only. |
+| `dom_fallback_playlist_selected_row_safeguard` | `js/content/dom_fallback.js:7099` | Semantic proof incomplete; location only. |
+| `dom_fallback_run_state_pending_rerun_timer` | `js/content/dom_fallback.js:7826` | Semantic proof incomplete; location only. |
+| `content_bridge_schedulePrefetchScan_frame_gate` | `js/content_bridge.js:1201` | Semantic proof incomplete; location only. |
+| `content_bridge_attachPrefetchObservers_card_cap` | `js/content_bridge.js:1320` | Semantic proof incomplete; location only. |
+| `content_bridge_startCardPrefetchObserver_visibility_listener` | `js/content_bridge.js:1362` | Semantic proof incomplete; location only. |
+| `content_bridge_installPlaylistPanelPrefetchHook_scroll_observer` | `js/content_bridge.js:1393` | Semantic proof incomplete; location only. |
+| `content_bridge_installRightRailWhitelistObserver_mode_route_timers` | `js/content_bridge.js:1438` | Semantic proof incomplete; location only. |
+| `content_bridge_refreshFilterTubeRuntimeObservers_fanout` | `js/content_bridge.js:1500` | Semantic proof incomplete; location only. |
+| `content_bridge_scheduleVideoMetaDomRerun_debounce` | `js/content_bridge.js:2114` | Semantic proof incomplete; location only. |
+| `content_bridge_initializeDOMFallback_delayed_boot` | `js/content_bridge.js:7142` | Semantic proof incomplete; location only. |
+| `content_bridge_scheduleWhitelistPendingRecheck_timer` | `js/content_bridge.js:7404` | Semantic proof incomplete; location only. |
+| `content_bridge_queueWhitelistPendingHide_pending_timer` | `js/content_bridge.js:7419` | Semantic proof incomplete; location only. |
+| `content_bridge_refreshDOMFallbackMutationObserver_active_gate` | `js/content_bridge.js:7771` | Semantic proof incomplete; location only. |
+| `content_bridge_ensureFallbackMenuButtons_lifecycle_scan` | `js/content_bridge.js:7820` | Semantic proof incomplete; location only. |
+| `content_bridge_tail_message_listener_initialize_timer` | `js/content_bridge.js:15050` | Semantic proof incomplete; location only. |
 | `background_compiledSettingsCache_profile_shape` | `js/background.js:2008` | Semantic proof incomplete; location only. |
 | `background_enqueueChannelMapUpdate_cache_patch` | `js/background.js:3007` | Semantic proof incomplete; location only. |
 | `background_enqueueVideoChannelMapUpdate_cache_patch` | `js/background.js:3167` | Semantic proof incomplete; location only. |
@@ -1232,3 +1233,9 @@ The import writer remains behind the shared-lock importV3 wrapper.
 | `block_quick_setupObserver_page_lifecycle` | `js/content/block_channel.js:2154` | Semantic proof incomplete; location only. |
 | `block_quick_pointerRecovery_dynamic_listener` | `js/content/block_channel.js:2372` | Semantic proof incomplete; location only. |
 | `block_quick_mobileMutationObserver_eager_only` | `js/content/block_channel.js:2393` | Semantic proof incomplete; location only. |
+
+### Advert And Workflow Inventory Revalidation - 2026-10-22
+
+The same lexical parser now measures 111 tracked files and 9,167 matches. The seed change adds `isAdVoidContentPayload` plus two control-flow matches, moving its lexical count from 170 to 173; this is not three new semantic method proofs. Moving the declarative lane rules into `scripts/test-lane-file-rules.mjs` adds one tracked audit/workflow file with zero matches and leaves that family's 517 matches unchanged. Zero lexical matches do not establish absence of runtime effects or complete review. The hot runtime family now totals 3,820 matches.
+
+This dated refresh changes only inventories. All callable completeness, affected-method review, runtime behavior, and installed-browser proof boundaries remain separate; complete per-callable semantic proofs remain zero.

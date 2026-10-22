@@ -25,10 +25,12 @@ function read(file) {
 test('changed-lane runner is wired to the classifier and sequential lane execution', () => {
   const runner = read('scripts/run-test-lane.mjs');
   const config = read('scripts/test-lane-config.mjs');
+  const fileRules = read('scripts/test-lane-file-rules.mjs');
   const matrix = read(matrixPath);
 
-  assert.match(config, /id: 'lane-workflow-surface'/);
-  assert.match(config, /run-test-lane\|test-lane-config\|audit-proof-drift/);
+  assert.match(config, /export \{ FILE_LANE_RULES \} from '\.\/test-lane-file-rules\.mjs'/);
+  assert.match(fileRules, /id: 'lane-workflow-surface'/);
+  assert.match(fileRules, /run-test-lane\|test-lane-config\|audit-proof-drift/);
   assert.match(runner, /gitLineReader\(\['diff', '--name-only', 'HEAD', '--'\]\)/);
   assert.match(runner, /gitLineReader\(\['ls-files', '--others', '--exclude-standard'\]\)/);
   assert.match(runner, /throw new Error\(`git \$\{args\.join\(' '\)\} failed/);

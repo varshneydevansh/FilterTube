@@ -30,7 +30,7 @@ changes, or whitelist behavior changes.
 | Source file | Lines | Bytes | SHA-256 |
 | --- | ---: | ---: | --- |
 | `js/background.js` | 8538 | 386043 | `cc89bb4a0375145e1c811b7cf5953729c39c409b6b24cacdc65c80f9f6ff44d0` |
-| `js/content_bridge.js` | 15,053 | 678,250 | `c653324d1f042c0473cf2102d81bcd161bfaa26f8c7ee545e250226594dc9618` |
+| `js/content_bridge.js` | 15,054 | 678,313 | `4daad851b77516cbe723e6695d5553752f663be55813b7019bfddce2479a917a` |
 | `js/state_manager.js` | 2,979 | 124,009 | `04879b5b1dcac9229c70d0ea14241667755682649865ad1d52030c1ce21950d3` |
 
 ## Pinned Source And Effect Blocks
@@ -39,7 +39,7 @@ changes, or whitelist behavior changes.
 | --- | ---: | ---: | ---: | --- |
 | `backgroundToggleChannelFilterAllReceiver` | `js/background.js:7129` | 14 | 413 | `7e15cc800cdde69487959513b30d2cfab29c55f9b1caa566f96b99bcb844c94e` |
 | `backgroundHandleToggleChannelFilterAll` | `js/background.js:8265` | 115 | 4346 | `fb6605fa4f172708f0eceacbbc21f9cf99ba0c3c9ca8ee2177e60bb1dab65ee6` |
-| `contentBridgeAddFilterAllContentCheckbox` | `js/content_bridge.js:14915` | 67 | 2525 | `a9c6c874a5e2a8b527d4ba3fcbb7e6957cc3d6210fdd61af5ad6d1d7102a8cb1` |
+| `contentBridgeAddFilterAllContentCheckbox` | `js/content_bridge.js:14916` | 67 | 2525 | `a9c6c874a5e2a8b527d4ba3fcbb7e6957cc3d6210fdd61af5ad6d1d7102a8cb1` |
 | `stateManagerToggleChannelFilterAll` | `js/state_manager.js:2310` | 34 | 988 | `b7028d96e93e5b89cfcf68d83d09256c9b06888a3b5b0ee181e6165f74318298` |
 | `stateManagerToggleKidsChannelFilterAll` | `js/state_manager.js:1254` | 40 | 1419 | `768f37c9efb5ad5071f5ce96b965c402edb9622001368a0be48b59a5a49069a2` |
 
@@ -141,3 +141,22 @@ Source fingerprints and bounded extraction inventories were refreshed against th
 ## Authorization Revalidation - 2026-10-18
 
 The current background helper checks the active profile session before mutation. The runtime fixture loads the actual verifier/session helper chain and verifies `profile_locked` with zero storage writes, alongside the unlocked positive and missing-channel controls. This does not resolve the separately documented absence of an explicit profile/list target in the checkbox message.
+
+
+## Advert source-pin revalidation - 2026-10-22
+
+The earlier dated runtime-change statements describe their historical slices.
+The content bridge fingerprint now includes one extra MAIN-world startup
+predicate for enabled `hideSponsoredCards`-only profiles. The existing Disabled
+and managed-route-denial checks still precede that predicate. This separate
+advert correction does not change the channel/menu/comment list-target or
+persistence semantics reviewed in this slice.
+
+Affected whole-file fingerprints and shifted source anchors were recomputed
+from the current files. Selected source/effect block bytes, hashes, counts and
+semantic assertions were retained. The five affected blocking audit suites
+passed at pre-advert HEAD `14f08c4b` before these pin updates; their current
+fixtures also pass after the bounded refresh. This is source/VM regression
+evidence, not installed ad coverage, physical-device acceptance, or completion
+of the wider semantic/security proof gates. This audit refresh changes no
+product runtime.

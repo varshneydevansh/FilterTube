@@ -23,7 +23,7 @@ runtime addFilteredChannel Filter All comments default fixtures: 11
 
 | File | Lines | Bytes | SHA-256 |
 | --- | ---: | ---: | --- |
-| `js/content_bridge.js` | 15,053 | 678,250 | `c653324d1f042c0473cf2102d81bcd161bfaa26f8c7ee545e250226594dc9618` |
+| `js/content_bridge.js` | 15,054 | 678,313 | `4daad851b77516cbe723e6695d5553752f663be55813b7019bfddce2479a917a` |
 | `js/background.js` | 8538 | 386043 | `cc89bb4a0375145e1c811b7cf5953729c39c409b6b24cacdc65c80f9f6ff44d0` |
 | `js/state_manager.js` | 2,979 | 124,009 | `04879b5b1dcac9229c70d0ea14241667755682649865ad1d52030c1ce21950d3` |
 | `js/settings_shared.js` | 1,313 | 66,857 | `19f0a1fb3cd512494481b7eb39169bf84feeda4a0a6a20cf58ebaf1c18ff7ba9` |
@@ -32,7 +32,7 @@ runtime addFilteredChannel Filter All comments default fixtures: 11
 
 | Block | Anchor | Lines | Bytes | SHA-256 |
 | --- | --- | ---: | ---: | --- |
-| `contentBridgeAddChannelDirectly` | `js/content_bridge.js:14855` | 55 | 2759 | `de0b0304a2269331926856153492eae471d385455e5548c45b11f8cf01e4582d` |
+| `contentBridgeAddChannelDirectly` | `js/content_bridge.js:14856` | 55 | 2759 | `de0b0304a2269331926856153492eae471d385455e5548c45b11f8cf01e4582d` |
 | `backgroundAddFilteredChannelReceiver` | `js/background.js:7072` | 58 | 2408 | `3a506e117b2d2a79bc9156c5dcb782077c69bc63a3b3a3fe982d25d7f2f5553c` |
 | `backgroundHandleAddFilteredChannelSignature` | `js/background.js:7156` | 2 | 204 | `ce94174aa1b2f302e1e89a75b463271aa13d1c95f62cb89ee34364fb9c3ab603` |
 | `backgroundExistingChannelUpdate` | `js/background.js:7974` | 22 | 1331 | `ccc5b7c341685ced769a8bab9846303ca1b3028fe0ee71a768993c1c8bdc35cb` |
@@ -156,3 +156,22 @@ changes, or public claims.
 ## Revalidation - 2026-10-18
 
 Source fingerprints and bounded extraction inventories were refreshed against the current checkout after source review. These are drift detectors, not exhaustive semantic proof, installed-browser evidence, or approval of the broader missing-authority gates. Executable fixtures below remain the behavior checks.
+
+
+## Advert source-pin revalidation - 2026-10-22
+
+The earlier dated runtime-change statements describe their historical slices.
+The content bridge fingerprint now includes one extra MAIN-world startup
+predicate for enabled `hideSponsoredCards`-only profiles. The existing Disabled
+and managed-route-denial checks still precede that predicate. This separate
+advert correction does not change the channel/menu/comment list-target or
+persistence semantics reviewed in this slice.
+
+Affected whole-file fingerprints and shifted source anchors were recomputed
+from the current files. Selected source/effect block bytes, hashes, counts and
+semantic assertions were retained. The five affected blocking audit suites
+passed at pre-advert HEAD `14f08c4b` before these pin updates; their current
+fixtures also pass after the bounded refresh. This is source/VM regression
+evidence, not installed ad coverage, physical-device acceptance, or completion
+of the wider semantic/security proof gates. This audit refresh changes no
+product runtime.

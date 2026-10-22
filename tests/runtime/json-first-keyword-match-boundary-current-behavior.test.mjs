@@ -231,7 +231,7 @@ test('JSON-first keyword match boundary audit is audit-only and source pinned', 
   assert.ok(doc.includes(`| \`js/filter_logic.js\` | 4534 | 221980 | \`${sha256('js/filter_logic.js')}\` |`));
   assert.ok(doc.includes(`| \`js/settings_shared.js\` | 1313 | 66857 | \`${sha256('js/settings_shared.js')}\` |`));
   assert.ok(doc.includes(`| \`js/background.js\` | 8538 | 386043 | \`${sha256('js/background.js')}\` |`));
-  assert.ok(doc.includes(`| \`js/content/dom_fallback.js\` | 8,172 | 380,506 | \`${sha256('js/content/dom_fallback.js')}\` |`));
+  assert.ok(doc.includes(`| \`js/content/dom_fallback.js\` | 8,177 | 380,719 | \`${sha256('js/content/dom_fallback.js')}\` |`));
 });
 
 test('keyword match boundary source counts remain pinned', () => {

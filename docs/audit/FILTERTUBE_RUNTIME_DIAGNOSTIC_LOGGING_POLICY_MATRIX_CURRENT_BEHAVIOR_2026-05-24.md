@@ -767,15 +767,15 @@ relative isolated-world production console-gate ordering are checked in source.
 | `js/content/bridge_settings.js` | 2110 | 93234 | `0a42241fd8a9b6559995895ef7174745d7e4a7b21e0644ef6940eadd66162723` |
 | `js/content/collab_dialog.js` | 393 | 14623 | `dc34bba556b310da8b7516d106e9d67addea59d8a707a02f21607ac97af1f72a` |
 | `js/content/dom_extractors.js` | 1166 | 48221 | `ddb421e018c6e9a1ef92c7cd8dc4d91d201da814c6f25a3b63d771795cdd9e19` |
-| `js/content/dom_fallback.js` | 8172 | 380506 | `df11dc69db7f7b8818c8dceb1d237d1794c8687af161dc2b9ae9d12acaed9e16` |
+| `js/content/dom_fallback.js` | 8177 | 380719 | `bc072cfd232c1b19fc02c38de008fd84c52de774752f802aef9dac8b560d4851` |
 | `js/content/handle_resolver.js` | 291 | 10230 | `fab995e0e5c85c8ba4e9d342bc452d297ea4dc99220bb94fee4c490ff4a98b47` |
-| `js/content_bridge.js` | 15053 | 678250 | `c653324d1f042c0473cf2102d81bcd161bfaa26f8c7ee545e250226594dc9618` |
+| `js/content_bridge.js` | 15054 | 678313 | `4daad851b77516cbe723e6695d5553752f663be55813b7019bfddce2479a917a` |
 | `js/filter_logic.js` | 4534 | 221980 | `f7021a053af96a4cd31a577f56e900ffb1a5d990fe55a838af64a6dba867afc4` |
 | `js/injector.js` | 4148 | 183860 | `62bd7222e7ea8c7fc51cbffd63b894a2f03509b4cc09ddf7525b8a748f91eb60` |
 | `js/io_manager.js` | 3203 | 162604 | `ca73f44abb4d2d4e57a81470cfcb2447b1e62ef8680ef0457b81dcdc6734e4c3` |
 | `js/layout.js` | 680 | 30604 | `48831ccdc2d62c75818d9c6a153d7bfacec9d7be9f2408485f74b1a7c13c57c7` |
 | `js/popup.js` | 2553 | 117093 | `645fab83d4b665796f5b2fe1be262ca336df6a4cf3ffb1daebc588a50c091aa7` |
-| `js/seed.js` | 2261 | 97497 | `ae45137438c5a19610855b443fbeae0d6fc34931f62a5346a0849005078f7250` |
+| `js/seed.js` | 2307 | 99988 | `8b5d08f600868aac65d111e549836dd3f47c0f679ff1811f27c3a03d804656e9` |
 | `js/settings_shared.js` | 1313 | 66857 | `19f0a1fb3cd512494481b7eb39169bf84feeda4a0a6a20cf58ebaf1c18ff7ba9` |
 | `js/state_manager.js` | 2979 | 124009 | `04879b5b1dcac9229c70d0ea14241667755682649865ad1d52030c1ce21950d3` |
 | `js/tab-view.js` | 32531 | 1760504 | `6da5a37b9018368588ff9c7091aca30c22a4398a038f681bad2ba2a1be4a4eca` |
@@ -815,3 +815,9 @@ relative isolated-world production console-gate ordering are checked in source.
 | `page-runtime-core` | 197 |
 | `quarantined-legacy` | 4 |
 | `extension-ui` | 41 |
+
+## Advert Trace Revalidation - 2026-10-22
+
+The sponsored-renderer pass now calls the existing `adVoidTrace` helper with event `sponsored-content-removed`, `dataName`, and `removedRenderers`. This adds a helper invocation, not a console callsite: the scoped console total remains 446. The helper is not debug-gated; it appends to the page-local history capped at 100 entries and emits `console.info` with the event and existing current-video/session metadata. This is a source observation, not an installed-console sample or a completed privacy/performance budget. Historical debug-gate claims above do not establish a guard for this trace path.
+
+Source fingerprints and the relocated seed routine console line were measured again for this diff. The existing global logging authority and installed-browser proof limits remain open.

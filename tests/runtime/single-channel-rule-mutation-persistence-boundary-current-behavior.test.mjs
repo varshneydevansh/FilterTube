@@ -199,7 +199,7 @@ test('single-channel rule mutation source fingerprints stay pinned', () => {
   const expected = [
     ['js/background.js', 8538, 386043, 'cc89bb4a0375145e1c811b7cf5953729c39c409b6b24cacdc65c80f9f6ff44d0'],
     ['js/state_manager.js', 2979, 124009, '04879b5b1dcac9229c70d0ea14241667755682649865ad1d52030c1ce21950d3'],
-    ['js/content_bridge.js', 15053, 678250, 'c653324d1f042c0473cf2102d81bcd161bfaa26f8c7ee545e250226594dc9618']
+    ['js/content_bridge.js', 15054, 678313, '4daad851b77516cbe723e6695d5553752f663be55813b7019bfddce2479a917a']
   ];
 
   for (const [file, lines, bytes, hash] of expected) {

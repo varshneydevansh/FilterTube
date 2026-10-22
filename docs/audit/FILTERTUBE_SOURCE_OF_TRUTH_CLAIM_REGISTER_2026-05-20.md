@@ -227,7 +227,7 @@ runtime behavior changed by this register refresh: no
 | `docs/filtertube_mobile_runtime_adapter_plan.md:18` | `historical-plan` | Planning, checkpoint or downstream proposal; not current runtime, installed-device or store proof. |
 | `docs/filtertube_mobile_runtime_adapter_plan.md:205` | `historical-plan` | Planning, checkpoint or downstream proposal; not current runtime, installed-device or store proof. |
 | `docs/filtertube_mobile_tv_architecture_plan.md:272` | `historical-plan` | Planning, checkpoint or downstream proposal; not current runtime, installed-device or store proof. |
-| `js/content_bridge.js:3429` | `narrow-local-owner` | Parsing, current-video identity or stored channel state only; no general hide/action authority. |
+| `js/content_bridge.js:3430` | `narrow-local-owner` | Parsing, current-video identity or stored channel state only; no general hide/action authority. |
 | `js/shared/identity.js:12` | `narrow-local-owner` | Parsing, current-video identity or stored channel state only; no general hide/action authority. |
 | `tests/runtime/active-goal-completion-audit-current-behavior.test.mjs:12131` | `audit-boundary` | Audit/test/workflow wording records evidence or a gate, not runtime permission or completed broad proof. |
 | `tests/runtime/audit-completion-gap-register-current-behavior.test.mjs:323` | `audit-boundary` | Audit/test/workflow wording records evidence or a gate, not runtime permission or completed broad proof. |

@@ -10,7 +10,7 @@ const repoRoot = process.cwd();
 const docPath = 'docs/audit/FILTERTUBE_CONTENT_BRIDGE_MENU_ACTION_LIST_TARGET_CURRENT_BEHAVIOR_2026-05-23.md';
 
 const sourceFingerprints = {
-  'js/content_bridge.js': [15053, 678250, 'c653324d1f042c0473cf2102d81bcd161bfaa26f8c7ee545e250226594dc9618']
+  'js/content_bridge.js': [15054, 678313, '4daad851b77516cbe723e6695d5553752f663be55813b7019bfddce2479a917a']
 };
 
 const blockSpecs = {
@@ -18,7 +18,7 @@ const blockSpecs = {
     file: 'js/content_bridge.js',
     start: 'const performBlock = async (channelInfo, filterAll) => {',
     end: "const list = document.createElement('div');",
-    startLine: 8807,
+    startLine: 8808,
     lines: 213,
     bytes: 10098,
     hash: '5be9da457c71dbac81c2528bdfe32819e004ab1342101670395b8e914898c54c'
@@ -27,7 +27,7 @@ const blockSpecs = {
     file: 'js/content_bridge.js',
     start: 'async function injectFilterTubeMenuItem(dropdown, videoCard) {',
     end: 'function attachFilterTubeMenuHandlers',
-    startLine: 12132,
+    startLine: 12133,
     lines: 749,
     bytes: 35705,
     hash: 'f65508646d50dff95d24a96f423fac757fcdc08dc3c955f05aba936cdb649906'
@@ -36,7 +36,7 @@ const blockSpecs = {
     file: 'js/content_bridge.js',
     start: 'function attachFilterTubeMenuHandlers({ menuItem, toggle, channelInfo, videoCard, injectionOptions = {} }) {',
     end: 'function createFilterTubeIconElement',
-    startLine: 12881,
+    startLine: 12882,
     lines: 71,
     bytes: 2490,
     hash: '07e0e72b5c4c4a7f95615c0e752bd1ea987fd4851f31e23e3569e8d3bcadd540'
@@ -45,7 +45,7 @@ const blockSpecs = {
     file: 'js/content_bridge.js',
     start: 'async function handleBlockChannelClick(channelInfo, menuItem, filterAll = false, videoCard = null) {',
     end: '/**\n * Add channel directly using chrome.storage',
-    startLine: 13611,
+    startLine: 13612,
     lines: 1236,
     bytes: 62040,
     hash: '956364e43600997d84cbdd5c5c9d9ffe7183eab86565ccd6882cce2dfe14f8d9'
@@ -54,7 +54,7 @@ const blockSpecs = {
     file: 'js/content_bridge.js',
     start: 'async function addChannelDirectly(input, filterAll = false, collaborationWith = null, collaborationGroupId = null, metadata = {}) {',
     end: '/**\n * Add "Filter All Content" checkbox',
-    startLine: 14855,
+    startLine: 14856,
     lines: 55,
     bytes: 2759,
     hash: 'de0b0304a2269331926856153492eae471d385455e5548c45b11f8cf01e4582d'
@@ -75,7 +75,7 @@ const ampersandTopicMenuGuardSpec = {
   file: 'js/content_bridge.js',
   start: 'function contentBridgeAmpersandTopicSingleChannelMenuGuard',
   end: 'const filterTubeRawConsole',
-  startLine: 14982,
+  startLine: 14983,
   lines: 31,
   bytes: 1223,
   hash: '735cefcc42c64e33cd8ff6842c64f0348b70893bbc4a526e3008a37d782753b6'

@@ -10,19 +10,19 @@ This slice covers the content bridge menu action path where the visible three-do
 
 | Source file | Lines | Bytes | SHA-256 |
 | --- | ---: | ---: | --- |
-| `js/content_bridge.js` | 15,053 | 678,250 | `c653324d1f042c0473cf2102d81bcd161bfaa26f8c7ee545e250226594dc9618` |
+| `js/content_bridge.js` | 15,054 | 678,313 | `4daad851b77516cbe723e6695d5553752f663be55813b7019bfddce2479a917a` |
 
 ## Pinned Source And Effect Blocks
 
 | Block | Source lines | Lines | Bytes | SHA-256 |
 | --- | ---: | ---: | ---: | --- |
-| `contentBridgeFallbackPerformBlock` | `js/content_bridge.js:8807` | 213 | 10098 | `5be9da457c71dbac81c2528bdfe32819e004ab1342101670395b8e914898c54c` |
+| `contentBridgeFallbackPerformBlock` | `js/content_bridge.js:8808` | 213 | 10098 | `5be9da457c71dbac81c2528bdfe32819e004ab1342101670395b8e914898c54c` |
 | `contentBridgeRenderFilterTubeMenuEntries` | `js/content_bridge.js:737` | 125 | 6426 | `5302af35a20ef44c3f24b2ad0cc3c5ebccb16b0dd198ddafc5509aacbc4a956b` |
-| `contentBridgeInjectFilterTubeMenuItem` | `js/content_bridge.js:12132` | 749 | 35705 | `f65508646d50dff95d24a96f423fac757fcdc08dc3c955f05aba936cdb649906` |
-| `contentBridgeAttachFilterTubeMenuHandlers` | `js/content_bridge.js:12881` | 71 | 2490 | `07e0e72b5c4c4a7f95615c0e752bd1ea987fd4851f31e23e3569e8d3bcadd540` |
-| `contentBridgeHandleBlockChannelClick` | `js/content_bridge.js:13611` | 1236 | 62040 | `956364e43600997d84cbdd5c5c9d9ffe7183eab86565ccd6882cce2dfe14f8d9` |
-| `contentBridgeAddChannelDirectly` | `js/content_bridge.js:14855` | 55 | 2759 | `de0b0304a2269331926856153492eae471d385455e5548c45b11f8cf01e4582d` |
-| `contentBridgeAmpersandTopicSingleChannelMenuGuard` | `js/content_bridge.js:14982` | 31 | 1223 | `735cefcc42c64e33cd8ff6842c64f0348b70893bbc4a526e3008a37d782753b6` |
+| `contentBridgeInjectFilterTubeMenuItem` | `js/content_bridge.js:12133` | 749 | 35705 | `f65508646d50dff95d24a96f423fac757fcdc08dc3c955f05aba936cdb649906` |
+| `contentBridgeAttachFilterTubeMenuHandlers` | `js/content_bridge.js:12882` | 71 | 2490 | `07e0e72b5c4c4a7f95615c0e752bd1ea987fd4851f31e23e3569e8d3bcadd540` |
+| `contentBridgeHandleBlockChannelClick` | `js/content_bridge.js:13612` | 1236 | 62040 | `956364e43600997d84cbdd5c5c9d9ffe7183eab86565ccd6882cce2dfe14f8d9` |
+| `contentBridgeAddChannelDirectly` | `js/content_bridge.js:14856` | 55 | 2759 | `de0b0304a2269331926856153492eae471d385455e5548c45b11f8cf01e4582d` |
+| `contentBridgeAmpersandTopicSingleChannelMenuGuard` | `js/content_bridge.js:14983` | 31 | 1223 | `735cefcc42c64e33cd8ff6842c64f0348b70893bbc4a526e3008a37d782753b6` |
 
 ## Selected Token Counts
 
@@ -289,3 +289,22 @@ claims.
 ## Revalidation - 2026-10-18
 
 Source fingerprints and bounded extraction inventories were refreshed against the current checkout after source review. These are drift detectors, not exhaustive semantic proof, installed-browser evidence, or approval of the broader missing-authority gates. Executable fixtures below remain the behavior checks.
+
+
+## Advert source-pin revalidation - 2026-10-22
+
+The earlier dated runtime-change statements describe their historical slices.
+The content bridge fingerprint now includes one extra MAIN-world startup
+predicate for enabled `hideSponsoredCards`-only profiles. The existing Disabled
+and managed-route-denial checks still precede that predicate. This separate
+advert correction does not change the channel/menu/comment list-target or
+persistence semantics reviewed in this slice.
+
+Affected whole-file fingerprints and shifted source anchors were recomputed
+from the current files. Selected source/effect block bytes, hashes, counts and
+semantic assertions were retained. The five affected blocking audit suites
+passed at pre-advert HEAD `14f08c4b` before these pin updates; their current
+fixtures also pass after the bounded refresh. This is source/VM regression
+evidence, not installed ad coverage, physical-device acceptance, or completion
+of the wider semantic/security proof gates. This audit refresh changes no
+product runtime.

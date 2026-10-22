@@ -21,12 +21,12 @@ This slice pins the current content-bridge path that temporarily hides newly-add
 
 This boundary matters for whitelist optimization and first-class JSON filtering because this queue is a false-hide/leak and performance bridge: it intentionally hides content before full identity certainty, then depends on DOM fallback to remove or confirm that state.
 
-## Source Fingerprints
+## Source Fingerprints — refreshed 2026-10-22
 
 | Source file | Lines | Bytes | SHA-256 |
 | --- | ---: | ---: | --- |
-| `js/content_bridge.js` | 15,053 | 678,250 | `c653324d1f042c0473cf2102d81bcd161bfaa26f8c7ee545e250226594dc9618` |
-| `js/content/dom_fallback.js` | 8,172 | 380,506 | `df11dc69db7f7b8818c8dceb1d237d1794c8687af161dc2b9ae9d12acaed9e16` |
+| `js/content_bridge.js` | 15,054 | 678,313 | `4daad851b77516cbe723e6695d5553752f663be55813b7019bfddce2479a917a` |
+| `js/content/dom_fallback.js` | 8,177 | 380,719 | `bc072cfd232c1b19fc02c38de008fd84c52de774752f802aef9dac8b560d4851` |
 
 content bridge whitelist pending refresh source files pinned: 2
 
@@ -34,15 +34,15 @@ content bridge whitelist pending refresh source files pinned: 2
 
 | Block | Source | Start line | Lines | Bytes | SHA-256 |
 | --- | --- | ---: | ---: | ---: | --- |
-| `contentBridgeRightRailWhitelistObserver` | `js/content_bridge.js:1437` | 1,437 | 98 | 3,094 | `f657ce4b4b8ba815a4149d3508ebec0445450bf49c74478c0e2169da4c679bc4` |
-| `contentBridgeInitializeFallbackThrottle` | `js/content_bridge.js:7141` | 7,141 | 255 | 12,647 | `f7ffef2af0d96ca65b0166b8940b15d46f8fd7a222940ae856fad8ee68562a52` |
-| `contentBridgeWhitelistPendingQueue` | `js/content_bridge.js:7396` | 7,396 | 70 | 4,159 | `3181b672c5d3a1a558baa5b0dbb175c05f7d966b908b835ae7c216ebc7eaa86b` |
-| `contentBridgeWhitelistPendingApply` | `js/content_bridge.js:7466` | 7,466 | 112 | 5,829 | `2ff0a4ef33bdaf0acde1b27bf31d8d026f675702adae2bbc03692c213c266ad8` |
-| `contentBridgeFallbackMutationObserver` | `js/content_bridge.js:7578` | 7,578 | 217 | 9,542 | `644e542cd718856d5a3d447c3ecce919cf66cbad4bb0373efc61da62b3df09b9` |
-| `domFallbackOnlyWhitelistPendingSelector` | `js/content/dom_fallback.js:5403` | 5,403 | 19 | 950 | `7235b5ea6e0689ab98e3e2e21e02e37d95b52675bc16a7c5bffa56b50c905894` |
-| `domFallbackWhitelistPendingStateReset` | `js/content/dom_fallback.js:5666` | 5,666 | 74 | 4,342 | `7f374fecc191fc37bbef5af4e05b040ff3b3b2e0585baec5f8036b1d4f4c7c6f` |
-| `domFallbackWhitelistPendingIdentityHide` | `js/content/dom_fallback.js:6949` | 6,949 | 16 | 993 | `2352973b418feb0a4da5f8b71c11940d6a0292b6bdb5db511262db89889c1f17` |
-| `domFallbackOnlyWhitelistPendingReturn` | `js/content/dom_fallback.js:7244` | 7,244 | 4 | 83 | `438296f1dbec1d892317f6177e74323886b6830fd0697eb1b1c12e4779776ad0` |
+| `contentBridgeRightRailWhitelistObserver` | `js/content_bridge.js:1438` | 1,438 | 98 | 3,094 | `f657ce4b4b8ba815a4149d3508ebec0445450bf49c74478c0e2169da4c679bc4` |
+| `contentBridgeInitializeFallbackThrottle` | `js/content_bridge.js:7142` | 7,142 | 255 | 12,647 | `f7ffef2af0d96ca65b0166b8940b15d46f8fd7a222940ae856fad8ee68562a52` |
+| `contentBridgeWhitelistPendingQueue` | `js/content_bridge.js:7397` | 7,397 | 70 | 4,159 | `3181b672c5d3a1a558baa5b0dbb175c05f7d966b908b835ae7c216ebc7eaa86b` |
+| `contentBridgeWhitelistPendingApply` | `js/content_bridge.js:7467` | 7,467 | 112 | 5,829 | `2ff0a4ef33bdaf0acde1b27bf31d8d026f675702adae2bbc03692c213c266ad8` |
+| `contentBridgeFallbackMutationObserver` | `js/content_bridge.js:7579` | 7,579 | 217 | 9,542 | `644e542cd718856d5a3d447c3ecce919cf66cbad4bb0373efc61da62b3df09b9` |
+| `domFallbackOnlyWhitelistPendingSelector` | `js/content/dom_fallback.js:5408` | 5,408 | 19 | 950 | `7235b5ea6e0689ab98e3e2e21e02e37d95b52675bc16a7c5bffa56b50c905894` |
+| `domFallbackWhitelistPendingStateReset` | `js/content/dom_fallback.js:5671` | 5,671 | 74 | 4,342 | `7f374fecc191fc37bbef5af4e05b040ff3b3b2e0585baec5f8036b1d4f4c7c6f` |
+| `domFallbackWhitelistPendingIdentityHide` | `js/content/dom_fallback.js:6954` | 6,954 | 16 | 993 | `2352973b418feb0a4da5f8b71c11940d6a0292b6bdb5db511262db89889c1f17` |
+| `domFallbackOnlyWhitelistPendingReturn` | `js/content/dom_fallback.js:7249` | 7,249 | 4 | 83 | `438296f1dbec1d892317f6177e74323886b6830fd0697eb1b1c12e4779776ad0` |
 
 content bridge whitelist pending refresh source/effect blocks pinned: 9
 
@@ -260,3 +260,28 @@ No `contentBridgeWhitelistPendingRefreshContract`, `contentBridgeWhitelistPendin
 ## Revalidation - 2026-10-18
 
 Source fingerprints and bounded extraction inventories were refreshed against the current checkout after source review. These are drift detectors, not exhaustive semantic proof, installed-browser evidence, or approval of the broader missing-authority gates. Executable fixtures below remain the behavior checks.
+
+
+## Advert startup and selector revalidation - 2026-10-22
+
+The opening runtime-change statement describes this slice's historical
+whitelist intake optimization. The current source fingerprint tables include
+separate advert corrections: `needsMainWorldRuntimeWork()` now admits an
+enabled profile whose only active setting is `hideSponsoredCards`, and the
+shared content-control stylesheet includes exact mobile ad-slot, promoted-video,
+and video-masthead-ad selectors. The Disabled and managed-route-denial guards
+remain ahead of advert startup. These changes do not grant a general masthead
+or organic-card hide rule.
+
+All nine selected whitelist source/effect blocks retain their previous bytes,
+lengths and SHA-256 values; only their source line anchors moved. The whitelist
+queue, coalescing, route exclusion, identity reset, focused rerun and observer
+assertions remain unchanged. Source pins were recalculated from the current
+files rather than treating stale line numbers as a behavior contract.
+
+The separate advert behavior fixtures are
+`tests/runtime/advert-runtime-startup.test.mjs` and
+`tests/runtime/advert-content-interception.test.mjs`. They do not replace this
+slice's whitelist fixtures. This inventory refresh changes no product runtime,
+provides no installed-browser or physical-device acceptance, and closes none of
+the missing-authority gates above.

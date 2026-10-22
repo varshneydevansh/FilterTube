@@ -185,22 +185,24 @@ The May source loci above are historical. Current content_bridge accepted Filter
 
 | Message/map | Source |
 | --- | --- |
-| `FilterTube_InjectorToBridge_Ready` | `js/content_bridge.js:6865` |
-| `FilterTube_Refresh` | `js/content_bridge.js:6867` |
-| `FilterTube_UpdateChannelMap` | `js/content_bridge.js:6872` |
-| `FilterTube_UpdateVideoChannelMap` | `js/content_bridge.js:6875` |
-| `FilterTube_UpdateVideoMetaMap` | `js/content_bridge.js:6924` |
-| `FilterTube_UpdateCustomUrlMap` | `js/content_bridge.js:6958` |
-| `FilterTube_CollaboratorInfoResponse` | `js/content_bridge.js:6971` |
-| `FilterTube_SubscriptionsImportProgress` | `js/content_bridge.js:6998` |
-| `FilterTube_SubscriptionsImportResponse` | `js/content_bridge.js:7017` |
-| `FilterTube_VideoMetaResponse` | `js/content_bridge.js:7025` |
-| `FilterTube_CacheCollaboratorInfo` | `js/content_bridge.js:7033` |
-| `FilterTube_ChannelInfoResponse` | `js/content_bridge.js:7054` |
-| `FilterTube_CollabDialogData` | `js/content_bridge.js:7065` |
-| `pendingCollaboratorRequests` | `js/content_bridge.js:6351` |
-| `pendingChannelInfoRequests` | `js/content_bridge.js:6359` |
-| `pendingSubscriptionImportRequests` | `js/content_bridge.js:6367` |
+| `FilterTube_InjectorToBridge_Ready` | `js/content_bridge.js:6866` |
+| `FilterTube_Refresh` | `js/content_bridge.js:6868` |
+| `FilterTube_UpdateChannelMap` | `js/content_bridge.js:6873` |
+| `FilterTube_UpdateVideoChannelMap` | `js/content_bridge.js:6876` |
+| `FilterTube_UpdateVideoMetaMap` | `js/content_bridge.js:6925` |
+| `FilterTube_UpdateCustomUrlMap` | `js/content_bridge.js:6959` |
+| `FilterTube_CollaboratorInfoResponse` | `js/content_bridge.js:6972` |
+| `FilterTube_SubscriptionsImportProgress` | `js/content_bridge.js:6999` |
+| `FilterTube_SubscriptionsImportResponse` | `js/content_bridge.js:7018` |
+| `FilterTube_VideoMetaResponse` | `js/content_bridge.js:7026` |
+| `FilterTube_CacheCollaboratorInfo` | `js/content_bridge.js:7034` |
+| `FilterTube_ChannelInfoResponse` | `js/content_bridge.js:7055` |
+| `FilterTube_CollabDialogData` | `js/content_bridge.js:7066` |
+| `pendingCollaboratorRequests` | `js/content_bridge.js:6352` |
+| `pendingChannelInfoRequests` | `js/content_bridge.js:6360` |
+| `pendingSubscriptionImportRequests` | `js/content_bridge.js:6368` |
 | `injector_message_listener` | `js/injector.js:2328` |
 | `subscription_import_listener` | `js/content/bridge_settings.js:167` |
 | `collab_dialog_broadcast` | `js/content/collab_dialog.js:244-247` |
+
+Rechecked on 2026-10-22: the advert-work predicate adds one earlier bridge line, so the 13 receiver and three pending-map anchors above were resolved again from their exact source needles. The message types, trust checks, pending-request ownership observations, and NO-GO boundary remain unchanged by this location refresh.

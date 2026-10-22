@@ -222,8 +222,8 @@ lexical and its scope remains tracked JS/JSX/MJS: CJS/Python tooling requires it
 separate release/workflow review and is not silently counted as JavaScript here.
 
 ```text
-current tracked JS/JSX/MJS files: 110
-current repo-wide lexical callables: 9164
+current tracked JS/JSX/MJS files: 111
+current repo-wide lexical callables: 9167
 current complete per-callable semantic proofs: 0
 current callable behavior-change approval: NO-GO
 runtime behavior changed by inventory refresh: no
@@ -232,12 +232,12 @@ runtime behavior changed by inventory refresh: no
 | Family | Files | Lexical callables |
 | --- | ---: | ---: |
 | Build/sync scripts | 5 | 75 |
-| Hot page/background runtime | 9 | 3817 |
+| Hot page/background runtime | 9 | 3820 |
 | Content helper runtime | 13 | 491 |
 | UI/settings runtime | 24 | 3712 |
 | Generated/quarantined UI | 6 | 147 |
 | Vendor bundles | 3 | 279 |
-| Audit/test lane scripts | 24 | 517 |
+| Audit/test lane scripts | 25 | 517 |
 | Website routes/components/config | 26 | 126 |
 
 | File | Family | Lexical callables | Audit status |
@@ -280,7 +280,7 @@ runtime behavior changed by inventory refresh: no
 | `js/render_engine.js` | UI/settings runtime | 171 | UI/settings counted |
 | `js/rule_list_import_reports.js` | UI/settings runtime | 38 | UI/settings counted; semantic proof incomplete |
 | `js/security_manager.js` | UI/settings runtime | 18 | UI/settings counted |
-| `js/seed.js` | Hot page/background runtime | 170 | hot runtime mapped |
+| `js/seed.js` | Hot page/background runtime | 173 | hot runtime mapped |
 | `js/settings_shared.js` | UI/settings runtime | 45 | UI/settings counted |
 | `js/shared/identity.js` | Content helper runtime | 110 | helper counted |
 | `js/shared/view_count.js` | Content helper runtime | 4 | helper counted; semantic proof incomplete |
@@ -320,6 +320,7 @@ runtime behavior changed by inventory refresh: no
 | `scripts/run-test-lane.mjs` | Audit/test lane scripts | 61 | audit lane counted |
 | `scripts/sync-native-runtime.mjs` | Build/sync scripts | 1 | build/website counted |
 | `scripts/test-lane-config.mjs` | Audit/test lane scripts | 0 | audit lane counted |
+| `scripts/test-lane-file-rules.mjs` | Audit/test lane scripts | 0 | audit lane counted |
 | `scripts/update-family-device-evidence-log.mjs` | Audit/test lane scripts | 23 | workflow/evidence tooling counted; semantic proof incomplete |
 | `scripts/validate-family-device-evidence.mjs` | Audit/test lane scripts | 24 | workflow/evidence tooling counted; semantic proof incomplete |
 | `scripts/verify-managed-app-policy-contract.mjs` | Audit/test lane scripts | 14 | workflow/evidence tooling counted; semantic proof incomplete |
@@ -352,3 +353,9 @@ runtime behavior changed by inventory refresh: no
 | `website/components/theme-toggle.js` | Website routes/components/config | 10 | website counted |
 | `website/next.config.mjs` | Website routes/components/config | 0 | website counted |
 | `website/postcss.config.mjs` | Website routes/components/config | 0 | website counted |
+
+### Advert And Workflow Inventory Revalidation - 2026-10-22
+
+The same lexical parser now measures 111 tracked files and 9,167 matches. The seed change adds `isAdVoidContentPayload` plus two control-flow matches, moving its lexical count from 170 to 173; this is not three new semantic method proofs. Moving the declarative lane rules into `scripts/test-lane-file-rules.mjs` adds one tracked audit/workflow file with zero matches and leaves that family's 517 matches unchanged. Zero lexical matches do not establish absence of runtime effects or complete review. The hot runtime family now totals 3,820 matches.
+
+This dated refresh changes only inventories. All callable completeness, affected-method review, runtime behavior, and installed-browser proof boundaries remain separate; complete per-callable semantic proofs remain zero.

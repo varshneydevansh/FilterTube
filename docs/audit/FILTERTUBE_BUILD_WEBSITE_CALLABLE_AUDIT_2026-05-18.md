@@ -22,10 +22,10 @@ surfaces even when they do not contain callables.
 
 | Family | Files | Lexical callables | Public authority |
 | --- | ---: | ---: | --- |
-| Build and sync scripts | 29 | 341 | Extension ZIPs, generated UI shell, vendor Nanah/QR bundles, native app runtime sync, GitHub release body/assets, focused test-lane runner, declarative test-lane config, lane-owned audit proof drift guard |
+| Build and sync scripts | 30 | 341 | Extension ZIPs, generated UI shell, vendor Nanah/QR bundles, native app runtime sync, GitHub release body/assets, focused test-lane runner, declarative test-lane config, lane-owned audit proof drift guard |
 | Website app routes | 9 | 22 | Public metadata, downloads page, privacy/terms policy, sitemap, robots, platform detail pages |
 | Website components | 15 | 54 | Public platform copy, browser links, footer/header/navigation, theme/scene runtime, animation/reveal behavior, hero media control |
-| Total | 53 | 417 | Public release and website truth boundary |
+| Total | 54 | 417 | Public release and website truth boundary |
 
 ## Accounted Files
 
@@ -57,6 +57,7 @@ surfaces even when they do not contain callables.
 | `scripts/run-test-lane.mjs` | 23 | `classifyPaths`, `auditProofRequirement`, `runtimeFixtureRequirement`, `changedPathsFromGit`, `newChangedPaths`, `changedPathContentSnapshot`, `changedPathsWithSnapshotDrift`, `snapshotFileContent`, `formatLaneList`, `requiresManagedRemoteDeliveryHandoff`, `requiresManagedAppParityHandoff`, `laneNames`, `validateLaneFiles`, `runNode`, `runLane`, `runAuditDrift`, `printClassification`, `printList`, `main` |
 | `scripts/sync-native-runtime.mjs` | 0 | top-level native repo sync authority |
 | `scripts/test-lane-config.mjs` | 0 | declarative lane matrix and file classification data |
+| `scripts/test-lane-file-rules.mjs` | 0 | Declarative file classification rules extracted from the lane config; zero lexical matches do not establish complete semantic proof. |
 | `scripts/update-family-device-evidence-log.mjs` | 13 | Lexical inventory only; this row does not assert complete semantic or installed proof. |
 | `scripts/validate-family-device-evidence.mjs` | 14 | Lexical inventory only; this row does not assert complete semantic or installed proof. |
 | `scripts/verify-managed-app-policy-contract.mjs` | 7 | Lexical inventory only; this row does not assert complete semantic or installed proof. |
@@ -286,3 +287,7 @@ claims.
 ## 2026-10-18 Scope Refresh
 
 The file table now accounts for all current JS/MJS files in the existing build/scripts/website roots. This is lexical inventory, not semantic review of every newly listed helper. New-release draft/upload/name-verification/publish behavior is exercised through the actual build orchestrator with stubbed command boundaries. Existing draft visibility is deliberately preserved; no public release operation was executed. The public Android copy distinguishes the complete Google Play application from the simpler direct APK. Installed/store/physical-device gates remain separate.
+
+## Workflow Data Split Revalidation - 2026-10-22
+
+The file-classification data moved into `scripts/test-lane-file-rules.mjs`. The unchanged lexical parser now accounts for 54 files (30 build/scripts files); the new module adds zero callable matches, so totals remain 341 for build/scripts and 417 overall. The file list and counts were measured from the current source; this does not promote any new semantic, publication, installed-app, or real-browser proof.

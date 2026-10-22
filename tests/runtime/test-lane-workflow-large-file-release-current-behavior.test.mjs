@@ -12,6 +12,7 @@ const workflowLineLimit = 1000;
 const workflowFiles = Object.freeze([
   'scripts/run-test-lane.mjs',
   'scripts/test-lane-config.mjs',
+  'scripts/test-lane-file-rules.mjs',
   'scripts/audit-proof-drift.mjs',
   'tests/runtime/test-lane-matrix-current-behavior.test.mjs',
   classifierWorkflow,

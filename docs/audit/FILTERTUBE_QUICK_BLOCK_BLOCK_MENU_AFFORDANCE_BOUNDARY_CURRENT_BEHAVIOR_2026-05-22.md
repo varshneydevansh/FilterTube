@@ -50,7 +50,7 @@ quick-block/block-menu affordance source/effect blocks: 16
 | `js/content/bridge_settings.js` | 2110 | 93234 | `0a42241fd8a9b6559995895ef7174745d7e4a7b21e0644ef6940eadd66162723` |
 | `js/state_manager.js` | 2979 | 124009 | `04879b5b1dcac9229c70d0ea14241667755682649865ad1d52030c1ce21950d3` |
 | `js/content/block_channel.js` | 3361 | 135050 | `f2a02886a83d64d93186cd1f0c1f300683ae49754b928d2e0329fd1a88d8f2c9` |
-| `js/content_bridge.js` | 15053 | 678250 | `c653324d1f042c0473cf2102d81bcd161bfaa26f8c7ee545e250226594dc9618` |
+| `js/content_bridge.js` | 15054 | 678313 | `4daad851b77516cbe723e6695d5553752f663be55813b7019bfddce2479a917a` |
 
 ## Pinned Source Counts
 
@@ -420,3 +420,22 @@ optimization, JSON-first behavior, menu action behavior, dialog lifecycle
 behavior, injector behavior, quick-block behavior, whitelist behavior, metric
 collectors, artifact creation, native sync, release package changes, or public
 claims.
+
+
+## Advert startup source revalidation - 2026-10-22
+
+The opening lifecycle-only statement and dated action addenda describe their
+historical changes. The current `content_bridge.js` fingerprint now includes
+one additional startup predicate: enabled `hideSponsoredCards`-only profiles
+load MAIN-world runtime after the existing Disabled and managed-route guards.
+The companion DOM change adds exact ad-owner selectors, including mobile
+ad slots and video masthead ads; it does not hide the normal navigation
+masthead. Neither change modifies quick-block eligibility, collaborator
+resolution, menu action targets, or lifecycle scheduling reviewed here.
+
+Only the affected whole-file fingerprint was refreshed in this slice. All
+selected affordance block/count assertions and executable action fixtures are
+retained. Advert-specific behavior has separate startup/interception tests;
+these source pins do not certify live ad coverage or promote the historical
+semantic/security proof limits to completion. This audit refresh changes no
+product runtime.
