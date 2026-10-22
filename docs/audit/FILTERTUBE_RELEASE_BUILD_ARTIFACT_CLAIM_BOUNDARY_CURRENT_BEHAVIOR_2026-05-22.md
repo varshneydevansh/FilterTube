@@ -18,7 +18,7 @@ changes.
 | --- | ---: | ---: | --- |
 | `build.js` | 861 | 33225 | `a198cc1d0bf98e410deb8f66ced0e56a046bbf987a0a5b878e1278577622fb2e` |
 | `package.json` | 86 | 4580 | `c9cb2c3c4fea302fa3946f462dbfbb474381a78946ca59adb653814d06a4de51` |
-| `README.md` | 456 | 28669 | `0ff873be1e7df7d2dccaffb8cdedbce55239bb3a1cfac415efc262465d452cc4` |
+| `README.md` | 456 | 28669 | `40577ad3e86fe8b8695b95586be46f17e6b772a83d4296f511440b40bebcb6cf` |
 | `CHANGELOG.md` | 938 | 75511 | `e57906dca95911874ef251aa45d8c3a76df00df576b36277d9c0e9b9654c3036` |
 | `manifest.json` | 154 | 5204 | `d8dea8d10e715d01bab25ea12ff6fc3055d403f2486654fcb6907f94bd4f4627` |
 | `manifest.chrome.json` | 154 | 5204 | `d8dea8d10e715d01bab25ea12ff6fc3055d403f2486654fcb6907f94bd4f4627` |

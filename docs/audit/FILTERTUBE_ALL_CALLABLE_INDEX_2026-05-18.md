@@ -223,7 +223,7 @@ separate release/workflow review and is not silently counted as JavaScript here.
 
 ```text
 current tracked JS/JSX/MJS files: 111
-current repo-wide lexical callables: 9187
+current repo-wide lexical callables: 9189
 current complete per-callable semantic proofs: 0
 current callable behavior-change approval: NO-GO
 runtime behavior changed by inventory refresh: no
@@ -232,7 +232,7 @@ runtime behavior changed by inventory refresh: no
 | Family | Files | Lexical callables |
 | --- | ---: | ---: |
 | Build/sync scripts | 5 | 75 |
-| Hot page/background runtime | 9 | 3840 |
+| Hot page/background runtime | 9 | 3842 |
 | Content helper runtime | 13 | 491 |
 | UI/settings runtime | 24 | 3712 |
 | Generated/quarantined UI | 6 | 147 |
@@ -280,7 +280,7 @@ runtime behavior changed by inventory refresh: no
 | `js/render_engine.js` | UI/settings runtime | 171 | UI/settings counted |
 | `js/rule_list_import_reports.js` | UI/settings runtime | 38 | UI/settings counted; semantic proof incomplete |
 | `js/security_manager.js` | UI/settings runtime | 18 | UI/settings counted |
-| `js/seed.js` | Hot page/background runtime | 193 | hot runtime mapped |
+| `js/seed.js` | Hot page/background runtime | 195 | hot runtime mapped |
 | `js/settings_shared.js` | UI/settings runtime | 45 | UI/settings counted |
 | `js/shared/identity.js` | Content helper runtime | 110 | helper counted |
 | `js/shared/view_count.js` | Content helper runtime | 4 | helper counted; semantic proof incomplete |
@@ -365,3 +365,19 @@ This dated refresh changes only inventories. All callable completeness, affected
 After the frozen streaming `get_watch` response helper and popup intrinsic-width fix, the unchanged lexical parser measures 111 tracked source files and 9,187 matches. Only `js/seed.js` changes its count, from 173 to 193, bringing the hot runtime family to 3,840. The 20 added matches include nested callbacks and control-flow syntax; they are not 20 newly proved semantic methods. The source UI helper and both generated bundles retain their callable counts. Current seed fetch/XHR locations were measured from the frozen source where listed. Earlier dated measurements remain historical.
 
 This is bookkeeping only. The dedicated streaming tests cover record boundaries, early player delivery, settings guards and stream cleanup; they do not establish installed playback timing, complete per-callable proof, or a published release.
+
+
+### Exact-Duration Fallback Inventory Revalidation - 2026-10-22
+
+The final seed duration/seek correction moves the current lexical count from
+193 to 195, with 111 tracked source files unchanged. Current tables therefore
+show 9,189 total matches and 3,842 hot-runtime matches. The two added duration
+helpers and shifted seed locations are inventory records, not complete semantic
+method proofs. Earlier dated 9,187/193 measurements remain historical.
+
+The correction binds known duration to the exact current video and bounds
+confirmed-ad seek retries. Its dedicated behavior test is registered in JSON,
+performance and smoke lanes. This does not establish independent media
+acquisition, resolve live SABR backoff, prove installed playback timing, or
+change the wider semantic/security completion boundaries. This refresh changes
+only bookkeeping and test assertions about current inventories.

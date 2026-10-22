@@ -2,6 +2,8 @@
 
 Status: source corrections, executable regression coverage and Chrome fixture verification. A reload of the newly built extension is required for installed popup and YouTube timing acceptance. No publish or push is authorized here.
 
+Follow-up: the user confirmed normal popup width and initially prompt playback after reloading, then reported another delay. The installed replay and separate fallback corrections are recorded in [Advert startup delay and independent content playback](ADVERT_STREAMING_BACKOFF_AND_CONTENT_PLAYER_2026-10-22.md). Popup acceptance does not close the remaining playback gate.
+
 ## Narrow toolbar popup
 
 The supplied screenshot shows the toolbar popup collapsed into a thin vertical strip. The earlier responsive change in `920ec56b` changed the root's maximum width from its preferred 392 pixels to `100vw`, and its minimum width to zero. The popup's viewport is itself derived from its intrinsic document size. At a tiny initial viewport this maximum clamps the intended width, leaving a sizing feedback loop. The rest of the popup inherits percentage widths and cannot establish a larger size.

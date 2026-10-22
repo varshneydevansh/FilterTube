@@ -1,0 +1,102 @@
+{
+  "observedAt": "2026-10-22T15:16:36Z",
+  "videoId": "8OO1pOqRJkA",
+  "buildCommit": "3a441cc2",
+  "kind": "installed Chrome replay; no runtime behavior modifications",
+  "events": [
+    {
+      "event": "waiting",
+      "ms": 7276,
+      "id": "8OO1pOqRJkA",
+      "duration": null,
+      "time": 0,
+      "ready": 0,
+      "ad": false
+    },
+    {
+      "event": "loadstart",
+      "ms": 7282,
+      "id": "8OO1pOqRJkA",
+      "duration": null,
+      "time": 0,
+      "ready": 0,
+      "ad": false
+    },
+    {
+      "event": "loadedmetadata",
+      "ms": 11801,
+      "id": "8OO1pOqRJkA",
+      "duration": 170.141,
+      "time": 0,
+      "ready": 1,
+      "ad": false
+    },
+    {
+      "event": "loadeddata",
+      "ms": 11840,
+      "id": "8OO1pOqRJkA",
+      "duration": 170.141,
+      "time": 0,
+      "ready": 4,
+      "ad": false
+    },
+    {
+      "event": "canplay",
+      "ms": 11843,
+      "id": "8OO1pOqRJkA",
+      "duration": 170.141,
+      "time": 0,
+      "ready": 4,
+      "ad": false
+    },
+    {
+      "event": "playing",
+      "ms": 11844,
+      "id": "8OO1pOqRJkA",
+      "duration": 170.141,
+      "time": 0,
+      "ready": 4,
+      "ad": false
+    }
+  ],
+  "stats": {
+    "settingsLoaded": true,
+    "hooksEstablished": true,
+    "queuedItems": 0,
+    "lastYtData": true,
+    "lastPlayerData": false,
+    "adVoid": "ad-not-active"
+  },
+  "firstMedia": {
+    "requestId": "37376.2036",
+    "timestamp": 304323.587644,
+    "responseTimestamp": 304323.856974,
+    "finishedTimestamp": 304323.855389,
+    "mime": "application/vnd.yt-ump",
+    "decodedBytes": 104,
+    "parts": [
+      {
+        "type": 57,
+        "size": 92
+      },
+      {
+        "type": 67,
+        "size": 2
+      },
+      {
+        "type": 35,
+        "size": 5
+      }
+    ],
+    "nextRequestPolicy": {
+      "backoffTimeMs": 4000
+    }
+  },
+  "nextMedia": {
+    "requestId": "37376.2059",
+    "timestamp": 304327.98161,
+    "responseTimestamp": 304328.112001
+  },
+  "interpretation": "First response has no MEDIA(21) payload and requests 4000ms backoff; next request begins 4394ms later. No ad interruption observed. This does not establish why server chose backoff or exclude indirect effects of plan removal.",
+  "privacy": "No signed URLs, request headers/bodies, cookies or opaque SABR context recorded."
+}

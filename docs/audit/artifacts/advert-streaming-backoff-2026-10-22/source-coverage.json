@@ -1,0 +1,24 @@
+{
+  "observedAt": "2026-10-22T15:22:53.309Z",
+  "routeVideoId": "kIDWgqDBNXA",
+  "players": [
+    {
+      "videoId": "kIDWgqDBNXA",
+      "playability": "OK",
+      "formats": [
+        {
+          "itag": 18,
+          "mime": "video/mp4; codecs=\"avc1.42001E, mp4a.40.2\"",
+          "directUrl": false,
+          "cipher": true
+        }
+      ],
+      "adaptiveCount": 16,
+      "adaptiveDirectCount": 0,
+      "sabr": true,
+      "hls": false,
+      "dash": false
+    }
+  ],
+  "kind": "Already-present page metadata only; require matching routeVideoId before reuse. No URL playback or resolver tested; signed URLs omitted."
+}

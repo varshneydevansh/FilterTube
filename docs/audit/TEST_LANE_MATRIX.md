@@ -493,3 +493,12 @@ while the all-scope source fingerprint drift inventory remains backlog evidence
 for older current-boundary tests. Focused lanes and `test:audit-drift` remain
 the change-safety gates while `audit:runtime` stays the inventory to retire or
 refresh in smaller proof batches.
+
+
+### Exact-duration advert fallback fixture — 2026-10-22
+
+`tests/runtime/ad-void-duration-seek-current-behavior.test.mjs` is explicitly
+owned by JSON, performance and smoke lanes. It covers exact-route duration
+metadata and bounded confirmed-ad seek attempts; this registration does not
+convert local behavior checks into live playback, SABR-backoff, or native
+acceptance evidence.

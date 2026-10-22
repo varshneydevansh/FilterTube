@@ -255,6 +255,7 @@ export const LANES = Object.freeze({
     description: 'JSON-first filtering, network interception, response mutation, list mode, and endpoint work gates.',
     tests: [
       'tests/runtime/get-watch-streaming-interception.test.mjs',
+      'tests/runtime/ad-void-duration-seek-current-behavior.test.mjs',
       'tests/runtime/advert-content-interception.test.mjs',
       'tests/runtime/advert-runtime-startup.test.mjs',
       'tests/runtime/json-comment-explicit-keyword-scope-current-behavior.test.mjs',
@@ -368,6 +369,7 @@ export const LANES = Object.freeze({
     description: 'No-rule/no-work budgets, SPA lag guards, disabled mode, active-rule gates, and identity work budgets.',
     tests: [
       'tests/runtime/get-watch-streaming-interception.test.mjs',
+      'tests/runtime/ad-void-duration-seek-current-behavior.test.mjs',
       'tests/runtime/popup-intrinsic-sizing.test.mjs',
       ...FILTER_LOGIC_AUDIT_PROOF_TESTS,
       'tests/runtime/empty-install-idle-observer-budget-current-behavior.test.mjs',
@@ -479,6 +481,7 @@ export const LANES = Object.freeze({
     checks: ['build.js'],
     tests: [
       'tests/runtime/get-watch-streaming-interception.test.mjs',
+      'tests/runtime/ad-void-duration-seek-current-behavior.test.mjs',
       'tests/runtime/popup-intrinsic-sizing.test.mjs',
       'tests/runtime/advert-content-interception.test.mjs',
       'tests/runtime/advert-runtime-startup.test.mjs',

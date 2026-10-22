@@ -354,7 +354,7 @@ test('filter logic method semantic register is audit-only and scoped to current 
 test('filter logic JSON decision family docs carry the method semantic proof gap blocker', () => {
   const methodGap = read(methodGapPath);
 
-  assert.match(methodGap, /current repo-wide lexical callables: 9187/);
+  assert.match(methodGap, /current repo-wide lexical callables: 9189/);
   assert.match(methodGap, /current tracked JS\/JSX\/MJS files: 111/);
   assert.match(methodGap, /files with complete per-callable semantic proof: 0/);
   assert.match(methodGap, /current callable behavior-change approval: NO-GO/);
