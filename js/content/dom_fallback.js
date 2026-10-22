@@ -3098,9 +3098,14 @@ function ensureContentControlStyles(settings) {
     if (settings.hideSponsoredCards) {
         rules.push(`
             ytd-ad-slot-renderer,
+            ytm-ad-slot-renderer,
             ytd-in-feed-ad-layout-renderer,
             ytd-promoted-sparkles-web-renderer,
             ytd-promoted-sparkles-text-search-renderer,
+            ytd-promoted-video-renderer,
+            ytd-video-masthead-ad-renderer,
+            ytd-video-masthead-ad-v3-renderer,
+            ytm-video-masthead-ad-v3-renderer,
             ytd-search-pyv-renderer,
             ytd-display-ad-renderer,
             ytd-companion-slot-renderer,

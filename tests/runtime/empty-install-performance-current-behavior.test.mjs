@@ -85,7 +85,7 @@ test('empty-install performance audit documents no-rule work and required future
   assert.match(releaseDoc, /must not run periodic full-page sweeps, desktop body observers, or eager menu body observation/);
 });
 
-test('seed fetch interception returns native fetch promise before response hooks when no JSON work is active', () => {
+test('seed fetch interception checks work at response delivery before parsing the body', () => {
   const seed = source('js/seed.js');
   const fetchHook = sliceBetween(
     seed,
@@ -93,11 +93,14 @@ test('seed fetch interception returns native fetch promise before response hooks
     '        seedDebugLog("✅ Fetch interception established");'
   );
 
-  assert.match(fetchHook, /const dataName = `fetch:\$\{getPathname\(urlStr\)\}`;\s*if \(shouldBypassYouTubeiNetworkResponse\(dataName\)\) \{\s*return originalFetch\.apply\(this, arguments\);\s*\}/);
+  assert.ok(fetchHook.indexOf('originalFetch.apply(this, arguments).then(response =>')
+    < fetchHook.indexOf('if (shouldBypassYouTubeiNetworkResponse(dataName)) return response;'));
+  assert.ok(fetchHook.indexOf('if (shouldBypassYouTubeiNetworkResponse(dataName)) return response;')
+    < fetchHook.indexOf('response.clone().json()'));
   assert.equal(
     countLiteral(fetchHook, 'shouldBypassYouTubeiNetworkResponse(dataName)'),
     1,
-    'fetch bypass should be decided once before attaching response processing'
+    'fetch bypass is decided once at delivery so settings arriving in flight are honored'
   );
 });
 

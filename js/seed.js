@@ -843,15 +843,40 @@
         'adBreakHeartbeatParams'
     ]);
 
+    // Exact advert owners, never titles, badges, arbitrary "ad" substrings, or
+    // the site's navigation masthead. Keep this pass independent of the rule
+    // engine: advert-only profiles and restore-friendly route skips need it too.
+    const AD_VOID_RENDERER_KEYS = new Set([
+        'adSlotRenderer',
+        'adPlacementRenderer',
+        'inFeedAdLayoutRenderer',
+        'displayAdRenderer',
+        'promotedSparklesWebRenderer',
+        'promotedSparklesTextSearchRenderer',
+        'promotedVideoRenderer',
+        'searchPyvRenderer',
+        'companionSlotRenderer',
+        'actionCompanionAdRenderer',
+        'videoMastheadAdRenderer',
+        'videoMastheadAdV3Renderer',
+        'adsEngagementPanelContentRenderer'
+    ]);
+
     function isAdVoidPlayerPayload(dataName) {
         const name = String(dataName || '');
         return name.includes('ytInitialPlayerResponse')
-            || name.includes('/youtubei/v1/player')
-            || name.includes('/youtubei/v1/get_watch');
+            || /\/youtubei\/v1\/(?:player|get_watch)(?:$|[?-])/.test(name);
+    }
+
+    function isAdVoidContentPayload(dataName) {
+        const name = String(dataName || '');
+        return isAdVoidPlayerPayload(name)
+            || name.includes('ytInitialData')
+            || /\/youtubei\/v1\/(?:browse|next|search|reel\/reel_item_watch)(?:$|[?-])/.test(name);
     }
 
     function adVoidRemovePlayerAdPlan(data, dataName) {
-        if (!isAdVoidEnabled() || !isAdVoidPlayerPayload(dataName) || !data || typeof data !== 'object') {
+        if (!isAdVoidEnabled() || !isAdVoidContentPayload(dataName) || !data || typeof data !== 'object') {
             return data;
         }
         const seen = new WeakSet();
@@ -861,21 +886,39 @@
             adSlots: 0,
             adBreakHeartbeatParams: 0
         };
-        const visit = value => {
-            if (!value || typeof value !== 'object' || seen.has(value)) return;
+        let removedRenderers = 0;
+        const legacyPlayerPayload = isAdVoidPlayerPayload(dataName);
+        const visit = (value, playerOwned = false) => {
+            if (!value || typeof value !== 'object' || seen.has(value)) return false;
             seen.add(value);
             if (Array.isArray(value)) {
-                value.forEach(visit);
-                return;
+                for (let i = value.length - 1; i >= 0; i--) {
+                    if (visit(value[i], playerOwned)) value.splice(i, 1);
+                }
+                return false;
             }
+            const isPlayer = playerOwned || Boolean(
+                value.videoDetails?.videoId && (value.playabilityStatus || value.streamingData)
+            );
+            let removedAdvert = false;
             for (const key of Object.keys(value)) {
-                if (AD_VOID_PLAYER_PLAN_KEYS.has(key)) {
+                if (AD_VOID_PLAYER_PLAN_KEYS.has(key) && (legacyPlayerPayload || isPlayer)) {
                     removed[key] += 1;
                     try { delete value[key]; } catch (e) {}
                     continue;
                 }
-                visit(value[key]);
+                if (AD_VOID_RENDERER_KEYS.has(key) && value[key] && typeof value[key] === 'object') {
+                    delete value[key];
+                    removedRenderers += 1;
+                    removedAdvert = true;
+                } else if (visit(value[key], isPlayer || key === 'playerResponse' || key === 'player_response')) {
+                    delete value[key];
+                    removedAdvert = true;
+                }
             }
+            // Drop an emptied ad-only richItem/content wrapper, but retain any
+            // mixed shelf, organic renderer, pagination field or other sibling.
+            return removedAdvert && Object.keys(value).every(key => key === 'trackingParams' || key === 'contentIndex');
         };
         visit(data);
         const removedCount = Object.values(removed).reduce((sum, count) => sum + count, 0);
@@ -884,6 +927,9 @@
                 dataName,
                 removed
             });
+        }
+        if (removedRenderers > 0) {
+            adVoidTrace('sponsored-content-removed', { dataName, removedRenderers });
         }
         return data;
     }
@@ -1753,12 +1799,12 @@
             }
 
             const dataName = `fetch:${getPathname(urlStr)}`;
-            if (shouldBypassYouTubeiNetworkResponse(dataName)) {
-                return originalFetch.apply(this, arguments);
-            }
-
             return originalFetch.apply(this, arguments).then(response => {
                 if (!response.ok) return response;
+                // Settings can arrive while the initial request is in flight.
+                // Decide at delivery time, while preserving the no-parse fast
+                // path when filtering is still disabled or has no work.
+                if (shouldBypassYouTubeiNetworkResponse(dataName)) return response;
 
                 return response.clone().json().then(jsonData => {
                     // Special handling for comment requests when hideAllComments is enabled

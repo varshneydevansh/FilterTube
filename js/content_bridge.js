@@ -1164,6 +1164,7 @@ function needsMainWorldRuntimeWork(settings) {
         if (isFilterTubeManagedViewingRouteDenied()) return false;
         if (!settings || typeof settings !== 'object') return false;
         if (settings.enabled === false) return false;
+        if (settings.hideSponsoredCards === true) return true;
         if (settings.listMode === 'whitelist') return true;
         return hasBridgeEnabledContentFilters(settings) || hasBridgeActiveJsonFilterRules(settings);
     } catch (e) {
