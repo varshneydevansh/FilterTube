@@ -672,3 +672,23 @@ test('new view, playback, family and localization files retain explicit proof ow
     ['settings', 'ui-localization-runtime-current-behavior']
   ]) assert.ok(LANES[lane].tests.includes(`tests/runtime/${fixture}.test.mjs`), `${lane} must run ${fixture}`);
 });
+
+test('opt-in content playback retains component and profile-admission proof lane ownership', () => {
+  const components = [
+    'admission-current-behavior', 'source-current-behavior', 'captions-current-behavior',
+    'player', 'response', 'coordinator'
+  ].map(name => `tests/runtime/content-playback-${name}.test.mjs`);
+  for (const lane of ['json', 'performance', 'smoke']) {
+    for (const fixture of components) assert.ok(LANES[lane].tests.includes(fixture), `${lane}: ${fixture}`);
+  }
+  for (const lane of ['blocking', 'whitelist', 'dom', 'settings']) {
+    for (const fixture of [components[0], components.at(-1)]) {
+      assert.ok(LANES[lane].tests.includes(fixture), `${lane}: ${fixture}`);
+    }
+  }
+  assertClassifiedLanesInclude([
+    'js/shared/content_playback_source.js', 'js/content/content_playback_admission.js',
+    'js/content/content_playback_player.js', 'js/content/content_playback_captions.js',
+    'js/content/content_playback_response.js', 'js/content/content_playback.js'
+  ], ['release', 'blocking', 'whitelist', 'json', 'dom', 'performance', 'settings', 'smoke']);
+});

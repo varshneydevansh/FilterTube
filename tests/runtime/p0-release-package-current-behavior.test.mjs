@@ -193,53 +193,53 @@ function manifestIncognitoBoundaryStats() {
 // observations. Routine release tests never inspect a personal browser profile.
 const currentManifestSnapshot = {
   "manifest.json": {
-    "references": 64,
-    "unique": 30,
+    "references": 70,
+    "unique": 36,
     "entries": 6,
-    "js": 43,
+    "js": 48,
     "worlds": [
       "MAIN",
       "ISOLATED"
     ],
-    "resources": 12
+    "resources": 13
   },
   "manifest.chrome.json": {
-    "references": 64,
-    "unique": 30,
+    "references": 70,
+    "unique": 36,
     "entries": 6,
-    "js": 43,
+    "js": 48,
     "worlds": [
       "MAIN",
       "ISOLATED"
     ],
-    "resources": 12
+    "resources": 13
   },
   "manifest.firefox.json": {
-    "references": 63,
-    "unique": 31,
+    "references": 69,
+    "unique": 37,
     "entries": 5,
-    "js": 39,
+    "js": 44,
+    "worlds": [
+      "MAIN"
+    ],
+    "resources": 13
+  },
+  "manifest.opera.json": {
+    "references": 69,
+    "unique": 35,
+    "entries": 7,
+    "js": 48,
     "worlds": [
       "MAIN"
     ],
     "resources": 12
-  },
-  "manifest.opera.json": {
-    "references": 63,
-    "unique": 29,
-    "entries": 7,
-    "js": 43,
-    "worlds": [
-      "MAIN"
-    ],
-    "resources": 11
   }
 };
 
 function assertBrowserManifestReferenceClosureAddendum(doc) {
   const stats = manifestReferenceClosureStats();
   assert.match(doc, /2026-10-18 Current Source And Historical Evidence Boundary/);
-  assert.equal(stats.combinedUnique.size, 31);
+  assert.equal(stats.combinedUnique.size, 37);
   assert.deepEqual(stats.missing, []);
   assert.deepEqual(stats.outsideCopiedRoots, []);
   assert.equal(stats.contentScriptCssRefs, 0);

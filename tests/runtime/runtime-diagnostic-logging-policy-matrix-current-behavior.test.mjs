@@ -11,12 +11,12 @@ const sourceFingerprints = {
   'build.js': [861, 33225, "a198cc1d0bf98e410deb8f66ced0e56a046bbf987a0a5b878e1278577622fb2e"],
   'js/background.js': [8538, 386043, "cc89bb4a0375145e1c811b7cf5953729c39c409b6b24cacdc65c80f9f6ff44d0"],
   'js/content/block_channel.js': [3361, 135050, "f2a02886a83d64d93186cd1f0c1f300683ae49754b928d2e0329fd1a88d8f2c9"],
-  'js/content/bridge_settings.js': [2110, 93234, "0a42241fd8a9b6559995895ef7174745d7e4a7b21e0644ef6940eadd66162723"],
+  'js/content/bridge_settings.js': [2130,94626,"20177156d2064b98c3e5b95310f01aaafff4f035610accbcb9d5fbf6b967a62c"],
   'js/content/collab_dialog.js': [393, 14623, "dc34bba556b310da8b7516d106e9d67addea59d8a707a02f21607ac97af1f72a"],
   'js/content/dom_extractors.js': [1166, 48221, "ddb421e018c6e9a1ef92c7cd8dc4d91d201da814c6f25a3b63d771795cdd9e19"],
-  'js/content/dom_fallback.js': [8177, 380719, "bc072cfd232c1b19fc02c38de008fd84c52de774752f802aef9dac8b560d4851"],
+  'js/content/dom_fallback.js': [8180,381121,"121f71b40a27024636d448cd5b5de0f1e9a33e3e4e118377f1b07c20e52eb49d"],
   'js/content/handle_resolver.js': [291, 10230, "fab995e0e5c85c8ba4e9d342bc452d297ea4dc99220bb94fee4c490ff4a98b47"],
-  'js/content_bridge.js': [15054, 678313, "4daad851b77516cbe723e6695d5553752f663be55813b7019bfddce2479a917a"],
+  'js/content_bridge.js': [15056,678414,"9e0bca2973ffb01d0216ea8b096531ad3c1afe7af4acc7363fa4b1cc2ca09f18"],
   'js/filter_logic.js': [4534, 221980, "f7021a053af96a4cd31a577f56e900ffb1a5d990fe55a838af64a6dba867afc4"],
   'js/injector.js': [4148, 183860, "62bd7222e7ea8c7fc51cbffd63b894a2f03509b4cc09ddf7525b8a748f91eb60"],
   'js/io_manager.js': [3203, 162604, "ca73f44abb4d2d4e57a81470cfcb2447b1e62ef8680ef0457b81dcdc6734e4c3"],
@@ -29,6 +29,39 @@ const sourceFingerprints = {
   'scripts/build-extension-ui.mjs': [50, 1188, "6326362ebf90f448ccdbf68945b3fb522b7b215edaf9b3e28589a4e166239cf3"],
   'scripts/build-nanah-vendor.mjs': [65, 1818, "dae8d3ef29c4cd44b0bf975090e9d53f3bb05b523355f5038930fc03b27e921c"],
   'scripts/sync-native-runtime.mjs': [34, 1070, "4f46c13bf6099092193712790d231ff4809b00b1b0061d04af71ac3ba6bf21c6"]
+};
+
+const playbackSourceFingerprints = {
+  "js/content/content_playback.js": [
+    290,
+    16888,
+    "e88ba8ab3140190d006484ad40832e15c717eac2ce36cb8e5460d884c9b75b36"
+  ],
+  "js/content/content_playback_admission.js": [
+    131,
+    7500,
+    "71ee13a96de07fdf988dc25300b1b09e0379e687047b5a5b7c21605bcbe68763"
+  ],
+  "js/content/content_playback_captions.js": [
+    138,
+    8244,
+    "c5768f3bb7836321b030009492fe2ae703bb3e785352eabf8b2f383ca203c196"
+  ],
+  "js/content/content_playback_player.js": [
+    336,
+    17903,
+    "56d208f7efe5e09dac1de2499b1c2df23f7185f0312dc3277f8987d07c82a557"
+  ],
+  "js/content/content_playback_response.js": [
+    83,
+    4744,
+    "214f184f7bf78a9c6e89f335947118b2d53831e4518645b725a73ecce6baf0da"
+  ],
+  "js/shared/content_playback_source.js": [
+    187,
+    12402,
+    "cc22a59b178f681b29ad460a32cca7bb09dd9ffc52e5b650d6e18240578c0f0b"
+  ]
 };
 
 const expectedConsoleRows = {
@@ -710,4 +743,18 @@ test('first-class diagnostic logging authority tokens are absent from scoped pro
 
   assert.doesNotMatch(productSource, /diagnosticLogPolicyReport/);
   assert.doesNotMatch(productSource, /diagnosticLogDecision/);
+});
+
+
+test('new playback modules add no direct console or logging relay callsites', () => {
+  const doc = read(docPath);
+  for (const [file, [lines, bytes, hash]] of Object.entries(playbackSourceFingerprints)) {
+    const source = read(file);
+    assert.equal(lineCount(source), lines);
+    assert.equal(Buffer.byteLength(source), bytes);
+    assert.equal(sha256(file), hash);
+    assert.deepEqual(consoleCounts(file), { log: 0, warn: 0, error: 0, debug: 0, info: 0, total: 0 });
+    assert.doesNotMatch(source, /postLog\s*\(|adVoidTrace\s*\(/);
+    assert.ok(doc.includes(hash));
+  }
 });

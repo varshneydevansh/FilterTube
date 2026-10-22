@@ -858,3 +858,15 @@ Current copied roots include `_locales`. Exact permissions include storage, unli
 The current ZIP, staged tree and source bytes are compared for all three browser targets. ZIP paths must match the staged tree exactly without duplicate paths, every archived/staged byte hash must match, source-backed files must match current source, and browser manifest JSON must agree semantically. Missing/stale outputs fail and require a build. This is not reproducible-build, installed-browser or physical-device proof.
 
 New GitHub releases start as draft, upload missing assets, verify expected names, then publish only the newly created draft. Existing release visibility is preserved, including intentional review drafts. Name checks do not authenticate bytes or replace signing/artifact provenance. The actual orchestrator's four workflow regressions live in build-release-method-semantic-register-current-behavior.test.mjs; no GitHub release action was performed for this review.
+
+
+## Opt-In Content Player Package Closure - 2026-10-22
+
+Five normal isolated helpers plus one MAIN fallback resource add six distinct referenced paths (37 combined unique paths). Permission, host, world, CSS-quarantine and missing/outside-root checks retain their previous semantics. Earlier per-manifest measurements remain historical; current source/tree/archive equality is checked independently and does not establish installed playback or release publication.
+
+| Manifest | References | Unique paths | Script entries | Script JS references | Web-accessible references |
+| --- | ---: | ---: | ---: | ---: | ---: |
+| `manifest.json` | 70 | 36 | 6 | 48 | 13 |
+| `manifest.chrome.json` | 70 | 36 | 6 | 48 | 13 |
+| `manifest.firefox.json` | 69 | 37 | 5 | 44 | 13 |
+| `manifest.opera.json` | 69 | 35 | 7 | 48 | 12 |

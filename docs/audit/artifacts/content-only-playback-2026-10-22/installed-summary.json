@@ -1,0 +1,73 @@
+{
+  "date": "2026-10-22",
+  "evidenceLevel": "installed Chrome UI/runtime observations; no successful independent playback established",
+  "observations": [
+    {
+      "videoId": "-wK200l4KNc",
+      "observedBackend": "YouTube web player",
+      "experimentalReason": "throttling_transform_required",
+      "ownedPlayerCount": 0,
+      "nativeReadyState": 4,
+      "nativePaused": false,
+      "advertState": "ad-not-active",
+      "sourceMetadata": {
+        "directMuxedItag": 18,
+        "directUrlPresent": true,
+        "nParameterPresent": true,
+        "sabrPresent": true
+      },
+      "boundedDirectSourceProbe": {
+        "rangeRequested": "bytes=0-2047",
+        "status": 403,
+        "mime": "text/plain",
+        "sampleBytes": 0
+      },
+      "interpretation": "The supplied direct URL is not independently usable in this test. This does not establish that n is the only cause; token, context, protocol or other access requirements may apply."
+    },
+    {
+      "videoId": "8OO1pOqRJkA",
+      "observedBackend": "YouTube web player",
+      "advertInstructionsRemoved": {
+        "playerAds": 1,
+        "adSlots": 1,
+        "adBreakHeartbeatParams": 1
+      },
+      "sponsoredRenderersRemoved": 1
+    },
+    {
+      "videoId": "C-dvTjK_07c",
+      "observedBackend": "YouTube web player",
+      "experimentalReason": "captions_unsupported",
+      "ownedPlayerCount": 0,
+      "nativeReadyState": 4,
+      "nativePaused": false,
+      "advertState": "ad-not-active",
+      "sourceMetadata": {
+        "muxedItag": 18,
+        "signatureCipherPresent": true,
+        "directUrlPresent": false,
+        "sabrPresent": true
+      },
+      "advertInstructionsRemoved": {
+        "playerAds": 1,
+        "adSlots": 1,
+        "adBreakHeartbeatParams": 1
+      },
+      "sponsoredRenderersRemoved": 1,
+      "interpretation": "Pilot retains the existing caption/audio-capable player. Source planning without captions also lacks a resolved direct URL; no successful handoff occurred."
+    }
+  ],
+  "additionalReadOnlyExperiment": {
+    "profile": "One existing WEB context request with documented Safari userAgent field; credentials omitted; no access checks overridden",
+    "videoId": "-wK200l4KNc",
+    "http": 200,
+    "playability": "UNPLAYABLE",
+    "formats": 0,
+    "hlsPresent": false,
+    "sabrPresent": false,
+    "shipped": false
+  },
+  "privacy": "Signed URLs, n values, signatures, opaque contexts, request bodies, cookies and authorization headers omitted.",
+  "sourceCoordinatorSha256": "e88ba8ab3140190d006484ad40832e15c717eac2ce36cb8e5460d884c9b75b36",
+  "userFeedback": "Video played relatively quickly; exact startup duration was not measured."
+}

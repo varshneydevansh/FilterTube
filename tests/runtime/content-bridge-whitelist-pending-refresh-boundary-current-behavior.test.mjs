@@ -10,8 +10,8 @@ const repoRoot = process.cwd();
 const docPath = 'docs/audit/FILTERTUBE_CONTENT_BRIDGE_WHITELIST_PENDING_REFRESH_BOUNDARY_CURRENT_BEHAVIOR_2026-05-23.md';
 
 const sourceFingerprints = {
-  'js/content_bridge.js': [15054, 678313, '4daad851b77516cbe723e6695d5553752f663be55813b7019bfddce2479a917a'],
-  'js/content/dom_fallback.js': [8177, 380719, 'bc072cfd232c1b19fc02c38de008fd84c52de774752f802aef9dac8b560d4851']
+  'js/content_bridge.js': [15056, 678414, '9e0bca2973ffb01d0216ea8b096531ad3c1afe7af4acc7363fa4b1cc2ca09f18'],
+  'js/content/dom_fallback.js': [8180, 381121, '121f71b40a27024636d448cd5b5de0f1e9a33e3e4e118377f1b07c20e52eb49d']
 };
 
 const blockSpecs = {
@@ -29,15 +29,15 @@ const blockSpecs = {
     start: 'async function initializeDOMFallback(settings) {',
     end: '        const whitelistPendingRefreshState = {',
     startLine: 7142,
-    lines: 255,
-    bytes: 12647,
-    hash: 'f7ffef2af0d96ca65b0166b8940b15d46f8fd7a222940ae856fad8ee68562a52'
+    lines: 257,
+    bytes: 12748,
+    hash: 'ee1f260f090adeea22e50c42a62df41bfe23402eabf2178bea4ebeac0bfda2bc'
   },
   contentBridgeWhitelistPendingQueue: {
     file: 'js/content_bridge.js',
     start: '        const whitelistPendingRefreshState = {',
     end: '        function applyWhitelistPendingHide(candidates) {',
-    startLine: 7397,
+    startLine: 7399,
     lines: 70,
     bytes: 4159,
     hash: '3181b672c5d3a1a558baa5b0dbb175c05f7d966b908b835ae7c216ebc7eaa86b'
@@ -46,7 +46,7 @@ const blockSpecs = {
     file: 'js/content_bridge.js',
     start: '        function applyWhitelistPendingHide(candidates) {',
     end: '        function fallbackRelevantSelector() {',
-    startLine: 7467,
+    startLine: 7469,
     lines: 112,
     bytes: 5829,
     hash: '2ff0a4ef33bdaf0acde1b27bf31d8d026f675702adae2bbc03692c213c266ad8'
@@ -55,7 +55,7 @@ const blockSpecs = {
     file: 'js/content_bridge.js',
     start: '        function fallbackRelevantSelector() {',
     end: '        refreshDOMFallbackMutationObserver();',
-    startLine: 7579,
+    startLine: 7581,
     lines: 217,
     bytes: 9542,
     hash: '644e542cd718856d5a3d447c3ecce919cf66cbad4bb0373efc61da62b3df09b9'
@@ -64,7 +64,7 @@ const blockSpecs = {
     file: 'js/content/dom_fallback.js',
     start: '    // 1. Video/Content Filtering',
     end: '    if (!window.__filtertubePlaylistNavGuardInstalled) {',
-    startLine: 5408,
+    startLine: 5411,
     lines: 19,
     bytes: 950,
     hash: '7235b5ea6e0689ab98e3e2e21e02e37d95b52675bc16a7c5bffa56b50c905894'
@@ -73,7 +73,7 @@ const blockSpecs = {
     file: 'js/content/dom_fallback.js',
     start: "            const alreadyProcessed = element.hasAttribute('data-filtertube-processed');",
     end: "            const cachedVideoId = element.getAttribute('data-filtertube-video-id') || '';",
-    startLine: 5671,
+    startLine: 5674,
     lines: 74,
     bytes: 4342,
     hash: '7f374fecc191fc37bbef5af4e05b040ff3b3b2e0585baec5f8036b1d4f4c7c6f'
@@ -82,7 +82,7 @@ const blockSpecs = {
     file: 'js/content/dom_fallback.js',
     start: '            let hideReason = `Content: ${title}`;',
     end: '            if (hideByDuration) {',
-    startLine: 6954,
+    startLine: 6957,
     lines: 16,
     bytes: 993,
     hash: '2352973b418feb0a4da5f8b71c11940d6a0292b6bdb5db511262db89889c1f17'
@@ -91,7 +91,7 @@ const blockSpecs = {
     file: 'js/content/dom_fallback.js',
     start: "    if (onlyWhitelistPending && listMode === 'whitelist') {",
     end: '    // Inline survey containers',
-    startLine: 7249,
+    startLine: 7252,
     lines: 4,
     bytes: 83,
     hash: '438296f1dbec1d892317f6177e74323886b6830fd0697eb1b1c12e4779776ad0'

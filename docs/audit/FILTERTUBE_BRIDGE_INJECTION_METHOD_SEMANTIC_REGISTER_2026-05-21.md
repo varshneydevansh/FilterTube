@@ -327,3 +327,76 @@ changes, fallback lifecycle changes, or selector/message authority changes.
 The two added named helpers detect the local debug switch and install console log/info/debug gates. They belong to debug/global setup; warnings and errors remain available. A VM fixture verifies disabled logging, explicit debug logging, DOM-attribute debug logging, and idempotent reinstallation. Three console wrapper arrows are counted as callbacks rather than additional named methods.
 
 The Chromium duplicate/failure and Firefox sequential fixtures execute the actual source. They now include `shared/view_count` before the engine, with Firefox seed before injector. Five executable scenarios are exercised (success, duplicate in progress, failure, Firefox fallback, debug console gating); the separate fallback cleanup row shares the Firefox scenario. Current counts are inventories and file-local evidence, not real-browser injection, sender authentication, load readiness, or exhaustive semantic proof. The global semantic proof count remains zero.
+
+
+## Opt-In Content Player Injection Revalidation - 2026-10-22
+
+The unchanged seven named methods and eleven callback sites now inject the bounded MAIN data-response helper before injector. Current real-source Chromium success/duplicate/failure and Firefox sequential lifecycle fixtures retain their assertions with the explicit added dependency. This does not grant page replies authority, close sender/allowlist gaps, or prove installed injection/readiness. The earlier source snapshot remains historical.
+
+line count: 153
+source bytes: 6135
+source sha256: 495033ca85678f848c0a815791a0696ad870a92b00048dfcbab99d000fc162d8
+globalThis literal occurrences: 19
+bridgeState references: 15
+scriptsInjected references: 5
+injectionInProgress references: 3
+injectionPromise references: 7
+browserAPI_BRIDGE references: 4
+IS_FIREFOX_BRIDGE references: 4
+currentSettings references: 5
+debugLog references: 7
+injectMainWorldScripts references: 4
+requestSettingsFromBackground references: 2
+api.runtime.sendMessage calls: 1
+api.runtime.getURL calls: 1
+api.scripting?.executeScript references: 1
+document literal occurrences: 6
+document.createElement calls: 1
+document.head references: 1
+document.documentElement references: 2
+appendChild calls: 1
+setTimeout calls: 2
+addEventListener calls: 0
+removeEventListener calls: 0
+MutationObserver references: 0
+postMessage calls: 0
+new Promise calls: 2
+Promise.resolve references: 1
+new Error calls: 2
+try blocks: 5
+catch blocks: 5
+finally blocks: 1
+await expressions: 2
+script.onload assignments: 1
+script.onerror assignments: 1
+scriptsToInject references: 6
+shared/identity references: 1
+filter_logic references: 2
+seed references: 2
+injector references: 2
+browser word references: 3
+chrome word references: 1
+isFirefox references: 6
+api references: 7
+
+| Current line | Lexical name | Runtime method | Current source |
+| ---: | --- | --- | --- |
+| 25 | `isFilterTubeContentDebugEnabled` | yes | `function isFilterTubeContentDebugEnabled() {` |
+| 34 | `installFilterTubeContentConsoleGate` | yes | `function installFilterTubeContentConsoleGate() {` |
+| 50 | `if` | no | `if (typeof globalThis.currentSettings === 'undefined') {` |
+| 54 | `if` | no | `if (typeof globalThis.debugLog !== 'function') {` |
+| 61 | `injectViaScriptingAPI` | yes | `async function injectViaScriptingAPI(scripts) {` |
+| 67 | `if` | no | `if (api.runtime.lastError || !response?.success) {` |
+| 76 | `injectViaFallback` | yes | `async function injectViaFallback(scripts) {` |
+| 79 | `injectNext` | yes | `function injectNext() {` |
+| 80 | `if` | no | `if (currentIndex >= scripts.length) {` |
+| 101 | `if` | no | `if (bridgeState.scriptsInjected) {` |
+| 104 | `if` | no | `if (bridgeState.injectionPromise) {` |
+| 116 | `if` | no | `if (!isFirefox && api.scripting?.executeScript) {` |
+| 124 | `if` | no | `if (typeof requestSettingsFromBackground === 'function') {` |
+| 139 | `if` | no | `if (!bridgeState.scriptsInjected) {` |
+
+| 122 | `setTimeout(() =>` | fixed settings replay timer; no new readiness guarantee |
+
+Chromium executable proof: one successful injectMainWorldScripts() call sends injectScripts for shared/identity, shared/view_count, filter_logic, content/content_playback_response, and injector
+Firefox fallback executable proof: appends shared/identity, shared/view_count, filter_logic, seed, content/content_playback_response, and injector script tags in order with 50ms load spacing

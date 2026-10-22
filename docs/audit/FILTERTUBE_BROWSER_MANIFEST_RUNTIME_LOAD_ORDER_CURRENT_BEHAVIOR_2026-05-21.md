@@ -193,3 +193,15 @@ The May inventory above is historical. Current manifests use localized names, ve
 | manifest.chrome.json | 154 | 5204 | d8dea8d10e715d01bab25ea12ff6fc3055d403f2486654fcb6907f94bd4f4627 |
 | manifest.firefox.json | 128 | 4138 | 2c0fe680fe1d204250ce687ef29c00767d3ff6269024a410da5c9fccff4ebf79 |
 | manifest.opera.json | 162 | 5393 | a7c541876ed54303d3a21613f5eaacbef536d694bf6061da207456eca476fce1 |
+
+
+## Opt-In Content Player Load Order - 2026-10-22
+
+Current normal isolated stacks add source planning, admission leases, the owned-player controller, caption preparation, and the coordinator in that order before content_bridge. Embed and Google preview stacks retain their previous exact dependencies; the experimental controller is not loaded there. The MAIN response bridge is a web-accessible resource injected before injector (and after Firefox seed), never an isolated content script. This data-only bridge supplies no admission authority. Existing permissions, hosts, worlds and browser-specific entry counts are unchanged. Source load-order checks do not establish installed playback, media availability, caption/audio success, native parity or release readiness. The historical tables above are preserved.
+
+| File | Newlines | Bytes | SHA-256 |
+| --- | ---: | ---: | --- |
+| manifest.json | 160 | 5545 | b5229834ae6c291dbc4ad69b212c5ef086d8214b199678a0c09a46ae0eaa80c9 |
+| manifest.chrome.json | 160 | 5545 | b5229834ae6c291dbc4ad69b212c5ef086d8214b199678a0c09a46ae0eaa80c9 |
+| manifest.firefox.json | 134 | 4431 | f5ae06e03e855cd3c8c4a88e4fcc832c70341d56eb2edab33211d380a6b5c2fb |
+| manifest.opera.json | 168 | 5734 | 5f5809782261a21e8d8a6231178011c25a9de47fd8dfc8f4af834009a9084a07 |

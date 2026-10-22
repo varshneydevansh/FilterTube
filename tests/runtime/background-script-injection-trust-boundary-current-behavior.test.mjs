@@ -171,6 +171,9 @@ test('manifests carry scripting permission and bridge asks background to inject 
   assert.match(scriptingApi, /api\.runtime\.lastError \|\| !response\?\.success/);
   assert.match(orchestrator, /const scriptsToInject = \['shared\/identity', 'shared\/view_count', 'filter_logic'\]/);
   assert.match(orchestrator, /if \(isFirefox\) scriptsToInject\.push\('seed'\)/);
+  assert.match(orchestrator, /scriptsToInject\.push\('content\/content_playback_response'\)/);
+  assert.ok(orchestrator.indexOf("scriptsToInject.push('content/content_playback_response')")
+    < orchestrator.indexOf("scriptsToInject.push('injector')"));
   assert.match(orchestrator, /scriptsToInject\.push\('injector'\)/);
   assert.match(orchestrator, /if \(!isFirefox && api\.scripting\?\.executeScript\)/);
   assert.match(orchestrator, /await injectViaScriptingAPI\(scriptsToInject\)/);

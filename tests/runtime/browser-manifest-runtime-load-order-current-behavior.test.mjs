@@ -33,6 +33,15 @@ const helperStack = [
   'js/content_bridge.js',
 ];
 
+const playbackStack = [
+  'js/shared/content_playback_source.js',
+  'js/content/content_playback_admission.js',
+  'js/content/content_playback_player.js',
+  'js/content/content_playback_captions.js',
+  'js/content/content_playback.js',
+];
+const normalHelperStack = [...helperStack.slice(0, -1), ...playbackStack, ...helperStack.slice(-1)];
+
 const commonMatches = [
   '*://*.youtube.com/*',
   '*://*.youtubekids.com/*',
@@ -109,8 +118,8 @@ function trackedFiles() {
 }
 
 test('browser manifest current source inventory is pinned independently of historical May snapshot', () => {
-  const expected = [["manifest.json", 154, 5204, "d8dea8d10e715d01bab25ea12ff6fc3055d403f2486654fcb6907f94bd4f4627"], ["manifest.chrome.json", 154, 5204, "d8dea8d10e715d01bab25ea12ff6fc3055d403f2486654fcb6907f94bd4f4627"], ["manifest.firefox.json", 128, 4138, "2c0fe680fe1d204250ce687ef29c00767d3ff6269024a410da5c9fccff4ebf79"], ["manifest.opera.json", 162, 5393, "a7c541876ed54303d3a21613f5eaacbef536d694bf6061da207456eca476fce1"]];
-  const doc = read(docPath).split('## October 18, 2026 source review')[1];
+  const expected = [["manifest.json",160,5545,"b5229834ae6c291dbc4ad69b212c5ef086d8214b199678a0c09a46ae0eaa80c9"],["manifest.chrome.json",160,5545,"b5229834ae6c291dbc4ad69b212c5ef086d8214b199678a0c09a46ae0eaa80c9"],["manifest.firefox.json",134,4431,"f5ae06e03e855cd3c8c4a88e4fcc832c70341d56eb2edab33211d380a6b5c2fb"],["manifest.opera.json",168,5734,"5f5809782261a21e8d8a6231178011c25a9de47fd8dfc8f4af834009a9084a07"]];
+  const doc = read(docPath).split('## Opt-In Content Player Load Order - 2026-10-22')[1];
   assert.ok(doc, 'current review must distinguish historical claims');
   for (const [file, lines, size, hash] of expected) {
     assert.equal(lineCount(file), lines);
@@ -152,7 +161,7 @@ test('normal, embedded and Google preview paths retain explicit browser-specific
     const entries = manifest.content_scripts;
     assert.equal(entries.length, firefox ? 5 : opera ? 7 : 6);
     const normal = entries.find(entry => entry.js.includes('js/content_bridge.js') && !entry.all_frames);
-    assert.deepEqual(normal.js, helperStack);
+    assert.deepEqual(normal.js, normalHelperStack);
     assert.deepEqual(normal.matches, commonMatches);
     assert.deepEqual(normal.exclude_matches, ['*://*.youtube.com/embed/*']);
     assert.equal(normal.world, isolatedWorld);
@@ -208,7 +217,7 @@ test('every declared script/resource exists and quarantined CSS cannot be activa
 });
 
 test('fallback resources explicitly cover view counts, admission, localization and host-limited Google icons', () => {
-  const resources = ['js/injector.js','js/filter_logic.js','js/seed.js','js/shared/identity.js','js/shared/view_count.js','js/content/admission_overlay.js','data/ui_locales/*.json','assets/images/homepage_hero_day.mp4','icons/icon-48.png'];
+  const resources = ['js/injector.js','js/content/content_playback_response.js','js/filter_logic.js','js/seed.js','js/shared/identity.js','js/shared/view_count.js','js/content/admission_overlay.js','data/ui_locales/*.json','assets/images/homepage_hero_day.mp4','icons/icon-48.png'];
   for (const file of manifestFiles) {
     const entries = readJson(file).web_accessible_resources;
     assert.deepEqual(entries[0].resources, file.includes('opera') ? resources : [...resources,'icons/file.svg']);
@@ -221,10 +230,31 @@ test('fallback and build keep dependency ordering without claiming a runtime rea
   const bridge = read('js/content/bridge_injection.js');
   assert.match(bridge,/const scriptsToInject = \['shared\/identity', 'shared\/view_count', 'filter_logic'\]/);
   assert.match(bridge,/if \(isFirefox\) scriptsToInject\.push\('seed'\)/);
+  assert.match(bridge,/scriptsToInject\.push\('content\/content_playback_response'\)/);
   assert.match(bridge,/scriptsToInject\.push\('injector'\)/);
+  assert.ok(bridge.indexOf("scriptsToInject.push('content/content_playback_response')")
+    > bridge.indexOf("if (isFirefox) scriptsToInject.push('seed')"));
+  assert.ok(bridge.indexOf("scriptsToInject.push('content/content_playback_response')")
+    < bridge.indexOf("scriptsToInject.push('injector')"));
   const build = read('build.js');
   assert.match(build,/ensureCollabDialogScriptOrder\(manifestJSON\)/);
   assert.match(build,/fs\.writeJsonSync\(path\.join\(targetDir, 'manifest\.json'\), manifestJSON/);
+});
+
+test('owned playback dependencies stay isolated on normal pages and out of embed and preview stacks', () => {
+  for (const file of manifestFiles) {
+    const manifest = readJson(file);
+    const containing = manifest.content_scripts.filter(entry => entry.js.some(path => playbackStack.includes(path)));
+    assert.equal(containing.length, 1);
+    const [entry] = containing;
+    assert.deepEqual(entry.js.filter(path => playbackStack.includes(path)), playbackStack);
+    assert.notEqual(entry.world, 'MAIN');
+    assert.equal(entry.all_frames, undefined);
+    assert.deepEqual(entry.matches, commonMatches);
+    assert.deepEqual(entry.exclude_matches, ['*://*.youtube.com/embed/*']);
+    assert.ok(entry.js.indexOf(playbackStack.at(-1)) < entry.js.indexOf('js/content_bridge.js'));
+    assert.equal(contentScriptRefs(manifest).includes('js/content/content_playback_response.js'), false);
+  }
 });
 
 test('browser manifest runtime load-order authority symbols are not implemented in product source', () => {

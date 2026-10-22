@@ -239,12 +239,12 @@ test('bridge injection method semantic register is audit-only and source scoped'
   assert.match(text, /Status: audit-only current-behavior register/);
   assert.match(text, /Runtime behavior is unchanged/);
   assert.match(text, /source file: js\/content\/bridge_injection\.js/);
-  assert.equal(sourceLineCount(bridge), 152);
-  assert.match(text, /line count: 152/);
-  assert.equal(readBuffer(sourcePath).length, 6064);
-  assert.match(text, /source bytes: 6064/);
-  assert.equal(sha256(sourcePath), '6097691b4c6f4d2ede943014694aec4f6cc1ef0134945e576ca9c6c94dd9c669');
-  assert.match(text, /source sha256: 6097691b4c6f4d2ede943014694aec4f6cc1ef0134945e576ca9c6c94dd9c669/);
+  assert.equal(sourceLineCount(bridge), 153);
+  assert.match(text, /line count: 153/);
+  assert.equal(readBuffer(sourcePath).length, 6135);
+  assert.match(text, /source bytes: 6135/);
+  assert.equal(sha256(sourcePath), '495033ca85678f848c0a815791a0696ad870a92b00048dfcbab99d000fc162d8');
+  assert.match(text, /source sha256: 495033ca85678f848c0a815791a0696ad870a92b00048dfcbab99d000fc162d8/);
   assert.match(text, /repo-wide broad parser lexical callable matches: 14/);
   assert.match(text, /runtime method\/helper declarations in scope: 7/);
   assert.match(text, /broad-parser runtime declarations in scope: 5/);
@@ -366,7 +366,7 @@ test('bridge injection register pins callback inventory and primitive counts', (
     "resets bridge state on failure"
   ],
   [
-    121,
+    122,
     "setTimeout(() =>",
     "requestSettingsFromBackground()"
   ]
@@ -454,7 +454,7 @@ test('bridge injection register preserves manifest background and fallback entry
       scripts.indexOf('js/content/bridge_injection.js') < scripts.indexOf('js/content_bridge.js'),
       `${manifestFile} should load bridge_injection before content_bridge`
     );
-    for (const resource of ['js/injector.js', 'js/filter_logic.js', 'js/seed.js', 'js/shared/identity.js', 'js/shared/view_count.js']) {
+    for (const resource of ['js/injector.js', 'js/filter_logic.js', 'js/seed.js', 'js/shared/identity.js', 'js/shared/view_count.js', 'js/content/content_playback_response.js']) {
       assert.ok(webAccessibleResources(manifestFile).includes(resource), `${manifestFile} missing ${resource}`);
     }
   }
@@ -547,7 +547,7 @@ test('bridge injection register pins current behavior boundaries and missing aut
   await Promise.all([firstPromise, secondPromise]);
   assert.equal(chromiumSuccess.messages.length, 1);
   assert.equal(chromiumSuccess.messages[0].action, 'injectScripts');
-  assert.deepEqual([...chromiumSuccess.messages[0].scripts], ['shared/identity', 'shared/view_count', 'filter_logic', 'injector']);
+  assert.deepEqual([...chromiumSuccess.messages[0].scripts], ['shared/identity', 'shared/view_count', 'filter_logic', 'content/content_playback_response', 'injector']);
   assert.equal(chromiumSuccess.context.__filtertubeBridgeState.scriptsInjected, true);
   assert.equal(chromiumSuccess.context.__filtertubeBridgeState.injectionInProgress, false);
   assert.equal(chromiumSuccess.timers.length, 1);
@@ -574,6 +574,7 @@ test('bridge injection register pins current behavior boundaries and missing aut
     'shared/view_count',
     'filter_logic',
     'seed',
+    'content/content_playback_response',
     'injector'
   ];
   for (const [index, scriptName] of expectedFallbackScripts.entries()) {
@@ -589,18 +590,18 @@ test('bridge injection register pins current behavior boundaries and missing aut
   await fallbackPromise;
   assert.equal(firefoxFallback.context.IS_FIREFOX_BRIDGE, true);
   assert.equal(firefoxFallback.context.__filtertubeBridgeState.scriptsInjected, true);
-  assert.equal(firefoxFallback.appended.length, 5);
+  assert.equal(firefoxFallback.appended.length, 6);
   assert.equal(firefoxFallback.appended.every(({ node }) => node.removed === false), true);
-  assert.equal(firefoxFallback.timers.filter((timer) => timer.delay === 50).length, 5);
+  assert.equal(firefoxFallback.timers.filter((timer) => timer.delay === 50).length, 6);
   assert.equal(firefoxFallback.timers.at(-1).delay, 100);
   firefoxFallback.timers.at(-1).callback();
   assert.equal(firefoxFallback.settingsRequests.length, 1);
 
   for (const token of [
-    'Chromium executable proof: one successful injectMainWorldScripts() call sends injectScripts for shared/identity, shared/view_count, filter_logic, and injector',
+    'Chromium executable proof: one successful injectMainWorldScripts() call sends injectScripts for shared/identity, shared/view_count, filter_logic, content/content_playback_response, and injector',
     'Chromium executable proof: a duplicate in-progress injectMainWorldScripts() call reuses the same promise and sends no second injectScripts message',
     'Chromium executable proof: failed background injection rejects, clears injectionPromise, leaves scriptsInjected false, and calls debugLog once',
-    'Firefox fallback executable proof: appends shared/identity, shared/view_count, filter_logic, seed, and injector script tags in order with 50ms load spacing',
+    'Firefox fallback executable proof: appends shared/identity, shared/view_count, filter_logic, seed, content/content_playback_response, and injector script tags in order with 50ms load spacing',
     'Firefox fallback executable proof: fallback script tags are not removed after load and successful injection schedules the same 100ms settings request timer'
   ]) {
     assert.ok(text.includes(token), `missing executable proof token ${token}`);

@@ -189,3 +189,13 @@ The prior manifest-count snapshot is historical. Source and currently built mani
 - dist manifest quarantined CSS content script refs: 0
 - dist manifest quarantined CSS web-accessible refs: 0
 - extension HTML link tags checked: 10
+
+
+## Opt-In Content Player Manifest Counts - 2026-10-22
+
+The new runtime dependencies change only the manifest JS/resource totals below. All quarantine counts remain zero and packaged CSS bytes must still match source. Earlier counts are historical; no quarantined stylesheet is activated or deletion approved.
+
+active manifest content script JS refs checked: 188
+active manifest web-accessible resource refs checked: 51
+dist manifest content script JS refs checked: 140
+dist manifest web-accessible resource refs checked: 38

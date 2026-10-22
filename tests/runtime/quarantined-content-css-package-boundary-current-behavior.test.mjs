@@ -222,20 +222,20 @@ test('quarantined content CSS is packaged but not manifest or extension HTML loa
   assert.deepEqual(activeStats, {
   "manifestFiles": 4,
   "contentScriptEntries": 24,
-  "contentScriptJsRefs": 168,
+  "contentScriptJsRefs": 188,
   "contentScriptCssRefs": 0,
   "webAccessibleEntries": 8,
-  "webAccessibleResourceRefs": 47,
+  "webAccessibleResourceRefs": 51,
   "quarantinedCssContentScriptRefs": 0,
   "quarantinedCssWebAccessibleRefs": 0
 });
   assert.deepEqual(distStats, {
   "manifestFiles": 3,
   "contentScriptEntries": 18,
-  "contentScriptJsRefs": 125,
+  "contentScriptJsRefs": 140,
   "contentScriptCssRefs": 0,
   "webAccessibleEntries": 6,
-  "webAccessibleResourceRefs": 35,
+  "webAccessibleResourceRefs": 38,
   "quarantinedCssContentScriptRefs": 0,
   "quarantinedCssWebAccessibleRefs": 0
 });
@@ -259,18 +259,18 @@ test('quarantined content CSS is packaged but not manifest or extension HTML loa
   for (const token of [
     'active manifest files checked: 4',
     'active manifest content_script entries checked: 24',
-    'active manifest content script JS refs checked: 168',
+    'active manifest content script JS refs checked: 188',
     'active manifest content script CSS refs checked: 0',
     'active manifest web_accessible_resources entries checked: 8',
-    'active manifest web-accessible resource refs checked: 47',
+    'active manifest web-accessible resource refs checked: 51',
     'active manifest quarantined CSS content script refs: 0',
     'active manifest quarantined CSS web-accessible refs: 0',
     'dist manifest files checked: 3',
     'dist manifest content_script entries checked: 18',
-    'dist manifest content script JS refs checked: 125',
+    'dist manifest content script JS refs checked: 140',
     'dist manifest content script CSS refs checked: 0',
     'dist manifest web_accessible_resources entries checked: 6',
-    'dist manifest web-accessible resource refs checked: 35',
+    'dist manifest web-accessible resource refs checked: 38',
     'dist manifest quarantined CSS content script refs: 0',
     'dist manifest quarantined CSS web-accessible refs: 0',
     'extension HTML files checked: 3',

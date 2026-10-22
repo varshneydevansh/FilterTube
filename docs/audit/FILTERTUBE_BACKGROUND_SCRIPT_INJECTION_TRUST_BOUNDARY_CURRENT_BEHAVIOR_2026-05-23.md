@@ -222,3 +222,46 @@ selected frameIds tokens: 1
 selected tabId tokens: 8
 selected files tokens: 3
 selected setTimeout tokens: 2
+
+
+## Opt-In Content Player Injection Review - 2026-10-22
+
+The bridge now adds content/content_playback_response before injector and after Firefox seed. This MAIN-world module projects bounded exact-video source metadata only; its nonce reply does not authorize isolated playback. The existing sender-derived tab/frame target and the separately documented general-injection allowlist/trust gaps are unchanged. Earlier source measurements remain historical; this refresh changes no runtime code or security-completion claim.
+
+sha256: `cc89bb4a0375145e1c811b7cf5953729c39c409b6b24cacdc65c80f9f6ff44d0`
+sha256: `495033ca85678f848c0a815791a0696ad870a92b00048dfcbab99d000fc162d8`
+background lines: 8538
+background bytes: 386043
+bridge_injection lines: 153
+bridge_injection bytes: 6135
+injectScripts block lines: 47
+injectScripts block bytes: 1612
+subscriptions bridge block lines: 40
+subscriptions bridge block bytes: 1469
+injectViaScriptingAPI block lines: 14
+injectViaScriptingAPI block bytes: 505
+injectViaFallback block lines: 23
+injectViaFallback block bytes: 904
+injectMainWorldScripts block lines: 47
+injectMainWorldScripts block bytes: 1844
+selected injectScripts tokens: 4
+selected request.scripts tokens: 1
+selected sender tab tokens: 1
+selected sender frame tokens: 1
+selected executeScript tokens: 3
+selected world MAIN tokens: 1
+selected world ISOLATED tokens: 0
+selected isTrustedUiSender tokens: 0
+selected allowlist tokens: 0
+selected sender url tokens: 0
+selected tabs.get tokens: 0
+selected tabs.query tokens: 0
+selected youtube host tokens: 0
+selected sendResponse success tokens: 2
+selected sendResponse failure tokens: 5
+selected return true tokens: 2
+selected return false tokens: 5
+selected frameIds tokens: 1
+selected tabId tokens: 8
+selected files tokens: 3
+selected setTimeout tokens: 2

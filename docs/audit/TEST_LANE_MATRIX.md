@@ -502,3 +502,8 @@ owned by JSON, performance and smoke lanes. It covers exact-route duration
 metadata and bounded confirmed-ad seek attempts; this registration does not
 convert local behavior checks into live playback, SABR-backoff, or native
 acceptance evidence.
+
+
+## Opt-In Content Player Lane Ownership — 2026-10-22
+
+The six content-playback runtime suites run together in JSON, performance and smoke lanes. Admission and coordinator suites also run in blocking, whitelist, DOM and settings lanes, where they check pending/blocked profile authority and lifecycle revocation. The six source modules classify to release plus those behavior lanes so manifest/injection and component changes trigger review. These are source/VM checks; a passing lane does not establish a playable installed source, captions/audio success, or native-device parity. The feature remains explicitly started and may refuse unsupported sources without replacing native playback. Existing unrelated lane assignments and historical evidence remain unchanged.

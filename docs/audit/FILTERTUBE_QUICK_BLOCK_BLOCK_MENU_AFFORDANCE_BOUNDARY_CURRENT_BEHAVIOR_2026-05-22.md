@@ -439,3 +439,13 @@ retained. Advert-specific behavior has separate startup/interception tests;
 these source pins do not certify live ad coverage or promote the historical
 semantic/security proof limits to completion. This audit refresh changes no
 product runtime.
+
+
+## Opt-In Playback Hook Fingerprints - 2026-10-22
+
+The content bridge now initializes the explicitly started player, and bridge settings revokes playback on rule/profile/managed changes. These source fingerprints include those independent hooks and the profile metadata-only classifier correction. The selected quick-block/menu blocks and action tests retain their original semantics; no menu target or eligibility assertion is replaced by a source hash. Earlier measurements above remain historical. This documentation/test refresh changes no runtime behavior or installed acceptance claim.
+
+| File | Lines | Bytes | SHA-256 |
+| --- | ---: | ---: | --- |
+| `js/content/bridge_settings.js` | 2130 | 94626 | `20177156d2064b98c3e5b95310f01aaafff4f035610accbcb9d5fbf6b967a62c` |
+| `js/content_bridge.js` | 15056 | 678414 | `9e0bca2973ffb01d0216ea8b096531ad3c1afe7af4acc7363fa4b1cc2ca09f18` |

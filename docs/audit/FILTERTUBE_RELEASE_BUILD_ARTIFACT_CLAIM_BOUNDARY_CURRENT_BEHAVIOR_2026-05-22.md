@@ -18,7 +18,7 @@ changes.
 | --- | ---: | ---: | --- |
 | `build.js` | 861 | 33225 | `a198cc1d0bf98e410deb8f66ced0e56a046bbf987a0a5b878e1278577622fb2e` |
 | `package.json` | 86 | 4580 | `c9cb2c3c4fea302fa3946f462dbfbb474381a78946ca59adb653814d06a4de51` |
-| `README.md` | 456 | 28669 | `40577ad3e86fe8b8695b95586be46f17e6b772a83d4296f511440b40bebcb6cf` |
+| `README.md` | 456 | 28669 | `db3a973e936abd66a84ab7888e5f466fe7b0c1274f5b58aa999c4ea6b12fdbfd` |
 | `CHANGELOG.md` | 938 | 75511 | `e57906dca95911874ef251aa45d8c3a76df00df576b36277d9c0e9b9654c3036` |
 | `manifest.json` | 154 | 5204 | `d8dea8d10e715d01bab25ea12ff6fc3055d403f2486654fcb6907f94bd4f4627` |
 | `manifest.chrome.json` | 154 | 5204 | `d8dea8d10e715d01bab25ea12ff6fc3055d403f2486654fcb6907f94bd4f4627` |
@@ -244,3 +244,15 @@ The build-generated total-lines badge changed from 879.2k to 881.0k. The README 
 ## Popup And Streaming Build Fingerprint Revalidation - 2026-10-22
 
 The frozen build refreshed only README badges: total lines changed from 881.0k to 881.9k and JavaScript lines from 121.3k to 121.5k. README remains 456 lines and 28,669 bytes; the current SHA-256 above was measured after the completed build. This pin refresh is not release publication, installed-package verification, or a code-coverage claim.
+
+
+## Opt-In Content Player Manifest Source Pins - 2026-10-22
+
+The new isolated dependencies and MAIN response resource update current manifest fingerprints only. Build/publish behavior, source/effect block assertions and the existing release boundary stay unchanged; historical source fingerprints above remain dated evidence.
+
+| File | Lines | Bytes | SHA-256 |
+| --- | ---: | ---: | --- |
+| `manifest.json` | 160 | 5545 | `b5229834ae6c291dbc4ad69b212c5ef086d8214b199678a0c09a46ae0eaa80c9` |
+| `manifest.chrome.json` | 160 | 5545 | `b5229834ae6c291dbc4ad69b212c5ef086d8214b199678a0c09a46ae0eaa80c9` |
+| `manifest.firefox.json` | 134 | 4431 | `f5ae06e03e855cd3c8c4a88e4fcc832c70341d56eb2edab33211d380a6b5c2fb` |
+| `manifest.opera.json` | 168 | 5734 | `5f5809782261a21e8d8a6231178011c25a9de47fd8dfc8f4af834009a9084a07` |

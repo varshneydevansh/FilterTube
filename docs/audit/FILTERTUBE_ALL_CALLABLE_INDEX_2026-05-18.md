@@ -222,8 +222,8 @@ lexical and its scope remains tracked JS/JSX/MJS: CJS/Python tooling requires it
 separate release/workflow review and is not silently counted as JavaScript here.
 
 ```text
-current tracked JS/JSX/MJS files: 111
-current repo-wide lexical callables: 9189
+current tracked JS/JSX/MJS files: 117
+current repo-wide lexical callables: 9299
 current complete per-callable semantic proofs: 0
 current callable behavior-change approval: NO-GO
 runtime behavior changed by inventory refresh: no
@@ -232,8 +232,8 @@ runtime behavior changed by inventory refresh: no
 | Family | Files | Lexical callables |
 | --- | ---: | ---: |
 | Build/sync scripts | 5 | 75 |
-| Hot page/background runtime | 9 | 3842 |
-| Content helper runtime | 13 | 491 |
+| Hot page/background runtime | 9 | 3843 |
+| Content helper runtime | 19 | 600 |
 | UI/settings runtime | 24 | 3712 |
 | Generated/quarantined UI | 6 | 147 |
 | Vendor bundles | 3 | 279 |
@@ -247,8 +247,14 @@ runtime behavior changed by inventory refresh: no
 | `js/content/admission_overlay.js` | Content helper runtime | 25 | helper counted; semantic proof incomplete |
 | `js/content/block_channel.js` | Hot page/background runtime | 234 | hot runtime mapped |
 | `js/content/bridge_injection.js` | Content helper runtime | 14 | helper counted |
-| `js/content/bridge_settings.js` | Hot page/background runtime | 140 | hot runtime mapped |
+| `js/content/bridge_settings.js` | Hot page/background runtime | 141 | hot runtime mapped |
 | `js/content/collab_dialog.js` | Content helper runtime | 42 | helper counted |
+| `js/content/content_playback.js` | Content helper runtime | 24 | helper counted; semantic proof incomplete |
+| `js/content/content_playback_admission.js` | Content helper runtime | 12 | helper counted; semantic proof incomplete |
+| `js/content/content_playback_captions.js` | Content helper runtime | 19 | helper counted; semantic proof incomplete |
+| `js/content/content_playback_player.js` | Content helper runtime | 32 | helper counted; semantic proof incomplete |
+| `js/content/content_playback_response.js` | Content helper runtime | 4 | helper counted; semantic proof incomplete |
+| `js/shared/content_playback_source.js` | Content helper runtime | 18 | helper counted; semantic proof incomplete |
 | `js/content/dom_extractors.js` | Content helper runtime | 117 | helper counted |
 | `js/content/dom_fallback.js` | Hot page/background runtime | 669 | hot runtime mapped |
 | `js/content/dom_helpers.js` | Content helper runtime | 21 | helper counted |
@@ -381,3 +387,9 @@ performance and smoke lanes. This does not establish independent media
 acquisition, resolve live SABR backoff, prove installed playback timing, or
 change the wider semantic/security completion boundaries. This refresh changes
 only bookkeeping and test assertions about current inventories.
+
+### Opt-In Content Player Inventory Revalidation - 2026-10-22
+
+Six new playback modules are now tracked: source planning, isolated admission, VTT preparation, an explicitly started player, its isolated coordinator, and a bounded MAIN response bridge. The unchanged lexical parser measures 117 files and 9,299 matches (3,843 hot-runtime and 600 helper matches). New helper matches include callbacks and control-flow forms; they are not complete semantic method proofs. Current counters include the playback invalidation hooks and the profile-change classifier correction.
+
+The six dedicated runtime suites cover planning, authority, response projection, caption preparation, controller lifecycle and coordinator boundaries. Source/VM evidence does not establish installed playable-source availability, browser caption/audio success, native parity, or a solution to live SABR backoff. Default playback remains native until an explicit experimental action; missing authority or unsupported features retain that path. Existing historical measurements and NO-GO limits remain unchanged. This inventory refresh changes no runtime behavior.
