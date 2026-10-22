@@ -307,4 +307,4 @@ All three browser packages were rebuilt from the frozen automatic playback sourc
 
 | File | Lines | Bytes | SHA-256 |
 | --- | ---: | ---: | --- |
-| `README.md` | 456 | 28669 | `8020a7f53a3380d7e47887c7d0c8c106953225a43b205f246da64e6ba75e6d93` |
+| `README.md` | 456 | 28669 | `ddbbc23859fc87d2b7270e358db6c875660f927b70d0f96418f742d4aedeaa5f` |

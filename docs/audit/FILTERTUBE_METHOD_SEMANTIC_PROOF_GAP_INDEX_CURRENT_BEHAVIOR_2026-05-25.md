@@ -310,8 +310,8 @@ gate remains closed.
 
 | Semantic row | Source | Owner / trigger / inputs | Side effects and no-work behavior | Existing proof boundary |
 | --- | --- | --- | --- | --- |
-| `seed_hasNetworkJsonWork` | `js/seed.js:1370` | Seed MAIN-world network predicate, called before fetch/XHR clone/parse/rewrite work. Inputs: `enabled`, `listMode`, content filters, keyword/channel/comment rules, Shorts/comments toggles, and selected categories. | Pure boolean. Missing settings, disabled runtime, and empty blocklist mode return false; whitelist returns true because unresolved JSON cards may need fail-closed handling. | Covered by seed fetch/XHR no-work, P0 no-work, and JSON-first active-work predicate fixtures; not complete proof for every seed callable. |
-| `seed_shouldBypassYouTubeiNetworkResponse` | `js/seed.js:1396` | Seed fetch/XHR admission gate for named YouTubei responses. Inputs: cached settings and `hasNetworkJsonWork()`. | Returns true before parsing when settings are missing or no active JSON work exists; logs only through seed debug. | Proves the empty-install lag fix boundary but not all endpoint semantics. |
+| `seed_hasNetworkJsonWork` | `js/seed.js:1369` | Seed MAIN-world network predicate, called before fetch/XHR clone/parse/rewrite work. Inputs: `enabled`, `listMode`, content filters, keyword/channel/comment rules, Shorts/comments toggles, and selected categories. | Pure boolean. Missing settings, disabled runtime, and empty blocklist mode return false; whitelist returns true because unresolved JSON cards may need fail-closed handling. | Covered by seed fetch/XHR no-work, P0 no-work, and JSON-first active-work predicate fixtures; not complete proof for every seed callable. |
+| `seed_shouldBypassYouTubeiNetworkResponse` | `js/seed.js:1395` | Seed fetch/XHR admission gate for named YouTubei responses. Inputs: cached settings and `hasNetworkJsonWork()`. | Returns true before parsing when settings are missing or no active JSON work exists; logs only through seed debug. | Proves the empty-install lag fix boundary but not all endpoint semantics. |
 | `injector_hasNetworkJsonWork` | `js/injector.js:185` | Main-world injector mirror predicate for snapshot hold/replay and settings work. Inputs mirror seed active JSON work. | Pure boolean; prevents queued snapshot work when inactive. | Covered by network snapshot producer/consumer and no-work fixtures; not complete proof for all injector message handlers. |
 | `bridge_settings_refreshRuntimeObserversAfterSettingsUpdate` | `js/content/bridge_settings.js:1000` | Isolated-world settings fanout after a refreshed settings payload. Inputs: available global refresh hooks. | Calls only the first available whole-runtime observer refresh, else quick-block, DOM fallback, and prefetch fallbacks. | Confirms runtime observer refresh ownership is still split and ordered; no shared lifecycle registry exists. |
 | `bridge_settings_scheduleSettingsRefreshFromStorage` | `js/content/bridge_settings.js:1033` | Storage-change debounce owner. Inputs: `forceReprocess`, elapsed time, pending timer state, and changed storage keys. | Coalesces refreshes and upgrades pending `forceReprocess` with `pendingStorageRefreshForceReprocess || shouldForceReprocess`; delayed branch applies `forcePendingReprocess`. | Fixes stale visible-card reprocess after keyword/profile changes; not proof for every storage key consumer. |
@@ -347,12 +347,12 @@ audit-only and do not approve predicate merging or runtime optimization.
 
 | Semantic row | Source | Owner / trigger / inputs | Side effects and no-work behavior | Existing proof boundary |
 | --- | --- | --- | --- | --- |
-| `seed_hasEnabledContentFilters_strict_boolean` | `js/seed.js:1328` | Seed MAIN-world content-filter admission helper. Inputs are `settings.contentFilters.duration/uploadDate/uppercase.enabled`. | Pure boolean; only exact `true` enables seed JSON content-filter work. Truthy malformed/imported values do not wake seed body work. | Strictness now matches injector/bridge, but schema normalization authority is still separate. |
-| `seed_hasActiveJsonFilterRules_rule_branches` | `js/seed.js:1355` | Seed JSON rule predicate. Inputs are keyword, channel, comment keyword lists, `hideAllComments`, `hideAllShorts`, and selected category filters. | Pure boolean; catalog controls outside these branches do not make seed network JSON active. | Content-control catalog activity and JSON rule activity remain different authorities. |
-| `seed_shouldSkipEngineProcessing_harvest_only_scope` | `js/seed.js:1410` | Seed route/layout skip predicate for search, channel, and desktop home browse responses. Inputs are URL path, dataName, list mode, content-filter activity, JSON-rule activity, and response shape. | Returns skip only for selected blocklist/no-active-rule layouts; active rules, active content filters, and whitelist keep engine processing live. | Skip means harvest-only/pass-through, not no work; route/surface mutation budgets remain incomplete. |
-| `seed_processWithEngine_transport_dispatcher` | `js/seed.js:1530` | Seed network processing dispatcher for page globals/fetch/XHR payloads. Inputs are cached settings, engine availability, skip predicate, and dataName. | Queues missing-settings data, returns without engine work when no JSON work or disabled, harvests-only for skip cases, or calls `FilterTubeEngine.processData()`. | This is the central parse/mutate/pass-through decision but not a first-class shared work report. |
-| `seed_setupFetchInterception_clone_parse_gate` | `js/seed.js:1960` | Seed fetch interceptor owner for admitted YouTubei responses. Inputs are URL endpoint match, cached settings, active-work gate, response clone, engine result, and original response metadata. | Endpoint-like fetches can be bypassed before clone/parse when inactive; active paths clone, parse, process, stringify, and rebuild a `Response`. | Fetch mutation budget, endpoint reason, and per-route parse/stringify counters remain missing. |
-| `seed_setupXhrInterception_parse_override_gate` | `js/seed.js:2060` | Seed XHR interceptor owner for admitted YouTubei responses. Inputs are open/send URL marks, ready-state/load listeners, cached settings, active-work gate, and response override fields. | Marks endpoint-like XHRs, wraps listeners, bypasses before parse when inactive, and can override `response`/`responseText` when active. | XHR listener lifecycle and fetch/XHR parity are not yet a single transport authority. |
+| `seed_hasEnabledContentFilters_strict_boolean` | `js/seed.js:1327` | Seed MAIN-world content-filter admission helper. Inputs are `settings.contentFilters.duration/uploadDate/uppercase.enabled`. | Pure boolean; only exact `true` enables seed JSON content-filter work. Truthy malformed/imported values do not wake seed body work. | Strictness now matches injector/bridge, but schema normalization authority is still separate. |
+| `seed_hasActiveJsonFilterRules_rule_branches` | `js/seed.js:1354` | Seed JSON rule predicate. Inputs are keyword, channel, comment keyword lists, `hideAllComments`, `hideAllShorts`, and selected category filters. | Pure boolean; catalog controls outside these branches do not make seed network JSON active. | Content-control catalog activity and JSON rule activity remain different authorities. |
+| `seed_shouldSkipEngineProcessing_harvest_only_scope` | `js/seed.js:1409` | Seed route/layout skip predicate for search, channel, and desktop home browse responses. Inputs are URL path, dataName, list mode, content-filter activity, JSON-rule activity, and response shape. | Returns skip only for selected blocklist/no-active-rule layouts; active rules, active content filters, and whitelist keep engine processing live. | Skip means harvest-only/pass-through, not no work; route/surface mutation budgets remain incomplete. |
+| `seed_processWithEngine_transport_dispatcher` | `js/seed.js:1529` | Seed network processing dispatcher for page globals/fetch/XHR payloads. Inputs are cached settings, engine availability, skip predicate, and dataName. | Queues missing-settings data, returns without engine work when no JSON work or disabled, harvests-only for skip cases, or calls `FilterTubeEngine.processData()`. | This is the central parse/mutate/pass-through decision but not a first-class shared work report. |
+| `seed_setupFetchInterception_clone_parse_gate` | `js/seed.js:1959` | Seed fetch interceptor owner for admitted YouTubei responses. Inputs are URL endpoint match, cached settings, active-work gate, response clone, engine result, and original response metadata. | Endpoint-like fetches can be bypassed before clone/parse when inactive; active paths clone, parse, process, stringify, and rebuild a `Response`. | Fetch mutation budget, endpoint reason, and per-route parse/stringify counters remain missing. |
+| `seed_setupXhrInterception_parse_override_gate` | `js/seed.js:2059` | Seed XHR interceptor owner for admitted YouTubei responses. Inputs are open/send URL marks, ready-state/load listeners, cached settings, active-work gate, and response override fields. | Marks endpoint-like XHRs, wraps listeners, bypasses before parse when inactive, and can override `response`/`responseText` when active. | XHR listener lifecycle and fetch/XHR parity are not yet a single transport authority. |
 | `injector_processDataWithFilterLogic_active_gate` | `js/injector.js:3405` | Injector page-world JSON processor. Inputs are current settings, engine availability, data, and dataName. | Returns unchanged when engine is absent or no active JSON work exists; active path calls `FilterTubeEngine.processData()`. | Mirrors seed admission but still owns a separate hook/replay path. |
 | `injector_processInitialDataQueue_no_work_clear` | `js/injector.js:3427` | Injector queued initial-data replay owner. Inputs are `settingsReceived`, engine presence, active JSON work, and queued page data. | Delays until settings/engine exist, clears queued data when no active JSON work exists, otherwise processes queued items. | Queue cleanup avoids stale replay cost, but settings revision and duplicate hook proof remain incomplete. |
 | `bridge_needsIdentityPrefetchWork_non_json_branch` | `js/content_bridge.js:1013` | Content bridge identity prefetch predicate. Inputs are enabled state, list mode, and channel filter list. | Returns true for whitelist mode or channel rows even when JSON mutation is not the only reason to wake work. | Identity prefetch must remain separate from JSON mutation ownership. |
@@ -960,7 +960,7 @@ separate release/workflow review and is not silently counted as JavaScript here.
 
 ```text
 current tracked JS/JSX/MJS files: 120
-current repo-wide lexical callables: 9478
+current repo-wide lexical callables: 9484
 current complete per-callable semantic proofs: 0
 current callable behavior-change approval: NO-GO
 runtime behavior changed by inventory refresh: no
@@ -969,8 +969,8 @@ runtime behavior changed by inventory refresh: no
 | Family | Files | Lexical callables |
 | --- | ---: | ---: |
 | Build/sync scripts | 5 | 75 |
-| Hot page/background runtime | 9 | 3857 |
-| Content helper runtime | 22 | 765 |
+| Hot page/background runtime | 9 | 3860 |
+| Content helper runtime | 22 | 768 |
 | UI/settings runtime | 24 | 3712 |
 | Generated/quarantined UI | 6 | 147 |
 | Vendor bundles | 3 | 279 |
@@ -986,7 +986,7 @@ runtime behavior changed by inventory refresh: no
 | `js/content/bridge_injection.js` | Content helper runtime | 14 | `semantic proof incomplete` | Lexical accounting only; no complete per-callable closure claimed. |
 | `js/content/bridge_settings.js` | Hot page/background runtime | 153 | `semantic proof incomplete` | Lexical accounting only; no complete per-callable closure claimed. |
 | `js/content/collab_dialog.js` | Content helper runtime | 42 | `semantic proof incomplete` | Lexical accounting only; no complete per-callable closure claimed. |
-| `js/content/content_playback.js` | Content helper runtime | 27 | `semantic proof incomplete` | Lexical accounting only; no complete per-callable closure claimed. |
+| `js/content/content_playback.js` | Content helper runtime | 30 | `semantic proof incomplete` | Lexical accounting only; no complete per-callable closure claimed. |
 | `js/content/content_playback_admission.js` | Content helper runtime | 12 | `semantic proof incomplete` | Lexical accounting only; no complete per-callable closure claimed. |
 | `js/content/content_playback_captions.js` | Content helper runtime | 19 | `semantic proof incomplete` | Lexical accounting only; no complete per-callable closure claimed. |
 | `js/content/content_playback_native.js` | Content helper runtime | 47 | `semantic proof incomplete` | Lexical accounting only; no complete per-callable closure claimed. |
@@ -1024,7 +1024,7 @@ runtime behavior changed by inventory refresh: no
 | `js/render_engine.js` | UI/settings runtime | 171 | `semantic proof incomplete` | Lexical accounting only; no complete per-callable closure claimed. |
 | `js/rule_list_import_reports.js` | UI/settings runtime | 38 | `semantic proof incomplete` | Lexical accounting only; no complete per-callable closure claimed. |
 | `js/security_manager.js` | UI/settings runtime | 18 | `semantic proof incomplete` | Lexical accounting only; no complete per-callable closure claimed. |
-| `js/seed.js` | Hot page/background runtime | 195 | `semantic proof incomplete` | Lexical accounting only; no complete per-callable closure claimed. |
+| `js/seed.js` | Hot page/background runtime | 198 | `semantic proof incomplete` | Lexical accounting only; no complete per-callable closure claimed. |
 | `js/settings_shared.js` | UI/settings runtime | 45 | `semantic proof incomplete` | Lexical accounting only; no complete per-callable closure claimed. |
 | `js/shared/content_playback_resolver.js` | Content helper runtime | 25 | `semantic proof incomplete` | Lexical accounting only; no complete per-callable closure claimed. |
 | `js/shared/content_playback_source.js` | Content helper runtime | 18 | `semantic proof incomplete` | Lexical accounting only; no complete per-callable closure claimed. |
@@ -1430,3 +1430,7 @@ Current locations below account for setting propagation and transition-only refr
 | `block_quick_mobileMutationObserver_eager_only` | `js/content/block_channel.js:2393` |
 
 Healthy admitted same-video native media is now preserved before extraction and before source commit. Buffered content past its startup position, with exact native identity and explicit inactive-ad API evidence, is marked native_ready without fetching a fresh source or pausing/reloading the player. This guard adds two lexical matches; it does not grant profile admission or claim a fresh source was selected.
+
+## Native fallback retirement revalidation - 2026-10-23
+
+Current lexical accounting is 9,484 matches across 120 tracked files after native fallback retirement: 3,860 hot-runtime and 768 helper matches. Current seed line references were refreshed. Policy fixtures and live Chrome observations are recorded in NATIVE_PLAYBACK_VOID_RETIREMENT_2026-10-23.md; the inventory does not establish complete per-callable proof.

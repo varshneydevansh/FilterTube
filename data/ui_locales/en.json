@@ -289,7 +289,7 @@
   "controls.title.hideComments": "Hide All Comments",
   "controls.description.hideComments": "Remove comment sections entirely",
   "controls.title.hideSponsoredCards": "Send adverts to The Void",
-  "controls.description.hideSponsoredCards": "On by default. Remove YouTube ad plans before playback and quietly suppress any advert that still reaches the player on YouTube and YouTube Kids",
+  "controls.description.hideSponsoredCards": "On by default. Filter advert data on YouTube and YouTube Kids. Desktop videos keep YouTube’s controls; Content-only playback can choose the main-video source when needed.",
   "controls.title.hidePlayables": "Hide YouTube Playables",
   "controls.description.hidePlayables": "Hide Playables shelves, game cards, and navigation entries",
   "controls.title.hidePlaylistCards": "Hide Playlist cards",

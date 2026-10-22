@@ -19,11 +19,13 @@ function sliceBetween(source, startNeedle, endNeedle) {
   return source.slice(start, end);
 }
 
-test('existing sponsored-content consent owns the Android-style Advert Void runtime', () => {
+test('sponsored-content consent retains bounded fallback outside native desktop Watch', () => {
   assert.match(catalog, /key: 'hideSponsoredCards'[\s\S]*title: 'Send adverts to The Void'/);
   assert.match(seed, /cachedSettings\.hideSponsoredCards === true/);
   assert.match(seed, /const AD_VOID_POLL_MS = 900/);
   assert.match(seed, /window\.setInterval\(runAdVoidPass, AD_VOID_POLL_MS\)/);
+  assert.match(seed, /function isAdVoidMediaFallbackEnabled\(\)/);
+  assert.match(seed, /function isNativeContentPlaybackRoute\(\)/);
 });
 
 test('Advert Void is default-on for installs, upgrades, profiles, and missing legacy values', () => {
@@ -67,13 +69,14 @@ test('ad recognition requires player interruption or visible ad evidence', () =>
   assert.match(detection, /!adVoidContainerHasSignal\(candidate\)/);
 });
 
-test('active adverts are muted before scoped skip, parallel content, or confirmed ad advancement', () => {
+test('retained fallback scopes advert mutations and never resumes paused content', () => {
   const pass = sliceBetween(seed, 'function runAdVoidPass() {', '\n    function syncAdVoidRuntime');
   assert.ok(pass.indexOf('adVoidQuarantine(adVideo, player, contentVideo);') < pass.indexOf('adVoidClickSkip(player)'));
   assert.match(pass, /adVoidClickSkip\(player\)/);
   assert.match(pass, /adVoidStartParallelContent\(contentVideo\)/);
   assert.match(pass, /adVoidAdvanceConfirmedAd\(adVideo, player, expectedDuration\)/);
-  assert.match(seed, /contentVideo\.play\(\)/);
+  assert.doesNotMatch(seed, /contentVideo\.play\(\)/);
+  assert.doesNotMatch(seed, /function adVoidKeepParallelContentPlaying/);
   assert.match(seed, /player\.contains\(adVideo\)/);
   assert.match(seed, /currentPlayerVideo !== adVideo/);
   assert.match(seed, /hasAdShowing\s*&&\s*hasAdInterrupting\s*&&\s*differsFromRequestedContent/);
@@ -135,7 +138,9 @@ test('ambiguous matching durations are not promoted or advanced as adverts', () 
 
 test('quarantine does nothing without an advert belonging to the selected player', () => {
   const source = sliceBetween(seed, 'function adVoidQuarantine(adVideo, player, contentVideo) {', '\n    function adVoidClickSkip');
-  const quarantine = Function(`${source}; return adVoidQuarantine;`)();
+  const quarantine = Function('isAdVoidMediaFallbackEnabled', `${source}; return adVoidQuarantine;`)(() => true);
+  const retired = Function('isAdVoidMediaFallbackEnabled', `${source}; return adVoidQuarantine;`)(() => false);
+  retired(media(30), { contains: () => true }, null);
   // Any audio helper call would throw: these paths must return before effects.
   quarantine(null, { contains: () => true }, null);
   quarantine(media(30), { contains: () => false }, null);
@@ -151,10 +156,6 @@ test('Advert Void diagnostics expose bounded transition and playback evidence', 
   assert.match(runtime, /'ad-detected'/);
   assert.match(runtime, /'media-roles'/);
   assert.match(runtime, /'waiting-for-requested-content'/);
-  assert.match(runtime, /'content-play-requested'/);
-  assert.match(runtime, /'content-play-started'/);
-  assert.match(runtime, /'content-play-rejected'/);
-  assert.match(runtime, /'content-paused-during-ad'/);
   assert.match(runtime, /'confirmed-ad-advanced'/);
   assert.match(runtime, /'ad-ended'/);
   assert.match(runtime, /'requested-content-ready'/);
@@ -198,23 +199,26 @@ test('the extension restores user audio and owns no network-blocking path', () =
   assert.doesNotMatch(runtime, /fetch\s*\(|XMLHttpRequest|webRequest|declarativeNetRequest/);
 });
 
-test('Help explains Player-plan prevention and the guarded fallback', () => {
+test('Help distinguishes native desktop ownership, retained fallback and profile authority', () => {
   assert.match(help, /Send adverts to The Void/);
   assert.match(help, /default-on control/);
-  assert.match(help, /applies on YouTube Main and YouTube Kids/);
-  assert.match(help, /removes the observed advert plan from YouTube's existing Player response/);
-  assert.match(help, /does not create extra YouTube API traffic/);
-  assert.match(help, /advances only positively identified advert media/);
-  assert.match(help, /prevent recommendation previews or the requested video from being advanced/);
+  assert.match(help, /filters advert plans and sponsored items on YouTube Main and YouTube Kids/);
+  assert.match(help, /choose the main-video source once when needed/);
+  assert.match(help, /healthy video stays untouched/);
+  assert.match(help, /does not enable repeated hidden seeking or resume attempts/);
+  assert.match(help, /without automatically resuming paused content/);
+  assert.match(help, /Parent and child filtering rules still apply/);
+  assert.match(help, /does not prove every advert was prevented/);
   assert.match(help, /player-ad-plan-removed/);
 });
 
-test('the same default-on MAIN-world runtime is installed on Main and Kids', () => {
+test('default-on advert data filtering remains installed on Main and Kids', () => {
   const seedRegistration = manifest.content_scripts.find(entry => (
     entry.world === 'MAIN' && Array.isArray(entry.js) && entry.js.includes('js/seed.js')
   ));
   assert.ok(seedRegistration);
   assert.ok(seedRegistration.matches.includes('*://*.youtube.com/*'));
   assert.ok(seedRegistration.matches.includes('*://*.youtubekids.com/*'));
-  assert.match(catalog, /Remove YouTube ad plans before playback and quietly suppress any advert that still reaches the player on YouTube and YouTube Kids/);
+  assert.match(catalog, /Filter advert data on YouTube and YouTube Kids/);
+  assert.match(catalog, /Desktop videos keep YouTube’s controls/);
 });

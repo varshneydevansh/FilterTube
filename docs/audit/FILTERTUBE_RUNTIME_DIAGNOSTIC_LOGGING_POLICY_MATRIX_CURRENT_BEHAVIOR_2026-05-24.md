@@ -775,7 +775,7 @@ relative isolated-world production console-gate ordering are checked in source.
 | `js/io_manager.js` | 3203 | 162604 | `ca73f44abb4d2d4e57a81470cfcb2447b1e62ef8680ef0457b81dcdc6734e4c3` |
 | `js/layout.js` | 680 | 30604 | `48831ccdc2d62c75818d9c6a153d7bfacec9d7be9f2408485f74b1a7c13c57c7` |
 | `js/popup.js` | 2553 | 117093 | `645fab83d4b665796f5b2fe1be262ca336df6a4cf3ffb1daebc588a50c091aa7` |
-| `js/seed.js` | 2499 | 109884 | `4fe890e049b31bdadab8a3447fe4d853fb19962db91b9e3299fed38e87ebd8b2` |
+| `js/seed.js` | 2508 | 110538 | `af10e116a8580bf380e6f26b312c5ed3e3597693f7cf9a9bbb4661c2c597c8a1` |
 | `js/settings_shared.js` | 1313 | 66857 | `19f0a1fb3cd512494481b7eb39169bf84feeda4a0a6a20cf58ebaf1c18ff7ba9` |
 | `js/state_manager.js` | 2979 | 124009 | `04879b5b1dcac9229c70d0ea14241667755682649865ad1d52030c1ce21950d3` |
 | `js/tab-view.js` | 32531 | 1760504 | `6da5a37b9018368588ff9c7091aca30c22a4398a038f681bad2ba2a1be4a4eca` |
@@ -900,7 +900,7 @@ Automatic scheduling, profile preference propagation and transition-only readine
 | File | Lines | Bytes | SHA-256 |
 | --- | ---: | ---: | --- |
 | `js/content/bridge_settings.js` | 2238 | 101092 | `923110bd0a8f2c3216199e1c930550ab80f6458448060d874da19e336aab3e24` |
-| `js/content/content_playback.js` | 307 | 17025 | `040c8c8606f6c8cb76703b094aae86e3269c816b4ef80266b35de112df2749f5` |
+| `js/content/content_playback.js` | 337 | 19386 | `eaadabbd10387d6994ce1175c4dfc19ce375958e399e2f5f0c267b5ecf55cc7d` |
 | `js/content/content_playback_admission.js` | 131 | 7500 | `71ee13a96de07fdf988dc25300b1b09e0379e687047b5a5b7c21605bcbe68763` |
 | `js/content/content_playback_captions.js` | 138 | 8244 | `c5768f3bb7836321b030009492fe2ae703bb3e785352eabf8b2f383ca203c196` |
 | `js/content/content_playback_native.js` | 276 | 18819 | `baf6f57897442a338aada4fdc44915dc324eff93f8594b4b0006b648dd64823a` |
@@ -918,3 +918,7 @@ Automatic scheduling, profile preference propagation and transition-only readine
 | `js/tab-view.js` | 32535 | 1760706 | `801d77180fe4ab2b3e470f7337bc8640bcbdd2f882f58e5628f61852d42c4286` |
 | `js/content/block_channel.js` | 3361 | 135050 | `f2a02886a83d64d93186cd1f0c1f300683ae49754b928d2e0329fd1a88d8f2c9` |
 | `js/content_bridge.js` | 15056 | 678414 | `9e0bca2973ffb01d0216ea8b096531ad3c1afe7af4acc7363fa4b1cc2ca09f18` |
+
+## Native fallback retirement revalidation - 2026-10-23
+
+Current seed and coordinator source fingerprints were recomputed after fallback retirement. Direct console counts remain unchanged; seed has four sites at current lines 11, 33, 126 and 1279. Desktop watch routes no longer run the legacy media poll, while the bounded JSON-removal trace remains. This fingerprint update is not a complete logging/privacy proof.

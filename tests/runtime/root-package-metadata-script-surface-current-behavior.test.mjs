@@ -11,7 +11,7 @@ const rootMetadataRows = [
   ['.gitignore', 157, 2275, 'f3033e094938bb4fc6ecf30aad468286f1dccd8d18db1c136e348ab087208bcd'],
   ['CHANGELOG.md', 938, 75511, 'e57906dca95911874ef251aa45d8c3a76df00df576b36277d9c0e9b9654c3036'],
   ['LICENSE', 21, 1073, 'd0739cbb6232b0fb9ea59347feaf412bab5042768aa02856b16af24bb35e9d9d'],
-  ['README.md', 456, 28669, '8020a7f53a3380d7e47887c7d0c8c106953225a43b205f246da64e6ba75e6d93'],
+  ['README.md', 456, 28669, 'ddbbc23859fc87d2b7270e358db6c875660f927b70d0f96418f742d4aedeaa5f'],
   ['channel-identity-watch-mix-collab-recovery-plan.md', 262, 16023, '01f82169b06d3752e318b20b956c8a4284ae80166686e5c40aeee66c957d108a'],
   ['package.json', 86, 4580, 'c9cb2c3c4fea302fa3946f462dbfbb474381a78946ca59adb653814d06a4de51'],
   ['package-lock.json', 1468, 50219, '84e60039228a76c10550d2e3922706ef2b7dd3671ef218a1d6e9263598cef33d'],

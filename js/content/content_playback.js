@@ -93,20 +93,41 @@
         if (['settings_changed', 'storage_changed', 'storage_settings_changed'].includes(reason)) queueMicrotask(refresh);
         if (['direct_admission_changed', 'category_admission_changed'].includes(reason)) queueMicrotask(schedule);
     }
-    function requestResponse(id, audioTrackId = '') {
+    function requestResponse(id, audioTrackId = '', stateOnly = false) {
         return new Promise(resolve => {
             const bytes = new Uint8Array(18);
             crypto.getRandomValues(bytes);
             const requestId = Array.from(bytes, value => value.toString(16).padStart(2, '0')).join('');
-            const timer = setTimeout(() => finish(null), 3000);
+            const timer = setTimeout(() => finish(null), stateOnly ? 2000 : 3000);
             function finish(value) {
                 clearTimeout(timer);
                 pending.delete(requestId);
                 resolve(value);
             }
-            pending.set(requestId, { videoId: id, audioTrackId, finish });
-            root.postMessage({ type: audioTrackId ? 'FilterTube_SelectContentPlaybackAudio' : 'FilterTube_RequestContentPlayback', source: 'content_bridge',
+            const replyType = stateOnly ? 'FilterTube_NativeContentState' : audioTrackId
+                ? 'FilterTube_ContentPlaybackAudioResult' : 'FilterTube_ContentPlaybackResponse';
+            pending.set(requestId, { videoId: id, audioTrackId, replyType, finish });
+            root.postMessage({ type: stateOnly ? 'FilterTube_ReadNativeContentState' : audioTrackId ? 'FilterTube_SelectContentPlaybackAudio' : 'FilterTube_RequestContentPlayback', source: 'content_bridge',
                 payload: { requestId, videoId: id, ...(audioTrackId ? { audioTrackId } : {}) } }, location.origin);
+        });
+    }
+    function sameNativeFeatures(before, after) {
+        if (!before || !after || before.audioKnown !== true || after.audioKnown !== true
+            || before.captionsKnown !== true || after.captionsKnown !== true
+            || typeof before.captionsEnabled !== 'boolean' || after.captionsEnabled !== before.captionsEnabled
+            || !Number.isInteger(before.audioTrackCount) || before.audioTrackCount < 0 || before.audioTrackCount > 64
+            || after.audioTrackCount !== before.audioTrackCount) return false;
+        const ids = value => {
+            if (!Array.isArray(value.audioTracks) || value.audioTracks.length !== value.audioTrackCount) return null;
+            const tracks = value.audioTracks.map(track => track?.id);
+            return tracks.every(id => typeof id === 'string' && id.length > 0 && id.length <= 160
+                && !/[\u0000-\u001f\u007f]/.test(id)) && new Set(tracks).size === tracks.length ? tracks.sort() : null;
+        };
+        const expected = ids(before); const actual = ids(after);
+        if (!expected || !actual || expected.some((id, index) => id !== actual[index])) return false;
+        return ['audioTrackId', 'captionTrackId', 'captionLanguage'].every(key => {
+            const previous = before[key] ?? ''; const current = after[key] ?? '';
+            return typeof previous === 'string' && typeof current === 'string' && previous === current;
         });
     }
     function keepLease() {
@@ -166,10 +187,10 @@
         const ownsNativeNode = () => document.getElementById('movie_player') === surface
             && surface.querySelector('video.html5-main-video') === original;
         const isCurrent = () => attempt === generation && videoId() === id && ownsNativeNode() && gate.validate(lease);
-        const nativeAlreadyReady = () => {
+        const nativeAlreadyReady = (preferences = response?.preferences) => {
             const duration = Number(response?.playerResponse?.videoDetails?.lengthSeconds);
-            return isCurrent() && response?.preferences?.nativeVideoId === id
-                && response.preferences.nativeAdInactive === true
+            return isCurrent() && preferences?.nativeVideoId === id
+                && preferences.nativeAdInactive === true
                 && response.playerResponse?.videoDetails?.videoId === id
                 && Number.isFinite(duration) && duration > 0 && original.readyState >= 3
                 && Number.isFinite(original.currentTime) && original.currentTime >= 1 && original.ended !== true
@@ -197,9 +218,6 @@
         if (attempt !== generation) return;
         if (!isCurrent()) { invalidate('admission_changed'); return; }
         sourceAbort = null;
-        // A source request must not interrupt content that became ready while
-        // it was pending. Keeping native playback is not a source-swap success.
-        if (nativeAlreadyReady()) { keepReadyNative(); return; }
         const originalIsContent = () => ownsNativeNode()
             && !surface.classList.contains('ad-showing') && !surface.classList.contains('ad-interrupting')
             && Number.isFinite(original.duration) && plan.video?.durationSeconds > 0
@@ -220,6 +238,18 @@
             setStatus(reason);
             return;
         }
+        // Re-read native state after resolution: an advert may have ended or
+        // a feature selection may have changed while the source was pending.
+        const freshState = await requestResponse(id, '', true);
+        if (attempt !== generation) return;
+        if (!isCurrent()) { invalidate('admission_changed'); return; }
+        if (!freshState || freshState.videoIdMatched !== true) {
+            invalidate('native_state_unknown'); setStatus('native_state_unknown'); return;
+        }
+        if (!sameNativeFeatures(response.preferences, freshState.preferences)) {
+            invalidate('native_preferences_changed'); setStatus('native_preferences_changed'); return;
+        }
+        if (nativeAlreadyReady(freshState.preferences)) { keepReadyNative(); return; }
         controller = root.FilterTubeContentPlaybackNative.create({ originalVideo: original, originalSurface: surface,
             validateLease: value => gate.validate(value) && ownsNativeNode(),
             isOriginalContent: originalIsContent,
@@ -247,7 +277,7 @@
             playbackIntent: { videoId: id, nativeTimeline: originalIsContent() ? 'content' : 'unrelated',
                 durationSeconds: plan.video.durationSeconds, positionSeconds: originalIsContent() ? original.currentTime : 0,
                 paused: original.paused, volume: original.volume, muted: original.muted === true, rate: original.playbackRate },
-            source: plan.source, preferences: response.preferences });
+            source: plan.source, preferences: freshState.preferences });
         if (attempt !== generation) return;
         busy = false;
         if (result?.status !== 'active' || result.handedOff !== true) { invalidate('player_fallback'); return; }
@@ -288,11 +318,11 @@
         initialized = true;
         root.addEventListener('message', event => {
             if (event.source !== root || event.origin !== location.origin || event.data?.source !== 'injector'
-                || !['FilterTube_ContentPlaybackResponse', 'FilterTube_ContentPlaybackAudioResult'].includes(event.data?.type)) return;
+                || !['FilterTube_ContentPlaybackResponse', 'FilterTube_ContentPlaybackAudioResult', 'FilterTube_NativeContentState'].includes(event.data?.type)) return;
             const payload = event.data.payload;
             const request = pending.get(payload?.requestId);
             const audioReply = event.data.type === 'FilterTube_ContentPlaybackAudioResult';
-            if (request && request.videoId === payload.videoId && videoId() === payload.videoId
+            if (request && request.replyType === event.data.type && request.videoId === payload.videoId && videoId() === payload.videoId
                 && Boolean(request.audioTrackId) === audioReply
                 && (!audioReply || request.audioTrackId === payload.audioTrackId)) request.finish(payload);
         });

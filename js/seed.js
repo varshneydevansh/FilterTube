@@ -52,14 +52,15 @@
         attempts: 0
     };
 
-    // Android's native-owned playback bridge does not block ad requests. It
-    // recognizes an active YouTube ad interruption, quarantines its audio, and
-    // asks YouTube to skip it. When YouTube exposes separate advert and content
-    // media elements, keep the advert silent behind the requested content.
+    // Legacy presentation/skip fallback remains scoped to other YouTube
+    // surfaces. Desktop watch playback has one native media owner; JSON advert
+    // sanitization is independent of this fallback and remains enabled there.
     const AD_VOID_POLL_MS = 900;
     const AD_VOID_STYLE_ID = 'filtertube-ad-void-player-style';
     const adVoidState = {
         timer: null,
+        pageHidden: false,
+        navigating: false,
         active: false,
         quietPasses: 0,
         audioSnapshot: null,
@@ -69,7 +70,6 @@
         sessionStartedAt: 0,
         lastRoleSignature: '',
         lastWaitingLogAt: 0,
-        resumeAttempts: 0,
         advancedAdVideo: null,
         advancedAdDuration: 0,
         advanceAttempt: null,
@@ -143,8 +143,12 @@
     function syncAdVoidPresentation(enabled) {
         const root = document.documentElement;
         if (!root) return;
+        enabled = enabled === true && isAdVoidMediaFallbackEnabled();
         root.toggleAttribute('data-filtertube-ad-void-enabled', enabled === true);
-        if (!enabled) return;
+        if (!enabled) {
+            try { document.getElementById(AD_VOID_STYLE_ID)?.remove(); } catch (e) {}
+            return;
+        }
         if (document.getElementById(AD_VOID_STYLE_ID)) return;
         const style = document.createElement('style');
         style.id = AD_VOID_STYLE_ID;
@@ -177,6 +181,24 @@
             && cachedSettings.enabled !== false
             && cachedSettings.hideSponsoredCards === true
         );
+    }
+
+    function isNativeContentPlaybackRoute() {
+        return document.location.hostname === 'www.youtube.com' && document.location.pathname === '/watch';
+    }
+
+    function isAdVoidMediaFallbackEnabled() {
+        return isAdVoidEnabled() && !isNativeContentPlaybackRoute() && !adVoidState.pageHidden && !adVoidState.navigating;
+    }
+
+    function adVoidRouteKey() {
+        const route = document.location;
+        return `${route.hostname || ''}${route.pathname || ''}${route.search || ''}`;
+    }
+
+    function adVoidVideoSource(video) {
+        return typeof video?.currentSrc === 'string' && video.currentSrc
+            || (typeof video?.src === 'string' ? video.src : '');
     }
 
     function adVoidPlayerRoot() {
@@ -412,7 +434,7 @@
     }
 
     function adVoidCaptureAudio(video, player) {
-        if (adVoidState.audioSnapshot) return;
+        if (!isAdVoidMediaFallbackEnabled() || adVoidState.audioSnapshot) return;
         let playerMuted = null;
         let playerVolume = null;
         try {
@@ -427,6 +449,9 @@
         } catch (e) {
         }
         adVoidState.audioSnapshot = {
+            routeKey: adVoidRouteKey(),
+            player,
+            videoSource: adVoidVideoSource(video),
             playerMuted,
             playerVolume,
             video,
@@ -437,7 +462,7 @@
     }
 
     function adVoidMuteMedia(media) {
-        if (!media) return;
+        if (!isAdVoidMediaFallbackEnabled() || !media) return;
         try { media.muted = true; } catch (e) {}
         try { media.defaultMuted = true; } catch (e) {}
         try { media.volume = 0; } catch (e) {}
@@ -445,7 +470,7 @@
     }
 
     function adVoidQuarantine(adVideo, player, contentVideo) {
-        if (!adVideo || !player?.contains(adVideo)) return;
+        if (!isAdVoidMediaFallbackEnabled() || !adVideo || !player?.contains(adVideo)) return;
         adVoidCaptureAudio(adVideo, player);
         if (!contentVideo) {
             try { if (typeof player?.mute === 'function') player.mute(); } catch (e) {}
@@ -469,7 +494,7 @@
     }
 
     function adVoidClickSkip(player) {
-        if (!player) return false;
+        if (!isAdVoidMediaFallbackEnabled() || !player) return false;
         const selectors = [
             '.ytp-ad-skip-button',
             '.ytp-ad-skip-button-modern',
@@ -494,7 +519,7 @@
     }
 
     function adVoidAdvanceConfirmedAd(adVideo, player, expectedDuration) {
-        if (!isAdVoidEnabled() || !adVideo || !player || !player.contains(adVideo)) return false;
+        if (!isAdVoidMediaFallbackEnabled() || !adVideo || !player || !player.contains(adVideo)) return false;
         const videoId = adVoidCurrentVideoId();
         if (!videoId) return false;
         // Discovery's duration is not authority for a later attempt or route.
@@ -539,7 +564,7 @@
         const currentPlayerVideo = Array.from(player.querySelectorAll('video'))
             .find(video => !video.paused) || player.querySelector('video.html5-main-video');
         if (currentPlayerVideo !== adVideo || !adVoidHasInterruption(player)
-            || !isAdVoidEnabled() || !player.contains(adVideo)
+            || !isAdVoidMediaFallbackEnabled() || !player.contains(adVideo)
             || adVoidCurrentVideoId() !== videoId
             || adVoidExpectedContentDuration() !== expectedDuration
             || Number(adVideo.duration) !== duration) return false;
@@ -604,8 +629,11 @@
     }
 
     function adVoidApplyContentAudio(contentVideo) {
-        if (!contentVideo) return;
+        if (!isAdVoidMediaFallbackEnabled() || !contentVideo || contentVideo.paused) return;
         const snapshot = adVoidState.audioSnapshot;
+        if (!snapshot || snapshot.routeKey !== adVoidRouteKey() || snapshot.player !== adVoidPlayerRoot()
+            || !snapshot.video?.isConnected || !snapshot.player?.contains(snapshot.video)
+            || adVoidVideoSource(snapshot.video) !== snapshot.videoSource) return;
         const shouldRemainMuted = snapshot?.playerMuted === true || snapshot?.videoMuted === true;
         try {
             if (snapshot?.videoVolume !== null && Number.isFinite(snapshot?.videoVolume)) {
@@ -622,69 +650,21 @@
         }
     }
 
-    function adVoidKeepParallelContentPlaying() {
-        const parallel = adVoidState.parallelContent;
-        const contentVideo = parallel?.video;
-        if (!contentVideo?.isConnected || !isAdVoidEnabled()) return;
-        adVoidApplyContentAudio(contentVideo);
-        if (!contentVideo.paused) return;
-        adVoidState.resumeAttempts += 1;
-        const attempt = adVoidState.resumeAttempts;
-        adVoidTrace('content-play-requested', {
-            attempt,
-            content: adVoidVideoSummary(contentVideo)
-        });
-        try {
-            const playResult = contentVideo.play();
-            if (playResult && typeof playResult.then === 'function') {
-                playResult.then(() => {
-                    adVoidTrace('content-play-started', {
-                        attempt,
-                        content: adVoidVideoSummary(contentVideo)
-                    });
-                }).catch(error => {
-                    adVoidTrace('content-play-rejected', {
-                        attempt,
-                        error: String(error?.name || error?.message || error || 'unknown'),
-                        content: adVoidVideoSummary(contentVideo)
-                    });
-                });
-            }
-        } catch (e) {
-            adVoidTrace('content-play-threw', {
-                attempt,
-                error: String(e?.name || e?.message || e || 'unknown')
-            });
-        }
-    }
-
     function adVoidStartParallelContent(contentVideo) {
-        if (!contentVideo) return false;
+        if (!isAdVoidMediaFallbackEnabled() || !contentVideo?.isConnected || contentVideo.paused) {
+            adVoidStopParallelContent();
+            return false;
+        }
         if (adVoidState.parallelContent?.video !== contentVideo) {
-            const previous = adVoidState.parallelContent;
-            if (previous?.video && previous.pauseHandler) {
-                previous.video.removeEventListener('pause', previous.pauseHandler, true);
-                previous.video.removeAttribute('data-filtertube-ad-void-content');
-            }
-            const parallel = { video: contentVideo, pauseHandler: null, resumeTimer: null };
-            parallel.pauseHandler = () => {
-                adVoidTrace('content-paused-during-ad', {
-                    content: adVoidVideoSummary(contentVideo)
-                });
-                if (parallel.resumeTimer) window.clearTimeout(parallel.resumeTimer);
-                parallel.resumeTimer = window.setTimeout(() => {
-                    parallel.resumeTimer = null;
-                    adVoidKeepParallelContentPlaying();
-                }, 60);
-            };
+            adVoidStopParallelContent();
+            const parallel = { video: contentVideo };
             adVoidState.parallelContent = parallel;
             contentVideo.setAttribute('data-filtertube-ad-void-content', 'true');
-            contentVideo.addEventListener('pause', parallel.pauseHandler, true);
             adVoidTrace('content-promoted', {
                 content: adVoidVideoSummary(contentVideo)
             });
         }
-        adVoidKeepParallelContentPlaying();
+        adVoidApplyContentAudio(contentVideo);
         return true;
     }
 
@@ -704,11 +684,12 @@
     function adVoidRestoreAudio(preferredVideo = null) {
         const snapshot = adVoidState.audioSnapshot;
         adVoidState.audioSnapshot = null;
-        if (!snapshot) return;
+        if (!snapshot || isNativeContentPlaybackRoute() || adVoidState.pageHidden || adVoidState.navigating
+            || snapshot.routeKey !== adVoidRouteKey()) return;
         const player = adVoidPlayerRoot();
-        const video = preferredVideo?.isConnected
-            ? preferredVideo
-            : (snapshot.video?.isConnected ? snapshot.video : adVoidPrimaryVideo(player));
+        const video = snapshot.video;
+        if (player !== snapshot.player || !video?.isConnected || !player?.contains(video)
+            || (preferredVideo && preferredVideo !== video) || adVoidVideoSource(video) !== snapshot.videoSource) return;
         try {
             if (snapshot.playerVolume !== null && typeof player?.setVolume === 'function') {
                 player.setVolume(snapshot.playerVolume);
@@ -732,14 +713,36 @@
         }
     }
 
+    function stopAdVoidRuntime(result, restoreAudio = false) {
+        if (adVoidState.timer) window.clearInterval(adVoidState.timer);
+        adVoidState.timer = null;
+        const contentVideo = adVoidStopParallelContent();
+        // Route/lifecycle retirement drops old media state. Only disabling the
+        // fallback on its unchanged retained surface may restore bound audio.
+        if (restoreAudio) adVoidRestoreAudio(contentVideo);
+        else adVoidState.audioSnapshot = null;
+        syncAdVoidPresentation(false);
+        adVoidState.active = false;
+        adVoidState.quietPasses = 0;
+        adVoidState.advancedAdVideo = null;
+        adVoidState.advancedAdDuration = 0;
+        adVoidState.advanceAttempt = null;
+        adVoidState.contentDuration = null;
+        adVoidState.sessionStartedAt = 0;
+        adVoidState.lastRoleSignature = '';
+        adVoidState.lastWaitingLogAt = 0;
+        adVoidState.placement = 'unknown';
+        adVoidState.contentTimelineAtAdStart = null;
+        adVoidState.adEndedAt = 0;
+        adVoidState.awaitingContentVideoId = '';
+        return adVoidRecordResult(result);
+    }
+
     function runAdVoidPass() {
-        if (!isAdVoidEnabled()) {
-            const contentVideo = adVoidStopParallelContent();
-            if (adVoidState.active || adVoidState.audioSnapshot) adVoidRestoreAudio(contentVideo);
-            adVoidState.active = false;
-            adVoidState.quietPasses = 0;
-            return adVoidRecordResult('disabled');
-        }
+        if (!isAdVoidMediaFallbackEnabled()) return stopAdVoidRuntime(
+            isNativeContentPlaybackRoute() && isAdVoidEnabled() ? 'native-player-owned' : 'disabled',
+            !isNativeContentPlaybackRoute() && !adVoidState.pageHidden && !adVoidState.navigating
+        );
         const player = adVoidPlayerRoot();
         if (!adVoidHasInterruption(player)) {
             if (adVoidState.active) {
@@ -759,7 +762,6 @@
                     adVoidState.sessionStartedAt = 0;
                     adVoidState.lastRoleSignature = '';
                     adVoidState.lastWaitingLogAt = 0;
-                    adVoidState.resumeAttempts = 0;
                     adVoidState.advancedAdVideo = null;
                     adVoidState.advancedAdDuration = 0;
                     adVoidState.advanceAttempt = null;
@@ -773,7 +775,6 @@
             adVoidState.sessionStartedAt = Date.now();
             adVoidState.lastRoleSignature = '';
             adVoidState.lastWaitingLogAt = 0;
-            adVoidState.resumeAttempts = 0;
             adVoidState.advancedAdVideo = null;
             adVoidState.advancedAdDuration = 0;
             adVoidState.advanceAttempt = null;
@@ -842,11 +843,9 @@
     }
 
     function syncAdVoidRuntime() {
-        const enabled = isAdVoidEnabled();
+        const enabled = isAdVoidMediaFallbackEnabled();
         syncAdVoidPresentation(enabled);
         if (!enabled) {
-            if (adVoidState.timer) window.clearInterval(adVoidState.timer);
-            adVoidState.timer = null;
             runAdVoidPass();
             return;
         }
@@ -2469,18 +2468,28 @@
 
     document.addEventListener('yt-navigate-finish', () => scheduleOriginalAudioPreference(true), true);
     document.addEventListener('yt-page-data-updated', () => scheduleOriginalAudioPreference(true), true);
-    document.addEventListener('yt-navigate-finish', runAdVoidPass, true);
-    document.addEventListener('yt-page-data-updated', runAdVoidPass, true);
+    document.addEventListener('yt-navigate-start', () => {
+        adVoidState.navigating = true;
+        stopAdVoidRuntime('navigation');
+    }, true);
+    document.addEventListener('yt-navigate-finish', () => {
+        adVoidState.navigating = false;
+        syncAdVoidRuntime();
+    }, true);
+    document.addEventListener('yt-page-data-updated', syncAdVoidRuntime, true);
     document.addEventListener('playing', runAdVoidPass, true);
     document.addEventListener('loadedmetadata', runAdVoidPass, true);
     document.addEventListener('durationchange', runAdVoidPass, true);
     document.addEventListener('canplay', runAdVoidPass, true);
     window.addEventListener('pagehide', () => {
-        if (adVoidState.timer) window.clearInterval(adVoidState.timer);
-        adVoidState.timer = null;
-        adVoidRestoreAudio();
-        syncAdVoidPresentation(false);
-    }, { once: true });
+        adVoidState.pageHidden = true;
+        stopAdVoidRuntime('page-hidden');
+    });
+    window.addEventListener('pageshow', () => {
+        adVoidState.pageHidden = false;
+        adVoidState.navigating = false;
+        syncAdVoidRuntime();
+    });
     
     // Mark as ready and dispatch event
     window.ftSeedInitialized = true;

@@ -466,7 +466,7 @@ The new profile playback preference adds settings propagation and refresh keys. 
 
 | File | Lines | Bytes | SHA-256 |
 | --- | ---: | ---: | --- |
-| `js/content_controls_catalog.js` | 304 | 12826 | `f8951a8249b0a0683c00d7f4b062bd819105539bf37f84fd3c5d569910f0aef4` |
+| `js/content_controls_catalog.js` | 304 | 12854 | `6100dd0ac275d6948a8d406cd92cd5913c7175de98c934d16efcecf12588c449` |
 | `js/settings_shared.js` | 1327 | 67805 | `c3d0f4b965acaaf46f6424cd0ad329c50e616de7b1cf8905a9fa578123e2bf69` |
 | `js/background.js` | 8546 | 386625 | `b4986d2a61879532c30d376ec2b85149498c45647fced0cad24e45f8620c4353` |
 | `js/content/bridge_settings.js` | 2238 | 101092 | `923110bd0a8f2c3216199e1c930550ab80f6458448060d874da19e336aab3e24` |

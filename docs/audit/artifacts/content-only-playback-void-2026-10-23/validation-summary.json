@@ -1,0 +1,62 @@
+{
+  "date": "2026-10-23",
+  "version": "3.4.1",
+  "scope": "Extension desktop watch fallback retirement and fresh native state before source commit",
+  "smoke": {
+    "passed": 982,
+    "total": 982
+  },
+  "release": {
+    "passed": 271,
+    "total": 271
+  },
+  "adVoidTargeted": {
+    "passed": 50,
+    "total": 50
+  },
+  "nativeResponseCoordinatorTargeted": {
+    "passed": 225,
+    "total": 225
+  },
+  "settings": {
+    "passed": 660,
+    "total": 755,
+    "failed": 95,
+    "newFailingTitles": [],
+    "resolvedFailingTitles": [],
+    "baselineLog": "/tmp/filtertube-auto-settings.log",
+    "limitation": "Same failing titles do not prove assertions hidden behind earlier failures"
+  },
+  "extraSeedNetworkChecks": {
+    "passed": 333,
+    "total": 344,
+    "failed": 11,
+    "baselineComparison": {
+      "baseline": 11,
+      "current": 11,
+      "new": [],
+      "resolved": [],
+      "baselineSeed": "HEAD:d7389f8f:js/seed.js",
+      "method": "Test-only fs read substitution of seed source with HEAD; production files not modified"
+    },
+    "limitation": "Includes stale audit source-count pins and an incomplete older XHR DOM fixture; not fixed in this playback change"
+  },
+  "uiLocaleStructure": "passed; translation completeness and quality not certified",
+  "installedNewBuild": true,
+  "installedGate": "Chrome observed native-player-owned with no fallback style; Shakira native source handoff, pause retention, Next/Previous roundtrip and lecture English captions/mute/pause. Exact injected source bytes were not read back. See installed-chrome-observations.json; remaining platform/device/soak gates are separate.",
+  "nativeSiblingModified": false,
+  "published": false,
+  "llmCopyReview": {
+    "requestedModel": "gemini-3.8-flash",
+    "result": "timed out after 20 seconds; no result used as validation"
+  },
+  "sourcePins": {
+    "js/seed.js": "af10e116a8580bf380e6f26b312c5ed3e3597693f7cf9a9bbb4661c2c597c8a1",
+    "js/content/content_playback.js": "eaadabbd10387d6994ce1175c4dfc19ce375958e399e2f5f0c267b5ecf55cc7d",
+    "js/content/content_playback_native.js": "baf6f57897442a338aada4fdc44915dc324eff93f8594b4b0006b648dd64823a",
+    "js/content/content_playback_response.js": "fdfa409eac404e807ff34935e771dfc1da6f0ebdbbeb5990c22c36fb11decc84",
+    "js/content_controls_catalog.js": "6100dd0ac275d6948a8d406cd92cd5913c7175de98c934d16efcecf12588c449",
+    "html/tab-view.html": "47b4d3769e1771b7b464c948e0a3a71b680ed705c12b945396310493cd13c83d",
+    "data/ui_locales/en.json": "e6cb445a6efa9cc52dcb74ea7224b085516fd39cefc2fde7f77ccc731e4bbfa1"
+  }
+}

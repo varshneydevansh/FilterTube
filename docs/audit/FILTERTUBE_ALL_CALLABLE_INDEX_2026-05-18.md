@@ -223,7 +223,7 @@ separate release/workflow review and is not silently counted as JavaScript here.
 
 ```text
 current tracked JS/JSX/MJS files: 120
-current repo-wide lexical callables: 9478
+current repo-wide lexical callables: 9484
 current complete per-callable semantic proofs: 0
 current callable behavior-change approval: NO-GO
 runtime behavior changed by inventory refresh: no
@@ -232,8 +232,8 @@ runtime behavior changed by inventory refresh: no
 | Family | Files | Lexical callables |
 | --- | ---: | ---: |
 | Build/sync scripts | 5 | 75 |
-| Hot page/background runtime | 9 | 3857 |
-| Content helper runtime | 22 | 765 |
+| Hot page/background runtime | 9 | 3860 |
+| Content helper runtime | 22 | 768 |
 | UI/settings runtime | 24 | 3712 |
 | Generated/quarantined UI | 6 | 147 |
 | Vendor bundles | 3 | 279 |
@@ -249,7 +249,7 @@ runtime behavior changed by inventory refresh: no
 | `js/content/bridge_injection.js` | Content helper runtime | 14 | helper counted |
 | `js/content/bridge_settings.js` | Hot page/background runtime | 153 | hot runtime mapped |
 | `js/content/collab_dialog.js` | Content helper runtime | 42 | helper counted |
-| `js/content/content_playback.js` | Content helper runtime | 27 | helper counted; semantic proof incomplete |
+| `js/content/content_playback.js` | Content helper runtime | 30 | helper counted; semantic proof incomplete |
 | `js/content/content_playback_admission.js` | Content helper runtime | 12 | helper counted; semantic proof incomplete |
 | `js/content/content_playback_captions.js` | Content helper runtime | 19 | helper counted; semantic proof incomplete |
 | `js/content/content_playback_native.js` | Content helper runtime | 47 | helper counted; semantic proof incomplete |
@@ -287,7 +287,7 @@ runtime behavior changed by inventory refresh: no
 | `js/render_engine.js` | UI/settings runtime | 171 | UI/settings counted |
 | `js/rule_list_import_reports.js` | UI/settings runtime | 38 | UI/settings counted; semantic proof incomplete |
 | `js/security_manager.js` | UI/settings runtime | 18 | UI/settings counted |
-| `js/seed.js` | Hot page/background runtime | 195 | hot runtime mapped |
+| `js/seed.js` | Hot page/background runtime | 198 | hot runtime mapped |
 | `js/settings_shared.js` | UI/settings runtime | 45 | UI/settings counted |
 | `js/shared/content_playback_resolver.js` | Content helper runtime | 25 | helper counted; semantic proof incomplete |
 | `js/shared/content_playback_source.js` | Content helper runtime | 18 | helper counted; semantic proof incomplete |
@@ -418,3 +418,7 @@ The unchanged parser now measures 120 tracked files and 9,471 lexical matches: 3
 The unchanged parser measures 120 tracked files and 9,478 lexical matches: 3,857 hot-runtime matches and 765 helper matches across 22 helper files. The five-module active native stack is unchanged. The new default-on contentOnlyPlayback preference is profile-scoped; explicit false survives persistence and backup migration. Trusted admission and managed permit readiness can wake one automatic attempt; same-route settings and metadata refreshes do not restart a completed or failed extraction. These are source/fixture boundaries, not installed acceptance. Earlier measurements remain historical.
 
 Healthy admitted same-video native media is now preserved before extraction and before source commit. Buffered content past its startup position, with exact native identity and explicit inactive-ad API evidence, is marked native_ready without fetching a fresh source or pausing/reloading the player. This guard adds two lexical matches; it does not grant profile admission or claim a fresh source was selected.
+
+## Native fallback retirement revalidation - 2026-10-23
+
+The unchanged lexical parser now measures 120 tracked files and 9,484 matches: 3,860 hot-runtime and 768 helper matches. Seed changes from 195 to 198 and the coordinator from 27 to 30. The desktop media fallback retirement and one fresh precommit observation are behavior changes documented separately; these counts remain lexical inventory rather than semantic completion proof.

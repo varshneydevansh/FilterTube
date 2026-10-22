@@ -89,7 +89,7 @@
                 {
                     key: 'hideSponsoredCards',
                     title: 'Send adverts to The Void',
-                    description: 'On by default. Remove YouTube ad plans before playback and quietly suppress any advert that still reaches the player on YouTube and YouTube Kids'
+                    description: 'On by default. Filter advert data on YouTube and YouTube Kids. Desktop videos keep YouTube’s controls; Content-only playback can choose the main-video source when needed.'
                 },
                 {
                     key: 'hidePlayables',

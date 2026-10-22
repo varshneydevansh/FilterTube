@@ -1,0 +1,86 @@
+{
+  "date": "2026-10-23",
+  "browser": "Chrome",
+  "evidenceLevel": "Installed observed behavior; exact injected source bytes not read back",
+  "shakira": {
+    "videoId": "8OO1pOqRJkA",
+    "state": "native_active",
+    "voidState": "native-player-owned",
+    "fallbackStylePresent": false,
+    "playingSample": {
+      "positionSeconds": 26.581944,
+      "durationSeconds": 170.17904761904762,
+      "readyState": 4,
+      "paused": false,
+      "muted": false,
+      "rate": 1
+    },
+    "pauseSamples": [
+      {
+        "positionSeconds": 52.769463,
+        "paused": true
+      },
+      {
+        "positionSeconds": 52.769463,
+        "paused": true
+      }
+    ],
+    "nativeNextTarget": "kIDWgqDBNXA",
+    "nextResult": {
+      "videoId": "kIDWgqDBNXA",
+      "state": "native_active",
+      "voidState": "native-player-owned",
+      "positionSeconds": 10.353106,
+      "durationSeconds": 216.27065759637188,
+      "paused": false,
+      "fallbackStylePresent": false
+    },
+    "nativePreviousResult": {
+      "videoId": "8OO1pOqRJkA",
+      "positionSeconds": 0,
+      "paused": true
+    },
+    "previousNote": "Above three seconds, native Previous restarts the current video. From a paused zero-second position it returned to the preceding playlist item.",
+    "screenshot": "shakira-native-paused.png"
+  },
+  "lecture": {
+    "videoId": "w9MXqXBZy9U",
+    "state": "native_ready",
+    "voidState": "native-player-owned",
+    "fallbackStylePresent": false,
+    "playingSample": {
+      "positionSeconds": 270.948433,
+      "readyState": 4,
+      "paused": false,
+      "muted": false,
+      "selectedEnglishCaptionPressed": true,
+      "captionVisible": true
+    },
+    "pausedMutedSamples": [
+      {
+        "positionSeconds": 303.741058,
+        "paused": true,
+        "muted": true,
+        "captionVisible": true
+      },
+      {
+        "positionSeconds": 303.741058,
+        "paused": true,
+        "muted": true,
+        "captionVisible": true
+      }
+    ],
+    "screenshot": "lecture-native-captions.png"
+  },
+  "cleanup": {
+    "testTabClosed": true,
+    "testAudioRestoredUnmuted": true,
+    "testCaptionPreferenceRestoredOff": true,
+    "userViewingTabLeftAlone": true
+  },
+  "limitations": [
+    "Raw CDP inspection unavailable for fresh test tabs while browser tooling resolved a paused document response; not bypassed.",
+    "No timed full-length/midroll soak, multi-audio-program selection, installed Firefox/Opera, physical child-device, or fullscreen acceptance claimed.",
+    "Profile admission/cancellation proven by focused production-function fixtures, not changes to user child profiles."
+  ]
+}

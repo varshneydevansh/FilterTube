@@ -451,3 +451,32 @@ test('unsupported mode strings and page messages cannot enable native automatic 
   state.reply('FilterTube_NativeContentSourceResult', { requestId: 'page-request', videoId, applied: true, mode: 'automatic' });
   assert.equal(state.posts.length, 0); assert.equal(state.video.playCalls, 0); assert.equal(state.document.count(), 0);
 });
+
+test('successful automatic handoff leaves later native controls, source changes and profile ownership untouched', async () => {
+  let automaticEnabled = true;
+  const state = fixture({ allowAutomaticStart: () => automaticEnabled });
+  const input = state.input(); input.mode = 'automatic'; delete input.actionToken;
+  const pending = state.controller.start(input);
+  state.ready(); state.ack(); state.stateReply();
+  assert.equal((await pending).handedOff, true);
+  const posts = state.posts.length;
+  const pauses = state.video.pauseCalls;
+  const plays = state.video.playCalls;
+  const states = state.states.length;
+  automaticEnabled = false; state.invalidate();
+  Object.assign(state.video, { volume: .15, muted: true, playbackRate: 1.75,
+    currentTime: 81, paused: false, currentSrc: 'blob:later-native-source', duration: 150 });
+  for (const type of ['loadstart', 'emptied', 'error', 'loadedmetadata', 'playing', 'durationchange']) {
+    state.document.emit(type, { target: state.video });
+  }
+  const old = state.last('FilterTube_ApplyNativeContentSource').payload;
+  state.reply('FilterTube_NativeContentSourceResult', { requestId: old.requestId, videoId, applied: false, reason: 'cancelled' });
+  state.advance(120000); await state.flush();
+  await state.controller.stop('settings_changed'); await state.controller.destroy();
+  assert.equal(state.posts.length, posts);
+  assert.equal(state.video.pauseCalls, pauses); assert.equal(state.video.playCalls, plays);
+  assert.equal(state.video.volume, .15); assert.equal(state.video.muted, true); assert.equal(state.video.playbackRate, 1.75);
+  assert.equal(state.video.currentTime, 81); assert.equal(state.video.paused, false);
+  assert.equal(state.states.length, states); assert.equal(state.reevaluations(), 0);
+  assert.equal(state.timers.size, 0); assert.equal(state.document.count(), 0); assert.equal(state.window.count(), 0);
+});

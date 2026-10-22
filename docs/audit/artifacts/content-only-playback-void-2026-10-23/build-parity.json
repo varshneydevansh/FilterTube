@@ -1,0 +1,122 @@
+[
+  {
+    "browser": "chrome",
+    "checks": [
+      {
+        "path": "js/seed.js",
+        "sourceStageZipMatch": true,
+        "sha256": "af10e116a8580bf380e6f26b312c5ed3e3597693f7cf9a9bbb4661c2c597c8a1"
+      },
+      {
+        "path": "js/content/content_playback.js",
+        "sourceStageZipMatch": true,
+        "sha256": "eaadabbd10387d6994ce1175c4dfc19ce375958e399e2f5f0c267b5ecf55cc7d"
+      },
+      {
+        "path": "js/content/content_playback_native.js",
+        "sourceStageZipMatch": true,
+        "sha256": "baf6f57897442a338aada4fdc44915dc324eff93f8594b4b0006b648dd64823a"
+      },
+      {
+        "path": "js/content/content_playback_response.js",
+        "sourceStageZipMatch": true,
+        "sha256": "fdfa409eac404e807ff34935e771dfc1da6f0ebdbbeb5990c22c36fb11decc84"
+      },
+      {
+        "path": "js/content_controls_catalog.js",
+        "sourceStageZipMatch": true,
+        "sha256": "6100dd0ac275d6948a8d406cd92cd5913c7175de98c934d16efcecf12588c449"
+      },
+      {
+        "path": "html/tab-view.html",
+        "sourceStageZipMatch": true,
+        "sha256": "47b4d3769e1771b7b464c948e0a3a71b680ed705c12b945396310493cd13c83d"
+      },
+      {
+        "path": "data/ui_locales/en.json",
+        "sourceStageZipMatch": true,
+        "sha256": "e6cb445a6efa9cc52dcb74ea7224b085516fd39cefc2fde7f77ccc731e4bbfa1"
+      }
+    ]
+  },
+  {
+    "browser": "firefox",
+    "checks": [
+      {
+        "path": "js/seed.js",
+        "sourceStageZipMatch": true,
+        "sha256": "af10e116a8580bf380e6f26b312c5ed3e3597693f7cf9a9bbb4661c2c597c8a1"
+      },
+      {
+        "path": "js/content/content_playback.js",
+        "sourceStageZipMatch": true,
+        "sha256": "eaadabbd10387d6994ce1175c4dfc19ce375958e399e2f5f0c267b5ecf55cc7d"
+      },
+      {
+        "path": "js/content/content_playback_native.js",
+        "sourceStageZipMatch": true,
+        "sha256": "baf6f57897442a338aada4fdc44915dc324eff93f8594b4b0006b648dd64823a"
+      },
+      {
+        "path": "js/content/content_playback_response.js",
+        "sourceStageZipMatch": true,
+        "sha256": "fdfa409eac404e807ff34935e771dfc1da6f0ebdbbeb5990c22c36fb11decc84"
+      },
+      {
+        "path": "js/content_controls_catalog.js",
+        "sourceStageZipMatch": true,
+        "sha256": "6100dd0ac275d6948a8d406cd92cd5913c7175de98c934d16efcecf12588c449"
+      },
+      {
+        "path": "html/tab-view.html",
+        "sourceStageZipMatch": true,
+        "sha256": "47b4d3769e1771b7b464c948e0a3a71b680ed705c12b945396310493cd13c83d"
+      },
+      {
+        "path": "data/ui_locales/en.json",
+        "sourceStageZipMatch": true,
+        "sha256": "e6cb445a6efa9cc52dcb74ea7224b085516fd39cefc2fde7f77ccc731e4bbfa1"
+      }
+    ]
+  },
+  {
+    "browser": "opera",
+    "checks": [
+      {
+        "path": "js/seed.js",
+        "sourceStageZipMatch": true,
+        "sha256": "af10e116a8580bf380e6f26b312c5ed3e3597693f7cf9a9bbb4661c2c597c8a1"
+      },
+      {
+        "path": "js/content/content_playback.js",
+        "sourceStageZipMatch": true,
+        "sha256": "eaadabbd10387d6994ce1175c4dfc19ce375958e399e2f5f0c267b5ecf55cc7d"
+      },
+      {
+        "path": "js/content/content_playback_native.js",
+        "sourceStageZipMatch": true,
+        "sha256": "baf6f57897442a338aada4fdc44915dc324eff93f8594b4b0006b648dd64823a"
+      },
+      {
+        "path": "js/content/content_playback_response.js",
+        "sourceStageZipMatch": true,
+        "sha256": "fdfa409eac404e807ff34935e771dfc1da6f0ebdbbeb5990c22c36fb11decc84"
+      },
+      {
+        "path": "js/content_controls_catalog.js",
+        "sourceStageZipMatch": true,
+        "sha256": "6100dd0ac275d6948a8d406cd92cd5913c7175de98c934d16efcecf12588c449"
+      },
+      {
+        "path": "html/tab-view.html",
+        "sourceStageZipMatch": true,
+        "sha256": "47b4d3769e1771b7b464c948e0a3a71b680ed705c12b945396310493cd13c83d"
+      },
+      {
+        "path": "data/ui_locales/en.json",
+        "sourceStageZipMatch": true,
+        "sha256": "e6cb445a6efa9cc52dcb74ea7224b085516fd39cefc2fde7f77ccc731e4bbfa1"
+      }
+    ]
+  }
+]

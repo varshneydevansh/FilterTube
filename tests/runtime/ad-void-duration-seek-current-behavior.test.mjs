@@ -14,8 +14,10 @@ const details = (videoId, lengthSeconds) => ({ videoDetails: { videoId, lengthSe
 
 // Run the complete production script, exposing only private entry points for
 // behavior assertions. The fetch interceptor, cache and seek implementation are real.
-function fixture({ payload = [], pathname = '/watch', search = `?v=${currentId}` } = {}) {
-  const base = loadSeedRuntime();
+// Retained fallback seek coverage uses mobile YouTube; native desktop Watch
+// intentionally leaves all playback to the original player and isolated owner.
+function fixture({ payload = [], hostname = 'm.youtube.com', pathname = '/watch', search = `?v=${currentId}` } = {}) {
+  const base = loadSeedRuntime({ hostname, origin: `https://${hostname}` });
   let now = 10000;
   let player = null;
   const document = base.context.document;

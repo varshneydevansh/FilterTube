@@ -42,3 +42,7 @@ The final unpacked build is `dist/chrome`. Source and archives remain version 3.
 ## Viewing-continuity priority
 
 The user clarified that a modest startup wait is acceptable. The acceptance priority is optimized, efficient, uninterrupted viewing: retain working playback, position, audio/captions and native navigation; avoid repeated source replacement, retries and foreground prompts. Startup latency alone is not evidence of a defect or a reason to replace a healthy stream. The healthy-native skip and one-attempt-per-route limit implement this priority.
+
+## Subsequent fallback ownership correction
+
+[Native playback Void retirement](NATIVE_PLAYBACK_VOID_RETIREMENT_2026-10-23.md) records the subsequent desktop fallback removal, fresh precommit native-state check, final local checks and actual installed Chrome pause/caption/playlist observations. Its installed observations supersede the earlier pending-reload gate above for that tested Chrome scope; other platform/device gates remain separate.

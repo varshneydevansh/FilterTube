@@ -208,7 +208,7 @@ test('quick-block/block-menu affordance audit is audit-only and source pinned', 
   assert.match(doc, /quick-block\/block-menu affordance boundary source files: 7/);
   assert.match(doc, /runtime quick-block\/block-menu affordance fixtures: 7/);
 
-  assert.ok(doc.includes(`| \`js/content_controls_catalog.js\` | 304 | 12826 | \`${sha256('js/content_controls_catalog.js')}\` |`));
+  assert.ok(doc.includes(`| \`js/content_controls_catalog.js\` | 304 | 12854 | \`${sha256('js/content_controls_catalog.js')}\` |`));
   assert.ok(doc.includes(`| \`js/settings_shared.js\` | 1327 | 67805 | \`${sha256('js/settings_shared.js')}\` |`));
   assert.ok(doc.includes(`| \`js/background.js\` | 8546 | 386625 | \`${sha256('js/background.js')}\` |`));
   assert.ok(doc.includes(`| \`js/content/bridge_settings.js\` | 2238 | 101092 | \`${sha256('js/content/bridge_settings.js')}\` |`));

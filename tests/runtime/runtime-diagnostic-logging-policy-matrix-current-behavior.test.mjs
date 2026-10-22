@@ -22,7 +22,7 @@ const sourceFingerprints = {
   'js/io_manager.js': [3213, 163538, '9dfae40b90db3ea7bf0a1f0f44479508894bee92616582a1543d3460af825150'],
   'js/layout.js': [680, 30604, "48831ccdc2d62c75818d9c6a153d7bfacec9d7be9f2408485f74b1a7c13c57c7"],
   'js/popup.js': [2553, 117093, "645fab83d4b665796f5b2fe1be262ca336df6a4cf3ffb1daebc588a50c091aa7"],
-  'js/seed.js': [2499, 109884, "4fe890e049b31bdadab8a3447fe4d853fb19962db91b9e3299fed38e87ebd8b2"],
+  'js/seed.js': [2508, 110538, 'af10e116a8580bf380e6f26b312c5ed3e3597693f7cf9a9bbb4661c2c597c8a1'],
   'js/settings_shared.js': [1327, 67805, 'c3d0f4b965acaaf46f6424cd0ad329c50e616de7b1cf8905a9fa578123e2bf69'],
   'js/state_manager.js': [2984, 124258, '029b2e7d4356d4629348f174bdaf7858fa1fa0c09a4b54c6bb0e293a161a8d5e'],
   'js/tab-view.js': [32535, 1760706, '801d77180fe4ab2b3e470f7337bc8640bcbdd2f882f58e5628f61852d42c4286'],
@@ -32,9 +32,7 @@ const sourceFingerprints = {
 };
 
 const playbackSourceFingerprints = {
-  "js/content/content_playback.js": [
-    307, 17025, '040c8c8606f6c8cb76703b094aae86e3269c816b4ef80266b35de112df2749f5'
-  ],
+  'js/content/content_playback.js': [337, 19386, 'eaadabbd10387d6994ce1175c4dfc19ce375958e399e2f5f0c267b5ecf55cc7d'],
   "js/content/content_playback_admission.js": [
     131, 7500, '71ee13a96de07fdf988dc25300b1b09e0379e687047b5a5b7c21605bcbe68763'
   ],
@@ -429,7 +427,7 @@ function assertProductionConsoleGateLoadOrderAddendum(doc) {
   assert.equal(preGateRoutineConsoleSites, 0);
   assert.equal(layoutRefs, 0);
 
-  assert.deepEqual(routineConsoleSites('js/seed.js'), [11, 33, 126, 1280]);
+  assert.deepEqual(routineConsoleSites('js/seed.js'), [11, 33, 126, 1279]);
   assert.match(read('js/seed.js'), /if \(filterTubeSeedDebugEnabled\) \{\s*console\.log\('FilterTube: seed\.js initializing \(MAIN world\)'\);/s);
   assert.match(read('js/seed.js'), /function seedDebugLog\(message, \.\.\.args\) \{\s*if \(!isSeedDebugEnabled\(\)\) return;/s);
   assert.deepEqual(routineConsoleSites('js/filter_logic.js'), [11, 2020, 2035]);

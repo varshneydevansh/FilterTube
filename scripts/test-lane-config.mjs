@@ -165,6 +165,7 @@ const CONTENT_PLAYBACK_TESTS = Object.freeze([
   'tests/runtime/content-playback-resolver.test.mjs',
   'tests/runtime/content-playback-transport.test.mjs',
   'tests/runtime/content-playback-native.test.mjs',
+  'tests/runtime/ad-void-native-ownership-current-behavior.test.mjs',
   'tests/runtime/managed-content-playback-permit.test.mjs',
   'tests/runtime/content-only-playback-settings.test.mjs'
 ]);
@@ -173,6 +174,7 @@ export const LANES = Object.freeze({
     description: 'Build, package, release docs, public claims, and artifact boundaries.',
     checks: ['build.js'],
     tests: [
+      'tests/runtime/ad-void-native-ownership-current-behavior.test.mjs',
       'tests/runtime/popup-intrinsic-sizing.test.mjs',
       'tests/runtime/build-release-method-semantic-register-current-behavior.test.mjs',
       'tests/runtime/build-script-method-semantic-register-current-behavior.test.mjs',
@@ -212,6 +214,7 @@ export const LANES = Object.freeze({
   whitelist: {
     description: 'Whitelist-only mode, pending hides, allow-list leaks, Shorts, watch, end-screen, Kids, and YTM allow behavior.',
     tests: [
+      'tests/runtime/ad-void-native-ownership-current-behavior.test.mjs',
       'tests/runtime/content-playback-admission-current-behavior.test.mjs',
       'tests/runtime/content-playback-coordinator.test.mjs',
       'tests/runtime/managed-content-playback-permit.test.mjs',
@@ -244,6 +247,7 @@ export const LANES = Object.freeze({
   blocking: {
     description: 'Keyword, channel, comment, blocklist, list-target, and hide-decision behavior.',
     tests: [
+      'tests/runtime/ad-void-native-ownership-current-behavior.test.mjs',
       'tests/runtime/content-playback-admission-current-behavior.test.mjs',
       'tests/runtime/content-playback-coordinator.test.mjs',
       'tests/runtime/managed-content-playback-permit.test.mjs',
