@@ -458,3 +458,53 @@ The bridge-settings fingerprint now includes isolated managed playback receipts 
 | File | Lines | Bytes | SHA-256 |
 | --- | ---: | ---: | --- |
 | `js/content/bridge_settings.js` | 2236 | 100980 | `6cac827d16839ce9fc01ebc94b54e56ce550169271e27ce73a77453ea0160a8d` |
+
+
+## Automatic Playback Preference Source Revalidation - 2026-10-23
+
+The new profile playback preference adds settings propagation and refresh keys. It does not become a quick-block blocking-rule condition. Existing behavioral affordance assertions remain. Earlier source rows and counts are dated evidence; current pins and unchanged block measurements follow.
+
+| File | Lines | Bytes | SHA-256 |
+| --- | ---: | ---: | --- |
+| `js/content_controls_catalog.js` | 304 | 12826 | `f8951a8249b0a0683c00d7f4b062bd819105539bf37f84fd3c5d569910f0aef4` |
+| `js/settings_shared.js` | 1327 | 67805 | `c3d0f4b965acaaf46f6424cd0ad329c50e616de7b1cf8905a9fa578123e2bf69` |
+| `js/background.js` | 8546 | 386625 | `b4986d2a61879532c30d376ec2b85149498c45647fced0cad24e45f8620c4353` |
+| `js/content/bridge_settings.js` | 2238 | 101092 | `923110bd0a8f2c3216199e1c930550ab80f6458448060d874da19e336aab3e24` |
+| `js/state_manager.js` | 2984 | 124258 | `029b2e7d4356d4629348f174bdaf7858fa1fa0c09a4b54c6bb0e293a161a8d5e` |
+| `js/content/block_channel.js` | 3361 | 135050 | `f2a02886a83d64d93186cd1f0c1f300683ae49754b928d2e0329fd1a88d8f2c9` |
+| `js/content_bridge.js` | 15056 | 678414 | `9e0bca2973ffb01d0216ea8b096531ad3c1afe7af4acc7363fa4b1cc2ca09f18` |
+
+```text
+catalog feed affordance controls block lines: 10
+catalog feed affordance controls block bytes: 488
+settings_shared settings keys block lines: 44
+settings_shared settings keys block bytes: 1201
+settings_shared affordance compile block lines: 2
+settings_shared affordance compile block bytes: 126
+background boolean pass-through block lines: 38
+background boolean pass-through block bytes: 3983
+background storage refresh keys block lines: 20
+background storage refresh keys block bytes: 594
+content bridge storage refresh keys block lines: 47
+content bridge storage refresh keys block bytes: 1353
+state manager valid setting keys block lines: 36
+state manager valid setting keys block bytes: 1165
+state manager external reload keys block lines: 47
+state manager external reload keys block bytes: 1846
+quick block card selectors block lines: 60
+quick block card selectors block bytes: 2088
+quick block enabled gate block lines: 91
+quick block enabled gate block bytes: 3025
+quick block setup lifecycle block lines: 320
+quick block setup lifecycle block bytes: 13892
+normal menu injection gate block lines: 14
+normal menu injection gate block bytes: 411
+fallback menu button creation block lines: 31
+fallback menu button creation block bytes: 1591
+fallback menu scan lifecycle block lines: 293
+fallback menu scan lifecycle block bytes: 10382
+fallback popover open block lines: 107
+fallback popover open block bytes: 3636
+fallback perform block action block lines: 212
+fallback perform block action block bytes: 10098
+```

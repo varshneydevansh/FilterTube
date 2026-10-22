@@ -61,7 +61,15 @@
         const caption = player?.getOption?.('captions', 'track');
         const captionId = caption?.vss_id || caption?.vssId;
         const region = window.ytcfg?.get?.('INNERTUBE_CONTEXT')?.client?.gl;
-        return { regionCode: typeof region === 'string' && /^[A-Z]{2}$/.test(region) ? region : '',
+        // These observations only avoid unnecessary UX reloads. They never
+        // replace isolated-world admission or grant playback permission.
+        let nativeVideoId = ''; let nativeAdInactive = false;
+        try {
+            const id = player?.getPlayerResponse?.()?.videoDetails?.videoId;
+            if (typeof id === 'string' && /^[a-zA-Z0-9_-]{11}$/.test(id)) nativeVideoId = id;
+        } catch (_) {}
+        try { nativeAdInactive = player?.getAdState?.() === -1; } catch (_) {}
+        return { nativeVideoId, nativeAdInactive, regionCode: typeof region === 'string' && /^[A-Z]{2}$/.test(region) ? region : '',
             audioTrackId: trackId(audio), audioTrackCount: Array.isArray(availableAudio) ? availableAudio.length : null,
             audioTracks: Array.isArray(availableAudio) && availableAudio.length <= 64
                 ? availableAudio.map(track => ({ id: trackId(track) })) : [],
@@ -201,6 +209,15 @@
             raw.playerConfig.playbackStartConfig ||= {};
             const position = intent.nativeTimeline === 'content' ? node.currentTime : 0;
             raw.playerConfig.playbackStartConfig.startSeconds = position;
+            const watchNext = player.getWatchNextResponse?.();
+            let watchNextSnapshot = null;
+            if (watchNext != null) {
+                if (typeof watchNext !== 'object' || Array.isArray(watchNext)) throw Error('native_navigation_unavailable');
+                watchNextSnapshot = jsonClone(watchNext, 2 * 1024 * 1024);
+                if (!watchNextSnapshot || typeof watchNextSnapshot !== 'object' || Array.isArray(watchNextSnapshot)) throw Error('native_navigation_unavailable');
+                const navigationVideoId = watchNextSnapshot.currentVideoEndpoint?.watchEndpoint?.videoId;
+                if (navigationVideoId != null && navigationVideoId !== videoId) throw Error('native_navigation_changed');
+            }
             const caption = player.getOption?.('captions', 'track');
             if (latest.captionsEnabled && typeof player.setOption !== 'function') throw Error('native_captions_unavailable');
             const snapshot = { volume: node.volume, muted: node.muted, rate: node.playbackRate };
@@ -216,8 +233,11 @@
             // admission, readiness verification and any later user-intended play.
             pauseNative(transaction);
             if (nativeRequests.get(requestId)?.reason === 'cancelled') throw Error('cancelled');
+            // Native's second argument preserves its existing playlist object,
+            // index and queue. Supplying list IDs would recreate that context.
             player.loadVideoByPlayerVars({ video_id: videoId, raw_player_response: raw,
-                start: position, startSeconds: position, pause_at_start: 1, autoplay: 0, resume: '1' });
+                ...(watchNextSnapshot ? { raw_watch_next_response: watchNextSnapshot } : {}),
+                start: position, startSeconds: position, pause_at_start: 1, autoplay: 0, resume: '1' }, true);
             if (nativeRequests.get(requestId)?.reason === 'cancelled') throw Error('cancelled');
             if (!nativeCurrent(transaction)) throw Error('native_player_changed');
             pauseNative(transaction);
@@ -236,7 +256,8 @@
             pauseNative(transaction);
             const reasons = ['commit_deadline_invalid', 'cancelled', 'request_replayed', 'source_kind_unsupported', 'source_invalid', 'metadata_limit',
                 'native_player_unavailable', 'native_playability_unsupported', 'playback_intent_invalid', 'playback_intent_stale',
-                'native_preferences_changed', 'native_audio_unsupported', 'native_captions_unavailable', 'native_player_changed', 'native_source_not_accepted'];
+                'native_preferences_changed', 'native_audio_unsupported', 'native_captions_unavailable', 'native_player_changed', 'native_source_not_accepted',
+                'native_navigation_unavailable', 'native_navigation_changed'];
             nativeReceipt(requestId, videoId, false, reasons.includes(error?.message) ? error.message : 'native_source_failed');
         }
     }

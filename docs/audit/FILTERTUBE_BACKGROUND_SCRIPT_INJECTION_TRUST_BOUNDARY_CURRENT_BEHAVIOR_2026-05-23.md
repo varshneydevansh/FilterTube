@@ -265,3 +265,15 @@ selected frameIds tokens: 1
 selected tabId tokens: 8
 selected files tokens: 3
 selected setTimeout tokens: 2
+
+
+## Automatic Playback Preference Source Revalidation - 2026-10-23
+
+The default-on profile playback preference adds boolean propagation, persistence and refresh-key entries. Existing script injection blocks and authority assertions remain unchanged. The whole background file's current fingerprint follows; earlier fingerprints remain dated evidence. This is source freshness, not security-completion or installed acceptance.
+
+```text
+background lines: 8546
+background bytes: 386625
+```
+
+sha256: `b4986d2a61879532c30d376ec2b85149498c45647fced0cad24e45f8620c4353`

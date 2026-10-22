@@ -62,7 +62,7 @@
     }
 
     function create(options = {}) {
-        const { originalVideo, originalSurface, validateLease } = options;
+        const { originalVideo, originalSurface, validateLease, allowAutomaticStart } = options;
         if (!originalVideo || !originalSurface || typeof validateLease !== 'function') throw new TypeError('Native media and lease authority are required');
         const document = originalSurface.ownerDocument;
         const now = typeof options.now === 'function' ? options.now : () => Date.now();
@@ -79,9 +79,17 @@
                 && originalSurface.querySelector('video.html5-main-video') === originalVideo;
         }
         function currentSource() { return originalVideo.currentSrc || originalVideo.src || ''; }
+        function automaticAllowed(videoId, lease) {
+            // Only the isolated caller's current-setting callback can enable
+            // automatic transactions. Source data and MAIN receipts cannot.
+            if (typeof allowAutomaticStart !== 'function') return false;
+            try { return allowAutomaticStart({ videoId, lease }) === true; }
+            catch (_) { return false; }
+        }
         function authority(session) {
             if (!sameNode(session) || !Number.isFinite(session.lease?.expiresAt)
                 || now() >= session.lease.expiresAt || now() >= session.sourceExpiry) return false;
+            if (session.mode === 'automatic' && !automaticAllowed(session.videoId, session.lease)) return false;
             try { return validateLease(session.lease, { videoId: session.videoId, source: session.source }) === true; }
             catch (_) { return false; }
         }
@@ -179,17 +187,20 @@
             if (destroyed) return reject('destroyed');
             if (current || owners.has(originalVideo)) return reject('transaction_in_progress');
             const { videoId, lease, source } = input;
+            const mode = input.mode === undefined ? 'manual' : input.mode;
             const intent = intentFor(input.playbackIntent, videoId);
             const preferences = selectedPreferences(input.preferences);
             if (!validId(videoId) || !intent) return reject('invalid_playback_intent', videoId);
-            if (!consumeAction(input.actionToken, videoId)) return reject('user_gesture_required', videoId);
+            if (!['manual', 'automatic'].includes(mode)) return reject('invalid_start_mode', videoId);
+            if (mode === 'automatic' && !automaticAllowed(videoId, lease)) return reject('automatic_start_disabled', videoId);
+            if (mode === 'manual' && !consumeAction(input.actionToken, videoId)) return reject('user_gesture_required', videoId);
             if (source?.kind !== 'adaptive_mp4' || !Number.isFinite(source.expiresAt)) return reject('unsupported_source', videoId);
             if (!preferences) {
                 return reject('feature_parity_unavailable', videoId);
             }
             let resolve;
             const result = new Promise(done => { resolve = done; });
-            const session = { videoId, lease, source, sourceExpiry: source.expiresAt, intent, preferences, resolve, result,
+            const session = { videoId, lease, source, sourceExpiry: source.expiresAt, intent, preferences, mode, resolve, result,
                 requestId: nonce(), phase: 'committing', acknowledged: false, checking: false, closed: false,
                 originalSource: currentSource(), sourceTransition: false, removers: [], stateRequest: null };
             if (!authority(session)) return reject('authorization_invalid', videoId);

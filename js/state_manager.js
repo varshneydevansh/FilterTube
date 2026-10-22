@@ -76,6 +76,7 @@ const StateManager = (() => {
         hideComments: false,
         hideHomeFeed: false,
         hideSponsoredCards: true,
+        contentOnlyPlayback: true,
         hidePlayables: false,
         hideWatchPlaylistPanel: false,
         hidePlaylistCards: false,
@@ -243,6 +244,7 @@ const StateManager = (() => {
         state.hideComments = data.hideComments || false;
         state.hideHomeFeed = data.hideHomeFeed || false;
         state.hideSponsoredCards = data.hideSponsoredCards !== false;
+        state.contentOnlyPlayback = data.contentOnlyPlayback !== false;
         state.hidePlayables = data.hidePlayables || false;
         state.hideWatchPlaylistPanel = data.hideWatchPlaylistPanel || false;
         state.hidePlaylistCards = data.hidePlaylistCards || false;
@@ -1315,6 +1317,7 @@ const StateManager = (() => {
                 hideComments: state.hideComments,
                 hideHomeFeed: state.hideHomeFeed,
                 hideSponsoredCards: state.hideSponsoredCards,
+                contentOnlyPlayback: state.contentOnlyPlayback,
                 hidePlayables: state.hidePlayables,
                 hideWatchPlaylistPanel: state.hideWatchPlaylistPanel,
                 hidePlaylistCards: state.hidePlaylistCards,
@@ -2451,6 +2454,7 @@ const StateManager = (() => {
             'hideComments',
             'hideHomeFeed',
             'hideSponsoredCards',
+            'contentOnlyPlayback',
             'hidePlayables',
             'hideWatchPlaylistPanel',
             'hidePlaylistCards',
@@ -2856,6 +2860,7 @@ const StateManager = (() => {
                     'filterComments',
                     'hideHomeFeed',
                     'hideSponsoredCards',
+                    'contentOnlyPlayback',
                     'hidePlayables',
                     'hideWatchPlaylistPanel',
                     'hidePlaylistCards',

@@ -9,23 +9,23 @@ const docPath = 'docs/audit/FILTERTUBE_RUNTIME_DIAGNOSTIC_LOGGING_POLICY_MATRIX_
 
 const sourceFingerprints = {
   'build.js': [861, 33225, "a198cc1d0bf98e410deb8f66ced0e56a046bbf987a0a5b878e1278577622fb2e"],
-  'js/background.js': [8538, 386043, "cc89bb4a0375145e1c811b7cf5953729c39c409b6b24cacdc65c80f9f6ff44d0"],
-  'js/content/block_channel.js': [3361, 135050, "f2a02886a83d64d93186cd1f0c1f300683ae49754b928d2e0329fd1a88d8f2c9"],
-  'js/content/bridge_settings.js': [2236, 100980, '6cac827d16839ce9fc01ebc94b54e56ce550169271e27ce73a77453ea0160a8d'],
+  'js/background.js': [8546, 386625, 'b4986d2a61879532c30d376ec2b85149498c45647fced0cad24e45f8620c4353'],
+  'js/content/block_channel.js': [3361, 135050, 'f2a02886a83d64d93186cd1f0c1f300683ae49754b928d2e0329fd1a88d8f2c9'],
+  'js/content/bridge_settings.js': [2238, 101092, '923110bd0a8f2c3216199e1c930550ab80f6458448060d874da19e336aab3e24'],
   'js/content/collab_dialog.js': [393, 14623, "dc34bba556b310da8b7516d106e9d67addea59d8a707a02f21607ac97af1f72a"],
   'js/content/dom_extractors.js': [1166, 48221, "ddb421e018c6e9a1ef92c7cd8dc4d91d201da814c6f25a3b63d771795cdd9e19"],
-  'js/content/dom_fallback.js': [8180,381121,"121f71b40a27024636d448cd5b5de0f1e9a33e3e4e118377f1b07c20e52eb49d"],
+  'js/content/dom_fallback.js': [8188, 381556, '97d951f4a550d9fae239fd65092069f1841ca71f9eb66492d7578fcfdf21f0b2'],
   'js/content/handle_resolver.js': [291, 10230, "fab995e0e5c85c8ba4e9d342bc452d297ea4dc99220bb94fee4c490ff4a98b47"],
-  'js/content_bridge.js': [15056,678414,"9e0bca2973ffb01d0216ea8b096531ad3c1afe7af4acc7363fa4b1cc2ca09f18"],
+  'js/content_bridge.js': [15056, 678414, '9e0bca2973ffb01d0216ea8b096531ad3c1afe7af4acc7363fa4b1cc2ca09f18'],
   'js/filter_logic.js': [4534, 221980, "f7021a053af96a4cd31a577f56e900ffb1a5d990fe55a838af64a6dba867afc4"],
   'js/injector.js': [4148, 183860, "62bd7222e7ea8c7fc51cbffd63b894a2f03509b4cc09ddf7525b8a748f91eb60"],
-  'js/io_manager.js': [3203, 162604, "ca73f44abb4d2d4e57a81470cfcb2447b1e62ef8680ef0457b81dcdc6734e4c3"],
+  'js/io_manager.js': [3213, 163538, '9dfae40b90db3ea7bf0a1f0f44479508894bee92616582a1543d3460af825150'],
   'js/layout.js': [680, 30604, "48831ccdc2d62c75818d9c6a153d7bfacec9d7be9f2408485f74b1a7c13c57c7"],
   'js/popup.js': [2553, 117093, "645fab83d4b665796f5b2fe1be262ca336df6a4cf3ffb1daebc588a50c091aa7"],
   'js/seed.js': [2499, 109884, "4fe890e049b31bdadab8a3447fe4d853fb19962db91b9e3299fed38e87ebd8b2"],
-  'js/settings_shared.js': [1313, 66857, "19f0a1fb3cd512494481b7eb39169bf84feeda4a0a6a20cf58ebaf1c18ff7ba9"],
-  'js/state_manager.js': [2979, 124009, "04879b5b1dcac9229c70d0ea14241667755682649865ad1d52030c1ce21950d3"],
-  'js/tab-view.js': [32531, 1760504, "6da5a37b9018368588ff9c7091aca30c22a4398a038f681bad2ba2a1be4a4eca"],
+  'js/settings_shared.js': [1327, 67805, 'c3d0f4b965acaaf46f6424cd0ad329c50e616de7b1cf8905a9fa578123e2bf69'],
+  'js/state_manager.js': [2984, 124258, '029b2e7d4356d4629348f174bdaf7858fa1fa0c09a4b54c6bb0e293a161a8d5e'],
+  'js/tab-view.js': [32535, 1760706, '801d77180fe4ab2b3e470f7337bc8640bcbdd2f882f58e5628f61852d42c4286'],
   'scripts/build-extension-ui.mjs': [50, 1188, "6326362ebf90f448ccdbf68945b3fb522b7b215edaf9b3e28589a4e166239cf3"],
   'scripts/build-nanah-vendor.mjs': [65, 1818, "dae8d3ef29c4cd44b0bf975090e9d53f3bb05b523355f5038930fc03b27e921c"],
   'scripts/sync-native-runtime.mjs': [34, 1070, "4f46c13bf6099092193712790d231ff4809b00b1b0061d04af71ac3ba6bf21c6"]
@@ -33,49 +33,31 @@ const sourceFingerprints = {
 
 const playbackSourceFingerprints = {
   "js/content/content_playback.js": [
-    302,
-    17926,
-    "12a84c004a11098f1cf5c2b9d1172aa4a95ccdd6533465ef9410fc9d8fee72b4"
+    307, 17025, '040c8c8606f6c8cb76703b094aae86e3269c816b4ef80266b35de112df2749f5'
   ],
   "js/content/content_playback_admission.js": [
-    131,
-    7500,
-    "71ee13a96de07fdf988dc25300b1b09e0379e687047b5a5b7c21605bcbe68763"
+    131, 7500, '71ee13a96de07fdf988dc25300b1b09e0379e687047b5a5b7c21605bcbe68763'
   ],
   "js/content/content_playback_captions.js": [
-    138,
-    8244,
-    "c5768f3bb7836321b030009492fe2ae703bb3e785352eabf8b2f383ca203c196"
+    138, 8244, 'c5768f3bb7836321b030009492fe2ae703bb3e785352eabf8b2f383ca203c196'
   ],
   "js/content/content_playback_native.js": [
-    265,
-    17946,
-    "8ab9407e60777b3a9b694fabde9ed25cce87287e0da2271e2e1a6023e6e633df"
+    276, 18819, 'baf6f57897442a338aada4fdc44915dc324eff93f8594b4b0006b648dd64823a'
   ],
   "js/content/content_playback_player.js": [
-    484,
-    27588,
-    "791e88bfa8f53c5e7dd5b8a4752a222812cf288f43e31ff3f0b9b7a6708c81cd"
+    484, 27588, '791e88bfa8f53c5e7dd5b8a4752a222812cf288f43e31ff3f0b9b7a6708c81cd'
   ],
   "js/content/content_playback_response.js": [
-    341,
-    24688,
-    "c033715d279ecc6e45ba3a00006b719e8131a14f8d55b6c7518c71fef39434e4"
+    362, 26305, 'fdfa409eac404e807ff34935e771dfc1da6f0ebdbbeb5990c22c36fb11decc84'
   ],
   "js/content/content_playback_transport.js": [
-    400,
-    25096,
-    "02b9b6d076757eca5b8f25d94bbf8865db4e3eb6a7e24d65c69ebd894cd6fd88"
+    400, 25096, '02b9b6d076757eca5b8f25d94bbf8865db4e3eb6a7e24d65c69ebd894cd6fd88'
   ],
   "js/shared/content_playback_resolver.js": [
-    295,
-    21072,
-    "63e5825e494d120e25328ce478e2bbcafb11be4b6a4a337ed6856d61428a7d81"
+    295, 21072, '63e5825e494d120e25328ce478e2bbcafb11be4b6a4a337ed6856d61428a7d81'
   ],
   "js/shared/content_playback_source.js": [
-    187,
-    12402,
-    "cc22a59b178f681b29ad460a32cca7bb09dd9ffc52e5b650d6e18240578c0f0b"
+    187, 12402, 'cc22a59b178f681b29ad460a32cca7bb09dd9ffc52e5b650d6e18240578c0f0b'
   ]
 };
 
@@ -542,7 +524,7 @@ function assertProductionConsoleResidualHotPathPreflight(doc) {
 
   assert.equal(routineConsoleSites('js/background.js').length, 62);
   assert.equal(lineNumberForToken(read('js/background.js'), 'installFilterTubeBackgroundConsoleGate();'), 12);
-  assert.equal(routineConsoleSites('js/background.js')[0], 3336);
+  assert.equal(routineConsoleSites('js/background.js')[0], 3340);
 
   const isolatedGateFiles = new Set();
   for (const manifestFile of activeManifestFiles) {

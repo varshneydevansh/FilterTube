@@ -1301,6 +1301,8 @@ function initializeFiltersTabs() {
             const input = document.createElement('input');
             input.type = 'checkbox';
             input.id = `setting_${control.key}`;
+            t.id = `setting_${control.key}_title`;
+            input.setAttribute('aria-labelledby', t.id);
             input.setAttribute('data-ft-setting', control.key);
 
             const slider = document.createElement('span');
@@ -29781,6 +29783,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                     allowKidsViewing: true,
                     syncKidsToMain: false,
                     hideSponsoredCards: true,
+                    contentOnlyPlayback: true,
                     autoBackupEnabled,
                     autoBackupMode,
                     autoBackupFormat
@@ -29891,6 +29894,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                     allowKidsViewing: true,
                     syncKidsToMain: false,
                     hideSponsoredCards: true,
+                    contentOnlyPlayback: true,
                     autoBackupEnabled,
                     autoBackupMode,
                     autoBackupFormat

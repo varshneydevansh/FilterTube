@@ -165,7 +165,8 @@ const CONTENT_PLAYBACK_TESTS = Object.freeze([
   'tests/runtime/content-playback-resolver.test.mjs',
   'tests/runtime/content-playback-transport.test.mjs',
   'tests/runtime/content-playback-native.test.mjs',
-  'tests/runtime/managed-content-playback-permit.test.mjs'
+  'tests/runtime/managed-content-playback-permit.test.mjs',
+  'tests/runtime/content-only-playback-settings.test.mjs'
 ]);
 export const LANES = Object.freeze({
   release: {
@@ -214,6 +215,7 @@ export const LANES = Object.freeze({
       'tests/runtime/content-playback-admission-current-behavior.test.mjs',
       'tests/runtime/content-playback-coordinator.test.mjs',
       'tests/runtime/managed-content-playback-permit.test.mjs',
+      'tests/runtime/content-only-playback-settings.test.mjs',
       ...FILTER_LOGIC_AUDIT_PROOF_TESTS,
       'tests/runtime/json-first-whitelist-decision-identity-boundary-current-behavior.test.mjs',
       'tests/runtime/content-bridge-whitelist-pending-refresh-boundary-current-behavior.test.mjs',
@@ -245,6 +247,7 @@ export const LANES = Object.freeze({
       'tests/runtime/content-playback-admission-current-behavior.test.mjs',
       'tests/runtime/content-playback-coordinator.test.mjs',
       'tests/runtime/managed-content-playback-permit.test.mjs',
+      'tests/runtime/content-only-playback-settings.test.mjs',
       'tests/runtime/watch-selected-playlist-row-admission.test.mjs',
       'tests/runtime/category-pending-lifetime.test.mjs',
       'tests/runtime/category-pending-dom-pipeline.test.mjs',
@@ -346,6 +349,7 @@ export const LANES = Object.freeze({
       'tests/runtime/content-playback-admission-current-behavior.test.mjs',
       'tests/runtime/content-playback-coordinator.test.mjs',
       'tests/runtime/managed-content-playback-permit.test.mjs',
+      'tests/runtime/content-only-playback-settings.test.mjs',
       'tests/runtime/watch-selected-playlist-row-admission.test.mjs',
       'tests/runtime/category-pending-lifetime.test.mjs',
       'tests/runtime/category-pending-dom-pipeline.test.mjs',
@@ -428,6 +432,7 @@ export const LANES = Object.freeze({
       'tests/runtime/content-playback-admission-current-behavior.test.mjs',
       'tests/runtime/content-playback-coordinator.test.mjs',
       'tests/runtime/managed-content-playback-permit.test.mjs',
+      'tests/runtime/content-only-playback-settings.test.mjs',
       'tests/runtime/minimum-view-count-current-behavior.test.mjs',
       'tests/runtime/minimum-views-controls-current-behavior.test.mjs',
       'tests/runtime/nanah-storage-lock-current-behavior.test.mjs',

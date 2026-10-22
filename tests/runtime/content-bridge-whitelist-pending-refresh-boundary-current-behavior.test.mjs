@@ -11,7 +11,7 @@ const docPath = 'docs/audit/FILTERTUBE_CONTENT_BRIDGE_WHITELIST_PENDING_REFRESH_
 
 const sourceFingerprints = {
   'js/content_bridge.js': [15056, 678414, '9e0bca2973ffb01d0216ea8b096531ad3c1afe7af4acc7363fa4b1cc2ca09f18'],
-  'js/content/dom_fallback.js': [8180, 381121, '121f71b40a27024636d448cd5b5de0f1e9a33e3e4e118377f1b07c20e52eb49d']
+  'js/content/dom_fallback.js': [8188, 381556, '97d951f4a550d9fae239fd65092069f1841ca71f9eb66492d7578fcfdf21f0b2']
 };
 
 const blockSpecs = {
@@ -64,7 +64,7 @@ const blockSpecs = {
     file: 'js/content/dom_fallback.js',
     start: '    // 1. Video/Content Filtering',
     end: '    if (!window.__filtertubePlaylistNavGuardInstalled) {',
-    startLine: 5411,
+    startLine: 5419,
     lines: 19,
     bytes: 950,
     hash: '7235b5ea6e0689ab98e3e2e21e02e37d95b52675bc16a7c5bffa56b50c905894'
@@ -73,7 +73,7 @@ const blockSpecs = {
     file: 'js/content/dom_fallback.js',
     start: "            const alreadyProcessed = element.hasAttribute('data-filtertube-processed');",
     end: "            const cachedVideoId = element.getAttribute('data-filtertube-video-id') || '';",
-    startLine: 5674,
+    startLine: 5682,
     lines: 74,
     bytes: 4342,
     hash: '7f374fecc191fc37bbef5af4e05b040ff3b3b2e0585baec5f8036b1d4f4c7c6f'
@@ -82,7 +82,7 @@ const blockSpecs = {
     file: 'js/content/dom_fallback.js',
     start: '            let hideReason = `Content: ${title}`;',
     end: '            if (hideByDuration) {',
-    startLine: 6957,
+    startLine: 6965,
     lines: 16,
     bytes: 993,
     hash: '2352973b418feb0a4da5f8b71c11940d6a0292b6bdb5db511262db89889c1f17'
@@ -91,7 +91,7 @@ const blockSpecs = {
     file: 'js/content/dom_fallback.js',
     start: "    if (onlyWhitelistPending && listMode === 'whitelist') {",
     end: '    // Inline survey containers',
-    startLine: 7252,
+    startLine: 7260,
     lines: 4,
     bytes: 83,
     hash: '438296f1dbec1d892317f6177e74323886b6830fd0697eb1b1c12e4779776ad0'

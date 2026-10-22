@@ -17,20 +17,20 @@ function policy(overrides = {}) {
 function fixture({ at = Date.parse('2026-10-22T12:00:00Z'), policyOverrides = {} } = {}) {
   let clock = at;
   const listeners = new Map(), timers = new Map(), calls = [], invalidations = [], queries = [];
-  let timerId = 0;
+  let timerId = 0, refreshes = 0;
   const settings = { activeProfileId: 'child-1', activeProfileKind: 'child', profileType: 'main',
     managedTimeLimitPolicy: policy(policyOverrides) };
   const location = { href: 'https://www.youtube.com/watch?v=C-dvTjK_07c' };
   const window = {
     addEventListener(name, fn) { const list = listeners.get(name) || []; list.push(fn); listeners.set(name, list); },
     removeEventListener(name, fn) { listeners.set(name, (listeners.get(name) || []).filter(value => value !== fn)); },
-    FilterTubeContentPlayback: { invalidate(reason) { invalidations.push(reason); } }, postMessage() {}
+    FilterTubeContentPlayback: { invalidate(reason) { invalidations.push(reason); }, refresh() { refreshes++; } }, postMessage() {}
   };
   class ClockDate extends Date { constructor(value) { super(value === undefined ? clock : value); } static now() { return clock; } }
   const browserAPI_BRIDGE = { runtime: { lastError: null,
     sendMessage(request, callback) { calls.push({ request, callback }); } } };
   const context = vm.createContext({ window, location, currentSettings: settings, latestSettings: settings,
-    browserAPI_BRIDGE, URL, Intl, Date: ClockDate,
+    browserAPI_BRIDGE, URL, Intl, Date: ClockDate, queueMicrotask,
     document: { visibilityState: 'visible', hasFocus: () => true,
       querySelectorAll(selector) { queries.push(selector); return context.videos || []; } },
     setInterval(fn, delay) { const id = ++timerId; timers.set(id, { fn, delay }); return id; },
@@ -64,7 +64,7 @@ function fixture({ at = Date.parse('2026-10-22T12:00:00Z'), policyOverrides = {}
   function emit(name) { for (const fn of [...(listeners.get(name) || [])]) fn({ type: name }); }
   return { context, settings, location, calls, window, invalidations, timers, queries, read, reply, emit,
     send: () => context.controls.sendManagedTimeLimitHeartbeat(), setTime: value => { clock = value; },
-    time: () => clock, start: at, api: browserAPI_BRIDGE };
+    time: () => clock, refreshes: () => refreshes, start: at, api: browserAPI_BRIDGE };
 }
 
 test('actual heartbeat reply alone publishes a frozen isolated-world permit', () => {
@@ -197,4 +197,13 @@ test('existing heartbeat counts owned and native video playback once per tab', (
   const f = fixture(); f.context.videos = [{ paused: false, ended: false, readyState: 4 }, { paused: false, ended: false, readyState: 4 }];
   f.send(); assert.equal(f.calls.length, 1); assert.equal(f.calls[0].request.playing, true);
   assert.equal(f.queries[0], 'video:not([data-filtertube-managed-overlay-background="true"])');
+});
+
+
+test('authoritative permit publication schedules a fresh automatic admission check', async () => {
+  const f = fixture(); f.send(); f.reply();
+  assert.equal(f.refreshes(), 0, 'publication finishes before automatic coordinator rechecks');
+  await Promise.resolve(); assert.equal(f.refreshes(), 1); assert.ok(f.read());
+  f.send(); f.reply({ ok: false }); await Promise.resolve();
+  assert.equal(f.refreshes(), 1, 'failed heartbeats cannot wake source discovery'); assert.equal(f.read(), null);
 });

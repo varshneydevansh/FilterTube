@@ -352,3 +352,12 @@ All three browser packages were rebuilt from the frozen native source. The READM
 | File | Lines | Bytes | SHA-256 |
 | --- | ---: | ---: | --- |
 | `README.md` | 456 | 28669 | `a700c32e22dcbfc3ea8e68b40aa4320006b634fef1843d5f117e9e55bc691f3c` |
+
+
+## Automatic Native Playback Final Build Metadata - 2026-10-23
+
+All three browser packages were rebuilt from the frozen automatic playback source. The generated README badge is pinned below. Source/stage/archive parity is checked independently; this is not installed playback, profile or publication acceptance. Healthy admitted native media remains unchanged, and fresh source selection is attempted only when needed. Earlier build hashes remain historical.
+
+| File | Lines | Bytes | SHA-256 |
+| --- | ---: | ---: | --- |
+| `README.md` | 456 | 28669 | `8020a7f53a3380d7e47887c7d0c8c106953225a43b205f246da64e6ba75e6d93` |

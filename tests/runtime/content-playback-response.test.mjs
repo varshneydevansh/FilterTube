@@ -273,7 +273,7 @@ test('a newer audio selection supersedes an older pending selection with separat
 });
 
 function nativeFixture(options = {}) {
-  const calls = [], captionCalls = [];
+  const calls = [], captionCalls = [], nativeLoads = [];
   const node = { currentTime: 12, duration: 90, paused: false, volume: .35, muted: true, playbackRate: 1.25,
     pause() { this.paused = true; calls.push('pause'); } };
   let caption = options.caption || { vssId: '.es', languageCode: 'es', privateNativeCaption: true };
@@ -287,7 +287,8 @@ function nativeFixture(options = {}) {
   const player = { querySelector: () => node, getPlayerResponse: () => response,
     getOption: kind => kind === 'captions' ? caption : null,
     pauseVideo() { node.paused = true; calls.push('native-pause'); },
-    loadVideoByPlayerVars(args) { calls.push(args); response = args.raw_player_response; options.onLoad?.(state, args); },
+    loadVideoByPlayerVars(args, preservePlaylist) { calls.push(args); nativeLoads.push({ args, preservePlaylist });
+      response = args.raw_player_response; options.onLoad?.(state, args, preservePlaylist); },
     setOption(kind, name, value) { captionCalls.push({ kind, name, value }); caption = value; }, ...options.player };
   state = fixture({ payload, player, ...options.fixture });
   const url = tag => `https://r1.googlevideo.com/videoplayback?expire=600&itag=${tag}`;
@@ -312,7 +313,7 @@ function nativeFixture(options = {}) {
   const cancel = extra => nativeRequest('FilterTube_CancelNativeContentSource', extra);
   const read = extra => nativeRequest('FilterTube_ReadNativeContentState', extra);
   Object.assign(state, { apply, cancel, read });
-  return { ...state, node, calls, captionCalls, sourcePlan, intent, preferences, original: payload, apply, cancel, read,
+  return { ...state, node, calls, captionCalls, nativeLoads, sourcePlan, intent, preferences, original: payload, apply, cancel, read,
     setResponse(value) { response = value; }, setCaption(value) { caption = value; } };
 }
 const plain = value => JSON.parse(JSON.stringify(value));
@@ -580,4 +581,91 @@ test('a transient native response getter failure keeps bounded watch-response fa
   state.request();
   assert.equal(state.sent.length, 1);
   assert.equal(state.sent[0][0].payload.playerResponse.videoDetails.videoId, id);
+});
+
+test('native handoff preserves the actual playlist object and index without reconstructing a queue', () => {
+  const queue = { listId: 'RDcontent0001', index: 7, items: [{ videoId: id }, { videoId: 'nextvideo01' }], order: [1, 0] };
+  let nativeQueue = queue;
+  const state = nativeFixture({ player: { getPlaylist: () => nativeQueue },
+    onLoad(_state, _args, preservePlaylist) { if (!preservePlaylist) nativeQueue = null; } });
+  state.apply();
+  assert.equal(state.sent[0][0].payload.applied, true);
+  assert.strictEqual(state.player.getPlaylist(), queue);
+  assert.equal(state.player.getPlaylist().index, 7);
+  assert.equal(state.nativeLoads[0].preservePlaylist, true);
+  for (const key of ['list', 'playlist', 'index', 'api', 'external_list']) assert.equal(key in state.nativeLoads[0].args, false);
+});
+
+test('native handoff retains the current watch-next navigation context locally without inventing entries', () => {
+  const watchNext = { currentVideoEndpoint: { watchEndpoint: { videoId: id } },
+    contents: { twoColumnWatchNextResults: { autoplay: { autoplay: { sets: [{ autoplayVideo: { watchEndpoint: { videoId: 'nextvideo01' } } }] } } } },
+    playerOverlays: { playerOverlayRenderer: { endScreen: { watchNextEndScreenRenderer: { results: [{ endScreenVideoRenderer: { videoId: 'nextvideo01' } }] } } } } };
+  const before = plain(watchNext);
+  const state = nativeFixture({ player: { getWatchNextResponse: () => watchNext } });
+  state.apply();
+  assert.equal(state.sent[0][0].payload.applied, true);
+  const preserved = state.nativeLoads[0].args.raw_watch_next_response;
+  assert.deepEqual(plain(preserved), before);
+  assert.notStrictEqual(preserved, watchNext);
+  assert.deepEqual(watchNext, before);
+  assert.equal(JSON.stringify(state.sent).includes('nextvideo01'), false, 'navigation data must remain in MAIN');
+  assert.equal(state.node.paused, true, 'preserving Next never grants autoplay');
+});
+
+for (const [name, value] of [
+  ['absent API', undefined], ['no loaded navigation', () => null]
+]) test('simple native videos remain supported with ' + name, () => {
+  const state = nativeFixture({ player: { getWatchNextResponse: value } }); state.apply();
+  assert.equal(state.sent[0][0].payload.applied, true);
+  assert.equal(state.nativeLoads[0].preservePlaylist, true);
+  assert.equal('raw_watch_next_response' in state.nativeLoads[0].args, false);
+});
+
+for (const [name, value] of [
+  ['foreign current video', { currentVideoEndpoint: { watchEndpoint: { videoId: 'foreign0001' } } }],
+  ['invalid primitive', 'untrusted navigation'],
+  ['invalid array', []],
+  ['oversized response', { oversized: 'x'.repeat(2 * 1024 * 1024) }],
+  ['circular response', (() => { const value = {}; value.loop = value; return value; })()]
+]) test('invalid watch-next context is rejected before touching native navigation: ' + name, () => {
+  const state = nativeFixture({ player: { getWatchNextResponse: () => value } }); state.apply();
+  assert.equal(state.calls.length, 0); assert.equal(state.captionCalls.length, 0);
+  assert.equal(state.sent[0][0].payload.applied, false);
+  assert.equal(state.node.paused, false);
+});
+
+test('native UX observations report exact current identity and strict inactive-ad evidence', () => {
+  const state = nativeFixture({ player: { getAdState: () => -1 } }); state.read();
+  const preferences = state.sent[0][0].payload.preferences;
+  assert.equal(preferences.nativeVideoId, id);
+  assert.equal(preferences.nativeAdInactive, true);
+  assert.equal(preferences.audioTrackId, 'es.1');
+  assert.equal(preferences.captionTrackId, '.es');
+});
+
+for (const [name, api] of [
+  ['missing API', undefined], ['active advertisement', () => 1], ['other native state', () => 0],
+  ['string minus one', () => '-1'], ['null state', () => null], ['throwing API', () => { throw Error('unavailable'); }]
+]) test('native UX observation remains unknown when ad state lacks strict evidence: ' + name, () => {
+  const state = nativeFixture({ player: { getAdState: api } }); state.read();
+  const preferences = state.sent[0][0].payload.preferences;
+  assert.equal(preferences.nativeAdInactive, false);
+  assert.equal(preferences.nativeVideoId, id);
+  assert.equal(preferences.audioTrackId, 'es.1');
+  assert.equal(preferences.captionTrackId, '.es');
+});
+
+for (const [name, getter, expected] of [
+  ['missing native response API', undefined, ''],
+  ['malformed native id', () => ({ videoDetails: { videoId: 'short' } }), ''],
+  ['foreign native id', () => ({ videoDetails: { videoId: 'foreign0001' } }), 'foreign0001'],
+  ['native response API throws', () => { throw Error('transient native failure'); }, '']
+]) test('native UX identity never infers current playback from watch-response fallback: ' + name, () => {
+  const state = fixture({ player: { getPlayerResponse: getter, getAdState: () => -1 } }); state.request();
+  const { playerResponse, preferences } = state.sent[0][0].payload;
+  assert.equal(playerResponse.videoDetails.videoId, id, 'watch metadata still provides bounded source context');
+  assert.equal(preferences.nativeVideoId, expected);
+  assert.equal(preferences.nativeVideoId === id && preferences.nativeAdInactive, false);
+  assert.equal(preferences.audioTrackId, 'es.1');
+  assert.equal(preferences.captionTrackId, '.es');
 });

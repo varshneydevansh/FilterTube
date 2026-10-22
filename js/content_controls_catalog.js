@@ -208,6 +208,11 @@
                     description: 'Disable or suppress autoplay UI'
                 },
                 {
+                    key: 'contentOnlyPlayback',
+                    title: 'Content-only playback (Experimental)',
+                    description: 'On by default with advert filtering. Choose a main-video source automatically when needed on desktop YouTube, keeping its controls and playlist. If playback has trouble, turn off and reload the video.'
+                },
+                {
                     key: 'alwaysUseOriginalAudio',
                     title: 'Always Use Original Audio (Experimental)',
                     description: 'Prefer the creator\'s original audio track instead of an automatic dub'

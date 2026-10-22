@@ -29,9 +29,9 @@ function adaptiveResponse(extraAudio = []) {
   return { videoDetails: { videoId: id, lengthSeconds: '180' }, playabilityStatus: { status: 'OK' },
     streamingData: { adaptiveFormats: [format('video'), format('audio', 'en.4'), ...extraAudio.map(track => format('audio', track))] } };
 }
-function fixture({ child = false, decision = 'allowed', paused = false, deferNative = false } = {}) {
+function fixture({ child = false, decision = 'allowed', paused = false, deferNative = false, playback = undefined } = {}) {
   let at = 10000, serial = 0, nativeVideo, targetReady = true, fresh = adaptiveResponse(), fetchDelegate = null;
-  const timers = new Map(), messages = [], calls = [], created = [], fetches = [], actions = new WeakSet();
+  const timers = new Map(), messages = [], calls = [], created = [], fetches = [];
   const rootListeners = new Map(), docListeners = new Map(), playerClasses = new Set();
   const target = new Element('section'), surface = new Element('div'), parent = new Element('div'); parent.appendChild(surface);
   const original = { duration: 180, currentTime: 25, volume: 0.7, playbackRate: 1.25, muted: false, paused, pauseCalls: 0, playCalls: 0,
@@ -48,10 +48,11 @@ function fixture({ child = false, decision = 'allowed', paused = false, deferNat
         ? { responseContext: { visitorData: 'opaque-test-visitor' } } : fresh), { headers: { 'content-type': 'application/json' } }));
     } };
   const settings = { enabled: true, hideSponsoredCards: true, activeProfileId: child ? 'child-a' : 'parent-a',
+    ...(playback === undefined ? {} : { contentOnlyPlayback: playback }),
     activeProfileKind: child ? 'child' : 'account', profileType: 'main', videoMetaMap: {} };
   root.__filtertubeDirectAccessState = { videoId: id, decision, routeTransitionPending: false, latestSettings: settings };
   const document = { documentElement: new Element('html'),
-    querySelector: selector => selector.includes('video.html5-main-video') ? nativeVideo : selector.includes('#above-the-fold') && targetReady ? target : null,
+    querySelector: selector => selector.includes('video.html5-main-video') ? (targetReady ? nativeVideo : null) : selector.includes('#above-the-fold') && targetReady ? target : null,
     getElementById: value => value === 'movie_player' ? surface : null,
     createElement(tag) { const node = new Element(tag); created.push(node); return node; },
     addEventListener(name, callback) { docListeners.set(name, callback); },
@@ -79,8 +80,6 @@ function fixture({ child = false, decision = 'allowed', paused = false, deferNat
   // native controller is the explicit boundary mock; its separate suite owns
   // MAIN cue acknowledgements, guard installation and actual media events.
   root.FilterTubeContentPlaybackNative = {
-    captureTrustedAction(event, videoId) { if (!event.isTrusted || videoId !== id) return null;
-      const token = Object.freeze({}); actions.add(token); return token; },
     create(options) {
       assert.equal(options.originalVideo, original); assert.equal(options.originalSurface, surface);
       const record = { options, input: null, closed: false, handedOff: false }; calls.push(record);
@@ -91,7 +90,8 @@ function fixture({ child = false, decision = 'allowed', paused = false, deferNat
           assert.equal(input.videoId, id); assert.equal(input.playbackIntent.videoId, id);
           assert.equal(input.source.kind, 'adaptive_mp4');
           assert.equal(input.preferences.audioKnown, true); assert.equal(input.preferences.captionsKnown, true);
-          assert.ok(actions.has(input.actionToken), 'a trusted captured action must reach the native transaction'); actions.delete(input.actionToken);
+          assert.equal(input.mode, 'automatic'); assert.equal(input.actionToken, undefined);
+          assert.equal(options.allowAutomaticStart({ videoId: id, lease: input.lease }), true, 'only current isolated preference may authorize automatic preparation');
           assert.equal(options.validateLease(input.lease), true, 'real admission must validate its own opaque token');
           const result = new Promise(resolve => { finish = resolve; });
           if (!deferNative) complete(); return result;
@@ -119,8 +119,15 @@ function fixture({ child = false, decision = 'allowed', paused = false, deferNat
   root.FilterTubeContentPlaybackPlayer = { create() { throw new Error('a competing owned player must not be created'); } };
   root.FilterTubeContentPlaybackCaptions = { prepare() { throw new Error('native captions must not be rebuilt'); } };
   vm.runInContext(fs.readFileSync('js/content/content_playback.js', 'utf8'), context, { filename: 'js/content/content_playback.js' });
-  const button = () => created.find(node => node.tagName === 'button' && node.isConnected);
-  const click = async (trusted = true) => { button().listeners.get('click')({ isTrusted: trusted }); await flush(); };
+  const refresh = async () => { root.FilterTubeContentPlayback.refresh(); await flush(); };
+  const runDelay = async delay => { const item = [...timers].find(([, value]) => !value.interval && value.delay === delay); assert.ok(item, `pending delay ${delay}`);
+    timers.delete(item[0]);
+    for (let elapsed = 0; elapsed < delay; elapsed += 250) {
+      at += Math.min(250, delay - elapsed);
+      for (const timer of [...timers.values()]) if (timer.interval) timer.callback();
+      await flush();
+    }
+    item[1].callback(); await flush(); };
   const response = (overrides = {}) => {
     const request = messages.at(-1)?.payload; assert.ok(request, 'a source request must exist');
     const payload = { requestId: request.requestId, videoId: request.videoId,
@@ -133,7 +140,7 @@ function fixture({ child = false, decision = 'allowed', paused = false, deferNat
       data: { type: 'FilterTube_ContentPlaybackResponse', source: 'injector', payload } }); return payload;
   };
   return { root, context, document, settings, timers, messages, calls, created, original, surface, parent, fetches,
-    button, click, response, playerClasses, setTargetReady: value => { targetReady = value; },
+    refresh, runDelay, response, playerClasses, setTargetReady: value => { targetReady = value; },
     replaceNativeVideo: value => { nativeVideo = value; }, setFresh: value => { fresh = value; },
     setFetch: value => { fetchDelegate = value; }, setCategory: value => { category = value; }, setLanguage: value => { language = value; },
     init: () => root.FilterTubeContentPlayback.initialize(),
@@ -144,7 +151,7 @@ function fixture({ child = false, decision = 'allowed', paused = false, deferNat
     emit: payload => rootListeners.get('message')?.({ source: root, origin: context.location.origin, data: payload }) };
 }
 
-async function begin(state, response) { state.init(); await state.click(); state.response(response); await flush(); }
+async function begin(state, response) { state.init(); await flush(); state.response(response); await flush(); }
 function noReplacementPlayer(state) {
   assert.equal(state.created.some(node => node.tagName === 'video'), false);
   assert.equal(state.created.some(node => node.hasAttribute('data-filtertube-content-player-host')), false);
@@ -152,14 +159,18 @@ function noReplacementPlayer(state) {
   assert.ok(state.fetches.every(call => /\/youtubei\/v1\/(?:visitor_id|player)\?/.test(String(call.url))), 'no caption or media fetch belongs to this coordinator');
 }
 
-test('initialization and untrusted clicks do not resolve media or change ordinary playback', async () => {
-  const state = fixture(); state.init(); await flush(); assert.ok(state.button()); await state.click(false);
-  assert.equal(state.messages.length, 0); assert.equal(state.fetches.length, 0); assert.equal(state.calls.length, 0);
-  assert.equal(state.original.pauseCalls, 0); noReplacementPlayer(state);
+test('default-on initialization prepares automatically without creating foreground UI', async () => {
+  const state = fixture(); state.init(); await flush();
+  assert.equal(state.messages.length, 1); assert.equal(state.fetches.length, 0); assert.equal(state.calls.length, 0);
+  assert.equal(state.created.length, 0); assert.equal(state.original.pauseCalls, 0); noReplacementPlayer(state);
+});
+test('explicit off starts no metadata discovery or timer', async () => {
+  const state = fixture({ playback: false }); state.init(); await state.refresh();
+  assert.equal(state.messages.length, 0); assert.equal(state.timers.size, 0); assert.equal(state.created.length, 0);
 });
 for (const decision of ['pending', 'blocked']) {
   test(`a child ${decision} decision cannot request or resolve a media source`, async () => {
-    const state = fixture({ child: true, decision }); state.init(); await state.click();
+    const state = fixture({ child: true, decision }); state.init(); await state.refresh();
     assert.equal(state.messages.length, 0); assert.equal(state.fetches.length, 0); assert.equal(state.calls.length, 0);
   });
 }
@@ -184,15 +195,20 @@ for (const paused of [true, false]) {
 test('unsolicited MAIN permission and forged lease fields never replace isolated admission', async () => {
   const state = fixture({ child: true, decision: 'blocked' }); state.init();
   state.emit({ type: 'FilterTube_AllowPlayback', source: 'injector', payload: { allowed: true, videoId: id, lease: { expiresAt: 999999 } } });
-  await state.click(); assert.equal(state.messages.length, 0); assert.equal(state.calls.length, 0);
+  await state.refresh(); assert.equal(state.messages.length, 0); assert.equal(state.calls.length, 0);
 });
 for (const cause of ['navigation', 'profile change']) {
-  test(`late source reply after ${cause} cannot begin a native transaction`, async () => {
-    const state = fixture(); state.init(); await state.click();
+  test(`late source reply after ${cause} cannot authorize the old native transaction`, async () => {
+    const state = fixture(); state.init(); await flush(); const prior = { ...state.messages.at(-1).payload };
     if (cause === 'navigation') state.navigate();
     else { state.context.currentSettings = { ...state.settings, activeProfileId: 'child-b', activeProfileKind: 'child' };
       state.root.FilterTubeContentPlayback.invalidate('settings_changed'); }
-    state.response(); await flush(); assert.equal(state.calls.length, 0); assert.equal(state.fetches.length, 0); assert.equal(state.timers.size, 0);
+    await flush();
+    state.emit({ type: 'FilterTube_ContentPlaybackResponse', source: 'injector', payload: { ...prior,
+      playerResponse: adaptiveResponse(), preferences: { audioKnown: true, captionsKnown: true } } });
+    await flush(); assert.equal(state.calls.length, 0); assert.equal(state.fetches.length, 0);
+    if (cause === 'navigation') assert.equal(state.timers.size, 0);
+    else assert.notEqual(state.messages.at(-1).payload.requestId, prior.requestId, 'the new profile needs a fresh request');
   });
 }
 for (const feature of ['audioKnown', 'captionsKnown']) {
@@ -203,19 +219,19 @@ for (const feature of ['audioKnown', 'captionsKnown']) {
 }
 test('native overlay ownership prevents source requests', async () => {
   const state = fixture(); state.document.documentElement.setAttribute('data-filtertube-native-overlay-covered', 'true');
-  state.init(); await state.click(); assert.equal(state.messages.length, 0); assert.equal(state.calls.length, 0);
+  state.init(); await state.refresh(); assert.equal(state.messages.length, 0); assert.equal(state.calls.length, 0);
 });
 for (const field of ['categoryFilters', 'languageFilters']) {
   test(`unresolved enabled ${field} cannot refresh the source`, async () => {
     const state = fixture({ child: true }); state.settings[field] = { enabled: true };
     if (field === 'categoryFilters') state.setCategory('unknown'); else state.setLanguage('unknown');
-    state.init(); await state.click(); assert.equal(state.messages.length, 0); assert.equal(state.calls.length, 0);
+    state.init(); await state.refresh(); assert.equal(state.messages.length, 0); assert.equal(state.calls.length, 0);
   });
 }
 test('a current category guard pause cannot be bypassed by fresh media resolution', async () => {
   const state = fixture({ child: true }); state.settings.categoryFilters = { enabled: true }; state.setCategory('allowed');
   state.root.__filtertubeCurrentWatchCategoryState = { videoId: id, pausedByGuard: true };
-  state.init(); await state.click(); assert.equal(state.messages.length, 0);
+  state.init(); await state.refresh(); assert.equal(state.messages.length, 0);
 });
 
 test('a child with no configured time policy can make the same admitted native handoff', async () => {
@@ -224,7 +240,7 @@ test('a child with no configured time policy can make the same admitted native h
 test('configured child time limits require a fresh authoritative permit before source discovery', async () => {
   const state = fixture({ child: true }); state.settings.managedTimeLimitPolicy = { schema: 'filtertube_managed_time_limit', version: 1,
     enabled: true, profileId: state.settings.activeProfileId, policyRevision: 1, policyHash: 'known' };
-  state.init(); await state.click(); assert.equal(state.messages.length, 0); assert.equal(state.calls.length, 0);
+  state.init(); await state.refresh(); assert.equal(state.messages.length, 0); assert.equal(state.calls.length, 0);
 });
 test('loss of a fresh child time allowance cancels a native transaction before handoff', async () => {
   const state = fixture({ child: true, deferNative: true });
@@ -256,45 +272,50 @@ test('independent source refresh during an advert carries zero content position'
   state.root.FilterTubeContentPlayback.invalidate('user_close'); await flush();
 });
 
-test('a source timeout removes discovery timers and leaves native controls untouched', async () => {
-  const state = fixture(); state.init(); await state.click();
-  const timeout = [...state.timers].find(([, timer]) => !timer.interval && timer.delay === 3000); assert.ok(timeout);
-  state.timers.delete(timeout[0]); timeout[1].callback(); await flush();
-  assert.equal(state.calls.length, 0); assert.equal(state.original.pauseCalls, 0); assert.equal(state.timers.size, 0);
+test('metadata timeouts retry only three times and leave native controls untouched', async () => {
+  const state = fixture(); state.init(); await flush();
+  for (let attempt = 0; attempt < 3; attempt++) {
+    await state.runDelay(3000);
+    if (attempt < 2) await state.runDelay(500);
+  }
+  await state.refresh();
+  assert.equal(state.messages.length, 3); assert.equal(state.calls.length, 0); assert.equal(state.fetches.length, 0);
+  assert.equal(state.original.pauseCalls, 0); assert.equal(state.timers.size, 0);
 });
-test('Cancel before the metadata reply ignores its eventual completion', async () => {
-  const state = fixture(); state.init(); await state.click(); assert.equal(state.button().textContent, 'Cancel'); await state.click();
+test('turning off before metadata reply cancels its eventual completion', async () => {
+  const state = fixture(); state.init(); await flush(); state.settings.contentOnlyPlayback = false;
+  state.root.FilterTubeContentPlayback.invalidate('settings_changed'); await flush();
   state.response(); await flush(); assert.equal(state.calls.length, 0); assert.equal(state.timers.size, 0); assert.equal(state.original.pauseCalls, 0);
 });
-test('Cancel during source extraction aborts it and cannot start a late native transaction', async () => {
+test('turning off during source extraction aborts it and cannot start a late native transaction', async () => {
   const state = fixture(); let resolve, request;
   state.setFetch((url, options) => { request = options; return new Promise(done => { resolve = done; }); });
-  state.init(); await state.click(); state.response(); await flush(); assert.ok(request); assert.equal(request.signal.aborted, false);
-  await state.click(); assert.equal(request.signal.aborted, true);
+  state.init(); await state.refresh(); state.response(); await flush(); assert.ok(request); assert.equal(request.signal.aborted, false);
+  state.settings.contentOnlyPlayback = false; state.root.FilterTubeContentPlayback.invalidate('settings_changed'); await flush(); assert.equal(request.signal.aborted, true);
   resolve(new Response(JSON.stringify({ responseContext: { visitorData: 'late' } }), { headers: { 'content-type': 'application/json' } }));
   await flush(); assert.equal(state.calls.length, 0); assert.equal(state.timers.size, 0); assert.equal(state.original.pauseCalls, 0);
 });
 test('trusted native interaction cancels preparation while preserving the latest position', async () => {
-  const state = fixture(); state.init(); await state.click(); state.interact(false);
+  const state = fixture(); state.init(); await state.refresh(); state.interact(false);
   state.original.currentTime = 50; state.interact(true);
   state.response(); await flush(); assert.equal(state.calls.length, 0); assert.equal(state.original.currentTime, 50);
   assert.equal(state.original.pauseCalls, 0); assert.equal(state.timers.size, 0);
 });
 test('trusted input outside the native player does not cancel its pending source refresh', async () => {
-  const state = fixture(); state.init(); await state.click(); state.interact(true, state.button());
+  const state = fixture(); state.init(); await state.refresh(); state.interact(true, state.document.documentElement);
   assert.equal(state.hasNativeInputGuard(), true); state.response(); await flush();
   assert.equal(state.calls.length, 1); assert.equal(state.calls[0].handedOff, true); assert.equal(state.hasNativeInputGuard(), false);
 });
 
 test('trusted native keyboard input cancels preparation and removes its capture guard', async () => {
-  const state = fixture(); state.init(); await state.click(); state.interact(true, state.original, 'keydown');
+  const state = fixture(); state.init(); await state.refresh(); state.interact(true, state.original, 'keydown');
   state.response(); await flush(); assert.equal(state.calls.length, 0); assert.equal(state.hasNativeInputGuard(), false);
   assert.equal(state.original.pauseCalls, 0); assert.equal(state.timers.size, 0);
 });
 
 test('an old metadata reply cannot satisfy a replacement source request', async () => {
-  const state = fixture(); state.init(); await state.click(); const old = { ...state.messages.at(-1).payload };
-  state.root.FilterTubeContentPlayback.invalidate('settings_changed'); await flush(); await state.click();
+  const state = fixture(); state.init(); await state.refresh(); const old = { ...state.messages.at(-1).payload };
+  state.root.FilterTubeContentPlayback.invalidate('settings_changed'); await flush(); await state.refresh();
   state.emit({ type: 'FilterTube_ContentPlaybackResponse', source: 'injector', payload: { ...old, playerResponse: adaptiveResponse() } });
   await flush(); assert.equal(state.calls.length, 0); state.response(); await flush(); assert.equal(state.calls.length, 1);
 });
@@ -334,14 +355,131 @@ test('post-handoff playlist/autoplay stays with native guards rather than a priv
   assert.equal(nextClicks, 0); assert.equal(state.calls[0].stopped, undefined); assert.equal(state.timers.size, 0);
 });
 
-test('late watch UI mounting retries briefly and stops after mounting once', async () => {
-  const state = fixture(); state.setTargetReady(false); state.init(); assert.equal(state.button(), undefined); assert.equal(state.timers.size, 1);
-  state.setTargetReady(true); const [key, timer] = [...state.timers][0]; assert.equal(timer.delay, 500);
-  state.timers.delete(key); timer.callback(); await flush(); assert.ok(state.button()); assert.equal(state.timers.size, 0);
-  assert.equal(state.messages.length, 0); assert.equal(state.calls.length, 0);
+test('late native media mounting retries briefly without adding foreground UI', async () => {
+  const state = fixture(); state.setTargetReady(false); state.init(); assert.equal(state.timers.size, 1);
+  state.setTargetReady(true); await state.runDelay(500); assert.equal(state.messages.length, 1);
+  state.response(); await flush(); assert.equal(state.calls.length, 1); assert.equal(state.timers.size, 0); assert.equal(state.created.length, 0);
 });
-test('missing watch UI retries are bounded and navigation clears the pending retry', () => {
+test('missing native media waits at most fifteen seconds and navigation clears retries', async () => {
   const state = fixture(); state.setTargetReady(false); state.init(); let count = 0;
-  while (state.timers.size) { const [key, timer] = [...state.timers][0]; state.timers.delete(key); timer.callback(); count++; assert.ok(count <= 20); }
-  assert.equal(count, 20); const other = fixture(); other.setTargetReady(false); other.init(); other.navigate(); assert.equal(other.timers.size, 0);
+  while (state.timers.size) { await state.runDelay(500); count++; assert.ok(count <= 30); }
+  assert.equal(count, 30); const other = fixture(); other.setTargetReady(false); other.init(); other.navigate(); assert.equal(other.timers.size, 0);
+});
+
+test('metadata and same-profile settings refreshes never reload an already handed-off video', async () => {
+  const state = fixture(); await begin(state); const requests = state.messages.length, fetches = state.fetches.length;
+  for (let index = 0; index < 4; index++) {
+    state.context.currentSettings = { ...state.context.currentSettings, videoMetaMap: { [id]: { category: 'Music', sequence: index } } };
+    state.root.FilterTubeContentPlayback.invalidate('settings_changed'); await state.refresh();
+  }
+  assert.equal(state.calls.length, 1); assert.equal(state.messages.length, requests); assert.equal(state.fetches.length, fetches);
+  assert.equal(state.original.pauseCalls, 0); assert.equal(state.timers.size, 0); assert.equal(state.created.length, 0);
+});
+
+test('explicit off then on permits one fresh attempt on the same route', async () => {
+  const state = fixture(); await begin(state);
+  state.settings.contentOnlyPlayback = false; state.root.FilterTubeContentPlayback.invalidate('storage_settings_changed'); await flush();
+  assert.equal(state.messages.length, 1); assert.equal(state.original.pauseCalls, 0);
+  state.settings.contentOnlyPlayback = true; state.root.FilterTubeContentPlayback.invalidate('settings_changed'); await flush();
+  assert.equal(state.messages.length, 2); state.response(); await flush(); assert.equal(state.calls.length, 2);
+  await state.refresh(); assert.equal(state.calls.length, 2);
+});
+
+test('a resolver failure cannot become a refresh loop', async () => {
+  const state = fixture(); state.setFresh({ ...adaptiveResponse(), playabilityStatus: { status: 'LOGIN_REQUIRED' } }); await begin(state);
+  const requests = state.messages.length, fetches = state.fetches.length;
+  for (let count = 0; count < 5; count++) { state.root.FilterTubeContentPlayback.invalidate('settings_changed'); await state.refresh(); }
+  assert.equal(state.messages.length, requests); assert.equal(state.fetches.length, fetches); assert.equal(state.calls.length, 0);
+  assert.equal(state.timers.size, 0); assert.equal(state.original.pauseCalls, 0);
+});
+
+test('native controls cancel preflight and prevent automatic restart on metadata updates', async () => {
+  const state = fixture(); state.init(); await flush(); state.interact(true);
+  await state.refresh(); state.root.FilterTubeContentPlayback.invalidate('settings_changed'); await state.refresh();
+  assert.equal(state.messages.length, 1); assert.equal(state.fetches.length, 0); assert.equal(state.timers.size, 0);
+});
+
+test('fresh managed allowance can wake a waiting route after its polling window', async () => {
+  const state = fixture({ child: true });
+  state.settings.managedTimeLimitPolicy = { schema: 'filtertube_managed_time_limit', version: 1, enabled: true, profileId: state.settings.activeProfileId, policyRevision: 1, policyHash: 'known' };
+  let permit = null; state.root.FilterTubeManagedPlaybackPermit = { read: () => permit };
+  state.init(); await flush();
+  while (state.timers.size) await state.runDelay(500);
+  assert.equal(state.messages.length, 0);
+  permit = Object.freeze({ decision: 'allowed', videoId: id, profileId: state.settings.activeProfileId,
+    policyRevision: 1, policyHash: 'known', expiresAt: 30000 });
+  await state.refresh(); assert.equal(state.messages.length, 1); state.response(); await flush();
+  assert.equal(state.calls.length, 1); assert.equal(state.timers.size, 0);
+});
+
+test('turning off during native preparation revokes automatic authority immediately', async () => {
+  const state = fixture({ deferNative: true }); await begin(state); const transaction = state.calls[0];
+  state.settings.contentOnlyPlayback = false;
+  assert.equal(transaction.options.allowAutomaticStart({ videoId: id, lease: transaction.input.lease }), false);
+  state.root.FilterTubeContentPlayback.invalidate('storage_settings_changed'); await flush(); transaction.complete(); await flush();
+  assert.equal(transaction.handedOff, false); assert.equal(state.original.paused, true); assert.equal(state.timers.size, 0);
+});
+
+for (const kind of ['direct', 'category']) {
+  test(`${kind} invalidation preserves bounded admission polling without granting permission`, async () => {
+    const state = fixture({ child: true, decision: kind === 'direct' ? 'pending' : 'allowed' });
+    if (kind === 'category') { state.settings.categoryFilters = { enabled: true }; state.setCategory('unknown'); }
+    state.init(); await flush(); assert.equal(state.timers.size, 1);
+    state.root.FilterTubeContentPlayback.invalidate(`${kind}_admission_changed`); await flush();
+    assert.equal(state.timers.size, 1); assert.equal(state.messages.length, 0);
+    while (state.timers.size) await state.runDelay(500);
+    assert.equal(state.messages.length, 0); assert.equal(state.fetches.length, 0); assert.equal(state.calls.length, 0);
+    // An allow-shaped page message is media data, never an admission decision.
+    state.emit({ type: 'FilterTube_AllowPlayback', source: 'injector', payload: { allowed: true, videoId: id } });
+    await state.refresh(); assert.equal(state.messages.length, 0);
+    // The trusted existing guard must update its own state before its refresh.
+    if (kind === 'direct') state.root.__filtertubeDirectAccessState.decision = 'allowed';
+    else state.setCategory('allowed');
+    await state.refresh(); assert.equal(state.messages.length, 1); state.response(); await flush();
+    assert.equal(state.calls.length, 1); assert.equal(state.timers.size, 0);
+  });
+}
+
+for (const paused of [false, true]) {
+  test(`healthy admitted native content stays untouched without fresh extraction (paused=${paused})`, async () => {
+    const state = fixture({ paused }); state.original.readyState = 4;
+    await begin(state, { preferences: { audioKnown: true, audioTrackCount: 1, audioTrackId: 'en.4', audioTracks: [{ id: 'en.4' }],
+      captionsKnown: true, captionsEnabled: false, nativeVideoId: id, nativeAdInactive: true } });
+    assert.equal(state.messages.length, 1); assert.equal(state.fetches.length, 0); assert.equal(state.calls.length, 0);
+    assert.equal(state.original.pauseCalls, 0); assert.equal(state.original.playCalls, 0); assert.equal(state.original.paused, paused);
+    assert.equal(state.document.documentElement.attributes.get('data-filtertube-content-playback-state'), 'native_ready');
+    assert.equal(state.timers.size, 0); await state.refresh(); assert.equal(state.messages.length, 1); noReplacementPlayer(state);
+  });
+}
+
+for (const [name, options] of [
+  ['unknown native ad state', { nativeAdInactive: undefined }],
+  ['mismatched native video', { nativeVideoId: 'lmnopqrstuv' }],
+  ['unbuffered native media', { readyState: 2 }],
+  ['startup content position', { currentTime: 0 }]
+]) {
+  test(`${name} cannot be mistaken for healthy main content`, async () => {
+    const state = fixture(); state.original.readyState = options.readyState ?? 4;
+    state.original.currentTime = options.currentTime ?? 25;
+    const preferences = { audioKnown: true, audioTrackCount: 1, audioTrackId: 'en.4', audioTracks: [{ id: 'en.4' }],
+      captionsKnown: true, captionsEnabled: false, nativeVideoId: id, nativeAdInactive: true };
+    for (const key of ['nativeAdInactive', 'nativeVideoId']) if (Object.hasOwn(options, key)) preferences[key] = options[key];
+    await begin(state, { preferences }); assert.equal(state.fetches.length, 2); assert.equal(state.calls.length, 1);
+  });
+}
+
+test('native content becoming healthy during source resolution avoids a late reload', async () => {
+  const state = fixture(); state.original.readyState = 2; state.original.currentTime = 0;
+  let finishVisitor;
+  state.setFetch(url => String(url).includes('/visitor_id')
+    ? new Promise(resolve => { finishVisitor = resolve; })
+    : Promise.resolve(new Response(JSON.stringify(adaptiveResponse()), { headers: { 'content-type': 'application/json' } })));
+  state.init(); await flush(); state.response({ preferences: { audioKnown: true, audioTrackCount: 1, audioTrackId: 'en.4', audioTracks: [{ id: 'en.4' }],
+    captionsKnown: true, captionsEnabled: false, nativeVideoId: id, nativeAdInactive: true } });
+  await flush(); assert.equal(state.fetches.length, 1);
+  state.original.readyState = 4; state.original.currentTime = 20;
+  finishVisitor(new Response(JSON.stringify({ responseContext: { visitorData: 'test-visitor' } }), { headers: { 'content-type': 'application/json' } }));
+  await flush(); assert.equal(state.calls.length, 0); assert.equal(state.original.pauseCalls, 0); assert.equal(state.original.playCalls, 0);
+  assert.equal(state.document.documentElement.attributes.get('data-filtertube-content-playback-state'), 'native_ready');
+  assert.equal(state.timers.size, 0);
 });

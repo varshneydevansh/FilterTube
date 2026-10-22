@@ -1653,6 +1653,7 @@ function clearDirectAccessOverlay() {
 
 function releaseDirectAccessGuard(videoId, resumePlayback = true) {
     const state = getDirectAccessState();
+    const playbackNeedsRefresh = state.decision !== 'allowed' || state.videoId !== (videoId || '');
     if (state.recheckTimer) {
         clearTimeout(state.recheckTimer);
         state.recheckTimer = 0;
@@ -1671,6 +1672,9 @@ function releaseDirectAccessGuard(videoId, resumePlayback = true) {
     state.pendingStartedAt = 0;
     state.pausedByGuard = false;
     state.wasPlaying = false;
+    if (playbackNeedsRefresh) {
+        try { queueMicrotask(() => window.FilterTubeContentPlayback?.refresh?.()); } catch (_) {}
+    }
     if (!shouldResume) return;
     try {
         const playPromise = document.querySelector('video.html5-main-video, video')?.play?.();
@@ -2540,6 +2544,7 @@ function releaseCurrentWatchCategoryGuard(videoId, resumePlayback = true) {
     const state = window.__filtertubeCurrentWatchCategoryState;
     clearCurrentWatchCategoryOverlay();
     if (!state) return;
+    const playbackNeedsRefresh = state.pausedByGuard === true;
 
     const shouldResume = Boolean(
         resumePlayback &&
@@ -2552,6 +2557,9 @@ function releaseCurrentWatchCategoryGuard(videoId, resumePlayback = true) {
     state.pendingStartedAt = 0;
     state.pausedByGuard = false;
     state.wasPlaying = false;
+    if (playbackNeedsRefresh) {
+        try { queueMicrotask(() => window.FilterTubeContentPlayback?.refresh?.()); } catch (_) {}
+    }
     if (!shouldResume) return;
 
     try {

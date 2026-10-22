@@ -4,6 +4,8 @@ Current status: the separate-player pilot failed installed acceptance (Shakira m
 
 The sections through the owned-resolver/MSE follow-on retain historical implementations. The superseding native-player section below records the current direction and its evidence boundaries. This is not Android playback parity or a guarantee against future YouTube changes. No publish, push, native-runtime synchronization or external issue posting is authorized.
 
+The subsequent automatic preference and playlist correction are documented in [Automatic native playback — 2026-10-23](CONTENT_ONLY_PLAYBACK_AUTOMATION_2026-10-23.md). The per-video UX described below is historical.
+
 ## User experience and default behavior
 
 On desktop `www.youtube.com/watch`, enabled FilterTube with sponsored filtering offers a closed **FilterTube playback options** disclosure. **Try content player (experimental)** requests a source only after the user chooses it and existing profile admission permits the video. The user can cancel while checking/preparing, or return to YouTube's player afterward. No automatic player replacement, new host permission, remote library or account mutation is introduced. Mobile, Kids, embeds, live/protected streams and unsupported source/feature combinations retain their existing playback path.

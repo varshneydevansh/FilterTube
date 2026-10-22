@@ -1,0 +1,29 @@
+{
+  "date": "2026-10-23",
+  "scope": "Local source and packages; installed automatic/native playlist validation awaits manual extension reload",
+  "smoke": {
+    "passed": 954,
+    "failed": 0
+  },
+  "releasePackage": {
+    "passed": 259,
+    "failed": 0
+  },
+  "settings": {
+    "passed": 645,
+    "failed": 95,
+    "total": 740,
+    "comparisonToPrior": {
+      "currentFailures": 95,
+      "baselineFailures": 95,
+      "newFailureTitles": [],
+      "noLongerFailingTitles": []
+    }
+  },
+  "uiLocaleStructure": "passed; not full translation coverage",
+  "sourceStageZipMatch": true,
+  "installedAutomaticAcceptance": false,
+  "installedParentChildAcceptance": false,
+  "installedFirefoxAcceptance": false,
+  "published": false
+}

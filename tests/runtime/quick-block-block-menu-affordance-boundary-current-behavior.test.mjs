@@ -208,11 +208,11 @@ test('quick-block/block-menu affordance audit is audit-only and source pinned', 
   assert.match(doc, /quick-block\/block-menu affordance boundary source files: 7/);
   assert.match(doc, /runtime quick-block\/block-menu affordance fixtures: 7/);
 
-  assert.ok(doc.includes(`| \`js/content_controls_catalog.js\` | 299 | 12438 | \`${sha256('js/content_controls_catalog.js')}\` |`));
-  assert.ok(doc.includes(`| \`js/settings_shared.js\` | 1313 | 66857 | \`${sha256('js/settings_shared.js')}\` |`));
-  assert.ok(doc.includes(`| \`js/background.js\` | 8538 | 386043 | \`${sha256('js/background.js')}\` |`));
-  assert.ok(doc.includes(`| \`js/content/bridge_settings.js\` | 2236 | 100980 | \`${sha256('js/content/bridge_settings.js')}\` |`));
-  assert.ok(doc.includes(`| \`js/state_manager.js\` | 2979 | 124009 | \`${sha256('js/state_manager.js')}\` |`));
+  assert.ok(doc.includes(`| \`js/content_controls_catalog.js\` | 304 | 12826 | \`${sha256('js/content_controls_catalog.js')}\` |`));
+  assert.ok(doc.includes(`| \`js/settings_shared.js\` | 1327 | 67805 | \`${sha256('js/settings_shared.js')}\` |`));
+  assert.ok(doc.includes(`| \`js/background.js\` | 8546 | 386625 | \`${sha256('js/background.js')}\` |`));
+  assert.ok(doc.includes(`| \`js/content/bridge_settings.js\` | 2238 | 101092 | \`${sha256('js/content/bridge_settings.js')}\` |`));
+  assert.ok(doc.includes(`| \`js/state_manager.js\` | 2984 | 124258 | \`${sha256('js/state_manager.js')}\` |`));
   assert.ok(doc.includes(`| \`js/content/block_channel.js\` | 3361 | 135050 | \`${sha256('js/content/block_channel.js')}\` |`));
   assert.ok(doc.includes(`| \`js/content_bridge.js\` | 15056 | 678414 | \`${sha256('js/content_bridge.js')}\` |`));
 
@@ -285,13 +285,13 @@ test('quick-block/block-menu source counts remain pinned', () => {
   const blocks = sourceBlocks();
   const countRows = [
     ['catalog feed affordance controls block', blocks.catalogFeedAffordanceControls, 10, 488],
-    ['settings_shared settings keys block', blocks.sharedSettingsKeys, 43, 1170],
+    ['settings_shared settings keys block', blocks.sharedSettingsKeys, 44, 1201],
     ['settings_shared affordance compile block', blocks.sharedAffordanceCompile, 2, 126],
-    ['background boolean pass-through block', blocks.bgBooleanPassThrough, 37, 3832],
-    ['background storage refresh keys block', blocks.bgRefreshKeys, 19, 559],
-    ['content bridge storage refresh keys block', blocks.bridgeRefreshKeys, 46, 1322],
-    ['state manager valid setting keys block', blocks.stateValidKeys, 35, 1130],
-    ['state manager external reload keys block', blocks.stateExternalReloadKeys, 46, 1803],
+    ['background boolean pass-through block', blocks.bgBooleanPassThrough, 38, 3983],
+    ['background storage refresh keys block', blocks.bgRefreshKeys, 20, 594],
+    ['content bridge storage refresh keys block', blocks.bridgeRefreshKeys, 47, 1353],
+    ['state manager valid setting keys block', blocks.stateValidKeys, 36, 1165],
+    ['state manager external reload keys block', blocks.stateExternalReloadKeys, 47, 1846],
     ['quick block card selectors block', blocks.quickBlockSelectors, 60, 2088],
     ['quick block enabled gate block', blocks.quickBlockEnabledGate, 91, 3025],
     ['quick block setup lifecycle block', blocks.quickBlockSetupLifecycle, 320, 13892],

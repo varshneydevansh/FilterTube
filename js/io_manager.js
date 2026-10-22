@@ -1760,6 +1760,7 @@
                     hideComments: !!mainSettings?.hideComments,
                     hideHomeFeed: !!mainSettings?.hideHomeFeed,
                     hideSponsoredCards: !!mainSettings?.hideSponsoredCards,
+                    contentOnlyPlayback: mainSettings?.contentOnlyPlayback !== false,
                     hidePlayables: !!mainSettings?.hidePlayables,
                     hideWatchPlaylistPanel: !!mainSettings?.hideWatchPlaylistPanel,
                     hidePlaylistCards: !!mainSettings?.hidePlaylistCards,
@@ -2486,6 +2487,7 @@
             hideComments: Object.prototype.hasOwnProperty.call(mainSettingsOverrides, 'hideComments') ? !!mainSettingsOverrides.hideComments : current.hideComments,
             hideHomeFeed: Object.prototype.hasOwnProperty.call(mainSettingsOverrides, 'hideHomeFeed') ? !!mainSettingsOverrides.hideHomeFeed : current.hideHomeFeed,
             hideSponsoredCards: Object.prototype.hasOwnProperty.call(mainSettingsOverrides, 'hideSponsoredCards') ? !!mainSettingsOverrides.hideSponsoredCards : current.hideSponsoredCards,
+            contentOnlyPlayback: Object.prototype.hasOwnProperty.call(mainSettingsOverrides, 'contentOnlyPlayback') ? mainSettingsOverrides.contentOnlyPlayback !== false : current.contentOnlyPlayback !== false,
             hidePlayables: Object.prototype.hasOwnProperty.call(mainSettingsOverrides, 'hidePlayables') ? !!mainSettingsOverrides.hidePlayables : current.hidePlayables,
             hideWatchPlaylistPanel: Object.prototype.hasOwnProperty.call(mainSettingsOverrides, 'hideWatchPlaylistPanel') ? !!mainSettingsOverrides.hideWatchPlaylistPanel : current.hideWatchPlaylistPanel,
             hidePlaylistCards: Object.prototype.hasOwnProperty.call(mainSettingsOverrides, 'hidePlaylistCards') ? !!mainSettingsOverrides.hidePlaylistCards : current.hidePlaylistCards,
@@ -2758,6 +2760,14 @@
                 settings: {
                     ...(strategy === 'replace' ? {} : targetSettings),
                     ...safeObject(incomingV4Settings),
+                    // Legacy backups keep playback preferences in settings.main.
+                    // Preserve that explicit choice when the final profile write
+                    // follows the compiled-settings save above.
+                    ...(!incomingProfileForImport ? {
+                        contentOnlyPlayback: Object.prototype.hasOwnProperty.call(safeObject(parsed.mainSettings), 'contentOnlyPlayback')
+                            ? parsed.mainSettings.contentOnlyPlayback !== false
+                            : (strategy === 'merge' ? targetSettings.contentOnlyPlayback !== false : true)
+                    } : {}),
                     syncKidsToMain: !!incomingApplyKidsRulesOnMain
                 },
                 main: normalizeMainProfileAliasFields({

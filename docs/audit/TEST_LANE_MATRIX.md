@@ -517,3 +517,8 @@ The resolver, transport and managed-content-playback-permit suites join the exis
 ## Native Source Handoff Lanes — 2026-10-22
 
 The native transaction suite joins JSON, performance and smoke. Coordinator coverage now checks one-shot native handoff, lease release, unchanged audio/caption preferences and cancellation before handoff. Legacy engine tests remain repository component coverage; active manifests use only the native transaction. Source/VM tests do not replace installed media, fullscreen, profile or release acceptance.
+
+
+## Automatic Playback Preference Coverage — 2026-10-23
+
+The content-only-playback-settings fixture joins JSON, performance and smoke, and the existing blocking, whitelist, DOM and settings policy lanes. It checks default-on normalization, explicit-off profile authority, actual state/backup round trips, legacy import preservation and the protected UI lock. Coordinator coverage checks automatic startup without foreground controls, one-attempt deduplication, bounded preflight readiness, off/profile cancellation and late trusted admission wakeups. These fixtures do not establish installed media, fullscreen or parent/child acceptance.

@@ -328,6 +328,8 @@
   "controls.description.hideEndscreenCards": "Hide endscreen cards (end-card overlays)",
   "controls.title.disableAutoplay": "Disable Autoplay",
   "controls.description.disableAutoplay": "Disable or suppress autoplay UI",
+  "controls.title.contentOnlyPlayback": "Content-only playback (Experimental)",
+  "controls.description.contentOnlyPlayback": "On by default with advert filtering. Choose a main-video source automatically when needed on desktop YouTube, keeping its controls and playlist. If playback has trouble, turn off and reload the video.",
   "controls.title.alwaysUseOriginalAudio": "Always Use Original Audio (Experimental)",
   "controls.description.alwaysUseOriginalAudio": "Prefer the creator's original audio track instead of an automatic dub",
   "controls.title.disableAnnotations": "Disable Annotations",

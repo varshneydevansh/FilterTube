@@ -679,11 +679,12 @@ test('opt-in content playback retains component and profile-admission proof lane
     'player', 'response', 'coordinator', 'resolver', 'transport', 'native'
   ].map(name => `tests/runtime/content-playback-${name}.test.mjs`);
   const managedPermit = 'tests/runtime/managed-content-playback-permit.test.mjs';
+  const playbackSetting = 'tests/runtime/content-only-playback-settings.test.mjs';
   for (const lane of ['json', 'performance', 'smoke']) {
-    for (const fixture of [...components, managedPermit]) assert.ok(LANES[lane].tests.includes(fixture), `${lane}: ${fixture}`);
+    for (const fixture of [...components, managedPermit, playbackSetting]) assert.ok(LANES[lane].tests.includes(fixture), `${lane}: ${fixture}`);
   }
   for (const lane of ['blocking', 'whitelist', 'dom', 'settings']) {
-    for (const fixture of [components[0], components[5], managedPermit]) {
+    for (const fixture of [components[0], components[5], managedPermit, playbackSetting]) {
       assert.ok(LANES[lane].tests.includes(fixture), `${lane}: ${fixture}`);
     }
   }

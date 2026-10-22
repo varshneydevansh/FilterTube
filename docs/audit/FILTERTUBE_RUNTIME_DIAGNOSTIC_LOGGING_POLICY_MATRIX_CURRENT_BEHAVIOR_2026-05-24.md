@@ -891,3 +891,30 @@ All nine repository playback modules have zero direct console and logging relay 
 | `js/content/content_playback_transport.js` | 400 | 25096 | `02b9b6d076757eca5b8f25d94bbf8865db4e3eb6a7e24d65c69ebd894cd6fd88` |
 | `js/shared/content_playback_resolver.js` | 295 | 21072 | `63e5825e494d120e25328ce478e2bbcafb11be4b6a4a337ed6856d61428a7d81` |
 | `js/shared/content_playback_source.js` | 187 | 12402 | `cc22a59b178f681b29ad460a32cca7bb09dd9ffc52e5b650d6e18240578c0f0b` |
+
+
+## Automatic Native Playback Current Source Pins - 2026-10-23
+
+Automatic scheduling, profile preference propagation and transition-only readiness notifications add no console callsites. The existing 21-file console matrix retains its 446-callsite total. The first routine background callsite moved from 3336 to 3340. The nine playback modules remain free of direct console and logging relay calls. These measurements are source evidence, not installed performance or release acceptance.
+
+| File | Lines | Bytes | SHA-256 |
+| --- | ---: | ---: | --- |
+| `js/content/bridge_settings.js` | 2238 | 101092 | `923110bd0a8f2c3216199e1c930550ab80f6458448060d874da19e336aab3e24` |
+| `js/content/content_playback.js` | 307 | 17025 | `040c8c8606f6c8cb76703b094aae86e3269c816b4ef80266b35de112df2749f5` |
+| `js/content/content_playback_admission.js` | 131 | 7500 | `71ee13a96de07fdf988dc25300b1b09e0379e687047b5a5b7c21605bcbe68763` |
+| `js/content/content_playback_captions.js` | 138 | 8244 | `c5768f3bb7836321b030009492fe2ae703bb3e785352eabf8b2f383ca203c196` |
+| `js/content/content_playback_native.js` | 276 | 18819 | `baf6f57897442a338aada4fdc44915dc324eff93f8594b4b0006b648dd64823a` |
+| `js/content/content_playback_player.js` | 484 | 27588 | `791e88bfa8f53c5e7dd5b8a4752a222812cf288f43e31ff3f0b9b7a6708c81cd` |
+| `js/content/content_playback_response.js` | 362 | 26305 | `fdfa409eac404e807ff34935e771dfc1da6f0ebdbbeb5990c22c36fb11decc84` |
+| `js/content/content_playback_transport.js` | 400 | 25096 | `02b9b6d076757eca5b8f25d94bbf8865db4e3eb6a7e24d65c69ebd894cd6fd88` |
+| `js/shared/content_playback_resolver.js` | 295 | 21072 | `63e5825e494d120e25328ce478e2bbcafb11be4b6a4a337ed6856d61428a7d81` |
+| `js/shared/content_playback_source.js` | 187 | 12402 | `cc22a59b178f681b29ad460a32cca7bb09dd9ffc52e5b650d6e18240578c0f0b` |
+| `js/background.js` | 8546 | 386625 | `b4986d2a61879532c30d376ec2b85149498c45647fced0cad24e45f8620c4353` |
+| `js/content/dom_fallback.js` | 8188 | 381556 | `97d951f4a550d9fae239fd65092069f1841ca71f9eb66492d7578fcfdf21f0b2` |
+| `js/content_controls_catalog.js` | 304 | 12826 | `f8951a8249b0a0683c00d7f4b062bd819105539bf37f84fd3c5d569910f0aef4` |
+| `js/io_manager.js` | 3213 | 163538 | `9dfae40b90db3ea7bf0a1f0f44479508894bee92616582a1543d3460af825150` |
+| `js/settings_shared.js` | 1327 | 67805 | `c3d0f4b965acaaf46f6424cd0ad329c50e616de7b1cf8905a9fa578123e2bf69` |
+| `js/state_manager.js` | 2984 | 124258 | `029b2e7d4356d4629348f174bdaf7858fa1fa0c09a4b54c6bb0e293a161a8d5e` |
+| `js/tab-view.js` | 32535 | 1760706 | `801d77180fe4ab2b3e470f7337bc8640bcbdd2f882f58e5628f61852d42c4286` |
+| `js/content/block_channel.js` | 3361 | 135050 | `f2a02886a83d64d93186cd1f0c1f300683ae49754b928d2e0329fd1a88d8f2c9` |
+| `js/content_bridge.js` | 15056 | 678414 | `9e0bca2973ffb01d0216ea8b096531ad3c1afe7af4acc7363fa4b1cc2ca09f18` |

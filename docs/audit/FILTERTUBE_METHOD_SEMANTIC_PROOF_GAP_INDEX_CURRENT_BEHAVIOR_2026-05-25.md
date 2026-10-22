@@ -960,7 +960,7 @@ separate release/workflow review and is not silently counted as JavaScript here.
 
 ```text
 current tracked JS/JSX/MJS files: 120
-current repo-wide lexical callables: 9471
+current repo-wide lexical callables: 9478
 current complete per-callable semantic proofs: 0
 current callable behavior-change approval: NO-GO
 runtime behavior changed by inventory refresh: no
@@ -969,8 +969,8 @@ runtime behavior changed by inventory refresh: no
 | Family | Files | Lexical callables |
 | --- | ---: | ---: |
 | Build/sync scripts | 5 | 75 |
-| Hot page/background runtime | 9 | 3855 |
-| Content helper runtime | 22 | 760 |
+| Hot page/background runtime | 9 | 3857 |
+| Content helper runtime | 22 | 765 |
 | UI/settings runtime | 24 | 3712 |
 | Generated/quarantined UI | 6 | 147 |
 | Vendor bundles | 3 | 279 |
@@ -986,15 +986,15 @@ runtime behavior changed by inventory refresh: no
 | `js/content/bridge_injection.js` | Content helper runtime | 14 | `semantic proof incomplete` | Lexical accounting only; no complete per-callable closure claimed. |
 | `js/content/bridge_settings.js` | Hot page/background runtime | 153 | `semantic proof incomplete` | Lexical accounting only; no complete per-callable closure claimed. |
 | `js/content/collab_dialog.js` | Content helper runtime | 42 | `semantic proof incomplete` | Lexical accounting only; no complete per-callable closure claimed. |
-| `js/content/content_playback.js` | Content helper runtime | 25 | `semantic proof incomplete` | Lexical accounting only; no complete per-callable closure claimed. |
+| `js/content/content_playback.js` | Content helper runtime | 27 | `semantic proof incomplete` | Lexical accounting only; no complete per-callable closure claimed. |
 | `js/content/content_playback_admission.js` | Content helper runtime | 12 | `semantic proof incomplete` | Lexical accounting only; no complete per-callable closure claimed. |
 | `js/content/content_playback_captions.js` | Content helper runtime | 19 | `semantic proof incomplete` | Lexical accounting only; no complete per-callable closure claimed. |
-| `js/content/content_playback_native.js` | Content helper runtime | 45 | `semantic proof incomplete` | Lexical accounting only; no complete per-callable closure claimed. |
+| `js/content/content_playback_native.js` | Content helper runtime | 47 | `semantic proof incomplete` | Lexical accounting only; no complete per-callable closure claimed. |
 | `js/content/content_playback_player.js` | Content helper runtime | 45 | `semantic proof incomplete` | Lexical accounting only; no complete per-callable closure claimed. |
-| `js/content/content_playback_response.js` | Content helper runtime | 29 | `semantic proof incomplete` | Lexical accounting only; no complete per-callable closure claimed. |
+| `js/content/content_playback_response.js` | Content helper runtime | 30 | `semantic proof incomplete` | Lexical accounting only; no complete per-callable closure claimed. |
 | `js/content/content_playback_transport.js` | Content helper runtime | 51 | `semantic proof incomplete` | Lexical accounting only; no complete per-callable closure claimed. |
 | `js/content/dom_extractors.js` | Content helper runtime | 117 | `semantic proof incomplete` | Lexical accounting only; no complete per-callable closure claimed. |
-| `js/content/dom_fallback.js` | Hot page/background runtime | 669 | `semantic proof incomplete` | Lexical accounting only; no complete per-callable closure claimed. |
+| `js/content/dom_fallback.js` | Hot page/background runtime | 671 | `semantic proof incomplete` | Lexical accounting only; no complete per-callable closure claimed. |
 | `js/content/dom_helpers.js` | Content helper runtime | 21 | `semantic proof incomplete` | Lexical accounting only; no complete per-callable closure claimed. |
 | `js/content/dom_state.js` | Content helper runtime | 42 | `semantic proof incomplete` | Lexical accounting only; no complete per-callable closure claimed. |
 | `js/content/external_youtube_guard.js` | Content helper runtime | 62 | `semantic proof incomplete` | Lexical accounting only; no complete per-callable closure claimed. |
@@ -1301,3 +1301,132 @@ A bounded coordinator mount retry adds two lexical matches. Current accounting i
 ### Native Source Handoff Lexical Revalidation - 2026-10-22
 
 The unchanged parser now measures 120 tracked files and 9,471 lexical matches: 3,855 hot-runtime matches and 760 helper matches across 22 helper files. The new native source transaction joins the repository inventory. Legacy transport, separate player and caption modules remain tracked but are not in the active manifest stack. Counts establish lexical coverage only; installed native playback, profile enforcement and release acceptance require separate evidence. Earlier dated counts remain historical.
+
+
+### Automatic Native Playback Lexical Revalidation - 2026-10-23
+
+The unchanged parser measures 120 tracked files and 9,478 lexical matches: 3,857 hot-runtime matches and 765 helper matches across 22 helper files. The five-module active native stack is unchanged. The new default-on contentOnlyPlayback preference is profile-scoped; explicit false survives persistence and backup migration. Trusted admission and managed permit readiness can wake one automatic attempt; same-route settings and metadata refreshes do not restart a completed or failed extraction. These are source/fixture boundaries, not installed acceptance. Earlier measurements remain historical.
+
+
+### Automatic Playback Current Source Locations - 2026-10-23
+
+Current locations below account for setting propagation and transition-only refresh hooks. They do not close the earlier semantic proof gaps.
+
+| Semantic row | Current source |
+| --- | --- |
+| `bridge_settings_refreshRuntimeObserversAfterSettingsUpdate` | `js/content/bridge_settings.js:1992` |
+| `bridge_settings_scheduleSettingsRefreshFromStorage` | `js/content/bridge_settings.js:2025` |
+| `background_v4KeywordEntries` | `js/background.js:3730` |
+| `content_bridge_forceCloseDropdown` | `js/content_bridge.js:538` |
+| `content_bridge_parseCollaboratorNames` | `js/content_bridge.js:3529` |
+| `block_refreshQuickBlockRuntimeState` | `js/content/block_channel.js:455` |
+| `block_refreshQuickBlockAvailability` | `js/content/block_channel.js:466` |
+| `block_resolveOutermostShortsQuickBlockHost` | `js/content/block_channel.js:665` |
+| `block_repairFilterTubeHiddenDropdownState` | `js/content/block_channel.js:2500` |
+| `block_closeFilterTubeInjectedDropdownsOnOutsidePointer` | `js/content/block_channel.js:2644` |
+| `content_bridge_getValidatedCachedCollaborators_ampersand_topic_guard` | `js/content_bridge.js:3427` |
+| `content_bridge_ampersandTopicNameOnlyCollaboratorState_guard` | `js/content_bridge.js:5867` |
+| `content_bridge_applyResolvedCollaborators_card_stamp_provenance` | `js/content_bridge.js:4344` |
+| `content_bridge_applyCollaboratorsByVideoId_unstamped_cache` | `js/content_bridge.js:4440` |
+| `content_bridge_prefetchCollaboratorsForCard_single_card_warmup` | `js/content_bridge.js:6787` |
+| `content_bridge_normalizeCollaboratorCache_before_fresh_parser` | `js/content_bridge.js:5935` |
+| `content_bridge_menu_enrichment_list_only_cache` | `js/content_bridge.js:12648` |
+| `content_bridge_block_all_stale_delete_no_op` | `js/content_bridge.js:14028` |
+| `content_bridge_rejectAmpersandTopicCollaboratorWrite_topic_writer_guard` | `js/content_bridge.js:5889` |
+| `content_bridge_applyResolvedCollaborators_writer_guard` | `js/content_bridge.js:4344` |
+| `content_bridge_applyCollaboratorsByVideoId_writer_guard` | `js/content_bridge.js:4440` |
+| `content_bridge_renderer_hydration_writer_guard` | `js/content_bridge.js:5210` |
+| `content_bridge_cacheResult_writer_guard` | `js/content_bridge.js:5285` |
+| `content_bridge_active_menu_refresh_writer_partial_guard` | `js/content_bridge.js:917` |
+| `block_quick_collectCollaborators_action_trust_boundary` | `js/content/block_channel.js:1590` |
+| `content_bridge_menu_renderer_action_trust_boundary` | `js/content_bridge.js:737` |
+| `content_bridge_ampersandTopic_menu_renderer_guard` | `js/content_bridge.js:14985` |
+| `content_bridge_cleanupDropdownState_native_menu_state` | `js/content_bridge.js:512` |
+| `content_bridge_getReusableNativeDropdownRoot_close_target` | `js/content_bridge.js:529` |
+| `content_bridge_forceCloseDropdown_native_close_policy` | `js/content_bridge.js:538` |
+| `content_bridge_renderFilterTubeMenuEntries_dropdown_writer` | `js/content_bridge.js:737` |
+| `content_bridge_injectFilterTubeMenuItem_async_open_wait` | `js/content_bridge.js:12135` |
+| `block_setupMenuObserver_page_lifetime_owner` | `js/content/block_channel.js:2479` |
+| `block_ensureDropdownVisibilityObserver_attribute_scope` | `js/content/block_channel.js:2549` |
+| `block_scheduleDropdownInjection_deferred_dedupe` | `js/content/block_channel.js:2595` |
+| `block_scanExistingDropdowns_explicit_repair_scope` | `js/content/block_channel.js:2634` |
+| `block_closeFilterTubeInjectedDropdownsOnOutsidePointer_owned_close` | `js/content/block_channel.js:2644` |
+| `block_armDropdownDiscoveryObserver_short_lived_body_observer` | `js/content/block_channel.js:2706` |
+| `block_handleDropdownAppearedInternal_reusable_node_identity_cleanup` | `js/content/block_channel.js:3088` |
+| `bridge_needsIdentityPrefetchWork_non_json_branch` | `js/content_bridge.js:1058` |
+| `bridge_needsMainWorldRuntimeWork_admission` | `js/content_bridge.js:1162` |
+| `bridge_ensureMainWorldRuntimeForSettings_injection_gate` | `js/content_bridge.js:1175` |
+| `state_manager_addKeyword_mode_split_persistence` | `js/state_manager.js:1656` |
+| `state_manager_persistMainProfiles_dual_schema_alias_writer` | `js/state_manager.js:1395` |
+| `state_manager_addChannel_background_action_branch` | `js/state_manager.js:1984` |
+| `state_manager_importSubscribedChannelsToWhitelist_batch_handoff` | `js/state_manager.js:2114` |
+| `settings_shared_loadSettings_read_path_v4_writer` | `js/settings_shared.js:659` |
+| `settings_shared_saveSettings_v4_root_mirror_writer` | `js/settings_shared.js:850` |
+| `background_setListMode_destructive_transition_writer` | `js/background.js:5060` |
+| `background_addWhitelistChannelPersistent_trusted_whitelist_call` | `js/background.js:5250` |
+| `background_addChannelPersistent_legacy_block_writer` | `js/background.js:5865` |
+| `background_addFilteredChannel_secondary_default_blocklist` | `js/background.js:7080` |
+| `background_handleAddFilteredChannel_multi_surface_writer` | `js/background.js:7164` |
+| `content_bridge_addChannelDirectly_content_payload` | `js/content_bridge.js:14858` |
+| `io_manager_importV3_multi_profile_import_writer` | `js/io_manager.js:2308` |
+| `dom_fallback_hasActiveDOMFallbackWork_admission` | `js/content/dom_fallback.js:4319` |
+| `dom_fallback_clearStaleDOMFallbackVisibility_cleanup` | `js/content/dom_fallback.js:4393` |
+| `dom_fallback_applyDOMFallback_run_state_gate` | `js/content/dom_fallback.js:5057` |
+| `dom_fallback_applyDOMFallback_no_work_cleanup_return` | `js/content/dom_fallback.js:5171` |
+| `dom_fallback_feed_channels_cleanup_return` | `js/content/dom_fallback.js:5227` |
+| `dom_fallback_whitelist_watch_scaffolding_restore` | `js/content/dom_fallback.js:3949` |
+| `dom_fallback_videoElements_selector_scope` | `js/content/dom_fallback.js:5420` |
+| `dom_fallback_processed_identity_skip_gate` | `js/content/dom_fallback.js:5682` |
+| `dom_fallback_channel_identity_selector_waterfall` | `js/content/dom_fallback.js:5864` |
+| `dom_fallback_pending_meta_recheck_timer` | `js/content/dom_fallback.js:7033` |
+| `dom_fallback_playlist_selected_row_safeguard` | `js/content/dom_fallback.js:7110` |
+| `dom_fallback_run_state_pending_rerun_timer` | `js/content/dom_fallback.js:7837` |
+| `content_bridge_schedulePrefetchScan_frame_gate` | `js/content_bridge.js:1201` |
+| `content_bridge_attachPrefetchObservers_card_cap` | `js/content_bridge.js:1320` |
+| `content_bridge_startCardPrefetchObserver_visibility_listener` | `js/content_bridge.js:1362` |
+| `content_bridge_installPlaylistPanelPrefetchHook_scroll_observer` | `js/content_bridge.js:1393` |
+| `content_bridge_installRightRailWhitelistObserver_mode_route_timers` | `js/content_bridge.js:1438` |
+| `content_bridge_refreshFilterTubeRuntimeObservers_fanout` | `js/content_bridge.js:1500` |
+| `content_bridge_scheduleVideoMetaDomRerun_debounce` | `js/content_bridge.js:2114` |
+| `content_bridge_initializeDOMFallback_delayed_boot` | `js/content_bridge.js:7142` |
+| `content_bridge_scheduleWhitelistPendingRecheck_timer` | `js/content_bridge.js:7406` |
+| `content_bridge_queueWhitelistPendingHide_pending_timer` | `js/content_bridge.js:7421` |
+| `content_bridge_refreshDOMFallbackMutationObserver_active_gate` | `js/content_bridge.js:7773` |
+| `content_bridge_ensureFallbackMenuButtons_lifecycle_scan` | `js/content_bridge.js:7822` |
+| `content_bridge_tail_message_listener_initialize_timer` | `js/content_bridge.js:15052` |
+| `background_compiledSettingsCache_profile_shape` | `js/background.js:2011` |
+| `background_enqueueChannelMapUpdate_cache_patch` | `js/background.js:3011` |
+| `background_enqueueVideoChannelMapUpdate_cache_patch` | `js/background.js:3171` |
+| `background_enqueueVideoMetaMapUpdate_cache_patch` | `js/background.js:3196` |
+| `background_getCompiledSettings_cache_return_gate` | `js/background.js:3344` |
+| `background_getCompiledSettings_compile_assign` | `js/background.js:4261` |
+| `background_runtime_getCompiledSettings_cache_branch` | `js/background.js:5010` |
+| `background_setListMode_cache_invalidation_refresh` | `js/background.js:5060` |
+| `background_batchImportWhitelist_cache_invalidation_refresh` | `js/background.js:5289` |
+| `background_transferWhitelistToBlocklist_cache_invalidation_refresh` | `js/background.js:5511` |
+| `background_applySettings_recompile_broadcast` | `js/background.js:6175` |
+| `background_learned_map_message_receivers` | `js/background.js:6203` |
+| `background_storage_onChanged_cache_invalidation` | `js/background.js:6266` |
+| `background_handleAddFilteredChannel_mutation_cache_invalidation` | `js/background.js:7164` |
+| `block_quick_shouldRefresh_runtime_state_gate` | `js/content/block_channel.js:450` |
+| `block_quick_refreshRuntimeState_lazy_observer` | `js/content/block_channel.js:455` |
+| `block_quick_refreshAvailability_disable_cleanup` | `js/content/block_channel.js:466` |
+| `block_quick_hoverIntent_desktop_delay` | `js/content/block_channel.js:508` |
+| `block_quick_isShortsCard_surface_detection` | `js/content/block_channel.js:613` |
+| `block_quick_resolveHost_shorts_outer_card` | `js/content/block_channel.js:628` |
+| `block_quick_resolveOutermostShortsHost_depth_cap` | `js/content/block_channel.js:665` |
+| `block_quick_resolveAnchor_renderable_target` | `js/content/block_channel.js:725` |
+| `block_quick_findCardFromTarget_bounded_lookup` | `js/content/block_channel.js:1343` |
+| `block_quick_isEnabled_mode_gate` | `js/content/block_channel.js:1365` |
+| `block_quick_shouldEagerSweep_mobile_only` | `js/content/block_channel.js:1453` |
+| `block_quick_removeButtons_cleanup` | `js/content/block_channel.js:1570` |
+| `block_quick_buildContext_identity_source` | `js/content/block_channel.js:1705` |
+| `block_quick_runFallback_mutation_path` | `js/content/block_channel.js:1834` |
+| `block_quick_applyImmediateHide_optimistic_writer` | `js/content/block_channel.js:1889` |
+| `block_quick_ensureButton_anchor_wrap_events` | `js/content/block_channel.js:1959` |
+| `block_quick_scheduleSweep_coalesced_roots` | `js/content/block_channel.js:2124` |
+| `block_quick_setupObserver_page_lifecycle` | `js/content/block_channel.js:2154` |
+| `block_quick_pointerRecovery_dynamic_listener` | `js/content/block_channel.js:2372` |
+| `block_quick_mobileMutationObserver_eager_only` | `js/content/block_channel.js:2393` |
+
+Healthy admitted same-video native media is now preserved before extraction and before source commit. Buffered content past its startup position, with exact native identity and explicit inactive-ad API evidence, is marked native_ready without fetching a fresh source or pausing/reloading the player. This guard adds two lexical matches; it does not grant profile admission or claim a fresh source was selected.

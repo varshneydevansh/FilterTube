@@ -476,6 +476,7 @@ const managedContentPlaybackPermit = (() => {
             record = { request, receipt: Object.freeze({ decision: 'allowed', videoId: id,
                 profileId: policy.profileId, policyRevision: policy.policyRevision,
                 policyHash: policy.policyHash, surface: route.surface, expiresAt }) };
+            queueMicrotask(() => window.FilterTubeContentPlayback?.refresh?.());
             return true;
         } catch (_) { clear(); return false; }
     }
@@ -2191,6 +2192,7 @@ function handleStorageChanges(changes, area) {
         'hideAllShorts',
         'hideHomeFeed',
         'hideSponsoredCards',
+        'contentOnlyPlayback',
         'hidePlayables',
         'hideWatchPlaylistPanel',
         'hidePlaylistCards',

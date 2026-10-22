@@ -307,3 +307,25 @@ The current fallback initializer adds two opt-in playback initialization/refresh
 | `domFallbackWhitelistPendingStateReset` | `js/content/dom_fallback.js:5674` | 5,674 | 74 | 4,342 | `7f374fecc191fc37bbef5af4e05b040ff3b3b2e0585baec5f8036b1d4f4c7c6f` |
 | `domFallbackWhitelistPendingIdentityHide` | `js/content/dom_fallback.js:6957` | 6,957 | 16 | 993 | `2352973b418feb0a4da5f8b71c11940d6a0292b6bdb5db511262db89889c1f17` |
 | `domFallbackOnlyWhitelistPendingReturn` | `js/content/dom_fallback.js:7252` | 7,252 | 4 | 83 | `438296f1dbec1d892317f6177e74323886b6830fd0697eb1b1c12e4779776ad0` |
+
+
+## Automatic Playback Readiness Source Revalidation - 2026-10-23
+
+Only the current DOM fallback file and source locations move with the direct/category allow-transition notifications. The nine whitelist pending-refresh source/effect blocks below retain their body hashes and behavior assertions. This refresh does not change whitelist policy or establish installed acceptance. Earlier rows remain dated evidence.
+
+| File | Lines | Bytes | SHA-256 |
+| --- | ---: | ---: | --- |
+| `js/content_bridge.js` | 15,056 | 678,414 | `9e0bca2973ffb01d0216ea8b096531ad3c1afe7af4acc7363fa4b1cc2ca09f18` |
+| `js/content/dom_fallback.js` | 8,188 | 381,556 | `97d951f4a550d9fae239fd65092069f1841ca71f9eb66492d7578fcfdf21f0b2` |
+
+| Block | Source | Start line | Lines | Bytes | SHA-256 |
+| --- | --- | ---: | ---: | ---: | --- |
+| `contentBridgeRightRailWhitelistObserver` | `js/content_bridge.js:1438` | 1,438 | 98 | 3,094 | `f657ce4b4b8ba815a4149d3508ebec0445450bf49c74478c0e2169da4c679bc4` |
+| `contentBridgeInitializeFallbackThrottle` | `js/content_bridge.js:7142` | 7,142 | 257 | 12,748 | `ee1f260f090adeea22e50c42a62df41bfe23402eabf2178bea4ebeac0bfda2bc` |
+| `contentBridgeWhitelistPendingQueue` | `js/content_bridge.js:7399` | 7,399 | 70 | 4,159 | `3181b672c5d3a1a558baa5b0dbb175c05f7d966b908b835ae7c216ebc7eaa86b` |
+| `contentBridgeWhitelistPendingApply` | `js/content_bridge.js:7469` | 7,469 | 112 | 5,829 | `2ff0a4ef33bdaf0acde1b27bf31d8d026f675702adae2bbc03692c213c266ad8` |
+| `contentBridgeFallbackMutationObserver` | `js/content_bridge.js:7581` | 7,581 | 217 | 9,542 | `644e542cd718856d5a3d447c3ecce919cf66cbad4bb0373efc61da62b3df09b9` |
+| `domFallbackOnlyWhitelistPendingSelector` | `js/content/dom_fallback.js:5419` | 5,419 | 19 | 950 | `7235b5ea6e0689ab98e3e2e21e02e37d95b52675bc16a7c5bffa56b50c905894` |
+| `domFallbackWhitelistPendingStateReset` | `js/content/dom_fallback.js:5682` | 5,682 | 74 | 4,342 | `7f374fecc191fc37bbef5af4e05b040ff3b3b2e0585baec5f8036b1d4f4c7c6f` |
+| `domFallbackWhitelistPendingIdentityHide` | `js/content/dom_fallback.js:6965` | 6,965 | 16 | 993 | `2352973b418feb0a4da5f8b71c11940d6a0292b6bdb5db511262db89889c1f17` |
+| `domFallbackOnlyWhitelistPendingReturn` | `js/content/dom_fallback.js:7260` | 7,260 | 4 | 83 | `438296f1dbec1d892317f6177e74323886b6830fd0697eb1b1c12e4779776ad0` |

@@ -223,7 +223,7 @@ separate release/workflow review and is not silently counted as JavaScript here.
 
 ```text
 current tracked JS/JSX/MJS files: 120
-current repo-wide lexical callables: 9471
+current repo-wide lexical callables: 9478
 current complete per-callable semantic proofs: 0
 current callable behavior-change approval: NO-GO
 runtime behavior changed by inventory refresh: no
@@ -232,8 +232,8 @@ runtime behavior changed by inventory refresh: no
 | Family | Files | Lexical callables |
 | --- | ---: | ---: |
 | Build/sync scripts | 5 | 75 |
-| Hot page/background runtime | 9 | 3855 |
-| Content helper runtime | 22 | 760 |
+| Hot page/background runtime | 9 | 3857 |
+| Content helper runtime | 22 | 765 |
 | UI/settings runtime | 24 | 3712 |
 | Generated/quarantined UI | 6 | 147 |
 | Vendor bundles | 3 | 279 |
@@ -249,15 +249,15 @@ runtime behavior changed by inventory refresh: no
 | `js/content/bridge_injection.js` | Content helper runtime | 14 | helper counted |
 | `js/content/bridge_settings.js` | Hot page/background runtime | 153 | hot runtime mapped |
 | `js/content/collab_dialog.js` | Content helper runtime | 42 | helper counted |
-| `js/content/content_playback.js` | Content helper runtime | 25 | helper counted; semantic proof incomplete |
+| `js/content/content_playback.js` | Content helper runtime | 27 | helper counted; semantic proof incomplete |
 | `js/content/content_playback_admission.js` | Content helper runtime | 12 | helper counted; semantic proof incomplete |
 | `js/content/content_playback_captions.js` | Content helper runtime | 19 | helper counted; semantic proof incomplete |
-| `js/content/content_playback_native.js` | Content helper runtime | 45 | helper counted; semantic proof incomplete |
+| `js/content/content_playback_native.js` | Content helper runtime | 47 | helper counted; semantic proof incomplete |
 | `js/content/content_playback_player.js` | Content helper runtime | 45 | helper counted; semantic proof incomplete |
-| `js/content/content_playback_response.js` | Content helper runtime | 29 | helper counted; semantic proof incomplete |
+| `js/content/content_playback_response.js` | Content helper runtime | 30 | helper counted; semantic proof incomplete |
 | `js/content/content_playback_transport.js` | Content helper runtime | 51 | helper counted; semantic proof incomplete |
 | `js/content/dom_extractors.js` | Content helper runtime | 117 | helper counted |
-| `js/content/dom_fallback.js` | Hot page/background runtime | 669 | hot runtime mapped |
+| `js/content/dom_fallback.js` | Hot page/background runtime | 671 | hot runtime mapped |
 | `js/content/dom_helpers.js` | Content helper runtime | 21 | helper counted |
 | `js/content/dom_state.js` | Content helper runtime | 42 | helper counted |
 | `js/content/external_youtube_guard.js` | Content helper runtime | 62 | helper counted; semantic proof incomplete |
@@ -411,3 +411,10 @@ A bounded coordinator mount retry adds two lexical matches. Current accounting i
 ### Native Source Handoff Lexical Revalidation - 2026-10-22
 
 The unchanged parser now measures 120 tracked files and 9,471 lexical matches: 3,855 hot-runtime matches and 760 helper matches across 22 helper files. The new native source transaction joins the repository inventory. Legacy transport, separate player and caption modules remain tracked but are not in the active manifest stack. Counts establish lexical coverage only; installed native playback, profile enforcement and release acceptance require separate evidence. Earlier dated counts remain historical.
+
+
+### Automatic Native Playback Lexical Revalidation - 2026-10-23
+
+The unchanged parser measures 120 tracked files and 9,478 lexical matches: 3,857 hot-runtime matches and 765 helper matches across 22 helper files. The five-module active native stack is unchanged. The new default-on contentOnlyPlayback preference is profile-scoped; explicit false survives persistence and backup migration. Trusted admission and managed permit readiness can wake one automatic attempt; same-route settings and metadata refreshes do not restart a completed or failed extraction. These are source/fixture boundaries, not installed acceptance. Earlier measurements remain historical.
+
+Healthy admitted same-video native media is now preserved before extraction and before source commit. Buffered content past its startup position, with exact native identity and explicit inactive-ad API evidence, is marked native_ready without fetching a fresh source or pausing/reloading the player. This guard adds two lexical matches; it does not grant profile admission or claim a fresh source was selected.

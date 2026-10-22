@@ -18,7 +18,7 @@ class Events {
   count() { return [...this.listeners.values()].reduce((total, listeners) => total + listeners.size, 0); }
 }
 
-function fixture({ paused = false, rejectPlay = false, leaseLifetime = 30000, onState } = {}) {
+function fixture({ paused = false, rejectPlay = false, leaseLifetime = 30000, onState, allowAutomaticStart } = {}) {
   let clock = 10000, leaseExpiry = clock + leaseLifetime, valid = true, content = true, nextTimer = 0, nextNonce = 0;
   const timers = new Map(), posts = [], states = [], fallbacks = [];
   let reevaluations = 0;
@@ -54,6 +54,7 @@ function fixture({ paused = false, rejectPlay = false, leaseLifetime = 30000, on
   const api = window.FilterTubeContentPlaybackNative;
   const controllerOptions = { originalVideo: video, originalSurface: surface,
     validateLease: () => valid, isOriginalContent: () => content, now: () => clock,
+    allowAutomaticStart,
     enforceNativeAdmission: () => { reevaluations++; },
     onState: value => { states.push(value); onState?.(value); }, onFallback: value => fallbacks.push(value) };
   const controller = api.create(controllerOptions);
@@ -359,4 +360,94 @@ test('synchronous policy revocation during the staging notification prevents an 
   const pending = state.controller.start(state.input());
   assert.equal(state.last('FilterTube_ApplyNativeContentSource'), undefined);
   state.cancelAck(); assert.equal((await pending).reason, 'admission_changed'); assert.equal(state.video.playCalls, 0);
+});
+
+function automaticInput(state) {
+  const input = state.input(); input.mode = 'automatic'; delete input.actionToken; return input;
+}
+
+test('an explicitly enabled isolated automatic transaction needs no forged gesture and preserves paused intent', async () => {
+  let expectedLease;
+  const state = fixture({ paused: true, allowAutomaticStart: context => {
+    assert.equal(context.videoId, videoId); assert.equal(context.lease, expectedLease); return true;
+  } });
+  const input = automaticInput(state); expectedLease = input.lease;
+  state.window.navigator.userActivation.isActive = false;
+  const pending = state.controller.start(input); state.ready(); state.ack(); state.stateReply();
+  assert.equal((await pending).status, 'active'); assert.equal(state.video.paused, true); assert.equal(state.video.playCalls, 0);
+  assert.equal(state.document.count(), 0); assert.equal(state.timers.size, 0);
+});
+
+test('automatic mode requires a synchronous strict-true isolated callback regardless of page or source flags', async () => {
+  for (const callback of [undefined, true, () => false, () => 1, () => Promise.resolve(true), () => { throw new Error('unavailable'); }]) {
+    const state = fixture({ allowAutomaticStart: callback }); const input = automaticInput(state);
+    input.source.allowAutomaticStart = true; input.preferences.automatic = true; input.actionToken = {};
+    assert.equal((await state.controller.start(input)).reason, 'automatic_start_disabled');
+    assert.equal(state.posts.length, 0); assert.equal(state.document.count(), 0); assert.equal(state.video.pauseCalls, 0);
+  }
+});
+
+test('an enabled automatic callback cannot replace current profile admission or detached-route checks', async () => {
+  for (const failure of ['lease', 'route', 'detached']) {
+    const state = fixture({ allowAutomaticStart: () => true }); const input = automaticInput(state);
+    if (failure === 'lease') state.invalidate();
+    if (failure === 'route') state.window.location.search = '?v=different01';
+    if (failure === 'detached') state.video.isConnected = false;
+    assert.equal((await state.controller.start(input)).reason, 'authorization_invalid');
+    assert.equal(state.posts.length, 0); assert.equal(state.video.playCalls, 0);
+  }
+});
+
+test('turning the isolated automatic setting off during staging prevents the apply message', async () => {
+  let enabled = true;
+  const state = fixture({ allowAutomaticStart: () => enabled,
+    onState: value => { if (value.status === 'staging') enabled = false; } });
+  const pending = state.controller.start(automaticInput(state));
+  assert.equal(state.last('FilterTube_ApplyNativeContentSource'), undefined);
+  state.cancelAck(); assert.equal((await pending).reason, 'admission_changed'); assert.equal(state.video.playCalls, 0);
+});
+
+test('turning automatic mode off after source readiness cannot resume playback from a late feature reply', async () => {
+  let enabled = true;
+  const state = fixture({ allowAutomaticStart: () => enabled }); const pending = state.controller.start(automaticInput(state));
+  state.ready(); state.ack(); enabled = false; state.stateReply(); await state.flush();
+  state.cancelAck(); assert.equal((await pending).reason, 'admission_changed'); assert.equal(state.video.playCalls, 0);
+  assert.equal(state.video.paused, true); assert.equal(state.document.count(), 0);
+});
+
+test('automatic resume respects browser autoplay refusal without changing mute state or retrying playback', async () => {
+  const state = fixture({ rejectPlay: true, allowAutomaticStart: () => true });
+  state.window.navigator.userActivation.isActive = false;
+  const pending = state.controller.start(automaticInput(state)); state.ready(); state.ack(); state.stateReply();
+  await state.flush(); state.cancelAck(); assert.equal((await pending).reason, 'native_resume_failed');
+  assert.equal(state.video.playCalls, 1); assert.equal(state.video.muted, false); assert.equal(state.video.paused, true);
+  state.advance(10000); assert.equal(state.video.playCalls, 1);
+});
+
+test('automatic permission revoked synchronously by native play is paused before ownership can be handed off', async () => {
+  let enabled = true;
+  const state = fixture({ allowAutomaticStart: () => enabled });
+  const play = state.video.play; state.video.play = () => { enabled = false; return play(); };
+  const pending = state.controller.start(automaticInput(state)); state.ready(); state.ack(); state.stateReply();
+  await state.flush(); assert.equal(state.video.paused, true); state.cancelAck();
+  assert.equal((await pending).reason, 'admission_changed');
+  assert.equal(state.states.some(value => value.status === 'active'), false); assert.equal(state.video.playCalls, 1);
+});
+
+test('manual default and explicit manual mode retain trusted-action requirements even when automatic mode is enabled', async () => {
+  for (const mode of [undefined, 'manual']) {
+    const state = fixture({ allowAutomaticStart: () => true }); const input = state.input();
+    input.mode = mode; delete input.actionToken;
+    assert.equal((await state.controller.start(input)).reason, 'user_gesture_required'); assert.equal(state.posts.length, 0);
+  }
+  const state = fixture({ allowAutomaticStart: () => false }); const input = state.input(); input.mode = 'manual';
+  const pending = state.controller.start(input); state.ready(); state.ack(); state.stateReply();
+  assert.equal((await pending).status, 'active');
+});
+
+test('unsupported mode strings and page messages cannot enable native automatic startup', async () => {
+  const state = fixture({ allowAutomaticStart: () => true }); const input = automaticInput(state); input.mode = 'page-authorized';
+  assert.equal((await state.controller.start(input)).reason, 'invalid_start_mode');
+  state.reply('FilterTube_NativeContentSourceResult', { requestId: 'page-request', videoId, applied: true, mode: 'automatic' });
+  assert.equal(state.posts.length, 0); assert.equal(state.video.playCalls, 0); assert.equal(state.document.count(), 0);
 });

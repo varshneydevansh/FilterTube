@@ -1,0 +1,197 @@
+[
+  {
+    "browser": "chrome",
+    "checks": [
+      {
+        "path": "data/ui_locales/en.json",
+        "sourceStageZipMatch": true,
+        "sha256": "8f6514b135a4bd41a7d34bb54b160edcaa6064f991ec56ebca6f47f90f0ead5b"
+      },
+      {
+        "path": "js/background.js",
+        "sourceStageZipMatch": true,
+        "sha256": "b4986d2a61879532c30d376ec2b85149498c45647fced0cad24e45f8620c4353"
+      },
+      {
+        "path": "js/content/bridge_settings.js",
+        "sourceStageZipMatch": true,
+        "sha256": "923110bd0a8f2c3216199e1c930550ab80f6458448060d874da19e336aab3e24"
+      },
+      {
+        "path": "js/content/content_playback.js",
+        "sourceStageZipMatch": true,
+        "sha256": "040c8c8606f6c8cb76703b094aae86e3269c816b4ef80266b35de112df2749f5"
+      },
+      {
+        "path": "js/content/content_playback_native.js",
+        "sourceStageZipMatch": true,
+        "sha256": "baf6f57897442a338aada4fdc44915dc324eff93f8594b4b0006b648dd64823a"
+      },
+      {
+        "path": "js/content/content_playback_response.js",
+        "sourceStageZipMatch": true,
+        "sha256": "fdfa409eac404e807ff34935e771dfc1da6f0ebdbbeb5990c22c36fb11decc84"
+      },
+      {
+        "path": "js/content/dom_fallback.js",
+        "sourceStageZipMatch": true,
+        "sha256": "97d951f4a550d9fae239fd65092069f1841ca71f9eb66492d7578fcfdf21f0b2"
+      },
+      {
+        "path": "js/content_controls_catalog.js",
+        "sourceStageZipMatch": true,
+        "sha256": "f8951a8249b0a0683c00d7f4b062bd819105539bf37f84fd3c5d569910f0aef4"
+      },
+      {
+        "path": "js/io_manager.js",
+        "sourceStageZipMatch": true,
+        "sha256": "9dfae40b90db3ea7bf0a1f0f44479508894bee92616582a1543d3460af825150"
+      },
+      {
+        "path": "js/settings_shared.js",
+        "sourceStageZipMatch": true,
+        "sha256": "c3d0f4b965acaaf46f6424cd0ad329c50e616de7b1cf8905a9fa578123e2bf69"
+      },
+      {
+        "path": "js/state_manager.js",
+        "sourceStageZipMatch": true,
+        "sha256": "029b2e7d4356d4629348f174bdaf7858fa1fa0c09a4b54c6bb0e293a161a8d5e"
+      },
+      {
+        "path": "js/tab-view.js",
+        "sourceStageZipMatch": true,
+        "sha256": "801d77180fe4ab2b3e470f7337bc8640bcbdd2f882f58e5628f61852d42c4286"
+      }
+    ]
+  },
+  {
+    "browser": "firefox",
+    "checks": [
+      {
+        "path": "data/ui_locales/en.json",
+        "sourceStageZipMatch": true,
+        "sha256": "8f6514b135a4bd41a7d34bb54b160edcaa6064f991ec56ebca6f47f90f0ead5b"
+      },
+      {
+        "path": "js/background.js",
+        "sourceStageZipMatch": true,
+        "sha256": "b4986d2a61879532c30d376ec2b85149498c45647fced0cad24e45f8620c4353"
+      },
+      {
+        "path": "js/content/bridge_settings.js",
+        "sourceStageZipMatch": true,
+        "sha256": "923110bd0a8f2c3216199e1c930550ab80f6458448060d874da19e336aab3e24"
+      },
+      {
+        "path": "js/content/content_playback.js",
+        "sourceStageZipMatch": true,
+        "sha256": "040c8c8606f6c8cb76703b094aae86e3269c816b4ef80266b35de112df2749f5"
+      },
+      {
+        "path": "js/content/content_playback_native.js",
+        "sourceStageZipMatch": true,
+        "sha256": "baf6f57897442a338aada4fdc44915dc324eff93f8594b4b0006b648dd64823a"
+      },
+      {
+        "path": "js/content/content_playback_response.js",
+        "sourceStageZipMatch": true,
+        "sha256": "fdfa409eac404e807ff34935e771dfc1da6f0ebdbbeb5990c22c36fb11decc84"
+      },
+      {
+        "path": "js/content/dom_fallback.js",
+        "sourceStageZipMatch": true,
+        "sha256": "97d951f4a550d9fae239fd65092069f1841ca71f9eb66492d7578fcfdf21f0b2"
+      },
+      {
+        "path": "js/content_controls_catalog.js",
+        "sourceStageZipMatch": true,
+        "sha256": "f8951a8249b0a0683c00d7f4b062bd819105539bf37f84fd3c5d569910f0aef4"
+      },
+      {
+        "path": "js/io_manager.js",
+        "sourceStageZipMatch": true,
+        "sha256": "9dfae40b90db3ea7bf0a1f0f44479508894bee92616582a1543d3460af825150"
+      },
+      {
+        "path": "js/settings_shared.js",
+        "sourceStageZipMatch": true,
+        "sha256": "c3d0f4b965acaaf46f6424cd0ad329c50e616de7b1cf8905a9fa578123e2bf69"
+      },
+      {
+        "path": "js/state_manager.js",
+        "sourceStageZipMatch": true,
+        "sha256": "029b2e7d4356d4629348f174bdaf7858fa1fa0c09a4b54c6bb0e293a161a8d5e"
+      },
+      {
+        "path": "js/tab-view.js",
+        "sourceStageZipMatch": true,
+        "sha256": "801d77180fe4ab2b3e470f7337bc8640bcbdd2f882f58e5628f61852d42c4286"
+      }
+    ]
+  },
+  {
+    "browser": "opera",
+    "checks": [
+      {
+        "path": "data/ui_locales/en.json",
+        "sourceStageZipMatch": true,
+        "sha256": "8f6514b135a4bd41a7d34bb54b160edcaa6064f991ec56ebca6f47f90f0ead5b"
+      },
+      {
+        "path": "js/background.js",
+        "sourceStageZipMatch": true,
+        "sha256": "b4986d2a61879532c30d376ec2b85149498c45647fced0cad24e45f8620c4353"
+      },
+      {
+        "path": "js/content/bridge_settings.js",
+        "sourceStageZipMatch": true,
+        "sha256": "923110bd0a8f2c3216199e1c930550ab80f6458448060d874da19e336aab3e24"
+      },
+      {
+        "path": "js/content/content_playback.js",
+        "sourceStageZipMatch": true,
+        "sha256": "040c8c8606f6c8cb76703b094aae86e3269c816b4ef80266b35de112df2749f5"
+      },
+      {
+        "path": "js/content/content_playback_native.js",
+        "sourceStageZipMatch": true,
+        "sha256": "baf6f57897442a338aada4fdc44915dc324eff93f8594b4b0006b648dd64823a"
+      },
+      {
+        "path": "js/content/content_playback_response.js",
+        "sourceStageZipMatch": true,
+        "sha256": "fdfa409eac404e807ff34935e771dfc1da6f0ebdbbeb5990c22c36fb11decc84"
+      },
+      {
+        "path": "js/content/dom_fallback.js",
+        "sourceStageZipMatch": true,
+        "sha256": "97d951f4a550d9fae239fd65092069f1841ca71f9eb66492d7578fcfdf21f0b2"
+      },
+      {
+        "path": "js/content_controls_catalog.js",
+        "sourceStageZipMatch": true,
+        "sha256": "f8951a8249b0a0683c00d7f4b062bd819105539bf37f84fd3c5d569910f0aef4"
+      },
+      {
+        "path": "js/io_manager.js",
+        "sourceStageZipMatch": true,
+        "sha256": "9dfae40b90db3ea7bf0a1f0f44479508894bee92616582a1543d3460af825150"
+      },
+      {
+        "path": "js/settings_shared.js",
+        "sourceStageZipMatch": true,
+        "sha256": "c3d0f4b965acaaf46f6424cd0ad329c50e616de7b1cf8905a9fa578123e2bf69"
+      },
+      {
+        "path": "js/state_manager.js",
+        "sourceStageZipMatch": true,
+        "sha256": "029b2e7d4356d4629348f174bdaf7858fa1fa0c09a4b54c6bb0e293a161a8d5e"
+      },
+      {
+        "path": "js/tab-view.js",
+        "sourceStageZipMatch": true,
+        "sha256": "801d77180fe4ab2b3e470f7337bc8640bcbdd2f882f58e5628f61852d42c4286"
+      }
+    ]
+  }
+]

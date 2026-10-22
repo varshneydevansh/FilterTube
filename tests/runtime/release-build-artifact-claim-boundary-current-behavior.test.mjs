@@ -11,7 +11,7 @@ const docPath = 'docs/audit/FILTERTUBE_RELEASE_BUILD_ARTIFACT_CLAIM_BOUNDARY_CUR
 const sourceRows = [
   ['build.js', 861, 33225, 'a198cc1d0bf98e410deb8f66ced0e56a046bbf987a0a5b878e1278577622fb2e'],
   ['package.json', 86, 4580, 'c9cb2c3c4fea302fa3946f462dbfbb474381a78946ca59adb653814d06a4de51'],
-  ['README.md', 456, 28669, 'a700c32e22dcbfc3ea8e68b40aa4320006b634fef1843d5f117e9e55bc691f3c'],
+  ['README.md', 456, 28669, '8020a7f53a3380d7e47887c7d0c8c106953225a43b205f246da64e6ba75e6d93'],
   ['CHANGELOG.md', 938, 75511, 'e57906dca95911874ef251aa45d8c3a76df00df576b36277d9c0e9b9654c3036'],
   ['manifest.json', 160, 5544, '78e3025b7b5bc01db2d88ab79edcb6294c815bf721060d384b2905d4adb21337'],
   ['manifest.chrome.json', 160, 5544, '78e3025b7b5bc01db2d88ab79edcb6294c815bf721060d384b2905d4adb21337'],
