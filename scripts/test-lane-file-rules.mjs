@@ -1,5 +1,8 @@
 // Declarative path ownership, split from test-lane-config.mjs to keep workflow files bounded.
 export const FILE_LANE_RULES = Object.freeze([
+  { id: 'advert-streaming-backoff-evidence', patterns: [/^docs\/audit\/artifacts\/advert-streaming-backoff-[^/]+\/.*\.json$/], lanes: ['release', 'performance', 'smoke'] },
+  { id: 'content-only-playback-evidence', patterns: [/^docs\/audit\/artifacts\/content-only-playback-[^/]+\//], lanes: ['release', 'performance', 'smoke'] },
+  { id: 'content-only-playback-runtime', patterns: [/^js\/(?:shared\/content_playback_source|content\/content_playback(?:_(?:admission|captions|player|response))?)\.js$/], lanes: ['release', 'blocking', 'whitelist', 'json', 'dom', 'performance', 'settings', 'smoke'] },
   { id: 'test-lane-file-rules', patterns: [/^scripts\/test-lane-file-rules\.mjs$/], lanes: ['release', 'performance', 'smoke'] },
   { id: 'installed-firefox-android-evidence', patterns: [/^docs\/audit\/FIREFOX_ANDROID_.*\.json$/], lanes: ['release', 'smoke'] },
   { id: 'minimum-view-count-runtime', patterns: [/^js\/shared\/view_count\.js$/], lanes: ['blocking', 'whitelist', 'json', 'dom', 'settings', 'performance'] },

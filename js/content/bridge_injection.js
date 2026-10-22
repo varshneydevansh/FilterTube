@@ -109,6 +109,7 @@
         bridgeState.injectionPromise = (async () => {
             const scriptsToInject = ['shared/identity', 'shared/view_count', 'filter_logic'];
             if (isFirefox) scriptsToInject.push('seed');
+            scriptsToInject.push('content/content_playback_response');
             scriptsToInject.push('injector');
 
             try {

@@ -62,6 +62,11 @@
                 "js/content/collab_dialog.js",
                 "js/content/release_notes_prompt.js",
                 "js/content/first_run_prompt.js",
+                "js/shared/content_playback_source.js",
+                "js/content/content_playback_admission.js",
+                "js/content/content_playback_player.js",
+                "js/content/content_playback_captions.js",
+                "js/content/content_playback.js",
                 "js/content_bridge.js"
             ],
             "run_at": "document_start"
@@ -126,6 +131,7 @@
         {
             "resources": [
                 "js/injector.js",
+                "js/content/content_playback_response.js",
                 "js/filter_logic.js",
                 "js/seed.js",
                 "js/shared/identity.js", "js/shared/view_count.js", "js/content/admission_overlay.js",

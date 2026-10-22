@@ -7163,6 +7163,8 @@ async function initializeDOMFallback(settings) {
     }
 
     await new Promise(resolve => setTimeout(resolve, 1000));
+    window.FilterTubeContentPlayback?.initialize();
+    window.FilterTubeContentPlayback?.refresh();
     if (!settings) {
         const response = await requestSettingsFromBackground();
         settings = response?.settings;

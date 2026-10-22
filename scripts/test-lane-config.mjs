@@ -155,6 +155,14 @@ const FILTER_LOGIC_AUDIT_PROOF_TESTS = Object.freeze([
   'tests/runtime/filter-logic-rule-field-effect-semantic-register-current-behavior.test.mjs',
   'tests/runtime/filter-logic-rule-path-semantic-register-current-behavior.test.mjs'
 ]);
+const CONTENT_PLAYBACK_TESTS = Object.freeze([
+  'tests/runtime/content-playback-admission-current-behavior.test.mjs',
+  'tests/runtime/content-playback-source-current-behavior.test.mjs',
+  'tests/runtime/content-playback-captions-current-behavior.test.mjs',
+  'tests/runtime/content-playback-player.test.mjs',
+  'tests/runtime/content-playback-response.test.mjs',
+  'tests/runtime/content-playback-coordinator.test.mjs'
+]);
 export const LANES = Object.freeze({
   release: {
     description: 'Build, package, release docs, public claims, and artifact boundaries.',
@@ -199,6 +207,8 @@ export const LANES = Object.freeze({
   whitelist: {
     description: 'Whitelist-only mode, pending hides, allow-list leaks, Shorts, watch, end-screen, Kids, and YTM allow behavior.',
     tests: [
+      'tests/runtime/content-playback-admission-current-behavior.test.mjs',
+      'tests/runtime/content-playback-coordinator.test.mjs',
       ...FILTER_LOGIC_AUDIT_PROOF_TESTS,
       'tests/runtime/json-first-whitelist-decision-identity-boundary-current-behavior.test.mjs',
       'tests/runtime/content-bridge-whitelist-pending-refresh-boundary-current-behavior.test.mjs',
@@ -227,6 +237,8 @@ export const LANES = Object.freeze({
   blocking: {
     description: 'Keyword, channel, comment, blocklist, list-target, and hide-decision behavior.',
     tests: [
+      'tests/runtime/content-playback-admission-current-behavior.test.mjs',
+      'tests/runtime/content-playback-coordinator.test.mjs',
       'tests/runtime/watch-selected-playlist-row-admission.test.mjs',
       'tests/runtime/category-pending-lifetime.test.mjs',
       'tests/runtime/category-pending-dom-pipeline.test.mjs',
@@ -254,6 +266,7 @@ export const LANES = Object.freeze({
   json: {
     description: 'JSON-first filtering, network interception, response mutation, list mode, and endpoint work gates.',
     tests: [
+      ...CONTENT_PLAYBACK_TESTS,
       'tests/runtime/get-watch-streaming-interception.test.mjs',
       'tests/runtime/ad-void-duration-seek-current-behavior.test.mjs',
       'tests/runtime/advert-content-interception.test.mjs',
@@ -324,6 +337,8 @@ export const LANES = Object.freeze({
   dom: {
     description: 'DOM fallback selectors, hide/restore state, cleanup passes, and recycled node behavior.',
     tests: [
+      'tests/runtime/content-playback-admission-current-behavior.test.mjs',
+      'tests/runtime/content-playback-coordinator.test.mjs',
       'tests/runtime/watch-selected-playlist-row-admission.test.mjs',
       'tests/runtime/category-pending-lifetime.test.mjs',
       'tests/runtime/category-pending-dom-pipeline.test.mjs',
@@ -368,6 +383,7 @@ export const LANES = Object.freeze({
   performance: {
     description: 'No-rule/no-work budgets, SPA lag guards, disabled mode, active-rule gates, and identity work budgets.',
     tests: [
+      ...CONTENT_PLAYBACK_TESTS,
       'tests/runtime/get-watch-streaming-interception.test.mjs',
       'tests/runtime/ad-void-duration-seek-current-behavior.test.mjs',
       'tests/runtime/popup-intrinsic-sizing.test.mjs',
@@ -402,6 +418,8 @@ export const LANES = Object.freeze({
   settings: {
     description: 'Settings compile, profiles, storage refresh, migrations, import/export, backups, and sync boundaries.',
     tests: [
+      'tests/runtime/content-playback-admission-current-behavior.test.mjs',
+      'tests/runtime/content-playback-coordinator.test.mjs',
       'tests/runtime/minimum-view-count-current-behavior.test.mjs',
       'tests/runtime/minimum-views-controls-current-behavior.test.mjs',
       'tests/runtime/nanah-storage-lock-current-behavior.test.mjs',
@@ -480,6 +498,7 @@ export const LANES = Object.freeze({
     description: 'Small release confidence lane for common lag, blocking, menu, and release-surface regressions.',
     checks: ['build.js'],
     tests: [
+      ...CONTENT_PLAYBACK_TESTS,
       'tests/runtime/get-watch-streaming-interception.test.mjs',
       'tests/runtime/ad-void-duration-seek-current-behavior.test.mjs',
       'tests/runtime/popup-intrinsic-sizing.test.mjs',
