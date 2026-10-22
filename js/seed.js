@@ -72,6 +72,8 @@
         resumeAttempts: 0,
         advancedAdVideo: null,
         advancedAdDuration: 0,
+        advanceAttempt: null,
+        contentDuration: null,
         placement: 'unknown',
         contentTimelineAtAdStart: null,
         adEndedAt: 0,
@@ -199,7 +201,33 @@
         }) || candidates[0] || null;
     }
 
+    function adVoidCurrentVideoId() {
+        const route = document.location;
+        const videoId = /^\/watch\/?$/.test(route?.pathname || '')
+            ? new URLSearchParams(route?.search || '').get('v') || ''
+            : /^\/(?:shorts|embed|live)\/([^/?#]+)(?:\/|$)/.exec(route?.pathname || '')?.[1] || '';
+        return /^[A-Za-z0-9_-]{11}$/.test(videoId) ? videoId : '';
+    }
+
+    function adVoidRememberContentDuration(data, dataName) {
+        if (!isAdVoidEnabled() || !isAdVoidPlayerPayload(dataName)) return;
+        const videoId = adVoidCurrentVideoId();
+        if (!videoId) return;
+        for (const candidate of playerResponseCandidates(data)) {
+            const details = candidate?.videoDetails;
+            const duration = Number(details?.lengthSeconds);
+            if (details?.videoId === videoId && Number.isFinite(duration) && duration > 0) {
+                // Keep one identity-bound scalar, not another raw response.
+                adVoidState.contentDuration = { videoId, duration };
+                return;
+            }
+        }
+    }
+
     function adVoidExpectedContentDuration() {
+        const videoId = adVoidCurrentVideoId();
+        if (!videoId) return 0;
+        if (adVoidState.contentDuration?.videoId === videoId) return adVoidState.contentDuration.duration;
         const candidates = [
             rawYtInitialPlayerResponse,
             window.ytInitialPlayerResponse,
@@ -209,8 +237,10 @@
             document.querySelector('ytd-watch-flexy')?.playerData?.videoDetails,
             document.querySelector('ytd-watch-flexy')?.data?.playerResponse
         ];
-        for (const candidate of candidates) {
-            const value = Number(candidate?.videoDetails?.lengthSeconds || candidate?.lengthSeconds);
+        for (const candidate of candidates.flatMap(playerResponseCandidates)) {
+            const details = candidate?.videoDetails || candidate;
+            if (details?.videoId !== videoId) continue;
+            const value = Number(details.lengthSeconds);
             if (Number.isFinite(value) && value > 0) return value;
         }
         return 0;
@@ -464,10 +494,11 @@
     }
 
     function adVoidAdvanceConfirmedAd(adVideo, player, expectedDuration) {
-        if (!adVideo || !player || !player.contains(adVideo)) return false;
-        if (adVoidState.advancedAdVideo === adVideo && adVoidState.advancedAdDuration === adVideo.duration) {
-            return false;
-        }
+        if (!isAdVoidEnabled() || !adVideo || !player || !player.contains(adVideo)) return false;
+        const videoId = adVoidCurrentVideoId();
+        if (!videoId) return false;
+        // Discovery's duration is not authority for a later attempt or route.
+        expectedDuration = adVoidExpectedContentDuration();
         const className = String(player.className || '');
         const hasAdShowing = className.includes('ad-showing');
         const hasAdInterrupting = className.includes('ad-interrupting');
@@ -475,6 +506,14 @@
         const duration = Number(adVideo.duration);
         const currentTime = Number(adVideo.currentTime || 0);
         if (!Number.isFinite(duration) || duration <= 2) return false;
+        const safeEnd = Math.max(0, duration - 0.25);
+        if (adVoidState.advancedAdVideo === adVideo && adVoidState.advancedAdDuration === duration) {
+            if (currentTime >= safeEnd - 0.1) return false;
+            // A player may roll back an accepted seek. It may retry, but only
+            // within the same per-element, duration and route attempt budget.
+            adVoidState.advancedAdVideo = null;
+            adVoidState.advancedAdDuration = 0;
+        }
         const differsFromRequestedContent = expectedDuration > 0
             && Math.abs(duration - expectedDuration) > 2.5;
         if (expectedDuration > 0 && !differsFromRequestedContent) {
@@ -499,12 +538,22 @@
         // into the requested video between discovery and advancement.
         const currentPlayerVideo = Array.from(player.querySelectorAll('video'))
             .find(video => !video.paused) || player.querySelector('video.html5-main-video');
-        if (currentPlayerVideo !== adVideo || !adVoidHasInterruption(player)) return false;
-        const safeEnd = Math.max(0, duration - 0.25);
+        if (currentPlayerVideo !== adVideo || !adVoidHasInterruption(player)
+            || !isAdVoidEnabled() || !player.contains(adVideo)
+            || adVoidCurrentVideoId() !== videoId
+            || adVoidExpectedContentDuration() !== expectedDuration
+            || Number(adVideo.duration) !== duration) return false;
         if (currentTime >= safeEnd - 0.1) return false;
+        const now = Date.now();
+        let attempt = adVoidState.advanceAttempt;
+        if (!attempt || attempt.video !== adVideo || attempt.duration !== duration || attempt.videoId !== videoId) {
+            attempt = { video: adVideo, duration, videoId, count: 0, at: 0 };
+            adVoidState.advanceAttempt = attempt;
+        }
+        if (attempt.count >= 3 || (attempt.count > 0 && now - attempt.at < AD_VOID_POLL_MS)) return false;
+        attempt.count += 1;
+        attempt.at = now;
         try {
-            adVoidState.advancedAdVideo = adVideo;
-            adVoidState.advancedAdDuration = duration;
             adVideo.currentTime = safeEnd;
             let playerDuration = null;
             let playerSeekApplied = false;
@@ -529,7 +578,14 @@
                 }
             } catch (e) {
             }
+            if (Number(adVideo.currentTime) < safeEnd - 0.1 || !Number.isFinite(Number(adVideo.currentTime))) {
+                adVoidTrace('confirmed-ad-advance-not-applied', { attempt: attempt.count });
+                return false;
+            }
+            adVoidState.advancedAdVideo = adVideo;
+            adVoidState.advancedAdDuration = duration;
             adVoidTrace('confirmed-ad-advanced', {
+                attempt: attempt.count,
                 from: currentTime,
                 to: safeEnd,
                 playerDuration,
@@ -706,6 +762,7 @@
                     adVoidState.resumeAttempts = 0;
                     adVoidState.advancedAdVideo = null;
                     adVoidState.advancedAdDuration = 0;
+                    adVoidState.advanceAttempt = null;
                 }
             }
             adVoidTraceRequestedContentReady(player);
@@ -719,6 +776,7 @@
             adVoidState.resumeAttempts = 0;
             adVoidState.advancedAdVideo = null;
             adVoidState.advancedAdDuration = 0;
+            adVoidState.advanceAttempt = null;
             adVoidState.contentTimelineAtAdStart = adVoidContentTimelineSnapshot(player);
             adVoidState.placement = adVoidState.contentTimelineAtAdStart.placement;
             adVoidState.adEndedAt = 0;
@@ -1482,6 +1540,7 @@
             rememberOriginalAudioTrack(data);
         }
 
+        adVoidRememberContentDuration(data, dataName);
         adVoidRemovePlayerAdPlan(data, dataName);
 
         const queueForLater = (reason) => {
