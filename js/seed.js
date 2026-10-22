@@ -1769,6 +1769,135 @@
     /**
      * Set up fetch interception for dynamic content
      */
+    // get_watch sends a top-level array whose player record can arrive long
+    // before its watch-next tail. Preserve that delivery boundary instead of
+    // awaiting clone().json() for the complete response.
+    function streamGetWatchResponse(response, dataName) {
+        if (!response.body || typeof response.body.getReader !== 'function'
+            || typeof ReadableStream !== 'function' || typeof TextDecoder !== 'function'
+            || typeof TextEncoder !== 'function' || typeof Headers !== 'function') return null;
+        const reader = response.body.getReader();
+        const decoder = new TextDecoder('utf-8', { fatal: true });
+        const encoder = new TextEncoder();
+        let mode = 'root';
+        let token = '';
+        let fallback = '';
+        let depth = 0;
+        let inString = false;
+        let escaped = false;
+        let allowEmpty = true;
+        let finished = false;
+        const release = () => { try { reader.releaseLock(); } catch (e) {} };
+        const stream = new ReadableStream({
+            async pull(controller) {
+                let emitted = false;
+                const emit = text => {
+                    if (!text) return;
+                    controller.enqueue(encoder.encode(text));
+                    emitted = true;
+                };
+                const completeRecord = () => {
+                    const record = JSON.parse(token);
+                    const processed = processWithEngine(record, dataName);
+                    emit(JSON.stringify(processed));
+                    token = '';
+                    mode = 'delimiter';
+                };
+                const consume = text => {
+                    for (let index = 0; index < text.length; index++) {
+                        const char = text[index];
+                        if (mode === 'fallback') { fallback += text.slice(index); break; }
+                        if (mode === 'root') {
+                            fallback += char;
+                            if (/[ \t\r\n]/.test(char)) continue;
+                            if (char !== '[') { mode = 'fallback'; continue; }
+                            fallback = '';
+                            mode = 'value';
+                            emit('[');
+                            continue;
+                        }
+                        if (mode === 'end') {
+                            if (!/[ \t\r\n]/.test(char)) throw new SyntaxError('Unexpected data after get_watch array');
+                            continue;
+                        }
+                        if (mode === 'delimiter') {
+                            if (/[ \t\r\n]/.test(char)) continue;
+                            if (char === ']') { mode = 'end'; emit(']'); continue; }
+                            if (char !== ',') throw new SyntaxError('Missing get_watch record delimiter');
+                            emit(',');
+                            allowEmpty = false;
+                            mode = 'value';
+                            continue;
+                        }
+                        if (!token) {
+                            if (/[ \t\r\n]/.test(char)) continue;
+                            if (char === ']' && allowEmpty) { mode = 'end'; emit(']'); continue; }
+                            if (char === ']' || char === ',') throw new SyntaxError('Missing get_watch record');
+                        }
+                        // Primitive values need a delimiter; objects, arrays and
+                        // strings can be forwarded as soon as their token closes.
+                        if (token && !inString && depth === 0 && /[ \t\r\n,\]]/.test(char)) {
+                            completeRecord();
+                            index -= 1;
+                            continue;
+                        }
+                        token += char;
+                        if (inString) {
+                            if (escaped) escaped = false;
+                            else if (char === '\\') escaped = true;
+                            else if (char === '"') {
+                                inString = false;
+                                if (depth === 0) completeRecord();
+                            }
+                        } else if (char === '"') {
+                            inString = true;
+                        } else if (char === '{' || char === '[') {
+                            depth += 1;
+                        } else if (char === '}' || char === ']') {
+                            depth -= 1;
+                            if (depth === 0) completeRecord();
+                        }
+                    }
+                };
+                try {
+                    while (!finished && !emitted) {
+                        const chunk = await reader.read();
+                        if (finished) return;
+                        consume(decoder.decode(chunk.value, { stream: !chunk.done }));
+                        if (!chunk.done) continue;
+                        if (mode === 'fallback' || mode === 'root') {
+                            let output = fallback;
+                            try { output = JSON.stringify(processWithEngine(JSON.parse(fallback), dataName)); }
+                            catch (error) { /* Unknown non-array wire formats retain their original text. */ }
+                            emit(output);
+                        } else if (mode !== 'end') {
+                            throw new SyntaxError('Incomplete get_watch array');
+                        }
+                        finished = true;
+                        release();
+                        controller.close();
+                    }
+                } catch (error) {
+                    finished = true;
+                    const cancellation = reader.cancel(error);
+                    release();
+                    controller.error(error);
+                    try { await cancellation; } catch (e) {}
+                }
+            },
+            async cancel(reason) {
+                finished = true;
+                try { await reader.cancel(reason); } finally { release(); }
+            }
+        });
+        const headers = new Headers(response.headers);
+        // fetch exposes decoded bytes; the transformed body's wire length and
+        // compression metadata no longer describe the returned representation.
+        headers.delete('content-length');
+        headers.delete('content-encoding');
+        return new Response(stream, { status: response.status, statusText: response.statusText, headers });
+    }
+
     function setupFetchInterception() {
         const fetchEndpoints = [
             '/youtubei/v1/search',
@@ -1805,6 +1934,10 @@
                 // Decide at delivery time, while preserving the no-parse fast
                 // path when filtering is still disabled or has no work.
                 if (shouldBypassYouTubeiNetworkResponse(dataName)) return response;
+                if (getPathname(urlStr) === '/youtubei/v1/get_watch') {
+                    const streamed = streamGetWatchResponse(response, dataName);
+                    if (streamed) return streamed;
+                }
 
                 return response.clone().json().then(jsonData => {
                     // Special handling for comment requests when hideAllComments is enabled
