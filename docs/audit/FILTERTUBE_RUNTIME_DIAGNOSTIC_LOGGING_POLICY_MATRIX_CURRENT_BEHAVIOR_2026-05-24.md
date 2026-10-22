@@ -848,3 +848,46 @@ The existing 21-file scoped console matrix remains at 446 callsites. The six new
 | `js/content/content_playback_player.js` | 336 | 17903 | `56d208f7efe5e09dac1de2499b1c2df23f7185f0312dc3277f8987d07c82a557` |
 | `js/content/content_playback_response.js` | 83 | 4744 | `214f184f7bf78a9c6e89f335947118b2d53831e4518645b725a73ecce6baf0da` |
 | `js/shared/content_playback_source.js` | 187 | 12402 | `cc22a59b178f681b29ad460a32cca7bb09dd9ffc52e5b650d6e18240578c0f0b` |
+
+
+## Owned Playback Current Fingerprint And Logging Revalidation - 2026-10-22
+
+The eight playback modules remain free of direct console and logging relay callsites. Current pins include the locally replaceable resolver, indexed transport, track selection, action tokens, dynamic native timeline checks and managed heartbeat receipt integration. The existing 21-file console matrix retains its counts and proof limits. Earlier source hashes and line positions remain dated evidence; these new current pins do not establish installed playback or a complete privacy/performance budget.
+
+| File | Lines | Bytes | SHA-256 |
+| --- | ---: | ---: | --- |
+| `js/content/bridge_settings.js` | 2236 | 100980 | `6cac827d16839ce9fc01ebc94b54e56ce550169271e27ce73a77453ea0160a8d` |
+| `js/content/content_playback.js` | 353 | 21744 | `d58896b43193a66e7d765b160163be5413f16490aff973da26e8aade545487a8` |
+| `js/content/content_playback_admission.js` | 131 | 7500 | `71ee13a96de07fdf988dc25300b1b09e0379e687047b5a5b7c21605bcbe68763` |
+| `js/content/content_playback_captions.js` | 138 | 8244 | `c5768f3bb7836321b030009492fe2ae703bb3e785352eabf8b2f383ca203c196` |
+| `js/content/content_playback_player.js` | 484 | 27588 | `791e88bfa8f53c5e7dd5b8a4752a222812cf288f43e31ff3f0b9b7a6708c81cd` |
+| `js/content/content_playback_response.js` | 122 | 7295 | `f6f6f3ecc18a87bba9c707bb246b6912543877be623ae76fc177dc616776e804` |
+| `js/content/content_playback_transport.js` | 400 | 25096 | `02b9b6d076757eca5b8f25d94bbf8865db4e3eb6a7e24d65c69ebd894cd6fd88` |
+| `js/shared/content_playback_resolver.js` | 289 | 20517 | `0b6eaa53cd414f276af434ade022357adab37372707e669768b70d87ab953bc3` |
+| `js/shared/content_playback_source.js` | 187 | 12402 | `cc22a59b178f681b29ad460a32cca7bb09dd9ffc52e5b650d6e18240578c0f0b` |
+
+
+## Cold-Mount Coordinator Build Revalidation - 2026-10-22
+
+The coordinator now retries a missing initial watch-page mount target at most twenty times at 500ms intervals, with cleanup on route/settings invalidation or successful mount. The final rebuild refreshed generated README line-count badges. Earlier hashes remain dated source checkpoints. This current pin is independent of installed playback acceptance.
+
+| File | Lines | Bytes | SHA-256 |
+| --- | ---: | ---: | --- |
+| `js/content/content_playback.js` | 370 | 22453 | `121794e9a4fe939f416fed499e43a4e4e1131a8b417e8a40d504b89552a55664` |
+
+
+## Native Source Handoff Fingerprints - 2026-10-22
+
+All nine repository playback modules have zero direct console and logging relay callsites. The active isolated stack is source, resolver, admission, native and coordinator; response remains the MAIN bridge. The older transport, player and caption modules remain inventoried but inactive. These pins do not establish installed playback or a complete privacy/performance budget.
+
+| File | Lines | Bytes | SHA-256 |
+| --- | ---: | ---: | --- |
+| `js/content/content_playback.js` | 302 | 17926 | `12a84c004a11098f1cf5c2b9d1172aa4a95ccdd6533465ef9410fc9d8fee72b4` |
+| `js/content/content_playback_admission.js` | 131 | 7500 | `71ee13a96de07fdf988dc25300b1b09e0379e687047b5a5b7c21605bcbe68763` |
+| `js/content/content_playback_captions.js` | 138 | 8244 | `c5768f3bb7836321b030009492fe2ae703bb3e785352eabf8b2f383ca203c196` |
+| `js/content/content_playback_native.js` | 265 | 17946 | `8ab9407e60777b3a9b694fabde9ed25cce87287e0da2271e2e1a6023e6e633df` |
+| `js/content/content_playback_player.js` | 484 | 27588 | `791e88bfa8f53c5e7dd5b8a4752a222812cf288f43e31ff3f0b9b7a6708c81cd` |
+| `js/content/content_playback_response.js` | 341 | 24688 | `c033715d279ecc6e45ba3a00006b719e8131a14f8d55b6c7518c71fef39434e4` |
+| `js/content/content_playback_transport.js` | 400 | 25096 | `02b9b6d076757eca5b8f25d94bbf8865db4e3eb6a7e24d65c69ebd894cd6fd88` |
+| `js/shared/content_playback_resolver.js` | 295 | 21072 | `63e5825e494d120e25328ce478e2bbcafb11be4b6a4a337ed6856d61428a7d81` |
+| `js/shared/content_playback_source.js` | 187 | 12402 | `cc22a59b178f681b29ad460a32cca7bb09dd9ffc52e5b650d6e18240578c0f0b` |

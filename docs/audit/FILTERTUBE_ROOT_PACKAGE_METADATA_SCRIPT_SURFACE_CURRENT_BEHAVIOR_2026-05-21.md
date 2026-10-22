@@ -325,3 +325,30 @@ The build-generated total-lines badge changed from 879.2k to 881.0k. The README 
 ## Popup And Streaming Build Fingerprint Revalidation - 2026-10-22
 
 The frozen build refreshed only README badges: total lines changed from 881.0k to 881.9k and JavaScript lines from 121.3k to 121.5k. README remains 456 lines and 28,669 bytes; the current SHA-256 above was measured after the completed build. This pin refresh is not release publication, installed-package verification, or a code-coverage claim.
+
+
+## Owned Playback Build Metadata Revalidation - 2026-10-22
+
+The README generated line-count badges were refreshed by the build. Its line and byte totals are unchanged; only its current hash changes. Earlier hashes remain historical, and this pin supplies no new runtime, dependency or release-publication authority.
+
+| File | Lines | Bytes | SHA-256 |
+| --- | ---: | ---: | --- |
+| `README.md` | 456 | 28669 | `c86a3b7a701bbc48f653e3c916c464859317906ca1300805f027f7750932fa23` |
+
+
+## Cold-Mount Coordinator Build Revalidation - 2026-10-22
+
+The coordinator now retries a missing initial watch-page mount target at most twenty times at 500ms intervals, with cleanup on route/settings invalidation or successful mount. The final rebuild refreshed generated README line-count badges. Earlier hashes remain dated source checkpoints. This current pin is independent of installed playback acceptance.
+
+| File | Lines | Bytes | SHA-256 |
+| --- | ---: | ---: | --- |
+| `README.md` | 456 | 28669 | `93a31fb23de82c2bdb4b3d2da44be114dcf0ecc64fa771e7f8d05033e1b8e625` |
+
+
+## Native Source Handoff Final Build Metadata - 2026-10-22
+
+All three browser packages were rebuilt from the frozen native source. The README generated badge is pinned below. Package/source equality is checked independently; this is not installed playback, fullscreen, profile or release-publication acceptance. Earlier build hashes remain dated evidence.
+
+| File | Lines | Bytes | SHA-256 |
+| --- | ---: | ---: | --- |
+| `README.md` | 456 | 28669 | `a700c32e22dcbfc3ea8e68b40aa4320006b634fef1843d5f117e9e55bc691f3c` |

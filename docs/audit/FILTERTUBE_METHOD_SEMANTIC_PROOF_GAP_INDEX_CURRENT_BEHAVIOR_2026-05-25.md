@@ -959,8 +959,8 @@ lexical and its scope remains tracked JS/JSX/MJS: CJS/Python tooling requires it
 separate release/workflow review and is not silently counted as JavaScript here.
 
 ```text
-current tracked JS/JSX/MJS files: 117
-current repo-wide lexical callables: 9299
+current tracked JS/JSX/MJS files: 120
+current repo-wide lexical callables: 9471
 current complete per-callable semantic proofs: 0
 current callable behavior-change approval: NO-GO
 runtime behavior changed by inventory refresh: no
@@ -969,8 +969,8 @@ runtime behavior changed by inventory refresh: no
 | Family | Files | Lexical callables |
 | --- | ---: | ---: |
 | Build/sync scripts | 5 | 75 |
-| Hot page/background runtime | 9 | 3843 |
-| Content helper runtime | 19 | 600 |
+| Hot page/background runtime | 9 | 3855 |
+| Content helper runtime | 22 | 760 |
 | UI/settings runtime | 24 | 3712 |
 | Generated/quarantined UI | 6 | 147 |
 | Vendor bundles | 3 | 279 |
@@ -984,14 +984,15 @@ runtime behavior changed by inventory refresh: no
 | `js/content/admission_overlay.js` | Content helper runtime | 25 | `semantic proof incomplete` | Lexical accounting only; no complete per-callable closure claimed. |
 | `js/content/block_channel.js` | Hot page/background runtime | 234 | `semantic proof incomplete` | Lexical accounting only; no complete per-callable closure claimed. |
 | `js/content/bridge_injection.js` | Content helper runtime | 14 | `semantic proof incomplete` | Lexical accounting only; no complete per-callable closure claimed. |
-| `js/content/bridge_settings.js` | Hot page/background runtime | 141 | `semantic proof incomplete` | Lexical accounting only; no complete per-callable closure claimed. |
+| `js/content/bridge_settings.js` | Hot page/background runtime | 153 | `semantic proof incomplete` | Lexical accounting only; no complete per-callable closure claimed. |
 | `js/content/collab_dialog.js` | Content helper runtime | 42 | `semantic proof incomplete` | Lexical accounting only; no complete per-callable closure claimed. |
-| `js/content/content_playback.js` | Content helper runtime | 24 | `semantic proof incomplete` | Lexical accounting only; no complete per-callable closure claimed. |
+| `js/content/content_playback.js` | Content helper runtime | 25 | `semantic proof incomplete` | Lexical accounting only; no complete per-callable closure claimed. |
 | `js/content/content_playback_admission.js` | Content helper runtime | 12 | `semantic proof incomplete` | Lexical accounting only; no complete per-callable closure claimed. |
 | `js/content/content_playback_captions.js` | Content helper runtime | 19 | `semantic proof incomplete` | Lexical accounting only; no complete per-callable closure claimed. |
-| `js/content/content_playback_player.js` | Content helper runtime | 32 | `semantic proof incomplete` | Lexical accounting only; no complete per-callable closure claimed. |
-| `js/content/content_playback_response.js` | Content helper runtime | 4 | `semantic proof incomplete` | Lexical accounting only; no complete per-callable closure claimed. |
-| `js/shared/content_playback_source.js` | Content helper runtime | 18 | `semantic proof incomplete` | Lexical accounting only; no complete per-callable closure claimed. |
+| `js/content/content_playback_native.js` | Content helper runtime | 45 | `semantic proof incomplete` | Lexical accounting only; no complete per-callable closure claimed. |
+| `js/content/content_playback_player.js` | Content helper runtime | 45 | `semantic proof incomplete` | Lexical accounting only; no complete per-callable closure claimed. |
+| `js/content/content_playback_response.js` | Content helper runtime | 29 | `semantic proof incomplete` | Lexical accounting only; no complete per-callable closure claimed. |
+| `js/content/content_playback_transport.js` | Content helper runtime | 51 | `semantic proof incomplete` | Lexical accounting only; no complete per-callable closure claimed. |
 | `js/content/dom_extractors.js` | Content helper runtime | 117 | `semantic proof incomplete` | Lexical accounting only; no complete per-callable closure claimed. |
 | `js/content/dom_fallback.js` | Hot page/background runtime | 669 | `semantic proof incomplete` | Lexical accounting only; no complete per-callable closure claimed. |
 | `js/content/dom_helpers.js` | Content helper runtime | 21 | `semantic proof incomplete` | Lexical accounting only; no complete per-callable closure claimed. |
@@ -1025,6 +1026,8 @@ runtime behavior changed by inventory refresh: no
 | `js/security_manager.js` | UI/settings runtime | 18 | `semantic proof incomplete` | Lexical accounting only; no complete per-callable closure claimed. |
 | `js/seed.js` | Hot page/background runtime | 195 | `semantic proof incomplete` | Lexical accounting only; no complete per-callable closure claimed. |
 | `js/settings_shared.js` | UI/settings runtime | 45 | `semantic proof incomplete` | Lexical accounting only; no complete per-callable closure claimed. |
+| `js/shared/content_playback_resolver.js` | Content helper runtime | 25 | `semantic proof incomplete` | Lexical accounting only; no complete per-callable closure claimed. |
+| `js/shared/content_playback_source.js` | Content helper runtime | 18 | `semantic proof incomplete` | Lexical accounting only; no complete per-callable closure claimed. |
 | `js/shared/identity.js` | Content helper runtime | 110 | `semantic proof incomplete` | Lexical accounting only; no complete per-callable closure claimed. |
 | `js/shared/view_count.js` | Content helper runtime | 4 | `semantic proof incomplete` | Lexical accounting only; no complete per-callable closure claimed. |
 | `js/state_manager.js` | UI/settings runtime | 180 | `semantic proof incomplete` | Lexical accounting only; no complete per-callable closure claimed. |
@@ -1273,3 +1276,28 @@ only bookkeeping and test assertions about current inventories.
 Six new playback modules are now tracked: source planning, isolated admission, VTT preparation, an explicitly started player, its isolated coordinator, and a bounded MAIN response bridge. The unchanged lexical parser measures 117 files and 9,299 matches (3,843 hot-runtime and 600 helper matches). New helper matches include callbacks and control-flow forms; they are not complete semantic method proofs. Current counters include the playback invalidation hooks and the profile-change classifier correction.
 
 The six dedicated runtime suites cover planning, authority, response projection, caption preparation, controller lifecycle and coordinator boundaries. Source/VM evidence does not establish installed playable-source availability, browser caption/audio success, native parity, or a solution to live SABR backoff. Default playback remains native until an explicit experimental action; missing authority or unsupported features retain that path. Existing historical measurements and NO-GO limits remain unchanged. This inventory refresh changes no runtime behavior.
+
+
+### Owned Resolver And Indexed Transport Lexical Revalidation - 2026-10-22
+
+The unchanged parser now measures 119 tracked files and 9,406 lexical matches: 3,855 hot-runtime matches and 695 helper matches across 21 helper files. The two new source files are the locally replaceable resolver and bounded indexed-media transport; the refreshed counts also include managed heartbeat receipts, explicit audio selection and native timeline provenance checks. This is current lexical coverage, not complete per-callable semantic proof, installed playback acceptance or release approval. Earlier dated revalidation measurements remain historical.
+
+
+### Managed Receipt Bridge Source Locus Revalidation - 2026-10-22
+
+Historical source locations above remain dated. These settings-fanout functions shifted after the new managed receipt closure and hooks; the current locations below supply no new semantic or installed proof.
+
+| Method | Current source | Boundary |
+| --- | --- | --- |
+| `bridge_settings_refreshRuntimeObserversAfterSettingsUpdate` | `js/content/bridge_settings.js:1991` | Current location only; complete semantic proof remains unavailable. |
+| `bridge_settings_scheduleSettingsRefreshFromStorage` | `js/content/bridge_settings.js:2024` | Current location only; complete semantic proof remains unavailable. |
+
+
+### Cold-Mount Retry Lexical Revalidation - 2026-10-22
+
+A bounded coordinator mount retry adds two lexical matches. Current accounting is 119 files, 9,408 total matches and 697 helper matches across 21 files; hot runtime remains 3,855. Earlier follow-on source counts above describe the pre-retry checkpoint. The retry and its source inventory do not establish installed acceptance or complete semantic proof.
+
+
+### Native Source Handoff Lexical Revalidation - 2026-10-22
+
+The unchanged parser now measures 120 tracked files and 9,471 lexical matches: 3,855 hot-runtime matches and 760 helper matches across 22 helper files. The new native source transaction joins the repository inventory. Legacy transport, separate player and caption modules remain tracked but are not in the active manifest stack. Counts establish lexical coverage only; installed native playback, profile enforcement and release acceptance require separate evidence. Earlier dated counts remain historical.

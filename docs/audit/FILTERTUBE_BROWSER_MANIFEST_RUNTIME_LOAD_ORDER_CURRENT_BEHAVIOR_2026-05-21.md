@@ -205,3 +205,27 @@ Current normal isolated stacks add source planning, admission leases, the owned-
 | manifest.chrome.json | 160 | 5545 | b5229834ae6c291dbc4ad69b212c5ef086d8214b199678a0c09a46ae0eaa80c9 |
 | manifest.firefox.json | 134 | 4431 | f5ae06e03e855cd3c8c4a88e4fcc832c70341d56eb2edab33211d380a6b5c2fb |
 | manifest.opera.json | 168 | 5734 | 5f5809782261a21e8d8a6231178011c25a9de47fd8dfc8f4af834009a9084a07 |
+
+
+## Owned Resolver And Transport Load Order - 2026-10-22
+
+The normal isolated stack now loads source planner, replaceable resolver, admission, indexed transport, player, captions and coordinator before content_bridge. The two new modules do not enter MAIN, embed or Google-preview stacks. Permissions, host scope, world assignments, web-accessible resources and CSS quarantine retain their asserted boundaries. Earlier rows describe dated source states, not current playback acceptance.
+
+| File | Lines | Bytes | SHA-256 |
+| --- | ---: | ---: | --- |
+| `manifest.json` | 162 | 5663 | `f60a40c4344a7dd0390cb8dd88971b148b0600358c1d7b9bed609954f7ad633e` |
+| `manifest.chrome.json` | 162 | 5663 | `f60a40c4344a7dd0390cb8dd88971b148b0600358c1d7b9bed609954f7ad633e` |
+| `manifest.firefox.json` | 136 | 4533 | `f65bb52374d869f2b78f6a9b6b63679b68ef4fc0fb20e4725a536584c61d20ea` |
+| `manifest.opera.json` | 170 | 5852 | `940b18bd821f9463260b6fb20f19bc32321132663a72f3de0d9cfee7b4eba30e` |
+
+
+## Native Source Handoff Load Order - 2026-10-22
+
+Normal isolated pages load source planner, resolver, admission, native source transaction and coordinator before content_bridge. Legacy transport, separate player and captions are absent from all active content script entries. MAIN response remains a web-accessible injected bridge; permissions, host scope, worlds, embed and Google-preview boundaries are unchanged. Earlier source snapshots describe the superseded overlay pilot.
+
+| File | Lines | Bytes | SHA-256 |
+| --- | ---: | ---: | --- |
+| `manifest.json` | 160 | 5544 | `78e3025b7b5bc01db2d88ab79edcb6294c815bf721060d384b2905d4adb21337` |
+| `manifest.chrome.json` | 160 | 5544 | `78e3025b7b5bc01db2d88ab79edcb6294c815bf721060d384b2905d4adb21337` |
+| `manifest.firefox.json` | 134 | 4430 | `8f177b22836825420d6967945b83eaa7cba8c48cd615bed2b05cdd1f54de430c` |
+| `manifest.opera.json` | 168 | 5733 | `9070a9af9b7bf4b218c6a618b0ddf8c42f20c4e0f60661db41308e21da901a4e` |

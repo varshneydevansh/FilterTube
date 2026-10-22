@@ -1,0 +1,113 @@
+[
+  {
+    "browser": "chrome",
+    "checks": [
+      {
+        "path": "js/content/content_playback_native.js",
+        "sourceStageZipMatch": true,
+        "sha256": "8ab9407e60777b3a9b694fabde9ed25cce87287e0da2271e2e1a6023e6e633df"
+      },
+      {
+        "path": "js/content/content_playback.js",
+        "sourceStageZipMatch": true,
+        "sha256": "12a84c004a11098f1cf5c2b9d1172aa4a95ccdd6533465ef9410fc9d8fee72b4"
+      },
+      {
+        "path": "js/content/content_playback_response.js",
+        "sourceStageZipMatch": true,
+        "sha256": "c033715d279ecc6e45ba3a00006b719e8131a14f8d55b6c7518c71fef39434e4"
+      },
+      {
+        "path": "js/shared/content_playback_resolver.js",
+        "sourceStageZipMatch": true,
+        "sha256": "63e5825e494d120e25328ce478e2bbcafb11be4b6a4a337ed6856d61428a7d81"
+      },
+      {
+        "path": "js/content/bridge_settings.js",
+        "sourceStageZipMatch": true,
+        "sha256": "6cac827d16839ce9fc01ebc94b54e56ce550169271e27ce73a77453ea0160a8d"
+      }
+    ],
+    "activePlaybackScripts": [
+      "js/shared/content_playback_source.js",
+      "js/shared/content_playback_resolver.js",
+      "js/content/content_playback_admission.js",
+      "js/content/content_playback_native.js",
+      "js/content/content_playback.js"
+    ]
+  },
+  {
+    "browser": "firefox",
+    "checks": [
+      {
+        "path": "js/content/content_playback_native.js",
+        "sourceStageZipMatch": true,
+        "sha256": "8ab9407e60777b3a9b694fabde9ed25cce87287e0da2271e2e1a6023e6e633df"
+      },
+      {
+        "path": "js/content/content_playback.js",
+        "sourceStageZipMatch": true,
+        "sha256": "12a84c004a11098f1cf5c2b9d1172aa4a95ccdd6533465ef9410fc9d8fee72b4"
+      },
+      {
+        "path": "js/content/content_playback_response.js",
+        "sourceStageZipMatch": true,
+        "sha256": "c033715d279ecc6e45ba3a00006b719e8131a14f8d55b6c7518c71fef39434e4"
+      },
+      {
+        "path": "js/shared/content_playback_resolver.js",
+        "sourceStageZipMatch": true,
+        "sha256": "63e5825e494d120e25328ce478e2bbcafb11be4b6a4a337ed6856d61428a7d81"
+      },
+      {
+        "path": "js/content/bridge_settings.js",
+        "sourceStageZipMatch": true,
+        "sha256": "6cac827d16839ce9fc01ebc94b54e56ce550169271e27ce73a77453ea0160a8d"
+      }
+    ],
+    "activePlaybackScripts": [
+      "js/shared/content_playback_source.js",
+      "js/shared/content_playback_resolver.js",
+      "js/content/content_playback_admission.js",
+      "js/content/content_playback_native.js",
+      "js/content/content_playback.js"
+    ]
+  },
+  {
+    "browser": "opera",
+    "checks": [
+      {
+        "path": "js/content/content_playback_native.js",
+        "sourceStageZipMatch": true,
+        "sha256": "8ab9407e60777b3a9b694fabde9ed25cce87287e0da2271e2e1a6023e6e633df"
+      },
+      {
+        "path": "js/content/content_playback.js",
+        "sourceStageZipMatch": true,
+        "sha256": "12a84c004a11098f1cf5c2b9d1172aa4a95ccdd6533465ef9410fc9d8fee72b4"
+      },
+      {
+        "path": "js/content/content_playback_response.js",
+        "sourceStageZipMatch": true,
+        "sha256": "c033715d279ecc6e45ba3a00006b719e8131a14f8d55b6c7518c71fef39434e4"
+      },
+      {
+        "path": "js/shared/content_playback_resolver.js",
+        "sourceStageZipMatch": true,
+        "sha256": "63e5825e494d120e25328ce478e2bbcafb11be4b6a4a337ed6856d61428a7d81"
+      },
+      {
+        "path": "js/content/bridge_settings.js",
+        "sourceStageZipMatch": true,
+        "sha256": "6cac827d16839ce9fc01ebc94b54e56ce550169271e27ce73a77453ea0160a8d"
+      }
+    ],
+    "activePlaybackScripts": [
+      "js/shared/content_playback_source.js",
+      "js/shared/content_playback_resolver.js",
+      "js/content/content_playback_admission.js",
+      "js/content/content_playback_native.js",
+      "js/content/content_playback.js"
+    ]
+  }
+]

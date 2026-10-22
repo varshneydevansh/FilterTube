@@ -35,9 +35,9 @@ const helperStack = [
 
 const playbackStack = [
   'js/shared/content_playback_source.js',
+  'js/shared/content_playback_resolver.js',
   'js/content/content_playback_admission.js',
-  'js/content/content_playback_player.js',
-  'js/content/content_playback_captions.js',
+  'js/content/content_playback_native.js',
   'js/content/content_playback.js',
 ];
 const normalHelperStack = [...helperStack.slice(0, -1), ...playbackStack, ...helperStack.slice(-1)];
@@ -118,8 +118,8 @@ function trackedFiles() {
 }
 
 test('browser manifest current source inventory is pinned independently of historical May snapshot', () => {
-  const expected = [["manifest.json",160,5545,"b5229834ae6c291dbc4ad69b212c5ef086d8214b199678a0c09a46ae0eaa80c9"],["manifest.chrome.json",160,5545,"b5229834ae6c291dbc4ad69b212c5ef086d8214b199678a0c09a46ae0eaa80c9"],["manifest.firefox.json",134,4431,"f5ae06e03e855cd3c8c4a88e4fcc832c70341d56eb2edab33211d380a6b5c2fb"],["manifest.opera.json",168,5734,"5f5809782261a21e8d8a6231178011c25a9de47fd8dfc8f4af834009a9084a07"]];
-  const doc = read(docPath).split('## Opt-In Content Player Load Order - 2026-10-22')[1];
+  const expected = [["manifest.json",160, 5544, '78e3025b7b5bc01db2d88ab79edcb6294c815bf721060d384b2905d4adb21337'],["manifest.chrome.json",160, 5544, '78e3025b7b5bc01db2d88ab79edcb6294c815bf721060d384b2905d4adb21337'],["manifest.firefox.json",134, 4430, '8f177b22836825420d6967945b83eaa7cba8c48cd615bed2b05cdd1f54de430c'],["manifest.opera.json",168, 5733, '9070a9af9b7bf4b218c6a618b0ddf8c42f20c4e0f60661db41308e21da901a4e']];
+  const doc = read(docPath).split('## Native Source Handoff Load Order - 2026-10-22')[1];
   assert.ok(doc, 'current review must distinguish historical claims');
   for (const [file, lines, size, hash] of expected) {
     assert.equal(lineCount(file), lines);
@@ -254,6 +254,10 @@ test('owned playback dependencies stay isolated on normal pages and out of embed
     assert.deepEqual(entry.exclude_matches, ['*://*.youtube.com/embed/*']);
     assert.ok(entry.js.indexOf(playbackStack.at(-1)) < entry.js.indexOf('js/content_bridge.js'));
     assert.equal(contentScriptRefs(manifest).includes('js/content/content_playback_response.js'), false);
+    for (const inactive of ['transport', 'player', 'captions']) {
+      assert.equal(contentScriptRefs(manifest).includes(`js/content/content_playback_${inactive}.js`), false,
+        `${file} must leave the superseded separate engine inactive`);
+    }
   }
 });
 

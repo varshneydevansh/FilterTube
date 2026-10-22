@@ -11,7 +11,7 @@ const sourceFingerprints = {
   'build.js': [861, 33225, "a198cc1d0bf98e410deb8f66ced0e56a046bbf987a0a5b878e1278577622fb2e"],
   'js/background.js': [8538, 386043, "cc89bb4a0375145e1c811b7cf5953729c39c409b6b24cacdc65c80f9f6ff44d0"],
   'js/content/block_channel.js': [3361, 135050, "f2a02886a83d64d93186cd1f0c1f300683ae49754b928d2e0329fd1a88d8f2c9"],
-  'js/content/bridge_settings.js': [2130,94626,"20177156d2064b98c3e5b95310f01aaafff4f035610accbcb9d5fbf6b967a62c"],
+  'js/content/bridge_settings.js': [2236, 100980, '6cac827d16839ce9fc01ebc94b54e56ce550169271e27ce73a77453ea0160a8d'],
   'js/content/collab_dialog.js': [393, 14623, "dc34bba556b310da8b7516d106e9d67addea59d8a707a02f21607ac97af1f72a"],
   'js/content/dom_extractors.js': [1166, 48221, "ddb421e018c6e9a1ef92c7cd8dc4d91d201da814c6f25a3b63d771795cdd9e19"],
   'js/content/dom_fallback.js': [8180,381121,"121f71b40a27024636d448cd5b5de0f1e9a33e3e4e118377f1b07c20e52eb49d"],
@@ -33,9 +33,9 @@ const sourceFingerprints = {
 
 const playbackSourceFingerprints = {
   "js/content/content_playback.js": [
-    290,
-    16888,
-    "e88ba8ab3140190d006484ad40832e15c717eac2ce36cb8e5460d884c9b75b36"
+    302,
+    17926,
+    "12a84c004a11098f1cf5c2b9d1172aa4a95ccdd6533465ef9410fc9d8fee72b4"
   ],
   "js/content/content_playback_admission.js": [
     131,
@@ -47,15 +47,30 @@ const playbackSourceFingerprints = {
     8244,
     "c5768f3bb7836321b030009492fe2ae703bb3e785352eabf8b2f383ca203c196"
   ],
+  "js/content/content_playback_native.js": [
+    265,
+    17946,
+    "8ab9407e60777b3a9b694fabde9ed25cce87287e0da2271e2e1a6023e6e633df"
+  ],
   "js/content/content_playback_player.js": [
-    336,
-    17903,
-    "56d208f7efe5e09dac1de2499b1c2df23f7185f0312dc3277f8987d07c82a557"
+    484,
+    27588,
+    "791e88bfa8f53c5e7dd5b8a4752a222812cf288f43e31ff3f0b9b7a6708c81cd"
   ],
   "js/content/content_playback_response.js": [
-    83,
-    4744,
-    "214f184f7bf78a9c6e89f335947118b2d53831e4518645b725a73ecce6baf0da"
+    341,
+    24688,
+    "c033715d279ecc6e45ba3a00006b719e8131a14f8d55b6c7518c71fef39434e4"
+  ],
+  "js/content/content_playback_transport.js": [
+    400,
+    25096,
+    "02b9b6d076757eca5b8f25d94bbf8865db4e3eb6a7e24d65c69ebd894cd6fd88"
+  ],
+  "js/shared/content_playback_resolver.js": [
+    295,
+    21072,
+    "63e5825e494d120e25328ce478e2bbcafb11be4b6a4a337ed6856d61428a7d81"
   ],
   "js/shared/content_playback_source.js": [
     187,

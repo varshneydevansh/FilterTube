@@ -23,6 +23,7 @@ function fixture({ denied = false, inject = async () => {}, available = true, se
   const events = [];
   const context = vm.createContext({
     mainWorldSettingsDispatchRevision: 0,
+    managedContentPlaybackPermit: { clear() {} },
     latestSettings: null,
     currentSettings: null,
     pendingSeedSettings: null,

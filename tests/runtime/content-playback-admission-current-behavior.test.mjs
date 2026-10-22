@@ -199,6 +199,7 @@ for (const [name, text, args] of [
         if (mode === 'throws') throw new Error('controller unavailable');
       } };
       const context = vm.createContext({ window, currentSettings: {}, mainWorldSettingsDispatchRevision: 0,
+        managedContentPlaybackPermit: { clear: reason => events.push(['permit-clear', reason]) },
         latestSettings: null, pendingSeedSettings: null, pendingSeedSettingsRevision: 0,
         isFilterTubeFilteringEnabled: () => false,
         releaseDisabledDirectAccessState: () => events.push('native'),
@@ -214,7 +215,8 @@ for (const [name, text, args] of [
       });
       vm.runInContext(productionFunction(text, name), context);
       context[name](...args);
-      assert.deepEqual(events, mode === 'absent' ? ['native'] : ['hook', 'native']);
+      const permitEvents = name === 'sendSettingsToMainWorld' ? [['permit-clear', 'managed_time_settings_changed']] : [];
+      assert.deepEqual(events, [...permitEvents, ...(mode === 'absent' ? ['native'] : ['hook', 'native'])]);
     }
   });
 }
@@ -227,6 +229,7 @@ function storageFixture(mode = 'present') {
     if (mode === 'throws') throw new Error('unavailable controller');
   } };
   const context = vm.createContext({ window,
+    managedContentPlaybackPermit: { clear: reason => events.push(['permit-clear', reason]) },
     scheduleSettingsRefreshFromStorage: options => events.push(['refresh', options.forceReprocess]) });
   const start = bridgeSource.indexOf('const FILTERTUBE_METADATA_ONLY_CHANNEL_FIELDS');
   const end = bridgeSource.indexOf('\ntry {\n    browserAPI_BRIDGE.storage.onChanged', start);
@@ -242,7 +245,7 @@ test('actual storage profile and rule changes revoke before the queued refresh',
     { hideSponsoredCards: { oldValue: true, newValue: false } }
   ]) {
     const state = storageFixture(); state.change(changes);
-    assert.deepEqual(state.events, [['invalidate', 'storage_settings_changed'], ['refresh', true]]);
+    assert.deepEqual(state.events, [['permit-clear', 'managed_time_storage_changed'], ['invalidate', 'storage_settings_changed'], ['refresh', true]]);
   }
 });
 
@@ -269,8 +272,8 @@ test('actual metadata-map refreshes and enrichment-only writes preserve their ex
 test('storage hooks never suppress original refresh when the controller is absent or throws', () => {
   for (const mode of ['absent', 'throws']) {
     const state = storageFixture(mode); state.change({ enabled: { newValue: false } });
-    assert.deepEqual(state.events, mode === 'absent' ? [['refresh', true]]
-      : [['invalidate', 'storage_settings_changed'], ['refresh', true]]);
+    assert.deepEqual(state.events, mode === 'absent' ? [['permit-clear', 'managed_time_storage_changed'], ['refresh', true]]
+      : [['permit-clear', 'managed_time_storage_changed'], ['invalidate', 'storage_settings_changed'], ['refresh', true]]);
   }
   const remote = storageFixture(); remote.change({ enabled: { newValue: false } }, 'sync');
   assert.deepEqual(remote.events, []);
@@ -288,11 +291,11 @@ test('an enrichment marker cannot hide a simultaneous profile, rule or parent-co
     const state = storageFixture();
     state.change({ ftProfilesV4: { oldValue: before, newValue: after },
       ftImportedChannelMetadataRevision: { oldValue: 1, newValue: 2 } });
-    assert.deepEqual(state.events, [['invalidate', 'storage_settings_changed'], ['refresh', true]]);
+    assert.deepEqual(state.events, [['permit-clear', 'managed_time_storage_changed'], ['invalidate', 'storage_settings_changed'], ['refresh', true]]);
   }
   const missing = storageFixture();
   missing.change({ ftProfilesV4: { newValue: before }, ftImportedChannelMetadataRevision: { newValue: 1 } });
-  assert.deepEqual(missing.events, [['invalidate', 'storage_settings_changed'], ['refresh', true]]);
+  assert.deepEqual(missing.events, [['permit-clear', 'managed_time_storage_changed'], ['invalidate', 'storage_settings_changed'], ['refresh', true]]);
 });
 
 test('a revision-marked pure channel enrichment still skips invalidation and refresh', () => {

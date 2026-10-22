@@ -1,0 +1,361 @@
+{
+  "date": "2026-10-22",
+  "evidenceLevel": "Current production resolver, caption and transport modules run as ephemeral muted developer probes on actual YouTube media. This is not installed UI handoff or installed parent-child backend proof.",
+  "cleanup": "Every probe removed its media node and destroyed transport; original lecture remained paused. No profile or rule settings were changed.",
+  "strategy": "FilterTube-owned fixed VisionOS JSON adapter following the currently documented NewPipe strategy; no NewPipe dependency or remote evaluator added.",
+  "observations": {
+    "musicLaterSegment": {
+      "segments": [
+        {
+          "http": 200,
+          "indexHttp": 200,
+          "kind": "video",
+          "sampleBytes": 1203,
+          "segmentBytes": 1664126,
+          "segmentTime": 113.36325
+        },
+        {
+          "http": 200,
+          "indexHttp": 200,
+          "kind": "audio",
+          "sampleBytes": 1220,
+          "segmentBytes": 161367,
+          "segmentTime": 109.83038548752836
+        }
+      ],
+      "title": "Pitbull - Rain Over Me ft. Marc Anthony",
+      "videoId": "SmM0653YvXU"
+    },
+    "lectureDecodeAndSeek": {
+      "afterSeek": {
+        "decodedAudioBytes": 19333,
+        "decodedVideoFrames": 65,
+        "ready": 4,
+        "time": 120.295681
+      },
+      "initial": {
+        "decodedAudioBytes": 9580,
+        "decodedVideoFrames": 10,
+        "ready": 4,
+        "time": 0.286802
+      },
+      "nativeUnaffected": {
+        "paused": true,
+        "ready": 4
+      },
+      "phase": "decoded_and_sought",
+      "ranges": [
+        {
+          "http": 200,
+          "length": "8840",
+          "mime": "audio/mp4",
+          "requested": "723-9562"
+        },
+        {
+          "http": 200,
+          "length": "723",
+          "mime": "audio/mp4",
+          "requested": "0-722"
+        },
+        {
+          "http": 200,
+          "length": "14912",
+          "mime": "video/mp4",
+          "requested": "741-15652"
+        },
+        {
+          "http": 200,
+          "length": "741",
+          "mime": "video/mp4",
+          "requested": "0-740"
+        },
+        {
+          "http": 200,
+          "length": "1024",
+          "mime": "video/mp4",
+          "requested": "1538633457-1538634480"
+        },
+        {
+          "http": 200,
+          "length": "1024",
+          "mime": "audio/mp4",
+          "requested": "118445885-118446908"
+        },
+        {
+          "http": 200,
+          "length": "1466499",
+          "mime": "video/mp4",
+          "requested": "15653-1482151"
+        },
+        {
+          "http": 200,
+          "length": "161702",
+          "mime": "audio/mp4",
+          "requested": "9563-171264"
+        },
+        {
+          "http": 200,
+          "length": "1683890",
+          "mime": "video/mp4",
+          "requested": "1482152-3166041"
+        },
+        {
+          "http": 200,
+          "length": "161814",
+          "mime": "audio/mp4",
+          "requested": "171265-333078"
+        },
+        {
+          "http": 200,
+          "length": "161279",
+          "mime": "audio/mp4",
+          "requested": "333079-494357"
+        },
+        {
+          "http": 200,
+          "length": "161648",
+          "mime": "audio/mp4",
+          "requested": "494358-656005"
+        },
+        {
+          "http": 200,
+          "length": "867567",
+          "mime": "video/mp4",
+          "requested": "3166042-4033608"
+        },
+        {
+          "http": 200,
+          "length": "862562",
+          "mime": "video/mp4",
+          "requested": "4033609-4896170"
+        },
+        {
+          "http": 200,
+          "length": "840467",
+          "mime": "video/mp4",
+          "requested": "4896171-5736637"
+        },
+        {
+          "http": 200,
+          "length": "862594",
+          "mime": "video/mp4",
+          "requested": "5736638-6599231"
+        },
+        {
+          "http": 200,
+          "length": "161784",
+          "mime": "audio/mp4",
+          "requested": "1948495-2110278"
+        },
+        {
+          "http": 200,
+          "length": "860061",
+          "mime": "video/mp4",
+          "requested": "19883345-20743405"
+        },
+        {
+          "http": 200,
+          "length": "161489",
+          "mime": "audio/mp4",
+          "requested": "2110279-2271767"
+        },
+        {
+          "http": 200,
+          "length": "161625",
+          "mime": "audio/mp4",
+          "requested": "2271768-2433392"
+        },
+        {
+          "http": 200,
+          "length": "161477",
+          "mime": "audio/mp4",
+          "requested": "2433393-2594869"
+        },
+        {
+          "http": 200,
+          "length": "912775",
+          "mime": "video/mp4",
+          "requested": "20743406-21656180"
+        },
+        {
+          "http": 200,
+          "length": "1044531",
+          "mime": "video/mp4",
+          "requested": "21656181-22700711"
+        }
+      ],
+      "title": "Understanding & Healing the Mind | Dr. Karl Deisseroth",
+      "videoId": "w9MXqXBZy9U"
+    },
+    "lectureCaptionDecodeAndSeek": {
+      "afterSeek": {
+        "activeCaptions": 1,
+        "captionMode": "showing",
+        "decodedAudioBytes": 19333,
+        "decodedVideoFrames": 65,
+        "ready": 4,
+        "time": 120.295655
+      },
+      "initial": {
+        "captionCount": 2727,
+        "captionMode": "showing",
+        "decodedAudioBytes": 9580,
+        "decodedVideoFrames": 10,
+        "ready": 4,
+        "time": 0.278739
+      },
+      "nativeUnaffected": {
+        "paused": true,
+        "ready": 4
+      },
+      "phase": "decoded_and_sought",
+      "ranges": [
+        {
+          "http": 200,
+          "length": "8840",
+          "mime": "audio/mp4",
+          "requested": "723-9562"
+        },
+        {
+          "http": 200,
+          "length": "723",
+          "mime": "audio/mp4",
+          "requested": "0-722"
+        },
+        {
+          "http": 200,
+          "length": "14912",
+          "mime": "video/mp4",
+          "requested": "741-15652"
+        },
+        {
+          "http": 200,
+          "length": "741",
+          "mime": "video/mp4",
+          "requested": "0-740"
+        },
+        {
+          "http": 200,
+          "length": "1024",
+          "mime": "video/mp4",
+          "requested": "1538633457-1538634480"
+        },
+        {
+          "http": 200,
+          "length": "1024",
+          "mime": "audio/mp4",
+          "requested": "118445885-118446908"
+        },
+        {
+          "http": 200,
+          "length": "1466499",
+          "mime": "video/mp4",
+          "requested": "15653-1482151"
+        },
+        {
+          "http": 200,
+          "length": "161702",
+          "mime": "audio/mp4",
+          "requested": "9563-171264"
+        },
+        {
+          "http": 200,
+          "length": "161814",
+          "mime": "audio/mp4",
+          "requested": "171265-333078"
+        },
+        {
+          "http": 200,
+          "length": "1683890",
+          "mime": "video/mp4",
+          "requested": "1482152-3166041"
+        },
+        {
+          "http": 200,
+          "length": "161279",
+          "mime": "audio/mp4",
+          "requested": "333079-494357"
+        },
+        {
+          "http": 200,
+          "length": "161648",
+          "mime": "audio/mp4",
+          "requested": "494358-656005"
+        },
+        {
+          "http": 200,
+          "length": "867567",
+          "mime": "video/mp4",
+          "requested": "3166042-4033608"
+        },
+        {
+          "http": 200,
+          "length": "862562",
+          "mime": "video/mp4",
+          "requested": "4033609-4896170"
+        },
+        {
+          "http": 200,
+          "length": "840467",
+          "mime": "video/mp4",
+          "requested": "4896171-5736637"
+        },
+        {
+          "http": 200,
+          "length": "862594",
+          "mime": "video/mp4",
+          "requested": "5736638-6599231"
+        },
+        {
+          "http": 200,
+          "length": "161784",
+          "mime": "audio/mp4",
+          "requested": "1948495-2110278"
+        },
+        {
+          "http": 200,
+          "length": "860061",
+          "mime": "video/mp4",
+          "requested": "19883345-20743405"
+        },
+        {
+          "http": 200,
+          "length": "161489",
+          "mime": "audio/mp4",
+          "requested": "2110279-2271767"
+        },
+        {
+          "http": 200,
+          "length": "161625",
+          "mime": "audio/mp4",
+          "requested": "2271768-2433392"
+        },
+        {
+          "http": 200,
+          "length": "912775",
+          "mime": "video/mp4",
+          "requested": "20743406-21656180"
+        },
+        {
+          "http": 200,
+          "length": "161477",
+          "mime": "audio/mp4",
+          "requested": "2433393-2594869"
+        }
+      ],
+      "title": "Understanding & Healing the Mind | Dr. Karl Deisseroth",
+      "videoId": "w9MXqXBZy9U"
+    }
+  },
+  "priorDesignRejected": {
+    "client": "IOS",
+    "evidence": "Opening audio/video fragments decoded, but later segments returned 403 even before MSE startup; this adapter was removed from the default resolver."
+  },
+  "limits": [
+    "Not a full-duration watch test",
+    "Audio-language switching UI and native return still need installed verification",
+    "Installed parent-child profile/rule/time update tests remain open",
+    "Firefox actual media verification remains open"
+  ],
+  "privacy": "No signed URLs, visitor identifiers, request bodies, content nonces, cookies, authorization headers or caption text recorded."
+}

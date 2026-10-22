@@ -47,9 +47,9 @@
         "js/content/release_notes_prompt.js",
         "js/content/first_run_prompt.js",
         "js/shared/content_playback_source.js",
+        "js/shared/content_playback_resolver.js",
         "js/content/content_playback_admission.js",
-        "js/content/content_playback_player.js",
-        "js/content/content_playback_captions.js",
+        "js/content/content_playback_native.js",
         "js/content/content_playback.js",
         "js/content_bridge.js"
       ],

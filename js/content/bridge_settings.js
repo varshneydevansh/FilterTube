@@ -397,6 +397,104 @@ let managedTimeLimitRuntimeGeneration = 0;
 let managedTimeLimitPolicyKey = '';
 let managedTimeLimitParentRequestKey = '';
 
+// This closure consumes extension-runtime replies only. Page messages and media
+// metadata can neither publish nor extend a managed playback allowance.
+const managedContentPlaybackPermit = (() => {
+    const MAX_FRESHNESS_MS = 7000;
+    let epoch = 0;
+    let record = null;
+    function clear(reason = 'managed_time_authority_changed') {
+        epoch += 1;
+        const hadPermit = Boolean(record);
+        record = null;
+        if (hadPermit) {
+            try { window.FilterTubeContentPlayback?.invalidate?.(reason); } catch (_) {}
+        }
+    }
+    function capture(settings, policy, href) {
+        return { settings, profileId: settings?.activeProfileId, profileKind: settings?.activeProfileKind,
+            profileType: settings?.profileType, policyKey: JSON.stringify(policy), href, epoch, startedAt: Date.now() };
+    }
+    function current(request) {
+        try {
+            return request && request.epoch === epoch && request.settings === currentSettings
+                && request.profileId === currentSettings?.activeProfileId
+                && request.profileKind === currentSettings?.activeProfileKind && request.profileType === currentSettings?.profileType
+                && request.href === location.href
+                && request.policyKey === JSON.stringify(getManagedTimeLimitPolicy(currentSettings));
+        } catch (_) { return false; }
+    }
+    function publish(request, response) {
+        try {
+            if (!current(request)) return false;
+            const policy = getManagedTimeLimitPolicy(currentSettings);
+            const route = classifyManagedViewingRoute(request.href);
+            const at = Date.now();
+            const parsed = new URL(request.href);
+            const id = parsed.pathname === '/watch' ? parsed.searchParams.get('v') : '';
+            if (!policy || route.surface === 'external' || currentSettings.activeProfileId !== policy.profileId
+                || !Number.isFinite(at) || !Number.isFinite(request.startedAt) || at < request.startedAt
+                || !/^[a-zA-Z0-9_-]{11}$/.test(id || '')
+                || response?.ok !== true || response.enforced !== true || response.timedOut !== false
+                || response.requestPolicyMatched !== true || response.policySource !== 'compiled_active_profile'
+                || response.profileId !== policy.profileId || response.surface !== route.surface
+                || response.policyRevision !== policy.policyRevision || response.policyHash !== policy.policyHash
+                || !Number.isFinite(response.remainingSeconds) || response.remainingSeconds <= 0) {
+                clear(); return false;
+            }
+            const formatter = new Intl.DateTimeFormat('en-US', {
+                timeZone: policy.timezone, year: 'numeric', month: '2-digit', day: '2-digit'
+            });
+            const dateKey = time => {
+                const parts = formatter.formatToParts(new Date(time));
+                return ['year', 'month', 'day'].map(type => parts.find(part => part.type === type)?.value).join('-');
+            };
+            const day = dateKey(request.startedAt);
+            if (dateKey(at) !== day || response.dateKey !== day) { clear(); return false; }
+            let expiresAt = Math.min(request.startedAt + MAX_FRESHNESS_MS,
+                request.startedAt + response.remainingSeconds * 1000);
+            if (policy.validFrom != null && (!Number.isFinite(policy.validFrom) || at < policy.validFrom)) {
+                clear(); return false;
+            }
+            for (const deadline of [policy.validUntil, policy.parentGrant?.enabled === true ? policy.parentGrant.expiresAt : null]) {
+                if (deadline != null) {
+                    if (!Number.isFinite(deadline)) { clear(); return false; }
+                    expiresAt = Math.min(expiresAt, deadline);
+                }
+            }
+            // A receipt from yesterday cannot authorize tomorrow's reset. Only
+            // a new background heartbeat may publish the next day's budget.
+            if (dateKey(expiresAt) !== day) {
+                let low = request.startedAt, high = expiresAt;
+                while (high - low > 1) {
+                    const middle = Math.floor((low + high) / 2);
+                    if (dateKey(middle) === day) low = middle; else high = middle;
+                }
+                expiresAt = high;
+            }
+            if (!Number.isFinite(expiresAt) || expiresAt <= at) { clear(); return false; }
+            record = { request, receipt: Object.freeze({ decision: 'allowed', videoId: id,
+                profileId: policy.profileId, policyRevision: policy.policyRevision,
+                policyHash: policy.policyHash, surface: route.surface, expiresAt }) };
+            return true;
+        } catch (_) { clear(); return false; }
+    }
+    function read({ settings, videoId, href } = {}) {
+        try {
+            const at = Date.now();
+            if (!record || settings !== currentSettings || href !== location.href
+                || !current(record.request) || videoId !== record.receipt.videoId
+                || !Number.isFinite(at) || at < record.request.startedAt || at >= record.receipt.expiresAt) return null;
+            return record.receipt;
+        } catch (_) { return null; }
+    }
+    for (const eventName of ['yt-navigate-start', 'popstate', 'hashchange', 'pagehide']) {
+        try { window.addEventListener(eventName, () => clear('managed_time_navigation'), true); } catch (_) {}
+    }
+    return Object.freeze({ capture, current, publish, clear, read });
+})();
+window.FilterTubeManagedPlaybackPermit = Object.freeze({ read: managedContentPlaybackPermit.read });
+
 function classifyManagedViewingRoute(rawUrl) {
     try {
         const parsed = new URL(rawUrl || location.href);
@@ -1529,6 +1627,7 @@ function clearManagedTimeLimitHeartbeatTimer() {
 }
 
 function releaseManagedTimeLimitRuntime() {
+    managedContentPlaybackPermit.clear('managed_time_runtime_released');
     managedTimeLimitRuntimeGeneration += 1;
     managedTimeLimitPolicyKey = '';
     managedTimeLimitParentRequestKey = '';
@@ -1596,6 +1695,7 @@ function sendManagedTimeLimitHeartbeat() {
     const heartbeatGeneration = managedTimeLimitRuntimeGeneration;
 
     try {
+        const playbackPermitRequest = managedContentPlaybackPermit.capture(currentSettings, policy, location.href);
         browserAPI_BRIDGE.runtime.sendMessage({
             action: 'FilterTube_ManagedTimeLimitHeartbeat',
             profileId: policy.profileId,
@@ -1607,7 +1707,10 @@ function sendManagedTimeLimitHeartbeat() {
         }, response => {
             managedTimeLimitHeartbeatInFlight = false;
             if (heartbeatGeneration !== managedTimeLimitRuntimeGeneration) return;
+            if (!managedContentPlaybackPermit.current(playbackPermitRequest)) return;
             const err = browserAPI_BRIDGE.runtime?.lastError;
+            if (err) managedContentPlaybackPermit.clear('managed_time_heartbeat_error');
+            else managedContentPlaybackPermit.publish(playbackPermitRequest, response);
             if (!err && response?.enforced === true && response.timedOut === true) {
                 showManagedTimeoutOverlay(response);
             } else if (!err && response?.enforced === true && response?.timedOut !== true) {
@@ -1627,6 +1730,7 @@ function sendManagedTimeLimitHeartbeat() {
         });
     } catch (e) {
         managedTimeLimitHeartbeatInFlight = false;
+        managedContentPlaybackPermit.clear('managed_time_heartbeat_error');
     }
 }
 
@@ -1847,6 +1951,7 @@ function retainVerifiedVideoMetadata(settings) {
 }
 
 function sendSettingsToMainWorld(settings) {
+    managedContentPlaybackPermit.clear('managed_time_settings_changed');
     try { if (typeof window !== 'undefined') window.FilterTubeContentPlayback?.invalidate?.('settings_changed'); } catch (_) {}
     const dispatchRevision = ++mainWorldSettingsDispatchRevision;
     retainVerifiedVideoMetadata(settings);
@@ -2118,6 +2223,7 @@ function handleStorageChanges(changes, area) {
         if (filterTubeIsMetadataOnlySettingsChange(changes)) return;
         const metadataMapsOnly = changedKeys.every(key => ['channelMap', 'videoChannelMap', 'videoMetaMap'].includes(key));
         if (!metadataMapsOnly) {
+            managedContentPlaybackPermit.clear('managed_time_storage_changed');
             try { if (typeof window !== 'undefined') window.FilterTubeContentPlayback?.invalidate?.('storage_settings_changed'); } catch (_) {}
         }
         // FIX: Apply changes IMMEDIATELY without debounce

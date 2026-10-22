@@ -199,3 +199,23 @@ active manifest content script JS refs checked: 188
 active manifest web-accessible resource refs checked: 51
 dist manifest content script JS refs checked: 140
 dist manifest web-accessible resource refs checked: 38
+
+
+## Owned Resolver And Transport Script Closure Revalidation - 2026-10-22
+
+The new resolver and indexed transport add two normal isolated script references per target. Quarantined content CSS remains unreferenced. Historical measurements remain dated. Current counters:
+
+```text
+active manifest content script JS refs checked: 196
+dist manifest content script JS refs checked: 146
+```
+
+
+## Native Source Handoff Script Closure - 2026-10-22
+
+The five-module isolated stack replaces the earlier seven-module overlay stack. Quarantined content CSS remains unreferenced. Final stage equality is checked after the build.
+
+```text
+active manifest content script JS refs checked: 188
+dist manifest content script JS refs checked: 140
+```

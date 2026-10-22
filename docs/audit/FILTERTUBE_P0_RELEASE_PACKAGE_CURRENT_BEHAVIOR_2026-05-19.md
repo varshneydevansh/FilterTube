@@ -870,3 +870,27 @@ Five normal isolated helpers plus one MAIN fallback resource add six distinct re
 | `manifest.chrome.json` | 70 | 36 | 6 | 48 | 13 |
 | `manifest.firefox.json` | 69 | 37 | 5 | 44 | 13 |
 | `manifest.opera.json` | 69 | 35 | 7 | 48 | 12 |
+
+
+## Owned Resolver And Indexed Transport Package Closure - 2026-10-22
+
+Two additional normal isolated modules produce 39 combined unique referenced paths. Resources, permissions, CSS quarantine, copied-root closure and source/stage/archive equality remain checked independently. Earlier per-manifest measurements remain historical and no installed playback or publication verdict follows from this refresh.
+
+| Manifest | References | Unique paths | Script entries | Script JS references | Web-accessible references |
+| --- | ---: | ---: | ---: | ---: | ---: |
+| `manifest.json` | 72 | 38 | 6 | 50 | 13 |
+| `manifest.chrome.json` | 72 | 38 | 6 | 50 | 13 |
+| `manifest.firefox.json` | 71 | 39 | 5 | 46 | 13 |
+| `manifest.opera.json` | 71 | 37 | 7 | 50 | 12 |
+
+
+## Native Source Handoff Package Closure - 2026-10-22
+
+Replacing the three overlay engine modules with one native transaction leaves 37 combined unique referenced paths. Resource, permission and CSS boundaries are unchanged. Source and stage/archive equality are checked separately after the final build; package closure is not installed or publication acceptance.
+
+| Manifest | References | Unique paths | Script entries | Script JS references | Web-accessible references |
+| --- | ---: | ---: | ---: | ---: | ---: |
+| `manifest.json` | 70 | 36 | 6 | 48 | 13 |
+| `manifest.chrome.json` | 70 | 36 | 6 | 48 | 13 |
+| `manifest.firefox.json` | 69 | 37 | 5 | 44 | 13 |
+| `manifest.opera.json` | 69 | 35 | 7 | 48 | 12 |

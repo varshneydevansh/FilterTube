@@ -449,3 +449,12 @@ The content bridge now initializes the explicitly started player, and bridge set
 | --- | ---: | ---: | --- |
 | `js/content/bridge_settings.js` | 2130 | 94626 | `20177156d2064b98c3e5b95310f01aaafff4f035610accbcb9d5fbf6b967a62c` |
 | `js/content_bridge.js` | 15056 | 678414 | `9e0bca2973ffb01d0216ea8b096531ad3c1afe7af4acc7363fa4b1cc2ca09f18` |
+
+
+## Managed Playback Receipt Source Revalidation - 2026-10-22
+
+The bridge-settings fingerprint now includes isolated managed playback receipts and revocation hooks. Existing quick-block behavior assertions remain; this current source pin is not a new installed affordance or playback proof. Earlier dated rows remain historical.
+
+| File | Lines | Bytes | SHA-256 |
+| --- | ---: | ---: | --- |
+| `js/content/bridge_settings.js` | 2236 | 100980 | `6cac827d16839ce9fc01ebc94b54e56ce550169271e27ce73a77453ea0160a8d` |

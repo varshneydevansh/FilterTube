@@ -507,3 +507,13 @@ acceptance evidence.
 ## Opt-In Content Player Lane Ownership — 2026-10-22
 
 The six content-playback runtime suites run together in JSON, performance and smoke lanes. Admission and coordinator suites also run in blocking, whitelist, DOM and settings lanes, where they check pending/blocked profile authority and lifecycle revocation. The six source modules classify to release plus those behavior lanes so manifest/injection and component changes trigger review. These are source/VM checks; a passing lane does not establish a playable installed source, captions/audio success, or native-device parity. The feature remains explicitly started and may refuse unsupported sources without replacing native playback. Existing unrelated lane assignments and historical evidence remain unchanged.
+
+
+## Owned Resolver, Indexed Transport And Managed Permit Lanes — 2026-10-22
+
+The resolver, transport and managed-content-playback-permit suites join the existing playback fixtures in JSON, performance and smoke lanes. Managed permit coverage is also assigned to blocking, whitelist, DOM and settings with admission/coordinator coverage. Source changes classify into release and relevant behavior lanes. These tests exercise source/VM boundaries; they cannot replace installed media, caption/audio, parent/child, browser or release acceptance.
+
+
+## Native Source Handoff Lanes — 2026-10-22
+
+The native transaction suite joins JSON, performance and smoke. Coordinator coverage now checks one-shot native handoff, lease release, unchanged audio/caption preferences and cancellation before handoff. Legacy engine tests remain repository component coverage; active manifests use only the native transaction. Source/VM tests do not replace installed media, fullscreen, profile or release acceptance.

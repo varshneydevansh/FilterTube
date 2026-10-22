@@ -1,0 +1,75 @@
+{
+  "date": "2026-10-22",
+  "scope": "Developer probes on actual Chrome YouTube pages; not installed isolated profile acceptance",
+  "lecture": {
+    "videoId": "w9MXqXBZy9U",
+    "sameOriginalVideoElement": true,
+    "readyState": 4,
+    "timeSeconds": 133.804172,
+    "decodedVideoFrames": 1369,
+    "decodedAudioBytes": 690355,
+    "visibleCaptionSegments": 2,
+    "captionLanguage": "en",
+    "nativeSeekSeconds": 120
+  },
+  "shakira": {
+    "videoId": "8OO1pOqRJkA",
+    "sameOriginalVideoElement": true,
+    "readyState": 4,
+    "decodedVideoFrames": 2352,
+    "decodedAudioBytes": 1535092,
+    "sampledTimeSeconds": 168.91229,
+    "nativeRangeRequestsMatchedResolvedVideoSignature": true,
+    "nativeRequestClient": "WEB",
+    "restoredPausedPositionSeconds": 75.034153,
+    "probeStateRemoved": true
+  },
+  "fullscreen": {
+    "resolvedLectureActivated": false,
+    "ordinaryShakiraBaselineActivated": false,
+    "status": "unresolved; not accepted"
+  },
+  "telemetry": "No fake advert completion implemented or proven",
+  "installedAcceptance": false,
+  "productionModuleDeveloperIntegration": {
+    "videoId": "8OO1pOqRJkA",
+    "modules": [
+      "content_playback_native.js",
+      "content_playback_response.js"
+    ],
+    "trustedTestButton": true,
+    "result": {
+      "status": "active",
+      "handedOff": true,
+      "paused": true
+    },
+    "sameOriginalVideoElement": true,
+    "readyState": 4,
+    "positionSeconds": 75.034153,
+    "lifecycle": [
+      "emptied",
+      "loadstart",
+      "loadedmetadata",
+      "canplay"
+    ],
+    "errorCode": null,
+    "harnessRemoved": true,
+    "authorityScope": "Developer lease fixture on already admitted same-video page; real isolated parent/child authority not validated by this probe"
+  },
+  "validation": {
+    "smoke": {
+      "passed": 898,
+      "failed": 0
+    },
+    "releasePackage": {
+      "passed": 259,
+      "failed": 0
+    },
+    "sourceStageZipParity": [
+      "chrome",
+      "firefox",
+      "opera"
+    ],
+    "freeLlmApiReview": "gemini-3.8-flash inference failed upstream HTTP502; no review accepted"
+  }
+}
