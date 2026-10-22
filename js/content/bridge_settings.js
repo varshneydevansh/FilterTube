@@ -835,6 +835,7 @@ function createManagedOverlayPanel(kind = '') {
 }
 
 function showManagedViewingBlockedOverlay(decision) {
+    try { if (typeof window !== 'undefined') window.FilterTubeContentPlayback?.invalidate?.('managed_route_denied'); } catch (_) {}
     try {
         globalThis.__filtertubeManagedViewingRouteDenied = true;
         document.documentElement?.setAttribute?.('data-filtertube-managed-viewing-route-denied', decision.surface || 'blocked');
@@ -1169,6 +1170,7 @@ function showManagedTimeLimitStatus(state) {
 }
 
 function showManagedTimeoutOverlay(state) {
+    try { if (typeof window !== 'undefined') window.FilterTubeContentPlayback?.invalidate?.('managed_time_denied'); } catch (_) {}
     try {
         globalThis.__filtertubeManagedTimeLimitTimedOut = true;
         ensureManagedTimeoutPlayGuard();
@@ -1845,6 +1847,7 @@ function retainVerifiedVideoMetadata(settings) {
 }
 
 function sendSettingsToMainWorld(settings) {
+    try { if (typeof window !== 'undefined') window.FilterTubeContentPlayback?.invalidate?.('settings_changed'); } catch (_) {}
     const dispatchRevision = ++mainWorldSettingsDispatchRevision;
     retainVerifiedVideoMetadata(settings);
     latestSettings = settings;
@@ -2019,7 +2022,20 @@ function filterTubeIsMetadataOnlySettingsChange(changes) {
         'ftProfilesV4',
         'ftImportedChannelMetadataRevision',
         'ftBlockTubeEnrichmentJobV1'
-    ].includes(key))) return true;
+    ].includes(key))) {
+        if (!changes.ftProfilesV4) return true;
+        const profileChange = changes.ftProfilesV4;
+        if (!Object.prototype.hasOwnProperty.call(profileChange, 'oldValue')
+            || !Object.prototype.hasOwnProperty.call(profileChange, 'newValue')) return false;
+        try {
+            // A revision marker is not proof that the same write preserved
+            // profile selection, rules and parent-controlled permissions.
+            return JSON.stringify(filterTubeStripMetadataOnlyChannelLists(profileChange.oldValue))
+                === JSON.stringify(filterTubeStripMetadataOnlyChannelLists(profileChange.newValue));
+        } catch (e) {
+            return false;
+        }
+    }
     const allowedKeys = new Set(['ftProfilesV4', 'filterChannels', 'uiChannels', 'channelMap']);
     if (keys.some(key => !allowedKeys.has(key))) return false;
     if (!changes.ftProfilesV4 && !changes.filterChannels) return false;
@@ -2100,6 +2116,10 @@ function handleStorageChanges(changes, area) {
     ];
     if (Object.keys(changes).some(key => relevantKeys.includes(key))) {
         if (filterTubeIsMetadataOnlySettingsChange(changes)) return;
+        const metadataMapsOnly = changedKeys.every(key => ['channelMap', 'videoChannelMap', 'videoMetaMap'].includes(key));
+        if (!metadataMapsOnly) {
+            try { if (typeof window !== 'undefined') window.FilterTubeContentPlayback?.invalidate?.('storage_settings_changed'); } catch (_) {}
+        }
         // FIX: Apply changes IMMEDIATELY without debounce
         scheduleSettingsRefreshFromStorage({ forceReprocess: !(isVideoChannelMapOnly || isVideoMetaMapOnly) });
     }

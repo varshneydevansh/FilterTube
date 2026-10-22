@@ -1488,6 +1488,7 @@ function clearCurrentVideoAdmissionPresentation() {
 }
 
 function beginCurrentVideoRouteTransition(settings = currentSettings) {
+    try { if (typeof window !== 'undefined') window.FilterTubeContentPlayback?.invalidate?.('route_transition'); } catch (_) {}
     if (!isFilterTubeFilteringEnabled(settings)) {
         releaseDisabledDirectAccessState();
         return false;
@@ -1595,6 +1596,7 @@ function installDirectAccessPlayGuard() {
 }
 
 function pauseCurrentWatchForDirectAccess(videoId, decision = 'pending') {
+    try { if (typeof window !== 'undefined') window.FilterTubeContentPlayback?.invalidate?.('direct_admission_changed'); } catch (_) {}
     const state = getDirectAccessState();
     if (state.videoId !== videoId) {
         state.videoId = videoId;
@@ -2509,6 +2511,7 @@ function clearCurrentWatchCategoryOverlay() {
 }
 
 function pauseCurrentWatchForCategory(videoId) {
+    try { if (typeof window !== 'undefined') window.FilterTubeContentPlayback?.invalidate?.('category_admission_changed'); } catch (_) {}
     const state = window.__filtertubeCurrentWatchCategoryState || (window.__filtertubeCurrentWatchCategoryState = {
         videoId: '',
         pendingStartedAt: 0,
