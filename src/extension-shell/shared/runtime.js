@@ -32,10 +32,12 @@ export function applyExtensionEnvironment(surface) {
   }
 
   if (surface === "popup" && root && body) {
-    const popupWidth = "392px";
+    const availableWidth = window.screen?.availWidth;
+    const popupWidth = `${Number.isFinite(availableWidth) && availableWidth > 0 ? Math.min(392, availableWidth) : 392}px`;
     root.style.width = popupWidth;
     root.style.minWidth = "0";
-    root.style.maxWidth = "100vw";
+    // Action popups derive their initial viewport from this intrinsic size.
+    root.style.maxWidth = popupWidth;
     body.style.width = popupWidth;
     body.style.minWidth = "0";
     body.style.maxWidth = "100%";
