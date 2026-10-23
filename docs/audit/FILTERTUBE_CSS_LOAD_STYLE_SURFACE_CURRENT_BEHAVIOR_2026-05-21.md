@@ -169,8 +169,8 @@ The private extension-origin html/video-notes.html loads this stylesheet. It doe
 
 ## Notes dialog readability inventory - 2026-10-23
 
-10 CSS files, 20,855 counted source lines; 571,170 bytes, 2,936 lexical rule blocks.
+10 CSS files, 20,861 counted source lines; 571,323 bytes, 2,936 lexical rule blocks.
 
-| `css/video-notes.css` | active extension private Notes editor CSS | 121 | 5117 | c15262dac04d81e5319a7bd792f0735d165a668a5ec9e7e6b94fd1444046a081 | 59 | 1 | 2 | 0 | 0 | 0 | 3 | 0 | 1 |
+| `css/video-notes.css` | active extension private Notes editor CSS | 127 | 5270 | da72df5db2d9ad321927cb710d8d48d01dc0127f656da11b920b7049c22ac388 | 59 | 1 | 2 | 0 | 0 | 0 | 3 | 0 | 1 |
 
 Readability changes use larger note text, higher contrast disabled states, a compact app-style header, separated timestamp controls and a visible Save action. Quarantined content styles remain inactive.

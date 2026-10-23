@@ -17,6 +17,11 @@
 body { margin: 0; }
 main { max-width: 760px; margin: auto; padding: 24px 28px; }
 header {
+    position: sticky;
+    top: 12px;
+    z-index: 2;
+    background: var(--paper);
+    box-shadow: 0 -24px 0 var(--paper);
     display: grid;
     grid-template-columns: minmax(0, 1fr) auto;
     align-items: flex-start;
@@ -69,6 +74,7 @@ textarea {
     font-size: 17px;
     line-height: 1.75;
     caret-color: var(--accent);
+    scroll-margin-top: 140px;
 }
 textarea::placeholder { color: var(--muted); }
 .meta { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 6px 16px; margin-top: 8px; color: var(--muted); font-size: 13px; }

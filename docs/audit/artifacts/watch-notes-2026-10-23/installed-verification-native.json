@@ -1,0 +1,86 @@
+{
+  "schema": "filtertube.watch-notes.installed-verification",
+  "version": 1,
+  "date": "2026-10-23",
+  "scope": {
+    "browser": "Installed desktop Chrome, existing FilterTube extension",
+    "controls": "Native Chrome accessibility controls via CUA; private iframe DOM not rewritten",
+    "profile": "Current authorized active profile only; exact ID and PIN status not exported",
+    "videoId": "w9MXqXBZy9U",
+    "javascriptBaselineCommit": "a4a363a9",
+    "stylesheetChange": "Pinned header after Save scroll; observed in installed editor",
+    "installedByteIdentityClaim": false
+  },
+  "checks": [
+    {
+      "check": "direct_watch_open",
+      "result": "pass",
+      "evidence": "Video notes title, enabled textarea, timestamp controls and Save/Delete present in extension-origin frame"
+    },
+    {
+      "check": "create_save_reopen",
+      "result": "pass",
+      "evidence": "Disposable note saved; Saved on this browser status; exact disposable text present after close/reopen"
+    },
+    {
+      "check": "update_and_insert_current_time",
+      "result": "pass",
+      "evidence": "Insert current time added 1:30; edit saved successfully"
+    },
+    {
+      "check": "timestamp_seek_preserves_pause",
+      "result": "pass",
+      "evidence": "Jump to 1:30 selected; native player reported 1 Minutes 30 Seconds and Play keyboard shortcut k"
+    },
+    {
+      "check": "dirty_escape_confirmation",
+      "result": "pass",
+      "evidence": "Escape revealed Keep editing and Discard draft; Keep editing preserved the draft"
+    },
+    {
+      "check": "delete_undo_resave",
+      "result": "pass",
+      "evidence": "Delete cleared the editor; Undo restored the exact text as a draft; Save confirmed recovery"
+    },
+    {
+      "check": "delete_persists_on_reopen",
+      "result": "pass",
+      "evidence": "After final Delete and reopen the textarea was empty and Delete/Save disabled"
+    },
+    {
+      "check": "visibility_revocation_and_draft_recovery",
+      "result": "pass",
+      "evidence": "New tab hid the editor; returning required a fresh Notes open and restored the temporary exact-key draft; draft then explicitly discarded"
+    },
+    {
+      "check": "home_search_watch_spa_open",
+      "result": "pass",
+      "evidence": "Fresh YouTube Home document -> native search -> lecture result -> Watch -> enabled Notes editor"
+    },
+    {
+      "check": "pinned_header_after_save",
+      "result": "pass",
+      "evidence": "After Save scrolled the editor, Video notes title and Close remained visible in installed screenshot"
+    }
+  ],
+  "cleanup": {
+    "initialSavedNote": "Empty before testing; no existing note text overwritten",
+    "disposableSavedNotes": "Deleted through the UI; normal causal null tombstone retained",
+    "temporaryDraft": "Explicitly discarded",
+    "verificationWindows": "Both isolated native test windows closed",
+    "userOriginalWindow": "Restored without navigating its page"
+  },
+  "limitations": [
+    "Installed checks cover the current authorized profile only; protected profile/PIN/time-limit/filter revocation remains fixture-covered and needs separate installed acceptance",
+    "No Firefox/Opera installed UI or physical mobile/TV proof",
+    "No Notes backup, device sync or cross-client restore proof",
+    "DOM-based automation previously observed an unexpected empty srcdoc; its mutator remains unattributed. Native Chrome controls consistently rendered the editor."
+  ],
+  "artifacts": [
+    "installed-notes-open-native.png",
+    "installed-note-saved-native.png",
+    "installed-notes-spa-open-native.png",
+    "installed-pinned-header-native.png"
+  ],
+  "sourceStylesheetSha256": "da72df5db2d9ad321927cb710d8d48d01dc0127f656da11b920b7049c22ac388"
+}

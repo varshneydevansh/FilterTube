@@ -26,7 +26,7 @@ The Watch action belongs beside YouTube's Share button, inside `ytd-watch-metada
 | Responsive harness | 360px viewport, 360px document scroll width | Editor layout only; native YouTube action-row responsiveness still needs installed testing |
 | Installed Chrome lecture | Old Notes DIV still mounted after a page-only reload; playback paused after testing | Extension reload is required before testing the new action-row script/background |
 
-The initial catch-all “unlock” message did not establish the failure cause. Follow-up testing found a SPA route check failure and an offscreen inline error. Those are addressed by the live-route handshake and top-layer dialog described below. Installed editor read/write/seek acceptance is still incomplete; do not infer it from local tests or a visible dialog.
+The initial catch-all “unlock” message did not establish the failure cause. Follow-up testing found a SPA route check failure and an offscreen inline error. Those are addressed by the live-route handshake and top-layer dialog described below. Current-profile installed editor acceptance subsequently passed with native Chrome controls; see the follow-up below. Protected-profile/device/browser acceptance remains separate.
 
 Current build: `/Users/devanshvarshney/FilterTube/dist/chrome`; Firefox and Opera packages are also built. Nothing pushed, submitted, published or posted to GitHub.
 
@@ -57,9 +57,10 @@ This extension intentionally rejects notes-bearing imports before any profile mu
 
 - [x] Confirm the installed public Notes action in the real YouTube action row.
 - [x] Reproduce the Home-to-Watch grant failure and add a regression; the previous background source fails this fixture.
-- [ ] Resolve/confirm the empty-editor observation described below with a direct user check.
-- [ ] On a disposable exact-profile/video note, verify create/update/reopen/Delete/Undo and timestamp controls in the installed extension.
-- [ ] Verify active profile/PIN revocation, blocked content, managed time expiry, navigation, native playback and narrow action-row layout without bypassing existing gates.
+- [x] Independently confirm installed editor rendering through native Chrome controls. DOM-tool empty-frame mutation remains unattributed and was not reproduced with native controls.
+- [x] On an initially empty current-profile/video note, verify installed create/update/reopen/Delete/Undo and timestamp controls; clean up through the UI.
+- [x] Verify Home → Search → Watch SPA opening, paused native-player timestamp seeking, tab-visibility revocation and temporary-draft recovery.
+- [ ] Separately verify installed protected-profile/PIN revocation, blocked content, managed time expiry and narrow action-row layout without bypassing existing gates.
 - [ ] Separately implement and cross-client-test explicit Notes backup/restore/sync before claiming portability.
 
 ## Follow-up: navigation, dialog and readability
@@ -74,4 +75,18 @@ Readability now follows the app's note-first layout: 16–17px note text, genero
 
 Live Chrome testing subsequently showed the modal opening on a video reached through SPA navigation (`aria-expanded=true`, live page visible). During automation, the private iframe had an unexpected empty `srcdoc` attribute and rendered blank. The production source does not set `srcdoc`. Its mutator is **not established**; do not attribute it to YouTube, another extension or browser tooling without evidence. Temporary Notes message instrumentation was restored and debugger instrumentation was disabled. No PIN, note body, writer identity or capability token was logged. A direct user clarification asks whether the editor itself opens or the user also sees an empty dialog.
 
-The latest readable build is packaged for Chrome, Firefox and Opera. Installed note creation, update, delete/recovery, timestamp seek and profile/PIN/filter revocation remain acceptance gates. No native files were edited and nothing was pushed or published.
+The latest readable build is packaged for Chrome, Firefox and Opera. Current-profile note creation/update/delete/recovery and timestamp seeking have now passed installed native checks. Installed protected-profile/PIN/filter/time revocation remains a separate gate. No native files were edited and nothing was pushed or published.
+
+## Installed verification with native Chrome controls — 2026-10-23
+
+The readable website editor **opened and worked in the installed extension**, independently of DOM-based browser inspection. Testing used separate native Chrome windows and the public lecture `w9MXqXBZy9U`; it did not replace or bypass the extension's authorization handlers. The current authorized profile was used without exporting its ID, PIN state, writer identity or private capability.
+
+Passed live UI flows: direct Watch opening; create/Save/close/reopen; edit/Save; current-time insertion; jumping to a saved 1:30 timestamp while the native player stayed paused; Escape's dirty-draft confirmation; Delete/Undo/Save recovery; deletion remaining empty after reopen; hiding the tab and recovering a temporary draft through fresh access; and fresh Home → Search → Watch SPA navigation followed by successful Notes opening.
+
+Saving could scroll the title and Close button out of view. The editor header is now sticky; the installed `installed-pinned-header-native.png` captures title and Close remaining visible after Save. This is the only runtime change in this verification pass (stylesheet only). Filter, profile/PIN, captions, audio, playlist and playback authorization code was not modified.
+
+All test note text was disposable. The saved test note was deleted through the UI, its normal causal tombstone retained, and the temporary draft explicitly discarded. Both native test windows were closed and the original Chrome window restored. Screenshots contain only disposable note text.
+
+The earlier blank frame is **not reproduced with native input**. The DOM-tool observation and unknown `srcdoc` mutator remain recorded; there is no speculative production workaround that clears another actor's iframe attributes or weakens the private frame. Future installed private-editor tests should use native controls.
+
+Structured evidence: [installed-verification-native.json](../audit/artifacts/watch-notes-2026-10-23/installed-verification-native.json). Current Chrome acceptance does not establish Firefox/mobile/TV rendering, installed protected-profile/PIN/time/filter revocation, or Notes backup/device-sync/cross-client interoperability. Shared format-1 portability stays pending until explicit transfer and restore are implemented and verified.
