@@ -5,7 +5,8 @@
     const api = typeof browser !== 'undefined' && browser.runtime ? browser : chrome;
     const bytes = new Uint8Array(18); crypto.getRandomValues(bytes);
     const instance = Array.from(bytes, value => value.toString(16).padStart(2, '0')).join('');
-    let host = null, panel = null, shadow = null, button = null, frame = null, status = null, token = '', scope = '', opening = false, renewing = false, generation = 0;
+    let host = null, panel = null, shadow = null, dialog = null, dismiss = null, button = null, frame = null, status = null, token = '', scope = '', opening = false, renewing = false, generation = 0;
+    let closeUnavailable = false;
     function send(payload) {
         return new Promise(resolve => api.runtime.sendMessage(payload,
             value => resolve(api.runtime.lastError ? { ok: false } : value || { ok: false })));
@@ -48,15 +49,29 @@
         generation++; opening = false; renewing = false;
         const old = token; token = '';
         frame?.remove(); frame = null;
+        if (dialog?.open) dialog.close();
         button?.setAttribute('aria-expanded', 'false');
         if (panel) panel.hidden = true;
         if (old) void send({ action: 'FilterTube_NotesRevoke', token: old, instance });
     }
-    function remove() { close(); host?.remove(); panel?.remove(); host = null; panel = null; shadow = null; button = null; scope = ''; }
+    function remove() { close(); host?.remove(); panel?.remove(); host = null; panel = null; shadow = null; dialog = null; dismiss = null; button = null; scope = ''; }
+    async function requestClose() {
+        if (!frame) { close(); button?.focus(); return; }
+        const attempt = generation, captured = token;
+        const result = await send({ action: 'FilterTube_NotesRequestClose', token, instance });
+        if (attempt !== generation || captured !== token) return;
+        if (result.closeUnopened) { close(); button?.focus(); return; }
+        if (!result.ok) {
+            closeUnavailable = true; dismiss.hidden = false; dismiss.textContent = 'Close without saving';
+            status.textContent = 'The editor is not responding. Try Close inside Notes, or close without saving. Unsaved changes may be lost; saved notes are kept.';
+        }
+    }
     async function open() {
         if (frame || opening || !sameScope(admitted())) return;
         const key = admitted(), attempt = ++generation;
         opening = true; panel.hidden = false; status.textContent = 'Opening personal notes…';
+        closeUnavailable = false; dismiss.textContent = 'Close notes';
+        dismiss.hidden = false; dialog.showModal(); button.setAttribute('aria-expanded', 'true');
         const result = await send({ action: 'FilterTube_NotesGrant', ...key, instance });
         if (attempt !== generation || !sameScope(admitted())) {
             if (result.token) void send({ action: 'FilterTube_NotesRevoke', token: result.token, instance });
@@ -76,7 +91,7 @@
         frame.title = 'FilterTube personal notes';
         frame.referrerPolicy = 'no-referrer';
         frame.src = api.runtime.getURL('html/video-notes.html') + '#key=' + encodeURIComponent(token);
-        shadow.appendChild(frame);
+        dialog.appendChild(frame); dismiss.hidden = true;
         status.textContent = ''; button.setAttribute('aria-expanded', 'true');
         frame.focus();
     }
@@ -95,21 +110,26 @@
             button = document.createElement('button'); button.type = 'button'; button.textContent = '✎ Notes';
             button.style.cssText = 'display:inline-flex;align-items:center;justify-content:center;gap:6px;min-height:36px;padding:0 16px;border:0;border-radius:18px;font:500 14px Roboto,Arial,sans-serif;white-space:nowrap;cursor:pointer;color:var(--yt-spec-text-primary,inherit);background:var(--yt-spec-badge-chip-background,rgba(128,128,128,.16))';
             button.setAttribute('aria-expanded', 'false'); button.setAttribute('aria-label', 'Open FilterTube personal notes');
+            button.setAttribute('aria-haspopup', 'dialog');
             button.addEventListener('click', () => { if (!frame) void open(); else frame.focus(); });
             host.appendChild(button);
             // Only this public action is in YouTube's row. Personal text and the
-            // editor capability stay inside the separate, closed extension panel.
+            // editor capability stay inside the separate, closed extension dialog.
             panel = document.createElement('div'); panel.className = 'filtertube-notes-panel'; panel.hidden = true;
             shadow = panel.attachShadow({ mode: 'closed' });
             const style = document.createElement('style');
-            style.textContent = ':host{display:block;margin:12px 0;max-width:100%;color-scheme:light dark}:host([hidden]){display:none}p{font:13px system-ui;margin:6px 0}p:empty{display:none}iframe{display:block;width:100%;height:min(650px,80vh);min-height:350px;border:1px solid light-dark(#d8c5bd,#79685f);border-radius:18px;background:light-dark(#fffaf7,#282320);box-sizing:border-box}';
+            style.textContent = ':host{color-scheme:light dark}:host([hidden]){display:none}dialog{position:fixed;inset:0;margin:auto;width:min(680px,calc(100vw - 24px));max-width:none;max-height:calc(100dvh - 32px);padding:0;border:1px solid light-dark(#d8c5bd,#79685f);border-radius:22px;background:light-dark(#fffaf7,#282320);color:light-dark(#302924,#f6ede7);box-shadow:0 18px 70px #0006;overflow:auto}dialog::backdrop{background:#0008}p{font:14px/1.5 system-ui;margin:0;padding:20px}p:empty{display:none}button{font:500 14px system-ui;color:inherit;background:transparent;border:1px solid #bda8a4;border-radius:22px;min-height:44px;padding:8px 18px;margin:0 20px 20px;cursor:pointer}button:focus-visible{outline:3px solid #b8574a;outline-offset:3px}[hidden]{display:none!important}iframe{display:block;width:100%;height:min(680px,calc(100dvh - 48px));min-height:280px;border:0;box-sizing:border-box}';
+            dialog = document.createElement('dialog'); dialog.setAttribute('aria-label', 'FilterTube personal notes');
+            dialog.addEventListener('cancel', event => { event.preventDefault(); void requestClose(); });
             status = document.createElement('p'); status.setAttribute('role', 'status');
-            shadow.append(style, status);
+            dismiss = document.createElement('button'); dismiss.type = 'button'; dismiss.textContent = 'Close notes';
+            dismiss.addEventListener('click', () => { if (closeUnavailable) { close(); button?.focus(); } else void requestClose(); });
+            dialog.append(status, dismiss); shadow.append(style, dialog);
         }
         // YouTube replaces the action container on navigation and layout changes.
         // Reattach the existing button without recreating or losing an open draft.
         if (host.parentNode !== actions) actions.appendChild(host);
-        if (panel.parentNode !== pane) pane.appendChild(panel);
+        if (panel.parentNode !== document.documentElement) document.documentElement.appendChild(panel);
         if (token && frame && !renewing) {
             const captured = token, attempt = generation;
             renewing = true;
@@ -159,7 +179,8 @@
     const seek = seconds => media(seconds);
     api.runtime.onMessage.addListener((request, _sender, respond) => {
         if (!['FilterTube_NotesCheck', 'FilterTube_NotesSeek', 'FilterTube_NotesPosition', 'FilterTube_NotesClose'].includes(request?.action)) return false;
-        if (request.instance !== instance || (!opening && request.token !== token) || !sameScope(admitted())) {
+        if (request.instance !== instance) return false;
+        if ((!opening && request.token !== token) || !sameScope(admitted())) {
             respond({ allowed: false }); return false;
         }
         const key = admitted();

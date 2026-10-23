@@ -33,8 +33,8 @@ const releaseFixStatusDoc = fs.readFileSync(
 );
 const expectedFamilyTotals = new Map([
   ['Build/sync scripts', { files: 5, count: 75 }],
-  ['Hot page/background runtime', { files: 11, count: 3884 }],
-  ['Content helper runtime', { files: 24, count: 810 }],
+  ['Hot page/background runtime', { files: 11, count: 3887 }],
+  ['Content helper runtime', { files: 24, count: 814 }],
   ['UI/settings runtime', { files: 25, count: 3737 }],
   ['Generated/quarantined UI', { files: 6, count: 147 }],
   ['Vendor bundles', { files: 3, count: 279 }],
@@ -272,8 +272,8 @@ test('all-callable index counts match current lexical callable source', () => {
     assert.equal(documented, actual, `${file} callable count should match current source`);
   }
 
-  assert.equal(total, 9575);
-  assert.match(indexDoc, /current repo-wide lexical callables: 9575/);
+  assert.equal(total, 9582);
+  assert.match(indexDoc, /current repo-wide lexical callables: 9582/);
 });
 
 test('all-callable family totals match the documented file rows', () => {
@@ -461,7 +461,7 @@ test('all-callable index documents semantic method proof boundary', () => {
     });
   }
 
-  assert.equal(total, 9575);
+  assert.equal(total, 9582);
   assert.deepEqual(methodTotals, expectedFamilyTotals);
 
   for (const authority of [

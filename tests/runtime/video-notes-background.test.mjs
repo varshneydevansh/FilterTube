@@ -16,7 +16,7 @@ function fixture() {
     const api = { runtime: { getURL: path => base + path, onMessage: { addListener: fn => { events.runtime = fn; } } },
         tabs: { get: (_id, cb) => cb({ ...tab }),
             sendMessage(_id, message, options, cb) {
-                assert.deepEqual(JSON.parse(JSON.stringify(options)), { frameId: 0 });
+                assert.deepEqual(JSON.parse(JSON.stringify(options)), message.action === 'FilterTube_NotesConfirmClose' ? { documentId: 'editor-a' } : { frameId: 0 });
                 messages.push(structuredClone(message));
                 cb({ allowed: permitted, ...key, ok: permitted });
             }, onRemoved: { addListener: fn => { events.removed = fn; } } },
@@ -99,4 +99,31 @@ test('locked profile errors are explicit and unrelated failures never disclose p
 test('an expired capability cannot be renewed back into existence', async () => {
     const f = fixture(); const { token } = await f.grant(); f.expire();
     await assert.rejects(f.send('Grant', token, { ...key, instance: 'a'.repeat(36) }, f.parent));
+});
+
+test('SPA navigation from Home or a previous video uses the live tab and current admission, never the initial document URL', async () => {
+    for (const initial of ['https://www.youtube.com/', 'https://www.youtube.com/watch?v=12345678901']) {
+        const f = fixture(); f.parent.url = initial;
+        assert.equal((await f.grant()).ok, true);
+        f.tab.url = 'https://www.youtube.com/watch?v=12345678901';
+        await assert.rejects(f.grant());
+    }
+});
+test('an untrusted top-frame origin or any child frame cannot use a matching live Watch route to acquire Notes', async () => {
+    for (const url of ['https://evil.example/watch?v=' + key.videoId, 'http://www.youtube.com/watch?v=' + key.videoId]) {
+        const f = fixture(); f.parent.url = url; await assert.rejects(f.grant());
+    }
+    const f = fixture(); f.parent.frameId = 1; await assert.rejects(f.grant());
+});
+test('modal close requests are scoped to the owning parent and exact editor document', async () => {
+    const f = fixture(); const { token } = await f.grant(); await f.send('Read', token);
+    const result = await f.send('RequestClose', token, { instance: 'a'.repeat(36) }, f.parent);
+    assert.equal(result.ok, true); assert.equal(f.messages.at(-1).action, 'FilterTube_NotesConfirmClose');
+    await assert.rejects(f.send('RequestClose', token, { instance: 'a'.repeat(36) }));
+    await assert.rejects(f.send('RequestClose', token, { instance: 'b'.repeat(36) }, f.parent));
+});
+test('closing an editor that never connected needs no draft confirmation and preserves stored notes', async () => {
+    const f = fixture(); const { token } = await f.grant();
+    assert.deepEqual(structuredClone(await f.send('RequestClose', token, { instance: 'a'.repeat(36) }, f.parent)), { ok: true, closeUnopened: true });
+    assert.equal(f.data[repository.DATA_KEY], undefined);
 });

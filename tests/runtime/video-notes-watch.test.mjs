@@ -14,6 +14,9 @@ class Node {
     addEventListener(name, fn) { this.events.set(name, fn); }
     remove() { this.isConnected = false; }
     focus() {}
+    showModal() { this.open = true; }
+    close() { this.open = false; }
+    hasAttribute(name) { return this.attributes.has(name); }
 }
 function fixture() {
     const settings = { enabled: true, hideSponsoredCards: false, activeProfileId: 'Parent', activeProfileKind: 'account', profileType: 'main' };
@@ -26,7 +29,7 @@ function fixture() {
         get currentTime() { return position; }, set currentTime(value) { seekWrites++; position = value; } };
     const pane = new Node('metadata'), actions = new Node('actions');
     pane.querySelector = () => actions;
-    const document = { visibilityState: 'visible', documentElement: { hasAttribute: () => false },
+    const document = { visibilityState: 'visible', documentElement: new Node('html'),
         querySelector: selector => selector.includes('ad-showing') ? (ad ? new Node('ad') : null)
             : selector.includes('video.html5-main-video') ? video : selector.includes('watch-metadata') ? pane : null,
         createElement: tag => { const node = new Node(tag); created.push(node); return node; },
@@ -137,7 +140,7 @@ test('Notes mounts only its action in YouTube buttons and reattaches without rep
     const f = fixture(); await f.start();
     const host = f.created.find(node => node.className === 'filtertube-notes-affordance');
     const panel = f.created.find(node => node.className === 'filtertube-notes-panel');
-    assert.equal(host.parentNode, f.actions); assert.equal(panel.parentNode, f.pane);
+    assert.equal(host.parentNode, f.actions); assert.equal(panel.parentNode, f.document.documentElement);
     assert.equal(host.children.some(node => node.tag === 'iframe'), false);
     host.parentNode = null; host.isConnected = false;
     await f.refresh();
@@ -151,4 +154,29 @@ test('current timestamp uses the same fresh admission as seeks without moving or
     await flush();
     assert.deepEqual(structuredClone(result), { ok: true, seconds: 12, duration: 180 });
     assert.equal(f.writes(), 0); assert.equal(f.video.paused, true);
+});
+
+test('Notes immediately opens a top-layer dialog and Escape requests draft review before closing', async () => {
+    const f = fixture(); await f.start();
+    const dialog = f.created.find(node => node.tag === 'dialog');
+    assert.equal(dialog.open, true);
+    let prevented = false;
+    dialog.events.get('cancel')({ preventDefault() { prevented = true; } }); await flush();
+    assert.equal(prevented, true); assert.equal(dialog.open, true);
+    assert.equal(f.runtime.at(-1).action, 'FilterTube_NotesRequestClose');
+    const grant = f.runtime.find(request => request.action === 'FilterTube_NotesGrant');
+    f.receive({ action: 'FilterTube_NotesClose', instance: grant.instance, token: 'opaque-notes-capability' }, () => {});
+    assert.equal(dialog.open, false);
+});
+test('a second isolated controller cannot reject a different Notes instance receipt', async () => {
+    const f = fixture(); await f.start(); let responded = false;
+    const result = f.receive({ action: 'FilterTube_NotesCheck', instance: 'other-instance' }, () => { responded = true; });
+    assert.equal(result, false); assert.equal(responded, false);
+});
+test('an opening error remains visible in the modal with a working Close control', async () => {
+    const f = fixture(); f.lock(); await f.start();
+    const dialog = f.created.find(node => node.tag === 'dialog');
+    assert.equal(dialog.open, true); assert.equal(f.created.some(node => node.tag === 'iframe'), false);
+    const close = f.created.find(node => node.tag === 'button' && node.textContent === 'Close notes');
+    close.events.get('click')(); await flush(); assert.equal(dialog.open, false);
 });

@@ -320,3 +320,9 @@ All three browser packages were rebuilt from the frozen automatic playback sourc
 | `manifest.firefox.json` | 136 | 4593 | `454805c26c62add8c1467d95ef41f1c4b6529b55ebcfbfbd81bfdcd93a0fb242` |
 | `manifest.opera.json` | 170 | 5819 | `c516d8c0439a79016b0ed04ffb3658bbd40f8e0868fc146d8707a9da076636a4` |
 | `data/release_notes.json` | 433 | 37594 | `9132b2e8809c5e1f01bf5715a115105f62387318b422ad681c0ef6a1be63c7f9` |
+
+## Notes dialog build fingerprint - 2026-10-23
+
+| `README.md` | 456 | 28669 | `002941cf5633b50fe77c0434639e3fe6b12ef85ab8a87d530a7bfee65ffe62af` |
+
+The build badge changed during the Notes dialog fix. This source fingerprint is not installed-browser proof.

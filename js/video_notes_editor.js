@@ -85,7 +85,7 @@
                 latest = result.record; preview(latest);
                 if (!equal(base, latest) || latest?.versions.length > 1) showIncoming();
                 status.textContent = 'Your temporary draft was restored.'; void keepDraft();
-            } else { use(result.record); status.textContent = 'Notes are private to this FilterTube profile.'; }
+            } else { use(result.record); status.textContent = ''; }
             if (!text.disabled) text.focus();
         } else if (!equal(latest, result.record)) {
             latest = result.record; preview(latest);
@@ -192,7 +192,11 @@
     byId('close').addEventListener('click', () => { if (dirty) { byId('confirm').hidden = false; byId('stay').focus(); } else void close(); });
     byId('stay').addEventListener('click', () => { byId('confirm').hidden = true; text.focus(); });
     byId('discard').addEventListener('click', async () => { await send('DiscardDraft'); dirty = false; await close(); });
-    document.addEventListener('keydown', event => { if (event.key === 'Escape') byId('close').click(); });
+    document.addEventListener('keydown', event => { if (event.key === 'Escape') { event.preventDefault(); byId('close').click(); } });
+    api.runtime.onMessage.addListener((request, _sender, respond) => {
+        if (request?.action !== 'FilterTube_NotesConfirmClose' || request.token !== token) return false;
+        byId('close').click(); respond({ ok: true }); return false;
+    });
     api.storage.onChanged.addListener((changes, area) => { if (area === 'local' && changes.ftSavedVideoNotesV1 && !saving) void load(); });
     setInterval(() => { if (!saving) void load(); }, 3000);
     void load();

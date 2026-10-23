@@ -371,3 +371,9 @@ All three browser packages were rebuilt from the frozen automatic playback sourc
 | `channel-identity-watch-mix-collab-recovery-plan.md` | 262 | 16023 | `01f82169b06d3752e318b20b956c8a4284ae80166686e5c40aeee66c957d108a` |
 | `package.json` | 86 | 4580 | `c9cb2c3c4fea302fa3946f462dbfbb474381a78946ca59adb653814d06a4de51` |
 | `package-lock.json` | 1468 | 50219 | `84e60039228a76c10550d2e3922706ef2b7dd3671ef218a1d6e9263598cef33d` |
+
+## Notes dialog build fingerprint - 2026-10-23
+
+| `README.md` | 456 | 28669 | `002941cf5633b50fe77c0434639e3fe6b12ef85ab8a87d530a7bfee65ffe62af` |
+
+The build badge changed during the Notes dialog fix. This source fingerprint is not installed-browser proof.

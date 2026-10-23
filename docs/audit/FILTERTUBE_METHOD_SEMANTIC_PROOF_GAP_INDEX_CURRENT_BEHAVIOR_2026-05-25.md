@@ -960,7 +960,7 @@ separate release/workflow review and is not silently counted as JavaScript here.
 
 ```text
 current tracked JS/JSX/MJS files: 125
-current repo-wide lexical callables: 9575
+current repo-wide lexical callables: 9582
 current complete per-callable semantic proofs: 0
 current callable behavior-change approval: NO-GO
 runtime behavior changed by inventory refresh: no
@@ -969,8 +969,8 @@ runtime behavior changed by inventory refresh: no
 | Family | Files | Lexical callables |
 | --- | ---: | ---: |
 | Build/sync scripts | 5 | 75 |
-| Hot page/background runtime | 11 | 3884 |
-| Content helper runtime | 24 | 810 |
+| Hot page/background runtime | 11 | 3887 |
+| Content helper runtime | 24 | 814 |
 | UI/settings runtime | 25 | 3737 |
 | Generated/quarantined UI | 6 | 147 |
 | Vendor bundles | 3 | 279 |
@@ -979,9 +979,9 @@ runtime behavior changed by inventory refresh: no
 
 | File | Family | Lexical callables | Semantic proof | Boundary |
 | --- | --- | ---: | --- | --- |
-| `js/content/video_notes.js` | Content helper runtime | 22 | `semantic proof incomplete` |
+| `js/content/video_notes.js` | Content helper runtime | 26 | `semantic proof incomplete` |
 | `js/shared/saved_video_notes.js` | Content helper runtime | 20 | `semantic proof incomplete` |
-| `js/video_notes_background.js` | Hot page/background runtime | 14 | `semantic proof incomplete` |
+| `js/video_notes_background.js` | Hot page/background runtime | 17 | `semantic proof incomplete` |
 | `js/video_notes_editor.js` | UI/settings runtime | 25 | `semantic proof incomplete` |
 | `js/video_notes_store.js` | Hot page/background runtime | 9 | `semantic proof incomplete` |
 | `build.js` | Build/sync scripts | 68 | `semantic proof incomplete` | Lexical accounting only; no complete per-callable closure claimed. |

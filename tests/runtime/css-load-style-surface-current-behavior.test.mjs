@@ -156,12 +156,12 @@ const cssRows = [
   [
     "css/video-notes.css",
     "active extension private Notes editor CSS",
-    4,
-    2441,
-    "a96732ddb9ea92efff27291e81bb89c87c584afadcb7177c9e5f7af34b37fa6f",
-    41,
+    121,
+    5117,
+    "c15262dac04d81e5319a7bd792f0735d165a668a5ec9e7e6b94fd1444046a081",
+    59,
     1,
-    1,
+    2,
     0,
     0,
     0,
@@ -242,11 +242,11 @@ test('CSS load style surface register is audit-only and covers every tracked CSS
   }
 
   assert.deepEqual(totals, {
-  "lines": 20738,
-  "bytes": 568494,
-  "rules": 2918,
+  "lines": 20855,
+  "bytes": 571170,
+  "rules": 2936,
   "important": 616,
-  "displayNone": 77,
+  "displayNone": 78,
   "notVisible": 72,
   "visible": 167,
   "hidden": 6,
@@ -254,8 +254,8 @@ test('CSS load style surface register is audit-only and covers every tracked CSS
   "keyframes": 9,
   "hiddenAttr": 17
 });
-  assert.match(doc, /10 CSS files, 20,738 counted source lines/);
-  assert.match(doc, /568,494 bytes, 2,918 lexical rule blocks/);
+  assert.match(doc, /10 CSS files, 20,855 counted source lines/);
+  assert.match(doc, /571,170 bytes, 2,936 lexical rule blocks/);
   assert.match(doc, /615 `!important` declarations, 76\s+`display:none` declarations/);
 });
 

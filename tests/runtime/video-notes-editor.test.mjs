@@ -23,7 +23,7 @@ class Element {
     click() { return this.events.get('click')?.({ preventDefault() {} }); }
 }
 function fixture(initial = null, initialDraft = null) {
-    const nodes = new Map(), requests = [], storageListeners = [];
+    const nodes = new Map(), requests = [], storageListeners = []; let runtimeListener;
     const ids = ['text', 'status', 'updates', 'versions', 'counter', 'save', 'delete', 'undo', 'preview', 'keep', 'form', 'review', 'close', 'confirm', 'stay', 'discard', 'insert-time', 'moments', 'moments-list'];
     for (const id of ids) nodes.set(id, new Element(id));
     for (const id of ['updates', 'versions', 'keep', 'undo', 'confirm']) nodes.get(id).hidden = true;
@@ -37,7 +37,7 @@ function fixture(initial = null, initialDraft = null) {
             cb({ ok: true, saved: true, record });
         }
     };
-    const api = { runtime: { sendMessage(request, cb) {
+    const api = { runtime: { onMessage: { addListener: fn => { runtimeListener = fn; } }, sendMessage(request, cb) {
         requests.push(structuredClone(request));
         if (denied) { cb({ ok: false }); return; }
         const action = request.action.slice('FilterTube_Notes'.length);
@@ -53,7 +53,7 @@ function fixture(initial = null, initialDraft = null) {
     });
     const event = async (id, name = 'click') => { await nodes.get(id).events.get(name)?.({ preventDefault() {} }); await flush(); };
     const input = async value => { nodes.get('text').value = value; await event('text', 'input'); };
-    return { nodes, requests, event, input,
+    return { nodes, requests, event, input, receive: (request, cb) => runtimeListener(request, {}, cb),
         incoming: async next => { record = next; for (const fn of storageListeners) fn({ ftSavedVideoNotesV1: {} }, 'local'); await flush(); },
         defer: () => { deferredSave = true; }, finish: async () => { resolveSave(); await flush(); },
         deny: async () => { denied = true; for (const fn of storageListeners) fn({ ftSavedVideoNotesV1: {} }, 'local'); await flush(); } };
@@ -152,4 +152,12 @@ test('large notes bound saved timestamp controls while retaining every character
     const f = fixture(contract.edit(key, null, 'a', value)); await flush();
     assert.equal(f.nodes.get('preview').children.filter(node => node.tagName === 'button').length, 64);
     assert.equal(f.nodes.get('preview').textContent, value);
+});
+
+test('dialog Escape uses the private editor close confirmation and cannot discard a dirty draft', async () => {
+    const f = fixture(); await flush(); await f.input('Keep my unsaved draft'); let response;
+    f.receive({ action: 'FilterTube_NotesConfirmClose', token: 'private-capability' }, value => { response = value; }); await flush();
+    assert.equal(response.ok, true); assert.equal(f.nodes.get('confirm').hidden, false);
+    assert.equal(f.nodes.get('text').value, 'Keep my unsaved draft');
+    assert.equal(f.requests.some(request => request.action === 'FilterTube_NotesClose'), false);
 });

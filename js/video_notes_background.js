@@ -10,11 +10,11 @@
                 target[method](...args, value => api.runtime.lastError ? reject(Error('notes_unavailable')) : resolve(value));
             });
         }
-        async function parentMessage(grant, action, extra = {}) {
+        async function parentMessage(grant, action, extra = {}, target = { frameId: 0 }) {
             let timer;
             try {
                 return await Promise.race([
-                    call(api.tabs, 'sendMessage', grant.tabId, { action, token: grant.token, instance: grant.instance, ...extra }, { frameId: 0 }),
+                    call(api.tabs, 'sendMessage', grant.tabId, { action, token: grant.token, instance: grant.instance, ...extra }, target),
                     new Promise((_, reject) => { timer = setTimeout(() => reject(Error('access_changed')), [prefix + 'Seek', prefix + 'Position'].includes(action) ? 4000 : 1200); })
                 ]);
             } finally { clearTimeout(timer); }
@@ -22,6 +22,10 @@
         function currentRoute(raw, id) {
             try { const url = new URL(raw); return url.protocol === 'https:' && ['www.youtube.com', 'm.youtube.com'].includes(url.hostname)
                 && url.pathname === '/watch' && url.searchParams.get('v') === id; } catch (_) { return false; }
+        }
+        function trustedParent(raw) {
+            try { const url = new URL(raw); return url.protocol === 'https:' && ['www.youtube.com', 'm.youtube.com'].includes(url.hostname); }
+            catch (_) { return false; }
         }
         async function authorize(key, scope) {
             const grant = grants.get(scope?.token);
@@ -49,7 +53,10 @@
             const tabId = sender?.tab?.id;
             if (!Number.isInteger(tabId)) throw Error('access_changed');
             if (action === prefix + 'Grant') {
-                if (sender.frameId !== 0 || !currentRoute(sender.url, request.videoId)
+                // MessageSender.url can retain the initial document URL across
+                // YouTube SPA navigation. Bind the live route below via tabs.get
+                // and the isolated parent's current admission receipt instead.
+                if (sender.frameId !== 0 || !trustedParent(sender.url)
                     || typeof request.profileId !== 'string' || typeof request.instance !== 'string'
                     || !/^[a-f0-9]{36}$/.test(request.instance)) throw Error('access_changed');
                 const settings = await getSettings(sender);
@@ -77,10 +84,18 @@
                 if (sender.frameId !== 0 || grant.instance !== request.instance) throw Error('access_changed');
                 grants.delete(grant.token); return { ok: true };
             }
+            if (action === prefix + 'RequestClose') {
+                if (sender.frameId !== 0 || grant.instance !== request.instance || !await authorize(grant.key, scope)) throw Error('access_changed');
+                if (!Number.isInteger(grant.editorFrameId)) return { ok: true, closeUnopened: true };
+                return await parentMessage(grant, prefix + 'ConfirmClose', {},
+                    grant.editorDocumentId ? { documentId: grant.editorDocumentId } : { frameId: grant.editorFrameId });
+            }
             if (String(sender.url || '').split(/[?#]/)[0] !== editorUrl || sender.frameId === 0) throw Error('access_changed');
             const editorIdentity = sender.documentId || 'frame-' + sender.frameId;
             if (grant.editorIdentity && grant.editorIdentity !== editorIdentity) throw Error('access_changed');
             grant.editorIdentity = editorIdentity;
+            grant.editorFrameId = sender.frameId;
+            grant.editorDocumentId = sender.documentId || null;
             if (!await authorize(grant.key, scope)) throw Error('access_changed');
             const name = draftKey(grant);
             if (action === prefix + 'Read') return { ok: true, record: await store.read(grant.key, scope), draft: drafts.get(name) || null };

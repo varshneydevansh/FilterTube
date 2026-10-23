@@ -166,3 +166,11 @@ The older measurements are historical. Current totals: 9 CSS files, 20,734 count
 | `css/video-notes.css` | active extension private Notes editor CSS | 4 | 2441 | a96732ddb9ea92efff27291e81bb89c87c584afadcb7177c9e5f7af34b37fa6f | 41 | 1 | 1 | 0 | 0 | 0 | 3 | 0 | 1 |
 
 The private extension-origin html/video-notes.html loads this stylesheet. It does not activate quarantined content CSS; the public Notes action and closed panel style live in js/content/video_notes.js.
+
+## Notes dialog readability inventory - 2026-10-23
+
+10 CSS files, 20,855 counted source lines; 571,170 bytes, 2,936 lexical rule blocks.
+
+| `css/video-notes.css` | active extension private Notes editor CSS | 121 | 5117 | c15262dac04d81e5319a7bd792f0735d165a668a5ec9e7e6b94fd1444046a081 | 59 | 1 | 2 | 0 | 0 | 0 | 3 | 0 | 1 |
+
+Readability changes use larger note text, higher contrast disabled states, a compact app-style header, separated timestamp controls and a visible Save action. Quarantined content styles remain inactive.

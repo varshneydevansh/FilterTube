@@ -8,7 +8,7 @@
 </head>
 <body>
     <main>
-        <header><div><h1>Personal notes</h1><p>Only for this video and your current FilterTube profile.</p></div><button id="close" type="button">Close</button></header>
+        <header><div><h1>Video notes</h1><p>Private to this profile. Saved in this browser.</p></div><button id="close" type="button">Close</button></header>
         <p id="status" role="status" aria-live="polite">Opening notes…</p>
         <section id="updates" hidden aria-label="Saved note changed">
             <p>A saved version changed. Your draft is safe.</p>
@@ -19,14 +19,14 @@
         <form id="form">
             <label for="text">Your note</label>
             <textarea id="text" rows="7" spellcheck="false" autocomplete="off" aria-describedby="hint counter" disabled placeholder="Write a thought, or add a timestamp such as 1:30."></textarea>
-            <div class="meta"><span id="hint">Plain text. Timestamps can jump within the allowed video.</span><output id="counter" for="text">0 / 16,000</output></div>
-            <div class="time-actions"><button id="insert-time" type="button" disabled>Insert current time</button><button id="moments" type="button" disabled>Jump to a timestamp</button></div>
+            <div class="meta"><span id="hint">Add a time like 1:30 to mark a moment.</span><output id="counter" for="text">0 / 16,000</output></div>
+            <div class="time-actions"><button id="insert-time" type="button" disabled>Insert current time</button><button id="moments" type="button" disabled>Jump to a noted time</button></div>
             <div id="moments-list" hidden aria-label="Timestamps in your draft"></div>
-            <div class="actions"><button id="save" class="primary" type="submit" disabled>Save note</button><button id="delete" type="button" disabled>Delete note</button><button id="undo" type="button" hidden>Undo deletion</button></div>
+            <div class="actions"><button id="delete" type="button" disabled>Delete note</button><button id="undo" type="button" hidden>Undo deletion</button><button id="save" class="primary" type="submit" disabled>Save note</button></div>
         </form>
         <section id="confirm" hidden aria-label="Unsaved draft"><p>Discard your unsaved draft and close?</p><button id="stay" type="button">Keep editing</button><button id="discard" type="button">Discard draft</button></section>
         <details id="saved-preview"><summary>Saved note preview</summary><div id="preview">No saved note yet.</div></details>
-        <footer>Saved on this browser. Notes backup and device sync are not connected yet. Unsaved drafts are temporary.</footer>
+        <footer><details><summary>About saving &amp; sync</summary><p>Saved notes stay in this browser. Notes backup and device sync are not connected yet. Unsaved drafts are temporary.</p></details></footer>
     </main>
     <script src="../js/video_notes_editor.js"></script>
 </body>
