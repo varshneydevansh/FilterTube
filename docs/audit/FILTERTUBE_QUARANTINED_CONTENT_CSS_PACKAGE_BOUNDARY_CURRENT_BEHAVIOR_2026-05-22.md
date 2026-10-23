@@ -219,3 +219,14 @@ The five-module isolated stack replaces the earlier seven-module overlay stack. 
 active manifest content script JS refs checked: 188
 dist manifest content script JS refs checked: 140
 ```
+
+## Watch Notes source inventory update - 2026-10-23
+
+active manifest content script JS refs checked: 192
+active manifest web-accessible resource refs checked: 55
+dist manifest content script JS refs checked: 143
+dist manifest web-accessible resource refs checked: 41
+extension HTML files checked: 4
+extension HTML link tags checked: 11
+
+Notes adds a private extension stylesheet; the three quarantined CSS files remain inactive.

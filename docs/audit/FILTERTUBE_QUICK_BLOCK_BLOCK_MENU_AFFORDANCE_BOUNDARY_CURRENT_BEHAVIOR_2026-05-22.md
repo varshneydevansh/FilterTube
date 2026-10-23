@@ -508,3 +508,8 @@ fallback popover open block bytes: 3636
 fallback perform block action block lines: 212
 fallback perform block action block bytes: 10098
 ```
+
+## Watch Notes source inventory update - 2026-10-23
+
+| `js/background.js` | 8565 | 387821 | `ac2b4ae17d2c3c7d50ce0fd8dc0d6052a2c56b43c4aefeb48c0053e74709538d` |
+Notes adds private background initialization; quick-block logic is unchanged.

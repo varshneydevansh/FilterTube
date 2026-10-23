@@ -894,3 +894,12 @@ Replacing the three overlay engine modules with one native transaction leaves 37
 | `manifest.chrome.json` | 70 | 36 | 6 | 48 | 13 |
 | `manifest.firefox.json` | 69 | 37 | 5 | 44 | 13 |
 | `manifest.opera.json` | 69 | 35 | 7 | 48 | 12 |
+
+## Watch Notes source inventory update - 2026-10-23
+
+| `manifest.json` | 72 | 38 | 6 | 49 | 14 |
+| `manifest.chrome.json` | 72 | 38 | 6 | 49 | 14 |
+| `manifest.firefox.json` | 74 | 42 | 5 | 45 | 14 |
+| `manifest.opera.json` | 71 | 37 | 7 | 49 | 13 |
+
+Combined unique declared references: 42. No permission expansion. This inventory is source closure, not installed Notes acceptance.

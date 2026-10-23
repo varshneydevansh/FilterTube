@@ -277,3 +277,11 @@ background bytes: 386625
 ```
 
 sha256: `b4986d2a61879532c30d376ec2b85149498c45647fced0cad24e45f8620c4353`
+
+## Watch Notes source inventory update - 2026-10-23
+
+background lines: 8565
+background bytes: 387821
+sha256: `ac2b4ae17d2c3c7d50ce0fd8dc0d6052a2c56b43c4aefeb48c0053e74709538d`
+
+Notes modules are synchronously imported in the browser background, with optional initialization isolated from filtering startup. They are never injected into MAIN.

@@ -67,6 +67,7 @@
                 "js/content/content_playback_admission.js",
                 "js/content/content_playback_native.js",
                 "js/content/content_playback.js",
+                "js/content/video_notes.js",
                 "js/content_bridge.js"
             ],
             "run_at": "document_start"
@@ -130,6 +131,7 @@
     "web_accessible_resources": [
         {
             "resources": [
+                "html/video-notes.html",
                 "js/injector.js",
                 "js/content/content_playback_response.js",
                 "js/filter_logic.js",

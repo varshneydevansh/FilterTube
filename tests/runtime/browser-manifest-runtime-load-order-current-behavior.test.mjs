@@ -40,7 +40,7 @@ const playbackStack = [
   'js/content/content_playback_native.js',
   'js/content/content_playback.js',
 ];
-const normalHelperStack = [...helperStack.slice(0, -1), ...playbackStack, ...helperStack.slice(-1)];
+const normalHelperStack = [...helperStack.slice(0, -1), ...playbackStack, 'js/content/video_notes.js', ...helperStack.slice(-1)];
 
 const commonMatches = [
   '*://*.youtube.com/*',
@@ -118,7 +118,7 @@ function trackedFiles() {
 }
 
 test('browser manifest current source inventory is pinned independently of historical May snapshot', () => {
-  const expected = [["manifest.json",160, 5544, '78e3025b7b5bc01db2d88ab79edcb6294c815bf721060d384b2905d4adb21337'],["manifest.chrome.json",160, 5544, '78e3025b7b5bc01db2d88ab79edcb6294c815bf721060d384b2905d4adb21337'],["manifest.firefox.json",134, 4430, '8f177b22836825420d6967945b83eaa7cba8c48cd615bed2b05cdd1f54de430c'],["manifest.opera.json",168, 5733, '9070a9af9b7bf4b218c6a618b0ddf8c42f20c4e0f60661db41308e21da901a4e']];
+  const expected = [["manifest.json",162,5630,"ba155d12e591c0306620bc57c59ad7378c5313084314a748414b5b1d39879d9d"],["manifest.chrome.json",162,5630,"ba155d12e591c0306620bc57c59ad7378c5313084314a748414b5b1d39879d9d"],["manifest.firefox.json",136,4593,"454805c26c62add8c1467d95ef41f1c4b6529b55ebcfbfbd81bfdcd93a0fb242"],["manifest.opera.json",170,5819,"c516d8c0439a79016b0ed04ffb3658bbd40f8e0868fc146d8707a9da076636a4"]];
   const doc = read(docPath).split('## Native Source Handoff Load Order - 2026-10-22')[1];
   assert.ok(doc, 'current review must distinguish historical claims');
   for (const [file, lines, size, hash] of expected) {
@@ -193,7 +193,7 @@ test('normal, embedded and Google preview paths retain explicit browser-specific
       assert.deepEqual(entry.css || [],[]);
     }
     if (firefox) {
-      assert.deepEqual(manifest.background.scripts,['js/shared/identity.js','js/content/admission_overlay.js','js/imported_channel_enrichment.js','js/background.js']);
+      assert.deepEqual(manifest.background.scripts,['js/shared/identity.js','js/content/admission_overlay.js','js/imported_channel_enrichment.js','js/shared/saved_video_notes.js','js/video_notes_store.js','js/video_notes_background.js','js/background.js']);
       assert.equal(manifest.browser_specific_settings.gecko.id,'filtertube@devanshvarshney.com');
       assert.deepEqual(manifest.browser_specific_settings.gecko.data_collection_permissions.required,['none']);
       assert.equal(manifest.browser_specific_settings.gecko_android.strict_min_version,'109.0');
@@ -217,7 +217,7 @@ test('every declared script/resource exists and quarantined CSS cannot be activa
 });
 
 test('fallback resources explicitly cover view counts, admission, localization and host-limited Google icons', () => {
-  const resources = ['js/injector.js','js/content/content_playback_response.js','js/filter_logic.js','js/seed.js','js/shared/identity.js','js/shared/view_count.js','js/content/admission_overlay.js','data/ui_locales/*.json','assets/images/homepage_hero_day.mp4','icons/icon-48.png'];
+  const resources = ['html/video-notes.html','js/injector.js','js/content/content_playback_response.js','js/filter_logic.js','js/seed.js','js/shared/identity.js','js/shared/view_count.js','js/content/admission_overlay.js','data/ui_locales/*.json','assets/images/homepage_hero_day.mp4','icons/icon-48.png'];
   for (const file of manifestFiles) {
     const entries = readJson(file).web_accessible_resources;
     assert.deepEqual(entries[0].resources, file.includes('opera') ? resources : [...resources,'icons/file.svg']);

@@ -308,3 +308,15 @@ All three browser packages were rebuilt from the frozen automatic playback sourc
 | File | Lines | Bytes | SHA-256 |
 | --- | ---: | ---: | --- |
 | `README.md` | 456 | 28669 | `ddbbc23859fc87d2b7270e358db6c875660f927b70d0f96418f742d4aedeaa5f` |
+
+## Watch Notes source inventory update - 2026-10-23
+
+| `build.js` | 861 | 33225 | `a198cc1d0bf98e410deb8f66ced0e56a046bbf987a0a5b878e1278577622fb2e` |
+| `package.json` | 86 | 4580 | `c9cb2c3c4fea302fa3946f462dbfbb474381a78946ca59adb653814d06a4de51` |
+| `README.md` | 456 | 28669 | `b3f860c07748babe5f79c29116559ed9230020fdfa163f8c7ccfa8d778de316d` |
+| `CHANGELOG.md` | 938 | 75511 | `e57906dca95911874ef251aa45d8c3a76df00df576b36277d9c0e9b9654c3036` |
+| `manifest.json` | 162 | 5630 | `ba155d12e591c0306620bc57c59ad7378c5313084314a748414b5b1d39879d9d` |
+| `manifest.chrome.json` | 162 | 5630 | `ba155d12e591c0306620bc57c59ad7378c5313084314a748414b5b1d39879d9d` |
+| `manifest.firefox.json` | 136 | 4593 | `454805c26c62add8c1467d95ef41f1c4b6529b55ebcfbfbd81bfdcd93a0fb242` |
+| `manifest.opera.json` | 170 | 5819 | `c516d8c0439a79016b0ed04ffb3658bbd40f8e0868fc146d8707a9da076636a4` |
+| `data/release_notes.json` | 433 | 37594 | `9132b2e8809c5e1f01bf5715a115105f62387318b422ad681c0ef6a1be63c7f9` |

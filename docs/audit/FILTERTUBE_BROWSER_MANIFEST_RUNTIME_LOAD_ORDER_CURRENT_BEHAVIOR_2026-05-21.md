@@ -229,3 +229,12 @@ Normal isolated pages load source planner, resolver, admission, native source tr
 | `manifest.chrome.json` | 160 | 5544 | `78e3025b7b5bc01db2d88ab79edcb6294c815bf721060d384b2905d4adb21337` |
 | `manifest.firefox.json` | 134 | 4430 | `8f177b22836825420d6967945b83eaa7cba8c48cd615bed2b05cdd1f54de430c` |
 | `manifest.opera.json` | 168 | 5733 | `9070a9af9b7bf4b218c6a618b0ddf8c42f20c4e0f60661db41308e21da901a4e` |
+
+## Watch Notes source inventory update - 2026-10-23
+
+| `manifest.json` | 162 | 5630 | `ba155d12e591c0306620bc57c59ad7378c5313084314a748414b5b1d39879d9d` |
+| `manifest.chrome.json` | 162 | 5630 | `ba155d12e591c0306620bc57c59ad7378c5313084314a748414b5b1d39879d9d` |
+| `manifest.firefox.json` | 136 | 4593 | `454805c26c62add8c1467d95ef41f1c4b6529b55ebcfbfbd81bfdcd93a0fb242` |
+| `manifest.opera.json` | 170 | 5819 | `c516d8c0439a79016b0ed04ffb3658bbd40f8e0868fc146d8707a9da076636a4` |
+
+Notes is an ISOLATED normal-watch helper before content_bridge. The extension-origin editor HTML alone is web-accessible; note text, store, writer and background are not. Firefox loads contract/store/adapter before background. Existing permissions, embeds, previews and MAIN playback stacks are unchanged.

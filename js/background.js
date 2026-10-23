@@ -1217,6 +1217,25 @@ async function waitForPostBlockEnrichmentBeforeBackup(timeoutMs = 9000) {
 // Browser detection for compatibility
 const IS_FIREFOX = typeof browser !== 'undefined' && !!browser.runtime;
 const browserAPI = IS_FIREFOX ? browser : chrome;
+// Private Notes modules are browser-only; never forwarded to MAIN or native assets.
+try {
+    if (typeof importScripts === 'function' && !globalThis.FilterTubeVideoNotesBackground) {
+        importScripts('shared/saved_video_notes.js', 'video_notes_store.js', 'video_notes_background.js');
+    }
+    globalThis.FilterTubeVideoNotesBackground?.install({
+        api: browserAPI,
+        getSettings: sender => getCompiledSettings(sender, 'main'),
+        profileAuthorized: async profileId => {
+            const data = await new Promise(resolve => browserAPI.storage.local.get(['ftProfilesV4'], resolve));
+            const profiles = data?.ftProfilesV4;
+            // Existing PIN/session helpers normalize IDs. Never alias an exact notes key.
+            if (profileId !== profileId.trim() || profiles?.activeProfileId !== profileId
+                || !Object.prototype.hasOwnProperty.call(profiles.profiles || {}, profileId)) return false;
+            return isProfileSessionAuthorized(profiles, profileId);
+        },
+        storeFactory: options => globalThis.FilterTubeVideoNotesStore.create(options)
+    });
+} catch (_) { /* Optional Notes failure must not stop filtering startup. */ }
 const SHORTS_PARTIAL_STREAM_LIMIT = 51200;
 const WATCH_PARTIAL_STREAM_LIMIT = 2000000;
 const SHORTS_FETCH_TIMEOUT_MS = 8000;

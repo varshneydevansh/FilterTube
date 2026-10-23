@@ -826,10 +826,13 @@
     }
 
     async function restoreStorageSnapshot(snapshot) {
-        const safeSnapshot = safeObject(snapshot);
+        // Profile import does not own personal notes or the installation writer.
+        // Preserve concurrent note saves/deletions even when an older import fails.
+        const privateNotesKeys = new Set(['ftSavedVideoNotesV1', 'ftSavedVideoNotesWriterV1']);
+        const safeSnapshot = Object.fromEntries(Object.entries(safeObject(snapshot)).filter(([key]) => !privateNotesKeys.has(key)));
         const current = await readStorage(null, { required: true });
         const extraKeys = Object.keys(safeObject(current)).filter(
-            key => !Object.prototype.hasOwnProperty.call(safeSnapshot, key)
+            key => !privateNotesKeys.has(key) && !Object.prototype.hasOwnProperty.call(safeSnapshot, key)
         );
         if (extraKeys.length) {
             requireStorageSuccess(await removeStorage(extraKeys), 'Import rollback cleanup');
@@ -2298,6 +2301,9 @@
     }
 
     async function importV3(json, options = {}) {
+        if (json && Object.prototype.hasOwnProperty.call(json, 'savedVideoNotes')) {
+            throw new Error('This backup includes personal video notes. Notes transfer is not supported by this extension yet. Keep the original file; no profiles or notes were imported.');
+        }
         const coordinator = global.FilterTubeNanahStorageLock;
         if (typeof coordinator?.run !== 'function') {
             throw new Error('Secure device storage locking is unavailable. Reload this page before importing settings.');

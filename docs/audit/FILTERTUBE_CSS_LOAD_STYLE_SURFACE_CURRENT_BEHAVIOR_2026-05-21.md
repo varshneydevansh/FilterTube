@@ -158,3 +158,11 @@ The older measurements are historical. Current totals: 9 CSS files, 20,734 count
 | css/serene-shell.css | active extension shell CSS | 9656 | 267377 | 53608a364e8e62a326a0a7b98daa0ef2f6762cff272730f24a33c425690ee75b |
 | css/tab-view.css | active extension dashboard CSS | 5749 | 144577 | 8fbfff1804e96aefe5d211ff633be081233361ed551fff55e45496b9206648b2 |
 | website/app/globals.css | website-only global CSS | 541 | 14785 | 2341d3570c01f4ac118fa8587937d60c2a1ccf750163e74f90428c56fe5d7d06 |
+
+## Watch Notes source inventory update - 2026-10-23
+
+10 CSS files, 20,738 counted source lines; 568,494 bytes, 2,918 lexical rule blocks.
+
+| `css/video-notes.css` | active extension private Notes editor CSS | 4 | 2441 | a96732ddb9ea92efff27291e81bb89c87c584afadcb7177c9e5f7af34b37fa6f | 41 | 1 | 1 | 0 | 0 | 0 | 3 | 0 | 1 |
+
+The private extension-origin html/video-notes.html loads this stylesheet. It does not activate quarantined content CSS; the public Notes action and closed panel style live in js/content/video_notes.js.

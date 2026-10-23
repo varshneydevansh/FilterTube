@@ -5,7 +5,7 @@
   "default_locale": "en",
   "version": "3.4.1",
   "background": {
-    "scripts": ["js/shared/identity.js", "js/content/admission_overlay.js", "js/imported_channel_enrichment.js", "js/background.js"]
+    "scripts": ["js/shared/identity.js", "js/content/admission_overlay.js", "js/imported_channel_enrichment.js", "js/shared/saved_video_notes.js", "js/video_notes_store.js", "js/video_notes_background.js", "js/background.js"]
   },
   "browser_specific_settings": {
     "gecko": {
@@ -51,6 +51,7 @@
         "js/content/content_playback_admission.js",
         "js/content/content_playback_native.js",
         "js/content/content_playback.js",
+        "js/content/video_notes.js",
         "js/content_bridge.js"
       ],
       "run_at": "document_start"
@@ -99,6 +100,7 @@
   "web_accessible_resources": [
     {
       "resources": [
+        "html/video-notes.html",
         "js/injector.js",
         "js/content/content_playback_response.js",
         "js/filter_logic.js",

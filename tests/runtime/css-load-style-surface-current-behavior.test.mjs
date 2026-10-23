@@ -152,6 +152,22 @@ const cssRows = [
     1,
     1,
     0
+  ],
+  [
+    "css/video-notes.css",
+    "active extension private Notes editor CSS",
+    4,
+    2441,
+    "a96732ddb9ea92efff27291e81bb89c87c584afadcb7177c9e5f7af34b37fa6f",
+    41,
+    1,
+    1,
+    0,
+    0,
+    0,
+    3,
+    0,
+    1
   ]
 ];
 
@@ -202,7 +218,7 @@ test('CSS load style surface register is audit-only and covers every tracked CSS
   assert.match(doc, /Status: audit-only current-behavior proof/);
   assert.match(doc, /Runtime behavior is unchanged/);
   assert.match(doc, /not a CSS cleanup, UI redesign, manifest change, or package pruning patch/);
-  assert.equal(trackedCss.length, 9);
+  assert.equal(trackedCss.length, 10);
   assert.deepEqual(trackedCss.sort(), cssRows.map(([file]) => file).sort());
 
   const totals = { lines: 0, bytes: 0, rules: 0, important: 0, displayNone: 0, notVisible: 0, visible: 0, hidden: 0, media: 0, keyframes: 0, hiddenAttr: 0 };
@@ -226,20 +242,20 @@ test('CSS load style surface register is audit-only and covers every tracked CSS
   }
 
   assert.deepEqual(totals, {
-  "lines": 20734,
-  "bytes": 566053,
-  "rules": 2877,
-  "important": 615,
-  "displayNone": 76,
+  "lines": 20738,
+  "bytes": 568494,
+  "rules": 2918,
+  "important": 616,
+  "displayNone": 77,
   "notVisible": 72,
   "visible": 167,
   "hidden": 6,
-  "media": 60,
+  "media": 63,
   "keyframes": 9,
-  "hiddenAttr": 16
+  "hiddenAttr": 17
 });
-  assert.match(doc, /9 CSS files, 20,734 counted source lines/);
-  assert.match(doc, /566,053 bytes, 2,877 lexical rule blocks/);
+  assert.match(doc, /10 CSS files, 20,738 counted source lines/);
+  assert.match(doc, /568,494 bytes, 2,918 lexical rule blocks/);
   assert.match(doc, /615 `!important` declarations, 76\s+`display:none` declarations/);
 });
 

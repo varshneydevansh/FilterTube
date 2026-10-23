@@ -222,8 +222,8 @@ lexical and its scope remains tracked JS/JSX/MJS: CJS/Python tooling requires it
 separate release/workflow review and is not silently counted as JavaScript here.
 
 ```text
-current tracked JS/JSX/MJS files: 120
-current repo-wide lexical callables: 9484
+current tracked JS/JSX/MJS files: 125
+current repo-wide lexical callables: 9575
 current complete per-callable semantic proofs: 0
 current callable behavior-change approval: NO-GO
 runtime behavior changed by inventory refresh: no
@@ -232,9 +232,9 @@ runtime behavior changed by inventory refresh: no
 | Family | Files | Lexical callables |
 | --- | ---: | ---: |
 | Build/sync scripts | 5 | 75 |
-| Hot page/background runtime | 9 | 3860 |
-| Content helper runtime | 22 | 768 |
-| UI/settings runtime | 24 | 3712 |
+| Hot page/background runtime | 11 | 3884 |
+| Content helper runtime | 24 | 810 |
+| UI/settings runtime | 25 | 3737 |
 | Generated/quarantined UI | 6 | 147 |
 | Vendor bundles | 3 | 279 |
 | Audit/test lane scripts | 25 | 517 |
@@ -242,8 +242,13 @@ runtime behavior changed by inventory refresh: no
 
 | File | Family | Lexical callables | Audit status |
 | --- | --- | ---: | --- |
+| `js/content/video_notes.js` | Content helper runtime | 22 | helper counted; semantic proof incomplete |
+| `js/shared/saved_video_notes.js` | Content helper runtime | 20 | helper counted; semantic proof incomplete |
+| `js/video_notes_background.js` | Hot page/background runtime | 14 | helper counted; semantic proof incomplete |
+| `js/video_notes_editor.js` | UI/settings runtime | 25 | helper counted; semantic proof incomplete |
+| `js/video_notes_store.js` | Hot page/background runtime | 9 | helper counted; semantic proof incomplete |
 | `build.js` | Build/sync scripts | 68 | release-audited first pass |
-| `js/background.js` | Hot page/background runtime | 568 | hot runtime mapped |
+| `js/background.js` | Hot page/background runtime | 569 | hot runtime mapped |
 | `js/content/admission_overlay.js` | Content helper runtime | 25 | helper counted; semantic proof incomplete |
 | `js/content/block_channel.js` | Hot page/background runtime | 234 | hot runtime mapped |
 | `js/content/bridge_injection.js` | Content helper runtime | 14 | helper counted |

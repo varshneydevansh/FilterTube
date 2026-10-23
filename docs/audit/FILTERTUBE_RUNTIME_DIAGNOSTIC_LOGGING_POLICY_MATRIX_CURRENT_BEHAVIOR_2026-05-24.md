@@ -909,10 +909,10 @@ Automatic scheduling, profile preference propagation and transition-only readine
 | `js/content/content_playback_transport.js` | 400 | 25096 | `02b9b6d076757eca5b8f25d94bbf8865db4e3eb6a7e24d65c69ebd894cd6fd88` |
 | `js/shared/content_playback_resolver.js` | 295 | 21072 | `63e5825e494d120e25328ce478e2bbcafb11be4b6a4a337ed6856d61428a7d81` |
 | `js/shared/content_playback_source.js` | 187 | 12402 | `cc22a59b178f681b29ad460a32cca7bb09dd9ffc52e5b650d6e18240578c0f0b` |
-| `js/background.js` | 8546 | 386625 | `b4986d2a61879532c30d376ec2b85149498c45647fced0cad24e45f8620c4353` |
+| `js/background.js` | 8565 | 387821 | `ac2b4ae17d2c3c7d50ce0fd8dc0d6052a2c56b43c4aefeb48c0053e74709538d` |
 | `js/content/dom_fallback.js` | 8188 | 381556 | `97d951f4a550d9fae239fd65092069f1841ca71f9eb66492d7578fcfdf21f0b2` |
 | `js/content_controls_catalog.js` | 304 | 12826 | `f8951a8249b0a0683c00d7f4b062bd819105539bf37f84fd3c5d569910f0aef4` |
-| `js/io_manager.js` | 3213 | 163538 | `9dfae40b90db3ea7bf0a1f0f44479508894bee92616582a1543d3460af825150` |
+| `js/io_manager.js` | 3219 | 164198 | `b14ddc3f0652b02199f187dbab11e65f7548aeabd02a51277eabd2fac217eb7e` |
 | `js/settings_shared.js` | 1327 | 67805 | `c3d0f4b965acaaf46f6424cd0ad329c50e616de7b1cf8905a9fa578123e2bf69` |
 | `js/state_manager.js` | 2984 | 124258 | `029b2e7d4356d4629348f174bdaf7858fa1fa0c09a4b54c6bb0e293a161a8d5e` |
 | `js/tab-view.js` | 32535 | 1760706 | `801d77180fe4ab2b3e470f7337bc8640bcbdd2f882f58e5628f61852d42c4286` |

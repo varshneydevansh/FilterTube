@@ -26,7 +26,8 @@ const distManifestPaths = [
 const extensionHtmlPaths = [
   'html/popup.html',
   'html/tab-view.html',
-  'html/troubleshoot.html'
+  'html/troubleshoot.html',
+  'html/video-notes.html'
 ];
 
 function read(file) {
@@ -222,26 +223,26 @@ test('quarantined content CSS is packaged but not manifest or extension HTML loa
   assert.deepEqual(activeStats, {
   "manifestFiles": 4,
   "contentScriptEntries": 24,
-  "contentScriptJsRefs": 188,
+  "contentScriptJsRefs": 192,
   "contentScriptCssRefs": 0,
   "webAccessibleEntries": 8,
-  "webAccessibleResourceRefs": 51,
+  "webAccessibleResourceRefs": 55,
   "quarantinedCssContentScriptRefs": 0,
   "quarantinedCssWebAccessibleRefs": 0
 });
   assert.deepEqual(distStats, {
   "manifestFiles": 3,
   "contentScriptEntries": 18,
-  "contentScriptJsRefs": 140,
+  "contentScriptJsRefs": 143,
   "contentScriptCssRefs": 0,
   "webAccessibleEntries": 6,
-  "webAccessibleResourceRefs": 38,
+  "webAccessibleResourceRefs": 41,
   "quarantinedCssContentScriptRefs": 0,
   "quarantinedCssWebAccessibleRefs": 0
 });
   assert.deepEqual(htmlStats, {
-  "htmlFiles": 3,
-  "linkTags": 10,
+  "htmlFiles": 4,
+  "linkTags": 11,
   "quarantinedCssLinks": 0
 });
 
@@ -259,22 +260,22 @@ test('quarantined content CSS is packaged but not manifest or extension HTML loa
   for (const token of [
     'active manifest files checked: 4',
     'active manifest content_script entries checked: 24',
-    'active manifest content script JS refs checked: 188',
+    'active manifest content script JS refs checked: 192',
     'active manifest content script CSS refs checked: 0',
     'active manifest web_accessible_resources entries checked: 8',
-    'active manifest web-accessible resource refs checked: 51',
+    'active manifest web-accessible resource refs checked: 55',
     'active manifest quarantined CSS content script refs: 0',
     'active manifest quarantined CSS web-accessible refs: 0',
     'dist manifest files checked: 3',
     'dist manifest content_script entries checked: 18',
-    'dist manifest content script JS refs checked: 140',
+    'dist manifest content script JS refs checked: 143',
     'dist manifest content script CSS refs checked: 0',
     'dist manifest web_accessible_resources entries checked: 6',
-    'dist manifest web-accessible resource refs checked: 38',
+    'dist manifest web-accessible resource refs checked: 41',
     'dist manifest quarantined CSS content script refs: 0',
     'dist manifest quarantined CSS web-accessible refs: 0',
-    'extension HTML files checked: 3',
-    'extension HTML link tags checked: 10',
+    'extension HTML files checked: 4',
+    'extension HTML link tags checked: 11',
     'extension HTML quarantined CSS link refs: 0',
     'packaged dist CSS copies: 9',
     'dist CSS copies hash-match source: yes'

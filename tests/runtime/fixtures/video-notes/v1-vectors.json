@@ -1,0 +1,457 @@
+{
+  "validMerges": [
+    {
+      "name": "stale-deletion",
+      "left": {
+        "profileId": "default",
+        "videoId": "abcdefghijk",
+        "versions": [
+          {
+            "revision": [
+              {
+                "actor": "a",
+                "counter": 1
+              }
+            ],
+            "text": "Original"
+          }
+        ]
+      },
+      "right": {
+        "profileId": "default",
+        "videoId": "abcdefghijk",
+        "versions": [
+          {
+            "revision": [
+              {
+                "actor": "a",
+                "counter": 2
+              }
+            ],
+            "text": null
+          }
+        ]
+      },
+      "expected": {
+        "profileId": "default",
+        "videoId": "abcdefghijk",
+        "versions": [
+          {
+            "revision": [
+              {
+                "actor": "a",
+                "counter": 2
+              }
+            ],
+            "text": null
+          }
+        ]
+      }
+    },
+    {
+      "name": "concurrent-edit-delete",
+      "left": {
+        "profileId": "default",
+        "videoId": "abcdefghijk",
+        "versions": [
+          {
+            "revision": [
+              {
+                "actor": "a",
+                "counter": 1
+              },
+              {
+                "actor": "b",
+                "counter": 1
+              }
+            ],
+            "text": "Other edit"
+          }
+        ]
+      },
+      "right": {
+        "profileId": "default",
+        "videoId": "abcdefghijk",
+        "versions": [
+          {
+            "revision": [
+              {
+                "actor": "a",
+                "counter": 1
+              },
+              {
+                "actor": "c",
+                "counter": 1
+              }
+            ],
+            "text": null
+          }
+        ]
+      },
+      "expected": {
+        "profileId": "default",
+        "videoId": "abcdefghijk",
+        "versions": [
+          {
+            "revision": [
+              {
+                "actor": "a",
+                "counter": 1
+              },
+              {
+                "actor": "b",
+                "counter": 1
+              }
+            ],
+            "text": "Other edit"
+          },
+          {
+            "revision": [
+              {
+                "actor": "a",
+                "counter": 1
+              },
+              {
+                "actor": "c",
+                "counter": 1
+              }
+            ],
+            "text": null
+          }
+        ]
+      }
+    },
+    {
+      "name": "idempotent-replay",
+      "left": {
+        "profileId": "default",
+        "videoId": "abcdefghijk",
+        "versions": [
+          {
+            "revision": [
+              {
+                "actor": "a",
+                "counter": 1
+              }
+            ],
+            "text": "Original"
+          }
+        ]
+      },
+      "right": {
+        "profileId": "default",
+        "videoId": "abcdefghijk",
+        "versions": [
+          {
+            "revision": [
+              {
+                "actor": "a",
+                "counter": 1
+              }
+            ],
+            "text": "Original"
+          }
+        ]
+      },
+      "expected": {
+        "profileId": "default",
+        "videoId": "abcdefghijk",
+        "versions": [
+          {
+            "revision": [
+              {
+                "actor": "a",
+                "counter": 1
+              }
+            ],
+            "text": "Original"
+          }
+        ]
+      }
+    },
+    {
+      "name": "recreate-after-delete",
+      "left": {
+        "profileId": "default",
+        "videoId": "abcdefghijk",
+        "versions": [
+          {
+            "revision": [
+              {
+                "actor": "a",
+                "counter": 2
+              }
+            ],
+            "text": null
+          }
+        ]
+      },
+      "right": {
+        "profileId": "default",
+        "videoId": "abcdefghijk",
+        "versions": [
+          {
+            "revision": [
+              {
+                "actor": "a",
+                "counter": 2
+              },
+              {
+                "actor": "b",
+                "counter": 1
+              }
+            ],
+            "text": "Recreated"
+          }
+        ]
+      },
+      "expected": {
+        "profileId": "default",
+        "videoId": "abcdefghijk",
+        "versions": [
+          {
+            "revision": [
+              {
+                "actor": "a",
+                "counter": 2
+              },
+              {
+                "actor": "b",
+                "counter": 1
+              }
+            ],
+            "text": "Recreated"
+          }
+        ]
+      }
+    },
+    {
+      "name": "unicode-and-active-empty",
+      "left": {
+        "profileId": "\u9ed8\u8ba4",
+        "videoId": "abcdefghijk",
+        "versions": [
+          {
+            "revision": [
+              {
+                "actor": "a",
+                "counter": 1
+              }
+            ],
+            "text": "  \u0939\u093f\u0928\u094d\u0926\u0940 \ud83c\udfb5\n1:30 Detail  "
+          }
+        ]
+      },
+      "right": {
+        "profileId": "\u9ed8\u8ba4",
+        "videoId": "abcdefghijk",
+        "versions": [
+          {
+            "revision": [
+              {
+                "actor": "b",
+                "counter": 1
+              }
+            ],
+            "text": ""
+          }
+        ]
+      },
+      "expected": {
+        "profileId": "\u9ed8\u8ba4",
+        "videoId": "abcdefghijk",
+        "versions": [
+          {
+            "revision": [
+              {
+                "actor": "a",
+                "counter": 1
+              }
+            ],
+            "text": "  \u0939\u093f\u0928\u094d\u0926\u0940 \ud83c\udfb5\n1:30 Detail  "
+          },
+          {
+            "revision": [
+              {
+                "actor": "b",
+                "counter": 1
+              }
+            ],
+            "text": ""
+          }
+        ]
+      }
+    },
+    {
+      "name": "safe-prototype-names",
+      "left": {
+        "profileId": "__proto__",
+        "videoId": "abcdefghijk",
+        "versions": [
+          {
+            "revision": [
+              {
+                "actor": "constructor",
+                "counter": 1
+              }
+            ],
+            "text": "A"
+          }
+        ]
+      },
+      "right": {
+        "profileId": "__proto__",
+        "videoId": "abcdefghijk",
+        "versions": [
+          {
+            "revision": [
+              {
+                "actor": "a",
+                "counter": 1
+              }
+            ],
+            "text": "B"
+          }
+        ]
+      },
+      "expected": {
+        "profileId": "__proto__",
+        "videoId": "abcdefghijk",
+        "versions": [
+          {
+            "revision": [
+              {
+                "actor": "a",
+                "counter": 1
+              }
+            ],
+            "text": "B"
+          },
+          {
+            "revision": [
+              {
+                "actor": "constructor",
+                "counter": 1
+              }
+            ],
+            "text": "A"
+          }
+        ]
+      }
+    }
+  ],
+  "invalidEnvelopes": [
+    {
+      "name": "outside-profile",
+      "json": "{\"format\":\"filtertube.saved-video-notes\",\"version\":1,\"entries\":[{\"profileId\":\"default\",\"videoId\":\"abcdefghijk\",\"versions\":[{\"revision\":[{\"actor\":\"a\",\"counter\":1}],\"text\":\"Original\"}]}]}",
+      "allowedProfiles": [
+        "other"
+      ]
+    },
+    {
+      "name": "duplicate-keys",
+      "json": "{\"format\":\"filtertube.saved-video-notes\",\"version\":1,\"entries\":[{\"profileId\":\"default\",\"videoId\":\"abcdefghijk\",\"versions\":[{\"revision\":[{\"actor\":\"a\",\"counter\":1}],\"text\":\"Original\"}]},{\"profileId\":\"default\",\"videoId\":\"abcdefghijk\",\"versions\":[{\"revision\":[{\"actor\":\"a\",\"counter\":1}],\"text\":\"Original\"}]}]}",
+      "allowedProfiles": [
+        "default"
+      ]
+    },
+    {
+      "name": "duplicate-actors",
+      "json": "{\"format\":\"filtertube.saved-video-notes\",\"version\":1,\"entries\":[{\"profileId\":\"default\",\"videoId\":\"abcdefghijk\",\"versions\":[{\"revision\":[{\"actor\":\"a\",\"counter\":1},{\"actor\":\"a\",\"counter\":2}],\"text\":\"A\"}]}]}",
+      "allowedProfiles": [
+        "default"
+      ]
+    },
+    {
+      "name": "empty-versions",
+      "json": "{\"format\":\"filtertube.saved-video-notes\",\"version\":1,\"entries\":[{\"profileId\":\"default\",\"videoId\":\"abcdefghijk\",\"versions\":[]}]}",
+      "allowedProfiles": [
+        "default"
+      ]
+    },
+    {
+      "name": "dominated-heads",
+      "json": "{\"format\":\"filtertube.saved-video-notes\",\"version\":1,\"entries\":[{\"profileId\":\"default\",\"videoId\":\"abcdefghijk\",\"versions\":[{\"revision\":[{\"actor\":\"a\",\"counter\":1}],\"text\":\"Original\"},{\"revision\":[{\"actor\":\"a\",\"counter\":2}],\"text\":null}]}]}",
+      "allowedProfiles": [
+        "default"
+      ]
+    },
+    {
+      "name": "duplicate-revisions",
+      "json": "{\"format\":\"filtertube.saved-video-notes\",\"version\":1,\"entries\":[{\"profileId\":\"default\",\"videoId\":\"abcdefghijk\",\"versions\":[{\"revision\":[{\"actor\":\"a\",\"counter\":1}],\"text\":\"Original\"},{\"revision\":[{\"actor\":\"a\",\"counter\":1}],\"text\":\"Original\"}]}]}",
+      "allowedProfiles": [
+        "default"
+      ]
+    },
+    {
+      "name": "invalid-counter-0",
+      "json": "{\"format\":\"filtertube.saved-video-notes\",\"version\":1,\"entries\":[{\"profileId\":\"default\",\"videoId\":\"abcdefghijk\",\"versions\":[{\"revision\":[{\"actor\":\"a\",\"counter\":0}],\"text\":\"A\"}]}]}",
+      "allowedProfiles": [
+        "default"
+      ]
+    },
+    {
+      "name": "invalid-counter--1",
+      "json": "{\"format\":\"filtertube.saved-video-notes\",\"version\":1,\"entries\":[{\"profileId\":\"default\",\"videoId\":\"abcdefghijk\",\"versions\":[{\"revision\":[{\"actor\":\"a\",\"counter\":-1}],\"text\":\"A\"}]}]}",
+      "allowedProfiles": [
+        "default"
+      ]
+    },
+    {
+      "name": "invalid-counter-1.5",
+      "json": "{\"format\":\"filtertube.saved-video-notes\",\"version\":1,\"entries\":[{\"profileId\":\"default\",\"videoId\":\"abcdefghijk\",\"versions\":[{\"revision\":[{\"actor\":\"a\",\"counter\":1.5}],\"text\":\"A\"}]}]}",
+      "allowedProfiles": [
+        "default"
+      ]
+    },
+    {
+      "name": "invalid-counter-9007199254740992",
+      "json": "{\"format\":\"filtertube.saved-video-notes\",\"version\":1,\"entries\":[{\"profileId\":\"default\",\"videoId\":\"abcdefghijk\",\"versions\":[{\"revision\":[{\"actor\":\"a\",\"counter\":9007199254740992}],\"text\":\"A\"}]}]}",
+      "allowedProfiles": [
+        "default"
+      ]
+    },
+    {
+      "name": "invalid-counter-1",
+      "json": "{\"format\":\"filtertube.saved-video-notes\",\"version\":1,\"entries\":[{\"profileId\":\"default\",\"videoId\":\"abcdefghijk\",\"versions\":[{\"revision\":[{\"actor\":\"a\",\"counter\":\"1\"}],\"text\":\"A\"}]}]}",
+      "allowedProfiles": [
+        "default"
+      ]
+    },
+    {
+      "name": "invalid-counter-True",
+      "json": "{\"format\":\"filtertube.saved-video-notes\",\"version\":1,\"entries\":[{\"profileId\":\"default\",\"videoId\":\"abcdefghijk\",\"versions\":[{\"revision\":[{\"actor\":\"a\",\"counter\":true}],\"text\":\"A\"}]}]}",
+      "allowedProfiles": [
+        "default"
+      ]
+    },
+    {
+      "name": "invalid-counter-None",
+      "json": "{\"format\":\"filtertube.saved-video-notes\",\"version\":1,\"entries\":[{\"profileId\":\"default\",\"videoId\":\"abcdefghijk\",\"versions\":[{\"revision\":[{\"actor\":\"a\",\"counter\":null}],\"text\":\"A\"}]}]}",
+      "allowedProfiles": [
+        "default"
+      ]
+    },
+    {
+      "name": "unknown-version",
+      "json": "{\"format\":\"filtertube.saved-video-notes\",\"version\":2,\"entries\":[{\"profileId\":\"default\",\"videoId\":\"abcdefghijk\",\"versions\":[{\"revision\":[{\"actor\":\"a\",\"counter\":1}],\"text\":\"Original\"}]}]}",
+      "allowedProfiles": [
+        "default"
+      ]
+    },
+    {
+      "name": "extra-entry-field",
+      "json": "{\"format\":\"filtertube.saved-video-notes\",\"version\":1,\"entries\":[{\"profileId\":\"default\",\"videoId\":\"abcdefghijk\",\"versions\":[{\"revision\":[{\"actor\":\"a\",\"counter\":1}],\"text\":\"Original\"}],\"extra\":true}]}",
+      "allowedProfiles": [
+        "default"
+      ]
+    },
+    {
+      "name": "video-url",
+      "json": "{\"format\":\"filtertube.saved-video-notes\",\"version\":1,\"entries\":[{\"profileId\":\"default\",\"videoId\":\"https://youtube.com/watch?v=abcdefghijk\",\"versions\":[{\"revision\":[{\"actor\":\"a\",\"counter\":1}],\"text\":\"Original\"}]}]}",
+      "allowedProfiles": [
+        "default"
+      ]
+    }
+  ]
+}
