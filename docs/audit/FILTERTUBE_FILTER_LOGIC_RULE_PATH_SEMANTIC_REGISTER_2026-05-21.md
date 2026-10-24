@@ -18,9 +18,9 @@ Current-source register reviewed on 2026-10-18. This refresh changes no runtime 
 
 ```text
 source file: js/filter_logic.js
-source line count: 4534
-source bytes: 221980
-source sha256: f7021a053af96a4cd31a577f56e900ffb1a5d990fe55a838af64a6dba867afc4
+source line count: 4536
+source bytes: 222044
+source sha256: 20c1426a56eeaa925b42d192a56699c2cfaafbc291bb7e2f583d3e5d29fc7f6c
 path owner object: FILTER_RULES
 shared alias object: BASE_VIDEO_RULES
 BASE_VIDEO_RULES field rows: 9
@@ -437,3 +437,7 @@ runtime behavior changed: no
 These counts are audit-only blockers. They do not approve runtime
 optimization, JSON-first behavior, rule-path changes, duplicate path policy
 changes, JSON/DOM parity changes, or selector/renderer authority changes.
+
+## Controls source inventory refresh - 2026-10-25
+
+The current `js/filter_logic.js` fingerprint and any affected line references above reflect the narrow autoplay correction: decorative end-screen hiding preserves playback endpoints; explicit Disable autoplay and individual filtering rules still govern them. This inventory refresh itself changes no runtime code and promotes none of the unresolved semantic-proof gates. See `docs/audit/TIME_LIMITS_AUTOPLAY_RESET_IMPLEMENTATION_2026-10-25.md` for implementation and executable validation.

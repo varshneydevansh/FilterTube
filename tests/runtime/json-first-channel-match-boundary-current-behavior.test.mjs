@@ -123,7 +123,7 @@ test('JSON-first channel match boundary audit is audit-only and source pinned', 
   assert.match(doc, /not completion proof for JSON-first channel match authority/);
 
   for (const [file, lines, bytes, hash] of [
-    ['js/filter_logic.js', 4534, 221980, 'f7021a053af96a4cd31a577f56e900ffb1a5d990fe55a838af64a6dba867afc4'],
+    ['js/filter_logic.js', 4536, 222044, '20c1426a56eeaa925b42d192a56699c2cfaafbc291bb7e2f583d3e5d29fc7f6c'],
     ['js/shared/identity.js', 1016, 39123, 'fafcbe72d9807a487ecc11d2252f2363e5b8a741eacc740307b1ebd378ebbecb']
   ]) {
     const source = read(file);

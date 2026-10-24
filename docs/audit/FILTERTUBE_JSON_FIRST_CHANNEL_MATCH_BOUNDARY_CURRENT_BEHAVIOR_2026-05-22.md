@@ -28,7 +28,7 @@ identity is not present.
 
 | Source | Lines | Bytes | SHA-256 |
 | --- | ---: | ---: | --- |
-| `js/filter_logic.js` | 4534 | 221980 | `f7021a053af96a4cd31a577f56e900ffb1a5d990fe55a838af64a6dba867afc4` |
+| `js/filter_logic.js` | 4536 | 222044 | `20c1426a56eeaa925b42d192a56699c2cfaafbc291bb7e2f583d3e5d29fc7f6c` |
 | `js/shared/identity.js` | 1016 | 39123 | `fafcbe72d9807a487ecc11d2252f2363e5b8a741eacc740307b1ebd378ebbecb` |
 
 Related proof layers:
@@ -181,3 +181,7 @@ changes.
 ## Revalidation - 2026-10-18
 
 Source fingerprints and bounded extraction inventories were refreshed against the current checkout after source review. These are drift detectors, not exhaustive semantic proof, installed-browser evidence, or approval of the broader missing-authority gates. Executable fixtures below remain the behavior checks.
+
+## Controls source inventory refresh - 2026-10-25
+
+The current `js/filter_logic.js` fingerprint and any affected line references above reflect the narrow autoplay correction: decorative end-screen hiding preserves playback endpoints; explicit Disable autoplay and individual filtering rules still govern them. This inventory refresh itself changes no runtime code and promotes none of the unresolved semantic-proof gates. See `docs/audit/TIME_LIMITS_AUTOPLAY_RESET_IMPLEMENTATION_2026-10-25.md` for implementation and executable validation.

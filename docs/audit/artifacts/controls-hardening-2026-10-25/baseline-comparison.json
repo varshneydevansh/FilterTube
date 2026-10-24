@@ -1,0 +1,581 @@
+{
+  "baseline_revision": "29eb7b5bac08bc9f88af11a7fc49e1d2d5f412c4",
+  "baseline_environment": "Disposable git archive with local read-only Git object alternates, populated index and node_modules/capture symlinks",
+  "lanes": [
+    {
+      "lane": "whitelist",
+      "baseline_counts": {
+        "tests": "458",
+        "pass": "423",
+        "fail": "35"
+      },
+      "initial_comparison": {
+        "current_counts": {
+          "tests": "487",
+          "pass": "442",
+          "fail": "45"
+        },
+        "new_failed_titles": [
+          "JSON-first whitelist decision identity audit is audit-only and source pinned",
+          "Shorts reel overlay owner audit doc and fixture provenance are pinned",
+          "filter logic method semantic register is audit-only and scoped to current behavior",
+          "filter logic method semantic register preserves every source row and future proof field",
+          "filter logic rule field effect register is audit-only and source scoped",
+          "filter logic rule path register is audit-only and source scoped",
+          "hideEndscreenCards removes watch autoplay endpoint sets during active JSON processing",
+          "hideEndscreenVideowall removes watch autoplay endpoint sets during active JSON processing",
+          "source proof pins player end-card CSS hide split refresh omission and missing authority",
+          "source proof pins player-overlay CSS hide split refresh omission and missing authority"
+        ],
+        "resolved_failed_titles": [],
+        "shared_failed_titles_count": 35
+      },
+      "final_counts": {
+        "tests": 487,
+        "pass": 452,
+        "fail": 35
+      },
+      "new_failed_titles": [],
+      "resolved_failed_titles": [],
+      "remaining_failed_titles": [
+        "DOM source keeps YTM selected-row whitelist behavior generic rather than first-class",
+        "JSON-first disableAutoplay/disableAnnotations boundary audit is audit-only and source pinned",
+        "JSON-first hideAllShorts boundary audit is audit-only and source pinned",
+        "JSON-first hideEndscreenCards boundary audit is release-fix proof and source pinned",
+        "JSON-first hideEndscreenVideowall boundary audit is release-fix proof and source pinned",
+        "Kids latest JSON owner extension fixture audit is audit-only and source pinned",
+        "Kids latest owner-extension source counts stay pinned",
+        "Shorts DOM cleanup boundary audit is audit-only and source pinned",
+        "Shorts DOM cleanup source counts remain pinned",
+        "Shorts card decision promotes target to rich item parent under global hide",
+        "Shorts card decision removes keyword marker when global hide and keyword match are inactive while preserving video map evidence",
+        "YouTube Music source and effect blocks remain pinned",
+        "YouTube Music surface identity boundary audit is audit-only and source pinned",
+        "batch whitelist import persistence audit is audit-only and source pinned",
+        "current cache asymmetries remain explicit before broader optimization",
+        "current source proves mode and route gates now run before queue collection",
+        "direct shortsLockupViewModelV2 currently leaks through recursive renderer discovery",
+        "disableAutoplay/disableAnnotations source counts remain pinned",
+        "executable selected-row branch restores whitelist selected rows but schedules blocklist next clicks",
+        "filter logic JSON decision family docs carry the method semantic proof gap blocker",
+        "hideAllShorts source counts remain pinned",
+        "hideEndscreenCards source counts remain pinned",
+        "hideEndscreenVideowall source counts remain pinned",
+        "live smoke template is still non-executed and no result artifact is present",
+        "metric packet gate preserves optimization and JSON-first approval absence",
+        "packet rows, live smoke rows, and diagrams remain explicit",
+        "player/end-screen DOM cleanup boundary audit is audit-only and source pinned",
+        "player/end-screen DOM cleanup source counts remain pinned",
+        "release live YouTube SPA smoke remains a separate missing release gate",
+        "right-rail whitelist observer audit documents watch-route ambiguity and coalesced timer fix",
+        "selected cache hot-path token counts remain pinned",
+        "source proof pins active work settings aliases DOM markers and missing authority",
+        "whitelist cache hot-path boundary records narrow dedupe and source pins",
+        "whitelist cache hot-path source/effect blocks stay source-derived",
+        "whitelist readiness source anchors still show split runtime ownership"
+      ]
+    },
+    {
+      "lane": "blocking",
+      "baseline_counts": {
+        "tests": "570",
+        "pass": "557",
+        "fail": "13"
+      },
+      "initial_comparison": {
+        "current_counts": {
+          "tests": "599",
+          "pass": "579",
+          "fail": "20"
+        },
+        "new_failed_titles": [
+          "JSON comment keyword provenance source and effect blocks remain pinned",
+          "JSON-first channel match boundary audit is audit-only and source pinned",
+          "Shorts reel overlay owner audit doc and fixture provenance are pinned",
+          "filter logic method semantic register is audit-only and scoped to current behavior",
+          "filter logic method semantic register preserves every source row and future proof field",
+          "filter logic rule field effect register is audit-only and source scoped",
+          "filter logic rule path register is audit-only and source scoped"
+        ],
+        "resolved_failed_titles": [],
+        "shared_failed_titles_count": 13
+      },
+      "final_counts": {
+        "tests": 599,
+        "pass": 586,
+        "fail": 13
+      },
+      "new_failed_titles": [],
+      "resolved_failed_titles": [],
+      "remaining_failed_titles": [
+        "JSON comment author channel provenance audit is audit-only and source pinned",
+        "JSON comment keyword provenance audit is audit-only and source pinned",
+        "JSON-first keyword match boundary audit is audit-only and source pinned",
+        "addFilteredChannel Filter All comments default audit is audit-only and source pinned",
+        "addFilteredChannel Filter All comments default source and effect blocks remain pinned",
+        "background addFilteredChannel list-target audit is audit-only and source pinned",
+        "background addFilteredChannel list-target source and effect blocks remain pinned",
+        "filter logic JSON decision family docs carry the method semantic proof gap blocker",
+        "filter-all toggle list-target audit is audit-only and source pinned",
+        "filter-all toggle source and effect blocks remain pinned",
+        "menu action list-target audit is audit-only and source pinned",
+        "menu action list-target source and effect blocks remain pinned",
+        "single-channel rule mutation source fingerprints stay pinned"
+      ]
+    },
+    {
+      "lane": "json",
+      "baseline_counts": {
+        "tests": "1265",
+        "pass": "1134",
+        "fail": "131"
+      },
+      "initial_comparison": {
+        "current_counts": {
+          "tests": "1294",
+          "pass": "1156",
+          "fail": "138"
+        },
+        "new_failed_titles": [
+          "JSON comment keyword provenance source and effect blocks remain pinned",
+          "JSON-first whitelist decision identity audit is audit-only and source pinned",
+          "Shorts reel overlay owner audit doc and fixture provenance are pinned",
+          "filter logic method semantic register is audit-only and scoped to current behavior",
+          "filter logic method semantic register preserves every source row and future proof field",
+          "filter logic rule field effect register is audit-only and source scoped",
+          "filter logic rule path register is audit-only and source scoped"
+        ],
+        "resolved_failed_titles": [],
+        "shared_failed_titles_count": 131
+      },
+      "final_counts": {
+        "tests": 1294,
+        "pass": 1163,
+        "fail": 131
+      },
+      "new_failed_titles": [],
+      "resolved_failed_titles": [],
+      "remaining_failed_titles": [
+        "JSON candidate extraction exposes membership evidence only as generic metadata",
+        "JSON comment author channel provenance audit is audit-only and source pinned",
+        "JSON comment continuation sibling preservation slice is audit-only and pinned",
+        "JSON comment entity payload provenance slice is audit-only and pinned",
+        "JSON comment keyword provenance audit is audit-only and source pinned",
+        "JSON comment structural wrapper cleanup audit is audit-only and source pinned",
+        "JSON comment structural wrapper cleanup selected token counts remain pinned",
+        "JSON comment structural wrapper cleanup source and effect blocks remain pinned",
+        "JSON-first active work predicate register is audit-only and source pinned",
+        "JSON-first active work predicate rows remain source-derived",
+        "JSON-first active work source anchors and predicate mismatches remain pinned",
+        "JSON-first block decision effect boundary audit is audit-only and source pinned",
+        "JSON-first candidate extraction boundary audit is audit-only and source pinned",
+        "JSON-first comment continuation shortcut is audit-only and source pinned",
+        "JSON-first filter readiness gate is audit-only and links current proof layers",
+        "JSON-first hideAllComments boundary audit is audit-only and source pinned",
+        "JSON-first hideAskButton boundary audit is audit-only and source pinned",
+        "JSON-first hideExploreTrending boundary audit is audit-only and source pinned",
+        "JSON-first hideHomeFeed boundary audit is audit-only and source pinned",
+        "JSON-first hideLiveChat boundary audit is audit-only and source pinned",
+        "JSON-first hideMembersOnly boundary audit is audit-only and source pinned",
+        "JSON-first hideMerchTicketsOffers boundary audit is audit-only and source pinned",
+        "JSON-first hideMixPlaylists boundary audit is audit-only and source pinned",
+        "JSON-first hideMoreFromYouTube boundary audit is audit-only and source pinned",
+        "JSON-first hideNotificationBell boundary audit is audit-only and source pinned",
+        "JSON-first hidePlaylistCards boundary audit is audit-only and source pinned",
+        "JSON-first hideRecommended boundary audit is audit-only and source pinned",
+        "JSON-first hideSearchShelves boundary audit is audit-only and source pinned",
+        "JSON-first hideSponsoredCards boundary audit is audit-only and source pinned",
+        "JSON-first hideSubscriptions boundary audit is audit-only and source pinned",
+        "JSON-first hideTopHeader boundary audit is audit-only and source pinned",
+        "JSON-first hideVideoButtonsBar boundary audit is audit-only and source pinned",
+        "JSON-first hideVideoChannelRow boundary audit is audit-only and source pinned",
+        "JSON-first hideVideoDescription boundary audit is audit-only and source pinned",
+        "JSON-first hideVideoInfo boundary audit is audit-only and source pinned",
+        "JSON-first hideVideoSidebar boundary audit is audit-only and source pinned",
+        "JSON-first hideWatchPlaylistPanel boundary audit is audit-only and source pinned",
+        "JSON-first implementation loci preserve current behavior risks",
+        "JSON-first implementation locus register is audit-only and source pinned",
+        "JSON-first implementation locus register line anchors match current source",
+        "JSON-first list-mode matrix audit is audit-only and source pinned",
+        "JSON-first network snapshot clone isolation audit is audit-only and source pinned",
+        "JSON-first network snapshot consumer application audit is audit-only and source pinned",
+        "JSON-first network snapshot consumer traversal budget audit is audit-only and source pinned",
+        "JSON-first readiness gate is backed by current source blockers",
+        "JSON-first renderer traversal mutation boundary audit is audit-only and source pinned",
+        "JSON-first response mutation contract is audit-only and source pinned",
+        "YTM showSheet enrichment handoff doc and source facts are pinned",
+        "YTM showSheet injector/filter-logic parity doc and source facts are pinned",
+        "YouTube Music source and effect blocks remain pinned",
+        "YouTube Music surface identity boundary audit is audit-only and source pinned",
+        "applyResolvedCollaborators stamps matching cards caches roster and schedules DOM fallback rerun",
+        "applyResolvedCollaborators with no target card still caches and schedules follow-on work while returning false",
+        "block decision source counts remain pinned",
+        "blocklist mode does not let matching whitelist rows override a blocklist channel row",
+        "browse snapshots store the engine result object directly in latest and recent fields",
+        "buildCandidate gates channel identity extraction but still builds metadata text",
+        "candidate extraction source counts remain pinned",
+        "catalog aliases and settings invalidation are split across current owners",
+        "catalog controls map to current proof docs and tests",
+        "collection-root parity slice is audit-only and source pinned",
+        "command-shape parity slice is audit-only and source pinned",
+        "comment continuation shortcut source rows and anchors remain current",
+        "comments bypass non-comment empty whitelist fail-closed but still honor comment keyword blocking",
+        "content bridge dispatch branch inventory is pinned exactly",
+        "content bridge main-world dispatch audit is audit-only and source counted",
+        "content-control JSON-first boundary index is audit-only and source pinned",
+        "desktop and mobile home empty-blocklist XHRs bypass body work",
+        "disabled and missing-settings XHRs do not mark hook or do body work",
+        "disabled page load listener is not wrapped when XHR body work is bypassed",
+        "empty selected category does not make search XHR active JSON work",
+        "engine fallback stashes the same parsed object that failed engine processing",
+        "filter logic JSON decision family docs carry the method semantic proof gap blocker",
+        "force bypasses global richer-cache gate but does not overwrite richer card cache",
+        "hideAllComments source counts remain pinned",
+        "hideAskButton source counts remain pinned",
+        "hideExploreTrending source counts remain pinned",
+        "hideHomeFeed source counts remain pinned",
+        "hideLiveChat source counts remain pinned",
+        "hideMembersOnly source counts remain pinned",
+        "hideMerchTicketsOffers source counts remain pinned",
+        "hideMixPlaylists source counts remain pinned",
+        "hideMoreFromYouTube source counts remain pinned",
+        "hideNotificationBell source counts remain pinned",
+        "hidePlaylistCards source counts remain pinned",
+        "hideRecommended source counts remain pinned",
+        "hideSearchShelves source counts remain pinned",
+        "hideSponsoredCards source counts remain pinned",
+        "hideSubscriptions source counts remain pinned",
+        "hideTopHeader source counts remain pinned",
+        "hideVideoButtonsBar source counts remain pinned",
+        "hideVideoChannelRow source counts remain pinned",
+        "hideVideoDescription source counts remain pinned",
+        "hideVideoInfo source counts remain pinned",
+        "hideVideoSidebar source counts remain pinned",
+        "hideWatchPlaylistPanel source counts remain pinned",
+        "injector direct extraction returns the captured YTM showSheet roster",
+        "injector main-world message dispatch audit is audit-only and source counted",
+        "injector recognizes showSheet collaborator shapes that filter_logic does not parse today",
+        "injector snapshot lookup returns the full captured roster from bridge handoff options",
+        "injector snapshot search finds the captured YTM showSheet roster by video id",
+        "list-mode matrix source counts remain pinned",
+        "main injector listener accepts string source labels without origin nonce revision or capability checks",
+        "network fetch/xhr callsite counts remain source-derived",
+        "network fetch/xhr callsite register is audit-only and source pinned",
+        "next and player snapshots store latest engine result objects without clone or history fields",
+        "no-active-rule search path bypasses parsing processing and snapshot writes",
+        "player next and guide empty-blocklist XHRs bypass body work",
+        "renderer traversal source counts remain pinned",
+        "response mutation source rows and counts remain current",
+        "richer global resolved cache blocks lower quality incoming collaborators unless force is set",
+        "search empty blocklist XHR bypasses hook body work",
+        "search snapshots store the engine result object directly in latest and recent fields",
+        "search whitelist mode XHR runs processData instead of harvest-only",
+        "seed XHR no-work/list-mode audit is audit-only and source pinned",
+        "seed XHR no-work/list-mode source counts remain pinned",
+        "seed fetch no-work/list-mode audit is audit-only and source pinned",
+        "seed fetch no-work/list-mode source counts remain pinned",
+        "seed/injector network JSON work predicate parity addendum remains source-derived",
+        "settings message merges caller payload and drains queue without revision gate",
+        "source blocks fixture anchors and selected product runtime gaps remain current",
+        "source order exposes renderer removal before property copy and DOM selector-only structural parity",
+        "source proof pins DOM-only Mix hiding and missing refresh key authority",
+        "source proof pins DOM-only sponsored hiding and settings parity gap",
+        "source proof pins DOM-owned Members-only hiding and settings parity gap",
+        "source proof pins DOM-owned live-chat hiding refresh omission and missing authority",
+        "source proof pins DOM-owned playlist-card hiding refresh omission and Mix exclusion",
+        "source proof pins comment settings aliases DOM parity and missing authority",
+        "source rows and selected token counts pin shortcut versus engine sibling behavior",
+        "source rows and token counts pin endpoint-only shortcut detection",
+        "source rows pin append-only shortcut detection against reload and replace commands"
+      ]
+    },
+    {
+      "lane": "dom",
+      "baseline_counts": {
+        "tests": "428",
+        "pass": "375",
+        "fail": "53"
+      },
+      "initial_comparison": {
+        "current_counts": {
+          "tests": "457",
+          "pass": "401",
+          "fail": "56"
+        },
+        "new_failed_titles": [
+          "filter logic method semantic register is audit-only and scoped to current behavior",
+          "filter logic method semantic register preserves every source row and future proof field",
+          "filter logic rule field effect register is audit-only and source scoped",
+          "filter logic rule path register is audit-only and source scoped"
+        ],
+        "resolved_failed_titles": [
+          "quarantined content CSS is packaged but not manifest or extension HTML loaded"
+        ],
+        "shared_failed_titles_count": 52
+      },
+      "final_counts": {
+        "tests": 457,
+        "pass": 405,
+        "fail": 52
+      },
+      "new_failed_titles": [],
+      "resolved_failed_titles": [
+        "quarantined content CSS is packaged but not manifest or extension HTML loaded"
+      ],
+      "remaining_failed_titles": [
+        "DOM fallback broad lexical reconciliation separates semantic rows from artifacts",
+        "DOM fallback category card logic requires selected categories before metadata fetch scheduling",
+        "DOM fallback members-only badge host selector currently includes watch primary containers",
+        "DOM fallback method semantic register accounts for every current top-level method row in scope",
+        "DOM fallback method semantic register is audit-only and scoped to current behavior",
+        "DOM fallback method semantic register preserves every source row and future proof field",
+        "DOM fallback run-state and scroll cleanup remain source-derived",
+        "DOM fallback run-state visibility cleanup doc is audit-only and source pinned",
+        "DOM fallback run-state visibility cleanup source/effect blocks remain pinned",
+        "DOM fallback run-state visibility selected token counts remain current",
+        "DOM fallback selector semantic register accounts for every current selector API site",
+        "DOM fallback selector semantic register pins every dynamic selector expression by family",
+        "DOM fallback selector semantic register preserves semantic group counts and future selector fields",
+        "DOM fallback selector semantic register source-backs the current risk boundaries",
+        "DOM fallback source backs active-work cleanup lifecycle and visual side-effect boundaries",
+        "DOM fallback source backs whitelist fail-closed resolver and current-watch side effects",
+        "DOM selector instance register documents boundary and non-completion",
+        "DOM selector instance register enumerates current API sites and literal dynamic split",
+        "Shorts DOM cleanup boundary audit is audit-only and source pinned",
+        "Shorts DOM cleanup source counts remain pinned",
+        "Shorts card decision promotes target to rich item parent under global hide",
+        "Shorts card decision removes keyword marker when global hide and keyword match are inactive while preserving video map evidence",
+        "comments DOM cleanup boundary audit is audit-only and source pinned",
+        "comments DOM cleanup source counts remain pinned",
+        "comments mobile marker is omitted by stale and disabled cleanup branches",
+        "current watch and members-only fallback paths include broad hide and playback/navigation side effects",
+        "current-watch owner enforcement can hide the selected row and click only a verified allowed target",
+        "direct display-none writes currently bypass the shared toggleVisibility path in bridge and fallback code",
+        "direct hide writer register enumerates every active page-runtime display-none writer",
+        "direct hide writer register is backed by current source snippets for each writer family",
+        "dynamic content-control style can own broad content hides and must be tied to settings",
+        "dynamic selector expressions include the high-risk constants and runtime templates",
+        "every selector API site has file line api expression snippet and source family metadata",
+        "fallback 3-dot scan currently omits post renderers even though native dropdown targeting includes them",
+        "filter logic JSON decision family docs carry the method semantic proof gap blocker",
+        "global comments hide returns before reply renderers and view-model renderers are toggled",
+        "hideAllComments hides containers threads and collected mobile cards with marker writes",
+        "home-feed DOM cleanup boundary audit is audit-only and source pinned",
+        "home-feed DOM cleanup source counts remain pinned",
+        "members-only CSS and JS fallback can target watch shells and shelf parents today",
+        "mobile comments collector is watch-route and comment-text gated",
+        "player/end-screen DOM cleanup boundary audit is audit-only and source pinned",
+        "player/end-screen DOM cleanup source counts remain pinned",
+        "playlist card CSS and JS can hide parent shelf or horizontal list from one lockup today",
+        "playlist selected-row detection is present, and current-watch owner block hides the selected playlist row",
+        "release build still packages css directory even though content CSS is not manifest-loaded",
+        "selector hot-file totals match the source-derived register",
+        "selector source-family totals match the current register doc",
+        "toggle-off restores only marked mobile cards that still classify as comments",
+        "watch playlist panel DOM cleanup boundary audit is audit-only and source pinned",
+        "watch playlist panel DOM cleanup source counts remain pinned",
+        "whitelist mode locally restores comment containers and composer before normal processing continues"
+      ]
+    },
+    {
+      "lane": "menu",
+      "baseline_counts": {
+        "tests": "108",
+        "pass": "89",
+        "fail": "19"
+      },
+      "initial_comparison": {
+        "current_counts": {
+          "tests": "108",
+          "pass": "89",
+          "fail": "19"
+        },
+        "new_failed_titles": [],
+        "resolved_failed_titles": [],
+        "shared_failed_titles_count": 19
+      },
+      "final_counts": {
+        "tests": 108,
+        "pass": 89,
+        "fail": 19
+      },
+      "new_failed_titles": [],
+      "resolved_failed_titles": [],
+      "remaining_failed_titles": [
+        "block channel method register accounts for every current declaration row",
+        "block channel method register preserves every source row",
+        "block channel method semantic register is audit-only and scoped to current behavior",
+        "block channel register pins DOM lifecycle selector mutation and message counts",
+        "checkIfChannelBlocked fallback matching works without shared identity helpers",
+        "checkIfChannelBlocked uses storage filterChannels and shared identity to disable menu state",
+        "collaborator identity promotion handoff audit and implementation addendum are source pinned",
+        "collaborator identity promotion handoff source and effect blocks remain pinned",
+        "content bridge menu injection action audit is audit-only and source pinned",
+        "content bridge menu injection action blocks and selected counts stay pinned",
+        "filter logic supports videoWithContextRenderer but does not parse showSheet collaborator rosters today",
+        "menu action list-target audit is audit-only and source pinned",
+        "menu action list-target source and effect blocks remain pinned",
+        "menu blocked-state list-shape audit is audit-only and source pinned",
+        "menu blocked-state source and effect blocks remain pinned",
+        "menu blocked-state token counts remain pinned",
+        "menu injection and block click fanout stay source-derived",
+        "quick-block default migration audit is audit-only and source pinned",
+        "quick-block default migration source counts remain pinned"
+      ]
+    },
+    {
+      "lane": "performance",
+      "baseline_counts": {
+        "tests": "916",
+        "pass": "872",
+        "fail": "44"
+      },
+      "initial_comparison": {
+        "current_counts": {
+          "tests": "945",
+          "pass": "896",
+          "fail": "49"
+        },
+        "new_failed_titles": [
+          "filter logic method semantic register is audit-only and scoped to current behavior",
+          "filter logic method semantic register preserves every source row and future proof field",
+          "filter logic rule field effect register is audit-only and source scoped",
+          "filter logic rule path register is audit-only and source scoped",
+          "new playback modules add no direct console or logging relay callsites"
+        ],
+        "resolved_failed_titles": [],
+        "shared_failed_titles_count": 44
+      },
+      "final_counts": {
+        "tests": 945,
+        "pass": 901,
+        "fail": 44
+      },
+      "new_failed_titles": [],
+      "resolved_failed_titles": [],
+      "remaining_failed_titles": [
+        "DOM and settings owners split active gate style refresh and invalidation coverage",
+        "JSON-first no-work crosswalk links source-locus register as audit-only implementation map",
+        "JSON-first no-work optimization crosswalk is audit-only and source-pinned",
+        "catalog controls match the documented active-work matrix rows",
+        "content-control active-work matrix is audit-only and source pinned",
+        "content-control active-work source block counts remain pinned",
+        "current source facts map every optimization candidate to a blocked proof gate",
+        "current source proves mode and route gates now run before queue collection",
+        "desktop and mobile home empty-blocklist XHRs bypass body work",
+        "disabled and missing-settings XHRs do not mark hook or do body work",
+        "disabled page load listener is not wrapped when XHR body work is bypassed",
+        "empty selected category does not make search XHR active JSON work",
+        "enabled disabled-runtime boundary is audit-only and source pinned",
+        "enabled disabled-runtime source/effect blocks remain current",
+        "enabled key propagation is not parity-complete across background content and UI refresh",
+        "every lifecycle instance has source family owner line and snippet metadata",
+        "every tracked JS JSX and MJS file is lifecycle-classified",
+        "filter logic JSON decision family docs carry the method semantic proof gap blocker",
+        "hot lifecycle files and teardown imbalance are documented as current audit findings",
+        "large product-owned source files are guarded before new spaghetti growth",
+        "lifecycle instance hot files remain pinned before cleanup work",
+        "lifecycle instance register enumerates every current observer listener timer and frame instance",
+        "lifecycle instance register links the source-derived DOM fallback lifecycle callback addendum",
+        "lifecycle instance source-family totals match the current register doc",
+        "lifecycle primitive family totals pin page runtime UI website vendor and quarantine burden",
+        "live smoke template is still non-executed and no result artifact is present",
+        "metric packet gate preserves optimization and JSON-first approval absence",
+        "network fetch/xhr callsite counts remain source-derived",
+        "network fetch/xhr callsite register is audit-only and source pinned",
+        "packet rows, live smoke rows, and diagrams remain explicit",
+        "page-resident lifecycle token imbalance is pinned as a cleanup no-go",
+        "player next and guide empty-blocklist XHRs bypass body work",
+        "quarantined YouTube CSS is packaged today but not manifest-loaded",
+        "repo-wide lifecycle primitive totals match current tracked source",
+        "runtime audit already proves lag-relevant work remains in empty or disabled states",
+        "search empty blocklist XHR bypasses hook body work",
+        "search whitelist mode XHR runs processData instead of harvest-only",
+        "seed XHR no-work/list-mode audit is audit-only and source pinned",
+        "seed XHR no-work/list-mode source counts remain pinned",
+        "seed and filter logic direct content-control work is limited to Shorts and comments controls",
+        "seed fetch no-work/list-mode audit is audit-only and source pinned",
+        "seed fetch no-work/list-mode source counts remain pinned",
+        "source locus callable line anchors resolve to current source text",
+        "zero-byte troubleshoot page is packaged through html directory and not a proven support surface"
+      ]
+    }
+  ],
+  "new_failure_classifications": [
+    {
+      "title": "JSON-first whitelist decision identity audit is audit-only and source pinned",
+      "classification": "source-fingerprint",
+      "cause": "filter_logic whole file changed4534 to4536 lines; root supplementary refresh already addresses"
+    },
+    {
+      "title": "Shorts reel overlay owner audit doc and fixture provenance are pinned",
+      "classification": "source-fingerprint",
+      "cause": "filter_logic whole file changed4534 to4536 lines"
+    },
+    {
+      "title": "filter logic method semantic register is audit-only and scoped to current behavior",
+      "classification": "source-fingerprint",
+      "cause": "filter_logic bytes/hash/splitLines updated by intentional2-line change"
+    },
+    {
+      "title": "filter logic method semantic register preserves every source row and future proof field",
+      "classification": "source-location",
+      "cause": "method row classMethod:_regexMatches moved2409 to2411"
+    },
+    {
+      "title": "filter logic rule field effect register is audit-only and source scoped",
+      "classification": "source-fingerprint",
+      "cause": "filter_logic whole file changed4534 to4536 lines"
+    },
+    {
+      "title": "filter logic rule path register is audit-only and source scoped",
+      "classification": "source-fingerprint",
+      "cause": "filter_logic whole file changed4534 to4536 lines"
+    },
+    {
+      "title": "hideEndscreenCards removes watch autoplay endpoint sets during active JSON processing",
+      "classification": "intentional-behavior-change",
+      "cause": "old assertion requires all autoplay endpoints removed by decorative hide flag, contrary to authorized autoplay fix"
+    },
+    {
+      "title": "hideEndscreenVideowall removes watch autoplay endpoint sets during active JSON processing",
+      "classification": "intentional-behavior-change",
+      "cause": "old assertion requires all autoplay endpoints removed by decorative hide flag, contrary to authorized autoplay fix"
+    },
+    {
+      "title": "source proof pins player end-card CSS hide split refresh omission and missing authority",
+      "classification": "intentional-source-contract-change",
+      "cause": "old assertion requires hideEndscreenCards identifier in JSON engine; removed from autoplay gate intentionally"
+    },
+    {
+      "title": "source proof pins player-overlay CSS hide split refresh omission and missing authority",
+      "classification": "intentional-source-contract-change",
+      "cause": "old assertion requires hideEndscreenVideowall identifier in JSON engine; removed from autoplay gate intentionally"
+    },
+    {
+      "title": "JSON comment keyword provenance source and effect blocks remain pinned",
+      "classification": "source-block-fingerprint",
+      "cause": "filterLogicCandidateMetadataSearch block changed243 to245lines due autoplay gate comments"
+    },
+    {
+      "title": "JSON-first channel match boundary audit is audit-only and source pinned",
+      "classification": "source-fingerprint",
+      "cause": "filter_logic whole file changed4534 to4536 lines"
+    },
+    {
+      "title": "new playback modules add no direct console or logging relay callsites",
+      "classification": "source-fingerprint",
+      "cause": "playback coordinator changed337 to374lines; root supplementary refresh already addresses"
+    }
+  ],
+  "caveats": [
+    "Compared exact failure titles against before-fix HEAD; baseline source/tests are29eb7b5b, current logs predate final supplementary source-pin refresh.",
+    "No product runtime source was changed by baseline task. Capture fixtures and node_modules are symlinks to same local inputs. Git objects read via alternates from actual repository; all temporary refs/index are inside disposable copy.",
+    "Archive lacked ignored dist packages, causing one additional baseline-only quarantined-CSS packaging failure; do not count this as a product correction."
+  ],
+  "reconciliation": "Only changed source fingerprints/locations and intentional end-screen/autoplay contracts were refreshed. Remaining baseline semantic failures were not waived.",
+  "settings": {
+    "baselineLog": "/tmp/filtertube-p2p-settings.log",
+    "same95FailedTitles": true
+  }
+}

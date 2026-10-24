@@ -381,10 +381,10 @@ test('filter logic rule path register is audit-only and source scoped', () => {
   assert.match(text, /source file: js\/filter_logic\.js/);
   assert.match(text, /path owner object: FILTER_RULES/);
   assert.match(text, /shared alias object: BASE_VIDEO_RULES/);
-  assert.equal(sourceLineCount(source), 4534);
-  assert.equal(fs.statSync(path.join(repoRoot, sourcePath)).size, 221980);
-  assert.match(text, /source line count: 4534/);
-  assert.match(text, /source bytes: 221980/);
+  assert.equal(sourceLineCount(source), 4536);
+  assert.equal(fs.statSync(path.join(repoRoot, sourcePath)).size, 222044);
+  assert.match(text, /source line count: 4536/);
+  assert.match(text, /source bytes: 222044/);
   assert.match(text, new RegExp(`source sha256: ${sha256(sourcePath)}`));
 });
 

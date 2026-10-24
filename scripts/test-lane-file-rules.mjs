@@ -1,5 +1,7 @@
 // Declarative path ownership, split from test-lane-config.mjs to keep workflow files bounded.
 export const FILE_LANE_RULES = Object.freeze([
+  { id: 'profile-reset-and-time-transactions', patterns: [/^js\/profile_preference_defaults\.js$/, /^tests\/runtime\/(?:profile-preference-reset|managed-time-usage-transactions)\.test\.mjs$/], lanes: ['release', 'settings', 'smoke'] },
+  { id: 'controls-hardening-evidence', patterns: [/^docs\/audit\/artifacts\/controls-hardening-[^/]+\//], lanes: ['release', 'settings', 'smoke'] },
   { id: 'time-autoplay-review-evidence', patterns: [/^docs\/audit\/artifacts\/time-limits-and-autoplay-review\//], lanes: ['release', 'settings', 'smoke'] },
   { id: 'two-endpoint-sync-evidence', patterns: [/^tests\/runtime\/fixtures\/auto-sync-two-endpoint-harness\.js$/, /^docs\/audit\/artifacts\/auto-sync-two-endpoint-[^/]+\//], lanes: ['release', 'settings', 'smoke'] },
   { id: 'opt-in-device-auto-sync', patterns: [/^js\/(?:auto_sync_(?:queue|wakeup)|device_auto_sync(?:_ui)?|managed_auto_sync|personal_sync|personal_auto_sync_runtime)\.js$/, /^tests\/runtime\/(?:auto-sync-.*|device-auto-sync.*|managed-auto-sync.*|personal-sync|personal-auto-sync.*)\.test\.mjs$/, /^css\/device-auto-sync\.css$/], lanes: ['release', 'settings', 'smoke'] },

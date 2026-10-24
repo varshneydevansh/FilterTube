@@ -324,10 +324,10 @@ test('filter logic method semantic register is audit-only and scoped to current 
   assert.match(text, /Status: audit-only current-behavior register/);
   assert.match(text, /Runtime behavior is unchanged/);
   assert.match(text, /source file: js\/filter_logic\.js/);
-  assert.match(text, /split source lines: 4535/);
-  assert.match(text, /wc line count: 4534/);
-  assert.match(text, /source bytes: 221980/);
-  assert.match(text, /source sha256: f7021a053af96a4cd31a577f56e900ffb1a5d990fe55a838af64a6dba867afc4/);
+  assert.match(text, /split source lines: 4537/);
+  assert.match(text, /wc line count: 4536/);
+  assert.match(text, /source bytes: 222044/);
+  assert.match(text, /source sha256: 20c1426a56eeaa925b42d192a56699c2cfaafbc291bb7e2f583d3e5d29fc7f6c/);
   assert.match(text, /source object\/class: YouTubeDataFilter/);
   assert.match(text, /global interface: window\.FilterTubeEngine/);
   assert.match(text, /method and entrypoint rows: 79/);
@@ -345,9 +345,9 @@ test('filter logic method semantic register is audit-only and scoped to current 
   assert.match(text, /not completion proof for every nested local callback/);
 
   assert.deepEqual(sourceStats(sourcePath), {
-    bytes: 221980,
-    sha256: 'f7021a053af96a4cd31a577f56e900ffb1a5d990fe55a838af64a6dba867afc4',
-    splitLines: 4535
+    bytes: 222044,
+    sha256: '20c1426a56eeaa925b42d192a56699c2cfaafbc291bb7e2f583d3e5d29fc7f6c',
+    splitLines: 4537
   });
 });
 

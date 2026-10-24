@@ -29,7 +29,7 @@ absent, the legacy global-list fallback still applies to comment bodies.
 
 | File | Lines | Bytes | SHA-256 |
 | --- | ---: | ---: | --- |
-| `js/filter_logic.js` | 4534 | 221980 | `f7021a053af96a4cd31a577f56e900ffb1a5d990fe55a838af64a6dba867afc4` |
+| `js/filter_logic.js` | 4536 | 222044 | `20c1426a56eeaa925b42d192a56699c2cfaafbc291bb7e2f583d3e5d29fc7f6c` |
 | `js/settings_shared.js` | 1313 | 66857 | `19f0a1fb3cd512494481b7eb39169bf84feeda4a0a6a20cf58ebaf1c18ff7ba9` |
 | `js/background.js` | 8538 | 386043 | `cc89bb4a0375145e1c811b7cf5953729c39c409b6b24cacdc65c80f9f6ff44d0` |
 
@@ -168,3 +168,9 @@ changes, or public claims.
 ## Revalidation - 2026-10-18
 
 Source fingerprints and bounded extraction inventories were refreshed against the current checkout after source review. These are drift detectors, not exhaustive semantic proof, installed-browser evidence, or approval of the broader missing-authority gates. Executable fixtures below remain the behavior checks.
+
+Current candidate metadata/search extraction block: 245 lines, 12502 bytes. This includes the reviewed autoplay gate and does not establish broader comment keyword proof.
+
+## Controls source inventory refresh - 2026-10-25
+
+The current `js/filter_logic.js` fingerprint and any affected line references above reflect the narrow autoplay correction: decorative end-screen hiding preserves playback endpoints; explicit Disable autoplay and individual filtering rules still govern them. This inventory refresh itself changes no runtime code and promotes none of the unresolved semantic-proof gates. See `docs/audit/TIME_LIMITS_AUTOPLAY_RESET_IMPLEMENTATION_2026-10-25.md` for implementation and executable validation.

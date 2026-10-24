@@ -11,7 +11,7 @@ const repoRoot = process.cwd();
 const docPath = 'docs/audit/FILTERTUBE_JSON_COMMENT_KEYWORD_PROVENANCE_BOUNDARY_CURRENT_BEHAVIOR_2026-05-23.md';
 
 const sourceFingerprints = {
-  'js/filter_logic.js': [4534, 221980, 'f7021a053af96a4cd31a577f56e900ffb1a5d990fe55a838af64a6dba867afc4'],
+  'js/filter_logic.js': [4536, 222044, '20c1426a56eeaa925b42d192a56699c2cfaafbc291bb7e2f583d3e5d29fc7f6c'],
   'js/settings_shared.js': [1313, 66857, '19f0a1fb3cd512494481b7eb39169bf84feeda4a0a6a20cf58ebaf1c18ff7ba9'],
   'js/background.js': [8538, 386043, 'cc89bb4a0375145e1c811b7cf5953729c39c409b6b24cacdc65c80f9f6ff44d0']
 };
@@ -49,8 +49,8 @@ const blockSpecs = {
     file: 'js/filter_logic.js',
     start: '        _buildCandidate(item, rendererType, wrapperRendererType = null, options = {}) {',
     end: '        _regexMatches(regex, text) {',
-    lines: 243,
-    bytes: 12438
+    lines: 245,
+    bytes: 12502
   },
   filterLogicGlobalCommentKeywordBranch: {
     file: 'js/filter_logic.js',

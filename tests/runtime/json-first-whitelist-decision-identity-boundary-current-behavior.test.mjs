@@ -166,9 +166,9 @@ test('JSON-first whitelist decision identity audit is audit-only and source pinn
   assert.match(doc, /not completion proof for JSON-first whitelist decision authority/);
 
   const source = read('js/filter_logic.js');
-  assert.equal(lineCount(source), 4534);
-  assert.equal(Buffer.byteLength(source), 221980);
-  assert.equal(sha256('js/filter_logic.js'), 'f7021a053af96a4cd31a577f56e900ffb1a5d990fe55a838af64a6dba867afc4');
+  assert.equal(lineCount(source), 4536);
+  assert.equal(Buffer.byteLength(source), 222044);
+  assert.equal(sha256('js/filter_logic.js'), '20c1426a56eeaa925b42d192a56699c2cfaafbc291bb7e2f583d3e5d29fc7f6c');
   assert.ok(doc.includes('`js/filter_logic.js`'));
 
   for (const artifact of [

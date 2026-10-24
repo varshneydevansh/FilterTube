@@ -926,15 +926,15 @@ Current seed and coordinator source fingerprints were recomputed after fallback 
 ## Auto-sync source inventory - 2026-10-24
 
 | `build.js` | 861 | 33225 | `a198cc1d0bf98e410deb8f66ced0e56a046bbf987a0a5b878e1278577622fb2e` |
-| `js/background.js` | 8607 | 390769 | `11606b409f8cef1c2d6821a411f81a41eb0684ab65ee183139ad42cac25830fb` |
+| `js/background.js` | 8726 | 398724 | `ea60b72cf56dec6523ba4dfb827bca1791619836dfca40bf7ee9c669ffa639c6` |
 | `js/content/block_channel.js` | 3361 | 135050 | `f2a02886a83d64d93186cd1f0c1f300683ae49754b928d2e0329fd1a88d8f2c9` |
-| `js/content/bridge_settings.js` | 2238 | 101092 | `923110bd0a8f2c3216199e1c930550ab80f6458448060d874da19e336aab3e24` |
+| `js/content/bridge_settings.js` | 2281 | 103815 | `4bbd8d3c2d65aae8b1743bd779410803b17078319b0f5f5176e7495b46ab3055` |
 | `js/content/collab_dialog.js` | 393 | 14623 | `dc34bba556b310da8b7516d106e9d67addea59d8a707a02f21607ac97af1f72a` |
 | `js/content/dom_extractors.js` | 1166 | 48221 | `ddb421e018c6e9a1ef92c7cd8dc4d91d201da814c6f25a3b63d771795cdd9e19` |
 | `js/content/dom_fallback.js` | 8188 | 381556 | `97d951f4a550d9fae239fd65092069f1841ca71f9eb66492d7578fcfdf21f0b2` |
 | `js/content/handle_resolver.js` | 291 | 10230 | `fab995e0e5c85c8ba4e9d342bc452d297ea4dc99220bb94fee4c490ff4a98b47` |
 | `js/content_bridge.js` | 15056 | 678414 | `9e0bca2973ffb01d0216ea8b096531ad3c1afe7af4acc7363fa4b1cc2ca09f18` |
-| `js/filter_logic.js` | 4534 | 221980 | `f7021a053af96a4cd31a577f56e900ffb1a5d990fe55a838af64a6dba867afc4` |
+| `js/filter_logic.js` | 4536 | 222044 | `20c1426a56eeaa925b42d192a56699c2cfaafbc291bb7e2f583d3e5d29fc7f6c` |
 | `js/injector.js` | 4148 | 183860 | `62bd7222e7ea8c7fc51cbffd63b894a2f03509b4cc09ddf7525b8a748f91eb60` |
 | `js/io_manager.js` | 3219 | 164248 | `f00d15e7dd636585c999b3a51a40363d181b192e85fd2be00231b37ca827ed43` |
 | `js/layout.js` | 680 | 30604 | `48831ccdc2d62c75818d9c6a153d7bfacec9d7be9f2408485f74b1a7c13c57c7` |
@@ -942,9 +942,23 @@ Current seed and coordinator source fingerprints were recomputed after fallback 
 | `js/seed.js` | 2508 | 110538 | `af10e116a8580bf380e6f26b312c5ed3e3597693f7cf9a9bbb4661c2c597c8a1` |
 | `js/settings_shared.js` | 1327 | 67805 | `c3d0f4b965acaaf46f6424cd0ad329c50e616de7b1cf8905a9fa578123e2bf69` |
 | `js/state_manager.js` | 2984 | 124258 | `029b2e7d4356d4629348f174bdaf7858fa1fa0c09a4b54c6bb0e293a161a8d5e` |
-| `js/tab-view.js` | 32851 | 1785014 | `402bb0af7f4b1843036cf04d3c299dbf71689b8ce8ffaf43ff6f358082e0fddb` |
+| `js/tab-view.js` | 32961 | 1793490 | `cfea9c4e584d14c9298db26a10670ec223e38484dfc2206ff8e427c0ab4a2b9a` |
 | `scripts/build-extension-ui.mjs` | 50 | 1188 | `6326362ebf90f448ccdbf68945b3fb522b7b215edaf9b3e28589a4e166239cf3` |
 | `scripts/build-nanah-vendor.mjs` | 65 | 1818 | `dae8d3ef29c4cd44b0bf975090e9d53f3bb05b523355f5038930fc03b27e921c` |
 | `scripts/sync-native-runtime.mjs` | 34 | 1070 | `4f46c13bf6099092193712790d231ff4809b00b1b0061d04af71ac3ba6bf21c6` |
 
-The first textual routine background console site is now at line 3400. Existing console-count, startup-gate, redaction, and installed-sampling assertions are unchanged. Source freshness is not logging-policy completion.
+The first textual routine background console site is now at line 3518. Existing console-count, startup-gate, redaction, and installed-sampling assertions are unchanged. Source freshness is not logging-policy completion.
+
+## Controls hardening playback fingerprints
+
+| `js/content/content_playback.js` | 374 | 21770 | `728b8df9f41d39f86774f550788f22317dfd4edfe6f64b766905da6611b70b80` |
+| `js/content/content_playback_admission.js` | 131 | 7500 | `71ee13a96de07fdf988dc25300b1b09e0379e687047b5a5b7c21605bcbe68763` |
+| `js/content/content_playback_captions.js` | 138 | 8244 | `c5768f3bb7836321b030009492fe2ae703bb3e785352eabf8b2f383ca203c196` |
+| `js/content/content_playback_native.js` | 280 | 19192 | `3bc1852f55e0a3238ecb42dd42bb3c360760d98bfcd5de2504a3a1462da99d6c` |
+| `js/content/content_playback_player.js` | 484 | 27588 | `791e88bfa8f53c5e7dd5b8a4752a222812cf288f43e31ff3f0b9b7a6708c81cd` |
+| `js/content/content_playback_response.js` | 362 | 26305 | `fdfa409eac404e807ff34935e771dfc1da6f0ebdbbeb5990c22c36fb11decc84` |
+| `js/content/content_playback_transport.js` | 400 | 25096 | `02b9b6d076757eca5b8f25d94bbf8865db4e3eb6a7e24d65c69ebd894cd6fd88` |
+| `js/shared/content_playback_resolver.js` | 295 | 21072 | `63e5825e494d120e25328ce478e2bbcafb11be4b6a4a337ed6856d61428a7d81` |
+| `js/shared/content_playback_source.js` | 187 | 12402 | `cc22a59b178f681b29ad460a32cca7bb09dd9ffc52e5b650d6e18240578c0f0b` |
+
+Only source measurements changed here. Zero direct console and logging-relay assertions remain enforced; installed console sampling is separate.

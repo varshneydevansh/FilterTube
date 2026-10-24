@@ -197,3 +197,9 @@ carry this identity boundary into the broader optimization decision. The
 readiness matrix keeps whitelist optimization blocked until empty whitelist,
 unresolved identity, comment, pending-hide, selected-row, transition, import,
 surface parity, side-effect, and metric evidence exists.
+
+## Controls hardening source measurement
+
+| `js/filter_logic.js` | 4536 | 222044 | `20c1426a56eeaa925b42d192a56699c2cfaafbc291bb7e2f583d3e5d29fc7f6c` |
+
+End-screen visibility no longer removes the complete autoplay endpoint set. Existing endpoint rule admission remains independently tested; this is not complete whitelist authority proof.

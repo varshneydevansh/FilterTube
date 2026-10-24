@@ -152,12 +152,12 @@ test('filter logic rule field effect register is audit-only and source scoped', 
   assert.match(text, /field-effect coverage/);
   assert.match(text, /JSON-first filtering work does not confuse/);
   assert.match(text, /source file: js\/filter_logic\.js/);
-  assert.match(text, /source line count: 4534/);
-  assert.match(text, /source bytes: 221980/);
-  assert.match(text, /source sha256: f7021a053af96a4cd31a577f56e900ffb1a5d990fe55a838af64a6dba867afc4/);
-  assert.equal(sourceLineCount(sourceText), 4534);
-  assert.equal(Buffer.byteLength(sourceText), 221980);
-  assert.equal(sha256(sourcePath), 'f7021a053af96a4cd31a577f56e900ffb1a5d990fe55a838af64a6dba867afc4');
+  assert.match(text, /source line count: 4536/);
+  assert.match(text, /source bytes: 222044/);
+  assert.match(text, /source sha256: 20c1426a56eeaa925b42d192a56699c2cfaafbc291bb7e2f583d3e5d29fc7f6c/);
+  assert.equal(sourceLineCount(sourceText), 4536);
+  assert.equal(Buffer.byteLength(sourceText), 222044);
+  assert.equal(sha256(sourcePath), '20c1426a56eeaa925b42d192a56699c2cfaafbc291bb7e2f583d3e5d29fc7f6c');
   assert.match(text, /docs\/audit\/FILTERTUBE_FILTER_LOGIC_RULE_PATH_SEMANTIC_REGISTER_2026-05-21\.md/);
 });
 

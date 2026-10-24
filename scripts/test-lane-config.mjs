@@ -155,6 +155,10 @@ const FILTER_LOGIC_AUDIT_PROOF_TESTS = Object.freeze([
   'tests/runtime/filter-logic-rule-field-effect-semantic-register-current-behavior.test.mjs',
   'tests/runtime/filter-logic-rule-path-semantic-register-current-behavior.test.mjs'
 ]);
+const SAFETY_AND_PREFERENCE_TESTS = Object.freeze([
+  'tests/runtime/managed-time-usage-transactions.test.mjs',
+  'tests/runtime/profile-preference-reset.test.mjs',
+]);
 const AUTO_SYNC_TESTS = Object.freeze([
   'tests/runtime/auto-sync-two-endpoint.test.mjs',
   'tests/runtime/managed-auto-sync-two-endpoint.test.mjs',
@@ -202,6 +206,7 @@ export const LANES = Object.freeze({
     checks: ['build.js'],
     tests: [
       ...AUTO_SYNC_TESTS,
+      ...SAFETY_AND_PREFERENCE_TESTS,
       ...VIDEO_NOTES_TESTS,
       'tests/runtime/ad-void-native-ownership-current-behavior.test.mjs',
       'tests/runtime/popup-intrinsic-sizing.test.mjs',
@@ -468,6 +473,7 @@ export const LANES = Object.freeze({
     description: 'Settings compile, profiles, storage refresh, migrations, import/export, backups, and sync boundaries.',
     tests: [
       ...AUTO_SYNC_TESTS,
+      ...SAFETY_AND_PREFERENCE_TESTS,
       ...VIDEO_NOTES_TESTS,
       'tests/runtime/content-playback-admission-current-behavior.test.mjs',
       'tests/runtime/content-playback-coordinator.test.mjs',
@@ -552,6 +558,7 @@ export const LANES = Object.freeze({
     checks: ['build.js'],
     tests: [
       ...AUTO_SYNC_TESTS,
+      ...SAFETY_AND_PREFERENCE_TESTS,
       ...VIDEO_NOTES_TESTS,
       ...CONTENT_PLAYBACK_TESTS,
       'tests/runtime/get-watch-streaming-interception.test.mjs',

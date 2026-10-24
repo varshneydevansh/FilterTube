@@ -1,5 +1,7 @@
 # Time limits, reset preferences and autoplay review
 
+**Historical pre-change review.** The authorized corrections were subsequently implemented; see [implementation and current evidence](TIME_LIMITS_AUTOPLAY_RESET_IMPLEMENTATION_2026-10-25.md). Findings, source locations and diagnostic results below describe the reviewed revision, not the current code. Archived defect probes may now fail because the defects changed; the production regression suites supersede them.
+
 Review of source revision `c6c75588` plus the local P2P wording update. This is a decision record, not an implementation of reset, autoplay or time-limit fixes. No native app or installed extension data was changed. Source-derived probes use disposable synthetic storage/runtime; installed reproduction remains separate.
 
 ## Decisions

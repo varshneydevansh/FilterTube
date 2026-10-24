@@ -19,9 +19,9 @@ Current-source register reviewed on 2026-10-18. This refresh changes no runtime 
 
 ```text
 source file: js/filter_logic.js
-source line count: 4534
-source bytes: 221980
-source sha256: f7021a053af96a4cd31a577f56e900ffb1a5d990fe55a838af64a6dba867afc4
+source line count: 4536
+source bytes: 222044
+source sha256: 20c1426a56eeaa925b42d192a56699c2cfaafbc291bb7e2f583d3e5d29fc7f6c
 upstream path register: docs/audit/FILTERTUBE_FILTER_LOGIC_RULE_PATH_SEMANTIC_REGISTER_2026-05-21.md
 rule fields with runtime consumers: 11
 consumer methods with rules.<field> references: 10
@@ -143,3 +143,7 @@ These counts are audit-only blockers. They do not approve runtime
 optimization, JSON-first behavior, field-effect changes, category fetch work
 changes, whitelist/blocklist behavior changes, or selector/renderer authority
 changes.
+
+## Controls source inventory refresh - 2026-10-25
+
+The current `js/filter_logic.js` fingerprint and any affected line references above reflect the narrow autoplay correction: decorative end-screen hiding preserves playback endpoints; explicit Disable autoplay and individual filtering rules still govern them. This inventory refresh itself changes no runtime code and promotes none of the unresolved semantic-proof gates. See `docs/audit/TIME_LIMITS_AUTOPLAY_RESET_IMPLEMENTATION_2026-10-25.md` for implementation and executable validation.

@@ -19,10 +19,10 @@ Current-source register reviewed on 2026-10-18. This refresh changes no runtime 
 
 ```text
 source file: js/filter_logic.js
-split source lines: 4535
-wc line count: 4534
-source bytes: 221980
-source sha256: f7021a053af96a4cd31a577f56e900ffb1a5d990fe55a838af64a6dba867afc4
+split source lines: 4537
+wc line count: 4536
+source bytes: 222044
+source sha256: 20c1426a56eeaa925b42d192a56699c2cfaafbc291bb7e2f583d3e5d29fc7f6c
 source object/class: YouTubeDataFilter
 global interface: window.FilterTubeEngine
 method and entrypoint rows: 79
@@ -141,35 +141,35 @@ none of these lexical counts establishes complete behavioral proof.
 | 2300 | `classMethod` | `_autoplayEndpointCandidate` | `autoplayEndpointFiltering` |
 | 2332 | `classMethod` | `_shouldBlockAutoplayEndpoint` | `autoplayEndpointFiltering` |
 | 2399 | `classMethod` | `_shouldDropAutoplayEndpointSet` | `autoplayEndpointFiltering` |
-| 2409 | `classMethod` | `_regexMatches` | `candidateAndRendererUnwrap` |
-| 2424 | `classMethod` | `_parseKeywordDateBoundary` | `fieldExtractionAndParsing` |
-| 2442 | `classMethod` | `_getCurrentWatchVideoId` | `fieldExtractionAndParsing` |
-| 2455 | `classMethod` | `_extractKeywordTimestampFromVideoMeta` | `fieldExtractionAndParsing` |
-| 2469 | `classMethod` | `_extractKeywordPublishTimestamp` | `fieldExtractionAndParsing` |
-| 2499 | `classMethod` | `_keywordDateFilterAllows` | `blockDecisionPipeline` |
-| 2522 | `classMethod` | `_shouldBlock` | `blockDecisionPipeline` |
-| 2910 | `classMethod` | `_checkCategoryFilters` | `blockDecisionPipeline` |
-| 2972 | `classMethod` | `_checkLanguageFilters` | `blockDecisionPipeline` |
-| 3031 | `classMethod` | `_extractTitle` | `fieldExtractionAndParsing` |
-| 3055 | `classMethod` | `_extractDescription` | `fieldExtractionAndParsing` |
-| 3092 | `classMethod` | `_parseDurationToSeconds` | `fieldExtractionAndParsing` |
-| 3123 | `classMethod` | `_parseAriaLabelDurationSeconds` | `fieldExtractionAndParsing` |
-| 3138 | `classMethod` | `_parseRelativeTimeToTimestamp` | `fieldExtractionAndParsing` |
-| 3177 | `classMethod` | `_extractDuration` | `fieldExtractionAndParsing` |
-| 3415 | `classMethod` | `_extractPublishedTime` | `fieldExtractionAndParsing` |
-| 3545 | `classMethod` | `_extractViewCount` | `fieldExtractionAndParsing` |
-| 3583 | `classMethod` | `_checkContentFilters` | `blockDecisionPipeline` |
-| 3752 | `classMethod` | `_checkUppercaseTitle` | `blockDecisionPipeline` |
-| 3788 | `classMethod` | `_extractChannelInfo` | `fieldExtractionAndParsing` |
-| 4110 | `classMethod` | `_matchesChannel` | `channelMatchPolicy` |
-| 4283 | `classMethod` | `_hasChannelShelfCardOwner` | `channelMatchPolicy` |
-| 4302 | `classMethod` | `_getChannelShelfOwner` | `channelMatchPolicy` |
-| 4313 | `classMethod` | `_getChannelShelfChildScope` | `recursionAndEntrypoints` |
-| 4328 | `classMethod` | `filter` | `recursionAndEntrypoints` |
-| 4395 | `classMethod` | `processData` | `recursionAndEntrypoints` |
-| 4476 | `topLevelFunction` | `getReusableFilter` | `constructionAndSettings` |
-| 4513 | `globalInterfaceFunction` | `FilterTubeEngine.processData` | `recursionAndEntrypoints` |
-| 4521 | `globalInterfaceFunction` | `FilterTubeEngine.harvestOnly` | `recursionAndEntrypoints` |
+| 2411 | `classMethod` | `_regexMatches` | `candidateAndRendererUnwrap` |
+| 2426 | `classMethod` | `_parseKeywordDateBoundary` | `fieldExtractionAndParsing` |
+| 2444 | `classMethod` | `_getCurrentWatchVideoId` | `fieldExtractionAndParsing` |
+| 2457 | `classMethod` | `_extractKeywordTimestampFromVideoMeta` | `fieldExtractionAndParsing` |
+| 2471 | `classMethod` | `_extractKeywordPublishTimestamp` | `fieldExtractionAndParsing` |
+| 2501 | `classMethod` | `_keywordDateFilterAllows` | `blockDecisionPipeline` |
+| 2524 | `classMethod` | `_shouldBlock` | `blockDecisionPipeline` |
+| 2912 | `classMethod` | `_checkCategoryFilters` | `blockDecisionPipeline` |
+| 2974 | `classMethod` | `_checkLanguageFilters` | `blockDecisionPipeline` |
+| 3033 | `classMethod` | `_extractTitle` | `fieldExtractionAndParsing` |
+| 3057 | `classMethod` | `_extractDescription` | `fieldExtractionAndParsing` |
+| 3094 | `classMethod` | `_parseDurationToSeconds` | `fieldExtractionAndParsing` |
+| 3125 | `classMethod` | `_parseAriaLabelDurationSeconds` | `fieldExtractionAndParsing` |
+| 3140 | `classMethod` | `_parseRelativeTimeToTimestamp` | `fieldExtractionAndParsing` |
+| 3179 | `classMethod` | `_extractDuration` | `fieldExtractionAndParsing` |
+| 3417 | `classMethod` | `_extractPublishedTime` | `fieldExtractionAndParsing` |
+| 3547 | `classMethod` | `_extractViewCount` | `fieldExtractionAndParsing` |
+| 3585 | `classMethod` | `_checkContentFilters` | `blockDecisionPipeline` |
+| 3754 | `classMethod` | `_checkUppercaseTitle` | `blockDecisionPipeline` |
+| 3790 | `classMethod` | `_extractChannelInfo` | `fieldExtractionAndParsing` |
+| 4112 | `classMethod` | `_matchesChannel` | `channelMatchPolicy` |
+| 4285 | `classMethod` | `_hasChannelShelfCardOwner` | `channelMatchPolicy` |
+| 4304 | `classMethod` | `_getChannelShelfOwner` | `channelMatchPolicy` |
+| 4315 | `classMethod` | `_getChannelShelfChildScope` | `recursionAndEntrypoints` |
+| 4330 | `classMethod` | `filter` | `recursionAndEntrypoints` |
+| 4397 | `classMethod` | `processData` | `recursionAndEntrypoints` |
+| 4478 | `topLevelFunction` | `getReusableFilter` | `constructionAndSettings` |
+| 4515 | `globalInterfaceFunction` | `FilterTubeEngine.processData` | `recursionAndEntrypoints` |
+| 4523 | `globalInterfaceFunction` | `FilterTubeEngine.harvestOnly` | `recursionAndEntrypoints` |
 
 ## Current Behavior Boundaries
 
@@ -287,3 +287,7 @@ endpoints and propagate scope only down the known shelf/list/card chain; mixed
 or explicitly owned children do not acquire a guessed owner. None creates trust,
 loads the encyclopedia, or proves native/installed parity. Diagnostics remain
 below method authority. Existing global semantic completion remains zero/NO-GO.
+
+## Controls source inventory refresh - 2026-10-25
+
+The current `js/filter_logic.js` fingerprint and any affected line references above reflect the narrow autoplay correction: decorative end-screen hiding preserves playback endpoints; explicit Disable autoplay and individual filtering rules still govern them. This inventory refresh itself changes no runtime code and promotes none of the unresolved semantic-proof gates. See `docs/audit/TIME_LIMITS_AUTOPLAY_RESET_IMPLEMENTATION_2026-10-25.md` for implementation and executable validation.

@@ -222,8 +222,8 @@ lexical and its scope remains tracked JS/JSX/MJS: CJS/Python tooling requires it
 separate release/workflow review and is not silently counted as JavaScript here.
 
 ```text
-current tracked JS/JSX/MJS files: 133
-current repo-wide lexical callables: 9856
+current tracked JS/JSX/MJS files: 134
+current repo-wide lexical callables: 9895
 current complete per-callable semantic proofs: 0
 current callable behavior-change approval: NO-GO
 runtime behavior changed by inventory refresh: no
@@ -232,9 +232,9 @@ runtime behavior changed by inventory refresh: no
 | Family | Files | Lexical callables |
 | --- | ---: | ---: |
 | Build/sync scripts | 5 | 75 |
-| Hot page/background runtime | 12 | 3907 |
-| Content helper runtime | 24 | 814 |
-| UI/settings runtime | 32 | 3991 |
+| Hot page/background runtime | 12 | 3920 |
+| Content helper runtime | 24 | 820 |
+| UI/settings runtime | 33 | 4011 |
 | Generated/quarantined UI | 6 | 147 |
 | Vendor bundles | 3 | 279 |
 | Audit/test lane scripts | 25 | 517 |
@@ -255,14 +255,15 @@ runtime behavior changed by inventory refresh: no
 | `js/personal_auto_sync_runtime.js` | UI/settings runtime | 67 | helper counted; semantic proof incomplete |
 | `js/personal_sync.js` | UI/settings runtime | 54 | helper counted; semantic proof incomplete |
 | `js/nanah_pairing_ui.js` | UI/settings runtime | 6 | helper counted; semantic proof incomplete |
+| `js/profile_preference_defaults.js` | UI/settings runtime | 14 | helper counted; semantic proof incomplete |
 | `build.js` | Build/sync scripts | 68 | release-audited first pass |
-| `js/background.js` | Hot page/background runtime | 573 | hot runtime mapped |
+| `js/background.js` | Hot page/background runtime | 582 | hot runtime mapped |
 | `js/content/admission_overlay.js` | Content helper runtime | 25 | helper counted; semantic proof incomplete |
 | `js/content/block_channel.js` | Hot page/background runtime | 234 | hot runtime mapped |
 | `js/content/bridge_injection.js` | Content helper runtime | 14 | helper counted |
-| `js/content/bridge_settings.js` | Hot page/background runtime | 153 | hot runtime mapped |
+| `js/content/bridge_settings.js` | Hot page/background runtime | 157 | hot runtime mapped |
 | `js/content/collab_dialog.js` | Content helper runtime | 42 | helper counted |
-| `js/content/content_playback.js` | Content helper runtime | 30 | helper counted; semantic proof incomplete |
+| `js/content/content_playback.js` | Content helper runtime | 36 | helper counted; semantic proof incomplete |
 | `js/content/content_playback_admission.js` | Content helper runtime | 12 | helper counted; semantic proof incomplete |
 | `js/content/content_playback_captions.js` | Content helper runtime | 19 | helper counted; semantic proof incomplete |
 | `js/content/content_playback_native.js` | Content helper runtime | 47 | helper counted; semantic proof incomplete |
@@ -307,7 +308,7 @@ runtime behavior changed by inventory refresh: no
 | `js/shared/identity.js` | Content helper runtime | 110 | helper counted |
 | `js/shared/view_count.js` | Content helper runtime | 4 | helper counted; semantic proof incomplete |
 | `js/state_manager.js` | UI/settings runtime | 180 | UI/settings counted |
-| `js/tab-view.js` | UI/settings runtime | 2150 | UI/settings counted |
+| `js/tab-view.js` | UI/settings runtime | 2156 | UI/settings counted |
 | `js/ui-shell/popup-shell.js` | Generated/quarantined UI | 42 | generated output boundary |
 | `js/ui-shell/tab-view-decor.js` | Generated/quarantined UI | 41 | generated output boundary |
 | `js/ui_components.js` | UI/settings runtime | 65 | UI/settings counted |

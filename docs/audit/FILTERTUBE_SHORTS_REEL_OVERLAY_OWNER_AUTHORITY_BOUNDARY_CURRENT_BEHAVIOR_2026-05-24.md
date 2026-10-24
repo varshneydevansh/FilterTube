@@ -40,7 +40,7 @@ through the existing `reelItemRenderer.headline.simpleText` rule.
 | --- | ---: | ---: | --- | --- |
 | `reel_item_watch?prettyPrint=False.JSON` | 1971 | 149486 | `cc8befaef3cf44c893f3809af34cdc1c798a3b855e0aacfd9b2034381f0b1026` | Ignored raw active Shorts/reel overlay evidence. |
 | `tests/runtime/fixtures/captures/main-reel-player-overlay-renderer.json` | 108 | 3706 | `99452336bec6d1be5a2242b9c3cefe06061fe980c256ac675fc721cb6a2a648e` | Reduced active overlay owner fixture. |
-| `js/filter_logic.js` | 3652 | 172174 | `f7021a053af96a4cd31a577f56e900ffb1a5d990fe55a838af64a6dba867afc4` | JSON filtering and direct renderer rule owner. |
+| `js/filter_logic.js` | 4536 | 222044 | `20c1426a56eeaa925b42d192a56699c2cfaafbc291bb7e2f583d3e5d29fc7f6c` | JSON filtering and direct renderer rule owner. |
 
 ## Current Field Matrix
 
@@ -129,3 +129,7 @@ These counts are audit-only blockers. They do not approve runtime
 optimization, JSON-first behavior, Shorts filtering behavior, Reel overlay
 behavior, whitelist behavior, metric collectors, artifact creation, native
 sync, release package changes, or public claims.
+
+## Controls source inventory refresh - 2026-10-25
+
+The current `js/filter_logic.js` fingerprint and any affected line references above reflect the narrow autoplay correction: decorative end-screen hiding preserves playback endpoints; explicit Disable autoplay and individual filtering rules still govern them. This inventory refresh itself changes no runtime code and promotes none of the unresolved semantic-proof gates. See `docs/audit/TIME_LIMITS_AUTOPLAY_RESET_IMPLEMENTATION_2026-10-25.md` for implementation and executable validation.

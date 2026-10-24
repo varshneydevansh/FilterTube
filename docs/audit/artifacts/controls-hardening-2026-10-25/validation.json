@@ -1,0 +1,456 @@
+{
+  "date": "2026-10-25",
+  "preChangeRevision": "29eb7b5b",
+  "scope": "Extension only; native app not built or mirrored",
+  "focusedTests": {
+    "tests": 322,
+    "pass": 322,
+    "fail": 0
+  },
+  "release": {
+    "tests": 742,
+    "pass": 742,
+    "fail": 0
+  },
+  "smoke": {
+    "tests": 1482,
+    "pass": 1482,
+    "fail": 0
+  },
+  "settings": {
+    "current": {
+      "tests": 1255,
+      "pass": 1160,
+      "fail": 95
+    },
+    "same95FailedTitlesAsPreviousBaseline": true
+  },
+  "packageParity": [
+    {
+      "browser": "chrome",
+      "archive": "dist/filtertube-chrome-v3.4.1.zip",
+      "archiveSha256": "9c7e2da391c94b6eb946b5545fb7a51b61a9a248f7774f4685e14a22871935a3",
+      "assets": [
+        {
+          "path": "js/background.js",
+          "bytes": 398724,
+          "sha256": "ea60b72cf56dec6523ba4dfb827bca1791619836dfca40bf7ee9c669ffa639c6",
+          "sourceUnpackedZipEqual": true
+        },
+        {
+          "path": "js/content/bridge_settings.js",
+          "bytes": 103815,
+          "sha256": "4bbd8d3c2d65aae8b1743bd779410803b17078319b0f5f5176e7495b46ab3055",
+          "sourceUnpackedZipEqual": true
+        },
+        {
+          "path": "js/content/content_playback.js",
+          "bytes": 21770,
+          "sha256": "728b8df9f41d39f86774f550788f22317dfd4edfe6f64b766905da6611b70b80",
+          "sourceUnpackedZipEqual": true
+        },
+        {
+          "path": "js/content/content_playback_native.js",
+          "bytes": 19192,
+          "sha256": "3bc1852f55e0a3238ecb42dd42bb3c360760d98bfcd5de2504a3a1462da99d6c",
+          "sourceUnpackedZipEqual": true
+        },
+        {
+          "path": "js/filter_logic.js",
+          "bytes": 222044,
+          "sha256": "20c1426a56eeaa925b42d192a56699c2cfaafbc291bb7e2f583d3e5d29fc7f6c",
+          "sourceUnpackedZipEqual": true
+        },
+        {
+          "path": "js/profile_preference_defaults.js",
+          "bytes": 11514,
+          "sha256": "0909de7a56f49cd983b6383405cc3d35cd117e3e56e9a71eabfd7e096c641f48",
+          "sourceUnpackedZipEqual": true
+        },
+        {
+          "path": "js/tab-view.js",
+          "bytes": 1793490,
+          "sha256": "cfea9c4e584d14c9298db26a10670ec223e38484dfc2206ff8e427c0ab4a2b9a",
+          "sourceUnpackedZipEqual": true
+        },
+        {
+          "path": "html/tab-view.html",
+          "bytes": 272157,
+          "sha256": "0e05d686441e9e41d6e196fef4a9958c7ba89ee250dce6cbcb66b7bb6658cb68",
+          "sourceUnpackedZipEqual": true
+        },
+        {
+          "path": "data/ui_locales/en.json",
+          "bytes": 248458,
+          "sha256": "6336871b7dbfb9b22e54c4efa2c67d738b2109e566b93f4704811d030cb6c500",
+          "sourceUnpackedZipEqual": true
+        },
+        {
+          "path": "js/state_manager.js",
+          "bytes": 124258,
+          "sha256": "029b2e7d4356d4629348f174bdaf7858fa1fa0c09a4b54c6bb0e293a161a8d5e",
+          "sourceUnpackedZipEqual": true
+        },
+        {
+          "path": "js/settings_shared.js",
+          "bytes": 67805,
+          "sha256": "c3d0f4b965acaaf46f6424cd0ad329c50e616de7b1cf8905a9fa578123e2bf69",
+          "sourceUnpackedZipEqual": true
+        },
+        {
+          "path": "js/content/content_playback_admission.js",
+          "bytes": 7500,
+          "sha256": "71ee13a96de07fdf988dc25300b1b09e0379e687047b5a5b7c21605bcbe68763",
+          "sourceUnpackedZipEqual": true
+        },
+        {
+          "path": "js/content/content_playback_captions.js",
+          "bytes": 8244,
+          "sha256": "c5768f3bb7836321b030009492fe2ae703bb3e785352eabf8b2f383ca203c196",
+          "sourceUnpackedZipEqual": true
+        },
+        {
+          "path": "js/shared/content_playback_source.js",
+          "bytes": 12402,
+          "sha256": "cc22a59b178f681b29ad460a32cca7bb09dd9ffc52e5b650d6e18240578c0f0b",
+          "sourceUnpackedZipEqual": true
+        },
+        {
+          "path": "js/shared/content_playback_resolver.js",
+          "bytes": 21072,
+          "sha256": "63e5825e494d120e25328ce478e2bbcafb11be4b6a4a337ed6856d61428a7d81",
+          "sourceUnpackedZipEqual": true
+        },
+        {
+          "path": "js/nanah_storage_lock.js",
+          "bytes": 1497,
+          "sha256": "b36faae74774e8d7d8d85c4d1f316c32935f8654284379fdc2015ebd3145067c",
+          "sourceUnpackedZipEqual": true
+        },
+        {
+          "path": "js/personal_sync.js",
+          "bytes": 30098,
+          "sha256": "ff78ff3965fc05f911bfe8b750d402833542cb4e5b08833b50055347a1c7d1b2",
+          "sourceUnpackedZipEqual": true
+        },
+        {
+          "path": "js/device_auto_sync.js",
+          "bytes": 18852,
+          "sha256": "cb34fa34eb4f15faf287d919eeefb031737a76375fe9a3b1d68f88f2b58bfced",
+          "sourceUnpackedZipEqual": true
+        }
+      ]
+    },
+    {
+      "browser": "firefox",
+      "archive": "dist/filtertube-firefox-v3.4.1.zip",
+      "archiveSha256": "928f93ea0c8bfc39ea1e5ca5a3d390d75c845cf152f86f50fe3552c107dd5377",
+      "assets": [
+        {
+          "path": "js/background.js",
+          "bytes": 398724,
+          "sha256": "ea60b72cf56dec6523ba4dfb827bca1791619836dfca40bf7ee9c669ffa639c6",
+          "sourceUnpackedZipEqual": true
+        },
+        {
+          "path": "js/content/bridge_settings.js",
+          "bytes": 103815,
+          "sha256": "4bbd8d3c2d65aae8b1743bd779410803b17078319b0f5f5176e7495b46ab3055",
+          "sourceUnpackedZipEqual": true
+        },
+        {
+          "path": "js/content/content_playback.js",
+          "bytes": 21770,
+          "sha256": "728b8df9f41d39f86774f550788f22317dfd4edfe6f64b766905da6611b70b80",
+          "sourceUnpackedZipEqual": true
+        },
+        {
+          "path": "js/content/content_playback_native.js",
+          "bytes": 19192,
+          "sha256": "3bc1852f55e0a3238ecb42dd42bb3c360760d98bfcd5de2504a3a1462da99d6c",
+          "sourceUnpackedZipEqual": true
+        },
+        {
+          "path": "js/filter_logic.js",
+          "bytes": 222044,
+          "sha256": "20c1426a56eeaa925b42d192a56699c2cfaafbc291bb7e2f583d3e5d29fc7f6c",
+          "sourceUnpackedZipEqual": true
+        },
+        {
+          "path": "js/profile_preference_defaults.js",
+          "bytes": 11514,
+          "sha256": "0909de7a56f49cd983b6383405cc3d35cd117e3e56e9a71eabfd7e096c641f48",
+          "sourceUnpackedZipEqual": true
+        },
+        {
+          "path": "js/tab-view.js",
+          "bytes": 1793490,
+          "sha256": "cfea9c4e584d14c9298db26a10670ec223e38484dfc2206ff8e427c0ab4a2b9a",
+          "sourceUnpackedZipEqual": true
+        },
+        {
+          "path": "html/tab-view.html",
+          "bytes": 272157,
+          "sha256": "0e05d686441e9e41d6e196fef4a9958c7ba89ee250dce6cbcb66b7bb6658cb68",
+          "sourceUnpackedZipEqual": true
+        },
+        {
+          "path": "data/ui_locales/en.json",
+          "bytes": 248458,
+          "sha256": "6336871b7dbfb9b22e54c4efa2c67d738b2109e566b93f4704811d030cb6c500",
+          "sourceUnpackedZipEqual": true
+        },
+        {
+          "path": "js/state_manager.js",
+          "bytes": 124258,
+          "sha256": "029b2e7d4356d4629348f174bdaf7858fa1fa0c09a4b54c6bb0e293a161a8d5e",
+          "sourceUnpackedZipEqual": true
+        },
+        {
+          "path": "js/settings_shared.js",
+          "bytes": 67805,
+          "sha256": "c3d0f4b965acaaf46f6424cd0ad329c50e616de7b1cf8905a9fa578123e2bf69",
+          "sourceUnpackedZipEqual": true
+        },
+        {
+          "path": "js/content/content_playback_admission.js",
+          "bytes": 7500,
+          "sha256": "71ee13a96de07fdf988dc25300b1b09e0379e687047b5a5b7c21605bcbe68763",
+          "sourceUnpackedZipEqual": true
+        },
+        {
+          "path": "js/content/content_playback_captions.js",
+          "bytes": 8244,
+          "sha256": "c5768f3bb7836321b030009492fe2ae703bb3e785352eabf8b2f383ca203c196",
+          "sourceUnpackedZipEqual": true
+        },
+        {
+          "path": "js/shared/content_playback_source.js",
+          "bytes": 12402,
+          "sha256": "cc22a59b178f681b29ad460a32cca7bb09dd9ffc52e5b650d6e18240578c0f0b",
+          "sourceUnpackedZipEqual": true
+        },
+        {
+          "path": "js/shared/content_playback_resolver.js",
+          "bytes": 21072,
+          "sha256": "63e5825e494d120e25328ce478e2bbcafb11be4b6a4a337ed6856d61428a7d81",
+          "sourceUnpackedZipEqual": true
+        },
+        {
+          "path": "js/nanah_storage_lock.js",
+          "bytes": 1497,
+          "sha256": "b36faae74774e8d7d8d85c4d1f316c32935f8654284379fdc2015ebd3145067c",
+          "sourceUnpackedZipEqual": true
+        },
+        {
+          "path": "js/personal_sync.js",
+          "bytes": 30098,
+          "sha256": "ff78ff3965fc05f911bfe8b750d402833542cb4e5b08833b50055347a1c7d1b2",
+          "sourceUnpackedZipEqual": true
+        },
+        {
+          "path": "js/device_auto_sync.js",
+          "bytes": 18852,
+          "sha256": "cb34fa34eb4f15faf287d919eeefb031737a76375fe9a3b1d68f88f2b58bfced",
+          "sourceUnpackedZipEqual": true
+        }
+      ]
+    },
+    {
+      "browser": "opera",
+      "archive": "dist/filtertube-opera-v3.4.1.zip",
+      "archiveSha256": "7bf8da6ea12a791f7222c7041bebcf5c3ce64e76d559e82e950170968fabcd35",
+      "assets": [
+        {
+          "path": "js/background.js",
+          "bytes": 398724,
+          "sha256": "ea60b72cf56dec6523ba4dfb827bca1791619836dfca40bf7ee9c669ffa639c6",
+          "sourceUnpackedZipEqual": true
+        },
+        {
+          "path": "js/content/bridge_settings.js",
+          "bytes": 103815,
+          "sha256": "4bbd8d3c2d65aae8b1743bd779410803b17078319b0f5f5176e7495b46ab3055",
+          "sourceUnpackedZipEqual": true
+        },
+        {
+          "path": "js/content/content_playback.js",
+          "bytes": 21770,
+          "sha256": "728b8df9f41d39f86774f550788f22317dfd4edfe6f64b766905da6611b70b80",
+          "sourceUnpackedZipEqual": true
+        },
+        {
+          "path": "js/content/content_playback_native.js",
+          "bytes": 19192,
+          "sha256": "3bc1852f55e0a3238ecb42dd42bb3c360760d98bfcd5de2504a3a1462da99d6c",
+          "sourceUnpackedZipEqual": true
+        },
+        {
+          "path": "js/filter_logic.js",
+          "bytes": 222044,
+          "sha256": "20c1426a56eeaa925b42d192a56699c2cfaafbc291bb7e2f583d3e5d29fc7f6c",
+          "sourceUnpackedZipEqual": true
+        },
+        {
+          "path": "js/profile_preference_defaults.js",
+          "bytes": 11514,
+          "sha256": "0909de7a56f49cd983b6383405cc3d35cd117e3e56e9a71eabfd7e096c641f48",
+          "sourceUnpackedZipEqual": true
+        },
+        {
+          "path": "js/tab-view.js",
+          "bytes": 1793490,
+          "sha256": "cfea9c4e584d14c9298db26a10670ec223e38484dfc2206ff8e427c0ab4a2b9a",
+          "sourceUnpackedZipEqual": true
+        },
+        {
+          "path": "html/tab-view.html",
+          "bytes": 272157,
+          "sha256": "0e05d686441e9e41d6e196fef4a9958c7ba89ee250dce6cbcb66b7bb6658cb68",
+          "sourceUnpackedZipEqual": true
+        },
+        {
+          "path": "data/ui_locales/en.json",
+          "bytes": 248458,
+          "sha256": "6336871b7dbfb9b22e54c4efa2c67d738b2109e566b93f4704811d030cb6c500",
+          "sourceUnpackedZipEqual": true
+        },
+        {
+          "path": "js/state_manager.js",
+          "bytes": 124258,
+          "sha256": "029b2e7d4356d4629348f174bdaf7858fa1fa0c09a4b54c6bb0e293a161a8d5e",
+          "sourceUnpackedZipEqual": true
+        },
+        {
+          "path": "js/settings_shared.js",
+          "bytes": 67805,
+          "sha256": "c3d0f4b965acaaf46f6424cd0ad329c50e616de7b1cf8905a9fa578123e2bf69",
+          "sourceUnpackedZipEqual": true
+        },
+        {
+          "path": "js/content/content_playback_admission.js",
+          "bytes": 7500,
+          "sha256": "71ee13a96de07fdf988dc25300b1b09e0379e687047b5a5b7c21605bcbe68763",
+          "sourceUnpackedZipEqual": true
+        },
+        {
+          "path": "js/content/content_playback_captions.js",
+          "bytes": 8244,
+          "sha256": "c5768f3bb7836321b030009492fe2ae703bb3e785352eabf8b2f383ca203c196",
+          "sourceUnpackedZipEqual": true
+        },
+        {
+          "path": "js/shared/content_playback_source.js",
+          "bytes": 12402,
+          "sha256": "cc22a59b178f681b29ad460a32cca7bb09dd9ffc52e5b650d6e18240578c0f0b",
+          "sourceUnpackedZipEqual": true
+        },
+        {
+          "path": "js/shared/content_playback_resolver.js",
+          "bytes": 21072,
+          "sha256": "63e5825e494d120e25328ce478e2bbcafb11be4b6a4a337ed6856d61428a7d81",
+          "sourceUnpackedZipEqual": true
+        },
+        {
+          "path": "js/nanah_storage_lock.js",
+          "bytes": 1497,
+          "sha256": "b36faae74774e8d7d8d85c4d1f316c32935f8654284379fdc2015ebd3145067c",
+          "sourceUnpackedZipEqual": true
+        },
+        {
+          "path": "js/personal_sync.js",
+          "bytes": 30098,
+          "sha256": "ff78ff3965fc05f911bfe8b750d402833542cb4e5b08833b50055347a1c7d1b2",
+          "sourceUnpackedZipEqual": true
+        },
+        {
+          "path": "js/device_auto_sync.js",
+          "bytes": 18852,
+          "sha256": "cb34fa34eb4f15faf287d919eeefb031737a76375fe9a3b1d68f88f2b58bfced",
+          "sourceUnpackedZipEqual": true
+        }
+      ]
+    }
+  ],
+  "installedBrowser": {
+    "userConfirmedReload": true,
+    "extensionPackageBytesNotReadByBrowserTool": true,
+    "pause": {
+      "beforeSeconds": 37.076693,
+      "afterSeconds": 37.076693,
+      "paused": true,
+      "readyState": 4,
+      "error": null
+    },
+    "playlist": [
+      {
+        "videoId": "8OO1pOqRJkA",
+        "title": "Shakira - Rabiosa",
+        "state": "native_active"
+      },
+      {
+        "videoId": "ItSKahBISg0",
+        "title": "YENA - Catch Catch",
+        "state": "adaptive_source_unavailable",
+        "playing": true,
+        "readyState": 4,
+        "error": null
+      },
+      {
+        "videoId": "AByfaYcOm4A",
+        "title": "Demi Lovato - Heart Attack",
+        "state": "native_active",
+        "playing": true,
+        "timeSamplesSeconds": [
+          1.326741,
+          6.766827
+        ],
+        "error": null
+      }
+    ],
+    "playlistNotes": "Native keyboard seek was used to shorten test. End and ArrowLeft were sent on first item. Subsequent 9 seek was observed on second item. Both end transitions advanced without another Play click. Not a measured startup-latency benchmark. One fallback retained native playback; content-source replacement is not claimed for every video.",
+    "captions": {
+      "videoId": "w9MXqXBZy9U",
+      "selected": "English",
+      "observedText": "and the only tools we have are words.",
+      "playing": true,
+      "timeSeconds": 545.290864,
+      "state": "native_ready",
+      "restoredTo": "Off"
+    },
+    "audio": "Native playback controls retained; no audible multi-track or alternate-language verification claimed.",
+    "cleanup": "Agent-owned tabs closed; no reset or real trust/Auto-sync change performed."
+  },
+  "remainingGates": [
+    "Installed reset preview/accessibility and actual reset on disposable profiles",
+    "Installed parent/child time-limit and worker-restart testing",
+    "Actual paired installed-device offline reconnect remains pending",
+    "Other broad lanes retain baseline historical failures; see baseline comparison",
+    "Time accounting is local per installation/profile/day and uses device clock; heartbeat is approximately five seconds",
+    "New reset strings use English catalog and existing fallback; full translation review pending"
+  ],
+  "implementationCommits": {
+    "timeLimits": "e40c67b4",
+    "autoplay": "cf743d70",
+    "preferenceReset": "45c6d235"
+  },
+  "commands": {
+    "builds": [
+      "node build.js chrome",
+      "node build.js firefox",
+      "node build.js opera"
+    ],
+    "lanes": [
+      "node scripts/run-test-lane.mjs release",
+      "node scripts/run-test-lane.mjs whitelist",
+      "node scripts/run-test-lane.mjs blocking",
+      "node scripts/run-test-lane.mjs json",
+      "node scripts/run-test-lane.mjs dom",
+      "node scripts/run-test-lane.mjs menu",
+      "node scripts/run-test-lane.mjs performance",
+      "node scripts/run-test-lane.mjs settings",
+      "node scripts/run-test-lane.mjs smoke"
+    ],
+    "focused": "node --test tests/runtime/managed-time-usage-transactions.test.mjs tests/runtime/managed-content-playback-permit.test.mjs tests/runtime/managed-time-budget-enforcement-current-behavior.test.mjs tests/runtime/managed-child-time-limit-schema-current-behavior.test.mjs tests/runtime/content-playback-native.test.mjs tests/runtime/content-playback-coordinator.test.mjs tests/runtime/main-upnext-feed-watchpage3-autoplay-previous-end-screen-current-behavior.test.mjs tests/runtime/profile-preference-reset.test.mjs tests/runtime/auto-sync-two-endpoint.test.mjs tests/runtime/managed-auto-sync-two-endpoint.test.mjs"
+  }
+}
