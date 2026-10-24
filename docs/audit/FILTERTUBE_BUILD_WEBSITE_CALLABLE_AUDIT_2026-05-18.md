@@ -291,3 +291,73 @@ The file table now accounts for all current JS/MJS files in the existing build/s
 ## Workflow Data Split Revalidation - 2026-10-22
 
 The file-classification data moved into `scripts/test-lane-file-rules.mjs`. The unchanged lexical parser now accounts for 54 files (30 build/scripts files); the new module adds zero callable matches, so totals remain 341 for build/scripts and 417 overall. The file list and counts were measured from the current source; this does not promote any new semantic, publication, installed-app, or real-browser proof.
+
+## Conservative website simplification inventory - 2026-10-25
+
+The earlier dated tables above remain historical. The authorized change preserves the original hero, scenic identity, download-card data arrays, browser-logo rail, existing route tree and sitemap date. Current lexical measurements reflect shorter repeated copy and shared platform content, not a broad redesign.
+
+| Family | Files | Lexical callables |
+| --- | ---: | ---: |
+| Build and sync scripts | 30 | 341 |
+| Website app routes | 9 | 21 |
+| Website components | 15 | 54 |
+| Total | 54 | 416 |
+
+| File | Current lexical callables |
+| --- | ---: |
+| `build.js` | 38 |
+| `scripts/audit-proof-drift.mjs` | 12 |
+| `scripts/build-extension-ui.mjs` | 2 |
+| `scripts/build-nanah-vendor.mjs` | 4 |
+| `scripts/build-qr-scanner-vendor.mjs` | 0 |
+| `scripts/check-release-note-locales.mjs` | 1 |
+| `scripts/check-ui-locales.mjs` | 1 |
+| `scripts/create-family-device-capture-checklist.mjs` | 12 |
+| `scripts/create-family-device-evidence-packet.mjs` | 7 |
+| `scripts/create-managed-app-parity-smoke-artifact.mjs` | 25 |
+| `scripts/create-managed-extension-installed-smoke-artifact.mjs` | 20 |
+| `scripts/create-managed-native-runtime-sync-handoff.mjs` | 18 |
+| `scripts/create-managed-pickup-provider-ownership-artifact.mjs` | 21 |
+| `scripts/extract-family-ui-fallbacks.mjs` | 0 |
+| `scripts/import-family-device-downloaded-evidence.mjs` | 18 |
+| `scripts/managed-delivery-lan-discovery.mjs` | 21 |
+| `scripts/managed-delivery-provider.mjs` | 44 |
+| `scripts/merge-ui-locale-batch.mjs` | 1 |
+| `scripts/merge-ui-locale-drafts.mjs` | 2 |
+| `scripts/report-family-device-phase11-status.mjs` | 16 |
+| `scripts/report-family-device-phase12-status.mjs` | 11 |
+| `scripts/report-family-device-provider-surface.mjs` | 7 |
+| `scripts/report-family-device-release-readiness.mjs` | 3 |
+| `scripts/run-test-lane.mjs` | 23 |
+| `scripts/sync-native-runtime.mjs` | 0 |
+| `scripts/test-lane-config.mjs` | 0 |
+| `scripts/test-lane-file-rules.mjs` | 0 |
+| `scripts/update-family-device-evidence-log.mjs` | 13 |
+| `scripts/validate-family-device-evidence.mjs` | 14 |
+| `scripts/verify-managed-app-policy-contract.mjs` | 7 |
+| `website/app/[slug]/page.js` | 3 |
+| `website/app/downloads/page.js` | 3 |
+| `website/app/layout.js` | 1 |
+| `website/app/not-found.js` | 1 |
+| `website/app/page.js` | 5 |
+| `website/app/privacy/page.js` | 5 |
+| `website/app/robots.js` | 1 |
+| `website/app/sitemap.js` | 1 |
+| `website/app/terms/page.js` | 1 |
+| `website/components/browser-logo-rail.js` | 1 |
+| `website/components/footer-signal-art.js` | 20 |
+| `website/components/hero-video.js` | 2 |
+| `website/components/marketing-ui.js` | 5 |
+| `website/components/reveal.js` | 1 |
+| `website/components/route-content.js` | 0 |
+| `website/components/scene-controller.js` | 5 |
+| `website/components/scenic-detail-page.js` | 3 |
+| `website/components/scenic-illustration.js` | 3 |
+| `website/components/scenic-tones.js` | 1 |
+| `website/components/site-data.js` | 0 |
+| `website/components/site-footer.js` | 2 |
+| `website/components/site-header.js` | 3 |
+| `website/components/site-shell-data.js` | 0 |
+| `website/components/theme-toggle.js` | 8 |
+
+This inventory does not approve or waive extension behavior, native freshness, release signing, deployment, installed-device or public artifact gates. The independent user-facing change rationale and rendered verification belong in the new website simplification documentation; lexical counts are not semantic completion.

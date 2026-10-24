@@ -205,7 +205,7 @@ const expectedCounts = new Map([
   ],
   [
     "website/app/page.js",
-    6
+    5
   ],
   [
     "website/app/privacy/page.js",
@@ -432,9 +432,9 @@ test('build/website callable counts match the current lexical source surface', (
     assert.equal(count, expectedCounts.get(file), `${file} callable count drifted`);
   }
 
-  assert.equal(total, 417);
+  assert.equal(total, 416);
   assert.match(auditDoc, /\| Build and sync scripts \| 30 \| 341 \|/);
-  assert.match(auditDoc, /\| Total \| 54 \| 417 \|/);
+  assert.match(auditDoc, /\| Total \| 54 \| 416 \|/);
 
   const build = read('build.js');
   const buildRows = buildMethodRows();

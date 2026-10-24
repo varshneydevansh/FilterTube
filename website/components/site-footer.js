@@ -5,7 +5,7 @@ import { FooterSignalArt } from "@/components/footer-signal-art";
 import { ActionLink } from "@/components/marketing-ui";
 import {
   downloadsHref,
-  extensionInstallHref,
+  androidPlayStoreHref,
   footerLinks,
 } from "@/components/route-content";
 
@@ -51,17 +51,16 @@ export function SiteFooter() {
                   Built to leave the screen calmer than it was.
                 </h2>
                 <p className="mt-5 max-w-[56ch] text-base leading-8 text-[var(--color-muted)]">
-                  FilterTube is live today on desktop browsers and Android
-                  phone/tablet through Google Play, with dedicated iOS, iPad,
-                  TV, Kids, and local intelligence paths shaped into the same
-                  serene system.
+                  Calmer viewing on Android phones and tablets, and in your
+                  browser. iPhone, iPad and Android TV are in development.
+                  Explore each platform’s features and availability.
                 </p>
                 <div className="mt-8 flex flex-col gap-3 sm:flex-row">
-                  <ActionLink external href={extensionInstallHref}>
-                    Get FilterTube today
+                  <ActionLink external href={androidPlayStoreHref}>
+                    Get Android app
                   </ActionLink>
                   <ActionLink href={downloadsHref} variant="secondary">
-                    Open downloads
+                    Get extension
                   </ActionLink>
                 </div>
               </div>
@@ -100,6 +99,26 @@ export function SiteFooter() {
                     Local-first filtering, family-safe direction, and calmer
                     viewing across the devices that matter.
                   </p>
+                  <details className="ft-disclosure mt-4 max-w-[48ch] text-sm leading-7 text-[var(--color-muted)]">
+                    <summary className="w-fit cursor-pointer py-2 font-medium text-[var(--color-ink)]">
+                      Support independent development
+                    </summary>
+                    <p className="mt-2">
+                      FilterTube is built by an independent developer, currently
+                      without a salaried role or outside funding. My family
+                      funds the project. Contributions help with app accounts,
+                      testing and compatibility work.{" "}
+                      <a
+                        className="underline underline-offset-4"
+                        href="https://ko-fi.com/filtertube"
+                        rel="noreferrer"
+                        target="_blank"
+                      >
+                        Support on Ko-fi
+                      </a>
+                      .
+                    </p>
+                  </details>
                 </div>
                 <p className="ft-footer-wordmark self-start pr-[0.1em] font-display text-[clamp(4.8rem,18vw,14.8rem)] leading-[0.82] tracking-[-0.12em] lg:mr-10 lg:self-auto xl:mr-16">
                   FilterTube

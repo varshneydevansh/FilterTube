@@ -16,7 +16,6 @@ import {
   demoVideoHref,
   detailPages,
   docsHref,
-  downloadsHref,
   featuredRouteSlugs,
   githubHref,
   heroVideoUrl,
@@ -25,8 +24,6 @@ import {
   homeStoryNotes,
   homeTechnicalFeatures,
   homeUserVoices,
-  platformOrder,
-  systemSteps,
 } from "@/components/route-content";
 import { getTonePreset } from "@/components/scenic-tones";
 
@@ -37,26 +34,8 @@ const featuredSpans = [
   "xl:col-span-7",
 ];
 
-const technicalFeatureSpans = [
-  "xl:col-span-12",
-  "xl:col-span-5",
-  "xl:col-span-7",
-  "xl:col-span-6",
-  "xl:col-span-6",
-  "xl:col-span-4",
-  "xl:col-span-8",
-  "xl:col-span-7",
-  "xl:col-span-5",
-  "xl:col-span-6",
-  "xl:col-span-6",
-  "xl:col-span-12",
-  "xl:col-span-12",
-];
-
 const featuredPages = featuredRouteSlugs.map((slug) => detailPages[slug]);
-const shortcutPages = platformOrder
-  .filter((slug) => !featuredRouteSlugs.includes(slug))
-  .map((slug) => detailPages[slug]);
+const shortcutPages = ["ml-ai"].map((slug) => detailPages[slug]);
 
 function FeaturedPlatformCard({ page, span }) {
   const tone = getTonePreset(page.tone);
@@ -187,18 +166,18 @@ function AppReleaseStatusSection() {
   const appCards = [
     {
       eyebrow: "Android phone + tablet",
-      title: "The complete custom app is public on Google Play.",
-      body: "FilterTube's public Google Play app includes the feature-rich custom viewing experience for YouTube Main and Kids. Install it from the listing or search Google Play for FilterTube. It is different from the simpler direct APK available on GitHub.",
+      title: "Your YouTube, on Android.",
+      body: "Browse Main and Kids, choose your filters, and manage family profiles. Available on Google Play—no invitation or email needed.",
       image: "/apps/android.png",
       imageAlt: "FilterTube Android app artwork",
-      action: "Open on Google Play",
-      href: androidPlayStoreHref,
+      action: "Explore Android",
+      href: "/android",
       themeClass: "ft-app-release-card--android",
     },
     {
       eyebrow: "iPhone + iPad",
-      title: "The Apple build is being finalized.",
-      body: "Final build and testing alignment is underway. An Apple Developer account issue on Apple's side is delaying TestFlight access, and we are working to resolve it as soon as possible.",
+      title: "iPhone and iPad, together.",
+      body: "A native app for smaller screens and a wider iPad workspace. In development; public TestFlight and App Store access are not available yet.",
       image: "/apps/app-store-transparent.png",
       imageAlt: "FilterTube iPhone and iPad app artwork",
       action: "Follow iOS status",
@@ -239,33 +218,32 @@ function AppReleaseStatusSection() {
                   alt={card.imageAlt}
                   className={`absolute -bottom-2 -right-8 h-[62%] w-[54%] object-contain object-bottom drop-shadow-[0_24px_30px_rgba(39,48,48,0.22)] sm:-right-5 sm:h-[72%] ${card.imageClass || ""}`}
                   src={card.image}
+                  width={768}
+                  height={512}
+                  loading="lazy"
                 />
               </article>
             ))}
 
             <article className="ft-shell flex min-h-[22rem] flex-col rounded-[2rem] border border-[color:var(--color-line)] p-6 shadow-[var(--shadow-diffuse)] md:p-7 lg:col-span-2 xl:col-span-1">
               <p className="text-[0.72rem] font-semibold uppercase tracking-[0.22em] text-[var(--color-accent)]">
-                Independent open source
+                Browser extension · available now
               </p>
               <h2 className="mt-4 text-balance font-display text-3xl tracking-[-0.055em] text-[var(--color-ink)] md:text-4xl">
-                Help keep FilterTube independent.
+                Keep YouTube in your browser.
               </h2>
               <p className="mt-4 text-sm leading-7 text-[var(--color-muted)]">
-                FilterTube is built by an independent open-source developer,
-                currently without a salaried role or outside funding. My family
-                is funding the project today. If FilterTube helps your household,
-                a contribution supports app accounts, testing, and continued
-                compatibility work.
+                Use FilterTube on YouTube itself, with a quick popup, full
+                settings, and channel controls in YouTube’s menu. Choose Chrome,
+                Firefox, Edge or another supported browser.
               </p>
-              <a
+              <Link
                 className="mt-auto inline-flex min-h-11 w-fit items-center gap-2 rounded-full bg-[var(--color-accent)] px-5 py-2 text-sm font-semibold text-white transition hover:-translate-y-0.5"
-                href="https://ko-fi.com/filtertube"
-                rel="noreferrer"
-                target="_blank"
+                href="/extension"
               >
-                Support on Ko-fi
+                Explore the extension
                 <ArrowUpRight aria-hidden="true" size={16} weight="light" />
-              </a>
+              </Link>
             </article>
           </div>
         </Reveal>
@@ -276,13 +254,13 @@ function AppReleaseStatusSection() {
 
 function QuickGuideSection() {
   return (
-    <section className="px-4 py-20 md:px-6 md:py-28 lg:py-32">
+    <section id="system" className="px-4 py-20 md:px-6 md:py-28 lg:py-32">
       <div className="mx-auto max-w-[1400px]">
         <Reveal>
           <SectionHeading
             eyebrow="Quick guide"
             title="Start small, then add family controls only when needed."
-            description="This is the parent-friendly path the website now leads with: one block, one refresh, then profiles, imports, or device updates if your setup needs them."
+            description="Choose the app or extension, add one rule, then build the setup that fits you."
           />
         </Reveal>
 
@@ -290,24 +268,24 @@ function QuickGuideSection() {
           <Reveal>
             <Panel innerClassName="h-full p-6 md:p-7">
               <p className="text-[0.72rem] uppercase tracking-[0.22em] text-[var(--color-muted)]">
-                Three-minute setup
+                Get started
               </p>
               <div className="mt-7 grid gap-4">
                 {[
                   [
                     "1",
                     "Install and open FilterTube",
-                    "Use the browser extension first. Android users can install the public app from Google Play or search the store for FilterTube.",
+                    "Install the Android app from Google Play or add the extension to your browser.",
                   ],
                   [
                     "2",
                     "Block one thing",
-                    "Add one channel or one keyword, then refresh YouTube and confirm it hides.",
+                    "Choose your profile, add one channel or keyword, then open Main or Kids. In the extension, refresh YouTube to check the result.",
                   ],
                   [
                     "3",
                     "Add only what you need",
-                    "Profiles, PINs, whitelist mode, CSV/TXT/JSON imports, and device updates can wait until the basic rule works.",
+                    "Add family profiles, viewing limits, allow-only rules, imports or device sharing when you need them. You can adjust the rules at any time.",
                   ],
                 ].map(([number, title, body]) => (
                   <div
@@ -345,151 +323,81 @@ function QuickGuideSection() {
                   Pair your devices, match the safety phrase, then choose what
                   to share. Direct peer-to-peer transfers keep profile data
                   between verified devices while both Accounts &amp; Sync pages
-                  are open and connected. Parents can send approved rules,
-                  time limits, and viewing access to a protected profile.
+                  are open and connected. Parents can send approved rules, time
+                  limits, and viewing access to a protected profile.
                 </p>
                 <p className="mt-3 max-w-[62ch] text-sm leading-7 text-[var(--color-muted)]">
-                  The extension candidate also offers opt-in Auto-sync for
-                  supported settings, filter rules, and saved video notes on
-                  your own linked profiles. Offline changes wait for a verified
-                  connection. Android support for this update is still pending.
-                  Optional pickup services have separate delivery settings.
+                  Your rules stay on your devices. There is no central
+                  FilterTube account vault. Connection helpers, encrypted relay
+                  and optional encrypted pickup can help devices reach each
+                  other.
                 </p>
-
-                <div className="mt-7 grid gap-4 md:grid-cols-3">
-                  {[
-                    ["Direct peer-to-peer", "Both devices open and connected"],
-                    ["Home Pickup", "Same network, explicit setup"],
-                    ["Internet Pickup", "Verified device opens later"],
-                  ].map(([title, body]) => (
-                    <div
-                      className="rounded-[1.25rem] border border-[color:var(--color-line)] bg-[color:var(--color-soft-panel)] p-4"
-                      key={title}
-                    >
-                      <p className="font-display text-xl tracking-[-0.045em] text-[var(--color-ink)]">
-                        {title}
-                      </p>
-                      <p className="mt-2 text-sm leading-6 text-[var(--color-muted)]">
-                        {body}
-                      </p>
-                    </div>
-                  ))}
-                </div>
-
-                <div className="mt-6 rounded-[1.4rem] border border-[color:var(--color-line)] bg-[rgba(255,255,255,0.62)] p-4 shadow-[inset_0_1px_0_rgba(255,255,255,0.7)]">
-                  <div className="flex flex-wrap items-center justify-between gap-3">
-                    <p className="font-mono text-xs uppercase tracking-[0.2em] text-[var(--color-muted)]">
-                      Account & Sync model
+                <details className="ft-disclosure mt-7 rounded-[1.4rem] border border-[color:var(--color-line)] bg-[color:var(--color-soft-panel)]">
+                  <summary className="cursor-pointer px-5 py-4 font-semibold text-[var(--color-ink)]">
+                    How device syncing works
+                  </summary>
+                  <div className="space-y-4 px-5 pb-5 text-sm leading-7 text-[var(--color-muted)]">
+                    <p>
+                      Pair with a code or QR, compare the safety phrase, then
+                      choose the profile and what to share. Being on the same
+                      network never makes a device trusted.
                     </p>
-                    <span className="rounded-full border border-[color:var(--color-line)] px-3 py-1 text-xs font-semibold text-[var(--color-accent)]">
-                      parent reviewed
-                    </span>
+                    <p>
+                      Parents can send approved rules, time and viewing access
+                      to their chosen child profile. Receiving an update does
+                      not grant a child permission to edit protected settings.
+                    </p>
+                    <p>
+                      Opt-in Auto-sync for settings, filter rules and video
+                      notes is in testing in the extension and Android
+                      development build. Both devices must approve a personal
+                      profile link. Changes wait locally while disconnected;
+                      direct syncing requires FilterTube open and connected on
+                      both devices.
+                    </p>
+                    <p>
+                      Home Pickup and Internet Pickup are optional, separately
+                      configured delivery paths for approved parent updates.
+                      Queued, received and applied are different states. This
+                      does not promise background delivery whenever a device
+                      comes online.
+                    </p>
                   </div>
-                  <div className="mt-4 grid gap-3 md:grid-cols-3">
-                    <span className="rounded-full bg-[var(--color-accent)] px-4 py-3 text-center text-sm font-semibold text-[#fff8f1]">
-                      Pair protected device
-                    </span>
-                    <span className="rounded-full border border-[color:var(--color-line)] px-4 py-3 text-center text-sm font-semibold text-[var(--color-ink)]">
-                      Send protected update
-                    </span>
-                    <span className="rounded-full border border-[color:var(--color-line)] px-4 py-3 text-center text-sm font-semibold text-[var(--color-ink)]">
-                      Check saved updates
-                    </span>
-                  </div>
-                </div>
+                </details>
               </div>
             </Panel>
           </Reveal>
         </div>
-      </div>
-    </section>
-  );
-}
-
-function HowItWorksSection() {
-  return (
-    <section id="system" className="px-4 py-20 md:px-6 md:py-28 lg:py-32">
-      <div className="mx-auto max-w-[1400px]">
-        <Reveal>
-          <SectionHeading
-            eyebrow="How it works"
-            title="A simple setup path for non-technical users."
-            description="You do not need to understand YouTube internals. Add rules, choose the profile, open YouTube, then adjust when something changes."
-          />
-        </Reveal>
-
-        <div className="mt-12 grid gap-5 xl:grid-cols-[minmax(0,1.1fr)_minmax(0,0.9fr)]">
-          <div className="grid gap-5 md:grid-cols-2">
-            {systemSteps.map((step, index) => (
-              <Reveal delay={index * 90} key={step.title}>
-                <Panel innerClassName="h-full p-6">
-                  <div className="flex items-center justify-between">
-                    <span className="font-mono text-xs uppercase tracking-[0.22em] text-[var(--color-muted)]">
-                      0{index + 1}
-                    </span>
-                    <span className="rounded-full bg-[rgba(171,68,56,0.08)] p-2 text-[var(--color-accent)]">
-                      <step.icon aria-hidden="true" size={18} weight="light" />
-                    </span>
-                  </div>
-                  <h3 className="mt-6 font-display text-3xl tracking-[-0.05em] text-[var(--color-ink)]">
-                    {step.title}
-                  </h3>
-                  <p className="mt-4 text-sm leading-7 text-[var(--color-muted)]">
-                    {step.description}
-                  </p>
-                </Panel>
-              </Reveal>
-            ))}
+        <details className="ft-disclosure ft-shell mt-6 rounded-[1.5rem] border border-[color:var(--color-line)]">
+          <summary className="cursor-pointer px-6 py-5 font-semibold text-[var(--color-ink)]">
+            If filtering misses something
+          </summary>
+          <div className="px-6 pb-6 text-sm leading-7 text-[var(--color-muted)]">
+            <p>
+              YouTube changes its layouts and player. Check the active profile
+              and rule first, then report what happened with the page type, a
+              screenshot and a small example of the affected word or channel.
+            </p>
+            <p className="mt-3">
+              Email{" "}
+              <a
+                className="underline underline-offset-4"
+                href="mailto:hello@filtertube.in"
+              >
+                hello@filtertube.in
+              </a>
+              , open a{" "}
+              <a
+                className="underline underline-offset-4"
+                href={`${githubHref}/issues`}
+              >
+                GitHub issue
+              </a>
+              , or reply where you found FilterTube. Share private family rules
+              only if you choose to; a small example is usually enough.
+            </p>
           </div>
-
-          <Reveal delay={120}>
-            <Panel innerClassName="relative overflow-hidden p-7 md:p-8">
-              <div className="absolute inset-0 bg-[radial-gradient(circle_at_16%_18%,rgba(191,214,202,0.24),transparent_28%),radial-gradient(circle_at_82%_16%,rgba(239,204,189,0.26),transparent_24%)]" />
-              <div className="relative z-10">
-                <p className="text-[0.72rem] uppercase tracking-[0.22em] text-[var(--color-muted)]">
-                  If filtering misses something
-                </p>
-                <h3 className="mt-5 max-w-[14ch] font-display text-4xl tracking-[-0.06em] text-[var(--color-ink)]">
-                  Tell the developer when YouTube changes.
-                </h3>
-                <p className="mt-5 text-sm leading-7 text-[var(--color-muted)]">
-                  YouTube changes its page structure often. If a rule stops
-                  hiding something, that usually means FilterTube needs a small
-                  update for the new layout.
-                </p>
-                <div className="mt-8 space-y-4">
-                  <div className="ft-tile rounded-[1.4rem] border border-[color:var(--color-line)] px-4 py-4">
-                    <p className="text-[0.7rem] uppercase tracking-[0.22em] text-[var(--color-muted)]">
-                      What to send
-                    </p>
-                    <p className="mt-3 text-sm leading-7 text-[var(--color-muted)]">
-                      A screenshot, the page type, and the blocked word or
-                      channel is usually enough to start debugging.
-                    </p>
-                  </div>
-                  <div className="ft-tile rounded-[1.4rem] border border-[color:var(--color-line)] px-4 py-4">
-                    <p className="text-[0.7rem] uppercase tracking-[0.22em] text-[var(--color-muted)]">
-                      Where to send it
-                    </p>
-                    <p className="mt-3 text-sm leading-7 text-[var(--color-muted)]">
-                      Email hello@filtertube.in, open a GitHub issue, or comment
-                      wherever you already found FilterTube.
-                    </p>
-                  </div>
-                  <div className="ft-tile rounded-[1.4rem] border border-[color:var(--color-line)] px-4 py-4">
-                    <p className="text-[0.7rem] uppercase tracking-[0.22em] text-[var(--color-muted)]">
-                      What stays private
-                    </p>
-                    <p className="mt-3 text-sm leading-7 text-[var(--color-muted)]">
-                      Do not send private family rules unless you choose to. A
-                      small example is usually enough.
-                    </p>
-                  </div>
-                </div>
-              </div>
-            </Panel>
-          </Reveal>
-        </div>
+        </details>
       </div>
     </section>
   );
@@ -563,9 +471,8 @@ export default function HomePage() {
                 </a>
               </div>
               <p className="ft-hero-status mt-5 max-w-[720px] rounded-2xl px-5 py-3 text-sm font-medium leading-6 text-white md:px-6">
-                Desktop extensions are available now, and the complete Android
-                app is public on Google Play. iPhone and iPad are being
-                finalized for TestFlight.
+                Your devices. Your profiles. Verified, encrypted peer-to-peer
+                sharing keeps you in control of what moves between them.
               </p>
             </div>
 
@@ -600,14 +507,12 @@ export default function HomePage() {
 
       <QuickGuideSection />
 
-      <HowItWorksSection />
-
       <section id="story" className="px-4 py-20 md:px-6 md:py-28 lg:py-32">
         <div className="mx-auto grid max-w-[1400px] gap-10 lg:grid-cols-[minmax(0,0.9fr)_minmax(0,1.1fr)] lg:gap-16">
           <Reveal>
             <SectionHeading
-              eyebrow="Start here"
-              title="Block the YouTube content you do not want to keep seeing."
+              eyebrow="Why FilterTube"
+              title="A calmer place for what you choose to watch."
               description="FilterTube is for parents, students, and everyday users who need clear controls: add words, block channels, hide Shorts, set stricter profiles, and keep the setup local."
             />
             <div className="mt-8 space-y-4">
@@ -653,11 +558,11 @@ export default function HomePage() {
                       Live today
                     </p>
                     <p className="mt-3 font-display text-3xl tracking-[-0.05em] text-[var(--color-ink)]">
-                      Browser extension
+                      Android + browsers
                     </p>
                     <p className="mt-3 text-sm leading-7 text-[var(--color-muted)]">
-                      Chrome, Firefox, Edge, Brave, and Opera-friendly paths
-                      are ready for daily use.
+                      Install the Android phone/tablet app or use FilterTube in
+                      a supported desktop browser.
                     </p>
                   </div>
                   <div className="ft-tile rounded-[1.5rem] p-5 ring-1 ring-[color:var(--color-line)]">
@@ -674,14 +579,14 @@ export default function HomePage() {
                   </div>
                   <div className="rounded-[1.5rem] border border-white/8 bg-[linear-gradient(180deg,#18202a,#10161d)] p-5 text-[#f8f6f2] shadow-[0_24px_48px_-34px_rgba(4,8,14,0.7)]">
                     <p className="text-[0.72rem] uppercase tracking-[0.22em] text-white/72">
-                      Apps next
+                      In development
                     </p>
                     <p className="mt-3 font-display text-3xl tracking-[-0.05em] text-[#fffaf4]">
-                      Phone, tablet, TV
+                      iOS + Android TV
                     </p>
                     <p className="mt-3 text-sm leading-7 text-white/84">
-                      Dedicated apps will carry the same rules and profiles to
-                      more screens.
+                      iPhone, iPad and TV work is underway, with each platform’s
+                      availability and tested features shown separately.
                     </p>
                   </div>
                 </div>
@@ -743,8 +648,8 @@ export default function HomePage() {
           <Reveal>
             <SectionHeading
               eyebrow="Apps"
-              title="Desktop works today. Phone and tablet control is next."
-              description="The browser extension is the live product. The app work extends the same rules, profiles, and parent controls to more places."
+              title="On your phone, your tablet, and more screens."
+              description="Android is available now. Explore iPhone and iPad development, the browser extension, and the Android TV work inside the Android overview."
             />
           </Reveal>
 
@@ -766,24 +671,24 @@ export default function HomePage() {
                 <div className="flex flex-wrap items-center justify-between gap-4">
                   <div>
                     <p className="text-[0.72rem] uppercase tracking-[0.22em] text-[var(--color-muted)]">
-                      Choose a screen
+                      Keep exploring
                     </p>
                     <p className="mt-3 max-w-[30ch] text-sm leading-7 text-[var(--color-muted)]">
-                      Pick the screen that matters most and see what works now,
-                      what is in testing, and what is planned next.
+                      Android TV and Fire TV share the Android story. Local
+                      intelligence has its own clearly labelled research track.
                     </p>
                   </div>
                   <Link
                     className="ft-shell-strong inline-flex min-h-11 items-center gap-2 rounded-full border border-[color:var(--color-line)] px-4 py-2 text-sm font-medium text-[var(--color-ink)] transition duration-700 ease-[cubic-bezier(0.32,0.72,0,1)] hover:-translate-y-0.5 hover:border-[color:var(--color-accent)] hover:text-[var(--color-accent)]"
-                    href="/mobile"
+                    href="/android"
                     prefetch
                   >
-                    Start with phone and tablet
+                    Android app and TV
                     <ArrowUpRight aria-hidden="true" size={16} weight="light" />
                   </Link>
                 </div>
 
-                <div className="mt-6 grid auto-rows-fr gap-4 md:grid-cols-2 xl:grid-cols-5">
+                <div className="mt-6 grid auto-rows-fr gap-4">
                   {shortcutPages.map((page) => (
                     <ShortcutCard key={page.slug} page={page} />
                   ))}
@@ -798,38 +703,43 @@ export default function HomePage() {
         <div className="mx-auto max-w-[1400px]">
           <Reveal>
             <SectionHeading
-              eyebrow="Everyday controls"
-              title="A plain-language map of the controls inside FilterTube."
-              description="These are the settings people use most: rules, profiles, backups, imports, dates, and device updates."
+              eyebrow="Feature guide"
+              title="The details, when you need them."
+              description="Explore the full controls below. Development and experimental features are labelled; support differs by platform and release."
             />
           </Reveal>
-          <div className="mt-12 grid auto-rows-fr gap-5 xl:grid-cols-12">
-            {homeTechnicalFeatures.map((feature, index) => (
-              <Reveal
-                className={technicalFeatureSpans[index]}
-                delay={index * 70}
-                key={feature.title}
-              >
-                <Panel
+          <details className="ft-disclosure ft-shell mt-8 rounded-[2rem] border border-[color:var(--color-line)] p-2">
+            <summary className="ft-inset cursor-pointer rounded-[1.5rem] px-6 py-5 font-display text-xl text-[var(--color-ink)]">
+              Explore all features
+            </summary>
+            <div className="grid auto-rows-fr gap-5 px-2 pb-2 pt-5 md:grid-cols-2">
+              {homeTechnicalFeatures.map((feature, index) => (
+                <Reveal
                   className="h-full"
-                  innerClassName="flex h-full flex-col p-6 md:p-7"
+                  delay={index * 70}
+                  key={feature.title}
                 >
-                  <p className="text-[0.72rem] uppercase tracking-[0.22em] text-[var(--color-muted)]">
-                    Current feature
-                  </p>
-                  <h3 className="mt-4 max-w-[18ch] font-display text-3xl tracking-[-0.05em] text-[var(--color-ink)]">
-                    {feature.title}
-                  </h3>
-                  <p className="mt-4 text-sm leading-7 text-[var(--color-muted)]">
-                    {feature.description}
-                  </p>
-                  <p className="mt-auto pt-6 text-[0.72rem] uppercase tracking-[0.2em] text-[var(--color-accent)]">
-                    {feature.detail}
-                  </p>
-                </Panel>
-              </Reveal>
-            ))}
-          </div>
+                  <Panel
+                    className="h-full"
+                    innerClassName="flex h-full flex-col p-6 md:p-7"
+                  >
+                    <p className="text-[0.72rem] uppercase tracking-[0.22em] text-[var(--color-muted)]">
+                      {feature.status || "Core controls"}
+                    </p>
+                    <h3 className="mt-4 max-w-[18ch] font-display text-3xl tracking-[-0.05em] text-[var(--color-ink)]">
+                      {feature.title}
+                    </h3>
+                    <p className="mt-4 text-sm leading-7 text-[var(--color-muted)]">
+                      {feature.description}
+                    </p>
+                    <p className="mt-auto pt-6 text-[0.72rem] uppercase tracking-[0.2em] text-[var(--color-accent)]">
+                      {feature.detail}
+                    </p>
+                  </Panel>
+                </Reveal>
+              ))}
+            </div>
+          </details>
         </div>
       </section>
 
@@ -922,30 +832,34 @@ export default function HomePage() {
                     Get started
                   </p>
                   <h2 className="mt-5 max-w-[12ch] font-display text-4xl tracking-[-0.06em] text-[var(--color-ink)] md:text-6xl md:leading-[0.98]">
-                    Install the extension, then block one thing first.
+                    Start on Android or in your browser.
                   </h2>
                   <p className="mt-5 max-w-[58ch] text-base leading-8 text-[var(--color-muted)]">
-                    The safest first step is small: add one keyword or channel,
-                    refresh YouTube, and confirm it works. Then build profiles,
-                    PINs, imports, or family device updates around that.
-                    Android users can install the public app from Google Play
-                    or search the store for FilterTube.
+                    Choose where you want to watch, add a channel or keyword,
+                    and make the experience your own. Android phone and tablet
+                    installs are public—no invitation or email needed.
                   </p>
                   <div className="mt-8 flex flex-col gap-3 sm:flex-row">
-                    <ActionLink external href={demoVideoHref}>
-                      Watch the demo
+                    <ActionLink external href={androidPlayStoreHref}>
+                      Get Android app
                     </ActionLink>
-                    <ActionLink external href={docsHref} variant="secondary">
-                      Read the docs
+                    <ActionLink href="/downloads" variant="secondary">
+                      Get extension
                     </ActionLink>
                   </div>
                   <div className="mt-4 flex flex-wrap gap-3">
-                    <ActionLink external href={androidPlayStoreHref}>
-                      Open FilterTube on Google Play
-                    </ActionLink>
-                    <ActionLink href={downloadsHref} variant="secondary">
-                      Open downloads
-                    </ActionLink>
+                    <Link
+                      className="inline-flex min-h-11 items-center text-sm underline underline-offset-4"
+                      href="/ios"
+                    >
+                      iPhone and iPad status
+                    </Link>
+                    <a
+                      className="inline-flex min-h-11 items-center text-sm underline underline-offset-4"
+                      href={docsHref}
+                    >
+                      Read the docs
+                    </a>
                   </div>
                 </div>
               </Reveal>

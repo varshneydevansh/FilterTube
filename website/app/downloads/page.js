@@ -36,8 +36,7 @@ const primaryDownloads = [
     actions: [
       {
         label: "Chrome Web Store",
-        href:
-          "https://chromewebstore.google.com/detail/filtertube/cjmdggnnpmpchholgnkfokibidbbnfgc",
+        href: "https://chromewebstore.google.com/detail/filtertube/cjmdggnnpmpchholgnkfokibidbbnfgc",
       },
       {
         label: "Firefox Add-ons",
@@ -64,10 +63,6 @@ const primaryDownloads = [
         label: "Simpler direct APK",
         href: latestReleaseHref,
       },
-      {
-        label: "Google Play listing",
-        href: androidPlayStoreHref,
-      },
     ],
   },
   {
@@ -75,7 +70,7 @@ const primaryDownloads = [
     label: "Final testing alignment",
     icon: AppleLogo,
     description:
-      "The iPhone and iPad build is in final build and testing alignment. Apple Developer account access is delaying TestFlight availability and will be resolved as soon as possible.",
+      "The iPhone and iPad build is in final build and testing alignment. Apple Developer account access is delaying TestFlight availability. There is no public TestFlight or App Store install yet.",
     actions: [
       {
         label: "iOS status",
@@ -169,7 +164,11 @@ function DownloadCard({ item }) {
         <div className="mt-6 grid gap-3">
           {item.actions.map((action) =>
             action.internal ? (
-              <ActionLink href={action.href} key={action.label} variant="secondary">
+              <ActionLink
+                href={action.href}
+                key={action.label}
+                variant="secondary"
+              >
                 {action.label}
               </ActionLink>
             ) : (
@@ -208,8 +207,8 @@ export default function DownloadsPage() {
               Browser releases stay public on GitHub and store listings. Android
               phone/tablet builds can be attached to the same release stream for
               Google Play, GrapheneOS, and other direct-install users. iPhone
-              and iPad are in final build and testing alignment,
-              with Apple Developer account access currently delaying TestFlight.
+              and iPad are in final build and testing alignment, with Apple
+              Developer account access currently delaying TestFlight.
             </p>
           </div>
 
@@ -230,13 +229,14 @@ export default function DownloadsPage() {
                   App release state
                 </p>
                 <h2 className="mt-5 font-display text-4xl tracking-[-0.06em] text-[var(--color-ink)] md:text-5xl">
-                  Android is public on Google Play; Apple testing is being finalized.
+                  Android is public on Google Play; Apple testing is being
+                  finalized.
                 </h2>
                 <p className="mt-5 text-sm leading-7 text-[var(--color-muted)]">
                   Anyone can install the Android app from Google Play or search
-                  the store for FilterTube. The iPhone and iPad build is in final alignment, while
-                  Apple Developer account access is the current TestFlight delay.
-                  TV remains separate platform work.
+                  the store for FilterTube. The iPhone and iPad build is in
+                  final alignment, while Apple Developer account access is the
+                  current TestFlight delay. TV remains separate platform work.
                 </p>
               </div>
               <div id="ios-status" className="grid gap-3 sm:grid-cols-2">
@@ -256,9 +256,10 @@ export default function DownloadsPage() {
                     iOS and iPadOS
                   </h3>
                   <p className="mt-3 text-sm leading-7 text-[var(--color-muted)]">
-                    Final build and testing alignment is underway. Apple Developer
-                    account access is delaying TestFlight; Apple-channel testing
-                    will open as soon as that access is resolved.
+                    Final build and testing alignment is underway. Apple
+                    Developer account access is delaying TestFlight;
+                    Apple-channel testing will open as soon as that access is
+                    resolved.
                   </p>
                 </div>
               </div>
@@ -276,13 +277,12 @@ export default function DownloadsPage() {
                   Android distribution
                 </p>
                 <h2 className="mt-5 font-display text-4xl tracking-[-0.06em] text-[var(--color-ink)] md:text-5xl">
-                  Play first, direct APK next, repository listings after proof.
+                  Choose the Android build that fits.
                 </h2>
                 <p className="mt-5 text-sm leading-7 text-[var(--color-muted)]">
-                  The public repo can host the release page and metadata even if
-                  the native app repo stays private for now. The APK itself
-                  should be signed, checksummed, and attached intentionally.
-                  Accrescent stays a watchlist item because submission is invite-only.
+                  Google Play is the simplest way to get the complete phone and
+                  tablet app. The direct APK is a separate, simpler build.
+                  Android TV and Fire TV have their own development track.
                 </p>
                 <div className="mt-7 flex flex-col gap-3 sm:flex-row">
                   <ActionLink external href={releaseHref}>
@@ -295,22 +295,52 @@ export default function DownloadsPage() {
               </div>
 
               <div className="grid gap-3 sm:grid-cols-2">
-                {androidMarkets.map((market) => (
-                  <div
-                    className="rounded-[1.2rem] border border-[color:var(--color-line)] bg-[color:var(--color-soft-panel)] p-4"
-                    key={market.title}
-                  >
-                    <p className="text-[0.68rem] uppercase tracking-[0.2em] text-[var(--color-muted)]">
-                      {market.status}
+                {androidMarkets
+                  .filter((market) =>
+                    [
+                      "Google Play",
+                      "Direct APK",
+                      "Android TV / Fire TV",
+                    ].includes(market.title),
+                  )
+                  .map((market) => (
+                    <div
+                      className="rounded-[1.2rem] border border-[color:var(--color-line)] bg-[color:var(--color-soft-panel)] p-4"
+                      key={market.title}
+                    >
+                      <p className="text-[0.68rem] uppercase tracking-[0.2em] text-[var(--color-muted)]">
+                        {market.status}
+                      </p>
+                      <h3 className="mt-3 font-display text-xl tracking-[-0.04em] text-[var(--color-ink)]">
+                        {market.title}
+                      </h3>
+                      <p className="mt-3 text-sm leading-7 text-[var(--color-muted)]">
+                        {market.detail}
+                      </p>
+                    </div>
+                  ))}
+                <details className="ft-disclosure rounded-[1.2rem] border border-[color:var(--color-line)] p-4 sm:col-span-2">
+                  <summary className="cursor-pointer py-2 font-medium text-[var(--color-ink)]">
+                    Other distribution plans
+                  </summary>
+                  <div className="mt-3 space-y-4 text-sm leading-7 text-[var(--color-muted)]">
+                    <p>
+                      These are possible future distribution channels, not
+                      available downloads.
                     </p>
-                    <h3 className="mt-3 font-display text-xl tracking-[-0.04em] text-[var(--color-ink)]">
-                      {market.title}
-                    </h3>
-                    <p className="mt-3 text-sm leading-7 text-[var(--color-muted)]">
-                      {market.detail}
-                    </p>
+                    {androidMarkets
+                      .filter((market) =>
+                        ["IzzyOnDroid", "F-Droid", "Accrescent"].includes(
+                          market.title,
+                        ),
+                      )
+                      .map((market) => (
+                        <p key={market.title}>
+                          <strong>{market.title}:</strong> {market.detail}
+                        </p>
+                      ))}
                   </div>
-                ))}
+                </details>
               </div>
             </div>
           </Panel>
@@ -335,7 +365,10 @@ export default function DownloadsPage() {
                 </p>
                 <ul className="mt-6 grid gap-3">
                   {safetyChecks.map((item) => (
-                    <li className="flex gap-3 text-sm leading-7 text-[var(--color-muted)]" key={item}>
+                    <li
+                      className="flex gap-3 text-sm leading-7 text-[var(--color-muted)]"
+                      key={item}
+                    >
                       <CheckCircle
                         aria-hidden="true"
                         className="mt-1 shrink-0 text-[var(--color-accent)]"

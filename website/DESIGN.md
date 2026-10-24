@@ -1,0 +1,44 @@
+# FilterTube website: preserve the scenic design
+
+This is a content refinement of the existing website, not a replacement design.
+The user's explicit preservation direction takes precedence over generic redesign
+advice. Hallmark, Claude Frontend, Design Taste, design-system patterns and the
+UI/UX review skills are used to improve clarity within these boundaries.
+
+## Keep
+
+- Full-width scenic video hero, both original headlines, typography and demo links.
+- Outfit, Plus Jakarta Sans, Cormorant Garamond and JetBrains Mono from next/font.
+- Existing cream, muted red and scenic light/dark tokens in app/globals.css.
+- Original glass header, scenic cards, Android/Apple artwork, large footer wordmark
+  and FooterSignalArt. Existing Reveal motion and reduced-motion behavior.
+- Next.js/React/Tailwind stack, source links, community feedback and independent
+  funding story. No new runtime dependencies.
+
+## Improve through content hierarchy
+
+- Apps are full products. Android phone/tablet is public; TV is important ongoing
+  work. Android and iOS lead navigation; the extension remains easy to install.
+- Android combines phone, tablet and TV information. iOS combines iPhone and iPad.
+  Legacy pages remain accessible; do not break bookmarked URLs.
+- One setup sequence. Keep all unique troubleshooting and feature information;
+  reveal secondary details with native, keyboard-accessible disclosures.
+- Use concrete benefits instead of generic design commentary. Preserve all
+  thirteen original detailed features and include missing capabilities.
+- Reuse ScenicDetailPage for the extension overview; do not introduce another
+  visual language. Only optional per-card status and anchor metadata are added.
+
+## Claim and interaction rules
+
+- Label public availability, testing, experimental controls and research clearly.
+  A shared direction does not imply identical features in every platform/release.
+- Describe verified encrypted P2P and user-owned local rules. Explain connection
+  helpers, encrypted relay and optional pickup; do not claim no servers exist.
+- Parent authority, child switching PINs, trust, consent, delivery and application
+  are separate. Direct Auto-sync needs open connected supported endpoints.
+- Keep summaries focusable with a strong visible outline. Preserve native link,
+  details and summary semantics. Check narrow layouts and enlarged/desktop widths.
+- Use real product media. Do not invent app screenshots or fake device chrome.
+
+Hallmark pre-emit review: Philosophy 5, Hierarchy 4, Execution 4, Specificity 5,
+Restraint 5, Variety 4. These are internal design judgments, not usability results.

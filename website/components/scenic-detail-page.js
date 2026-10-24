@@ -301,7 +301,7 @@ export function ScenicDetailPage({ page, relatedPages }) {
             <div className="grid gap-5 md:grid-cols-2">
               {page.featureCards.map((card, index) => (
                 <Reveal delay={index * 90} key={card.title}>
-                  <div className="ft-shell rounded-[1.9rem] p-2 ring-1 ring-[color:var(--color-line)] shadow-[var(--shadow-diffuse)]">
+                  <div id={card.id} className="ft-shell rounded-[1.9rem] p-2 ring-1 ring-[color:var(--color-line)] shadow-[var(--shadow-diffuse)]">
                     <div
                       className={`ft-inset relative h-full overflow-hidden rounded-[calc(1.9rem-0.5rem)] p-6 md:p-7 ${tone.surface}`}
                     >
@@ -315,6 +315,11 @@ export function ScenicDetailPage({ page, relatedPages }) {
                         >
                           <Icon aria-hidden="true" size={20} weight="light" />
                         </div>
+                        {card.status ? (
+                          <p className={`mt-5 text-xs font-semibold uppercase tracking-[0.14em] ${eyebrowText}`}>
+                            {card.status}
+                          </p>
+                        ) : null}
                         <h3
                           className={`mt-6 max-w-[15ch] text-balance font-display text-3xl tracking-[-0.05em] ${headingText}`}
                         >

@@ -61,8 +61,8 @@ test('source of truth claim register accounts for every current exact wording oc
   const source = read(docPath);
   const refs = occurrenceRefs();
 
-  assert.equal(refs.length, 101);
-  assert.match(source, /current exact wording occurrences: 101/);
+  assert.equal(refs.length, 102);
+  assert.match(source, /current exact wording occurrences: 102/);
 
   const current = source.slice(source.indexOf('## Current Exact Wording Register - 2026-10-18'));
   const rows = [...current.matchAll(/\| `([^`]+:\d+)` \| `([^`]+)` \|/g)];

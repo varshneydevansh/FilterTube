@@ -1,0 +1,56 @@
+{
+  "scope": "Returned local Chrome observations; no full-device or complete matrix claim.",
+  "checks": [
+    {
+      "route": "/ios",
+      "width": 320,
+      "scrollWidth": 320
+    },
+    {
+      "route": "/ios",
+      "width": 375,
+      "scrollWidth": 375
+    },
+    {
+      "route": "/ios",
+      "width": 414,
+      "scrollWidth": 414
+    },
+    {
+      "route": "/ios",
+      "width": 767,
+      "scrollWidth": 767
+    },
+    {
+      "route": "/ios",
+      "width": 769,
+      "scrollWidth": 769
+    },
+    {
+      "route": "/android",
+      "width": 375,
+      "scrollWidth": 375
+    },
+    {
+      "route": "/",
+      "width": 375,
+      "scrollWidth": 375
+    },
+    {
+      "route": "/",
+      "width": 2250,
+      "scrollWidth": 2250
+    },
+    {
+      "route": "/android",
+      "width": 2250,
+      "scrollWidth": 2250
+    }
+  ],
+  "feature_guide_keyboard_open_close": true,
+  "all_21_feature_headings_present_when_expanded": true,
+  "mobile_menu_ios_navigation": true,
+  "exact_768": "Integer viewport overrides at existing browser zoom yielded767and769; fractional override was rejected.",
+  "remaining_matrix": "A later five-page batch timed out before returning or persisting results. Rebinding, fresh-tab and viewport-reset attempts also timed out. No partial results from that batch are claimed.",
+  "viewport_restore": "Reset succeeded before the timed-out batch. Reset after the batch timed out; final override state is unverified."
+}

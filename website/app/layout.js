@@ -45,11 +45,11 @@ export const metadata = {
     template: "%s | FilterTube",
   },
   description:
-    "Local-first YouTube filtering for calmer feeds, safer family setups, and upcoming mobile, iPad, and TV control surfaces.",
+    "Calmer YouTube on Android and in your browser. Explore family profiles, local filtering, verified peer-to-peer sharing, and iOS and TV development.",
   openGraph: {
     title: "FilterTube",
     description:
-      "Calm the feed before it renders. FilterTube blocks channels, keywords, Shorts, comments, and more without sending your data anywhere.",
+      "Your feed, your rules. FilterTube brings local filtering, family controls and verified encrypted device sharing to Android and browsers, with iOS and TV in development.",
     url: "https://filtertube.in",
     siteName: "FilterTube",
     images: [

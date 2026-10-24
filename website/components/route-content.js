@@ -33,6 +33,12 @@ export const androidPlayStoreHref =
 
 export const browserLinks = [
   {
+    name: "Android",
+    note: "Google Play",
+    href: androidPlayStoreHref,
+    logo: "/apps/android.png",
+  },
+  {
     name: "Chrome",
     note: "Web Store",
     href: extensionInstallHref,
@@ -69,12 +75,6 @@ export const browserLinks = [
     logo: "https://cdnjs.cloudflare.com/ajax/libs/browser-logos/74.1.0/opera/opera_48x48.png",
   },
   {
-    name: "Android",
-    note: "Google Play",
-    href: androidPlayStoreHref,
-    logo: "/apps/android.png",
-  },
-  {
     name: "iOS",
     note: "App status",
     href: "/ios",
@@ -83,14 +83,14 @@ export const browserLinks = [
   },
 ];
 
-export const featuredRouteSlugs = ["mobile", "tv", "kids", "ml-ai"];
+export const featuredRouteSlugs = ["android", "ios", "extension", "kids"];
 
 export const footerLinks = {
   product: [
     { label: "Downloads", href: downloadsHref },
-    { label: "Desktop browsers", href: extensionInstallHref, external: true },
-    { label: "Mobile", href: "/mobile" },
-    { label: "TV", href: "/tv" },
+    { label: "Android: phone, tablet, TV", href: "/android" },
+    { label: "iOS: iPhone and iPad", href: "/ios" },
+    { label: "Browser extension", href: "/extension" },
     { label: "YouTube Kids", href: "/kids" },
     { label: "ML & AI", href: "/ml-ai" },
   ],
@@ -114,76 +114,70 @@ export const footerLinks = {
 };
 
 export const homeStoryNotes = [
-  "Install the browser extension, open FilterTube, and add the words or channels you do not want YouTube to show.",
-  "FilterTube is built by a neurodivergent developer who needed calmer YouTube for ADHD focus, then shaped further by parents and caregivers.",
-  "Families with autistic children and other neurodivergent users are part of the reason the controls are becoming simpler, clearer, and easier to trust.",
-  "Use profiles when different people need different rules. Use a PIN when those rules should not be changed casually.",
-  "Desktop extensions work today. FilterTube for Android is publicly available on Google Play and can be installed from the listing or found by searching Google Play for FilterTube.",
-  "The Android app includes Main, Kids, profiles, protected time, and content-first playback.",
-  "The iPhone and iPad build is in final testing alignment. Apple Developer account access is delaying TestFlight for now and will be resolved as soon as possible.",
+  "FilterTube began with a neurodivergent developer who wanted calmer YouTube for ADHD focus.",
+  "Parents, caregivers, and autistic and other neurodivergent users have helped shape clearer controls for different needs.",
+  "The goal is practical: enjoy the creators you choose, keep unwanted content out, and give each person rules that fit them.",
+  "Independent development keeps the project close to that feedback. Community reports and contributions help it improve across phones, tablets, TVs, and browsers.",
 ];
 
 export const homeCapabilityCards = [
   {
-    label: "Ad-free viewing",
-    title: "Keep YouTube adverts out of the video you asked to watch.",
+    label: "Playback",
+    title: "Keep the video you chose at the center.",
     description:
-      "The extension removes observed YouTube advert plans before playback and keeps a guarded fallback for adverts that escape. The native app uses its content-first player path instead of YouTube's browser advert path.",
+      "FilterTube filters YouTube adverts and unwanted content. The Android app has its own viewing experience; the extension keeps YouTube's familiar player controls.",
     points: [
-      "Advert removal is enabled by default and works in both Blocklist and Whitelist modes.",
-      "Built for YouTube Main and YouTube Kids, with compatibility checked as YouTube changes its player.",
+      "Advert filtering is enabled by default in Blocklist and Whitelist modes.",
+      "Playback paths differ by platform, and compatibility still needs maintenance when YouTube changes.",
     ],
     icon: EyeSlash,
     span: "xl:col-span-12",
   },
   {
-    label: "Block what you name",
-    title: "Hide channels, keywords, Shorts, comments, and noisy surfaces.",
+    label: "Rules",
+    title: "Block what you name, or allow only what you trust.",
     description:
-      "Start with the simple lists: add a channel, add a word, or turn off an entire surface like Shorts or comments.",
+      "Add channels, keywords, or supported content filters. Keep separate rules for YouTube Main and Kids when they need different boundaries.",
     points: [
-      "Blocklist mode hides what you add.",
-      "Whitelist mode is stricter: only approved channels or rules should remain visible.",
+      "Blocklist hides matching content; Whitelist limits viewing to approved rules.",
+      "Exact matching, date ranges, categories, and content controls help make rules more precise.",
     ],
     icon: Compass,
     span: "xl:col-span-7",
   },
   {
-    label: "Profiles and PINs",
-    title:
-      "Give each person their own rules without turning setup into an IT job.",
+    label: "Family",
+    title: "Separate profiles, clear parent controls.",
     description:
-      "A parent can keep the main profile open, create protected child profiles, and use PINs so settings are not changed by accident.",
+      "Each person can have their own rules and viewing access. Parents manage protected child profiles and set viewing time where supported.",
     points: [
-      "Child profile PINs help stop casual profile switching.",
-      "Parent or master unlock controls rule editing, device trust, and backups.",
+      "A child switching PIN does not unlock parent settings.",
+      "Parent or master approval controls protected edits, device permissions, and backups.",
     ],
     icon: ShieldCheck,
     span: "xl:col-span-5",
   },
   {
-    label: "Daily calm",
-    title:
-      "Reduce the parts of YouTube that usually pull people off track.",
+    label: "Focus",
+    title: "Keep the useful parts. Quiet the distractions.",
     description:
-      "FilterTube is useful for parents, students, ADHD focus, and anyone who wants YouTube to stop pushing the same distractions.",
+      "Choose the surfaces that interrupt your attention instead of removing everything from YouTube.",
     points: [
-      "Hide Shorts when short-form scrolling is the problem.",
-      "Hide comments when the watch page needs to stay quieter.",
+      "Hide Shorts, comments, or other supported feed and watch-page distractions.",
+      "Choose Home feed, recommendations, Mixes, playlist panels, live chat, or end-screen controls where supported.",
     ],
     icon: EyeSlash,
     span: "xl:col-span-5",
   },
   {
-    label: "Devices and apps",
-    title:
-      "The same rule model is moving from desktop into phone, tablet, and TV.",
+    label: "Devices and data",
+    title: "Your profiles, shared between devices you choose.",
     description:
-      "The extension and Android app are live, and the native Apple build is in final testing alignment.",
+      "Pair and verify devices before sharing updates. Keep local backups and review imported rules without handing control to a central FilterTube account.",
     points: [
-      "Open the public Android listing directly or search Google Play for FilterTube.",
-      "Apple Developer account access is currently delaying TestFlight and will be resolved as soon as possible.",
-      "Remote family updates use verified device trust, not a public account full of private viewing data.",
+      "Use a code or QR, compare the safety phrase, then choose the profile and update.",
+      "Opt-in Auto-sync is in testing. Availability varies by app and release.",
+      "Connection services may help devices meet or relay encrypted updates. PINs, ownership, and device permissions stay local.",
     ],
     icon: Stack,
     span: "xl:col-span-7",
@@ -240,29 +234,34 @@ export const systemSteps = [
 
 export const homeFaqItems = [
   {
-    question: "What should I do first after installing?",
+    question: "How do I start?",
     answer:
-      "Open FilterTube, add one word or one channel you want hidden, then refresh YouTube. Add profiles, PINs, Kids rules, or imports later only if you need them.",
+      "Install the Android app or browser extension, add one channel or keyword, then check the result. In the extension, refresh YouTube after your first rule. Add profiles, PINs, Kids rules, and imports when you need them.",
   },
   {
     question: "What does Exact mean?",
     answer:
-      "Exact off is wider. For example, poop can also catch poops or pooping. Exact on is stricter, so poop only matches the word poop.",
+      "Exact off is wider: poop can also catch poops or pooping. Exact on matches the word poop. Use it when a short word hides more than you intended.",
   },
   {
-    question: "Can a child or sibling change the rules?",
+    question: "Can a child change the rules?",
     answer:
-      "Not if you lock the profile. A child PIN helps stop casual profile switching. The parent or master unlock is still needed to change rules, devices, and backups.",
+      "Protected child profiles require parent approval for managed changes. A child PIN protects switching into that profile; it does not unlock parent controls. Lock the parent or master session after making changes.",
   },
   {
-    question: "Does FilterTube send browsing data to your servers?",
+    question: "How private is device sync?",
     answer:
-      "No. Filtering is local-first. Device sync can help two trusted devices connect or pick up an update, but it is designed so the helper service cannot read your rules.",
+      "Rules are stored locally. Verified devices exchange encrypted updates, with connection services available to help them meet or relay data. Optional pickup can hold encrypted parent updates. Providers can still see connection metadata; there is no central FilterTube account storing your readable rules.",
   },
   {
-    question: "How do I install the Android app?",
+    question: "Do I need an invitation for Android?",
     answer:
-      "Open the public FilterTube listing on Google Play and install it, or search Google Play for FilterTube and choose the app from the official listing.",
+      "No. Install FilterTube from the public Google Play listing—no invitation or email needed. The separate direct APK is a simpler build, not the same custom app.",
+  },
+  {
+    question: "What if a filter misses something?",
+    answer:
+      "Check the active profile, rule space, and Exact setting first. YouTube layout changes can also affect filtering. A small example, page type, and screenshot help diagnose it; share only the private details you choose.",
   },
 ];
 
@@ -313,7 +312,7 @@ export const homeTechnicalFeatures = [
   {
     title: "Backups",
     description:
-      "Export your FilterTube setup before a big change, or keep local backup files for recovery.",
+      "Export your FilterTube setup before a big change, or keep local backup files for recovery. Encrypted and optional automatic backup options are available where supported.",
     detail: "Designed to keep control in your hands.",
   },
   {
@@ -338,19 +337,153 @@ export const homeTechnicalFeatures = [
     title: "Device updates",
     description:
       "A parent device can send approved rules, time, and access to a verified protected device, with optional pickup when the other device opens later.",
-    detail: "Live P2P, same-network pickup, and lazy checks are separate paths.",
+    detail:
+      "Direct pairing and optional pickup have different setup and delivery requirements.",
   },
   {
     title: "Local-first design",
     description:
-      "FilterTube is built around local rules and public source code, so users can inspect what the product is doing.",
-    detail: "Open source and privacy-first by design.",
+      "Filtering uses local rules. The browser extension source is public, while native app source availability differs.",
+    detail:
+      "Device transfers are a choice; connection metadata and optional encrypted pickup have their own privacy boundaries.",
+  },
+  {
+    title: "Protected viewing time",
+    description:
+      "Parents can set daily viewing limits for protected profiles. The extension also offers timed self-control sessions that hold chosen rules until the session ends.",
+    detail:
+      "Daily time is counted per installation and profile, not as a shared family-wide budget. A child switching PIN cannot grant extra time.",
+  },
+  {
+    title: "Duration, dates, and categories",
+    description:
+      "Use supported video-length, upload-date, category, and uppercase-title filters alongside channel and keyword rules.",
+    detail:
+      "Availability and metadata coverage vary by viewing space and platform.",
+  },
+  {
+    title: "Language controls",
+    status: "Experimental",
+    description:
+      "Language controls use available video metadata to narrow viewing, with original-audio handling where supported.",
+    detail:
+      "Experimental original-audio preference favors an identified original track over automatic dubbing. Metadata can be incomplete; spoken language is not guaranteed.",
+  },
+  {
+    title: "Minimum-view filters",
+    status: "Extension update",
+    description:
+      "Optionally hide videos below a view-count threshold in Main and Kids when a usable view count is available.",
+    detail:
+      "A newer extension feature; do not assume identical support in every installed app build.",
+  },
+  {
+    title: "Saved video notes",
+    status: "Development updates",
+    description:
+      "Keep notes with a video inside the selected profile. New Notes features are available in extension and Android development builds.",
+    detail:
+      "In testing; availability and Notes access depend on the app, release and profile permissions.",
+  },
+  {
+    title: "Opt-in Auto-sync",
+    status: "Development updates",
+    description:
+      "Choose supported settings, filter rules, and notes to sync on approved profile links between verified devices. Offline changes wait locally for a supported connection.",
+    detail:
+      "In testing for extension and Android updates; supported devices must be open and connected for direct sync.",
+  },
+  {
+    title: "Reviewed preference reset",
+    status: "Extension update",
+    description:
+      "Review ordinary display and playback defaults for the chosen profile. Your filter rules, notes, PINs, time limits, device permissions and profile ownership are preserved.",
+    detail:
+      "Parent safeguards still apply; reset is a deliberate action, not an automatic cleanup.",
+  },
+  {
+    title: "Compatible rule exports",
+    status: "Extension update",
+    description:
+      "Review compatible channel and keyword rules before exporting one profile and rule space for BlockTube.",
+    detail:
+      "A compatibility export is not a complete FilterTube backup; unsupported settings stay out.",
   },
 ];
 
 export const platformOrder = platformSlugs;
 
 export const detailPages = {
+  extension: {
+    slug: "extension",
+    icon: MonitorPlay,
+    tone: "sage",
+    status: "Available for browsers",
+    eyebrow: "Browser extension",
+    navTitle: "Browser extension",
+    routeSummary:
+      "Keep YouTube's familiar player and add filters, profiles, and local control in your browser.",
+    titleLead: "Your familiar YouTube, with",
+    titleDisplay: "your rules",
+    description:
+      "Filter channels, keywords, Shorts, comments, and supported content without leaving the YouTube website. Use the popup for quick changes, the dashboard for deeper setup, and YouTube's menu to block content as you browse.",
+    chips: ["YouTube Main + Kids", "Local rules", "Family profiles"],
+    primaryCta: {
+      label: "Choose your browser",
+      href: downloadsHref,
+      external: false,
+    },
+    secondaryCta: {
+      label: "Watch the extension demo",
+      href: demoVideoHref,
+      external: true,
+    },
+    previewLabel: "Browser control",
+    previewTitle: "Quick changes nearby. Full settings when you need them.",
+    previewRows: [
+      {
+        label: "Quick access",
+        value: "Popup",
+        detail:
+          "Change everyday controls without opening a separate settings tab.",
+      },
+      {
+        label: "Full setup",
+        value: "Dashboard",
+        detail:
+          "Manage rules, profiles, imports, and device connections in one place.",
+      },
+      {
+        label: "While browsing",
+        value: "YouTube menu",
+        detail:
+          "Block supported content from the page you are already viewing.",
+      },
+    ],
+    featureCards: [
+      {
+        title: "Choose what remains visible",
+        body: "Channel and keyword rules, Exact matching, Whitelist, Shorts and comment controls, and supported content filters help shape Main and Kids.",
+      },
+      {
+        title: "Keep family boundaries clear",
+        body: "Profiles, parent permissions, PIN gates, protected viewing time, reviewed imports, and backups stay scoped to the selected profile.",
+      },
+      {
+        title: "Connect your verified devices",
+        body: "Pair with a code or QR and compare the safety phrase before sharing updates. Optional personal Auto-sync and per-video Notes are in testing for newer releases.",
+      },
+    ],
+    milestoneTitle: "Browser availability",
+    milestoneIntro:
+      "Choose a store or manual build appropriate for your browser; a development feature is not automatically in every store release.",
+    milestones: [
+      "Chrome, Firefox, and Edge have store listings; compatible Chromium browsers use the relevant installation path.",
+      "Newer Notes, minimum-view rules, compatible exports, preference reset, and Auto-sync features may not be in your store release yet.",
+      "YouTube changes still require compatibility work; advert filtering is not a promise of permanent immunity to platform changes.",
+    ],
+    related: ["android", "kids", "ml-ai"],
+  },
   mobile: {
     slug: "mobile",
     icon: DeviceMobile,
@@ -393,7 +526,7 @@ export const detailPages = {
       watchHref: appDemoVideoHref,
     },
     previewLabel: "Mobile direction",
-    previewTitle: "Protected now stays visible in under five seconds.",
+    previewTitle: "Viewing and profile status, easy to find.",
     previewRows: [
       {
         label: "Source",
@@ -426,7 +559,7 @@ export const detailPages = {
       },
       {
         title: "Browse remains modular",
-        body: "Protected browsing can grow through in-app sessions, Safari handoff, or guided setup without breaking the calm experience.",
+        body: "Main and Kids viewing sit alongside native rule and profile controls. Check the Android and iOS pages for the features available on your device.",
       },
     ],
     milestoneTitle: "What mobile needs to do first",
@@ -444,23 +577,23 @@ export const detailPages = {
     slug: "ios",
     icon: DeviceMobile,
     tone: "pearl",
-    status: "Finalizing for TestFlight",
-    eyebrow: "iPhone app",
-    navTitle: "iPhone",
+    status: "Public access pending",
+    eyebrow: "iPhone + iPad",
+    navTitle: "iPhone and iPad",
     routeSummary:
-      "A dedicated iPhone app centered on quick control and trusted setup.",
+      "Native iPhone and iPad viewing, filters, profiles, and family controls; public distribution is not available yet.",
     titleLead: "A native FilterTube app for",
-    titleDisplay: "iPhone control",
+    titleDisplay: "iPhone and iPad",
     description:
-      "The native iPhone app is in final build and testing alignment. An Apple Developer account issue on Apple's side is delaying TestFlight access, and we are working to resolve it as soon as possible.",
+      "FilterTube brings Main and Kids viewing, native controls, profiles, PINs, and protected time to iPhone and iPad. The builds are in testing; public TestFlight and App Store access are not available while developer enrollment is unresolved.",
     heroArtwork: {
       src: "/apps/app-store-transparent.png",
       alt: "FilterTube iPhone app artwork",
     },
     chips: ["Protected now", "Profile switching", "Quick toggles"],
     primaryCta: {
-      label: "See the mobile direction",
-      href: "/mobile",
+      label: "Public access status",
+      href: "/downloads#ios-status",
       external: false,
     },
     secondaryCta: {
@@ -496,24 +629,26 @@ export const detailPages = {
     ],
     featureCards: [
       {
-        title: "Clear protection status",
-        body: "The iPhone app becomes the quick control center for what FilterTube is doing right now.",
+        title: "Main and Kids, with your rules",
+        body: "Native viewing and rule controls keep Main and Kids contexts separate. Channel, keyword, and supported content filters stay scoped to the chosen profile.",
       },
       {
-        title: "Friendly setup language",
-        body: "Copy stays plain with labels like Protected now, Kids profile active, or Paused until you re-enable.",
+        title: "Profiles and parent control",
+        body: "Profiles, PIN gates, protected time, imports, and backups are part of the native build. Child switching does not grant parent editing authority.",
       },
       {
-        title: "No dashboard clutter",
-        body: "The interface avoids admin-console clutter and never slips into security-dashboard language.",
+        id: "ipad",
+        title: "Room for iPad",
+        body: "The iPad layout gives browsing, rule editing, and family setup more space while keeping the same profile boundaries. Public distribution remains pending for both devices.",
       },
     ],
-    milestoneTitle: "What iPhone makes clear first",
-    milestoneIntro: "The iPhone story is clarity first, not feature volume.",
+    milestoneTitle: "iOS availability",
+    milestoneIntro:
+      "A native build in testing is different from an app users can install from a public listing.",
     milestones: [
-      "Reassure in under five seconds.",
-      "Respect safe areas, thumb reach, and mobile readability.",
-      "Keep advanced controls available without making the first screen dense.",
+      "iPhone and iPad public TestFlight and App Store access are pending.",
+      "Pair verified devices and send parent updates. Newer personal Auto-sync features are not yet available on iOS.",
+      "Follow this page for public installation links when testing and distribution are ready.",
     ],
     related: ["mobile", "ipados", "android"],
   },
@@ -521,7 +656,7 @@ export const detailPages = {
     slug: "ipados",
     icon: MonitorPlay,
     tone: "sky",
-    status: "Finalizing for TestFlight",
+    status: "Public access pending",
     eyebrow: "iPad app",
     navTitle: "iPadOS",
     routeSummary:
@@ -529,7 +664,7 @@ export const detailPages = {
     titleLead: "A wider FilterTube workspace for",
     titleDisplay: "iPad and home setup",
     description:
-      "The native iPad build is in final build and testing alignment alongside iPhone. An Apple Developer account issue on Apple's side is delaying TestFlight access for now.",
+      "The native iPad build is in final build and testing alignment alongside iPhone. Public TestFlight access is pending while developer enrollment is unresolved.",
     heroArtwork: {
       src: "/apps/app-store-transparent.png",
       alt: "FilterTube iPad app artwork",
@@ -594,86 +729,128 @@ export const detailPages = {
     slug: "android",
     icon: DeviceMobile,
     tone: "forest",
-    status: "Available on Google Play",
-    eyebrow: "Android app",
+    status: "Phone + tablet on Google Play",
+    eyebrow: "Android phone, tablet + TV",
     navTitle: "Android",
     routeSummary:
-      "The feature-rich Android custom viewing app is publicly available on Google Play.",
-    titleLead: "A flexible FilterTube companion for",
-    titleDisplay: "Android devices",
+      "The phone and tablet app is public. Android TV browsing and playback are in development; Fire TV support is planned.",
+    titleLead: "Your viewing, your rules on",
+    titleDisplay: "Android",
     description:
-      "The public Google Play app contains FilterTube's complete custom viewing experience, including rules, profiles, protected time, YouTube Main, YouTube Kids, and content-first ad-free playback. Users can install it from the listing or search Google Play for FilterTube. The direct APK is a separate, simpler build without this complete custom frontend.",
+      "Watch YouTube Main and Kids in FilterTube's custom Android app, with filters, profiles, parent controls, and protected time. Install the phone and tablet app from Google Play—no invitation or email needed. Android TV is separate development work, not part of the public phone listing.",
     heroArtwork: {
       src: "/apps/android.png",
       alt: "FilterTube Android app artwork",
     },
-    chips: ["Complete custom frontend", "Ad-free playback", "Google Play"],
+    chips: [
+      "Phone + tablet: available",
+      "Android TV: in development",
+      "Your rules",
+    ],
     primaryCta: {
-      label: "Open on Google Play",
+      label: "Install from Google Play",
       href: androidPlayStoreHref,
       external: true,
     },
     secondaryCta: {
-      label: "See the mobile overview",
-      href: "/mobile",
-      external: false,
+      label: "Watch the app demo",
+      href: appDemoVideoHref,
+      external: true,
     },
-    previewLabel: "Android intent",
-    previewTitle: "The complete custom app is available to everyone.",
+    appPreview: {
+      eyebrow: "Android app demo",
+      title: "See the custom viewing experience.",
+      body: "A look at FilterTube on phone and tablet. Newer development features below are labelled separately from the public release.",
+      embedHref: "https://www.youtube-nocookie.com/embed/SHvSICSMHL4?rel=0",
+      watchHref: appDemoVideoHref,
+    },
+    previewLabel: "Choose your Android device",
+    previewTitle: "Phone and tablet today. A TV experience in development.",
     previewRows: [
       {
-        label: "Access",
-        value: "Public listing",
-        detail: "Install from the listing or search Google Play for FilterTube.",
+        label: "Phone + tablet",
+        value: "Available",
+        detail:
+          "Install the complete custom app from Google Play. The direct APK is a separate, simpler build.",
       },
       {
-        label: "Profiles",
-        value: "Scoped",
-        detail: "Main and Kids contexts should remain clearly separated.",
+        label: "Android TV",
+        value: "In development",
+        detail:
+          "Main browsing, search, remote navigation, playback, and local history/resume are in testing. A public TV release is not available yet.",
       },
       {
-        label: "Current build",
-        value: "Custom frontend",
-        detail: "The feature-rich Main and Kids viewing experience is available on public Android installs.",
+        label: "Fire TV",
+        value: "Planned",
+        detail:
+          "Separate compatibility and distribution work; no public TV install is promised by the phone listing.",
       },
     ],
     featureCards: [
       {
-        title: "Complete custom viewing app",
-        body: "The Google Play build brings FilterTube rules, profiles, protected time, Main, Kids, and content-first playback into one feature-rich experience.",
+        title: "Main and Kids viewing",
+        body: "The public app brings YouTube Main and Kids into a custom viewing experience, with rules and profiles instead of a generic browser.",
       },
       {
-        title: "Readable under motion",
-        body: "The product stays legible even while scenic theming and motion are active.",
+        title: "Filter around your needs",
+        body: "Use channel and keyword rules, Blocklist or Whitelist, and supported category and content controls. Imports and backups help keep existing setups usable.",
       },
       {
-        title: "Available on real Android devices",
-        body: "Anyone can install the app from Google Play and use the complete experience across phones and tablets.",
+        title: "Family profiles and protected time",
+        body: "Separate profiles, PIN gates, and parent-managed viewing limits keep child access distinct from parent editing authority.",
+      },
+      {
+        id: "android-tv",
+        status: "In development",
+        title: "Android TV",
+        body: "Browse and search Main, navigate with a remote, play videos, and resume from local history in the TV test build. Full Kids and family controls, device sync, and public installation are still in development.",
+      },
+      {
+        status: "Availability varies by release",
+        title: "Native player and browsing",
+        body: "Android development work includes browsing and search, channels and playlists, playback queues, history, captions, and transcript controls. Exact availability depends on the installed build.",
+      },
+      {
+        id: "notes-auto-sync",
+        status: "In testing",
+        title: "Notes and Auto-sync",
+        body: "Keep notes with videos and choose what to sync between approved profile links on your verified devices. These updates are in testing and may not be in your Google Play version yet.",
+      },
+      {
+        status: "In testing",
+        title: "Music and local media",
+        body: "Music controls and a local-file library are in testing. Saving YouTube videos for offline viewing is a separate planned feature on Android.",
+      },
+      {
+        title: "Secure device updates",
+        body: "Pairing and parent updates use verified devices. New personal Auto-sync has its own consent and connection requirements; no shared-network presence automatically creates trust.",
       },
     ],
-    milestoneTitle: "Android priorities",
+    milestoneTitle: "What is available, and what comes next",
     milestoneIntro:
-      "Android balances flexibility with the same calm trust posture used elsewhere.",
+      "Choose the version available for your device. New features and TV access have separate release schedules.",
     milestones: [
-      "Welcome Android users from the public Google Play listing.",
-      "Keep the working release build stable across real phones and tablets.",
-      "Keep product-control language clear and direct.",
-      "Use serene visuals without losing Android’s practical character.",
+      "Phone and tablet: public on Google Play. Install directly—no invitation or email needed.",
+      "Newer Notes, Auto-sync, Music, and local-media updates are in testing; availability varies by release.",
+      "Android TV: Main browsing and playback are in testing. Full family controls, device sync, and public installation are not ready yet.",
+      "Fire TV compatibility is planned. TV Notes, Auto-sync, Music, offline saves, and local ML are not available yet.",
+      "The separate direct APK has a simpler frontend than the Google Play app.",
     ],
-    related: ["mobile", "ios", "ipados"],
+    related: ["extension", "ios", "kids"],
   },
   tv: {
     slug: "tv",
     icon: Television,
     tone: "sunset",
-    status: "Mapping",
+    status: "In development",
     eyebrow: "TV overview",
     navTitle: "TV overview",
-    routeSummary: "A living-room overview for Android TV and Amazon Fire TV.",
+    routeSummary:
+      "Android TV Main browsing and playback are in testing; Fire TV compatibility is planned.",
     titleLead: "Shared-screen calm for",
     titleDisplay: "TV environments",
     description:
-      "The TV family needs a different promise than mobile: shared-screen safety, playback trust, and household-friendly controls that make sense from across the room.",
+      "Android TV browsing, search, remote navigation, playback, and local history/resume are in testing. Full Kids and family controls, device sync, and public installation are still in development. Fire TV support is planned separately.",
     chips: ["Shared screens", "Playback trust", "Household safety"],
     primaryCta: {
       label: "Get FilterTube on desktop",
@@ -709,15 +886,15 @@ export const detailPages = {
     featureCards: [
       {
         title: "Built for shared attention",
-        body: "TV viewing stays focused on family-safe playback and the confidence of handing the remote to someone else.",
+        body: "Main browsing and playback are in testing. Full Kids and family controls are still in development.",
       },
       {
         title: "Less configuration in the foreground",
-        body: "Heavy editing belongs on phone or tablet. TV keeps playback state and quick overrides in front.",
+        body: "Remote navigation keeps Main browsing and playback usable from the sofa. Cross-device control and Accounts & Sync remain development work.",
       },
       {
         title: "A different mood from mobile",
-        body: "The mood turns more cinematic and spacious, with copy tuned for shared-screen trust.",
+        body: "TV layouts are designed for distance and directional input. Public installation is not available yet.",
       },
     ],
     milestoneTitle: "What TV needs to make clear",
@@ -734,15 +911,15 @@ export const detailPages = {
     slug: "android-tv",
     icon: Television,
     tone: "sky",
-    status: "Planned",
+    status: "In development",
     eyebrow: "Android TV app",
     navTitle: "Android TV",
     routeSummary:
-      "A living-room FilterTube companion for Android TV households.",
+      "Main browsing, search, remote navigation, playback, and local history/resume, currently in testing.",
     titleLead: "A FilterTube companion for",
     titleDisplay: "Android TV playback",
     description:
-      "Android TV brings FilterTube into the living room with clear protection status, shared-screen trust, and feedback that stays easy to read from the sofa.",
+      "Browse Main and play videos with remote navigation and local history/resume in the TV test build. Full Kids and family controls, device sync, and public installation are still in development.",
     chips: ["Distance readable", "Playback cues", "Household trust"],
     primaryCta: {
       label: "See the TV overview",
@@ -780,7 +957,7 @@ export const detailPages = {
       },
       {
         title: "Trust at glance",
-        body: "Parents and households can trust that the shared screen remains predictable.",
+        body: "Full Kids and parent controls are still in development and are not part of the current TV viewing experience.",
       },
       {
         title: "Still one brand",
@@ -809,7 +986,7 @@ export const detailPages = {
     titleLead: "A household-safe FilterTube layer for",
     titleDisplay: "Amazon Fire TV",
     description:
-      "Fire TV carries the same household-safe promise as Android TV with platform-specific framing: family-safe playback, visible protection cues, and a calm shared-screen experience.",
+      "Fire TV compatibility and public installation are planned. Android TV browsing and playback are in testing; full family controls are still in development.",
     chips: [
       "Family-safe playback",
       "Shared-screen confidence",
@@ -996,7 +1173,7 @@ export const detailPages = {
       },
       {
         title: "What is being explored",
-        body: "Semantic matching, rule suggestions, and later thumbnail checks belong to the research track, not the shipped claim.",
+        body: "Semantic matching, rule suggestions, and later thumbnail checks are being explored. They are not available as working filters yet.",
       },
       {
         title: "Why local matters",

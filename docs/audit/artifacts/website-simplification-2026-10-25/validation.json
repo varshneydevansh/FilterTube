@@ -1,0 +1,71 @@
+{
+  "date": "2026-10-25",
+  "scope": "Local website content refinement; not deployed or submitted.",
+  "source_start": "7a476d57",
+  "release_baseline": "885aa49",
+  "website_source_sha256": {
+    "website/DESIGN.md": "286861b80a0b53cc5f002fe68074a5c0d6fd5807d0c6552c07a013499e5b7861",
+    "website/app/downloads/page.js": "7fc173c6a19f7c539544537de891fdb152125c02a178b93ff52c5a6608f21878",
+    "website/app/globals.css": "0e9c60505298b5c3b795842874d61237a8ff1c63b4e689ac1658605337c267ee",
+    "website/app/layout.js": "669806183a3dee17e4e564f54493f4605572cde09793e392dcdab468f73561cf",
+    "website/app/page.js": "e4cc56170b2d8682730ef93a62914ebc9d2a694b2e4978bd500ed9de240fe82d",
+    "website/components/route-content.js": "316e61c88915705c3372392fc100aa6c60f0772244c44bcc4989ba896ae086d8",
+    "website/components/scenic-detail-page.js": "79b5b1b623bd0b8b0e2656222e3533eeaf64e0ff9018101eeeb97ae2c9ac15c8",
+    "website/components/site-footer.js": "c2349671226731dfd8096a802cf897d3b8675ea79cc7a4e35a5841a54c80cbb5",
+    "website/components/site-shell-data.js": "d2fc7d7a1fe3d708bfa8a1b7b7f71a296679a4b83e77f07c9eedae7007b8038c"
+  },
+  "build": {
+    "command": "npm run build -- --webpack",
+    "exit_code": 0,
+    "static_generation": "19/19 internal build entries"
+  },
+  "checks": {
+    "public_and_inventory": {
+      "passed": 35,
+      "failed": 0
+    },
+    "claim_register": {
+      "passed": 5,
+      "failed": 0
+    },
+    "release": {
+      "passed": 742,
+      "failed": 0
+    },
+    "smoke": {
+      "passed": 1482,
+      "failed": 0
+    },
+    "diff_check": "passed",
+    "served_routes": 14,
+    "internal_links_and_anchors": 46,
+    "not_found": 404
+  },
+  "preservation": {
+    "original_detailed_features": 13,
+    "current_detailed_features": 21,
+    "old_platform_routes": 9,
+    "old_routes_retained": true,
+    "new_extension_overview": true,
+    "original_hero_structure_classes_headlines_demos_retained": true,
+    "hero_status_copy_changed": true,
+    "platform_rail_android_first": true,
+    "scenic_palette_fonts_header_footer_art_retained": true,
+    "homepage_sections_before": 11,
+    "homepage_sections_after": 10
+  },
+  "review": {
+    "android_owner_reply_before_edits": true,
+    "tv_owner_reply_before_edits": true,
+    "public_claim_review": "No claim-blocking issue; summary focus indicator fixed.",
+    "llm_critique": "Advisory top-model text review; unsuitable additions rejected."
+  },
+  "limits": [
+    "Current Google Play and browser store feature rollout not independently reverified.",
+    "Native Android/TV/iOS runtime unchanged by website work.",
+    "Responsive matrix incomplete after browser-control timeouts; see responsive-check.json.",
+    "Existing legal-page heading/canonical inheritance and manual scenery playback controls were not changed.",
+    "Historical broad extension/native acceptance gates remain separate."
+  ],
+  "no_push_deploy_store_or_issue_post": true
+}

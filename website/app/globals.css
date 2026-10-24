@@ -186,6 +186,20 @@ button:focus-visible {
   box-shadow: 0 0 0 3px rgba(171, 68, 56, 0.14);
 }
 
+summary:focus-visible {
+  outline: 2px solid var(--color-ink);
+  outline-offset: 4px;
+}
+
+.ft-disclosure > summary {
+  touch-action: manipulation;
+}
+
+section[id],
+div[id] {
+  scroll-margin-top: 7rem;
+}
+
 .font-display {
   font-family: var(--font-display-family);
 }

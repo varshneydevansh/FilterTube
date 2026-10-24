@@ -1,0 +1,82 @@
+{
+  "server": "local production candidate, not deployed",
+  "routes": [
+    {
+      "route": "/",
+      "status": 200,
+      "h1": 1
+    },
+    {
+      "route": "/android",
+      "status": 200,
+      "h1": 1
+    },
+    {
+      "route": "/ios",
+      "status": 200,
+      "h1": 1
+    },
+    {
+      "route": "/extension",
+      "status": 200,
+      "h1": 1
+    },
+    {
+      "route": "/mobile",
+      "status": 200,
+      "h1": 1
+    },
+    {
+      "route": "/ipados",
+      "status": 200,
+      "h1": 1
+    },
+    {
+      "route": "/tv",
+      "status": 200,
+      "h1": 1
+    },
+    {
+      "route": "/android-tv",
+      "status": 200,
+      "h1": 1
+    },
+    {
+      "route": "/fire-tv",
+      "status": 200,
+      "h1": 1
+    },
+    {
+      "route": "/kids",
+      "status": 200,
+      "h1": 1
+    },
+    {
+      "route": "/ml-ai",
+      "status": 200,
+      "h1": 1
+    },
+    {
+      "route": "/downloads",
+      "status": 200,
+      "h1": 1
+    },
+    {
+      "route": "/privacy",
+      "status": 200,
+      "h1": 1
+    },
+    {
+      "route": "/terms",
+      "status": 200,
+      "h1": 0
+    }
+  ],
+  "unique_internal_links": 46,
+  "link_errors": [],
+  "not_found": 404,
+  "final_disclosure_labels": true,
+  "android_tv_anchor": true,
+  "ios_combined": true,
+  "inherited_terms_h1_missing": true
+}

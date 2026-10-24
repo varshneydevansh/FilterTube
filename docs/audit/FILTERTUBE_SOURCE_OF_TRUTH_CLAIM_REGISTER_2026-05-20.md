@@ -139,7 +139,7 @@ current location register records every present exact occurrence without
 converting ownership language into permission to change runtime behavior.
 
 ```text
-current exact wording occurrences: 101
+current exact wording occurrences: 102
 current broad behavior approval from wording: NO-GO
 runtime behavior changed by this register refresh: no
 ```
@@ -247,3 +247,5 @@ runtime behavior changed by this register refresh: no
 | `tests/runtime/reference-doc-claim-drift-current-behavior.test.mjs:212` | `audit-boundary` | Audit/test/workflow wording records evidence or a gate, not runtime permission or completed broad proof. |
 | `tests/runtime/stabilization-fix-order-current-behavior.test.mjs:121` | `audit-boundary` | Audit/test/workflow wording records evidence or a gate, not runtime permission or completed broad proof. |
 | `tests/runtime/test-lane-visible-safety-current-behavior.test.mjs:97` | `audit-boundary` | Audit/test/workflow wording records evidence or a gate, not runtime permission or completed broad proof. |
+
+| `docs/audit/artifacts/website-simplification-2026-10-25/post-release-commit-inventory.json:475` | `audit-boundary` | The post-release inventory records an existing audit-test filename; it grants no runtime ownership or behavior authority. |

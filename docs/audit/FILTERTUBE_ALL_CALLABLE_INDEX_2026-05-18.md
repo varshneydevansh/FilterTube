@@ -223,7 +223,7 @@ separate release/workflow review and is not silently counted as JavaScript here.
 
 ```text
 current tracked JS/JSX/MJS files: 134
-current repo-wide lexical callables: 9895
+current repo-wide lexical callables: 9894
 current complete per-callable semantic proofs: 0
 current callable behavior-change approval: NO-GO
 runtime behavior changed by inventory refresh: no
@@ -238,7 +238,7 @@ runtime behavior changed by inventory refresh: no
 | Generated/quarantined UI | 6 | 147 |
 | Vendor bundles | 3 | 279 |
 | Audit/test lane scripts | 25 | 517 |
-| Website routes/components/config | 26 | 126 |
+| Website routes/components/config | 26 | 125 |
 
 | File | Family | Lexical callables | Audit status |
 | --- | --- | ---: | --- |
@@ -354,7 +354,7 @@ runtime behavior changed by inventory refresh: no
 | `website/app/downloads/page.js` | Website routes/components/config | 2 | website counted |
 | `website/app/layout.js` | Website routes/components/config | 0 | website counted |
 | `website/app/not-found.js` | Website routes/components/config | 0 | website counted |
-| `website/app/page.js` | Website routes/components/config | 5 | website counted |
+| `website/app/page.js` | Website routes/components/config | 4 | website counted |
 | `website/app/privacy/page.js` | Website routes/components/config | 4 | website counted |
 | `website/app/robots.js` | Website routes/components/config | 0 | website counted |
 | `website/app/sitemap.js` | Website routes/components/config | 0 | website counted |
@@ -440,3 +440,7 @@ The unchanged lexical parser now measures 120 tracked files and 9,484 matches: 3
 ## Auto-sync source inventory - 2026-10-24
 
 The current lexical inventory above was remeasured after adding the opt-in Auto-sync modules. Older May snapshots remain historical. New module rows retain semantic proof incomplete; counts alone do not establish behavior, network delivery, or native parity.
+
+## Conservative website lexical refresh - 2026-10-25
+
+The existing broad lexical matcher was rerun after the authorized content and platform-grouping simplification. It accounts for 134 files and 9894 lexical callables. The comparison subset reports 200 broad matches and 119 build/website matches (81 difference); the parsers intentionally count different shapes. No complete semantic proof, source-classifier convergence, release approval, native acceptance or deployment claim follows. Original visual assets, hero markup, component ownership and route files are retained.

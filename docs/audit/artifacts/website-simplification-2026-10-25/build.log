@@ -1,0 +1,38 @@
+
+> filtertube-website@1.0.0 build
+> next build --webpack
+
+▲ Next.js 16.1.6 (webpack)
+- Experiments (use with caution):
+  · optimizePackageImports
+
+  Creating an optimized production build ...
+✓ Compiled successfully in 4.3s
+  Running TypeScript ...
+  Collecting page data using 9 workers ...
+  Generating static pages using 9 workers (0/19) ...
+  Generating static pages using 9 workers (4/19)
+  Generating static pages using 9 workers (9/19)
+  Generating static pages using 9 workers (14/19)
+✓ Generating static pages using 9 workers (19/19) in 293.2ms
+  Finalizing page optimization ...
+  Collecting build traces ...
+
+Route (app)
+┌ ○ /
+├ ○ /_not-found
+├ ● /[slug]
+│ ├ /extension
+│ ├ /mobile
+│ ├ /ios
+│ └ [+7 more paths]
+├ ○ /downloads
+├ ○ /icon.png
+├ ○ /privacy
+├ ○ /robots.txt
+├ ○ /sitemap.xml
+└ ○ /terms
+
+
+○  (Static)  prerendered as static content
+●  (SSG)     prerendered as static HTML (uses generateStaticParams)
