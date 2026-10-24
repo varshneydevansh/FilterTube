@@ -1162,12 +1162,14 @@
     function applyMainSurfaceData(currentMain, data, replace) {
         const current = safeObject(currentMain);
         const incoming = safeObject(data);
+        const incomingMode = normalizeString(incoming.mode);
         const incomingChannels = Array.isArray(incoming.channels) ? incoming.channels : incoming.blockedChannels;
         const incomingKeywords = Array.isArray(incoming.keywords) ? incoming.keywords : incoming.blockedKeywords;
         return normalizeMainProfileAliasFields({
             ...current,
             ...incoming,
-            mode: normalizeString(incoming.mode) === 'whitelist' ? 'whitelist' : (current.mode === 'whitelist' ? 'whitelist' : 'blocklist'),
+            mode: incomingMode === 'whitelist' || (replace && incomingMode === 'blocklist')
+                ? incomingMode : (current.mode === 'whitelist' ? 'whitelist' : 'blocklist'),
             channels: replace
                 ? safeArray(incomingChannels)
                 : mergeChannelLists(current.channels, incomingChannels),
@@ -1189,10 +1191,12 @@
     function applyKidsSurfaceData(currentKids, data, replace) {
         const current = safeObject(currentKids);
         const incoming = safeObject(data);
+        const incomingMode = normalizeString(incoming.mode);
         return {
             ...current,
             ...incoming,
-            mode: normalizeString(incoming.mode) === 'whitelist' ? 'whitelist' : (current.mode === 'whitelist' ? 'whitelist' : 'blocklist'),
+            mode: incomingMode === 'whitelist' || (replace && incomingMode === 'blocklist')
+                ? incomingMode : (current.mode === 'whitelist' ? 'whitelist' : 'blocklist'),
             strictMode: Object.prototype.hasOwnProperty.call(incoming, 'strictMode')
                 ? incoming.strictMode !== false
                 : current.strictMode !== false,
@@ -1267,6 +1271,17 @@
         throw new Error(`Unsupported scoped payload: ${scope}`);
     }
 
+    async function requirePersistedProfile(io, saved, profileId, expectedProfile) {
+        // FilterTubeIO resolves storage failures instead of throwing. A transport
+        // receipt must acknowledge persisted policy, never just a completed call.
+        if (!saved || saved.ok !== true) throw new Error('Synced profile could not be saved');
+        const persisted = safeObject(await io.loadProfilesV4());
+        const actualProfile = safeObject(persisted.profiles)[profileId];
+        if (!actualProfile || stableManagedNanahJson(actualProfile) !== stableManagedNanahJson(expectedProfile)) {
+            throw new Error('Synced profile could not be verified after saving');
+        }
+    }
+
     async function applyScopedPortablePayload(io, portable, { strategy = 'merge', targetProfileId = null, beforeProfileWrite = null } = {}) {
         if (typeof io.loadProfilesV4 !== 'function' || typeof io.saveProfilesV4 !== 'function') {
             throw new Error('Profile-scoped Nanah sync requires load/saveProfilesV4');
@@ -1305,10 +1320,11 @@
         }
 
         if (typeof beforeProfileWrite === 'function') await beforeProfileWrite(resolvedTargetProfileId);
-        await io.saveProfilesV4({
+        const saved = await io.saveProfilesV4({
             ...profilesV4,
             profiles
         });
+        await requirePersistedProfile(io, saved, resolvedTargetProfileId, profiles[resolvedTargetProfileId]);
 
         return {
             ok: true,
@@ -1740,7 +1756,12 @@
         const profile = safeObject(profiles[targetProfileId]);
         if (!profile || Object.keys(profile).length === 0 || profile.type !== 'child') return false;
         profiles[targetProfileId] = withManagedPolicyDecisionHistory(profile, envelope, decision, context);
-        await io.saveProfilesV4({ ...profilesV4, schemaVersion: 4, profiles });
+        const saved = await io.saveProfilesV4({ ...profilesV4, schemaVersion: 4, profiles });
+        try {
+            await requirePersistedProfile(io, saved, targetProfileId, profiles[targetProfileId]);
+        } catch (_) {
+            return false;
+        }
         return true;
     }
 
@@ -1878,11 +1899,12 @@
             root
         ), root, applyResult, context);
         profiles[root.targetProfileId] = updatedProfile;
-        await io.saveProfilesV4({
+        const saved = await io.saveProfilesV4({
             ...profilesV4,
             schemaVersion: 4,
             profiles
         });
+        await requirePersistedProfile(io, saved, root.targetProfileId, updatedProfile);
         return applyResult;
     }
 

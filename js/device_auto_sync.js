@@ -204,6 +204,7 @@
                 } catch (_) { return false; }
             },
             send: deps.sendPersonal, confirm: deps.confirmPersonal,
+            withReceiveLock: deps.withReceiveLock,
             notesRead: deps.notesRead, notesMerge: deps.notesMerge, applySettings: deps.applySettings,
             changed
         });

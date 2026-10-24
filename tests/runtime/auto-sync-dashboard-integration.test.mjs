@@ -8,10 +8,13 @@ const source=fs.readFileSync(new URL('../../js/tab-view.js',import.meta.url),'ut
 const section=(a,b)=>source.slice(source.indexOf(a),source.indexOf(b,source.indexOf(a)));
 function fixture({firefox=false}={}) {
  let root={activeProfileId:'Parent',profiles:{Parent:{type:'account',name:'Parent',settings:{enabled:true},main:{keywords:[]}},Child:{type:'child',parentProfileId:'Parent',main:{keywords:[{word:'retain-child'}]}}}};
- let writes=0, loads=0, beforeLoad=null, deps;
- const io={loadProfilesV4:async()=>{loads++;await beforeLoad?.(loads);return structuredClone(root)},saveProfilesV4:async value=>{root=structuredClone(value);writes++}};
+ let writes=0, loads=0, beforeLoad=null, deps, saveBehavior=null;const lockNames=[];
+ const io={loadProfilesV4:async()=>{loads++;await beforeLoad?.(loads);return structuredClone(root)},saveProfilesV4:async value=>{
+  if(saveBehavior)return saveBehavior(value);
+  root=structuredClone(value);writes++;return {ok:true};
+ }};
  const api={runtime:{id:'test',lastError:null,onMessage:{addListener(){}},getURL:p=>'chrome-extension://test/'+p,sendMessage:(r,done)=>done({ok:true})},storage:{local:{get:(keys,done)=>done({}),set:(data,done)=>done()},onChanged:{addListener(){}}}};
- const box={chrome:api,safeArray:value=>Array.isArray(value)?value:[],navigator:{locks:{request:(_n,_o,fn)=>fn()}},console,document:{getElementById:()=>({}),addEventListener(){}},
+ const box={chrome:api,safeArray:value=>Array.isArray(value)?value:[],navigator:{locks:{request:(name,_o,fn)=>{lockNames.push(name);return fn()}}},console,document:{getElementById:()=>({}),addEventListener(){}},
   loadNanahTrustedLinks:async()=>{},nanahTrustedLinks:[],NANAH_TRUSTED_LINKS_KEY:'ftNanahTrustedLinks',nanahStableDeviceId:'device-a',nanahSessionState:{},nanahClient:null,
   getNanahRole:()=> 'peer',getNanahRemoteLabel:()=> 'Other device',nanahFamilyDeviceSelectedIntent:null,
   refreshFilterTubeUiAfterNanahImport:async()=>{},runNanahManagedBackgroundSync:async()=>{},
@@ -25,7 +28,7 @@ function fixture({firefox=false}={}) {
   box.browser=api;
  }
  box.window=box;vm.createContext(box);vm.runInContext(section('    // Automatic updates reuse','    async function runNanahManagedOpenSync('),box);
- return {box,ready:()=>box.initializeDeviceAutoSync(),get deps(){return deps},get root(){return root},get writes(){return writes},intercept:fn=>{beforeLoad=fn}};
+ return {box,lockNames,ready:()=>box.initializeDeviceAutoSync(),get deps(){return deps},get root(){return root},get writes(){return writes},intercept:fn=>{beforeLoad=fn},saveUsing:fn=>{saveBehavior=fn}};
 }
 test('dashboard adapter supports callback Chrome and promise-only Firefox APIs',async()=>{
  for(const firefox of [false,true]){
@@ -34,6 +37,12 @@ test('dashboard adapter supports callback Chrome and promise-only Firefox APIs',
   assert.equal(context.unlocked,true);assert.equal(context.profilesV4.activeProfileId,'Parent');
   await f.deps.set({test:true});assert.deepEqual(await f.deps.get(['test']),{});
  }
+});
+test('dashboard receive transactions use a shared grant lock separate from config storage',async()=>{
+ const f=fixture();await f.ready();
+ assert.equal(await f.deps.withReceiveLock('grant-A',async()=>42),42);
+ await f.deps.withLock(async()=>{});await f.deps.withReceiveLock('grant-B',async()=>{});
+ assert.deepEqual(f.lockNames,['filtertube-personal-receive-v1:grant-A','filtertube-auto-sync-v1','filtertube-personal-receive-v1:grant-B']);
 });
 test('real dashboard settings writer refuses an edit made after runtime merge observed its base',async()=>{
  const f=fixture();await f.ready();const expected=protocol.snapshotSettings(f.root.profiles.Parent),remote=structuredClone(expected);remote.settings.enabled=false;
@@ -47,6 +56,14 @@ test('real dashboard writer preserves sibling and unrelated current profile fiel
  await f.deps.applySettings('Parent',remote,async()=>true,expected);
  assert.equal(f.writes,1);assert.equal(f.root.profiles.Parent.settings.enabled,false);assert.equal(f.root.profiles.Parent.futureLocalOnly.keep,true);
  assert.equal(f.root.profiles.Child.main.keywords[0].word,'retain-child');
+});
+test('real dashboard writer rejects failed writes and false successful writes before acknowledging application',async()=>{
+ for(const result of [{ok:false,error:'quota'},{ok:true}]){
+  const f=fixture();await f.ready();const expected=protocol.snapshotSettings(f.root.profiles.Parent),remote=structuredClone(expected);remote.settings.enabled=false;
+  f.saveUsing(async()=>result);
+  await assert.rejects(f.deps.applySettings('Parent',remote,async()=>true,expected),/could not be saved|could not be confirmed/);
+  assert.equal(f.root.profiles.Parent.settings.enabled,true);
+ }
 });
 test('real dashboard writer rechecks active profile and security around waits',async()=>{
  for(const change of [f=>{f.root.activeProfileId='Child'},f=>{f.root.profiles.Parent.security={profilePinVerifier:{changed:true}}}]){

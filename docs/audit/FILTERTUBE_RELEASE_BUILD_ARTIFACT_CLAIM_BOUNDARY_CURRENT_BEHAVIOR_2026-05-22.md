@@ -331,7 +331,7 @@ The build badge changed during the Notes dialog fix. This source fingerprint is 
 
 | `build.js` | 861 | 33225 | `a198cc1d0bf98e410deb8f66ced0e56a046bbf987a0a5b878e1278577622fb2e` |
 | `package.json` | 86 | 4580 | `c9cb2c3c4fea302fa3946f462dbfbb474381a78946ca59adb653814d06a4de51` |
-| `README.md` | 456 | 28669 | `e14c02036b3039e16101cc58cdf911deb22c59ff87da9d25843027f0cb49b8f2` |
+| `README.md` | 456 | 28669 | `858a799af64cbf03f6a04581b23950f4b04fa4688d52276e841c43156fe79814` |
 | `CHANGELOG.md` | 938 | 75511 | `e57906dca95911874ef251aa45d8c3a76df00df576b36277d9c0e9b9654c3036` |
 | `manifest.json` | 162 | 5630 | `ba155d12e591c0306620bc57c59ad7378c5313084314a748414b5b1d39879d9d` |
 | `manifest.chrome.json` | 162 | 5630 | `ba155d12e591c0306620bc57c59ad7378c5313084314a748414b5b1d39879d9d` |

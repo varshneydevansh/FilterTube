@@ -23,7 +23,7 @@ async function fixture() {
     crypto: webcrypto, TextEncoder, Uint8Array, atob, btoa,
     FilterTubeIO: { exportV3: async () => ({}), importV3: async () => ({}),
       loadProfilesV4: async () => { await readHook?.(); return profiles; },
-      saveProfilesV4: async next => { writes.push(clone(next)); profiles = next; } }
+      saveProfilesV4: async next => { writes.push(clone(next)); profiles = next; return { ok: true }; } }
   };
   sandbox.window = sandbox;
   vm.runInNewContext(adapterSource, sandbox);

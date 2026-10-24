@@ -17,7 +17,7 @@ async function fixture() {
     } };
     const box = { crypto: crypto.webcrypto, TextEncoder, TextDecoder, atob, btoa,
         FilterTubeIO: { exportV3: async () => ({}), importV3: async () => ({}),
-            loadProfilesV4: async () => clone(stored), saveProfilesV4: async value => { stored = clone(value); } } };
+            loadProfilesV4: async () => clone(stored), saveProfilesV4: async value => { stored = clone(value); return { ok: true }; } } };
     box.window = box;
     vm.createContext(box);
     for (const file of ['nanah_sync_adapter', 'nanah_managed_live_policy']) {

@@ -25,7 +25,7 @@ function fixture({ active = 'child-a', target = 'child-a', parentApproval = true
   const io = {
     exportV3: async () => ({}), importV3: async () => { throw new Error('unexpected import'); },
     loadProfilesV4: async () => stored,
-    saveProfilesV4: async next => { stored = next; calls.writes += 1; }
+    saveProfilesV4: async next => { stored = next; calls.writes += 1; return { ok: true }; }
   };
   const box = { console, FilterTubeIO: io, Date, JSON, Math, TextEncoder, setTimeout, clearTimeout };
   box.window = box;

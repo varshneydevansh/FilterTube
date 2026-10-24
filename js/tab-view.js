@@ -23132,6 +23132,8 @@ document.addEventListener('DOMContentLoaded', async () => {
         };
         deviceAutoSync = window.FilterTubeDeviceAutoSync.create({
             get, set, withLock, queue, context, session,
+            withReceiveLock: (grantId, work) => navigator.locks.request('filtertube-personal-receive-v1:' + grantId,
+                { mode: 'exclusive' }, work),
             operation: (grant, current) => nanahManagedLivePolicy.createSendOperation({
                 source: { profileId: grant.binding.localPolicyProfileId, profile: current.profilesV4.profiles[grant.binding.localPolicyProfileId], sourceKind: 'auto_sync' },
                 actor: { profileId: grant.binding.sourceProfileId, profileType: 'account' }, surface: 'main'
@@ -23193,7 +23195,16 @@ document.addEventListener('DOMContentLoaded', async () => {
                         || JSON.stringify(window.FilterTubePersonalSync.snapshotSettings(latest.profiles[profileId])) !== JSON.stringify(current)) {
                         throw Error('Settings changed here. Review sync again.');
                     }
-                    await window.FilterTubeIO.saveProfilesV4({ ...latest, profiles: { ...latest.profiles, [profileId]: window.FilterTubePersonalSync.applySettings(latest.profiles[profileId], snapshot) } });
+                    const applied = window.FilterTubePersonalSync.applySettings(latest.profiles[profileId], snapshot);
+                    const saved = await window.FilterTubeIO.saveProfilesV4({ ...latest, profiles: { ...latest.profiles, [profileId]: applied } });
+                    if (saved?.ok !== true) throw Error('Settings could not be saved. The update remains unconfirmed.');
+                    const persisted = await window.FilterTubeIO.loadProfilesV4();
+                    if (window.FilterTubeDeviceAutoSync.security(persisted, profileId) !== authority
+                        || JSON.stringify(window.FilterTubePersonalSync.snapshotSettings(persisted.profiles[profileId]))
+                            !== JSON.stringify(window.FilterTubePersonalSync.snapshotSettings(applied))
+                        || !await beforeCheck()) {
+                        throw Error('Settings could not be confirmed. Review sync again.');
+                    }
                 });
                 await refreshFilterTubeUiAfterNanahImport();
             },

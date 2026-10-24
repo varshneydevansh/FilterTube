@@ -29,7 +29,7 @@ function fixture() {
         };
         const get = async keys => Object.fromEntries(keys.filter(key => key in state.data).map(key => [key, copy(state.data[key])]));
         const set = async update => Object.assign(state.data, copy(update));
-        let queueLock = Promise.resolve(), configLock = Promise.resolve();
+        let queueLock = Promise.resolve(), configLock = Promise.resolve(), receiveLock = Promise.resolve();
         state.queue = queueAPI.create({ get, set, now: () => clock, retryMs: 100, withLock: work => {
             const result = queueLock.then(work); queueLock = result.catch(() => {}); return result;
         } });
@@ -48,6 +48,7 @@ function fixture() {
                 return !!row && row.grant.areas.includes('notes') && row.grant.localProfileId === profileId && await authorize(row);
             } });
         state.start = () => runtime.create({ crypto: webcrypto, protocol,
+            withReceiveLock: (_id, work) => { const result = receiveLock.then(work); receiveLock = result.catch(() => {}); return result; },
             context: async () => ({ profilesV4: copy(state.profilesV4), deviceId: 'device-' + name, links: copy(state.links), unlocked: state.unlocked }),
             session: () => ({ ...state.session }), security, authorize, queue: state.queue,
             read: async () => copy(state.personal), mutate: fn => {

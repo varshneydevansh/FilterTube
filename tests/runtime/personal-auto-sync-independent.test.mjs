@@ -19,7 +19,7 @@ function network() {
                 linkType: 'peer_link', localRole: 'peer', remoteRole: 'peer', remoteDeviceId: 'device-' + remote }],
             session: { client: {}, ready: true, role: 'peer', remoteRole: 'peer', autoSyncVersion: 1,
                 remoteDeviceId: 'device-' + remote, remoteProfileId: 'profile-' + remote, remoteProfileType: 'account' } };
-        let lock = Promise.resolve(), mutation = Promise.resolve();
+        let lock = Promise.resolve(), mutation = Promise.resolve(), receiveLock = Promise.resolve();
         state.queue = queueAPI.create({ get: async keys => Object.fromEntries(keys.map(key => [key, state.data[key]])),
             set: async values => Object.assign(state.data, clone(values)), now: () => 10000,
             withLock: work => { const result = lock.then(work); lock = result.catch(() => {}); return result; } });
@@ -30,6 +30,7 @@ function network() {
         };
         state.profile = () => state.root.profiles[id];
         state.start = () => runtime.create({ protocol, crypto: webcrypto, queue: state.queue,
+            withReceiveLock: (_id, work) => { const result = receiveLock.then(work); receiveLock = result.catch(() => {}); return result; },
             context: async () => { await state.contextHook?.(); return { profilesV4: clone(state.root), deviceId: state.deviceId, unlocked: state.unlocked, links: clone(state.links) }; },
             session: () => ({ ...state.session }), security,
             read: async () => clone(state.rows),

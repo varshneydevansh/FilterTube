@@ -156,6 +156,9 @@ const FILTER_LOGIC_AUDIT_PROOF_TESTS = Object.freeze([
   'tests/runtime/filter-logic-rule-path-semantic-register-current-behavior.test.mjs'
 ]);
 const AUTO_SYNC_TESTS = Object.freeze([
+  'tests/runtime/auto-sync-two-endpoint.test.mjs',
+  'tests/runtime/managed-auto-sync-two-endpoint.test.mjs',
+  'tests/runtime/personal-auto-sync-adversarial.test.mjs',
   'tests/runtime/nanah-pairing-ui.test.mjs',
   'tests/runtime/auto-sync-queue.test.mjs',
   'tests/runtime/auto-sync-wakeup.test.mjs',

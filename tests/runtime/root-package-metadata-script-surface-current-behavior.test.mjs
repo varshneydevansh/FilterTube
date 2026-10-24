@@ -30,7 +30,7 @@ const rootMetadataRows = [
     "README.md",
     456,
     28669,
-    "e14c02036b3039e16101cc58cdf911deb22c59ff87da9d25843027f0cb49b8f2"
+    "858a799af64cbf03f6a04581b23950f4b04fa4688d52276e841c43156fe79814"
   ],
   [
     "channel-identity-watch-mix-collab-recovery-plan.md",

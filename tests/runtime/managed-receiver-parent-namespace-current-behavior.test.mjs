@@ -21,7 +21,7 @@ async function fixture() {
     crypto: webcrypto, TextEncoder, Uint8Array, atob, btoa,
     FilterTubeIO: {
       loadProfilesV4: async () => stored,
-      saveProfilesV4: async next => { stored = next; writes += 1; },
+      saveProfilesV4: async next => { stored = next; writes += 1; return { ok: true }; },
       exportV3: async () => ({}), importV3: async () => ({ ok: true })
     }
   };

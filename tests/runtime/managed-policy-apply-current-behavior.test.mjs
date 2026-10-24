@@ -100,7 +100,7 @@ function createAdapterHarness(initialProfiles = createProfilesFixture()) {
     saveProfilesV4: async (next) => {
       saveCount += 1;
       profiles = next;
-      return true;
+      return { ok: true };
     },
     exportV3: async ({ scope }) => ({ scope }),
     importV3: async (portable, options) => ({ ok: true, portable, options })

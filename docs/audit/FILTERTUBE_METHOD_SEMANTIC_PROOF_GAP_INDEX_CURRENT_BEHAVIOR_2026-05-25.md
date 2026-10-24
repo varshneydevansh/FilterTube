@@ -960,7 +960,7 @@ separate release/workflow review and is not silently counted as JavaScript here.
 
 ```text
 current tracked JS/JSX/MJS files: 133
-current repo-wide lexical callables: 9851
+current repo-wide lexical callables: 9856
 current complete per-callable semantic proofs: 0
 current callable behavior-change approval: NO-GO
 runtime behavior changed by inventory refresh: no
@@ -971,7 +971,7 @@ runtime behavior changed by inventory refresh: no
 | Build/sync scripts | 5 | 75 |
 | Hot page/background runtime | 12 | 3907 |
 | Content helper runtime | 24 | 814 |
-| UI/settings runtime | 32 | 3986 |
+| UI/settings runtime | 32 | 3991 |
 | Generated/quarantined UI | 6 | 147 |
 | Vendor bundles | 3 | 279 |
 | Audit/test lane scripts | 25 | 517 |
@@ -989,7 +989,7 @@ runtime behavior changed by inventory refresh: no
 | `js/device_auto_sync.js` | UI/settings runtime | 27 | `semantic proof incomplete` |
 | `js/device_auto_sync_ui.js` | UI/settings runtime | 25 | `semantic proof incomplete` |
 | `js/managed_auto_sync.js` | UI/settings runtime | 16 | `semantic proof incomplete` |
-| `js/personal_auto_sync_runtime.js` | UI/settings runtime | 63 | `semantic proof incomplete` |
+| `js/personal_auto_sync_runtime.js` | UI/settings runtime | 67 | `semantic proof incomplete` |
 | `js/personal_sync.js` | UI/settings runtime | 54 | `semantic proof incomplete` |
 | `js/nanah_pairing_ui.js` | UI/settings runtime | 6 | `semantic proof incomplete` |
 | `build.js` | Build/sync scripts | 68 | `semantic proof incomplete` | Lexical accounting only; no complete per-callable closure claimed. |
@@ -1032,7 +1032,7 @@ runtime behavior changed by inventory refresh: no
 | `js/nanah_managed_open_sync.js` | UI/settings runtime | 35 | `semantic proof incomplete` | Lexical accounting only; no complete per-callable closure claimed. |
 | `js/nanah_qr_scanner.js` | UI/settings runtime | 15 | `semantic proof incomplete` | Lexical accounting only; no complete per-callable closure claimed. |
 | `js/nanah_storage_lock.js` | UI/settings runtime | 3 | `semantic proof incomplete` | Lexical accounting only; no complete per-callable closure claimed. |
-| `js/nanah_sync_adapter.js` | UI/settings runtime | 207 | `semantic proof incomplete` | Lexical accounting only; no complete per-callable closure claimed. |
+| `js/nanah_sync_adapter.js` | UI/settings runtime | 208 | `semantic proof incomplete` | Lexical accounting only; no complete per-callable closure claimed. |
 | `js/popup.js` | UI/settings runtime | 170 | `semantic proof incomplete` | Lexical accounting only; no complete per-callable closure claimed. |
 | `js/render_engine.js` | UI/settings runtime | 171 | `semantic proof incomplete` | Lexical accounting only; no complete per-callable closure claimed. |
 | `js/rule_list_import_reports.js` | UI/settings runtime | 38 | `semantic proof incomplete` | Lexical accounting only; no complete per-callable closure claimed. |

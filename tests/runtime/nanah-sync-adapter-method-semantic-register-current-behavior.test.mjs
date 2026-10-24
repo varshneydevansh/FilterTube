@@ -348,7 +348,7 @@ test('Nanah sync adapter source still proves current payload and apply boundarie
     saveProfilesV4: async (next) => {
       savedProfiles = next;
       profiles = next;
-      return true;
+      return { ok: true };
     },
     exportV3: async ({ scope }) => ({ version: 'v3', meta: { exportType: scope }, exportedScope: scope }),
     importV3: async (portable, options) => ({ ok: true, portable, options })

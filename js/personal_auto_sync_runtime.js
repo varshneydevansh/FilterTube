@@ -295,9 +295,11 @@
                 reason: message.status === 'needs_review' ? 'needs_review' : message.status === 'rejected' ? 'peer_kept_local' : '' });
             changed(); return true;
         }
-        async function apply(row, message, session, resolution = null) {
+        async function apply(row, message, session, resolution = null, expectedRevision = null) {
             const verified = await codec.verify(row.grant, message, { lastSequence: 0 });
-            if (!await current(row)) fail('Auto-sync permission changed.');
+            row = await current(row);
+            if (!row) fail('Auto-sync permission changed.');
+            if (expectedRevision !== null && receiveRevision(row) !== expectedRevision) fail('This update changed while you reviewed it. Review the latest settings.');
             if (row.confirmed !== true) {
                 await update(row, value => ({ ...value, confirmed: true }));
                 row = await rowFor(row.grant.localGrantId);
@@ -306,31 +308,54 @@
             const prior = (row.received || []).find(value => value.sequence === verified.sequence && value.messageId === verified.messageId && value.digest === verified.digest);
             if (prior) { await acknowledge(row, message, prior.status, session); return true; }
             if (verified.sequence <= row.lastSequence) fail('This Auto-sync update is stale.');
+            // The grant can remain identical while another dashboard applies a
+            // newer update. Authorization alone must not revive an older merge.
+            const revision = receiveRevision(row);
+            const unchanged = async () => {
+                const latest = await current(row);
+                return !!latest && receiveRevision(latest) === revision;
+            };
+            const checkRevision = value => {
+                if (receiveRevision(value) !== revision) fail('A newer Auto-sync update needs review.');
+            };
             let merged;
             if (verified.payload.settings) {
                 const context = await accountContext();
+                if (!await unchanged()) fail('A newer Auto-sync update needs review.');
                 const expectedLocalSnapshot = protocol.snapshotSettings(context.profile);
                 merged = protocol.mergeSettings(row.lastRemoteSettings || empty(), expectedLocalSnapshot, verified.payload.settings);
                 if (!merged.ok && !resolution) {
-                    await update(row, value => ({ ...value, conflict: { message, fields: merged.conflicts } }));
+                    await update(row, value => { checkRevision(value); return { ...value, conflict: { message, fields: merged.conflicts } }; });
                     await acknowledge(row, message, 'needs_review', session); return true;
                 }
                 if (resolution === 'remote') merged = { ok: true, snapshot: verified.payload.settings };
                 if (resolution !== 'local') await deps.applySettings(row.grant.localProfileId, merged.snapshot,
-                    () => current(row).then(Boolean), expectedLocalSnapshot);
+                    unchanged, expectedLocalSnapshot);
             }
             if (verified.payload.notes) {
-                if (!await current(row)) fail('Auto-sync permission changed.');
+                if (!await unchanged()) fail('Auto-sync permission or update changed.');
                 const local = await deps.notesRead(row.grant.localProfileId, row.grant.localGrantId);
                 const entries = protocol.mergeNotes(local.entries, verified.payload.notes, row.grant);
+                if (!await unchanged()) fail('Auto-sync permission or update changed.');
                 await deps.notesMerge(row.grant.localProfileId,
                     { format: 'filtertube.saved-video-notes', version: 1, entries }, row.grant.localGrantId);
             }
             const status = resolution === 'local' ? 'rejected' : 'applied';
-            await update(row, value => ({ ...value, lastSequence: verified.sequence,
+            await update(row, value => { checkRevision(value); return { ...value, lastSequence: verified.sequence,
                 lastRemoteSettings: verified.payload.settings || value.lastRemoteSettings,
-                received: [...(value.received || []), { sequence: verified.sequence, messageId: verified.messageId, digest: verified.digest, status }].slice(-32), conflict: null }));
+                received: [...(value.received || []), { sequence: verified.sequence, messageId: verified.messageId, digest: verified.digest, status }].slice(-32), conflict: null }; });
             await acknowledge(row, message, status, session); return true;
+        }
+        function receiveRevision(row) {
+            return JSON.stringify([row.lastSequence, row.received || [], row.conflict || null]);
+        }
+        async function receiveTransaction(row, message, session, resolution = null, expectedRevision = null) {
+            if (typeof deps.withReceiveLock !== 'function') fail('Secure Auto-sync receive locking is unavailable.');
+            return deps.withReceiveLock(row.grant.localGrantId, async () => {
+                const latest = await current(row);
+                if (!latest || !sameSession(session, deps.session()) || !live(deps.session(), latest.grant)) fail('The Auto-sync connection or permission changed.');
+                return apply(latest, message, session, resolution, expectedRevision);
+            });
         }
         async function receive(message) {
             if (![OFFER, ACCEPT, ACK, protocol.MESSAGE_SCHEMA].includes(message?.schema)) return false;
@@ -347,7 +372,7 @@
             if (message.schema === ACK) return receipt(message, row, session);
             const token = row.grant.localGrantId;
             if (receiving.has(token)) fail('An Auto-sync update is already being checked.');
-            receiving.add(token); try { return await apply(row, message, session); } finally { receiving.delete(token); }
+            receiving.add(token); try { return await receiveTransaction(row, message, session); } finally { receiving.delete(token); }
         }
         async function outgoing(row) {
             const context = await accountContext(), payload = {};
@@ -428,7 +453,14 @@
             if (!row?.conflict || !await current(row) || !live(session, row.grant)) fail('Reconnect the verified device to resolve this update.');
             if (!await deps.confirm({ title: 'Resolve these settings?', message: choice === 'remote' ? 'Use the other device’s settings for these changes.' : 'Keep this device’s settings and decline the conflicting changes.',
                 details: row.conflict.fields })) return false;
-            return apply(row, row.conflict.message, session, choice);
+            const latest = await current(row);
+            if (!latest || receiveRevision(latest) !== receiveRevision(row)
+                || !sameSession(session, deps.session()) || !live(deps.session(), row.grant)) fail('This update changed while you reviewed it. Review the latest settings.');
+            const token = row.grant.localGrantId;
+            if (receiving.has(token)) fail('An Auto-sync update is already being checked.');
+            receiving.add(token);
+            try { return await receiveTransaction(latest, latest.conflict.message, session, choice, receiveRevision(latest)); }
+            finally { receiving.delete(token); }
         }
         async function view() {
             const state = await deps.queue.read(), result = [];
