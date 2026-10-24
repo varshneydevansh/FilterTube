@@ -377,6 +377,7 @@ const MANAGED_TIME_LIMIT_OVERLAY_ID = 'filtertube-managed-timeout-overlay';
 const MANAGED_TIME_LIMIT_STATUS_ID = 'filtertube-managed-time-status';
 const MANAGED_OVERLAY_STYLE_ID = 'filtertube-managed-overlay-styles';
 const MANAGED_TIME_LIMIT_HEARTBEAT_MS = 5000;
+const MANAGED_TIME_LIMIT_RESPONSE_TIMEOUT_MS = 7000;
 const MANAGED_TIME_LIMIT_REVALIDATION_EVENTS = [
     'yt-navigate-finish',
     'yt-page-data-updated',
@@ -391,6 +392,7 @@ let managedViewingRouteGateHandler = null;
 let managedTimeLimitHeartbeatTimer = 0;
 let managedTimeLimitHeartbeatInFlight = false;
 let managedTimeLimitPendingHeartbeat = false;
+let managedTimeLimitHeartbeatRequest = null;
 let managedTimeLimitListenersAttached = false;
 let managedTimeLimitRouteHandler = null;
 let managedTimeLimitRuntimeGeneration = 0;
@@ -1645,6 +1647,7 @@ function releaseManagedTimeLimitRuntime() {
     managedTimeLimitRouteHandler = null;
     managedTimeLimitHeartbeatInFlight = false;
     managedTimeLimitPendingHeartbeat = false;
+    clearManagedTimeLimitHeartbeatRequest();
     removeManagedTimeLimitStatus();
     removeManagedTimeoutOverlay();
 }
@@ -1678,6 +1681,38 @@ function ensureManagedTimeLimitRuntimeListeners() {
     }
 }
 
+function clearManagedTimeLimitHeartbeatRequest() {
+    if (managedTimeLimitHeartbeatRequest) clearTimeout(managedTimeLimitHeartbeatRequest.timer);
+    managedTimeLimitHeartbeatRequest = null;
+    managedTimeLimitHeartbeatInFlight = false;
+    managedTimeLimitPendingHeartbeat = false;
+}
+
+function managedTimeLimitResponseMatches(request, response, policy, route) {
+    const at = Date.now();
+    if (!Number.isFinite(at) || at < request.startedAt || at - request.startedAt >= MANAGED_TIME_LIMIT_RESPONSE_TIMEOUT_MS
+        || response?.ok !== true || response.enforced !== true || response.requestPolicyMatched !== true
+        || response.policySource !== 'compiled_active_profile' || response.profileId !== policy.profileId
+        || response.surface !== route.surface || response.policyRevision !== policy.policyRevision
+        || response.policyHash !== policy.policyHash || typeof response.timedOut !== 'boolean'
+        || !Number.isFinite(response.remainingSeconds) || response.remainingSeconds < 0
+        || response.timedOut !== (response.remainingSeconds === 0)) return false;
+    // An expired policy may deny access without a daily-usage row. Only a
+    // current same-day budget response may remove an existing exhausted lock.
+    if (response.timedOut && response.reason === 'expired_policy_requires_parent_revalidation'
+        && Number.isFinite(policy.validUntil) && at > policy.validUntil) return true;
+    const formatter = new Intl.DateTimeFormat('en-US', {
+        timeZone: policy.timezone, year: 'numeric', month: '2-digit', day: '2-digit'
+    });
+    const day = value => {
+        const parts = formatter.formatToParts(new Date(value));
+        return ['year', 'month', 'day'].map(type => parts.find(part => part.type === type)?.value).join('-');
+    };
+    return day(request.startedAt) === day(at) && response.dateKey === day(at)
+        && (policy.validFrom == null || at >= policy.validFrom)
+        && (policy.validUntil == null || at <= policy.validUntil);
+}
+
 function sendManagedTimeLimitHeartbeat() {
     const policy = getManagedTimeLimitPolicy(currentSettings);
     const route = classifyManagedViewingRoute(location.href);
@@ -1694,9 +1729,40 @@ function sendManagedTimeLimitHeartbeat() {
     managedTimeLimitHeartbeatInFlight = true;
     managedTimeLimitPendingHeartbeat = false;
     const heartbeatGeneration = managedTimeLimitRuntimeGeneration;
-
+    const playbackPermitRequest = managedContentPlaybackPermit.capture(currentSettings, policy, location.href);
+    const transaction = { timer: 0 };
+    managedTimeLimitHeartbeatRequest = transaction;
+    const finish = (response, err = null) => {
+        // A timed-out or replaced request must not finish a newer heartbeat.
+        if (managedTimeLimitHeartbeatRequest !== transaction) return;
+        clearTimeout(transaction.timer);
+        managedTimeLimitHeartbeatRequest = null;
+        managedTimeLimitHeartbeatInFlight = false;
+        if (heartbeatGeneration === managedTimeLimitRuntimeGeneration && managedContentPlaybackPermit.current(playbackPermitRequest)) {
+            let valid = false;
+            try { valid = !err && managedTimeLimitResponseMatches(playbackPermitRequest, response, policy, route); } catch (_) {}
+            if (!valid) {
+                managedContentPlaybackPermit.clear(err ? 'managed_time_heartbeat_error' : 'managed_time_authority_changed');
+                removeManagedTimeLimitStatus();
+                // Unknown authority is never a reason to unlock an exhausted
+                // profile. A fresh policy response or authorized settings change
+                // must explicitly recover it.
+            } else if (response.timedOut) {
+                managedContentPlaybackPermit.clear('managed_time_budget_exhausted');
+                showManagedTimeoutOverlay(response);
+            } else {
+                managedContentPlaybackPermit.publish(playbackPermitRequest, response);
+                removeManagedTimeoutOverlay();
+                showManagedTimeLimitStatus(response);
+            }
+        }
+        if (managedTimeLimitPendingHeartbeat) {
+            managedTimeLimitPendingHeartbeat = false;
+            sendManagedTimeLimitHeartbeat();
+        }
+    };
+    transaction.timer = setTimeout(() => finish(null, { message: 'managed_time_heartbeat_timeout' }), MANAGED_TIME_LIMIT_RESPONSE_TIMEOUT_MS);
     try {
-        const playbackPermitRequest = managedContentPlaybackPermit.capture(currentSettings, policy, location.href);
         browserAPI_BRIDGE.runtime.sendMessage({
             action: 'FilterTube_ManagedTimeLimitHeartbeat',
             profileId: policy.profileId,
@@ -1705,33 +1771,9 @@ function sendManagedTimeLimitHeartbeat() {
             visible: document.visibilityState === 'visible',
             focused: isManagedTimeLimitTabActive(),
             playing: isManagedTimeLimitPlaybackActive()
-        }, response => {
-            managedTimeLimitHeartbeatInFlight = false;
-            if (heartbeatGeneration !== managedTimeLimitRuntimeGeneration) return;
-            if (!managedContentPlaybackPermit.current(playbackPermitRequest)) return;
-            const err = browserAPI_BRIDGE.runtime?.lastError;
-            if (err) managedContentPlaybackPermit.clear('managed_time_heartbeat_error');
-            else managedContentPlaybackPermit.publish(playbackPermitRequest, response);
-            if (!err && response?.enforced === true && response.timedOut === true) {
-                showManagedTimeoutOverlay(response);
-            } else if (!err && response?.enforced === true && response?.timedOut !== true) {
-                removeManagedTimeoutOverlay();
-                showManagedTimeLimitStatus(response);
-            } else if (!err && response?.timedOut !== true) {
-                removeManagedTimeLimitStatus();
-                removeManagedTimeoutOverlay();
-            } else {
-                removeManagedTimeLimitStatus();
-                removeManagedTimeoutOverlay();
-            }
-            if (managedTimeLimitPendingHeartbeat) {
-                managedTimeLimitPendingHeartbeat = false;
-                sendManagedTimeLimitHeartbeat();
-            }
-        });
+        }, response => finish(response, browserAPI_BRIDGE.runtime?.lastError));
     } catch (e) {
-        managedTimeLimitHeartbeatInFlight = false;
-        managedContentPlaybackPermit.clear('managed_time_heartbeat_error');
+        finish(null, e);
     }
 }
 
@@ -1746,6 +1788,7 @@ function applyManagedTimeLimitRuntime(settings, options = {}) {
 
         const policyKey = `${policy.profileId}:${policy.policyRevision}:${policy.policyHash}`;
         if (policyKey !== managedTimeLimitPolicyKey) {
+            clearManagedTimeLimitHeartbeatRequest();
             managedTimeLimitRuntimeGeneration += 1;
             managedTimeLimitPolicyKey = policyKey;
         }

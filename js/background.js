@@ -2193,6 +2193,50 @@ const MANAGED_TIME_PARENT_REQUEST_COOLDOWN_MS = 5 * 60 * 1000;
 const MANAGED_TIME_HEARTBEAT_STALE_MS = 8000;
 const MANAGED_TIME_MAX_HEARTBEAT_DELTA_SECONDS = 10;
 const managedTimeActiveScopes = new Map();
+const managedTimeUnconfirmedScopes = new Map();
+let managedTimeAccountingGeneration = 0;
+let managedTimeUsageTransaction = Promise.resolve();
+
+// All profile/day rows share one storage value. Keep its complete read/modify/
+// write transaction serial, including failures, rather than locking each row.
+function managedTimeStorage(method, value) {
+    return new Promise((resolve, reject) => {
+        let settled = false;
+        const finish = (result, error) => {
+            if (settled) return;
+            settled = true;
+            if (error) reject(new Error(error.message || String(error)));
+            else resolve(result);
+        };
+        try {
+            const pending = IS_FIREFOX
+                ? browserAPI.storage.local[method](value)
+                : browserAPI.storage.local[method](value, result => finish(result, browserAPI.runtime?.lastError));
+            if (pending && typeof pending.then === 'function') pending.then(result => finish(result), error => finish(null, error));
+        } catch (error) { finish(null, error); }
+    });
+}
+
+function managedTimePolicyStillCurrent(data, profileId, policy) {
+    const root = data?.[FT_PROFILES_V4_KEY];
+    if (!isValidProfilesV4(root) || normalizeString(root.activeProfileId) !== profileId) return false;
+    const profile = safeObject(safeObject(root.profiles)[profileId]);
+    const current = normalizeManagedTimeLimitPolicy(safeObject(profile.settings).timeLimitPolicy);
+    return current?.enabled === true && JSON.stringify(current) === JSON.stringify(policy);
+}
+
+function invalidateManagedTimeAccountingForProfileChange(change) {
+    if (!change) return;
+    const identity = root => {
+        const profileId = normalizeString(root?.activeProfileId);
+        const profile = safeObject(safeObject(root?.profiles)[profileId]);
+        return JSON.stringify([profileId, normalizeManagedTimeLimitPolicy(safeObject(profile.settings).timeLimitPolicy)]);
+    };
+    if (identity(change.oldValue) === identity(change.newValue)) return;
+    managedTimeAccountingGeneration += 1;
+    managedTimeActiveScopes.clear();
+    managedTimeUnconfirmedScopes.clear();
+}
 
 function classifyManagedTimeLimitRoute(rawUrl) {
     try {
@@ -2500,53 +2544,220 @@ async function recordManagedTimeLimitParentRequest({ profileId, profileName, pol
 }
 
 async function handleManagedTimeLimitHeartbeat(request, sender, sendResponse) {
-    try {
-        const now = nowTs();
-        const requestPolicy = normalizeManagedTimeLimitPolicy(request?.policy);
-        if (!requestPolicy || requestPolicy.enabled !== true) {
-            sendResponse?.({ ok: true, enforced: false, reason: 'disabled_policy_no_work' });
-            return;
-        }
+    const run = async () => {
+        try {
+            const now = nowTs();
+            const accountingGeneration = managedTimeAccountingGeneration;
+            const requestPolicy = normalizeManagedTimeLimitPolicy(request?.policy);
+            if (!requestPolicy || requestPolicy.enabled !== true) {
+                sendResponse?.({ ok: true, enforced: false, reason: 'disabled_policy_no_work' });
+                return;
+            }
 
-        // Prefer the matched content-script frame URL so a YouTube embed inside
-        // an external page is governed as YouTube rather than as its parent tab.
-        const route = classifyManagedTimeLimitRoute(sender?.url || request?.href || sender?.tab?.url || '');
-        if (route.surface === 'external') {
-            sendResponse?.({ ok: true, enforced: false, reason: 'external_route_no_work' });
-            return;
-        }
+            // Prefer the matched content-script frame URL so a YouTube embed inside
+            // an external page is governed as YouTube rather than as its parent tab.
+            const route = classifyManagedTimeLimitRoute(sender?.url || request?.href || sender?.tab?.url || '');
+            if (route.surface === 'external') {
+                sendResponse?.({ ok: true, enforced: false, reason: 'external_route_no_work' });
+                return;
+            }
 
-        const compiledSettings = await getCompiledSettings(sender, route.surface, false);
-        const compiledPolicy = normalizeManagedTimeLimitPolicy(compiledSettings?.managedTimeLimitPolicy);
-        if (!compiledPolicy || compiledPolicy.enabled !== true) {
-            sendResponse?.({ ok: true, enforced: false, reason: 'active_profile_policy_absent_no_work' });
-            return;
-        }
+            const compiledSettings = await getCompiledSettings(sender, route.surface, false);
+            const compiledPolicy = normalizeManagedTimeLimitPolicy(compiledSettings?.managedTimeLimitPolicy);
+            if (!compiledPolicy || compiledPolicy.enabled !== true) {
+                const data = await managedTimeStorage('get', [FT_PROFILES_V4_KEY]);
+                const root = data?.[FT_PROFILES_V4_KEY];
+                const activeId = normalizeString(compiledSettings?.activeProfileId);
+                const profile = safeObject(safeObject(root?.profiles)[activeId]);
+                const currentPolicy = normalizeManagedTimeLimitPolicy(safeObject(profile.settings).timeLimitPolicy);
+                if (accountingGeneration === managedTimeAccountingGeneration && isValidProfilesV4(root)
+                    && root.activeProfileId === activeId && currentPolicy?.enabled !== true) {
+                    managedTimeActiveScopes.clear();
+                    managedTimeUnconfirmedScopes.clear();
+                }
+                sendResponse?.({ ok: true, enforced: false, reason: 'active_profile_policy_absent_no_work' });
+                return;
+            }
 
-        const profileId = normalizeString(compiledSettings.activeProfileId) || normalizeString(compiledSettings.managedTimeLimitPolicy?.profileId);
-        if (!profileId) {
-            sendResponse?.({ ok: false, enforced: false, error: 'missing_profile_id' });
-            return;
-        }
+            const profileId = normalizeString(compiledSettings.activeProfileId) || normalizeString(compiledSettings.managedTimeLimitPolicy?.profileId);
+            if (!profileId) {
+                sendResponse?.({ ok: false, enforced: false, error: 'missing_profile_id' });
+                return;
+            }
 
-        const requestedProfileId = normalizeString(request?.profileId) || normalizeString(request?.policy?.profileId);
-        const requestPolicyMatched = (!requestedProfileId || requestedProfileId === profileId)
-            && JSON.stringify(requestPolicy) === JSON.stringify(compiledPolicy);
-        const policy = compiledPolicy;
+            const requestedProfileId = normalizeString(request?.profileId) || normalizeString(request?.policy?.profileId);
+            const requestPolicyMatched = (!requestedProfileId || requestedProfileId === profileId)
+                && JSON.stringify(requestPolicy) === JSON.stringify(compiledPolicy);
+            const policy = compiledPolicy;
+            if (!requestPolicyMatched) {
+                sendResponse?.({ ok: false, enforced: false, reason: 'active_profile_policy_changed' });
+                return;
+            }
 
-        if (policy.validFrom != null && now < policy.validFrom) {
-            sendResponse?.({ ok: true, enforced: false, reason: 'future_policy_not_active' });
-            return;
-        }
-        if (policy.validUntil != null && now > policy.validUntil) {
+            const data = await managedTimeStorage('get', [MANAGED_TIME_USAGE_STORAGE_KEY, FT_PROFILES_V4_KEY]);
+            if (accountingGeneration !== managedTimeAccountingGeneration || !managedTimePolicyStillCurrent(data, profileId, policy)) {
+                sendResponse?.({ ok: false, enforced: false, reason: 'active_profile_policy_changed' });
+                return;
+            }
+
+            if (policy.validFrom != null && now < policy.validFrom) {
+                sendResponse?.({ ok: true, enforced: false, reason: 'future_policy_not_active' });
+                return;
+            }
+            if (policy.validUntil != null && now > policy.validUntil) {
+                sendResponse?.({
+                    ok: true,
+                    enforced: true,
+                    timedOut: true,
+                    remainingSeconds: 0,
+                    consumedSeconds: 0,
+                    totalBudgetSeconds: 0,
+                    reason: 'expired_policy_requires_parent_revalidation',
+                    profileId,
+                    profileName: normalizeString(compiledSettings.managedTimeLimitPolicy?.profileName) || 'Protected profile',
+                    surface: route.surface,
+                    timezone: policy.timezone,
+                    resetPolicy: policy.resetPolicy,
+                    policyRevision: policy.policyRevision,
+                    policyHash: policy.policyHash,
+                    policySource: 'compiled_active_profile',
+                    requestPolicyMatched
+                });
+                return;
+            }
+
+            const dateKey = managedTimeLimitDateKey(now, policy.timezone);
+            const usageKey = managedTimeLimitUsageKey(profileId, dateKey);
+            const totalBudgetSeconds = managedTimeLimitTotalBudgetSeconds(policy, now);
+            const tabId = Number(sender?.tab?.id);
+            const visible = request?.visible === true;
+            const focused = request?.focused === true;
+            const playing = request?.playing === true;
+            const shouldCount = ((visible && focused) || playing) && Number.isFinite(tabId);
+
+            const usageStore = normalizeManagedTimeUsageStore(data?.[MANAGED_TIME_USAGE_STORAGE_KEY]);
+            const rows = safeObject(usageStore.rows);
+            const existing = safeObject(rows[usageKey]);
+            const row = {
+                schema: MANAGED_TIME_USAGE_SCHEMA,
+                version: 1,
+                profileId,
+                dateKey,
+                consumedSeconds: normalizeNonNegativeInteger(existing.consumedSeconds) || 0,
+                updatedAt: normalizeNonNegativeInteger(existing.updatedAt) || now,
+                policyRevision: policy.policyRevision,
+                policyHash: policy.policyHash,
+                lastSurface: route.surface
+            };
+
+            let countedSeconds = 0;
+            let countDecision = shouldCount ? 'first_active_heartbeat' : 'inactive_heartbeat_no_count';
+            const remainingBeforeCount = Math.max(0, totalBudgetSeconds - row.consumedSeconds);
+            const policyKey = JSON.stringify(policy);
+            const unconfirmed = managedTimeUnconfirmedScopes.get(usageKey);
+            if (unconfirmed) {
+                // A successful write followed by a failed verification read is
+                // reconciled before charging again. Dropped writes retain the
+                // original anchor; persisted writes retain their counted time.
+                if (unconfirmed.generation === accountingGeneration && unconfirmed.policyKey === policyKey && JSON.stringify(existing) === JSON.stringify(unconfirmed.row)) {
+                    if (unconfirmed.nextActive) managedTimeActiveScopes.set(usageKey, unconfirmed.nextActive);
+                    else managedTimeActiveScopes.delete(usageKey);
+                }
+                managedTimeUnconfirmedScopes.delete(usageKey);
+            }
+            const previousActive = managedTimeActiveScopes.get(usageKey);
+            const active = previousActive?.policyKey === policyKey ? previousActive : null;
+            let nextActive = active;
+
+            if (shouldCount && remainingBeforeCount > 0) {
+                const heartbeatAge = now - active?.lastHeartbeatAt;
+                if (active && active.tabId !== tabId && heartbeatAge >= 0 && heartbeatAge < MANAGED_TIME_HEARTBEAT_STALE_MS) {
+                    countDecision = 'another_active_tab_recently_counted';
+                } else if (active && active.tabId === tabId) {
+                    const anchor = normalizeNonNegativeInteger(active.lastCountedAt) ?? now;
+                    const elapsed = Math.max(0, now - anchor);
+                    countedSeconds = Math.max(
+                        0,
+                        Math.min(
+                            MANAGED_TIME_MAX_HEARTBEAT_DELTA_SECONDS,
+                            Math.floor(elapsed / 1000)
+                        )
+                    );
+                    countedSeconds = Math.min(countedSeconds, remainingBeforeCount);
+                    row.consumedSeconds += countedSeconds;
+                    row.updatedAt = now;
+                    countDecision = countedSeconds > 0 ? 'count_single_active_tab' : 'active_heartbeat_no_elapsed_seconds';
+                    nextActive = {
+                        tabId,
+                        lastHeartbeatAt: now,
+                        policyKey,
+                        // Carry subsecond elapsed time. Long sleep remains capped,
+                        // and a backward clock establishes a new local anchor.
+                        lastCountedAt: now < anchor || elapsed > MANAGED_TIME_MAX_HEARTBEAT_DELTA_SECONDS * 1000
+                            ? now : anchor + countedSeconds * 1000
+                    };
+                } else {
+                    nextActive = {
+                        tabId,
+                        lastHeartbeatAt: now,
+                        policyKey,
+                        lastCountedAt: now
+                    };
+                }
+            } else {
+                if (active?.tabId === tabId || remainingBeforeCount <= 0) {
+                    nextActive = null;
+                }
+            }
+
+            const windowStillCurrent = () => {
+                const at = nowTs();
+                return accountingGeneration === managedTimeAccountingGeneration && Number.isFinite(at) && at >= now && managedTimeLimitDateKey(at, policy.timezone) === dateKey
+                    && (policy.validUntil == null || at <= policy.validUntil)
+                    && managedTimeLimitTotalBudgetSeconds(policy, at) === totalBudgetSeconds;
+            };
+            const latest = await managedTimeStorage('get', [FT_PROFILES_V4_KEY]);
+            if (!managedTimePolicyStillCurrent(latest, profileId, policy) || !windowStillCurrent()) {
+                sendResponse?.({ ok: false, enforced: false, reason: 'active_profile_policy_changed' });
+                return;
+            }
+            rows[usageKey] = row;
+            const nextUsageStore = {
+                schema: MANAGED_TIME_USAGE_SCHEMA,
+                version: 1,
+                rows: pruneManagedTimeUsageRows(rows)
+            };
+            // At most one unconfirmed write belongs to the current serialized session.
+            managedTimeUnconfirmedScopes.clear();
+            managedTimeUnconfirmedScopes.set(usageKey, { generation: accountingGeneration, policyKey, row: { ...row }, nextActive });
+            await managedTimeStorage('set', { [MANAGED_TIME_USAGE_STORAGE_KEY]: nextUsageStore });
+            const confirmed = await managedTimeStorage('get', [FT_PROFILES_V4_KEY, MANAGED_TIME_USAGE_STORAGE_KEY]);
+            if (JSON.stringify(confirmed?.[MANAGED_TIME_USAGE_STORAGE_KEY]) !== JSON.stringify(nextUsageStore)) {
+                sendResponse?.({ ok: false, enforced: false, error: 'managed_time_usage_not_persisted' });
+                return;
+            }
+            const remainingSeconds = Math.max(0, totalBudgetSeconds - row.consumedSeconds);
+            // Advance the anchor only after reading back the complete saved ledger.
+            // Failed or silently dropped writes leave elapsed time for the retry.
+            // An authoritative active-profile transition ends the old scope's
+            // counting session, while its persisted consumption remains intact.
+            managedTimeActiveScopes.clear();
+            managedTimeUnconfirmedScopes.clear();
+            if (accountingGeneration === managedTimeAccountingGeneration && nextActive && remainingSeconds > 0) managedTimeActiveScopes.set(usageKey, nextActive);
+            if (!managedTimePolicyStillCurrent(confirmed, profileId, policy) || !windowStillCurrent()) {
+                sendResponse?.({ ok: false, enforced: false, reason: 'active_profile_policy_changed' });
+                return;
+            }
             sendResponse?.({
                 ok: true,
                 enforced: true,
-                timedOut: true,
-                remainingSeconds: 0,
-                consumedSeconds: 0,
-                totalBudgetSeconds: 0,
-                reason: 'expired_policy_requires_parent_revalidation',
+                timedOut: remainingSeconds === 0,
+                remainingSeconds,
+                consumedSeconds: row.consumedSeconds,
+                totalBudgetSeconds,
+                countedSeconds,
+                countDecision,
+                dateKey,
                 profileId,
                 profileName: normalizeString(compiledSettings.managedTimeLimitPolicy?.profileName) || 'Protected profile',
                 surface: route.surface,
@@ -2557,106 +2768,13 @@ async function handleManagedTimeLimitHeartbeat(request, sender, sendResponse) {
                 policySource: 'compiled_active_profile',
                 requestPolicyMatched
             });
-            return;
+        } catch (e) {
+            sendResponse?.({ ok: false, enforced: false, error: e?.message || 'managed_time_limit_failed' });
         }
-
-        const dateKey = managedTimeLimitDateKey(now, policy.timezone);
-        const usageKey = managedTimeLimitUsageKey(profileId, dateKey);
-        const totalBudgetSeconds = managedTimeLimitTotalBudgetSeconds(policy, now);
-        const tabId = Number(sender?.tab?.id);
-        const visible = request?.visible === true;
-        const focused = request?.focused === true;
-        const playing = request?.playing === true;
-        const shouldCount = ((visible && focused) || playing) && Number.isFinite(tabId);
-
-        const data = await storageGet([MANAGED_TIME_USAGE_STORAGE_KEY]);
-        const usageStore = normalizeManagedTimeUsageStore(data?.[MANAGED_TIME_USAGE_STORAGE_KEY]);
-        const rows = safeObject(usageStore.rows);
-        const existing = safeObject(rows[usageKey]);
-        const row = {
-            schema: MANAGED_TIME_USAGE_SCHEMA,
-            version: 1,
-            profileId,
-            dateKey,
-            consumedSeconds: normalizeNonNegativeInteger(existing.consumedSeconds) || 0,
-            updatedAt: normalizeNonNegativeInteger(existing.updatedAt) || now,
-            policyRevision: policy.policyRevision,
-            policyHash: policy.policyHash,
-            lastSurface: route.surface
-        };
-
-        let countedSeconds = 0;
-        let countDecision = shouldCount ? 'first_active_heartbeat' : 'inactive_heartbeat_no_count';
-        const remainingBeforeCount = Math.max(0, totalBudgetSeconds - row.consumedSeconds);
-
-        if (shouldCount && remainingBeforeCount > 0) {
-            const active = managedTimeActiveScopes.get(usageKey);
-            if (active && active.tabId !== tabId && now - active.lastHeartbeatAt < MANAGED_TIME_HEARTBEAT_STALE_MS) {
-                countDecision = 'another_active_tab_recently_counted';
-            } else if (active && active.tabId === tabId) {
-                countedSeconds = Math.max(
-                    0,
-                    Math.min(
-                        MANAGED_TIME_MAX_HEARTBEAT_DELTA_SECONDS,
-                        Math.floor((now - (normalizeNonNegativeInteger(active.lastCountedAt) || now)) / 1000)
-                    )
-                );
-                countedSeconds = Math.min(countedSeconds, remainingBeforeCount);
-                row.consumedSeconds += countedSeconds;
-                row.updatedAt = now;
-                countDecision = countedSeconds > 0 ? 'count_single_active_tab' : 'active_heartbeat_no_elapsed_seconds';
-                managedTimeActiveScopes.set(usageKey, {
-                    tabId,
-                    lastHeartbeatAt: now,
-                    lastCountedAt: now
-                });
-            } else {
-                managedTimeActiveScopes.set(usageKey, {
-                    tabId,
-                    lastHeartbeatAt: now,
-                    lastCountedAt: now
-                });
-            }
-        } else {
-            const active = managedTimeActiveScopes.get(usageKey);
-            if (active?.tabId === tabId || remainingBeforeCount <= 0) {
-                managedTimeActiveScopes.delete(usageKey);
-            }
-        }
-
-        rows[usageKey] = row;
-        await browserAPI.storage.local.set({
-            [MANAGED_TIME_USAGE_STORAGE_KEY]: {
-                schema: MANAGED_TIME_USAGE_SCHEMA,
-                version: 1,
-                rows: pruneManagedTimeUsageRows(rows)
-            }
-        });
-
-        const remainingSeconds = Math.max(0, totalBudgetSeconds - row.consumedSeconds);
-        sendResponse?.({
-            ok: true,
-            enforced: true,
-            timedOut: remainingSeconds === 0,
-            remainingSeconds,
-            consumedSeconds: row.consumedSeconds,
-            totalBudgetSeconds,
-            countedSeconds,
-            countDecision,
-            dateKey,
-            profileId,
-            profileName: normalizeString(compiledSettings.managedTimeLimitPolicy?.profileName) || 'Protected profile',
-            surface: route.surface,
-            timezone: policy.timezone,
-            resetPolicy: policy.resetPolicy,
-            policyRevision: policy.policyRevision,
-            policyHash: policy.policyHash,
-            policySource: 'compiled_active_profile',
-            requestPolicyMatched
-        });
-    } catch (e) {
-        sendResponse?.({ ok: false, enforced: false, error: e?.message || 'managed_time_limit_failed' });
-    }
+    };
+    const transaction = managedTimeUsageTransaction.then(run, run);
+    managedTimeUsageTransaction = transaction.catch(() => {});
+    return transaction;
 }
 
 async function handleManagedTimeLimitStateQuery(request, sender, sendResponse) {
@@ -6326,6 +6444,7 @@ browserAPI.runtime.onMessage.addListener(function (request, sender, sendResponse
 // Listen for storage changes to re-compile settings
 browserAPI.storage.onChanged.addListener((changes, area) => {
     if (area === 'local') {
+        invalidateManagedTimeAccountingForProfileChange(changes[FT_PROFILES_V4_KEY]);
         const importedMetadataWrite = Boolean(changes.ftImportedChannelMetadataRevision);
         if (changes[FT_PROFILES_V4_KEY] && importedChannelEnrichmentScheduler && !importedMetadataWrite) {
             importedChannelEnrichmentScheduler.profilesChanged().catch((error) => {

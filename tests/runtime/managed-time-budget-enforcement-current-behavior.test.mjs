@@ -259,7 +259,8 @@ test('managed time-budget status is passive and appears only for active governed
   assert.match(statusBlock, /formatManagedTimeRemaining\(remainingSeconds\)/);
   assert.match(statusBlock, /remainingSeconds <= 0/);
   assert.match(statusBlock, /removeManagedTimeLimitStatus\(\)/);
-  assert.match(heartbeatBlock, /response\?\.enforced === true && response\?\.timedOut !== true/);
+  assert.match(heartbeatBlock, /managedTimeLimitResponseMatches\(playbackPermitRequest, response, policy, route\)/);
+  assert.match(heartbeatBlock, /else if \(response\.timedOut\)/);
   assert.match(heartbeatBlock, /showManagedTimeLimitStatus\(response\)/);
   assert.doesNotMatch(statusBlock, /recordTimeSaved|hidden-content|filtertube-hidden|data-filtertube-processed/);
 });

@@ -17,7 +17,7 @@ function policy(overrides = {}) {
 function fixture({ at = Date.parse('2026-10-22T12:00:00Z'), policyOverrides = {} } = {}) {
   let clock = at;
   const listeners = new Map(), timers = new Map(), calls = [], invalidations = [], queries = [];
-  let timerId = 0, refreshes = 0;
+  let timerId = 0, refreshes = 0, exhausted = false;
   const settings = { activeProfileId: 'child-1', activeProfileKind: 'child', profileType: 'main',
     managedTimeLimitPolicy: policy(policyOverrides) };
   const location = { href: 'https://www.youtube.com/watch?v=C-dvTjK_07c' };
@@ -33,9 +33,12 @@ function fixture({ at = Date.parse('2026-10-22T12:00:00Z'), policyOverrides = {}
     browserAPI_BRIDGE, URL, Intl, Date: ClockDate, queueMicrotask,
     document: { visibilityState: 'visible', hasFocus: () => true,
       querySelectorAll(selector) { queries.push(selector); return context.videos || []; } },
-    setInterval(fn, delay) { const id = ++timerId; timers.set(id, { fn, delay }); return id; },
+    setInterval(fn, delay) { const id = ++timerId; timers.set(id, { fn, delay, kind: 'interval' }); return id; },
+    setTimeout(fn, delay) { const id = ++timerId; timers.set(id, { fn, delay, kind: 'timeout' }); return id; },
+    clearTimeout(id) { timers.delete(id); },
     clearInterval(id) { timers.delete(id); },
-    removeManagedTimeLimitStatus() {}, removeManagedTimeoutOverlay() {}, showManagedTimeoutOverlay() {}, showManagedTimeLimitStatus() {},
+    removeManagedTimeLimitStatus() {}, removeManagedTimeoutOverlay() { exhausted = false; },
+    showManagedTimeoutOverlay() { exhausted = true; }, showManagedTimeLimitStatus() {},
     mainWorldSettingsDispatchRevision: 0, retainVerifiedVideoMetadata() {}, applyManagedViewingRouteGate: () => false,
     tryApplySettingsToSeed: () => true, refreshRuntimeObserversAfterSettingsUpdate() {}, scheduleSettingsRefreshFromStorage() {}
   });
@@ -64,7 +67,7 @@ function fixture({ at = Date.parse('2026-10-22T12:00:00Z'), policyOverrides = {}
   function emit(name) { for (const fn of [...(listeners.get(name) || [])]) fn({ type: name }); }
   return { context, settings, location, calls, window, invalidations, timers, queries, read, reply, emit,
     send: () => context.controls.sendManagedTimeLimitHeartbeat(), setTime: value => { clock = value; },
-    time: () => clock, refreshes: () => refreshes, start: at, api: browserAPI_BRIDGE };
+    time: () => clock, refreshes: () => refreshes, exhausted: () => exhausted, start: at, api: browserAPI_BRIDGE };
 }
 
 test('actual heartbeat reply alone publishes a frozen isolated-world permit', () => {
@@ -206,4 +209,54 @@ test('authoritative permit publication schedules a fresh automatic admission che
   await Promise.resolve(); assert.equal(f.refreshes(), 1); assert.ok(f.read());
   f.send(); f.reply({ ok: false }); await Promise.resolve();
   assert.equal(f.refreshes(), 1, 'failed heartbeats cannot wake source discovery'); assert.equal(f.read(), null);
+});
+
+for (const [name, deliver] of [
+  ['runtime IPC failure', f => { f.api.runtime.lastError = { message: 'worker unavailable' }; f.reply(); }],
+  ['missing callback data', f => f.calls.at(-1).callback(undefined)],
+  ['no-work response from a competing or hidden tab', f => f.reply({ enforced: false })],
+  ['stale successful-looking policy', f => f.reply({ policyRevision: 3 })],
+  ['different profile successful-looking policy', f => f.reply({ profileId: 'child-2' })],
+  ['same profile invalid date', f => f.reply({ dateKey: '2026-10-21' })],
+  ['inconsistent timeout verdict', f => f.reply({ timedOut: false, remainingSeconds: 0 })]
+]) {
+  test(`exhausted lock survives ${name} until fresh authority explicitly recovers it`, () => {
+    const f = fixture(); f.send(); f.reply({ timedOut: true, remainingSeconds: 0 });
+    assert.equal(f.exhausted(), true); f.context.document.visibilityState = 'hidden'; f.context.document.hasFocus = () => false;
+    f.send(); deliver(f); assert.equal(f.exhausted(), true); assert.equal(f.read(), null);
+    f.api.runtime.lastError = null; f.send(); f.reply({ remainingSeconds: 30 });
+    assert.equal(f.exhausted(), false, 'fresh matching allowance can recover the lock'); assert.ok(f.read());
+  });
+}
+
+test('timeout keeps exhaustion locked, drains pending work and ignores the old callback', () => {
+  const f = fixture(); f.send(); f.reply({ timedOut: true, remainingSeconds: 0 });
+  f.send(); const old = f.calls.at(-1); f.send();
+  const timeout = [...f.timers.values()].find(timer => timer.kind === 'timeout'); assert.ok(timeout);
+  f.setTime(f.start + 7000); timeout.fn();
+  assert.equal(f.exhausted(), true); assert.equal(f.calls.length, 3, 'one queued request begins after timeout');
+  f.reply({ remainingSeconds: 60 }, old); assert.equal(f.exhausted(), true); assert.equal(f.read(), null);
+  f.reply({ remainingSeconds: 30 }); assert.equal(f.exhausted(), false); assert.ok(f.read());
+});
+
+test('an expired matching policy denial locks without needing a daily ledger row', () => {
+  const f = fixture({ policyOverrides: { validUntil: Date.parse('2026-10-22T11:59:59Z') } });
+  f.send(); f.reply({ timedOut: true, remainingSeconds: 0, dateKey: undefined, reason: 'expired_policy_requires_parent_revalidation' });
+  assert.equal(f.exhausted(), true); assert.equal(f.read(), null);
+});
+
+test('a callback stale across authoritative settings cannot unlock exhaustion or strand a pending request', () => {
+  const f = fixture(); f.send(); f.reply({ timedOut: true, remainingSeconds: 0 });
+  f.send(); const old = f.calls.at(-1); f.context.currentSettings = { ...f.settings }; f.send();
+  f.reply({}, old); assert.equal(f.exhausted(), true); assert.equal(f.read(), null);
+  assert.equal(f.calls.length, 3); f.reply(); assert.equal(f.exhausted(), false); assert.ok(f.read());
+});
+
+test('fresh authoritative disabled settings remove an exhausted lock and make old callbacks inert', () => {
+  const f = fixture(); f.send(); f.reply({ timedOut: true, remainingSeconds: 0 }); f.send(); const old = f.calls.at(-1);
+  const next = { ...f.settings, managedTimeLimitPolicy: { ...f.settings.managedTimeLimitPolicy, enabled: false } };
+  f.context.controls.sendSettingsToMainWorld(next);
+  assert.equal(f.exhausted(), false); assert.equal(f.read(), null); assert.equal(f.calls.length, 2);
+  f.reply({}, old); assert.equal(f.exhausted(), false); assert.equal(f.read(), null);
+  assert.equal([...f.timers.values()].some(timer => timer.kind === 'timeout'), false);
 });
