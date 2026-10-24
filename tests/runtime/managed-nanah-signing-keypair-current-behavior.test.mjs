@@ -3,6 +3,7 @@ import path from 'node:path';
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import vm from 'node:vm';
+import { webcrypto, createHash } from 'node:crypto';
 
 const repoRoot = process.cwd();
 const docPath = 'docs/audit/FILTERTUBE_NANAH_MANAGED_SIGNING_KEYPAIR_2026-06-04.md';
@@ -27,6 +28,10 @@ function loadNanahAdapter() {
       crypto: {
         randomUUID: () => 'uuid-key',
         subtle: {
+          async digest(algorithm, data) {
+            assert.equal(algorithm, 'SHA-256');
+            return webcrypto.subtle.digest(algorithm, data);
+          },
           async generateKey(algorithm, extractable, usages) {
             assert.equal(algorithm.name, 'Ed25519');
             assert.equal(extractable, true);
@@ -147,7 +152,8 @@ test('Nanah adapter signs canonical managed-policy fields and strips private key
     targetDeviceId: 'child-device-1',
     revision: 4,
     policyHash: envelope.policyHash,
-    payloadScope: 'keywords'
+    payloadScope: 'keywords',
+    payloadSha256: 'sha256:' + createHash('sha256').update('{"operations":[{"op":"add_keyword","word":"math"}],"scope":"keywords"}').digest('base64url')
   });
   assert.equal(signed.integrity.signature, 'AQID');
 

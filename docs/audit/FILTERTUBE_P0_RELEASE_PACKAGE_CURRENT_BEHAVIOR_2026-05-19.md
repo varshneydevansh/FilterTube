@@ -903,3 +903,14 @@ Replacing the three overlay engine modules with one native transaction leaves 37
 | `manifest.opera.json` | 71 | 37 | 7 | 49 | 13 |
 
 Combined unique declared references: 42. No permission expansion. This inventory is source closure, not installed Notes acceptance.
+
+## Auto-sync source inventory - 2026-10-24
+
+Current combined unique manifest references: 45
+
+| `manifest.json` | 72 | 38 | 6 | 49 | 14 |
+| `manifest.chrome.json` | 72 | 38 | 6 | 49 | 14 |
+| `manifest.firefox.json` | 77 | 45 | 5 | 45 | 14 |
+| `manifest.opera.json` | 71 | 37 | 7 | 49 | 13 |
+
+No missing references or references outside copied roots were introduced. Manifest source closure does not establish installed or incognito access. Historical package verdicts remain dated; current ZIP, staged tree and source bytes are compared separately by the release test.

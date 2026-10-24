@@ -210,7 +210,7 @@ test('quick-block/block-menu affordance audit is audit-only and source pinned', 
 
   assert.ok(doc.includes(`| \`js/content_controls_catalog.js\` | 304 | 12854 | \`${sha256('js/content_controls_catalog.js')}\` |`));
   assert.ok(doc.includes(`| \`js/settings_shared.js\` | 1327 | 67805 | \`${sha256('js/settings_shared.js')}\` |`));
-  assert.ok(doc.includes(`| \`js/background.js\` | 8565 | 387821 | \`${sha256('js/background.js')}\` |`));
+  assert.ok(doc.includes(`| \`js/background.js\` | 8607 | 390769 | \`${sha256('js/background.js')}\` |`));
   assert.ok(doc.includes(`| \`js/content/bridge_settings.js\` | 2238 | 101092 | \`${sha256('js/content/bridge_settings.js')}\` |`));
   assert.ok(doc.includes(`| \`js/state_manager.js\` | 2984 | 124258 | \`${sha256('js/state_manager.js')}\` |`));
   assert.ok(doc.includes(`| \`js/content/block_channel.js\` | 3361 | 135050 | \`${sha256('js/content/block_channel.js')}\` |`));

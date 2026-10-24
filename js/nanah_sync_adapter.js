@@ -259,7 +259,23 @@
         if (signed.payloadScope !== getManagedPayloadScopeFamily(envelope.payload)) {
             return validationResult('integrity_payload_scope_mismatch');
         }
+        if (Object.prototype.hasOwnProperty.call(signed, 'payloadSha256')
+            && !isManagedPayloadSha256(signed.payloadSha256)) return validationResult('integrity_payload_digest_invalid');
         return null;
+    }
+
+    function isManagedPayloadSha256(value) {
+        return typeof value === 'string' && /^sha256:[A-Za-z0-9_-]{43}$/.test(value);
+    }
+
+    async function digestManagedPolicyPayload(payload) {
+        const subtle = global.crypto?.subtle;
+        if (!subtle || typeof subtle.digest !== 'function' || typeof global.TextEncoder !== 'function') {
+            throw new Error('Managed policy integrity requires WebCrypto SHA-256 and TextEncoder.');
+        }
+        const bytes = new global.TextEncoder().encode(stableManagedNanahJson(safeObject(payload)));
+        const digest = await subtle.digest('SHA-256', bytes);
+        return `sha256:${encodeManagedNanahBase64Url(digest)}`;
     }
 
     function stableManagedNanahJson(value) {
@@ -384,6 +400,7 @@
             throw new Error('Managed Nanah signing requires TextEncoder');
         }
         const signedFields = buildManagedPolicySignedFields(root);
+        signedFields.payloadSha256 = await digestManagedPolicyPayload(root.payload);
         const bindingDecision = validateManagedIntegrityBinding({
             ...root,
             integrity: {
@@ -424,6 +441,14 @@
         try {
             const key = await subtle.importKey('jwk', publicKeyJwk, { name: 'Ed25519' }, false, ['verify']);
             const signedFields = safeObject(integrity.signedFields);
+            // Legacy signatures retain their exact bytes. When the new optional
+            // field exists it is mandatory to validate; never fall back after a
+            // malformed, changed or stripped digest fails its signed binding.
+            if (Object.prototype.hasOwnProperty.call(signedFields, 'payloadSha256')) {
+                if (!isManagedPayloadSha256(signedFields.payloadSha256)) return { verified: false, reason: 'payload_digest_invalid' };
+                const digest = await digestManagedPolicyPayload(root.payload);
+                if (digest !== signedFields.payloadSha256) return { verified: false, reason: 'payload_digest_mismatch' };
+            }
             const data = new global.TextEncoder().encode(stableManagedNanahJson(signedFields));
             const verified = await subtle.verify({ name: 'Ed25519' }, key, signature, data);
             return verified
@@ -659,6 +684,10 @@
             if (root.revision === accepted.revision && root.policyHash !== accepted.policyHash) {
                 return validationResult('equal_revision_hash_conflict');
             }
+            if (root.revision === accepted.revision
+                && normalizeString(accepted.payloadSha256) !== normalizeString(safeObject(root.integrity?.signedFields).payloadSha256)) {
+                return validationResult('equal_revision_hash_conflict');
+            }
             if (root.revision === accepted.revision && root.policyHash === accepted.policyHash) {
                 return {
                     accepted: true,
@@ -782,6 +811,8 @@
             scope,
             revision,
             policyHash: normalizeString(root.policyHash),
+            ...(isManagedPayloadSha256(safeObject(root.integrity?.signedFields).payloadSha256)
+                ? { payloadSha256: root.integrity.signedFields.payloadSha256 } : {}),
             sourcePublicKeyId: normalizeString(root.sourcePublicKeyId),
             keyVersion,
             cipherSuite: normalizeString(sealed.cipherSuite),
@@ -1611,6 +1642,8 @@
                         [scope]: {
                             revision: root.revision,
                             policyHash: normalizeString(root.policyHash),
+                            ...(isManagedPayloadSha256(safeObject(root.integrity?.signedFields).payloadSha256)
+                                ? { payloadSha256: root.integrity.signedFields.payloadSha256 } : {}),
                             sourceProfileId: normalizeString(root.sourceProfileId),
                             sourceDeviceId: normalizeString(root.sourceDeviceId),
                             sourcePublicKeyId: normalizeString(root.sourcePublicKeyId),
@@ -1797,6 +1830,12 @@
                 return result;
             }
             if (root.revision === latestAccepted.revision && root.policyHash !== latestAccepted.policyHash) {
+                const result = validationResult('equal_revision_hash_conflict');
+                await recordManagedPolicyDecisionHistory(root, result, context);
+                return result;
+            }
+            if (root.revision === latestAccepted.revision
+                && normalizeString(latestAccepted.payloadSha256) !== normalizeString(safeObject(root.integrity?.signedFields).payloadSha256)) {
                 const result = validationResult('equal_revision_hash_conflict');
                 await recordManagedPolicyDecisionHistory(root, result, context);
                 return result;
@@ -2142,6 +2181,7 @@
         openManagedMailboxStorageItem,
         validateManagedLocalNetworkCandidate,
         buildManagedPolicyPayloadHash,
+        digestManagedPolicyPayload,
         verifyManagedNanahPolicyIntegritySignature,
         createManagedNanahSigningKeyPair,
         signManagedPolicyEnvelope,

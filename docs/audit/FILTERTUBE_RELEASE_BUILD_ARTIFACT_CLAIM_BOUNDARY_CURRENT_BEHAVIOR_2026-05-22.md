@@ -326,3 +326,17 @@ All three browser packages were rebuilt from the frozen automatic playback sourc
 | `README.md` | 456 | 28669 | `002941cf5633b50fe77c0434639e3fe6b12ef85ab8a87d530a7bfee65ffe62af` |
 
 The build badge changed during the Notes dialog fix. This source fingerprint is not installed-browser proof.
+
+## Auto-sync source inventory - 2026-10-24
+
+| `build.js` | 861 | 33225 | `a198cc1d0bf98e410deb8f66ced0e56a046bbf987a0a5b878e1278577622fb2e` |
+| `package.json` | 86 | 4580 | `c9cb2c3c4fea302fa3946f462dbfbb474381a78946ca59adb653814d06a4de51` |
+| `README.md` | 456 | 28669 | `e14c02036b3039e16101cc58cdf911deb22c59ff87da9d25843027f0cb49b8f2` |
+| `CHANGELOG.md` | 938 | 75511 | `e57906dca95911874ef251aa45d8c3a76df00df576b36277d9c0e9b9654c3036` |
+| `manifest.json` | 162 | 5630 | `ba155d12e591c0306620bc57c59ad7378c5313084314a748414b5b1d39879d9d` |
+| `manifest.chrome.json` | 162 | 5630 | `ba155d12e591c0306620bc57c59ad7378c5313084314a748414b5b1d39879d9d` |
+| `manifest.firefox.json` | 136 | 4668 | `30b981228a8214e0721d8c29ca3a74cac369508b0aca702e6b55286bc87ee7b8` |
+| `manifest.opera.json` | 170 | 5819 | `c516d8c0439a79016b0ed04ffb3658bbd40f8e0868fc146d8707a9da076636a4` |
+| `data/release_notes.json` | 433 | 37594 | `9132b2e8809c5e1f01bf5715a115105f62387318b422ad681c0ef6a1be63c7f9` |
+
+These are current source measurements after Auto-sync and browser packaging changes. No installed-device, provider, native, publication, or release-readiness claim follows from these fingerprints.

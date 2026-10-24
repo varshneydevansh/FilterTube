@@ -518,7 +518,7 @@ test('managed parent UI surface docs and runtime binding are linked', () => {
   assert.match(tabViewHtml, /id="ftNanahDeliveryLocalCheckBtn"[\s\S]*>Check<\/button>/);
   assert.match(tabViewHtml, /Home Pickup is different: it is an advanced waiting-update service for already verified protected devices/);
   assert.match(tabViewHtml, /id="ftNanahDeliveryAdvanced"/);
-  assert.match(tabViewHtml, /Use only if the protected device cannot stay open for Send Update/);
+  assert.match(tabViewHtml, /Advanced delivery is only for verified protected devices that cannot stay open while the parent sends an update/);
   assert.match(tabViewHtml, /id="ftNanahDeliveryCheckRow"/);
   assert.match(tabViewHtml, /Check waiting parent updates/);
   assert.match(tabViewHtml, /Available after this protected profile saves a trusted parent link/);

@@ -76,13 +76,20 @@
             return activeSurface === 'kids' ? 'kids' : 'main';
         }
 
-        function createSendOperation() {
+        function createSendOperation(explicitSnapshot = null) {
             if (sendContext) return api;
-            const snapshot = JSON.parse(JSON.stringify({
+            const requested = explicitSnapshot == null ? {
                 source: resolvePolicySourceProfile(),
                 actor: deps.getLocalProfileContext(),
                 surface: resolvePayloadSurface('keywords')
-            }));
+            } : safeObject(explicitSnapshot);
+            if (explicitSnapshot != null && (!normalizeString(safeObject(requested.source).profileId)
+                || Object.keys(safeObject(safeObject(requested.source).profile)).length === 0
+                || !normalizeString(safeObject(requested.actor).profileId)
+                || !['main', 'kids'].includes(requested.surface))) {
+                throw new Error('An explicit managed send snapshot requires a source, actor and Main or Kids surface.');
+            }
+            const snapshot = JSON.parse(JSON.stringify(requested));
             const freeze = (value) => {
                 if (!value || typeof value !== 'object' || Object.isFrozen(value)) return value;
                 Object.values(value).forEach(freeze);
@@ -263,10 +270,29 @@
 
         function getOutgoingPolicyState(trustedLink, scope) {
             const trusted = deps.normalizeTrustedLink(trustedLink);
-            const state = safeObject(safeObject(safeObject(trusted?.policy).outgoingManagedPolicies)[normalizeString(scope).toLowerCase()]);
-            const revision = normalizeNonNegativeInteger(state.revision);
-            const policyHash = normalizeString(state.policyHash);
-            return revision && policyHash ? { revision, policyHash } : null;
+            const policy = safeObject(trusted?.policy);
+            const key = normalizeString(scope).toLowerCase();
+            const sent = safeObject(safeObject(policy.outgoingManagedPolicies)[key]);
+            const reserved = safeObject(safeObject(policy.autoSyncReservedPolicies)[key]);
+            const state = value => Number.isSafeInteger(value.revision) && value.revision > 0 && normalizeString(value.policyHash)
+                ? { revision: value.revision, policyHash: normalizeString(value.policyHash),
+                    ...(payloadSha256(value.payloadSha256) ? { payloadSha256: value.payloadSha256 } : {}) } : null;
+            const sentState = state(sent), reservedState = state(reserved);
+            if ([sent, reserved].some(value => Object.prototype.hasOwnProperty.call(value, 'payloadSha256') && !payloadSha256(value.payloadSha256))) {
+                throw new Error('The managed policy payload digest is invalid.');
+            }
+            if (Object.keys(reserved).length && !reservedState) throw new Error('The reserved managed policy revision is invalid.');
+            if (sentState && reservedState && sentState.revision === reservedState.revision
+                && (sentState.policyHash !== reservedState.policyHash || (sentState.payloadSha256 || '') !== (reservedState.payloadSha256 || ''))) {
+                throw new Error('The managed policy revision has conflicting reservations.');
+            }
+            if (!sentState) return reservedState;
+            if (!reservedState) return sentState;
+            return reservedState.revision > sentState.revision ? reservedState : sentState;
+        }
+
+        function payloadSha256(value) {
+            return typeof value === 'string' && /^sha256:[A-Za-z0-9_-]{43}$/.test(value) ? value : '';
         }
 
         async function buildEnvelopeForScope(policy, scope, options = {}) {
@@ -318,6 +344,9 @@
             }
 
             const payload = buildPayload(normalizedScope);
+            const digest = typeof adapter.digestManagedPolicyPayload === 'function'
+                ? payloadSha256(await adapter.digestManagedPolicyPayload(payload)) : '';
+            if (typeof adapter.digestManagedPolicyPayload === 'function' && !digest) throw new Error('The managed policy payload digest is invalid.');
             const policyHash = buildPolicyHash({
                 linkId: trustedLink.linkId,
                 scope: normalizedScope,
@@ -328,9 +357,10 @@
                 payload
             });
             const prior = getOutgoingPolicyState(trustedLink, normalizedScope);
-            const revision = prior?.policyHash === policyHash
+            const revision = prior?.policyHash === policyHash && (prior.payloadSha256 || '') === digest
                 ? prior.revision
                 : Math.max(0, prior?.revision || 0) + 1;
+            if (!Number.isSafeInteger(revision) || revision <= 0) throw new Error('The managed policy revision limit was reached.');
 
             const signedEnvelope = await adapter.signManagedPolicyEnvelope({
                 type: 'filtertube_managed_policy',
@@ -349,7 +379,82 @@
                 payload,
                 privateKeyJwk: keyPair.privateKeyJwk
             });
+            if (digest && payloadSha256(safeObject(signedEnvelope.integrity?.signedFields).payloadSha256) !== digest) {
+                throw new Error('The signed managed policy does not bind the selected payload digest.');
+            }
             return stripEnvelopePrivateFields(signedEnvelope);
+        }
+
+        function reservationBinding(trustedLink) {
+            const trusted = deps.normalizeTrustedLink(trustedLink);
+            if (!trusted) throw new Error('The saved managed link is unavailable.');
+            const policy = safeObject(trusted.policy);
+            return {
+                linkId: normalizeString(trusted.linkId),
+                linkType: trusted.linkType, localRole: trusted.localRole, remoteRole: trusted.remoteRole,
+                sourceDeviceId: normalizeString(trusted.sourceDeviceId || policy.sourceDeviceId),
+                targetDeviceId: normalizeString(trusted.targetDeviceId || policy.targetDeviceId || trusted.remoteDeviceId),
+                sourceProfileId: normalizeString(trusted.sourceProfileId || policy.sourceProfileId),
+                targetProfileId: normalizeString(trusted.targetProfileId || policy.targetProfileId),
+                localPolicyProfileId: normalizeString(trusted.localPolicyProfileId),
+                sourcePublicKeyId: normalizeString(trusted.sourcePublicKeyId || policy.sourcePublicKeyId),
+                keyVersion: trusted.keyVersion || policy.keyVersion,
+                targetProfileBehavior: policy.targetProfileBehavior,
+                allowedScopes: deps.getAllowedScopeList(policy.allowedScopes || policy.defaultScope).slice().sort(),
+                sourcePublicKeyJwk: safeObject(trusted.sourcePublicKeyJwk || policy.sourcePublicKeyJwk)
+            };
+        }
+
+        async function reserveEnvelope(envelope) {
+            const outbound = JSON.parse(JSON.stringify(safeObject(envelope)));
+            const linkId = normalizeString(outbound.linkId), scope = normalizeScope(outbound.scope);
+            if (outbound.type !== 'filtertube_managed_policy' || !linkId || !scope
+                || MANAGED_LIVE_BUNDLE_SCOPES[scope] || !Number.isSafeInteger(outbound.revision) || outbound.revision <= 0
+                || !normalizeString(outbound.policyHash) || !normalizeString(safeObject(outbound.integrity).signature)) {
+                throw new Error('A managed reservation requires an individual signed policy envelope.');
+            }
+            const trusted = deps.normalizeTrustedLink(deps.findTrustedLinkById(linkId));
+            const assertCurrent = () => {
+                const current = deps.normalizeTrustedLink(deps.findTrustedLinkById(linkId));
+                const error = receiptTrustError(current);
+                if (error || current.linkType !== 'managed_link' || current.localRole !== 'source'
+                    || current.remoteRole !== 'replica') throw new Error('The managed reservation link was revoked or changed.');
+                const binding = reservationBinding(current);
+                if (binding.targetProfileBehavior !== 'fixed_profile' || !binding.allowedScopes.includes(scope)
+                    || binding.sourceDeviceId !== normalizeString(deps.getStableDeviceId())
+                    || ['sourceDeviceId', 'targetDeviceId', 'sourceProfileId', 'targetProfileId', 'sourcePublicKeyId']
+                        .some(field => !binding[field] || binding[field] !== normalizeString(outbound[field]))
+                    || binding.keyVersion !== outbound.keyVersion) {
+                    throw new Error('The managed reservation does not match its saved source, target, key or scope.');
+                }
+                return { current, binding };
+            };
+            const checked = assertCurrent();
+            const expectedBinding = reservationBinding(trusted);
+            if (stablePolicyJson(checked.binding) !== stablePolicyJson(expectedBinding)) throw new Error('The managed reservation link changed.');
+            const previous = getOutgoingPolicyState(checked.current, scope);
+            const digest = payloadSha256(safeObject(outbound.integrity?.signedFields).payloadSha256);
+            if (Object.prototype.hasOwnProperty.call(safeObject(outbound.integrity?.signedFields), 'payloadSha256') && !digest) {
+                throw new Error('The reserved managed policy payload digest is invalid.');
+            }
+            if (previous && (outbound.revision < previous.revision
+                || (outbound.revision === previous.revision
+                    && (outbound.policyHash !== previous.policyHash || (previous.payloadSha256 || '') !== digest)))) {
+                throw new Error('The managed reservation revision is stale or conflicts with another update.');
+            }
+            // This is an allocation floor only. It deliberately does not write
+            // outgoingManagedPolicies, sent history, receipts or applied status.
+            const saved = await deps.updateTrustedLinkPolicy(linkId, {
+                autoSyncReservationExpected: expectedBinding,
+                policy: { autoSyncReservedPolicies: {
+                    [scope]: { revision: outbound.revision, policyHash: outbound.policyHash,
+                        ...(digest ? { payloadSha256: digest } : {}) }
+                } }
+            });
+            if (!saved) throw new Error('The managed policy revision reservation could not be saved.');
+            const after = assertCurrent();
+            if (stablePolicyJson(after.binding) !== stablePolicyJson(expectedBinding)) throw new Error('The managed reservation link changed during persistence.');
+            return { ok: true, linkId, scope, revision: outbound.revision, policyHash: outbound.policyHash };
         }
 
         async function buildEnvelopeForLiveSend(policy) {
@@ -478,6 +583,8 @@
                 scope,
                 revision,
                 policyHash,
+                ...(payloadSha256(safeObject(root.integrity?.signedFields).payloadSha256)
+                    ? { payloadSha256: root.integrity.signedFields.payloadSha256 } : {}),
                 sourcePublicKeyId: normalizeString(root.sourcePublicKeyId),
                 keyVersion: normalizeNonNegativeInteger(root.keyVersion) || 0,
                 issuedAt: normalizeNonNegativeInteger(root.issuedAt) || createdAt,
@@ -571,7 +678,8 @@
                         sourceProfileId: row.sourceProfileId,
                         sourceDeviceId: row.sourceDeviceId,
                         issuedAt: row.issuedAt,
-                        delivery: 'local_network_provider'
+                        delivery: 'local_network_provider',
+                        ...(payloadSha256(row.payloadSha256) ? { payloadSha256: row.payloadSha256 } : {})
                     });
                     if (marked) markedSentCount += 1;
                 }
@@ -737,7 +845,8 @@
                         sourceProfileId: row.sourceProfileId,
                         sourceDeviceId: row.sourceDeviceId,
                         issuedAt: row.createdAtMs,
-                        delivery: 'encrypted_mailbox_provider'
+                        delivery: 'encrypted_mailbox_provider',
+                        ...(payloadSha256(row.payloadSha256) ? { payloadSha256: row.payloadSha256 } : {})
                     });
                     if (marked) markedSentCount += 1;
                 }
@@ -1189,6 +1298,15 @@
             if (!trusted) return false;
             const policy = safeObject(trusted.policy);
             const outgoing = safeObject(policy.outgoingManagedPolicies);
+            const digest = payloadSha256(safeObject(options).payloadSha256);
+            if (Object.prototype.hasOwnProperty.call(safeObject(options), 'payloadSha256') && !digest) {
+                throw new Error('The sent managed policy payload digest is invalid.');
+            }
+            const previous = safeObject(outgoing[normalizedScope]);
+            if (previous.revision === revision
+                && (normalizeString(previous.policyHash) !== normalizeString(policyHash) || (previous.payloadSha256 || '') !== digest)) {
+                throw new Error('The sent managed policy conflicts with a saved payload at this revision.');
+            }
             const sentAt = deps.now();
             const historyRows = Array.isArray(policy.outboundManagedPolicyHistory)
                 ? policy.outboundManagedPolicyHistory
@@ -1205,6 +1323,7 @@
                         [normalizedScope]: {
                             revision,
                             policyHash,
+                            ...(digest ? { payloadSha256: digest } : {}),
                             sentAt
                         }
                     },
@@ -1248,7 +1367,9 @@
                     sourceProfileId: outbound.sourceProfileId,
                     sourceDeviceId: outbound.sourceDeviceId,
                     issuedAt: outbound.issuedAt,
-                    ...safeObject(options)
+                    ...safeObject(options),
+                    ...(payloadSha256(safeObject(outbound.integrity?.signedFields).payloadSha256)
+                        ? { payloadSha256: outbound.integrity.signedFields.payloadSha256 } : {})
                 });
                 if (!marked) throw new Error('The sent update could not be recorded.');
                 assertCurrentLink();
@@ -1271,6 +1392,7 @@
 
         const api = {
             createSendOperation,
+            reserveEnvelope,
             normalizeScope,
             expandScope,
             resolveConcreteSendScopes,

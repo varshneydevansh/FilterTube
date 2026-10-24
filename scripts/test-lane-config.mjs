@@ -155,6 +155,23 @@ const FILTER_LOGIC_AUDIT_PROOF_TESTS = Object.freeze([
   'tests/runtime/filter-logic-rule-field-effect-semantic-register-current-behavior.test.mjs',
   'tests/runtime/filter-logic-rule-path-semantic-register-current-behavior.test.mjs'
 ]);
+const AUTO_SYNC_TESTS = Object.freeze([
+  'tests/runtime/nanah-pairing-ui.test.mjs',
+  'tests/runtime/auto-sync-queue.test.mjs',
+  'tests/runtime/auto-sync-wakeup.test.mjs',
+  'tests/runtime/device-auto-sync-ui.test.mjs',
+  'tests/runtime/device-auto-sync.test.mjs',
+  'tests/runtime/managed-auto-sync.test.mjs',
+  'tests/runtime/managed-auto-sync-reservation.test.mjs',
+  'tests/runtime/managed-auto-sync-storage-reservation.test.mjs',
+  'tests/runtime/managed-policy-payload-integrity.test.mjs',
+  'tests/runtime/personal-sync.test.mjs',
+  'tests/runtime/personal-auto-sync-runtime.test.mjs',
+  'tests/runtime/personal-auto-sync-independent.test.mjs',
+  'tests/runtime/video-notes-sync.test.mjs',
+  'tests/runtime/auto-sync-background-authority.test.mjs',
+  'tests/runtime/auto-sync-dashboard-integration.test.mjs',
+]);
 const VIDEO_NOTES_TESTS = Object.freeze([
   'tests/runtime/video-notes-contract.test.mjs',
   'tests/runtime/video-notes-store.test.mjs',
@@ -181,6 +198,7 @@ export const LANES = Object.freeze({
     description: 'Build, package, release docs, public claims, and artifact boundaries.',
     checks: ['build.js'],
     tests: [
+      ...AUTO_SYNC_TESTS,
       ...VIDEO_NOTES_TESTS,
       'tests/runtime/ad-void-native-ownership-current-behavior.test.mjs',
       'tests/runtime/popup-intrinsic-sizing.test.mjs',
@@ -446,6 +464,7 @@ export const LANES = Object.freeze({
   settings: {
     description: 'Settings compile, profiles, storage refresh, migrations, import/export, backups, and sync boundaries.',
     tests: [
+      ...AUTO_SYNC_TESTS,
       ...VIDEO_NOTES_TESTS,
       'tests/runtime/content-playback-admission-current-behavior.test.mjs',
       'tests/runtime/content-playback-coordinator.test.mjs',
@@ -529,6 +548,7 @@ export const LANES = Object.freeze({
     description: 'Small release confidence lane for common lag, blocking, menu, and release-surface regressions.',
     checks: ['build.js'],
     tests: [
+      ...AUTO_SYNC_TESTS,
       ...VIDEO_NOTES_TESTS,
       ...CONTENT_PLAYBACK_TESTS,
       'tests/runtime/get-watch-streaming-interception.test.mjs',

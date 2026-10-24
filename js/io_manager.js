@@ -826,9 +826,9 @@
     }
 
     async function restoreStorageSnapshot(snapshot) {
-        // Profile import does not own personal notes or the installation writer.
-        // Preserve concurrent note saves/deletions even when an older import fails.
-        const privateNotesKeys = new Set(['ftSavedVideoNotesV1', 'ftSavedVideoNotesWriterV1']);
+        // Profile import does not own private notes, installation writers or Auto-sync
+        // grants/queues. Rollback must not revive revoked consent or old deliveries.
+        const privateNotesKeys = new Set(['ftSavedVideoNotesV1', 'ftSavedVideoNotesWriterV1', 'ftDeviceAutoSyncV1', 'ftAutoSyncQueueV1']);
         const safeSnapshot = Object.fromEntries(Object.entries(safeObject(snapshot)).filter(([key]) => !privateNotesKeys.has(key)));
         const current = await readStorage(null, { required: true });
         const extraKeys = Object.keys(safeObject(current)).filter(

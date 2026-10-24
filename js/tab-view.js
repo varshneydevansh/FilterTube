@@ -8556,7 +8556,8 @@ document.addEventListener('DOMContentLoaded', async () => {
         const accepted = safeObject(linkPolicies[normalizeString(scope).toLowerCase()]);
         const revision = normalizeNonNegativeInteger(accepted.revision);
         const policyHash = normalizeString(accepted.policyHash);
-        return revision && policyHash ? { revision, policyHash } : null;
+        const payloadSha256 = normalizeString(accepted.payloadSha256);
+        return revision && policyHash ? { revision, policyHash, ...(payloadSha256 ? { payloadSha256 } : {}) } : null;
     }
 
     function findNanahTrustedLinkForManagedEnvelope(envelope) {
@@ -20943,6 +20944,15 @@ document.addEventListener('DOMContentLoaded', async () => {
         if (ftNanahDeliveryAdvanced && (mailbox.configured === true || local.pickupConfigured === true)) {
             ftNanahDeliveryAdvanced.open = true;
         }
+        const advancedStatus = ftNanahSyncShell?.querySelector?.('#ftNanahAdvancedStatus');
+        if (advancedStatus) {
+            const pickupLabels = [];
+            if (mailbox.configured === true) pickupLabels.push(familyDeviceMapCopy(mailbox.label));
+            if (local.pickupConfigured === true) pickupLabels.push(familyDeviceMapCopy(local.label));
+            const statusText = pickupLabels.join(' · ');
+            if (advancedStatus.textContent !== statusText) advancedStatus.textContent = statusText;
+            advancedStatus.hidden = pickupLabels.length === 0;
+        }
         if (ftNanahDeliveryLocalCard) {
             ftNanahDeliveryLocalCard.dataset.tone = local.configured ? 'success' : (localCanConfigure ? 'optional' : 'neutral');
         }
@@ -22793,6 +22803,9 @@ document.addEventListener('DOMContentLoaded', async () => {
     async function updateNanahTrustedLinkPolicy(linkId, updates = {}) {
         const normalized = normalizeString(linkId);
         const detachedUpdates = JSON.parse(JSON.stringify(safeObject(updates)));
+        const reservationExpected = safeObject(detachedUpdates.autoSyncReservationExpected);
+        const hasReservationExpected = Object.prototype.hasOwnProperty.call(detachedUpdates, 'autoSyncReservationExpected');
+        delete detachedUpdates.autoSyncReservationExpected;
         if (!normalized) return false;
         const baseline = JSON.parse(JSON.stringify(safeObject(nanahTrustedLinks.find(entry => normalizeString(entry?.linkId) === normalized))));
         return commitNanahTrustedLinkMutation(rows => {
@@ -22804,6 +22817,86 @@ document.addEventListener('DOMContentLoaded', async () => {
             const baselinePolicy = safeObject(baseline.policy);
             const patch = safeObject(detachedUpdates.policy);
             const policy = { ...currentPolicy, ...patch };
+            const hasReservation = Object.prototype.hasOwnProperty.call(patch, 'autoSyncReservedPolicies');
+            if (hasReservation || hasReservationExpected) {
+                const canonical = value => {
+                    if (Array.isArray(value)) return value.map(canonical);
+                    if (value && typeof value === 'object') return Object.fromEntries(Object.keys(value).sort().map(key => [key, canonical(value[key])]));
+                    return value;
+                };
+                const same = (a, b) => JSON.stringify(canonical(a)) === JSON.stringify(canonical(b));
+                if (!hasReservation || !hasReservationExpected
+                    || Object.keys(detachedUpdates).some(key => key !== 'policy')
+                    || Object.keys(patch).some(key => key !== 'autoSyncReservedPolicies')) {
+                    throw new Error('A managed revision reservation requires its exact saved-link binding.');
+                }
+                const binding = {
+                    linkId: normalizeString(current.linkId),
+                    linkType: current.linkType, localRole: current.localRole, remoteRole: current.remoteRole,
+                    sourceDeviceId: normalizeString(current.sourceDeviceId || currentPolicy.sourceDeviceId),
+                    targetDeviceId: normalizeString(current.targetDeviceId || currentPolicy.targetDeviceId || current.remoteDeviceId),
+                    sourceProfileId: normalizeString(current.sourceProfileId || currentPolicy.sourceProfileId),
+                    targetProfileId: normalizeString(current.targetProfileId || currentPolicy.targetProfileId),
+                    localPolicyProfileId: normalizeString(current.localPolicyProfileId),
+                    sourcePublicKeyId: normalizeString(current.sourcePublicKeyId || currentPolicy.sourcePublicKeyId),
+                    keyVersion: current.keyVersion || currentPolicy.keyVersion,
+                    targetProfileBehavior: currentPolicy.targetProfileBehavior,
+                    allowedScopes: getNanahManagedPolicyScopeList(currentPolicy.allowedScopes || currentPolicy.defaultScope).slice().sort(),
+                    sourcePublicKeyJwk: safeObject(current.sourcePublicKeyJwk || currentPolicy.sourcePublicKeyJwk)
+                };
+                const conflictingIdentity = ['sourceDeviceId', 'targetDeviceId', 'sourceProfileId', 'targetProfileId', 'sourcePublicKeyId']
+                    .some(key => normalizeString(current[key]) && normalizeString(currentPolicy[key])
+                        && normalizeString(current[key]) !== normalizeString(currentPolicy[key]));
+                if (!same(binding, reservationExpected) || conflictingIdentity
+                    || binding.linkId !== normalized || binding.linkType !== 'managed_link'
+                    || binding.localRole !== 'source' || binding.remoteRole !== 'replica'
+                    || binding.targetProfileBehavior !== 'fixed_profile'
+                    || ['sourceDeviceId', 'targetDeviceId', 'sourceProfileId', 'targetProfileId', 'localPolicyProfileId', 'sourcePublicKeyId']
+                        .some(key => !normalizeString(binding[key]))
+                    || (normalizeString(current.remoteDeviceId) && normalizeString(current.remoteDeviceId) !== binding.targetDeviceId)
+                    || (current.keyVersion != null && currentPolicy.keyVersion != null && current.keyVersion !== currentPolicy.keyVersion)
+                    || !Number.isSafeInteger(binding.keyVersion) || binding.keyVersion <= 0
+                    || current.revoked || currentPolicy.revoked || current.keyRevoked || currentPolicy.keyRevoked
+                    || current.stalePairing || currentPolicy.stalePairing || current.quarantined || currentPolicy.quarantined) {
+                    throw new Error('The saved managed link changed before its revision could be reserved.');
+                }
+                const latestReservations = safeObject(currentPolicy.autoSyncReservedPolicies);
+                const latestSent = safeObject(currentPolicy.outgoingManagedPolicies);
+                const merged = { ...latestReservations };
+                const requested = Object.entries(safeObject(patch.autoSyncReservedPolicies));
+                if (!requested.length) throw new Error('A managed revision reservation requires a policy area.');
+                for (const [scope, value] of requested) {
+                    const incoming = safeObject(value);
+                    if (!binding.allowedScopes.includes(scope)
+                        || !['main', 'kids', 'videos', 'keywords', 'channels', 'viewing_space', 'time_limits'].includes(scope)
+                        || !Number.isSafeInteger(incoming.revision) || incoming.revision <= 0
+                        || !normalizeString(incoming.policyHash)
+                        || (Object.prototype.hasOwnProperty.call(incoming, 'payloadSha256')
+                            && !(typeof incoming.payloadSha256 === 'string' && /^sha256:[A-Za-z0-9_-]{43}$/.test(incoming.payloadSha256)))
+                        || Object.keys(incoming).some(key => !['revision', 'policyHash', 'payloadSha256'].includes(key))) {
+                        throw new Error('The managed policy revision reservation is invalid.');
+                    }
+                    const floors = [latestReservations[scope], latestSent[scope]].filter(value => value != null);
+                    for (const value of floors) {
+                        const committed = safeObject(value);
+                        if (!Number.isSafeInteger(committed.revision) || committed.revision <= 0 || !normalizeString(committed.policyHash)
+                            || (Object.prototype.hasOwnProperty.call(committed, 'payloadSha256')
+                                && !(typeof committed.payloadSha256 === 'string' && /^sha256:[A-Za-z0-9_-]{43}$/.test(committed.payloadSha256)))
+                            || incoming.revision < committed.revision
+                            || (incoming.revision === committed.revision && (incoming.policyHash !== committed.policyHash
+                                || (incoming.payloadSha256 || '') !== (committed.payloadSha256 || '')))) {
+                            throw new Error('A newer or conflicting managed policy revision is already reserved or sent.');
+                        }
+                    }
+                    if (floors.length === 2 && floors[0].revision === floors[1].revision && (floors[0].policyHash !== floors[1].policyHash
+                        || (floors[0].payloadSha256 || '') !== (floors[1].payloadSha256 || ''))) {
+                        throw new Error('The saved managed policy revision has conflicting allocation floors.');
+                    }
+                    merged[scope] = { revision: incoming.revision, policyHash: incoming.policyHash,
+                        ...(incoming.payloadSha256 ? { payloadSha256: incoming.payloadSha256 } : {}) };
+                }
+                policy.autoSyncReservedPolicies = merged;
+            }
             if (Object.prototype.hasOwnProperty.call(patch, 'outgoingManagedPolicies')) {
                 const original = safeObject(baselinePolicy.outgoingManagedPolicies);
                 const latest = safeObject(currentPolicy.outgoingManagedPolicies);
@@ -22818,7 +22911,8 @@ document.addEventListener('DOMContentLoaded', async () => {
                         const receiptFields = ['lastAckAt', 'lastAckState', 'lastAckResult', 'lastAckReason', 'lastAckTargetProfileId'];
                         const samePolicy = (a, b) => Number.isInteger(a.revision) && a.revision > 0
                             && a.revision === b.revision && !!normalizeString(a.policyHash)
-                            && normalizeString(a.policyHash) === normalizeString(b.policyHash);
+                            && normalizeString(a.policyHash) === normalizeString(b.policyHash)
+                            && (a.payloadSha256 || '') === (b.payloadSha256 || '');
                         const receiptOnly = normalizeNonNegativeInteger(incoming.lastAckAt) > 0
                             && samePolicy(previous, incoming)
                             && Object.keys({ ...previous, ...incoming }).every(key => receiptFields.includes(key)
@@ -22984,6 +23078,145 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     function formatNanahManagedOpenSyncStatus(link) {
         return createNanahManagedOpenSyncHelper()?.formatStatus(link, nanahManagedOpenSyncState, activeProfileId) || '';
+    }
+
+    // Automatic updates reuse the existing signed transport and receiver checks.
+    // Enrollment never changes the receiver's saved permissions.
+    let deviceAutoSync = null;
+    let deviceAutoSyncUi = null;
+    async function initializeDeviceAutoSync() {
+        const promiseApi = typeof browser !== 'undefined' && !!browser.runtime;
+        const api = promiseApi ? browser : chrome;
+        const call = (target, method, ...args) => promiseApi
+            ? Promise.resolve().then(() => target[method](...args))
+            : new Promise((resolve, reject) => {
+            target[method](...args, result => api.runtime.lastError ? reject(Error('Auto-sync storage is unavailable.')) : resolve(result));
+        });
+        const get = keys => call(api.storage.local, 'get', keys);
+        const set = values => call(api.storage.local, 'set', values);
+        const withLock = fn => {
+            if (!navigator.locks?.request) throw Error('Secure Auto-sync storage is unavailable in this browser.');
+            return navigator.locks.request('filtertube-auto-sync-v1', { mode: 'exclusive' }, fn);
+        };
+        const queue = window.FilterTubeAutoSyncQueue.create({ get, set, withLock });
+        const session = () => ({ client: nanahClient, ready: nanahSessionState.connected === true && nanahSessionState.sasConfirmed === true,
+            remoteDeviceId: normalizeString(nanahSessionState.remoteDevice?.deviceId),
+            remoteProfileId: normalizeString(nanahSessionState.remoteProfile?.profileId),
+            remoteProfileType: normalizeString(nanahSessionState.remoteProfile?.profileType),
+            remoteProfileName: normalizeString(nanahSessionState.remoteProfile?.profileName),
+            remoteDeviceLabel: getNanahRemoteLabel(),
+            role: getNanahRole(), remoteRole: nanahSessionState.remoteRole,
+            autoSyncVersion: nanahSessionState.autoSyncVersion || 0,
+            managedReady: safeArray(nanahSessionState.autoSyncManagedReady) });
+        const context = async () => {
+            const profilesV4 = await window.FilterTubeIO.loadProfilesV4();
+            await loadNanahTrustedLinks();
+            const auth = await call(api.runtime, 'sendMessage', { action: 'FilterTube_AutoSyncAuthorize', profileId: profilesV4.activeProfileId });
+            const stored = await get([NANAH_TRUSTED_LINKS_KEY]);
+            const rawLinks = safeArray(stored[NANAH_TRUSTED_LINKS_KEY]);
+            // Personal grants pin persisted identity, never normalization's
+            // synthetic timestamps or inferred legacy roles.
+            const links = nanahTrustedLinks.map(link => {
+                if (link.linkType !== 'peer_link') return link;
+                const raw = rawLinks.find(entry => entry.linkId === link.linkId && entry.remoteDeviceId === link.remoteDeviceId);
+                return raw ? { ...raw, revoked: link.revoked === true || link.policy?.revoked === true } : null;
+            }).filter(Boolean);
+            return { profilesV4, links, deviceId: nanahStableDeviceId, unlocked: auth?.ok === true };
+        };
+        const checkSession = captured => {
+            const current = session();
+            if (!captured?.client || captured.client !== current.client || !current.ready
+                || current.remoteDeviceId !== captured.remoteDeviceId || current.remoteProfileId !== captured.remoteProfileId) {
+                throw Error('The device connection changed. Waiting to reconnect.');
+            }
+        };
+        deviceAutoSync = window.FilterTubeDeviceAutoSync.create({
+            get, set, withLock, queue, context, session,
+            operation: (grant, current) => nanahManagedLivePolicy.createSendOperation({
+                source: { profileId: grant.binding.localPolicyProfileId, profile: current.profilesV4.profiles[grant.binding.localPolicyProfileId], sourceKind: 'auto_sync' },
+                actor: { profileId: grant.binding.sourceProfileId, profileType: 'account' }, surface: 'main'
+            }),
+            hasTimePolicy: profile => !!getManagedTimeLimitPolicy(profile),
+            confirmManaged: async (link, binding) => {
+                const fresh = await window.FilterTubeIO.loadProfilesV4();
+                if (!await ensureProfileUnlocked(fresh, binding.sourceProfileId, { sensitiveAction: true })) return false;
+                const choice = await showChoiceModal({ title: 'Turn on Auto-sync?',
+                    message: `${getProfileName(fresh, binding.localPolicyProfileId)} → ${link.policy.targetProfileName || binding.targetProfileId} on ${link.deviceLabel}`,
+                    details: ['Future saved changes to the approved areas will be sent automatically. The receiving device keeps its existing parent permissions.',
+                        'Direct peer-to-peer updates stay between these devices. Keep FilterTube open on both devices; offline changes wait here.',
+                        `Approved areas: ${binding.allowedScopes.map(getNanahScopeLabel).join(', ')}.`],
+                    choices: [{ value: 'enable', label: 'Turn on Auto-sync' }], cancelText: 'Keep off' });
+                return choice === 'enable';
+            },
+            confirmPersonal: async ({ title, message, details = [] }) => {
+                const fresh = await window.FilterTubeIO.loadProfilesV4();
+                if (getProfileType(fresh, fresh.activeProfileId) === 'child'
+                    || !await ensureProfileUnlocked(fresh, fresh.activeProfileId, { sensitiveAction: true })) return false;
+                return await showChoiceModal({ title, message, details,
+                    choices: [{ value: 'enable', label: 'Allow Auto-sync' }], cancelText: 'Keep off' }) === 'enable';
+            },
+            sendManaged: async (envelope, captured, authorize) => {
+                checkSession(captured);
+                if (!await authorize()) throw Error('Parent access changed.');
+                await nanahManagedLivePolicy.sendLiveEnvelope(envelope, async outgoing => {
+                    if (!await authorize()) throw Error('Parent access changed.');
+                    checkSession(captured);
+                    await captured.client.send(outgoing);
+                }, { delivery: 'auto_sync_direct' });
+            },
+            sendPersonal: async (envelope, captured) => {
+                checkSession(captured); await captured.client.send(envelope);
+            },
+            notesRead: async (profileId, grantId) => {
+                const result = await call(api.runtime, 'sendMessage', { action: 'FilterTube_PersonalNotesRead', profileId, grantId });
+                if (!result?.ok) throw Error('Unlock this profile before syncing notes.');
+                return result.envelope;
+            },
+            notesMerge: async (profileId, envelope, grantId) => {
+                const result = await call(api.runtime, 'sendMessage', { action: 'FilterTube_PersonalNotesMerge', profileId, grantId, envelope });
+                if (!result?.ok) throw Error('Notes could not be applied.');
+                return result.envelope;
+            },
+            applySettings: async (profileId, snapshot, beforeCheck, expectedLocalSnapshot) => {
+                await window.FilterTubeNanahStorageLock.run(async () => {
+                    if (!await beforeCheck()) throw Error('Profile sync access changed.');
+                    const fresh = await window.FilterTubeIO.loadProfilesV4();
+                    window.FilterTubeDeviceAutoSync.security(fresh, profileId);
+                    const current = window.FilterTubePersonalSync.snapshotSettings(fresh.profiles[profileId]);
+                    if (!expectedLocalSnapshot || JSON.stringify(current) !== JSON.stringify(expectedLocalSnapshot)) {
+                        throw Error('Settings changed here while the update was checked. Review sync again.');
+                    }
+                    const authority = window.FilterTubeDeviceAutoSync.security(fresh, profileId);
+                    if (!await beforeCheck()) throw Error('Profile sync access changed.');
+                    const latest = await window.FilterTubeIO.loadProfilesV4();
+                    if (window.FilterTubeDeviceAutoSync.security(latest, profileId) !== authority
+                        || JSON.stringify(window.FilterTubePersonalSync.snapshotSettings(latest.profiles[profileId])) !== JSON.stringify(current)) {
+                        throw Error('Settings changed here. Review sync again.');
+                    }
+                    await window.FilterTubeIO.saveProfilesV4({ ...latest, profiles: { ...latest.profiles, [profileId]: window.FilterTubePersonalSync.applySettings(latest.profiles[profileId], snapshot) } });
+                });
+                await refreshFilterTubeUiAfterNanahImport();
+            },
+            checkIncoming: async () => { await runNanahManagedBackgroundSync({ reason: 'auto_sync_check' }); }
+        });
+        deviceAutoSyncUi = window.FilterTubeDeviceAutoSyncUI.install({ root: document.getElementById('ftDeviceAutoSync'), controller: deviceAutoSync,
+            context: () => ({ selectedLinkId: nanahFamilyDeviceSelectedIntent?.linkId || '' }),
+            text: (key, fallback) => tabViewUiText(key, fallback) });
+        api.storage.onChanged.addListener((changes, area) => {
+            if (area === 'local' && ['ftProfilesV4', 'ftSavedVideoNotesV1', NANAH_TRUSTED_LINKS_KEY, 'ftDeviceAutoSyncV1'].some(key => changes[key])) {
+                deviceAutoSync.schedule();
+            }
+        });
+        api.runtime.onMessage.addListener((request, sender) => {
+            if (request?.action === 'FilterTube_AutoSyncWake' && sender.id === api.runtime.id && !sender.tab
+                && (!sender.url || sender.url === api.runtime.getURL('js/background.js'))) deviceAutoSync.schedule();
+            return false;
+        });
+        window.addEventListener('online', () => deviceAutoSync.run({ wake: true }).catch(() => {}));
+        document.addEventListener('visibilitychange', () => { if (!document.hidden) deviceAutoSync.schedule(); });
+        // No hidden dashboard or always-on socket is created. Queues survive browser restarts.
+        await deviceAutoSyncUi.ready;
+        deviceAutoSync.schedule();
     }
 
     async function runNanahManagedOpenSync({ reason = 'dashboard_open' } = {}) {
@@ -24939,6 +25172,8 @@ document.addEventListener('DOMContentLoaded', async () => {
     }
 
     function updateNanahUi() {
+        // Native disabling can blur an action before the presentation phase changes.
+        const pairingFocus = ftNanahPairingDetails?.contains?.(document.activeElement) ? document.activeElement : null;
         enforceChildSyncSurfaceRestrictions();
         let nanahTone = 'idle';
         if (!nanahClient) {
@@ -25081,6 +25316,27 @@ document.addEventListener('DOMContentLoaded', async () => {
         refreshNanahAdvancedSummary();
         updateNanahModeUi();
         renderNanahDeliveryPathStrip();
+        window.FilterTubeNanahPairingUI?.render?.({
+            root: ftNanahPairingDetails,
+            previouslyFocused: pairingFocus,
+            state: {
+                active: !!nanahClient,
+                connected: nanahSessionState.connected === true,
+                code: normalizeString(nanahSessionState.code),
+                phrase: normalizeString(nanahSessionState.sasPhrase),
+                phraseConfirmed: nanahSessionState.sasConfirmed === true,
+                pairUri: normalizeString(nanahSessionState.pairUri),
+                hasQrRenderer: typeof window.FilterTubeQrCode?.toCanvas === 'function',
+                canHost: ftNanahHostBtn?.disabled === false,
+                canSend: ftNanahSendBtn?.disabled === false,
+                canTrust: ftNanahTrustBtn?.disabled === false,
+                targetVisible: ftNanahRemoteTargetField?.hidden === false,
+                managedTargetsVisible: ftNanahManagedTargetsField?.hidden === false,
+                childReceiveOnly: isNanahChildReceiveOnly() || isNanahChildReplicaOnly(),
+                savedLinkCount: Array.isArray(nanahTrustedLinks) ? nanahTrustedLinks.length : 0,
+                mode: getNanahUiMode()
+            }
+        });
         renderNanahQr().catch(() => { });
     }
 
@@ -25256,6 +25512,29 @@ document.addEventListener('DOMContentLoaded', async () => {
         }
     }
 
+    async function sendNanahAutoSyncReadiness() {
+        if (!nanahClient || getNanahRole() !== 'replica' || nanahSessionState.remoteRole !== 'source'
+            || !nanahSessionState.connected || !nanahSessionState.sasConfirmed || nanahSessionState.autoSyncVersion !== 1) return;
+        const client = nanahClient;
+        const remoteDeviceId = normalizeString(nanahSessionState.remoteDevice?.deviceId);
+        const sourceProfileId = normalizeString(nanahSessionState.remoteProfile?.profileId);
+        await loadNanahTrustedLinks();
+        const linkIds = nanahTrustedLinks.filter(link => link.localRole === 'replica' && link.remoteRole === 'source'
+            && !link.revoked && !link.keyRevoked && !link.stalePairing && !link.quarantined
+            && !link.policy?.revoked && !link.policy?.keyRevoked && !link.policy?.stalePairing
+            && link.remoteDeviceId === remoteDeviceId
+            && (link.sourceProfileId || link.policy?.sourceProfileId) === sourceProfileId
+            && link.policy?.autoApplyControlProposals === true
+            && (link.policy?.reconnectMode === 'fast' || (nanahSessionState.trustedReconnectApproved === true
+                && nanahSessionState.trustedReconnectDeviceId === remoteDeviceId)))
+            .map(link => link.linkId).slice(0, 64);
+        if (nanahClient === client && nanahSessionState.connected && nanahSessionState.sasConfirmed
+            && normalizeString(nanahSessionState.remoteDevice?.deviceId) === remoteDeviceId
+            && normalizeString(nanahSessionState.remoteProfile?.profileId) === sourceProfileId) {
+            await client.send({ schema: 'filtertube.managed-auto-sync-ready', version: 1, linkIds });
+        }
+    }
+
     async function sendNanahHelloEnvelope(force = false) {
         if (!nanahClient || !nanahSessionState.connected || (nanahSessionState.helloSent && !force)) return;
         const device = buildNanahDeviceDescriptor();
@@ -25266,6 +25545,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             app: 'filtertube',
             role,
             device,
+            autoSyncVersion: 1,
             profileContext: getNanahLocalProfileContext(),
             profileInventory: getNanahProfileInventory(),
             targetProfileContext: buildNanahHelloTargetProfileContext(),
@@ -26368,7 +26648,24 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     async function handleNanahIncomingEnvelope(envelope) {
         const root = safeObject(envelope);
+        if (typeof deviceAutoSync !== 'undefined' && deviceAutoSync && await deviceAutoSync.receive(root)) return;
+        if (root.schema === 'filtertube.managed-auto-sync-ready') {
+            if (root.version === 1 && nanahSessionState.connected && nanahSessionState.sasConfirmed
+                && getNanahRole() === 'source' && nanahSessionState.remoteRole === 'replica'
+                && Array.isArray(root.linkIds) && root.linkIds.length <= 64) {
+                await loadNanahTrustedLinks();
+                const remoteId = normalizeString(nanahSessionState.remoteDevice?.deviceId);
+                nanahSessionState.autoSyncManagedReady = root.linkIds.filter(id => typeof id === 'string'
+                    && nanahTrustedLinks.some(link => link.linkId === id && link.localRole === 'source'
+                        && link.remoteRole === 'replica' && link.remoteDeviceId === remoteId
+                        && link.policy?.autoApplyControlProposals === true));
+                if (typeof deviceAutoSync !== 'undefined') void deviceAutoSync?.run({ wake: true }).catch(() => {});
+            }
+            return;
+        }
         if (root.t === 'hello') {
+            nanahSessionState.autoSyncManagedReady = [];
+            nanahSessionState.autoSyncVersion = root.autoSyncVersion === 1 ? 1 : 0;
             nanahSessionState.remoteDevice = safeObject(root.device);
             nanahSessionState.remoteProfile = normalizeNanahProfileContext(root.profileContext || root.profile);
             nanahSessionState.remoteProfileInventory = normalizeNanahProfileInventory(root.profileInventory || root.profiles);
@@ -26380,9 +26677,11 @@ document.addEventListener('DOMContentLoaded', async () => {
             }
             syncNanahRemoteTargetOptions();
             updateNanahUi();
+            if (typeof deviceAutoSync !== 'undefined') deviceAutoSync?.schedule();
             const trustedLink = getNanahCurrentTrustedLink();
             const approved = await ensureNanahTrustedReconnectApproved(trustedLink, { closeOnDecline: true });
             if (approved) {
+                if (typeof sendNanahAutoSyncReadiness === 'function') await sendNanahAutoSyncReadiness();
                 const targetProfile = normalizeNanahTargetProfileContext(nanahSessionState.remoteTargetProfile);
                 await markNanahTrustedLinkUsed(safeObject(root.device).deviceId, {
                     targetProfileId: targetProfile.behavior === 'fixed_profile' ? targetProfile.profileId : '',
@@ -29313,6 +29612,10 @@ document.addEventListener('DOMContentLoaded', async () => {
     renderNanahTrustedLinks();
     setNanahMode(nanahUiMode, { persist: false, applyPreset: true });
     updateNanahUi();
+    void initializeDeviceAutoSync().catch(() => {
+        const node = document.getElementById('ftDeviceAutoSync');
+        if (node) node.textContent = 'Auto-sync is unavailable. Existing manual sync is still available.';
+    });
     void runNanahManagedBackgroundSync({ reason: 'dashboard_open' });
     document.addEventListener('visibilitychange', () => {
         if (document.visibilityState === 'visible') {
@@ -29451,6 +29754,8 @@ document.addEventListener('DOMContentLoaded', async () => {
                     if (confirmed !== 'confirm') return;
                     await nanahClient.confirmSas();
                     nanahSessionState.sasConfirmed = true;
+                    void sendNanahHelloEnvelope(true).then(() => sendNanahAutoSyncReadiness()).catch(() => {});
+                    void deviceAutoSync?.run({ wake: true }).catch(() => {});
                     updateNanahUi();
                     await sendNanahHelloEnvelope();
                     UIComponents.showToast(tabViewUiText('dashboard.sync.toast.secureSessionConfirmed', 'Secure session confirmed'), 'success');

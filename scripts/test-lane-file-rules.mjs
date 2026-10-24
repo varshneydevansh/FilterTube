@@ -1,5 +1,6 @@
 // Declarative path ownership, split from test-lane-config.mjs to keep workflow files bounded.
 export const FILE_LANE_RULES = Object.freeze([
+  { id: 'opt-in-device-auto-sync', patterns: [/^js\/(?:auto_sync_(?:queue|wakeup)|device_auto_sync(?:_ui)?|managed_auto_sync|personal_sync|personal_auto_sync_runtime)\.js$/, /^tests\/runtime\/(?:auto-sync-.*|device-auto-sync.*|managed-auto-sync.*|personal-sync|personal-auto-sync.*)\.test\.mjs$/, /^css\/device-auto-sync\.css$/], lanes: ['release', 'settings', 'smoke'] },
   { id: 'video-notes-runtime-and-contract', patterns: [/^js\/(?:shared\/saved_video_notes|content\/video_notes|video_notes_(?:background|editor|store))\.js$/, /^tests\/runtime\/(?:video-notes-.*\.test\.mjs|fixtures\/video-notes\/)/, /^html\/video-notes\.html$/, /^css\/video-notes\.css$/, /^docs\/design\/VIDEO_NOTES_/, /^docs\/audit\/artifacts\/watch-notes-/], lanes: ['release', 'blocking', 'whitelist', 'json', 'dom', 'performance', 'settings', 'smoke'] },
   { id: 'advert-streaming-backoff-evidence', patterns: [/^docs\/audit\/artifacts\/advert-streaming-backoff-[^/]+\/.*\.json$/], lanes: ['release', 'performance', 'smoke'] },
   { id: 'content-only-playback-evidence', patterns: [/^docs\/audit\/artifacts\/content-only-playback-[^/]+\//], lanes: ['release', 'performance', 'smoke'] },
@@ -99,7 +100,7 @@ export const FILE_LANE_RULES = Object.freeze([
     patterns: [/^js\/content_controls_catalog\.js$/],
     lanes: ['whitelist', 'blocking', 'json', 'dom', 'menu', 'performance', 'settings']
   },
-  { id: 'nanah-sync-runtime', patterns: [/^js\/(?:nanah_sync_adapter|nanah_qr_scanner|nanah_storage_lock)\.js$/], lanes: ['release', 'settings', 'smoke'] },
+  { id: 'nanah-sync-runtime', patterns: [/^js\/(?:nanah_sync_adapter|nanah_qr_scanner|nanah_storage_lock|nanah_pairing_ui)\.js$/, /^tests\/runtime\/(?:managed-policy-payload-integrity|nanah-pairing-ui)\.test\.mjs$/], lanes: ['release', 'settings', 'smoke'] },
   {
     id: 'nanah-managed-policy-runtime',
     patterns: [/^js\/nanah_managed_(?:live_policy|open_sync|mailbox_client|local_network_client)\.js$/],

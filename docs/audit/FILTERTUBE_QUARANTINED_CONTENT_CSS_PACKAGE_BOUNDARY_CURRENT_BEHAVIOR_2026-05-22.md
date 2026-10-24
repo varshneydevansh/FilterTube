@@ -230,3 +230,11 @@ extension HTML files checked: 4
 extension HTML link tags checked: 11
 
 Notes adds a private extension stylesheet; the three quarantined CSS files remain inactive.
+
+## Auto-sync source inventory - 2026-10-24
+
+extension HTML files checked: 4
+extension HTML link tags checked: 12
+extension HTML quarantined CSS link refs: 0
+
+The extra dashboard stylesheet is css/device-auto-sync.css. It does not activate any quarantined content CSS. Existing packaging and manifest no-content-CSS assertions remain unchanged.

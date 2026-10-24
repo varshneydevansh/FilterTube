@@ -285,3 +285,11 @@ background bytes: 387821
 sha256: `ac2b4ae17d2c3c7d50ce0fd8dc0d6052a2c56b43c4aefeb48c0053e74709538d`
 
 Notes modules are synchronously imported in the browser background, with optional initialization isolated from filtering startup. They are never injected into MAIN.
+
+## Auto-sync source inventory - 2026-10-24
+
+background lines: 8607
+background bytes: 390769
+sha256: `11606b409f8cef1c2d6821a411f81a41eb0684ab65ee183139ad42cac25830fb`
+
+Auto-sync authorization/startup additions change the whole-file fingerprint. Existing script injection blocks and their semantic assertions remain separately checked; this is not injection-security completion.

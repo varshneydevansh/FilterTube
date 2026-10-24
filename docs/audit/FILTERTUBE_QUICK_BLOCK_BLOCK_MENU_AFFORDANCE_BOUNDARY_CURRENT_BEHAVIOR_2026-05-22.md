@@ -513,3 +513,15 @@ fallback perform block action block bytes: 10098
 
 | `js/background.js` | 8565 | 387821 | `ac2b4ae17d2c3c7d50ce0fd8dc0d6052a2c56b43c4aefeb48c0053e74709538d` |
 Notes adds private background initialization; quick-block logic is unchanged.
+
+## Auto-sync source inventory - 2026-10-24
+
+| `js/content_controls_catalog.js` | 304 | 12854 | `6100dd0ac275d6948a8d406cd92cd5913c7175de98c934d16efcecf12588c449` |
+| `js/settings_shared.js` | 1327 | 67805 | `c3d0f4b965acaaf46f6424cd0ad329c50e616de7b1cf8905a9fa578123e2bf69` |
+| `js/background.js` | 8607 | 390769 | `11606b409f8cef1c2d6821a411f81a41eb0684ab65ee183139ad42cac25830fb` |
+| `js/content/bridge_settings.js` | 2238 | 101092 | `923110bd0a8f2c3216199e1c930550ab80f6458448060d874da19e336aab3e24` |
+| `js/state_manager.js` | 2984 | 124258 | `029b2e7d4356d4629348f174bdaf7858fa1fa0c09a4b54c6bb0e293a161a8d5e` |
+| `js/content/block_channel.js` | 3361 | 135050 | `f2a02886a83d64d93186cd1f0c1f300683ae49754b928d2e0329fd1a88d8f2c9` |
+| `js/content_bridge.js` | 15056 | 678414 | `9e0bca2973ffb01d0216ea8b096531ad3c1afe7af4acc7363fa4b1cc2ca09f18` |
+
+Only source fingerprints were refreshed here. Existing affordance behavior assertions and release blockers remain unchanged.

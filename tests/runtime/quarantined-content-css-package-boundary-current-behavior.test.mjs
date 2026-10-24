@@ -242,7 +242,7 @@ test('quarantined content CSS is packaged but not manifest or extension HTML loa
 });
   assert.deepEqual(htmlStats, {
   "htmlFiles": 4,
-  "linkTags": 11,
+  "linkTags": 12,
   "quarantinedCssLinks": 0
 });
 
@@ -275,7 +275,7 @@ test('quarantined content CSS is packaged but not manifest or extension HTML loa
     'dist manifest quarantined CSS content script refs: 0',
     'dist manifest quarantined CSS web-accessible refs: 0',
     'extension HTML files checked: 4',
-    'extension HTML link tags checked: 11',
+    'extension HTML link tags checked: 12',
     'extension HTML quarantined CSS link refs: 0',
     'packaged dist CSS copies: 9',
     'dist CSS copies hash-match source: yes'

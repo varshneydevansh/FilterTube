@@ -238,3 +238,12 @@ Normal isolated pages load source planner, resolver, admission, native source tr
 | `manifest.opera.json` | 170 | 5819 | `c516d8c0439a79016b0ed04ffb3658bbd40f8e0868fc146d8707a9da076636a4` |
 
 Notes is an ISOLATED normal-watch helper before content_bridge. The extension-origin editor HTML alone is web-accessible; note text, store, writer and background are not. Firefox loads contract/store/adapter before background. Existing permissions, embeds, previews and MAIN playback stacks are unchanged.
+
+## Auto-sync source inventory - 2026-10-24
+
+| `manifest.json` | 162 | 5630 | `ba155d12e591c0306620bc57c59ad7378c5313084314a748414b5b1d39879d9d` |
+| `manifest.chrome.json` | 162 | 5630 | `ba155d12e591c0306620bc57c59ad7378c5313084314a748414b5b1d39879d9d` |
+| `manifest.firefox.json` | 136 | 4668 | `30b981228a8214e0721d8c29ca3a74cac369508b0aca702e6b55286bc87ee7b8` |
+| `manifest.opera.json` | 170 | 5819 | `c516d8c0439a79016b0ed04ffb3658bbd40f8e0868fc146d8707a9da076636a4` |
+
+Firefox background order now explicitly loads the private personal-sync validator, Auto-sync security helper, and wakeup scheduler before background.js. Existing YouTube content-script order/world/permissions remain independently asserted. This is source-load evidence only.

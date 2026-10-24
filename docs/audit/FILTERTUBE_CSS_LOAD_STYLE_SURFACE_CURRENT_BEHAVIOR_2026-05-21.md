@@ -174,3 +174,21 @@ The private extension-origin html/video-notes.html loads this stylesheet. It doe
 | `css/video-notes.css` | active extension private Notes editor CSS | 127 | 5270 | da72df5db2d9ad321927cb710d8d48d01dc0127f656da11b920b7049c22ac388 | 59 | 1 | 2 | 0 | 0 | 0 | 3 | 0 | 1 |
 
 Readability changes use larger note text, higher contrast disabled states, a compact app-style header, separated timestamp controls and a visible Save action. Quarantined content styles remain inactive.
+
+## Auto-sync source inventory - 2026-10-24
+
+11 CSS files, 21,063 counted source lines; 586,423 bytes, 3,050 lexical rule blocks.
+
+| `css/components.css` | active extension UI shared CSS | 1966 | 52694 | `f7aefe9b0400f0427bbbd8dc52c9dfc7ccd675847d28e6555c564426a29e5036` | 283 | 48 | 2 | 0 | 0 | 0 | 7 | 1 | 1 |
+| `css/content.css` | packaged quarantined content CSS | 385 | 12890 | `442c6ad823ebed5075099036b057c29914b218b0bea9e823e9e0b216d771141b` | 45 | 113 | 6 | 5 | 35 | 0 | 0 | 0 | 0 |
+| `css/design_tokens.css` | active extension UI token CSS | 301 | 10361 | `7da73da79df23e6325c921e45fd786270488ee8ad212b57b7e634b63898c27dc` | 12 | 0 | 0 | 0 | 0 | 0 | 1 | 0 | 0 |
+| `css/device-auto-sync.css` | active extension Auto-sync dashboard CSS | 202 | 15100 | `9cbe4a611981f2ef4e153d153bbf24d1831edd07e4094e1624e1c0f7397f6201` | 114 | 3 | 6 | 0 | 0 | 0 | 3 | 0 | 3 |
+| `css/filter.css` | packaged quarantined content CSS | 74 | 2412 | `e2462d446b1a3738d937945eabf013ec05173224970b0c877593901aba5a5032` | 6 | 12 | 5 | 5 | 6 | 0 | 0 | 0 | 0 |
+| `css/layout.css` | packaged quarantined content CSS | 803 | 28581 | `9ae38491aeb2dc3a58027d4a005c6136042c66dc438786483285fdbd91cb1941` | 86 | 353 | 11 | 62 | 126 | 6 | 0 | 0 | 0 |
+| `css/popup.css` | active extension popup CSS | 1259 | 32376 | `c388d39fab962528365711baa0bfe953ed84ca660ac6123571f79b2c4be820c5` | 197 | 5 | 3 | 0 | 0 | 0 | 2 | 0 | 1 |
+| `css/serene-shell.css` | active extension shell CSS | 9656 | 267377 | `53608a364e8e62a326a0a7b98daa0ef2f6762cff272730f24a33c425690ee75b` | 1328 | 59 | 27 | 0 | 0 | 0 | 28 | 2 | 8 |
+| `css/tab-view.css` | active extension dashboard CSS | 5749 | 144577 | `8fbfff1804e96aefe5d211ff633be081233361ed551fff55e45496b9206648b2` | 844 | 25 | 22 | 0 | 0 | 0 | 21 | 5 | 6 |
+| `css/video-notes.css` | active extension private Notes editor CSS | 127 | 5270 | `da72df5db2d9ad321927cb710d8d48d01dc0127f656da11b920b7049c22ac388` | 59 | 1 | 2 | 0 | 0 | 0 | 3 | 0 | 1 |
+| `website/app/globals.css` | website-only global CSS | 541 | 14785 | `2341d3570c01f4ac118fa8587937d60c2a1ccf750163e74f90428c56fe5d7d06` | 76 | 0 | 0 | 0 | 0 | 0 | 1 | 1 | 0 |
+
+Auto-sync adds one scoped dashboard stylesheet with responsive controls. Counts and selector totals are lexical evidence; existing quarantined styles stay inactive. Installed, keyboard, phone and TV acceptance remain separate.

@@ -58,6 +58,22 @@ const cssRows = [
     0
   ],
   [
+    "css/device-auto-sync.css",
+    "active extension Auto-sync dashboard CSS",
+    202,
+    15100,
+    "9cbe4a611981f2ef4e153d153bbf24d1831edd07e4094e1624e1c0f7397f6201",
+    114,
+    3,
+    6,
+    0,
+    0,
+    0,
+    3,
+    0,
+    3
+  ],
+  [
     "css/filter.css",
     "packaged quarantined content CSS",
     74,
@@ -138,22 +154,6 @@ const cssRows = [
     6
   ],
   [
-    "website/app/globals.css",
-    "website-only global CSS",
-    541,
-    14785,
-    "2341d3570c01f4ac118fa8587937d60c2a1ccf750163e74f90428c56fe5d7d06",
-    76,
-    0,
-    0,
-    0,
-    0,
-    0,
-    1,
-    1,
-    0
-  ],
-  [
     "css/video-notes.css",
     "active extension private Notes editor CSS",
     127,
@@ -168,6 +168,22 @@ const cssRows = [
     3,
     0,
     1
+  ],
+  [
+    "website/app/globals.css",
+    "website-only global CSS",
+    541,
+    14785,
+    "2341d3570c01f4ac118fa8587937d60c2a1ccf750163e74f90428c56fe5d7d06",
+    76,
+    0,
+    0,
+    0,
+    0,
+    0,
+    1,
+    1,
+    0
   ]
 ];
 
@@ -218,7 +234,7 @@ test('CSS load style surface register is audit-only and covers every tracked CSS
   assert.match(doc, /Status: audit-only current-behavior proof/);
   assert.match(doc, /Runtime behavior is unchanged/);
   assert.match(doc, /not a CSS cleanup, UI redesign, manifest change, or package pruning patch/);
-  assert.equal(trackedCss.length, 10);
+  assert.equal(trackedCss.length, 11);
   assert.deepEqual(trackedCss.sort(), cssRows.map(([file]) => file).sort());
 
   const totals = { lines: 0, bytes: 0, rules: 0, important: 0, displayNone: 0, notVisible: 0, visible: 0, hidden: 0, media: 0, keyframes: 0, hiddenAttr: 0 };
@@ -242,20 +258,20 @@ test('CSS load style surface register is audit-only and covers every tracked CSS
   }
 
   assert.deepEqual(totals, {
-  "lines": 20861,
-  "bytes": 571323,
-  "rules": 2936,
-  "important": 616,
-  "displayNone": 78,
+  "lines": 21063,
+  "bytes": 586423,
+  "rules": 3050,
+  "important": 619,
+  "displayNone": 84,
   "notVisible": 72,
   "visible": 167,
   "hidden": 6,
-  "media": 63,
+  "media": 66,
   "keyframes": 9,
-  "hiddenAttr": 17
+  "hiddenAttr": 20
 });
-  assert.match(doc, /10 CSS files, 20,861 counted source lines/);
-  assert.match(doc, /571,323 bytes, 2,936 lexical rule blocks/);
+  assert.match(doc, /11 CSS files, 21,063 counted source lines/);
+  assert.match(doc, /586,423 bytes, 3,050 lexical rule blocks/);
   assert.match(doc, /615 `!important` declarations, 76\s+`display:none` declarations/);
 });
 

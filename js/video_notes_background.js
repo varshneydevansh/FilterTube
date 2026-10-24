@@ -1,10 +1,12 @@
 /* Notes capabilities never carry text through the page or MAIN-world bridge. */
 (function (root) {
     'use strict';
-    function install({ api, getSettings, profileAuthorized, storeFactory, now = Date.now, randomId = () => crypto.randomUUID() }) {
+    function install({ api, getSettings, profileAuthorized, storeFactory, syncAuthorize = async () => false,
+        now = Date.now, randomId = () => crypto.randomUUID() }) {
         const grants = new Map(), drafts = new Map();
         const prefix = 'FilterTube_Notes';
         const editorUrl = api.runtime.getURL('html/video-notes.html');
+        const dashboardUrl = api.runtime.getURL('html/tab-view.html');
         function call(target, method, ...args) {
             return new Promise((resolve, reject) => {
                 target[method](...args, value => api.runtime.lastError ? reject(Error('notes_unavailable')) : resolve(value));
@@ -45,11 +47,25 @@
         const store = storeFactory({
             get: keys => call(api.storage.local, 'get', keys),
             set: values => call(api.storage.local, 'set', values),
-            authorize, randomId: () => 'writer-' + randomId()
+            authorize, authorizeSync: syncAuthorize, randomId: () => 'writer-' + randomId()
         });
         const draftKey = grant => JSON.stringify([grant.tabId, grant.key.profileId, grant.key.videoId]);
         async function handle(request, sender) {
             const action = request.action;
+            if (action === 'FilterTube_PersonalNotesRead' || action === 'FilterTube_PersonalNotesMerge') {
+                // A YouTube/content-script caller cannot acquire bulk Notes
+                // access with an editor token, a peer envelope, or a grant ID.
+                if (sender.id !== api.runtime.id
+                    || !(sender.frameId === 0 || (sender.frameId === undefined && sender.tab === undefined))
+                    || String(sender.url || '').split('#')[0] !== dashboardUrl
+                    || typeof request.profileId !== 'string' || typeof request.grantId !== 'string'
+                    || !request.grantId.length || request.grantId.length > 1024) throw Error('access_changed');
+                const scope = Object.freeze({ grantId: request.grantId });
+                const envelope = action === 'FilterTube_PersonalNotesRead'
+                    ? await store.syncRead(request.profileId, scope)
+                    : await store.syncMerge(request.profileId, request.envelope, scope);
+                return { ok: true, envelope };
+            }
             const tabId = sender?.tab?.id;
             if (!Number.isInteger(tabId)) throw Error('access_changed');
             if (action === prefix + 'Grant') {
@@ -127,7 +143,8 @@
             throw Error('notes_unavailable');
         }
         api.runtime.onMessage.addListener((request, sender, respond) => {
-            if (typeof request?.action !== 'string' || !request.action.startsWith(prefix)
+            if (typeof request?.action !== 'string' || (!request.action.startsWith(prefix)
+                && !['FilterTube_PersonalNotesRead', 'FilterTube_PersonalNotesMerge'].includes(request.action))
                 || [prefix + 'Check'].includes(request.action)) return false;
             handle(request, sender).then(respond).catch(error => respond({ ok: false, error: ['profile_locked', 'access_changed'].includes(error?.message) ? error.message : 'notes_unavailable' }));
             return true;

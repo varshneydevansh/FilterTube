@@ -1220,7 +1220,7 @@ const browserAPI = IS_FIREFOX ? browser : chrome;
 // Private Notes modules are browser-only; never forwarded to MAIN or native assets.
 try {
     if (typeof importScripts === 'function' && !globalThis.FilterTubeVideoNotesBackground) {
-        importScripts('shared/saved_video_notes.js', 'video_notes_store.js', 'video_notes_background.js');
+        importScripts('shared/saved_video_notes.js', 'video_notes_store.js', 'video_notes_background.js', 'personal_sync.js', 'device_auto_sync.js', 'auto_sync_wakeup.js');
     }
     globalThis.FilterTubeVideoNotesBackground?.install({
         api: browserAPI,
@@ -1233,9 +1233,50 @@ try {
                 || !Object.prototype.hasOwnProperty.call(profiles.profiles || {}, profileId)) return false;
             return isProfileSessionAuthorized(profiles, profileId);
         },
+        syncAuthorize: authorizePersonalNotesSync,
         storeFactory: options => globalThis.FilterTubeVideoNotesStore.create(options)
     });
 } catch (_) { /* Optional Notes failure must not stop filtering startup. */ }
+// Sync privileges are private to the top-level extension dashboard. Web pages
+// cannot request note exports, profile authorization or auto-sync administration.
+function isAutoSyncDashboardSender(sender) {
+    return sender?.id === browserAPI.runtime.id
+        && (sender.frameId === 0 || (sender.frameId === undefined && sender.tab === undefined))
+        && String(sender.url || '').split('#')[0] === browserAPI.runtime.getURL('html/tab-view.html');
+}
+async function authorizePersonalNotesSync(profileId, scope) {
+    const stored = await storageGet(['ftProfilesV4', 'ftDeviceAutoSyncV1', 'ftNanahDeviceId', 'ftNanahTrustedLinks']);
+    const root = stored.ftProfilesV4;
+    const rows = stored.ftDeviceAutoSyncV1?.personal;
+    const row = Array.isArray(rows) ? rows.find(item => item.grant?.localGrantId === scope?.grantId) : null;
+    try {
+        const grant = globalThis.FilterTubePersonalSync.normalizeGrant(row?.grant);
+        const peers = Array.isArray(stored.ftNanahTrustedLinks) ? stored.ftNanahTrustedLinks.filter(link =>
+            link.linkType === 'peer_link' && link.localRole === 'peer' && link.remoteRole === 'peer'
+            && link.remoteDeviceId === grant.remoteDeviceId
+            && !['revoked', 'keyRevoked', 'stalePairing', 'quarantined'].some(key => link[key] === true || link.policy?.[key] === true)) : [];
+        return grant.enabled && row.confirmed === true && row.invalidated !== true && peers.length === 1
+            && row.peerBinding === globalThis.FilterTubePersonalSync.peerBinding(stored.ftNanahTrustedLinks, grant.remoteDeviceId)
+            && grant.localDeviceId === stored.ftNanahDeviceId
+            && grant.areas.includes('notes') && grant.localProfileId === profileId
+            && row.securityFingerprint === globalThis.FilterTubeDeviceAutoSync.security(root, profileId)
+            && isProfileSessionAuthorized(root, profileId);
+    } catch (_) { return false; }
+}
+function handleAutoSyncAuthorization(request, sender, respond) {
+    if (request?.action !== 'FilterTube_AutoSyncAuthorize') return false;
+    if (!isAutoSyncDashboardSender(sender)) { respond({ ok: false }); return false; }
+    storageGet(['ftProfilesV4']).then(data => {
+        const root = data.ftProfilesV4, id = request.profileId;
+        respond({ ok: !!root && typeof id === 'string' && root.activeProfileId === id
+            && Object.prototype.hasOwnProperty.call(root.profiles || {}, id)
+            && isProfileSessionAuthorized(root, id) });
+    }).catch(() => respond({ ok: false }));
+    return true;
+}
+try { globalThis.FilterTubeAutoSyncWakeup?.install({ api: browserAPI, promiseApi: IS_FIREFOX }); }
+catch (_) { /* Wakeup failure cannot interfere with filtering. */ }
+
 const SHORTS_PARTIAL_STREAM_LIMIT = 51200;
 const WATCH_PARTIAL_STREAM_LIMIT = 2000000;
 const SHORTS_FETCH_TIMEOUT_MS = 8000;
@@ -4865,6 +4906,7 @@ async function performWatchIdentityFetch(videoId) {
 // Listen for messages sent from other parts of the extension (e.g., content scripts, popup).
 browserAPI.runtime.onMessage.addListener(function (request, sender, sendResponse) {
     const action = request?.action || request?.type;
+    if (action === 'FilterTube_AutoSyncAuthorize') return handleAutoSyncAuthorization(request, sender, sendResponse);
 
     if (IMPORTED_CHANNEL_ENRICHMENT_ACTIONS.has(action)) {
         if (!isTrustedUiSender(sender)) {

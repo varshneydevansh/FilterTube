@@ -11,14 +11,15 @@ assert.ok(start >= 0 && end > start);
 const renderer = source.slice(start, end);
 const interpolate = (text, values = {}) => text.replace(/\{(\w+)\}/g, (match, key) => Object.hasOwn(values, key) ? String(values[key]) : match);
 
-function render({ configured = false, verified = false, protectedProfile = verified, live = false, personal = false, nearbyOnly = false, localized = false } = {}) {
+function render({ configured = false, verified = false, protectedProfile = verified, live = false, personal = false, nearbyOnly = false, pickupConfigured = configured && !nearbyOnly, localized = false } = {}) {
   const nodes = Object.fromEntries([...new Set(renderer.match(/\bftNanah\w+/g))].map(name => [name, {
     dataset: {}, textContent: '', title: '', hidden: false, disabled: false,
     setAttribute(key, value) { this[key] = value; }
   }]));
   nodes.ftNanahSyncShell.dataset.personalSyncOpen = String(personal);
+  nodes.ftNanahSyncShell.querySelector = selector => selector === '#ftNanahAdvancedStatus' ? nodes.ftNanahAdvancedStatus : null;
   const mailbox = { configured, label: 'Internet Pickup', detail: 'Provider readiness details' };
-  const local = { configured, pickupConfigured: configured, label: 'Home Pickup', detail: 'Local readiness details', nearbyDiscoveryOnly: nearbyOnly };
+  const local = { configured, pickupConfigured, label: 'Home Pickup', detail: 'Local readiness details', nearbyDiscoveryOnly: nearbyOnly };
   const before = JSON.stringify({ mailbox, local });
   let captured;
   const used = new Set();
@@ -28,6 +29,7 @@ function render({ configured = false, verified = false, protectedProfile = verif
   const context = {
     ...nodes,
     normalizeString: value => String(value ?? '').trim(),
+    isActiveChildNanahProfile: () => false,
     nanahSessionState: { connected: live, sasConfirmed: live }, nanahClient: live ? {} : null,
     getNanahFamilyDeliveryReadinessSummary: () => ({ protectedProfileCount: protectedProfile ? 1 : 0, verifiedProfileCount: verified ? 1 : 0 }),
     summarizeManagedMailboxServerConfig: () => mailbox,
@@ -96,4 +98,17 @@ test('language changes do not alter visibility, readiness, disabled state or pro
       assert.deepEqual(localized[name].dataset, english[name].dataset, `${name}: state remains unchanged`);
     }
   }
+});
+
+test('configured pickup remains visible outside the closed advanced controls without treating nearby discovery as pickup', () => {
+  const off = render().nodes.ftNanahAdvancedStatus;
+  assert.equal(off.hidden, true); assert.equal(off.textContent, '');
+  const both = render({ configured: true }).nodes.ftNanahAdvancedStatus;
+  assert.equal(both.hidden, false); assert.equal(both.textContent, 'Internet Pickup · Home Pickup');
+  const nearbyOnly = render({ configured: false, nearbyOnly: true }).nodes.ftNanahAdvancedStatus;
+  assert.equal(nearbyOnly.hidden, true);
+  const internetOnly = render({ configured: true, nearbyOnly: true }).nodes.ftNanahAdvancedStatus;
+  assert.equal(internetOnly.hidden, false); assert.equal(internetOnly.textContent, 'Internet Pickup');
+  const translated = render({ configured: true, localized: true }).nodes.ftNanahAdvancedStatus;
+  assert.equal(translated.hidden, false); assert.match(translated.textContent, /Mapped: Internet Pickup.*Mapped: Home Pickup/);
 });

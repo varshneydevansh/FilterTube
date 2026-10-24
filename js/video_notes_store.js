@@ -11,7 +11,7 @@
     const WRITER_KEY = 'ftSavedVideoNotesWriterV1';
     const blank = /^[\u0009-\u000d\u001c-\u0020\u00a0\u1680\u2000-\u200a\u2028\u2029\u202f\u205f\u3000]*$/;
     const equal = (a, b) => JSON.stringify(a) === JSON.stringify(b);
-    function create({ get, set, randomId, authorize }) {
+    function create({ get, set, randomId, authorize, authorizeSync = async () => false }) {
         let queue = Promise.resolve();
         const serial = work => { const result = queue.then(work); queue = result.catch(() => {}); return result; };
         async function allowed(key, scope) {
@@ -71,7 +71,52 @@
                 return { saved: true, record: next };
             });
         }
-        return Object.freeze({ read, save });
+        async function syncAllowed(profileId, scope) {
+            // Validate an exact profile key independently of its authorization.
+            contract.edit({ profileId, videoId: '___________' }, null, 'validation', null);
+            if (await authorizeSync(profileId, scope) !== true) throw Error('access_changed');
+        }
+        function syncEnvelope(rows, profileId) {
+            return JSON.parse(contract.encode(rows.filter(row => row.profileId === profileId), [profileId]));
+        }
+        function syncRead(profileId, scope) {
+            return serial(async () => {
+                await syncAllowed(profileId, scope);
+                const data = await get([DATA_KEY]);
+                await syncAllowed(profileId, scope);
+                const result = syncEnvelope(unpack(data[DATA_KEY]), profileId);
+                await syncAllowed(profileId, scope);
+                return result;
+            });
+        }
+        function syncMerge(profileId, envelope, scope) {
+            return serial(async () => {
+                await syncAllowed(profileId, scope);
+                // Transport/profile mapping is the caller's responsibility. No
+                // peer may name a second local target inside this envelope.
+                const incoming = contract.decode(JSON.stringify(envelope), [profileId]);
+                const data = await get([DATA_KEY]);
+                await syncAllowed(profileId, scope);
+                const rows = unpack(data[DATA_KEY]);
+                const merged = new Map(rows.filter(row => row.profileId === profileId).map(row => [row.videoId, row]));
+                for (const row of incoming) merged.set(row.videoId,
+                    merged.has(row.videoId) ? contract.merge(merged.get(row.videoId), row) : row);
+                const updated = rows.filter(row => row.profileId !== profileId).concat(Array.from(merged.values()));
+                const encoded = contract.encode(updated, updated.map(row => row.profileId));
+                await syncAllowed(profileId, scope);
+                if (encoded !== data[DATA_KEY] && (incoming.length > 0 || data[DATA_KEY] !== undefined)) {
+                    await set({ [DATA_KEY]: encoded });
+                    await syncAllowed(profileId, scope);
+                    const verified = await get([DATA_KEY]);
+                    await syncAllowed(profileId, scope);
+                    if (verified[DATA_KEY] !== encoded) throw Error('notes_storage_not_verified');
+                }
+                const result = syncEnvelope(updated, profileId);
+                await syncAllowed(profileId, scope);
+                return result;
+            });
+        }
+        return Object.freeze({ read, save, syncRead, syncMerge });
     }
     return Object.freeze({ DATA_KEY, WRITER_KEY, create });
 }));

@@ -9,7 +9,7 @@ const docPath = 'docs/audit/FILTERTUBE_RUNTIME_DIAGNOSTIC_LOGGING_POLICY_MATRIX_
 
 const sourceFingerprints = {
   'build.js': [861, 33225, "a198cc1d0bf98e410deb8f66ced0e56a046bbf987a0a5b878e1278577622fb2e"],
-  'js/background.js': [8565, 387821, 'ac2b4ae17d2c3c7d50ce0fd8dc0d6052a2c56b43c4aefeb48c0053e74709538d'],
+  'js/background.js': [8607, 390769, '11606b409f8cef1c2d6821a411f81a41eb0684ab65ee183139ad42cac25830fb'],
   'js/content/block_channel.js': [3361, 135050, 'f2a02886a83d64d93186cd1f0c1f300683ae49754b928d2e0329fd1a88d8f2c9'],
   'js/content/bridge_settings.js': [2238, 101092, '923110bd0a8f2c3216199e1c930550ab80f6458448060d874da19e336aab3e24'],
   'js/content/collab_dialog.js': [393, 14623, "dc34bba556b310da8b7516d106e9d67addea59d8a707a02f21607ac97af1f72a"],
@@ -19,13 +19,13 @@ const sourceFingerprints = {
   'js/content_bridge.js': [15056, 678414, '9e0bca2973ffb01d0216ea8b096531ad3c1afe7af4acc7363fa4b1cc2ca09f18'],
   'js/filter_logic.js': [4534, 221980, "f7021a053af96a4cd31a577f56e900ffb1a5d990fe55a838af64a6dba867afc4"],
   'js/injector.js': [4148, 183860, "62bd7222e7ea8c7fc51cbffd63b894a2f03509b4cc09ddf7525b8a748f91eb60"],
-  'js/io_manager.js': [3219, 164198, 'b14ddc3f0652b02199f187dbab11e65f7548aeabd02a51277eabd2fac217eb7e'],
+  'js/io_manager.js': [3219, 164248, 'f00d15e7dd636585c999b3a51a40363d181b192e85fd2be00231b37ca827ed43'],
   'js/layout.js': [680, 30604, "48831ccdc2d62c75818d9c6a153d7bfacec9d7be9f2408485f74b1a7c13c57c7"],
   'js/popup.js': [2553, 117093, "645fab83d4b665796f5b2fe1be262ca336df6a4cf3ffb1daebc588a50c091aa7"],
   'js/seed.js': [2508, 110538, 'af10e116a8580bf380e6f26b312c5ed3e3597693f7cf9a9bbb4661c2c597c8a1'],
   'js/settings_shared.js': [1327, 67805, 'c3d0f4b965acaaf46f6424cd0ad329c50e616de7b1cf8905a9fa578123e2bf69'],
   'js/state_manager.js': [2984, 124258, '029b2e7d4356d4629348f174bdaf7858fa1fa0c09a4b54c6bb0e293a161a8d5e'],
-  'js/tab-view.js': [32535, 1760706, '801d77180fe4ab2b3e470f7337bc8640bcbdd2f882f58e5628f61852d42c4286'],
+  'js/tab-view.js': [32840, 1784098, '32c277630ea4568b24e7a611546131456b1db302a8cc46548de0f75fa131f8db'],
   'scripts/build-extension-ui.mjs': [50, 1188, "6326362ebf90f448ccdbf68945b3fb522b7b215edaf9b3e28589a4e166239cf3"],
   'scripts/build-nanah-vendor.mjs': [65, 1818, "dae8d3ef29c4cd44b0bf975090e9d53f3bb05b523355f5038930fc03b27e921c"],
   'scripts/sync-native-runtime.mjs': [34, 1070, "4f46c13bf6099092193712790d231ff4809b00b1b0061d04af71ac3ba6bf21c6"]
@@ -522,7 +522,7 @@ function assertProductionConsoleResidualHotPathPreflight(doc) {
 
   assert.equal(routineConsoleSites('js/background.js').length, 62);
   assert.equal(lineNumberForToken(read('js/background.js'), 'installFilterTubeBackgroundConsoleGate();'), 12);
-  assert.equal(routineConsoleSites('js/background.js')[0], 3359);
+  assert.equal(routineConsoleSites('js/background.js')[0], 3400);
 
   const isolatedGateFiles = new Set();
   for (const manifestFile of activeManifestFiles) {

@@ -377,3 +377,15 @@ All three browser packages were rebuilt from the frozen automatic playback sourc
 | `README.md` | 456 | 28669 | `002941cf5633b50fe77c0434639e3fe6b12ef85ab8a87d530a7bfee65ffe62af` |
 
 The build badge changed during the Notes dialog fix. This source fingerprint is not installed-browser proof.
+
+## Auto-sync source inventory - 2026-10-24
+
+| `.gitignore` | 157 | 2275 | `f3033e094938bb4fc6ecf30aad468286f1dccd8d18db1c136e348ab087208bcd` |
+| `CHANGELOG.md` | 938 | 75511 | `e57906dca95911874ef251aa45d8c3a76df00df576b36277d9c0e9b9654c3036` |
+| `LICENSE` | 21 | 1073 | `d0739cbb6232b0fb9ea59347feaf412bab5042768aa02856b16af24bb35e9d9d` |
+| `README.md` | 456 | 28669 | `e14c02036b3039e16101cc58cdf911deb22c59ff87da9d25843027f0cb49b8f2` |
+| `channel-identity-watch-mix-collab-recovery-plan.md` | 262 | 16023 | `01f82169b06d3752e318b20b956c8a4284ae80166686e5c40aeee66c957d108a` |
+| `package.json` | 86 | 4580 | `c9cb2c3c4fea302fa3946f462dbfbb474381a78946ca59adb653814d06a4de51` |
+| `package-lock.json` | 1468 | 50219 | `84e60039228a76c10550d2e3922706ef2b7dd3671ef218a1d6e9263598cef33d` |
+
+These are current source measurements after Auto-sync and browser packaging changes. No installed-device, provider, native, publication, or release-readiness claim follows from these fingerprints.

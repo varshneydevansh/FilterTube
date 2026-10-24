@@ -25,7 +25,7 @@ const sourceRows = [
     "README.md",
     456,
     28669,
-    "002941cf5633b50fe77c0434639e3fe6b12ef85ab8a87d530a7bfee65ffe62af"
+    "e14c02036b3039e16101cc58cdf911deb22c59ff87da9d25843027f0cb49b8f2"
   ],
   [
     "CHANGELOG.md",
@@ -48,8 +48,8 @@ const sourceRows = [
   [
     "manifest.firefox.json",
     136,
-    4593,
-    "454805c26c62add8c1467d95ef41f1c4b6529b55ebcfbfbd81bfdcd93a0fb242"
+    4668,
+    "30b981228a8214e0721d8c29ca3a74cac369508b0aca702e6b55286bc87ee7b8"
   ],
   [
     "manifest.opera.json",

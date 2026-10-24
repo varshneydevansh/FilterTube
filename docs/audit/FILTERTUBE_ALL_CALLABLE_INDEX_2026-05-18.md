@@ -222,8 +222,8 @@ lexical and its scope remains tracked JS/JSX/MJS: CJS/Python tooling requires it
 separate release/workflow review and is not silently counted as JavaScript here.
 
 ```text
-current tracked JS/JSX/MJS files: 125
-current repo-wide lexical callables: 9582
+current tracked JS/JSX/MJS files: 133
+current repo-wide lexical callables: 9851
 current complete per-callable semantic proofs: 0
 current callable behavior-change approval: NO-GO
 runtime behavior changed by inventory refresh: no
@@ -232,9 +232,9 @@ runtime behavior changed by inventory refresh: no
 | Family | Files | Lexical callables |
 | --- | ---: | ---: |
 | Build/sync scripts | 5 | 75 |
-| Hot page/background runtime | 11 | 3887 |
+| Hot page/background runtime | 12 | 3907 |
 | Content helper runtime | 24 | 814 |
-| UI/settings runtime | 25 | 3737 |
+| UI/settings runtime | 32 | 3986 |
 | Generated/quarantined UI | 6 | 147 |
 | Vendor bundles | 3 | 279 |
 | Audit/test lane scripts | 25 | 517 |
@@ -244,11 +244,19 @@ runtime behavior changed by inventory refresh: no
 | --- | --- | ---: | --- |
 | `js/content/video_notes.js` | Content helper runtime | 26 | helper counted; semantic proof incomplete |
 | `js/shared/saved_video_notes.js` | Content helper runtime | 20 | helper counted; semantic proof incomplete |
-| `js/video_notes_background.js` | Hot page/background runtime | 17 | helper counted; semantic proof incomplete |
+| `js/video_notes_background.js` | Hot page/background runtime | 18 | helper counted; semantic proof incomplete |
 | `js/video_notes_editor.js` | UI/settings runtime | 25 | helper counted; semantic proof incomplete |
-| `js/video_notes_store.js` | Hot page/background runtime | 9 | helper counted; semantic proof incomplete |
+| `js/video_notes_store.js` | Hot page/background runtime | 13 | helper counted; semantic proof incomplete |
+| `js/auto_sync_queue.js` | UI/settings runtime | 33 | helper counted; semantic proof incomplete |
+| `js/auto_sync_wakeup.js` | Hot page/background runtime | 11 | helper counted; semantic proof incomplete |
+| `js/device_auto_sync.js` | UI/settings runtime | 27 | helper counted; semantic proof incomplete |
+| `js/device_auto_sync_ui.js` | UI/settings runtime | 25 | helper counted; semantic proof incomplete |
+| `js/managed_auto_sync.js` | UI/settings runtime | 16 | helper counted; semantic proof incomplete |
+| `js/personal_auto_sync_runtime.js` | UI/settings runtime | 63 | helper counted; semantic proof incomplete |
+| `js/personal_sync.js` | UI/settings runtime | 54 | helper counted; semantic proof incomplete |
+| `js/nanah_pairing_ui.js` | UI/settings runtime | 6 | helper counted; semantic proof incomplete |
 | `build.js` | Build/sync scripts | 68 | release-audited first pass |
-| `js/background.js` | Hot page/background runtime | 569 | hot runtime mapped |
+| `js/background.js` | Hot page/background runtime | 573 | hot runtime mapped |
 | `js/content/admission_overlay.js` | Content helper runtime | 25 | helper counted; semantic proof incomplete |
 | `js/content/block_channel.js` | Hot page/background runtime | 234 | hot runtime mapped |
 | `js/content/bridge_injection.js` | Content helper runtime | 14 | helper counted |
@@ -281,13 +289,13 @@ runtime behavior changed by inventory refresh: no
 | `js/layout.js` | Generated/quarantined UI | 52 | quarantined/generated boundary |
 | `js/managed_admin_authority.js` | UI/settings runtime | 18 | UI/settings counted |
 | `js/managed_parent_command_center.js` | UI/settings runtime | 78 | UI/settings counted |
-| `js/nanah_managed_live_policy.js` | UI/settings runtime | 115 | UI/settings counted |
+| `js/nanah_managed_live_policy.js` | UI/settings runtime | 120 | UI/settings counted |
 | `js/nanah_managed_local_network_client.js` | UI/settings runtime | 48 | UI/settings counted; semantic proof incomplete |
 | `js/nanah_managed_mailbox_client.js` | UI/settings runtime | 37 | UI/settings counted; semantic proof incomplete |
 | `js/nanah_managed_open_sync.js` | UI/settings runtime | 35 | UI/settings counted |
 | `js/nanah_qr_scanner.js` | UI/settings runtime | 15 | UI/settings counted; semantic proof incomplete |
 | `js/nanah_storage_lock.js` | UI/settings runtime | 3 | UI/settings counted; semantic proof incomplete |
-| `js/nanah_sync_adapter.js` | UI/settings runtime | 204 | UI/settings counted |
+| `js/nanah_sync_adapter.js` | UI/settings runtime | 207 | UI/settings counted |
 | `js/popup.js` | UI/settings runtime | 170 | UI/settings counted |
 | `js/render_engine.js` | UI/settings runtime | 171 | UI/settings counted |
 | `js/rule_list_import_reports.js` | UI/settings runtime | 38 | UI/settings counted; semantic proof incomplete |
@@ -299,7 +307,7 @@ runtime behavior changed by inventory refresh: no
 | `js/shared/identity.js` | Content helper runtime | 110 | helper counted |
 | `js/shared/view_count.js` | Content helper runtime | 4 | helper counted; semantic proof incomplete |
 | `js/state_manager.js` | UI/settings runtime | 180 | UI/settings counted |
-| `js/tab-view.js` | UI/settings runtime | 2133 | UI/settings counted |
+| `js/tab-view.js` | UI/settings runtime | 2150 | UI/settings counted |
 | `js/ui-shell/popup-shell.js` | Generated/quarantined UI | 42 | generated output boundary |
 | `js/ui-shell/tab-view-decor.js` | Generated/quarantined UI | 41 | generated output boundary |
 | `js/ui_components.js` | UI/settings runtime | 65 | UI/settings counted |
@@ -427,3 +435,7 @@ Healthy admitted same-video native media is now preserved before extraction and 
 ## Native fallback retirement revalidation - 2026-10-23
 
 The unchanged lexical parser now measures 120 tracked files and 9,484 matches: 3,860 hot-runtime and 768 helper matches. Seed changes from 195 to 198 and the coordinator from 27 to 30. The desktop media fallback retirement and one fresh precommit observation are behavior changes documented separately; these counts remain lexical inventory rather than semantic completion proof.
+
+## Auto-sync source inventory - 2026-10-24
+
+The current lexical inventory above was remeasured after adding the opt-in Auto-sync modules. Older May snapshots remain historical. New module rows retain semantic proof incomplete; counts alone do not establish behavior, network delivery, or native parity.

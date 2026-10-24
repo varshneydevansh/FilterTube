@@ -12,6 +12,7 @@
     <link
         href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@1,400;1,500;1,600&family=JetBrains+Mono:wght@500;700&family=Outfit:wght@400;500;600;700;800&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap"
         rel="stylesheet">
+    <link rel="stylesheet" href="../css/device-auto-sync.css">
 </head>
 
 <body>
@@ -1077,10 +1078,12 @@
                                                         <button id="ftNanahDeviceSourceBtn" class="btn-secondary" type="button" hidden>Choose rules profile</button>
                                                     </div>
                                                 </div>
-                                                <details class="nanah-device-help">
-                                                    <summary>Connection options and help</summary>
+                                                <section id="ftDeviceAutoSync" aria-label="Peer-to-peer Auto-sync"></section>
+                                                <p id="ftNanahAdvancedStatus" class="nanah-advanced-status" aria-live="polite" hidden></p>
+                                                <details class="nanah-device-help nanah-device-help--compact">
+                                                    <summary>Advanced connection options</summary>
                                                 <div class="nanah-device-compass__grid">
-                                                    <button id="ftNanahCompassLiveBtn" class="nanah-device-compass__choice" type="button" data-filtertube-help="Best default. Keep both devices open, pair with the code or QR, verify the phrase, then send the update.">
+                                                    <button id="ftNanahCompassLiveBtn" class="nanah-device-compass__choice" type="button" hidden tabindex="-1" data-filtertube-help="Best default. Keep both devices open, pair with the code or QR, verify the phrase, then send the update.">
                                                         <div class="nanah-device-compass__device" aria-hidden="true"><i></i></div>
                                                         <span>Start here</span>
                                                         <strong>Open now</strong>
@@ -1099,26 +1102,20 @@
                                                         <small>For a verified device that checks in later.</small>
                                                     </button>
                                                 </div>
-                                                    <div class="nanah-device-compass-stage__plain-rule">
+                                                    <div class="nanah-device-compass-stage__plain-rule" hidden>
                                                         <strong id="ftNanahMapRuleTitle">Open now is the normal setup.</strong>
                                                         <span id="ftNanahMapRuleDetail">Same-place and open-later delivery only work after the protected device is already paired and trusted.</span>
                                                     </div>
                                         <div class="nanah-delivery-strip" aria-label="How parent updates can reach verified devices">
-                                            <article class="nanah-delivery-card nanah-delivery-card--live" id="ftNanahDeliveryLiveCard" data-filtertube-help="Use live Send Update first. It is the simplest path and does not require a pickup provider.">
+                                            <article class="nanah-delivery-card nanah-delivery-card--live" id="ftNanahDeliveryLiveCard" hidden data-filtertube-help="Use live Send Update first. It is the simplest path and does not require a pickup provider.">
                                                 <div>
                                                     <span class="nanah-delivery-card__eyebrow">Live update</span>
                                                     <strong id="ftNanahDeliveryLiveLabel">Open both devices</strong>
                                                     <small id="ftNanahDeliveryLiveDetail">Use Send Update when parent and protected devices are open together.</small>
                                                 </div>
                                             </article>
-                                            <details id="ftNanahDeliveryAdvanced" class="nanah-delivery-advanced" data-filtertube-help="Advanced delivery is only for verified protected devices that cannot stay open while the parent sends an update.">
-                                                <summary>
-                                                    <span>
-                                                        <strong>Need later delivery?</strong>
-                                                        <small>Use only if the protected device cannot stay open for Send Update.</small>
-                                                    </span>
-                                                    <code>Advanced</code>
-                                                </summary>
+                                            <details id="ftNanahDeliveryAdvanced" class="nanah-delivery-advanced nanah-delivery-advanced--flat" open data-filtertube-help="Advanced delivery is only for verified protected devices that cannot stay open while the parent sends an update.">
+                                                <summary hidden>Pickup services</summary>
                                                 <div class="nanah-delivery-advanced__cards">
                                                     <article class="nanah-delivery-card" id="ftNanahDeliveryMailboxCard">
                                                         <div>
@@ -1161,7 +1158,7 @@
                                                 </div>
                                             </details>
                                         </div>
-                                        <div class="nanah-parent-edit-model" aria-label="How parent editing reaches a protected device">
+                                        <div class="nanah-parent-edit-model" aria-label="How parent editing reaches a protected device" hidden>
                                             <article>
                                                 <span>1</span>
                                                 <strong>Edit here</strong>
@@ -1178,7 +1175,7 @@
                                                 <small>Send now when both devices are open, or let the verified device pick up the signed update later.</small>
                                             </article>
                                         </div>
-                                        <div class="nanah-sync-simple-path" aria-label="Family device update path">
+                                        <div class="nanah-sync-simple-path" aria-label="Family device update path" hidden>
                                             <article class="nanah-sync-simple-path__item">
                                                 <span>1</span>
                                                 <strong>Choose profile</strong>
@@ -1196,6 +1193,8 @@
                                             </article>
                                             <div class="nanah-sync-simple-path__note">Files, saved links, and pickup paths cannot change PINs, trust, profiles, or time limits on their own.</div>
                                         </div>
+                                                <details class="nanah-support-evidence">
+                                                    <summary>Support evidence</summary>
                                                 <div class="nanah-device-compass__evidence-row" aria-label="Family Devices evidence tools">
                                                     <div>
                                                         <span>Need support?</span>
@@ -1206,6 +1205,7 @@
                                                         <button id="ftNanahDownloadMapEvidenceBtn" class="btn-secondary nanah-device-compass__evidence-button" type="button" data-filtertube-help="Downloads the same redacted Family Devices evidence JSON. Use this when clipboard access is blocked or you want to attach a file to an audit row.">Download evidence</button>
                                                     </div>
                                                 </div>
+                                                </details>
                                                 </details>
                                             </div>
                                         </div>
@@ -1220,18 +1220,12 @@
                                     <details id="ftNanahPairingDetails" class="nanah-pairing-details">
                                         <summary class="nanah-pairing-details__summary" data-filtertube-help="Open this when you are ready to pair a device, type a code, scan a QR, send the reviewed update, or inspect trusted-device details.">
                                             <span>
-                                                <strong>Pairing details</strong>
-                                                <small>Open only when you are pairing, sending, or checking a trusted device.</small>
+                                                <strong>Connect a device</strong>
+                                                <small>Create a code or enter one from your other device.</small>
                                             </span>
-                                            <code>Open controls</code>
+                                            <code>Connect</code>
                                         </summary>
-                                    <div class="nanah-device-setup">
-                                            <div class="nanah-sync-intro__actions" aria-label="Personal device sync and family control actions">
-                                                <button id="ftNanahQuickSyncDevicesBtn" class="btn-primary" type="button" data-filtertube-help="Copy the profile currently open to your own second device. No protected profile or PIN is required. Switch profiles first if you want to copy a different profile.">Sync My Devices</button>
-                                                <button id="ftNanahQuickCreateProtectedBtn" class="btn-secondary" type="button" data-filtertube-help="Create a protected child/user profile only when you want parent-managed rules, time limits, or viewing access.">Set Up Family Control</button>
-                                                <button id="ftNanahQuickSendUpdateBtn" class="btn-secondary" type="button" data-filtertube-help="Send parent-approved rules, time, and viewing access to an existing protected profile. Use this when both devices are open together.">Send Protected Update</button>
-                                            </div>
-                                    </div>
+                                    <p class="nanah-pairing-open-hint">Keep Accounts &amp; Sync open on both devices while connecting and sending.</p>
                                     <div class="nanah-sync-grid nanah-sync-grid--featured">
                                         <div class="nanah-sync-panel nanah-sync-panel--setup">
                                             <div class="nanah-sync-panel__header">
@@ -1245,7 +1239,7 @@
 
                                             <div class="nanah-sync-panel__content nanah-sync-panel__content--setup">
                                                 <div class="nanah-sync-panel__stack nanah-sync-panel__stack--setup">
-                                                    <div class="nanah-sync-mode-switch" role="tablist" aria-label="Choose device update mode">
+                                                    <div id="ftNanahPurposeChooser" class="nanah-sync-mode-switch" role="tablist" aria-label="Choose device update mode">
                                                         <button id="ftNanahModeParent" class="nanah-sync-mode" type="button" data-mode="parent_control" aria-pressed="true" data-filtertube-help="Use this for a child, family member, or protected device. It sends parent-approved rules, time limits, and viewing access.">
                                                             <span class="nanah-sync-mode__eyebrow">Family control</span>
                                                             <strong class="nanah-sync-mode__title">Protected device</strong>
@@ -1263,6 +1257,31 @@
                                                         </button>
                                                     </div>
 
+
+                                                    <p id="ftNanahReceiverInstruction" class="nanah-pairing-receiver-hint" hidden>On the receiving device, open the intended protected profile before entering the code.</p>
+                                                    <div class="nanah-sync-form nanah-sync-form--primary">
+
+                                                        <label class="nanah-sync-field" id="ftNanahRemoteTargetField" data-filtertube-help="Choose where this update should land. If left blank, it follows the profile currently open on the other device.">
+                                                            <span id="ftNanahRemoteTargetLabel">Profile to update</span>
+                                                            <select id="ftNanahRemoteTarget" class="select-input">
+                                                                <option value="">Use the profile open there</option>
+                                                            </select>
+                                                            <small id="ftNanahRemoteTargetHint" class="nanah-sync-field__hint">After pairing, choose exactly which protected profile on the other device should receive this update.</small>
+                                                        </label>
+                                                    <fieldset class="nanah-sync-field nanah-managed-targets" id="ftNanahManagedTargetsField" hidden data-filtertube-help="Saved protected profiles from the connected device appear here when they can be targeted directly.">
+                                                                    <legend>Managed targets</legend>
+                                                                    <div id="ftNanahManagedTargets" class="nanah-managed-targets__list"></div>
+                                                                    <small id="ftNanahManagedTargetsHint" class="nanah-sync-field__hint">Saved protected profiles on the connected device can be selected here.</small>
+                                                                </fieldset>
+                                                    </div>
+
+                                                    <details class="nanah-sync-advanced" id="ftNanahAdvancedDetails" data-filtertube-help="Advanced controls for role, scope, rule source, and merge/replace behavior. Most families can leave this closed.">
+                                                        <summary class="nanah-sync-advanced__summary" data-filtertube-help="Open only when you need to repair a link, choose a smaller rule scope, or change merge versus replace behavior.">
+                                                            <span class="nanah-sync-advanced__title">More options</span>
+                                                            <span id="ftNanahAdvancedSummary" class="nanah-sync-advanced__value">My other device · Active profile · Merge</span>
+                                                        </summary>
+                                                        <details id="ftNanahPurposeDetails" class="nanah-pairing-secondary">
+                                                        <summary>About this update</summary>
                                                     <div class="nanah-sync-mode-spotlight" id="ftNanahModeSpotlight">
                                                         <div class="nanah-sync-mode-spotlight__head">
                                                             <span id="ftNanahModeEyebrow" class="nanah-sync-guide__title">Family control</span>
@@ -1277,26 +1296,23 @@
                                                         </ol>
                                                     </div>
 
-                                                    <div class="nanah-sync-form nanah-sync-form--primary">
+                                                    </details><details id="ftNanahDeviceNameDetails" class="nanah-pairing-secondary">
+                                                            <summary>Device name</summary>
                                                         <label class="nanah-sync-field" data-filtertube-help="A friendly name shown to the other device during pairing and in trusted-device history.">
                                                             <span>This device name</span>
                                                             <input id="ftNanahDeviceLabel" class="text-input" type="text" placeholder="My laptop" />
                                                         </label>
-                                                        <label class="nanah-sync-field" id="ftNanahRemoteTargetField" data-filtertube-help="Choose where this update should land. If left blank, it follows the profile currently open on the other device.">
-                                                            <span id="ftNanahRemoteTargetLabel">Profile to update</span>
-                                                            <select id="ftNanahRemoteTarget" class="select-input">
-                                                                <option value="">Use the profile open there</option>
-                                                            </select>
-                                                            <small id="ftNanahRemoteTargetHint" class="nanah-sync-field__hint">After pairing, choose exactly which protected profile on the other device should receive this update.</small>
-                                                        </label>
-                                                    </div>
-
-                                                    <details class="nanah-sync-advanced" id="ftNanahAdvancedDetails" data-filtertube-help="Advanced controls for role, scope, rule source, and merge/replace behavior. Most families can leave this closed.">
-                                                        <summary class="nanah-sync-advanced__summary" data-filtertube-help="Open only when you need to repair a link, choose a smaller rule scope, or change merge versus replace behavior.">
-                                                            <span class="nanah-sync-advanced__title">More options</span>
-                                                            <span id="ftNanahAdvancedSummary" class="nanah-sync-advanced__value">My other device · Active profile · Merge</span>
-                                                        </summary>
-                                                        <div class="nanah-sync-advanced__body">
+                                                        </details><details class="nanah-pairing-secondary" id="ftNanahFamilyShortcuts">
+                                                        <summary>Family setup shortcuts</summary>
+                                    <div class="nanah-device-setup">
+                                            <div class="nanah-sync-intro__actions" aria-label="Personal device sync and family control actions">
+                                                <button id="ftNanahQuickSyncDevicesBtn" class="btn-primary" type="button" data-filtertube-help="Copy the profile currently open to your own second device. No protected profile or PIN is required. Switch profiles first if you want to copy a different profile.">Sync My Devices</button>
+                                                <button id="ftNanahQuickCreateProtectedBtn" class="btn-secondary" type="button" data-filtertube-help="Create a protected child/user profile only when you want parent-managed rules, time limits, or viewing access.">Set Up Family Control</button>
+                                                <button id="ftNanahQuickSendUpdateBtn" class="btn-secondary" type="button" data-filtertube-help="Send parent-approved rules, time, and viewing access to an existing protected profile. Use this when both devices are open together.">Send Protected Update</button>
+                                            </div>
+                                    </div>
+                                                    </details>
+<div class="nanah-sync-advanced__body">
                                                             <div class="nanah-sync-form nanah-sync-form--grid">
                                                                 <label class="nanah-sync-field" data-filtertube-help="Relationship decides whether this device sends, receives, or just copies settings once. Family control uses parent-to-protected defaults.">
                                                                     <span>Relationship</span>
@@ -1330,11 +1346,7 @@
                                                                     </select>
                                                                     <small id="ftNanahGranularSurfaceHint" class="nanah-sync-field__hint">Keyword, channel, and video updates use this local rule surface.</small>
                                                                 </label>
-                                                                <fieldset class="nanah-sync-field nanah-managed-targets" id="ftNanahManagedTargetsField" hidden data-filtertube-help="Saved protected profiles from the connected device appear here when they can be targeted directly.">
-                                                                    <legend>Managed targets</legend>
-                                                                    <div id="ftNanahManagedTargets" class="nanah-managed-targets__list"></div>
-                                                                    <small id="ftNanahManagedTargetsHint" class="nanah-sync-field__hint">Saved protected profiles on the connected device can be selected here.</small>
-                                                                </fieldset>
+
                                                                 <label class="nanah-sync-field" data-filtertube-help="Merge adds the selected rules. Replace overwrites only the selected scope for managed protected devices.">
                                                                     <span id="ftNanahStrategyLabel">How update applies</span>
                                                                     <select id="ftNanahStrategy" class="select-input">
@@ -1347,6 +1359,7 @@
                                                         </div>
                                                     </details>
 
+
                                                     <p id="ftNanahSendTransferSummary" class="nanah-transfer-summary" hidden></p>
                                                     <div class="nanah-sync-actions">
                                                         <button id="ftNanahHostBtn" class="btn-primary" type="button" data-filtertube-help="Create a pairing code or QR on this device. The other device must join and show the same safety phrase.">Start Pairing</button>
@@ -1354,9 +1367,28 @@
                                                         <button id="ftNanahTrustBtn" class="btn-secondary" type="button" disabled data-filtertube-help="Save parent trust only for devices that should keep receiving approved updates for a protected profile.">Save Trust</button>
                                                         <button id="ftNanahEndSessionBtn" class="btn-secondary" type="button" disabled data-filtertube-help="Close this pairing session. It does not remove existing rules or saved trusted-device links.">End Session</button>
                                                     </div>
-                                                </div>
+<div id="ftNanahJoinControls">
+                                                <label class="nanah-sync-field" data-filtertube-help="Type the short code shown on the other device, then verify the same safety phrase on both screens.">
+                                                    <span>Enter pairing code</span>
+                                                    <div class="nanah-sync-join-row">
+                                                        <input id="ftNanahJoinCode" class="text-input nanah-sync-code-input" type="text" maxlength="8" placeholder="ABCD" />
+                                                        <button id="ftNanahJoinBtn" class="btn-secondary" type="button" data-filtertube-help="Join the live pairing session from the other device. Nothing applies until the phrase is confirmed.">Join Session</button>
+                                                    </div>
+                                                </label>
 
-                                                <div class="nanah-sync-panel__stack nanah-sync-panel__stack--status">
+                                                <div class="nanah-qr-actions">
+                                                    <button id="ftNanahScanQrBtn" class="btn-secondary" type="button">Scan QR</button>
+                                                    <button id="ftNanahReadQrImageBtn" class="btn-secondary" type="button">Read QR image</button>
+                                                    <input id="ftNanahQrImageInput" type="file" accept="image/png,image/jpeg,image/webp" hidden />
+                                                </div>
+                                                </div>
+<div id="ftNanahQrReader" class="nanah-qr-reader" hidden>
+                                                    <video id="ftNanahQrVideo" hidden autoplay muted playsinline aria-label="Pairing QR camera preview"></video>
+                                                    <canvas id="ftNanahQrReaderCanvas" hidden></canvas>
+                                                    <p id="ftNanahQrReaderStatus" role="status">Point the camera at the pairing QR on your other device.</p>
+                                                    <button id="ftNanahQrStopBtn" class="btn-secondary" type="button">Close scanner</button>
+                                                </div>
+<div class="nanah-sync-panel__stack nanah-sync-panel__stack--status">
                                                     <div class="nanah-sync-status" id="ftNanahStatusCard">
                                                         <div class="nanah-sync-status__headline">
                                                             <div>
@@ -1365,23 +1397,15 @@
                                                             </div>
                                                             <div id="ftNanahStatusSignal" class="nanah-sync-status__signal" data-filtertube-help="Both devices must show the same safety phrase before anything is trusted.">Secure handshake</div>
                                                         </div>
-                                                        <div class="nanah-sync-status__row">
-                                                            <span class="nanah-sync-status__label">This profile + device</span>
-                                                            <strong id="ftNanahLocalProfile">Default (master account)</strong>
-                                                        </div>
-                                                        <div class="nanah-sync-status__row">
+                                                        <div class="nanah-sync-status__row" id="ftNanahRemoteEndpointRow">
                                                             <span class="nanah-sync-status__label">Remote profile + device</span>
                                                             <strong id="ftNanahRemoteLabel">Not connected</strong>
-                                                        </div>
-                                                        <div class="nanah-sync-status__row">
-                                                            <span class="nanah-sync-status__label">Remote active profile</span>
-                                                            <strong id="ftNanahRemoteProfile">Unknown</strong>
                                                         </div>
                                                         <div class="nanah-sync-status__row" id="ftNanahPairCodeRow" hidden>
                                                             <span class="nanah-sync-status__label">Pairing code</span>
                                                             <strong id="ftNanahPairCode" class="nanah-sync-status__pair-code">----</strong>
                                                         </div>
-                                                        <div class="nanah-sync-status__row">
+                                                        <div class="nanah-sync-status__row" id="ftNanahPhraseRow">
                                                             <span class="nanah-sync-status__label">Safety phrase</span>
                                                             <strong id="ftNanahSasPhrase">Waiting</strong>
                                                         </div>
@@ -1393,14 +1417,38 @@
                                                             <strong>Pairing still needs code or QR</strong>
                                                             <small>Nothing is trusted until both devices show the same safety phrase.</small>
                                                         </div>
+                                                        <details id="ftNanahSessionDetails" class="nanah-pairing-secondary">
+                                                            <summary>Connection details</summary>
+                                                        <div class="nanah-sync-status__row">
+                                                            <span class="nanah-sync-status__label">This profile + device</span>
+                                                            <strong id="ftNanahLocalProfile">Default (master account)</strong>
+                                                        </div>
+                                                        <div class="nanah-sync-status__row">
+                                                            <span class="nanah-sync-status__label">Remote active profile</span>
+                                                            <strong id="ftNanahRemoteProfile">Unknown</strong>
+                                                        </div>
                                                         <div class="nanah-sync-status__hint" id="ftNanahTargetHint">
                                                             Updates write into the receiver's active profile by default, or a fixed protected profile if one was chosen. Saved links remember trust and allowed policy. They are not a live connection, but Pickup can let a verified device collect a signed parent update when it opens later.
                                                         </div>
+                                                        <details class="nanah-pairing-secondary" id="ftNanahPrivacyDetails">
+                                                    <summary>Connection privacy</summary>
+                                                <div class="nanah-sync-privacy-banner" data-filtertube-help="The meeting service helps devices find each other. After the handshake, signed settings move between devices and still need local validation.">
+                                                    <strong>Private after the handshake</strong>
+                                                    <span>For Send Update, keep both devices open. This meeting step connects them; it does not store rules or PINs.</span>
+                                                    <details class="nanah-sync-technical" data-filtertube-help="Advanced link for the public meeting service. It helps with pairing, but it should not read your private settings payload.">
+                                                        <summary>Meeting service link</summary>
+                                                        <span><a href="https://nanah-signaling.varshney-devansh614.workers.dev/" target="_blank" rel="noopener noreferrer">nanah-signaling.varshney-devansh614.workers.dev</a></span>
+                                                    </details>
+                                                </div>
+                                                </details></details>
                                                         <div class="nanah-sync-sas-actions">
                                                             <button id="ftNanahConfirmSasBtn" class="btn-primary" type="button" disabled data-filtertube-help="Click only if both devices display the same safety phrase. This prevents sending to the wrong device.">Confirm Matching Phrase</button>
                                                         </div>
                                                     </div>
                                                 </div>
+                                                </div>
+
+
                                             </div>
                                         </div>
 
@@ -1415,45 +1463,26 @@
                                             </div>
 
                                             <div class="nanah-sync-stack">
-                                                <div class="nanah-sync-privacy-banner" data-filtertube-help="The meeting service helps devices find each other. After the handshake, signed settings move between devices and still need local validation.">
-                                                    <strong>Private after the handshake</strong>
-                                                    <span>For Send Update, keep both devices open. This meeting step connects them; it does not store rules or PINs.</span>
-                                                    <details class="nanah-sync-technical" data-filtertube-help="Advanced link for the public meeting service. It helps with pairing, but it should not read your private settings payload.">
-                                                        <summary>Meeting service link</summary>
-                                                        <span><a href="https://nanah-signaling.varshney-devansh614.workers.dev/" target="_blank" rel="noopener noreferrer">nanah-signaling.varshney-devansh614.workers.dev</a></span>
-                                                    </details>
-                                                </div>
-                                                <label class="nanah-sync-field" data-filtertube-help="Type the short code shown on the other device, then verify the same safety phrase on both screens.">
-                                                    <span>Enter pairing code</span>
-                                                    <div class="nanah-sync-join-row">
-                                                        <input id="ftNanahJoinCode" class="text-input nanah-sync-code-input" type="text" maxlength="8" placeholder="ABCD" />
-                                                        <button id="ftNanahJoinBtn" class="btn-secondary" type="button" data-filtertube-help="Join the live pairing session from the other device. Nothing applies until the phrase is confirmed.">Join Session</button>
-                                                    </div>
-                                                </label>
 
-                                                <div class="nanah-qr-actions">
-                                                    <button id="ftNanahScanQrBtn" class="btn-secondary" type="button">Scan QR</button>
-                                                    <button id="ftNanahReadQrImageBtn" class="btn-secondary" type="button">Read QR image</button>
-                                                    <input id="ftNanahQrImageInput" type="file" accept="image/png,image/jpeg,image/webp" hidden />
-                                                </div>
-                                                <div id="ftNanahQrReader" class="nanah-qr-reader" hidden>
-                                                    <video id="ftNanahQrVideo" hidden autoplay muted playsinline aria-label="Pairing QR camera preview"></video>
-                                                    <canvas id="ftNanahQrReaderCanvas" hidden></canvas>
-                                                    <p id="ftNanahQrReaderStatus" role="status">Point the camera at the pairing QR on your other device.</p>
-                                                    <button id="ftNanahQrStopBtn" class="btn-secondary" type="button">Close scanner</button>
-                                                </div>
 
+
+
+                                                <details id="ftNanahPairUriRow" class="nanah-pairing-secondary">
+                                                    <summary>Copy pairing link</summary>
                                                 <div class="nanah-sync-link-row">
                                                     <input id="ftNanahPairUri" class="text-input" type="text" readonly placeholder="Pairing URI will appear here" data-filtertube-help="This link contains pairing information only. The other device still has to verify the same safety phrase." />
                                                     <button id="ftNanahCopyPairUriBtn" class="btn-secondary" type="button" disabled data-filtertube-help="Copy the pairing link for another device. The receiving device still has to verify the same safety phrase.">Copy Link</button>
                                                 </div>
+                                                </details>
 
-                                                <div class="nanah-sync-qr-wrap">
+                                                <div id="ftNanahQrWrap" class="nanah-sync-qr-wrap">
                                                     <canvas id="ftNanahQrCanvas" width="180" height="180" aria-label="Nanah pairing QR"></canvas>
                                                     <div class="nanah-sync-qr-caption" id="ftNanahQrCaption" data-filtertube-help="Start pairing first, then this area shows a QR or status message for the other device.">No active pairing session</div>
                                                 </div>
                                             </div>
 
+                                            <details id="ftNanahSavedLinksDetails" class="nanah-pairing-secondary">
+                                                <summary>Saved device links</summary>
                                             <div class="nanah-sync-trusted">
                                                 <div class="nanah-sync-trusted__header">
                                                     <div id="ftNanahTrustedTitle" class="help-item-title" data-filtertube-help="Trusted devices remember a verified relationship so future sends are easier.">Trusted devices</div>
@@ -1463,6 +1492,7 @@
                                                     <div class="nanah-trusted-links__empty">No trusted devices yet.</div>
                                                 </div>
                                             </div>
+                                            </details>
                                         </div>
                                     </div>
                                     </details>
@@ -2712,6 +2742,14 @@
     <script src="../js/nanah_managed_local_network_client.js"></script>
     <script src="../js/nanah_managed_live_policy.js"></script>
     <script src="../js/nanah_managed_open_sync.js"></script>
+    <script src="../js/shared/saved_video_notes.js"></script>
+    <script src="../js/auto_sync_queue.js"></script>
+    <script src="../js/managed_auto_sync.js"></script>
+    <script src="../js/personal_sync.js"></script>
+    <script src="../js/personal_auto_sync_runtime.js"></script>
+    <script src="../js/device_auto_sync.js"></script>
+    <script src="../js/device_auto_sync_ui.js"></script>
+    <script src="../js/nanah_pairing_ui.js"></script>
     <script src="../js/content_controls_catalog.js"></script>
     <script src="../js/ui_components.js"></script>
     <script src="../js/rule_list_import_reports.js"></script>
