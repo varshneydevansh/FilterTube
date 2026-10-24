@@ -1,0 +1,3 @@
+{"initialPaused":true,"afterNativeStartAttempt":{"paused":true,"calls":1},"result":{"status":"active","handedOff":true,"videoId":"content0001","paused":true},"totalPlayCalls":1,"remainingGuards":0}
+{"initialPaused":false,"afterNativeStartAttempt":{"paused":true,"calls":1},"result":{"status":"active","handedOff":true,"videoId":"content0001","paused":false},"totalPlayCalls":2,"remainingGuards":0}
+{"explicitPausedNoNewStartAttempt":"preserved","playCalls":0}

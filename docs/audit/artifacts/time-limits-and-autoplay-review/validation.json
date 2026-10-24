@@ -1,0 +1,40 @@
+{
+  "smoke": {
+    "tests": 1379,
+    "pass": 1379,
+    "fail": 0
+  },
+  "release": {
+    "tests": 668,
+    "pass": 668,
+    "fail": 0
+  },
+  "settings": {
+    "tests": 1152,
+    "pass": 1057,
+    "fail": 95
+  },
+  "unchangedSettingsFailureTitles": true,
+  "sourceSha256": {
+    "README.md": "b6bcdc0f37f2a7bf6d0493c4463fe95f7c6524970cc608768987f7ca559e6c70",
+    "data/ui_locales/en.json": "23ca8075f6969cb2c1563d6412ca75618961ddb4e0b2aff38c7bd127d3a33aea",
+    "html/tab-view.html": "d4d8a15bde8542e48032e5359e9a44cca81b43fdeb91425c8ef5db5ebf2d8062",
+    "website/app/page.js": "7649fb7b6a712581128d9e07ca901b415813674e260fc2b7cf046becce051440"
+  },
+  "websiteBuild": "passed locally; no deployment",
+  "runtimeFixesImplemented": false,
+  "packages": {
+    "chrome": {
+      "archive": "dist/filtertube-chrome-v3.4.1.zip",
+      "sha256": "eed4fc1230189a52cb4ff493e77a786f6a31966cf05750ade01b5d9754f4382c"
+    },
+    "firefox": {
+      "archive": "dist/filtertube-firefox-v3.4.1.zip",
+      "sha256": "b8a32064cdaade0dfb598f8d5f9076d7daa47ef90aaa18ed798da5b3ab4963a3"
+    },
+    "opera": {
+      "archive": "dist/filtertube-opera-v3.4.1.zip",
+      "sha256": "3c58ba7ef34aed39c1b964a214a12c518589c393213c4f65d05552837e650d1b"
+    }
+  }
+}

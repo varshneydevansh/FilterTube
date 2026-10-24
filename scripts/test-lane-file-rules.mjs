@@ -1,5 +1,6 @@
 // Declarative path ownership, split from test-lane-config.mjs to keep workflow files bounded.
 export const FILE_LANE_RULES = Object.freeze([
+  { id: 'time-autoplay-review-evidence', patterns: [/^docs\/audit\/artifacts\/time-limits-and-autoplay-review\//], lanes: ['release', 'settings', 'smoke'] },
   { id: 'two-endpoint-sync-evidence', patterns: [/^tests\/runtime\/fixtures\/auto-sync-two-endpoint-harness\.js$/, /^docs\/audit\/artifacts\/auto-sync-two-endpoint-[^/]+\//], lanes: ['release', 'settings', 'smoke'] },
   { id: 'opt-in-device-auto-sync', patterns: [/^js\/(?:auto_sync_(?:queue|wakeup)|device_auto_sync(?:_ui)?|managed_auto_sync|personal_sync|personal_auto_sync_runtime)\.js$/, /^tests\/runtime\/(?:auto-sync-.*|device-auto-sync.*|managed-auto-sync.*|personal-sync|personal-auto-sync.*)\.test\.mjs$/, /^css\/device-auto-sync\.css$/], lanes: ['release', 'settings', 'smoke'] },
   { id: 'video-notes-runtime-and-contract', patterns: [/^js\/(?:shared\/saved_video_notes|content\/video_notes|video_notes_(?:background|editor|store))\.js$/, /^tests\/runtime\/(?:video-notes-.*\.test\.mjs|fixtures\/video-notes\/)/, /^html\/video-notes\.html$/, /^css\/video-notes\.css$/, /^docs\/design\/VIDEO_NOTES_/, /^docs\/audit\/artifacts\/watch-notes-/], lanes: ['release', 'blocking', 'whitelist', 'json', 'dom', 'performance', 'settings', 'smoke'] },
