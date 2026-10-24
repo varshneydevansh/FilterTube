@@ -1,0 +1,32 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <title>FilterTube isolated WebRTC sync verification</title>
+    <style>
+        body { margin: 0; padding: 24px; background: #f7f4ef; color: #302b28; font: 17px/1.55 system-ui,sans-serif; }
+        main { max-width: 850px; margin: auto; }
+        button { min-height: 48px; padding: 10px 18px; font: inherit; cursor: pointer; }
+        li { padding: 7px 0; }
+        pre { white-space: pre-wrap; overflow-wrap: anywhere; font-size: 14px; }
+    </style>
+</head>
+<body><main>
+    <h1>Isolated peer-to-peer sync verification</h1>
+    <p>Two independent synthetic profiles, production sync modules, browser local storage and a real encrypted WebRTC data channel. Both endpoints run on this computer. This does not establish installed-extension, discovery, physical-device or cross-network compatibility.</p>
+    <button id="run" type="button">Run isolated WebRTC checks</button>
+    <p id="status" role="status">Ready. No real profiles or devices will be changed.</p>
+    <ol id="checks"></ol>
+    <details><summary>Machine-readable report</summary><pre id="report"></pre></details>
+    <script src="/js/shared/saved_video_notes.js"></script>
+    <script src="/js/video_notes_store.js"></script>
+    <script src="/js/auto_sync_queue.js"></script>
+    <script src="/js/managed_auto_sync.js"></script>
+    <script src="/js/personal_sync.js"></script>
+    <script src="/js/personal_auto_sync_runtime.js"></script>
+    <script src="/js/device_auto_sync.js"></script>
+    <script src="/tests/runtime/fixtures/auto-sync-two-endpoint-harness.js"></script>
+    <script src="browser.js"></script>
+</main></body>
+</html>

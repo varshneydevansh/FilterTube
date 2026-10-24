@@ -1,0 +1,50 @@
+Extension auto-sync hardening — 2026-10-24
+Source commit: 660f6fd6f9a4b6eaed631b2c17aa864ada9dcf78
+
+All installed/physical-network/native acceptance remains pending.
+
+focused
+log sha256: 070b1f09422136a703da67e15480a631d7f7b9ffe5425e8b67b489324dcd1cb3
+# tests 397
+# suites 0
+# pass 397
+# fail 0
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 963.151333
+
+smoke
+log sha256: 69745308a9168caf02c5f6f9ac9fe65f7b452aa8adebc8786734020ff66e66c4
+# tests 1379
+# suites 0
+# pass 1379
+# fail 0
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 6443.229416
+
+release
+log sha256: 2d314741351a58e4015a21852d737b079c46a55a0a5a74745f9b25c1e1884524
+# tests 668
+# suites 0
+# pass 668
+# fail 0
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 6060.683083
+
+settings
+log sha256: 8444d7e779450134d7d47f2a9455a90bdfc66dcb15188bffa3b0a6bc8d3b7f58
+# tests 1152
+# suites 0
+# pass 1057
+# fail 95
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 6110.372417
+
+The 95 settings failure titles exactly match /tmp/filtertube-void-settings.log; see verification.json for the portable title set.

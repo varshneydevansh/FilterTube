@@ -1,0 +1,18 @@
+{
+  "date": "2026-10-24",
+  "evidence": "same-browser synthetic endpoints over real WebRTC; not installed-device proof",
+  "checks": [
+    "Real WebRTC data channel connected without an external STUN/TURN server",
+    "Both synthetic endpoints explicitly approved their exact profile and data areas",
+    "Settings, channel/keyword rules and Unicode notes persisted with a signed Applied receipt",
+    "A note edited on endpoint B returned to endpoint A",
+    "Offline changes stayed queued through reconstruction from browser local storage",
+    "A new WebRTC connection delivered only the latest offline settings, removals and note",
+    "Notes deletion propagated as a causal tombstone",
+    "Child profiles and local security were unchanged; no signing secrets, PINs or private tokens were sent"
+  ],
+  "connections": 2,
+  "messages": 12,
+  "bytes": 11207,
+  "result": "pass"
+}
