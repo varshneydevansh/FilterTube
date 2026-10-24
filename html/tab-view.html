@@ -534,6 +534,17 @@
                                         </div>
                                     </div>
                                 </div>
+                                <div class="card settings-card" aria-labelledby="ftPreferenceDefaultsTitle">
+                                    <div class="card-header">
+                                        <h3 id="ftPreferenceDefaultsTitle" data-ft-i18n="dashboard.preferences.title">Restore preference defaults</h3>
+                                    </div>
+                                    <div class="card-body settings-card__body">
+                                        <p id="ftPreferenceDefaultsTarget" class="import-export-summary" aria-live="polite"></p>
+                                        <p class="import-export-hint" data-ft-i18n="dashboard.preferences.description">Restore this profile's display and playback preferences. Your filter rules, modes, content restrictions, Notes, PINs, verified devices and time limits stay as they are.</p>
+                                        <p class="import-export-hint" data-ft-i18n="dashboard.preferences.syncHint">Review the changes and any enabled Settings Auto-sync links before restoring. Device permissions stay as they are.</p>
+                                        <button id="ftRestorePreferencesBtn" type="button" class="btn-secondary" data-ft-i18n="dashboard.preferences.action" aria-describedby="ftPreferenceDefaultsTarget">Restore this profile's preferences</button>
+                                    </div>
+                                </div>
                                 <div class="card settings-card">
                                     <div class="card-header">
                                         <h3>Import / Export</h3>
@@ -2729,6 +2740,7 @@
 
 
     <script src="../js/settings_shared.js"></script>
+    <script src="../js/profile_preference_defaults.js"></script>
     <script src="../js/security_manager.js"></script>
     <script src="../js/managed_admin_authority.js"></script>
     <script src="../js/nanah_storage_lock.js"></script>

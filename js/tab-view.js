@@ -4324,6 +4324,11 @@ document.addEventListener('DOMContentLoaded', async () => {
     const ftSelfControlActive = document.getElementById('ftSelfControlActive');
     const ftSelfControlMinutes = document.getElementById('ftSelfControlMinutes');
     const ftStartSelfControlBtn = document.getElementById('ftStartSelfControlBtn');
+    const ftRestorePreferencesBtn = document.getElementById('ftRestorePreferencesBtn');
+    const ftPreferenceDefaultsTarget = document.getElementById('ftPreferenceDefaultsTarget');
+    let profilePreferenceReset = null;
+    let isRestoringProfilePreferences = false;
+    ftRestorePreferencesBtn?.addEventListener('click', () => { void restoreProfilePreferences(); });
     const ftSelfControlCountdown = document.getElementById('ftSelfControlCountdown');
     const ftSelfControlEndsAt = document.getElementById('ftSelfControlEndsAt');
     const ftSelfControlActiveLabel = document.getElementById('ftSelfControlActiveLabel');
@@ -9335,6 +9340,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     }
 
     function updateChildProfileCapabilityControls() {
+        updatePreferenceDefaultsControls();
         const isChild = getActiveProfileType() === 'child';
         const scopedProtectedEdit = isManagedChildEditActive();
         const childTitle = tabViewUiText('family.profileManager.childAdminRestrictedHelp', 'Protected profiles cannot manage profile names, deletion, PIN rules, viewing spaces, time limits, or profile switching PINs from this surface.');
@@ -9500,6 +9506,108 @@ document.addEventListener('DOMContentLoaded', async () => {
             return null;
         }
         return latest;
+    }
+
+    function preferenceResetSelection(root) {
+        const actorProfileId = normalizeString(root?.activeProfileId);
+        return { actorProfileId, targetProfileId: normalizeString(managedChildEdit?.profileId) || actorProfileId,
+            scope: managedChildEdit };
+    }
+
+    function updatePreferenceDefaultsControls() {
+        if (!ftRestorePreferencesBtn) return;
+        const selection = preferenceResetSelection(profilesV4Cache);
+        const target = safeObject(profilesV4Cache?.profiles)[selection.targetProfileId];
+        if (ftPreferenceDefaultsTarget) ftPreferenceDefaultsTarget.textContent = target
+            ? tabViewUiText('dashboard.preferences.profile', 'Profile: {name} ({id})', { name: target.name || selection.targetProfileId, id: selection.targetProfileId })
+            : tabViewUiText('popup.profile.unavailable', 'Profiles unavailable');
+        ftRestorePreferencesBtn.disabled = isRestoringProfilePreferences || !target || getActiveProfileType() === 'child' || isSelfControlSessionActive();
+    }
+
+    function createProfilePreferenceReset() {
+        const defaults = window.FilterTubeProfilePreferenceDefaults;
+        if (!defaults || !window.FilterTubeNanahStorageLock?.run) throw Error('reset_unavailable');
+        const promiseApi = typeof browser !== 'undefined' && !!browser.runtime;
+        const api = promiseApi ? browser : chrome;
+        const get = keys => promiseApi ? Promise.resolve().then(() => api.storage.local.get(keys))
+            : new Promise((resolve, reject) => api.storage.local.get(keys, result => api.runtime.lastError
+                ? reject(Error('save_failed')) : resolve(result)));
+        return defaults.create({
+            read: async () => {
+                const data = await get([...defaults.legacyKeys, 'ftDeviceAutoSyncV1', 'ftSelfControlSessionV1']);
+                return { root: await window.FilterTubeIO.loadProfilesV4(), legacy: Object.fromEntries(defaults.legacyKeys
+                    .filter(key => Object.prototype.hasOwnProperty.call(data, key)).map(key => [key, data[key]])),
+                    sync: data.ftDeviceAutoSyncV1, session: data.ftSelfControlSessionV1 };
+            },
+            selection: preferenceResetSelection,
+            authority: (root, selection) => captureProfileMutationAuthorization(root, selection.targetProfileId, selection.actorProfileId),
+            authorized: (root, selection) => canActiveProfileManageProfile(root, selection.targetProfileId)
+                && (!isProfileLocked(root, selection.actorProfileId)
+                    || isProfileUnlockSessionValid.check(selection.actorProfileId, { sensitiveAction: true })),
+            unlock: (root, selection) => ensureProfileUnlocked(root, selection.actorProfileId, { sensitiveAction: true }),
+            guard: async () => {
+                const response = await sendRuntimeMessage({ action: 'FilterTube_GetSelfControlSession' });
+                if (!response?.ok) throw Error('session_unavailable');
+                if (response.active === true || isSelfControlSessionActive()) throw Error('session_locked');
+            },
+            // Grant enrollment uses this lock; acquire it before profile/trust storage.
+            withLock: work => {
+                if (!navigator.locks?.request) throw Error('reset_unavailable');
+                return navigator.locks.request('filtertube-auto-sync-v1', { mode: 'exclusive' },
+                    () => window.FilterTubeNanahStorageLock.run(work));
+            },
+            save: next => window.FilterTubeIO.saveProfilesV4(next),
+            confirm: async ({ profileName, profileId, changes, devices }) => {
+                const changed = changes.map(({ key, label, value }) => tabViewUiText('dashboard.preferences.change', '{name}: {value}', {
+                    name: tabViewUiText(`controls.title.${key}`, label),
+                    value: value ? tabViewUiText('dashboard.preferences.on', 'On') : tabViewUiText('dashboard.preferences.off', 'Off')
+                }));
+                const sync = devices.length
+                    ? tabViewUiText('dashboard.preferences.syncImpact', 'Settings Auto-sync may send these preferences to {count} linked profile(s): {devices}. Offline changes wait here until a verified connection is available.', {
+                        count: devices.length, devices: devices.map(device => device.label).join(', ') })
+                    : tabViewUiText('dashboard.preferences.noSyncImpact', 'No Settings Auto-sync links are enabled for these preferences. Existing device permissions stay as they are.');
+                return await showChoiceModal({
+                    title: tabViewUiText('dashboard.preferences.confirmTitle', 'Restore {name}’s preferences?', { name: profileName }),
+                    message: tabViewUiText('dashboard.preferences.confirmMessage', 'Restore {count} display and playback preference(s) for {name} ({id}).', {
+                        count: changes.length, name: profileName, id: profileId }),
+                    details: [tabViewUiText('dashboard.preferences.explicitDefaults', 'Preferences without a saved value, or with an older value format, are included so linked profiles use the same defaults.'),
+                        tabViewUiText('dashboard.preferences.preserved', 'Keep filter rules, list modes, content restrictions, Kids strictness, Notes, PINs, ownership, verified devices, viewing access and time limits.'),
+                        sync, ...changed],
+                    choices: [{ value: 'restore', label: tabViewUiText('dashboard.preferences.confirmAction', 'Restore preferences'), className: 'btn-primary' }],
+                    cancelText: tabViewUiText('dashboard.preferences.cancel', 'Keep preferences'), focusCancel: true
+                }) === 'restore';
+            }
+        });
+    }
+
+    async function restoreProfilePreferences() {
+        if (!ftRestorePreferencesBtn || ftRestorePreferencesBtn.disabled || isRestoringProfilePreferences) return;
+        isRestoringProfilePreferences = true;
+        ftRestorePreferencesBtn.disabled = true;
+        try {
+            profilePreferenceReset ||= createProfilePreferenceReset();
+            const result = await profilePreferenceReset.restore();
+            if (result.status === 'restored') {
+                await StateManager.loadSettings({ notify: true, resetEnrichment: false, scheduleEnrichment: false });
+                await refreshProfilesUI();
+                updateCheckboxes();
+                UIComponents.showToast(tabViewUiText('dashboard.preferences.restored', 'Restored {count} preference(s). Rules and protection settings were kept.', { count: result.changedCount }), 'success');
+            } else if (result.status === 'noop') {
+                UIComponents.showToast(tabViewUiText('dashboard.preferences.alreadyDefault', 'This profile’s display and playback preferences already use the defaults.'), 'info');
+            }
+        } catch (error) {
+            const code = error?.code || error?.message;
+            const fallback = code === 'session_locked'
+                ? 'Preferences stay locked until the focus session ends.'
+                : code === 'save_failed' || code === 'readback_failed'
+                    ? 'The restored preferences could not be saved and verified. Review this profile before trying again.'
+                    : 'The profile, parent approval or Settings Auto-sync links changed, or could not be checked. Review and try again.';
+            UIComponents.showToast(tabViewUiText(`dashboard.preferences.error.${code === 'session_locked' ? 'session' : code === 'save_failed' || code === 'readback_failed' ? 'save' : 'changed'}`, fallback), 'warning');
+        } finally {
+            isRestoringProfilePreferences = false;
+            updatePreferenceDefaultsControls();
+            ftRestorePreferencesBtn?.focus();
+        }
     }
 
     async function updateProfileViewingAccess(profileId, patch) {
@@ -30095,6 +30203,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                 parentProfileId: null,
                 name,
                 settings: {
+                    ...(window.FilterTubeProfilePreferenceDefaults?.defaults?.() || {}),
                     allowMainViewing: true,
                     allowKidsViewing: true,
                     syncKidsToMain: false,
@@ -30206,6 +30315,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                 parentProfileId: currentActive,
                 name,
                 settings: {
+                    ...(window.FilterTubeProfilePreferenceDefaults?.defaults?.() || {}),
                     allowMainViewing: false,
                     allowKidsViewing: true,
                     syncKidsToMain: false,
