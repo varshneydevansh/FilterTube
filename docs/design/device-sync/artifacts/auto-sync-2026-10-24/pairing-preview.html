@@ -1,0 +1,73 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <title>FilterTube pairing layout preview</title>
+    <link rel="stylesheet" href="/css/design_tokens.css">
+    <link rel="stylesheet" href="/css/components.css">
+    <link rel="stylesheet" href="/css/tab-view.css">
+    <link rel="stylesheet" href="/css/serene-shell.css">
+    <link rel="stylesheet" href="/css/device-auto-sync.css">
+    <style>
+        body { display: block; height: auto; min-height: 100vh; overflow: auto; margin: 0; padding: 16px; background: #f7f4f0; }
+        main, header { max-width: 1100px; margin: 0 auto 16px; min-width: 0; }
+        header { font: 15px/1.5 system-ui,sans-serif; }
+        header label { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; }
+        header select { min-height: 44px; font: inherit; }
+        #familyDeviceUpdatesCard { padding: 0; }
+    </style>
+</head>
+<body>
+    <header>
+        <p>Layout preview · actual source markup · synthetic session · no device connection</p>
+        <label>Preview stage <select id="previewStage">
+            <option value="connect">Connect</option>
+            <option value="waiting">Waiting for device</option>
+            <option value="verify">Match safety phrase</option>
+            <option value="share">Share / sync</option>
+        </select></label>
+    </header>
+    <main id="familyDeviceUpdatesCard"></main>
+    <script src="/js/nanah_pairing_ui.js"></script>
+    <script>
+        (async () => {
+            const source = await (await fetch('/html/tab-view.html')).text();
+            const parsed = new DOMParser().parseFromString(source, 'text/html');
+            const root = document.importNode(parsed.getElementById('ftNanahPairingDetails'), true);
+            root.open = true;
+            document.getElementById('familyDeviceUpdatesCard').append(root);
+            const stage = document.getElementById('previewStage');
+            const find = id => root.querySelector('#' + id);
+            const text = (id, value) => { if (find(id)) find(id).textContent = value; };
+            for (const button of root.querySelectorAll('[data-mode]')) {
+                button.setAttribute('aria-pressed', button.dataset.mode === 'send_once' ? 'true' : 'false');
+            }
+            function render() {
+                const value = stage.value, active = value !== 'connect', connected = value === 'verify' || value === 'share';
+                const ready = value === 'share';
+                const state = { active, connected, phraseConfirmed: ready, mode: 'send_once', childReceiveOnly: false,
+                    canHost: !active, canSend: ready, canTrust: ready, targetVisible: false, savedLinkCount: 0,
+                    phrase: connected ? 'maple river fox' : '', code: active ? 'DEMO' : '',
+                    pairUri: active ? 'nanah://pair?code=DEMO' : '', hasQrRenderer: false };
+                for (const [id, disabled] of [['ftNanahHostBtn', active], ['ftNanahSendBtn', !ready],
+                    ['ftNanahTrustBtn', !ready], ['ftNanahConfirmSasBtn', value !== 'verify'], ['ftNanahEndSessionBtn', !active]]) {
+                    find(id).disabled = disabled;
+                }
+                text('ftNanahSetupTitle', 'Connect your devices');
+                text('ftNanahSetupBody', 'Choose the connection purpose, then show a code or enter one from your other device.');
+                text('ftNanahStage', {connect:'Connect',waiting:'Waiting for your other device',verify:'Match the safety phrase',share:'Phrase confirmed here'}[value]);
+                text('ftNanahStatusHint', {connect:'Show your code or enter the code from your other device.',waiting:'Enter DEMO on your other device. Keep both Accounts & Sync pages open.',verify:'Compare this phrase on both devices. Confirm only if it matches.',share:'Keep both Accounts & Sync pages open and connected.'}[value]);
+                text('ftNanahPairCode', state.code); find('ftNanahPairCodeRow').hidden = !state.code;
+                text('ftNanahSasPhrase', state.phrase);
+                text('ftNanahRemoteLabel', 'Maya · My tablet');
+                text('ftNanahSendTransferSummary', 'Copy Maya → Maya on My tablet. The other device reviews before applying.');
+                find('ftNanahPairUri').value = state.pairUri;
+                FilterTubeNanahPairingUI.render({root,state});
+            }
+            stage.addEventListener('change', render);
+            render();
+        })();
+    </script>
+</body>
+</html>

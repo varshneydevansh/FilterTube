@@ -90,3 +90,7 @@ All test note text was disposable. The saved test note was deleted through the U
 The earlier blank frame is **not reproduced with native input**. The DOM-tool observation and unknown `srcdoc` mutator remain recorded; there is no speculative production workaround that clears another actor's iframe attributes or weakens the private frame. Future installed private-editor tests should use native controls.
 
 Structured evidence: [installed-verification-native.json](../audit/artifacts/watch-notes-2026-10-23/installed-verification-native.json). Current Chrome acceptance does not establish Firefox/mobile/TV rendering, installed protected-profile/PIN/time/filter revocation, or Notes backup/device-sync/cross-client interoperability. Shared format-1 portability stays pending until explicit transfer and restore are implemented and verified.
+
+## Auto-sync extension candidate — 2026-10-24
+
+A separate opt-in personal profile sync contract now provides private Notes export/merge through the existing background repository queue. It requires two explicitly approved, version-compatible profile/device grants and a confirmed direct Nanah session. Writer identity and temporary drafts stay local; ordinary backup/import remains separate. See [Auto-sync implementation and acceptance](device-sync/AUTO-SYNC-2026-10-24.md). Source/runtime checks do not establish installed extension↔native Notes interoperability.

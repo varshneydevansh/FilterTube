@@ -1,0 +1,124 @@
+{
+  "date": "2026-10-24",
+  "status": "extension_candidate_installed_network_acceptance_pending",
+  "autoSyncDefault": "off",
+  "checks": {
+    "focusedSyncAndNotes": {
+      "tests": 346,
+      "pass": 346,
+      "fail": 0
+    },
+    "smoke": {
+      "tests": 1328,
+      "pass": 1328,
+      "fail": 0
+    },
+    "release": {
+      "tests": 617,
+      "pass": 617,
+      "fail": 0
+    },
+    "settings": {
+      "tests": 1101,
+      "pass": 1006,
+      "fail": 95
+    },
+    "settingsFailureTitlesMatchPriorBaseline": true
+  },
+  "packages": {
+    "chrome": {
+      "archive": "dist/filtertube-chrome-v3.4.1.zip",
+      "sha256": "acff6a3d2ec4052ad1cd6c2757c83c95e4ac872792384114c00872c6725e1941",
+      "verifiedRuntimeAssets": 17
+    },
+    "firefox": {
+      "archive": "dist/filtertube-firefox-v3.4.1.zip",
+      "sha256": "8f2c7ffe1a12972dd9a99e0d594702801ffa941e3684ff6a031044febd877477",
+      "verifiedRuntimeAssets": 17
+    },
+    "opera": {
+      "archive": "dist/filtertube-opera-v3.4.1.zip",
+      "sha256": "07b82167101d3e5fda2f2dc11ef3cdfd5287270aa1edd2396153e760901dd6e1",
+      "verifiedRuntimeAssets": 17
+    }
+  },
+  "sourceSha256": {
+    "js/auto_sync_queue.js": "7572e13d2eb55252d2238f1fca4064597f98dfbb8aea9ff8cd8404d93a12697c",
+    "js/auto_sync_wakeup.js": "0b66d0579e53f05dbe1bebd100544c128ca1baff7c5708efa41cdd5f724763b4",
+    "js/managed_auto_sync.js": "e508fc1af204ad5a8a1f22cbf69309c254b90f7a9f160254089ae3ce3716e482",
+    "js/personal_sync.js": "ff78ff3965fc05f911bfe8b750d402833542cb4e5b08833b50055347a1c7d1b2",
+    "js/personal_auto_sync_runtime.js": "c3f5449b19b438e3576dede092b3935c886a6f67de0c4ca2ee82ddf9fe8d1269",
+    "js/device_auto_sync.js": "4942493c05ce8adcebeefec124b1e436301cc4664f812a8dc76534a4c843d9ee",
+    "js/device_auto_sync_ui.js": "33f8339e896d018ebda8f70684663a0d7ecf3c3162d3506d343c305484d60502",
+    "js/video_notes_background.js": "0fccf17754646241fae9b7e88ecd098c4017598ceabbd69c36ae8e21c2c994da",
+    "js/video_notes_store.js": "f5f44c401e4e6685f80d6ccb32805fd23ac59d7bb3ab403a51a54b2dedfcfbd6",
+    "js/nanah_managed_live_policy.js": "557fd9d60383b2ef841b782a7d41198ec928fcad64c9366d2eb8bcacca10c821",
+    "js/tab-view.js": "32c277630ea4568b24e7a611546131456b1db302a8cc46548de0f75fa131f8db",
+    "js/background.js": "11606b409f8cef1c2d6821a411f81a41eb0684ab65ee183139ad42cac25830fb",
+    "js/io_manager.js": "f00d15e7dd636585c999b3a51a40363d181b192e85fd2be00231b37ca827ed43",
+    "html/tab-view.html": "1b7a6f139f3d3813668a9f7769746bba953e213ea7a30c0b1a92ad8fcb478bc5",
+    "css/device-auto-sync.css": "9cbe4a611981f2ef4e153d153bbf24d1831edd07e4094e1624e1c0f7397f6201",
+    "js/nanah_sync_adapter.js": "a4e2bdc0a7da13eb3f57d89896d657e2dd2698ad69021de575f8f6e797fcbfca",
+    "js/nanah_pairing_ui.js": "35dd9d091c61e9b491f725bb81d70d7cd716b3dce961015b1bb8a86f3a494340"
+  },
+  "layout": {
+    "type": "real component with synthetic controller and devices, not installed authority/transport proof",
+    "viewportWidths": [
+      375,
+      768,
+      1440
+    ],
+    "horizontalOverflow": false,
+    "observedButtonMinimumHeightPx": 46,
+    "conflictDisclosureOpened": true,
+    "screenshots": [
+      "layout-375.png",
+      "layout-768.png",
+      "layout-1440.png",
+      "layout-empty-375.png"
+    ],
+    "emptyState": "Only Peer-to-peer sync and Add a device, verify it, then choose what to sync.",
+    "pairing": {
+      "type": "actual source HTML and production presenter, synthetic session with inert transport actions",
+      "widths": [
+        375,
+        768,
+        1440
+      ],
+      "horizontalOverflow": false,
+      "codeInputHeightPx": 48,
+      "statesInspected": [
+        "connect",
+        "waiting",
+        "verify",
+        "share"
+      ],
+      "retainedCodeHiddenAfterConnection": true,
+      "screenshots": [
+        "pairing-connect-375.png",
+        "pairing-connect-768.png",
+        "pairing-connect-1440.png",
+        "pairing-verify-768.png",
+        "pairing-share-375.png"
+      ]
+    }
+  },
+  "installed": {
+    "userReloadConfirmed": true,
+    "automatedDashboardInspection": "blocked by browser URL policy for chrome-extension protocol; no alternate-surface bypass attempted",
+    "userVisualConfirmation": "User screenshots confirm compact empty panel and reveal crowding in older advanced/pairing drawer; final staged-pairing package reload remains pending.",
+    "newOptInPermissionsEnabledOnUserDevices": false,
+    "twoInstalledEndpointAcceptance": false,
+    "twoPhysicalDeviceAcceptance": false,
+    "nativeParity": false,
+    "finalStagedPairingPackageVerified": false
+  },
+  "boundaries": [
+    "Direct auto-sync requires open dashboards and an established verified Nanah session.",
+    "Background alarms do not discover peers, establish sessions or wake closed browsers.",
+    "Personal synchronization runs for the active unlocked own account profile.",
+    "Existing optional manual pickup paths remain separate.",
+    "No push, publishing, store submission, GitHub issue posting or native runtime synchronization performed."
+  ],
+  "sourceCommit": "4154e387"
+}
