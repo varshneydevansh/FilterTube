@@ -2399,8 +2399,10 @@
         _shouldDropAutoplayEndpointSet(obj) {
             if (!hasAutoplayEndpointKey(obj)) return false;
 
-            if (this.settings.hideEndscreenVideowall || this.settings.hideEndscreenCards || this.settings.disableAutoplay) {
-                this._log('🚫 Removing watch autoplay endpoint set due to player end-screen/autoplay setting');
+            // End-screen visibility controls do not disable native queue
+            // navigation. Individual endpoints still pass the rules below.
+            if (this.settings.disableAutoplay) {
+                this._log('🚫 Removing watch autoplay endpoint set due to disable autoplay setting');
                 return true;
             }
             return false;

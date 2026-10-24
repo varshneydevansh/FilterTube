@@ -1,9 +1,10 @@
 # FilterTube JSON-First Hide Endscreen Cards Boundary Current Behavior - 2026-05-22
 
-Status: release-fix proof slice. Runtime behavior changed on 2026-05-31 for
-watch autoplay endpoint sets during active JSON filtering. This is not an
-unrelated optimization patch, DOM fallback patch, settings schema patch, or
-selector cleanup patch.
+Status: release-fix proof slice, with the autoplay contract corrected on
+2026-10-25. Hiding end-screen cards preserves permitted native autoplay and
+Previous/Next endpoints when `disableAutoplay` is false. The earlier
+2026-05-31 coupling between visual hiding and endpoint-set removal is
+superseded. This is not a DOM selector or settings-schema change.
 
 This slice promotes the JSON-first feature audit into `hideEndscreenCards`
 proof. It isolates how the player end-screen card toggle currently crosses
@@ -13,6 +14,10 @@ traversal, unsupported `compactAutoplayRenderer` traversal, DOM fallback CSS,
 whitelist mode, and ordinary `/youtubei/v1/next` endpoint behavior.
 
 ## Source Scope
+
+The source table and lexical counts below retain their historical capture
+pins. Updating the autoplay behavior assertions does not refresh those hashes,
+counts, or unrelated audit gaps.
 
 | File | Lines | Bytes | SHA-256 |
 | --- | ---: | ---: | --- |
@@ -105,10 +110,10 @@ runtime hideEndscreenCards fixtures: 8
 
 | Boundary | Current behavior | Missing proof before implementation changes |
 | --- | --- | --- |
-| JSON end-screen renderer decision | `js/filter_logic.js` now has direct `hideEndscreenCards` authority for watch autoplay endpoint sets. Direct and nested `endScreenVideoRenderer` rows are still covered by ordinary shared video rules, category allowlists, content allowlists, and nested unwrap keys; `compactAutoplayRenderer` is not covered by those direct allowlists today. | A follow-up renderer inventory proving whether `compactAutoplayRenderer` should share the same endpoint-set authority. |
-| Feature toggle interaction | `hideEndscreenCards` can remove watch autoplay endpoint sets during an already-running JSON pass. Ordinary keyword/channel/list-mode rules can still remove supported `endScreenVideoRenderer` rows independently of the feature toggle. | A player-overlay interaction report proving visible end-screen cards, videowall, compact autoplay, and JSON end-screen renderers across real watch captures. |
+| JSON end-screen renderer decision | `hideEndscreenCards` does not remove watch autoplay endpoint sets; explicit `disableAutoplay` still removes them, and ordinary endpoint admission rules remain active. Direct and nested `endScreenVideoRenderer` rows are still covered by ordinary shared video rules, category allowlists, content allowlists, and nested unwrap keys; `compactAutoplayRenderer` is not covered by those direct allowlists today. | A follow-up renderer inventory separating compact autoplay presentation from native navigation and endpoint admission. |
+| Feature toggle interaction | `hideEndscreenCards` preserves permitted autoplay, Next and Previous endpoints during an already-running JSON pass when `disableAutoplay` is false. Ordinary keyword/channel/list-mode rules can still remove supported `endScreenVideoRenderer` rows independently of the feature toggle. | A player-overlay interaction report proving visible end-screen cards, videowall, compact autoplay, and JSON end-screen renderers across real watch captures. |
 | Whitelist mode | Empty whitelist mode can remove direct supported `endScreenVideoRenderer` rows, while unsupported `compactAutoplayRenderer` rows can pass through. The DOM end-screen card CSS block is not gated by `listMode !== 'whitelist'`. | A whitelist-mode report proving supported and unsupported end-screen renderer behavior, player overlay visibility, and allow-mode false-hide/leak boundaries. |
-| Seed active JSON work | Seed JSON active-work detection still does not include `hideEndscreenCards`. `/youtubei/v1/next` still bypasses `processData` with only `hideEndscreenCards` enabled because the no-active-JSON-work gate passes through before JSON parse. When whitelist/blocklist work already activates JSON filtering, endpoint-set removal runs inside `filter_logic.js`. | A watch-route no-work budget that proves when `/next` may parse/stringify, harvest only, mutate, or pass through. |
+| Seed active JSON work | Seed JSON active-work detection still does not include `hideEndscreenCards`. `/youtubei/v1/next` still bypasses `processData` with only `hideEndscreenCards` enabled because the no-active-JSON-work gate passes through before JSON parse. When whitelist/blocklist work already activates JSON filtering, permitted endpoints remain; explicit `disableAutoplay` and ordinary endpoint admission still apply inside `filter_logic.js`. | A watch-route no-work budget that proves when `/next` may parse/stringify, harvest only, mutate, or pass through. |
 | DOM fallback | DOM fallback owns the visible player end-card hide with `#movie_player .ytp-ce-element`. | A JSON/DOM parity report for player end-screen cards, direct JSON end-screen rows, compact autoplay, and end-screen videowall. |
 | Background compile and invalidation | Background storage reads and compiles `hideEndscreenCards`. Background storage-change invalidation does not include `hideEndscreenCards` today. | A cache invalidation report that either adds the dependency or explicitly classifies it as DOM-only with a bounded refresh path. |
 | Content bridge refresh | `js/content/bridge_settings.js` includes `hideEndscreenCards` in its storage refresh key list. This can refresh active content scripts but does not make the background compiler invalidation list complete. | A settings parity report across background, content bridge, shared settings, StateManager, and UI save paths. |
@@ -119,16 +124,19 @@ runtime hideEndscreenCards fixtures: 8
 Watch end-screen renderer rows still pass through unchanged when only
 `hideEndscreenCards` is enabled.
 
-Watch autoplay endpoint sets are removed during active JSON processing when
-`hideEndscreenCards` is enabled.
+Watch autoplay, Next and Previous endpoints remain during active JSON
+processing when only `hideEndscreenCards` is enabled and `disableAutoplay` is
+false. A separate assertion verifies that explicit `disableAutoplay: true`
+still removes the endpoint sets.
 
 `/youtubei/v1/next` now bypasses `processData` with only
 `hideEndscreenCards` enabled.
 
 1. JSON `endScreenVideoRenderer` and `compactAutoplayRenderer` rows pass
    through unchanged when only `hideEndscreenCards` is enabled.
-2. Watch autoplay endpoint sets are removed during an active JSON pass when
-   `hideEndscreenCards` is enabled.
+2. Permitted watch autoplay, Next and Previous endpoints remain during an
+   active JSON pass when `hideEndscreenCards` is enabled and `disableAutoplay`
+   is false. Explicit `disableAutoplay: true` still removes endpoint sets.
 3. Ordinary keyword rules can remove a matching `endScreenVideoRenderer` row
    while a matching `compactAutoplayRenderer` row remains because that renderer
    has no direct JSON rule today.
@@ -155,8 +163,9 @@ Watch autoplay endpoint sets are removed during active JSON processing when
   player-overlay CSS block is independent of that JSON decision.
 - Performance risk: the no-active-JSON gate still avoids parse/traverse work
   when only `hideEndscreenCards` is enabled. When another rule already activates
-  JSON filtering, endpoint-set removal adds bounded object-key checks rather
-  than an additional network pass.
+  JSON filtering, ordinary endpoint admission and explicit autoplay-disable
+  checks remain bounded object-key checks rather than an additional network
+  pass.
 - Code-burden risk: background compile, background invalidation, content bridge
   refresh, shared settings, seed active-work, JSON renderer rules, category and
   content allowlists, nested unwrap, and DOM player-overlay selectors all
@@ -182,7 +191,9 @@ No `jsonFirstHideEndscreenCardsContract`,
 
 This file and
 `tests/runtime/json-first-hide-endscreen-cards-boundary-current-behavior.test.mjs`
-pin the #57 endpoint-set release fix. They do not authorize deleting DOM
+pin the 2026-10-25 separation of visual hiding from autoplay suppression,
+while preserving ordinary endpoint admission and explicit Disable Autoplay.
+They do not authorize deleting DOM
 selectors, adding `compactAutoplayRenderer` rules, changing background cache
 invalidation, or merging player controls into a broader shared authority
 without follow-up implementation proof.

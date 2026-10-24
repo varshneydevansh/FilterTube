@@ -366,15 +366,18 @@ test('blocklist keyword proves row authority but not autoplay endpoint authority
   assert.deepEqual(nextButtonWatchIds(output), ['UrAhnndvrSU']);
 });
 
-test('end-screen settings remove watch autoplay endpoint sets directly', () => {
-  const cardsRun = runFixture({ hideEndscreenCards: true });
-  const videowallRun = runFixture({ hideEndscreenVideowall: true });
-
-  assert.deepEqual(plain(watchNext(cardsRun.output).autoplay.autoplay.sets), []);
-  assert.deepEqual(plain(watchNext(cardsRun.output).autoplay.autoplay.modifiedSets), []);
-  assert.deepEqual(plain(watchNext(videowallRun.output).autoplay.autoplay.sets), []);
-  assert.deepEqual(plain(watchNext(videowallRun.output).autoplay.autoplay.modifiedSets), []);
-});
+for (const control of ['hideEndscreenCards', 'hideEndscreenVideowall']) {
+  test(`${control} hides presentation without disabling allowed autoplay or playlist navigation`, () => {
+    const baseline = runFixture(); const hidden = runFixture({ [control]: true, disableAutoplay: false });
+    assert.deepEqual(autoplayWatchIds(hidden.output), autoplayWatchIds(baseline.output));
+    assert.deepEqual(nextButtonWatchIds(hidden.output), nextButtonWatchIds(baseline.output));
+    assert.deepEqual(previousButtonWatchIds(hidden.output), previousButtonWatchIds(baseline.output));
+    assert.deepEqual(playlistIds(hidden.output), playlistIds(baseline.output));
+    const disabled = runFixture({ [control]: true, disableAutoplay: true });
+    assert.deepEqual(plain(watchNext(disabled.output).autoplay.autoplay.sets), []);
+    assert.deepEqual(plain(watchNext(disabled.output).autoplay.autoplay.modifiedSets), []);
+  });
+}
 
 test('product source now has direct previous/autoplay endpoint authority outside renderer rules', () => {
   const filter = read('js/filter_logic.js');

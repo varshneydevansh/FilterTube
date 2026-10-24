@@ -366,16 +366,20 @@ function automaticInput(state) {
   const input = state.input(); input.mode = 'automatic'; delete input.actionToken; return input;
 }
 
-test('an explicitly enabled isolated automatic transaction needs no forged gesture and preserves paused intent', async () => {
+test('automatic paused startup is refused without swallowing a subsequent native play attempt', async () => {
   let expectedLease;
   const state = fixture({ paused: true, allowAutomaticStart: context => {
     assert.equal(context.videoId, videoId); assert.equal(context.lease, expectedLease); return true;
   } });
   const input = automaticInput(state); expectedLease = input.lease;
   state.window.navigator.userActivation.isActive = false;
-  const pending = state.controller.start(input); state.ready(); state.ack(); state.stateReply();
-  assert.equal((await pending).status, 'active'); assert.equal(state.video.paused, true); assert.equal(state.video.playCalls, 0);
+  const pending = state.controller.start(input);
+  assert.equal(state.posts.length, 0, 'a paused automatic startup must not enter a mutating native transaction');
+  const result = await pending;
+  assert.equal(result.reason, 'native_playback_not_started'); assert.equal(state.posts.length, 0);
+  assert.equal(state.video.paused, true); assert.equal(state.video.pauseCalls, 0); assert.equal(state.video.playCalls, 0);
   assert.equal(state.document.count(), 0); assert.equal(state.timers.size, 0);
+  await state.video.play(); assert.equal(state.video.paused, false); assert.equal(state.video.playCalls, 1);
 });
 
 test('automatic mode requires a synchronous strict-true isolated callback regardless of page or source flags', async () => {

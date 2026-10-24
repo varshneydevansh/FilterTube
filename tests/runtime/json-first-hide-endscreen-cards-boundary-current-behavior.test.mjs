@@ -238,8 +238,8 @@ test('JSON-first hideEndscreenCards boundary audit is release-fix proof and sour
   const doc = read(docPath);
 
   assert.match(doc, /Status: release-fix proof slice/);
-  assert.match(doc, /Runtime behavior changed on 2026-05-31/);
-  assert.match(doc, /not an\s+unrelated optimization patch, DOM fallback patch/);
+  assert.match(doc, /autoplay contract corrected on\s+2026-10-25/);
+  assert.match(doc, /not a DOM selector or settings-schema change/);
   assert.match(doc, /hideEndscreenCards boundary source files: 6/);
   assert.match(doc, /runtime hideEndscreenCards fixtures: 8/);
 
@@ -320,10 +320,11 @@ test('hideEndscreenCards does not remove JSON end-screen renderer rows in filter
   assert.deepEqual(run(payload, { hideEndscreenCards: true }), plain(payload));
 });
 
-test('hideEndscreenCards removes watch autoplay endpoint sets during active JSON processing', () => {
+test('hideEndscreenCards retains permitted watch navigation and only disableAutoplay removes endpoint sets', () => {
   const payload = autoplayEndpointSet();
 
-  assert.deepEqual(run(payload, { hideEndscreenCards: true }), {
+  assert.deepEqual(run(payload, { hideEndscreenCards: true, disableAutoplay: false }), plain(payload));
+  assert.deepEqual(run(payload, { hideEndscreenCards: true, disableAutoplay: true }), {
     sets: []
   });
 });
@@ -379,7 +380,7 @@ test('source proof pins player end-card CSS hide split refresh omission and miss
   const blocks = sourceBlocks();
   const runtimeSource = productRuntimeSource();
 
-  assert.match(blocks.filterLogic, /hideEndscreenCards/);
+  assert.doesNotMatch(blocks.filterLogic, /hideEndscreenCards/);
   assert.match(blocks.filterLogic, /AUTOPLAY_ENDPOINT_KEYS/);
   assert.match(blocks.filterLogic, /_shouldDropAutoplayEndpointSet/);
   assert.doesNotMatch(blocks.seed, /hideEndscreenCards/);
@@ -406,7 +407,7 @@ test('source proof pins player end-card CSS hide split refresh omission and miss
   assert.match(doc, /Background storage-change invalidation does not include `hideEndscreenCards` today/);
   assert.match(doc, /Seed JSON active-work detection still does not include `hideEndscreenCards`/);
   assert.match(doc, /Watch end-screen renderer rows still pass through unchanged when only\s+`hideEndscreenCards` is enabled/);
-  assert.match(doc, /Watch autoplay endpoint sets are removed during active JSON processing when\s+`hideEndscreenCards` is enabled/);
+  assert.match(doc, /Watch autoplay, Next and Previous endpoints remain during active JSON\s+processing when only `hideEndscreenCards` is enabled and `disableAutoplay` is\s+false/);
   assert.match(doc, /`\/youtubei\/v1\/next` now bypasses `processData` with only\s+`hideEndscreenCards` enabled/);
   assert.match(doc, /DOM fallback owns the visible player end-card hide with `#movie_player \.ytp-ce-element`/);
   assert.match(doc, /`compactAutoplayRenderer` is not covered by those direct allowlists today/);

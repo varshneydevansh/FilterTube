@@ -193,6 +193,10 @@
             if (!validId(videoId) || !intent) return reject('invalid_playback_intent', videoId);
             if (!['manual', 'automatic'].includes(mode)) return reject('invalid_start_mode', videoId);
             if (mode === 'automatic' && !automaticAllowed(videoId, lease)) return reject('automatic_start_disabled', videoId);
+            // Automatic source preparation must not claim an unstarted or
+            // explicitly paused native timeline. Its next play belongs to
+            // YouTube and the existing profile guards, not a paused reload.
+            if (mode === 'automatic' && (intent.paused || originalVideo.paused !== false)) return reject('native_playback_not_started', videoId);
             if (mode === 'manual' && !consumeAction(input.actionToken, videoId)) return reject('user_gesture_required', videoId);
             if (source?.kind !== 'adaptive_mp4' || !Number.isFinite(source.expiresAt)) return reject('unsupported_source', videoId);
             if (!preferences) {

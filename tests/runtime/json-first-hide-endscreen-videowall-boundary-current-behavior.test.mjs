@@ -238,8 +238,8 @@ test('JSON-first hideEndscreenVideowall boundary audit is release-fix proof and 
   const doc = read(docPath);
 
   assert.match(doc, /Status: release-fix proof slice/);
-  assert.match(doc, /Runtime behavior changed on 2026-05-31/);
-  assert.match(doc, /not an\s+unrelated optimization patch, DOM fallback patch/);
+  assert.match(doc, /autoplay contract corrected on\s+2026-10-25/);
+  assert.match(doc, /not a DOM selector or settings-schema change/);
   assert.match(doc, /hideEndscreenVideowall boundary source files: 6/);
   assert.match(doc, /runtime hideEndscreenVideowall fixtures: 8/);
 
@@ -321,10 +321,11 @@ test('hideEndscreenVideowall does not remove JSON end-screen renderer rows in fi
   assert.deepEqual(run(payload, { hideEndscreenVideowall: true }), plain(payload));
 });
 
-test('hideEndscreenVideowall removes watch autoplay endpoint sets during active JSON processing', () => {
+test('hideEndscreenVideowall retains permitted watch navigation and only disableAutoplay removes endpoint sets', () => {
   const payload = autoplayEndpointSet();
 
-  assert.deepEqual(run(payload, { hideEndscreenVideowall: true }), {
+  assert.deepEqual(run(payload, { hideEndscreenVideowall: true, disableAutoplay: false }), plain(payload));
+  assert.deepEqual(run(payload, { hideEndscreenVideowall: true, disableAutoplay: true }), {
     sets: []
   });
 });
@@ -380,7 +381,7 @@ test('source proof pins player-overlay CSS hide split refresh omission and missi
   const blocks = sourceBlocks();
   const runtimeSource = productRuntimeSource();
 
-  assert.match(blocks.filterLogic, /hideEndscreenVideowall/);
+  assert.doesNotMatch(blocks.filterLogic, /hideEndscreenVideowall/);
   assert.match(blocks.filterLogic, /AUTOPLAY_ENDPOINT_KEYS/);
   assert.match(blocks.filterLogic, /_shouldDropAutoplayEndpointSet/);
   assert.doesNotMatch(blocks.seed, /hideEndscreenVideowall/);
@@ -408,7 +409,7 @@ test('source proof pins player-overlay CSS hide split refresh omission and missi
   assert.match(doc, /Background storage-change invalidation does not include `hideEndscreenVideowall` today/);
   assert.match(doc, /Seed JSON active-work detection still does not include `hideEndscreenVideowall`/);
   assert.match(doc, /Watch end-screen renderer rows still pass through unchanged when only\s+`hideEndscreenVideowall` is enabled/);
-  assert.match(doc, /Watch autoplay endpoint sets are removed during active JSON processing when\s+`hideEndscreenVideowall` is enabled/);
+  assert.match(doc, /Watch autoplay, Next and Previous endpoints remain during active JSON\s+processing when only `hideEndscreenVideowall` is enabled and `disableAutoplay` is\s+false/);
   assert.match(doc, /`\/youtubei\/v1\/next` now bypasses `processData` with only\s+`hideEndscreenVideowall` enabled/);
   assert.match(doc, /DOM fallback owns the visible player videowall hide with `#movie_player \.ytp-endscreen-content` and `#movie_player \.ytp-fullscreen-grid-stills-container`/);
   assert.match(doc, /`compactAutoplayRenderer` is not covered by those direct allowlists today/);

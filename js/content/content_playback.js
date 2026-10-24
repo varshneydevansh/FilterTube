@@ -11,6 +11,7 @@
     let busy = false;
     let sourceAbort = null;
     let clearOriginalInteraction = null;
+    let clearNativePlaybackWait = null;
     let retryTimer = 0;
     let readinessDeadline = 0;
     let contextKey = '';
@@ -81,6 +82,8 @@
         retryTimer = 0;
         clearOriginalInteraction?.();
         clearOriginalInteraction = null;
+        clearNativePlaybackWait?.();
+        clearNativePlaybackWait = null;
         gate?.invalidate(reason);
         lease = null;
         if (heartbeat) clearInterval(heartbeat);
@@ -136,6 +139,31 @@
             setStatus('admission_changed');
         }
     }
+    function waitForNativePlayback(original, surface, key) {
+        invalidate('native_waiting_for_playback');
+        // A paused startup is not a user request to reload and remain paused.
+        // Let the existing native player/admission guards establish playback
+        // first. This observer never plays media or grants admission itself.
+        attemptedKey = '';
+        const attempt = generation;
+        const wake = event => {
+            if (attempt !== generation || currentContext() !== key
+                || document.getElementById('movie_player') !== surface
+                || surface.querySelector('video.html5-main-video') !== original) {
+                clearNativePlaybackWait?.(); clearNativePlaybackWait = null; return;
+            }
+            if (event.isTrusted !== true || event.target !== original || original.paused !== false || busy || controller) return;
+            clearNativePlaybackWait?.(); clearNativePlaybackWait = null;
+            queueMicrotask(() => { if (attempt === generation && currentContext() === key) refresh(); });
+        };
+        document.addEventListener('play', wake, true);
+        document.addEventListener('playing', wake, true);
+        clearNativePlaybackWait = () => {
+            document.removeEventListener('play', wake, true);
+            document.removeEventListener('playing', wake, true);
+        };
+        setStatus('native_waiting_for_playback');
+    }
     async function start() {
         if (busy || controller || !gate || !enabled() || !videoId() || attemptedKey === contextKey) return;
         const id = videoId();
@@ -143,6 +171,8 @@
         const original = document.querySelector('#movie_player video.html5-main-video');
         const surface = document.getElementById('movie_player');
         if (!original || !surface || original.ended === true || !surface.parentElement) { schedule(); return; }
+        if (original.paused !== false) { waitForNativePlayback(original, surface, key); return; }
+        clearNativePlaybackWait?.(); clearNativePlaybackWait = null;
         // Run the existing admission evaluator. Its explicit receipt is needed
         // even when the current profile has no blocking rules.
         if (typeof enforceCurrentVideoAdmissionForRoute === 'function') enforceCurrentVideoAdmissionForRoute(currentSettings);
@@ -155,7 +185,11 @@
         busy = true;
         const attempt = ++generation;
         const nativeInteraction = event => {
-            if (event.isTrusted && busy && surface.contains(event.target)) {
+            const target = event.target;
+            const editable = target?.isContentEditable === true || ['INPUT', 'TEXTAREA', 'SELECT'].includes(target?.tagName);
+            const playbackKey = event.type === 'keydown' && !editable
+                && [' ', 'Spacebar', 'k', 'K', 'MediaPause', 'MediaPlayPause'].includes(event.key);
+            if (event.isTrusted && busy && (surface.contains(target) || playbackKey)) {
                 invalidate('native_controls_changed');
                 attemptedKey = key;
                 setStatus('native_controls_changed');
@@ -175,6 +209,7 @@
         const response = await requestResponse(id);
         if (attempt !== generation) return;
         if (!gate.validate(lease) || videoId() !== id) { invalidate('admission_changed'); return; }
+        if (original.paused !== false) { waitForNativePlayback(original, surface, key); return; }
         const requirements = {
             nativeAdaptiveOnly: true,
             audioTrackId: response?.preferences?.audioTrackId || '',
@@ -218,6 +253,7 @@
         if (attempt !== generation) return;
         if (!isCurrent()) { invalidate('admission_changed'); return; }
         sourceAbort = null;
+        if (original.paused !== false) { waitForNativePlayback(original, surface, key); return; }
         const originalIsContent = () => ownsNativeNode()
             && !surface.classList.contains('ad-showing') && !surface.classList.contains('ad-interrupting')
             && Number.isFinite(original.duration) && plan.video?.durationSeconds > 0
@@ -250,6 +286,7 @@
             invalidate('native_preferences_changed'); setStatus('native_preferences_changed'); return;
         }
         if (nativeAlreadyReady(freshState.preferences)) { keepReadyNative(); return; }
+        if (original.paused !== false) { waitForNativePlayback(original, surface, key); return; }
         controller = root.FilterTubeContentPlaybackNative.create({ originalVideo: original, originalSurface: surface,
             validateLease: value => gate.validate(value) && ownsNativeNode(),
             isOriginalContent: originalIsContent,
@@ -293,7 +330,7 @@
     function refresh() {
         if (!initialized) return;
         if (!videoId() || !enabled()) {
-            if (busy || controller) invalidate('disabled');
+            if (busy || controller || clearNativePlaybackWait) invalidate('disabled');
             if (retryTimer) clearTimeout(retryTimer);
             retryTimer = 0; contextKey = ''; attemptedKey = ''; preflightCount = 0; readinessDeadline = 0;
             setStatus('disabled');

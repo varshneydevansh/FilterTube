@@ -159,8 +159,10 @@ function fixture({ child = false, decision = 'allowed', paused = false, deferNat
     init: () => root.FilterTubeContentPlayback.initialize(),
     tick: () => { at += 250; for (const item of [...timers.values()]) if (item.interval) item.callback(); },
     navigate: () => docListeners.get('yt-navigate-start')(),
-    interact: (trusted, target = original, type = 'pointerdown') => docListeners.get(type)?.({ isTrusted: trusted, target }),
+    media: (type, trusted = true, target = original) => docListeners.get(type)?.({ type, isTrusted: trusted, target }),
+    interact: (trusted, target = original, type = 'pointerdown', key = '') => docListeners.get(type)?.({ type, isTrusted: trusted, target, key }),
     hasNativeInputGuard: () => docListeners.has('pointerdown') || docListeners.has('keydown'),
+    hasNativePlaybackWait: () => docListeners.has('play') || docListeners.has('playing'),
     emit: payload => rootListeners.get('message')?.({ source: root, origin: context.location.origin, data: payload }) };
 }
 
@@ -197,11 +199,127 @@ test('real adaptive resolution hands off the original player without leaving a s
   assert.equal(state.timers.size, 0); assert.equal(state.original.pauseCalls, 0); assert.equal(state.original.playCalls, 0);
   assert.equal(state.original.paused, false); assert.equal(state.fetches.length, 2); assert.equal(state.hasNativeInputGuard(), false); noReplacementPlayer(state);
 });
-for (const paused of [true, false]) {
+for (const paused of [false]) {
   test(`handoff preserves original paused intent ${paused} and subsequent cleanup does not own native playback`, async () => {
     const state = fixture({ paused }); await begin(state); assert.equal(state.calls[0].input.playbackIntent.paused, paused);
     state.root.FilterTubeContentPlayback.invalidate('settings_changed'); await flush();
     assert.equal(state.original.paused, paused); assert.equal(state.original.pauseCalls, 0); assert.equal(state.calls[0].stopped, undefined);
+  });
+}
+
+test('a paused playlist startup waits without mutating media or consuming a later native start', async () => {
+  const state = fixture({ paused: true }); state.settings.disableAutoplay = false;
+  state.original.currentTime = 0; state.original.readyState = 2;
+  state.init(); await flush();
+  assert.equal(state.messages.length, 0); assert.equal(state.calls.length, 0); assert.equal(state.timers.size, 0);
+  assert.equal(state.original.pauseCalls, 0); assert.equal(state.original.playCalls, 0);
+  assert.equal(state.document.documentElement.attributes.get('data-filtertube-content-playback-state'), 'native_waiting_for_playback');
+  // Synthetic page dispatch cannot establish native playback intent.
+  state.original.paused = false; state.media('play', false); await flush(); assert.equal(state.messages.length, 0);
+  state.media('play'); await flush(); assert.equal(state.messages.length, 1);
+  state.response(); await flush(); assert.equal(state.calls.length, 1);
+  assert.equal(state.calls[0].input.playbackIntent.paused, false); assert.equal(state.calls[0].handedOff, true);
+  state.media('playing'); await state.refresh(); assert.equal(state.calls.length, 1); assert.equal(state.messages.length, 2);
+  assert.equal(state.original.pauseCalls, 0); assert.equal(state.original.playCalls, 0);
+});
+
+test('an explicit paused video is left alone until its own native playback starts', async () => {
+  const state = fixture({ paused: true }); state.init(); await flush();
+  state.media('play'); state.media('playing'); await state.refresh();
+  assert.equal(state.messages.length, 0); assert.equal(state.calls.length, 0); assert.equal(state.original.paused, true);
+  assert.equal(state.original.playCalls, 0); assert.equal(state.original.pauseCalls, 0);
+});
+
+test('the native-play waiter is removed before preparation and when settings disable it', async () => {
+  const state = fixture({ paused: true }); state.init(); await flush();
+  assert.equal(state.hasNativePlaybackWait(), true);
+  state.original.paused = false; state.media('play'); await flush();
+  assert.equal(state.hasNativePlaybackWait(), false);
+  const before = state.messages.length; state.media('playing'); await flush(); assert.equal(state.messages.length, before);
+  state.response(); await flush(); assert.equal(state.calls.length, 1);
+  const waiting = fixture({ paused: true }); waiting.init(); await flush();
+  waiting.settings.contentOnlyPlayback = false; await waiting.refresh();
+  assert.equal(waiting.hasNativePlaybackWait(), false);
+  waiting.original.paused = false; waiting.media('playing'); await flush();
+  assert.equal(waiting.messages.length, 0); assert.equal(waiting.calls.length, 0); assert.equal(waiting.timers.size, 0);
+});
+
+for (const denial of ['blocked child', 'expired time permit', 'pending category']) {
+  test(`a native start after paused waiting cannot bypass ${denial}`, async () => {
+    const state = fixture({ paused: true, child: true });
+    if (denial === 'blocked child') state.root.__filtertubeDirectAccessState.decision = 'blocked';
+    if (denial === 'expired time permit') {
+      state.settings.managedTimeLimitPolicy = { enabled: true, profileId: state.settings.activeProfileId,
+        policyRevision: 1, policyHash: 'known' };
+      state.root.FilterTubeManagedPlaybackPermit = { read: () => ({ decision: 'allowed', videoId: id,
+        profileId: state.settings.activeProfileId, policyRevision: 1, policyHash: 'known', expiresAt: 9999 }) };
+    }
+    if (denial === 'pending category') { state.settings.categoryFilters = { enabled: true }; state.setCategory('unknown'); }
+    state.init(); await flush(); state.original.paused = false; state.media('play'); await flush();
+    assert.equal(state.messages.length, 0); assert.equal(state.fetches.length, 0); assert.equal(state.calls.length, 0);
+    assert.equal(state.original.playCalls, 0);
+  });
+}
+
+for (const key of [' ', 'k', 'MediaPause', 'MediaPlayPause']) {
+  test(`a trusted global ${JSON.stringify(key)} playback key cancels a pending native handoff`, async () => {
+    const state = fixture({ deferNative: true }); await begin(state); assert.equal(state.calls.length, 1);
+    state.interact(true, { tagName: 'BODY' }, 'keydown', key); await flush();
+    assert.equal(state.calls[0].stopped, 'native_controls_changed'); assert.equal(state.calls[0].handedOff, false);
+    assert.equal(state.original.paused, true); assert.equal(state.original.playCalls, 0);
+  });
+}
+
+test('typing a playback letter into an editable field is not a native pause command', async () => {
+  const state = fixture({ deferNative: true }); await begin(state);
+  state.interact(true, { tagName: 'INPUT' }, 'keydown', 'k'); await flush();
+  assert.equal(state.calls[0].stopped, undefined); state.calls[0].complete(); await flush();
+  assert.equal(state.calls[0].handedOff, true);
+});
+
+test('paused startup becoming healthy native content needs no extraction or reset after play', async () => {
+  const state = fixture({ paused: true }); state.init(); await flush();
+  state.original.paused = false; state.original.readyState = 4; state.media('playing'); await flush();
+  state.response({ preferences: { audioKnown: true, audioTrackCount: 1, audioTrackId: 'en.4', audioTracks: [{ id: 'en.4' }],
+    captionsKnown: true, captionsEnabled: false, nativeVideoId: id, nativeAdInactive: true } }); await flush();
+  assert.equal(state.calls.length, 0); assert.equal(state.fetches.length, 0); assert.equal(state.original.pauseCalls, 0);
+  assert.equal(state.original.playCalls, 0); assert.equal(state.timers.size, 0);
+});
+
+for (const cause of ['navigation', 'profile change', 'setting off', 'node replacement']) {
+  test(`the paused-node wait cannot authorize playback after ${cause}`, async () => {
+    const state = fixture({ paused: true }); state.init(); await flush();
+    if (cause === 'navigation') state.navigate();
+    else if (cause === 'profile change') {
+      state.context.currentSettings = { ...state.settings, activeProfileId: 'other-profile' };
+      state.root.__filtertubeDirectAccessState.decision = 'blocked';
+      state.root.FilterTubeContentPlayback.invalidate('settings_changed');
+    } else if (cause === 'setting off') {
+      state.settings.contentOnlyPlayback = false; state.root.FilterTubeContentPlayback.invalidate('settings_changed');
+    } else state.replaceNativeVideo({ paused: true });
+    state.original.paused = false; state.media('play'); await flush();
+    assert.equal(state.messages.length, 0); assert.equal(state.calls.length, 0); assert.equal(state.original.pauseCalls, 0);
+  });
+}
+
+for (const phase of ['metadata', 'resolution', 'fresh state']) {
+  test(`a user pause during ${phase} prevents automatic source mutation`, async () => {
+    const state = fixture({ deferState: phase === 'fresh state' });
+    let finishVisitor;
+    if (phase === 'resolution') state.setFetch(url => String(url).includes('/visitor_id')
+      ? new Promise(resolve => { finishVisitor = resolve; })
+      : Promise.resolve(new Response(JSON.stringify(adaptiveResponse()), { headers: { 'content-type': 'application/json' } })));
+    state.init(); await flush();
+    if (phase === 'metadata') state.original.paused = true;
+    state.response(); await flush();
+    if (phase === 'resolution') {
+      state.original.paused = true;
+      finishVisitor(new Response(JSON.stringify({ responseContext: { visitorData: 'test-visitor' } }), { headers: { 'content-type': 'application/json' } }));
+      await flush();
+    }
+    if (phase === 'fresh state') { state.original.paused = true; state.stateReply(); await flush(); }
+    assert.equal(state.calls.length, 0); assert.equal(state.original.paused, true);
+    assert.equal(state.original.pauseCalls, 0); assert.equal(state.original.playCalls, 0); assert.equal(state.timers.size, 0);
   });
 }
 
@@ -456,6 +574,11 @@ for (const kind of ['direct', 'category']) {
 for (const paused of [false, true]) {
   test(`healthy admitted native content stays untouched without fresh extraction (paused=${paused})`, async () => {
     const state = fixture({ paused }); state.original.readyState = 4;
+    if (paused) {
+      state.init(); await flush(); assert.equal(state.messages.length, 0); assert.equal(state.calls.length, 0);
+      assert.equal(state.original.pauseCalls, 0); assert.equal(state.original.playCalls, 0); assert.equal(state.original.paused, true);
+      assert.equal(state.timers.size, 0); return;
+    }
     await begin(state, { preferences: { audioKnown: true, audioTrackCount: 1, audioTrackId: 'en.4', audioTracks: [{ id: 'en.4' }],
       captionsKnown: true, captionsEnabled: false, nativeVideoId: id, nativeAdInactive: true } });
     assert.equal(state.messages.length, 1); assert.equal(state.fetches.length, 0); assert.equal(state.calls.length, 0);
@@ -498,7 +621,7 @@ test('native content becoming healthy during source resolution avoids a late rel
 });
 
 for (const paused of [false, true]) test(`an advert ending during extraction keeps newly healthy native content uninterrupted (paused=${paused})`, async () => {
-  const state = fixture({ paused }); state.original.readyState = 2; state.original.currentTime = 0;
+  const state = fixture(); state.original.readyState = 2; state.original.currentTime = 0;
   state.playerClasses.add('ad-showing'); state.playerClasses.add('ad-interrupting');
   let finishVisitor;
   state.setFetch(url => String(url).includes('/visitor_id')
@@ -508,14 +631,14 @@ for (const paused of [false, true]) test(`an advert ending during extraction kee
     captionsKnown: true, captionsEnabled: false, captionTrackId: '', captionLanguage: '', nativeVideoId: id, nativeAdInactive: false };
   state.init(); await flush(); state.response({ preferences: baseline }); await flush();
   assert.equal(state.fetches.length, 1);
-  state.playerClasses.clear(); state.original.readyState = 4; state.original.currentTime = 20;
+  state.playerClasses.clear(); state.original.readyState = 4; state.original.currentTime = 20; state.original.paused = paused;
   state.setFreshPreferences({ ...baseline, nativeAdInactive: true });
   finishVisitor(new Response(JSON.stringify({ responseContext: { visitorData: 'test-visitor' } }), { headers: { 'content-type': 'application/json' } }));
   await flush();
-  assert.equal(state.messages.filter(value => value.type === 'FilterTube_ReadNativeContentState').length, 1);
+  assert.equal(state.messages.filter(value => value.type === 'FilterTube_ReadNativeContentState').length, paused ? 0 : 1);
   assert.equal(state.fetches.length, 2); assert.equal(state.calls.length, 0);
   assert.equal(state.original.pauseCalls, 0); assert.equal(state.original.playCalls, 0); assert.equal(state.original.paused, paused);
-  assert.equal(state.document.documentElement.attributes.get('data-filtertube-content-playback-state'), 'native_ready');
+  assert.equal(state.document.documentElement.attributes.get('data-filtertube-content-playback-state'), paused ? 'native_waiting_for_playback' : 'native_ready');
   assert.equal(state.timers.size, 0); assert.equal(state.hasNativeInputGuard(), false);
   await state.refresh(); assert.equal(state.fetches.length, 2); noReplacementPlayer(state);
 });
