@@ -3,13 +3,15 @@
   <h1>FilterTube</h1>
   <p>Peace of Mind for your Digital Space</p>
   
-[![Ask DeepWiki](https://deepwiki.com/badge.svg)](https://deepwiki.com/varshneydevansh/FilterTube) ![Version](https://img.shields.io/badge/version-3.4.1-blue.svg) ![License](https://img.shields.io/badge/license-MIT-green.svg) ![Lines of Code](https://img.shields.io/badge/total%20lines-902.5k-brightgreen.svg) ![JavaScript LoC](https://img.shields.io/badge/javascript-127.9k%20lines-yellow.svg) ![Top Language](https://img.shields.io/github/languages/top/varshneydevansh/FilterTube?color=f1e05a) ![Repo Size](https://img.shields.io/github/repo-size/varshneydevansh/FilterTube?color=orange)
+[![Ask DeepWiki](https://deepwiki.com/badge.svg)](https://deepwiki.com/varshneydevansh/FilterTube) ![Version](https://img.shields.io/badge/version-3.4.1-blue.svg) ![License](https://img.shields.io/badge/license-MIT-green.svg) ![Lines of Code](https://img.shields.io/badge/total%20lines-903.2k-brightgreen.svg) ![JavaScript LoC](https://img.shields.io/badge/javascript-128.0k%20lines-yellow.svg) ![Top Language](https://img.shields.io/github/languages/top/varshneydevansh/FilterTube?color=f1e05a) ![Repo Size](https://img.shields.io/github/repo-size/varshneydevansh/FilterTube?color=orange)
   
 </div>
 
 ## Overview
 
 FilterTube is a browser extension that gives you control over your YouTube feed. Filter videos, shorts, channels, and comments using keywords and smart rules—all processing happens privately on your device.
+
+**Your devices can sync peer-to-peer.** Pair with a code or QR, match the safety phrase, then share directly between verified devices. The current extension candidate adds opt-in Auto-sync for supported settings, filter rules and saved video notes on explicitly linked own-account profiles, plus approved parent-to-child policy updates. Both Accounts & Sync pages must be open and connected; offline changes wait for that connection. Native Android support for this update and installed two-device acceptance remain pending. See the [Auto-sync scope and verification](docs/design/device-sync/AUTO-SYNC-2026-10-24.md).
 
 The public website now also acts as the download hub for browser releases, Android phone/tablet builds, and future store links:
 
@@ -56,13 +58,14 @@ and installed-device verification are separate.
 
 ## Nanah Device Trust & Sync
 
-FilterTube now includes a device-to-device sync system powered by Nanah.
+FilterTube includes direct peer-to-peer device syncing powered by Nanah.
 
 What it is:
 
 - private device-to-device settings transfer
 - no central sync account required
 - supports one-time send, family device updates, and full-account migration
+- the current extension candidate also supports explicitly opted-in Auto-sync; it does not discover or reconnect saved peers by itself
 
 Plain-language model:
 

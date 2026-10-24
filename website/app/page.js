@@ -336,22 +336,29 @@ function QuickGuideSection() {
               <div className="absolute inset-0 bg-[radial-gradient(circle_at_18%_16%,rgba(171,68,56,0.12),transparent_28%),radial-gradient(circle_at_84%_22%,rgba(158,190,177,0.18),transparent_28%)]" />
               <div className="relative z-10">
                 <p className="text-[0.72rem] uppercase tracking-[0.22em] text-[var(--color-muted)]">
-                  Family device updates
+                  Peer-to-peer device sync
                 </p>
                 <h3 className="mt-4 max-w-[16ch] font-display text-4xl tracking-[-0.06em] text-[var(--color-ink)]">
-                  Send rules privately to a verified device.
+                  Your devices, connected directly.
                 </h3>
                 <p className="mt-4 max-w-[62ch] text-sm leading-7 text-[var(--color-muted)]">
-                  A parent device can pair with a protected device, confirm the
-                  safety phrase, then send rules, time, and access. Live P2P
-                  works when both devices are open. Optional Home Pickup helps
-                  on the same network, and Internet Pickup can let a verified
-                  device collect a signed update later.
+                  Pair your devices, match the safety phrase, then choose what
+                  to share. Direct peer-to-peer transfers keep profile data
+                  between verified devices while both Accounts &amp; Sync pages
+                  are open and connected. Parents can send approved rules,
+                  time limits, and viewing access to a protected profile.
+                </p>
+                <p className="mt-3 max-w-[62ch] text-sm leading-7 text-[var(--color-muted)]">
+                  The extension candidate also offers opt-in Auto-sync for
+                  supported settings, filter rules, and saved video notes on
+                  your own linked profiles. Offline changes wait for a verified
+                  connection. Android support for this update is still pending.
+                  Optional pickup services have separate delivery settings.
                 </p>
 
                 <div className="mt-7 grid gap-4 md:grid-cols-3">
                   {[
-                    ["Live P2P", "Both devices open now"],
+                    ["Direct peer-to-peer", "Both devices open and connected"],
                     ["Home Pickup", "Same network, explicit setup"],
                     ["Internet Pickup", "Verified device opens later"],
                   ].map(([title, body]) => (
@@ -579,6 +586,9 @@ export default function HomePage() {
                 </span>
                 <span className="rounded-full border border-white/24 bg-[rgba(255,255,255,0.08)] px-4 py-2 text-[#fffaf4] shadow-[inset_0_1px_0_rgba(255,255,255,0.16)] backdrop-blur-xl">
                   PIN locked profiles
+                </span>
+                <span className="rounded-full border border-white/24 bg-[rgba(255,255,255,0.08)] px-4 py-2 text-[#fffaf4] shadow-[inset_0_1px_0_rgba(255,255,255,0.16)] backdrop-blur-xl">
+                  Peer-to-peer device sync
                 </span>
               </div>
             </div>

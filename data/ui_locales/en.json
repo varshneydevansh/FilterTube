@@ -1,4 +1,5 @@
 {
+  "dashboard.sync.peerHero": "Peer-to-peer sync between your verified devices. Choose what to share and manage family profiles.",
   "dashboard.sync.picker.receiveConfirmed": "Phrase confirmed here. Keep both devices open. Waiting for a parent update.",
   "dashboard.sync.picker.receivePermissions": "Updates follow the permissions approved by a parent on this device.",
   "dashboard.sync.picker.receiveModeEyebrow": "Receive only",

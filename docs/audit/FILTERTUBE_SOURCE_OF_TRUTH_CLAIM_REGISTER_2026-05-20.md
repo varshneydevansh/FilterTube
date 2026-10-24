@@ -146,7 +146,7 @@ runtime behavior changed by this register refresh: no
 
 | Current reference | Claim class | Current review boundary |
 | --- | --- | --- |
-| `README.md:21` | `release-sync-owner` | Repository/runtime or release-note ownership; native parity still requires source provenance and installed proof. |
+| `README.md:23` | `release-sync-owner` | Repository/runtime or release-note ownership; native parity still requires source provenance and installed proof. |
 | `docs/APP_RELEASE_AND_RUNTIME_SYNC_WORKFLOW.md:5` | `release-sync-owner` | Repository/runtime or release-note ownership; native parity still requires source provenance and installed proof. |
 | `docs/ARCHITECTURE.md:27` | `release-sync-owner` | Repository/runtime or release-note ownership; native parity still requires source provenance and installed proof. |
 | `docs/ARCHITECTURE.md:41` | `release-sync-owner` | Repository/runtime or release-note ownership; native parity still requires source provenance and installed proof. |
