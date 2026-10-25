@@ -7,6 +7,8 @@ import {
 
 import { ActionLink, SectionHeading } from "@/components/marketing-ui";
 import { Reveal } from "@/components/reveal";
+import { AppScreenStack } from "@/components/app-screen-stack";
+import { HeroVideo } from "@/components/hero-video";
 import { getTonePreset } from "@/components/scenic-tones";
 
 function formatRelatedTitles(relatedPages) {
@@ -110,27 +112,24 @@ export function ScenicDetailPage({ page, relatedPages }) {
   const relatedSummary = formatRelatedTitles(relatedPages);
   const hasHeroVideo = Boolean(page.heroVideo?.src);
   const heroArtworks = page.heroArtworks || (page.heroArtwork ? [page.heroArtwork] : []);
+  const hasHeroScreens = Boolean(page.heroScreens?.length);
 
   return (
     <>
-      <section className="relative isolate min-h-[100dvh] overflow-hidden px-4 pb-20 pt-28 md:px-6 md:pb-24 md:pt-36">
+      <section data-tone={page.tone} className={`relative isolate min-h-[100dvh] overflow-hidden px-4 pb-20 pt-28 md:px-6 md:pb-24 md:pt-36 ${hasHeroScreens ? "ft-app-hero" : ""}`}>
+        <div className={`absolute inset-0 ${tone.heroBackdrop}`} />
         {hasHeroVideo ? (
-          <video
-            aria-hidden="true"
-            autoPlay
-            className="absolute inset-0 h-full w-full object-cover"
-            loop
-            muted
-            playsInline
-            preload="metadata"
+          <HeroVideo
+            poster={page.heroVideo.poster}
+            showControls
             src={page.heroVideo.src}
           />
-        ) : (
-          <div className={`absolute inset-0 ${tone.heroBackdrop}`} />
-        )}
+        ) : null}
         <div
           className={
-            hasHeroVideo
+            hasHeroVideo && hasHeroScreens
+              ? "ft-app-hero-wash absolute inset-0"
+              : hasHeroVideo
               ? "absolute inset-0 bg-[radial-gradient(circle_at_34%_34%,rgba(255,255,255,0.78),rgba(255,255,255,0.48)_34%,rgba(255,255,255,0.18)_58%,rgba(255,255,255,0.08)_100%),linear-gradient(90deg,rgba(255,255,255,0.86),rgba(255,255,255,0.48)_48%,rgba(255,255,255,0.18)_100%)]"
               : "absolute inset-0 bg-[linear-gradient(180deg,rgba(255,255,255,0.18),transparent_26%,rgba(255,255,255,0.08)_100%)]"
           }
@@ -145,7 +144,7 @@ export function ScenicDetailPage({ page, relatedPages }) {
 
         <div className="relative z-10 mx-auto max-w-[1400px]">
           <div className={`grid items-center gap-10 lg:gap-14 ${
-            heroArtworks.length > 0
+            hasHeroScreens || heroArtworks.length > 0
               ? "lg:grid-cols-[minmax(0,0.98fr)_minmax(22rem,0.72fr)]"
               : ""
           }`}>
@@ -222,7 +221,9 @@ export function ScenicDetailPage({ page, relatedPages }) {
                 ) : null}
               </div>
             </Reveal>
-            {heroArtworks.length > 0 ? (
+            {hasHeroScreens ? (
+              <AppScreenStack label={page.heroScreensLabel} screens={page.heroScreens} />
+            ) : heroArtworks.length > 0 ? (
               <Reveal delay={120}>
                 <div
                   className={`relative mx-auto flex w-full max-w-[34rem] items-center justify-center ${

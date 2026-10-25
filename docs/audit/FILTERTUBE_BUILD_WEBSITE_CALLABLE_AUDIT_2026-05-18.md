@@ -300,8 +300,8 @@ The earlier dated tables above remain historical. The authorized change preserve
 | --- | ---: | ---: |
 | Build and sync scripts | 30 | 341 |
 | Website app routes | 9 | 21 |
-| Website components | 15 | 54 |
-| Total | 54 | 416 |
+| Website components | 16 | 55 |
+| Total | 55 | 417 |
 
 | File | Current lexical callables |
 | --- | ---: |
@@ -344,6 +344,7 @@ The earlier dated tables above remain historical. The authorized change preserve
 | `website/app/robots.js` | 1 |
 | `website/app/sitemap.js` | 1 |
 | `website/app/terms/page.js` | 1 |
+| `website/components/app-screen-stack.js` | 1 |
 | `website/components/browser-logo-rail.js` | 1 |
 | `website/components/footer-signal-art.js` | 20 |
 | `website/components/hero-video.js` | 2 |

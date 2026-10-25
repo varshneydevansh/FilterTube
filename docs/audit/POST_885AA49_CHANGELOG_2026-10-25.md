@@ -104,3 +104,14 @@ rollout, native interoperability and physical-device release gates remain
 separate from these local website and copy changes.
 
 The feature-inventory follow-up passed website production build, 742 release checks, 1,482 smoke checks, and 18 focused website inventory checks. Six broader filtering lanes still fail; baseline comparison found no newly failing test names. Full extension release acceptance remains open, and nothing was pushed or deployed. See the website validation receipt for counts and comparison limits.
+
+## App hero and Kids refinement after `2b3d30bb`
+
+Android/iOS hero logos become interactive stacks of three genuine development
+screens. Android retains green, iOS uses blue, and Kids retains pink. A silent
+original fframes Android background loop includes reproducible source and a
+poster; background motion has pause and reduced-motion handling. Kids explains
+specific parent choices, limits and platform availability. All existing routes
+and unique feature information remain. The native signature-solver simulator
+crash is documented separately and remains unresolved; this website update does
+not claim native playback repair or public iOS distribution.

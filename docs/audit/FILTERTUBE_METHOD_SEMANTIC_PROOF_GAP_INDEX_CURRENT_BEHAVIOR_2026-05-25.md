@@ -959,8 +959,8 @@ lexical and its scope remains tracked JS/JSX/MJS: CJS/Python tooling requires it
 separate release/workflow review and is not silently counted as JavaScript here.
 
 ```text
-current tracked JS/JSX/MJS files: 134
-current repo-wide lexical callables: 9893
+current tracked JS/JSX/MJS files: 135
+current repo-wide lexical callables: 9894
 current complete per-callable semantic proofs: 0
 current callable behavior-change approval: NO-GO
 runtime behavior changed by inventory refresh: no
@@ -975,7 +975,7 @@ runtime behavior changed by inventory refresh: no
 | Generated/quarantined UI | 6 | 147 |
 | Vendor bundles | 3 | 279 |
 | Audit/test lane scripts | 25 | 517 |
-| Website routes/components/config | 26 | 124 |
+| Website routes/components/config | 27 | 125 |
 
 | File | Family | Lexical callables | Semantic proof | Boundary |
 | --- | --- | ---: | --- | --- |
@@ -1096,6 +1096,7 @@ runtime behavior changed by inventory refresh: no
 | `website/app/robots.js` | Website routes/components/config | 0 | `semantic proof incomplete` | Lexical accounting only; no complete per-callable closure claimed. |
 | `website/app/sitemap.js` | Website routes/components/config | 0 | `semantic proof incomplete` | Lexical accounting only; no complete per-callable closure claimed. |
 | `website/app/terms/page.js` | Website routes/components/config | 0 | `semantic proof incomplete` | Lexical accounting only; no complete per-callable closure claimed. |
+| `website/components/app-screen-stack.js` | Website routes/components/config | 1 | `semantic proof incomplete` | Lexical accounting only; no complete per-callable closure claimed. |
 | `website/components/browser-logo-rail.js` | Website routes/components/config | 1 | `semantic proof incomplete` | Lexical accounting only; no complete per-callable closure claimed. |
 | `website/components/footer-signal-art.js` | Website routes/components/config | 63 | `semantic proof incomplete` | Lexical accounting only; no complete per-callable closure claimed. |
 | `website/components/hero-video.js` | Website routes/components/config | 4 | `semantic proof incomplete` | Lexical accounting only; no complete per-callable closure claimed. |
@@ -1481,4 +1482,4 @@ The current lexical inventory above was remeasured after adding the opt-in Auto-
 
 ## Conservative website lexical refresh - 2026-10-25
 
-The existing broad lexical matcher was rerun after the authorized content and platform-grouping simplification. It accounts for 134 files and 9893 lexical callables. The comparison subset reports 199 broad matches and 119 build/website matches (80 difference); the parsers intentionally count different shapes. No complete semantic proof, source-classifier convergence, release approval, native acceptance or deployment claim follows. Original visual assets, hero markup, component ownership and route files are retained.
+The existing broad lexical matcher was rerun after the authorized content and platform-grouping simplification. It accounts for 135 files and 9894 lexical callables. The comparison subset reports 199 broad matches and 119 build/website matches (80 difference); the parsers intentionally count different shapes. No complete semantic proof, source-classifier convergence, release approval, native acceptance or deployment claim follows. Original visual assets, hero markup, component ownership and route files are retained.

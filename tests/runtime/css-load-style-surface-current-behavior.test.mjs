@@ -172,16 +172,16 @@ const cssRows = [
   [
     "website/app/globals.css",
     "website-only global CSS",
-    555,
-    14987,
-    "0e9c60505298b5c3b795842874d61237a8ff1c63b4e689ac1658605337c267ee",
-    79,
+    675,
+    17554,
+    "74c9782f94e9434696de3a51768c5b7f412a7bfd8ca9324ba7d2473a4581ead9",
+    100,
     0,
     0,
     0,
     0,
     0,
-    1,
+    2,
     1,
     0
   ]
@@ -258,20 +258,20 @@ test('CSS load style surface register is audit-only and covers every tracked CSS
   }
 
   assert.deepEqual(totals, {
-  "lines": 21077,
-  "bytes": 586625,
-  "rules": 3053,
+  "lines": 21197,
+  "bytes": 589192,
+  "rules": 3074,
   "important": 619,
   "displayNone": 84,
   "notVisible": 72,
   "visible": 167,
   "hidden": 6,
-  "media": 66,
+  "media": 67,
   "keyframes": 9,
   "hiddenAttr": 20
 });
-  assert.match(doc, /11 CSS files, 21,077 counted source lines/);
-  assert.match(doc, /586,625 bytes, 3,053 lexical rule blocks/);
+  assert.match(doc, /11 CSS files, 21,197 counted source lines/);
+  assert.match(doc, /589,192 bytes, 3,074 lexical rule blocks/);
   assert.match(doc, /615 `!important` declarations, 76\s+`display:none` declarations/);
 });
 

@@ -49,6 +49,7 @@ const accountedFiles = [
   "website/app/robots.js",
   "website/app/sitemap.js",
   "website/app/terms/page.js",
+  "website/components/app-screen-stack.js",
   "website/components/browser-logo-rail.js",
   "website/components/footer-signal-art.js",
   "website/components/hero-video.js",
@@ -221,6 +222,10 @@ const expectedCounts = new Map([
   ],
   [
     "website/app/terms/page.js",
+    1
+  ],
+  [
+    "website/components/app-screen-stack.js",
     1
   ],
   [
@@ -432,9 +437,9 @@ test('build/website callable counts match the current lexical source surface', (
     assert.equal(count, expectedCounts.get(file), `${file} callable count drifted`);
   }
 
-  assert.equal(total, 416);
+  assert.equal(total, 417);
   assert.match(auditDoc, /\| Build and sync scripts \| 30 \| 341 \|/);
-  assert.match(auditDoc, /\| Total \| 54 \| 416 \|/);
+  assert.match(auditDoc, /\| Total \| 55 \| 417 \|/);
 
   const build = read('build.js');
   const buildRows = buildMethodRows();
@@ -507,7 +512,7 @@ test('build/website audit pins high-risk release and public claim patterns to cu
   assert.match(browserRail, /src=\{browser\.logo\}/);
 
   const heroVideo = read('website/components/hero-video.js');
-  assert.match(home, /<HeroVideo src=\{heroVideoUrl\} \/>/);
+  assert.match(home, /<HeroVideo showControls src=\{heroVideoUrl\} \/>/);
   assert.match(heroVideo, /preload="metadata"/);
   assert.match(heroVideo, /IntersectionObserver/);
 

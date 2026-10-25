@@ -407,7 +407,7 @@ export default function HomePage() {
   return (
     <>
       <section className="relative min-h-[100dvh] overflow-hidden px-4 pb-12 pt-28 md:px-6 md:pb-20 md:pt-36">
-        <HeroVideo src={heroVideoUrl} />
+        <HeroVideo showControls src={heroVideoUrl} />
         <div className="absolute inset-0 bg-[radial-gradient(circle_at_top,rgba(255,255,255,0.18),transparent_28%),linear-gradient(180deg,rgba(255,255,255,0.08),rgba(255,255,255,0.02)_30%,rgba(18,16,20,0.12)_100%)]" />
         <div className="absolute inset-x-0 bottom-0 h-28 bg-[linear-gradient(180deg,transparent,rgba(11,14,18,0.08))]" />
 

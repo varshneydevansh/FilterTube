@@ -8,6 +8,11 @@
   --color-muted: #625f58;
   --color-line: rgba(70, 60, 48, 0.12);
   --color-accent: #ab4438;
+  --color-hero-ink: #1d1b18;
+  --color-hero-muted: #4f4b45;
+  --color-hero-sage: #edf4e7;
+  --color-hero-sky: #e9f4fb;
+  --color-hero-rose: #fae8e6;
   --shadow-diffuse: 0 30px 80px -40px rgba(60, 42, 33, 0.24);
   --color-shell: rgba(255, 255, 255, 0.56);
   --color-shell-strong: rgba(255, 255, 255, 0.74);
@@ -27,6 +32,114 @@
   --font-body-family: var(--font-body);
   --font-editorial-family: var(--font-editorial);
   --font-mono-family: var(--font-mono);
+}
+
+/* Real app screens: stable hit areas, lift in place, no automatic carousel. */
+.ft-screen-showcase {
+  width: 100%;
+  max-width: 34rem;
+  min-width: 0;
+  margin-inline: auto;
+  color: var(--color-hero-ink);
+}
+
+.ft-screen-stack {
+  position: relative;
+  isolation: isolate;
+  width: 100%;
+  aspect-ratio: 0.82;
+}
+
+.ft-stack-screen {
+  position: absolute;
+  top: 47%;
+  left: 50%;
+  width: 46%;
+  aspect-ratio: 0.45;
+  padding: 0;
+  border: 1px solid var(--color-line);
+  border-radius: 1rem;
+  background: var(--color-cream);
+  cursor: pointer;
+  box-shadow: var(--shadow-diffuse);
+  transform: translate(-50%, -50%);
+  transition: transform 600ms cubic-bezier(0.22, 1, 0.36, 1), filter 600ms;
+}
+
+.ft-stack-screen[data-position="center"] {
+  top: 54%;
+  z-index: 2;
+  width: 54%;
+}
+
+.ft-stack-screen[data-position="left"] {
+  left: 28%;
+  transform: translate(-50%, -50%) rotate(-9deg);
+}
+
+.ft-stack-screen[data-position="right"] {
+  left: 72%;
+  transform: translate(-50%, -50%) rotate(9deg);
+}
+
+.ft-stack-screen[data-front="true"] {
+  z-index: 3;
+  transform: translate(-50%, -50%) rotate(0deg) scale(1.025);
+}
+
+.ft-stack-screen img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  border-radius: inherit;
+}
+
+.ft-stack-screen:focus-visible {
+  outline: 3px solid var(--color-accent);
+  outline-offset: 5px;
+}
+
+.ft-stack-screen:active {
+  filter: brightness(0.96);
+}
+
+.ft-stack-unavailable {
+  display: grid;
+  min-height: 100%;
+  place-content: center;
+  padding: 1rem;
+  font-size: 0.8rem;
+  line-height: 1.8;
+}
+
+.ft-stack-caption {
+  position: relative;
+  margin-top: 1.5rem;
+  text-align: center;
+}
+
+.ft-stack-caption > p {
+  color: var(--color-hero-muted);
+}
+
+.ft-stack-choice {
+  min-height: 44px;
+  color: var(--color-hero-muted);
+  font-size: 0.8rem;
+  cursor: pointer;
+  border-bottom: 1px solid transparent;
+}
+
+.ft-stack-choice[aria-pressed="true"] {
+  color: var(--color-hero-ink);
+  border-bottom-color: currentColor;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .ft-stack-screen {
+    transition: none;
+  }
 }
 
 html[data-theme="dark"] {
@@ -552,4 +665,11 @@ html[data-theme="dark"] .ft-download-rail {
     animation: none;
     transform: none;
   }
+}
+
+.ft-app-hero { --hero-tint: var(--color-hero-sage); }
+.ft-app-hero[data-tone="sky"] { --hero-tint: var(--color-hero-sky); }
+.ft-app-hero[data-tone="rose"] { --hero-tint: var(--color-hero-rose); }
+.ft-app-hero-wash {
+  background: linear-gradient(90deg, color-mix(in srgb, var(--hero-tint) 88%, transparent), color-mix(in srgb, var(--hero-tint) 60%, transparent));
 }

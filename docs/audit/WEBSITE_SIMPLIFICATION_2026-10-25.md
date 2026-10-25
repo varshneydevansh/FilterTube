@@ -260,3 +260,57 @@ The new anchors also required a one-match lexical inventory refresh; the prior e
 ### Broader filtering checks remain open
 
 The changed-file selector also requires six filtering lanes because the Notes HTML file is broadly classified. These remain failing: Whitelist 35/487, blocking 13/599, JSON 131/1,294, DOM 52/457, performance 44/945, and settings 95/1,255. Each lane was run against an isolated local clone of `0cbb98dd` with the same installed Node dependencies. No current failing test name is new relative to that baseline. The clone lacks ignored captures/package output, so lower current failure counts are not claimed as fixes. These inherited failures remain unresolved; a passing website build and release lane do not mean full extension acceptance. No new live YouTube or installed-device smoke was claimed for these copy changes. Counts and comparison limits are in the validation receipt.
+
+## App heroes and Kids follow-up — 25 October 2026
+
+Starting checkpoint: `2b3d30bb`. This follow-up implements the user's explicit
+request for three real overlapping screens in Android/iOS heroes, a subtle
+Android video, clearer Kids information and the original green/blue/pink tints.
+It does not replace the homepage or remove any platform route or unique feature.
+
+- Android reuses the already captured development Music, Player settings and
+  empty Video notes screens. iOS now uses fresh launcher, native controls and
+  empty Filters captures from an isolated iPhone 17 Pro / iOS 26.4 simulator,
+  running the existing 3.3.6 (30316) app binary. No account, PIN, rule or device
+  trust was changed. These are development previews, not App Store availability
+  or iPad-layout proof. Public iOS access remains explicitly pending.
+- The stack supports mouse hover, keyboard focus/Enter and persistent click/tap
+  selection through labelled choices. Original screenshot pixels remain intact;
+  a full-resolution link makes the detail readable. No fake device chrome or
+  invented app interface was generated. Reduced motion disables transitions.
+- The Android video is an original silent eight-second fframes 1.3.0 composition:
+  1280×720, 24 fps, 192 frames. Source, lockfile, render commands and font license
+  are retained in `website/motion/android-hero`. The static poster remains usable
+  if playback is disabled. The website adds no runtime library dependency.
+- Background video playback waits for visibility, respects reduced motion and
+  pauses when offscreen or the document is hidden. Visible controls allow a
+  persistent manual pause; Home and Downloads receive the same pause affordance.
+- Kids now explains channel/word filters, approved-channel viewing, separate
+  Main/Kids rules, parent authority, per-device limits and verified encrypted
+  updates. It distinguishes viewing spaces from child profiles, a child PIN
+  from parent authority, Android TV development from planned Fire TV support,
+  and local limits from a shared family budget.
+- Applied Hallmark, Claude Frontend, Design Taste, existing scenic tokens and
+  Elayadesign's `design-to-motion` website guidance. User preservation and
+  explicit requested Android motion override generic redesign/static-background
+  rules. A bounded FreeLLMAPI gpt-oss-120b critique and a read-only subagent review
+  informed accessibility and honest availability wording; source and browser
+  evidence determined the changes. Screenshot interaction uses CSS transforms,
+  so adding GSAP is unnecessary for this scope.
+
+The native simulator crash remains open. See
+[the redacted findings](IOS_SIMULATOR_SIGNATURE_SOLVER_CRASH_2026-10-25.md).
+Fresh static screenshots do not establish a native playback fix. No native source
+was edited, rebuilt or installed over the user's original simulator.
+
+Validation for this follow-up: production build passed; 18 focused website, 742
+release and 1,482 smoke checks passed. All 14 routes returned success, local links
+and anchors resolved, and an invalid route returned 404. Browser checks covered
+hover/Enter/selection, reduced motion (paused video and zero transition), manual
+pause/resume, offscreen pause and reachable Home/Downloads controls. Android,
+iOS and Kids fit at 320/375/414/768/1440 pixels without horizontal overflow. The
+final Android production page loaded all three images and video, with no captured
+console errors. The fframes inspector checked 33 frames with no problems.
+Evidence and asset fingerprints: `artifacts/website-simplification-2026-10-25/`.
+Existing broader filtering/settings suite failures remain separate gates; they
+were not rerun or waived by this website-only check.

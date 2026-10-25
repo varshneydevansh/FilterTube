@@ -1,12 +1,18 @@
 "use client";
 
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 
 export function HeroVideo({
   src,
   className = "absolute inset-0 h-full w-full object-cover",
+  poster,
+  showControls = false,
+  fixedControls = false,
 }) {
   const videoRef = useRef(null);
+  const [userPaused, setUserPaused] = useState(false);
+  const [reducedMotion, setReducedMotion] = useState(true);
+  const [unavailable, setUnavailable] = useState(false);
 
   useEffect(() => {
     const video = videoRef.current;
@@ -15,14 +21,16 @@ export function HeroVideo({
       return undefined;
     }
 
-    let visible = true;
+    let visible = false;
     const reducedMotionQuery = window.matchMedia("(prefers-reduced-motion: reduce)");
 
     const syncPlayback = () => {
+      setReducedMotion(reducedMotionQuery.matches);
       const shouldPlay =
         visible &&
         document.visibilityState === "visible" &&
-        !reducedMotionQuery.matches;
+        !reducedMotionQuery.matches &&
+        !userPaused;
 
       if (shouldPlay) {
         video.play().catch(() => {});
@@ -49,19 +57,32 @@ export function HeroVideo({
       document.removeEventListener("visibilitychange", syncPlayback);
       reducedMotionQuery.removeEventListener("change", syncPlayback);
     };
-  }, []);
+  }, [src, userPaused]);
 
   return (
-    <video
-      ref={videoRef}
-      aria-hidden="true"
-      autoPlay
-      className={className}
-      loop
-      muted
-      playsInline
-      preload="metadata"
-      src={src}
-    />
+    <>
+      <video
+        ref={videoRef}
+        aria-hidden="true"
+        className={className}
+        loop
+        muted
+        playsInline
+        preload="metadata"
+        poster={poster}
+        onError={() => setUnavailable(true)}
+        src={src}
+      />
+      {showControls && !reducedMotion && !unavailable ? (
+        <button
+          aria-pressed={userPaused}
+          className={`ft-shell-strong ${fixedControls ? "fixed" : "absolute"} bottom-5 right-5 z-20 min-h-11 rounded-full border border-[color:var(--color-line)] px-4 text-xs text-[var(--color-ink)]`}
+          onClick={() => setUserPaused((paused) => !paused)}
+          type="button"
+        >
+          {userPaused ? "Play background motion" : "Pause background motion"}
+        </button>
+      ) : null}
+    </>
   );
 }

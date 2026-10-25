@@ -1,0 +1,69 @@
+{
+  "scope": "local website preview; not deployed",
+  "starting_checkpoint": "2b3d30bb",
+  "ios_capture": {
+    "runtime": "iOS 26.4",
+    "device": "iPhone 17 Pro simulator",
+    "app": "existing installed 3.3.6 (30316) binary",
+    "native_playback_fix": false
+  },
+  "assets": [
+    {
+      "path": "website/public/apps/screenshots/ios-launcher.png",
+      "bytes": 2555586,
+      "sha256": "ae6401d3797ba57b097891c65d36456c86f9725c69f79b73f3bad0a9bd7c932b"
+    },
+    {
+      "path": "website/public/apps/screenshots/ios-controls.png",
+      "bytes": 1798505,
+      "sha256": "42fe23a10a77771a62241ac8e7c729bb3b1c9cf0f66b44c85c800303b014c6a7"
+    },
+    {
+      "path": "website/public/apps/screenshots/ios-filters.png",
+      "bytes": 1290722,
+      "sha256": "3ff2a9991de313fe3427df92f27c268a91dd41d135fce978cd78dfd876e62361"
+    },
+    {
+      "path": "website/public/videos/android/android-contours.mp4",
+      "bytes": 297103,
+      "sha256": "b37fd0a46ed7da604ed231055dacb03459f1dffe9fb5675f03ff5dcc43428d95"
+    },
+    {
+      "path": "website/public/videos/android/android-contours-poster.png",
+      "bytes": 290251,
+      "sha256": "b04021814069c4f2915e32d4ce611614298a0773af3f849999d4c5d68299dcd4"
+    }
+  ],
+  "browser_checks": {
+    "desktop_and_narrow_layouts": "Android, iOS and Kids at 320/375/414/768/1440; no horizontal overflow",
+    "mouse_hover": true,
+    "keyboard_enter_select": true,
+    "mobile_width_selection": true,
+    "reduced_motion": "video paused; screenshot transition 0s",
+    "pause_resume": true,
+    "offscreen_video_paused": true,
+    "home_and_download_pause": true,
+    "final_android_console_errors": []
+  },
+  "fframes": {
+    "inspect_frames": 33,
+    "problems": 0,
+    "width": 1280,
+    "height": 720,
+    "fps": 24,
+    "frames": 192,
+    "duration_seconds": 8,
+    "audio": false
+  },
+  "checks": {
+    "production_build": "passed",
+    "focused_website": 18,
+    "release": 742,
+    "smoke": 1482
+  },
+  "limitations": [
+    "Existing broad filtering/settings audit failures are unchanged gates, not waived.",
+    "Static clean simulator captures do not exercise the crashing populated-feed preloader.",
+    "No deployed, store or installed-device release acceptance is claimed."
+  ]
+}

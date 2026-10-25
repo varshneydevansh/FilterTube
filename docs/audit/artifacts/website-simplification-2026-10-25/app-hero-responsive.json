@@ -1,0 +1,97 @@
+[
+  {
+    "loaded": true,
+    "route": "/ios",
+    "scrollWidth": 320,
+    "stackFits": true,
+    "width": 320
+  },
+  {
+    "loaded": true,
+    "route": "/ios",
+    "scrollWidth": 375,
+    "stackFits": true,
+    "width": 375
+  },
+  {
+    "loaded": true,
+    "route": "/ios",
+    "scrollWidth": 414,
+    "stackFits": true,
+    "width": 414
+  },
+  {
+    "loaded": true,
+    "route": "/ios",
+    "scrollWidth": 768,
+    "stackFits": true,
+    "width": 768
+  },
+  {
+    "loaded": true,
+    "route": "/ios",
+    "scrollWidth": 1440,
+    "stackFits": true,
+    "width": 1440
+  },
+  {
+    "loaded": true,
+    "route": "/android",
+    "scrollWidth": 320,
+    "stackFits": true,
+    "width": 320
+  },
+  {
+    "loaded": true,
+    "route": "/android",
+    "scrollWidth": 375,
+    "stackFits": true,
+    "width": 375
+  },
+  {
+    "loaded": true,
+    "route": "/android",
+    "scrollWidth": 414,
+    "stackFits": true,
+    "width": 414
+  },
+  {
+    "loaded": true,
+    "route": "/android",
+    "scrollWidth": 768,
+    "stackFits": true,
+    "width": 768
+  },
+  {
+    "loaded": true,
+    "route": "/android",
+    "scrollWidth": 1440,
+    "stackFits": true,
+    "width": 1440
+  },
+  {
+    "route": "/kids",
+    "scrollWidth": 320,
+    "width": 320
+  },
+  {
+    "route": "/kids",
+    "scrollWidth": 375,
+    "width": 375
+  },
+  {
+    "route": "/kids",
+    "scrollWidth": 414,
+    "width": 414
+  },
+  {
+    "route": "/kids",
+    "scrollWidth": 768,
+    "width": 768
+  },
+  {
+    "route": "/kids",
+    "scrollWidth": 1440,
+    "width": 1440
+  }
+]

@@ -10,9 +10,9 @@ const routePath = 'website/app/[slug]/page.js';
 
 const sourceRows = [
   ['website/app/[slug]/page.js', 54, 1229, '0233757cc9b72d7292750fc0a83560b54969f6489aa397091b408a16f25716f3'],
-  ['website/components/route-content.js', 1331, 59547, '48790b1f558bfe5fb3fc3beab8d1f7e0f70dde64c6de851ab42e437df6a1a886'],
+  ['website/components/route-content.js', 1346, 62651, '7aa131a7be51dd828552f8d6a6245bf5b50d0207324a6abd22aa5ae49b1ce4db'],
   ['website/components/site-shell-data.js', 22, 488, 'd2fc7d7a1fe3d708bfa8a1b7b7f71a296679a4b83e77f07c9eedae7007b8038c'],
-  ['website/components/scenic-detail-page.js', 494, 23220, 'b5f07e4edbe21b5417017705733a079544b154f8832190eabe269d05d0945a96']
+  ['website/components/scenic-detail-page.js', 495, 23555, '5c09ea4e20566141af00b96b9dd146c9f22318d80ba78b0245d7b7e039bc24a8']
 ];
 
 function filePath(file) {
@@ -174,7 +174,7 @@ test('website dynamic route current behavior is pinned to static params metadata
     'ml-ai'
   ]);
   assert.deepEqual(details, slugs);
-  assert.equal(related.length, 25);
+  assert.equal(related.length, 26);
   assert.equal(new Set(related).size, 10);
   assert.deepEqual(unresolved, []);
 
@@ -192,7 +192,7 @@ test('website dynamic route current behavior is pinned to static params metadata
 
   assert.match(text, /platform slugs: 10/);
   assert.match(text, /detail page entries: 10/);
-  assert.match(text, /related-page references: 25/);
+  assert.match(text, /related-page references: 26/);
   assert.match(text, /unresolved related-page references: 0/);
   assert.match(text, /mobile, ios, ipados, android, tv, android-tv, fire-tv, kids, ml-ai/);
 });

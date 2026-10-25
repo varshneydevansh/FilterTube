@@ -45,3 +45,20 @@ UI/UX review skills are used to improve clarity within these boundaries.
 
 Hallmark pre-emit review: Philosophy 5, Hierarchy 4, Execution 4, Specificity 5,
 Restraint 5, Variety 4. These are internal design judgments, not usability results.
+
+## App hero refinement — 25 October 2026
+
+The user's later explicit direction replaces only Android/iOS hero logo artwork
+with three real development screenshots. Preserve Android sage green, iOS sky
+blue and Kids rose pink, matching their platform cards. Preserve the original
+homepage hero and all unique features. Screenshot hover is a preview; clicking
+or pressing Enter selects it, and labelled text choices support touch. Keep a
+full-resolution link and a readable unavailable state.
+
+Use Elayadesign's design-to-motion guidance in website context: live HTML copy,
+intact screenshots, existing tokens and reduced-motion support. The user's
+request for an Android background loop takes precedence over that skill's static
+background rule. The original silent fframes contour loop is decorative; no UI
+story, user data or simulated feature behavior is composited into it. Background
+videos pause offscreen/when hidden and have visible pause controls. CSS transforms
+handle the screenshot interaction; no GSAP runtime dependency is needed here.

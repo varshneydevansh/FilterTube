@@ -186,11 +186,13 @@ function DownloadCard({ item }) {
 export default function DownloadsPage() {
   return (
     <div className="relative isolate overflow-hidden">
+      <HeroVideo
+        className="fixed inset-0 -z-10 h-full w-full object-cover"
+        fixedControls
+        showControls
+        src={heroVideoUrl}
+      />
       <div className="fixed inset-0 -z-10">
-        <HeroVideo
-          className="absolute inset-0 h-full w-full object-cover"
-          src={heroVideoUrl}
-        />
         <div className="absolute inset-0 bg-[radial-gradient(circle_at_28%_16%,rgba(255,255,255,0.76),rgba(255,255,255,0.46)_35%,rgba(246,242,235,0.76)_72%),linear-gradient(180deg,rgba(246,242,235,0.64),rgba(246,242,235,0.9)_58%,rgba(246,242,235,0.96))]" />
         <div className="absolute inset-0 bg-[radial-gradient(circle_at_80%_18%,rgba(171,68,56,0.1),transparent_28%),radial-gradient(circle_at_18%_82%,rgba(255,255,255,0.22),transparent_30%)]" />
       </div>

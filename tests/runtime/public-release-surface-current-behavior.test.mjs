@@ -158,7 +158,7 @@ test('website home and browser-logo surfaces currently carry public performance 
   const logoRail = read('website/components/browser-logo-rail.js');
 
   assert.match(home, /import \{ HeroVideo \}/);
-  assert.match(home, /<HeroVideo src=\{heroVideoUrl\} \/>/);
+  assert.match(home, /<HeroVideo showControls src=\{heroVideoUrl\} \/>/);
   assert.match(heroVideo, /<video/);
   assert.match(heroVideo, /preload="metadata"/);
   assert.match(heroVideo, /IntersectionObserver/);

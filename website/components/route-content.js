@@ -643,7 +643,7 @@ export const detailPages = {
   ios: {
     slug: "ios",
     icon: DeviceMobile,
-    tone: "pearl",
+    tone: "sky",
     status: "Public access pending",
     eyebrow: "iPhone + iPad",
     navTitle: "iPhone and iPad",
@@ -653,10 +653,30 @@ export const detailPages = {
     titleDisplay: "iPhone and iPad",
     description:
       "FilterTube brings Main and Kids viewing, native controls, profiles, PINs, and protected time to iPhone and iPad. The builds are in testing; public TestFlight and App Store access are not available while developer enrollment is unresolved.",
-    heroArtwork: {
-      src: "/apps/app-store-transparent.png",
-      alt: "FilterTube iPhone app artwork",
-    },
+    heroScreensLabel: "iOS simulator development build · hover or tap a screen",
+    heroScreens: [
+      {
+        src: "/apps/screenshots/ios-launcher.png",
+        title: "Main and Kids",
+        alt: "FilterTube iOS launcher with separate Main and Kids viewing choices",
+        width: 1206,
+        height: 2622,
+      },
+      {
+        src: "/apps/screenshots/ios-controls.png",
+        title: "Native controls",
+        alt: "FilterTube iOS controls with filters, profiles, settings and device sync",
+        width: 1206,
+        height: 2622,
+      },
+      {
+        src: "/apps/screenshots/ios-filters.png",
+        title: "Your filters",
+        alt: "FilterTube iOS filter editor with Blocklist and Whitelist choices",
+        width: 1206,
+        height: 2622,
+      },
+    ],
     chips: ["Protected now", "Profile switching", "Quick toggles"],
     primaryCta: {
       label: "Public access status",
@@ -805,10 +825,17 @@ export const detailPages = {
     titleDisplay: "Android",
     description:
       "Watch YouTube Main and Kids in FilterTube's custom Android app, with filters, profiles, parent controls, and protected time. Install the phone and tablet app from Google Play—no invitation or email needed. Android TV is separate development work, not part of the public phone listing.",
-    heroArtwork: {
-      src: "/apps/android.png",
-      alt: "FilterTube Android app artwork",
+    heroVideo: {
+      src: "/videos/android/android-contours.mp4",
+      poster: "/videos/android/android-contours-poster.png",
+      label: "Quiet Android background motion",
     },
+    heroScreensLabel: "Android development build · hover or tap a screen",
+    heroScreens: [
+      { src: "/apps/screenshots/android-music-player.png", title: "Music player", alt: "Android development Music player", width: 1080, height: 2400 },
+      { src: "/apps/screenshots/android-player-settings.png", title: "Player settings", alt: "Android development playback settings", width: 1080, height: 2400 },
+      { src: "/apps/screenshots/android-notes-editor.png", title: "Video notes", alt: "Empty Android per-video Notes editor", width: 1080, height: 2400 },
+    ],
     chips: [
       "Phone + tablet: available",
       "Android TV: in development",
@@ -1189,73 +1216,61 @@ export const detailPages = {
     slug: "kids",
     icon: ShieldCheck,
     tone: "rose",
-    status: "Available today",
-    eyebrow: "YouTube Kids protection",
+    status: "Android + browser extension",
+    eyebrow: "Rules for YouTube Kids",
     navTitle: "Kids",
     routeSummary:
-      "A YouTube Kids overview focused on family safety, whitelist confidence, and parent-origin trust.",
-    titleLead: "Make YouTube Kids feel",
-    titleDisplay: "safer and calmer",
+      "Block unwanted channels and words, or allow only channels you choose. Keep Kids rules separate and parent-managed.",
+    titleLead: "More say in what your",
+    titleDisplay: "children watch",
     description:
-      "FilterTube began because parents needed keyword and channel blocking on YouTube Kids. Today FilterTube already offers whitelist mode, separate profiles, and calmer control for family viewing.",
-    chips: [
-      "Whitelist confidence",
-      "Parent-origin story",
-      "Zero-network Kids logic",
-    ],
-    primaryCta: {
-      label: "Get FilterTube on desktop",
-      href: extensionInstallHref,
-      external: true,
-    },
-    secondaryCta: {
-      label: "Read why FilterTube exists",
-      href: "/#story",
-      external: false,
-    },
-    previewLabel: "Kids mode today",
-    previewTitle: "Separate profiles, stricter rules, and calm family trust.",
+      "Block channels and words you do not want in YouTube Kids—or choose Whitelist to allow only the channels you approve. Give each child their own rules and viewing limits, with changes managed by their parent.",
+    chips: ["Channel + keyword filters", "Allow-only viewing", "Parent-managed profiles"],
+    primaryCta: { label: "Get the Android app", href: androidPlayStoreHref, external: true },
+    secondaryCta: { label: "Get the browser extension", href: downloadsHref, external: false },
+    previewLabel: "A simple starting point",
+    previewTitle: "Choose a child. Choose their rules. Check the result.",
     previewRows: [
-      {
-        label: "Mode",
-        value: "Kids profile",
-        detail: "Kids rules stay separate from the main profile when needed.",
-      },
-      {
-        label: "Filtering",
-        value: "Whitelist",
-        detail: "Whitelist mode is especially strong for family-safe setups.",
-      },
-      {
-        label: "Behavior",
-        value: "Zero-network",
-        detail:
-          "Kids filtering avoids unnecessary fetches and relies on intercepted data.",
-      },
+      { label: "1 · Profile", value: "Choose your child", detail: "Create or select the child's profile from the parent account. Open its Kids rule space." },
+      { label: "2 · Rules", value: "Block or allow", detail: "Add a channel or word to block, or select Whitelist and add approved channels. Main and Kids can use different rules." },
+      { label: "3 · Review", value: "Try a few videos", detail: "Check the active profile, mode and results. Lock the parent session when you finish making changes." },
     ],
     featureCards: [
       {
-        title: "Why parents start here",
-        body: "Many families land on FilterTube because YouTube Kids still needs clearer blocking tools than the platform provides.",
+        title: "Keep unwanted content out",
+        body: "Block a channel or add words that match unwanted video titles and supported metadata. Use Exact matching when a short keyword is catching too much. Filtering depends on the information available on each supported page.",
       },
       {
-        title: "What works today",
-        body: "Whitelist mode, blocked channels, keyword rules, and profile separation already exist in FilterTube today.",
+        title: "Or start with approved channels",
+        body: "Whitelist is the stricter choice: select which channels may appear instead of building a long list of things to block. Review the resulting videos; approving a creator is not a promise that every future upload suits your child.",
       },
       {
-        title: "Why the tone stays calm",
-        body: "Parents need to understand the controls quickly. The experience should feel trustworthy and protective, not fear-driven.",
+        title: "Different children, different rules",
+        body: "Each profile has its own setup. A profile's Main and Kids spaces can have different channels, keywords and viewing modes. YouTube Kids is a viewing space; it is not the same thing as a protected child profile.",
+      },
+      {
+        title: "Parent controls stay with the parent",
+        body: "Parents manage protected settings and viewing limits. A child's switching PIN opens their profile; it does not unlock parent controls. Close the parent session after editing. An unmanaged extension cannot stop a device owner from disabling or uninstalling it.",
+      },
+      {
+        title: "Make room for a stopping point",
+        body: "Set supported daily viewing allowances and review requests for more time. Time is counted per device and profile, not as a single shared allowance across the family. Sleep timers and focus sessions are separate controls.",
+      },
+      {
+        title: "Share approved changes with their device",
+        body: "Pair with a code or QR, compare the safety phrase, then send an approved update to the chosen child profile. Direct peer-to-peer sync needs supported devices open and connected. Opt-in Auto-sync and optional delivery services have separate setup and release availability.",
       },
     ],
-    milestoneTitle: "What parents should know right away",
-    milestoneIntro:
-      "Parents usually need two answers quickly: why FilterTube exists, and what a household can already use today.",
+    milestoneTitle: "Choose where your child watches",
+    milestoneIntro: "The same family direction, with different availability on each platform.",
     milestones: [
-      "FilterTube exists because families needed stronger keyword and channel controls on YouTube Kids.",
-      "Whitelist mode, profile separation, and stricter rules already work in FilterTube today on desktop browsers.",
-      "The product tone stays calm because family safety should read as trust, not panic.",
+      "Android phones and tablets: the custom Main and Kids app is on Google Play. No invitation or email is needed.",
+      "Browser extension: adds filtering to supported YouTube Kids pages. Use the full settings page to manage profiles and Kids rules.",
+      "iPhone and iPad: development builds include Kids viewing and family controls; public App Store and TestFlight access is pending.",
+      "Android TV: full Kids and family-control parity is still in development. Fire TV compatibility is planned. The phone listing is not a TV release.",
+      "Rules stay local. Optional verified device sharing is encrypted; helpers or relay services may be involved. Filters support parent decisions, rather than replacing review of what a child watches.",
     ],
-    related: ["mobile", "ml-ai"],
+    related: ["android", "ios", "extension"],
   },
   "ml-ai": {
     slug: "ml-ai",
