@@ -90,3 +90,20 @@ Keep full-resolution links and skip the loop copy in keyboard/screen-reader
 navigation. A sparse screen set needs a cycle longer than the viewport plus a
 card, so the same image cannot appear at both edges simultaneously. Homepage
 media and future app/tablet/TV captures remain later work; do not imply parity.
+
+## Consistent platform identity — 25 October 2026
+
+Homepage release cards, featured/related cards, platform hero actions and primary
+Downloads cards follow the route's tone: forest green for Android, sky blue for
+iOS, lilac for the extension and rose for Kids. Use scoped platform tokens for
+surfaces, borders, icon shells, status badges, focus and actions; do not recolor
+the global FilterTube brand or homepage hero. Keep text contrast in light/dark
+mode. Available store installs have filled actions; manual ZIPs, the simpler
+APK and iOS status have themed secondary actions.
+
+The user explicitly requested Firefox artwork for the browser extension. Use
+Firefox as the extension's visual identifier while retaining Chrome, Firefox,
+Edge and other supported-browser choices in the copy and installation links.
+Home release cards use one shared layout; at narrow widths keep full-width copy
+and a compact icon, reserving larger artwork for wider screens. Download cards
+and buttons must fit their containers without relying on page overflow clipping.

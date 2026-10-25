@@ -145,3 +145,13 @@ opposite edges at the same time. Manual controls, full-resolution links,
 keyboard focus, drag recovery and reduced-motion navigation were reviewed and
 checked. Existing hero art, platform colors, route content and app behavior are
 unchanged. Fresh native Kids screenshots remain an explicit media follow-up.
+
+## Platform card and download identity after `0c432a5c`
+
+Unified homepage release-card rendering and scoped platform colors across cards,
+icons, badges, focus and actions: green Android, blue iOS, purple extension and
+pink Kids. Firefox artwork now identifies extension cards at the user's request;
+all supported browser options remain. Downloads gets matching platform surfaces,
+secondary manual-build links and readable dark-mode scenery. Mobile cards use
+full-width copy and compact icons; download bounds fit without hidden clipping.
+The homepage hero, feature information, install URLs and availability remain.

@@ -1,5 +1,7 @@
 import Link from "next/link";
 import {
+  AndroidLogo,
+  AppleLogo,
   ArrowRight,
   ArrowUpRight,
   DeviceMobile,
@@ -47,7 +49,8 @@ function FeaturedPlatformCard({ page, span }) {
 
   return (
     <Link
-      className={`group ft-shell block h-full rounded-[2rem] p-2 ring-1 ring-[color:var(--color-line)] shadow-[var(--shadow-diffuse)] transition duration-700 ease-[cubic-bezier(0.32,0.72,0,1)] hover:-translate-y-1 ${span}`}
+      data-tone={page.tone}
+      className={`group ft-shell ft-platform-theme block h-full rounded-[2rem] p-2 ring-1 ring-[color:var(--color-line)] shadow-[var(--shadow-diffuse)] transition duration-700 ease-[cubic-bezier(0.32,0.72,0,1)] hover:-translate-y-1 ${span}`}
       href={`/${page.slug}`}
       prefetch
     >
@@ -64,12 +67,12 @@ function FeaturedPlatformCard({ page, span }) {
         <div className="relative z-10 flex h-full flex-col">
           <div className="flex items-start justify-between gap-4">
             <div
-              className={`flex h-12 w-12 items-center justify-center rounded-[1rem] ${tone.iconShell}`}
+              className={`ft-platform-icon flex h-12 w-12 items-center justify-center rounded-[1rem] ${tone.iconShell}`}
             >
-              <Icon aria-hidden="true" size={22} weight="light" />
+              {page.slug === "extension" ? <img alt="" src="/apps/firefox.png" width={28} height={28} /> : <Icon aria-hidden="true" size={22} weight="light" />}
             </div>
             <span
-              className={`inline-flex min-h-9 items-center rounded-full px-3 py-1 text-[0.68rem] font-medium uppercase tracking-[0.22em] ${tone.accentBadge}`}
+              className={`ft-platform-badge inline-flex min-h-9 items-center rounded-full px-3 py-1 text-[0.68rem] font-medium uppercase tracking-[0.22em] ${tone.accentBadge}`}
             >
               {page.status}
             </span>
@@ -172,7 +175,8 @@ function AppReleaseStatusSection() {
       imageAlt: "FilterTube Android app artwork",
       action: "Explore Android",
       href: "/android",
-      themeClass: "ft-app-release-card--android",
+      platform: "android",
+      icon: AndroidLogo,
     },
     {
       eyebrow: "iPhone + iPad",
@@ -182,7 +186,19 @@ function AppReleaseStatusSection() {
       imageAlt: "FilterTube iPhone and iPad app artwork",
       action: "Follow iOS status",
       href: "/ios",
-      themeClass: "ft-app-release-card--ios",
+      platform: "ios",
+      icon: AppleLogo,
+    },
+    {
+      eyebrow: "Browser extension · available now",
+      title: "Keep watching in your browser.",
+      body: "Use FilterTube on the pages you already visit, with a quick popup, full settings, and channel controls in the video menu. Choose Chrome, Firefox, Edge or another supported browser.",
+      image: "/apps/firefox.png",
+      imageAlt: "Firefox browser artwork for the FilterTube extension",
+      action: "Explore the extension",
+      href: "/extension",
+      platform: "extension",
+      imageClass: "ft-app-release-art--browser",
     },
   ];
 
@@ -190,61 +206,49 @@ function AppReleaseStatusSection() {
     <section className="px-4 py-10 md:px-6 md:py-14">
       <div className="mx-auto max-w-[1400px]">
         <Reveal>
-          <div className="grid gap-5 lg:grid-cols-2 xl:grid-cols-[1fr_1fr_0.9fr]">
-            {appCards.map((card) => (
-              <article
-                className={`ft-app-release-card relative isolate min-h-[22rem] overflow-hidden rounded-[2rem] border p-6 shadow-[var(--shadow-diffuse)] md:p-7 ${card.themeClass}`}
-                key={card.title}
-              >
-                <div className="relative z-10 flex h-full max-w-[58%] flex-col sm:max-w-[62%]">
-                  <p className="text-[0.72rem] font-semibold uppercase tracking-[0.22em] text-[var(--color-muted)]">
-                    {card.eyebrow}
-                  </p>
-                  <h2 className="mt-4 text-balance font-display text-3xl tracking-[-0.055em] text-[var(--color-ink)] md:text-4xl">
-                    {card.title}
-                  </h2>
-                  <p className="mt-4 text-sm leading-7 text-[var(--color-muted)]">
-                    {card.body}
-                  </p>
-                  <a
-                    className="ft-app-release-action mt-auto inline-flex min-h-11 w-fit items-center gap-2 rounded-full border border-[color:var(--color-line)] bg-white/76 px-4 py-2 text-sm font-semibold text-[var(--color-ink)] transition hover:-translate-y-0.5 hover:border-[color:var(--color-accent)] hover:text-[var(--color-accent)]"
-                    href={card.href}
-                  >
-                    {card.action}
-                    <ArrowUpRight aria-hidden="true" size={16} weight="light" />
-                  </a>
-                </div>
-                <img
-                  alt={card.imageAlt}
-                  className={`absolute -bottom-2 -right-8 h-[62%] w-[54%] object-contain object-bottom drop-shadow-[0_24px_30px_rgba(39,48,48,0.22)] sm:-right-5 sm:h-[72%] ${card.imageClass || ""}`}
-                  src={card.image}
-                  width={768}
-                  height={512}
-                  loading="lazy"
-                />
-              </article>
-            ))}
-
-            <article className="ft-shell flex min-h-[22rem] flex-col rounded-[2rem] border border-[color:var(--color-line)] p-6 shadow-[var(--shadow-diffuse)] md:p-7 lg:col-span-2 xl:col-span-1">
-              <p className="text-[0.72rem] font-semibold uppercase tracking-[0.22em] text-[var(--color-accent)]">
-                Browser extension · available now
-              </p>
-              <h2 className="mt-4 text-balance font-display text-3xl tracking-[-0.055em] text-[var(--color-ink)] md:text-4xl">
-                Keep watching in your browser.
-              </h2>
-              <p className="mt-4 text-sm leading-7 text-[var(--color-muted)]">
-                Use FilterTube on the pages you already visit, with a quick popup, full
-                settings, and channel controls in the video menu. Choose Chrome,
-                Firefox, Edge or another supported browser.
-              </p>
-              <Link
-                className="mt-auto inline-flex min-h-11 w-fit items-center gap-2 rounded-full bg-[var(--color-accent)] px-5 py-2 text-sm font-semibold text-white transition hover:-translate-y-0.5"
-                href="/extension"
-              >
-                Explore the extension
-                <ArrowUpRight aria-hidden="true" size={16} weight="light" />
-              </Link>
-            </article>
+          <div className="grid gap-5 lg:grid-cols-2 xl:grid-cols-3">
+            {appCards.map((card) => {
+              const Icon = card.icon;
+              return (
+                <article
+                  className="ft-app-release-card ft-platform-theme ft-platform-surface relative isolate min-h-[22rem] overflow-hidden rounded-[2rem] border p-6 shadow-[var(--shadow-diffuse)] md:p-7"
+                  data-tone={detailPages[card.platform].tone}
+                  key={card.title}
+                >
+                  <div className="relative z-10 flex h-full flex-col sm:max-w-[62%]">
+                    <div className="flex items-center gap-2.5">
+                      <span className="ft-platform-icon flex h-10 w-10 shrink-0 items-center justify-center rounded-xl">
+                        {Icon ? <Icon aria-hidden="true" size={22} weight="light" /> : <img alt="" src="/apps/firefox.png" width={28} height={28} />}
+                      </span>
+                      <p className="ft-platform-label text-[0.68rem] font-semibold uppercase tracking-[0.16em]">
+                        {card.eyebrow}
+                      </p>
+                    </div>
+                    <h2 className="mt-4 text-balance font-display text-3xl tracking-[-0.055em] text-[var(--color-ink)] md:text-4xl">
+                      {card.title}
+                    </h2>
+                    <p className="mb-6 mt-4 text-sm leading-7 text-[var(--color-muted)]">
+                      {card.body}
+                    </p>
+                    <Link
+                      className="ft-platform-action mt-auto inline-flex min-h-11 w-fit items-center gap-2 rounded-full px-4 py-2 text-sm font-semibold transition hover:-translate-y-0.5"
+                      href={card.href}
+                    >
+                      {card.action}
+                      <ArrowUpRight aria-hidden="true" size={16} weight="light" />
+                    </Link>
+                  </div>
+                  <img
+                    alt={card.imageAlt}
+                    className={`ft-app-release-art absolute hidden sm:block -bottom-2 -right-8 h-[62%] w-[54%] object-contain object-bottom drop-shadow-[0_24px_30px_rgba(39,48,48,0.22)] sm:-right-5 sm:h-[72%] ${card.imageClass || ""}`}
+                    src={card.image}
+                    width={768}
+                    height={512}
+                    loading="lazy"
+                  />
+                </article>
+              );
+            })}
           </div>
         </Reveal>
       </div>

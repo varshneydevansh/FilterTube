@@ -195,7 +195,7 @@ Auto-sync adds one scoped dashboard stylesheet with responsive controls. Counts 
 
 ## Conservative website content inventory - 2026-10-25
 
-Current totals: 11 CSS files, 21,241 counted source lines; 591,516 bytes, 3,093 lexical rule blocks.
+Current totals: 11 CSS files, 21,295 counted source lines; 594,286 bytes, 3,111 lexical rule blocks.
 
 | File | Classification | Lines | Bytes | SHA256 | Rules | Important | Display none | Old reveal selectors | Visible tokens | Hidden tokens | Media | Keyframes | Hidden attribute |
 | --- | --- | ---: | ---: | --- | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: |
@@ -209,6 +209,6 @@ Current totals: 11 CSS files, 21,241 counted source lines; 591,516 bytes, 3,093 
 | `css/serene-shell.css` | active extension shell CSS | 9656 | 267377 | `53608a364e8e62a326a0a7b98daa0ef2f6762cff272730f24a33c425690ee75b` | 1328 | 59 | 27 | 0 | 0 | 0 | 28 | 2 | 8 |
 | `css/tab-view.css` | active extension dashboard CSS | 5749 | 144577 | `8fbfff1804e96aefe5d211ff633be081233361ed551fff55e45496b9206648b2` | 844 | 25 | 22 | 0 | 0 | 0 | 21 | 5 | 6 |
 | `css/video-notes.css` | active extension private Notes editor CSS | 127 | 5270 | `da72df5db2d9ad321927cb710d8d48d01dc0127f656da11b920b7049c22ac388` | 59 | 1 | 2 | 0 | 0 | 0 | 3 | 0 | 1 |
-| `website/app/globals.css` | website-only global CSS | 719 | 19878 | `c0392e6e111a344df42e384d421ec5dec40230904a68732bb533661d5203fecf` | 119 | 0 | 1 | 0 | 0 | 0 | 2 | 1 | 0 |
+| `website/app/globals.css` | website-only global CSS | 773 | 22648 | `dd67fc2da4128e3fff95fa13e36939af7923f9669a6705f554845310f3b5b591` | 137 | 0 | 1 | 0 | 0 | 0 | 2 | 1 | 0 |
 
 The conservative change retains the original scenic visual system and adds a limited website disclosure style. No extension CSS, quarantine activation, manifest, native mirror or package pruning changed. Counts are lexical evidence, not a waiver of semantic, rendered accessibility, deployment or installed-device acceptance gates.

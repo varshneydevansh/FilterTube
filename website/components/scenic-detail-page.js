@@ -39,7 +39,8 @@ function RelatedCard({ relatedPage }) {
 
   return (
     <Link
-      className="group ft-shell block rounded-[1.9rem] p-2 ring-1 ring-[color:var(--color-line)] shadow-[var(--shadow-diffuse)] transition duration-700 ease-[cubic-bezier(0.32,0.72,0,1)] hover:-translate-y-1"
+      data-tone={relatedPage.tone}
+      className="group ft-shell ft-platform-theme block rounded-[1.9rem] p-2 ring-1 ring-[color:var(--color-line)] shadow-[var(--shadow-diffuse)] transition duration-700 ease-[cubic-bezier(0.32,0.72,0,1)] hover:-translate-y-1"
       href={`/${relatedPage.slug}`}
     >
       <div
@@ -55,12 +56,12 @@ function RelatedCard({ relatedPage }) {
         <div className="relative z-10">
           <div className="flex items-start justify-between gap-4">
             <div
-              className={`flex h-12 w-12 items-center justify-center rounded-[1rem] ${tone.iconShell}`}
+              className={`ft-platform-icon flex h-12 w-12 items-center justify-center rounded-[1rem] ${tone.iconShell}`}
             >
-              <RelatedIcon aria-hidden="true" size={22} weight="light" />
+              {relatedPage.slug === "extension" ? <img alt="" src="/apps/firefox.png" width={28} height={28} /> : <RelatedIcon aria-hidden="true" size={22} weight="light" />}
             </div>
             <span
-              className={`inline-flex min-h-9 items-center rounded-full px-3 py-1 text-[0.68rem] font-medium uppercase tracking-[0.22em] ${tone.accentBadge}`}
+              className={`ft-platform-badge inline-flex min-h-9 items-center rounded-full px-3 py-1 text-[0.68rem] font-medium uppercase tracking-[0.22em] ${tone.accentBadge}`}
             >
               {relatedPage.status}
             </span>
@@ -117,7 +118,7 @@ export function ScenicDetailPage({ page, relatedPages }) {
 
   return (
     <>
-      <section data-tone={page.tone} className={`relative isolate min-h-[100dvh] overflow-hidden px-4 pb-20 pt-28 md:px-6 md:pb-24 md:pt-36 ${hasHeroScreens ? "ft-app-hero" : ""}`}>
+      <section data-tone={page.tone} className={`ft-platform-theme relative isolate min-h-[100dvh] overflow-hidden px-4 pb-20 pt-28 md:px-6 md:pb-24 md:pt-36 ${hasHeroScreens ? "ft-app-hero" : ""}`}>
         <div className={`absolute inset-0 ${tone.heroBackdrop}`} />
         {hasHeroVideo ? (
           <HeroVideo
@@ -164,7 +165,7 @@ export function ScenicDetailPage({ page, relatedPages }) {
                 </Link>
                 <div className="mt-8 flex flex-wrap items-center gap-3">
                   <span
-                    className={`inline-flex min-h-9 items-center rounded-full px-3 py-1 text-[0.68rem] font-medium uppercase tracking-[0.22em] ${tone.accentBadge}`}
+                    className={`ft-platform-badge inline-flex min-h-9 items-center rounded-full px-3 py-1 text-[0.68rem] font-medium uppercase tracking-[0.22em] ${tone.accentBadge}`}
                   >
                     {page.status}
                   </span>

@@ -1,7 +1,6 @@
 import {
   AndroidLogo,
   AppleLogo,
-  Browser,
   CheckCircle,
   DownloadSimple,
   GithubLogo,
@@ -12,6 +11,7 @@ import { HeroVideo } from "@/components/hero-video";
 import { ActionLink, Panel } from "@/components/marketing-ui";
 import {
   androidPlayStoreHref,
+  detailPages,
   docsHref,
   githubHref,
   heroVideoUrl,
@@ -30,7 +30,8 @@ const primaryDownloads = [
   {
     title: "Browser extension",
     label: "Available now",
-    icon: Browser,
+    platform: "extension",
+    logo: "/apps/firefox.png",
     description:
       "Install FilterTube on desktop browsers today. Store listings are the easiest path; GitHub releases keep the manual ZIP builds available.",
     actions: [
@@ -45,13 +46,15 @@ const primaryDownloads = [
       {
         label: "GitHub ZIPs",
         href: releaseHref,
+        variant: "secondary",
       },
     ],
   },
   {
     title: "Android phone/tablet",
     label: "Available on Google Play",
-    icon: AndroidLogo,
+    platform: "android",
+    logo: "/apps/android.png",
     description:
       "The feature-rich Android custom viewing app is publicly available on Google Play. Install it from the listing or search Google Play for FilterTube. The direct APK is a separate, simpler build and does not include the complete custom frontend.",
     actions: [
@@ -62,13 +65,15 @@ const primaryDownloads = [
       {
         label: "Simpler direct APK",
         href: latestReleaseHref,
+        variant: "secondary",
       },
     ],
   },
   {
     title: "iPhone and iPad",
     label: "Final testing alignment",
-    icon: AppleLogo,
+    platform: "ios",
+    logo: "/apps/app-store-transparent.png",
     description:
       "The iPhone and iPad build is in final build and testing alignment. Apple Developer account access is delaying TestFlight availability. There is no public TestFlight or App Store install yet.",
     actions: [
@@ -143,40 +148,41 @@ function ExternalTextLink({ href, children }) {
 }
 
 function DownloadCard({ item }) {
-  const Icon = item.icon;
   return (
-    <Panel innerClassName="h-full p-6 md:p-7">
-      <div className="flex h-full flex-col">
-        <div className="flex items-start justify-between gap-4">
-          <div className="flex h-12 w-12 items-center justify-center rounded-[1rem] bg-[color:var(--color-elevation-spot)] text-[var(--color-ink)]">
-            <Icon aria-hidden="true" size={24} weight="light" />
+    <Panel className="h-full min-w-0" innerClassName="h-full">
+      <div className="ft-platform-theme ft-platform-surface h-full rounded-[calc(2rem-0.5rem)] border p-6 md:p-7" data-tone={detailPages[item.platform].tone}>
+        <div className="flex h-full flex-col">
+          <div className="flex items-start justify-between gap-4">
+            <div className="ft-platform-icon flex h-12 w-12 shrink-0 items-center justify-center rounded-[1rem]">
+              <img alt="" className="h-10 w-10 object-contain" src={item.logo} width={40} height={40} />
+            </div>
+            <span className="ft-platform-badge rounded-full border px-3 py-2 text-[0.68rem] uppercase tracking-[0.2em]">
+              {item.label}
+            </span>
           </div>
-          <span className="rounded-full border border-[color:var(--color-line)] px-3 py-2 text-[0.68rem] uppercase tracking-[0.2em] text-[var(--color-muted)]">
-            {item.label}
-          </span>
-        </div>
-        <h2 className="mt-6 font-display text-3xl tracking-[-0.05em] text-[var(--color-ink)]">
-          {item.title}
-        </h2>
-        <p className="mt-4 text-sm leading-7 text-[var(--color-muted)]">
-          {item.description}
-        </p>
-        <div className="mt-6 grid gap-3">
-          {item.actions.map((action) =>
-            action.internal ? (
-              <ActionLink
-                href={action.href}
-                key={action.label}
-                variant="secondary"
-              >
-                {action.label}
-              </ActionLink>
-            ) : (
-              <ActionLink external href={action.href} key={action.label}>
-                {action.label}
-              </ActionLink>
-            ),
-          )}
+          <h2 className="mt-6 font-display text-3xl tracking-[-0.05em] text-[var(--color-ink)]">
+            {item.title}
+          </h2>
+          <p className="mt-4 text-sm leading-7 text-[var(--color-muted)]">
+            {item.description}
+          </p>
+          <div className="mt-6 grid gap-3">
+            {item.actions.map((action) =>
+              action.internal ? (
+                <ActionLink
+                  href={action.href}
+                  key={action.label}
+                  variant="secondary"
+                >
+                  {action.label}
+                </ActionLink>
+              ) : (
+                <ActionLink external href={action.href} key={action.label} variant={action.variant}>
+                  {action.label}
+                </ActionLink>
+              ),
+            )}
+          </div>
         </div>
       </div>
     </Panel>
@@ -192,9 +198,9 @@ export default function DownloadsPage() {
         showControls
         src={heroVideoUrl}
       />
-      <div className="fixed inset-0 -z-10">
-        <div className="absolute inset-0 bg-[radial-gradient(circle_at_28%_16%,rgba(255,255,255,0.76),rgba(255,255,255,0.46)_35%,rgba(246,242,235,0.76)_72%),linear-gradient(180deg,rgba(246,242,235,0.64),rgba(246,242,235,0.9)_58%,rgba(246,242,235,0.96))]" />
-        <div className="absolute inset-0 bg-[radial-gradient(circle_at_80%_18%,rgba(171,68,56,0.1),transparent_28%),radial-gradient(circle_at_18%_82%,rgba(255,255,255,0.22),transparent_30%)]" />
+      <div className="ft-download-scene fixed inset-0 -z-10">
+        <div className="ft-download-scene-wash absolute inset-0 bg-[radial-gradient(circle_at_28%_16%,rgba(255,255,255,0.76),rgba(255,255,255,0.46)_35%,rgba(246,242,235,0.76)_72%),linear-gradient(180deg,rgba(246,242,235,0.64),rgba(246,242,235,0.9)_58%,rgba(246,242,235,0.96))]" />
+        <div className="ft-download-scene-glow absolute inset-0 bg-[radial-gradient(circle_at_80%_18%,rgba(171,68,56,0.1),transparent_28%),radial-gradient(circle_at_18%_82%,rgba(255,255,255,0.22),transparent_30%)]" />
       </div>
       <section className="px-4 pb-10 pt-32 md:px-6 md:pb-16 md:pt-40">
         <div className="mx-auto max-w-[1180px]">

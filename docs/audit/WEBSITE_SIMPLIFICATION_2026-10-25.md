@@ -461,3 +461,54 @@ minimum cycle length needed to avoid simultaneous duplicate edge images.
 Reduced-motion Android wraps through native offsets 0→192→201→0 after entering
 at the final screen. These are local browser and source results; nothing was
 pushed or deployed, and fresh native Kids media remains pending.
+
+## Platform identity correction after `0c432a5c`
+
+The user identified a visual mismatch between the generic browser release block,
+the themed Android/iOS release cards, the extension's lilac featured card and
+neutral Downloads cards with red buttons. The browser block had separate markup;
+Downloads inherited global brand action styling. Neither used the route's tone.
+
+- All three homepage release cards now share the same rendering path and action
+  treatment. Their tone comes from the existing detail page data: Android forest,
+  iOS sky and extension lilac. Existing copy, artwork, links and public-access
+  distinctions remain; the original homepage hero is unchanged.
+- Scoped CSS tokens carry platform surfaces, borders, labels, icons, badges,
+  actions and visible focus. Featured and related cards use the same identity;
+  primary detail-page actions follow the relevant tone. Kids remains pink.
+  A read-only subagent review confirmed white-on-accent contrast and caught a
+  selector that initially missed focus on themed anchors themselves; it was fixed.
+- At the user's explicit request, Firefox artwork identifies the browser extension
+  on release, featured, related and download cards. This is a visual identifier,
+  not an exclusive browser-support claim. Chrome, Firefox, Edge and other existing
+  browser choices remain. The locally served 256px PNG comes from the same
+  browser-logos version already used by the site's browser rail:
+  https://cdnjs.cloudflare.com/ajax/libs/browser-logos/74.1.0/firefox/firefox_256x256.png
+  Firefox identity remains Mozilla's; no endorsement or new runtime dependency
+  is implied. The source asset dimensions were verified before adding it.
+- Downloads now has purple extension, green Android and blue iOS cards. Filled
+  store actions retain priority; GitHub ZIPs and the separately described simpler
+  APK are themed secondary actions. iOS status stays a status action, with no
+  new install/public TestFlight claim. All action URLs remain unchanged.
+- Mobile review caught the previous artwork layout squeezing release copy into
+  a narrow column. Below 640px, copy now uses the card width with a compact icon;
+  larger decorative artwork remains on wider screens. The Firefox artwork size
+  leaves copy and buttons unobstructed. Downloads dark mode also gets a dark
+  scenic wash so its introductory text stays readable.
+- A 320px review caught download-card min-content width exceeding the padded grid
+  even though the page's overflow clipping hid horizontal page overflow. The
+  grid items now allow shrinking, and scoped action padding/wrapping lets the
+  actual card and button bounds fit. Validation checks those bounds directly.
+
+Light/dark screenshots, responsive measurements and verification results are
+stored under the existing dated website artifact directory. These changes are
+website presentation only; extension behavior, native app state, sync protocol,
+store publishing and deployment are unchanged.
+
+The final Downloads icons use the existing Android and App Store artwork, with
+scoped scaling to compensate for transparent asset padding; Firefox is unchanged.
+Production build, 18 focused checks, 742 release checks and 1,482 smoke checks
+pass after the final logo change. A smoke wording count initially picked up test
+titles in ignored full-width validation logs; those generated logs were moved
+outside the repository, and the original assertion passed without modification.
+All 16 responsive light/dark cases fit their actual card and button bounds.

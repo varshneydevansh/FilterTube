@@ -569,45 +569,88 @@ html[data-theme="dark"] .ft-hero-support-emphasis {
   backdrop-filter: blur(26px) saturate(145%) contrast(94%);
 }
 
-.ft-app-release-card--android {
-  border-color: #a3c9ac;
+/* Platform identity follows the route tone across home, download and detail cards. */
+.ft-platform-theme {
+  --platform-accent: #735080;
+  --platform-soft: #efe6f7;
+  --platform-label: var(--platform-accent);
+  --platform-border: color-mix(in srgb, var(--platform-accent) 32%, white);
+  --color-accent: var(--platform-accent);
+}
+.ft-platform-theme[data-tone="sage"], .ft-platform-theme[data-tone="forest"] {
+  --platform-accent: #28623f;
+  --platform-soft: #d8ebdd;
+}
+.ft-platform-theme[data-tone="sky"] {
+  --platform-accent: #235d9b;
+  --platform-soft: #d7e7fa;
+}
+.ft-platform-theme[data-tone="rose"] {
+  --platform-accent: #9d3a66;
+  --platform-soft: #f5dde6;
+}
+.ft-platform-theme[data-tone="ink"], .ft-platform-theme[data-tone="amber"], .ft-platform-theme[data-tone="sunset"], .ft-platform-theme[data-tone="pearl"] {
+  --platform-accent: #ab4438;
+}
+.ft-platform-surface {
+  border-color: var(--platform-border);
   background:
-    radial-gradient(circle at 88% 86%, rgba(105, 178, 132, 0.32), transparent 38%),
-    linear-gradient(145deg, #e9f5eb 0%, #d8ebdd 100%);
+    radial-gradient(circle at 88% 86%, color-mix(in srgb, var(--platform-accent) 20%, transparent), transparent 42%),
+    linear-gradient(145deg, color-mix(in srgb, var(--platform-soft) 45%, white), var(--platform-soft));
 }
-
-.ft-app-release-card--ios {
-  border-color: #a5c3e8;
-  background:
-    radial-gradient(circle at 88% 86%, rgba(82, 143, 221, 0.3), transparent 38%),
-    linear-gradient(145deg, #e9f2ff 0%, #d7e7fa 100%);
+.ft-platform-icon {
+  overflow: hidden;
+  background: color-mix(in srgb, var(--platform-accent) 10%, white);
+  color: var(--platform-label);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.7);
 }
-
-html[data-theme="dark"] article.ft-app-release-card--android {
-  border-color: rgba(111, 178, 139, 0.36);
-  background:
-    radial-gradient(circle at 88% 86%, rgba(87, 161, 117, 0.2), transparent 36%),
-    linear-gradient(145deg, rgba(24, 42, 35, 0.98), rgba(14, 23, 23, 0.98));
+.ft-platform-icon img[src="/apps/android.png"] { transform: scale(2.2); }
+.ft-platform-icon img[src="/apps/app-store-transparent.png"] { transform: scale(1.8); }
+.ft-platform-label, .ft-platform-badge { color: var(--platform-label); }
+.ft-platform-badge {
+  border-color: var(--platform-border);
+  background: color-mix(in srgb, var(--platform-soft) 62%, white);
 }
-
-html[data-theme="dark"] article.ft-app-release-card--ios {
-  border-color: rgba(105, 154, 214, 0.4);
-  background:
-    radial-gradient(circle at 88% 86%, rgba(66, 136, 224, 0.2), transparent 36%),
-    linear-gradient(145deg, rgba(24, 36, 52, 0.98), rgba(14, 21, 31, 0.98));
-}
-
-html[data-theme="dark"] .ft-app-release-action {
-  border-color: rgba(255, 255, 255, 0.2);
-  background: rgba(255, 255, 255, 0.1);
-  color: #f7f9fb;
-  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.12);
-}
-
-html[data-theme="dark"] .ft-app-release-action:hover {
-  border-color: rgba(255, 255, 255, 0.38);
-  background: rgba(255, 255, 255, 0.16);
+.ft-platform-action, .ft-platform-theme .ft-action-solid,
+html[data-theme="dark"] .ft-platform-theme .ft-action-solid {
+  background: var(--platform-accent);
   color: #ffffff;
+  box-shadow: 0 16px 32px -24px var(--platform-accent), inset 0 1px 0 rgba(255, 255, 255, 0.18);
+}
+.ft-platform-action:hover, .ft-platform-theme .ft-action-solid:hover,
+html[data-theme="dark"] .ft-platform-theme .ft-action-solid:hover {
+  background: color-mix(in srgb, var(--platform-accent) 88%, black);
+}
+.ft-platform-theme .ft-action-secondary,
+html[data-theme="dark"] .ft-platform-theme .ft-action-secondary {
+  border-color: var(--platform-border);
+  color: var(--platform-label);
+}
+.ft-platform-surface .ft-action-solid, .ft-platform-surface .ft-action-secondary {
+  min-width: 0;
+  white-space: normal;
+  padding-inline: 1rem;
+  gap: 0.75rem;
+}
+.ft-platform-surface .ft-button-icon { flex-shrink: 0; }
+.ft-platform-theme .ft-action-secondary .ft-button-icon { color: var(--platform-label); }
+.ft-platform-theme:focus-visible, .ft-platform-theme a:focus-visible {
+  outline: 3px solid var(--platform-label);
+  outline-offset: 4px;
+}
+.ft-app-release-art--browser { right: 0.75rem; bottom: 1.5rem; height: 36%; width: 36%; }
+html[data-theme="dark"] .ft-platform-theme {
+  --platform-label: color-mix(in srgb, var(--platform-accent) 40%, white);
+  --platform-border: color-mix(in srgb, var(--platform-accent) 64%, transparent);
+}
+html[data-theme="dark"] .ft-platform-surface {
+  background:
+    radial-gradient(circle at 88% 86%, color-mix(in srgb, var(--platform-accent) 28%, transparent), transparent 42%),
+    linear-gradient(145deg, color-mix(in srgb, var(--platform-accent) 24%, #101820), color-mix(in srgb, var(--platform-accent) 10%, #101820));
+}
+html[data-theme="dark"] .ft-platform-icon, html[data-theme="dark"] .ft-platform-badge {
+  background: color-mix(in srgb, var(--platform-accent) 24%, #101820);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.1);
 }
 
 .ft-footer-wordmark {
@@ -644,6 +687,17 @@ html[data-theme="dark"] .ft-download-glow {
     radial-gradient(circle at 18% 18%, rgba(102, 140, 122, 0.22), transparent 34%),
     radial-gradient(circle at 82% 16%, rgba(170, 112, 90, 0.2), transparent 30%),
     linear-gradient(180deg, rgba(24, 31, 40, 0.94), rgba(15, 21, 28, 0.98));
+}
+
+html[data-theme="dark"] .ft-download-scene-wash {
+  background:
+    radial-gradient(circle at 28% 16%, rgba(24, 32, 44, 0.86), rgba(15, 20, 27, 0.8) 48%),
+    linear-gradient(180deg, rgba(15, 20, 27, 0.8), #0f141b);
+}
+html[data-theme="dark"] .ft-download-scene-glow {
+  background:
+    radial-gradient(circle at 80% 18%, rgba(115, 80, 128, 0.14), transparent 30%),
+    radial-gradient(circle at 18% 82%, rgba(40, 98, 63, 0.12), transparent 32%);
 }
 
 .ft-download-rail {

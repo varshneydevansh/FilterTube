@@ -1,0 +1,38 @@
+{
+  "scope": "Local website candidate; not deployed",
+  "responsive_cases": 16,
+  "browser_findings": [
+    "Homepage and Downloads cards fit at 320/375/768/1280px in light/dark modes",
+    "Actual card bounds checked separately from clipped page width",
+    "Keyboard Tab focuses featured extension card with 3px lilac outline",
+    "Firefox PNG loaded at 256px",
+    "Dark Downloads scene wash keeps introductory copy readable"
+  ],
+  "button_contrast_white_text": {
+    "lilac": 6.59,
+    "forest": 7.22,
+    "sky": 6.75,
+    "rose": 6.5
+  },
+  "asset": {
+    "path": "website/public/apps/firefox.png",
+    "source": "https://cdnjs.cloudflare.com/ajax/libs/browser-logos/74.1.0/firefox/firefox_256x256.png",
+    "sha256": "608cb951b7ed3f3b4cb7d38aa26cbf662f501bd0a5fc58a96df04bcb5a720ec0"
+  },
+  "build": "Production Next build passed after final logo scaling; browser verified all three loaded assets",
+  "test_artifact_note": "Ignored fullwidth log files were moved to /tmp/filtertube-website-evidence-logs-20261025 because a wording audit scans every repository file, including quoted test titles in generated logs. No test assertion was waived.",
+  "checks": {
+    "focused": {
+      "pass": 18,
+      "fail": 0
+    },
+    "release": {
+      "pass": 742,
+      "fail": 0
+    },
+    "smoke": {
+      "pass": 1482,
+      "fail": 0
+    }
+  }
+}
