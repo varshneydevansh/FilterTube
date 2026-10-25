@@ -169,6 +169,6 @@ Current closure: platform slugs: 10; detail page entries: 10; related-page refer
 | File | Lines | Bytes | SHA-256 |
 | --- | ---: | ---: | --- |
 | `website/app/[slug]/page.js` | 54 | 1,229 | `0233757cc9b72d7292750fc0a83560b54969f6489aa397091b408a16f25716f3` |
-| `website/components/route-content.js` | 1,409 | 65,363 | `b82e315853035b26e5f1acce8f7521e8a0def755c48041fab1682fd8ced818f2` |
+| `website/components/route-content.js` | 1,424 | 66,845 | `f819072ba8c43b3d681734fcc3e454c831d2c70b1d5cdbab8bfc9989f6df9496` |
 | `website/components/site-shell-data.js` | 22 | 488 | `d2fc7d7a1fe3d708bfa8a1b7b7f71a296679a4b83e77f07c9eedae7007b8038c` |
-| `website/components/scenic-detail-page.js` | 480 | 22,925 | `9414cfdeeccfdd17141abc4bc01b5afbbae625e2c7f184956fc9390c41325ae4` |
+| `website/components/scenic-detail-page.js` | 488 | 23,584 | `74fbc370b98db4cbc4ab778f9d5a73c68091c8e2da7285412a10455901fe09b1` |

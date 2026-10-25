@@ -7,6 +7,7 @@ import {
 
 import { ActionLink, SectionHeading } from "@/components/marketing-ui";
 import { Reveal } from "@/components/reveal";
+import { BrowserLogoRail } from "@/components/browser-logo-rail";
 import { ScreenshotCarousel } from "@/components/screenshot-carousel";
 import { AppScreenStack } from "@/components/app-screen-stack";
 import { HeroVideo } from "@/components/hero-video";
@@ -255,6 +256,13 @@ export function ScenicDetailPage({ page, relatedPages }) {
             ) : null}
           </div>
         </div>
+        {page.slug === "extension" ? (
+          <div className="relative z-10 -mx-4 mt-12 md:-mx-6">
+            <p className="mx-auto mb-4 max-w-[1400px] px-4 text-xs uppercase tracking-[0.2em] text-[var(--color-hero-muted)] md:px-6">Available for desktop browsers</p>
+            <BrowserLogoRail carousel />
+            <p className="mx-auto mt-3 max-w-[1400px] px-4 text-xs leading-6 text-[var(--color-hero-muted)] md:px-6">Choose the matching store or manual package. Compatibility varies by browser and version. Arc is for existing desktop users.</p>
+          </div>
+        ) : null}
       </section>
 
       {page.appPreview ? (

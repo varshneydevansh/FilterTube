@@ -7,6 +7,7 @@ import {
   ShieldCheck,
 } from "@phosphor-icons/react/ssr";
 
+import { LatestReleaseAssets } from "@/components/latest-release-assets";
 import { HeroVideo } from "@/components/hero-video";
 import { ActionLink, Panel } from "@/components/marketing-ui";
 import {
@@ -219,6 +220,8 @@ export default function DownloadsPage() {
               Developer account access currently delaying TestFlight.
             </p>
           </div>
+
+          <div className="mt-10"><LatestReleaseAssets /></div>
 
           <div className="mt-10 grid gap-5 lg:grid-cols-[1.08fr_0.96fr_0.96fr]">
             {primaryDownloads.map((item) => (

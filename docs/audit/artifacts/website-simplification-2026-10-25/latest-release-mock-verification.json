@@ -1,0 +1,63 @@
+{
+  "source": "/Users/devanshvarshney/FilterTube/website/components/latest-release-assets.js",
+  "sourceSha256": "57c8e4a6db16b61dec9da35d13819fce8d835916b1df591d969dfb09efb50f06",
+  "checkedAt": "2026-10-25T17:16:55.750Z",
+  "method": "Next SWC compile plus isolated mocked fetch and React renderToStaticMarkup. No network/provider requests and no repository writes.",
+  "boundaries": "Does not validate actual GitHub uptime, live timeout duration, Next production cache lifecycle, browser layout or downloadable binary behavior.",
+  "checks": [
+    {
+      "name": "Next SWC JSX syntax and isolated CommonJS compilation",
+      "passed": true
+    },
+    {
+      "name": "Captured v3.4.1 contains all 9 assets exactly once with 4 normal and 4 developer files plus main checksum",
+      "passed": true
+    },
+    {
+      "name": "Future tag/date/package filenames update dynamically and do not retain captured v3.4.1",
+      "passed": true
+    },
+    {
+      "name": "draft response renders clear manual-release fallback",
+      "passed": true
+    },
+    {
+      "name": "prerelease response renders clear manual-release fallback",
+      "passed": true
+    },
+    {
+      "name": "Offline fetch renders fallback without rejected server render",
+      "passed": true
+    },
+    {
+      "name": "HTTP/rate-limit failure renders fallback",
+      "passed": true
+    },
+    {
+      "name": "Malformed API JSON renders fallback",
+      "passed": true
+    },
+    {
+      "name": "10 unsafe download URL variants are rejected",
+      "passed": true
+    },
+    {
+      "name": "Wrong-repository release URL cannot appear in rendered hrefs",
+      "passed": true
+    },
+    {
+      "name": "Invalid individual asset is omitted while safe asset remains with complete-list notice",
+      "passed": true
+    },
+    {
+      "name": "Asset count is capped at 50 with explicit complete-list notice state",
+      "passed": true
+    },
+    {
+      "name": "Requests use locked public endpoint, one-hour Next revalidation, 5-second timeout and no credentials",
+      "passed": true
+    }
+  ],
+  "passed": 13,
+  "failed": 0
+}

@@ -512,3 +512,70 @@ pass after the final logo change. A smoke wording count initially picked up test
 titles in ignored full-width validation logs; those generated logs were moved
 outside the repository, and the original assertion passed without modification.
 All 16 responsive light/dark cases fit their actual card and button bounds.
+
+## P2P explainer, browser choices and live release assets after `85c87cb6`
+
+The user asked for less text around device sync, desktop browser choices at the
+bottom of the extension hero, and the newest GitHub release assets at the top of
+Downloads. This update changes website presentation and public release metadata
+only. The homepage hero, scenic identity, platform tints and screenshot galleries
+remain. It changes no sync transport, device trust or parent/child permissions.
+
+- The homepage now explicitly says “P2P · Peer-to-peer sync” and uses an original
+  interactive laptop/phone SVG to explain Connect, Choose and Share. The Anatomy
+  skill informed the device illustration. Three accessible buttons update a
+  short caption; the illustration is labelled and never pretends to be a live
+  device connection. Finite transfer motion stops offscreen and respects reduced
+  motion. There is no new animation dependency or rendered FFrames video.
+- Detailed help remains collapsed: code/QR pairing, safety-phrase comparison,
+  nearby presence not granting trust, approved parent changes, mutual personal
+  links, optional Auto-sync in testing, local offline waiting and distinct
+  queued/received/applied states. Optional encrypted relay and pickup still have
+  separate delivery limits; there is no promised always-on background delivery.
+- The extension hero ends with eleven locally served browser logos using the
+  existing carousel: Chrome, Firefox, Edge, Brave, Vivaldi, Opera, Waterfox, Zen,
+  Floorp, Chromium and Arc. It has automatic motion, pause/previous/next controls
+  and a static native scrolling mode by default for reduced motion. Installation
+  links follow each browser's documented path; compatibility varies by version.
+  Arc is labelled for existing desktop users because new accounts have closed
+  and its desktop sunset is scheduled for 22 December 2026. These are supported
+  installation paths, not claims of installed testing in every browser.
+- Downloads fetches the fixed repository's `/releases/latest` API server-side,
+  with hourly revalidation and a five-second request timeout. No version or asset
+  filename is pinned. It shows the current release tag/date and validated asset
+  links, prioritizes normal browser packages and release APKs, pairs SHA-256
+  links, and collapses debug APKs/AABs under Developer files. Google Play's complete
+  app and the separate simpler direct APK remain clearly distinguished.
+- Drafts/prereleases, foreign repository URLs, unsafe links and malformed results
+  are rejected. Asset rendering is capped at fifty files; missing or rate-limited
+  metadata retains the GitHub latest-release link. No token, visitor profile data
+  or client-side GitHub request was introduced. Hourly revalidation applies to
+  this Next server deployment; a future static-only host would need an equivalent
+  refresh mechanism. GitHub's latest stable release semantics determine the result.
+
+Primary browser installation references checked during this work:
+
+- Chrome: https://support.google.com/chrome/answer/2664769?hl=en
+- Firefox: https://support.mozilla.org/en-US/kb/find-and-install-add-ons-add-features-to-firefox
+- Edge: https://support.microsoft.com/en-gb/edge/add-turn-off-or-remove-extensions-in-microsoft-edge
+- Brave: https://support.brave.com/hc/en-us/articles/360017909112-How-can-I-add-extensions-to-Brave
+- Vivaldi: https://help.vivaldi.com/desktop/appearance-customization/extensions/
+- Opera: https://help.opera.com/en/faq/
+- Waterfox: https://www.waterfox.com/support/addons-help/
+- Zen: https://docs.zen-browser.app/user-manual/extensions
+- Floorp: https://blog.floorp.app/en/release/12.11.0/
+- Chromium: https://chromium.googlesource.com/chromium/src/+/main/extensions/docs/security_faq.md
+- Arc: https://resources.arc.net/hc/en-us/articles/44413577819159-Arc-Sunset-Frequently-Asked-Questions
+
+Browser-logo source URLs and hashes, screenshots and compact validation receipts
+are in the dated artifact folder. The production page displayed all nine assets
+from the actual latest release, v3.4.1. A read-only subagent independently passed
+thirteen mocked rendering checks, including a future v9.12.0 release, changed
+filenames, offline fallback, draft/prerelease rejection and unsafe URL variants.
+Those mocked checks are separate from the observed current live metadata.
+
+Production build, eighteen focused checks, 742 release checks and 1,482 smoke
+checks pass. Fourteen served routes and their internal links resolve; the
+pre-existing Terms page missing H1 remains recorded by the route audit. Local
+browser checks cover the new P2P steps, keyboard focus, dark mode, 320px bounds,
+carousel playback/controls and reduced motion. Nothing was pushed or deployed.

@@ -1,0 +1,68 @@
+[
+  {
+    "file": "chrome.png",
+    "source": "https://cdnjs.cloudflare.com/ajax/libs/browser-logos/74.1.0/chrome/chrome_128x128.png",
+    "bytes": 8883,
+    "sha256": "9eaac4e67bbf412b348b6ee88c2fa8b5438a50e90492aedd927ce11f1b48075f"
+  },
+  {
+    "file": "chromium.png",
+    "source": "https://cdnjs.cloudflare.com/ajax/libs/browser-logos/74.1.0/chromium/chromium_128x128.png",
+    "bytes": 5190,
+    "sha256": "a06cbb809932623cbc31af5533d37c2027de852dbe8b50596179eb9def21733b"
+  },
+  {
+    "file": "firefox.png",
+    "source": "https://cdnjs.cloudflare.com/ajax/libs/browser-logos/74.1.0/firefox/firefox_128x128.png",
+    "bytes": 15035,
+    "sha256": "5fe5bb1300688feba171bb269db6411ee92923d454f0e30f605e245aef81f8c4"
+  },
+  {
+    "file": "edge.png",
+    "source": "https://cdnjs.cloudflare.com/ajax/libs/browser-logos/74.1.0/edge/edge_128x128.png",
+    "bytes": 11311,
+    "sha256": "c1297d9d3b478a1f1a4015146a2d25a3ff260379963ca833cd4415f08471257b"
+  },
+  {
+    "file": "brave.png",
+    "source": "https://cdnjs.cloudflare.com/ajax/libs/browser-logos/74.1.0/brave/brave_128x128.png",
+    "bytes": 7114,
+    "sha256": "ed1d23870fffad6a24010d2ad8d93d9eb1c7a42e20e185974fcd6aa76146d759"
+  },
+  {
+    "file": "vivaldi.png",
+    "source": "https://cdnjs.cloudflare.com/ajax/libs/browser-logos/74.1.0/vivaldi/vivaldi_128x128.png",
+    "bytes": 7634,
+    "sha256": "d0bb7ef3165d4b0736da3314d25e41f78ce431ce3badd8654483b55628cdbf4f"
+  },
+  {
+    "file": "opera.png",
+    "source": "https://cdnjs.cloudflare.com/ajax/libs/browser-logos/74.1.0/opera/opera_128x128.png",
+    "bytes": 5749,
+    "sha256": "4100cbd7e150f7ae7ead7e69f1aa5af8028c131718f62cdeddb779c57b7db05e"
+  },
+  {
+    "file": "arc.png",
+    "source": "https://arc.net/favicon.png",
+    "bytes": 1586,
+    "sha256": "2e6881ee4ea7b22e3bdd97f2432b7ce5bb3e3d5bbbdb5457a4a4f8b69a43e7bd"
+  },
+  {
+    "file": "zen.svg",
+    "source": "https://zen-browser.app/favicon.svg",
+    "bytes": 531,
+    "sha256": "090a9ce0283dc66359be584bd1db9227faf4f15fc666f261759852e2519c7c68"
+  },
+  {
+    "file": "floorp.svg",
+    "source": "https://floorp.app/icon.svg?51b46abeef3fc9d9",
+    "bytes": 2199,
+    "sha256": "15cf85f15cd722524008cb621763eb8560561048df210cf3a6180732c254f49b"
+  },
+  {
+    "file": "waterfox.png",
+    "source": "https://www.waterfox.com/favicons/favicon-96x96.png",
+    "bytes": 8213,
+    "sha256": "95838b6e3b436c1da5c25910c0ddf46367c96fac8a96987d93ee10839041e4b5"
+  }
+]

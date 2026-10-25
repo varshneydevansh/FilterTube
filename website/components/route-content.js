@@ -83,6 +83,21 @@ export const browserLinks = [
   },
 ];
 
+// Desktop package routes, not a claim of installed testing in every browser.
+export const desktopExtensionBrowsers = [
+  { title: "Chrome", src: "/browsers/chrome.png", href: extensionInstallHref, note: "Chrome Web Store" },
+  { title: "Firefox", src: "/browsers/firefox.png", href: "https://addons.mozilla.org/en-US/firefox/addon/filtertube/", note: "Firefox Add-ons" },
+  { title: "Edge", src: "/browsers/edge.png", href: "https://microsoftedge.microsoft.com/addons/detail/filtertube/lgeflbmplcmljnhffmoghkoccflhlbem", note: "Edge Add-ons" },
+  { title: "Brave", src: "/browsers/brave.png", href: extensionInstallHref, note: "Chrome Web Store" },
+  { title: "Vivaldi", src: "/browsers/vivaldi.png", href: extensionInstallHref, note: "Chrome Web Store" },
+  { title: "Opera", src: "/browsers/opera.png", href: extensionInstallHref, note: "Chrome Web Store" },
+  { title: "Waterfox", src: "/browsers/waterfox.png", href: "https://addons.mozilla.org/en-US/firefox/addon/filtertube/", note: "Firefox Add-ons" },
+  { title: "Zen", src: "/browsers/zen.svg", href: "https://addons.mozilla.org/en-US/firefox/addon/filtertube/", note: "Firefox Add-ons" },
+  { title: "Floorp", src: "/browsers/floorp.svg", href: extensionInstallHref, note: "Chrome extensions" },
+  { title: "Chromium", src: "/browsers/chromium.png", href: `${githubHref}/releases/latest`, note: "Manual ZIP" },
+  { title: "Arc", src: "/browsers/arc.png", href: extensionInstallHref, note: "Existing desktop users" },
+];
+
 export const featuredRouteSlugs = ["android", "ios", "extension", "kids"];
 
 export const footerLinks = {

@@ -1,0 +1,24 @@
+{
+  "scope": "Local production website candidate; no deployment or installed sync behavior claim",
+  "build": "website npm run build passed",
+  "focused": {
+    "passed": 18,
+    "failed": 0
+  },
+  "release": {
+    "passed": 742,
+    "failed": 0
+  },
+  "smoke": {
+    "passed": 1482,
+    "failed": 0
+  },
+  "browser": {
+    "downloads": "Actual latest GitHub release v3.4.1 rendered; nine asset links including checksums, developer disclosure opens",
+    "extension": "Eleven browser entries; visible logos load; carousel transform changed from -14.0715 to -590.355 while Playing; pause and next exercised",
+    "p2p": "Connect, Choose and Share update illustration and caption; keyboard Tab reaches Choose with solid outline; light and dark rendered",
+    "narrow320": "No page overflow on home, extension or Downloads; P2P controls 44px high; release panel x16..304; filenames wrap within x37..283",
+    "reduced_motion": "Browser rail data-static=true; native next works; emulation reset",
+    "limits": "Browser compatibility links are documented install paths, not installed FilterTube tests on all eleven browsers. Latest release checks use mocked SSR plus current live metadata; no future release published."
+  }
+}

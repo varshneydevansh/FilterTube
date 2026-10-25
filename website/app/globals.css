@@ -771,3 +771,17 @@ html[data-theme="dark"] .ft-download-rail {
 .ft-screenshot-carousel[data-static="true"] .ft-gallery-viewport { overflow-x: auto; touch-action: auto; }
 .ft-screenshot-carousel[data-static="true"] .ft-gallery-group { min-width: var(--rail-min-width, 100vw); }
 .ft-screenshot-carousel[data-static="true"] .ft-gallery-copy { display: none; }
+
+/* Desktop installation choices share the tested moving-rail interaction. */
+.ft-screenshot-carousel[data-layout="browser"] { --rail-card-width: 11rem; }
+.ft-browser-carousel-link {
+  display: flex; min-height: 144px; align-items: center; justify-content: center;
+  flex-direction: column; gap: .5rem; padding: 1rem;
+  border: 1px solid var(--color-line); border-radius: 1.25rem;
+  background: var(--color-shell-strong); color: var(--color-ink);
+}
+.ft-browser-carousel-link img { width: 44px; height: 44px; object-fit: contain; }
+.ft-browser-carousel-link > span { font-weight: 600; }
+.ft-browser-carousel-link small { color: var(--color-muted); font-size: .7rem; text-align: center; }
+.ft-browser-carousel-link:hover { border-color: var(--color-accent); }
+.ft-browser-carousel-link:focus-visible { outline: 3px solid var(--color-accent); outline-offset: 3px; }

@@ -12,6 +12,7 @@ import { BrowserLogoRail } from "@/components/browser-logo-rail";
 import { HeroVideo } from "@/components/hero-video";
 import { ActionLink, Panel, SectionHeading } from "@/components/marketing-ui";
 import { Reveal } from "@/components/reveal";
+import { P2PSyncExplainer } from "@/components/p2p-sync-explainer";
 import {
   appDemoVideoHref,
   androidPlayStoreHref,
@@ -318,54 +319,35 @@ function QuickGuideSection() {
               <div className="absolute inset-0 bg-[radial-gradient(circle_at_18%_16%,rgba(171,68,56,0.12),transparent_28%),radial-gradient(circle_at_84%_22%,rgba(158,190,177,0.18),transparent_28%)]" />
               <div id="device-sync" className="relative z-10">
                 <p className="text-[0.72rem] uppercase tracking-[0.22em] text-[var(--color-muted)]">
-                  Peer-to-peer device sync
+                  P2P · Peer-to-peer sync
                 </p>
                 <h3 className="mt-4 max-w-[16ch] font-display text-4xl tracking-[-0.06em] text-[var(--color-ink)]">
-                  Your devices, connected directly.
+                  Your devices. In sync.
                 </h3>
                 <p className="mt-4 max-w-[62ch] text-sm leading-7 text-[var(--color-muted)]">
-                  Pair your devices, match the safety phrase, then choose what
-                  to share. Direct peer-to-peer transfers keep profile data
-                  between verified devices while both Accounts &amp; Sync pages
-                  are open and connected. Parents can send approved rules, time
-                  limits, and viewing access to a protected profile.
+                  Share settings, filter rules and notes between devices you
+                  verify. Encrypted P2P, without a central FilterTube account
+                  storing your readable data.
                 </p>
-                <p className="mt-3 max-w-[62ch] text-sm leading-7 text-[var(--color-muted)]">
-                  Your rules stay on your devices. There is no central
-                  FilterTube account vault. Connection helpers, encrypted relay
-                  and optional encrypted pickup can help devices reach each
-                  other.
-                </p>
+                <P2PSyncExplainer />
                 <details className="ft-disclosure mt-7 rounded-[1.4rem] border border-[color:var(--color-line)] bg-[color:var(--color-soft-panel)]">
                   <summary className="cursor-pointer px-5 py-4 font-semibold text-[var(--color-ink)]">
                     How device syncing works
                   </summary>
                   <div className="space-y-4 px-5 pb-5 text-sm leading-7 text-[var(--color-muted)]">
-                    <p>
-                      Pair with a code or QR, compare the safety phrase, then
-                      choose the profile and what to share. Being on the same
-                      network never makes a device trusted.
-                    </p>
-                    <p>
-                      Parents can send approved rules, time and viewing access
-                      to their chosen child profile. Receiving an update does
-                      not grant a child permission to edit protected settings.
-                    </p>
-                    <p>
-                      Opt-in Auto-sync for settings, filter rules and video
-                      notes is in testing in the extension and Android
-                      development build. Both devices must approve a personal
-                      profile link. Changes wait locally while disconnected;
-                      direct syncing requires FilterTube open and connected on
-                      both devices.
-                    </p>
-                    <p>
-                      Home Pickup and Internet Pickup are optional, separately
-                      configured delivery paths for approved parent updates.
-                      Queued, received and applied are different states. This
-                      does not promise background delivery whenever a device
-                      comes online.
-                    </p>
+                    <p><strong>Connect safely.</strong> Use a code or QR and compare
+                      the safety phrase. Nearby devices are not automatically trusted.</p>
+                    <p><strong>You choose.</strong> Select a profile and updates.
+                      Both devices approve personal links; only approved parents
+                      can change a child's protected settings.</p>
+                    <p><strong>Auto-sync is optional and in testing.</strong> Supported
+                      settings, rules and notes wait locally while disconnected.
+                      Direct sync needs FilterTube open and connected on both devices.</p>
+                    <p><strong>Across networks.</strong> Connection helpers and
+                      encrypted relays can help your devices reach each other.
+                      Optional Home Pickup and Internet Pickup separately deliver
+                      approved parent updates. Queued, received and applied are
+                      different states; background delivery is not guaranteed.</p>
                   </div>
                 </details>
               </div>

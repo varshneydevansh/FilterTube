@@ -1,12 +1,16 @@
 import { ArrowUpRight } from "@phosphor-icons/react/ssr";
 
-import { browserLinks } from "@/components/route-content";
+import { browserLinks, desktopExtensionBrowsers } from "@/components/route-content";
+
+import { ScreenshotCarousel } from "@/components/screenshot-carousel";
 
 export function BrowserLogoRail({
   className = "",
   muted = false,
   panel = false,
+  carousel = false,
 }) {
+  if (carousel) return <ScreenshotCarousel screenshots={desktopExtensionBrowsers} label="Desktop browser installation options" layout="browser" />;
   const shellClasses = muted
     ? "border-white/28 bg-[rgba(255,255,255,0.1)] text-[#fffaf4] shadow-[inset_0_1px_0_rgba(255,255,255,0.22)]"
     : "border-[color:var(--color-line)] ft-shell-strong text-[var(--color-ink)] shadow-[inset_0_1px_0_var(--color-inset-line)]";

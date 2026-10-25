@@ -4,6 +4,8 @@ import { useEffect, useRef, useState } from "react";
 import { ArrowLeft, ArrowRight, Pause, Play } from "@phosphor-icons/react";
 
 export function ScreenshotCarousel({ screenshots, label, layout = "phone" }) {
+  const browserRail = layout === "browser";
+  const noun = browserRail ? "browsers" : "screenshots";
   const viewportRef = useRef(null);
   const groupRef = useRef(null);
   const trackRef = useRef(null);
@@ -140,19 +142,19 @@ export function ScreenshotCarousel({ screenshots, label, layout = "phone" }) {
       }}
     >
       <div className="ft-gallery-toolbar mx-auto mb-5 flex max-w-[1400px] flex-wrap items-center justify-between gap-3 px-4 md:px-6">
-        <p className="text-sm text-[var(--color-muted)]">{screenshots.length} {screenshots.length === 1 ? "screen" : "screens"} · Open a screen for a closer look.</p>
+        <p className="text-sm text-[var(--color-muted)]">{screenshots.length} {browserRail ? "desktop browsers · Choose your install path." : `${screenshots.length === 1 ? "screen" : "screens"} · Open a screen for a closer look.`}</p>
         {screenshots.length > 1 ? (
           <div className="flex flex-wrap items-center gap-2">
             <span className="mr-2 text-xs text-[var(--color-muted)]" role="status">{status}</span>
-            <button aria-label="Previous screenshots" className="ft-gallery-control" onClick={() => move(-1)} type="button"><ArrowLeft aria-hidden="true" size={18} /></button>
+            <button aria-label={`Previous ${noun}`} className="ft-gallery-control" onClick={() => move(-1)} type="button"><ArrowLeft aria-hidden="true" size={18} /></button>
             <button className="ft-gallery-control px-4" onClick={() => {
               if (playing) { setPaused(true); setResume(false); }
               else { setPaused(false); setMotionOptIn(true); setResume(true); }
             }} type="button">
               {playing ? <Pause aria-hidden="true" size={16} /> : <Play aria-hidden="true" size={16} />}
-              {playing ? "Pause showcase" : "Play showcase"}
+              {playing ? (browserRail ? "Pause browsers" : "Pause showcase") : (browserRail ? "Play browsers" : "Play showcase")}
             </button>
-            <button aria-label="Next screenshots" className="ft-gallery-control" onClick={() => move(1)} type="button"><ArrowRight aria-hidden="true" size={18} /></button>
+            <button aria-label={`Next ${noun}`} className="ft-gallery-control" onClick={() => move(1)} type="button"><ArrowRight aria-hidden="true" size={18} /></button>
           </div>
         ) : null}
       </div>
@@ -193,12 +195,20 @@ export function ScreenshotCarousel({ screenshots, label, layout = "phone" }) {
             <div aria-hidden={copy > 0 || undefined} className={`ft-gallery-group${copy ? " ft-gallery-copy" : ""}`} key={copy} ref={copy ? undefined : groupRef}>
               {screenshots.map((screenshot, index) => (
                 <figure className="ft-gallery-slide" key={screenshot.src}>
+                  {browserRail ? (
+                    <a className="ft-browser-carousel-link" aria-label={`${screenshot.title}: ${screenshot.note}`} data-screen-index={index} href={screenshot.href} rel="noreferrer" target="_blank" tabIndex={copy ? -1 : undefined} draggable="false">
+                      <img alt="" src={screenshot.src} width={44} height={44} loading="lazy" draggable="false" />
+                      <span>{screenshot.title}</span>
+                      <small>{screenshot.note}</small>
+                    </a>
+                  ) : <>
                   <a aria-label={`Open full screenshot: ${screenshot.title}`} className="block rounded-lg" data-screen-index={index} href={screenshot.src} tabIndex={copy ? -1 : undefined} draggable="false">
                     <img alt={copy ? "" : screenshot.alt} className="ft-gallery-image rounded-lg border border-[color:var(--color-line)]" draggable="false" height={screenshot.height || 2400} loading="lazy" src={screenshot.src} width={screenshot.width || 1080} />
                   </a>
                   <figcaption className="mt-4 text-center">
                     <h3 className="font-display text-base text-[var(--color-ink)]">{screenshot.title}</h3>
                   </figcaption>
+                  </>}
                 </figure>
               ))}
             </div>
