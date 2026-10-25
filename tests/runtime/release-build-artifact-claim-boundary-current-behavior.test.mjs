@@ -23,9 +23,9 @@ const sourceRows = [
   ],
   [
     "README.md",
-    459,
-    29423,
-    "be5578e2af1b8c656f015d309eef229a2d0fae630f4d69d80b61a9963a4944c3"
+    185,
+    17131,
+    "043d9927830923d24d3b8ab885c6a9eb9aa4e274035aca6606a4a6885aa448f3"
   ],
   [
     "CHANGELOG.md",
@@ -207,8 +207,9 @@ test('release build artifact claim boundary records package versions scripts and
   assert.equal(releaseVersions[1], '3.4.0');
 
   assert.match(readme, /filtertube\.in\/downloads/);
-  assert.match(readme, /Large Blocklist Matching \(v3\.3\.1\)/);
-  assert.match(readme, /200\+ saved channels do not create renderer-by-renderer scan costs/);
+  assert.match(readme, /Rule matching reuses compiled indexes/);
+  assert.match(readme, /## Features/);
+  assert.doesNotMatch(readme, /## What's New in/);
   assert.match(readme, /JSON-backed surfaces can be filtered before paint/);
   assert.match(readme, /Current audit work is tightening no-rule, route, lifecycle, and resolver budgets/);
 

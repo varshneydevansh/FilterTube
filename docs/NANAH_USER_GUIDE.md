@@ -1,319 +1,143 @@
-# Nanah User Guide
+# Nanah Device Trust & Sync — user guide
 
-## What Nanah is
+Updated 26 October 2026. This guide describes the current extension candidate. Store releases and native apps can have different capabilities; the [acceptance checklist](NANAH_MANAGED_LINK_QA.md) records what still needs installed-device testing.
 
-Nanah lets you move FilterTube settings directly between your own devices.
+## Connect once, then choose what to share
 
-Think of it like this:
+Nanah is FilterTube's encrypted peer-to-peer (P2P) device-sharing layer. There is no central FilterTube account holding your readable profile settings. A signaling service helps the devices meet; the live settings transfer uses their verified WebRTC connection.
 
-- both devices meet at a small relay
-- they confirm the same safety phrase
-- then the real settings are meant to move directly from device to device
+Start with one of these tasks:
 
-FilterTube does **not** need a central sync account to read your settings.
+| Your task | Use |
+| --- | --- |
+| Copy the profile open here to another device once | **Copy once / This profile**; the receiver reviews the proposal. |
+| Keep your own account profiles up to date | An explicitly approved **personal Auto-sync link**, with settings/rules, saved Notes, or both selected. |
+| Update a child's protected profile | An approved **parent connection**, with manual Send update or opted-in parent Auto-sync. |
+| Migrate or recover the wider account tree | The separate **Full account** flow and its required local authority; not automatic profile sync. |
 
-## The easiest way to think about it
+Auto-sync is off by default. A verified device and a profile-sync permission are different things: saving trust does not silently enroll every profile or data area.
 
-There are three things you can move, and three safe delivery paths.
+## Add and verify a device
 
-### 1. Send this profile once
+1. Open **Accounts & Sync** on both devices. Use compatible builds and the intended profiles. Unlock the account locally when asked.
+2. On one device, choose **Add with code or QR**, then **Start Pairing**.
+3. On the other, enter the displayed **four-character code** and choose **Join Session**, or use **Scan QR / Read QR image**. Codes use Nanah's safe alphanumeric alphabet; they are not necessarily four digits.
+4. Compare the **same safety phrase on both screens**. Confirm it before trusting or sharing.
+5. Review the local profile, receiving profile/device and proposed action. Confirm only the intended relationship and scopes.
 
-Use this when you just want to copy settings one time.
+QR scanning fills the code; joining and phrase verification remain separate steps. Camera frames and local PNG/JPEG/WebP QR images are decoded locally. Closing the scanner, hiding the tab or leaving the page stops camera use. Manual entry remains available for devices without cameras, including future TV clients.
 
-Example:
+The pairing drawer follows **Connect → waiting → verify → share/sync**. Advanced connection help stays collapsed. The device map puts a saved or discovered recipient and its next action first; focus stays stable during background refreshes. Rings indicate a bounded search, not physical distance.
 
-- Chrome laptop -> Edge laptop
-- laptop -> phone
+### Find nearby
 
-Flow:
+On the receiving computer, choose **Receive nearby**; on the other, **Find nearby**. These are bounded visibility/search windows, not permanent broadcasting. The optional helper must be running on both computers on the same network:
 
-1. Start pairing on one device.
-2. Join from the other device.
-3. Confirm the same safety phrase.
-4. Send once.
-5. The other device reviews and applies it.
+```bash
+npm run managed:nearby
+```
 
-### 2. Parent controls protected profile
+Being on the same Wi-Fi alone does not make browser extensions discover each other. A nearby device must still pair and match the safety phrase. Nearby visibility, saved trust and online connection state are separate.
 
-Use this when a parent/caregiver device should update a protected profile on another verified device.
+## Your own devices: copy or Auto-sync
 
-Flow:
+**Copy once** sends the currently open profile for receiver review. Switch profiles to copy a different one. It does not enable Auto-sync or parent control.
 
-1. On the parent device, open **Accounts & Sync** and choose the child's
-   **Edit Rules**. The editing banner names the local child and approving parent.
-2. On the receiving device, create or open the intended protected child profile.
-   Its receive page offers **Enter parent code**. Your own adult profiles can
-   still use **Copy once** separately.
-3. Start pairing on the parent device. Enter its code or scan its QR on the
-   receiving device, then confirm the same safety phrase on both screens.
-4. Review which local rules profile will update which receiving profile/device.
-   An explicit remote target can select another permitted receiving child.
-5. Use the separate **Send Protected Update** action.
-6. On the receiving device, authorize **Apply Once**, or **Apply + Save Parent
-   Link** to permit future matching updates under the reviewed permissions.
+For Auto-sync:
 
-Important:
+1. Open the intended account profile on each device and complete verified pairing.
+2. Under **Your other devices**, choose **Settings and filter rules**, **Saved video notes**, or both.
+3. Choose **Link this profile**. Approve the exact profile/device mapping at **both endpoints**.
+4. Make a small change and check the receiver's actual data and status, not just the sender's queue.
 
-- the first managed connection may still need one local parent/caregiver approval on the protected device
-- after that, later updates can be easier depending on the saved policy
+Both clients must support the personal Auto-sync protocol. An older trusted-device record alone is not that permission. Personal setup requires active, unlocked account profiles; protected child profiles cannot use this route to publish settings or obtain administration rights.
 
-### 3. Move full account
+Settings use the supported field list, not a full-account import. PINs, profile ownership, trust permissions, viewing grants and managed time-policy authority stay local. Settings conflicts show **Needs review**; review the versions before choosing **Keep this device** or **Use other device**. A stale review is rejected instead of overwriting a newer change.
 
-Use this only when you want the wider account tree.
+Saved Notes are bound to a profile and exact video ID. Temporary drafts and writer credentials are not sent. Concurrent edits and deletions retain conflict information for review in Notes; there is no silent wall-clock winner.
 
-Examples:
+## Parents: update the intended child profile
 
-- reinstall recovery
-- moving to a new browser
-- full migration
+One family can have multiple parents, children and profiles on each device. Choose the actual source rules profile and receiving child; names are labels, not automatic identity mapping.
 
-This is broader than normal profile sync.
+1. In the parent account, use the child's **Edit Rules** action. The editing banner names that child while the parent remains active.
+2. On the receiving device, open or create the intended protected profile. Use its receive flow to join the parent's pairing session.
+3. Verify the phrase and review both profile/device labels. The receiving parent/caregiver approves the initial managed relationship.
+4. Send an approved protected update. **Apply Once** is separate from saving a parent link for future matching updates.
+5. To enable parent Auto-sync, choose the verified child connection and explicitly **Turn on Auto-sync** with fresh parent authorization.
 
-## What the relay does
+Automatic parent dispatch also needs the receiver's saved auto-apply permission and readiness for that exact confirmed session. Enabling it on the sender does not change receiver permissions. **Standard parent control** permits easier later updates under its saved policy; **Strict child protection** requires the stricter reconnect/local approval policy.
 
-The relay is only the meeting place.
+Approved managed scopes include Main rule lists/mode, Kids-owned rules/mode and supported Kids filter groups, plus viewing access and normalized time limits **only when those separate scopes were approved**. Current managed grants do not cover every general child preference toggle, Main filter group or child Notes. Existing grants are not silently expanded. Personal sharing is not a workaround for child restrictions.
 
-It helps both devices:
+A child's switching PIN can open receive-only sync; it cannot unlock parent settings, backups, profile administration or trusted-link policy. Parent/Master unlocks are separate and temporary. Protect parent accounts too, and lock the admin session after editing. Profile protection is not device-wide management: an unmanaged browser/device owner can still disable or uninstall the extension.
 
-- find each other
-- exchange connection setup data
-
-It is **not** meant to be where your FilterTube settings live.
-
-After the secure handshake, the real settings payload is meant to move directly between your devices.
+Daily time usage is per profile and installation. Sending a time-limit policy does not pool usage into one household-wide allowance.
 
 ## Send to a saved device
 
-Open **Account & sync**. Devices appears first, above Profiles and Security.
+Choose the verified recipient tile, then **Send update**. **Rules from** selects the local rules profile; it does not change the fixed receiving profile or trust relationship. A review names the source, recipient and available delivery route before sending.
 
-1. Choose a saved device tile. The tile shows its bound profile and trust state.
-2. Press **Send update**. Choose which local profile’s rules to use if this device
-   has not been linked to a local rules profile yet. Review both profile names
-   and the delivery route.
-3. Confirm the update. FilterTube targets that device link and profile only.
+The recipient picker uses a verified live connection first, then configured healthy Home Pickup, then Internet Pickup. If no route is available, reconnect with a fresh pairing code. A saved tile does not prove that the device is online.
 
-**Rules from** on the selected device lets you change the local rules profile.
-The verified receiving profile stays fixed; choosing rules never changes that
-trust relationship. Local and receiving profiles may have different IDs.
+For an ordinary personal saved device, **Connect device** establishes a fresh session. Copy once and personal Auto-sync remain separate choices.
 
-The picker chooses one available route: a verified live connection first, then
-configured Home Pickup, then Internet Pickup. A service whose last health check
-failed is skipped. The review names the route before sending. A saved device is
-not necessarily online; if no route is available, reconnect it with a fresh code.
-Pickup means the device must collect the update. Its receipt reports whether
-the update was applied or rejected; the receipt is not a separate cryptographic
-signature from the receiving device.
+This resembles selecting a recipient in a sharing app, but **it is not an open torrent swarm**. Updates are not seeded to unrelated peers.
 
-For your own saved device, **Connect device** opens a fresh pairing session.
-Personal sharing copies the currently open profile once; it does not enable
-continuous background sync or create parent control.
+## Offline, reconnect and conflict states
 
-This is similar to choosing a recipient in a file-sharing app, but it is not an open torrent swarm. FilterTube never treats network visibility as permission, and it never sends one device's update to unrelated peers.
+**The browser cannot deliver directly to a device that is offline.** Direct Auto-sync needs **both Accounts & Sync pages open and connected**. Offline changes remain in a bounded local queue and resume after an authorized verified connection is re-established.
 
-The browser cannot deliver directly to a device that is offline. Internet Pickup therefore stores only an encrypted, signed envelope until the already-verified device checks in. The provider cannot read the rules, choose a profile, grant itself trust, or apply the update.
+Refresh or closing the page ends the live session; saved trust, permitted links and queued changes persist. Reconnect/pair again as required, matching the phrase and any saved approval policy. Merely restoring Wi-Fi or opening a browser does not automatically rendezvous saved peers. Background alarms can ask an existing dashboard to check eligible work; they do not create a hidden transport or wake a closed browser.
 
-If you want to inspect the public relay endpoint yourself, open:
+| State | Meaning |
+| --- | --- |
+| **Off** | This Auto-sync enrollment is not enabled. |
+| **Waiting for device / confirmation** | Connection, reciprocal setup or receiver readiness is still needed. |
+| **Paused** | Profile, authority, permission, storage or connection conditions need attention. |
+| **Needs review** | A conflict or invalid/oversized update needs a deliberate decision. |
+| **Up to date** | The current exchange has completed under its protocol; verify received contents during testing. |
 
-- [https://nanah-signaling.varshney-devansh614.workers.dev/](https://nanah-signaling.varshney-devansh614.workers.dev/)
-- [https://nanah-signaling.varshney-devansh614.workers.dev/privacy](https://nanah-signaling.varshney-devansh614.workers.dev/privacy)
+Queued, sent, received and applied are different stages. Parent-policy delivery receipts retain their existing trust model; they are not newly signed receiver attestations. Turning Auto-sync off removes its matching local enrollment and pending work, not changes already applied on another device.
 
-## Add a device
+## Connection services and optional pickup
 
-- **Add with code or QR** opens the pairing controls. Use the four-character code
-  on the receiving device, or choose **Scan QR** to read the sender’s QR with a
-  camera. **Read QR image** accepts a local PNG, JPEG, or WebP screenshot.
-- The QR reader fills the pairing code; choose **Join Session** to connect. Images
-  and camera frames are decoded locally. Closing the scanner, leaving the page,
-  or hiding the tab stops camera use. Manual code entry remains available for TVs
-  and devices without a camera.
-- **Find nearby** searches for two minutes. On the other device, choose **Receive nearby**, which makes it visible for three minutes. Nearby selection
-  needs the optional FilterTube helper running on both computers on the same
-  network. Being on the same Wi-Fi alone does not make extension devices appear.
-- A nearby device must still pair and show the same safety phrase. Saved devices
-  appear separately from nearby results; helper availability never proves that
-  a saved device is currently on the network.
+| Path | What the service can see | Limit |
+| --- | --- | --- |
+| **Direct Nanah** | Signaling/STUN services handle connection setup metadata. Payloads use the encrypted peer connection. | Current extension has STUN, no configured TURN relay. Restrictive NAT/firewalls can prevent connection. |
+| **Home Pickup** | The explicitly configured trusted home/school service receives signed policy contents and must be trusted with them. | This is not automatic Wi-Fi discovery or an encrypted-at-rest mailbox guarantee. |
+| **Internet Pickup** | It stores only an encrypted, signed envelope for an already approved parent/child route. Connection/delivery metadata can remain visible. | The provider cannot read the rules, choose a profile, grant itself trust, or apply the update. The receiver must collect and validate it. |
 
-**Connection options and help** contains transport and support details. The
-rings animate only during a bounded search, respect reduced motion, and do not
-represent physical distance. Device buttons support touch, Tab, and directional
-keys. Selecting a device moves focus to its next action; Escape returns to the
-device tile. Background polling never moves focus into the review.
+Pickup is separately configured for approved parent updates. It is not the delivery path for personal settings/Notes Auto-sync, and does not guarantee background delivery whenever a device goes online.
 
-## Profiles in a family
+For a separately configured pickup provider:
 
-One device can contain several profiles, and a family can have several parents
-and children. Choose both the local rules profile and the receiving profile in
-the device review. Two profiles on one device remain separate recipients.
+```bash
+FILTERTUBE_PROVIDER_HOST=0.0.0.0 \
+FILTERTUBE_PROVIDER_STORE=.filtertube/managed-delivery-store.json \
+npm run managed:provider
+```
 
-**Switch** opens a profile. **Edit Rules** lets an authorized parent edit a child
-while staying in the parent account. **Profile options** keeps viewing access,
-time limits, PINs, history, rename and deletion available. Saving here changes
-this device; sending an update is a separate action.
+Home Pickup uses your trusted LAN endpoint, such as `http://<computer-lan-ip>:8787/filtertube`. Internet Pickup requires your own trusted HTTPS setup and the relevant authorization/configuration; starting the local command alone does not establish a secure public service. The `/filtertube` status page omits rule contents, PINs, keys and profile policy.
 
-A parent can rename or delete their own child profile after approval. An account
-with children cannot be deleted until those dependencies are resolved. Deleting
-a local profile does not delete other devices or their saved profiles.
+[Public signaling service](https://nanah-signaling.varshney-devansh614.workers.dev/) · [Signaling privacy](https://nanah-signaling.varshney-devansh614.workers.dev/privacy) · [Nanah project](https://github.com/varshneydevansh/nanah)
 
-Set the Master PIN and protect each parent account if children should not be
-able to select those accounts freely. A child's switching PIN alone does not
-protect a PIN-free parent. This pass keeps the existing optional PIN policy.
+## Unlinking, backup and recovery
 
-## What FilterTube does not need
+- PINs stay local; a required local unlock does not send the PIN across Nanah.
+- Normal/plain exports exclude the saved trust graph. Trusted-link recovery belongs to the explicit encrypted full-account recovery path; do not casually clone one device's identity to another.
+- Private extension Notes, Auto-sync grants/keys and pending queues are not ordinary backup payloads. A notes-bearing native app backup is not an interchangeable extension restore.
+- Removing trust, changing keys/scope/ownership or revoking consent invalidates affected pending work. Unlink/re-pair does not revive old Auto-sync consent.
+- A failed link removal reports a storage error. The open page blocks that link, but saved permission may remain after reload until removal succeeds. Retry before treating removal as permanent.
+- After successful link removal, reload before fresh pairing. Legacy links with mismatched endpoint identities require explicit removal on both devices, reload and re-pair. Other profiles and working links remain separate.
 
-For live device-to-device transfer, FilterTube does not need:
+## Current verification and troubleshooting
 
-- a central sync account
-- a readable cloud copy of your Nanah settings
-- a server in the middle reading your lists
+If a change does not arrive, check the profile mapping, matching phrase, both open/connected pages, reciprocal consent, selected data area and receiver permissions. Read **Needs review** rather than repeatedly sending. Use **Check now** when eligible and the collapsed connection/support controls for redacted evidence; do not share PINs, keys or private Notes.
 
-The goal is device-to-device transfer, with encrypted store-and-forward only when a verified device must collect an update later.
+Automated two-endpoint tests and isolated real WebRTC fixtures exercise settings, rules, Notes, offline reconstruction, conflicts, persistence failures and revocation. They are not two installed devices. Installed two-Chrome-profile pairing and offline reconnect are still open, along with physical LAN/separate-network and native interoperability acceptance. Android development has related adoption work; older app/TV builds are not assumed compatible.
 
-## What trust means
-
-Trust does **not** mean:
-
-- hidden background sync
-- always-on streaming
-- your devices stay permanently connected
-
-Trust means:
-
-- remember this relationship
-- remember the allowed scope
-- remember the target and apply policy
-- make the next live session easier
-
-## What happens after refresh
-
-Refreshing the page ends the live session.
-
-That is normal.
-
-What stays saved:
-
-- trusted links
-- saved policy
-- saved device identity
-
-What does not stay alive:
-
-- the current live connection
-
-So after refresh:
-
-- you start a new session
-- you do not rebuild trust from zero
-
-## Do kids always need to press Allow?
-
-No.
-
-Current rule:
-
-- first managed parent -> protected-profile connection may need one local parent/caregiver approval on the protected device
-- after that, the protected user does **not** always need to press allow
-
-Whether the protected device stops for approval later depends on the saved managed-link policy:
-
-- `standard parent control`
-  - easier later updates
-- `strict child protection`
-  - more approval steps on the protected device
-
-## Do PINs get sent?
-
-No.
-
-PINs stay local.
-
-Nanah may require a local unlock on the sending or receiving device, but the PIN itself is not sent across Nanah.
-
-## Protected profile rules
-
-Current rule is profile-based, not whole-device based.
-
-That means:
-
-- if the active profile in the Nanah UI is a protected profile, that surface is receive-only
-- the protected-profile PIN can open receive-only Accounts & Sync for that protected profile
-- the protected-profile PIN does not unlock Dashboard, Filters, Kids Mode editing, Settings, backups, trusted-link policy, or profile management
-- parent/account PIN controls rule edits, sync policy, backups, and viewing-space policy
-- protected profiles are not full admin surfaces
-
-## Remote target profile
-
-If you are doing parent control, use `Remote target profile`.
-
-This lets the sender choose exactly which profile on the other device should receive the update.
-
-That is the safe way to avoid sending to the wrong active profile.
-
-## Profile + device labels
-
-During a live session, FilterTube shows each side as profile plus device.
-
-Example:
-
-- `pushkal (account profile, locked) • Pixel Tablet`
-- `pussy (protected profile) • Family iPad`
-
-This is only display context. The editable device label remains just the device name, but the status area shows the active profile too so you can verify the target before sending or applying settings.
-
-## Parent-managed protected-profile rules
-
-Parents and caregivers should edit protected-profile rules from the parent/account surface.
-
-Use **Edit Rules** on the protected profile row in Accounts & Sync. A Kids-only
-profile opens its Kids rules; profiles with Main access open their Main rules.
-The editing banner keeps that child as the target while the parent remains
-active. **Profile options** contains the other maintenance controls.
-
-This lets teenagers, younger kids, or other protected users keep their own profile identity while the parent/caregiver keeps control over the rule list and policy.
-
-## Backups and trusted links
-
-Normal/plain exports do **not** include the saved Nanah trust graph.
-
-Trusted-link recovery is only part of the encrypted full-account recovery path.
-
-That is intentional.
-
-If saving or removing a device link fails, FilterTube reports the storage error
-rather than confirming success. A failed removal blocks that link in the open
-page, but its saved permission can remain after reload until removal succeeds.
-Retry the removal before treating it as permanent.
-
-After successfully removing a link, reload the page before pairing that device
-again. Older links whose two ends saved different identities require explicit
-removal on both devices, then reload and fresh pairing. Other profiles and
-working saved links are retained.
-
-## What nearby and verified mean (current behavior)
-
-The device map may show a nearby FilterTube device, but nearby only means that
-the device can be discovered or invited. It does not authorize a settings
-transfer.
-
-For a parent-managed update, FilterTube also checks:
-
-- the saved trusted device link;
-- the intended protected profile on that device;
-- the signed revision and revocation state; and
-- the delivery receipt from the native/runtime owner.
-
-The same target binding is retained for an update collected later through Home
-Pickup or Internet Pickup. Internet Pickup stores an encrypted signed envelope
-whose rules the provider cannot read. Home Pickup sends the signed rules to
-your configured home service, so that service must be trusted with their
-contents. Neither service can choose a receiving profile or grant itself trust.
-
-If a source/build note says that managed delivery is synchronized, that means
-the policy was accepted by the intended runtime boundary. It does not by itself
-prove that two installed devices completed a live transfer; that still needs a
-device-level smoke test.
-
-## Open project
-
-Nanah is open here:
-
-- [https://github.com/varshneydevansh/nanah](https://github.com/varshneydevansh/nanah)
+- [Auto-sync scope, implementation and evidence](design/device-sync/AUTO-SYNC-2026-10-24.md)
+- [Installed acceptance checklist](NANAH_MANAGED_LINK_QA.md)
+- [Profiles and PIN model](PROFILES_PIN_MODEL.md)
+- [Current concerns and remaining work](NANAH_POST_IMPLEMENTATION_CONCERNS_TRACKER.md)

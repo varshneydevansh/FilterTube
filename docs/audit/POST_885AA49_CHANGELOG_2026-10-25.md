@@ -155,3 +155,15 @@ all supported browser options remain. Downloads gets matching platform surfaces,
 secondary manual-build links and readable dark-mode scenery. Mobile cards use
 full-width copy and compact icons; download bounds fit without hidden clipping.
 The homepage hero, feature information, install URLs and availability remain.
+
+## README and Nanah documentation refresh after `b1f08c91`
+
+The user requested a current project introduction rather than repeated release
+highlights. README now leads with Android/browser availability, reuses the
+website's Android, extension and iPhone preview assets, lists current features
+and explains child PINs, parent-side editing and deliberately enabled verified
+P2P/Auto-sync. History stays in CHANGELOG.md. The Nanah user guide, concerns,
+project checkpoint, acceptance checklist and Auto-sync status were aligned
+without changing runtime code or claiming installed/native completion.
+
+[Change rationale, exact scope and checks](README_SYNC_DOCS_REFRESH_2026-10-26.md).

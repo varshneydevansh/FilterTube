@@ -1,5 +1,28 @@
 # Nanah Post-Implementation Concerns Tracker
 
+## Current status — 26 October 2026
+
+The original rows below describe implemented checkpoints, not a release approval.
+`Done` means the stated code/UX behavior exists; installed browser, network and
+native acceptance can still be open. The current extension adds device-first
+selection, staged pairing and explicitly opted-in managed/personal Auto-sync.
+Read the [updated user guide](NANAH_USER_GUIDE.md) and
+[Auto-sync scope](design/device-sync/AUTO-SYNC-2026-10-24.md) first.
+
+| Area | Implementation | Remaining acceptance or gap |
+| --- | --- | --- |
+| Device selection / staged pairing | Saved/nearby recipients, one next action, code/QR, phrase confirmation and scoped review. | Installed QR/camera, keyboard and multi-profile flow with final package. |
+| Parent Auto-sync | Opt-in approved policy scopes; fixed child/device; receiver auto-apply/readiness and parent authority retained. | Two installed endpoints, reconnect, lock/switch/revoke and saved receiver data. General child toggles and child Notes remain outside current managed scopes. |
+| Personal Auto-sync | Reciprocal account-profile grants; settings/rules and Notes choices; conflict review. | Both installed approvals, simultaneous setup, edits/deletes, stale review and multiple dashboards. |
+| Offline recovery | Durable bounded queue, generation/revision binding, readback before Applied and retry after a verified reconnect. | Installed restart and lost receipts; automatic saved-peer rendezvous/closed-browser delivery is not implemented. |
+| Nearby / networks | Optional discovery helper and current STUN-based direct connection. | Physical LAN/separate-network/NAT testing; same Wi-Fi is not trust; no TURN configured. |
+| Optional pickup | Trusted Home service receives signed rule contents; Internet Pickup stores encrypted signed envelopes for approved managed routes. | Provider/network acceptance; not personal Notes/settings Auto-sync or universal background delivery. |
+| Native adoption | Related Android development work exists. | Extension↔app acceptance and TV/iOS capability/focus/background validation remain independent. |
+
+The earlier “no desktop blockers” conclusion is superseded by these gates. Reload
+alone is not pairing or sync proof. Keep sent/received/applied distinct and do not
+expand trust because a device appears nearby.
+
 ## Purpose
 
 This document captures the concerns raised after the original Nanah `Implementation decisions required next` phase.
@@ -54,7 +77,7 @@ These are not just "Nanah v1 leftovers."
 | Trusted devices should persist even if the live session ends | `Done` | Trusted links persist in local extension storage. | Consider future reconnect shortcuts; do not imply live-session persistence. |
 | Reconnect after refresh feels unclear | `Done` | Docs now explain that refresh ends live pairing while trust remains saved, and trusted-device cards expose `Start New Session` with an explicit “uses saved trust and policy” hint. | Preserve the explicit fresh-session wording in future clients. |
 | Need clarity on whether relay compute stays active forever | `Done` | Docs now state the relay is intended for short-lived signaling and low-duty coordination only. | Later optimize immediate signaling shutdown if needed. |
-| Saved trust looked like it might mean always-on parent -> child sync | `Done` | UI/docs now explicitly state trusted links remember policy for later live sessions only; they do not keep a background connection alive. | Keep this wording explicit in future mobile/native clients too. |
+| Saved trust looked like it might mean always-on parent -> child sync | `Done` | Saved trust remembers policy. Auto-sync is a separate opt-in using a verified live connection; trust alone does not enroll a profile or keep a background connection alive. | Keep this wording explicit in future mobile/native clients too. |
 | Need a practical reconnect shortcut after trust | `Done` | Trusted-device cards now expose `Start New Session`, which starts a fresh live session with the saved role/policy defaults. Managed links also persist `fast` vs `approval-needed` reconnect policy. | Keep future reconnect work explicit instead of drifting into hidden background sync. |
 | Approval-needed reconnect needed to be enforced on the replica side | `Done` | Managed source -> replica links with `approval-needed` now block incoming managed updates until the replica approves that reconnect for the current session. | Preserve this as the child-safe reconnect path. |
 | Sender needed to see the same saved managed link after the receiver approved it | `Done` | First managed `Apply + Save Parent Control` now mirrors the managed-link record back to the sender side as well, so both devices keep the same saved relationship. | Keep source/replica trust records symmetric for later fresh-session UX. |
@@ -98,7 +121,7 @@ These are not just "Nanah v1 leftovers."
 
 | Concern | Current status | Current state | Next action |
 | --- | --- | --- | --- |
-| Sending profile `B` to a device currently active on profile `A` was ambiguous | `Done` | Docs/UI now state that v1 non-`full` sync applies to the receiver's current active profile only. | Keep warning users before send when remote active profile differs. |
+| Sending profile `B` to a device currently active on profile `A` was ambiguous | `Done` | Legacy one-time copies use the reviewed receiver profile. Current managed and personal Auto-sync bind an explicit approved profile/device mapping and cannot fall back to an unrelated active profile. | Keep warning users before send when remote active profile differs. |
 | Need explicit remote profile mapping so `B -> B` works across devices with multiple profiles | `Done` | Managed `source -> replica` links on the receiving device can now choose `Current active profile` or `Always this local profile`. The fixed option pins the link to a specific local profile so later updates can land in `B` even if some other profile is active when the session reconnects. | Keep the model explicit and local; do not add automatic same-name guessing across devices. |
 | Need sender visibility into the receiver's current active profile | `Done` | Live Nanah hello/session UI now surfaces the receiver's active profile context. Managed replica links also expose a fixed receiver-side target during the live session when that link pins one local profile. | Preserve this in future mobile/native implementations. |
 | Parent/source needed to choose a remote child profile directly instead of relying only on the receiver's active profile | `Done` | Live sessions now exchange remote profile inventory and expose a sender-side `Remote target profile` picker so parent/source can aim a sync at a specific remote profile during the session. | Later simplification pass should hide this inside a clearer parent-control flow instead of exposing it as a raw sync control. |
@@ -166,4 +189,9 @@ This is the short practical list:
 
 ## 12. Recommended next implementation order
 
-Current desktop checkpoint complete. No remaining desktop v1 blockers remain for the guided parent/peer flows. Post-checkpoint work is now intentional future refinement, not missing core behavior.
+Implementation exists, but release acceptance remains open. Complete the installed
+managed and personal scenarios in [the QA checklist](NANAH_MANAGED_LINK_QA.md),
+then physical LAN/separate-network and native interoperability tests. Keep broader
+historical suite failures visible; neither a provider health check nor the
+website illustration closes these gates. Automatic peer rendezvous and wider
+managed scopes require separate design/consent work.

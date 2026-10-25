@@ -1,0 +1,122 @@
+{
+  "scope": "Documentation and existing documentation assertions; no application runtime source changed",
+  "source_pins": [
+    {
+      "file": "README.md",
+      "lines": 185,
+      "bytes": 17131,
+      "sha256": "043d9927830923d24d3b8ab885c6a9eb9aa4e274035aca6606a4a6885aa448f3"
+    },
+    {
+      "file": "docs/NANAH_USER_GUIDE.md",
+      "lines": 143,
+      "bytes": 13253,
+      "sha256": "e2e16cd08f3d8a50623b11e9974d2c2531041e3df03fad5b0647bf7b6c302cc1"
+    },
+    {
+      "file": "docs/NANAH_MANAGED_LINK_QA.md",
+      "lines": 215,
+      "bytes": 9512,
+      "sha256": "fde19ee817241f6153714d4fde8127c542b31de85b3aaf8e9e6e6da6e615fd09"
+    },
+    {
+      "file": "docs/NANAH_P2P_PROJECT_PLAN.md",
+      "lines": 511,
+      "bytes": 17318,
+      "sha256": "41ced3e4a703ed01dbe7083debf4e017316639a91cfd1f1d93c00cf59b54d12e"
+    },
+    {
+      "file": "docs/NANAH_POST_IMPLEMENTATION_CONCERNS_TRACKER.md",
+      "lines": 197,
+      "bytes": 19862,
+      "sha256": "c5eaaa01c831dc91697a7f2af998af5d6bbb847980320385638ddfe76084be83"
+    },
+    {
+      "file": "docs/design/device-sync/AUTO-SYNC-2026-10-24.md",
+      "lines": 130,
+      "bytes": 18770,
+      "sha256": "451236d891f29b3e4c83412d906da50d2887f8b0f5ec94257ed9e03713b1e8e3"
+    }
+  ],
+  "links_and_images": {
+    "local_references": 48,
+    "missing": [],
+    "readme_before_lines": 459,
+    "readme_after_lines": 185,
+    "images": [
+      {
+        "path": "icons/icon-128.png",
+        "width": 128,
+        "height": 128
+      },
+      {
+        "path": "website/public/apps/screenshots/android-player-settings.png",
+        "width": 1080,
+        "height": 2400
+      },
+      {
+        "path": "website/public/apps/screenshots/android-music-player.png",
+        "width": 1080,
+        "height": 2400
+      },
+      {
+        "path": "website/public/apps/screenshots/android-notes-editor.png",
+        "width": 1080,
+        "height": 2400
+      },
+      {
+        "path": "website/public/apps/screenshots/extension-dashboard.png",
+        "width": 1720,
+        "height": 1261
+      },
+      {
+        "path": "website/public/apps/screenshots/extension-accounts-sync.png",
+        "width": 1718,
+        "height": 1258
+      },
+      {
+        "path": "website/public/apps/screenshots/ios-launcher.png",
+        "width": 1206,
+        "height": 2622
+      },
+      {
+        "path": "website/public/apps/screenshots/ios-filters.png",
+        "width": 1206,
+        "height": 2622
+      }
+    ]
+  },
+  "checks": {
+    "release": {
+      "pass": 742,
+      "fail": 0
+    },
+    "smoke": {
+      "pass": 1482,
+      "fail": 0
+    },
+    "sync_notes_reset_scope": {
+      "pass": 144,
+      "fail": 0
+    },
+    "targeted_documentation": {
+      "pass": 48,
+      "fail": 5,
+      "same_failing_titles_as_before": true,
+      "baseline_failures": [
+        "reference_doc_claim_drift_pins_stale_network_and_kids_claims",
+        "reference_doc_claim_drift_pins_menu_and_dom_overclaims",
+        "tracked public doc claim surface is audit-only and fingerprint pinned",
+        "tracked public docs keep structure and claim-token counts pinned",
+        "tracked public docs remain documentation claims rather than runtime or package authority"
+      ],
+      "limits": "Equal test titles do not establish equal assertion-level coverage within already failing tests; historical public-doc fingerprint/token and identity claim audits remain unresolved."
+    }
+  },
+  "packages": "Chrome Firefox Opera rebuilt locally; current README matches stage/archive checks. Non-interactive build skipped release prompt.",
+  "review": {
+    "qwen3.5-397b": "length-truncated result rejected",
+    "gpt-oss-120b": "completed bounded outline/pitfall proposal; advisory only, transport and platform details verified against code and owner evidence"
+  },
+  "publication": "No push, store submission, upload or deployment"
+}

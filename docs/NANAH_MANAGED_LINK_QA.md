@@ -1,5 +1,17 @@
 # Nanah Managed Link QA
 
+## Current acceptance status — 26 October 2026
+
+This is a checklist, not a completed test report. Automated controlled-peer and
+isolated WebRTC checks exist; two installed Chrome profiles have not completed
+pairing/Auto-sync acceptance. Reloading both extensions does not close this gate.
+Record sender and receiver build, exact source/target profiles, transport, stored
+receiver values, receipts and observed permission failures for each scenario.
+Use disposable test profiles and harmless notes/rules.
+
+The original five manual-link tests remain regression coverage. The Auto-sync
+scenarios below are additional gates. Native/TV acceptance is separate.
+
 ## Purpose
 
 This checklist covers the current high-risk Nanah flows in FilterTube after the managed-link pass.
@@ -134,14 +146,14 @@ Use it before shipping changes to:
 - peer <-> peer still uses receiver-chosen merge/replace
 - untrusted source/replica still remains receiver-reviewed
 - `full` still requires `Default` profile context
-- `main`, `kids`, and `active` still apply into the receiver's current active profile
+- legacy one-time `main`, `kids`, and `active` proposals honor the reviewed receiver profile; managed fixed targets and personal Auto-sync must not fall back to an unrelated active profile
 - Help page still explains managed-link behavior clearly
 
 ## Ship gate
 
 Treat Nanah managed-link changes as ready only if:
 
-1. all five tests pass
+1. all five manual-link tests and the applicable Auto-sync scenarios below pass on installed endpoints
 2. no stale trusted-link data causes contradictory UI
 3. no send/apply path bypasses local unlock requirements
 4. no managed link can be saved without the currently approved incoming scope remaining allowed
@@ -171,3 +183,33 @@ This covers the target-device, keyed-profile, mailbox, and Pickup bindings from
 the July 21 managed-policy commits. It still requires two installed devices;
 source tests or a provider status response are not a substitute for this
 smoke test.
+
+## Auto-sync acceptance additions
+
+For each row, inspect stored receiver contents as well as visible status. Queue or
+send success must not be reported as Applied before persistence is verified.
+
+| Scenario | Required observation | Installed result |
+| --- | --- | --- |
+| Initial state | No automatic enrollment from saving trust; Auto-sync starts off. | Not run |
+| Parent opt-in | Fresh parent authorization; explicit local-rules child → fixed remote child/device; approved scopes only. Receiver permission is unchanged by sender opt-in. | Not run |
+| Parent changes | Main/Kids rule additions/removals and both mode directions; approved viewing/time-policy changes; siblings/PINs/ownership unchanged. | Not run |
+| Receiver readiness | No automatic managed dispatch before exact current-session readiness/auto-apply permission. Strict reconnect approval remains required. | Not run |
+| Personal consent | Active unlocked adult/account profiles, both exact reciprocal approvals, selected settings/rules/Notes areas only. Legacy clients cannot silently enroll. | Not run |
+| Settings | Supported toggle, channel and keyword changes persist on the receiver; exclusions and unrelated profiles remain local. | Not run |
+| Notes | Exact profile/video save, reverse edit, Unicode/timestamp text and deletion; drafts/writer credentials do not transfer. | Not run |
+| Concurrent edits | Settings require review; stale decisions cannot overwrite newer data. Notes retain concurrent edit/delete heads. | Not run |
+| Offline/restart | End the connection, make multiple changes, restart/reopen, then explicitly establish the verified channel. Latest eligible state arrives; network-online alone does not reconnect peers. | Not run |
+| Lost/delayed receipt | Retry does not duplicate mutation or clear a newer queued revision/consent. Show waiting until receipt/application is known. | Not run |
+| Persistence failure | Failed/dropped storage writes do not acknowledge Applied; retry preserves local and queued data. | Not run |
+| Lock/switch/revoke | Expired unlock, profile switching, trust/key/scope changes and unlink invalidate or pause the affected work. No wrong-profile fallback or old-consent resurrection. | Not run |
+| Multiple dashboards | Concurrent receivers/first invitations serialize correctly and require the exact current grant. | Not run |
+| Turn off | Local enrollment/pending payloads stop; already applied remote data is not erased. Manual Send still works separately. | Not run |
+| Scope exclusion | Child general preferences/Main filter groups and child Notes do not escape through a personal grant or broadened managed scope. | Not run |
+| Discovery / networks | Helper absent versus present, nearby untrusted devices, physical LAN and separate restrictive NAT/firewall networks. No false connected/success state. | Not run |
+| Pickup | Home service is trusted with rule contents; Internet envelope is encrypted. Wrong target/revision is rejected and pickup/receipt/application remain distinct. | Not run |
+| Native clients | Actual compatible Android build and independent TV/iOS flows; PIN, background, persistence and focus behavior. No parity inferred from shared names. | Not run |
+
+Current direct extension Auto-sync requires both Accounts & Sync pages open and
+connected. No automatic saved-peer rendezvous or closed-browser wakeup is claimed.
+Parent scope exclusions are recorded in the [Auto-sync contract](design/device-sync/AUTO-SYNC-2026-10-24.md).

@@ -139,14 +139,13 @@ current location register records every present exact occurrence without
 converting ownership language into permission to change runtime behavior.
 
 ```text
-current exact wording occurrences: 102
+current exact wording occurrences: 101
 current broad behavior approval from wording: NO-GO
 runtime behavior changed by this register refresh: no
 ```
 
 | Current reference | Claim class | Current review boundary |
 | --- | --- | --- |
-| `README.md:23` | `release-sync-owner` | Repository/runtime or release-note ownership; native parity still requires source provenance and installed proof. |
 | `docs/APP_RELEASE_AND_RUNTIME_SYNC_WORKFLOW.md:5` | `release-sync-owner` | Repository/runtime or release-note ownership; native parity still requires source provenance and installed proof. |
 | `docs/ARCHITECTURE.md:27` | `release-sync-owner` | Repository/runtime or release-note ownership; native parity still requires source provenance and installed proof. |
 | `docs/ARCHITECTURE.md:41` | `release-sync-owner` | Repository/runtime or release-note ownership; native parity still requires source provenance and installed proof. |
@@ -156,7 +155,7 @@ runtime behavior changed by this register refresh: no
 | `docs/JSON_FIRST_FILTERING_PLAN.md:205` | `misleading-identity-effect-risk` | Field/roster guidance requires route, owner, mode and effect proof; wording alone cannot authorize hiding. |
 | `docs/MOBILE_APP_UI_SPEC.md:43` | `historical-plan` | Planning, checkpoint or downstream proposal; not current runtime, installed-device or store proof. |
 | `docs/MOBILE_APP_UI_SPEC.md:6` | `historical-plan` | Planning, checkpoint or downstream proposal; not current runtime, installed-device or store proof. |
-| `docs/NANAH_POST_IMPLEMENTATION_CONCERNS_TRACKER.md:148` | `historical-plan` | Planning, checkpoint or downstream proposal; not current runtime, installed-device or store proof. |
+| `docs/NANAH_POST_IMPLEMENTATION_CONCERNS_TRACKER.md:171` | `historical-plan` | Planning, checkpoint or downstream proposal; not current runtime, installed-device or store proof. |
 | `docs/NETWORK_REQUEST_PIPELINE.md:6` | `audit-boundary` | Audit/test/workflow wording records evidence or a gate, not runtime permission or completed broad proof. |
 | `docs/TECHNICAL.md:108` | `release-sync-owner` | Repository/runtime or release-note ownership; native parity still requires source provenance and installed proof. |
 | `docs/THREE_DOT_MENU_IMPROVEMENTS.md:58` | `misleading-identity-effect-risk` | Field/roster guidance requires route, owner, mode and effect proof; wording alone cannot authorize hiding. |
@@ -222,6 +221,7 @@ runtime behavior changed by this register refresh: no
 | `docs/audit/POST_3_3_5_CHANGE_LEDGER_2026-08-23.md:39` | `release-sync-owner` | Repository/runtime or release-note ownership; native parity still requires source provenance and installed proof. |
 | `docs/audit/TEST_LANE_MATRIX.md:27` | `audit-boundary` | Audit/test/workflow wording records evidence or a gate, not runtime permission or completed broad proof. |
 | `docs/audit/TEST_LANE_MATRIX.md:47` | `audit-boundary` | Audit/test/workflow wording records evidence or a gate, not runtime permission or completed broad proof. |
+| `docs/audit/artifacts/website-simplification-2026-10-25/post-release-commit-inventory.json:475` | `audit-boundary` | The post-release inventory records an existing audit-test filename; it grants no runtime ownership or behavior authority. |
 | `docs/collab_three_dot_ui_google_aistudio.md:10` | `historical-plan` | Planning, checkpoint or downstream proposal; not current runtime, installed-device or store proof. |
 | `docs/collab_three_dot_ui_google_aistudio.md:275` | `historical-plan` | Planning, checkpoint or downstream proposal; not current runtime, installed-device or store proof. |
 | `docs/filtertube_mobile_runtime_adapter_plan.md:18` | `historical-plan` | Planning, checkpoint or downstream proposal; not current runtime, installed-device or store proof. |
@@ -247,5 +247,3 @@ runtime behavior changed by this register refresh: no
 | `tests/runtime/reference-doc-claim-drift-current-behavior.test.mjs:212` | `audit-boundary` | Audit/test/workflow wording records evidence or a gate, not runtime permission or completed broad proof. |
 | `tests/runtime/stabilization-fix-order-current-behavior.test.mjs:121` | `audit-boundary` | Audit/test/workflow wording records evidence or a gate, not runtime permission or completed broad proof. |
 | `tests/runtime/test-lane-visible-safety-current-behavior.test.mjs:97` | `audit-boundary` | Audit/test/workflow wording records evidence or a gate, not runtime permission or completed broad proof. |
-
-| `docs/audit/artifacts/website-simplification-2026-10-25/post-release-commit-inventory.json:475` | `audit-boundary` | The post-release inventory records an existing audit-test filename; it grants no runtime ownership or behavior authority. |

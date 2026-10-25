@@ -402,3 +402,18 @@ The authorized Help-copy rebuild refreshed only README line-count badges. Earlie
 | File | Lines | Bytes | SHA-256 |
 | --- | ---: | ---: | --- |
 | `README.md` | 459 | 29,423 | `be5578e2af1b8c656f015d309eef229a2d0fae630f4d69d80b61a9963a4944c3` |
+
+## User-requested README refresh — 26 October 2026
+
+The README now leads with Android and browser availability, real development
+screenshots, a current feature table and concise verified-device P2P guidance.
+Version-by-version highlights stay in CHANGELOG.md; line-count badges and
+duplicate install/implementation walkthroughs were removed. Earlier source rows
+remain historical. No runtime, package, store release or native interoperability
+acceptance is implied by this documentation-only change.
+
+| File | Lines | Bytes | SHA256 |
+| --- | ---: | ---: | --- |
+| `README.md` | 185 | 17131 | `043d9927830923d24d3b8ab885c6a9eb9aa4e274035aca6606a4a6885aa448f3` |
+
+Current root metadata totals: 7 files, 3,117 newline counts, and 166,812 bytes. Other root metadata is unchanged.

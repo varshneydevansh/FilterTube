@@ -15,29 +15,38 @@ Nanah should be:
 - **Browser-first** (works inside extensions / websites)
 - **Small + composable** (usable by other projects)
 
-## Current desktop checkpoint
+## Current FilterTube checkpoint — 26 October 2026
 
-FilterTube already ships a working desktop integration for:
+The extension candidate implements device-first selection, staged code/QR pairing,
+safety-phrase verification, saved trust, one-time profile copies, managed parent
+updates and opt-in Auto-sync. Own-account settings/rules and Notes use separately
+approved reciprocal personal links; parent Auto-sync keeps its approved managed
+scopes and fixed child/device target. Queue recovery and conflict review are
+implemented, but they do not supply automatic saved-peer rendezvous.
 
-- short-code and QR pairing
-- SAS verification
-- peer links and managed source/replica links
-- trusted-link persistence
-- sender-side remote target profile selection during a live session
-- receiver-side fixed target profile binding for later managed updates
-- encrypted recovery of trusted-link state for same-device restore
+Direct sync still requires both Accounts & Sync pages open and connected.
+Signaling/STUN help peers meet; no TURN relay is configured. Nearby discovery
+needs the optional helper. Home Pickup trusts the configured service with signed
+policy contents; Internet Pickup stores encrypted signed envelopes. Delivery is
+not authority and receipt is not automatically application.
 
-The major remaining work is no longer the transport core. It is product simplification:
+Source tests and isolated two-endpoint WebRTC evidence exist. Two installed
+Chrome profiles have not completed pairing/offline acceptance; physical LAN,
+separate-network and native interoperability remain open. Android development
+has related adoption work, not a proved extension-to-app session. TV/iOS are not
+implicitly covered. The remaining work includes these acceptance gates, not only
+visual simplification.
 
-- fewer visible controls for ordinary users
-- a clearer `Parent controls child device` guided flow
-- advanced policy knobs hidden until needed
+Use these current entry points before the original proposals below:
 
-Related docs in this repo:
+- [User guide](NANAH_USER_GUIDE.md)
+- [Auto-sync contract and scope](design/device-sync/AUTO-SYNC-2026-10-24.md)
+- [Concerns and acceptance tracker](NANAH_POST_IMPLEMENTATION_CONCERNS_TRACKER.md)
+- [Managed/personal acceptance checklist](NANAH_MANAGED_LINK_QA.md)
+- [Profiles and PINs](PROFILES_PIN_MODEL.md)
 
-- `docs/NANAH_USER_GUIDE.md`
-- `docs/NANAH_POST_IMPLEMENTATION_CONCERNS_TRACKER.md`
-- `docs/PROFILES_PIN_MODEL.md`
+The numbered design sections below retain planning history. Proposals for chat,
+file transfer or alternate signaling are not delivered FilterTube features.
 
 ---
 
@@ -67,7 +76,7 @@ So in practice you need **one of these**:
 - **STUN** tells each peer its public-facing network info. Free public STUN servers exist (commonly used).
 - **TURN** relays traffic when direct P2P fails (costly because it carries the data).
 
-**MVP decision:** ship with **STUN only**, no TURN. Nanah works for most home/mobile networks; may fail in strict corporate networks.
+**Current transport:** STUN only, no configured TURN. Direct reachability depends on NAT/firewall conditions; physical home/mobile and restrictive-network acceptance must be measured separately.
 
 ---
 
@@ -75,7 +84,7 @@ So in practice you need **one of these**:
 
 ### 2.1 Key policy decision (recommended)
 
-- **Main YouTube (www.youtube.com)** and **YouTube Kids (www.youtubekids.com)** must be treated as **separate profiles**.
+- **Main** and **Kids** have separate **rule spaces and modes within a profile**. A protected child profile is a different account/authority concept; do not conflate the two.
 - Do **not mix kids channels/keywords** with main YouTube by default.
 
 This is both:

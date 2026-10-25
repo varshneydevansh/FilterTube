@@ -28,9 +28,9 @@ const rootMetadataRows = [
   ],
   [
     "README.md",
-    459,
-    29423,
-    "be5578e2af1b8c656f015d309eef229a2d0fae630f4d69d80b61a9963a4944c3"
+    185,
+    17131,
+    "043d9927830923d24d3b8ab885c6a9eb9aa4e274035aca6606a4a6885aa448f3"
   ],
   [
     "channel-identity-watch-mix-collab-recovery-plan.md",
@@ -126,9 +126,9 @@ test('root package metadata script surface doc is audit-only and fingerprint pin
   assert.match(doc, /optimization, release, dependency, JSON-first, or cleanup implementation work/);
   assert.deepEqual(trackedRootMetadata.sort(), rootMetadataRows.map(([file]) => file).sort());
 
-  assert.equal(rootMetadataRows.reduce((sum, [, lines]) => sum + lines, 0), 3391);
-  assert.equal(rootMetadataRows.reduce((sum, [, , bytes]) => sum + bytes, 0), 179104);
-  assert.match(doc, /7 files, 3,391 newline counts, and\s+179,104 bytes/);
+  assert.equal(rootMetadataRows.reduce((sum, [, lines]) => sum + lines, 0), 3117);
+  assert.equal(rootMetadataRows.reduce((sum, [, , bytes]) => sum + bytes, 0), 166812);
+  assert.match(doc, /7 files, 3,117 newline counts, and\s+166,812 bytes/);
 
   for (const [file, lines, bytes, hash] of rootMetadataRows) {
     assert.equal(newlineCount(file), lines, `${file} newline count drifted`);
@@ -309,11 +309,12 @@ test('root public docs expose release and JSON-first claims that still need pari
 
   assert.match(readme, /version-3\.4\.1-blue\.svg/);
   assert.match(readme, /license-MIT-green\.svg/);
-  assert.match(readme, /total%20lines-[\d.]+k-brightgreen\.svg/);
-  assert.match(readme, /javascript-[\d.]+k%20lines-yellow\.svg/);
+  assert.doesNotMatch(readme, /total%20lines-|javascript-[\d.]+k%20lines/);
+  assert.match(readme, /github\/v\/release\/varshneydevansh\/FilterTube/);
   assert.match(readme, /filtertube\.in\/downloads/);
-  assert.match(readme, /Large Blocklist Matching \(v3\.3\.1\)/);
-  assert.match(readme, /200\+ saved channels do not create renderer-by-renderer scan costs/);
+  assert.match(readme, /Rule matching reuses compiled indexes/);
+  assert.match(readme, /## Features/);
+  assert.doesNotMatch(readme, /## What's New in/);
   assert.match(readme, /JSON-backed surfaces can be filtered before paint/);
   assert.match(readme, /Current audit work is tightening no-rule, route, lifecycle, and resolver budgets/);
   assert.equal(changelog.startsWith('# Changelog\n\n## Unreleased'), true);
