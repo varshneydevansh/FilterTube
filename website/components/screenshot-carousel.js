@@ -2,8 +2,10 @@
 
 import { useEffect, useRef, useState } from "react";
 import { ArrowLeft, ArrowRight, Pause, Play } from "@phosphor-icons/react";
+import { ScreenshotViewer } from "@/components/screenshot-viewer";
 
 export function ScreenshotCarousel({ screenshots, label, layout = "phone" }) {
+  const [viewerIndex, setViewerIndex] = useState(null);
   const browserRail = layout === "browser";
   const noun = browserRail ? "browsers" : "screenshots";
   const viewportRef = useRef(null);
@@ -24,7 +26,7 @@ export function ScreenshotCarousel({ screenshots, label, layout = "phone" }) {
   const [motionOptIn, setMotionOptIn] = useState(false);
   const staticView = screenshots.length < 2 || (reducedMotion && !motionOptIn);
   const status = staticView ? (screenshots.length < 2 ? "1 screen" : "Reduced motion")
-    : paused ? "Paused" : dragging ? "Paused while dragging"
+    : viewerIndex !== null ? "Paused while viewing" : paused ? "Paused" : dragging ? "Paused while dragging"
     : focused && !resume ? "Paused for keyboard"
     : hovered && !resume ? "Paused while reading"
     : visible ? "Playing" : "Ready";
@@ -182,7 +184,7 @@ export function ScreenshotCarousel({ screenshots, label, layout = "phone" }) {
         onPointerUp={() => { dragRef.current = null; setDragging(false); }}
         onPointerCancel={() => { dragRef.current = null; setDragging(false); }}
         onLostPointerCapture={() => { dragRef.current = null; setDragging(false); }}
-        onClickCapture={(event) => { if (suppressClickRef.current) { event.preventDefault(); suppressClickRef.current = false; } }}
+        onClickCapture={(event) => { if (suppressClickRef.current) { event.preventDefault(); event.stopPropagation(); suppressClickRef.current = false; } }}
         onWheel={(event) => {
           if (!staticView && Math.abs(event.deltaX) > Math.abs(event.deltaY)) {
             setPaused(true); setResume(false); seek(position() + event.deltaX);
@@ -202,9 +204,9 @@ export function ScreenshotCarousel({ screenshots, label, layout = "phone" }) {
                       <small>{screenshot.note}</small>
                     </a>
                   ) : <>
-                  <a aria-label={`Open full screenshot: ${screenshot.title}`} className="block rounded-lg" data-screen-index={index} href={screenshot.src} tabIndex={copy ? -1 : undefined} draggable="false">
+                  <button type="button" aria-label={`Open full screenshot: ${screenshot.title}`} className="block w-full cursor-zoom-in rounded-lg" data-screen-index={index} onClick={() => setViewerIndex(index)} tabIndex={copy ? -1 : undefined} draggable="false">
                     <img alt={copy ? "" : screenshot.alt} className="ft-gallery-image rounded-lg border border-[color:var(--color-line)]" draggable="false" height={screenshot.height || 2400} loading="lazy" src={screenshot.src} width={screenshot.width || 1080} />
-                  </a>
+                  </button>
                   <figcaption className="mt-4 text-center">
                     <h3 className="font-display text-base text-[var(--color-ink)]">{screenshot.title}</h3>
                   </figcaption>
@@ -215,6 +217,7 @@ export function ScreenshotCarousel({ screenshots, label, layout = "phone" }) {
           ))}
         </div>
       </div>
+      {viewerIndex !== null && !browserRail ? <ScreenshotViewer screens={screenshots} index={viewerIndex} onNavigate={setViewerIndex} onClose={() => setViewerIndex(null)} /> : null}
     </div>
   );
 }

@@ -300,8 +300,8 @@ The earlier dated tables above remain historical. The authorized change preserve
 | --- | ---: | ---: |
 | Build and sync scripts | 30 | 341 |
 | Website app routes | 9 | 21 |
-| Website components | 19 | 71 |
-| Total | 58 | 433 |
+| Website components | 20 | 74 |
+| Total | 59 | 436 |
 
 | File | Current lexical callables |
 | --- | ---: |
@@ -350,7 +350,7 @@ The earlier dated tables above remain historical. The authorized change preserve
 | `website/components/hero-video.js` | 2 |
 | `website/components/latest-release-assets.js` | 5 |
 | `website/components/marketing-ui.js` | 5 |
-| `website/components/p2p-sync-explainer.js` | 2 |
+| `website/components/p2p-sync-explainer.js` | 3 |
 | `website/components/reveal.js` | 1 |
 | `website/components/route-content.js` | 0 |
 | `website/components/scene-controller.js` | 5 |
@@ -358,6 +358,7 @@ The earlier dated tables above remain historical. The authorized change preserve
 | `website/components/scenic-illustration.js` | 3 |
 | `website/components/scenic-tones.js` | 1 |
 | `website/components/screenshot-carousel.js` | 9 |
+| `website/components/screenshot-viewer.js` | 2 |
 | `website/components/site-data.js` | 0 |
 | `website/components/site-footer.js` | 2 |
 | `website/components/site-header.js` | 3 |

@@ -51,6 +51,7 @@ const accountedFiles = [
   "website/app/terms/page.js",
   "website/components/app-screen-stack.js",
   "website/components/screenshot-carousel.js",
+  "website/components/screenshot-viewer.js",
   "website/components/p2p-sync-explainer.js",
   "website/components/latest-release-assets.js",
   "website/components/browser-logo-rail.js",
@@ -253,7 +254,7 @@ const expectedCounts = new Map([
   ],
   [
     "website/components/p2p-sync-explainer.js",
-    2
+    3
   ],
   [
     "website/components/reveal.js",
@@ -282,6 +283,10 @@ const expectedCounts = new Map([
   [
     "website/components/screenshot-carousel.js",
     9
+  ],
+  [
+    "website/components/screenshot-viewer.js",
+    2
   ],
   [
     "website/components/site-data.js",
@@ -452,9 +457,9 @@ test('build/website callable counts match the current lexical source surface', (
     assert.equal(count, expectedCounts.get(file), `${file} callable count drifted`);
   }
 
-  assert.equal(total, 433);
+  assert.equal(total, 436);
   assert.match(auditDoc, /\| Build and sync scripts \| 30 \| 341 \|/);
-  assert.match(auditDoc, /\| Total \| 58 \| 433 \|/);
+  assert.match(auditDoc, /\| Total \| 59 \| 436 \|/);
 
   const build = read('build.js');
   const buildRows = buildMethodRows();

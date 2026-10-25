@@ -1,10 +1,12 @@
 "use client";
 
 import { useState } from "react";
-import { ArrowUpRight } from "@phosphor-icons/react";
+import { ArrowsOut } from "@phosphor-icons/react";
+import { ScreenshotViewer } from "@/components/screenshot-viewer";
 
 // Hallmark · pre-emit critique: P5 H4 E4 S5 R5 V4
 export function AppScreenStack({ screens, label, layout = "phone" }) {
+  const [viewerIndex, setViewerIndex] = useState(null);
   const [selected, setSelected] = useState(0);
   const [preview, setPreview] = useState(null);
   const [failed, setFailed] = useState({});
@@ -22,7 +24,7 @@ export function AppScreenStack({ screens, label, layout = "phone" }) {
             data-front={current === index}
             key={screen.src}
             onBlur={() => setPreview(null)}
-            onClick={() => setSelected(index)}
+            onClick={() => { setSelected(index); setViewerIndex(index); }}
             onFocus={() => setPreview(index)}
             onPointerEnter={(event) => {
               if (event.pointerType === "mouse") setPreview(index);
@@ -61,12 +63,13 @@ export function AppScreenStack({ screens, label, layout = "phone" }) {
           ))}
         </div>
         {!failed[current] ? (
-          <a className="mt-3 inline-flex min-h-11 items-center gap-2 text-xs underline underline-offset-4" href={screens[current].src}>
+          <button type="button" className="mt-3 inline-flex min-h-11 items-center gap-2 text-xs underline underline-offset-4" onClick={() => setViewerIndex(current)}>
             View full screen: {screens[current].title}
-            <ArrowUpRight aria-hidden="true" size={14} />
-          </a>
+            <ArrowsOut aria-hidden="true" size={14} />
+          </button>
         ) : null}
       </figcaption>
+      {viewerIndex !== null ? <ScreenshotViewer screens={screens} index={viewerIndex} onNavigate={setViewerIndex} onClose={() => setViewerIndex(null)} /> : null}
     </figure>
   );
 }

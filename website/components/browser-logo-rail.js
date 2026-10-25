@@ -38,6 +38,7 @@ export function BrowserLogoRail({
             rel={browser.internal ? undefined : "noreferrer"}
             target={browser.internal ? undefined : "_blank"}
           >
+            <span className="ft-browser-logo h-8 w-8 shrink-0 overflow-hidden">
             <img
               alt={`${browser.name} logo`}
               className="h-8 w-8 shrink-0 object-contain"
@@ -45,6 +46,7 @@ export function BrowserLogoRail({
               src={browser.logo}
               width="32"
             />
+            </span>
             <div className="min-w-0 flex-1">
               <p className="text-sm font-semibold">{browser.name}</p>
               <p

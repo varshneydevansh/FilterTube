@@ -26,7 +26,7 @@ export const docsHref =
   "https://github.com/varshneydevansh/FilterTube/tree/master/docs";
 
 export const githubHref = "https://github.com/varshneydevansh/FilterTube";
-export const redditHref = "https://www.reddit.com/r/FilterTube/";
+export const redditHref = "https://www.reddit.com/r/FilterTubeApp/";
 export const downloadsHref = "/downloads";
 export const androidPlayStoreHref =
   "https://play.google.com/store/apps/details?id=com.filtertube.app";

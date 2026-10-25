@@ -579,3 +579,56 @@ checks pass. Fourteen served routes and their internal links resolve; the
 pre-existing Terms page missing H1 remains recorded by the route audit. Local
 browser checks cover the new P2P steps, keyboard focus, dark mode, 320px bounds,
 carousel playback/controls and reduced motion. Nothing was pushed or deployed.
+
+## Automatic P2P walkthrough and same-page screenshots after `ddc40102`
+
+The P2P diagram previously advanced only when the user selected a step. It now
+cycles Connect → Choose → Share every six seconds while visible, with a Pause/Play
+control. Selecting a step pauses the cycle so the caption can be read. Keyboard
+focus within the steps also pauses it. Timers stop when offscreen, the document
+is hidden, or reduced motion is requested; listeners and timers are removed on
+unmount. Automatic captions use aria-live=off to avoid repeated announcements.
+Manual captions remain polite. The note now explicitly describes enabled
+Auto-sync between verified devices, the direct-sync requirement that both devices
+are open, and the existing testing status. This is a website illustration, not
+a change to the sync engine or a claim of background delivery. The Animation
+Designer skill guided this change without adding a runtime dependency.
+
+Homepage browser-panel Android and iOS logos had transparent padding in their
+source artwork. Their fixed 32px shells now clip scoped scaling of 2.2× Android
+and 1.8× iOS, matching the visible weight of the browser logos. Source images,
+links and layout remain; the Downloads logo correction is unchanged.
+
+Hero screenshots and gallery screenshots previously navigated to the image URL.
+They now open a shared native dialog in the same page, with the existing image
+URL, caption, close control, previous/next controls and arrow-key navigation.
+Escape closes the dialog, native modal focus stays inside, and closing restores
+focus to the opener without scrolling. Background scrolling and carousel motion
+are paused while viewing. Tapping the hero image opens the viewer; hover still
+brings a rear screenshot forward. A suppressed drag cannot open the viewer.
+Browser installation links remain ordinary links. The image URL does not add a
+cache-busting query or fetch call: the browser can reuse an already cached image,
+but a zero-network-request guarantee would depend on browser cache state.
+
+All shared website Reddit community links now target r/FilterTubeApp. The direct
+link to an older feedback post remains a historical source link.
+
+Browser observations include an automatic P2P change from step 0 to step 2, an
+explicit pause holding step 2 across observations, reduced motion disabling the
+cycle, offscreen data-running=false, and loaded larger app logos. The extension
+hero and dashboard gallery opened a same-page viewer, keyboard ArrowRight changed
+Keywords to Channels, and Escape restored focus to the original Keywords button
+with body scrolling restored. At 375px, the Android viewer stayed within x=7.5 to
+367.5 and y=35.2 to 776.8; its screenshot remained contained without page overflow.
+Production build and verification receipts are kept alongside the screenshots.
+No extension/native runtime changes, push, publishing or deployment are included.
+
+Final viewer check: Shift+Tab from Close wraps to Next; Tab from Next wraps to
+Close. A specific native keyboard boundary initially moved focus to browser
+chrome, so the dialog now handles both boundaries explicitly. Escape still
+closes and restores the opener. With network observation enabled after the
+page's images loaded, opening Keywords produced zero requestWillBeSent events
+and kept the extension page URL. This is an observed cached-browser result,
+not a guarantee for uncached or previously unseen screenshots. No browser
+network overrides were left enabled. Final build, 18 focused, 742 release and
+1,482 smoke checks pass. The local server remains running on port 3108.

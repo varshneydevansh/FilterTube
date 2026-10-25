@@ -29,6 +29,11 @@ export function P2PSyncExplainer({ className = "" }) {
   const [step, setStep] = useState(0);
   const [onScreen, setOnScreen] = useState(false);
   const [pageVisible, setPageVisible] = useState(true);
+  const [reducedMotion, setReducedMotion] = useState(true);
+  const [paused, setPaused] = useState(false);
+  const [focused, setFocused] = useState(false);
+  const playbackRef = useRef(null);
+  const running = onScreen && pageVisible && !reducedMotion && !paused && !focused;
   const figureRef = useRef(null);
   const id = useId().replace(/[^a-zA-Z0-9_-]/g, "");
   const captionId = `${id}-caption`;
@@ -38,6 +43,10 @@ export function P2PSyncExplainer({ className = "" }) {
 
   useEffect(() => {
     const updateVisibility = () => setPageVisible(!document.hidden);
+    const preference = window.matchMedia("(prefers-reduced-motion: reduce)");
+    const updatePreference = () => setReducedMotion(preference.matches);
+    updatePreference();
+    preference.addEventListener("change", updatePreference);
     updateVisibility();
     document.addEventListener("visibilitychange", updateVisibility);
     let observer;
@@ -54,15 +63,25 @@ export function P2PSyncExplainer({ className = "" }) {
       setOnScreen(true);
     }
     return () => {
+      preference.removeEventListener("change", updatePreference);
       observer?.disconnect();
       document.removeEventListener("visibilitychange", updateVisibility);
     };
   }, []);
 
+  useEffect(() => {
+    if (!running) return undefined;
+    const timer = window.setTimeout(() => setStep((current) => (current + 1) % STEPS.length), 6000);
+    return () => window.clearTimeout(timer);
+  }, [running, step]);
+
   return (
     <figure
       className={`p2p-figure ${className}`}
-      data-running={onScreen && pageVisible ? "true" : "false"}
+      data-running={running ? "true" : "false"}
+      data-step={step}
+      onFocusCapture={(event) => setFocused(event.target !== playbackRef.current)}
+      onBlurCapture={(event) => { if (!event.currentTarget.contains(event.relatedTarget)) setFocused(false); }}
       ref={figureRef}
       aria-labelledby={titleId}
     >
@@ -246,17 +265,24 @@ export function P2PSyncExplainer({ className = "" }) {
             key={label}
             aria-pressed={step === index}
             aria-controls={captionId}
-            onClick={() => setStep(index)}
+            onClick={() => { setPaused(true); setStep(index); }}
           >
             <span aria-hidden="true">{index + 1}</span>
             {label}
           </button>
         ))}
       </div>
-      <figcaption id={captionId} className="p2p-caption" aria-live="polite" aria-atomic="true">
+      <div className="p2p-playback">
+        <span>Illustrated walkthrough</span>
+        <button type="button" ref={playbackRef} disabled={reducedMotion}
+          onClick={() => { setPaused(!paused); setFocused(false); }}>
+          {reducedMotion ? "Reduced motion" : paused ? "Play walkthrough" : "Pause walkthrough"}
+        </button>
+      </div>
+      <figcaption id={captionId} className="p2p-caption" aria-live={running ? "off" : "polite"} aria-atomic="true">
         {STEPS[step].caption}
       </figcaption>
-      <p className="p2p-note">Auto-sync is optional and in testing. Direct sync needs both devices open.</p>
+      <p className="p2p-note">Auto-sync keeps verified devices up to date when enabled. Direct sync needs both devices open. Auto-sync is currently in testing.</p>
 
       <style jsx>{`
         .p2p-figure {
@@ -316,6 +342,10 @@ export function P2PSyncExplainer({ className = "" }) {
         .p2p-steps button:hover { border-color: var(--color-accent); }
         .p2p-steps button[aria-pressed="true"] { border-color: var(--color-accent); background: color-mix(in srgb, var(--color-accent) 9%, var(--color-surface)); }
         .p2p-steps button:focus-visible { outline: 2px solid var(--color-accent); outline-offset: 3px; }
+        .p2p-playback { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: .3rem .75rem; margin-top: .6rem; color: var(--color-muted); font-size: .7rem; }
+        .p2p-playback button { min-height: 44px; padding: .4rem .6rem; border: 1px solid var(--color-line); border-radius: .7rem; background: var(--color-surface); color: var(--color-ink); cursor: pointer; font: inherit; }
+        .p2p-playback button:focus-visible { outline: 2px solid var(--color-accent); outline-offset: 3px; }
+        .p2p-playback button:disabled { cursor: default; color: var(--color-muted); }
         .p2p-caption { margin-top: 1rem; min-height: 4.7em; color: var(--color-ink); font-size: .875rem; line-height: 1.6; }
         .p2p-note { margin: .35rem 0 0; color: var(--color-muted); font-size: .75rem; line-height: 1.6; }
         @keyframes p2p-share {

@@ -785,3 +785,16 @@ html[data-theme="dark"] .ft-download-rail {
 .ft-browser-carousel-link small { color: var(--color-muted); font-size: .7rem; text-align: center; }
 .ft-browser-carousel-link:hover { border-color: var(--color-accent); }
 .ft-browser-carousel-link:focus-visible { outline: 3px solid var(--color-accent); outline-offset: 3px; }
+
+/* Match the visible artwork bounds despite padding in the source app images. */
+.ft-browser-logo { display: inline-flex; align-items: center; justify-content: center; }
+.ft-browser-logo img[src="/apps/android.png"] { transform: scale(2.2); }
+.ft-browser-logo img[src="/apps/app-store-transparent.png"] { transform: scale(1.8); }
+
+.ft-screenshot-viewer { width: min(96vw, 1400px); max-width: none; max-height: 96dvh; margin: auto; padding: 0; overflow: auto; border: 1px solid var(--color-line); border-radius: 1.4rem; background: var(--color-panel); color: var(--color-ink); box-shadow: 0 24px 90px #0006; }
+.ft-screenshot-viewer::backdrop { background: rgb(8 12 20 / .82); }
+.ft-viewer-content { padding: clamp(.75rem, 2vw, 1.5rem); }
+.ft-viewer-header { display: flex; justify-content: space-between; align-items: center; gap: 1rem; margin-bottom: .75rem; }
+.ft-viewer-image { display: flex; min-height: 120px; align-items: center; justify-content: center; }
+.ft-viewer-image img { display: block; width: auto; height: auto; max-width: 100%; max-height: calc(96dvh - 180px); object-fit: contain; }
+.ft-viewer-navigation { display: flex; justify-content: space-between; gap: .75rem; margin-top: .75rem; }

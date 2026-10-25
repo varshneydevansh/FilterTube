@@ -1,0 +1,45 @@
+{
+  "scope": "Local production website only; nothing deployed",
+  "build": "passed after generated Next font cache was moved aside; source dependencies unchanged",
+  "checks": {
+    "focused": 18,
+    "release": 742,
+    "smoke": 1482,
+    "failures": 0
+  },
+  "p2p": {
+    "automatic": "Observed step0 to step2 while running without a step click",
+    "pause": "Step2 held after explicit pause",
+    "reduced_motion": "running=false, playback control disabled, manual steps available",
+    "offscreen": "running=false",
+    "caption": "Enabled Auto-sync between verified devices; both open for direct sync; testing label retained"
+  },
+  "viewer": {
+    "sources": "Hero stack and carousel share same URL-based native dialog",
+    "extension": "Keywords and Dashboard opened at unchanged /extension URL; arrow navigation changed Keywords to Channels",
+    "escape": "Dialog removed, scrolling restored, focus returned to original View full screen button",
+    "focus_boundaries": "Shift+Tab Close to Next; Tab Next to Close; active element stays in dialog",
+    "backdrop": "Outside click closed viewer",
+    "carousel": "Paused while viewing",
+    "cached_network_observation": {
+      "method": "Network.requestWillBeSent after images loaded",
+      "events": 0,
+      "truncated": false,
+      "limit": "Cached image in this browser; not an uncached-image guarantee"
+    },
+    "mobile375": {
+      "dialog_x": [
+        7.5,
+        367.5
+      ],
+      "dialog_y": [
+        35.2421875,
+        776.75
+      ],
+      "page_width": 375
+    }
+  },
+  "icons": "32px clipped shells; Android2.2x, iOS1.8x; images loaded and visually inspected",
+  "reddit": "Shared community links point to https://www.reddit.com/r/FilterTubeApp/; historic feedback permalink retained",
+  "server": "http://127.0.0.1:3108"
+}

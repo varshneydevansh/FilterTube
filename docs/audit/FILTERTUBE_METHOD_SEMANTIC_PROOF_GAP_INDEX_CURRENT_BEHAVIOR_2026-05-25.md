@@ -959,8 +959,8 @@ lexical and its scope remains tracked JS/JSX/MJS: CJS/Python tooling requires it
 separate release/workflow review and is not silently counted as JavaScript here.
 
 ```text
-current tracked JS/JSX/MJS files: 138
-current repo-wide lexical callables: 9913
+current tracked JS/JSX/MJS files: 139
+current repo-wide lexical callables: 9918
 current complete per-callable semantic proofs: 0
 current callable behavior-change approval: NO-GO
 runtime behavior changed by inventory refresh: no
@@ -975,7 +975,7 @@ runtime behavior changed by inventory refresh: no
 | Generated/quarantined UI | 6 | 147 |
 | Vendor bundles | 3 | 279 |
 | Audit/test lane scripts | 25 | 517 |
-| Website routes/components/config | 30 | 144 |
+| Website routes/components/config | 31 | 149 |
 
 | File | Family | Lexical callables | Semantic proof | Boundary |
 | --- | --- | ---: | --- | --- |
@@ -1097,9 +1097,10 @@ runtime behavior changed by inventory refresh: no
 | `website/app/sitemap.js` | Website routes/components/config | 0 | `semantic proof incomplete` | Lexical accounting only; no complete per-callable closure claimed. |
 | `website/app/terms/page.js` | Website routes/components/config | 0 | `semantic proof incomplete` | Lexical accounting only; no complete per-callable closure claimed. |
 | `website/components/app-screen-stack.js` | Website routes/components/config | 1 | `semantic proof incomplete` | Lexical accounting only; no complete per-callable closure claimed. |
-| `website/components/p2p-sync-explainer.js` | Website routes/components/config | 3 | `semantic proof incomplete` | Lexical accounting only; no complete per-callable closure claimed. |
+| `website/components/p2p-sync-explainer.js` | Website routes/components/config | 4 | `semantic proof incomplete` | Lexical accounting only; no complete per-callable closure claimed. |
 | `website/components/latest-release-assets.js` | Website routes/components/config | 5 | `semantic proof incomplete` | Lexical accounting only; no complete per-callable closure claimed. |
 | `website/components/screenshot-carousel.js` | Website routes/components/config | 11 | `semantic proof incomplete` | Lexical accounting only; no complete per-callable closure claimed. |
+| `website/components/screenshot-viewer.js` | Website routes/components/config | 4 | `semantic proof incomplete` | Lexical accounting only; no complete per-callable closure claimed. |
 | `website/components/browser-logo-rail.js` | Website routes/components/config | 1 | `semantic proof incomplete` | Lexical accounting only; no complete per-callable closure claimed. |
 | `website/components/footer-signal-art.js` | Website routes/components/config | 63 | `semantic proof incomplete` | Lexical accounting only; no complete per-callable closure claimed. |
 | `website/components/hero-video.js` | Website routes/components/config | 4 | `semantic proof incomplete` | Lexical accounting only; no complete per-callable closure claimed. |
@@ -1485,4 +1486,4 @@ The current lexical inventory above was remeasured after adding the opt-in Auto-
 
 ## Conservative website lexical refresh - 2026-10-25
 
-The existing broad lexical matcher was rerun after the authorized content and platform-grouping simplification. It accounts for 138 files and 9913 lexical callables. The comparison subset reports 199 broad matches and 119 build/website matches (80 difference); the parsers intentionally count different shapes. No complete semantic proof, source-classifier convergence, release approval, native acceptance or deployment claim follows. The original homepage hero and scenic identity are retained; authorized website additions include the P2P illustration, browser choices and live release metadata.
+The existing broad lexical matcher was rerun after the authorized content and platform-grouping simplification. It accounts for 139 files and 9918 lexical callables. The comparison subset reports 199 broad matches and 119 build/website matches (80 difference); the parsers intentionally count different shapes. No complete semantic proof, source-classifier convergence, release approval, native acceptance or deployment claim follows. The original homepage hero and scenic identity are retained; authorized website additions include the P2P walkthrough and same-page screenshot viewer.
