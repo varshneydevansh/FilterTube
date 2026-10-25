@@ -223,7 +223,7 @@ separate release/workflow review and is not silently counted as JavaScript here.
 
 ```text
 current tracked JS/JSX/MJS files: 136
-current repo-wide lexical callables: 9903
+current repo-wide lexical callables: 9905
 current complete per-callable semantic proofs: 0
 current callable behavior-change approval: NO-GO
 runtime behavior changed by inventory refresh: no
@@ -238,7 +238,7 @@ runtime behavior changed by inventory refresh: no
 | Generated/quarantined UI | 6 | 147 |
 | Vendor bundles | 3 | 279 |
 | Audit/test lane scripts | 25 | 517 |
-| Website routes/components/config | 28 | 134 |
+| Website routes/components/config | 28 | 136 |
 
 | File | Family | Lexical callables | Audit status |
 | --- | --- | ---: | --- |
@@ -360,7 +360,7 @@ runtime behavior changed by inventory refresh: no
 | `website/app/sitemap.js` | Website routes/components/config | 0 | website counted |
 | `website/app/terms/page.js` | Website routes/components/config | 0 | website counted |
 | `website/components/app-screen-stack.js` | Website routes/components/config | 1 | website counted |
-| `website/components/screenshot-carousel.js` | Website routes/components/config | 9 | website counted |
+| `website/components/screenshot-carousel.js` | Website routes/components/config | 11 | website counted |
 | `website/components/browser-logo-rail.js` | Website routes/components/config | 1 | website counted |
 | `website/components/footer-signal-art.js` | Website routes/components/config | 63 | website counted |
 | `website/components/hero-video.js` | Website routes/components/config | 4 | website counted |
@@ -445,4 +445,4 @@ The current lexical inventory above was remeasured after adding the opt-in Auto-
 
 ## Conservative website lexical refresh - 2026-10-25
 
-The existing broad lexical matcher was rerun after the authorized content and platform-grouping simplification. It accounts for 136 files and 9903 lexical callables. The comparison subset reports 199 broad matches and 119 build/website matches (80 difference); the parsers intentionally count different shapes. No complete semantic proof, source-classifier convergence, release approval, native acceptance or deployment claim follows. Existing scenic identity, homepage hero and route files are retained. Platform hero media and shared gallery behavior changed under the explicit screenshot/showcase request.
+The existing broad lexical matcher was rerun after the authorized content and platform-grouping simplification. It accounts for 136 files and 9905 lexical callables. The comparison subset reports 199 broad matches and 119 build/website matches (80 difference); the parsers intentionally count different shapes. No complete semantic proof, source-classifier convergence, release approval, native acceptance or deployment claim follows. Original scenic assets and route files are retained; authorized screenshot heroes and the shared gallery layout have changed as documented in the website simplification audit.

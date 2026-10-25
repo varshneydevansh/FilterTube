@@ -299,8 +299,8 @@ export function ScenicDetailPage({ page, relatedPages }) {
       ) : null}
 
       {page.screenshots?.length ? (
-        <section className="px-4 py-10 md:px-6 md:py-16" aria-label={page.screenshotsLabel || "Android development screenshots"}>
-          <div className="mx-auto max-w-[1400px]">
+        <section className="py-10 md:py-16" aria-label={page.screenshotsLabel || "Android development screenshots"}>
+          <div className="mx-auto max-w-[1400px] px-4 md:px-6">
             <Reveal>
               <SectionHeading
                 eyebrow={page.screenshotsEyebrow || "Installed Android development build"}
@@ -308,13 +308,13 @@ export function ScenicDetailPage({ page, relatedPages }) {
                 description={page.screenshotsDescription}
               />
             </Reveal>
-            <div className="mt-10">
-              <ScreenshotCarousel
-                label={page.screenshotsLabel || "Android development screenshots"}
-                layout={page.screenshotsLayout}
-                screenshots={page.screenshots}
-              />
-            </div>
+          </div>
+          <div className="mt-10">
+            <ScreenshotCarousel
+              label={page.screenshotsLabel || "Android development screenshots"}
+              layout={page.screenshotsLayout}
+              screenshots={page.screenshots}
+            />
           </div>
         </section>
       ) : null}

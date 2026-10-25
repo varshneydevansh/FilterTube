@@ -81,8 +81,12 @@ six supplied desktop captures. Shared gallery metadata supports future platform
 and device-size captures without incorrectly labelling them Android.
 
 The user explicitly requested a moving showcase inspired by Flow's screen rail.
-Use an original native-scroll carousel with gentle movement, visible pause/play
-and Previous/Next controls. Pause on hover, keyboard focus, manual scrolling,
-offscreen/hidden documents and reduced-motion preference. Keep full-resolution
-links and skip duplicate copies in keyboard/screen-reader navigation. Homepage
+Use an original transform-driven rail spanning the browser width, with constrained
+headings, intrinsic image proportions, concise captions and visible playback
+status. Keep pause/play and Previous/Next controls. Pause on hover, keyboard
+focus, manual browsing and offscreen/hidden documents. Reduced motion defaults
+to a unique manually scrollable row; explicit Play can opt into movement.
+Keep full-resolution links and skip the loop copy in keyboard/screen-reader
+navigation. A sparse screen set needs a cycle longer than the viewport plus a
+card, so the same image cannot appear at both edges simultaneously. Homepage
 media and future app/tablet/TV captures remain later work; do not imply parity.

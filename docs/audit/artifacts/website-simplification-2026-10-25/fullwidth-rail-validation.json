@@ -1,0 +1,41 @@
+{
+  "scope": "Local website only; not deployed",
+  "build": "Production Next build passed after one generated font-cache retry",
+  "checks": {
+    "focused": {
+      "pass": 18,
+      "fail": 0
+    },
+    "release": {
+      "pass": 742,
+      "fail": 0
+    },
+    "smoke": {
+      "pass": 1482,
+      "fail": 0
+    }
+  },
+  "routes": 14,
+  "responsive_receipt": "fullwidth-rail-size-checks.json",
+  "browser_observations": {
+    "android": "Full width; 3 unique screens; automatic transform progression; Pause stable at -571.807 across reads; 1440px viewport has 1680px cycle and 208px cards",
+    "reduced_motion": "375px Android native Next offsets 0,192,201,0 after Previous to last; touch-action auto; visual copy display none; explicit Play then Next remains animated and paused",
+    "keyboard": "Tab into toolbar pauses motion; only original screenshot links in tab order",
+    "pointer": "Full-resolution Dashboard link opens 1720x1261 image; release outside rail recovers to Playing; horizontal wheel pauses",
+    "reference": "Observed live Flow: full-width rail, two groups of 13 unique Android screens, 50s linear transform animation, hover pause; no code or assets copied"
+  },
+  "media_gates": {
+    "kids_native": "Fresh native Kids screenshots still unavailable; Android chat asked for existing captures without interrupting device work",
+    "android": "Three current development screenshots only; phone/tablet/TV release differences remain labelled",
+    "ios": "No new native media or playback claim"
+  },
+  "screenshots": [
+    "android-fullwidth-rail-desktop.jpg",
+    "android-fullwidth-rail-mobile.jpg",
+    "extension-fullwidth-rail-desktop.jpg"
+  ],
+  "limits": [
+    "Desktop browser and emulated viewport/preference checks, not physical touch-device proof",
+    "Existing broader extension/native acceptance gates remain separate"
+  ]
+}

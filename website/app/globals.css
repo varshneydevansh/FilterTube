@@ -704,11 +704,16 @@ html[data-theme="dark"] .ft-download-rail {
   background: linear-gradient(90deg, color-mix(in srgb, var(--hero-tint) 88%, transparent), color-mix(in srgb, var(--hero-tint) 60%, transparent));
 }
 
-/* Native horizontal scrolling keeps moving showcases swipeable and focusable. */
-.ft-screenshot-carousel { min-width: 0; }
-.ft-gallery-viewport { overflow-x: auto; padding: 6px 6px 18px; overscroll-behavior-x: contain; scrollbar-width: thin; }
-.ft-gallery-track, .ft-gallery-group { display: flex; gap: 1.5rem; width: max-content; align-items: flex-start; }
-.ft-gallery-slide { width: min(72vw, 19rem); flex: 0 0 auto; }
-.ft-screenshot-carousel[data-layout="desktop"] .ft-gallery-slide { width: min(86vw, 44rem); }
+/* Full-width, transform-driven screenshot rail; logical screens appear only once. */
+.ft-screenshot-carousel { min-width: 0; --rail-card-width: clamp(10rem, 17vw, 13rem); }
+.ft-screenshot-carousel[data-layout="desktop"] { --rail-card-width: clamp(18rem, 38vw, 30rem); }
+.ft-gallery-viewport { overflow: hidden; padding-block: 8px 24px; width: 100%; touch-action: pan-y; }
+.ft-gallery-track { display: flex; width: max-content; }
+.ft-gallery-group { display: flex; width: max-content; min-width: calc(var(--rail-min-width, 100vw) + var(--rail-card-width) + 2rem); flex: 0 0 auto; justify-content: space-around; gap: 2rem; padding-inline: 1rem; align-items: flex-start; }
+.ft-gallery-slide { width: var(--rail-card-width); flex: 0 0 auto; }
+.ft-gallery-image { display: block; height: auto; width: 100%; object-fit: contain; }
 .ft-gallery-control { display: inline-flex; min-width: 44px; min-height: 44px; align-items: center; justify-content: center; gap: 0.5rem; border: 1px solid var(--color-line); border-radius: 999px; background: var(--color-shell-strong); color: var(--color-ink); cursor: pointer; }
 .ft-gallery-control:focus-visible, .ft-gallery-slide a:focus-visible { outline: 3px solid var(--color-accent); outline-offset: 3px; }
+.ft-screenshot-carousel[data-static="true"] .ft-gallery-viewport { overflow-x: auto; touch-action: auto; }
+.ft-screenshot-carousel[data-static="true"] .ft-gallery-group { min-width: var(--rail-min-width, 100vw); }
+.ft-screenshot-carousel[data-static="true"] .ft-gallery-copy { display: none; }

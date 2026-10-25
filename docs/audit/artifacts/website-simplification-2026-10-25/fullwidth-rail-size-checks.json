@@ -1,0 +1,98 @@
+[
+  {
+    "path": "android",
+    "card": 160,
+    "crops": 0,
+    "cycle": 576,
+    "duplicateTabStops": 0,
+    "page": 320,
+    "railLeft": 0,
+    "railWidth": 320,
+    "unique": 3,
+    "viewport": 320
+  },
+  {
+    "path": "android",
+    "card": 160,
+    "crops": 0,
+    "cycle": 576,
+    "duplicateTabStops": 0,
+    "page": 375,
+    "railLeft": 0,
+    "railWidth": 375,
+    "unique": 3,
+    "viewport": 375
+  },
+  {
+    "path": "android",
+    "card": 160,
+    "crops": 0,
+    "cycle": 960,
+    "duplicateTabStops": 0,
+    "page": 768,
+    "railLeft": 0,
+    "railWidth": 768,
+    "unique": 3,
+    "viewport": 768
+  },
+  {
+    "path": "android",
+    "card": 208,
+    "crops": 0,
+    "cycle": 1680,
+    "duplicateTabStops": 0,
+    "page": 1440,
+    "railLeft": 0,
+    "railWidth": 1440,
+    "unique": 3,
+    "viewport": 1440
+  },
+  {
+    "path": "extension",
+    "card": 288,
+    "crops": 0,
+    "cycle": 1920,
+    "duplicateTabStops": 0,
+    "page": 320,
+    "railLeft": 0,
+    "railWidth": 320,
+    "unique": 6,
+    "viewport": 320
+  },
+  {
+    "path": "extension",
+    "card": 288,
+    "crops": 0,
+    "cycle": 1920,
+    "duplicateTabStops": 0,
+    "page": 375,
+    "railLeft": 0,
+    "railWidth": 375,
+    "unique": 6,
+    "viewport": 375
+  },
+  {
+    "path": "extension",
+    "card": 291.8359375,
+    "crops": 0,
+    "cycle": 1943.015625,
+    "duplicateTabStops": 0,
+    "page": 768,
+    "railLeft": 0,
+    "railWidth": 768,
+    "unique": 6,
+    "viewport": 768
+  },
+  {
+    "path": "extension",
+    "card": 480,
+    "crops": 0,
+    "cycle": 3072,
+    "duplicateTabStops": 0,
+    "page": 1440,
+    "railLeft": 0,
+    "railWidth": 1440,
+    "unique": 6,
+    "viewport": 1440
+  }
+]

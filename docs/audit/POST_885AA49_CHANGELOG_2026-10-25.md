@@ -133,3 +133,15 @@ handling. Shared platform labels and intrinsic image dimensions prepare for late
 phone/tablet/TV media without claiming availability or parity. Existing hero,
 features and download routes remain. Source and evidence are documented in the
 website refinement record; nothing is deployed by a local commit.
+
+## Full-width Android and extension rails after `0ff5e465`
+
+Corrected the moving showcases after the user's clipping/repetition report and
+live comparison with Flow. Both rails now span the viewport and use transform
+motion with truthful pause/play state, concise captions and intact screenshot
+proportions. One semantic screen set plus an inaccessible loop copy replaces
+three scrollable copies. Sparse Android spacing prevents duplicate images at
+opposite edges at the same time. Manual controls, full-resolution links,
+keyboard focus, drag recovery and reduced-motion navigation were reviewed and
+checked. Existing hero art, platform colors, route content and app behavior are
+unchanged. Fresh native Kids screenshots remain an explicit media follow-up.

@@ -390,3 +390,74 @@ extension offscreen position stayed at 8. Reduced-motion manual Next moved
 No console errors were captured on the final extension route. Validation JSON,
 asset fingerprints and final desktop/mobile screenshots are in the dated
 website artifact folder. Existing broader acceptance gates remain unchanged.
+
+## Full-width gallery correction after `0ff5e465`
+
+The user reported repeated images, apparent non-playing behavior and clipping
+inside the central column, then asked to inspect the Flow reference directly
+and apply the correction to Android too. The following supersedes the earlier
+native-scroll gallery implementation described above.
+
+Observed live at https://flow-tube.org/: the Android track has 13 unique screens
+and a second visual copy, a 50-second linear transform animation, approximately
+210px phone cards, a viewport-wide rail and pause-on-hover. Its headings remain
+constrained independently. Repetition is the loop mechanism; a visible duplicate
+listing and clipping inside a narrow content column are not needed. No reference
+implementation code or media was copied.
+
+Both extension and Android now use one shared original Web Animations transform
+rail at 40px/second, with one semantic screen set and one inaccessible visual
+loop copy. The gallery spans the viewport; its heading and controls retain the
+existing content width. Intrinsic proportions and full-resolution links remain.
+The sparse three-screen Android cycle is at least the viewport plus a card and
+gap, preventing the same image from appearing at both edges simultaneously.
+It still contains only the three real current Android captures; no new app
+features or screenshots are implied. Android green, iOS blue, Kids pink,
+extension lilac and the existing heroes remain unchanged by this correction.
+
+Playback status describes actual effective state: Playing, hover pause,
+keyboard pause, explicit pause, offscreen readiness or reduced motion. Explicit
+Play can resume while hovering/focused and can opt into motion when requested
+despite the default reduced-motion setting. Vertical page scrolling does not
+permanently pause the rail; horizontal browsing and dragging do. Reduced motion
+defaults to a native horizontal row with no visible loop copy and touch-action
+auto. No per-frame React update or runtime dependency was added.
+
+A read-only subagent review found and prompted fixes for release-outside drag
+cleanup, reduced-motion touch swiping, navigation after explicit motion opt-in,
+toolbar keyboard focus, pointer focus moving a screenshot before click, and a
+valid native scroll offset of zero being discarded. Animation observers and
+window listeners are cleaned up on unmount. Resize preserves animation phase.
+A browser check also caught Next getting stuck at the native scroll end when the
+last card could not align fully left; the end boundary now advances to the first
+screen rather than repeatedly selecting the already-visible last one.
+
+Browser observations: Android spanned x=0 to 1280 with 208px cards and automatic
+transform movement; Pause held at -571.807 across reads. At 375px reduced-motion
+Next reached native offset 544; Play followed by Next stayed in animated mode and
+paused at the next screen. Keyboard Tab into a control showed Paused for keyboard.
+The extension full-resolution Dashboard link opened its genuine 1720×1261 image.
+Release outside the rail recovered to Playing; horizontal wheel input paused.
+Final Android at 1440px has a 1680px cycle, exceeding viewport+card width. Screen
+size receipts and updated Android/extension images are in the dated artifacts.
+
+The first production build hit a Next font-cache resolution error. Rebuilding
+after moving only the generated .next directory aside passed; no dependency or
+font source change was needed. Build/check results and remaining media gates
+are recorded in fullwidth-rail-validation.json.
+
+Kids app media remains a separate open item. The extension Kids-rules screenshot
+is present in the extension gallery; it is not a native app screenshot. Existing
+iOS Kids proofs are old, and Android TV Kidstube reference images belong to a
+different app. Neither was presented as current FilterTube Kids media. The
+Android chat was asked for recent existing captures without interrupting device
+work; none had been supplied at this checkpoint.
+
+Final full-width candidate: production build, 18 focused website checks, 742
+release checks and 1,482 smoke checks pass. All 14 served routes and internal
+screenshot links resolve, with the expected invalid-route 404. Responsive
+geometry passes at 320/375/768/1440px on Android and extension, including the
+minimum cycle length needed to avoid simultaneous duplicate edge images.
+Reduced-motion Android wraps through native offsets 0→192→201→0 after entering
+at the final screen. These are local browser and source results; nothing was
+pushed or deployed, and fresh native Kids media remains pending.

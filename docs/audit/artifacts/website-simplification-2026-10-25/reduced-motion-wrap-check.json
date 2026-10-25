@@ -1,0 +1,17 @@
+{
+  "platform": "android",
+  "width": 375,
+  "offsets": [
+    0,
+    192,
+    201,
+    0
+  ],
+  "expected": [
+    0,
+    192,
+    201,
+    0
+  ],
+  "pass": true
+}
