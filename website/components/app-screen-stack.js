@@ -4,14 +4,14 @@ import { useState } from "react";
 import { ArrowUpRight } from "@phosphor-icons/react";
 
 // Hallmark · pre-emit critique: P5 H4 E4 S5 R5 V4
-export function AppScreenStack({ screens, label }) {
+export function AppScreenStack({ screens, label, layout = "phone" }) {
   const [selected, setSelected] = useState(0);
   const [preview, setPreview] = useState(null);
   const [failed, setFailed] = useState({});
   const current = preview ?? selected;
 
   return (
-    <figure className="ft-screen-showcase" aria-label={label}>
+    <figure className="ft-screen-showcase" aria-label={label} data-layout={layout}>
       <div className="ft-screen-stack" onPointerLeave={() => setPreview(null)}>
         {screens.map((screen, index) => (
           <button

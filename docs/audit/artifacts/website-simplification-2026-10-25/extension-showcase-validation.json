@@ -1,0 +1,83 @@
+{
+  "scope": "local website production candidate; not deployed",
+  "base": "f850048d",
+  "hero": "three supplied popup captures, lilac scenic tone, original aspect ratios",
+  "showcases": {
+    "extension": 6,
+    "android": 3,
+    "ios": "existing hero only; gallery additions deferred",
+    "home": "screenshot montage deferred"
+  },
+  "assets": [
+    {
+      "path": "website/public/apps/screenshots/extension-accounts-sync.png",
+      "bytes": 836490,
+      "sha256": "cf9b9ad152a2d8807583893c9f5ae312585631ec17cb821fcab9a2ef4fe8f921"
+    },
+    {
+      "path": "website/public/apps/screenshots/extension-channel-rules.png",
+      "bytes": 922862,
+      "sha256": "e37caa8630082fb2a0890273f0e0006249e5d46337c1e8508a3eadaba758340b"
+    },
+    {
+      "path": "website/public/apps/screenshots/extension-channels.png",
+      "bytes": 145911,
+      "sha256": "4dc0105d76097e12e36829536f0fa979459a710c49c888beb8e35440f8d2c94a"
+    },
+    {
+      "path": "website/public/apps/screenshots/extension-content-controls.png",
+      "bytes": 189821,
+      "sha256": "a038aaeaae0aff280ab0b03f287fc53c6217d83d19387a4136186831a803035a"
+    },
+    {
+      "path": "website/public/apps/screenshots/extension-dashboard.png",
+      "bytes": 1726089,
+      "sha256": "23999c7a4ca8a2cb15ba06d5a8ac9a11080533ec93ba86b592ab871a6089c177"
+    },
+    {
+      "path": "website/public/apps/screenshots/extension-focus-settings.png",
+      "bytes": 1030825,
+      "sha256": "0365465e0624db5fe269c0b2ca0e6b7693c6df8edf8eb16b9219594d57be159b"
+    },
+    {
+      "path": "website/public/apps/screenshots/extension-imports-language.png",
+      "bytes": 817894,
+      "sha256": "98acd92aa79fea5bbfb43386641827c3b0e8bfded22f2722a133ce40f5d9acaf"
+    },
+    {
+      "path": "website/public/apps/screenshots/extension-keywords.png",
+      "bytes": 125125,
+      "sha256": "7c7b96db87552ab7dc29d2b432e353706617c5a15356a6302cf1c1e232604bdf"
+    },
+    {
+      "path": "website/public/apps/screenshots/extension-kids-rules.png",
+      "bytes": 955282,
+      "sha256": "37d1b590bedc502bfabd94f4b3b6fbc131dfc76a384bf010e35cf19d7aae8991"
+    }
+  ],
+  "checks": {
+    "website_build": "pass",
+    "focused": 18,
+    "release": 742,
+    "smoke": 1482,
+    "served_routes": 14,
+    "invalid_route": 404,
+    "extension_and_android_widths": [
+      320,
+      375,
+      414,
+      768,
+      1440
+    ],
+    "final_horizontal_overflow": false,
+    "final_extension_popup_edge_crop": false,
+    "extension_console_errors": []
+  },
+  "browser_evidence": "screenshot-carousel-checks.json",
+  "boundaries": [
+    "Actual supplied screenshot pixels remain unchanged; authored copy avoids service naming.",
+    "Existing broad filtering/settings failures remain separate and were not waived.",
+    "No app parity, installed extension release, store or deployment claim.",
+    "Moving groups cover the currently supplied sets of at least three screens."
+  ]
+}

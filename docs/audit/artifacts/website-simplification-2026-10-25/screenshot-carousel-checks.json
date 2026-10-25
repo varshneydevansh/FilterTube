@@ -1,0 +1,96 @@
+{
+  "extension": {
+    "previousSettled": 3640,
+    "reducedMotion": {
+      "playControls": 0,
+      "x": 3640
+    },
+    "finalReduced": {
+      "before": 0,
+      "after": 347,
+      "accessibleScreens": 6,
+      "motionControls": 0
+    },
+    "offscreenX": 8,
+    "offscreenAfter": 8
+  },
+  "android": {
+    "loopStart": 975,
+    "cycle": 984,
+    "afterBoundary": 146,
+    "focusX": 147,
+    "focusAfter": 147
+  },
+  "responsive": [
+    {
+      "galleryWidth": 288,
+      "heroFits": true,
+      "route": "/extension",
+      "scrollWidth": 320,
+      "uncropped": 0.9946808510638298,
+      "width": 320
+    },
+    {
+      "galleryWidth": 343,
+      "heroFits": true,
+      "route": "/extension",
+      "scrollWidth": 375,
+      "uncropped": 0.9955357142857144,
+      "width": 375
+    },
+    {
+      "galleryWidth": 382,
+      "heroFits": true,
+      "route": "/extension",
+      "scrollWidth": 414,
+      "uncropped": 0.992,
+      "width": 414
+    },
+    {
+      "galleryWidth": 720,
+      "heroFits": true,
+      "route": "/extension",
+      "scrollWidth": 768,
+      "uncropped": 0.9915966386554622,
+      "width": 768
+    },
+    {
+      "galleryWidth": 1392,
+      "heroFits": true,
+      "route": "/extension",
+      "scrollWidth": 1440,
+      "uncropped": 0.9915966386554622,
+      "width": 1440
+    },
+    {
+      "galleryWidth": 288,
+      "route": "/android",
+      "scrollWidth": 320,
+      "width": 320
+    },
+    {
+      "galleryWidth": 343,
+      "route": "/android",
+      "scrollWidth": 375,
+      "width": 375
+    },
+    {
+      "galleryWidth": 382,
+      "route": "/android",
+      "scrollWidth": 414,
+      "width": 414
+    },
+    {
+      "galleryWidth": 720,
+      "route": "/android",
+      "scrollWidth": 768,
+      "width": 768
+    },
+    {
+      "galleryWidth": 1392,
+      "route": "/android",
+      "scrollWidth": 1440,
+      "width": 1440
+    }
+  ]
+}

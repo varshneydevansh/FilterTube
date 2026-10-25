@@ -71,3 +71,18 @@ or the video platform as the context requires. Keep functional demo/source URLs
 and intact genuine product screenshots. Do not imply broader site support or
 remove privacy/no-affiliation facts; Google still owns its underlying services.
 Third-party player chrome is outside the website's authored copy.
+
+## Extension media and moving showcases — 25 October 2026
+
+Extension uses a muted lilac/purple scenic tone, distinct from Android green,
+iOS blue and Kids pink. Its three supplied popup captures use their real wider
+proportions in the hero. Do not stretch them into phone frames. Its showcase uses
+six supplied desktop captures. Shared gallery metadata supports future platform
+and device-size captures without incorrectly labelling them Android.
+
+The user explicitly requested a moving showcase inspired by Flow's screen rail.
+Use an original native-scroll carousel with gentle movement, visible pause/play
+and Previous/Next controls. Pause on hover, keyboard focus, manual scrolling,
+offscreen/hidden documents and reduced-motion preference. Keep full-resolution
+links and skip duplicate copies in keyboard/screen-reader navigation. Homepage
+media and future app/tablet/TV captures remain later work; do not imply parity.

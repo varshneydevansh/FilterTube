@@ -332,3 +332,61 @@ routes found no service name in authored text, accessible/image labels, titles
 or metadata; functional external URLs match the prior checkpoint exactly.
 Android, iOS and Kids still have no horizontal overflow at 320 pixels. Refreshed
 browser images and `authored-copy-validation.json` record the final wording.
+
+## Extension hero and moving screenshot showcases after `f850048d`
+
+The user supplied three popup screenshots for the extension hero and six desktop
+screens for its showcase, then explicitly asked for a moving rail like the Flow
+reference (https://flow-tube.org/), including movement in the existing Android
+showcase. The implementation retains the scenic layout and feature information.
+
+- Extension now has a muted lilac/purple tone, including cards driven by the same
+  tone preset. Android stays green, iOS blue and Kids pink. The three hero popup
+  captures retain their native aspect ratios; the phone hero layout is unchanged.
+- The extension rail shows Dashboard, Channel rules, Kids rules, Focus/settings,
+  Imports/language and Accounts & Sync. The existing three Android screenshots
+  use the same moving component. No homepage screenshot montage, new iOS gallery,
+  tablet or TV media was invented; those remain later additions.
+- Shared gallery labels/layout/dimensions replace Android-only headings and
+  hard-coded phone dimensions, ready for later genuine captures. Public-version
+  differences remain visible. Supplied pixels are unchanged, including the app's
+  own labels; authored website copy continues to avoid service naming.
+- The original carousel uses native horizontal scrolling at approximately 28
+  pixels/second, retaining touch/trackpad scrolling and full-resolution links.
+  Three repeated groups keep the current three-screen phone set long enough to
+  loop at the maximum 1400px content width. Duplicate links work with a pointer
+  but are removed from the tab order and accessibility tree. No dependency or
+  implementation code was copied from the reference website.
+- Automatic motion stops for reduced motion, offscreen/hidden documents, hover,
+  keyboard focus and explicit/manual pause. Controls move one screenshot at a
+  time; the Previous boundary recenters an equivalent copy before moving left.
+  Frame work is cancelled on pause/unmount, with elapsed time bounded on resume.
+- A read-only subagent review identified keyboard-focus and wrap-direction
+  problems; both were corrected before final verification. FreeLLMAPI
+  gpt-oss-120b supplied bounded caption proposals; an initial truncated response
+  was rejected. Source review and actual browser results determined the copy.
+
+Observed browser checks: extension automatic movement advanced from 16 to 1284;
+Pause stopped it; Previous from zero settled at 3640 in a 4368px cycle. Android
+crossed its 984px boundary (975 to 146), then remained at 147 while a keyboard
+control held focus. Reduced motion removed the play/pause control and retained
+manual navigation. Evidence is stored alongside the prior website screenshots.
+A narrow-screen check caught a slight popup edge crop; popup spacing was tightened
+before the final build. Final checks below distinguish the corrected candidate.
+
+During verification, the repository-root extension build was invoked by mistake.
+It regenerated ignored local packages and README badge counts; the badge-only
+edit was restored. No extension source, native source or publishing action was
+part of this website change. The website candidate was built from `website/`.
+
+Final corrected candidate: website production build passes, with 18 focused
+website, 742 release and 1,482 smoke checks passing. The regenerated package
+README bytes were restored to match the source before the release recheck. All
+14 routes and internal screenshot links resolve; the invalid route returns 404.
+Extension and Android fit 320/375/414/768/1440px without page overflow; all three
+popup edges fit after correction. Android focus stayed at 147 across reads;
+extension offscreen position stayed at 8. Reduced-motion manual Next moved
+0→347 and exposed only the six original screenshot links to accessibility.
+No console errors were captured on the final extension route. Validation JSON,
+asset fingerprints and final desktop/mobile screenshots are in the dated
+website artifact folder. Existing broader acceptance gates remain unchanged.

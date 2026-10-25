@@ -7,6 +7,7 @@ import {
 
 import { ActionLink, SectionHeading } from "@/components/marketing-ui";
 import { Reveal } from "@/components/reveal";
+import { ScreenshotCarousel } from "@/components/screenshot-carousel";
 import { AppScreenStack } from "@/components/app-screen-stack";
 import { HeroVideo } from "@/components/hero-video";
 import { getTonePreset } from "@/components/scenic-tones";
@@ -222,7 +223,7 @@ export function ScenicDetailPage({ page, relatedPages }) {
               </div>
             </Reveal>
             {hasHeroScreens ? (
-              <AppScreenStack label={page.heroScreensLabel} screens={page.heroScreens} />
+              <AppScreenStack layout={page.heroScreensLayout} label={page.heroScreensLabel} screens={page.heroScreens} />
             ) : heroArtworks.length > 0 ? (
               <Reveal delay={120}>
                 <div
@@ -298,38 +299,21 @@ export function ScenicDetailPage({ page, relatedPages }) {
       ) : null}
 
       {page.screenshots?.length ? (
-        <section className="px-4 py-10 md:px-6 md:py-16" aria-label="Android development screenshots">
+        <section className="px-4 py-10 md:px-6 md:py-16" aria-label={page.screenshotsLabel || "Android development screenshots"}>
           <div className="mx-auto max-w-[1400px]">
             <Reveal>
               <SectionHeading
-                eyebrow="Installed Android development build"
+                eyebrow={page.screenshotsEyebrow || "Installed Android development build"}
                 title={page.screenshotsTitle}
                 description={page.screenshotsDescription}
               />
             </Reveal>
-            <div className="mt-10 flex snap-x snap-mandatory gap-6 overflow-x-auto pb-4 md:grid md:grid-cols-3 md:gap-8 md:overflow-visible">
-              {page.screenshots.map((screenshot) => (
-                <figure className="w-[min(78vw,19rem)] shrink-0 snap-start md:w-auto" key={screenshot.src}>
-                  <a
-                    className="block rounded-lg"
-                    href={screenshot.src}
-                    aria-label={`Open full screenshot: ${screenshot.title}`}
-                  >
-                    <img
-                      alt={screenshot.alt}
-                      className="mx-auto h-auto w-full max-w-[19rem] rounded-lg border border-[color:var(--color-line)]"
-                      height={2400}
-                      loading="lazy"
-                      src={screenshot.src}
-                      width={1080}
-                    />
-                  </a>
-                  <figcaption className="mx-auto mt-5 max-w-[34ch]">
-                    <h3 className="font-display text-xl text-[var(--color-ink)]">{screenshot.title}</h3>
-                    <p className="mt-2 text-sm leading-7 text-[var(--color-muted)]">{screenshot.caption}</p>
-                  </figcaption>
-                </figure>
-              ))}
+            <div className="mt-10">
+              <ScreenshotCarousel
+                label={page.screenshotsLabel || "Android development screenshots"}
+                layout={page.screenshotsLayout}
+                screenshots={page.screenshots}
+              />
             </div>
           </div>
         </section>

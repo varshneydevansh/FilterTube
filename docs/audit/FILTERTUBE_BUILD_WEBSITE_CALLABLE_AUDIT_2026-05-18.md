@@ -300,8 +300,8 @@ The earlier dated tables above remain historical. The authorized change preserve
 | --- | ---: | ---: |
 | Build and sync scripts | 30 | 341 |
 | Website app routes | 9 | 21 |
-| Website components | 16 | 55 |
-| Total | 55 | 417 |
+| Website components | 17 | 61 |
+| Total | 56 | 423 |
 
 | File | Current lexical callables |
 | --- | ---: |
@@ -355,6 +355,7 @@ The earlier dated tables above remain historical. The authorized change preserve
 | `website/components/scenic-detail-page.js` | 3 |
 | `website/components/scenic-illustration.js` | 3 |
 | `website/components/scenic-tones.js` | 1 |
+| `website/components/screenshot-carousel.js` | 6 |
 | `website/components/site-data.js` | 0 |
 | `website/components/site-footer.js` | 2 |
 | `website/components/site-header.js` | 3 |

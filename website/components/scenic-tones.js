@@ -17,6 +17,17 @@ export const tonePresets = {
     chip: scenicChip,
     iconShell: `${scenicIconShell} text-[#5f7553]`,
   },
+  lilac: {
+    heroBackdrop:
+      "bg-[radial-gradient(circle_at_18%_18%,rgba(209,181,232,0.68),transparent_32%),radial-gradient(circle_at_82%_18%,rgba(239,211,193,0.45),transparent_26%),linear-gradient(180deg,#faf7fd_0%,#efe6f7_56%,#e5d7ef_100%)]",
+    surface: scenicSurface,
+    primaryOrb: "bg-[#d4bbe9]/55",
+    secondaryOrb: "bg-[#efd9c6]/45",
+    accentText: "text-[#735080]",
+    accentBadge: "bg-[#e5d6ef]/82 text-[#694176]",
+    chip: scenicChip,
+    iconShell: `${scenicIconShell} text-[#79548b]`,
+  },
   pearl: {
     heroBackdrop:
       "bg-[radial-gradient(circle_at_20%_16%,rgba(237,239,248,0.92),transparent_30%),radial-gradient(circle_at_82%_18%,rgba(247,220,214,0.6),transparent_24%),linear-gradient(180deg,#fafbff_0%,#f2f2f7_58%,#e8e8ef_100%)]",

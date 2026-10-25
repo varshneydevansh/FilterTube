@@ -39,7 +39,7 @@ const expectedFamilyTotals = new Map([
   ['Generated/quarantined UI', { files: 6, count: 147 }],
   ['Vendor bundles', { files: 3, count: 279 }],
   ['Audit/test lane scripts', { files: 25, count: 517 }],
-  ['Website routes/components/config', { files: 27, count: 125 }],
+  ['Website routes/components/config', { files: 28, count: 134 }],
 ]);
 
 const callableRe = /(?:^|\n)\s*(?:export\s+)?(?:async\s+)?function\s+([A-Za-z_$][\w$]*)\s*\(|(?:^|\n)\s*(?:export\s+)?(?:const|let|var)\s+([A-Za-z_$][\w$]*)\s*=\s*(?:async\s*)?\([^)]*\)\s*=>|(?:^|\n)\s*(?:export\s+)?(?:const|let|var)\s+([A-Za-z_$][\w$]*)\s*=\s*(?:async\s*)?[A-Za-z_$][\w$]*\s*=>|(?:^|\n)\s*([A-Za-z_$][\w$]*)\s*:\s*(?:async\s*)?function\s*\(|(?:^|\n)\s*(?:async\s+)?([A-Za-z_$][\w$]*)\s*\([^)]*\)\s*\{/g;
@@ -254,8 +254,8 @@ test('audit meta index docs carry the method proof gap blocker', () => {
 
 test('all-callable index accounts for every tracked JS JSX and MJS source file', () => {
   const files = trackedJsFiles();
-  assert.equal(files.length, 135);
-  assert.match(indexDoc, /current tracked JS\/JSX\/MJS files: 135/);
+  assert.equal(files.length, 136);
+  assert.match(indexDoc, /current tracked JS\/JSX\/MJS files: 136/);
 
   for (const file of files) {
     docRow(file);
@@ -272,8 +272,8 @@ test('all-callable index counts match current lexical callable source', () => {
     assert.equal(documented, actual, `${file} callable count should match current source`);
   }
 
-  assert.equal(total, 9894);
-  assert.match(indexDoc, /current repo-wide lexical callables: 9894/);
+  assert.equal(total, 9903);
+  assert.match(indexDoc, /current repo-wide lexical callables: 9903/);
 });
 
 test('all-callable family totals match the documented file rows', () => {
@@ -461,7 +461,7 @@ test('all-callable index documents semantic method proof boundary', () => {
     });
   }
 
-  assert.equal(total, 9894);
+  assert.equal(total, 9903);
   assert.deepEqual(methodTotals, expectedFamilyTotals);
 
   for (const authority of [

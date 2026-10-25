@@ -123,3 +123,13 @@ at the user's request. Main, Kids, Music and videos provide the context. Demo an
 support links, genuine media, installation choices and all feature/availability
 information remain. Privacy and Terms preserve third-party ownership and data
 boundaries. No extension or native application behavior changes.
+
+## Extension screenshots and moving showcases after `f850048d`
+
+A distinct purple extension hero shows three genuine popup captures. Six supplied
+desktop screenshots form its moving showcase; the Android gallery now moves too.
+Both offer pause/play, adjacent navigation, touch scrolling and reduced-motion
+handling. Shared platform labels and intrinsic image dimensions prepare for later
+phone/tablet/TV media without claiming availability or parity. Existing hero,
+features and download routes remain. Source and evidence are documented in the
+website refinement record; nothing is deployed by a local commit.

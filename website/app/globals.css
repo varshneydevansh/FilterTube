@@ -13,6 +13,7 @@
   --color-hero-sage: #edf4e7;
   --color-hero-sky: #e9f4fb;
   --color-hero-rose: #fae8e6;
+  --color-hero-lilac: #efe6f7;
   --shadow-diffuse: 0 30px 80px -40px rgba(60, 42, 33, 0.24);
   --color-shell: rgba(255, 255, 255, 0.56);
   --color-shell-strong: rgba(255, 255, 255, 0.74);
@@ -93,6 +94,34 @@
   height: 100%;
   object-fit: cover;
   border-radius: inherit;
+}
+
+/* Popup captures keep their real proportions instead of inheriting phone crops. */
+.ft-screen-showcase[data-layout="popup"] .ft-screen-stack {
+  aspect-ratio: 1.05;
+}
+
+.ft-screen-showcase[data-layout="popup"] .ft-stack-screen {
+  width: 55%;
+  aspect-ratio: auto;
+}
+
+.ft-screen-showcase[data-layout="popup"] .ft-stack-screen[data-position="center"] {
+  width: 66%;
+  top: 55%;
+}
+
+.ft-screen-showcase[data-layout="popup"] .ft-stack-screen[data-position="left"] {
+  left: 30%;
+}
+
+.ft-screen-showcase[data-layout="popup"] .ft-stack-screen[data-position="right"] {
+  left: 70%;
+}
+
+.ft-screen-showcase[data-layout="popup"] .ft-stack-screen img {
+  height: auto;
+  object-fit: contain;
 }
 
 .ft-stack-screen:focus-visible {
@@ -670,6 +699,16 @@ html[data-theme="dark"] .ft-download-rail {
 .ft-app-hero { --hero-tint: var(--color-hero-sage); }
 .ft-app-hero[data-tone="sky"] { --hero-tint: var(--color-hero-sky); }
 .ft-app-hero[data-tone="rose"] { --hero-tint: var(--color-hero-rose); }
+.ft-app-hero[data-tone="lilac"] { --hero-tint: var(--color-hero-lilac); }
 .ft-app-hero-wash {
   background: linear-gradient(90deg, color-mix(in srgb, var(--hero-tint) 88%, transparent), color-mix(in srgb, var(--hero-tint) 60%, transparent));
 }
+
+/* Native horizontal scrolling keeps moving showcases swipeable and focusable. */
+.ft-screenshot-carousel { min-width: 0; }
+.ft-gallery-viewport { overflow-x: auto; padding: 6px 6px 18px; overscroll-behavior-x: contain; scrollbar-width: thin; }
+.ft-gallery-track, .ft-gallery-group { display: flex; gap: 1.5rem; width: max-content; align-items: flex-start; }
+.ft-gallery-slide { width: min(72vw, 19rem); flex: 0 0 auto; }
+.ft-screenshot-carousel[data-layout="desktop"] .ft-gallery-slide { width: min(86vw, 44rem); }
+.ft-gallery-control { display: inline-flex; min-width: 44px; min-height: 44px; align-items: center; justify-content: center; gap: 0.5rem; border: 1px solid var(--color-line); border-radius: 999px; background: var(--color-shell-strong); color: var(--color-ink); cursor: pointer; }
+.ft-gallery-control:focus-visible, .ft-gallery-slide a:focus-visible { outline: 3px solid var(--color-accent); outline-offset: 3px; }
