@@ -45,7 +45,7 @@ export const metadata = {
     template: "%s | FilterTube",
   },
   description:
-    "Calmer YouTube on Android and in your browser. Explore family profiles, local filtering, verified peer-to-peer sharing, and iOS and TV development.",
+    "Calmer viewing on Android and in your browser. Explore family profiles, local filtering, verified peer-to-peer sharing, and iOS and TV development.",
   openGraph: {
     title: "FilterTube",
     description:
@@ -67,7 +67,7 @@ export const metadata = {
     card: "summary_large_image",
     title: "FilterTube",
     description:
-      "Local-first YouTube filtering for calmer feeds and safer family setups.",
+      "Local-first video filtering for calmer feeds and safer family setups.",
     images: ["/brand/logo.png"],
   },
   alternates: {

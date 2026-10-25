@@ -86,7 +86,7 @@ const androidMarkets = [
     title: "Google Play",
     status: "Complete custom viewing app",
     detail:
-      "The Google Play build is FilterTube's feature-rich, complete custom viewing experience for YouTube Main and Kids. Anyone can install it directly from the public listing or find it by searching Google Play.",
+      "The Google Play build is FilterTube's feature-rich, complete custom viewing experience for Main and Kids. Anyone can install it directly from the public listing or find it by searching Google Play.",
   },
   {
     title: "Direct APK",

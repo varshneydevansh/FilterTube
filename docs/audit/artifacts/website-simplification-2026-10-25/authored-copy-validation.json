@@ -1,0 +1,81 @@
+{
+  "scope": "local production rendered authored HTML text, image labels, accessible labels and metadata; third-party iframe contents and image pixels excluded",
+  "routes": [
+    {
+      "route": "/",
+      "status": 200,
+      "name_in_authored_text_or_metadata": false
+    },
+    {
+      "route": "/android",
+      "status": 200,
+      "name_in_authored_text_or_metadata": false
+    },
+    {
+      "route": "/ios",
+      "status": 200,
+      "name_in_authored_text_or_metadata": false
+    },
+    {
+      "route": "/extension",
+      "status": 200,
+      "name_in_authored_text_or_metadata": false
+    },
+    {
+      "route": "/mobile",
+      "status": 200,
+      "name_in_authored_text_or_metadata": false
+    },
+    {
+      "route": "/ipados",
+      "status": 200,
+      "name_in_authored_text_or_metadata": false
+    },
+    {
+      "route": "/tv",
+      "status": 200,
+      "name_in_authored_text_or_metadata": false
+    },
+    {
+      "route": "/android-tv",
+      "status": 200,
+      "name_in_authored_text_or_metadata": false
+    },
+    {
+      "route": "/fire-tv",
+      "status": 200,
+      "name_in_authored_text_or_metadata": false
+    },
+    {
+      "route": "/kids",
+      "status": 200,
+      "name_in_authored_text_or_metadata": false
+    },
+    {
+      "route": "/ml-ai",
+      "status": 200,
+      "name_in_authored_text_or_metadata": false
+    },
+    {
+      "route": "/downloads",
+      "status": 200,
+      "name_in_authored_text_or_metadata": false
+    },
+    {
+      "route": "/privacy",
+      "status": 200,
+      "name_in_authored_text_or_metadata": false
+    },
+    {
+      "route": "/terms",
+      "status": 200,
+      "name_in_authored_text_or_metadata": false
+    }
+  ],
+  "functional_urls_unchanged": true,
+  "production_build": "passed",
+  "focused_website_checks": 18,
+  "release_checks": 742,
+  "smoke_checks": 1482,
+  "deployed": false
+}

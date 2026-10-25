@@ -92,7 +92,7 @@ export const footerLinks = {
     { label: "iOS: iPhone and iPad", href: "/ios" },
     { label: "Browser extension", href: "/extension" },
     { label: "Peer-to-peer device sync", href: "/#device-sync" },
-    { label: "YouTube Kids", href: "/kids" },
+    { label: "Kids", href: "/kids" },
     { label: "ML & AI", href: "/ml-ai" },
   ],
   resources: [
@@ -115,7 +115,7 @@ export const footerLinks = {
 };
 
 export const homeStoryNotes = [
-  "FilterTube began with a neurodivergent developer who wanted calmer YouTube for ADHD focus.",
+  "FilterTube began with a neurodivergent developer who wanted calmer viewing for ADHD focus.",
   "Parents, caregivers, and autistic and other neurodivergent users have helped shape clearer controls for different needs.",
   "The goal is practical: enjoy the creators you choose, keep unwanted content out, and give each person rules that fit them.",
   "Independent development keeps the project close to that feedback. Community reports and contributions help it improve across phones, tablets, TVs, and browsers.",
@@ -126,10 +126,10 @@ export const homeCapabilityCards = [
     label: "Playback",
     title: "Keep the video you chose at the center.",
     description:
-      "FilterTube filters YouTube adverts and unwanted content. The Android app has its own viewing experience; the extension keeps YouTube's familiar player controls.",
+      "FilterTube filters adverts and unwanted content. The Android app has its own viewing experience; the extension keeps the familiar player controls.",
     points: [
       "Advert filtering is enabled by default in Blocklist and Whitelist modes.",
-      "Playback paths differ by platform, and compatibility still needs maintenance when YouTube changes.",
+      "Playback paths differ by platform, and compatibility still needs maintenance when the platform changes.",
     ],
     icon: EyeSlash,
     span: "xl:col-span-12",
@@ -138,7 +138,7 @@ export const homeCapabilityCards = [
     label: "Rules",
     title: "Block what you name, or allow only what you trust.",
     description:
-      "Add channels, keywords, or supported content filters. Keep separate rules for YouTube Main and Kids when they need different boundaries.",
+      "Add channels, keywords, or supported content filters. Keep separate rules for Main and Kids when they need different boundaries.",
     points: [
       "Blocklist hides matching content; Whitelist limits viewing to approved rules.",
       "Exact matching, date ranges, categories, and content controls help make rules more precise.",
@@ -162,7 +162,7 @@ export const homeCapabilityCards = [
     label: "Focus",
     title: "Keep the useful parts. Quiet the distractions.",
     description:
-      "Choose the surfaces that interrupt your attention instead of removing everything from YouTube.",
+      "Choose the surfaces that interrupt your attention instead of removing every feature.",
     points: [
       "Hide Shorts, comments, or other supported feed and watch-page distractions.",
       "Choose Home feed, recommendations, Mixes, playlist panels, live chat, or end-screen controls where supported.",
@@ -189,7 +189,7 @@ export const homeUserVoices = [
   {
     source: "Parent feedback on Reddit",
     title: "Parents want calmer words, not developer language.",
-    body: "A parent using FilterTube on a child’s PC said the product is exactly what YouTube has been missing, then asked for a simpler guide and clearer explanations.",
+    body: "A parent using FilterTube on a child’s PC said the product is exactly what their viewing experience has been missing, then asked for a simpler guide and clearer explanations.",
     href: "https://www.reddit.com/r/FilterTube/comments/1uhtqo7/some_feedback/",
   },
   {
@@ -199,7 +199,7 @@ export const homeUserVoices = [
     href: "https://github.com/varshneydevansh/FilterTube/issues/60#issuecomment-4612147210",
   },
   {
-    source: "YouTube parent comment",
+    source: "Parent demo comment",
     title: "Allow-only setups matter for study computers.",
     body: "A parent said FilterTube solved nearly everything for a child’s study PC and asked for stronger protection around turning filtering off.",
     href: "https://www.youtube.com/watch?v=dmLUu3lm7dE&t=26s",
@@ -216,19 +216,19 @@ export const systemSteps = [
   {
     title: "Pick the profile",
     description:
-      "Keep the adult profile, child profiles, and YouTube Kids rules separate when they need different limits.",
+      "Keep the adult profile, child profiles, and Kids rules separate when they need different limits.",
     icon: Stack,
   },
   {
-    title: "Open YouTube",
+    title: "Start watching",
     description:
-      "FilterTube removes matching videos and surfaces as YouTube loads, then cleans up anything YouTube adds later.",
+      "FilterTube removes matching videos and surfaces as the page loads, then cleans up anything added later.",
     icon: EyeSlash,
   },
   {
     title: "Adjust when needed",
     description:
-      "If YouTube changes its layout, tell the developer. That is usually the reason filtering suddenly misses a surface.",
+      "If the platform changes its layout, tell the developer. That is usually the reason filtering suddenly misses a surface.",
     icon: ShieldCheck,
   },
 ];
@@ -237,7 +237,7 @@ export const homeFaqItems = [
   {
     question: "How do I start?",
     answer:
-      "Install the Android app or browser extension, add one channel or keyword, then check the result. In the extension, refresh YouTube after your first rule. Add profiles, PINs, Kids rules, and imports when you need them.",
+      "Install the Android app or browser extension, add one channel or keyword, then check the result. In the extension, refresh the page after your first rule. Add profiles, PINs, Kids rules, and imports when you need them.",
   },
   {
     question: "What does Exact mean?",
@@ -262,7 +262,7 @@ export const homeFaqItems = [
   {
     question: "What if a filter misses something?",
     answer:
-      "Check the active profile, rule space, and Exact setting first. YouTube layout changes can also affect filtering. A small example, page type, and screenshot help diagnose it; share only the private details you choose.",
+      "Check the active profile, rule space, and Exact setting first. Page layout changes can also affect filtering. A small example, page type, and screenshot help diagnose it; share only the private details you choose.",
   },
 ];
 
@@ -270,7 +270,7 @@ export const homeTechnicalFeatures = [
   {
     title: "Ad-free playback",
     description:
-      "Remove YouTube adverts without changing whether the active profile uses Blocklist or Whitelist rules.",
+      "Filter adverts without changing whether the active profile uses Blocklist or Whitelist rules.",
     detail:
       "Enabled by default; the extension and native app use platform-specific playback paths.",
   },
@@ -283,7 +283,7 @@ export const homeTechnicalFeatures = [
   {
     title: "Channel rules",
     description:
-      "Block a channel, allow only trusted channels, or use channel IDs and handles without memorizing YouTube URL formats.",
+      "Block a channel, allow only trusted channels, or use channel IDs and handles without memorizing URL formats.",
     detail: "Best for creators you always want hidden or always want allowed.",
   },
   {
@@ -301,7 +301,7 @@ export const homeTechnicalFeatures = [
   {
     title: "Profiles",
     description:
-      "Keep different rule sets for adults, children, study time, or stricter YouTube Kids setups.",
+      "Keep different rule sets for adults, children, study time, or stricter Kids setups.",
     detail: "Rules stay scoped to the profile you choose.",
   },
   {
@@ -325,7 +325,7 @@ export const homeTechnicalFeatures = [
   {
     title: "Subscribed-channel whitelist",
     description:
-      "Import channels from the signed-in YouTube account into the current profile whitelist, then choose whether to only store them or turn whitelist mode on.",
+      "Import channels from the signed-in viewing account into the current profile whitelist, then choose whether to only store them or turn whitelist mode on.",
     detail: "Useful when a child should only see channels already subscribed.",
   },
   {
@@ -423,12 +423,12 @@ export const detailPages = {
     eyebrow: "Browser extension",
     navTitle: "Browser extension",
     routeSummary:
-      "Keep YouTube's familiar player and add filters, profiles, and local control in your browser.",
-    titleLead: "Your familiar YouTube, with",
+      "Keep the familiar player and add filters, profiles, and local control in your browser.",
+    titleLead: "Your familiar viewing, with",
     titleDisplay: "your rules",
     description:
-      "Filter channels, keywords, Shorts, comments, and supported content without leaving the YouTube website. Use the popup for quick changes, the dashboard for deeper setup, and YouTube's menu to block content as you browse.",
-    chips: ["YouTube Main + Kids", "Local rules", "Family profiles"],
+      "Filter channels, keywords, Shorts, comments, and supported content on the pages you already use. Use the popup for quick changes, the dashboard for deeper setup, and the video menu to block content as you browse.",
+    chips: ["Main + Kids", "Local rules", "Family profiles"],
     primaryCta: {
       label: "Choose your browser",
       href: downloadsHref,
@@ -456,7 +456,7 @@ export const detailPages = {
       },
       {
         label: "While browsing",
-        value: "YouTube menu",
+        value: "Video menu",
         detail:
           "Block supported content from the page you are already viewing.",
       },
@@ -464,7 +464,7 @@ export const detailPages = {
     featureCards: [],
     deviceSyncHref: "#extension-p2p",
     exploreTitle: "Explore the extension",
-    exploreDescription: "Add controls to YouTube's existing pages through the popup, dashboard, and supported inline actions. Open a group for the details. Newer features may not be in your browser store release yet.",
+    exploreDescription: "Add controls to the existing pages through the popup, dashboard, and supported inline actions. Open a group for the details. Newer features may not be in your browser store release yet.",
     exploreGroups: [
       {
         id: "extension-filters",
@@ -486,8 +486,8 @@ export const detailPages = {
           "The content-control catalogue has 32 switches across seven groups: Core, Feeds, Watch page, Video info, Player, Navigation, and Search.",
           "Hide Shorts, the homepage feed, comments, Playables, playlist cards, members-only videos, or Mix/Radio playlists. Quick Block and the three-dot Block menu can be enabled separately.",
           "Quiet the Watch page by hiding related videos, the sidebar, live chat, or playlist panel. Video information controls cover the buttons bar, Ask, channel row, description, and merchandise/ticket/offer panels.",
-          "Player controls include advert filtering, end-screen cards and videowalls, autoplay, and annotations. Content-only playback and original-audio preference are separate experimental controls; the desktop Watch path keeps YouTube's native player.",
-          "Navigation controls can hide the top header, notification bell, Explore/Trending, More from YouTube, or Subscriptions. Search has its own irrelevant-result control. Coverage varies with YouTube's current page layouts.",
+          "Player controls include advert filtering, end-screen cards and videowalls, autoplay, and annotations. Content-only playback and original-audio preference are separate experimental controls; the desktop Watch path keeps the native player.",
+          "Navigation controls can hide the top header, notification bell, Explore/Trending, additional services, or Subscriptions. Search has its own irrelevant-result control. Coverage varies with current page layouts.",
         ],
       },
       {
@@ -508,7 +508,7 @@ export const detailPages = {
         title: "Notes for useful moments",
         summary: "Keep a note with the video and profile it belongs to.",
         points: [
-          "Notes are scoped to the exact profile and video. The inline editor is for admitted Main Watch pages on supported YouTube hosts; this is not a claim of Notes support in Music, Kids, or Shorts.",
+          "Notes are scoped to the exact profile and video. The inline editor is for admitted Main Watch pages on supported hosts; this is not a claim of Notes support in Music, Kids, or Shorts.",
           "Add timestamps to return to a moment, keep a temporary draft, save edits, or delete with undo. If another edit arrives, review the conflicting version instead of silently overwriting it.",
           "Notes access still follows profile, parent, and protected-time checks. Personal Notes text is edited within the extension's own interface.",
           "Ordinary extension backups do not include private video Notes. Opt-in personal Notes sync is a separate choice, and notes-bearing native app backups cannot currently be restored through the ordinary extension importer.",
@@ -547,7 +547,7 @@ export const detailPages = {
     milestones: [
       "Chrome, Firefox, and Edge have store listings; compatible Chromium browsers use the relevant installation path.",
       "Newer Notes, minimum-view rules, compatible exports, preference reset, and Auto-sync features may not be in your store release yet.",
-      "YouTube changes still require compatibility work; advert filtering is not a promise of permanent immunity to platform changes.",
+      "Platform changes still require compatibility work; advert filtering is not a promise of permanent immunity to platform changes.",
     ],
     related: ["android", "kids", "ml-ai"],
   },
@@ -588,7 +588,7 @@ export const detailPages = {
     appPreview: {
       eyebrow: "App preview video",
       title: "See FilterTube’s custom mobile experience.",
-      body: "Watch the working phone and tablet experience, including the calmer custom interface built for YouTube Main and Kids.",
+      body: "Watch the working phone and tablet experience, including the calmer custom interface built for Main and Kids.",
       embedHref: "https://www.youtube-nocookie.com/embed/SHvSICSMHL4?rel=0",
       watchHref: appDemoVideoHref,
     },
@@ -824,7 +824,7 @@ export const detailPages = {
     titleLead: "Your viewing, your rules on",
     titleDisplay: "Android",
     description:
-      "Watch YouTube Main and Kids in FilterTube's custom Android app, with filters, profiles, parent controls, and protected time. Install the phone and tablet app from Google Play—no invitation or email needed. Android TV is separate development work, not part of the public phone listing.",
+      "Watch Main and Kids in FilterTube's custom Android app, with filters, profiles, parent controls, and protected time. Install the phone and tablet app from Google Play—no invitation or email needed. Android TV is separate development work, not part of the public phone listing.",
     heroVideo: {
       src: "/videos/android/android-contours.mp4",
       poster: "/videos/android/android-contours-poster.png",
@@ -974,7 +974,7 @@ export const detailPages = {
         summary: "Keep useful video moments and local files close.",
         points: [
           "The newer Android development build includes per-video Notes with timestamps, an editor and a searchable Notes index. Notes belong to the chosen profile and still follow its permissions.",
-          "Offline Media organizes local files into Recent, Folders, Videos, Audio and Favourites, with resume and queue controls. It is different from saving YouTube videos for offline viewing, which remains planned on Android.",
+          "Offline Media organizes local files into Recent, Folders, Videos, Audio and Favourites, with resume and queue controls. It is different from saving online videos for offline viewing, which remains planned on Android.",
           "Notes and local-media updates are in testing; availability varies by app release.",
         ],
       },
@@ -1217,14 +1217,14 @@ export const detailPages = {
     icon: ShieldCheck,
     tone: "rose",
     status: "Android + browser extension",
-    eyebrow: "Rules for YouTube Kids",
+    eyebrow: "Rules for Kids",
     navTitle: "Kids",
     routeSummary:
       "Block unwanted channels and words, or allow only channels you choose. Keep Kids rules separate and parent-managed.",
     titleLead: "More say in what your",
     titleDisplay: "children watch",
     description:
-      "Block channels and words you do not want in YouTube Kids—or choose Whitelist to allow only the channels you approve. Give each child their own rules and viewing limits, with changes managed by their parent.",
+      "Block channels and words you do not want in Kids—or choose Whitelist to allow only the channels you approve. Give each child their own rules and viewing limits, with changes managed by their parent.",
     chips: ["Channel + keyword filters", "Allow-only viewing", "Parent-managed profiles"],
     primaryCta: { label: "Get the Android app", href: androidPlayStoreHref, external: true },
     secondaryCta: { label: "Get the browser extension", href: downloadsHref, external: false },
@@ -1246,7 +1246,7 @@ export const detailPages = {
       },
       {
         title: "Different children, different rules",
-        body: "Each profile has its own setup. A profile's Main and Kids spaces can have different channels, keywords and viewing modes. YouTube Kids is a viewing space; it is not the same thing as a protected child profile.",
+        body: "Each profile has its own setup. A profile's Main and Kids spaces can have different channels, keywords and viewing modes. Kids is a viewing space; it is not the same thing as a protected child profile.",
       },
       {
         title: "Parent controls stay with the parent",
@@ -1265,7 +1265,7 @@ export const detailPages = {
     milestoneIntro: "The same family direction, with different availability on each platform.",
     milestones: [
       "Android phones and tablets: the custom Main and Kids app is on Google Play. No invitation or email is needed.",
-      "Browser extension: adds filtering to supported YouTube Kids pages. Use the full settings page to manage profiles and Kids rules.",
+      "Browser extension: adds filtering to supported Kids pages. Use the full settings page to manage profiles and Kids rules.",
       "iPhone and iPad: development builds include Kids viewing and family controls; public App Store and TestFlight access is pending.",
       "Android TV: full Kids and family-control parity is still in development. Fire TV compatibility is planned. The phone listing is not a TV release.",
       "Rules stay local. Optional verified device sharing is encrypted; helpers or relay services may be involved. Filters support parent decisions, rather than replacing review of what a child watches.",

@@ -115,3 +115,11 @@ specific parent choices, limits and platform availability. All existing routes
 and unique feature information remain. The native signature-solver simulator
 crash is documented separately and remains unresolved; this website update does
 not claim native playback repair or public iOS distribution.
+
+## Website wording after `768d8755`
+
+Removed repeated underlying-service naming from authored site copy and metadata
+at the user's request. Main, Kids, Music and videos provide the context. Demo and
+support links, genuine media, installation choices and all feature/availability
+information remain. Privacy and Terms preserve third-party ownership and data
+boundaries. No extension or native application behavior changes.

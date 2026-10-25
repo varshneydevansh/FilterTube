@@ -62,3 +62,12 @@ background rule. The original silent fframes contour loop is decorative; no UI
 story, user data or simulated feature behavior is composited into it. Background
 videos pause offscreen/when hidden and have visible pause controls. CSS transforms
 handle the screenshot interaction; no GSAP runtime dependency is needed here.
+
+## Naming direction — 25 October 2026
+
+The user explicitly asks not to repeat the underlying service name anywhere in
+the website's own copy or metadata. Use Main, Kids, Music, videos, supported pages
+or the video platform as the context requires. Keep functional demo/source URLs
+and intact genuine product screenshots. Do not imply broader site support or
+remove privacy/no-affiliation facts; Google still owns its underlying services.
+Third-party player chrome is outside the website's authored copy.

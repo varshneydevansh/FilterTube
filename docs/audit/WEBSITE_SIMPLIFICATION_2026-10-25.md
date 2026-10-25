@@ -314,3 +314,21 @@ console errors. The fframes inspector checked 33 frames with no problems.
 Evidence and asset fingerprints: `artifacts/website-simplification-2026-10-25/`.
 Existing broader filtering/settings suite failures remain separate gates; they
 were not rerun or waived by this website-only check.
+
+## Service-name copy follow-up after `768d8755`
+
+The user requested removal of repeated underlying-service naming across the
+website. Home, platform guides, navigation, footer, demo labels, metadata,
+Privacy, Terms and shared copy now use Main/Kids/Music/videos/supported pages.
+Functional demo, attribution and support URLs remain unchanged; genuine app
+screenshots are intact. Privacy and Terms retain Google ownership, independent
+service policies, host permission boundaries and non-affiliation. This is a
+wording change, not support for arbitrary video services. Third-party embedded
+player chrome and text inside real product media are outside authored copy.
+
+Validation of the wording follow-up: production build, 18 focused website checks,
+742 release checks and 1,482 smoke checks pass. A served-HTML scan across all 14
+routes found no service name in authored text, accessible/image labels, titles
+or metadata; functional external URLs match the prior checkpoint exactly.
+Android, iOS and Kids still have no horizontal overflow at 320 pixels. Refreshed
+browser images and `authored-copy-validation.json` record the final wording.

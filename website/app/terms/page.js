@@ -23,10 +23,10 @@ const sections = [
     ],
   },
   {
-    title: "No affiliation with YouTube or Google",
+    title: "No affiliation with Google or its video services",
     body: [
-      "FilterTube is an independent project. It is not endorsed by, sponsored by, or affiliated with YouTube or Google.",
-      "Any references to YouTube describe compatibility and product context only.",
+      "FilterTube is an independent project. It is not endorsed by, sponsored by, or affiliated with Google or its video services.",
+      "References to Main, Music, Kids, or other supported video services describe compatibility and product context only.",
     ],
   },
   {

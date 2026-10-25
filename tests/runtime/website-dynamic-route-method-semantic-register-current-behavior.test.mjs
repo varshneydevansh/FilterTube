@@ -10,9 +10,9 @@ const routePath = 'website/app/[slug]/page.js';
 
 const sourceRows = [
   ['website/app/[slug]/page.js', 54, 1229, '0233757cc9b72d7292750fc0a83560b54969f6489aa397091b408a16f25716f3'],
-  ['website/components/route-content.js', 1346, 62651, '7aa131a7be51dd828552f8d6a6245bf5b50d0207324a6abd22aa5ae49b1ce4db'],
+  ['website/components/route-content.js', 1346, 62498, '5006fb0815011199b5fffbade4857445b03ff45f175c4c37538633ac817c851a'],
   ['website/components/site-shell-data.js', 22, 488, 'd2fc7d7a1fe3d708bfa8a1b7b7f71a296679a4b83e77f07c9eedae7007b8038c'],
-  ['website/components/scenic-detail-page.js', 495, 23555, '5c09ea4e20566141af00b96b9dd146c9f22318d80ba78b0245d7b7e039bc24a8']
+  ['website/components/scenic-detail-page.js', 495, 23548, 'cd23c437360caf7cc094afd7ed18633c18a4546f28d242856bc70956bf54b48d']
 ];
 
 function filePath(file) {

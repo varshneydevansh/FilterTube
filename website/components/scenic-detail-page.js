@@ -276,7 +276,7 @@ export function ScenicDetailPage({ page, relatedPages }) {
                     rel="noreferrer"
                     target="_blank"
                   >
-                    Open video on YouTube
+                    Watch the demo
                     <ArrowUpRight aria-hidden="true" size={16} weight="light" />
                   </a>
                 </div>

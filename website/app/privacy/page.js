@@ -13,7 +13,7 @@ const summaryCards = [
     label: "Core product model",
     value: "A local tool, not an account service",
     detail:
-      "Your rules and profiles live in the app or extension on your device. FilterTube has no account area where we receive or view your YouTube activity.",
+      "Your rules and profiles live in the app or extension on your device. FilterTube has no account area where we receive or inspect your viewing activity.",
   },
   {
     label: "Rules and history",
@@ -39,12 +39,12 @@ const platformCoverage = [
   {
     title: "Browser extension",
     body:
-      "Chrome/Chromium and other supported browser builds apply your rules on supported YouTube surfaces. Extension settings stay in browser storage unless you export or sync them.",
+      "Chrome/Chromium and other supported browser builds apply your rules on supported video-service pages. Extension settings stay in browser storage unless you export or sync them.",
   },
   {
     title: "Android phone and tablet app",
     body:
-      "The Android app provides native FilterTube controls, profiles, PIN protection, YouTube Main viewing, public YouTube Kids WebView access, local settings, and Nanah sync controls.",
+      "The Android app provides native FilterTube controls, profiles, PIN protection, Main viewing, public Kids web-view access, local settings, and Nanah sync controls.",
   },
   {
     title: "iOS and iPad app",
@@ -69,8 +69,8 @@ const platformCoverage = [
 ];
 
 const noProductCollection = [
-  "Your YouTube or Google password, login token, private account credential, or payment details",
-  "Your complete YouTube watch history or search history",
+  "Your Google password, service login token, private account credential, or payment details",
+  "Your complete video watch history or search history",
   "Your general browsing history outside supported FilterTube surfaces",
   "Your FilterTube blocklist, whitelist, keywords, profile settings, PIN state, Kids/Main viewing choice, theme, or route controls as something we can view online",
   "Contacts, photos, camera stream, microphone recordings, precise location, or phone contacts",
@@ -90,7 +90,7 @@ const infrastructure = [
   {
     title: "No FilterTube account area",
     detail:
-      "There is no FilterTube account page where your app or extension rules, profiles, watch history, search history, PINs, or YouTube account details are uploaded for us to view.",
+      "There is no FilterTube account page where your app or extension rules, profiles, watch history, search history, PINs, or video-service account details are uploaded for us to view.",
   },
   {
     title: "Website hosting",
@@ -108,9 +108,9 @@ const infrastructure = [
       "Google Play, Apple App Store, browser stores, and TV app stores may process installs, reviews, integrity checks, crash diagnostics, and account information under their own policies.",
   },
   {
-    title: "Google/YouTube services",
+    title: "Google video services",
     detail:
-      "YouTube Main, YouTube Music, and YouTube Kids remain Google services. FilterTube controls its shell and local filtering rules; Google controls the underlying web service.",
+      "The underlying Main, Music, and Kids video services remain Google services. FilterTube controls its shell and local filtering rules; Google controls the underlying web service.",
   },
   {
     title: "Support contact",
@@ -128,7 +128,7 @@ const oldPolicyAnswers = [
   {
     title: "Data usage",
     detail:
-      "Rules and settings are used locally to hide or block matching YouTube content according to your choices.",
+      "Rules and settings are used locally to hide or block matching video content according to your choices.",
   },
   {
     title: "Data sharing",
@@ -151,17 +151,17 @@ const browserPermissions = [
   {
     title: "Active tab",
     detail:
-      "Lets FilterTube respond when you interact with the current supported YouTube tab.",
+      "Lets FilterTube respond when you interact with the current supported video-service tab.",
   },
   {
     title: "Scripting",
     detail:
-      "Lets FilterTube run local filtering scripts on supported YouTube pages so matching elements can be hidden according to your settings.",
+      "Lets FilterTube run local filtering scripts on supported video-service pages so matching elements can be hidden according to your settings.",
   },
   {
     title: "Tabs",
     detail:
-      "Lets FilterTube respond to navigation changes on supported tabs and keep filtering behavior in sync as YouTube changes routes.",
+      "Lets FilterTube respond to navigation changes on supported tabs and keep filtering behavior in sync as the video service changes routes.",
   },
   {
     title: "Downloads",
@@ -171,7 +171,7 @@ const browserPermissions = [
   {
     title: "Host permissions",
     detail:
-      "Scopes filtering to supported YouTube surfaces, including youtube.com, youtube-nocookie.com, music.youtube.com, and youtubekids.com where supported.",
+      "Scopes filtering to supported Main, Music, Kids, and embedded-video hosts. The browser permission dialog lists the exact domains covered by the installed build.",
   },
 ];
 
@@ -179,7 +179,7 @@ const appAccess = [
   {
     title: "Managed web views",
     detail:
-      "Android and iOS/iPad load YouTube Main and public YouTube Kids surfaces in platform web views. Those pages are still Google/YouTube web services.",
+      "Android and iOS/iPad load supported Main and public Kids pages in platform web views. Those pages are still Google web services.",
   },
   {
     title: "Native controls",
@@ -233,9 +233,9 @@ const nanahDetails = [
 
 const dataMovement = [
   {
-    title: "You open YouTube, YouTube Music, or YouTube Kids",
+    title: "You open Main, Music, or Kids",
     detail:
-      "Network activity for those services is between your device/web view/browser and Google/YouTube. Their policies apply to their account, video, ad, cookie, and recommendation systems.",
+      "Network activity for those services is between your device/web view/browser and Google. Their policies apply to their account, video, ad, cookie, and recommendation systems.",
   },
   {
     title: "You export or back up settings",
@@ -280,14 +280,14 @@ const faq = [
       "No. Your rules, profiles, PINs, watch history, and search history are not uploaded into a FilterTube account or dashboard.",
   },
   {
-    question: "Does FilterTube collect my YouTube watch history?",
+    question: "Does FilterTube collect my video watch history?",
     answer:
-      "No. FilterTube applies rules locally to supported YouTube surfaces. It does not upload a copy of your watch history to FilterTube.",
+      "No. FilterTube applies rules locally to supported video-service pages. It does not upload a copy of your watch history to FilterTube.",
   },
   {
     question: "Does FilterTube collect my search queries?",
     answer:
-      "No. Search terms are handled by YouTube/Google on their service. FilterTube does not create a FilterTube search-history account or analytics profile.",
+      "No. Search terms are handled by Google on its video services. FilterTube does not create a FilterTube search-history account or analytics profile.",
   },
   {
     question: "Where are my blocklists, keywords, and profiles stored?",
@@ -297,7 +297,7 @@ const faq = [
   {
     question: "Can FilterTube read all websites I visit?",
     answer:
-      "No. FilterTube is scoped to supported YouTube-related surfaces needed for filtering, such as youtube.com, music.youtube.com, youtube-nocookie.com, and youtubekids.com where supported.",
+      "No. FilterTube is scoped to supported Main, Music, Kids, and embedded-video hosts needed for filtering. The browser permission dialog lists the exact domains covered by the installed build.",
   },
   {
     question: "Does FilterTube track how many videos it blocks?",
@@ -327,12 +327,12 @@ const faq = [
   {
     question: "Can FilterTube see my Google password?",
     answer:
-      "No. YouTube/Google login is handled by Google inside the browser or platform web view. FilterTube does not ask for or store your Google password.",
+      "No. Google sign-in is handled by Google inside the browser or platform web view. FilterTube does not ask for or store your Google password.",
   },
   {
-    question: "Does FilterTube control YouTube's own data collection?",
+    question: "Does FilterTube control the video services' data collection?",
     answer:
-      "No. YouTube Main, YouTube Music, and YouTube Kids remain Google services. Their account, playback, ads, cookies, and recommendations are governed by Google's policies.",
+      "No. The underlying Main, Music, and Kids video services remain Google services. Their account, playback, ads, cookies, and recommendations are governed by Google's policies.",
   },
   {
     question: "What happens if I uninstall FilterTube?",
@@ -345,9 +345,9 @@ const faq = [
       "Yes. Nanah sync is optional. Filtering works without pairing devices.",
   },
   {
-    question: "Is FilterTube affiliated with YouTube or Google?",
+    question: "Is FilterTube affiliated with Google or its video services?",
     answer:
-      "No. FilterTube is independent and not endorsed by, sponsored by, or affiliated with Google, YouTube, YouTube Music, or YouTube Kids.",
+      "No. FilterTube is independent and not endorsed by, sponsored by, or affiliated with Google or its Main, Music, and Kids video services.",
   },
 ];
 
@@ -383,7 +383,7 @@ const policyNav = [
   ["Android, iOS/iPad, and TV", "#native-apps"],
   ["Nanah P2P sync", "#nanah"],
   ["Website analytics", "#website"],
-  ["YouTube and Google", "#third-parties"],
+  ["Google and video services", "#third-parties"],
   ["Store disclosures", "#store-summary"],
   ["Direct answers", "#faq"],
   ["Contact", "#contact"],
@@ -466,7 +466,7 @@ export default function PrivacyPage() {
             <p className="mt-6 max-w-[72ch] text-base leading-8 text-[var(--color-muted)] md:text-lg">
               Last updated on May 4, 2026. This page covers the FilterTube
               browser extension, Android app, iOS/iPad app, TV app path,
-              website, public YouTube Kids access, and optional Nanah
+              website, public Kids access, and optional Nanah
               peer-to-peer settings sync.
             </p>
             <div className="mt-6 flex flex-wrap gap-3">
@@ -547,9 +547,9 @@ export default function PrivacyPage() {
               <p>
                 FilterTube (&quot;we&quot;, &quot;our&quot;, or
                 &quot;the product&quot;) is a free, independent control layer
-                for calmer YouTube viewing. It helps users, families, students,
-                and profile owners hide noisy or unwanted YouTube surfaces using
-                rules they control.
+                for calmer video viewing. It helps users, families, students,
+                and profile owners hide noisy or unwanted content on supported
+                video pages using rules they control.
               </p>
               <p>
                 The privacy model is intentionally simple: rules are stored on
@@ -599,7 +599,7 @@ export default function PrivacyPage() {
                 channels, Shorts visibility, comments visibility, watch-page
                 controls, route controls, profile rules, Kids/Main viewing
                 choices, and PIN-protected management surfaces. FilterTube reads
-                supported YouTube page content locally and hides matching
+                supported video-service page content locally and hides matching
                 elements according to your settings.
               </p>
               <p>
@@ -612,8 +612,7 @@ export default function PrivacyPage() {
             <PolicySection id="browser-permissions" title="6. Browser extension permissions">
               <p>
                 Browser permissions exist so the extension can operate on
-                supported YouTube pages and manage optional local backup/export
-                flows.
+                supported video pages and manage optional local backup/export flows.
               </p>
               <CardGrid columns="md:grid-cols-2 lg:grid-cols-3" items={browserPermissions} />
             </PolicySection>
@@ -680,17 +679,16 @@ export default function PrivacyPage() {
               </p>
             </PolicySection>
 
-            <PolicySection id="third-parties" title="11. YouTube and third-party services">
+            <PolicySection id="third-parties" title="11. Google and third-party video services">
               <p>
-                YouTube Main, YouTube Music, and YouTube Kids are Google
-                services. FilterTube is independent and not affiliated with,
-                endorsed by, or sponsored by Google, YouTube, YouTube Music, or
-                YouTube Kids.
+                The underlying Main, Music, and Kids video services belong to
+                Google. FilterTube is independent and not affiliated with,
+                endorsed by, or sponsored by Google or those services.
               </p>
               <p>
                 If you sign in, play videos, search, subscribe, comment, or
-                interact with Google/YouTube services, that activity is handled
-                by Google/YouTube under their own policies. FilterTube controls
+                interact with Google video services, that activity is handled
+                by Google under its own policies. FilterTube controls
                 local filtering and native shell behavior; it does not control
                 Google's account, ad, cookie, playback, or recommendation
                 systems.
@@ -719,9 +717,9 @@ export default function PrivacyPage() {
                 for children.
               </p>
               <p>
-                YouTube Kids content and accounts remain Google/YouTube
-                services. Parents should review Google's YouTube Kids and family
-                privacy policies for those surfaces.
+                The underlying Kids content and accounts remain Google
+                services. Parents should review Google's children's video and
+                family privacy policies for those services.
               </p>
             </PolicySection>
 

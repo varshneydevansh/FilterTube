@@ -50,7 +50,7 @@ export const capabilityTiles = [
     label: "Zero-flash filtering",
     title: "Intercept the feed before it renders.",
     description:
-      "FilterTube removes matching content from YouTube responses when the data is still JSON, so blocked content often never appears on screen in the first place.",
+      "FilterTube removes matching content from page responses when the data is still JSON, so blocked content often never appears on screen in the first place.",
     points: [
       "Pre-render filtering covers home, search, watch, and playlist surfaces.",
       "A DOM fallback handles SPA navigation and recycled nodes without turning the system into a visual flicker machine.",
@@ -74,7 +74,7 @@ export const capabilityTiles = [
     label: "Feed cleanup",
     title: "Shorts, comments, mixes, and shelf noise can all go.",
     description:
-      "The product already supports broad cleanup controls so people can decide what kind of YouTube experience they want rather than inheriting the default one.",
+      "The product already supports broad cleanup controls so people can decide what kind of viewing experience they want rather than inheriting the default one.",
     points: [
       "Hide Shorts entirely or remove comments for a calmer watch page.",
       "Mix and playlist handling stays precise enough to avoid collateral damage.",
@@ -98,7 +98,7 @@ export const capabilityTiles = [
     label: "Context-aware rules",
     title: "Filtering goes beyond simple word lists.",
     description:
-      "Whole-word matching, channel identity normalization, whitelist mode, and content-based rules keep FilterTube useful even when YouTube's data structures shift.",
+      "Whole-word matching, channel identity normalization, whitelist mode, and content-based rules keep FilterTube useful even when the platform's data structures shift.",
     points: [
       "Handles, UC IDs, and custom channel URLs are normalized behind the scenes.",
       "Category filters and clickbait detection extend the rule system beyond static phrases.",
@@ -112,13 +112,13 @@ export const pipelineSteps = [
   {
     title: "Intercept",
     description:
-      "Capture the YouTube data source that matters before the UI finishes building around it.",
+      "Capture the page data that matters before the UI finishes building around it.",
     icon: Strategy,
   },
   {
     title: "Resolve",
     description:
-      "Normalize channel identity across handles, canonical IDs, collaborative credits, and moving YouTube data structures.",
+      "Normalize channel identity across handles, canonical IDs, collaborative credits, and changing page data structures.",
     icon: Compass,
   },
   {
@@ -194,7 +194,7 @@ export const faqItems = [
       "No. The product is built around local filtering. Rules, settings, and activity counters stay on the device surface using browser or local app storage.",
   },
   {
-    question: "Can it handle YouTube Kids and family setups?",
+    question: "Can it handle Kids and family setups?",
     answer:
       "Yes. The product model already includes Kids-focused rule management, separate profiles, and PIN-protected flows so family safety is not bolted on later.",
   },

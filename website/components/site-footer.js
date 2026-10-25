@@ -45,7 +45,7 @@ export function SiteFooter() {
             <div className="grid gap-8 lg:grid-cols-[minmax(0,0.95fr)_minmax(0,1.05fr)] lg:items-start">
               <div>
                 <p className="text-[0.72rem] uppercase tracking-[0.24em] text-[var(--color-muted)]">
-                  Built for calmer YouTube
+                  Built for calmer viewing
                 </p>
                 <h2 className="mt-5 max-w-[11ch] font-display text-4xl tracking-[-0.06em] text-[var(--color-ink)] md:text-6xl md:leading-[0.96]">
                   Built to leave the screen calmer than it was.
@@ -131,7 +131,7 @@ export function SiteFooter() {
             <FooterSignalArt />
             <div className="absolute inset-x-0 bottom-0 flex flex-col gap-3 px-6 pb-5 pt-10 md:px-8 lg:flex-row lg:items-end lg:justify-between lg:px-10">
               <div className="rounded-full border border-white/14 bg-[rgba(9,14,22,0.36)] px-4 py-2 text-[0.72rem] uppercase tracking-[0.22em] text-white/78 backdrop-blur-md">
-                Serene by design. Not affiliated with Google or YouTube.
+                Serene by design. An independent project.
               </div>
               <div className="flex flex-wrap items-center gap-4 text-sm text-white/78">
                 <a

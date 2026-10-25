@@ -166,7 +166,7 @@ function AppReleaseStatusSection() {
   const appCards = [
     {
       eyebrow: "Android phone + tablet",
-      title: "Your YouTube, on Android.",
+      title: "Your videos, on Android.",
       body: "A custom Main and Kids app, with filters and family profiles. Explore Music, Notes and local-media development too. Install from Google Play—no invitation or email needed.",
       image: "/apps/android.png",
       imageAlt: "FilterTube Android app artwork",
@@ -230,11 +230,11 @@ function AppReleaseStatusSection() {
                 Browser extension · available now
               </p>
               <h2 className="mt-4 text-balance font-display text-3xl tracking-[-0.055em] text-[var(--color-ink)] md:text-4xl">
-                Keep YouTube in your browser.
+                Keep watching in your browser.
               </h2>
               <p className="mt-4 text-sm leading-7 text-[var(--color-muted)]">
-                Use FilterTube on YouTube itself, with a quick popup, full
-                settings, and channel controls in YouTube’s menu. Choose Chrome,
+                Use FilterTube on the pages you already visit, with a quick popup, full
+                settings, and channel controls in the video menu. Choose Chrome,
                 Firefox, Edge or another supported browser.
               </p>
               <Link
@@ -280,7 +280,7 @@ function QuickGuideSection() {
                   [
                     "2",
                     "Block one thing",
-                    "Choose your profile, add one channel or keyword, then open Main or Kids. In the extension, refresh YouTube to check the result.",
+                    "Choose your profile, add one channel or keyword, then open Main or Kids. In the extension, refresh the page to check the result.",
                   ],
                   [
                     "3",
@@ -374,7 +374,7 @@ function QuickGuideSection() {
           </summary>
           <div className="px-6 pb-6 text-sm leading-7 text-[var(--color-muted)]">
             <p>
-              YouTube changes its layouts and player. Check the active profile
+              Platforms change their layouts and players. Check the active profile
               and rule first, then report what happened with the page type, a
               screenshot and a small example of the affected word or channel.
             </p>
