@@ -91,6 +91,7 @@ export const footerLinks = {
     { label: "Android: phone, tablet, TV", href: "/android" },
     { label: "iOS: iPhone and iPad", href: "/ios" },
     { label: "Browser extension", href: "/extension" },
+    { label: "Peer-to-peer device sync", href: "/#device-sync" },
     { label: "YouTube Kids", href: "/kids" },
     { label: "ML & AI", href: "/ml-ai" },
   ],
@@ -294,7 +295,7 @@ export const homeTechnicalFeatures = [
   {
     title: "Shorts controls",
     description:
-      "Remove Shorts shelves, cards, and entry points when short-form scrolling is the habit you want to reduce.",
+      "Filter supported Shorts with channel and keyword rules, or hide Shorts shelves, cards, and entry points when you want less short-form scrolling.",
     detail: "A common first step for families and focus setups.",
   },
   {
@@ -350,7 +351,7 @@ export const homeTechnicalFeatures = [
   {
     title: "Protected viewing time",
     description:
-      "Parents can set daily viewing limits for protected profiles. The extension also offers timed self-control sessions that hold chosen rules until the session ends.",
+      "Set daily viewing limits per profile. Separate Self-Control Sessions hold chosen rules, while Hard Timer Whitelist limits Main viewing to selected approved channels for a reviewed countdown.",
     detail:
       "Daily time is counted per installation and profile, not as a shared family-wide budget. A child switching PIN cannot grant extra time.",
   },
@@ -381,7 +382,7 @@ export const homeTechnicalFeatures = [
     title: "Saved video notes",
     status: "Development updates",
     description:
-      "Keep notes with a video inside the selected profile. New Notes features are available in extension and Android development builds.",
+      "Keep notes with a video inside the selected profile. Extension Notes work on supported Watch pages; Android development builds also include a video Notes editor.",
     detail:
       "In testing; availability and Notes access depend on the app, release and profile permissions.",
   },
@@ -460,18 +461,84 @@ export const detailPages = {
           "Block supported content from the page you are already viewing.",
       },
     ],
-    featureCards: [
+    featureCards: [],
+    deviceSyncHref: "#extension-p2p",
+    exploreTitle: "Explore the extension",
+    exploreDescription: "Add controls to YouTube's existing pages through the popup, dashboard, and supported inline actions. Open a group for the details. Newer features may not be in your browser store release yet.",
+    exploreGroups: [
       {
-        title: "Choose what remains visible",
-        body: "Channel and keyword rules, Exact matching, Whitelist, Shorts and comment controls, and supported content filters help shape Main and Kids.",
+        id: "extension-filters",
+        title: "Filter what appears",
+        summary: "Channel, keyword, video, and metadata rules—with separate Main and Kids spaces.",
+        points: [
+          "Block unwanted channels, keywords or videos, or use Whitelist for approved content. Keep Blocked and Allowed rules with exceptions; editing a list does not switch your viewing mode.",
+          "Paste a channel handle, ID or supported URL. Use Exact for precise keywords, filter supported comments, and choose creators on supported collaboration cards.",
+          "Import subscribed channels into the current profile's whitelist, then choose whether to enable Whitelist mode. Main and Kids retain separate rule spaces and modes.",
+          "Narrow videos by length, upload date, uppercase titles and—in newer releases—minimum views. Search and sort saved rules separately by when they were added.",
+          "Choose from 15 video categories or 32 experimental Main video-language options using available metadata. Language filtering is not speech recognition and is not exposed for Kids; missing metadata can limit any content decision.",
+        ],
       },
       {
-        title: "Keep family boundaries clear",
-        body: "Profiles, parent permissions, PIN gates, protected viewing time, reviewed imports, and backups stay scoped to the selected profile.",
+        id: "extension-focus",
+        title: "Quiet the distractions",
+        summary: "Hide distracting feeds, panels, and player overlays.",
+        points: [
+          "The content-control catalogue has 32 switches across seven groups: Core, Feeds, Watch page, Video info, Player, Navigation, and Search.",
+          "Hide Shorts, the homepage feed, comments, Playables, playlist cards, members-only videos, or Mix/Radio playlists. Quick Block and the three-dot Block menu can be enabled separately.",
+          "Quiet the Watch page by hiding related videos, the sidebar, live chat, or playlist panel. Video information controls cover the buttons bar, Ask, channel row, description, and merchandise/ticket/offer panels.",
+          "Player controls include advert filtering, end-screen cards and videowalls, autoplay, and annotations. Content-only playback and original-audio preference are separate experimental controls; the desktop Watch path keeps YouTube's native player.",
+          "Navigation controls can hide the top header, notification bell, Explore/Trending, More from YouTube, or Subscriptions. Search has its own irrelevant-result control. Coverage varies with YouTube's current page layouts.",
+        ],
       },
       {
-        title: "Connect your verified devices",
-        body: "Pair with a code or QR and compare the safety phrase before sharing updates. Optional personal Auto-sync and per-video Notes are in testing for newer releases.",
+        id: "extension-family",
+        title: "Profiles and protected time",
+        summary: "Different rules for each person, with clear parent authority.",
+        points: [
+          "Use the default/master profile, independent accounts, or parent-owned child profiles. Parents can edit a chosen child's rules without granting that child access to parent settings.",
+          "Parent/account and Master unlocks are separate from a child switching PIN. Temporary admin sessions and Lock Admin Session let you close management access after editing.",
+          "Daily viewing allowances are per profile and installation, with remaining-time feedback and parent-reviewed requests for more time. They are not one pooled allowance shared across every family device.",
+          "Self-Control Session freezes the current profile and its existing settings for a reviewed countdown. Hard Timer Whitelist instead limits viewing to selected existing Main Allowed channels. Both survive restart, freeze changes, and have no in-app cancellation after activation; they are distinct from ordinary daily time and a mobile player sleep timer.",
+          "Profile protection cannot prevent a browser or device owner from disabling or uninstalling an unmanaged extension.",
+        ],
+      },
+      {
+        id: "extension-notes",
+        status: "Newer releases / in testing",
+        title: "Notes for useful moments",
+        summary: "Keep a note with the video and profile it belongs to.",
+        points: [
+          "Notes are scoped to the exact profile and video. The inline editor is for admitted Main Watch pages on supported YouTube hosts; this is not a claim of Notes support in Music, Kids, or Shorts.",
+          "Add timestamps to return to a moment, keep a temporary draft, save edits, or delete with undo. If another edit arrives, review the conflicting version instead of silently overwriting it.",
+          "Notes access still follows profile, parent, and protected-time checks. Personal Notes text is edited within the extension's own interface.",
+          "Ordinary extension backups do not include private video Notes. Opt-in personal Notes sync is a separate choice, and notes-bearing native app backups cannot currently be restored through the ordinary extension importer.",
+        ],
+      },
+      {
+        id: "extension-p2p",
+        status: "New Auto-sync features in testing",
+        title: "Connect your devices",
+        summary: "Share selected updates securely with verified devices.",
+        points: [
+          "Pair with a code or QR and compare the safety phrase before trusting a device. Choose a one-time personal profile copy or approved parent updates; receiving an update is different from applying it.",
+          "Opt-in Auto-sync uses approved parent connections or separately approved personal profile links. Personal links can choose supported settings, filter rules, and saved Notes; conflict review remains part of the process.",
+          "Direct sync needs both Accounts & Sync pages open and connected. Offline changes wait locally for a supported connection; background checks do not turn the extension into an always-on delivery service.",
+          "Nearby discovery needs the optional helper. Home Pickup and Internet Pickup are separately configured delivery choices for approved managed updates, not automatic trust from sharing Wi-Fi or guaranteed delivery whenever any device comes online.",
+          "PINs, ownership, and device permissions stay local. Verified transfers are encrypted; connection, relay, and optional encrypted pickup services can still be involved.",
+        ],
+        link: { label: "How peer-to-peer syncing works", href: "/#device-sync" },
+      },
+      {
+        id: "extension-data",
+        title: "Keep and move your setup",
+        summary: "Review imports, keep backups, and change preferences deliberately.",
+        points: [
+          "Preview supported CSV, TXT, JSON, BlockTube JSON, and raw HTTPS rule lists before applying them to Main, Kids, or both where permitted. Manage imported lists, review reports, use templates and suggested URL-list inputs, and approve refreshed URL contents before replacing saved rows.",
+          "Export or restore FilterTube JSON and password-encrypted backups, with permitted active-profile or broader scope. Automatic local backups offer Latest/History and plain or encrypted choices. These ordinary backup paths exclude private video Notes.",
+          "A compatible BlockTube export contains reviewed supported rules from one profile and rule space. It is not a full FilterTube backup; unsupported fields are reported, imported JavaScript is not run, and an imported password does not become a FilterTube PIN.",
+          "Review a preference reset before applying it. It restores ordinary display/playback defaults while preserving rules, modes, content restrictions, Notes, PINs, viewing limits, trusted devices, and profile ownership.",
+          "Choose light or dark appearance, interface language, and update-notification preferences. Translation previews are not fully reviewed language parity, and interface language is separate from filtering a video's language.",
+        ],
       },
     ],
     milestoneTitle: "Browser availability",
@@ -786,44 +853,115 @@ export const detailPages = {
           "Separate compatibility and distribution work; no public TV install is promised by the phone listing.",
       },
     ],
+    deviceSyncHref: "#android-p2p",
+    screenshotsTitle: "A closer look at the Android app",
+    screenshotsDescription: "Real screens from the installed Android development build. Features and appearance can differ from the current Google Play release.",
+    screenshots: [
+      {
+        src: "/apps/screenshots/android-player-settings.png",
+        alt: "Playback settings in the Android development build",
+        title: "Player settings",
+        caption: "Quality, captions, chapters, and viewing controls.",
+      },
+      {
+        src: "/apps/screenshots/android-music-player.png",
+        alt: "Music player in the Android development build",
+        title: "Music player",
+        caption: "A dedicated listening view with queue, lyrics, and playback controls.",
+      },
+      {
+        src: "/apps/screenshots/android-notes-editor.png",
+        alt: "Empty video Notes editor in the Android development build",
+        title: "Notes editor",
+        caption: "An empty per-video editor with timestamp tools.",
+      },
+    ],
     featureCards: [
-      {
-        title: "Main and Kids viewing",
-        body: "The public app brings YouTube Main and Kids into a custom viewing experience, with rules and profiles instead of a generic browser.",
-      },
-      {
-        title: "Filter around your needs",
-        body: "Use channel and keyword rules, Blocklist or Whitelist, and supported category and content controls. Imports and backups help keep existing setups usable.",
-      },
-      {
-        title: "Family profiles and protected time",
-        body: "Separate profiles, PIN gates, and parent-managed viewing limits keep child access distinct from parent editing authority.",
-      },
       {
         id: "android-tv",
         status: "In development",
         title: "Android TV",
-        body: "Browse and search Main, navigate with a remote, play videos, and resume from local history in the TV test build. Full Kids and family controls, device sync, and public installation are still in development.",
+        body: "Browse and search Main, navigate with a remote, play videos, and resume from local history in the TV test build. Full Kids and family controls, device sync, and public installation are still in development. Fire TV compatibility is planned separately.",
+      },
+    ],
+    exploreTitle: "Explore the full app",
+    exploreDescription: "The custom frontend goes beyond a filter list. Open a group to see the viewing spaces and controls. This overview includes the Android development build; availability varies by release.",
+    exploreGroups: [
+      {
+        id: "android-browse",
+        title: "Browse your way",
+        summary: "Home, Search, channels, and your own viewing spaces.",
+        points: [
+          "Home and Search help you discover videos, open search options, and visit channel pages. Watch keeps the video and its related controls together.",
+          "You, Subscriptions, Playlists, Shorts, and History give your browsing and saved activity their own destinations. Shorts can still be filtered when you prefer not to see them.",
+          "Kids has its own viewing context and rules. Main and Kids do not need to share the same filtering boundaries.",
+        ],
       },
       {
-        status: "Availability varies by release",
-        title: "Native player and browsing",
-        body: "Android development work includes browsing and search, channels and playlists, playback queues, history, captions, and transcript controls. Exact availability depends on the installed build.",
+        id: "android-playback",
+        title: "Make playback comfortable",
+        summary: "Choose how the video plays, sounds, and appears.",
+        points: [
+          "The native Watch player includes quality, buffering, loop, autoplay, sleep timer, silence handling, volume, and playback-speed controls in the development build.",
+          "Use fullscreen or floating playback, navigate chapters, and adjust captions and appearance. Transcript controls help you follow along with the video where text is available.",
+          "Playback queues and local history/resume keep the viewing flow connected. Available controls depend on the video and installed release.",
+          "Optional integrations include sponsor-segment skipping, estimated dislikes and community titles. These contact their respective services when enabled.",
+        ],
+      },
+      {
+        id: "android-music",
+        status: "In testing",
+        title: "Music, with its own space",
+        summary: "Browse Music and manage what is playing.",
+        points: [
+          "Music Home and Explore lead into Artist, Library, and Albums pages in the development build.",
+          "Search or sort the songs already loaded on an album page. Now Playing brings the queue, lyrics where available, and video controls together.",
+          "These Music updates are in testing and may not be in your current Google Play version.",
+        ],
+      },
+      {
+        id: "android-filters",
+        title: "Choose what appears",
+        summary: "Start with channels or words, then add more precise filters.",
+        points: [
+          "Blocklist hides matching content; Whitelist limits viewing to approved rules. Channel and keyword rules, Exact matching, and supported category and content controls help shape the result.",
+          "Supported duration and upload-date controls narrow video lists. Language and original-audio controls are experimental and rely on the metadata a video provides.",
+          "Hide Shorts, comments, and supported distractions without removing every useful part of the app. Rule availability differs by Main/Kids context and installed release.",
+        ],
+      },
+      {
+        id: "android-family",
+        title: "Profiles and family control",
+        summary: "Give each person their own rules and viewing limits.",
+        points: [
+          "Separate profiles, PIN gates, and parent-managed protected time keep child access distinct from parent editing authority. A child switching PIN does not unlock parent settings.",
+          "Review rule-list imports and keep backups when moving an existing setup. Profile scope stays separate from the Main/Kids rule space.",
+          "Daily viewing limits, a player sleep timer and timed Self-Control or Hard Timer Whitelist sessions serve different needs. Reviewed focus sessions hold the selected rules and cannot be cancelled inside the app once started.",
+          "Phone and tablet family controls do not imply identical TV coverage. Full Kids and family controls are still in development on Android TV.",
+        ],
       },
       {
         id: "notes-auto-sync",
         status: "In testing",
-        title: "Notes and Auto-sync",
-        body: "Keep notes with videos and choose what to sync between approved profile links on your verified devices. These updates are in testing and may not be in your Google Play version yet.",
+        title: "Notes and your media",
+        summary: "Keep useful video moments and local files close.",
+        points: [
+          "The newer Android development build includes per-video Notes with timestamps, an editor and a searchable Notes index. Notes belong to the chosen profile and still follow its permissions.",
+          "Offline Media organizes local files into Recent, Folders, Videos, Audio and Favourites, with resume and queue controls. It is different from saving YouTube videos for offline viewing, which remains planned on Android.",
+          "Notes and local-media updates are in testing; availability varies by app release.",
+        ],
       },
       {
-        status: "In testing",
-        title: "Music and local media",
-        body: "Music controls and a local-file library are in testing. Saving YouTube videos for offline viewing is a separate planned feature on Android.",
-      },
-      {
-        title: "Secure device updates",
-        body: "Pairing and parent updates use verified devices. New personal Auto-sync has its own consent and connection requirements; no shared-network presence automatically creates trust.",
+        id: "android-p2p",
+        status: "New Auto-sync features in testing",
+        title: "Your devices, connected",
+        summary: "Choose what to share between your verified devices.",
+        points: [
+          "Pair with a code or QR, compare the safety phrase, and choose the profile and update. Being on the same network does not automatically make a device trusted.",
+          "Parents can send approved updates to protected profiles. New personal Auto-sync uses approved profile links and lets you choose supported settings, filter rules, and Notes.",
+          "Offline changes wait locally for a supported connection. Direct sync needs the devices open and connected; optional pickup has separate delivery settings. Personal Auto-sync is in testing and may not be in your Play release.",
+        ],
+        link: { label: "How peer-to-peer syncing works", href: "/#device-sync" },
       },
     ],
     milestoneTitle: "What is available, and what comes next",

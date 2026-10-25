@@ -393,3 +393,12 @@ These are current source measurements after Auto-sync and browser packaging chan
 ## Controls hardening metadata totals
 
 Current measured metadata: 7 files, 3,391 newline counts, and 179,104 bytes. Historical measurements remain dated.
+
+
+## Local package metadata refresh - 2026-10-25
+
+The authorized Help-copy rebuild refreshed only README line-count badges. Earlier measurements remain historical. This fingerprint records local package parity, not publication, signing or installed-device acceptance.
+
+| File | Lines | Bytes | SHA-256 |
+| --- | ---: | ---: | --- |
+| `README.md` | 459 | 29,423 | `be5578e2af1b8c656f015d309eef229a2d0fae630f4d69d80b61a9963a4944c3` |

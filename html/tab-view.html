@@ -1664,7 +1664,7 @@
                                     </div>
                                     <div class="help-item">
                                         <div class="help-item-title">Safer complete BlockTube migration</div>
-                                        <div class="help-item-body">Large BlockTube JSON exports are previewed, capacity-checked, applied transactionally, read back, and summarized with an apply receipt. A failed write rolls the import back instead of reporting false success. Imported JavaScript is never executed, the BlockTube UI password never becomes a FilterTube PIN, and importing rules does not replace the FilterTube theme. After approval, missing channel names, handles or custom URLs, and avatars are filled one ID at a time with a long delay; the queue pauses when the dashboard is closed and resumes when it is opened again.</div>
+                                        <div class="help-item-body">Large BlockTube JSON exports are previewed, capacity-checked, applied transactionally, read back, and summarized with an apply receipt. A failed write rolls the import back instead of reporting false success. Imported JavaScript is never executed, the BlockTube UI password never becomes a FilterTube PIN, and importing rules does not replace the FilterTube theme. After approval, missing channel names, handles or custom URLs, and avatars are filled one ID at a time by the extension background worker. Closing the dashboard does not stop the queue; browser shutdown, authorization checks, and wakeup limits can delay it.</div>
                                     </div>
                                     <div class="help-item">
                                         <div class="help-item-title">Official category filtering</div>

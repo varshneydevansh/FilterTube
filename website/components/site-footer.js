@@ -10,13 +10,13 @@ import {
 } from "@/components/route-content";
 
 function FooterLink({ link }) {
-  if (link.external) {
+  if (link.external || link.href.includes("#")) {
     return (
       <a
         className="inline-flex items-center gap-2 text-sm text-[var(--color-muted)] transition duration-500 ease-[cubic-bezier(0.32,0.72,0,1)] hover:translate-x-1 hover:text-[var(--color-accent)]"
         href={link.href}
-        rel="noreferrer"
-        target="_blank"
+        rel={link.external ? "noreferrer" : undefined}
+        target={link.external ? "_blank" : undefined}
       >
         {link.label}
         <ArrowUpRight aria-hidden="true" size={14} weight="light" />

@@ -1,0 +1,65 @@
+[
+  {
+    "route": "/extension",
+    "detailCount": 6,
+    "h1": "your rules",
+    "scrollWidth": 375,
+    "width": 375
+  },
+  {
+    "route": "/android",
+    "detailCount": 7,
+    "h1": "Android",
+    "scrollWidth": 375,
+    "width": 375
+  },
+  {
+    "route": "/",
+    "detailCount": 3,
+    "h1": "Your feed, your rules",
+    "scrollWidth": 375,
+    "width": 375
+  },
+  {
+    "route": "/extension",
+    "detailCount": 6,
+    "h1": "your rules",
+    "scrollWidth": 320,
+    "width": 320
+  },
+  {
+    "route": "/android",
+    "detailCount": 7,
+    "h1": "Android",
+    "scrollWidth": 320,
+    "width": 320
+  },
+  {
+    "route": "/extension",
+    "detailCount": 6,
+    "h1": "your rules",
+    "scrollWidth": 768,
+    "width": 768
+  },
+  {
+    "route": "/android",
+    "detailCount": 7,
+    "h1": "Android",
+    "scrollWidth": 768,
+    "width": 768
+  },
+  {
+    "route": "/extension",
+    "detailCount": 6,
+    "h1": "your rules",
+    "scrollWidth": 1440,
+    "width": 1440
+  },
+  {
+    "route": "/android",
+    "detailCount": 7,
+    "h1": "Android",
+    "scrollWidth": 1440,
+    "width": 1440
+  }
+]

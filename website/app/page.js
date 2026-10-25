@@ -167,7 +167,7 @@ function AppReleaseStatusSection() {
     {
       eyebrow: "Android phone + tablet",
       title: "Your YouTube, on Android.",
-      body: "Browse Main and Kids, choose your filters, and manage family profiles. Available on Google Play—no invitation or email needed.",
+      body: "A custom Main and Kids app, with filters and family profiles. Explore Music, Notes and local-media development too. Install from Google Play—no invitation or email needed.",
       image: "/apps/android.png",
       imageAlt: "FilterTube Android app artwork",
       action: "Explore Android",
@@ -312,7 +312,7 @@ function QuickGuideSection() {
           <Reveal delay={100}>
             <Panel innerClassName="relative h-full overflow-hidden p-6 md:p-7">
               <div className="absolute inset-0 bg-[radial-gradient(circle_at_18%_16%,rgba(171,68,56,0.12),transparent_28%),radial-gradient(circle_at_84%_22%,rgba(158,190,177,0.18),transparent_28%)]" />
-              <div className="relative z-10">
+              <div id="device-sync" className="relative z-10">
                 <p className="text-[0.72rem] uppercase tracking-[0.22em] text-[var(--color-muted)]">
                   Peer-to-peer device sync
                 </p>
@@ -494,9 +494,9 @@ export default function HomePage() {
                 <span className="rounded-full border border-white/24 bg-[rgba(255,255,255,0.08)] px-4 py-2 text-[#fffaf4] shadow-[inset_0_1px_0_rgba(255,255,255,0.16)] backdrop-blur-xl">
                   PIN locked profiles
                 </span>
-                <span className="rounded-full border border-white/24 bg-[rgba(255,255,255,0.08)] px-4 py-2 text-[#fffaf4] shadow-[inset_0_1px_0_rgba(255,255,255,0.16)] backdrop-blur-xl">
+                <a href="#device-sync" className="rounded-full border border-white/24 bg-[rgba(255,255,255,0.08)] px-4 py-2 text-[#fffaf4] shadow-[inset_0_1px_0_rgba(255,255,255,0.16)] backdrop-blur-xl underline decoration-white/50 underline-offset-4">
                   Peer-to-peer device sync
-                </span>
+                </a>
               </div>
             </div>
           </Reveal>

@@ -340,3 +340,12 @@ The build badge changed during the Notes dialog fix. This source fingerprint is 
 | `data/release_notes.json` | 433 | 37594 | `9132b2e8809c5e1f01bf5715a115105f62387318b422ad681c0ef6a1be63c7f9` |
 
 These are current source measurements after Auto-sync and browser packaging changes. No installed-device, provider, native, publication, or release-readiness claim follows from these fingerprints.
+
+
+## Local package metadata refresh - 2026-10-25
+
+The authorized Help-copy rebuild refreshed only README line-count badges. Earlier measurements remain historical. This fingerprint records local package parity, not publication, signing or installed-device acceptance.
+
+| File | Lines | Bytes | SHA-256 |
+| --- | ---: | ---: | --- |
+| `README.md` | 459 | 29423 | `be5578e2af1b8c656f015d309eef229a2d0fae630f4d69d80b61a9963a4944c3` |

@@ -211,6 +211,15 @@ export function ScenicDetailPage({ page, relatedPages }) {
                     {page.secondaryCta.label}
                   </ActionLink>
                 </div>
+                {page.deviceSyncHref ? (
+                  <a
+                    className={`mt-5 inline-flex min-h-11 items-center gap-2 text-sm font-semibold underline underline-offset-4 ${headingText}`}
+                    href={page.deviceSyncHref}
+                  >
+                    Connect your devices
+                    <ArrowUpRight aria-hidden="true" size={16} weight="light" />
+                  </a>
+                ) : null}
               </div>
             </Reveal>
             {heroArtworks.length > 0 ? (
@@ -287,6 +296,44 @@ export function ScenicDetailPage({ page, relatedPages }) {
         </section>
       ) : null}
 
+      {page.screenshots?.length ? (
+        <section className="px-4 py-10 md:px-6 md:py-16" aria-label="Android development screenshots">
+          <div className="mx-auto max-w-[1400px]">
+            <Reveal>
+              <SectionHeading
+                eyebrow="Installed Android development build"
+                title={page.screenshotsTitle}
+                description={page.screenshotsDescription}
+              />
+            </Reveal>
+            <div className="mt-10 flex snap-x snap-mandatory gap-6 overflow-x-auto pb-4 md:grid md:grid-cols-3 md:gap-8 md:overflow-visible">
+              {page.screenshots.map((screenshot) => (
+                <figure className="w-[min(78vw,19rem)] shrink-0 snap-start md:w-auto" key={screenshot.src}>
+                  <a
+                    className="block rounded-lg"
+                    href={screenshot.src}
+                    aria-label={`Open full screenshot: ${screenshot.title}`}
+                  >
+                    <img
+                      alt={screenshot.alt}
+                      className="mx-auto h-auto w-full max-w-[19rem] rounded-lg border border-[color:var(--color-line)]"
+                      height={2400}
+                      loading="lazy"
+                      src={screenshot.src}
+                      width={1080}
+                    />
+                  </a>
+                  <figcaption className="mx-auto mt-5 max-w-[34ch]">
+                    <h3 className="font-display text-xl text-[var(--color-ink)]">{screenshot.title}</h3>
+                    <p className="mt-2 text-sm leading-7 text-[var(--color-muted)]">{screenshot.caption}</p>
+                  </figcaption>
+                </figure>
+              ))}
+            </div>
+          </div>
+        </section>
+      ) : null}
+
       <section className="px-4 py-20 md:px-6 md:py-28">
         <div className="mx-auto max-w-[1400px]">
           <Reveal>
@@ -298,7 +345,7 @@ export function ScenicDetailPage({ page, relatedPages }) {
           </Reveal>
 
           <div className="mt-12 grid gap-5 xl:grid-cols-[minmax(0,1.15fr)_minmax(0,0.85fr)]">
-            <div className="grid gap-5 md:grid-cols-2">
+            <div className={page.exploreGroups ? "space-y-6" : "grid gap-5 md:grid-cols-2"}>
               {page.featureCards.map((card, index) => (
                 <Reveal delay={index * 90} key={card.title}>
                   <div id={card.id} className="ft-shell rounded-[1.9rem] p-2 ring-1 ring-[color:var(--color-line)] shadow-[var(--shadow-diffuse)]">
@@ -333,6 +380,41 @@ export function ScenicDetailPage({ page, relatedPages }) {
                   </div>
                 </Reveal>
               ))}
+              {page.exploreGroups?.length ? (
+                <div className="ft-shell rounded-[1.9rem] border border-[color:var(--color-line)] p-5 md:p-7">
+                  <h3 className={`font-display text-3xl tracking-[-0.05em] ${headingText}`}>{page.exploreTitle}</h3>
+                  <p className={`mt-3 text-sm leading-7 ${mutedText}`}>{page.exploreDescription}</p>
+                  <div className="mt-6 space-y-3">
+                    {page.exploreGroups.map((group) => (
+                      <div id={group.id} key={group.id}>
+                        <details className={`ft-disclosure rounded-[1.2rem] border p-4 md:p-5 ${cardLineClass} ${scenicTileClass}`}>
+                          <summary className={`cursor-pointer font-semibold ${headingText}`}>
+                            <span>{group.title}</span>
+                            {group.status ? (
+                              <span className={`mt-2 block text-xs font-semibold uppercase tracking-[0.12em] ${eyebrowText}`}>{group.status}</span>
+                            ) : null}
+                            <span className={`mt-2 block text-sm font-normal leading-6 ${mutedText}`}>{group.summary}</span>
+                          </summary>
+                          <ul className={`mt-5 space-y-4 text-sm leading-7 ${mutedText}`}>
+                            {group.points.map((point) => (
+                              <li className="flex gap-3" key={point}>
+                                <span aria-hidden="true" className="mt-2.5 h-1.5 w-1.5 shrink-0 rounded-full bg-[var(--color-accent)]" />
+                                <span>{point}</span>
+                              </li>
+                            ))}
+                          </ul>
+                          {group.link ? (
+                            <a className={`mt-5 inline-flex min-h-11 items-center gap-2 text-sm font-semibold underline underline-offset-4 ${headingText}`} href={group.link.href}>
+                              {group.link.label}
+                              <ArrowUpRight aria-hidden="true" size={16} weight="light" />
+                            </a>
+                          ) : null}
+                        </details>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              ) : null}
             </div>
 
             <Reveal delay={120}>

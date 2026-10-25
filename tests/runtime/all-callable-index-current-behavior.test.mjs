@@ -39,7 +39,7 @@ const expectedFamilyTotals = new Map([
   ['Generated/quarantined UI', { files: 6, count: 147 }],
   ['Vendor bundles', { files: 3, count: 279 }],
   ['Audit/test lane scripts', { files: 25, count: 517 }],
-  ['Website routes/components/config', { files: 26, count: 125 }],
+  ['Website routes/components/config', { files: 26, count: 124 }],
 ]);
 
 const callableRe = /(?:^|\n)\s*(?:export\s+)?(?:async\s+)?function\s+([A-Za-z_$][\w$]*)\s*\(|(?:^|\n)\s*(?:export\s+)?(?:const|let|var)\s+([A-Za-z_$][\w$]*)\s*=\s*(?:async\s*)?\([^)]*\)\s*=>|(?:^|\n)\s*(?:export\s+)?(?:const|let|var)\s+([A-Za-z_$][\w$]*)\s*=\s*(?:async\s*)?[A-Za-z_$][\w$]*\s*=>|(?:^|\n)\s*([A-Za-z_$][\w$]*)\s*:\s*(?:async\s*)?function\s*\(|(?:^|\n)\s*(?:async\s+)?([A-Za-z_$][\w$]*)\s*\([^)]*\)\s*\{/g;
@@ -272,8 +272,8 @@ test('all-callable index counts match current lexical callable source', () => {
     assert.equal(documented, actual, `${file} callable count should match current source`);
   }
 
-  assert.equal(total, 9894);
-  assert.match(indexDoc, /current repo-wide lexical callables: 9894/);
+  assert.equal(total, 9893);
+  assert.match(indexDoc, /current repo-wide lexical callables: 9893/);
 });
 
 test('all-callable family totals match the documented file rows', () => {
@@ -417,9 +417,9 @@ test('all-callable index documents semantic method proof boundary', () => {
   }
 
   assert.equal(buildWebsiteParserComparisonFiles.length, 30);
-  assert.equal(broadBuildWebsiteTotal, 200);
+  assert.equal(broadBuildWebsiteTotal, 199);
   assert.equal(routeParserTotal, 119);
-  assert.equal(broadBuildWebsiteTotal - routeParserTotal, 81);
+  assert.equal(broadBuildWebsiteTotal - routeParserTotal, 80);
 
   for (const [file, broadCount, routeCount] of [
     ['build.js', 68, 38],
@@ -461,7 +461,7 @@ test('all-callable index documents semantic method proof boundary', () => {
     });
   }
 
-  assert.equal(total, 9894);
+  assert.equal(total, 9893);
   assert.deepEqual(methodTotals, expectedFamilyTotals);
 
   for (const authority of [

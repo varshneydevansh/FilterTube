@@ -1,0 +1,287 @@
+{
+  "date": "2026-10-25",
+  "scope": "Local website feature expansion and two extension Help copy corrections",
+  "base_commit": "0cbb98ddf30f77680ebbcd5e4cec828025fc07b3",
+  "design_preservation": {
+    "homepage_feature_titles_preserved": [
+      "Ad-free playback",
+      "Keyword rules",
+      "Channel rules",
+      "Comment controls",
+      "Shorts controls",
+      "Profiles",
+      "PIN protection",
+      "Backups",
+      "Rule-list imports",
+      "Subscribed-channel whitelist",
+      "Date-limited keywords",
+      "Device updates",
+      "Local-first design",
+      "Protected viewing time",
+      "Duration, dates, and categories",
+      "Language controls",
+      "Minimum-view filters",
+      "Saved video notes",
+      "Opt-in Auto-sync",
+      "Reviewed preference reset",
+      "Compatible rule exports"
+    ],
+    "platform_route_data_unchanged": true,
+    "hero_art_palette_typography_retained": true
+  },
+  "presentation": {
+    "android_disclosure_groups": 7,
+    "extension_disclosure_groups": 6,
+    "details_closed_by_default": true,
+    "android_gallery_mobile_horizontal_scroll": true,
+    "android_gallery_desktop_columns": 3
+  },
+  "browser": {
+    "server": "Local webpack dev candidate; production anchor and gallery recheck",
+    "responsive_checks": "feature-expansion-responsive.json",
+    "gallery_images_loaded": 3,
+    "summary_keyboard_enter_opens_and_closes": true,
+    "native_p2p_links": {
+      "android_section_target_top": 111.9296875,
+      "homepage_guide_target_top": 111.90625,
+      "viewport_height": 720
+    },
+    "temporary_viewport_reset": true,
+    "installed_app_acceptance_claimed": false
+  },
+  "public_screenshots": [
+    {
+      "path": "website/public/apps/screenshots/android-music-player.png",
+      "bytes": 486909,
+      "width": 1080,
+      "height": 2400,
+      "sha256": "ec39601e5c433a66a56796cae558f1fad261f4571993877cff4e7b09c92d76b1"
+    },
+    {
+      "path": "website/public/apps/screenshots/android-notes-editor.png",
+      "bytes": 304167,
+      "width": 1080,
+      "height": 2400,
+      "sha256": "5328cd3b8f5968bc99359131c74185f56acef027e45608ed07c5189c771854ab"
+    },
+    {
+      "path": "website/public/apps/screenshots/android-player-settings.png",
+      "bytes": 224717,
+      "width": 1080,
+      "height": 2400,
+      "sha256": "da26d80290be111f470b443f498ba96d49aca7b0453d058b5a8c829eaaa669ef"
+    }
+  ],
+  "screenshot_scope": "Previously captured installed Android development build; no phone operation during this follow-up; selected images reviewed for account, note, PIN and pairing data",
+  "builds": {
+    "website_production": {
+      "passed": true,
+      "log": "/tmp/filtertube-feature-expansion-production-build.log"
+    },
+    "browser_packages": {
+      "chrome": true,
+      "firefox": true,
+      "opera": true,
+      "log": "/tmp/filtertube-feature-expansion-extension-build.log"
+    }
+  },
+  "tests": {
+    "smoke": {
+      "passed": 1482,
+      "failed": 0,
+      "log": "/tmp/filtertube-feature-expansion-smoke-final.log"
+    },
+    "release": {
+      "passed": 742,
+      "failed": 0,
+      "log": "/tmp/filtertube-feature-expansion-release-final.log"
+    },
+    "website_inventory": {
+      "passed": 18,
+      "failed": 0,
+      "log": "/tmp/filtertube-feature-inventory-checks-final.log"
+    }
+  },
+  "served_routes": {
+    "server": "local production candidate, not deployed",
+    "routes": [
+      {
+        "route": "/",
+        "status": 200,
+        "h1": 1
+      },
+      {
+        "route": "/android",
+        "status": 200,
+        "h1": 1
+      },
+      {
+        "route": "/ios",
+        "status": 200,
+        "h1": 1
+      },
+      {
+        "route": "/extension",
+        "status": 200,
+        "h1": 1
+      },
+      {
+        "route": "/mobile",
+        "status": 200,
+        "h1": 1
+      },
+      {
+        "route": "/ipados",
+        "status": 200,
+        "h1": 1
+      },
+      {
+        "route": "/tv",
+        "status": 200,
+        "h1": 1
+      },
+      {
+        "route": "/android-tv",
+        "status": 200,
+        "h1": 1
+      },
+      {
+        "route": "/fire-tv",
+        "status": 200,
+        "h1": 1
+      },
+      {
+        "route": "/kids",
+        "status": 200,
+        "h1": 1
+      },
+      {
+        "route": "/ml-ai",
+        "status": 200,
+        "h1": 1
+      },
+      {
+        "route": "/downloads",
+        "status": 200,
+        "h1": 1
+      },
+      {
+        "route": "/privacy",
+        "status": 200,
+        "h1": 1
+      },
+      {
+        "route": "/terms",
+        "status": 200,
+        "h1": 0
+      }
+    ],
+    "unique_internal_links": 52,
+    "link_errors": [],
+    "not_found": 404,
+    "final_disclosure_labels": true,
+    "android_tv_anchor": true,
+    "ios_combined": true,
+    "inherited_terms_h1_missing": true
+  },
+  "boundaries": [
+    "No push, deployment, publication or store submission",
+    "No transport, storage, profile-permission or filtering behavior changed",
+    "No native source edits, phone operation or new installed-device acceptance",
+    "Local ML remains research; new app features and TV availability remain labelled",
+    "Direct sync requires supported endpoints open and connected; optional services acknowledged"
+  ],
+  "known_inherited_issue": "Terms route returns 200 but has no H1; not changed in this feature communication follow-up",
+  "broader_filtering_lanes": {
+    "status": "Existing failures remain; no new failing test names against isolated baseline clone",
+    "baseline_commit": "0cbb98dd",
+    "baseline_path": "/tmp/filtertube-website-baseline-0cbb98dd",
+    "comparison_limit": "Baseline clone shares installed Node dependencies but lacks ignored working-copy fixtures and package output. Lower current failure counts are not claimed as fixes. Failures shared by both runs remain unresolved. This is test-name comparison, not live YouTube acceptance.",
+    "lanes": [
+      {
+        "lane": "whitelist",
+        "current": {
+          "tests": 487,
+          "pass": 452,
+          "fail": 35
+        },
+        "baseline": {
+          "tests": 487,
+          "pass": 442,
+          "fail": 45
+        },
+        "new_failure_names": []
+      },
+      {
+        "lane": "blocking",
+        "current": {
+          "tests": 599,
+          "pass": 586,
+          "fail": 13
+        },
+        "baseline": {
+          "tests": 599,
+          "pass": 585,
+          "fail": 14
+        },
+        "new_failure_names": []
+      },
+      {
+        "lane": "json",
+        "current": {
+          "tests": 1294,
+          "pass": 1163,
+          "fail": 131
+        },
+        "baseline": {
+          "tests": 1294,
+          "pass": 1161,
+          "fail": 133
+        },
+        "new_failure_names": []
+      },
+      {
+        "lane": "dom",
+        "current": {
+          "tests": 457,
+          "pass": 405,
+          "fail": 52
+        },
+        "baseline": {
+          "tests": 457,
+          "pass": 404,
+          "fail": 53
+        },
+        "new_failure_names": []
+      },
+      {
+        "lane": "performance",
+        "current": {
+          "tests": 945,
+          "pass": 901,
+          "fail": 44
+        },
+        "baseline": {
+          "tests": 945,
+          "pass": 901,
+          "fail": 44
+        },
+        "new_failure_names": []
+      },
+      {
+        "lane": "settings",
+        "current": {
+          "tests": 1255,
+          "pass": 1160,
+          "fail": 95
+        },
+        "baseline": {
+          "tests": 1255,
+          "pass": 1159,
+          "fail": 96
+        },
+        "new_failure_names": []
+      }
+    ]
+  }
+}

@@ -163,3 +163,100 @@ behavior remains; this change does not add a manual scenery playback control.
   The existing exact-wording register now includes the single audit-test filename
   recorded in the new commit inventory. These are metadata freshness corrections,
   not relaxation of behavior or release gates.
+
+
+## Follow-up: real app screens and complete extension features
+
+The user clarified that the app's custom frontend is a major product, then
+requested a complete extension assessment and authorized updating the website.
+This follow-up preserves the scenic hero and design from `0cbb98dd` and all 21
+homepage feature titles. All existing platform routes remain unchanged.
+
+### Feature presentation
+
+- Android's eight overlapping generic cards are regrouped into seven closed
+  disclosures: browsing, playback, Music, filtering, family, Notes/local media,
+  and device sync. The Android TV development card stays visible and retains
+  `#android-tv`. All unique prior Android feature information is retained.
+- The app destinations are explicit: Home, Search, Watch, channels, You,
+  Subscriptions, Playlists, Shorts, History, Music Home/Explore/Artist/Library/
+  Albums, Offline Media, and the separate Kids viewing context. Player controls
+  include captions, chapters, searchable transcript, sleep timer, floating
+  playback and the supported quality/audio controls. Exact availability is
+  qualified by build, video and release.
+- Extension's three generic cards are regrouped into six closed disclosures:
+  filtering, distractions, profiles/time, Notes, P2P devices, and data management.
+  The source-derived count is 32 content switches in seven groups, with separate
+  metadata/category/language controls. This is not an inflated total-feature
+  count or proof of every layout working. The full supporting inventory is
+  [recorded separately](EXTENSION_FEATURE_INVENTORY_2026-10-25.md).
+- Homepage copy highlights app development beyond a filter list. The existing
+  Shorts entry now explains both filtering selected Shorts and hiding the
+  format; the time entry distinguishes daily limits and reviewed focus sessions.
+  Original titles, hero headlines, art, palette, typography and media remain.
+
+### Real screenshots and privacy
+
+Three raw 1080 x 2400 PNG captures from the installed Pixel development build
+show player settings, Music playback and an empty Notes editor. They came from
+`13-player-settings.png`, `25-music-player-paused.png` and `27-notes.png` in the
+local capture directory. These selected images contain no account identifier,
+private history/rule list, saved note text, PIN or pairing credential. Other
+phone captures remain outside the repository and public website.
+
+The images are under `website/public/apps/screenshots/`, with visible development
+status, accurate alt text, concise captions, intrinsic dimensions, lazy loading
+and full-resolution links. The empty editor demonstrates the UI, not successful
+saved-note persistence or sync. The gallery scrolls horizontally on compact
+screens and uses three columns from the existing medium breakpoint. No invented
+phone frame, image generation or additional dependency was introduced.
+
+### P2P visibility and capability boundaries
+
+The existing homepage P2P panel now has `#device-sync`; the existing hero chip,
+footer and app/extension detail pages link to it. Detail-page links target the
+visible wrappers `#android-p2p` and `#extension-p2p` even while disclosures are
+closed. Native anchors handle these new section jumps. No additional primary
+navigation choice or long duplicate homepage section was added.
+
+Pairing, matching phrase, device trust, profile consent and selected scope remain
+separate. Direct Auto-sync requires both supported endpoints open and connected;
+offline changes wait locally. Connection/relay/optional pickup services are
+acknowledged. There is no claim that no servers exist or that any online device
+will automatically receive/apply an update.
+
+Local-file playback remains separate from ongoing Android YouTube-download work.
+Notes backup support differs: the extension's ordinary backup excludes private
+Notes and rejects notes-bearing native backups; opt-in Notes sync is separate.
+Android/iOS/TV parity and public availability are not inferred from one candidate.
+Local ML stays research/disabled.
+
+### Extension copy corrections
+
+`html/video-notes.html` now describes opt-in Notes sync and its connection
+requirements while retaining the ordinary-backup exclusion and temporary-draft
+boundary. `html/tab-view.html` short migration help now matches its detailed Help:
+imported-channel metadata enrichment runs in the extension background worker;
+closing the dashboard does not stop it, but shutdown, authorization and wakeup
+limits can delay it. These are copy corrections, not transport/storage changes.
+
+All three browser extension packages were rebuilt locally for the copy changes.
+The existing build updates README line-count badges; that generated badge line
+is retained to match the packaged README. Nothing was installed, uploaded,
+submitted or deployed. The Android chat retains the phone and offline-media
+implementation; this follow-up did not operate the phone or edit native source.
+
+### Follow-up validation
+
+Final build, automated-test, served-route and responsive results are recorded in
+`artifacts/website-simplification-2026-10-25/feature-expansion-validation.json`.
+Browser screenshots and the responsive matrix are alongside it. These receipts
+prove local website/build behavior, not deployment or cross-device acceptance.
+
+Final results: production website build passed; all three local browser packages built; 1,482 smoke, 742 release and 18 website inventory checks passed. Fourteen served routes returned 200, all 52 distinct internal destinations resolved, and the invalid route returned 404. Android and extension layouts fit 320, 375, 768 and 1,440 pixel viewports; the homepage fit 375. Keyboard disclosure and mobile gallery scrolling were exercised. Production Android-to-home P2P links landed below the fixed header. The existing Terms page has no H1; this inherited semantic issue remains outside this feature-content update.
+
+The new anchors also required a one-match lexical inventory refresh; the prior extension route needed inclusion in the current dynamic-route closure assertions. Generated README badges required matching package-metadata fingerprints. These tests retain their existing assertions and measure the actual changed inputs.
+
+### Broader filtering checks remain open
+
+The changed-file selector also requires six filtering lanes because the Notes HTML file is broadly classified. These remain failing: Whitelist 35/487, blocking 13/599, JSON 131/1,294, DOM 52/457, performance 44/945, and settings 95/1,255. Each lane was run against an isolated local clone of `0cbb98dd` with the same installed Node dependencies. No current failing test name is new relative to that baseline. The clone lacks ignored captures/package output, so lower current failure counts are not claimed as fixes. These inherited failures remain unresolved; a passing website build and release lane do not mean full extension acceptance. No new live YouTube or installed-device smoke was claimed for these copy changes. Counts and comparison limits are in the validation receipt.

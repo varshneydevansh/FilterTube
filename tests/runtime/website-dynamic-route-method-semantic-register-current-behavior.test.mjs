@@ -10,9 +10,9 @@ const routePath = 'website/app/[slug]/page.js';
 
 const sourceRows = [
   ['website/app/[slug]/page.js', 54, 1229, '0233757cc9b72d7292750fc0a83560b54969f6489aa397091b408a16f25716f3'],
-  ['website/components/route-content.js', 903, 32419, '75cdf761288ad1f325c9d883715b98845a89a8859f7c13bf7752d658da592a26'],
-  ['website/components/site-shell-data.js', 21, 473, '28a1ac9ce4806438149720a36b7e4c586dd09f99142ebc63e1c863afcbd145d0'],
-  ['website/components/scenic-detail-page.js', 332, 14521, '2c8fcc51be06adc875c7496f478f6b61022d2ae8235216714f988ab8a5c27701']
+  ['website/components/route-content.js', 1331, 59547, '48790b1f558bfe5fb3fc3beab8d1f7e0f70dde64c6de851ab42e437df6a1a886'],
+  ['website/components/site-shell-data.js', 22, 488, 'd2fc7d7a1fe3d708bfa8a1b7b7f71a296679a4b83e77f07c9eedae7007b8038c'],
+  ['website/components/scenic-detail-page.js', 494, 23220, 'b5f07e4edbe21b5417017705733a079544b154f8832190eabe269d05d0945a96']
 ];
 
 function filePath(file) {
@@ -162,6 +162,7 @@ test('website dynamic route current behavior is pinned to static params metadata
   const unresolved = related.filter((slug) => !details.includes(slug));
 
   assert.deepEqual(slugs, [
+    'extension',
     'mobile',
     'ios',
     'ipados',
@@ -173,8 +174,8 @@ test('website dynamic route current behavior is pinned to static params metadata
     'ml-ai'
   ]);
   assert.deepEqual(details, slugs);
-  assert.equal(related.length, 22);
-  assert.equal(new Set(related).size, 9);
+  assert.equal(related.length, 25);
+  assert.equal(new Set(related).size, 10);
   assert.deepEqual(unresolved, []);
 
   assert.match(source, /export const dynamicParams = false/);
@@ -189,9 +190,9 @@ test('website dynamic route current behavior is pinned to static params metadata
   assert.match(source, /page\.related\s+\.\s*map\(\(relatedSlug\) => detailPages\[relatedSlug\]\)\s+\.\s*filter\(Boolean\)/);
   assert.match(source, /<ScenicDetailPage page=\{page\} relatedPages=\{relatedPages\} \/>/);
 
-  assert.match(text, /platform slugs: 9/);
-  assert.match(text, /detail page entries: 9/);
-  assert.match(text, /related-page references: 22/);
+  assert.match(text, /platform slugs: 10/);
+  assert.match(text, /detail page entries: 10/);
+  assert.match(text, /related-page references: 25/);
   assert.match(text, /unresolved related-page references: 0/);
   assert.match(text, /mobile, ios, ipados, android, tv, android-tv, fire-tv, kids, ml-ai/);
 });

@@ -87,3 +87,20 @@ The subjects below are a navigation index. The earlier sections explain behavior
 | `cf743d70` | 2026-10-25 | Preserve native autoplay intent and permitted playlist navigation |
 | `45c6d235` | 2026-10-25 | Add reviewed profile preference reset with parent and sync safeguards |
 | `7a476d57` | 2026-10-25 | Record controls hardening validation and reconcile source audit inventories |
+
+
+## Website feature-inventory follow-up
+
+After the earlier website checkpoint, the user requested real app-screen review
+and an extension feature inventory. The authorized update adds grouped Android
+and extension feature exploration, three labelled Android development screenshots,
+and direct links to the existing P2P guide while preserving the original hero,
+scenic design, feature titles and routes. It also corrects two stale extension
+Help messages about Notes sync/backups and background migration enrichment.
+
+See [the website follow-up rationale](WEBSITE_SIMPLIFICATION_2026-10-25.md) and
+[the extension inventory](EXTENSION_FEATURE_INVENTORY_2026-10-25.md). Public store
+rollout, native interoperability and physical-device release gates remain
+separate from these local website and copy changes.
+
+The feature-inventory follow-up passed website production build, 742 release checks, 1,482 smoke checks, and 18 focused website inventory checks. Six broader filtering lanes still fail; baseline comparison found no newly failing test names. Full extension release acceptance remains open, and nothing was pushed or deployed. See the website validation receipt for counts and comparison limits.

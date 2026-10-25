@@ -159,3 +159,16 @@ optimization, JSON-first behavior, website route behavior, website public copy,
 deployment claims, remote request changes, whitelist behavior, metric
 collectors, artifact creation, native sync, release package changes, or public
 claims.
+
+## App and extension feature inventory refresh - 2026-10-25
+
+The earlier dated rows remain historical. Current measurements follow the authorized scenic-design-preserving feature expansion. Counts and fingerprints do not establish complete semantic, browser, native, deployment or release acceptance. The extension route was introduced in the prior website checkpoint and remains included.
+
+Current closure: platform slugs: 10; detail page entries: 10; related-page references: 25; unresolved related-page references: 0.
+
+| File | Lines | Bytes | SHA-256 |
+| --- | ---: | ---: | --- |
+| `website/app/[slug]/page.js` | 54 | 1,229 | `0233757cc9b72d7292750fc0a83560b54969f6489aa397091b408a16f25716f3` |
+| `website/components/route-content.js` | 1,331 | 59,547 | `48790b1f558bfe5fb3fc3beab8d1f7e0f70dde64c6de851ab42e437df6a1a886` |
+| `website/components/site-shell-data.js` | 22 | 488 | `d2fc7d7a1fe3d708bfa8a1b7b7f71a296679a4b83e77f07c9eedae7007b8038c` |
+| `website/components/scenic-detail-page.js` | 494 | 23,220 | `b5f07e4edbe21b5417017705733a079544b154f8832190eabe269d05d0945a96` |

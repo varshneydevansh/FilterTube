@@ -960,7 +960,7 @@ separate release/workflow review and is not silently counted as JavaScript here.
 
 ```text
 current tracked JS/JSX/MJS files: 134
-current repo-wide lexical callables: 9894
+current repo-wide lexical callables: 9893
 current complete per-callable semantic proofs: 0
 current callable behavior-change approval: NO-GO
 runtime behavior changed by inventory refresh: no
@@ -975,7 +975,7 @@ runtime behavior changed by inventory refresh: no
 | Generated/quarantined UI | 6 | 147 |
 | Vendor bundles | 3 | 279 |
 | Audit/test lane scripts | 25 | 517 |
-| Website routes/components/config | 26 | 125 |
+| Website routes/components/config | 26 | 124 |
 
 | File | Family | Lexical callables | Semantic proof | Boundary |
 | --- | --- | ---: | --- | --- |
@@ -1107,7 +1107,7 @@ runtime behavior changed by inventory refresh: no
 | `website/components/scenic-illustration.js` | Website routes/components/config | 3 | `semantic proof incomplete` | Lexical accounting only; no complete per-callable closure claimed. |
 | `website/components/scenic-tones.js` | Website routes/components/config | 1 | `semantic proof incomplete` | Lexical accounting only; no complete per-callable closure claimed. |
 | `website/components/site-data.js` | Website routes/components/config | 0 | `semantic proof incomplete` | Lexical accounting only; no complete per-callable closure claimed. |
-| `website/components/site-footer.js` | Website routes/components/config | 3 | `semantic proof incomplete` | Lexical accounting only; no complete per-callable closure claimed. |
+| `website/components/site-footer.js` | Website routes/components/config | 2 | `semantic proof incomplete` | Lexical accounting only; no complete per-callable closure claimed. |
 | `website/components/site-header.js` | Website routes/components/config | 3 | `semantic proof incomplete` | Lexical accounting only; no complete per-callable closure claimed. |
 | `website/components/site-shell-data.js` | Website routes/components/config | 0 | `semantic proof incomplete` | Lexical accounting only; no complete per-callable closure claimed. |
 | `website/components/theme-toggle.js` | Website routes/components/config | 10 | `semantic proof incomplete` | Lexical accounting only; no complete per-callable closure claimed. |
@@ -1481,4 +1481,4 @@ The current lexical inventory above was remeasured after adding the opt-in Auto-
 
 ## Conservative website lexical refresh - 2026-10-25
 
-The existing broad lexical matcher was rerun after the authorized content and platform-grouping simplification. It accounts for 134 files and 9894 lexical callables. The comparison subset reports 200 broad matches and 119 build/website matches (81 difference); the parsers intentionally count different shapes. No complete semantic proof, source-classifier convergence, release approval, native acceptance or deployment claim follows. Original visual assets, hero markup, component ownership and route files are retained.
+The existing broad lexical matcher was rerun after the authorized content and platform-grouping simplification. It accounts for 134 files and 9893 lexical callables. The comparison subset reports 199 broad matches and 119 build/website matches (80 difference); the parsers intentionally count different shapes. No complete semantic proof, source-classifier convergence, release approval, native acceptance or deployment claim follows. Original visual assets, hero markup, component ownership and route files are retained.

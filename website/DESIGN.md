@@ -26,7 +26,10 @@ UI/UX review skills are used to improve clarity within these boundaries.
 - Use concrete benefits instead of generic design commentary. Preserve all
   thirteen original detailed features and include missing capabilities.
 - Reuse ScenicDetailPage for the extension overview; do not introduce another
-  visual language. Only optional per-card status and anchor metadata are added.
+  visual language. Optional feature disclosures, status/anchor metadata and a
+  gallery of real Android development screenshots extend the existing template.
+  Keep the gallery horizontally scrollable on phones and arranged in columns
+  on larger screens. Detailed feature groups start closed.
 
 ## Claim and interaction rules
 

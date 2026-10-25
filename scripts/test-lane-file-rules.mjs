@@ -1,6 +1,6 @@
 // Declarative path ownership, split from test-lane-config.mjs to keep workflow files bounded.
 export const FILE_LANE_RULES = Object.freeze([
-  { id: 'website-simplification-evidence', patterns: [/^docs\/audit\/artifacts\/website-simplification-\d{4}-\d{2}-\d{2}\/.*\.(?:json|png|log)$/], lanes: ['release', 'smoke'] },
+  { id: 'website-simplification-evidence', patterns: [/^docs\/audit\/artifacts\/website-simplification-\d{4}-\d{2}-\d{2}\/.*\.(?:json|png|jpg|log)$/], lanes: ['release', 'smoke'] },
   { id: 'profile-reset-and-time-transactions', patterns: [/^js\/profile_preference_defaults\.js$/, /^tests\/runtime\/(?:profile-preference-reset|managed-time-usage-transactions)\.test\.mjs$/], lanes: ['release', 'settings', 'smoke'] },
   { id: 'controls-hardening-evidence', patterns: [/^docs\/audit\/artifacts\/controls-hardening-[^/]+\//], lanes: ['release', 'settings', 'smoke'] },
   { id: 'time-autoplay-review-evidence', patterns: [/^docs\/audit\/artifacts\/time-limits-and-autoplay-review\//], lanes: ['release', 'settings', 'smoke'] },
