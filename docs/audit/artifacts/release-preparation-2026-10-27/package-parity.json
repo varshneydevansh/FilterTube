@@ -1,0 +1,29 @@
+[
+  {
+    "browser": "chrome",
+    "archive": "filtertube-chrome-v3.4.2.zip",
+    "bytes": 16240715,
+    "sha256": "006f1ab9f001d4f2ce7115ddedf6c142a5a8b80c4a2f2a6fd56a4f8be62dec1f",
+    "entries": 248,
+    "allSourceStagedZipBytesMatch": true,
+    "manifestSemanticParity": true
+  },
+  {
+    "browser": "firefox",
+    "archive": "filtertube-firefox-v3.4.2.zip",
+    "bytes": 16240857,
+    "sha256": "4c18d1c2b48676b36750fa9ab9fe22f203ebfa537364c10284fd1c7b4c845d37",
+    "entries": 248,
+    "allSourceStagedZipBytesMatch": true,
+    "manifestSemanticParity": true
+  },
+  {
+    "browser": "opera",
+    "archive": "filtertube-opera-v3.4.2.zip",
+    "bytes": 16240732,
+    "sha256": "14ecfe97c0e8b1286f7a9b26f06872d2d68af92f9c8e563918b4126e9bd3d648",
+    "entries": 248,
+    "allSourceStagedZipBytesMatch": true,
+    "manifestSemanticParity": true
+  }
+]

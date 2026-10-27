@@ -3,6 +3,23 @@
     "_comment": "Shared release notes source for the dashboard What's New tab and the YouTube release banner. Keep entries sorted newest-first by version."
   },
   {
+    "version": "3.4.2",
+    "headline": "Simpler device sync, video Notes and playback fixes",
+    "summary": "Preview release with clearer device pairing, opt-in Auto-sync, private video Notes, filtering fixes and safer preference resets. Installed-device checks remain open.",
+    "bannerSummary": "Preview: device sync, video Notes, playback fixes and reviewed preference reset.",
+    "highlights": [
+      "Pair with a code or QR, compare the safety phrase, then choose what to share. Nearby discovery never grants trust.",
+      "Opt-in Auto-sync queues settings, filter rules and video Notes locally while offline. Direct sync needs both FilterTube pages open and connected.",
+      "Child switching PINs do not grant settings access. Parents keep control of approved child-profile updates; personal links need approval on both devices.",
+      "Save private Notes per profile and video. Open the editor beside the video actions, including after page navigation.",
+      "Playback fixes preserve streamed video delivery, native controls and autoplay intent. Captions and audio checks retain guarded fallback; compatibility can change.",
+      "Optional minimum-view filters, reviewed BlockTube exports, comment filtering and category-placeholder fixes improve rule handling.",
+      "Review a profile's preference defaults before restoring. Rules, Notes, PINs, device trust and time limits stay protected; time accounting is hardened.",
+      "Two-device reconnect, installed reset and time-limit restart checks remain open. Some reporter-specific bugs remain; this release includes no mobile app update."
+    ],
+    "detailsUrl": "https://github.com/varshneydevansh/FilterTube/releases/tag/v3.4.2"
+  },
+  {
     "version": "3.4.1",
     "headline": "38 interface languages and safer playback checks",
     "summary": "FilterTube 3.4.1 includes the full 3.4.0 update: 38 bundled interface languages, improved YouTube and embedded playback checks, dashboard and comment-filter fixes. It also repairs the duplicate translation entries rejected by Mozilla and expands these release notes.",

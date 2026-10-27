@@ -9,60 +9,15 @@ const repoRoot = process.cwd();
 const docPath = 'docs/audit/FILTERTUBE_RELEASE_BUILD_ARTIFACT_CLAIM_BOUNDARY_CURRENT_BEHAVIOR_2026-05-22.md';
 
 const sourceRows = [
-  [
-    "build.js",
-    861,
-    33225,
-    "a198cc1d0bf98e410deb8f66ced0e56a046bbf987a0a5b878e1278577622fb2e"
-  ],
-  [
-    "package.json",
-    86,
-    4580,
-    "c9cb2c3c4fea302fa3946f462dbfbb474381a78946ca59adb653814d06a4de51"
-  ],
-  [
-    "README.md",
-    185,
-    17131,
-    "043d9927830923d24d3b8ab885c6a9eb9aa4e274035aca6606a4a6885aa448f3"
-  ],
-  [
-    "CHANGELOG.md",
-    938,
-    75511,
-    "e57906dca95911874ef251aa45d8c3a76df00df576b36277d9c0e9b9654c3036"
-  ],
-  [
-    "manifest.json",
-    162,
-    5630,
-    "ba155d12e591c0306620bc57c59ad7378c5313084314a748414b5b1d39879d9d"
-  ],
-  [
-    "manifest.chrome.json",
-    162,
-    5630,
-    "ba155d12e591c0306620bc57c59ad7378c5313084314a748414b5b1d39879d9d"
-  ],
-  [
-    "manifest.firefox.json",
-    136,
-    4668,
-    "30b981228a8214e0721d8c29ca3a74cac369508b0aca702e6b55286bc87ee7b8"
-  ],
-  [
-    "manifest.opera.json",
-    170,
-    5819,
-    "c516d8c0439a79016b0ed04ffb3658bbd40f8e0868fc146d8707a9da076636a4"
-  ],
-  [
-    "data/release_notes.json",
-    433,
-    37594,
-    "9132b2e8809c5e1f01bf5715a115105f62387318b422ad681c0ef6a1be63c7f9"
-  ]
+  ["build.js", 861, 33225, "a198cc1d0bf98e410deb8f66ced0e56a046bbf987a0a5b878e1278577622fb2e"],
+  ["package.json", 86, 4580, "4b54543b8f94e36dd2601e69b11c4a1cee13896701f521c19a7669b023e19cbe"],
+  ["README.md", 185, 17131, "cd3f93bd6bd36f8388e6af42c7a877eebad3482092fa2533845f6153abe26abe"],
+  ["CHANGELOG.md", 1062, 83168, "981a3c3aebce48082e3241161fe6082e3b9c0913524221a44144362844fb6f81"],
+  ["manifest.json", 162, 5630, "e3fb4474be24b84b4b742597f895c63324ba3dbf4de34e23815ff211e0cf7a04"],
+  ["manifest.chrome.json", 162, 5630, "e3fb4474be24b84b4b742597f895c63324ba3dbf4de34e23815ff211e0cf7a04"],
+  ["manifest.firefox.json", 136, 4668, "c05104052124e409d9cf52dde64e4a62922516071705441a109384b7190dd130"],
+  ["manifest.opera.json", 170, 5819, "d5c29a055e6454aba5aed3f65da4de8bba9d98e2bfbec76071fa9887b206d037"],
+  ["data/release_notes.json", 450, 39308, "bf25bf9000ae6e2d686cf7243f8358f66fef4ef552c99d62867a8ecd451fe1ca"]
 ];
 
 const blockRows = [
@@ -191,20 +146,20 @@ test('release build artifact claim boundary records package versions scripts and
   const releases = readJson('data/release_notes.json');
   const releaseVersions = releases.filter((entry) => entry && typeof entry.version === 'string').map((entry) => entry.version);
 
-  assert.equal(pkg.version, '3.4.1');
+  assert.equal(pkg.version, '3.4.2');
   assert.equal(pkg.scripts.build, 'node build.js');
   assert.equal(pkg.scripts['build:chrome'], 'node build.js chrome');
   assert.equal(pkg.scripts['build:firefox'], 'node build.js firefox');
   assert.equal(pkg.scripts['build:opera'], 'node build.js opera');
 
   for (const manifestFile of ['manifest.json', 'manifest.chrome.json', 'manifest.firefox.json', 'manifest.opera.json']) {
-    assert.equal(readJson(manifestFile).version, '3.4.1', `${manifestFile} version drifted`);
+    assert.equal(readJson(manifestFile).version, '3.4.2', `${manifestFile} version drifted`);
   }
 
-  assert.equal(releases.length, 31);
-  assert.equal(releaseVersions.length, 30);
-  assert.equal(releaseVersions[0], '3.4.1');
-  assert.equal(releaseVersions[1], '3.4.0');
+  assert.equal(releases.length, 32);
+  assert.equal(releaseVersions.length, 31);
+  assert.equal(releaseVersions[0], '3.4.2');
+  assert.equal(releaseVersions[1], '3.4.1');
 
   assert.match(readme, /filtertube\.in\/downloads/);
   assert.match(readme, /Rule matching reuses compiled indexes/);

@@ -99,7 +99,7 @@ test('release notes align with package and browser manifest versions', () => {
   const packageJson = readJson('package.json');
   const releaseNotes = readJson('data/release_notes.json');
 
-  assert.equal(packageJson.version, '3.4.1');
+  assert.equal(packageJson.version, '3.4.2');
   for (const manifest of ['manifest.json', 'manifest.chrome.json', 'manifest.firefox.json', 'manifest.opera.json']) {
     assert.equal(readJson(manifest).version, packageJson.version, `${manifest} should match package version today`);
   }

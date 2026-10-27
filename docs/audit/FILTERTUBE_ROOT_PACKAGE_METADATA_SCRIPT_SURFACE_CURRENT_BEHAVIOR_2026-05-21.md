@@ -417,3 +417,21 @@ acceptance is implied by this documentation-only change.
 | `README.md` | 185 | 17131 | `043d9927830923d24d3b8ab885c6a9eb9aa4e274035aca6606a4a6885aa448f3` |
 
 Current root metadata totals: 7 files, 3,117 newline counts, and 166,812 bytes. Other root metadata is unchanged.
+
+
+## Version 3.4.2 preview metadata inventory — 2026-10-27
+
+This refresh records version, changelog and release-note changes only. Existing
+audit boundaries and open installed/security/native gates remain unchanged.
+
+The current inventory is 7 files, 3,241 newline counts, and 174,469 bytes.
+
+| Source | Lines | Bytes | SHA-256 |
+| --- | ---: | ---: | --- |
+| `.gitignore` | 157 | 2275 | `f3033e094938bb4fc6ecf30aad468286f1dccd8d18db1c136e348ab087208bcd` |
+| `CHANGELOG.md` | 1062 | 83168 | `981a3c3aebce48082e3241161fe6082e3b9c0913524221a44144362844fb6f81` |
+| `LICENSE` | 21 | 1073 | `d0739cbb6232b0fb9ea59347feaf412bab5042768aa02856b16af24bb35e9d9d` |
+| `README.md` | 185 | 17131 | `cd3f93bd6bd36f8388e6af42c7a877eebad3482092fa2533845f6153abe26abe` |
+| `channel-identity-watch-mix-collab-recovery-plan.md` | 262 | 16023 | `01f82169b06d3752e318b20b956c8a4284ae80166686e5c40aeee66c957d108a` |
+| `package.json` | 86 | 4580 | `4b54543b8f94e36dd2601e69b11c4a1cee13896701f521c19a7669b023e19cbe` |
+| `package-lock.json` | 1468 | 50219 | `995fdc979b3f53ec49b59cca87cceb07e848d8bc4412a1a21cd295d17bf05f98` |

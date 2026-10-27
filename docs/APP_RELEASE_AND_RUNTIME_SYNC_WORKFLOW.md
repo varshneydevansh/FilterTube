@@ -2,6 +2,21 @@
 
 Last updated: May 31, 2026.
 
+## Current public-release checkpoint — October 27, 2026
+
+The [3.4.2 preview record](RELEASE_3_4_2_PREVIEW_2026-10-27.md) supersedes
+older availability examples below for this release. Android phone/tablet is
+public on Google Play; the full Play app and older simpler direct APK are
+different distributions. iOS public distribution is still pending, while TV
+development and native runtime adoption are separate acceptance work.
+
+This checkpoint publishes extension ZIPs as a GitHub prerelease, with no new
+mobile artifacts, automatic native runtime sync or browser-store submission.
+Personal Auto-sync remains opt-in and needs both direct endpoints open and
+connected. The linked checklist preserves the installed-device and broad-audit
+gates. Do not reuse an old APK/AAB as proof that it contains this extension's
+new features, and do not replace the existing stable release or its assets.
+
 This document is the release-order checklist for shipping FilterTube extension and native app updates together without losing the extension as the source of truth.
 
 ## Post-v3.3.5 source endpoint (2026-08-23)

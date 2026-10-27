@@ -139,14 +139,14 @@ current location register records every present exact occurrence without
 converting ownership language into permission to change runtime behavior.
 
 ```text
-current exact wording occurrences: 101
+current exact wording occurrences: 103
 current broad behavior approval from wording: NO-GO
 runtime behavior changed by this register refresh: no
 ```
 
 | Current reference | Claim class | Current review boundary |
 | --- | --- | --- |
-| `docs/APP_RELEASE_AND_RUNTIME_SYNC_WORKFLOW.md:5` | `release-sync-owner` | Repository/runtime or release-note ownership; native parity still requires source provenance and installed proof. |
+| `docs/APP_RELEASE_AND_RUNTIME_SYNC_WORKFLOW.md:20` | `release-sync-owner` | Repository/runtime or release-note ownership; native parity still requires source provenance and installed proof. |
 | `docs/ARCHITECTURE.md:27` | `release-sync-owner` | Repository/runtime or release-note ownership; native parity still requires source provenance and installed proof. |
 | `docs/ARCHITECTURE.md:41` | `release-sync-owner` | Repository/runtime or release-note ownership; native parity still requires source provenance and installed proof. |
 | `docs/CODEMAP.md:122` | `release-sync-owner` | Repository/runtime or release-note ownership; native parity still requires source provenance and installed proof. |
@@ -221,6 +221,8 @@ runtime behavior changed by this register refresh: no
 | `docs/audit/POST_3_3_5_CHANGE_LEDGER_2026-08-23.md:39` | `release-sync-owner` | Repository/runtime or release-note ownership; native parity still requires source provenance and installed proof. |
 | `docs/audit/TEST_LANE_MATRIX.md:27` | `audit-boundary` | Audit/test/workflow wording records evidence or a gate, not runtime permission or completed broad proof. |
 | `docs/audit/TEST_LANE_MATRIX.md:47` | `audit-boundary` | Audit/test/workflow wording records evidence or a gate, not runtime permission or completed broad proof. |
+| `docs/audit/artifacts/release-preparation-2026-10-27/validation.json:48` | `audit-boundary` | Release evidence inventory; no new runtime ownership or behavior authority. |
+| `docs/audit/artifacts/release-preparation-2026-10-27/validation.json:67` | `audit-boundary` | Release evidence inventory; no new runtime ownership or behavior authority. |
 | `docs/audit/artifacts/website-simplification-2026-10-25/post-release-commit-inventory.json:475` | `audit-boundary` | The post-release inventory records an existing audit-test filename; it grants no runtime ownership or behavior authority. |
 | `docs/collab_three_dot_ui_google_aistudio.md:10` | `historical-plan` | Planning, checkpoint or downstream proposal; not current runtime, installed-device or store proof. |
 | `docs/collab_three_dot_ui_google_aistudio.md:275` | `historical-plan` | Planning, checkpoint or downstream proposal; not current runtime, installed-device or store proof. |

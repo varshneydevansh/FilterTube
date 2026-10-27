@@ -3,7 +3,7 @@
   "name": "__MSG_extensionName__",
   "description": "__MSG_extensionDescription__",
   "default_locale": "en",
-  "version": "3.4.1",
+  "version": "3.4.2",
   "background": {
     "scripts": ["js/shared/identity.js", "js/content/admission_overlay.js", "js/imported_channel_enrichment.js", "js/shared/saved_video_notes.js", "js/video_notes_store.js", "js/video_notes_background.js", "js/personal_sync.js", "js/device_auto_sync.js", "js/auto_sync_wakeup.js", "js/background.js"]
   },

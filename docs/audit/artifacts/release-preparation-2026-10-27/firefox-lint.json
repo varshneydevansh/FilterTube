@@ -1,0 +1,275 @@
+{
+  "count": 28,
+  "summary": {
+    "errors": 0,
+    "notices": 0,
+    "warnings": 28
+  },
+  "metadata": {
+    "id": "filtertube@devanshvarshney.com",
+    "manifestVersion": 3,
+    "name": "__MSG_extensionName__",
+    "type": 1,
+    "version": "3.4.2",
+    "firefoxMinVersion": "109.0",
+    "firefoxStrictMinVersion": 109,
+    "experimentApiPaths": {},
+    "totalScannedFileSize": 27435015,
+    "emptyFiles": [
+      "html/troubleshoot.html"
+    ],
+    "jsLibs": {},
+    "unknownMinifiedFiles": [
+      "js/content/collab_dialog.js",
+      "js/ui_static_copy_capture.js",
+      "js/content/bridge_settings.js",
+      "js/vendor/jsqr.bundle.js"
+    ]
+  },
+  "errors": [],
+  "notices": [],
+  "warnings": [
+    {
+      "_type": "warning",
+      "code": "KEY_FIREFOX_UNSUPPORTED_BY_MIN_VERSION",
+      "message": "Manifest key not supported by the specified minimum Firefox version",
+      "description": "\"strict_min_version\" requires Firefox 109, which was released before version 140 introduced support for \"browser_specific_settings.gecko.data_collection_permissions\".",
+      "file": "manifest.json"
+    },
+    {
+      "_type": "warning",
+      "code": "KEY_FIREFOX_ANDROID_UNSUPPORTED_BY_MIN_VERSION",
+      "message": "Manifest key not supported by the specified minimum Firefox for Android version",
+      "description": "\"strict_min_version\" requires Firefox for Android 109, which was released before version 142 introduced support for \"browser_specific_settings.gecko.data_collection_permissions\".",
+      "file": "manifest.json"
+    },
+    {
+      "_type": "warning",
+      "code": "KEY_FIREFOX_ANDROID_UNSUPPORTED_BY_MIN_VERSION",
+      "message": "Manifest key not supported by the specified minimum Firefox for Android version",
+      "description": "\"strict_min_version\" requires Firefox for Android 109, which was released before version 113 introduced support for \"browser_specific_settings.gecko_android\".",
+      "file": "manifest.json"
+    },
+    {
+      "_type": "warning",
+      "code": "KEY_FIREFOX_UNSUPPORTED_BY_MIN_VERSION",
+      "message": "Manifest key not supported by the specified minimum Firefox version",
+      "description": "\"strict_min_version\" requires Firefox 109, which was released before version 128 introduced support for \"optional_host_permissions\".",
+      "file": "manifest.json"
+    },
+    {
+      "_type": "warning",
+      "code": "KEY_FIREFOX_ANDROID_UNSUPPORTED_BY_MIN_VERSION",
+      "message": "Manifest key not supported by the specified minimum Firefox for Android version",
+      "description": "\"strict_min_version\" requires Firefox for Android 109, which was released before version 128 introduced support for \"optional_host_permissions\".",
+      "file": "manifest.json"
+    },
+    {
+      "_type": "warning",
+      "code": "UNSAFE_VAR_ASSIGNMENT",
+      "message": "Unsafe assignment to innerHTML",
+      "description": "Due to both security and performance concerns, this may not be set using dynamic values which have not been adequately sanitized. This can lead to security issues or fairly serious performance degradation.",
+      "column": 85,
+      "file": "js/ui-shell/popup-shell.js",
+      "line": 202
+    },
+    {
+      "_type": "warning",
+      "code": "UNSAFE_VAR_ASSIGNMENT",
+      "message": "Unsafe assignment to innerHTML",
+      "description": "Due to both security and performance concerns, this may not be set using dynamic values which have not been adequately sanitized. This can lead to security issues or fairly serious performance degradation.",
+      "column": 85,
+      "file": "js/ui-shell/tab-view-decor.js",
+      "line": 202
+    },
+    {
+      "_type": "warning",
+      "code": "UNSAFE_VAR_ASSIGNMENT",
+      "message": "Unsafe assignment to innerHTML",
+      "description": "Due to both security and performance concerns, this may not be set using dynamic values which have not been adequately sanitized. This can lead to security issues or fairly serious performance degradation.",
+      "column": 13,
+      "file": "js/ui_components.js",
+      "line": 280
+    },
+    {
+      "_type": "warning",
+      "code": "UNSAFE_VAR_ASSIGNMENT",
+      "message": "Unsafe assignment to innerHTML",
+      "description": "Due to both security and performance concerns, this may not be set using dynamic values which have not been adequately sanitized. This can lead to security issues or fairly serious performance degradation.",
+      "column": 17,
+      "file": "js/ui_components.js",
+      "line": 296
+    },
+    {
+      "_type": "warning",
+      "code": "UNSAFE_VAR_ASSIGNMENT",
+      "message": "Unsafe assignment to innerHTML",
+      "description": "Due to both security and performance concerns, this may not be set using dynamic values which have not been adequately sanitized. This can lead to security issues or fairly serious performance degradation.",
+      "column": 9,
+      "file": "js/ui_components.js",
+      "line": 885
+    },
+    {
+      "_type": "warning",
+      "code": "UNSAFE_VAR_ASSIGNMENT",
+      "message": "Unsafe assignment to innerHTML",
+      "description": "Due to both security and performance concerns, this may not be set using dynamic values which have not been adequately sanitized. This can lead to security issues or fairly serious performance degradation.",
+      "column": 9,
+      "file": "js/render_engine.js",
+      "line": 1406
+    },
+    {
+      "_type": "warning",
+      "code": "UNSAFE_VAR_ASSIGNMENT",
+      "message": "Unsafe assignment to innerHTML",
+      "description": "Due to both security and performance concerns, this may not be set using dynamic values which have not been adequately sanitized. This can lead to security issues or fairly serious performance degradation.",
+      "column": 13,
+      "file": "js/popup.js",
+      "line": 211
+    },
+    {
+      "_type": "warning",
+      "code": "UNSAFE_VAR_ASSIGNMENT",
+      "message": "Unsafe assignment to innerHTML",
+      "description": "Due to both security and performance concerns, this may not be set using dynamic values which have not been adequately sanitized. This can lead to security issues or fairly serious performance degradation.",
+      "column": 5,
+      "file": "js/content_bridge.js",
+      "line": 14942
+    },
+    {
+      "_type": "warning",
+      "code": "UNSAFE_VAR_ASSIGNMENT",
+      "message": "Unsafe assignment to innerHTML",
+      "description": "Due to both security and performance concerns, this may not be set using dynamic values which have not been adequately sanitized. This can lead to security issues or fairly serious performance degradation.",
+      "column": 9,
+      "file": "js/tab-view.js",
+      "line": 5548
+    },
+    {
+      "_type": "warning",
+      "code": "UNSAFE_VAR_ASSIGNMENT",
+      "message": "Unsafe assignment to innerHTML",
+      "description": "Due to both security and performance concerns, this may not be set using dynamic values which have not been adequately sanitized. This can lead to security issues or fairly serious performance degradation.",
+      "column": 13,
+      "file": "js/tab-view.js",
+      "line": 6255
+    },
+    {
+      "_type": "warning",
+      "code": "UNSAFE_VAR_ASSIGNMENT",
+      "message": "Unsafe assignment to innerHTML",
+      "description": "Due to both security and performance concerns, this may not be set using dynamic values which have not been adequately sanitized. This can lead to security issues or fairly serious performance degradation.",
+      "column": 25,
+      "file": "js/tab-view.js",
+      "line": 11737
+    },
+    {
+      "_type": "warning",
+      "code": "UNSAFE_VAR_ASSIGNMENT",
+      "message": "Unsafe assignment to innerHTML",
+      "description": "Due to both security and performance concerns, this may not be set using dynamic values which have not been adequately sanitized. This can lead to security issues or fairly serious performance degradation.",
+      "column": 21,
+      "file": "js/tab-view.js",
+      "line": 11743
+    },
+    {
+      "_type": "warning",
+      "code": "UNSAFE_VAR_ASSIGNMENT",
+      "message": "Unsafe assignment to innerHTML",
+      "description": "Due to both security and performance concerns, this may not be set using dynamic values which have not been adequately sanitized. This can lead to security issues or fairly serious performance degradation.",
+      "column": 21,
+      "file": "js/tab-view.js",
+      "line": 11749
+    },
+    {
+      "_type": "warning",
+      "code": "UNSAFE_VAR_ASSIGNMENT",
+      "message": "Unsafe assignment to innerHTML",
+      "description": "Due to both security and performance concerns, this may not be set using dynamic values which have not been adequately sanitized. This can lead to security issues or fairly serious performance degradation.",
+      "column": 21,
+      "file": "js/tab-view.js",
+      "line": 11761
+    },
+    {
+      "_type": "warning",
+      "code": "UNSAFE_VAR_ASSIGNMENT",
+      "message": "Unsafe assignment to innerHTML",
+      "description": "Due to both security and performance concerns, this may not be set using dynamic values which have not been adequately sanitized. This can lead to security issues or fairly serious performance degradation.",
+      "column": 17,
+      "file": "js/tab-view.js",
+      "line": 24813
+    },
+    {
+      "_type": "warning",
+      "code": "UNSAFE_VAR_ASSIGNMENT",
+      "message": "Unsafe assignment to innerHTML",
+      "description": "Due to both security and performance concerns, this may not be set using dynamic values which have not been adequately sanitized. This can lead to security issues or fairly serious performance degradation.",
+      "column": 17,
+      "file": "js/tab-view.js",
+      "line": 24819
+    },
+    {
+      "_type": "warning",
+      "code": "UNSAFE_VAR_ASSIGNMENT",
+      "message": "Unsafe assignment to innerHTML",
+      "description": "Due to both security and performance concerns, this may not be set using dynamic values which have not been adequately sanitized. This can lead to security issues or fairly serious performance degradation.",
+      "column": 17,
+      "file": "js/tab-view.js",
+      "line": 24824
+    },
+    {
+      "_type": "warning",
+      "code": "UNSAFE_VAR_ASSIGNMENT",
+      "message": "Unsafe assignment to innerHTML",
+      "description": "Due to both security and performance concerns, this may not be set using dynamic values which have not been adequately sanitized. This can lead to security issues or fairly serious performance degradation.",
+      "column": 17,
+      "file": "js/tab-view.js",
+      "line": 24829
+    },
+    {
+      "_type": "warning",
+      "code": "UNSAFE_VAR_ASSIGNMENT",
+      "message": "Unsafe assignment to innerHTML",
+      "description": "Due to both security and performance concerns, this may not be set using dynamic values which have not been adequately sanitized. This can lead to security issues or fairly serious performance degradation.",
+      "column": 17,
+      "file": "js/tab-view.js",
+      "line": 24834
+    },
+    {
+      "_type": "warning",
+      "code": "UNSAFE_VAR_ASSIGNMENT",
+      "message": "Unsafe assignment to innerHTML",
+      "description": "Due to both security and performance concerns, this may not be set using dynamic values which have not been adequately sanitized. This can lead to security issues or fairly serious performance degradation.",
+      "column": 17,
+      "file": "js/tab-view.js",
+      "line": 24839
+    },
+    {
+      "_type": "warning",
+      "code": "UNSAFE_VAR_ASSIGNMENT",
+      "message": "Unsafe assignment to innerHTML",
+      "description": "Due to both security and performance concerns, this may not be set using dynamic values which have not been adequately sanitized. This can lead to security issues or fairly serious performance degradation.",
+      "column": 21,
+      "file": "js/tab-view.js",
+      "line": 24845
+    },
+    {
+      "_type": "warning",
+      "code": "UNSAFE_VAR_ASSIGNMENT",
+      "message": "Unsafe assignment to innerHTML",
+      "description": "Due to both security and performance concerns, this may not be set using dynamic values which have not been adequately sanitized. This can lead to security issues or fairly serious performance degradation.",
+      "column": 21,
+      "file": "js/tab-view.js",
+      "line": 24856
+    },
+    {
+      "_type": "warning",
+      "code": "UNSAFE_VAR_ASSIGNMENT",
+      "message": "Unsafe assignment to innerHTML",
+      "description": "Due to both security and performance concerns, this may not be set using dynamic values which have not been adequately sanitized. This can lead to security issues or fairly serious performance degradation.",
+      "column": 21,
+      "file": "js/tab-view.js",
+      "line": 24861
+    }
+  ]
+}

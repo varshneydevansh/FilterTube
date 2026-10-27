@@ -118,7 +118,7 @@ function trackedFiles() {
 }
 
 test('browser manifest current source inventory is pinned independently of historical May snapshot', () => {
-  const expected = [["manifest.json",162,5630,"ba155d12e591c0306620bc57c59ad7378c5313084314a748414b5b1d39879d9d"],["manifest.chrome.json",162,5630,"ba155d12e591c0306620bc57c59ad7378c5313084314a748414b5b1d39879d9d"],["manifest.firefox.json",136,4668,"30b981228a8214e0721d8c29ca3a74cac369508b0aca702e6b55286bc87ee7b8"],["manifest.opera.json",170,5819,"c516d8c0439a79016b0ed04ffb3658bbd40f8e0868fc146d8707a9da076636a4"]];
+  const expected = [["manifest.json", 162, 5630, "e3fb4474be24b84b4b742597f895c63324ba3dbf4de34e23815ff211e0cf7a04"],["manifest.chrome.json", 162, 5630, "e3fb4474be24b84b4b742597f895c63324ba3dbf4de34e23815ff211e0cf7a04"],["manifest.firefox.json", 136, 4668, "c05104052124e409d9cf52dde64e4a62922516071705441a109384b7190dd130"],["manifest.opera.json", 170, 5819, "d5c29a055e6454aba5aed3f65da4de8bba9d98e2bfbec76071fa9887b206d037"]];
   const doc = read(docPath).split('## Native Source Handoff Load Order - 2026-10-22')[1];
   assert.ok(doc, 'current review must distinguish historical claims');
   for (const [file, lines, size, hash] of expected) {
@@ -132,7 +132,7 @@ test('browser manifest current source inventory is pinned independently of histo
 
 test('all browser manifests retain localized identity, exact permissions and version alignment', () => {
   const version = readJson('package.json').version;
-  assert.equal(version, '3.4.1');
+  assert.equal(version, '3.4.2');
   for (const file of manifestFiles) {
     const manifest = readJson(file);
     assert.equal(manifest.manifest_version, 3);

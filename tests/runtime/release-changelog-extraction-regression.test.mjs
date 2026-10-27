@@ -17,6 +17,21 @@ function extract(raw, requested) {
 
 test('current release produces real notes and excludes the history index', () => {
   const entry = extract(changelog, version);
+  assert.ok(entry.section.includes('Opt-in Auto-sync'));
+  assert.ok(entry.section.includes('Private video Notes'));
+  assert.ok(entry.section.includes('Restore preference defaults'));
+  assert.ok(entry.section.includes('### Commit history after the last release'));
+  assert.ok(entry.section.includes('### Playback and filtering improvements'));
+  assert.ok(entry.section.includes('### Known limitations'));
+  assert.ok(entry.section.includes('Installed two-device pairing'));
+  assert.ok(entry.section.includes('no new Android/iOS/TV binary'));
+  assert.ok(!entry.section.includes('| Date | Commit |'));
+  assert.ok(!entry.section.includes('missing-details placeholder'));
+  assert.equal(entry.previousVersion, '3.4.1');
+});
+
+test('historical 3.4.1 release retains its original notes and predecessor', () => {
+  const entry = extract(changelog, '3.4.1');
   assert.ok(entry.section.includes('38 bundled interface languages'));
   assert.ok(entry.section.includes('Dashboard startup fixes'));
   assert.ok(entry.section.includes('### Commit history after the last release'));

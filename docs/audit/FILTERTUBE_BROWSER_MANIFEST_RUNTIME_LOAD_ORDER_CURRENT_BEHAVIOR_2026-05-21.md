@@ -247,3 +247,16 @@ Notes is an ISOLATED normal-watch helper before content_bridge. The extension-or
 | `manifest.opera.json` | 170 | 5819 | `c516d8c0439a79016b0ed04ffb3658bbd40f8e0868fc146d8707a9da076636a4` |
 
 Firefox background order now explicitly loads the private personal-sync validator, Auto-sync security helper, and wakeup scheduler before background.js. Existing YouTube content-script order/world/permissions remain independently asserted. This is source-load evidence only.
+
+
+## Version 3.4.2 preview metadata inventory — 2026-10-27
+
+This refresh records version, changelog and release-note changes only. Existing
+audit boundaries and open installed/security/native gates remain unchanged.
+
+| Source | Lines | Bytes | SHA-256 |
+| --- | ---: | ---: | --- |
+| `manifest.json` | 162 | 5630 | `e3fb4474be24b84b4b742597f895c63324ba3dbf4de34e23815ff211e0cf7a04` |
+| `manifest.chrome.json` | 162 | 5630 | `e3fb4474be24b84b4b742597f895c63324ba3dbf4de34e23815ff211e0cf7a04` |
+| `manifest.firefox.json` | 136 | 4668 | `c05104052124e409d9cf52dde64e4a62922516071705441a109384b7190dd130` |
+| `manifest.opera.json` | 170 | 5819 | `d5c29a055e6454aba5aed3f65da4de8bba9d98e2bfbec76071fa9887b206d037` |

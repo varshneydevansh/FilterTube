@@ -2,7 +2,131 @@
 
 ## Unreleased
 
-No additional changes recorded after the 3.4.1 preparation checkpoint.
+No additional changes recorded after the 3.4.2 preview checkpoint.
+
+## Version 3.4.2 — Device Sync, Video Notes And Playback Improvements (Preview)
+
+October 27, 2026. Public preview of the extension changes since v3.4.1
+(`885aa493`). Installed-device acceptance and broader audit failures remain open;
+this is not a stable-release readiness claim or a browser-store submission.
+
+### Accounts, family controls and peer-to-peer sync
+
+- Accounts & Sync now starts with devices and one clear next action. Code/QR
+  pairing, safety-phrase verification and advanced connection options remain
+  available. Nearby discovery never makes a device trusted.
+- **Opt-in Auto-sync** queues supported settings, filter rules and private video
+  Notes for approved personal-profile links. Both devices approve the link and
+  selected areas. Saving device trust alone does not enable Auto-sync.
+- Approved parent-to-child updates retain their existing scope and parent
+  authority. A child's switching PIN permits entry into that profile; it does
+  not grant permission to change protected settings, trust or ownership.
+- Changes wait locally while disconnected. Direct P2P sync requires FilterTube's
+  Accounts & Sync page open and connected on both devices. It does not promise
+  closed-browser delivery whenever a device comes online.
+- Queue persistence, concurrent receiver writes and stale authority checks are
+  hardened. Optional Home/Internet Pickup remains a separately configured parent
+  delivery path, not personal Auto-sync. Signaling and connection helpers are
+  distinct from profile storage; restrictive networks can still prevent direct
+  connections. Queued, received and applied remain different states.
+
+### Private video Notes
+
+- Save Notes by profile and video. A Notes button sits beside the Watch-page
+  actions and opens a readable dialog, including after in-page navigation.
+- Notes can be selected for an approved personal Auto-sync link. Child Notes
+  are not silently included in a parent policy grant. Existing profile access
+  and lock checks still apply.
+
+### Playback and filtering improvements
+
+- Advert filtering covers observed browse, next and streamed get_watch response
+  paths. Streamed player delivery is retained instead of waiting for the entire
+  response before playback can begin.
+- Guarded main-content source refresh keeps the native player and its controls.
+  Admission, profile, caption and audio checks decide whether replacement is
+  safe; unsupported cases retain native playback. The competing desktop Void
+  playback loop is retired. No universal or permanent advert-free guarantee is
+  made, and no simulated ad impressions are claimed.
+- Source replacement respects native playback intent and deliberate pauses.
+  Permitted playlist/autoplay endpoints remain available when decorative
+  end-screen elements are hidden. Selected playlist rows stay visible while
+  current-video admission remains enforced.
+- Delayed initialization uses current settings, preventing an older snapshot
+  from restoring Enabled after the user disables filtering.
+- Modern comment filtering respects reply/thread ownership and explicit
+  comment-rule scopes. Narrowly scoped shelf-owner identity improves ownerless
+  channel-card handling without assigning that identity to unrelated shelves.
+- Pending category cards have bounded visual deadlines. Installed Firefox
+  Android emulator testing imported the supplied #79 backup and exercised
+  rendering/navigation; the reporter's physical-device issue is not declared
+  universally resolved.
+
+### Imports, preferences and time limits
+
+- Optional minimum-view filters are available separately for Main and Kids.
+  Unknown counts and live streams stay visible; rounded counts are handled
+  conservatively. The filter is off by default.
+- A separate **reviewed BlockTube-compatible export** handles one profile and
+  rule space, reports omissions and preserves FilterTube's complete backup
+  format. It does not export PINs, trust, full profiles or unsupported semantics.
+- **Restore preference defaults** reviews ordinary display/playback preferences
+  for the named profile. Filter rules, modes, restrictions, Notes, PINs, trusted
+  devices and time limits remain intact. Parent authority and enabled Settings
+  Auto-sync impact are checked before applying the reviewed reset.
+- Time accounting serializes shared writes, retains fractional usage, checks
+  persistence and avoids double charging ambiguous saves. Exhausted locks remain
+  enforced on messaging failures. Budgets remain local per installation/profile/
+  day; this does not add a pooled device allowance or a trusted clock.
+- Responsive Settings/pairing layouts, toolbar popup sizing and the Notes dialog
+  are improved. Existing 38 bundled interface languages remain available; new
+  UI copy beyond these release notes still needs translation/layout review.
+
+### Website, documentation and app availability
+
+- Preserve the scenic hero and existing feature information while grouping
+  repeated content. Android phone/tablet and Android TV share an overview;
+  iPhone/iPad share the iOS page, with availability stated separately.
+- Green Android, blue iOS, purple extension and rose Kids treatments now align
+  cards, actions, icons and hero artwork. Genuine screenshot stacks and moving
+  showcases include same-page image viewing, pause controls and reduced motion.
+- An automatic P2P walkthrough explains pairing, verification and sharing.
+  Browser choices and download assets are clearer; the website discovers the
+  latest stable GitHub release instead of pinning a version. A preview release
+  does not silently replace stable downloads.
+- README and Nanah guides now explain current features, parent-managed child
+  profiles, local waiting, explicit Auto-sync consent and transport limits.
+- **Install Android from Google Play—no invitation or email needed.** The public
+  Play app is separate from the older, simpler direct APK. This release attaches
+  extension ZIPs only; it introduces no new Android/iOS/TV binary. iOS public
+  distribution remains pending; TV and local ML retain their development status.
+
+### Known limitations
+
+- Installed two-device pairing, verified settings/rules/Notes sync, offline
+  reconnect and revocation still need acceptance. Fixture tests are not proof of
+  physical-network or extension-to-app interoperability.
+- Installed preference reset, time-limit worker restart/multiple-tab behavior,
+  alternative audio and broader caption/playback scenarios remain open.
+- Reporter-specific false blocking (#75/#76), physical Firefox Android #79,
+  installed BlockTube import/save/reopen and remaining browser-specific issue
+  checks are not closed by this release. A previously observed concurrent-save
+  race remains a separate investigation.
+- New 3.4.2 notices use the existing labelled English fallback in non-English
+  locales; the 37 historical translation catalogs remain unchanged. Current-entry
+  translation/completeness checks are still open preview gates.
+- Broad historical audit failures remain visible. Passing release/smoke checks
+  do not establish full product readiness. Native mirrors, the iOS simulator
+  crash, public app parity, fresh Kids/tablet/TV screenshots, translation quality
+  and browser-store review are separate follow-ups.
+
+### Commit history after the last release
+
+The [source change inventory](docs/audit/POST_885AA49_CHANGELOG_2026-10-25.md)
+explains the implementation checkpoints. The [3.4.2 preview release record and
+remaining-work checklist](docs/RELEASE_3_4_2_PREVIEW_2026-10-27.md) records fresh
+checks, package hashes, exact scope and outstanding gates. Historical release
+notes below are retained unchanged.
 
 ## Version 3.4.1 — 38 Interface Languages, Playback Fixes And Firefox Packaging
 

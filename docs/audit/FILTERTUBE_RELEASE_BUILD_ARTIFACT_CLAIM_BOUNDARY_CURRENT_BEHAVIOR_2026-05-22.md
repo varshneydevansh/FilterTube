@@ -362,3 +362,21 @@ acceptance is implied by this documentation-only change.
 | File | Lines | Bytes | SHA256 |
 | --- | ---: | ---: | --- |
 | `README.md` | 185 | 17131 | `043d9927830923d24d3b8ab885c6a9eb9aa4e274035aca6606a4a6885aa448f3` |
+
+
+## Version 3.4.2 preview metadata inventory — 2026-10-27
+
+This refresh records version, changelog and release-note changes only. Existing
+audit boundaries and open installed/security/native gates remain unchanged.
+
+| Source | Lines | Bytes | SHA-256 |
+| --- | ---: | ---: | --- |
+| `build.js` | 861 | 33225 | `a198cc1d0bf98e410deb8f66ced0e56a046bbf987a0a5b878e1278577622fb2e` |
+| `package.json` | 86 | 4580 | `4b54543b8f94e36dd2601e69b11c4a1cee13896701f521c19a7669b023e19cbe` |
+| `README.md` | 185 | 17131 | `cd3f93bd6bd36f8388e6af42c7a877eebad3482092fa2533845f6153abe26abe` |
+| `CHANGELOG.md` | 1062 | 83168 | `981a3c3aebce48082e3241161fe6082e3b9c0913524221a44144362844fb6f81` |
+| `manifest.json` | 162 | 5630 | `e3fb4474be24b84b4b742597f895c63324ba3dbf4de34e23815ff211e0cf7a04` |
+| `manifest.chrome.json` | 162 | 5630 | `e3fb4474be24b84b4b742597f895c63324ba3dbf4de34e23815ff211e0cf7a04` |
+| `manifest.firefox.json` | 136 | 4668 | `c05104052124e409d9cf52dde64e4a62922516071705441a109384b7190dd130` |
+| `manifest.opera.json` | 170 | 5819 | `d5c29a055e6454aba5aed3f65da4de8bba9d98e2bfbec76071fa9887b206d037` |
+| `data/release_notes.json` | 450 | 39308 | `bf25bf9000ae6e2d686cf7243f8358f66fef4ef552c99d62867a8ecd451fe1ca` |

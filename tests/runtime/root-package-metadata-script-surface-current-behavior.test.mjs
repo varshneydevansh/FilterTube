@@ -8,48 +8,13 @@ import assert from 'node:assert/strict';
 const repoRoot = process.cwd();
 const docPath = 'docs/audit/FILTERTUBE_ROOT_PACKAGE_METADATA_SCRIPT_SURFACE_CURRENT_BEHAVIOR_2026-05-21.md';
 const rootMetadataRows = [
-  [
-    ".gitignore",
-    157,
-    2275,
-    "f3033e094938bb4fc6ecf30aad468286f1dccd8d18db1c136e348ab087208bcd"
-  ],
-  [
-    "CHANGELOG.md",
-    938,
-    75511,
-    "e57906dca95911874ef251aa45d8c3a76df00df576b36277d9c0e9b9654c3036"
-  ],
-  [
-    "LICENSE",
-    21,
-    1073,
-    "d0739cbb6232b0fb9ea59347feaf412bab5042768aa02856b16af24bb35e9d9d"
-  ],
-  [
-    "README.md",
-    185,
-    17131,
-    "043d9927830923d24d3b8ab885c6a9eb9aa4e274035aca6606a4a6885aa448f3"
-  ],
-  [
-    "channel-identity-watch-mix-collab-recovery-plan.md",
-    262,
-    16023,
-    "01f82169b06d3752e318b20b956c8a4284ae80166686e5c40aeee66c957d108a"
-  ],
-  [
-    "package.json",
-    86,
-    4580,
-    "c9cb2c3c4fea302fa3946f462dbfbb474381a78946ca59adb653814d06a4de51"
-  ],
-  [
-    "package-lock.json",
-    1468,
-    50219,
-    "84e60039228a76c10550d2e3922706ef2b7dd3671ef218a1d6e9263598cef33d"
-  ]
+  [".gitignore", 157, 2275, "f3033e094938bb4fc6ecf30aad468286f1dccd8d18db1c136e348ab087208bcd"],
+  ["CHANGELOG.md", 1062, 83168, "981a3c3aebce48082e3241161fe6082e3b9c0913524221a44144362844fb6f81"],
+  ["LICENSE", 21, 1073, "d0739cbb6232b0fb9ea59347feaf412bab5042768aa02856b16af24bb35e9d9d"],
+  ["README.md", 185, 17131, "cd3f93bd6bd36f8388e6af42c7a877eebad3482092fa2533845f6153abe26abe"],
+  ["channel-identity-watch-mix-collab-recovery-plan.md", 262, 16023, "01f82169b06d3752e318b20b956c8a4284ae80166686e5c40aeee66c957d108a"],
+  ["package.json", 86, 4580, "4b54543b8f94e36dd2601e69b11c4a1cee13896701f521c19a7669b023e19cbe"],
+  ["package-lock.json", 1468, 50219, "995fdc979b3f53ec49b59cca87cceb07e848d8bc4412a1a21cd295d17bf05f98"]
 ];
 
 function filePath(file) {
@@ -126,9 +91,9 @@ test('root package metadata script surface doc is audit-only and fingerprint pin
   assert.match(doc, /optimization, release, dependency, JSON-first, or cleanup implementation work/);
   assert.deepEqual(trackedRootMetadata.sort(), rootMetadataRows.map(([file]) => file).sort());
 
-  assert.equal(rootMetadataRows.reduce((sum, [, lines]) => sum + lines, 0), 3117);
-  assert.equal(rootMetadataRows.reduce((sum, [, , bytes]) => sum + bytes, 0), 166812);
-  assert.match(doc, /7 files, 3,117 newline counts, and\s+166,812 bytes/);
+  assert.equal(rootMetadataRows.reduce((sum, [, lines]) => sum + lines, 0), 3241);
+  assert.equal(rootMetadataRows.reduce((sum, [, , bytes]) => sum + bytes, 0), 174469);
+  assert.match(doc, /7 files, 3,241 newline counts, and\s+174,469 bytes/);
 
   for (const [file, lines, bytes, hash] of rootMetadataRows) {
     assert.equal(newlineCount(file), lines, `${file} newline count drifted`);
@@ -144,7 +109,7 @@ test('package scripts and dependency metadata are pinned before release or optim
   const doc = read(docPath);
 
   assert.equal(pkg.name, 'filtertube');
-  assert.equal(pkg.version, '3.4.1');
+  assert.equal(pkg.version, '3.4.2');
   assert.equal(pkg.license, 'MIT');
   assert.equal(pkg.repository.url, 'git+https://github.com/varshneydevansh/FilterTube.git');
   assert.equal(pkg.homepage, 'https://github.com/varshneydevansh/FilterTube');
@@ -267,7 +232,7 @@ test('package lock reproducibility surface records package count integrity licen
   }
 
   assert.equal(lock.name, 'filtertube');
-  assert.equal(lock.version, '3.4.1');
+  assert.equal(lock.version, '3.4.2');
   assert.equal(lock.lockfileVersion, 3);
   assert.equal(Object.keys(lock.packages).length, 113);
   assert.equal(nonRootPackages.length, 112);
@@ -307,7 +272,7 @@ test('root public docs expose release and JSON-first claims that still need pari
   const build = read('build.js');
   const doc = read(docPath);
 
-  assert.match(readme, /version-3\.4\.1-blue\.svg/);
+  assert.match(readme, /version-3\.4\.2-blue\.svg/);
   assert.match(readme, /license-MIT-green\.svg/);
   assert.doesNotMatch(readme, /total%20lines-|javascript-[\d.]+k%20lines/);
   assert.match(readme, /github\/v\/release\/varshneydevansh\/FilterTube/);

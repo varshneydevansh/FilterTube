@@ -1,0 +1,306 @@
+{
+  "baseline": "885aa4939e3ba674693fdfb57384c4f97ebe1922",
+  "through": "6e89c0bec60bcb321875ec1e46c20f837bd92995",
+  "commits": [
+    {
+      "commit": "3ac7842665e34dfa915f473f5cc91d653f4d17c1",
+      "date": "2026-10-17",
+      "subject": "Simplify account and device sync while preserving parent authority",
+      "changedFileCount": 146
+    },
+    {
+      "commit": "65ff48b3656d4b187ccd049d39d35a02a262f19c",
+      "date": "2026-10-17",
+      "subject": "Point Android install links at the public Google Play listing",
+      "changedFileCount": 46
+    },
+    {
+      "commit": "608589b73e8a7802e7159cd3de5c64b454d344bc",
+      "date": "2026-10-17",
+      "subject": "Add reviewed BlockTube-compatible exports for one profile and rule space",
+      "changedFileCount": 13
+    },
+    {
+      "commit": "88e9e8a303e6133dab5cde76567d56cc7170c86a",
+      "date": "2026-10-17",
+      "subject": "Add optional minimum-view filters to Main and Kids",
+      "changedFileCount": 22
+    },
+    {
+      "commit": "6baedc409d7fb6635e6def08efc51a580794f876",
+      "date": "2026-10-17",
+      "subject": "Apply explicit channel shelf identity to ownerless video cards",
+      "changedFileCount": 3
+    },
+    {
+      "commit": "7192109f0dc89db002fc1154ca9fc65daea3e0a3",
+      "date": "2026-10-17",
+      "subject": "Keep delayed DOM initialization on the current settings snapshot",
+      "changedFileCount": 2
+    },
+    {
+      "commit": "53a014d0c83123cd409100790465f579e734b827",
+      "date": "2026-10-17",
+      "subject": "Filter modern comments without hiding unrelated parent threads",
+      "changedFileCount": 2
+    },
+    {
+      "commit": "21088534534523f5421f15d4b2ebbf4fd82826b7",
+      "date": "2026-10-17",
+      "subject": "Document issue checkpoints, bounded race models and remaining acceptance gates",
+      "changedFileCount": 9
+    },
+    {
+      "commit": "920ec56b1f57fa6092b06837c86fcf518765f866",
+      "date": "2026-10-17",
+      "subject": "Fix responsive Settings, pairing fields and popup sizing",
+      "changedFileCount": 11
+    },
+    {
+      "commit": "f20861a7281803340398aa2ce126a2412b7f8414",
+      "date": "2026-10-18",
+      "subject": "Fix pending category cards, comment scope and selected playlist rows",
+      "changedFileCount": 7
+    },
+    {
+      "commit": "71e1e6dd71b1d9cc21158b831aadf0a5ced9148e",
+      "date": "2026-10-18",
+      "subject": "Repair source-aware regression and release audit gates",
+      "changedFileCount": 125
+    },
+    {
+      "commit": "b554be92d9c1d9775137154e761c1b1b1a63f842",
+      "date": "2026-10-18",
+      "subject": "Record Firefox Android acceptance setup and control blocker",
+      "changedFileCount": 1
+    },
+    {
+      "commit": "14f08c4b9734436ab1983ac84fad677dae24f668",
+      "date": "2026-10-18",
+      "subject": "Record installed Firefox Android issue 79 acceptance and remaining gates",
+      "changedFileCount": 3
+    },
+    {
+      "commit": "80871f058da909e2dadc11e2a2e784cce7b797c5",
+      "date": "2026-10-22",
+      "subject": "Restore advert-only startup and filter sponsored YouTube response content",
+      "changedFileCount": 8
+    },
+    {
+      "commit": "54d1396a96d8649998c6978c4b69ca027b5295d8",
+      "date": "2026-10-22",
+      "subject": "Register advert regressions and refresh affected audit evidence",
+      "changedFileCount": 33
+    },
+    {
+      "commit": "855bb754493bdd1a22d2d87f747f32e6321c5d8b",
+      "date": "2026-10-22",
+      "subject": "Fix toolbar popup intrinsic sizing without viewport feedback",
+      "changedFileCount": 5
+    },
+    {
+      "commit": "9b1dcaee87f22de3ebcfb4ef371b0e7aeb6d1a5f",
+      "date": "2026-10-22",
+      "subject": "Preserve streamed get_watch player delivery while filtering adverts",
+      "changedFileCount": 6
+    },
+    {
+      "commit": "3a441cc268a5c9dd8c399aae940ecb3909a745e6",
+      "date": "2026-10-22",
+      "subject": "Register popup and streaming checks and refresh runtime audit records",
+      "changedFileCount": 11
+    },
+    {
+      "commit": "8ed0e93537c057dccee7cf4f89490df918cccdd4",
+      "date": "2026-10-22",
+      "subject": "Bind advert fallback duration to current video and bound seek retries",
+      "changedFileCount": 2
+    },
+    {
+      "commit": "a4ae9e907189434a808b9a44673da90cf0656ee3",
+      "date": "2026-10-22",
+      "subject": "Record installed streaming backoff and independent content playback gates",
+      "changedFileCount": 18
+    },
+    {
+      "commit": "007e6bdf134b7df49f8f1b8b4fc68a24e00380f3",
+      "date": "2026-10-22",
+      "subject": "Bind owned playback to current profile admission and revoke stale permissions",
+      "changedFileCount": 4
+    },
+    {
+      "commit": "57051da9bcf638796e9b7028028690120177aaf4",
+      "date": "2026-10-22",
+      "subject": "Add opt-in content player with bounded source planning and caption-safe fallback",
+      "changedFileCount": 18
+    },
+    {
+      "commit": "f255f5a2625a1c7ddb57a94c770fad51c8bbc112",
+      "date": "2026-10-22",
+      "subject": "Record content playback validation and preserve installed resolver gates",
+      "changedFileCount": 29
+    },
+    {
+      "commit": "efe8312a52255dd59c245e9dba11af2c6b20f90e",
+      "date": "2026-10-22",
+      "subject": "Implement guarded native YouTube content-source refresh",
+      "changedFileCount": 47
+    },
+    {
+      "commit": "d7389f8f76e785f33bcb8f6715f43db51465acea",
+      "date": "2026-10-23",
+      "subject": "Automate native playback without interrupting healthy videos",
+      "changedFileCount": 40
+    },
+    {
+      "commit": "096a18e99b2d49e1659ed5c0e955ef563ee02361",
+      "date": "2026-10-23",
+      "subject": "Retire competing Void playback on desktop watch pages",
+      "changedFileCount": 30
+    },
+    {
+      "commit": "f28b7447917b6206fe6355e42f74ad9162ee0f19",
+      "date": "2026-10-23",
+      "subject": "Add private profile-scoped Watch notes and action-row controls",
+      "changedFileCount": 46
+    },
+    {
+      "commit": "a4a363a9ca7eff092d9428014f381dba666e06de",
+      "date": "2026-10-23",
+      "subject": "Fix Notes SPA access and open a readable modal editor",
+      "changedFileCount": 22
+    },
+    {
+      "commit": "e2aa2e557dbfb2567a92af45820e7d7be58ad0d6",
+      "date": "2026-10-23",
+      "subject": "Verify installed Watch notes and keep its dialog header visible",
+      "changedFileCount": 9
+    },
+    {
+      "commit": "4154e387fa672c42b31969a01bb04e45dacbf619",
+      "date": "2026-10-24",
+      "subject": "Add opt-in verified-device auto-sync and staged pairing",
+      "changedFileCount": 60
+    },
+    {
+      "commit": "3882556fc783c9652e4073ba7c884298ec9ff2bd",
+      "date": "2026-10-24",
+      "subject": "Document auto-sync evidence and installed-device acceptance gates",
+      "changedFileCount": 14
+    },
+    {
+      "commit": "660f6fd6f9a4b6eaed631b2c17aa864ada9dcf78",
+      "date": "2026-10-24",
+      "subject": "Harden auto-sync persistence and concurrent receiver updates",
+      "changedFileCount": 29
+    },
+    {
+      "commit": "c6c7558892b7ddc01d9d769a3cfc6cb9b2e2416c",
+      "date": "2026-10-24",
+      "subject": "Record two-endpoint sync evidence and remaining installed gates",
+      "changedFileCount": 9
+    },
+    {
+      "commit": "eef89f60dc094ebd3745308cbabcd9b5e5fa2bac",
+      "date": "2026-10-25",
+      "subject": "Highlight peer-to-peer syncing in extension and project copy",
+      "changedFileCount": 9
+    },
+    {
+      "commit": "29eb7b5bac08bc9f88af11a7fc49e1d2d5f412c4",
+      "date": "2026-10-25",
+      "subject": "Document time-limit defects and reset/autoplay decisions",
+      "changedFileCount": 7
+    },
+    {
+      "commit": "e40c67b4a623f1571309c77276480836025b108f",
+      "date": "2026-10-25",
+      "subject": "Fix managed time accounting and retain exhausted locks on failed heartbeats",
+      "changedFileCount": 5
+    },
+    {
+      "commit": "cf743d7095589c93ec47ed8ad69ee94ee68d32fa",
+      "date": "2026-10-25",
+      "subject": "Preserve native autoplay intent and permitted playlist navigation",
+      "changedFileCount": 10
+    },
+    {
+      "commit": "45c6d235bed1a1913106058cd82fb6431cf89776",
+      "date": "2026-10-25",
+      "subject": "Add reviewed profile preference reset with parent and sync safeguards",
+      "changedFileCount": 5
+    },
+    {
+      "commit": "7a476d57775d19c22c92e4f302a3a1cb5d9c472f",
+      "date": "2026-10-25",
+      "subject": "Record controls hardening validation and reconcile source audit inventories",
+      "changedFileCount": 35
+    },
+    {
+      "commit": "0cbb98ddf30f77680ebbcd5e4cec828025fc07b3",
+      "date": "2026-10-25",
+      "subject": "Clarify app features and P2P sharing while preserving website design",
+      "changedFileCount": 34
+    },
+    {
+      "commit": "2b3d30bbcb8e35d082e2f5a32a479413af7909a2",
+      "date": "2026-10-25",
+      "subject": "Expand app and extension feature guides with real Android screens",
+      "changedFileCount": 32
+    },
+    {
+      "commit": "768d8755ae68ebc1d546d461e0b5f6f949d2040c",
+      "date": "2026-10-25",
+      "subject": "Show real app screens in tinted heroes and clarify Kids controls",
+      "changedFileCount": 40
+    },
+    {
+      "commit": "f850048db64ba41207fa7170e492dba46b289f00",
+      "date": "2026-10-25",
+      "subject": "Remove repeated service naming from website copy and metadata",
+      "changedFileCount": 18
+    },
+    {
+      "commit": "0ff5e465863967c85ca89892e4bcadb24e789021",
+      "date": "2026-10-25",
+      "subject": "Add purple extension hero and moving screenshot showcases",
+      "changedFileCount": 35
+    },
+    {
+      "commit": "0c432a5cc8ada87fd1366e7fa9bb47f6c22f5897",
+      "date": "2026-10-25",
+      "subject": "Fix full-width Android and extension screenshot rails",
+      "changedFileCount": 21
+    },
+    {
+      "commit": "85c87cb6a91cb37a06f394e31b2aee7af9f42c00",
+      "date": "2026-10-25",
+      "subject": "Unify platform card themes and download artwork",
+      "changedFileCount": 22
+    },
+    {
+      "commit": "ddc4010243247428e430e6db63e674ce6060e76c",
+      "date": "2026-10-25",
+      "subject": "Clarify P2P sharing and surface current browser downloads",
+      "changedFileCount": 37
+    },
+    {
+      "commit": "b1f08c910351f286f8b41fd8e1f8c4aef2ee6332",
+      "date": "2026-10-25",
+      "subject": "Play sync walkthrough automatically and open screenshots in place",
+      "changedFileCount": 23
+    },
+    {
+      "commit": "45eb7ed65e311992d8659e71d1e0e76b1591658c",
+      "date": "2026-10-26",
+      "subject": "Refresh app features, family controls and Nanah sync documentation",
+      "changedFileCount": 15
+    },
+    {
+      "commit": "6e89c0bec60bcb321875ec1e46c20f837bd92995",
+      "date": "2026-10-27",
+      "subject": "Register README and release validation receipts with test lanes",
+      "changedFileCount": 1
+    }
+  ]
+}
