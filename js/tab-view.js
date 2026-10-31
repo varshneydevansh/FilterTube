@@ -15172,6 +15172,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         const selfControlLocked = isSelfControlSessionActive();
         const isLocked = selfControlLocked || (profilesV4 && isProfileLocked(profilesV4, activeProfileId) && !isProfileUnlockSessionValid.check(activeProfileId));
         document.body.classList.toggle('ft-app-locked', !!isLocked);
+        syncPageTone();
 
         window.FilterTubeIsUiLocked = () => isUiLocked();
         window.FilterTubeResolveViewAccess = (viewId) => resolveViewAccess(viewId);
@@ -32835,6 +32836,27 @@ document.addEventListener('DOMContentLoaded', async () => {
 // NAVIGATION
 // ============================================================================
 
+// Page tones shared with the Android app; see css/page-tones.css.
+const PAGE_TONE_BY_VIEW = {
+    dashboard: 'watch',
+    filters: 'amber',
+    semantic: 'amber',
+    kids: 'pink',
+    settings: 'sage',
+    sync: 'sky',
+    whatsnew: 'lilac',
+    help: 'lilac',
+    about: 'lilac',
+    donate: 'lilac'
+};
+
+function syncPageTone(viewId) {
+    const root = document.documentElement;
+    const activeView = viewId || root.dataset.activeView || 'dashboard';
+    const locked = document.body?.classList.contains('ft-app-locked');
+    root.dataset.pageTone = locked ? 'sky' : (PAGE_TONE_BY_VIEW[activeView] || 'watch');
+}
+
 function setupNavigation() {
     const navItems = document.querySelectorAll('.nav-item');
     const viewSections = document.querySelectorAll('.view-section');
@@ -32898,6 +32920,7 @@ function setupNavigation() {
         try {
             document.body.dataset.activeView = effectiveViewId;
             document.documentElement.dataset.activeView = effectiveViewId;
+            syncPageTone(effectiveViewId);
             document.dispatchEvent(new CustomEvent('filtertube:view-changed', {
                 detail: { viewId: effectiveViewId }
             }));

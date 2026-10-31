@@ -1,0 +1,562 @@
+/*
+ * FilterTube page tones.
+ *
+ * Every controls page carries one tone on <html data-page-tone="…">, shared
+ * with the Android app (docs/app/tv-ux-research/TV_CONTROLS_DESIGN.md §1.1
+ * in FilterTubeApp):
+ *   watch  Dashboard
+ *   amber  Filters (keywords, channels, content controls), popup on YouTube
+ *   pink   Kids Mode, popup on YouTube Kids
+ *   sage   Settings
+ *   sky    Accounts & Sync, profiles, PIN
+ *   lilac  What's New, Help, About, Donate
+ *
+ * Dialogs, sheets and menus live under <html>, so they inherit the tone of the
+ * page that opened them. Load this file last.
+ */
+
+/* ---------------------------------------------------------------------------
+   Tone tokens, light
+   --------------------------------------------------------------------------- */
+
+:root[data-page-tone="watch"] {
+    --ft-tone-page-start: #f6f2eb;
+    --ft-tone-page-end: #f2ede5;
+    --ft-tone-panel: #fbf8f3;
+    --ft-tone-accent: #ba352c;
+    --ft-tone-on-accent: #ffffff;
+    --ft-tone-soft: #f6deda;
+    --ft-tone-stroke: #e2d9cc;
+    --ft-tone-ink: #1f1b17;
+    --ft-tone-ink-soft: #6a625a;
+}
+
+:root[data-page-tone="amber"] {
+    --ft-tone-page-start: #fff9ef;
+    --ft-tone-page-end: #fbf5eb;
+    --ft-tone-panel: #fffcff;
+    --ft-tone-accent: #8f5339;
+    --ft-tone-on-accent: #ffffff;
+    --ft-tone-soft: #f1e1cd;
+    --ft-tone-stroke: #e4d4bb;
+    --ft-tone-ink: #251e2b;
+    --ft-tone-ink-soft: #665b6d;
+}
+
+:root[data-page-tone="pink"] {
+    --ft-tone-page-start: #fdf7f9;
+    --ft-tone-page-end: #f6ecef;
+    --ft-tone-panel: #fffbfd;
+    --ft-tone-accent: #8a3d52;
+    --ft-tone-on-accent: #fff8f9;
+    --ft-tone-soft: #f3dce4;
+    --ft-tone-stroke: #e6ced7;
+    --ft-tone-ink: #261b20;
+    --ft-tone-ink-soft: #69545d;
+}
+
+:root[data-page-tone="sage"] {
+    --ft-tone-page-start: #f7fbf2;
+    --ft-tone-page-end: #f2f6ee;
+    --ft-tone-panel: #fffcff;
+    --ft-tone-accent: #28623f;
+    --ft-tone-on-accent: #ffffff;
+    --ft-tone-soft: #ddebd8;
+    --ft-tone-stroke: #ccdcc5;
+    --ft-tone-ink: #251e2b;
+    --ft-tone-ink-soft: #665b6d;
+}
+
+:root[data-page-tone="sky"] {
+    --ft-tone-page-start: #f6fbff;
+    --ft-tone-page-end: #f0f6fa;
+    --ft-tone-panel: #fffcff;
+    --ft-tone-accent: #235d9b;
+    --ft-tone-on-accent: #ffffff;
+    --ft-tone-soft: #dceaf7;
+    --ft-tone-stroke: #c6d9e7;
+    --ft-tone-ink: #251e2b;
+    --ft-tone-ink-soft: #665b6d;
+}
+
+:root[data-page-tone="lilac"] {
+    --ft-tone-page-start: #faf8fc;
+    --ft-tone-page-end: #f7f4f9;
+    --ft-tone-panel: #fffcff;
+    --ft-tone-accent: #735080;
+    --ft-tone-on-accent: #ffffff;
+    --ft-tone-soft: #e5d6ef;
+    --ft-tone-stroke: #ded3e5;
+    --ft-tone-ink: #251e2b;
+    --ft-tone-ink-soft: #665b6d;
+}
+
+/* ---------------------------------------------------------------------------
+   Tone tokens, dark (the extension's data-theme="dark" switch)
+   --------------------------------------------------------------------------- */
+
+:root[data-theme="dark"][data-page-tone="watch"] {
+    --ft-tone-page-start: #131314;
+    --ft-tone-page-end: #101011;
+    --ft-tone-panel: #1c1c1e;
+    --ft-tone-accent: #f07870;
+    --ft-tone-on-accent: #251e2b;
+    --ft-tone-soft: #3a2224;
+    --ft-tone-stroke: #3a3a3c;
+    --ft-tone-ink: #f2efea;
+    --ft-tone-ink-soft: #b5afa8;
+}
+
+:root[data-theme="dark"][data-page-tone="amber"] {
+    --ft-tone-page-start: #241c16;
+    --ft-tone-page-end: #201913;
+    --ft-tone-panel: #241e2c;
+    --ft-tone-accent: #efc3a7;
+    --ft-tone-on-accent: #251e2b;
+    --ft-tone-soft: #4a3327;
+    --ft-tone-stroke: #654a38;
+    --ft-tone-ink: #f3edf6;
+    --ft-tone-ink-soft: #cabfd1;
+}
+
+:root[data-theme="dark"][data-page-tone="pink"] {
+    --ft-tone-page-start: #1a1216;
+    --ft-tone-page-end: #160f13;
+    --ft-tone-panel: #251920;
+    --ft-tone-accent: #f2b3c6;
+    --ft-tone-on-accent: #26161c;
+    --ft-tone-soft: #4b2e3c;
+    --ft-tone-stroke: #5f3d4e;
+    --ft-tone-ink: #f7eef1;
+    --ft-tone-ink-soft: #d2c0c7;
+}
+
+:root[data-theme="dark"][data-page-tone="sage"] {
+    --ft-tone-page-start: #171f19;
+    --ft-tone-page-end: #151c17;
+    --ft-tone-panel: #241e2c;
+    --ft-tone-accent: #a9d6b6;
+    --ft-tone-on-accent: #251e2b;
+    --ft-tone-soft: #293f31;
+    --ft-tone-stroke: #465d4b;
+    --ft-tone-ink: #f3edf6;
+    --ft-tone-ink-soft: #cabfd1;
+}
+
+:root[data-theme="dark"][data-page-tone="sky"] {
+    --ft-tone-page-start: #151d25;
+    --ft-tone-page-end: #131b23;
+    --ft-tone-panel: #241e2c;
+    --ft-tone-accent: #a2c9f5;
+    --ft-tone-on-accent: #251e2b;
+    --ft-tone-soft: #253d56;
+    --ft-tone-stroke: #435c76;
+    --ft-tone-ink: #f3edf6;
+    --ft-tone-ink-soft: #cabfd1;
+}
+
+:root[data-theme="dark"][data-page-tone="lilac"] {
+    --ft-tone-page-start: #19151f;
+    --ft-tone-page-end: #17131d;
+    --ft-tone-panel: #241e2c;
+    --ft-tone-accent: #dcb7ea;
+    --ft-tone-on-accent: #251e2b;
+    --ft-tone-soft: #493454;
+    --ft-tone-stroke: #55415e;
+    --ft-tone-ink: #f3edf6;
+    --ft-tone-ink-soft: #cabfd1;
+}
+
+/* ---------------------------------------------------------------------------
+   Map the shared design tokens onto the tone, so rules that already read
+   --ft-color-* follow it. [data-theme] keeps this above the dark/scene blocks
+   in design_tokens.css.
+   --------------------------------------------------------------------------- */
+
+:root[data-page-tone][data-theme] {
+    --ft-tone-page-mid: color-mix(in srgb, var(--ft-tone-page-start) 50%, var(--ft-tone-page-end));
+    --ft-tone-row: color-mix(in srgb, var(--ft-tone-panel) 70%, var(--ft-tone-page-start));
+
+    --ft-color-bg-base: var(--ft-tone-page-start);
+    --ft-color-bg-surface: var(--ft-tone-panel);
+    --ft-color-bg-panel: var(--ft-tone-panel);
+    --ft-color-bg-kids: var(--ft-tone-panel);
+    --ft-color-shell: var(--ft-tone-panel);
+    --ft-color-shell-strong: var(--ft-tone-panel);
+    --ft-color-tile: var(--ft-tone-panel);
+    --ft-color-soft-panel: var(--ft-tone-row);
+    --ft-color-inset-line: transparent;
+
+    --ft-color-text-primary: var(--ft-tone-ink);
+    --ft-color-text-secondary: var(--ft-tone-ink-soft);
+    --ft-color-text-muted: var(--ft-tone-ink-soft);
+    --ft-color-text-inverse: var(--ft-tone-on-accent);
+
+    --ft-color-brand-primary: var(--ft-tone-accent);
+    --ft-color-brand-primary-hover: color-mix(in srgb, var(--ft-tone-accent) 86%, var(--ft-tone-ink));
+    --ft-color-brand-subtle: var(--ft-tone-soft);
+
+    --ft-color-sem-neutral-border: var(--ft-tone-stroke);
+    --ft-color-sem-neutral-bg: var(--ft-tone-panel);
+    --ft-color-focus-outline: var(--ft-tone-accent);
+    --ft-shadow-focus-ring: none;
+
+    --ft-scene-top: var(--ft-tone-page-start);
+    --ft-scene-mid: var(--ft-tone-page-mid);
+    --ft-scene-bottom: var(--ft-tone-page-end);
+    --ft-scene-glow-a: transparent;
+    --ft-scene-glow-b: transparent;
+    --ft-scene-glow-c: transparent;
+
+    color-scheme: light;
+}
+
+:root[data-page-tone][data-theme="dark"] {
+    color-scheme: dark;
+}
+
+/* ---------------------------------------------------------------------------
+   Page background. The scenic video stays as a faint texture under a near
+   solid tone gradient; it still stops under prefers-reduced-motion.
+   --------------------------------------------------------------------------- */
+
+:root[data-page-tone][data-theme] body.ft-extension-surface[data-surface] {
+    background: linear-gradient(180deg, var(--ft-tone-page-start) 0%, var(--ft-tone-page-end) 100%);
+    color: var(--ft-tone-ink);
+}
+
+:root[data-page-tone][data-theme] body.ft-extension-surface[data-surface="popup"] {
+    background: transparent;
+}
+
+:root[data-page-tone][data-theme] body.ft-extension-surface[data-surface] .ft-tab-view-ambient__media-scrim,
+:root[data-page-tone][data-theme] body.ft-extension-surface[data-surface] .ft-popup-shell__video-scrim {
+    background: linear-gradient(180deg,
+        color-mix(in srgb, var(--ft-tone-page-start) 90%, transparent) 0%,
+        color-mix(in srgb, var(--ft-tone-page-end) 96%, transparent) 100%);
+}
+
+:root[data-page-tone][data-theme] body.ft-extension-surface[data-surface] .ft-tab-view-ambient__media-tint,
+:root[data-page-tone][data-theme] body.ft-extension-surface[data-surface] .ft-popup-shell__video-tint,
+:root[data-page-tone][data-theme] body.ft-extension-surface[data-surface] .ft-tab-view-ambient__glow,
+:root[data-page-tone][data-theme] body.ft-extension-surface[data-surface] .ft-popup-shell__ambient {
+    display: none;
+}
+
+/* Background motion has no toggle: it stops when the system asks for less
+   motion. Chrome pauses muted autoplay video that is not rendered. */
+@media (prefers-reduced-motion: reduce) {
+    .ft-tab-view-ambient__video,
+    .ft-popup-shell__video {
+        display: none;
+    }
+}
+
+/* ---------------------------------------------------------------------------
+   Panels: sidebar, top bar, cards, dialogs, sheets and menus.
+   --------------------------------------------------------------------------- */
+
+:root[data-page-tone][data-theme] body.ft-extension-surface[data-surface] .ft-popup-shell,
+:root[data-page-tone][data-theme] body.ft-extension-surface[data-surface] .sidebar,
+:root[data-page-tone][data-theme] body.ft-extension-surface[data-surface] .top-bar,
+:root[data-page-tone][data-theme] body.ft-extension-surface[data-surface] .view-shell,
+:root[data-page-tone][data-theme] body.ft-extension-surface[data-surface] .view-hero,
+:root[data-page-tone][data-theme] body.ft-extension-surface[data-surface] .card,
+:root[data-page-tone][data-theme] body.ft-extension-surface[data-surface] .settings-card,
+:root[data-page-tone][data-theme] body.ft-extension-surface[data-surface] .stat-card,
+:root[data-page-tone][data-theme] body.ft-extension-surface[data-surface] .action-card,
+:root[data-page-tone][data-theme] body.ft-extension-surface[data-surface] .help-cluster,
+:root[data-page-tone][data-theme] body.ft-extension-surface[data-surface] .help-start-card,
+:root[data-page-tone][data-theme] body.ft-extension-surface[data-surface] .help-technical-card,
+:root[data-page-tone][data-theme] body.ft-extension-surface[data-surface] .ft-modal,
+:root[data-page-tone][data-theme] body.ft-extension-surface[data-surface] .android-closed-testing-invite__sheet,
+:root[data-page-tone][data-theme] body.ft-extension-surface[data-surface] .ft-profile-dropdown,
+:root[data-page-tone][data-theme] body.ft-extension-surface[data-surface] .view-container,
+:root[data-page-tone][data-theme] body.ft-extension-surface[data-surface] .ft-rule-list-editor,
+:root[data-page-tone][data-theme] body.ft-extension-surface[data-surface] .dashboard-app-release,
+:root[data-page-tone][data-theme] body.ft-extension-surface[data-surface] .dashboard-app-preview,
+:root[data-page-tone][data-theme] body.ft-extension-surface[data-surface] .dashboard-app-card,
+:root[data-page-tone][data-theme] body.ft-extension-surface[data-surface] .release-note-card,
+:root[data-page-tone][data-theme] body.ft-extension-surface[data-surface] .rule-list-format-showcase,
+:root[data-page-tone][data-theme] body.ft-extension-surface[data-surface] .help-start-guide,
+:root[data-page-tone][data-theme] body.ft-extension-surface[data-surface] .help-flow-card,
+:root[data-page-tone][data-theme] body.ft-extension-surface[data-surface] .help-device-map-legend,
+:root[data-page-tone][data-theme] body.ft-extension-surface[data-surface] .ft-about-social-card,
+:root[data-page-tone][data-theme] body.ft-extension-surface[data-surface] .ft-about-hero-site,
+:root[data-page-tone][data-theme] body.ft-extension-surface[data-surface] .ft-about-video-card,
+:root[data-page-tone][data-theme] body.ft-extension-surface[data-surface] .ft-about-doc-card,
+:root[data-page-tone][data-theme] body.ft-extension-surface[data-surface] .nanah-sync-privacy-banner,
+:root[data-page-tone][data-theme] body.ft-extension-surface[data-surface] .nanah-sync-mode-spotlight,
+:root[data-page-tone][data-theme] body.ft-extension-surface[data-surface] .nanah-sync-advanced,
+:root[data-page-tone][data-theme] body.ft-extension-surface[data-surface] .nanah-delivery-advanced,
+:root[data-page-tone][data-theme] body.ft-extension-surface[data-surface] .nanah-delivery-card,
+:root[data-page-tone][data-theme] body.ft-extension-surface[data-surface] .ft-lock-gate .card,
+:root[data-page-tone][data-theme] body.ft-extension-surface[data-surface] .support-disclaimer,
+:root[data-page-tone][data-theme] body.ft-extension-surface[data-surface] .filtertube-help-bubble {
+    border-color: var(--ft-tone-stroke);
+    background: var(--ft-tone-panel);
+    background-image: none;
+    color: var(--ft-tone-ink);
+    backdrop-filter: none;
+    -webkit-backdrop-filter: none;
+}
+
+/* The popup frame is the page; its cards sit on it. */
+:root[data-page-tone][data-theme] body.ft-extension-surface[data-surface] .ft-popup-shell {
+    background: linear-gradient(180deg, var(--ft-tone-page-start) 0%, var(--ft-tone-page-end) 100%);
+}
+
+/* Transparent groupings inside a panel keep showing the panel. */
+:root[data-page-tone][data-theme] body.ft-extension-surface[data-surface] .view-shell {
+    border-color: transparent;
+    background: transparent;
+    box-shadow: none;
+}
+
+/* Rows, tiles and fields inside panels. */
+:root[data-page-tone][data-theme] body.ft-extension-surface[data-surface] .sidebar .nav-item,
+:root[data-page-tone][data-theme] body.ft-extension-surface[data-surface] .help-item,
+:root[data-page-tone][data-theme] body.ft-extension-surface[data-surface] .list-item,
+:root[data-page-tone][data-theme] body.ft-extension-surface[data-surface] .toggle-row,
+:root[data-page-tone][data-theme] body.ft-extension-surface[data-surface] .content-control-group,
+:root[data-page-tone][data-theme] body.ft-extension-surface[data-surface] .ft-kids-sub-toggle-row,
+:root[data-page-tone][data-theme] body.ft-extension-surface[data-surface] .dashboard-stats-source,
+:root[data-page-tone][data-theme] body.ft-extension-surface[data-surface] .ft-profile-dropdown-item,
+:root[data-page-tone][data-theme] body.ft-extension-surface[data-surface] .text-input,
+:root[data-page-tone][data-theme] body.ft-extension-surface[data-surface] .select-input,
+:root[data-page-tone][data-theme] body.ft-extension-surface[data-surface] .custom-date-input,
+:root[data-page-tone][data-theme] body.ft-extension-surface[data-surface] .ft-rule-target-tabs,
+:root[data-page-tone][data-theme] body.ft-extension-surface[data-surface] .tab-buttons,
+:root[data-page-tone][data-theme] body.ft-extension-surface[data-surface] .exact-toggle:not([class*="toggle-variant-"]),
+:root[data-page-tone][data-theme] body.ft-extension-surface[data-surface] .nanah-sync-mode-switch,
+:root[data-page-tone][data-theme] body.ft-extension-surface[data-surface] .dashboard-structure-note,
+:root[data-page-tone][data-theme] body.ft-extension-surface[data-surface] button.select-input.ft-select-trigger,
+:root[data-page-tone][data-theme] body.ft-extension-surface[data-surface] .search-input {
+    border-color: var(--ft-tone-stroke);
+    background: var(--ft-tone-row);
+    background-image: none;
+    color: var(--ft-tone-ink);
+    box-shadow: none;
+}
+
+:root[data-page-tone][data-theme] body.ft-extension-surface[data-surface] .sidebar .nav-item {
+    border-color: transparent;
+    background: transparent;
+}
+
+:root[data-page-tone][data-theme] body.ft-extension-surface[data-surface] .text-input::placeholder,
+:root[data-page-tone][data-theme] body.ft-extension-surface[data-surface] .search-input::placeholder {
+    color: var(--ft-tone-ink-soft);
+}
+
+/* Selected and hover rows use soft. */
+:root[data-page-tone][data-theme] body.ft-extension-surface[data-surface] .sidebar .nav-item:hover,
+:root[data-page-tone][data-theme] body.ft-extension-surface[data-surface] .sidebar .nav-item.active,
+:root[data-page-tone][data-theme] body.ft-extension-surface[data-surface] .help-item:hover,
+:root[data-page-tone][data-theme] body.ft-extension-surface[data-surface] .list-item:hover,
+:root[data-page-tone][data-theme] body.ft-extension-surface[data-surface] .toggle-row:hover,
+:root[data-page-tone][data-theme] body.ft-extension-surface[data-surface] .content-control-group .toggle-row:hover,
+:root[data-page-tone][data-theme] body.ft-extension-surface[data-surface] .ft-profile-dropdown-item:hover,
+:root[data-page-tone][data-theme] body.ft-extension-surface[data-surface] .ft-profile-dropdown-item.is-active {
+    border-color: var(--ft-tone-stroke);
+    background: var(--ft-tone-soft);
+    color: var(--ft-tone-ink);
+    box-shadow: none;
+}
+
+:root[data-page-tone][data-theme] body.ft-extension-surface[data-surface] .sidebar .nav-item.active,
+:root[data-page-tone][data-theme] body.ft-extension-surface[data-surface] .sidebar .nav-item.active .nav-label,
+:root[data-page-tone][data-theme] body.ft-extension-surface[data-surface] .sidebar .nav-item.active .nav-icon {
+    color: var(--ft-tone-accent);
+}
+
+:root[data-page-tone][data-theme] body.ft-extension-surface[data-surface] .sidebar .nav-item.active::before {
+    background: var(--ft-tone-accent);
+}
+
+/* Tabs inside a page (Keywords / Channels / Content). */
+:root[data-page-tone][data-theme] body.ft-extension-surface[data-surface] .tab-button.active,
+:root[data-page-tone][data-theme] body.ft-extension-surface[data-surface] .tab-btn.active,
+:root[data-page-tone][data-theme] body.ft-extension-surface[data-surface] [role="tab"][aria-selected="true"] {
+    border-color: var(--ft-tone-stroke);
+    background: var(--ft-tone-soft);
+    color: var(--ft-tone-accent);
+    box-shadow: none;
+}
+
+/* main-content only frames the top bar and the view container. */
+:root[data-page-tone][data-theme] body.ft-extension-surface[data-surface] .main-content,
+:root[data-page-tone][data-theme] body.ft-extension-surface[data-surface] .card-header,
+:root[data-page-tone][data-theme] body.ft-extension-surface[data-surface] .help-item-body,
+:root[data-page-tone][data-theme] body.ft-extension-surface[data-surface] .help-technical-card__summary {
+    border-color: var(--ft-tone-stroke);
+    background: transparent;
+    background-image: none;
+    box-shadow: none;
+}
+
+/* Help page rules are scoped by id. */
+:root[data-page-tone][data-theme] body.ft-extension-surface[data-surface] #helpView .help-item,
+:root[data-page-tone][data-theme] body.ft-extension-surface[data-surface] #helpView .help-toolbar-card .search-input {
+    border-color: var(--ft-tone-stroke);
+    background: var(--ft-tone-row);
+    color: var(--ft-tone-ink);
+    box-shadow: none;
+}
+
+:root[data-page-tone][data-theme] body.ft-extension-surface[data-surface] #helpView .help-toolbar-card .search-input::placeholder {
+    color: var(--ft-tone-ink-soft);
+}
+
+:root[data-page-tone][data-theme] body.ft-extension-surface[data-surface] #helpView .help-toolbar-card .search-input:focus-visible {
+    border-color: var(--ft-tone-accent);
+    outline: 2px solid var(--ft-tone-accent);
+    outline-offset: 2px;
+    box-shadow: none;
+}
+
+:root[data-page-tone][data-theme] body.ft-extension-surface[data-surface] #helpView .help-item-title {
+    color: var(--ft-tone-ink);
+}
+
+:root[data-page-tone][data-theme] body.ft-extension-surface[data-surface] #helpView :is(.help-item-body, .help-item-body p, .help-item-body li) {
+    background: transparent;
+    color: var(--ft-tone-ink-soft);
+}
+
+:root[data-page-tone][data-theme] body.ft-extension-surface[data-surface] #helpView .help-item-body a {
+    color: var(--ft-tone-accent);
+}
+
+/* Selected toggles and chips use soft. */
+:root[data-page-tone][data-theme] body.ft-extension-surface[data-surface] .exact-toggle.active:not([class*="toggle-variant-"]),
+:root[data-page-tone][data-theme] body.ft-extension-surface[data-surface] .ft-rule-target-tab.is-active {
+    border-color: var(--ft-tone-stroke);
+    background: var(--ft-tone-soft);
+    color: var(--ft-tone-accent);
+    box-shadow: none;
+}
+
+/* Kids Mode inputs carry their own id-scoped palette. */
+:root[data-page-tone][data-theme] body.ft-extension-surface[data-surface] #kidsView .input-row .text-input,
+:root[data-page-tone][data-theme] body.ft-extension-surface[data-surface] #kidsView .search-input {
+    border-color: var(--ft-tone-stroke);
+    background: var(--ft-tone-row);
+    color: var(--ft-tone-ink);
+    box-shadow: none;
+}
+
+:root[data-page-tone][data-theme] body.ft-extension-surface[data-surface] #kidsView .input-row .btn-primary,
+:root[data-page-tone][data-theme] body.ft-extension-surface[data-surface] #kidsView .input-row .btn-primary:hover {
+    border-color: var(--ft-tone-accent);
+    background: var(--ft-tone-accent);
+    background-image: none;
+    color: var(--ft-tone-on-accent);
+    box-shadow: none;
+}
+
+/* The popup's dark rules use !important; match them only where they apply. */
+:root[data-page-tone][data-theme] body.ft-extension-surface[data-surface] .tab-buttons,
+:root[data-page-tone][data-theme] body.ft-extension-surface[data-surface] .ft-popup-filter-card,
+:root[data-page-tone][data-theme] body.ft-extension-surface[data-surface] .ft-topbar-list-mode .exact-toggle:not(.ft-list-mode-pill) {
+    border-color: var(--ft-tone-stroke) !important;
+    background: var(--ft-tone-panel) !important;
+    box-shadow: none !important;
+}
+
+/* ---------------------------------------------------------------------------
+   Text
+   --------------------------------------------------------------------------- */
+
+:root[data-page-tone][data-theme] body.ft-extension-surface[data-surface] :is(h1, h2, h3, h4, .page-title, .view-hero__title, .card-header, .card-title, .toggle-title, .help-item-title, .ft-modal-title, .stat-value) {
+    color: var(--ft-tone-ink);
+}
+
+:root[data-page-tone][data-theme] body.ft-extension-surface[data-surface] :is(.view-hero__copy, .toggle-description, .help-item-body, .import-export-hint, .stat-label, .settings-card__body p, .card-body p) {
+    color: var(--ft-tone-ink-soft);
+}
+
+:root[data-page-tone][data-theme] body.ft-extension-surface[data-surface] :is(.view-hero__eyebrow, .ft-modal-eyebrow, .ft-about-eyebrow, .nanah-delivery-card__eyebrow, .nanah-sync-mode__eyebrow, .rule-list-format-panel__eyebrow) {
+    color: var(--ft-tone-accent);
+}
+
+:root[data-page-tone][data-theme] body.ft-extension-surface[data-surface] .view-meta-pill {
+    border-color: var(--ft-tone-stroke);
+    background: transparent;
+    color: var(--ft-tone-ink-soft);
+}
+
+/* ---------------------------------------------------------------------------
+   Buttons: primary is accent on on-accent, secondary is outlined.
+   --------------------------------------------------------------------------- */
+
+:root[data-page-tone][data-theme] body.ft-extension-surface[data-surface] :is(.btn-primary, .ft-about-action--solid, .ft-auto-sync__button--primary),
+:root[data-page-tone][data-theme] body.ft-extension-surface[data-surface] :is(.btn-primary, .ft-about-action--solid, .ft-auto-sync__button--primary):hover,
+:root[data-page-tone][data-theme] body.ft-extension-surface[data-surface] :is(.btn-primary, .ft-about-action--solid, .ft-auto-sync__button--primary):focus {
+    border-color: var(--ft-tone-accent);
+    background: var(--ft-tone-accent);
+    background-image: none;
+    color: var(--ft-tone-on-accent);
+    box-shadow: none;
+}
+
+:root[data-page-tone][data-theme] body.ft-extension-surface[data-surface] :is(.btn-primary, .ft-about-action--solid):hover:not(:disabled) {
+    background: color-mix(in srgb, var(--ft-tone-accent) 88%, var(--ft-tone-ink));
+}
+
+:root[data-page-tone][data-theme] body.ft-extension-surface[data-surface] :is(.btn-secondary, .ft-about-action, .ft-about-social-links a, .top-bar .icon-btn) {
+    border-color: var(--ft-tone-stroke);
+    background: var(--ft-tone-panel);
+    background-image: none;
+    color: var(--ft-tone-accent);
+    box-shadow: none;
+}
+
+:root[data-page-tone][data-theme] body.ft-extension-surface[data-surface] :is(.btn-secondary, .ft-about-action, .ft-about-social-links a, .top-bar .icon-btn):hover:not(:disabled),
+:root[data-page-tone][data-theme] body.ft-extension-surface[data-surface] .dashboard-stats-source__buttons .btn-secondary.active {
+    border-color: var(--ft-tone-stroke);
+    background: var(--ft-tone-soft);
+    color: var(--ft-tone-accent);
+}
+
+:root[data-page-tone][data-theme] body.ft-extension-surface[data-surface] .btn-secondary.btn-danger {
+    color: var(--ft-color-status-danger);
+}
+
+:root[data-page-tone][data-theme] body.ft-extension-surface[data-surface] :is(.btn-primary, .btn-secondary):disabled {
+    border-color: var(--ft-tone-stroke);
+    background: var(--ft-tone-row);
+    color: var(--ft-tone-ink-soft);
+    opacity: 0.7;
+    filter: none;
+}
+
+/* Switches */
+:root[data-page-tone][data-theme] body.ft-extension-surface[data-surface] input:checked + .slider {
+    border-color: var(--ft-tone-accent);
+    background: var(--ft-tone-accent);
+}
+
+:root[data-page-tone][data-theme] body.ft-extension-surface[data-surface] input:checked + .slider::before {
+    background: var(--ft-tone-on-accent);
+}
+
+/* ---------------------------------------------------------------------------
+   Keyboard focus: a clean outline. No translucent fill, no shadow change.
+   --------------------------------------------------------------------------- */
+
+:root[data-page-tone][data-theme] body.ft-extension-surface[data-surface] :focus-visible {
+    outline: 2px solid var(--ft-tone-accent);
+    outline-offset: 2px;
+    box-shadow: none;
+}
+
+:root[data-page-tone][data-theme] body.ft-extension-surface[data-surface="popup"] :focus-visible {
+    /* The popup header clips anything drawn outside its controls. */
+    outline-offset: -2px;
+}
+
+:root[data-page-tone][data-theme] body.ft-extension-surface[data-surface] :is(.text-input, .select-input, .search-input, .custom-date-input):focus {
+    border-color: var(--ft-tone-accent);
+    box-shadow: none;
+}

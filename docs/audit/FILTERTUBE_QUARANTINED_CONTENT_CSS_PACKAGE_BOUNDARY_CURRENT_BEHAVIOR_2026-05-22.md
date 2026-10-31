@@ -238,3 +238,11 @@ extension HTML link tags checked: 12
 extension HTML quarantined CSS link refs: 0
 
 The extra dashboard stylesheet is css/device-auto-sync.css. It does not activate any quarantined content CSS. Existing packaging and manifest no-content-CSS assertions remain unchanged.
+
+## Page tone source inventory - 2026-11-01
+
+extension HTML files checked: 4
+extension HTML link tags checked: 14
+extension HTML quarantined CSS link refs: 0
+
+The popup and dashboard each load css/page-tones.css last. It does not activate any quarantined content CSS. Existing packaging and manifest no-content-CSS assertions remain unchanged.

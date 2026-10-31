@@ -879,6 +879,7 @@ function initializePopupFiltersTabs() {
     async function updatePopupVideoFiltersVisibility() {
         const profileType = await resolveProfileTypeFromTabs();
         const showKids = profileType === 'kids';
+        document.documentElement.dataset.pageTone = showKids ? 'pink' : 'amber';
 
         const mainRows = [
             document.getElementById('popupVideoFilter_duration_enabled')?.closest('.toggle-row'),

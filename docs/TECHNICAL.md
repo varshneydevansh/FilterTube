@@ -2222,6 +2222,27 @@ Relevant runtime/build pieces:
 - `/Users/devanshvarshney/FilterTube/css/serene-shell.css`
 - `/Users/devanshvarshney/FilterTube/css/design_tokens.css`
 
+### Page Tones (v3.4.2 follow-up)
+
+Every controls page has a colour tone shared with the Android app (FilterTubeApp `docs/app/tv-ux-research/TV_CONTROLS_DESIGN.md` §1.1). `css/page-tones.css` loads last on the popup and the dashboard. It defines `--ft-tone-*` tokens for `[data-page-tone]` on `<html>`, with dark values under `data-theme="dark"`.
+
+| Tone | Pages |
+|---|---|
+| `watch` | Dashboard |
+| `amber` | Filters (keywords, channels, content controls); popup on YouTube |
+| `pink` | Kids Mode; popup on YouTube Kids |
+| `sage` | Settings |
+| `sky` | Accounts & Sync; the profile lock gate |
+| `lilac` | What's New, Help, About, Donate |
+
+- Tokens: `page-start`, `page-end`, `panel`, `accent`, `on-accent`, `soft`, `stroke`, `ink`, `ink-soft`. The hex values match the Android table.
+- Usage: the page background is a vertical gradient from page start to page end. Cards, dialogs and menus use panel with a stroke border. Primary buttons are accent with on-accent text, and selected or hover rows use soft. Text uses ink and ink soft.
+- The file also points the shared `--ft-color-*` tokens at the tone, so existing rules follow it. It overrides the hard-coded serene-shell surfaces directly.
+- `js/tab-view.js` (`PAGE_TONE_BY_VIEW`, `syncPageTone`) sets the tone when the view changes or the lock gate toggles. `js/popup.js` sets it from the active tab's site.
+- Dialogs and menus are attached under `<html>`, so they take the tone of the page that opened them.
+- Keyboard focus is a 2px accent outline, with no fill or shadow change.
+- The scenic video stays as a faint texture under the tone gradient. The extension has no background-motion toggle: `css/page-tones.css` hides the video under `prefers-reduced-motion`, and Chrome pauses muted autoplay video that is not rendered.
+
 ### Enhanced Dropdown & Select Components
 
 FilterTube v3.2.6 introduces refined dropdown and select styling with left accent borders and improved interactivity:

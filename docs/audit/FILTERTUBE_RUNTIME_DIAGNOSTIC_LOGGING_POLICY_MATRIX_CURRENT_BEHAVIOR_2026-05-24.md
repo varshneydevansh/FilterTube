@@ -774,7 +774,7 @@ relative isolated-world production console-gate ordering are checked in source.
 | `js/injector.js` | 4148 | 183860 | `62bd7222e7ea8c7fc51cbffd63b894a2f03509b4cc09ddf7525b8a748f91eb60` |
 | `js/io_manager.js` | 3203 | 162604 | `ca73f44abb4d2d4e57a81470cfcb2447b1e62ef8680ef0457b81dcdc6734e4c3` |
 | `js/layout.js` | 680 | 30604 | `48831ccdc2d62c75818d9c6a153d7bfacec9d7be9f2408485f74b1a7c13c57c7` |
-| `js/popup.js` | 2553 | 117093 | `645fab83d4b665796f5b2fe1be262ca336df6a4cf3ffb1daebc588a50c091aa7` |
+| `js/popup.js` | 2554 | 117174 | `6fccb7482d25aa9a56d2cea2e6522ca93bec7fe892c0cb8d68000238f28c89b9` |
 | `js/seed.js` | 2508 | 110538 | `af10e116a8580bf380e6f26b312c5ed3e3597693f7cf9a9bbb4661c2c597c8a1` |
 | `js/settings_shared.js` | 1313 | 66857 | `19f0a1fb3cd512494481b7eb39169bf84feeda4a0a6a20cf58ebaf1c18ff7ba9` |
 | `js/state_manager.js` | 2979 | 124009 | `04879b5b1dcac9229c70d0ea14241667755682649865ad1d52030c1ce21950d3` |
@@ -938,11 +938,11 @@ Current seed and coordinator source fingerprints were recomputed after fallback 
 | `js/injector.js` | 4148 | 183860 | `62bd7222e7ea8c7fc51cbffd63b894a2f03509b4cc09ddf7525b8a748f91eb60` |
 | `js/io_manager.js` | 3219 | 164248 | `f00d15e7dd636585c999b3a51a40363d181b192e85fd2be00231b37ca827ed43` |
 | `js/layout.js` | 680 | 30604 | `48831ccdc2d62c75818d9c6a153d7bfacec9d7be9f2408485f74b1a7c13c57c7` |
-| `js/popup.js` | 2553 | 117093 | `645fab83d4b665796f5b2fe1be262ca336df6a4cf3ffb1daebc588a50c091aa7` |
+| `js/popup.js` | 2554 | 117174 | `6fccb7482d25aa9a56d2cea2e6522ca93bec7fe892c0cb8d68000238f28c89b9` |
 | `js/seed.js` | 2508 | 110538 | `af10e116a8580bf380e6f26b312c5ed3e3597693f7cf9a9bbb4661c2c597c8a1` |
 | `js/settings_shared.js` | 1327 | 67805 | `c3d0f4b965acaaf46f6424cd0ad329c50e616de7b1cf8905a9fa578123e2bf69` |
 | `js/state_manager.js` | 2984 | 124258 | `029b2e7d4356d4629348f174bdaf7858fa1fa0c09a4b54c6bb0e293a161a8d5e` |
-| `js/tab-view.js` | 32961 | 1793490 | `cfea9c4e584d14c9298db26a10670ec223e38484dfc2206ff8e427c0ab4a2b9a` |
+| `js/tab-view.js` | 32984 | 1794175 | `ecbfbe6dc4a9ab5173c053e4d187d843cbde38c99f3cd7ba03f663357c8baaf1` |
 | `scripts/build-extension-ui.mjs` | 50 | 1188 | `6326362ebf90f448ccdbf68945b3fb522b7b215edaf9b3e28589a4e166239cf3` |
 | `scripts/build-nanah-vendor.mjs` | 65 | 1818 | `dae8d3ef29c4cd44b0bf975090e9d53f3bb05b523355f5038930fc03b27e921c` |
 | `scripts/sync-native-runtime.mjs` | 34 | 1070 | `4f46c13bf6099092193712790d231ff4809b00b1b0061d04af71ac3ba6bf21c6` |
