@@ -18,6 +18,8 @@
     const NANAH_TRUSTED_LINKS_KEY = 'ftNanahTrustedLinks';
     const NANAH_DEVICE_ID_KEY = 'ftNanahDeviceId';
     const DEFAULT_PROFILE_ID = 'default';
+    const SAVED_NOTES_KEY = 'ftSavedVideoNotesV1';
+    const LOCAL_PLAYLISTS_KEY = 'ftLocalPlaylistsV1';
 
     /** Returns a timestamp in ms (kept inline so tests can stub). */
     function nowTs() {
@@ -828,7 +830,7 @@
     async function restoreStorageSnapshot(snapshot) {
         // Profile import does not own private notes, installation writers or Auto-sync
         // grants/queues. Rollback must not revive revoked consent or old deliveries.
-        const privateNotesKeys = new Set(['ftSavedVideoNotesV1', 'ftSavedVideoNotesWriterV1', 'ftDeviceAutoSyncV1', 'ftAutoSyncQueueV1']);
+        const privateNotesKeys = new Set([SAVED_NOTES_KEY, 'ftSavedVideoNotesWriterV1', LOCAL_PLAYLISTS_KEY, 'ftDeviceAutoSyncV1', 'ftAutoSyncQueueV1']);
         const safeSnapshot = Object.fromEntries(Object.entries(safeObject(snapshot)).filter(([key]) => !privateNotesKeys.has(key)));
         const current = await readStorage(null, { required: true });
         const extraKeys = Object.keys(safeObject(current)).filter(
@@ -2288,7 +2290,7 @@
             ...(profilesV4ForExport ? { [FT_PROFILES_V4_KEY]: profilesV4ForExport } : {})
         };
 
-        return buildV3Export({
+        const payload = buildV3Export({
             mainSettings: exportSettings,
             mainKeywords,
             mainChannels,
@@ -2298,12 +2300,156 @@
             profileId: exportProfileId,
             profileName: exportProfileName
         });
+        return attachBackupPrivateData(payload, Object.keys(safeObject(payload.profilesV4?.profiles)));
+    }
+
+    /**
+     * The FilterTube apps export notes-bearing backups as a raw v4 profile tree. Convert it to
+     * the same v3 envelope the apps use for their plain backups (Android BackupExportEnvelope).
+     */
+    function convertAppProfileBackup(data) {
+        const root = safeObject(data);
+        const meta = safeObject(root.meta);
+        if (Object.prototype.hasOwnProperty.call(meta, 'version') || root.schemaVersion !== 4) return data;
+        const profileTree = safeObject(root.profiles);
+        const profileId = normalizeString(root.activeProfileId);
+        if (!profileId || !Object.prototype.hasOwnProperty.call(profileTree, profileId)) return data;
+        const activeOnly = normalizeString(meta.exportType) === 'profile';
+        const snapshot = { ...root };
+        delete snapshot.savedVideoNotes;
+        delete snapshot.localPlaylists;
+        delete snapshot.meta;
+        const profile = safeObject(profileTree[profileId]);
+        const main = safeObject(profile.main);
+        const kids = safeObject(profile.kids);
+        const profileSettings = safeObject(profile.settings);
+        const list = (surface, key) => safeArray(surface[key]);
+        const converted = {
+            meta: {
+                version: 3,
+                timestamp: nowTs(),
+                application: 'FilterTube',
+                exportType: activeOnly ? 'profile' : 'full',
+                ...(activeOnly ? { profileId, profileName: normalizeString(profile.name) || profileId } : {})
+            },
+            profilesV4: snapshot,
+            settings: {
+                theme: normalizeString(root.appThemeMode) || 'system',
+                main: {
+                    ...profileSettings,
+                    mode: normalizeString(main.mode) || 'blocklist',
+                    applyKidsRulesOnMain: profileSettings.syncKidsToMain === true
+                },
+                kids: { mode: normalizeString(kids.mode) || 'blocklist', strictMode: kids.strictMode !== false }
+            },
+            profiles: {
+                main: {
+                    channels: list(main, 'channels'), keywords: list(main, 'keywords'), videoIds: list(main, 'videoIds'),
+                    whitelistedChannels: list(main, 'whitelistChannels'), whitelistedKeywords: list(main, 'whitelistKeywords'),
+                    subscriptions: list(main, 'subscriptions')
+                },
+                kids: {
+                    blockedChannels: list(kids, 'blockedChannels'), blockedKeywords: list(kids, 'blockedKeywords'),
+                    whitelistedChannels: list(kids, 'whitelistChannels'), whitelistedKeywords: list(kids, 'whitelistKeywords'),
+                    videoIds: list(kids, 'videoIds'), subscriptions: list(kids, 'subscriptions')
+                }
+            },
+            maps: { channelMap: safeObject(profileSettings.channelMap) }
+        };
+        if (Object.prototype.hasOwnProperty.call(root, 'savedVideoNotes')) converted.savedVideoNotes = root.savedVideoNotes;
+        if (Object.prototype.hasOwnProperty.call(root, 'localPlaylists')) converted.localPlaylists = root.localPlaylists;
+        return converted;
+    }
+
+    /** Validates backup notes and playlists before anything is written. */
+    function readBackupPrivateData(root) {
+        const result = { notes: null, playlists: null };
+        if (Object.prototype.hasOwnProperty.call(root, 'savedVideoNotes')) {
+            const contract = global.FilterTubeSavedVideoNotes;
+            if (!contract) throw new Error('This backup includes saved video notes, but notes support is unavailable here. Reload this page and try again. Nothing was imported.');
+            try {
+                const envelope = safeObject(root.savedVideoNotes);
+                const ids = safeArray(envelope.entries).map(entry => entry?.profileId);
+                result.notes = contract.decode(JSON.stringify(root.savedVideoNotes), ids);
+            } catch (e) {
+                throw new Error('The saved video notes in this backup are not valid. Keep the original file; nothing was imported.');
+            }
+        }
+        if (Object.prototype.hasOwnProperty.call(root, 'localPlaylists')) {
+            const contract = global.FilterTubeLocalPlaylists;
+            if (!contract) throw new Error('This backup includes FilterTube playlists, but playlist support is unavailable here. Reload this page and try again. Nothing was imported.');
+            try {
+                result.playlists = contract.decode(root.localPlaylists);
+            } catch (e) {
+                throw new Error('The FilterTube playlists in this backup are not valid. Keep the original file; nothing was imported.');
+            }
+        }
+        return result;
+    }
+
+    /**
+     * Merges backup notes and playlists into this device after the profile write, with the same
+     * incoming-to-local profile mapping the import used. Unmapped profiles are dropped.
+     */
+    async function mergeBackupPrivateData(backup, mapping) {
+        const counts = { savedVideoNotes: 0, localPlaylists: 0 };
+        if (!backup.notes && !backup.playlists) return counts;
+        const stored = await readStorage([SAVED_NOTES_KEY, LOCAL_PLAYLISTS_KEY], { required: true });
+        const update = {};
+        if (backup.notes) {
+            const contract = global.FilterTubeSavedVideoNotes;
+            const raw = stored[SAVED_NOTES_KEY];
+            const existing = typeof raw === 'string'
+                ? contract.decode(raw, safeArray(safeObject(JSON.parse(raw)).entries).map(entry => entry?.profileId))
+                : [];
+            const rows = new Map(existing.map(row => [JSON.stringify([row.profileId, row.videoId]), row]));
+            for (const row of backup.notes) {
+                if (!Object.prototype.hasOwnProperty.call(mapping, row.profileId)) continue;
+                const mapped = contract.record({ ...row, profileId: mapping[row.profileId] });
+                const key = JSON.stringify([mapped.profileId, mapped.videoId]);
+                rows.set(key, rows.has(key) ? contract.merge(rows.get(key), mapped) : mapped);
+                counts.savedVideoNotes++;
+            }
+            const all = Array.from(rows.values());
+            const encoded = contract.encode(all, all.map(row => row.profileId));
+            if (counts.savedVideoNotes && encoded !== raw) update[SAVED_NOTES_KEY] = encoded;
+        }
+        if (backup.playlists) {
+            const contract = global.FilterTubeLocalPlaylists;
+            const raw = stored[LOCAL_PLAYLISTS_KEY];
+            const incoming = contract.mapProfiles(backup.playlists, mapping);
+            counts.localPlaylists = incoming.length;
+            if (incoming.length) {
+                const merged = contract.mergeAll(typeof raw === 'string' ? contract.decode(raw) : [], incoming);
+                const encoded = contract.encode(merged);
+                if (encoded !== raw) update[LOCAL_PLAYLISTS_KEY] = encoded;
+            }
+        }
+        if (Object.keys(update).length) requireStorageSuccess(await writeStorage(update), 'Saved notes and playlists write');
+        return counts;
+    }
+
+    /** Adds the exported profiles' notes and playlists to a backup, when there are any. */
+    async function attachBackupPrivateData(payload, profileIds) {
+        if (!profileIds.length) return payload;
+        const stored = await readStorage([SAVED_NOTES_KEY, LOCAL_PLAYLISTS_KEY]);
+        const notesContract = global.FilterTubeSavedVideoNotes;
+        const notesRaw = stored?.[SAVED_NOTES_KEY];
+        if (notesContract && typeof notesRaw === 'string') {
+            const rows = notesContract.decode(notesRaw, safeArray(safeObject(JSON.parse(notesRaw)).entries).map(entry => entry?.profileId))
+                .filter(row => profileIds.includes(row.profileId));
+            if (rows.length) payload.savedVideoNotes = JSON.parse(notesContract.encode(rows, profileIds));
+        }
+        const playlistsContract = global.FilterTubeLocalPlaylists;
+        const playlistsRaw = stored?.[LOCAL_PLAYLISTS_KEY];
+        if (playlistsContract && typeof playlistsRaw === 'string') {
+            const lists = playlistsContract.decode(playlistsRaw).filter(list => profileIds.includes(list.profileId));
+            if (lists.length) payload.localPlaylists = playlistsContract.envelope(lists);
+        }
+        return payload;
     }
 
     async function importV3(json, options = {}) {
-        if (json && Object.prototype.hasOwnProperty.call(json, 'savedVideoNotes')) {
-            throw new Error('This backup includes personal video notes. Notes transfer is not supported by this extension yet. Keep the original file; no profiles or notes were imported.');
-        }
         const coordinator = global.FilterTubeNanahStorageLock;
         if (typeof coordinator?.run !== 'function') {
             throw new Error('Secure device storage locking is unavailable. Reload this page before importing settings.');
@@ -2312,10 +2458,12 @@
     }
 
     async function importV3Unlocked(json, { strategy = 'merge', scope = 'auto', auth = null, targetProfileId = null, beforeProfileWrite = null } = {}) {
+        json = convertAppProfileBackup(json);
         const parsed = normalizeIncomingV3(json);
         if (!parsed.ok) {
             throw new Error(parsed.error || 'Invalid file');
         }
+        const backupPrivateData = readBackupPrivateData(safeObject(json));
 
         // Snapshot before any settings/profile loader can initialize storage.
         const storageSnapshot = JSON.parse(JSON.stringify(await readStorage(null, { required: true })));
@@ -2403,29 +2551,36 @@
         const shouldTouchLegacyV3 = canTouchLegacyV3 && !shouldImportIntoSeparateProfile;
 
         let incomingProfileForImport = null;
+        let incomingSourceProfileId = null;
+        let fullImportProfileIds = null;
         if (incomingV4) {
             if (effectiveScope === 'active' && !shouldImportIntoSeparateProfile) {
                 const incomingSourceId = normalizeString(incomingV4.activeProfileId) || incomingExportProfileId || DEFAULT_PROFILE_ID;
                 const activeSnapshot = safeObject(incomingProfiles[incomingSourceId]);
                 if (Object.keys(activeSnapshot).length > 0) {
                     incomingProfileForImport = activeSnapshot;
+                    incomingSourceProfileId = incomingSourceId;
                 } else if (!explicitTargetProfileId && localActiveId !== DEFAULT_PROFILE_ID) {
                     const exactMatch = safeObject(incomingProfiles[localActiveId]);
                     if (Object.keys(exactMatch).length > 0) {
                         incomingProfileForImport = exactMatch;
+                        incomingSourceProfileId = localActiveId;
                     } else if (incomingExportType === 'profile') {
                         incomingProfileForImport = safeObject(incomingProfiles[incomingSourceId]);
+                        incomingSourceProfileId = incomingSourceId;
                     } else {
                         throw new Error('Full backups can only be imported from the Default (Master) profile');
                     }
                 } else if (incomingExportType === 'profile') {
                     incomingProfileForImport = safeObject(incomingProfiles[incomingSourceId]);
+                    incomingSourceProfileId = incomingSourceId;
                 } else {
                     throw new Error('Incoming active profile snapshot is unavailable');
                 }
             } else {
                 const incomingActiveId = normalizeString(incomingV4.activeProfileId) || DEFAULT_PROFILE_ID;
                 incomingProfileForImport = safeObject(incomingProfiles[incomingActiveId]);
+                incomingSourceProfileId = incomingActiveId;
             }
         }
 
@@ -2626,6 +2781,7 @@
             if (incomingProfilesV4 && effectiveScope === 'full' && localActiveId === DEFAULT_PROFILE_ID) {
                 const sanitizedIncoming = sanitizeProfilesV4(incomingProfilesV4, { source: 'import' });
                 if (sanitizedIncoming) {
+                    fullImportProfileIds = Object.keys(safeObject(sanitizedIncoming.profiles));
                     if (strategy === 'replace') {
                         nextV4 = sanitizedIncoming;
                     } else {
@@ -2864,6 +3020,19 @@
         }).length;
         const addedKeywords = Array.from(incomingUniqueKeywordKeys).filter(key => !beforeKeywordKeys.has(key)).length;
         const addedVideoIds = Array.from(incomingUniqueVideoIds).filter(videoId => !beforeVideoIds.has(videoId)).length;
+        // Notes and playlists follow the profiles they belong to: a full import keeps profile IDs,
+        // a single-profile import moves the backup's profile onto the imported target.
+        const privateDataMapping = {};
+        const persistedProfileIds = new Set(Object.keys(safeObject(persistedProfilesV4?.profiles)));
+        if (fullImportProfileIds) {
+            for (const id of fullImportProfileIds) if (persistedProfileIds.has(id)) privateDataMapping[id] = id;
+        }
+        if (incomingSourceProfileId && persistedProfileIds.has(importedTargetProfileId)
+            && !Object.prototype.hasOwnProperty.call(privateDataMapping, incomingSourceProfileId)) {
+            privateDataMapping[incomingSourceProfileId] = importedTargetProfileId;
+        }
+        const privateDataCounts = await mergeBackupPrivateData(backupPrivateData, privateDataMapping);
+
         const migrationReport = safeObject(parsed.migrationReport);
         const skippedRows = safeArray(migrationReport.invalid).length
             + safeArray(migrationReport.unsupported).length
@@ -2889,6 +3058,8 @@
             storageBytesBefore: storagePreflight.storageBytesBefore,
             storageBytesAfter,
             sourceBytes: storagePreflight.sourceBytes,
+            savedVideoNotes: privateDataCounts.savedVideoNotes,
+            localPlaylists: privateDataCounts.localPlaylists,
             verified: true
         };
 
@@ -3206,6 +3377,7 @@
         exportV3Encrypted,
         importV3,
         importV3Encrypted,
+        convertAppProfileBackup,
         previewBlockTubeMigration,
         loadProfilesV3,
         saveProfilesV3,

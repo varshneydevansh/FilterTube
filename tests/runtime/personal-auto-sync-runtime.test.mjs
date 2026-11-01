@@ -8,6 +8,8 @@ const runtime = require('../../js/personal_auto_sync_runtime.js');
 const queueAPI = require('../../js/auto_sync_queue.js');
 const notesAPI = require('../../js/video_notes_store.js');
 const notes = require('../../js/shared/saved_video_notes.js');
+const playlistsAPI = require('../../js/local_playlists_store.js');
+const playlists = require('../../js/shared/local_playlists.js');
 const copy = value => structuredClone(value);
 const videoId = 'abcdefghijk';
 function fixture() {
@@ -47,6 +49,11 @@ function fixture() {
                 const row = state.personal.find(value => value.grant.localGrantId === scope.grantId);
                 return !!row && row.grant.areas.includes('notes') && row.grant.localProfileId === profileId && await authorize(row);
             } });
+        state.playlists = playlistsAPI.create({ get, set,
+            authorizeSync: async (profileId, scope) => {
+                const row = state.personal.find(value => value.grant.localGrantId === scope.grantId);
+                return !!row && row.grant.areas.includes('playlists') && row.grant.localProfileId === profileId && await authorize(row);
+            } });
         state.start = () => runtime.create({ crypto: webcrypto, protocol,
             withReceiveLock: (_id, work) => { const result = receiveLock.then(work); receiveLock = result.catch(() => {}); return result; },
             context: async () => ({ profilesV4: copy(state.profilesV4), deviceId: 'device-' + name, links: copy(state.links), unlocked: state.unlocked }),
@@ -63,6 +70,8 @@ function fixture() {
             confirm: async request => { state.confirms.push(copy(request)); await state.confirmHook?.(); return state.confirm; },
             notesRead: (profileId, grantId) => state.notes.syncRead(profileId, { grantId }),
             notesMerge: (profileId, envelope, grantId) => state.notes.syncMerge(profileId, envelope, { grantId }),
+            playlistsRead: (profileId, grantId) => state.playlists.syncRead(profileId, { grantId }),
+            playlistsMerge: (profileId, envelope, grantId) => state.playlists.syncMerge(profileId, envelope, { grantId }),
             applySettings: async (profileId, snapshot, beforeCheck) => {
                 await state.applyHook?.();
                 if (!await beforeCheck()) throw Error('access changed');
@@ -175,6 +184,23 @@ test('conflicting rule arrays stop before Notes apply and require explicit revie
     assert.deepEqual(b.profile().main.channels, [{ id: 'UCA' }]);
     assert.equal((await b.readNote()).versions[0].text, 'Wait for settings review');
     assert.equal((await a.queue.read()).enrollments[0].channels[0].status, 'applied');
+});
+test('FilterTube playlists synchronize both ways onto each exact profile and keep removals', async () => {
+    const f = fixture(); const { a, b } = f; await f.enroll({ playlists: true });
+    assert.deepEqual(a.personal[0].grant.areas, ['playlists']);
+    const item = (videoId, addedAt, removedAt) => ({ kind: 'video', videoId, title: videoId, addedAt, ...(removedAt ? { removedAt } : {}) });
+    const write = (state, items, extra = {}) => { state.data[playlistsAPI.DATA_KEY] = playlists.encode(playlists.decode({ format: playlists.FORMAT, version: 1,
+        playlists: [{ profileId: state.id, surface: 'main', id: 'lp_road', name: 'Road trip', nameUpdatedAt: 10, createdAt: 10, orderUpdatedAt: 10, items, ...extra }] })); };
+    const stored = state => playlists.decode(state.data[playlistsAPI.DATA_KEY]);
+    write(a, [item('aaaaaaaaaaa', 20)]); await f.cycle();
+    assert.deepEqual(stored(b).map(list => [list.profileId, list.id]), [['profile-b', 'lp_road']]);
+    write(b, [item('aaaaaaaaaaa', 20, 30), item('bbbbbbbbbbb', 25)], { name: 'Weekend', nameUpdatedAt: 40 }); f.advance(); await f.cycle(); await f.cycle();
+    for (const state of [a, b]) {
+        const [list] = stored(state);
+        assert.equal(list.name, 'Weekend');
+        assert.deepEqual(playlists.entries(list).map(entry => entry.videoId), ['bbbbbbbbbbb']);
+        assert.equal(list.items.length, 2, 'the removed item stays as a tombstone');
+    }
 });
 test('offline note edit/delete convergence retains both heads and stale replay cannot resurrect deletion', async () => {
     const f = fixture(); const { a, b } = f; await f.enroll({ notes: true });

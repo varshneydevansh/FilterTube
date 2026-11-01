@@ -5747,3 +5747,38 @@ html[data-theme="dark"] .video-filter-compact-option:has(.video-filter-compact-r
         max-width: none;
     }
 }
+
+/* Read-only FilterTube playlists on the dashboard. */
+.dashboard-local-playlists__list {
+    display: grid;
+    gap: 0.5rem;
+    margin: 0.75rem 0 0;
+    padding: 0;
+    list-style: none;
+}
+
+.dashboard-local-playlists__item {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 1rem;
+    padding: 0.7rem 0.9rem;
+    border: 1px solid var(--ft-color-sem-neutral-border);
+    border-radius: 0.8rem;
+    background: var(--ft-color-bg-surface);
+}
+
+.dashboard-local-playlists__name {
+    min-width: 0;
+    overflow: hidden;
+    color: var(--ft-color-text-primary);
+    font-weight: 600;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.dashboard-local-playlists__meta {
+    flex: none;
+    color: var(--ft-color-text-secondary);
+    font-size: 0.82rem;
+}

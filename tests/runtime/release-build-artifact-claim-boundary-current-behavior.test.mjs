@@ -15,7 +15,7 @@ const sourceRows = [
   ["CHANGELOG.md", 1062, 83168, "981a3c3aebce48082e3241161fe6082e3b9c0913524221a44144362844fb6f81"],
   ["manifest.json", 162, 5630, "e3fb4474be24b84b4b742597f895c63324ba3dbf4de34e23815ff211e0cf7a04"],
   ["manifest.chrome.json", 162, 5630, "e3fb4474be24b84b4b742597f895c63324ba3dbf4de34e23815ff211e0cf7a04"],
-  ["manifest.firefox.json", 136, 4668, "c05104052124e409d9cf52dde64e4a62922516071705441a109384b7190dd130"],
+  ["manifest.firefox.json", 136, 4731, "1e39bd87f254257cf8e274bfd7ee397628f995a8b8828bb0fa484dd333980d35"],
   ["manifest.opera.json", 170, 5819, "d5c29a055e6454aba5aed3f65da4de8bba9d98e2bfbec76071fa9887b206d037"],
   ["data/release_notes.json", 450, 39308, "bf25bf9000ae6e2d686cf7243f8358f66fef4ef552c99d62867a8ecd451fe1ca"]
 ];

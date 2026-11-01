@@ -380,6 +380,51 @@ function initializeHelpSearch() {
 
 document.addEventListener('DOMContentLoaded', initializeHelpSearch);
 
+// Read-only view of the active profile's FilterTube playlists. Editing lives in the apps.
+const DASHBOARD_LOCAL_PLAYLISTS_KEY = 'ftLocalPlaylistsV1';
+function renderDashboardLocalPlaylists() {
+    const section = document.getElementById('dashboardLocalPlaylists');
+    const list = document.getElementById('dashboardLocalPlaylistsList');
+    const contract = window.FilterTubeLocalPlaylists;
+    const storage = (typeof chrome !== 'undefined' && chrome.storage?.local) || null;
+    if (!section || !list || !contract || !storage) return;
+    storage.get([DASHBOARD_LOCAL_PLAYLISTS_KEY, 'ftProfilesV4'], data => {
+        let lists = [];
+        try {
+            const activeId = data?.ftProfilesV4?.activeProfileId || 'default';
+            const raw = data?.[DASHBOARD_LOCAL_PLAYLISTS_KEY];
+            lists = typeof raw === 'string'
+                ? contract.decode(raw).filter(playlist => playlist.profileId === activeId && !contract.isDeleted(playlist))
+                : [];
+        } catch (e) {
+            lists = [];
+        }
+        list.replaceChildren(...lists.map(playlist => {
+            const row = document.createElement('li');
+            row.className = 'dashboard-local-playlists__item';
+            const name = document.createElement('span');
+            name.className = 'dashboard-local-playlists__name';
+            name.textContent = playlist.name;
+            const meta = document.createElement('span');
+            meta.className = 'dashboard-local-playlists__meta';
+            const count = contract.entries(playlist).length;
+            meta.textContent = (playlist.surface === 'kids' ? 'Kids · ' : '') + (count === 1 ? '1 item' : `${count} items`);
+            row.append(name, meta);
+            return row;
+        }));
+        section.hidden = lists.length === 0;
+    });
+}
+document.addEventListener('DOMContentLoaded', () => {
+    renderDashboardLocalPlaylists();
+    try {
+        chrome.storage.onChanged.addListener((changes, area) => {
+            if (area === 'local' && (changes[DASHBOARD_LOCAL_PLAYLISTS_KEY] || changes.ftProfilesV4)) renderDashboardLocalPlaylists();
+        });
+    } catch (e) {
+    }
+});
+
 // ============================================================================
 // FILTERS TAB INITIALIZATION
 // ============================================================================
@@ -23288,6 +23333,16 @@ document.addEventListener('DOMContentLoaded', async () => {
                 if (!result?.ok) throw Error('Notes could not be applied.');
                 return result.envelope;
             },
+            playlistsRead: async (profileId, grantId) => {
+                const result = await call(api.runtime, 'sendMessage', { action: 'FilterTube_PersonalPlaylistsRead', profileId, grantId });
+                if (!result?.ok) throw Error('Unlock this profile before syncing playlists.');
+                return result.envelope;
+            },
+            playlistsMerge: async (profileId, envelope, grantId) => {
+                const result = await call(api.runtime, 'sendMessage', { action: 'FilterTube_PersonalPlaylistsMerge', profileId, grantId, envelope });
+                if (!result?.ok) throw Error('Playlists could not be applied.');
+                return result.envelope;
+            },
             applySettings: async (profileId, snapshot, beforeCheck, expectedLocalSnapshot) => {
                 await window.FilterTubeNanahStorageLock.run(async () => {
                     if (!await beforeCheck()) throw Error('Profile sync access changed.');
@@ -28648,6 +28703,8 @@ document.addEventListener('DOMContentLoaded', async () => {
                 }
                 payload = await Security.decryptJson(parsed.encrypted, password);
             }
+            // App backups that carry notes and playlists arrive as a raw v4 profile tree.
+            if (typeof io.convertAppProfileBackup === 'function') payload = io.convertAppProfileBackup(payload);
 
             let blockTubeMigrationApproved = false;
             let blockTubePayloadCandidate = null;

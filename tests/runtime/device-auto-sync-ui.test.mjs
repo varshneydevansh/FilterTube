@@ -62,7 +62,7 @@ test('personal areas start off, device-only copy is truthful, and controls have 
     assert.match(f.root.textContent, /Keep Accounts & Sync open/);
     assert.match(visibleText(f.root), /both Accounts & Sync pages are open and connected/);
     assert.match(f.root.textContent, /Optional pickup services/);
-    assert.deepEqual(inputs(f.root).map(input => input.checked), [false, false]);
+    assert.deepEqual(inputs(f.root).map(input => input.checked), [false, false, false]);
     assert.equal(button(f.root, 'Link this profile').disabled, true);
     assert.equal(by(f.root, node => node.tagName === 'select').disabled, false);
     assert.equal(walk(f.root).filter(node => node.tagName === 'button').every(node => node.type === 'button'), true);
@@ -99,11 +99,12 @@ test('asynchronous save retains focus and blocks duplicate actions without disab
 });
 test('personal linking sends only the selected areas and clears transient choices after request', async () => {
     const f = fixture(); await f.installed.ready;
-    const [settings, notes] = inputs(f.root); notes.checked = true; await notes.emit('change');
+    const [settings, notes, playlists] = inputs(f.root); notes.checked = true; await notes.emit('change');
+    playlists.checked = true; await playlists.emit('change');
     const link = button(f.root, 'Link this profile'); assert.equal(link.disabled, false); link.focus();
     await link.emit('click');
-    assert.deepEqual(f.calls, [['personal', { settings: false, notes: true }]]);
-    assert.equal(settings.checked, false); assert.equal(notes.checked, false);
+    assert.deepEqual(f.calls, [['personal', { settings: false, notes: true, playlists: true }]]);
+    assert.equal(settings.checked, false); assert.equal(notes.checked, false); assert.equal(playlists.checked, false);
     assert.equal(link.disabled, true);
     assert.match(classNode(f.root, 'ft-auto-sync__action-status').textContent, /other device must approve/);
     assert.equal(f.document.activeElement.tagName, 'h5');

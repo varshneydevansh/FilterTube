@@ -1220,7 +1220,7 @@ const browserAPI = IS_FIREFOX ? browser : chrome;
 // Private Notes modules are browser-only; never forwarded to MAIN or native assets.
 try {
     if (typeof importScripts === 'function' && !globalThis.FilterTubeVideoNotesBackground) {
-        importScripts('shared/saved_video_notes.js', 'video_notes_store.js', 'video_notes_background.js', 'personal_sync.js', 'device_auto_sync.js', 'auto_sync_wakeup.js');
+        importScripts('shared/saved_video_notes.js', 'shared/local_playlists.js', 'video_notes_store.js', 'video_notes_background.js', 'local_playlists_store.js', 'personal_sync.js', 'device_auto_sync.js', 'auto_sync_wakeup.js');
     }
     globalThis.FilterTubeVideoNotesBackground?.install({
         api: browserAPI,
@@ -1245,6 +1245,12 @@ function isAutoSyncDashboardSender(sender) {
         && String(sender.url || '').split('#')[0] === browserAPI.runtime.getURL('html/tab-view.html');
 }
 async function authorizePersonalNotesSync(profileId, scope) {
+    return authorizePersonalAreaSync('notes', profileId, scope);
+}
+async function authorizePersonalPlaylistsSync(profileId, scope) {
+    return authorizePersonalAreaSync('playlists', profileId, scope);
+}
+async function authorizePersonalAreaSync(area, profileId, scope) {
     const stored = await storageGet(['ftProfilesV4', 'ftDeviceAutoSyncV1', 'ftNanahDeviceId', 'ftNanahTrustedLinks']);
     const root = stored.ftProfilesV4;
     const rows = stored.ftDeviceAutoSyncV1?.personal;
@@ -1258,10 +1264,35 @@ async function authorizePersonalNotesSync(profileId, scope) {
         return grant.enabled && row.confirmed === true && row.invalidated !== true && peers.length === 1
             && row.peerBinding === globalThis.FilterTubePersonalSync.peerBinding(stored.ftNanahTrustedLinks, grant.remoteDeviceId)
             && grant.localDeviceId === stored.ftNanahDeviceId
-            && grant.areas.includes('notes') && grant.localProfileId === profileId
+            && grant.areas.includes(area) && grant.localProfileId === profileId
             && row.securityFingerprint === globalThis.FilterTubeDeviceAutoSync.security(root, profileId)
             && isProfileSessionAuthorized(root, profileId);
     } catch (_) { return false; }
+}
+// Local playlists sync shares the Notes guards: dashboard-only sender, exact grant and profile.
+let personalPlaylistsStore = null;
+try {
+    personalPlaylistsStore = globalThis.FilterTubeLocalPlaylistsStore?.create({
+        get: keys => new Promise(resolve => browserAPI.storage.local.get(keys, resolve)),
+        set: values => new Promise(resolve => browserAPI.storage.local.set(values, resolve)),
+        authorizeSync: authorizePersonalPlaylistsSync
+    }) || null;
+} catch (_) { personalPlaylistsStore = null; }
+function handlePersonalPlaylistsSync(request, sender, respond) {
+    const action = request?.action;
+    if (action !== 'FilterTube_PersonalPlaylistsRead' && action !== 'FilterTube_PersonalPlaylistsMerge') return false;
+    if (!personalPlaylistsStore || !isAutoSyncDashboardSender(sender) || typeof request.profileId !== 'string'
+        || typeof request.grantId !== 'string' || !request.grantId.length || request.grantId.length > 1024) {
+        respond({ ok: false, error: 'access_changed' });
+        return false;
+    }
+    const scope = Object.freeze({ grantId: request.grantId });
+    (action === 'FilterTube_PersonalPlaylistsRead'
+        ? personalPlaylistsStore.syncRead(request.profileId, scope)
+        : personalPlaylistsStore.syncMerge(request.profileId, request.envelope, scope))
+        .then(envelope => respond({ ok: true, envelope }))
+        .catch(error => respond({ ok: false, error: error?.message === 'access_changed' ? 'access_changed' : 'playlists_unavailable' }));
+    return true;
 }
 function handleAutoSyncAuthorization(request, sender, respond) {
     if (request?.action !== 'FilterTube_AutoSyncAuthorize') return false;
@@ -5025,6 +5056,9 @@ async function performWatchIdentityFetch(videoId) {
 browserAPI.runtime.onMessage.addListener(function (request, sender, sendResponse) {
     const action = request?.action || request?.type;
     if (action === 'FilterTube_AutoSyncAuthorize') return handleAutoSyncAuthorization(request, sender, sendResponse);
+    if (action === 'FilterTube_PersonalPlaylistsRead' || action === 'FilterTube_PersonalPlaylistsMerge') {
+        return handlePersonalPlaylistsSync(request, sender, sendResponse);
+    }
 
     if (IMPORTED_CHANNEL_ENRICHMENT_ACTIONS.has(action)) {
         if (!isTrustedUiSender(sender)) {

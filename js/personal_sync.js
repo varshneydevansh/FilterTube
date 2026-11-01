@@ -2,16 +2,19 @@
 (function (root, factory) {
     const notes = typeof module === 'object' && module.exports
         ? require('./shared/saved_video_notes.js') : root.FilterTubeSavedVideoNotes;
-    const api = factory(notes, root);
+    const playlists = typeof module === 'object' && module.exports
+        ? require('./shared/local_playlists.js') : root.FilterTubeLocalPlaylists;
+    const api = factory(notes, playlists, root);
     if (typeof module === 'object' && module.exports) module.exports = api;
     else root.FilterTubePersonalSync = api;
-}(typeof globalThis !== 'undefined' ? globalThis : this, function (notes, root) {
+}(typeof globalThis !== 'undefined' ? globalThis : this, function (notes, playlists, root) {
     'use strict';
     const MAX_BYTES = 512 * 1024;
     const GRANT_SCHEMA = 'filtertube.personal-sync-grant';
     const MESSAGE_SCHEMA = 'filtertube.personal-sync';
     const own = (value, key) => Object.prototype.hasOwnProperty.call(value, key);
     const forbidden = new Set(['__proto__', 'prototype', 'constructor']);
+    const AREAS = ['settings', 'notes', 'playlists'];
     const booleanSettings = [
         'enabled', 'syncKidsToMain', 'hideShorts', 'hideComments', 'hideHomeFeed',
         'hideSponsoredCards', 'contentOnlyPlayback', 'hidePlayables', 'hideWatchPlaylistPanel',
@@ -119,9 +122,9 @@
         if (own(value, 'schema')) requireValue(value.schema === GRANT_SCHEMA);
         if (own(value, 'version')) requireValue(value.version === 1);
         requireValue(typeof value.enabled === 'boolean');
-        requireValue(Array.isArray(value.areas) && value.areas.length >= 1 && value.areas.length <= 2
+        requireValue(Array.isArray(value.areas) && value.areas.length >= 1 && value.areas.length <= AREAS.length
             && new Set(value.areas).size === value.areas.length
-            && value.areas.every(area => area === 'settings' || area === 'notes'));
+            && value.areas.every(area => AREAS.includes(area)));
         const result = { schema: GRANT_SCHEMA, version: 1, enabled: value.enabled, areas: value.areas.slice().sort() };
         for (const key of ['localDeviceId', 'localProfileId', 'remoteDeviceId', 'remoteProfileId', 'localGrantId', 'remoteGrantId']) result[key] = id(value[key]);
         requireValue(result.localDeviceId !== result.remoteDeviceId, 'same_device_identity');
@@ -358,8 +361,22 @@
         }
         return notes.decode(notes.encode(Array.from(rows.values()), [grant.localProfileId]), [grant.localProfileId]);
     }
+    function playlistEnvelope(value, profileId) {
+        requireValue(!!playlists, 'playlists_contract_unavailable');
+        canonical(value);
+        return playlists.decode(JSON.parse(JSON.stringify(value)), [profileId]);
+    }
+    /** Joins a peer's lists into this profile's lists. Same merge as backup restore. */
+    function mergePlaylists(localEnvelope, remoteEnvelope, grant) {
+        grant = normalizeGrant(grant);
+        requireValue(grant.enabled && grant.areas.includes('playlists'), 'playlists_not_authorized');
+        const local = playlistEnvelope(localEnvelope, grant.localProfileId);
+        const remote = playlistEnvelope(remoteEnvelope, grant.remoteProfileId)
+            .map(playlist => ({ ...playlist, profileId: grant.localProfileId }));
+        return JSON.parse(playlists.encode(playlists.mergeAll(local, remote), [grant.localProfileId]));
+    }
     function payload(value, grant, incoming) {
-        canonical(value); fields(value, ['settings', 'notes'], []);
+        canonical(value); fields(value, AREAS, []);
         const areas = Object.keys(value).sort();
         requireValue(areas.length > 0 && areas.every(area => grant.areas.includes(area)), 'area_not_authorized');
         const result = {};
@@ -367,6 +384,10 @@
         if (own(value, 'notes')) {
             const profileId = incoming ? grant.remoteProfileId : grant.localProfileId;
             result.notes = { format: notes.FORMAT, version: 1, entries: noteEnvelope(value.notes, profileId) };
+        }
+        if (own(value, 'playlists')) {
+            const profileId = incoming ? grant.remoteProfileId : grant.localProfileId;
+            result.playlists = JSON.parse(playlists.encode(playlistEnvelope(value.playlists, profileId), [profileId]));
         }
         return result;
     }
@@ -429,5 +450,5 @@
         return Object.freeze({ digest, sign, verify });
     }
     return Object.freeze({ MAX_BYTES, GRANT_SCHEMA, MESSAGE_SCHEMA, normalizeGrant, peerBinding,
-        snapshotSettings, validateSettings, mergeSettings, applySettings, mergeNotes, create });
+        snapshotSettings, validateSettings, mergeSettings, applySettings, mergeNotes, mergePlaylists, create });
 }));
