@@ -960,7 +960,7 @@ separate release/workflow review and is not silently counted as JavaScript here.
 
 ```text
 current tracked JS/JSX/MJS files: 141
-current repo-wide lexical callables: 9992
+current repo-wide lexical callables: 9993
 current complete per-callable semantic proofs: 0
 current callable behavior-change approval: NO-GO
 runtime behavior changed by inventory refresh: no
@@ -971,7 +971,7 @@ runtime behavior changed by inventory refresh: no
 | Build/sync scripts | 5 | 75 |
 | Hot page/background runtime | 13 | 3931 |
 | Content helper runtime | 25 | 860 |
-| UI/settings runtime | 33 | 4028 |
+| UI/settings runtime | 33 | 4029 |
 | Generated/quarantined UI | 6 | 153 |
 | Vendor bundles | 3 | 279 |
 | Audit/test lane scripts | 25 | 517 |
@@ -992,7 +992,7 @@ runtime behavior changed by inventory refresh: no
 | `js/device_auto_sync_ui.js` | UI/settings runtime | 25 | `semantic proof incomplete` |
 | `js/managed_auto_sync.js` | UI/settings runtime | 16 | `semantic proof incomplete` |
 | `js/personal_auto_sync_runtime.js` | UI/settings runtime | 68 | `semantic proof incomplete` |
-| `js/personal_sync.js` | UI/settings runtime | 56 | `semantic proof incomplete` |
+| `js/personal_sync.js` | UI/settings runtime | 57 | `semantic proof incomplete` |
 | `js/nanah_pairing_ui.js` | UI/settings runtime | 6 | `semantic proof incomplete` |
 | `js/profile_preference_defaults.js` | UI/settings runtime | 14 | `semantic proof incomplete` |
 | `build.js` | Build/sync scripts | 68 | `semantic proof incomplete` | Lexical accounting only; no complete per-callable closure claimed. |

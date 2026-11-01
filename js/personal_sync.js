@@ -9,7 +9,11 @@
     else root.FilterTubePersonalSync = api;
 }(typeof globalThis !== 'undefined' ? globalThis : this, function (notes, playlists, root) {
     'use strict';
+    // Settings and notes together stay within 512 KiB. The playlists area has its own 2 MiB
+    // budget (UTF-8 bytes of its encoded envelope), the same cap Android and iOS use.
     const MAX_BYTES = 512 * 1024;
+    const PLAYLISTS_MAX_BYTES = 2 * 1024 * 1024;
+    const MESSAGE_MAX_BYTES = 3 * 1024 * 1024;
     const GRANT_SCHEMA = 'filtertube.personal-sync-grant';
     const MESSAGE_SCHEMA = 'filtertube.personal-sync';
     const own = (value, key) => Object.prototype.hasOwnProperty.call(value, key);
@@ -74,7 +78,7 @@
     }
     function generation(value) { requireValue(Number.isSafeInteger(value) && value > 0); return value; }
     function plain(value, depth = 0, count = { keys: 0 }) {
-        requireValue(depth <= 10 && ++count.keys <= 50000);
+        requireValue(depth <= 10 && ++count.keys <= 300000);
         if (value === null || typeof value === 'boolean') return value;
         if (typeof value === 'number') { requireValue(Number.isFinite(value)); return value; }
         if (typeof value === 'string') {
@@ -97,9 +101,9 @@
         }
         return result;
     }
-    function canonical(value) {
+    function canonical(value, limit = MAX_BYTES) {
         const result = JSON.stringify(plain(value));
-        requireValue(new TextEncoder().encode(result).length <= MAX_BYTES, 'personal_sync_too_large');
+        requireValue(new TextEncoder().encode(result).length <= limit, 'personal_sync_too_large');
         return result;
     }
     function clone(value) { return JSON.parse(canonical(value)); }
@@ -363,8 +367,13 @@
     }
     function playlistEnvelope(value, profileId) {
         requireValue(!!playlists, 'playlists_contract_unavailable');
-        canonical(value);
+        canonical(value, PLAYLISTS_MAX_BYTES);
         return playlists.decode(JSON.parse(JSON.stringify(value)), [profileId]);
+    }
+    function encodePlaylists(list, profileId) {
+        const encoded = playlists.encode(list, [profileId]);
+        requireValue(new TextEncoder().encode(encoded).length <= PLAYLISTS_MAX_BYTES, 'personal_sync_too_large');
+        return JSON.parse(encoded);
     }
     /** Joins a peer's lists into this profile's lists. Same merge as backup restore. */
     function mergePlaylists(localEnvelope, remoteEnvelope, grant) {
@@ -373,10 +382,12 @@
         const local = playlistEnvelope(localEnvelope, grant.localProfileId);
         const remote = playlistEnvelope(remoteEnvelope, grant.remoteProfileId)
             .map(playlist => ({ ...playlist, profileId: grant.localProfileId }));
+        // The merged result is stored locally whatever its size; sending it later is what the cap limits.
         return JSON.parse(playlists.encode(playlists.mergeAll(local, remote), [grant.localProfileId]));
     }
     function payload(value, grant, incoming) {
-        canonical(value); fields(value, AREAS, []);
+        canonical(value, MESSAGE_MAX_BYTES); fields(value, AREAS, []);
+        canonical(Object.fromEntries(Object.entries(value).filter(([area]) => area !== 'playlists')));
         const areas = Object.keys(value).sort();
         requireValue(areas.length > 0 && areas.every(area => grant.areas.includes(area)), 'area_not_authorized');
         const result = {};
@@ -387,7 +398,7 @@
         }
         if (own(value, 'playlists')) {
             const profileId = incoming ? grant.remoteProfileId : grant.localProfileId;
-            result.playlists = JSON.parse(playlists.encode(playlistEnvelope(value.playlists, profileId), [profileId]));
+            result.playlists = encodePlaylists(playlistEnvelope(value.playlists, profileId), profileId);
         }
         return result;
     }
@@ -405,7 +416,7 @@
     }
     function create({ crypto = root.crypto } = {}) {
         requireValue(!!crypto?.subtle, 'personal_sync_crypto_unavailable');
-        const bytes = value => new TextEncoder().encode(canonical(value));
+        const bytes = value => new TextEncoder().encode(canonical(value, MESSAGE_MAX_BYTES));
         async function digest(value) { return base64(new Uint8Array(await crypto.subtle.digest('SHA-256', bytes(value)))); }
         async function sign(rawGrant, rawPayload, { privateKey, sequence, messageId } = {}) {
             const grant = normalizeGrant(rawGrant);
@@ -423,12 +434,12 @@
             const signature = base64(new Uint8Array(await crypto.subtle.sign({ name: 'Ed25519' }, privateKey, bytes(body))));
             const verifyKey = await crypto.subtle.importKey('jwk', grant.localPublicKeyJwk, { name: 'Ed25519' }, false, ['verify']);
             requireValue(await crypto.subtle.verify({ name: 'Ed25519' }, verifyKey, unbase64(signature, 64), bytes(body)), 'wrong_local_signing_key');
-            const result = { ...body, signature }; canonical(result); return result;
+            const result = { ...body, signature }; canonical(result, MESSAGE_MAX_BYTES); return result;
         }
         async function verify(rawGrant, envelope, { lastSequence = 0 } = {}) {
             const grant = normalizeGrant(rawGrant);
             requireValue(grant.enabled, 'personal_sync_disabled');
-            canonical(envelope);
+            canonical(envelope, MESSAGE_MAX_BYTES);
             fields(envelope, ['schema', 'version', 'sourceDeviceId', 'sourceProfileId', 'targetDeviceId', 'targetProfileId',
                 'sourceGrantId', 'targetGrantId', 'sourceGeneration', 'targetGeneration', 'sequence', 'messageId', 'areas', 'payload', 'digest', 'signature']);
             requireValue(envelope.schema === MESSAGE_SCHEMA && envelope.version === 1);
@@ -449,6 +460,6 @@
         }
         return Object.freeze({ digest, sign, verify });
     }
-    return Object.freeze({ MAX_BYTES, GRANT_SCHEMA, MESSAGE_SCHEMA, normalizeGrant, peerBinding,
+    return Object.freeze({ MAX_BYTES, PLAYLISTS_MAX_BYTES, MESSAGE_MAX_BYTES, GRANT_SCHEMA, MESSAGE_SCHEMA, normalizeGrant, peerBinding,
         snapshotSettings, validateSettings, mergeSettings, applySettings, mergeNotes, mergePlaylists, create });
 }));

@@ -253,3 +253,42 @@ test('extension exports carry the exported profiles\' notes and playlists and im
     const nothing = await plain.box.FilterTubeIO.exportV3({ scope: 'full' });
     assert.equal(Object.hasOwn(nothing, 'savedVideoNotes') || Object.hasOwn(nothing, 'localPlaylists'), false);
 });
+
+const bigList = (profileId, count) => envelope([{ ...list('lp_big'), profileId, items: Array.from({ length: count }, (_, i) =>
+    video(String(i).padStart(11, 'v').replace(/[^A-Za-z0-9_-]/g, 'v'), 20 + i, { title: 'Track ' + i + ' '.repeat(230), channelName: 'Artist name '.repeat(4) })) }]);
+const utf8 = value => new TextEncoder().encode(JSON.stringify(value)).length;
+
+test('the playlists area carries up to 2 MiB per message; settings and notes keep their 512 KiB cap', async () => {
+    assert.equal(sync.PLAYLISTS_MAX_BYTES, 2 * 1024 * 1024);
+    const { source, receiver } = grants(['notes', 'playlists', 'settings']);
+    const codec = sync.create({ crypto: webcrypto });
+    const large = bigList('Profile-A', 4900);
+    assert.ok(utf8(large) > 1.5 * 1024 * 1024 && utf8(large) <= sync.PLAYLISTS_MAX_BYTES, 'fixture sits between 1.5 and 2 MiB');
+    const signed = await codec.sign(source, { playlists: large }, { privateKey: pairs[0].privateKey, sequence: 1, messageId: 'big' });
+    const verified = await codec.verify(receiver, signed);
+    assert.equal(verified.payload.playlists.playlists[0].items.length, 4900);
+
+    const tooLarge = bigList('Profile-A', 4900);
+    for (const item of tooLarge.playlists[0].items) item.title += 'x'.repeat(130);
+    assert.ok(utf8(tooLarge) > sync.PLAYLISTS_MAX_BYTES);
+    await assert.rejects(codec.sign(source, { playlists: tooLarge }, { privateKey: pairs[0].privateKey, sequence: 2, messageId: 'over' }), /personal_sync_too_large/);
+
+    const heavyNotes = { format: notes.FORMAT, version: 1, entries: Array.from({ length: 40 }, (_, i) =>
+        notes.edit({ profileId: 'Profile-A', videoId: 'n' + String(i).padStart(10, '0') }, null, 'writer-a', 'y'.repeat(15000))) };
+    await assert.rejects(codec.sign(source, { notes: heavyNotes, playlists: envelope([]) },
+        { privateKey: pairs[0].privateKey, sequence: 3, messageId: 'notes' }), /personal_sync_too_large/);
+});
+
+test('the delivery queue can hold a full-size signed playlists message', async () => {
+    const queueAPI = require('../../js/auto_sync_queue.js');
+    const data = {}; let tail = Promise.resolve();
+    const engine = queueAPI.create({ now: () => 1000,
+        get: async keyList => Object.fromEntries(keyList.filter(key => key in data).map(key => [key, data[key]])),
+        set: async values => { Object.assign(data, values); },
+        withLock: operation => { const result = tail.then(operation); tail = result.catch(() => {}); return result; } });
+    await engine.enroll({ enrollmentId: 'personal:grant-a', binding: 'binding-a' });
+    const message = { envelope: { body: 'x'.repeat(sync.MESSAGE_MAX_BYTES - 1024) } };
+    assert.throws(() => engine.enqueue('personal:grant-a', 'profile', 'fingerprint', message), /too_large/, 'the default cap is unchanged');
+    await engine.enqueue('personal:grant-a', 'profile', 'fingerprint', message, { maxBytes: sync.MESSAGE_MAX_BYTES + 64 * 1024 });
+    assert.equal((await engine.read()).enrollments[0].channels.length, 1, 'the stored large row passes re-validation on read');
+});

@@ -422,7 +422,9 @@
                     const key = await crypto.subtle.importKey('jwk', initial.privateKeyJwk, { name: 'Ed25519' }, false, ['sign']);
                     const envelope = await codec.sign(grant, data, { privateKey: key, sequence, messageId: uuid() });
                     if (await current(initial)) {
-                        await deps.queue.enqueue(enrollmentId, 'profile', fingerprint, { envelope });
+                        // Signed messages may carry up to 2 MiB of playlists; allow their full size.
+                        await deps.queue.enqueue(enrollmentId, 'profile', fingerprint, { envelope },
+                            { maxBytes: (protocol.MESSAGE_MAX_BYTES || 512 * 1024) + 64 * 1024 });
                         if (initial.scanIssue) await update(initial, value => ({ ...value, scanIssue: false }));
                     }
                 } catch (_) {

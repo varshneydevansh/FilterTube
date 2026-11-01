@@ -31,7 +31,18 @@ The FilterTube apps keep local playlists in the `filtertube.local-playlists` v1 
 - `exportV3` (and the encrypted export built on it) adds `savedVideoNotes` and `localPlaylists` for the exported profiles when there are any. Automatic backups do not include them.
 - Import rollback leaves `ftLocalPlaylistsV1` alone, as it already does for notes, so a rollback cannot undo a sync that landed meanwhile.
 
-## Limits and open items
+## Sync size cap (all platforms)
 
-- A sync message is still capped at 512 KiB by `personal_sync.js` (`MAX_BYTES`). The Android store allows 2 MiB per playlists message, so very large lists fail to send with `personal_sync_too_large` until the shared cap is raised on every platform.
-- The apps' copy of the sync runtime (FilterTubeApp `filtertube_nanah/`) must vendor `shared/local_playlists.js` and pass `playlistsRead`/`playlistsMerge` (Android's `autoSyncPlaylistsRead`/`autoSyncPlaylistsMerge`) before the area turns on there. An older peer refuses a grant that names `playlists`, so a mixed pair fails closed at linking.
+| Budget | Cap | Measured as |
+|---|---|---|
+| `playlists` area | **2 MiB** (2,097,152 bytes) | UTF-8 bytes of the encoded `filtertube.local-playlists` envelope for the one authorized profile. This is Android's `NativeLocalPlaylistSyncStore.MAX_SYNC_BYTES`; iOS should use the same number. |
+| `settings` + `notes` together | 512 KiB | Canonical JSON of those areas. Unchanged. |
+| Whole signed message | 3 MiB | Canonical JSON of the signed `filtertube.personal-sync` message (`personal_sync.js` `MESSAGE_MAX_BYTES`). |
+
+- A sender whose envelope is over the cap refuses to sign with `personal_sync_too_large`, and a receiver refuses a larger message the same way. A merge result is stored locally whatever its size; only sending is capped.
+- No chunking is needed above the protocol: Nanah's data channel already splits any message into 16,000-character frames and reassembles them before decryption.
+- The delivery queue keeps its 512 KiB default for managed updates. Personal sync enqueues with `maxBytes` set to the message cap plus 64 KiB, the queue accepts single items up to 4 MiB, and the whole queue is capped at 16 MiB.
+
+## Open items
+
+- The apps' copy of the sync runtime (FilterTubeApp `filtertube_nanah/`) must vendor `shared/local_playlists.js`, `personal_sync.js` and `auto_sync_queue.js` from this commit and pass `playlistsRead`/`playlistsMerge` (Android's `autoSyncPlaylistsRead`/`autoSyncPlaylistsMerge`). An older peer refuses a grant that names `playlists`, so a mixed pair fails closed at linking.

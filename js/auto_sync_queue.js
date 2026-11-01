@@ -6,7 +6,9 @@
 }(typeof globalThis !== 'undefined' ? globalThis : this, function () {
     'use strict';
     const KEY = 'ftAutoSyncQueueV1';
-    const MAX_BYTES = 4 * 1024 * 1024, MAX_PAYLOAD_BYTES = 512 * 1024;
+    // Payloads default to 512 KiB. A caller may allow up to LARGE_PAYLOAD_BYTES for one item:
+    // personal sync does, because a message carrying playlists can reach 3 MiB.
+    const MAX_BYTES = 16 * 1024 * 1024, MAX_PAYLOAD_BYTES = 512 * 1024, LARGE_PAYLOAD_BYTES = 4 * 1024 * 1024;
     const MAX_ENROLLMENTS = 64, MAX_CHANNELS = 256;
     const fail = reason => { throw Error(reason); };
     const bytes = value => new TextEncoder().encode(value).length;
@@ -36,9 +38,9 @@
         seen.delete(value);
         return out;
     }
-    function payload(value) {
+    function payload(value, limit = MAX_PAYLOAD_BYTES) {
         const encoded = JSON.stringify(json(value));
-        if (bytes(encoded) > MAX_PAYLOAD_BYTES) fail('queue_payload_too_large');
+        if (bytes(encoded) > Math.min(limit, LARGE_PAYLOAD_BYTES)) fail('queue_payload_too_large');
         return JSON.parse(encoded);
     }
     function validate(state) {
@@ -65,7 +67,7 @@
                 channels.add(row.channel); count++;
                 const terminal = ['applied', 'rejected'].includes(row.status);
                 if (terminal === Object.hasOwn(row, 'payload')) fail('queue_state_invalid');
-                if (!terminal) payload(row.payload);
+                if (!terminal) payload(row.payload, LARGE_PAYLOAD_BYTES);
             }
         }
         if (count > MAX_CHANNELS) fail('queue_capacity');
@@ -130,9 +132,9 @@
                 await save(state); return true;
             });
         }
-        function enqueue(enrollmentId, channel, fingerprint, value) {
+        function enqueue(enrollmentId, channel, fingerprint, value, { maxBytes = MAX_PAYLOAD_BYTES } = {}) {
             if (!id(enrollmentId) || !id(channel) || !id(fingerprint, 256)) return Promise.reject(Error('queue_item_invalid'));
-            const detached = payload(value);
+            const detached = payload(value, maxBytes);
             return withLock(async () => {
                 const state = await load(), enrollment = find(state, enrollmentId);
                 if (!enrollment?.enabled) fail('queue_not_enrolled');
@@ -219,5 +221,5 @@
         }
         return Object.freeze({ enroll, disable, remove, enqueue, read, wake, run, acknowledge });
     }
-    return Object.freeze({ KEY, MAX_BYTES, MAX_PAYLOAD_BYTES, MAX_ENROLLMENTS, MAX_CHANNELS, create });
+    return Object.freeze({ KEY, MAX_BYTES, MAX_PAYLOAD_BYTES, LARGE_PAYLOAD_BYTES, MAX_ENROLLMENTS, MAX_CHANNELS, create });
 }));

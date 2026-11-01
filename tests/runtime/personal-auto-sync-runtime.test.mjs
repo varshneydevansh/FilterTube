@@ -202,6 +202,17 @@ test('FilterTube playlists synchronize both ways onto each exact profile and kee
         assert.equal(list.items.length, 2, 'the removed item stays as a tombstone');
     }
 });
+test('a playlists update larger than 512 KiB is queued, signed and applied end to end', async () => {
+    const f = fixture(); const { a, b } = f; await f.enroll({ playlists: true });
+    const items = Array.from({ length: 3000 }, (_, i) => ({ kind: 'video', videoId: String(i).padStart(11, 'v'),
+        title: 'Track ' + i + ' '.repeat(200), addedAt: 20 + i }));
+    a.data[playlistsAPI.DATA_KEY] = playlists.encode(playlists.decode({ format: playlists.FORMAT, version: 1,
+        playlists: [{ profileId: a.id, surface: 'main', id: 'lp_big', name: 'Big', nameUpdatedAt: 10, createdAt: 10, orderUpdatedAt: 10, items }] }));
+    assert.ok(a.data[playlistsAPI.DATA_KEY].length > 512 * 1024);
+    await f.cycle();
+    const [list] = playlists.decode(b.data[playlistsAPI.DATA_KEY]);
+    assert.equal(list.profileId, 'profile-b'); assert.equal(list.items.length, 3000);
+});
 test('offline note edit/delete convergence retains both heads and stale replay cannot resurrect deletion', async () => {
     const f = fixture(); const { a, b } = f; await f.enroll({ notes: true });
     await a.saveNote('Original'); await f.cycle();
