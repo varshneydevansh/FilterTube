@@ -229,11 +229,20 @@
     background: transparent;
 }
 
-:root[data-page-tone][data-theme] body.ft-extension-surface[data-surface] .ft-tab-view-ambient__media-scrim,
-:root[data-page-tone][data-theme] body.ft-extension-surface[data-surface] .ft-popup-shell__video-scrim {
+:root[data-page-tone][data-theme] body.ft-extension-surface[data-surface] .ft-tab-view-ambient__media-scrim {
     background: linear-gradient(180deg,
         color-mix(in srgb, var(--ft-tone-page-start) 90%, transparent) 0%,
         color-mix(in srgb, var(--ft-tone-page-end) 96%, transparent) 100%);
+}
+
+/* The popup shows more of its video: a tone scrim that clears toward the top
+   and thickens behind the controls. Cards above it stay solid. */
+:root[data-page-tone][data-theme] body.ft-extension-surface[data-surface] .ft-popup-shell__video-scrim {
+    background: linear-gradient(180deg,
+        color-mix(in srgb, var(--ft-tone-page-start) 22%, transparent) 0%,
+        color-mix(in srgb, var(--ft-tone-page-start) 52%, transparent) 30%,
+        color-mix(in srgb, var(--ft-tone-page-end) 80%, transparent) 62%,
+        color-mix(in srgb, var(--ft-tone-page-end) 92%, transparent) 100%);
 }
 
 :root[data-page-tone][data-theme] body.ft-extension-surface[data-surface] .ft-tab-view-ambient__media-tint,

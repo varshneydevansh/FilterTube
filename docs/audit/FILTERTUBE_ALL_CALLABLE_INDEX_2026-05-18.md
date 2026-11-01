@@ -76,7 +76,7 @@ repo-wide lexical callables: 6315
 | Hot page/background runtime | 9 | 3177 | Already has detailed first-pass hot runtime table in `FILTERTUBE_FUNCTION_COVERAGE_2026-05-17.md`. |
 | Content helper runtime | 9 | 348 | First-pass helper surface audit exists, but behavior fixtures remain incomplete. |
 | UI/settings runtime | 14 | 2103 | First-pass UI/settings audit exists, but action-level fixtures remain incomplete. |
-| Generated/quarantined UI | 6 | 147 | Generated source/output and `js/layout.js`; freshness and quarantine checks required. |
+| Generated/quarantined UI | 6 | 153 | Generated source/output and `js/layout.js`; freshness and quarantine checks required. |
 | Vendor bundles | 2 | 279 | API/provenance boundary, not product-owned method behavior. |
 | Build/sync scripts | 4 | 58 | Release/package/native-sync behavior; separate release fixtures required. |
 | Audit/test lane scripts | 3 | 80 | Change-safety classifier, drift guard, and lane runner proof; workflow behavior, not product runtime. |
@@ -223,7 +223,7 @@ separate release/workflow review and is not silently counted as JavaScript here.
 
 ```text
 current tracked JS/JSX/MJS files: 139
-current repo-wide lexical callables: 9919
+current repo-wide lexical callables: 9925
 current complete per-callable semantic proofs: 0
 current callable behavior-change approval: NO-GO
 runtime behavior changed by inventory refresh: no
@@ -235,7 +235,7 @@ runtime behavior changed by inventory refresh: no
 | Hot page/background runtime | 12 | 3920 |
 | Content helper runtime | 24 | 820 |
 | UI/settings runtime | 33 | 4012 |
-| Generated/quarantined UI | 6 | 147 |
+| Generated/quarantined UI | 6 | 153 |
 | Vendor bundles | 3 | 279 |
 | Audit/test lane scripts | 25 | 517 |
 | Website routes/components/config | 31 | 149 |
@@ -309,7 +309,7 @@ runtime behavior changed by inventory refresh: no
 | `js/shared/view_count.js` | Content helper runtime | 4 | helper counted; semantic proof incomplete |
 | `js/state_manager.js` | UI/settings runtime | 180 | UI/settings counted |
 | `js/tab-view.js` | UI/settings runtime | 2157 | UI/settings counted |
-| `js/ui-shell/popup-shell.js` | Generated/quarantined UI | 42 | generated output boundary |
+| `js/ui-shell/popup-shell.js` | Generated/quarantined UI | 45 | generated output boundary |
 | `js/ui-shell/tab-view-decor.js` | Generated/quarantined UI | 41 | generated output boundary |
 | `js/ui_components.js` | UI/settings runtime | 65 | UI/settings counted |
 | `js/ui_localization.js` | UI/settings runtime | 20 | UI/settings counted; semantic proof incomplete |
@@ -347,7 +347,7 @@ runtime behavior changed by inventory refresh: no
 | `scripts/update-family-device-evidence-log.mjs` | Audit/test lane scripts | 23 | workflow/evidence tooling counted; semantic proof incomplete |
 | `scripts/validate-family-device-evidence.mjs` | Audit/test lane scripts | 24 | workflow/evidence tooling counted; semantic proof incomplete |
 | `scripts/verify-managed-app-policy-contract.mjs` | Audit/test lane scripts | 14 | workflow/evidence tooling counted; semantic proof incomplete |
-| `src/extension-shell/popup.jsx` | Generated/quarantined UI | 3 | generated source boundary |
+| `src/extension-shell/popup.jsx` | Generated/quarantined UI | 6 | generated source boundary |
 | `src/extension-shell/shared/runtime.js` | Generated/quarantined UI | 7 | generated source boundary |
 | `src/extension-shell/tab-view-decor.jsx` | Generated/quarantined UI | 2 | generated source boundary |
 | `website/app/[slug]/page.js` | Website routes/components/config | 4 | website counted |

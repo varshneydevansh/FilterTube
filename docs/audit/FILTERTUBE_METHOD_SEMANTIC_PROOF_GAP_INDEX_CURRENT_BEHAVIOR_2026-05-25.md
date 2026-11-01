@@ -216,7 +216,7 @@ have all of these fields pinned:
 | Hot page/background runtime | 9 | 3177 | `semantic proof incomplete` |
 | Content helper runtime | 9 | 348 | `semantic proof incomplete` |
 | UI/settings runtime | 14 | 2103 | `semantic proof incomplete` |
-| Generated/quarantined UI | 6 | 147 | `semantic proof incomplete` |
+| Generated/quarantined UI | 6 | 153 | `semantic proof incomplete` |
 | Vendor bundles | 2 | 279 | `semantic proof incomplete` |
 | Build/sync scripts | 4 | 58 | `semantic proof incomplete` |
 | Audit/test lane scripts | 3 | 80 | `semantic proof incomplete` |
@@ -960,7 +960,7 @@ separate release/workflow review and is not silently counted as JavaScript here.
 
 ```text
 current tracked JS/JSX/MJS files: 139
-current repo-wide lexical callables: 9919
+current repo-wide lexical callables: 9925
 current complete per-callable semantic proofs: 0
 current callable behavior-change approval: NO-GO
 runtime behavior changed by inventory refresh: no
@@ -972,7 +972,7 @@ runtime behavior changed by inventory refresh: no
 | Hot page/background runtime | 12 | 3920 |
 | Content helper runtime | 24 | 820 |
 | UI/settings runtime | 33 | 4012 |
-| Generated/quarantined UI | 6 | 147 |
+| Generated/quarantined UI | 6 | 153 |
 | Vendor bundles | 3 | 279 |
 | Audit/test lane scripts | 25 | 517 |
 | Website routes/components/config | 31 | 149 |
@@ -1046,7 +1046,7 @@ runtime behavior changed by inventory refresh: no
 | `js/shared/view_count.js` | Content helper runtime | 4 | `semantic proof incomplete` | Lexical accounting only; no complete per-callable closure claimed. |
 | `js/state_manager.js` | UI/settings runtime | 180 | `semantic proof incomplete` | Lexical accounting only; no complete per-callable closure claimed. |
 | `js/tab-view.js` | UI/settings runtime | 2157 | `semantic proof incomplete` | Lexical accounting only; no complete per-callable closure claimed. |
-| `js/ui-shell/popup-shell.js` | Generated/quarantined UI | 42 | `semantic proof incomplete` | Lexical accounting only; no complete per-callable closure claimed. |
+| `js/ui-shell/popup-shell.js` | Generated/quarantined UI | 45 | `semantic proof incomplete` | Lexical accounting only; no complete per-callable closure claimed. |
 | `js/ui-shell/tab-view-decor.js` | Generated/quarantined UI | 41 | `semantic proof incomplete` | Lexical accounting only; no complete per-callable closure claimed. |
 | `js/ui_components.js` | UI/settings runtime | 65 | `semantic proof incomplete` | Lexical accounting only; no complete per-callable closure claimed. |
 | `js/ui_localization.js` | UI/settings runtime | 20 | `semantic proof incomplete` | Lexical accounting only; no complete per-callable closure claimed. |
@@ -1084,7 +1084,7 @@ runtime behavior changed by inventory refresh: no
 | `scripts/update-family-device-evidence-log.mjs` | Audit/test lane scripts | 23 | `semantic proof incomplete` | Lexical accounting only; no complete per-callable closure claimed. |
 | `scripts/validate-family-device-evidence.mjs` | Audit/test lane scripts | 24 | `semantic proof incomplete` | Lexical accounting only; no complete per-callable closure claimed. |
 | `scripts/verify-managed-app-policy-contract.mjs` | Audit/test lane scripts | 14 | `semantic proof incomplete` | Lexical accounting only; no complete per-callable closure claimed. |
-| `src/extension-shell/popup.jsx` | Generated/quarantined UI | 3 | `semantic proof incomplete` | Lexical accounting only; no complete per-callable closure claimed. |
+| `src/extension-shell/popup.jsx` | Generated/quarantined UI | 6 | `semantic proof incomplete` | Lexical accounting only; no complete per-callable closure claimed. |
 | `src/extension-shell/shared/runtime.js` | Generated/quarantined UI | 7 | `semantic proof incomplete` | Lexical accounting only; no complete per-callable closure claimed. |
 | `src/extension-shell/tab-view-decor.jsx` | Generated/quarantined UI | 2 | `semantic proof incomplete` | Lexical accounting only; no complete per-callable closure claimed. |
 | `website/app/[slug]/page.js` | Website routes/components/config | 4 | `semantic proof incomplete` | Lexical accounting only; no complete per-callable closure claimed. |

@@ -12,11 +12,12 @@ function PopupShell() {
       <div aria-hidden="true" className="ft-popup-shell__media">
         <video
           className="ft-popup-shell__video"
-          autoPlay
           loop
           muted
           playsInline
-          preload="metadata"
+          disablePictureInPicture
+          preload="none"
+          tabIndex="-1"
         >
           <source src="../assets/images/homepage_hero_day.mp4" type="video/mp4" />
         </video>
@@ -134,9 +135,28 @@ function PopupShell() {
   );
 }
 
+// The background video starts after the first paint so it never delays the
+// popup, and stays paused while the system asks for reduced motion.
+function startAmbientVideoAfterPaint(video) {
+  if (!video) return;
+  const reducedMotion = window.matchMedia?.("(prefers-reduced-motion: reduce)");
+  const sync = () => {
+    if (reducedMotion?.matches) {
+      video.pause();
+      return;
+    }
+    video.preload = "auto";
+    const playing = video.play();
+    if (playing && typeof playing.catch === "function") playing.catch(() => {});
+  };
+  requestAnimationFrame(() => setTimeout(sync, 0));
+  reducedMotion?.addEventListener?.("change", sync);
+}
+
 applyExtensionEnvironment("popup");
 
 const mountNode = document.getElementById("popupRoot");
 if (mountNode) {
   render(<PopupShell />, mountNode);
+  startAmbientVideoAfterPaint(mountNode.querySelector(".ft-popup-shell__video"));
 }

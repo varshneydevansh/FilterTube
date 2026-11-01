@@ -310,11 +310,12 @@
       "video",
       {
         className: "ft-popup-shell__video",
-        autoPlay: true,
         loop: true,
         muted: true,
         playsInline: true,
-        preload: "metadata"
+        disablePictureInPicture: true,
+        preload: "none",
+        tabIndex: "-1"
       },
       /* @__PURE__ */ _("source", { src: "../assets/images/homepage_hero_day.mp4", type: "video/mp4" })
     ), /* @__PURE__ */ _("span", { className: "ft-popup-shell__video-scrim" }), /* @__PURE__ */ _("span", { className: "ft-popup-shell__video-tint" })), /* @__PURE__ */ _("div", { "aria-hidden": "true", className: "ft-popup-shell__ambient" }, /* @__PURE__ */ _(ShellGlow, { className: "ft-popup-shell__glow ft-popup-shell__glow--sky" }), /* @__PURE__ */ _(ShellGlow, { className: "ft-popup-shell__glow ft-popup-shell__glow--sun" }), /* @__PURE__ */ _(ShellGlow, { className: "ft-popup-shell__glow ft-popup-shell__glow--flora" })), /* @__PURE__ */ _("div", { className: "app-container ft-popup-shell__frame" }, /* @__PURE__ */ _("header", { className: "app-header ft-popup-header" }, /* @__PURE__ */ _(
@@ -394,9 +395,26 @@
       /* @__PURE__ */ _("svg", { "aria-hidden": "true", width: "16", height: "16", viewBox: "0 0 24 24", fill: "none", stroke: "currentColor" }, /* @__PURE__ */ _("path", { d: "M7 17L17 7M7 7h10v10", strokeWidth: "1.8", strokeLinecap: "round", strokeLinejoin: "round" }))
     )));
   }
+  function startAmbientVideoAfterPaint(video) {
+    if (!video) return;
+    const reducedMotion = window.matchMedia?.("(prefers-reduced-motion: reduce)");
+    const sync = () => {
+      if (reducedMotion?.matches) {
+        video.pause();
+        return;
+      }
+      video.preload = "auto";
+      const playing = video.play();
+      if (playing && typeof playing.catch === "function") playing.catch(() => {
+      });
+    };
+    requestAnimationFrame(() => setTimeout(sync, 0));
+    reducedMotion?.addEventListener?.("change", sync);
+  }
   applyExtensionEnvironment("popup");
   var mountNode = document.getElementById("popupRoot");
   if (mountNode) {
     J(/* @__PURE__ */ _(PopupShell, null), mountNode);
+    startAmbientVideoAfterPaint(mountNode.querySelector(".ft-popup-shell__video"));
   }
 })();

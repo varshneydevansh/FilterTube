@@ -36,7 +36,7 @@ const expectedFamilyTotals = new Map([
   ['Hot page/background runtime', { files: 12, count: 3920 }],
   ['Content helper runtime', { files: 24, count: 820 }],
   ['UI/settings runtime', { files: 33, count: 4012 }],
-  ['Generated/quarantined UI', { files: 6, count: 147 }],
+  ['Generated/quarantined UI', { files: 6, count: 153 }],
   ['Vendor bundles', { files: 3, count: 279 }],
   ['Audit/test lane scripts', { files: 25, count: 517 }],
   ['Website routes/components/config', { files: 31, count: 149 }],
@@ -272,8 +272,8 @@ test('all-callable index counts match current lexical callable source', () => {
     assert.equal(documented, actual, `${file} callable count should match current source`);
   }
 
-  assert.equal(total, 9919);
-  assert.match(indexDoc, /current repo-wide lexical callables: 9919/);
+  assert.equal(total, 9925);
+  assert.match(indexDoc, /current repo-wide lexical callables: 9925/);
 });
 
 test('all-callable family totals match the documented file rows', () => {
@@ -461,7 +461,7 @@ test('all-callable index documents semantic method proof boundary', () => {
     });
   }
 
-  assert.equal(total, 9919);
+  assert.equal(total, 9925);
   assert.deepEqual(methodTotals, expectedFamilyTotals);
 
   for (const authority of [
