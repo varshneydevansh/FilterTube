@@ -926,7 +926,7 @@ Current seed and coordinator source fingerprints were recomputed after fallback 
 ## Auto-sync source inventory - 2026-10-24
 
 | `build.js` | 861 | 33225 | `a198cc1d0bf98e410deb8f66ced0e56a046bbf987a0a5b878e1278577622fb2e` |
-| `js/background.js` | 8726 | 398724 | `ea60b72cf56dec6523ba4dfb827bca1791619836dfca40bf7ee9c669ffa639c6` |
+| `js/background.js` | 8760 | 400768 | `54c26506b789bec72d1ec2c6e0aa12ca40db81edaa46a1343552a7cf8c2bb576` |
 | `js/content/block_channel.js` | 3361 | 135050 | `f2a02886a83d64d93186cd1f0c1f300683ae49754b928d2e0329fd1a88d8f2c9` |
 | `js/content/bridge_settings.js` | 2281 | 103815 | `4bbd8d3c2d65aae8b1743bd779410803b17078319b0f5f5176e7495b46ab3055` |
 | `js/content/collab_dialog.js` | 393 | 14623 | `dc34bba556b310da8b7516d106e9d67addea59d8a707a02f21607ac97af1f72a` |
@@ -936,18 +936,18 @@ Current seed and coordinator source fingerprints were recomputed after fallback 
 | `js/content_bridge.js` | 15056 | 678414 | `9e0bca2973ffb01d0216ea8b096531ad3c1afe7af4acc7363fa4b1cc2ca09f18` |
 | `js/filter_logic.js` | 4536 | 222044 | `20c1426a56eeaa925b42d192a56699c2cfaafbc291bb7e2f583d3e5d29fc7f6c` |
 | `js/injector.js` | 4148 | 183860 | `62bd7222e7ea8c7fc51cbffd63b894a2f03509b4cc09ddf7525b8a748f91eb60` |
-| `js/io_manager.js` | 3219 | 164248 | `f00d15e7dd636585c999b3a51a40363d181b192e85fd2be00231b37ca827ed43` |
+| `js/io_manager.js` | 3391 | 174209 | `d718fa32414e5d66679591837e5f825de4ef224a9def93d6cd7f2894373896c3` |
 | `js/layout.js` | 680 | 30604 | `48831ccdc2d62c75818d9c6a153d7bfacec9d7be9f2408485f74b1a7c13c57c7` |
 | `js/popup.js` | 2554 | 117174 | `6fccb7482d25aa9a56d2cea2e6522ca93bec7fe892c0cb8d68000238f28c89b9` |
 | `js/seed.js` | 2508 | 110538 | `af10e116a8580bf380e6f26b312c5ed3e3597693f7cf9a9bbb4661c2c597c8a1` |
 | `js/settings_shared.js` | 1327 | 67805 | `c3d0f4b965acaaf46f6424cd0ad329c50e616de7b1cf8905a9fa578123e2bf69` |
 | `js/state_manager.js` | 2984 | 124258 | `029b2e7d4356d4629348f174bdaf7858fa1fa0c09a4b54c6bb0e293a161a8d5e` |
-| `js/tab-view.js` | 32984 | 1794175 | `ecbfbe6dc4a9ab5173c053e4d187d843cbde38c99f3cd7ba03f663357c8baaf1` |
+| `js/tab-view.js` | 33041 | 1797242 | `4b91333282c1a5dd93d22978db47992cad6da63a04bebe1ca60b13dfdc235972` |
 | `scripts/build-extension-ui.mjs` | 50 | 1188 | `6326362ebf90f448ccdbf68945b3fb522b7b215edaf9b3e28589a4e166239cf3` |
 | `scripts/build-nanah-vendor.mjs` | 65 | 1818 | `dae8d3ef29c4cd44b0bf975090e9d53f3bb05b523355f5038930fc03b27e921c` |
 | `scripts/sync-native-runtime.mjs` | 34 | 1070 | `4f46c13bf6099092193712790d231ff4809b00b1b0061d04af71ac3ba6bf21c6` |
 
-The first textual routine background console site is now at line 3518. Existing console-count, startup-gate, redaction, and installed-sampling assertions are unchanged. Source freshness is not logging-policy completion.
+The first textual routine background console site is now at line 3549 (local playlists sync wiring, 2026-11-01). Existing console-count, startup-gate, redaction, and installed-sampling assertions are unchanged. Source freshness is not logging-policy completion.
 
 ## Controls hardening playback fingerprints
 

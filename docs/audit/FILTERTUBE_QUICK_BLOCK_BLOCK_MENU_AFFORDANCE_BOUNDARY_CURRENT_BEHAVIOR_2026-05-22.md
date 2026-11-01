@@ -518,7 +518,7 @@ Notes adds private background initialization; quick-block logic is unchanged.
 
 | `js/content_controls_catalog.js` | 304 | 12854 | `6100dd0ac275d6948a8d406cd92cd5913c7175de98c934d16efcecf12588c449` |
 | `js/settings_shared.js` | 1327 | 67805 | `c3d0f4b965acaaf46f6424cd0ad329c50e616de7b1cf8905a9fa578123e2bf69` |
-| `js/background.js` | 8726 | 398724 | `ea60b72cf56dec6523ba4dfb827bca1791619836dfca40bf7ee9c669ffa639c6` |
+| `js/background.js` | 8760 | 400768 | `54c26506b789bec72d1ec2c6e0aa12ca40db81edaa46a1343552a7cf8c2bb576` |
 | `js/content/bridge_settings.js` | 2281 | 103815 | `4bbd8d3c2d65aae8b1743bd779410803b17078319b0f5f5176e7495b46ab3055` |
 | `js/state_manager.js` | 2984 | 124258 | `029b2e7d4356d4629348f174bdaf7858fa1fa0c09a4b54c6bb0e293a161a8d5e` |
 | `js/content/block_channel.js` | 3361 | 135050 | `f2a02886a83d64d93186cd1f0c1f300683ae49754b928d2e0329fd1a88d8f2c9` |

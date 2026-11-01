@@ -121,18 +121,20 @@ test('source/ad/time changes during the final fresh permission check are also re
         f.permission(); assert.equal(await pending, false); assert.equal(f.writes(), 0);
     }
 });
-test('notes-bearing imports reject before storage/profile mutation and rollback preserves live notes and writer', async () => {
+test('malformed notes-bearing imports reject before storage/profile mutation and rollback preserves live notes, playlists and writer', async () => {
     let writes = [];
-    const state = { ftSavedVideoNotesV1: 'new committed tombstone', ftSavedVideoNotesWriterV1: 'writer-new', enabled: true, extraImportKey: 1, ftDeviceAutoSyncV1: 'revoked-current', ftAutoSyncQueueV1: 'current-queue' };
+    const state = { ftSavedVideoNotesV1: 'new committed tombstone', ftSavedVideoNotesWriterV1: 'writer-new', ftLocalPlaylistsV1: 'synced-playlists', enabled: true, extraImportKey: 1, ftDeviceAutoSyncV1: 'revoked-current', ftAutoSyncQueueV1: 'current-queue' };
     const root = {};
     const code = fs.readFileSync('js/io_manager.js', 'utf8').replace('global.FilterTubeIO = {', 'global.FilterTubeIO = { restoreStorageSnapshot,');
     vm.runInNewContext(code, { window: root, chrome: { storage: { local: {
         get: (_keys, cb) => cb({ ...state }), set: (update, cb) => { writes.push(update); Object.assign(state, update); cb(); },
         remove: (keys, cb) => { keys.forEach(key => delete state[key]); cb(); }
     } }, runtime: {} } });
-    await assert.rejects(root.FilterTubeIO.importV3({ savedVideoNotes: {} }), /personal video notes/); assert.equal(writes.length, 0);
-    await root.FilterTubeIO.restoreStorageSnapshot({ enabled: false, ftSavedVideoNotesV1: 'old edit', ftSavedVideoNotesWriterV1: 'old-writer', ftDeviceAutoSyncV1: 'old-grant', ftAutoSyncQueueV1: 'old-delivery' });
+    // Valid app notes and playlists now import; tests/runtime/local-playlists.test.mjs covers that path.
+    await assert.rejects(root.FilterTubeIO.importV3({ savedVideoNotes: {} })); assert.equal(writes.length, 0);
+    await root.FilterTubeIO.restoreStorageSnapshot({ enabled: false, ftSavedVideoNotesV1: 'old edit', ftSavedVideoNotesWriterV1: 'old-writer', ftLocalPlaylistsV1: 'old-playlists', ftDeviceAutoSyncV1: 'old-grant', ftAutoSyncQueueV1: 'old-delivery' });
     assert.equal(state.ftSavedVideoNotesV1, 'new committed tombstone'); assert.equal(state.ftSavedVideoNotesWriterV1, 'writer-new');
+    assert.equal(state.ftLocalPlaylistsV1, 'synced-playlists');
     assert.equal(state.ftDeviceAutoSyncV1, 'revoked-current'); assert.equal(state.ftAutoSyncQueueV1, 'current-queue');
     assert.equal(state.enabled, false); assert.equal(state.extraImportKey, undefined);
 });

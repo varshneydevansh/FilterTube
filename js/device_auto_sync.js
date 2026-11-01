@@ -205,7 +205,8 @@
             },
             send: deps.sendPersonal, confirm: deps.confirmPersonal,
             withReceiveLock: deps.withReceiveLock,
-            notesRead: deps.notesRead, notesMerge: deps.notesMerge, applySettings: deps.applySettings,
+            notesRead: deps.notesRead, notesMerge: deps.notesMerge,
+            playlistsRead: deps.playlistsRead, playlistsMerge: deps.playlistsMerge, applySettings: deps.applySettings,
             changed
         });
         async function run({ wake = false } = {}) {

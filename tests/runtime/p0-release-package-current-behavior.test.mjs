@@ -215,8 +215,8 @@ const currentManifestSnapshot = {
     "resources": 14
   },
   "manifest.firefox.json": {
-    "references": 77,
-    "unique": 45,
+    "references": 79,
+    "unique": 47,
     "entries": 5,
     "js": 45,
     "worlds": [
@@ -239,7 +239,7 @@ const currentManifestSnapshot = {
 function assertBrowserManifestReferenceClosureAddendum(doc) {
   const stats = manifestReferenceClosureStats();
   assert.match(doc, /2026-10-18 Current Source And Historical Evidence Boundary/);
-  assert.equal(stats.combinedUnique.size, 45);
+  assert.equal(stats.combinedUnique.size, 47);
   assert.deepEqual(stats.missing, []);
   assert.deepEqual(stats.outsideCopiedRoots, []);
   assert.equal(stats.contentScriptCssRefs, 0);

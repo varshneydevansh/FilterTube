@@ -83,8 +83,8 @@
         }
         function areas(value) {
             const list = Array.isArray(value) ? value : Object.keys(value || {}).filter(key => value[key] === true);
-            if (!list.length || list.length > 2 || new Set(list).size !== list.length
-                || list.some(area => !['settings', 'notes'].includes(area))) fail('Choose settings, notes, or both.');
+            if (!list.length || list.length > 3 || new Set(list).size !== list.length
+                || list.some(area => !['settings', 'notes', 'playlists'].includes(area))) fail('Choose settings, notes, playlists, or a combination.');
             return list.slice().sort();
         }
         async function keys() {
@@ -340,6 +340,14 @@
                 await deps.notesMerge(row.grant.localProfileId,
                     { format: 'filtertube.saved-video-notes', version: 1, entries }, row.grant.localGrantId);
             }
+            if (verified.payload.playlists) {
+                if (typeof deps.playlistsRead !== 'function' || typeof deps.playlistsMerge !== 'function') fail('Playlist sync is unavailable here.');
+                if (!await unchanged()) fail('Auto-sync permission or update changed.');
+                const local = await deps.playlistsRead(row.grant.localProfileId, row.grant.localGrantId);
+                const envelope = protocol.mergePlaylists(local, verified.payload.playlists, row.grant);
+                if (!await unchanged()) fail('Auto-sync permission or update changed.');
+                await deps.playlistsMerge(row.grant.localProfileId, envelope, row.grant.localGrantId);
+            }
             const status = resolution === 'local' ? 'rejected' : 'applied';
             await update(row, value => { checkRevision(value); return { ...value, lastSequence: verified.sequence,
                 lastRemoteSettings: verified.payload.settings || value.lastRemoteSettings,
@@ -379,6 +387,10 @@
             if (context.profileId !== row.grant.localProfileId || context.deviceId !== row.grant.localDeviceId) fail('The account profile changed.');
             if (row.grant.areas.includes('settings')) payload.settings = protocol.snapshotSettings(context.profile);
             if (row.grant.areas.includes('notes')) payload.notes = await deps.notesRead(row.grant.localProfileId, row.grant.localGrantId);
+            if (row.grant.areas.includes('playlists')) {
+                if (typeof deps.playlistsRead !== 'function') fail('Playlist sync is unavailable here.');
+                payload.playlists = await deps.playlistsRead(row.grant.localProfileId, row.grant.localGrantId);
+            }
             return payload;
         }
         async function run() {

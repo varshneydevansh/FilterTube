@@ -65,6 +65,7 @@
         choices.appendChild(legend);
         const settings = choice('settings', tr('settings', 'Settings and filter rules'));
         const notes = choice('notes', tr('notes', 'Saved video notes'));
+        const playlists = choice('playlists', tr('playlists', 'FilterTube playlists'));
         const linkButton = button(tr('linkProfile', 'Link this profile'));
         const pairHelp = make('p', 'ft-auto-sync__help', tr('verifyFirst', 'Connect and verify your other device before linking this profile.'));
         const privateHelp = make('p', 'ft-auto-sync__help', tr('privateData', 'PINs, device permissions and profile ownership stay local.'));
@@ -136,8 +137,8 @@
                 : tr('noConnectionSelected', 'Choose a verified child-profile connection to change Auto-sync.'));
             setText(managedStatus, selected ? str(selected.status) : '');
             choices.disabled = busy || !model.canPairPersonal;
-            settings.disabled = notes.disabled = choices.disabled;
-            actionDisabled(linkButton, !model.canPairPersonal || (!settings.checked && !notes.checked) || typeof controller.requestPersonal !== 'function');
+            settings.disabled = notes.disabled = playlists.disabled = choices.disabled;
+            actionDisabled(linkButton, !model.canPairPersonal || (!settings.checked && !notes.checked && !playlists.checked) || typeof controller.requestPersonal !== 'function');
             pairHelp.hidden = model.canPairPersonal;
             actionDisabled(checkButton, typeof controller.run !== 'function');
             for (const row of personalNodes.values()) {
@@ -243,14 +244,14 @@
             const selected = currentManaged();
             if (selected) return perform(() => controller.setManaged(selected.id, !selected.enabled), tr('saved', 'Auto-sync preference saved.'));
         });
-        for (const input of [settings, notes]) input.addEventListener('change', stateControls);
+        for (const input of [settings, notes, playlists]) input.addEventListener('change', stateControls);
         linkButton.addEventListener('click', () => {
-            const selected = { settings: settings.checked, notes: notes.checked };
-            if (!model.canPairPersonal || (!selected.settings && !selected.notes)) return;
+            const selected = { settings: settings.checked, notes: notes.checked, playlists: playlists.checked };
+            if (!model.canPairPersonal || (!selected.settings && !selected.notes && !selected.playlists)) return;
             return perform(async () => {
                 const result = await controller.requestPersonal(selected);
                 if (result !== false && result?.ok !== false) {
-                    settings.checked = false; notes.checked = false;
+                    settings.checked = false; notes.checked = false; playlists.checked = false;
                     if (document.activeElement === linkButton) personalHeading.focus();
                 }
                 return result;
