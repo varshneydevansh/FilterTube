@@ -53,3 +53,25 @@ The extension now reads a signed-in parent's YouTube Kids profiles, switches who
 ## Privacy
 
 Nothing in this feature logs names, ids, keys or tokens. Background errors return status codes only.
+
+## Parent account (Android §8)
+
+- **Who can be a parent:** YouTube Kids parents are Google accounts only. Its sign-in sends `pageId=none`, so brand accounts can't own kid profiles. youtubekids.com uses one parent at a time and switches only by re-running its own Google sign-in. Nothing here ever signs anyone out: no `/accounts/ClearOSID` and no Google `Logout`.
+- **Identifying the parent:** the roster now returns the current parent (`GAIA_DELEGATION_TYPE_NONE` item) as `{ displayName, email, avatarUrl, parentKey }`, where `parentKey = "sha256:" + sha256("filtertube-kids-parent-v1:" + lowercased e-mail)`. The key is the same as Android's. The e-mail is shown to the parent in Kids Mode and is never stored or logged.
+- **"Parent account" row** (top of the card): the parent's name and e-mail, and **Change**.
+  - Change is a parent action. Inside a child it reads "Managed by a parent".
+  - A profile with a PIN enters it again first (fresh entry).
+  - It then runs YouTube Kids' own sign-in in the youtubekids.com tab, with `prompt=select_account`, so Google shows its account chooser.
+- **The switch** (`FilterTube_KidsParentSwitch`, background):
+  1. `pagePrepareParentSignIn` reads `OAUTH_CLIENT_ID`/`OAUTH_CLIENT_SCOPE` from `ytcfg` and appends a random `state` to the page's own expiring `yt.identity.kids::popup-xsrf` list (at most six entries, like the web).
+  2. The tab opens Google's `o/oauth2/v2/auth` with YouTube Kids' parameters (`response_type=none gsession`, `access_type=offline`, `redirect_uri=https://www.youtubekids.com/signin?gaia_popup_redirect=1`, `pageId=none`, plus `login_hint` when an e-mail is known, otherwise the chooser).
+  3. On the `/signin` return page, the background waits until the page has checked its state (`pageParentReturnStatus`), then reloads youtubekids.com.
+  4. It reads the roster and compares the parent: the outcome is `SWITCHED`, `UNCHANGED`, `OTHER_ACCOUNT`, `SIGNED_OUT`, `REJECTED` (`/signin/rejected`), `CANCELLED` or `TIMED_OUT`.
+  5. When the parent changed, the old parent's kid selection is cleared (`pageClearSelection`) and the active profile's linked kid is selected if it is in the new account.
+  6. Extension pages get `FilterTube_KidsParentSwitchResult`, and Kids Mode shows the outcome.
+- **Links remember the parent:** new links also store `parentKey` and `parentName` (never the e-mail). Links made before this change have no parent and keep the old behaviour.
+- **Linked parent:** when the active profile's link names a parent other than the current one:
+  - Kids Mode shows a banner and asks once, "Switch parent account?".
+  - The popup points to Kids Mode.
+  - "Switch to Dad" (`mode: 'apply_link'`) can only go to the linked parent, and the outcome is checked against that key. With no stored e-mail, Google shows its chooser.
+  - Inside a child it needs the parent's unlock, because Google's page can offer other accounts. Otherwise it needs the profile's own unlock.

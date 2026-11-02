@@ -924,6 +924,11 @@ function initializePopupFiltersTabs() {
                 : profiles.length ? '' : popupUiText('popup.kidsProfiles.none', 'No YouTube Kids profiles yet.');
         const actorId = stored?.activeProfileId || 'default';
         const links = contract.normalizeLinks(stored?.[contract.LINKS_KEY]);
+        if (result?.parent && contract.linkedParentDecision(links, actorId, result.parent.parentKey) === 'switch_needed') {
+            const link = contract.linkFor(links, actorId);
+            status.textContent = popupUiText('popup.kidsProfiles.parentMismatch', "This profile uses {kid} in {parent}'s account. Switch the parent account in Kids Mode.",
+                { kid: link.displayName, parent: link.parentName });
+        }
         chips.replaceChildren(...profiles.map(kid => {
             const chip = document.createElement('button');
             chip.type = 'button';

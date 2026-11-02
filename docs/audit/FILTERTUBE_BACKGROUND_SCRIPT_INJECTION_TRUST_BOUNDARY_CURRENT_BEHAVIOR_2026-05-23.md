@@ -289,7 +289,7 @@ Notes modules are synchronously imported in the browser background, with optiona
 ## Auto-sync source inventory - 2026-10-24
 
 background lines: 8778
-background bytes: 401948
-sha256: `9bcfae94bc65e8c59dfc64f79ba475919ca0b1ff49e8930b66fe1d517a8c9d35`
+background bytes: 401992
+sha256: `a86102e54444d56fe48baddebee893678ef29cb4e0ea4ac624ef3352acef2057`
 
 Auto-sync authorization/startup additions change the whole-file fingerprint. Existing script injection blocks and their semantic assertions remain separately checked; this is not injection-security completion.

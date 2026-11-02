@@ -97,9 +97,10 @@ function kidsPage({ loggedIn = true, stored = null, personaAge = 7, failPersona 
                 : response(JSON.stringify({ persona: { approximateAge: { age: personaAge }, birthday: { year: 2018 } } }));
             return response('{}', false);
         },
-        window: { ytcfg: { get: key => ({ LOGGED_IN: loggedIn, INNERTUBE_CONTEXT: { client: { clientName: 'WEB_KIDS' } } })[key] },
+        window: { ytcfg: { get: key => ({ LOGGED_IN: loggedIn, INNERTUBE_CONTEXT: { client: { clientName: 'WEB_KIDS' } },
+                OAUTH_CLIENT_ID: 'kids-client.apps.example', OAUTH_CLIENT_SCOPE: 'https://www.googleapis.com/auth/youtube openid' })[key] },
             localStorage: { getItem: key => storage.get(key) ?? null, setItem: (key, value) => storage.set(key, value) },
-            location: { assign: url => assigned.push(url) } } };
+            location: { hostname: 'www.youtubekids.com', assign: url => assigned.push(url) } } };
     vm.createContext(context);
     return { context, storage, calls, assigned, run: (fn, ...args) => vm.runInContext(`(${fn.toString()})(...${JSON.stringify(args)})`, context) };
 }
@@ -109,9 +110,10 @@ test('the page roster posts hashed keys, names and ages only, and clears the par
     const result = await page.run(kids.pageRoster, 8);
     assert.equal(result.status, 'ok');
     const text = JSON.stringify(result);
-    for (const secret of ['persona-A', 'child-B', 'parent-raw', 'owner-raw', 'parent-token', 'parent@example.com', '2018']) {
+    for (const secret of ['persona-A', 'child-B', 'parent-raw', 'owner-raw', 'parent-token', '2018']) {
         assert.equal(text.includes(secret), false, `no ${secret} in the result`);
     }
+    assert.equal(JSON.stringify(result.rows).includes('parent@example.com'), false, 'the e-mail is only on the parent, for display');
     const roster = kids.classify(result.rows);
     assert.deepEqual(roster.profiles.map(p => [p.personaKey, p.selected, p.ageYears, p.profileType]), [[KEY_A, true, 7, 0], [KEY_B, false, null, 1]]);
     assert.equal(roster.hiddenForOnboarding, 1);
@@ -219,4 +221,112 @@ test('manual backups carry no links and keep this device\'s links; Nanah sync ca
     assert.deepEqual(target.storage.ftProfilesV4.kidsPersonaLinks.links.map(l => l.personaKey), [KEY_B], 'a manual import adopts no links');
     await target.box.FilterTubeIO.importV3(clone(synced), { scope: 'full', adoptKidsPersonaLinks: true });
     assert.deepEqual(target.storage.ftProfilesV4.kidsPersonaLinks.links.map(l => l.personaKey), [KEY_A], 'device sync adopts the newer link');
+});
+
+const parentKeyOf = email => 'sha256:' + createHash('sha256').update('filtertube-kids-parent-v1:' + email).digest('hex');
+const DAD = parentKeyOf('dad@example.com'), MUM = parentKeyOf('parent@example.com');
+
+test('links remember the parent as a key and a name only; old links without a parent still load', () => {
+    const links = kids.normalizeLinks({ links: [
+        { profileId: 'ana', personaKey: KEY_A, displayName: 'Ana', linkedAtMillis: 1, parentKey: DAD, parentName: 'Dad', parentEmail: 'dad@example.com' },
+        { profileId: 'ben', personaKey: KEY_B, displayName: 'Ben', linkedAtMillis: 1 },
+        { profileId: 'mia', personaKey: keyOf('mia'), displayName: 'Mia', linkedAtMillis: 1, parentKey: 'broken', parentName: 'Nobody' }] });
+    assert.deepEqual(links.links.map(l => [l.profileId, l.parentKey || null, l.parentName || null]),
+        [['ana', DAD, 'Dad'], ['ben', null, null], ['mia', null, null]]);
+    assert.equal(JSON.stringify(links).includes('@'), false, 'no e-mail is ever stored');
+    assert.equal(kids.linkedParentDecision(links, 'ana', DAD), 'current');
+    assert.equal(kids.linkedParentDecision(links, 'ana', MUM), 'switch_needed');
+    assert.equal(kids.linkedParentDecision(links, 'ben', MUM), 'no_parent_in_link');
+    assert.equal(kids.parentChangeDecision(tree(), 'ana'), 'child');
+    assert.equal(kids.parentChangeDecision(tree(), 'parent2'), 'allowed');
+});
+
+test('the parent sign-in is YouTube Kids\' own request: Google accounts only, chooser unless the account is known', () => {
+    const base = { clientId: 'kids-client.apps.example', scope: 'https://www.googleapis.com/auth/youtube openid', state: 'a'.repeat(32) };
+    const chooser = new URL(kids.oauthUrl(base));
+    assert.equal(chooser.origin + chooser.pathname, 'https://accounts.google.com/o/oauth2/v2/auth');
+    assert.equal(chooser.searchParams.get('prompt'), 'select_account');
+    assert.equal(chooser.searchParams.get('pageId'), 'none', 'brand accounts are ruled out');
+    assert.equal(chooser.searchParams.get('redirect_uri'), 'https://www.youtubekids.com/signin?gaia_popup_redirect=1');
+    assert.equal(chooser.searchParams.get('response_type'), 'none gsession');
+    const hinted = new URL(kids.oauthUrl({ ...base, loginHint: ' Dad@Example.com ' }));
+    assert.equal(hinted.searchParams.get('login_hint'), 'dad@example.com');
+    assert.equal(hinted.searchParams.has('prompt'), false);
+    for (const bad of [{ ...base, state: 'short' }, { ...base, clientId: 'x' }, { ...base, scope: '' }]) assert.equal(kids.oauthUrl(bad), null);
+    assert.equal(kids.parentSwitchOutcome({ targetKey: DAD, beforeKey: MUM, afterSignedIn: true, afterKey: DAD }), 'SWITCHED');
+    assert.equal(kids.parentSwitchOutcome({ targetKey: DAD, beforeKey: MUM, afterSignedIn: true, afterKey: MUM }), 'UNCHANGED');
+    assert.equal(kids.parentSwitchOutcome({ targetKey: DAD, beforeKey: MUM, afterSignedIn: true, afterKey: parentKeyOf('x@example.com') }), 'OTHER_ACCOUNT');
+    assert.equal(kids.parentSwitchOutcome({ targetKey: null, beforeKey: MUM, afterSignedIn: true, afterKey: DAD }), 'SWITCHED');
+    assert.equal(kids.parentSwitchOutcome({ targetKey: DAD, afterSignedIn: false }), 'SIGNED_OUT');
+});
+
+test('the page roster names the parent with the app-scoped key; prepare keeps the page\'s own state list', async () => {
+    const page = kidsPage();
+    const result = await page.run(kids.pageRoster, 0);
+    assert.equal(result.parent.parentKey, MUM);
+    assert.equal(result.parent.email, 'parent@example.com', 'shown to the parent, never stored');
+    assert.equal(result.rows.some(row => JSON.stringify(row).includes('@')), false);
+    page.storage.set('yt.identity.kids::popup-xsrf', JSON.stringify({ data: JSON.stringify(['1', '2', '3', '4', '5', '6']), expiration: Date.now() + 1000, creation: 0 }));
+    const prepared = await page.run(kids.pagePrepareParentSignIn);
+    assert.equal(prepared.status, 'ready');
+    assert.match(prepared.state, /^[0-9a-f]{32}$/);
+    const list = JSON.parse(JSON.parse(page.storage.get('yt.identity.kids::popup-xsrf')).data);
+    assert.deepEqual(list, ['2', '3', '4', '5', '6', prepared.state], 'at most six states, like the web');
+    assert.equal(await page.run(kids.pageParentReturnStatus, prepared.state), 'pending');
+    page.storage.set('yt.identity.kids::popup-xsrf', JSON.stringify({ data: '[]', expiration: Date.now() + 1000, creation: 0 }));
+    page.storage.set('yt.identity.kids::versioninfo', 'opaque');
+    assert.equal(await page.run(kids.pageParentReturnStatus, prepared.state), 'consumed_version');
+    page.context.window.location.hostname = 'evil.example';
+    assert.equal((await page.run(kids.pagePrepareParentSignIn)).status, 'untrusted_origin');
+});
+
+function parentFixture({ profilesV4, parents }) {
+    const executed = [], updates = [], announced = [], listeners = [];
+    let rosterCall = 0;
+    const api = { runtime: { lastError: null, sendMessage: (message, done) => { announced.push(message); done?.(); } },
+        scripting: { executeScript: (details, done) => {
+            executed.push(details.func.name);
+            const name = details.func.name;
+            const result = name === 'pageRoster' ? { status: 'ok', signedIn: true, rows: [], parent: parents[Math.min(rosterCall++, parents.length - 1)] }
+                : name === 'pagePrepareParentSignIn' ? { status: 'ready', clientId: 'kids-client.apps.example', scope: 'openid', state: 'b'.repeat(32) }
+                    : name === 'pageParentReturnStatus' ? 'consumed_version' : name === 'pageClearSelection' ? 'cleared' : { status: 'persona_unavailable' };
+            done([{ result }]);
+        } },
+        tabs: { query: (_q, done) => done([{ id: 7, url: 'https://www.youtubekids.com/' }]), get: (id, done) => done({ id, url: 'https://www.youtubekids.com/' }),
+            update: (id, details, done) => { updates.push(details.url); done?.({ id }); }, reload: (_id, done) => done?.(),
+            onUpdated: { addListener: fn => listeners.push(fn), removeListener: () => {} }, onRemoved: { addListener: () => {} } },
+        storage: { onChanged: { addListener: () => {} } } };
+    const box = {}; vm.createContext(box); box.globalThis = box;
+    vm.runInContext(fs.readFileSync(new URL('../../js/kids_youtube_profiles_background.js', import.meta.url), 'utf8'), box);
+    const instance = box.FilterTubeKidsYouTubeProfilesBackground.install({ api, contract: kids, readProfilesV4: async () => clone(profilesV4),
+        isTrustedSender: () => true, isProfileAuthorized: async () => true, now: () => 1000 });
+    return { instance, executed, updates, announced, fire: async url => { for (const fn of listeners) fn(7, { status: 'complete' }, { id: 7, url }); await new Promise(r => setTimeout(r, 20)); } };
+}
+const mum = { displayName: 'Mum', email: 'parent@example.com', parentKey: MUM };
+const dad = { displayName: 'Dad', email: 'dad@example.com', parentKey: DAD };
+const linkedToDad = tree({ activeProfileId: 'ana', kidsPersonaLinks: { links: [{ profileId: 'ana', personaKey: KEY_A, displayName: 'Ana', linkedAtMillis: 1, parentKey: DAD, parentName: 'Dad' }] } });
+
+test('switching to a linked parent runs the sign-in, reloads, checks the outcome and never signs out', async () => {
+    const f = parentFixture({ profilesV4: linkedToDad, parents: [mum, dad] });
+    assert.deepEqual(clone(await f.instance.handle({ action: 'FilterTube_KidsParentSwitch', mode: 'change' }, dashboard)), { ok: false, error: 'child' });
+    const started = clone(await f.instance.handle({ action: 'FilterTube_KidsParentSwitch', mode: 'apply_link' }, dashboard));
+    assert.deepEqual(started, { ok: true, status: 'started' });
+    const oauth = new URL(f.updates[0]);
+    assert.equal(oauth.searchParams.get('pageId'), 'none');
+    assert.equal(oauth.searchParams.get('prompt'), 'select_account', 'no e-mail is stored, so Google shows its chooser');
+    await f.fire('https://accounts.google.com/o/oauth2/v2/auth?x=1');
+    await f.fire('https://www.youtubekids.com/signin?gaia_popup_redirect=1&state=' + 'b'.repeat(32));
+    assert.equal(f.updates.at(-1), 'https://www.youtubekids.com/');
+    await f.fire('https://www.youtubekids.com/');
+    assert.deepEqual(clone(f.announced), [{ action: 'FilterTube_KidsParentSwitchResult', outcome: 'SWITCHED', parentName: 'Dad' }]);
+    assert.ok(f.executed.includes('pageClearSelection'), 'the old parent\'s kid selection is cleared');
+    assert.equal(f.updates.some(url => /ClearOSID|Logout|signout/i.test(url)), false);
+    const already = parentFixture({ profilesV4: linkedToDad, parents: [dad] });
+    assert.deepEqual(clone(await already.instance.handle({ action: 'FilterTube_KidsParentSwitch', mode: 'apply_link' }, dashboard)), { ok: true, status: 'already_current' });
+    const noParent = parentFixture({ profilesV4: tree(), parents: [mum] });
+    assert.deepEqual(clone(await noParent.instance.handle({ action: 'FilterTube_KidsParentSwitch', mode: 'apply_link' }, dashboard)), { ok: false, error: 'no_parent_in_link' });
+    const rejected = parentFixture({ profilesV4: tree(), parents: [mum] });
+    await rejected.instance.handle({ action: 'FilterTube_KidsParentSwitch', mode: 'change' }, dashboard);
+    await rejected.fire('https://www.youtubekids.com/signin/rejected');
+    assert.equal(rejected.announced[0].outcome, 'REJECTED');
 });

@@ -5074,7 +5074,7 @@ browserAPI.runtime.onMessage.addListener(function (request, sender, sendResponse
     if (action === 'FilterTube_PersonalPlaylistsRead' || action === 'FilterTube_PersonalPlaylistsMerge') {
         return handlePersonalPlaylistsSync(request, sender, sendResponse);
     }
-    if (action === 'FilterTube_KidsProfilesRoster' || action === 'FilterTube_KidsProfilesSwitch') {
+    if (action === 'FilterTube_KidsProfilesRoster' || action === 'FilterTube_KidsProfilesSwitch' || action === 'FilterTube_KidsParentSwitch') {
         return handleKidsYouTubeProfiles(request, sender, sendResponse);
     }
 

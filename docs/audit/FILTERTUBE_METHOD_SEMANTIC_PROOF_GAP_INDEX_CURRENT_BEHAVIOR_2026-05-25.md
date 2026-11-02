@@ -960,7 +960,7 @@ separate release/workflow review and is not silently counted as JavaScript here.
 
 ```text
 current tracked JS/JSX/MJS files: 143
-current repo-wide lexical callables: 10067
+current repo-wide lexical callables: 10096
 current complete per-callable semantic proofs: 0
 current callable behavior-change approval: NO-GO
 runtime behavior changed by inventory refresh: no
@@ -969,9 +969,9 @@ runtime behavior changed by inventory refresh: no
 | Family | Files | Lexical callables |
 | --- | ---: | ---: |
 | Build/sync scripts | 5 | 75 |
-| Hot page/background runtime | 14 | 3949 |
-| Content helper runtime | 26 | 896 |
-| UI/settings runtime | 33 | 4049 |
+| Hot page/background runtime | 14 | 3958 |
+| Content helper runtime | 26 | 910 |
+| UI/settings runtime | 33 | 4055 |
 | Generated/quarantined UI | 6 | 153 |
 | Vendor bundles | 3 | 279 |
 | Audit/test lane scripts | 25 | 517 |
@@ -980,12 +980,12 @@ runtime behavior changed by inventory refresh: no
 | File | Family | Lexical callables | Semantic proof | Boundary |
 | --- | --- | ---: | --- | --- |
 | `js/content/video_notes.js` | Content helper runtime | 26 | `semantic proof incomplete` |
-| `js/shared/kids_youtube_profiles.js` | Content helper runtime | 36 | `semantic proof incomplete` |
+| `js/shared/kids_youtube_profiles.js` | Content helper runtime | 50 | `semantic proof incomplete` |
 | `js/shared/local_playlists.js` | Content helper runtime | 40 | `semantic proof incomplete` |
 | `js/shared/saved_video_notes.js` | Content helper runtime | 20 | `semantic proof incomplete` |
 | `js/video_notes_background.js` | Hot page/background runtime | 18 | `semantic proof incomplete` |
 | `js/video_notes_editor.js` | UI/settings runtime | 25 | `semantic proof incomplete` |
-| `js/kids_youtube_profiles_background.js` | Hot page/background runtime | 15 | `semantic proof incomplete` |
+| `js/kids_youtube_profiles_background.js` | Hot page/background runtime | 24 | `semantic proof incomplete` |
 | `js/local_playlists_store.js` | Hot page/background runtime | 7 | `semantic proof incomplete` |
 | `js/video_notes_store.js` | Hot page/background runtime | 13 | `semantic proof incomplete` |
 | `js/auto_sync_queue.js` | UI/settings runtime | 33 | `semantic proof incomplete` |
@@ -1049,7 +1049,7 @@ runtime behavior changed by inventory refresh: no
 | `js/shared/identity.js` | Content helper runtime | 110 | `semantic proof incomplete` | Lexical accounting only; no complete per-callable closure claimed. |
 | `js/shared/view_count.js` | Content helper runtime | 4 | `semantic proof incomplete` | Lexical accounting only; no complete per-callable closure claimed. |
 | `js/state_manager.js` | UI/settings runtime | 180 | `semantic proof incomplete` | Lexical accounting only; no complete per-callable closure claimed. |
-| `js/tab-view.js` | UI/settings runtime | 2172 | `semantic proof incomplete` | Lexical accounting only; no complete per-callable closure claimed. |
+| `js/tab-view.js` | UI/settings runtime | 2178 | `semantic proof incomplete` | Lexical accounting only; no complete per-callable closure claimed. |
 | `js/ui-shell/popup-shell.js` | Generated/quarantined UI | 45 | `semantic proof incomplete` | Lexical accounting only; no complete per-callable closure claimed. |
 | `js/ui-shell/tab-view-decor.js` | Generated/quarantined UI | 41 | `semantic proof incomplete` | Lexical accounting only; no complete per-callable closure claimed. |
 | `js/ui_components.js` | UI/settings runtime | 65 | `semantic proof incomplete` | Lexical accounting only; no complete per-callable closure claimed. |

@@ -774,7 +774,7 @@ relative isolated-world production console-gate ordering are checked in source.
 | `js/injector.js` | 4148 | 183860 | `62bd7222e7ea8c7fc51cbffd63b894a2f03509b4cc09ddf7525b8a748f91eb60` |
 | `js/io_manager.js` | 3203 | 162604 | `ca73f44abb4d2d4e57a81470cfcb2447b1e62ef8680ef0457b81dcdc6734e4c3` |
 | `js/layout.js` | 680 | 30604 | `48831ccdc2d62c75818d9c6a153d7bfacec9d7be9f2408485f74b1a7c13c57c7` |
-| `js/popup.js` | 2623 | 122413 | `14ec61fc9c06be1e72285d22718dfe63cf98948793d06961c639ab8a3e5cd016` |
+| `js/popup.js` | 2628 | 122847 | `0252c1b97b677af57466f91460fc21ce64ab8ae5e0e491eebbef315838fad8cb` |
 | `js/seed.js` | 2508 | 110538 | `af10e116a8580bf380e6f26b312c5ed3e3597693f7cf9a9bbb4661c2c597c8a1` |
 | `js/settings_shared.js` | 1313 | 66857 | `19f0a1fb3cd512494481b7eb39169bf84feeda4a0a6a20cf58ebaf1c18ff7ba9` |
 | `js/state_manager.js` | 2979 | 124009 | `04879b5b1dcac9229c70d0ea14241667755682649865ad1d52030c1ce21950d3` |
@@ -926,7 +926,7 @@ Current seed and coordinator source fingerprints were recomputed after fallback 
 ## Auto-sync source inventory - 2026-10-24
 
 | `build.js` | 861 | 33225 | `a198cc1d0bf98e410deb8f66ced0e56a046bbf987a0a5b878e1278577622fb2e` |
-| `js/background.js` | 8778 | 401948 | `9bcfae94bc65e8c59dfc64f79ba475919ca0b1ff49e8930b66fe1d517a8c9d35` |
+| `js/background.js` | 8778 | 401992 | `a86102e54444d56fe48baddebee893678ef29cb4e0ea4ac624ef3352acef2057` |
 | `js/content/block_channel.js` | 3361 | 135050 | `f2a02886a83d64d93186cd1f0c1f300683ae49754b928d2e0329fd1a88d8f2c9` |
 | `js/content/bridge_settings.js` | 2281 | 103815 | `4bbd8d3c2d65aae8b1743bd779410803b17078319b0f5f5176e7495b46ab3055` |
 | `js/content/collab_dialog.js` | 393 | 14623 | `dc34bba556b310da8b7516d106e9d67addea59d8a707a02f21607ac97af1f72a` |
@@ -938,11 +938,11 @@ Current seed and coordinator source fingerprints were recomputed after fallback 
 | `js/injector.js` | 4148 | 183860 | `62bd7222e7ea8c7fc51cbffd63b894a2f03509b4cc09ddf7525b8a748f91eb60` |
 | `js/io_manager.js` | 3425 | 176622 | `ba3546adcf5fa4d97ec221ce229bd9bf9bdbdf4fa43fcefeccb183bf1227f12a` |
 | `js/layout.js` | 680 | 30604 | `48831ccdc2d62c75818d9c6a153d7bfacec9d7be9f2408485f74b1a7c13c57c7` |
-| `js/popup.js` | 2623 | 122413 | `14ec61fc9c06be1e72285d22718dfe63cf98948793d06961c639ab8a3e5cd016` |
+| `js/popup.js` | 2628 | 122847 | `0252c1b97b677af57466f91460fc21ce64ab8ae5e0e491eebbef315838fad8cb` |
 | `js/seed.js` | 2508 | 110538 | `af10e116a8580bf380e6f26b312c5ed3e3597693f7cf9a9bbb4661c2c597c8a1` |
 | `js/settings_shared.js` | 1327 | 67805 | `c3d0f4b965acaaf46f6424cd0ad329c50e616de7b1cf8905a9fa578123e2bf69` |
 | `js/state_manager.js` | 2984 | 124258 | `029b2e7d4356d4629348f174bdaf7858fa1fa0c09a4b54c6bb0e293a161a8d5e` |
-| `js/tab-view.js` | 33256 | 1811354 | `3f52a6d32e483ff92738ea82fb8c8da4d0c8e8c25fb1e9f26ddc3c9e8f392c6c` |
+| `js/tab-view.js` | 33388 | 1820587 | `fee08830c87d155a6ca75b7d79b5cc167a4f7c6276e7012dc779d1d3f79b0582` |
 | `scripts/build-extension-ui.mjs` | 50 | 1188 | `6326362ebf90f448ccdbf68945b3fb522b7b215edaf9b3e28589a4e166239cf3` |
 | `scripts/build-nanah-vendor.mjs` | 65 | 1818 | `dae8d3ef29c4cd44b0bf975090e9d53f3bb05b523355f5038930fc03b27e921c` |
 | `scripts/sync-native-runtime.mjs` | 34 | 1070 | `4f46c13bf6099092193712790d231ff4809b00b1b0061d04af71ac3ba6bf21c6` |

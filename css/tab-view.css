@@ -5894,3 +5894,40 @@ html[data-theme="dark"] .video-filter-compact-option:has(.video-filter-compact-r
     width: auto;
     min-width: 10rem;
 }
+
+.kids-yt-profiles__parent {
+    margin-bottom: 0.75rem;
+}
+
+.kids-yt-profiles__parent-row,
+.kids-yt-profiles__parent-banner {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.6rem;
+    padding: 0.6rem 0.8rem;
+    border: 1px solid var(--ft-color-sem-neutral-border);
+    border-radius: 0.8rem;
+}
+
+.kids-yt-profiles__parent-banner {
+    margin-top: 0.5rem;
+    background: var(--ft-color-brand-subtle);
+    color: var(--ft-color-text-primary);
+}
+
+.kids-yt-profiles__parent-banner > span {
+    flex: 1 1 14rem;
+}
+
+.kids-yt-profiles__parent-label {
+    color: var(--ft-color-text-secondary);
+    font-size: 0.82rem;
+}
+
+.kids-yt-profiles__parent-name {
+    flex: 1 1 12rem;
+    color: var(--ft-color-text-primary);
+    font-weight: 600;
+    overflow-wrap: anywhere;
+}

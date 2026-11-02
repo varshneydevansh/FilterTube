@@ -17,6 +17,9 @@
     const MAX_PROFILES = 16;
     const MAX_AGE_YEARS = 25;
     const MAX_NAME = 120;
+    const PARENT_PREFIX = 'filtertube-kids-parent-v1:';
+    const AUTH_URL = 'https://accounts.google.com/o/oauth2/v2/auth';
+    const REDIRECT_URI = 'https://www.youtubekids.com/signin?gaia_popup_redirect=1';
     const own = (value, key) => !!value && Object.prototype.hasOwnProperty.call(value, key);
     const text = value => typeof value === 'string' ? value.trim() : '';
 
@@ -39,16 +42,21 @@
             if (!profileId || profileId.length > 1024 || !key || !displayName || seen.has(profileId)) continue;
             const linkedAtMillis = Number.isSafeInteger(row?.linkedAtMillis) && row.linkedAtMillis >= 0 ? row.linkedAtMillis : 0;
             seen.add(profileId);
-            links.push({ profileId, personaKey: key, displayName, linkedAtMillis });
+            const link = { profileId, personaKey: key, displayName, linkedAtMillis };
+            // The parent Google account is remembered as a key and a display name, never an e-mail.
+            const parentKey = personaKey(row?.parentKey);
+            const parentName = text(row?.parentName).slice(0, MAX_NAME);
+            if (parentKey && parentName) { link.parentKey = parentKey; link.parentName = parentName; }
+            links.push(link);
         }
         return { schemaVersion: 1, links };
     }
     function linkFor(links, profileId) {
         return normalizeLinks(links).links.find(link => link.profileId === profileId) || null;
     }
-    function withLink(links, { profileId, personaKey: key, displayName, linkedAtMillis = Date.now() }) {
+    function withLink(links, { profileId, personaKey: key, displayName, linkedAtMillis = Date.now(), parentKey = null, parentName = null }) {
         const next = normalizeLinks(links).links.filter(link => link.profileId !== profileId);
-        next.push({ profileId, personaKey: key, displayName, linkedAtMillis });
+        next.push({ profileId, personaKey: key, displayName, linkedAtMillis, ...(parentKey && parentName ? { parentKey, parentName } : {}) });
         const result = normalizeLinks({ links: next });
         if (!result.links.some(link => link.profileId === profileId)) throw new Error('Invalid YouTube Kids profile link');
         return result;
@@ -97,6 +105,53 @@
         const link = linkFor(links, actorId);
         if (link) return link.personaKey === targetKey ? 'allowed' : 'linked';
         return profileType(profilesV4, actorId) === 'child' ? 'child' : 'allowed';
+    }
+
+    // ---- Parent accounts (Google accounts only; same rules as Android §8) ----
+
+    function normalizedEmail(value) {
+        const email = text(value).toLowerCase();
+        return email.length <= 254 && /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email) ? email : null;
+    }
+    /** Changing the parent is a parent action; inside a child the row is managed by a parent. */
+    function parentChangeDecision(profilesV4, actorId) {
+        return profileType(profilesV4, actorId) === 'child' ? 'child' : 'allowed';
+    }
+    /** Whether the active profile's link names a parent other than the current one. */
+    function linkedParentDecision(links, actorId, currentParentKey) {
+        const link = linkFor(links, actorId);
+        if (!link?.parentKey) return 'no_parent_in_link';
+        return link.parentKey === currentParentKey ? 'current' : 'switch_needed';
+    }
+    /** YouTube Kids' own parent sign-in request, plus login_hint when the account is known. */
+    function oauthUrl({ clientId, scope, state, loginHint = null }) {
+        const id = text(clientId);
+        const scopes = text(scope).split(/\s+/).filter(Boolean);
+        if (!/^[A-Za-z0-9._-]{8,256}$/.test(id) || !scopes.length || scopes.length > 16
+            || scopes.some(item => !/^[A-Za-z0-9._:\/-]{1,256}$/.test(item)) || !/^[0-9a-f]{32}$/.test(text(state))) return null;
+        const hint = normalizedEmail(loginHint);
+        const params = [['client_id', id], ['response_type', 'none gsession'], ['access_type', 'offline'],
+            ['scope', scopes.join(' ')], ['redirect_uri', REDIRECT_URI], ['state', text(state)],
+            hint ? ['login_hint', hint] : ['prompt', 'select_account'], ['pageId', 'none']];
+        return AUTH_URL + '?' + params.map(([name, value]) => name + '=' + encodeURIComponent(value)).join('&');
+    }
+    /** SWITCHED, UNCHANGED, OTHER_ACCOUNT or SIGNED_OUT, checked against the roster after the sign-in. */
+    function parentSwitchOutcome({ targetKey = null, beforeKey = null, afterSignedIn, afterKey = null }) {
+        if (!afterSignedIn || !afterKey) return 'SIGNED_OUT';
+        if (targetKey && afterKey === targetKey) return 'SWITCHED';
+        if (beforeKey && afterKey === beforeKey) return 'UNCHANGED';
+        return targetKey ? 'OTHER_ACCOUNT' : 'SWITCHED';
+    }
+    function isSignInReturn(url) {
+        try {
+            const parsed = new URL(url);
+            return parsed.protocol === 'https:' && ['www.youtubekids.com', 'youtubekids.com'].includes(parsed.hostname)
+                && parsed.pathname === '/signin' && parsed.searchParams.has('gaia_popup_redirect');
+        } catch (_) { return false; }
+    }
+    function isSignInRejected(url) {
+        try { const parsed = new URL(url); return /(^|\.)youtubekids\.com$/.test(parsed.hostname) && parsed.pathname === '/signin/rejected'; }
+        catch (_) { return false; }
     }
 
     // ---- Roster: token-free rows from the page, classified with YouTube Kids' own rules ----
@@ -166,13 +221,22 @@
             const selectedId = String(stored.profileId || config('PROFILE_ID') || '').trim();
             const items = []; walk(data, item => items.push(item));
             const rows = [];
-            let lookups = 0;
+            let lookups = 0, parent = null;
             for (const item of items.slice(0, 64)) {
                 const identity = item.identity || {};
                 const rawId = rawIdOf(item);
                 const services = Array.isArray(identity.registeredGaiaServices) ? identity.registeredGaiaServices.map(String) : [];
                 const delegationType = String(identity.gaiaDelegationType || '');
                 const thumbs = item.accountPhoto?.thumbnails;
+                if (!parent && delegationType === 'GAIA_DELEGATION_TYPE_NONE') {
+                    const email = label(item.accountByline).toLowerCase();
+                    const parentBytes = new TextEncoder().encode('filtertube-kids-parent-v1:' + email);
+                    const parentHash = await crypto.subtle.digest('SHA-256', parentBytes);
+                    // The e-mail is returned for display only; FilterTube stores the key and the name.
+                    parent = { displayName: label(item.accountName), email: /@/.test(email) ? email : '',
+                        avatarUrl: Array.isArray(item.accountPhoto?.thumbnails) && item.accountPhoto.thumbnails.length ? String(item.accountPhoto.thumbnails[item.accountPhoto.thumbnails.length - 1].url || '') : '',
+                        parentKey: /@/.test(email) ? 'sha256:' + Array.from(new Uint8Array(parentHash)).map(v => v.toString(16).padStart(2, '0')).join('') : '' };
+                }
                 const row = { displayName: label(item.accountName), delegationType, services,
                     avatarUrl: Array.isArray(thumbs) && thumbs.length ? String(thumbs[thumbs.length - 1].url || '') : '',
                     selected: !!rawId && rawId === selectedId,
@@ -191,7 +255,7 @@
                 }
                 rows.push(row);
             }
-            return { status: 'ok', signedIn: true, rows };
+            return { status: 'ok', signedIn: true, rows, parent };
         } catch (_) {
             return { status: 'failed', signedIn: true, rows: [] };
         } finally {
@@ -245,7 +309,51 @@
         }
     }
 
-    return Object.freeze({ LINKS_KEY, SELECTION_STORAGE_KEY, MAX_PROFILES,
+    /** Before the parent sign-in: reads the page's OAuth settings and adds a fresh state to its own expiring list. */
+    function pagePrepareParentSignIn() {
+        const XSRF_KEY = 'yt.identity.kids::popup-xsrf';
+        try {
+            if (window.location.hostname !== 'www.youtubekids.com') return { status: 'untrusted_origin' };
+            const config = key => { try { const c = window.ytcfg; return c && typeof c.get === 'function' ? c.get(key) : (c && (c.data_ || c.data) || {})[key]; } catch (_) { return undefined; } };
+            const clientId = String(config('OAUTH_CLIENT_ID') || '').trim();
+            const scope = String(config('OAUTH_CLIENT_SCOPE') || '').trim();
+            if (!clientId || !scope) return { status: 'config_unavailable' };
+            const bytes = new Uint8Array(16); crypto.getRandomValues(bytes);
+            const state = Array.from(bytes).map(v => v.toString(16).padStart(2, '0')).join('');
+            let list = [];
+            try {
+                const wrapper = JSON.parse(window.localStorage.getItem(XSRF_KEY) || 'null');
+                const data = wrapper && wrapper.data;
+                const parsed = typeof data === 'string' ? JSON.parse(data) : data;
+                if (Array.isArray(parsed) && !(wrapper.expiration && wrapper.expiration < Date.now())) list = parsed.map(String);
+            } catch (_) { list = []; }
+            if (list.length > 5) list.shift();
+            list.push(state);
+            const now = Date.now();
+            window.localStorage.setItem(XSRF_KEY, JSON.stringify({ data: JSON.stringify(list), expiration: now + 864E5, creation: now }));
+            return { status: 'ready', clientId, scope, state };
+        } catch (_) {
+            return { status: 'failed' };
+        }
+    }
+    /** On the return page: 'pending' until the page has checked the state, then 'consumed_version' or 'consumed'. */
+    function pageParentReturnStatus(state) {
+        try {
+            const wrapper = JSON.parse(window.localStorage.getItem('yt.identity.kids::popup-xsrf') || 'null');
+            const data = wrapper && wrapper.data;
+            const list = typeof data === 'string' ? JSON.parse(data) : data;
+            if (Array.isArray(list) && list.indexOf(state) >= 0) return 'pending';
+            return window.localStorage.getItem('yt.identity.kids::versioninfo') ? 'consumed_version' : 'consumed';
+        } catch (_) { return 'unknown'; }
+    }
+    /** After a parent change: the stored kid belonged to the old parent. Only the selection key is removed. */
+    function pageClearSelection() {
+        try { window.localStorage.removeItem('yt.identity.kids::childprofile'); return 'cleared'; } catch (_) { return 'failed'; }
+    }
+
+    return Object.freeze({ LINKS_KEY, SELECTION_STORAGE_KEY, MAX_PROFILES, REDIRECT_URI,
+        normalizedEmail, parentChangeDecision, linkedParentDecision, oauthUrl, parentSwitchOutcome, isSignInReturn, isSignInRejected,
+        pagePrepareParentSignIn, pageParentReturnStatus, pageClearSelection,
         personaKey, emptyLinks, normalizeLinks, linkFor, withLink, unlink, retaining, adopt,
         profileType, canManage, linkDecision, switchDecision, classify, pageRoster, pageActivate });
 }));
