@@ -876,6 +876,74 @@ function initializePopupFiltersTabs() {
         return 'main';
     }
 
+    // Compact "YouTube Kids profiles" entry while the active tab is youtubekids.com.
+    // The background reads the roster from that tab; only hashed keys, names and ages reach the popup.
+    async function renderPopupKidsYouTubeProfiles() {
+        const api = (typeof chrome !== 'undefined' && chrome.runtime) ? chrome : ((typeof browser !== 'undefined' && browser.runtime) ? browser : null);
+        const contract = window.FilterTubeKidsYouTubeProfiles;
+        if (!api?.tabs?.query || !contract) return;
+        const send = payload => new Promise(resolve => {
+            try { api.runtime.sendMessage(payload, response => resolve(api.runtime.lastError ? null : response)); } catch (e) { resolve(null); }
+        });
+        const tabs = await new Promise(resolve => {
+            try { api.tabs.query({ active: true, currentWindow: true }, result => resolve(result || [])); } catch (e) { resolve([]); }
+        });
+        const tab = tabs[0];
+        if (!tab || !/^https:\/\/([a-z0-9-]+\.)?youtubekids\.com\//i.test(String(tab.url || ''))) return;
+        let section = document.getElementById('ftPopupKidsProfiles');
+        if (!section) {
+            section = document.createElement('section');
+            section.id = 'ftPopupKidsProfiles';
+            section.className = 'ft-popup-kids-profiles';
+            section.setAttribute('aria-labelledby', 'ftPopupKidsProfilesTitle');
+            const title = document.createElement('p');
+            title.id = 'ftPopupKidsProfilesTitle'; title.className = 'ft-popup-kids-profiles__title';
+            title.textContent = popupUiText('popup.kidsProfiles.title', 'YouTube Kids profiles');
+            const chips = document.createElement('div'); chips.className = 'ft-popup-kids-profiles__chips';
+            const status = document.createElement('p'); status.className = 'ft-popup-kids-profiles__status'; status.setAttribute('aria-live', 'polite');
+            const manage = document.createElement('button');
+            manage.type = 'button'; manage.className = 'ft-popup-kids-profiles__manage';
+            manage.textContent = popupUiText('popup.kidsProfiles.manage', 'Link profiles in Kids Mode');
+            manage.addEventListener('click', () => api.tabs.create({ url: api.runtime.getURL('html/tab-view.html?view=kids') }));
+            section.append(title, chips, status, manage);
+            const anchorNode = document.querySelector('.ft-popup-android-link');
+            if (anchorNode?.parentNode) anchorNode.parentNode.insertBefore(section, anchorNode);
+            else (document.querySelector('.ft-popup-shell__frame') || document.body).appendChild(section);
+        }
+        const chips = section.querySelector('.ft-popup-kids-profiles__chips');
+        const status = section.querySelector('.ft-popup-kids-profiles__status');
+        status.textContent = popupUiText('popup.kidsProfiles.loading', 'Reading profiles…');
+        const [result, stored] = await Promise.all([
+            send({ action: 'FilterTube_KidsProfilesRoster', tabId: tab.id }),
+            new Promise(resolve => api.storage.local.get(['ftProfilesV4'], data => resolve(data?.ftProfilesV4 || null)))
+        ]);
+        const profiles = Array.isArray(result?.profiles) ? result.profiles : [];
+        status.textContent = result?.status === 'signed_out'
+            ? popupUiText('popup.kidsProfiles.signedOut', 'Sign in to YouTube Kids to choose a profile.')
+            : (!result?.ok || result.status !== 'ok') ? popupUiText('popup.kidsProfiles.failed', 'Profiles could not be read.')
+                : profiles.length ? '' : popupUiText('popup.kidsProfiles.none', 'No YouTube Kids profiles yet.');
+        const actorId = stored?.activeProfileId || 'default';
+        const links = contract.normalizeLinks(stored?.[contract.LINKS_KEY]);
+        chips.replaceChildren(...profiles.map(kid => {
+            const chip = document.createElement('button');
+            chip.type = 'button';
+            chip.className = 'ft-popup-kids-profiles__chip' + (kid.selected ? ' is-selected' : '');
+            chip.setAttribute('aria-pressed', kid.selected ? 'true' : 'false');
+            chip.textContent = kid.ageYears !== null && kid.ageYears !== undefined
+                ? popupUiText('popup.kidsProfiles.nameAge', '{name} · {age}', { name: kid.displayName, age: kid.ageYears }) : kid.displayName;
+            const decision = contract.switchDecision(stored, links, actorId, kid.personaKey);
+            chip.disabled = kid.selected || decision !== 'allowed';
+            if (decision !== 'allowed') chip.title = popupUiText('popup.kidsProfiles.locked', 'A parent chooses who watches on this profile.');
+            chip.addEventListener('click', async () => {
+                const response = await send({ action: 'FilterTube_KidsProfilesSwitch', personaKey: kid.personaKey, tabId: tab.id });
+                status.textContent = response?.ok
+                    ? popupUiText('popup.kidsProfiles.switching', 'Switching to {name}…', { name: kid.displayName })
+                    : popupUiText('popup.kidsProfiles.switchFailed', 'Could not switch profiles.');
+            });
+            return chip;
+        }));
+    }
+
     async function updatePopupVideoFiltersVisibility() {
         const profileType = await resolveProfileTypeFromTabs();
         const showKids = profileType === 'kids';
@@ -1063,6 +1131,7 @@ function initializePopupFiltersTabs() {
         applyPopupVideoFiltersForActiveProfile();
         updatePopupVideoFilterUI();
         updatePopupVideoFiltersVisibility();
+        renderPopupKidsYouTubeProfiles().catch(() => {});
     }, 100);
 
     StateManager.subscribe((eventType, data) => {

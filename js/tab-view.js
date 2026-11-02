@@ -27330,6 +27330,221 @@ document.addEventListener('DOMContentLoaded', async () => {
         return ensureProfileUnlocked(profilesV4, 'default', options);
     }
 
+    // ---- YouTube Kids profiles (Kids Mode) ----
+    // The parent's kid profiles come from youtubekids.com through the background; only hashed keys, names,
+    // avatars and ages reach this page. Links live in profilesV4.kidsPersonaLinks (key, name, link time).
+    const kidsYouTubeProfilesState = { roster: null, status: '', busy: false, root: null };
+
+    function kidsYouTubeContract() {
+        return window.FilterTubeKidsYouTubeProfiles || null;
+    }
+
+    function kidsYouTubeStatusText(status, profiles) {
+        if (status === 'loading') return tabViewUiText('kids.youtubeProfiles.loading', 'Reading your YouTube Kids profiles…');
+        if (status === 'no_tab') return tabViewUiText('kids.youtubeProfiles.noTab', 'Open youtubekids.com, or select Show profiles to read them.');
+        if (status === 'signed_out') return tabViewUiText('kids.youtubeProfiles.signedOut', 'Sign in to YouTube Kids on youtubekids.com first.');
+        if (status === 'ok' && !profiles.length) return tabViewUiText('kids.youtubeProfiles.none', 'No YouTube Kids profiles yet. Add one on youtubekids.com.');
+        if (status === 'ok') return '';
+        if (!status) return '';
+        return tabViewUiText('kids.youtubeProfiles.failed', 'YouTube Kids profiles could not be read. Try again.');
+    }
+
+    async function loadKidsYouTubeProfiles({ openIfNeeded = false } = {}) {
+        if (kidsYouTubeProfilesState.busy) return;
+        kidsYouTubeProfilesState.busy = true;
+        kidsYouTubeProfilesState.status = 'loading';
+        renderKidsYouTubeProfiles();
+        try {
+            const result = await sendRuntimeMessage({ action: 'FilterTube_KidsProfilesRoster', openIfNeeded });
+            kidsYouTubeProfilesState.status = result?.ok ? result.status : 'failed';
+            if (result?.ok && result.status === 'ok') kidsYouTubeProfilesState.roster = result;
+            else if (result?.ok && result.status === 'signed_out') kidsYouTubeProfilesState.roster = null;
+        } finally {
+            kidsYouTubeProfilesState.busy = false;
+            renderKidsYouTubeProfiles();
+        }
+    }
+
+    function renderKidsYouTubeProfiles() {
+        const contract = kidsYouTubeContract();
+        const statusEl = document.getElementById('kidsYouTubeProfilesStatus');
+        const tilesEl = document.getElementById('kidsYouTubeProfilesTiles');
+        const linksEl = document.getElementById('kidsYouTubeProfilesLinks');
+        const loadButton = document.getElementById('kidsYouTubeProfilesLoad');
+        if (!contract || !statusEl || !tilesEl || !linksEl) return;
+        const root = safeObject(kidsYouTubeProfilesState.root || profilesV4Cache);
+        const actorId = normalizeString(root.activeProfileId) || 'default';
+        const links = contract.normalizeLinks(root[contract.LINKS_KEY]);
+        const profiles = safeArray(kidsYouTubeProfilesState.roster?.profiles);
+        if (loadButton) loadButton.disabled = kidsYouTubeProfilesState.busy;
+        const pendingSetup = Number(kidsYouTubeProfilesState.roster?.hiddenForOnboarding) || 0;
+        statusEl.textContent = [kidsYouTubeStatusText(kidsYouTubeProfilesState.status, profiles),
+            kidsYouTubeProfilesState.status === 'ok' && pendingSetup
+                ? tabViewUiText('kids.youtubeProfiles.pendingSetup', '{count} more profiles still need setup in YouTube Kids.', { count: pendingSetup })
+                : ''].filter(Boolean).join(' ');
+
+        tilesEl.replaceChildren(...profiles.map(kid => {
+            const tile = document.createElement('li');
+            tile.className = 'kids-yt-profiles__tile' + (kid.selected ? ' is-selected' : '');
+            if (kid.avatarUrl) {
+                const avatar = document.createElement('img');
+                avatar.className = 'kids-yt-profiles__avatar'; avatar.alt = ''; avatar.referrerPolicy = 'no-referrer';
+                avatar.src = kid.avatarUrl;
+                tile.appendChild(avatar);
+            } else {
+                const avatar = document.createElement('span');
+                avatar.className = 'kids-yt-profiles__avatar kids-yt-profiles__avatar--initial'; avatar.setAttribute('aria-hidden', 'true');
+                avatar.textContent = kid.displayName.slice(0, 1).toUpperCase();
+                tile.appendChild(avatar);
+            }
+            const name = document.createElement('strong');
+            name.className = 'kids-yt-profiles__name'; name.textContent = kid.displayName;
+            const meta = document.createElement('span');
+            meta.className = 'kids-yt-profiles__meta';
+            const linkedTo = links.links.filter(link => link.personaKey === kid.personaKey).map(link => getProfileName(root, link.profileId));
+            meta.textContent = [
+                kid.ageYears !== null && kid.ageYears !== undefined ? tabViewUiText('kids.youtubeProfiles.age', 'Age {age}', { age: kid.ageYears }) : '',
+                kid.profileType === 1 ? tabViewUiText('kids.youtubeProfiles.supervised', 'Supervised account') : '',
+                kid.selected ? tabViewUiText('kids.youtubeProfiles.watching', 'Watching now') : '',
+                linkedTo.length ? tabViewUiText('kids.youtubeProfiles.linkedTo', 'Linked to {profiles}', { profiles: linkedTo.join(', ') }) : ''
+            ].filter(Boolean).join(' · ');
+            const decision = contract.switchDecision(root, links, actorId, kid.personaKey);
+            const watch = document.createElement('button');
+            watch.type = 'button'; watch.className = 'btn-secondary kids-yt-profiles__watch';
+            watch.textContent = kid.selected ? tabViewUiText('kids.youtubeProfiles.watchingButton', 'Watching') : tabViewUiText('kids.youtubeProfiles.watchButton', 'Watch as {name}', { name: kid.displayName });
+            watch.disabled = kid.selected || decision !== 'allowed' || kidsYouTubeProfilesState.busy;
+            if (decision === 'linked') watch.title = tabViewUiText('kids.youtubeProfiles.lockedLinked', '{profile} is linked to another YouTube Kids profile. Change it here as the parent.', { profile: getProfileName(root, actorId) });
+            if (decision === 'child') watch.title = tabViewUiText('kids.youtubeProfiles.lockedChild', 'Ask a parent to choose who is watching.');
+            watch.addEventListener('click', () => switchKidsYouTubeProfile(kid));
+            tile.append(name, meta, watch);
+            return tile;
+        }));
+
+        linksEl.replaceChildren();
+        if (contract.profileType(root, actorId) === 'child') {
+            const note = document.createElement('p');
+            note.className = 'kids-yt-profiles__note';
+            note.textContent = tabViewUiText('kids.youtubeProfiles.parentOnly', 'Only a parent can link YouTube Kids profiles.');
+            linksEl.appendChild(note);
+            return;
+        }
+        const targets = Object.keys(safeObject(root.profiles)).filter(id => contract.linkDecision(root, actorId, id) === 'allowed');
+        for (const profileId of targets) {
+            const link = contract.linkFor(links, profileId);
+            if (!link && !profiles.length) continue;
+            const row = document.createElement('div');
+            row.className = 'kids-yt-profiles__link-row';
+            const label = document.createElement('span');
+            label.className = 'kids-yt-profiles__link-label';
+            label.textContent = tabViewUiText('kids.youtubeProfiles.linkRow', '{profile}: {kid}', {
+                profile: getProfileName(root, profileId),
+                kid: link ? link.displayName : tabViewUiText('kids.youtubeProfiles.notLinked', 'not linked')
+            });
+            row.appendChild(label);
+            if (profiles.length) {
+                const select = document.createElement('select');
+                select.className = 'select-input kids-yt-profiles__select';
+                select.setAttribute('aria-label', tabViewUiText('kids.youtubeProfiles.selectLabel', 'YouTube Kids profile for {profile}', { profile: getProfileName(root, profileId) }));
+                for (const kid of profiles) {
+                    const option = document.createElement('option');
+                    option.value = kid.personaKey; option.textContent = kid.displayName;
+                    option.selected = link?.personaKey === kid.personaKey;
+                    select.appendChild(option);
+                }
+                const save = document.createElement('button');
+                save.type = 'button'; save.className = 'btn-primary kids-yt-profiles__link';
+                save.textContent = link ? tabViewUiText('kids.youtubeProfiles.change', 'Change link') : tabViewUiText('kids.youtubeProfiles.link', 'Link');
+                save.addEventListener('click', () => {
+                    const kid = profiles.find(item => item.personaKey === select.value);
+                    if (kid) changeKidsYouTubeLink(profileId, kid);
+                });
+                row.append(select, save);
+            }
+            if (link) {
+                const remove = document.createElement('button');
+                remove.type = 'button'; remove.className = 'btn-secondary kids-yt-profiles__unlink';
+                remove.textContent = tabViewUiText('kids.youtubeProfiles.remove', 'Remove link');
+                remove.addEventListener('click', () => changeKidsYouTubeLink(profileId, null));
+                row.appendChild(remove);
+            }
+            linksEl.appendChild(row);
+        }
+    }
+
+    async function switchKidsYouTubeProfile(kid) {
+        const result = await sendRuntimeMessage({ action: 'FilterTube_KidsProfilesSwitch', personaKey: kid.personaKey });
+        if (result?.ok) {
+            UIComponents.showToast(tabViewUiText('kids.youtubeProfiles.switched', 'YouTube Kids is switching to {name}.', { name: kid.displayName }), 'success');
+            setTimeout(() => loadKidsYouTubeProfiles(), 2500);
+            return;
+        }
+        const reason = result?.error;
+        UIComponents.showToast(reason === 'linked' || reason === 'child'
+            ? tabViewUiText('kids.youtubeProfiles.lockedChild', 'Ask a parent to choose who is watching.')
+            : reason === 'locked'
+                ? tabViewUiText('kids.youtubeProfiles.unlockFirst', 'Unlock this profile first.')
+                : tabViewUiText('kids.youtubeProfiles.switchFailed', 'YouTube Kids could not switch profiles. Open youtubekids.com and try again.'), 'error');
+    }
+
+    /** Link or unlink a FilterTube profile: parent context only, PIN required, fresh PIN entry. */
+    async function changeKidsYouTubeLink(profileId, kid) {
+        const contract = kidsYouTubeContract();
+        const io = window.FilterTubeIO || {};
+        if (!contract || typeof io.loadProfilesV4 !== 'function' || typeof io.saveProfilesV4 !== 'function') return;
+        const fresh = await io.loadProfilesV4();
+        const actorId = normalizeString(fresh?.activeProfileId) || 'default';
+        const decision = contract.linkDecision(fresh, actorId, profileId);
+        if (decision !== 'allowed') {
+            UIComponents.showToast(decision === 'child'
+                ? tabViewUiText('kids.youtubeProfiles.parentOnly', 'Only a parent can link YouTube Kids profiles.')
+                : tabViewUiText('family.profileManager.switchParentToEdit', 'Switch to the master or parent account to edit this protected profile'), 'error');
+            return;
+        }
+        if (!isProfileLocked(fresh, actorId)) {
+            UIComponents.showToast(tabViewUiText('kids.youtubeProfiles.needsPin', 'Set a PIN for {profile} first, so a child cannot change this link.', { profile: getProfileName(fresh, actorId) }), 'warning');
+            return;
+        }
+        if (!(await ensureProfileUnlocked(fresh, actorId, { sensitiveAction: true }))) return;
+        const latest = await io.loadProfilesV4();
+        if ((normalizeString(latest?.activeProfileId) || 'default') !== actorId
+            || contract.linkDecision(latest, actorId, profileId) !== 'allowed') {
+            UIComponents.showToast(tabViewUiText('family.profileManager.managedEditChangedBeforeSave', 'The account, protected profile, or edit scope changed. Review the profile before saving.'), 'warning');
+            return;
+        }
+        const links = kid
+            ? contract.withLink(latest[contract.LINKS_KEY], { profileId, personaKey: kid.personaKey, displayName: kid.displayName })
+            : contract.unlink(latest[contract.LINKS_KEY], profileId);
+        const saved = await io.saveProfilesV4({ ...latest, [contract.LINKS_KEY]: links });
+        if (saved && saved.ok === false) {
+            UIComponents.showToast(tabViewUiText('kids.youtubeProfiles.saveFailed', 'The link could not be saved.'), 'error');
+            return;
+        }
+        kidsYouTubeProfilesState.root = await io.loadProfilesV4();
+        UIComponents.showToast(kid
+            ? tabViewUiText('kids.youtubeProfiles.linked', '{profile} now uses {kid} on YouTube Kids.', { profile: getProfileName(latest, profileId), kid: kid.displayName })
+            : tabViewUiText('kids.youtubeProfiles.unlinked', 'Link removed.'), 'success');
+        renderKidsYouTubeProfiles();
+    }
+
+    document.getElementById('kidsYouTubeProfilesLoad')?.addEventListener('click', () => loadKidsYouTubeProfiles({ openIfNeeded: true }));
+    document.addEventListener('filtertube:view-changed', event => {
+        if (normalizeString(event?.detail?.viewId) !== 'kids') return;
+        Promise.resolve(window.FilterTubeIO?.loadProfilesV4?.()).then(root => {
+            if (root) kidsYouTubeProfilesState.root = root;
+            loadKidsYouTubeProfiles();
+        }).catch(() => loadKidsYouTubeProfiles());
+    });
+    try {
+        runtimeAPI?.storage?.onChanged?.addListener((changes, area) => {
+            if (area !== 'local' || !changes.ftProfilesV4 || typeof window.FilterTubeIO?.loadProfilesV4 !== 'function') return;
+            window.FilterTubeIO.loadProfilesV4().then(root => {
+                kidsYouTubeProfilesState.root = root;
+                renderKidsYouTubeProfiles();
+            }).catch(() => {});
+        });
+    } catch (e) {
+    }
+
     function updateExportScopeControls() {
         if (!ftExportActiveOnly) return;
         if (activeProfileId !== 'default') {

@@ -177,6 +177,7 @@ const AUTO_SYNC_TESTS = Object.freeze([
   'tests/runtime/personal-auto-sync-independent.test.mjs',
   'tests/runtime/video-notes-sync.test.mjs',
   'tests/runtime/local-playlists.test.mjs',
+  'tests/runtime/kids-youtube-profiles.test.mjs',
   'tests/runtime/auto-sync-background-authority.test.mjs',
   'tests/runtime/auto-sync-dashboard-integration.test.mjs',
 ]);

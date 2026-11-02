@@ -925,3 +925,14 @@ Current combined unique manifest references: 47
 | `manifest.opera.json` | 71 | 37 | 7 | 49 | 13 |
 
 Firefox's background scripts add `js/shared/local_playlists.js` and `js/local_playlists_store.js`; Chromium service workers load the same files through `importScripts`. No permission expansion and no content-script change. Source closure does not establish installed sync acceptance.
+
+## YouTube Kids profiles source inventory - 2026-11-02
+
+Current combined unique manifest references: 49
+
+| `manifest.json` | 72 | 38 | 6 | 49 | 14 |
+| `manifest.chrome.json` | 72 | 38 | 6 | 49 | 14 |
+| `manifest.firefox.json` | 81 | 49 | 5 | 45 | 14 |
+| `manifest.opera.json` | 71 | 37 | 7 | 49 | 13 |
+
+Firefox's background scripts add `js/shared/kids_youtube_profiles.js` and `js/kids_youtube_profiles_background.js`; Chromium service workers load them through `importScripts`. The page functions run on demand through the existing `scripting` permission. No permission, host or content-script change.

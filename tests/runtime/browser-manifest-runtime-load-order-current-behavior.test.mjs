@@ -118,7 +118,7 @@ function trackedFiles() {
 }
 
 test('browser manifest current source inventory is pinned independently of historical May snapshot', () => {
-  const expected = [["manifest.json", 162, 5630, "e3fb4474be24b84b4b742597f895c63324ba3dbf4de34e23815ff211e0cf7a04"],["manifest.chrome.json", 162, 5630, "e3fb4474be24b84b4b742597f895c63324ba3dbf4de34e23815ff211e0cf7a04"],["manifest.firefox.json", 136, 4731, "1e39bd87f254257cf8e274bfd7ee397628f995a8b8828bb0fa484dd333980d35"],["manifest.opera.json", 170, 5819, "d5c29a055e6454aba5aed3f65da4de8bba9d98e2bfbec76071fa9887b206d037"]];
+  const expected = [["manifest.json", 162, 5630, "e3fb4474be24b84b4b742597f895c63324ba3dbf4de34e23815ff211e0cf7a04"],["manifest.chrome.json", 162, 5630, "e3fb4474be24b84b4b742597f895c63324ba3dbf4de34e23815ff211e0cf7a04"],["manifest.firefox.json", 136, 4811, "e9c73602d52997c19ac7ee24581f596ea4a764423ce5e61fae89d50969e1d68e"],["manifest.opera.json", 170, 5819, "d5c29a055e6454aba5aed3f65da4de8bba9d98e2bfbec76071fa9887b206d037"]];
   const doc = read(docPath).split('## Native Source Handoff Load Order - 2026-10-22')[1];
   assert.ok(doc, 'current review must distinguish historical claims');
   for (const [file, lines, size, hash] of expected) {
@@ -193,7 +193,7 @@ test('normal, embedded and Google preview paths retain explicit browser-specific
       assert.deepEqual(entry.css || [],[]);
     }
     if (firefox) {
-      assert.deepEqual(manifest.background.scripts,["js/shared/identity.js","js/content/admission_overlay.js","js/imported_channel_enrichment.js","js/shared/saved_video_notes.js","js/shared/local_playlists.js","js/video_notes_store.js","js/video_notes_background.js","js/local_playlists_store.js","js/personal_sync.js","js/device_auto_sync.js","js/auto_sync_wakeup.js","js/background.js"]);
+      assert.deepEqual(manifest.background.scripts,["js/shared/identity.js","js/content/admission_overlay.js","js/imported_channel_enrichment.js","js/shared/saved_video_notes.js","js/shared/local_playlists.js","js/shared/kids_youtube_profiles.js","js/video_notes_store.js","js/video_notes_background.js","js/local_playlists_store.js","js/kids_youtube_profiles_background.js","js/personal_sync.js","js/device_auto_sync.js","js/auto_sync_wakeup.js","js/background.js"]);
       assert.equal(manifest.browser_specific_settings.gecko.id,'filtertube@devanshvarshney.com');
       assert.deepEqual(manifest.browser_specific_settings.gecko.data_collection_permissions.required,['none']);
       assert.equal(manifest.browser_specific_settings.gecko_android.strict_min_version,'109.0');

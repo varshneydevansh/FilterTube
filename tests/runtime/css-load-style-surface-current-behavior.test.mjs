@@ -124,12 +124,12 @@ const cssRows = [
   [
     "css/popup.css",
     "active extension popup CSS",
-    1259,
-    32376,
-    "c388d39fab962528365711baa0bfe953ed84ca660ac6123571f79b2c4be820c5",
-    197,
+    1325,
+    33895,
+    "da90e7288eca25b5bcf667d6fd51a500f424c2e89e462f543df9c39de7405cfb",
+    206,
     5,
-    3,
+    4,
     0,
     0,
     0,
@@ -156,12 +156,12 @@ const cssRows = [
   [
     "css/tab-view.css",
     "active extension dashboard CSS",
-    5784,
-    145377,
-    "29f581698f473e74936917089764b2df40a9f1a3f83984a284ad7f6826cec8b8",
-    848,
+    5896,
+    147639,
+    "492dcbc8747f29572ea804d407e7064fc7aeaf5ab4e9d2bf0f4002900d34b46d",
+    865,
     25,
-    22,
+    23,
     0,
     0,
     0,
@@ -274,11 +274,11 @@ test('CSS load style surface register is audit-only and covers every tracked CSS
   }
 
   assert.deepEqual(totals, {
-  "lines": 21869,
-  "bytes": 620765,
-  "rules": 3183,
+  "lines": 22047,
+  "bytes": 624546,
+  "rules": 3209,
   "important": 623,
-  "displayNone": 87,
+  "displayNone": 89,
   "notVisible": 72,
   "visible": 167,
   "hidden": 6,
@@ -286,8 +286,8 @@ test('CSS load style surface register is audit-only and covers every tracked CSS
   "keyframes": 9,
   "hiddenAttr": 20
 });
-  assert.match(doc, /12 CSS files, 21,869 counted source lines/);
-  assert.match(doc, /620,765 bytes, 3,183 lexical rule blocks/);
+  assert.match(doc, /12 CSS files, 22,047 counted source lines/);
+  assert.match(doc, /624,546 bytes, 3,209 lexical rule blocks/);
   assert.match(doc, /615 `!important` declarations, 76\s+`display:none` declarations/);
 });
 

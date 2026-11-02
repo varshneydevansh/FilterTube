@@ -33,9 +33,9 @@ const releaseFixStatusDoc = fs.readFileSync(
 );
 const expectedFamilyTotals = new Map([
   ['Build/sync scripts', { files: 5, count: 75 }],
-  ['Hot page/background runtime', { files: 13, count: 3931 }],
-  ['Content helper runtime', { files: 25, count: 860 }],
-  ['UI/settings runtime', { files: 33, count: 4029 }],
+  ['Hot page/background runtime', { files: 14, count: 3949 }],
+  ['Content helper runtime', { files: 26, count: 896 }],
+  ['UI/settings runtime', { files: 33, count: 4049 }],
   ['Generated/quarantined UI', { files: 6, count: 153 }],
   ['Vendor bundles', { files: 3, count: 279 }],
   ['Audit/test lane scripts', { files: 25, count: 517 }],
@@ -254,8 +254,8 @@ test('audit meta index docs carry the method proof gap blocker', () => {
 
 test('all-callable index accounts for every tracked JS JSX and MJS source file', () => {
   const files = trackedJsFiles();
-  assert.equal(files.length, 141);
-  assert.match(indexDoc, /current tracked JS\/JSX\/MJS files: 141/);
+  assert.equal(files.length, 143);
+  assert.match(indexDoc, /current tracked JS\/JSX\/MJS files: 143/);
 
   for (const file of files) {
     docRow(file);
@@ -272,8 +272,8 @@ test('all-callable index counts match current lexical callable source', () => {
     assert.equal(documented, actual, `${file} callable count should match current source`);
   }
 
-  assert.equal(total, 9993);
-  assert.match(indexDoc, /current repo-wide lexical callables: 9993/);
+  assert.equal(total, 10067);
+  assert.match(indexDoc, /current repo-wide lexical callables: 10067/);
 });
 
 test('all-callable family totals match the documented file rows', () => {
@@ -461,7 +461,7 @@ test('all-callable index documents semantic method proof boundary', () => {
     });
   }
 
-  assert.equal(total, 9993);
+  assert.equal(total, 10067);
   assert.deepEqual(methodTotals, expectedFamilyTotals);
 
   for (const authority of [
@@ -825,7 +825,7 @@ test('all-callable index documents semantic method proof boundary', () => {
   const ioManager = source('js/io_manager.js');
   assert.match(ioManager, /async function importV3\(json, options = \{\}\) \{/);
   assert.match(ioManager, /return coordinator\.run\(\(\) => importV3Unlocked\(json, options\), options\.nanahStorageLockToken \?\? null\);/);
-  assert.match(ioManager, /async function importV3Unlocked\(json, \{ strategy = 'merge', scope = 'auto', auth = null, targetProfileId = null, beforeProfileWrite = null \} = \{\}\) \{/);
+  assert.match(ioManager, /async function importV3Unlocked\(json, \{ strategy = 'merge', scope = 'auto', auth = null, targetProfileId = null, beforeProfileWrite = null, adoptKidsPersonaLinks = false \} = \{\}\) \{/);
   assert.match(ioManager, /result = shouldTouchLegacyV3\s*\? await SettingsAPI\.saveSettings\(payload\)/);
   assert.match(ioManager, /await saveProfilesV3\(nextProfiles\)/);
   assert.match(ioManager, /await saveProfilesV4\(\{/);

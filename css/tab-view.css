@@ -5782,3 +5782,115 @@ html[data-theme="dark"] .video-filter-compact-option:has(.video-filter-compact-r
     color: var(--ft-color-text-secondary);
     font-size: 0.82rem;
 }
+
+/* YouTube Kids profiles in Kids Mode. Colours come from the page tone tokens. */
+.kids-yt-profiles {
+    margin: 0 0 1.25rem;
+}
+
+.kids-yt-profiles__header {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 1rem;
+}
+
+.kids-yt-profiles__header > .btn-secondary {
+    flex: none;
+    white-space: nowrap;
+}
+
+.kids-yt-profiles__help,
+.kids-yt-profiles__status,
+.kids-yt-profiles__note {
+    margin: 0.35rem 0 0;
+    color: var(--ft-color-text-secondary);
+    font-size: 0.86rem;
+    line-height: 1.5;
+}
+
+.kids-yt-profiles__status:empty {
+    display: none;
+}
+
+.kids-yt-profiles__tiles {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(11rem, 1fr));
+    gap: 0.75rem;
+    margin: 0.75rem 0 0;
+    padding: 0;
+    list-style: none;
+}
+
+.kids-yt-profiles__tile {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.35rem;
+    padding: 1rem 0.75rem;
+    border: 1px solid var(--ft-color-sem-neutral-border);
+    border-radius: 1rem;
+    background: var(--ft-color-bg-surface);
+    text-align: center;
+}
+
+.kids-yt-profiles__tile.is-selected {
+    background: var(--ft-color-brand-subtle);
+}
+
+.kids-yt-profiles__avatar {
+    width: 3.5rem;
+    height: 3.5rem;
+    border-radius: 50%;
+    object-fit: cover;
+}
+
+.kids-yt-profiles__avatar--initial {
+    display: grid;
+    place-items: center;
+    background: var(--ft-color-brand-subtle);
+    color: var(--ft-color-brand-primary);
+    font-size: 1.4rem;
+    font-weight: 700;
+}
+
+.kids-yt-profiles__name {
+    color: var(--ft-color-text-primary);
+}
+
+.kids-yt-profiles__meta {
+    min-height: 1.2em;
+    color: var(--ft-color-text-secondary);
+    font-size: 0.8rem;
+}
+
+.kids-yt-profiles__watch {
+    margin-top: 0.25rem;
+}
+
+.kids-yt-profiles__links {
+    display: grid;
+    gap: 0.5rem;
+    margin-top: 1rem;
+}
+
+.kids-yt-profiles__link-row {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.6rem;
+    padding: 0.6rem 0.8rem;
+    border: 1px solid var(--ft-color-sem-neutral-border);
+    border-radius: 0.8rem;
+}
+
+.kids-yt-profiles__link-label {
+    flex: 1 1 12rem;
+    color: var(--ft-color-text-primary);
+    font-weight: 600;
+}
+
+.kids-yt-profiles__select {
+    width: auto;
+    min-width: 10rem;
+}

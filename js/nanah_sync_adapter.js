@@ -2026,7 +2026,7 @@
         const normalizedScope = normalizeScope(scope);
         const payload = (normalizedScope === 'main' || normalizedScope === 'kids')
             ? (managedPortable || await buildScopedPortablePayload(io, normalizedScope))
-            : (managedPortable || await io.exportV3({ scope: normalizedScope, auth }));
+            : (managedPortable || await io.exportV3({ scope: normalizedScope, auth, includeKidsPersonaLinks: true }));
         return {
             app: APP_ID,
             scope: normalizedScope,
@@ -2148,7 +2148,9 @@
             scope: effectiveScope,
             auth,
             targetProfileId,
-            beforeProfileWrite
+            beforeProfileWrite,
+            // Device sync keeps YouTube Kids profile links (as on Android); manual backups never do.
+            adoptKidsPersonaLinks: true
         });
     }
 

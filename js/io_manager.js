@@ -20,6 +20,7 @@
     const DEFAULT_PROFILE_ID = 'default';
     const SAVED_NOTES_KEY = 'ftSavedVideoNotesV1';
     const LOCAL_PLAYLISTS_KEY = 'ftLocalPlaylistsV1';
+    const KIDS_PERSONA_LINKS_KEY = 'kidsPersonaLinks';
 
     /** Returns a timestamp in ms (kept inline so tests can stub). */
     function nowTs() {
@@ -2207,7 +2208,7 @@
         return result;
     }
 
-    async function exportV3({ scope = 'auto', auth = null } = {}) {
+    async function exportV3({ scope = 'auto', auth = null, includeKidsPersonaLinks = false } = {}) {
         const SettingsAPI = global.FilterTubeSettings || {};
         if (typeof SettingsAPI.loadSettings !== 'function') {
             throw new Error('FilterTubeSettings.loadSettings not available');
@@ -2300,6 +2301,12 @@
             profileId: exportProfileId,
             profileName: exportProfileName
         });
+        if (payload.profilesV4) {
+            const exportedIds = Object.keys(safeObject(payload.profilesV4.profiles));
+            payload.profilesV4[KIDS_PERSONA_LINKS_KEY] = includeKidsPersonaLinks
+                ? kidsLinksFor(profilesV4?.[KIDS_PERSONA_LINKS_KEY], exportedIds)
+                : { schemaVersion: 1, links: [] };
+        }
         return attachBackupPrivateData(payload, Object.keys(safeObject(payload.profilesV4?.profiles)));
     }
 
@@ -2429,6 +2436,17 @@
         return counts;
     }
 
+    /**
+     * YouTube Kids profile links live in profilesV4.kidsPersonaLinks. Like the Android app, they travel in
+     * Nanah device sync but not in manual backups: backups carry an empty list so strict readers still parse.
+     */
+    function kidsLinksFor(value, profileIds) {
+        const contract = global.FilterTubeKidsYouTubeProfiles;
+        if (contract) return contract.retaining(value, profileIds);
+        const ids = new Set(profileIds);
+        return { schemaVersion: 1, links: safeArray(safeObject(value).links).filter(link => ids.has(normalizeString(link?.profileId))) };
+    }
+
     /** Adds the exported profiles' notes and playlists to a backup, when there are any. */
     async function attachBackupPrivateData(payload, profileIds) {
         if (!profileIds.length) return payload;
@@ -2457,7 +2475,7 @@
         return coordinator.run(() => importV3Unlocked(json, options), options.nanahStorageLockToken ?? null);
     }
 
-    async function importV3Unlocked(json, { strategy = 'merge', scope = 'auto', auth = null, targetProfileId = null, beforeProfileWrite = null } = {}) {
+    async function importV3Unlocked(json, { strategy = 'merge', scope = 'auto', auth = null, targetProfileId = null, beforeProfileWrite = null, adoptKidsPersonaLinks = false } = {}) {
         json = convertAppProfileBackup(json);
         const parsed = normalizeIncomingV3(json);
         if (!parsed.ok) {
@@ -2959,12 +2977,18 @@
 
             if (typeof beforeProfileWrite === 'function') await beforeProfileWrite(targetProfileId);
             importMutationStarted = true;
-            requireStorageSuccess(await saveProfilesV4({
+            const nextProfilesV4 = {
                 ...nextV4,
                 schemaVersion: 4,
                 activeProfileId: writeActiveId,
                 profiles
-            }), 'Active profile write');
+            };
+            // A backup never brings YouTube Kids links; this device keeps its own for the remaining profiles.
+            delete nextProfilesV4[KIDS_PERSONA_LINKS_KEY];
+            if (localProfilesV4BeforeImport && Object.prototype.hasOwnProperty.call(localProfilesV4BeforeImport, KIDS_PERSONA_LINKS_KEY)) {
+                nextProfilesV4[KIDS_PERSONA_LINKS_KEY] = kidsLinksFor(localProfilesV4BeforeImport[KIDS_PERSONA_LINKS_KEY], Object.keys(profiles));
+            }
+            requireStorageSuccess(await saveProfilesV4(nextProfilesV4), 'Active profile write');
         }
 
         if (shouldTouchLegacyV3 && parsed.theme && SettingsAPI.setThemePreference) {
@@ -3032,6 +3056,16 @@
             privateDataMapping[incomingSourceProfileId] = importedTargetProfileId;
         }
         const privateDataCounts = await mergeBackupPrivateData(backupPrivateData, privateDataMapping);
+        const incomingKidsLinks = safeObject(parsed.profilesV4)[KIDS_PERSONA_LINKS_KEY];
+        if (adoptKidsPersonaLinks === true && incomingKidsLinks && global.FilterTubeKidsYouTubeProfiles) {
+            // Nanah device sync carries links through the same profile mapping; the newer link wins per profile.
+            const current = await loadProfilesV4();
+            const adopted = global.FilterTubeKidsYouTubeProfiles.adopt(current?.[KIDS_PERSONA_LINKS_KEY], incomingKidsLinks,
+                privateDataMapping, Object.keys(safeObject(current?.profiles)));
+            if (JSON.stringify(adopted) !== JSON.stringify(current?.[KIDS_PERSONA_LINKS_KEY])) {
+                requireStorageSuccess(await saveProfilesV4({ ...current, [KIDS_PERSONA_LINKS_KEY]: adopted }), 'YouTube Kids links write');
+            }
+        }
 
         const migrationReport = safeObject(parsed.migrationReport);
         const skippedRows = safeArray(migrationReport.invalid).length

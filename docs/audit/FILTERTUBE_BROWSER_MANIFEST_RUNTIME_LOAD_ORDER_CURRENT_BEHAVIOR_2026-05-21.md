@@ -258,5 +258,5 @@ audit boundaries and open installed/security/native gates remain unchanged.
 | --- | ---: | ---: | --- |
 | `manifest.json` | 162 | 5630 | `e3fb4474be24b84b4b742597f895c63324ba3dbf4de34e23815ff211e0cf7a04` |
 | `manifest.chrome.json` | 162 | 5630 | `e3fb4474be24b84b4b742597f895c63324ba3dbf4de34e23815ff211e0cf7a04` |
-| `manifest.firefox.json` | 136 | 4731 | `1e39bd87f254257cf8e274bfd7ee397628f995a8b8828bb0fa484dd333980d35` |
+| `manifest.firefox.json` | 136 | 4811 | `e9c73602d52997c19ac7ee24581f596ea4a764423ce5e61fae89d50969e1d68e` |
 | `manifest.opera.json` | 170 | 5819 | `d5c29a055e6454aba5aed3f65da4de8bba9d98e2bfbec76071fa9887b206d037` |

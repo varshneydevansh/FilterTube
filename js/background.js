@@ -1220,7 +1220,7 @@ const browserAPI = IS_FIREFOX ? browser : chrome;
 // Private Notes modules are browser-only; never forwarded to MAIN or native assets.
 try {
     if (typeof importScripts === 'function' && !globalThis.FilterTubeVideoNotesBackground) {
-        importScripts('shared/saved_video_notes.js', 'shared/local_playlists.js', 'video_notes_store.js', 'video_notes_background.js', 'local_playlists_store.js', 'personal_sync.js', 'device_auto_sync.js', 'auto_sync_wakeup.js');
+        importScripts('shared/saved_video_notes.js', 'shared/local_playlists.js', 'shared/kids_youtube_profiles.js', 'video_notes_store.js', 'video_notes_background.js', 'local_playlists_store.js', 'kids_youtube_profiles_background.js', 'personal_sync.js', 'device_auto_sync.js', 'auto_sync_wakeup.js');
     }
     globalThis.FilterTubeVideoNotesBackground?.install({
         api: browserAPI,
@@ -1278,6 +1278,21 @@ try {
         authorizeSync: authorizePersonalPlaylistsSync
     }) || null;
 } catch (_) { personalPlaylistsStore = null; }
+// YouTube Kids profiles: extension pages only, active profile unlocked, links read from ftProfilesV4.
+let kidsYouTubeProfiles = null;
+try {
+    kidsYouTubeProfiles = globalThis.FilterTubeKidsYouTubeProfilesBackground?.install({
+        api: browserAPI,
+        readProfilesV4: async () => (await new Promise(resolve => browserAPI.storage.local.get(['ftProfilesV4'], resolve)))?.ftProfilesV4 || null,
+        isTrustedSender: sender => isTrustedUiSender(sender),
+        isProfileAuthorized: async (profilesV4, profileId) => isProfileSessionAuthorized(profilesV4, profileId)
+    }) || null;
+} catch (_) { kidsYouTubeProfiles = null; }
+function handleKidsYouTubeProfiles(request, sender, respond) {
+    if (!kidsYouTubeProfiles) { respond({ ok: false, error: 'unavailable' }); return false; }
+    kidsYouTubeProfiles.handle(request, sender).then(respond).catch(() => respond({ ok: false, error: 'failed' }));
+    return true;
+}
 function handlePersonalPlaylistsSync(request, sender, respond) {
     const action = request?.action;
     if (action !== 'FilterTube_PersonalPlaylistsRead' && action !== 'FilterTube_PersonalPlaylistsMerge') return false;
@@ -5058,6 +5073,9 @@ browserAPI.runtime.onMessage.addListener(function (request, sender, sendResponse
     if (action === 'FilterTube_AutoSyncAuthorize') return handleAutoSyncAuthorization(request, sender, sendResponse);
     if (action === 'FilterTube_PersonalPlaylistsRead' || action === 'FilterTube_PersonalPlaylistsMerge') {
         return handlePersonalPlaylistsSync(request, sender, sendResponse);
+    }
+    if (action === 'FilterTube_KidsProfilesRoster' || action === 'FilterTube_KidsProfilesSwitch') {
+        return handleKidsYouTubeProfiles(request, sender, sendResponse);
     }
 
     if (IMPORTED_CHANNEL_ENRICHMENT_ACTIONS.has(action)) {

@@ -222,8 +222,8 @@ lexical and its scope remains tracked JS/JSX/MJS: CJS/Python tooling requires it
 separate release/workflow review and is not silently counted as JavaScript here.
 
 ```text
-current tracked JS/JSX/MJS files: 141
-current repo-wide lexical callables: 9993
+current tracked JS/JSX/MJS files: 143
+current repo-wide lexical callables: 10067
 current complete per-callable semantic proofs: 0
 current callable behavior-change approval: NO-GO
 runtime behavior changed by inventory refresh: no
@@ -232,9 +232,9 @@ runtime behavior changed by inventory refresh: no
 | Family | Files | Lexical callables |
 | --- | ---: | ---: |
 | Build/sync scripts | 5 | 75 |
-| Hot page/background runtime | 13 | 3931 |
-| Content helper runtime | 25 | 860 |
-| UI/settings runtime | 33 | 4029 |
+| Hot page/background runtime | 14 | 3949 |
+| Content helper runtime | 26 | 896 |
+| UI/settings runtime | 33 | 4049 |
 | Generated/quarantined UI | 6 | 153 |
 | Vendor bundles | 3 | 279 |
 | Audit/test lane scripts | 25 | 517 |
@@ -243,10 +243,12 @@ runtime behavior changed by inventory refresh: no
 | File | Family | Lexical callables | Audit status |
 | --- | --- | ---: | --- |
 | `js/content/video_notes.js` | Content helper runtime | 26 | helper counted; semantic proof incomplete |
+| `js/shared/kids_youtube_profiles.js` | Content helper runtime | 36 | helper counted; semantic proof incomplete |
 | `js/shared/local_playlists.js` | Content helper runtime | 40 | helper counted; semantic proof incomplete |
 | `js/shared/saved_video_notes.js` | Content helper runtime | 20 | helper counted; semantic proof incomplete |
 | `js/video_notes_background.js` | Hot page/background runtime | 18 | helper counted; semantic proof incomplete |
 | `js/video_notes_editor.js` | UI/settings runtime | 25 | helper counted; semantic proof incomplete |
+| `js/kids_youtube_profiles_background.js` | Hot page/background runtime | 15 | helper counted; semantic proof incomplete |
 | `js/local_playlists_store.js` | Hot page/background runtime | 7 | helper counted; semantic proof incomplete |
 | `js/video_notes_store.js` | Hot page/background runtime | 13 | helper counted; semantic proof incomplete |
 | `js/auto_sync_queue.js` | UI/settings runtime | 33 | helper counted; semantic proof incomplete |
@@ -259,7 +261,7 @@ runtime behavior changed by inventory refresh: no
 | `js/nanah_pairing_ui.js` | UI/settings runtime | 6 | helper counted; semantic proof incomplete |
 | `js/profile_preference_defaults.js` | UI/settings runtime | 14 | helper counted; semantic proof incomplete |
 | `build.js` | Build/sync scripts | 68 | release-audited first pass |
-| `js/background.js` | Hot page/background runtime | 586 | hot runtime mapped |
+| `js/background.js` | Hot page/background runtime | 589 | hot runtime mapped |
 | `js/content/admission_overlay.js` | Content helper runtime | 25 | helper counted; semantic proof incomplete |
 | `js/content/block_channel.js` | Hot page/background runtime | 234 | hot runtime mapped |
 | `js/content/bridge_injection.js` | Content helper runtime | 14 | helper counted |
@@ -288,7 +290,7 @@ runtime behavior changed by inventory refresh: no
 | `js/filter_logic.js` | Hot page/background runtime | 375 | hot runtime mapped |
 | `js/imported_channel_enrichment.js` | UI/settings runtime | 81 | UI/settings counted; semantic proof incomplete |
 | `js/injector.js` | Hot page/background runtime | 352 | hot runtime mapped |
-| `js/io_manager.js` | UI/settings runtime | 225 | UI/settings counted |
+| `js/io_manager.js` | UI/settings runtime | 228 | UI/settings counted |
 | `js/layout.js` | Generated/quarantined UI | 52 | quarantined/generated boundary |
 | `js/managed_admin_authority.js` | UI/settings runtime | 18 | UI/settings counted |
 | `js/managed_parent_command_center.js` | UI/settings runtime | 78 | UI/settings counted |
@@ -299,7 +301,7 @@ runtime behavior changed by inventory refresh: no
 | `js/nanah_qr_scanner.js` | UI/settings runtime | 15 | UI/settings counted; semantic proof incomplete |
 | `js/nanah_storage_lock.js` | UI/settings runtime | 3 | UI/settings counted; semantic proof incomplete |
 | `js/nanah_sync_adapter.js` | UI/settings runtime | 208 | UI/settings counted |
-| `js/popup.js` | UI/settings runtime | 170 | UI/settings counted |
+| `js/popup.js` | UI/settings runtime | 173 | UI/settings counted |
 | `js/render_engine.js` | UI/settings runtime | 171 | UI/settings counted |
 | `js/rule_list_import_reports.js` | UI/settings runtime | 38 | UI/settings counted; semantic proof incomplete |
 | `js/security_manager.js` | UI/settings runtime | 18 | UI/settings counted |
@@ -310,7 +312,7 @@ runtime behavior changed by inventory refresh: no
 | `js/shared/identity.js` | Content helper runtime | 110 | helper counted |
 | `js/shared/view_count.js` | Content helper runtime | 4 | helper counted; semantic proof incomplete |
 | `js/state_manager.js` | UI/settings runtime | 180 | UI/settings counted |
-| `js/tab-view.js` | UI/settings runtime | 2158 | UI/settings counted |
+| `js/tab-view.js` | UI/settings runtime | 2172 | UI/settings counted |
 | `js/ui-shell/popup-shell.js` | Generated/quarantined UI | 45 | generated output boundary |
 | `js/ui-shell/tab-view-decor.js` | Generated/quarantined UI | 41 | generated output boundary |
 | `js/ui_components.js` | UI/settings runtime | 65 | UI/settings counted |

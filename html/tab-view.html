@@ -466,6 +466,20 @@
                                 <p class="kids-header-desc">Keep the youngest surface calmer with the same profile-aware control system, tuned for family-safe viewing.</p>
                             </div>
                         </section>
+                        <section class="card kids-yt-profiles" id="kidsYouTubeProfiles" aria-labelledby="kidsYouTubeProfilesTitle">
+                            <div class="card-header kids-yt-profiles__header">
+                                <div>
+                                    <h3 id="kidsYouTubeProfilesTitle">YouTube Kids profiles</h3>
+                                    <p class="kids-yt-profiles__help">Your children's profiles on youtubekids.com. Link a FilterTube profile to one, and switching to that profile picks that child on YouTube Kids.</p>
+                                </div>
+                                <button type="button" class="btn-secondary" id="kidsYouTubeProfilesLoad">Show profiles</button>
+                            </div>
+                            <div class="card-body">
+                                <p class="kids-yt-profiles__status" id="kidsYouTubeProfilesStatus" aria-live="polite"></p>
+                                <ul class="kids-yt-profiles__tiles" id="kidsYouTubeProfilesTiles"></ul>
+                                <div class="kids-yt-profiles__links" id="kidsYouTubeProfilesLinks"></div>
+                            </div>
+                        </section>
                         <div id="kidsTabsContainer"></div>
                     </div>
                 </div>
@@ -2765,6 +2779,7 @@
     <script src="../js/nanah_managed_open_sync.js"></script>
     <script src="../js/shared/saved_video_notes.js"></script>
     <script src="../js/shared/local_playlists.js"></script>
+    <script src="../js/shared/kids_youtube_profiles.js"></script>
     <script src="../js/auto_sync_queue.js"></script>
     <script src="../js/managed_auto_sync.js"></script>
     <script src="../js/personal_sync.js"></script>

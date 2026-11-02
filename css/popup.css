@@ -1257,3 +1257,69 @@ html[data-theme="dark"] .video-filter-range input {
     border-color: var(--ft-color-sem-neutral-border-dark);
     color: var(--ft-color-text-primary-dark);
 }
+
+/* YouTube Kids profiles on youtubekids.com. Colours come from the page tone tokens. */
+.ft-popup-kids-profiles {
+    margin: 0.5rem 0;
+    padding: 0.7rem 0.8rem;
+    border: 1px solid var(--ft-color-sem-neutral-border);
+    border-radius: 1rem;
+    background: var(--ft-color-bg-surface);
+}
+
+.ft-popup-kids-profiles__title {
+    margin: 0 0 0.5rem;
+    color: var(--ft-color-text-primary);
+    font-size: 0.82rem;
+    font-weight: 700;
+}
+
+.ft-popup-kids-profiles__chips {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.4rem;
+}
+
+.ft-popup-kids-profiles__chip {
+    padding: 0.35rem 0.75rem;
+    border: 1px solid var(--ft-color-sem-neutral-border);
+    border-radius: 999px;
+    background: transparent;
+    color: var(--ft-color-brand-primary);
+    font: inherit;
+    font-size: 0.8rem;
+    cursor: pointer;
+}
+
+.ft-popup-kids-profiles__chip.is-selected {
+    background: var(--ft-color-brand-subtle);
+    color: var(--ft-color-text-primary);
+    cursor: default;
+}
+
+.ft-popup-kids-profiles__chip:disabled:not(.is-selected) {
+    opacity: 0.6;
+    cursor: not-allowed;
+}
+
+.ft-popup-kids-profiles__status {
+    margin: 0.4rem 0 0;
+    color: var(--ft-color-text-secondary);
+    font-size: 0.76rem;
+}
+
+.ft-popup-kids-profiles__status:empty {
+    display: none;
+}
+
+.ft-popup-kids-profiles__manage {
+    margin-top: 0.4rem;
+    padding: 0;
+    border: 0;
+    background: none;
+    color: var(--ft-color-brand-primary);
+    font: inherit;
+    font-size: 0.78rem;
+    text-decoration: underline;
+    cursor: pointer;
+}
