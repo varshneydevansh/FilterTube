@@ -4642,5 +4642,9 @@
   "Review BlockTube export": {
     "kind": "text",
     "line": 577
+  },
+  "This backup only restores into FilterTube. Moving rules to BlockTube? Use Export for BlockTube below instead.": {
+    "kind": "text",
+    "line": 617
   }
 }

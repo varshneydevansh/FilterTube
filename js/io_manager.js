@@ -1720,6 +1720,9 @@
                 mappedOptions: Object.keys(safeObject(parsed.mainSettings)).filter(key => key !== 'contentFilters').length,
                 durationFilters: parsed.mainSettings?.contentFilters?.duration?.enabled === true ? 1 : 0
             },
+            durationFilter: parsed.mainSettings?.contentFilters?.duration
+                ? { ...parsed.mainSettings.contentFilters.duration }
+                : null,
             channelEntries: safeArray(parsed.mainChannels).map((entry, index) => ({
                 id: normalizeString(entry?.id),
                 name: normalizeString(entry?.name),
@@ -2057,6 +2060,75 @@
             else if (row.scope !== 'comment') add('title', value);
             if (row.scope === 'comment' || row.comments === true) add('comment', value);
         };
+        // BlockTube's channelName list is tested against the label a renderer
+        // shows for the channel (display name on most cards, @handle on
+        // comments and Shorts). Without a verified UC ID, keep the channel as
+        // an anchored, case-insensitive, whole-label regex so that a name such
+        // as "뉴스" cannot hide "뉴스 하이라이트" or titles. A known @handle is
+        // added as a second alternative; it only matches where YouTube shows
+        // the handle as the channel label, which the review reports.
+        const matchedByName = [];
+        const exactChannelNameRule = (row) => {
+            const clean = value => {
+                let text = normalizeString(value);
+                if (/%[0-9A-Fa-f]{2}/.test(text)) {
+                    try { text = decodeURIComponent(text); } catch (error) { /* keep the stored text */ }
+                }
+                return text.normalize('NFC').replace(/\s+/g, ' ').trim();
+            };
+            const looksLikeIdentifier = value => !value || /[\r\n]/.test(value) || /^UC[\w-]{22}$/.test(value)
+                || /:\/\/|(^|\.)youtube\.com\/|^\/?(channel|c|user)\//i.test(value);
+            const name = clean(row.name);
+            const handleSource = clean(row.handle) || (/^@[^\s/]+$/.test(clean(row.originalInput)) ? clean(row.originalInput) : '');
+            const handle = handleSource && !/[\s/]/.test(handleSource)
+                ? (handleSource.startsWith('@') ? handleSource : `@${handleSource}`) : '';
+            const labels = [...new Set([name, handle].filter(value => !looksLikeIdentifier(value)))];
+            if (!labels.length) return null;
+            const escapeLabel = label => label.replace(/[.*+?^${}()|[\]\\/]/g, '\\$&').replace(/ /g, '\\s+');
+            const pattern = `^\\s*(?:${labels.map(escapeLabel).join('|')})\\s*$`;
+            try {
+                return { value: `/${new RegExp(pattern, 'iu').source}/iu`, labels, handleOnly: !labels.includes(name) };
+            } catch (error) {
+                return null;
+            }
+        };
+        // Inverse of parseBlockTube's vidLength mapping. FilterTube compares
+        // fractional minutes; BlockTube compares whole seconds, so lower bounds
+        // round up and upper bounds round down (identical for whole-second
+        // video lengths). Shapes BlockTube cannot express are reported.
+        const exportDurationFilter = (rule) => {
+            const finite = value => { const number = Number(value); return Number.isFinite(number) ? number : 0; };
+            let min = finite(rule.minMinutes ?? rule.minutes ?? rule.valueMinutes ?? rule.minutesMin ?? rule.value ?? 0);
+            let max = finite(rule.maxMinutes ?? rule.minutesMax ?? rule.valueMinutesMax ?? 0);
+            if ((min <= 0 || max <= 0) && typeof rule.value === 'string') {
+                const range = rule.value.trim().match(/^(\d+(?:\.\d+)?)\s*-\s*(\d+(?:\.\d+)?)$/);
+                if (range) {
+                    if (min <= 0) min = parseFloat(range[1]);
+                    if (max <= 0) max = parseFloat(range[2]);
+                }
+            }
+            if (max > 0 && min > max) [min, max] = [max, min];
+            const seconds = minutes => Math.round(minutes * 60 * 1e6) / 1e6;
+            const condition = rule.condition || 'between';
+            if (condition === 'between') {
+                if (!(max > 0)) return null;
+                const low = Math.max(0, Math.ceil(seconds(min))), high = Math.floor(seconds(max));
+                if (high <= 0 || low > high) return null;
+                return { vidLength: [low, high], type: rule.mode === 'block' ? 'block' : 'allow' };
+            }
+            // Longer/shorter default to block; their allow form has no
+            // BlockTube equivalent that round-trips.
+            if (rule.mode === 'allow' || !(min > 0)) return null;
+            if (condition === 'shorter') {
+                const low = Math.ceil(seconds(min));
+                return low > 0 ? { vidLength: [low, null], type: 'allow' } : null;
+            }
+            if (condition === 'longer') {
+                const high = Math.floor(seconds(min));
+                return high > 0 ? { vidLength: [null, high], type: 'allow' } : null;
+            }
+            return null;
+        };
         const channelsKey = surface === 'kids' ? 'blockedChannels' : 'channels';
         const keywordsKey = surface === 'kids' ? 'blockedKeywords' : 'keywords';
         for (const field of [channelsKey, keywordsKey, 'videoIds']) {
@@ -2078,7 +2150,15 @@
                 else omit(field, 'invalid_channel_name_rule', index, name);
             } else {
                 const ids = [row.id, ...safeArray(row.alternateIds)].filter(value => typeof value === 'string' && /^UC[\w-]{22}$/.test(value));
-                if (!ids.length) omit(field, 'unresolved_channel_id', index, normalizeString(row.handle || row.customUrl || row.name || row.originalInput));
+                if (!ids.length) {
+                    const nameRule = exactChannelNameRule(row);
+                    if (nameRule) {
+                        add('channelName', nameRule.value);
+                        matchedByName.push({ field, index, labels: nameRule.labels, handleOnly: nameRule.handleOnly, value: nameRule.value });
+                    } else {
+                        omit(field, 'unresolved_channel_id', index, normalizeString(row.handle || row.customUrl || row.name || row.originalInput));
+                    }
+                }
                 ids.forEach(value => add('channelId', value));
                 if (row.collaborationGroupId || safeArray(row.collaborationWith).length || safeArray(row.allCollaborators).length) {
                     omit(field, 'collaboration_metadata_not_supported', index);
@@ -2105,9 +2185,24 @@
         if (safeArray(selected.subscriptions).length) omit(`${surface}.subscriptions`, 'subscription_metadata_not_supported');
         if (selected.mode === 'whitelist') omit(`${surface}.mode`, 'whitelist_mode_not_supported');
         if (selected.mode && !['blocklist', 'whitelist'].includes(selected.mode)) omit(`${surface}.mode`, 'unknown_list_mode');
+        let duration = null;
+        const durationPrefix = surface === 'kids' ? `${surface}.contentFilters` : 'settings.contentFilters';
+        const durationRule = safeObject(safeObject(surface === 'kids' ? selected.contentFilters : settings.contentFilters).duration);
+        if (durationRule.enabled === true) {
+            duration = exportDurationFilter(durationRule);
+            if (duration) {
+                filterData.vidLength = duration.vidLength;
+                options.vidLength_type = duration.type;
+            }
+        }
         const reportFilterSettings = (filters, prefix) => {
             for (const [name, rule] of Object.entries(safeObject(filters))) {
-                if (rule === true || safeObject(rule).enabled === true) omit(`${prefix}.${name}`, 'setting_not_supported');
+                if (!(rule === true || safeObject(rule).enabled === true)) continue;
+                if (prefix === durationPrefix && name === 'duration') {
+                    if (!duration) omit(`${prefix}.${name}`, 'duration_condition_not_supported');
+                    continue;
+                }
+                omit(`${prefix}.${name}`, 'setting_not_supported');
             }
         };
         for (const field of ['contentFilters', 'categoryFilters', 'languageFilters']) {
@@ -2140,12 +2235,25 @@
         ];
         if (surface === 'kids') warnings.push('These are the selected YouTube Kids rules, but BlockTube does not provide a separate YouTube Kids profile or protection context.');
         if (settings.syncKidsToMain === true && surface === 'main') omit('settings.syncKidsToMain', 'kids_rules_not_merged_into_main_export');
+        if (matchedByName.some(row => row.handleOnly)) {
+            warnings.push('Channels known only by @handle are matched by that handle, which BlockTube sees only where YouTube shows the handle as the channel name (for example comments and Shorts).');
+        }
+        // Allow-only profiles still have blocked rules, which FilterTube keeps
+        // enforcing; export those and report the mode itself as omitted. An
+        // allow-only profile with no blocked rules stays non-exportable:
+        // BlockTube import replaces its rules, so an empty file would only
+        // erase the receiving BlockTube setup.
+        const allowOnlyMode = selected.mode === 'whitelist';
+        const hasContent = ruleCount > 0 || duration !== null || Object.values(options).some(value => value === true);
         return {
             payload: { filterData, options, uiPass: '' },
             report: {
                 format: 'blocktube', compatibilityVersion: '0.4.8', profileId,
                 profileName: normalizeString(profile.name) || profileId, surface, counts, unsupported, warnings,
-                canExport: (!selected.mode || selected.mode === 'blocklist') && (ruleCount > 0 || Object.values(options).some(value => value === true))
+                matchedByName: matchedByName.map(({ field, index, labels, handleOnly }) => ({ field, index, labels, handleOnly })),
+                duration: duration ? { vidLength: duration.vidLength.slice(), vidLength_type: duration.type } : null,
+                allowOnlyMode,
+                canExport: (!selected.mode || selected.mode === 'blocklist' || allowOnlyMode) && hasContent
             }
         };
     }

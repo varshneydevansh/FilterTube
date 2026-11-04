@@ -242,3 +242,63 @@ test('refresh lets the master choose every profile and clears stale options on a
   assert.equal(f.profile.options.length, 0);
   assert.equal(f.profile.value, '');
 });
+
+test('review lists channels matched by exact name and the exported duration filter (#80)', async () => {
+  const f = fixture({ report: {
+    counts: { channelName: 2 },
+    matchedByName: [{ field: 'main.channels', index: 0, labels: ['뉴스 채널', '@newschannel'], handleOnly: false },
+      { field: 'main.channels', index: 1, labels: ['@한국어채널'], handleOnly: true }],
+    duration: { vidLength: [120, 600], vidLength_type: 'allow' }
+  } });
+  await f.box.runBlockTubeExport();
+  const details = f.calls.reviews[0].details;
+  assert.ok(details.some(item => /exact channel name.*: 2 — 뉴스 채널 \/ @newschannel, @한국어채널/.test(item)), details.join('\n'));
+  assert.ok(details.some(item => item === 'Duration filter: hide videos shorter than 120 or longer than 600 seconds'));
+  assert.equal(f.calls.exports[0].acceptUnsupported, false, 'name-matched channels are transferred, not omitted');
+  assert.equal(f.calls.downloads.length, 1);
+  assertFinished(f);
+});
+
+for (const [duration, expected] of [
+  [{ vidLength: [90, 1200], vidLength_type: 'block' }, 'Duration filter: block videos from 90 to 1200 seconds long'],
+  [{ vidLength: [180, null], vidLength_type: 'allow' }, 'Duration filter: hide videos shorter than 180 seconds'],
+  [{ vidLength: [null, 900], vidLength_type: 'allow' }, 'Duration filter: hide videos longer than 900 seconds']
+]) {
+  test(`review describes BlockTube duration ${JSON.stringify(duration.vidLength)} ${duration.vidLength_type}`, async () => {
+    const f = fixture({ report: { duration } });
+    await f.box.runBlockTubeExport();
+    assert.ok(f.calls.reviews[0].details.includes(expected));
+  });
+}
+
+test('allow-only mode is listed as omitted, and an allow-only profile without blocked rules explains why nothing downloads', async () => {
+  const withRules = fixture({ report: { allowOnlyMode: true, unsupported: [{ field: 'main.mode', reason: 'whitelist_mode_not_supported' }] } });
+  await withRules.box.runBlockTubeExport();
+  assert.ok(withRules.calls.reviews[0].details.some(item => item === 'Not transferred: Allow-only mode is not supported by BlockTube and was omitted (1)'));
+  assert.equal(withRules.calls.downloads.length, 1);
+  const empty = fixture({ report: { allowOnlyMode: true, canExport: false, counts: {}, unsupported: [{ field: 'main.mode', reason: 'whitelist_mode_not_supported' }] } });
+  await empty.box.runBlockTubeExport();
+  assert.equal(empty.calls.reviews[0].choices.length, 0);
+  assert.match(empty.calls.reviews[0].details[0], /allow-only mode.*no blocked rules.*BlockTube rules stay as they are/);
+  assert.equal(empty.calls.downloads.length, 0);
+  assertFinished(empty);
+});
+
+test('the full FilterTube backup export points BlockTube users to the BlockTube-compatible export', () => {
+  const html = fs.readFileSync(new URL('../../html/tab-view.html', import.meta.url), 'utf8');
+  const backup = html.indexOf('id="ftExportV3Btn"'), hint = html.indexOf('id="ftExportV3BlockTubeHint"'), blockTube = html.indexOf('id="ftBlockTubeExportDetails"');
+  assert.ok(hint > 0 && hint < backup && backup < blockTube, 'the hint sits with the normal backup, above the BlockTube export');
+  assert.match(html.slice(hint, backup), /only restores into FilterTube[\s\S]*Export for BlockTube/);
+  const staticSource = JSON.parse(fs.readFileSync(new URL('../../data/ui_locales/en_static.json', import.meta.url), 'utf8'));
+  assert.ok(Object.hasOwn(staticSource, 'This backup only restores into FilterTube. Moving rules to BlockTube? Use Export for BlockTube below instead.'));
+});
+
+test('every BlockTube export UI key has English source copy', () => {
+  const english = JSON.parse(fs.readFileSync(new URL('../../data/ui_locales/en.json', import.meta.url), 'utf8'));
+  const keys = new Set([...source.matchAll(/tabViewUiText\('(blockTubeExport\.[\w.]+)'/g)].map(match => match[1]));
+  for (const reason of source.slice(source.indexOf('function blockTubeOmissionLabel'), source.indexOf('async function runBlockTubeExport')).matchAll(/^\s+(\w+): '/gm)) {
+    if (!['views', 'duration', 'uploadDate', 'uppercase', 'enabled'].includes(reason[1])) keys.add(`blockTubeExport.reason.${reason[1]}`);
+  }
+  assert.ok(keys.size > 30);
+  for (const key of keys) assert.equal(typeof english[key], 'string', key);
+});
