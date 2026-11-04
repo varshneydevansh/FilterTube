@@ -2,6 +2,49 @@
 
 ## Unreleased
 
+No additional changes recorded after the 3.5.0 release.
+
+## Version 3.5.0 — Android TV, YouTube Kids Profiles, Playlist Sync And Filtering Fixes
+
+November 5, 2026. Extension changes since v3.4.2, released together with the
+FilterTube 3.5.0 apps for Android phones, tablets and, new in this release,
+Android TV. Real-browser checks for the issue fixes below are still open.
+
+### Dashboard and popup
+
+- **The sidebar follows the apps.** The dashboard sidebar lists the same
+  controls as the apps' Control Center, in the same order: Dashboard, Filters,
+  Content Controls, Kids Mode, Settings, Time limits, Backup & restore,
+  Accounts & Sync, Profiles & PIN, What's New, Help, About and Donate. Each row
+  shows a live summary and whether it is locked.
+- **The original dashboard is back, refreshed.** The hero, FilterTube apps
+  section, stat cards, Quick Actions, support card and app preview return, with
+  frosted panels over the scenic background. The apps section says Android
+  phones, tablets and Android TV share one Google Play listing.
+- **Per-page colour tones.** Every controls page carries the same tone as the
+  Android app (Filters amber, Kids Mode pink, Settings sage, Accounts & Sync
+  sky), in light and dark. The popup's scenic video returns behind a scrim; it
+  starts after the first paint and stops when the system asks for reduced
+  motion.
+
+### YouTube Kids
+
+- **YouTube Kids profiles.** Kids Mode lists the YouTube Kids profiles under the
+  signed-in parent, switches between them the way youtubekids.com does, and can
+  link each one to a FilterTube profile.
+- **Parent account switcher.** Change the YouTube Kids parent with YouTube Kids'
+  own Google sign-in; nothing signs anyone out, and the parent's e-mail is shown
+  but never stored or logged.
+
+### Playlists and sync
+
+- **Local playlists sync and back up.** FilterTube local playlists from the apps
+  now have a home in the extension: they sync between your devices with
+  personal Auto-sync, merge exactly as on Android, and are included in backups.
+  Notes exported from the apps can be imported.
+- **Large playlists sync.** A playlists sync message may now be up to 2 MiB on
+  every platform, so long lists no longer fail to send.
+
 ### Android TV app
 
 - **FilterTube for Android TV / Google TV.** The 3.5.0 app adds a remote-first

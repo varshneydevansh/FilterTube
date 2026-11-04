@@ -3,6 +3,24 @@
     "_comment": "Shared release notes source for the dashboard What's New tab and the YouTube release banner. Keep entries sorted newest-first by version."
   },
   {
+    "version": "3.5.0",
+    "headline": "Android TV, YouTube Kids profiles and filtering fixes",
+    "summary": "FilterTube 3.5.0 brings the apps to Android TV, adds YouTube Kids profile switching, syncs local playlists between devices and fixes filtering for Korean, Japanese and Chinese keywords, view counts and autoplay.",
+    "bannerSummary": "Android TV app, YouTube Kids profiles, playlist sync and filtering fixes.",
+    "highlights": [
+      "FilterTube for Android TV and Google TV: Home, Search, Subscriptions, You and Watch built for the remote, with profiles, PINs, Kids controls and filters. Phones, tablets and TVs share one Google Play listing.",
+      "Switch between YouTube Kids profiles, link each one to a FilterTube profile, and change the YouTube Kids parent account with its own Google sign-in.",
+      "Local playlists sync between your devices with personal Auto-sync and are included in backups. Large playlists now send.",
+      "Korean, Japanese and Chinese keywords match inside sentences, and minimum views reads counts such as 조회수 1.2천회 and 1,2 Mio. Aufrufe.",
+      "In Allow only selected mode, allowed videos still pass your view, duration, date, category and language filters.",
+      "Cards stay visible and tappable while their category loads, and a video that already passed your rules is not paused again when you return to it.",
+      "When autoplay picks a blocked video, FilterTube points it at the next allowed one. An optional setting can also skip past blocked autoplay videos, up to 3 times.",
+      "The BlockTube export keeps channels without an ID, carries the duration filter and exports allow-only profiles' blocked rules.",
+      "The dashboard sidebar follows the apps' controls, with per-page colour tones in light and dark."
+    ],
+    "detailsUrl": "https://github.com/varshneydevansh/FilterTube/releases/tag/v3.5.0"
+  },
+  {
     "version": "3.4.2",
     "headline": "Simpler device sync, video Notes and playback fixes",
     "summary": "Preview release with clearer device pairing, opt-in Auto-sync, private video Notes, filtering fixes and safer preference resets. Installed-device checks remain open.",
