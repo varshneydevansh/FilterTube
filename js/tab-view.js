@@ -32239,19 +32239,19 @@ document.addEventListener('DOMContentLoaded', async () => {
         });
     }
 
-    // ---- Control Center: sidebar summaries, profile header, status strip, tiles and apps ----
-    // Mirrors the apps' Control Center (FilterTubeApp CONTROLS_IA_ALL_FORM_FACTORS.md §1–2): one destination
-    // list, a live status line per destination, and the same lock reasons the router enforces.
+    // ---- Sidebar summaries and the apps card ----
+    // The sidebar mirrors the apps' category list (FilterTubeApp CONTROLS_IA_ALL_FORM_FACTORS.md §1–2): a live
+    // status line per destination and the same lock reasons the router enforces.
     const FILTERTUBE_PLAY_LISTING = 'https://play.google.com/store/apps/details?id=com.filtertube.app';
     // One Google Play listing covers phone, tablet and TV. Flip a platform's status here when it ships.
     const FILTERTUBE_APP_PLATFORMS = Object.freeze([
         { id: 'android', status: 'available', variant: 'android', icon: '../assets/images/Android_icon.png', href: FILTERTUBE_PLAY_LISTING,
             kicker: ['apps.android.kicker', 'Android phone and tablet'],
-            body: ['apps.android.body', 'One Google Play listing for phone, tablet and TV, with the complete custom Main and Kids viewing experience.'],
+            body: ['apps.android.body', 'The complete custom Main and Kids viewing experience, more feature-rich than the direct APK.'],
             cta: ['apps.android.cta', 'Install from Google Play'] },
-        { id: 'android-tv', status: 'coming_soon', variant: 'android', icon: '../assets/images/Android_icon.png', href: FILTERTUBE_PLAY_LISTING,
+        { id: 'android-tv', status: 'available', variant: 'android', icon: '../assets/images/Android_icon.png', href: FILTERTUBE_PLAY_LISTING,
             kicker: ['apps.tv.kicker', 'Android TV'],
-            body: ['apps.tv.body', 'The same Google Play listing as phone and tablet. No separate app to install.'],
+            body: ['apps.tv.body', 'The same Google Play listing, installed on your Android TV.'],
             cta: ['apps.android.cta', 'Install from Google Play'] },
         { id: 'ios', status: 'coming_soon', variant: 'ios', icon: '../assets/images/App_Store_transparent.png', href: 'https://www.filtertube.in/downloads',
             kicker: ['apps.ios.kicker', 'iPhone and iPad'],
@@ -32259,47 +32259,8 @@ document.addEventListener('DOMContentLoaded', async () => {
             body: ['apps.ios.body', 'The native Apple build is being finalized. Apple Developer account access is delaying TestFlight availability and will be resolved as soon as possible.'],
             cta: ['apps.ios.cta', 'View status'], ctaWhileComingSoon: true }
     ]);
-    // The apps' tile order (§1); several tiles open a part of a section.
-    const CONTROL_CENTER_TILES = Object.freeze([
-        { id: 'filters', view: 'filters', title: ['navigation.filters', 'Filters'] },
-        { id: 'content', view: 'filters', target: 'content', icon: 'content', title: ['dashboard.filterTabs.contentControls', 'Content Controls'] },
-        { id: 'kids', view: 'kids', title: ['navigation.kids', 'Kids Mode'] },
-        { id: 'settings', view: 'settings', title: ['navigation.settings', 'Settings'] },
-        { id: 'timeLimits', view: 'settings', target: 'selfControl', icon: 'clock', title: ['dashboard.sync.scope.timeLimits', 'Time limits'] },
-        { id: 'backup', view: 'settings', target: 'importExport', icon: 'backup', title: ['controls.tile.backup', 'Backup & restore'] },
-        { id: 'sync', view: 'sync', title: ['navigation.sync', 'Accounts & Sync'] },
-        { id: 'profiles', view: 'sync', target: 'profiles', icon: 'profiles', title: ['controls.tile.profiles', 'Profiles & PIN'] },
-        { id: 'whatsnew', view: 'whatsnew', title: ['navigation.whatsNew', 'What’s New'] },
-        { id: 'help', view: 'help', title: ['navigation.help', 'Help'] },
-        { id: 'about', view: 'about', title: ['navigation.about', 'About'] },
-        { id: 'donate', view: 'donate', title: ['navigation.donate', 'Donate'], hiddenForChild: true }
-    ]);
-    const CONTROL_CENTER_ICON_PATHS = Object.freeze({
-        content: ['M3 4h18v16H3z', 'M7 8h10', 'M7 12h6', 'M7 16h8'],
-        clock: ['M12 22a10 10 0 1 0 0-20 10 10 0 0 0 0 20z', 'M12 6v6l4 2'],
-        backup: ['M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4', 'M7 10l5 5 5-5', 'M12 15V3'],
-        profiles: ['M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2', 'M9 11a4 4 0 1 0 0-8 4 4 0 0 0 0 8z', 'M19 11v6', 'M22 14h-6']
-    });
-    const controlCenterTileNodes = new Map();
     let controlCenterAppsRendered = false;
     const ccText = (entry, values) => tabViewUiText(entry[0], entry[1], values);
-
-    function controlCenterIcon(tile) {
-        if (!tile.icon) {
-            const svg = document.querySelector(`.nav-item[data-tab="${tile.view}"] .nav-icon svg`);
-            if (svg) return svg.cloneNode(true);
-        }
-        const ns = 'http://www.w3.org/2000/svg';
-        const svg = document.createElementNS(ns, 'svg');
-        for (const [name, value] of [['width', '24'], ['height', '24'], ['viewBox', '0 0 24 24'], ['fill', 'none'], ['stroke', 'currentColor'],
-            ['stroke-width', '2'], ['stroke-linecap', 'round'], ['stroke-linejoin', 'round'], ['aria-hidden', 'true']]) svg.setAttribute(name, value);
-        for (const d of CONTROL_CENTER_ICON_PATHS[tile.icon] || []) {
-            const path = document.createElementNS(ns, 'path');
-            path.setAttribute('d', d);
-            svg.appendChild(path);
-        }
-        return svg;
-    }
 
     /** The same rule the router enforces (resolveViewAccess), as a lock line. Null when the view opens. */
     function controlCenterLockFor(viewId) {
@@ -32319,20 +32280,16 @@ document.addEventListener('DOMContentLoaded', async () => {
         const state = StateManager.getState() || {};
         const main = getDashboardCounts('main', state);
         const kids = getDashboardCounts('kids', state);
-        const mainStats = getDashboardSurfaceStats('main', state);
-        const hidden = mainStats?.hiddenCount || 0;
-        const saved = formatSavedTime(mainStats?.savedSeconds || 0);
+        const hidden = getDashboardSurfaceStats('main', state)?.hiddenCount || 0;
         const devices = new Set((Array.isArray(nanahTrustedLinks) ? nanahTrustedLinks : [])
             .filter(link => link && !['revoked', 'keyRevoked'].some(key => link[key] === true || link.policy?.[key] === true))
             .map(link => normalizeString(link.remoteDeviceId)).filter(Boolean)).size;
-        const contentOn = Object.entries(state).filter(([key, value]) => /^(hide|disable)[A-Z]/.test(key) && value === true).length;
         return {
-            state, main, kids, hidden, saved, devices, contentOn,
+            state, main, kids, hidden, devices,
             mainMode: state.mode === 'whitelist' ? 'whitelist' : 'blocklist',
             kidsMode: state.kids?.mode === 'whitelist' ? 'whitelist' : 'blocklist',
             autoBackup: state.autoBackupEnabled === true,
             selfControl: isSelfControlSessionActive() ? formatSelfControlRemaining(selfControlSessionState?.remainingSeconds) : null,
-            profiles: Object.keys(safeObject(profilesV4Cache?.profiles)).length || 1,
             version: manifestVersion
         };
     }
@@ -32343,22 +32300,16 @@ document.addEventListener('DOMContentLoaded', async () => {
         switch (id) {
             case 'dashboard': return tabViewUiText('controls.summary.hiddenToday', 'Hidden today: {count}', { count: data.hidden });
             case 'filters': return rules(data.main);
-            case 'content': return tabViewUiText('controls.summary.contentOn', 'Turned on: {count}', { count: data.contentOn });
             case 'kids': return tabViewUiText('controls.summary.kids', '{mode} · Channels: {channels}',
                 { mode: controlCenterModeLabel(data.kidsMode), channels: data.kids.channelCount || 0 });
             case 'settings': return data.selfControl
                 ? tabViewUiText('controls.summary.selfControlLeft', 'Self-Control: {remaining}', { remaining: data.selfControl })
                 : (data.autoBackup ? tabViewUiText('controls.summary.autoBackupOn', 'Auto backup on') : tabViewUiText('controls.summary.autoBackupOff', 'Auto backup off'));
-            case 'timeLimits': return data.selfControl
-                ? tabViewUiText('controls.summary.selfControlLeft', 'Self-Control: {remaining}', { remaining: data.selfControl })
-                : tabViewUiText('family.commandCenter.detail.off', 'Off');
-            case 'backup': return data.autoBackup ? tabViewUiText('controls.summary.autoBackupOn', 'Auto backup on') : tabViewUiText('controls.summary.autoBackupOff', 'Auto backup off');
             case 'sync': return data.devices
                 ? (data.devices === 1
                     ? tabViewUiText('family.commandCenter.trustMap.oneVerifiedDevice', '{count} verified device', { count: 1 })
                     : tabViewUiText('family.commandCenter.trustMap.manyVerifiedDevices', '{count} verified devices', { count: data.devices }))
                 : tabViewUiText('controls.summary.noDevices', 'No devices yet');
-            case 'profiles': return tabViewUiText('controls.summary.profiles', 'Profiles: {count}', { count: data.profiles });
             case 'whatsnew': return data.version ? tabViewUiText('controls.summary.version', 'Version {version}', { version: data.version }) : '';
             case 'help': return tabViewUiText('controls.summary.help', 'Guides and answers');
             case 'about': return tabViewUiText('controls.summary.about', 'Who builds FilterTube');
@@ -32367,7 +32318,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         }
     }
 
-    async function openControlCenterDestination(view, target = '') {
+    async function openControlCenterDestination(view) {
         if (resolveViewAccess(view).reason === 'locked' && resolveViewAccess(view).viewId !== view) {
             // Same prompt as the lock gate; the router still enforces the result.
             const ok = await ensureProfileUnlocked(profilesV4Cache, activeProfileId);
@@ -32375,12 +32326,6 @@ document.addEventListener('DOMContentLoaded', async () => {
             await refreshProfilesUI();
         }
         if (typeof window.switchView === 'function') window.switchView(view);
-        if (resolveViewAccess(view).viewId !== view) return;
-        const scrollTo = node => node && requestAnimationFrame(() => node.scrollIntoView({ behavior: 'smooth', block: 'start' }));
-        if (target === 'content') document.querySelector('#filtersView [data-tab-id="content"]')?.click();
-        if (target === 'selfControl') scrollTo(document.querySelector('#settingsView .ft-self-control-card'));
-        if (target === 'importExport') scrollTo(document.getElementById('ftImportExportCard'));
-        if (target === 'profiles') scrollTo(document.getElementById('ftProfilesManager')?.closest('.settings-card'));
     }
 
     function renderControlCenterApps(force = false) {
@@ -32428,79 +32373,23 @@ document.addEventListener('DOMContentLoaded', async () => {
     function renderControlCenter() {
         let data;
         try { data = controlCenterData(); } catch (e) { return; }
-        const root = safeObject(profilesV4Cache);
-        const childProfile = getActiveProfileType() === 'child';
-
         document.querySelectorAll('.nav-item[data-tab]').forEach(item => {
             const tab = normalizeString(item.getAttribute('data-tab'));
             const summary = item.querySelector('.nav-summary');
             const lockLine = item.querySelector('.nav-lock');
-            if (summary) summary.textContent = controlCenterSummary(tab, data);
+            if (summary) {
+                summary.textContent = controlCenterSummary(tab, data);
+                summary.title = summary.textContent;
+            }
             const lock = tab === 'dashboard' ? null : controlCenterLockFor(tab);
             if (lockLine) { lockLine.textContent = lock || ''; lockLine.hidden = !lock; }
             if (item.classList.contains('active')) item.setAttribute('aria-current', 'page'); else item.removeAttribute('aria-current');
         });
 
-        const avatar = document.getElementById('ftControlCenterAvatar');
-        const name = document.getElementById('ftControlCenterProfileName');
-        const mode = document.getElementById('ftControlCenterProfileMode');
-        const strip = document.getElementById('ftControlCenterStrip');
-        if (avatar && root.profiles) {
-            const colors = getProfileColors(activeProfileId);
-            avatar.textContent = getProfileInitial(root, activeProfileId);
-            avatar.style.backgroundColor = colors.bg; avatar.style.color = colors.fg;
-        }
-        if (name) name.textContent = root.profiles ? getProfileName(root, activeProfileId) : '';
-        if (mode) {
-            const surface = dashboardStatsSurface === 'kids' ? 'kids' : 'main';
-            mode.textContent = tabViewUiText('controls.header.surfaceMode', '{surface} · {mode}', {
-                surface: surface === 'kids' ? tabViewUiText('family.commandCenter.surface.kids', 'Kids') : tabViewUiText('family.commandCenter.surface.main', 'Main'),
-                mode: controlCenterModeLabel(surface === 'kids' ? data.kidsMode : data.mainMode)
-            });
-        }
-        if (strip) {
-            strip.textContent = isUiLocked() && !childProfile && !isSelfControlSessionActive()
-                ? tabViewUiText('controls.strip.locked', 'Profile locked')
-                : tabViewUiText('controls.strip', 'Main · Channels: {mainChannels} · Keywords: {mainKeywords} · Hidden today: {hidden} · Time saved: {saved} · Kids · Channels: {kidsChannels} · Keywords: {kidsKeywords}', {
-                    mainChannels: data.main.channelCount || 0, mainKeywords: data.main.keywordCount || 0, hidden: data.hidden, saved: data.saved,
-                    kidsChannels: data.kids.channelCount || 0, kidsKeywords: data.kids.keywordCount || 0
-                });
-        }
-
-        const tilesHost = document.getElementById('ftControlCenterTiles');
-        if (tilesHost) {
-            for (const tile of CONTROL_CENTER_TILES) {
-                let node = controlCenterTileNodes.get(tile.id);
-                if (!node) {
-                    const item = document.createElement('li');
-                    const button = document.createElement('button');
-                    button.type = 'button'; button.className = 'ft-cc-tile'; button.dataset.tile = tile.id;
-                    const icon = document.createElement('span'); icon.className = 'ft-cc-tile__icon'; icon.appendChild(controlCenterIcon(tile));
-                    const title = document.createElement('span'); title.className = 'ft-cc-tile__title'; title.textContent = ccText(tile.title);
-                    const status = document.createElement('span'); status.className = 'ft-cc-tile__status';
-                    const lock = document.createElement('span'); lock.className = 'ft-cc-tile__lock'; lock.hidden = true;
-                    button.append(icon, title, status, lock);
-                    button.addEventListener('click', () => { openControlCenterDestination(tile.view, tile.target).catch(() => {}); });
-                    item.appendChild(button);
-                    tilesHost.appendChild(item);
-                    node = { item, title, status, lock };
-                    controlCenterTileNodes.set(tile.id, node);
-                }
-                node.title.textContent = ccText(tile.title);
-                node.item.hidden = !!(tile.hiddenForChild && childProfile);
-                node.status.textContent = controlCenterSummary(tile.id, data);
-                const lockText = controlCenterLockFor(tile.view);
-                node.lock.textContent = lockText || ''; node.lock.hidden = !lockText;
-            }
-        }
         renderControlCenterApps();
     }
 
     (function installControlCenter() {
-        document.getElementById('ftControlCenterSwitchProfile')?.addEventListener('click', () => {
-            ftProfileBadgeBtnTab?.focus();
-            ftProfileBadgeBtnTab?.click();
-        });
         // Rows are keyboard stops: Enter or Space selects, like a click.
         document.querySelectorAll('.nav-item[data-tab]').forEach(item => {
             item.addEventListener('keydown', event => {

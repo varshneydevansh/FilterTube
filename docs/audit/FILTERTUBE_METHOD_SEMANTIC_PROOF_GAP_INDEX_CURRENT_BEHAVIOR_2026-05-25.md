@@ -960,7 +960,7 @@ separate release/workflow review and is not silently counted as JavaScript here.
 
 ```text
 current tracked JS/JSX/MJS files: 143
-current repo-wide lexical callables: 10119
+current repo-wide lexical callables: 10110
 current complete per-callable semantic proofs: 0
 current callable behavior-change approval: NO-GO
 runtime behavior changed by inventory refresh: no
@@ -971,7 +971,7 @@ runtime behavior changed by inventory refresh: no
 | Build/sync scripts | 5 | 75 |
 | Hot page/background runtime | 14 | 3958 |
 | Content helper runtime | 26 | 910 |
-| UI/settings runtime | 33 | 4078 |
+| UI/settings runtime | 33 | 4069 |
 | Generated/quarantined UI | 6 | 153 |
 | Vendor bundles | 3 | 279 |
 | Audit/test lane scripts | 25 | 517 |
@@ -1049,7 +1049,7 @@ runtime behavior changed by inventory refresh: no
 | `js/shared/identity.js` | Content helper runtime | 110 | `semantic proof incomplete` | Lexical accounting only; no complete per-callable closure claimed. |
 | `js/shared/view_count.js` | Content helper runtime | 4 | `semantic proof incomplete` | Lexical accounting only; no complete per-callable closure claimed. |
 | `js/state_manager.js` | UI/settings runtime | 180 | `semantic proof incomplete` | Lexical accounting only; no complete per-callable closure claimed. |
-| `js/tab-view.js` | UI/settings runtime | 2201 | `semantic proof incomplete` | Lexical accounting only; no complete per-callable closure claimed. |
+| `js/tab-view.js` | UI/settings runtime | 2192 | `semantic proof incomplete` | Lexical accounting only; no complete per-callable closure claimed. |
 | `js/ui-shell/popup-shell.js` | Generated/quarantined UI | 45 | `semantic proof incomplete` | Lexical accounting only; no complete per-callable closure claimed. |
 | `js/ui-shell/tab-view-decor.js` | Generated/quarantined UI | 41 | `semantic proof incomplete` | Lexical accounting only; no complete per-callable closure claimed. |
 | `js/ui_components.js` | UI/settings runtime | 65 | `semantic proof incomplete` | Lexical accounting only; no complete per-callable closure claimed. |
