@@ -78,7 +78,9 @@ test('build script can stage mobile artifacts with sha256 but interactive releas
   const build = read('build.js');
 
   assert.match(build, /MOBILE_ARTIFACT_FILE_RE/);
-  assert.match(build, /FilterTube-mobile-tablet-v/);
+  assert.match(build, /FilterTube-\(mobile-tablet\|TV\)-v/);
+  assert.match(build, /### 📺 Android TV \/ Google TV/);
+  assert.match(build, /SHA256SUMS\.txt/);
   assert.match(build, /fs\.writeFileSync\(checksumPath, `\$\{sha256File\(targetPath\)\}  \$\{fileName\}\\n`/);
   assert.match(build, /Non-interactive terminal detected; skipping release prompt/);
   assert.match(build, /Publish GitHub release v\$\{version\}\?/);
@@ -168,4 +170,34 @@ test('website home and browser-logo surfaces currently carry public performance 
   assert.match(routeContent, /cdnjs\.cloudflare\.com\/ajax\/libs\/browser-logos/);
   assert.match(logoRail, /src=\{browser\.logo\}/);
   assert.doesNotMatch(routeContent, /\/assets\/images\/browser-logos/);
+});
+
+test('release staging picks the latest phone/tablet and TV builds separately', () => {
+  const build = read('build.js');
+  const re = build.match(/const MOBILE_ARTIFACT_FILE_RE = (\/.*\/);/)[1];
+  const helpers = build.slice(build.indexOf('function parseMobileArtifactName('), build.indexOf('function describeAvailableMobileArtifacts('))
+    + build.slice(build.indexOf('// Phone/tablet and TV keep separate'), build.indexOf('function sha256File('));
+  const context = {};
+  vm.createContext(context);
+  vm.runInContext(`const MOBILE_ARTIFACT_FILE_RE = ${re};\n${helpers}\nthis.parse = parseMobileArtifactName; this.select = selectLatestMobileArtifacts;`, context);
+
+  assert.deepEqual({ ...context.parse('FilterTube-TV-v3.5.0-code1030500-release.aab') },
+    { platform: 'tv', version: '3.5.0', code: 1030500, variant: 'release', extension: 'aab' });
+  assert.equal(context.parse('FilterTube-mobile-tablet-v3.5.0-code30500-release.apk').platform, 'mobile');
+  assert.equal(context.parse('FilterTube-Fire-TV-v3.5.0-code30500-release.apk'), null);
+
+  const picked = context.select([
+    'FilterTube-mobile-tablet-v3.5.0-code30499-release.aab',
+    'FilterTube-mobile-tablet-v3.5.0-code30500-release.aab',
+    'FilterTube-mobile-tablet-v3.5.0-code30500-release.apk',
+    'FilterTube-TV-v3.5.0-code30500-debug.apk',
+    'FilterTube-TV-v3.5.0-code1030500-release.aab',
+    'FilterTube-TV-v3.5.0-code1030500-release.apk',
+  ]);
+  assert.deepEqual([...picked], [
+    'FilterTube-mobile-tablet-v3.5.0-code30500-release.aab',
+    'FilterTube-mobile-tablet-v3.5.0-code30500-release.apk',
+    'FilterTube-TV-v3.5.0-code1030500-release.aab',
+    'FilterTube-TV-v3.5.0-code1030500-release.apk',
+  ]);
 });

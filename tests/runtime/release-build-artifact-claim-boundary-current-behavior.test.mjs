@@ -189,7 +189,7 @@ test('release build artifact claim boundary records current package and release 
   assert.match(build, /execSync\('node scripts\/build-extension-ui\.mjs', \{ stdio: 'inherit' \}\)/);
   assert.match(build, /await updateReadmeBadges\(VERSION\)/);
   assert.match(build, /archive\.glob\('\*\*\/\*'/);
-  assert.match(build, /MOBILE_ARTIFACT_FILE_RE = \/\^FilterTube-mobile-tablet-v/);
+  assert.match(build, /MOBILE_ARTIFACT_FILE_RE = \/\^FilterTube-\(mobile-tablet\|TV\)-v/);
   assert.match(build, /resolveMobileArtifactPromptDir\(sourceDir, defaultDir\)/);
   assert.match(build, /sha256File\(targetPath\)/);
   assert.match(build, /'--draft'/);

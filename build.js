@@ -32,9 +32,13 @@ const COMMON_DIRS = ['_locales', 'js', 'css', 'html', 'icons', 'data', 'assets']
 const COMMON_FILES = ['README.md', 'CHANGELOG.md', 'LICENSE'];
 const REPO_OWNER = 'varshneydevansh';
 const REPO_NAME = 'FilterTube';
-const MOBILE_ARTIFACT_FILE_RE = /^FilterTube-mobile-tablet-v([0-9][A-Za-z0-9._-]*)-code([0-9]+)-(release|debug)\.(apk|aab)$/;
+// Google Play phone/tablet (`FilterTube-mobile-tablet-v…`) and Android TV (`FilterTube-TV-v…`)
+// release files. Both are built by FilterTubeApp into one folder; TV codes are base + 1,000,000.
+const MOBILE_ARTIFACT_FILE_RE = /^FilterTube-(mobile-tablet|TV)-v([0-9][A-Za-z0-9._-]*)-code([0-9]+)-(release|debug)\.(apk|aab)$/;
 const LOCAL_MOBILE_ARTIFACTS_DIR = path.join('release-artifacts', 'mobile');
-const SIBLING_APP_MOBILE_ARTIFACTS_DIR = path.resolve(__dirname, '..', 'FilterTubeApp', 'release-artifacts', 'android-mobile-tablet');
+const SIBLING_APP_MOBILE_ARTIFACTS_DIR = path.resolve(__dirname, '..', 'FilterTubeApp', 'release-artifacts', 'android');
+// Builds before 3.5.0 wrote phone/tablet files here.
+const SIBLING_APP_LEGACY_MOBILE_ARTIFACTS_DIR = path.resolve(__dirname, '..', 'FilterTubeApp', 'release-artifacts', 'android-mobile-tablet');
 const TEXT_LOC_EXTENSIONS = new Set([
     '.js',
     '.jsx',
@@ -187,6 +191,18 @@ async function buildTargets() {
     }
 
     const mobileArtifactPaths = await maybeCollectMobileArtifacts(VERSION);
+    const releaseAssetPaths = [...zipPaths, ...mobileArtifactPaths];
+    if (releaseAssetPaths.length) {
+        // One list of every downloadable asset, beside each file's own .sha256.
+        const sumsPath = path.join('dist', 'SHA256SUMS.txt');
+        const sums = releaseAssetPaths
+            .filter(assetPath => !assetPath.endsWith('.sha256'))
+            .map(assetPath => `${sha256File(assetPath)}  ${path.basename(assetPath)}`)
+            .join('\n');
+        fs.writeFileSync(sumsPath, `${sums}\n`, 'utf8');
+        mobileArtifactPaths.push(sumsPath);
+        console.log(`✅ Checksums written: ${sumsPath}`);
+    }
     await maybePromptRelease(VERSION, zipPaths, mobileArtifactPaths);
 }
 
@@ -255,7 +271,7 @@ async function maybeCollectMobileArtifacts(version) {
     }
 
     if (!sourceDir && process.stdout.isTTY) {
-        const include = await promptYesNo(`📱 Attach Android mobile/tablet APK/AAB artifacts to release v${version}? (y/N): `);
+        const include = await promptYesNo(`📱 Attach Android phone/tablet and TV APK/AAB artifacts to release v${version}? (y/N): `);
         if (!include) return [];
         sourceDir = await promptText(`   Artifact directory [${defaultDir}]: `);
         sourceDir = resolveMobileArtifactPromptDir(sourceDir, defaultDir);
@@ -310,9 +326,17 @@ async function maybeCollectMobileArtifacts(version) {
         console.log(`ℹ️  Mobile artifacts: selected v${requestedArtifactVersion} latest versionCode ${latestCode}. Use --all-mobile-artifacts to attach every matching file for this version.`);
     }
 
-    const selectedArtifactSummary = summarizeMobileArtifacts(sourceFiles);
-    if (!selectedArtifactSummary.hasApk || !selectedArtifactSummary.hasAab) {
-        console.warn(`⚠️  Mobile artifacts for v${requestedArtifactVersion} code${selectedArtifactSummary.latestCode || 'unknown'} do not include both APK and AAB files.`);
+    for (const platform of ['mobile', 'tv']) {
+        const platformFiles = sourceFiles.filter(name => parseMobileArtifactName(name)?.platform === platform);
+        const label = platform === 'tv' ? 'Android TV' : 'Phone/tablet';
+        if (!platformFiles.length) {
+            console.warn(`⚠️  No ${label} artifacts for v${requestedArtifactVersion} in ${resolvedSourceDir}.`);
+            continue;
+        }
+        const summary = summarizeMobileArtifacts(platformFiles);
+        if (!summary.hasApk || !summary.hasAab) {
+            console.warn(`⚠️  ${label} artifacts for v${requestedArtifactVersion} code${summary.latestCode || 'unknown'} do not include both APK and AAB files.`);
+        }
     }
 
     const targetDir = path.join('dist', 'mobile');
@@ -348,7 +372,7 @@ function resolveMobileArtifactPromptDir(answer, defaultDir) {
 }
 
 function resolveDefaultMobileArtifactsDir() {
-    const candidates = [SIBLING_APP_MOBILE_ARTIFACTS_DIR, LOCAL_MOBILE_ARTIFACTS_DIR];
+    const candidates = [SIBLING_APP_MOBILE_ARTIFACTS_DIR, SIBLING_APP_LEGACY_MOBILE_ARTIFACTS_DIR, LOCAL_MOBILE_ARTIFACTS_DIR];
     const existing = candidates.find(candidate => {
         const resolved = path.resolve(candidate);
         return fs.existsSync(resolved) && fs.statSync(resolved).isDirectory();
@@ -360,10 +384,11 @@ function parseMobileArtifactName(fileName) {
     const match = String(fileName).match(MOBILE_ARTIFACT_FILE_RE);
     if (!match) return null;
     return {
-        version: match[1],
-        code: Number.parseInt(match[2], 10),
-        variant: match[3],
-        extension: match[4]
+        platform: match[1] === 'TV' ? 'tv' : 'mobile',
+        version: match[2],
+        code: Number.parseInt(match[3], 10),
+        variant: match[4],
+        extension: match[5]
     };
 }
 
@@ -402,10 +427,19 @@ function describeAvailableMobileArtifacts(fileNames) {
         });
 }
 
+// Phone/tablet and TV keep separate versionCode ranges, so pick each one's latest build.
 function selectLatestMobileArtifacts(fileNames) {
-    const latestCode = Math.max(...fileNames.map(extractAndroidVersionCode).filter(Number.isFinite));
-    if (!Number.isFinite(latestCode)) return fileNames;
-    return fileNames.filter(name => extractAndroidVersionCode(name) === latestCode);
+    const latestCodeByPlatform = new Map();
+    for (const name of fileNames) {
+        const parsed = parseMobileArtifactName(name);
+        if (!parsed || !Number.isFinite(parsed.code)) continue;
+        latestCodeByPlatform.set(parsed.platform, Math.max(latestCodeByPlatform.get(parsed.platform) ?? -1, parsed.code));
+    }
+    if (!latestCodeByPlatform.size) return fileNames;
+    return fileNames.filter(name => {
+        const parsed = parseMobileArtifactName(name);
+        return parsed && latestCodeByPlatform.get(parsed.platform) === parsed.code;
+    });
 }
 
 function extractAndroidVersionCode(fileName) {
@@ -583,14 +617,26 @@ function buildReleaseBody({ version, section, previousVersion, mobileArtifactPat
 
     const whatsNew = `## What's New in v${version}\n\n${section.trim()}`;
 
-    const androidApkNames = mobileArtifactPaths
-        .map(assetPath => path.basename(assetPath))
-        .filter(name => name.endsWith('.apk'));
+    const artifactNames = mobileArtifactPaths.map(assetPath => path.basename(assetPath));
+    const phoneArtifactNames = artifactNames.filter(name => parseMobileArtifactName(name)?.platform === 'mobile');
+    const tvArtifactNames = artifactNames.filter(name => parseMobileArtifactName(name)?.platform === 'tv');
+    const androidApkNames = phoneArtifactNames.filter(name => name.endsWith('.apk'));
     const androidApk = androidApkNames.find(name => name.includes('-release.')) || androidApkNames[0];
     const androidApkIsDebug = Boolean(androidApk && androidApk.includes('-debug.'));
-    const androidAab = mobileArtifactPaths
-        .map(assetPath => path.basename(assetPath))
-        .find(name => name.endsWith('.aab'));
+    const androidAab = phoneArtifactNames.find(name => name.endsWith('.aab'));
+    const tvApk = tvArtifactNames.find(name => name.endsWith('-release.apk'));
+    const tvAab = tvArtifactNames.find(name => name.endsWith('-release.aab'));
+    const tvSection = tvApk || tvAab
+        ? [
+            '',
+            '### 📺 Android TV / Google TV',
+            tvApk ? `**TV APK:** [${tvApk}](${releaseAssetLink(tvApk)})` : '',
+            tvApk ? `**Checksum:** [${tvApk}.sha256](${releaseAssetLink(`${tvApk}.sha256`)})` : '',
+            tvAab ? `**Play/App bundle artifact:** [${tvAab}](${releaseAssetLink(tvAab)})` : '',
+            '',
+            'The TV APK installs on Android TV and Google TV devices (sideload with a file manager or `adb install`). It uses the same app ID as the phone app and is the build Google Play serves to TVs. The AAB is for store upload workflows, not normal sideloading.',
+        ].filter(Boolean)
+        : [];
     const mobileArtifactSummaries = mobileArtifactPaths
         .map(assetPath => parseMobileArtifactName(path.basename(assetPath)))
         .filter(Boolean);
@@ -668,6 +714,7 @@ function buildReleaseBody({ version, section, previousVersion, mobileArtifactPat
         '4. Click **Load unpacked**.',
         '5. Select the extracted folder.',
         ...mobileSection,
+        ...tvSection,
         '',
         '---',
         '',
