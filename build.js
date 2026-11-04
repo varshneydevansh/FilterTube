@@ -637,6 +637,9 @@ function buildReleaseBody({ version, section, previousVersion, mobileArtifactPat
             'The TV APK installs on Android TV and Google TV devices (sideload with a file manager or `adb install`). It uses the same app ID as the phone app and is the build Google Play serves to TVs. The AAB is for store upload workflows, not normal sideloading.',
         ].filter(Boolean)
         : [];
+    if (tvSection.length && !/Android TV/i.test(section)) {
+        console.warn(`⚠️  TV files are attached but the v${version} CHANGELOG section never mentions Android TV; say what changed for TV users.`);
+    }
     const mobileArtifactSummaries = mobileArtifactPaths
         .map(assetPath => parseMobileArtifactName(path.basename(assetPath)))
         .filter(Boolean);

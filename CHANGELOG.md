@@ -2,7 +2,19 @@
 
 ## Unreleased
 
-No additional changes recorded after the 3.4.2 preview checkpoint.
+### Android TV app
+
+- **FilterTube for Android TV / Google TV.** The 3.5.0 app adds a remote-first
+  TV experience: Home, Search, Subscriptions, You and Watch with remote focus,
+  profile PINs, Kids controls, filters and FilterTube Controls on the big screen.
+- **One Google Play listing.** The TV app ships under the phone app's ID
+  (`com.filtertube.app`) on Play's Android TV release track, with its own
+  versionCode range (base + 1,000,000), so phones/tablets and TVs each get their
+  own build.
+- **TV files on GitHub releases.** Each release now attaches the TV APK
+  (`FilterTube-TV-v…-release.apk`) for sideloading on Android TV / Google TV,
+  the TV AAB, per-file `.sha256` checksums, and one `SHA256SUMS.txt` covering
+  every asset.
 
 ## Version 3.4.2 — Device Sync, Video Notes And Playback Improvements (Preview)
 

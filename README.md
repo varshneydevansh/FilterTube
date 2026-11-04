@@ -20,7 +20,7 @@ FilterTube is a local-first viewing and filtering project for **Android and desk
 | **Android phone and tablet** | Public custom Main and Kids app on Google Play. No invitation or email needed. | [Google Play](https://play.google.com/store/apps/details?id=com.filtertube.app) · [Android overview](https://filtertube.in/android) |
 | **Browser extension** | Chrome, Firefox and Edge listings; compatible desktop browsers use the appropriate store or manual package. | [Chrome](https://chromewebstore.google.com/detail/filtertube/cjmdggnnpmpchholgnkfokibidbbnfgc) · [Firefox](https://addons.mozilla.org/en-US/firefox/addon/filtertube/) · [Edge](https://microsoftedge.microsoft.com/addons/detail/filtertube/lgeflbmplcmljnhffmoghkoccflhlbem) |
 | **iPhone and iPad** | In development; public TestFlight/App Store access is not available yet. | [iOS status](https://filtertube.in/ios) |
-| **Android TV** | Separate development build; not included in the public phone/tablet listing. Fire TV support is planned. | [TV development](https://filtertube.in/android#android-tv) |
+| **Android TV / Google TV** | Remote-first Main and Kids app from version 3.5.0, on the same Google Play listing as the phone app (TV release subject to Play review). A TV APK is attached to each GitHub release. Fire TV support is planned. | [Android TV](https://filtertube.in/android#android-tv) · [Latest release](https://github.com/varshneydevansh/FilterTube/releases/latest) |
 
 [Latest GitHub release and assets](https://github.com/varshneydevansh/FilterTube/releases/latest) · [All releases](https://github.com/varshneydevansh/FilterTube/releases)
 
