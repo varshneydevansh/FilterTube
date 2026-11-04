@@ -475,6 +475,28 @@ export const androidTvScreens = [
   { src: "/apps/screenshots/android/tv-accounts-sync.webp", title: "Accounts & Sync", alt: "Android TV Accounts and Sync", caption: "Pair the TV with your other devices.", width: 1920, height: 1080 },
 ];
 
+
+// Real Kids Viewing screens from FilterTube 3.5.0 with a YouTube Kids profile.
+export const kidsPhoneScreens = [
+  { src: "/apps/screenshots/android/phone-kids-home.webp", title: "Kids Home", alt: "FilterTube Kids Viewing home with the child's YouTube Kids profile", caption: "Kids Viewing with the child's own YouTube Kids profile.", width: 1080, height: 2424 },
+  { src: "/apps/screenshots/android/phone-parent-pin.webp", title: "Parent PIN to block", alt: "Parent Controls PIN prompt over Kids Viewing", caption: "Blocking or changing rules always asks the parent PIN.", width: 1080, height: 2424 },
+  { src: "/apps/screenshots/android/phone-kids-search.webp", title: "Kids Search", alt: "Kids search results for dinosaurs", caption: "Search inside YouTube Kids, with your Kids rules applied.", width: 1080, height: 2424 },
+  { src: "/apps/screenshots/android/phone-kids-watch.webp", title: "Kids Watch", alt: "Kids Watch page with Up next", caption: "Up next is checked against parent rules before it plays.", width: 1080, height: 2424 },
+  { src: "/apps/screenshots/android/phone-kids-mode.webp", title: "Kids Mode rules", alt: "FilterTube Kids Mode rules screen", caption: "Separate Kids rules, set by a parent.", width: 1080, height: 2424 },
+];
+
+export const kidsTabletScreens = [
+  { src: "/apps/screenshots/android/tablet-kids-home.webp", title: "Kids Home on tablet", alt: "Kids Viewing grid on a tablet with shows and playlists", caption: "A three-column grid of shows and playlists.", width: 2560, height: 1600 },
+  { src: "/apps/screenshots/android/tablet-kids-search.webp", title: "Kids Search on tablet", alt: "Kids search results list on a tablet", caption: "Search results with room for long titles.", width: 2560, height: 1600 },
+  { src: "/apps/screenshots/android/tablet-kids-watch.webp", title: "Two-pane Kids Watch", alt: "Kids Watch on a tablet with Up next beside the video", caption: "The video and Up next side by side.", width: 2560, height: 1600 },
+];
+
+export const kidsTvScreens = [
+  { src: "/apps/screenshots/android/tv-kids-home.webp", title: "Kids Home on TV", alt: "Kids Viewing on Android TV with Shows and More for you rows", caption: "Kids rows built for the remote.", width: 1920, height: 1080 },
+  { src: "/apps/screenshots/android/tv-kids-search.webp", title: "Kids Search on TV", alt: "Kids search for dinosaurs on Android TV", caption: "Kids search on the big screen.", width: 1920, height: 1080 },
+  { src: "/apps/screenshots/android/tv-kids-watch.webp", title: "Kids video on TV", alt: "A Kids video playing full screen on Android TV", caption: "Full-screen Kids playback.", width: 1920, height: 1080 },
+];
+
 export const platformOrder = platformSlugs;
 
 export const detailPages = {
@@ -1355,7 +1377,7 @@ export const detailPages = {
     slug: "kids",
     icon: ShieldCheck,
     tone: "rose",
-    status: "Android + browser extension",
+    status: "Android phone, tablet, TV + browser extension",
     eyebrow: "Rules for Kids",
     navTitle: "Kids",
     routeSummary:
@@ -1399,6 +1421,14 @@ export const detailPages = {
         title: "Share approved changes with their device",
         body: "Pair with a code or QR, compare the safety phrase, then send an approved update to the chosen child profile. Direct peer-to-peer sync needs supported devices open and connected. Opt-in Auto-sync and optional delivery services have separate setup and release availability.",
       },
+    ],
+    screenshotsTitle: "Kids Viewing on every screen",
+    screenshotsEyebrow: "Kids · phone, tablet and TV",
+    screenshotsDescription: "Real Kids Viewing screens from FilterTube 3.5.0 with a YouTube Kids profile. Changing rules from Kids always asks the parent PIN.",
+    screenshotRails: [
+      { id: "kids-phone-screens", label: "Phone", status: "Google Play", layout: "phone", screenshots: kidsPhoneScreens },
+      { id: "kids-tablet-screens", label: "Tablet", status: "Google Play", layout: "desktop", screenshots: kidsTabletScreens },
+      { id: "kids-tv-screens", label: "Android TV", status: "New in 3.5.0", layout: "desktop", screenshots: kidsTvScreens },
     ],
     milestoneTitle: "Choose where your child watches",
     milestoneIntro: "The same family direction, with different availability on each platform.",
