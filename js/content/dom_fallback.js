@@ -467,8 +467,13 @@ function getCategoryPolicySignature(settings) {
 
 // A queued lookup is not a reason to veil a card indefinitely. Remember the
 // first wait for this video/policy even after its visual placeholder expires.
+// Only allow-only ("Allow only selected") policies wait: showing an unverified
+// card there would admit content the user never allowed. Block-selected
+// policies hide on a confirmed match only, so an unresolved card stays visible
+// and interactive instead of turning into a blank tap-eating block (#79).
+// `scheduled` is accepted for call-site compatibility; it no longer veils.
 function getCategoryMetadataWaitState(card, videoId, policySignature, unresolved, allowOnly, scheduled, now = Date.now(), canStartWait = true) {
-    if (!unresolved || !videoId) {
+    if (!unresolved || !videoId || !allowOnly) {
         categoryMetadataWaitByCard.delete(card);
         return { pending: false, unavailable: false, remainingMs: 0 };
     }
@@ -477,7 +482,7 @@ function getCategoryMetadataWaitState(card, videoId, policySignature, unresolved
     if (!state || state.key !== key) {
         // Offscreen cards have not requested metadata yet. Their deadline starts
         // when they first become visible; an existing wait keeps its deadline.
-        if (!canStartWait || (!allowOnly && !scheduled)) {
+        if (!canStartWait) {
             categoryMetadataWaitByCard.delete(card);
             return { pending: false, unavailable: false, remainingMs: 0 };
         }
@@ -486,8 +491,8 @@ function getCategoryMetadataWaitState(card, videoId, policySignature, unresolved
     }
     const remainingMs = Math.max(0, 8000 - (now - state.startedAt));
     return {
-        pending: remainingMs > 0 && (allowOnly || scheduled),
-        unavailable: remainingMs === 0 && allowOnly,
+        pending: remainingMs > 0,
+        unavailable: remainingMs === 0,
         remainingMs
     };
 }
@@ -1595,6 +1600,69 @@ function installDirectAccessPlayGuard() {
     }
 }
 
+// #77: remember the last current-video admission per tab. A settings snapshot
+// (tab focus, storage refresh) may arrive without some session-only metadata;
+// re-entering the pending state for a video that was already admitted under the
+// same rules would pause it and flash the "Checking…" overlay again. A real rule
+// change produces a different signature and is evaluated (and may block) as
+// usual; Disabled releases everything and forgets the admission.
+const currentVideoAdmissionSignatureCache = new WeakMap();
+const CURRENT_VIDEO_ADMISSION_RULE_FIELDS = [
+    'filterKeywords', 'whitelistKeywords', 'filterChannels', 'whitelistChannels',
+    'blockedVideoIds', 'allowedVideoIds', 'contentFilters', 'categoryFilters', 'languageFilters'
+];
+
+function getCurrentVideoAdmissionRuleSignature(settings) {
+    if (!isFilterTubeFilteringEnabled(settings)) return '';
+    // Array lengths are recomputed every call so an in-place list edit on the
+    // same snapshot object still invalidates the cached serialization.
+    const shape = [
+        settings.listMode === 'whitelist' ? 'whitelist' : 'blocklist',
+        ...CURRENT_VIDEO_ADMISSION_RULE_FIELDS.map(field => Array.isArray(settings[field]) ? settings[field].length : (settings[field] ? 'o' : '-'))
+    ].join('|');
+    const cached = currentVideoAdmissionSignatureCache.get(settings);
+    if (cached && cached.shape === shape) return cached.signature;
+    let text = '';
+    try {
+        text = JSON.stringify(
+            CURRENT_VIDEO_ADMISSION_RULE_FIELDS.map(field => settings[field] ?? null),
+            (key, value) => (value instanceof RegExp ? `/${value.source}/${value.flags}` : value)
+        );
+    } catch (e) {
+        return '';
+    }
+    let hash = 5381;
+    for (let index = 0; index < text.length; index++) {
+        hash = ((hash * 33) ^ text.charCodeAt(index)) >>> 0;
+    }
+    const signature = `${shape}:${text.length}:${hash.toString(36)}`;
+    currentVideoAdmissionSignatureCache.set(settings, { shape, signature });
+    return signature;
+}
+
+function rememberCurrentVideoAdmission(videoId, settings) {
+    const signature = getCurrentVideoAdmissionRuleSignature(settings);
+    window.__filtertubeCurrentVideoAdmission = (videoId && signature)
+        ? { videoId, signature }
+        : null;
+}
+
+function isCurrentVideoAdmittedUnderSettings(videoId, settings) {
+    const record = window.__filtertubeCurrentVideoAdmission;
+    if (!record || !videoId || record.videoId !== videoId) return false;
+    const signature = getCurrentVideoAdmissionRuleSignature(settings);
+    return Boolean(signature) && record.signature === signature;
+}
+
+// Used where admission would otherwise re-enter "pending" for missing metadata.
+// Returns true (and keeps playback released) when this video is already admitted.
+function keepAdmittedCurrentVideo(videoId, settings, isShortRoute = false) {
+    if (!isCurrentVideoAdmittedUnderSettings(videoId, settings)) return false;
+    releaseDirectAccessGuard(videoId, true);
+    if (isShortRoute) clearCurrentShortAdmissionOverlay();
+    return true;
+}
+
 function pauseCurrentWatchForDirectAccess(videoId, decision = 'pending') {
     try { if (typeof window !== 'undefined') window.FilterTubeContentPlayback?.invalidate?.('direct_admission_changed'); } catch (_) {}
     const state = getDirectAccessState();
@@ -1605,6 +1673,10 @@ function pauseCurrentWatchForDirectAccess(videoId, decision = 'pending') {
         state.wasPlaying = false;
     }
     state.decision = decision === 'blocked' ? 'blocked' : 'pending';
+    // A block decision revokes any remembered admission for this video (#77).
+    if (state.decision === 'blocked' && window.__filtertubeCurrentVideoAdmission?.videoId === videoId) {
+        window.__filtertubeCurrentVideoAdmission = null;
+    }
     installDirectAccessPlayGuard();
     const video = document.querySelector('video.html5-main-video, video');
     if (!state.pausedByGuard) {
@@ -1688,6 +1760,7 @@ function isFilterTubeFilteringEnabled(settings) {
 }
 
 function releaseDisabledDirectAccessState() {
+    window.__filtertubeCurrentVideoAdmission = null;
     const videoId = getCurrentWatchVideoId();
     releaseDirectAccessGuard(videoId, true);
     getDirectAccessState().latestSettings = { enabled: false };
@@ -2235,6 +2308,7 @@ function enforceCurrentWatchOwnerBlock(settings) {
         );
         if (missingRuleMetadata) {
             scheduleCurrentVideoAdmissionMetadata(routeVideoId, requirements, listMode);
+            if (keepAdmittedCurrentVideo(routeVideoId, settings, isShortRoute)) return;
             const state = pauseCurrentWatchForDirectAccess(routeVideoId, 'pending');
             if (!state.pendingStartedAt) state.pendingStartedAt = Date.now();
             showCurrentVideoAdmissionPendingState(state, isShortRoute);
@@ -2258,6 +2332,7 @@ function enforceCurrentWatchOwnerBlock(settings) {
                 ownerMeta = { videoId: routeVideoId, id: '', handle: '', customUrl: '', name: '' };
             } else {
                 scheduleCurrentVideoAdmissionMetadata(routeVideoId, requirements, listMode);
+                if (keepAdmittedCurrentVideo(routeVideoId, settings, isShortRoute)) return;
                 const state = pauseCurrentWatchForDirectAccess(routeVideoId, 'pending');
                 if (!state.pendingStartedAt) state.pendingStartedAt = Date.now();
                 showCurrentVideoAdmissionPendingState(state, isShortRoute);
@@ -2275,6 +2350,7 @@ function enforceCurrentWatchOwnerBlock(settings) {
             });
             if (!channelOnlyBlocked) {
                 scheduleCurrentVideoAdmissionMetadata(routeVideoId, requirements, listMode);
+                if (keepAdmittedCurrentVideo(routeVideoId, settings, isShortRoute)) return;
                 const state = pauseCurrentWatchForDirectAccess(routeVideoId, 'pending');
                 if (!state.pendingStartedAt) state.pendingStartedAt = Date.now();
                 showCurrentVideoAdmissionPendingState(state, isShortRoute);
@@ -2301,6 +2377,7 @@ function enforceCurrentWatchOwnerBlock(settings) {
             );
             if (missingContentMetadata) {
                 scheduleCurrentVideoAdmissionMetadata(routeVideoId, requirements, listMode);
+                if (keepAdmittedCurrentVideo(routeVideoId, settings, isShortRoute)) return;
                 const state = pauseCurrentWatchForDirectAccess(routeVideoId, 'pending');
                 if (!state.pendingStartedAt) state.pendingStartedAt = Date.now();
                 showCurrentVideoAdmissionPendingState(state, isShortRoute);
@@ -2309,6 +2386,7 @@ function enforceCurrentWatchOwnerBlock(settings) {
             }
             const contentDecision = getCurrentWatchContentFilterDecision(settings, cachedVideoMeta || {});
             if (contentDecision.pending) {
+                if (keepAdmittedCurrentVideo(routeVideoId, settings, isShortRoute)) return;
                 const state = pauseCurrentWatchForDirectAccess(routeVideoId, 'pending');
                 if (!state.pendingStartedAt) state.pendingStartedAt = Date.now();
                 scheduleCurrentVideoAdmissionMetadata(routeVideoId, requirements, listMode);
@@ -2330,6 +2408,7 @@ function enforceCurrentWatchOwnerBlock(settings) {
 
         const shouldBlock = admissionDecision.blocked;
         if (!shouldBlock) {
+            rememberCurrentVideoAdmission(ownerMeta.videoId, settings);
             releaseDirectAccessGuard(ownerMeta.videoId, true);
             if (isShortRoute) clearCurrentShortAdmissionOverlay();
             try {
@@ -2648,6 +2727,12 @@ function enforceCurrentWatchCategoryPolicy(settings) {
         const requiresKnownMetadata = decision === 'unknown' && policy?.mode === 'allow';
         if (!requiresKnownMetadata) {
             releaseCurrentWatchCategoryGuard(videoId, false);
+            return;
+        }
+        // #77: an already admitted video is not paused again merely because a
+        // newer snapshot arrived before its category was re-supplied.
+        if (isCurrentVideoAdmittedUnderSettings(videoId, settings)) {
+            releaseCurrentWatchCategoryGuard(videoId, true);
             return;
         }
 
@@ -5595,12 +5680,11 @@ async function applyDOMFallback(settings, options = {}) {
                                 needCategory: true,
                                 priority: 'high'
                             });
-                            // A scheduled unresolved card must not flash on screen
-                            // and disappear after its official category resolves.
                             // Allow-only remains fail-closed even when a lookup is
-                            // temporarily suppressed; block-selected veils only
-                            // cards that are genuinely queued or already running.
-                            pendingCategoryMeta = mode === 'allow' || categoryFetchScheduled === true;
+                            // temporarily suppressed. Block-selected never veils:
+                            // the card stays usable and is hidden only once its
+                            // official category is a confirmed match (#79).
+                            pendingCategoryMeta = mode === 'allow';
                         }
                     }
 
@@ -6645,23 +6729,11 @@ async function applyDOMFallback(settings, options = {}) {
                         if (!isSelectedRow) {
                             hideByUploadDate = true;
                         }
-                    } else if (didScheduleMetaFetch) {
-                        const needsTimestamp = (() => {
-                            if (condition === 'newer') {
-                                return parseDateMs(uploadSettings.fromDate) !== null;
-                            }
-                            if (condition === 'older') {
-                                return parseDateMs(uploadSettings.toDate) !== null;
-                            }
-                            if (condition === 'between') {
-                                return parseDateMs(uploadSettings.fromDate) !== null && parseDateMs(uploadSettings.toDate) !== null;
-                            }
-                            return false;
-                        })();
-                        if (needsTimestamp) {
-                            pendingUploadDateMeta = true;
-                        }
                     }
+                    // A scheduled upload-date lookup never veils the card. Upload
+                    // date hides on a confirmed out-of-range match only, so the
+                    // card stays visible and interactive meanwhile (#79); the
+                    // metadata response re-runs this pass and hides it on a match.
                 }
             } catch (e) {
             }

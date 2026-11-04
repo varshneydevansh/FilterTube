@@ -1975,11 +1975,70 @@ function retainVerifiedVideoMetadata(settings) {
             cache.set(id, merged);
         }
     };
+    // Official category/language answers are page facts too. If a snapshot is
+    // compiled before the background has merged them, dropping them would show
+    // a card that was hidden by a confirmed match and then hide it again once
+    // the lookup re-resolves (a visible hide/unhide loop, #79). Only these
+    // fields are retained for unverified entries; identity/text never are.
+    const contentCache = window.__filtertubeResolvedVideoContentMetadata instanceof Map
+        ? window.__filtertubeResolvedVideoContentMetadata
+        : (window.__filtertubeResolvedVideoContentMetadata = new Map());
+    const CONTENT_FIELDS = ['category', 'languageCode', 'languageSource', 'languageConfidence'];
+    const rememberContent = (map) => {
+        for (const [id, meta] of Object.entries(map || {})) {
+            if (!/^[a-zA-Z0-9_-]{11}$/.test(id) || !meta || typeof meta !== 'object') continue;
+            const category = typeof meta.category === 'string' ? meta.category.trim() : '';
+            const languageCode = typeof meta.languageCode === 'string' ? meta.languageCode.trim() : '';
+            const staleLanguage = languageCode.toLowerCase() === 'und'
+                && String(meta.languageSource || '').trim() === 'player-unavailable';
+            const usableLanguage = Boolean(languageCode) && !staleLanguage;
+            if (!category && !usableLanguage) continue;
+            const entry = { ...(contentCache.get(id) || {}) };
+            if (category) entry.category = category;
+            if (usableLanguage) {
+                entry.languageCode = languageCode;
+                entry.languageSource = typeof meta.languageSource === 'string' ? meta.languageSource : '';
+                entry.languageConfidence = typeof meta.languageConfidence === 'string' ? meta.languageConfidence : '';
+            }
+            contentCache.delete(id);
+            contentCache.set(id, entry);
+        }
+    };
     remember(currentSettings?.videoMetaMap);
     remember(settings?.videoMetaMap);
+    rememberContent(currentSettings?.videoMetaMap);
+    rememberContent(settings?.videoMetaMap);
     while (cache.size > 256) cache.delete(cache.keys().next().value);
-    if (!settings || typeof settings !== 'object' || cache.size === 0) return;
+    while (contentCache.size > 512) contentCache.delete(contentCache.keys().next().value);
+    if (!settings || typeof settings !== 'object' || (cache.size === 0 && contentCache.size === 0)) return;
     const nextMap = { ...(settings.videoMetaMap || {}) };
+    for (const [id, content] of contentCache) {
+        const incoming = nextMap[id];
+        if (incoming && typeof incoming === 'object') {
+            const patched = { ...incoming };
+            let changed = false;
+            if (content.category && !String(incoming.category || '').trim()) {
+                patched.category = content.category;
+                changed = true;
+            }
+            const incomingLanguage = String(incoming.languageCode || '').trim();
+            const incomingStale = incomingLanguage.toLowerCase() === 'und'
+                && String(incoming.languageSource || '').trim() === 'player-unavailable';
+            if (content.languageCode && (!incomingLanguage || incomingStale)) {
+                patched.languageCode = content.languageCode;
+                patched.languageSource = content.languageSource;
+                patched.languageConfidence = content.languageConfidence;
+                changed = true;
+            }
+            if (changed) nextMap[id] = patched;
+        } else {
+            const restored = {};
+            for (const field of CONTENT_FIELDS) {
+                if (content[field]) restored[field] = content[field];
+            }
+            nextMap[id] = restored;
+        }
+    }
     for (const [id, verified] of cache) {
         const incoming = nextMap[id] || {};
         const merged = { ...verified, ...incoming };
