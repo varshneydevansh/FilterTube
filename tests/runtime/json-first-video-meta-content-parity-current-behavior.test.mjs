@@ -501,7 +501,8 @@ test('JSON engine upload-date uses videoMetaMap dates and blank cutoffs no-op', 
   assert.equal(blankCutoffKept.contents.length, 1);
 });
 
-test('DOM fallback upload-date uses metadata when present and pending state only after valid cutoff need', () => {
+// #79: a missing upload date schedules a lookup but never veils the card.
+test('DOM fallback upload-date uses metadata when present and never veils while a lookup runs', () => {
   const videoId = 'CONTENT0002';
   const settings = {
     contentFilters: {
@@ -525,7 +526,7 @@ test('DOM fallback upload-date uses metadata when present and pending state only
   });
   assert.deepEqual(missingRuntime.run(new FakeElement({ 'data-filtertube-video-id': videoId })), {
     hideByUploadDate: false,
-    pendingUploadDateMeta: true
+    pendingUploadDateMeta: false
   });
   assert.deepEqual(plain(missingRuntime.fetches), [{
     videoId,

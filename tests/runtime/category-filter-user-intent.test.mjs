@@ -170,7 +170,9 @@ test('allow-only gives unresolved actual viewport cards a per-card pending state
   assert.match(categoryBlock, /isVisibleOrNear = rect\.bottom > 0 && rect\.top < viewportHeight/);
   assert.match(categoryBlock, /if \(isVisibleOrNear\)[\s\S]*priority: 'high'/);
   assert.match(categoryBlock, /categoryFetchScheduled = scheduleVideoMetaFetch/);
-  assert.match(categoryBlock, /pendingCategoryMeta = mode === 'allow' \|\| categoryFetchScheduled === true/);
+  // #79: only allow-only veils; block-selected stays visible until a confirmed match.
+  assert.match(categoryBlock, /pendingCategoryMeta = mode === 'allow';/);
+  assert.doesNotMatch(categoryBlock, /categoryFetchScheduled === true/);
   assert.doesNotMatch(categoryBlock, /priority: 'low'/);
 });
 

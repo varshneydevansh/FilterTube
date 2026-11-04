@@ -193,7 +193,7 @@ test('DOM fallback category card logic requires selected categories before metad
   assert.match(block, /scheduleVideoMetaFetch\(videoId, \{ needDuration: false, needDates: false, needCategory: true \}\)/);
 });
 
-test('DOM fallback upload-date logic can schedule metadata before validating blank date predicates', () => {
+test('DOM fallback upload-date logic schedules metadata without a pending veil (#79)', () => {
   const text = source('js/content/dom_fallback.js');
   const block = sliceBetween(
     text,
@@ -201,16 +201,10 @@ test('DOM fallback upload-date logic can schedule metadata before validating bla
     'const isWatchPlaylistRow = (() => {'
   );
 
-  const scheduleIndex = block.indexOf("scheduleVideoMetaFetch(videoId, { needDuration: false, needDates: true })");
-  const needsTimestampIndex = text.indexOf('const needsTimestamp = (() => {', text.indexOf('let hideByUploadDate = false;'));
-
-  assert.notEqual(scheduleIndex, -1, 'missing upload-date metadata fetch scheduling');
-  assert.notEqual(needsTimestampIndex, -1, 'missing later needsTimestamp guard');
+  assert.notEqual(block.indexOf("scheduleVideoMetaFetch(videoId, { needDuration: false, needDates: true })"), -1,
+    'missing upload-date metadata fetch scheduling');
   assert.match(block, /if \(uploadSettings && uploadSettings\.enabled\) \{/);
-  assert.ok(
-    text.indexOf('scheduleVideoMetaFetch(videoId, { needDuration: false, needDates: true })') < needsTimestampIndex,
-    'metadata fetch scheduling occurs before the later valid-date needsTimestamp check'
-  );
+  assert.equal(text.includes('pendingUploadDateMeta = true'), false);
 });
 
 test('DOM fallback duration logic uses zero threshold for longer and shorter comparisons', () => {

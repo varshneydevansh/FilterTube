@@ -39,6 +39,21 @@
   against content filters, as the page fallback already did. A video you allowed
   by its exact video ID keeps its exemption. Counts such as `1.1K views` now
   parse too (they were dropped by a rounding error).
+- **No more white blocks while scrolling (#79).** With Category (Block selected)
+  or Upload date filters on, cards whose metadata is still loading now stay
+  visible and tappable, and are hidden only once a block match is confirmed.
+  Before, they showed as blank placeholders for up to 8 seconds, ignored taps,
+  and could flicker between blank, thumbnail and hidden. This was most visible on
+  m.youtube.com (Firefox for Android and desktop-site mode). Only "Allow only
+  selected" still shows a placeholder while it checks a card. That placeholder
+  now uses YouTube's theme colours, keeps the thumbnail's space and never blocks
+  taps. Resolved categories and languages now survive settings refreshes, so a
+  hidden card does not briefly come back.
+- **Checked videos stay playing (#77).** FilterTube remembers that the current
+  video already passed your rules. Switching back to its tab, or a new settings
+  snapshot arriving, no longer pauses it or shows "Checking this video against
+  your FilterTube rules…" again. If your rules really change, the video is checked
+  again and can be blocked. Turning FilterTube off still releases playback at once.
 
 ## Version 3.4.2 — Device Sync, Video Notes And Playback Improvements (Preview)
 

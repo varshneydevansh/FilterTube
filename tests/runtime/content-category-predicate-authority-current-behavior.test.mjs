@@ -134,8 +134,10 @@ test('DOM upload-date path currently schedules metadata before final valid cutof
   assert.match(uploadBlock, /if \(uploadSettings && uploadSettings\.enabled\)/);
   assert.match(uploadBlock, /scheduleVideoMetaFetch\(videoId, \{ needDuration: false, needDates: true \}\)/);
   assert.match(uploadBlock, /const condition = uploadSettings\.condition \|\| 'newer'/);
-  assert.match(uploadBlock, /parseDateMs\(uploadSettings\.fromDate\) !== null/);
-  assert.match(uploadBlock, /parseDateMs\(uploadSettings\.toDate\) !== null/);
+  assert.match(uploadBlock, /const cutoffMs = parseDateMs\(uploadSettings\.fromDate\)/);
+  assert.match(uploadBlock, /const cutoffMs = parseDateMs\(uploadSettings\.toDate\)/);
+  // #79: no pending veil is derived from the cutoff validation any more.
+  assert.equal(uploadBlock.includes('pendingUploadDateMeta = true'), false);
   assert.ok(
     uploadBlock.indexOf('scheduleVideoMetaFetch(videoId, { needDuration: false, needDates: true })') <
       uploadBlock.indexOf('const condition = uploadSettings.condition ||'),

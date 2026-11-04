@@ -130,25 +130,25 @@ function runtime(mode = 'block') {
   };
 }
 
-test('actual timer clears a queued block-mode placeholder and its processed-card state cannot reblank it', async () => {
+// #79: block-selected never veils a card while its category is loading.
+test('actual block-mode pass keeps a queued unresolved card visible and interactive', async () => {
   const state = runtime();
   const [card] = state.cards;
   await state.pass();
-  assert.equal(card.getAttribute('data-filtertube-pending-category'), 'true');
-  assert.equal(card.getAttribute('data-filtertube-processed'), 'true');
-  assert.equal(state.lastVisibility().pending, true);
-  state.setNow(104000);
-  await state.pass();
-  assert.equal(card.getAttribute('data-filtertube-pending-category-ts'), '100000');
-  assert.equal(state.timers.size, 1);
-  await state.fireNextTimer();
   assert.equal(card.hasAttribute('data-filtertube-pending-category'), false);
   assert.equal(card.hasAttribute('data-filtertube-pending-category-ts'), false);
+  assert.equal(card.hasAttribute('data-filtertube-category-unavailable'), false);
+  assert.equal(card.getAttribute('data-filtertube-processed'), 'true');
   assert.equal(state.lastVisibility().hidden, false);
   assert.equal(state.lastVisibility().pending, false);
+  assert.equal(state.timers.size, 0);
+  state.setNow(104000);
+  await state.pass({ forceReprocess: true });
   state.setNow(161000);
   await state.pass({ forceReprocess: true });
   assert.equal(card.hasAttribute('data-filtertube-pending-category'), false);
+  assert.equal(card.hasAttribute('data-filtertube-category-unavailable'), false);
+  assert.equal(state.lastVisibility().hidden, false);
   assert.equal(state.timers.size, 0);
 });
 
@@ -184,8 +184,8 @@ test('real metadata resolution replaces pending state with the actual category d
   assert.equal(state.lastVisibility().hidden, false);
 });
 
-test('expiry never clears an independent channel hide owner', async () => {
-  const state = runtime();
+test('allow-only expiry never clears an independent channel hide owner', async () => {
+  const state = runtime('allow');
   const [card] = state.cards;
   await state.pass();
   card.setAttribute('data-filtertube-hidden-by-channel', 'true');
@@ -195,8 +195,8 @@ test('expiry never clears an independent channel hide owner', async () => {
   assert.equal(state.lastVisibility().hidden, true);
 });
 
-test('shared production timer preserves independent deadlines for staggered cards', async () => {
-  const state = runtime();
+test('shared production timer preserves independent allow-only deadlines for staggered cards', async () => {
+  const state = runtime('allow');
   const [first] = state.cards;
   await state.pass();
   state.setNow(104000);
@@ -206,6 +206,7 @@ test('shared production timer preserves independent deadlines for staggered card
   assert.equal(state.timers.size, 1);
   await state.fireNextTimer();
   assert.equal(first.hasAttribute('data-filtertube-pending-category'), false);
+  assert.equal(first.getAttribute('data-filtertube-category-unavailable'), 'true');
   assert.equal(second.hasAttribute('data-filtertube-pending-category'), true);
   assert.equal(state.timers.size, 1);
   await state.fireNextTimer();
@@ -213,20 +214,26 @@ test('shared production timer preserves independent deadlines for staggered card
   assert.equal(state.timers.size, 0);
 });
 
-test('recycled video and changed category policy get a new bounded wait', async () => {
-  const state = runtime();
+test('recycled video and changed allow-only policy get a new bounded wait; block mode drops the veil', async () => {
+  const state = runtime('allow');
   const [card] = state.cards;
   await state.pass();
   await state.fireNextTimer();
+  assert.equal(card.hasAttribute('data-filtertube-category-unavailable'), true);
   card.videoId = 'lmnopqrstuv';
   await state.pass();
   assert.equal(card.hasAttribute('data-filtertube-pending-category'), true);
   await state.fireNextTimer();
-  state.settings.categoryFilters.mode = 'allow';
+  state.settings.categoryFilters.selected = ['music', 'news'];
   await state.pass();
   assert.equal(card.hasAttribute('data-filtertube-pending-category'), true);
   await state.fireNextTimer();
   assert.equal(card.hasAttribute('data-filtertube-category-unavailable'), true);
+  state.settings.categoryFilters.mode = 'block';
+  await state.pass({ forceReprocess: true });
+  assert.equal(card.hasAttribute('data-filtertube-pending-category'), false);
+  assert.equal(card.hasAttribute('data-filtertube-category-unavailable'), false);
+  assert.equal(state.lastVisibility().hidden, false);
 });
 
 test('offscreen allow-only card does not expire before its first visible lookup opportunity', async () => {

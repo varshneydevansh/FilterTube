@@ -15,13 +15,17 @@ function ensureStyles() {
         style.textContent = `
             .filtertube-hidden { display: none !important; }
             .filtertube-hidden-shelf { display: none !important; }
+            /* Pending placeholders exist only for allow-only policies (#79).
+               Children keep their layout box (visibility, not display), so the
+               thumbnail's space is preserved and nothing jumps on resolve. The
+               host never gets pointer-events:none: hidden children receive no
+               taps, and a card that resolves as allowed is usable at once. */
             .filtertube-pending-meta,
             [data-filtertube-pending-category],
             [data-filtertube-pending-language],
             [data-filtertube-pending-upload-date],
             [data-filtertube-category-unavailable] {
                 position: relative !important;
-                pointer-events: none !important;
                 overflow: hidden !important;
             }
 
@@ -41,10 +45,13 @@ function ensureStyles() {
                 position: absolute;
                 inset: 0;
                 border-radius: 12px;
-                background: linear-gradient(90deg,
-                    rgba(148, 163, 184, 0.18) 0%,
-                    rgba(148, 163, 184, 0.28) 40%,
-                    rgba(148, 163, 184, 0.18) 80%
+                /* YouTube theme tokens (desktop ytd-* and mobile ytm-*) so the
+                   placeholder reads as a muted skeleton on light and dark. */
+                background-color: var(--yt-spec-badge-chip-background, rgba(127, 127, 127, 0.1));
+                background-image: linear-gradient(90deg,
+                    transparent 0%,
+                    var(--yt-spec-10-percent-layer, rgba(127, 127, 127, 0.1)) 40%,
+                    transparent 80%
                 );
                 background-size: 220% 100%;
                 animation: filtertube-pending-shimmer 1.1s ease-in-out infinite;
@@ -67,7 +74,6 @@ function ensureStyles() {
             [data-filtertube-watch-category-state="unavailable"] {
                 position: relative !important;
                 overflow: hidden !important;
-                pointer-events: none !important;
             }
 
             [data-filtertube-watch-category-state="pending"] > *,
@@ -87,7 +93,7 @@ function ensureStyles() {
                 padding: 12px;
                 border-radius: 10px;
                 color: var(--yt-spec-text-secondary, #606060);
-                background: var(--yt-spec-general-background-a, #f2f2f2);
+                background: var(--yt-spec-badge-chip-background, rgba(127, 127, 127, 0.1));
                 font: 500 12px/1.35 Roboto, Arial, sans-serif;
                 text-align: center;
             }
@@ -104,10 +110,11 @@ function ensureStyles() {
 
             [data-filtertube-watch-category-state="pending"]::after {
                 color: transparent;
-                background: linear-gradient(90deg,
-                    rgba(148, 163, 184, 0.18) 0%,
-                    rgba(148, 163, 184, 0.28) 40%,
-                    rgba(148, 163, 184, 0.18) 80%
+                background-color: var(--yt-spec-badge-chip-background, rgba(127, 127, 127, 0.1));
+                background-image: linear-gradient(90deg,
+                    transparent 0%,
+                    var(--yt-spec-10-percent-layer, rgba(127, 127, 127, 0.1)) 40%,
+                    transparent 80%
                 );
                 background-size: 220% 100%;
                 animation: filtertube-pending-shimmer 1.1s ease-in-out infinite;
