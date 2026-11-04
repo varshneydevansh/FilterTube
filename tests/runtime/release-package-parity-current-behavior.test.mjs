@@ -132,7 +132,7 @@ test('new releases are drafts until every expected asset is verified, while exis
 test('mobile artifact staging has naming and checksum mechanics but no public claim gate', () => {
   const build = read('build.js');
 
-  assert.match(build, /MOBILE_ARTIFACT_FILE_RE = \/\^FilterTube-\(mobile-tablet\|TV\)-v/);
+  assert.match(build, /MOBILE_ARTIFACT_FILE_RE = \/\^FilterTube-\(mobile-tablet\|TV\|Direct-mobile-tablet\|Direct-TV\)-v/);
   assert.match(build, /selectLatestMobileArtifacts\(matchedSourceFiles\)/);
   assert.match(build, /sha256File\(targetPath\)/);
   assert.match(build, /dist', 'mobile'/);

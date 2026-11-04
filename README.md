@@ -9,43 +9,55 @@
 [Get Android app](https://play.google.com/store/apps/details?id=com.filtertube.app) · [Get browser extension](https://filtertube.in/downloads) · [Explore the website](https://filtertube.in)
 </div>
 
-FilterTube is a local-first viewing and filtering project for **Android and desktop browsers**. Block unwanted channels or words, allow only what you choose, quiet distracting surfaces, and give each family profile its own rules. Verified devices can share selected updates through **Nanah peer-to-peer (P2P) sync**.
+FilterTube puts **you** in charge of what you watch. This repository is the **browser extension**, and the same rules power full **FilterTube apps for Android phones, tablets and Android TV** (iPhone and iPad are in development). Block channels or words, allow only what you choose, give every family member their own profile, and keep your devices in sync **privately, device to device**.
 
-**For families:** children can have their own PIN-protected profiles while parents manage protected settings from their own machine. [See the parent workflow](#easy-parent-controls).
+### What the apps include
+
+- **A complete viewing app, not just a filter.** Home, Search, Watch, channels, Subscriptions, You, History, playlists, Watch later and Shorts, plus a separate **Kids** space. Chapters, a floating mini player, picture-in-picture, background play, a sleep timer, captions and quality controls.
+- **Music, with its own space.** Music Home, Explore, charts, moods, artists, albums and library, with a reorderable queue, shuffle, repeat and lyrics.
+- **Your rules everywhere.** Block or allow channels and keywords (Korean, Japanese and Chinese keywords match inside sentences), filter by category, language, duration, upload date and minimum views, hide Shorts, comments and distractions, and block any channel straight from a video card.
+- **Family controls.** Profiles with PINs, a stricter Kids mode, parent-managed daily time limits, and Self-Control sessions that lock your rules for a set time.
+- **Private peer-to-peer device sync (Nanah).** Pair two devices with a code or QR, compare the safety phrase, and choose what to share: rules, settings and video Notes. Updates travel **directly and encrypted between your devices**. No FilterTube account and no cloud copy of your rules.
+- **Android TV, new in 3.5.0.** Remote-first Home, Search, Subscriptions, You and Watch, with profiles, PINs, Kids controls and filters on the big screen.
+- **Optional integrations.** SponsorBlock segment skipping, Return YouTube Dislike counts and DeArrow community titles, each off until you turn it on.
+- **Video Notes and your own media.** Timestamped Notes per video, and a player for the videos and music already on your device.
+- **Offline downloads in the direct build.** The direct APK on [GitHub releases](https://github.com/varshneydevansh/FilterTube/releases/latest) can save videos for offline viewing (encrypted copies that expire after 30 days). The Google Play builds do not download videos.
+
+**Free, with no paywall.** Every feature is available to everyone. If FilterTube helps you, you can support it in whatever way feels right to you, monthly, one-time or any amount you choose. Supporting never unlocks features. [Ways to support](#community-and-support).
 
 ## Get FilterTube
 
 | Platform | Availability | Install or learn more |
 | --- | --- | --- |
-| **Android phone and tablet** | Public custom Main and Kids app on Google Play. No invitation or email needed. | [Google Play](https://play.google.com/store/apps/details?id=com.filtertube.app) · [Android overview](https://filtertube.in/android) |
-| **Browser extension** | Chrome, Firefox and Edge listings; compatible desktop browsers use the appropriate store or manual package. | [Chrome](https://chromewebstore.google.com/detail/filtertube/cjmdggnnpmpchholgnkfokibidbbnfgc) · [Firefox](https://addons.mozilla.org/en-US/firefox/addon/filtertube/) · [Edge](https://microsoftedge.microsoft.com/addons/detail/filtertube/lgeflbmplcmljnhffmoghkoccflhlbem) |
+| **Android phone and tablet** | Full custom Main and Kids app on Google Play. No invitation or email needed. | [Google Play](https://play.google.com/store/apps/details?id=com.filtertube.app) · [Android overview](https://filtertube.in/android) |
+| **Android TV / Google TV** | New in 3.5.0, on the same Google Play listing as the phone app (TV release subject to Play review). A TV APK is attached to every GitHub release. Fire TV support is planned. | [Android TV](https://filtertube.in/android-tv) · [Latest release](https://github.com/varshneydevansh/FilterTube/releases/latest) |
+| **Direct Android build** | GitHub-only phone/tablet and TV APKs with offline video saving and in-app update checks. Installs beside the Play app. | [Latest release](https://github.com/varshneydevansh/FilterTube/releases/latest) |
+| **Browser extension** | Chrome, Firefox and Edge listings; other desktop browsers use the matching store or the manual package. | [Chrome](https://chromewebstore.google.com/detail/filtertube/cjmdggnnpmpchholgnkfokibidbbnfgc) · [Firefox](https://addons.mozilla.org/en-US/firefox/addon/filtertube/) · [Edge](https://microsoftedge.microsoft.com/addons/detail/filtertube/lgeflbmplcmljnhffmoghkoccflhlbem) |
 | **iPhone and iPad** | In development; public TestFlight/App Store access is not available yet. | [iOS status](https://filtertube.in/ios) |
-| **Android TV / Google TV** | Remote-first Main and Kids app from version 3.5.0, on the same Google Play listing as the phone app (TV release subject to Play review). A TV APK is attached to each GitHub release. Fire TV support is planned. | [Android TV](https://filtertube.in/android#android-tv) · [Latest release](https://github.com/varshneydevansh/FilterTube/releases/latest) |
 
 [Latest GitHub release and assets](https://github.com/varshneydevansh/FilterTube/releases/latest) · [All releases](https://github.com/varshneydevansh/FilterTube/releases)
 
-The direct APK is a **separate, simpler build** from the complete custom app on Google Play. Repository features and development screenshots can be newer than public store releases; availability varies by platform and build.
-
-## The Android app
-
-The app has its own browsing and playback interface: **Home, Search, Watch, channels, Subscriptions, You, History, Playlists and Shorts**, alongside a separate **Kids** experience. It is a full app, not just a remote control for the extension.
-
-Newer development work also includes **Music Home/Explore, artists, albums, library and Now Playing; video Notes; opt-in Auto-sync; and a local-file library/player**. Downloading online videos for offline use is separate ongoing work. Do not assume every development feature is in the current Play release.
+## The apps
 
 <table>
+  <tr><th>Watch</th><th>Music</th><th>Controls</th><th>Private P2P pairing</th></tr>
   <tr>
-    <th>Playback settings</th>
-    <th>Music player</th>
-    <th>Video Notes</th>
-  </tr>
-  <tr>
-    <td><img src="website/public/apps/screenshots/android-player-settings.png" width="220" alt="Android development build playback settings, including captions and sleep timer"></td>
-    <td><img src="website/public/apps/screenshots/android-music-player.png" width="220" alt="Android development build Music player"></td>
-    <td><img src="website/public/apps/screenshots/android-notes-editor.png" width="220" alt="Android development build empty per-video Notes editor"></td>
+    <td><img src="website/public/apps/screenshots/android/phone-watch.webp" width="190" alt="FilterTube Android Watch page"></td>
+    <td><img src="website/public/apps/screenshots/android/phone-now-playing.webp" width="190" alt="FilterTube Android Music now playing"></td>
+    <td><img src="website/public/apps/screenshots/android/phone-controls.webp" width="190" alt="FilterTube Android Controls overview"></td>
+    <td><img src="website/public/apps/screenshots/android/phone-sync-pairing.webp" width="190" alt="FilterTube Android device pairing with code and QR"></td>
   </tr>
 </table>
 
-*Real Android development-build captures. The empty Notes editor shows the interface, not a completed save or cross-device sync test. [More app details](https://filtertube.in/android).*
+<table>
+  <tr><th>Tablet</th><th>Android TV</th></tr>
+  <tr>
+    <td><img src="website/public/apps/screenshots/android/tablet-watch.webp" width="400" alt="FilterTube tablet two-pane Watch page"></td>
+    <td><img src="website/public/apps/screenshots/android/tv-watch.webp" width="400" alt="FilterTube Android TV Watch page"></td>
+  </tr>
+</table>
+
+*Real screens from FilterTube 3.5.0. See every phone, tablet and TV screen on [filtertube.in/android](https://filtertube.in/android).*
 
 <details>
 <summary><strong>Browser extension screenshots</strong></summary>

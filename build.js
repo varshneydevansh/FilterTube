@@ -34,7 +34,8 @@ const REPO_OWNER = 'varshneydevansh';
 const REPO_NAME = 'FilterTube';
 // Google Play phone/tablet (`FilterTube-mobile-tablet-v…`) and Android TV (`FilterTube-TV-v…`)
 // release files. Both are built by FilterTubeApp into one folder; TV codes are base + 1,000,000.
-const MOBILE_ARTIFACT_FILE_RE = /^FilterTube-(mobile-tablet|TV)-v([0-9][A-Za-z0-9._-]*)-code([0-9]+)-(release|debug)\.(apk|aab)$/;
+// Direct (GitHub-only, with offline saving) APKs are `FilterTube-Direct-mobile-tablet-v…` / `FilterTube-Direct-TV-v…`.
+const MOBILE_ARTIFACT_FILE_RE = /^FilterTube-(mobile-tablet|TV|Direct-mobile-tablet|Direct-TV)-v([0-9][A-Za-z0-9._-]*)-code([0-9]+)-(release|debug)\.(apk|aab)$/;
 const LOCAL_MOBILE_ARTIFACTS_DIR = path.join('release-artifacts', 'mobile');
 const SIBLING_APP_MOBILE_ARTIFACTS_DIR = path.resolve(__dirname, '..', 'FilterTubeApp', 'release-artifacts', 'android');
 // Builds before 3.5.0 wrote phone/tablet files here.
@@ -326,15 +327,16 @@ async function maybeCollectMobileArtifacts(version) {
         console.log(`ℹ️  Mobile artifacts: selected v${requestedArtifactVersion} latest versionCode ${latestCode}. Use --all-mobile-artifacts to attach every matching file for this version.`);
     }
 
-    for (const platform of ['mobile', 'tv']) {
+    for (const platform of ['mobile', 'tv', 'direct-mobile', 'direct-tv']) {
         const platformFiles = sourceFiles.filter(name => parseMobileArtifactName(name)?.platform === platform);
-        const label = platform === 'tv' ? 'Android TV' : 'Phone/tablet';
+        const label = { mobile: 'Phone/tablet', tv: 'Android TV', 'direct-mobile': 'Direct phone/tablet', 'direct-tv': 'Direct Android TV' }[platform];
         if (!platformFiles.length) {
             console.warn(`⚠️  No ${label} artifacts for v${requestedArtifactVersion} in ${resolvedSourceDir}.`);
             continue;
         }
         const summary = summarizeMobileArtifacts(platformFiles);
-        if (!summary.hasApk || !summary.hasAab) {
+        // Direct builds never go to a store, so they ship an APK only.
+        if (!summary.hasApk || (!summary.hasAab && !platform.startsWith('direct'))) {
             console.warn(`⚠️  ${label} artifacts for v${requestedArtifactVersion} code${summary.latestCode || 'unknown'} do not include both APK and AAB files.`);
         }
     }
@@ -384,7 +386,7 @@ function parseMobileArtifactName(fileName) {
     const match = String(fileName).match(MOBILE_ARTIFACT_FILE_RE);
     if (!match) return null;
     return {
-        platform: match[1] === 'TV' ? 'tv' : 'mobile',
+        platform: { TV: 'tv', 'Direct-mobile-tablet': 'direct-mobile', 'Direct-TV': 'direct-tv' }[match[1]] || 'mobile',
         version: match[2],
         code: Number.parseInt(match[3], 10),
         variant: match[4],
@@ -626,6 +628,18 @@ function buildReleaseBody({ version, section, previousVersion, mobileArtifactPat
     const androidAab = phoneArtifactNames.find(name => name.endsWith('.aab'));
     const tvApk = tvArtifactNames.find(name => name.endsWith('-release.apk'));
     const tvAab = tvArtifactNames.find(name => name.endsWith('-release.aab'));
+    const directPhoneApk = artifactNames.find(name => parseMobileArtifactName(name)?.platform === 'direct-mobile' && name.endsWith('-release.apk'));
+    const directTvApk = artifactNames.find(name => parseMobileArtifactName(name)?.platform === 'direct-tv' && name.endsWith('-release.apk'));
+    const directSection = directPhoneApk || directTvApk
+        ? [
+            '',
+            '### ⬇️ Direct build with offline downloads (GitHub only)',
+            directPhoneApk ? `**Phone/tablet:** [${directPhoneApk}](${releaseAssetLink(directPhoneApk)}) · [checksum](${releaseAssetLink(`${directPhoneApk}.sha256`)})` : '',
+            directTvApk ? `**Android TV:** [${directTvApk}](${releaseAssetLink(directTvApk)}) · [checksum](${releaseAssetLink(`${directTvApk}.sha256`)})` : '',
+            '',
+            'The direct build adds saving videos for offline viewing (encrypted copies that expire after 30 days) and checks this repository for updates. It installs as a separate app (`com.filtertube.app.direct`) beside the Google Play version.',
+        ].filter(Boolean)
+        : [];
     const tvSection = tvApk || tvAab
         ? [
             '',
@@ -718,6 +732,7 @@ function buildReleaseBody({ version, section, previousVersion, mobileArtifactPat
         '5. Select the extracted folder.',
         ...mobileSection,
         ...tvSection,
+        ...directSection,
         '',
         '---',
         '',

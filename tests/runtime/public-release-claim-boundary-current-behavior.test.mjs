@@ -84,7 +84,7 @@ test('tv claim remains a separate future package instead of a mobile apk claim',
 test('release script can stage checksums but has no public claim manifest or signing fingerprint gate', () => {
   const build = read('build.js');
 
-  assert.match(build, /MOBILE_ARTIFACT_FILE_RE = \/\^FilterTube-\(mobile-tablet\|TV\)-v/);
+  assert.match(build, /MOBILE_ARTIFACT_FILE_RE = \/\^FilterTube-\(mobile-tablet\|TV\|Direct-mobile-tablet\|Direct-TV\)-v/);
   assert.match(build, /selectLatestMobileArtifacts\(matchedSourceFiles\)/);
   assert.match(build, /sha256File\(targetPath\)/);
   assert.match(build, /dist', 'mobile'/);

@@ -485,7 +485,7 @@ test('release_package_parity_github_release_new_draft_waits_for_expected_asset_n
 test('release_package_parity_mobile_artifacts_have_checksum_and_claim_gate is only partial today', () => {
   const build = read('build.js');
 
-  assert.match(build, /MOBILE_ARTIFACT_FILE_RE = \/\^FilterTube-\(mobile-tablet\|TV\)-v/);
+  assert.match(build, /MOBILE_ARTIFACT_FILE_RE = \/\^FilterTube-\(mobile-tablet\|TV\|Direct-mobile-tablet\|Direct-TV\)-v/);
   assert.match(build, /selectLatestMobileArtifacts\(matchedSourceFiles\)/);
   assert.match(build, /const checksumPath = `\$\{targetPath\}\.sha256`/);
   assert.match(build, /sha256File\(targetPath\)/);

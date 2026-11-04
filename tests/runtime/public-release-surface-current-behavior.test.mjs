@@ -78,7 +78,7 @@ test('build script can stage mobile artifacts with sha256 but interactive releas
   const build = read('build.js');
 
   assert.match(build, /MOBILE_ARTIFACT_FILE_RE/);
-  assert.match(build, /FilterTube-\(mobile-tablet\|TV\)-v/);
+  assert.match(build, /FilterTube-\(mobile-tablet\|TV\|Direct-mobile-tablet\|Direct-TV\)-v/);
   assert.match(build, /### 📺 Android TV \/ Google TV/);
   assert.match(build, /SHA256SUMS\.txt/);
   assert.match(build, /fs\.writeFileSync\(checksumPath, `\$\{sha256File\(targetPath\)\}  \$\{fileName\}\\n`/);
@@ -193,11 +193,16 @@ test('release staging picks the latest phone/tablet and TV builds separately', (
     'FilterTube-TV-v3.5.0-code30500-debug.apk',
     'FilterTube-TV-v3.5.0-code1030500-release.aab',
     'FilterTube-TV-v3.5.0-code1030500-release.apk',
+    'FilterTube-Direct-mobile-tablet-v3.5.0-code30500-release.apk',
+    'FilterTube-Direct-TV-v3.5.0-code30500-release.apk',
   ]);
+  assert.equal(context.parse('FilterTube-Direct-TV-v3.5.0-code30500-release.apk').platform, 'direct-tv');
   assert.deepEqual([...picked], [
     'FilterTube-mobile-tablet-v3.5.0-code30500-release.aab',
     'FilterTube-mobile-tablet-v3.5.0-code30500-release.apk',
     'FilterTube-TV-v3.5.0-code1030500-release.aab',
     'FilterTube-TV-v3.5.0-code1030500-release.apk',
+    'FilterTube-Direct-mobile-tablet-v3.5.0-code30500-release.apk',
+    'FilterTube-Direct-TV-v3.5.0-code30500-release.apk',
   ]);
 });
