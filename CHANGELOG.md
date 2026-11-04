@@ -16,6 +16,22 @@
   the TV AAB, per-file `.sha256` checksums, and one `SHA256SUMS.txt` covering
   every asset.
 
+### Playback
+
+- **Autoplay keeps going past blocked videos (#82).** On regular (non-playlist)
+  watch pages, when YouTube's autoplay or Next pick is blocked by your rules,
+  FilterTube now points it at the first related video in the same page data
+  that passes all of your rules (channels, keywords and content filters,
+  including "Allow only selected" mode), instead of removing it and letting
+  YouTube choose another video that may also be blocked. Playlists, Mixes and
+  "Disable Autoplay" keep their existing behavior.
+- **New opt-in "Skip blocked autoplay videos" control (#82).** When autoplay
+  still lands on a video your rules block, FilterTube can continue to the next
+  visible allowed up-next video, at most 3 times in a row before staying on the
+  block screen. It is off by default, never acts on direct links, your own
+  clicks, playlists, Shorts or embeds, and any pending skip is cancelled as soon
+  as settings change or FilterTube is turned off.
+
 ## Version 3.4.2 — Device Sync, Video Notes And Playback Improvements (Preview)
 
 October 27, 2026. Public preview of the extension changes since v3.4.1

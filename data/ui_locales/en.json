@@ -329,6 +329,8 @@
   "controls.description.hideEndscreenCards": "Hide endscreen cards (end-card overlays)",
   "controls.title.disableAutoplay": "Disable Autoplay",
   "controls.description.disableAutoplay": "Disable or suppress autoplay UI",
+  "controls.title.skipBlockedAutoplay": "Skip blocked autoplay videos",
+  "controls.description.skipBlockedAutoplay": "When autoplay reaches a video your rules block, continue to the next allowed video (up to 3 tries)",
   "controls.title.contentOnlyPlayback": "Content-only playback (Experimental)",
   "controls.description.contentOnlyPlayback": "On by default with advert filtering. Choose a main-video source automatically when needed on desktop YouTube, keeping its controls and playlist. If playback has trouble, turn off and reload the video.",
   "controls.title.alwaysUseOriginalAudio": "Always Use Original Audio (Experimental)",

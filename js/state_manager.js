@@ -94,6 +94,7 @@ const StateManager = (() => {
         hideEndscreenVideowall: false,
         hideEndscreenCards: false,
         disableAutoplay: false,
+        skipBlockedAutoplay: false,
         alwaysUseOriginalAudio: false,
         disableAnnotations: false,
         hideTopHeader: false,
@@ -262,6 +263,7 @@ const StateManager = (() => {
         state.hideEndscreenVideowall = data.hideEndscreenVideowall || false;
         state.hideEndscreenCards = data.hideEndscreenCards || false;
         state.disableAutoplay = data.disableAutoplay || false;
+        state.skipBlockedAutoplay = data.skipBlockedAutoplay || false;
         state.alwaysUseOriginalAudio = data.alwaysUseOriginalAudio || false;
         state.disableAnnotations = data.disableAnnotations || false;
         state.hideTopHeader = data.hideTopHeader || false;
@@ -1335,6 +1337,7 @@ const StateManager = (() => {
                 hideEndscreenVideowall: state.hideEndscreenVideowall,
                 hideEndscreenCards: state.hideEndscreenCards,
                 disableAutoplay: state.disableAutoplay,
+                skipBlockedAutoplay: state.skipBlockedAutoplay,
                 alwaysUseOriginalAudio: state.alwaysUseOriginalAudio,
                 disableAnnotations: state.disableAnnotations,
                 hideTopHeader: state.hideTopHeader,
@@ -2472,6 +2475,7 @@ const StateManager = (() => {
             'hideEndscreenVideowall',
             'hideEndscreenCards',
             'disableAutoplay',
+            'skipBlockedAutoplay',
             'alwaysUseOriginalAudio',
             'disableAnnotations',
             'hideTopHeader',
@@ -2878,6 +2882,7 @@ const StateManager = (() => {
                     'hideEndscreenVideowall',
                     'hideEndscreenCards',
                     'disableAutoplay',
+                    'skipBlockedAutoplay',
                     'alwaysUseOriginalAudio',
                     'disableAnnotations',
                     'hideTopHeader',
