@@ -265,6 +265,7 @@ function buildAutoBackupPayload({ settings, profilesV3, theme }) {
                 hideEndscreenVideowall: !!s.hideEndscreenVideowall,
                 hideEndscreenCards: !!s.hideEndscreenCards,
                 disableAutoplay: !!s.disableAutoplay,
+                skipBlockedAutoplay: !!s.skipBlockedAutoplay,
                 alwaysUseOriginalAudio: !!s.alwaysUseOriginalAudio,
                 disableAnnotations: !!s.disableAnnotations,
                 hideTopHeader: !!s.hideTopHeader,
@@ -349,6 +350,7 @@ function readAutoBackupState() {
             'hideEndscreenVideowall',
             'hideEndscreenCards',
             'disableAutoplay',
+            'skipBlockedAutoplay',
             'alwaysUseOriginalAudio',
             'disableAnnotations',
             'hideTopHeader',
@@ -456,6 +458,7 @@ function readAutoBackupState() {
                 hideEndscreenVideowall: boolFromV4('hideEndscreenVideowall', !!items?.hideEndscreenVideowall),
                 hideEndscreenCards: boolFromV4('hideEndscreenCards', !!items?.hideEndscreenCards),
                 disableAutoplay: boolFromV4('disableAutoplay', !!items?.disableAutoplay),
+                skipBlockedAutoplay: boolFromV4('skipBlockedAutoplay', !!items?.skipBlockedAutoplay),
                 alwaysUseOriginalAudio: boolFromV4('alwaysUseOriginalAudio', !!items?.alwaysUseOriginalAudio),
                 disableAnnotations: boolFromV4('disableAnnotations', !!items?.disableAnnotations),
                 hideTopHeader: boolFromV4('hideTopHeader', !!items?.hideTopHeader),
@@ -3160,6 +3163,7 @@ function buildProfilesV4FromLegacyState(items, storageUpdates = {}) {
                     hideEndscreenVideowall: !!items?.hideEndscreenVideowall,
                     hideEndscreenCards: !!items?.hideEndscreenCards,
                     disableAutoplay: !!items?.disableAutoplay,
+                    skipBlockedAutoplay: !!items?.skipBlockedAutoplay,
                     alwaysUseOriginalAudio: !!items?.alwaysUseOriginalAudio,
                     disableAnnotations: !!items?.disableAnnotations,
                     hideTopHeader: !!items?.hideTopHeader,
@@ -3610,6 +3614,7 @@ async function getCompiledSettings(sender = null, profileType = null, forceRefre
             'hideEndscreenVideowall',
             'hideEndscreenCards',
             'disableAutoplay',
+            'skipBlockedAutoplay',
             'alwaysUseOriginalAudio',
             'disableAnnotations',
             'hideTopHeader',
@@ -4412,6 +4417,7 @@ async function getCompiledSettings(sender = null, profileType = null, forceRefre
             compiledSettings.hideEndscreenVideowall = boolFromV4('hideEndscreenVideowall', items.hideEndscreenVideowall || false);
             compiledSettings.hideEndscreenCards = boolFromV4('hideEndscreenCards', items.hideEndscreenCards || false);
             compiledSettings.disableAutoplay = boolFromV4('disableAutoplay', items.disableAutoplay || false);
+            compiledSettings.skipBlockedAutoplay = boolFromV4('skipBlockedAutoplay', items.skipBlockedAutoplay || false);
             compiledSettings.alwaysUseOriginalAudio = boolFromV4('alwaysUseOriginalAudio', items.alwaysUseOriginalAudio || false);
             compiledSettings.disableAnnotations = boolFromV4('disableAnnotations', items.disableAnnotations || false);
             compiledSettings.hideTopHeader = boolFromV4('hideTopHeader', items.hideTopHeader || false);

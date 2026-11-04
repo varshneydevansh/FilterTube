@@ -83,7 +83,7 @@ test('every shared reset key matches actual initial state and actual account/chi
 });
 
 test('ordinary reset allowlist excludes master filtering, rules, restrictions, trust and family/time policy', () => {
-    const keys = Object.keys(api.defaults()); assert.equal(keys.length, 32);
+    const keys = Object.keys(api.defaults()); assert.equal(keys.length, 33);
     for (const key of ['enabled', 'syncKidsToMain', 'mode', 'strictMode', 'contentFilters', 'categoryFilters', 'languageFilters', 'autoBackupEnabled',
         'allowMainViewing', 'allowKidsViewing', 'defaultLaunchTarget', 'timeLimitPolicy', 'security', 'parentProfileId', 'notes', 'managedPolicyState']) assert.equal(keys.includes(key), false, key);
     const one = api.defaults(); one.hideShorts = true; assert.equal(api.defaults().hideShorts, false);
@@ -226,7 +226,7 @@ for (const [legacyKey, legacyValue, profileKey] of [
     assert.equal(before[profileKey], true);
     // Loading settings itself materializes legacy fields; exercise a still-sparse V4 profile at reset entry.
     f.data.ftProfilesV4.profiles.parent.settings = {};
-    assert.equal((await f.controller.restore()).changedCount, 32);
+    assert.equal((await f.controller.restore()).changedCount, 33);
     const after = await f.box.FilterTubeSettings.loadSettings();
     for (const { key, value } of api.entries) {
         assert.equal(f.data.ftProfilesV4.profiles.parent.settings[key], value, key + ' canonical explicit field');

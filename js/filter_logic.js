@@ -70,6 +70,7 @@
     const seenVideoChannelUpdates = new Map();
     let pendingVideoChannelFlush = null;
     const AUTOPLAY_ENDPOINT_KEYS = new Set(['autoplayVideo', 'nextButtonVideo', 'previousButtonVideo']);
+    const AUTOPLAY_POOL_RENDERERS = new Set(['compactVideoRenderer', 'videoWithContextRenderer', 'lockupViewModel']);
     const BLOCKTUBE_CHANNEL_NAME_SOURCE = 'blocktube-channel-name';
     const BLOCKTUBE_CHANNEL_NAME_BOUNDARY = "[ \n\r\t!@#$%^&*()_\\-=+\\[\\]\\\\\\|;:'\",\\.\\/<>\\?`~:]+";
     const blockTubeChannelNameRegexCache = new WeakMap();
@@ -2408,6 +2409,137 @@
             return false;
         }
 
+        // Issue #82: a blocked autoplay/Next endpoint used to be deleted, so
+        // YouTube fell back to its own pick, which was often blocked too.
+        // For ordinary (non-playlist) autoplay, point the endpoint at the
+        // first related video in this same response that passes the full
+        // renderer rule check (channels, keywords, content filters).
+        _isPlaylistAutoplayEndpoint(endpoint) {
+            if (!endpoint || typeof endpoint !== 'object') return true;
+            if (endpoint.watchPlaylistEndpoint) return true;
+            const watchEndpoints = [
+                endpoint.watchEndpoint,
+                endpoint.command?.watchEndpoint,
+                endpoint.innertubeCommand?.watchEndpoint
+            ].filter(Boolean);
+            if (watchEndpoints.some(watch => watch.playlistId)) return true;
+            const url = String(endpoint.commandMetadata?.webCommandMetadata?.url || '');
+            return /[?&]list=/.test(url);
+        }
+
+        _autoplayResponseRoot() {
+            const data = this._autoplayReplacementRoot;
+            if (!data || typeof data !== 'object') return null;
+            // get_watch responses are arrays whose entry carries watchNextResponse.
+            if (Array.isArray(data)) {
+                return data.find(entry => entry?.watchNextResponse)?.watchNextResponse || null;
+            }
+            return data.watchNextResponse || data;
+        }
+
+        _autoplayReplacementPool() {
+            if (this._autoplayPool) return this._autoplayPool;
+            const pool = [];
+            const seen = new Set();
+            const root = this._autoplayResponseRoot();
+            const watchNext = root?.contents?.twoColumnWatchNextResults || root?.contents?.singleColumnWatchNextResults;
+            // Playlist watch pages keep their playlist order; never replace there.
+            if (!watchNext || watchNext.playlist?.playlist) {
+                this._autoplayPool = pool;
+                return pool;
+            }
+            const sources = [watchNext.secondaryResults, watchNext.results];
+            const visit = (node, depth) => {
+                if (!node || typeof node !== 'object' || depth > 10 || pool.length >= 40) return;
+                if (Array.isArray(node)) {
+                    for (const child of node) visit(child, depth + 1);
+                    return;
+                }
+                for (const rendererType of AUTOPLAY_POOL_RENDERERS) {
+                    const renderer = node[rendererType];
+                    if (!renderer || typeof renderer !== 'object') continue;
+                    const endpoint = rendererType === 'lockupViewModel'
+                        ? renderer.rendererContext?.commandContext?.onTap?.innertubeCommand
+                        : renderer.navigationEndpoint;
+                    const videoId = rendererType === 'lockupViewModel'
+                        ? (renderer.contentType === 'LOCKUP_CONTENT_TYPE_VIDEO' ? endpoint?.watchEndpoint?.videoId || renderer.contentId : '')
+                        : (renderer.videoId || endpoint?.watchEndpoint?.videoId);
+                    if (typeof videoId !== 'string' || !/^[a-zA-Z0-9_-]{11}$/.test(videoId)) continue;
+                    // Shorts, Mixes and playlist lockups are not autoplay successors.
+                    if (!endpoint?.watchEndpoint || endpoint.watchEndpoint.playlistId || seen.has(videoId)) continue;
+                    seen.add(videoId);
+                    pool.push({ videoId, rendererType, renderer, endpoint });
+                }
+                for (const [key, value] of Object.entries(node)) {
+                    if (key === 'autoplay' || key === 'playlist' || AUTOPLAY_POOL_RENDERERS.has(key)) continue;
+                    if (value && typeof value === 'object') visit(value, depth + 1);
+                }
+            };
+            for (const source of sources) visit(source, 0);
+            this._autoplayPool = pool;
+            return pool;
+        }
+
+        _autoplayPoolEntryAllowed(entry) {
+            const cache = this._autoplayPoolDecisions || (this._autoplayPoolDecisions = new Map());
+            if (cache.has(entry.videoId)) return cache.get(entry.videoId);
+            let allowed = false;
+            try {
+                allowed = !this._shouldBlock(entry.renderer, entry.rendererType);
+            } catch (e) {
+                allowed = false;
+            }
+            cache.set(entry.videoId, allowed);
+            return allowed;
+        }
+
+        _rewriteAutoplayEndpoint(endpoint, fromVideoId, entry) {
+            const next = JSON.parse(JSON.stringify(endpoint));
+            for (const holder of [next, next.command, next.innertubeCommand]) {
+                if (!holder || typeof holder !== 'object' || !holder.watchEndpoint) continue;
+                const watch = holder.watchEndpoint;
+                watch.videoId = entry.videoId;
+                delete watch.playlistId;
+                delete watch.index;
+                delete watch.startTimeSeconds;
+                const meta = holder.commandMetadata?.webCommandMetadata;
+                if (meta && typeof meta.url === 'string') {
+                    meta.url = fromVideoId && meta.url.includes(fromVideoId)
+                        ? meta.url.split(fromVideoId).join(entry.videoId)
+                        : `/watch?v=${entry.videoId}`;
+                }
+            }
+            if (!next.watchEndpoint && !next.command?.watchEndpoint && !next.innertubeCommand?.watchEndpoint) {
+                return JSON.parse(JSON.stringify(entry.endpoint));
+            }
+            return next;
+        }
+
+        /**
+         * Returns the endpoint to keep for a blocked autoplay/Next entry, or
+         * null when it should be removed (the pre-#82 behavior).
+         */
+        _replacementForBlockedAutoplayEndpoint(endpoint, endpointKey) {
+            if (endpointKey === 'previousButtonVideo') return null;
+            if (this.settings.enabled === false || this.settings.disableAutoplay) return null;
+            if (this._isPlaylistAutoplayEndpoint(endpoint)) return null;
+            const blockedVideoId = this._extractAutoplayEndpointVideoId(endpoint);
+            const currentVideoId = this._autoplayResponseRoot()?.currentVideoEndpoint?.watchEndpoint?.videoId || '';
+            for (const entry of this._autoplayReplacementPool()) {
+                if (entry.videoId === currentVideoId) continue;
+                if (!this._autoplayPoolEntryAllowed(entry)) continue;
+                // Whitelist mode can reject an endpoint only because its owner is
+                // not yet mapped; a fully described related card proves otherwise.
+                if (entry.videoId === blockedVideoId) {
+                    if (this.settings.listMode === 'whitelist') return endpoint;
+                    continue;
+                }
+                this._log(`🔁 Replacing blocked ${endpointKey} ${blockedVideoId} with ${entry.videoId}`);
+                return this._rewriteAutoplayEndpoint(endpoint, blockedVideoId, entry);
+            }
+            return null;
+        }
+
         _regexMatches(regex, text) {
             if (!regex || !text) return false;
             try {
@@ -4372,6 +4504,11 @@
             const result = {};
             for (const [key, value] of Object.entries(obj)) {
                 if (AUTOPLAY_ENDPOINT_KEYS.has(key) && this._shouldBlockAutoplayEndpoint(value, key)) {
+                    const replacement = this._replacementForBlockedAutoplayEndpoint(value, key);
+                    if (replacement) {
+                        result[key] = replacement;
+                        continue;
+                    }
                     this.blockedCount++;
                     const endpointPath = this.debugEnabled ? `${path}.${key}` : path;
                     this._log(`✂️ Removed ${key} endpoint at ${endpointPath}`);
@@ -4432,7 +4569,14 @@
             // 2. THEN FILTER
             this._log(`🔄 Starting to filter ${dataName}`);
             const startTime = Date.now();
+            // Autoplay replacement (#82) reads related videos from this payload only.
+            this._autoplayReplacementRoot = data;
+            this._autoplayPool = null;
+            this._autoplayPoolDecisions = null;
             const filtered = this.filter(data);
+            this._autoplayReplacementRoot = null;
+            this._autoplayPool = null;
+            this._autoplayPoolDecisions = null;
             const endTime = Date.now();
 
             if (perfEnabled) {

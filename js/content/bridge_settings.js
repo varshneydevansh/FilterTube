@@ -2057,6 +2057,8 @@ function sendSettingsToMainWorld(settings) {
     managedContentPlaybackPermit.clear('managed_time_settings_changed');
     try { if (typeof window !== 'undefined') window.FilterTubeContentPlayback?.invalidate?.('settings_changed'); } catch (_) {}
     const dispatchRevision = ++mainWorldSettingsDispatchRevision;
+    // A pending blocked-autoplay skip (#82) belongs to the previous settings.
+    try { if (typeof cancelBlockedAutoplaySkip === 'function') cancelBlockedAutoplaySkip(); } catch (_) {}
     retainVerifiedVideoMetadata(settings);
     latestSettings = settings;
     currentSettings = settings;
@@ -2312,6 +2314,7 @@ function handleStorageChanges(changes, area) {
         'hideEndscreenVideowall',
         'hideEndscreenCards',
         'disableAutoplay',
+        'skipBlockedAutoplay',
         'alwaysUseOriginalAudio',
         'disableAnnotations',
         'hideTopHeader',

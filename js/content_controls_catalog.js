@@ -208,6 +208,11 @@
                     description: 'Disable or suppress autoplay UI'
                 },
                 {
+                    key: 'skipBlockedAutoplay',
+                    title: 'Skip blocked autoplay videos',
+                    description: 'When autoplay reaches a video your rules block, continue to the next allowed video (up to 3 tries)'
+                },
+                {
                     key: 'contentOnlyPlayback',
                     title: 'Content-only playback (Experimental)',
                     description: 'On by default with advert filtering. Choose a main-video source automatically when needed on desktop YouTube, keeping its controls and playlist. If playback has trouble, turn off and reload the video.'
