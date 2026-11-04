@@ -54,6 +54,26 @@
   snapshot arriving, no longer pauses it or shows "Checking this video against
   your FilterTube rules…" again. If your rules really change, the video is checked
   again and can be blocked. Turning FilterTube off still releases playback at once.
+### Import and export
+
+- **BlockTube export keeps channels without a channel ID (#80).** Channels known
+  only by name or @handle are now exported to BlockTube's channel-name list as
+  exact, case-insensitive whole-name rules (Korean and other scripts included)
+  instead of being dropped, and the review lists them as "matched by name".
+  A channel known only by its @handle matches where YouTube shows the handle as
+  the channel name, such as comments and Shorts.
+- **Duration filter carries over to BlockTube (#80).** The Duration Filter is
+  exported to BlockTube's runtime length (seconds plus Block/Allow), using the
+  exact reverse of the BlockTube import; shapes BlockTube cannot express are
+  listed instead of approximated.
+- **Allow-only profiles can export their blocked rules (#80).** BlockTube has no
+  allow-only mode, so the review lists that mode as omitted and still exports
+  the profile's blocked rules. An allow-only rule space with no blocked rules is
+  not downloaded, because BlockTube's import would replace its rules with an
+  empty list.
+- **Clearer backup choice (#80).** The normal FilterTube backup now says it only
+  restores into FilterTube and points to **Export for BlockTube** for moving
+  rules to BlockTube.
 
 ## Version 3.4.2 — Device Sync, Video Notes And Playback Improvements (Preview)
 

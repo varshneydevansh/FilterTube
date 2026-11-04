@@ -28740,7 +28740,8 @@ document.addEventListener('DOMContentLoaded', async () => {
             invalid_video_id: 'Invalid video identifiers',
             allow_rules_not_supported: 'Allowed rules (BlockTube only supports blocked rules)',
             subscription_metadata_not_supported: 'Saved subscriptions',
-            whitelist_mode_not_supported: 'Allow-only mode (this profile cannot be exported to BlockTube)',
+            whitelist_mode_not_supported: 'Allow-only mode is not supported by BlockTube and was omitted',
+            duration_condition_not_supported: 'Duration filter settings that BlockTube cannot represent',
             unknown_list_mode: 'An unsupported filtering mode',
             setting_not_supported: 'FilterTube-only filtering settings',
             parental_time_policy_not_supported: 'Parental time limits',
@@ -28759,6 +28760,31 @@ document.addEventListener('DOMContentLoaded', async () => {
             || (String(item.field).includes('languageFilters') ? 'Spoken Language' : '')
             || key?.replace(/([a-z])([A-Z])/g, '$1 $2');
         return label ? `${reason}: ${label}` : reason;
+    }
+
+    function summarizeBlockTubeExport(report) {
+        const lines = [];
+        const duration = report?.duration;
+        if (duration && Array.isArray(duration.vidLength)) {
+            const [min, max] = duration.vidLength;
+            if (duration.vidLength_type === 'block') {
+                lines.push(tabViewUiText('blockTubeExport.durationBlock', 'Duration filter: block videos from {min} to {max} seconds long', { min, max }));
+            } else if (min !== null && max !== null) {
+                lines.push(tabViewUiText('blockTubeExport.durationAllowRange', 'Duration filter: hide videos shorter than {min} or longer than {max} seconds', { min, max }));
+            } else if (min !== null) {
+                lines.push(tabViewUiText('blockTubeExport.durationAllowMin', 'Duration filter: hide videos shorter than {min} seconds', { min }));
+            } else if (max !== null) {
+                lines.push(tabViewUiText('blockTubeExport.durationAllowMax', 'Duration filter: hide videos longer than {max} seconds', { max }));
+            }
+        }
+        const byName = Array.isArray(report?.matchedByName) ? report.matchedByName : [];
+        if (byName.length) {
+            const names = byName.map(row => (Array.isArray(row?.labels) ? row.labels : []).join(' / ')).filter(Boolean);
+            lines.push(tabViewUiText('blockTubeExport.matchedByName',
+                'Matched by exact channel name (no verified YouTube channel ID): {count} — {names}',
+                { count: byName.length, names: names.join(', ') }));
+        }
+        return lines;
     }
 
     async function runBlockTubeExport() {
@@ -28801,8 +28827,11 @@ document.addEventListener('DOMContentLoaded', async () => {
                 omitted.set(item.reason, bucket);
             }
             const details = [
-                ...(!report.canExport ? [tabViewUiText('blockTubeExport.nothingCompatible', 'No compatible rules can be downloaded for this selection. Choose another profile or rule space, or use a complete FilterTube backup.')] : []),
+                ...(!report.canExport ? [report.allowOnlyMode
+                    ? tabViewUiText('blockTubeExport.allowOnlyNothing', 'This rule space uses allow-only mode, which BlockTube does not support, and it has no blocked rules to export. Nothing was downloaded, so your BlockTube rules stay as they are.')
+                    : tabViewUiText('blockTubeExport.nothingCompatible', 'No compatible rules can be downloaded for this selection. Choose another profile or rule space, or use a complete FilterTube backup.')] : []),
                 Object.entries(report.counts || {}).map(([field, count]) => `${tabViewUiText(`blockTubeExport.count.${field}`, ({ title: 'Title rules', channelName: 'Channel-name rules', channelId: 'Channels', videoId: 'Videos', comment: 'Comment rules' })[field] || field)}: ${count}`).join(' · '),
+                ...summarizeBlockTubeExport(report),
                 ...(report.warnings || []),
                 ...[...omitted.values()].map(({ reason, count, fields }) => `${tabViewUiText('blockTubeExport.omitted', 'Not transferred')}: ${reason} (${count})${fields.size ? ` — ${[...fields].join(', ')}` : ''}`)
             ];

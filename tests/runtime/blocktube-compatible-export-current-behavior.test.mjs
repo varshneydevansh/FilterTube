@@ -173,7 +173,7 @@ test('large multilingual exports retain every distinct row without a truncation 
 
 test('unsupported constraints, unresolved identities and paused rows are reported and require explicit review', async () => {
   const f = fixture();
-  f.selected.main.channels = [{ handle: '@unresolved', name: 'Not an ID' }, { id: channelId, name: 'Paused', filterAll: true, managedListPaused: true }];
+  f.selected.main.channels = [{ customUrl: 'c/LegacyOnly', originalInput: 'https://www.youtube.com/c/LegacyOnly' }, { id: channelId, name: 'Paused', filterAll: true, managedListPaused: true }];
   f.selected.main.keywords.push(
     { word: 'future rule', dateFilter: { enabled: true, after: '2099-01-01' } },
     { word: 'semantic', semantic: true }, { word: 'global', matchMode: 'regex', regexFlags: 'g' },
@@ -187,17 +187,39 @@ test('unsupported constraints, unresolved identities and paused rows are reporte
   await assert.rejects(f.io.exportBlockTube({ ...args, reviewToken: report.reviewToken }), /explicitly accept/);
   const { payload } = await f.io.exportBlockTube({ ...args, reviewToken: report.reviewToken, acceptUnsupported: true });
   assert.equal(payload.filterData.title.length, 1); assert.equal(payload.filterData.channelId.length, 0);
+  assert.deepEqual(clone(payload.filterData.channelName), [], 'a custom URL is not a displayed channel name');
+  assert.deepEqual(clone(payload.filterData.vidLength), [null, 300], 'the duration filter is exported rather than omitted');
+  assert.equal(payload.options.vidLength_type, 'allow');
+  assert.equal(report.unsupported.some(row => row.field === 'settings.contentFilters.duration'), false);
   assert.equal(payload.options.shorts, true);
   assert.equal(payload.options.enable_javascript, false); assert.equal(payload.filterData.javascript, '');
 });
 
-test('whitelist mode and entirely unconvertible rules cannot be exported even after accepting omissions', async () => {
+test('allow-only mode exports its blocked rules and reports the mode itself as omitted (#80)', async () => {
+  const f = fixture();
+  f.selected.main.mode = 'whitelist';
+  f.selected.main.whitelistChannels = [{ id: channelId }];
+  f.selected.main.keywords.push({ word: '광고 영상' });
+  const args = { profileId: 'child', surface: 'main' }, report = await f.io.previewBlockTubeExport(args);
+  assert.equal(report.canExport, true);
+  assert.equal(report.allowOnlyMode, true);
+  assert.ok(report.unsupported.some(row => row.field === 'main.mode' && row.reason === 'whitelist_mode_not_supported'));
+  assert.ok(report.unsupported.some(row => row.reason === 'allow_rules_not_supported'));
+  await assert.rejects(f.io.exportBlockTube({ ...args, reviewToken: report.reviewToken }), /explicitly accept/);
+  const { payload } = await f.io.exportBlockTube({ ...args, reviewToken: report.reviewToken, acceptUnsupported: true });
+  const compiled = upstreamCompile(upstreamImport(payload).saved);
+  assert.equal(matches(compiled, 'title', '오늘의 광고 영상 모음'), true);
+  assert.equal(matches(compiled, 'channelId', channelId), false, 'allowed channels never become BlockTube blocks');
+});
+
+test('allow-only mode without blocked rules and entirely unconvertible rules cannot be exported even after accepting omissions', async () => {
   for (const kind of ['whitelist', 'empty']) {
     const f = fixture();
-    if (kind === 'whitelist') f.selected.main.mode = 'whitelist';
+    if (kind === 'whitelist') { f.selected.main.mode = 'whitelist'; f.selected.main.keywords = []; }
     else f.selected.main.keywords = [{ word: 'conditional', dateFilter: { enabled: true } }];
     const args = { profileId: 'child', surface: 'main' }, report = await f.io.previewBlockTubeExport(args);
     assert.equal(report.canExport, false);
+    assert.equal(report.allowOnlyMode, kind === 'whitelist');
     await assert.rejects(f.io.exportBlockTube({ ...args, reviewToken: report.reviewToken, acceptUnsupported: true }), /cannot be safely exported/);
   }
 });
@@ -281,4 +303,181 @@ test('required storage read errors do not fall back to another profile or create
   f.box.chrome.storage.local.get = (_, callback) => { f.box.chrome.runtime.lastError = { message: 'synthetic export read failed' }; callback({}); f.box.chrome.runtime.lastError = null; };
   await assert.rejects(f.io.previewBlockTubeExport({ profileId: 'child', surface: 'main' }), /synthetic export read failed/);
   assert.equal(f.calls.writes, 0);
+});
+
+// BlockTube 0.4.8 runtime-length predicate, copied for this test only from
+// amitbl/blocktube src/scripts/inject.js (commit d8a1bdba062ab603726b0ac3ea06c229d61fd710,
+// GPL-3.0-only, see fixtures/blocktube-0.4.8/LICENSE): parseTime() and the
+// `h === 'vidLength'` branch of ObjectFilter.prototype.matchFilterData.
+// It is not shipped in FilterTube product code.
+function blockTubeParseTime(timeStr) {
+  if (timeStr === 'SHORTS') return -2;
+  const parts = String(timeStr).split(':').map(x => parseInt(x, 10));
+  switch (parts.length) {
+    case 3: return (parts[0] * 60 * 60) + (parts[1] * 60) + parts[2];
+    case 2: return (parts[0] * 60) + parts[1];
+    case 1: return parts[0];
+    default: return -1;
+  }
+}
+function blockTubeBlocksLength(storageData, value) {
+  const properties = storageData.filterData.vidLength;
+  const vidLen = blockTubeParseTime(value);
+  if (vidLen > 0 && properties.length === 2) {
+    if (storageData.options.vidLength_type === 'block') {
+      if ((properties[0] !== null && vidLen >= properties[0]) && (properties[1] !== null && vidLen <= properties[1])) return true;
+    } else {
+      if ((properties[0] !== null && vidLen < properties[0]) || (properties[1] !== null && vidLen > properties[1])) return true;
+    }
+  }
+  return false;
+}
+
+// Mirrors FilterTube's duration decision in js/filter_logic.js (minutes,
+// condition, mode) so both sides can be compared second by second.
+function filterTubeBlocksLength(rule, seconds) {
+  const minutes = seconds / 60, condition = rule.condition || 'between';
+  let min = Number(rule.minMinutes ?? 0) || 0, max = Number(rule.maxMinutes ?? 0) || 0;
+  if (max > 0 && min > max) [min, max] = [max, min];
+  if (condition === 'between') {
+    if (!(max > 0)) return false;
+    const inside = minutes >= min && minutes <= max;
+    return rule.mode === 'block' ? inside : !inside;
+  }
+  const mode = rule.mode === 'allow' ? 'allow' : 'block';
+  const hit = condition === 'longer' ? minutes > min : minutes < min;
+  return mode === 'allow' ? !hit : hit;
+}
+
+const asClock = seconds => `${Math.floor(seconds / 60)}:${String(seconds % 60).padStart(2, '0')}`;
+
+for (const [name, duration, vidLength, type] of [
+  ['allow-only range', { enabled: true, condition: 'between', minMinutes: 2, maxMinutes: 10, value: '', mode: 'allow' }, [120, 600], 'allow'],
+  ['allow-only range from zero', { enabled: true, condition: 'between', minMinutes: 0, maxMinutes: 4.5, value: '', mode: 'allow' }, [0, 270], 'allow'],
+  ['blocked range', { enabled: true, condition: 'between', minMinutes: 1.5, maxMinutes: 20, value: '', mode: 'block' }, [90, 1200], 'block'],
+  ['shorter than', { enabled: true, condition: 'shorter', minMinutes: 3, maxMinutes: 0, value: '3', mode: 'block' }, [180, null], 'allow'],
+  ['longer than', { enabled: true, condition: 'longer', minMinutes: 15, maxMinutes: 0, value: '15', mode: 'block' }, [null, 900], 'allow']
+]) {
+  test(`duration ${name} exports to BlockTube vidLength and imports back to the same FilterTube filter (#80)`, async () => {
+    const f = fixture();
+    f.selected.settings = { contentFilters: { duration } };
+    const { payload, report } = await exportReviewed(f);
+    assert.deepEqual(clone(payload.filterData.vidLength), vidLength);
+    assert.equal(payload.options.vidLength_type, type);
+    assert.deepEqual(clone(report.duration), { vidLength, vidLength_type: type });
+    assert.equal(report.unsupported.some(row => String(row.field).includes('duration')), false);
+    const saved = upstreamImport(clone(payload)).saved;
+    assert.deepEqual(saved.filterData.vidLength, vidLength, 'the actual BlockTube import -> save keeps both bounds');
+    assert.equal(saved.options.vidLength_type, type);
+    for (let seconds = 1; seconds <= 1500; seconds++) {
+      assert.equal(blockTubeBlocksLength(saved, asClock(seconds)), filterTubeBlocksLength(duration, seconds), `${seconds}s`);
+    }
+    for (const candidate of [payload, saved]) {
+      const preview = f.io.previewBlockTubeMigration(clone(candidate));
+      assert.equal(preview.ok, true);
+      assert.equal(preview.counts.durationFilters, 1);
+      assert.deepEqual(clone(preview.durationFilter), duration, 'export -> import is the identity for this duration filter');
+    }
+  });
+}
+
+test('duration bounds round to whole seconds without changing whole-second decisions, and Kids uses its own filter', async () => {
+  const f = fixture();
+  f.selected.settings = { contentFilters: { duration: { enabled: true, condition: 'between', minMinutes: 1.01, maxMinutes: 2.99, mode: 'allow' } } };
+  f.selected.kids.contentFilters = { duration: { enabled: true, condition: 'longer', minMinutes: 0.1 } };
+  const main = await exportReviewed(f), kids = await exportReviewed(f, { surface: 'kids' });
+  assert.deepEqual(clone(main.payload.filterData.vidLength), [61, 179]);
+  assert.deepEqual(clone(kids.payload.filterData.vidLength), [null, 6]);
+  for (let seconds = 1; seconds <= 400; seconds++) {
+    assert.equal(blockTubeBlocksLength(upstreamImport(main.payload).saved, asClock(seconds)), filterTubeBlocksLength(f.selected.settings.contentFilters.duration, seconds), `main ${seconds}s`);
+    assert.equal(blockTubeBlocksLength(kids.payload, String(seconds)), filterTubeBlocksLength(f.selected.kids.contentFilters.duration, seconds), `kids ${seconds}s`);
+  }
+});
+
+test('duration shapes BlockTube cannot represent are reported, not approximated', async () => {
+  for (const duration of [
+    { enabled: true, condition: 'longer', minMinutes: 5, mode: 'allow' },
+    { enabled: true, condition: 'shorter', minMinutes: 0 },
+    { enabled: true, condition: 'between', minMinutes: 3, maxMinutes: 0 },
+    { enabled: true, condition: 'between', minMinutes: 1.01, maxMinutes: 1.012 }
+  ]) {
+    const f = fixture();
+    f.selected.settings = { contentFilters: { duration } };
+    const { payload, report } = await exportReviewed(f);
+    assert.deepEqual(clone(payload.filterData.vidLength), [null, null], JSON.stringify(duration));
+    assert.equal(payload.options.vidLength_type, undefined);
+    assert.equal(report.duration, null);
+    assert.ok(report.unsupported.some(row => row.field === 'settings.contentFilters.duration' && row.reason === 'duration_condition_not_supported'));
+  }
+  const disabled = fixture();
+  disabled.selected.settings = { contentFilters: { duration: { enabled: false, condition: 'longer', minMinutes: 5 } } };
+  const { payload, report } = await exportReviewed(disabled);
+  assert.deepEqual(clone(payload.filterData.vidLength), [null, null]);
+  assert.equal(report.unsupported.some(row => String(row.field).includes('duration')), false);
+});
+
+test('Hangul channels without a resolved UC ID export as exact, case-insensitive channel-name rules (#80)', async () => {
+  const f = fixture();
+  f.selected.main.channels = [
+    { name: '뉴스 채널', handle: '@newschannel' },
+    { name: '한국어 (공식) [K-POP] a.b*c/d' },
+    { handle: '@한국어채널' },
+    { handle: '%ED%95%9C%EA%B8%80tv', originalInput: '@%ED%95%9C%EA%B8%80tv' },
+    { name: 'MixedCase 채널', filterAll: true, filterAllComments: false },
+    { id: channelId, name: '정식 채널' },
+    { customUrl: 'c/OnlyCustom', originalInput: 'https://www.youtube.com/c/OnlyCustom' }
+  ];
+  f.selected.main.keywords = [{ word: '먹방' }, { word: '광고', exact: true, comments: true }];
+  const before = clone(f.storage), { payload, report } = await exportReviewed(f);
+  assert.equal(payload.filterData.channelName.length, 5);
+  assert.equal(payload.filterData.channelId.length, 1);
+  assert.deepEqual(clone(report.matchedByName.map(row => [row.index, row.labels, row.handleOnly])), [
+    [0, ['뉴스 채널', '@newschannel'], false],
+    [1, ['한국어 (공식) [K-POP] a.b*c/d'], false],
+    [2, ['@한국어채널'], true],
+    [3, ['@한글tv'], true],
+    [4, ['MixedCase 채널'], false]
+  ]);
+  assert.equal(report.unsupported.filter(row => row.reason === 'unresolved_channel_id').length, 1, 'only the custom-URL-only row lacks a displayable name');
+  assert.match(report.warnings.join('\n'), /known only by @handle/);
+  const imported = upstreamImport(payload);
+  assert.deepEqual(imported.alerts, []);
+  const compiled = upstreamCompile(imported.saved);
+  for (const label of ['뉴스 채널', ' 뉴스  채널 ', '@newschannel', '@NewsChannel', '한국어 (공식) [K-POP] a.b*c/d', '한국어 (공식) [k-pop] A.B*C/D', '@한국어채널', '@한글TV', 'mixedcase 채널']) {
+    assert.equal(matches(compiled, 'channelName', label), true, label);
+  }
+  for (const label of ['뉴스 채널 하이라이트', '오늘의 뉴스 채널', '뉴스채널', 'newschannel', '한국어 (공식) [K-POP] aXbbc/d', '한국어채널', '@한국어채널2', '정식 채널', 'OnlyCustom']) {
+    assert.equal(matches(compiled, 'channelName', label), false, label);
+  }
+  assert.equal(matches(compiled, 'title', '뉴스 채널'), false, 'channel-name rules never become title rules');
+  assert.equal(matches(compiled, 'title', 'MixedCase 채널 리뷰'), true, 'filterAll still adds the title rule');
+  assert.equal(matches(compiled, 'comment', 'MixedCase 채널 리뷰'), false);
+  assert.equal(matches(compiled, 'title', '오늘 먹방 시작'), true);
+  assert.equal(matches(compiled, 'comment', '이건 광고!'), true);
+  assert.equal(matches(compiled, 'title', '광고주'), false, 'an exact Hangul keyword keeps its word boundary');
+  assert.equal(matches(compiled, 'channelId', channelId), true);
+  assert.deepEqual(f.storage, before);
+
+  // FilterTube re-import keeps them as name-scoped channel rows.
+  const preview = f.io.previewBlockTubeMigration(clone(imported.saved));
+  assert.equal(preview.ok, true);
+  assert.equal(preview.counts.channelNameRules, 5);
+  assert.equal(preview.counts.channelIds, 1);
+});
+
+test('the exported BlockTube file always has the shape BlockTube import requires', async () => {
+  const f = fixture();
+  f.selected.main.channels = [{ name: '채널' }];
+  f.selected.settings = { contentFilters: { duration: { enabled: true, condition: 'longer', minMinutes: 10 } } };
+  const { payload } = await exportReviewed(f);
+  const json = JSON.parse(JSON.stringify(payload));
+  assert.ok(json.filterData && json.options, 'options.js importOptions requires json.filterData && json.options');
+  for (const field of ['title', 'channelName', 'channelId', 'videoId', 'comment']) assert.ok(Array.isArray(json.filterData[field]), field);
+  assert.equal(json.filterData.vidLength.length, 2);
+  assert.equal(typeof json.filterData.javascript, 'string');
+  const compiled = upstreamCompile(json);
+  for (const field of ['title', 'channelName', 'channelId', 'videoId', 'comment']) {
+    for (const [pattern, flags] of compiled.filterData[field]) assert.doesNotThrow(() => new RegExp(pattern, flags), `${field}: ${pattern}`);
+  }
+  assert.deepEqual(compiled.filterData.vidLength, [null, 600]);
 });
