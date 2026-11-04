@@ -2450,5 +2450,11 @@
   "apps.ios.cta": "مشاهدهٔ وضعیت",
   "apps.heading": "FilterTube برای گوشی، تبلت و Android TV اکنون در Google Play است، با یک صفحه.",
   "dashboard.stats.title": "امروز",
-  "dashboard.stats.surface": "آمار برای"
+  "dashboard.stats.surface": "آمار برای",
+  "controls.header.label": "نمایهٔ فعال",
+  "controls.header.surfaceMode": "{surface} · {mode}",
+  "controls.tile.backup": "پشتیبان‌گیری و بازیابی",
+  "controls.tile.profiles": "نمایه‌ها & PIN",
+  "controls.summary.contentOn": "روشن: {count}",
+  "controls.summary.profiles": "نمایه‌ها: {count}"
 }

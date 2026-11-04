@@ -1,0 +1,913 @@
+/* FilterTube dashboard and sidebar (2026-11-04).
+   Keeps the original FilterTube look: the background video behind frosted panels, warm glass cards, the
+   rounded display type and the large tilted app art. Loaded last so the page tones keep their colours while
+   the tab view lets its video show through. Every colour comes from the page-tone tokens. */
+
+/* ---------------------------------------------------------------------------
+   The background video shows through the shell again.
+   --------------------------------------------------------------------------- */
+
+:root[data-page-tone][data-theme] body.ft-extension-surface[data-surface="tab-view"] .ft-tab-view-ambient__media-scrim {
+    background: linear-gradient(180deg,
+        color-mix(in srgb, var(--ft-tone-page-start) 30%, transparent) 0%,
+        color-mix(in srgb, var(--ft-tone-page-start) 48%, transparent) 38%,
+        color-mix(in srgb, var(--ft-tone-page-end) 70%, transparent) 100%);
+}
+
+:root[data-page-tone][data-theme="dark"] body.ft-extension-surface[data-surface="tab-view"] .ft-tab-view-ambient__media-scrim {
+    background: linear-gradient(180deg,
+        color-mix(in srgb, var(--ft-tone-page-start) 46%, transparent) 0%,
+        color-mix(in srgb, var(--ft-tone-page-start) 62%, transparent) 40%,
+        color-mix(in srgb, var(--ft-tone-page-end) 80%, transparent) 100%);
+}
+
+:root[data-page-tone][data-theme] body.ft-extension-surface[data-surface="tab-view"] :is(.sidebar, .top-bar, .view-container) {
+    border-color: color-mix(in srgb, var(--ft-tone-stroke) 70%, rgba(255, 255, 255, 0.5));
+    background: color-mix(in srgb, var(--ft-tone-panel) 66%, transparent);
+    backdrop-filter: blur(22px) saturate(1.12);
+    -webkit-backdrop-filter: blur(22px) saturate(1.12);
+}
+
+:root[data-page-tone][data-theme="dark"] body.ft-extension-surface[data-surface="tab-view"] :is(.sidebar, .top-bar, .view-container) {
+    border-color: color-mix(in srgb, var(--ft-tone-stroke) 80%, rgba(255, 255, 255, 0.06));
+    background: color-mix(in srgb, var(--ft-tone-panel) 74%, transparent);
+}
+
+/* ---------------------------------------------------------------------------
+   Sidebar: the apps' Control Center options, grouped like the apps' tree.
+   --------------------------------------------------------------------------- */
+
+body.ft-extension-surface[data-surface="tab-view"] .sidebar .nav-list {
+    min-height: 0;
+    flex: 1 1 auto;
+    gap: 0.12rem;
+    overflow-y: auto;
+    overscroll-behavior: contain;
+}
+
+body.ft-extension-surface[data-surface="tab-view"] .sidebar .brand {
+    margin-bottom: 0.6rem;
+}
+
+body.ft-extension-surface[data-surface="tab-view"] .sidebar .nav-divider {
+    flex: none;
+    height: 1px;
+    margin: 0.2rem 0.85rem;
+    list-style: none;
+    background: var(--ft-tone-stroke, var(--ft-color-sem-neutral-border));
+}
+
+:root[data-page-tone][data-theme] body.ft-extension-surface[data-surface="tab-view"] .sidebar .nav-list .nav-item[data-tab] {
+    position: relative;
+    align-items: flex-start;
+    gap: 0.75rem;
+    min-height: 2.4rem;
+    padding: 0.3rem 0.8rem;
+    border: 1px solid transparent;
+    border-radius: 0.9rem;
+    background: transparent;
+    box-shadow: none;
+    color: var(--ft-tone-ink);
+    transform: none;
+    transition: background-color 220ms cubic-bezier(0.16, 1, 0.3, 1), border-color 220ms ease;
+}
+
+:root[data-page-tone][data-theme] body.ft-extension-surface[data-surface="tab-view"] .sidebar .nav-list .nav-item[data-tab][hidden] {
+    display: none;
+}
+
+:root[data-page-tone][data-theme] body.ft-extension-surface[data-surface="tab-view"] .sidebar .nav-list .nav-item[data-tab]::before {
+    content: "";
+    position: absolute;
+    top: 0.7rem;
+    bottom: 0.7rem;
+    left: 0.28rem;
+    width: 3px;
+    border-radius: 999px;
+    background: var(--ft-tone-accent);
+    opacity: 0;
+    transform: scaleY(0.4);
+    transition: opacity 220ms ease, transform 320ms cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+/* Several rows share a page; only the chosen row is current. */
+:root[data-page-tone][data-theme] body.ft-extension-surface[data-surface="tab-view"] .sidebar .nav-list .nav-item[data-tab].active,
+:root[data-page-tone][data-theme] body.ft-extension-surface[data-surface="tab-view"] .sidebar .nav-list .nav-item[data-tab]:hover {
+    border-color: transparent;
+    background: transparent;
+    box-shadow: none;
+}
+
+:root[data-page-tone][data-theme] body.ft-extension-surface[data-surface="tab-view"] .sidebar .nav-list .nav-item[data-tab]:hover:not([aria-disabled="true"]) {
+    background: color-mix(in srgb, var(--ft-tone-soft) 45%, transparent);
+}
+
+:root[data-page-tone][data-theme] body.ft-extension-surface[data-surface="tab-view"] .sidebar .nav-list .nav-item[data-tab][aria-current="page"],
+:root[data-page-tone][data-theme] body.ft-extension-surface[data-surface="tab-view"] .sidebar .nav-list .nav-item[data-tab][aria-current="page"]:hover {
+    border-color: color-mix(in srgb, var(--ft-tone-accent) 16%, transparent);
+    background: color-mix(in srgb, var(--ft-tone-panel) 86%, transparent);
+    box-shadow: 0 10px 24px -18px color-mix(in srgb, var(--ft-tone-accent) 60%, transparent), inset 0 1px 0 rgba(255, 255, 255, 0.5);
+}
+
+:root[data-page-tone][data-theme] body.ft-extension-surface[data-surface="tab-view"] .sidebar .nav-list .nav-item[data-tab][aria-current="page"]::before {
+    opacity: 1;
+    transform: scaleY(1);
+}
+
+:root[data-page-tone][data-theme] body.ft-extension-surface[data-surface="tab-view"] .sidebar .nav-list .nav-item[data-tab]:focus {
+    outline: none;
+}
+
+:root[data-page-tone][data-theme] body.ft-extension-surface[data-surface="tab-view"] .sidebar .nav-list .nav-item[data-tab]:focus-visible {
+    outline: 2px solid var(--ft-tone-accent);
+    outline-offset: -2px;
+}
+
+:root[data-page-tone][data-theme] body.ft-extension-surface[data-surface="tab-view"] .sidebar .nav-list .nav-item[data-tab] .nav-icon {
+    flex: none;
+    margin-top: 0.08rem;
+    color: var(--ft-tone-ink-soft);
+}
+
+:root[data-page-tone][data-theme] body.ft-extension-surface[data-surface="tab-view"] .sidebar .nav-list .nav-item[data-tab] .nav-label {
+    color: var(--ft-tone-ink);
+    font-weight: 600;
+    line-height: 1.25;
+}
+
+:root[data-page-tone][data-theme] body.ft-extension-surface[data-surface="tab-view"] .sidebar .nav-list .nav-item[data-tab][aria-current="page"] :is(.nav-icon, .nav-label) {
+    color: var(--ft-tone-accent);
+}
+
+.nav-text {
+    display: flex;
+    min-width: 0;
+    flex: 1 1 auto;
+    flex-direction: column;
+    gap: 0.08rem;
+}
+
+.nav-summary,
+.nav-lock {
+    display: block;
+    max-width: 100%;
+    overflow: hidden;
+    font-size: 0.74rem;
+    font-weight: 500;
+    line-height: 1.3;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.nav-summary {
+    color: var(--ft-tone-ink-soft, var(--ft-color-text-secondary));
+}
+
+.nav-summary:empty,
+.nav-lock[hidden] {
+    display: none;
+}
+
+.nav-lock {
+    color: var(--ft-tone-accent, var(--ft-color-brand-primary));
+}
+
+/* ---------------------------------------------------------------------------
+   Dashboard
+   --------------------------------------------------------------------------- */
+
+@keyframes ftDashRise {
+    from { opacity: 0; transform: translateY(14px); }
+    to { opacity: 1; transform: none; }
+}
+
+@keyframes ftDashPulse {
+    0%, 100% { box-shadow: 0 0 0 0 color-mix(in srgb, var(--ft-dash-live) 45%, transparent); }
+    60% { box-shadow: 0 0 0 0.45rem color-mix(in srgb, var(--ft-dash-live) 0%, transparent); }
+}
+
+#dashboardView .ft-dash {
+    --ft-dash-glass: color-mix(in srgb, var(--ft-tone-panel) 62%, transparent);
+    --ft-dash-glass-strong: color-mix(in srgb, var(--ft-tone-panel) 86%, transparent);
+    --ft-dash-edge: color-mix(in srgb, var(--ft-tone-stroke) 65%, rgba(255, 255, 255, 0.55));
+    --ft-dash-shadow: 0 22px 48px -30px color-mix(in srgb, var(--ft-tone-ink) 38%, transparent);
+    --ft-dash-live: #3f9a63;
+    display: grid;
+    gap: clamp(1.1rem, 2vw, 1.6rem);
+}
+
+:root[data-theme="dark"] #dashboardView .ft-dash {
+    --ft-dash-glass: color-mix(in srgb, var(--ft-tone-panel) 70%, transparent);
+    --ft-dash-glass-strong: color-mix(in srgb, var(--ft-tone-panel) 90%, transparent);
+    --ft-dash-edge: color-mix(in srgb, var(--ft-tone-stroke) 85%, rgba(255, 255, 255, 0.05));
+    --ft-dash-shadow: 0 22px 48px -28px rgba(0, 0, 0, 0.7);
+    --ft-dash-live: #5cc485;
+}
+
+#dashboardView.active .ft-dash > section {
+    animation: ftDashRise 720ms cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+#dashboardView.active .ft-dash > section:nth-child(2) { animation-delay: 70ms; }
+#dashboardView.active .ft-dash > section:nth-child(3) { animation-delay: 140ms; }
+#dashboardView.active .ft-dash > section:nth-child(4) { animation-delay: 210ms; }
+#dashboardView.active .ft-dash > section:nth-child(n+5) { animation-delay: 280ms; }
+
+.ft-dash-sr-only {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip: rect(0 0 0 0);
+    white-space: nowrap;
+}
+
+/* Hero: the copy on the left, the live profile card on the right. */
+:root[data-page-tone][data-theme] body.ft-extension-surface[data-surface="tab-view"] #dashboardView .ft-dash-hero {
+    position: relative;
+    isolation: isolate;
+    display: grid;
+    grid-template-columns: minmax(0, 1.4fr) minmax(17.5rem, 0.85fr);
+    align-items: stretch;
+    gap: clamp(1.2rem, 2.6vw, 2.4rem);
+    overflow: hidden;
+    padding: clamp(1.5rem, 3.2vw, 2.6rem);
+    border: 1px solid var(--ft-dash-edge);
+    border-radius: 1.9rem;
+    background:
+        radial-gradient(120% 90% at 100% 0%, color-mix(in srgb, var(--ft-tone-accent) 13%, transparent), transparent 55%),
+        radial-gradient(80% 70% at 0% 100%, color-mix(in srgb, var(--ft-tone-soft) 70%, transparent), transparent 60%),
+        var(--ft-dash-glass);
+    box-shadow: var(--ft-dash-shadow), inset 0 1px 0 rgba(255, 255, 255, 0.45);
+    backdrop-filter: blur(18px) saturate(1.1);
+    -webkit-backdrop-filter: blur(18px) saturate(1.1);
+}
+
+#dashboardView .ft-dash-hero__copy {
+    display: flex;
+    min-width: 0;
+    flex-direction: column;
+    justify-content: center;
+    gap: 1rem;
+}
+
+#dashboardView .ft-dash-hero .view-hero__eyebrow {
+    color: var(--ft-tone-accent);
+}
+
+#dashboardView .ft-dash-hero .view-hero__title {
+    max-width: 15ch;
+    font-size: clamp(2.1rem, 3.6vw, 3.25rem);
+    line-height: 1.02;
+    letter-spacing: -0.035em;
+    color: var(--ft-tone-ink);
+    text-wrap: balance;
+}
+
+#dashboardView .ft-dash-hero .view-hero__body {
+    max-width: 52ch;
+    font-size: 1.02rem;
+    line-height: 1.65;
+    color: var(--ft-tone-ink-soft);
+}
+
+:root[data-page-tone][data-theme] body.ft-extension-surface[data-surface="tab-view"] #dashboardView .ft-dash-hero .view-meta-pill {
+    min-height: 2rem;
+    padding: 0.3rem 0.8rem;
+    border: 1px solid color-mix(in srgb, var(--ft-tone-accent) 22%, transparent);
+    background: color-mix(in srgb, var(--ft-tone-soft) 80%, transparent);
+    color: color-mix(in srgb, var(--ft-tone-accent) 78%, var(--ft-tone-ink));
+    font-size: 0.64rem;
+    letter-spacing: 0.14em;
+}
+
+#dashboardView .ft-dash-hero__note {
+    max-width: 60ch;
+    margin: 0.15rem 0 0;
+    padding-left: 0.85rem;
+    border-left: 2px solid color-mix(in srgb, var(--ft-tone-accent) 55%, transparent);
+    color: var(--ft-tone-ink-soft);
+    font-size: 0.84rem;
+    line-height: 1.55;
+}
+
+/* The live profile card. */
+#dashboardView .ft-dash-status {
+    display: flex;
+    min-width: 0;
+    align-self: center;
+    flex-direction: column;
+    gap: 1rem;
+    padding: 1.15rem;
+    border: 1px solid var(--ft-dash-edge);
+    border-radius: 1.4rem;
+    background: var(--ft-dash-glass-strong);
+    box-shadow: 0 18px 40px -30px color-mix(in srgb, var(--ft-tone-ink) 45%, transparent), inset 0 1px 0 rgba(255, 255, 255, 0.55);
+}
+
+#dashboardView .ft-dash-status__profile {
+    display: grid;
+    grid-template-columns: auto minmax(0, 1fr) auto;
+    align-items: center;
+    gap: 0.8rem;
+}
+
+#dashboardView .ft-dash-status__avatar {
+    display: inline-flex;
+    width: 2.9rem;
+    height: 2.9rem;
+    align-items: center;
+    justify-content: center;
+    border-radius: 999px;
+    background: var(--ft-tone-soft);
+    color: var(--ft-tone-accent);
+    font-family: var(--ft-font-family-display);
+    font-size: 1.1rem;
+    font-weight: 700;
+    box-shadow: 0 0 0 3px color-mix(in srgb, var(--ft-tone-panel) 90%, transparent), 0 8px 18px -10px color-mix(in srgb, var(--ft-tone-ink) 50%, transparent);
+}
+
+#dashboardView .ft-dash-status__who {
+    display: flex;
+    min-width: 0;
+    flex-direction: column;
+    gap: 0.1rem;
+}
+
+#dashboardView .ft-dash-status__label {
+    color: var(--ft-tone-ink-soft);
+    font-size: 0.64rem;
+    font-weight: 700;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+}
+
+#dashboardView .ft-dash-status__name {
+    overflow: hidden;
+    color: var(--ft-tone-ink);
+    font-family: var(--ft-font-family-display);
+    font-size: 1.18rem;
+    line-height: 1.2;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+#dashboardView .ft-dash-status__mode {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.45rem;
+    color: var(--ft-tone-ink-soft);
+    font-size: 0.8rem;
+    font-weight: 600;
+}
+
+#dashboardView .ft-dash-status__pulse {
+    width: 0.5rem;
+    height: 0.5rem;
+    flex: none;
+    border-radius: 999px;
+    background: var(--ft-dash-live);
+    animation: ftDashPulse 2.6s cubic-bezier(0.16, 1, 0.3, 1) infinite;
+}
+
+#dashboardView .ft-dash-status__switch {
+    min-height: 2.25rem;
+    padding: 0.35rem 0.85rem;
+    border: 1px solid var(--ft-tone-stroke);
+    border-radius: 999px;
+    background: transparent;
+    color: var(--ft-tone-ink);
+    font: inherit;
+    font-size: 0.78rem;
+    font-weight: 700;
+    white-space: nowrap;
+    cursor: pointer;
+    transition: border-color 200ms ease, background-color 200ms ease, transform 160ms ease;
+}
+
+#dashboardView .ft-dash-status__switch:hover {
+    border-color: color-mix(in srgb, var(--ft-tone-accent) 45%, var(--ft-tone-stroke));
+    background: color-mix(in srgb, var(--ft-tone-soft) 60%, transparent);
+}
+
+#dashboardView .ft-dash-status__switch:active {
+    transform: scale(0.97);
+}
+
+/* Main / Kids as one segmented control. */
+:root[data-page-tone][data-theme] body.ft-extension-surface[data-surface="tab-view"] #dashboardView .ft-dash-status__source {
+    display: block;
+    margin: 0;
+    padding: 0;
+    border: 0;
+    background: none;
+    box-shadow: none;
+}
+
+:root[data-page-tone][data-theme] body.ft-extension-surface[data-surface="tab-view"] #dashboardView .ft-dash-status__source .dashboard-stats-source__buttons {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 0.25rem;
+    padding: 0.25rem;
+    border: 1px solid var(--ft-tone-stroke);
+    border-radius: 0.95rem;
+    background: color-mix(in srgb, var(--ft-tone-page-start) 55%, transparent);
+}
+
+:root[data-page-tone][data-theme] body.ft-extension-surface[data-surface="tab-view"] #dashboardView .ft-dash-status__source .btn-secondary {
+    min-height: 2.35rem;
+    margin: 0;
+    padding: 0.35rem 0.6rem;
+    border: 1px solid transparent;
+    border-radius: 0.75rem;
+    background: transparent;
+    box-shadow: none;
+    color: var(--ft-tone-ink-soft);
+    font-size: 0.8rem;
+    font-weight: 700;
+    transition: background-color 220ms ease, color 220ms ease, box-shadow 220ms ease;
+}
+
+:root[data-page-tone][data-theme] body.ft-extension-surface[data-surface="tab-view"] #dashboardView .ft-dash-status__source .btn-secondary.active {
+    border-color: color-mix(in srgb, var(--ft-tone-accent) 18%, transparent);
+    background: var(--ft-tone-panel);
+    color: var(--ft-tone-accent);
+    box-shadow: 0 6px 16px -10px color-mix(in srgb, var(--ft-tone-ink) 45%, transparent);
+}
+
+:root[data-page-tone][data-theme] body.ft-extension-surface[data-surface="tab-view"] #dashboardView .ft-dash-status__cta {
+    display: flex;
+    box-sizing: border-box;
+    width: 100%;
+    min-height: 3rem;
+    align-items: center;
+    justify-content: center;
+    margin: 0;
+    padding: 0.7rem 1rem;
+    border: 0;
+    border-radius: 1rem;
+    background: var(--ft-color-brand-primary, #c3503f);
+    color: #fff;
+    font-size: 0.9rem;
+    font-weight: 700;
+    text-decoration: none;
+    box-shadow: 0 14px 28px -16px color-mix(in srgb, var(--ft-color-brand-primary, #c3503f) 85%, transparent);
+    transition: transform 200ms cubic-bezier(0.16, 1, 0.3, 1), box-shadow 200ms ease, filter 200ms ease;
+}
+
+:root[data-page-tone][data-theme] body.ft-extension-surface[data-surface="tab-view"] #dashboardView .ft-dash-status__cta:hover {
+    filter: brightness(1.05);
+    transform: translateY(-1px);
+}
+
+:root[data-page-tone][data-theme] body.ft-extension-surface[data-surface="tab-view"] #dashboardView .ft-dash-status__cta:active {
+    transform: scale(0.98);
+}
+
+:root[data-page-tone][data-theme="dark"] body.ft-extension-surface[data-surface="tab-view"] #dashboardView .ft-dash-status__cta {
+    background: #c4483a;
+    box-shadow: 0 14px 28px -16px rgba(196, 72, 58, 0.8);
+}
+
+/* Today: four glass stat cards. */
+:root[data-page-tone][data-theme] body.ft-extension-surface[data-surface="tab-view"] #dashboardView .ft-dash-stats .stats-grid {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 0.85rem;
+    margin: 0;
+    padding: 0;
+}
+
+:root[data-page-tone][data-theme] body.ft-extension-surface[data-surface="tab-view"] #dashboardView .ft-dash-stats .stat-card {
+    position: relative;
+    display: grid;
+    grid-template-columns: auto minmax(0, 1fr);
+    grid-template-areas: "icon label" "value value";
+    align-items: center;
+    column-gap: 0.7rem;
+    row-gap: 0.9rem;
+    min-height: 0;
+    padding: 1.1rem 1.2rem;
+    border: 1px solid var(--ft-dash-edge);
+    border-radius: 1.35rem;
+    background: var(--ft-dash-glass);
+    box-shadow: var(--ft-dash-shadow), inset 0 1px 0 rgba(255, 255, 255, 0.4);
+    text-align: left;
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+    transition: transform 320ms cubic-bezier(0.16, 1, 0.3, 1), border-color 220ms ease;
+}
+
+:root[data-page-tone][data-theme] body.ft-extension-surface[data-surface="tab-view"] #dashboardView .ft-dash-stats .stat-card::before,
+:root[data-page-tone][data-theme] body.ft-extension-surface[data-surface="tab-view"] #dashboardView .ft-dash-stats .stat-card::after {
+    display: none;
+}
+
+:root[data-page-tone][data-theme] body.ft-extension-surface[data-surface="tab-view"] #dashboardView .ft-dash-stats .stat-card:hover {
+    transform: translateY(-2px);
+    border-color: color-mix(in srgb, var(--ft-tone-accent) 28%, var(--ft-dash-edge));
+}
+
+#dashboardView .stat-card__icon {
+    grid-area: icon;
+    display: inline-flex;
+    width: 2.1rem;
+    height: 2.1rem;
+    align-items: center;
+    justify-content: center;
+    border-radius: 0.75rem;
+    background: var(--ft-tone-soft);
+    color: var(--ft-tone-accent);
+}
+
+:root[data-page-tone][data-theme] body.ft-extension-surface[data-surface="tab-view"] #dashboardView .ft-dash-stats .stat-value {
+    grid-area: value;
+    margin: 0;
+    color: var(--ft-tone-ink);
+    font-family: var(--ft-font-family-display);
+    font-size: clamp(1.9rem, 2.6vw, 2.45rem);
+    font-weight: 700;
+    font-variant-numeric: tabular-nums;
+    line-height: 1;
+    letter-spacing: -0.03em;
+}
+
+:root[data-page-tone][data-theme] body.ft-extension-surface[data-surface="tab-view"] #dashboardView .ft-dash-stats .stat-label {
+    grid-area: label;
+    margin: 0;
+    color: var(--ft-tone-ink-soft);
+    font-size: 0.68rem;
+    font-weight: 700;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+}
+
+/* Quick Actions: glass tiles with a tinted icon. */
+#dashboardView .dashboard-actions .section-header h2 {
+    color: var(--ft-tone-ink);
+    font-family: var(--ft-font-family-display);
+    font-size: 1.35rem;
+    letter-spacing: -0.02em;
+}
+
+#dashboardView .dashboard-actions .section-header__body {
+    color: var(--ft-tone-ink-soft);
+}
+
+:root[data-page-tone][data-theme] body.ft-extension-surface[data-surface="tab-view"] #dashboardView .quick-actions-grid {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 0.85rem;
+}
+
+:root[data-page-tone][data-theme] body.ft-extension-surface[data-surface="tab-view"] #dashboardView .action-card {
+    display: flex;
+    min-height: 4.6rem;
+    flex-direction: row;
+    align-items: center;
+    justify-content: flex-start;
+    gap: 0.85rem;
+    padding: 0.9rem 1.05rem;
+    border: 1px solid var(--ft-dash-edge);
+    border-radius: 1.25rem;
+    background: var(--ft-dash-glass);
+    box-shadow: var(--ft-dash-shadow), inset 0 1px 0 rgba(255, 255, 255, 0.4);
+    color: var(--ft-tone-ink);
+    text-align: left;
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+    transition: transform 320ms cubic-bezier(0.16, 1, 0.3, 1), border-color 220ms ease, background-color 220ms ease;
+}
+
+:root[data-page-tone][data-theme] body.ft-extension-surface[data-surface="tab-view"] #dashboardView .action-card::after {
+    display: none;
+}
+
+:root[data-page-tone][data-theme] body.ft-extension-surface[data-surface="tab-view"] #dashboardView .action-card:hover {
+    transform: translateY(-2px);
+    border-color: color-mix(in srgb, var(--ft-tone-accent) 32%, var(--ft-dash-edge));
+    background: var(--ft-dash-glass-strong);
+}
+
+:root[data-page-tone][data-theme] body.ft-extension-surface[data-surface="tab-view"] #dashboardView .action-card:active {
+    transform: scale(0.98);
+}
+
+:root[data-page-tone][data-theme] body.ft-extension-surface[data-surface="tab-view"] #dashboardView .action-card .icon {
+    display: inline-flex;
+    width: 2.6rem;
+    height: 2.6rem;
+    flex: none;
+    align-items: center;
+    justify-content: center;
+    margin: 0;
+    border-radius: 0.9rem;
+    background: var(--ft-tone-soft);
+    color: var(--ft-tone-accent);
+}
+
+:root[data-page-tone][data-theme] body.ft-extension-surface[data-surface="tab-view"] #dashboardView .action-card .icon svg {
+    width: 1.2rem;
+    height: 1.2rem;
+}
+
+:root[data-page-tone][data-theme] body.ft-extension-surface[data-surface="tab-view"] #dashboardView .action-card .label {
+    color: var(--ft-tone-ink);
+    font-size: 0.92rem;
+    font-weight: 700;
+}
+
+/* FilterTube apps: one large Android card beside TV and Apple, with the original tilted art. */
+:root[data-page-tone][data-theme] body.ft-extension-surface[data-surface="tab-view"] #dashboardView .ft-dash-apps {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 1rem;
+    padding: 0;
+    border: 0;
+    background: none;
+    box-shadow: none;
+    backdrop-filter: none;
+    -webkit-backdrop-filter: none;
+}
+
+:root[data-page-tone][data-theme] body.ft-extension-surface[data-surface="tab-view"] #dashboardView .ft-dash-apps::before,
+:root[data-page-tone][data-theme] body.ft-extension-surface[data-surface="tab-view"] #dashboardView .ft-dash-apps::after {
+    display: none;
+}
+
+#dashboardView .ft-dash-apps__head {
+    display: grid;
+    gap: 0.45rem;
+}
+
+#dashboardView .ft-dash-apps__head .view-hero__eyebrow {
+    color: var(--ft-tone-accent);
+}
+
+#dashboardView .ft-dash-apps__title {
+    max-width: 34ch;
+    margin: 0;
+    color: var(--ft-tone-ink);
+    font-family: var(--ft-font-family-display);
+    font-size: clamp(1.35rem, 2.2vw, 1.85rem);
+    line-height: 1.15;
+    letter-spacing: -0.025em;
+    text-wrap: balance;
+}
+
+#dashboardView .ft-dash-apps__grid {
+    display: grid;
+    grid-template-columns: repeat(12, minmax(0, 1fr));
+    grid-auto-rows: minmax(12.5rem, auto);
+    gap: 1rem;
+}
+
+#dashboardView .ft-dash-apps__grid > .dashboard-app-card[data-platform="android"] {
+    grid-column: span 7;
+    grid-row: span 2;
+}
+
+#dashboardView .ft-dash-apps__grid > .dashboard-app-card:not([data-platform="android"]) {
+    grid-column: span 5;
+}
+
+:root[data-page-tone][data-theme] body.ft-extension-surface[data-surface="tab-view"] #dashboardView .ft-dash-apps .dashboard-app-card {
+    min-height: 0;
+    padding: clamp(1.25rem, 2.2vw, 1.75rem);
+    border: 1px solid color-mix(in srgb, var(--dashboard-app-accent) 30%, var(--ft-dash-edge));
+    border-radius: 1.75rem;
+    background:
+        linear-gradient(90deg, color-mix(in srgb, var(--ft-tone-panel) 97%, transparent) 0%, color-mix(in srgb, var(--ft-tone-panel) 90%, transparent) 46%, color-mix(in srgb, var(--ft-tone-panel) 52%, transparent) 100%),
+        radial-gradient(circle at 85% 24%, color-mix(in srgb, var(--dashboard-app-accent) 24%, transparent), transparent 38%),
+        var(--ft-dash-glass);
+    box-shadow: 0 26px 52px -30px color-mix(in srgb, var(--dashboard-app-accent) 55%, rgba(40, 30, 25, 0.5));
+    color: var(--ft-tone-ink);
+    animation: ftDashRise 720ms cubic-bezier(0.16, 1, 0.3, 1) both;
+    animation-delay: calc(240ms + var(--ft-dash-i, 0) * 90ms);
+    backdrop-filter: blur(18px);
+    -webkit-backdrop-filter: blur(18px);
+}
+
+:root[data-page-tone][data-theme] body.ft-extension-surface[data-surface="tab-view"] #dashboardView .ft-dash-apps .dashboard-app-card:hover {
+    transform: translateY(-3px);
+    border-color: color-mix(in srgb, var(--dashboard-app-accent) 50%, var(--ft-dash-edge));
+}
+
+:root[data-page-tone][data-theme] body.ft-extension-surface[data-surface="tab-view"] #dashboardView .ft-dash-apps .dashboard-app-card::before {
+    display: none;
+}
+
+#dashboardView .ft-dash-apps .dashboard-app-card--tv {
+    --dashboard-app-accent: #c4553f;
+    --dashboard-app-cta-bg: rgba(196, 85, 63, 0.13);
+    --dashboard-app-cta-text: #a8432f;
+}
+
+:root[data-theme="dark"] #dashboardView .ft-dash-apps .dashboard-app-card--tv {
+    --dashboard-app-cta-bg: rgba(232, 120, 96, 0.16);
+    --dashboard-app-cta-text: #f09a85;
+}
+
+:root[data-theme="dark"] #dashboardView .ft-dash-apps .dashboard-app-card--android {
+    --dashboard-app-cta-text: #7fd19c;
+}
+
+:root[data-theme="dark"] #dashboardView .ft-dash-apps .dashboard-app-card--ios {
+    --dashboard-app-cta-text: #8db8ea;
+}
+
+#dashboardView .ft-dash-apps .dashboard-app-card__content {
+    min-height: 100%;
+    width: min(56%, 24rem);
+    justify-content: center;
+}
+
+#dashboardView .ft-dash-apps .dashboard-app-card[data-platform="android"] .dashboard-app-card__content {
+    width: min(54%, 25rem);
+}
+
+#dashboardView .ft-dash-apps .dashboard-app-card strong {
+    max-width: 14ch;
+    color: var(--ft-tone-ink);
+}
+
+#dashboardView .ft-dash-apps .dashboard-app-card[data-platform="android"] strong {
+    font-size: clamp(1.75rem, 2.8vw, 2.5rem);
+}
+
+#dashboardView .ft-dash-apps .dashboard-app-card:not([data-platform="android"]) strong {
+    font-size: clamp(1.2rem, 1.7vw, 1.5rem);
+}
+
+#dashboardView .ft-dash-apps .dashboard-app-card__body {
+    color: var(--ft-tone-ink-soft);
+}
+
+#dashboardView .ft-dash-apps .dashboard-app-card:not([data-platform="android"]) .dashboard-app-card__body {
+    margin-top: 0.5rem;
+    font-size: 0.86rem;
+    line-height: 1.55;
+}
+
+#dashboardView .ft-dash-apps .dashboard-app-card:not([data-platform="android"]) .dashboard-app-card__content {
+    width: min(62%, 20rem);
+}
+
+#dashboardView .ft-dash-apps .dashboard-app-card:not([data-platform="android"]) .dashboard-app-card__cta {
+    margin-top: 0.85rem;
+    font-size: 0.8rem;
+    white-space: nowrap;
+}
+
+#dashboardView .ft-dash-apps .dashboard-app-card[data-platform="android"] .dashboard-app-card__art {
+    right: 1.25rem;
+    top: 1.5rem;
+    width: min(42%, 17rem);
+    height: calc(100% - 3rem);
+}
+
+#dashboardView .ft-dash-apps .dashboard-app-card[data-platform="android"]::after {
+    right: 1.25rem;
+    top: 1.5rem;
+    width: min(42%, 17rem);
+    height: calc(100% - 3rem);
+}
+
+#dashboardView .ft-dash-apps .dashboard-app-card:not([data-platform="android"]) .dashboard-app-card__art,
+#dashboardView .ft-dash-apps .dashboard-app-card:not([data-platform="android"])::after {
+    right: 1rem;
+    top: 1rem;
+    width: min(32%, 9rem);
+    height: calc(100% - 2rem);
+    border-radius: 1.9rem;
+}
+
+/* Android TV: a TV showing FilterTube, drawn in CSS. */
+#dashboardView .ft-tv-art {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 0;
+    overflow: visible;
+}
+
+#dashboardView .ft-tv-art__screen {
+    position: relative;
+    display: flex;
+    width: 100%;
+    aspect-ratio: 16 / 10;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+    border: 0.32rem solid #1c1d22;
+    border-radius: 0.95rem;
+    background:
+        radial-gradient(90% 80% at 30% 20%, rgba(255, 255, 255, 0.95), rgba(255, 238, 230, 0.9) 45%, rgba(246, 214, 200, 0.85) 100%);
+    box-shadow: 0 22px 36px -14px rgba(60, 25, 15, 0.45), inset 0 0 0 1px rgba(255, 255, 255, 0.4);
+}
+
+#dashboardView .ft-tv-art__screen::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(125deg, rgba(255, 255, 255, 0.55) 0%, rgba(255, 255, 255, 0) 38%);
+    pointer-events: none;
+}
+
+#dashboardView .ft-tv-art__screen img {
+    width: 42%;
+    height: auto;
+    object-fit: contain;
+    transform: none;
+    filter: drop-shadow(0 8px 12px rgba(150, 40, 25, 0.28));
+}
+
+#dashboardView .ft-tv-art__bar {
+    position: absolute;
+    right: 12%;
+    bottom: 11%;
+    left: 12%;
+    height: 0.22rem;
+    overflow: hidden;
+    border-radius: 999px;
+    background: rgba(28, 29, 34, 0.14);
+}
+
+#dashboardView .ft-tv-art__bar::before {
+    content: "";
+    display: block;
+    width: 58%;
+    height: 100%;
+    border-radius: inherit;
+    background: #c4553f;
+}
+
+#dashboardView .ft-tv-art__stand {
+    width: 34%;
+    height: 0.7rem;
+    margin-top: -0.05rem;
+    border-radius: 0 0 0.5rem 0.5rem;
+    background: linear-gradient(180deg, #2a2b31, #17181c);
+    clip-path: polygon(18% 0, 82% 0, 100% 100%, 0 100%);
+}
+
+:root[data-theme="dark"] #dashboardView .ft-tv-art__screen {
+    border-color: #0d0e11;
+    background: radial-gradient(90% 80% at 30% 20%, #3a2a2a, #241a1d 55%, #171316 100%);
+}
+
+/* Preview and Support keep their layout and sit on the same glass. */
+:root[data-page-tone][data-theme] body.ft-extension-surface[data-surface="tab-view"] #dashboardView :is(.dashboard-app-preview, .donate-promo-card) {
+    border: 1px solid var(--ft-dash-edge);
+    border-radius: 1.6rem;
+    background: var(--ft-dash-glass);
+    box-shadow: var(--ft-dash-shadow), inset 0 1px 0 rgba(255, 255, 255, 0.4);
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+}
+
+/* ---------------------------------------------------------------------------
+   Narrower windows
+   --------------------------------------------------------------------------- */
+
+@media (max-width: 1180px) {
+    :root[data-page-tone][data-theme] body.ft-extension-surface[data-surface="tab-view"] #dashboardView .ft-dash-hero {
+        grid-template-columns: 1fr;
+    }
+
+    #dashboardView .ft-dash-apps__grid > .dashboard-app-card[data-platform="android"] {
+        grid-column: span 12;
+        grid-row: span 1;
+        min-height: 17rem;
+    }
+
+    #dashboardView .ft-dash-apps__grid > .dashboard-app-card:not([data-platform="android"]) {
+        grid-column: span 6;
+    }
+}
+
+@media (max-width: 900px) {
+    :root[data-page-tone][data-theme] body.ft-extension-surface[data-surface="tab-view"] #dashboardView :is(.ft-dash-stats .stats-grid, .quick-actions-grid) {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+}
+
+@media (max-width: 720px) {
+    #dashboardView .ft-dash-apps__grid > .dashboard-app-card:not([data-platform="android"]) {
+        grid-column: span 12;
+    }
+
+    #dashboardView .ft-dash-apps .dashboard-app-card__content,
+    #dashboardView .ft-dash-apps .dashboard-app-card[data-platform="android"] .dashboard-app-card__content {
+        width: min(62%, 24rem);
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    #dashboardView.active .ft-dash > section,
+    :root[data-page-tone][data-theme] body.ft-extension-surface[data-surface="tab-view"] #dashboardView .ft-dash-apps .dashboard-app-card,
+    #dashboardView .ft-dash-status__pulse {
+        animation: none;
+    }
+}

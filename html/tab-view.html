@@ -14,6 +14,7 @@
         rel="stylesheet">
     <link rel="stylesheet" href="../css/device-auto-sync.css">
     <link rel="stylesheet" href="../css/page-tones.css">
+    <link rel="stylesheet" href="../css/dashboard-studio.css">
 </head>
 
 <body>
@@ -39,6 +40,7 @@
                     </span>
                     <span class="nav-text"><span class="nav-label" data-ft-i18n="navigation.dashboard">Dashboard</span><span class="nav-summary" aria-hidden="true"></span><span class="nav-lock" hidden></span></span>
                 </li>
+                <li class="nav-divider" role="separator" aria-hidden="true"></li>
                 <li class="nav-item" tabindex="0" data-tab="filters">
                     <span class="nav-icon">
                         <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor"
@@ -47,6 +49,18 @@
                         </svg>
                     </span>
                     <span class="nav-text"><span class="nav-label" data-ft-i18n="navigation.filters">Filters</span><span class="nav-summary" aria-hidden="true"></span><span class="nav-lock" hidden></span></span>
+                </li>
+                <li class="nav-item nav-item--sub" tabindex="0" data-tab="filters" data-nav-id="content" data-nav-target="content">
+                    <span class="nav-icon">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                            stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M3 4h18v16H3z"></path>
+                            <path d="M7 8h10"></path>
+                            <path d="M7 12h6"></path>
+                            <path d="M7 16h8"></path>
+                        </svg>
+                    </span>
+                    <span class="nav-text"><span class="nav-label" data-ft-i18n="dashboard.filterTabs.contentControls">Content Controls</span><span class="nav-summary" aria-hidden="true"></span><span class="nav-lock" hidden></span></span>
                 </li>
                 <li class="nav-item" tabindex="0" data-tab="semantic" hidden aria-hidden="true" data-feature-state="future">
                     <span class="nav-icon">
@@ -74,6 +88,7 @@
                     </span>
                     <span class="nav-text"><span class="nav-label" data-ft-i18n="navigation.kids">Kids Mode</span><span class="nav-summary" aria-hidden="true"></span><span class="nav-lock" hidden></span></span>
                 </li>
+                <li class="nav-divider" role="separator" aria-hidden="true"></li>
                 <li class="nav-item" tabindex="0" data-tab="settings">
                     <span class="nav-icon">
                         <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor"
@@ -86,6 +101,28 @@
                     </span>
                     <span class="nav-text"><span class="nav-label" data-ft-i18n="navigation.settings">Settings</span><span class="nav-summary" aria-hidden="true"></span><span class="nav-lock" hidden></span></span>
                 </li>
+                <li class="nav-item nav-item--sub" tabindex="0" data-tab="settings" data-nav-id="timeLimits" data-nav-target="selfControl">
+                    <span class="nav-icon">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                            stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M12 22a10 10 0 1 0 0-20 10 10 0 0 0 0 20z"></path>
+                            <path d="M12 6v6l4 2"></path>
+                        </svg>
+                    </span>
+                    <span class="nav-text"><span class="nav-label" data-ft-i18n="dashboard.sync.scope.timeLimits">Time limits</span><span class="nav-summary" aria-hidden="true"></span><span class="nav-lock" hidden></span></span>
+                </li>
+                <li class="nav-item nav-item--sub" tabindex="0" data-tab="settings" data-nav-id="backup" data-nav-target="importExport">
+                    <span class="nav-icon">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                            stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                            <path d="M7 10l5 5 5-5"></path>
+                            <path d="M12 15V3"></path>
+                        </svg>
+                    </span>
+                    <span class="nav-text"><span class="nav-label" data-ft-i18n="controls.tile.backup">Backup &amp; restore</span><span class="nav-summary" aria-hidden="true"></span><span class="nav-lock" hidden></span></span>
+                </li>
+                <li class="nav-divider" role="separator" aria-hidden="true"></li>
                 <li class="nav-item" tabindex="0" data-tab="sync">
                     <span class="nav-icon">
                         <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor"
@@ -98,6 +135,19 @@
                     </span>
                     <span class="nav-text"><span class="nav-label" data-ft-i18n="navigation.sync">Accounts &amp; Sync</span><span class="nav-summary" aria-hidden="true"></span><span class="nav-lock" hidden></span></span>
                 </li>
+                <li class="nav-item nav-item--sub" tabindex="0" data-tab="sync" data-nav-id="profiles" data-nav-target="profiles">
+                    <span class="nav-icon">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                            stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"></path>
+                            <path d="M9 11a4 4 0 1 0 0-8 4 4 0 0 0 0 8z"></path>
+                            <path d="M19 8v6"></path>
+                            <path d="M22 11h-6"></path>
+                        </svg>
+                    </span>
+                    <span class="nav-text"><span class="nav-label" data-ft-i18n="controls.tile.profiles">Profiles &amp; PIN</span><span class="nav-summary" aria-hidden="true"></span><span class="nav-lock" hidden></span></span>
+                </li>
+                <li class="nav-divider" role="separator" aria-hidden="true"></li>
                 <li class="nav-item" tabindex="0" data-tab="whatsnew">
                     <span class="nav-icon">
                         <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor"
@@ -187,11 +237,11 @@
 
                 <!-- Dashboard View -->
                 <div id="dashboardView" class="view-section active">
-                    <div class="view-shell view-shell--dashboard dashboard-shell">
-                        <section class="view-hero dashboard-hero">
-                            <div class="view-hero__copy">
+                    <div class="view-shell view-shell--dashboard dashboard-shell ft-dash">
+                        <section class="view-hero dashboard-hero ft-dash-hero" aria-labelledby="ftDashHeroTitle">
+                            <div class="view-hero__copy ft-dash-hero__copy">
                                 <p class="view-hero__eyebrow">FilterTube control center</p>
-                                <h2 class="view-hero__title">Keep YouTube calmer for your household.</h2>
+                                <h2 id="ftDashHeroTitle" class="view-hero__title">Keep YouTube calmer for your household.</h2>
                                 <p class="view-hero__body">See what FilterTube is doing, switch between Main and Kids rules, and open the controls parents use most.</p>
                                 <div class="view-hero__meta" aria-label="Current playback protection">
                                     <span class="view-meta-pill">Ad-free playback</span>
@@ -199,34 +249,49 @@
                                     <span class="view-meta-pill">Main + Kids</span>
                                     <span class="view-meta-pill">Blocklist + Whitelist</span>
                                 </div>
+                                <p class="ft-dash-hero__note">If filtering stops working, please tell the developer by email, GitHub, or a video comment. It usually means YouTube changed its page structure.</p>
                             </div>
-                        </section>
-
-                        <section class="dashboard-metrics" aria-labelledby="dashboardStatsTitle">
-                            <div class="ft-dash-section-head">
-                                <h2 id="dashboardStatsTitle" class="ft-dash-section-title" data-ft-i18n="dashboard.stats.title">Today</h2>
-                                <div class="dashboard-stats-source" role="group" data-ft-i18n-aria-label="dashboard.stats.surface" aria-label="Stats for">
+                            <aside class="ft-dash-status" aria-label="Active profile" data-ft-i18n-aria-label="controls.header.label">
+                                <div class="ft-dash-status__profile">
+                                    <span class="ft-dash-status__avatar" id="ftDashProfileAvatar" aria-hidden="true"></span>
+                                    <span class="ft-dash-status__who">
+                                        <span class="ft-dash-status__label" data-ft-i18n="controls.header.label">Active profile</span>
+                                        <strong class="ft-dash-status__name" id="ftDashProfileName"></strong>
+                                        <span class="ft-dash-status__mode"><span class="ft-dash-status__pulse" aria-hidden="true"></span><span id="ftDashProfileMode"></span></span>
+                                    </span>
+                                    <button id="ftDashSwitchProfile" class="ft-dash-status__switch" type="button" data-ft-i18n="managedOverlay.switch.action">Switch profile</button>
+                                </div>
+                                <div class="dashboard-stats-source ft-dash-status__source" role="group" data-ft-i18n-aria-label="dashboard.stats.surface" aria-label="Stats for">
                                     <div id="dashboardStatsSourceLabel" class="dashboard-stats-source__label" hidden></div>
                                     <div class="dashboard-stats-source__buttons">
                                         <button id="dashboardStatsMainBtn" class="btn-secondary" type="button">YouTube Main</button>
                                         <button id="dashboardStatsKidsBtn" class="btn-secondary" type="button">YouTube Kids</button>
                                     </div>
                                 </div>
-                            </div>
+                                <a class="btn-primary android-closed-testing-invite__mail dashboard-android-testing-cta ft-dash-status__cta" href="https://play.google.com/store/apps/details?id=com.filtertube.app" target="_blank" rel="noreferrer">Open FilterTube on Google Play</a>
+                            </aside>
+                        </section>
+
+                        <section class="dashboard-metrics ft-dash-stats" aria-labelledby="dashboardStatsTitle">
+                            <h2 id="dashboardStatsTitle" class="ft-dash-sr-only" data-ft-i18n="dashboard.stats.title">Today</h2>
                             <div class="stats-grid">
                                 <div class="stat-card">
+                                    <span class="stat-card__icon" aria-hidden="true"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94"></path><path d="M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19"></path><path d="M14.12 14.12a3 3 0 1 1-4.24-4.24"></path><path d="M1 1l22 22"></path></svg></span>
                                     <div class="stat-value" id="statHiddenToday">0</div>
                                     <div class="stat-label">Content Hidden Today</div>
                                 </div>
                                 <div class="stat-card">
+                                    <span class="stat-card__icon" aria-hidden="true"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 7V4h16v3"></path><path d="M9 20h6"></path><path d="M12 4v16"></path></svg></span>
                                     <div class="stat-value" id="statActiveKeywords">0</div>
                                     <div class="stat-label">Active Keywords</div>
                                 </div>
                                 <div class="stat-card">
+                                    <span class="stat-card__icon" aria-hidden="true"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 3H2l8 9.46V19l4 2v-8.54L22 3z"></path></svg></span>
                                     <div class="stat-value" id="statFilteredChannels">0</div>
                                     <div class="stat-label">Filtered Channels</div>
                                 </div>
                                 <div class="stat-card" title="Total duration of all videos hidden by your filters">
+                                    <span class="stat-card__icon" aria-hidden="true"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22a10 10 0 1 0 0-20 10 10 0 0 0 0 20z"></path><path d="M12 6v6l4 2"></path></svg></span>
                                     <div class="stat-value" id="statSavedTime">0m</div>
                                     <div class="stat-label">Est. Time Saved</div>
                                 </div>
@@ -289,12 +354,12 @@
                             </div>
                         </section>
 
-                        <section class="dashboard-app-release ft-cc-apps" aria-labelledby="dashboardAppsTitle">
-                            <div class="ft-dash-section-head ft-dash-section-head--stacked">
-                                <h2 id="dashboardAppsTitle" class="ft-dash-section-title" data-ft-i18n="apps.title">FilterTube apps</h2>
-                                <p class="ft-dash-section-sub" data-ft-i18n="apps.heading">FilterTube for Android phones, tablets and Android TV is on Google Play, from one listing.</p>
+                        <section class="dashboard-app-release ft-dash-apps" aria-labelledby="dashboardAppsTitle">
+                            <div class="ft-dash-apps__head">
+                                <p class="view-hero__eyebrow" data-ft-i18n="apps.title">FilterTube apps</p>
+                                <h2 id="dashboardAppsTitle" class="ft-dash-apps__title" data-ft-i18n="apps.heading">FilterTube for Android phones, tablets and Android TV is on Google Play, from one listing.</h2>
                             </div>
-                            <div class="dashboard-app-release__grid" id="ftControlCenterApps"></div>
+                            <div class="dashboard-app-release__grid ft-dash-apps__grid" id="ftControlCenterApps"></div>
                         </section>
 
                         <section class="dashboard-app-preview" aria-labelledby="dashboardAppPreviewTitle">

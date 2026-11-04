@@ -42,6 +42,22 @@ const cssRows = [
     0
   ],
   [
+    "css/dashboard-studio.css",
+    "active extension page tone CSS",
+    913,
+    31875,
+    "1caea1536314648de16fa1b6e45bb6ea712de4375fe0b30d47de316d4f208039",
+    128,
+    0,
+    6,
+    0,
+    0,
+    0,
+    4,
+    2,
+    2
+  ],
+  [
     "css/design_tokens.css",
     "active extension UI token CSS",
     301,
@@ -156,18 +172,18 @@ const cssRows = [
   [
     "css/tab-view.css",
     "active extension dashboard CSS",
-    6572,
-    170342,
-    "eeec8abddb34e8a772e573d956c86b555228e127fa0f936cd8b423733608ca23",
-    973,
+    5933,
+    148430,
+    "3e09eb31f7c602df276d91b2facc82e2a336fa22cdd553183622751ffeaffa12",
+    871,
     25,
-    32,
+    23,
     0,
     0,
     0,
-    22,
+    21,
     5,
-    8
+    6
   ],
   [
     "css/video-notes.css",
@@ -250,7 +266,7 @@ test('CSS load style surface register is audit-only and covers every tracked CSS
   assert.match(doc, /Status: audit-only current-behavior proof/);
   assert.match(doc, /Runtime behavior is unchanged/);
   assert.match(doc, /not a CSS cleanup, UI redesign, manifest change, or package pruning patch/);
-  assert.equal(trackedCss.length, 12);
+  assert.equal(trackedCss.length, 13);
   assert.deepEqual(trackedCss.sort(), cssRows.map(([file]) => file).sort());
 
   const totals = { lines: 0, bytes: 0, rules: 0, important: 0, displayNone: 0, notVisible: 0, visible: 0, hidden: 0, media: 0, keyframes: 0, hiddenAttr: 0 };
@@ -274,20 +290,20 @@ test('CSS load style surface register is audit-only and covers every tracked CSS
   }
 
   assert.deepEqual(totals, {
-  "lines": 22723,
-  "bytes": 647249,
-  "rules": 3317,
+  "lines": 22997,
+  "bytes": 657212,
+  "rules": 3343,
   "important": 623,
-  "displayNone": 98,
+  "displayNone": 95,
   "notVisible": 72,
   "visible": 167,
   "hidden": 6,
-  "media": 69,
-  "keyframes": 9,
+  "media": 72,
+  "keyframes": 11,
   "hiddenAttr": 22
 });
-  assert.match(doc, /12 CSS files, 22,723 counted source lines/);
-  assert.match(doc, /647,249 bytes, 3,317 lexical rule blocks/);
+  assert.match(doc, /13 CSS files, 22,997 counted source lines/);
+  assert.match(doc, /657,212 bytes, 3,343 lexical rule blocks/);
   assert.match(doc, /615 `!important` declarations, 76\s+`display:none` declarations/);
 });
 

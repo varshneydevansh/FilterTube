@@ -2450,5 +2450,11 @@
   "apps.ios.cta": "સ્થિતિ જુઓ",
   "apps.heading": "Android ફોન, ટેબ્લેટ અને Android TV માટે FilterTube હવે Google Play પર છે, એક જ લિસ્ટિંગમાંથી.",
   "dashboard.stats.title": "આજે",
-  "dashboard.stats.surface": "આંકડા કોના માટે"
+  "dashboard.stats.surface": "આંકડા કોના માટે",
+  "controls.header.label": "સક્રિય પ્રોફાઇલ",
+  "controls.header.surfaceMode": "{surface} · {mode}",
+  "controls.tile.backup": "બેકઅપ અને પુનઃસ્થાપન",
+  "controls.tile.profiles": "પ્રોફાઇલ્સ & PIN",
+  "controls.summary.contentOn": "ચાલુ: {count}",
+  "controls.summary.profiles": "પ્રોફાઇલ્સ: {count}"
 }

@@ -2450,5 +2450,11 @@
   "apps.ios.cta": "অবস্থা দেখুন",
   "apps.heading": "Android ফোন, ট্যাবলেট ও Android TV-র জন্য FilterTube এখন Google Play-তে, একটি তালিকা থেকেই।",
   "dashboard.stats.title": "আজ",
-  "dashboard.stats.surface": "পরিসংখ্যান যার জন্য"
+  "dashboard.stats.surface": "পরিসংখ্যান যার জন্য",
+  "controls.header.label": "সক্রিয় প্রোফাইল",
+  "controls.header.surfaceMode": "{surface} · {mode}",
+  "controls.tile.backup": "ব্যাকআপ ও পুনরুদ্ধার",
+  "controls.tile.profiles": "প্রোফাইল & PIN",
+  "controls.summary.contentOn": "চালু: {count}",
+  "controls.summary.profiles": "প্রোফাইল: {count}"
 }

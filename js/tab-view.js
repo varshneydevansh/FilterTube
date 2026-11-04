@@ -32249,7 +32249,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             kicker: ['apps.android.kicker', 'Android phone and tablet'],
             body: ['apps.android.body', 'The complete custom Main and Kids viewing experience, more feature-rich than the direct APK.'],
             cta: ['apps.android.cta', 'Install from Google Play'] },
-        { id: 'android-tv', status: 'available', variant: 'android', icon: '../assets/images/Android_icon.png', href: FILTERTUBE_PLAY_LISTING,
+        { id: 'android-tv', status: 'available', variant: 'tv', icon: '../assets/images/Android_icon.png', href: FILTERTUBE_PLAY_LISTING,
             kicker: ['apps.tv.kicker', 'Android TV'],
             body: ['apps.tv.body', 'The same Google Play listing, installed on your Android TV.'],
             cta: ['apps.android.cta', 'Install from Google Play'] },
@@ -32260,6 +32260,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             cta: ['apps.ios.cta', 'View status'], ctaWhileComingSoon: true }
     ]);
     let controlCenterAppsRendered = false;
+    let controlCenterSelectedRow = 'dashboard';
     const ccText = (entry, values) => tabViewUiText(entry[0], entry[1], values);
 
     /** The same rule the router enforces (resolveViewAccess), as a lock line. Null when the view opens. */
@@ -32284,8 +32285,10 @@ document.addEventListener('DOMContentLoaded', async () => {
         const devices = new Set((Array.isArray(nanahTrustedLinks) ? nanahTrustedLinks : [])
             .filter(link => link && !['revoked', 'keyRevoked'].some(key => link[key] === true || link.policy?.[key] === true))
             .map(link => normalizeString(link.remoteDeviceId)).filter(Boolean)).size;
+        const contentOn = Object.entries(state).filter(([key, value]) => /^(hide|disable)[A-Z]/.test(key) && value === true).length;
         return {
-            state, main, kids, hidden, devices,
+            state, main, kids, hidden, devices, contentOn,
+            profiles: Object.keys(safeObject(profilesV4Cache?.profiles)).length || 1,
             mainMode: state.mode === 'whitelist' ? 'whitelist' : 'blocklist',
             kidsMode: state.kids?.mode === 'whitelist' ? 'whitelist' : 'blocklist',
             autoBackup: state.autoBackupEnabled === true,
@@ -32300,6 +32303,12 @@ document.addEventListener('DOMContentLoaded', async () => {
         switch (id) {
             case 'dashboard': return tabViewUiText('controls.summary.hiddenToday', 'Hidden today: {count}', { count: data.hidden });
             case 'filters': return rules(data.main);
+            case 'content': return tabViewUiText('controls.summary.contentOn', 'Turned on: {count}', { count: data.contentOn });
+            case 'timeLimits': return data.selfControl
+                ? tabViewUiText('controls.summary.selfControlLeft', 'Self-Control: {remaining}', { remaining: data.selfControl })
+                : tabViewUiText('family.commandCenter.detail.off', 'Off');
+            case 'backup': return data.autoBackup ? tabViewUiText('controls.summary.autoBackupOn', 'Auto backup on') : tabViewUiText('controls.summary.autoBackupOff', 'Auto backup off');
+            case 'profiles': return tabViewUiText('controls.summary.profiles', 'Profiles: {count}', { count: data.profiles });
             case 'kids': return tabViewUiText('controls.summary.kids', '{mode} · Channels: {channels}',
                 { mode: controlCenterModeLabel(data.kidsMode), channels: data.kids.channelCount || 0 });
             case 'settings': return data.selfControl
@@ -32318,6 +32327,15 @@ document.addEventListener('DOMContentLoaded', async () => {
         }
     }
 
+    // Rows that open a part of a page (the apps' Content controls, Time limits, Backup & restore, Profiles & PIN).
+    function revealControlCenterTarget(target) {
+        const scrollTo = node => node && requestAnimationFrame(() => node.scrollIntoView({ behavior: 'smooth', block: 'start' }));
+        if (target === 'content') document.querySelector('#filtersView [data-tab-id="content"]')?.click();
+        if (target === 'selfControl') scrollTo(document.querySelector('#settingsView .ft-self-control-card'));
+        if (target === 'importExport') scrollTo(document.getElementById('ftImportExportCard'));
+        if (target === 'profiles') scrollTo(document.getElementById('ftProfilesManager')?.closest('.settings-card'));
+    }
+
     async function openControlCenterDestination(view) {
         if (resolveViewAccess(view).reason === 'locked' && resolveViewAccess(view).viewId !== view) {
             // Same prompt as the lock gate; the router still enforces the result.
@@ -32332,12 +32350,13 @@ document.addEventListener('DOMContentLoaded', async () => {
         const host = document.getElementById('ftControlCenterApps');
         if (!host || (controlCenterAppsRendered && !force)) return;
         controlCenterAppsRendered = true;
-        host.replaceChildren(...FILTERTUBE_APP_PLATFORMS.map(platform => {
+        host.replaceChildren(...FILTERTUBE_APP_PLATFORMS.map((platform, index) => {
             const available = platform.status === 'available';
             const linked = available || platform.ctaWhileComingSoon;
             const card = document.createElement(linked ? 'a' : 'div');
             card.className = `dashboard-app-card dashboard-app-card--${platform.variant} ft-cc-app ft-cc-app--${available ? 'available' : 'soon'}`;
             card.dataset.platform = platform.id;
+            card.style.setProperty('--ft-dash-i', String(index));
             if (linked) { card.href = platform.href; card.target = '_blank'; card.rel = 'noreferrer'; }
             const content = document.createElement('span');
             content.className = 'dashboard-app-card__content';
@@ -32363,8 +32382,19 @@ document.addEventListener('DOMContentLoaded', async () => {
             }
             const art = document.createElement('span');
             art.className = 'dashboard-app-card__art'; art.setAttribute('aria-hidden', 'true');
-            const artImg = document.createElement('img'); artImg.src = platform.icon; artImg.alt = '';
-            art.appendChild(artImg);
+            if (platform.variant === 'tv') {
+                // A TV showing FilterTube, drawn in CSS: no extra image asset.
+                art.classList.add('ft-tv-art');
+                const screen = document.createElement('span'); screen.className = 'ft-tv-art__screen';
+                const logo = document.createElement('img'); logo.src = '../icons/icon-128.png'; logo.alt = '';
+                const bar = document.createElement('span'); bar.className = 'ft-tv-art__bar';
+                screen.append(logo, bar);
+                const stand = document.createElement('span'); stand.className = 'ft-tv-art__stand';
+                art.append(screen, stand);
+            } else {
+                const artImg = document.createElement('img'); artImg.src = platform.icon; artImg.alt = '';
+                art.appendChild(artImg);
+            }
             card.append(content, art);
             return card;
         }));
@@ -32373,25 +32403,70 @@ document.addEventListener('DOMContentLoaded', async () => {
     function renderControlCenter() {
         let data;
         try { data = controlCenterData(); } catch (e) { return; }
+        const activeView = normalizeString(document.body?.dataset.activeView) || 'dashboard';
+        // Several rows share a page (Settings, Time limits, Backup & restore); only the chosen one is current.
+        const current = document.querySelector(`.nav-item[data-nav-id="${controlCenterSelectedRow}"][data-tab="${activeView}"]`)
+            || document.querySelector(`.nav-item[data-tab="${activeView}"]:not([data-nav-id])`);
         document.querySelectorAll('.nav-item[data-tab]').forEach(item => {
             const tab = normalizeString(item.getAttribute('data-tab'));
+            const id = normalizeString(item.getAttribute('data-nav-id')) || tab;
             const summary = item.querySelector('.nav-summary');
             const lockLine = item.querySelector('.nav-lock');
             if (summary) {
-                summary.textContent = controlCenterSummary(tab, data);
+                summary.textContent = controlCenterSummary(id, data);
                 summary.title = summary.textContent;
             }
             const lock = tab === 'dashboard' ? null : controlCenterLockFor(tab);
             if (lockLine) { lockLine.textContent = lock || ''; lockLine.hidden = !lock; }
-            if (item.classList.contains('active')) item.setAttribute('aria-current', 'page'); else item.removeAttribute('aria-current');
+            if (item === current) item.setAttribute('aria-current', 'page'); else item.removeAttribute('aria-current');
         });
 
+        try {
+            renderDashboardProfileCard(data);
+        } catch (e) {
+        }
         renderControlCenterApps();
     }
 
+    /** The hero's profile card: who is active and which rules the stats show. */
+    function renderDashboardProfileCard(data) {
+        const root = safeObject(profilesV4Cache);
+        const avatar = document.getElementById('ftDashProfileAvatar');
+        const name = document.getElementById('ftDashProfileName');
+        const mode = document.getElementById('ftDashProfileMode');
+        if (avatar && root.profiles) {
+            const colors = getProfileColors(activeProfileId);
+            avatar.textContent = getProfileInitial(root, activeProfileId);
+            avatar.style.backgroundColor = colors.bg; avatar.style.color = colors.fg;
+        }
+        if (name) name.textContent = root.profiles ? getProfileName(root, activeProfileId) : '';
+        if (mode) {
+            const kidsSurface = dashboardStatsSurface === 'kids';
+            mode.textContent = tabViewUiText('controls.header.surfaceMode', '{surface} · {mode}', {
+                surface: kidsSurface ? tabViewUiText('family.commandCenter.surface.kids', 'Kids') : tabViewUiText('family.commandCenter.surface.main', 'Main'),
+                mode: controlCenterModeLabel(kidsSurface ? data.kidsMode : data.mainMode)
+            });
+        }
+    }
+
     (function installControlCenter() {
+        document.getElementById('ftDashSwitchProfile')?.addEventListener('click', () => {
+            ftProfileBadgeBtnTab?.focus();
+            ftProfileBadgeBtnTab?.click();
+        });
         // Rows are keyboard stops: Enter or Space selects, like a click.
         document.querySelectorAll('.nav-item[data-tab]').forEach(item => {
+            item.addEventListener('click', () => {
+                if (item.getAttribute('aria-disabled') === 'true') return;
+                const tab = normalizeString(item.getAttribute('data-tab'));
+                controlCenterSelectedRow = normalizeString(item.getAttribute('data-nav-id')) || tab;
+                const target = normalizeString(item.getAttribute('data-nav-target'));
+                // After the router has switched pages.
+                requestAnimationFrame(() => {
+                    renderControlCenter();
+                    if (target && normalizeString(document.body?.dataset.activeView) === tab) revealControlCenterTarget(target);
+                });
+            });
             item.addEventListener('keydown', event => {
                 if (event.key !== 'Enter' && event.key !== ' ') return;
                 event.preventDefault();
@@ -32535,6 +32610,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             dashboardStatsUserOverride = true;
         }
         updateStats();
+        renderControlCenter();
     }
 
     function scheduleDashboardStatsRotation() {

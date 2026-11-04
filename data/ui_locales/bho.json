@@ -2450,5 +2450,11 @@
   "apps.ios.cta": "स्थिति देखीं",
   "apps.heading": "Android फोन, टैबलेट आ Android TV खातिर FilterTube अब Google Play पर बा, एके लिस्टिंग से।",
   "dashboard.stats.title": "आज",
-  "dashboard.stats.surface": "आँकड़ा केकरा खातिर"
+  "dashboard.stats.surface": "आँकड़ा केकरा खातिर",
+  "controls.header.label": "चालू प्रोफाइल",
+  "controls.header.surfaceMode": "{surface} · {mode}",
+  "controls.tile.backup": "बैकअप आ रिस्टोर",
+  "controls.tile.profiles": "प्रोफाइल & PIN",
+  "controls.summary.contentOn": "चालू: {count}",
+  "controls.summary.profiles": "प्रोफाइल: {count}"
 }

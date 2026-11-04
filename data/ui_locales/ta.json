@@ -2450,5 +2450,11 @@
   "apps.ios.cta": "நிலையைக் காண்க",
   "apps.heading": "Android போன், டேப்லெட், Android TV-க்கான FilterTube இப்போது Google Play-இல், ஒரே பட்டியலில்.",
   "dashboard.stats.title": "இன்று",
-  "dashboard.stats.surface": "புள்ளிவிவரம் எதற்கு"
+  "dashboard.stats.surface": "புள்ளிவிவரம் எதற்கு",
+  "controls.header.label": "செயலில் உள்ள சுயவிவரம்",
+  "controls.header.surfaceMode": "{surface} · {mode}",
+  "controls.tile.backup": "காப்புப்பிரதி & மீட்டமை",
+  "controls.tile.profiles": "சுயவிவரங்கள் & PIN",
+  "controls.summary.contentOn": "இயக்கத்தில்: {count}",
+  "controls.summary.profiles": "சுயவிவரங்கள்: {count}"
 }

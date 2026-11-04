@@ -2450,5 +2450,11 @@
   "apps.ios.cta": "Angalia hali",
   "apps.heading": "FilterTube kwa simu, kompyuta kibao na Android TV sasa iko Google Play, kwenye ukurasa mmoja.",
   "dashboard.stats.title": "Leo",
-  "dashboard.stats.surface": "Takwimu za"
+  "dashboard.stats.surface": "Takwimu za",
+  "controls.header.label": "Wasifu unaotumika",
+  "controls.header.surfaceMode": "{surface} · {mode}",
+  "controls.tile.backup": "Hifadhi nakala na urejeshe",
+  "controls.tile.profiles": "Wasifu & PIN",
+  "controls.summary.contentOn": "Zimewashwa: {count}",
+  "controls.summary.profiles": "Wasifu: {count}"
 }

@@ -2450,5 +2450,11 @@
   "apps.ios.cta": "ดูสถานะ",
   "apps.heading": "FilterTube สำหรับโทรศัพท์ แท็บเล็ต และ Android TV มีบน Google Play แล้วในหน้าเดียว",
   "dashboard.stats.title": "วันนี้",
-  "dashboard.stats.surface": "สถิติสำหรับ"
+  "dashboard.stats.surface": "สถิติสำหรับ",
+  "controls.header.label": "โปรไฟล์ที่ใช้งาน",
+  "controls.header.surfaceMode": "{surface} · {mode}",
+  "controls.tile.backup": "สำรองและกู้คืน",
+  "controls.tile.profiles": "โปรไฟล์ & PIN",
+  "controls.summary.contentOn": "เปิดอยู่: {count}",
+  "controls.summary.profiles": "โปรไฟล์: {count}"
 }

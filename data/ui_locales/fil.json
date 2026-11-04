@@ -2450,5 +2450,11 @@
   "apps.ios.cta": "Tingnan ang status",
   "apps.heading": "Nasa Google Play na ang FilterTube para sa Android phone, tablet, at Android TV, mula sa iisang listing.",
   "dashboard.stats.title": "Ngayon",
-  "dashboard.stats.surface": "Mga stats para sa"
+  "dashboard.stats.surface": "Mga stats para sa",
+  "controls.header.label": "Aktibong profile",
+  "controls.header.surfaceMode": "{surface} · {mode}",
+  "controls.tile.backup": "Backup at restore",
+  "controls.tile.profiles": "Mga profile & PIN",
+  "controls.summary.contentOn": "Naka-on: {count}",
+  "controls.summary.profiles": "Mga profile: {count}"
 }

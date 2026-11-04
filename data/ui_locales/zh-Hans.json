@@ -2450,5 +2450,11 @@
   "apps.ios.cta": "查看状态",
   "apps.heading": "适用于 Android 手机、平板和 Android TV 的 FilterTube 已在 Google Play 上架，只需一个页面。",
   "dashboard.stats.title": "今天",
-  "dashboard.stats.surface": "统计范围"
+  "dashboard.stats.surface": "统计范围",
+  "controls.header.label": "当前配置",
+  "controls.header.surfaceMode": "{surface} · {mode}",
+  "controls.tile.backup": "备份与恢复",
+  "controls.tile.profiles": "配置文件 & PIN",
+  "controls.summary.contentOn": "已开启: {count}",
+  "controls.summary.profiles": "配置文件: {count}"
 }

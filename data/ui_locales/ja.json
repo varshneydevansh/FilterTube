@@ -2450,5 +2450,11 @@
   "apps.ios.cta": "状況を見る",
   "apps.heading": "Android スマートフォン・タブレット・Android TV 向けの FilterTube が、1 つの Google Play ページで公開中です。",
   "dashboard.stats.title": "今日",
-  "dashboard.stats.surface": "統計の対象"
+  "dashboard.stats.surface": "統計の対象",
+  "controls.header.label": "現在のプロフィール",
+  "controls.header.surfaceMode": "{surface} · {mode}",
+  "controls.tile.backup": "バックアップと復元",
+  "controls.tile.profiles": "プロフィール & PIN",
+  "controls.summary.contentOn": "オン: {count}",
+  "controls.summary.profiles": "プロフィール: {count}"
 }

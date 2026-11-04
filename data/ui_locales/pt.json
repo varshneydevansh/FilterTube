@@ -2450,5 +2450,11 @@
   "apps.ios.cta": "Ver status",
   "apps.heading": "O FilterTube para telemóveis/celulares, tablets e Android TV está no Google Play, numa só página.",
   "dashboard.stats.title": "Hoje",
-  "dashboard.stats.surface": "Estatísticas de"
+  "dashboard.stats.surface": "Estatísticas de",
+  "controls.header.label": "Perfil ativo",
+  "controls.header.surfaceMode": "{surface} · {mode}",
+  "controls.tile.backup": "Backup e restauração",
+  "controls.tile.profiles": "Perfis & PIN",
+  "controls.summary.contentOn": "Ativados: {count}",
+  "controls.summary.profiles": "Perfis: {count}"
 }

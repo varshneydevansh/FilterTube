@@ -2450,5 +2450,11 @@
   "apps.ios.cta": "Deleng status",
   "apps.heading": "FilterTube kanggo HP, tablet, lan Android TV saiki ana ing Google Play, saka siji listing.",
   "dashboard.stats.title": "Dina iki",
-  "dashboard.stats.surface": "Statistik kanggo"
+  "dashboard.stats.surface": "Statistik kanggo",
+  "controls.header.label": "Profil aktif",
+  "controls.header.surfaceMode": "{surface} · {mode}",
+  "controls.tile.backup": "Serep lan pulihake",
+  "controls.tile.profiles": "Profil & PIN",
+  "controls.summary.contentOn": "Urip: {count}",
+  "controls.summary.profiles": "Profil: {count}"
 }

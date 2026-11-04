@@ -2583,5 +2583,11 @@
   "apps.ios.cta": "View status",
   "apps.heading": "FilterTube for Android phones, tablets and Android TV is on Google Play, from one listing.",
   "dashboard.stats.title": "Today",
-  "dashboard.stats.surface": "Stats for"
+  "dashboard.stats.surface": "Stats for",
+  "controls.header.label": "Active profile",
+  "controls.header.surfaceMode": "{surface} · {mode}",
+  "controls.tile.backup": "Backup & restore",
+  "controls.tile.profiles": "Profiles & PIN",
+  "controls.summary.contentOn": "Turned on: {count}",
+  "controls.summary.profiles": "Profiles: {count}"
 }

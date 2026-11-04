@@ -2450,5 +2450,11 @@
   "apps.ios.cta": "شوف الحالة",
   "apps.heading": "FilterTube للموبايل والتابلت وAndroid TV بقى في Google Play من صفحة واحدة.",
   "dashboard.stats.title": "الليلة",
-  "dashboard.stats.surface": "إحصائيات لـ"
+  "dashboard.stats.surface": "إحصائيات لـ",
+  "controls.header.label": "الملف النشط",
+  "controls.header.surfaceMode": "{surface} · {mode}",
+  "controls.tile.backup": "نسخة احتياطية واسترجاع",
+  "controls.tile.profiles": "ملفات & PIN",
+  "controls.summary.contentOn": "شغّال: {count}",
+  "controls.summary.profiles": "ملفات: {count}"
 }

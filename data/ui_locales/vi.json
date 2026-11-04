@@ -2450,5 +2450,11 @@
   "apps.ios.cta": "Xem trạng thái",
   "apps.heading": "FilterTube cho điện thoại, máy tính bảng và Android TV đã có trên Google Play, chỉ một trang.",
   "dashboard.stats.title": "Hôm nay",
-  "dashboard.stats.surface": "Thống kê cho"
+  "dashboard.stats.surface": "Thống kê cho",
+  "controls.header.label": "Hồ sơ đang hoạt động",
+  "controls.header.surfaceMode": "{surface} · {mode}",
+  "controls.tile.backup": "Sao lưu & khôi phục",
+  "controls.tile.profiles": "Hồ sơ & PIN",
+  "controls.summary.contentOn": "Đang bật: {count}",
+  "controls.summary.profiles": "Hồ sơ: {count}"
 }

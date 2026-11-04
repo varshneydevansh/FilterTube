@@ -2450,5 +2450,11 @@
   "apps.ios.cta": "حالت ویکھو",
   "apps.heading": "Android فون، ٹیبلیٹ تے Android TV لئی FilterTube ہن Google Play اُتے اے، اکو لسٹنگ توں۔",
   "dashboard.stats.title": "اج",
-  "dashboard.stats.surface": "انکڑے کس لئی"
+  "dashboard.stats.surface": "انکڑے کس لئی",
+  "controls.header.label": "چالو پروفائل",
+  "controls.header.surfaceMode": "{surface} · {mode}",
+  "controls.tile.backup": "بیک اپ تے بحالی",
+  "controls.tile.profiles": "پروفائل & PIN",
+  "controls.summary.contentOn": "چالو: {count}",
+  "controls.summary.profiles": "پروفائل: {count}"
 }

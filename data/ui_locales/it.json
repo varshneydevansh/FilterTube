@@ -2450,5 +2450,11 @@
   "apps.ios.cta": "Visualizza lo stato",
   "apps.heading": "FilterTube per telefoni, tablet e Android TV è su Google Play, da un’unica scheda.",
   "dashboard.stats.title": "Oggi",
-  "dashboard.stats.surface": "Statistiche per"
+  "dashboard.stats.surface": "Statistiche per",
+  "controls.header.label": "Profilo attivo",
+  "controls.header.surfaceMode": "{surface} · {mode}",
+  "controls.tile.backup": "Backup e ripristino",
+  "controls.tile.profiles": "Profili & PIN",
+  "controls.summary.contentOn": "Attivi: {count}",
+  "controls.summary.profiles": "Profili: {count}"
 }

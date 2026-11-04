@@ -2450,5 +2450,11 @@
   "apps.ios.cta": "Lihat status",
   "apps.heading": "FilterTube untuk ponsel, tablet, dan Android TV kini ada di Google Play, dari satu listing.",
   "dashboard.stats.title": "Hari ini",
-  "dashboard.stats.surface": "Statistik untuk"
+  "dashboard.stats.surface": "Statistik untuk",
+  "controls.header.label": "Profil aktif",
+  "controls.header.surfaceMode": "{surface} · {mode}",
+  "controls.tile.backup": "Cadangkan & pulihkan",
+  "controls.tile.profiles": "Profil & PIN",
+  "controls.summary.contentOn": "Diaktifkan: {count}",
+  "controls.summary.profiles": "Profil: {count}"
 }

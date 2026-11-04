@@ -2450,5 +2450,11 @@
   "apps.ios.cta": "ሁኔታውን ይመልከቱ",
   "apps.heading": "ለAndroid ስልኮች፣ ታብሌቶች እና Android TV FilterTube አሁን በአንድ የGoogle Play ገጽ ላይ ይገኛል።",
   "dashboard.stats.title": "ዛሬ",
-  "dashboard.stats.surface": "ስታቲስቲክስ ለ"
+  "dashboard.stats.surface": "ስታቲስቲክስ ለ",
+  "controls.header.label": "ንቁ መገለጫ",
+  "controls.header.surfaceMode": "{surface} · {mode}",
+  "controls.tile.backup": "ምትኬ እና መመለስ",
+  "controls.tile.profiles": "መገለጫዎች & PIN",
+  "controls.summary.contentOn": "በርቷል: {count}",
+  "controls.summary.profiles": "መገለጫዎች: {count}"
 }

@@ -2450,5 +2450,11 @@
   "apps.ios.cta": "Wo ipò",
   "apps.heading": "FilterTube fún fóònù Android, tábúlẹ́ẹ̀tì àti Android TV ti wà lórí Google Play báyìí, láti ojú-ewé kan.",
   "dashboard.stats.title": "Òní",
-  "dashboard.stats.surface": "Ìṣirò fún"
+  "dashboard.stats.surface": "Ìṣirò fún",
+  "controls.header.label": "Profaili tó ń ṣiṣẹ́",
+  "controls.header.surfaceMode": "{surface} · {mode}",
+  "controls.tile.backup": "Ẹ̀dà ìpamọ́ àti ìmúpadàbọ̀sípò",
+  "controls.tile.profiles": "Àwọn profaili & PIN",
+  "controls.summary.contentOn": "Ó wà ní títàn: {count}",
+  "controls.summary.profiles": "Àwọn profaili: {count}"
 }

@@ -2450,5 +2450,11 @@
   "apps.ios.cta": "Durumu görüntüle",
   "apps.heading": "Android telefon, tablet ve Android TV için FilterTube artık tek bir sayfayla Google Play’de.",
   "dashboard.stats.title": "Bugün",
-  "dashboard.stats.surface": "İstatistik kapsamı"
+  "dashboard.stats.surface": "İstatistik kapsamı",
+  "controls.header.label": "Etkin profil",
+  "controls.header.surfaceMode": "{surface} · {mode}",
+  "controls.tile.backup": "Yedekle ve geri yükle",
+  "controls.tile.profiles": "Profiller & PIN",
+  "controls.summary.contentOn": "Açık: {count}",
+  "controls.summary.profiles": "Profiller: {count}"
 }

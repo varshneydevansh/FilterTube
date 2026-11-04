@@ -2450,5 +2450,11 @@
   "apps.ios.cta": "상태 보기",
   "apps.heading": "Android 휴대전화·태블릿·Android TV용 FilterTube가 하나의 Google Play 페이지로 출시되었습니다.",
   "dashboard.stats.title": "오늘",
-  "dashboard.stats.surface": "통계 대상"
+  "dashboard.stats.surface": "통계 대상",
+  "controls.header.label": "활성 프로필",
+  "controls.header.surfaceMode": "{surface} · {mode}",
+  "controls.tile.backup": "백업 및 복원",
+  "controls.tile.profiles": "프로필 & PIN",
+  "controls.summary.contentOn": "켜짐: {count}",
+  "controls.summary.profiles": "프로필: {count}"
 }

@@ -2450,5 +2450,11 @@
   "apps.ios.cta": "See status",
   "apps.heading": "FilterTube for Android phone, tablet and Android TV don dey Google Play, from one listing.",
   "dashboard.stats.title": "Today",
-  "dashboard.stats.surface": "Stats for"
+  "dashboard.stats.surface": "Stats for",
+  "controls.header.label": "Profile wey dey active",
+  "controls.header.surfaceMode": "{surface} · {mode}",
+  "controls.tile.backup": "Backup and restore",
+  "controls.tile.profiles": "Profiles & PIN",
+  "controls.summary.contentOn": "E dey on: {count}",
+  "controls.summary.profiles": "Profiles: {count}"
 }

@@ -2450,5 +2450,11 @@
   "apps.ios.cta": "Duba hali",
   "apps.heading": "FilterTube don waya, kwamfutar hannu da Android TV yanzu yana Google Play, daga shafi ɗaya.",
   "dashboard.stats.title": "Yau",
-  "dashboard.stats.surface": "Ƙididdiga don"
+  "dashboard.stats.surface": "Ƙididdiga don",
+  "controls.header.label": "Bayanan martaba mai aiki",
+  "controls.header.surfaceMode": "{surface} · {mode}",
+  "controls.tile.backup": "Ajiya da maidowa",
+  "controls.tile.profiles": "Bayanan martaba & PIN",
+  "controls.summary.contentOn": "A kunne: {count}",
+  "controls.summary.profiles": "Bayanan martaba: {count}"
 }

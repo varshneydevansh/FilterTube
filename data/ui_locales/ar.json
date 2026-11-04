@@ -2450,5 +2450,11 @@
   "apps.ios.cta": "عرض الحالة",
   "apps.heading": "FilterTube للهواتف والأجهزة اللوحية وAndroid TV متاح الآن على Google Play من صفحة واحدة.",
   "dashboard.stats.title": "اليوم",
-  "dashboard.stats.surface": "إحصاءات لـ"
+  "dashboard.stats.surface": "إحصاءات لـ",
+  "controls.header.label": "الملف الشخصي النشط",
+  "controls.header.surfaceMode": "{surface} · {mode}",
+  "controls.tile.backup": "النسخ الاحتياطي والاستعادة",
+  "controls.tile.profiles": "الملفات الشخصية & PIN",
+  "controls.summary.contentOn": "مفعّل: {count}",
+  "controls.summary.profiles": "الملفات الشخصية: {count}"
 }

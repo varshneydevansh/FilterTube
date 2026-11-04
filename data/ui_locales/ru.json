@@ -2450,5 +2450,11 @@
   "apps.ios.cta": "Посмотреть состояние",
   "apps.heading": "FilterTube для телефонов, планшетов и Android TV уже в Google Play — на одной странице.",
   "dashboard.stats.title": "Сегодня",
-  "dashboard.stats.surface": "Статистика для"
+  "dashboard.stats.surface": "Статистика для",
+  "controls.header.label": "Активный профиль",
+  "controls.header.surfaceMode": "{surface} · {mode}",
+  "controls.tile.backup": "Резервная копия и восстановление",
+  "controls.tile.profiles": "Профили & PIN",
+  "controls.summary.contentOn": "Включено: {count}",
+  "controls.summary.profiles": "Профили: {count}"
 }

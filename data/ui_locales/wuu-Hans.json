@@ -2450,5 +2450,11 @@
   "apps.ios.cta": "查看状态",
   "apps.heading": "Android 手机、平板搭 Android TV 用个 FilterTube 已经上 Google Play 了，一只页面就够。",
   "dashboard.stats.title": "今朝",
-  "dashboard.stats.surface": "统计范围"
+  "dashboard.stats.surface": "统计范围",
+  "controls.header.label": "当前用个个人档案",
+  "controls.header.surfaceMode": "{surface} · {mode}",
+  "controls.tile.backup": "备份搭恢复",
+  "controls.tile.profiles": "档案 & PIN",
+  "controls.summary.contentOn": "已开: {count}",
+  "controls.summary.profiles": "档案: {count}"
 }
