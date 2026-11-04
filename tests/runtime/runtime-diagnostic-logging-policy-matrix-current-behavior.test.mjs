@@ -25,7 +25,7 @@ const sourceFingerprints = {
   'js/seed.js': [2508, 110538, 'af10e116a8580bf380e6f26b312c5ed3e3597693f7cf9a9bbb4661c2c597c8a1'],
   'js/settings_shared.js': [1327, 67805, 'c3d0f4b965acaaf46f6424cd0ad329c50e616de7b1cf8905a9fa578123e2bf69'],
   'js/state_manager.js': [2984, 124258, '029b2e7d4356d4629348f174bdaf7858fa1fa0c09a4b54c6bb0e293a161a8d5e'],
-  'js/tab-view.js': [33388, 1820587, 'fee08830c87d155a6ca75b7d79b5cc167a4f7c6276e7012dc779d1d3f79b0582'],
+  'js/tab-view.js': [33681, 1840696, 'd62105c1d6476792feaff0968b21e5fe1fcf82776b64c6085762018fcc043bda'],
   'scripts/build-extension-ui.mjs': [50, 1188, "6326362ebf90f448ccdbf68945b3fb522b7b215edaf9b3e28589a4e166239cf3"],
   'scripts/build-nanah-vendor.mjs': [65, 1818, "dae8d3ef29c4cd44b0bf975090e9d53f3bb05b523355f5038930fc03b27e921c"],
   'scripts/sync-native-runtime.mjs': [34, 1070, "4f46c13bf6099092193712790d231ff4809b00b1b0061d04af71ac3ba6bf21c6"]

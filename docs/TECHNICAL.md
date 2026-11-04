@@ -2243,6 +2243,19 @@ Every controls page has a colour tone shared with the Android app (FilterTubeApp
 - Keyboard focus is a 2px accent outline, with no fill or shadow change.
 - The scenic video stays as a faint texture under the tone gradient. The extension has no background-motion toggle: `css/page-tones.css` hides the video under `prefers-reduced-motion`, and Chrome pauses muted autoplay video that is not rendered.
 
+### Sidebar and Control Center (2026-11-04)
+
+The dashboard follows the apps' Control Center (FilterTubeApp `docs/app/tv-ux-research/CONTROLS_IA_ALL_FORM_FACTORS.md` §1–2):
+
+- **Sidebar:** one panel in the page tone. Flat rows show an icon, a title and a live summary, for example "Channels: 6 · Keywords: 0" or "Version 3.4.2". A lock line ("PIN required", "Parent PIN required", "Locked by Self-Control") comes from the same `resolveViewAccess` rule the router enforces. The selected row uses the tone's soft fill. Rows are keyboard stops (Enter or Space) with a focus-visible outline and no hover change. A row locked only by the profile PIN asks for the PIN, then opens.
+- **Dashboard:**
+  - A profile header: avatar, name, Main/Kids, Blocklist/Whitelist, and Switch profile, which opens the top-bar switcher.
+  - A one-line status strip.
+  - Twelve tiles in the apps' order: Filters, Content Controls, Kids Mode, Settings, Time limits, Backup & restore, Accounts & Sync, Profiles & PIN, What's New, Help, About and Donate. Donate is hidden for a child.
+  - The apps card.
+- **App platforms:** they are data in `FILTERTUBE_APP_PLATFORMS` (`js/tab-view.js`). Each platform has `status: 'available' | 'coming_soon'`. Android TV shares the phone and tablet Google Play listing and is `coming_soon`; changing its `status` to `'available'` shows "Available on Google Play" and the install link.
+- All copy uses `data/ui_locales` keys (`controls.*`, `apps.*`) in every target locale.
+
 ### Enhanced Dropdown & Select Components
 
 FilterTube v3.2.6 introduces refined dropdown and select styling with left accent borders and improved interactivity:
