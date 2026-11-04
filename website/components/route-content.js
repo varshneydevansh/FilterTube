@@ -427,6 +427,54 @@ export const homeTechnicalFeatures = [
   },
 ];
 
+
+// Real screens from the 3.5.0 apps (phone 1080×2424, tablet 2560×1600, TV 1920×1080).
+export const androidPhoneScreens = [
+  { src: "/apps/screenshots/android/phone-entry.webp", title: "Viewing spaces", alt: "FilterTube Android choose your viewing space page with Main and Kids", caption: "Main and Kids each keep their own rules.", width: 1080, height: 2424 },
+  { src: "/apps/screenshots/android/phone-search.webp", title: "Search", alt: "Android search results for Our Planet with filters and block buttons", caption: "Search with filters; every card can be blocked.", width: 1080, height: 2424 },
+  { src: "/apps/screenshots/android/phone-watch.webp", title: "Watch", alt: "Android Watch page playing Our Planet Forests", caption: "A clean Watch page with your rules applied.", width: 1080, height: 2424 },
+  { src: "/apps/screenshots/android/phone-player-controls.webp", title: "Player", alt: "Android player controls with chapter markers", caption: "Captions, floating player, fullscreen and chapter marks.", width: 1080, height: 2424 },
+  { src: "/apps/screenshots/android/phone-player-settings.webp", title: "Player settings", alt: "Android player settings sheet", caption: "Quality, buffer, loop, autoplay, sleep timer, skip silence and more.", width: 1080, height: 2424 },
+  { src: "/apps/screenshots/android/phone-chapters.webp", title: "Chapters", alt: "Android chapters sheet with search", caption: "Search and jump between chapters.", width: 1080, height: 2424 },
+  { src: "/apps/screenshots/android/phone-channel-miniplayer.webp", title: "Channel + mini player", alt: "Netflix channel page with the floating mini player", caption: "Browse channels while the video keeps playing.", width: 1080, height: 2424 },
+  { src: "/apps/screenshots/android/phone-music-home.webp", title: "Music", alt: "Android Music Home with Quick picks", caption: "Music Home, Explore and Library.", width: 1080, height: 2424 },
+  { src: "/apps/screenshots/android/phone-now-playing.webp", title: "Now playing", alt: "Android Music now playing screen", caption: "Album art, shuffle, repeat, lyrics and video.", width: 1080, height: 2424 },
+  { src: "/apps/screenshots/android/phone-queue.webp", title: "Queue", alt: "Android music queue with drag handles", caption: "Reorder the queue or save it as a playlist.", width: 1080, height: 2424 },
+  { src: "/apps/screenshots/android/phone-you.webp", title: "You", alt: "Android You page with library and history", caption: "Local playlists, Watch later, Notes, offline media and history.", width: 1080, height: 2424 },
+  { src: "/apps/screenshots/android/phone-controls.webp", title: "FilterTube Controls", alt: "Android FilterTube Controls overview", caption: "Every control in one place.", width: 1080, height: 2424 },
+  { src: "/apps/screenshots/android/phone-filters-channels.webp", title: "Channel rules", alt: "Android channel rules with suggestions", caption: "Block or allow channels, with suggestions from what you watched.", width: 1080, height: 2424 },
+  { src: "/apps/screenshots/android/phone-content-controls.webp", title: "Content controls", alt: "Android content controls list", caption: "Hide Shorts, the Home feed, comments, categories and more.", width: 1080, height: 2424 },
+  { src: "/apps/screenshots/android/phone-sync.webp", title: "Accounts & Sync", alt: "Android Accounts and Sync menu", caption: "Connect devices, keep in sync, profiles and PINs.", width: 1080, height: 2424 },
+  { src: "/apps/screenshots/android/phone-sync-pairing.webp", title: "Private P2P pairing", alt: "Android device pairing with code and QR", caption: "Pair with a code or QR. No account, no cloud copy.", width: 1080, height: 2424 },
+  { src: "/apps/screenshots/android/phone-kids-mode.webp", title: "Kids Mode", alt: "Android Kids Mode rules", caption: "Separate YouTube Kids rules from Main.", width: 1080, height: 2424 },
+  { src: "/apps/screenshots/android/phone-self-control.webp", title: "Self-Control", alt: "Android Self-Control session setup", caption: "Lock your rules for a set time.", width: 1080, height: 2424 },
+  { src: "/apps/screenshots/android/phone-settings.webp", title: "Settings", alt: "Android settings list", caption: "Language, theme, launch behavior and integrations.", width: 1080, height: 2424 },
+  { src: "/apps/screenshots/android/phone-integrations.webp", title: "Integrations", alt: "Android SponsorBlock, Return YouTube Dislike and DeArrow toggles", caption: "Optional SponsorBlock, dislikes and community titles.", width: 1080, height: 2424 },
+];
+
+export const androidTabletScreens = [
+  { src: "/apps/screenshots/android/tablet-controls.webp", title: "Controls on tablet", alt: "FilterTube Controls on a tablet", caption: "A wide Controls grid with the signed-in channel.", width: 2560, height: 1600 },
+  { src: "/apps/screenshots/android/tablet-search.webp", title: "Search grid", alt: "Tablet search results grid for Kurzgesagt", caption: "Three-column search results.", width: 2560, height: 1600 },
+  { src: "/apps/screenshots/android/tablet-watch.webp", title: "Two-pane Watch", alt: "Tablet Watch page with recommendations beside the video", caption: "The video and recommendations side by side.", width: 2560, height: 1600 },
+  { src: "/apps/screenshots/android/tablet-music-explore.webp", title: "Music Explore", alt: "Tablet Music Explore with new releases and moods", caption: "New releases, charts, moods and podcasts.", width: 2560, height: 1600 },
+  { src: "/apps/screenshots/android/tablet-block-menu.webp", title: "Block from any card", alt: "Tablet Subscriptions with the FilterTube block menu open", caption: "Block a channel or filter all its videos from any card.", width: 2560, height: 1600 },
+];
+
+export const androidTvScreens = [
+  { src: "/apps/screenshots/android/tv-entry.webp", title: "Viewing spaces", alt: "FilterTube Android TV viewing space choice", caption: "Main and Kids on the big screen.", width: 1920, height: 1080 },
+  { src: "/apps/screenshots/android/tv-home.webp", title: "Home", alt: "Android TV Home with blocked cards counted", caption: "Home with your filters applied.", width: 1920, height: 1080 },
+  { src: "/apps/screenshots/android/tv-search.webp", title: "Search", alt: "Android TV search sheet", caption: "A remote-friendly search sheet.", width: 1920, height: 1080 },
+  { src: "/apps/screenshots/android/tv-search-results.webp", title: "Search results", alt: "Android TV search results for Our Planet", caption: "Results laid out for the remote.", width: 1920, height: 1080 },
+  { src: "/apps/screenshots/android/tv-watch.webp", title: "Watch", alt: "Android TV Watch page playing Our Planet", caption: "Watch with recommendations from the same channel.", width: 1920, height: 1080 },
+  { src: "/apps/screenshots/android/tv-subscriptions.webp", title: "Subscriptions", alt: "Android TV Subscriptions with channel avatars", caption: "Your subscriptions, filtered.", width: 1920, height: 1080 },
+  { src: "/apps/screenshots/android/tv-you.webp", title: "You", alt: "Android TV You page", caption: "History, playlists and your channel.", width: 1920, height: 1080 },
+  { src: "/apps/screenshots/android/tv-controls.webp", title: "FilterTube Controls", alt: "Android TV FilterTube Controls", caption: "Controls from the sofa.", width: 1920, height: 1080 },
+  { src: "/apps/screenshots/android/tv-filters.webp", title: "Filters", alt: "Android TV keyword filters", caption: "Keyword and channel rules with the remote.", width: 1920, height: 1080 },
+  { src: "/apps/screenshots/android/tv-kids.webp", title: "Kids Mode", alt: "Android TV Kids Mode rules", caption: "Kids rules on TV.", width: 1920, height: 1080 },
+  { src: "/apps/screenshots/android/tv-settings.webp", title: "Settings", alt: "Android TV settings", caption: "TV settings and integrations.", width: 1920, height: 1080 },
+  { src: "/apps/screenshots/android/tv-accounts-sync.webp", title: "Accounts & Sync", alt: "Android TV Accounts and Sync", caption: "Pair the TV with your other devices.", width: 1920, height: 1080 },
+];
+
 export const platformOrder = platformSlugs;
 
 export const detailPages = {
@@ -894,30 +942,30 @@ export const detailPages = {
     slug: "android",
     icon: DeviceMobile,
     tone: "forest",
-    status: "Phone + tablet on Google Play",
+    status: "Phone, tablet + TV · 3.5.0",
     eyebrow: "Android phone, tablet + TV",
     navTitle: "Android",
     routeSummary:
-      "The phone and tablet app is public. Android TV browsing and playback are in development; Fire TV support is planned.",
+      "Phone, tablet and Android TV share one app and one Google Play listing. Fire TV support is planned.",
     titleLead: "Your viewing, your rules on",
     titleDisplay: "Android",
     description:
-      "Watch Main and Kids in FilterTube's custom Android app, with filters, profiles, parent controls, and protected time. Install the phone and tablet app from Google Play—no invitation or email needed. Android TV is separate development work, not part of the public phone listing.",
+      "Watch Main and Kids in FilterTube's custom Android app, with filters, profiles, parent controls, protected time and private peer-to-peer device sync. Phones and tablets install from Google Play. Android TV arrives with 3.5.0 on the same listing, and a TV APK is on every GitHub release.",
     heroVideo: {
       src: "/videos/android/android-contours.mp4",
       poster: "/videos/android/android-contours-poster.png",
       label: "Quiet Android background motion",
     },
-    heroScreensLabel: "Android development build · hover or tap a screen",
+    heroScreensLabel: "FilterTube 3.5.0 · hover or tap a screen",
     heroScreens: [
-      { src: "/apps/screenshots/android-music-player.png", title: "Music player", alt: "Android development Music player", width: 1080, height: 2400 },
-      { src: "/apps/screenshots/android-player-settings.png", title: "Player settings", alt: "Android development playback settings", width: 1080, height: 2400 },
-      { src: "/apps/screenshots/android-notes-editor.png", title: "Video notes", alt: "Empty Android per-video Notes editor", width: 1080, height: 2400 },
+      androidPhoneScreens.find((screen) => screen.src.endsWith("phone-watch.webp")),
+      androidPhoneScreens.find((screen) => screen.src.endsWith("phone-now-playing.webp")),
+      androidPhoneScreens.find((screen) => screen.src.endsWith("phone-sync-pairing.webp")),
     ],
     chips: [
       "Phone + tablet: available",
-      "Android TV: in development",
-      "Your rules",
+      "Android TV: new in 3.5.0",
+      "Private P2P sync",
     ],
     primaryCta: {
       label: "Install from Google Play",
@@ -937,7 +985,7 @@ export const detailPages = {
       watchHref: appDemoVideoHref,
     },
     previewLabel: "Choose your Android device",
-    previewTitle: "Phone and tablet today. A TV experience in development.",
+    previewTitle: "Phone, tablet and TV from one app.",
     previewRows: [
       {
         label: "Phone + tablet",
@@ -947,9 +995,9 @@ export const detailPages = {
       },
       {
         label: "Android TV",
-        value: "In development",
+        value: "New in 3.5.0",
         detail:
-          "Main browsing, search, remote navigation, playback, and local history/resume are in testing. A public TV release is not available yet.",
+          "Remote-first Home, Search, Subscriptions, You and Watch, with profiles, PINs, Kids controls and filters. Install the TV APK from GitHub; the Google Play TV release follows Play review.",
       },
       {
         label: "Fire TV",
@@ -960,7 +1008,13 @@ export const detailPages = {
     ],
     deviceSyncHref: "#android-p2p",
     screenshotsTitle: "A closer look at the Android app",
-    screenshotsDescription: "Real screens from the installed Android development build. Features and appearance can differ from the current Google Play release.",
+    screenshotsEyebrow: "Every screen · phone, tablet and TV",
+    screenshotsDescription: "Real screens from FilterTube 3.5.0 on a phone, a tablet and Android TV. Open any screen for a full-size view.",
+    screenshotRails: [
+      { id: "android-phone-screens", label: "Phone", status: "Google Play", layout: "phone", screenshots: androidPhoneScreens },
+      { id: "android-tablet-screens", label: "Tablet", status: "Google Play", layout: "desktop", screenshots: androidTabletScreens },
+      { id: "android-tv-screens", label: "Android TV", status: "New in 3.5.0", layout: "desktop", screenshots: androidTvScreens },
+    ],
     screenshots: [
       {
         src: "/apps/screenshots/android-player-settings.png",
@@ -984,9 +1038,9 @@ export const detailPages = {
     featureCards: [
       {
         id: "android-tv",
-        status: "In development",
+        status: "New in 3.5.0",
         title: "Android TV",
-        body: "Browse and search Main, navigate with a remote, play videos, and resume from local history in the TV test build. Full Kids and family controls, device sync, and public installation are still in development. Fire TV compatibility is planned separately.",
+        body: "Home, Search, Subscriptions, You and Watch built for the remote, with profiles, PINs, Kids controls, filters and FilterTube Controls on the big screen. Install the TV APK from GitHub; the Google Play TV release follows Play review. Personal Auto-sync on TV is still in testing, and Fire TV compatibility is planned separately.",
       },
     ],
     exploreTitle: "Explore the full app",
@@ -1052,7 +1106,7 @@ export const detailPages = {
         summary: "Keep useful video moments and local files close.",
         points: [
           "The newer Android development build includes per-video Notes with timestamps, an editor and a searchable Notes index. Notes belong to the chosen profile and still follow its permissions.",
-          "Offline Media organizes local files into Recent, Folders, Videos, Audio and Favourites, with resume and queue controls. It is different from saving online videos for offline viewing, which remains planned on Android.",
+          "Offline Media organizes local files into Recent, Folders, Videos, Audio and Favourites, with resume and queue controls. Saving online videos for offline viewing is available only in the direct GitHub build, with encrypted copies that expire after 30 days; the Google Play build does not download videos.",
           "Notes and local-media updates are in testing; availability varies by app release.",
         ],
       },
@@ -1075,8 +1129,9 @@ export const detailPages = {
     milestones: [
       "Phone and tablet: public on Google Play. Install directly—no invitation or email needed.",
       "Newer Notes, Auto-sync, Music, and local-media updates are in testing; availability varies by release.",
-      "Android TV: Main browsing and playback are in testing. Full family controls, device sync, and public installation are not ready yet.",
-      "Fire TV compatibility is planned. TV Notes, Auto-sync, Music, offline saves, and local ML are not available yet.",
+      "Android TV: new in 3.5.0. The TV APK is on GitHub releases; the Google Play TV release follows Play review.",
+      "Offline video saving: direct GitHub build only, encrypted and expiring after 30 days. Google Play builds do not download videos.",
+      "Fire TV compatibility is planned. TV Personal Auto-sync is still in testing.",
       "The separate direct APK has a simpler frontend than the Google Play app.",
     ],
     related: ["extension", "ios", "kids"],
@@ -1085,15 +1140,15 @@ export const detailPages = {
     slug: "tv",
     icon: Television,
     tone: "sunset",
-    status: "In development",
+    status: "Android TV: new in 3.5.0",
     eyebrow: "TV overview",
     navTitle: "TV overview",
     routeSummary:
-      "Android TV Main browsing and playback are in testing; Fire TV compatibility is planned.",
+      "Android TV is new in FilterTube 3.5.0; Fire TV compatibility is planned.",
     titleLead: "Shared-screen calm for",
     titleDisplay: "TV environments",
     description:
-      "Android TV browsing, search, remote navigation, playback, and local history/resume are in testing. Full Kids and family controls, device sync, and public installation are still in development. Fire TV support is planned separately.",
+      "FilterTube 3.5.0 brings browsing, search, remote navigation, playback, profiles, PINs, Kids controls and filters to Android TV. Install the TV APK from GitHub; the Google Play TV release follows Play review. Fire TV support is planned separately.",
     chips: ["Shared screens", "Playback trust", "Household safety"],
     primaryCta: {
       label: "Get FilterTube on desktop",
@@ -1154,25 +1209,31 @@ export const detailPages = {
     slug: "android-tv",
     icon: Television,
     tone: "sky",
-    status: "In development",
+    status: "New in 3.5.0",
     eyebrow: "Android TV app",
     navTitle: "Android TV",
     routeSummary:
-      "Main browsing, search, remote navigation, playback, and local history/resume, currently in testing.",
-    titleLead: "A FilterTube companion for",
-    titleDisplay: "Android TV playback",
+      "Remote-first Home, Search, Subscriptions, You and Watch with profiles, PINs, Kids controls and filters.",
+    titleLead: "Your rules, from the sofa, on",
+    titleDisplay: "Android TV",
     description:
-      "Browse Main and play videos with remote navigation and local history/resume in the TV test build. Full Kids and family controls, device sync, and public installation are still in development.",
+      "FilterTube 3.5.0 brings the custom app to Android TV and Google TV: browse, search and watch with the remote, with profiles, PINs, Kids controls and your filters on the big screen. Install the TV APK from GitHub; the Google Play TV release follows Play review.",
+    screenshotsTitle: "Every TV screen",
+    screenshotsEyebrow: "Android TV · 1920×1080",
+    screenshotsDescription: "Real screens from FilterTube 3.5.0 on Android TV. Open any screen for a full-size view.",
+    screenshotRails: [
+      { id: "tv-screens", label: "Android TV", status: "New in 3.5.0", layout: "desktop", screenshots: androidTvScreens },
+    ],
     chips: ["Distance readable", "Playback cues", "Household trust"],
     primaryCta: {
+      label: "Get the TV APK",
+      href: `${githubHref}/releases/latest`,
+      external: true,
+    },
+    secondaryCta: {
       label: "See the TV overview",
       href: "/tv",
       external: false,
-    },
-    secondaryCta: {
-      label: "Get FilterTube on desktop",
-      href: extensionInstallHref,
-      external: true,
     },
     previewLabel: "Android TV intent",
     previewTitle: "Protection cues still make sense from the sofa.",
@@ -1200,7 +1261,7 @@ export const detailPages = {
       },
       {
         title: "Trust at glance",
-        body: "Full Kids and parent controls are still in development and are not part of the current TV viewing experience.",
+        body: "Profiles, PINs, Kids controls and filters work on TV. Personal Auto-sync on TV is still in testing.",
       },
       {
         title: "Still one brand",

@@ -307,7 +307,28 @@ export function ScenicDetailPage({ page, relatedPages }) {
         </section>
       ) : null}
 
-      {page.screenshots?.length ? (
+      {page.screenshotRails?.length ? (
+        <section className="py-10 md:py-16" aria-label={page.screenshotsLabel || "App screenshots"}>
+          <div className="mx-auto max-w-[1400px] px-4 md:px-6">
+            <Reveal>
+              <SectionHeading
+                eyebrow={page.screenshotsEyebrow || "Every screen"}
+                title={page.screenshotsTitle}
+                description={page.screenshotsDescription}
+              />
+            </Reveal>
+          </div>
+          {page.screenshotRails.map((rail) => (
+            <div className="mt-12" id={rail.id} key={rail.id}>
+              <div className="mx-auto mb-4 flex max-w-[1400px] items-baseline justify-between gap-4 px-4 md:px-6">
+                <p className="text-xs font-semibold uppercase tracking-[0.2em] text-[var(--color-muted)]">{rail.label}</p>
+                {rail.status ? <p className="text-xs font-semibold uppercase tracking-[0.2em] text-[var(--color-muted)]">{rail.status}</p> : null}
+              </div>
+              <ScreenshotCarousel label={`${rail.label} screenshots`} layout={rail.layout} screenshots={rail.screenshots} />
+            </div>
+          ))}
+        </section>
+      ) : page.screenshots?.length ? (
         <section className="py-10 md:py-16" aria-label={page.screenshotsLabel || "Android development screenshots"}>
           <div className="mx-auto max-w-[1400px] px-4 md:px-6">
             <Reveal>
