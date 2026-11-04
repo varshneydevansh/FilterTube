@@ -16,6 +16,13 @@
   the TV AAB, per-file `.sha256` checksums, and one `SHA256SUMS.txt` covering
   every asset.
 
+### Filtering fixes
+
+- **Korean, Japanese and Chinese keywords match inside sentences.** Whole-word
+  keywords written in Hangul, Han, Hiragana or Katakana (including rules
+  imported from BlockTube) now match wherever they appear, so `좌파` hides
+  `좌파가 문제`. Whole-word rules in other scripts are unchanged (#79).
+
 ## Version 3.4.2 — Device Sync, Video Notes And Playback Improvements (Preview)
 
 October 27, 2026. Public preview of the extension changes since v3.4.1

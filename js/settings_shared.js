@@ -14,6 +14,7 @@
     const FT_PROFILES_V3_KEY = 'ftProfilesV3';
     const FT_PROFILES_V4_KEY = 'ftProfilesV4';
     const DEFAULT_PROFILE_ID = 'default';
+    const CJK_KEYWORD_SCRIPT_RE = /[\p{Script=Han}\p{Script=Hangul}\p{Script=Hiragana}\p{Script=Katakana}]/u;
     const SETTINGS_KEYS = [
         'enabled',
         'filterKeywords',
@@ -466,7 +467,13 @@
                 const escaped = rawRegex
                     ? entry.word
                     : entry.word.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
-                const exactPattern = `(^|[^\\p{L}\\p{N}_])${escaped}(?=$|[^\\p{L}\\p{N}_])`;
+                // Han/Hangul/Kana text has no spaces between words and Korean
+                // attaches particles directly to nouns, so a whole-word
+                // boundary would never match there (#79). Such keywords are
+                // compiled as substrings; other scripts keep the boundary.
+                const exactPattern = CJK_KEYWORD_SCRIPT_RE.test(entry.word)
+                    ? escaped
+                    : `(^|[^\\p{L}\\p{N}_])${escaped}(?=$|[^\\p{L}\\p{N}_])`;
                 return {
                     pattern: rawRegex ? escaped : (entry.exact ? exactPattern : escaped),
                     flags: rawRegex ? (entry.regexFlags || 'i') : (entry.exact ? 'iu' : 'i'),

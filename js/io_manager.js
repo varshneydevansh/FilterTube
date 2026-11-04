@@ -1419,6 +1419,10 @@
                     addedAt: now
                 };
             }
+            // BlockTube wraps plain lines in an ASCII whitespace/punctuation
+            // boundary, which whole-word (exact) is the closest match for.
+            // Exact rules with Han/Hangul/Kana compile as substrings, so CJK
+            // keywords still match inside sentences (#79).
             return {
                 word: value,
                 exact: true,
@@ -2031,8 +2035,12 @@
                 omit(field, 'unsupported_regex_flags', index, word); return null;
             }
             const escaped = word.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+            // Mirrors the compilers: exact rules containing Han/Hangul/Kana
+            // match as substrings, since those scripts lack word spacing (#79).
+            const wholeWord = entry.exact
+                && !/[\p{Script=Han}\p{Script=Hangul}\p{Script=Hiragana}\p{Script=Katakana}]/u.test(word);
             const pattern = entry.matchMode === 'regex' ? word
-                : (entry.exact ? `(^|[^\\p{L}\\p{N}_])${escaped}(?=$|[^\\p{L}\\p{N}_])` : escaped);
+                : (wholeWord ? `(^|[^\\p{L}\\p{N}_])${escaped}(?=$|[^\\p{L}\\p{N}_])` : escaped);
             try {
                 // .source escapes slashes and line breaks for BlockTube's
                 // one-rule-per-line /pattern/flags syntax without ASCII loss.

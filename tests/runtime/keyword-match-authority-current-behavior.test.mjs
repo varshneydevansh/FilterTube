@@ -92,9 +92,9 @@ test('shared settings and background compile exact keywords with the same Unicod
   const sharedCompile = sliceBetween(shared, 'function compileKeywords(keywords, predicate = null) {', 'function getChannelDerivedKey(channel) {');
   const backgroundCompile = sliceBetween(background, 'const escapeRegex = (value) =>', '// Helper to validate compiled keyword entries');
 
-  assert.match(sharedCompile, /const exactPattern = `\(\^\|\[\^\\\\p\{L\}\\\\p\{N\}_\]\)\$\{escaped\}\(\?=\$\|\[\^\\\\p\{L\}\\\\p\{N\}_\]\)`/);
+  assert.match(sharedCompile, /const exactPattern = CJK_KEYWORD_SCRIPT_RE\.test\(entry\.word\)\s*\? escaped\s*: `\(\^\|\[\^\\\\p\{L\}\\\\p\{N\}_\]\)\$\{escaped\}\(\?=\$\|\[\^\\\\p\{L\}\\\\p\{N\}_\]\)`/);
   assert.match(sharedCompile, /flags: rawRegex \? \(entry\.regexFlags \|\| 'i'\) : \(entry\.exact \? 'iu' : 'i'\)/);
-  assert.match(backgroundCompile, /const exactKeywordPattern = \(escaped\) => `\(\^\|\[\^\\\\p\{L\}\\\\p\{N\}_\]\)\$\{escaped\}\(\?=\$\|\[\^\\\\p\{L\}\\\\p\{N\}_\]\)`/);
+  assert.match(backgroundCompile, /const exactKeywordPattern = \(escaped, word = ''\) => \(cjkKeywordScriptRe\.test\(String\(word \|\| ''\)\)\s*\? escaped\s*: `\(\^\|\[\^\\\\p\{L\}\\\\p\{N\}_\]\)\$\{escaped\}\(\?=\$\|\[\^\\\\p\{L\}\\\\p\{N\}_\]\)`\)/);
   assert.match(backgroundCompile, /flags: exact \? 'iu' : 'i'/);
 });
 

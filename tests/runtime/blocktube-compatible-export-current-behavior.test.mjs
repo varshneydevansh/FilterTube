@@ -121,8 +121,9 @@ test('literal delimiters, comment prefixes, newlines and Unicode exact boundarie
   assert.equal(actual.saved.filterData.title.length, 5);
   for (const text of ['//literal', '/pattern/i', 'one\ntwo', 'a/b.*[c]']) assert.equal(matches(compiled, 'title', text), true, text);
   assert.equal(matches(compiled, 'title', 'a/bZZc'), false);
-  assert.equal(matches(compiled, 'title', 'a猫b'), false);
-  assert.equal(matches(compiled, 'title', '猫咪'), false);
+  // Exact Han/Hangul/Kana rules export as substrings, mirroring FilterTube's compilers (#79).
+  assert.equal(matches(compiled, 'title', 'a猫b'), true);
+  assert.equal(matches(compiled, 'title', '猫咪'), true);
   assert.equal(matches(compiled, 'title', 'x 猫 😀'), true);
   assert.equal(matches(compiled, 'comment', 'ТЕСТ'), true);
   assert.equal(matches(compiled, 'comment', 'preтест'), false);

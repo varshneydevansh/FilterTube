@@ -3636,11 +3636,18 @@ async function getCompiledSettings(sender = null, profileType = null, forceRefre
             const useExact = items.useExactWordMatching || false;
 
             const escapeRegex = (value) => String(value || '').replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
-            const exactKeywordPattern = (escaped) => `(^|[^\\p{L}\\p{N}_])${escaped}(?=$|[^\\p{L}\\p{N}_])`;
+            // Han/Hangul/Kana text has no spaces between words and Korean
+            // attaches particles directly to nouns, so a whole-word boundary
+            // would never match there (#79). Such keywords compile as
+            // substrings; other scripts keep the Unicode word boundary.
+            const cjkKeywordScriptRe = /[\p{Script=Han}\p{Script=Hangul}\p{Script=Hiragana}\p{Script=Katakana}]/u;
+            const exactKeywordPattern = (escaped, word = '') => (cjkKeywordScriptRe.test(String(word || ''))
+                ? escaped
+                : `(^|[^\\p{L}\\p{N}_])${escaped}(?=$|[^\\p{L}\\p{N}_])`);
             const compileKeywordPattern = (word, exact = false) => {
                 const escaped = escapeRegex(word);
                 return {
-                    pattern: exact ? exactKeywordPattern(escaped) : escaped,
+                    pattern: exact ? exactKeywordPattern(escaped, word) : escaped,
                     flags: exact ? 'iu' : 'i'
                 };
             };
