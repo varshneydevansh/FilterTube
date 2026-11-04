@@ -454,7 +454,7 @@ test('Hangul channels without a resolved UC ID export as exact, case-insensitive
   assert.equal(matches(compiled, 'comment', 'MixedCase 채널 리뷰'), false);
   assert.equal(matches(compiled, 'title', '오늘 먹방 시작'), true);
   assert.equal(matches(compiled, 'comment', '이건 광고!'), true);
-  assert.equal(matches(compiled, 'title', '광고주'), false, 'an exact Hangul keyword keeps its word boundary');
+  assert.equal(matches(compiled, 'title', '광고주'), true, 'an exact Hangul keyword matches inside words, as FilterTube does (#79)');
   assert.equal(matches(compiled, 'channelId', channelId), true);
   assert.deepEqual(f.storage, before);
 
