@@ -2449,5 +2449,6 @@
   "apps.ios.body": "نسخة Apple الأصلية بنكمّل تجهيزها. الوصول لحساب Apple Developer مأخّر إتاحتها في TestFlight، وبنحل الموضوع بأسرع ما نقدر.",
   "apps.ios.cta": "شوف الحالة",
   "apps.heading": "FilterTube للموبايل والتابلت وAndroid TV بقى في Google Play من صفحة واحدة.",
-  "apps.intro": "افتح الصفحة أو فتّش على FilterTube في Google Play. ملف APK المباشر لسه نسخة براها وأبسط من غير الواجهة المخصّصة كاملة."
+  "dashboard.stats.title": "الليلة",
+  "dashboard.stats.surface": "إحصائيات لـ"
 }

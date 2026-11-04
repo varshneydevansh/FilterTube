@@ -2449,5 +2449,6 @@
   "apps.ios.body": "Apple 原生版本正在做最后定稿。Apple Developer 账户访问问题拖慢了 TestFlight 上线，阿拉会尽快解决。",
   "apps.ios.cta": "查看状态",
   "apps.heading": "Android 手机、平板搭 Android TV 用个 FilterTube 已经上 Google Play 了，一只页面就够。",
-  "apps.intro": "打开页面，或者到 Google Play 搜 FilterTube。直接装个 APK 还是另外一只简化版本，呒没完整个自定义界面。"
+  "dashboard.stats.title": "今朝",
+  "dashboard.stats.surface": "统计范围"
 }

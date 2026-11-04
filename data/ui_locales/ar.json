@@ -2449,5 +2449,6 @@
   "apps.ios.body": "يجري وضع اللمسات الأخيرة على الإصدار الأصلي لأجهزة Apple. وقد أخّر تعذّر الوصول إلى حساب Apple Developer إتاحته على TestFlight، وسنعالج الأمر في أقرب وقت ممكن.",
   "apps.ios.cta": "عرض الحالة",
   "apps.heading": "FilterTube للهواتف والأجهزة اللوحية وAndroid TV متاح الآن على Google Play من صفحة واحدة.",
-  "apps.intro": "افتح الصفحة أو ابحث عن FilterTube في Google Play. يظل ملف APK المباشر إصدارًا منفصلًا وأبسط دون الواجهة المخصصة الكاملة."
+  "dashboard.stats.title": "اليوم",
+  "dashboard.stats.surface": "إحصاءات لـ"
 }

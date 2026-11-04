@@ -2253,11 +2253,21 @@ The sidebar follows the apps' category list (FilterTubeApp `docs/app/tv-ux-resea
 - The selected row uses the tone's soft fill.
 - Rows are keyboard stops (Enter or Space) with a focus-visible outline and no hover change. A row locked only by the profile PIN asks for the PIN, then opens.
 
-The dashboard keeps its original layout. Its "FilterTube apps" cards come from `FILTERTUBE_APP_PLATFORMS` in `js/tab-view.js`:
+The dashboard is one column of flat sections, in this order:
+1. a hero with one headline, one line and the mode badges;
+2. "Today": the four stats as one hairline row, with the YouTube Main / YouTube Kids switch in the section head;
+3. the four Quick Actions;
+4. FilterTube apps;
+5. the preview video;
+6. Support.
+
+Every surface is transparent with a 1px `--ft-tone-stroke` border and a 12px radius at most. There are no gradients, shadows or nested cards, and the only accent is the tone's. The rules are scoped to `#dashboardView` at the end of `css/tab-view.css`. Below 900px the stats and Quick Actions use two columns. The background video and its scrim are unchanged.
+
+The "FilterTube apps" cards come from `FILTERTUBE_APP_PLATFORMS` in `js/tab-view.js`:
 - Android phone and tablet, and Android TV, both `available` on the same Google Play listing;
 - iPhone and iPad, `coming_soon`.
 
-Changing a platform's `status` switches its card between "Available on Google Play" with the install link and "Coming soon". Copy uses `data/ui_locales` keys (`controls.*`, `apps.*`) in every target locale.
+Changing a platform's `status` switches its card between "Available on Google Play" with the install link and "Coming soon". Copy uses `data/ui_locales` keys (`controls.*`, `apps.*`, `dashboard.stats.title`, `dashboard.stats.surface`) in every target locale.
 
 ### Enhanced Dropdown & Select Components
 

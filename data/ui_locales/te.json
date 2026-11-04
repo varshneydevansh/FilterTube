@@ -2449,5 +2449,6 @@
   "apps.ios.body": "Apple పరికరాల కోసం స్థానిక బిల్డ్‌ను తుది రూపానికి తెస్తున్నాం. Apple Developer ఖాతా అందుబాటులో లేకపోవడంతో TestFlight విడుదల ఆలస్యమవుతోంది; వీలైనంత త్వరగా ఈ సమస్యను పరిష్కరిస్తాం.",
   "apps.ios.cta": "స్థితిని చూడండి",
   "apps.heading": "Android ఫోన్‌లు, టాబ్లెట్‌లు, Android TV కోసం FilterTube ఇప్పుడు Google Play‌లో, ఒకే లిస్టింగ్ నుంచి.",
-  "apps.intro": "లిస్టింగ్ తెరవండి లేదా Google Play‌లో FilterTube కోసం వెతకండి. నేరుగా ఇన్‌స్టాల్ చేసే APK వేరు, సరళమైన బిల్డ్; పూర్తి కస్టమ్ ఫ్రంట్‌ఎండ్ ఉండదు."
+  "dashboard.stats.title": "ఈరోజు",
+  "dashboard.stats.surface": "గణాంకాలు దేనికి"
 }

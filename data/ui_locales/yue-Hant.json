@@ -2449,5 +2449,6 @@
   "apps.ios.body": "Apple 原生版本正進行最後定稿。Apple Developer 帳戶存取問題令 TestFlight 延遲推出，我哋會盡快處理。",
   "apps.ios.cta": "查看狀態",
   "apps.heading": "Android 手機、平板同 Android TV 用嘅 FilterTube 已經喺 Google Play 上架，一個頁面搞掂。",
-  "apps.intro": "打開頁面，或者喺 Google Play 搜尋 FilterTube。直接安裝嘅 APK 仍然係另一個簡化版本，冇完整自訂介面。"
+  "dashboard.stats.title": "今日",
+  "dashboard.stats.surface": "統計範圍"
 }

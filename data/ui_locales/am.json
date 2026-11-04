@@ -2449,5 +2449,6 @@
   "apps.ios.body": "ቤተኛው የApple ግንባታ የመጨረሻ ማስተካከያ ላይ ነው። የApple Developer መለያ መዳረሻ ማግኘት መዘግየቱ TestFlight እንዲገኝ እያዘገየው ሲሆን በተቻለ ፍጥነት ይፈታል።",
   "apps.ios.cta": "ሁኔታውን ይመልከቱ",
   "apps.heading": "ለAndroid ስልኮች፣ ታብሌቶች እና Android TV FilterTube አሁን በአንድ የGoogle Play ገጽ ላይ ይገኛል።",
-  "apps.intro": "ገጹን ይክፈቱ ወይም በGoogle Play ላይ FilterTubeን ይፈልጉ። ቀጥታ APK ሙሉ ብጁ ገጽታ የሌለው የተለየ ቀላል ስሪት ሆኖ ይቀጥላል።"
+  "dashboard.stats.title": "ዛሬ",
+  "dashboard.stats.surface": "ስታቲስቲክስ ለ"
 }

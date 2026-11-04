@@ -2449,5 +2449,6 @@
   "apps.ios.body": "Apple 네이티브 버전을 마무리하고 있습니다. Apple Developer 계정 접근 문제로 TestFlight 제공이 늦어지고 있으며, 가능한 한 빨리 해결하겠습니다.",
   "apps.ios.cta": "상태 보기",
   "apps.heading": "Android 휴대전화·태블릿·Android TV용 FilterTube가 하나의 Google Play 페이지로 출시되었습니다.",
-  "apps.intro": "페이지를 열거나 Google Play에서 FilterTube를 검색하세요. 직접 설치하는 APK는 완전한 맞춤 화면이 없는 별도의 간단한 버전입니다."
+  "dashboard.stats.title": "오늘",
+  "dashboard.stats.surface": "통계 대상"
 }

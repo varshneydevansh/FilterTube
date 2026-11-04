@@ -2449,5 +2449,6 @@
   "apps.ios.body": "Ana kammala sigar Apple ta asali. Matsalar samun damar asusun Apple Developer tana jinkirta samuwar TestFlight, kuma za a warware ta da wuri-wuri.",
   "apps.ios.cta": "Duba hali",
   "apps.heading": "FilterTube don waya, kwamfutar hannu da Android TV yanzu yana Google Play, daga shafi ɗaya.",
-  "apps.intro": "Buɗe shafin ko nemi FilterTube a Google Play. APK kai tsaye ya kasance siga daban mai sauƙi ba tare da cikakken fuskar musamman ba."
+  "dashboard.stats.title": "Yau",
+  "dashboard.stats.surface": "Ƙididdiga don"
 }

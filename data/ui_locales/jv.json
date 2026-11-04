@@ -2449,5 +2449,6 @@
   "apps.ios.body": "Versi asli kanggo Apple lagi dirampungake. Akses akun Apple Developer ndadekake TestFlight telat kasedhiya, lan iki bakal dirampungake sanalika bisa.",
   "apps.ios.cta": "Deleng status",
   "apps.heading": "FilterTube kanggo HP, tablet, lan Android TV saiki ana ing Google Play, saka siji listing.",
-  "apps.intro": "Bukak listing utawa goleki FilterTube ing Google Play. APK langsung tetep build kapisah sing luwih prasaja tanpa frontend kustom lengkap."
+  "dashboard.stats.title": "Dina iki",
+  "dashboard.stats.surface": "Statistik kanggo"
 }

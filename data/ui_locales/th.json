@@ -2449,5 +2449,6 @@
   "apps.ios.body": "กำลังจัดทำแอป Apple แบบเนทีฟให้เสร็จสมบูรณ์ การเข้าถึงบัญชี Apple Developer ทำให้ TestFlight ล่าช้า และจะเร่งแก้ไขโดยเร็วที่สุด",
   "apps.ios.cta": "ดูสถานะ",
   "apps.heading": "FilterTube สำหรับโทรศัพท์ แท็บเล็ต และ Android TV มีบน Google Play แล้วในหน้าเดียว",
-  "apps.intro": "เปิดหน้า หรือค้นหา FilterTube ใน Google Play ไฟล์ APK แบบติดตั้งตรงยังเป็นเวอร์ชันแยกที่เรียบง่ายกว่า ไม่มีหน้าจอแบบกำหนดเองครบชุด"
+  "dashboard.stats.title": "วันนี้",
+  "dashboard.stats.surface": "สถิติสำหรับ"
 }

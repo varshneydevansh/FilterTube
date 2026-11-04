@@ -199,34 +199,20 @@
                                     <span class="view-meta-pill">Main + Kids</span>
                                     <span class="view-meta-pill">Blocklist + Whitelist</span>
                                 </div>
-                                <p class="dashboard-structure-note" data-filtertube-help="YouTube changes its page structure often. A quick report helps FilterTube update the matching logic before more families are affected.">
-                                    If filtering stops working, please tell the developer by email, GitHub, or a video comment. It usually means YouTube changed its page structure.
-                                </p>
                             </div>
-                            <div class="dashboard-hero__actions">
-                                <a class="btn-primary android-closed-testing-invite__mail dashboard-android-testing-cta" href="https://play.google.com/store/apps/details?id=com.filtertube.app" target="_blank" rel="noreferrer">
-                                    Open FilterTube on Google Play
-                                </a>
-                                <div class="dashboard-stats-source dashboard-hero__surface">
-                                    <div id="dashboardStatsSourceLabel" class="dashboard-stats-source__label"></div>
+                        </section>
+
+                        <section class="dashboard-metrics" aria-labelledby="dashboardStatsTitle">
+                            <div class="ft-dash-section-head">
+                                <h2 id="dashboardStatsTitle" class="ft-dash-section-title" data-ft-i18n="dashboard.stats.title">Today</h2>
+                                <div class="dashboard-stats-source" role="group" data-ft-i18n-aria-label="dashboard.stats.surface" aria-label="Stats for">
+                                    <div id="dashboardStatsSourceLabel" class="dashboard-stats-source__label" hidden></div>
                                     <div class="dashboard-stats-source__buttons">
                                         <button id="dashboardStatsMainBtn" class="btn-secondary" type="button">YouTube Main</button>
                                         <button id="dashboardStatsKidsBtn" class="btn-secondary" type="button">YouTube Kids</button>
                                     </div>
                                 </div>
                             </div>
-                        </section>
-
-                        <section class="dashboard-app-release ft-cc-apps" aria-labelledby="dashboardAppsTitle">
-                            <div class="dashboard-app-release__copy">
-                                <p class="view-hero__eyebrow" data-ft-i18n="apps.title">FilterTube apps</p>
-                                <h2 id="dashboardAppsTitle" class="dashboard-app-release__title" data-ft-i18n="apps.heading">FilterTube for Android phones, tablets and Android TV is on Google Play, from one listing.</h2>
-                                <p class="dashboard-app-release__body" data-ft-i18n="apps.intro">Open the listing or search Google Play for FilterTube. The direct APK stays a separate, simpler build without the complete custom frontend.</p>
-                            </div>
-                            <div class="dashboard-app-release__grid" id="ftControlCenterApps"></div>
-                        </section>
-
-                        <section class="dashboard-metrics">
                             <div class="stats-grid">
                                 <div class="stat-card">
                                     <div class="stat-value" id="statHiddenToday">0</div>
@@ -301,33 +287,14 @@
                                     <span class="label">Toggle Kids Mode</span>
                                 </button>
                             </div>
-
-                            <div class="card donate-promo-card">
-                                <div class="card-body">
-                                    <div class="donate-promo-content">
-                                        <div class="donate-promo-icon">
-                                            <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor"
-                                                stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                                                <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78L12 21.23l8.84-8.84a5.5 5.5 0 0 0 0-7.78z"></path>
-                                            </svg>
-                                        </div>
-                                        <div class="donate-promo-text">
-                                            <h3>Support FilterTube</h3>
-                                            <p>Keep FilterTube moving across desktop, mobile, tablet, and TV without turning privacy into a tradeoff.<br>
-                                            Support helps fund maintenance, new surfaces, and the next calm control tools.</p>
-                                        </div>
-                                        <button id="dashboardDonateBtn" class="btn-primary donate-promo-btn">Support the build</button>
-                                    </div>
-                                </div>
-                            </div>
                         </section>
 
-                        <section class="dashboard-local-playlists" id="dashboardLocalPlaylists" aria-labelledby="dashboardLocalPlaylistsTitle" hidden>
-                            <div class="section-header">
-                                <h2 id="dashboardLocalPlaylistsTitle">FilterTube playlists</h2>
-                                <p class="section-header__body">Lists saved in the FilterTube apps for this profile. They arrive here by device sync or backup; edit them in the app.</p>
+                        <section class="dashboard-app-release ft-cc-apps" aria-labelledby="dashboardAppsTitle">
+                            <div class="ft-dash-section-head ft-dash-section-head--stacked">
+                                <h2 id="dashboardAppsTitle" class="ft-dash-section-title" data-ft-i18n="apps.title">FilterTube apps</h2>
+                                <p class="ft-dash-section-sub" data-ft-i18n="apps.heading">FilterTube for Android phones, tablets and Android TV is on Google Play, from one listing.</p>
                             </div>
-                            <ul class="dashboard-local-playlists__list" id="dashboardLocalPlaylistsList"></ul>
+                            <div class="dashboard-app-release__grid" id="ftControlCenterApps"></div>
                         </section>
 
                         <section class="dashboard-app-preview" aria-labelledby="dashboardAppPreviewTitle">
@@ -356,6 +323,35 @@
                                 </span>
                                 <span class="dashboard-app-preview__watch">Watch app preview</span>
                             </a>
+                        </section>
+
+                        <section class="dashboard-support" aria-label="Support FilterTube">
+                            <div class="card donate-promo-card">
+                                <div class="card-body">
+                                    <div class="donate-promo-content">
+                                        <div class="donate-promo-icon">
+                                            <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                                stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                                <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78L12 21.23l8.84-8.84a5.5 5.5 0 0 0 0-7.78z"></path>
+                                            </svg>
+                                        </div>
+                                        <div class="donate-promo-text">
+                                            <h3>Support FilterTube</h3>
+                                            <p>Keep FilterTube moving across desktop, mobile, tablet, and TV without turning privacy into a tradeoff.<br>
+                                            Support helps fund maintenance, new surfaces, and the next calm control tools.</p>
+                                        </div>
+                                        <button id="dashboardDonateBtn" class="btn-primary donate-promo-btn">Support the build</button>
+                                    </div>
+                                </div>
+                            </div>
+                        </section>
+
+                        <section class="dashboard-local-playlists" id="dashboardLocalPlaylists" aria-labelledby="dashboardLocalPlaylistsTitle" hidden>
+                            <div class="section-header">
+                                <h2 id="dashboardLocalPlaylistsTitle">FilterTube playlists</h2>
+                                <p class="section-header__body">Lists saved in the FilterTube apps for this profile. They arrive here by device sync or backup; edit them in the app.</p>
+                            </div>
+                            <ul class="dashboard-local-playlists__list" id="dashboardLocalPlaylistsList"></ul>
                         </section>
                     </div>
                 </div>

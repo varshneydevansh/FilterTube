@@ -2449,5 +2449,6 @@
   "apps.ios.body": "Bản dựng gốc cho thiết bị Apple đang được hoàn thiện. Quyền truy cập tài khoản Apple Developer đang làm chậm việc phát hành trên TestFlight; chúng tôi sẽ xử lý sớm nhất có thể.",
   "apps.ios.cta": "Xem trạng thái",
   "apps.heading": "FilterTube cho điện thoại, máy tính bảng và Android TV đã có trên Google Play, chỉ một trang.",
-  "apps.intro": "Mở trang hoặc tìm FilterTube trên Google Play. Bản APK trực tiếp vẫn là bản riêng, đơn giản hơn, không có giao diện tùy chỉnh đầy đủ."
+  "dashboard.stats.title": "Hôm nay",
+  "dashboard.stats.surface": "Thống kê cho"
 }

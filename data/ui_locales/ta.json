@@ -2449,5 +2449,6 @@
   "apps.ios.body": "Apple-க்கான நேரடி செயலி உருவாக்கம் இறுதிக்கட்டத்தில் உள்ளது. Apple Developer கணக்கிற்கான அணுகல் தாமதிப்பதால் TestFlight இன்னும் கிடைக்கவில்லை; இதை விரைவில் சரிசெய்வோம்.",
   "apps.ios.cta": "நிலையைக் காண்க",
   "apps.heading": "Android போன், டேப்லெட், Android TV-க்கான FilterTube இப்போது Google Play-இல், ஒரே பட்டியலில்.",
-  "apps.intro": "பட்டியலைத் திறக்கவும் அல்லது Google Play-இல் FilterTube-ஐத் தேடவும். நேரடி APK தனியான, எளிய பதிப்பாகவே இருக்கும்; முழு தனிப்பயன் முன்முனை இல்லை."
+  "dashboard.stats.title": "இன்று",
+  "dashboard.stats.surface": "புள்ளிவிவரம் எதற்கு"
 }

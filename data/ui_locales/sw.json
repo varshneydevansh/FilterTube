@@ -2449,5 +2449,6 @@
   "apps.ios.body": "Toleo asilia la Apple linakamilishwa. Ufikiaji wa akaunti ya Apple Developer unachelewesha upatikanaji wa TestFlight; jambo hili litatatuliwa haraka iwezekanavyo.",
   "apps.ios.cta": "Angalia hali",
   "apps.heading": "FilterTube kwa simu, kompyuta kibao na Android TV sasa iko Google Play, kwenye ukurasa mmoja.",
-  "apps.intro": "Fungua ukurasa au tafuta FilterTube kwenye Google Play. APK ya moja kwa moja inabaki toleo tofauti na rahisi bila sehemu kamili ya mbele iliyobinafsishwa."
+  "dashboard.stats.title": "Leo",
+  "dashboard.stats.surface": "Takwimu za"
 }

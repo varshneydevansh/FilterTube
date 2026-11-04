@@ -2449,5 +2449,6 @@
   "apps.ios.body": "A ń parí ẹ̀dà Apple abinibi. Ìṣòro wíwọlé sí àkáǹtì Apple Developer ń fa ìdádúró fún wíwà TestFlight; a ó yanjú rẹ̀ ní kíákíá bí ó ti ṣeé ṣe.",
   "apps.ios.cta": "Wo ipò",
   "apps.heading": "FilterTube fún fóònù Android, tábúlẹ́ẹ̀tì àti Android TV ti wà lórí Google Play báyìí, láti ojú-ewé kan.",
-  "apps.intro": "Ṣí ojú-ewé náà tàbí wá FilterTube lórí Google Play. APK tààrà ṣì jẹ́ ẹ̀yà ọ̀tọ̀ tó rọrùn, láìsí ojú-ìwòye àdáni pípé."
+  "dashboard.stats.title": "Òní",
+  "dashboard.stats.surface": "Ìṣirò fún"
 }

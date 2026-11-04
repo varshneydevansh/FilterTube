@@ -2449,5 +2449,6 @@
   "apps.ios.body": "Yerel Apple sürümü son hâline getiriliyor. Apple Developer hesabına erişim, TestFlight'ın kullanıma sunulmasını geciktiriyor; bu sorun en kısa sürede çözülecek.",
   "apps.ios.cta": "Durumu görüntüle",
   "apps.heading": "Android telefon, tablet ve Android TV için FilterTube artık tek bir sayfayla Google Play’de.",
-  "apps.intro": "Sayfayı açın veya Google Play’de FilterTube’u arayın. Doğrudan APK, tam özel arayüzü olmayan ayrı ve daha basit bir sürüm olarak kalır."
+  "dashboard.stats.title": "Bugün",
+  "dashboard.stats.surface": "İstatistik kapsamı"
 }

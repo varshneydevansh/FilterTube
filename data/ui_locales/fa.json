@@ -2449,5 +2449,6 @@
   "apps.ios.body": "نسخهٔ بومی Apple در حال نهایی‌شدن است. دسترسی به حساب Apple Developer باعث تأخیر در ارائهٔ TestFlight شده و هرچه زودتر برطرف خواهد شد.",
   "apps.ios.cta": "مشاهدهٔ وضعیت",
   "apps.heading": "FilterTube برای گوشی، تبلت و Android TV اکنون در Google Play است، با یک صفحه.",
-  "apps.intro": "صفحه را باز کنید یا FilterTube را در Google Play جست‌وجو کنید. APK مستقیم همچنان نسخه‌ای جدا و ساده‌تر بدون رابط سفارشی کامل است."
+  "dashboard.stats.title": "امروز",
+  "dashboard.stats.surface": "آمار برای"
 }

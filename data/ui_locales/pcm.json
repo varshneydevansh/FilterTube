@@ -2449,5 +2449,6 @@
   "apps.ios.body": "Dem dey finish di Apple app build. Access to Apple Developer account don delay TestFlight; dem go settle am as soon as dem fit.",
   "apps.ios.cta": "See status",
   "apps.heading": "FilterTube for Android phone, tablet and Android TV don dey Google Play, from one listing.",
-  "apps.intro": "Open the listing or search FilterTube for Google Play. The direct APK still be separate, simple build wey no get the full custom frontend."
+  "dashboard.stats.title": "Today",
+  "dashboard.stats.surface": "Stats for"
 }

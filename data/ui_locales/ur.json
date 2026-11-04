@@ -2449,5 +2449,6 @@
   "apps.ios.body": "Apple کا مقامی ورژن حتمی شکل دیا جا رہا ہے۔ Apple Developer اکاؤنٹ تک رسائی میں تاخیر سے TestFlight کی دستیابی رکی ہوئی ہے؛ اسے جلد از جلد حل کیا جائے گا۔",
   "apps.ios.cta": "حیثیت دیکھیں",
   "apps.heading": "Android فون، ٹیبلیٹ اور Android TV کے لیے FilterTube اب Google Play پر ہے، ایک ہی لسٹنگ سے۔",
-  "apps.intro": "لسٹنگ کھولیں یا Google Play پر FilterTube تلاش کریں۔ براہ راست APK ایک الگ، سادہ بلڈ ہے جس میں مکمل حسبِ ضرورت فرنٹ اینڈ نہیں۔"
+  "dashboard.stats.title": "آج",
+  "dashboard.stats.surface": "اعداد و شمار برائے"
 }

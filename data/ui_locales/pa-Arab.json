@@ -2449,5 +2449,6 @@
   "apps.ios.body": "Apple دی اصلی ایپ بلڈ نوں آخری شکل دتی جا رہی اے۔ Apple Developer اکاؤنٹ دی رسائی کارن TestFlight وچ دیر ہو رہی اے، تے ایہ مسئلہ جلد توں جلد حل ہووے گا۔",
   "apps.ios.cta": "حالت ویکھو",
   "apps.heading": "Android فون، ٹیبلیٹ تے Android TV لئی FilterTube ہن Google Play اُتے اے، اکو لسٹنگ توں۔",
-  "apps.intro": "لسٹنگ کھولو یا Google Play اُتے FilterTube لبھو۔ سدھا APK اک وکھرا، سادہ بلڈ اے جیہدے وچ پورا کسٹم فرنٹ اینڈ نہیں۔"
+  "dashboard.stats.title": "اج",
+  "dashboard.stats.surface": "انکڑے کس لئی"
 }

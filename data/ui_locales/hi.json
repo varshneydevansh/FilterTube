@@ -2449,5 +2449,6 @@
   "apps.ios.body": "Apple का मूल ऐप बिल्ड अंतिम रूप दिया जा रहा है। Apple Developer खाते तक पहुँच न होने से TestFlight की उपलब्धता में देरी हो रही है; इसे जल्द से जल्द सुलझाया जाएगा।",
   "apps.ios.cta": "स्थिति देखें",
   "apps.heading": "Android फ़ोन, टैबलेट और Android TV के लिए FilterTube अब Google Play पर है, एक ही लिस्टिंग से।",
-  "apps.intro": "लिस्टिंग खोलें या Google Play पर FilterTube खोजें। सीधा APK एक अलग, सरल बिल्ड है, जिसमें पूरा कस्टम फ़्रंटएंड नहीं है।"
+  "dashboard.stats.title": "आज",
+  "dashboard.stats.surface": "आँकड़े किसके लिए"
 }

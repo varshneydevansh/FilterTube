@@ -2449,5 +2449,6 @@
   "apps.ios.body": "Tinatapos na ang native na bersiyon para sa Apple. Naantala ang paglabas nito sa TestFlight dahil sa access sa Apple Developer account; lulutasin ito sa lalong madaling panahon.",
   "apps.ios.cta": "Tingnan ang status",
   "apps.heading": "Nasa Google Play na ang FilterTube para sa Android phone, tablet, at Android TV, mula sa iisang listing.",
-  "apps.intro": "Buksan ang listing o hanapin ang FilterTube sa Google Play. Ang direktang APK ay nananatiling hiwalay at mas simpleng build na walang buong custom frontend."
+  "dashboard.stats.title": "Ngayon",
+  "dashboard.stats.surface": "Mga stats para sa"
 }

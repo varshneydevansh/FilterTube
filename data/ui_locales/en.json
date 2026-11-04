@@ -2582,5 +2582,6 @@
   "apps.ios.body": "The native Apple build is being finalized. Apple Developer account access is delaying TestFlight availability and will be resolved as soon as possible.",
   "apps.ios.cta": "View status",
   "apps.heading": "FilterTube for Android phones, tablets and Android TV is on Google Play, from one listing.",
-  "apps.intro": "Open the listing or search Google Play for FilterTube. The direct APK stays a separate, simpler build without the complete custom frontend."
+  "dashboard.stats.title": "Today",
+  "dashboard.stats.surface": "Stats for"
 }

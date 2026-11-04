@@ -2449,5 +2449,6 @@
   "apps.ios.body": "Versi native Apple sedang diselesaikan. Akses akun Apple Developer menunda ketersediaan TestFlight dan akan ditangani sesegera mungkin.",
   "apps.ios.cta": "Lihat status",
   "apps.heading": "FilterTube untuk ponsel, tablet, dan Android TV kini ada di Google Play, dari satu listing.",
-  "apps.intro": "Buka listing atau cari FilterTube di Google Play. APK langsung tetap build terpisah yang lebih sederhana tanpa frontend kustom lengkap."
+  "dashboard.stats.title": "Hari ini",
+  "dashboard.stats.surface": "Statistik untuk"
 }

@@ -2449,5 +2449,6 @@
   "apps.ios.body": "Apple के नेटिव बिल्ड के आखिरी रूप दिहल जा रहल बा। Apple Developer खाता के पहुँच ना मिले से TestFlight पर उपलब्धता देर हो रहल बा; एहके जल्दी से जल्दी सुलझावल जाई।",
   "apps.ios.cta": "स्थिति देखीं",
   "apps.heading": "Android फोन, टैबलेट आ Android TV खातिर FilterTube अब Google Play पर बा, एके लिस्टिंग से।",
-  "apps.intro": "लिस्टिंग खोलीं भा Google Play पर FilterTube खोजीं। सीधा APK अलग, सरल बिल्ड रही, जवना में पूरा कस्टम फ्रंटएंड नइखे।"
+  "dashboard.stats.title": "आज",
+  "dashboard.stats.surface": "आँकड़ा केकरा खातिर"
 }

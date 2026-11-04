@@ -2449,5 +2449,6 @@
   "apps.ios.body": "Нативная версия для устройств Apple завершается. Доступ к учётной записи Apple Developer задерживает выпуск в TestFlight; вопрос будет решён как можно скорее.",
   "apps.ios.cta": "Посмотреть состояние",
   "apps.heading": "FilterTube для телефонов, планшетов и Android TV уже в Google Play — на одной странице.",
-  "apps.intro": "Откройте страницу или найдите FilterTube в Google Play. Прямой APK остаётся отдельной, более простой сборкой без полного собственного интерфейса."
+  "dashboard.stats.title": "Сегодня",
+  "dashboard.stats.surface": "Статистика для"
 }

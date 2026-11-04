@@ -2449,5 +2449,6 @@
   "apps.ios.body": "Apple ನ ಸ್ಥಳೀಯ ಆ್ಯಪ್ ನಿರ್ಮಾಣ ಅಂತಿಮ ಹಂತದಲ್ಲಿದೆ. Apple Developer ಖಾತೆಯ ಪ್ರವೇಶ ವಿಳಂಬದಿಂದ TestFlight ಲಭ್ಯತೆ ತಡವಾಗಿದ್ದು, ಇದನ್ನು ಸಾಧ್ಯವಾದಷ್ಟು ಬೇಗ ಪರಿಹರಿಸಲಾಗುತ್ತದೆ.",
   "apps.ios.cta": "ಸ್ಥಿತಿ ವೀಕ್ಷಿಸಿ",
   "apps.heading": "Android ಫೋನ್, ಟ್ಯಾಬ್ಲೆಟ್ ಮತ್ತು Android TV ಗಾಗಿ FilterTube ಈಗ Google Play ನಲ್ಲಿ, ಒಂದೇ ಪಟ್ಟಿಯಿಂದ.",
-  "apps.intro": "ಪಟ್ಟಿಯನ್ನು ತೆರೆಯಿರಿ ಅಥವಾ Google Play ನಲ್ಲಿ FilterTube ಹುಡುಕಿ. ನೇರ APK ಸಂಪೂರ್ಣ ಕಸ್ಟಮ್ ಫ್ರಂಟ್‌ಎಂಡ್ ಇಲ್ಲದ ಪ್ರತ್ಯೇಕ, ಸರಳ ಬಿಲ್ಡ್ ಆಗಿಯೇ ಉಳಿಯುತ್ತದೆ."
+  "dashboard.stats.title": "ಇಂದು",
+  "dashboard.stats.surface": "ಅಂಕಿಅಂಶಗಳು ಯಾವುದಕ್ಕೆ"
 }

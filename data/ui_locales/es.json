@@ -2449,5 +2449,6 @@
   "apps.ios.body": "Estamos ultimando la versión nativa para Apple. El acceso a la cuenta de Apple Developer está retrasando su disponibilidad en TestFlight; resolveremos el problema lo antes posible.",
   "apps.ios.cta": "Ver estado",
   "apps.heading": "FilterTube para teléfonos, tabletas y Android TV ya está en Google Play, en una sola ficha.",
-  "apps.intro": "Abre la ficha o busca FilterTube en Google Play. El APK directo sigue siendo una versión aparte y más sencilla, sin la interfaz personalizada completa."
+  "dashboard.stats.title": "Hoy",
+  "dashboard.stats.surface": "Estadísticas de"
 }

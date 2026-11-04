@@ -2449,5 +2449,6 @@
   "apps.ios.body": "Apple चा मूळ बिल्ड अंतिम केला जात आहे. Apple Developer खात्याचा प्रवेश उपलब्ध नसल्यामुळे TestFlight ला विलंब होत आहे; हा प्रश्न शक्य तितक्या लवकर सोडवला जाईल.",
   "apps.ios.cta": "स्थिती पाहा",
   "apps.heading": "Android फोन, टॅबलेट आणि Android TV साठी FilterTube आता Google Play वर आहे, एकाच सूचीतून.",
-  "apps.intro": "सूची उघडा किंवा Google Play वर FilterTube शोधा. थेट APK हे वेगळे, सोपे बिल्ड आहे, ज्यात संपूर्ण कस्टम फ्रंटएंड नाही."
+  "dashboard.stats.title": "आज",
+  "dashboard.stats.surface": "आकडेवारी यासाठी"
 }

@@ -156,16 +156,16 @@ const cssRows = [
   [
     "css/tab-view.css",
     "active extension dashboard CSS",
-    6133,
-    154289,
-    "f8a4a905119527eb7c9d3ab802fac97bd7affdd17c803f3cbc6ad49f67b762a8",
-    906,
+    6572,
+    170342,
+    "eeec8abddb34e8a772e573d956c86b555228e127fa0f936cd8b423733608ca23",
+    973,
     25,
-    28,
+    32,
     0,
     0,
     0,
-    21,
+    22,
     5,
     8
   ],
@@ -274,20 +274,20 @@ test('CSS load style surface register is audit-only and covers every tracked CSS
   }
 
   assert.deepEqual(totals, {
-  "lines": 22284,
-  "bytes": 631196,
-  "rules": 3250,
+  "lines": 22723,
+  "bytes": 647249,
+  "rules": 3317,
   "important": 623,
-  "displayNone": 94,
+  "displayNone": 98,
   "notVisible": 72,
   "visible": 167,
   "hidden": 6,
-  "media": 68,
+  "media": 69,
   "keyframes": 9,
   "hiddenAttr": 22
 });
-  assert.match(doc, /12 CSS files, 22,284 counted source lines/);
-  assert.match(doc, /631,196 bytes, 3,250 lexical rule blocks/);
+  assert.match(doc, /12 CSS files, 22,723 counted source lines/);
+  assert.match(doc, /647,249 bytes, 3,317 lexical rule blocks/);
   assert.match(doc, /615 `!important` declarations, 76\s+`display:none` declarations/);
 });
 

@@ -2449,5 +2449,6 @@
   "apps.ios.body": "Apple-এর নেটিভ বিল্ডটি চূড়ান্ত করা হচ্ছে। Apple Developer অ্যাকাউন্টে প্রবেশাধিকার না থাকায় TestFlight-এ আসতে দেরি হচ্ছে; যত দ্রুত সম্ভব সমস্যাটি মেটানো হবে।",
   "apps.ios.cta": "অবস্থা দেখুন",
   "apps.heading": "Android ফোন, ট্যাবলেট ও Android TV-র জন্য FilterTube এখন Google Play-তে, একটি তালিকা থেকেই।",
-  "apps.intro": "তালিকাটি খুলুন বা Google Play-তে FilterTube খুঁজুন। সরাসরি APK একটি আলাদা, সহজ বিল্ড, যাতে সম্পূর্ণ কাস্টম ফ্রন্টএন্ড নেই।"
+  "dashboard.stats.title": "আজ",
+  "dashboard.stats.surface": "পরিসংখ্যান যার জন্য"
 }
