@@ -271,3 +271,86 @@ for (const prefix of ['videoFilter', 'kidsVideoFilter']) {
     assert.deepEqual(saves[2], { showToast: true });
   });
 }
+
+// #81: YouTube renders counts in the account's display language, not English.
+for (const [label, value, count, exact] of [
+  ['Korean exact', '조회수 500회', 500, true], ['Korean grouped', '조회수 1,234회', 1234, true],
+  ['Korean cheon', '조회수 1.2천회', 1200, false], ['Korean man', '조회수 1.2만회', 12000, false], ['Korean eok', '조회수 3억회', 3e8, false],
+  ['Korean no views', '조회수 없음', 0, true],
+  ['Japanese prefix exact', '視聴回数 500 回', 500, true], ['Japanese prefix man', '視聴回数 1.2万 回', 12000, false],
+  ['Japanese suffix', '1.2万 回視聴', 12000, false], ['Japanese sen', '視聴回数 1.2千 回', 1200, false], ['Japanese oku', '2億 回視聴', 2e8, false],
+  ['Japanese zero', '視聴回数 0 回', 0, true],
+  ['Chinese simplified', '1.2万次观看', 12000, false], ['Chinese simplified exact', '500次观看', 500, true],
+  ['Chinese simplified yi', '1.2亿次观看', 1.2e8, false], ['Chinese simplified prefix', '观看次数：1.2万次', 12000, false],
+  ['Chinese traditional', '1.2萬次觀看', 12000, false], ['Chinese traditional prefix', '觀看次數：500次', 500, true],
+  ['Chinese traditional yi', '3億次觀看', 3e8, false], ['Chinese qian', '1.2千次观看', 1200, false],
+  ['German Mio', '1,2 Mio. Aufrufe', 1.2e6, false], ['German Tsd', '1,2 Tsd. Aufrufe', 1200, false],
+  ['German grouping', '12.345 Aufrufe', 12345, true], ['German nbsp', '1,2 Mio. Aufrufe', 1.2e6, false],
+  ['French k', '1,2 k vues', 1200, false], ['French M de', '1,2 M de vues', 1.2e6, false],
+  ['French narrow nbsp', '1 234 vues', 1234, true], ['French narrow nbsp unit', '1,2 k vues', 1200, false],
+  ['Spanish mil', '1,2 mil visualizaciones', 1200, false], ['Spanish M de', '1,2 M de visualizaciones', 1.2e6, false],
+  ['Portuguese mil', '1,2 mil visualizações', 1200, false], ['Portuguese mi', '1,2 mi de visualizações', 1.2e6, false],
+  ['Russian tys', '1,2 тыс. просмотров', 1200, false], ['Russian mln', '1,2 млн просмотров', 1.2e6, false],
+  ['Russian grouping', '1 234 просмотра', 1234, true],
+  ['Italian exact', '1234 visualizzazioni', 1234, true], ['Italian Mln', '1,2 Mln di visualizzazioni', 1.2e6, false],
+  ['Turkish B is bin', '1,2 B görüntüleme', 1200, false], ['Turkish Mn', '1,2 Mn görüntüleme', 1.2e6, false],
+  ['Polish tys', '1,2 tys. wyświetleń', 1200, false], ['Indonesian rb', '1,2 rb x ditonton', 1200, false],
+  ['Vietnamese N', '1,2 N lượt xem', 1200, false], ['Hindi hazaar', '1.2 हज़ार बार देखा गया', 1200, false],
+  ['English float-noisy compact', '1.1K views', 1100, false], ['English long form', '1.2 million views', 1.2e6, false]
+]) {
+  test(`localized view parser: ${label}`, () => {
+    const api = parser(), evidence = api.parse(value);
+    assert.ok(evidence, value);
+    assert.equal(evidence.count, count); assert.equal(evidence.exact, exact);
+    if (!exact) {
+      // Conservative rounding: only the top of the display range proves "below".
+      assert.equal(api.shouldBlock(evidence, { enabled: true, minViews: Math.round(evidence.upperBoundExclusive) }), true, value);
+      assert.equal(api.shouldBlock(evidence, { enabled: true, minViews: Math.round(evidence.upperBoundExclusive) - 1 }), false, value);
+    }
+  });
+}
+
+test('localized concurrent, waiting and label-less values stay unknown; English B stays billion', () => {
+  const api = parser();
+  for (const value of ['1.2천명 시청 중', '1.2万 人が視聴中', '1,2 тыс. смотрят', '12 waiting', '1,2 B izleyici', '조회수', '1.2만']) {
+    assert.equal(api.parse(value, { requireLabel: true }), null, value);
+  }
+  assert.equal(api.parse('1,2 B views').count, 1.2e9);
+  assert.equal(api.parse('1,2 M x ditonton').count, 1.2e9, 'Indonesian M is miliar; a larger count never over-blocks');
+  assert.equal(api.parse('조회수 1.2천회', { requireLabel: true }).count, 1200);
+  assert.equal(api.shouldBlock('조회수 1.2천회', rule), false);
+  assert.equal(api.shouldBlock('조회수 499회', rule), true);
+});
+
+const allowedOwner = 'UCzyxwvutsrqponmlkjihgfe', otherOwner = 'UCabcdefghijklmnopqrstuv';
+let rendererKey = 'videoRenderer';
+const owned = (id, owner, count, extra = {}) => ({ [rendererKey]: video(count, { videoId: id,
+  shortBylineText: { runs: [{ text: 'Creator', navigationEndpoint: { browseEndpoint: { browseId: owner } } }] }, ...extra }) });
+const ids = rows => clone(rows).map(row => Object.values(row)[0].videoId);
+// Kids compiles its own listMode/contentFilters into the same engine; its feeds
+// arrive as compactVideoRenderer rows.
+for (const renderer of ['videoRenderer', 'compactVideoRenderer']) {
+  test(`allow-only mode still applies minimum views and duration in the JSON layer (${renderer})`, () => {
+    rendererKey = renderer;
+    const base = { listMode: 'whitelist', whitelistChannels: [{ id: allowedOwner }], whitelistKeywords: [], filterChannels: [], filterKeywords: [] };
+    const f = engine(base);
+    const output = f.process([
+      owned('allowedLow1', allowedOwner, '조회수 499회'), owned('allowedHigh', allowedOwner, '1,2 k vues'),
+      owned('allowedNone', allowedOwner, undefined), owned('otherHigh01', otherOwner, '1.2M views'),
+      owned('allowedLive', allowedOwner, '3 watching', { isLive: true })
+    ]);
+    assert.deepEqual(ids(output), ['allowedHigh', 'allowedNone', 'allowedLive']);
+    const duration = engine({ ...base, contentFilters: { duration: { enabled: true, condition: 'shorter', minMinutes: 1 } } });
+    assert.deepEqual(ids(duration.process([owned('allowShort1', allowedOwner, '9 views', { lengthText: { simpleText: '0:10' } }),
+      owned('allowLong01', allowedOwner, '9 views', { lengthText: { simpleText: '5:00' } })])), ['allowLong01']);
+    const keyword = engine({ ...base, whitelistChannels: [], whitelistKeywords: [{ pattern: 'ordinary', flags: 'i' }] });
+    assert.deepEqual(ids(keyword.process([owned('keywordLow1', otherOwner, '3 views'), owned('keywordHigh', otherOwner, '3,000 views')])), ['keywordHigh']);
+  });
+}
+
+test('blocklist-mode allow rules no longer bypass content filters; exact allowed IDs keep their precedence', () => {
+  rendererKey = 'videoRenderer';
+  const f = engine({ listMode: 'blocklist', whitelistChannels: [{ id: allowedOwner }], filterChannels: [{ id: allowedOwner }], allowedVideoIds: ['explicitAll'] });
+  assert.deepEqual(ids(f.process([owned('allowedLow1', allowedOwner, '3 views'), owned('allowedHigh', allowedOwner, '3,000 views'),
+    owned('explicitAll', otherOwner, '3 views')])), ['allowedHigh', 'explicitAll']);
+});

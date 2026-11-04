@@ -2699,7 +2699,9 @@
                             allowSpecificity,
                             blockSpecificity
                         });
-                        return false;
+                        // An exact allowed video ID keeps its precedence; a channel/keyword allow
+                        // still passes through content filters, as in the DOM and external layers.
+                        return allowSpecificity < 3 && this._blocksByContentRules(item, rules, rendererType);
                     }
                     this._log(`🚫 Blocking by dual-rule precedence: "${title || rendererType}"`);
                     return true;
@@ -2753,7 +2755,7 @@
                                     matched: collaborator.handle || collaborator.customUrl || collaborator.id || collaborator.name || '',
                                     collaborator
                                 });
-                                return false;
+                                return this._blocksByContentRules(item, rules, rendererType);
                             }
                         }
                     }
@@ -2769,7 +2771,7 @@
                                 title,
                                 keyword: keywordRegex.source
                             });
-                            return false;
+                            return this._blocksByContentRules(item, rules, rendererType);
                         }
                     }
                 }
@@ -2791,7 +2793,7 @@
                                     title,
                                     pageChannel: this.pageChannelMeta
                                 });
-                                return false;
+                                return this._blocksByContentRules(item, rules, rendererType);
                             }
                         }
                     } catch (e) {
@@ -2890,23 +2892,21 @@
 
             // Content filters (duration, upload date) - applied after channel/keyword filtering
             if (!isCommentRenderer) {
-                const shouldBlockByContent = this._checkContentFilters(item, rules, rendererType);
-                if (shouldBlockByContent) {
-                    return true;
-                }
-
-                const shouldBlockByCategory = this._checkCategoryFilters(item, rules, rendererType);
-                if (shouldBlockByCategory) {
-                    return true;
-                }
-
-                const shouldBlockByLanguage = this._checkLanguageFilters(item, rules, rendererType);
-                if (shouldBlockByLanguage) {
+                if (this._blocksByContentRules(item, rules, rendererType)) {
                     return true;
                 }
             }
 
             return false;
+        }
+
+        // Content, category and language filters narrow whatever the list rules
+        // admit, in both list modes: an allow-only match is still subject to
+        // minimum views, duration, upload date and the other content filters.
+        _blocksByContentRules(item, rules, rendererType) {
+            return this._checkContentFilters(item, rules, rendererType)
+                || this._checkCategoryFilters(item, rules, rendererType)
+                || this._checkLanguageFilters(item, rules, rendererType);
         }
 
         _checkCategoryFilters(item, rules, rendererType) {

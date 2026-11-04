@@ -22,6 +22,23 @@
   keywords written in Hangul, Han, Hiragana or Katakana (including rules
   imported from BlockTube) now match wherever they appear, so `좌파` hides
   `좌파가 문제`. Whole-word rules in other scripts are unchanged (#79).
+- **Minimum views now reads non-English counts** (#81). "Hide videos with less
+  than X views" understands the counts YouTube shows in Korean (`조회수 1.2천회`),
+  Japanese (`視聴回数 1.2万 回`), Chinese (`1.2万次观看`, `1.2萬次觀看`), German,
+  French, Spanish, Portuguese, Russian, Italian, Turkish, Polish, Indonesian,
+  Vietnamese and Hindi, including decimal commas and narrow no-break spaces.
+  Rounded counts still hide a video only when even the top of the rounding range
+  is below your minimum; unknown, live and "watching" counts stay visible.
+- **Allow-only mode respects content filters** (#81). Videos from allowed
+  channels or keywords now still go through minimum views, duration, upload
+  date, category and language filters before the page renders, instead of
+  briefly showing and then disappearing. Videos not on your allow list stay
+  hidden, on YouTube and YouTube Kids alike.
+- **Allow rules in block mode no longer skip content filters** (#81). An allowed
+  channel or keyword overrides a matching block rule but is still checked
+  against content filters, as the page fallback already did. A video you allowed
+  by its exact video ID keeps its exemption. Counts such as `1.1K views` now
+  parse too (they were dropped by a rounding error).
 
 ## Version 3.4.2 — Device Sync, Video Notes And Playback Improvements (Preview)
 
