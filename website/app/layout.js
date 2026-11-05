@@ -1,9 +1,4 @@
-import {
-  Cormorant_Garamond,
-  JetBrains_Mono,
-  Outfit,
-  Plus_Jakarta_Sans,
-} from "next/font/google";
+import localFont from "next/font/local";
 import { Analytics } from "@vercel/analytics/next";
 import Script from "next/script";
 
@@ -13,29 +8,35 @@ import { SiteHeader } from "@/components/site-header";
 
 import "./globals.css";
 
-const displayFont = Outfit({
-  subsets: ["latin"],
+// Fonts are bundled in app/fonts (Latin variable WOFF2 from Google Fonts, SIL Open Font
+// License) so builds never fetch fonts over the network; Vercel builds failed when that fetch did.
+const displayFont = localFont({
+  src: "./fonts/outfit-latin.woff2",
   variable: "--font-display",
-  weight: ["400", "500", "600", "700", "800"],
+  weight: "400 800",
+  display: "swap",
 });
 
-const bodyFont = Plus_Jakarta_Sans({
-  subsets: ["latin"],
+const bodyFont = localFont({
+  src: "./fonts/plus-jakarta-sans-latin.woff2",
   variable: "--font-body",
-  weight: ["400", "500", "600", "700", "800"],
+  weight: "400 800",
+  display: "swap",
 });
 
-const editorialFont = Cormorant_Garamond({
-  subsets: ["latin"],
+const editorialFont = localFont({
+  src: "./fonts/cormorant-garamond-italic-latin.woff2",
   variable: "--font-editorial",
-  weight: ["400", "500", "600"],
-  style: ["italic"],
+  weight: "400 600",
+  style: "italic",
+  display: "swap",
 });
 
-const monoFont = JetBrains_Mono({
-  subsets: ["latin"],
+const monoFont = localFont({
+  src: "./fonts/jetbrains-mono-latin.woff2",
   variable: "--font-mono",
-  weight: ["500", "700"],
+  weight: "500 700",
+  display: "swap",
 });
 
 export const metadata = {
