@@ -4,7 +4,7 @@ import { Reveal } from "@/components/reveal";
 export const metadata = {
   title: "Terms of use",
   description:
-    "FilterTube terms of use for the website, current browser release, public code, and related product surfaces.",
+    "FilterTube terms of use for the website, apps, browser extension, public code, and the optional supporter subscription.",
 };
 
 const sections = [
@@ -34,6 +34,15 @@ const sections = [
     body: [
       "Current and upcoming surfaces, including mobile, iPad, and TV plans, are presented as product direction rather than a binding delivery promise.",
       "App-store or platform approvals may affect release timing and feature scope.",
+    ],
+  },
+  {
+    title: "Optional supporter subscription",
+    body: [
+      "Every FilterTube feature is free and stays free. Supporting the project is optional and never unlocks, restricts, or changes any feature; it only hides the in-app support reminder.",
+      "In the Android app from Google Play, support is offered as an auto-renewing Google Play subscription (monthly or yearly, at the tier and price shown for your country). Google Play processes the payment, renews the subscription until you cancel, and handles receipts. FilterTube never receives or stores your payment details.",
+      "You can change tier or cancel at any time in Google Play (Play Store, Payments & subscriptions, Subscriptions). Cancelling stops future renewals; the current paid period is not refunded by FilterTube, and refunds follow Google Play's refund policy.",
+      "One-time support outside Google Play, for example through Ko-fi, is handled by that provider under its own terms.",
     ],
   },
   {
