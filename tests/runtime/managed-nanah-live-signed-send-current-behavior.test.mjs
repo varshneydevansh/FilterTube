@@ -331,7 +331,7 @@ test('dashboard exposes explicit Main Kids rule source picker for granular manag
 test('dashboard builds signed managed envelopes only after source link scope target and key gates', () => {
   const source = read(managedLivePolicyPath);
 
-  assert.match(source, /global\.FilterTubeNanahManagedLivePolicy = \{ create \}/);
+  assert.match(source, /global\.FilterTubeNanahManagedLivePolicy = \{ create, MANAGED_STUDY_SCOPES, STUDY_CAPABILITY \}/);
   assert.match(source, /function normalizeScope\(scope\)/);
   assert.match(source, /MANAGED_LIVE_POLICY_SCOPES\.includes\(normalized\)/);
   assert.match(source, /active: \['main', 'kids', 'viewing_space', 'time_limits'\]/);
@@ -350,7 +350,7 @@ test('dashboard builds signed managed envelopes only after source link scope tar
   assert.match(source, /if \(!trustedLink \|\| trustedLink\.linkType !== 'managed_link'\)/);
   assert.match(source, /if \(trustedLink\.localRole !== 'source' \|\| trustedLink\.remoteRole !== 'replica'\)/);
   assert.match(source, /MANAGED_LIVE_BUNDLE_SCOPES/);
-  assert.match(source, /if \(!allowedScopes\.includes\(normalizedScope\)\)/);
+  assert.match(source, /if \(!allowedScopes\.includes\(normalizedScope\) && !studyScopeAllowed\(normalizedScope, allowedScopes, trustedLink\)\)/);
   assert.match(source, /if \(!normalizeString\(targetProfile\?\.profileId\)\)/);
   assert.match(source, /Signed managed sends require a fixed target device/);
   assert.match(source, /targetDeviceId/);

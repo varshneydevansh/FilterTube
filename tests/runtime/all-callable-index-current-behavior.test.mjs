@@ -32,10 +32,10 @@ const releaseFixStatusDoc = fs.readFileSync(
   'utf8'
 );
 const expectedFamilyTotals = new Map([
-  ['Build/sync scripts', { files: 5, count: 75 }],
+  ['Build/sync scripts', { files: 6, count: 87 }],
   ['Hot page/background runtime', { files: 14, count: 3958 }],
-  ['Content helper runtime', { files: 26, count: 910 }],
-  ['UI/settings runtime', { files: 33, count: 4075 }],
+  ['Content helper runtime', { files: 28, count: 970 }],
+  ['UI/settings runtime', { files: 33, count: 4117 }],
   ['Generated/quarantined UI', { files: 6, count: 153 }],
   ['Vendor bundles', { files: 3, count: 279 }],
   ['Audit/test lane scripts', { files: 25, count: 517 }],
@@ -254,8 +254,8 @@ test('audit meta index docs carry the method proof gap blocker', () => {
 
 test('all-callable index accounts for every tracked JS JSX and MJS source file', () => {
   const files = trackedJsFiles();
-  assert.equal(files.length, 143);
-  assert.match(indexDoc, /current tracked JS\/JSX\/MJS files: 143/);
+  assert.equal(files.length, 146);
+  assert.match(indexDoc, /current tracked JS\/JSX\/MJS files: 146/);
 
   for (const file of files) {
     docRow(file);
@@ -272,8 +272,8 @@ test('all-callable index counts match current lexical callable source', () => {
     assert.equal(documented, actual, `${file} callable count should match current source`);
   }
 
-  assert.equal(total, 10116);
-  assert.match(indexDoc, /current repo-wide lexical callables: 10116/);
+  assert.equal(total, 10230);
+  assert.match(indexDoc, /current repo-wide lexical callables: 10230/);
 });
 
 test('all-callable family totals match the documented file rows', () => {
