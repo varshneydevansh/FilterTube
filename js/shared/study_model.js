@@ -22,9 +22,11 @@
     const EDIT_LISTS = Object.freeze(['addChannels', 'removeChannels', 'addTopics', 'removeTopics']);
     const LOCK_MODES = Object.freeze(['gentle', 'locked']);
     const LIST_MODES = Object.freeze(['blocklist', 'whitelist']);
+    // Breaks show the rest screen (no feed) by default, or normal videos with the break timer as a hard stop.
+    const BREAK_MODES = Object.freeze(['rest', 'normal']);
     // Plan days are ISO weekdays, Monday = 1 ... Sunday = 7.
     const DAY_ALIASES = Object.freeze({ mon: 1, tue: 2, wed: 3, thu: 4, fri: 5, sat: 6, sun: 7 });
-    const KNOWN_FIELDS = Object.freeze(['version', 'packIds', 'edits', 'focus', 'plan', 'lock', 'savedListMode', 'progress', 'weekView']);
+    const KNOWN_FIELDS = Object.freeze(['version', 'packIds', 'edits', 'focus', 'plan', 'lock', 'savedListMode', 'progress', 'weekView', 'breakMode']);
     const MAX_PACKS = 64;
     const MAX_EDIT_ROWS = 2000;
     const MAX_DEVICES = 64;
@@ -227,6 +229,11 @@
         return out;
     }
 
+    function breakMode(value) {
+        const mode = text(value).toLowerCase();
+        return BREAK_MODES.includes(mode) ? mode : null;
+    }
+
     function listMode(value) {
         const mode = text(value).toLowerCase();
         return LIST_MODES.includes(mode) ? mode : null;
@@ -259,7 +266,8 @@
             lock: normalizeLock(value.lock),
             savedListMode: listMode(value.savedListMode),
             progress: normalizeProgress(value.progress),
-            weekView: value.weekView === true
+            weekView: value.weekView === true,
+            breakMode: breakMode(value.breakMode) || 'rest'
         };
     }
 
@@ -296,6 +304,11 @@
         return out;
     }
 
+    function isEmpty(value) {
+        return !value.packIds.length && !Object.keys(value.edits).length && !value.plan && !value.lock
+            && !Object.keys(value.progress).length;
+    }
+
     /**
      * Merges an incoming study object (backup restore, Copy once, Merge, personal sync) into this profile's.
      * - packs and edits merge like keywords (union; the incoming row wins for the same identity);
@@ -313,7 +326,7 @@
             const kept = createStudy({ progress: mine.progress, lock: mine.lock, savedListMode: mine.savedListMode });
             return kept.lock || kept.savedListMode || Object.keys(kept.progress).length ? kept : null;
         }
-        if (!mine) return { ...theirs, lock: null, savedListMode: theirs.savedListMode };
+        if (!mine) return isEmpty(theirs) ? null : { ...theirs, lock: null };
         const replace = strategy === 'replace';
         const incomingFocus = object(object(incoming).focus);
         return {
@@ -327,7 +340,8 @@
             lock: mine.lock,
             savedListMode: mine.savedListMode || theirs.savedListMode,
             progress: mergeProgress(mine.progress, theirs.progress),
-            weekView: own(object(incoming), 'weekView') && typeof incoming.weekView === 'boolean' ? incoming.weekView : mine.weekView
+            weekView: own(object(incoming), 'weekView') && typeof incoming.weekView === 'boolean' ? incoming.weekView : mine.weekView,
+            breakMode: replace ? theirs.breakMode : (breakMode(object(incoming).breakMode) || mine.breakMode)
         };
     }
 
@@ -409,7 +423,8 @@
         const name = text(scope).toLowerCase();
         const study = normalizeStudy(studyValue) || createStudy();
         if (name === 'study') {
-            return { scope: 'study', replace: true, packIds: study.packIds, edits: study.edits, focus: study.focus, weekView: study.weekView };
+            return { scope: 'study', replace: true, packIds: study.packIds, edits: study.edits, focus: study.focus,
+                weekView: study.weekView, breakMode: study.breakMode };
         }
         if (name === 'schedule') return { scope: 'schedule', plan: study.plan };
         if (name === 'focus_lock') return { scope: 'focus_lock', lock: study.lock ? { ...study.lock, mode: 'locked' } : null };
@@ -424,6 +439,7 @@
             if (!Array.isArray(root.packIds) || uniquePackIds(root.packIds).length !== root.packIds.length) return 'invalid_study_payload';
             if (own(root, 'edits') && !isObject(root.edits)) return 'invalid_study_payload';
             if (own(root, 'focus') && !isObject(root.focus)) return 'invalid_study_payload';
+            if (own(root, 'breakMode') && !breakMode(root.breakMode)) return 'invalid_study_payload';
             return '';
         }
         if (name === 'schedule') {
@@ -457,7 +473,8 @@
                 packIds: root.packIds,
                 edits: own(root, 'edits') ? root.edits : study.edits,
                 focus: own(root, 'focus') ? normalizeFocus(root.focus, study.focus) : study.focus,
-                weekView: typeof root.weekView === 'boolean' ? root.weekView : study.weekView
+                weekView: typeof root.weekView === 'boolean' ? root.weekView : study.weekView,
+                breakMode: breakMode(root.breakMode) || study.breakMode
             });
         }
         if (name === 'schedule') {
@@ -471,6 +488,46 @@
         return normalizeStudy({ ...study, lock: root.lock === null ? null : { ...root.lock, mode: 'locked', setBy: parent || normalizeSetBy(root.lock.setBy) } });
     }
 
+    /**
+     * Layered rules. A surface (profile.main or profile.kids) has a block list that always applies and an
+     * optional allow list on top: "Only these" limits what can show and the block list still subtracts.
+     * Stored data keeps its existing fields so every app can still read it:
+     * - `mode: "whitelist"` now means "allow list on"; `mode: "blocklist"` means "allow list off";
+     * - `layered: true` marks a surface saved with layered rules, where the block list also applies while
+     *   the allow list is on. A whitelist surface without it is the old either/or mode, which maps to
+     *   "allow list on, block list empty": its stored block rows stay kept, but dormant.
+     * A study pack is one allow layer (rows tagged study:<packId>); its blocked words join the block list.
+     */
+    function ruleLayers(surfaceValue, { surface = 'main' } = {}) {
+        const data = object(surfaceValue);
+        const kids = surface === 'kids';
+        const allowListOn = text(data.mode).toLowerCase() === 'whitelist';
+        const layered = data.layered === true;
+        const blockListApplies = !allowListOn || layered;
+        const pick = (...keys) => { for (const key of keys) if (Array.isArray(data[key])) return data[key]; return []; };
+        const block = {
+            channels: kids ? pick('blockedChannels') : pick('channels', 'blockedChannels'),
+            keywords: kids ? pick('blockedKeywords') : pick('keywords', 'blockedKeywords'),
+            videoIds: kids ? pick('videoIds') : pick('videoIds', 'blockedVideoIds')
+        };
+        const allow = { channels: pick('whitelistChannels'), keywords: pick('whitelistKeywords'), videoIds: pick('allowedVideoIds') };
+        return {
+            allowListOn,
+            layered,
+            blockListApplies,
+            stored: { block, allow },
+            effective: {
+                block: blockListApplies ? block : { channels: [], keywords: [], videoIds: [] },
+                allow: allowListOn ? allow : { channels: [], keywords: [], videoIds: [] }
+            }
+        };
+    }
+
+    /** Marks a surface as saved with layered rules; the stored lists and mode are unchanged. */
+    function withLayeredRules(surfaceValue) {
+        return isObject(surfaceValue) ? { ...surfaceValue, layered: true } : surfaceValue;
+    }
+
     /** Validates a study area value for personal sync; the lock never travels. Throws when invalid. */
     function validateForSync(value) {
         if (!isObject(value)) throw Error('invalid_personal_sync');
@@ -481,7 +538,8 @@
     }
 
     return Object.freeze({
-        VERSION, CAPABILITY, MANAGED_SCOPES, TAG_PREFIX, DEFAULT_FOCUS,
+        VERSION, CAPABILITY, MANAGED_SCOPES, TAG_PREFIX, DEFAULT_FOCUS, BREAK_MODES,
+        ruleLayers, withLayeredRules,
         normalizeStudy, createStudy, mergeStudy, mergeProgress, mergeEdits, withoutLock,
         packIdsFromTags, profileStudy, withProfileStudy, studyTagPackId,
         channelIdentity, topicIdentity, setByProfileId,

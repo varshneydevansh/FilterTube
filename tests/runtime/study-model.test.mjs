@@ -19,7 +19,8 @@ const sample = () => ({
 
 test('a study object normalizes to the version 1 shape', () => {
   const study = Study.normalizeStudy(sample());
-  assert.deepEqual(Object.keys(study).sort(), ['edits', 'focus', 'lock', 'packIds', 'plan', 'progress', 'savedListMode', 'version', 'weekView']);
+  assert.deepEqual(Object.keys(study).sort(), ['breakMode', 'edits', 'focus', 'lock', 'packIds', 'plan', 'progress', 'savedListMode', 'version', 'weekView']);
+  assert.equal(study.breakMode, 'rest', 'breaks show the rest screen unless someone chose normal videos');
   assert.equal(study.version, 1);
   assert.deepEqual(study.edits.in_upsc_cse.addTopics, ['indian polity']);
   assert.deepEqual(study.plan.days, [1, 2, 3, 4, 5]);
@@ -171,4 +172,40 @@ test('the personal sync value never carries the lock', () => {
   const value = Study.validateForSync(sample());
   assert.equal(value.lock, null);
   assert.throws(() => Study.validateForSync({ version: 1 }), /invalid_personal_sync/);
+});
+
+test('breakMode is "rest" by default, "normal" when chosen, and merges like a setting', () => {
+  assert.equal(Study.normalizeStudy({ breakMode: 'Normal' }).breakMode, 'normal');
+  assert.equal(Study.normalizeStudy({ breakMode: 'feed' }).breakMode, 'rest');
+  const local = { ...sample(), breakMode: 'normal' };
+  assert.equal(Study.mergeStudy(local, { version: 1, packIds: [] }).breakMode, 'normal', 'a missing value keeps local');
+  assert.equal(Study.mergeStudy(local, { version: 1, packIds: [], breakMode: 'rest' }).breakMode, 'rest');
+  const payload = Study.buildManagedPayload('study', local);
+  assert.equal(payload.breakMode, 'normal');
+  assert.equal(Study.applyManagedPayload(null, 'study', payload, { sourceProfileId: 'mum' }).breakMode, 'normal');
+  assert.equal(Study.validateManagedPayload('study', { ...payload, breakMode: 'party' }), 'invalid_study_payload');
+});
+
+test('layered rules: the block list always applies and the allow list is an optional layer', () => {
+  const blockOnly = Study.ruleLayers({ mode: 'blocklist', channels: [{ id: 'UC1' }], keywords: [{ word: 'drama' }], whitelistChannels: [{ id: 'UC2' }] });
+  assert.equal(blockOnly.allowListOn, false);
+  assert.equal(blockOnly.effective.block.keywords.length, 1);
+  assert.equal(blockOnly.effective.allow.channels.length, 0, 'allow rows stay stored but off');
+
+  const layered = Study.ruleLayers(Study.withLayeredRules({ mode: 'whitelist', keywords: [{ word: 'drama' }], whitelistChannels: [{ id: 'UC2' }] }));
+  assert.equal(layered.allowListOn, true);
+  assert.equal(layered.blockListApplies, true, 'allow Apex channels and still block "drama"');
+  assert.deepEqual(layered.effective.block.keywords, [{ word: 'drama' }]);
+
+  // A whitelist surface saved before layered rules is "allow list on, block list empty"; nothing is deleted.
+  const legacy = Study.ruleLayers({ mode: 'whitelist', keywords: [{ word: 'drama' }], whitelistChannels: [{ id: 'UC2' }] });
+  assert.equal(legacy.layered, false);
+  assert.equal(legacy.blockListApplies, false);
+  assert.deepEqual(legacy.effective.block.keywords, []);
+  assert.deepEqual(legacy.stored.block.keywords, [{ word: 'drama' }]);
+
+  const kids = Study.ruleLayers({ mode: 'blocklist', blockedChannels: [{ id: 'UCk' }], blockedKeywords: [] }, { surface: 'kids' });
+  assert.deepEqual(kids.effective.block.channels, [{ id: 'UCk' }]);
+  // Marking a surface keeps the mode and lists every app already reads.
+  assert.deepEqual(Study.withLayeredRules({ mode: 'whitelist', channels: [] }), { mode: 'whitelist', channels: [], layered: true });
 });

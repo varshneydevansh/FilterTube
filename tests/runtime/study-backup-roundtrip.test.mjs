@@ -19,6 +19,7 @@ const study = (overrides = {}) => ({
   savedListMode: 'blocklist',
   progress: { laptop: { '2026-11-14': 50, '2026-11-15': 20 } },
   weekView: true,
+  breakMode: 'normal',
   ...overrides
 });
 
@@ -117,4 +118,15 @@ test('a backup without study leaves this profile\'s study alone on merge', async
   const phone = await device(profileRoot(study()));
   await phone.io.importV3(clone(backup), { scope: 'full', strategy: 'merge' });
   assert.deepEqual(phone.study(), study());
+});
+
+test('the layered-rules marker survives a backup and the mode stays readable', async () => {
+  const backup = await (await device(profileRoot(null, { layered: true, keywords: [{ word: 'drama' }] }))).io.exportV3({ scope: 'full' });
+  const main = backup.profilesV4.profiles.default.main;
+  assert.equal(main.mode, 'whitelist');
+  assert.equal(main.layered, true);
+  const phone = await device(profileRoot(null));
+  await phone.io.importV3(clone(backup), { scope: 'full', strategy: 'replace' });
+  assert.equal(phone.storage.ftProfilesV4.profiles.default.main.layered, true);
+  assert.equal(phone.storage.ftProfilesV4.profiles.default.main.mode, 'whitelist');
 });
