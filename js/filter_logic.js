@@ -2823,7 +2823,11 @@
 
                 if (blockSpecificity > 0 || allowSpecificity > 0) {
                     // Higher target specificity wins; allow wins an equal-specificity tie.
-                    if (allowSpecificity >= blockSpecificity && allowSpecificity > 0) {
+                    // Layered rules ("Only these" plus the block list): any block match subtracts.
+                    const allowWins = this.settings.listLayered === true
+                        ? blockSpecificity === 0 && allowSpecificity > 0
+                        : allowSpecificity >= blockSpecificity && allowSpecificity > 0;
+                    if (allowWins) {
                         this._logWhitelistDecision('allow:dual_rule_precedence', {
                             rendererType,
                             originalRendererType,

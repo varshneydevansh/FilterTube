@@ -3851,6 +3851,8 @@ async function getCompiledSettings(sender = null, profileType = null, forceRefre
             compiledSettings.activeProfileId = activeProfileId;
             compiledSettings.activeProfileKind = activeProfileKind;
             const activeRuleSurface = shouldUseKidsProfile ? activeKids : activeMain;
+            // Layered rules (3.6.2): "whitelist" plus layered:true keeps the block list subtracting.
+            compiledSettings.listLayered = compiledSettings.listMode === 'whitelist' && activeRuleSurface.layered === true;
             compiledSettings.blockedVideoIds = Array.from(new Set(
                 safeArray(activeRuleSurface.blockedVideoIds || activeRuleSurface.videoIds)
                     .map(value => normalizeString(value))

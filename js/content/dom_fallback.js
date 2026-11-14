@@ -2102,7 +2102,11 @@ function getCurrentWatchAdmissionDecision(settings, context = {}) {
     const blockSpecificity = explicitlyBlocked ? 3 : (blockedChannel ? 2 : (blockedKeyword ? 1 : 0));
     const allowSpecificity = explicitlyAllowed ? 3 : (allowedChannel ? 2 : (allowedKeyword ? 1 : 0));
     if (blockSpecificity > 0 || allowSpecificity > 0) {
-        if (allowSpecificity >= blockSpecificity && allowSpecificity > 0) {
+        // Layered rules: the block list always subtracts from what the allow list admits.
+        const allowWins = settings?.listLayered === true
+            ? blockSpecificity === 0 && allowSpecificity > 0
+            : allowSpecificity >= blockSpecificity && allowSpecificity > 0;
+        if (allowWins) {
             return { blocked: false, kind: 'allowed-rule' };
         }
         if (explicitlyBlocked) return { blocked: true, kind: 'video', videoId };
@@ -8197,6 +8201,7 @@ function shouldHideContent(title, channel, settings, options = {}) {
             ? 3
             : ruleSpecificity(settings.whitelistChannels, settings.whitelistKeywords);
         if (blockSpecificity > 0 || allowSpecificity > 0) {
+            if (settings.listLayered === true) return blockSpecificity > 0 || allowSpecificity === 0;
             return !(allowSpecificity >= blockSpecificity && allowSpecificity > 0);
         }
     }

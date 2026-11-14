@@ -373,7 +373,7 @@
         const explicitlyAllowed = !!videoId && hasEntries(settings.allowedVideoIds) && settings.allowedVideoIds.includes(videoId);
         // The selected video ID already verifies this rule. No lower-specificity
         // channel/keyword match can override it; an explicit allow can still tie.
-        if (explicitlyBlocked && !explicitlyAllowed) return { state: 'blocked', kind: 'video', videoId };
+        if (explicitlyBlocked && (!explicitlyAllowed || settings.listLayered === true)) return { state: 'blocked', kind: 'video', videoId };
         // ID-only rules need only the selected ID. Waiting for Player JSON here
         // would hold an unrelated allowed video for metadata no rule requires.
         if (videoId && !hasActiveMetadataAdmissionRules(settings)) return { state: 'allowed', kind: 'none' };
@@ -398,7 +398,8 @@
         const blockSpecificity = explicitlyBlocked ? 3 : (blockedChannel ? 2 : (blockedKeyword.matched ? 1 : 0));
         const allowSpecificity = explicitlyAllowed ? 3 : (allowedChannel ? 2 : (allowedKeyword.matched ? 1 : 0));
         if (blockSpecificity > 0 || allowSpecificity > 0) {
-            if (allowSpecificity < blockSpecificity) {
+            // Layered rules: any block match subtracts, whatever the allow match.
+            if (allowSpecificity < blockSpecificity || (settings.listLayered === true && blockSpecificity > 0)) {
                 if (explicitlyBlocked) return { state: 'blocked', kind: 'video', videoId };
                 if (blockedChannel) return { state: 'blocked', kind: 'channel', ownerName: metadata.channelName || metadata.channelId };
                 return { state: 'blocked', kind: 'keyword', ...blockedKeyword };
