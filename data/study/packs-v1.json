@@ -1,0 +1,5667 @@
+{
+ "schema": "filtertube_study_packs",
+ "version": 1,
+ "draftGenerated": "2026-11-14",
+ "packs": [
+  {
+   "id": "in_upsc_cse",
+   "kind": "study",
+   "name": {
+    "en": "UPSC Civil Services (CSE)",
+    "hi": "संघ लोक सेवा आयोग सिविल सेवा परीक्षा"
+   },
+   "countries": [
+    "IN"
+   ],
+   "nearby": [
+    "NP"
+   ],
+   "languages": [
+    "en",
+    "hi"
+   ],
+   "subjects": [
+    "Prelims GS Paper I",
+    "CSAT",
+    "Mains GS I-IV",
+    "Essay",
+    "Optional subject",
+    "Current affairs",
+    "Interview"
+   ],
+   "keywords": [
+    "upsc",
+    "ias",
+    "civil services",
+    "prelims",
+    "mains",
+    "csat",
+    "gs paper",
+    "polity",
+    "laxmikanth",
+    "indian economy",
+    "modern history",
+    "ancient history",
+    "art and culture",
+    "geography",
+    "environment and ecology",
+    "science and technology",
+    "international relations",
+    "ethics",
+    "answer writing",
+    "essay",
+    "current affairs",
+    "the hindu analysis",
+    "indian express",
+    "pib",
+    "yojana",
+    "kurukshetra",
+    "ncert",
+    "optional",
+    "upsc pyq",
+    "previous year questions",
+    "संघ लोक सेवा आयोग",
+    "सिविल सेवा",
+    "प्रारंभिक परीक्षा",
+    "मुख्य परीक्षा",
+    "करंट अफेयर्स",
+    "भारतीय राजव्यवस्था"
+   ],
+   "channels": [
+    {
+     "handle": "@StudyIQEducationLtd",
+     "name": "StudyIQ IAS",
+     "language": "hi"
+    },
+    {
+     "handle": "@studyiqiasenglish",
+     "name": "StudyIQ IAS English",
+     "language": "en"
+    },
+    {
+     "handle": "@DrishtiIASvideos",
+     "name": "Drishti IAS",
+     "language": "hi"
+    },
+    {
+     "handle": "@DrishtiIASEnglish",
+     "name": "Drishti IAS English",
+     "language": "en"
+    },
+    {
+     "channelId": "UCV1lbzgZNcYFAT3VHKOb7Cg",
+     "handle": "@UnacademyUPSC101",
+     "name": "Unacademy UPSC",
+     "language": "hi"
+    },
+    {
+     "handle": "@SansadTV",
+     "name": "Sansad TV",
+     "language": "hi"
+    },
+    {
+     "handle": "@pibindia",
+     "name": "PIB India",
+     "language": "en"
+    },
+    {
+     "channelId": "UCw4wosjC-DKq95xI5klz92w",
+     "handle": "@VisionIASdelhi",
+     "name": "VisionIAS",
+     "language": "en"
+    },
+    {
+     "channelId": "UCwDfgcUkKKTxPozU9UnQ8Pw",
+     "handle": "@TheMrunalPatel",
+     "name": "Mrunal Patel",
+     "language": "en"
+    },
+    {
+     "handle": "@clearias",
+     "name": "ClearIAS",
+     "language": "en"
+    },
+    {
+     "channelId": "UChvbVdio9Wgj7Z3nQz1Q0ZQ",
+     "handle": "@IASbaba_Official",
+     "name": "IASbaba",
+     "language": "en"
+    },
+    {
+     "channelId": "UCzuYmh_kQUpJpguQCwLKoPg",
+     "handle": "@ForumIASOfficial",
+     "name": "ForumIAS",
+     "language": "en"
+    },
+    {
+     "channelId": "UCgKgAaGbKS-XWUJGWqP5W0A",
+     "handle": "@nextias",
+     "name": "NEXT IAS",
+     "language": "en"
+    },
+    {
+     "channelId": "UCzelA5kqD9v6k6drK44l4_g",
+     "handle": "@VajiramandRaviOfficial",
+     "name": "Vajiram & Ravi Official",
+     "language": "en"
+    },
+    {
+     "channelId": "UCgRf62bnK3uX4N-YEhG4Jog",
+     "handle": "@SleepyClassesIAS",
+     "name": "Sleepy Classes IAS",
+     "language": "en"
+    },
+    {
+     "channelId": "UCh4f3NyOzqGwZfwTSX78QfQ",
+     "handle": "@OnlyIasnothingelse",
+     "name": "PW OnlyIAS",
+     "language": "en"
+    },
+    {
+     "channelId": "UC1pfsmDBnMQB8sOuQvmTvRQ",
+     "handle": "@BYJUSIAS",
+     "name": "BYJU'S IAS",
+     "language": "en"
+    },
+    {
+     "channelId": "UCWdeyiTcwjboM3qLcBPJThQ",
+     "handle": "@rausias1953",
+     "name": "Rau's IAS Study Circle",
+     "language": "en"
+    },
+    {
+     "channelId": "UCpoccbCX9GEIwaiIe4HLjwA",
+     "handle": "@Insights_IAS",
+     "name": "INSIGHTSIAS",
+     "language": "en"
+    },
+    {
+     "channelId": "UCMXdi-xFPcZV2tDXlHuZHgw",
+     "handle": "@DhyeyaTV",
+     "name": "Dhyeya TV (Dhyeya IAS)",
+     "language": "hi"
+    },
+    {
+     "channelId": "UC58IAk1i-6d5XgHZG4NnffA",
+     "handle": "@SANSKRITIIAS",
+     "name": "Sanskriti IAS",
+     "language": "hi"
+    },
+    {
+     "channelId": "UC7krt1E6XvrywJBu0ZOyq3Q",
+     "handle": "@khanglobalstudies",
+     "name": "Khan Global Studies",
+     "language": "hi"
+    },
+    {
+     "channelId": "UCatL-c6pmnjzEOHSyjn-sHA",
+     "handle": "@khangsresearchcentre1685",
+     "name": "Khan GS Research Centre",
+     "language": "hi"
+    },
+    {
+     "handle": "@NCERTOFFICIAL",
+     "name": "NCERT Official",
+     "language": "hi"
+    }
+   ]
+  },
+  {
+   "id": "in_state_psc",
+   "kind": "study",
+   "name": {
+    "en": "State Public Service Commission exams (group)",
+    "hi": "राज्य लोक सेवा आयोग परीक्षाएं"
+   },
+   "countries": [
+    "IN"
+   ],
+   "languages": [
+    "hi",
+    "en",
+    "ta",
+    "mr",
+    "bn",
+    "kn",
+    "ml",
+    "te",
+    "gu"
+   ],
+   "subjects": [
+    "State GS",
+    "State history, geography, economy",
+    "Current affairs",
+    "Aptitude",
+    "Regional language"
+   ],
+   "keywords": [
+    "psc",
+    "pcs",
+    "bpsc",
+    "uppsc",
+    "rpsc",
+    "ras",
+    "mppsc",
+    "mpsc",
+    "tnpsc",
+    "group 1",
+    "group 2",
+    "kpsc",
+    "kerala psc",
+    "wbcs",
+    "appsc",
+    "tspsc",
+    "hpsc",
+    "ukpsc",
+    "cgpsc",
+    "opsc",
+    "gpsc",
+    "jpsc",
+    "state gk",
+    "rajasthan gk",
+    "bihar gk",
+    "up gk",
+    "mp gk",
+    "current affairs",
+    "previous year questions",
+    "pyq",
+    "lok sewa",
+    "राज्य सेवा",
+    "प्रारंभिक परीक्षा",
+    "मुख्य परीक्षा"
+   ],
+   "channels": [
+    {
+     "handle": "@DrishtiIASvideos",
+     "name": "Drishti IAS",
+     "language": "hi"
+    },
+    {
+     "channelId": "UCsEHYlZjY9LYIIvEsynL_yQ",
+     "handle": "@Drishtiuppcsvideo",
+     "name": "Drishti PCS",
+     "language": "hi"
+    },
+    {
+     "handle": "@StudyIQEducationLtd",
+     "name": "StudyIQ IAS",
+     "language": "hi"
+    },
+    {
+     "channelId": "UC-dqsmy1qOtU06d3-U896lQ",
+     "handle": "@StudyIQPCSofficial",
+     "name": "StudyIQ PCS",
+     "language": "hi"
+    },
+    {
+     "channelId": "UCatL-c6pmnjzEOHSyjn-sHA",
+     "handle": "@khangsresearchcentre1685",
+     "name": "Khan GS Research Centre",
+     "language": "hi"
+    },
+    {
+     "channelId": "UC7krt1E6XvrywJBu0ZOyq3Q",
+     "handle": "@khanglobalstudies",
+     "name": "Khan Global Studies",
+     "language": "hi"
+    },
+    {
+     "channelId": "UCLuBF4Xr1-BIpcpFFm7zp7w",
+     "handle": "@UTKARSHCLASSES13",
+     "name": "Utkarsh Classes",
+     "language": "hi"
+    },
+    {
+     "channelId": "UCUXLSXXkXRoPZw6jLeGVpRQ",
+     "handle": "@SpringboardAcademyOnline",
+     "name": "Springboard Academy",
+     "language": "hi"
+    },
+    {
+     "handle": "@Exampur__Official",
+     "name": "Exampur",
+     "language": "hi"
+    },
+    {
+     "handle": "@adda247",
+     "name": "Adda247",
+     "language": "hi"
+    },
+    {
+     "channelId": "UCrthsrCaRSnnUC42FyyoNHw",
+     "handle": "@suresh_ias_academy",
+     "name": "Suresh IAS Academy",
+     "language": "ta"
+    },
+    {
+     "channelId": "UCj0t9VmB-FNrXuVJJCW7etw",
+     "handle": "@ShankarIASAcademyVideos",
+     "name": "Shankar IAS Academy",
+     "language": "en"
+    },
+    {
+     "channelId": "UC92gfU5reJoxoQkLO9p4BPw",
+     "handle": "@UnacademyLiveMPSC",
+     "name": "Unacademy MPSC",
+     "language": "mr"
+    },
+    {
+     "channelId": "UC9VKXPGzRIs9raMlCwzljtA",
+     "handle": "@entriapp",
+     "name": "Entri Kerala PSC",
+     "language": "ml"
+    }
+   ]
+  },
+  {
+   "id": "in_ssc",
+   "kind": "study",
+   "name": {
+    "en": "SSC CGL / CHSL",
+    "hi": "कर्मचारी चयन आयोग सीजीएल / सीएचएसएल"
+   },
+   "countries": [
+    "IN"
+   ],
+   "languages": [
+    "hi",
+    "en"
+   ],
+   "subjects": [
+    "Quantitative aptitude",
+    "Reasoning",
+    "English",
+    "General awareness",
+    "Computer knowledge"
+   ],
+   "keywords": [
+    "ssc",
+    "ssc cgl",
+    "ssc chsl",
+    "ssc mts",
+    "ssc gd",
+    "cpo",
+    "tier 1",
+    "tier 2",
+    "quantitative aptitude",
+    "maths",
+    "advance maths",
+    "reasoning",
+    "english grammar",
+    "vocabulary",
+    "one word substitution",
+    "idioms",
+    "static gk",
+    "general awareness",
+    "polity",
+    "history",
+    "geography",
+    "science",
+    "current affairs",
+    "mock test",
+    "previous year questions",
+    "pyq",
+    "tcs pattern",
+    "गणित",
+    "रीजनिंग",
+    "सामान्य ज्ञान",
+    "सामान्य अध्ययन",
+    "पिछले वर्ष के प्रश्न"
+   ],
+   "channels": [
+    {
+     "handle": "@adda247",
+     "name": "Adda247",
+     "language": "hi"
+    },
+    {
+     "channelId": "UCAyYBPzFioHUxvVZEn4rMJA",
+     "handle": "@SSCAdda247",
+     "name": "SSC Adda247",
+     "language": "hi"
+    },
+    {
+     "channelId": "UCgM9qPLv7R-hTRQIGa4wgKA",
+     "handle": "@Testbook",
+     "name": "Testbook",
+     "language": "hi"
+    },
+    {
+     "channelId": "UCl7O3Q1tHsZ12GDIzUaG7mQ",
+     "handle": "@wifistudyStudios",
+     "name": "wifistudy",
+     "language": "hi"
+    },
+    {
+     "handle": "@RojgarwithAnkit",
+     "name": "Rojgar with Ankit",
+     "language": "hi"
+    },
+    {
+     "handle": "@Exampur__Official",
+     "name": "Exampur",
+     "language": "hi"
+    },
+    {
+     "handle": "@Careerwillapp",
+     "name": "Careerwill App",
+     "language": "hi"
+    },
+    {
+     "handle": "@parmarssc",
+     "name": "Parmar SSC",
+     "language": "hi"
+    },
+    {
+     "handle": "@GaganPratapMaths",
+     "name": "Gagan Pratap Maths",
+     "language": "hi"
+    },
+    {
+     "channelId": "UC1Qf-G1tSfsDmVLehoSoSog",
+     "handle": "@AdityaRanjanTalks",
+     "name": "Aditya Ranjan Maths",
+     "language": "hi"
+    },
+    {
+     "channelId": "UCnoFgtSgG9PPAmwzG2P00JA",
+     "handle": "@SelectionWaySSC-StateExams",
+     "name": "SelectionWay SSC (Rankers Gurukul)",
+     "language": "hi"
+    },
+    {
+     "channelId": "UCOyT274gK_v2Xu6TXV5RgtQ",
+     "handle": "@rakeshyadav_sir",
+     "name": "Rakesh Yadav Readers Publication",
+     "language": "hi"
+    },
+    {
+     "handle": "@reasoningbypiyushvarshney",
+     "name": "Reasoning By Piyush Varshney",
+     "language": "hi"
+    },
+    {
+     "channelId": "UCvagVtkTsj3ASMTlhcIc-7A",
+     "handle": "@EnglishWithRaniMam",
+     "name": "English with Rani Mam",
+     "language": "hi"
+    },
+    {
+     "handle": "@DearSir",
+     "name": "Dear Sir",
+     "language": "hi"
+    },
+    {
+     "handle": "@ParchamClasses",
+     "name": "Parcham Classes",
+     "language": "hi"
+    },
+    {
+     "handle": "@ABHINAYMATHS",
+     "name": "Abhinay Maths",
+     "language": "hi"
+    },
+    {
+     "channelId": "UCnRI8GekLC4QPbbJfcuxwlQ",
+     "handle": "@NIMISHABANSAL",
+     "name": "English with Nimisha Bansal",
+     "language": "en"
+    },
+    {
+     "channelId": "UCatL-c6pmnjzEOHSyjn-sHA",
+     "handle": "@khangsresearchcentre1685",
+     "name": "Khan GS Research Centre",
+     "language": "hi"
+    },
+    {
+     "channelId": "UCZWUw4fL9ShDZfxyGYrmPIg",
+     "handle": "@SSCStudyIQ",
+     "name": "StudyIQ Education",
+     "language": "hi"
+    }
+   ]
+  },
+  {
+   "id": "in_banking",
+   "kind": "study",
+   "name": {
+    "en": "Banking exams (IBPS / SBI PO & Clerk, RBI)",
+    "hi": "बैंकिंग परीक्षा (आईबीपीएस / एसबीआई पीओ)"
+   },
+   "countries": [
+    "IN"
+   ],
+   "languages": [
+    "hi",
+    "en"
+   ],
+   "subjects": [
+    "Quantitative aptitude",
+    "Reasoning ability",
+    "English language",
+    "General/banking awareness",
+    "Computer aptitude",
+    "Descriptive writing"
+   ],
+   "keywords": [
+    "ibps",
+    "ibps po",
+    "ibps clerk",
+    "sbi po",
+    "sbi clerk",
+    "rbi grade b",
+    "rbi assistant",
+    "rrb po",
+    "nabard",
+    "lic aao",
+    "prelims",
+    "mains",
+    "puzzles",
+    "seating arrangement",
+    "syllogism",
+    "data interpretation",
+    "simplification",
+    "quadratic equation",
+    "number series",
+    "reading comprehension",
+    "cloze test",
+    "banking awareness",
+    "financial awareness",
+    "static gk",
+    "current affairs",
+    "descriptive",
+    "mock test",
+    "previous year questions",
+    "बैंकिंग",
+    "रीजनिंग पहेली"
+   ],
+   "channels": [
+    {
+     "handle": "@bankersadda",
+     "name": "Bankers Adda",
+     "language": "hi"
+    },
+    {
+     "handle": "@adda247",
+     "name": "Adda247",
+     "language": "hi"
+    },
+    {
+     "channelId": "UCgM9qPLv7R-hTRQIGa4wgKA",
+     "handle": "@Testbook",
+     "name": "Testbook",
+     "language": "hi"
+    },
+    {
+     "channelId": "UCl7O3Q1tHsZ12GDIzUaG7mQ",
+     "handle": "@wifistudyStudios",
+     "name": "wifistudy",
+     "language": "hi"
+    },
+    {
+     "channelId": "UCzARHhsjYS-qcaaIRv5A0mA",
+     "handle": "@BANKINGCHRONICLE20",
+     "name": "Banking Chronicle",
+     "language": "en"
+    },
+    {
+     "channelId": "UCzdgWZfyWtkrlRUrLwWYfbw",
+     "handle": "@bankerswaybyunacademy",
+     "name": "Bankers Way",
+     "language": "hi"
+    },
+    {
+     "channelId": "UCaxFAUkNZp0Ph5D6Tnw77cQ",
+     "handle": "@SmartKeedaOfficial",
+     "name": "Smartkeeda",
+     "language": "en"
+    },
+    {
+     "channelId": "UCiDKcjKocimAO1tVw1XIJ0Q",
+     "handle": "@MahendraGuruvideos",
+     "name": "Mahendras",
+     "language": "hi"
+    },
+    {
+     "channelId": "UC-2Ga6vFz3l4Q-O0jFVnIIg",
+     "handle": "@GuidelyLearn",
+     "name": "Guidely",
+     "language": "en"
+    },
+    {
+     "channelId": "UCbAgKfKahvJFTIZXQahtjag",
+     "handle": "@Bankexamstoday",
+     "name": "Bank Exams Today",
+     "language": "en"
+    },
+    {
+     "channelId": "UCZFj46N4pUDAf-QIBVxo64g",
+     "handle": "@ShuddhDesiBanking",
+     "name": "Shuddh Desi Banking",
+     "language": "hi"
+    },
+    {
+     "channelId": "UCnRI8GekLC4QPbbJfcuxwlQ",
+     "handle": "@NIMISHABANSAL",
+     "name": "English with Nimisha Bansal",
+     "language": "en"
+    },
+    {
+     "channelId": "UCIfCOl43tunZVNYafeC4RQA",
+     "handle": "@reservebankofindia593",
+     "name": "Reserve Bank of India",
+     "language": "en"
+    },
+    {
+     "handle": "@Exampur__Official",
+     "name": "Exampur",
+     "language": "hi"
+    },
+    {
+     "handle": "@Careerwillapp",
+     "name": "Careerwill App",
+     "language": "hi"
+    }
+   ]
+  },
+  {
+   "id": "in_gate",
+   "kind": "study",
+   "name": {
+    "en": "GATE",
+    "hi": "गेट (अभियांत्रिकी स्नातक अभिक्षमता परीक्षा)"
+   },
+   "countries": [
+    "IN"
+   ],
+   "nearby": [
+    "NP",
+    "BD",
+    "LK"
+   ],
+   "languages": [
+    "en",
+    "hi"
+   ],
+   "subjects": [
+    "Engineering mathematics",
+    "General aptitude",
+    "Branch subjects (CS, EC, EE, ME, CE, etc.)"
+   ],
+   "keywords": [
+    "gate",
+    "gate cse",
+    "gate ece",
+    "gate ee",
+    "gate me",
+    "gate civil",
+    "ese",
+    "ies",
+    "engineering mathematics",
+    "general aptitude",
+    "data structures",
+    "algorithms",
+    "operating system",
+    "dbms",
+    "computer networks",
+    "theory of computation",
+    "compiler design",
+    "digital logic",
+    "signals and systems",
+    "control systems",
+    "network theory",
+    "thermodynamics",
+    "fluid mechanics",
+    "strength of materials",
+    "machine design",
+    "structural analysis",
+    "geotechnical",
+    "previous year questions",
+    "gate pyq",
+    "nptel"
+   ],
+   "channels": [
+    {
+     "handle": "@iit",
+     "name": "NPTEL",
+     "language": "en"
+    },
+    {
+     "channelId": "UC9PoSJoftLvEnXT-PtQ5Wtw",
+     "handle": "@GATEWallahbyPW",
+     "name": "GATE Wallah",
+     "language": "hi"
+    },
+    {
+     "channelId": "UCSZ4B14ShWqkXiTHk-YOL_w",
+     "handle": "@Gatecsit-dsai",
+     "name": "Unacademy GATE",
+     "language": "en"
+    },
+    {
+     "channelId": "UCSrLdrCGaVWDSUyrTgqgmOw",
+     "handle": "@MADEEASYEducation",
+     "name": "MADE EASY",
+     "language": "en"
+    },
+    {
+     "channelId": "UCukI6GR31qv8UkgBsZDrRSw",
+     "handle": "@aceengacademy",
+     "name": "ACE Engineering Academy",
+     "language": "en"
+    },
+    {
+     "handle": "@GateSmashers",
+     "name": "Gate Smashers",
+     "language": "hi"
+    },
+    {
+     "channelId": "UCJjC1hn78yZqTf0vdTC6wAQ",
+     "handle": "@ravindrababu_ravula",
+     "name": "Ravindrababu Ravula",
+     "language": "en"
+    },
+    {
+     "handle": "@nesoacademy",
+     "name": "Neso Academy",
+     "language": "en"
+    },
+    {
+     "channelId": "UCA6yfpYhy5sWMjRGOT-OAIQ",
+     "handle": "@KNOWLEDGEGATE_kg",
+     "name": "KnowledgeGATE by Sanchit Sir",
+     "language": "hi"
+    },
+    {
+     "channelId": "UCZCFT11CWBi3MHNlGf019nw",
+     "handle": "@abdul_bari",
+     "name": "Abdul Bari",
+     "language": "en"
+    },
+    {
+     "channelId": "UCjLo9uXVaok5YCbDtUW7P4A",
+     "handle": "@Engineers-Academy-India",
+     "name": "Engineers Academy",
+     "language": "en"
+    },
+    {
+     "channelId": "UCnaOzPCUym-vNapCjV2p9Pg",
+     "handle": "@gate_academy",
+     "name": "GATE Academy",
+     "language": "en"
+    },
+    {
+     "channelId": "UCltVEZ6GecWntoZ19FvaWhQ",
+     "handle": "@Ekeeda",
+     "name": "Ekeeda",
+     "language": "en"
+    },
+    {
+     "channelId": "UCka_l-40lJnMtPG1BiwOb7g",
+     "handle": "@IESMaster01",
+     "name": "IES Master",
+     "language": "en"
+    },
+    {
+     "handle": "@mitocw",
+     "name": "MIT OpenCourseWare",
+     "language": "en"
+    },
+    {
+     "channelId": "UCM-yUTYGmrNvKOCcAl21g3w",
+     "handle": "@JennyslecturesCSIT",
+     "name": "Jenny's Lectures CS IT",
+     "language": "en"
+    }
+   ]
+  },
+  {
+   "id": "in_jee",
+   "kind": "study",
+   "name": {
+    "en": "JEE Main / Advanced",
+    "hi": "संयुक्त प्रवेश परीक्षा (जेईई मेन / एडवांस्ड)"
+   },
+   "countries": [
+    "IN"
+   ],
+   "nearby": [
+    "NP",
+    "BD",
+    "LK",
+    "AE"
+   ],
+   "languages": [
+    "hi",
+    "en"
+   ],
+   "subjects": [
+    "Physics",
+    "Chemistry",
+    "Mathematics"
+   ],
+   "keywords": [
+    "jee",
+    "jee main",
+    "jee advanced",
+    "iit jee",
+    "nta",
+    "physics",
+    "chemistry",
+    "mathematics",
+    "kinematics",
+    "rotational motion",
+    "electrostatics",
+    "current electricity",
+    "modern physics",
+    "optics",
+    "organic chemistry",
+    "inorganic chemistry",
+    "physical chemistry",
+    "chemical bonding",
+    "thermodynamics",
+    "calculus",
+    "integration",
+    "differentiation",
+    "coordinate geometry",
+    "vectors",
+    "probability",
+    "matrices",
+    "complex numbers",
+    "one shot",
+    "pyq",
+    "previous year questions",
+    "ncert",
+    "class 11",
+    "class 12",
+    "मैथ्स",
+    "भौतिकी",
+    "रसायन"
+   ],
+   "channels": [
+    {
+     "handle": "@PhysicsWallah",
+     "name": "Physics Wallah - Alakh Pandey",
+     "language": "hi"
+    },
+    {
+     "channelId": "UCVJU_IChPMOe8RWkdVQjtfQ",
+     "handle": "@PW-JEEWallah",
+     "name": "JEE Wallah",
+     "language": "hi"
+    },
+    {
+     "channelId": "UCcMU5NE1Lmf4Fqpx7n9F3Sw",
+     "handle": "@JEEnexus",
+     "name": "Unacademy JEE",
+     "language": "en"
+    },
+    {
+     "channelId": "UC91RZv71f8p0VV2gaFI07pg",
+     "handle": "@VedantuMath",
+     "name": "Vedantu JEE",
+     "language": "en"
+    },
+    {
+     "channelId": "UCpyc1eTpM1cA3P0ZWym4clw",
+     "handle": "@MohitTyagi",
+     "name": "Mohit Tyagi",
+     "language": "en"
+    },
+    {
+     "channelId": "UCkUI45drrKTWLxy3q3voJRw",
+     "handle": "@ALLENJEE",
+     "name": "ALLEN JEE",
+     "language": "en"
+    },
+    {
+     "channelId": "UCfRxSp1qtic_q06e9HwhxJw",
+     "handle": "@JEEatAakash",
+     "name": "Aakash Institute",
+     "language": "en"
+    },
+    {
+     "channelId": "UCNn75PJi2J5OmZGuLCZGJPg",
+     "handle": "@mathongo",
+     "name": "MathonGo",
+     "language": "en"
+    },
+    {
+     "channelId": "UCgBmfNILAlXmGv3CsJ8oFJA",
+     "handle": "@physicsgalaxyworld",
+     "name": "Physics Galaxy",
+     "language": "en"
+    },
+    {
+     "channelId": "UCd7OIpmiEXf3iu1cir6-PrA",
+     "handle": "@motionkotajee",
+     "name": "Motion JEE",
+     "language": "hi"
+    },
+    {
+     "channelId": "UC6ieIswHA9WInRsa2r88hRw",
+     "handle": "@competishun",
+     "name": "Competishun",
+     "language": "hi"
+    },
+    {
+     "channelId": "UCddnJhXMUxzHoH8AZkZSd8w",
+     "handle": "@eSaral",
+     "name": "eSaral",
+     "language": "hi"
+    },
+    {
+     "handle": "@class12th-jee",
+     "name": "Lakshya JEE",
+     "language": "hi"
+    },
+    {
+     "channelId": "UC7px6OmooQLmsJlYACR_n-A",
+     "handle": "@mohitgoenka99",
+     "name": "Eduniti",
+     "language": "hi"
+    },
+    {
+     "channelId": "UCUFfwnE8oOAvJHD7AMgrTLA",
+     "handle": "@NationalTestingAgency",
+     "name": "National Testing Agency",
+     "language": "en"
+    },
+    {
+     "handle": "@khanacademy",
+     "name": "Khan Academy",
+     "language": "en"
+    },
+    {
+     "handle": "@TheOrganicChemistryTutor",
+     "name": "The Organic Chemistry Tutor",
+     "language": "en"
+    },
+    {
+     "handle": "@NCERTOFFICIAL",
+     "name": "NCERT Official",
+     "language": "hi"
+    }
+   ]
+  },
+  {
+   "id": "in_neet_ug",
+   "kind": "study",
+   "name": {
+    "en": "NEET-UG",
+    "hi": "राष्ट्रीय पात्रता सह प्रवेश परीक्षा (नीट-यूजी)"
+   },
+   "countries": [
+    "IN"
+   ],
+   "nearby": [
+    "NP",
+    "BD"
+   ],
+   "languages": [
+    "hi",
+    "en"
+   ],
+   "subjects": [
+    "Physics",
+    "Chemistry",
+    "Biology (Botany, Zoology)"
+   ],
+   "keywords": [
+    "neet",
+    "neet ug",
+    "nta neet",
+    "aiims",
+    "biology",
+    "botany",
+    "zoology",
+    "human physiology",
+    "genetics",
+    "molecular basis of inheritance",
+    "plant kingdom",
+    "animal kingdom",
+    "cell biology",
+    "ecology",
+    "biotechnology",
+    "reproduction",
+    "physics",
+    "chemistry",
+    "organic chemistry",
+    "inorganic chemistry",
+    "ncert line by line",
+    "ncert",
+    "neet pyq",
+    "previous year questions",
+    "one shot",
+    "class 11",
+    "class 12",
+    "medical entrance",
+    "जीव विज्ञान",
+    "नीट"
+   ],
+   "channels": [
+    {
+     "handle": "@PhysicsWallah",
+     "name": "Physics Wallah - Alakh Pandey",
+     "language": "hi"
+    },
+    {
+     "channelId": "UCD16eo98AXl-9T61Xd711kQ",
+     "handle": "@PW-NEETWallah",
+     "name": "Competition Wallah",
+     "language": "hi"
+    },
+    {
+     "channelId": "UCk19x9BG23f5xkHOzihhclA",
+     "handle": "@prachand-neet",
+     "name": "Yakeen NEET",
+     "language": "hi"
+    },
+    {
+     "channelId": "UCdQwYksctqqiRwqp3PiJMWA",
+     "handle": "@UnacademyNEET",
+     "name": "Unacademy NEET",
+     "language": "en"
+    },
+    {
+     "channelId": "UCS1L9B6Swy1WVXOMWgJuMuw",
+     "handle": "@BiologyNEET",
+     "name": "Vedantu Biotonic",
+     "language": "en"
+    },
+    {
+     "channelId": "UCySvBtI4jMLXp0BT9osvASw",
+     "handle": "@ALLENNEET",
+     "name": "ALLEN NEET",
+     "language": "en"
+    },
+    {
+     "channelId": "UCAPDuc6Kfpe1mKjMX367qmA",
+     "handle": "@Aakash_NEET",
+     "name": "Aakash NEET",
+     "language": "en"
+    },
+    {
+     "handle": "@SeepPahuja",
+     "name": "Seep Pahuja - Unacademy",
+     "language": "hi"
+    },
+    {
+     "channelId": "UCGi2Q4YyKiJFiBOx4cGXsgw",
+     "handle": "@scienceandfuneducation",
+     "name": "Science and Fun",
+     "language": "hi"
+    },
+    {
+     "channelId": "UCD7O0ABXcFzKPTAuUTNCE3A",
+     "handle": "@NEETeSaral",
+     "name": "eSaral NEET",
+     "language": "hi"
+    },
+    {
+     "channelId": "UCPu-I3uoI8Ti8bORaT9YN0A",
+     "handle": "@Arvindarorachemistry",
+     "name": "Arvind Arora",
+     "language": "hi"
+    },
+    {
+     "channelId": "UCWEmndu9aCunQAVCjxsP7jg",
+     "handle": "@class11th-neet",
+     "name": "Arjuna NEET",
+     "language": "hi"
+    },
+    {
+     "channelId": "UCUFfwnE8oOAvJHD7AMgrTLA",
+     "handle": "@NationalTestingAgency",
+     "name": "National Testing Agency",
+     "language": "en"
+    },
+    {
+     "handle": "@NCERTOFFICIAL",
+     "name": "NCERT Official",
+     "language": "hi"
+    },
+    {
+     "handle": "@khanacademy",
+     "name": "Khan Academy",
+     "language": "en"
+    },
+    {
+     "channelId": "UC6QYFutt9cluQ3uSM963_KQ",
+     "handle": "@NinjaNerdOfficial",
+     "name": "Ninja Nerd",
+     "language": "en"
+    },
+    {
+     "handle": "@AmoebaSisters",
+     "name": "Amoeba Sisters",
+     "language": "en"
+    }
+   ]
+  },
+  {
+   "id": "in_cat",
+   "kind": "study",
+   "name": {
+    "en": "CAT (MBA entrance)",
+    "hi": "कैट (सामान्य प्रवेश परीक्षा)"
+   },
+   "countries": [
+    "IN"
+   ],
+   "languages": [
+    "en",
+    "hi"
+   ],
+   "subjects": [
+    "Quantitative ability",
+    "Data interpretation & logical reasoning (DILR)",
+    "Verbal ability & reading comprehension (VARC)"
+   ],
+   "keywords": [
+    "cat",
+    "cat exam",
+    "mba entrance",
+    "iim",
+    "xat",
+    "snap",
+    "nmat",
+    "cmat",
+    "quant",
+    "quantitative aptitude",
+    "arithmetic",
+    "algebra",
+    "geometry",
+    "number system",
+    "dilr",
+    "data interpretation",
+    "logical reasoning",
+    "varc",
+    "reading comprehension",
+    "para jumbles",
+    "para summary",
+    "odd sentence",
+    "verbal ability",
+    "mock analysis",
+    "previous year paper",
+    "cat pyq"
+   ],
+   "channels": [
+    {
+     "channelId": "UCHXQiDwicRon0tRuWj6r9HA",
+     "handle": "@Rodha",
+     "name": "Rodha",
+     "language": "en"
+    },
+    {
+     "channelId": "UCvs8v1B4G9NNWyiZSkPPsXQ",
+     "handle": "@UnacademyCAT",
+     "name": "Unacademy CAT",
+     "language": "en"
+    },
+    {
+     "channelId": "UCA17v3ENpnoN4MWo8sbmM6w",
+     "handle": "@2iimcat",
+     "name": "2IIM CAT Preparation",
+     "language": "en"
+    },
+    {
+     "channelId": "UCjX-3wCGEPW3DzlLR35pB7g",
+     "handle": "@IMS_CAT_MBA",
+     "name": "IMS India",
+     "language": "en"
+    },
+    {
+     "channelId": "UChKZRlNNGsgujbQapH6hp-w",
+     "handle": "@TIME4CAT-MBA",
+     "name": "T.I.M.E.",
+     "language": "en"
+    },
+    {
+     "channelId": "UCXBX0R2Qo6bypx0dj4SHDuQ",
+     "handle": "@CareerLauncher_MBA",
+     "name": "Career Launcher",
+     "language": "en"
+    },
+    {
+     "channelId": "UCjrG4n3cS6y45BfCJjp3boQ",
+     "handle": "@CrackuInexam",
+     "name": "Cracku",
+     "language": "en"
+    },
+    {
+     "channelId": "UCJcXnTkWeIrXavsa_DUzq5w",
+     "handle": "@CatpreparationiQuanta",
+     "name": "iQuanta",
+     "language": "en"
+    },
+    {
+     "channelId": "UCs4yZLnnkdnDh6Qf6yQAQKQ",
+     "handle": "@elitesgridCAT",
+     "name": "Elites Grid",
+     "language": "en"
+    },
+    {
+     "channelId": "UC4eEFUtZeW6iOqH8e9e0CyQ",
+     "handle": "@SumitCatking",
+     "name": "CATKing",
+     "language": "en"
+    },
+    {
+     "channelId": "UCsmRe6dscMAmSn30lknKcJw",
+     "handle": "@handakafunda995",
+     "name": "Handa Ka Funda",
+     "language": "en"
+    },
+    {
+     "channelId": "UCUlwUXDeJgGL4hToJuw_jmQ",
+     "handle": "@hitbullseye",
+     "name": "Hitbullseye",
+     "language": "en"
+    }
+   ]
+  },
+  {
+   "id": "in_clat",
+   "kind": "study",
+   "name": {
+    "en": "CLAT (law entrance)",
+    "hi": "क्लैट (कॉमन लॉ एडमिशन टेस्ट)"
+   },
+   "countries": [
+    "IN"
+   ],
+   "languages": [
+    "en"
+   ],
+   "subjects": [
+    "English",
+    "Current affairs & GK",
+    "Legal reasoning",
+    "Logical reasoning",
+    "Quantitative techniques"
+   ],
+   "keywords": [
+    "clat",
+    "ailet",
+    "law entrance",
+    "nlu",
+    "legal reasoning",
+    "logical reasoning",
+    "legal gk",
+    "constitution",
+    "torts",
+    "contract law",
+    "criminal law",
+    "current affairs",
+    "reading comprehension",
+    "quantitative techniques",
+    "clat pyq",
+    "previous year paper",
+    "mock analysis"
+   ],
+   "channels": [
+    {
+     "channelId": "UCExh058w31k9oQ9TDmxwxpw",
+     "handle": "@LegalEdgeTutorials",
+     "name": "LegalEdge",
+     "language": "en"
+    },
+    {
+     "channelId": "UCBhjpuj0F1oTWFZsPhu7Fcw",
+     "handle": "@UnacademyCLAT",
+     "name": "Unacademy CLAT",
+     "language": "en"
+    },
+    {
+     "channelId": "UCeAB8QHdHxb4dp6o6J-_9-w",
+     "handle": "@ClatPossibleOfficial",
+     "name": "CLAT Possible",
+     "language": "en"
+    },
+    {
+     "channelId": "UCsdI005zSvVAE-ipfVE_How",
+     "handle": "@lawpreptutorialofficial",
+     "name": "Law Prep Tutorial",
+     "language": "en"
+    },
+    {
+     "channelId": "UChXp1WxnWo_Ps-7ybd5OZmQ",
+     "handle": "@PWCLAT",
+     "name": "PW CLAT",
+     "language": "en"
+    }
+   ]
+  },
+  {
+   "id": "in_nda_cds",
+   "kind": "study",
+   "name": {
+    "en": "NDA / CDS (defence entrance)",
+    "hi": "एनडीए / सीडीएस"
+   },
+   "countries": [
+    "IN"
+   ],
+   "nearby": [
+    "NP"
+   ],
+   "languages": [
+    "hi",
+    "en"
+   ],
+   "subjects": [
+    "Mathematics",
+    "General ability (English, GK)",
+    "SSB interview"
+   ],
+   "keywords": [
+    "nda",
+    "cds",
+    "afcat",
+    "capf",
+    "ssb interview",
+    "nda maths",
+    "general ability test",
+    "gat",
+    "english",
+    "gk",
+    "physics",
+    "history",
+    "geography",
+    "polity",
+    "current affairs",
+    "previous year questions",
+    "pyq",
+    "ssb",
+    "oir test",
+    "ppdt",
+    "tat",
+    "wat",
+    "gto"
+   ],
+   "channels": [
+    {
+     "channelId": "UCnH5fsDRMpuxWZZbP-PmcNw",
+     "handle": "@SSBCrackExamsYT",
+     "name": "SSBCrack",
+     "language": "en"
+    },
+    {
+     "channelId": "UCdj90_1REl-8VzxhhwidjAA",
+     "handle": "@major_kalshi_classes",
+     "name": "Major Kalshi Classes",
+     "language": "hi"
+    },
+    {
+     "channelId": "UCqZeVBcZvtRS8XfNjCk-JTw",
+     "handle": "@LearnwithSumitSir",
+     "name": "Learn With Sumit",
+     "language": "hi"
+    },
+    {
+     "channelId": "UC8OCoGX9tmMneOzIFUTWq2Q",
+     "handle": "@DefenceWallahPW",
+     "name": "Defence Wallah",
+     "language": "hi"
+    },
+    {
+     "channelId": "UCUAXVZ40S-oVJo_cVojlbKA",
+     "handle": "@NDAVijaybyUnacademy",
+     "name": "Unacademy NDA",
+     "language": "en"
+    },
+    {
+     "channelId": "UC_ovpykq47grPDSlhzciLYQ",
+     "handle": "@CADETSDEFENCEACADEMY",
+     "name": "Cadets Defence Academy",
+     "language": "hi"
+    },
+    {
+     "channelId": "UCnlNdQg13rbSpSDCq1dU0nw",
+     "handle": "@WarriorsDefenceAcademy",
+     "name": "Warriors Defence Academy",
+     "language": "hi"
+    },
+    {
+     "channelId": "UCS7UIBUDGBnUXyXcV1DyHOg",
+     "handle": "@CenturionDefenceAcademy",
+     "name": "Centurion Defence Academy",
+     "language": "hi"
+    }
+   ]
+  },
+  {
+   "id": "in_cbse_10_12",
+   "kind": "study",
+   "name": {
+    "en": "CBSE Board Class 10 / 12",
+    "hi": "सीबीएसई बोर्ड कक्षा 10 / 12"
+   },
+   "countries": [
+    "IN"
+   ],
+   "nearby": [
+    "NP",
+    "AE",
+    "SA",
+    "QA",
+    "KW",
+    "OM"
+   ],
+   "languages": [
+    "en",
+    "hi"
+   ],
+   "subjects": [
+    "Science",
+    "Mathematics",
+    "Social science",
+    "English",
+    "Hindi",
+    "Physics",
+    "Chemistry",
+    "Biology",
+    "Accountancy",
+    "Economics",
+    "Business studies"
+   ],
+   "keywords": [
+    "cbse",
+    "class 10",
+    "class 12",
+    "board exam",
+    "ncert",
+    "ncert solutions",
+    "sample paper",
+    "previous year questions",
+    "pyq",
+    "one shot",
+    "chapter",
+    "physics",
+    "chemistry",
+    "biology",
+    "maths",
+    "science",
+    "social science",
+    "history",
+    "geography",
+    "civics",
+    "economics",
+    "accountancy",
+    "business studies",
+    "english",
+    "hindi",
+    "important questions",
+    "कक्षा 10",
+    "कक्षा 12",
+    "बोर्ड परीक्षा"
+   ],
+   "channels": [
+    {
+     "channelId": "UCAre7caIM9EvmD-mcSy6VyA",
+     "handle": "@cbsehq1905",
+     "name": "CBSE HQ",
+     "language": "en"
+    },
+    {
+     "handle": "@NCERTOFFICIAL",
+     "name": "NCERT Official",
+     "language": "hi"
+    },
+    {
+     "channelId": "UC3HS6gQ79jjn4xHxogw0HiA",
+     "handle": "@MagnetBrainsEducation",
+     "name": "Magnet Brains",
+     "language": "hi"
+    },
+    {
+     "handle": "@PhysicsWallah",
+     "name": "Physics Wallah - Alakh Pandey",
+     "language": "hi"
+    },
+    {
+     "channelId": "UCMY7ZvLB6-DnuSis_2s37_A",
+     "handle": "@Vedantu9_10",
+     "name": "Vedantu 9 & 10",
+     "language": "en"
+    },
+    {
+     "channelId": "UCdeH0IQxtPy1XKvbb8Kwgqg",
+     "handle": "@ShobhitNirwan17",
+     "name": "Shobhit Nirwan",
+     "language": "hi"
+    },
+    {
+     "channelId": "UC8cEGswq9Oihe96ppLoG9KA",
+     "handle": "@padhleakshay",
+     "name": "Padhle",
+     "language": "hi"
+    },
+    {
+     "channelId": "UC6k0UlWg59GNng1T-3X71DA",
+     "handle": "@NextToppers23",
+     "name": "Next Toppers",
+     "language": "hi"
+    },
+    {
+     "handle": "@DearSir",
+     "name": "Dear Sir",
+     "language": "hi"
+    },
+    {
+     "channelId": "UCGi2Q4YyKiJFiBOx4cGXsgw",
+     "handle": "@scienceandfuneducation",
+     "name": "Science and Fun",
+     "language": "hi"
+    },
+    {
+     "channelId": "UC34qgLijjhpbpFiorTopc-A",
+     "handle": "@ArvindAcademy",
+     "name": "Arvind Academy",
+     "language": "en"
+    },
+    {
+     "handle": "@ExpHub",
+     "name": "ExpHub - Prashant Kirad",
+     "language": "hi"
+    },
+    {
+     "handle": "@Sunlikestudy",
+     "name": "Sunlike Study",
+     "language": "hi"
+    },
+    {
+     "channelId": "UCU0kWLAbhVGxXarmE3b8rHg",
+     "handle": "@khanacademyindia",
+     "name": "Khan Academy India - English",
+     "language": "en"
+    },
+    {
+     "handle": "@khanacademy",
+     "name": "Khan Academy",
+     "language": "en"
+    }
+   ]
+  },
+  {
+   "id": "np_lok_sewa",
+   "kind": "study",
+   "name": {
+    "en": "Lok Sewa Aayog (Public Service Commission) exams",
+    "ne": "लोक सेवा आयोग"
+   },
+   "countries": [
+    "NP"
+   ],
+   "languages": [
+    "ne"
+   ],
+   "subjects": [
+    "General knowledge",
+    "Constitution & governance",
+    "IQ / aptitude",
+    "Current affairs",
+    "Service-specific papers"
+   ],
+   "keywords": [
+    "loksewa",
+    "lok sewa",
+    "lok sewa aayog",
+    "kharidar",
+    "nayab subba",
+    "sakha adhikrit",
+    "adhikrit",
+    "computer operator",
+    "tsc",
+    "shikshak sewa aayog",
+    "nepal police",
+    "nepal army",
+    "bank exam nepal",
+    "nrb",
+    "gk nepal",
+    "constitution of nepal",
+    "iq",
+    "model question",
+    "old question",
+    "लोक सेवा",
+    "खरिदार",
+    "नायब सुब्बा",
+    "शाखा अधिकृत",
+    "सामान्य ज्ञान",
+    "संविधान",
+    "बौद्धिक परीक्षण",
+    "पुरानो प्रश्न",
+    "नमुना प्रश्न",
+    "शिक्षक सेवा आयोग"
+   ],
+   "channels": [
+    {
+     "channelId": "UCoyvLy31Ov7QX-KIcWTgwWA",
+     "handle": "@ExamSanjal",
+     "name": "Exam Sanjal",
+     "language": "ne"
+    },
+    {
+     "channelId": "UC8aSNbhBGZjA8MOztyh78CQ",
+     "handle": "@IgnitedNepal",
+     "name": "Ignited Nepal",
+     "language": "ne"
+    },
+    {
+     "channelId": "UCyPr9KIODQt5J1oOGbz44Hg",
+     "handle": "@ReadersNepal",
+     "name": "Readers Nepal",
+     "language": "ne"
+    },
+    {
+     "channelId": "UC982cqWn0aljDSWBRro9UfQ",
+     "handle": "@Bestloksewapreparation",
+     "name": "Loksewa Best Preparation",
+     "language": "ne"
+    },
+    {
+     "channelId": "UC9oVO3tv79Pfwl5nj75afXg",
+     "handle": "@loksewaupdate4614",
+     "name": "Aayog Tayari",
+     "language": "ne"
+    },
+    {
+     "handle": "@sankalploksewabrj",
+     "name": "Sankalp Loksewa",
+     "language": "ne"
+    },
+    {
+     "handle": "@Sakshamlearning",
+     "name": "Saksham Learning",
+     "language": "ne"
+    },
+    {
+     "channelId": "UCZeem6ltyd88EqI6pylFU5Q",
+     "handle": "@loksewagyan",
+     "name": "Loksewa Gyan",
+     "language": "ne"
+    },
+    {
+     "channelId": "UCSFeHpNoMSF-BBgsDtro0zw",
+     "handle": "@HealthLoksewa",
+     "name": "Health Loksewa",
+     "language": "ne"
+    },
+    {
+     "channelId": "UCzVEZe3rvu4j8H06dhf4x-g",
+     "handle": "@aayognepal",
+     "name": "Aayog Nepal",
+     "language": "ne"
+    },
+    {
+     "handle": "@Bestloksupport",
+     "name": "Best Loksewa Support",
+     "language": "ne"
+    }
+   ]
+  },
+  {
+   "id": "np_ioe_entrance",
+   "kind": "study",
+   "name": {
+    "en": "IOE engineering entrance (TU)",
+    "ne": "आईओई इन्जिनियरिङ प्रवेश परीक्षा"
+   },
+   "countries": [
+    "NP"
+   ],
+   "languages": [
+    "ne",
+    "en"
+   ],
+   "subjects": [
+    "Physics",
+    "Chemistry",
+    "Mathematics",
+    "English"
+   ],
+   "keywords": [
+    "ioe",
+    "ioe entrance",
+    "tu ioe",
+    "pulchowk",
+    "engineering entrance nepal",
+    "be entrance",
+    "class 11",
+    "class 12",
+    "neb",
+    "physics",
+    "chemistry",
+    "mathematics",
+    "english",
+    "model question",
+    "old question",
+    "पुरानो प्रश्न",
+    "प्रवेश परीक्षा"
+   ],
+   "channels": [
+    {
+     "handle": "@PhysicsWallah",
+     "name": "Physics Wallah - Alakh Pandey",
+     "language": "hi"
+    },
+    {
+     "channelId": "UCVJU_IChPMOe8RWkdVQjtfQ",
+     "handle": "@PW-JEEWallah",
+     "name": "JEE Wallah",
+     "language": "hi"
+    },
+    {
+     "handle": "@khanacademy",
+     "name": "Khan Academy",
+     "language": "en"
+    }
+   ]
+  },
+  {
+   "id": "np_mbbs_entrance",
+   "kind": "study",
+   "name": {
+    "en": "Medical entrance (MECEE-BL / MBBS)",
+    "ne": "चिकित्सा शिक्षा प्रवेश परीक्षा (MECEE-BL)"
+   },
+   "countries": [
+    "NP"
+   ],
+   "languages": [
+    "ne",
+    "en"
+   ],
+   "subjects": [
+    "Physics",
+    "Chemistry",
+    "Zoology",
+    "Botany",
+    "Mental agility (MAT)"
+   ],
+   "keywords": [
+    "mecee",
+    "mecee-bl",
+    "mbbs entrance",
+    "medical entrance nepal",
+    "mec",
+    "iom entrance",
+    "bsc nursing entrance",
+    "zoology",
+    "botany",
+    "biology",
+    "physics",
+    "chemistry",
+    "mat",
+    "model question",
+    "old question",
+    "neb",
+    "चिकित्सा शिक्षा आयोग",
+    "प्रवेश परीक्षा"
+   ],
+   "channels": [
+    {
+     "handle": "@PhysicsWallah",
+     "name": "Physics Wallah - Alakh Pandey",
+     "language": "hi"
+    },
+    {
+     "channelId": "UCdQwYksctqqiRwqp3PiJMWA",
+     "handle": "@UnacademyNEET",
+     "name": "Unacademy NEET",
+     "language": "en"
+    },
+    {
+     "handle": "@NCERTOFFICIAL",
+     "name": "NCERT Official",
+     "language": "hi"
+    },
+    {
+     "handle": "@AmoebaSisters",
+     "name": "Amoeba Sisters",
+     "language": "en"
+    },
+    {
+     "channelId": "UC6QYFutt9cluQ3uSM963_KQ",
+     "handle": "@NinjaNerdOfficial",
+     "name": "Ninja Nerd",
+     "language": "en"
+    }
+   ]
+  },
+  {
+   "id": "pk_css",
+   "kind": "study",
+   "name": {
+    "en": "CSS (Central Superior Services)",
+    "ur": "سی ایس ایس مقابلے کا امتحان"
+   },
+   "countries": [
+    "PK"
+   ],
+   "languages": [
+    "en",
+    "ur"
+   ],
+   "subjects": [
+    "English essay",
+    "Precis & composition",
+    "General science & ability",
+    "Current affairs",
+    "Pakistan affairs",
+    "Islamic studies",
+    "Optional subjects"
+   ],
+   "keywords": [
+    "css",
+    "pms",
+    "fpsc",
+    "css exam",
+    "mpt",
+    "essay writing",
+    "precis and composition",
+    "pakistan affairs",
+    "current affairs",
+    "islamic studies",
+    "comparative religion",
+    "general science and ability",
+    "international relations",
+    "public administration",
+    "political science",
+    "gender studies",
+    "past papers",
+    "solved past paper",
+    "one paper",
+    "سی ایس ایس",
+    "پاکستان افیئرز",
+    "کرنٹ افیئرز",
+    "اسلامیات"
+   ],
+   "channels": [
+    {
+     "channelId": "UCgHnY6rfInMTufksnpSmqAw",
+     "handle": "@kipscssnetwork",
+     "name": "KIPS CSS Network",
+     "language": "en"
+    },
+    {
+     "channelId": "UCNwTKySqvZw6J9ga0O54f8g",
+     "handle": "@CSSTimes",
+     "name": "CSS Times Pakistan",
+     "language": "ur"
+    },
+    {
+     "channelId": "UCrbditpKFCvaZhT_Wmzl-LA",
+     "handle": "@csspmswithamna919",
+     "name": "CSS PMS With Amna",
+     "language": "ur"
+    },
+    {
+     "handle": "@cssprepakistan",
+     "name": "CSS Prep Pakistan",
+     "language": "en"
+    },
+    {
+     "channelId": "UCptfMx6J5Qiq-WQUtcldITg",
+     "handle": "@MCStudycss",
+     "name": "MC Study CSS",
+     "language": "en"
+    },
+    {
+     "channelId": "UCOQI6tJD3NdRe5K8WI5tkFQ",
+     "handle": "@SelfStudyinPakistan",
+     "name": "Self Study in Pakistan",
+     "language": "ur"
+    },
+    {
+     "channelId": "UCYYoGcuMMfbMrNoWq2d0Law",
+     "handle": "@JWTCSSVideos",
+     "name": "Jahangir's World Times",
+     "language": "ur"
+    },
+    {
+     "channelId": "UCplMtixZJ6pRcrMogBSYvuQ",
+     "handle": "@ilmkidunyaofficial",
+     "name": "Ilmkidunya",
+     "language": "ur"
+    },
+    {
+     "channelId": "UCS9CYANJxdYM78xq4kuOWjA",
+     "handle": "@educatepakistanmuhammadnasir",
+     "name": "Educate Pakistan",
+     "language": "ur"
+    }
+   ]
+  },
+  {
+   "id": "pk_mdcat",
+   "kind": "study",
+   "name": {
+    "en": "MDCAT (medical entrance)",
+    "ur": "ایم ڈی کیٹ"
+   },
+   "countries": [
+    "PK"
+   ],
+   "languages": [
+    "en",
+    "ur"
+   ],
+   "subjects": [
+    "Biology",
+    "Chemistry",
+    "Physics",
+    "English",
+    "Logical reasoning"
+   ],
+   "keywords": [
+    "mdcat",
+    "pmdc",
+    "uhs",
+    "etea",
+    "nums",
+    "mbbs admission",
+    "biology",
+    "chemistry",
+    "physics",
+    "english",
+    "logical reasoning",
+    "fsc",
+    "past papers",
+    "mcqs",
+    "chapter wise",
+    "ایم ڈی کیٹ",
+    "بیالوجی"
+   ],
+   "channels": [
+    {
+     "handle": "@MDCATMentor",
+     "name": "MDCAT Mentor",
+     "language": "ur"
+    },
+    {
+     "channelId": "UCJJJ1f4tF4hXQ0Kd17Qlz7w",
+     "handle": "@KIPSVirtual",
+     "name": "KIPS Education",
+     "language": "ur"
+    },
+    {
+     "channelId": "UCSo-mem2jhGXgRj6PCcAsDw",
+     "handle": "@Nearpeerofficial",
+     "name": "Nearpeer",
+     "language": "ur"
+    },
+    {
+     "channelId": "UCfnVA3TOeDBIeMYr1quObAg",
+     "handle": "@maqsadapp",
+     "name": "Maqsad",
+     "language": "ur"
+    },
+    {
+     "channelId": "UCIrfp0tjWW5QowJCJlsklWQ",
+     "handle": "@sabaqpk",
+     "name": "Sabaq Foundation",
+     "language": "ur"
+    },
+    {
+     "channelId": "UCgj5mRimhblmkvHR-vKzEOQ",
+     "handle": "@STEPLECTURESBYA.K",
+     "name": "STEP (PGC)",
+     "language": "ur"
+    },
+    {
+     "channelId": "UCplMtixZJ6pRcrMogBSYvuQ",
+     "handle": "@ilmkidunyaofficial",
+     "name": "Ilmkidunya",
+     "language": "ur"
+    },
+    {
+     "handle": "@khanacademy",
+     "name": "Khan Academy",
+     "language": "en"
+    },
+    {
+     "handle": "@AmoebaSisters",
+     "name": "Amoeba Sisters",
+     "language": "en"
+    }
+   ]
+  },
+  {
+   "id": "bd_bcs",
+   "kind": "study",
+   "name": {
+    "en": "BCS (Bangladesh Civil Service)",
+    "bn": "বিসিএস পরীক্ষা"
+   },
+   "countries": [
+    "BD"
+   ],
+   "languages": [
+    "bn"
+   ],
+   "subjects": [
+    "Bangla",
+    "English",
+    "Bangladesh affairs",
+    "International affairs",
+    "Mathematical reasoning",
+    "Mental ability",
+    "General science",
+    "ICT",
+    "Ethics"
+   ],
+   "keywords": [
+    "bcs",
+    "bcs preliminary",
+    "bcs written",
+    "bpsc bangladesh",
+    "bank job bd",
+    "ntrca",
+    "primary teacher",
+    "bangla grammar",
+    "bangla literature",
+    "english grammar",
+    "bangladesh affairs",
+    "international affairs",
+    "mental ability",
+    "math",
+    "general science",
+    "ict",
+    "previous questions",
+    "বিসিএস",
+    "প্রিলিমিনারি",
+    "লিখিত",
+    "বাংলা ব্যাকরণ",
+    "বাংলা সাহিত্য",
+    "বাংলাদেশ বিষয়াবলি",
+    "আন্তর্জাতিক বিষয়াবলি",
+    "মানসিক দক্ষতা",
+    "গাণিতিক যুক্তি",
+    "বিগত সালের প্রশ্ন",
+    "চাকরির প্রস্তুতি"
+   ],
+   "channels": [
+    {
+     "channelId": "UCV0HVj0_493DTEwv2TF1pOQ",
+     "handle": "@biddabari",
+     "name": "Biddabari",
+     "language": "bn"
+    },
+    {
+     "channelId": "UC5Lmp82VUimW5iKCv3roC7w",
+     "handle": "@BCSONLINETUTOR",
+     "name": "BCS ONLINE TUTOR",
+     "language": "bn"
+    },
+    {
+     "channelId": "UCVNbSz5dDunAVgt2vChrMqg",
+     "handle": "@ShawonsBangla",
+     "name": "Shawon's Bangla",
+     "language": "bn"
+    },
+    {
+     "channelId": "UCM3dXSn0WcSPvZFioXRElUQ",
+     "handle": "@BCS-Daily",
+     "name": "BCS Daily",
+     "language": "bn"
+    },
+    {
+     "channelId": "UC9g7FhWqVpmSBiYM0eailBw",
+     "handle": "@KhairulsMath",
+     "name": "Khairul's Math",
+     "language": "bn"
+    },
+    {
+     "channelId": "UCMZ_ooBbawdYVvO14htt8HQ",
+     "handle": "@BCSPreliminaryAnalysis",
+     "name": "BCS Preliminary Analysis",
+     "language": "bn"
+    },
+    {
+     "channelId": "UCUBBazm0S7au60QVbpzhe1Q",
+     "name": "bcspedia",
+     "language": "bn"
+    },
+    {
+     "channelId": "UC0rnDMs_kTFsclXfpoZeK-g",
+     "handle": "@Uttoron",
+     "name": "BCS Uttoron",
+     "language": "bn"
+    },
+    {
+     "handle": "@examherobd",
+     "name": "Exam Hero BD",
+     "language": "bn"
+    },
+    {
+     "handle": "@paperless_education",
+     "name": "Paperless Education",
+     "language": "bn"
+    },
+    {
+     "handle": "@10minuteschool",
+     "name": "10 Minute School",
+     "language": "bn"
+    }
+   ]
+  },
+  {
+   "id": "bd_hsc_admission",
+   "kind": "study",
+   "name": {
+    "en": "HSC & university admission (Bangladesh)",
+    "bn": "এইচএসসি ও বিশ্ববিদ্যালয় ভর্তি পরীক্ষা"
+   },
+   "countries": [
+    "BD"
+   ],
+   "languages": [
+    "bn"
+   ],
+   "subjects": [
+    "Physics",
+    "Chemistry",
+    "Higher maths",
+    "Biology",
+    "Bangla",
+    "English",
+    "ICT"
+   ],
+   "keywords": [
+    "hsc",
+    "ssc bangladesh",
+    "admission test",
+    "medical admission",
+    "varsity admission",
+    "buet",
+    "du admission",
+    "physics",
+    "chemistry",
+    "higher math",
+    "biology",
+    "ict",
+    "board question",
+    "এইচএসসি",
+    "ভর্তি পরীক্ষা",
+    "মেডিকেল ভর্তি",
+    "পদার্থবিজ্ঞান",
+    "রসায়ন",
+    "উচ্চতর গণিত",
+    "জীববিজ্ঞান"
+   ],
+   "channels": [
+    {
+     "handle": "@10minuteschool",
+     "name": "10 Minute School",
+     "language": "bn"
+    },
+    {
+     "channelId": "UCUe10_--oNkwLxz9kvkMe5g",
+     "handle": "@UdvashUnmesh",
+     "name": "Udvash Unmesh",
+     "language": "bn"
+    },
+    {
+     "channelId": "UCYfTpKVP5YQ7t7p6_eJhSEQ",
+     "handle": "@Shikho",
+     "name": "Shikho",
+     "language": "bn"
+    },
+    {
+     "channelId": "UCaY3R1U4k0uLPkkz0wj8duA",
+     "handle": "@GhooriLearning",
+     "name": "Ghoori Learning",
+     "language": "bn"
+    }
+   ]
+  },
+  {
+   "id": "us_sat",
+   "kind": "study",
+   "name": {
+    "en": "SAT"
+   },
+   "countries": [
+    "US"
+   ],
+   "nearby": [
+    "IN",
+    "CN",
+    "KR",
+    "AE",
+    "NG",
+    "PK"
+   ],
+   "languages": [
+    "en"
+   ],
+   "subjects": [
+    "Reading and writing",
+    "Math"
+   ],
+   "keywords": [
+    "sat",
+    "digital sat",
+    "psat",
+    "sat math",
+    "sat reading",
+    "sat writing",
+    "bluebook",
+    "desmos",
+    "algebra",
+    "advanced math",
+    "problem solving and data analysis",
+    "geometry and trigonometry",
+    "grammar",
+    "punctuation",
+    "transitions",
+    "rhetorical synthesis",
+    "reading comprehension",
+    "practice test",
+    "official practice test",
+    "college board"
+   ],
+   "channels": [
+    {
+     "handle": "@collegeboard",
+     "name": "College Board",
+     "language": "en"
+    },
+    {
+     "handle": "@khanacademy",
+     "name": "Khan Academy",
+     "language": "en"
+    },
+    {
+     "handle": "@ScalarLearning",
+     "name": "Scalar Learning",
+     "language": "en"
+    },
+    {
+     "handle": "@SupertutorTV",
+     "name": "SupertutorTV",
+     "language": "en"
+    },
+    {
+     "channelId": "UCb7sbqRJV3QfW0-2oVWiBQg",
+     "handle": "@PrepScholar",
+     "name": "PrepScholar",
+     "language": "en"
+    },
+    {
+     "handle": "@ThePrincetonReview",
+     "name": "The Princeton Review",
+     "language": "en"
+    },
+    {
+     "handle": "@KaplanTestPrep",
+     "name": "Kaplan",
+     "language": "en"
+    },
+    {
+     "channelId": "UCZ4sGYJ6l0cgnVNIHY8GY6w",
+     "handle": "@MagooshGRE",
+     "name": "Magoosh",
+     "language": "en"
+    },
+    {
+     "channelId": "UCC7F_3MMCQKSp7QvD-C9xbw",
+     "handle": "@PrepExpert",
+     "name": "Prep Expert",
+     "language": "en"
+    },
+    {
+     "channelId": "UCd-7TV_TXzgnes6I5PQPE7Q",
+     "handle": "@WyzantTutorTed",
+     "name": "Tutor Ted",
+     "language": "en"
+    },
+    {
+     "handle": "@johnpaullozada",
+     "name": "JohnPaul Lozada SAT",
+     "language": "en"
+    }
+   ]
+  },
+  {
+   "id": "us_act",
+   "kind": "study",
+   "name": {
+    "en": "ACT"
+   },
+   "countries": [
+    "US"
+   ],
+   "languages": [
+    "en"
+   ],
+   "subjects": [
+    "English",
+    "Math",
+    "Reading",
+    "Science",
+    "Writing (optional)"
+   ],
+   "keywords": [
+    "act",
+    "act math",
+    "act english",
+    "act reading",
+    "act science",
+    "act writing",
+    "practice test",
+    "grammar",
+    "punctuation",
+    "algebra",
+    "geometry",
+    "trigonometry",
+    "data representation",
+    "research summaries",
+    "conflicting viewpoints",
+    "superscore"
+   ],
+   "channels": [
+    {
+     "channelId": "UCK71x27rzo034iVq5fnVS5A",
+     "handle": "@TheACTTest",
+     "name": "ACT",
+     "language": "en"
+    },
+    {
+     "handle": "@ScalarLearning",
+     "name": "Scalar Learning",
+     "language": "en"
+    },
+    {
+     "handle": "@SupertutorTV",
+     "name": "SupertutorTV",
+     "language": "en"
+    },
+    {
+     "channelId": "UCb7sbqRJV3QfW0-2oVWiBQg",
+     "handle": "@PrepScholar",
+     "name": "PrepScholar",
+     "language": "en"
+    },
+    {
+     "handle": "@ThePrincetonReview",
+     "name": "The Princeton Review",
+     "language": "en"
+    },
+    {
+     "handle": "@KaplanTestPrep",
+     "name": "Kaplan",
+     "language": "en"
+    },
+    {
+     "channelId": "UCZ4sGYJ6l0cgnVNIHY8GY6w",
+     "handle": "@MagooshGRE",
+     "name": "Magoosh",
+     "language": "en"
+    },
+    {
+     "channelId": "UCC7F_3MMCQKSp7QvD-C9xbw",
+     "handle": "@PrepExpert",
+     "name": "Prep Expert",
+     "language": "en"
+    },
+    {
+     "channelId": "UCd-7TV_TXzgnes6I5PQPE7Q",
+     "handle": "@WyzantTutorTed",
+     "name": "Tutor Ted",
+     "language": "en"
+    },
+    {
+     "handle": "@khanacademy",
+     "name": "Khan Academy",
+     "language": "en"
+    }
+   ]
+  },
+  {
+   "id": "us_ap",
+   "kind": "study",
+   "name": {
+    "en": "AP (Advanced Placement)"
+   },
+   "countries": [
+    "US"
+   ],
+   "nearby": [
+    "CA",
+    "IN",
+    "CN",
+    "KR"
+   ],
+   "languages": [
+    "en"
+   ],
+   "subjects": [
+    "Calculus",
+    "Statistics",
+    "Physics",
+    "Chemistry",
+    "Biology",
+    "US/World/European History",
+    "Government",
+    "Economics",
+    "Psychology",
+    "English Lang/Lit",
+    "Computer Science"
+   ],
+   "keywords": [
+    "ap exam",
+    "ap calculus",
+    "ap calc ab",
+    "ap calc bc",
+    "ap statistics",
+    "ap physics",
+    "ap chemistry",
+    "ap biology",
+    "apush",
+    "ap world history",
+    "ap euro",
+    "ap gov",
+    "ap macroeconomics",
+    "ap microeconomics",
+    "ap psychology",
+    "ap lang",
+    "ap lit",
+    "ap computer science",
+    "frq",
+    "free response",
+    "dbq",
+    "leq",
+    "saq",
+    "unit review",
+    "ap classroom",
+    "ap daily"
+   ],
+   "channels": [
+    {
+     "handle": "@advancedplacement",
+     "name": "Advanced Placement",
+     "language": "en"
+    },
+    {
+     "handle": "@khanacademy",
+     "name": "Khan Academy",
+     "language": "en"
+    },
+    {
+     "handle": "@heimlershistory",
+     "name": "Heimler's History",
+     "language": "en"
+    },
+    {
+     "channelId": "UCCQEbqDL8i40d83Au55lYMQ",
+     "handle": "@JacobAClifford",
+     "name": "Jacob Clifford (ACDC Econ)",
+     "language": "en"
+    },
+    {
+     "handle": "@TheOrganicChemistryTutor",
+     "name": "The Organic Chemistry Tutor",
+     "language": "en"
+    },
+    {
+     "handle": "@FlippingPhysics",
+     "name": "Flipping Physics",
+     "language": "en"
+    },
+    {
+     "channelId": "UCEik-U3T6u6JA0XiHLbNbOw",
+     "handle": "@Bozemanscience1",
+     "name": "Bozeman Science",
+     "language": "en"
+    },
+    {
+     "handle": "@AmoebaSisters",
+     "name": "Amoeba Sisters",
+     "language": "en"
+    },
+    {
+     "handle": "@crashcourse",
+     "name": "CrashCourse",
+     "language": "en"
+    },
+    {
+     "handle": "@tomrichey",
+     "name": "Tom Richey",
+     "language": "en"
+    },
+    {
+     "handle": "@ProfessorDaveExplains",
+     "name": "Professor Dave Explains",
+     "language": "en"
+    },
+    {
+     "channelId": "UCxnnTFTsVttnVo190h_-wZw",
+     "handle": "@ThinkFiveable",
+     "name": "Fiveable",
+     "language": "en"
+    },
+    {
+     "channelId": "UC88Pezsxv3IUMAoQGP2w07w",
+     "handle": "@melissamaribel",
+     "name": "Melissa Maribel",
+     "language": "en"
+    },
+    {
+     "channelId": "UCj3EXpr5v35g3peVWnVLoew",
+     "handle": "@tdewitt451",
+     "name": "Tyler DeWitt",
+     "language": "en"
+    },
+    {
+     "handle": "@3blue1brown",
+     "name": "3Blue1Brown",
+     "language": "en"
+    },
+    {
+     "channelId": "UCF6P4oCJGjk7-qgcoueYWZw",
+     "handle": "@MrRaymondSocialStudies",
+     "name": "Mr. Raymond's Civics and Social Studies Academy",
+     "language": "en"
+    }
+   ]
+  },
+  {
+   "id": "us_mcat",
+   "kind": "study",
+   "name": {
+    "en": "MCAT"
+   },
+   "countries": [
+    "US",
+    "CA"
+   ],
+   "languages": [
+    "en"
+   ],
+   "subjects": [
+    "Chem/Phys",
+    "CARS",
+    "Bio/Biochem",
+    "Psych/Soc"
+   ],
+   "keywords": [
+    "mcat",
+    "aamc",
+    "cars",
+    "critical analysis and reasoning",
+    "biochemistry",
+    "amino acids",
+    "enzyme kinetics",
+    "metabolism",
+    "organic chemistry",
+    "general chemistry",
+    "physics",
+    "psychology",
+    "sociology",
+    "behavioral science",
+    "full length",
+    "practice exam",
+    "uworld",
+    "anki",
+    "content review",
+    "passage",
+    "discrete questions"
+   ],
+   "channels": [
+    {
+     "handle": "@KhanAcademyMCATprep",
+     "name": "Khan Academy Medicine / MCAT",
+     "language": "en"
+    },
+    {
+     "channelId": "UClpq_Z9aMQuZDhZU-3XEnUg",
+     "handle": "@JackWestin",
+     "name": "Jack Westin",
+     "language": "en"
+    },
+    {
+     "channelId": "UCFMt9Mv_LMFjhz3T2MIhlFQ",
+     "handle": "@blueprintmcat",
+     "name": "Blueprint MCAT",
+     "language": "en"
+    },
+    {
+     "channelId": "UC143ManQe67vKW2tY5Ls1jw",
+     "name": "AAMC - Official MCAT Prep",
+     "language": "en"
+    },
+    {
+     "handle": "@KaplanTestPrep",
+     "name": "Kaplan",
+     "language": "en"
+    },
+    {
+     "handle": "@ThePrincetonReview",
+     "name": "The Princeton Review",
+     "language": "en"
+    },
+    {
+     "channelId": "UCvNn3nXnH9YEtHEymb7MX6A",
+     "handle": "@Leah4sci",
+     "name": "Leah4sci",
+     "language": "en"
+    },
+    {
+     "channelId": "UC6QYFutt9cluQ3uSM963_KQ",
+     "handle": "@NinjaNerdOfficial",
+     "name": "Ninja Nerd",
+     "language": "en"
+    },
+    {
+     "handle": "@TheOrganicChemistryTutor",
+     "name": "The Organic Chemistry Tutor",
+     "language": "en"
+    },
+    {
+     "handle": "@ProfessorDaveExplains",
+     "name": "Professor Dave Explains",
+     "language": "en"
+    },
+    {
+     "channelId": "UCx7l7GusEB1xMDPGM_TYHeQ",
+     "handle": "@Shemmassian",
+     "name": "Shemmassian Academic Consulting",
+     "language": "en"
+    }
+   ]
+  },
+  {
+   "id": "us_lsat",
+   "kind": "study",
+   "name": {
+    "en": "LSAT"
+   },
+   "countries": [
+    "US",
+    "CA"
+   ],
+   "languages": [
+    "en"
+   ],
+   "subjects": [
+    "Logical reasoning",
+    "Reading comprehension",
+    "Argumentative writing"
+   ],
+   "keywords": [
+    "lsat",
+    "lsac",
+    "logical reasoning",
+    "reading comprehension",
+    "flaw questions",
+    "assumption questions",
+    "necessary assumption",
+    "sufficient assumption",
+    "strengthen",
+    "weaken",
+    "parallel reasoning",
+    "conditional reasoning",
+    "lawhub",
+    "preptest",
+    "lsat writing"
+   ],
+   "channels": [
+    {
+     "channelId": "UCKVQOf1GQy4m-bRO_qXvafg",
+     "handle": "@7sage",
+     "name": "7Sage",
+     "language": "en"
+    },
+    {
+     "channelId": "UCOrXB1JfWrBJoA81nr5A6Gw",
+     "handle": "@LSATDemon",
+     "name": "LSAT Demon",
+     "language": "en"
+    },
+    {
+     "channelId": "UCLikjZKDWEb38BK3md8EOUA",
+     "handle": "@PowerScoreTestPreparation",
+     "name": "PowerScore",
+     "language": "en"
+    },
+    {
+     "handle": "@blueprintprep",
+     "name": "Blueprint Prep",
+     "language": "en"
+    },
+    {
+     "handle": "@KaplanTestPrep",
+     "name": "Kaplan",
+     "language": "en"
+    },
+    {
+     "handle": "@ThePrincetonReview",
+     "name": "The Princeton Review",
+     "language": "en"
+    },
+    {
+     "channelId": "UCFl8cvr-F486qRT_-mwsGEw",
+     "handle": "@LSATLab",
+     "name": "LSAT Lab",
+     "language": "en"
+    }
+   ]
+  },
+  {
+   "id": "us_usmle",
+   "kind": "study",
+   "name": {
+    "en": "USMLE"
+   },
+   "countries": [
+    "US"
+   ],
+   "nearby": [
+    "IN",
+    "PK",
+    "NP",
+    "BD",
+    "EG"
+   ],
+   "languages": [
+    "en"
+   ],
+   "subjects": [
+    "Step 1 (basic sciences)",
+    "Step 2 CK (clinical)",
+    "Step 3"
+   ],
+   "keywords": [
+    "usmle",
+    "step 1",
+    "step 2 ck",
+    "step 3",
+    "nbme",
+    "uworld",
+    "first aid",
+    "pathology",
+    "pharmacology",
+    "physiology",
+    "microbiology",
+    "biochemistry",
+    "immunology",
+    "anatomy",
+    "cardiology",
+    "nephrology",
+    "endocrinology",
+    "neurology",
+    "biostatistics",
+    "ethics",
+    "high yield",
+    "clinical vignette",
+    "img",
+    "fmge",
+    "next exam"
+   ],
+   "channels": [
+    {
+     "channelId": "UC6QYFutt9cluQ3uSM963_KQ",
+     "handle": "@NinjaNerdOfficial",
+     "name": "Ninja Nerd",
+     "language": "en"
+    },
+    {
+     "handle": "@osmosis",
+     "name": "Osmosis from Elsevier",
+     "language": "en"
+    },
+    {
+     "channelId": "UCZaDAUF7UEcRXIFvGZu3O9Q",
+     "handle": "@DirtyMedicine",
+     "name": "Dirty Medicine",
+     "language": "en"
+    },
+    {
+     "handle": "@armandohasudungan",
+     "name": "Armando Hasudungan",
+     "language": "en"
+    },
+    {
+     "channelId": "UCbYmF43dpGHz8gi2ugiXr0Q",
+     "handle": "@lecturiomedical",
+     "name": "Lecturio Medical",
+     "language": "en"
+    },
+    {
+     "channelId": "UC8xEQrU6VhJU6pDZd-GkJWg",
+     "handle": "@ambossmedical",
+     "name": "AMBOSS",
+     "language": "en"
+    },
+    {
+     "channelId": "UCG-iSMVtWbbwDDXgXXypARQ",
+     "handle": "@Medcram",
+     "name": "MedCram",
+     "language": "en"
+    },
+    {
+     "channelId": "UCFq5vPnNRNNNysLrktz4aSw",
+     "handle": "@StrongMed",
+     "name": "Strong Medicine",
+     "language": "en"
+    },
+    {
+     "channelId": "UCJayvjGvKEblkA3KYK1BQQw",
+     "handle": "@khanacademymedicine",
+     "name": "Khan Academy Medicine",
+     "language": "en"
+    },
+    {
+     "channelId": "UCCoMNx7QcSV7cGwx-ydKd6A",
+     "handle": "@physeo-USMLE",
+     "name": "Physeo",
+     "language": "en"
+    }
+   ]
+  },
+  {
+   "id": "us_bar",
+   "kind": "study",
+   "name": {
+    "en": "US bar exam (UBE / NextGen)"
+   },
+   "countries": [
+    "US"
+   ],
+   "languages": [
+    "en"
+   ],
+   "subjects": [
+    "MBE subjects",
+    "MEE essays",
+    "MPT",
+    "NextGen bar"
+   ],
+   "keywords": [
+    "bar exam",
+    "ube",
+    "mbe",
+    "mee",
+    "mpt",
+    "nextgen bar",
+    "contracts",
+    "torts",
+    "civil procedure",
+    "constitutional law",
+    "criminal law",
+    "criminal procedure",
+    "evidence",
+    "real property",
+    "irac",
+    "bar prep",
+    "essay writing",
+    "multistate"
+   ],
+   "channels": [
+    {
+     "channelId": "UC_1cWNNmLeGcTfpWY_9643A",
+     "handle": "@ThemisBarReview",
+     "name": "Themis Bar Review",
+     "language": "en"
+    },
+    {
+     "channelId": "UCFvomGfdLbJg20OREgjqu3w",
+     "handle": "@1BARBRI",
+     "name": "BARBRI",
+     "language": "en"
+    },
+    {
+     "channelId": "UC2DoZ1eZkPd_amNxUMlfNEw",
+     "handle": "@KaplanBarReview",
+     "name": "Kaplan Bar Review",
+     "language": "en"
+    },
+    {
+     "channelId": "UCrklp2vfcxhVVTsqUmErglw",
+     "handle": "@JDAdvising",
+     "name": "JD Advising",
+     "language": "en"
+    },
+    {
+     "channelId": "UC-EfBSCKgm_dZJhHTBc5Mmg",
+     "handle": "@barexamtoolbox",
+     "name": "Bar Exam Toolbox",
+     "language": "en"
+    },
+    {
+     "channelId": "UCwHlQocBSCkopoT159_7tKA",
+     "handle": "@studicata",
+     "name": "Studicata",
+     "language": "en"
+    },
+    {
+     "channelId": "UCVTrDBjyx2YUs-IyqTn2AVg",
+     "handle": "@QuimbeeDotCom",
+     "name": "Quimbee",
+     "language": "en"
+    }
+   ]
+  },
+  {
+   "id": "gb_gcse",
+   "kind": "study",
+   "name": {
+    "en": "GCSE"
+   },
+   "countries": [
+    "GB"
+   ],
+   "nearby": [
+    "IE",
+    "IN",
+    "PK",
+    "AE"
+   ],
+   "languages": [
+    "en"
+   ],
+   "subjects": [
+    "Maths",
+    "English language",
+    "English literature",
+    "Biology",
+    "Chemistry",
+    "Physics",
+    "Combined science",
+    "History",
+    "Geography",
+    "RE",
+    "Computer science",
+    "Languages"
+   ],
+   "keywords": [
+    "gcse",
+    "igcse",
+    "aqa",
+    "edexcel",
+    "ocr",
+    "wjec",
+    "gcse maths",
+    "gcse english",
+    "gcse science",
+    "combined science",
+    "triple science",
+    "biology",
+    "chemistry",
+    "physics",
+    "an inspector calls",
+    "macbeth",
+    "a christmas carol",
+    "jekyll and hyde",
+    "power and conflict",
+    "past paper",
+    "mark scheme",
+    "foundation",
+    "higher tier",
+    "revision",
+    "required practical"
+   ],
+   "channels": [
+    {
+     "channelId": "UCUHkEB7t0eOLmmhhMgiOgvg",
+     "handle": "@BBCBitesizeGCSE",
+     "name": "BBC Bitesize",
+     "language": "en"
+    },
+    {
+     "handle": "@Freesciencelessons",
+     "name": "Freesciencelessons",
+     "language": "en"
+    },
+    {
+     "handle": "@Cognitoedu",
+     "name": "Cognito",
+     "language": "en"
+    },
+    {
+     "handle": "@PrimroseKitten",
+     "name": "Primrose Kitten",
+     "language": "en"
+    },
+    {
+     "handle": "@mrbruff",
+     "name": "Mr Bruff",
+     "language": "en"
+    },
+    {
+     "channelId": "UCEB4IwW-eVk9SxHBIGhrY3w",
+     "handle": "@MrSallesTeachesEnglish",
+     "name": "MrSallesTeachesEnglish",
+     "language": "en"
+    },
+    {
+     "handle": "@corbettmaths",
+     "name": "corbettmaths",
+     "language": "en"
+    },
+    {
+     "channelId": "UCLJnnnahpUYO2tOEcXe1mHA",
+     "handle": "@HEGARTYMATHS",
+     "name": "Hegarty Maths",
+     "language": "en"
+    },
+    {
+     "channelId": "UC0QUAInT0wuRKhnK-vm58KQ",
+     "handle": "@oaknational",
+     "name": "Oak National Academy",
+     "language": "en"
+    },
+    {
+     "channelId": "UCMdb23cYgONtCG-zPaWigog",
+     "handle": "@SciencewithHazel",
+     "name": "Science With Hazel",
+     "language": "en"
+    },
+    {
+     "handle": "@MrEverythingEnglish",
+     "name": "Mr Everything English",
+     "language": "en"
+    },
+    {
+     "channelId": "UCMTFi1ucnMIwFi6QncyoCrA",
+     "handle": "@SnapReviseUK",
+     "name": "SnapRevise",
+     "language": "en"
+    },
+    {
+     "channelId": "UCeUFexWB7xDcw91NzqO--bQ",
+     "handle": "@savemyexams",
+     "name": "Save My Exams",
+     "language": "en"
+    },
+    {
+     "channelId": "UCtOLJIWPWAcxFa37iQOUtOA",
+     "handle": "@MrMcMillanREvis",
+     "name": "Mr McMillan REvis",
+     "language": "en"
+    },
+    {
+     "channelId": "UC0HzEBLlJxlrwBAHJ5S9JQg",
+     "handle": "@craigndave",
+     "name": "Craig 'n' Dave",
+     "language": "en"
+    },
+    {
+     "channelId": "UCTr7jsVuqZdRJDe2Nnvnxvw",
+     "handle": "@mathsgenie7808",
+     "name": "Maths Genie",
+     "language": "en"
+    },
+    {
+     "channelId": "UCxfkOonfIpu6XCba7W0LbcQ",
+     "handle": "@1stClassMaths",
+     "name": "1st Class Maths",
+     "language": "en"
+    }
+   ]
+  },
+  {
+   "id": "gb_a_level",
+   "kind": "study",
+   "name": {
+    "en": "A-levels"
+   },
+   "countries": [
+    "GB"
+   ],
+   "nearby": [
+    "IE",
+    "PK",
+    "LK",
+    "NG",
+    "KE",
+    "IN"
+   ],
+   "languages": [
+    "en"
+   ],
+   "subjects": [
+    "Maths",
+    "Further maths",
+    "Physics",
+    "Chemistry",
+    "Biology",
+    "Economics",
+    "Psychology",
+    "English",
+    "History",
+    "Computer science"
+   ],
+   "keywords": [
+    "a level",
+    "a-level",
+    "as level",
+    "cambridge international",
+    "caie",
+    "aqa",
+    "edexcel",
+    "ocr",
+    "pure maths",
+    "mechanics",
+    "statistics",
+    "further maths",
+    "organic chemistry",
+    "physical chemistry",
+    "biology",
+    "physics",
+    "economics",
+    "psychology",
+    "past paper",
+    "mark scheme",
+    "exam technique",
+    "revision",
+    "required practical"
+   ],
+   "channels": [
+    {
+     "channelId": "UCCgGyPD6MYQcHuMIc-Kv-Uw",
+     "handle": "@TLMaths",
+     "name": "TLMaths",
+     "language": "en"
+    },
+    {
+     "channelId": "UCtuvpPNTY1lKAoaVzBrzcLg",
+     "handle": "@ExamSolutions_Maths",
+     "name": "ExamSolutions",
+     "language": "en"
+    },
+    {
+     "channelId": "UCIVaddFslWk1TFoKNrvh99Q",
+     "handle": "@DrPhysicsA",
+     "name": "DrPhysicsA",
+     "language": "en"
+    },
+    {
+     "channelId": "UCZzatyx-xC-Dl_VVUVHYDYw",
+     "handle": "@PhysicsOnline",
+     "name": "Physics Online",
+     "language": "en"
+    },
+    {
+     "handle": "@AlleryChemistry",
+     "name": "Allery Chemistry",
+     "language": "en"
+    },
+    {
+     "channelId": "UCyl4QJXN9zNapzmKAn-fJgQ",
+     "handle": "@MaChemGuy",
+     "name": "MaChemGuy",
+     "language": "en"
+    },
+    {
+     "channelId": "UCN4caNO-iJ8-4jGB1WOdo9w",
+     "handle": "@MissEstruchBiology",
+     "name": "Miss Estruch",
+     "language": "en"
+    },
+    {
+     "handle": "@Freesciencelessons",
+     "name": "Freesciencelessons",
+     "language": "en"
+    },
+    {
+     "channelId": "UCQbBh9Jn2IjcSPZOiNKJu0g",
+     "handle": "@econplusdal",
+     "name": "EconplusDal",
+     "language": "en"
+    },
+    {
+     "channelId": "UCe83jLdZ3PuqVwAHe6B3U2A",
+     "handle": "@tutor2u-official",
+     "name": "tutor2u",
+     "language": "en"
+    },
+    {
+     "channelId": "UC0HzEBLlJxlrwBAHJ5S9JQg",
+     "handle": "@craigndave",
+     "name": "Craig 'n' Dave",
+     "language": "en"
+    },
+    {
+     "handle": "@mrbruff",
+     "name": "Mr Bruff",
+     "language": "en"
+    },
+    {
+     "channelId": "UCMTFi1ucnMIwFi6QncyoCrA",
+     "handle": "@SnapReviseUK",
+     "name": "SnapRevise",
+     "language": "en"
+    },
+    {
+     "channelId": "UCeUFexWB7xDcw91NzqO--bQ",
+     "handle": "@savemyexams",
+     "name": "Save My Exams",
+     "language": "en"
+    },
+    {
+     "handle": "@PrimroseKitten",
+     "name": "Primrose Kitten",
+     "language": "en"
+    },
+    {
+     "channelId": "UCps4gUjfZsu6-b-7mwK41lg",
+     "handle": "@MrERintoul",
+     "name": "Eliot Rintoul",
+     "language": "en"
+    }
+   ]
+  },
+  {
+   "id": "gb_ucat",
+   "kind": "study",
+   "name": {
+    "en": "UCAT (medical admissions)"
+   },
+   "countries": [
+    "GB"
+   ],
+   "nearby": [
+    "AU",
+    "NZ",
+    "IE"
+   ],
+   "languages": [
+    "en"
+   ],
+   "subjects": [
+    "Verbal reasoning",
+    "Decision making",
+    "Quantitative reasoning",
+    "Situational judgement"
+   ],
+   "keywords": [
+    "ucat",
+    "ucat anz",
+    "verbal reasoning",
+    "decision making",
+    "quantitative reasoning",
+    "situational judgement",
+    "sjt",
+    "medicine interview",
+    "mmi",
+    "medical school application",
+    "personal statement",
+    "bmat"
+   ],
+   "channels": [
+    {
+     "channelId": "UCottWqxLlCDPJBFfKhvl8aQ",
+     "handle": "@OfficialUCAT",
+     "name": "UCAT Official",
+     "language": "en"
+    },
+    {
+     "channelId": "UCWr-EUVsI2Gxv2dbs7yuPmg",
+     "handle": "@MedicMind",
+     "name": "Medic Mind",
+     "language": "en"
+    },
+    {
+     "channelId": "UCXov_HHAK5bOkGedPrJdtNA",
+     "handle": "@TheMedicPortal",
+     "name": "The Medic Portal",
+     "language": "en"
+    },
+    {
+     "channelId": "UCYlwSdpmi_wOQPRcCT7iuvg",
+     "handle": "@6med373",
+     "name": "6med",
+     "language": "en"
+    }
+   ]
+  },
+  {
+   "id": "jp_common_test",
+   "kind": "study",
+   "name": {
+    "en": "University Entrance Common Test",
+    "ja": "大学入学共通テスト"
+   },
+   "countries": [
+    "JP"
+   ],
+   "languages": [
+    "ja"
+   ],
+   "subjects": [
+    "国語",
+    "数学",
+    "英語 (リーディング・リスニング)",
+    "理科",
+    "地理歴史・公民",
+    "情報Ⅰ"
+   ],
+   "keywords": [
+    "共通テスト",
+    "大学入学共通テスト",
+    "センター試験",
+    "大学受験",
+    "二次試験",
+    "過去問",
+    "解説",
+    "数学ⅠA",
+    "数学ⅡBC",
+    "英語リーディング",
+    "英語リスニング",
+    "現代文",
+    "古文",
+    "漢文",
+    "物理",
+    "化学",
+    "生物",
+    "地学",
+    "日本史",
+    "世界史",
+    "地理",
+    "公共",
+    "情報Ⅰ",
+    "模試",
+    "勉強法",
+    "授業"
+   ],
+   "channels": [
+    {
+     "channelId": "UChIH9GgJ13jncOH3qecY18Q",
+     "handle": "@KAWAIJUKUacjp",
+     "name": "河合塾",
+     "language": "ja"
+    },
+    {
+     "handle": "@toshintv",
+     "name": "【公式】東進TV",
+     "language": "ja"
+    },
+    {
+     "channelId": "UCaW8HzSp7F_p0U8xlkasFhA",
+     "handle": "@SUNDAI_prepschool",
+     "name": "駿台",
+     "language": "ja"
+    },
+    {
+     "channelId": "UCXErsls7YWBKrxbSTVvjCBw",
+     "handle": "@takedajuku",
+     "name": "武田塾チャンネル",
+     "language": "ja"
+    },
+    {
+     "channelId": "UCzDd3Byvt91oyf3ggRlTb3A",
+     "handle": "@toaruotoko",
+     "name": "とある男が授業をしてみた",
+     "language": "ja"
+    },
+    {
+     "handle": "@passlabo",
+     "name": "PASSLABO",
+     "language": "ja"
+    },
+    {
+     "channelId": "UCySNyY7ZlIyIeQ0T_8ah4Vg",
+     "handle": "@Stardy",
+     "name": "Stardy 河野玄斗",
+     "language": "ja"
+    },
+    {
+     "channelId": "UCRRvT4AyRUOrnpK4yyCB7mg",
+     "handle": "@yobikou",
+     "name": "YouTube予備校 松原一樹",
+     "language": "ja"
+    },
+    {
+     "channelId": "UCZ3daKzWhRfpCYhfC6qrT-g",
+     "handle": "@Kasanimaro",
+     "name": "カサニマロ",
+     "language": "ja"
+    },
+    {
+     "channelId": "UCqmWJJolqAgjIdLqK3zD1QQ",
+     "handle": "@yobinori",
+     "name": "予備校のノリで学ぶ「大学の数学・物理」",
+     "language": "ja"
+    },
+    {
+     "channelId": "UC57H40XcMcL4Lbp_Uq2MVaQ",
+     "handle": "@SekaChan",
+     "name": "せかチャン",
+     "language": "ja"
+    },
+    {
+     "channelId": "UCOfSkpMdTIgcuhvPShBRKIg",
+     "handle": "@Sukyojuku",
+     "name": "藤原進之介の情報ラボ",
+     "language": "ja"
+    },
+    {
+     "channelId": "UCcj-cHmS0uD91MLjtdiN89Q",
+     "handle": "@TryIT_official",
+     "name": "Try IT (家庭教師のトライ)",
+     "language": "ja"
+    },
+    {
+     "channelId": "UCye8PYMLvXg-h48lTPFwb2w",
+     "handle": "@kantaro1966",
+     "name": "鈴木貫太郎",
+     "language": "ja"
+    }
+   ]
+  },
+  {
+   "id": "kr_suneung",
+   "kind": "study",
+   "name": {
+    "en": "CSAT (Suneung)",
+    "ko": "대학수학능력시험 (수능)"
+   },
+   "countries": [
+    "KR"
+   ],
+   "languages": [
+    "ko"
+   ],
+   "subjects": [
+    "국어",
+    "수학",
+    "영어",
+    "한국사",
+    "탐구 (사회/과학)",
+    "제2외국어"
+   ],
+   "keywords": [
+    "수능",
+    "대학수학능력시험",
+    "모의고사",
+    "기출",
+    "기출문제",
+    "해설",
+    "수학",
+    "국어",
+    "영어",
+    "한국사",
+    "사회탐구",
+    "과학탐구",
+    "6월 모평",
+    "9월 모평",
+    "인강",
+    "개념",
+    "EBS 연계"
+   ],
+   "channels": [
+    {
+     "channelId": "UCDkTanNuZGwYtf-Y6_xBmqw",
+     "handle": "@EBS_i",
+     "name": "EBSi",
+     "language": "ko"
+    },
+    {
+     "channelId": "UCma37fJBlF718VRgGlx4yGA",
+     "handle": "@theMEGASTUDY",
+     "name": "메가스터디",
+     "language": "ko"
+    },
+    {
+     "handle": "@mimac_study",
+     "name": "대성마이맥",
+     "language": "ko"
+    },
+    {
+     "channelId": "UCEv0kqq3WYMjCnJ6AMKYCpg",
+     "handle": "@ETOOS_edu",
+     "name": "이투스",
+     "language": "ko"
+    },
+    {
+     "channelId": "UCdrgKUPCbSV1208y8ly6VQw",
+     "handle": "@kice8471",
+     "name": "한국교육과정평가원",
+     "language": "ko"
+    }
+   ]
+  },
+  {
+   "id": "de_abitur",
+   "kind": "study",
+   "name": {
+    "en": "Abitur",
+    "de": "Abitur"
+   },
+   "countries": [
+    "DE"
+   ],
+   "nearby": [
+    "AT",
+    "CH"
+   ],
+   "languages": [
+    "de"
+   ],
+   "subjects": [
+    "Mathe",
+    "Deutsch",
+    "Englisch",
+    "Physik",
+    "Chemie",
+    "Biologie",
+    "Geschichte",
+    "Politik"
+   ],
+   "keywords": [
+    "abitur",
+    "abi",
+    "abiturvorbereitung",
+    "mathe abi",
+    "analysis",
+    "stochastik",
+    "analytische geometrie",
+    "ableitung",
+    "integral",
+    "deutsch abi",
+    "gedichtanalyse",
+    "erörterung",
+    "physik",
+    "chemie",
+    "biologie",
+    "genetik",
+    "abiturprüfung",
+    "lernen",
+    "erklärt",
+    "matura"
+   ],
+   "channels": [
+    {
+     "channelId": "UCy0FxMgGUlRnkxCoNZUNRQQ",
+     "handle": "@lehrerschmidt",
+     "name": "Lehrerschmidt",
+     "language": "de"
+    },
+    {
+     "channelId": "UCPtUzxTfdaxAmr4ie9bXZVA",
+     "handle": "@MathebyDanielJung",
+     "name": "Daniel Jung",
+     "language": "de"
+    },
+    {
+     "handle": "@MathemaTrick",
+     "name": "MathemaTrick",
+     "language": "de"
+    },
+    {
+     "channelId": "UCaxX8488TqU6bZdcKpxPVvQ",
+     "handle": "@musstewissenMathe",
+     "name": "musstewissen Mathe",
+     "language": "de"
+    },
+    {
+     "handle": "@studyflix",
+     "name": "Studyflix",
+     "language": "de"
+    },
+    {
+     "channelId": "UCsVWpmoRsNAWZb59b6Pt9Kg",
+     "handle": "@MrWissen2goGeschichte",
+     "name": "MrWissen2go Geschichte",
+     "language": "de"
+    },
+    {
+     "channelId": "UCE3vUBi72Mvy1TpPAPoq_9g",
+     "handle": "@sofatutorGmbH",
+     "name": "sofatutor",
+     "language": "de"
+    }
+   ]
+  },
+  {
+   "id": "fr_baccalaureat",
+   "kind": "study",
+   "name": {
+    "en": "Baccalauréat",
+    "fr": "Baccalauréat"
+   },
+   "countries": [
+    "FR"
+   ],
+   "nearby": [
+    "BE",
+    "MA",
+    "SN",
+    "CI",
+    "TN",
+    "DZ",
+    "CM"
+   ],
+   "languages": [
+    "fr"
+   ],
+   "subjects": [
+    "Philosophie",
+    "Français (bac de français)",
+    "Mathématiques",
+    "Physique-chimie",
+    "SVT",
+    "SES",
+    "Histoire-géographie",
+    "Grand oral"
+   ],
+   "keywords": [
+    "bac",
+    "baccalauréat",
+    "bac 2027",
+    "bac de français",
+    "philosophie",
+    "dissertation",
+    "commentaire de texte",
+    "spécialité maths",
+    "physique-chimie",
+    "svt",
+    "ses",
+    "histoire-géographie",
+    "grand oral",
+    "terminale",
+    "première",
+    "révisions",
+    "annales",
+    "corrigé",
+    "cours"
+   ],
+   "channels": [
+    {
+     "channelId": "UCaDqmzanCq4ZYhdEm0Df9Qg",
+     "handle": "@YMONKA",
+     "name": "Yvan Monka",
+     "language": "fr"
+    },
+    {
+     "channelId": "UCL7FXdd8TW0hxNHmzlPlAQQ",
+     "handle": "@lesbonsprofs",
+     "name": "Les Bons Profs",
+     "language": "fr"
+    },
+    {
+     "channelId": "UCDbismsx1l31qVKCiFRWxYA",
+     "handle": "@SchoolMouv",
+     "name": "SchoolMouv",
+     "language": "fr"
+    },
+    {
+     "channelId": "UCR9raBqPQisip_qnuCaUL1w",
+     "handle": "@lumnifr",
+     "name": "Lumni",
+     "language": "fr"
+    },
+    {
+     "channelId": "UCo-O74A4qVz6nq5cfCIee6w",
+     "handle": "@jaicomprisMaths",
+     "name": "Jaicompris Maths",
+     "language": "fr"
+    },
+    {
+     "channelId": "UCp0jxeetANhaifijiK7nkoA",
+     "handle": "@ProfPaulOlivier",
+     "name": "Paul Olivier",
+     "language": "fr"
+    },
+    {
+     "channelId": "UCzWsfWbewv4Hi4Oo8D814Zw",
+     "handle": "@digischool-lycee",
+     "name": "digiSchool",
+     "language": "fr"
+    }
+   ]
+  },
+  {
+   "id": "es_pau",
+   "kind": "study",
+   "name": {
+    "en": "PAU / EBAU (Spain university entrance)",
+    "es": "Prueba de Acceso a la Universidad (PAU / EBAU / Selectividad)"
+   },
+   "countries": [
+    "ES"
+   ],
+   "languages": [
+    "es"
+   ],
+   "subjects": [
+    "Matemáticas",
+    "Lengua castellana",
+    "Historia de España",
+    "Inglés",
+    "Física",
+    "Química",
+    "Biología"
+   ],
+   "keywords": [
+    "selectividad",
+    "ebau",
+    "evau",
+    "pau",
+    "pevau",
+    "bachillerato",
+    "matemáticas ii",
+    "historia de españa",
+    "comentario de texto",
+    "física",
+    "química",
+    "biología",
+    "examen resuelto",
+    "exámenes de años anteriores"
+   ],
+   "channels": [
+    {
+     "handle": "@unicoos",
+     "name": "unicoos",
+     "language": "es"
+    },
+    {
+     "channelId": "UCx2Y_55MBCq3lkc3aOtmAiw",
+     "handle": "@profesor10demates",
+     "name": "Profesor10demates",
+     "language": "es"
+    },
+    {
+     "channelId": "UCTeFgT77A2LNTb05VcCW71Q",
+     "handle": "@BreakingVlad",
+     "name": "Breaking Vlad",
+     "language": "es"
+    },
+    {
+     "handle": "@julioprofe",
+     "name": "julioprofe",
+     "language": "es"
+    }
+   ]
+  },
+  {
+   "id": "waec_wassce",
+   "kind": "study",
+   "name": {
+    "en": "WAEC WASSCE (West Africa)"
+   },
+   "countries": [
+    "NG",
+    "GH",
+    "SL",
+    "LR",
+    "GM"
+   ],
+   "nearby": [
+    "CM"
+   ],
+   "languages": [
+    "en"
+   ],
+   "subjects": [
+    "English language",
+    "Mathematics",
+    "Physics",
+    "Chemistry",
+    "Biology",
+    "Economics",
+    "Government",
+    "Literature",
+    "Accounting"
+   ],
+   "keywords": [
+    "waec",
+    "wassce",
+    "neco",
+    "gce",
+    "bece",
+    "past questions",
+    "objective questions",
+    "theory questions",
+    "english language",
+    "mathematics",
+    "further mathematics",
+    "physics",
+    "chemistry",
+    "biology",
+    "economics",
+    "government",
+    "literature in english",
+    "financial accounting",
+    "commerce",
+    "civic education",
+    "agricultural science",
+    "core maths",
+    "integrated science",
+    "syllabus"
+   ],
+   "channels": [
+    {
+     "channelId": "UCqrEK8bRyShUBI0xggV8b-A",
+     "handle": "@waecghanainfo",
+     "name": "WAEC (official)",
+     "language": "en"
+    },
+    {
+     "handle": "@yourstudypath",
+     "name": "Your Study Path",
+     "language": "en"
+    },
+    {
+     "handle": "@exammajor",
+     "name": "Exam Major",
+     "language": "en"
+    },
+    {
+     "handle": "@O3schools",
+     "name": "O3SCHOOLS",
+     "language": "en"
+    },
+    {
+     "handle": "@Examprep_africa",
+     "name": "ExamPrep Africa",
+     "language": "en"
+    },
+    {
+     "channelId": "UCnVI2W1uKyeD5LridwYQvYw",
+     "handle": "@FlashLearners",
+     "name": "Flashlearners",
+     "language": "en"
+    },
+    {
+     "channelId": "UCXFUIQnv3AbWO-HDQ2-TOHw",
+     "handle": "@MyschoolNigeria",
+     "name": "Myschool Nigeria",
+     "language": "en"
+    },
+    {
+     "handle": "@Afrilearn",
+     "name": "Afrilearn",
+     "language": "en"
+    },
+    {
+     "channelId": "UCjeXQ5VITD6h8_jnQC02VqA",
+     "handle": "@DTWTUTORIALS",
+     "name": "DTW Tutorials",
+     "language": "en"
+    },
+    {
+     "channelId": "UCFDGcTNgADMaBQF1QoJtnNg",
+     "handle": "@gesofficialTV",
+     "name": "Ghana Learning TV",
+     "language": "en"
+    },
+    {
+     "handle": "@khanacademy",
+     "name": "Khan Academy",
+     "language": "en"
+    }
+   ]
+  },
+  {
+   "id": "ng_jamb_utme",
+   "kind": "study",
+   "name": {
+    "en": "JAMB UTME (Nigeria)"
+   },
+   "countries": [
+    "NG"
+   ],
+   "languages": [
+    "en"
+   ],
+   "subjects": [
+    "Use of English",
+    "Mathematics",
+    "Physics",
+    "Chemistry",
+    "Biology",
+    "Economics",
+    "Government",
+    "Literature"
+   ],
+   "keywords": [
+    "jamb",
+    "utme",
+    "post utme",
+    "jamb cbt",
+    "jamb syllabus",
+    "use of english",
+    "the lekki headmaster",
+    "mathematics",
+    "physics",
+    "chemistry",
+    "biology",
+    "economics",
+    "government",
+    "literature in english",
+    "past questions",
+    "cbt practice",
+    "admission"
+   ],
+   "channels": [
+    {
+     "channelId": "UCabKr6uJETOBh2v_AALwOaQ",
+     "handle": "@jambofficialyoutubechannel1340",
+     "name": "JAMB (official)",
+     "language": "en"
+    },
+    {
+     "handle": "@yourstudypath",
+     "name": "Your Study Path",
+     "language": "en"
+    },
+    {
+     "handle": "@exammajor",
+     "name": "Exam Major",
+     "language": "en"
+    },
+    {
+     "handle": "@O3schools",
+     "name": "O3SCHOOLS",
+     "language": "en"
+    },
+    {
+     "handle": "@Examprep_africa",
+     "name": "ExamPrep Africa",
+     "language": "en"
+    },
+    {
+     "handle": "@MedicWealth",
+     "name": "Medic Wealth",
+     "language": "en"
+    },
+    {
+     "channelId": "UCnVI2W1uKyeD5LridwYQvYw",
+     "handle": "@FlashLearners",
+     "name": "Flashlearners",
+     "language": "en"
+    },
+    {
+     "channelId": "UCXFUIQnv3AbWO-HDQ2-TOHw",
+     "handle": "@MyschoolNigeria",
+     "name": "Myschool Nigeria",
+     "language": "en"
+    },
+    {
+     "handle": "@Afrilearn",
+     "name": "Afrilearn",
+     "language": "en"
+    },
+    {
+     "channelId": "UCjeXQ5VITD6h8_jnQC02VqA",
+     "handle": "@DTWTUTORIALS",
+     "name": "DTW Tutorials",
+     "language": "en"
+    },
+    {
+     "handle": "@khanacademy",
+     "name": "Khan Academy",
+     "language": "en"
+    }
+   ]
+  },
+  {
+   "id": "ke_kcse",
+   "kind": "study",
+   "name": {
+    "en": "KCSE (Kenya)",
+    "sw": "Mtihani wa Kitaifa wa KCSE"
+   },
+   "countries": [
+    "KE"
+   ],
+   "nearby": [
+    "UG",
+    "TZ"
+   ],
+   "languages": [
+    "en",
+    "sw"
+   ],
+   "subjects": [
+    "Mathematics",
+    "English",
+    "Kiswahili",
+    "Biology",
+    "Chemistry",
+    "Physics",
+    "Geography",
+    "History",
+    "Business studies",
+    "CRE"
+   ],
+   "keywords": [
+    "kcse",
+    "knec",
+    "kcpe",
+    "kpsea",
+    "kjsea",
+    "cbc",
+    "cbe",
+    "8-4-4",
+    "form 4",
+    "form 3",
+    "past papers",
+    "mocks",
+    "revision",
+    "mathematics",
+    "chemistry",
+    "biology",
+    "physics",
+    "english",
+    "kiswahili",
+    "insha",
+    "fasihi",
+    "set books",
+    "marking scheme"
+   ],
+   "channels": [
+    {
+     "handle": "@ReviseKenya",
+     "name": "Revise Kenya",
+     "language": "en"
+    },
+    {
+     "handle": "@kcseforecast7580",
+     "name": "KCSEFORECAST",
+     "language": "en"
+    },
+    {
+     "channelId": "UCLk-Ys_I0vijUHT_MNWlUpg",
+     "handle": "@SciCliqueKCSE",
+     "name": "SciClique",
+     "language": "en"
+    },
+    {
+     "channelId": "UCJSlJdxrawYs-M23jueFTeQ",
+     "handle": "@ZitAcademy",
+     "name": "ZitAcademy",
+     "language": "en"
+    },
+    {
+     "channelId": "UCQo_Y1DBMVA35NyDu1o6Gnw",
+     "handle": "@examscouncil",
+     "name": "KNEC (official)",
+     "language": "en"
+    },
+    {
+     "handle": "@khanacademy",
+     "name": "Khan Academy",
+     "language": "en"
+    }
+   ]
+  },
+  {
+   "id": "za_nsc_matric",
+   "kind": "study",
+   "name": {
+    "en": "NSC Matric (South Africa)",
+    "af": "Nasionale Senior Sertifikaat (Matriek)"
+   },
+   "countries": [
+    "ZA"
+   ],
+   "nearby": [
+    "NA",
+    "BW",
+    "LS",
+    "SZ"
+   ],
+   "languages": [
+    "en",
+    "af"
+   ],
+   "subjects": [
+    "Mathematics",
+    "Maths literacy",
+    "Physical sciences",
+    "Life sciences",
+    "Accounting",
+    "English HL/FAL",
+    "Afrikaans",
+    "Geography",
+    "History"
+   ],
+   "keywords": [
+    "matric",
+    "nsc",
+    "ieb",
+    "grade 12",
+    "grade 11",
+    "caps",
+    "past papers",
+    "memo",
+    "mathematics",
+    "maths literacy",
+    "physical sciences",
+    "life sciences",
+    "accounting",
+    "business studies",
+    "economics",
+    "geography",
+    "history",
+    "english fal",
+    "afrikaans",
+    "trigonometry",
+    "calculus",
+    "euclidean geometry",
+    "stoichiometry",
+    "matriek",
+    "eksamen"
+   ],
+   "channels": [
+    {
+     "channelId": "UCr_LvRvuqPHHZlh9ArGA-RA",
+     "handle": "@DBESouthAfrica",
+     "name": "Department of Basic Education",
+     "language": "en"
+    },
+    {
+     "channelId": "UC_ayO9NLpGuhCvxnWZ0KwYw",
+     "handle": "@MindsetLearn",
+     "name": "Mindset Learn",
+     "language": "en"
+    },
+    {
+     "channelId": "UCTJq14xRdZHAhWzpf4LntNg",
+     "handle": "@siyavulafoundation",
+     "name": "Siyavula",
+     "language": "en"
+    },
+    {
+     "channelId": "UCRfDNAbcR-Y3T46XiL4Sqsw",
+     "handle": "@kevinmathscience",
+     "name": "Kevinmathscience",
+     "language": "en"
+    },
+    {
+     "channelId": "UCbNeinBP3a-KiMtmki9vNdQ",
+     "handle": "@goon_school",
+     "name": "Goon School",
+     "language": "en"
+    },
+    {
+     "channelId": "UCNj-PW5PUoARU6R0D8y8HZw",
+     "handle": "@acemyexams1",
+     "name": "Ace My Exams",
+     "language": "en"
+    },
+    {
+     "channelId": "UCQsZn3miHmz-S3neLkab_mA",
+     "handle": "@MlungisiNkosi",
+     "name": "Mlungisi Nkosi",
+     "language": "en"
+    },
+    {
+     "channelId": "UCCnhoVcXQFZhIkbqls09X2A",
+     "handle": "@WOZAMATRICS",
+     "name": "Woza Matrics",
+     "language": "en"
+    }
+   ]
+  },
+  {
+   "id": "br_enem",
+   "kind": "study",
+   "name": {
+    "en": "ENEM (Brazil)",
+    "pt": "Exame Nacional do Ensino Médio (ENEM)"
+   },
+   "countries": [
+    "BR"
+   ],
+   "languages": [
+    "pt"
+   ],
+   "subjects": [
+    "Linguagens",
+    "Ciências humanas",
+    "Ciências da natureza",
+    "Matemática",
+    "Redação"
+   ],
+   "keywords": [
+    "enem",
+    "vestibular",
+    "fuvest",
+    "unicamp",
+    "sisu",
+    "redação",
+    "redação nota mil",
+    "matemática",
+    "física",
+    "química",
+    "biologia",
+    "história",
+    "geografia",
+    "filosofia",
+    "sociologia",
+    "linguagens",
+    "literatura",
+    "gramática",
+    "interpretação de texto",
+    "questões do enem",
+    "prova resolvida",
+    "resolução",
+    "aula",
+    "revisão",
+    "ensino médio",
+    "inep"
+   ],
+   "channels": [
+    {
+     "handle": "@ProENEMOficial",
+     "name": "ProEnem",
+     "language": "pt"
+    },
+    {
+     "channelId": "UCT0JugAtGmqiYkwxFZOwAtg",
+     "handle": "@descomplica",
+     "name": "Descomplica",
+     "language": "pt"
+    },
+    {
+     "channelId": "UCWv7JMNjrWlVtkiBmygefHQ",
+     "handle": "@mesalva",
+     "name": "Me Salva!",
+     "language": "pt"
+    },
+    {
+     "channelId": "UCW9_n8p_Byz-4k8wV1tnUBg",
+     "handle": "@professorferretto",
+     "name": "Professor Ferretto",
+     "language": "pt"
+    },
+    {
+     "channelId": "UCvYGE2sOd_g0WgUuqO_bEmg",
+     "handle": "@paulovalim",
+     "name": "Química com Prof. Paulo Valim",
+     "language": "pt"
+    },
+    {
+     "channelId": "UCx7HKmnCIIbRBF2FjAoV0bg",
+     "handle": "@deboraaladim",
+     "name": "Débora Aladim",
+     "language": "pt"
+    },
+    {
+     "channelId": "UC_53VGoH_0XLFmYVpGMvhvg",
+     "handle": "@CursoEnemGratuito",
+     "name": "Curso Enem Gratuito",
+     "language": "pt"
+    },
+    {
+     "channelId": "UCUDJR8h5P28xaN7UBEPo0VQ",
+     "handle": "@stoodibr",
+     "name": "Stoodi",
+     "language": "pt"
+    },
+    {
+     "channelId": "UCsgHWN8lYveMUEWTDheTjZA",
+     "handle": "@brasilescola",
+     "name": "Brasil Escola",
+     "language": "pt"
+    },
+    {
+     "channelId": "UCCTHtVMXy9gQA8X_HOEJA2A",
+     "handle": "@Giscomgiz",
+     "name": "Gis com Giz Matemática",
+     "language": "pt"
+    },
+    {
+     "channelId": "UCjIPRjJZtGhzWD2LrEKOHMA",
+     "handle": "@MatematicaRio",
+     "name": "Matemática Rio",
+     "language": "pt"
+    },
+    {
+     "channelId": "UCwSxSJqGpSRpEsq5-YUbM8g",
+     "handle": "@ProfessorNoslen",
+     "name": "Professor Noslen",
+     "language": "pt"
+    },
+    {
+     "channelId": "UCG-eghyORxNrzSG8FkAWKyw",
+     "handle": "@paulojubilut",
+     "name": "Biologia Total com Prof. Jubilut",
+     "language": "pt"
+    },
+    {
+     "channelId": "UChcAczGVMrjZ7cCTgpVYXRQ",
+     "handle": "@FISICATOTAL",
+     "name": "Física Total",
+     "language": "pt"
+    },
+    {
+     "channelId": "UCzshJ2mSjxhqKFBUXqP49Uw",
+     "handle": "@professorboaro",
+     "name": "Professor Boaro",
+     "language": "pt"
+    },
+    {
+     "channelId": "UCZLyNRqqp2MeFuwuZdbGDJw",
+     "handle": "@equacionamatematica",
+     "name": "Equaciona Matemática",
+     "language": "pt"
+    },
+    {
+     "channelId": "UCPsFqRodwOk0esir1I2qaqQ",
+     "handle": "@okuadrooficial",
+     "name": "Kuadro",
+     "language": "pt"
+    },
+    {
+     "channelId": "UCXBJ_Ef8qfYrwN5cY8W7ziA",
+     "handle": "@sandrocuriodicasdemat",
+     "name": "Sandro Curió",
+     "language": "pt"
+    },
+    {
+     "channelId": "UCzcROM6Epqq7jC0hbElxCJg",
+     "handle": "@inep_oficial",
+     "name": "INEP Oficial",
+     "language": "pt"
+    }
+   ]
+  },
+  {
+   "id": "mx_admision",
+   "kind": "study",
+   "name": {
+    "en": "Mexico university admission (EXANI-II / UNAM / IPN)",
+    "es": "Examen de admisión (EXANI-II / UNAM / IPN)"
+   },
+   "countries": [
+    "MX"
+   ],
+   "languages": [
+    "es"
+   ],
+   "subjects": [
+    "Pensamiento matemático",
+    "Comprensión lectora",
+    "Redacción",
+    "Ciencias",
+    "Historia"
+   ],
+   "keywords": [
+    "exani ii",
+    "ceneval",
+    "examen unam",
+    "examen ipn",
+    "guía unam",
+    "examen de admisión",
+    "pensamiento matemático",
+    "álgebra",
+    "aritmética",
+    "geometría",
+    "comprensión lectora",
+    "redacción indirecta",
+    "física",
+    "química",
+    "biología",
+    "simulador",
+    "reactivos"
+   ],
+   "channels": [
+    {
+     "handle": "@math2me",
+     "name": "math2me",
+     "language": "es"
+    },
+    {
+     "handle": "@julioprofe",
+     "name": "julioprofe",
+     "language": "es"
+    },
+    {
+     "handle": "@MatematicasprofeAlex",
+     "name": "Matemáticas profe Alex",
+     "language": "es"
+    },
+    {
+     "channelId": "UCwScwtu5zVqc_wHtRx9XvDA",
+     "handle": "@danielcarreon",
+     "name": "Daniel Carreón",
+     "language": "es"
+    },
+    {
+     "handle": "@unicoos",
+     "name": "unicoos",
+     "language": "es"
+    },
+    {
+     "channelId": "UCJok4N-aJSFTl63LJ16o9VQ",
+     "handle": "@AcademiaInternet",
+     "name": "Academia Internet",
+     "language": "es"
+    }
+   ]
+  },
+  {
+   "id": "co_saber11",
+   "kind": "study",
+   "name": {
+    "en": "Saber 11 (Colombia)",
+    "es": "Prueba Saber 11 (ICFES)"
+   },
+   "countries": [
+    "CO"
+   ],
+   "languages": [
+    "es"
+   ],
+   "subjects": [
+    "Lectura crítica",
+    "Matemáticas",
+    "Sociales y ciudadanas",
+    "Ciencias naturales",
+    "Inglés"
+   ],
+   "keywords": [
+    "icfes",
+    "saber 11",
+    "pruebas saber",
+    "lectura crítica",
+    "matemáticas",
+    "sociales y ciudadanas",
+    "ciencias naturales",
+    "inglés",
+    "simulacro",
+    "preguntas tipo icfes",
+    "preicfes"
+   ],
+   "channels": [
+    {
+     "channelId": "UC65lkH6BkE0xKxMX7RYmu9g",
+     "handle": "@IcfesOficial",
+     "name": "ICFES",
+     "language": "es"
+    },
+    {
+     "handle": "@julioprofe",
+     "name": "julioprofe",
+     "language": "es"
+    },
+    {
+     "handle": "@MatematicasprofeAlex",
+     "name": "Matemáticas profe Alex",
+     "language": "es"
+    }
+   ]
+  },
+  {
+   "id": "global_ielts",
+   "kind": "study",
+   "name": {
+    "en": "IELTS"
+   },
+   "countries": [
+    "GB",
+    "AU",
+    "CA",
+    "NZ"
+   ],
+   "nearby": [
+    "IN",
+    "NP",
+    "PK",
+    "BD",
+    "LK",
+    "NG",
+    "KE",
+    "CN",
+    "VN",
+    "PH",
+    "BR"
+   ],
+   "languages": [
+    "en"
+   ],
+   "subjects": [
+    "Listening",
+    "Reading",
+    "Writing (Task 1 & 2)",
+    "Speaking"
+   ],
+   "keywords": [
+    "ielts",
+    "ielts academic",
+    "ielts general",
+    "ielts listening",
+    "ielts reading",
+    "ielts writing",
+    "writing task 1",
+    "writing task 2",
+    "ielts speaking",
+    "speaking part 2",
+    "cue card",
+    "band 7",
+    "band 8",
+    "band score",
+    "true false not given",
+    "matching headings",
+    "vocabulary",
+    "grammar",
+    "practice test",
+    "cambridge ielts",
+    "pte",
+    "english test"
+   ],
+   "channels": [
+    {
+     "channelId": "UCcZJFoCjX0S9N4Gcn5tD3SA",
+     "handle": "@IELTSOfficial",
+     "name": "IELTS Official",
+     "language": "en"
+    },
+    {
+     "channelId": "UCOtnu-KKoAbN47IuYMeDPOg",
+     "handle": "@BritishCouncilEnglish",
+     "name": "British Council LearnEnglish",
+     "language": "en"
+    },
+    {
+     "channelId": "UCpUJqrN2xpUHWrAdn7nbuDg",
+     "handle": "@IELTSIDPIndiaOfficial",
+     "name": "IDP IELTS",
+     "language": "en"
+    },
+    {
+     "channelId": "UCglDIsg_Z9mE2oT9hsrbzFA",
+     "handle": "@E2IELTS",
+     "name": "E2 IELTS",
+     "language": "en"
+    },
+    {
+     "handle": "@ieltsliz",
+     "name": "IELTS Liz",
+     "language": "en"
+    },
+    {
+     "channelId": "UCXg7gy4XmPZEGr4kumPNGyQ",
+     "handle": "@Ieltsadvantage",
+     "name": "IELTS Advantage",
+     "language": "en"
+    },
+    {
+     "channelId": "UCiVm8XcbwS8-pcDEa5lFXIA",
+     "handle": "@EnglishSpeakingSuccess",
+     "name": "Keith O'Hare - IELTS Speaking Success",
+     "language": "en"
+    },
+    {
+     "channelId": "UCOtm57EUdtsWqQY7xtfTUBA",
+     "handle": "@AsadYaqubOfficial",
+     "name": "Asad Yaqub",
+     "language": "en"
+    },
+    {
+     "channelId": "UC2bakveoV-5Cp0adALaAHrQ",
+     "handle": "@RossIELTSAcademy",
+     "name": "Ross IELTS Academy",
+     "language": "en"
+    },
+    {
+     "handle": "@EngVid",
+     "name": "engVid",
+     "language": "en"
+    },
+    {
+     "handle": "@bbclearningenglish",
+     "name": "BBC Learning English",
+     "language": "en"
+    },
+    {
+     "channelId": "UC39W_uzNjIAIYrimiKkI-rA",
+     "handle": "@IELTSDaily",
+     "name": "IELTS Daily",
+     "language": "en"
+    },
+    {
+     "channelId": "UCnXqRankqlC47qzXcYMazKA",
+     "handle": "@cambridgeenglishtv",
+     "name": "Cambridge English",
+     "language": "en"
+    }
+   ]
+  },
+  {
+   "id": "global_toefl",
+   "kind": "study",
+   "name": {
+    "en": "TOEFL iBT"
+   },
+   "countries": [
+    "US"
+   ],
+   "nearby": [
+    "IN",
+    "CN",
+    "KR",
+    "JP",
+    "BR",
+    "NP",
+    "PK",
+    "BD"
+   ],
+   "languages": [
+    "en"
+   ],
+   "subjects": [
+    "Reading",
+    "Listening",
+    "Speaking",
+    "Writing"
+   ],
+   "keywords": [
+    "toefl",
+    "toefl ibt",
+    "toefl essentials",
+    "toefl reading",
+    "toefl listening",
+    "toefl speaking",
+    "toefl writing",
+    "integrated writing",
+    "academic discussion",
+    "independent speaking",
+    "practice test",
+    "ets",
+    "english test"
+   ],
+   "channels": [
+    {
+     "channelId": "UCEI_IuJ2jdqjYl0T-k04RLw",
+     "handle": "@TOEFLofficial",
+     "name": "TOEFL (ETS official)",
+     "language": "en"
+    },
+    {
+     "channelId": "UCL0ZOT3eKp4RvKcQyBZJ4bw",
+     "handle": "@TSTPrep",
+     "name": "TST Prep TOEFL",
+     "language": "en"
+    },
+    {
+     "channelId": "UCysg99o8WpfFnFF22fV2NMQ",
+     "handle": "@NoteFullTOEFLMastery",
+     "name": "Notefull TOEFL",
+     "language": "en"
+    },
+    {
+     "channelId": "UCpi4cyj1hTscwo0XRDqlSsA",
+     "handle": "@Toeflresources",
+     "name": "TOEFL Resources (Michael Goodine)",
+     "language": "en"
+    },
+    {
+     "channelId": "UClgEU5L6R4RuWZGd99h7qDA",
+     "handle": "@E2TOEFL",
+     "name": "E2 TOEFL",
+     "language": "en"
+    },
+    {
+     "channelId": "UCHG1wZgWRqyLscd8xE3d6Ng",
+     "handle": "@MagooshTOEFL",
+     "name": "Magoosh TOEFL",
+     "language": "en"
+    },
+    {
+     "channelId": "UC1W8uPihtHiLMwkTv503rlA",
+     "handle": "@BestMyTest",
+     "name": "BestMyTest",
+     "language": "en"
+    },
+    {
+     "handle": "@EngVid",
+     "name": "engVid",
+     "language": "en"
+    }
+   ]
+  },
+  {
+   "id": "global_gre",
+   "kind": "study",
+   "name": {
+    "en": "GRE"
+   },
+   "countries": [
+    "US"
+   ],
+   "nearby": [
+    "IN",
+    "CN",
+    "NP",
+    "BD",
+    "PK",
+    "NG",
+    "IR"
+   ],
+   "languages": [
+    "en"
+   ],
+   "subjects": [
+    "Verbal reasoning",
+    "Quantitative reasoning",
+    "Analytical writing"
+   ],
+   "keywords": [
+    "gre",
+    "gre general",
+    "gre quant",
+    "gre verbal",
+    "text completion",
+    "sentence equivalence",
+    "reading comprehension",
+    "quantitative comparison",
+    "data interpretation",
+    "analytical writing",
+    "issue essay",
+    "vocabulary",
+    "powerprep",
+    "ets"
+   ],
+   "channels": [
+    {
+     "channelId": "UCia8sCkZeAteKBHL5-hNRzA",
+     "handle": "@etsgre9006",
+     "name": "ETS GRE",
+     "language": "en"
+    },
+    {
+     "channelId": "UCktwzce9ncy_K78l1KBZkYQ",
+     "handle": "@gregmattesting",
+     "name": "GregMat",
+     "language": "en"
+    },
+    {
+     "channelId": "UCZ4sGYJ6l0cgnVNIHY8GY6w",
+     "handle": "@MagooshGRE",
+     "name": "Magoosh",
+     "language": "en"
+    },
+    {
+     "channelId": "UClrQI1Oq5vpCbszyssXOVsA",
+     "handle": "@TargetTestPrep",
+     "name": "Target Test Prep",
+     "language": "en"
+    },
+    {
+     "channelId": "UCCvxJPdq-I7Tx2RIpx_v2ng",
+     "handle": "@manhattanprepgre7390",
+     "name": "Manhattan Prep",
+     "language": "en"
+    },
+    {
+     "handle": "@ThePrincetonReview",
+     "name": "The Princeton Review",
+     "language": "en"
+    },
+    {
+     "handle": "@KaplanTestPrep",
+     "name": "Kaplan",
+     "language": "en"
+    },
+    {
+     "channelId": "UCIRZsN8eJEe4jHuITOEcShw",
+     "handle": "@VinceKotchian",
+     "name": "Vince Kotchian",
+     "language": "en"
+    },
+    {
+     "handle": "@Wizako",
+     "name": "Wizako",
+     "language": "en"
+    },
+    {
+     "handle": "@JamboreeEducation",
+     "name": "Jamboree Education",
+     "language": "en"
+    },
+    {
+     "handle": "@khanacademy",
+     "name": "Khan Academy",
+     "language": "en"
+    }
+   ]
+  },
+  {
+   "id": "global_gmat",
+   "kind": "study",
+   "name": {
+    "en": "GMAT (Focus Edition)"
+   },
+   "countries": [
+    "US"
+   ],
+   "nearby": [
+    "IN",
+    "CN",
+    "NG",
+    "GB",
+    "PK"
+   ],
+   "languages": [
+    "en"
+   ],
+   "subjects": [
+    "Quantitative reasoning",
+    "Verbal reasoning",
+    "Data insights"
+   ],
+   "keywords": [
+    "gmat",
+    "gmat focus",
+    "data insights",
+    "quantitative reasoning",
+    "verbal reasoning",
+    "critical reasoning",
+    "reading comprehension",
+    "data sufficiency",
+    "multi-source reasoning",
+    "two-part analysis",
+    "table analysis",
+    "gmat official guide",
+    "mba admissions"
+   ],
+   "channels": [
+    {
+     "channelId": "UCzvWSgQrY0R411BYal4GrCg",
+     "handle": "@WeAreGMAC",
+     "name": "GMAC (official GMAT)",
+     "language": "en"
+    },
+    {
+     "channelId": "UClrQI1Oq5vpCbszyssXOVsA",
+     "handle": "@TargetTestPrep",
+     "name": "Target Test Prep",
+     "language": "en"
+    },
+    {
+     "channelId": "UCCvxJPdq-I7Tx2RIpx_v2ng",
+     "handle": "@manhattanprepgre7390",
+     "name": "Manhattan Prep",
+     "language": "en"
+    },
+    {
+     "channelId": "UC8ORadrSTbAkFQ1gKN3Y6NA",
+     "handle": "@egmat",
+     "name": "e-GMAT",
+     "language": "en"
+    },
+    {
+     "channelId": "UCEIeUiExox8otkETZFC9DKA",
+     "handle": "@gmatclub",
+     "name": "GMAT Club",
+     "language": "en"
+    },
+    {
+     "channelId": "UCRvPnXEZhNzKMHilkVXb3Cw",
+     "handle": "@GMATNinjaTutoring",
+     "name": "GMAT Ninja",
+     "language": "en"
+    },
+    {
+     "channelId": "UCXdHebJzuVP-j9dGRzHQ97Q",
+     "handle": "@Experts_Global",
+     "name": "Experts' Global",
+     "language": "en"
+    },
+    {
+     "channelId": "UCZ4sGYJ6l0cgnVNIHY8GY6w",
+     "handle": "@MagooshGRE",
+     "name": "Magoosh",
+     "language": "en"
+    },
+    {
+     "handle": "@KaplanTestPrep",
+     "name": "Kaplan",
+     "language": "en"
+    },
+    {
+     "handle": "@ThePrincetonReview",
+     "name": "The Princeton Review",
+     "language": "en"
+    },
+    {
+     "handle": "@Wizako",
+     "name": "Wizako",
+     "language": "en"
+    },
+    {
+     "handle": "@JamboreeEducation",
+     "name": "Jamboree Education",
+     "language": "en"
+    }
+   ]
+  },
+  {
+   "id": "global_jlpt",
+   "kind": "study",
+   "name": {
+    "en": "JLPT (Japanese-Language Proficiency Test)",
+    "ja": "日本語能力試験"
+   },
+   "countries": [
+    "JP"
+   ],
+   "nearby": [
+    "CN",
+    "KR",
+    "VN",
+    "NP",
+    "IN",
+    "ID",
+    "PH",
+    "MM",
+    "BR",
+    "US"
+   ],
+   "languages": [
+    "ja",
+    "en"
+   ],
+   "subjects": [
+    "Vocabulary (文字・語彙)",
+    "Grammar (文法)",
+    "Reading (読解)",
+    "Listening (聴解)"
+   ],
+   "keywords": [
+    "jlpt",
+    "n5",
+    "n4",
+    "n3",
+    "n2",
+    "n1",
+    "日本語能力試験",
+    "文法",
+    "語彙",
+    "漢字",
+    "読解",
+    "聴解",
+    "learn japanese",
+    "japanese grammar",
+    "hiragana",
+    "katakana",
+    "kanji",
+    "comprehensible input",
+    "japanese listening practice"
+   ],
+   "channels": [
+    {
+     "channelId": "UCWNkrzmC1XpWFCDBDs2dShA",
+     "handle": "@thejapanfoundation",
+     "name": "Japan Foundation",
+     "language": "ja"
+    },
+    {
+     "handle": "@NHKWORLDJAPAN",
+     "name": "NHK WORLD-JAPAN",
+     "language": "en"
+    },
+    {
+     "channelId": "UCVx6RFaEAg46xfAsD2zz16w",
+     "handle": "@nihongonomori2013",
+     "name": "日本語の森",
+     "language": "ja"
+    },
+    {
+     "channelId": "UC0ox9NuTHYeRys63yZpBFuA",
+     "handle": "@JapanesePod101",
+     "name": "JapanesePod101",
+     "language": "en"
+    },
+    {
+     "channelId": "UCBSyd8tXJoEJKIXfrwkPdbA",
+     "handle": "@JapaneseAmmowithMisa",
+     "name": "Japanese Ammo with Misa",
+     "language": "en"
+    },
+    {
+     "channelId": "UCsHzgQRjPzOz_w4HSrNLIVw",
+     "handle": "@ToKiniAndy",
+     "name": "Tokini Andy",
+     "language": "en"
+    },
+    {
+     "channelId": "UCsXJuG5tSNRr9IwfjMbNvqQ",
+     "handle": "@GameGengo",
+     "name": "Game Gengo",
+     "language": "en"
+    }
+   ]
+  },
+  {
+   "id": "kids_age_2_4",
+   "kind": "kids_age",
+   "name": {
+    "en": "Ages 2-4"
+   },
+   "channels": [
+    {
+     "handle": "@SesameStreet",
+     "name": "Sesame Street",
+     "language": "en"
+    },
+    {
+     "handle": "@msrachel",
+     "name": "Ms Rachel - Toddler Learning Videos",
+     "language": "en"
+    },
+    {
+     "handle": "@SuperSimpleSongs",
+     "name": "Super Simple Songs",
+     "language": "en"
+    },
+    {
+     "handle": "@PBSKIDS",
+     "name": "PBS KIDS",
+     "language": "en"
+    },
+    {
+     "handle": "@cbeebies",
+     "name": "CBeebies",
+     "language": "en"
+    },
+    {
+     "channelId": "UCAOtE1V7Ots4DjM8JLlrYgg",
+     "handle": "@PeppaPigOfficial",
+     "name": "Peppa Pig - Official Channel",
+     "language": "en"
+    },
+    {
+     "handle": "@BlueyOfficialChannel",
+     "name": "Bluey - Official Channel",
+     "language": "en"
+    },
+    {
+     "channelId": "UCj_mFUb-47d9QNiJ5556LjQ",
+     "handle": "@HeyDuggeeOfficial",
+     "name": "Hey Duggee",
+     "language": "en"
+    },
+    {
+     "channelId": "UCDqgSnRMGVx3dP4sn3ATZMA",
+     "handle": "@DanielTigersNeighbourhood",
+     "name": "Daniel Tiger's Neighborhood",
+     "language": "en"
+    },
+    {
+     "channelId": "UCPlwvN0w4qFSP1FllALB92w",
+     "handle": "@Numberblocks",
+     "name": "Numberblocks",
+     "language": "en"
+    },
+    {
+     "channelId": "UC_qs3c0ehDvZkbiEbOj6Drg",
+     "handle": "@officialalphablocks",
+     "name": "Alphablocks",
+     "language": "en"
+    },
+    {
+     "channelId": "UCcdwLMPsaU2ezNSJU1nFoBQ",
+     "handle": "@Pinkfong",
+     "name": "Pinkfong",
+     "language": "en"
+    },
+    {
+     "handle": "@CoComelon",
+     "name": "CoComelon - Nursery Rhymes",
+     "language": "en"
+    },
+    {
+     "channelId": "UCJkWoS4RsldA1coEIot5yDA",
+     "handle": "@MotherGooseClub",
+     "name": "Mother Goose Club",
+     "language": "en"
+    },
+    {
+     "handle": "@BingBunny",
+     "name": "Bing - Official Channel",
+     "language": "en"
+    },
+    {
+     "channelId": "UCtf9cFBJkHVAf2qMqF01xYg",
+     "handle": "@HeyBear",
+     "name": "Hey Bear Sensory",
+     "language": "en"
+    },
+    {
+     "handle": "@Blippi",
+     "name": "Blippi",
+     "language": "en"
+    },
+    {
+     "channelId": "UC0qrcKuayvbMtPj-WXNFylA",
+     "handle": "@thomasandfriends",
+     "name": "Thomas & Friends",
+     "language": "en"
+    },
+    {
+     "channelId": "UCNcdbMyA59zE-Vk668bKWOg",
+     "handle": "@disneyjr",
+     "name": "Disney Junior",
+     "language": "en"
+    },
+    {
+     "channelId": "UCTjqRlLLqGUv2fkklU-Ntiw",
+     "handle": "@OfficialMiffy",
+     "name": "Miffy",
+     "language": "en"
+    }
+   ]
+  },
+  {
+   "id": "kids_age_5_7",
+   "kind": "kids_age",
+   "name": {
+    "en": "Ages 5-7"
+   },
+   "channels": [
+    {
+     "handle": "@PBSKIDS",
+     "name": "PBS KIDS",
+     "language": "en"
+    },
+    {
+     "channelId": "UCPlwvN0w4qFSP1FllALB92w",
+     "handle": "@Numberblocks",
+     "name": "Numberblocks",
+     "language": "en"
+    },
+    {
+     "channelId": "UC_qs3c0ehDvZkbiEbOj6Drg",
+     "handle": "@officialalphablocks",
+     "name": "Alphablocks",
+     "language": "en"
+    },
+    {
+     "channelId": "UCnBdzaRy-Ky9Vh54XJlFz1Q",
+     "handle": "@StorylineOnline",
+     "name": "Storyline Online",
+     "language": "en"
+    },
+    {
+     "channelId": "UCVcQH8A634mauPrGbWs7QlQ",
+     "handle": "@JackHartmann",
+     "name": "Jack Hartmann Kids Music Channel",
+     "language": "en"
+    },
+    {
+     "channelId": "UC8NFs-VWUsyuq4zaYVVMgCQ",
+     "handle": "@ScratchGarden",
+     "name": "Scratch Garden",
+     "language": "en"
+    },
+    {
+     "channelId": "UC2ri4rEb8abnNwXvTjg5ARw",
+     "handle": "@KhanAcademyKids",
+     "name": "Khan Academy Kids",
+     "language": "en"
+    },
+    {
+     "channelId": "UCXVCgDuD_QCkI7gTKU7-tpg",
+     "handle": "@natgeokids",
+     "name": "Nat Geo Kids",
+     "language": "en"
+    },
+    {
+     "handle": "@SciShowKids",
+     "name": "SciShow Kids",
+     "language": "en"
+    },
+    {
+     "channelId": "UCxlJ45KjG4XVcQ_hd8j227A",
+     "handle": "@Peekaboo_Kidz",
+     "name": "Peekaboo Kidz",
+     "language": "en"
+    },
+    {
+     "channelId": "UCXLLQkbYE-G9jYrra7R4Qsw",
+     "handle": "@Octonauts",
+     "name": "Octonauts",
+     "language": "en"
+    },
+    {
+     "channelId": "UCxEmDFo1yUbbxjEb9RjitVA",
+     "handle": "@WildKratts",
+     "name": "Wild Kratts",
+     "language": "en"
+    },
+    {
+     "handle": "@SesameStreet",
+     "name": "Sesame Street",
+     "language": "en"
+    },
+    {
+     "handle": "@BlueyOfficialChannel",
+     "name": "Bluey - Official Channel",
+     "language": "en"
+    },
+    {
+     "channelId": "UC5XMF3Inoi8R9nSI8ChOsdQ",
+     "handle": "@artforkidshub",
+     "name": "Art for Kids Hub",
+     "language": "en"
+    },
+    {
+     "channelId": "UC2YBT7HYqCbbvzu3kKZ3wnw",
+     "handle": "@GoNoodle",
+     "name": "GoNoodle",
+     "language": "en"
+    },
+    {
+     "channelId": "UC5uIZ2KOZZeQDQo_Gsi_qbQ",
+     "handle": "@CosmicKidsYoga",
+     "name": "Cosmic Kids Yoga",
+     "language": "en"
+    },
+    {
+     "channelId": "UCAJnyTWJPpKXuwgWQDdNWrQ",
+     "handle": "@NetflixJr",
+     "name": "Netflix Jr.",
+     "language": "en"
+    },
+    {
+     "channelId": "UCONtPx56PSebXJOxbFv-2jQ",
+     "handle": "@crashcoursekids",
+     "name": "Crash Course Kids",
+     "language": "en"
+    },
+    {
+     "handle": "@cbeebies",
+     "name": "CBeebies",
+     "language": "en"
+    }
+   ]
+  },
+  {
+   "id": "kids_age_8_12",
+   "kind": "kids_age",
+   "name": {
+    "en": "Ages 8-12"
+   },
+   "channels": [
+    {
+     "channelId": "UCXVCgDuD_QCkI7gTKU7-tpg",
+     "handle": "@natgeokids",
+     "name": "Nat Geo Kids",
+     "language": "en"
+    },
+    {
+     "handle": "@TEDEd",
+     "name": "TED-Ed",
+     "language": "en"
+    },
+    {
+     "handle": "@kurzgesagt",
+     "name": "Kurzgesagt - In a Nutshell",
+     "language": "en"
+    },
+    {
+     "handle": "@MarkRober",
+     "name": "Mark Rober",
+     "language": "en"
+    },
+    {
+     "channelId": "UCONtPx56PSebXJOxbFv-2jQ",
+     "handle": "@crashcoursekids",
+     "name": "Crash Course Kids",
+     "language": "en"
+    },
+    {
+     "channelId": "UCZYTClx2T1of7BRZ86-8fow",
+     "handle": "@SciShow",
+     "name": "SciShow",
+     "language": "en"
+    },
+    {
+     "channelId": "UC510QYlOlKNyhy_zdQxnGYw",
+     "handle": "@Simplehistory",
+     "name": "Simple History",
+     "language": "en"
+    },
+    {
+     "channelId": "UCUNYSwNARexFwxXp3oPAtvg",
+     "handle": "@HorribleHistoriesOfficial",
+     "name": "Horrible Histories (official)",
+     "language": "en"
+    },
+    {
+     "channelId": "UCQJDFI9j8UeNoqra37p5OkA",
+     "handle": "@OperationOuch",
+     "name": "Operation Ouch",
+     "language": "en"
+    },
+    {
+     "channelId": "UCA_kqRHsoKxPZ22PPkaGwjA",
+     "handle": "@SpanglerScienceTV",
+     "name": "Steve Spangler Science",
+     "language": "en"
+    },
+    {
+     "channelId": "UCbprhISv-0ReKPPyhf7-Dtw",
+     "handle": "@ScienceMax",
+     "name": "Science Max",
+     "language": "en"
+    },
+    {
+     "channelId": "UCebMFnw6WxozGmqGekJHOJg",
+     "handle": "@freeschool",
+     "name": "Free School",
+     "language": "en"
+    },
+    {
+     "channelId": "UC5XMF3Inoi8R9nSI8ChOsdQ",
+     "handle": "@artforkidshub",
+     "name": "Art for Kids Hub",
+     "language": "en"
+    },
+    {
+     "handle": "@NASA",
+     "name": "NASA",
+     "language": "en"
+    },
+    {
+     "handle": "@khanacademy",
+     "name": "Khan Academy",
+     "language": "en"
+    },
+    {
+     "channelId": "UCJ5dVwsCLKlWuOZyi7WDwfw",
+     "handle": "@brainpop",
+     "name": "BrainPOP",
+     "language": "en"
+    },
+    {
+     "channelId": "UCxlJ45KjG4XVcQ_hd8j227A",
+     "handle": "@Peekaboo_Kidz",
+     "name": "Peekaboo Kidz",
+     "language": "en"
+    },
+    {
+     "handle": "@LEGO",
+     "name": "LEGO",
+     "language": "en"
+    },
+    {
+     "channelId": "UCeiYXex_fwgYDonaTcSIk6w",
+     "handle": "@MinuteEarth",
+     "name": "Minute Earth",
+     "language": "en"
+    }
+   ]
+  },
+  {
+   "id": "classic_1980s",
+   "kind": "kids_classic",
+   "name": {
+    "en": "Classic cartoons: 1980s"
+   },
+   "channels": [
+    {
+     "handle": "@wbkids",
+     "name": "WB Kids",
+     "language": "en"
+    },
+    {
+     "channelId": "UCeY4C8Sbx8B4bIyREPSvORQ",
+     "handle": "@TheSmurfsEnglish",
+     "name": "The Smurfs - Official",
+     "language": "en"
+    },
+    {
+     "channelId": "UCx7b66RpQRLuOXvItxy0Wxg",
+     "handle": "@TransformersHQ",
+     "name": "Transformers Official",
+     "language": "en"
+    },
+    {
+     "channelId": "UC9qgVkKRZUXcgHdf35Z-8dw",
+     "handle": "@MyLittlePonyOfficial",
+     "name": "My Little Pony Official",
+     "language": "en"
+    },
+    {
+     "channelId": "UChRHU6dbz5cpM2qVBK0Omng",
+     "handle": "@carebears",
+     "name": "Care Bears",
+     "language": "en"
+    },
+    {
+     "channelId": "UCTsgmnXbWotzbR36vU0YPrA",
+     "handle": "@tmnt",
+     "name": "Teenage Mutant Ninja Turtles",
+     "language": "en"
+    },
+    {
+     "channelId": "UCgDFVgTnw_W5DftgN2NQApQ",
+     "handle": "@thegarfieldshowofficial",
+     "name": "Garfield",
+     "language": "en"
+    },
+    {
+     "channelId": "UCB0ABGbdSggBXLF0UdN4d5A",
+     "handle": "@MuppetsStudio",
+     "name": "The Muppets",
+     "language": "en"
+    },
+    {
+     "channelId": "UCI-lg_sDdzBtYKVpebqasIA",
+     "handle": "@InspectorGadget",
+     "name": "Inspector Gadget",
+     "language": "en"
+    },
+    {
+     "channelId": "UCURCSaXYhIsnsiK-jFFZg3w",
+     "handle": "@StrawberryShortcake",
+     "name": "Strawberry Shortcake",
+     "language": "en"
+    },
+    {
+     "channelId": "UCK5a-KVUdyEGTG6QQe7Cbnw",
+     "handle": "@alvinandthechipmunks-official",
+     "name": "Alvin and the Chipmunks",
+     "language": "en"
+    }
+   ]
+  },
+  {
+   "id": "classic_1990s",
+   "kind": "kids_classic",
+   "name": {
+    "en": "Classic cartoons: 1990s"
+   },
+   "channels": [
+    {
+     "channelId": "UCMsgXPD3wzzt8RxHJmXH7hQ",
+     "handle": "@cartoonnetwork",
+     "name": "Cartoon Network",
+     "language": "en"
+    },
+    {
+     "channelId": "UCmst562fALOY2cKb4IFgqEg",
+     "handle": "@BoomerangUK",
+     "name": "Boomerang UK",
+     "language": "en"
+    },
+    {
+     "handle": "@Nickelodeon",
+     "name": "Nickelodeon",
+     "language": "en"
+    },
+    {
+     "handle": "@Nicktoons",
+     "name": "Nicktoons",
+     "language": "en"
+    },
+    {
+     "channelId": "UCx27Pkk8plpiosF14qXq-VA",
+     "handle": "@SpongeBobOfficial",
+     "name": "SpongeBob SquarePants Official",
+     "language": "en"
+    },
+    {
+     "handle": "@wbkids",
+     "name": "WB Kids",
+     "language": "en"
+    },
+    {
+     "channelId": "UCyu8StPfZWapR6rfW_JgqcA",
+     "handle": "@dckids",
+     "name": "DC Kids",
+     "language": "en"
+    },
+    {
+     "handle": "@pokemon",
+     "name": "Pokémon (official)",
+     "language": "en"
+    },
+    {
+     "channelId": "UCpgxmlXoDtkYzRQ4cJgCT5A",
+     "handle": "@PowerRangersOfficial",
+     "name": "Power Rangers Official",
+     "language": "en"
+    },
+    {
+     "channelId": "UCSPzXeCRf12qayHCAtuffzw",
+     "handle": "@arthur",
+     "name": "Arthur (PBS KIDS)",
+     "language": "en"
+    },
+    {
+     "channelId": "UCOk55dAgB8VnMlhaTEMeX5A",
+     "handle": "@teletubbies",
+     "name": "Teletubbies",
+     "language": "en"
+    },
+    {
+     "channelId": "UCTn45orVsFOsNZHxAJcZK5g",
+     "handle": "@barney",
+     "name": "Barney",
+     "language": "en"
+    },
+    {
+     "channelId": "UCkAGrHCLFmlK3H2kd6isipg",
+     "handle": "@MrBean",
+     "name": "Mr Bean",
+     "language": "en"
+    },
+    {
+     "channelId": "UCNtOgTAORZDgXE2U6XJAFYQ",
+     "handle": "@Aardman.Official",
+     "name": "Aardman (Wallace & Gromit)",
+     "language": "en"
+    },
+    {
+     "handle": "@disneychannel",
+     "name": "Disney Channel",
+     "language": "en"
+    }
+   ]
+  },
+  {
+   "id": "classic_2000s",
+   "kind": "kids_classic",
+   "name": {
+    "en": "Classic cartoons: 2000s"
+   },
+   "channels": [
+    {
+     "channelId": "UCx27Pkk8plpiosF14qXq-VA",
+     "handle": "@SpongeBobOfficial",
+     "name": "SpongeBob SquarePants Official",
+     "language": "en"
+    },
+    {
+     "channelId": "UC5UxQbRoUOSlDfE6PXpIz0g",
+     "handle": "@avatarthelastairbender",
+     "name": "Avatar: The Last Airbender",
+     "language": "en"
+    },
+    {
+     "channelId": "UCMsgXPD3wzzt8RxHJmXH7hQ",
+     "handle": "@cartoonnetwork",
+     "name": "Cartoon Network",
+     "language": "en"
+    },
+    {
+     "channelId": "UCoWgc1mqe-bcfb_lem7EyOg",
+     "handle": "@Ben10",
+     "name": "Ben 10",
+     "language": "en"
+    },
+    {
+     "channelId": "UCRmz-wwsTeHEaGOK6WAiTNw",
+     "handle": "@DisneyXD-OfficialChannel",
+     "name": "Disney XD",
+     "language": "en"
+    },
+    {
+     "channelId": "UCUe6ZpY6TJ0no8jI4l2iLxw",
+     "handle": "@nickjr",
+     "name": "Nick Jr.",
+     "language": "en"
+    },
+    {
+     "channelId": "UCS7H8U-n5mINVJjJsaRtGHg",
+     "handle": "@ShauntheSheepOfficial",
+     "name": "Shaun the Sheep",
+     "language": "en"
+    },
+    {
+     "handle": "@Pingu",
+     "name": "Pingu - Official Channel",
+     "language": "en"
+    },
+    {
+     "channelId": "UCNEKMkg_DG8eAyR1BNWsSvw",
+     "handle": "@oggy",
+     "name": "Oggy and the Cockroaches",
+     "language": "en"
+    },
+    {
+     "channelId": "UCzoFjzSkbrDD1GHsz2YNLig",
+     "handle": "@theworldofmrbean",
+     "name": "Mr Bean Cartoon World",
+     "language": "en"
+    },
+    {
+     "channelId": "UCyu8StPfZWapR6rfW_JgqcA",
+     "handle": "@dckids",
+     "name": "DC Kids",
+     "language": "en"
+    },
+    {
+     "handle": "@wbkids",
+     "name": "WB Kids",
+     "language": "en"
+    },
+    {
+     "channelId": "UCZLYbETi-hygKzyCerJ5daw",
+     "handle": "@BobtheBuilderOfficial",
+     "name": "Bob the Builder",
+     "language": "en"
+    },
+    {
+     "channelId": "UCeuCusk31pZdvI8ap69A2DA",
+     "handle": "@TotallySpiesChannel",
+     "name": "Totally Spies",
+     "language": "en"
+    },
+    {
+     "channelId": "UCn9zTBZVl6lu72s-6fXttZg",
+     "handle": "@CODELYOKOENGLISHOFFICIAL",
+     "name": "Code Lyoko",
+     "language": "en"
+    },
+    {
+     "handle": "@pokemon",
+     "name": "Pokémon (official)",
+     "language": "en"
+    }
+   ]
+  }
+ ]
+}

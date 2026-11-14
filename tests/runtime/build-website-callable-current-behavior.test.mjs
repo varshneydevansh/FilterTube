@@ -15,6 +15,7 @@ const accountedFiles = [
   "scripts/build-extension-ui.mjs",
   "scripts/build-nanah-vendor.mjs",
   "scripts/build-qr-scanner-vendor.mjs",
+  "scripts/build-study-packs.mjs",
   "scripts/check-release-note-locales.mjs",
   "scripts/check-ui-locales.mjs",
   "scripts/create-family-device-capture-checklist.mjs",
@@ -91,6 +92,10 @@ const expectedCounts = new Map([
   [
     "scripts/build-qr-scanner-vendor.mjs",
     0
+  ],
+  [
+    "scripts/build-study-packs.mjs",
+    8
   ],
   [
     "scripts/check-release-note-locales.mjs",

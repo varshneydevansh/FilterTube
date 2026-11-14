@@ -36,6 +36,7 @@ surfaces even when they do not contain callables.
 | `scripts/build-extension-ui.mjs` | 2 | `ensureOutputDirectories`, `bundleAll` |
 | `scripts/build-nanah-vendor.mjs` | 4 | `buildQrcodeBundle`, `buildNanahBundle`, `main` |
 | `scripts/build-qr-scanner-vendor.mjs` | 0 | Lexical inventory only; this row does not assert complete semantic or installed proof. |
+| `scripts/build-study-packs.mjs` | 8 | `buildCatalog`, `renderCatalog`, `main` (Study pack catalog generator; same rules as the apps' generator) |
 | `scripts/check-release-note-locales.mjs` | 1 | Lexical inventory only; this row does not assert complete semantic or installed proof. |
 | `scripts/check-ui-locales.mjs` | 1 | Lexical inventory only; this row does not assert complete semantic or installed proof. |
 | `scripts/create-family-device-capture-checklist.mjs` | 12 | Lexical inventory only; this row does not assert complete semantic or installed proof. |
@@ -310,6 +311,7 @@ The earlier dated tables above remain historical. The authorized change preserve
 | `scripts/build-extension-ui.mjs` | 2 |
 | `scripts/build-nanah-vendor.mjs` | 4 |
 | `scripts/build-qr-scanner-vendor.mjs` | 0 |
+| `scripts/build-study-packs.mjs` | 8 |
 | `scripts/check-release-note-locales.mjs` | 1 |
 | `scripts/check-ui-locales.mjs` | 1 |
 | `scripts/create-family-device-capture-checklist.mjs` | 12 |
