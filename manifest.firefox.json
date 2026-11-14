@@ -51,7 +51,7 @@
         "js/content/content_playback_admission.js",
         "js/content/content_playback_native.js",
         "js/content/content_playback.js",
-        "js/content/video_notes.js",
+        "js/content/video_notes.js", "js/content/study_overlay.js",
         "js/content_bridge.js"
       ],
       "run_at": "document_start"
