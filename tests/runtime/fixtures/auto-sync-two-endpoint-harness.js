@@ -112,7 +112,13 @@
                             root.profiles[profileId] = protocol.applySettings(root.profiles[profileId], snapshot);
                             await set({ ftProfilesV4: root }); state.applies.push(clone(snapshot));
                         });
-                    }
+                    },
+                    applyStudy: async (profileId, remoteStudy, beforeCheck, grant) => state.withLock(async () => {
+                        if (!await beforeCheck()) throw Error('Profile sync access changed');
+                        const root = await state.readRoot();
+                        root.profiles[profileId] = protocol.applyStudy(root.profiles[profileId], remoteStudy, grant);
+                        await set({ ftProfilesV4: root });
+                    })
                 });
             };
             state.readNote = (videoId = 'abcdefghijk') => state.notes.read({ profileId: state.profileId, videoId }, 'editor');

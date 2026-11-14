@@ -83,8 +83,8 @@
         }
         function areas(value) {
             const list = Array.isArray(value) ? value : Object.keys(value || {}).filter(key => value[key] === true);
-            if (!list.length || list.length > 3 || new Set(list).size !== list.length
-                || list.some(area => !['settings', 'notes', 'playlists'].includes(area))) fail('Choose settings, notes, playlists, or a combination.');
+            if (!list.length || list.length > 4 || new Set(list).size !== list.length
+                || list.some(area => !['settings', 'notes', 'playlists', 'study'].includes(area))) fail('Choose settings, notes, playlists, study, or a combination.');
             return list.slice().sort();
         }
         async function keys() {
@@ -348,6 +348,12 @@
                 if (!await unchanged()) fail('Auto-sync permission or update changed.');
                 await deps.playlistsMerge(row.grant.localProfileId, envelope, row.grant.localGrantId);
             }
+            if (verified.payload.study && resolution !== 'local') {
+                // Packs and edits merge like keywords, progress by the larger value; the lock never travels.
+                if (typeof deps.applyStudy !== 'function') fail('Study sync is unavailable here.');
+                if (!await unchanged()) fail('Auto-sync permission or update changed.');
+                await deps.applyStudy(row.grant.localProfileId, verified.payload.study, unchanged, row.grant);
+            }
             const status = resolution === 'local' ? 'rejected' : 'applied';
             await update(row, value => { checkRevision(value); return { ...value, lastSequence: verified.sequence,
                 lastRemoteSettings: verified.payload.settings || value.lastRemoteSettings,
@@ -391,6 +397,7 @@
                 if (typeof deps.playlistsRead !== 'function') fail('Playlist sync is unavailable here.');
                 payload.playlists = await deps.playlistsRead(row.grant.localProfileId, row.grant.localGrantId);
             }
+            if (row.grant.areas.includes('study')) payload.study = protocol.snapshotStudy(context.profile);
             return payload;
         }
         async function run() {

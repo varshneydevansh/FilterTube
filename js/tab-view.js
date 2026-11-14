@@ -23343,6 +23343,24 @@ document.addEventListener('DOMContentLoaded', async () => {
                 if (!result?.ok) throw Error('Playlists could not be applied.');
                 return result.envelope;
             },
+            applyStudy: async (profileId, remoteStudy, beforeCheck, grant) => {
+                await window.FilterTubeNanahStorageLock.run(async () => {
+                    if (!await beforeCheck()) throw Error('Profile sync access changed.');
+                    const latest = await window.FilterTubeIO.loadProfilesV4();
+                    const authority = window.FilterTubeDeviceAutoSync.security(latest, profileId);
+                    // Merged against the stored value under the lock, so a newer local change is never lost.
+                    const applied = window.FilterTubePersonalSync.applyStudy(latest.profiles[profileId], remoteStudy, grant);
+                    const saved = await window.FilterTubeIO.saveProfilesV4({ ...latest, profiles: { ...latest.profiles, [profileId]: applied } });
+                    if (saved?.ok !== true) throw Error('Study could not be saved. The update remains unconfirmed.');
+                    const persisted = await window.FilterTubeIO.loadProfilesV4();
+                    if (window.FilterTubeDeviceAutoSync.security(persisted, profileId) !== authority
+                        || JSON.stringify(persisted.profiles[profileId]?.study ?? null) !== JSON.stringify(applied.study ?? null)
+                        || !await beforeCheck()) {
+                        throw Error('Study could not be confirmed. Review sync again.');
+                    }
+                });
+                await refreshFilterTubeUiAfterNanahImport();
+            },
             applySettings: async (profileId, snapshot, beforeCheck, expectedLocalSnapshot) => {
                 await window.FilterTubeNanahStorageLock.run(async () => {
                     if (!await beforeCheck()) throw Error('Profile sync access changed.');

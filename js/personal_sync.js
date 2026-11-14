@@ -4,10 +4,12 @@
         ? require('./shared/saved_video_notes.js') : root.FilterTubeSavedVideoNotes;
     const playlists = typeof module === 'object' && module.exports
         ? require('./shared/local_playlists.js') : root.FilterTubeLocalPlaylists;
-    const api = factory(notes, playlists, root);
+    const study = typeof module === 'object' && module.exports
+        ? require('./shared/study_model.js') : root.FilterTubeStudyModel;
+    const api = factory(notes, playlists, root, study);
     if (typeof module === 'object' && module.exports) module.exports = api;
     else root.FilterTubePersonalSync = api;
-}(typeof globalThis !== 'undefined' ? globalThis : this, function (notes, playlists, root) {
+}(typeof globalThis !== 'undefined' ? globalThis : this, function (notes, playlists, root, study) {
     'use strict';
     // Settings and notes together stay within 512 KiB. The playlists area has its own 2 MiB
     // budget (UTF-8 bytes of its encoded envelope), the same cap Android and iOS use.
@@ -18,7 +20,8 @@
     const MESSAGE_SCHEMA = 'filtertube.personal-sync';
     const own = (value, key) => Object.prototype.hasOwnProperty.call(value, key);
     const forbidden = new Set(['__proto__', 'prototype', 'constructor']);
-    const AREAS = ['settings', 'notes', 'playlists'];
+    // "study" is offered only by apps that know it; an older peer never grants it.
+    const AREAS = ['settings', 'notes', 'playlists', 'study'];
     const booleanSettings = [
         'enabled', 'syncKidsToMain', 'hideShorts', 'hideComments', 'hideHomeFeed',
         'hideSponsoredCards', 'contentOnlyPlayback', 'hidePlayables', 'hideWatchPlaylistPanel',
@@ -385,6 +388,38 @@
         // The merged result is stored locally whatever its size; sending it later is what the cap limits.
         return JSON.parse(playlists.encode(playlists.mergeAll(local, remote), [grant.localProfileId]));
     }
+    /**
+     * The study area: packs, edits, focus, plan, week view and progress. The running lock never travels.
+     * Fields the sender doesn't have are left out, so they keep the receiver's values when merged.
+     */
+    function studyValue(value) {
+        requireValue(!!study, 'study_contract_unavailable');
+        canonical(value);
+        study.validateForSync(value);
+        const result = clone(value);
+        if (own(result, 'lock')) result.lock = null;
+        return result;
+    }
+    function snapshotStudy(profile) {
+        object(profile);
+        requireValue(!!study, 'study_contract_unavailable');
+        const stored = profile.study === undefined ? null : study.normalizeStudy(profile.study);
+        if (stored) return studyValue({ ...stored, lock: null });
+        return studyValue({ version: study.VERSION, packIds: study.packIdsFromTags(profile) });
+    }
+    /** Joins a peer's study object into this profile's. Same rules as backup Merge. */
+    function mergeStudy(localValue, remoteValue, grant) {
+        grant = normalizeGrant(grant);
+        requireValue(grant.enabled && grant.areas.includes('study'), 'study_not_authorized');
+        return study.mergeStudy(localValue == null ? null : localValue, studyValue(remoteValue), { strategy: 'merge' });
+    }
+    function applyStudy(profile, remoteValue, grant) {
+        object(profile);
+        const merged = mergeStudy(study.profileStudy(profile), remoteValue, grant);
+        const result = clone(profile);
+        if (merged) result.study = merged;
+        return result;
+    }
     function payload(value, grant, incoming) {
         canonical(value, MESSAGE_MAX_BYTES); fields(value, AREAS, []);
         canonical(Object.fromEntries(Object.entries(value).filter(([area]) => area !== 'playlists')));
@@ -400,6 +435,7 @@
             const profileId = incoming ? grant.remoteProfileId : grant.localProfileId;
             result.playlists = encodePlaylists(playlistEnvelope(value.playlists, profileId), profileId);
         }
+        if (own(value, 'study')) result.study = studyValue(value.study);
         return result;
     }
     function base64(bytes) {
@@ -461,5 +497,6 @@
         return Object.freeze({ digest, sign, verify });
     }
     return Object.freeze({ MAX_BYTES, PLAYLISTS_MAX_BYTES, MESSAGE_MAX_BYTES, GRANT_SCHEMA, MESSAGE_SCHEMA, normalizeGrant, peerBinding,
-        snapshotSettings, validateSettings, mergeSettings, applySettings, mergeNotes, mergePlaylists, create });
+        snapshotSettings, validateSettings, mergeSettings, applySettings, mergeNotes, mergePlaylists,
+        snapshotStudy, mergeStudy, applyStudy, create });
 }));

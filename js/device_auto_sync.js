@@ -207,6 +207,7 @@
             withReceiveLock: deps.withReceiveLock,
             notesRead: deps.notesRead, notesMerge: deps.notesMerge,
             playlistsRead: deps.playlistsRead, playlistsMerge: deps.playlistsMerge, applySettings: deps.applySettings,
+            applyStudy: deps.applyStudy,
             changed
         });
         async function run({ wake = false } = {}) {
