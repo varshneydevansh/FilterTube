@@ -181,6 +181,11 @@ const AUTO_SYNC_TESTS = Object.freeze([
   'tests/runtime/auto-sync-background-authority.test.mjs',
   'tests/runtime/auto-sync-dashboard-integration.test.mjs',
 ]);
+const STUDY_TESTS = Object.freeze([
+  'tests/runtime/nanah-keyword-merge-identity.test.mjs',
+  'tests/runtime/study-model.test.mjs',
+  'tests/runtime/study-backup-roundtrip.test.mjs',
+]);
 const VIDEO_NOTES_TESTS = Object.freeze([
   'tests/runtime/video-notes-contract.test.mjs',
   'tests/runtime/video-notes-store.test.mjs',
@@ -210,6 +215,7 @@ export const LANES = Object.freeze({
       ...AUTO_SYNC_TESTS,
       ...SAFETY_AND_PREFERENCE_TESTS,
       ...VIDEO_NOTES_TESTS,
+      ...STUDY_TESTS,
       'tests/runtime/ad-void-native-ownership-current-behavior.test.mjs',
       'tests/runtime/popup-intrinsic-sizing.test.mjs',
       'tests/runtime/build-release-method-semantic-register-current-behavior.test.mjs',
@@ -251,6 +257,7 @@ export const LANES = Object.freeze({
     description: 'Whitelist-only mode, pending hides, allow-list leaks, Shorts, watch, end-screen, Kids, and YTM allow behavior.',
     tests: [
       ...VIDEO_NOTES_TESTS,
+      ...STUDY_TESTS,
       'tests/runtime/ad-void-native-ownership-current-behavior.test.mjs',
       'tests/runtime/content-playback-admission-current-behavior.test.mjs',
       'tests/runtime/content-playback-coordinator.test.mjs',
@@ -285,6 +292,7 @@ export const LANES = Object.freeze({
     description: 'Keyword, channel, comment, blocklist, list-target, and hide-decision behavior.',
     tests: [
       ...VIDEO_NOTES_TESTS,
+      ...STUDY_TESTS,
       'tests/runtime/ad-void-native-ownership-current-behavior.test.mjs',
       'tests/runtime/content-playback-admission-current-behavior.test.mjs',
       'tests/runtime/content-playback-coordinator.test.mjs',
@@ -318,6 +326,7 @@ export const LANES = Object.freeze({
     description: 'JSON-first filtering, network interception, response mutation, list mode, and endpoint work gates.',
     tests: [
       ...VIDEO_NOTES_TESTS,
+      ...STUDY_TESTS,
       ...CONTENT_PLAYBACK_TESTS,
       'tests/runtime/get-watch-streaming-interception.test.mjs',
       'tests/runtime/ad-void-duration-seek-current-behavior.test.mjs',
@@ -390,6 +399,7 @@ export const LANES = Object.freeze({
     description: 'DOM fallback selectors, hide/restore state, cleanup passes, and recycled node behavior.',
     tests: [
       ...VIDEO_NOTES_TESTS,
+      ...STUDY_TESTS,
       'tests/runtime/content-playback-admission-current-behavior.test.mjs',
       'tests/runtime/content-playback-coordinator.test.mjs',
       'tests/runtime/managed-content-playback-permit.test.mjs',
@@ -439,6 +449,7 @@ export const LANES = Object.freeze({
     description: 'No-rule/no-work budgets, SPA lag guards, disabled mode, active-rule gates, and identity work budgets.',
     tests: [
       ...VIDEO_NOTES_TESTS,
+      ...STUDY_TESTS,
       ...CONTENT_PLAYBACK_TESTS,
       'tests/runtime/get-watch-streaming-interception.test.mjs',
       'tests/runtime/ad-void-duration-seek-current-behavior.test.mjs',
@@ -477,6 +488,7 @@ export const LANES = Object.freeze({
       ...AUTO_SYNC_TESTS,
       ...SAFETY_AND_PREFERENCE_TESTS,
       ...VIDEO_NOTES_TESTS,
+      ...STUDY_TESTS,
       'tests/runtime/content-playback-admission-current-behavior.test.mjs',
       'tests/runtime/content-playback-coordinator.test.mjs',
       'tests/runtime/managed-content-playback-permit.test.mjs',
@@ -562,6 +574,7 @@ export const LANES = Object.freeze({
       ...AUTO_SYNC_TESTS,
       ...SAFETY_AND_PREFERENCE_TESTS,
       ...VIDEO_NOTES_TESTS,
+      ...STUDY_TESTS,
       ...CONTENT_PLAYBACK_TESTS,
       'tests/runtime/get-watch-streaming-interception.test.mjs',
       'tests/runtime/ad-void-duration-seek-current-behavior.test.mjs',

@@ -28,6 +28,37 @@
     }
 
     /** Coerces unknown values into arrays so downstream logic can assume [] */
+    /** Study mode model (js/shared/study_model.js); absent in contexts that don't load it. */
+    function studyModel() {
+        const model = global.FilterTubeStudyModel;
+        return model && typeof model.mergeStudy === 'function' ? model : null;
+    }
+
+    /** The profile's study object, rebuilt from study:<packId> tags when an older app dropped it. */
+    function profileStudyOf(profile) {
+        const model = studyModel();
+        return model ? model.profileStudy(profile) : (safeObject(profile).study || null);
+    }
+
+    /**
+     * Profile fields for an incoming study object: packs and edits merge like keywords, progress takes
+     * the larger value per device and day, and this device's running lock is never replaced.
+     */
+    function mergedStudyFields(localProfile, incomingProfile, strategy) {
+        const model = studyModel();
+        if (!model) {
+            const incomingStudy = safeObject(incomingProfile).study;
+            return incomingStudy ? { study: incomingStudy } : {};
+        }
+        const merged = model.mergeStudy(profileStudyOf(localProfile), profileStudyOf(incomingProfile), { strategy });
+        return merged ? { study: merged } : {};
+    }
+
+    function withoutStudyField(profile) {
+        const { study: _study, ...rest } = safeObject(profile);
+        return rest;
+    }
+
     function safeArray(value) {
         return Array.isArray(value) ? value : [];
     }
@@ -272,6 +303,8 @@
                 : '',
             scope: ['title', 'channel_name', 'comment'].includes(entry?.scope) ? entry.scope : null,
             ...(entry?.modeBootstrapCopy === true ? { modeBootstrapCopy: true } : {}),
+            // Rows a list or study pack added keep their tag (managedListId "study:<packId>").
+            ...(normalizeString(entry?.managedListId) ? { managedListId: normalizeString(entry.managedListId) } : {}),
             addedAt
         };
     }
@@ -1119,6 +1152,13 @@
                         .filter(Boolean)
                 }
             };
+        }
+
+        const model = studyModel();
+        if (model) {
+            for (const profileId of Object.keys(outProfiles)) {
+                outProfiles[profileId] = model.withProfileStudy(outProfiles[profileId]);
+            }
         }
 
         const activeProfileId = normalizeString(profilesV4.activeProfileId) || DEFAULT_PROFILE_ID;
@@ -2919,7 +2959,16 @@
                 if (sanitizedIncoming) {
                     fullImportProfileIds = Object.keys(safeObject(sanitizedIncoming.profiles));
                     if (strategy === 'replace') {
-                        nextV4 = sanitizedIncoming;
+                        const localProfiles = safeObject(nextV4?.profiles);
+                        const replacedProfiles = {};
+                        for (const [profileId, incProfile] of Object.entries(safeObject(sanitizedIncoming.profiles))) {
+                            // Replacing rules never ends a lock running here or drops this device's progress.
+                            replacedProfiles[profileId] = {
+                                ...withoutStudyField(incProfile),
+                                ...mergedStudyFields(localProfiles[profileId], incProfile, 'replace')
+                            };
+                        }
+                        nextV4 = { ...sanitizedIncoming, profiles: replacedProfiles };
                     } else {
                         const baseProfiles = safeObject(nextV4?.profiles);
                         const incomingProfiles = safeObject(sanitizedIncoming.profiles);
@@ -2930,7 +2979,8 @@
                             const existingProfile = safeObject(mergedProfiles[profileId]);
                             if (!existingProfile || Object.keys(existingProfile).length === 0) {
                                 mergedProfiles[profileId] = {
-                                    ...incProfile,
+                                    ...withoutStudyField(incProfile),
+                                    ...mergedStudyFields(null, incProfile, 'merge'),
                                     main: normalizeMainProfileAliasFields(safeObject(incProfile.main))
                                 };
                                 continue;
@@ -2940,8 +2990,9 @@
                             const incMain = safeObject(incProfile.main);
                             const incKids = safeObject(incProfile.kids);
                             mergedProfiles[profileId] = {
-                                ...existingProfile,
-                                ...incProfile,
+                                ...withoutStudyField(existingProfile),
+                                ...withoutStudyField(incProfile),
+                                ...mergedStudyFields(existingProfile, incProfile, 'merge'),
                                 settings: {
                                     ...safeObject(existingProfile.settings),
                                     ...safeObject(incProfile.settings)
@@ -3044,8 +3095,13 @@
                 ? v4KidsWhitelistKeywords
                 : mergeKeywordLists(safeArray(targetKids.whitelistKeywords), v4KidsWhitelistKeywords);
 
+            // Only a v4 profile snapshot carries a study object; a legacy file leaves this profile's alone.
+            const targetStudyFields = incomingProfileForImport
+                ? mergedStudyFields(targetProfile, incomingProfileForImport, strategy === 'replace' ? 'replace' : 'merge')
+                : (safeObject(targetProfile).study ? { study: targetProfile.study } : {});
             profiles[targetProfileId] = {
-                ...targetProfile,
+                ...withoutStudyField(targetProfile),
+                ...targetStudyFields,
                 type: typeof targetProfile.type === 'string'
                     ? targetProfile.type
                     : (targetProfileId === DEFAULT_PROFILE_ID ? 'account' : 'child'),
