@@ -1722,6 +1722,7 @@
 
                 this._harvestFromRendererByline(candidate);
                 this._harvestVideoOwnerFromRenderer(candidate);
+                this._harvestShortOwner(node);
 
                 for (const key in node) {
                     if (!Object.prototype.hasOwnProperty.call(node, key)) continue;
@@ -1733,6 +1734,48 @@
             };
 
             visit(root);
+        }
+
+        /**
+         * Shorts name their channel in a few places the page already sends: a reelItemRenderer's
+         * reel player header, a reelWatchEndpoint's overlay (header or channel bar), and a Shorts
+         * lockup's avatar. Learn videoId -> channel from each, so a shelf Short that names no channel
+         * can still be matched in allow mode. Only the owner's own browse endpoint is read: never a
+         * title, a sound pivot or another link in the overlay.
+         */
+        _harvestShortOwner(node) {
+            if (!node || typeof node !== 'object') return;
+            const reel = node.reelItemRenderer && typeof node.reelItemRenderer === 'object' ? node.reelItemRenderer : null;
+            const endpoint = node.reelWatchEndpoint && typeof node.reelWatchEndpoint === 'object'
+                ? node.reelWatchEndpoint
+                : reel?.navigationEndpoint?.reelWatchEndpoint;
+            const lockup = node.shortsLockupViewModel || node.shortsLockupViewModelV2 || null;
+            const videoId = [reel?.videoId, endpoint?.videoId, lockup?.onTap?.innertubeCommand?.reelWatchEndpoint?.videoId]
+                .find(value => typeof value === 'string' && /^[a-zA-Z0-9_-]{11}$/.test(value)) || '';
+            if (!videoId) return;
+            const owners = [];
+            const overlay = endpoint?.overlay?.reelPlayerOverlayRenderer;
+            if (overlay) {
+                owners.push(overlay.reelPlayerHeaderSupportedRenderers?.reelPlayerHeaderRenderer?.channelNavigationEndpoint?.browseEndpoint);
+                const items = overlay.metapanel?.reelMetapanelViewModel?.metadataItems;
+                for (const item of Array.isArray(items) ? items : []) {
+                    const bar = item?.reelChannelBarViewModel;
+                    if (!bar) continue;
+                    for (const run of Array.isArray(bar.channelName?.commandRuns) ? bar.channelName.commandRuns : []) {
+                        owners.push(run?.onTap?.innertubeCommand?.browseEndpoint);
+                    }
+                    owners.push(bar.channelAvatar?.avatarViewModel?.endpoint?.innertubeCommand?.browseEndpoint);
+                    owners.push(bar.onTap?.innertubeCommand?.browseEndpoint);
+                }
+            }
+            if (lockup) {
+                owners.push(lockup.belowThumbnailMetadata?.avatar?.avatarViewModel?.endpoint?.innertubeCommand?.browseEndpoint);
+            }
+            const owner = owners.find(browse => typeof browse?.browseId === 'string' && /^UC[\w-]{22}$/.test(browse.browseId));
+            if (!owner) return;
+            this._registerVideoChannelMapping(videoId, owner.browseId);
+            const handle = typeof owner.canonicalBaseUrl === 'string' ? normalizeChannelHandle(owner.canonicalBaseUrl) : '';
+            if (handle) this._registerMapping(owner.browseId, handle);
         }
 
         _harvestVideoOwnerFromRenderer(renderer) {

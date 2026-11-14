@@ -1199,6 +1199,57 @@ function getCurrentWatchExactOwnerMeta(settings) {
     };
 }
 
+/**
+ * The owner of the Short playing on a /shorts/<id> route when the Player metadata isn't in yet:
+ * first the learned videoId -> channel map, then the active reel's own channel link (the overlay's
+ * channel bar or header), read only once the route has shown this video for a moment so a recycled
+ * overlay can't lend the previous Short's channel. A UC id learned from the link is remembered.
+ * Null when neither names the channel: in allow mode an unknown Short then stays held.
+ */
+function getCurrentShortOwnerMeta(settings, videoId, now = Date.now()) {
+    if (!videoId) return null;
+    const mapped = typeof settings?.videoChannelMap?.[videoId] === 'string' ? settings.videoChannelMap[videoId].trim() : '';
+    if (/^UC[\w-]{22}$/.test(mapped)) {
+        return { id: mapped, handle: '', customUrl: '', name: '', videoId, mappedIdAuthoritative: true, ownerRoot: null, ownerAnchor: null };
+    }
+    const route = window.__filtertubeShortRouteSince;
+    if (!route || route.videoId !== videoId) {
+        window.__filtertubeShortRouteSince = { videoId, at: now };
+        return null;
+    }
+    if (now - route.at < 400) return null;
+    let reel = null;
+    let anchor = null;
+    try {
+        reel = document.querySelector('ytd-reel-video-renderer[is-active], ytm-reel-video-renderer[is-active]');
+        anchor = reel?.querySelector?.(
+            'yt-reel-channel-bar-view-model a[href], ' +
+            'ytd-reel-player-header-renderer a[href], ' +
+            'ytm-reel-player-header-renderer a[href], ' +
+            '.ytReelChannelBarViewModelChannelName a[href], ' +
+            'reel-player-header-renderer a[href]'
+        ) || null;
+    } catch (e) {
+        return null;
+    }
+    const href = String(anchor?.getAttribute?.('href') || '');
+    const idMatch = href.match(/\/channel\/(UC[\w-]{22})(?:[/?#]|$)/);
+    const handleMatch = href.match(/\/(@[^/?#]+)/);
+    if (!idMatch && !handleMatch) return null;
+    const id = idMatch ? idMatch[1] : '';
+    const handle = handleMatch ? normalizeHandleForComparison(decodeURIComponent(handleMatch[1])) : '';
+    const name = String(anchor?.textContent || '').replace(/\s+/g, ' ').trim();
+    if (id) {
+        settings.videoChannelMap = { ...(settings.videoChannelMap || {}), [videoId]: id };
+        try {
+            const runtime = globalThis.browser?.runtime || globalThis.chrome?.runtime;
+            runtime?.sendMessage?.({ action: 'updateVideoChannelMap', videoId, channelId: id });
+        } catch (e) {
+        }
+    }
+    return { id, handle, customUrl: '', name, videoId, fromShortOverlay: true, ownerRoot: reel, ownerAnchor: anchor };
+}
+
 function getCurrentShortPlayerHost() {
     try {
         return document.querySelector(
@@ -2253,7 +2304,9 @@ function enforceCurrentWatchOwnerBlock(settings) {
         }
         installDirectAccessPlayGuard();
 
-        const exactOwnerMeta = getCurrentWatchExactOwnerMeta(settings);
+        // On /shorts the reel player's own channel is read too (learned map, then the active overlay).
+        const exactOwnerMeta = getCurrentWatchExactOwnerMeta(settings)
+            || (isShortRoute ? getCurrentShortOwnerMeta(settings, routeVideoId) : null);
         let ownerMeta = requirements.needsIdentity
             ? exactOwnerMeta
             : (exactOwnerMeta || { videoId: routeVideoId, id: '', handle: '', customUrl: '', name: '' });

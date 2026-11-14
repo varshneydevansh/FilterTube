@@ -221,21 +221,29 @@ test('direct reelPlayerOverlayRenderer payload passes through matching blocklist
   assert.deepEqual(channelMapPayloads(allowRun.messages), expectedMapPayloads);
 });
 
-test('wrapped reelItemRenderer ignores captured metapanel owner fields but still filters title keywords', () => {
+// 3.6.2 (Study mode, Shorts in allow mode): the reel overlay's channel bar names the Short's owner, so
+// it is learned as videoId -> channel and the channel rules apply to the reel like any other card.
+test('wrapped reelItemRenderer learns the captured metapanel owner and still filters title keywords', () => {
   const input = wrappedReelItemInput();
   const expectedMapPayloads = [[{ id: owner.id, handle: owner.handle }]];
 
   const channelBlockRun = runPayload(input, {
     filterChannels: [{ id: owner.id, handle: owner.handle }]
   });
-  assert.deepEqual(channelBlockRun.output, plain(input));
+  assert.deepEqual(channelBlockRun.output, { contents: [] }, 'a blocked owner hides its reel');
   assert.deepEqual(channelMapPayloads(channelBlockRun.messages), expectedMapPayloads);
 
   const whitelistRun = runPayload(input, {
     listMode: 'whitelist',
     whitelistChannels: [{ id: owner.id, handle: owner.handle }]
   });
-  assert.deepEqual(whitelistRun.output, { contents: [] });
+  assert.deepEqual(whitelistRun.output, plain(input), 'an allowed owner keeps its reel in allow mode');
+
+  const otherWhitelistRun = runPayload(input, {
+    listMode: 'whitelist',
+    whitelistChannels: [{ id: 'UC0000000000000000000001', handle: '@someoneelse' }]
+  });
+  assert.deepEqual(otherWhitelistRun.output, { contents: [] }, 'another owner stays hidden');
 
   const keywordInput = wrappedReelItemInput('Electric captured overlay reel');
   const keywordRun = runPayload(keywordInput, {
