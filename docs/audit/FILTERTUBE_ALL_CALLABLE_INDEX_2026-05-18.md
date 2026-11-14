@@ -73,14 +73,14 @@ repo-wide lexical callables: 6315
 
 | Family | Files | Lexical callables | Boundary |
 | --- | ---: | ---: | --- |
-| Hot page/background runtime | 9 | 3177 | Already has detailed first-pass hot runtime table in `FILTERTUBE_FUNCTION_COVERAGE_2026-05-17.md`. |
-| Content helper runtime | 9 | 348 | First-pass helper surface audit exists, but behavior fixtures remain incomplete. |
-| UI/settings runtime | 14 | 2103 | First-pass UI/settings audit exists, but action-level fixtures remain incomplete. |
+| Hot page/background runtime | 15 | 4038 | Already has detailed first-pass hot runtime table in `FILTERTUBE_FUNCTION_COVERAGE_2026-05-17.md`. |
+| Content helper runtime | 30 | 1040 | First-pass helper surface audit exists, but behavior fixtures remain incomplete. |
+| UI/settings runtime | 33 | 4117 | First-pass UI/settings audit exists, but action-level fixtures remain incomplete. |
 | Generated/quarantined UI | 6 | 153 | Generated source/output and `js/layout.js`; freshness and quarantine checks required. |
-| Vendor bundles | 2 | 279 | API/provenance boundary, not product-owned method behavior. |
-| Build/sync scripts | 4 | 58 | Release/package/native-sync behavior; separate release fixtures required. |
-| Audit/test lane scripts | 3 | 80 | Change-safety classifier, drift guard, and lane runner proof; workflow behavior, not product runtime. |
-| Website routes/components/config | 26 | 123 | Public website callable surface; public-claim and asset-budget fixtures required. |
+| Vendor bundles | 3 | 279 | API/provenance boundary, not product-owned method behavior. |
+| Build/sync scripts | 6 | 88 | Release/package/native-sync behavior; separate release fixtures required. |
+| Audit/test lane scripts | 25 | 517 | Change-safety classifier, drift guard, and lane runner proof; workflow behavior, not product runtime. |
+| Website routes/components/config | 31 | 149 | Public website callable surface; public-claim and asset-budget fixtures required. |
 
 ## File-Level Index
 
@@ -222,8 +222,8 @@ lexical and its scope remains tracked JS/JSX/MJS: CJS/Python tooling requires it
 separate release/workflow review and is not silently counted as JavaScript here.
 
 ```text
-current tracked JS/JSX/MJS files: 146
-current repo-wide lexical callables: 10230
+current tracked JS/JSX/MJS files: 149
+current repo-wide lexical callables: 10381
 current complete per-callable semantic proofs: 0
 current callable behavior-change approval: NO-GO
 runtime behavior changed by inventory refresh: no
@@ -246,7 +246,10 @@ runtime behavior changed by inventory refresh: no
 | `js/shared/kids_youtube_profiles.js` | Content helper runtime | 50 | helper counted; semantic proof incomplete |
 | `js/shared/local_playlists.js` | Content helper runtime | 40 | helper counted; semantic proof incomplete |
 | `js/shared/study_model.js` | Content helper runtime | 43 | helper counted; semantic proof incomplete |
-| `js/shared/study_packs.js` | Content helper runtime | 17 | helper counted; semantic proof incomplete |
+| `js/shared/study_packs.js` | Content helper runtime | 19 | helper counted; semantic proof incomplete |
+| `js/shared/study_engine.js` | Content helper runtime | 44 | helper counted; semantic proof incomplete |
+| `js/content/study_overlay.js` | Content helper runtime | 25 | helper counted; semantic proof incomplete |
+| `js/study_background.js` | Hot page/background runtime | 40 | helper counted; semantic proof incomplete |
 | `js/shared/saved_video_notes.js` | Content helper runtime | 20 | helper counted; semantic proof incomplete |
 | `js/video_notes_background.js` | Hot page/background runtime | 18 | helper counted; semantic proof incomplete |
 | `js/video_notes_editor.js` | UI/settings runtime | 25 | helper counted; semantic proof incomplete |
@@ -263,7 +266,7 @@ runtime behavior changed by inventory refresh: no
 | `js/nanah_pairing_ui.js` | UI/settings runtime | 6 | helper counted; semantic proof incomplete |
 | `js/profile_preference_defaults.js` | UI/settings runtime | 14 | helper counted; semantic proof incomplete |
 | `build.js` | Build/sync scripts | 68 | release-audited first pass |
-| `js/background.js` | Hot page/background runtime | 589 | hot runtime mapped |
+| `js/background.js` | Hot page/background runtime | 597 | hot runtime mapped |
 | `js/content/admission_overlay.js` | Content helper runtime | 25 | helper counted; semantic proof incomplete |
 | `js/content/block_channel.js` | Hot page/background runtime | 234 | hot runtime mapped |
 | `js/content/bridge_injection.js` | Content helper runtime | 14 | helper counted |
@@ -277,10 +280,10 @@ runtime behavior changed by inventory refresh: no
 | `js/content/content_playback_response.js` | Content helper runtime | 30 | helper counted; semantic proof incomplete |
 | `js/content/content_playback_transport.js` | Content helper runtime | 51 | helper counted; semantic proof incomplete |
 | `js/content/dom_extractors.js` | Content helper runtime | 117 | helper counted |
-| `js/content/dom_fallback.js` | Hot page/background runtime | 671 | hot runtime mapped |
+| `js/content/dom_fallback.js` | Hot page/background runtime | 688 | hot runtime mapped |
 | `js/content/dom_helpers.js` | Content helper runtime | 21 | helper counted |
 | `js/content/dom_state.js` | Content helper runtime | 42 | helper counted |
-| `js/content/external_youtube_guard.js` | Content helper runtime | 62 | helper counted; semantic proof incomplete |
+| `js/content/external_youtube_guard.js` | Content helper runtime | 61 | helper counted; semantic proof incomplete |
 | `js/content/external_youtube_network.js` | Content helper runtime | 28 | helper counted; semantic proof incomplete |
 | `js/content/first_run_prompt.js` | Content helper runtime | 11 | helper counted |
 | `js/content/handle_resolver.js` | Hot page/background runtime | 23 | hot runtime mapped |
@@ -289,7 +292,7 @@ runtime behavior changed by inventory refresh: no
 | `js/content_bridge.js` | Hot page/background runtime | 1286 | hot runtime mapped |
 | `js/content_controls_catalog.js` | UI/settings runtime | 5 | UI/settings counted |
 | `js/family_device_navigation.js` | UI/settings runtime | 10 | UI/settings counted; semantic proof incomplete |
-| `js/filter_logic.js` | Hot page/background runtime | 375 | hot runtime mapped |
+| `js/filter_logic.js` | Hot page/background runtime | 390 | hot runtime mapped |
 | `js/imported_channel_enrichment.js` | UI/settings runtime | 81 | UI/settings counted; semantic proof incomplete |
 | `js/injector.js` | Hot page/background runtime | 352 | hot runtime mapped |
 | `js/io_manager.js` | UI/settings runtime | 249 | UI/settings counted |
@@ -328,7 +331,7 @@ runtime behavior changed by inventory refresh: no
 | `scripts/build-extension-ui.mjs` | Build/sync scripts | 2 | build/website counted |
 | `scripts/build-nanah-vendor.mjs` | Build/sync scripts | 4 | build/website counted |
 | `scripts/build-qr-scanner-vendor.mjs` | Build/sync scripts | 0 | build provenance counted; semantic proof incomplete |
-| `scripts/build-study-packs.mjs` | Build/sync scripts | 12 | build provenance counted; semantic proof incomplete |
+| `scripts/build-study-packs.mjs` | Build/sync scripts | 13 | build provenance counted; semantic proof incomplete |
 | `scripts/check-release-note-locales.mjs` | Audit/test lane scripts | 4 | workflow/evidence tooling counted; semantic proof incomplete |
 | `scripts/check-ui-locales.mjs` | Audit/test lane scripts | 16 | workflow/evidence tooling counted; semantic proof incomplete |
 | `scripts/create-family-device-capture-checklist.mjs` | Audit/test lane scripts | 17 | workflow/evidence tooling counted; semantic proof incomplete |

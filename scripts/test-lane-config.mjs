@@ -188,6 +188,12 @@ const STUDY_TESTS = Object.freeze([
   'tests/runtime/study-personal-sync.test.mjs',
   'tests/runtime/study-family-scopes.test.mjs',
   'tests/runtime/study-packs-catalog.test.mjs',
+  'tests/runtime/study-layered-rules.test.mjs',
+  'tests/runtime/study-engine-clock.test.mjs',
+  'tests/runtime/study-engine-apply.test.mjs',
+  'tests/runtime/study-background-controller.test.mjs',
+  'tests/runtime/study-overlay-content.test.mjs',
+  'tests/runtime/study-shorts-allow-mode.test.mjs',
 ]);
 const VIDEO_NOTES_TESTS = Object.freeze([
   'tests/runtime/video-notes-contract.test.mjs',
