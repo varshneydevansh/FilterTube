@@ -191,9 +191,12 @@
     }
 
     function isDay(value) {
-        if (!/^\d{4}-\d{2}-\d{2}$/.test(value)) return false;
-        const date = new Date(`${value}T00:00:00Z`);
-        return Number.isFinite(date.getTime()) && date.toISOString().slice(0, 10) === value;
+        const match = /^(\d{4})-(\d{2})-(\d{2})$/.exec(value);
+        if (!match) return false;
+        const year = Number(match[1]), month = Number(match[2]), day = Number(match[3]);
+        const leap = (year % 4 === 0 && year % 100 !== 0) || year % 400 === 0;
+        const days = [31, leap ? 29 : 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31][month - 1];
+        return year >= 2000 && !!days && day >= 1 && day <= days;
     }
 
     function minutes(value) {

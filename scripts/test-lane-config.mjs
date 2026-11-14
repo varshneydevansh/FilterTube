@@ -186,6 +186,7 @@ const STUDY_TESTS = Object.freeze([
   'tests/runtime/study-model.test.mjs',
   'tests/runtime/study-backup-roundtrip.test.mjs',
   'tests/runtime/study-personal-sync.test.mjs',
+  'tests/runtime/study-family-scopes.test.mjs',
 ]);
 const VIDEO_NOTES_TESTS = Object.freeze([
   'tests/runtime/video-notes-contract.test.mjs',

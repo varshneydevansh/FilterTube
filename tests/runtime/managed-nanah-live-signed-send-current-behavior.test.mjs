@@ -336,7 +336,7 @@ test('dashboard builds signed managed envelopes only after source link scope tar
   assert.match(source, /MANAGED_LIVE_POLICY_SCOPES\.includes\(normalized\)/);
   assert.match(source, /active: \['main', 'kids', 'viewing_space', 'time_limits'\]/);
   assert.match(source, /full: \['main', 'kids', 'viewing_space', 'time_limits'\]/);
-  assert.match(source, /function resolveConcreteSendScopes\(scope\)/);
+  assert.match(source, /function resolveConcreteSendScopes\(scope, trustedLink = null\)/);
   assert.match(source, /function resolveTargetProfile\(trustedLink\)/);
   assert.match(source, /function buildListPayload\(scope, profile, surface\)/);
   assert.match(source, /function buildViewingSpacePayload\(profile\)/);

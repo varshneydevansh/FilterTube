@@ -17166,10 +17166,11 @@ document.addEventListener('DOMContentLoaded', async () => {
         if (role === 'source') {
             return ['sync.send', 'control.propose', 'device.link'];
         }
+        // study.v1: this device applies the Study mode scopes (study, focus_lock, schedule).
         if (role === 'replica') {
-            return ['sync.receive', 'control.apply', 'device.link'];
+            return ['sync.receive', 'control.apply', 'device.link', 'study.v1'];
         }
-        return ['sync.send', 'sync.receive', 'control.propose', 'control.apply', 'device.link'];
+        return ['sync.send', 'sync.receive', 'control.propose', 'control.apply', 'device.link', 'study.v1'];
     }
 
     function buildNanahPairUri(code) {

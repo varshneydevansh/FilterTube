@@ -1,7 +1,10 @@
 (function initNanahManagedLivePolicy(global) {
     'use strict';
 
-    const MANAGED_LIVE_POLICY_SCOPES = ['active', 'full', 'main', 'kids', 'videos', 'keywords', 'channels', 'viewing_space', 'time_limits', 'rules_bundle'];
+    const MANAGED_LIVE_POLICY_SCOPES = ['active', 'full', 'main', 'kids', 'videos', 'keywords', 'channels', 'viewing_space', 'time_limits', 'rules_bundle', 'study', 'focus_lock', 'schedule'];
+    // Study scopes go only to a child that advertised support (FilterTubeStudyModel.CAPABILITY); they never
+    // join a bundle's static list or the 3.6.1 permission list, because 3.6.1 rejects unknown areas.
+    const MANAGED_STUDY_SCOPES = ['study', 'focus_lock', 'schedule'];
     const MANAGED_LIVE_BUNDLE_SCOPES = { active: ['main', 'kids', 'viewing_space', 'time_limits'], full: ['main', 'kids', 'viewing_space', 'time_limits'], rules_bundle: ['keywords', 'channels', 'videos'] };
     const MANAGED_LIVE_ACK_SCHEMA = 'filtertube_nanah_managed_live_ack';
     const MANAGED_MAILBOX_ACK_SCHEMA = 'filtertube_nanah_managed_open_sync_ack';
@@ -30,6 +33,25 @@
 
         function safeArray(value) {
             return Array.isArray(value) ? value : [];
+        }
+
+        function studyModel() {
+            const model = deps.studyModel || global.FilterTubeStudyModel;
+            return model && typeof model.buildManagedPayload === 'function' ? model : null;
+        }
+
+        function isStudyScope(scope) {
+            return MANAGED_STUDY_SCOPES.includes(normalizeScope(scope));
+        }
+
+        /** The study scopes a profile bundle adds for this link: only for a child that supports them. */
+        function studyScopesForLink(profile, trustedLink) {
+            const model = studyModel();
+            if (!model || !trustedLink) return [];
+            const trusted = deps.normalizeTrustedLink(trustedLink);
+            if (!model.linkSupportsStudy(trusted) || !model.profileStudy(profile)) return [];
+            const allowed = deps.getAllowedScopeList(safeObject(trusted?.policy).allowedScopes || safeObject(trusted?.policy).defaultScope);
+            return MANAGED_STUDY_SCOPES.filter((scope) => model.managedScopeAllowed(scope, allowed));
         }
 
         function expandScope(scope) {
@@ -168,7 +190,7 @@
             };
         }
 
-        function resolveConcreteSendScopes(scope) {
+        function resolveConcreteSendScopes(scope, trustedLink = null) {
             const normalizedScope = normalizeScope(scope);
             const scopes = expandScope(normalizedScope);
             if (!isProfilePolicyBundle(normalizedScope)) return scopes;
@@ -178,7 +200,10 @@
             const timeLimitPolicy = typeof deps.getManagedTimeLimitPolicy === 'function'
                 ? deps.getManagedTimeLimitPolicy(profile)
                 : null;
-            return scopes.filter((item) => item !== 'time_limits' || !!timeLimitPolicy);
+            return [
+                ...scopes.filter((item) => item !== 'time_limits' || !!timeLimitPolicy),
+                ...studyScopesForLink(profile, trustedLink)
+            ];
         }
 
         function buildPayload(scope) {
@@ -211,6 +236,11 @@
             }
             if (normalizedScope === 'time_limits') {
                 return buildTimeLimitPayload(profile);
+            }
+            if (isStudyScope(normalizedScope)) {
+                const model = studyModel();
+                if (!model) throw new Error('Study plans are unavailable here.');
+                return model.buildManagedPayload(normalizedScope, model.profileStudy(profile));
             }
             return {
                 scope: normalizedScope,
@@ -323,7 +353,15 @@
                 throw new Error('Signed managed sends require Main, Kids, keyword, channel, video, viewing-space, or time-limit scope.');
             }
             const allowedScopes = deps.getAllowedScopeList(safeObject(trustedLink.policy).allowedScopes || safeObject(trustedLink.policy).defaultScope);
-            if (!allowedScopes.includes(normalizedScope)) {
+            if (isStudyScope(normalizedScope)) {
+                const model = studyModel();
+                if (!model || !model.linkSupportsStudy(trustedLink)) {
+                    throw new Error('This device\'s FilterTube app is too old for Study plans. Update it first.');
+                }
+                if (!model.managedScopeAllowed(normalizedScope, allowedScopes)) {
+                    throw new Error('This managed link does not allow signed study policy sends.');
+                }
+            } else if (!allowedScopes.includes(normalizedScope)) {
                 throw new Error(`This managed link does not allow signed ${deps.getScopeLabel(normalizedScope)} policy sends.`);
             }
 
@@ -468,7 +506,8 @@
 
         async function buildEnvelopeBatchForLiveSend(policy) {
             if (!sendContext) return createSendOperation().buildEnvelopeBatchForLiveSend(policy);
-            const scopes = resolveConcreteSendScopes(policy.scope);
+            const scopes = resolveConcreteSendScopes(policy.scope,
+                typeof deps.getCurrentTrustedLink === 'function' ? deps.getCurrentTrustedLink() : null);
             if (scopes.length === 0) {
                 throw new Error('Signed managed sends require Main, Kids, keyword, channel, video, viewing-space, or time-limit scope.');
             }
@@ -496,7 +535,8 @@
                 if (!normalizeString(trustedLink.linkId)) {
                     throw new Error('Managed fanout sends require every trusted link to have a link id.');
                 }
-                for (const scope of scopes) {
+                // Study scopes differ per child: only links whose device supports them get them.
+                for (const scope of resolveConcreteSendScopes(policy.scope, trustedLink)) {
                     envelopes.push(await buildEnvelopeForScope(policy, scope, { trustedLink }));
                 }
             }

@@ -15,13 +15,24 @@
         'keywords',
         'channels',
         'viewing_space',
-        'time_limits'
+        'time_limits',
+        // Study mode (3.6.2). A parent sends these only to a child that advertises the study capability.
+        'study',
+        'focus_lock',
+        'schedule'
     ];
+    const MANAGED_STUDY_SCOPES = ['study', 'focus_lock', 'schedule'];
     const DEFAULT_DEVICE_CAPABILITIES = [
         'sync.send',
         'sync.receive',
-        'control.propose'
+        'control.propose',
+        'study.v1'
     ];
+
+    function studyModel() {
+        const model = global.FilterTubeStudyModel;
+        return model && typeof model.applyManagedPayload === 'function' ? model : null;
+    }
 
     function normalizeString(value) {
         return typeof value === 'string' ? value.trim() : '';
@@ -164,6 +175,12 @@
         const family = getManagedPayloadScopeFamily(payload);
         if (!family) return validationResult('payload_scope_unknown');
         if (family !== scope) return validationResult('payload_scope_mismatch');
+        if (MANAGED_STUDY_SCOPES.includes(scope)) {
+            const model = studyModel();
+            if (!model) return validationResult('study_unsupported');
+            const reason = model.validateManagedPayload(scope, payload);
+            return reason ? validationResult(reason) : null;
+        }
         const root = safeObject(payload);
         const operations = safeArray(root.operations);
         if (scope === 'keywords' && operations.some(operation => !normalizeString(operation?.op).toLowerCase().includes('keyword'))) {
@@ -648,7 +665,11 @@
         if (root.targetDeviceId !== localDeviceId) return validationResult('wrong_target_device');
         if (root.sourceProfileId !== trustedLink.sourceProfileId) return validationResult('wrong_source_profile');
         if (root.targetProfileId !== trustedLink.targetProfileId) return validationResult('wrong_target_profile');
-        if (!safeArray(trustedLink.allowedScopes).includes(scope) && !safeArray(safeObject(trustedLink.policy).allowedScopes).includes(scope)) {
+        const linkAllowedScopes = [...safeArray(trustedLink.allowedScopes), ...safeArray(safeObject(trustedLink.policy).allowedScopes)];
+        const scopeAllowed = MANAGED_STUDY_SCOPES.includes(scope)
+            ? !!studyModel()?.managedScopeAllowed(scope, linkAllowedScopes)
+            : linkAllowedScopes.includes(scope);
+        if (!scopeAllowed) {
             return validationResult('scope_not_allowed');
         }
         if (root.sourcePublicKeyId !== trustedLink.sourcePublicKeyId) return validationResult('wrong_public_key');
@@ -1649,6 +1670,18 @@
         if (scope === 'videos') return applyManagedVideoPolicy(profile, payload);
         if (scope === 'viewing_space') return applyManagedViewingSpacePolicy(profile, payload);
         if (scope === 'time_limits') return applyManagedTimeLimitPolicy(profile, payload, envelope);
+        if (MANAGED_STUDY_SCOPES.includes(scope)) {
+            const model = studyModel();
+            if (!model) throw new Error('Unsupported managed policy scope');
+            return {
+                ...profile,
+                study: model.applyManagedPayload(model.profileStudy(profile), scope, payload, {
+                    sourceProfileId: normalizeString(root.sourceProfileId),
+                    sourceDeviceId: normalizeString(root.sourceDeviceId),
+                    sourceProfileName: normalizeString(root.sourceProfileName)
+                })
+            };
+        }
         throw new Error('Unsupported managed policy scope');
     }
 
