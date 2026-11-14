@@ -32,6 +32,16 @@
         return { channelId, handle, name, language: text(row.language) || null };
     }
 
+    function parseGradeKeywords(value) {
+        const out = {};
+        if (!value || typeof value !== 'object' || Array.isArray(value)) return out;
+        for (const [grade, words] of Object.entries(value)) {
+            const list = strings(words);
+            if (text(grade) && list.length) out[text(grade)] = list;
+        }
+        return out;
+    }
+
     /** Validates and reads a catalog; rows the apps would skip are skipped here too. */
     function parseCatalog(value) {
         if (!value || typeof value !== 'object' || value.schema !== SCHEMA) throw new Error('Not a study pack catalog');
@@ -53,6 +63,11 @@
                 languages: strings(json.languages),
                 subjects: strings(json.subjects),
                 keywords: strings(json.keywords),
+                // Class packs: the grade band ("6-8"), the board, and topic words per grade.
+                grade: text(json.grade) || null,
+                board: text(json.board) || null,
+                gradeKeywords: parseGradeKeywords(json.gradeKeywords),
+                blockedWords: strings(json.blockedWords),
                 channels: array(json.channels).map(parseChannel).filter(Boolean)
             });
         }
@@ -99,6 +114,11 @@
         return [...own, ...nearby, ...global].filter(pack => !seen.has(pack.id) && seen.add(pack.id));
     }
 
+    /** The picker's two tabs: "exams" (kind study/exam) and "school" (kind class), for a country. */
+    function forTab(catalog, country, tab) {
+        return forCountry(catalog, country, { kinds: tab === 'school' ? ['class'] : ['study', 'exam'] });
+    }
+
     function kidsPacks(catalog) {
         return array(catalog?.packs).filter(pack => KIDS_KINDS.includes(pack.kind));
     }
@@ -136,7 +156,7 @@
 
     return Object.freeze({
         CATALOG_PATH, SCHEMA, VERSION, STUDY_KINDS, KIDS_KINDS,
-        load, resetCache, parseCatalog, countryFromLocale, isGlobal, forCountry, kidsPacks, packById, packName,
+        load, resetCache, parseCatalog, countryFromLocale, isGlobal, forCountry, forTab, kidsPacks, packById, packName,
         matchChannel, packsForChannel
     });
 }));

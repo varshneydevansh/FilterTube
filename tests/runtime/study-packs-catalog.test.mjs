@@ -55,18 +55,57 @@ test('the bundled catalog has at least 3 approved channels per pack and fits the
   }
   const ids = bundled.packs.map(pack => pack.id);
   assert.equal(new Set(ids).size, ids.length);
-  for (const hidden of ['cn_gaokao', 'cn_kaoyan', 'lk_gce_al', 'jp_eju', 'cl_paes']) assert.equal(ids.includes(hidden), false, hidden);
-  assert.deepEqual([...new Set(bundled.packs.map(pack => pack.kind))].sort(), ['kids_age', 'kids_classic', 'study']);
+  for (const hidden of ['cn_gaokao', 'cn_kaoyan', 'tz_necta', 'my_stpm', 'cm_gce_bac', 'us_praxis']) assert.equal(ids.includes(hidden), false, hidden);
+  assert.deepEqual([...new Set(bundled.packs.map(pack => pack.kind))].sort(), ['class', 'kids_age', 'kids_classic', 'study']);
   assert.equal(catalog.packs.length, bundled.packs.length, 'the loader reads every bundled pack');
 });
 
-test('the bundled catalog is the generator output for the draft, and the same bytes the apps bundle', t => {
+test('the bundled catalog is the generator output for the v2 draft, and the same bytes the apps bundle', t => {
   const app = new URL('../../../study-3.6.2/', import.meta.url);
-  const draftPath = new URL('docs/app/study-mode/study-packs-draft.json', app);
+  const draftPath = new URL('docs/app/study-mode/study-packs-draft-v2.json', app);
   if (!fs.existsSync(draftPath)) { t.skip('the draft lives in the app repository'); return; }
   assert.equal(renderCatalog(JSON.parse(fs.readFileSync(draftPath, 'utf8'))), raw);
   const androidAsset = new URL('apps/android/app/src/main/assets/study/packs-v1.json', app);
-  if (fs.existsSync(androidAsset)) assert.equal(fs.readFileSync(androidAsset, 'utf8'), raw);
+  if (!fs.existsSync(androidAsset)) return;
+  const android = fs.readFileSync(androidAsset, 'utf8');
+  // Until the app regenerates from the v2 draft its asset still carries the v1 draft date.
+  if (JSON.parse(android).draftGenerated !== bundled.draftGenerated) { t.diagnostic('the Android asset is still built from an older draft'); return; }
+  assert.equal(android, raw);
+});
+
+test('v2: class packs carry grade, board, subjects and grade keywords; the picker has Exams and School tabs', () => {
+  assert.equal(bundled.draftGenerated, '2026-11-15');
+  assert.ok(bundled.packs.length >= 130, 'v2 has 145 packs before thin ones are hidden');
+  const cbse = Packs.packById(catalog, 'cls_in_cbse_6_8');
+  assert.equal(cbse.kind, 'class');
+  assert.equal(cbse.grade, '6-8');
+  assert.equal(cbse.board, 'CBSE (NCERT)');
+  assert.ok(cbse.subjects.includes('Mathematics'));
+  assert.deepEqual(Object.keys(cbse.gradeKeywords), ['6', '7', '8']);
+  assert.ok(cbse.gradeKeywords['6'].includes('class 6 maths'));
+  const rawCbse = bundled.packs.find(pack => pack.id === 'cls_in_cbse_6_8');
+  assert.deepEqual(Object.keys(rawCbse), ['id', 'kind', 'name', 'grade', 'board', 'countries', 'nearby', 'languages', 'subjects', 'keywords', 'gradeKeywords', 'channels'],
+    'field order is part of the byte-identical contract with the apps');
+  const school = Packs.forTab(catalog, 'IN', 'school');
+  assert.ok(school.length > 0 && school.every(pack => pack.kind === 'class'));
+  assert.equal(school[0].countries.includes('IN'), true, 'own country first');
+  const exams = Packs.forTab(catalog, 'IN', 'exams');
+  assert.ok(exams.some(pack => pack.id === 'in_upsc_cse') && exams.every(pack => pack.kind === 'study'));
+  const upsc = Packs.packById(catalog, 'in_upsc_cse');
+  assert.equal(upsc.grade, null);
+  assert.deepEqual(upsc.gradeKeywords, {});
+  assert.equal(Packs.kidsPacks(catalog).length, 6);
+});
+
+test('the generator writes class fields and pack blocked words only when they have values', () => {
+  const { catalog: built } = buildCatalog({ generated: 'g', packs: [], kidsPacks: [], classPacks: [
+    { id: 'cls_x', kind: 'class', grade: ' 9-10 ', board: 'Board', name: { en: 'X' }, subjects: ['Maths', 'Maths'],
+      gradeKeywords: { 9: [' class 9 ', 'class 9'], 10: [], '': ['x'] }, blockedWords: ['reaction', ' vlog '],
+      channels: [1, 2, 3].map(n => ({ name: `C${n}`, handle: `c${n}`, confidence: 'medium' })) }
+  ] });
+  assert.deepEqual(built.packs[0], { id: 'cls_x', kind: 'class', name: { en: 'X' }, grade: '9-10', board: 'Board', subjects: ['Maths'],
+    gradeKeywords: { 9: ['class 9'] }, blockedWords: ['reaction', 'vlog'],
+    channels: [{ handle: '@c1', name: 'C1' }, { handle: '@c2', name: 'C2' }, { handle: '@c3', name: 'C3' }] });
 });
 
 test('packs for a country: own first, then nearby, then global; kids packs are separate', () => {
