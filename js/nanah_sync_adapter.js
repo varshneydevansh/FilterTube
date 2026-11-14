@@ -16,22 +16,107 @@
         'channels',
         'viewing_space',
         'time_limits',
-        // Study mode (3.6.2). A parent sends these only to a child that advertises the study capability.
+        // Study mode (3.6.2). A parent sends these only to a child that advertises STUDY_CAPABILITY;
+        // they ride on the time_limits permission and never join a link's allowedScopes.
         'study',
         'focus_lock',
         'schedule'
     ];
     const MANAGED_STUDY_SCOPES = ['study', 'focus_lock', 'schedule'];
+    const STUDY_CAPABILITY = 'filtertube.study.v1';
+    const STUDY_CARRIER_PERMISSION = 'time_limits';
     const DEFAULT_DEVICE_CAPABILITIES = [
         'sync.send',
         'sync.receive',
         'control.propose',
-        'study.v1'
+        STUDY_CAPABILITY
     ];
 
-    function studyModel() {
+    /** The signer and receiver both know this scope (nanah_managed_live_policy.js asks before sending). */
+    function supportsManagedPolicyScope(scope) {
+        return !!normalizeManagedPolicyScope(scope);
+    }
+
+    // Study payloads are checked and applied here so every app that copies this adapter can receive
+    // them without the extension's study model. The shape is profile.study version 1 (study_model.js).
+    const STUDY_PACK_ID = /^[A-Za-z0-9_.-]{1,64}$/;
+    const STUDY_TIME = /^([01]\d|2[0-3]):[0-5]\d$/;
+
+    function studyPlanValid(plan) {
+        const root = safeObject(plan);
+        return STUDY_TIME.test(normalizeString(root.start)) && STUDY_TIME.test(normalizeString(root.end));
+    }
+
+    function validateManagedStudyPayload(scope, payload) {
+        const root = safeObject(payload);
+        const has = key => Object.prototype.hasOwnProperty.call(root, key);
+        if (scope === 'study') {
+            if (!Array.isArray(root.activePackIds) || root.activePackIds.some(id => !STUDY_PACK_ID.test(normalizeString(id)))) return 'invalid_study_payload';
+            if (has('packEdits') && (!root.packEdits || typeof root.packEdits !== 'object' || Array.isArray(root.packEdits))) return 'invalid_study_payload';
+            if (has('focus') && (!root.focus || typeof root.focus !== 'object' || Array.isArray(root.focus))) return 'invalid_study_payload';
+            if (has('weekView') && root.weekView !== null && typeof root.weekView !== 'boolean') return 'invalid_study_payload';
+            return '';
+        }
+        if (scope === 'schedule') {
+            if (!has('plan') || (root.plan !== null && !studyPlanValid(root.plan))) return 'invalid_schedule_payload';
+            if (has('breakMode') && !['rest', 'normal'].includes(root.breakMode)) return 'invalid_schedule_payload';
+            return '';
+        }
+        if (!has('lock') || (root.lock !== null && !normalizeString(safeObject(root.lock).sessionId))) return 'invalid_focus_lock_payload';
+        return '';
+    }
+
+    function managedStudyScopeAllowed(allowedScopes) {
+        return safeArray(allowedScopes).map(scope => normalizeString(scope).toLowerCase())
+            .some(scope => scope === STUDY_CARRIER_PERMISSION || scope === 'active' || scope === 'full');
+    }
+
+    /**
+     * Applies one signed parent payload to the child's study object. The parent is the authority for what
+     * it sent; the child keeps its own progress and saved list mode. A lock or plan one parent set can only
+     * be changed or ended by that parent.
+     */
+    function applyManagedStudyPolicy(profile, scope, payload, envelope) {
+        const root = safeObject(payload);
+        const parentId = normalizeString(safeObject(envelope).sourceProfileId) || null;
+        const current = safeObject(profile.study);
+        const base = {
+            version: 1, activePackIds: [], packEdits: {}, focus: { roundMinutes: 25, breakMinutes: 5, dailyGoalMinutes: 120 },
+            plan: null, lock: null, savedListMode: null, breakMode: 'rest', progress: {}, weekView: null, ...current
+        };
+        const owner = value => normalizeString(safeObject(value).setByParentId);
+        let next;
+        if (scope === 'study') {
+            next = {
+                ...base,
+                activePackIds: Array.from(new Set(root.activePackIds.map(normalizeString))),
+                packEdits: Object.prototype.hasOwnProperty.call(root, 'packEdits') ? safeObject(root.packEdits) : base.packEdits,
+                focus: Object.prototype.hasOwnProperty.call(root, 'focus') ? safeObject(root.focus) : base.focus,
+                weekView: typeof root.weekView === 'boolean' ? root.weekView : base.weekView
+            };
+        } else if (scope === 'schedule') {
+            if (owner(base.plan) && owner(base.plan) !== parentId) throw new Error('Another parent set this study plan');
+            next = {
+                ...base,
+                plan: root.plan === null ? null : { ...safeObject(root.plan), setByParentId: parentId },
+                breakMode: root.breakMode === 'normal' || root.breakMode === 'rest' ? root.breakMode : base.breakMode
+            };
+        } else {
+            if (owner(base.lock) && owner(base.lock) !== parentId) throw new Error('Another parent set this study lock');
+            const lock = safeObject(root.lock);
+            next = {
+                ...base,
+                lock: root.lock === null ? null : {
+                    ...lock,
+                    sessionKind: ['self_control', 'hard_whitelist'].includes(lock.sessionKind) ? lock.sessionKind : 'hard_whitelist',
+                    // A parent-set session is always Locked.
+                    mode: 'locked',
+                    setByParentId: parentId
+                }
+            };
+        }
         const model = global.FilterTubeStudyModel;
-        return model && typeof model.applyManagedPayload === 'function' ? model : null;
+        return { ...profile, study: model && typeof model.normalizeStudy === 'function' ? model.normalizeStudy(next) : next };
     }
 
     function normalizeString(value) {
@@ -176,9 +261,7 @@
         if (!family) return validationResult('payload_scope_unknown');
         if (family !== scope) return validationResult('payload_scope_mismatch');
         if (MANAGED_STUDY_SCOPES.includes(scope)) {
-            const model = studyModel();
-            if (!model) return validationResult('study_unsupported');
-            const reason = model.validateManagedPayload(scope, payload);
+            const reason = validateManagedStudyPayload(scope, payload);
             return reason ? validationResult(reason) : null;
         }
         const root = safeObject(payload);
@@ -667,7 +750,7 @@
         if (root.targetProfileId !== trustedLink.targetProfileId) return validationResult('wrong_target_profile');
         const linkAllowedScopes = [...safeArray(trustedLink.allowedScopes), ...safeArray(safeObject(trustedLink.policy).allowedScopes)];
         const scopeAllowed = MANAGED_STUDY_SCOPES.includes(scope)
-            ? !!studyModel()?.managedScopeAllowed(scope, linkAllowedScopes)
+            ? managedStudyScopeAllowed(linkAllowedScopes)
             : linkAllowedScopes.includes(scope);
         if (!scopeAllowed) {
             return validationResult('scope_not_allowed');
@@ -1681,18 +1764,7 @@
         if (scope === 'videos') return applyManagedVideoPolicy(profile, payload);
         if (scope === 'viewing_space') return applyManagedViewingSpacePolicy(profile, payload);
         if (scope === 'time_limits') return applyManagedTimeLimitPolicy(profile, payload, envelope);
-        if (MANAGED_STUDY_SCOPES.includes(scope)) {
-            const model = studyModel();
-            if (!model) throw new Error('Unsupported managed policy scope');
-            return {
-                ...profile,
-                study: model.applyManagedPayload(model.profileStudy(profile), scope, payload, {
-                    sourceProfileId: normalizeString(root.sourceProfileId),
-                    sourceDeviceId: normalizeString(root.sourceDeviceId),
-                    sourceProfileName: normalizeString(root.sourceProfileName)
-                })
-            };
-        }
+        if (MANAGED_STUDY_SCOPES.includes(scope)) return applyManagedStudyPolicy(profile, scope, payload, root);
         throw new Error('Unsupported managed policy scope');
     }
 
@@ -2273,6 +2345,9 @@
         applyManagedPolicyEnvelope,
         applyManagedMailboxItem,
         applyIncomingEnvelope,
-        extractPortableFromEnvelope
+        extractPortableFromEnvelope,
+        supportsManagedPolicyScope,
+        managedStudyScopes: MANAGED_STUDY_SCOPES.slice(),
+        studyCapability: STUDY_CAPABILITY
     };
 })(typeof window !== 'undefined' ? window : this);

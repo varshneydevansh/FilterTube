@@ -17166,11 +17166,11 @@ document.addEventListener('DOMContentLoaded', async () => {
         if (role === 'source') {
             return ['sync.send', 'control.propose', 'device.link'];
         }
-        // study.v1: this device applies the Study mode scopes (study, focus_lock, schedule).
+        // filtertube.study.v1: this device applies the Study mode scopes (study, focus_lock, schedule).
         if (role === 'replica') {
-            return ['sync.receive', 'control.apply', 'device.link', 'study.v1'];
+            return ['sync.receive', 'control.apply', 'device.link', 'filtertube.study.v1'];
         }
-        return ['sync.send', 'sync.receive', 'control.propose', 'control.apply', 'device.link', 'study.v1'];
+        return ['sync.send', 'sync.receive', 'control.propose', 'control.apply', 'device.link', 'filtertube.study.v1'];
     }
 
     function buildNanahPairUri(code) {
@@ -26380,6 +26380,8 @@ document.addEventListener('DOMContentLoaded', async () => {
         buildLocalPolicyHash,
         getCurrentTrustedLink: getNanahCurrentTrustedLink,
         getAllowedScopeList: getNanahManagedPolicyScopeList,
+        // The paired child's hello; study scopes go only to a child advertising filtertube.study.v1.
+        getRemoteCapabilities: () => safeArray(nanahSessionState.remoteDevice?.capabilities),
         getScopeLabel: getNanahScopeLabel,
         ensureSigningKeyPair: ensureNanahManagedSigningKeyPair,
         getStableDeviceId: () => nanahStableDeviceId,
