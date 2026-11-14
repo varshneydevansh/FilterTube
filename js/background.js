@@ -1223,7 +1223,7 @@ const browserAPI = IS_FIREFOX ? browser : chrome;
 // Private Notes modules are browser-only; never forwarded to MAIN or native assets.
 try {
     if (typeof importScripts === 'function' && !globalThis.FilterTubeVideoNotesBackground) {
-        importScripts('shared/saved_video_notes.js', 'shared/local_playlists.js', 'shared/study_model.js', 'shared/kids_youtube_profiles.js', 'video_notes_store.js', 'video_notes_background.js', 'local_playlists_store.js', 'kids_youtube_profiles_background.js', 'personal_sync.js', 'device_auto_sync.js', 'auto_sync_wakeup.js');
+        importScripts('shared/saved_video_notes.js', 'shared/local_playlists.js', 'shared/study_model.js', 'shared/study_packs.js', 'shared/study_engine.js', 'study_background.js', 'shared/kids_youtube_profiles.js', 'video_notes_store.js', 'video_notes_background.js', 'local_playlists_store.js', 'kids_youtube_profiles_background.js', 'personal_sync.js', 'device_auto_sync.js', 'auto_sync_wakeup.js');
     }
     globalThis.FilterTubeVideoNotesBackground?.install({
         api: browserAPI,
@@ -1417,6 +1417,8 @@ function stripMetadataOnlyChannelLists(value) {
         : {};
     Object.values(profiles).forEach((profile) => {
         if (!profile || typeof profile !== 'object') return;
+        // Study minutes are bookkeeping, not rules: a progress-only write must not repaint YouTube.
+        if (profile.study && typeof profile.study === 'object') delete profile.study.progress;
         [profile, profile.main, profile.kids].forEach((surface) => {
             if (!surface || typeof surface !== 'object') return;
             ['channels', 'blockedChannels', 'whitelistChannels', 'allowedChannels'].forEach((key) => {
@@ -1707,6 +1709,105 @@ async function enforceSelfControlProfileSnapshot(changedProfilesV4) {
         }
     });
     return true;
+}
+
+// Study mode (3.6.2): applied at compile time from the plan and the clock; see js/study_background.js.
+async function writeStudyProfile(profileId, profile) {
+    if (await getActiveSelfControlSession()) return { ok: false, error: 'self_control_settings_locked' };
+    const stored = await storageGet([FT_PROFILES_V4_KEY]);
+    const profilesV4 = stored?.[FT_PROFILES_V4_KEY];
+    if (!isValidProfilesV4(profilesV4) || !safeObject(profilesV4.profiles)[profileId]) return { ok: false, error: 'profiles_unavailable' };
+    await browserAPI.storage.local.set({
+        [FT_PROFILES_V4_KEY]: { ...profilesV4, profiles: { ...safeObject(profilesV4.profiles), [profileId]: cloneJsonValue(profile) } }
+    });
+    return { ok: true };
+}
+
+// Locked study is today's Self-Control Session record: the hard_whitelist kind (a pack is active), the
+// profile held as it is with study.lock pointing at the session, restored without the lock on expiry.
+async function startStudyLockedSession({ profileId, sessionId, startedAt, lockedUntil }) {
+    const existing = await getActiveSelfControlSession();
+    if (existing) return { ok: false, error: 'session_already_active' };
+    const stored = await storageGet([FT_PROFILES_V4_KEY]);
+    const profilesV4 = stored?.[FT_PROFILES_V4_KEY];
+    if (!isValidProfilesV4(profilesV4)) return { ok: false, error: 'profiles_unavailable' };
+    const profile = safeObject(safeObject(profilesV4.profiles)[profileId]);
+    const StudyModel = globalThis.FilterTubeStudyModel;
+    const study = StudyModel?.profileStudy(profile);
+    if (!study) return { ok: false, error: 'no_study' };
+    const lock = { sessionId, sessionKind: SELF_CONTROL_SESSION_KIND_HARD_WHITELIST, mode: 'locked', setByParentId: null };
+    const profileSnapshot = cloneJsonValue({ ...profile, study: { ...study, lock }, settings: { ...safeObject(profile.settings), enabled: true } });
+    const session = normalizeSelfControlSession({
+        schema: SELF_CONTROL_SESSION_SCHEMA,
+        version: 1,
+        sessionKind: SELF_CONTROL_SESSION_KIND_HARD_WHITELIST,
+        sessionId,
+        profileId,
+        profileName: normalizeString(profile.name) || (profileId === DEFAULT_PROFILE_ID ? 'Default' : 'Profile'),
+        startedAt,
+        lockedUntil,
+        profileSnapshot,
+        restoreProfileSnapshot: cloneJsonValue({ ...profile, study: { ...study, lock: null } })
+    }, startedAt);
+    if (!session) return { ok: false, error: 'invalid_duration' };
+    await browserAPI.storage.local.set({
+        [SELF_CONTROL_SESSION_KEY]: session,
+        [FT_PROFILES_V4_KEY]: {
+            ...profilesV4,
+            schemaVersion: 4,
+            activeProfileId: profileId,
+            profiles: { ...safeObject(profilesV4.profiles), [profileId]: cloneJsonValue(profileSnapshot) }
+        }
+    });
+    await scheduleSelfControlSessionExpiry(session);
+    return { ok: true, sessionId, lockedUntil };
+}
+
+async function broadcastStudyTransition() {
+    compiledSettingsCache.main = null;
+    compiledSettingsCache.kids = null;
+    const targets = [
+        { profile: 'main', url: 'https://www.youtube.com/', patterns: ['*://*.youtube.com/*'] },
+        { profile: 'kids', url: 'https://www.youtubekids.com/', patterns: ['*://*.youtubekids.com/*'] }
+    ];
+    for (const target of targets) {
+        try {
+            const settings = await getCompiledSettings({ tab: { url: target.url } }, target.profile, true);
+            browserAPI.tabs?.query?.({ url: target.patterns }, (tabs) => {
+                (tabs || []).forEach((tab) => {
+                    if (!tab?.id) return;
+                    sendMessageToTabQuietly(tab.id, { action: 'FilterTube_ApplySettings', settings });
+                    sendMessageToTabQuietly(tab.id, { action: 'FilterTube_StudyState', state: settings?.study || null });
+                });
+            });
+        } catch (e) {
+            console.warn('FilterTube Study: transition broadcast failed', e);
+        }
+    }
+}
+
+const studyBackground = globalThis.FilterTubeStudyBackground?.createStudyBackground
+    ? globalThis.FilterTubeStudyBackground.createStudyBackground({
+        browserAPI,
+        getSelfControlSession: () => getActiveSelfControlSession(),
+        startLockedSession: startStudyLockedSession,
+        writeProfile: writeStudyProfile,
+        onTransition: () => broadcastStudyTransition()
+    })
+    : null;
+
+async function prepareStudyForCompile() {
+    try {
+        return studyBackground ? await studyBackground.prepare() : null;
+    } catch (e) {
+        return null;
+    }
+}
+
+/** A cached compile is reused only until the next study transition. */
+function compiledSettingsStillFresh(compiled) {
+    const until = Number(compiled?.study?.validUntil);
+    return !Number.isFinite(until) || Date.now() < until;
 }
 
 try {
@@ -3575,8 +3676,10 @@ async function getCompiledSettings(sender = null, profileType = null, forceRefre
 
     // Return cached settings if available
     if (!forceRefresh && compiledSettingsCache[targetProfile]) {
-        return compiledSettingsCache[targetProfile];
+        // Reused only until the next study transition.
+        if (compiledSettingsStillFresh(compiledSettingsCache[targetProfile])) return compiledSettingsCache[targetProfile];
     }
+    const studyPrepared = await prepareStudyForCompile();
 
     return new Promise((resolve) => {
         browserAPI.storage.local.get([
@@ -3827,8 +3930,15 @@ async function getCompiledSettings(sender = null, profileType = null, forceRefre
                 ? effectiveProfilesV4.activeProfileId
                 : DEFAULT_PROFILE_ID;
             const activeProfile = safeObject(safeObject(effectiveProfilesV4?.profiles)?.[activeProfileId]);
-            const activeMain = safeObject(activeProfile.main);
-            const activeKids = safeObject(activeProfile.kids);
+            // During study the active packs become the allow layer of Main and Kids (layered over the
+            // block list); the rest of the profile is used as stored.
+            const studyApplication = studyBackground && studyPrepared
+                ? studyBackground.apply(activeProfileId, activeProfile, studyPrepared)
+                : null;
+            const studyRuleProfile = safeObject(studyApplication?.profile || activeProfile);
+            compiledSettings.study = studyApplication?.state ? { ...studyApplication.state, applied: studyApplication.applied === true } : null;
+            const activeMain = safeObject(studyRuleProfile.main);
+            const activeKids = safeObject(studyRuleProfile.kids);
 
             const activeSettings = safeObject(activeProfile.settings);
             const activeProfileKind = (() => {
@@ -5084,6 +5194,16 @@ async function performWatchIdentityFetch(videoId) {
 
 // Listen for messages sent from other parts of the extension (e.g., content scripts, popup).
 browserAPI.runtime.onMessage.addListener(function (request, sender, sendResponse) {
+    const studyResponse = studyBackground?.handleMessage(request, {
+        extensionPage: isTrustedUiSender(sender),
+        youtubeContent: isYouTubeContentSender(sender)
+    });
+    if (studyResponse) {
+        studyResponse
+            .then(response => sendResponse?.(response))
+            .catch(e => sendResponse?.({ ok: false, error: e?.message || 'study_failed' }));
+        return true;
+    }
     const action = request?.action || request?.type;
     if (action === 'FilterTube_AutoSyncAuthorize') return handleAutoSyncAuthorization(request, sender, sendResponse);
     if (action === 'FilterTube_PersonalPlaylistsRead' || action === 'FilterTube_PersonalPlaylistsMerge') {
@@ -5259,8 +5379,10 @@ browserAPI.runtime.onMessage.addListener(function (request, sender, sendResponse
         const profileType = requestedProfile === 'kids' ? 'kids' : (requestedProfile === 'main' ? 'main' : (isKidsUrl(senderUrl) ? 'kids' : 'main'));
 
         if (compiledSettingsCache[profileType] && !request.forceRefresh) {
-            sendResponse(compiledSettingsCache[profileType]);
-            return;
+            if (compiledSettingsStillFresh(compiledSettingsCache[profileType])) {
+                sendResponse(compiledSettingsCache[profileType]);
+                return;
+            }
         }
 
         console.log(`FilterTube Background: Received getCompiledSettings message for profile: ${profileType} (force: ${!!request.forceRefresh})`);
@@ -8759,6 +8881,10 @@ if (browserAPI.alarms?.onAlarm && typeof browserAPI.alarms.onAlarm.addListener =
             reconcileSelfControlSessionExpiry().catch(() => {});
             return;
         }
+        if (studyBackground && alarm?.name === studyBackground.ALARM) {
+            studyBackground.onAlarm(alarm.name).catch(() => {});
+            return;
+        }
         importedChannelEnrichmentScheduler?.handleAlarm?.(alarm?.name);
     });
 }
@@ -8772,6 +8898,7 @@ if (browserAPI.runtime?.onStartup && typeof browserAPI.runtime.onStartup.addList
 
 void reconcileSelfControlSessionExpiry();
 void initializeImportedChannelEnrichment();
+void studyBackground?.schedule().catch(() => {});
 
 console.log(`FilterTube Background ${IS_FIREFOX ? 'Script' : 'Service Worker'} loaded and ready to serve filtered content.`);
 
