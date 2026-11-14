@@ -83,8 +83,10 @@
         }
         function areas(value) {
             const list = Array.isArray(value) ? value : Object.keys(value || {}).filter(key => value[key] === true);
-            if (!list.length || list.length > 4 || new Set(list).size !== list.length
-                || list.some(area => !['settings', 'notes', 'playlists', 'study'].includes(area))) fail('Choose settings, notes, playlists, study, or a combination.');
+            // "study" only where the protocol has the study model loaded (protocol.AREAS).
+            const known = Array.isArray(protocol.AREAS) ? protocol.AREAS : ['settings', 'notes', 'playlists'];
+            if (!list.length || list.length > known.length || new Set(list).size !== list.length
+                || list.some(area => !known.includes(area))) fail('Choose settings, notes, playlists, study, or a combination.');
             return list.slice().sort();
         }
         async function keys() {

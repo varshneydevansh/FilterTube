@@ -20,8 +20,10 @@
     const MESSAGE_SCHEMA = 'filtertube.personal-sync';
     const own = (value, key) => Object.prototype.hasOwnProperty.call(value, key);
     const forbidden = new Set(['__proto__', 'prototype', 'constructor']);
-    // "study" is offered only by apps that know it; an older peer never grants it.
-    const AREAS = ['settings', 'notes', 'playlists', 'study'];
+    // "study" is offered only where the study model (js/shared/study_model.js) is loaded; an older peer
+    // never grants it, and a copy of this file without the model behaves exactly as before.
+    const AREAS = study && typeof study.mergeStudy === 'function'
+        ? ['settings', 'notes', 'playlists', 'study'] : ['settings', 'notes', 'playlists'];
     const booleanSettings = [
         'enabled', 'syncKidsToMain', 'hideShorts', 'hideComments', 'hideHomeFeed',
         'hideSponsoredCards', 'contentOnlyPlayback', 'hidePlayables', 'hideWatchPlaylistPanel',
@@ -35,8 +37,9 @@
     ];
     const sectionFields = {
         settings: [...booleanSettings, 'contentFilters', 'categoryFilters', 'languageFilters'],
-        main: ['mode', 'channels', 'keywords', 'whitelistChannels', 'whitelistKeywords', 'videoIds', 'allowedVideoIds'],
-        kids: ['mode', 'strictMode', 'blockedChannels', 'blockedKeywords', 'whitelistChannels', 'whitelistKeywords', 'videoIds', 'contentFilters', 'categoryFilters']
+        // layered: true (written only when on) keeps the block list applying under the allow list.
+        main: ['mode', 'layered', 'channels', 'keywords', 'whitelistChannels', 'whitelistKeywords', 'videoIds', 'allowedVideoIds'],
+        kids: ['mode', 'layered', 'strictMode', 'blockedChannels', 'blockedKeywords', 'whitelistChannels', 'whitelistKeywords', 'videoIds', 'contentFilters', 'categoryFilters']
     };
     const contentGroups = {
         views: ['enabled', 'minViews'],
@@ -203,7 +206,7 @@
                 else if (section === 'settings') {
                     requireValue(typeof item === 'boolean');
                 } else if (key === 'mode') requireValue(item === 'whitelist' || item === 'blocklist');
-                else if (key === 'strictMode') requireValue(typeof item === 'boolean');
+                else if (key === 'strictMode' || key === 'layered') requireValue(typeof item === 'boolean');
                 else validateList(item, key);
             }
         }
@@ -266,6 +269,8 @@
                     ? profile.main?.[key === 'syncKidsToMain' ? 'applyKidsRulesOnMain' : key] : undefined;
                 const value = own(source, key) ? source[key] : alias && own(source, alias) ? source[alias] : legacy;
                 if (value === undefined) continue;
+                // Written only when on, like the apps, so a peer that never used layered rules sees no change.
+                if (key === 'layered' && value !== true) continue;
                 if (key === 'contentFilters') {
                     result[section].contentFilters = selectedContentFilters(value);
                 } else if (key === 'categoryFilters' || key === 'languageFilters') {
@@ -392,22 +397,19 @@
      * The study area: packs, edits, focus, plan, week view and progress. The running lock never travels.
      * Fields the sender doesn't have are left out, so they keep the receiver's values when merged.
      */
+    // null: the sender has no study object, so nothing changes here.
     function studyValue(value) {
-        requireValue(!!study, 'study_contract_unavailable');
+        requireValue(AREAS.includes('study'), 'study_contract_unavailable');
+        if (value === null) return null;
         canonical(value);
-        study.validateForSync(value);
-        const result = clone(value);
-        if (own(result, 'lock')) result.lock = null;
-        return result;
+        return study.validateForSync(value);
     }
     function snapshotStudy(profile) {
         object(profile);
-        requireValue(!!study, 'study_contract_unavailable');
-        const stored = profile.study === undefined ? null : study.normalizeStudy(profile.study);
-        if (stored) return studyValue({ ...stored, lock: null });
-        return studyValue({ version: study.VERSION, packIds: study.packIdsFromTags(profile) });
+        requireValue(AREAS.includes('study'), 'study_contract_unavailable');
+        return profile.study === undefined ? null : studyValue(study.withoutLock(profile.study));
     }
-    /** Joins a peer's study object into this profile's. Same rules as backup Merge. */
+    /** Joins a peer's study object into this profile's. Same rules as Nearby Merge; the lock never travels. */
     function mergeStudy(localValue, remoteValue, grant) {
         grant = normalizeGrant(grant);
         requireValue(grant.enabled && grant.areas.includes('study'), 'study_not_authorized');
@@ -415,7 +417,7 @@
     }
     function applyStudy(profile, remoteValue, grant) {
         object(profile);
-        const merged = mergeStudy(study.profileStudy(profile), remoteValue, grant);
+        const merged = mergeStudy(profile.study === undefined ? null : profile.study, remoteValue, grant);
         const result = clone(profile);
         if (merged) result.study = merged;
         return result;
@@ -496,7 +498,7 @@
         }
         return Object.freeze({ digest, sign, verify });
     }
-    return Object.freeze({ MAX_BYTES, PLAYLISTS_MAX_BYTES, MESSAGE_MAX_BYTES, GRANT_SCHEMA, MESSAGE_SCHEMA, normalizeGrant, peerBinding,
+    return Object.freeze({ AREAS: Object.freeze(AREAS.slice()), MAX_BYTES, PLAYLISTS_MAX_BYTES, MESSAGE_MAX_BYTES, GRANT_SCHEMA, MESSAGE_SCHEMA, normalizeGrant, peerBinding,
         snapshotSettings, validateSettings, mergeSettings, applySettings, mergeNotes, mergePlaylists,
         snapshotStudy, mergeStudy, applyStudy, create });
 }));

@@ -2,210 +2,162 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import { createRequire } from 'node:module';
 
+// profile.study version 1, the same shape and merge rules as Android (StudyModels.kt, StudyMerge.kt).
 const require = createRequire(import.meta.url);
 const Study = require('../../js/shared/study_model.js');
 
-const sample = () => ({
-  version: 1,
-  packIds: ['in_upsc_cse'],
-  edits: { in_upsc_cse: { addChannels: [{ channelId: 'UCV1lbzgZNcYFAT3VHKOb7Cg', handle: '@UnacademyUPSC101' }], removeChannels: ['@SansadTV'], addTopics: ['Indian  Polity'], removeTopics: [] } },
-  focus: { roundMinutes: 40, breakMinutes: 10, dailyGoalMinutes: 120 },
-  plan: { days: [1, 2, 3, 4, 5], start: '16:00', end: '18:00', setBy: { kind: 'parent', profileId: 'mum', name: 'Mum' } },
-  lock: { ref: 'session-1', mode: 'locked', setBy: 'self' },
+const KEYS = ['activePackIds', 'breakMode', 'focus', 'lock', 'packEdits', 'plan', 'progress', 'savedListMode', 'version', 'weekView'];
+const study = (extra = {}) => ({ version: 1, activePackIds: [], packEdits: {}, focus: { roundMinutes: 25, breakMinutes: 5, dailyGoalMinutes: 120 },
+  plan: null, lock: null, savedListMode: null, breakMode: 'rest', progress: {}, weekView: null, ...extra });
+const localStudy = () => study({
+  activePackIds: ['in_upsc_cse'],
+  packEdits: { in_upsc_cse: { channelsAdded: [{ handle: '@Mine' }], channelsRemoved: [], topicsAdded: ['Polity'], topicsRemoved: [] } },
+  lock: { sessionId: 'local-session', sessionKind: 'hard_whitelist', mode: 'locked', setByParentId: null },
   savedListMode: 'blocklist',
-  progress: { phone: { '2026-11-14': 50, '2026-11-15': 20 } },
-  weekView: true
+  progress: { phone: { '2026-11-14': 30, '2026-11-15': 10 } }
+});
+const remoteStudy = () => study({
+  activePackIds: ['in_upsc_cse', 'in_ssc'],
+  packEdits: { in_upsc_cse: { channelsAdded: [{ handle: '@mine' }, { channelId: 'UCV1lbzgZNcYFAT3VHKOb7Cg' }], channelsRemoved: ['@Vlogs'], topicsAdded: ['polity '], topicsRemoved: ['vlog'] } },
+  lock: { sessionId: 'remote-session', sessionKind: 'hard_whitelist', mode: 'locked', setByParentId: null },
+  savedListMode: 'layered',
+  focus: { roundMinutes: 50, breakMinutes: 10, dailyGoalMinutes: 180 },
+  progress: { phone: { '2026-11-15': 5 }, tablet: { '2026-11-15': 40 } }
 });
 
-test('a study object normalizes to the version 1 shape', () => {
-  const study = Study.normalizeStudy(sample());
-  assert.deepEqual(Object.keys(study).sort(), ['breakMode', 'edits', 'focus', 'lock', 'packIds', 'plan', 'progress', 'savedListMode', 'version', 'weekView']);
-  assert.equal(study.breakMode, 'rest', 'breaks show the rest screen unless someone chose normal videos');
-  assert.equal(study.version, 1);
-  assert.deepEqual(study.edits.in_upsc_cse.addTopics, ['indian polity']);
-  assert.deepEqual(study.plan.days, [1, 2, 3, 4, 5]);
-  assert.equal(study.lock.mode, 'locked');
+test('every key is always written and null means unset', () => {
+  const value = Study.normalizeStudy({});
+  assert.deepEqual(Object.keys(value).sort(), KEYS);
+  assert.deepEqual(value, study());
   assert.equal(Study.normalizeStudy(null), null);
   assert.equal(Study.normalizeStudy([]), null);
 });
 
-test('invalid fields fall back without dropping the rest', () => {
-  const study = Study.normalizeStudy({
-    packIds: ['ok_pack', 'ok_pack', '', 'bad id', 7],
-    focus: { roundMinutes: 1, breakMinutes: 'x', dailyGoalMinutes: 90 },
-    plan: { days: ['Mon', 'fri', 9], start: '25:00', end: '18:00' },
-    lock: { mode: 'locked' },
-    savedListMode: 'other',
-    progress: { phone: { '2026-02-30': 5, '2026-11-15': -1, '2026-11-14': 30 }, __proto__: { x: 1 } }
+test('values are clamped and invalid rows dropped the way Android reads them', () => {
+  const value = Study.normalizeStudy({
+    version: 0,
+    activePackIds: ['in_upsc_cse', 'in_upsc_cse', ' in_ssc ', 'bad id', 7],
+    packEdits: { in_ssc: { channelsAdded: [{ name: 'no id or handle' }, { handle: '@A' }, { handle: '@a' }], channelsRemoved: ['@x', '@X'], topicsAdded: ['Polity', ' polity'] }, 'bad id': {} },
+    focus: { roundMinutes: 1, breakMinutes: 500, dailyGoalMinutes: 99.9 },
+    plan: { days: ['Fri', 'mon', 'xyz'], start: '16:00', end: '18:00' },
+    lock: { sessionId: 's1', sessionKind: 'other', mode: 'weird' },
+    savedListMode: 'Layered', breakMode: 'party',
+    progress: { ' phone ': { '2026-11-15': 2000, '2026-11-14': -5, 'bad': 3, '2026-11-13': 'x' } },
+    weekView: 'yes'
   });
-  assert.deepEqual(study.packIds, ['ok_pack']);
-  assert.deepEqual(study.focus, { roundMinutes: 25, breakMinutes: 5, dailyGoalMinutes: 90 });
-  assert.equal(study.plan, null, 'a plan without a valid time range is dropped');
-  assert.equal(study.lock, null, 'a lock needs its reference');
-  assert.equal(study.savedListMode, null);
-  assert.deepEqual(study.progress, { phone: { '2026-11-14': 30 } });
-  assert.equal(study.weekView, false);
+  assert.deepEqual(value.activePackIds, ['in_upsc_cse', 'in_ssc']);
+  assert.deepEqual(Object.keys(value.packEdits), ['in_ssc']);
+  assert.deepEqual(value.packEdits.in_ssc, { channelsAdded: [{ handle: '@A' }], channelsRemoved: ['@x'], topicsAdded: ['Polity'], topicsRemoved: [] });
+  assert.deepEqual(value.focus, { roundMinutes: 5, breakMinutes: 120, dailyGoalMinutes: 99 });
+  assert.deepEqual(value.plan, { days: ['mon', 'fri'], start: '16:00', end: '18:00', setByParentId: null });
+  assert.deepEqual(value.lock, { sessionId: 's1', sessionKind: 'hard_whitelist', mode: 'locked', setByParentId: null });
+  assert.equal(value.savedListMode, 'layered');
+  assert.equal(value.breakMode, 'rest');
+  assert.deepEqual(value.progress, { phone: { '2026-11-14': 0, '2026-11-15': 1440 } });
+  assert.equal(value.weekView, null);
+  assert.equal(Study.normalizeStudy({ plan: { start: '25:00', end: '18:00' } }).plan, null);
 });
 
-test('fields a newer app wrote survive normalization and merge', () => {
-  const study = Study.normalizeStudy({ ...sample(), futureField: { a: 1 } });
-  assert.deepEqual(study.futureField, { a: 1 });
-  assert.deepEqual(Study.mergeStudy(sample(), study).futureField, { a: 1 });
+test('fields a newer app wrote survive on every object', () => {
+  const value = Study.normalizeStudy(study({ futureField: { a: 1 }, focus: { roundMinutes: 30, extra: true },
+    packEdits: { p1: { channelsAdded: [{ handle: '@a', note: 'x' }], future: 1 } } }));
+  assert.deepEqual(value.futureField, { a: 1 });
+  assert.equal(value.focus.extra, true);
+  assert.equal(value.packEdits.p1.future, 1);
+  assert.equal(value.packEdits.p1.channelsAdded[0].note, 'x');
+  assert.deepEqual(Study.mergeStudy(value, study()).futureField, { a: 1 });
 });
 
-test('packs and edits merge like keywords', () => {
-  const local = sample();
-  const incoming = {
-    version: 1,
-    packIds: ['in_upsc_cse', 'in_ssc'],
-    edits: {
-      in_upsc_cse: { addChannels: ['@SansadTV', { handle: '@unacademyupsc101', name: 'Unacademy' }], removeChannels: [], addTopics: ['indian polity', 'ethics'], removeTopics: [] },
-      in_ssc: { addChannels: [], removeChannels: [], addTopics: ['reasoning'], removeTopics: [] }
-    }
-  };
-  const merged = Study.mergeStudy(local, incoming);
-  assert.deepEqual(merged.packIds, ['in_upsc_cse', 'in_ssc']);
-  const upsc = merged.edits.in_upsc_cse;
-  assert.deepEqual(upsc.addTopics, ['indian polity', 'ethics']);
-  assert.deepEqual(upsc.removeChannels, [], 'an incoming add of a channel this device removed wins');
-  assert.equal(upsc.addChannels.length, 3, 'the channel id row and the handle row differ in identity');
-  assert.deepEqual(merged.edits.in_ssc.addTopics, ['reasoning']);
+test('Merge unions packs and edits, takes the larger progress and keeps this device\'s lock', () => {
+  const result = Study.mergeStudy(localStudy(), remoteStudy());
+  assert.deepEqual(result.activePackIds, ['in_upsc_cse', 'in_ssc']);
+  const edits = result.packEdits.in_upsc_cse;
+  assert.equal(edits.channelsAdded.length, 2, 'the same handle in another case is one channel');
+  assert.deepEqual(edits.channelsRemoved, ['@Vlogs']);
+  assert.equal(edits.topicsAdded.length, 1, 'the same topic with other spacing or case is one topic');
+  assert.deepEqual(edits.topicsRemoved, ['vlog']);
+  assert.deepEqual(result.progress, { phone: { '2026-11-14': 30, '2026-11-15': 10 }, tablet: { '2026-11-15': 40 } });
+  assert.equal(result.lock.sessionId, 'local-session');
+  assert.equal(result.savedListMode, 'blocklist', 'the rules to return to stay this device\'s');
+  assert.deepEqual(result.focus, { roundMinutes: 50, breakMinutes: 10, dailyGoalMinutes: 180 });
+  assert.deepEqual(Study.mergeProgress(result.progress, result.progress), result.progress, 'merging again changes nothing');
 });
 
-test('channel identity prefers the channel id, then the handle', () => {
-  assert.equal(Study.channelIdentity({ channelId: 'UCV1lbzgZNcYFAT3VHKOb7Cg', handle: '@x' }), 'id:UCV1lbzgZNcYFAT3VHKOb7Cg');
-  assert.equal(Study.channelIdentity({ handle: '@StudyIQ' }), Study.channelIdentity('@studyiq'));
-  assert.equal(Study.channelIdentity('UCV1lbzgZNcYFAT3VHKOb7Cg'), 'id:UCV1lbzgZNcYFAT3VHKOb7Cg');
+test('Replace takes the incoming packs and edits but progress never goes down and the lock stays', () => {
+  const result = Study.mergeStudy(localStudy(), remoteStudy(), { strategy: 'replace' });
+  assert.deepEqual(result.activePackIds, ['in_upsc_cse', 'in_ssc']);
+  assert.deepEqual(result.packEdits.in_upsc_cse.channelsRemoved, ['@Vlogs']);
+  assert.equal(result.packEdits.in_upsc_cse.topicsAdded[0], 'polity');
+  assert.equal(result.progress.phone['2026-11-14'], 30);
+  assert.equal(result.lock.sessionId, 'local-session');
 });
 
-test('progress takes the larger value per device and per day, never the sum', () => {
-  const merged = Study.mergeProgress(
-    { phone: { '2026-11-14': 50, '2026-11-15': 20 }, tv: { '2026-11-15': 5 } },
-    { phone: { '2026-11-14': 40, '2026-11-15': 30 }, laptop: { '2026-11-15': 15 } }
-  );
-  assert.deepEqual(merged, { phone: { '2026-11-14': 50, '2026-11-15': 30 }, tv: { '2026-11-15': 5 }, laptop: { '2026-11-15': 15 } });
-  // Merging the same data again changes nothing.
-  assert.deepEqual(Study.mergeProgress(merged, merged), merged);
+test('a device new to study gets no lock; Move account (carryLock) brings it', () => {
+  assert.equal(Study.mergeStudy(null, remoteStudy()).lock, null);
+  assert.equal(Study.mergeStudy(null, remoteStudy(), { carryLock: true }).lock.sessionId, 'remote-session');
+  const moved = Study.mergeStudy(localStudy(), remoteStudy(), { strategy: 'replace', carryLock: true });
+  assert.equal(moved.lock.sessionId, 'remote-session');
+  assert.equal(moved.savedListMode, 'layered');
+  assert.equal(moved.progress.phone['2026-11-14'], 30, 'progress still never goes down');
+  assert.deepEqual(Study.mergeStudy(localStudy(), null), localStudy());
 });
 
-test('a running lock is never copied, by merge or by replace', () => {
-  const incoming = { ...sample(), lock: { ref: 'other-device-session', mode: 'locked', setBy: 'self' } };
-  assert.equal(Study.mergeStudy(null, incoming).lock, null);
-  assert.equal(Study.mergeStudy(null, incoming, { strategy: 'replace' }).lock, null);
-  const local = { ...sample(), lock: null };
-  assert.equal(Study.mergeStudy(local, incoming).lock, null);
-  assert.equal(Study.mergeStudy(local, incoming, { strategy: 'replace' }).lock, null);
-  const running = sample();
-  assert.equal(Study.mergeStudy(running, { ...incoming, lock: null }, { strategy: 'replace' }).lock.ref, 'session-1',
-    'replacing rules does not end the lock running here');
-  assert.equal(Study.withoutLock(running).lock, null);
+test('a plan and break mode a parent set here stay; the profile\'s own plan follows the other device', () => {
+  const parentPlan = { days: ['mon'], start: '16:00', end: '18:00', setByParentId: 'mum' };
+  const local = study({ plan: parentPlan, breakMode: 'normal' });
+  const incoming = study({ plan: { days: ['sat'], start: '09:00', end: '10:00', setByParentId: null }, breakMode: 'rest' });
+  const kept = Study.mergeStudy(local, incoming);
+  assert.deepEqual(kept.plan, parentPlan);
+  assert.equal(kept.breakMode, 'normal');
+  assert.equal(Study.mergeStudy(local, incoming, { strategy: 'replace' }).plan.setByParentId, 'mum');
+  assert.equal(Study.mergeStudy(local, incoming, { carryLock: true }).plan.days[0], 'sat', 'Move account carries everything');
+  const own = study({ plan: { days: ['mon'], start: '16:00', end: '18:00', setByParentId: null } });
+  assert.deepEqual(Study.mergeStudy(own, incoming).plan.days, ['sat']);
+  assert.deepEqual(Study.mergeStudy(own, study()).plan.days, ['mon'], 'Merge keeps a local plan the other device lacks');
+  assert.equal(Study.mergeStudy(own, study(), { strategy: 'replace' }).plan, null);
 });
 
-test('replace takes the incoming plan and packs but keeps this device\'s own progress', () => {
-  const merged = Study.mergeStudy(sample(), { version: 1, packIds: ['gb_gcse'], progress: { laptop: { '2026-11-15': 9 } } }, { strategy: 'replace' });
-  assert.deepEqual(merged.packIds, ['gb_gcse']);
-  assert.equal(merged.plan, null);
-  assert.deepEqual(merged.progress, { phone: { '2026-11-14': 50, '2026-11-15': 20 }, laptop: { '2026-11-15': 9 } });
-  assert.equal(merged.savedListMode, 'blocklist', 'the mode to return to belongs to this device');
+test('weekView: an explicit value wins, null keeps local; null means the profile-type default', () => {
+  assert.equal(Study.mergeStudy(study({ weekView: false }), study()).weekView, false);
+  assert.equal(Study.mergeStudy(study({ weekView: false }), study({ weekView: true })).weekView, true);
+  assert.equal(Study.weekViewEnabled(study(), 'account'), true);
+  assert.equal(Study.weekViewEnabled(study(), 'child'), false);
+  assert.equal(Study.weekViewEnabled(study({ weekView: true }), 'child'), true);
 });
 
-test('merge: explicit incoming settings win, missing ones keep local', () => {
-  const merged = Study.mergeStudy(sample(), { version: 1, packIds: [], focus: { roundMinutes: 50 }, weekView: false });
-  assert.deepEqual(merged.focus, { roundMinutes: 50, breakMinutes: 10, dailyGoalMinutes: 120 });
-  assert.equal(merged.weekView, false);
-  assert.equal(Study.mergeStudy(sample(), { version: 1, packIds: [] }).weekView, true);
-  assert.equal(Study.mergeStudy(sample(), { version: 1, packIds: [] }).plan.start, '16:00');
-});
-
-test('pack ids are rebuilt from study:<packId> tags when the study object is missing', () => {
+test('the active packs are rebuilt from study:<packId> tags without writing study back', () => {
   const profile = { main: {
     whitelistChannels: [{ id: 'UC1', managedListId: 'study:in_upsc_cse' }, { id: 'UC2', managedListId: 'list:other' }, { id: 'UC3', managedListId: 'study:in_ssc' }],
     whitelistKeywords: [{ word: 'polity', managedListId: 'study:in_upsc_cse' }]
-  }, kids: { whitelistChannels: [{ id: 'UC4', managedListId: 'STUDY:gb_gcse' }] } };
+  }, kids: { whitelistChannels: [{ id: 'UC4', managedListId: 'study:gb_gcse' }, { id: 'UC5', managedListId: 'STUDY:ignored' }] } };
   assert.deepEqual(Study.packIdsFromTags(profile), ['in_upsc_cse', 'in_ssc', 'gb_gcse']);
-  const rebuilt = Study.withProfileStudy(profile).study;
-  assert.deepEqual(rebuilt.packIds, ['in_upsc_cse', 'in_ssc', 'gb_gcse']);
-  assert.equal(rebuilt.version, 1);
-  // A stored object wins over the tags; a profile with neither stays without one.
-  assert.deepEqual(Study.withProfileStudy({ ...profile, study: { version: 1, packIds: ['x_pack'] } }).study.packIds, ['x_pack']);
-  assert.equal(Object.hasOwn(Study.withProfileStudy({ main: {} }), 'study'), false);
-});
-
-test('managed study scopes need the child capability and ride the time grant', () => {
-  assert.equal(Study.linkSupportsStudy({ capabilities: ['sync.receive', 'control.apply'] }), false);
-  assert.equal(Study.linkSupportsStudy({ policy: { capabilities: ['study.v1'] } }), true);
-  assert.equal(Study.managedScopeAllowed('study', ['main', 'kids']), false);
-  assert.equal(Study.managedScopeAllowed('schedule', ['main', 'time_limits']), true);
-  assert.equal(Study.managedScopeAllowed('focus_lock', ['focus_lock']), true);
-  assert.equal(Study.managedScopeAllowed('time_limits', ['time_limits']), false);
-});
-
-test('managed payloads round-trip and only the parent that locked can unlock', () => {
-  const source = { sourceProfileId: 'mum', sourceDeviceId: 'mum-phone', sourceProfileName: 'Mum' };
-  const parentStudy = sample();
-  let child = Study.createStudy({ progress: { tablet: { '2026-11-15': 12 } }, savedListMode: 'blocklist' });
-  for (const scope of Study.MANAGED_SCOPES) {
-    const payload = Study.buildManagedPayload(scope, parentStudy);
-    assert.equal(Study.validateManagedPayload(scope, payload), '');
-    child = Study.applyManagedPayload(child, scope, payload, source);
-  }
-  assert.deepEqual(child.packIds, ['in_upsc_cse']);
-  assert.deepEqual(child.focus, parentStudy.focus);
-  assert.equal(child.plan.setBy.profileId, 'mum');
-  assert.equal(child.lock.mode, 'locked');
-  assert.deepEqual(child.lock.setBy, { kind: 'parent', profileId: 'mum', deviceId: 'mum-phone', name: 'Mum' });
-  assert.deepEqual(child.progress, { tablet: { '2026-11-15': 12 } }, 'the child keeps its own progress');
-  assert.throws(() => Study.applyManagedPayload(child, 'focus_lock', { scope: 'focus_lock', lock: null }, { sourceProfileId: 'dad' }),
-    /focus_lock_owned_by_another_parent/);
-  assert.equal(Study.applyManagedPayload(child, 'focus_lock', { scope: 'focus_lock', lock: null }, source).lock, null);
-  assert.equal(Study.validateManagedPayload('schedule', { scope: 'schedule' }), 'invalid_schedule_payload');
-  assert.equal(Study.validateManagedPayload('study', { scope: 'schedule', packIds: [] }), 'payload_scope_mismatch');
-});
-
-test('a self-started lock can be replaced by a parent lock', () => {
-  const child = Study.createStudy({ lock: { ref: 'self-1', mode: 'locked', setBy: 'self' } });
-  const next = Study.applyManagedPayload(child, 'focus_lock', { scope: 'focus_lock', lock: { ref: 'exam-week', mode: 'locked' } }, { sourceProfileId: 'mum' });
-  assert.equal(next.lock.ref, 'exam-week');
-});
-
-test('the personal sync value never carries the lock', () => {
-  const value = Study.validateForSync(sample());
-  assert.equal(value.lock, null);
-  assert.throws(() => Study.validateForSync({ version: 1 }), /invalid_personal_sync/);
-});
-
-test('breakMode is "rest" by default, "normal" when chosen, and merges like a setting', () => {
-  assert.equal(Study.normalizeStudy({ breakMode: 'Normal' }).breakMode, 'normal');
-  assert.equal(Study.normalizeStudy({ breakMode: 'feed' }).breakMode, 'rest');
-  const local = { ...sample(), breakMode: 'normal' };
-  assert.equal(Study.mergeStudy(local, { version: 1, packIds: [] }).breakMode, 'normal', 'a missing value keeps local');
-  assert.equal(Study.mergeStudy(local, { version: 1, packIds: [], breakMode: 'rest' }).breakMode, 'rest');
-  const payload = Study.buildManagedPayload('study', local);
-  assert.equal(payload.breakMode, 'normal');
-  assert.equal(Study.applyManagedPayload(null, 'study', payload, { sourceProfileId: 'mum' }).breakMode, 'normal');
-  assert.equal(Study.validateManagedPayload('study', { ...payload, breakMode: 'party' }), 'invalid_study_payload');
+  assert.deepEqual(Study.profileStudy(profile), study({ activePackIds: ['in_upsc_cse', 'in_ssc', 'gb_gcse'] }));
+  assert.equal(Object.hasOwn(profile, 'study'), false);
+  assert.deepEqual(Study.profileStudy({ ...profile, study: study({ activePackIds: ['x_pack'] }) }).activePackIds, ['x_pack']);
+  assert.equal(Study.profileStudy({ main: {} }), null);
 });
 
 test('layered rules: the block list always applies and the allow list is an optional layer', () => {
-  const blockOnly = Study.ruleLayers({ mode: 'blocklist', channels: [{ id: 'UC1' }], keywords: [{ word: 'drama' }], whitelistChannels: [{ id: 'UC2' }] });
-  assert.equal(blockOnly.allowListOn, false);
-  assert.equal(blockOnly.effective.block.keywords.length, 1);
+  const blockOnly = Study.ruleLayers({ mode: 'blocklist', keywords: [{ word: 'drama' }], whitelistChannels: [{ id: 'UC2' }] });
+  assert.equal(blockOnly.layering, 'blocklist');
   assert.equal(blockOnly.effective.allow.channels.length, 0, 'allow rows stay stored but off');
-
-  const layered = Study.ruleLayers(Study.withLayeredRules({ mode: 'whitelist', keywords: [{ word: 'drama' }], whitelistChannels: [{ id: 'UC2' }] }));
-  assert.equal(layered.allowListOn, true);
-  assert.equal(layered.blockListApplies, true, 'allow Apex channels and still block "drama"');
-  assert.deepEqual(layered.effective.block.keywords, [{ word: 'drama' }]);
-
-  // A whitelist surface saved before layered rules is "allow list on, block list empty"; nothing is deleted.
-  const legacy = Study.ruleLayers({ mode: 'whitelist', keywords: [{ word: 'drama' }], whitelistChannels: [{ id: 'UC2' }] });
-  assert.equal(legacy.layered, false);
-  assert.equal(legacy.blockListApplies, false);
+  const layered = Study.ruleLayers({ mode: 'whitelist', layered: true, keywords: [{ word: 'drama' }], whitelistChannels: [{ id: 'UC2' }] });
+  assert.equal(layered.layering, 'layered');
+  assert.deepEqual(layered.effective.block.keywords, [{ word: 'drama' }], 'allow Apex channels and still block "drama"');
+  // Whitelist data saved before 3.6.2 keeps its meaning: allow list on, block list ignored, nothing deleted.
+  const legacy = Study.ruleLayers({ mode: 'whitelist', keywords: [{ word: 'drama' }] });
+  assert.equal(legacy.layering, 'whitelist');
   assert.deepEqual(legacy.effective.block.keywords, []);
   assert.deepEqual(legacy.stored.block.keywords, [{ word: 'drama' }]);
+  assert.deepEqual(Study.ruleLayers({ mode: 'blocklist', blockedChannels: [{ id: 'UCk' }] }, { surface: 'kids' }).effective.block.channels, [{ id: 'UCk' }]);
+  // layered is written only when on, next to the mode every app already reads.
+  assert.deepEqual(Study.withRuleLayering({ mode: 'blocklist', channels: [] }, 'layered'), { mode: 'whitelist', channels: [], layered: true });
+  assert.deepEqual(Study.withRuleLayering({ mode: 'whitelist', layered: true }, 'whitelist'), { mode: 'whitelist' });
+  assert.deepEqual(Study.withRuleLayering({ mode: 'whitelist', layered: true }, 'blocklist'), { mode: 'blocklist' });
+});
 
-  const kids = Study.ruleLayers({ mode: 'blocklist', blockedChannels: [{ id: 'UCk' }], blockedKeywords: [] }, { surface: 'kids' });
-  assert.deepEqual(kids.effective.block.channels, [{ id: 'UCk' }]);
-  // Marking a surface keeps the mode and lists every app already reads.
-  assert.deepEqual(Study.withLayeredRules({ mode: 'whitelist', channels: [] }), { mode: 'whitelist', channels: [], layered: true });
+test('the personal sync value never carries the lock', () => {
+  assert.equal(Study.validateForSync(localStudy()).lock, null);
+  assert.equal(Study.validateForSync(null), null);
+  assert.throws(() => Study.validateForSync({ version: 1 }), /invalid_personal_sync/);
 });

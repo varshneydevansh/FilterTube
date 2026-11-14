@@ -34,23 +34,21 @@
         return model && typeof model.mergeStudy === 'function' ? model : null;
     }
 
-    /** The profile's study object, rebuilt from study:<packId> tags when an older app dropped it. */
-    function profileStudyOf(profile) {
-        const model = studyModel();
-        return model ? model.profileStudy(profile) : (safeObject(profile).study || null);
-    }
-
     /**
-     * Profile fields for an incoming study object: packs and edits merge like keywords, progress takes
-     * the larger value per device and day, and this device's running lock is never replaced.
+     * Profile fields for an incoming study object (Android StudyMerge rules): packs and edits merge like
+     * keywords, progress takes the larger value per device and day, and this device keeps its own running
+     * lock and parent-set plan unless carryLock (Move account). The stored objects are merged; a study
+     * rebuilt from study:<packId> tags is a read-time view and isn't written here.
      */
-    function mergedStudyFields(localProfile, incomingProfile, strategy) {
+    function mergedStudyFields(localProfile, incomingProfile, strategy, carryLock = false) {
         const model = studyModel();
+        const localStudy = safeObject(localProfile).study;
+        const incomingStudy = safeObject(incomingProfile).study;
         if (!model) {
-            const incomingStudy = safeObject(incomingProfile).study;
-            return incomingStudy ? { study: incomingStudy } : {};
+            const kept = incomingStudy || localStudy;
+            return kept ? { study: kept } : {};
         }
-        const merged = model.mergeStudy(profileStudyOf(localProfile), profileStudyOf(incomingProfile), { strategy });
+        const merged = model.mergeStudy(localStudy, incomingStudy, { strategy, carryLock });
         return merged ? { study: merged } : {};
     }
 
@@ -1156,8 +1154,12 @@
 
         const model = studyModel();
         if (model) {
+            // A stored study object is written with every key; a profile without one stays without it.
             for (const profileId of Object.keys(outProfiles)) {
-                outProfiles[profileId] = model.withProfileStudy(outProfiles[profileId]);
+                const profile = outProfiles[profileId];
+                if (!Object.prototype.hasOwnProperty.call(profile, 'study')) continue;
+                const study = model.normalizeStudy(profile.study);
+                outProfiles[profileId] = study ? { ...profile, study } : withoutStudyField(profile);
             }
         }
 
@@ -2632,7 +2634,7 @@
         return coordinator.run(() => importV3Unlocked(json, options), options.nanahStorageLockToken ?? null);
     }
 
-    async function importV3Unlocked(json, { strategy = 'merge', scope = 'auto', auth = null, targetProfileId = null, beforeProfileWrite = null, adoptKidsPersonaLinks = false } = {}) {
+    async function importV3Unlocked(json, { strategy = 'merge', scope = 'auto', auth = null, targetProfileId = null, beforeProfileWrite = null, adoptKidsPersonaLinks = false, carryStudyLock = false } = {}) {
         json = convertAppProfileBackup(json);
         const parsed = normalizeIncomingV3(json);
         if (!parsed.ok) {
@@ -2965,7 +2967,7 @@
                             // Replacing rules never ends a lock running here or drops this device's progress.
                             replacedProfiles[profileId] = {
                                 ...withoutStudyField(incProfile),
-                                ...mergedStudyFields(localProfiles[profileId], incProfile, 'replace')
+                                ...mergedStudyFields(localProfiles[profileId], incProfile, 'replace', carryStudyLock === true)
                             };
                         }
                         nextV4 = { ...sanitizedIncoming, profiles: replacedProfiles };
@@ -2980,7 +2982,7 @@
                             if (!existingProfile || Object.keys(existingProfile).length === 0) {
                                 mergedProfiles[profileId] = {
                                     ...withoutStudyField(incProfile),
-                                    ...mergedStudyFields(null, incProfile, 'merge'),
+                                    ...mergedStudyFields(null, incProfile, 'merge', carryStudyLock === true),
                                     main: normalizeMainProfileAliasFields(safeObject(incProfile.main))
                                 };
                                 continue;
@@ -2992,7 +2994,7 @@
                             mergedProfiles[profileId] = {
                                 ...withoutStudyField(existingProfile),
                                 ...withoutStudyField(incProfile),
-                                ...mergedStudyFields(existingProfile, incProfile, 'merge'),
+                                ...mergedStudyFields(existingProfile, incProfile, 'merge', carryStudyLock === true),
                                 settings: {
                                     ...safeObject(existingProfile.settings),
                                     ...safeObject(incProfile.settings)
@@ -3097,7 +3099,8 @@
 
             // Only a v4 profile snapshot carries a study object; a legacy file leaves this profile's alone.
             const targetStudyFields = incomingProfileForImport
-                ? mergedStudyFields(targetProfile, incomingProfileForImport, strategy === 'replace' ? 'replace' : 'merge')
+                ? mergedStudyFields(targetProfile, incomingProfileForImport, strategy === 'replace' ? 'replace' : 'merge',
+                    carryStudyLock === true && effectiveScope === 'full')
                 : (safeObject(targetProfile).study ? { study: targetProfile.study } : {});
             profiles[targetProfileId] = {
                 ...withoutStudyField(targetProfile),

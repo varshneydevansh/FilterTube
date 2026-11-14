@@ -1251,6 +1251,17 @@
         };
     }
 
+    function withoutStudyLocks(portable) {
+        const profiles = safeObject(safeObject(safeObject(portable).profilesV4).profiles);
+        Object.values(profiles).forEach((profile) => {
+            const study = safeObject(profile).study;
+            if (study && typeof study === 'object' && !Array.isArray(study) && Object.prototype.hasOwnProperty.call(study, 'lock')) {
+                profile.study = { ...study, lock: null };
+            }
+        });
+        return portable;
+    }
+
     function cloneJson(value) {
         return JSON.parse(JSON.stringify(value));
     }
@@ -2072,6 +2083,8 @@
         const payload = (normalizedScope === 'main' || normalizedScope === 'kids')
             ? (managedPortable || await buildScopedPortablePayload(io, normalizedScope))
             : (managedPortable || await io.exportV3({ scope: normalizedScope, auth, includeKidsPersonaLinks: true }));
+        // Copy once and Merge never send a running study lock (the same rule as the PIN); Move account does.
+        if (normalizedScope !== 'full') withoutStudyLocks(payload);
         return {
             app: APP_ID,
             scope: normalizedScope,
@@ -2195,7 +2208,9 @@
             targetProfileId,
             beforeProfileWrite,
             // Device sync keeps YouTube Kids profile links (as on Android); manual backups never do.
-            adoptKidsPersonaLinks: true
+            adoptKidsPersonaLinks: true,
+            // Move account carries the study lock; Copy once and Merge never do.
+            carryStudyLock: effectiveScope === 'full'
         });
     }
 
