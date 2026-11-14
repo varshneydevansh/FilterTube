@@ -1074,18 +1074,21 @@
             .filter(Boolean);
     }
 
+    // One rule per word and match type, the same identity the Android and iOS merges use.
+    // Comments is a setting of that rule, not part of it: apps disagree on whether "off" is
+    // stored or omitted, so keying on it kept the same word twice after a merge. The packed
+    // source (including any "|label=") never takes part either.
     function keywordKey(entry) {
-        if (typeof entry === 'string') {
-            return normalizeString(entry).toLowerCase();
-        }
-        const item = safeObject(entry);
-        const word = normalizeString(item.word).toLowerCase();
+        const item = typeof entry === 'string' ? { word: entry } : safeObject(entry);
+        const word = normalizeString(item.word).replace(/\s+/g, ' ').toLowerCase();
         if (!word) return '';
+        const regex = normalizeString(item.matchMode).toLowerCase() === 'regex';
         return [
             word,
             item.exact === true ? '1' : '0',
-            item.comments === false ? '0' : '1',
-            item.semantic === true ? '1' : '0'
+            item.semantic === true ? '1' : '0',
+            regex ? 'regex' : 'literal',
+            regex ? normalizeString(item.regexFlags) : ''
         ].join('|');
     }
 
@@ -1108,7 +1111,16 @@
         safeArray(incoming).forEach((entry) => {
             const normalized = normalizeKeywordEntry(entry);
             const key = keywordKey(normalized);
-            if (key) seen.set(key, normalized);
+            if (!key) return;
+            const local = seen.get(key);
+            // An explicit incoming comments value wins; a row that doesn't say keeps this device's choice.
+            if (local && typeof local === 'object' && normalized && typeof normalized === 'object'
+                && !Object.prototype.hasOwnProperty.call(normalized, 'comments')
+                && Object.prototype.hasOwnProperty.call(local, 'comments')) {
+                seen.set(key, { ...normalized, comments: local.comments });
+                return;
+            }
+            seen.set(key, normalized);
         });
         return Array.from(seen.values());
     }
