@@ -2563,5 +2563,18 @@
   "study.parent.lockNow": "ہنے لاک کرو",
   "study.nav.title": "پڑھائی تے دھیان",
   "study.card.eyebrow": "پڑھائی موڈ",
-  "study.card.summary": "پڑھائی پیک تے ویلا چنو۔ پڑھائی دوران صرف تہاڈے پلان دیاں ویڈیوز دسدیاں تے چلدیاں نیں، تے تہاڈی بلاک لسٹ وی لاگو رہندی اے۔"
+  "study.card.summary": "پڑھائی پیک تے ویلا چنو۔ پڑھائی دوران صرف تہاڈے پلان دیاں ویڈیوز دسدیاں تے چلدیاں نیں، تے تہاڈی بلاک لسٹ وی لاگو رہندی اے۔",
+  "mascot.welcome.line": "جو تسیں بلاک کرو گے، میں اوہنوں نظروں توں دور رکھاں گی۔",
+  "mascot.welcome.dismiss": "ٹھیک اے",
+  "mascot.popup.hiddenCount": "ہُن تک {count} لُکائے گئے",
+  "mascot.popup.milestone": "{count} چیزاں تہاڈے رستے توں ہٹائیاں گئیاں۔",
+  "mascot.popup.allowOnly": "صرف اجازت والے چینل ای لنگھدے نیں۔",
+  "mascot.options.emptyKeywords": "فلٹر شروع کرن لئی کوئی لفظ جوڑو۔",
+  "mascot.options.emptyChannels": "کسے چینل نوں بلاک کرو، اوہ ہر تھاں لُک جائے گا۔",
+  "mascot.options.imported": "سیٹنگاں امپورٹ ہو گئیاں۔",
+  "mascot.setting.title": "ساتھی",
+  "mascot.setting.description": "رونقی وچ انداز تے گل بات دے غبارے دِسدے نیں۔ چُپ وچ صرف انداز۔ بند وچ کجھ نئیں۔",
+  "mascot.setting.lively": "رونقی",
+  "mascot.setting.quiet": "چُپ",
+  "mascot.setting.off": "بند"
 }

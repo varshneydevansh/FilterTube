@@ -2563,5 +2563,18 @@
   "study.parent.lockNow": "今すぐロック",
   "study.nav.title": "学習と集中",
   "study.card.eyebrow": "学習モード",
-  "study.card.summary": "学習パックと時間を選びましょう。学習中はプランの動画だけが表示・再生され、ブロックリストも引き続き適用されます。"
+  "study.card.summary": "学習パックと時間を選びましょう。学習中はプランの動画だけが表示・再生され、ブロックリストも引き続き適用されます。",
+  "mascot.welcome.line": "ブロックしたものは、見えないようにしておくね。",
+  "mascot.welcome.dismiss": "OK",
+  "mascot.popup.hiddenCount": "これまでに{count}件を非表示",
+  "mascot.popup.milestone": "{count}件をよけておいたよ。",
+  "mascot.popup.allowOnly": "許可したチャンネルだけが通れます。",
+  "mascot.options.emptyKeywords": "単語を追加してフィルターを始めましょう。",
+  "mascot.options.emptyChannels": "チャンネルをブロックすると、どこでも非表示になります。",
+  "mascot.options.imported": "設定をインポートしました。",
+  "mascot.setting.title": "なかま",
+  "mascot.setting.description": "にぎやか：ポーズと吹き出しを表示。しずか：ポーズだけ。オフ：表示しません。",
+  "mascot.setting.lively": "にぎやか",
+  "mascot.setting.quiet": "しずか",
+  "mascot.setting.off": "オフ"
 }

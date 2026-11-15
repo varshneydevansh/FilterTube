@@ -2563,5 +2563,18 @@
   "study.parent.lockNow": "এখনই লক করুন",
   "study.nav.title": "পড়াশোনা ও মনোযোগ",
   "study.card.eyebrow": "পড়াশোনা মোড",
-  "study.card.summary": "একটি পড়াশোনার প্যাক ও সময় বেছে নিন। পড়াশোনার সময় শুধু আপনার পরিকল্পনার ভিডিও দেখায় ও চলে, আর আপনার ব্লক তালিকাও কাজ করে।"
+  "study.card.summary": "একটি পড়াশোনার প্যাক ও সময় বেছে নিন। পড়াশোনার সময় শুধু আপনার পরিকল্পনার ভিডিও দেখায় ও চলে, আর আপনার ব্লক তালিকাও কাজ করে।",
+  "mascot.welcome.line": "আপনি যা ব্লক করবেন, আমি তা চোখের আড়ালে রাখব।",
+  "mascot.welcome.dismiss": "বুঝেছি",
+  "mascot.popup.hiddenCount": "এখন পর্যন্ত {count}টি লুকানো",
+  "mascot.popup.milestone": "{count}টি জিনিস আপনার পথ থেকে সরানো হয়েছে।",
+  "mascot.popup.allowOnly": "শুধু অনুমোদিত চ্যানেলই পার হয়।",
+  "mascot.options.emptyKeywords": "ফিল্টার শুরু করতে একটি শব্দ যোগ করুন।",
+  "mascot.options.emptyChannels": "একটি চ্যানেল ব্লক করুন, সেটি সব জায়গায় লুকাবে।",
+  "mascot.options.imported": "সেটিংস ইমপোর্ট হয়েছে।",
+  "mascot.setting.title": "সঙ্গী",
+  "mascot.setting.description": "প্রাণবন্ত-তে ভঙ্গি ও কথার বুদবুদ দেখায়। শান্ত-তে শুধু ভঙ্গি। বন্ধ-তে সব লুকানো থাকে।",
+  "mascot.setting.lively": "প্রাণবন্ত",
+  "mascot.setting.quiet": "শান্ত",
+  "mascot.setting.off": "বন্ধ"
 }

@@ -2563,5 +2563,18 @@
   "study.parent.lockNow": "立即锁定",
   "study.nav.title": "学习与专注",
   "study.card.eyebrow": "学习模式",
-  "study.card.summary": "选择学习包和时间。学习期间只显示和播放计划中的视频，屏蔽列表仍然有效。"
+  "study.card.summary": "选择学习包和时间。学习期间只显示和播放计划中的视频，屏蔽列表仍然有效。",
+  "mascot.welcome.line": "你屏蔽的内容，我会帮你挡在视线之外。",
+  "mascot.welcome.dismiss": "知道了",
+  "mascot.popup.hiddenCount": "已隐藏 {count} 项",
+  "mascot.popup.milestone": "已为你挡下 {count} 项内容。",
+  "mascot.popup.allowOnly": "只有允许的频道才能通过。",
+  "mascot.options.emptyKeywords": "添加一个词，开始过滤。",
+  "mascot.options.emptyChannels": "屏蔽一个频道，让它在各处隐藏。",
+  "mascot.options.imported": "设置已导入。",
+  "mascot.setting.title": "小伙伴",
+  "mascot.setting.description": "活泼：显示姿势和对话气泡。安静：只显示姿势。关闭：全部隐藏。",
+  "mascot.setting.lively": "活泼",
+  "mascot.setting.quiet": "安静",
+  "mascot.setting.off": "关闭"
 }

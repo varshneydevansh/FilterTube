@@ -2563,5 +2563,18 @@
   "study.parent.lockNow": "Şimdi kilitle",
   "study.nav.title": "Ders ve odak",
   "study.card.eyebrow": "Ders modu",
-  "study.card.summary": "Bir ders paketi ve süre seç. Ders sırasında yalnızca plandaki videolar gösterilir ve oynatılır, engel listen de geçerli olmaya devam eder."
+  "study.card.summary": "Bir ders paketi ve süre seç. Ders sırasında yalnızca plandaki videolar gösterilir ve oynatılır, engel listen de geçerli olmaya devam eder.",
+  "mascot.welcome.line": "Engellediklerini gözden uzak tutacağım.",
+  "mascot.welcome.dismiss": "Anladım",
+  "mascot.popup.hiddenCount": "Şimdiye kadar {count} gizlendi",
+  "mascot.popup.milestone": "{count} şey yolundan çekildi.",
+  "mascot.popup.allowOnly": "Yalnızca izin verilen kanallar geçer.",
+  "mascot.options.emptyKeywords": "Filtrelemeye başlamak için bir kelime ekle.",
+  "mascot.options.emptyChannels": "Bir kanalı her yerde gizlemek için engelle.",
+  "mascot.options.imported": "Ayarlar içe aktarıldı.",
+  "mascot.setting.title": "Arkadaş",
+  "mascot.setting.description": "Canlı, pozları ve konuşma balonlarını gösterir. Sakin yalnızca pozları gösterir. Kapalı onları gizler.",
+  "mascot.setting.lively": "Canlı",
+  "mascot.setting.quiet": "Sakin",
+  "mascot.setting.off": "Kapalı"
 }

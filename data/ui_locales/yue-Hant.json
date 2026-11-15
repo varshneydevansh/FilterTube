@@ -2563,5 +2563,18 @@
   "study.parent.lockNow": "即刻鎖定",
   "study.nav.title": "溫習同專注",
   "study.card.eyebrow": "溫習模式",
-  "study.card.summary": "揀溫習包同時間。溫習期間只會顯示同播放計劃入面嘅影片，封鎖清單照樣有效。"
+  "study.card.summary": "揀溫習包同時間。溫習期間只會顯示同播放計劃入面嘅影片，封鎖清單照樣有效。",
+  "mascot.welcome.line": "你封鎖嘅嘢，我會幫你收埋唔俾你見到。",
+  "mascot.welcome.dismiss": "知道喇",
+  "mascot.popup.hiddenCount": "至今已隱藏 {count} 項",
+  "mascot.popup.milestone": "已經幫你擋走 {count} 樣嘢。",
+  "mascot.popup.allowOnly": "只有允許嘅頻道先可以通過。",
+  "mascot.options.emptyKeywords": "加個字詞就可以開始過濾。",
+  "mascot.options.emptyChannels": "封鎖一個頻道，佢就會喺所有地方隱藏。",
+  "mascot.options.imported": "設定已匯入。",
+  "mascot.setting.title": "小夥伴",
+  "mascot.setting.description": "活潑：顯示姿勢同對白氣泡。安靜：只顯示姿勢。關閉：全部隱藏。",
+  "mascot.setting.lively": "活潑",
+  "mascot.setting.quiet": "安靜",
+  "mascot.setting.off": "關閉"
 }

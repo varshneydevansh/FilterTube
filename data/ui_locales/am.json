@@ -2563,5 +2563,18 @@
   "study.parent.lockNow": "አሁን ቆልፍ",
   "study.nav.title": "ጥናት እና ትኩረት",
   "study.card.eyebrow": "የጥናት ሁነታ",
-  "study.card.summary": "የጥናት ጥቅል እና ጊዜ ይምረጡ። በጥናት ጊዜ ከዕቅድዎ ያሉ ቪዲዮዎች ብቻ ይታያሉ እና ይጫወታሉ፣ የእገዳ ዝርዝርዎም ተግባራዊ ይሆናል።"
+  "study.card.summary": "የጥናት ጥቅል እና ጊዜ ይምረጡ። በጥናት ጊዜ ከዕቅድዎ ያሉ ቪዲዮዎች ብቻ ይታያሉ እና ይጫወታሉ፣ የእገዳ ዝርዝርዎም ተግባራዊ ይሆናል።",
+  "mascot.welcome.line": "ያገዱትን ከእይታ አርቃለሁ።",
+  "mascot.welcome.dismiss": "ገባኝ",
+  "mascot.popup.hiddenCount": "እስካሁን {count} ተደብቀዋል",
+  "mascot.popup.milestone": "{count} ነገሮች ከመንገድዎ ተወግደዋል።",
+  "mascot.popup.allowOnly": "የተፈቀዱ ቻናሎች ብቻ ያልፋሉ።",
+  "mascot.options.emptyKeywords": "ማጣራት ለመጀመር ቃል ያክሉ።",
+  "mascot.options.emptyChannels": "ቻናልን ያግዱ፣ በሁሉም ቦታ ይደበቃል።",
+  "mascot.options.imported": "ቅንብሮች ገብተዋል።",
+  "mascot.setting.title": "አጋር",
+  "mascot.setting.description": "ንቁ አቋሞችንና የንግግር አረፋዎችን ያሳያል። ጸጥ ያለ አቋሞችን ብቻ ያሳያል። ጠፍቷል ይደብቃቸዋል።",
+  "mascot.setting.lively": "ንቁ",
+  "mascot.setting.quiet": "ጸጥ ያለ",
+  "mascot.setting.off": "ጠፍቷል"
 }

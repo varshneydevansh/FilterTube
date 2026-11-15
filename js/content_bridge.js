@@ -1020,6 +1020,8 @@ function refreshActiveCollaborationMenu(videoId, collaborators, options = {}) {
 
 // Statistics tracking
 let statsCountToday = 0;
+// Hidden since the last write; flushStatsToStorage adds it to the stored running total (totalHiddenCount).
+let statsTotalHiddenDelta = 0;
 let statsTotalSeconds = 0; // Track total seconds saved instead of using multiplier
 let statsLastDate = new Date().toDateString();
 let statsInitialized = false;
@@ -4713,6 +4715,7 @@ function incrementHiddenStats(element) {
     // Only increment if valid
     if (secondsSaved > 0) {
         statsCountToday++;
+        statsTotalHiddenDelta++;
         statsTotalSeconds += secondsSaved;
 
         if (element) {
@@ -4741,6 +4744,7 @@ function decrementHiddenStats(element) {
 
     if (savedTime > 0) {
         statsCountToday = Math.max(0, statsCountToday - 1);
+        statsTotalHiddenDelta--;
         statsTotalSeconds = Math.max(0, statsTotalSeconds - savedTime);
 
         // Remove the attribute
@@ -4793,6 +4797,17 @@ function flushStatsToStorage() {
             const existingBySurface = (safeResult.statsBySurface && typeof safeResult.statsBySurface === 'object' && !Array.isArray(safeResult.statsBySurface))
                 ? safeResult.statsBySurface
                 : {};
+
+            // The running total adds this tab's change to what storage holds, so tabs never overwrite each
+            // other's counts and the daily reset leaves it alone. The first write seeds it with today's count.
+            const previousEntry = (existingBySurface[surface] && typeof existingBySurface[surface] === 'object')
+                ? existingBySurface[surface]
+                : (surface === 'main' && safeResult.stats && typeof safeResult.stats === 'object' ? safeResult.stats : {});
+            const previousTotal = Number.isFinite(Number(previousEntry.totalHiddenCount))
+                ? Number(previousEntry.totalHiddenCount)
+                : Math.max(0, Number(previousEntry.hiddenCount) || 0);
+            nextStats.totalHiddenCount = Math.max(0, previousTotal + statsTotalHiddenDelta);
+            statsTotalHiddenDelta = 0;
 
             const statsBySurface = {
                 ...existingBySurface,

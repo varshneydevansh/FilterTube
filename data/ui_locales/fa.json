@@ -2563,5 +2563,18 @@
   "study.parent.lockNow": "همین الان قفل کن",
   "study.nav.title": "مطالعه و تمرکز",
   "study.card.eyebrow": "حالت مطالعه",
-  "study.card.summary": "یک بستهٔ مطالعه و یک زمان انتخاب کن. در زمان مطالعه فقط ویدیوهای برنامه‌ات نمایش و پخش می‌شوند و فهرست مسدودی‌ات همچنان اعمال می‌شود."
+  "study.card.summary": "یک بستهٔ مطالعه و یک زمان انتخاب کن. در زمان مطالعه فقط ویدیوهای برنامه‌ات نمایش و پخش می‌شوند و فهرست مسدودی‌ات همچنان اعمال می‌شود.",
+  "mascot.welcome.line": "هر چیزی را که مسدود کنی، از دید دور نگه می‌دارم.",
+  "mascot.welcome.dismiss": "فهمیدم",
+  "mascot.popup.hiddenCount": "تا حالا {count} مورد پنهان شده",
+  "mascot.popup.milestone": "{count} چیز از سر راهت کنار رفت.",
+  "mascot.popup.allowOnly": "فقط کانال‌های مجاز رد می‌شوند.",
+  "mascot.options.emptyKeywords": "برای شروع فیلتر، یک کلمه اضافه کن.",
+  "mascot.options.emptyChannels": "یک کانال را مسدود کن تا همه‌جا پنهان شود.",
+  "mascot.options.imported": "تنظیمات وارد شد.",
+  "mascot.setting.title": "همراه",
+  "mascot.setting.description": "«سرزنده» حالت‌ها و حباب‌های گفتار را نشان می‌دهد. «آرام» فقط حالت‌ها را. «خاموش» آن‌ها را پنهان می‌کند.",
+  "mascot.setting.lively": "سرزنده",
+  "mascot.setting.quiet": "آرام",
+  "mascot.setting.off": "خاموش"
 }

@@ -2563,5 +2563,18 @@
   "study.parent.lockNow": "Khóa ngay",
   "study.nav.title": "Học tập và tập trung",
   "study.card.eyebrow": "Chế độ học tập",
-  "study.card.summary": "Chọn gói học tập và thời gian. Trong giờ học chỉ video trong kế hoạch được hiển thị và phát, danh sách chặn vẫn áp dụng."
+  "study.card.summary": "Chọn gói học tập và thời gian. Trong giờ học chỉ video trong kế hoạch được hiển thị và phát, danh sách chặn vẫn áp dụng.",
+  "mascot.welcome.line": "Mình sẽ giấu khỏi tầm mắt những gì bạn chặn.",
+  "mascot.welcome.dismiss": "Đã hiểu",
+  "mascot.popup.hiddenCount": "Đã ẩn {count} mục",
+  "mascot.popup.milestone": "Đã dẹp {count} thứ khỏi đường của bạn.",
+  "mascot.popup.allowOnly": "Chỉ kênh được phép mới đi qua.",
+  "mascot.options.emptyKeywords": "Thêm một từ để bắt đầu lọc.",
+  "mascot.options.emptyChannels": "Chặn một kênh để ẩn nó ở mọi nơi.",
+  "mascot.options.imported": "Đã nhập cài đặt.",
+  "mascot.setting.title": "Bạn đồng hành",
+  "mascot.setting.description": "Sôi nổi hiện tư thế và bong bóng thoại. Yên tĩnh chỉ hiện tư thế. Tắt sẽ ẩn hết.",
+  "mascot.setting.lively": "Sôi nổi",
+  "mascot.setting.quiet": "Yên tĩnh",
+  "mascot.setting.off": "Tắt"
 }

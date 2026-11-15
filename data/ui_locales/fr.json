@@ -2563,5 +2563,18 @@
   "study.parent.lockNow": "Verrouiller maintenant",
   "study.nav.title": "Études et concentration",
   "study.card.eyebrow": "Mode études",
-  "study.card.summary": "Choisis un pack d’études et une heure. Pendant les études, seules les vidéos de ton plan s’affichent et se lisent, et ta liste de blocage s’applique toujours."
+  "study.card.summary": "Choisis un pack d’études et une heure. Pendant les études, seules les vidéos de ton plan s’affichent et se lisent, et ta liste de blocage s’applique toujours.",
+  "mascot.welcome.line": "Je garde hors de vue ce que vous bloquez.",
+  "mascot.welcome.dismiss": "Compris",
+  "mascot.popup.hiddenCount": "{count} masqués jusqu'ici",
+  "mascot.popup.milestone": "{count} éléments écartés de votre chemin.",
+  "mascot.popup.allowOnly": "Seules les chaînes autorisées passent.",
+  "mascot.options.emptyKeywords": "Ajoutez un mot pour commencer à filtrer.",
+  "mascot.options.emptyChannels": "Bloquez une chaîne pour la masquer partout.",
+  "mascot.options.imported": "Paramètres importés.",
+  "mascot.setting.title": "Compagnon",
+  "mascot.setting.description": "Animé affiche des poses et des bulles. Calme affiche seulement des poses. Désactivé les masque.",
+  "mascot.setting.lively": "Animé",
+  "mascot.setting.quiet": "Calme",
+  "mascot.setting.off": "Désactivé"
 }

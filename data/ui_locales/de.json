@@ -2563,5 +2563,18 @@
   "study.parent.lockNow": "Jetzt sperren",
   "study.nav.title": "Lernen und Fokus",
   "study.card.eyebrow": "Lernmodus",
-  "study.card.summary": "Wähle ein Lernpaket und eine Zeit. Beim Lernen werden nur Videos aus deinem Plan angezeigt und abgespielt, und deine Sperrliste gilt weiterhin."
+  "study.card.summary": "Wähle ein Lernpaket und eine Zeit. Beim Lernen werden nur Videos aus deinem Plan angezeigt und abgespielt, und deine Sperrliste gilt weiterhin.",
+  "mascot.welcome.line": "Was du blockierst, halte ich aus dem Blick.",
+  "mascot.welcome.dismiss": "Verstanden",
+  "mascot.popup.hiddenCount": "Bisher {count} ausgeblendet",
+  "mascot.popup.milestone": "{count} Dinge aus dem Weg geräumt.",
+  "mascot.popup.allowOnly": "Nur erlaubte Kanäle kommen durch.",
+  "mascot.options.emptyKeywords": "Füge ein Wort hinzu, um zu filtern.",
+  "mascot.options.emptyChannels": "Blockiere einen Kanal, um ihn überall auszublenden.",
+  "mascot.options.imported": "Einstellungen importiert.",
+  "mascot.setting.title": "Begleiter",
+  "mascot.setting.description": "Lebhaft zeigt Posen und Sprechblasen. Ruhig zeigt nur Posen. Aus blendet sie aus.",
+  "mascot.setting.lively": "Lebhaft",
+  "mascot.setting.quiet": "Ruhig",
+  "mascot.setting.off": "Aus"
 }

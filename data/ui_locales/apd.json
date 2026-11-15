@@ -2563,5 +2563,18 @@
   "study.parent.lockNow": "أقفل هسي",
   "study.nav.title": "القراية والتركيز",
   "study.card.eyebrow": "وضع القراية",
-  "study.card.summary": "أختار حزمة قراية ووكت. وكت القراية بتظهر وبتشتغل فيديوهات خطتك بس، وقائمة الحظر حقتك لسه شغالة."
+  "study.card.summary": "أختار حزمة قراية ووكت. وكت القراية بتظهر وبتشتغل فيديوهات خطتك بس، وقائمة الحظر حقتك لسه شغالة.",
+  "mascot.welcome.line": "أي حاجة بتحظرها حأخبيها من عينك.",
+  "mascot.welcome.dismiss": "تمام",
+  "mascot.popup.hiddenCount": "اتخبّت {count} لحدي هسع",
+  "mascot.popup.milestone": "{count} حاجة اتشالت من طريقك.",
+  "mascot.popup.allowOnly": "القنوات المسموح بيها بس هي البتعدّي.",
+  "mascot.options.emptyKeywords": "ضيف كلمة عشان تبدأ الفلترة.",
+  "mascot.options.emptyChannels": "احظر قناة عشان تتخبّى في كل حتة.",
+  "mascot.options.imported": "الإعدادات اتستوردت.",
+  "mascot.setting.title": "الرفيق",
+  "mascot.setting.description": "«نشيط» بيوري الحركات وفقاعات الكلام. «هادي» بيوري الحركات بس. «مقفول» بيخبّيهم.",
+  "mascot.setting.lively": "نشيط",
+  "mascot.setting.quiet": "هادي",
+  "mascot.setting.off": "مقفول"
 }

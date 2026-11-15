@@ -2563,5 +2563,18 @@
   "study.parent.lockNow": "अबहीं लॉक करीं",
   "study.nav.title": "पढ़ाई आ ध्यान",
   "study.card.eyebrow": "पढ़ाई मोड",
-  "study.card.summary": "एगो पढ़ाई पैक आ समय चुनीं। पढ़ाई के दौरान खाली रउआ योजना के वीडियो देखाई आ चली, आ रउआ ब्लॉक सूची लागू रही।"
+  "study.card.summary": "एगो पढ़ाई पैक आ समय चुनीं। पढ़ाई के दौरान खाली रउआ योजना के वीडियो देखाई आ चली, आ रउआ ब्लॉक सूची लागू रही।",
+  "mascot.welcome.line": "रउआ जवन ब्लॉक करब, ओकरा के हम नजर से दूर राखब।",
+  "mascot.welcome.dismiss": "ठीक बा",
+  "mascot.popup.hiddenCount": "अब ले {count} लुकावल गइल",
+  "mascot.popup.milestone": "{count} चीज रउआ राह से हटावल गइल।",
+  "mascot.popup.allowOnly": "खाली अनुमति वाला चैनल आगे जाला।",
+  "mascot.options.emptyKeywords": "फिल्टर शुरू करे खातिर कवनो शब्द जोड़ीं।",
+  "mascot.options.emptyChannels": "कवनो चैनल ब्लॉक करीं, ऊ हर जगह लुका जाई।",
+  "mascot.options.imported": "सेटिंग इंपोर्ट हो गइल।",
+  "mascot.setting.title": "संगी",
+  "mascot.setting.description": "चहक में पोज आ बतकही के बुलबुला देखाई देला। शांत में खाली पोज। बंद में कुछ ना।",
+  "mascot.setting.lively": "चहक",
+  "mascot.setting.quiet": "शांत",
+  "mascot.setting.off": "बंद"
 }

@@ -2563,5 +2563,18 @@
   "study.parent.lockNow": "马上锁定",
   "study.nav.title": "学习搭专注",
   "study.card.eyebrow": "学习模式",
-  "study.card.summary": "选一只学习包搭辰光。学习辰光只显示搭播放计划里个视频，屏蔽列表照样有效。"
+  "study.card.summary": "选一只学习包搭辰光。学习辰光只显示搭播放计划里个视频，屏蔽列表照样有效。",
+  "mascot.welcome.line": "侬屏蔽个物事，我会帮侬藏好，看勿见。",
+  "mascot.welcome.dismiss": "晓得了",
+  "mascot.popup.hiddenCount": "到现在已经隐藏 {count} 样",
+  "mascot.popup.milestone": "已经帮侬挡脱 {count} 样物事。",
+  "mascot.popup.allowOnly": "只有允许个频道好通过。",
+  "mascot.options.emptyKeywords": "加一个词，就好开始过滤。",
+  "mascot.options.emptyChannels": "屏蔽一个频道，伊就到处侪隐藏。",
+  "mascot.options.imported": "设置已经导入。",
+  "mascot.setting.title": "小伙伴",
+  "mascot.setting.description": "活泼：显示姿势搭对白气泡。安静：只显示姿势。关脱：全部隐藏。",
+  "mascot.setting.lively": "活泼",
+  "mascot.setting.quiet": "安静",
+  "mascot.setting.off": "关脱"
 }

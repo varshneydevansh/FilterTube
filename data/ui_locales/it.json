@@ -2563,5 +2563,18 @@
   "study.parent.lockNow": "Blocca ora",
   "study.nav.title": "Studio e concentrazione",
   "study.card.eyebrow": "Modalità studio",
-  "study.card.summary": "Scegli un pacchetto di studio e un orario. Durante lo studio si vedono e si riproducono solo i video del tuo piano, e la tua lista di blocco resta valida."
+  "study.card.summary": "Scegli un pacchetto di studio e un orario. Durante lo studio si vedono e si riproducono solo i video del tuo piano, e la tua lista di blocco resta valida.",
+  "mascot.welcome.line": "Terrò lontano dalla vista ciò che blocchi.",
+  "mascot.welcome.dismiss": "Ho capito",
+  "mascot.popup.hiddenCount": "{count} nascosti finora",
+  "mascot.popup.milestone": "{count} cose tolte dalla tua strada.",
+  "mascot.popup.allowOnly": "Passano solo i canali consentiti.",
+  "mascot.options.emptyKeywords": "Aggiungi una parola per iniziare a filtrare.",
+  "mascot.options.emptyChannels": "Blocca un canale per nasconderlo ovunque.",
+  "mascot.options.imported": "Impostazioni importate.",
+  "mascot.setting.title": "Compagno",
+  "mascot.setting.description": "Vivace mostra pose e fumetti. Tranquillo mostra solo le pose. Disattivato li nasconde.",
+  "mascot.setting.lively": "Vivace",
+  "mascot.setting.quiet": "Tranquillo",
+  "mascot.setting.off": "Disattivato"
 }

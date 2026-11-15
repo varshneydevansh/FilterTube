@@ -2563,5 +2563,18 @@
   "study.parent.lockNow": "Kunci sekarang",
   "study.nav.title": "Belajar dan fokus",
   "study.card.eyebrow": "Mode belajar",
-  "study.card.summary": "Pilih paket belajar dan waktunya. Selama belajar hanya video dari rencanamu yang tampil dan diputar, dan daftar blokirmu tetap berlaku."
+  "study.card.summary": "Pilih paket belajar dan waktunya. Selama belajar hanya video dari rencanamu yang tampil dan diputar, dan daftar blokirmu tetap berlaku.",
+  "mascot.welcome.line": "Aku akan menjauhkan yang kamu blokir dari pandangan.",
+  "mascot.welcome.dismiss": "Mengerti",
+  "mascot.popup.hiddenCount": "{count} disembunyikan sejauh ini",
+  "mascot.popup.milestone": "{count} hal disingkirkan dari jalanmu.",
+  "mascot.popup.allowOnly": "Hanya channel yang diizinkan yang lolos.",
+  "mascot.options.emptyKeywords": "Tambahkan kata untuk mulai memfilter.",
+  "mascot.options.emptyChannels": "Blokir channel untuk menyembunyikannya di mana pun.",
+  "mascot.options.imported": "Pengaturan diimpor.",
+  "mascot.setting.title": "Teman",
+  "mascot.setting.description": "Ceria menampilkan pose dan balon kata. Tenang hanya menampilkan pose. Mati menyembunyikannya.",
+  "mascot.setting.lively": "Ceria",
+  "mascot.setting.quiet": "Tenang",
+  "mascot.setting.off": "Mati"
 }

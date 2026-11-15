@@ -2563,5 +2563,18 @@
   "study.parent.lockNow": "ابھی لاک کریں",
   "study.nav.title": "پڑھائی اور توجہ",
   "study.card.eyebrow": "پڑھائی موڈ",
-  "study.card.summary": "پڑھائی پیک اور وقت چنیں۔ پڑھائی کے دوران صرف آپ کے منصوبے کی ویڈیوز دکھائی اور چلائی جاتی ہیں، اور آپ کی بلاک فہرست بھی لاگو رہتی ہے۔"
+  "study.card.summary": "پڑھائی پیک اور وقت چنیں۔ پڑھائی کے دوران صرف آپ کے منصوبے کی ویڈیوز دکھائی اور چلائی جاتی ہیں، اور آپ کی بلاک فہرست بھی لاگو رہتی ہے۔",
+  "mascot.welcome.line": "آپ جو بلاک کریں گے، میں اسے نظروں سے دور رکھوں گی۔",
+  "mascot.welcome.dismiss": "ٹھیک ہے",
+  "mascot.popup.hiddenCount": "اب تک {count} چھپائے گئے",
+  "mascot.popup.milestone": "{count} چیزیں آپ کے راستے سے ہٹا دی گئیں۔",
+  "mascot.popup.allowOnly": "صرف اجازت والے چینل ہی گزرتے ہیں۔",
+  "mascot.options.emptyKeywords": "فلٹر شروع کرنے کے لیے کوئی لفظ شامل کریں۔",
+  "mascot.options.emptyChannels": "کسی چینل کو بلاک کریں، وہ ہر جگہ چھپ جائے گا۔",
+  "mascot.options.imported": "سیٹنگز امپورٹ ہو گئیں۔",
+  "mascot.setting.title": "ساتھی",
+  "mascot.setting.description": "زندہ دل میں انداز اور بات کے غبارے دکھتے ہیں۔ پرسکون میں صرف انداز۔ بند میں کچھ نہیں۔",
+  "mascot.setting.lively": "زندہ دل",
+  "mascot.setting.quiet": "پرسکون",
+  "mascot.setting.off": "بند"
 }

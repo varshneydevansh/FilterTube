@@ -2563,5 +2563,18 @@
   "study.parent.lockNow": "ล็อกตอนนี้",
   "study.nav.title": "เรียนและโฟกัส",
   "study.card.eyebrow": "โหมดเรียน",
-  "study.card.summary": "เลือกชุดการเรียนและเวลา ระหว่างเรียนจะแสดงและเล่นเฉพาะวิดีโอจากแผน และรายการบล็อกยังมีผลอยู่"
+  "study.card.summary": "เลือกชุดการเรียนและเวลา ระหว่างเรียนจะแสดงและเล่นเฉพาะวิดีโอจากแผน และรายการบล็อกยังมีผลอยู่",
+  "mascot.welcome.line": "อะไรที่คุณบล็อก ฉันจะเก็บให้พ้นสายตา",
+  "mascot.welcome.dismiss": "เข้าใจแล้ว",
+  "mascot.popup.hiddenCount": "ซ่อนไปแล้ว {count} รายการ",
+  "mascot.popup.milestone": "กันออกจากทางคุณแล้ว {count} อย่าง",
+  "mascot.popup.allowOnly": "เฉพาะช่องที่อนุญาตเท่านั้นที่ผ่านได้",
+  "mascot.options.emptyKeywords": "เพิ่มคำเพื่อเริ่มกรอง",
+  "mascot.options.emptyChannels": "บล็อกช่องเพื่อซ่อนช่องนั้นทุกที่",
+  "mascot.options.imported": "นำเข้าการตั้งค่าแล้ว",
+  "mascot.setting.title": "เพื่อนคู่ใจ",
+  "mascot.setting.description": "สดใสจะแสดงท่าทางและบอลลูนคำพูด เงียบจะแสดงแค่ท่าทาง ปิดจะซ่อนทั้งหมด",
+  "mascot.setting.lively": "สดใส",
+  "mascot.setting.quiet": "เงียบ",
+  "mascot.setting.off": "ปิด"
 }

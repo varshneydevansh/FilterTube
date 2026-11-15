@@ -29444,6 +29444,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                     'success'
                 );
             }
+            window.FilterTubeMascots?.celebrateImport?.();
         } catch (e) {
             const message = normalizeString(e?.message) || tabViewUiText(
                 'dashboard.backup.import.failedFallback',

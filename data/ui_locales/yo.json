@@ -2563,5 +2563,18 @@
   "study.parent.lockNow": "Tìpa báyìí",
   "study.nav.title": "Ẹ̀kọ́ àti àfiyèsí",
   "study.card.eyebrow": "Ipò ẹ̀kọ́",
-  "study.card.summary": "Yan àpò ẹ̀kọ́ kan àti àkókò. Nígbà ẹ̀kọ́, àwọn fídíò láti inú ètò rẹ nìkan ló ń hàn tí wọ́n sì ń ṣiṣẹ́, àkójọ ìdènà rẹ sì ṣì wúlò."
+  "study.card.summary": "Yan àpò ẹ̀kọ́ kan àti àkókò. Nígbà ẹ̀kọ́, àwọn fídíò láti inú ètò rẹ nìkan ló ń hàn tí wọ́n sì ń ṣiṣẹ́, àkójọ ìdènà rẹ sì ṣì wúlò.",
+  "mascot.welcome.line": "Màá pa ohun tí o dí mọ́ kúrò lójú.",
+  "mascot.welcome.dismiss": "Ó yé mi",
+  "mascot.popup.hiddenCount": "A ti fi {count} pamọ́ títí di báyìí",
+  "mascot.popup.milestone": "A ti mú nǹkan {count} kúrò lọ́nà rẹ.",
+  "mascot.popup.allowOnly": "Àwọn ìkànnì tí a gbà láàyè nìkan ló ń kọjá.",
+  "mascot.options.emptyKeywords": "Fi ọ̀rọ̀ kan kún un láti bẹ̀rẹ̀ àsẹ́.",
+  "mascot.options.emptyChannels": "Dí ìkànnì kan láti fi pamọ́ níbi gbogbo.",
+  "mascot.options.imported": "A ti kó àwọn ètò wọlé.",
+  "mascot.setting.title": "Alábàákẹ́gbẹ́",
+  "mascot.setting.description": "Alárinrin ń fi ìdúró àti fọ́nrán ọ̀rọ̀ hàn. Píparọ́rọ́ ń fi ìdúró nìkan hàn. Pa á ń fi wọ́n pamọ́.",
+  "mascot.setting.lively": "Alárinrin",
+  "mascot.setting.quiet": "Píparọ́rọ́",
+  "mascot.setting.off": "Pa á"
 }

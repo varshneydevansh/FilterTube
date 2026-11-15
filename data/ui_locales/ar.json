@@ -2563,5 +2563,18 @@
   "study.parent.lockNow": "اقفل الآن",
   "study.nav.title": "الدراسة والتركيز",
   "study.card.eyebrow": "وضع الدراسة",
-  "study.card.summary": "اختر حزمة دراسة ووقتًا. أثناء الدراسة تظهر وتُشغَّل مقاطع خطتك فقط، وتبقى قائمة الحظر لديك مطبّقة."
+  "study.card.summary": "اختر حزمة دراسة ووقتًا. أثناء الدراسة تظهر وتُشغَّل مقاطع خطتك فقط، وتبقى قائمة الحظر لديك مطبّقة.",
+  "mascot.welcome.line": "سأُبقي ما تحظره بعيدًا عن الأنظار.",
+  "mascot.welcome.dismiss": "حسنًا",
+  "mascot.popup.hiddenCount": "{count} مخفي حتى الآن",
+  "mascot.popup.milestone": "أبعدنا {count} شيء عن طريقك.",
+  "mascot.popup.allowOnly": "تمر القنوات المسموح بها فقط.",
+  "mascot.options.emptyKeywords": "أضف كلمة لبدء التصفية.",
+  "mascot.options.emptyChannels": "احظر قناة لإخفائها في كل مكان.",
+  "mascot.options.imported": "تم استيراد الإعدادات.",
+  "mascot.setting.title": "الرفيق",
+  "mascot.setting.description": "«حيوي» يعرض الوضعيات وفقاعات الكلام. «هادئ» يعرض الوضعيات فقط. «إيقاف» يخفيها.",
+  "mascot.setting.lively": "حيوي",
+  "mascot.setting.quiet": "هادئ",
+  "mascot.setting.off": "إيقاف"
 }

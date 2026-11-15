@@ -2563,5 +2563,18 @@
   "study.parent.lockNow": "आता लॉक करा",
   "study.nav.title": "अभ्यास आणि लक्ष",
   "study.card.eyebrow": "अभ्यास मोड",
-  "study.card.summary": "अभ्यास पॅक आणि वेळ निवडा. अभ्यासादरम्यान फक्त तुमच्या योजनेतील व्हिडिओ दिसतात आणि चालतात, आणि तुमची ब्लॉक यादी लागू राहते."
+  "study.card.summary": "अभ्यास पॅक आणि वेळ निवडा. अभ्यासादरम्यान फक्त तुमच्या योजनेतील व्हिडिओ दिसतात आणि चालतात, आणि तुमची ब्लॉक यादी लागू राहते.",
+  "mascot.welcome.line": "तुम्ही जे ब्लॉक कराल, ते मी नजरेआड ठेवेन.",
+  "mascot.welcome.dismiss": "समजले",
+  "mascot.popup.hiddenCount": "आतापर्यंत {count} लपवले",
+  "mascot.popup.milestone": "{count} गोष्टी तुमच्या वाटेतून दूर केल्या.",
+  "mascot.popup.allowOnly": "फक्त परवानगी असलेले चॅनेलच पुढे जातात.",
+  "mascot.options.emptyKeywords": "फिल्टर सुरू करण्यासाठी एक शब्द जोडा.",
+  "mascot.options.emptyChannels": "चॅनेल ब्लॉक करा, तो सगळीकडे लपेल.",
+  "mascot.options.imported": "सेटिंग्ज इम्पोर्ट झाल्या.",
+  "mascot.setting.title": "सोबती",
+  "mascot.setting.description": "उत्साही मध्ये पोझ आणि संवादाचे फुगे दिसतात. शांत मध्ये फक्त पोझ. बंद मध्ये काहीच नाही.",
+  "mascot.setting.lively": "उत्साही",
+  "mascot.setting.quiet": "शांत",
+  "mascot.setting.off": "बंद"
 }

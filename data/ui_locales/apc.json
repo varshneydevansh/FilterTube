@@ -2563,5 +2563,18 @@
   "study.parent.lockNow": "اقفل هلق",
   "study.nav.title": "دراسة وتركيز",
   "study.card.eyebrow": "وضع الدراسة",
-  "study.card.summary": "اختار حزمة دراسة ووقت. وقت الدراسة بس فيديوهات خطتك بتبيّن وبتشتغل، وقائمة الحظر تبعك بتضل مطبّقة."
+  "study.card.summary": "اختار حزمة دراسة ووقت. وقت الدراسة بس فيديوهات خطتك بتبيّن وبتشتغل، وقائمة الحظر تبعك بتضل مطبّقة.",
+  "mascot.welcome.line": "رح خبّي عن عيونك كل شي بتحظره.",
+  "mascot.welcome.dismiss": "تمام",
+  "mascot.popup.hiddenCount": "انخبى {count} لهلّق",
+  "mascot.popup.milestone": "{count} شغلة انشالت من دربك.",
+  "mascot.popup.allowOnly": "بس القنوات المسموحة بتمرق.",
+  "mascot.options.emptyKeywords": "زيد كلمة لتبلّش الفلترة.",
+  "mascot.options.emptyChannels": "احظر قناة لتنخبى بكل مكان.",
+  "mascot.options.imported": "انستوردت الإعدادات.",
+  "mascot.setting.title": "الرفيق",
+  "mascot.setting.description": "«نشيط» بيعرض الحركات وفقاعات الحكي. «هادي» بيعرض الحركات بس. «مطفّى» بيخبّيهن.",
+  "mascot.setting.lively": "نشيط",
+  "mascot.setting.quiet": "هادي",
+  "mascot.setting.off": "مطفّى"
 }

@@ -2563,5 +2563,18 @@
   "study.parent.lockNow": "Kulle yanzu",
   "study.nav.title": "Karatu da mayar da hankali",
   "study.card.eyebrow": "Yanayin karatu",
-  "study.card.summary": "Zaɓi fakitin karatu da lokaci. Yayin karatu bidiyoyin shirinka kaɗai ke bayyana kuma suke kunnuwa, kuma jerin toshewarka yana nan aiki."
+  "study.card.summary": "Zaɓi fakitin karatu da lokaci. Yayin karatu bidiyoyin shirinka kaɗai ke bayyana kuma suke kunnuwa, kuma jerin toshewarka yana nan aiki.",
+  "mascot.welcome.line": "Zan ɓoye duk abin da ka toshe daga gani.",
+  "mascot.welcome.dismiss": "Na gane",
+  "mascot.popup.hiddenCount": "An ɓoye {count} zuwa yanzu",
+  "mascot.popup.milestone": "An kawar da abubuwa {count} daga hanyarka.",
+  "mascot.popup.allowOnly": "Tasoshin da aka yarda da su kawai ke wucewa.",
+  "mascot.options.emptyKeywords": "Ƙara kalma don fara tacewa.",
+  "mascot.options.emptyChannels": "Toshe tasha don ɓoye ta ko'ina.",
+  "mascot.options.imported": "An shigo da saituna.",
+  "mascot.setting.title": "Abokin tafiya",
+  "mascot.setting.description": "Mai kuzari na nuna motsi da kumfar magana. Shiru na nuna motsi kawai. A kashe na ɓoye su.",
+  "mascot.setting.lively": "Mai kuzari",
+  "mascot.setting.quiet": "Shiru",
+  "mascot.setting.off": "A kashe"
 }

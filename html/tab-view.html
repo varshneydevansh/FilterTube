@@ -16,6 +16,7 @@
     <link rel="stylesheet" href="../css/page-tones.css">
     <link rel="stylesheet" href="../css/dashboard-studio.css">
     <link rel="stylesheet" href="../css/study.css">
+    <link rel="stylesheet" href="../css/mascots.css">
 </head>
 
 <body>
@@ -1096,6 +1097,23 @@
                                                 <input id="setting_showUpdateRefreshPrompt" type="checkbox" />
                                                 <span class="slider round"></span>
                                             </label>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="card settings-card">
+                                    <div class="card-header">
+                                        <h3 id="ftCompanionModeTitle" data-ft-i18n="mascot.setting.title">Companion</h3>
+                                    </div>
+                                    <div class="card-body settings-card__body">
+                                        <div class="toggle-row">
+                                            <div class="toggle-info">
+                                                <div id="ftCompanionModeHint" class="toggle-description" data-ft-i18n="mascot.setting.description">Lively shows poses and speech bubbles. Quiet shows poses only. Off hides them.</div>
+                                            </div>
+                                            <select id="ftCompanionMode" class="select-input" style="min-width:160px;" aria-labelledby="ftCompanionModeTitle" aria-describedby="ftCompanionModeHint">
+                                                <option value="lively" data-ft-i18n="mascot.setting.lively">Lively</option>
+                                                <option value="quiet" data-ft-i18n="mascot.setting.quiet" selected>Quiet</option>
+                                                <option value="off" data-ft-i18n="mascot.setting.off">Off</option>
+                                            </select>
                                         </div>
                                     </div>
                                 </div>
@@ -2839,6 +2857,7 @@
     <script src="../js/state_manager.js"></script>
     <script src="../js/render_engine.js"></script>
     <script src="../js/ui_localization.js"></script>
+    <script src="../js/mascots.js"></script>
     <script src="../js/ui_static_copy_capture.js"></script>
     <script src="../js/ui-shell/tab-view-decor.js"></script>
     <script src="../js/shared/study_packs.js"></script>

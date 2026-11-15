@@ -2705,5 +2705,18 @@
   "study.parent.lockNow": "Lock now",
   "study.nav.title": "Study and focus",
   "study.card.eyebrow": "Study mode",
-  "study.card.summary": "Pick a study pack and a time. During study only videos from your plan show and play, and your block list still applies."
+  "study.card.summary": "Pick a study pack and a time. During study only videos from your plan show and play, and your block list still applies.",
+  "mascot.welcome.line": "I'll keep what you block out of sight.",
+  "mascot.welcome.dismiss": "Got it",
+  "mascot.popup.hiddenCount": "{count} hidden so far",
+  "mascot.popup.milestone": "{count} things kept out of your way.",
+  "mascot.popup.allowOnly": "Only allowed channels get through.",
+  "mascot.options.emptyKeywords": "Add a word to start filtering.",
+  "mascot.options.emptyChannels": "Block a channel to hide it everywhere.",
+  "mascot.options.imported": "Settings imported.",
+  "mascot.setting.title": "Companion",
+  "mascot.setting.description": "Lively shows poses and speech bubbles. Quiet shows poses only. Off hides them.",
+  "mascot.setting.lively": "Lively",
+  "mascot.setting.quiet": "Quiet",
+  "mascot.setting.off": "Off"
 }

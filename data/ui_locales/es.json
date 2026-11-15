@@ -2563,5 +2563,18 @@
   "study.parent.lockNow": "Bloquear ahora",
   "study.nav.title": "Estudio y concentración",
   "study.card.eyebrow": "Modo estudio",
-  "study.card.summary": "Elige un paquete de estudio y un horario. Durante el estudio solo se muestran y reproducen videos de tu plan, y tu lista de bloqueo sigue activa."
+  "study.card.summary": "Elige un paquete de estudio y un horario. Durante el estudio solo se muestran y reproducen videos de tu plan, y tu lista de bloqueo sigue activa.",
+  "mascot.welcome.line": "Mantendré fuera de la vista lo que bloquees.",
+  "mascot.welcome.dismiss": "Entendido",
+  "mascot.popup.hiddenCount": "{count} ocultos hasta ahora",
+  "mascot.popup.milestone": "{count} cosas fuera de tu camino.",
+  "mascot.popup.allowOnly": "Solo pasan los canales permitidos.",
+  "mascot.options.emptyKeywords": "Añade una palabra para empezar a filtrar.",
+  "mascot.options.emptyChannels": "Bloquea un canal para ocultarlo en todas partes.",
+  "mascot.options.imported": "Ajustes importados.",
+  "mascot.setting.title": "Compañero",
+  "mascot.setting.description": "Animado muestra poses y bocadillos. Tranquilo muestra solo poses. Desactivado los oculta.",
+  "mascot.setting.lively": "Animado",
+  "mascot.setting.quiet": "Tranquilo",
+  "mascot.setting.off": "Desactivado"
 }

@@ -2563,5 +2563,18 @@
   "study.parent.lockNow": "Funga sasa",
   "study.nav.title": "Masomo na umakini",
   "study.card.eyebrow": "Hali ya masomo",
-  "study.card.summary": "Chagua kifurushi cha masomo na muda. Wakati wa masomo, video za mpango wako pekee ndizo zinaonekana na kucheza, na orodha yako ya kuzuia bado inatumika."
+  "study.card.summary": "Chagua kifurushi cha masomo na muda. Wakati wa masomo, video za mpango wako pekee ndizo zinaonekana na kucheza, na orodha yako ya kuzuia bado inatumika.",
+  "mascot.welcome.line": "Nitaficha usionekane chochote unachozuia.",
+  "mascot.welcome.dismiss": "Nimeelewa",
+  "mascot.popup.hiddenCount": "{count} zimefichwa hadi sasa",
+  "mascot.popup.milestone": "Vitu {count} vimeondolewa njiani mwako.",
+  "mascot.popup.allowOnly": "Ni chaneli zilizoruhusiwa tu zinazopita.",
+  "mascot.options.emptyKeywords": "Ongeza neno ili uanze kuchuja.",
+  "mascot.options.emptyChannels": "Zuia chaneli ili ifichwe kila mahali.",
+  "mascot.options.imported": "Mipangilio imeingizwa.",
+  "mascot.setting.title": "Mwenzi",
+  "mascot.setting.description": "Changamfu huonyesha mikao na viputo vya maneno. Tulivu huonyesha mikao tu. Zima huvificha.",
+  "mascot.setting.lively": "Changamfu",
+  "mascot.setting.quiet": "Tulivu",
+  "mascot.setting.off": "Zima"
 }

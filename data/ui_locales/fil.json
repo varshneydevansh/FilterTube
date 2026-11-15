@@ -2563,5 +2563,18 @@
   "study.parent.lockNow": "I-lock ngayon",
   "study.nav.title": "Pag-aaral at focus",
   "study.card.eyebrow": "Study mode",
-  "study.card.summary": "Pumili ng study pack at oras. Habang nag-aaral, mga video lang mula sa plano mo ang lumalabas at nagpe-play, at nalalapat pa rin ang block list mo."
+  "study.card.summary": "Pumili ng study pack at oras. Habang nag-aaral, mga video lang mula sa plano mo ang lumalabas at nagpe-play, at nalalapat pa rin ang block list mo.",
+  "mascot.welcome.line": "Itatago ko sa paningin ang mga bina-block mo.",
+  "mascot.welcome.dismiss": "Sige",
+  "mascot.popup.hiddenCount": "{count} na ang naitago",
+  "mascot.popup.milestone": "{count} bagay ang inalis sa daan mo.",
+  "mascot.popup.allowOnly": "Mga pinapayagang channel lang ang nakakalusot.",
+  "mascot.options.emptyKeywords": "Magdagdag ng salita para magsimulang mag-filter.",
+  "mascot.options.emptyChannels": "I-block ang isang channel para maitago ito kahit saan.",
+  "mascot.options.imported": "Na-import ang settings.",
+  "mascot.setting.title": "Kasama",
+  "mascot.setting.description": "Ang Masigla ay nagpapakita ng pose at speech bubble. Ang Tahimik ay pose lang. Ang Naka-off ay nagtatago sa kanila.",
+  "mascot.setting.lively": "Masigla",
+  "mascot.setting.quiet": "Tahimik",
+  "mascot.setting.off": "Naka-off"
 }

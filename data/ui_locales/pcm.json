@@ -2563,5 +2563,18 @@
   "study.parent.lockNow": "Lock am now",
   "study.nav.title": "Study and focus",
   "study.card.eyebrow": "Study mode",
-  "study.card.summary": "Pick study pack and time. During study, na only videos from your plan go show and play, and your block list still dey work."
+  "study.card.summary": "Pick study pack and time. During study, na only videos from your plan go show and play, and your block list still dey work.",
+  "mascot.welcome.line": "Anything wey you block, I go keep am comot for your eye.",
+  "mascot.welcome.dismiss": "I don hear",
+  "mascot.popup.hiddenCount": "{count} don hide so far",
+  "mascot.popup.milestone": "{count} things don comot for your way.",
+  "mascot.popup.allowOnly": "Na only channels wey you allow go pass.",
+  "mascot.options.emptyKeywords": "Add one word make filtering start.",
+  "mascot.options.emptyChannels": "Block one channel make e hide everywhere.",
+  "mascot.options.imported": "Settings don import.",
+  "mascot.setting.title": "Padi",
+  "mascot.setting.description": "Jolly dey show poses and talk bubble. Quiet dey show poses only. Off go hide dem.",
+  "mascot.setting.lively": "Jolly",
+  "mascot.setting.quiet": "Quiet",
+  "mascot.setting.off": "Off"
 }

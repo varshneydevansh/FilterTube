@@ -2563,5 +2563,18 @@
   "study.parent.lockNow": "હમણાં લૉક કરો",
   "study.nav.title": "અભ્યાસ અને ફોકસ",
   "study.card.eyebrow": "અભ્યાસ મોડ",
-  "study.card.summary": "અભ્યાસ પૅક અને સમય પસંદ કરો. અભ્યાસ દરમિયાન ફક્ત તમારી યોજનાના વીડિયો દેખાય અને ચાલે છે, અને તમારી બ્લૉક સૂચિ લાગુ રહે છે."
+  "study.card.summary": "અભ્યાસ પૅક અને સમય પસંદ કરો. અભ્યાસ દરમિયાન ફક્ત તમારી યોજનાના વીડિયો દેખાય અને ચાલે છે, અને તમારી બ્લૉક સૂચિ લાગુ રહે છે.",
+  "mascot.welcome.line": "તમે જે બ્લૉક કરશો, તેને હું નજરથી દૂર રાખીશ.",
+  "mascot.welcome.dismiss": "સમજાયું",
+  "mascot.popup.hiddenCount": "અત્યાર સુધી {count} છુપાવ્યા",
+  "mascot.popup.milestone": "{count} વસ્તુઓ તમારા માર્ગમાંથી દૂર કરી.",
+  "mascot.popup.allowOnly": "ફક્ત મંજૂર ચેનલો જ પસાર થાય છે.",
+  "mascot.options.emptyKeywords": "ફિલ્ટર શરૂ કરવા એક શબ્દ ઉમેરો.",
+  "mascot.options.emptyChannels": "ચેનલને બ્લૉક કરો, તે દરેક જગ્યાએ છુપાઈ જશે.",
+  "mascot.options.imported": "સેટિંગ્સ ઇમ્પોર્ટ થઈ.",
+  "mascot.setting.title": "સાથી",
+  "mascot.setting.description": "ઉત્સાહી માં પોઝ અને વાતના પરપોટા દેખાય છે. શાંત માં ફક્ત પોઝ. બંધ માં કંઈ નહીં.",
+  "mascot.setting.lively": "ઉત્સાહી",
+  "mascot.setting.quiet": "શાંત",
+  "mascot.setting.off": "બંધ"
 }

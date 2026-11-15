@@ -2563,5 +2563,18 @@
   "study.parent.lockNow": "अभी लॉक करें",
   "study.nav.title": "पढ़ाई और फ़ोकस",
   "study.card.eyebrow": "पढ़ाई मोड",
-  "study.card.summary": "एक पढ़ाई पैक और समय चुनें। पढ़ाई के दौरान सिर्फ़ आपकी योजना के वीडियो दिखते और चलते हैं, और आपकी ब्लॉक सूची लागू रहती है।"
+  "study.card.summary": "एक पढ़ाई पैक और समय चुनें। पढ़ाई के दौरान सिर्फ़ आपकी योजना के वीडियो दिखते और चलते हैं, और आपकी ब्लॉक सूची लागू रहती है।",
+  "mascot.welcome.line": "आप जो ब्लॉक करेंगे, उसे मैं नज़रों से दूर रखूँगी।",
+  "mascot.welcome.dismiss": "ठीक है",
+  "mascot.popup.hiddenCount": "अब तक {count} छिपाए गए",
+  "mascot.popup.milestone": "{count} चीज़ें आपके रास्ते से हटाई गईं।",
+  "mascot.popup.allowOnly": "सिर्फ़ अनुमति वाले चैनल ही आगे आते हैं।",
+  "mascot.options.emptyKeywords": "फ़िल्टर शुरू करने के लिए कोई शब्द जोड़ें।",
+  "mascot.options.emptyChannels": "किसी चैनल को ब्लॉक करें, वह हर जगह छिप जाएगा।",
+  "mascot.options.imported": "सेटिंग्स इंपोर्ट हो गईं।",
+  "mascot.setting.title": "साथी",
+  "mascot.setting.description": "जीवंत में मुद्राएँ और बातचीत के बुलबुले दिखते हैं। शांत में सिर्फ़ मुद्राएँ। बंद में कुछ नहीं।",
+  "mascot.setting.lively": "जीवंत",
+  "mascot.setting.quiet": "शांत",
+  "mascot.setting.off": "बंद"
 }

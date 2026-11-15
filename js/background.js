@@ -4689,7 +4689,9 @@ browserAPI.runtime.onInstalled.addListener(function (details) {
             [SHOW_UPDATE_REFRESH_PROMPT_KEY]: true,
             firstRunRefreshNeeded: true,
             releaseNotesSeenVersion: CURRENT_VERSION,
-            releaseNotesPayload: null
+            releaseNotesPayload: null,
+            // The options page shows Kriti's welcome once, on its first open (js/mascots.js).
+            ftMascotWelcomePending: true
         }, () => {
             applyQuickBlockDefaultMigrationOnce({ isInstall: true })
                 .then(() => applyKeywordCommentsScopeMigrationOnce())

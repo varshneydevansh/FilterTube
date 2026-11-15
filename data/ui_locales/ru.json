@@ -2563,5 +2563,18 @@
   "study.parent.lockNow": "Заблокировать сейчас",
   "study.nav.title": "Учёба и фокус",
   "study.card.eyebrow": "Режим учёбы",
-  "study.card.summary": "Выберите учебный набор и время. Во время учёбы показываются и воспроизводятся только видео из плана, а ваш список блокировки продолжает действовать."
+  "study.card.summary": "Выберите учебный набор и время. Во время учёбы показываются и воспроизводятся только видео из плана, а ваш список блокировки продолжает действовать.",
+  "mascot.welcome.line": "Я спрячу от глаз всё, что вы заблокируете.",
+  "mascot.welcome.dismiss": "Понятно",
+  "mascot.popup.hiddenCount": "Скрыто: {count}",
+  "mascot.popup.milestone": "Убрано с вашего пути: {count}.",
+  "mascot.popup.allowOnly": "Проходят только разрешённые каналы.",
+  "mascot.options.emptyKeywords": "Добавьте слово, чтобы начать фильтрацию.",
+  "mascot.options.emptyChannels": "Заблокируйте канал, чтобы скрыть его везде.",
+  "mascot.options.imported": "Настройки импортированы.",
+  "mascot.setting.title": "Компаньон",
+  "mascot.setting.description": "«Живо» — позы и реплики. «Тихо» — только позы. «Выкл.» — без персонажей.",
+  "mascot.setting.lively": "Живо",
+  "mascot.setting.quiet": "Тихо",
+  "mascot.setting.off": "Выкл."
 }

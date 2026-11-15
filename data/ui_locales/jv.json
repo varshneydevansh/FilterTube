@@ -2563,5 +2563,18 @@
   "study.parent.lockNow": "Kunci saiki",
   "study.nav.title": "Sinau lan fokus",
   "study.card.eyebrow": "Mode sinau",
-  "study.card.summary": "Pilih paket sinau lan wektuné. Nalika sinau mung video saka rencanamu sing katon lan diputer, lan daftar blokirmu tetep laku."
+  "study.card.summary": "Pilih paket sinau lan wektuné. Nalika sinau mung video saka rencanamu sing katon lan diputer, lan daftar blokirmu tetep laku.",
+  "mascot.welcome.line": "Apa sing mbok blokir, bakal dakadohke saka pandeleng.",
+  "mascot.welcome.dismiss": "Ngerti",
+  "mascot.popup.hiddenCount": "{count} wis didhelikake",
+  "mascot.popup.milestone": "{count} bab wis disingkirake saka dalanmu.",
+  "mascot.popup.allowOnly": "Mung channel sing diidini sing bisa liwat.",
+  "mascot.options.emptyKeywords": "Tambahna tembung kanggo miwiti nyaring.",
+  "mascot.options.emptyChannels": "Blokir channel supaya didhelikake ing ngendi wae.",
+  "mascot.options.imported": "Setelan wis diimpor.",
+  "mascot.setting.title": "Kanca",
+  "mascot.setting.description": "Rame nuduhake pose lan gelembung omongan. Sepi mung nuduhake pose. Mati ndhelikake kabeh.",
+  "mascot.setting.lively": "Rame",
+  "mascot.setting.quiet": "Sepi",
+  "mascot.setting.off": "Mati"
 }

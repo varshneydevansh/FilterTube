@@ -2563,5 +2563,18 @@
   "study.parent.lockNow": "지금 잠그기",
   "study.nav.title": "공부와 집중",
   "study.card.eyebrow": "공부 모드",
-  "study.card.summary": "공부 팩과 시간을 고르세요. 공부 중에는 계획에 있는 동영상만 표시되고 재생되며, 차단 목록도 계속 적용됩니다."
+  "study.card.summary": "공부 팩과 시간을 고르세요. 공부 중에는 계획에 있는 동영상만 표시되고 재생되며, 차단 목록도 계속 적용됩니다.",
+  "mascot.welcome.line": "차단한 건 눈에 띄지 않게 치워 둘게요.",
+  "mascot.welcome.dismiss": "알겠어요",
+  "mascot.popup.hiddenCount": "지금까지 {count}개 숨김",
+  "mascot.popup.milestone": "{count}개를 치워 드렸어요.",
+  "mascot.popup.allowOnly": "허용한 채널만 통과해요.",
+  "mascot.options.emptyKeywords": "단어를 추가해 필터링을 시작하세요.",
+  "mascot.options.emptyChannels": "채널을 차단하면 어디서든 숨겨져요.",
+  "mascot.options.imported": "설정을 가져왔어요.",
+  "mascot.setting.title": "친구",
+  "mascot.setting.description": "활발: 포즈와 말풍선을 보여 줘요. 조용: 포즈만 보여 줘요. 끄기: 모두 숨겨요.",
+  "mascot.setting.lively": "활발",
+  "mascot.setting.quiet": "조용",
+  "mascot.setting.off": "끄기"
 }

@@ -2563,5 +2563,18 @@
   "study.parent.lockNow": "اقفل دلوقتي",
   "study.nav.title": "مذاكرة وتركيز",
   "study.card.eyebrow": "وضع المذاكرة",
-  "study.card.summary": "اختار باقة مذاكرة ووقت. وقت المذاكرة هتظهر وتشتغل فيديوهات خطتك بس، وقائمة الحظر بتاعتك لسه شغالة."
+  "study.card.summary": "اختار باقة مذاكرة ووقت. وقت المذاكرة هتظهر وتشتغل فيديوهات خطتك بس، وقائمة الحظر بتاعتك لسه شغالة.",
+  "mascot.welcome.line": "هخبّي عن عينك أي حاجة تحظرها.",
+  "mascot.welcome.dismiss": "تمام",
+  "mascot.popup.hiddenCount": "اتخبّى {count} لحد دلوقتي",
+  "mascot.popup.milestone": "{count} حاجة اتشالت من طريقك.",
+  "mascot.popup.allowOnly": "القنوات المسموحة بس هي اللي بتعدّي.",
+  "mascot.options.emptyKeywords": "ضيف كلمة عشان تبدأ الفلترة.",
+  "mascot.options.emptyChannels": "احظر قناة عشان تستخبّى في كل حتة.",
+  "mascot.options.imported": "الإعدادات اتستوردت.",
+  "mascot.setting.title": "الرفيق",
+  "mascot.setting.description": "«نشيط» بيعرض الحركات وفقاعات الكلام. «هادي» بيعرض الحركات بس. «مقفول» بيخبّيهم.",
+  "mascot.setting.lively": "نشيط",
+  "mascot.setting.quiet": "هادي",
+  "mascot.setting.off": "مقفول"
 }
