@@ -88,26 +88,26 @@ Accepted `content_bridge.js` message rows:
 
 | Message row | Source pin | Pending/request ownership today | Current side-effect class |
 | --- | --- | --- | --- |
-| `FilterTube_InjectorToBridge_Ready` | `js/content_bridge.js:5903` | Not request-owned. | Requests settings from background. |
-| `FilterTube_Refresh` | `js/content_bridge.js:5905` | Not request-owned. | Requests settings and forces DOM fallback reprocessing. |
-| `FilterTube_UpdateChannelMap` | `js/content_bridge.js:5910` | Not request-owned. | Persists learned channel mappings. |
-| `FilterTube_UpdateVideoChannelMap` | `js/content_bridge.js:5913` | Not request-owned. | Persists learned video-channel mappings, stamps matching DOM cards, and can rerun DOM fallback. |
-| `FilterTube_UpdateVideoMetaMap` | `js/content_bridge.js:5962` | Not request-owned. | Persists learned video metadata, touches DOM flags, and can schedule metadata rerun. |
-| `FilterTube_UpdateCustomUrlMap` | `js/content_bridge.js:5988` | Not request-owned. | Writes `channelMap` directly from the content bridge storage path. |
-| `FilterTube_CollaboratorInfoResponse` | `js/content_bridge.js:6001` | Pending request may resolve, but `videoId` collaborator application still runs when collaborators exist. | Applies collaborator identity and can rerun menus/DOM fallback. |
-| `FilterTube_SubscriptionsImportProgress` | `js/content_bridge.js:6027` | Owned by `pendingSubscriptionImportRequests`. | Refreshes pending import timeout and progress. |
-| `FilterTube_SubscriptionsImportResponse` | `js/content_bridge.js:6046` | Owned by `pendingSubscriptionImportRequests`. | Resolves pending import response. |
-| `FilterTube_CacheCollaboratorInfo` | `js/content_bridge.js:6054` | Not request-owned. | Stamps cards and applies collaborator identity by video ID. |
-| `FilterTube_ChannelInfoResponse` | `js/content_bridge.js:6093` | Owned by `pendingChannelInfoRequests`. | Resolves pending single-channel lookup. |
-| `FilterTube_CollabDialogData` | `js/content_bridge.js:6104` | Partially owned by `pendingCollabCards` when `collabKey` matches; `videoId` application still runs independently. | Applies dialog collaborators by card key and/or video ID. |
+| `FilterTube_InjectorToBridge_Ready` | `js/content_bridge.js:5918` | Not request-owned. | Requests settings from background. |
+| `FilterTube_Refresh` | `js/content_bridge.js:5920` | Not request-owned. | Requests settings and forces DOM fallback reprocessing. |
+| `FilterTube_UpdateChannelMap` | `js/content_bridge.js:5925` | Not request-owned. | Persists learned channel mappings. |
+| `FilterTube_UpdateVideoChannelMap` | `js/content_bridge.js:5928` | Not request-owned. | Persists learned video-channel mappings, stamps matching DOM cards, and can rerun DOM fallback. |
+| `FilterTube_UpdateVideoMetaMap` | `js/content_bridge.js:5977` | Not request-owned. | Persists learned video metadata, touches DOM flags, and can schedule metadata rerun. |
+| `FilterTube_UpdateCustomUrlMap` | `js/content_bridge.js:6003` | Not request-owned. | Writes `channelMap` directly from the content bridge storage path. |
+| `FilterTube_CollaboratorInfoResponse` | `js/content_bridge.js:6016` | Pending request may resolve, but `videoId` collaborator application still runs when collaborators exist. | Applies collaborator identity and can rerun menus/DOM fallback. |
+| `FilterTube_SubscriptionsImportProgress` | `js/content_bridge.js:6042` | Owned by `pendingSubscriptionImportRequests`. | Refreshes pending import timeout and progress. |
+| `FilterTube_SubscriptionsImportResponse` | `js/content_bridge.js:6061` | Owned by `pendingSubscriptionImportRequests`. | Resolves pending import response. |
+| `FilterTube_CacheCollaboratorInfo` | `js/content_bridge.js:6069` | Not request-owned. | Stamps cards and applies collaborator identity by video ID. |
+| `FilterTube_ChannelInfoResponse` | `js/content_bridge.js:6108` | Owned by `pendingChannelInfoRequests`. | Resolves pending single-channel lookup. |
+| `FilterTube_CollabDialogData` | `js/content_bridge.js:6119` | Partially owned by `pendingCollabCards` when `collabKey` matches; `videoId` application still runs independently. | Applies dialog collaborators by card key and/or video ID. |
 
 Pending request map rows:
 
 | Pending map | Source pin | Current coverage |
 | --- | --- | --- |
-| `pendingCollaboratorRequests` | `js/content_bridge.js:5481` | Collaborator lookup request/response, but not all collaborator application. |
-| `pendingChannelInfoRequests` | `js/content_bridge.js:5489` | Single-channel lookup request/response. |
-| `pendingSubscriptionImportRequests` | `js/content_bridge.js:5497` | Subscription import progress/response. |
+| `pendingCollaboratorRequests` | `js/content_bridge.js:5496` | Collaborator lookup request/response, but not all collaborator application. |
+| `pendingChannelInfoRequests` | `js/content_bridge.js:5504` | Single-channel lookup request/response. |
+| `pendingSubscriptionImportRequests` | `js/content_bridge.js:5512` | Subscription import progress/response. |
 
 String-source and wildcard bridge rows:
 
@@ -121,13 +121,13 @@ String-source and wildcard bridge rows:
 
 | Claim | Current source |
 | --- | --- |
-| `content_bridge.js` accepts same-window `FilterTube_*` messages and excludes only `source: "content_bridge"` at the top of the handler. | `js/content_bridge.js:5829`, `js/content_bridge.js:5830` |
-| Learned video-channel map messages persist maps and can rerun DOM fallback. | `js/content_bridge.js:5850`, `js/content_bridge.js:5858`, `js/content_bridge.js:5890` |
-| Video metadata map messages persist data and can schedule DOM rerun. | `js/content_bridge.js:5900`, `js/content_bridge.js:5904`, `js/content_bridge.js:5912` |
-| Custom URL map messages write `channelMap` directly from the content bridge instead of a pending request or background enqueue path. | `js/content_bridge.js:5920`, `js/content_bridge.js:5924`, `js/content_bridge.js:5925` |
-| Collaborator cache messages can apply collaborator data by `videoId` without pending request ownership. | `js/content_bridge.js:5983`, `js/content_bridge.js:6015` |
-| Collaborator dialog messages are accepted and applied by `collabKey` or `videoId`. | `js/content_bridge.js:6033`, `js/content_bridge.js:6044`, `js/content_bridge.js:6055` |
-| Refresh messages can fetch settings and force DOM fallback reprocessing. | `js/content_bridge.js:5836`, `js/content_bridge.js:5837` |
+| `content_bridge.js` accepts same-window `FilterTube_*` messages and excludes only `source: "content_bridge"` at the top of the handler. | `js/content_bridge.js:5844`, `js/content_bridge.js:5845` |
+| Learned video-channel map messages persist maps and can rerun DOM fallback. | `js/content_bridge.js:5865`, `js/content_bridge.js:5873`, `js/content_bridge.js:5905` |
+| Video metadata map messages persist data and can schedule DOM rerun. | `js/content_bridge.js:5915`, `js/content_bridge.js:5919`, `js/content_bridge.js:5927` |
+| Custom URL map messages write `channelMap` directly from the content bridge instead of a pending request or background enqueue path. | `js/content_bridge.js:5935`, `js/content_bridge.js:5939`, `js/content_bridge.js:5940` |
+| Collaborator cache messages can apply collaborator data by `videoId` without pending request ownership. | `js/content_bridge.js:5998`, `js/content_bridge.js:6030` |
+| Collaborator dialog messages are accepted and applied by `collabKey` or `videoId`. | `js/content_bridge.js:6048`, `js/content_bridge.js:6059`, `js/content_bridge.js:6070` |
+| Refresh messages can fetch settings and force DOM fallback reprocessing. | `js/content_bridge.js:5851`, `js/content_bridge.js:5852` |
 | Injector accepts string-source messages from `content_bridge` and `filter_logic`. | `js/injector.js:1873`, `js/injector.js:1881`, `js/injector.js:1901`, `js/injector.js:1914`, `js/injector.js:1964` |
 | Collab dialog broadcasts with wildcard target and `source: "collab_dialog"`. | `js/content/collab_dialog.js:224` |
 
@@ -185,22 +185,22 @@ The May source loci above are historical. Current content_bridge accepted Filter
 
 | Message/map | Source |
 | --- | --- |
-| `FilterTube_InjectorToBridge_Ready` | `js/content_bridge.js:6866` |
-| `FilterTube_Refresh` | `js/content_bridge.js:6868` |
-| `FilterTube_UpdateChannelMap` | `js/content_bridge.js:6873` |
-| `FilterTube_UpdateVideoChannelMap` | `js/content_bridge.js:6876` |
-| `FilterTube_UpdateVideoMetaMap` | `js/content_bridge.js:6925` |
-| `FilterTube_UpdateCustomUrlMap` | `js/content_bridge.js:6959` |
-| `FilterTube_CollaboratorInfoResponse` | `js/content_bridge.js:6972` |
-| `FilterTube_SubscriptionsImportProgress` | `js/content_bridge.js:6999` |
-| `FilterTube_SubscriptionsImportResponse` | `js/content_bridge.js:7018` |
-| `FilterTube_VideoMetaResponse` | `js/content_bridge.js:7026` |
-| `FilterTube_CacheCollaboratorInfo` | `js/content_bridge.js:7034` |
-| `FilterTube_ChannelInfoResponse` | `js/content_bridge.js:7055` |
-| `FilterTube_CollabDialogData` | `js/content_bridge.js:7066` |
-| `pendingCollaboratorRequests` | `js/content_bridge.js:6352` |
-| `pendingChannelInfoRequests` | `js/content_bridge.js:6360` |
-| `pendingSubscriptionImportRequests` | `js/content_bridge.js:6368` |
+| `FilterTube_InjectorToBridge_Ready` | `js/content_bridge.js:6881` |
+| `FilterTube_Refresh` | `js/content_bridge.js:6883` |
+| `FilterTube_UpdateChannelMap` | `js/content_bridge.js:6888` |
+| `FilterTube_UpdateVideoChannelMap` | `js/content_bridge.js:6891` |
+| `FilterTube_UpdateVideoMetaMap` | `js/content_bridge.js:6940` |
+| `FilterTube_UpdateCustomUrlMap` | `js/content_bridge.js:6974` |
+| `FilterTube_CollaboratorInfoResponse` | `js/content_bridge.js:6987` |
+| `FilterTube_SubscriptionsImportProgress` | `js/content_bridge.js:7014` |
+| `FilterTube_SubscriptionsImportResponse` | `js/content_bridge.js:7033` |
+| `FilterTube_VideoMetaResponse` | `js/content_bridge.js:7041` |
+| `FilterTube_CacheCollaboratorInfo` | `js/content_bridge.js:7049` |
+| `FilterTube_ChannelInfoResponse` | `js/content_bridge.js:7070` |
+| `FilterTube_CollabDialogData` | `js/content_bridge.js:7081` |
+| `pendingCollaboratorRequests` | `js/content_bridge.js:6367` |
+| `pendingChannelInfoRequests` | `js/content_bridge.js:6375` |
+| `pendingSubscriptionImportRequests` | `js/content_bridge.js:6383` |
 | `injector_message_listener` | `js/injector.js:2328` |
 | `subscription_import_listener` | `js/content/bridge_settings.js:167` |
 | `collab_dialog_broadcast` | `js/content/collab_dialog.js:244-247` |

@@ -198,6 +198,10 @@ const STUDY_TESTS = Object.freeze([
   'tests/runtime/study-clock-guard.test.mjs',
   'tests/runtime/study-ui.test.mjs',
 ]);
+// Companion characters in the popup and options page (js/mascots.js).
+const COMPANION_TESTS = Object.freeze([
+  'tests/runtime/mascots.test.mjs',
+]);
 const VIDEO_NOTES_TESTS = Object.freeze([
   'tests/runtime/video-notes-contract.test.mjs',
   'tests/runtime/video-notes-store.test.mjs',
@@ -228,6 +232,7 @@ export const LANES = Object.freeze({
       ...SAFETY_AND_PREFERENCE_TESTS,
       ...VIDEO_NOTES_TESTS,
       ...STUDY_TESTS,
+      ...COMPANION_TESTS,
       'tests/runtime/ad-void-native-ownership-current-behavior.test.mjs',
       'tests/runtime/popup-intrinsic-sizing.test.mjs',
       'tests/runtime/build-release-method-semantic-register-current-behavior.test.mjs',
@@ -501,6 +506,7 @@ export const LANES = Object.freeze({
       ...SAFETY_AND_PREFERENCE_TESTS,
       ...VIDEO_NOTES_TESTS,
       ...STUDY_TESTS,
+      ...COMPANION_TESTS,
       'tests/runtime/content-playback-admission-current-behavior.test.mjs',
       'tests/runtime/content-playback-coordinator.test.mjs',
       'tests/runtime/managed-content-playback-permit.test.mjs',
@@ -587,6 +593,7 @@ export const LANES = Object.freeze({
       ...SAFETY_AND_PREFERENCE_TESTS,
       ...VIDEO_NOTES_TESTS,
       ...STUDY_TESTS,
+      ...COMPANION_TESTS,
       ...CONTENT_PLAYBACK_TESTS,
       'tests/runtime/get-watch-streaming-interception.test.mjs',
       'tests/runtime/ad-void-duration-seek-current-behavior.test.mjs',
