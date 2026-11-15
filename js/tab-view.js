@@ -27909,6 +27909,12 @@ document.addEventListener('DOMContentLoaded', async () => {
             const summary = document.createElement('summary');
             summary.textContent = tabViewUiText('family.profileManager.familyToolsAndBulk', 'Family tools and bulk actions');
             familyTools.append(summary, commandCenter);
+            // Study plans (3.6.2): the active parent's protected profiles, each with its plan and a lock.
+            const studyActiveId = normalizeString(root.activeProfileId) || 'default';
+            const studyChildren = getChildrenForAccount(profilesV4, studyActiveId)
+                .filter(childId => getProfileType(profilesV4, childId) === 'child' && canActiveProfileManageProfile(profilesV4, childId))
+                .map(childId => ({ id: childId, name: getProfileName(profilesV4, childId) }));
+            window.FilterTubeStudyUi?.renderParentPlans?.(commandCenter, { children: studyChildren });
         }
 
         let lastAccount = null;
@@ -32381,7 +32387,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     function revealControlCenterTarget(target) {
         const scrollTo = node => node && requestAnimationFrame(() => node.scrollIntoView({ behavior: 'smooth', block: 'start' }));
         if (target === 'content') document.querySelector('#filtersView [data-tab-id="content"]')?.click();
-        if (target === 'selfControl') scrollTo(document.querySelector('#settingsView .ft-self-control-card'));
+        if (target === 'selfControl') scrollTo(document.getElementById('ftStudyCard') || document.querySelector('#settingsView .ft-self-control-card'));
         if (target === 'importExport') scrollTo(document.getElementById('ftImportExportCard'));
         if (target === 'profiles') scrollTo(document.getElementById('ftProfilesManager')?.closest('.settings-card'));
     }

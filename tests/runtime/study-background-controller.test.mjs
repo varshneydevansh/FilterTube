@@ -215,3 +215,35 @@ test('background.js wires the controller into the compiler, alarms and messages'
     assert.ok(scripts.indexOf('js/shared/study_clock_guard.js') < scripts.indexOf('js/study_background.js'));
     assert.match(source, /const activeSettings = safeObject\(studyRuleProfile\.settings\);/, 'study forces the master switch on');
 });
+
+test('a parent sets a child\'s plan and lock from this device; the child can\'t, and only that parent ends the lock', async () => {
+    const h = harness({ now: at(16, 12) });
+    const profiles = h.store.ftProfilesV4;
+    profiles.profiles.p1.type = 'account';
+    profiles.profiles.kid = { name: 'Kid', type: 'child', parentProfileId: 'p1', main: { mode: 'blocklist', channels: [], keywords: [] }, kids: { mode: 'blocklist' } };
+    const plan = { days: ['mon', 'tue'], start: '16:00', end: '18:00' };
+    assert.equal((await h.controller.handleMessage({ action: 'FilterTube_StudyUpdateChild', profileId: 'kid', patch: { activePackIds: ['in_upsc_cse'], plan } }, { extensionPage: true })).ok, true);
+    assert.equal(h.store.ftProfilesV4.profiles.kid.study.plan.setByParentId, 'p1', 'the parent is stamped on the plan');
+    const locked = await h.controller.startParentLock('kid', { minutes: 120 });
+    assert.equal(locked.ok, true);
+    assert.equal(h.store.ftProfilesV4.profiles.kid.study.lock.setByParentId, 'p1');
+    assert.equal(h.store.ftProfilesV4.profiles.kid.study.lock.endsAt - h.store.ftProfilesV4.profiles.kid.study.lock.startsAt, 120 * 60 * 1000);
+    assert.equal((await h.controller.startParentLock('kid', { minutes: 8 * 24 * 60 })).error, 'invalid_duration', '7 days at most');
+    const child = await h.controller.getChildState('kid');
+    assert.equal(child.lockedUntil, h.store.ftProfilesV4.profiles.kid.study.lock.endsAt);
+    // From the child's own profile, the parent controls are refused.
+    h.store.ftProfilesV4.activeProfileId = 'kid';
+    assert.equal((await h.controller.endParentLock('kid')).error, 'not_parent');
+    assert.equal((await h.controller.update({ breakMode: 'normal' })).error, 'set_by_parent');
+    h.store.ftProfilesV4.activeProfileId = 'p1';
+    assert.equal((await h.controller.endParentLock('kid')).ok, true);
+    assert.equal(h.store.ftProfilesV4.profiles.kid.study.lock, null);
+    assert.equal((await h.controller.handleMessage({ action: 'FilterTube_StudyUpdateChild', profileId: 'kid', patch: {} }, { youtubeContent: true })).error, 'untrusted_sender');
+});
+
+test('getState names the active packs for the UI', async () => {
+    const h = harness({ study: { activePackIds: ['in_gate'], packEdits: { in_gate: { variant: 'ece' } } }, now: at(16, 16, 10) });
+    const state = await h.controller.getState();
+    assert.equal(state.packs[0].shortName, 'GATE');
+    assert.equal(state.packs[0].variant.id, 'ece');
+});

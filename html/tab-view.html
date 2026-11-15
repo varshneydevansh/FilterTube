@@ -15,6 +15,7 @@
     <link rel="stylesheet" href="../css/device-auto-sync.css">
     <link rel="stylesheet" href="../css/page-tones.css">
     <link rel="stylesheet" href="../css/dashboard-studio.css">
+    <link rel="stylesheet" href="../css/study.css">
 </head>
 
 <body>
@@ -109,7 +110,7 @@
                             <path d="M12 6v6l4 2"></path>
                         </svg>
                     </span>
-                    <span class="nav-text"><span class="nav-label" data-ft-i18n="dashboard.sync.scope.timeLimits">Time limits</span><span class="nav-summary" aria-hidden="true"></span><span class="nav-lock" hidden></span></span>
+                    <span class="nav-text"><span class="nav-label" data-ft-i18n="study.nav.title">Study and focus</span><span class="nav-summary" aria-hidden="true"></span><span class="nav-lock" hidden></span></span>
                 </li>
                 <li class="nav-item nav-item--sub" tabindex="0" data-tab="settings" data-nav-id="backup" data-nav-target="importExport">
                     <span class="nav-icon">
@@ -531,6 +532,18 @@
 
                         <div class="settings-grid">
                             <div class="settings-core">
+                                <div id="ftStudyCard" class="card settings-card settings-card--featured ft-study-card" aria-labelledby="ftStudyCardTitle">
+                                    <div class="card-header">
+                                        <div>
+                                            <p class="ft-self-control-card__eyebrow" data-ft-i18n="study.card.eyebrow">Study mode</p>
+                                            <h3 id="ftStudyCardTitle" data-ft-i18n="study.nav.title">Study and focus</h3>
+                                        </div>
+                                    </div>
+                                    <div class="card-body settings-card__body">
+                                        <p class="import-export-summary" data-ft-i18n="study.card.summary">Pick a study pack and a time. During study only videos from your plan show and play, and your block list still applies.</p>
+                                        <div id="ftStudyDashboard" aria-live="polite"></div>
+                                    </div>
+                                </div>
                                 <div class="card settings-card settings-card--featured ft-self-control-card">
                                     <div class="card-header">
                                         <div>
@@ -2828,6 +2841,9 @@
     <script src="../js/ui_localization.js"></script>
     <script src="../js/ui_static_copy_capture.js"></script>
     <script src="../js/ui-shell/tab-view-decor.js"></script>
+    <script src="../js/shared/study_packs.js"></script>
+    <script src="../js/shared/study_engine.js"></script>
+    <script src="../js/study_ui.js"></script>
     <script src="../js/managed_parent_command_center.js"></script>
     <script src="../js/family_device_navigation.js"></script>
     <script src="../js/tab-view.js"></script>

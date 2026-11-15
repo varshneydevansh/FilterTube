@@ -77,7 +77,8 @@
         const Engine = deps.Engine || root.FilterTubeStudyEngine;
         const Model = deps.Model || root.FilterTubeStudyModel;
         const Packs = deps.Packs || root.FilterTubeStudyPacks;
-        const Guard = deps.Guard || root.FilterTubeStudyClockGuard;
+        const Guard = deps.Guard || root.FilterTubeStudyClockGuard
+            || (typeof module === 'object' && module.exports && typeof require === 'function' ? require('./shared/study_clock_guard.js') : null);
         const now = () => (typeof deps.now === 'function' ? deps.now() : Date.now());
         // A monotonic clock and the worker instance it belongs to. With an injected `now` and no
         // monotonic clock (tests), the guard sees no jumps.
@@ -329,6 +330,21 @@
             return { ok: true, wrote };
         }
 
+        /** Names for the UI (it doesn't load the catalog): {id, names, shortName, variant: {id, names}}. */
+        function packLabels(study, catalog) {
+            return array(study?.activePackIds).map(id => {
+                const pack = array(catalog?.packs).find(item => item.id === id);
+                const variant = pack && Engine.packVariant ? Engine.packVariant(pack, object(object(study.packEdits)[id]).variant) : null;
+                return {
+                    id,
+                    names: object(pack?.names),
+                    shortName: pack?.shortName || null,
+                    kind: pack?.kind || null,
+                    variant: variant ? { id: variant.id, names: object(variant.names) } : null
+                };
+            });
+        }
+
         /** The UI state for the active profile. */
         async function getState() {
             const guard = await readClock();
@@ -349,6 +365,7 @@
                 session: local.session,
                 clockNotes: array(object(guard.clockStore?.notes)[profileId]),
                 lock: lock ? { sessionId: lock.sessionId, sessionKind: lock.sessionKind, lockedUntil: lock.lockedUntil } : null,
+                packs: packLabels(study, catalog),
                 todayMinutes: Engine.minutesOn(progress, date),
                 week: Engine.weekProgress(progress, at, study?.focus?.dailyGoalMinutes || 0),
                 weekView: study ? Model.weekViewEnabled(study, profile.type) : false
@@ -524,6 +541,95 @@
             return { ok: true };
         }
 
+        /**
+         * A parent editing a protected (child) profile on this device: the active profile must be that
+         * child's parent account. The plan the parent saves carries setByParentId, so Family control
+         * sends it as the schedule scope and the child can only tighten it. A plan or lock another
+         * parent set stays theirs.
+         */
+        async function parentContext(childId) {
+            if (await deps.getSelfControlSession?.()) return { ok: false, error: 'locked' };
+            const { profiles } = await readAll();
+            const parentId = text(profiles.activeProfileId) || 'default';
+            const all = object(profiles.profiles);
+            const parent = object(all[parentId]);
+            const child = object(all[text(childId)]);
+            const parentIsAccount = parentId === 'default' || text(parent.type || 'account') === 'account';
+            if (!Object.keys(child).length || text(child.type) !== 'child' || text(child.parentProfileId) !== parentId || !parentIsAccount) {
+                return { ok: false, error: 'not_parent' };
+            }
+            return { ok: true, parentId, child, childId: text(childId) };
+        }
+
+        async function getChildState(childId) {
+            const context = await parentContext(childId);
+            if (!context.ok) return context;
+            const catalog = await loadCatalog();
+            const study = Model.profileStudy(context.child);
+            const clock = study ? clockFor(context.child, emptyRuntime(), context.childId, now()).clock : null;
+            return { ok: true, profileId: context.childId, parentId: context.parentId, study, state: clock?.state || 'NORMAL',
+                packs: packLabels(study, catalog), lockedUntil: Model.isParentLock(study?.lock) ? Number(study.lock.endsAt) : null };
+        }
+
+        async function updateChild(childId, patch = {}) {
+            const context = await parentContext(childId);
+            if (!context.ok) return context;
+            const current = Model.profileStudy(context.child) || Model.createStudy();
+            const owner = value => text(object(value).setByParentId);
+            if ((owner(current.plan) && owner(current.plan) !== context.parentId) || (owner(current.lock) && owner(current.lock) !== context.parentId)) {
+                return { ok: false, error: 'set_by_other_parent' };
+            }
+            const allowed = ['activePackIds', 'packEdits', 'focus', 'plan', 'breakMode', 'weekView', 'packChannelsOnly'];
+            const value = object(patch);
+            const result = await updateProfileStudy(context.childId, study => {
+                const next = { ...study };
+                for (const key of allowed) if (Object.prototype.hasOwnProperty.call(value, key)) next[key] = clone(value[key]);
+                if (next.plan) next.plan = { ...next.plan, setByParentId: context.parentId };
+                return next;
+            });
+            if (result?.ok === false) return result;
+            await deps.onTransition?.('parent_update');
+            return { ok: true };
+        }
+
+        /** A parent's session lock on a child: study rounds for `minutes` (7 days at most), from now. */
+        async function startParentLock(childId, { minutes } = {}) {
+            const context = await parentContext(childId);
+            if (!context.ok) return context;
+            const length = Math.trunc(Number(minutes));
+            if (!Number.isFinite(length) || length < 15 || length > Engine.PARENT_LOCK_MAX_MINUTES) {
+                return { ok: false, error: 'invalid_duration', maxMinutes: Engine.PARENT_LOCK_MAX_MINUTES };
+            }
+            const current = Model.profileStudy(context.child);
+            if (!current || !current.activePackIds.length) return { ok: false, error: 'no_active_pack' };
+            if (text(object(current.lock).setByParentId) && text(current.lock.setByParentId) !== context.parentId) return { ok: false, error: 'set_by_other_parent' };
+            const startsAt = now();
+            const lock = {
+                sessionId: `parent-${startsAt.toString(36)}-${Math.random().toString(36).slice(2, 8)}`,
+                sessionKind: 'hard_whitelist', mode: 'locked', setByParentId: context.parentId,
+                startsAt, endsAt: startsAt + length * 60 * 1000, scope: 'session'
+            };
+            const result = await updateProfileStudy(context.childId, study => ({ ...study, lock }));
+            if (result?.ok === false) return result;
+            await schedule();
+            await deps.onTransition?.('parent_lock');
+            return { ok: true, lock };
+        }
+
+        /** Only the parent who set a lock ends it early. */
+        async function endParentLock(childId) {
+            const context = await parentContext(childId);
+            if (!context.ok) return context;
+            const current = Model.profileStudy(context.child);
+            if (!current?.lock) return { ok: true };
+            if (text(current.lock.setByParentId) !== context.parentId) return { ok: false, error: 'set_by_other_parent' };
+            const result = await updateProfileStudy(context.childId, study => ({ ...study, lock: null }));
+            if (result?.ok === false) return result;
+            await schedule();
+            await deps.onTransition?.('parent_unlock');
+            return { ok: true };
+        }
+
         /** Runtime messages. Returns a promise of the response, or null when the action isn't ours. */
         function handleMessage(request, { extensionPage = false, youtubeContent = false } = {}) {
             const action = text(request?.action);
@@ -545,12 +651,16 @@
             if (action === 'FilterTube_StudyEndSession') return requestEnd();
             if (action === 'FilterTube_StudyCancelEnd') return cancelEnd();
             if (action === 'FilterTube_StudyUpdate') return update(request.patch);
+            if (action === 'FilterTube_StudyGetChild') return getChildState(request.profileId);
+            if (action === 'FilterTube_StudyUpdateChild') return updateChild(request.profileId, request.patch);
+            if (action === 'FilterTube_StudyStartParentLock') return startParentLock(request.profileId, request);
+            if (action === 'FilterTube_StudyEndParentLock') return endParentLock(request.profileId);
             return Promise.resolve({ ok: false, error: 'unknown_action' });
         }
 
         return Object.freeze({
             ALARM, RUNTIME_KEY, prepare, apply, getState, schedule, onAlarm, startSession, requestEnd, cancelEnd,
-            skipBreak, tick, update, foldProgress, handleMessage, deviceId
+            skipBreak, tick, update, foldProgress, handleMessage, deviceId, getChildState, updateChild, startParentLock, endParentLock
         });
     }
 
