@@ -1223,7 +1223,7 @@ const browserAPI = IS_FIREFOX ? browser : chrome;
 // Private Notes modules are browser-only; never forwarded to MAIN or native assets.
 try {
     if (typeof importScripts === 'function' && !globalThis.FilterTubeVideoNotesBackground) {
-        importScripts('shared/saved_video_notes.js', 'shared/local_playlists.js', 'shared/study_model.js', 'shared/study_packs.js', 'shared/study_engine.js', 'study_background.js', 'shared/kids_youtube_profiles.js', 'video_notes_store.js', 'video_notes_background.js', 'local_playlists_store.js', 'kids_youtube_profiles_background.js', 'personal_sync.js', 'device_auto_sync.js', 'auto_sync_wakeup.js');
+        importScripts('shared/saved_video_notes.js', 'shared/local_playlists.js', 'shared/study_model.js', 'shared/study_packs.js', 'shared/study_engine.js', 'shared/study_clock_guard.js', 'study_background.js', 'shared/kids_youtube_profiles.js', 'video_notes_store.js', 'video_notes_background.js', 'local_playlists_store.js', 'kids_youtube_profiles_background.js', 'personal_sync.js', 'device_auto_sync.js', 'auto_sync_wakeup.js');
     }
     globalThis.FilterTubeVideoNotesBackground?.install({
         api: browserAPI,
@@ -1792,9 +1792,27 @@ const studyBackground = globalThis.FilterTubeStudyBackground?.createStudyBackgro
         getSelfControlSession: () => getActiveSelfControlSession(),
         startLockedSession: startStudyLockedSession,
         writeProfile: writeStudyProfile,
-        onTransition: () => broadcastStudyTransition()
+        onTransition: () => broadcastStudyTransition(),
+        // The clock guard's network time: the Date header of a tiny request to the video site, read
+        // only when a jump is suspected (or the worker restarted) during a lock or a parent's plan.
+        networkTime: () => readStudyNetworkTime()
     })
     : null;
+
+async function readStudyNetworkTime() {
+    try {
+        const controller = typeof AbortController === 'function' ? new AbortController() : null;
+        const timer = controller ? setTimeout(() => controller.abort(), 5000) : null;
+        const response = await fetch('https://www.youtube.com/generate_204', {
+            method: 'HEAD', cache: 'no-store', credentials: 'omit', signal: controller?.signal
+        });
+        if (timer) clearTimeout(timer);
+        const value = Date.parse(response.headers.get('date') || '');
+        return Number.isFinite(value) ? value : null;
+    } catch (e) {
+        return null;
+    }
+}
 
 async function prepareStudyForCompile() {
     try {

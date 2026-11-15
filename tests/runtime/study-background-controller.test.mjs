@@ -197,7 +197,7 @@ test('message routing keeps UI-only actions away from web pages', async () => {
 
 test('background.js wires the controller into the compiler, alarms and messages', () => {
     const source = fs.readFileSync('js/background.js', 'utf8');
-    assert.match(source, /importScripts\([^)]*'shared\/study_engine\.js', 'study_background\.js'/);
+    assert.match(source, /importScripts\([^)]*'shared\/study_engine\.js', 'shared\/study_clock_guard\.js', 'study_background\.js'/);
     assert.match(source, /studyBackground\.apply\(activeProfileId, activeProfile, studyPrepared\)/);
     assert.match(source, /const activeMain = safeObject\(studyRuleProfile\.main\);/);
     assert.match(source, /const activeKids = safeObject\(studyRuleProfile\.kids\);/);
@@ -208,4 +208,6 @@ test('background.js wires the controller into the compiler, alarms and messages'
     const scripts = firefox.background.scripts;
     assert.ok(scripts.indexOf('js/study_background.js') < scripts.indexOf('js/background.js'));
     assert.ok(scripts.indexOf('js/shared/study_engine.js') < scripts.indexOf('js/study_background.js'));
+    assert.ok(scripts.indexOf('js/shared/study_clock_guard.js') < scripts.indexOf('js/study_background.js'));
+    assert.match(source, /const activeSettings = safeObject\(studyRuleProfile\.settings\);/, 'study forces the master switch on');
 });

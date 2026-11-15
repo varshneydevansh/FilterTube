@@ -15,6 +15,13 @@
  * Live seconds fold into profile.study.progress[deviceId][date] (whole minutes, larger value wins)
  * when a session ends and no Self-Control lock holds the profile.
  *
+ * The clock guard (ftStudyClockV1, device-local; study_clock_guard.js, Android StudyClockGuard):
+ *   { anchor, meter, lockSeen: {<lockSessionId>: {meterAt, credit}}, notes: {<profileId>: [...]},
+ *     holdSince: {<profileId>: ms}, network: {at, time} }
+ * A parent's lock {startsAt, endsAt, scope, setByParentId} runs study rounds (scope "session", the
+ * default) until both clocks and its running time say it ended. A time or zone change during a lock
+ * or a parent's plan holds the session at rest (LIMIT, clockHold) instead of ending it.
+ *
  * The UI (popup and options, Phase 5) talks to it through runtime messages; see handleMessage().
  */
 (function (root, factory) {
@@ -29,12 +36,14 @@
     const NANAH_DEVICE_KEY = 'ftNanahDeviceId';
     const PROFILES_KEY = 'ftProfilesV4';
     const ALARM = 'ftStudyTransition';
+    const CLOCK_KEY = 'ftStudyClockV1';
     const MAX_TICK_SECONDS = 60;
     const MAX_SESSION_MINUTES = 24 * 60;
 
     function isObject(value) { return !!value && typeof value === 'object' && !Array.isArray(value); }
     function object(value) { return isObject(value) ? value : {}; }
     function text(value) { return typeof value === 'string' ? value.trim() : ''; }
+    function array(value) { return Array.isArray(value) ? value : []; }
     function clone(value) { return value === undefined ? undefined : JSON.parse(JSON.stringify(value)); }
 
     function emptyRuntime() { return { version: 1, profiles: {}, seconds: {}, lastCreditAt: 0 }; }
@@ -68,7 +77,14 @@
         const Engine = deps.Engine || root.FilterTubeStudyEngine;
         const Model = deps.Model || root.FilterTubeStudyModel;
         const Packs = deps.Packs || root.FilterTubeStudyPacks;
+        const Guard = deps.Guard || root.FilterTubeStudyClockGuard;
         const now = () => (typeof deps.now === 'function' ? deps.now() : Date.now());
+        // A monotonic clock and the worker instance it belongs to. With an injected `now` and no
+        // monotonic clock (tests), the guard sees no jumps.
+        const monotonic = typeof deps.monotonic === 'function' ? deps.monotonic
+            : (typeof deps.now === 'function' ? () => ({ mono: now(), bootId: 'injected' })
+                : () => ({ mono: root.performance?.now?.() ?? Date.now(), bootId: String(Math.round(root.performance?.timeOrigin || 0)) }));
+        const zoneId = typeof deps.zoneId === 'function' ? deps.zoneId : () => (Guard ? Guard.deviceZoneId() : 'UTC');
         let catalogPromise = null;
 
         function storageGet(keys) {
@@ -104,22 +120,133 @@
             return { profiles, profileId, profile, runtime: normalizeRuntime(items[RUNTIME_KEY]) };
         }
 
-        /** The clock for one profile, from its study plan and this device's runtime. */
+        function emptyClockStore() { return { anchor: null, meter: null, lockSeen: {}, notes: {}, holdSince: {}, network: null }; }
+
+        function normalizeClockStore(value) {
+            const raw = object(value);
+            return { ...emptyClockStore(), ...clone(raw), lockSeen: object(clone(raw.lockSeen)), notes: object(clone(raw.notes)), holdSince: object(clone(raw.holdSince)) };
+        }
+
+        /** A lock or a parent's plan exists: a clock change is held, not accepted. */
+        function clockSensitive(study, local) {
+            if (!study) return false;
+            if (text(object(study.plan).setByParentId) || (Guard && Guard.isParentLock(study.lock))) return true;
+            return local?.session?.lockMode === 'locked' || text(object(study.lock).mode) === 'locked';
+        }
+
+        function guardFor(study, reading, clockStore) {
+            const lock = study?.lock;
+            if (!Guard || !Guard.isParentLock(lock)) return { lock: { active: false, ended: false, remainingMs: 0 }, window: null };
+            const state = Guard.parentLockState(lock, reading, {
+                seen: object(clockStore?.lockSeen)[text(lock.sessionId)] || null,
+                meter: clockStore?.meter || null,
+                networkTime: Number.isFinite(clockStore?.networkNow) ? clockStore.networkNow : null
+            });
+            if (!state.active || text(lock.scope) === 'plan') return { lock: state, window: null };
+            const startsAt = Number(lock.startsAt);
+            const endsAt = Number(lock.endsAt);
+            // Past its end on the wall clock, a lock runs on until its running time is used up.
+            const at = reading.wall;
+            const end = at >= endsAt ? at + Math.min(Math.max(state.remainingMs, 60 * 1000), Engine.PARENT_LOCK_MAX_MINUTES * 60 * 1000) : endsAt;
+            return { lock: state, window: { startsAt, endsAt: end, setByParentId: lock.setByParentId } };
+        }
+
+        /** True while a lock or a parent's plan holds now, by either clock. */
+        function clockInForce(study, local, reading, guarded) {
+            if (guarded.lock.active) return true;
+            const plan = object(study?.plan);
+            if (text(plan.setByParentId)) {
+                for (const time of [reading.wall, reading.trusted]) {
+                    const clock = Engine.studyClock({ plan: study.plan, focus: study.focus, breakMode: study.breakMode, now: time });
+                    if (clock.studying || clock.state === Engine.LIMIT) return true;
+                }
+            }
+            const session = local?.session;
+            if (session?.lockMode === 'locked') {
+                for (const time of [reading.wall, reading.trusted]) if (time >= session.startedAt && time < session.endsAt) return true;
+            }
+            return false;
+        }
+
+        /** The clock for one profile, from its study plan, this device's runtime and the clock guard. */
         function clockFor(profile, runtime, profileId, at = now(), options = {}) {
             const study = Model.profileStudy(profile);
             const local = profileRuntime(runtime, profileId);
-            if (!study) return { study: null, local, clock: Engine.studyClock({ plan: null, now: at }) };
+            if (!study) return { study: null, local, clock: Engine.studyClock({ plan: null, now: at }), reading: null };
+            const reading = options.reading || (Guard ? Guard.wallOnly(at, zoneId()) : null);
+            const guarded = reading ? guardFor(study, reading, options.clockStore) : { lock: { active: false }, window: null };
+            const clockHold = !!reading && reading.changed && clockInForce(study, local, reading, guarded);
             const clock = Engine.studyClock({
                 plan: study.plan, focus: study.focus, breakMode: study.breakMode, now: at,
-                session: local.session, endedUntil: local.endedUntil, limitReached: options.limitReached === true
+                session: local.session, endedUntil: local.endedUntil, limitReached: options.limitReached === true,
+                parentLock: guarded.window, clockHold
             });
-            return { study, local, clock };
+            if (clock.state === Engine.BREAK && Number.isFinite(local.breakSkippedUntil) && at < local.breakSkippedUntil) clock.breakSkipped = true;
+            return { study, local, clock, reading, parentLock: guarded.lock };
         }
 
-        function publicState(study, local, clock, packIds, at) {
+        /**
+         * Reads both clocks for the active profile, advances the lock meter, notes a hold for the parent
+         * and stores the guard state. A network time is read when a jump is suspected (or a new worker
+         * started) while a lock or a parent's plan exists, at most every 10 minutes.
+         */
+        async function readClock() {
+            if (!Guard) return { reading: null, clockStore: emptyClockStore() };
+            const [items, { profileId, profile, runtime }] = await Promise.all([storageGet([CLOCK_KEY]), readAll()]);
+            const clockStore = normalizeClockStore(items[CLOCK_KEY]);
+            const study = Model.profileStudy(profile);
+            const local = profileRuntime(runtime, profileId);
+            const sensitive = clockSensitive(study, local);
+            const wall = now();
+            const { mono, bootId } = monotonic();
+            let result = Guard.read(clockStore.anchor, { wall, mono, bootId, zoneId: zoneId(), sensitive });
+            const network = object(clockStore.network);
+            const networkStale = !Number.isFinite(network.at) || Math.abs(wall - network.at) > Guard.NETWORK_RECHECK_MS;
+            if (sensitive && (result.reading.changed || result.newBoot) && networkStale && typeof deps.networkTime === 'function') {
+                const time = await Promise.resolve(deps.networkTime()).catch(() => null);
+                clockStore.network = { at: wall, time: Number.isFinite(time) ? time : null };
+                if (Number.isFinite(time)) {
+                    clockStore.networkNow = time;
+                    result = Guard.read(clockStore.anchor, { wall, mono, bootId, zoneId: zoneId(), sensitive, networkTime: time });
+                }
+            } else if (Number.isFinite(network.time) && Number.isFinite(network.at)) {
+                // The last network time, carried forward by the wall clock only while the wall clock agrees.
+                const carried = network.time + (wall - network.at);
+                if (!result.reading.changed && Math.abs(carried - wall) <= Guard.TOLERANCE_MS) clockStore.networkNow = carried;
+                else delete clockStore.networkNow;
+            }
+            clockStore.anchor = result.anchor;
+            clockStore.meter = Guard.advanceMeter(clockStore.meter, { mono, bootId, wall });
+            const lock = study?.lock;
+            if (Guard.isParentLock(lock) && !clockStore.lockSeen[text(lock.sessionId)]) {
+                clockStore.lockSeen[text(lock.sessionId)] = Guard.firstSight(lock, clockStore.meter, result.reading.lockNow);
+            }
+            const guarded = study ? guardFor(study, result.reading, clockStore) : { lock: { active: false }, window: null };
+            const held = !!study && result.reading.changed && clockInForce(study, local, result.reading, guarded);
+            if (held && !Number.isFinite(clockStore.holdSince[profileId])) {
+                clockStore.holdSince[profileId] = wall;
+                clockStore.notes[profileId] = Guard.addNote(clockStore.notes[profileId], result.reading, wall);
+            } else if (!held) {
+                delete clockStore.holdSince[profileId];
+            }
+            await storageSet({ [CLOCK_KEY]: clockStore });
+            return { reading: result.reading, clockStore };
+        }
+
+        /** When a lock ends, for "Locked until ...": a parent's lock or plan, or a self Locked session. */
+        function lockedUntil(study, local, clock) {
+            if (clock.setByParentId) return clock.source === 'parent_lock' ? Number(object(study?.lock).endsAt) || clock.sessionEnd : clock.sessionEnd;
+            if (local.session?.lockMode === 'locked' && clock.source === 'session') return local.session.endsAt;
+            return null;
+        }
+
+        function publicState(study, local, clock, packIds, at, applied = {}) {
             const breakSkipped = clock.state === Engine.BREAK && Number.isFinite(local.breakSkippedUntil) && at < local.breakSkippedUntil;
-            const policy = study ? Engine.endPolicy(study) : { canEnd: false, reason: 'no_study' };
-            const transitions = [clock.next?.at, local.endRequestedAt ? local.endRequestedAt + Engine.GENTLE_END_PAUSE_MS : null]
+            let policy = study ? Engine.endPolicy(study) : { canEnd: false, reason: 'no_study' };
+            if (clock.setByParentId) policy = { canEnd: false, reason: 'set_by_parent' };
+            else if (local.session?.lockMode === 'locked') policy = { canEnd: false, reason: 'locked' };
+            const transitions = [clock.next?.at, local.endRequestedAt ? local.endRequestedAt + Engine.GENTLE_END_PAUSE_MS : null,
+                clock.clockHold || clock.source === 'parent_lock' ? at + 60 * 1000 : null]
                 .filter(value => Number.isFinite(value) && value > at);
             return {
                 state: clock.state,
@@ -132,9 +259,15 @@
                 breakMode: clock.breakMode,
                 breakNoticeAt: clock.breakNoticeAt,
                 breakSkipped,
-                canSkipBreak: !!study && Engine.selfStarted(study) && clock.state === Engine.BREAK,
+                canSkipBreak: !!study && Engine.selfStarted(study) && !clock.setByParentId && clock.state === Engine.BREAK,
                 next: clock.next,
                 packIds,
+                phase: applied.phase || 'normal',
+                failClosed: applied.failClosed === true,
+                setByParentId: clock.setByParentId || null,
+                clockHold: clock.clockHold === true,
+                lockedUntil: lockedUntil(study, local, clock),
+                lockMode: clock.setByParentId ? 'locked' : (local.session?.lockMode || null),
                 endPolicy: policy,
                 endRequestedAt: local.endRequestedAt,
                 validUntil: transitions.length ? Math.min(...transitions) : null
@@ -143,8 +276,9 @@
 
         /** Loaded once per compile: the catalog and this device's runtime. */
         async function prepare() {
-            const [catalog, items] = await Promise.all([loadCatalog(), storageGet([RUNTIME_KEY])]);
-            return { catalog, runtime: normalizeRuntime(items[RUNTIME_KEY]), now: now() };
+            const [catalog, guard] = await Promise.all([loadCatalog(), readClock()]);
+            const items = await storageGet([RUNTIME_KEY]);
+            return { catalog, runtime: normalizeRuntime(items[RUNTIME_KEY]), now: now(), reading: guard.reading, clockStore: guard.clockStore };
         }
 
         /**
@@ -153,10 +287,11 @@
          */
         function apply(profileId, profile, prepared, options = {}) {
             const at = prepared?.now ?? now();
-            const { study, local, clock } = clockFor(profile, prepared?.runtime || emptyRuntime(), profileId, at, options);
+            const { study, local, clock } = clockFor(profile, prepared?.runtime || emptyRuntime(), profileId, at,
+                { ...options, reading: prepared?.reading, clockStore: prepared?.clockStore });
             if (!study) return { profile, applied: false, state: null };
             const result = Engine.studyEffectiveProfile(profile, { catalog: prepared?.catalog, clock, study });
-            return { profile: result.profile, applied: result.applied, state: publicState(study, local, clock, result.packIds, at) };
+            return { profile: result.profile, applied: result.applied, state: publicState(study, local, clock, result.packIds, at, result) };
         }
 
         async function writeRuntime(runtime) {
@@ -168,7 +303,9 @@
             const profile = object(object(profiles.profiles)[profileId]);
             if (!Object.keys(profile).length) return { ok: false, error: 'profile_unavailable' };
             const current = Model.profileStudy(profile) || Model.createStudy();
-            const next = Model.normalizeStudy(mutate(clone(current)));
+            // Keep a copy of each active pack inside study, so a catalog change can't drop it (audit H3).
+            const catalog = await loadCatalog();
+            const next = Model.normalizeStudy(Engine.stampPackCopies(mutate(clone(current)), catalog));
             return deps.writeProfile(profileId, { ...profile, study: next });
         }
 
@@ -194,9 +331,10 @@
 
         /** The UI state for the active profile. */
         async function getState() {
+            const guard = await readClock();
             const [{ profileId, profile, runtime }, catalog, device] = await Promise.all([readAll(), loadCatalog(), deviceId()]);
             const at = now();
-            const { study, local, clock } = clockFor(profile, runtime, profileId, at);
+            const { study, local, clock } = clockFor(profile, runtime, profileId, at, guard);
             const applied = study ? Engine.studyEffectiveProfile(profile, { catalog, clock, study }) : { packIds: [] };
             const date = Engine.localDateKey(at);
             const progress = study ? Model.mergeProgress(study.progress, { [device]: Object.fromEntries(
@@ -207,8 +345,9 @@
                 profileId,
                 deviceId: device,
                 study,
-                ...publicState(study, local, clock, applied.packIds || [], at),
+                ...publicState(study, local, clock, applied.packIds || [], at, applied),
                 session: local.session,
+                clockNotes: array(object(guard.clockStore?.notes)[profileId]),
                 lock: lock ? { sessionId: lock.sessionId, sessionKind: lock.sessionKind, lockedUntil: lock.lockedUntil } : null,
                 todayMinutes: Engine.minutesOn(progress, date),
                 week: Engine.weekProgress(progress, at, study?.focus?.dailyGoalMinutes || 0),
@@ -218,10 +357,13 @@
 
         async function schedule() {
             if (!api.alarms?.create) return null;
+            const guard = await readClock();
             const { profileId, profile, runtime } = await readAll();
             const at = now();
-            const { study, local, clock } = clockFor(profile, runtime, profileId, at);
-            const candidates = [clock.next?.at, local.endRequestedAt ? local.endRequestedAt + Engine.GENTLE_END_PAUSE_MS : null]
+            const { study, local, clock, parentLock } = clockFor(profile, runtime, profileId, at, guard);
+            // A hold re-checks every minute; a parent's lock advances its running-time meter every minute.
+            const minute = clock.clockHold || parentLock?.active || clockSensitive(study, local) && clock.studying ? at + 60 * 1000 : null;
+            const candidates = [clock.next?.at, local.endRequestedAt ? local.endRequestedAt + Engine.GENTLE_END_PAUSE_MS : null, minute]
                 .filter(value => Number.isFinite(value) && value > at);
             if (!study || !candidates.length) {
                 await Promise.resolve(api.alarms.clear?.(ALARM));
@@ -253,18 +395,21 @@
         async function onAlarm(name) {
             if (name && name !== ALARM) return false;
             await finishEndRequest();
+            const guard = await readClock();
             const { profileId, profile, runtime } = await readAll();
-            const { study, local, clock } = clockFor(profile, runtime, profileId);
-            if (local.session && now() >= Number(local.session.endsAt)) {
+            const { study, local, clock, parentLock } = clockFor(profile, runtime, profileId, now(), guard);
+            // A held clock never ends a session: the session waits until the clock is put back.
+            if (local.session && !clock.clockHold && (guard.reading ? guard.reading.lockNow : now()) >= Number(local.session.endsAt)) {
                 runtime.profiles[profileId] = { ...local, session: null };
                 await writeRuntime(runtime);
             }
-            if (study?.lock && !clock.studying) {
+            // A parent's lock is never cleared here: only that parent ends it (signed unlock or Family).
+            if (study?.lock && !text(study.lock.setByParentId) && !clock.studying && !clock.clockHold) {
                 // A Locked session's Self-Control record expires by itself; clear the reference it left.
                 const active = await deps.getSelfControlSession?.();
                 if (!active || active.sessionId !== study.lock.sessionId) await updateProfileStudy(profileId, value => ({ ...value, lock: null }));
             }
-            if (!clock.studying) await foldProgress();
+            if (!clock.studying && !clock.clockHold && !parentLock?.active) await foldProgress();
             await schedule();
             await deps.onTransition?.('alarm');
             return true;
