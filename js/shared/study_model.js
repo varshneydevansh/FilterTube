@@ -274,11 +274,19 @@
      *   (carryLock) brings the other device's lock and saved list mode;
      * - a plan a parent set here, and its break mode, stay unless carryLock.
      */
-    function mergeStudy(local, incoming, { strategy = 'merge', carryLock = false } = {}) {
+    function mergeStudy(local, incoming, { strategy = 'merge', carryLock = false, now = Date.now() } = {}) {
         const mine = normalizeStudy(local);
         const theirs = normalizeStudy(incoming);
         if (!theirs) return mine;
         if (!mine) return carryLock ? theirs : { ...theirs, lock: null };
+        const merged = mergeStudyValues(mine, theirs, { strategy, carryLock });
+        // A parent's lock or plan holds this profile (audit M4): an ordinary sync or Merge may only
+        // tighten study. A loosening change waits; this device keeps its study, plus the peer's progress.
+        if (!carryLock && !tightenAllowed(mine, merged, { now })) return { ...mine, progress: mergeProgress(mine.progress, theirs.progress) };
+        return merged;
+    }
+
+    function mergeStudyValues(mine, theirs, { strategy, carryLock }) {
         const replace = strategy === 'replace';
         const parentPlan = !!(mine.plan && mine.plan.setByParentId) && !carryLock;
         return {
@@ -296,6 +304,96 @@
             progress: mergeProgress(mine.progress, theirs.progress),
             weekView: theirs.weekView ?? mine.weekView
         };
+    }
+
+    /** A parent's lock: set by a parent with a window ({startsAt, endsAt}). */
+    function isParentLock(lock) {
+        const value = object(lock);
+        return !!text(value.setByParentId) && Number.isFinite(Number(value.startsAt)) && Number.isFinite(Number(value.endsAt));
+    }
+
+    function minuteOf(value) {
+        const match = /^([01]\d|2[0-3]):([0-5]\d)$/.exec(text(value));
+        return match ? Number(match[1]) * 60 + Number(match[2]) : null;
+    }
+
+    /** Music while studying: unset is on for a person's own plan and off for a parent's. */
+    function musicAllowed(plan) {
+        const value = object(plan);
+        return typeof value.music === 'boolean' ? value.music : !text(value.setByParentId);
+    }
+
+    function planTighter(before, after) {
+        if (!isObject(after)) return false;
+        if (text(after.setByParentId) !== text(before.setByParentId)) return false;
+        // Moving the plan to another zone moves its window.
+        if (text(before.zone) && text(after.zone) !== text(before.zone)) return false;
+        const days = new Set(array(after.days));
+        if (!array(before.days).every(day => days.has(day))) return false;
+        const bs = minuteOf(before.start); const be = minuteOf(before.end);
+        const s = minuteOf(after.start); const e = minuteOf(after.end);
+        if ([bs, be, s, e].some(value => value === null)) return false;
+        // Overnight plans: compare only the same shape.
+        if ((be <= bs) !== (e <= s)) return after.start === before.start && after.end === before.end;
+        if (s > bs || e < be) return false;
+        const beforeLimit = minuteOf(before.limit);
+        const afterLimit = minuteOf(after.limit);
+        if (beforeLimit !== null && (afterLimit === null || afterLimit > beforeLimit)) return false;
+        if (!musicAllowed(before) && musicAllowed(after)) return false;
+        return true;
+    }
+
+    function editsTighter(before, after) {
+        const prevAll = object(before);
+        const nextAll = object(after);
+        const keys = list => new Set(array(list).map(channelKey));
+        const words = list => new Set(array(list).map(topicKey));
+        for (const [packId, nextValue] of Object.entries(nextAll)) {
+            const prev = object(prevAll[packId]);
+            const next = object(nextValue);
+            const addedBefore = keys(prev.channelsAdded);
+            const topicsBefore = words(prev.topicsAdded);
+            if (!array(next.channelsAdded).every(row => addedBefore.has(channelKey(row)))) return false;
+            if (!array(next.topicsAdded).every(word => topicsBefore.has(topicKey(word)))) return false;
+            const removedNow = keys(next.channelsRemoved);
+            if (!array(prev.channelsRemoved).every(row => removedNow.has(channelKey(row)))) return false;
+            const removedTopicsNow = words(next.topicsRemoved);
+            if (!array(prev.topicsRemoved).every(word => removedTopicsNow.has(topicKey(word)))) return false;
+        }
+        // Dropping a pack's edits would bring back channels it removed.
+        return Object.keys(prevAll).every(packId => Object.prototype.hasOwnProperty.call(nextAll, packId)
+            || (!array(object(prevAll[packId]).channelsRemoved).length && !array(object(prevAll[packId]).topicsRemoved).length));
+    }
+
+    /**
+     * Android StudyTighten.allowed: while a parent's plan or lock holds `before`, a write by anyone other
+     * than that parent may only tighten study. `lockActive(lock)` defaults to "a parent's lock that
+     * hasn't reached its end".
+     */
+    function tightenAllowed(beforeValue, afterValue, { now = Date.now(), lockActive = null } = {}) {
+        const before = normalizeStudy(beforeValue);
+        if (!before) return true;
+        const parentPlan = !!text(object(before.plan).setByParentId);
+        const parentLock = typeof lockActive === 'function'
+            ? lockActive(before.lock) === true
+            : isParentLock(before.lock) && now < Number(before.lock.endsAt);
+        if (!parentPlan && !parentLock) return true;
+        const after = normalizeStudy(afterValue);
+        if (!after) return false;
+        if (parentLock) {
+            const a = after.lock;
+            const b = before.lock;
+            if (!a || a.sessionId !== b.sessionId || a.setByParentId !== b.setByParentId || text(a.scope) !== text(b.scope)) return false;
+            if (!(Number(a.startsAt) <= Number(b.startsAt)) || !(Number(a.endsAt) >= Number(b.endsAt))) return false;
+        }
+        if (parentPlan && !planTighter(before.plan, after.plan)) return false;
+        const packs = new Set(before.activePackIds);
+        if (!after.activePackIds.every(id => packs.has(id))) return false;
+        if (!editsTighter(before.packEdits, after.packEdits)) return false;
+        if (before.breakMode === BREAK_REST && after.breakMode !== BREAK_REST) return false;
+        if (before.packChannelsOnly !== false && after.packChannelsOnly === false) return false;
+        if (after.focus.roundMinutes < before.focus.roundMinutes || after.focus.breakMinutes > before.focus.breakMinutes) return false;
+        return true;
     }
 
     /** The study object as Copy once / Merge send it: never with the running lock. */
@@ -385,6 +483,7 @@
         VERSION, PROFILE_KEY, CAPABILITY, MANAGED_SCOPES, TAG_PREFIX, DEFAULT_FOCUS, FOCUS_LIMITS, DAYS,
         BREAK_REST, BREAK_NORMAL, SAVED_LIST_MODES,
         normalizeStudy, createStudy, weekViewEnabled, mergeStudy, mergeProgress, mergePackEdits, withoutLock,
+        tightenAllowed, isParentLock, musicAllowed,
         channelKey, topicKey, isPackId, packIdOfTag, packIdsFromTags, profileStudy,
         ruleLayers, withRuleLayering, validateForSync
     });

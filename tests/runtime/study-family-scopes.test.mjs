@@ -207,3 +207,57 @@ test('another parent cannot end or replace a lock it did not set', async () => {
   assert.equal(result.accepted, true);
   assert.equal(r.study().lock, null, 'the parent that set it can end it early');
 });
+
+test('tighten only: a study change from a parent who did not set the plan may only make it stricter', async () => {
+  // The plan was set by an earlier parent link; the child's current parent can only tighten it.
+  const plan = { days: ['mon', 'tue'], start: '16:00', end: '18:00', setByParentId: 'earlier-parent' };
+  const start = { version: 1, activePackIds: ['in_upsc_cse', 'in_ssc'], plan, breakMode: 'rest', focus: { roundMinutes: 40, breakMinutes: 10, dailyGoalMinutes: 120 } };
+  const r = receiver(start, { withModel: true });
+  await assert.rejects(r.adapter.applyManagedPolicyEnvelope(envelopeFor('study', { scope: 'study', replace: true,
+    activePackIds: ['in_upsc_cse', 'in_ssc', 'global_ielts'] }, 1), context(r, ['time_limits'])), /only stricter changes apply/);
+  assert.deepEqual(r.study().activePackIds, ['in_upsc_cse', 'in_ssc'], 'a new pack is a loosening change');
+  const stricter = await r.adapter.applyManagedPolicyEnvelope(envelopeFor('study', { scope: 'study', replace: true,
+    activePackIds: ['in_upsc_cse'] }, 2), context(r, ['time_limits']));
+  assert.equal(stricter.accepted, true, stricter.reason);
+  assert.deepEqual(r.study().activePackIds, ['in_upsc_cse']);
+  const own = receiver({ ...start, plan: { ...plan, setByParentId: 'parent-profile-1' } }, { withModel: true });
+  const owner = await own.adapter.applyManagedPolicyEnvelope(envelopeFor('study', { scope: 'study', replace: true,
+    activePackIds: ['global_ielts'] }, 1), context(own, ['time_limits']));
+  assert.equal(owner.accepted, true, 'the parent who set the plan decides');
+  assert.deepEqual(own.study().activePackIds, ['global_ielts']);
+});
+
+test('StudyTighten rules: packs, edits, plan window, limit, music, breaks, focus and the lock', () => {
+  const box = {};
+  vm.runInNewContext(read('shared/study_model'), box);
+  const Model = box.FilterTubeStudyModel;
+  const now = 1_779_300_000_000;
+  const base = {
+    version: 1, activePackIds: ['a', 'b'], breakMode: 'rest', focus: { roundMinutes: 40, breakMinutes: 10 },
+    packEdits: { a: { channelsRemoved: ['@gone'], topicsAdded: ['algebra'] } },
+    plan: { days: ['mon', 'tue'], start: '16:00', end: '18:00', limit: '20:00', setByParentId: 'mum' },
+    lock: { sessionId: 's1', setByParentId: 'mum', startsAt: now - 1000, endsAt: now + 3_600_000, scope: 'session' }
+  };
+  const allowed = change => Model.tightenAllowed(base, { ...base, ...change }, { now });
+  assert.equal(Model.tightenAllowed(null, base), true);
+  assert.equal(allowed({}), true);
+  assert.equal(allowed({ activePackIds: ['a'] }), true, 'fewer packs');
+  assert.equal(allowed({ activePackIds: ['a', 'b', 'c'] }), false, 'a new pack');
+  assert.equal(allowed({ packEdits: { a: { channelsRemoved: ['@gone', '@also'], topicsAdded: [] } } }), true, 'more removed, fewer added');
+  assert.equal(allowed({ packEdits: { a: { channelsRemoved: [], topicsAdded: ['algebra'] } } }), false, 'a removed channel back');
+  assert.equal(allowed({ packEdits: {} }), false, 'dropping edits brings removed channels back');
+  assert.equal(allowed({ plan: { ...base.plan, start: '15:30', end: '18:30', days: ['mon', 'tue', 'wed'] } }), true, 'a longer window');
+  assert.equal(allowed({ plan: { ...base.plan, end: '17:30' } }), false, 'a shorter window');
+  assert.equal(allowed({ plan: { ...base.plan, limit: '21:00' } }), false, 'a later limit');
+  assert.equal(allowed({ plan: { ...base.plan, music: true } }), false, 'music on under a parent plan');
+  assert.equal(allowed({ plan: { ...base.plan, music: false } }), true, 'music off');
+  assert.equal(allowed({ breakMode: 'normal' }), false);
+  assert.equal(allowed({ packChannelsOnly: false }), false);
+  assert.equal(allowed({ focus: { roundMinutes: 25, breakMinutes: 10 } }), false, 'shorter rounds');
+  assert.equal(allowed({ lock: null }), false, 'the lock can\'t be dropped');
+  assert.equal(allowed({ lock: { ...base.lock, endsAt: base.lock.endsAt - 1 } }), false, 'or shortened');
+  assert.equal(allowed({ lock: { ...base.lock, endsAt: base.lock.endsAt + 1 } }), true, 'or extended');
+  const merged = Model.mergeStudy(base, { ...base, activePackIds: ['a', 'b', 'z'], progress: { other: { '2026-11-15': 30 } } }, { now });
+  assert.deepEqual(plain(merged.activePackIds), ['a', 'b'], 'Merge holds a loosening change while the parent plan runs');
+  assert.deepEqual(plain(merged.progress), { other: { '2026-11-15': 30 } }, 'progress still merges');
+});

@@ -116,6 +116,13 @@
             };
         }
         const model = global.FilterTubeStudyModel;
+        // Tighten only (Android StudyTighten): while another parent's plan or lock holds this profile,
+        // this parent's study change may only make study stricter.
+        const owners = [owner(base.plan), owner(base.lock)].filter(Boolean);
+        if (owners.length && !owners.includes(parentId) && model && typeof model.tightenAllowed === 'function'
+            && !model.tightenAllowed(base, next)) {
+            throw new Error('Another parent set this study plan; only stricter changes apply');
+        }
         return { ...profile, study: model && typeof model.normalizeStudy === 'function' ? model.normalizeStudy(next) : next };
     }
 

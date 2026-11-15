@@ -506,15 +506,18 @@
         /** Phase 5 edits: packs, packEdits, focus, plan, breakMode, weekView. Never the lock or progress. */
         async function update(patch = {}) {
             if (await deps.getSelfControlSession?.()) return { ok: false, error: 'locked' };
-            const allowed = ['activePackIds', 'packEdits', 'focus', 'plan', 'breakMode', 'weekView'];
+            const allowed = ['activePackIds', 'packEdits', 'focus', 'plan', 'breakMode', 'weekView', 'packChannelsOnly'];
             const { profileId, profile } = await readAll();
             const current = Model.profileStudy(profile);
-            if (current && (current.plan?.setByParentId || current.lock?.setByParentId)) return { ok: false, error: 'set_by_parent' };
-            const result = await updateProfileStudy(profileId, study => {
+            const apply = study => {
                 const next = { ...study };
                 for (const key of allowed) if (Object.prototype.hasOwnProperty.call(object(patch), key)) next[key] = clone(patch[key]);
                 return next;
-            });
+            };
+            // Under a parent's plan or lock the person may tighten study, never loosen it (StudyTighten).
+            if (current && (current.plan?.setByParentId || current.lock?.setByParentId)
+                && !Model.tightenAllowed(current, apply(clone(current)), { now: now() })) return { ok: false, error: 'set_by_parent' };
+            const result = await updateProfileStudy(profileId, apply);
             if (result?.ok === false) return result;
             await schedule();
             await deps.onTransition?.('update');

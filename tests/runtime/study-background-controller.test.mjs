@@ -142,7 +142,7 @@ test('Locked: goes through the Self-Control session, is capped at 4 hours and ca
     assert.equal(h.profile().study.lock, null, 'the expired lock reference is cleared');
 });
 
-test('a parent-set plan cannot be ended, skipped or edited here', async () => {
+test('a parent-set plan cannot be ended, skipped or loosened here; it can be tightened', async () => {
     const h = harness({ study: { plan: { days: ['mon'], start: '16:00', end: '18:00', setByParentId: 'mum' } }, now: at(16, 16, 55) });
     const state = await h.controller.getState();
     assert.equal(state.state, 'BREAK');
@@ -150,6 +150,10 @@ test('a parent-set plan cannot be ended, skipped or edited here', async () => {
     assert.equal((await h.controller.skipBreak()).error, 'set_by_parent');
     assert.equal((await h.controller.requestEnd()).error, 'set_by_parent');
     assert.equal((await h.controller.update({ breakMode: 'normal' })).error, 'set_by_parent');
+    assert.equal((await h.controller.update({ plan: { days: ['mon'], start: '16:00', end: '17:00', setByParentId: 'mum' } })).error, 'set_by_parent');
+    assert.equal((await h.controller.update({ plan: { days: ['mon', 'tue'], start: '16:00', end: '18:30', setByParentId: 'mum' } })).ok, true, 'stricter');
+    assert.deepEqual(h.profile().study.plan.days, ['mon', 'tue']);
+    assert.ok(h.profile().study.packCopies.in_upsc_cse.channels.length > 0, 'a copy of the active pack rides in study');
 });
 
 test('Skip break: self-started only, until the break ends', async () => {
