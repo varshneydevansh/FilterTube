@@ -244,7 +244,7 @@
                         <section class="view-hero dashboard-hero ft-dash-hero" aria-labelledby="ftDashHeroTitle">
                             <div class="view-hero__copy ft-dash-hero__copy">
                                 <p class="view-hero__eyebrow">FilterTube control center</p>
-                                <h2 id="ftDashHeroTitle" class="view-hero__title">Keep YouTube calmer for your household.</h2>
+                                <h2 id="ftDashHeroTitle" class="view-hero__title">Keep viewing calmer for your household.</h2>
                                 <p class="view-hero__body">See what FilterTube is doing, switch between Main and Kids rules, and open the controls parents use most.</p>
                                 <div class="view-hero__meta" aria-label="Current playback protection">
                                     <span class="view-meta-pill">Ad-free playback</span>
@@ -252,7 +252,7 @@
                                     <span class="view-meta-pill">Main + Kids</span>
                                     <span class="view-meta-pill">Blocklist + Whitelist</span>
                                 </div>
-                                <p class="ft-dash-hero__note">If filtering stops working, please tell the developer by email, GitHub, or a video comment. It usually means YouTube changed its page structure.</p>
+                                <p class="ft-dash-hero__note">If filtering stops working, please tell the developer by email, GitHub, or a video comment. It usually means the site changed its page structure.</p>
                             </div>
                             <aside class="ft-dash-status" aria-label="Active profile" data-ft-i18n-aria-label="controls.header.label">
                                 <div class="ft-dash-status__profile">
@@ -267,8 +267,8 @@
                                 <div class="dashboard-stats-source ft-dash-status__source" role="group" data-ft-i18n-aria-label="dashboard.stats.surface" aria-label="Stats for">
                                     <div id="dashboardStatsSourceLabel" class="dashboard-stats-source__label" hidden></div>
                                     <div class="dashboard-stats-source__buttons">
-                                        <button id="dashboardStatsMainBtn" class="btn-secondary" type="button">YouTube Main</button>
-                                        <button id="dashboardStatsKidsBtn" class="btn-secondary" type="button">YouTube Kids</button>
+                                        <button id="dashboardStatsMainBtn" class="btn-secondary" type="button">Main</button>
+                                        <button id="dashboardStatsKidsBtn" class="btn-secondary" type="button">Kids</button>
                                     </div>
                                 </div>
                                 <a class="btn-primary android-closed-testing-invite__mail dashboard-android-testing-cta ft-dash-status__cta" href="https://play.google.com/store/apps/details?id=com.filtertube.app" target="_blank" rel="noreferrer">Open FilterTube on Google Play</a>
@@ -371,7 +371,7 @@
                                 <h2 id="dashboardAppPreviewTitle" class="dashboard-app-preview__title">See FilterTube’s mobile experience.</h2>
                                 <p class="dashboard-app-preview__body">Press play for a quick look at the calmer app experience with no adverts built for phones, tablets, and TV.</p>
                                 <a class="dashboard-app-preview__link" href="https://www.youtube.com/watch?v=SHvSICSMHL4" target="_blank" rel="noreferrer">
-                                    <span>Open video on YouTube</span>
+                                    <span>Open video on the video site</span>
                                     <span aria-hidden="true">↗</span>
                                 </a>
                             </div>
@@ -380,7 +380,7 @@
                                 href="https://www.youtube.com/watch?v=SHvSICSMHL4"
                                 target="_blank"
                                 rel="noreferrer"
-                                aria-label="Play the FilterTube mobile app preview on YouTube">
+                                aria-label="Play the FilterTube mobile app preview on the video site">
                                 <img
                                     src="https://i.ytimg.com/vi/SHvSICSMHL4/maxresdefault.jpg"
                                     alt="FilterTube mobile app preview video thumbnail">
@@ -431,7 +431,7 @@
                             <div class="view-hero__copy">
                                 <p class="view-hero__eyebrow">Rules that already work today</p>
                                 <h2 class="view-hero__title">Build the exact feed boundaries you want FilterTube to keep.</h2>
-                                <p class="view-hero__body">Channels, keywords, Shorts, comments, and profile-specific rules all stay local and stay explicit.</p>
+                                <p class="view-hero__body">Channels, keywords, clips, comments, and profile-specific rules all stay local and stay explicit.</p>
                             </div>
                         </section>
                         <div id="filtersTabsContainer"></div>
@@ -492,7 +492,7 @@
                                         <circle cx="6" cy="10" r="2" fill="currentColor" stroke="none"></circle>
                                         <circle cx="18" cy="10" r="2" fill="currentColor" stroke="none"></circle>
                                     </svg>
-                                    <span>YouTube Kids Filters</span>
+                                    <span>Kids Filters</span>
                                 </div>
                                 <p class="kids-header-desc">Keep the youngest surface calmer with the same profile-aware control system, tuned for family-safe viewing.</p>
                             </div>
@@ -581,10 +581,10 @@
                                                     <p class="ft-self-control-card__eyebrow">Selected-channel focus</p>
                                                     <h3>Hard Timer Whitelist</h3>
                                                 </div>
-                                                <span class="view-meta-pill">Main YouTube</span>
+                                                <span class="view-meta-pill">Main</span>
                                             </div>
                                             <p class="import-export-summary">Allow only the channels already listed in Main Allowed rules for a non-cancellable timer.</p>
-                                            <p class="import-export-hint">This starts an explicit allow-only session for Main YouTube. It enables filtering, forces Whitelist mode, ignores Main keyword/video allow rules for the session, pins this profile, and locks settings, rules, imports, and profile switching until the countdown finishes. Kids keeps its current mode and rules but is frozen with the profile snapshot.</p>
+                                            <p class="import-export-hint">This starts an explicit allow-only session for Main. It enables filtering, forces Whitelist mode, ignores Main keyword/video allow rules for the session, pins this profile, and locks settings, rules, imports, and profile switching until the countdown finishes. Kids keeps its current mode and rules but is frozen with the profile snapshot.</p>
                                             <div id="ftHardWhitelistReady" class="ft-self-control-ready">
                                                 <div class="ft-self-control-presets" role="group" aria-label="Hard Timer Whitelist duration">
                                                     <button class="btn-secondary" type="button" data-hard-whitelist-minutes="30">30 minutes</button>
@@ -653,8 +653,8 @@
                                                     <select id="ftBlockTubeExportProfile"></select>
                                                     <label for="ftBlockTubeExportSurface">Rule space</label>
                                                     <select id="ftBlockTubeExportSurface">
-                                                        <option value="main">Main YouTube</option>
-                                                        <option value="kids">YouTube Kids</option>
+                                                        <option value="main">Main</option>
+                                                        <option value="kids">Kids</option>
                                                     </select>
                                                     <button id="ftBlockTubeExportBtn" class="btn-secondary" type="button">Review BlockTube export</button>
                                                 </div>
@@ -915,7 +915,7 @@
                                                                         <div class="rule-list-format-panel__facts">
                                                                             <span><code>filterData.channelId</code> and <code>channelName</code> become channel rules.</span>
                                                                             <span><code>filterData.title</code> becomes keyword rules.</span>
-                                                                            <span>BlockTube JSON applies supported rules to Main YouTube only; incomplete channel identifiers are enriched one at a time after approval, never in a request burst.</span>
+                                                                            <span>BlockTube JSON applies supported rules to Main only; incomplete channel identifiers are enriched one at a time after approval, never in a request burst.</span>
                                                                         </div>
                                                                     </div>
                                                                     <div class="rule-list-preview-json rule-list-preview-json--blocktube" aria-label="BlockTube JSON rule list example">
@@ -966,11 +966,11 @@
                                                             <p class="rule-list-target-picker__hint">Choose before import. The file can add rules here, but it cannot choose profiles, PINs, time limits, trusted devices, or sync destinations.</p>
                                                             <label>
                                                                 <input type="radio" name="ftRuleListImportTarget" value="main" checked />
-                                                                <span>Main YouTube</span>
+                                                                <span>Main</span>
                                                             </label>
                                                             <label>
                                                                 <input type="radio" name="ftRuleListImportTarget" value="kids" />
-                                                                <span>YouTube Kids</span>
+                                                                <span>Kids</span>
                                                             </label>
                                                             <label>
                                                                 <input type="radio" name="ftRuleListImportTarget" value="both" />
@@ -983,7 +983,7 @@
                                                                 <code>safe preview first</code>
                                                             </summary>
                                                             <div class="rule-list-parser-notes" aria-label="Rule list parser boundaries">
-                                                                <span><b>Channels:</b> <code>UC...</code>, <code>@handle</code>, <code>/channel/UC...</code>, <code>/c/Name</code>, <code>/user/Name</code>, or YouTube channel URLs.</span>
+                                                                <span><b>Channels:</b> <code>UC...</code>, <code>@handle</code>, <code>/channel/UC...</code>, <code>/c/Name</code>, <code>/user/Name</code>, or channel URLs.</span>
                                                                 <span><b>Keywords:</b> CSV <code>keyword</code> cells, JSON <code>keywords</code>, or TXT rows starting with <code>keyword:</code>. BlockTube <code>filterData.title</code> and <code>comment</code> are mapped separately.</span>
                                                                 <span><b>Messy files:</b> invalid rows are skipped with row numbers and reasons in preview before anything changes.</span>
                                                                 <span><b>Metadata pacing:</b> incomplete channel identifiers from CSV, TXT, FilterTube JSON, and BlockTube JSON are enriched only after approval by the extension background worker, one serialized lookup at a randomized 7–15 second interval while it is awake. A failed row retries after about 2 minutes, then backs off to a 30-minute maximum; it never pauses fresh rows. Closing this dashboard does not stop the queue.</span>
@@ -1089,10 +1089,10 @@
                                         <h3>Extension updates</h3>
                                     </div>
                                     <div class="card-body settings-card__body">
-                                        <div class="toggle-row" title="Disable automatic FilterTube update reminders and What’s New notifications on YouTube and YouTube Kids.">
+                                        <div class="toggle-row" title="Disable automatic FilterTube update reminders and What’s New notifications on Main and Kids.">
                                             <div class="toggle-info">
                                                 <div class="toggle-title">Disable update notifications</div>
-                                                <div class="toggle-description">Device-wide opt-out. Hides automatic reload reminders and What’s New banners on YouTube and YouTube Kids. You can still open What’s New from this dashboard.</div>
+                                                <div class="toggle-description">Device-wide opt-out. Hides automatic reload reminders and What’s New banners on Main and Kids. You can still open What’s New from this dashboard.</div>
                                             </div>
                                             <label class="switch">
                                                 <input id="setting_showUpdateRefreshPrompt" type="checkbox" />
@@ -1264,8 +1264,8 @@
                                             </article>
                                             <article>
                                                 <span>2</span>
-                                                <strong>Child PIN is different</strong>
-                                                <small>The child PIN only protects switching into that profile. It does not unlock parent controls.</small>
+                                                <strong>Kids profile PIN is different</strong>
+                                                <small>The Kids profile PIN only protects switching into that profile. It does not unlock parent controls.</small>
                                             </article>
                                             <article>
                                                 <span>3</span>
@@ -1425,8 +1425,8 @@
                                                                     <span>Scope to send</span>
                                                                     <select id="ftNanahScope" class="select-input">
                                                                         <option value="active">Active profile</option>
-                                                                        <option value="main">YouTube Main only</option>
-                                                                        <option value="kids">YouTube Kids only</option>
+                                                                        <option value="main">Main only</option>
+                                                                        <option value="kids">Kids only</option>
                                                                         <option value="keywords">Keyword rules</option>
                                                                         <option value="channels">Channel rules</option>
                                                                         <option value="videos">Blocked video IDs</option>
@@ -1436,11 +1436,11 @@
                                                                         <option value="full">Full backup</option>
                                                                     </select>
                                                                 </label>
-                                                                <label class="nanah-sync-field" id="ftNanahGranularSurfaceField" hidden data-filtertube-help="For keyword, channel, and video rule sends, choose whether the local Main YouTube or YouTube Kids rules are used.">
+                                                                <label class="nanah-sync-field" id="ftNanahGranularSurfaceField" hidden data-filtertube-help="For keyword, channel, and video rule sends, choose whether the local Main or Kids rules are used.">
                                                                     <span>Rule source</span>
                                                                     <select id="ftNanahGranularSurface" class="select-input">
-                                                                        <option value="main">YouTube Main rules</option>
-                                                                        <option value="kids">YouTube Kids rules</option>
+                                                                        <option value="main">Main rules</option>
+                                                                        <option value="kids">Kids rules</option>
                                                                     </select>
                                                                     <small id="ftNanahGranularSurfaceHint" class="nanah-sync-field__hint">Keyword, channel, and video updates use this local rule surface.</small>
                                                                 </label>
@@ -1519,7 +1519,7 @@
                                                             <summary>Connection details</summary>
                                                         <div class="nanah-sync-status__row">
                                                             <span class="nanah-sync-status__label">This profile + device</span>
-                                                            <strong id="ftNanahLocalProfile">Default (master account)</strong>
+                                                            <strong id="ftNanahLocalProfile">Default (parent account)</strong>
                                                         </div>
                                                         <div class="nanah-sync-status__row">
                                                             <span class="nanah-sync-status__label">Remote active profile</span>
@@ -1607,7 +1607,7 @@
                                     <div class="card-body settings-card__body settings-card__body--profiles">
                                         <div id="managedChildSyncBoundary" class="ft-managed-child-sync-boundary" hidden></div>
                                         <div class="import-export-hint" style="margin-bottom:10px;">
-                                            Each device can have several profiles. Choose whose rules you want to edit or send. <code>Default</code> is the master account; each parent manages their own child profiles.
+                                            Each device can have several profiles. Choose whose rules you want to edit or send. <code>Default</code> is the parent account; each parent manages their own Kids profiles.
                                         </div>
                                         <div id="ftProfilesManager" class="help-list"></div>
                                         <div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:12px;">
@@ -1627,7 +1627,7 @@
                                         <div class="import-export-hint" style="margin-bottom:10px;">
                                             The Master PIN protects Default and its admin controls. Set a PIN on each parent account too. A child switching PIN protects entry to that child profile; it does not protect an unlocked parent account.
                                         </div>
-                                        <div class="toggle-row" title="When enabled, the Default (Master) profile can create new independent accounts.">
+                                        <div class="toggle-row" title="When enabled, the Default (Parent) profile can create new independent accounts.">
                                             <div class="toggle-info">
                                                 <div class="toggle-title">Allow independent account creation</div>
                                             </div>
@@ -1706,7 +1706,7 @@
                                 <article class="help-start-card">
                                     <span>1</span>
                                     <strong>Add what you never want to see</strong>
-                                    <p>Use Filters for keywords and channels. Start with a few obvious rules, then test YouTube.</p>
+                                    <p>Use Filters for keywords and channels. Start with a few obvious rules, then test them on a few pages.</p>
                                 </article>
                                 <article class="help-start-card">
                                     <span>2</span>
@@ -1731,23 +1731,23 @@
                                 <h3>FilterTube Feature Guide</h3>
                             </div>
                             <div class="card-body">
-                                <p><strong>Start here for the main filtering, focus, migration, and YouTube behavior controls.</strong> Use the detailed Help sections below whenever you need the full behavior or safety boundary.</p>
+                                <p><strong>Start here for the main filtering, focus, migration, and page behavior controls.</strong> Use the detailed Help sections below whenever you need the full behavior or safety boundary.</p>
                                 <div class="help-list">
                                     <div class="help-item">
                                         <div class="help-item-title">Self-Control Sessions and time limits for every profile</div>
-                                        <div class="help-item-body">Any profile can have its own daily YouTube allowance. The popup shows the remaining daily time, and an exhausted profile receives the full-page serene pause screen. Separately, Settings now offers a Self-Control Session that pins the active profile and freezes its current filters until a non-cancellable countdown ends.</div>
+                                        <div class="help-item-body">Any profile can have its own daily viewing time. The popup shows the remaining daily time, and an exhausted profile receives the full-page serene pause screen. Separately, Settings now offers a Self-Control Session that pins the active profile and freezes its current filters until a non-cancellable countdown ends.</div>
                                     </div>
                                     <div class="help-item">
                                         <div class="help-item-title">Blocked and Always allowed rule collections</div>
-                                        <div class="help-item-body">Main YouTube and YouTube Kids each keep independent Blocked and Allowed rule collections. Opening a collection only chooses which saved rules you are editing; it does not change the active <strong>Blocklist</strong> or <strong>Whitelist</strong> mode. Quick additions in the popup follow the active mode, while advanced exceptions stay in the full Filters page.</div>
+                                        <div class="help-item-body">Main and Kids each keep independent Blocked and Allowed rule collections. Opening a collection only chooses which saved rules you are editing; it does not change the active <strong>Blocklist</strong> or <strong>Whitelist</strong> mode. Quick additions in the popup follow the active mode, while advanced exceptions stay in the full Filters page.</div>
                                     </div>
                                     <div class="help-item">
                                         <div class="help-item-title">Direct-access and description checks</div>
-                                        <div class="help-item-body">Blocked Watch, Shorts, channel, playlist/autoplay, and embedded-player routes cannot bypass the active rules. FilterTube reuses YouTube's loaded Player response and visible Watch description before considering another metadata lookup, so ordinary blocklist playback is not held merely because a complete description is still missing. Allow-only mode remains safer and waits when identity is required.</div>
+                                        <div class="help-item-body">Blocked Watch, Clips, channel, playlist/autoplay, and embedded-player routes cannot bypass the active rules. FilterTube reuses the page's loaded Player response and visible Watch description before considering another metadata lookup, so ordinary blocklist playback is not held merely because a complete description is still missing. Allow-only mode remains safer and waits when identity is required.</div>
                                     </div>
                                     <div class="help-item">
                                         <div class="help-item-title">Send adverts to The Void</div>
-                                        <div class="help-item-body">This default-on control filters advert plans and sponsored items on YouTube Main and YouTube Kids in both Blocklist and Whitelist modes. On desktop watch pages, <strong>Content-only playback</strong> can choose the main-video source once when needed, then leave playback to YouTube’s own controls, captions, audio choices and playlist. A healthy video stays untouched. Turning Content-only playback off keeps ordinary YouTube playback; it does not enable repeated hidden seeking or resume attempts. Other surfaces retain their existing advert fallback, without automatically resuming paused content. Parent and child filtering rules still apply. For troubleshooting, <code>player-ad-plan-removed</code> in the latest 100 <code>window.__filtertubeAdVoidLog</code> events confirms observed advert-data removal; it does not prove every advert was prevented.</div>
+                                        <div class="help-item-body">This default-on control filters advert plans and sponsored items on Main and Kids in both Blocklist and Whitelist modes. On desktop watch pages, <strong>Content-only playback</strong> can choose the main-video source once when needed, then leave playback to the player’s own controls, captions, audio choices and playlist. A healthy video stays untouched. Turning Content-only playback off keeps ordinary playback; it does not enable repeated hidden seeking or resume attempts. Other surfaces retain their existing advert fallback, without automatically resuming paused content. Parent and Kids filtering rules still apply. For troubleshooting, <code>player-ad-plan-removed</code> in the latest 100 <code>window.__filtertubeAdVoidLog</code> events confirms observed advert-data removal; it does not prove every advert was prevented.</div>
                                     </div>
                                     <div class="help-item">
                                         <div class="help-item-title">Safer complete BlockTube migration</div>
@@ -1755,19 +1755,19 @@
                                     </div>
                                     <div class="help-item">
                                         <div class="help-item-title">Official category filtering</div>
-                                        <div class="help-item-body">Category Filters now use YouTube's official video category, have their own independent Block/Allow-only mode, appear below Core in full Content Controls, and are also available in the popup. Nearby uncached cards are checked in small bounded batches so FilterTube does not continuously request metadata.</div>
+                                        <div class="help-item-body">Category Filters now use the official video category, have their own independent Block/Allow-only mode, appear below Core in full Content Controls, and are also available in the popup. Nearby uncached cards are checked in small bounded batches so FilterTube does not continuously request metadata.</div>
                                     </div>
                                     <div class="help-item">
                                         <div class="help-item-title">Spoken-language filtering (Experimental)</div>
-                                        <div class="help-item-body">Language Filters prefer YouTube's original/default spoken-audio evidence. Auto-dubbed alternatives do not change the source language. For captionless videos, FilterTube can use strong writing-system evidence from creator-supplied Player metadata; weak or ambiguous text remains unknown. Category and language checks share one paced Player-metadata request and one cache entry per video.</div>
+                                        <div class="help-item-body">Language Filters prefer the original/default spoken-audio evidence. Auto-dubbed alternatives do not change the source language. For captionless videos, FilterTube can use strong writing-system evidence from creator-supplied Player metadata; weak or ambiguous text remains unknown. Category and language checks share one paced Player-metadata request and one cache entry per video.</div>
                                     </div>
                                     <div class="help-item">
                                         <div class="help-item-title">Always use original audio (Experimental)</div>
-                                        <div class="help-item-body">This separate Player control changes only the currently playing video's audio track. It reuses YouTube's loaded Player response and in-page player API to prefer a proven original track over an automatic dub. It makes no extra request, never delays playback, and leaves the current audio unchanged when the original cannot be proven.</div>
+                                        <div class="help-item-body">This separate Player control changes only the currently playing video's audio track. It reuses the page's loaded Player response and in-page player API to prefer a proven original track over an automatic dub. It makes no extra request, never delays playback, and leaves the current audio unchanged when the original cannot be proven.</div>
                                     </div>
                                     <div class="help-item">
-                                        <div class="help-item-title">Current Watch, Mix, comments, and YouTube layouts</div>
-                                        <div class="help-item-body">Current camelCase video lockups and Watch recommendations are recognized without treating comments, navigation chips, or Mix queue rows as ordinary category-owned videos. A Mix discovery card can use its seed video's identity, including for faster 3-dot channel actions, without copying that identity to every queue item.</div>
+                                        <div class="help-item-title">Current Watch, auto playlist, comments, and page layouts</div>
+                                        <div class="help-item-body">Current camelCase video lockups and Watch recommendations are recognized without treating comments, navigation chips, or auto playlist queue rows as ordinary category-owned videos. An auto playlist discovery card can use its seed video's identity, including for faster 3-dot channel actions, without copying that identity to every queue item.</div>
                                     </div>
                                 </div>
                             </div>
@@ -1778,7 +1778,7 @@
                                 <h3>Category Filters Are Working</h3>
                             </div>
                             <div class="card-body">
-                                <p><strong>Category Filters use the official category supplied by YouTube for each video.</strong> Open <strong>Content Controls</strong>, find the Category Filters card directly below Core, choose categories, select a mode, and turn the filter on. The same controls are also available in the extension popup.</p>
+                                <p><strong>Category Filters use the official category supplied for each video.</strong> Open <strong>Content Controls</strong>, find the Category Filters card directly below Core, choose categories, select a mode, and turn the filter on. The same controls are also available in the extension popup.</p>
                                 <div class="help-list">
                                     <div class="help-item">
                                         <div class="help-item-title">Block selected</div>
@@ -1786,7 +1786,7 @@
                                     </div>
                                     <div class="help-item">
                                         <div class="help-item-title">Allow only selected</div>
-                                        <div class="help-item-body">Only videos whose resolved YouTube category is selected are shown. Unknown cards stay covered while FilterTube checks their category, so unrelated videos should not flash briefly and disappear later.</div>
+                                        <div class="help-item-body">Only videos whose resolved category is selected are shown. Unknown cards stay covered while FilterTube checks their category, so unrelated videos should not flash briefly and disappear later.</div>
                                     </div>
                                     <div class="help-item">
                                         <div class="help-item-title">This mode is independent</div>
@@ -1794,11 +1794,11 @@
                                     </div>
                                     <div class="help-item">
                                         <div class="help-item-title">Where it applies</div>
-                                        <div class="help-item-body">FilterTube applies resolved categories to ordinary video cards, the current Watch video, and Watch recommendations. A Mix discovery card may use its seed video's category, but playlist and Mix queue rows are not treated as separate category-owned videos. Comments are never category-filter targets.</div>
+                                        <div class="help-item-body">FilterTube applies resolved categories to ordinary video cards, the current Watch video, and Watch recommendations. An auto playlist discovery card may use its seed video's category, but playlist and auto playlist queue rows are not treated as separate category-owned videos. Comments are never category-filter targets.</div>
                                     </div>
                                     <div class="help-item">
                                         <div class="help-item-title">Why a card may load briefly</div>
-                                        <div class="help-item-body">Home and Search responses often omit category. FilterTube checks only nearby cards through YouTube's structured Player response, reuses saved results, and limits requests to small batches. A short loading veil is expected on uncached cards; repeated “Category unavailable” cards are not normal.</div>
+                                        <div class="help-item-body">Home and Search responses often omit category. FilterTube checks only nearby cards through the structured Player response, reuses saved results, and limits requests to small batches. A short loading veil is expected on uncached cards; repeated “Category unavailable” cards are not normal.</div>
                                     </div>
                                 </div>
                             </div>
@@ -1807,13 +1807,13 @@
                         <div class="card help-language-filters-card">
                             <div class="card-header"><h3>Filter Videos By Spoken Language (Experimental)</h3></div>
                             <div class="card-body">
-                                <p><strong>Language Filters prefer the language linked to YouTube's default audio track.</strong> For captionless videos, strong script evidence in creator-supplied Player metadata can provide a fallback. Find this experimental card at the bottom of <strong>Content Controls</strong>, then turn it on to choose <strong>Block selected</strong> or <strong>Allow only selected</strong> and select languages from the visible pills. Turning the filter off collapses the picker but keeps your saved selection. Unknown-language videos remain visible, and YouTube Kids is not filtered by language yet. Main YouTube controls are also available in the popup.</p>
+                                <p><strong>Language Filters prefer the language linked to the video's default audio track.</strong> For captionless videos, strong script evidence in creator-supplied Player metadata can provide a fallback. Find this experimental card at the bottom of <strong>Content Controls</strong>, then turn it on to choose <strong>Block selected</strong> or <strong>Allow only selected</strong> and select languages from the visible pills. Turning the filter off collapses the picker but keeps your saved selection. Unknown-language videos remain visible, and Kids is not filtered by language yet. Main controls are also available in the popup.</p>
                                 <div class="help-list">
-                                    <div class="help-item"><div class="help-item-title">What counts as the language?</div><div class="help-item-body">FilterTube first uses YouTube's explicit original/default audio-format metadata, excluding auto-dubbed alternatives, then its audio/caption-track mapping. If those are absent, it can accept strong writing-system evidence from the title, description, and tags inside the same Player response—for example, dominant Russian Cyrillic text. It does not use the interface language, country, channel locale, or translated-subtitle menu.</div></div>
+                                    <div class="help-item"><div class="help-item-title">What counts as the language?</div><div class="help-item-body">FilterTube first uses the explicit original/default audio-format metadata, excluding auto-dubbed alternatives, then its audio/caption-track mapping. If those are absent, it can accept strong writing-system evidence from the title, description, and tags inside the same Player response—for example, dominant Russian Cyrillic text. It does not use the interface language, country, channel locale, or translated-subtitle menu.</div></div>
                                     <div class="help-item"><div class="help-item-title">Block selected</div><div class="help-item-body">A resolved matching language is hidden. A video whose language is unavailable stays visible.</div></div>
                                     <div class="help-item"><div class="help-item-title">Allow only selected</div><div class="help-item-body">A resolved nonmatching language is blocked. While language evidence is loading—or if it remains unavailable—the page stays usable instead of being blanked or pausing playback.</div></div>
-                                    <div class="help-item"><div class="help-item-title">Why this does not double requests</div><div class="help-item-body">FilterTube first reuses a Player response already loaded by YouTube. If a visible uncached card needs more information, category, language, description, dates, and identity needs are merged into one paced request for that video and then cached.</div></div>
-                                    <div class="help-item"><div class="help-item-title">Current boundary</div><div class="help-item-body">This control applies to Main YouTube. YouTube Kids does not show it until Kids responses provide equally reliable default-audio evidence. A dubbed video follows YouTube's selected default track.</div></div>
+                                    <div class="help-item"><div class="help-item-title">Why this does not double requests</div><div class="help-item-body">FilterTube first reuses a Player response already loaded by the page. If a visible uncached card needs more information, category, language, description, dates, and identity needs are merged into one paced request for that video and then cached.</div></div>
+                                    <div class="help-item"><div class="help-item-title">Current boundary</div><div class="help-item-body">This control applies to Main. Kids does not show it until Kids responses provide equally reliable default-audio evidence. A dubbed video follows the selected default track.</div></div>
                                 </div>
                             </div>
                         </div>
@@ -1821,12 +1821,12 @@
                         <div class="card help-original-audio-card">
                             <div class="card-header"><h3>Always Use Original Audio (Experimental)</h3></div>
                             <div class="card-body">
-                                <p><strong>This is a playback preference, not a language filter.</strong> Open <strong>Filters &gt; Content Controls &gt; Player</strong> and enable <strong>Always Use Original Audio (Experimental)</strong>. On Main YouTube, FilterTube will prefer the creator's proven original track instead of an automatic dub.</p>
+                                <p><strong>This is a playback preference, not a language filter.</strong> Open <strong>Filters &gt; Content Controls &gt; Player</strong> and enable <strong>Always Use Original Audio (Experimental)</strong>. On Main, FilterTube will prefer the creator's proven original track instead of an automatic dub.</p>
                                 <div class="help-list">
                                     <div class="help-item"><div class="help-item-title">What changes?</div><div class="help-item-body">Only the audio track selected in the current player. Search results, recommendations, translated titles and descriptions, captions, and filtering rules do not change.</div></div>
-                                    <div class="help-item"><div class="help-item-title">Does it make another request?</div><div class="help-item-body">No. FilterTube reads the Player response YouTube already loaded, then uses YouTube's own in-page audio-track controls. There is no caption download, language lookup, or repeated network polling.</div></div>
+                                    <div class="help-item"><div class="help-item-title">Does it make another request?</div><div class="help-item-body">No. FilterTube reads the Player response the page already loaded, then uses the player's own in-page audio-track controls. There is no caption download, language lookup, or repeated network polling.</div></div>
                                     <div class="help-item"><div class="help-item-title">What if the original is unclear?</div><div class="help-item-body">Playback continues normally. FilterTube does not guess from the title or channel and does not show a checking screen. It acts only when a non-auto-dubbed original/source track can be matched uniquely.</div></div>
-                                    <div class="help-item"><div class="help-item-title">Current boundary</div><div class="help-item-body">The experimental preference applies to Main YouTube Watch playback, including SPA navigation and playlist or autoplay transitions. YouTube Kids is excluded until its Player data exposes equally reliable original-track evidence.</div></div>
+                                    <div class="help-item"><div class="help-item-title">Current boundary</div><div class="help-item-body">The experimental preference applies to Main Watch playback, including SPA navigation and playlist or autoplay transitions. Kids is excluded until its Player data exposes equally reliable original-track evidence.</div></div>
                                 </div>
                             </div>
                         </div>
@@ -1863,7 +1863,7 @@
                                 </div>
                                 <div class="help-family-devices-notes" aria-label="Family device safety notes">
                                     <div><strong>Parent or Master PIN</strong><span>Unlocks rules, time limits, trusted devices, backups, and profile policy.</span></div>
-                                    <div><strong>Child profile PIN</strong><span>Only protects switching into that profile, so siblings or other users cannot casually open it.</span></div>
+                                    <div><strong>Kids profile PIN</strong><span>Only protects switching into that profile, so siblings or other users cannot casually open it.</span></div>
                                     <div><strong>Nearby vs verified</strong><span>Nearby means reachable. Verified means this device is allowed to receive signed parent updates.</span></div>
                                     <div><strong>Nearby helper</strong><span>Shows opted-in FilterTube devices on the same network. It never sends rules or creates trust; pairing still needs the matching safety phrase.</span></div>
                                 </div>
@@ -1879,11 +1879,11 @@
                                     <div class="help-list">
                                         <div class="help-item">
                                             <div class="help-item-title">Where do I add a blocked word?</div>
-                                            <div class="help-item-body">Open <strong>Filters</strong>, add the word under Keywords, then reload or navigate YouTube once. Use the Comment pill only if that word should also filter comments.</div>
+                                            <div class="help-item-body">Open <strong>Filters</strong>, add the word under Keywords, then reload or navigate the page once. Use the Comment pill only if that word should also filter comments.</div>
                                         </div>
                                         <div class="help-item">
                                             <div class="help-item-title">What does Exact mean?</div>
-                                            <div class="help-item-body"><strong>Exact off:</strong> broader matching, so <code>poop</code> can also catch text like <code>poops</code> or <code>pooping</code> when YouTube exposes that text.<br> <strong>Exact on:</strong> stricter matching, so <code>poop</code> matches as its own word only.</div>
+                                            <div class="help-item-body"><strong>Exact off:</strong> broader matching, so <code>poop</code> can also catch text like <code>poops</code> or <code>pooping</code> when the page exposes that text.<br> <strong>Exact on:</strong> stricter matching, so <code>poop</code> matches as its own word only.</div>
                                         </div>
                                         <div class="help-item">
                                             <div class="help-item-title">What does Date mean on a keyword?</div>
@@ -1891,22 +1891,22 @@
                                         </div>
                                         <div class="help-item">
                                             <div class="help-item-title">Where do I block a channel?</div>
-                                            <div class="help-item-body">Use the YouTube 3-dot menu or add the channel in <strong>Filters &gt; Channels</strong>. A stable <code>UC...</code> channel ID is best, but handles and YouTube channel URLs are supported.</div>
+                                            <div class="help-item-body">Use the 3-dot menu on a video or add the channel in <strong>Filters &gt; Channels</strong>. A stable <code>UC...</code> channel ID is best, but handles and channel URLs are supported.</div>
                                         </div>
                                         <div class="help-item">
-                                            <div class="help-item-title">How do I limit YouTube time?</div>
-                                            <div class="help-item-body">Open <strong>Accounts &amp; Sync</strong>, create or choose a protected profile, then use <strong>Set limit</strong>. When time is finished, YouTube shows a calm FilterTube screen until the next reset or parent approval.</div>
+                                            <div class="help-item-title">How do I limit viewing time?</div>
+                                            <div class="help-item-body">Open <strong>Accounts &amp; Sync</strong>, create or choose a protected profile, then use <strong>Set limit</strong>. When time is finished, the page shows a calm FilterTube screen until the next reset or parent approval.</div>
                                         </div>
                                         <div class="help-item">
                                             <div class="help-item-title">Can I hide update notifications?</div>
-                                            <div class="help-item-body">Open <strong>Settings &gt; Extension updates</strong> and turn on <strong>Disable update notifications</strong>. This hides automatic reload reminders and What’s New banners on YouTube and YouTube Kids. The dashboard’s <strong>What’s New</strong> page remains available whenever you want to read it.</div>
+                                            <div class="help-item-body">Open <strong>Settings &gt; Extension updates</strong> and turn on <strong>Disable update notifications</strong>. This hides automatic reload reminders and What’s New banners on Main and Kids. The dashboard’s <strong>What’s New</strong> page remains available whenever you want to read it.</div>
                                         </div>
                                         <div class="help-item">
                                             <div class="help-item-title">Can my child change these settings?</div>
                                             <div class="help-item-body">Not from a protected profile. A protected profile can watch within its rules, but it cannot change rules, PINs, trusted devices, viewing spaces, backups, or time limits without parent/account authority.</div>
                                         </div>
                                         <div class="help-item">
-                                            <div class="help-item-title">Why are there two PINs for Child Profile?</div>
+                                            <div class="help-item-title">Why are there two PINs for a Kids profile?</div>
                                             <div class="help-item-body">They do different jobs. The parent/account or Master PIN controls rules, time limits, viewing access, trusted devices, and backups.<br> The child/profile PIN only protects opening that profile, so siblings or any other user cannot casually switch into it. It never grants rule-editing power.</div>
                                         </div>
                                         <div class="help-item">
@@ -1919,7 +1919,7 @@
                                         </div>
                                         <div class="help-item">
                                             <div class="help-item-title">Where do imported lists go?</div>
-                                            <div class="help-item-body">Use <strong>Settings &gt; Rule list imports</strong>. Choose Main YouTube, YouTube Kids, or Both before applying. CSV, TXT, and FilterTube rule-list files add channel and keyword rules; BlockTube migration JSON also imports its supported Main YouTube video IDs and safe setting mappings. Missing names, handles/custom URLs, and avatars are completed after approval in a slow persisted queue, regardless of import format. Files cannot change PINs, devices, profiles, time limits, or access.</div>
+                                            <div class="help-item-body">Use <strong>Settings &gt; Rule list imports</strong>. Choose Main, Kids, or Both before applying. CSV, TXT, and FilterTube rule-list files add channel and keyword rules; BlockTube migration JSON also imports its supported Main video IDs and safe setting mappings. Missing names, handles/custom URLs, and avatars are completed after approval in a slow persisted queue, regardless of import format. Files cannot change PINs, devices, profiles, time limits, or access.</div>
                                         </div>
                                         <div class="help-item">
                                             <div class="help-item-title">What should I avoid touching at first?</div>
@@ -1936,8 +1936,8 @@
                                 <div class="card-body">
                                     <div class="help-page-map" aria-label="FilterTube page map">
                                         <div><strong>Dashboard</strong><span>See status and the buttons parents use most.</span></div>
-                                        <div><strong>Filters</strong><span>Block words, channels, comments, Shorts, and other YouTube surfaces.</span></div>
-                                        <div><strong>Kids Mode</strong><span>Manage YouTube Kids rules separately.</span></div>
+                                        <div><strong>Filters</strong><span>Block words, channels, comments, clips, and other surfaces.</span></div>
+                                        <div><strong>Kids Mode</strong><span>Manage Kids rules separately.</span></div>
                                     <div><strong>Settings</strong><span>Start a Self-Control Session, back up, restore, or import rule lists safely.</span></div>
                                         <div><strong>Accounts &amp; Sync</strong><span>Create protected profiles, set PINs, time limits, Main/Kids access, and device updates.</span></div>
                                     </div>
@@ -1960,7 +1960,7 @@
                                                     <span class="collaboration-badge">Collaboration</span>
                                                     <span class="channel-derived-badge badge-variant-kids">From Kids</span>
                                                 </div>
-                                                <div style="margin-top:6px;">Badges match row tinting: green for channel-derived, brown for comment-sourced, yellow for collaborations, Pink for YT Kids Derived.</div>
+                                                <div style="margin-top:6px;">Badges match row tinting: green for channel-derived, brown for comment-sourced, yellow for collaborations, Pink for Kids Derived.</div>
                                             </div>
                                         </div>
                                         <div class="help-item">
@@ -2004,15 +2004,15 @@
                                     <span>Optional</span>
                                 </summary>
                                 <div class="card-body">
-                                    <p>FilterTube uses two hiding paths so rules keep working as YouTube changes pages.</p>
+                                    <p>FilterTube uses two hiding paths so rules keep working as the site changes pages.</p>
                                     <div class="help-list">
                                         <div class="help-item">
-                                            <div class="help-item-title">Before YouTube draws a card</div>
-                                            <div class="help-item-body">When YouTube loads video data through JSON, FilterTube tries to remove blocked items before they appear.</div>
+                                            <div class="help-item-title">Before a card is drawn</div>
+                                            <div class="help-item-body">When the page loads video data through JSON, FilterTube tries to remove blocked items before they appear.</div>
                                         </div>
                                         <div class="help-item">
-                                            <div class="help-item-title">After YouTube changes the page</div>
-                                            <div class="help-item-body">YouTube reuses page pieces while you scroll and navigate. FilterTube checks visible cards again and hides anything that matches your rules.</div>
+                                            <div class="help-item-title">After the page changes</div>
+                                            <div class="help-item-body">The site reuses page pieces while you scroll and navigate. FilterTube checks visible cards again and hides anything that matches your rules.</div>
                                         </div>
                                     </div>
                                 </div>
@@ -2024,11 +2024,11 @@
                                     <h3>How FilterTube Works</h3>
                                 </div>
                                 <div class="card-body">
-                                    <p>FilterTube uses a hybrid approach to hide content across YouTube:</p>
+                                    <p>FilterTube uses a hybrid approach to hide content across the site:</p>
                                     <div class="help-list">
                                         <div class="help-item">
                                             <div class="help-item-title">Data interception (Zero-flash when possible)</div>
-                                            <div class="help-item-body">When YouTube loads content via JSON, FilterTube removes blocked items before they render.</div>
+                                            <div class="help-item-body">When the page loads content via JSON, FilterTube removes blocked items before they render.</div>
                                         </div>
                                         <div class="help-item">
                                             <div class="help-item-title">DOM fallback (Safety net)</div>
@@ -2071,7 +2071,7 @@
                                     <div class="help-list">
                                         <div class="help-item">
                                             <div class="help-item-title">Keywords</div>
-                                            <div class="help-item-body">Add keywords to block or always allow videos whose title, available description, YouTube tags, or visible metadata matches your list. Home and Search often provide only a short description snippet; the complete creator description and tags normally arrive with the Watch/player response. FilterTube reuses that supplied data and does not send a separate description request for every card.</div>
+                                            <div class="help-item-body">Add keywords to block or always allow videos whose title, available description, video tags, or visible metadata matches your list. Home and Search often provide only a short description snippet; the complete creator description and tags normally arrive with the Watch/player response. FilterTube reuses that supplied data and does not send a separate description request for every card.</div>
                                         </div>
                                         <div class="help-item">
                                             <div class="help-item-title">Exact</div>
@@ -2079,19 +2079,19 @@
                                         </div>
                                         <div class="help-item">
                                             <div class="help-item-title">Keyword Date pill</div>
-                                            <div class="help-item-body">Use Date for one keyword when only newer, older, or date-range videos should be affected. It uses YouTube upload/release date evidence when available. If FilterTube cannot prove the video date, that date-limited keyword does not hide the video or matching comments by itself.</div>
+                                            <div class="help-item-body">Use Date for one keyword when only newer, older, or date-range videos should be affected. It uses upload/release date evidence when available. If FilterTube cannot prove the video date, that date-limited keyword does not hide the video or matching comments by itself.</div>
                                         </div>
                                         <div class="help-item">
                                             <div class="help-item-title">Channels</div>
-                                            <div class="help-item-body">Add a channel by <b><code>UC...</code></b> or <b><code>@handle</code></b> or <b><code>/c/Name</code></b> or <b><code>/user/Name</code></b>. <br/>Channels blocked from the YouTube 3-dot menu will appear here automatically.</div>
+                                            <div class="help-item-body">Add a channel by <b><code>UC...</code></b> or <b><code>@handle</code></b> or <b><code>/c/Name</code></b> or <b><code>/user/Name</code></b>. <br/>Channels blocked from the 3-dot menu will appear here automatically.</div>
                                         </div>
                                         <div class="help-item">
                                             <div class="help-item-title">Rule list imports</div>
-                                            <div class="help-item-body">Open Settings &gt; Import / Export &gt; Rule list imports. Choose Main YouTube, YouTube Kids, or Both, then preview a CSV, TXT, raw HTTPS list, FilterTube JSON rule list, or BlockTube migration JSON before applying it. Imported rows are then reviewed and edited from the normal Main/Kids rule pages. Missing channel metadata is enriched slowly after approval for every supported import format, one row at a time.</div>
+                                            <div class="help-item-body">Open Settings &gt; Import / Export &gt; Rule list imports. Choose Main, Kids, or Both, then preview a CSV, TXT, raw HTTPS list, FilterTube JSON rule list, or BlockTube migration JSON before applying it. Imported rows are then reviewed and edited from the normal Main/Kids rule pages. Missing channel metadata is enriched slowly after approval for every supported import format, one row at a time.</div>
                                         </div>
                                         <div class="help-item">
                                             <div class="help-item-title">Filter All Content (per-channel)</div>
-                                            <div class="help-item-body">Adds the channel name as a keyword source so content mentioning that channel is also hidden (useful for Mixes, reposts, and recommendations).</div>
+                                            <div class="help-item-body">Adds the channel name as a keyword source so content mentioning that channel is also hidden (useful for auto playlists, reposts, and recommendations).</div>
                                         </div>
                                     </div>
                                 </div>
@@ -2104,8 +2104,8 @@
                                 <div class="card-body">
                                     <div class="help-list">
                                         <div class="help-item">
-                                            <div class="help-item-title">Hide Shorts</div>
-                                            <div class="help-item-body">Hides Shorts cards across YouTube surfaces.</div>
+                                            <div class="help-item-title">Hide Clips</div>
+                                            <div class="help-item-body">Hides clip cards across all surfaces.</div>
                                         </div>
                                         <div class="help-item">
                                             <div class="help-item-title">Hide All Comments</div>
@@ -2150,7 +2150,7 @@
                                             <div class="help-item-title">Export</div>
                                             <div class="help-item-body">
                                                 <ul>
-                                                    <li><strong>Full vs Active-only:</strong> Master (Default) can export all profiles; non-master is forced to “Export active profile only”.</li>
+                                                    <li><strong>Full vs Active-only:</strong> Parent (Default) can export all profiles; other profiles are forced to “Export active profile only”.</li>
                                                     <li><strong>Formats:</strong> Plain JSON or Encrypted; encrypted exports require a PIN at import.</li>
                                                     <li><strong>Destination:</strong> <code>Downloads/FilterTube Export/</code> with versioned filename.</li>
                                                 </ul>
@@ -2192,7 +2192,7 @@
                                             <div class="help-item-title">Profile types</div>
                                             <div class="help-item-body">
                                                 <ul>
-                                                    <li><strong>Default (Master):</strong> Admin for full exports, profile management, and account policy.</li>
+                                                    <li><strong>Default (Parent):</strong> Admin for full exports, profile management, and account policy.</li>
                                                     <li><strong>Account:</strong> Independent profile; can manage protected profiles.</li>
                                                     <li><strong>Protected profile:</strong> Private viewing profile with its own Main/Kids rules; rule editing and settings stay parent-managed.</li>
                                                     <li><strong>Parent-managed protected editing:</strong> A parent/account profile can use a protected profile row’s <strong>Edit Rules</strong> action without switching into that protected profile.</li>
@@ -2220,7 +2220,7 @@
                                                 <ul>
                                                     <li>New profiles inherit the creator’s auto-backup mode/format/enable state.</li>
                                                     <li>Scheduling runs on profile creation and mode/format changes only if auto-backup is enabled for that profile.</li>
-                                                    <li>Export scope toggle is disabled/forced to active-only for non-master; enabled for Master.</li>
+                                                    <li>Export scope toggle is disabled/forced to active-only for other profiles; enabled for Parent.</li>
                                                 </ul>
                                             </div>
                                         </div>
@@ -2426,7 +2426,7 @@
                                                     <li>A live Nanah session is not meant to survive a page refresh, browser restart, or tab close. Refresh ends the live pairing session.</li>
                                                     <li>Trusted links are saved locally so you do not lose the remembered relationship, but today you still start a fresh live session when reconnecting.</li>
                                                     <li>The trusted-device card now has a <strong>Start New Session</strong> shortcut that starts the next fresh session with the saved role/policy defaults.</li>
-                                                    <li>Saved trust means a faster next Send Update session. If Internet Pickup is separately configured, a protected profile can check for signed parent updates when it opens without adding YouTube page background work.</li>
+                                                    <li>Saved trust means a faster next Send Update session. If Internet Pickup is separately configured, a protected profile can check for signed parent updates when it opens without adding page background work.</li>
                                                     <li>If you try to reuse the same pairing code on the same active device session, FilterTube now blocks that locally instead of silently burning the code.</li>
                                                     <li>If no fixed target is saved on the managed replica link, non-<code>full</code> sync still writes into the receiver's current active profile at receive time.</li>
                                                     <li>If a managed replica link is saved with <strong>Always this local profile</strong>, future managed updates land in that pinned local profile even when some other profile is active on the receiving device.</li>
@@ -2445,10 +2445,10 @@
                                             </div>
                                         </div>
                                         <div class="help-item">
-                                            <div class="help-item-title">Master, account, and protected behavior</div>
+                                            <div class="help-item-title">Parent, account, and protected behavior</div>
                                             <div class="help-item-body">
                                                 <ul>
-                                                    <li><strong>Default / Master:</strong> Owns full import/export, master policy, and the broadest account controls.</li>
+                                                    <li><strong>Default / Parent:</strong> Owns full import/export, parent policy, and the broadest account controls.</li>
                                                     <li><strong>Independent account:</strong> Owns its own settings and can manage its own protected profiles, but does not gain authority over parallel accounts.</li>
                                                     <li><strong>Protected profile:</strong> A private viewing surface with its own Main/Kids rules. The profile PIN protects switching into it, but parent/account PIN controls policy and rule edits.</li>
                                                     <li><strong>Viewing spaces:</strong> A parent can set each protected profile to Kids only, Main only, or Main + Kids. New protected profiles start as Kids only.</li>
@@ -2495,7 +2495,7 @@
                                     <div class="help-list">
                                         <div class="help-item">
                                             <div class="help-item-title">Collaboration-aware blocking</div>
-                                            <div class="help-item-body">FilterTube can resolve collaborator rosters from YouTube’s watch-page and menu data so the 3-dot UI can show all channels involved in a collab instead of only the visible uploader.</div>
+                                            <div class="help-item-body">FilterTube can resolve collaborator rosters from the watch-page and menu data so the 3-dot UI can show all channels involved in a collab instead of only the visible uploader.</div>
                                         </div>
                                         <div class="help-item">
                                             <div class="help-item-title">Where collab recovery works</div>
@@ -2503,13 +2503,13 @@
                                                 <ul>
                                                     <li>Watch right rail and watch-like recommendation lockups</li>
                                                     <li>Watch-page playlist rows</li>
-                                                    <li>YouTube Music surfaces, including Mix cards seeded by collaboration videos</li>
+                                                    <li>Sangeet surfaces, including auto playlist cards seeded by collaboration videos</li>
                                                 </ul>
                                             </div>
                                         </div>
                                         <div class="help-item">
                                             <div class="help-item-title">If the menu only shows “Block Channel”</div>
-                                            <div class="help-item-body">That usually means YouTube supplied incomplete or stale card metadata. Reopen the menu or refresh the page to let FilterTube rebuild the collaboration roster from fresh watch-page data.</div>
+                                            <div class="help-item-body">That usually means the page supplied incomplete or stale card metadata. Reopen the menu or refresh the page to let FilterTube rebuild the collaboration roster from fresh watch-page data.</div>
                                         </div>
                                         <div class="help-item">
                                             <div class="help-item-title">Quick Block vs 3-dot Block item</div>
@@ -2529,12 +2529,12 @@
                                     <div class="help-list">
                                         <div class="help-item">
                                             <div class="help-item-title">Choose the default policy</div>
-                                            <div class="help-item-body"><strong>Blocklist</strong> keeps YouTube visible except for things you block. <strong>Whitelist</strong> hides by default and shows only matching allowed channels or keywords.</div>
+                                            <div class="help-item-body"><strong>Blocklist</strong> keeps everything visible except for things you block. <strong>Whitelist</strong> hides by default and shows only matching allowed channels or keywords.</div>
                                         </div>
                                         <div class="help-item">
                                             <div class="help-item-title">Add an exception without changing modes</div>
                                             <div class="help-item-body">
-                                                <p>The full Main and YouTube Kids filter pages each have a list browser. Open <strong>Blocked rules</strong> or <strong>Allowed rules</strong> to view and edit that saved collection. This only changes the list you are looking at; it does not switch <strong>Blocklist</strong> / <strong>Whitelist</strong> mode, and Kids rules remain independent from Main:</p>
+                                                <p>The full Main and Kids filter pages each have a list browser. Open <strong>Blocked rules</strong> or <strong>Allowed rules</strong> to view and edit that saved collection. This only changes the list you are looking at; it does not switch <strong>Blocklist</strong> / <strong>Whitelist</strong> mode, and Kids rules remain independent from Main:</p>
                                                 <ol style="margin: 8px 0; padding-left: 20px;">
                                                     <li>Choose <strong>Blocked</strong> to add a normal block rule.</li>
                                                     <li>Put a favorite channel or useful keyword in <strong>Allowed rules</strong>.</li>
@@ -2558,24 +2558,24 @@
                                             </div>
                                         </div>
                                         <div class="help-item">
-                                            <div class="help-item-title">Subscriptions page stays reachable</div>
-                                            <div class="help-item-body">Your subscriptions management page stays visible so you can still review and manage channels without locking yourself out.</div>
+                                            <div class="help-item-title">Following page stays reachable</div>
+                                            <div class="help-item-body">Your followed-channels page stays visible so you can still review and manage channels without locking yourself out.</div>
                                         </div>
                                         <div class="help-item">
                                             <div class="help-item-title">Creator and channel pages</div>
-                                            <div class="help-item-body">Opening a blocked channel directly redirects back to YouTube Home. Creator and channel cards still follow the same allow-only idea: if FilterTube cannot confirm a card is allowed, it chooses the safer hidden state.</div>
+                                            <div class="help-item-body">Opening a blocked channel directly redirects back to Home. Creator and channel cards still follow the same allow-only idea: if FilterTube cannot confirm a card is allowed, it chooses the safer hidden state.</div>
                                         </div>
                                         <div class="help-item">
                                             <div class="help-item-title">Direct links and embedded players</div>
-                                            <div class="help-item-body">A direct Watch, Shorts, playlist/autoplay, or embedded YouTube player cannot bypass your rules. FilterTube pauses a blocked current video and stays on that video; it does not automatically choose another video, including in a playlist. You can choose what to open next. It reuses the loaded Player response and visible Watch description first. Block selected does not hold normal playback merely because a complete description is still unavailable; Allow only selected waits when identity is required to prove the video is allowed.</div>
+                                            <div class="help-item-body">A direct Watch, Clips, playlist/autoplay, or embedded player cannot bypass your rules. FilterTube pauses a blocked current video and stays on that video; it does not automatically choose another video, including in a playlist. You can choose what to open next. It reuses the loaded Player response and visible Watch description first. Block selected does not hold normal playback merely because a complete description is still unavailable; Allow only selected waits when identity is required to prove the video is allowed.</div>
                                         </div>
                                         <div class="help-item">
                                             <div class="help-item-title">Links on Google and other websites</div>
-                                            <div class="help-item-body">FilterTube does not read or remove ordinary YouTube links on Google Search or other websites. When the link opens YouTube, the direct-access gate applies there. Embedded YouTube and privacy-enhanced YouTube players are covered inside their player frames. Hiding links on external pages would be a separate opt-in feature because it requires permission to read and modify those websites.</div>
+                                            <div class="help-item-body">FilterTube does not read or remove ordinary video links on Google Search or other websites. When the link opens the video site, the direct-access gate applies there. Embedded and privacy-enhanced players are covered inside their player frames. Hiding links on external pages would be a separate opt-in feature because it requires permission to read and modify those websites.</div>
                                         </div>
                                         <div class="help-item">
                                             <div class="help-item-title">Which rule wins?</div>
-                                            <div class="help-item-body">A video rule is more specific than a channel rule, and a channel rule is more specific than a keyword. When equally specific block and allow rules both match, allow wins. Core controls such as Hide Shorts and Hide All Comments still win over ordinary exceptions.</div>
+                                            <div class="help-item-body">A video rule is more specific than a channel rule, and a channel rule is more specific than a keyword. When equally specific block and allow rules both match, allow wins. Core controls such as Hide Clips and Hide All Comments still win over ordinary exceptions.</div>
                                         </div>
                                         <div class="help-item">
                                             <div class="help-item-title">Moving from BlockTube</div>
@@ -2593,7 +2593,7 @@
                                     <div class="help-list">
                                         <div class="help-item">
                                             <div class="help-item-title">What is a protected profile?</div>
-                                            <div class="help-item-body">A protected profile is a viewing space for a child, family member, or anyone who should watch within rules but not change those rules. It can have its own Main YouTube rules, Kids rules, PIN, and time limit.</div>
+                                            <div class="help-item-body">A protected profile is a viewing space for a child, family member, or anyone who should watch within rules but not change those rules. It can have its own Main rules, Kids rules, PIN, and time limit.</div>
                                         </div>
                                         <div class="help-item">
                                             <div class="help-item-title">Two PINs: control vs switching</div>
@@ -2613,12 +2613,12 @@
                                         </div>
                                         <div class="help-item">
                                             <div class="help-item-title">Allowed viewing spaces</div>
-                                            <div class="help-item-body">Each profile can be set to Kids only, Main only, or Main + Kids. This supports younger kids on YouTube Kids and teenagers on supervised Main YouTube without letting either edit policy.</div>
+                                            <div class="help-item-body">Each profile can be set to Kids only, Main only, or Main + Kids. This supports younger kids on Kids and teenagers on supervised Main without letting either edit policy.</div>
                                         </div>
                                         <div class="help-item">
                                             <div class="help-item-title">Family Controls</div>
                                             <div class="help-item-body">
-                                                Use the parent/account profile to create a protected profile, set Main/Kids access, set daily YouTube time, edit rules, and send updates to a verified device. The protected profile can watch within those rules, but cannot change parent controls from its own surface.
+                                                Use the parent/account profile to create a protected profile, set Main/Kids access, set daily viewing time, edit rules, and send updates to a verified device. The protected profile can watch within those rules, but cannot change parent controls from its own surface.
                                             </div>
                                         </div>
                                         <div class="help-item">
@@ -2630,13 +2630,13 @@
                                         <div class="help-item">
                                             <div class="help-item-title">When time is finished</div>
                                             <div class="help-item-body">
-                                                Daily time is counted separately for every profile that has a limit—not as one shared browser allowance. The popup shows the active profile's remaining time. YouTube and its controls stay behind a full-page FilterTube pause screen with the serene landscape only while the active profile is exhausted. A protected profile can wait for its daily reset, request more time for parent review, or switch through the normal PIN flow to another independently governed profile. Account profiles use their own policy and remaining balance, and active playback continues counting even when another extension or developer window temporarily has focus.
+                                                Daily time is counted separately for every profile that has a limit—not as one shared browser allowance. The popup shows the active profile's remaining time. The video page and its controls stay behind a full-page FilterTube pause screen with the serene landscape only while the active profile is exhausted. A protected profile can wait for its daily reset, request more time for parent review, or switch through the normal PIN flow to another independently governed profile. Account profiles use their own policy and remaining balance, and active playback continues counting even when another extension or developer window temporarily has focus.
                                             </div>
                                         </div>
                                         <div class="help-item">
-                                            <div class="help-item-title">Self-Control Session vs daily YouTube time</div>
+                                            <div class="help-item-title">Self-Control Session vs daily viewing time</div>
                                             <div class="help-item-body">
-                                                A daily limit controls how long a profile can use YouTube. A <b>Self-Control Session</b>, started from <b>Settings</b>, instead enables and freezes the active profile's current filters and settings for a countdown you choose. During that session, profile switching, filtering pause, rule edits, mode changes, and imports are blocked. It survives a browser restart, shows its countdown in the popup and dashboard, and has no FilterTube cancel button. The browser owner can still disable or uninstall an extension unless the browser or device is externally managed.
+                                                A daily limit controls how long a profile can watch. A <b>Self-Control Session</b>, started from <b>Settings</b>, instead enables and freezes the active profile's current filters and settings for a countdown you choose. During that session, profile switching, filtering pause, rule edits, mode changes, and imports are blocked. It survives a browser restart, shows its countdown in the popup and dashboard, and has no FilterTube cancel button. The browser owner can still disable or uninstall an extension unless the browser or device is externally managed.
                                             </div>
                                         </div>
                                         <div class="help-item">
@@ -2651,17 +2651,17 @@
 
                             <div class="card">
                                 <div class="card-header">
-                                    <h3>YouTube Kids</h3>
+                                    <h3>Kids</h3>
                                 </div>
                                 <div class="card-body">
                                     <div class="help-list">
                                         <div class="help-item">
                                             <div class="help-item-title">Keep Kids rules separate</div>
-                                            <div class="help-item-body">YouTube Kids has its own rules in FilterTube. Use Kids Mode when you want a different list for younger children.</div>
+                                            <div class="help-item-body">Kids has its own rules in FilterTube. Use Kids Mode when you want a different list for younger children.</div>
                                         </div>
                                         <div class="help-item">
                                             <div class="help-item-title">Parent changes stay parent-side</div>
-                                            <div class="help-item-body">FilterTube avoids adding rule-changing shortcut buttons inside YouTube Kids because a protected user could tap them. Change Kids rules from FilterTube or YouTube Kids parent controls instead.</div>
+                                            <div class="help-item-body">FilterTube avoids adding rule-changing shortcut buttons inside Kids because a protected user could tap them. Change Kids rules from FilterTube or YouTube Kids parent controls instead.</div>
                                         </div>
                                         <div class="help-item">
                                             <div class="help-item-title">YouTube blocks and FilterTube blocks are separate</div>
@@ -2683,11 +2683,11 @@
                                             <div class="help-item-body">Some YouTube Kids actions still require YouTube's linked parent account. FilterTube adds extra local rules; it does not replace YouTube's parent-account controls. See <a href="https://support.google.com/youtubekids/answer/7178746?hl=en" target="_blank" rel="noopener noreferrer">YouTube Kids Help Center</a> for YouTube-owned controls.</div>
                                         </div>
                                         <div class="help-item">
-                                            <div class="help-item-title">Using Kids rules on Main YouTube</div>
+                                            <div class="help-item-title">Using Kids rules on Main</div>
                                             <div class="help-item-body">
                                                 <ul style="margin: 8px 0; padding-left: 20px;">
-                                                    <li>Kids block rules can apply on Main YouTube when Main is also in Blocklist mode.</li>
-                                                    <li>Kids allow rules can apply on Main YouTube when Main is also in Whitelist mode.</li>
+                                                    <li>Kids block rules can apply on Main when Main is also in Blocklist mode.</li>
+                                                    <li>Kids allow rules can apply on Main when Main is also in Whitelist mode.</li>
                                                     <li>FilterTube does not flip a Kids allow-list into a Main blocklist, or a Kids blocklist into a Main allow-list.</li>
                                                     <li>Rows copied from Kids Mode are labeled so parents can see where they came from.</li>
                                                 </ul>
@@ -2709,11 +2709,11 @@
                                         </div>
                                         <div class="help-item">
                                             <div class="help-item-title">Blocked channel still appears</div>
-                                            <div class="help-item-body">YouTube sometimes reuses DOM nodes during SPA navigation. FilterTube re-scans and clears stale cached metadata, but a hard refresh can help confirm persistence.</div>
+                                            <div class="help-item-body">The site sometimes reuses DOM nodes during SPA navigation. FilterTube re-scans and clears stale cached metadata, but a hard refresh can help confirm persistence.</div>
                                         </div>
                                         <div class="help-item">
-                                            <div class="help-item-title">Subscribed-channel import</div>
-                                            <div class="help-item-body">Imported subscriptions are now captured more defensively across browsers. If the first pass looks incomplete, reopen the subscribed channels surface and let FilterTube re-capture the page data before trying again.</div>
+                                            <div class="help-item-title">Followed-channel import</div>
+                                            <div class="help-item-body">Imported followed channels are now captured more defensively across browsers. If the first pass looks incomplete, reopen the followed channels page and let FilterTube re-capture the page data before trying again.</div>
                                         </div>
                                     </div>
                                 </div>

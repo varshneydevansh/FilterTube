@@ -315,8 +315,8 @@ test('dashboard exposes explicit Main Kids rule source picker for granular manag
   assert.match(html, /id="ftNanahManagedTargetsField" hidden/);
   assert.match(html, /id="ftNanahManagedTargets"/);
   assert.match(html, /id="ftNanahManagedTargetsHint"/);
-  assert.match(html, /YouTube Main rules/);
-  assert.match(html, /YouTube Kids rules/);
+  assert.match(html, />Main rules</);
+  assert.match(html, />Kids rules</);
   assert.match(html, /value="rules_bundle">Rule bundle/);
   assert.match(source, /const ftNanahGranularSurfaceField = document\.getElementById\('ftNanahGranularSurfaceField'\)/);
   assert.match(source, /const ftNanahGranularSurface = document\.getElementById\('ftNanahGranularSurface'\)/);

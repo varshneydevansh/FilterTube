@@ -17,7 +17,7 @@ test('Help has one discoverable version-neutral feature overview', () => {
   assert.match(help, /Direct-access and description checks/);
   assert.match(help, /Safer complete BlockTube migration/);
   assert.match(help, /Official category filtering/);
-  assert.match(help, /Current Watch, Mix, comments, and YouTube layouts/);
+  assert.match(help, /Current Watch, auto playlist, comments, and page layouts/);
 });
 
 test('Help documents the user-facing safety and performance boundaries', () => {
@@ -25,9 +25,9 @@ test('Help documents the user-facing safety and performance boundaries', () => {
   assert.match(help, /browser owner can still disable or uninstall/i);
   assert.match(help, /applied as a transaction/);
   assert.match(help, /Imported JavaScript stays inactive/);
-  assert.match(help, /ordinary YouTube links on Google Search or other websites/);
+  assert.match(help, /ordinary video links on Google Search or other websites/);
   assert.match(help, /small bounded batches/);
-  assert.match(help, /comments, navigation chips, or Mix queue rows/);
+  assert.match(help, /comments, navigation chips, or auto playlist queue rows/);
 });
 
 test('Help uses a high-contrast responsive reading surface', () => {

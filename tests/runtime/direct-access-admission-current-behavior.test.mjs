@@ -742,7 +742,7 @@ test('blocked playback stays on the current video even with an allowed playlist 
   assert.doesNotMatch(admission, /toggleVisibility\(shell, true/);
   assert.match(admission, /rejection owns only this video's admission/);
   assert.match(help, /does not automatically choose another video/);
-  assert.match(help, /does not read or remove ordinary YouTube links on Google Search or other websites/);
+  assert.match(help, /does not read or remove ordinary video links on Google Search or other websites/);
   assert.match(spec, /external search-result links remain visible/);
   assert.match(spec, /youtube-nocookie\.com\/embed\//);
 });
