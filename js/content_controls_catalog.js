@@ -66,8 +66,8 @@
             controls: [
                 {
                     key: 'hideShorts',
-                    title: 'Hide Shorts',
-                    description: 'Remove all Shorts from feed'
+                    title: 'Hide Clips',
+                    description: 'Remove all short videos from feed'
                 },
                 {
                     key: 'hideHomeFeed',
@@ -89,17 +89,17 @@
                 {
                     key: 'hideSponsoredCards',
                     title: 'Send adverts to The Void',
-                    description: 'On by default. Filter advert data on YouTube and YouTube Kids. Desktop videos keep YouTube’s controls; Content-only playback can choose the main-video source when needed.'
+                    description: 'On by default. Filter advert data on Main and Kids. Desktop videos keep the site’s own controls; Content-only playback can choose the main-video source when needed.'
                 },
                 {
                     key: 'hidePlayables',
-                    title: 'Hide YouTube Playables',
+                    title: 'Hide Playables',
                     description: 'Hide Playables shelves, game cards, and navigation entries'
                 },
                 {
                     key: 'hidePlaylistCards',
                     title: 'Hide Playlist cards',
-                    description: 'Remove playlist cards across YouTube'
+                    description: 'Remove playlist cards everywhere'
                 },
                 {
                     key: 'hideMembersOnly',
@@ -108,8 +108,8 @@
                 },
                 {
                     key: 'hideMixPlaylists',
-                    title: 'Hide Mix / Radio playlists',
-                    description: 'Hide Mix and radio playlist items'
+                    title: 'Hide Auto playlists and radio',
+                    description: 'Hide auto playlist and radio playlist items'
                 },
                 {
                     key: 'showQuickBlockButton',
@@ -119,7 +119,7 @@
                 {
                     key: 'showBlockMenuItem',
                     title: '3 Dot Block menu item',
-                    description: 'Show FilterTube’s Block/Filter All entry in YouTube’s 3-dot menus'
+                    description: 'Show FilterTube’s Block/Filter All entry in the site’s 3-dot menus'
                 }
             ]
         },
@@ -173,7 +173,7 @@
                 {
                     key: 'hideVideoChannelRow',
                     title: 'Hide Channel row',
-                    description: 'Hide channel info + subscribe section'
+                    description: 'Hide channel info + follow section'
                 },
                 {
                     key: 'hideVideoDescription',
@@ -215,7 +215,7 @@
                 {
                     key: 'contentOnlyPlayback',
                     title: 'Content-only playback (Experimental)',
-                    description: 'On by default with advert filtering. Choose a main-video source automatically when needed on desktop YouTube, keeping its controls and playlist. If playback has trouble, turn off and reload the video.'
+                    description: 'On by default with advert filtering. Choose a main-video source automatically when needed on desktop, keeping the site’s controls and playlist. If playback has trouble, turn off and reload the video.'
                 },
                 {
                     key: 'alwaysUseOriginalAudio',
@@ -246,18 +246,18 @@
                 },
                 {
                     key: 'hideExploreTrending',
-                    title: 'Hide Explore and Trending',
-                    description: 'Hide Explore/Trending entries and pages'
+                    title: 'Hide Explore and Popular',
+                    description: 'Hide Explore/Popular entries and pages'
                 },
                 {
                     key: 'hideMoreFromYouTube',
-                    title: 'Hide More from YouTube',
-                    description: 'Hide the “More from YouTube” guide section'
+                    title: 'Hide More from the video service',
+                    description: 'Hide the “More from the video service” guide section'
                 },
                 {
                     key: 'hideSubscriptions',
-                    title: 'Hide Subscriptions',
-                    description: 'Hide subscriptions page and nav entry'
+                    title: 'Hide Following',
+                    description: 'Hide the followed channels page and nav entry'
                 }
             ]
         },

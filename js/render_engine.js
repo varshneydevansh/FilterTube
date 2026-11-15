@@ -320,7 +320,7 @@ const RenderEngine = (() => {
     function createKidsSyncBadge() {
         const badge = createPillBadge({
             text: 'From Kids',
-            title: 'This entry is synced from your YouTube Kids blocklist',
+            title: 'This entry is synced from your Kids blocklist',
             variantClass: 'badge-variant-kids'
         });
         setRendererCopy(badge, 'textContent', 'render.sourceKids', 'From Kids');
@@ -328,7 +328,7 @@ const RenderEngine = (() => {
             badge,
             'title',
             'render.kidsSyncBadgeTitle',
-            'This entry is synced from your YouTube Kids blocklist'
+            'This entry is synced from your Kids blocklist'
         );
         return badge;
     }
@@ -411,7 +411,7 @@ const RenderEngine = (() => {
         link.target = '_blank';
         link.rel = 'noopener noreferrer';
         setRendererCopy(link, 'title', 'render.openChannelOnYouTube',
-            'Open channel on YouTube: {url}', { url: channelUrl });
+            'Open channel page: {url}', { url: channelUrl });
         return link;
     }
 
@@ -928,7 +928,7 @@ const RenderEngine = (() => {
             const exactToggleTitleKey = entry.exact ? 'render.exactOnTooltip' : 'render.exactOffTooltip';
             const exactToggleTitleFallback = entry.exact
                 ? 'Exact is on: "{word}" must appear as its own word.'
-                : 'Exact is off: "{word}" can also match plurals or longer forms when YouTube exposes that text.';
+                : 'Exact is off: "{word}" can also match plurals or longer forms when the page shows that text.';
             const exactToggleValues = () => ({ word: String(entry.word || 'this keyword').trim() || 'this keyword' });
             setRendererCopy(exactToggle, 'title', exactToggleTitleKey, exactToggleTitleFallback, exactToggleValues);
             setRendererCopy(exactToggle, 'data-filtertube-help', exactToggleTitleKey, exactToggleTitleFallback, exactToggleValues);
@@ -1581,13 +1581,13 @@ const RenderEngine = (() => {
         if (channel?.source === 'comments') {
             const commentsBadge = createSourceBadge({
                 sourceKey: 'comments',
-                title: 'This channel was blocked from the YouTube comments menu'
+                title: 'This channel was blocked from the comments menu'
             });
             setRendererCopy(
                 commentsBadge,
                 'title',
                 'render.channelCommentsBadgeTitle',
-                'This channel was blocked from the YouTube comments menu'
+                'This channel was blocked from the comments menu'
             );
             infoGroup.appendChild(commentsBadge);
         }
@@ -2050,7 +2050,7 @@ const RenderEngine = (() => {
         }
         return rendererText(
             'render.exactOffTooltip',
-            'Exact is off: "{word}" can also match plurals or longer forms when YouTube exposes that text.',
+            'Exact is off: "{word}" can also match plurals or longer forms when the page shows that text.',
             { word }
         );
     }

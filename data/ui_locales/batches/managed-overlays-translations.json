@@ -77,7 +77,7 @@
       "{surface} necesita la aprobación de un padre o cuidador.",
       "El tiempo de visualización de hoy se ha completado.",
       "Un padre, madre o cuidador debe revisar esta regla de tiempo para {profileName} antes de que pueda continuar en {surface}.",
-      "{profileName} ha usado el tiempo de YouTube permitido para hoy. {surface} permanecerá en pausa hasta el reinicio diario o hasta que se apruebe más tiempo.",
+      "{profileName} ha usado el tiempo de visualización permitido para hoy. {surface} permanecerá en pausa hasta el reinicio diario o hasta que se apruebe más tiempo.",
       "{profileName} · {surface}",
       "Límite diario",
       "Usado hoy",
@@ -100,11 +100,11 @@
       "El PIN no es correcto.",
       "No se pudo cambiar de perfil. Inténtalo de nuevo.",
       "Solicitar más tiempo",
-      "Esta solicitud solo informa al perfil del padre o cuidador de que se necesita más tiempo. No desbloquea YouTube por sí sola.",
+      "La solicitud guardada aquí solo avisa al perfil de los padres de que se necesita más tiempo. No desbloquea la visualización por sí sola.",
       "Solicitud enviada",
-      "Solicitud guardada para que la revise un padre o cuidador. YouTube seguirá en pausa hasta que un padre o cuidador conceda más tiempo desde FilterTube.",
-      "Ya hay una solicitud reciente guardada para que la revise un padre o cuidador. YouTube seguirá en pausa hasta que se conceda más tiempo desde FilterTube.",
-      "Un padre o cuidador todavía puede abrir FilterTube y conceder más tiempo desde un perfil de confianza. Este botón no desbloqueó YouTube."
+      "Solicitud guardada para revisión de los padres. La visualización sigue en pausa hasta que un padre o cuidador conceda más tiempo desde FilterTube.",
+      "Ya hay una solicitud reciente guardada para revisión de los padres. La visualización sigue en pausa hasta que se conceda más tiempo desde FilterTube.",
+      "Un padre o cuidador puede abrir FilterTube y conceder más tiempo desde un perfil de confianza. Este botón no desbloqueó la visualización."
     ],
     "fr": [
       "Ce profil",
@@ -130,7 +130,7 @@
       "L’autorisation d’un parent ou responsable est nécessaire pour utiliser {surface}.",
       "Le temps de visionnage d’aujourd’hui est écoulé.",
       "Un parent ou responsable doit examiner cette règle de durée pour {profileName} avant que l’accès à {surface} puisse reprendre.",
-      "{profileName} a utilisé son temps YouTube autorisé aujourd’hui. {surface} reste en pause jusqu’à la réinitialisation quotidienne ou jusqu’à l’approbation de temps supplémentaire.",
+      "{profileName} a utilisé son temps de visionnage autorisé aujourd’hui. {surface} reste en pause jusqu’à la réinitialisation quotidienne ou jusqu’à l’approbation de temps supplémentaire.",
       "{profileName} · {surface}",
       "Limite quotidienne",
       "Utilisé aujourd’hui",
@@ -153,11 +153,11 @@
       "Ce PIN est incorrect.",
       "Échec du changement de profil. Réessayez.",
       "Demander plus de temps",
-      "Cette demande indique uniquement au profil parent qu’un délai supplémentaire est nécessaire. Elle ne débloque pas YouTube à elle seule.",
+      "Une demande enregistrée ici indique seulement au profil parent qu’il faut plus de temps. Elle ne débloque pas le visionnage à elle seule.",
       "Demande envoyée",
-      "Demande enregistrée pour examen par un parent. YouTube reste en pause jusqu’à ce qu’un parent ou responsable accorde plus de temps depuis FilterTube.",
-      "Une demande récente est déjà enregistrée pour examen par un parent. YouTube reste en pause jusqu’à l’octroi de temps supplémentaire depuis FilterTube.",
-      "Un parent ou responsable peut toujours ouvrir FilterTube et accorder plus de temps depuis un profil de confiance. Ce bouton n’a pas débloqué YouTube."
+      "Demande enregistrée pour examen par le parent. Le visionnage reste en pause jusqu’à ce qu’un parent ou une personne responsable accorde plus de temps depuis FilterTube.",
+      "Une demande récente est déjà enregistrée pour examen par le parent. Le visionnage reste en pause jusqu’à ce que plus de temps soit accordé depuis FilterTube.",
+      "Un parent ou une personne responsable peut toujours ouvrir FilterTube et accorder plus de temps depuis un profil de confiance. Ce bouton n’a pas débloqué le visionnage."
     ],
     "de": [
       "Dieses Profil",
@@ -183,7 +183,7 @@
       "{surface} benötigt die Genehmigung eines Elternteils oder einer Betreuungsperson.",
       "Die heutige Wiedergabezeit ist aufgebraucht.",
       "Ein Elternteil oder eine Betreuungsperson muss diese Zeitregel für {profileName} prüfen, bevor {surface} fortgesetzt werden kann.",
-      "{profileName} hat das heutige YouTube-Zeitkontingent ausgeschöpft. {surface} bleibt bis zum täglichen Reset oder bis zur Genehmigung zusätzlicher Zeit pausiert.",
+      "{profileName} hat das heutige Sehzeitkontingent ausgeschöpft. {surface} bleibt bis zum täglichen Reset oder bis zur Genehmigung zusätzlicher Zeit pausiert.",
       "{profileName} · {surface}",
       "Tageslimit",
       "Heute genutzt",
@@ -206,11 +206,11 @@
       "Diese PIN ist falsch.",
       "Profilwechsel fehlgeschlagen. Versuche es erneut.",
       "Mehr Zeit anfragen",
-      "Diese Anfrage informiert nur das Elternprofil darüber, dass mehr Zeit benötigt wird. Sie entsperrt YouTube nicht selbst.",
+      "Eine hier gespeicherte Anfrage teilt dem Elternprofil nur mit, dass mehr Zeit benötigt wird. Das Ansehen wird dadurch nicht freigeschaltet.",
       "Anfrage gesendet",
-      "Anfrage zur Prüfung durch die Eltern gespeichert. YouTube bleibt pausiert, bis ein Elternteil oder eine Betreuungsperson über FilterTube mehr Zeit gewährt.",
-      "Eine aktuelle Anfrage ist bereits zur Prüfung durch die Eltern gespeichert. YouTube bleibt pausiert, bis über FilterTube mehr Zeit gewährt wird.",
-      "Ein Elternteil oder eine Betreuungsperson kann FilterTube weiterhin öffnen und über ein vertrauenswürdiges Profil mehr Zeit gewähren. Diese Schaltfläche hat YouTube nicht entsperrt."
+      "Anfrage zur Prüfung durch die Eltern gespeichert. Das Ansehen bleibt pausiert, bis ein Elternteil oder eine Betreuungsperson in FilterTube mehr Zeit gewährt.",
+      "Eine aktuelle Anfrage ist bereits zur Prüfung durch die Eltern gespeichert. Das Ansehen bleibt pausiert, bis in FilterTube mehr Zeit gewährt wird.",
+      "Ein Elternteil oder eine Betreuungsperson kann FilterTube trotzdem öffnen und über ein vertrauenswürdiges Profil mehr Zeit gewähren. Diese Schaltfläche hat das Ansehen nicht freigeschaltet."
     ],
     "pt": [
       "Este perfil",
@@ -236,7 +236,7 @@
       "{surface} precisa da aprovação de um pai, mãe ou responsável.",
       "O tempo de visualização de hoje terminou.",
       "Um pai, mãe ou responsável precisa rever esta regra de tempo de {profileName} antes que {surface} possa continuar.",
-      "{profileName} usou a cota diária de tempo do YouTube. {surface} continuará pausado até à reposição diária ou até ser aprovado mais tempo.",
+      "{profileName} usou a cota diária de tempo de visualização. {surface} continuará pausado até a reposição diária ou até ser aprovado mais tempo.",
       "{profileName} · {surface}",
       "Limite diário",
       "Usado hoje",
@@ -259,11 +259,11 @@
       "O PIN não está correto.",
       "Falha ao mudar de perfil. Tenta novamente.",
       "Pedir mais tempo",
-      "Este pedido apenas informa o perfil dos pais de que é necessário mais tempo. Não desbloqueia o YouTube por si só.",
+      "Este pedido apenas informa o perfil dos pais de que é necessário mais tempo. Não libera a visualização por si só.",
       "Pedido enviado",
-      "Pedido guardado para revisão dos pais. O YouTube continuará pausado até que um pai, mãe ou responsável conceda mais tempo através do FilterTube.",
-      "Já existe um pedido recente guardado para revisão dos pais. O YouTube continuará pausado até ser concedido mais tempo através do FilterTube.",
-      "Um pai, mãe ou responsável ainda pode abrir o FilterTube e conceder mais tempo a partir de um perfil de confiança. Este botão não desbloqueou o YouTube."
+      "Pedido guardado para revisão dos pais. A visualização continuará pausada até que um pai, mãe ou responsável conceda mais tempo através do FilterTube.",
+      "Já existe um pedido recente guardado para revisão dos pais. A visualização continuará pausada até ser concedido mais tempo através do FilterTube.",
+      "Um pai, mãe ou responsável ainda pode abrir o FilterTube e conceder mais tempo a partir de um perfil de confiança. Este botão não liberou a visualização."
     ],
     "ru": [
       "Этот профиль",
@@ -289,7 +289,7 @@
       "Для доступа к {surface} требуется разрешение родителя или опекуна.",
       "Время просмотра на сегодня завершено.",
       "Родитель или опекун должен проверить это правило времени для профиля «{profileName}», прежде чем просмотр на {surface} продолжится.",
-      "Профиль «{profileName}» использовал дневной лимит времени YouTube. {surface} останется на паузе до ежедневного сброса или одобрения дополнительного времени.",
+      "Профиль «{profileName}» использовал дневной лимит времени просмотра. {surface} останется на паузе до ежедневного сброса или одобрения дополнительного времени.",
       "{profileName} · {surface}",
       "Дневной лимит",
       "Использовано сегодня",
@@ -312,11 +312,11 @@
       "Неверный PIN.",
       "Не удалось сменить профиль. Попробуйте ещё раз.",
       "Запросить дополнительное время",
-      "Этот запрос только сообщает родительскому профилю, что нужно больше времени. Сам по себе он не разблокирует YouTube.",
+      "Этот запрос только сообщает родительскому профилю, что нужно больше времени. Сам по себе он не разблокирует просмотр.",
       "Запрос отправлен",
-      "Запрос сохранён для проверки родителем. YouTube останется на паузе, пока родитель или опекун не предоставит дополнительное время через FilterTube.",
-      "Недавний запрос уже сохранён для проверки родителем. YouTube останется на паузе, пока через FilterTube не будет предоставлено дополнительное время.",
-      "Родитель или опекун может открыть FilterTube и предоставить дополнительное время из доверенного профиля. Эта кнопка не разблокировала YouTube."
+      "Запрос сохранён для проверки родителем. Просмотр останется на паузе, пока родитель или опекун не предоставит дополнительное время через FilterTube.",
+      "Недавний запрос уже сохранён для проверки родителем. Просмотр останется на паузе, пока через FilterTube не будет предоставлено дополнительное время.",
+      "Родитель или опекун может открыть FilterTube и предоставить дополнительное время из доверенного профиля. Эта кнопка не разблокировала просмотр."
     ],
     "zh-Hans": [
       "此配置文件",
@@ -342,7 +342,7 @@
       "{surface} 需要家长或照护者批准。",
       "今天的观看时间已用完。",
       "家长或照护者需要先审核 {profileName} 的此时间规则，之后才能继续使用 {surface}。",
-      "{profileName} 已用完今天的 YouTube 时间额度。{surface} 将保持暂停，直到每日重置或批准更多时间。",
+      "{profileName} 已用完今天的观看时间额度。{surface} 将保持暂停，直到每日重置或批准更多时间。",
       "{profileName} · {surface}",
       "每日限额",
       "今天已使用",
@@ -365,11 +365,11 @@
       "PIN 不正确。",
       "切换配置文件失败。请重试。",
       "申请更多时间",
-      "此请求只会告知家长配置文件需要更多时间，本身不会解锁 YouTube。",
+      "此请求只会告知家长配置文件需要更多时间，本身不会解锁观看。",
       "请求已发送",
-      "请求已保存，等待家长审核。家长或照护者通过 FilterTube 批准更多时间之前，YouTube 会保持暂停。",
-      "已有一条近期请求保存并等待家长审核。通过 FilterTube 批准更多时间之前，YouTube 会保持暂停。",
-      "家长或照护者仍可打开 FilterTube，并从可信配置文件批准更多时间。此按钮未能解锁 YouTube。"
+      "请求已保存，等待家长审核。家长或照护者通过 FilterTube 批准更多时间之前，观看会保持暂停。",
+      "已有一条近期请求保存并等待家长审核。通过 FilterTube 批准更多时间之前，观看会保持暂停。",
+      "家长或照护者仍可打开 FilterTube，并从可信配置文件批准更多时间。此按钮未能解锁观看。"
     ],
     "ja": [
       "このプロフィール",
@@ -395,7 +395,7 @@
       "{surface} の利用には保護者または介護者の承認が必要です。",
       "今日の視聴時間は終了しました。",
       "{surface} を再開する前に、保護者または介護者が {profileName} のこの時間ルールを確認する必要があります。",
-      "{profileName} は今日の YouTube 利用時間を使い切りました。{surface} は、日次リセットまたは追加時間の承認まで一時停止されます。",
+      "{profileName} は今日の視聴時間を使い切りました。{surface} は、日次リセットまたは追加時間の承認まで一時停止されます。",
       "{profileName} · {surface}",
       "1日の上限",
       "今日の使用時間",
@@ -418,11 +418,11 @@
       "PIN が正しくありません。",
       "プロフィールを切り替えられませんでした。もう一度お試しください。",
       "時間を追加でリクエスト",
-      "このリクエストは、追加時間が必要であることを保護者プロフィールに知らせるだけです。それだけで YouTube が解除されることはありません。",
+      "このリクエストは、追加時間が必要であることを保護者プロフィールに知らせるだけです。それだけで視聴が解除されることはありません。",
       "リクエストを送信しました",
-      "保護者の確認用にリクエストを保存しました。保護者または介護者が FilterTube から追加時間を許可するまで、YouTube は一時停止されます。",
-      "最近のリクエストはすでに保護者の確認用に保存されています。FilterTube から追加時間が許可されるまで、YouTube は一時停止されます。",
-      "保護者または介護者は、信頼できるプロフィールから FilterTube を開いて追加時間を許可できます。このボタンで YouTube が解除されたわけではありません。"
+      "保護者の確認用にリクエストを保存しました。保護者または介護者が FilterTube から追加時間を許可するまで、視聴は一時停止されます。",
+      "最近のリクエストはすでに保護者の確認用に保存されています。FilterTube から追加時間が許可されるまで、視聴は一時停止されます。",
+      "保護者または介護者は、信頼できるプロフィールから FilterTube を開いて追加時間を許可できます。このボタンで視聴が解除されたわけではありません。"
     ],
     "hi": [
       "यह प्रोफ़ाइल",
@@ -448,7 +448,7 @@
       "{surface} के लिए माता-पिता या देखभालकर्ता की मंज़ूरी ज़रूरी है।",
       "आज का देखने का समय पूरा हो गया है।",
       "{surface} फिर से चलाने से पहले माता-पिता या देखभालकर्ता को {profileName} का यह समय नियम देखना होगा।",
-      "{profileName} आज का YouTube समय भत्ता इस्तेमाल कर चुका है। {surface} दैनिक रीसेट या अतिरिक्त समय की मंज़ूरी मिलने तक रुका रहेगा।",
+      "{profileName} आज का देखने का समय भत्ता इस्तेमाल कर चुका है। {surface} दैनिक रीसेट या अतिरिक्त समय की मंज़ूरी मिलने तक रुका रहेगा।",
       "{profileName} · {surface}",
       "दैनिक सीमा",
       "आज इस्तेमाल किया",
@@ -471,11 +471,11 @@
       "यह PIN सही नहीं था।",
       "प्रोफ़ाइल बदलना विफल हुआ। फिर कोशिश करें।",
       "अधिक समय माँगें",
-      "यह अनुरोध केवल माता-पिता की प्रोफ़ाइल को बताता है कि अधिक समय चाहिए। इससे YouTube अपने-आप अनलॉक नहीं होता।",
+      "यह अनुरोध केवल माता-पिता की प्रोफ़ाइल को बताता है कि अधिक समय चाहिए। इससे देखना अपने-आप अनलॉक नहीं होता।",
       "अनुरोध भेजा गया",
-      "अनुरोध माता-पिता की समीक्षा के लिए सहेजा गया। माता-पिता या देखभालकर्ता FilterTube से अधिक समय देने तक YouTube रुका रहेगा।",
-      "माता-पिता की समीक्षा के लिए हाल का अनुरोध पहले से सहेजा गया है। FilterTube से अधिक समय मिलने तक YouTube रुका रहेगा।",
-      "माता-पिता या देखभालकर्ता अब भी किसी विश्वसनीय प्रोफ़ाइल से FilterTube खोलकर अधिक समय दे सकते हैं। इस बटन ने YouTube अनलॉक नहीं किया।"
+      "अनुरोध माता-पिता की समीक्षा के लिए सहेजा गया। माता-पिता या देखभालकर्ता FilterTube से अधिक समय देने तक देखना रुका रहेगा।",
+      "माता-पिता की समीक्षा के लिए हाल का अनुरोध पहले से सहेजा गया है। FilterTube से अधिक समय मिलने तक देखना रुका रहेगा।",
+      "माता-पिता या देखभालकर्ता अब भी किसी विश्वसनीय प्रोफ़ाइल से FilterTube खोलकर अधिक समय दे सकते हैं। इस बटन ने देखना अनलॉक नहीं किया।"
     ],
     "ar": [
       "هذا الملف الشخصي",
@@ -501,7 +501,7 @@
       "يتطلب {surface} موافقة الوالد أو مقدم الرعاية.",
       "انتهى وقت المشاهدة لهذا اليوم.",
       "على الوالد أو مقدم الرعاية مراجعة قاعدة الوقت هذه لـ {profileName} قبل متابعة {surface}.",
-      "استخدم {profileName} مخصص وقت YouTube لهذا اليوم. سيظل {surface} متوقفًا مؤقتًا حتى إعادة الضبط اليومية أو الموافقة على وقت إضافي.",
+      "استخدم {profileName} مخصص وقت المشاهدة لهذا اليوم. سيظل {surface} متوقفًا مؤقتًا حتى إعادة الضبط اليومية أو الموافقة على وقت إضافي.",
       "{profileName} · {surface}",
       "الحد اليومي",
       "المستخدم اليوم",
@@ -524,11 +524,11 @@
       "PIN غير صحيح.",
       "فشل تبديل الملف الشخصي. حاول مجددًا.",
       "طلب وقت إضافي",
-      "يُعلم هذا الطلب ملف الوالد فقط بالحاجة إلى مزيد من الوقت. ولا يفتح YouTube من تلقاء نفسه.",
+      "يُعلم هذا الطلب ملف الوالد فقط بالحاجة إلى مزيد من الوقت. ولا يفتح المشاهدة من تلقاء نفسه.",
       "تم إرسال الطلب",
-      "حُفظ الطلب لمراجعة الوالد. سيظل YouTube متوقفًا مؤقتًا حتى يمنح الوالد أو مقدم الرعاية وقتًا إضافيًا من FilterTube.",
-      "يوجد بالفعل طلب حديث محفوظ لمراجعة الوالد. سيظل YouTube متوقفًا مؤقتًا حتى يُمنح وقت إضافي من FilterTube.",
-      "لا يزال بإمكان الوالد أو مقدم الرعاية فتح FilterTube ومنح وقت إضافي من ملف موثوق. هذا الزر لم يفتح YouTube."
+      "حُفظ الطلب لمراجعة الوالد. ستظل المشاهدة متوقفة مؤقتًا حتى يمنح الوالد أو مقدم الرعاية وقتًا إضافيًا من FilterTube.",
+      "يوجد بالفعل طلب حديث محفوظ لمراجعة الوالد. ستظل المشاهدة متوقفة مؤقتًا حتى يُمنح وقت إضافي من FilterTube.",
+      "لا يزال بإمكان الوالد أو مقدم الرعاية فتح FilterTube ومنح وقت إضافي من ملف موثوق. هذا الزر لم يفتح المشاهدة."
     ],
     "bn": [
       "এই প্রোফাইল",
@@ -554,7 +554,7 @@
       "{surface} ব্যবহারের জন্য অভিভাবক বা পরিচর্যাকারীর অনুমোদন দরকার।",
       "আজকের দেখার সময় শেষ।",
       "{surface} চালিয়ে যাওয়ার আগে অভিভাবক বা পরিচর্যাকারীকে {profileName}-এর এই সময়সীমার নিয়মটি পর্যালোচনা করতে হবে।",
-      "{profileName} আজকের YouTube সময়সীমা ব্যবহার করে ফেলেছে। দৈনিক রিসেট না হওয়া বা অতিরিক্ত সময় অনুমোদন না পাওয়া পর্যন্ত {surface} থামানো থাকবে।",
+      "{profileName} আজকের দেখার সময়সীমা ব্যবহার করে ফেলেছে। দৈনিক রিসেট না হওয়া বা অতিরিক্ত সময় অনুমোদন না পাওয়া পর্যন্ত {surface} থামানো থাকবে।",
       "{profileName} · {surface}",
       "দৈনিক সীমা",
       "আজ ব্যবহার হয়েছে",
@@ -577,11 +577,11 @@
       "PIN সঠিক ছিল না।",
       "প্রোফাইল বদলানো যায়নি। আবার চেষ্টা করুন।",
       "আরও সময়ের অনুরোধ করুন",
-      "এই অনুরোধ শুধু অভিভাবক প্রোফাইলকে জানায় যে আরও সময় দরকার। এটি নিজে থেকে YouTube আনলক করে না।",
+      "এখানে সংরক্ষিত অনুরোধ শুধু অভিভাবক প্রোফাইলকে জানায় যে আরও সময় দরকার। এটি নিজে দেখা চালু করে না।",
       "অনুরোধ পাঠানো হয়েছে",
-      "অভিভাবকের পর্যালোচনার জন্য অনুরোধ সংরক্ষিত হয়েছে। অভিভাবক বা পরিচর্যাকারী FilterTube থেকে আরও সময় না দেওয়া পর্যন্ত YouTube থামানো থাকবে।",
-      "অভিভাবকের পর্যালোচনার জন্য সাম্প্রতিক একটি অনুরোধ ইতিমধ্যেই সংরক্ষিত আছে। FilterTube থেকে আরও সময় না দেওয়া পর্যন্ত YouTube থামানো থাকবে।",
-      "অভিভাবক বা পরিচর্যাকারী এখনও বিশ্বস্ত প্রোফাইল থেকে FilterTube খুলে আরও সময় দিতে পারেন। এই বোতাম YouTube আনলক করেনি।"
+      "অনুরোধ অভিভাবকের পর্যালোচনার জন্য সংরক্ষিত হয়েছে। অভিভাবক বা পরিচর্যাকারী FilterTube থেকে আরও সময় না দেওয়া পর্যন্ত দেখা বন্ধ থাকবে।",
+      "সাম্প্রতিক একটি অনুরোধ আগেই অভিভাবকের পর্যালোচনার জন্য সংরক্ষিত আছে। FilterTube থেকে আরও সময় না দেওয়া পর্যন্ত দেখা বন্ধ থাকবে।",
+      "অভিভাবক বা পরিচর্যাকারী এখনও FilterTube খুলে বিশ্বস্ত প্রোফাইল থেকে আরও সময় দিতে পারেন। এই বোতাম দেখা চালু করেনি।"
     ],
     "id": [
       "Profil ini",
@@ -607,7 +607,7 @@
       "{surface} memerlukan persetujuan orang tua atau pengasuh.",
       "Waktu menonton hari ini telah habis.",
       "Orang tua atau pengasuh harus meninjau aturan waktu ini untuk {profileName} sebelum {surface} dapat dilanjutkan.",
-      "{profileName} telah memakai jatah waktu YouTube hari ini. {surface} tetap dijeda hingga reset harian atau hingga waktu tambahan disetujui.",
+      "{profileName} telah memakai jatah waktu menonton hari ini. {surface} tetap dijeda hingga reset harian atau hingga waktu tambahan disetujui.",
       "{profileName} · {surface}",
       "Batas harian",
       "Digunakan hari ini",
@@ -630,11 +630,11 @@
       "PIN tersebut salah.",
       "Gagal beralih profil. Coba lagi.",
       "Minta waktu tambahan",
-      "Permintaan ini hanya memberi tahu profil orang tua bahwa waktu tambahan diperlukan. Permintaan ini tidak membuka YouTube dengan sendirinya.",
+      "Permintaan ini hanya memberi tahu profil orang tua bahwa waktu tambahan diperlukan. Permintaan ini tidak membuka akses menonton dengan sendirinya.",
       "Permintaan terkirim",
-      "Permintaan disimpan untuk ditinjau orang tua. YouTube tetap dijeda sampai orang tua atau pengasuh memberikan waktu tambahan melalui FilterTube.",
-      "Permintaan terbaru sudah disimpan untuk ditinjau orang tua. YouTube tetap dijeda sampai waktu tambahan diberikan melalui FilterTube.",
-      "Orang tua atau pengasuh tetap dapat membuka FilterTube dan memberikan waktu tambahan dari profil tepercaya. Tombol ini tidak membuka YouTube."
+      "Permintaan disimpan untuk ditinjau orang tua. Menonton tetap dijeda sampai orang tua atau pengasuh memberikan waktu tambahan melalui FilterTube.",
+      "Permintaan terbaru sudah disimpan untuk ditinjau orang tua. Menonton tetap dijeda sampai waktu tambahan diberikan melalui FilterTube.",
+      "Orang tua atau pengasuh tetap dapat membuka FilterTube dan memberikan waktu tambahan dari profil tepercaya. Tombol ini tidak membuka akses menonton."
     ],
     "ur": [
       "یہ پروفائل",
@@ -660,7 +660,7 @@
       "{surface} کے لیے والد یا نگہبان کی منظوری درکار ہے۔",
       "آج دیکھنے کا وقت مکمل ہوگیا ہے۔",
       "{surface} جاری رکھنے سے پہلے والد یا نگہبان کو {profileName} کا یہ وقت کا اصول دیکھنا ہوگا۔",
-      "{profileName} آج کا YouTube وقت استعمال کر چکا ہے۔ {surface} روزانہ ری سیٹ ہونے یا مزید وقت منظور ہونے تک رکا رہے گا۔",
+      "{profileName} آج کا دیکھنے کا وقت استعمال کر چکا ہے۔ {surface} روزانہ ری سیٹ ہونے یا مزید وقت منظور ہونے تک رکا رہے گا۔",
       "{profileName} · {surface}",
       "روزانہ حد",
       "آج استعمال شدہ",
@@ -683,11 +683,11 @@
       "PIN درست نہیں تھا۔",
       "پروفائل تبدیل نہیں ہوسکا۔ دوبارہ کوشش کریں۔",
       "مزید وقت کی درخواست کریں",
-      "یہ درخواست صرف والد کے پروفائل کو بتاتی ہے کہ مزید وقت درکار ہے۔ اس سے YouTube خود نہیں کھلتا۔",
+      "یہاں محفوظ درخواست صرف والدین کے پروفائل کو بتاتی ہے کہ مزید وقت درکار ہے۔ یہ خود سے دیکھنا غیر مقفل نہیں کرتی۔",
       "درخواست بھیج دی گئی",
-      "درخواست والد کی جانچ کے لیے محفوظ ہوگئی۔ والد یا نگہبان FilterTube سے مزید وقت دینے تک YouTube رکا رہے گا۔",
-      "والد کی جانچ کے لیے ایک حالیہ درخواست پہلے ہی محفوظ ہے۔ FilterTube سے مزید وقت ملنے تک YouTube رکا رہے گا۔",
-      "والد یا نگہبان اب بھی کسی قابلِ اعتماد پروفائل سے FilterTube کھول کر مزید وقت دے سکتے ہیں۔ اس بٹن نے YouTube نہیں کھولا۔"
+      "درخواست والدین کے جائزے کے لیے محفوظ ہو گئی۔ جب تک والدین یا نگہداشت کرنے والا FilterTube سے مزید وقت نہ دے، دیکھنا رکا رہے گا۔",
+      "ایک حالیہ درخواست پہلے ہی والدین کے جائزے کے لیے محفوظ ہے۔ جب تک FilterTube سے مزید وقت نہ دیا جائے، دیکھنا رکا رہے گا۔",
+      "والدین یا نگہداشت کرنے والا اب بھی FilterTube کھول کر قابل اعتماد پروفائل سے مزید وقت دے سکتا ہے۔ اس بٹن نے دیکھنا غیر مقفل نہیں کیا۔"
     ],
     "pcm": [
       "Dis profile",
@@ -713,7 +713,7 @@
       "Parent or caregiver need to approve {surface}.",
       "Today watching time don finish.",
       "Parent or caregiver gats review dis time rule for {profileName} before {surface} fit continue.",
-      "{profileName} don use all im YouTube time for today. {surface} go remain paused until daily reset or dem approve extra time.",
+      "{profileName} don use today viewing time finish. {surface} go dey pause until daily reset or until dem approve more time.",
       "{profileName} · {surface}",
       "Limit for each day",
       "Use today",
@@ -736,11 +736,11 @@
       "Dat PIN no correct.",
       "Profile switch no work. Try again.",
       "Ask make dem add time",
-      "Dis request only tell the parent profile say more time dey needed. E no unlock YouTube by itself.",
+      "Request wey you save here na only to tell parent profile say you need more time. E no dey unlock viewing by itself.",
       "Request don send",
-      "Dem save request make parent review am. YouTube go remain paused until parent or caregiver grant more time from FilterTube.",
-      "Dem don already save recent request make parent review am. YouTube go remain paused until dem grant more time from FilterTube.",
-      "Parent or caregiver still fit open FilterTube and grant more time from trusted profile. Dis button no unlock YouTube."
+      "Request don save for parent to check. Viewing go dey pause until parent or caregiver give more time from FilterTube.",
+      "Recent request don already save for parent to check. Viewing go dey pause until dem give more time from FilterTube.",
+      "Parent or caregiver fit still open FilterTube and give more time from trusted profile. Dis button no unlock viewing."
     ],
     "arz": [
       "الملف ده",
@@ -766,7 +766,7 @@
       "استخدام {surface} محتاج موافقة الأب أو مقدم الرعاية.",
       "وقت المشاهدة بتاع النهارده خلص.",
       "الأب أو مقدم الرعاية لازم يراجع قاعدة الوقت دي لـ {profileName} قبل ما استخدام {surface} يكمل.",
-      "{profileName} استخدم وقت YouTube المسموح بيه النهارده كله. {surface} هيفضل متوقف لحد التجديد اليومي أو الموافقة على وقت زيادة.",
+      "{profileName} استخدم وقت المشاهدة المسموح بيه النهارده كله. {surface} هيفضل متوقف لحد التجديد اليومي أو الموافقة على وقت زيادة.",
       "{profileName} · {surface}",
       "الحد اليومي",
       "المستخدم النهارده",
@@ -789,11 +789,11 @@
       "الـ PIN ده مش صح.",
       "تبديل الملف فشل. جرب تاني.",
       "اطلب وقت زيادة",
-      "الطلب ده بيبلغ ملف ولي الأمر بس إن في احتياج لوقت زيادة. هو مش بيفتح YouTube لوحده.",
+      "يُعلم هذا الطلب ملف الوالد فقط بالحاجة إلى مزيد من الوقت. ولا يفتح المشاهدة من تلقاء نفسه.",
       "الطلب اتبعت",
-      "الطلب اتحفظ لمراجعة ولي الأمر. YouTube هيفضل متوقف لحد ما الأب أو مقدم الرعاية يدي وقت زيادة من FilterTube.",
-      "في طلب قريب متحفظ بالفعل لمراجعة ولي الأمر. YouTube هيفضل متوقف لحد ما يتمنح وقت زيادة من FilterTube.",
-      "الأب أو مقدم الرعاية يقدر لسه يفتح FilterTube ويدي وقت زيادة من ملف موثوق. الزر ده ما فتحش YouTube."
+      "حُفظ الطلب لمراجعة الوالد. ستظل المشاهدة متوقفة مؤقتًا حتى يمنح الوالد أو مقدم الرعاية وقتًا إضافيًا من FilterTube.",
+      "يوجد بالفعل طلب حديث محفوظ لمراجعة الوالد. ستظل المشاهدة متوقفة مؤقتًا حتى يُمنح وقت إضافي من FilterTube.",
+      "لا يزال بإمكان الوالد أو مقدم الرعاية فتح FilterTube ومنح وقت إضافي من ملف موثوق. هذا الزر لم يفتح المشاهدة."
     ],
     "mr": [
       "हे प्रोफाइल",
@@ -819,7 +819,7 @@
       "{surface} साठी पालक किंवा काळजीवाहकाची मंजुरी आवश्यक आहे.",
       "आजचा पाहण्याचा वेळ संपला आहे.",
       "{surface} पुन्हा सुरू करण्यापूर्वी पालक किंवा काळजीवाहकाने {profileName} चा हा वेळेचा नियम तपासणे आवश्यक आहे.",
-      "{profileName} ने आजचा YouTube वेळ वापरून संपवला आहे. दैनिक रीसेट होईपर्यंत किंवा अधिक वेळ मंजूर होईपर्यंत {surface} थांबलेले राहील.",
+      "{profileName} ने आजचा पाहण्याचा वेळ वापरला आहे. दैनिक रीसेट होईपर्यंत किंवा अधिक वेळ मंजूर होईपर्यंत {surface} थांबलेले राहील.",
       "{profileName} · {surface}",
       "दैनिक मर्यादा",
       "आज वापरलेला वेळ",
@@ -842,11 +842,11 @@
       "ते PIN चुकीचे होते.",
       "प्रोफाइल बदलता आले नाही. पुन्हा प्रयत्न करा.",
       "अधिक वेळ मागा",
-      "ही विनंती फक्त पालक प्रोफाइलला अधिक वेळ हवा असल्याचे सांगते. ती स्वतःहून YouTube अनलॉक करत नाही.",
+      "येथे जतन केलेली विनंती फक्त पालक प्रोफाइलला अधिक वेळ हवा असल्याचे कळवते. ती स्वतःहून पाहणे अनलॉक करत नाही.",
       "विनंती पाठवली",
-      "पालकांच्या तपासणीसाठी विनंती जतन केली. पालक किंवा काळजीवाहक FilterTube मधून अधिक वेळ देईपर्यंत YouTube थांबलेले राहील.",
-      "पालकांच्या तपासणीसाठी अलीकडील विनंती आधीच जतन केली आहे. FilterTube मधून अधिक वेळ मिळेपर्यंत YouTube थांबलेले राहील.",
-      "पालक किंवा काळजीवाहक अजूनही विश्वासार्ह प्रोफाइलमधून FilterTube उघडून अधिक वेळ देऊ शकतात. या बटणाने YouTube अनलॉक केले नाही."
+      "विनंती पालकांच्या पुनरावलोकनासाठी जतन केली. पालक किंवा काळजीवाहक FilterTube मधून अधिक वेळ देईपर्यंत पाहणे थांबलेले राहील.",
+      "अलीकडील विनंती आधीच पालकांच्या पुनरावलोकनासाठी जतन आहे. FilterTube मधून अधिक वेळ मिळेपर्यंत पाहणे थांबलेले राहील.",
+      "पालक किंवा काळजीवाहक अजूनही FilterTube उघडून विश्वासार्ह प्रोफाइलमधून अधिक वेळ देऊ शकतात. या बटणाने पाहणे अनलॉक झाले नाही."
     ],
     "vi": [
       "Hồ sơ này",
@@ -872,7 +872,7 @@
       "Cần cha mẹ hoặc người giám hộ phê duyệt để dùng {surface}.",
       "Thời gian xem hôm nay đã hết.",
       "Cha mẹ hoặc người giám hộ cần xem xét quy tắc thời gian này của {profileName} trước khi có thể tiếp tục dùng {surface}.",
-      "{profileName} đã dùng hết thời lượng YouTube được phép hôm nay. {surface} sẽ tạm dừng cho đến lần đặt lại hằng ngày hoặc khi được duyệt thêm thời gian.",
+      "{profileName} đã dùng hết thời gian xem được phép hôm nay. {surface} sẽ tạm dừng cho đến lần đặt lại hằng ngày hoặc khi được duyệt thêm thời gian.",
       "{profileName} · {surface}",
       "Giới hạn hằng ngày",
       "Đã dùng hôm nay",
@@ -895,11 +895,11 @@
       "PIN không chính xác.",
       "Chuyển hồ sơ thất bại. Hãy thử lại.",
       "Yêu cầu thêm thời gian",
-      "Yêu cầu này chỉ báo cho hồ sơ cha mẹ biết rằng cần thêm thời gian. Yêu cầu không tự mở khóa YouTube.",
+      "Yêu cầu này chỉ báo cho hồ sơ cha mẹ biết rằng cần thêm thời gian. Yêu cầu không tự mở khóa việc xem.",
       "Đã gửi yêu cầu",
-      "Đã lưu yêu cầu để cha mẹ xem xét. YouTube vẫn tạm dừng cho đến khi cha mẹ hoặc người giám hộ cấp thêm thời gian trong FilterTube.",
-      "Một yêu cầu gần đây đã được lưu để cha mẹ xem xét. YouTube vẫn tạm dừng cho đến khi có thêm thời gian được cấp trong FilterTube.",
-      "Cha mẹ hoặc người giám hộ vẫn có thể mở FilterTube và cấp thêm thời gian từ hồ sơ đáng tin cậy. Nút này không mở khóa YouTube."
+      "Đã lưu yêu cầu để cha mẹ xem xét. Việc xem vẫn tạm dừng cho đến khi cha mẹ hoặc người giám hộ cấp thêm thời gian trong FilterTube.",
+      "Một yêu cầu gần đây đã được lưu để cha mẹ xem xét. Việc xem vẫn tạm dừng cho đến khi có thêm thời gian được cấp trong FilterTube.",
+      "Cha mẹ hoặc người giám hộ vẫn có thể mở FilterTube và cấp thêm thời gian từ hồ sơ đáng tin cậy. Nút này không mở khóa việc xem."
     ],
     "te": [
       "ఈ ప్రొఫైల్",
@@ -925,7 +925,7 @@
       "{surface}కు తల్లిదండ్రులు లేదా సంరక్షకుల ఆమోదం అవసరం.",
       "ఈరోజు వీక్షణ సమయం పూర్తయింది.",
       "{surface}ను కొనసాగించే ముందు {profileName} సమయ నియమాన్ని తల్లిదండ్రులు లేదా సంరక్షకులు సమీక్షించాలి.",
-      "{profileName} ఈరోజు YouTube సమయ కేటాయింపును పూర్తిగా ఉపయోగించింది. రోజువారీ రీసెట్ అయ్యే వరకు లేదా అదనపు సమయం ఆమోదించే వరకు {surface} పాజ్‌లో ఉంటుంది.",
+      "{profileName} నేటి వీక్షణ సమయాన్ని ఉపయోగించేసింది. రోజువారీ రీసెట్ వరకు లేదా అదనపు సమయం ఆమోదించే వరకు {surface} పాజ్‌లో ఉంటుంది.",
       "{profileName} · {surface}",
       "రోజువారీ పరిమితి",
       "ఈరోజు ఉపయోగించినది",
@@ -948,11 +948,11 @@
       "ఆ PIN సరైంది కాదు.",
       "ప్రొఫైల్ మార్పు విఫలమైంది. మళ్లీ ప్రయత్నించండి.",
       "మరింత సమయం కోరండి",
-      "ఈ అభ్యర్థనకు మరింత సమయం అవసరమని తల్లిదండ్రుల ప్రొఫైల్‌కు తెలియజేయడం మాత్రమే సాధ్యం. ఇది స్వయంగా YouTubeను అన్‌లాక్ చేయదు.",
+      "ఇక్కడ సేవ్ చేసిన అభ్యర్థన అదనపు సమయం అవసరమని తల్లిదండ్రుల ప్రొఫైల్‌కు మాత్రమే తెలియజేస్తుంది. ఇది దానంతట అదే వీక్షణను అన్‌లాక్ చేయదు.",
       "అభ్యర్థన పంపబడింది",
-      "తల్లిదండ్రుల సమీక్ష కోసం అభ్యర్థన సేవ్ చేయబడింది. FilterTube ద్వారా తల్లిదండ్రులు లేదా సంరక్షకులు మరింత సమయం ఇచ్చేవరకు YouTube పాజ్‌లో ఉంటుంది.",
-      "తల్లిదండ్రుల సమీక్ష కోసం ఇటీవలి అభ్యర్థన ఇప్పటికే సేవ్ చేయబడింది. FilterTube ద్వారా మరింత సమయం ఇచ్చేవరకు YouTube పాజ్‌లో ఉంటుంది.",
-      "నమ్మకమైన ప్రొఫైల్ నుంచి తల్లిదండ్రులు లేదా సంరక్షకులు FilterTube తెరిచి మరింత సమయం ఇవ్వవచ్చు. ఈ బటన్ YouTubeను అన్‌లాక్ చేయలేదు."
+      "అభ్యర్థన తల్లిదండ్రుల సమీక్ష కోసం సేవ్ చేయబడింది. తల్లిదండ్రులు లేదా సంరక్షకులు FilterTube నుండి అదనపు సమయం ఇచ్చే వరకు వీక్షణ పాజ్‌లో ఉంటుంది.",
+      "ఇటీవలి అభ్యర్థన ఇప్పటికే తల్లిదండ్రుల సమీక్ష కోసం సేవ్ చేయబడింది. FilterTube నుండి అదనపు సమయం ఇచ్చే వరకు వీక్షణ పాజ్‌లో ఉంటుంది.",
+      "తల్లిదండ్రులు లేదా సంరక్షకులు ఇప్పటికీ FilterTubeను తెరిచి విశ్వసనీయ ప్రొఫైల్ నుండి అదనపు సమయం ఇవ్వగలరు. ఈ బటన్ వీక్షణను అన్‌లాక్ చేయలేదు."
     ],
     "sw": [
       "Wasifu huu",
@@ -978,7 +978,7 @@
       "{surface} inahitaji idhini ya mzazi au mlezi.",
       "Muda wa kutazama wa leo umekwisha.",
       "Mzazi au mlezi lazima akague kanuni hii ya muda ya {profileName} kabla ya kuendelea na {surface}.",
-      "{profileName} ametumia muda wote wa YouTube wa leo. {surface} itasalia imesitishwa hadi muda wa kila siku uweke upya au muda zaidi uidhinishwe.",
+      "{profileName} ametumia muda wa kutazama wa leo. {surface} itabaki imesitishwa hadi kuwekwa upya kwa kila siku au hadi muda zaidi uidhinishwe.",
       "{profileName} · {surface}",
       "Kikomo cha kila siku",
       "Uliotumika leo",
@@ -1001,11 +1001,11 @@
       "PIN hiyo si sahihi.",
       "Imeshindwa kubadili wasifu. Jaribu tena.",
       "Omba muda zaidi",
-      "Ombi hili hujulisha tu wasifu wa mzazi kwamba muda zaidi unahitajika. Halifungui YouTube lenyewe.",
+      "Ombi lililohifadhiwa hapa humjulisha tu wasifu wa mzazi kuwa muda zaidi unahitajika. Halifungui kutazama lenyewe.",
       "Ombi limetumwa",
-      "Ombi limehifadhiwa ili mzazi alikague. YouTube itasalia imesitishwa hadi mzazi au mlezi atoe muda zaidi kupitia FilterTube.",
-      "Ombi la hivi karibuni tayari limehifadhiwa ili mzazi alikague. YouTube itasalia imesitishwa hadi muda zaidi utolewe kupitia FilterTube.",
-      "Mzazi au mlezi bado anaweza kufungua FilterTube na kutoa muda zaidi kutoka kwa wasifu unaoaminika. Kitufe hiki hakikufungua YouTube."
+      "Ombi limehifadhiwa ili mzazi alikague. Kutazama kutabaki kumesitishwa hadi mzazi au mlezi atoe muda zaidi kupitia FilterTube.",
+      "Ombi la hivi karibuni tayari limehifadhiwa ili mzazi alikague. Kutazama kutabaki kumesitishwa hadi muda zaidi utolewe kupitia FilterTube.",
+      "Mzazi au mlezi bado anaweza kufungua FilterTube na kutoa muda zaidi kutoka kwa wasifu unaoaminika. Kitufe hiki hakikufungua kutazama."
     ]
   }
 }

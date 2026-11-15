@@ -1,7 +1,7 @@
 {
   "english": {
     "dashboard.modal.remaining.whereShouldThisListApply": "Where Should This List Apply?",
-    "dashboard.modal.remaining.chooseTheYouTubeSpaceForTheseRulesFilterTubeWillRespectEachProtectedProfileCurrentBlocklistWhitelistMode": "Choose the YouTube space for these rules. FilterTube will respect each protected profile current Blocklist/Whitelist mode.",
+    "dashboard.modal.remaining.chooseTheYouTubeSpaceForTheseRulesFilterTubeWillRespectEachProtectedProfileCurrentBlocklistWhitelistMode": "Choose the space (Main or Kids) for these rules. FilterTube will respect each protected profile current Blocklist/Whitelist mode.",
     "dashboard.modal.remaining.sendRemovalUpdateNow": "Send removal update now?",
     "dashboard.modal.remaining.managedProtectedTargetRequired": "Managed protected target required",
     "dashboard.modal.remaining.forProtectedProfilesFilterTubeBlocksSendAnywayInThisSituationSoTheUpdateDoesNotLandInTheWrongRemoteProfile": "For protected profiles, FilterTube blocks \"send anyway\" in this situation so the update does not land in the wrong remote profile.",

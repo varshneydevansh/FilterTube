@@ -47,7 +47,7 @@ test('actual subscription renderer localizes progress without mutating state or 
     'dashboard.subscriptionStatus.pageReadOther': 'Pages read: {count}'
   };
   const { context, status, notice } = harness(translations);
-  const state = { phase: 'fetching', tone: 'info', message: 'Reading subscribed channels from My private tab <🙂>…', meta: '2 new • 3 pages read', inProgress: true, canEnableWhitelist: false, requestId: 'secret-request-id', sourceTabId: 123 };
+  const state = { phase: 'fetching', tone: 'info', message: 'Reading followed channels from My private tab <🙂>…', meta: '2 new • 3 pages read', inProgress: true, canEnableWhitelist: false, requestId: 'secret-request-id', sourceTabId: 123 };
   const snapshot = JSON.stringify(state);
   context.subscriptionsImportState = state;
   context.run();
@@ -66,7 +66,7 @@ test('unknown runtime details pass through and singular/plural progress resolves
     'dashboard.subscriptionStatus.collectedOther': 'Channel count: {count}'
   });
   for (const [count, noun, expected] of [[1, 'channel', 'One channel: 1'], [0, 'channels', 'Channel count: 0'], [2, 'channels', 'Channel count: 2'], [5, 'channels', 'Channel count: 5']]) {
-    context.subscriptionsImportState = { phase: 'fetching', tone: 'info', inProgress: true, message: `Collected ${count} subscribed ${noun} so far.`, meta: '' };
+    context.subscriptionsImportState = { phase: 'fetching', tone: 'info', inProgress: true, message: `Collected ${count} followed ${noun} so far.`, meta: '' };
     context.run();
     assert.equal(status.textContent, expected);
   }

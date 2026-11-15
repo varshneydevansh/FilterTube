@@ -57,7 +57,7 @@
   ],
   "translations": {
     "fil": [
-      "Madalas baguhin ng YouTube ang ayos ng mga page nito. Makakatulong ang mabilis na ulat para ma-update ng FilterTube ang pagtutugma bago pa maapektuhan ang mas marami pang pamilya.",
+      "Madalas baguhin ng video site ang istruktura ng mga page nito. Nakakatulong ang mabilis na ulat para ma-update ng FilterTube ang matching logic bago maapektuhan ang mas maraming pamilya.",
       "Kopyahin ang kasalukuyang bukas na profile papunta sa sarili mong pangalawang device. Hindi kailangan ng protected profile o PIN. Lumipat muna ng profile kung ibang profile ang kokopyahin.",
       "Gumawa lang ng protected child/user profile kung kailangan mo ng mga panuntunang pinamamahalaan ng magulang, limitasyon sa oras, o pahintulot sa panonood.",
       "Ipadala ang mga panuntunan, oras, at pahintulot sa panonood na inaprubahan ng magulang sa kasalukuyang protected profile. Gamitin ito kapag parehong bukas ang mga device.",
@@ -88,7 +88,7 @@
       "Buksan lamang kapag kailangan mong ayusin ang link, pumili ng mas maliit na saklaw ng panuntunan, o baguhin ang gawi ng merge kumpara sa replace.",
       "Tinutukoy ng ugnayan kung magpapadala, tatanggap, o minsanang kokopya lang ng setting ang device na ito. Ginagamit ng kontrol ng pamilya ang default na magulang-patungo-sa-protected.",
       "Tinutukoy ng saklaw kung ano ang ipapadala: kasalukuyang profile, mga panuntunan ng Main, mga panuntunan ng Kids, mga keyword, channel, limitasyon sa oras, o buong backup.",
-      "Para sa pagpapadala ng mga panuntunan sa keyword, channel, at video, piliin kung lokal na mga panuntunan ng Main YouTube o YouTube Kids ang gagamitin.",
+      "Para sa pagpapadala ng keyword, channel, at video rule, piliin kung ang lokal na rule ng Main o Kids ang gagamitin.",
       "Lalabas dito ang mga naka-save na protected profile mula sa nakakonektang device kapag maaari silang direktang piliin bilang target.",
       "Idinadagdag ng merge ang mga piniling panuntunan. Pinapalitan ng replace ang napiling saklaw lamang para sa mga pinamamahalaang protected device.",
       "Gumawa ng pairing code o QR sa device na ito. Dapat sumali ang kabilang device at magpakita ng kaparehong safety phrase.",
@@ -113,7 +113,7 @@
       "Ang naka-save na tiwala ay hindi live na koneksyon at hindi kailanman lumalaktaw sa lokal na pagpapatunay."
     ],
     "ta": [
-      "YouTube அதன் பக்க அமைப்பை அடிக்கடி மாற்றுகிறது. விரைவான அறிக்கை, மேலும் குடும்பங்கள் பாதிக்கப்படுவதற்கு முன் பொருத்தும் முறையை FilterTube புதுப்பிக்க உதவும்.",
+      "வீடியோ தளம் தன் பக்க அமைப்பை அடிக்கடி மாற்றுகிறது. மேலும் பல குடும்பங்கள் பாதிக்கப்படுவதற்கு முன் FilterTube பொருத்தல் தர்க்கத்தைப் புதுப்பிக்க ஒரு சிறு அறிக்கை உதவுகிறது.",
       "தற்போது திறந்திருக்கும் சுயவிவரத்தை உங்கள் இரண்டாவது சாதனத்திற்கு நகலெடுக்கவும். பாதுகாக்கப்பட்ட சுயவிவரமோ PIN-ஓ தேவையில்லை. வேறு சுயவிவரத்தை நகலெடுக்க விரும்பினால் முதலில் அதற்கு மாறவும்.",
       "பெற்றோர் நிர்வகிக்கும் விதிகள், நேர வரம்புகள் அல்லது பார்வை அணுகல் தேவைப்பட்டால் மட்டுமே பாதுகாக்கப்பட்ட குழந்தை/பயனர் சுயவிவரத்தை உருவாக்கவும்.",
       "பெற்றோர் ஒப்புதல் அளித்த விதிகள், நேரம் மற்றும் பார்வை அணுகலை ஏற்கனவே உள்ள பாதுகாக்கப்பட்ட சுயவிவரத்திற்கு அனுப்பவும். இரண்டு சாதனங்களும் ஒன்றாகத் திறந்திருக்கும் போது இதைப் பயன்படுத்தவும்.",
@@ -144,7 +144,7 @@
       "இணைப்பைச் சரிசெய்ய, சிறிய விதி வரம்பைத் தேர்ந்தெடுக்க அல்லது இணைத்தல் மற்றும் மாற்றுதல் நடத்தையை மாற்ற வேண்டியபோது மட்டுமே திறக்கவும்.",
       "இந்தச் சாதனம் அமைப்புகளை அனுப்புமா, பெறுமா அல்லது ஒருமுறை நகலெடுக்குமா என்பதை உறவு தீர்மானிக்கும். குடும்பக் கட்டுப்பாடு பெற்றோர்-முதல்-பாதுகாக்கப்பட்ட இயல்புநிலைகளைப் பயன்படுத்தும்.",
       "எதை அனுப்புவது என்பதை வரம்பு தீர்மானிக்கும்: தற்போதைய சுயவிவரம், Main விதிகள், Kids விதிகள், முக்கியச்சொற்கள், சேனல்கள், நேர வரம்புகள் அல்லது முழுக் காப்புப்பிரதி.",
-      "முக்கியச்சொல், சேனல் மற்றும் வீடியோ விதிகளை அனுப்பும்போது உள்ளூர் Main YouTube அல்லது YouTube Kids விதிகளைப் பயன்படுத்த வேண்டுமா என்பதைத் தேர்ந்தெடுக்கவும்.",
+      "முக்கியச்சொல், சேனல், வீடியோ விதிகளை அனுப்பும்போது, உள்ளூர் முதன்மை அல்லது குழந்தைகள் விதிகளில் எது பயன்படுத்தப்பட வேண்டும் எனத் தேர்ந்தெடுக்கவும்.",
       "நேரடியாக இலக்காகத் தேர்ந்தெடுக்கக்கூடிய இணைக்கப்பட்ட சாதனத்தின் சேமிக்கப்பட்ட பாதுகாக்கப்பட்ட சுயவிவரங்கள் இங்கே தோன்றும்.",
       "இணைத்தல் தேர்ந்தெடுத்த விதிகளைச் சேர்க்கும். மாற்றுதல், நிர்வகிக்கப்படும் பாதுகாக்கப்பட்ட சாதனங்களில் தேர்ந்தெடுத்த வரம்பை மட்டுமே மேலெழுதும்.",
       "இந்தச் சாதனத்தில் இணைப்பு குறியீடு அல்லது QR-ஐ உருவாக்கவும். மற்ற சாதனம் சேர்ந்து அதே பாதுகாப்புச் சொற்றொடரைக் காட்ட வேண்டும்.",
@@ -169,7 +169,7 @@
       "சேமிக்கப்பட்ட நம்பிக்கை நேரடி இணைப்பு அல்ல; உள்ளூர் சரிபார்ப்பை ஒருபோதும் தவிர்க்காது."
     ],
     "yue-Hant": [
-      "YouTube 成日改頁面結構。快速回報可以幫 FilterTube 更新配對邏輯，避免更多家庭受影響。",
+      "影片網站成日改頁面結構。快速回報可以幫 FilterTube 更新配對邏輯，避免更多家庭受影響。",
       "將而家開住嘅個人檔案複製到你自己第二部裝置。唔需要受保護個人檔案或者 PIN。想複製另一個檔案嘅話，先切換過去。",
       "只有喺你需要由家長管理嘅規則、時間限制或者觀看權限時，先建立受保護嘅兒童／使用者個人檔案。",
       "將家長批准嘅規則、時間同觀看權限傳送到現有嘅受保護個人檔案。兩部裝置可以同時開住時用呢個方法。",
@@ -200,7 +200,7 @@
       "只有喺你需要修復連結、選擇較細嘅規則範圍，或者更改合併／取代方式時先打開。",
       "關係會決定呢部裝置係傳送、接收，定係只複製一次設定。家庭控制會使用家長到受保護裝置嘅預設方式。",
       "範圍會決定傳送乜嘢：目前個人檔案、Main 規則、Kids 規則、關鍵字、頻道、時間限制，或者完整備份。",
-      "傳送關鍵字、頻道同影片規則時，選擇使用本機 Main YouTube 定係 YouTube Kids 規則。",
+      "傳送關鍵字、頻道同影片規則時，選擇使用本機主站定係 Kids 規則。",
       "連接裝置上已儲存、而且可以直接指定嘅受保護個人檔案會喺呢度顯示。",
       "合併會加入已選規則。取代只會覆寫受管理受保護裝置上已選嘅範圍。",
       "喺呢部裝置建立配對代碼或者 QR。另一部裝置必須加入，並顯示相同安全短句。",
@@ -225,7 +225,7 @@
       "已儲存嘅信任唔係即時連線，亦永遠唔會略過本機驗證。"
     ],
     "wuu-Hans": [
-      "YouTube 常常改网页结构。侬快点报一记，能帮 FilterTube 趁更多人家受影响前更新匹配逻辑。",
+      "视频网站常常改网页结构。侬快点报一记，能帮 FilterTube 趁更多人家受影响前更新匹配逻辑。",
       "把现在开着个个人资料拷到侬自家第二部设备上。勿需要受保护个人资料，也勿需要 PIN。要拷别个资料，先切换过去。",
       "只有侬需要家长管理个规则、时间限制或者观看权限时，才创建受保护个儿童／用户个人资料。",
       "把家长批准个规则、时间和观看权限发送到现有个受保护个人资料。两部设备一道开着时，用这个。",
@@ -256,7 +256,7 @@
       "只有要修复链接、选小点个规则范围，或者改合并和替换行为时才打开。",
       "关系决定这部设备是发送、接收，还是只拷一次设置。家庭控制用家长到受保护设备个默认设置。",
       "范围决定发送啥：当前资料、Main 规则、Kids 规则、关键词、频道、时间限制，或者完整备份。",
-      "发送关键词、频道和视频规则时，选择用本地 Main YouTube 还是 YouTube Kids 规则。",
+      "发送关键词、频道和视频规则时，选择用本地主站还是 Kids 规则。",
       "连接设备上保存个受保护资料，能直接选作目标时会显示在这里。",
       "合并会添进选中个规则。替换只会覆盖受管理受保护设备上选中个范围。",
       "在这部设备上创建配对代码或者 QR。另一部设备要加入，还要显示相同个安全短句。",

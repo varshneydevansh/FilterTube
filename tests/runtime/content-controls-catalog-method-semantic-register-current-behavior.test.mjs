@@ -268,7 +268,7 @@ test('content controls catalog source still proves current accessor behavior bou
 
   assert.equal(api.getControlByKey(''), null);
   assert.equal(api.getControlByKey('missingKey'), null);
-  assert.equal(api.getControlByKey('hideShorts').title, 'Hide Shorts');
+  assert.equal(api.getControlByKey('hideShorts').title, 'Hide Clips');
 
   assert.match(source, /function getCatalog\(\) \{/);
   assert.match(source, /return groups\.map\(group => \(\{/);

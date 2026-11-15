@@ -199,13 +199,13 @@ test('dashboard dynamic filter, PIN, modal, and import feedback paths use their 
     ['dashboard.toast.masterPinUpdated', 'Master PIN updated'],
     ['dashboard.toast.masterPinRemoved', 'Master PIN removed'],
     ['dashboard.toast.securityManagerUnavailable', 'Security manager unavailable'],
-    ['dashboard.toast.subscriptionsImportLocked', 'Unlock this profile to import subscribed channels'],
-    ['dashboard.toast.subscriptionsImportSignIn', 'Sign in to YouTube, then retry the import'],
-    ['dashboard.toast.subscriptionsImportTabLoading', 'YouTube tab is still loading'],
-    ['dashboard.toast.subscriptionsImportFailed', 'Subscribed channel import failed'],
-    ['dashboard.toast.subscriptionsImportNoChannels', 'No subscribed channels found'],
-    ['dashboard.toast.subscriptionsImportComplete', 'Subscribed channels imported'],
-    ['dashboard.toast.subscriptionsImportCompleteAndWhitelistEnabled', 'Subscribed channels imported and whitelist mode enabled']
+    ['dashboard.toast.subscriptionsImportLocked', 'Unlock this profile to import followed channels'],
+    ['dashboard.toast.subscriptionsImportSignIn', 'Sign in to the video site, then retry the import'],
+    ['dashboard.toast.subscriptionsImportTabLoading', 'The video tab is still loading'],
+    ['dashboard.toast.subscriptionsImportFailed', 'Followed channel import failed'],
+    ['dashboard.toast.subscriptionsImportNoChannels', 'No followed channels found'],
+    ['dashboard.toast.subscriptionsImportComplete', 'Followed channels imported'],
+    ['dashboard.toast.subscriptionsImportCompleteAndWhitelistEnabled', 'Followed channels imported and whitelist mode enabled']
   ];
   for (const [key, fallback] of keyFallbacks) {
     assert.ok(tabView.includes(`tabViewUiText('${key}', '${fallback}')`), `${key} uses the exact English fallback`);

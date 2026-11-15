@@ -79,7 +79,7 @@ test('category card is inserted after Core and before Feeds with official-source
     '\n\n    let isApplyingCategoryFiltersUI'
   );
 
-  assert.match(categoryBlock, /official YouTube category independently of the profile Blocklist or Whitelist mode/);
+  assert.match(categoryBlock, /video’s official category independently of the profile Blocklist or Whitelist mode/);
   assert.match(categoryBlock, /contentTab\.insertBefore\(categoryFiltersSection, feedControlsSection\)/);
   assert.ok(
     source.indexOf("groupEl.id = 'feedControlsSection'") < source.indexOf("const categoryFiltersSection = document.createElement('div');"),

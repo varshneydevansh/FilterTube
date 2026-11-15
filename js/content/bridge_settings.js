@@ -1376,7 +1376,7 @@ function showManagedTimeoutOverlay(state) {
             )
             : managedOverlayText(
                 'managedOverlay.timeout.copy.dailyPause',
-                "{profileName} has used today's YouTube time allowance. {surface} stays paused until the daily reset or until more time is approved.",
+                "{profileName} has used today's viewing time allowance. {surface} stays paused until the daily reset or until more time is approved.",
                 { profileName, surface: surfaceLabel }
             );
 
@@ -1537,7 +1537,7 @@ function showManagedTimeoutOverlay(state) {
         instruction.className = 'filtertube-managed-overlay__instruction';
         instruction.textContent = managedOverlayText(
             'managedOverlay.request.initialInstruction',
-            'Request saved here only tells the parent profile that more time is needed. It does not unlock YouTube by itself.'
+            'Request saved here only tells the parent profile that more time is needed. It does not unlock viewing by itself.'
         );
 
         askButton.addEventListener('click', () => {
@@ -1567,16 +1567,16 @@ function showManagedTimeoutOverlay(state) {
                             instruction.textContent = response.recorded === true
                                 ? managedOverlayText(
                                     'managedOverlay.request.saved',
-                                    'Request saved for parent review. YouTube stays paused until a parent or caregiver grants more time from FilterTube.'
+                                    'Request saved for parent review. Viewing stays paused until a parent or caregiver grants more time from FilterTube.'
                                 )
                                 : managedOverlayText(
                                     'managedOverlay.request.alreadySaved',
-                                    'A recent request is already saved for parent review. YouTube stays paused until more time is granted from FilterTube.'
+                                    'A recent request is already saved for parent review. Viewing stays paused until more time is granted from FilterTube.'
                                 );
                         } else {
                             instruction.textContent = managedOverlayText(
                                 'managedOverlay.request.unavailable',
-                                'A parent or caregiver can still open FilterTube and grant more time from a trusted profile. This button did not unlock YouTube.'
+                                'A parent or caregiver can still open FilterTube and grant more time from a trusted profile. This button did not unlock viewing.'
                             );
                         }
                         pauseManagedTimeoutVideos();
@@ -1584,7 +1584,7 @@ function showManagedTimeoutOverlay(state) {
                 } catch (e) {
                     instruction.textContent = managedOverlayText(
                         'managedOverlay.request.unavailable',
-                        'A parent or caregiver can still open FilterTube and grant more time from a trusted profile. This button did not unlock YouTube.'
+                        'A parent or caregiver can still open FilterTube and grant more time from a trusted profile. This button did not unlock viewing.'
                     );
                 }
             }

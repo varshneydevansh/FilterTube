@@ -57,7 +57,7 @@
   ],
   "translations": {
     "sw": [
-      "YouTube hubadilisha muundo wa kurasa zake mara kwa mara. Ripoti fupi husaidia FilterTube kusasisha mantiki ya kulinganisha kabla familia nyingine hazijaathirika.",
+      "Tovuti ya video hubadilisha muundo wa kurasa zake mara kwa mara. Ripoti fupi husaidia FilterTube kusasisha mantiki ya ulinganishaji kabla familia zaidi hazijaathirika.",
       "Nakili wasifu uliofunguliwa sasa kwenye kifaa chako cha pili. Huhitaji wasifu uliolindwa wala PIN. Badili wasifu kwanza ikiwa unataka kunakili mwingine.",
       "Unda wasifu uliolindwa wa mtoto/mtumiaji tu ikiwa unahitaji sheria, vikomo vya muda au ruhusa ya kutazama zinazosimamiwa na mzazi.",
       "Tuma sheria, muda na ruhusa ya kutazama zilizoidhinishwa na mzazi kwenye wasifu uliolindwa uliopo. Tumia njia hii vifaa vyote viwili vikiwa wazi pamoja.",
@@ -88,7 +88,7 @@
       "Fungua tu ikiwa unahitaji kurekebisha kiungo, kuchagua upeo mdogo wa sheria au kubadilisha tabia ya kuunganisha dhidi ya kubadilisha.",
       "Uhusiano huamua ikiwa kifaa hiki hutuma, hupokea au hunakili mipangilio mara moja tu. Udhibiti wa familia hutumia chaguo-msingi la mzazi kwenda kwa kifaa kilicholindwa.",
       "Upeo huamua kitakachotumwa: wasifu wa sasa, sheria za Main, sheria za Kids, maneno muhimu, vituo, vikomo vya muda au nakala kamili.",
-      "Unapotuma sheria za maneno muhimu, vituo na video, chagua kutumia sheria za ndani za Main YouTube au YouTube Kids.",
+      "Kwa kutuma sheria za maneno muhimu, vituo na video, chagua iwapo sheria za ndani za Kuu au Watoto zitatumika.",
       "Wasifu uliolindwa uliohifadhiwa kutoka kwenye kifaa kilichounganishwa huonekana hapa unapoweza kulengwa moja kwa moja.",
       "Kuunganisha huongeza sheria zilizochaguliwa. Kubadilisha hufuta na kuweka upya upeo uliochaguliwa pekee kwenye vifaa vilivyolindwa vinavyosimamiwa.",
       "Unda msimbo wa uoanishaji au QR kwenye kifaa hiki. Kifaa kingine lazima kijiunge na kuonyesha kauli ileile ya usalama.",
@@ -113,7 +113,7 @@
       "Uaminifu uliohifadhiwa si muunganisho wa moja kwa moja na hauwahi kuruka ukaguzi wa ndani."
     ],
     "ha": [
-      "YouTube kan yawan canza tsarin shafukansa. Rahoto mai sauri yana taimaka wa FilterTube ya sabunta dabarar daidaitawa kafin ya shafi iyalai da yawa.",
+      "Shafin bidiyo kan yawan canza tsarin shafukansa. Rahoto mai sauri yana taimaka wa FilterTube ya sabunta dabarar daidaitawa kafin ya shafi iyalai da yawa.",
       "Kwafi bayanin martabar da ke buɗe yanzu zuwa na'urarka ta biyu. Ba a buƙatar bayanin martaba mai kariya ko PIN. Sauya bayanin martaba tukuna idan kana son kwafi wani daban.",
       "Ƙirƙiri bayanin martabar yaro/mai amfani mai kariya ne kawai idan kana son dokoki, iyakokin lokaci ko damar kallo da iyaye ke sarrafawa.",
       "Aika dokoki, lokaci da damar kallo da iyaye suka amince da su zuwa bayanin martaba mai kariya da yake akwai. Yi amfani da wannan idan na'urorin biyu suna buɗe tare.",
@@ -144,7 +144,7 @@
       "Buɗe shi ne kawai idan kana buƙatar gyara hanyar haɗi, zaɓar ƙaramin faɗin dokoki, ko sauya tsakanin haɗawa da maye gurbi.",
       "Dangantaka ce ke ƙayyade ko wannan na'ura za ta aika, karɓa, ko kwafi saituna sau ɗaya kawai. Sarrafa iyali kan yi amfani da tsarin iyaye-zuwa-na'ura mai kariya.",
       "Faɗin aiki yana ƙayyade abin da za a aika: bayanin martaba na yanzu, dokokin Main, dokokin Kids, kalmomin maɓalli, tashoshi, iyakokin lokaci, ko cikakken madadin.",
-      "Don aika dokokin kalmomin maɓalli, tashoshi da bidiyo, zaɓi ko za a yi amfani da dokokin Main YouTube na gida ko na YouTube Kids.",
+      "Don aika dokokin kalmomin maɓalli, tashoshi da bidiyo, zaɓi ko za a yi amfani da dokokin Babba na gida ko na Kids.",
       "Bayanan martaba masu kariya da aka adana daga na'urar da aka haɗa suna bayyana nan idan za a iya nufar su kai tsaye.",
       "Haɗawa yana ƙara dokokin da aka zaɓa. Maye gurbi yana rubuta sabon abu a kan faɗin da aka zaɓa kawai ga na'urori masu kariya da ake sarrafawa.",
       "Ƙirƙiri lambar haɗawa ko QR a wannan na'ura. Dole ne ɗaya na'urar ta shiga ta nuna jimlar tsaro iri ɗaya.",
@@ -169,7 +169,7 @@
       "Amincewar da aka adana ba haɗin kai tsaye ba ce kuma ba ta tsallake tantancewar gida."
     ],
     "tr": [
-      "YouTube sayfa yapısını sık sık değiştirir. Kısa bir rapor, daha fazla aile etkilenmeden önce FilterTube'un eşleştirme mantığını güncellemesine yardımcı olur.",
+      "Video sitesi sayfa yapısını sık sık değiştirir. Kısa bir rapor, daha fazla aile etkilenmeden FilterTube'un eşleştirme mantığını güncellemesine yardımcı olur.",
       "Şu anda açık olan profili kendi ikinci cihazınıza kopyalayın. Korumalı profil veya PIN gerekmez. Başka bir profili kopyalamak istiyorsanız önce profilleri değiştirin.",
       "Ebeveyn tarafından yönetilen kurallar, süre sınırları veya izleme erişimi istiyorsanız korumalı çocuk/kullanıcı profili oluşturun.",
       "Ebeveynin onayladığı kuralları, süreyi ve izleme erişimini mevcut bir korumalı profile gönderin. İki cihaz aynı anda açıksa bunu kullanın.",
@@ -200,7 +200,7 @@
       "Yalnızca bir bağlantıyı onarmanız, daha küçük bir kural kapsamı seçmeniz veya birleştirme ile değiştirme davranışını değiştirmeniz gerektiğinde açın.",
       "Bu cihazın gönderip göndermeyeceğini, alıp almayacağını veya ayarları yalnızca bir kez kopyalayıp kopyalamayacağını ilişki belirler. Aile denetimi varsayılan olarak ebeveynden korumalı cihaza çalışır.",
       "Kapsam, neyin gönderileceğini belirler: geçerli profil, Main kuralları, Kids kuralları, anahtar sözcükler, kanallar, süre sınırları veya tam yedek.",
-      "Anahtar sözcük, kanal ve video kuralları gönderirken yerel Main YouTube veya YouTube Kids kurallarının kullanılıp kullanılmayacağını seçin.",
+      "Anahtar kelime, kanal ve video kuralı gönderimlerinde yerel Ana veya Çocuk kurallarının kullanılacağını seçin.",
       "Bağlı cihazdaki kayıtlı korumalı profiller, doğrudan hedeflenebildiklerinde burada görünür.",
       "Birleştir seçilen kuralları ekler. Değiştir, yönetilen korumalı cihazlarda yalnızca seçilen kapsamın üzerine yazar.",
       "Bu cihazda bir eşleştirme kodu veya QR oluşturun. Diğer cihazın katılması ve aynı güvenlik ifadesini göstermesi gerekir.",
@@ -225,7 +225,7 @@
       "Kaydedilmiş güven ilişkisi canlı bağlantı değildir ve yerel doğrulamayı asla atlamaz."
     ],
     "pa-Arab": [
-      "YouTube اکثر اپنے صفحے دا ڈھانچا بدلدا رہندا اے۔ چھوٹی جئی رپورٹ نال FilterTube ہور ٹبّراں دے متاثر ہون توں پہلاں میچنگ دا طریقہ اپ ڈیٹ کر سکدا اے۔",
+      "ویڈیو سائٹ اپنے صفحیاں دی بناوٹ اکثر بدلدی اے۔ اک چھیتی رپورٹ ہور ٹبراں تے اثر پین توں پہلاں FilterTube نوں ملان والی منطق اپ ڈیٹ کرن وچ مدد دیندی اے۔",
       "ہُن کھلے پروفائل نوں اپنے دوجے ڈیوائس تے نقل کرو۔ محفوظ پروفائل یا PIN دی لوڑ نئیں۔ جے ہور پروفائل نقل کرنا اے تاں پہلاں پروفائل بدل لو۔",
       "محفوظ بچے/ورتن والے دا پروفائل اوہدوں بناؤ جدوں والدین دے زیرِ انتظام قاعدے، وقت دیاں حدّاں یا ویکھن دی رسائی چاہیدی ہووے۔",
       "والدین ولوں منظور قاعدے، وقت تے ویکھن دی رسائی موجود محفوظ پروفائل نوں بھیجو۔ جدوں دونویں ڈیوائس اکٹھے کھلے ہون تاں ایہہ ورتو۔",
@@ -256,7 +256,7 @@
       "صرف اوہدوں کھولو جدوں لنک ٹھیک کرنا، قاعدیاں دا چھوٹا دائرہ چننا یا ملاؤن تے بدلنے دا طریقہ بدلنا ہووے۔",
       "رشتہ طے کردا اے کہ ایہہ ڈیوائس بھیجے گا، وصول کرے گا یا صرف اک واری سیٹنگ نقل کرے گا۔ خاندانی کنٹرول وچ عام طور تے والدین توں محفوظ ڈیوائس ول بھیجیا جاندا اے۔",
       "دائرہ طے کردا اے کہ کیہ بھیجیا جانا اے: موجودہ پروفائل، Main قاعدے، Kids قاعدے، کلیدی لفظ، چینل، وقت دیاں حدّاں یا پورا بیک اپ۔",
-      "کلیدی لفظ، چینل تے ویڈیو دے قاعدے بھیجن ویلے چنو کہ مقامی Main YouTube یا YouTube Kids دے قاعدے ورتنے نیں۔",
+      "کی ورڈ، چینل تے ویڈیو اصول بھیجن ویلے چُنو کہ مقامی مرکزی یا بچے اصول ورتے جان۔",
       "جڑے ہوئے ڈیوائس دے سنبھالے محفوظ پروفائل ایتھے ویکھدے نیں جدوں انہاں نوں سیدھا نشانہ بنایا جا سکے۔",
       "ملاؤ چنے قاعدے شامل کردا اے۔ بدلو صرف سنبھالے محفوظ ڈیوائساں تے چنے دائرے نوں اوپر لکھدا اے۔",
       "ایس ڈیوائس تے جوڑن دا کوڈ یا QR بناؤ۔ دوجے ڈیوائس نوں شامل ہو کے اوہی حفاظت والا فقرہ وکھانا پئے گا۔",

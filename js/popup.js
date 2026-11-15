@@ -40,7 +40,7 @@ function popupChannelErrorText(error) {
         ],
         'Invalid format. Use @handle, Channel ID, legacy c/ChannelName, or YouTube URL': [
             'popup.channel.invalidFormat',
-            'Invalid format. Use @handle, Channel ID, legacy c/ChannelName, or YouTube URL'
+            'Invalid format. Use @handle, Channel ID, legacy c/ChannelName, or a channel URL'
         ],
         'Channel already exists': ['popup.channel.alreadyExists', 'Channel already exists'],
         'Failed to add Kids channel': ['popup.channel.kidsAddFailed', 'Failed to add Kids channel'],
@@ -1350,7 +1350,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         }
         ftManagedTimeStatusPopup.classList.remove('is-self-control');
         if (statusLabel) {
-            statusLabel.textContent = popupUiText('popup.youtubeTime', 'YouTube time');
+            statusLabel.textContent = popupUiText('popup.youtubeTime', 'Viewing time');
             statusLabel.setAttribute('data-ft-i18n', 'popup.youtubeTime');
         }
         const response = await sendRuntimeMessage({
@@ -1494,20 +1494,20 @@ document.addEventListener('DOMContentLoaded', async () => {
                 if (nextState && whitelistEmpty && blocklistHasRules) {
                     copyBlocklist = window.confirm(profileType === 'kids'
                         ? popupUiText('popup.listMode.copyKidsRulesConfirm',
-                            'Copy your current YT Kids blocked rules into Allowed rules? Your blocked rules will be kept.')
+                            'Copy your current Kids blocked rules into Allowed rules? Your blocked rules will be kept.')
                         : popupUiText('popup.listMode.copyRulesConfirm',
                             'Copy the current blocked rules into Allowed rules? Your blocked rules will be kept.'));
                     if (!copyBlocklist) {
                         UIComponents.showToast(profileType === 'kids'
                             ? popupUiText('popup.listMode.emptyKidsAllowedRules',
-                                'YT Kids Allowed rules are empty — videos will stay hidden until you add allow rules.')
+                                'Kids Allowed rules are empty — videos will stay hidden until you add allow rules.')
                             : popupUiText('popup.listMode.emptyAllowedRules',
                                 'Allowed rules are empty — videos will stay hidden until you add allow rules.'), 'info');
                     }
                 } else if (nextState && whitelistEmpty) {
                     UIComponents.showToast(profileType === 'kids'
                         ? popupUiText('popup.listMode.emptyKidsAllowedRules',
-                            'YT Kids Allowed rules are empty — videos will stay hidden until you add allow rules.')
+                            'Kids Allowed rules are empty — videos will stay hidden until you add allow rules.')
                         : popupUiText('popup.listMode.emptyAllowedRules',
                             'Allowed rules are empty — videos will stay hidden until you add allow rules.'), 'info');
                 }

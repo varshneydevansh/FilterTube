@@ -2,7 +2,7 @@
   "english": {
     "content.quickBlock.ariaLabel": "Quick block all channels on this card",
     "content.menu.filterTubeMenu": "FilterTube menu",
-    "content.menu.fallbackHint": "Fallback menu (YouTube 3-dot unavailable for this item).",
+    "content.menu.fallbackHint": "Fallback menu (the site’s 3-dot menu is unavailable for this item).",
     "content.menu.block": "Block",
     "content.menu.filterAll": "Filter All",
     "content.menu.filterAllContent": "Filter All Content",
@@ -19,7 +19,7 @@
     "content.menu.channelResolving": "{name} (resolving…)",
     "content.menu.channelFallback": "Channel",
     "firstRun.activeTitle": "FilterTube is active",
-    "firstRun.reloadExplanation": "This tab can now use FilterTube controls. Reload once if you want the earliest YouTube data on this already-open tab covered too.",
+    "firstRun.reloadExplanation": "This tab can now use FilterTube controls. Reload once if you want the earliest page data on this already-open tab covered too.",
     "firstRun.refreshNow": "Refresh now",
     "firstRun.notNow": "Not now",
     "firstRun.dismiss": "Dismiss",

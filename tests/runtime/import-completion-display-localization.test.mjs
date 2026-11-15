@@ -26,7 +26,7 @@ test('import completion localizes exact generated copy without rewriting private
   for (const count of [0, 1, 2, 5]) {
     const text = `Imported ${count} ${count === 1 ? 'rule' : 'rules'} into Private surface <🙂>.`;
     assert.equal(context.render(text), `Localized: ${text}`);
-    assert.ok(context.render(`${count} imported channel ${count === 1 ? 'row needs' : 'rows need'} manual verification; see Import Reports for the exact YouTube reason.`).startsWith('Localized:'));
+    assert.ok(context.render(`${count} imported channel ${count === 1 ? 'row needs' : 'rows need'} manual verification; see Import Reports for the exact reason from the video service.`).startsWith('Localized:'));
     for (const pacing of ['at', 'with']) {
       const pending = `Channel details continue in the background (${count} pending), one row at a time ${pacing} a randomized 7–15 second interval while the worker is awake; large lists can take time. Closing this dashboard does not stop the queue. Permanent not-found or terminated rows stop retrying and remain in Import Reports for manual verification.`;
       assert.ok(context.render(pending).includes(`(${count} pending)`));

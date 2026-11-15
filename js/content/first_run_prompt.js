@@ -143,7 +143,7 @@
         desc.style.marginBottom = '16px';
         desc.style.color = palette.subtext;
         desc.style.fontSize = '14px';
-        desc.textContent = 'This tab can now use FilterTube controls. Reload once if you want the earliest YouTube data on this already-open tab covered too.';
+        desc.textContent = 'This tab can now use FilterTube controls. Reload once if you want the earliest page data on this already-open tab covered too.';
         desc.dataset.ftFirstRunI18n = 'firstRun.reloadExplanation';
         container.appendChild(desc);
 

@@ -214,11 +214,11 @@ test('managed time-budget overlay is a lock surface and not a content-hide write
   assert.match(overlayBlock, /role', 'alertdialog'/);
   assert.match(overlayBlock, /pointer-events:auto/);
   assert.match(overlayBlock, /pauseManagedTimeoutVideos\(\)/);
-  assert.match(overlayBlock, /today's YouTube time allowance/);
+  assert.match(overlayBlock, /today's viewing time allowance/);
   assert.match(overlayBlock, /FilterTube · profile time/);
   assert.match(overlayBlock, /Request more time/);
-  assert.match(overlayBlock, /does not unlock YouTube by itself/);
-  assert.match(overlayBlock, /YouTube stays paused until/);
+  assert.match(overlayBlock, /does not unlock viewing by itself/);
+  assert.match(overlayBlock, /Viewing stays paused until/);
   assert.doesNotMatch(overlayBlock, /recordTimeSaved|hidden-content|filtertube-hidden|data-filtertube-processed/);
 });
 

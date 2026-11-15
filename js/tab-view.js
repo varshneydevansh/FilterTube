@@ -464,7 +464,7 @@ function initializeResponsiveNav() {
 const DASHBOARD_HELP_BUBBLE_COPY = tabViewCompileDisplayCopy([
     {
         "key": "dashboard.helpBubble.tip01",
-        "fallback": "YouTube changes its page structure often. A quick report helps FilterTube update the matching logic before more families are affected."
+        "fallback": "The video site changes its page structure often. A quick report helps FilterTube update the matching logic before more families are affected."
     },
     {
         "key": "dashboard.helpBubble.tip02",
@@ -588,7 +588,7 @@ const DASHBOARD_HELP_BUBBLE_COPY = tabViewCompileDisplayCopy([
     },
     {
         "key": "dashboard.helpBubble.tip32",
-        "fallback": "For keyword, channel, and video rule sends, choose whether the local Main YouTube or YouTube Kids rules are used."
+        "fallback": "For keyword, channel, and video rule sends, choose whether the local Main or Kids rules are used."
     },
     {
         "key": "dashboard.helpBubble.tip33",
@@ -1667,11 +1667,11 @@ function initializeFiltersTabs() {
     const categoryMainTitle = document.createElement('div');
     categoryMainTitle.className = 'toggle-title';
     setTabViewLocalizedCopy(categoryMainTitle, 'textContent', 'popup.categoryFilter', 'Category Filter');
-    setTabViewLocalizedCopy(categoryMainTitle, 'title', 'tabView.categoryFilter.title', 'Filter videos by their YouTube category');
+    setTabViewLocalizedCopy(categoryMainTitle, 'title', 'tabView.categoryFilter.title', 'Filter videos by their category');
 
     const categoryMainDesc = document.createElement('div');
     categoryMainDesc.className = 'toggle-description';
-    setTabViewLocalizedCopy(categoryMainDesc, 'textContent', 'tabView.categoryFilter.description', 'Uses the official YouTube category independently of the profile Blocklist or Whitelist mode.');
+    setTabViewLocalizedCopy(categoryMainDesc, 'textContent', 'tabView.categoryFilter.description', 'Uses the video’s official category independently of the profile Blocklist or Whitelist mode.');
 
     categoryMainInfo.appendChild(categoryMainTitle);
     categoryMainInfo.appendChild(categoryMainDesc);
@@ -2905,14 +2905,14 @@ function initializeKidsTabs() {
     kidsMainSyncRow.className = 'toggle-row';
     kidsMainSyncRow.setAttribute('data-ft-control-row', 'true');
     kidsMainSyncRow.setAttribute('data-ft-search', 'apply matching yt kids rules on youtube sync kids to main from kids badge');
-    setTabViewLocalizedCopy(kidsMainSyncRow, 'title', 'tabView.kidsSync.title', 'When enabled, matching-mode YouTube Kids rules are also applied on main YouTube for this profile. Kids blocklist syncs only into Main blocklist; Kids whitelist syncs only into Main whitelist.');
+    setTabViewLocalizedCopy(kidsMainSyncRow, 'title', 'tabView.kidsSync.title', 'When enabled, matching-mode Kids rules are also applied on Main for this profile. Kids blocklist syncs only into Main blocklist; Kids whitelist syncs only into Main whitelist.');
 
     const kidsMainSyncInfo = document.createElement('div');
     kidsMainSyncInfo.className = 'toggle-info';
 
     const kidsMainSyncTitle = document.createElement('div');
     kidsMainSyncTitle.className = 'toggle-title';
-    setTabViewLocalizedCopy(kidsMainSyncTitle, 'textContent', 'tabView.kidsSync.heading', 'Apply matching YT Kids rules on YouTube');
+    setTabViewLocalizedCopy(kidsMainSyncTitle, 'textContent', 'tabView.kidsSync.heading', 'Apply matching Kids rules on Main');
 
     const kidsMainSyncHint = document.createElement('div');
     kidsMainSyncHint.className = 'import-export-hint';
@@ -5401,27 +5401,27 @@ document.addEventListener('DOMContentLoaded', async () => {
     }
 
     const SUBSCRIPTION_IMPORT_DISPLAY_COPY = Object.freeze({
-        "dashboard.subscriptionStatus.preparing": "Preparing the subscribed channels import for this whitelist.",
-        "dashboard.subscriptionStatus.signIn": "Sign in to YouTube in the selected tab, then retry the subscriptions import.",
-        "dashboard.subscriptionStatus.tabNotReady": "The selected YouTube tab is still loading or has not finished starting FilterTube.",
-        "dashboard.subscriptionStatus.noSubscriptions": "No subscribed channels were found for the selected YouTube account.",
-        "dashboard.subscriptionStatus.openedTab": "FilterTube opened a YouTube tab because no usable signed-in session was ready.",
-        "dashboard.subscriptionStatus.signInRouting": "The selected YouTube tab is still on a sign-in or account-routing page.",
-        "dashboard.subscriptionStatus.keepTabOpen": "Keep a signed-in YouTube tab open for a moment, then retry.",
-        "dashboard.subscriptionStatus.reading": "Reading subscribed channels from {tab}…",
-        "dashboard.subscriptionStatus.readingAccount": "Reading the subscribed channel list for the active YouTube account.",
-        "dashboard.subscriptionStatus.collectedOne": "Collected {count} subscribed channel so far.",
-        "dashboard.subscriptionStatus.collectedOther": "Collected {count} subscribed channels so far.",
+        "dashboard.subscriptionStatus.preparing": "Preparing the followed channels import for this whitelist.",
+        "dashboard.subscriptionStatus.signIn": "Sign in to the video site in the selected tab, then retry the followed channels import.",
+        "dashboard.subscriptionStatus.tabNotReady": "The selected tab is still loading or has not finished starting FilterTube.",
+        "dashboard.subscriptionStatus.noSubscriptions": "No followed channels were found for the selected account.",
+        "dashboard.subscriptionStatus.openedTab": "FilterTube opened a video tab because no usable signed-in session was ready.",
+        "dashboard.subscriptionStatus.signInRouting": "The selected tab is still on a sign-in or account-routing page.",
+        "dashboard.subscriptionStatus.keepTabOpen": "Keep a signed-in video tab open for a moment, then retry.",
+        "dashboard.subscriptionStatus.reading": "Reading followed channels from {tab}…",
+        "dashboard.subscriptionStatus.readingAccount": "Reading the followed channel list for the signed-in account.",
+        "dashboard.subscriptionStatus.collectedOne": "Collected {count} followed channel so far.",
+        "dashboard.subscriptionStatus.collectedOther": "Collected {count} followed channels so far.",
         "dashboard.subscriptionStatus.enabled": "Allow only selected is now active. Your Blocked rules were kept unchanged.",
-        "dashboard.subscriptionStatus.importedEnabledOne": "Imported {count} subscribed channel into Allowed rules and turned on Allow only selected. Your Blocked rules were kept unchanged.",
-        "dashboard.subscriptionStatus.importedEnabledOther": "Imported {count} subscribed channels into Allowed rules and turned on Allow only selected. Your Blocked rules were kept unchanged.",
-        "dashboard.subscriptionStatus.addedInactiveOne": "Added {count} subscribed channel to whitelist. Your blocklist channels and keywords were left unchanged.",
-        "dashboard.subscriptionStatus.addedInactiveOther": "Added {count} subscribed channels to whitelist. Your blocklist channels and keywords were left unchanged.",
-        "dashboard.subscriptionStatus.addedActiveOne": "Added {count} subscribed channel to the active whitelist.",
-        "dashboard.subscriptionStatus.addedActiveOther": "Added {count} subscribed channels to the active whitelist.",
-        "dashboard.subscriptionStatus.alreadyInactive": "All subscribed channels were already present in whitelist. Your blocklist channels and keywords were left unchanged.",
-        "dashboard.subscriptionStatus.alreadyActive": "All subscribed channels were already present in whitelist.",
-        "dashboard.subscriptionStatus.active": "Imported subscribed channels are now active in whitelist mode.",
+        "dashboard.subscriptionStatus.importedEnabledOne": "Imported {count} followed channel into Allowed rules and turned on Allow only selected. Your Blocked rules were kept unchanged.",
+        "dashboard.subscriptionStatus.importedEnabledOther": "Imported {count} followed channels into Allowed rules and turned on Allow only selected. Your Blocked rules were kept unchanged.",
+        "dashboard.subscriptionStatus.addedInactiveOne": "Added {count} followed channel to whitelist. Your blocklist channels and keywords were left unchanged.",
+        "dashboard.subscriptionStatus.addedInactiveOther": "Added {count} followed channels to whitelist. Your blocklist channels and keywords were left unchanged.",
+        "dashboard.subscriptionStatus.addedActiveOne": "Added {count} followed channel to the active whitelist.",
+        "dashboard.subscriptionStatus.addedActiveOther": "Added {count} followed channels to the active whitelist.",
+        "dashboard.subscriptionStatus.alreadyInactive": "All followed channels were already present in whitelist. Your blocklist channels and keywords were left unchanged.",
+        "dashboard.subscriptionStatus.alreadyActive": "All followed channels were already present in whitelist.",
+        "dashboard.subscriptionStatus.active": "Imported followed channels are now active in whitelist mode.",
         "dashboard.subscriptionStatus.new": "{count} new",
         "dashboard.subscriptionStatus.repaired": "{count} repaired",
         "dashboard.subscriptionStatus.alreadyPresent": "{count} already present",
@@ -5806,10 +5806,10 @@ document.addEventListener('DOMContentLoaded', async () => {
         'dashboard.backup.blockTube.verified.ruleCounts': 'Added {keywords} keyword/comment rules · {regex} regex rules reviewed',
         'dashboard.backup.blockTube.verified.alreadyPresent': 'Already present: {channels} channels · {keywords} keyword/comment rules · {videoIds} video IDs',
         'dashboard.backup.blockTube.verified.skipped': 'Skipped or unsupported outcomes: {count}',
-        'dashboard.backup.blockTube.verified.metadataReviewSingular': '{count} imported channel row needs manual verification in Import Reports; the exact YouTube reason is retained.',
-        'dashboard.backup.blockTube.verified.metadataReviewPlural': '{count} imported channel rows need manual verification in Import Reports; the exact YouTube reason is retained.',
-        'dashboard.backup.import.metadataReviewSingular': '{count} imported channel row needs manual verification; see Import Reports for the exact YouTube reason.',
-        'dashboard.backup.import.metadataReviewPlural': '{count} imported channel rows need manual verification; see Import Reports for the exact YouTube reason.',
+        'dashboard.backup.blockTube.verified.metadataReviewSingular': '{count} imported channel row needs manual verification in Import Reports; the exact reason from the video service is retained.',
+        'dashboard.backup.blockTube.verified.metadataReviewPlural': '{count} imported channel rows need manual verification in Import Reports; the exact reason from the video service is retained.',
+        'dashboard.backup.import.metadataReviewSingular': '{count} imported channel row needs manual verification; see Import Reports for the exact reason from the video service.',
+        'dashboard.backup.import.metadataReviewPlural': '{count} imported channel rows need manual verification; see Import Reports for the exact reason from the video service.',
         'dashboard.backup.import.metadataCompleteToast': 'Channel details are already complete.'
     }).map(([key, fallback]) => ({ key, fallback })));
 
@@ -5958,24 +5958,24 @@ document.addEventListener('DOMContentLoaded', async () => {
         const normalizedReason = rawReason.toLowerCase();
         const knownReasons = {
             incomplete_channel_metadata: ['reason.incompleteMetadata', 'Some channel details are still missing. FilterTube will try again.'],
-            temporary_fetch_failure: ['reason.temporaryError', 'YouTube returned a temporary error. FilterTube will try again.'],
-            fetch_failed: ['reason.fetchFailed', 'YouTube did not return channel details. FilterTube will try again.'],
-            metadata_unavailable: ['reason.metadataUnavailable', 'YouTube did not provide complete channel details.'],
-            timeout: ['reason.timeout', 'YouTube took too long to respond. FilterTube will try again.'],
-            channel_not_found: ['reason.channelNotFound', 'YouTube could not find this channel.'],
-            resource_not_found: ['reason.channelNotFound', 'YouTube could not find this channel.'],
-            not_found: ['reason.channelNotFound', 'YouTube could not find this channel.'],
-            http_404: ['reason.channelNotFound', 'YouTube could not find this channel.'],
-            http_410: ['reason.channelDeleted', 'YouTube reports that this channel was deleted.'],
-            channel_deleted: ['reason.channelDeleted', 'YouTube reports that this channel was deleted.'],
-            channel_terminated: ['reason.channelTerminated', 'YouTube reports that this account was terminated.'],
-            channel_unavailable: ['reason.channelUnavailable', 'YouTube reports that this channel is unavailable.'],
+            temporary_fetch_failure: ['reason.temporaryError', 'The video service returned a temporary error. FilterTube will try again.'],
+            fetch_failed: ['reason.fetchFailed', 'The video service did not return channel details. FilterTube will try again.'],
+            metadata_unavailable: ['reason.metadataUnavailable', 'The video service did not provide complete channel details.'],
+            timeout: ['reason.timeout', 'The video service took too long to respond. FilterTube will try again.'],
+            channel_not_found: ['reason.channelNotFound', 'The video service could not find this channel.'],
+            resource_not_found: ['reason.channelNotFound', 'The video service could not find this channel.'],
+            not_found: ['reason.channelNotFound', 'The video service could not find this channel.'],
+            http_404: ['reason.channelNotFound', 'The video service could not find this channel.'],
+            http_410: ['reason.channelDeleted', 'The video service reports that this channel was deleted.'],
+            channel_deleted: ['reason.channelDeleted', 'The video service reports that this channel was deleted.'],
+            channel_terminated: ['reason.channelTerminated', 'The video service reports that this account was terminated.'],
+            channel_unavailable: ['reason.channelUnavailable', 'The video service reports that this channel is unavailable.'],
             saved_rule_missing: ['reason.savedRuleMissing', 'The saved rule is no longer present in this target.'],
             name_only_rule: ['reason.nameOnly', 'This is a name-only rule. Add a channel link or UC ID if you want exact channel identity and metadata.'],
-            channel_not_verified: ['reason.notVerified', 'YouTube could not verify this channel identifier.'],
+            channel_not_verified: ['reason.notVerified', 'The video service could not verify this channel identifier.'],
             channel_fetching: ['reason.fetching', 'Channel details are being fetched now.'],
             metadata_not_queued: ['reason.metadataNotQueued', 'The rule is active, but its incomplete metadata is not currently queued.'],
-            incomplete_channel_details: ['reason.incompleteDetails', 'YouTube returned incomplete channel details.'],
+            incomplete_channel_details: ['reason.incompleteDetails', 'The video service returned incomplete channel details.'],
             waiting_in_paced_queue: ['reason.waitingInQueue', 'The rule is active; channel details are waiting in the paced queue.'],
             channel_details_complete: ['reason.complete', 'Channel details are complete.'],
             waiting_for_first_lookup: ['reason.waitingFirstLookup', 'Waiting for the first lookup.'],
@@ -5985,10 +5985,10 @@ document.addEventListener('DOMContentLoaded', async () => {
             'waiting for the first lookup.': ['reason.waitingFirstLookup', 'Waiting for the first lookup.'],
             'the saved rule is no longer present in this target.': ['reason.savedRuleMissing', 'The saved rule is no longer present in this target.'],
             'this is a name-only rule. add a channel link or uc id if you want exact channel identity and metadata.': ['reason.nameOnly', 'This is a name-only rule. Add a channel link or UC ID if you want exact channel identity and metadata.'],
-            'youtube could not verify this channel identifier.': ['reason.notVerified', 'YouTube could not verify this channel identifier.'],
+            'youtube could not verify this channel identifier.': ['reason.notVerified', 'The video service could not verify this channel identifier.'],
             'channel details are being fetched now.': ['reason.fetching', 'Channel details are being fetched now.'],
             'the rule is active, but its incomplete metadata is not currently queued.': ['reason.metadataNotQueued', 'The rule is active, but its incomplete metadata is not currently queued.'],
-            'youtube returned incomplete channel details.': ['reason.incompleteDetails', 'YouTube returned incomplete channel details.'],
+            'youtube returned incomplete channel details.': ['reason.incompleteDetails', 'The video service returned incomplete channel details.'],
             'the rule is active; channel details are waiting in the paced queue.': ['reason.waitingInQueue', 'The rule is active; channel details are waiting in the paced queue.']
         };
         const knownReason = knownReasons[normalizeString(row?.reasonCode).toLowerCase()] || knownReasons[normalizedReason];
@@ -6198,7 +6198,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         const statusDescriptions = {
             all: ['description.allRows', 'Every row in this import.'],
             needs_attention: ['description.needsAttention', 'Automatic completion has stopped for this row—usually “channel does not exist,” terminated/deleted, a name-only entry, or a queue inconsistency. The rule remains active unless you remove it.'],
-            retrying: ['description.retrying', 'YouTube returned a temporary error or incomplete metadata; the rule remains active and will be tried again.'],
+            retrying: ['description.retrying', 'The video service returned a temporary error or incomplete metadata; the rule remains active and will be tried again.'],
             pending: ['description.pending', 'The row is waiting for its first paced lookup.'],
             fetching: ['description.fetching', 'This is the one channel lookup currently running.'],
             complete: ['description.complete', 'The UC ID, channel name, handle/custom URL, and avatar are available.']
@@ -6338,7 +6338,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                                 : ruleListImportReportText('result.waiting', 'Waiting for metadata.'));
                         const readableReason = formatRuleListReportReason({ ...row, reason: resultReason });
                         const manualGuidance = permanentFailure
-                            ? ruleListImportReportText('guidance.permanent', 'Verify this identifier on YouTube or replace it with an exact channel URL/UC ID. The saved rule remains active until you change or remove it.')
+                            ? ruleListImportReportText('guidance.permanent', 'Verify this identifier on the video site or replace it with an exact channel URL/UC ID. The saved rule remains active until you change or remove it.')
                             : '';
                         const actionMarkup = [
                             url ? `<a class="btn-secondary" href="${escapeManagedRuleListPreviewCell(url)}" target="_blank" rel="noopener noreferrer">${escapeManagedRuleListPreviewCell(ruleListImportReportText(permanentFailure ? 'action.verifyChannel' : 'action.openChannel', permanentFailure ? 'Verify channel' : 'Open channel'))}</a>` : (permanentFailure ? `<small>${escapeManagedRuleListPreviewCell(ruleListImportReportText('guidance.manualVerification', 'Verify the imported value manually, then replace it with an exact channel link or UC ID.'))}</small>` : `<small>${escapeManagedRuleListPreviewCell(ruleListImportReportText('guidance.provideExact', 'Provide an exact channel link to replace a name-only or invalid row.'))}</small>`),
@@ -6472,10 +6472,10 @@ document.addEventListener('DOMContentLoaded', async () => {
         importSubscriptionsBtn.classList.toggle('is-loading', busy);
         importSubscriptionsBtn.textContent = busy
             ? tabViewUiText('dashboard.import.buttonBusyLabel', 'Importing…')
-            : tabViewUiText('dashboard.import.buttonLabel', 'Import Subscribed Channels');
+            : tabViewUiText('dashboard.import.buttonLabel', 'Import followed channels');
         importSubscriptionsBtn.title = locked
-            ? 'Unlock this profile to import subscribed channels.'
-            : 'Import subscribed channels into whitelist only. You will choose separately whether to turn whitelist mode on.';
+            ? 'Unlock this profile to import followed channels.'
+            : 'Import followed channels into whitelist only. You will choose separately whether to turn whitelist mode on.';
     }
 
     function setSubscriptionsImportState(patch = {}) {
@@ -6545,16 +6545,16 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     function updateSubscriptionsImportWaitState(phase, options = {}) {
         const tabTitle = normalizeString(options.tabTitle);
-        const tabLabel = tabTitle || tabViewUiText('dashboard.import.selectedYoutubeTab', 'the selected YouTube tab');
+        const tabLabel = tabTitle || tabViewUiText('dashboard.import.selectedYoutubeTab', 'the selected tab');
         let title = '';
         let message = '';
         let meta = normalizeString(options.meta);
 
         if (phase === 'searching') {
-            title = tabViewUiText('dashboard.import.waitSearchTitle', 'Looking For YouTube');
-            message = tabViewUiText('dashboard.import.waitSearchMessage', 'Checking open YouTube tabs for the active account.');
+            title = tabViewUiText('dashboard.import.waitSearchTitle', 'Looking for the video site');
+            message = tabViewUiText('dashboard.import.waitSearchMessage', 'Checking open video tabs for the signed-in account.');
         } else if (phase === 'waiting_page') {
-            title = tabViewUiText('dashboard.import.waitPageTitle', 'Waiting For YouTube');
+            title = tabViewUiText('dashboard.import.waitPageTitle', 'Waiting for the video site');
             message = tabViewUiText('dashboard.import.waitPageMessage', 'Waiting for {tabTitle} to finish loading.', { tabTitle: tabLabel });
             meta = meta || tabViewUiText('dashboard.import.waitPageMeta', 'Keep the tab open for a moment.');
         } else if (phase === 'waiting_bridge') {
@@ -6562,13 +6562,13 @@ document.addEventListener('DOMContentLoaded', async () => {
             message = tabViewUiText('dashboard.import.waitBridgeMessage', 'Waiting for FilterTube to finish starting in {tabTitle}.', { tabTitle: tabLabel });
             meta = meta || tabViewUiText('dashboard.import.waitBridgeMeta', 'The import will begin automatically once the bridge is ready.');
         } else if (phase === 'bootstrapping_bridge') {
-            title = tabViewUiText('dashboard.import.bootstrapTitle', 'Connecting To YouTube');
+            title = tabViewUiText('dashboard.import.bootstrapTitle', 'Connecting to the video site');
             message = tabViewUiText('dashboard.import.bootstrapMessage', 'Connecting FilterTube to {tabTitle}.', { tabTitle: tabLabel });
-            meta = meta || tabViewUiText('dashboard.import.bootstrapMeta', 'This can happen when the YouTube tab was already open before FilterTube reloaded.');
+            meta = meta || tabViewUiText('dashboard.import.bootstrapMeta', 'This can happen when the video tab was already open before FilterTube reloaded.');
         } else if (phase === 'opening_fallback') {
-            title = tabViewUiText('dashboard.import.openingTitle', 'Opening YouTube');
-            message = tabViewUiText('dashboard.import.openingMessage', 'Opening a background YouTube tab for the active account.');
-            meta = meta || tabViewUiText('dashboard.import.openingMeta', 'Waiting for YouTube and FilterTube to finish loading…');
+            title = tabViewUiText('dashboard.import.openingTitle', 'Opening the video site');
+            message = tabViewUiText('dashboard.import.openingMessage', 'Opening a background video tab for the signed-in account.');
+            meta = meta || tabViewUiText('dashboard.import.openingMeta', 'Waiting for the video site and FilterTube to finish loading…');
         } else {
             return;
         }
@@ -6688,21 +6688,21 @@ document.addEventListener('DOMContentLoaded', async () => {
     function describeSubscriptionsImportError(result = {}) {
         const code = normalizeString(result?.errorCode);
         if (code === 'signed_out') {
-            return tabViewUiText('dashboard.import.errorSignedOut', 'Sign in to YouTube in the selected tab, then retry the import.');
+            return tabViewUiText('dashboard.import.errorSignedOut', 'Sign in to the video site in the selected tab, then retry the import.');
         }
         if (code === 'receiver_unavailable' || code === 'subscriptions_import_unavailable') {
-            return tabViewUiText('dashboard.import.errorReceiverUnavailable', 'The YouTube tab is still starting FilterTube. Keep it open for a moment, then retry.');
+            return tabViewUiText('dashboard.import.errorReceiverUnavailable', 'The selected tab is still starting FilterTube. Keep it open for a moment, then retry.');
         }
         if (code === 'profile_locked') {
-            return tabViewUiText('dashboard.import.errorProfileLocked', 'Unlock this profile before importing subscribed channels.');
+            return tabViewUiText('dashboard.import.errorProfileLocked', 'Unlock this profile before importing followed channels.');
         }
         if (code === 'profile_changed') {
             return tabViewUiText('dashboard.import.errorProfileChanged', 'The active profile changed during import. Retry once the intended profile is active again.');
         }
         if (code === 'tab_import_failed') {
-            return tabViewUiText('dashboard.import.errorTabImportFailed', 'The selected YouTube tab was not ready for import. Retry after the page finishes loading.');
+            return tabViewUiText('dashboard.import.errorTabImportFailed', 'The selected tab was not ready for import. Retry after the page finishes loading.');
         }
-        return normalizeString(result?.error) || tabViewUiText('dashboard.import.errorFallback', 'Unable to import subscribed channels right now.');
+        return normalizeString(result?.error) || tabViewUiText('dashboard.import.errorFallback', 'Unable to import followed channels right now.');
     }
 
     function getProfileColors(seed) {
@@ -10062,8 +10062,8 @@ document.addEventListener('DOMContentLoaded', async () => {
         title,
         message,
         presets = [],
-        customTitle = tabViewUiText('family.profileManager.customYouTubeTimeLimit', 'Custom YouTube Time Limit'),
-        customMessage = tabViewUiText('family.profileManager.customBudgetPrompt', 'Enter whole minutes for this daily YouTube budget.'),
+        customTitle = tabViewUiText('family.profileManager.customYouTubeTimeLimit', 'Custom viewing time limit'),
+        customMessage = tabViewUiText('family.profileManager.customBudgetPrompt', 'Enter whole minutes for this daily viewing time.'),
         customPlaceholder = tabViewUiText('family.profileManager.minutesPerDay', 'Minutes per day'),
         customConfirmText = tabViewUiText('family.profileManager.useCustomLimit', 'Use Custom Limit'),
         initialMinutes = 120,
@@ -10078,8 +10078,8 @@ document.addEventListener('DOMContentLoaded', async () => {
             }))
             .filter((preset) => preset.value && preset.label);
         const choice = await showChoiceModal({
-            title: title || tabViewUiText('family.profileManager.setYouTubeTimeLimit', 'Set YouTube Time Limit'),
-            message: message || tabViewUiText('family.profileManager.chooseDailyBudget', 'Choose a daily YouTube budget for this protected profile.'),
+            title: title || tabViewUiText('family.profileManager.setYouTubeTimeLimit', 'Set viewing time limit'),
+            message: message || tabViewUiText('family.profileManager.chooseDailyBudget', 'Choose a daily viewing time for this protected profile.'),
             choices: [
                 ...presetChoices,
                 {
@@ -10119,10 +10119,10 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     async function promptManagedDailyTimeLimitMinutes({ selectedCount = 1, initialMinutes = 120 } = {}) {
         return promptManagedTimeLimitMinutes({
-            title: tabViewUiText('family.profileManager.setYouTubeTimeLimit', 'Set YouTube Time Limit'),
+            title: tabViewUiText('family.profileManager.setYouTubeTimeLimit', 'Set viewing time limit'),
             message: selectedCount > 1
-                ? tabViewUiText('family.profileManager.chooseSameDailyBudget', 'Choose the same daily YouTube budget for the selected profiles. Use 0 minutes to require approval before viewing.')
-                : tabViewUiText('family.profileManager.chooseProfileDailyBudget', 'Choose the daily YouTube budget for this profile. Use 0 minutes to require approval before viewing.'),
+                ? tabViewUiText('family.profileManager.chooseSameDailyBudget', 'Choose the same daily viewing time for the selected profiles. Use 0 minutes to require approval before viewing.')
+                : tabViewUiText('family.profileManager.chooseProfileDailyBudget', 'Choose the daily viewing time for this profile. Use 0 minutes to require approval before viewing.'),
             presets: [
                 { value: '30', label: tabViewUiText('family.profileManager.minutesPreset', '{count} min', { count: 30 }), className: 'btn-secondary' },
                 { value: '60', label: tabViewUiText('family.profileManager.oneHourPreset', '1 hour'), className: 'btn-secondary' },
@@ -10131,10 +10131,10 @@ document.addEventListener('DOMContentLoaded', async () => {
             ],
             customTitle: selectedCount > 1
                 ? tabViewUiText('family.profileManager.customSelectedTimeLimit', 'Custom Selected Time Limit')
-                : tabViewUiText('family.profileManager.customYouTubeTimeLimit', 'Custom YouTube Time Limit'),
+                : tabViewUiText('family.profileManager.customYouTubeTimeLimit', 'Custom viewing time limit'),
             customMessage: selectedCount > 1
-                ? tabViewUiText('family.profileManager.selectedDailyMinutesPrompt', 'Daily YouTube minutes for the selected profiles. Use 0 to require approval before viewing.')
-                : tabViewUiText('family.profileManager.profileDailyMinutesPrompt', 'Daily YouTube minutes for this profile. Use 0 to require approval before viewing.'),
+                ? tabViewUiText('family.profileManager.selectedDailyMinutesPrompt', 'Daily viewing minutes for the selected profiles. Use 0 to require approval before viewing.')
+                : tabViewUiText('family.profileManager.profileDailyMinutesPrompt', 'Daily viewing minutes for this profile. Use 0 to require approval before viewing.'),
             customPlaceholder: tabViewUiText('family.profileManager.minutesPerDay', 'Minutes per day'),
             customConfirmText: selectedCount > 1
                 ? tabViewUiText('family.profileManager.saveLimits', 'Save Limits')
@@ -10339,8 +10339,8 @@ document.addEventListener('DOMContentLoaded', async () => {
         return promptManagedTimeLimitMinutes({
             title: selectedCount > 1
                 ? tabViewUiText('family.profileManager.addTimeToSelectedProfiles', 'Add Time To Selected Profiles')
-                : tabViewUiText('family.profileManager.addExtraYoutubeTime', 'Add Extra YouTube Time'),
-            message: tabViewUiText('family.profileManager.extraTimePrompt', 'Choose temporary parent-approved YouTube time. The grant expires automatically in 2 hours.'),
+                : tabViewUiText('family.profileManager.addExtraYoutubeTime', 'Add extra viewing time'),
+            message: tabViewUiText('family.profileManager.extraTimePrompt', 'Choose temporary parent-approved viewing time. The grant expires automatically in 2 hours.'),
             presets: [
                 { value: '15', label: tabViewUiText('family.profileManager.minutesPreset', '{count} min', { count: 15 }), className: 'btn-primary' },
                 { value: '30', label: tabViewUiText('family.profileManager.minutesPreset', '{count} min', { count: 30 }), className: 'btn-secondary' },
@@ -10348,8 +10348,8 @@ document.addEventListener('DOMContentLoaded', async () => {
             ],
             customTitle: selectedCount > 1
                 ? tabViewUiText('family.profileManager.customExtraTimeSelected', 'Custom Extra Time For Selected Profiles')
-                : tabViewUiText('family.profileManager.customExtraYoutubeTime', 'Custom Extra YouTube Time'),
-            customMessage: tabViewUiText('family.profileManager.customExtraTimePrompt', 'Extra parent-approved YouTube minutes. The grant expires automatically in 2 hours.'),
+                : tabViewUiText('family.profileManager.customExtraYoutubeTime', 'Custom extra viewing time'),
+            customMessage: tabViewUiText('family.profileManager.customExtraTimePrompt', 'Extra parent-approved viewing minutes. The grant expires automatically in 2 hours.'),
             customPlaceholder: tabViewUiText('family.profileManager.extraMinutes', 'Extra minutes'),
             customConfirmText: tabViewUiText('family.profileManager.addTime', 'Add Time'),
             initialMinutes: 15,
@@ -10436,7 +10436,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             title: minutes === 1
                 ? tabViewUiText('family.profileManager.grantExtraMinuteTitle', 'Grant {minutes} extra minute?', { minutes })
                 : tabViewUiText('family.profileManager.grantExtraMinutesTitle', 'Grant {minutes} extra minutes?', { minutes }),
-            message: tabViewUiText('family.profileManager.grantExtraMinutesMessage', 'This will add temporary parent-approved YouTube time to {count} protected {profileWord} after parent/account re-auth. The grant expires in 2 hours.', {
+            message: tabViewUiText('family.profileManager.grantExtraMinutesMessage', 'This will add temporary parent-approved viewing time to {count} protected {profileWord} after parent/account re-auth. The grant expires in 2 hours.', {
                 count: eligibleIds.length,
                 profileWord: eligibleIds.length === 1
                     ? tabViewUiText('family.profileManager.profileWord', 'profile')
@@ -10602,12 +10602,12 @@ document.addEventListener('DOMContentLoaded', async () => {
             choices: [
                 {
                     value: 'main',
-                    label: tabViewUiText('family.profileManager.youtubeMain', 'YouTube Main'),
+                    label: tabViewUiText('family.profileManager.youtubeMain', 'Main'),
                     className: 'btn-primary'
                 },
                 {
                     value: 'kids',
-                    label: tabViewUiText('family.profileManager.youtubeKids', 'YouTube Kids'),
+                    label: tabViewUiText('family.profileManager.youtubeKids', 'Kids'),
                     className: 'btn-secondary'
                 }
             ],
@@ -10625,9 +10625,9 @@ document.addEventListener('DOMContentLoaded', async () => {
                     ? tabViewUiText('family.profileManager.channelToAdd', 'Channel To Add')
                     : tabViewUiText('family.profileManager.keywordToAdd', 'Keyword To Add')),
             message: type === 'video'
-                ? tabViewUiText('family.profileManager.videoIdPrompt', 'Paste a YouTube watch/Shorts URL or an 11-character video ID.')
+                ? tabViewUiText('family.profileManager.videoIdPrompt', 'Paste a video or clip URL or an 11-character video ID.')
                 : (type === 'channel'
-                    ? tabViewUiText('family.profileManager.channelPrompt', 'Use @handle, Channel ID, c/ChannelName, user/ChannelName, or a YouTube URL.')
+                    ? tabViewUiText('family.profileManager.channelPrompt', 'Use @handle, Channel ID, c/ChannelName, user/ChannelName, or a channel URL.')
                     : tabViewUiText('family.profileManager.keywordPrompt', 'Enter the keyword to add to selected protected profiles.')),
             placeholder: type === 'video'
                 ? tabViewUiText('family.profileManager.videoIdPlaceholder', 'watch URL or video ID')
@@ -12192,10 +12192,10 @@ document.addEventListener('DOMContentLoaded', async () => {
     async function promptManagedChannelListSurface() {
         const surface = await showChoiceModal({
             title: tabViewUiText("dashboard.modal.remaining.whereShouldThisListApply", "Where Should This List Apply?"),
-            message: tabViewUiText("dashboard.modal.remaining.chooseTheYouTubeSpaceForTheseRulesFilterTubeWillRespectEachProtectedProfileCurrentBlocklistWhitelistMode", "Choose the YouTube space for these rules. FilterTube will respect each protected profile current Blocklist/Whitelist mode."),
+            message: tabViewUiText("dashboard.modal.remaining.chooseTheYouTubeSpaceForTheseRulesFilterTubeWillRespectEachProtectedProfileCurrentBlocklistWhitelistMode", "Choose the space (Main or Kids) for these rules. FilterTube will respect each protected profile current Blocklist/Whitelist mode."),
             choices: [
-                { value: 'main', label: tabViewUiText("dashboard.managedLists.surfaceMain", "Main YouTube"), className: 'btn-primary' },
-                { value: 'kids', label: tabViewUiText("dashboard.managedLists.surfaceKids", "YouTube Kids"), className: 'btn-secondary' },
+                { value: 'main', label: tabViewUiText("dashboard.managedLists.surfaceMain", "Main"), className: 'btn-primary' },
+                { value: 'kids', label: tabViewUiText("dashboard.managedLists.surfaceKids", "Kids"), className: 'btn-secondary' },
                 { value: 'both', label: tabViewUiText("family.profileManager.access.mainKids", "Main + Kids"), className: 'btn-secondary' }
             ],
             cancelText: tabViewUiText("dashboard.modal.cancel", "Cancel")
@@ -13124,11 +13124,11 @@ document.addEventListener('DOMContentLoaded', async () => {
             return;
         }
         if (type === 'channel' && !normalizeProfileChannel(value)) {
-            showManagedRuleListToast('invalidChannelFormat', 'Invalid format. Use @handle, Channel ID, c/ChannelName, or YouTube URL', 'error');
+            showManagedRuleListToast('invalidChannelFormat', 'Invalid format. Use @handle, Channel ID, c/ChannelName, or a channel URL', 'error');
             return;
         }
         if (type === 'video' && !normalizeManagedVideoIdInput(value)) {
-            showManagedRuleListToast('invalidVideoInput', 'Enter a valid YouTube watch/Shorts URL or 11-character video ID', 'error');
+            showManagedRuleListToast('invalidVideoInput', 'Enter a valid video or clip URL or 11-character video ID', 'error');
             return;
         }
         if (type === 'keyword' && !normalizeProfileKeyword(value, { comments: surface !== 'kids' })) {
@@ -13387,7 +13387,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             const metadataNotice = enrichment?.pending
                 ? ` Channel details continue in the background (${Number(enrichment.pending) || 0} pending), one row at a time at a randomized 7–15 second interval while the worker is awake; large lists can take time. Closing this dashboard does not stop the queue. Permanent not-found or terminated rows stop retrying and remain in Import Reports for manual verification.`
                 : (enrichment?.attention
-                    ? ` ${Number(enrichment.attention) || 0} imported channel ${Number(enrichment.attention) === 1 ? 'row needs' : 'rows need'} manual verification; see Import Reports for the exact YouTube reason.`
+                    ? ` ${Number(enrichment.attention) || 0} imported channel ${Number(enrichment.attention) === 1 ? 'row needs' : 'rows need'} manual verification; see Import Reports for the exact reason from the video service.`
                     : '');
             const report = await saveParsedRuleListImportReport({
                 parsed,
@@ -13426,7 +13426,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         const metadataNotice = enrichment?.pending
             ? ` Channel details continue in the background (${Number(enrichment.pending) || 0} pending), one row at a time with a randomized 7–15 second interval while the worker is awake; large lists can take time. Closing this dashboard does not stop the queue. Permanent not-found or terminated rows stop retrying and remain in Import Reports for manual verification.`
             : (enrichment?.attention
-                ? ` ${Number(enrichment.attention) || 0} imported channel ${Number(enrichment.attention) === 1 ? 'row needs' : 'rows need'} manual verification; see Import Reports for the exact YouTube reason.`
+                ? ` ${Number(enrichment.attention) || 0} imported channel ${Number(enrichment.attention) === 1 ? 'row needs' : 'rows need'} manual verification; see Import Reports for the exact reason from the video service.`
                 : ' Channel details are already complete.');
         const importReport = await saveParsedRuleListImportReport({
             parsed,
@@ -13480,10 +13480,10 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     function formatRuleListSurfaceLabel(surfaces) {
         const items = [...new Set(safeArray(surfaces).map(surface => surface === 'kids' ? 'kids' : (surface === 'main' ? 'main' : '')).filter(Boolean))];
-        if (items.length > 1) return tabViewUiText('dashboard.managedLists.surfaceMainAndKids', 'Main YouTube + YouTube Kids');
+        if (items.length > 1) return tabViewUiText('dashboard.managedLists.surfaceMainAndKids', 'Main + Kids');
         return items[0] === 'kids'
-            ? tabViewUiText('dashboard.managedLists.surfaceKids', 'YouTube Kids')
-            : tabViewUiText('dashboard.managedLists.surfaceMain', 'Main YouTube');
+            ? tabViewUiText('dashboard.managedLists.surfaceKids', 'Kids')
+            : tabViewUiText('dashboard.managedLists.surfaceMain', 'Main');
     }
 
     function getSettingsRuleListImportSurfaces() {
@@ -13594,7 +13594,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                         enrichment?.pending
                             ? `Channel metadata queue: ${Number(enrichment.pending) || 0} imported rows pending. The background worker performs one serialized lookup at a randomized 7–15 second interval while awake. A failed row retries after about 2 minutes, then backs off up to 30 minutes; that retry never pauses fresh rows. Permanent not-found or terminated rows stop retrying and remain in Import Reports for manual verification. No burst of requests was made during import. Closing this dashboard does not stop the queue, although browser shutdown or wakeup limits can delay it.`
                             : (enrichment?.attention
-                                ? `${Number(enrichment.attention) || 0} imported channel ${Number(enrichment.attention) === 1 ? 'row needs' : 'rows need'} manual verification in Import Reports; the exact YouTube reason is retained.`
+                                ? `${Number(enrichment.attention) || 0} imported channel ${Number(enrichment.attention) === 1 ? 'row needs' : 'rows need'} manual verification in Import Reports; the exact reason from the video service is retained.`
                                 : 'All imported channel rows already have complete metadata; no metadata lookup is pending.')
                     ].map(importCompletionDisplayCopy),
                     choices: [
@@ -13669,7 +13669,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         }
         const isBlockTubeImport = Boolean(blockTubeInspection?.preview?.ok === true);
         if (isBlockTubeImport && targetSurfaces.some(surface => surface !== 'main')) {
-            showManagedRuleListToast('blockTubeMainOnly', 'BlockTube Migration JSON applies to Main YouTube only. Select Main YouTube, then import it as a complete migration.', 'error');
+            showManagedRuleListToast('blockTubeMainOnly', 'BlockTube Migration JSON applies to Main only. Select Main, then import it as a complete migration.', 'error');
             return;
         }
         const parsedCounts = countManagedRuleListRows(parsed);
@@ -13688,7 +13688,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         const confirmImport = await showChoiceModal({
             title: tabViewUiText('dashboard.managedLists.applyFormatTitle', 'Apply {format} to {surface}?', { format: applyLabel, surface: surfaceLabel }),
             message: isBlockTubeImport
-                ? tabViewUiText('dashboard.managedLists.applyBlockTubeMessage', 'BlockTube migration found {channelCount} effective channels and {videoCount} video IDs. Apply the complete supported migration to {profileName} on Main YouTube.', {
+                ? tabViewUiText('dashboard.managedLists.applyBlockTubeMessage', 'BlockTube migration found {channelCount} effective channels and {videoCount} video IDs. Apply the complete supported migration to {profileName} on Main.', {
                     channelCount: Number(blockTubeCounts.channels) || 0,
                     videoCount: Number(blockTubeCounts.videoIds) || 0,
                     profileName: getProfileName(fresh, currentActive)
@@ -13704,14 +13704,14 @@ document.addEventListener('DOMContentLoaded', async () => {
                     `${Number(blockTubeCounts.keywords) || 0} title rules · ${Number(blockTubeCounts.comments) || 0} comment rules · ${Number(blockTubeCounts.regex) || 0} validated regex rules`,
                     `${Number(blockTubeCounts.mappedOptions) || 0} mapped setting groups · ${Number(blockTubeCounts.durationFilters) || 0} duration filters · ${safeArray(blockTubeInspection.preview?.report?.inactive).length} inactive preserved`,
                     `${blockTubeSkipped} unsupported, invalid, or unknown outcomes`,
-                    tabViewUiText('dashboard.managedLists.blockTubeReviewDetail', 'No per-channel YouTube requests are made while the list is being reviewed. After approval, imported channel identifiers use a separate persisted background queue: one serialized lookup at a randomized 7–15 second interval while awake. A failed row retries after about 2 minutes and backs off up to 30 minutes without pausing fresh rows; permanent not-found or terminated rows stop retrying and remain in Import Reports for manual verification. A large list can still take time. Nothing changes until you confirm.')
+                    tabViewUiText('dashboard.managedLists.blockTubeReviewDetail', 'No per-channel requests are made to the video service while the list is being reviewed. After approval, imported channel identifiers use a separate persisted background queue: one serialized lookup at a randomized 7–15 second interval while awake. A failed row retries after about 2 minutes and backs off up to 30 minutes without pausing fresh rows; permanent not-found or terminated rows stop retrying and remain in Import Reports for manual verification. A large list can still take time. Nothing changes until you confirm.')
                 ]
                 : [
                     tabViewUiText('dashboard.managedLists.readyCount', '{counts} ready', { counts: formatManagedRuleListCount(parsedCounts) }),
                     parsed.skippedCount
                         ? tabViewUiText('dashboard.managedLists.skippedRows', '{count} {rowNoun} skipped', { count: parsed.skippedCount, rowNoun: tabViewUiText(parsed.skippedCount === 1 ? 'dashboard.managedLists.rowSingular' : 'dashboard.managedLists.rowPlural', parsed.skippedCount === 1 ? 'row' : 'rows') })
                         : tabViewUiText('dashboard.managedLists.noRowsSkipped', 'No rows skipped'),
-                    tabViewUiText('dashboard.managedLists.importReviewDetail', 'No per-channel YouTube requests are made while the list is being reviewed. After approval, incomplete channel identifiers are completed in a persisted one-at-a-time queue. A failed row retries after about 2 minutes and backs off up to 30 minutes without pausing fresh rows; permanent not-found or terminated rows stop retrying and remain in Import Reports for manual verification. A large list can still take time. Nothing changes until you confirm.')
+                    tabViewUiText('dashboard.managedLists.importReviewDetail', 'No per-channel requests are made to the video service while the list is being reviewed. After approval, incomplete channel identifiers are completed in a persisted one-at-a-time queue. A failed row retries after about 2 minutes and backs off up to 30 minutes without pausing fresh rows; permanent not-found or terminated rows stop retrying and remain in Import Reports for manual verification. A large list can still take time. Nothing changes until you confirm.')
                 ],
             choices: [
                 {
@@ -13771,7 +13771,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             const metadataNotice = enrichment?.pending
                 ? ` Channel details continue in the background (${Number(enrichment.pending) || 0} pending), one row at a time at a randomized 7–15 second interval while the worker is awake; large lists can take time. Closing this dashboard does not stop the queue. Permanent not-found or terminated rows stop retrying and remain in Import Reports for manual verification.`
                 : (enrichment?.attention
-                    ? ` ${Number(enrichment.attention) || 0} imported channel ${Number(enrichment.attention) === 1 ? 'row needs' : 'rows need'} manual verification; see Import Reports for the exact YouTube reason.`
+                    ? ` ${Number(enrichment.attention) || 0} imported channel ${Number(enrichment.attention) === 1 ? 'row needs' : 'rows need'} manual verification; see Import Reports for the exact reason from the video service.`
                     : '');
             const report = await saveParsedRuleListImportReport({
                 parsed,
@@ -13814,7 +13814,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         const metadataNotice = enrichment?.pending
             ? ` Channel details continue in the background (${Number(enrichment.pending) || 0} pending), one row at a time with a randomized 7–15 second interval while the worker is awake; large lists can take time. Closing this dashboard does not stop the queue. Permanent not-found or terminated rows stop retrying and remain in Import Reports for manual verification.`
             : (enrichment?.attention
-                ? ` ${Number(enrichment.attention) || 0} imported channel ${Number(enrichment.attention) === 1 ? 'row needs' : 'rows need'} manual verification; see Import Reports for the exact YouTube reason.`
+                ? ` ${Number(enrichment.attention) || 0} imported channel ${Number(enrichment.attention) === 1 ? 'row needs' : 'rows need'} manual verification; see Import Reports for the exact reason from the video service.`
                 : ' Channel details are already complete.');
         const importReport = await saveParsedRuleListImportReport({
             parsed,
@@ -14901,7 +14901,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                 profileName: getProfileName(profilesV4Cache, activeProfileId)
             }),
             details: [
-                tabViewUiText('dashboard.selfControl.hardWhitelist.start.detail.mainFiltering', 'Main YouTube filtering will be enabled and Whitelist mode will be forced.'),
+                tabViewUiText('dashboard.selfControl.hardWhitelist.start.detail.mainFiltering', 'Main filtering will be enabled and Whitelist mode will be forced.'),
                 tabViewUiText('dashboard.selfControl.hardWhitelist.start.detail.noRuleExpansion', 'Main keyword and video allow rules will not widen this channel-only session.'),
                 tabViewUiText('dashboard.selfControl.hardWhitelist.start.detail.settingsLocked', 'Profile switching, rules, modes, imports, and settings will be blocked.'),
                 tabViewUiText('dashboard.selfControl.hardWhitelist.start.detail.kidsFrozen', 'Kids keeps its current mode and rules, but the profile snapshot is frozen.'),
@@ -15045,7 +15045,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         const totalApplied = Number(context.totalApplied) || 0;
         const meta = normalizeString(context.meta);
         const message = totalApplied > 0
-            ? `Imported ${totalApplied} subscribed ${pluralize(totalApplied, 'channel')} into Allowed rules and turned on Allow only selected. Your Blocked rules were kept unchanged.`
+            ? `Imported ${totalApplied} followed ${pluralize(totalApplied, 'channel')} into Allowed rules and turned on Allow only selected. Your Blocked rules were kept unchanged.`
             : 'Allow only selected is now active. Your Blocked rules were kept unchanged.';
 
         setSubscriptionsImportState({
@@ -15087,10 +15087,10 @@ document.addEventListener('DOMContentLoaded', async () => {
         setSubscriptionsImportState({
             phase: 'fetching',
             tone: 'info',
-            title: phase === 'starting' ? 'Connecting To YouTube' : 'Importing Subscribed Channels',
+            title: phase === 'starting' ? 'Connecting to the video site' : 'Importing followed channels',
             message: phase === 'starting'
-                ? 'Reading the subscribed channel list for the active YouTube account.'
-                : `Collected ${foundCount} subscribed ${pluralize(foundCount, 'channel')} so far.`,
+                ? 'Reading the followed channel list for the signed-in account.'
+                : `Collected ${foundCount} followed ${pluralize(foundCount, 'channel')} so far.`,
             meta: metaParts.join(' • '),
             inProgress: true,
             canEnableWhitelist: false
@@ -15178,7 +15178,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     async function startSubscribedChannelsImport(trigger = 'manual') {
         if (isUiLocked()) {
             updateCheckboxes();
-            UIComponents.showToast(tabViewUiText('dashboard.toast.subscriptionsImportLocked', 'Unlock this profile to import subscribed channels'), 'error');
+            UIComponents.showToast(tabViewUiText('dashboard.toast.subscriptionsImportLocked', 'Unlock this profile to import followed channels'), 'error');
             return;
         }
 
@@ -15209,7 +15209,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             phase: 'preparing',
             tone: 'info',
             title: 'Preparing Import',
-            message: 'Preparing the subscribed channels import for this whitelist.',
+            message: 'Preparing the followed channels import for this whitelist.',
             meta: '',
             requestId: '',
             sourceTabId: null,
@@ -15224,16 +15224,16 @@ document.addEventListener('DOMContentLoaded', async () => {
                 phase: 'error',
                 tone: 'warning',
                 title: 'Sign In Required',
-                message: 'Sign in to YouTube in the selected tab, then retry the subscriptions import.',
+                message: 'Sign in to the video site in the selected tab, then retry the followed channels import.',
                 meta: sourceOutcome?.opened
-                    ? 'FilterTube opened a YouTube tab because no usable signed-in session was ready.'
-                    : 'The selected YouTube tab is still on a sign-in or account-routing page.',
+                    ? 'FilterTube opened a video tab because no usable signed-in session was ready.'
+                    : 'The selected tab is still on a sign-in or account-routing page.',
                 requestId: '',
                 sourceTabId: sourceTab?.id || null,
                 inProgress: false,
                 canEnableWhitelist: false
             });
-            UIComponents.showToast(tabViewUiText('dashboard.toast.subscriptionsImportSignIn', 'Sign in to YouTube, then retry the import'), 'info');
+            UIComponents.showToast(tabViewUiText('dashboard.toast.subscriptionsImportSignIn', 'Sign in to the video site, then retry the import'), 'info');
             return;
         }
 
@@ -15242,14 +15242,14 @@ document.addEventListener('DOMContentLoaded', async () => {
                 phase: 'error',
                 tone: 'error',
                 title: 'YouTube Tab Not Ready',
-                message: 'The selected YouTube tab is still loading or has not finished starting FilterTube.',
-                meta: 'Keep a signed-in YouTube tab open for a moment, then retry.',
+                message: 'The selected tab is still loading or has not finished starting FilterTube.',
+                meta: 'Keep a signed-in video tab open for a moment, then retry.',
                 requestId: '',
                 sourceTabId: null,
                 inProgress: false,
                 canEnableWhitelist: false
             });
-            UIComponents.showToast(tabViewUiText('dashboard.toast.subscriptionsImportTabLoading', 'YouTube tab is still loading'), 'error');
+            UIComponents.showToast(tabViewUiText('dashboard.toast.subscriptionsImportTabLoading', 'The video tab is still loading'), 'error');
             return;
         }
 
@@ -15258,8 +15258,8 @@ document.addEventListener('DOMContentLoaded', async () => {
         setSubscriptionsImportState({
             phase: 'fetching',
             tone: 'info',
-            title: 'Importing Subscribed Channels',
-            message: `Reading subscribed channels from ${sourceTab.title || 'YouTube'}…`,
+            title: 'Importing followed channels',
+            message: `Reading followed channels from ${sourceTab.title || 'the selected tab'}…`,
             meta: '',
             requestId,
             sourceTabId: sourceTab.id,
@@ -15303,7 +15303,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                 canEnableWhitelist: false
             });
             if (trigger !== 'auto') {
-                UIComponents.showToast(tabViewUiText('dashboard.toast.subscriptionsImportFailed', 'Subscribed channel import failed'), 'error');
+                UIComponents.showToast(tabViewUiText('dashboard.toast.subscriptionsImportFailed', 'Followed channel import failed'), 'error');
             }
             return;
         }
@@ -15331,14 +15331,14 @@ document.addEventListener('DOMContentLoaded', async () => {
                 phase: 'empty',
                 tone: 'warning',
                 title: 'No Subscriptions Imported',
-                message: 'No subscribed channels were found for the selected YouTube account.',
+                message: 'No followed channels were found for the selected account.',
                 meta: metaParts.join(' • '),
                 requestId: '',
                 sourceTabId: null,
                 inProgress: false,
                 canEnableWhitelist: false
             });
-            UIComponents.showToast(tabViewUiText('dashboard.toast.subscriptionsImportNoChannels', 'No subscribed channels found'), 'info');
+            UIComponents.showToast(tabViewUiText('dashboard.toast.subscriptionsImportNoChannels', 'No followed channels found'), 'info');
             return;
         }
 
@@ -15348,20 +15348,20 @@ document.addEventListener('DOMContentLoaded', async () => {
                 totalApplied,
                 meta: metaParts.join(' • ')
             });
-            UIComponents.showToast(tabViewUiText('dashboard.toast.subscriptionsImportCompleteAndWhitelistEnabled', 'Subscribed channels imported and whitelist mode enabled'), 'success');
+            UIComponents.showToast(tabViewUiText('dashboard.toast.subscriptionsImportCompleteAndWhitelistEnabled', 'Followed channels imported and whitelist mode enabled'), 'success');
             return;
         }
 
         const successMessage = totalApplied > 0
             ? (
                 whitelistOff
-                    ? `Added ${totalApplied} subscribed ${pluralize(totalApplied, 'channel')} to whitelist. Your blocklist channels and keywords were left unchanged.`
-                    : `Added ${totalApplied} subscribed ${pluralize(totalApplied, 'channel')} to the active whitelist.`
+                    ? `Added ${totalApplied} followed ${pluralize(totalApplied, 'channel')} to whitelist. Your blocklist channels and keywords were left unchanged.`
+                    : `Added ${totalApplied} followed ${pluralize(totalApplied, 'channel')} to the active whitelist.`
             )
             : (
                 whitelistOff
-                    ? 'All subscribed channels were already present in whitelist. Your blocklist channels and keywords were left unchanged.'
-                    : 'All subscribed channels were already present in whitelist.'
+                    ? 'All followed channels were already present in whitelist. Your blocklist channels and keywords were left unchanged.'
+                    : 'All followed channels were already present in whitelist.'
             );
         setSubscriptionsImportState({
             phase: 'success',
@@ -15374,7 +15374,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             inProgress: false,
             canEnableWhitelist: whitelistOff
         });
-        UIComponents.showToast(tabViewUiText('dashboard.toast.subscriptionsImportComplete', 'Subscribed channels imported'), 'success');
+        UIComponents.showToast(tabViewUiText('dashboard.toast.subscriptionsImportComplete', 'Followed channels imported'), 'success');
     }
 
     function resolveViewAccess(requestedViewId) {
@@ -16224,14 +16224,14 @@ document.addEventListener('DOMContentLoaded', async () => {
     function getNanahScopeDescription(scope) {
         const normalized = normalizeString(scope).toLowerCase();
         const descriptions = {
-            main: ['main', 'Only the main YouTube rules and lists.'],
+            main: ['main', 'Only the Main rules and lists.'],
             kids: ['kids', 'Only the Kids profile rules and lists.'],
             keywords: ['keywords', 'Only keyword rules from the selected Main or Kids surface.'],
             channels: ['channels', 'Only channel rules from the selected Main or Kids surface.'],
             videos: ['videos', 'Only blocked video IDs from the selected Main or Kids surface.'],
             rules_bundle: ['rulesBundle', 'Keyword, channel, and blocked-video rules from the selected Main or Kids surface.'],
             viewing_space: ['viewingSpace', 'Only Main/Kids access policy for the protected profile.'],
-            time_limits: ['timeLimits', 'Only the protected profile daily YouTube time limit.'],
+            time_limits: ['timeLimits', 'Only the protected profile daily viewing time limit.'],
             full: ['full', 'The wider account snapshot, best for full migration.']
         };
         const [key, fallback] = descriptions[normalized] || ['active', 'The currently active FilterTube profile snapshot.'];
@@ -27597,11 +27597,11 @@ document.addEventListener('DOMContentLoaded', async () => {
         }
 
         return showChoiceModal({
-            title: tabViewUiText('dashboard.import.modeChoiceTitle', 'Import Subscribed Channels'),
-            message: tabViewUiText('dashboard.import.modeChoiceMessage', 'This feature appends channels from your active YouTube account into this profile\'s whitelist.'),
+            title: tabViewUiText('dashboard.import.modeChoiceTitle', 'Import followed channels'),
+            message: tabViewUiText('dashboard.import.modeChoiceMessage', 'This feature appends the channels followed by the signed-in account into this profile\'s whitelist.'),
             details: [
-                tabViewUiText('dashboard.import.modeChoiceImportOnly', 'Import Only keeps the imported subscriptions stored in whitelist and leaves your current blocklist exactly as it is.'),
-                tabViewUiText('dashboard.import.modeChoiceTurnOn', 'Import + Turn On Whitelist stores the subscribed channels in Allowed rules and enables Allow only selected. Your current Blocked rules stay unchanged.'),
+                tabViewUiText('dashboard.import.modeChoiceImportOnly', 'Import Only keeps the imported followed channels stored in whitelist and leaves your current blocklist exactly as it is.'),
+                tabViewUiText('dashboard.import.modeChoiceTurnOn', 'Import + Turn On Whitelist stores the followed channels in Allowed rules and enables Allow only selected. Your current Blocked rules stay unchanged.'),
                 tabViewUiText('dashboard.import.modeChoiceSummary', 'Choose whether to store the whitelist only, or store it and turn on whitelist mode when the import finishes.')
             ],
             choices: [
@@ -28033,7 +28033,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         if (activeProfileId !== 'default') {
             ftExportActiveOnly.checked = true;
             ftExportActiveOnly.disabled = true;
-            ftExportActiveOnly.title = tabViewUiText('family.profileManager.exportAllProfilesHelp', 'Only the Default (Master) profile can export all profiles.');
+            ftExportActiveOnly.title = tabViewUiText('family.profileManager.exportAllProfilesHelp', 'Only the Default (Parent) profile can export all profiles.');
         } else {
             ftExportActiveOnly.disabled = false;
             ftExportActiveOnly.title = '';
@@ -28476,7 +28476,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                 ? tabViewUiText('family.profileManager.mainAllowed', 'Main allowed')
                 : tabViewUiText('family.profileManager.mainBlocked', 'Main blocked');
             mainAccessBtn.disabled = childAdminRestricted;
-            mainAccessBtn.title = childAdminRestricted ? childAdminTitle : tabViewUiText('family.profileManager.toggleMainHelp', 'Toggle whether this profile can open Main YouTube.');
+            mainAccessBtn.title = childAdminRestricted ? childAdminTitle : tabViewUiText('family.profileManager.toggleMainHelp', 'Toggle whether this profile can open Main.');
             mainAccessBtn.addEventListener('click', async () => {
                 if (childAdminRestricted) {
                     UIComponents.showToast(tabViewUiText('family.profileManager.cannotChangeAccessHere', 'Protected profiles cannot change viewing access here'), 'error');
@@ -28492,7 +28492,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                 ? tabViewUiText('family.profileManager.kidsAllowed', 'Kids allowed')
                 : tabViewUiText('family.profileManager.kidsBlocked', 'Kids blocked');
             kidsAccessBtn.disabled = childAdminRestricted;
-            kidsAccessBtn.title = childAdminRestricted ? childAdminTitle : tabViewUiText('family.profileManager.toggleKidsHelp', 'Toggle whether this profile can open YouTube Kids.');
+            kidsAccessBtn.title = childAdminRestricted ? childAdminTitle : tabViewUiText('family.profileManager.toggleKidsHelp', 'Toggle whether this profile can open Kids.');
             kidsAccessBtn.addEventListener('click', async () => {
                 if (childAdminRestricted) {
                     UIComponents.showToast(tabViewUiText('family.profileManager.cannotChangeAccessHere', 'Protected profiles cannot change viewing access here'), 'error');
@@ -28512,7 +28512,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                 ? tabViewUiText('family.profileManager.changeLimit', 'Change limit')
                 : tabViewUiText('family.profileManager.setLimit', 'Set limit');
             timeLimitBtn.disabled = childAdminRestricted;
-            timeLimitBtn.title = childAdminRestricted ? childAdminTitle : tabViewUiText('family.profileManager.setDailyLimitHelp', 'Set the daily YouTube time limit for this profile.');
+            timeLimitBtn.title = childAdminRestricted ? childAdminTitle : tabViewUiText('family.profileManager.setDailyLimitHelp', 'Set the daily viewing time limit for this profile.');
             timeLimitBtn.addEventListener('click', async () => {
                 if (childAdminRestricted) {
                     UIComponents.showToast(tabViewUiText('family.profileManager.cannotChangeTimeHere', 'Protected profiles cannot change time limits here'), 'error');
@@ -28528,7 +28528,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                 disableTimeLimitBtn.type = 'button';
                 disableTimeLimitBtn.textContent = tabViewUiText('family.profileManager.disableLimit', 'Disable limit');
                 disableTimeLimitBtn.disabled = childAdminRestricted;
-                disableTimeLimitBtn.title = childAdminRestricted ? childAdminTitle : tabViewUiText('family.profileManager.disableDailyLimitHelp', 'Disable the daily YouTube time limit for this profile.');
+                disableTimeLimitBtn.title = childAdminRestricted ? childAdminTitle : tabViewUiText('family.profileManager.disableDailyLimitHelp', 'Disable the daily viewing time limit for this profile.');
                 disableTimeLimitBtn.addEventListener('click', async () => {
                     if (childAdminRestricted) {
                         UIComponents.showToast(tabViewUiText('family.profileManager.cannotChangeTimeHere', 'Protected profiles cannot change time limits here'), 'error');
@@ -29112,11 +29112,11 @@ document.addEventListener('DOMContentLoaded', async () => {
             unknown_keyword_scope: 'Rules with an unsupported matching area',
             invalid_rule_list: 'Invalid rule lists',
             invalid_channel_name_rule: 'Channel-name rules that cannot be preserved',
-            unresolved_channel_id: 'Channels without a verified YouTube channel ID',
+            unresolved_channel_id: 'Channels without a verified channel ID',
             collaboration_metadata_not_supported: 'Channel collaboration settings',
             invalid_video_id: 'Invalid video identifiers',
             allow_rules_not_supported: 'Allowed rules (BlockTube only supports blocked rules)',
-            subscription_metadata_not_supported: 'Saved subscriptions',
+            subscription_metadata_not_supported: 'Saved followed channels',
             whitelist_mode_not_supported: 'Allow-only mode is not supported by BlockTube and was omitted',
             duration_condition_not_supported: 'Duration filter settings that BlockTube cannot represent',
             unknown_list_mode: 'An unsupported filtering mode',
@@ -29124,7 +29124,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             parental_time_policy_not_supported: 'Parental time limits',
             disabled_filtering_not_transferred: 'The paused filtering state',
             profile_access_restriction_not_supported: 'Profile access restrictions',
-            kids_rules_not_merged_into_main_export: 'Extra Kids rules applied on Main YouTube (export Kids rules separately)'
+            kids_rules_not_merged_into_main_export: 'Extra Kids rules applied on Main (export Kids rules separately)'
         };
         const reason = tabViewUiText(`blockTubeExport.reason.${item.reason}`, reasons[item.reason] || 'Other FilterTube-only data');
         if (item.reason !== 'setting_not_supported') return reason;
@@ -29158,7 +29158,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         if (byName.length) {
             const names = byName.map(row => (Array.isArray(row?.labels) ? row.labels : []).join(' / ')).filter(Boolean);
             lines.push(tabViewUiText('blockTubeExport.matchedByName',
-                'Matched by exact channel name (no verified YouTube channel ID): {count} — {names}',
+                'Matched by exact channel name (no verified channel ID): {count} — {names}',
                 { count: byName.length, names: names.join(', ') }));
         }
         return lines;
@@ -29421,7 +29421,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             if (activeId !== 'default') {
                 UIComponents.showToast(tabViewUiText(
                     'dashboard.backup.toast.switchToDefaultForImport',
-                    'Switch to Default (Master) to import backups'
+                    'Switch to Default (Parent) to import backups'
                 ), 'error');
                 return;
             }
@@ -29531,7 +29531,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                         ),
                         tabViewUiText(
                             'dashboard.backup.blockTube.review.privacy',
-                            'The original backup is unchanged. No per-channel YouTube requests are made during import.'
+                            'The original backup is unchanged. No per-channel requests are made to the video service during import.'
                         )
                     ],
                     choices: [
@@ -29735,7 +29735,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                         importedChannelEnrichment?.pending
                             ? tabViewUiText(
                                 'dashboard.backup.blockTube.verified.metadataPending',
-                                'Imported channel metadata will be completed in the extension background one row at a time at a randomized 7–15 second interval while the worker is awake ({count} pending). Large lists can take time; this pacing avoids a burst of YouTube requests. Permanent not-found or terminated rows stop retrying and remain in Import Reports for manual verification. Closing this dashboard does not stop the queue, although browser shutdown or wakeup limits can delay it.',
+                                'Imported channel metadata will be completed in the extension background one row at a time at a randomized 7–15 second interval while the worker is awake ({count} pending). Large lists can take time; this pacing avoids a burst of requests to the video service. Permanent not-found or terminated rows stop retrying and remain in Import Reports for manual verification. Closing this dashboard does not stop the queue, although browser shutdown or wakeup limits can delay it.',
                                 { count: Number(importedChannelEnrichment.pending) || 0 }
                             )
                             : (importedChannelEnrichment?.attention
@@ -29744,8 +29744,8 @@ document.addEventListener('DOMContentLoaded', async () => {
                                         ? 'dashboard.backup.blockTube.verified.metadataReviewSingular'
                                         : 'dashboard.backup.blockTube.verified.metadataReviewPlural',
                                     Number(importedChannelEnrichment.attention) === 1
-                                        ? '{count} imported channel row needs manual verification in Import Reports; the exact YouTube reason is retained.'
-                                        : '{count} imported channel rows need manual verification in Import Reports; the exact YouTube reason is retained.',
+                                        ? '{count} imported channel row needs manual verification in Import Reports; the exact reason from the video service is retained.'
+                                        : '{count} imported channel rows need manual verification in Import Reports; the exact reason from the video service is retained.',
                                     { count: Number(importedChannelEnrichment.attention) || 0 }
                                 )
                                 : tabViewUiText(
@@ -29775,8 +29775,8 @@ document.addEventListener('DOMContentLoaded', async () => {
                                 ? 'dashboard.backup.import.metadataReviewSingular'
                                 : 'dashboard.backup.import.metadataReviewPlural',
                             Number(importedChannelEnrichment.attention) === 1
-                                ? '{count} imported channel row needs manual verification; see Import Reports for the exact YouTube reason.'
-                                : '{count} imported channel rows need manual verification; see Import Reports for the exact YouTube reason.',
+                                ? '{count} imported channel row needs manual verification; see Import Reports for the exact reason from the video service.'
+                                : '{count} imported channel rows need manual verification; see Import Reports for the exact reason from the video service.',
                             { count: Number(importedChannelEnrichment.attention) || 0 }
                         )
                         : tabViewUiText(
@@ -31189,7 +31189,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             }
             const profilesV4 = await io.loadProfilesV4();
             if (normalizeString(profilesV4?.activeProfileId) !== 'default') {
-                UIComponents.showToast(tabViewUiText('family.profileManager.switchDefaultToManageMasterPin', 'Switch to Default (Master) to manage Master PIN'), 'error');
+                UIComponents.showToast(tabViewUiText('family.profileManager.switchDefaultToManageMasterPin', 'Switch to Default (Parent) to manage Master PIN'), 'error');
                 return;
             }
 
@@ -31267,7 +31267,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             }
             const profilesV4 = await io.loadProfilesV4();
             if (normalizeString(profilesV4?.activeProfileId) !== 'default') {
-                UIComponents.showToast(tabViewUiText('family.profileManager.switchDefaultToManageMasterPin', 'Switch to Default (Master) to manage Master PIN'), 'error');
+                UIComponents.showToast(tabViewUiText('family.profileManager.switchDefaultToManageMasterPin', 'Switch to Default (Parent) to manage Master PIN'), 'error');
                 return;
             }
 
@@ -31714,7 +31714,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                 intro,
                 'textContent',
                 'dashboard.ruleEditor.dateLimitIntro',
-                'Use this only when a word should affect videos from a certain upload date. If YouTube does not show a date for a video, this date-limited keyword will not hide it by itself.'
+                'Use this only when a word should affect videos from a certain upload date. If no date is shown for a video, this date-limited keyword will not hide it by itself.'
             );
             body.appendChild(intro);
 
@@ -31872,7 +31872,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             if (!channel) {
                 UIComponents.showToast(tabViewUiText(
                     'dashboard.ruleEditor.invalidChannelFormat',
-                    'Invalid format. Use @handle, Channel ID, c/ChannelName, or YouTube URL'
+                    'Invalid format. Use @handle, Channel ID, c/ChannelName, or a channel URL'
                 ), 'error');
                 return false;
             }
@@ -31898,7 +31898,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         if (message.startsWith('Invalid format. Use @handle, Channel ID,')) {
             return tabViewUiText(
                 'dashboard.ruleEditor.invalidChannelFormat',
-                'Invalid format. Use @handle, Channel ID, c/ChannelName, or YouTube URL'
+                'Invalid format. Use @handle, Channel ID, c/ChannelName, or a channel URL'
             );
         }
         if (message === 'Channel already exists or could not be added') {
@@ -32488,16 +32488,16 @@ document.addEventListener('DOMContentLoaded', async () => {
                 let copyBlocklist = false;
                 if (nextState && whitelistEmpty && blocklistHasRules) {
                     copyBlocklist = window.confirm(profileType === 'kids'
-                        ? tabViewUiText('popup.listMode.copyKidsRulesConfirm', 'Copy your current YT Kids blocked rules into Allowed rules? Your blocked rules will be kept.')
+                        ? tabViewUiText('popup.listMode.copyKidsRulesConfirm', 'Copy your current Kids blocked rules into Allowed rules? Your blocked rules will be kept.')
                         : tabViewUiText('popup.listMode.copyRulesConfirm', 'Copy the current blocked rules into Allowed rules? Your blocked rules will be kept.'));
                     if (!copyBlocklist) {
                         UIComponents.showToast(profileType === 'kids'
-                            ? tabViewUiText('popup.listMode.emptyKidsAllowedRules', 'YT Kids Allowed rules are empty — videos will stay hidden until you add allow rules.')
+                            ? tabViewUiText('popup.listMode.emptyKidsAllowedRules', 'Kids Allowed rules are empty — videos will stay hidden until you add allow rules.')
                             : tabViewUiText('popup.listMode.emptyAllowedRules', 'Allowed rules are empty — videos will stay hidden until you add allow rules.'), 'info');
                     }
                 } else if (nextState && whitelistEmpty) {
                     UIComponents.showToast(profileType === 'kids'
-                        ? tabViewUiText('popup.listMode.emptyKidsAllowedRules', 'YT Kids Allowed rules are empty — videos will stay hidden until you add allow rules.')
+                        ? tabViewUiText('popup.listMode.emptyKidsAllowedRules', 'Kids Allowed rules are empty — videos will stay hidden until you add allow rules.')
                         : tabViewUiText('popup.listMode.emptyAllowedRules', 'Allowed rules are empty — videos will stay hidden until you add allow rules.'), 'info');
                 }
                 let resp = null;
@@ -32590,7 +32590,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         if (profileType === 'main' && currentMode === 'whitelist' && subscriptionsImportState.canEnableWhitelist) {
             setSubscriptionsImportState({
                 tone: 'success',
-                message: 'Imported subscribed channels are now active in whitelist mode.',
+                message: 'Imported followed channels are now active in whitelist mode.',
                 canEnableWhitelist: false
             });
         } else {

@@ -57,7 +57,7 @@
   ],
   "translations": {
     "zh-Hans": [
-      "YouTube 经常更改页面结构。提交简短报告有助于 FilterTube 在影响更多家庭前更新匹配逻辑。",
+      "视频网站经常更改页面结构。提交简短报告有助于 FilterTube 在影响更多家庭前更新匹配逻辑。",
       "将当前打开的个人资料复制到你自己的第二台设备。无需使用受保护个人资料或 PIN。若要复制其他个人资料，请先切换。",
       "只有在需要家长管理规则、时间限制或观看权限时，才创建受保护的儿童/用户个人资料。",
       "将家长批准的规则、时间和观看权限发送到现有的受保护个人资料。两台设备同时打开时使用此功能。",
@@ -88,7 +88,7 @@
       "仅在需要修复链接、选择较小的规则范围，或更改合并与替换行为时打开。",
       "关系决定此设备是发送、接收，还是仅复制一次设置。家庭控制默认采用家长到受保护设备的方式。",
       "范围决定发送内容：当前个人资料、Main 规则、Kids 规则、关键词、频道、时间限制或完整备份。",
-      "发送关键词、频道和视频规则时，选择使用本地 Main YouTube 还是 YouTube Kids 规则。",
+      "发送关键词、频道和视频规则时，选择使用本地主站还是 Kids 规则。",
       "已连接设备上可直接设为目标的受保护个人资料会显示在这里。",
       "合并会添加所选规则。替换仅覆盖受管理的受保护设备上所选范围。",
       "在此设备上创建配对代码或 QR。另一台设备必须加入并显示相同的安全短语。",
@@ -113,7 +113,7 @@
       "已保存的信任不等于实时连接，也绝不会跳过本地验证。"
     ],
     "hi": [
-      "YouTube अक्सर अपने पेज की संरचना बदलता है। एक छोटी रिपोर्ट से FilterTube को मिलान का तरीका अपडेट करने में मदद मिलती है, इससे पहले कि और परिवार प्रभावित हों।",
+      "वीडियो साइट अक्सर अपने पेज की संरचना बदलती है। एक छोटी रिपोर्ट से FilterTube को मिलान का तरीका अपडेट करने में मदद मिलती है, इससे पहले कि और परिवार प्रभावित हों।",
       "अभी खुली प्रोफ़ाइल को अपने दूसरे डिवाइस पर कॉपी करें। सुरक्षित प्रोफ़ाइल या PIN की ज़रूरत नहीं है। दूसरी प्रोफ़ाइल कॉपी करनी हो तो पहले प्रोफ़ाइल बदलें।",
       "सुरक्षित बाल/उपयोगकर्ता प्रोफ़ाइल तभी बनाएँ जब आपको अभिभावक-प्रबंधित नियम, समय-सीमाएँ या देखने की पहुँच चाहिए।",
       "अभिभावक-अनुमोदित नियम, समय और देखने की पहुँच किसी मौजूदा सुरक्षित प्रोफ़ाइल पर भेजें। दोनों डिवाइस एक साथ खुले हों तो इसका उपयोग करें।",
@@ -144,7 +144,7 @@
       "इसे केवल तब खोलें जब लिंक ठीक करना हो, नियमों का छोटा दायरा चुनना हो, या मर्ज और बदलने का तरीका बदलना हो।",
       "संबंध तय करता है कि यह डिवाइस भेजेगा, प्राप्त करेगा या केवल एक बार सेटिंग कॉपी करेगा। पारिवारिक नियंत्रण में डिफ़ॉल्ट रूप से अभिभावक से सुरक्षित डिवाइस तक भेजा जाता है।",
       "दायरा तय करता है कि क्या भेजा जाएगा: मौजूदा प्रोफ़ाइल, Main नियम, Kids नियम, कीवर्ड, चैनल, समय-सीमाएँ या पूरा बैकअप।",
-      "कीवर्ड, चैनल और वीडियो नियम भेजते समय चुनें कि स्थानीय Main YouTube के नियम इस्तेमाल हों या YouTube Kids के।",
+      "कीवर्ड, चैनल और वीडियो नियम भेजते समय चुनें कि स्थानीय मुख्य के नियम इस्तेमाल हों या Kids के।",
       "कनेक्ट किए गए डिवाइस की वे सहेजी सुरक्षित प्रोफ़ाइलें यहाँ दिखती हैं जिन्हें सीधे लक्ष्य बनाया जा सकता है।",
       "मर्ज चुने हुए नियम जोड़ता है। बदलना केवल प्रबंधित सुरक्षित डिवाइसों पर चुने हुए दायरे को ओवरराइट करता है।",
       "इस डिवाइस पर जोड़ने का कोड या QR बनाएँ। दूसरी डिवाइस को शामिल होकर वही सुरक्षा वाक्य दिखाना होगा।",
@@ -169,7 +169,7 @@
       "सहेजा हुआ भरोसा लाइव कनेक्शन नहीं है और स्थानीय सत्यापन को कभी छोड़ता नहीं है।"
     ],
     "es": [
-      "YouTube cambia la estructura de sus páginas con frecuencia. Un informe rápido ayuda a FilterTube a actualizar la lógica de coincidencia antes de que afecte a más familias.",
+      "El sitio de vídeos cambia a menudo la estructura de sus páginas. Un informe rápido ayuda a FilterTube a actualizar la lógica de coincidencia antes de que afecte a más familias.",
       "Copia el perfil abierto ahora a tu segundo dispositivo personal. No hace falta un perfil protegido ni un PIN. Cambia de perfil primero si quieres copiar otro.",
       "Crea un perfil protegido infantil/de usuario solo si quieres reglas, límites de tiempo o acceso de visualización administrados por un progenitor.",
       "Envía reglas, tiempo y acceso de visualización aprobados por el progenitor a un perfil protegido existente. Úsalo cuando ambos dispositivos estén abiertos a la vez.",
@@ -200,7 +200,7 @@
       "Ábrelo solo si necesitas reparar un enlace, elegir un alcance de reglas menor o cambiar entre combinar y reemplazar.",
       "La relación determina si este dispositivo envía, recibe o solo copia ajustes una vez. El control familiar usa por defecto la dirección del progenitor al dispositivo protegido.",
       "El alcance determina qué se envía: perfil actual, reglas Main, reglas Kids, palabras clave, canales, límites de tiempo o copia de seguridad completa.",
-      "Para enviar reglas de palabras clave, canales y vídeos, elige si se usan las reglas locales de Main YouTube o YouTube Kids.",
+      "Al enviar reglas de palabras clave, canales y vídeos, elige si se usan las reglas locales de Principal o de Kids.",
       "Aquí aparecen los perfiles protegidos guardados del dispositivo conectado cuando pueden seleccionarse como destino directo.",
       "Combinar añade las reglas seleccionadas. Reemplazar sobrescribe solo el alcance seleccionado en dispositivos protegidos administrados.",
       "Crea un código o QR de emparejamiento en este dispositivo. El otro debe unirse y mostrar la misma frase de seguridad.",
@@ -225,7 +225,7 @@
       "La confianza guardada no es una conexión en directo y nunca omite la validación local."
     ],
     "ar": [
-      "يغيّر YouTube بنية صفحاته كثيرًا. يساعد التقرير السريع FilterTube على تحديث منطق المطابقة قبل تأثر مزيد من العائلات.",
+      "يغيّر موقع الفيديو بنية صفحاته كثيرًا. يساعد التقرير السريع FilterTube على تحديث منطق المطابقة قبل تأثر مزيد من العائلات.",
       "انسخ الملف الشخصي المفتوح حاليًا إلى جهازك الشخصي الثاني. لا حاجة إلى ملف محمي أو PIN. بدّل الملفات الشخصية أولًا إذا أردت نسخ ملف آخر.",
       "أنشئ ملفًا شخصيًا محميًا لطفل/مستخدم فقط إذا أردت قواعد أو حدود وقت أو صلاحية مشاهدة يديرها الوالد.",
       "أرسل القواعد والوقت وصلاحية المشاهدة التي وافق عليها الوالد إلى ملف شخصي محمي موجود. استخدم هذا عندما يكون الجهازان مفتوحين معًا.",
@@ -256,7 +256,7 @@
       "افتح هذا فقط عند الحاجة إلى إصلاح رابط أو اختيار نطاق قواعد أصغر أو تغيير سلوك الدمج والاستبدال.",
       "تحدد العلاقة ما إذا كان هذا الجهاز سيرسل أو يستقبل أو ينسخ الإعدادات مرة واحدة فقط. يستخدم التحكم العائلي افتراضيًا الاتجاه من الوالد إلى الجهاز المحمي.",
       "يحدد النطاق ما يُرسل: الملف الشخصي الحالي أو قواعد Main أو قواعد Kids أو الكلمات المفتاحية أو القنوات أو حدود الوقت أو النسخة الاحتياطية الكاملة.",
-      "عند إرسال قواعد الكلمات المفتاحية والقنوات والفيديو، اختر استخدام قواعد Main YouTube المحلية أو YouTube Kids.",
+      "عند إرسال قواعد الكلمات المفتاحية والقنوات والفيديو، اختر استخدام قواعد الرئيسي أو Kids المحلية.",
       "تظهر هنا الملفات الشخصية المحمية المحفوظة من الجهاز المتصل عندما يمكن استهدافها مباشرة.",
       "يضيف الدمج القواعد المحددة. ويستبدل الخيار الآخر النطاق المحدد فقط على الأجهزة المحمية المُدارة.",
       "أنشئ رمز إقران أو QR على هذا الجهاز. يجب أن ينضم الجهاز الآخر ويعرض عبارة الأمان نفسها.",
@@ -281,7 +281,7 @@
       "الثقة المحفوظة ليست اتصالًا مباشرًا ولا تتجاوز التحقق المحلي أبدًا."
     ],
     "fr": [
-      "YouTube modifie souvent la structure de ses pages. Un signalement rapide aide FilterTube à mettre à jour la logique de correspondance avant que d’autres familles soient touchées.",
+      "Le site vidéo modifie souvent la structure de ses pages. Un signalement rapide aide FilterTube à mettre à jour sa logique de correspondance avant que d’autres familles soient touchées.",
       "Copiez le profil actuellement ouvert sur votre propre deuxième appareil. Aucun profil protégé ni PIN n’est nécessaire. Changez d’abord de profil si vous souhaitez en copier un autre.",
       "Créez un profil protégé enfant/utilisateur uniquement si vous souhaitez des règles, des limites de temps ou un accès vidéo gérés par un parent.",
       "Envoyez les règles, le temps et l’accès vidéo approuvés par le parent à un profil protégé existant. Utilisez cette option lorsque les deux appareils sont ouverts en même temps.",
@@ -312,7 +312,7 @@
       "Ouvrez uniquement si vous devez réparer un lien, choisir une portée de règles plus petite ou modifier le comportement de fusion/remplacement.",
       "La relation détermine si cet appareil envoie, reçoit ou copie seulement les paramètres une fois. Le contrôle familial utilise par défaut le sens parent vers appareil protégé.",
       "La portée détermine ce qui est envoyé : profil actuel, règles Main, règles Kids, mots-clés, chaînes, limites de temps ou sauvegarde complète.",
-      "Pour envoyer des règles de mots-clés, de chaînes et de vidéos, choisissez d’utiliser les règles locales Main YouTube ou YouTube Kids.",
+      "Pour l’envoi de règles de mots-clés, de chaînes et de vidéos, choisissez si les règles locales de Principal ou de Kids sont utilisées.",
       "Les profils protégés enregistrés depuis l’appareil connecté apparaissent ici lorsqu’ils peuvent être ciblés directement.",
       "Fusionner ajoute les règles sélectionnées. Remplacer écrase uniquement la portée sélectionnée sur les appareils protégés gérés.",
       "Créez un code ou un QR d’association sur cet appareil. L’autre appareil doit rejoindre la session et afficher la même phrase de sécurité.",
@@ -337,7 +337,7 @@
       "La confiance enregistrée n’est pas une connexion en direct et ne contourne jamais la validation locale."
     ],
     "bn": [
-      "YouTube তার পৃষ্ঠার গঠন প্রায়ই বদলায়। দ্রুত রিপোর্ট পেলে আরও পরিবার প্রভাবিত হওয়ার আগে FilterTube মিল খোঁজার পদ্ধতি হালনাগাদ করতে পারে।",
+      "ভিডিও সাইট তার পৃষ্ঠার গঠন প্রায়ই বদলায়। দ্রুত রিপোর্ট পেলে আরও পরিবার প্রভাবিত হওয়ার আগে FilterTube মিল খোঁজার পদ্ধতি হালনাগাদ করতে পারে।",
       "এখন খোলা প্রোফাইলটি আপনার নিজের দ্বিতীয় ডিভাইসে কপি করুন। সুরক্ষিত প্রোফাইল বা PIN দরকার নেই। অন্য প্রোফাইল কপি করতে চাইলে আগে প্রোফাইল বদলান।",
       "অভিভাবক-পরিচালিত নিয়ম, সময়সীমা বা দেখার প্রবেশাধিকার চাইলে তবেই সুরক্ষিত শিশু/ব্যবহারকারী প্রোফাইল তৈরি করুন।",
       "অভিভাবক-অনুমোদিত নিয়ম, সময় ও দেখার প্রবেশাধিকার বিদ্যমান সুরক্ষিত প্রোফাইলে পাঠান। দুই ডিভাইস একসঙ্গে খোলা থাকলে এটি ব্যবহার করুন।",
@@ -368,7 +368,7 @@
       "লিংক মেরামত, নিয়মের ছোট পরিসর নির্বাচন, বা মেশানো ও প্রতিস্থাপনের আচরণ বদলাতে হলেই শুধু খুলুন।",
       "এই ডিভাইস পাঠাবে, গ্রহণ করবে, নাকি শুধু একবার সেটিং কপি করবে তা সম্পর্ক নির্ধারণ করে। পারিবারিক নিয়ন্ত্রণে ডিফল্ট হলো অভিভাবক থেকে সুরক্ষিত ডিভাইসে পাঠানো।",
       "কী পাঠানো হবে তা পরিসর ঠিক করে: বর্তমান প্রোফাইল, Main নিয়ম, Kids নিয়ম, কীওয়ার্ড, চ্যানেল, সময়সীমা বা সম্পূর্ণ ব্যাকআপ।",
-      "কীওয়ার্ড, চ্যানেল ও ভিডিও নিয়ম পাঠানোর সময় স্থানীয় Main YouTube নাকি YouTube Kids নিয়ম ব্যবহার হবে বেছে নিন।",
+      "কিওয়ার্ড, চ্যানেল ও ভিডিও নিয়ম পাঠানোর সময় লোকাল মূল না Kids নিয়ম ব্যবহার হবে তা বেছে নিন।",
       "সংযুক্ত ডিভাইসের সংরক্ষিত সুরক্ষিত প্রোফাইলগুলো সরাসরি লক্ষ্য করা গেলে এখানে দেখা যায়।",
       "মেশানো নির্বাচিত নিয়ম যোগ করে। প্রতিস্থাপন শুধু পরিচালিত সুরক্ষিত ডিভাইসে নির্বাচিত পরিসরটি মুছে নতুন করে বসায়।",
       "এই ডিভাইসে জোড়া লাগানোর কোড বা QR তৈরি করুন। অন্য ডিভাইসকে যোগ দিয়ে একই নিরাপত্তা বাক্য দেখাতে হবে।",
@@ -393,7 +393,7 @@
       "সংরক্ষিত বিশ্বাস সরাসরি সংযোগ নয় এবং স্থানীয় যাচাই কখনো এড়িয়ে যায় না।"
     ],
     "pt": [
-      "O YouTube muda a estrutura das páginas com frequência. Um relatório rápido ajuda o FilterTube a atualizar a lógica de correspondência antes que mais famílias sejam afetadas.",
+      "O site de vídeos muda a estrutura das páginas com frequência. Um relatório rápido ajuda o FilterTube a atualizar a lógica de correspondência antes que mais famílias sejam afetadas.",
       "Copie o perfil aberto agora para seu segundo dispositivo. Não é necessário um perfil protegido nem PIN. Troque de perfil primeiro se quiser copiar outro.",
       "Crie um perfil protegido infantil/de usuário apenas quando quiser regras, limites de tempo ou acesso de visualização gerenciados pelos pais.",
       "Envie regras, tempo e acesso de visualização aprovados pelos pais para um perfil protegido existente. Use quando os dois dispositivos estiverem abertos ao mesmo tempo.",
@@ -424,7 +424,7 @@
       "Abra somente se precisar reparar um vínculo, escolher um escopo menor de regras ou alterar o comportamento de mesclar versus substituir.",
       "A relação define se este dispositivo envia, recebe ou apenas copia configurações uma vez. O controle familiar usa como padrão o envio dos pais para o dispositivo protegido.",
       "O escopo define o que será enviado: perfil atual, regras Main, regras Kids, palavras-chave, canais, limites de tempo ou backup completo.",
-      "Ao enviar regras de palavras-chave, canais e vídeos, escolha entre as regras locais Main YouTube e YouTube Kids.",
+      "Ao enviar regras de palavras-chave, canais e vídeos, escolha entre as regras locais do Principal e do Kids.",
       "Perfis protegidos salvos no dispositivo conectado aparecem aqui quando podem ser escolhidos diretamente como destino.",
       "Mesclar adiciona as regras selecionadas. Substituir sobrescreve somente o escopo escolhido em dispositivos protegidos gerenciados.",
       "Crie um código ou QR de pareamento neste dispositivo. O outro precisa entrar e mostrar a mesma frase de segurança.",
@@ -449,7 +449,7 @@
       "A confiança salva não é uma conexão ao vivo e nunca ignora a validação local."
     ],
     "id": [
-      "YouTube sering mengubah struktur halamannya. Laporan singkat membantu FilterTube memperbarui logika pencocokan sebelum lebih banyak keluarga terdampak.",
+      "Situs video sering mengubah struktur halamannya. Laporan singkat membantu FilterTube memperbarui logika pencocokan sebelum lebih banyak keluarga terdampak.",
       "Salin profil yang sedang terbuka ke perangkat kedua milik Anda. Tidak perlu profil terlindungi atau PIN. Ganti profil terlebih dahulu jika ingin menyalin profil lain.",
       "Buat profil anak/pengguna terlindungi hanya jika Anda menginginkan aturan, batas waktu, atau akses tontonan yang dikelola orang tua.",
       "Kirim aturan, waktu, dan akses tontonan yang disetujui orang tua ke profil terlindungi yang sudah ada. Gunakan saat kedua perangkat terbuka bersamaan.",
@@ -480,7 +480,7 @@
       "Buka hanya jika perlu memperbaiki tautan, memilih cakupan aturan yang lebih kecil, atau mengubah perilaku gabung dan ganti.",
       "Hubungan menentukan apakah perangkat ini mengirim, menerima, atau hanya menyalin pengaturan sekali. Kontrol keluarga secara bawaan mengirim dari orang tua ke perangkat terlindungi.",
       "Cakupan menentukan yang dikirim: profil saat ini, aturan Main, aturan Kids, kata kunci, kanal, batas waktu, atau cadangan penuh.",
-      "Untuk pengiriman aturan kata kunci, kanal, dan video, pilih apakah akan memakai aturan lokal Main YouTube atau YouTube Kids.",
+      "Untuk pengiriman aturan kata kunci, kanal, dan video, pilih apakah akan memakai aturan lokal Utama atau Kids.",
       "Profil terlindungi tersimpan dari perangkat yang terhubung muncul di sini jika dapat langsung dijadikan tujuan.",
       "Gabungkan menambahkan aturan yang dipilih. Ganti menimpa hanya cakupan terpilih pada perangkat terlindungi yang dikelola.",
       "Buat kode atau QR pemasangan di perangkat ini. Perangkat lain harus bergabung dan menampilkan frasa keamanan yang sama.",
@@ -505,7 +505,7 @@
       "Kepercayaan yang tersimpan bukan koneksi langsung dan tidak pernah melewati validasi lokal."
     ],
     "ur": [
-      "YouTube اکثر اپنے صفحے کی ساخت بدلتا رہتا ہے۔ ایک مختصر رپورٹ FilterTube کو مماثلت کا طریقہ اپ ڈیٹ کرنے میں مدد دیتی ہے، اس سے پہلے کہ مزید خاندان متاثر ہوں۔",
+      "ویڈیو سائٹ اکثر اپنے صفحات کی ساخت بدلتی ہے۔ ایک فوری رپورٹ FilterTube کو مزید خاندانوں کے متاثر ہونے سے پہلے مماثلت کی منطق اپ ڈیٹ کرنے میں مدد دیتی ہے۔",
       "ابھی کھلے ہوئے پروفائل کو اپنے دوسرے آلے پر نقل کریں۔ محفوظ پروفائل یا PIN درکار نہیں۔ کوئی دوسرا پروفائل نقل کرنا ہو تو پہلے پروفائل بدلیں۔",
       "محفوظ بچے/صارف کا پروفائل صرف تب بنائیں جب آپ کو والدین کے زیرِ انتظام قواعد، وقت کی حدود یا دیکھنے کی رسائی چاہیے۔",
       "والدین کے منظور کردہ قواعد، وقت اور دیکھنے کی رسائی کسی موجود محفوظ پروفائل پر بھیجیں۔ دونوں آلات ایک ساتھ کھلے ہوں تو یہ استعمال کریں۔",
@@ -536,7 +536,7 @@
       "صرف تب کھولیں جب رابطہ درست کرنا ہو، قواعد کا چھوٹا دائرۂ کار چننا ہو یا ضم اور بدلنے کا طریقہ تبدیل کرنا ہو۔",
       "تعلق طے کرتا ہے کہ یہ آلہ بھیجے گا، وصول کرے گا یا صرف ایک بار ترتیبات نقل کرے گا۔ خاندانی کنٹرول میں پہلے سے طے شدہ راستہ والدین سے محفوظ آلے تک ہے۔",
       "دائرۂ کار طے کرتا ہے کہ کیا بھیجا جائے گا: موجودہ پروفائل، Main قواعد، Kids قواعد، کلیدی الفاظ، چینلز، وقت کی حدود یا مکمل بیک اپ۔",
-      "کلیدی الفاظ، چینلز اور ویڈیو کے قواعد بھیجتے وقت چنیں کہ مقامی Main YouTube یا YouTube Kids قواعد استعمال ہوں۔",
+      "کلیدی لفظ، چینل اور ویڈیو قواعد بھیجتے وقت منتخب کریں کہ مقامی مرکزی یا Kids قواعد استعمال ہوں۔",
       "منسلک آلے کے محفوظ شدہ پروفائل یہاں دکھائی دیتے ہیں جب انہیں براہِ راست ہدف بنایا جا سکتا ہو۔",
       "ضم کرنے سے منتخب قواعد شامل ہوتے ہیں۔ بدلنے سے صرف منتخب دائرۂ کار زیرِ انتظام محفوظ آلات پر اووررائٹ ہوتا ہے۔",
       "اس آلے پر جوڑنے کا کوڈ یا QR بنائیں۔ دوسرے آلے کو شامل ہو کر وہی حفاظتی فقرہ دکھانا ہوگا۔",
@@ -561,7 +561,7 @@
       "محفوظ شدہ اعتماد براہِ راست رابطہ نہیں ہے اور مقامی تصدیق کو کبھی نہیں چھوڑتا۔"
     ],
     "ru": [
-      "YouTube часто меняет структуру страниц. Краткий отчёт помогает FilterTube обновить логику сопоставления, пока проблема не затронула больше семей.",
+      "Видеосайт часто меняет структуру страниц. Краткий отчёт помогает FilterTube обновить логику сопоставления, пока проблема не затронула больше семей.",
       "Скопируйте открытый сейчас профиль на своё второе устройство. Защищённый профиль или PIN не требуются. Чтобы скопировать другой профиль, сначала переключитесь на него.",
       "Создавайте защищённый детский профиль или профиль пользователя, только если нужны правила, лимиты времени или доступ к просмотру под контролем родителя.",
       "Отправьте одобренные родителем правила, время и доступ к просмотру в существующий защищённый профиль. Используйте, когда оба устройства открыты одновременно.",
@@ -592,7 +592,7 @@
       "Открывайте, только если нужно восстановить связь, выбрать меньшую область правил или изменить режим слияния и замены.",
       "Тип связи определяет, отправляет ли устройство настройки, получает их или копирует один раз. Для семейного управления по умолчанию используется связь от родителя к защищённому устройству.",
       "Область определяет содержимое отправки: текущий профиль, правила Main, правила Kids, ключевые слова, каналы, лимиты времени или полная резервная копия.",
-      "При отправке правил для ключевых слов, каналов и видео выберите локальные правила Main YouTube или YouTube Kids.",
+      "При отправке правил для ключевых слов, каналов и видео выберите локальные правила Основного или Детского режима.",
       "Здесь отображаются сохранённые защищённые профили подключённого устройства, если их можно выбрать напрямую.",
       "Слияние добавляет выбранные правила. Замена перезаписывает только выбранную область на управляемых защищённых устройствах.",
       "Создайте код или QR для связывания на этом устройстве. Второе устройство должно присоединиться и показать ту же фразу безопасности.",
@@ -617,7 +617,7 @@
       "Сохранённое доверие не является активным подключением и никогда не отменяет локальную проверку."
     ],
     "de": [
-      "YouTube ändert seine Seitenstruktur häufig. Ein kurzer Bericht hilft FilterTube, die Erkennungslogik zu aktualisieren, bevor weitere Familien betroffen sind.",
+      "Die Videoseite ändert ihre Seitenstruktur oft. Eine kurze Meldung hilft FilterTube, die Erkennung zu aktualisieren, bevor weitere Familien betroffen sind.",
       "Kopiere das aktuell geöffnete Profil auf dein eigenes zweites Gerät. Ein geschütztes Profil oder eine PIN ist nicht erforderlich. Wechsle zuerst das Profil, wenn du ein anderes kopieren möchtest.",
       "Erstelle ein geschütztes Kinder-/Benutzerprofil nur, wenn du elternverwaltete Regeln, Zeitlimits oder Wiedergabezugriff möchtest.",
       "Sende elternseitig genehmigte Regeln, Zeit und Wiedergabezugriff an ein vorhandenes geschütztes Profil. Nutze dies, wenn beide Geräte gleichzeitig geöffnet sind.",
@@ -648,7 +648,7 @@
       "Nur öffnen, wenn du eine Verbindung reparieren, einen kleineren Regelumfang wählen oder das Zusammenführen-/Ersetzen-Verhalten ändern musst.",
       "Die Beziehung legt fest, ob dieses Gerät Einstellungen sendet, empfängt oder nur einmal kopiert. Bei Familiensteuerung gilt standardmäßig Elternteil-zu-geschütztem-Gerät.",
       "Der Umfang bestimmt den Inhalt: aktuelles Profil, Main-Regeln, Kids-Regeln, Schlüsselwörter, Kanäle, Zeitlimits oder vollständiges Backup.",
-      "Wähle beim Senden von Schlüsselwort-, Kanal- und Videoregeln, ob lokale Main-YouTube- oder YouTube Kids-Regeln verwendet werden.",
+      "Lege beim Senden von Schlüsselwort-, Kanal- und Videoregeln fest, ob die lokalen Regeln des Hauptbereichs oder von Kids verwendet werden.",
       "Hier erscheinen gespeicherte geschützte Profile des verbundenen Geräts, wenn sie direkt als Ziel ausgewählt werden können.",
       "Zusammenführen fügt die ausgewählten Regeln hinzu. Ersetzen überschreibt auf verwalteten geschützten Geräten nur den ausgewählten Umfang.",
       "Erstelle auf diesem Gerät einen Kopplungscode oder QR. Das andere Gerät muss beitreten und denselben Sicherheitssatz anzeigen.",
@@ -673,7 +673,7 @@
       "Gespeichertes Vertrauen ist keine aktive Verbindung und überspringt niemals die lokale Prüfung."
     ],
     "ja": [
-      "YouTube はページ構造を頻繁に変更します。簡単な報告があれば、影響する家庭が増える前に FilterTube が判定ロジックを更新できます。",
+      "動画サイトはページ構造を頻繁に変更します。簡単な報告があれば、影響する家庭が増える前に FilterTube が判定ロジックを更新できます。",
       "現在開いているプロフィールを自分の2台目のデバイスにコピーします。保護プロフィールや PIN は不要です。別のプロフィールをコピーする場合は、先に切り替えてください。",
       "保護者が管理するルール、時間制限、視聴アクセスが必要な場合に限り、保護された子ども/ユーザープロフィールを作成してください。",
       "保護者が承認したルール、時間、視聴アクセスを既存の保護プロフィールへ送信します。両方のデバイスを同時に開ける場合に使います。",
@@ -704,7 +704,7 @@
       "リンクの修復、より小さいルール範囲の選択、統合と置換の動作変更が必要な場合だけ開きます。",
       "このデバイスが送信、受信、または一度だけ設定をコピーするかは関係によって決まります。ファミリー管理では保護者から保護デバイスへの設定が既定です。",
       "送信範囲を選びます：現在のプロフィール、Main ルール、Kids ルール、キーワード、チャンネル、時間制限、または完全バックアップ。",
-      "キーワード、チャンネル、動画ルールを送る場合、ローカルの Main YouTube と YouTube Kids のどちらのルールを使うか選びます。",
+      "キーワード、チャンネル、動画ルールを送る場合、ローカルのメインと Kids のどちらのルールを使うか選びます。",
       "接続中のデバイスに保存され、直接送信先にできる保護プロフィールがここに表示されます。",
       "統合は選択したルールを追加します。置換は管理対象の保護デバイスで選択した範囲だけを上書きします。",
       "このデバイスでペアリングコードまたは QR を作成します。相手のデバイスが参加し、同じ安全フレーズを表示する必要があります。",
@@ -729,7 +729,7 @@
       "保存済みの信頼関係はライブ接続ではなく、ローカル検証を省略することもありません。"
     ],
     "pcm": [
-      "YouTube dey change how e arrange e page often. Quick report go help FilterTube update the matching logic before e affect more families.",
+      "The video site dey change how im page dey arrange well-well. Quick report go help FilterTube update the matching logic before e affect more families.",
       "Copy the profile wey dey open now go your own second device. You no need protected profile or PIN. Change profile first if na another profile you wan copy.",
       "Create protected pikin/user profile only when you want parent-managed rules, time limits, or viewing access.",
       "Send rules, time, and viewing access wey parent approve go an existing protected profile. Use am when both devices dey open together.",
@@ -760,7 +760,7 @@
       "Open am only when you need repair link, choose smaller rule scope, or change merge versus replace behavior.",
       "Relationship decide whether this device go send, receive, or copy settings once. Family control dey use parent-to-protected default.",
       "Scope decide wetin to send: current profile, Main rules, Kids rules, keywords, channels, time limits, or full backup.",
-      "For keyword, channel, and video rule sends, choose whether to use local Main YouTube or YouTube Kids rules.",
+      "For keyword, channel, and video rule sends, choose whether na the local Main or Kids rules dem go use.",
       "Saved protected profiles from the connected device go show here when you fit target them directly.",
       "Merge add the rules wey you choose. Replace overwrite only the scope wey you choose for managed protected devices.",
       "Create pairing code or QR for this device. The other device must join and show the same safety phrase.",

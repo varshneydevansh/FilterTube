@@ -33,7 +33,7 @@
     "dashboard.selfControl.hardWhitelist.start.message.oneMinute.multipleChannels": "For {duration} minute, FilterTube will allow only {count} selected Main channels in {profileName}.",
     "dashboard.selfControl.hardWhitelist.start.message.multipleMinutes.oneChannel": "For {duration} minutes, FilterTube will allow only {count} selected Main channel in {profileName}.",
     "dashboard.selfControl.hardWhitelist.start.message.multipleMinutes.multipleChannels": "For {duration} minutes, FilterTube will allow only {count} selected Main channels in {profileName}.",
-    "dashboard.selfControl.hardWhitelist.start.detail.mainFiltering": "Main YouTube filtering will be enabled and Whitelist mode will be forced.",
+    "dashboard.selfControl.hardWhitelist.start.detail.mainFiltering": "Main filtering will be enabled and Whitelist mode will be forced.",
     "dashboard.selfControl.hardWhitelist.start.detail.noRuleExpansion": "Main keyword and video allow rules will not widen this channel-only session.",
     "dashboard.selfControl.hardWhitelist.start.detail.settingsLocked": "Profile switching, rules, modes, imports, and settings will be blocked.",
     "dashboard.selfControl.hardWhitelist.start.detail.kidsFrozen": "Kids keeps its current mode and rules, but the profile snapshot is frozen.",

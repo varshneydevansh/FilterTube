@@ -69,7 +69,7 @@
   "translations": {
     "fa": [
       "این فهرست باید کجا اعمال شود؟",
-      "فضای YouTube را برای این قوانین انتخاب کنید. FilterTube حالت فعلی Blocklist/Whitelist هر پروفایل محافظت‌شده را رعایت می‌کند.",
+      "فضا (اصلی یا Kids) را برای این قوانین انتخاب کنید. FilterTube حالت فعلی Blocklist/Whitelist هر نمایهٔ محافظت‌شده را رعایت می‌کند.",
       "اکنون به‌روزرسانی حذف ارسال شود؟",
       "هدف محافظت‌شدهٔ مدیریت‌شده لازم است",
       "برای پروفایل‌های محافظت‌شده، FilterTube در این وضعیت گزینهٔ «ارسال با این حال» را مسدود می‌کند تا به‌روزرسانی به پروفایل راه‌دور اشتباه نرسد.",
@@ -136,7 +136,7 @@
     ],
     "ko": [
       "이 목록을 어디에 적용할까요?",
-      "이 규칙에 사용할 YouTube 공간을 선택하세요. FilterTube는 보호 프로필마다 현재 Blocklist/Whitelist 모드를 따릅니다.",
+      "이 규칙을 적용할 공간(메인 또는 키즈)을 선택하세요. FilterTube는 각 보호 프로필의 현재 차단 목록/허용 목록 모드를 따릅니다.",
       "삭제 업데이트를 지금 보낼까요?",
       "관리되는 보호 대상이 필요합니다",
       "보호 프로필에서는 업데이트가 잘못된 원격 프로필에 적용되지 않도록 FilterTube가 이 상황에서 ‘그래도 보내기’를 차단합니다.",
@@ -203,7 +203,7 @@
     ],
     "am": [
       "ይህ ዝርዝር የት ላይ ይተገበር?",
-      "ለእነዚህ ሕጎች የYouTube ቦታን ይምረጡ። FilterTube የእያንዳንዱን የተጠበቀ ፕሮፋይል የአሁኑን Blocklist/Whitelist ሁነታ ይከተላል።",
+      "ለእነዚህ ደንቦች ቦታውን (ዋና ወይም Kids) ይምረጡ። FilterTube የእያንዳንዱን የተጠበቀ መገለጫ የአሁኑን Blocklist/Whitelist ሁነታ ያከብራል።",
       "የማስወገጃ ዝማኔውን አሁን ይላክ?",
       "የሚተዳደር የተጠበቀ ዒላማ ያስፈልጋል",
       "ለተጠበቁ ፕሮፋይሎች ዝማኔው ወደ ተሳሳተ የርቀት ፕሮፋይል እንዳይደርስ FilterTube በዚህ ሁኔታ «ለማንኛውም ላክ»ን ያግዳል።",
@@ -270,7 +270,7 @@
     ],
     "th": [
       "ต้องการใช้รายการนี้ที่ไหน",
-      "เลือกพื้นที่ YouTube สำหรับกฎเหล่านี้ FilterTube จะใช้โหมด Blocklist/Whitelist ปัจจุบันของแต่ละโปรไฟล์ที่ได้รับการปกป้อง",
+      "เลือกพื้นที่ (หลักหรือเด็ก) สำหรับกฎเหล่านี้ FilterTube จะยึดตามโหมดรายการบล็อก/รายการที่อนุญาตปัจจุบันของแต่ละโปรไฟล์ที่ได้รับการปกป้อง",
       "ส่งการอัปเดตการนำออกตอนนี้ไหม",
       "ต้องระบุเป้าหมายที่ได้รับการปกป้องและจัดการแล้ว",
       "สำหรับโปรไฟล์ที่ได้รับการปกป้อง FilterTube จะบล็อก “ส่งต่อไป” ในกรณีนี้ เพื่อไม่ให้อัปเดตไปยังโปรไฟล์ระยะไกลที่ไม่ถูกต้อง",
@@ -337,7 +337,7 @@
     ],
     "jv": [
       "Dhaptar iki arep ditrapake ing ngendi?",
-      "Pilih ruang YouTube kanggo aturan iki. FilterTube bakal manut mode Blocklist/Whitelist sing saiki digunakake saben profil sing dilindhungi.",
+      "Pilih papan (Utama utawa Kids) kanggo aturan iki. FilterTube bakal manut mode Blocklist/Whitelist sing saiki digunakake saben profil sing dilindhungi.",
       "Kirim nganyari pambusakan saiki?",
       "Target profil dilindhungi sing dikelola dibutuhake",
       "Kanggo profil sing dilindhungi, FilterTube ngalangi pilihan “kirim wae” ing kahanan iki supaya nganyari ora mlebu ing profil adoh sing salah.",
@@ -404,7 +404,7 @@
     ],
     "it": [
       "Dove deve essere applicato questo elenco?",
-      "Scegli lo spazio YouTube per queste regole. FilterTube rispetterà la modalità Blocklist/Whitelist attuale di ogni profilo protetto.",
+      "Scegli lo spazio (Principale o Kids) per queste regole. FilterTube rispetterà la modalità Blocklist/Whitelist attuale di ogni profilo protetto.",
       "Inviare ora l'aggiornamento di rimozione?",
       "È necessario un target protetto gestito",
       "Per i profili protetti, in questa situazione FilterTube blocca «invia comunque» per evitare che l'aggiornamento finisca nel profilo remoto sbagliato.",

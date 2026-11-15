@@ -219,6 +219,6 @@ test('default-on advert data filtering remains installed on Main and Kids', () =
   assert.ok(seedRegistration);
   assert.ok(seedRegistration.matches.includes('*://*.youtube.com/*'));
   assert.ok(seedRegistration.matches.includes('*://*.youtubekids.com/*'));
-  assert.match(catalog, /Filter advert data on YouTube and YouTube Kids/);
-  assert.match(catalog, /Desktop videos keep YouTube’s controls/);
+  assert.match(catalog, /Filter advert data on Main and Kids/);
+  assert.match(catalog, /Desktop videos keep the site’s own controls/);
 });

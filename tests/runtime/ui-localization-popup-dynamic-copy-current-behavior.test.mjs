@@ -35,7 +35,7 @@ test('popup runtime-generated status copy uses existing localized catalog keys',
 
   assert.match(popupSource, /const statusKey = enabled \? 'popup\.enabled' : 'popup\.disabled'/);
   assert.match(popupSource, /statusText\.textContent = popupUiText\(statusKey, enabled \? 'Enabled' : 'Disabled'\)/);
-  assert.match(popupSource, /statusLabel\.textContent = popupUiText\('popup\.youtubeTime', 'YouTube time'\)/);
+  assert.match(popupSource, /statusLabel\.textContent = popupUiText\('popup\.youtubeTime', 'Viewing time'\)/);
   assert.match(popupSource, /window\.addEventListener\('filtertube-ui-locale-changed'[\s\S]*?updateCheckboxes\(\)/);
 });
 

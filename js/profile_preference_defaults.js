@@ -6,7 +6,7 @@
 }(typeof globalThis !== 'undefined' ? globalThis : this, function () {
     'use strict';
     const entries = [
-        ['hideShorts', false, 'Hide Shorts'], ['hideComments', false, 'Hide comments'],
+        ['hideShorts', false, 'Hide Clips'], ['hideComments', false, 'Hide comments'],
         ['hideHomeFeed', false, 'Hide Home feed'], ['hideSponsoredCards', true, 'Hide sponsored cards'],
         ['contentOnlyPlayback', true, 'Content-only playback'], ['hidePlayables', false, 'Hide Playables'],
         ['hideWatchPlaylistPanel', false, 'Hide watch playlist panel'], ['hidePlaylistCards', false, 'Hide playlist cards'],
@@ -20,7 +20,7 @@
         ['skipBlockedAutoplay', false, 'Skip blocked autoplay videos'],
         ['alwaysUseOriginalAudio', false, 'Always use original audio'], ['disableAnnotations', false, 'Disable annotations'],
         ['hideTopHeader', false, 'Hide top header'], ['hideNotificationBell', false, 'Hide notification bell'],
-        ['hideExploreTrending', false, 'Hide Explore and Trending'], ['hideMoreFromYouTube', false, 'Hide More from YouTube'],
+        ['hideExploreTrending', false, 'Hide Explore and Popular'], ['hideMoreFromYouTube', false, 'Hide More from the video service'],
         ['hideSubscriptions', false, 'Hide subscriptions'], ['showQuickBlockButton', true, 'Show quick block button'],
         ['showBlockMenuItem', true, 'Show block menu item'], ['hideSearchShelves', false, 'Hide search shelves']
     ].map(([key, value, label]) => Object.freeze({ key, value, label }));

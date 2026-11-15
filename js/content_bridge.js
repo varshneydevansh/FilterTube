@@ -8725,7 +8725,7 @@ function openFilterTubePlaylistFallbackPopover(button, row) {
     hint.className = 'ft-hint';
     hint.textContent = filterTubeContentMenuText(
         'content.menu.fallbackHint',
-        'Fallback menu (YouTube 3-dot unavailable for this item).'
+        'Fallback menu (the site’s 3-dot menu is unavailable for this item).'
     );
 
     const hasIdentifier = (channel) => Boolean(channel?.handle || channel?.id || channel?.customUrl);

@@ -1067,8 +1067,8 @@
                     title: familyUiText('family.commandCenter.firstSetup.step.createProfileHelp', 'The profile gets its own Main and Kids rules. The parent/account keeps policy authority.')
                 },
                 {
-                    text: familyUiText('family.commandCenter.firstSetup.step.setAccessTime', 'Set Main/Kids access and daily YouTube time'),
-                    title: familyUiText('family.commandCenter.firstSetup.step.setAccessTimeHelp', 'The runtime gate enforces access and time limits on YouTube surfaces for that profile.')
+                    text: familyUiText('family.commandCenter.firstSetup.step.setAccessTime', 'Set Main/Kids access and daily viewing time'),
+                    title: familyUiText('family.commandCenter.firstSetup.step.setAccessTimeHelp', 'The runtime gate enforces access and time limits on every video page for that profile.')
                 },
                 {
                     text: familyUiText('family.commandCenter.firstSetup.step.addRules', 'Add keywords, channels, whitelist, or blocklist rules'),
@@ -1147,7 +1147,7 @@
             { label: familyUiText('family.commandCenter.stat.readyDevices', 'Ready devices'), value: summary.syncReadyProfileCount, tone: summary.syncReadyProfileCount ? 'success' : 'neutral', title: familyUiText('family.commandCenter.stat.readyDevicesHelp', 'Profiles with a verified device path available now.'), always: true },
             { label: familyUiText('family.commandCenter.stat.ruleLists', 'Rule lists'), value: summary.managedChannelListProfileCount, tone: 'success', title: familyUiText('family.commandCenter.stat.ruleListsHelp', 'Protected profiles with parent-approved channel or keyword lists.') },
             { label: familyUiText('family.commandCenter.stat.needsPairing', 'Needs pairing'), value: summary.noDeviceProfileCount + summary.syncRepairProfileCount + summary.syncStaleProfileCount, tone: 'warning', title: familyUiText('family.commandCenter.stat.needsPairingHelp', 'Profiles that need a verified device, refreshed trust, or re-pairing before remote updates.') },
-            { label: familyUiText('family.commandCenter.stat.timeRequests', 'Time requests'), value: summary.pendingExtraTimeRequestCount, tone: 'warning', title: familyUiText('family.commandCenter.stat.timeRequestsHelp', 'Protected profiles asking for more YouTube time.') },
+            { label: familyUiText('family.commandCenter.stat.timeRequests', 'Time requests'), value: summary.pendingExtraTimeRequestCount, tone: 'warning', title: familyUiText('family.commandCenter.stat.timeRequestsHelp', 'Protected profiles asking for more viewing time.') },
             { label: familyUiText('family.commandCenter.stat.conflicts', 'Conflicts'), value: summary.remoteConflictCount, tone: 'danger', title: familyUiText('family.commandCenter.stat.conflictsHelp', 'Rejected or conflicting remote-policy history rows that need parent review.') }
         ].filter(item => item.always || (Number(item.value) || 0) > 0).forEach((item) => {
             const card = document.createElement('div');
@@ -1483,9 +1483,9 @@
                             ? familyUiText('family.commandCenter.bulk.selectFirstHelp', 'Select one or more protected profiles first. Requires parent/account re-auth.')
                             : selectedRequestCount
                                 ? (selectedRequestCount === 1
-                                    ? familyUiText('family.commandCenter.bulk.grantOneRequestHelp', 'Grant temporary parent-approved YouTube time to selected profiles. {count} selected profile has asked for more time. Requires parent/account re-auth.', { count: selectedRequestCount })
-                                    : familyUiText('family.commandCenter.bulk.grantManyRequestsHelp', 'Grant temporary parent-approved YouTube time to selected profiles. {count} selected profiles have asked for more time. Requires parent/account re-auth.', { count: selectedRequestCount }))
-                                : familyUiText('family.commandCenter.bulk.addExtraTimeHelp', 'Add temporary parent-approved YouTube time to selected profiles with active limits. Requires parent/account re-auth.');
+                                    ? familyUiText('family.commandCenter.bulk.grantOneRequestHelp', 'Grant temporary parent-approved viewing time to selected profiles. {count} selected profile has asked for more time. Requires parent/account re-auth.', { count: selectedRequestCount })
+                                    : familyUiText('family.commandCenter.bulk.grantManyRequestsHelp', 'Grant temporary parent-approved viewing time to selected profiles. {count} selected profiles have asked for more time. Requires parent/account re-auth.', { count: selectedRequestCount }))
+                                : familyUiText('family.commandCenter.bulk.addExtraTimeHelp', 'Add temporary parent-approved viewing time to selected profiles with active limits. Requires parent/account re-auth.');
                     }
                 });
                 clearSelectionButton.disabled = count === 0;
@@ -1599,8 +1599,8 @@
             const statusCell = document.createElement('div');
             statusCell.className = 'ft-managed-command-center__status';
             [
-                { label: item.viewingAccess, tone: 'neutral', title: familyUiText('family.commandCenter.status.viewingAccessHelp', 'Allowed YouTube space for this protected profile.') },
-                { label: item.timeLimit, tone: item.timeLimited ? 'warning' : 'neutral', title: familyUiText('family.commandCenter.status.dailyTimeHelp', 'Daily YouTube time for this protected profile.') },
+                { label: item.viewingAccess, tone: 'neutral', title: familyUiText('family.commandCenter.status.viewingAccessHelp', 'Allowed viewing space for this protected profile.') },
+                { label: item.timeLimit, tone: item.timeLimited ? 'warning' : 'neutral', title: familyUiText('family.commandCenter.status.dailyTimeHelp', 'Daily viewing time for this protected profile.') },
                 item.managedChannelListLabel ? { label: item.managedChannelListLabel, tone: 'success', title: item.managedChannelListDetail || familyUiText('family.commandCenter.status.parentApprovedListsHelp', 'Parent-approved lists attached to this profile.') } : null,
                 { label: syncState.label, tone: syncState.tone, title: item.deliveryPathDetail || familyUiText('family.commandCenter.status.deviceDeliveryHelp', 'Device delivery status.') },
                 item.syncTargetCount > 0 && item.syncOpenCheckCount > 0 ? { label: familyUiText('family.commandCenter.providers.savedUpdatesTitle', 'Automatic saved updates'), tone: 'success', title: familyUiText('family.commandCenter.status.automaticSavedUpdatesHelp', 'This verified device can check for newer signed parent updates when the protected profile opens.') } : null,

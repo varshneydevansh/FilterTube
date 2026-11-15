@@ -1,6 +1,6 @@
 {
   "english": {
-    "dashboard.helpBubble.tip01": "YouTube changes its page structure often. A quick report helps FilterTube update the matching logic before more families are affected.",
+    "dashboard.helpBubble.tip01": "The video site changes its page structure often. A quick report helps FilterTube update the matching logic before more families are affected.",
     "dashboard.helpBubble.tip02": "Copy the profile currently open to your own second device. No protected profile or PIN is required. Switch profiles first if you want to copy a different profile.",
     "dashboard.helpBubble.tip03": "Create a protected child/user profile only when you want parent-managed rules, time limits, or viewing access.",
     "dashboard.helpBubble.tip04": "Send parent-approved rules, time, and viewing access to an existing protected profile. Use this when both devices are open together.",
@@ -31,7 +31,7 @@
     "dashboard.helpBubble.tip29": "Open only when you need to repair a link, choose a smaller rule scope, or change merge versus replace behavior.",
     "dashboard.helpBubble.tip30": "Relationship decides whether this device sends, receives, or just copies settings once. Family control uses parent-to-protected defaults.",
     "dashboard.helpBubble.tip31": "Scope decides what is sent: current profile, Main rules, Kids rules, keywords, channels, time limits, or full backup.",
-    "dashboard.helpBubble.tip32": "For keyword, channel, and video rule sends, choose whether the local Main YouTube or YouTube Kids rules are used.",
+    "dashboard.helpBubble.tip32": "For keyword, channel, and video rule sends, choose whether the local Main or Kids rules are used.",
     "dashboard.helpBubble.tip33": "Saved protected profiles from the connected device appear here when they can be targeted directly.",
     "dashboard.helpBubble.tip34": "Merge adds the selected rules. Replace overwrites only the selected scope for managed protected devices.",
     "dashboard.helpBubble.tip35": "Create a pairing code or QR on this device. The other device must join and show the same safety phrase.",

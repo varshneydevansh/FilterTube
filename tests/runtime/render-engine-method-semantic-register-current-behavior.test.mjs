@@ -530,8 +530,8 @@ test('render engine register pins source fingerprint and broad callable reconcil
   const text = doc();
 
   assert.deepEqual(stats, {
-    bytes: 93845,
-    sha256: '90a22771f0d9947dc2bd3b325a4bacdbfd3d0219265c10d16a43a80f3fc53ba6',
+    bytes: 93805,
+    sha256: '3566d2caa51a9ab6382983a1e16341449f1a8029809c36994c0a17d178b6020c',
     splitLines: 2095,
     wcLines: 2094
   });
@@ -549,8 +549,8 @@ test('render engine register pins source fingerprint and broad callable reconcil
   for (const expected of [
     'source split lines: 2095',
     'source wc -l: 2094',
-    'source bytes: 93845',
-    'source sha256: 90a22771f0d9947dc2bd3b325a4bacdbfd3d0219265c10d16a43a80f3fc53ba6',
+    'source bytes: 93805',
+    'source sha256: 3566d2caa51a9ab6382983a1e16341449f1a8029809c36994c0a17d178b6020c',
     'broad lexical callable matches: 171',
     'accepted IIFE-scoped declaration rows: 51',
     'semantic method rows promoted: 51',

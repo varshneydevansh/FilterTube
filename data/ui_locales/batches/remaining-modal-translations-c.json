@@ -69,7 +69,7 @@
   "translations": {
     "arz": [
       "فين هتتطبّق القائمة دي؟",
-      "اختار مساحة YouTube للقواعد دي. FilterTube هيلتزم بوضع Blocklist/Whitelist الحالي في كل ملف شخصي محمي.",
+      "اختر المساحة (الرئيسي أو Kids) لهذه القواعد. سيحترم FilterTube وضع Blocklist/Whitelist الحالي لكل ملف شخصي محمي.",
       "تبعت تحديث الإزالة دلوقتي؟",
       "مطلوب اختيار وجهة محمية مُدارة",
       "في الملفات الشخصية المحمية، FilterTube بيمنع خيار \"الإرسال على أي حال\" في الحالة دي عشان التحديث ما يوصلش لملف شخصي بعيد غلط.",
@@ -136,7 +136,7 @@
     ],
     "mr": [
       "ही यादी कुठे लागू करायची?",
-      "या नियमांसाठी YouTube जागा निवडा. FilterTube प्रत्येक संरक्षित प्रोफाइलचा सध्याचा Blocklist/Whitelist मोड पाळेल.",
+      "या नियमांसाठी विभाग (मुख्य किंवा मुलांसाठी) निवडा. FilterTube प्रत्येक संरक्षित प्रोफाइलचा सध्याचा ब्लॉकलिस्ट/व्हाइटलिस्ट मोड पाळेल.",
       "काढण्याचे अपडेट आता पाठवायचे?",
       "संरक्षित व्यवस्थापित लक्ष्य आवश्यक",
       "संरक्षित प्रोफाइलसाठी, या परिस्थितीत अपडेट चुकीच्या रिमोट प्रोफाइलमध्ये जाऊ नये म्हणून FilterTube “तरीही पाठवा” हा पर्याय रोखते.",
@@ -203,7 +203,7 @@
     ],
     "vi": [
       "Danh sách này sẽ áp dụng ở đâu?",
-      "Chọn không gian YouTube cho các quy tắc này. FilterTube sẽ tuân theo chế độ Blocklist/Whitelist hiện tại của từng hồ sơ được bảo vệ.",
+      "Chọn không gian (Chính hoặc Kids) cho các quy tắc này. FilterTube sẽ tuân theo chế độ Blocklist/Whitelist hiện tại của từng hồ sơ được bảo vệ.",
       "Gửi bản cập nhật xóa ngay bây giờ?",
       "Cần có đích được bảo vệ do quản lý",
       "Với hồ sơ được bảo vệ, FilterTube chặn tùy chọn “vẫn gửi” trong trường hợp này để bản cập nhật không đến nhầm hồ sơ từ xa.",
@@ -270,7 +270,7 @@
     ],
     "te": [
       "ఈ జాబితా ఎక్కడ వర్తించాలి?",
-      "ఈ నియమాల కోసం YouTube స్థలాన్ని ఎంచుకోండి. ప్రతి రక్షిత ప్రొఫైల్‌లో ప్రస్తుతం ఉన్న Blocklist/Whitelist మోడ్‌ను FilterTube గౌరవిస్తుంది.",
+      "ఈ నియమాల కోసం విభాగాన్ని (ప్రధానం లేదా పిల్లలు) ఎంచుకోండి. FilterTube ప్రతి రక్షిత ప్రొఫైల్ ప్రస్తుత బ్లాక్ జాబితా/అనుమతి జాబితా మోడ్‌ను గౌరవిస్తుంది.",
       "తొలగింపు నవీకరణను ఇప్పుడే పంపాలా?",
       "నిర్వహిత రక్షిత లక్ష్యం అవసరం",
       "రక్షిత ప్రొఫైళ్లలో, ఈ పరిస్థితిలో “అయినా పంపు” ఎంపికను FilterTube అడ్డుకుంటుంది, తద్వారా నవీకరణ తప్పు రిమోట్ ప్రొఫైల్‌కు చేరదు.",
@@ -337,7 +337,7 @@
     ],
     "sw": [
       "Orodha hii itatumika wapi?",
-      "Chagua nafasi ya YouTube ya sheria hizi. FilterTube itaheshimu hali ya sasa ya Blocklist/Whitelist ya kila wasifu uliolindwa.",
+      "Chagua nafasi (Kuu au Watoto) kwa sheria hizi. FilterTube itaheshimu hali ya sasa ya Orodha ya kuzuia/Orodha ya kuruhusu ya kila wasifu uliolindwa.",
       "Utume sasisho la kuondoa sasa?",
       "Lengo lililolindwa linalodhibitiwa linahitajika",
       "Kwa wasifu uliolindwa, FilterTube huzuia chaguo la “tuma hata hivyo” katika hali hii ili sasisho lisifike kwenye wasifu wa mbali usio sahihi.",
@@ -404,7 +404,7 @@
     ],
     "ha": [
       "A ina za a yi amfani da wannan jerin?",
-      "Zaɓi wurin YouTube na waɗannan dokoki. FilterTube zai mutunta yanayin Blocklist/Whitelist na yanzu na kowane bayanin martaba da aka kare.",
+      "Zaɓi wurin (Babba ko Kids) na waɗannan dokoki. FilterTube zai mutunta yanayin Blocklist/Whitelist na yanzu na kowane bayanin martaba da aka kare.",
       "A aika da sabuntawar cirewa yanzu?",
       "Ana buƙatar manufa mai kariya da ake sarrafawa",
       "Ga bayanan martaba masu kariya, FilterTube yana hana zaɓin “a aika duk da haka” a wannan yanayin don kada sabuntawar ta shiga bayanin martaba na nesa da ba daidai ba.",
@@ -471,7 +471,7 @@
     ],
     "tr": [
       "Bu liste nerede uygulanmalı?",
-      "Bu kurallar için YouTube alanını seçin. FilterTube, korunan her profilin mevcut Blocklist/Whitelist moduna uyar.",
+      "Bu kurallar için alanı (Ana veya Çocuk) seçin. FilterTube her korumalı profilin mevcut Engelleme/Beyaz liste modunu dikkate alır.",
       "Liste kaldırma güncellemesi şimdi gönderilsin mi?",
       "Yönetilen korumalı hedef gerekli",
       "Korumalı profillerde FilterTube, bu durumda “yine de gönder” seçeneğini engeller; böylece güncelleme yanlış uzak profile gitmez.",
@@ -538,7 +538,7 @@
     ],
     "pa-Arab": [
       "ایہہ فہرست کتھے لاگو ہووے؟",
-      "ایناں قاعدیاں لئی YouTube دی جگہ چنو۔ FilterTube ہر محفوظ پروفائل دے موجودہ Blocklist/Whitelist موڈ دی پابندی کرے گا۔",
+      "ایہناں اصولاں لئی جگہ (مرکزی یا بچے) چُنو۔ FilterTube ہر محفوظ پروفائل دے موجودہ روک فہرست/اجازت فہرست موڈ دا خیال رکھے گا۔",
       "فہرست توں ہٹاؤن والی اپ ڈیٹ ہُن بھیجنی اے؟",
       "منظم محفوظ ہدف لوڑیں دا اے",
       "محفوظ پروفائلاں لئی FilterTube ایس حالت وچ “فیر وی بھیجو” نوں روکدا اے، تاں جو اپ ڈیٹ غلط ریموٹ پروفائل تے نہ جاوے۔",
@@ -605,7 +605,7 @@
     ],
     "fil": [
       "Saan ilalapat ang listahang ito?",
-      "Piliin ang espasyo sa YouTube para sa mga panuntunang ito. Igagalang ng FilterTube ang kasalukuyang Blocklist/Whitelist mode ng bawat protektadong profile.",
+      "Piliin ang espasyo (Main o Kids) para sa mga rule na ito. Igagalang ng FilterTube ang kasalukuyang Blocklist/Whitelist mode ng bawat protektadong profile.",
       "Ipadala na ba ang update sa pag-aalis?",
       "Kailangan ng pinamamahalaang protektadong target",
       "Para sa mga protektadong profile, hinaharang ng FilterTube ang “ipadala pa rin” sa sitwasyong ito para hindi mapunta ang update sa maling remote profile.",
@@ -672,7 +672,7 @@
     ],
     "ta": [
       "இந்தப் பட்டியல் எங்கே பொருந்த வேண்டும்?",
-      "இந்த விதிகளுக்கான YouTube இடத்தைத் தேர்ந்தெடுக்கவும். ஒவ்வொரு பாதுகாக்கப்பட்ட சுயவிவரத்தின் தற்போதைய Blocklist/Whitelist பயன்முறையையும் FilterTube மதிக்கும்.",
+      "இந்த விதிகளுக்கான பகுதியை (முதன்மை அல்லது குழந்தைகள்) தேர்ந்தெடுக்கவும். ஒவ்வொரு பாதுகாக்கப்பட்ட சுயவிவரத்தின் தற்போதைய தடுப்புப் பட்டியல்/அனுமதிப் பட்டியல் பயன்முறையை FilterTube மதிக்கும்.",
       "நீக்குதல் புதுப்பிப்பை இப்போது அனுப்பவா?",
       "நிர்வகிக்கப்படும் பாதுகாக்கப்பட்ட இலக்கு தேவை",
       "பாதுகாக்கப்பட்ட சுயவிவரங்களுக்கு, இந்தச் சூழலில் “இருந்தாலும் அனுப்பு” என்பதை FilterTube தடுக்கிறது; இதனால் புதுப்பிப்பு தவறான தொலைநிலைச் சுயவிவரத்துக்குச் செல்லாது.",
@@ -739,7 +739,7 @@
     ],
     "yue-Hant": [
       "呢份清單會套用喺邊度？",
-      "揀呢啲規則要用嘅 YouTube 空間。FilterTube 會遵守每個受保護個人檔案目前嘅 Blocklist/Whitelist 模式。",
+      "揀呢啲規則要用嘅空間（主站或 Kids）。FilterTube 會遵守每個受保護個人檔案目前嘅 Blocklist/Whitelist 模式。",
       "而家傳送移除更新？",
       "需要指定受管理嘅受保護目標",
       "對受保護個人檔案，FilterTube 喺呢種情況會封鎖「照樣傳送」，避免更新傳錯去另一個遠端個人檔案。",
@@ -806,7 +806,7 @@
     ],
     "wuu-Hans": [
       "这份列表要用勒啥地方？",
-      "为这些规则选一个 YouTube 空间。FilterTube 会遵守每个受保护个人资料当前个 Blocklist/Whitelist 模式。",
+      "为这些规则选一个空间（主站或 Kids）。FilterTube 会遵守每个受保护个人资料当前个 Blocklist/Whitelist 模式。",
       "现在发送移除更新伐？",
       "需要指定受管理个受保护目标",
       "对受保护个人资料，FilterTube 勒这种情况会拦住“还是发送”，免得更新送错到另一个远程个人资料。",

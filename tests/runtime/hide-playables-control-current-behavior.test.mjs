@@ -88,7 +88,7 @@ test('catalog exposes Hide YouTube Playables in the Feeds group', () => {
 
   assert.deepEqual(control, {
     key: 'hidePlayables',
-    title: 'Hide YouTube Playables',
+    title: 'Hide Playables',
     description: 'Hide Playables shelves, game cards, and navigation entries'
   });
 });
