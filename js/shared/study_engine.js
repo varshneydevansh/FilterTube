@@ -53,7 +53,7 @@
 
     /*
      * Study search suggestions (Android StudySuggestions.kt, StaticSuggestions; kept identical). The
-     * curated lists are lowercase English, like the packs' own topics: a topic's everyday words for
+     * curated lists are lowercase: English, plus the local words of packs taught in other languages: a topic's everyday words for
      * routing a search, plus the multi-word phrases that are clearly lessons. A topic's multi-word
      * synonyms ("concrete technology" under "building materials") allow a title like the topic
      * does; single everyday words ("cement") never allow on their own, since "cement" alone names
@@ -151,7 +151,42 @@
         vectors: ['dot product', 'cross product', '3d geometry', 'three dimensional geometry'],
         probability: ['bayes theorem', 'conditional probability', 'binomial distribution'],
         matrices: ['determinants', 'inverse of a matrix'],
-        'complex numbers': ['argand plane', 'de moivre', 'roots of unity']
+        'complex numbers': ['argand plane', 'de moivre', 'roots of unity'],
+        // ECAT / entry tests (Pakistan)
+        'engineering entry test': ['ecat', 'uet ecat', 'nust net', 'fast entry test', 'giki entry test', 'entry test'],
+        'ecat past papers': ['ecat past paper', 'ecat mcqs', 'ecat solved paper'],
+        // Bangladesh admissions
+        'medical admission': ['মেডিকেল ভর্তি', 'মেডিকেল এডমিশন', 'mbbs admission', 'medical admission test'],
+        // LGS / lise (Turkey)
+        'lgs matematik': ['üslü ifadeler', 'kareköklü ifadeler', 'çarpanlar ve katlar', 'veri analizi', 'olasılık'],
+        'lgs fen bilimleri': ['dna ve genetik kod', 'basınç', 'mevsimler ve iklim', 'madde ve endüstri', 'basit makineler'],
+        paragraf: ['paragraf soruları', 'okuduğunu anlama', 'sözel mantık', 'anlam bilgisi'],
+        // Concursos / OAB (Brazil)
+        'raciocínio lógico': ['raciocinio logico', 'lógica proposicional', 'rlm', 'tabela verdade', 'equivalências lógicas'],
+        'direito constitucional': ['constituição federal', 'cf/88', 'direitos fundamentais', 'controle de constitucionalidade'],
+        'direito administrativo': ['atos administrativos', 'licitações', 'lei 14.133', 'lei 8.112', 'improbidade administrativa'],
+        'ética profissional': ['estatuto da advocacia', 'código de ética oab', 'ética oab'],
+        // Oposiciones (Spain)
+        'constitución española': ['constitucion española', 'ce 1978', 'título preliminar', 'derechos fundamentales'],
+        'procedimiento administrativo': ['ley 39/2015', 'ley 40/2015', 'recursos administrativos', 'silencio administrativo'],
+        // Brevet / lycée (France)
+        brevet: ['dnb', 'diplôme national du brevet', 'annales brevet', 'sujet brevet', 'brevet blanc'],
+        'trigonométrie': ['cosinus', 'sinus', 'tangente', 'trigonometrie'],
+        // Abitur / Oberstufe (Germany)
+        analysis: ['ableitung', 'integral', 'kurvendiskussion', 'integralrechnung', 'extremstellen'],
+        stochastik: ['wahrscheinlichkeit', 'binomialverteilung', 'baumdiagramm', 'bedingte wahrscheinlichkeit'],
+        // High school (Japan, Korea)
+        '高校入試': ['高校受験', '入試対策', '公立高校入試', '過去問'],
+        '미적분': ['미분', '적분', '극한', '도함수'],
+        '확률과 통계': ['확률', '통계', '순열과 조합', '조건부확률'],
+        // THPT (Vietnam)
+        'thi tốt nghiệp thpt': ['thi thpt', 'thi thpt quốc gia', 'ôn thi thpt', 'đề thi tốt nghiệp'],
+        'hàm số': ['khảo sát hàm số', 'đạo hàm', 'cực trị', 'đồ thị hàm số'],
+        // SMA (Indonesia)
+        trigonometri: ['sin cos tan', 'identitas trigonometri', 'aturan sinus', 'aturan cosinus'],
+        stoikiometri: ['konsep mol', 'persamaan reaksi', 'mol'],
+        // O/L (Sri Lanka)
+        'o/l': ['ordinary level', 'gce o/l', 'සාමාන්‍ය පෙළ', 'சாதாரண தரம்']
     });
     const MAX_TOPIC_PATTERNS = 200;
 

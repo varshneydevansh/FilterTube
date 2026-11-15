@@ -123,3 +123,13 @@ test('the filter engine allows a lesson phrase by title and still hides a single
     }, 'study-synonyms');
     assert.deepEqual(JSON.parse(JSON.stringify(result.contents.map(item => item.videoRenderer.videoId))), ['AAAAAAAAAAA', 'BBBBBBBBBBB']);
 });
+
+test('packs taught in other languages carry their local synonyms (2026-11-16 catalog)', () => {
+    assert.ok(Engine.suggest(Engine.SUGGESTION_KINDS.TOPIC_SYNONYMS, 'Direito Constitucional').includes('cf/88'));
+    assert.ok(Engine.suggest(Engine.SUGGESTION_KINDS.TOPIC_SYNONYMS, '高校入試').includes('過去問'));
+    assert.ok(Engine.suggest(Engine.SUGGESTION_KINDS.TOPIC_SYNONYMS, 'o/l').includes('gce o/l'));
+    assert.deepEqual(Engine.topicsForQuery('cf/88 resumo', ['direito constitucional', 'direito administrativo']), ['direito constitucional']);
+    assert.deepEqual(Engine.topicsForQuery('미분 기초', ['미적분', '확률과 통계']), ['미적분']);
+    assert.ok(Engine.studyAllowPhrases('br_oab', null, ['ética profissional']).includes('estatuto da advocacia'));
+    for (const id of ['pk_ecat', 'us_praxis']) assert.ok(catalog.packs.some(pack => pack.id === id), id);
+});

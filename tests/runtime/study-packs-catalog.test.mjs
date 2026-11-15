@@ -55,7 +55,9 @@ test('the bundled catalog has at least 3 approved channels per pack and fits the
   }
   const ids = bundled.packs.map(pack => pack.id);
   assert.equal(new Set(ids).size, ids.length);
-  for (const hidden of ['cn_gaokao', 'cn_kaoyan', 'tz_necta', 'my_stpm', 'cm_gce_bac', 'us_praxis']) assert.equal(ids.includes(hidden), false, hidden);
+  for (const hidden of ['cn_gaokao', 'cn_kaoyan', 'tz_necta', 'my_stpm', 'cm_gce_bac']) assert.equal(ids.includes(hidden), false, hidden);
+  // us_praxis was thin until 2026-11-16, when it got five verified channels (app StudyPackCatalogTest).
+  assert.ok(bundled.packs.find(pack => pack.id === 'us_praxis').channels.length >= 3);
   assert.deepEqual([...new Set(bundled.packs.map(pack => pack.kind))].sort(), ['class', 'kids_age', 'kids_classic', 'study']);
   assert.equal(catalog.packs.length, bundled.packs.length, 'the loader reads every bundled pack');
 });
@@ -74,7 +76,7 @@ test('the bundled catalog is the generator output for the v2 draft, and the same
 });
 
 test('v2: class packs carry grade, board, subjects and grade keywords; the picker has Exams and School tabs', () => {
-  assert.equal(bundled.draftGenerated, '2026-11-15');
+  assert.equal(bundled.draftGenerated, '2026-11-16');
   assert.ok(bundled.packs.length >= 130, 'v2 has 145 packs before thin ones are hidden');
   const cbse = Packs.packById(catalog, 'cls_in_cbse_6_8');
   assert.equal(cbse.kind, 'class');

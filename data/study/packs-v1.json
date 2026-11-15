@@ -1,7 +1,7 @@
 {
  "schema": "filtertube_study_packs",
  "version": 1,
- "draftGenerated": "2026-11-15",
+ "draftGenerated": "2026-11-16",
  "packs": [
   {
    "id": "in_upsc_cse",
@@ -14309,6 +14309,1260 @@
    ]
   },
   {
+   "id": "br_concursos",
+   "kind": "study",
+   "name": {
+    "en": "Concursos públicos (Brazil civil-service exams)",
+    "pt": "Concursos Públicos"
+   },
+   "shortName": "Concursos",
+   "countries": [
+    "BR"
+   ],
+   "languages": [
+    "pt"
+   ],
+   "subjects": [
+    "Língua Portuguesa",
+    "Raciocínio Lógico",
+    "Direito Constitucional",
+    "Direito Administrativo",
+    "Informática",
+    "Matemática",
+    "Direito Penal",
+    "Legislação"
+   ],
+   "keywords": [
+    "concurso público",
+    "concursos",
+    "aula para concurso",
+    "questões comentadas",
+    "Cebraspe",
+    "CESPE",
+    "FGV",
+    "FCC",
+    "Vunesp",
+    "banca",
+    "português para concursos",
+    "raciocínio lógico",
+    "direito constitucional",
+    "direito administrativo",
+    "informática para concursos",
+    "matemática financeira",
+    "lei 8.112",
+    "lei 14.133 licitações",
+    "CNU",
+    "INSS",
+    "PRF",
+    "edital",
+    "resolução de questões",
+    "revisão"
+   ],
+   "blockedWords": [
+    "notícias de concursos",
+    "salário",
+    "vlog",
+    "motivação",
+    "rotina de estudos vlog",
+    "gabarito extraoficial ao vivo",
+    "black friday",
+    "entrevista aprovado"
+   ],
+   "chips": [
+    "Português",
+    "Raciocínio lógico",
+    "Direito constitucional",
+    "Direito administrativo",
+    "Informática",
+    "Matemática",
+    "Direito penal",
+    "Questões comentadas",
+    "Cebraspe",
+    "FGV"
+   ],
+   "channels": [
+    {
+     "channelId": "UC74icFVsxTFr2BW3Vm8n_iw",
+     "handle": "@grancursostv",
+     "name": "Gran Cursos Online",
+     "language": "pt"
+    },
+    {
+     "channelId": "UChvwkhC3eHxJsVxW_ItDjdA",
+     "handle": "@EstrategiaConcursosBrasil",
+     "name": "Estratégia Concursos",
+     "language": "pt"
+    },
+    {
+     "channelId": "UCoihrBTsIlpFnTkJFU-kdtQ",
+     "handle": "@AlfaConBr",
+     "name": "AlfaCon",
+     "language": "pt"
+    },
+    {
+     "channelId": "UCwpEtd9d_4n3sQSDhDvu9jQ",
+     "handle": "@FocusconcursosBr",
+     "name": "Focus Concursos",
+     "language": "pt"
+    },
+    {
+     "channelId": "UCBRXmX3weo-Ffsd1qAaeEuw",
+     "handle": "@profalvaroferreira",
+     "name": "Prof. Álvaro Ferreira",
+     "language": "pt"
+    },
+    {
+     "channelId": "UCMcncIoKuRsv8H8mxYSjUmg",
+     "handle": "@FelippeLoureiroProf",
+     "name": "Felippe Loureiro",
+     "language": "pt"
+    },
+    {
+     "channelId": "UCd1PWMpgSlaV9uSDiEbNktA",
+     "handle": "@ProfArthurLima",
+     "name": "Prof. Arthur Lima",
+     "language": "pt"
+    },
+    {
+     "channelId": "UCOVBqtU7WtXUfIYOWY46gAw",
+     "handle": "@proftanaka",
+     "name": "Prof. Eduardo Tanaka",
+     "language": "pt"
+    }
+   ]
+  },
+  {
+   "id": "br_oab",
+   "kind": "study",
+   "name": {
+    "en": "OAB Bar Exam (Exame de Ordem)",
+    "pt": "Exame de Ordem Unificado (OAB)"
+   },
+   "shortName": "OAB",
+   "countries": [
+    "BR"
+   ],
+   "languages": [
+    "pt"
+   ],
+   "subjects": [
+    "Ética Profissional",
+    "Direito Constitucional",
+    "Direito Administrativo",
+    "Direito Civil",
+    "Processo Civil",
+    "Direito Penal",
+    "Processo Penal",
+    "Direito do Trabalho",
+    "Processo do Trabalho",
+    "Direito Tributário",
+    "Direito Empresarial",
+    "Direitos Humanos",
+    "Filosofia do Direito"
+   ],
+   "keywords": [
+    "OAB",
+    "Exame de Ordem",
+    "exame da OAB",
+    "FGV OAB",
+    "1ª fase OAB",
+    "2ª fase OAB",
+    "peça prático-profissional",
+    "questões OAB comentadas",
+    "ética profissional",
+    "Estatuto da Advocacia",
+    "direito constitucional OAB",
+    "direito civil OAB",
+    "processo civil",
+    "direito penal OAB",
+    "processo penal",
+    "direito do trabalho",
+    "direito tributário",
+    "direito empresarial",
+    "simulado OAB",
+    "revisão OAB",
+    "Vade Mecum"
+   ],
+   "blockedWords": [
+    "black friday",
+    "vlog",
+    "motivação",
+    "resultado ao vivo",
+    "salário advogado",
+    "polêmica",
+    "fofoca"
+   ],
+   "chips": [
+    "1ª fase",
+    "2ª fase",
+    "Ética",
+    "Constitucional",
+    "Civil",
+    "Penal",
+    "Trabalho",
+    "Tributário",
+    "Administrativo",
+    "Empresarial",
+    "Peça prático-profissional"
+   ],
+   "channels": [
+    {
+     "channelId": "UC7rgrKTSF5aOrBGWOw60ovw",
+     "handle": "@EstratégiaOAB",
+     "name": "Estratégia OAB",
+     "language": "pt"
+    },
+    {
+     "channelId": "UCo3oYAxA7au8EZCZsujKvdw",
+     "handle": "@cursoceisc",
+     "name": "CEISC",
+     "language": "pt"
+    },
+    {
+     "channelId": "UCy6H4B38zlXcmtBO9YPXS9w",
+     "handle": "@GranCursosOAB",
+     "name": "Gran Cursos OAB",
+     "language": "pt"
+    },
+    {
+     "channelId": "UChpEF4T9F3uNGugdyCOFhYg",
+     "handle": "@damasio_oab",
+     "name": "Damásio OAB",
+     "language": "pt"
+    },
+    {
+     "channelId": "UCQT9GC2yCq7EH09u8xb9qrA",
+     "handle": "@CERSOAB",
+     "name": "CERS OAB",
+     "language": "pt"
+    },
+    {
+     "channelId": "UCntiYsKzKS4wommJlWuKSaQ",
+     "handle": "@estudarparaoab",
+     "name": "Estudar para OAB | by Vilaça Cursos",
+     "language": "pt"
+    },
+    {
+     "channelId": "UCw8h0xQgPHI256mrPbnJNbg",
+     "handle": "@TVSATE",
+     "name": "TV SATE - Eu Vou Passar na OAB",
+     "language": "pt"
+    }
+   ]
+  },
+  {
+   "id": "mx_comipems",
+   "kind": "study",
+   "name": {
+    "en": "ECOEMS / COMIPEMS (high-school entrance, Mexico City area)",
+    "es": "Examen ECOEMS (antes COMIPEMS) – Mi Derecho, Mi Lugar"
+   },
+   "shortName": "COMIPEMS",
+   "countries": [
+    "MX"
+   ],
+   "languages": [
+    "es"
+   ],
+   "subjects": [
+    "Habilidad Verbal",
+    "Habilidad Matemática",
+    "Español",
+    "Matemáticas",
+    "Historia",
+    "Geografía",
+    "Formación Cívica y Ética",
+    "Física",
+    "Química",
+    "Biología"
+   ],
+   "keywords": [
+    "ECOEMS",
+    "COMIPEMS",
+    "Mi Derecho Mi Lugar",
+    "examen de ingreso a la prepa",
+    "examen UNAM IPN bachillerato",
+    "guía ECOEMS",
+    "guía COMIPEMS",
+    "simulador ECOEMS",
+    "reactivos",
+    "habilidad verbal",
+    "habilidad matemática",
+    "español",
+    "matemáticas",
+    "historia",
+    "geografía",
+    "formación cívica y ética",
+    "física",
+    "química",
+    "biología",
+    "128 preguntas",
+    "ENP",
+    "CCH",
+    "CECyT"
+   ],
+   "blockedWords": [
+    "resultados en vivo",
+    "reacción resultados",
+    "vlog",
+    "chisme",
+    "trend",
+    "motivación",
+    "broma"
+   ],
+   "chips": [
+    "Habilidad verbal",
+    "Habilidad matemática",
+    "Español",
+    "Matemáticas",
+    "Historia",
+    "Geografía",
+    "Formación cívica",
+    "Física",
+    "Química",
+    "Biología",
+    "Simulador"
+   ],
+   "channels": [
+    {
+     "channelId": "UC_MJLSHeihsnXPCgnD4xddQ",
+     "handle": "@IkniuM",
+     "name": "IkniuM Media Superior",
+     "language": "es"
+    },
+    {
+     "channelId": "UCmT8e4J3KggXDUX27ywxmrQ",
+     "handle": "@EduardoSanzECOEMS",
+     "name": "Eduardo Sánchez | EXAMEN ECOEMS 2027",
+     "language": "es"
+    },
+    {
+     "channelId": "UCiSEW_94dFLAMOx9L3acYIg",
+     "handle": "@matesimplificadasconamat9788",
+     "name": "MateSimplificadas CONAMAT",
+     "language": "es"
+    },
+    {
+     "channelId": "UCtR0TodLvtHI6mqmN5ELGvQ",
+     "handle": "@MásPreparación",
+     "name": "Más Preparación",
+     "language": "es"
+    }
+   ]
+  },
+  {
+   "id": "us_praxis",
+   "kind": "study",
+   "name": {
+    "en": "Praxis / TExES / CBEST"
+   },
+   "shortName": "Praxis",
+   "countries": [
+    "US"
+   ],
+   "languages": [
+    "en"
+   ],
+   "subjects": [
+    "Praxis Core Reading",
+    "Praxis Core Writing",
+    "Praxis Core Math",
+    "Praxis Elementary Education",
+    "Teaching Reading",
+    "Principles of Learning and Teaching",
+    "TExES Core Subjects EC-6",
+    "TExES PPR",
+    "TExES Science of Teaching Reading",
+    "CBEST Reading",
+    "CBEST Mathematics",
+    "CBEST Writing"
+   ],
+   "keywords": [
+    "Praxis",
+    "Praxis Core",
+    "Praxis 5733",
+    "Praxis 5001",
+    "Praxis 5205",
+    "Praxis PLT",
+    "TExES",
+    "TExES PPR 160",
+    "TExES Core Subjects 391",
+    "Science of Teaching Reading 293",
+    "CBEST",
+    "CSET",
+    "RICA",
+    "teacher certification exam",
+    "practice test",
+    "study guide",
+    "phonemic awareness",
+    "pedagogy",
+    "ETS",
+    "test prep"
+   ],
+   "blockedWords": [
+    "teacher vlog",
+    "day in the life",
+    "classroom tour",
+    "teacher salary",
+    "quit teaching",
+    "drama",
+    "reaction"
+   ],
+   "chips": [
+    "Praxis Core",
+    "Core Math",
+    "Elementary 5001",
+    "Teaching Reading 5205",
+    "PLT",
+    "TExES EC-6",
+    "TExES PPR",
+    "STR 293",
+    "CBEST",
+    "Practice questions"
+   ],
+   "channels": [
+    {
+     "channelId": "UCgMv3Yml20ijXlxraJtPr2Q",
+     "handle": "@KathleenJasperEdD",
+     "name": "Kathleen Jasper",
+     "language": "en"
+    },
+    {
+     "channelId": "UCR5-tn_tDry2zuIA1L8gtQQ",
+     "handle": "@240Tutoring",
+     "name": "240 Tutoring",
+     "language": "en"
+    },
+    {
+     "channelId": "UCe73CUDvEaEmp6GCVYl9PfQ",
+     "handle": "@PraxisTestPrep",
+     "name": "Praxis Test Prep",
+     "language": "en"
+    },
+    {
+     "channelId": "UCoo-Bnm7pUX6_qrR__7beWQ",
+     "handle": "@EverythingTeacher",
+     "name": "Everything Teacher",
+     "language": "en"
+    },
+    {
+     "channelId": "UCDyfiyfa2isSWuotxv361CA",
+     "handle": "@texasteachertoday2423",
+     "name": "Texas Teacher Today",
+     "language": "en"
+    }
+   ]
+  },
+  {
+   "id": "jp_koukou_juken",
+   "kind": "study",
+   "name": {
+    "en": "High school entrance exams (Koukou nyuushi)",
+    "ja": "高校入試"
+   },
+   "shortName": "高校入試",
+   "countries": [
+    "JP"
+   ],
+   "languages": [
+    "ja"
+   ],
+   "subjects": [
+    "国語",
+    "数学",
+    "英語",
+    "理科",
+    "社会"
+   ],
+   "keywords": [
+    "高校入試",
+    "高校受験",
+    "公立高校入試",
+    "過去問",
+    "入試対策",
+    "中学数学",
+    "中学理科",
+    "中学社会",
+    "中学英語",
+    "一次関数",
+    "二次方程式",
+    "図形の証明",
+    "浮力",
+    "化学変化",
+    "地震",
+    "歴史",
+    "公民",
+    "一問一答",
+    "定期テスト",
+    "内申点"
+   ],
+   "blockedWords": [
+    "vlog",
+    "ドッキリ",
+    "ゲーム実況",
+    "炎上",
+    "合格発表ライブ",
+    "恋愛",
+    "雑談配信",
+    "切り抜き"
+   ],
+   "chips": [
+    "数学",
+    "英語",
+    "国語",
+    "理科",
+    "社会",
+    "中1",
+    "中2",
+    "中3",
+    "過去問",
+    "内申点"
+   ],
+   "channels": [
+    {
+     "channelId": "UCzDd3Byvt91oyf3ggRlTb3A",
+     "handle": "@toaruotoko",
+     "name": "とある男が授業をしてみた",
+     "language": "ja"
+    },
+    {
+     "channelId": "UCcj-cHmS0uD91MLjtdiN89Q",
+     "handle": "@TryIT_official",
+     "name": "映像授業 Try IT（トライイット）",
+     "language": "ja"
+    },
+    {
+     "channelId": "UCpJZbF-bMpdxvpd2leDs5ZQ",
+     "handle": "@lao_teacher",
+     "name": "ラオ先生＠高校受験チャンネル",
+     "language": "ja"
+    },
+    {
+     "channelId": "UC1oDC9K4sen7d43QwAGf-BQ",
+     "handle": "@mitakanobenkyooooo",
+     "name": "みたかの勉強 – 高校入試攻略チャンネル",
+     "language": "ja"
+    },
+    {
+     "channelId": "UCkwjpK-R8Ry6SGfhtN7pUDQ",
+     "handle": "@rikahina",
+     "name": "りかひな先生",
+     "language": "ja"
+    },
+    {
+     "channelId": "UC_03zAYgUYJn7lCcW6GHI0g",
+     "handle": "@eva11100",
+     "name": "えば一問一答／中高生の勉強を応援",
+     "language": "ja"
+    }
+   ]
+  },
+  {
+   "id": "es_oposiciones",
+   "kind": "study",
+   "name": {
+    "en": "Oposiciones (Spanish public-service exams)",
+    "es": "Oposiciones"
+   },
+   "shortName": "Oposiciones",
+   "countries": [
+    "ES"
+   ],
+   "languages": [
+    "es"
+   ],
+   "subjects": [
+    "Constitución Española",
+    "Ley 39/2015 (Procedimiento Administrativo Común)",
+    "Ley 40/2015 (Régimen Jurídico del Sector Público)",
+    "TREBEP",
+    "Ofimática",
+    "Psicotécnicos",
+    "Temario Guardia Civil",
+    "Temario Policía Nacional",
+    "Temario Magisterio (Cuerpo de Maestros)"
+   ],
+   "keywords": [
+    "oposiciones",
+    "temario oposiciones",
+    "auxiliar administrativo del estado",
+    "administrativo del estado",
+    "AGE C2",
+    "AGE C1",
+    "guardia civil oposición",
+    "policía nacional escala básica",
+    "oposiciones magisterio",
+    "oposiciones docentes",
+    "programación didáctica",
+    "Constitución Española",
+    "Ley 39/2015",
+    "Ley 40/2015",
+    "TREBEP",
+    "Estatuto Básico del Empleado Público",
+    "procedimiento administrativo",
+    "test oposiciones",
+    "psicotécnicos",
+    "exámenes resueltos",
+    "supuesto práctico",
+    "ofimática oposiciones",
+    "BOE convocatoria temario",
+    "INAP"
+   ],
+   "blockedWords": [
+    "vlog",
+    "nota de corte en directo",
+    "plazas sueldo",
+    "cuánto cobra",
+    "motivación",
+    "reacción",
+    "polémica",
+    "directo resultados"
+   ],
+   "chips": [
+    "Constitución",
+    "Ley 39/2015",
+    "Ley 40/2015",
+    "TREBEP",
+    "Auxiliar Administrativo",
+    "Guardia Civil",
+    "Policía Nacional",
+    "Magisterio",
+    "Psicotécnicos",
+    "Ofimática",
+    "Test",
+    "Supuestos prácticos"
+   ],
+   "channels": [
+    {
+     "channelId": "UCe7fVBtUQAeNV0EVUK3ojFQ",
+     "handle": "@PacoBarbie",
+     "name": "Paco Barbié",
+     "language": "es"
+    },
+    {
+     "channelId": "UC1Z-hdMqVBSmGKuiMGPcPNw",
+     "handle": "@AcademiaLANDLFormacion",
+     "name": "LANDL Formación",
+     "language": "es"
+    },
+    {
+     "channelId": "UCO9xgj94KB62c8UEi86ZxKQ",
+     "handle": "@JonFernándezAbogados",
+     "name": "Jon Fernández Abogados",
+     "language": "es"
+    },
+    {
+     "channelId": "UCU2WFXVS-erIfpLNJ_7OW7g",
+     "handle": "@formacionninja",
+     "name": "Formación Ninja | Academia de Oposiciones Online",
+     "language": "es"
+    },
+    {
+     "channelId": "UCi3-9gr3WDcKqB4Kdrukteg",
+     "handle": "@Leyesparaoposiciones",
+     "name": "Leyes para oposiciones",
+     "language": "es"
+    },
+    {
+     "channelId": "UCITAA6i2KYR4RU2ZLMZfqCg",
+     "handle": "@oposiciones_online",
+     "name": "Oposiciones Online",
+     "language": "es"
+    },
+    {
+     "channelId": "UCIv79MN2j9KtTSmD6svI2VA",
+     "handle": "@DiegoFuentes.oposiciones",
+     "name": "Diego Fuentes - Oposiciones de Educación",
+     "language": "es"
+    }
+   ]
+  },
+  {
+   "id": "fr_brevet",
+   "kind": "study",
+   "name": {
+    "en": "Brevet (DNB, end of collège)",
+    "fr": "Diplôme national du brevet"
+   },
+   "shortName": "Brevet",
+   "countries": [
+    "FR"
+   ],
+   "nearby": [
+    "BE",
+    "LU",
+    "MC"
+   ],
+   "languages": [
+    "fr"
+   ],
+   "subjects": [
+    "Français",
+    "Mathématiques",
+    "Histoire-géographie et enseignement moral et civique",
+    "Sciences (physique-chimie, SVT, technologie)",
+    "Oral du brevet"
+   ],
+   "keywords": [
+    "brevet",
+    "DNB",
+    "diplôme national du brevet",
+    "brevet 2027",
+    "3ème",
+    "révision brevet",
+    "annales brevet",
+    "sujet brevet corrigé",
+    "brevet maths",
+    "théorème de Pythagore",
+    "Thalès",
+    "trigonométrie",
+    "fonctions affines",
+    "brevet français",
+    "dictée",
+    "grammaire",
+    "figures de style",
+    "brevet histoire géographie",
+    "EMC",
+    "première guerre mondiale",
+    "brevet sciences",
+    "oral du brevet"
+   ],
+   "blockedWords": [
+    "vlog",
+    "résultats brevet en direct",
+    "réaction",
+    "prank",
+    "challenge",
+    "motivation shorts",
+    "story time"
+   ],
+   "chips": [
+    "Français",
+    "Maths",
+    "Histoire-géo",
+    "EMC",
+    "Physique-chimie",
+    "SVT",
+    "Technologie",
+    "Dictée",
+    "Oral",
+    "Annales"
+   ],
+   "channels": [
+    {
+     "channelId": "UC6vJtm6jRN-iD2wEzkpSwYQ",
+     "handle": "@digiSchool-college",
+     "name": "digiSchool Collège",
+     "language": "fr"
+    },
+    {
+     "channelId": "UCL7FXdd8TW0hxNHmzlPlAQQ",
+     "handle": "@lesbonsprofs",
+     "name": "Les Bons Profs",
+     "language": "fr"
+    },
+    {
+     "channelId": "UCR9raBqPQisip_qnuCaUL1w",
+     "handle": "@lumnifr",
+     "name": "Lumni",
+     "language": "fr"
+    },
+    {
+     "channelId": "UCKbEbc0PgJA5YEQO8NkARGA",
+     "handle": "@Maths_College",
+     "name": "Maths Collège",
+     "language": "fr"
+    },
+    {
+     "channelId": "UCAkOpueVXr-Fbt6ZbU3geiA",
+     "handle": "@lesrouagesdufrancais7343",
+     "name": "Les rouages du français",
+     "language": "fr"
+    },
+    {
+     "channelId": "UCkEnXec_WyDPk6Qf0m_Skzw",
+     "handle": "@MmeHistoire-Géographie",
+     "name": "Mme Histoire-Géographie",
+     "language": "fr"
+    },
+    {
+     "channelId": "UCxTP9KfRoCffDZ_Wp_2zfSA",
+     "handle": "@physique-chimie1969",
+     "name": "Physique-Chimie",
+     "language": "fr"
+    }
+   ]
+  },
+  {
+   "id": "tr_lgs",
+   "kind": "study",
+   "name": {
+    "en": "LGS (high school entrance)",
+    "tr": "LGS (Liselere Geçiş Sistemi)"
+   },
+   "shortName": "LGS",
+   "countries": [
+    "TR"
+   ],
+   "languages": [
+    "tr"
+   ],
+   "subjects": [
+    "Türkçe",
+    "Matematik",
+    "Fen Bilimleri",
+    "T.C. İnkılap Tarihi ve Atatürkçülük",
+    "Din Kültürü ve Ahlak Bilgisi",
+    "Yabancı Dil (İngilizce)"
+   ],
+   "keywords": [
+    "LGS",
+    "Liselere Geçiş Sistemi",
+    "8. sınıf",
+    "LGS matematik",
+    "LGS Türkçe",
+    "LGS fen bilimleri",
+    "inkılap tarihi",
+    "din kültürü",
+    "LGS İngilizce",
+    "yeni nesil soru",
+    "çıkmış sorular",
+    "LGS deneme",
+    "konu anlatımı",
+    "soru çözümü",
+    "üslü ifadeler",
+    "kareköklü ifadeler",
+    "DNA ve genetik kod",
+    "basınç",
+    "paragraf",
+    "sözel mantık",
+    "MEB örnek sorular",
+    "Maarif modeli",
+    "8. sınıf yazılı"
+   ],
+   "blockedWords": [
+    "LGS sonuçları canlı",
+    "vlog",
+    "tercih robotu",
+    "puan hesaplama",
+    "motivasyon shorts",
+    "oyun",
+    "tepki videosu"
+   ],
+   "chips": [
+    "LGS Matematik",
+    "LGS Türkçe",
+    "LGS Fen",
+    "İnkılap Tarihi",
+    "Din Kültürü",
+    "LGS İngilizce",
+    "Paragraf",
+    "Yeni nesil sorular",
+    "Çıkmış sorular",
+    "Deneme"
+   ],
+   "channels": [
+    {
+     "channelId": "UCPdN4Vx2DogwmjDJCkyVcXQ",
+     "handle": "@tonguc8",
+     "name": "tonguç 8. Sınıf | LGS",
+     "language": "tr"
+    },
+    {
+     "channelId": "UChH7ByCfWqN7jE2i_M-p-PQ",
+     "handle": "@hocalarageldik8",
+     "name": "Hocalara Geldik 8.Sınıf",
+     "language": "tr"
+    },
+    {
+     "channelId": "UCXeL-Z1PfCS5_0RntYJz_UA",
+     "handle": "@HızYayınlarıOrtaokul",
+     "name": "Hız Yayınları Ortaokul",
+     "language": "tr"
+    },
+    {
+     "channelId": "UCRnT96PJOr4KeMEjhizEMfg",
+     "handle": "@PartikülMatematik",
+     "name": "Partikül Matematik",
+     "language": "tr"
+    },
+    {
+     "channelId": "UCW8nvbawj1rlb8qpdy8eOag",
+     "handle": "@lgslisehocam",
+     "name": "LGS & LİSE HOCAM",
+     "language": "tr"
+    },
+    {
+     "channelId": "UCfic0Fa5a25uC-vmwBzkW7Q",
+     "handle": "@RüştüHocaileLGSTürkçe",
+     "name": "Rüştü Hoca ile LGS Türkçe",
+     "language": "tr"
+    },
+    {
+     "channelId": "UCR_TM9615xnEWPuzGPY_BrQ",
+     "handle": "@osmansari",
+     "name": "Osman Sarı",
+     "language": "tr"
+    },
+    {
+     "channelId": "UCHz1b04sr4sdACJiuhHzPGA",
+     "handle": "@mehmethocafen",
+     "name": "Mehmet HOCA ile FEN",
+     "language": "tr"
+    },
+    {
+     "channelId": "UChEl9rRzsv6ytZiDytGABdA",
+     "handle": "@copurhoca",
+     "name": "Çopur Hoca",
+     "language": "tr"
+    },
+    {
+     "channelId": "UCToLAmHh4RNhYVSHAENBmDg",
+     "handle": "@BgmMatematik",
+     "name": "BGM Matematik",
+     "language": "tr"
+    }
+   ]
+  },
+  {
+   "id": "pk_ecat",
+   "kind": "study",
+   "name": {
+    "en": "ECAT (UET engineering entry test)",
+    "ur": "ای کیٹ - انجینئرنگ کالج داخلہ ٹیسٹ"
+   },
+   "shortName": "ECAT",
+   "countries": [
+    "PK"
+   ],
+   "languages": [
+    "ur",
+    "en"
+   ],
+   "subjects": [
+    "Mathematics",
+    "Physics",
+    "Chemistry / Computer Science",
+    "English"
+   ],
+   "keywords": [
+    "ECAT",
+    "UET ECAT",
+    "ای کیٹ",
+    "انٹری ٹیسٹ",
+    "engineering entry test",
+    "NUST NET",
+    "NET engineering",
+    "FAST entry test",
+    "GIKI entry test",
+    "PIEAS",
+    "ECAT past papers",
+    "ECAT maths",
+    "ECAT physics",
+    "ECAT chemistry",
+    "ECAT computer",
+    "ECAT English",
+    "ریاضی",
+    "فزکس",
+    "کیمسٹری",
+    "MCQs",
+    "FSc pre-engineering",
+    "calculus",
+    "vectors",
+    "electrostatics",
+    "mock test",
+    "self assessment test"
+   ],
+   "blockedWords": [
+    "result live",
+    "merit list reaction",
+    "vlog",
+    "job alert",
+    "salary",
+    "motivation shorts",
+    "prank",
+    "admission news"
+   ],
+   "chips": [
+    "ریاضی",
+    "فزکس",
+    "کیمسٹری",
+    "کمپیوٹر",
+    "انگلش",
+    "پاسٹ پیپرز",
+    "ECAT",
+    "NET",
+    "MCQs",
+    "ٹیسٹ سیشن"
+   ],
+   "channels": [
+    {
+     "channelId": "UCqqGFk5yI9hRFwZg53GFyeQ",
+     "handle": "@MathsflixByHashimZia",
+     "name": "Mathsflix By Hashim Zia x Physikomatics",
+     "language": "ur"
+    },
+    {
+     "channelId": "UCwXONAF7z6_em7QtjyFyEzA",
+     "handle": "@passeducationsystem",
+     "name": "PASS Education System",
+     "language": "ur"
+    },
+    {
+     "channelId": "UCGhicCh93Cp9M-E4EXRjSDw",
+     "handle": "@PhysicsInSeconds",
+     "name": "Physics In Seconds - Ustaad Jee",
+     "language": "ur"
+    },
+    {
+     "channelId": "UCfnVA3TOeDBIeMYr1quObAg",
+     "handle": "@maqsadapp",
+     "name": "Maqsad - Online Learning",
+     "language": "ur"
+    },
+    {
+     "channelId": "UCWAiAV3m08lldG31uEfFuEw",
+     "handle": "@FakharStemSphere",
+     "name": "Fakhar STEM Sphere",
+     "language": "ur"
+    },
+    {
+     "channelId": "UCoZJFROkYtdoovuh2BrdgpQ",
+     "handle": "@KIPSPreparationsOfficial",
+     "name": "KIPS Preparations",
+     "language": "ur"
+    },
+    {
+     "channelId": "UCQy7SnswxFHD8J394dN8wUg",
+     "handle": "@Nustify_",
+     "name": "Nustify",
+     "language": "en"
+    },
+    {
+     "channelId": "UCBF0_O3dKaqAs5r3ZI3mEJA",
+     "handle": "@nowsherwankhan3834",
+     "name": "Nowsherwan Khan",
+     "language": "ur"
+    }
+   ]
+  },
+  {
+   "id": "bd_medical_admission",
+   "kind": "study",
+   "name": {
+    "en": "MBBS/BDS medical admission test",
+    "bn": "এমবিবিএস/বিডিএস মেডিকেল ভর্তি পরীক্ষা"
+   },
+   "shortName": "MBBS",
+   "countries": [
+    "BD"
+   ],
+   "languages": [
+    "bn",
+    "en"
+   ],
+   "subjects": [
+    "জীববিজ্ঞান",
+    "রসায়ন",
+    "পদার্থবিজ্ঞান",
+    "ইংরেজি",
+    "সাধারণ জ্ঞান"
+   ],
+   "keywords": [
+    "মেডিকেল ভর্তি পরীক্ষা",
+    "মেডিকেল ভর্তি প্রস্তুতি",
+    "মেডিকেল এডমিশন",
+    "medical admission",
+    "MBBS admission test",
+    "BDS",
+    "DGHS",
+    "DGME",
+    "প্রশ্নব্যাংক",
+    "medical question bank",
+    "মডেল টেস্ট",
+    "জীববিজ্ঞান",
+    "প্রাণিবিজ্ঞান",
+    "উদ্ভিদবিজ্ঞান",
+    "রসায়ন",
+    "পদার্থবিজ্ঞান",
+    "ইংরেজি vocabulary",
+    "সাধারণ জ্ঞান",
+    "HSC biology",
+    "DMC",
+    "MCQ solve"
+   ],
+   "blockedWords": [
+    "রেজাল্ট লাইভ",
+    "vlog",
+    "ভ্লগ",
+    "চাকরির খবর",
+    "salary",
+    "motivation shorts",
+    "prank",
+    "ফানি"
+   ],
+   "chips": [
+    "জীববিজ্ঞান",
+    "রসায়ন",
+    "পদার্থবিজ্ঞান",
+    "ইংরেজি",
+    "সাধারণ জ্ঞান",
+    "প্রশ্নব্যাংক",
+    "মডেল টেস্ট",
+    "MCQ",
+    "প্রাণিবিজ্ঞান",
+    "উদ্ভিদবিজ্ঞান"
+   ],
+   "channels": [
+    {
+     "channelId": "UCl361hXLUyGM_ytcPD1CGhg",
+     "handle": "@RetinaBd",
+     "name": "RETINA - রেটিনা",
+     "language": "bn"
+    },
+    {
+     "channelId": "UCdeMGBoMZGdZiF435vKlpGg",
+     "handle": "@MedilogyBD",
+     "name": "Medilogy",
+     "language": "bn"
+    },
+    {
+     "channelId": "UCmIIO0GfiIBLRLVZUtFRQww",
+     "handle": "@DMC_Dreamers",
+     "name": "DMC Dreamers",
+     "language": "bn"
+    },
+    {
+     "channelId": "UCVxN0LBfZePoP_7DpCuCIDw",
+     "handle": "@unmeshmedical",
+     "name": "UNMESH Medical Admission",
+     "language": "bn"
+    },
+    {
+     "channelId": "UC-0y7c0QV9Alk28ZzIf1_ww",
+     "handle": "@medicoedubd",
+     "name": "MEDICO",
+     "language": "bn"
+    },
+    {
+     "channelId": "UCVupHi06ggcwxjR3i8i2K0g",
+     "handle": "@medicalourdream",
+     "name": "Medical Our Dream",
+     "language": "bn"
+    },
+    {
+     "channelId": "UCap4N0YyrE9neX9IZKZo6nw",
+     "handle": "@nabilacademy",
+     "name": "Dr. Nabil Academy",
+     "language": "bn"
+    },
+    {
+     "channelId": "UCewHrQ2zUiRA20pKe_p1KaQ",
+     "handle": "@atlasprep",
+     "name": "ATLAS-Medical Admission Preparation",
+     "language": "bn"
+    }
+   ]
+  },
+  {
+   "id": "bd_engineering_admission",
+   "kind": "study",
+   "name": {
+    "en": "BUET / CKRUET engineering admission",
+    "bn": "বুয়েট / চুয়েট-কুয়েট-রুয়েট ইঞ্জিনিয়ারিং ভর্তি পরীক্ষা"
+   },
+   "shortName": "BUET",
+   "countries": [
+    "BD"
+   ],
+   "languages": [
+    "bn",
+    "en"
+   ],
+   "subjects": [
+    "গণিত",
+    "পদার্থবিজ্ঞান",
+    "রসায়ন",
+    "ইংরেজি"
+   ],
+   "keywords": [
+    "বুয়েট ভর্তি",
+    "ইঞ্জিনিয়ারিং ভর্তি প্রস্তুতি",
+    "BUET admission",
+    "CKRUET",
+    "KUET",
+    "RUET",
+    "CUET",
+    "engineering admission",
+    "প্রশ্নব্যাংক",
+    "question bank solve",
+    "মডেল টেস্ট",
+    "উচ্চতর গণিত",
+    "পদার্থবিজ্ঞান",
+    "রসায়ন",
+    "ভেক্টর",
+    "ক্যালকুলাস",
+    "HSC physics",
+    "written exam",
+    "MIST admission",
+    "DU Ka unit"
+   ],
+   "blockedWords": [
+    "রেজাল্ট লাইভ",
+    "vlog",
+    "ভ্লগ",
+    "campus tour",
+    "চাকরির খবর",
+    "salary",
+    "motivation shorts",
+    "prank"
+   ],
+   "chips": [
+    "গণিত",
+    "উচ্চতর গণিত",
+    "পদার্থবিজ্ঞান",
+    "রসায়ন",
+    "ইংরেজি",
+    "প্রশ্নব্যাংক",
+    "মডেল টেস্ট",
+    "লিখিত প্রশ্ন",
+    "ভেক্টর",
+    "ক্যালকুলাস"
+   ],
+   "channels": [
+    {
+     "channelId": "UC-sTOZXvgj6UaZ1Bk4DZiLQ",
+     "handle": "@udvashengineering",
+     "name": "UDVASH Engineering Admission",
+     "language": "bn"
+    },
+    {
+     "channelId": "UCUe10_--oNkwLxz9kvkMe5g",
+     "handle": "@UdvashUnmesh",
+     "name": "উদ্ভাস-উন্মেষ শিক্ষা পরিবার",
+     "language": "bn"
+    },
+    {
+     "channelId": "UCM3zi0H11duC6t_ccXylwQg",
+     "handle": "@ededgroup",
+     "name": "EDED Group - এডেড গ্রুপ",
+     "language": "bn"
+    },
+    {
+     "channelId": "UCFWscT6MbKxn809Zmx8N_jA",
+     "handle": "@GrindwithGourab",
+     "name": "Grind with Gourab",
+     "language": "bn"
+    },
+    {
+     "channelId": "UCf9ibpMoyP_W1Slm2b-nlBQ",
+     "handle": "@NeoNudgEd",
+     "name": "NeoNudge",
+     "language": "bn"
+    }
+   ]
+  },
+  {
    "id": "cls_in_cbse_6_8",
    "kind": "class",
    "name": {
@@ -18299,6 +19553,2754 @@
      "handle": "@MaamArianne",
      "name": "Ma'am Arianne",
      "language": "fil"
+    }
+   ]
+  },
+  {
+   "id": "cls_br_ensino_medio_10_12",
+   "kind": "class",
+   "name": {
+    "en": "Brazil Upper Secondary (Ensino Médio)",
+    "pt": "Ensino Médio (1ª a 3ª série)"
+   },
+   "shortName": "Ensino Médio",
+   "grade": "10-12",
+   "board": "MEC (BNCC)",
+   "countries": [
+    "BR"
+   ],
+   "languages": [
+    "pt"
+   ],
+   "subjects": [
+    "Língua Portuguesa",
+    "Matemática",
+    "Física",
+    "Química",
+    "Biologia",
+    "História",
+    "Geografia",
+    "Filosofia",
+    "Sociologia",
+    "Inglês"
+   ],
+   "keywords": [
+    "ensino médio",
+    "aula ensino médio",
+    "1ª série",
+    "2ª série",
+    "3ª série",
+    "BNCC",
+    "videoaula",
+    "matemática ensino médio",
+    "física",
+    "química",
+    "biologia",
+    "história",
+    "geografia",
+    "redação",
+    "funções",
+    "trigonometria",
+    "cinemática",
+    "estequiometria",
+    "genética",
+    "citologia",
+    "ecologia",
+    "Brasil colônia",
+    "exercícios resolvidos"
+   ],
+   "gradeKeywords": {
+    "10": [
+     "funções",
+     "cinemática",
+     "citologia",
+     "atomística"
+    ],
+    "11": [
+     "trigonometria",
+     "termodinâmica",
+     "estequiometria",
+     "genética"
+    ],
+    "12": [
+     "geometria analítica",
+     "eletricidade",
+     "química orgânica",
+     "evolução"
+    ]
+   },
+   "blockedWords": [
+    "vlog",
+    "motivação",
+    "fofoca",
+    "react",
+    "rotina de estudos vlog",
+    "black friday",
+    "trend"
+   ],
+   "chips": [
+    "Matemática",
+    "Português",
+    "Física",
+    "Química",
+    "Biologia",
+    "História",
+    "Geografia",
+    "Redação",
+    "Filosofia",
+    "Sociologia"
+   ],
+   "channels": [
+    {
+     "channelId": "UCsgHWN8lYveMUEWTDheTjZA",
+     "handle": "@brasilescola",
+     "name": "Brasil Escola Oficial",
+     "language": "pt"
+    },
+    {
+     "channelId": "UCW9_n8p_Byz-4k8wV1tnUBg",
+     "handle": "@professorferretto",
+     "name": "Professor Ferretto | ENEM e Vestibulares",
+     "language": "pt"
+    },
+    {
+     "channelId": "UCXj2oSzwg6G0iBjKg33joMQ",
+     "handle": "@khanacademyportugues",
+     "name": "Khan Academy Brasil",
+     "language": "pt"
+    },
+    {
+     "channelId": "UCT0JugAtGmqiYkwxFZOwAtg",
+     "handle": "@descomplica",
+     "name": "Descomplica",
+     "language": "pt"
+    },
+    {
+     "channelId": "UC0xLE2oM2iDiWhDsep8Iu-A",
+     "handle": "@goiastec.1serie",
+     "name": "Goiás Tec - 1ª Série",
+     "language": "pt"
+    },
+    {
+     "channelId": "UCM5U9EpaRFrJh5Wt3dXggKg",
+     "handle": "@goiastec.2serie",
+     "name": "Goiás Tec - 2ª Série",
+     "language": "pt"
+    },
+    {
+     "channelId": "UC3MKYCEnPR1NDayp7TQwMmg",
+     "handle": "@goiastec.3serie",
+     "name": "Goiás Tec - 3ª Série",
+     "language": "pt"
+    },
+    {
+     "channelId": "UCiBDWKbSUxCeZxs3OBqFKZg",
+     "handle": "@fisica_up",
+     "name": "Física Up - Profa. Carina Vellosa",
+     "language": "pt"
+    }
+   ]
+  },
+  {
+   "id": "cls_mx_bachillerato_10_12",
+   "kind": "class",
+   "name": {
+    "en": "Mexico Upper Secondary (Bachillerato)",
+    "es": "Bachillerato / Preparatoria"
+   },
+   "shortName": "Bachillerato",
+   "grade": "10-12",
+   "board": "SEP (Bachillerato)",
+   "countries": [
+    "MX"
+   ],
+   "languages": [
+    "es"
+   ],
+   "subjects": [
+    "Matemáticas",
+    "Física",
+    "Química",
+    "Biología",
+    "Lengua y Comunicación",
+    "Historia",
+    "Ciencias Sociales",
+    "Inglés",
+    "Pensamiento Matemático"
+   ],
+   "keywords": [
+    "bachillerato",
+    "preparatoria",
+    "prepa",
+    "SEP",
+    "Nueva Escuela Mexicana",
+    "MCCEMS",
+    "CCH",
+    "ENP",
+    "Colegio de Bachilleres",
+    "Prepa en Línea",
+    "álgebra",
+    "geometría analítica",
+    "cálculo diferencial",
+    "cálculo integral",
+    "límites",
+    "física",
+    "química",
+    "biología",
+    "lectura y redacción",
+    "ejercicios resueltos"
+   ],
+   "gradeKeywords": {
+    "10": [
+     "álgebra",
+     "química I",
+     "lectura y redacción"
+    ],
+    "11": [
+     "geometría analítica",
+     "física I",
+     "biología"
+    ],
+    "12": [
+     "cálculo diferencial",
+     "cálculo integral",
+     "probabilidad"
+    ]
+   },
+   "blockedWords": [
+    "vlog",
+    "chisme",
+    "reacción",
+    "broma",
+    "trend",
+    "motivación",
+    "en vivo resultados"
+   ],
+   "chips": [
+    "Álgebra",
+    "Geometría y trigonometría",
+    "Cálculo",
+    "Física",
+    "Química",
+    "Biología",
+    "Lectura y redacción",
+    "Historia de México",
+    "Inglés",
+    "Probabilidad"
+   ],
+   "channels": [
+    {
+     "channelId": "UCcgaNFUdJWyAG8tPKfvqDzw",
+     "handle": "@PrepaenLinea-SEP",
+     "name": "Prepa en Línea-SEP",
+     "language": "es"
+    },
+    {
+     "channelId": "UCYhbILQe1xKAF2cuGSjo5IA",
+     "handle": "@portalacademicocch1",
+     "name": "Portal Académico CCH",
+     "language": "es"
+    },
+    {
+     "channelId": "UCwScwtu5zVqc_wHtRx9XvDA",
+     "handle": "@danielcarreon",
+     "name": "Daniel Carreón",
+     "language": "es"
+    },
+    {
+     "channelId": "UCxL0vYx7tELx8rmI4CJZw9w",
+     "handle": "@ProfeLuisConchas",
+     "name": "Profe Luis Conchas",
+     "language": "es"
+    },
+    {
+     "channelId": "UCIkCzk3ezlAxX5r2OFlHLaQ",
+     "handle": "@julioprofe",
+     "name": "julioprofe",
+     "language": "es"
+    },
+    {
+     "channelId": "UCanMxWvOoiwtjLYm08Bo8QQ",
+     "handle": "@MatematicasprofeAlex",
+     "name": "Matemáticas profe Alex",
+     "language": "es"
+    }
+   ]
+  },
+  {
+   "id": "cls_id_sma_10_12",
+   "kind": "class",
+   "name": {
+    "en": "SMA/MA grades 10-12 (Kurikulum Merdeka)",
+    "id": "SMA/MA Kelas 10-12 (Kurikulum Merdeka)"
+   },
+   "shortName": "SMP / SMA",
+   "grade": "10-12",
+   "board": "Kemendikdasmen (Kurikulum Merdeka)",
+   "countries": [
+    "ID"
+   ],
+   "languages": [
+    "id"
+   ],
+   "subjects": [
+    "Matematika",
+    "Fisika",
+    "Kimia",
+    "Biologi",
+    "Bahasa Indonesia",
+    "Bahasa Inggris",
+    "Sejarah",
+    "Ekonomi",
+    "Geografi",
+    "Sosiologi"
+   ],
+   "keywords": [
+    "materi SMA",
+    "kelas 10",
+    "kelas 11",
+    "kelas 12",
+    "kurikulum merdeka",
+    "matematika SMA",
+    "fisika SMA",
+    "kimia SMA",
+    "biologi SMA",
+    "fungsi komposisi",
+    "persamaan kuadrat",
+    "trigonometri",
+    "limit",
+    "turunan",
+    "integral",
+    "stoikiometri",
+    "hukum Newton",
+    "sel",
+    "genetika",
+    "latihan soal",
+    "pembahasan soal",
+    "TKA SMA",
+    "ujian sekolah",
+    "Kemendikdasmen"
+   ],
+   "gradeKeywords": {
+    "10": [
+     "kelas 10",
+     "fase E",
+     "eksponen dan logaritma",
+     "barisan dan deret"
+    ],
+    "11": [
+     "kelas 11",
+     "fase F",
+     "polinomial",
+     "matriks"
+    ],
+    "12": [
+     "kelas 12",
+     "fase F",
+     "limit dan turunan",
+     "integral"
+    ]
+   },
+   "blockedWords": [
+    "vlog",
+    "prank",
+    "gosip",
+    "live streaming game",
+    "motivasi shorts",
+    "drama",
+    "mukbang",
+    "pengumuman hasil"
+   ],
+   "chips": [
+    "Matematika",
+    "Fisika",
+    "Kimia",
+    "Biologi",
+    "Bahasa Indonesia",
+    "Bahasa Inggris",
+    "Sejarah",
+    "Ekonomi",
+    "Geografi",
+    "Sosiologi",
+    "TKA"
+   ],
+   "channels": [
+    {
+     "channelId": "UCbc1RY0McnikiEMD8Box5Ig",
+     "handle": "@Ruangguru",
+     "name": "Ruangguru Bimbel Terbesar No. 1 di Indonesia!",
+     "language": "id"
+    },
+    {
+     "channelId": "UCPFc7-vFol1QBMZxw62w_Hw",
+     "handle": "@ZeniusEducation",
+     "name": "Zenius",
+     "language": "id"
+    },
+    {
+     "channelId": "UCHlS8Bp0ljxDJfNpgT6Isyw",
+     "handle": "@wienclassroom",
+     "name": "Wien Classroom",
+     "language": "id"
+    },
+    {
+     "channelId": "UCHwGBkN0GVPiy_k_jbAkFeA",
+     "handle": "@SeekorLebah",
+     "name": "Seekor Lebah",
+     "language": "id"
+    },
+    {
+     "channelId": "UCd5QYHdVpbdPPd-pVRdAzpQ",
+     "handle": "@legurules",
+     "name": "Le GuruLes",
+     "language": "id"
+    },
+    {
+     "channelId": "UCOxrQ4i5MCahmGOrhgO2bgg",
+     "handle": "@TettysChemistryClass",
+     "name": "Tetty's Chemistry Class",
+     "language": "id"
+    },
+    {
+     "channelId": "UCjCkDKQ9Xv8eOuoVfei3vFg",
+     "handle": "@kimatika_official",
+     "name": "Kimatika",
+     "language": "id"
+    },
+    {
+     "channelId": "UCN3EmgZPd-15cmG8hgnijqQ",
+     "handle": "@GIAAcademy",
+     "name": "GIA Academy",
+     "language": "id"
+    },
+    {
+     "channelId": "UCUBaaRwc9pj41qtrjMsSPfQ",
+     "handle": "@NablaEducation",
+     "name": "Nabla Education",
+     "language": "id"
+    },
+    {
+     "channelId": "UCc7f6ktPyVQfakWoG7gO34Q",
+     "handle": "@kejarcita",
+     "name": "kejarcita",
+     "language": "id"
+    }
+   ]
+  },
+  {
+   "id": "cls_id_smp_7_9",
+   "kind": "class",
+   "name": {
+    "en": "SMP/MTs grades 7-9 (Kurikulum Merdeka)",
+    "id": "SMP/MTs Kelas 7-9 (Kurikulum Merdeka)"
+   },
+   "shortName": "SMP / SMA",
+   "grade": "7-9",
+   "board": "Kemendikdasmen (Kurikulum Merdeka)",
+   "countries": [
+    "ID"
+   ],
+   "languages": [
+    "id"
+   ],
+   "subjects": [
+    "Matematika",
+    "IPA",
+    "IPS",
+    "Bahasa Indonesia",
+    "Bahasa Inggris",
+    "Pendidikan Pancasila",
+    "Informatika"
+   ],
+   "keywords": [
+    "materi SMP",
+    "kelas 7",
+    "kelas 8",
+    "kelas 9",
+    "kurikulum merdeka",
+    "matematika SMP",
+    "IPA SMP",
+    "IPS SMP",
+    "bilangan bulat",
+    "aljabar",
+    "persamaan linear",
+    "teorema Pythagoras",
+    "sistem pencernaan",
+    "sistem peredaran darah",
+    "gaya dan gerak",
+    "listrik",
+    "latihan soal",
+    "pembahasan soal",
+    "TKA SMP",
+    "asesmen sumatif"
+   ],
+   "gradeKeywords": {
+    "7": [
+     "kelas 7",
+     "bilangan bulat",
+     "FPB dan KPK"
+    ],
+    "8": [
+     "kelas 8",
+     "sistem pernapasan",
+     "persamaan linear satu variabel"
+    ],
+    "9": [
+     "kelas 9",
+     "bangun ruang sisi lengkung",
+     "perubahan sosial budaya"
+    ]
+   },
+   "blockedWords": [
+    "vlog",
+    "prank",
+    "gosip",
+    "game live",
+    "motivasi shorts",
+    "drama",
+    "mukbang",
+    "kartun"
+   ],
+   "chips": [
+    "Matematika",
+    "IPA",
+    "IPS",
+    "Bahasa Indonesia",
+    "Bahasa Inggris",
+    "Pendidikan Pancasila",
+    "Informatika",
+    "Latihan Soal",
+    "TKA SMP"
+   ],
+   "channels": [
+    {
+     "channelId": "UCd5QYHdVpbdPPd-pVRdAzpQ",
+     "handle": "@legurules",
+     "name": "Le GuruLes",
+     "language": "id"
+    },
+    {
+     "channelId": "UCkrcVT30Z-mJfqtlSYxXtcw",
+     "handle": "@BuAndChannel",
+     "name": "Bu And' Channel",
+     "language": "id"
+    },
+    {
+     "channelId": "UCB9xhj1IUB7oJUDHf-myMzQ",
+     "handle": "@PortalEdukasi",
+     "name": "Portal Edukasi",
+     "language": "id"
+    },
+    {
+     "channelId": "UCDnQ4sOu1yObcV2dkasrx8w",
+     "handle": "@belajar_biologi",
+     "name": "Channel Biologi Asik",
+     "language": "id"
+    },
+    {
+     "channelId": "UCcMDDg2VjElD4kCn08-GWgA",
+     "handle": "@BelajarIPSseru",
+     "name": "Belajar IPS Seru",
+     "language": "id"
+    },
+    {
+     "channelId": "UCOp3y1KIVvMlvCVvPfweMdg",
+     "handle": "@edcentid",
+     "name": "Edcent",
+     "language": "id"
+    },
+    {
+     "channelId": "UCbc1RY0McnikiEMD8Box5Ig",
+     "handle": "@Ruangguru",
+     "name": "Ruangguru Bimbel Terbesar No. 1 di Indonesia!",
+     "language": "id"
+    }
+   ]
+  },
+  {
+   "id": "cls_vn_thpt_10_12",
+   "kind": "class",
+   "name": {
+    "en": "Upper secondary (THPT) grades 10-12, GDPT 2018",
+    "vi": "THPT lớp 10-12 (Chương trình GDPT 2018)"
+   },
+   "shortName": "GDPT 2018",
+   "grade": "10-12",
+   "board": "Bộ GD&ĐT (Chương trình GDPT 2018)",
+   "countries": [
+    "VN"
+   ],
+   "languages": [
+    "vi"
+   ],
+   "subjects": [
+    "Toán",
+    "Ngữ văn",
+    "Tiếng Anh",
+    "Vật lí",
+    "Hóa học",
+    "Sinh học",
+    "Lịch sử",
+    "Địa lí",
+    "Tin học"
+   ],
+   "keywords": [
+    "toán 10",
+    "toán 11",
+    "toán 12",
+    "vật lí 10",
+    "vật lí 11",
+    "vật lí 12",
+    "hóa học 10",
+    "hóa học 11",
+    "hóa học 12",
+    "ngữ văn 12",
+    "kết nối tri thức",
+    "chân trời sáng tạo",
+    "cánh diều",
+    "hàm số",
+    "vectơ",
+    "dao động",
+    "sóng",
+    "phản ứng oxi hóa khử",
+    "hóa hữu cơ",
+    "đề thi giữa kì",
+    "thi tốt nghiệp THPT",
+    "GDPT 2018"
+   ],
+   "gradeKeywords": {
+    "10": [
+     "lớp 10",
+     "mệnh đề tập hợp",
+     "chuyển động thẳng"
+    ],
+    "11": [
+     "lớp 11",
+     "dao động",
+     "hàm số lượng giác"
+    ],
+    "12": [
+     "lớp 12",
+     "khảo sát hàm số",
+     "ôn thi tốt nghiệp"
+    ]
+   },
+   "blockedWords": [
+    "vlog",
+    "prank",
+    "drama",
+    "livestream game",
+    "tin đồn",
+    "review phim",
+    "mukbang",
+    "giải trí"
+   ],
+   "chips": [
+    "Toán",
+    "Ngữ văn",
+    "Tiếng Anh",
+    "Vật lí",
+    "Hóa học",
+    "Sinh học",
+    "Lịch sử",
+    "Địa lí",
+    "Ôn thi THPT",
+    "Đề giữa kì"
+   ],
+   "channels": [
+    {
+     "channelId": "UC7Ndf6Vo7E8ut3DP_4CISCQ",
+     "handle": "@tuyensinh247tv",
+     "name": "Tuyensinh247 - Học trực tuyến",
+     "language": "vi"
+    },
+    {
+     "channelId": "UCjZqkflJzz8esp39oGPaFQg",
+     "handle": "@HOCMAITHPT",
+     "name": "HOCMAI THPT",
+     "language": "vi"
+    },
+    {
+     "channelId": "UC7ambC6lu_T-P7SMnAXGJ0g",
+     "handle": "@ThầyNguyễnQuốcChí",
+     "name": "Thầy Nguyễn Quốc Chí",
+     "language": "vi"
+    },
+    {
+     "channelId": "UCokwvW0Ry1qXmroTKoS3lIQ",
+     "handle": "@ToananhgiaoKid",
+     "name": "Toán Anh Giáo Kid",
+     "language": "vi"
+    },
+    {
+     "channelId": "UCP98Gj2fYErscrQy56hX1ig",
+     "handle": "@thayvnachuyenluyenthivatly",
+     "name": "Thầy Vũ Ngọc Anh - Chuyên luyện thi Vật Lý",
+     "language": "vi"
+    },
+    {
+     "channelId": "UC2prfDQAHLCcU7fQk83TyQQ",
+     "handle": "@ThầyVũTuấnAnh-VậtLý",
+     "name": "Thầy Vũ Tuấn Anh - Vật Lý",
+     "language": "vi"
+    },
+    {
+     "channelId": "UCmqb300uaJGLzLA8KfjWQPw",
+     "handle": "@LýThầyQuân",
+     "name": "Lý Thầy Quân",
+     "language": "vi"
+    },
+    {
+     "channelId": "UCtbaa4gZyFL0dwKlNiiSaIg",
+     "handle": "@khoicaominh",
+     "name": "Khôi Cao Minh - Vật Lý",
+     "language": "vi"
+    },
+    {
+     "channelId": "UCDOFh-PJG9DpBtWd5EEyEdQ",
+     "handle": "@hochoachet",
+     "name": "Học Hóa Đến Chết",
+     "language": "vi"
+    },
+    {
+     "channelId": "UCGCFMjPGMOuim_xub0pTt1w",
+     "handle": "@NguyenPhucHau84",
+     "name": "Nguyễn Phúc Hậu",
+     "language": "vi"
+    },
+    {
+     "channelId": "UCWocbHQKwi5vK5BTTEfps1A",
+     "handle": "@PhamMinhNhatOfficial",
+     "name": "Phạm Minh Nhật Official",
+     "language": "vi"
+    }
+   ]
+  },
+  {
+   "id": "cls_th_m4_6",
+   "kind": "class",
+   "name": {
+    "en": "Upper secondary M.4-6 (Basic Education Core Curriculum)",
+    "th": "มัธยมศึกษาตอนปลาย ม.4-6 (หลักสูตรแกนกลาง)"
+   },
+   "shortName": "ม.ปลาย",
+   "grade": "10-12",
+   "board": "สพฐ. (หลักสูตรแกนกลาง)",
+   "countries": [
+    "TH"
+   ],
+   "languages": [
+    "th"
+   ],
+   "subjects": [
+    "คณิตศาสตร์",
+    "ฟิสิกส์",
+    "เคมี",
+    "ชีววิทยา",
+    "ภาษาไทย",
+    "ภาษาอังกฤษ",
+    "สังคมศึกษา",
+    "วิทยาการคำนวณ"
+   ],
+   "keywords": [
+    "ม.4",
+    "ม.5",
+    "ม.6",
+    "มัธยมปลาย",
+    "คณิตศาสตร์เพิ่มเติม",
+    "ฟิสิกส์ ม.4",
+    "เคมี ม.4",
+    "ชีววิทยา ม.4",
+    "สสวท.",
+    "จำนวนจริง",
+    "ฟังก์ชัน",
+    "เอกซ์โพเนนเชียลและลอการิทึม",
+    "ความน่าจะเป็น",
+    "การเคลื่อนที่",
+    "อัตราการเกิดปฏิกิริยาเคมี",
+    "ระบบประสาท",
+    "เฉลยแบบฝึกหัด",
+    "ติวสอบกลางภาค",
+    "A-Level",
+    "TGAT TPAT"
+   ],
+   "gradeKeywords": {
+    "10": [
+     "ม.4",
+     "เซต",
+     "การเคลื่อนที่แนวตรง"
+    ],
+    "11": [
+     "ม.5",
+     "ลำดับและอนุกรม",
+     "ไฟฟ้าเคมี"
+    ],
+    "12": [
+     "ม.6",
+     "แคลคูลัส",
+     "ระบบประสาท"
+    ]
+   },
+   "blockedWords": [
+    "vlog",
+    "แกล้ง",
+    "ดราม่า",
+    "ไลฟ์เกม",
+    "ดูดวง",
+    "ซีรีส์",
+    "รีวิวกิน",
+    "ประกาศผล"
+   ],
+   "chips": [
+    "คณิตศาสตร์",
+    "คณิตเพิ่มเติม",
+    "ฟิสิกส์",
+    "เคมี",
+    "ชีววิทยา",
+    "ภาษาไทย",
+    "ภาษาอังกฤษ",
+    "สังคมศึกษา",
+    "A-Level",
+    "สอบกลางภาค"
+   ],
+   "channels": [
+    {
+     "channelId": "UC0qWWV4YLpxnAQGJ8ednXlA",
+     "handle": "@I.know.physics.a.little",
+     "name": "I know PHYSICs a little",
+     "language": "th"
+    },
+    {
+     "channelId": "UCF7vHzVbNWUrjjYW7qH1rbw",
+     "handle": "@physicskoake",
+     "name": "ฟิสิกส์โกเอก",
+     "language": "th"
+    },
+    {
+     "channelId": "UCUQVbylqHsfKlMik3I_xvng",
+     "handle": "@math_draft",
+     "name": "สอบติด พิชิตคณิตศาสตร์",
+     "language": "th"
+    },
+    {
+     "channelId": "UCQ2NNTQSWgXVs8UIKp8M39Q",
+     "handle": "@Hack-MATH",
+     "name": "HACK คณิตศาสตร์ Channel",
+     "language": "th"
+    },
+    {
+     "channelId": "UC58GT_EW9hst-pPUEEVIF6g",
+     "handle": "@wowmathPthames",
+     "name": "ว้าว คณิต มันโคตรง่าย By P'Thames",
+     "language": "th"
+    },
+    {
+     "channelId": "UCpeZtM5AsDvDgk9zIx7DaIQ",
+     "handle": "@mathbypop",
+     "name": "คณิตศาสตร์พี่ป๊อป",
+     "language": "th"
+    },
+    {
+     "channelId": "UCz9ZJxsbgsp38bStaaRMnaA",
+     "handle": "@ChemSaiy",
+     "name": "ChemSaiy เคมีครูทราย",
+     "language": "th"
+    },
+    {
+     "channelId": "UC3Z-UU8sJJmcyB0TWmD0h7A",
+     "handle": "@easybioKruFai",
+     "name": "easybio",
+     "language": "th"
+    },
+    {
+     "channelId": "UCExEsSbSgj52ZlMzq0jydJQ",
+     "handle": "@whatisbioplus",
+     "name": "Whatisbioplus",
+     "language": "th"
+    }
+   ]
+  },
+  {
+   "id": "cls_jp_koukou_10_12",
+   "kind": "class",
+   "name": {
+    "en": "Japanese high school (Koukou years 1-3)",
+    "ja": "高校1〜3年 (高等学校学習指導要領)"
+   },
+   "shortName": "高校",
+   "grade": "10-12",
+   "board": "文部科学省 (高等学校学習指導要領)",
+   "countries": [
+    "JP"
+   ],
+   "languages": [
+    "ja"
+   ],
+   "subjects": [
+    "数学",
+    "国語",
+    "英語",
+    "物理",
+    "化学",
+    "生物",
+    "地学",
+    "日本史",
+    "世界史",
+    "地理",
+    "公共",
+    "情報"
+   ],
+   "keywords": [
+    "高校数学",
+    "高校物理",
+    "高校化学",
+    "高校生物",
+    "古文",
+    "漢文",
+    "歴史総合",
+    "日本史探究",
+    "世界史探究",
+    "数学I",
+    "数学A",
+    "数学II",
+    "数学B",
+    "数学III",
+    "二次関数",
+    "三角比",
+    "微分積分",
+    "ベクトル",
+    "波動",
+    "力学",
+    "化学基礎",
+    "定期テスト",
+    "共通テスト",
+    "授業動画"
+   ],
+   "gradeKeywords": {
+    "10": [
+     "高校1年",
+     "数学I",
+     "化学基礎"
+    ],
+    "11": [
+     "高校2年",
+     "数学II",
+     "物理"
+    ],
+    "12": [
+     "高校3年",
+     "数学III",
+     "共通テスト"
+    ]
+   },
+   "blockedWords": [
+    "vlog",
+    "ドッキリ",
+    "ゲーム実況",
+    "炎上",
+    "雑談配信",
+    "切り抜き",
+    "恋愛",
+    "大食い"
+   ],
+   "chips": [
+    "数学I・A",
+    "数学II・B",
+    "物理",
+    "化学",
+    "生物",
+    "古文",
+    "漢文",
+    "英語",
+    "日本史",
+    "世界史",
+    "歴史総合",
+    "共通テスト"
+   ],
+   "channels": [
+    {
+     "channelId": "UCcj-cHmS0uD91MLjtdiN89Q",
+     "handle": "@TryIT_official",
+     "name": "映像授業 Try IT（トライイット）",
+     "language": "ja"
+    },
+    {
+     "channelId": "UCZUPMvvW1ggn4gbSY741LdA",
+     "handle": "@chowakaru",
+     "name": "超わかる！授業動画",
+     "language": "ja"
+    },
+    {
+     "channelId": "UCGdGyJ6N07dvumQSTOCEOQg",
+     "handle": "@Y_Eschool",
+     "name": "Japanese History / YouTube High School",
+     "language": "ja"
+    },
+    {
+     "channelId": "UCRNYfIK7BV_DCoR7KqdhBhQ",
+     "handle": "@tadayobi-humanities",
+     "name": "「ただよび」文系チャンネル",
+     "language": "ja"
+    },
+    {
+     "channelId": "UC7zx7uOmqXsD153rPSUvxcg",
+     "handle": "@math-english.torisetu",
+     "name": "数学・英語のトリセツ!",
+     "language": "ja"
+    },
+    {
+     "channelId": "UCNYq78AzoFMk5Bn0uXe3M3w",
+     "handle": "@tanoshi-butsuri",
+     "name": "たのしいぶつり【高校物理】",
+     "language": "ja"
+    },
+    {
+     "channelId": "UCKb8y24VzBDTy4ukiXBubfw",
+     "handle": "@hosokawajp",
+     "name": "細川JPの高校物理",
+     "language": "ja"
+    },
+    {
+     "channelId": "UCwaN2Y-XT66JcLaHLpjZaWQ",
+     "handle": "@enchemi",
+     "name": "ヒロシのエンジョイケミストリー",
+     "language": "ja"
+    }
+   ]
+  },
+  {
+   "id": "cls_kr_godeung_10_12",
+   "kind": "class",
+   "name": {
+    "en": "Korean high school (grades 10-12, 2022 revised curriculum)",
+    "ko": "고등학교 고1~고3 (2022 개정 교육과정)"
+   },
+   "shortName": "고등학교",
+   "grade": "10-12",
+   "board": "교육부 (2022 개정 교육과정)",
+   "countries": [
+    "KR"
+   ],
+   "languages": [
+    "ko"
+   ],
+   "subjects": [
+    "국어",
+    "수학",
+    "영어",
+    "한국사",
+    "통합사회",
+    "통합과학",
+    "물리학",
+    "화학",
+    "생명과학",
+    "지구과학"
+   ],
+   "keywords": [
+    "고1",
+    "고2",
+    "고3",
+    "고등 수학",
+    "공통수학",
+    "대수",
+    "미적분",
+    "확률과 통계",
+    "통합과학",
+    "통합사회",
+    "한국사",
+    "문학",
+    "독서",
+    "화법과 작문",
+    "언어와 매체",
+    "영어 독해",
+    "내신 대비",
+    "기말고사",
+    "모의고사",
+    "수능",
+    "EBS",
+    "개념 강의",
+    "2022 개정 교육과정"
+   ],
+   "gradeKeywords": {
+    "10": [
+     "고1",
+     "공통수학",
+     "통합과학"
+    ],
+    "11": [
+     "고2",
+     "대수",
+     "미적분I"
+    ],
+    "12": [
+     "고3",
+     "수능",
+     "모의고사"
+    ]
+   },
+   "blockedWords": [
+    "브이로그",
+    "먹방",
+    "몰카",
+    "게임 방송",
+    "연예",
+    "드라마",
+    "썰",
+    "합격 발표"
+   ],
+   "chips": [
+    "국어",
+    "수학",
+    "영어",
+    "한국사",
+    "통합사회",
+    "통합과학",
+    "물리",
+    "화학",
+    "생명과학",
+    "내신",
+    "모의고사",
+    "수능"
+   ],
+   "channels": [
+    {
+     "channelId": "UCDkTanNuZGwYtf-Y6_xBmqw",
+     "handle": "@EBS_i",
+     "name": "EBSi",
+     "language": "ko"
+    },
+    {
+     "channelId": "UCXQ5zAqIFOohc0SJO1j17Ow",
+     "handle": "@ebsi3107",
+     "name": "EBSi임재석쌤",
+     "language": "ko"
+    },
+    {
+     "channelId": "UC0MVv0wGYB078pISgHFwhzQ",
+     "handle": "@bigstar1tv",
+     "name": "최태성 1TV",
+     "language": "ko"
+    },
+    {
+     "channelId": "UC-X6oxZ_VXBWFiNCB9DIvtQ",
+     "handle": "@윾머벨유대종유튜브",
+     "name": "윾머벨 [유대종 유튜브]",
+     "language": "ko"
+    },
+    {
+     "channelId": "UC8ksbVHkR26plmw5hbRNvuw",
+     "handle": "@seoha_math",
+     "name": "수학의 필연성 서하쌤",
+     "language": "ko"
+    },
+    {
+     "channelId": "UCOtJLaVAMJ2MqjWRoF8c14w",
+     "handle": "@tomomath",
+     "name": "김강용: 심화와 응용에 강한 수학",
+     "language": "ko"
+    },
+    {
+     "channelId": "UCvgRYCzfZk0MtfV26AKRzZA",
+     "handle": "@parksunscience",
+     "name": "통합과학 박선",
+     "language": "ko"
+    },
+    {
+     "channelId": "UC7fAOD8cT3KyyPIS6agqSLg",
+     "handle": "@soan_sam",
+     "name": "대치동 솬쌤(김소환T)",
+     "language": "ko"
+    }
+   ]
+  },
+  {
+   "id": "cls_es_eso_bachillerato_7_12",
+   "kind": "class",
+   "name": {
+    "en": "ESO and Bachillerato (Spain, grades 7-12)",
+    "es": "ESO y Bachillerato (LOMLOE)"
+   },
+   "shortName": "ESO / Bachillerato",
+   "grade": "7-12",
+   "board": "LOMLOE (ESO y Bachillerato)",
+   "countries": [
+    "ES"
+   ],
+   "languages": [
+    "es"
+   ],
+   "subjects": [
+    "Matemáticas",
+    "Física y Química",
+    "Biología y Geología",
+    "Lengua Castellana y Literatura",
+    "Geografía e Historia",
+    "Historia de España",
+    "Filosofía",
+    "Economía",
+    "Inglés"
+   ],
+   "keywords": [
+    "ESO",
+    "1º ESO",
+    "2º ESO",
+    "3º ESO",
+    "4º ESO",
+    "1º Bachillerato",
+    "2º Bachillerato",
+    "Matemáticas II",
+    "ejercicios resueltos",
+    "ecuaciones",
+    "derivadas",
+    "integrales",
+    "límites",
+    "física y química",
+    "cinemática",
+    "formulación inorgánica",
+    "análisis sintáctico",
+    "comentario de texto",
+    "Historia de España",
+    "PAU",
+    "EvAU",
+    "selectividad",
+    "LOMLOE"
+   ],
+   "gradeKeywords": {
+    "7": [
+     "1º ESO",
+     "fracciones",
+     "números enteros"
+    ],
+    "8": [
+     "2º ESO",
+     "proporcionalidad",
+     "ecuaciones de primer grado"
+    ],
+    "9": [
+     "3º ESO",
+     "sistemas de ecuaciones",
+     "funciones lineales"
+    ],
+    "10": [
+     "4º ESO",
+     "trigonometría",
+     "cinemática 4º ESO"
+    ],
+    "11": [
+     "1º Bachillerato",
+     "vectores",
+     "derivadas"
+    ],
+    "12": [
+     "2º Bachillerato",
+     "integrales",
+     "PAU"
+    ]
+   },
+   "blockedWords": [
+    "vlog",
+    "reacción",
+    "bromas",
+    "challenge",
+    "directo gaming",
+    "notas de corte en directo"
+   ],
+   "chips": [
+    "Matemáticas",
+    "Física y Química",
+    "Biología",
+    "Lengua",
+    "Sintaxis",
+    "Historia",
+    "Filosofía",
+    "Integrales",
+    "Derivadas",
+    "Formulación",
+    "PAU",
+    "EvAU"
+   ],
+   "channels": [
+    {
+     "channelId": "UCx2Y_55MBCq3lkc3aOtmAiw",
+     "handle": "@profesor10demates",
+     "name": "profesor10demates",
+     "language": "es"
+    },
+    {
+     "channelId": "UCb40x1kRqrq7---i14VaA-A",
+     "handle": "@matematicaconjuan",
+     "name": "Mathematics with Juan",
+     "language": "es"
+    },
+    {
+     "channelId": "UC3RYy7GbMHDvPQGCdAh3H5g",
+     "handle": "@unicoos",
+     "name": "unicoos",
+     "language": "es"
+    },
+    {
+     "channelId": "UC73702acnOOmrWMzFRHe4oA",
+     "handle": "@MatesconAndrés",
+     "name": "Mates con Andrés",
+     "language": "es"
+    },
+    {
+     "channelId": "UCtkmpuSfYi9R8Xeq9OrO6GA",
+     "handle": "@juanmemol",
+     "name": "lasmatematicas.es",
+     "language": "es"
+    },
+    {
+     "channelId": "UCnKlfDXaVP-6uIACOJeVPfw",
+     "handle": "@ClasesParticularesenÁvila",
+     "name": "Clases Particulares en Ávila",
+     "language": "es"
+    },
+    {
+     "channelId": "UCBXBFe8yIMq2FyBuytQ-9ew",
+     "handle": "@profesorfisicayquimica",
+     "name": "Teacher Physics and Chemistry",
+     "language": "es"
+    },
+    {
+     "channelId": "UCa2BZMhRhM8FObBprOeLCcA",
+     "handle": "@FisicayQuimicaConAlfonso",
+     "name": "FÍSICA y QUÍMICA",
+     "language": "es"
+    },
+    {
+     "channelId": "UCDX_kJijpN3NhoGS8Nftong",
+     "handle": "@MarTeLoExplica",
+     "name": "MarTeLoExplica | Clases Online",
+     "language": "es"
+    },
+    {
+     "channelId": "UCHVdasRNr38XYE_OqQWVQEQ",
+     "handle": "@AcademiaOsorio",
+     "name": "Academia Osorio",
+     "language": "es"
+    },
+    {
+     "channelId": "UCR8bB7bQvFBRlyFbPWg4s_g",
+     "handle": "@clasesmanueldelasheras",
+     "name": "Clases Manuel de las Heras",
+     "language": "es"
+    }
+   ]
+  },
+  {
+   "id": "cls_fr_lycee_10_12",
+   "kind": "class",
+   "name": {
+    "en": "Lycée général (France, Seconde to Terminale)",
+    "fr": "Lycée général (Seconde, Première, Terminale)"
+   },
+   "shortName": "Lycée",
+   "grade": "10-12",
+   "board": "Éducation nationale (lycée général)",
+   "countries": [
+    "FR"
+   ],
+   "languages": [
+    "fr"
+   ],
+   "subjects": [
+    "Mathématiques",
+    "Physique-chimie",
+    "SVT",
+    "Français",
+    "Philosophie",
+    "Histoire-géographie",
+    "SES",
+    "HLP",
+    "Enseignement scientifique"
+   ],
+   "keywords": [
+    "lycée",
+    "seconde",
+    "première",
+    "terminale",
+    "spécialité maths",
+    "suites",
+    "dérivation",
+    "fonction exponentielle",
+    "logarithme",
+    "probabilités",
+    "géométrie dans l'espace",
+    "physique-chimie terminale",
+    "SVT terminale",
+    "enseignement scientifique",
+    "bac de français",
+    "commentaire de texte",
+    "dissertation",
+    "philosophie terminale",
+    "grand oral",
+    "annales bac"
+   ],
+   "gradeKeywords": {
+    "10": [
+     "seconde",
+     "fonctions de référence",
+     "vecteurs"
+    ],
+    "11": [
+     "première",
+     "dérivation",
+     "suites numériques",
+     "bac de français"
+    ],
+    "12": [
+     "terminale",
+     "limites",
+     "logarithme népérien",
+     "philosophie"
+    ]
+   },
+   "blockedWords": [
+    "vlog",
+    "résultats du bac en direct",
+    "réaction",
+    "prank",
+    "challenge",
+    "story time",
+    "motivation shorts"
+   ],
+   "chips": [
+    "Maths",
+    "Physique-chimie",
+    "SVT",
+    "Français",
+    "Philosophie",
+    "Histoire-géo",
+    "SES",
+    "Spécialité",
+    "Bac",
+    "Grand oral"
+   ],
+   "channels": [
+    {
+     "channelId": "UCaDqmzanCq4ZYhdEm0Df9Qg",
+     "handle": "@YMONKA",
+     "name": "Yvan Monka",
+     "language": "fr"
+    },
+    {
+     "channelId": "UCp0jxeetANhaifijiK7nkoA",
+     "handle": "@ProfPaulOlivier",
+     "name": "Paul Olivier",
+     "language": "fr"
+    },
+    {
+     "channelId": "UCL7FXdd8TW0hxNHmzlPlAQQ",
+     "handle": "@lesbonsprofs",
+     "name": "Les Bons Profs",
+     "language": "fr"
+    },
+    {
+     "channelId": "UCo-O74A4qVz6nq5cfCIee6w",
+     "handle": "@jaicomprisMaths",
+     "name": "jaicompris Maths",
+     "language": "fr"
+    },
+    {
+     "channelId": "UCDjXdK_Jg_0OqRlRhKiZ_Rw",
+     "handle": "@maths-lycee",
+     "name": "Hans Amble - Maths au Lycée",
+     "language": "fr"
+    },
+    {
+     "channelId": "UCgy2HAvvCNvvJb7bpqpY9XQ",
+     "handle": "@Mathemax",
+     "name": "Mathemax",
+     "language": "fr"
+    },
+    {
+     "channelId": "UCzWsfWbewv4Hi4Oo8D814Zw",
+     "handle": "@digischool-lycee",
+     "name": "digiSchool Lycée",
+     "language": "fr"
+    },
+    {
+     "channelId": "UCCwqAeWMgHB0aVBcBTl4T8Q",
+     "handle": "@eSVTMPOURCHER",
+     "name": "e-SVT - M POURCHER",
+     "language": "fr"
+    },
+    {
+     "channelId": "UCRh1rQLUPRGuhrZdFXnA9pQ",
+     "handle": "@MadameSVT",
+     "name": "Madame SVT",
+     "language": "fr"
+    },
+    {
+     "channelId": "UCLVy1G4ns5D4qPttvE4Cmcg",
+     "handle": "@ParleMoiDePhilo",
+     "name": "Parle Moi de Philo",
+     "language": "fr"
+    },
+    {
+     "channelId": "UCMsscJFhto24BB120ifUuoA",
+     "handle": "@BenjaminConnaisSciences",
+     "name": "Benjamin Connais-Sciences",
+     "language": "fr"
+    }
+   ]
+  },
+  {
+   "id": "cls_de_gymnasium_11_13",
+   "kind": "class",
+   "name": {
+    "en": "Gymnasiale Oberstufe (Germany, grades 11-13)",
+    "de": "Gymnasiale Oberstufe (Einführungs- und Qualifikationsphase)"
+   },
+   "shortName": "Oberstufe",
+   "grade": "11-13",
+   "board": "KMK (Gymnasiale Oberstufe)",
+   "countries": [
+    "DE"
+   ],
+   "languages": [
+    "de"
+   ],
+   "subjects": [
+    "Mathematik",
+    "Physik",
+    "Chemie",
+    "Biologie",
+    "Deutsch",
+    "Geschichte",
+    "Geographie",
+    "Ethik/Philosophie",
+    "Sozialwissenschaften",
+    "Englisch"
+   ],
+   "keywords": [
+    "Oberstufe",
+    "Abitur",
+    "Abi",
+    "Qualifikationsphase",
+    "Einführungsphase",
+    "Leistungskurs",
+    "Grundkurs",
+    "Analysis",
+    "Ableitung",
+    "Integral",
+    "Stochastik",
+    "Vektoren",
+    "analytische Geometrie",
+    "Abiaufgaben",
+    "Physik Oberstufe",
+    "Genetik",
+    "Ökologie",
+    "Gedichtanalyse",
+    "Erörterung",
+    "Pflichtlektüre",
+    "Geschichte Oberstufe",
+    "Ethik Abitur"
+   ],
+   "gradeKeywords": {
+    "11": [
+     "Einführungsphase",
+     "Ableitung",
+     "Kinematik"
+    ],
+    "12": [
+     "Qualifikationsphase",
+     "Integralrechnung",
+     "Genetik"
+    ],
+    "13": [
+     "Abitur",
+     "Stochastik",
+     "Abiaufgaben"
+    ]
+   },
+   "blockedWords": [
+    "Vlog",
+    "Reaktion",
+    "Prank",
+    "Challenge",
+    "Abiball",
+    "Abistreich",
+    "Motivation Shorts"
+   ],
+   "chips": [
+    "Mathe",
+    "Analysis",
+    "Stochastik",
+    "Vektoren",
+    "Physik",
+    "Chemie",
+    "Biologie",
+    "Deutsch",
+    "Geschichte",
+    "Ethik",
+    "Abitur"
+   ],
+   "channels": [
+    {
+     "channelId": "UCNQbGjfhJcYoDpSJ15mdtmw",
+     "handle": "@Mathehoch13",
+     "name": "Mathehoch13",
+     "language": "de"
+    },
+    {
+     "channelId": "UCPtUzxTfdaxAmr4ie9bXZVA",
+     "handle": "@MathebyDanielJung",
+     "name": "Mathe by Daniel Jung",
+     "language": "de"
+    },
+    {
+     "channelId": "UCoFF7wU7410IiUSvYAGVkkQ",
+     "handle": "@studytiger-Physik-E-Technik",
+     "name": "Studytiger - Physik & E-Technik",
+     "language": "de"
+    },
+    {
+     "channelId": "UCy165zH3hvUP_j4riK3kwUA",
+     "handle": "@teachertoby",
+     "name": "TeacherToby",
+     "language": "de"
+    },
+    {
+     "channelId": "UCv_a9RHYMtZYKdukHIFu7cg",
+     "handle": "@deinabiturtrainer",
+     "name": "deinABITURtrainer",
+     "language": "de"
+    },
+    {
+     "channelId": "UCZg1J53-T93wjPPYZMLGLrA",
+     "handle": "@selbstorientiert",
+     "name": "selbstorientiert",
+     "language": "de"
+    },
+    {
+     "channelId": "UCsVWpmoRsNAWZb59b6Pt9Kg",
+     "handle": "@MrWissen2goGeschichte",
+     "name": "MrWissen2go Geschichte | Terra X",
+     "language": "de"
+    },
+    {
+     "channelId": "UC2pLc3uiUFt6JJy2dZ8CPgA",
+     "handle": "@EthikAbibyBOE",
+     "name": "Ethik-Abi by BOE",
+     "language": "de"
+    }
+   ]
+  },
+  {
+   "id": "cls_gb_scotland_s4_s6",
+   "kind": "class",
+   "name": {
+    "en": "Scottish National 5 and Highers (S4-S6)"
+   },
+   "shortName": "SQA",
+   "grade": "10-12",
+   "board": "SQA (National 5 / Higher)",
+   "countries": [
+    "GB"
+   ],
+   "languages": [
+    "en"
+   ],
+   "subjects": [
+    "Mathematics",
+    "Chemistry",
+    "Physics",
+    "Biology",
+    "English"
+   ],
+   "keywords": [
+    "SQA",
+    "National 5",
+    "Nat 5",
+    "Higher",
+    "Advanced Higher",
+    "Higher Maths",
+    "Nat 5 Maths",
+    "Higher Chemistry",
+    "Higher Physics",
+    "Higher English",
+    "RUAE",
+    "critical essay",
+    "SQA past papers",
+    "past paper solutions",
+    "Curriculum for Excellence",
+    "S4",
+    "S5",
+    "S6",
+    "prelim"
+   ],
+   "gradeKeywords": {
+    "10": [
+     "National 5",
+     "S4",
+     "Nat 5 past papers"
+    ],
+    "11": [
+     "Higher",
+     "S5",
+     "Higher past papers"
+    ],
+    "12": [
+     "Advanced Higher",
+     "S6"
+    ]
+   },
+   "blockedWords": [
+    "vlog",
+    "results day reaction",
+    "prank",
+    "challenge",
+    "storytime",
+    "day in the life"
+   ],
+   "chips": [
+    "Nat 5 Maths",
+    "Higher Maths",
+    "Chemistry",
+    "Physics",
+    "Biology",
+    "English",
+    "RUAE",
+    "Past papers"
+   ],
+   "channels": [
+    {
+     "channelId": "UC8XkJnNLavN1Jbicf0nLNdQ",
+     "handle": "@ClellandMaths",
+     "name": "Clelland Maths",
+     "language": "en"
+    },
+    {
+     "channelId": "UCXt3XlkIJoAMovD7ngorKQQ",
+     "handle": "@DLBmaths",
+     "name": "DLBmaths",
+     "language": "en"
+    },
+    {
+     "channelId": "UCU32Og7N9VTUWL1qfJOPZxA",
+     "handle": "@MissAdamsChemistry",
+     "name": "Miss Adams Chemistry",
+     "language": "en"
+    },
+    {
+     "channelId": "UCH_iDlZ8ofreATa8oGc0nNg",
+     "handle": "@thechemacad",
+     "name": "The Chemistry Academy",
+     "language": "en"
+    },
+    {
+     "channelId": "UCiSRDTm2YIaX78bFibh-CCg",
+     "handle": "@thephysicsacad",
+     "name": "The Physics Academy",
+     "language": "en"
+    },
+    {
+     "channelId": "UCEDNuZPBM2TvlmzFKUNgkOQ",
+     "handle": "@englishwithmissmccombie",
+     "name": "English with Miss McCombie",
+     "language": "en"
+    }
+   ]
+  },
+  {
+   "id": "cls_tr_lise_9_12",
+   "kind": "class",
+   "name": {
+    "en": "Turkish high school (lise) grades 9-12",
+    "tr": "Lise 9-12. sınıf (MEB Ortaöğretim)"
+   },
+   "shortName": "MEB",
+   "grade": "9-12",
+   "board": "MEB (Ortaöğretim)",
+   "countries": [
+    "TR"
+   ],
+   "languages": [
+    "tr"
+   ],
+   "subjects": [
+    "Matematik",
+    "Fizik",
+    "Kimya",
+    "Biyoloji",
+    "Türk Dili ve Edebiyatı",
+    "Tarih",
+    "Coğrafya",
+    "Felsefe",
+    "İngilizce",
+    "Din Kültürü ve Ahlak Bilgisi"
+   ],
+   "keywords": [
+    "lise",
+    "9. sınıf",
+    "10. sınıf",
+    "11. sınıf",
+    "12. sınıf",
+    "Maarif modeli",
+    "konu anlatımı",
+    "yazılıya hazırlık",
+    "ortak sınav",
+    "senaryolar",
+    "matematik",
+    "fizik",
+    "kimya",
+    "biyoloji",
+    "Türk dili ve edebiyatı",
+    "tarih",
+    "coğrafya",
+    "felsefe",
+    "periyodik tablo",
+    "hücre",
+    "fonksiyonlar",
+    "türev",
+    "integral",
+    "MEB"
+   ],
+   "gradeKeywords": {
+    "9": [
+     "9. sınıf",
+     "sayılar",
+     "atom ve periyodik tablo",
+     "canlıların ortak özellikleri"
+    ],
+    "10": [
+     "10. sınıf",
+     "fonksiyonlar",
+     "kimyasal tepkimeler",
+     "hücre bölünmeleri"
+    ],
+    "11": [
+     "11. sınıf",
+     "trigonometri",
+     "kuvvet ve hareket",
+     "gazlar"
+    ],
+    "12": [
+     "12. sınıf",
+     "türev",
+     "integral",
+     "çembersel hareket"
+    ]
+   },
+   "blockedWords": [
+    "vlog",
+    "tepki",
+    "oyun",
+    "motivasyon shorts",
+    "sonuç açıklandı canlı",
+    "dizi",
+    "magazin"
+   ],
+   "chips": [
+    "Matematik",
+    "Fizik",
+    "Kimya",
+    "Biyoloji",
+    "Edebiyat",
+    "Tarih",
+    "Coğrafya",
+    "Felsefe",
+    "İngilizce",
+    "Yazılıya hazırlık"
+   ],
+   "channels": [
+    {
+     "channelId": "UCnMkrwpqeeUdULISjn-_NGA",
+     "handle": "@tonguc9",
+     "name": "tonguç 9. SINIF",
+     "language": "tr"
+    },
+    {
+     "channelId": "UC-5ku9Z61IGy12z8xVeFA6g",
+     "handle": "@tonguc10",
+     "name": "tonguç 10. SINIF",
+     "language": "tr"
+    },
+    {
+     "channelId": "UCiuFKj-SmFf8M4m1ybbftCw",
+     "handle": "@tonguc11",
+     "name": "tonguç 11. SINIF",
+     "language": "tr"
+    },
+    {
+     "channelId": "UChTC9Z4bTcLhzblXFTIjWxg",
+     "handle": "@hocalarageldik9",
+     "name": "Hocalara Geldik 9. Sınıf",
+     "language": "tr"
+    },
+    {
+     "channelId": "UCtIbTZI49MuNHB0AKw--wZg",
+     "handle": "@hocalarageldik10",
+     "name": "Hocalara Geldik 10.Sınıf",
+     "language": "tr"
+    },
+    {
+     "channelId": "UCu_805HoED0v411XVkv4kiQ",
+     "handle": "@yusufmert11",
+     "name": "Yusuf Mert 11. Sınıf - Maarif",
+     "language": "tr"
+    },
+    {
+     "channelId": "UCSiatSbaEJZpI_tkQXwRbcw",
+     "handle": "@smlmatematik",
+     "name": "SML Matematik",
+     "language": "tr"
+    },
+    {
+     "channelId": "UCzxj9SKkLuDhdxSDXxcmwqQ",
+     "handle": "@RehberMatematik",
+     "name": "Rehber Matematik",
+     "language": "tr"
+    },
+    {
+     "channelId": "UC-zDbhn0rWs2EywjGQMrK7A",
+     "handle": "@Fizikfinito",
+     "name": "Fizikfinito",
+     "language": "tr"
+    },
+    {
+     "channelId": "UCpwzd_LivzU7guJ33tgkCQA",
+     "handle": "@meschemykimya",
+     "name": "Meschemy Kimya",
+     "language": "tr"
+    },
+    {
+     "channelId": "UCqvkFrFWtKe9hgGA6HwfZvg",
+     "handle": "@betulbiyoloji",
+     "name": "BETÜL BİYOLOJİ",
+     "language": "tr"
+    },
+    {
+     "channelId": "UCTR3FZld7SysalUMHnIDnuA",
+     "handle": "@KİMYAADASI",
+     "name": "KİMYA ADASI",
+     "language": "tr"
+    }
+   ]
+  },
+  {
+   "id": "cls_eg_secondary_10_12",
+   "kind": "class",
+   "name": {
+    "en": "Egyptian general secondary (grades 10-12)",
+    "ar": "المرحلة الثانوية العامة (الصف الأول والثاني والثالث الثانوي)"
+   },
+   "shortName": "الثانوية العامة",
+   "grade": "10-12",
+   "board": "وزارة التربية والتعليم (الثانوية العامة)",
+   "countries": [
+    "EG"
+   ],
+   "languages": [
+    "ar"
+   ],
+   "subjects": [
+    "اللغة العربية",
+    "اللغة الإنجليزية",
+    "الرياضيات",
+    "الفيزياء",
+    "الكيمياء",
+    "الأحياء",
+    "التاريخ",
+    "الجغرافيا",
+    "الفلسفة والمنطق",
+    "علم النفس"
+   ],
+   "keywords": [
+    "أولى ثانوي",
+    "تانية ثانوي",
+    "تالتة ثانوي",
+    "الصف الأول الثانوي",
+    "الصف الثاني الثانوي",
+    "الصف الثالث الثانوي",
+    "البكالوريا المصرية",
+    "شرح",
+    "مراجعة",
+    "تقييمات الوزارة",
+    "امتحان الشهر",
+    "فيزياء",
+    "كيمياء",
+    "أحياء",
+    "رياضيات",
+    "تاريخ",
+    "جغرافيا",
+    "فلسفة ومنطق",
+    "علم نفس",
+    "نحو",
+    "بلاغة",
+    "علمي",
+    "أدبي"
+   ],
+   "gradeKeywords": {
+    "10": [
+     "أولى ثانوي",
+     "الصف الأول الثانوي",
+     "فلسفة ومنطق"
+    ],
+    "11": [
+     "تانية ثانوي",
+     "الصف الثاني الثانوي",
+     "تانية بكالوريا"
+    ],
+    "12": [
+     "تالتة ثانوي",
+     "الصف الثالث الثانوي",
+     "مراجعة نهائية"
+    ]
+   },
+   "blockedWords": [
+    "نتيجة الثانوية العامة لايف",
+    "تنسيق",
+    "فلوج",
+    "تسريب",
+    "مقلب",
+    "أخبار التعليم"
+   ],
+   "chips": [
+    "عربي",
+    "إنجليزي",
+    "رياضيات",
+    "فيزياء",
+    "كيمياء",
+    "أحياء",
+    "تاريخ",
+    "جغرافيا",
+    "فلسفة",
+    "علم نفس",
+    "مراجعة شهرية"
+   ],
+   "variantLabel": {
+    "en": "Stream",
+    "ar": "الشعبة"
+   },
+   "variants": [
+    {
+     "id": "science",
+     "name": {
+      "en": "Scientific",
+      "ar": "علمي"
+     },
+     "default": true,
+     "chips": [
+      "فيزياء",
+      "كيمياء",
+      "أحياء",
+      "رياضيات",
+      "جيولوجيا"
+     ],
+     "keywords": [
+      "علمي علوم",
+      "علمي رياضة",
+      "فيزياء",
+      "كيمياء",
+      "أحياء",
+      "جيولوجيا"
+     ],
+     "channels": [
+      "@HossamDackrony.PhysicsDragon",
+      "@Mr.MohamedFathy0",
+      "@Dr.SalmaMhazem",
+      "@mr.abdelrahmanelbaz",
+      "@moatyinchemistry1",
+      "@MathRebublic"
+     ]
+    },
+    {
+     "id": "literary",
+     "name": {
+      "en": "Literary",
+      "ar": "أدبي"
+     },
+     "chips": [
+      "تاريخ",
+      "جغرافيا",
+      "فلسفة",
+      "علم نفس",
+      "عربي"
+     ],
+     "keywords": [
+      "أدبي",
+      "تاريخ",
+      "جغرافيا",
+      "فلسفة",
+      "علم نفس"
+     ],
+     "channels": [
+      "@MohamedTolbaa_",
+      "@elkhdewy1",
+      "@ELSulttan",
+      "@_taharamadan",
+      "@Eslamelseadyofficial"
+     ]
+    }
+   ],
+   "channels": [
+    {
+     "channelId": "UCZ-g-5yYrEI7KCLIDZAEF-w",
+     "handle": "@Madrasetnasecondary",
+     "name": "Madrasetna secondary",
+     "language": "ar"
+    },
+    {
+     "channelId": "UC-alIGdpq29TUrQUoKM9BWw",
+     "handle": "@elkheta-senior11",
+     "name": "الخطة التعليمية - الأول الثانوي",
+     "language": "ar"
+    },
+    {
+     "channelId": "UCLXVLh8KSX1xPrQlNcuBhgA",
+     "handle": "@elkheta-seniors",
+     "name": "الخطة التعليمية - بكالوريا",
+     "language": "ar"
+    },
+    {
+     "channelId": "UCADJD44SSfh2nuS8N4C_FZw",
+     "handle": "@MathRebublic",
+     "name": "جمهورية الرياضيات - Mohamed Gaber",
+     "language": "ar"
+    },
+    {
+     "channelId": "UCNJ8PQYsmykkqLWHgZ2k-4A",
+     "handle": "@Mr.Mohamed_Tarek",
+     "name": "القيصر محمد طارق",
+     "language": "ar"
+    },
+    {
+     "channelId": "UCrB8-sV3WRepz8XrC_xgOXg",
+     "handle": "@HossamDackrony.PhysicsDragon",
+     "name": "Mr. Hossam Dackrony - تنين الفيزياء",
+     "language": "ar"
+    },
+    {
+     "channelId": "UC0AtYpkYftjI3UrNlJcGJWA",
+     "handle": "@Mr.MohamedFathy0",
+     "name": "Mr Mohamed Fathy",
+     "language": "ar"
+    },
+    {
+     "channelId": "UCvftZGZzx2ISMY3_bFp25qA",
+     "handle": "@Dr.SalmaMhazem",
+     "name": "دكتورة سلمى محزم - أحياء",
+     "language": "ar"
+    },
+    {
+     "channelId": "UCZJdmjp4Mt-wU7miDGMEOuA",
+     "handle": "@mr.abdelrahmanelbaz",
+     "name": "Mr.Abdelrahman Elbaz",
+     "language": "ar"
+    },
+    {
+     "channelId": "UCBX1417UV5IIIDIK-dd4zbg",
+     "handle": "@moatyinchemistry1",
+     "name": "مستر محمد عبد المعطي",
+     "language": "ar"
+    },
+    {
+     "channelId": "UCYFVIsAg_6E_0N2A_8Fsiow",
+     "handle": "@MohamedTolbaa_",
+     "name": "Mohamed Tolba - القيصر محمد طلبة",
+     "language": "ar"
+    },
+    {
+     "channelId": "UCCV7HKPAc7F19M2W6nbdxjg",
+     "handle": "@elkhdewy1",
+     "name": "الخديوي ابراهيم بحيري - Ibrahim behary",
+     "language": "ar"
+    },
+    {
+     "channelId": "UCE5XUo397Ut-hJeJbgPUQLQ",
+     "handle": "@ELSulttan",
+     "name": "السلطان | ELSultan",
+     "language": "ar"
+    },
+    {
+     "channelId": "UC2iJcGbBHoJB3Zf9FKUrV3A",
+     "handle": "@_taharamadan",
+     "name": "طه رمضان _ فلسفة وعلم نفس",
+     "language": "ar"
+    },
+    {
+     "channelId": "UCe3xkJxkZrrBdQYdY6q9nMw",
+     "handle": "@Eslamelseadyofficial",
+     "name": "إسلام الصعيدى - Eslam Elseady",
+     "language": "ar"
+    }
+   ]
+  },
+  {
+   "id": "cls_sa_secondary_10_12",
+   "kind": "class",
+   "name": {
+    "en": "Saudi secondary (Tracks system, grades 10-12)",
+    "ar": "المرحلة الثانوية (نظام المسارات)"
+   },
+   "shortName": "المرحلة الثانوية",
+   "grade": "10-12",
+   "board": "وزارة التعليم (المسارات)",
+   "countries": [
+    "SA"
+   ],
+   "languages": [
+    "ar"
+   ],
+   "subjects": [
+    "الرياضيات",
+    "الفيزياء",
+    "الكيمياء",
+    "الأحياء",
+    "علم البيئة",
+    "علوم الأرض والفضاء",
+    "الكفايات اللغوية",
+    "اللغة الإنجليزية",
+    "الدراسات الإسلامية",
+    "التقنية الرقمية"
+   ],
+   "keywords": [
+    "أول ثانوي",
+    "ثاني ثانوي",
+    "ثالث ثانوي",
+    "المسارات",
+    "السنة المشتركة",
+    "المسار العام",
+    "مسار الصحة والحياة",
+    "مسار علوم الحاسب والهندسة",
+    "رياضيات 1-1",
+    "فيزياء 2-2",
+    "كيمياء",
+    "أحياء",
+    "عين دروس",
+    "مدرستي",
+    "شرح",
+    "حل تمارين",
+    "الفصل الدراسي الأول",
+    "اختبار نهائي"
+   ],
+   "gradeKeywords": {
+    "10": [
+     "أول ثانوي",
+     "السنة المشتركة",
+     "رياضيات 1"
+    ],
+    "11": [
+     "ثاني ثانوي",
+     "فيزياء 2",
+     "كيمياء 2"
+    ],
+    "12": [
+     "ثالث ثانوي",
+     "رياضيات 3",
+     "فيزياء 3"
+    ]
+   },
+   "blockedWords": [
+    "تسريبات",
+    "حل تسريبات",
+    "فلوق",
+    "سنابات",
+    "مقلب",
+    "نتائج نور"
+   ],
+   "chips": [
+    "رياضيات",
+    "فيزياء",
+    "كيمياء",
+    "أحياء",
+    "علم البيئة",
+    "كفايات لغوية",
+    "إنجليزي",
+    "تقنية رقمية",
+    "مراجعة نهائية"
+   ],
+   "channels": [
+    {
+     "channelId": "UCndb1LGM5oQJVhjh2NViU5g",
+     "handle": "@iendroos",
+     "name": "عين دروس",
+     "language": "ar"
+    },
+    {
+     "channelId": "UCXkznWXnLTGbgkYw3snJmTQ",
+     "handle": "@Chemestry41",
+     "name": "Ahmed alharbi احمد الحربي",
+     "language": "ar"
+    },
+    {
+     "channelId": "UCg34viRdTmWQQS8Mjvcoq_Q",
+     "handle": "@saeedacademy50",
+     "name": "أكاديمية سعيد الشلوي للرياضيات",
+     "language": "ar"
+    },
+    {
+     "channelId": "UCz9DWvHN22WWJrJET_6pz_w",
+     "handle": "@Pi_Harbi",
+     "name": "محمد الحربي-رياضيات ثانوي",
+     "language": "ar"
+    },
+    {
+     "channelId": "UCsGpBqVb6wBtDcxIndYmxLQ",
+     "handle": "@abdullahphysics",
+     "name": "عبدالله Physics",
+     "language": "ar"
+    },
+    {
+     "channelId": "UCw3D-bWVzfZG1-QTCg6WeUw",
+     "handle": "@phizican",
+     "name": "المهند في الفيزياء",
+     "language": "ar"
+    },
+    {
+     "channelId": "UCbwfIP_oFbc-1caajzUxXoA",
+     "handle": "@ahmadschool",
+     "name": "ahmad school أحياء و علم بيئة",
+     "language": "ar"
+    },
+    {
+     "channelId": "UCE5VwklSp0lsq9ayl1D2sbA",
+     "handle": "@-manaralattas5776",
+     "name": "منار العطاس",
+     "language": "ar"
+    }
+   ]
+  },
+  {
+   "id": "cls_ae_moe_9_12",
+   "kind": "class",
+   "name": {
+    "en": "UAE MOE curriculum (grades 9-12)",
+    "ar": "منهاج وزارة التربية والتعليم الإماراتية (الصفوف 9-12)"
+   },
+   "shortName": "MOE",
+   "grade": "9-12",
+   "board": "وزارة التربية والتعليم الإماراتية (MOE)",
+   "countries": [
+    "AE"
+   ],
+   "languages": [
+    "ar",
+    "en"
+   ],
+   "subjects": [
+    "Mathematics (Reveal)",
+    "Physics (Inspire)",
+    "Chemistry",
+    "Biology",
+    "Arabic",
+    "English",
+    "Islamic Education",
+    "Social Studies"
+   ],
+   "keywords": [
+    "منهاج الإمارات",
+    "المنهج الإماراتي",
+    "UAE MOE",
+    "متقدم",
+    "عام",
+    "Advanced",
+    "General",
+    "هيكل",
+    "EoT",
+    "End of Term",
+    "Reveal Math",
+    "Inspire Physics",
+    "الصف التاسع",
+    "الصف العاشر",
+    "الحادي عشر",
+    "الثاني عشر",
+    "Grade 9",
+    "Grade 10",
+    "Grade 11",
+    "Grade 12",
+    "EmSAT"
+   ],
+   "gradeKeywords": {
+    "9": [
+     "الصف التاسع",
+     "Grade 9",
+     "9 متقدم"
+    ],
+    "10": [
+     "الصف العاشر",
+     "Grade 10",
+     "10 متقدم"
+    ],
+    "11": [
+     "الحادي عشر",
+     "Grade 11",
+     "11 متقدم"
+    ],
+    "12": [
+     "الثاني عشر",
+     "Grade 12",
+     "12 متقدم"
+    ]
+   },
+   "blockedWords": [
+    "vlog",
+    "توظيف",
+    "رواتب",
+    "مقلب",
+    "prank",
+    "recruitment"
+   ],
+   "chips": [
+    "رياضيات",
+    "فيزياء",
+    "كيمياء",
+    "أحياء",
+    "هيكل الامتحان",
+    "EoT",
+    "متقدم",
+    "عام",
+    "Math",
+    "Physics"
+   ],
+   "channels": [
+    {
+     "channelId": "UCFF99OTef1RjxIk-vgsp-eQ",
+     "handle": "@samahmath",
+     "name": "samah math",
+     "language": "ar"
+    },
+    {
+     "channelId": "UCblQirFQ0ZtcPgoxA9JHRew",
+     "handle": "@EasyChemistry4all",
+     "name": "EasyChemistry4all",
+     "language": "ar"
+    },
+    {
+     "channelId": "UCLJTv_-eoSO7nEHMO7CyO1Q",
+     "handle": "@Mr.Elsayed.Elsayad",
+     "name": "قطوف فيزيائية",
+     "language": "ar"
+    },
+    {
+     "channelId": "UCYZLW4SPufnZYsz7t4q-yZA",
+     "handle": "@Mr.Aghead",
+     "name": "إمارات ماث \\ UAE MATH",
+     "language": "ar"
+    },
+    {
+     "channelId": "UCvyojYVtaSKb7dt8U7C2a9g",
+     "handle": "@allam_math",
+     "name": "مصطفى علام رياضيات - المنهج الإماراتي",
+     "language": "ar"
+    },
+    {
+     "channelId": "UCphuSTBc_D5xxIy4YxkyUGg",
+     "handle": "@zeyadclass",
+     "name": "Zeyad Class | زياد كلاس",
+     "language": "ar"
+    }
+   ]
+  },
+  {
+   "id": "cls_lk_gce_ol_10_11",
+   "kind": "class",
+   "name": {
+    "en": "G.C.E. Ordinary Level (Grades 10-11)",
+    "si": "අ.පො.ස. සාමාන්‍ය පෙළ (10-11 ශ්‍රේණි)",
+    "ta": "க.பொ.த. சாதாரண தரம் (தரம் 10-11)"
+   },
+   "shortName": "O/L",
+   "grade": "10-11",
+   "board": "Department of Examinations (NIE syllabus)",
+   "countries": [
+    "LK"
+   ],
+   "languages": [
+    "si",
+    "ta",
+    "en"
+   ],
+   "subjects": [
+    "ගණිතය",
+    "විද්‍යාව",
+    "සිංහල",
+    "ඉංග්‍රීසි",
+    "ඉතිහාසය",
+    "තොරතුරු තාක්ෂණය",
+    "கணிதம்",
+    "விஞ்ஞானம்"
+   ],
+   "keywords": [
+    "O/L",
+    "GCE O/L",
+    "සාමාන්‍ය පෙළ",
+    "අ.පො.ස. සාමාන්‍ය පෙළ",
+    "க.பொ.த சாதாரண தரம்",
+    "O/L maths",
+    "O/L science",
+    "ගණිතය",
+    "විද්‍යාව",
+    "past paper",
+    "පසුගිය ප්‍රශ්න පත්‍ර",
+    "model paper",
+    "grade 10",
+    "grade 11",
+    "10 ශ්‍රේණිය",
+    "11 ශ්‍රේණිය",
+    "தரம் 11",
+    "கணிதம்",
+    "விஞ்ஞானம்",
+    "Channel NIE",
+    "ත්‍රිකෝණමිතිය",
+    "ජීව ගෝලය"
+   ],
+   "gradeKeywords": {
+    "10": [
+     "10 ශ්‍රේණිය",
+     "grade 10",
+     "தரம் 10"
+    ],
+    "11": [
+     "11 ශ්‍රේණිය",
+     "grade 11",
+     "O/L revision",
+     "தரம் 11"
+    ]
+   },
+   "blockedWords": [
+    "vlog",
+    "prank",
+    "teledrama",
+    "ටෙලිනාට්‍ය",
+    "gossip",
+    "result live",
+    "job vacancy",
+    "motivation shorts"
+   ],
+   "chips": [
+    "ගණිතය",
+    "විද්‍යාව",
+    "ඉංග්‍රීසි",
+    "ඉතිහාසය",
+    "සිංහල",
+    "ICT",
+    "පසුගිය ප්‍රශ්න පත්‍ර",
+    "கணிதம்",
+    "விஞ்ஞானம்",
+    "Past papers"
+   ],
+   "channels": [
+    {
+     "channelId": "UChr7K9dI0ZkPFm1AuXyXW-g",
+     "handle": "@channelnie",
+     "name": "Channel NIE",
+     "language": "si"
+    },
+    {
+     "channelId": "UCnY7v189bwoSTFFYD_PNWhQ",
+     "handle": "@ChannelNIETamil",
+     "name": "Channel NIE - தமிழ்",
+     "language": "ta"
+    },
+    {
+     "channelId": "UCaXHgF7cAdDElEtgG2XSjlw",
+     "handle": "@DPEducationOLSubjects",
+     "name": "DP Education - O/L සිංහල මාධ්‍යය",
+     "language": "si"
+    },
+    {
+     "channelId": "UCSL3Jd1qtL3RkeKCpbhOspg",
+     "handle": "@DPEducationScience",
+     "name": "DP Education - Science",
+     "language": "si"
+    },
+    {
+     "channelId": "UCYoc1Su4qjRo6bXXBwfWJHg",
+     "handle": "@GanithaPapersOL",
+     "name": "Ganitha Papers OL",
+     "language": "si"
+    },
+    {
+     "channelId": "UCCuyUz9WbGbhv3LEZsceEgg",
+     "handle": "@chanakauththamawadu-maths",
+     "name": "Chanaka Uththamawadu - Maths",
+     "language": "si"
+    },
+    {
+     "channelId": "UC8ea0YE9Wwr2XzAGBWBNA1g",
+     "handle": "@ScienceAPlus",
+     "name": "Science A Plus",
+     "language": "si"
+    },
+    {
+     "channelId": "UCHRWfYR7E3TQIfUYpnxa5Ag",
+     "handle": "@thaproscience",
+     "name": "THAPRO SCIENCE",
+     "language": "si"
+    },
+    {
+     "channelId": "UC9pBPfsP6Liquwv8-23sOjg",
+     "handle": "@SLMathsTamil",
+     "name": "SL Maths Tamil",
+     "language": "ta"
+    },
+    {
+     "channelId": "UCQtiS6TxmNMEB8h0N7iMRng",
+     "handle": "@Hasrysir",
+     "name": "Hasry sir",
+     "language": "ta"
+    }
+   ]
+  },
+  {
+   "id": "cls_np_neb_11_12",
+   "kind": "class",
+   "name": {
+    "en": "NEB Class 11-12 (+2)",
+    "ne": "राष्ट्रिय परीक्षा बोर्ड कक्षा ११-१२"
+   },
+   "shortName": "NEB",
+   "grade": "11-12",
+   "board": "NEB (Class 11-12)",
+   "countries": [
+    "NP"
+   ],
+   "languages": [
+    "ne",
+    "en"
+   ],
+   "subjects": [
+    "English",
+    "नेपाली",
+    "Physics",
+    "Chemistry",
+    "Biology",
+    "Mathematics",
+    "Computer Science",
+    "Accountancy",
+    "Economics",
+    "Business Studies"
+   ],
+   "keywords": [
+    "NEB",
+    "NEB class 12",
+    "NEB class 11",
+    "कक्षा ११",
+    "कक्षा १२",
+    "+2 Nepal",
+    "NEB physics",
+    "NEB chemistry",
+    "NEB maths",
+    "NEB biology",
+    "NEB English",
+    "class 12 accountancy",
+    "class 12 economics",
+    "business studies",
+    "model question",
+    "old question",
+    "important questions",
+    "भौतिक विज्ञान",
+    "रसायन विज्ञान",
+    "गणित",
+    "लेखा",
+    "notes",
+    "exercise solution",
+    "board exam"
+   ],
+   "gradeKeywords": {
+    "11": [
+     "class 11",
+     "कक्षा ११",
+     "grade 11"
+    ],
+    "12": [
+     "class 12",
+     "कक्षा १२",
+     "grade 12"
+    ]
+   },
+   "blockedWords": [
+    "result live",
+    "vlog",
+    "prank",
+    "tiktok",
+    "job vacancy",
+    "loksewa",
+    "motivation shorts",
+    "gossip"
+   ],
+   "chips": [
+    "भौतिक विज्ञान",
+    "रसायन विज्ञान",
+    "जीव विज्ञान",
+    "गणित",
+    "अंग्रेजी",
+    "नेपाली",
+    "लेखा",
+    "अर्थशास्त्र",
+    "कम्प्युटर",
+    "मोडेल प्रश्न"
+   ],
+   "channels": [
+    {
+     "channelId": "UCZBmRPAHP3Lx4UtB44DMNyw",
+     "handle": "@bppokharel1579",
+     "name": "Easy Physics - BP Sarthak",
+     "language": "ne"
+    },
+    {
+     "channelId": "UCKjaLvpieOZlkBKMBmvk2Rw",
+     "handle": "@physicsindepth",
+     "name": "Physics in Depth",
+     "language": "ne"
+    },
+    {
+     "channelId": "UCLGFmXLDwSsFiwdxgRSj2EA",
+     "handle": "@AllChemistryClass",
+     "name": "All Chemistry",
+     "language": "ne"
+    },
+    {
+     "channelId": "UClgUSgU6SbFQ2WqmluR1SnA",
+     "handle": "@GoalXNepal",
+     "name": "GoalX",
+     "language": "ne"
+    },
+    {
+     "channelId": "UCxOs22TkIOv4GDldxux0UDA",
+     "handle": "@TuitionMasterSumitYadav",
+     "name": "Tuition Master",
+     "language": "ne"
+    },
+    {
+     "channelId": "UC89oyG2WXKSlnLTJL5pmg5A",
+     "handle": "@NepalCaesar",
+     "name": "Nepal Caesar",
+     "language": "ne"
+    },
+    {
+     "channelId": "UCKQsJoAJ_3X37qoO_9eKbsg",
+     "handle": "@prabin_sir_neb",
+     "name": "Prabin Sir: NEB",
+     "language": "ne"
+    },
+    {
+     "channelId": "UCQa1OHBXGPgZu6c2M5y_nvg",
+     "handle": "@hariiacharya",
+     "name": "Hari Acharya (Accounting Teacher)",
+     "language": "ne"
+    },
+    {
+     "channelId": "UC35CKfc3iWQ-fT_9-_Fgu0w",
+     "handle": "@bijaykeshari0125",
+     "name": "Bijay Keshari",
+     "language": "ne"
+    },
+    {
+     "channelId": "UCKNTxHjiG7MoeoAwRyWTRtQ",
+     "handle": "@HSEBSURAJ",
+     "name": "HSEB SURAJ",
+     "language": "ne"
+    },
+    {
+     "channelId": "UCY7ZFbFPJVtYHLTdkALkt0A",
+     "handle": "@TheSRZone",
+     "name": "SR Zone",
+     "language": "ne"
     }
    ]
   },
