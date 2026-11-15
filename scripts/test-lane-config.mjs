@@ -194,6 +194,7 @@ const STUDY_TESTS = Object.freeze([
   'tests/runtime/study-background-controller.test.mjs',
   'tests/runtime/study-overlay-content.test.mjs',
   'tests/runtime/study-shorts-allow-mode.test.mjs',
+  'tests/runtime/study-title-only-keywords.test.mjs',
 ]);
 const VIDEO_NOTES_TESTS = Object.freeze([
   'tests/runtime/video-notes-contract.test.mjs',

@@ -32,15 +32,75 @@ function profile(extra = {}) {
     };
 }
 
-test('outside study, in a normal break and without packs, the profile is unchanged', () => {
+test('outside study and in a normal or skipped break, the profile is unchanged', () => {
     const base = profile();
-    for (const clock of [{ state: Engine.NORMAL }, { state: Engine.BREAK, breakMode: 'normal' }, { state: Engine.LIMIT }]) {
+    for (const clock of [{ state: Engine.NORMAL }, { state: Engine.BREAK, breakMode: 'normal' }, { state: Engine.BREAK, breakMode: 'rest', breakSkipped: true }]) {
         const result = Engine.studyEffectiveProfile(base, { catalog, clock });
         assert.equal(result.applied, false);
         assert.equal(result.profile, base);
     }
+});
+
+test('a rest break, the limit and a clock hold allow nothing, with the master switch forced on', () => {
+    const base = profile();
+    base.settings = { enabled: false, hideComments: false };
+    for (const clock of [{ state: Engine.LIMIT }, { state: Engine.BREAK, breakMode: 'rest' }, { state: Engine.LIMIT, clockHold: true }]) {
+        const result = Engine.studyEffectiveProfile(base, { catalog, clock });
+        assert.equal(result.applied, true);
+        assert.equal(result.phase, 'rest');
+        assert.equal(result.profile.settings.enabled, true);
+        assert.equal(result.profile.settings.hideComments, true);
+        for (const surface of [result.profile.main, result.profile.kids]) {
+            assert.equal(surface.mode, 'whitelist');
+            assert.deepEqual(surface.whitelistChannels, []);
+            assert.deepEqual(surface.whitelistKeywords, []);
+        }
+    }
+});
+
+test('fail closed: a study round with no known pack is own allowed channels, or rest; never normal rules', () => {
     const none = profile({ study: Model.createStudy({ activePackIds: ['not_a_pack'] }) });
-    assert.equal(Engine.studyEffectiveProfile(none, { catalog, clock: studying }).applied, false);
+    none.main = { mode: 'blocklist', channels: [], keywords: [], whitelistChannels: [] };
+    none.kids = { mode: 'blocklist', blockedChannels: [], blockedKeywords: [], whitelistChannels: [] };
+    const rest = Engine.studyEffectiveProfile(none, { catalog, clock: studying });
+    assert.equal(rest.applied, true);
+    assert.equal(rest.phase, 'rest');
+    assert.equal(rest.failClosed, true);
+    assert.deepEqual(rest.profile.main.whitelistChannels, []);
+    const own = profile({ study: Model.createStudy({ activePackIds: [] }) });
+    own.main = { mode: 'whitelist', channels: [], keywords: [], whitelistChannels: [{ id: 'UCownownownownownownown1', name: 'Mine' }] };
+    const mine = Engine.studyEffectiveProfile(own, { catalog, clock: studying });
+    assert.equal(mine.phase, 'study');
+    assert.equal(mine.failClosed, true);
+    assert.deepEqual(mine.profile.main.whitelistChannels.map(row => row.id), ['UCownownownownownownown1']);
+    // Under a parent's plan, pack channels only: own channels sit out, so it is rest.
+    const parent = Engine.studyEffectiveProfile(own, { catalog, clock: { ...studying, setByParentId: 'mum' } });
+    assert.equal(parent.phase, 'rest');
+    // A copy of the pack kept in study keeps it working when the catalog doesn't know it.
+    const copied = profile({ study: Model.createStudy({ activePackIds: ['gone_pack'], packCopies: { gone_pack: {
+        channels: [{ channelId: 'UCcopycopycopycopycopy01', name: 'Copy' }], topics: ['algebra'], blockedWords: ['reaction'] } } }) });
+    const fromCopy = Engine.studyEffectiveProfile(copied, { catalog: { packs: [] }, clock: studying });
+    assert.equal(fromCopy.phase, 'study');
+    assert.deepEqual(fromCopy.packIds, ['gone_pack']);
+    assert.ok(fromCopy.profile.main.whitelistChannels.some(row => row.id === 'UCcopycopycopycopycopy01'));
+});
+
+test('pack topics and blocked words are title-only rows; the chosen variant adds its topics', () => {
+    const gate = profile({ study: Model.createStudy({ activePackIds: ['in_gate'], packEdits: { in_gate: { variant: 'ece' } } }) });
+    const { profile: effective } = Engine.studyEffectiveProfile(gate, { catalog, clock: studying });
+    const pack = Packs.packById(catalog, 'in_gate');
+    const ece = pack.variants.find(variant => variant.id === 'ece');
+    const words = effective.main.whitelistKeywords.map(row => row.word);
+    for (const word of ece.keywords || []) assert.ok(words.includes(word), word);
+    assert.ok(effective.main.whitelistKeywords.every(row => row.titleOnly === true && row.source === 'study_topic'));
+    const blocked = effective.main.keywords.filter(row => row.source === 'study_pack');
+    assert.ok(blocked.length > 0 && blocked.every(row => row.titleOnly === true));
+    const cse = pack.variants.find(variant => variant.id === 'cse');
+    const onlyCse = (cse.keywords || []).filter(word => !(ece.keywords || []).includes(word) && !pack.keywords.includes(word));
+    if (onlyCse.length) assert.equal(words.includes(onlyCse[0]), false, 'another branch\'s topics stay out');
+    const stamped = Engine.stampPackCopies(gate.study, catalog);
+    assert.ok(stamped.packCopies.in_gate.channels.length === pack.channels.length);
+    assert.equal(Engine.stampPackCopies(stamped, catalog), stamped, 'stable once stamped');
 });
 
 test('during study the pack is the allow layer, layered over the block list, on Main and Kids', () => {

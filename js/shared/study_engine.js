@@ -14,10 +14,16 @@
  *      gives LIMIT outside study too.
  *    - A self-started session ({startedAt, endsAt}) is one more occurrence. `endedUntil` hides
  *      occurrences that end at or before it (a Gentle session ended early).
- * 2. studyEffectiveProfile(): during STUDY (and a "rest" BREAK) the active packs, with packEdits
+ * 2. studyEffectiveProfile(): during STUDY the active packs, with packEdits (and the chosen variant)
  *    applied, are the allow layer of Main and Kids; the block list plus each pack's blocked words still
- *    subtract (mode "whitelist", layered: true). The user's own allowed channels stay; their allow
+ *    subtract (mode "whitelist", layered: true). Pack topics and pack blocked words match the video
+ *    title only (titleOnly rows), never its description or channel name, as on Android. The user's own
+ *    allowed channels stay (not under a parent's plan or lock with "pack channels only"); their allow
  *    keywords and allowed video ids are left out for the session, as in a Hard Whitelist session.
+ *    A rest BREAK, LIMIT and a clock hold use the rest profile: allow mode with nothing allowed.
+ *    Fail closed: a study round with no known pack (catalog failed, pack removed, empty pack list)
+ *    uses the person's own allowed channels, or rest; never the normal rules. The master switch and
+ *    comments can't be turned on during study.
  * 3. Progress helpers: minutes per device id and local date.
  */
 (function (root, factory) {
@@ -41,6 +47,8 @@
     const SELF_LOCK_MAX_MINUTES = 240;
     const PARENT_LOCK_MAX_MINUTES = 7 * 24 * 60;
     const STUDY_SOURCE = 'study_pack';
+    // Pack topics: they match a video's title only, never its channel name or category (audit M1).
+    const TOPIC_SOURCE = 'study_topic';
     const TAG_PREFIX = 'study:';
 
     function isObject(value) { return !!value && typeof value === 'object' && !Array.isArray(value); }
@@ -127,7 +135,7 @@
                 limitAt = limitMin >= startMin ? atMinutes(day, limitMin) : atMinutes(addDays(day, 1), limitMin);
                 limitAt = Math.max(limitAt, end);
             }
-            if (end > from - 2 * 24 * 60 * MINUTE) out.push({ start, end, limitAt, day, source: 'plan' });
+            if (end > from - 2 * 24 * 60 * MINUTE) out.push({ start, end, limitAt, day, source: 'plan', setByParentId: text(value.setByParentId) || null });
         }
         return out;
     }
@@ -140,22 +148,42 @@
         const startedAt = Number(session.startedAt);
         const endsAt = Number(session.endsAt);
         if (Number.isFinite(startedAt) && Number.isFinite(endsAt) && endsAt > startedAt) {
-            list.push({ start: startedAt, end: endsAt, limitAt: null, day: localMidnight(startedAt), source: 'session' });
+            list.push({ start: startedAt, end: endsAt, limitAt: null, day: localMidnight(startedAt), source: 'session', setByParentId: null });
+        }
+        // A parent's session lock ({startsAt, endsAt, setByParentId}) runs study rounds for its whole
+        // window. It wins over a self session that overlaps it (audit M5).
+        const lock = object(input.parentLock);
+        const lockStart = Number(lock.startsAt);
+        const lockEnd = Number(lock.endsAt);
+        if (Number.isFinite(lockStart) && Number.isFinite(lockEnd) && lockEnd > lockStart) {
+            for (let index = list.length - 1; index >= 0; index -= 1) {
+                const item = list[index];
+                if (item.source === 'session' && item.start < lockEnd && item.end > lockStart) list.splice(index, 1);
+            }
+            list.push({ start: lockStart, end: lockEnd, limitAt: null, day: localMidnight(lockStart), source: 'parent_lock', setByParentId: text(lock.setByParentId) || 'parent' });
         }
         const endedUntil = Number(input.endedUntil);
         return list
-            .filter(occurrence => !(Number.isFinite(endedUntil) && occurrence.end <= endedUntil))
+            // Only self occurrences can be ended early; a parent's plan or lock can't.
+            .filter(occurrence => occurrence.setByParentId || !(Number.isFinite(endedUntil) && occurrence.end <= endedUntil))
             .sort((a, b) => a.start - b.start);
     }
 
     function stateAt(input, now, occurrences) {
-        const current = occurrences.find(occurrence => occurrence.start <= now && now < occurrence.end);
+        // The clock guard saw the time or zone change during a lock or a parent's plan: hold at rest.
+        if (input.clockHold === true) {
+            return { state: LIMIT, until: now + MINUTE, reason: 'clock_hold', clockHold: true, setByParentId: null };
+        }
+        // A parent's occurrence wins over a self one that overlaps it (audit M5).
+        const covering = occurrences.filter(occurrence => occurrence.start <= now && now < occurrence.end);
+        const current = covering.find(occurrence => occurrence.setByParentId) || covering[0];
         if (current) {
             const segments = splitRounds(current.start, current.end, input.focus);
             const segment = segments.find(item => item.start <= now && now < item.end) || segments[segments.length - 1];
             return {
                 state: segment.kind, round: segment.round, rounds: segment.rounds, until: segment.end,
-                sessionStart: current.start, sessionEnd: current.end, source: current.source, segments
+                sessionStart: current.start, sessionEnd: current.end, source: current.source,
+                setByParentId: current.setByParentId || null, segments
             };
         }
         const limited = occurrences.find(occurrence => occurrence.limitAt !== null
@@ -169,7 +197,7 @@
      * The study state at `now`:
      *   {state, round, rounds, until, sessionStart, sessionEnd, source, breakMode, segments,
      *    next: {state, at} | null, breakNoticeAt}
-     * Input: {plan, focus, breakMode, now, session?, endedUntil?, limitReached?}.
+     * Input: {plan, focus, breakMode, now, session?, endedUntil?, limitReached?, parentLock?, clockHold?}.
      */
     function studyClock(input = {}) {
         const now = toMs(input.now);
@@ -188,7 +216,8 @@
             next = { state: after.state, at: nextAt, round: after.round || null };
         }
         const breakMode = text(input.breakMode) === 'normal' ? 'normal' : 'rest';
-        const result = { round: null, rounds: null, sessionStart: null, sessionEnd: null, source: null, segments: [], ...current, breakMode, next };
+        const result = { round: null, rounds: null, sessionStart: null, sessionEnd: null, source: null, setByParentId: null,
+            clockHold: false, segments: [], ...current, breakMode, next };
         result.breakNoticeAt = result.state === STUDY && next && next.state === BREAK ? Math.max(now, next.at - BREAK_NOTICE_MS) : null;
         result.studying = result.state === STUDY || result.state === BREAK;
         return result;
@@ -225,6 +254,14 @@
      * One pack with its edits: {id, channels, keywords, blockedWords}. channelsRemoved and topicsRemoved
      * take rows out; channelsAdded and topicsAdded put rows in. Class packs add every grade's words.
      */
+    /** The chosen variant, else the default one, else the first (parsed or raw catalog rows). */
+    function packVariant(pack, id) {
+        const variants = array(object(pack).variants).filter(isObject);
+        const wanted = text(id).toLowerCase();
+        return variants.find(variant => text(variant.id).toLowerCase() === wanted && wanted)
+            || variants.find(variant => variant.isDefault === true || variant.default === true) || variants[0] || null;
+    }
+
     function packLayer(pack, edits) {
         const change = object(edits);
         const removedChannels = array(change.channelsRemoved);
@@ -238,7 +275,9 @@
         const keywords = [];
         const seen = new Set();
         const grades = Object.values(object(pack.gradeKeywords)).flat();
-        for (const word of [...array(pack.keywords), ...grades, ...array(change.topicsAdded)]) {
+        // The chosen branch's topics (GATE CSE: "dbms", ...) join the pack's own.
+        const variantWords = array(packVariant(pack, change.variant)?.keywords);
+        for (const word of [...array(pack.keywords), ...grades, ...variantWords, ...array(change.topicsAdded)]) {
             const key = wordKey(word);
             if (!key || removedTopics.has(key) || seen.has(key)) continue;
             seen.add(key);
@@ -247,14 +286,61 @@
         return { id: pack.id, channels, keywords, blockedWords: array(pack.blockedWords).map(text).filter(Boolean) };
     }
 
-    /** The active packs found in the catalog, with packEdits applied, in activePackIds order. */
+    /**
+     * A pack copy kept inside `study.packCopies[id]` ({channels, topics, blockedWords}, the Android
+     * StudyPackCopy shape) read as a pack, so a catalog that fails to load or an update that removes
+     * the pack can't switch study off.
+     */
+    function copyAsPack(id, copy) {
+        const value = object(copy);
+        const channels = array(value.channels).filter(isObject);
+        if (!channels.length) return null;
+        return { id, kind: 'copy', channels, keywords: array(value.topics), blockedWords: array(value.blockedWords) };
+    }
+
+    function packFor(study, catalog, id) {
+        const packs = array(object(catalog).packs);
+        return packs.find(pack => pack.id === id) || copyAsPack(id, object(object(study).packCopies)[id]);
+    }
+
+    /** The active packs found in the catalog (or in the study's own pack copies), with packEdits applied. */
     function activePackLayers(study, catalog) {
         const value = object(study);
-        const packs = array(object(catalog).packs);
         return array(value.activePackIds)
-            .map(id => packs.find(pack => pack.id === id))
+            .map(id => packFor(value, catalog, id))
             .filter(Boolean)
             .map(pack => packLayer(pack, object(value.packEdits)[pack.id]));
+    }
+
+    /** `study` with a copy of each active pack the catalog knows (as Android stampCopies); others stay. */
+    function stampPackCopies(study, catalog) {
+        const value = object(study);
+        const packs = array(object(catalog).packs);
+        if (!packs.length) return study;
+        const current = object(value.packCopies);
+        const copies = {};
+        for (const id of array(value.activePackIds)) {
+            const pack = packs.find(item => item.id === id);
+            if (pack) {
+                const variantWords = array(packVariant(pack, object(object(value.packEdits)[id]).variant)?.keywords);
+                const seen = new Set();
+                const topics = [...array(pack.keywords), ...Object.values(object(pack.gradeKeywords)).flat(), ...variantWords]
+                    .map(text).filter(word => word && !seen.has(wordKey(word)) && seen.add(wordKey(word))).slice(0, 400);
+                copies[id] = {
+                    channels: array(pack.channels).slice(0, 400).map(channel => ({
+                        ...(text(channel.channelId) ? { channelId: text(channel.channelId) } : {}),
+                        ...(text(channel.handle) ? { handle: text(channel.handle) } : {}),
+                        ...(text(channel.name) ? { name: text(channel.name) } : {})
+                    })),
+                    topics,
+                    blockedWords: array(pack.blockedWords).map(text).filter(Boolean).slice(0, 400)
+                };
+            } else if (isObject(current[id])) {
+                copies[id] = current[id];
+            }
+        }
+        if (JSON.stringify(copies) === JSON.stringify(current)) return study;
+        return { ...value, packCopies: copies };
     }
 
     function packChannelRow(channel, packId) {
@@ -268,8 +354,9 @@
         };
     }
 
-    function packWordRow(word, packId) {
-        return { word, exact: true, comments: false, source: STUDY_SOURCE, managedListId: `${TAG_PREFIX}${packId}` };
+    /** Pack topics (allow) and pack blocked words: whole words, matched against the title only. */
+    function packWordRow(word, packId, source = STUDY_SOURCE) {
+        return { word, exact: true, comments: false, titleOnly: true, source, managedListId: `${TAG_PREFIX}${packId}` };
     }
 
     function appendWords(list, rows) {
@@ -284,7 +371,7 @@
         return out;
     }
 
-    function studySurface(surface, layers, { kids }) {
+    function studySurface(surface, layers, { kids, packChannelsOnly = false }) {
         const data = object(surface);
         const savedLayering = text(data.mode) === 'whitelist' ? (data.layered === true ? 'layered' : 'whitelist') : 'blocklist';
         // The user's own allowed channels stay; rows a mode switch only copied over (blocklist users)
@@ -296,14 +383,14 @@
             if (typeof row === 'object' && text(row.managedListId).startsWith(TAG_PREFIX)) return false;
             return true;
         });
-        const channels = [...ownChannels];
+        const channels = packChannelsOnly ? [] : [...ownChannels];
         for (const layer of layers) {
             for (const channel of layer.channels) {
                 if (channels.some(existing => sameChannel(existing, channel))) continue;
                 channels.push(packChannelRow(channel, layer.id));
             }
         }
-        const allowWords = layers.flatMap(layer => layer.keywords.map(word => packWordRow(word, layer.id)));
+        const allowWords = layers.flatMap(layer => layer.keywords.map(word => packWordRow(word, layer.id, TOPIC_SOURCE)));
         const blockWords = layers.flatMap(layer => layer.blockedWords.map(word => packWordRow(word, layer.id)));
         const blockKey = kids ? 'blockedKeywords' : (Array.isArray(data.keywords) || !Array.isArray(data.blockedKeywords) ? 'keywords' : 'blockedKeywords');
         const next = {
@@ -315,28 +402,85 @@
             allowedVideoIds: [],
             [blockKey]: appendWords(clone(array(data[blockKey])), blockWords)
         };
+        if (kids) next.subscriptions = [];
         return next;
     }
 
+    /** Rest break, the limit or a clock hold: allow mode with nothing allowed, so every surface is empty. */
+    function restSurface(surface, { kids }) {
+        const next = { ...clone(object(surface)), mode: 'whitelist', layered: true, whitelistChannels: [], whitelistKeywords: [], allowedVideoIds: [] };
+        if (kids) next.subscriptions = [];
+        return next;
+    }
+
+    function ownAllowedChannels(surface) {
+        const data = object(surface);
+        const blocklist = text(data.mode) !== 'whitelist';
+        return array(data.whitelistChannels).some(row => row && !(typeof row === 'object' && (row.managedListPaused === true
+            || (row.modeBootstrapCopy === true && blocklist) || text(row.managedListId).startsWith(TAG_PREFIX))));
+    }
+
+    /** Fail closed: the master switch can't turn study off, and comments are off while studying. */
+    function studySettings(settings) {
+        return { ...clone(object(settings)), enabled: true, syncKidsToMain: false, hideComments: true };
+    }
+
+    /** "study" during a round, "rest" for a rest break, the limit or a clock hold, else "normal". */
+    function studyPhase(clock) {
+        const value = object(clock);
+        if (value.clockHold === true || value.state === LIMIT) return 'rest';
+        if (value.state === STUDY) return 'study';
+        if (value.state === BREAK && value.breakMode !== 'normal' && value.breakSkipped !== true) return 'rest';
+        return 'normal';
+    }
+
     /**
-     * The profile the filters use right now. Outside study (and in a "normal" break or LIMIT) it is the
-     * profile unchanged; during study, Main and Kids get the pack allow layer with layered blocking.
-     * Returns {profile, applied, packIds}.
+     * The profile the filters use right now. Outside study (and in a "normal" or skipped break) it is the
+     * profile unchanged; during a round Main and Kids get the pack allow layer with layered blocking;
+     * a rest break, the limit and a clock hold get the rest profile.
+     * `clock.setByParentId` (a parent's plan or lock) defaults to "pack channels only" (audit L2).
+     * Returns {profile, applied, packIds, phase, failClosed}.
      */
     function studyEffectiveProfile(profile, { catalog, clock, study } = {}) {
         const source = object(profile);
         const value = study || source.study;
-        if (!isObject(value) || !studyRulesApply(clock)) return { profile, applied: false, packIds: [] };
+        const unchanged = { profile, applied: false, packIds: [], phase: 'normal', failClosed: false };
+        if (!isObject(value)) return unchanged;
+        const phase = studyPhase(clock);
+        if (phase === 'normal') return unchanged;
+        if (phase === 'rest') {
+            return {
+                profile: { ...source, settings: studySettings(source.settings), main: restSurface(source.main, { kids: false }), kids: restSurface(source.kids, { kids: true }) },
+                applied: true, packIds: [], phase: 'rest', failClosed: false
+            };
+        }
+        const packChannelsOnly = !!text(object(clock).setByParentId) && value.packChannelsOnly !== false;
         const layers = activePackLayers(value, catalog);
-        if (!layers.length) return { profile, applied: false, packIds: [] };
+        if (!layers.length) {
+            // Fail closed (audit H3): the person's own allowed channels, or rest. Never the normal rules.
+            const own = !packChannelsOnly && (ownAllowedChannels(source.main) || ownAllowedChannels(source.kids));
+            const rest = !own;
+            return {
+                profile: {
+                    ...source,
+                    settings: studySettings(source.settings),
+                    main: rest ? restSurface(source.main, { kids: false }) : studySurface(source.main, [], { kids: false }),
+                    kids: rest ? restSurface(source.kids, { kids: true }) : studySurface(source.kids, [], { kids: true })
+                },
+                applied: true, packIds: [], phase: rest ? 'rest' : 'study', failClosed: true
+            };
+        }
         return {
             profile: {
                 ...source,
-                main: studySurface(source.main, layers, { kids: false }),
-                kids: studySurface(source.kids, layers, { kids: true })
+                settings: studySettings(source.settings),
+                main: studySurface(source.main, layers, { kids: false, packChannelsOnly }),
+                kids: studySurface(source.kids, layers, { kids: true, packChannelsOnly })
             },
             applied: true,
-            packIds: layers.map(layer => layer.id)
+            packIds: layers.map(layer => layer.id),
+            phase: 'study',
+            failClosed: false
         };
     }
 
@@ -387,9 +531,9 @@
 
     return Object.freeze({
         NORMAL, STUDY, BREAK, LIMIT, BREAK_NOTICE_MS, BREAK_WAIT_MAX_MS, GENTLE_END_PAUSE_MS,
-        SELF_LOCK_MAX_MINUTES, PARENT_LOCK_MAX_MINUTES, STUDY_SOURCE,
-        parseTime, localDateKey, splitRounds, planOccurrences, studyClock, studyRulesApply,
-        packLayer, activePackLayers, studyEffectiveProfile,
+        SELF_LOCK_MAX_MINUTES, PARENT_LOCK_MAX_MINUTES, STUDY_SOURCE, TOPIC_SOURCE,
+        parseTime, localDateKey, splitRounds, planOccurrences, studyClock, studyRulesApply, studyPhase,
+        packVariant, packLayer, activePackLayers, stampPackCopies, studyEffectiveProfile,
         addProgressMinutes, minutesOn, weekProgress, selfStarted, endPolicy
     });
 }));

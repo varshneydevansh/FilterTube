@@ -729,6 +729,10 @@ function getCompiledKeywordRegexes(rawList) {
                 if (dateFilter.enabled) {
                     regex.__filtertubeDateFilter = dateFilter;
                 }
+                // Study pack topics and blocked words match the video title only (as on Android).
+                if (keywordData.titleOnly === true) {
+                    regex.__filtertubeTitleOnly = true;
+                }
                 compiled.push(regex);
                 continue;
             }
@@ -2114,7 +2118,12 @@ function getCurrentWatchAdmissionDecision(settings, context = {}) {
         for (let index = 0; index < compiled.length; index += 1) {
             const regex = compiled[index];
             if (!regex || !keywordDateFilterAllows(regex, publishTimestamp)) continue;
-            if (matchesKeyword(regex, searchText)) {
+            // Title-only (study) rows: the feed card and the Watch gate decide on the same text.
+            const titleOnly = regex.__filtertubeTitleOnly === true;
+            const ruleText = titleOnly
+                ? (textFields.find(field => field && field.label === 'title')?.text || '')
+                : searchText;
+            if (matchesKeyword(regex, ruleText)) {
                 const source = textFields.find(field => (
                     field && typeof field.text === 'string' && field.text && matchesKeyword(regex, field.text)
                 ));
@@ -2123,7 +2132,7 @@ function getCurrentWatchAdmissionDecision(settings, context = {}) {
                     source: source?.label || 'video metadata'
                 };
             }
-            if (includeOwner && ownerName && matchesKeyword(regex, ownerName)) {
+            if (includeOwner && !titleOnly && ownerName && matchesKeyword(regex, ownerName)) {
                 return {
                     pattern: regex.source || '',
                     source: 'channel identity'
@@ -8382,7 +8391,8 @@ function shouldHideContent(title, channel, settings, options = {}) {
     if (!skipKeywords && settings.filterKeywords && settings.filterKeywords.length > 0) {
         const compiled = getCompiledKeywordRegexes(settings.filterKeywords);
         for (const regex of compiled) {
-            if ((matchesKeyword(regex, title) || matchesKeyword(regex, channel)) && keywordDateFilterAllows(regex, publishTimestamp)) {
+            const ownerText = regex.__filtertubeTitleOnly === true ? '' : channel;
+            if ((matchesKeyword(regex, title) || matchesKeyword(regex, ownerText)) && keywordDateFilterAllows(regex, publishTimestamp)) {
                 return true;
             }
         }

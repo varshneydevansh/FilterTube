@@ -146,3 +146,25 @@ test('end policy: Gentle ends after a 30-second pause; Locked and parent-set ses
     assert.equal(Engine.endPolicy({ plan: { setByParentId: 'parent-1' } }).reason, 'set_by_parent');
     assert.equal(Engine.selfStarted({ plan: { setByParentId: null }, lock: null }), true);
 });
+
+test('a parent session lock runs rounds for its window, wins over a self session and can\'t be ended early', () => {
+    const lock = { startsAt: at(16, 10, 0), endsAt: at(16, 12, 0), setByParentId: 'mum' };
+    const self = { startedAt: at(16, 10, 30), endsAt: at(16, 11, 0) };
+    const inside = clock(at(16, 10, 40), { input: { parentLock: lock, session: self, endedUntil: at(16, 23, 0) } });
+    assert.equal(inside.state, Engine.STUDY);
+    assert.equal(inside.source, 'parent_lock');
+    assert.equal(inside.setByParentId, 'mum');
+    assert.equal(inside.sessionEnd, at(16, 12, 0));
+    const parentPlan = clock(at(16, 16, 10), { plan: { setByParentId: 'dad' }, input: { endedUntil: at(16, 23, 0) } });
+    assert.equal(parentPlan.state, Engine.STUDY, 'endedUntil only ends self occurrences');
+    assert.equal(parentPlan.setByParentId, 'dad');
+    assert.equal(clock(at(16, 16, 10)).setByParentId, null);
+});
+
+test('a clock hold is LIMIT at rest, re-checked within a minute', () => {
+    const held = clock(at(16, 16, 10), { input: { clockHold: true } });
+    assert.equal(held.state, Engine.LIMIT);
+    assert.equal(held.clockHold, true);
+    assert.equal(held.until, at(16, 16, 11));
+    assert.equal(Engine.studyPhase(held), 'rest');
+});

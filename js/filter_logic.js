@@ -1360,6 +1360,10 @@
                     if (dateFilter.enabled) {
                         regex.__filtertubeDateFilter = dateFilter;
                     }
+                    // Study pack topics and blocked words: the title only, never description or channel.
+                    if (item.titleOnly === true) {
+                        regex.__filtertubeTitleOnly = true;
+                    }
                     return regex;
                 } catch (e) {
                     console.error('FilterTube: Failed to reconstruct RegExp:', item, e);
@@ -2411,7 +2415,7 @@
                 if (hasKeywordRules) {
                     const textToSearch = this._candidateSearchText(candidate);
                     for (const keywordRegex of whitelistKeywords) {
-                        if (this._regexMatches(keywordRegex, textToSearch) && this._keywordDateFilterAllows(keywordRegex, candidate, null, null, 'autoplayEndpoint')) {
+                        if (this._regexMatches(keywordRegex, this._keywordText(keywordRegex, candidate, textToSearch)) && this._keywordDateFilterAllows(keywordRegex, candidate, null, null, 'autoplayEndpoint')) {
                             this._logWhitelistDecision('allow:autoplay_endpoint_matched_keyword', {
                                 endpointKey,
                                 videoId,
@@ -2581,6 +2585,12 @@
                 return this._rewriteAutoplayEndpoint(endpoint, blockedVideoId, entry);
             }
             return null;
+        }
+
+        /** The text a keyword is matched against: the title alone for title-only (study) rows. */
+        _keywordText(regex, candidate, fullText) {
+            if (regex && regex.__filtertubeTitleOnly === true) return String(candidate?.title || '');
+            return fullText;
         }
 
         _regexMatches(regex, text) {
@@ -2839,7 +2849,7 @@
                         const textToSearch = this._candidateSearchText(candidate);
                         for (const keywordRegex of keywords) {
                             if (
-                                this._regexMatches(keywordRegex, textToSearch) &&
+                                this._regexMatches(keywordRegex, this._keywordText(keywordRegex, candidate, textToSearch)) &&
                                 this._keywordDateFilterAllows(keywordRegex, candidate, item, rules, rendererType)
                             ) {
                                 return 1;
@@ -2943,7 +2953,7 @@
                 if (hasKeywordRules) {
                     const textToSearch = this._candidateSearchText(candidate);
                     for (const keywordRegex of whitelistKeywords) {
-                        if (this._regexMatches(keywordRegex, textToSearch) && this._keywordDateFilterAllows(keywordRegex, candidate, item, rules, rendererType)) {
+                        if (this._regexMatches(keywordRegex, this._keywordText(keywordRegex, candidate, textToSearch)) && this._keywordDateFilterAllows(keywordRegex, candidate, item, rules, rendererType)) {
                             this._logWhitelistDecision('allow:matched_keyword', {
                                 rendererType,
                                 originalRendererType,
@@ -3019,7 +3029,7 @@
                 const textToSearch = this._candidateSearchText(candidate);
 
                 for (const keywordRegex of this.settings.filterKeywords) {
-                    if (this._regexMatches(keywordRegex, textToSearch) && this._keywordDateFilterAllows(keywordRegex, candidate, item, rules, rendererType)) {
+                    if (this._regexMatches(keywordRegex, this._keywordText(keywordRegex, candidate, textToSearch)) && this._keywordDateFilterAllows(keywordRegex, candidate, item, rules, rendererType)) {
                         let matchLocation = '';
                         if (this._regexMatches(keywordRegex, title)) matchLocation += 'title';
                         if (this._regexMatches(keywordRegex, description)) {

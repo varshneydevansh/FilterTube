@@ -3831,7 +3831,11 @@ async function getCompiledSettings(sender = null, profileType = null, forceRefre
                     if (dateFilter?.enabled) {
                         compiledEntry.dateFilter = dateFilter;
                     }
-                    const key = `${compiledEntry.pattern.toLowerCase()}::${compiledEntry.flags}`;
+                    // Study pack topics and blocked words match the video title only (as on Android).
+                    if (typeof entry === 'object' && entry?.titleOnly === true) {
+                        compiledEntry.titleOnly = true;
+                    }
+                    const key = `${compiledEntry.pattern.toLowerCase()}::${compiledEntry.flags}${compiledEntry.titleOnly ? '::title' : ''}`;
                     if (seen.has(key)) continue;
                     seen.add(key);
                     compiled.push(compiledEntry);
@@ -3940,7 +3944,8 @@ async function getCompiledSettings(sender = null, profileType = null, forceRefre
             const activeMain = safeObject(studyRuleProfile.main);
             const activeKids = safeObject(studyRuleProfile.kids);
 
-            const activeSettings = safeObject(activeProfile.settings);
+            // Study forces the master switch and Hide comments on (fail closed, audit H2).
+            const activeSettings = safeObject(studyRuleProfile.settings);
             const activeProfileKind = (() => {
                 if (activeProfileId === DEFAULT_PROFILE_ID) return 'account';
                 const rawType = normalizeString(activeProfile.type).toLowerCase();
