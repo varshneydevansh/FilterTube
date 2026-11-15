@@ -5,8 +5,11 @@
 //
 // Sources, in this order: draft.packs (exam packs), draft.classPacks (kind "class": grade, board,
 // subjects, gradeKeywords) and draft.kidsPacks. Each pack is written as
-//   id, kind, name, [grade], [board], [countries], [nearby], [languages], [subjects], [keywords],
-//   [gradeKeywords], [blockedWords], channels
+//   id, kind, name, [shortName], [grade], [board], [countries], [nearby], [languages], [subjects],
+//   [keywords], [gradeKeywords], [blockedWords], [chips], [variants], channels
+// shortName is the exam's short label ("GATE"); chips are the study Home's subject chips; variants
+// are branches or streams (GATE CSE, ECE, ...), each {id, name, [default], [chips], [keywords],
+// [channels]}, where channels lists handles or ids of the pack's own approved channels that teach it.
 // where a bracketed field is written only when it has a value. The catalog format stays version 1:
 // the new fields are additive and older loaders skip them.
 // The same generator as FilterTubeApp tools/generate-study-packs.mjs, so the extension and the apps
@@ -51,6 +54,29 @@ function channel(row) {
     return out.name && (out.channelId || out.handle) ? out : null;
 }
 
+/** Branches or streams: ids unique and pack-id shaped; channels kept only when the pack lists them. */
+function variants(value, packChannels) {
+    if (!Array.isArray(value)) return [];
+    const known = new Set(packChannels.flatMap(row => [row.channelId, row.handle && row.handle.toLowerCase()]).filter(Boolean));
+    const out = [];
+    const ids = new Set();
+    for (const row of value) {
+        const id = text(row && row.id).toLowerCase();
+        if (!/^[a-z0-9_.-]{1,64}$/.test(id) || ids.has(id)) continue;
+        ids.add(id);
+        const name = {};
+        Object.entries((row && row.name) || {}).forEach(([lang, label]) => { if (text(label)) name[lang] = text(label); });
+        const variant = { id, name };
+        if (row.default === true) variant.default = true;
+        for (const [key, list] of [['chips', strings(row.chips)], ['keywords', strings(row.keywords)],
+            ['channels', strings(row.channels).filter(ref => known.has(ref) || known.has(ref.toLowerCase()))]]) {
+            if (list.length) variant[key] = list;
+        }
+        out.push(variant);
+    }
+    return out;
+}
+
 function channelKey(row) {
     return row.channelId ? `id:${row.channelId}` : `h:${row.handle.slice(1).toLowerCase()}`;
 }
@@ -77,6 +103,7 @@ export function buildCatalog(draft) {
         const name = {};
         Object.entries(source.name || {}).forEach(([lang, value]) => { if (text(value)) name[lang] = text(value); });
         const pack = { id, kind: text(source.kind) || 'study', name };
+        if (text(source.shortName)) pack.shortName = text(source.shortName);
         for (const key of ['grade', 'board']) if (text(source[key])) pack[key] = text(source[key]);
         for (const [key, value] of [['countries', countries(source.countries)], ['nearby', countries(source.nearby)],
             ['languages', strings(source.languages)], ['subjects', strings(source.subjects)], ['keywords', strings(source.keywords)]]) {
@@ -87,6 +114,10 @@ export function buildCatalog(draft) {
         // Words hidden while this pack is studied ("reaction", "vlog", "result live").
         const blockedWords = strings(source.blockedWords);
         if (blockedWords.length) pack.blockedWords = blockedWords;
+        const chips = strings(source.chips);
+        if (chips.length) pack.chips = chips;
+        const branches = variants(source.variants, channels);
+        if (branches.length) pack.variants = branches;
         pack.channels = channels;
         packs.push(pack);
     }

@@ -67,10 +67,7 @@ test('the bundled catalog is the generator output for the v2 draft, and the same
   assert.equal(renderCatalog(JSON.parse(fs.readFileSync(draftPath, 'utf8'))), raw);
   const androidAsset = new URL('apps/android/app/src/main/assets/study/packs-v1.json', app);
   if (!fs.existsSync(androidAsset)) return;
-  const android = fs.readFileSync(androidAsset, 'utf8');
-  // Until the app regenerates from the v2 draft its asset still carries the v1 draft date.
-  if (JSON.parse(android).draftGenerated !== bundled.draftGenerated) { t.diagnostic('the Android asset is still built from an older draft'); return; }
-  assert.equal(android, raw);
+  assert.equal(fs.readFileSync(androidAsset, 'utf8'), raw, 'the extension bundles the same bytes as Android');
 });
 
 test('v2: class packs carry grade, board, subjects and grade keywords; the picker has Exams and School tabs', () => {
@@ -84,7 +81,7 @@ test('v2: class packs carry grade, board, subjects and grade keywords; the picke
   assert.deepEqual(Object.keys(cbse.gradeKeywords), ['6', '7', '8']);
   assert.ok(cbse.gradeKeywords['6'].includes('class 6 maths'));
   const rawCbse = bundled.packs.find(pack => pack.id === 'cls_in_cbse_6_8');
-  assert.deepEqual(Object.keys(rawCbse), ['id', 'kind', 'name', 'grade', 'board', 'countries', 'nearby', 'languages', 'subjects', 'keywords', 'gradeKeywords', 'channels'],
+  assert.deepEqual(Object.keys(rawCbse), ['id', 'kind', 'name', 'shortName', 'grade', 'board', 'countries', 'nearby', 'languages', 'subjects', 'keywords', 'gradeKeywords', 'chips', 'channels'],
     'field order is part of the byte-identical contract with the apps');
   const school = Packs.forTab(catalog, 'IN', 'school');
   assert.ok(school.length > 0 && school.every(pack => pack.kind === 'class'));
@@ -106,6 +103,34 @@ test('the generator writes class fields and pack blocked words only when they ha
   assert.deepEqual(built.packs[0], { id: 'cls_x', kind: 'class', name: { en: 'X' }, grade: '9-10', board: 'Board', subjects: ['Maths'],
     gradeKeywords: { 9: ['class 9'] }, blockedWords: ['reaction', 'vlog'],
     channels: [{ handle: '@c1', name: 'C1' }, { handle: '@c2', name: 'C2' }, { handle: '@c3', name: 'C3' }] });
+});
+
+test('shortName, chips and variants pass through like the Android generator', () => {
+  const channels = [1, 2, 3].map(n => ({ name: `C${n}`, handle: `@c${n}`, confidence: 'high' }));
+  const { catalog: built } = buildCatalog({ generated: 'g', packs: [
+    { id: 'gate', kind: 'study', name: { en: 'GATE' }, shortName: ' GATE ', chips: ['DBMS', 'DBMS', ' OS '], channels,
+      variants: [
+        { id: 'CSE', name: { en: 'CSE' }, default: true, chips: ['DBMS'], keywords: ['gate cse'], channels: ['@c1', '@C2', '@unknown'] },
+        { id: 'cse', name: { en: 'dupe' } },
+        { id: 'bad id!', name: { en: 'x' } },
+        { id: 'ece', name: { en: 'ECE', hi: '' }, default: 'yes' }
+      ] }
+  ] });
+  assert.deepEqual(built.packs[0], { id: 'gate', kind: 'study', name: { en: 'GATE' }, shortName: 'GATE', chips: ['DBMS', 'OS'],
+    variants: [
+      { id: 'cse', name: { en: 'CSE' }, default: true, chips: ['DBMS'], keywords: ['gate cse'], channels: ['@c1', '@C2'] },
+      { id: 'ece', name: { en: 'ECE' } }
+    ],
+    channels: channels.map(({ name, handle }) => ({ handle, name })) });
+  const gate = Packs.packById(catalog, 'in_gate');
+  assert.equal(gate.shortName, 'GATE');
+  assert.deepEqual(gate.variants.map(variant => variant.id), ['cse', 'ece', 'ee', 'me', 'civil']);
+  assert.equal(Packs.packVariant(gate, null).id, 'cse', 'the default branch');
+  assert.equal(Packs.packVariant(gate, 'me').id, 'me');
+  assert.equal(Packs.packVariant(gate, 'nope').id, 'cse');
+  assert.equal(Packs.packVariant(Packs.packById(catalog, 'us_sat'), 'x'), null);
+  assert.ok(gate.blockedWords.length > 0, 'pack blocked words are bundled');
+  assert.ok(Packs.packById(catalog, 'in_jee').chips.length > 0);
 });
 
 test('packs for a country: own first, then nearby, then global; kids packs are separate', () => {

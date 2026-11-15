@@ -10,6 +10,7 @@
     "en": "UPSC Civil Services (CSE)",
     "hi": "संघ लोक सेवा आयोग सिविल सेवा परीक्षा"
    },
+   "shortName": "UPSC",
    "countries": [
     "IN"
    ],
@@ -66,6 +67,21 @@
     "मुख्य परीक्षा",
     "करंट अफेयर्स",
     "भारतीय राजव्यवस्था"
+   ],
+   "chips": [
+    "Polity",
+    "History",
+    "Geography",
+    "Economy",
+    "Environment",
+    "Science and tech",
+    "International relations",
+    "Ethics",
+    "Essay",
+    "CSAT",
+    "Current affairs",
+    "Answer writing",
+    "Previous year questions"
    ],
    "channels": [
     {
@@ -697,6 +713,7 @@
     "en": "GATE",
     "hi": "गेट (अभियांत्रिकी स्नातक अभिक्षमता परीक्षा)"
    },
+   "shortName": "GATE",
    "countries": [
     "IN"
    ],
@@ -745,6 +762,248 @@
     "previous year questions",
     "gate pyq",
     "nptel"
+   ],
+   "blockedWords": [
+    "recruitment",
+    "vacancy",
+    "vacancies",
+    "salary",
+    "in hand salary",
+    "job alert",
+    "jobs",
+    "hiring",
+    "admit card",
+    "result live",
+    "vlog",
+    "psu recruitment",
+    "dsssb",
+    "tgt",
+    "pgt",
+    "भर्ती",
+    "वैकेंसी",
+    "सैलरी"
+   ],
+   "variants": [
+    {
+     "id": "cse",
+     "name": {
+      "en": "CSE"
+     },
+     "default": true,
+     "chips": [
+      "Data structures",
+      "Algorithms",
+      "Operating systems",
+      "DBMS",
+      "Computer networks",
+      "Theory of computation",
+      "Compiler design",
+      "Digital logic",
+      "Computer organisation",
+      "Discrete maths",
+      "Engineering maths",
+      "Aptitude",
+      "Previous year questions"
+     ],
+     "keywords": [
+      "gate cse",
+      "gate cs",
+      "data structures",
+      "algorithms",
+      "operating systems",
+      "dbms",
+      "computer networks",
+      "theory of computation",
+      "toc",
+      "compiler design",
+      "digital logic",
+      "computer organization",
+      "computer organisation",
+      "coa",
+      "discrete mathematics",
+      "discrete maths"
+     ],
+     "channels": [
+      "@GateSmashers",
+      "@ravindrababu_ravula",
+      "@KNOWLEDGEGATE_kg",
+      "@Gatecsit-dsai",
+      "@abdul_bari",
+      "@nesoacademy"
+     ]
+    },
+    {
+     "id": "ece",
+     "name": {
+      "en": "ECE"
+     },
+     "chips": [
+      "Networks",
+      "Signals and systems",
+      "Electronic devices",
+      "Analog circuits",
+      "Digital circuits",
+      "Control systems",
+      "Communications",
+      "Electromagnetics",
+      "Engineering maths",
+      "Aptitude",
+      "Previous year questions"
+     ],
+     "keywords": [
+      "gate ece",
+      "gate ec",
+      "network theory",
+      "signals and systems",
+      "electronic devices",
+      "analog circuits",
+      "digital circuits",
+      "control systems",
+      "communication systems",
+      "analog communication",
+      "digital communication",
+      "electromagnetics",
+      "emft"
+     ],
+     "channels": [
+      "@nesoacademy",
+      "@gate_academy",
+      "@MADEEASYEducation",
+      "@aceengacademy",
+      "@Engineers-Academy-India"
+     ]
+    },
+    {
+     "id": "ee",
+     "name": {
+      "en": "EE"
+     },
+     "chips": [
+      "Electric circuits",
+      "Electromagnetic fields",
+      "Signals and systems",
+      "Electrical machines",
+      "Power systems",
+      "Control systems",
+      "Measurements",
+      "Analog electronics",
+      "Digital electronics",
+      "Power electronics",
+      "Engineering maths",
+      "Aptitude",
+      "Previous year questions"
+     ],
+     "keywords": [
+      "gate ee",
+      "electric circuits",
+      "electrical machines",
+      "power systems",
+      "power electronics",
+      "control systems",
+      "electrical measurements",
+      "signals and systems",
+      "analog electronics",
+      "digital electronics",
+      "electromagnetic fields"
+     ],
+     "channels": [
+      "@gate_academy",
+      "@MADEEASYEducation",
+      "@aceengacademy",
+      "@Engineers-Academy-India",
+      "@nesoacademy"
+     ]
+    },
+    {
+     "id": "me",
+     "name": {
+      "en": "ME"
+     },
+     "chips": [
+      "Engineering mechanics",
+      "Strength of materials",
+      "Theory of machines",
+      "Machine design",
+      "Fluid mechanics",
+      "Heat transfer",
+      "Thermodynamics",
+      "Manufacturing",
+      "Industrial engineering",
+      "Engineering maths",
+      "Aptitude",
+      "Previous year questions"
+     ],
+     "keywords": [
+      "gate me",
+      "gate mechanical",
+      "engineering mechanics",
+      "strength of materials",
+      "som",
+      "theory of machines",
+      "tom",
+      "machine design",
+      "fluid mechanics",
+      "heat transfer",
+      "thermodynamics",
+      "manufacturing",
+      "production engineering",
+      "industrial engineering"
+     ],
+     "channels": [
+      "@MADEEASYEducation",
+      "@aceengacademy",
+      "@gate_academy",
+      "@Engineers-Academy-India",
+      "@GATEWallahbyPW"
+     ]
+    },
+    {
+     "id": "civil",
+     "name": {
+      "en": "Civil",
+      "hi": "सिविल"
+     },
+     "chips": [
+      "Engineering mechanics",
+      "Solid mechanics",
+      "Structural analysis",
+      "Concrete structures",
+      "Steel structures",
+      "Geotechnical engineering",
+      "Fluid mechanics",
+      "Hydrology",
+      "Environmental engineering",
+      "Transportation engineering",
+      "Surveying",
+      "Engineering maths",
+      "Aptitude",
+      "Previous year questions"
+     ],
+     "keywords": [
+      "gate civil",
+      "gate ce",
+      "solid mechanics",
+      "structural analysis",
+      "rcc",
+      "concrete structures",
+      "steel structures",
+      "geotechnical engineering",
+      "soil mechanics",
+      "hydrology",
+      "irrigation",
+      "environmental engineering",
+      "transportation engineering",
+      "highway engineering",
+      "surveying"
+     ],
+     "channels": [
+      "@MADEEASYEducation",
+      "@aceengacademy",
+      "@gate_academy",
+      "@Engineers-Academy-India",
+      "@GATEWallahbyPW"
+     ]
+    }
    ],
    "channels": [
     {
@@ -852,6 +1111,7 @@
     "en": "JEE Main / Advanced",
     "hi": "संयुक्त प्रवेश परीक्षा (जेईई मेन / एडवांस्ड)"
    },
+   "shortName": "JEE",
    "countries": [
     "IN"
    ],
@@ -907,6 +1167,36 @@
     "मैथ्स",
     "भौतिकी",
     "रसायन"
+   ],
+   "blockedWords": [
+    "recruitment",
+    "vacancy",
+    "vacancies",
+    "salary",
+    "in hand salary",
+    "job alert",
+    "jobs",
+    "hiring",
+    "admit card",
+    "result live",
+    "vlog",
+    "भर्ती",
+    "वैकेंसी",
+    "सैलरी"
+   ],
+   "chips": [
+    "Physics",
+    "Chemistry",
+    "Maths",
+    "Mechanics",
+    "Electrostatics",
+    "Organic chemistry",
+    "Physical chemistry",
+    "Inorganic chemistry",
+    "Calculus",
+    "Algebra",
+    "Coordinate geometry",
+    "Previous year questions"
    ],
    "channels": [
     {
@@ -1026,6 +1316,7 @@
     "en": "NEET-UG",
     "hi": "राष्ट्रीय पात्रता सह प्रवेश परीक्षा (नीट-यूजी)"
    },
+   "shortName": "NEET",
    "countries": [
     "IN"
    ],
@@ -1073,6 +1364,35 @@
     "medical entrance",
     "जीव विज्ञान",
     "नीट"
+   ],
+   "blockedWords": [
+    "recruitment",
+    "vacancy",
+    "vacancies",
+    "salary",
+    "in hand salary",
+    "job alert",
+    "jobs",
+    "hiring",
+    "admit card",
+    "result live",
+    "vlog",
+    "भर्ती",
+    "वैकेंसी",
+    "सैलरी"
+   ],
+   "chips": [
+    "Physics",
+    "Chemistry",
+    "Biology",
+    "Botany",
+    "Zoology",
+    "Human physiology",
+    "Genetics",
+    "Organic chemistry",
+    "Physical chemistry",
+    "NCERT biology",
+    "Previous year questions"
    ],
    "channels": [
     {
@@ -1225,6 +1545,22 @@
     "mock analysis",
     "previous year paper",
     "cat pyq"
+   ],
+   "blockedWords": [
+    "recruitment",
+    "vacancy",
+    "vacancies",
+    "salary",
+    "in hand salary",
+    "job alert",
+    "jobs",
+    "hiring",
+    "admit card",
+    "result live",
+    "vlog",
+    "भर्ती",
+    "वैकेंसी",
+    "सैलरी"
    ],
    "channels": [
     {
@@ -1551,6 +1887,7 @@
     "en": "CBSE Board Class 10 / 12",
     "hi": "सीबीएसई बोर्ड कक्षा 10 / 12"
    },
+   "shortName": "CBSE",
    "countries": [
     "IN"
    ],
@@ -1609,6 +1946,18 @@
     "कक्षा 10",
     "कक्षा 12",
     "बोर्ड परीक्षा"
+   ],
+   "chips": [
+    "Maths",
+    "Science",
+    "Physics",
+    "Chemistry",
+    "Biology",
+    "English",
+    "Social science",
+    "Accountancy",
+    "Economics",
+    "Sample papers"
    ],
    "channels": [
     {
@@ -1861,6 +2210,19 @@
     "old question",
     "पुरानो प्रश्न",
     "प्रवेश परीक्षा"
+   ],
+   "blockedWords": [
+    "recruitment",
+    "vacancy",
+    "vacancies",
+    "salary",
+    "in hand salary",
+    "job alert",
+    "jobs",
+    "hiring",
+    "admit card",
+    "result live",
+    "vlog"
    ],
    "channels": [
     {
@@ -2741,6 +3103,7 @@
    "name": {
     "en": "SAT"
    },
+   "shortName": "SAT",
    "countries": [
     "US"
    ],
@@ -2780,6 +3143,17 @@
     "practice test",
     "official practice test",
     "college board"
+   ],
+   "chips": [
+    "Math",
+    "Reading and writing",
+    "Algebra",
+    "Advanced math",
+    "Problem solving",
+    "Geometry",
+    "Grammar",
+    "Vocabulary",
+    "Practice test"
    ],
    "channels": [
     {
@@ -5993,6 +6367,19 @@
     "powerprep",
     "ets"
    ],
+   "blockedWords": [
+    "recruitment",
+    "vacancy",
+    "vacancies",
+    "salary",
+    "in hand salary",
+    "job alert",
+    "jobs",
+    "hiring",
+    "admit card",
+    "result live",
+    "vlog"
+   ],
    "channels": [
     {
      "channelId": "UCia8sCkZeAteKBHL5-hNRzA",
@@ -6100,6 +6487,19 @@
     "table analysis",
     "gmat official guide",
     "mba admissions"
+   ],
+   "blockedWords": [
+    "recruitment",
+    "vacancy",
+    "vacancies",
+    "salary",
+    "in hand salary",
+    "job alert",
+    "jobs",
+    "hiring",
+    "admit card",
+    "result live",
+    "vlog"
    ],
    "channels": [
     {
@@ -7422,6 +7822,22 @@
     "ICAI past papers",
     "SPOM"
    ],
+   "blockedWords": [
+    "recruitment",
+    "vacancy",
+    "vacancies",
+    "salary",
+    "in hand salary",
+    "job alert",
+    "jobs",
+    "hiring",
+    "admit card",
+    "result live",
+    "vlog",
+    "भर्ती",
+    "वैकेंसी",
+    "सैलरी"
+   ],
    "channels": [
     {
      "channelId": "UCMBsmDfLTOPRicJISPeXacw",
@@ -7602,6 +8018,22 @@
     "ICSI past papers",
     "CS exam"
    ],
+   "blockedWords": [
+    "recruitment",
+    "vacancy",
+    "vacancies",
+    "salary",
+    "in hand salary",
+    "job alert",
+    "jobs",
+    "hiring",
+    "admit card",
+    "result live",
+    "vlog",
+    "भर्ती",
+    "वैकेंसी",
+    "सैलरी"
+   ],
    "channels": [
     {
      "channelId": "UCoBn0KZLy4aVBgQ8YG92iuQ",
@@ -7732,6 +8164,22 @@
     "CMA revision",
     "cost and management accounting"
    ],
+   "blockedWords": [
+    "recruitment",
+    "vacancy",
+    "vacancies",
+    "salary",
+    "in hand salary",
+    "job alert",
+    "jobs",
+    "hiring",
+    "admit card",
+    "result live",
+    "vlog",
+    "भर्ती",
+    "वैकेंसी",
+    "सैलरी"
+   ],
    "channels": [
     {
      "channelId": "UCWmdXmq6yN6D5WEGLn6LR4g",
@@ -7849,6 +8297,22 @@
     "UGC NET history",
     "assistant professor exam",
     "SET exam"
+   ],
+   "blockedWords": [
+    "recruitment",
+    "vacancy",
+    "vacancies",
+    "salary",
+    "in hand salary",
+    "job alert",
+    "jobs",
+    "hiring",
+    "admit card",
+    "result live",
+    "vlog",
+    "भर्ती",
+    "वैकेंसी",
+    "सैलरी"
    ],
    "channels": [
     {
@@ -13568,6 +14032,7 @@
     "en": "CBSE / NCERT Classes 6-8",
     "hi": "सीबीएसई / एनसीईआरटी कक्षा 6-8"
    },
+   "shortName": "CBSE",
    "grade": "6-8",
    "board": "CBSE (NCERT)",
    "countries": [
@@ -13634,6 +14099,16 @@
      "class 8 geography"
     ]
    },
+   "chips": [
+    "Maths",
+    "Science",
+    "English",
+    "Hindi",
+    "Social science",
+    "History",
+    "Geography",
+    "Civics"
+   ],
    "channels": [
     {
      "channelId": "UCT0s92hGjqLX6p7qY9BBrSA",
@@ -13734,6 +14209,7 @@
     "en": "CBSE / NCERT Classes 9-10",
     "hi": "सीबीएसई / एनसीईआरटी कक्षा 9-10"
    },
+   "shortName": "CBSE",
    "grade": "9-10",
    "board": "CBSE (NCERT)",
    "countries": [
@@ -13801,6 +14277,17 @@
      "first flight"
     ]
    },
+   "chips": [
+    "Maths",
+    "Science",
+    "Physics",
+    "Chemistry",
+    "Biology",
+    "English",
+    "Hindi",
+    "Social science",
+    "Sample papers"
+   ],
    "channels": [
     {
      "channelId": "UCT0s92hGjqLX6p7qY9BBrSA",
@@ -13925,6 +14412,7 @@
     "en": "CBSE / NCERT Classes 11-12 (Science, Commerce, Humanities)",
     "hi": "सीबीएसई / एनसीईआरटी कक्षा 11-12"
    },
+   "shortName": "CBSE",
    "grade": "11-12",
    "board": "CBSE (NCERT)",
    "countries": [
@@ -13999,6 +14487,19 @@
      "flamingo"
     ]
    },
+   "chips": [
+    "Physics",
+    "Chemistry",
+    "Maths",
+    "Biology",
+    "Accountancy",
+    "Business studies",
+    "Economics",
+    "English",
+    "History",
+    "Political science",
+    "Sample papers"
+   ],
    "channels": [
     {
      "channelId": "UCT0s92hGjqLX6p7qY9BBrSA",

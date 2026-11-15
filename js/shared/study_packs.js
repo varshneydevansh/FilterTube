@@ -42,6 +42,32 @@
         return out;
     }
 
+    function parseNames(value) {
+        const names = {};
+        for (const [lang, name] of Object.entries(value && typeof value === 'object' ? value : {})) {
+            if (text(name)) names[lang] = text(name);
+        }
+        return names;
+    }
+
+    /** Branches or streams (GATE CSE, ECE, ...): their own chips, extra topics and the pack channels that teach them. */
+    function parseVariants(value) {
+        const out = [];
+        for (const row of array(value)) {
+            const id = text(row?.id);
+            if (!PACK_ID.test(id) || out.some(variant => variant.id === id)) continue;
+            out.push({
+                id,
+                names: parseNames(row.name),
+                chips: strings(row.chips),
+                keywords: strings(row.keywords),
+                channels: strings(row.channels),
+                isDefault: row.default === true
+            });
+        }
+        return out;
+    }
+
     /** Validates and reads a catalog; rows the apps would skip are skipped here too. */
     function parseCatalog(value) {
         if (!value || typeof value !== 'object' || value.schema !== SCHEMA) throw new Error('Not a study pack catalog');
@@ -50,10 +76,7 @@
         for (const json of array(value.packs)) {
             const id = text(json?.id);
             if (!PACK_ID.test(id)) continue;
-            const names = {};
-            for (const [lang, name] of Object.entries(json.name && typeof json.name === 'object' ? json.name : {})) {
-                if (text(name)) names[lang] = text(name);
-            }
+            const names = parseNames(json.name);
             packs.push({
                 id,
                 kind: text(json.kind) || 'study',
@@ -68,6 +91,10 @@
                 board: text(json.board) || null,
                 gradeKeywords: parseGradeKeywords(json.gradeKeywords),
                 blockedWords: strings(json.blockedWords),
+                // The exam's short label ("GATE"), the study Home's subject chips and the branches.
+                shortName: text(json.shortName) || null,
+                chips: strings(json.chips),
+                variants: parseVariants(json.variants),
                 channels: array(json.channels).map(parseChannel).filter(Boolean)
             });
         }
@@ -150,6 +177,18 @@
         return channels.find(channel => (!id || !channel.channelId) && channel.handle && normalizeHandle(channel.handle) === wanted) || null;
     }
 
+    /** The chosen variant, else the default one, else the first; null when the pack has none. */
+    function packVariant(pack, id) {
+        const variants = array(pack?.variants);
+        return variants.find(variant => variant.id === text(id)) || variants.find(variant => variant.isDefault) || variants[0] || null;
+    }
+
+    function variantName(variant, language) {
+        const names = variant?.names || {};
+        const lang = text(language).toLowerCase().split(/[-_]/)[0];
+        return (lang && names[lang]) || names.en || Object.values(names)[0] || text(variant?.id);
+    }
+
     function packsForChannel(catalog, channelId, handle) {
         return array(catalog?.packs).filter(pack => matchChannel(pack, channelId, handle));
     }
@@ -157,6 +196,6 @@
     return Object.freeze({
         CATALOG_PATH, SCHEMA, VERSION, STUDY_KINDS, KIDS_KINDS,
         load, resetCache, parseCatalog, countryFromLocale, isGlobal, forCountry, forTab, kidsPacks, packById, packName,
-        matchChannel, packsForChannel
+        matchChannel, packsForChannel, packVariant, variantName
     });
 }));
