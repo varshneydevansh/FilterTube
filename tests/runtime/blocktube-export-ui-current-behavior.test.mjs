@@ -95,7 +95,7 @@ for (const surface of ['main', 'kids']) {
     assert.equal(f.calls.exports[0].surface, surface);
     assert.equal(f.calls.exports[0].reviewToken, f.report.reviewToken);
     assert.equal(f.calls.exports[0].acceptUnsupported, false);
-    assert.equal(f.calls.reviews[0].message, `Own child · ${surface === 'kids' ? 'YouTube Kids' : 'Main YouTube'}`);
+    assert.equal(f.calls.reviews[0].message, `Own child · ${surface === 'kids' ? 'Kids' : 'Main'}`);
     assert.ok(f.calls.reviews[0].details.some(item => /3/.test(item)));
     assert.ok(f.calls.reviews[0].details.some(item => /2/.test(item)));
     assert.equal(f.calls.downloads.length, 1);

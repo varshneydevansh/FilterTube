@@ -2619,5 +2619,18 @@
   "blockTubeExport.reason.kids_rules_not_merged_into_main_export": "Aturan Kids tambahan yang diterapkan di Utama (ekspor aturan Kids secara terpisah)",
   "blockTubeExport.matchedByName": "Dicocokkan berdasarkan nama channel yang persis (tanpa ID channel terverifikasi): {count} — {names}",
   "profiles.avatarPickerTitle": "Pilih avatar untuk {name}",
-  "parentMode.hereBrowser": "Di browser ini"
+  "parentMode.hereBrowser": "Di browser ini",
+  "platformLabel.clips": "Klip",
+  "platformLabel.followingTab": "Mengikuti",
+  "platformLabel.follow": "Ikuti",
+  "platformLabel.followingState": "Mengikuti",
+  "platformLabel.saved": "Tersimpan",
+  "platformLabel.popular": "Populer",
+  "platformLabel.posts": "Postingan",
+  "platformLabel.paidChat": "Chat berbayar",
+  "platformLabel.music": "Sangeet",
+  "platformLabel.kids": "Anak",
+  "platformLabel.autoPlaylist": "Playlist otomatis",
+  "platformLabel.autoPlaylists": "Playlist otomatis",
+  "platformLabel.autoPlaylistNamed": "Playlist otomatis · {name}"
 }

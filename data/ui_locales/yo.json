@@ -2619,5 +2619,18 @@
   "blockTubeExport.reason.kids_rules_not_merged_into_main_export": "Àwọn òfin Kids àfikún tí a lò lórí Àkọ́kọ́ (kó àwọn òfin Kids jáde lọ́tọ̀)",
   "blockTubeExport.matchedByName": "A bá a mu nípa orúkọ ikanni pípé (kò sí ID ikanni tí a fìdí múlẹ̀): {count} — {names}",
   "profiles.avatarPickerTitle": "Yan àwòrán àmì fún {name}",
-  "parentMode.hereBrowser": "Nínú browser yìí"
+  "parentMode.hereBrowser": "Nínú browser yìí",
+  "platformLabel.clips": "Fídíò kúkúrú",
+  "platformLabel.followingTab": "Àwọn tí o ń tẹ̀lé",
+  "platformLabel.follow": "Tẹ̀lé",
+  "platformLabel.followingState": "Ò ń tẹ̀lé",
+  "platformLabel.saved": "Ti fipamọ́",
+  "platformLabel.popular": "Gbajúmọ̀",
+  "platformLabel.posts": "Àwọn ìfìwéránṣẹ́",
+  "platformLabel.paidChat": "Ìfọ̀rọ̀wérọ̀ tí a sanwó fún",
+  "platformLabel.music": "Sangeet",
+  "platformLabel.kids": "Ọmọdé",
+  "platformLabel.autoPlaylist": "Àkójọ eré aládàáṣe",
+  "platformLabel.autoPlaylists": "Àwọn àkójọ eré aládàáṣe",
+  "platformLabel.autoPlaylistNamed": "Àkójọ eré aládàáṣe · {name}"
 }

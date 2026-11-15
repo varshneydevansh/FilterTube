@@ -2619,5 +2619,18 @@
   "blockTubeExport.reason.kids_rules_not_merged_into_main_export": "Sheria za ziada za Watoto zinazotumika kwenye Kuu (hamisha sheria za Watoto kando)",
   "blockTubeExport.matchedByName": "Imelingana kwa jina kamili la kituo (hakuna kitambulisho cha kituo kilichothibitishwa): {count} — {names}",
   "profiles.avatarPickerTitle": "Chagua avatar ya {name}",
-  "parentMode.hereBrowser": "Katika kivinjari hiki"
+  "parentMode.hereBrowser": "Katika kivinjari hiki",
+  "platformLabel.clips": "Klipu",
+  "platformLabel.followingTab": "Unaowafuata",
+  "platformLabel.follow": "Fuata",
+  "platformLabel.followingState": "Unafuata",
+  "platformLabel.saved": "Imehifadhiwa",
+  "platformLabel.popular": "Maarufu",
+  "platformLabel.posts": "Machapisho",
+  "platformLabel.paidChat": "Gumzo la kulipia",
+  "platformLabel.music": "Sangeet",
+  "platformLabel.kids": "Watoto",
+  "platformLabel.autoPlaylist": "Orodha ya kucheza ya kiotomatiki",
+  "platformLabel.autoPlaylists": "Orodha za kucheza za kiotomatiki",
+  "platformLabel.autoPlaylistNamed": "Orodha ya kucheza ya kiotomatiki · {name}"
 }

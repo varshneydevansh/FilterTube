@@ -2619,5 +2619,18 @@
   "blockTubeExport.reason.kids_rules_not_merged_into_main_export": "กฎเพิ่มเติมของโหมดเด็กที่ใช้ในโหมดหลัก (ส่งออกกฎของโหมดเด็กแยกต่างหาก)",
   "blockTubeExport.matchedByName": "จับคู่ด้วยชื่อช่องที่ตรงกันทุกตัว (ไม่มีรหัสช่องที่ยืนยันแล้ว): {count} — {names}",
   "profiles.avatarPickerTitle": "เลือกอวาตาร์สำหรับ {name}",
-  "parentMode.hereBrowser": "ในเบราว์เซอร์นี้"
+  "parentMode.hereBrowser": "ในเบราว์เซอร์นี้",
+  "platformLabel.clips": "คลิปสั้น",
+  "platformLabel.followingTab": "กำลังติดตาม",
+  "platformLabel.follow": "ติดตาม",
+  "platformLabel.followingState": "ติดตามแล้ว",
+  "platformLabel.saved": "บันทึกแล้ว",
+  "platformLabel.popular": "ยอดนิยม",
+  "platformLabel.posts": "โพสต์",
+  "platformLabel.paidChat": "แชตแบบชำระเงิน",
+  "platformLabel.music": "สังคีต",
+  "platformLabel.kids": "เด็ก",
+  "platformLabel.autoPlaylist": "เพลย์ลิสต์อัตโนมัติ",
+  "platformLabel.autoPlaylists": "เพลย์ลิสต์อัตโนมัติ",
+  "platformLabel.autoPlaylistNamed": "เพลย์ลิสต์อัตโนมัติ · {name}"
 }

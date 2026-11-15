@@ -2619,5 +2619,18 @@
   "blockTubeExport.reason.kids_rules_not_merged_into_main_export": "ಮುಖ್ಯದಲ್ಲಿ ಅನ್ವಯಿಸಿದ ಹೆಚ್ಚುವರಿ ಮಕ್ಕಳು ನಿಯಮಗಳು (ಮಕ್ಕಳು ನಿಯಮಗಳನ್ನು ಪ್ರತ್ಯೇಕವಾಗಿ ರಫ್ತು ಮಾಡಿ)",
   "blockTubeExport.matchedByName": "ನಿಖರ ಚಾನೆಲ್ ಹೆಸರಿನಿಂದ ಹೊಂದಿಕೆ (ಪರಿಶೀಲಿಸಿದ ಚಾನೆಲ್ ID ಇಲ್ಲ): {count} — {names}",
   "profiles.avatarPickerTitle": "{name} ಗಾಗಿ ಅವತಾರ್ ಆಯ್ಕೆಮಾಡಿ",
-  "parentMode.hereBrowser": "ಈ ಬ್ರೌಸರ್‌ನಲ್ಲಿ"
+  "parentMode.hereBrowser": "ಈ ಬ್ರೌಸರ್‌ನಲ್ಲಿ",
+  "platformLabel.clips": "ಕ್ಲಿಪ್‌ಗಳು",
+  "platformLabel.followingTab": "ಫಾಲೋ ಮಾಡುತ್ತಿರುವುದು",
+  "platformLabel.follow": "ಫಾಲೋ ಮಾಡಿ",
+  "platformLabel.followingState": "ಫಾಲೋ ಮಾಡುತ್ತಿದ್ದೀರಿ",
+  "platformLabel.saved": "ಉಳಿಸಲಾಗಿದೆ",
+  "platformLabel.popular": "ಜನಪ್ರಿಯ",
+  "platformLabel.posts": "ಪೋಸ್ಟ್‌ಗಳು",
+  "platformLabel.paidChat": "ಪಾವತಿಸಿದ ಚಾಟ್",
+  "platformLabel.music": "ಸಂಗೀತ್",
+  "platformLabel.kids": "ಮಕ್ಕಳು",
+  "platformLabel.autoPlaylist": "ಸ್ವಯಂ ಪ್ಲೇಲಿಸ್ಟ್",
+  "platformLabel.autoPlaylists": "ಸ್ವಯಂ ಪ್ಲೇಲಿಸ್ಟ್‌ಗಳು",
+  "platformLabel.autoPlaylistNamed": "ಸ್ವಯಂ ಪ್ಲೇಲಿಸ್ಟ್ · {name}"
 }

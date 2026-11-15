@@ -2619,5 +2619,18 @@
   "blockTubeExport.reason.kids_rules_not_merged_into_main_export": "মূল-এ প্রয়োগ করা অতিরিক্ত Kids নিয়ম (Kids নিয়ম আলাদাভাবে রপ্তানি করুন)",
   "blockTubeExport.matchedByName": "চ্যানেলের সঠিক নাম দিয়ে মেলানো (যাচাই করা চ্যানেল ID নেই): {count} — {names}",
   "profiles.avatarPickerTitle": "{name}-এর জন্য একটি অবতার বেছে নিন",
-  "parentMode.hereBrowser": "এই ব্রাউজারে"
+  "parentMode.hereBrowser": "এই ব্রাউজারে",
+  "platformLabel.clips": "ক্লিপ",
+  "platformLabel.followingTab": "ফলো করা",
+  "platformLabel.follow": "ফলো করুন",
+  "platformLabel.followingState": "ফলো করছেন",
+  "platformLabel.saved": "সেভ করা",
+  "platformLabel.popular": "জনপ্রিয়",
+  "platformLabel.posts": "পোস্ট",
+  "platformLabel.paidChat": "পেইড চ্যাট",
+  "platformLabel.music": "সংগীত",
+  "platformLabel.kids": "শিশু",
+  "platformLabel.autoPlaylist": "অটো প্লেলিস্ট",
+  "platformLabel.autoPlaylists": "অটো প্লেলিস্ট",
+  "platformLabel.autoPlaylistNamed": "অটো প্লেলিস্ট · {name}"
 }

@@ -2619,5 +2619,18 @@
   "blockTubeExport.reason.kids_rules_not_merged_into_main_export": "મુખ્ય પર લાગુ થયેલા વધારાના Kids નિયમો (Kids નિયમો અલગથી નિકાસ કરો)",
   "blockTubeExport.matchedByName": "ચૅનલના ચોક્કસ નામથી મેળ ખાધો (ચકાસાયેલ ચૅનલ ID નથી): {count} — {names}",
   "profiles.avatarPickerTitle": "{name} માટે અવતાર પસંદ કરો",
-  "parentMode.hereBrowser": "આ બ્રાઉઝરમાં"
+  "parentMode.hereBrowser": "આ બ્રાઉઝરમાં",
+  "platformLabel.clips": "ક્લિપ્સ",
+  "platformLabel.followingTab": "ફોલો કરેલા",
+  "platformLabel.follow": "ફોલો કરો",
+  "platformLabel.followingState": "ફોલો કરી રહ્યાં છો",
+  "platformLabel.saved": "સાચવેલું",
+  "platformLabel.popular": "લોકપ્રિય",
+  "platformLabel.posts": "પોસ્ટ",
+  "platformLabel.paidChat": "પેઇડ ચૅટ",
+  "platformLabel.music": "સંગીત",
+  "platformLabel.kids": "બાળકો",
+  "platformLabel.autoPlaylist": "ઑટો પ્લેલિસ્ટ",
+  "platformLabel.autoPlaylists": "ઑટો પ્લેલિસ્ટ",
+  "platformLabel.autoPlaylistNamed": "ઑટો પ્લેલિસ્ટ · {name}"
 }

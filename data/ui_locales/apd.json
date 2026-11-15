@@ -2619,5 +2619,18 @@
   "blockTubeExport.reason.kids_rules_not_merged_into_main_export": "قواعد Kids الإضافية المطبّقة على الرئيسي (صدّر قواعد Kids بشكل منفصل)",
   "blockTubeExport.matchedByName": "مطابقة حسب الاسم الدقيق للقناة (دون معرّف قناة موثّق): {count} — {names}",
   "profiles.avatarPickerTitle": "اختر صورة رمزية لـ {name}",
-  "parentMode.hereBrowser": "في هذا المتصفح"
+  "parentMode.hereBrowser": "في هذا المتصفح",
+  "platformLabel.clips": "مقاطع",
+  "platformLabel.followingTab": "البتتابعهم",
+  "platformLabel.follow": "تابِع",
+  "platformLabel.followingState": "بتتابع",
+  "platformLabel.saved": "محفوظ",
+  "platformLabel.popular": "شائع",
+  "platformLabel.posts": "منشورات",
+  "platformLabel.paidChat": "دردشة مدفوعة",
+  "platformLabel.music": "سانجيت",
+  "platformLabel.kids": "أطفال",
+  "platformLabel.autoPlaylist": "قائمة تشغيل تلقائية",
+  "platformLabel.autoPlaylists": "قوائم تشغيل تلقائية",
+  "platformLabel.autoPlaylistNamed": "قائمة تشغيل تلقائية · {name}"
 }

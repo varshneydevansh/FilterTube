@@ -2619,5 +2619,18 @@
   "blockTubeExport.reason.kids_rules_not_merged_into_main_export": "メインに適用された追加の Kids ルール（Kids ルールは個別にエクスポートしてください）",
   "blockTubeExport.matchedByName": "チャンネル名の完全一致で照合（確認済みのチャンネル ID なし）: {count} — {names}",
   "profiles.avatarPickerTitle": "{name}さんのアバターを選択",
-  "parentMode.hereBrowser": "このブラウザーで"
+  "parentMode.hereBrowser": "このブラウザーで",
+  "platformLabel.clips": "クリップ",
+  "platformLabel.followingTab": "フォロー中",
+  "platformLabel.follow": "フォロー",
+  "platformLabel.followingState": "フォロー中",
+  "platformLabel.saved": "保存済み",
+  "platformLabel.popular": "人気",
+  "platformLabel.posts": "投稿",
+  "platformLabel.paidChat": "有料チャット",
+  "platformLabel.music": "サンギート",
+  "platformLabel.kids": "キッズ",
+  "platformLabel.autoPlaylist": "自動プレイリスト",
+  "platformLabel.autoPlaylists": "自動プレイリスト",
+  "platformLabel.autoPlaylistNamed": "自動プレイリスト · {name}"
 }

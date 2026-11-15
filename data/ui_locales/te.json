@@ -2619,5 +2619,18 @@
   "blockTubeExport.reason.kids_rules_not_merged_into_main_export": "ప్రధానంలో వర్తించిన అదనపు పిల్లల నియమాలు (పిల్లల నియమాలను విడిగా ఎగుమతి చేయండి)",
   "blockTubeExport.matchedByName": "ఖచ్చితమైన ఛానెల్ పేరుతో సరిపోలింది (ధృవీకరించిన ఛానెల్ ID లేదు): {count} — {names}",
   "profiles.avatarPickerTitle": "{name} కోసం అవతార్‌ను ఎంచుకోండి",
-  "parentMode.hereBrowser": "ఈ బ్రౌజర్‌లో"
+  "parentMode.hereBrowser": "ఈ బ్రౌజర్‌లో",
+  "platformLabel.clips": "క్లిప్‌లు",
+  "platformLabel.followingTab": "ఫాలో అవుతున్నవి",
+  "platformLabel.follow": "ఫాలో చేయి",
+  "platformLabel.followingState": "ఫాలో అవుతున్నారు",
+  "platformLabel.saved": "సేవ్ చేయబడింది",
+  "platformLabel.popular": "జనాదరణ పొందినవి",
+  "platformLabel.posts": "పోస్ట్‌లు",
+  "platformLabel.paidChat": "చెల్లింపు చాట్",
+  "platformLabel.music": "సంగీత్",
+  "platformLabel.kids": "పిల్లలు",
+  "platformLabel.autoPlaylist": "ఆటో ప్లేలిస్ట్",
+  "platformLabel.autoPlaylists": "ఆటో ప్లేలిస్ట్‌లు",
+  "platformLabel.autoPlaylistNamed": "ఆటో ప్లేలిస్ట్ · {name}"
 }

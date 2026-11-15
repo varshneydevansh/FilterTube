@@ -2619,5 +2619,18 @@
   "blockTubeExport.reason.kids_rules_not_merged_into_main_export": "Ana alanda uygulanan ek Çocuk kuralları (Çocuk kurallarını ayrıca dışa aktarın)",
   "blockTubeExport.matchedByName": "Tam kanal adıyla eşleşti (doğrulanmış kanal kimliği yok): {count} — {names}",
   "profiles.avatarPickerTitle": "{name} için bir avatar seçin",
-  "parentMode.hereBrowser": "Bu tarayıcıda"
+  "parentMode.hereBrowser": "Bu tarayıcıda",
+  "platformLabel.clips": "Klipler",
+  "platformLabel.followingTab": "Takip edilenler",
+  "platformLabel.follow": "Takip et",
+  "platformLabel.followingState": "Takip ediliyor",
+  "platformLabel.saved": "Kaydedildi",
+  "platformLabel.popular": "Popüler",
+  "platformLabel.posts": "Gönderiler",
+  "platformLabel.paidChat": "Ücretli sohbet",
+  "platformLabel.music": "Sangeet",
+  "platformLabel.kids": "Çocuk",
+  "platformLabel.autoPlaylist": "Otomatik oynatma listesi",
+  "platformLabel.autoPlaylists": "Otomatik oynatma listeleri",
+  "platformLabel.autoPlaylistNamed": "Otomatik oynatma listesi · {name}"
 }

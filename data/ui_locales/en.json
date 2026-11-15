@@ -2756,5 +2756,18 @@
   "profiles.avatar.arrow": "Arrow",
   "profiles.avatar.tick": "Tick mark",
   "profiles.avatarPickerTitle": "Choose an avatar for {name}",
-  "parentMode.hereBrowser": "In this browser"
+  "parentMode.hereBrowser": "In this browser",
+  "platformLabel.clips": "Clips",
+  "platformLabel.followingTab": "Following",
+  "platformLabel.follow": "Follow",
+  "platformLabel.followingState": "Following",
+  "platformLabel.saved": "Saved",
+  "platformLabel.popular": "Popular",
+  "platformLabel.posts": "Posts",
+  "platformLabel.paidChat": "Paid chat",
+  "platformLabel.music": "Sangeet",
+  "platformLabel.kids": "Kids",
+  "platformLabel.autoPlaylist": "Auto playlist",
+  "platformLabel.autoPlaylists": "Auto playlists",
+  "platformLabel.autoPlaylistNamed": "Auto playlist · {name}"
 }

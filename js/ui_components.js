@@ -223,6 +223,80 @@ const UIComponents = (() => {
     }
 
     // ============================================================================
+    // PLATFORM LABELS (Android PlatformLabelNeutralizer.kt, TERMINOLOGY.md "Labels the video service sends")
+    // ============================================================================
+    // A label the video service sent (a shelf, tab, chip or playlist name) shown in the extension's
+    // own UI, in FilterTube's words. Only whole labels and a few affixes ("Mix – X", "YouTube X",
+    // "X on YouTube") are mapped. Never call it for content: titles, channel names, comments.
+    const PLATFORM_LABEL_FORMS = Object.freeze({
+        clips: ['Shorts', 'YouTube Shorts', 'Short videos', 'ショート', 'ショート動画', '쇼츠', '숏츠', 'शॉर्ट्स', 'शॉर्ट वीडियो', 'شورتس', 'شورتز',
+            'شارٹس', 'শর্টস', 'ชอร์ต', 'ஷார்ட்ஸ்', 'షార్ట్స్', 'ಶಾರ್ಟ್ಸ್', 'શોર્ટ્સ', 'ሾርትስ', 'Шортс'],
+        followingTab: ['Subscriptions', 'Your subscriptions', 'Suscripciones', 'Tus suscripciones', 'Inscrições', 'Suas inscrições', 'Abonnements',
+            'Vos abonnements', 'Abos', 'Deine Abos', 'Iscrizioni', 'Le tue iscrizioni', 'Подписки', 'Ваши подписки', '登録チャンネル', '구독', '订阅',
+            '订阅内容', '訂閱', '訂閱內容', 'الاشتراكات', 'اشتراكاتك', 'सदस्यताएं', 'सदस्यताएँ', 'सब्सक्रिप्शन', 'Abonelikler', 'Langganan',
+            'Subscription', 'Kênh đăng ký', 'การติดตาม', 'Mga Subscription', 'اشتراک‌ها', 'سبسکرپشنز', 'Usajili', 'সাবস্ক্রিপশন', 'சந்தாக்கள்',
+            'సబ్‌స్క్రిప్షన్‌లు', 'सदस्यत्वे', 'સબ્સ્ક્રિપ્શન', 'ಸಬ್‌ಸ್ಕ್ರಿಪ್ಷನ್‌ಗಳು'],
+        follow: ['Subscribe', 'Suscribirse', 'Suscríbete', 'Inscrever-se', "S'abonner", 'S’abonner', 'Abonnieren', 'Iscriviti', 'チャンネル登録',
+            '구독하기', '订阅频道', '訂閱頻道', 'اشترِك', 'اشتراك', 'सदस्यता लें', 'सब्सक्राइब करें', 'Abone ol', 'Đăng ký', 'Mag-subscribe',
+            'সাবস্ক্রাইব করুন', 'குழுசேர்', 'సబ్‌స్క్రయిబ్ చేయండి', 'सदस्यता घ्या', 'સબ્સ્ક્રાઇબ કરો', 'ಸಬ್‌ಸ್ಕ್ರೈಬ್ ಮಾಡಿ', 'سبسکرائب کریں'],
+        followingState: ['Subscribed', 'Suscrito', 'Inscrito', 'Abonné', 'Abonniert', 'Iscritto', '登録済み', '구독중', '구독 중', '已订阅', '已訂閱',
+            'مشترك', 'सदस्यता ली गई', 'सब्सक्राइब किया हुआ', 'Abone olundu', 'Đã đăng ký', 'Naka-subscribe', 'সাবস্ক্রাইব করা হয়েছে'],
+        saved: ['Watch later', 'Ver más tarde', 'Ver después', 'Assistir mais tarde', 'À regarder plus tard', 'Später ansehen', 'Guarda più tardi',
+            'Смотреть позже', '後で見る', '나중에 볼 동영상', '稍后观看', '稍後觀看', 'مشاهدة لاحقًا', 'المشاهدة لاحقًا', 'बाद में देखें', 'Daha sonra izle',
+            'Tonton Nanti', 'Xem sau', 'ดูภายหลัง', 'Panoorin Mamaya', 'পরে দেখুন', 'பின்னர் பார்', 'తర్వాత చూడండి', 'नंतर पहा', 'પછી જુઓ',
+            'ನಂತರ ವೀಕ್ಷಿಸಿ', 'بعد میں دیکھیں', 'Tazama baadaye'],
+        popular: ['Trending', 'Tendencias', 'Tendencia', 'Em alta', 'Tendances', 'Trends', 'Tendenze', 'В тренде', 'Популярное на YouTube', '急上昇',
+            '인기 급상승', '인기 급상승 동영상', '时下流行', '發燒影片', 'المحتوى الرائج', 'रुझान में', 'ट्रेंडिंग', 'Trendler', 'Thịnh hành', 'มาแรง',
+            'ট্রেন্ডিং', 'ترند'],
+        posts: ['Community', 'Community posts', 'Comunidad', 'Comunidade', 'Communauté', 'Сообщество', 'コミュニティ', '커뮤니티', '社区', '社群',
+            'المنتدى', 'المجتمع', 'कम्युनिटी', 'समुदाय', 'Topluluk', 'Komunitas', 'Cộng đồng', 'ชุมชน', 'কমিউনিটি', 'Komunidad'],
+        paidChat: ['Super Chat', 'Super Chats', 'スーパーチャット', '슈퍼챗', '超级留言', '超級留言'],
+        music: ['YouTube Music', 'YT Music', 'YouTube Музыка', 'YouTube音乐', 'YouTube 音樂'],
+        kids: ['YouTube Kids', 'YouTube Niños', 'YouTube Детям'],
+        autoPlaylist: ['Mix', 'My Mix', 'Your Mix', 'Mi mix', 'Mon mix', 'Mein Mix', 'Il mio mix', 'Meu mix', 'Мой микс', 'Микс', 'マイミックス',
+            'ミックス', '믹스', '내 믹스', '合辑', '合輯', 'ميكس', 'मिक्स'],
+        autoPlaylists: ['Mixes', 'My Mixes', 'Your Mixes', 'Mis mixes', 'Mes mix', 'Meine Mixe', 'Миксы', 'ミックスリスト']
+    });
+    const PLATFORM_LABEL_WORDS = Object.freeze({
+        clips: 'Clips', followingTab: 'Following', follow: 'Follow', followingState: 'Following', saved: 'Saved', popular: 'Popular',
+        posts: 'Posts', paidChat: 'Paid chat', music: 'Sangeet', kids: 'Kids', autoPlaylist: 'Auto playlist', autoPlaylists: 'Auto playlists'
+    });
+    const platformLabelKey = label => String(label).trim().replace(/\s+/g, ' ').replace(/[:：]+$/, '').toLowerCase();
+    const PLATFORM_LABEL_INDEX = (() => {
+        const index = new Map();
+        for (const [term, forms] of Object.entries(PLATFORM_LABEL_FORMS)) {
+            for (const form of forms) if (!index.has(platformLabelKey(form))) index.set(platformLabelKey(form), term);
+        }
+        return index;
+    })();
+    const PLATFORM_MIX_PREFIX = /^(?:Mix|My Mix|Mezcla|Микс|ミックス|믹스|合辑|合輯|ميكس|मिक्स)(?:\s*[–—:|]\s*|\s+-\s+)(.+)$/iu;
+    const PLATFORM_BRAND_PREFIX = /^(?:YouTube|YT)\s+(.+)$/iu;
+    const PLATFORM_BRAND_SUFFIX = /^(.+?)\s+(?:on|from|en|sur|auf|su|no|na|в|на)\s+YouTube$/iu;
+
+    /** FilterTube's (localized) word for a platform UI label, or the label unchanged. Display only. */
+    function neutralizePlatformLabel(raw, words = null) {
+        if (typeof raw !== 'string') return raw;
+        const label = raw.trim();
+        if (!label) return raw;
+        const word = term => (words && typeof words[term] === 'string')
+            ? words[term] : localizedComponentText(`platformLabel.${term}`, PLATFORM_LABEL_WORDS[term]);
+        const whole = PLATFORM_LABEL_INDEX.get(platformLabelKey(label));
+        if (whole) return word(whole);
+        const mix = label.match(PLATFORM_MIX_PREFIX);
+        if (mix) {
+            const name = mix[1].trim();
+            return (words && typeof words.autoPlaylistNamed === 'string')
+                ? words.autoPlaylistNamed.replace('{name}', name)
+                : localizedComponentText('platformLabel.autoPlaylistNamed', 'Auto playlist · {name}', { name });
+        }
+        const suffix = label.match(PLATFORM_BRAND_SUFFIX);
+        if (suffix) return neutralizePlatformLabel(suffix[1], words);
+        const prefix = label.match(PLATFORM_BRAND_PREFIX);
+        if (prefix) return neutralizePlatformLabel(prefix[1], words);
+        return raw;
+    }
+
+    // ============================================================================
     // BUTTONS
     // ============================================================================
 
@@ -1143,6 +1217,7 @@ const UIComponents = (() => {
         profileAvatarSticker,
         profileInitial,
         renderProfileAvatar,
+        neutralizePlatformLabel,
         createButton,
         flashButtonSuccess,
         createToggleButton,

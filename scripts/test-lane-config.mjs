@@ -203,9 +203,11 @@ const STUDY_TESTS = Object.freeze([
 const COMPANION_TESTS = Object.freeze([
   'tests/runtime/mascots.test.mjs',
 ]);
-// Profile avatars (Android ProfileAvatarCodec) and the profile picker's look.
+// App parity: profile avatars (Android ProfileAvatarCodec), the profile picker's look and the
+// neutral terminology guard (docs/app/design-system/TERMINOLOGY.md in the app repo).
 const PROFILE_AVATAR_TESTS = Object.freeze([
   'tests/runtime/profile-avatar-roundtrip.test.mjs',
+  'tests/runtime/neutral-terminology.test.mjs',
 ]);
 const VIDEO_NOTES_TESTS = Object.freeze([
   'tests/runtime/video-notes-contract.test.mjs',

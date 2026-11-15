@@ -2619,5 +2619,18 @@
   "blockTubeExport.reason.kids_rules_not_merged_into_main_export": "套用喺主站嘅額外 Kids 規則（請另外匯出 Kids 規則）",
   "blockTubeExport.matchedByName": "按準確頻道名稱配對（冇已驗證頻道 ID）：{count} — {names}",
   "profiles.avatarPickerTitle": "為 {name} 揀頭像",
-  "parentMode.hereBrowser": "喺呢個瀏覽器"
+  "parentMode.hereBrowser": "喺呢個瀏覽器",
+  "platformLabel.clips": "短片",
+  "platformLabel.followingTab": "追蹤中",
+  "platformLabel.follow": "追蹤",
+  "platformLabel.followingState": "追蹤中",
+  "platformLabel.saved": "已儲存",
+  "platformLabel.popular": "熱門",
+  "platformLabel.posts": "帖文",
+  "platformLabel.paidChat": "付費聊天",
+  "platformLabel.music": "桑吉特",
+  "platformLabel.kids": "兒童",
+  "platformLabel.autoPlaylist": "自動播放清單",
+  "platformLabel.autoPlaylists": "自動播放清單",
+  "platformLabel.autoPlaylistNamed": "自動播放清單 · {name}"
 }

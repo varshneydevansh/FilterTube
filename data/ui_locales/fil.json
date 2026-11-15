@@ -2619,5 +2619,18 @@
   "blockTubeExport.reason.kids_rules_not_merged_into_main_export": "Mga dagdag na rule ng Kids na inilapat sa Main (i-export nang hiwalay ang mga rule ng Kids)",
   "blockTubeExport.matchedByName": "Tumugma sa eksaktong pangalan ng channel (walang beripikadong channel ID): {count} — {names}",
   "profiles.avatarPickerTitle": "Pumili ng avatar para kay {name}",
-  "parentMode.hereBrowser": "Sa browser na ito"
+  "parentMode.hereBrowser": "Sa browser na ito",
+  "platformLabel.clips": "Clips",
+  "platformLabel.followingTab": "Sinusundan",
+  "platformLabel.follow": "I-follow",
+  "platformLabel.followingState": "Sinusundan",
+  "platformLabel.saved": "Naka-save",
+  "platformLabel.popular": "Sikat",
+  "platformLabel.posts": "Mga post",
+  "platformLabel.paidChat": "Bayad na chat",
+  "platformLabel.music": "Sangeet",
+  "platformLabel.kids": "Bata",
+  "platformLabel.autoPlaylist": "Auto playlist",
+  "platformLabel.autoPlaylists": "Mga auto playlist",
+  "platformLabel.autoPlaylistNamed": "Auto playlist · {name}"
 }

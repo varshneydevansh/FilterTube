@@ -2619,5 +2619,18 @@
   "blockTubeExport.reason.kids_rules_not_merged_into_main_export": "Дополнительные правила детского режима, применённые в Основном (экспортируйте правила детского режима отдельно)",
   "blockTubeExport.matchedByName": "Совпадение по точному названию канала (нет подтверждённого ID канала): {count} — {names}",
   "profiles.avatarPickerTitle": "Выберите аватар для {name}",
-  "parentMode.hereBrowser": "В этом браузере"
+  "parentMode.hereBrowser": "В этом браузере",
+  "platformLabel.clips": "Клипы",
+  "platformLabel.followingTab": "Подписки",
+  "platformLabel.follow": "Подписаться",
+  "platformLabel.followingState": "Вы подписаны",
+  "platformLabel.saved": "Сохранено",
+  "platformLabel.popular": "Популярное",
+  "platformLabel.posts": "Публикации",
+  "platformLabel.paidChat": "Платный чат",
+  "platformLabel.music": "Сангит",
+  "platformLabel.kids": "Детский",
+  "platformLabel.autoPlaylist": "Автоплейлист",
+  "platformLabel.autoPlaylists": "Автоплейлисты",
+  "platformLabel.autoPlaylistNamed": "Автоплейлист · {name}"
 }

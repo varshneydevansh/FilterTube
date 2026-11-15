@@ -955,7 +955,7 @@ function showManagedViewingBlockedOverlay(decision) {
 
         const fallbackProfileName = managedOverlayText('managedOverlay.profile.this', 'This profile');
         const profileName = String(decision.profileName || fallbackProfileName).trim() || fallbackProfileName;
-        const surfaceLabel = decision.surface === 'kids' ? 'YouTube Kids' : 'YouTube';
+        const surfaceLabel = decision.surface === 'kids' ? managedOverlayText('family.commandCenter.surface.kids', 'Kids') : managedOverlayText('family.commandCenter.surface.main', 'Main');
         overlay.innerHTML = '';
         appendManagedOverlayBackground(overlay);
 
@@ -1254,7 +1254,7 @@ function showManagedTimeLimitStatus(state) {
 
         const fallbackProfileName = managedOverlayText('managedOverlay.profile.protected', 'Protected profile');
         const profileName = String(state.profileName || fallbackProfileName).trim() || fallbackProfileName;
-        const surfaceLabel = state.surface === 'kids' ? 'YouTube Kids' : 'YouTube';
+        const surfaceLabel = state.surface === 'kids' ? managedOverlayText('family.commandCenter.surface.kids', 'Kids') : managedOverlayText('family.commandCenter.surface.main', 'Main');
         const timeLeft = formatManagedTimeRemaining(remainingSeconds);
         status.textContent = managedOverlayText(
             'managedOverlay.timeRemaining.status',
@@ -1309,7 +1309,7 @@ function showManagedTimeoutOverlay(state) {
 
         const fallbackProfileName = managedOverlayText('managedOverlay.profile.this', 'This profile');
         const profileName = String(state?.profileName || fallbackProfileName).trim() || fallbackProfileName;
-        const surfaceLabel = state?.surface === 'kids' ? 'YouTube Kids' : 'YouTube';
+        const surfaceLabel = state?.surface === 'kids' ? managedOverlayText('family.commandCenter.surface.kids', 'Kids') : managedOverlayText('family.commandCenter.surface.main', 'Main');
         const timezone = String(state?.timezone || '').trim();
         const resetCopy = timezone
             ? managedOverlayText('managedOverlay.reset.midnight', 'Resets at midnight ({timezone}).', { timezone })

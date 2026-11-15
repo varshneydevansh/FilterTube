@@ -244,7 +244,7 @@ function organizeHelpReadingOrder(helpView) {
         'Device Update Details',
         'Advanced Profile and PIN Reference',
         'Backup And Restore Details',
-        'YouTube Kids',
+        'Kids',
         'Button And Badge Glossary',
         'How FilterTube Works',
         'Channel ID Details',
@@ -404,7 +404,10 @@ function renderDashboardLocalPlaylists() {
             row.className = 'dashboard-local-playlists__item';
             const name = document.createElement('span');
             name.className = 'dashboard-local-playlists__name';
-            name.textContent = playlist.name;
+            // The local "Watch later" keeps its stored name for sync; screens call it Saved (Android LocalPlaylist.displayName).
+            name.textContent = contract.isWatchLater?.(playlist)
+                ? (window.UIComponents?.neutralizePlatformLabel?.('Watch later') || 'Saved')
+                : playlist.name;
             const meta = document.createElement('span');
             meta.className = 'dashboard-local-playlists__meta';
             const count = contract.entries(playlist).length;
@@ -13142,7 +13145,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                 ruleType: managedBulkRuleTypeLabel(type),
                 profileCount: eligibleIds.length,
                 profileNoun: tabViewUiText(eligibleIds.length === 1 ? 'dashboard.managedLists.profileSingular' : 'dashboard.managedLists.profilePlural', eligibleIds.length === 1 ? 'profile' : 'profiles'),
-                surface: surface === 'kids' ? 'YouTube Kids' : 'Main YouTube'
+                surface: surface === 'kids' ? tabViewUiText('family.commandCenter.surface.kids', 'Kids') : tabViewUiText('family.commandCenter.surface.main', 'Main')
             }),
             confirmText: tabViewUiText('dashboard.managedLists.addToProfiles', 'Add to {count} {profileNoun}', {
                 count: eligibleIds.length,
@@ -13219,7 +13222,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                 message: tabViewUiText('dashboard.managedLists.sendRuleUpdateMessage', '{profileCount} changed {profileNoun} have a verified delivery path. Send the {surface} {ruleType} rule update to those devices now.', {
                     profileCount: readyProfileCount,
                     profileNoun: tabViewUiText(readyProfileCount === 1 ? 'dashboard.managedLists.profileHas' : 'dashboard.managedLists.profilesHave', readyProfileCount === 1 ? 'profile has' : 'profiles have'),
-                    surface: surface === 'kids' ? 'YouTube Kids' : 'Main YouTube',
+                    surface: surface === 'kids' ? tabViewUiText('family.commandCenter.surface.kids', 'Kids') : tabViewUiText('family.commandCenter.surface.main', 'Main'),
                     ruleType: managedBulkRuleTypeLabel(type)
                 }),
                 confirmText: tabViewUiText('dashboard.managedLists.sendUpdate', 'Send Update'),
@@ -25605,7 +25608,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                 : 'Rule source applies only to keyword, channel, blocked-video, and rule-bundle sends.';
         }
         if (ftNanahGranularSurfaceHint) {
-            const surfaceLabel = ftNanahGranularSurface?.value === 'kids' ? 'YouTube Kids' : 'YouTube Main';
+            const surfaceLabel = ftNanahGranularSurface?.value === 'kids' ? tabViewUiText('family.commandCenter.surface.kids', 'Kids') : tabViewUiText('family.commandCenter.surface.main', 'Main');
             setTabViewLocalizedCopy(ftNanahGranularSurfaceHint, 'textContent', 'dashboard.sync.hint.granularSurfaceSource', '{scope} sends will use {surface} rules from this local profile.', {
                 scope: getNanahScopeLabel(scope),
                 surface: surfaceLabel
@@ -29215,7 +29218,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             const choice = await showChoiceModal({
                 title: tabViewUiText('blockTubeExport.reviewTitle', 'Review BlockTube export'),
                 focusCancel: true,
-                message: `${report.profileName} · ${surface === 'kids' ? 'YouTube Kids' : 'Main YouTube'}`,
+                message: `${report.profileName} · ${surface === 'kids' ? tabViewUiText('family.commandCenter.surface.kids', 'Kids') : tabViewUiText('family.commandCenter.surface.main', 'Main')}`,
                 details,
                 choices: report.canExport ? [{ value: 'download', label: omitted.size
                     ? tabViewUiText('blockTubeExport.acceptOmissions', 'Download compatible rules; leave listed items out')

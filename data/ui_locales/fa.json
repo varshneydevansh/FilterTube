@@ -2619,5 +2619,18 @@
   "blockTubeExport.reason.kids_rules_not_merged_into_main_export": "قواعد اضافی Kids که در اصلی اعمال شده‌اند (قواعد Kids را جداگانه صادر کنید)",
   "blockTubeExport.matchedByName": "تطبیق با نام دقیق کانال (بدون شناسهٔ کانال تأییدشده): {count} — {names}",
   "profiles.avatarPickerTitle": "یک آواتار برای {name} انتخاب کنید",
-  "parentMode.hereBrowser": "در این مرورگر"
+  "parentMode.hereBrowser": "در این مرورگر",
+  "platformLabel.clips": "کلیپ‌ها",
+  "platformLabel.followingTab": "دنبال‌شده‌ها",
+  "platformLabel.follow": "دنبال کردن",
+  "platformLabel.followingState": "دنبال می‌کنید",
+  "platformLabel.saved": "ذخیره‌شده",
+  "platformLabel.popular": "محبوب",
+  "platformLabel.posts": "پست‌ها",
+  "platformLabel.paidChat": "گفت‌وگوی پولی",
+  "platformLabel.music": "سنگیت",
+  "platformLabel.kids": "کودک",
+  "platformLabel.autoPlaylist": "فهرست پخش خودکار",
+  "platformLabel.autoPlaylists": "فهرست‌های پخش خودکار",
+  "platformLabel.autoPlaylistNamed": "فهرست پخش خودکار · {name}"
 }

@@ -2619,5 +2619,18 @@
   "blockTubeExport.reason.kids_rules_not_merged_into_main_export": "முதன்மையில் பயன்படுத்தப்பட்ட கூடுதல் குழந்தைகள் விதிகள் (குழந்தைகள் விதிகளைத் தனியாக ஏற்றுமதி செய்யவும்)",
   "blockTubeExport.matchedByName": "சரியான சேனல் பெயரால் பொருந்தியது (சரிபார்க்கப்பட்ட சேனல் ID இல்லை): {count} — {names}",
   "profiles.avatarPickerTitle": "{name}-க்கான அவதாரத்தைத் தேர்ந்தெடுக்கவும்",
-  "parentMode.hereBrowser": "இந்த உலாவியில்"
+  "parentMode.hereBrowser": "இந்த உலாவியில்",
+  "platformLabel.clips": "கிளிப்புகள்",
+  "platformLabel.followingTab": "பின்தொடர்பவை",
+  "platformLabel.follow": "பின்தொடர்",
+  "platformLabel.followingState": "பின்தொடர்கிறீர்கள்",
+  "platformLabel.saved": "சேமிக்கப்பட்டது",
+  "platformLabel.popular": "பிரபலமானவை",
+  "platformLabel.posts": "இடுகைகள்",
+  "platformLabel.paidChat": "கட்டண அரட்டை",
+  "platformLabel.music": "சங்கீத்",
+  "platformLabel.kids": "குழந்தைகள்",
+  "platformLabel.autoPlaylist": "தானியங்கு பிளேலிஸ்ட்",
+  "platformLabel.autoPlaylists": "தானியங்கு பிளேலிஸ்ட்கள்",
+  "platformLabel.autoPlaylistNamed": "தானியங்கு பிளேலிஸ்ட் · {name}"
 }

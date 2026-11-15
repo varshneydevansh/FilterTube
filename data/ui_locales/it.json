@@ -2619,5 +2619,18 @@
   "blockTubeExport.reason.kids_rules_not_merged_into_main_export": "Regole Kids aggiuntive applicate su Principale (esporta le regole Kids separatamente)",
   "blockTubeExport.matchedByName": "Corrispondenza per nome esatto del canale (nessun ID canale verificato): {count} — {names}",
   "profiles.avatarPickerTitle": "Scegli un avatar per {name}",
-  "parentMode.hereBrowser": "In questo browser"
+  "parentMode.hereBrowser": "In questo browser",
+  "platformLabel.clips": "Clip",
+  "platformLabel.followingTab": "Seguiti",
+  "platformLabel.follow": "Segui",
+  "platformLabel.followingState": "Segui già",
+  "platformLabel.saved": "Salvato",
+  "platformLabel.popular": "Popolari",
+  "platformLabel.posts": "Post",
+  "platformLabel.paidChat": "Chat a pagamento",
+  "platformLabel.music": "Sangeet",
+  "platformLabel.kids": "Bambini",
+  "platformLabel.autoPlaylist": "Playlist automatica",
+  "platformLabel.autoPlaylists": "Playlist automatiche",
+  "platformLabel.autoPlaylistNamed": "Playlist automatica · {name}"
 }

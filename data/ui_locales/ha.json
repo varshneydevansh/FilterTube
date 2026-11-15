@@ -2619,5 +2619,18 @@
   "blockTubeExport.reason.kids_rules_not_merged_into_main_export": "Ƙarin dokokin Kids da aka aiwatar a Babba (fitar da dokokin Kids daban)",
   "blockTubeExport.matchedByName": "An daidaita ta ainihin sunan tasha (babu tabbataccen ID na tasha): {count} — {names}",
   "profiles.avatarPickerTitle": "Zaɓi hoton avatar don {name}",
-  "parentMode.hereBrowser": "A wannan mai bincike"
+  "parentMode.hereBrowser": "A wannan mai bincike",
+  "platformLabel.clips": "Gajerun bidiyo",
+  "platformLabel.followingTab": "Ana bi",
+  "platformLabel.follow": "Bi",
+  "platformLabel.followingState": "Ana bi",
+  "platformLabel.saved": "An ajiye",
+  "platformLabel.popular": "Shahararru",
+  "platformLabel.posts": "Wallafe-wallafe",
+  "platformLabel.paidChat": "Hira da aka biya",
+  "platformLabel.music": "Sangeet",
+  "platformLabel.kids": "Yara",
+  "platformLabel.autoPlaylist": "Jerin kunnawa na atomatik",
+  "platformLabel.autoPlaylists": "Jerin kunnawa na atomatik",
+  "platformLabel.autoPlaylistNamed": "Jerin kunnawa na atomatik · {name}"
 }

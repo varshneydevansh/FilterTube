@@ -2619,5 +2619,18 @@
   "blockTubeExport.reason.kids_rules_not_merged_into_main_export": "مرکزی پر لاگو اضافی Kids قواعد (Kids قواعد الگ سے برآمد کریں)",
   "blockTubeExport.matchedByName": "عین چینل نام سے مماثل (تصدیق شدہ چینل ID نہیں): {count} — {names}",
   "profiles.avatarPickerTitle": "{name} کے لیے اوتار منتخب کریں",
-  "parentMode.hereBrowser": "اس براؤزر میں"
+  "parentMode.hereBrowser": "اس براؤزر میں",
+  "platformLabel.clips": "کلپس",
+  "platformLabel.followingTab": "فالو کردہ",
+  "platformLabel.follow": "فالو کریں",
+  "platformLabel.followingState": "فالو کر رہے ہیں",
+  "platformLabel.saved": "محفوظ کیا گیا",
+  "platformLabel.popular": "مقبول",
+  "platformLabel.posts": "پوسٹس",
+  "platformLabel.paidChat": "ادا شدہ چیٹ",
+  "platformLabel.music": "سنگیت",
+  "platformLabel.kids": "بچے",
+  "platformLabel.autoPlaylist": "خودکار پلے لسٹ",
+  "platformLabel.autoPlaylists": "خودکار پلے لسٹس",
+  "platformLabel.autoPlaylistNamed": "خودکار پلے لسٹ · {name}"
 }

@@ -2619,5 +2619,18 @@
   "blockTubeExport.reason.kids_rules_not_merged_into_main_export": "Quy tắc Kids bổ sung áp dụng trên Chính (xuất quy tắc Kids riêng)",
   "blockTubeExport.matchedByName": "Khớp theo đúng tên kênh (không có ID kênh đã xác minh): {count} — {names}",
   "profiles.avatarPickerTitle": "Chọn ảnh đại diện cho {name}",
-  "parentMode.hereBrowser": "Trong trình duyệt này"
+  "parentMode.hereBrowser": "Trong trình duyệt này",
+  "platformLabel.clips": "Video ngắn",
+  "platformLabel.followingTab": "Đang theo dõi",
+  "platformLabel.follow": "Theo dõi",
+  "platformLabel.followingState": "Đang theo dõi",
+  "platformLabel.saved": "Đã lưu",
+  "platformLabel.popular": "Phổ biến",
+  "platformLabel.posts": "Bài đăng",
+  "platformLabel.paidChat": "Trò chuyện trả phí",
+  "platformLabel.music": "Sangeet",
+  "platformLabel.kids": "Trẻ em",
+  "platformLabel.autoPlaylist": "Danh sách phát tự động",
+  "platformLabel.autoPlaylists": "Danh sách phát tự động",
+  "platformLabel.autoPlaylistNamed": "Danh sách phát tự động · {name}"
 }

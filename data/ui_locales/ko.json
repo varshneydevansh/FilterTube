@@ -2619,5 +2619,18 @@
   "blockTubeExport.reason.kids_rules_not_merged_into_main_export": "메인에 적용된 추가 키즈 규칙(키즈 규칙은 별도로 내보내기)",
   "blockTubeExport.matchedByName": "정확한 채널 이름으로 일치(확인된 채널 ID 없음): {count} — {names}",
   "profiles.avatarPickerTitle": "{name}의 아바타 선택",
-  "parentMode.hereBrowser": "이 브라우저에서"
+  "parentMode.hereBrowser": "이 브라우저에서",
+  "platformLabel.clips": "숏폼",
+  "platformLabel.followingTab": "팔로잉",
+  "platformLabel.follow": "팔로우",
+  "platformLabel.followingState": "팔로잉",
+  "platformLabel.saved": "저장됨",
+  "platformLabel.popular": "인기",
+  "platformLabel.posts": "게시물",
+  "platformLabel.paidChat": "유료 채팅",
+  "platformLabel.music": "상기트",
+  "platformLabel.kids": "키즈",
+  "platformLabel.autoPlaylist": "자동 재생목록",
+  "platformLabel.autoPlaylists": "자동 재생목록",
+  "platformLabel.autoPlaylistNamed": "자동 재생목록 · {name}"
 }

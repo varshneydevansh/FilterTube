@@ -2619,5 +2619,18 @@
   "blockTubeExport.reason.kids_rules_not_merged_into_main_export": "مرکزی تے لاگو ہور بچے اصول (بچے اصول وکھرے برآمد کرو)",
   "blockTubeExport.matchedByName": "درست چینل ناں نال ملیا (کوئی تصدیق شدہ چینل ID نہیں): {count} — {names}",
   "profiles.avatarPickerTitle": "{name} لئی اوتار چُنو",
-  "parentMode.hereBrowser": "ایس براؤزر وچ"
+  "parentMode.hereBrowser": "ایس براؤزر وچ",
+  "platformLabel.clips": "کلپاں",
+  "platformLabel.followingTab": "فالو کیتے",
+  "platformLabel.follow": "فالو کرو",
+  "platformLabel.followingState": "فالو کر رہے او",
+  "platformLabel.saved": "سیو کیتا",
+  "platformLabel.popular": "مشہور",
+  "platformLabel.posts": "پوسٹاں",
+  "platformLabel.paidChat": "پیسیاں والی چیٹ",
+  "platformLabel.music": "سنگیت",
+  "platformLabel.kids": "بچے",
+  "platformLabel.autoPlaylist": "آٹو پلے لسٹ",
+  "platformLabel.autoPlaylists": "آٹو پلے لسٹاں",
+  "platformLabel.autoPlaylistNamed": "آٹو پلے لسٹ · {name}"
 }

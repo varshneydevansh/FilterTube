@@ -2619,5 +2619,18 @@
   "blockTubeExport.reason.kids_rules_not_merged_into_main_export": "በዋና ላይ የተተገበሩ ተጨማሪ የKids ደንቦች (የKids ደንቦችን ለብቻ ይላኩ)",
   "blockTubeExport.matchedByName": "በትክክለኛ የቻናል ስም የተዛመዱ (የተረጋገጠ Channel ID የሌላቸው)፦ {count} — {names}",
   "profiles.avatarPickerTitle": "ለ{name} አምሳያ ይምረጡ",
-  "parentMode.hereBrowser": "በዚህ አሳሽ ውስጥ"
+  "parentMode.hereBrowser": "በዚህ አሳሽ ውስጥ",
+  "platformLabel.clips": "ቅንጥቦች",
+  "platformLabel.followingTab": "የሚከተሏቸው",
+  "platformLabel.follow": "ተከተል",
+  "platformLabel.followingState": "እየተከተሉ ነው",
+  "platformLabel.saved": "ተቀምጧል",
+  "platformLabel.popular": "ታዋቂ",
+  "platformLabel.posts": "ልጥፎች",
+  "platformLabel.paidChat": "የሚከፈልበት ውይይት",
+  "platformLabel.music": "ሳንጊት",
+  "platformLabel.kids": "ልጆች",
+  "platformLabel.autoPlaylist": "ራስ-ሰር አጫዋች ዝርዝር",
+  "platformLabel.autoPlaylists": "ራስ-ሰር አጫዋች ዝርዝሮች",
+  "platformLabel.autoPlaylistNamed": "ራስ-ሰር አጫዋች ዝርዝር · {name}"
 }

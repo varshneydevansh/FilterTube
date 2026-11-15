@@ -2619,5 +2619,18 @@
   "blockTubeExport.reason.kids_rules_not_merged_into_main_export": "Aturan Kids tambahan sing ditrapake ing Utama (ekspor aturan Kids kanthi kapisah)",
   "blockTubeExport.matchedByName": "Dicocogake miturut jeneng saluran sing pas (tanpa ID saluran sing wis diverifikasi): {count} — {names}",
   "profiles.avatarPickerTitle": "Pilih avatar kanggo {name}",
-  "parentMode.hereBrowser": "Ing browser iki"
+  "parentMode.hereBrowser": "Ing browser iki",
+  "platformLabel.clips": "Klip",
+  "platformLabel.followingTab": "Ngikuti",
+  "platformLabel.follow": "Ikuti",
+  "platformLabel.followingState": "Ngikuti",
+  "platformLabel.saved": "Disimpen",
+  "platformLabel.popular": "Populer",
+  "platformLabel.posts": "Kiriman",
+  "platformLabel.paidChat": "Obrolan mbayar",
+  "platformLabel.music": "Sangeet",
+  "platformLabel.kids": "Bocah",
+  "platformLabel.autoPlaylist": "Dhaptar puter otomatis",
+  "platformLabel.autoPlaylists": "Dhaptar puter otomatis",
+  "platformLabel.autoPlaylistNamed": "Dhaptar puter otomatis · {name}"
 }

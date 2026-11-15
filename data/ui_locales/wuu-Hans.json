@@ -2619,5 +2619,18 @@
   "blockTubeExport.reason.kids_rules_not_merged_into_main_export": "用到主站上个额外 Kids 规则（Kids 规则要另外导出）",
   "blockTubeExport.matchedByName": "按准确频道名称匹配（呒没已验证频道 ID）：{count} — {names}",
   "profiles.avatarPickerTitle": "为 {name} 选只头像",
-  "parentMode.hereBrowser": "勒迭只浏览器里"
+  "parentMode.hereBrowser": "勒迭只浏览器里",
+  "platformLabel.clips": "短视频",
+  "platformLabel.followingTab": "关注",
+  "platformLabel.follow": "关注",
+  "platformLabel.followingState": "已关注",
+  "platformLabel.saved": "已存起来",
+  "platformLabel.popular": "热门",
+  "platformLabel.posts": "帖子",
+  "platformLabel.paidChat": "付费聊天",
+  "platformLabel.music": "桑吉特",
+  "platformLabel.kids": "小囡",
+  "platformLabel.autoPlaylist": "自动播放列表",
+  "platformLabel.autoPlaylists": "自动播放列表",
+  "platformLabel.autoPlaylistNamed": "自动播放列表 · {name}"
 }

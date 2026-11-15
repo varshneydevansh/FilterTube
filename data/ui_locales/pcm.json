@@ -2619,5 +2619,18 @@
   "blockTubeExport.reason.kids_rules_not_merged_into_main_export": "Extra Kids rules wey dey apply for Main (export Kids rules separately)",
   "blockTubeExport.matchedByName": "Match by exact channel name (no verified channel ID): {count} — {names}",
   "profiles.avatarPickerTitle": "Choose avatar for {name}",
-  "parentMode.hereBrowser": "For dis browser"
+  "parentMode.hereBrowser": "For dis browser",
+  "platformLabel.clips": "Clips",
+  "platformLabel.followingTab": "Following",
+  "platformLabel.follow": "Follow",
+  "platformLabel.followingState": "Dey follow",
+  "platformLabel.saved": "Don save",
+  "platformLabel.popular": "Popular",
+  "platformLabel.posts": "Posts",
+  "platformLabel.paidChat": "Paid chat",
+  "platformLabel.music": "Sangeet",
+  "platformLabel.kids": "Pikin",
+  "platformLabel.autoPlaylist": "Auto playlist",
+  "platformLabel.autoPlaylists": "Auto playlists",
+  "platformLabel.autoPlaylistNamed": "Auto playlist · {name}"
 }
