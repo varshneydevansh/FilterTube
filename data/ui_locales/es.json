@@ -2632,5 +2632,13 @@
   "platformLabel.kids": "Infantil",
   "platformLabel.autoPlaylist": "Lista automática",
   "platformLabel.autoPlaylists": "Listas automáticas",
-  "platformLabel.autoPlaylistNamed": "Lista automática · {name}"
+  "platformLabel.autoPlaylistNamed": "Lista automática · {name}",
+  "mascot.moment.loading": "Separando lo bueno…",
+  "mascot.moment.noMatches": "Nada por aquí. Prueba con menos palabras.",
+  "mascot.moment.error": "No se pudo cargar. Inténtalo de nuevo.",
+  "mascot.sounds.title": "Sonidos",
+  "mascot.sounds.off": "Desactivado",
+  "mascot.sounds.gentle": "Suave",
+  "mascot.sounds.playful": "Divertido",
+  "mascot.sounds.description": "Suave: sonidos tenues solo en los grandes momentos, como al cumplir una meta. Divertido: también toques y pops."
 }

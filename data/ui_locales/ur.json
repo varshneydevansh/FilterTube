@@ -2632,5 +2632,13 @@
   "platformLabel.kids": "بچے",
   "platformLabel.autoPlaylist": "خودکار پلے لسٹ",
   "platformLabel.autoPlaylists": "خودکار پلے لسٹس",
-  "platformLabel.autoPlaylistNamed": "خودکار پلے لسٹ · {name}"
+  "platformLabel.autoPlaylistNamed": "خودکار پلے لسٹ · {name}",
+  "mascot.moment.loading": "اچھی چیزیں چھانٹ رہے ہیں…",
+  "mascot.moment.noMatches": "یہاں کچھ نہیں۔ کم الفاظ آزمائیں۔",
+  "mascot.moment.error": "لوڈ نہیں ہوا۔ دوبارہ کوشش کریں۔",
+  "mascot.sounds.title": "آوازیں",
+  "mascot.sounds.off": "بند",
+  "mascot.sounds.gentle": "نرم",
+  "mascot.sounds.playful": "چنچل",
+  "mascot.sounds.description": "نرم: صرف بڑے لمحوں پر ہلکی آواز، جیسے ہدف پورا ہونے پر۔ چنچل: ٹیپ اور پاپ بھی۔"
 }

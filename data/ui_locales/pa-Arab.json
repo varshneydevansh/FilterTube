@@ -2632,5 +2632,13 @@
   "platformLabel.kids": "بچے",
   "platformLabel.autoPlaylist": "آٹو پلے لسٹ",
   "platformLabel.autoPlaylists": "آٹو پلے لسٹاں",
-  "platformLabel.autoPlaylistNamed": "آٹو پلے لسٹ · {name}"
+  "platformLabel.autoPlaylistNamed": "آٹو پلے لسٹ · {name}",
+  "mascot.moment.loading": "چنگیاں چیزاں چھانٹ رہے آں…",
+  "mascot.moment.noMatches": "ایتھے کجھ نئیں۔ گھٹ لفظ ورتو۔",
+  "mascot.moment.error": "لوڈ نئیں ہویا۔ فیر کوشش کرو۔",
+  "mascot.sounds.title": "آوازاں",
+  "mascot.sounds.off": "بند",
+  "mascot.sounds.gentle": "ہولی",
+  "mascot.sounds.playful": "چنچل",
+  "mascot.sounds.description": "ہولی: صرف وڈے پلاں لئی نرم آواز، جویں ٹیچا پورا ہون تے۔ چنچل: ٹیپ تے پاپ وی۔"
 }

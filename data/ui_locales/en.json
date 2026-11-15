@@ -2769,5 +2769,13 @@
   "platformLabel.kids": "Kids",
   "platformLabel.autoPlaylist": "Auto playlist",
   "platformLabel.autoPlaylists": "Auto playlists",
-  "platformLabel.autoPlaylistNamed": "Auto playlist · {name}"
+  "platformLabel.autoPlaylistNamed": "Auto playlist · {name}",
+  "mascot.moment.loading": "Sorting the good stuff…",
+  "mascot.moment.noMatches": "Nothing here. Try fewer words.",
+  "mascot.moment.error": "That didn't load. Try again.",
+  "mascot.sounds.title": "Sounds",
+  "mascot.sounds.off": "Off",
+  "mascot.sounds.gentle": "Gentle",
+  "mascot.sounds.playful": "Playful",
+  "mascot.sounds.description": "Gentle plays soft sounds for big moments, like a goal met. Playful adds taps and pops."
 }

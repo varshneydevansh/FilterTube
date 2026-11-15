@@ -2632,5 +2632,13 @@
   "platformLabel.kids": "キッズ",
   "platformLabel.autoPlaylist": "自動プレイリスト",
   "platformLabel.autoPlaylists": "自動プレイリスト",
-  "platformLabel.autoPlaylistNamed": "自動プレイリスト · {name}"
+  "platformLabel.autoPlaylistNamed": "自動プレイリスト · {name}",
+  "mascot.moment.loading": "いいものを選り分け中…",
+  "mascot.moment.noMatches": "見つかりませんでした。言葉を減らしてみてください。",
+  "mascot.moment.error": "読み込めませんでした。もう一度お試しください。",
+  "mascot.sounds.title": "サウンド",
+  "mascot.sounds.off": "オフ",
+  "mascot.sounds.gentle": "おだやか",
+  "mascot.sounds.playful": "にぎやか",
+  "mascot.sounds.description": "おだやか：目標達成など、大きな場面だけでやさしい音。にぎやか：タップやポンという音も。"
 }

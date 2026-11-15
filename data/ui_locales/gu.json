@@ -2632,5 +2632,13 @@
   "platformLabel.kids": "બાળકો",
   "platformLabel.autoPlaylist": "ઑટો પ્લેલિસ્ટ",
   "platformLabel.autoPlaylists": "ઑટો પ્લેલિસ્ટ",
-  "platformLabel.autoPlaylistNamed": "ઑટો પ્લેલિસ્ટ · {name}"
+  "platformLabel.autoPlaylistNamed": "ઑટો પ્લેલિસ્ટ · {name}",
+  "mascot.moment.loading": "સારી વસ્તુઓ છટણી કરી રહ્યાં છીએ…",
+  "mascot.moment.noMatches": "અહીં કંઈ નથી. ઓછા શબ્દો અજમાવો.",
+  "mascot.moment.error": "લોડ ન થયું. ફરી પ્રયાસ કરો.",
+  "mascot.sounds.title": "અવાજ",
+  "mascot.sounds.off": "બંધ",
+  "mascot.sounds.gentle": "હળવો",
+  "mascot.sounds.playful": "રમતિયાળ",
+  "mascot.sounds.description": "હળવો: ફક્ત મોટી પળો માટે નરમ અવાજ, જેમ કે લક્ષ્ય પૂરું થાય ત્યારે. રમતિયાળ: ટૅપ અને પૉપ પણ."
 }

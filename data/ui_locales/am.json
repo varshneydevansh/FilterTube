@@ -2632,5 +2632,13 @@
   "platformLabel.kids": "ልጆች",
   "platformLabel.autoPlaylist": "ራስ-ሰር አጫዋች ዝርዝር",
   "platformLabel.autoPlaylists": "ራስ-ሰር አጫዋች ዝርዝሮች",
-  "platformLabel.autoPlaylistNamed": "ራስ-ሰር አጫዋች ዝርዝር · {name}"
+  "platformLabel.autoPlaylistNamed": "ራስ-ሰር አጫዋች ዝርዝር · {name}",
+  "mascot.moment.loading": "ጥሩዎቹን እየለየን ነው…",
+  "mascot.moment.noMatches": "እዚህ ምንም የለም። ያነሱ ቃላትን ይሞክሩ።",
+  "mascot.moment.error": "አልተጫነም። እንደገና ይሞክሩ።",
+  "mascot.sounds.title": "ድምፆች",
+  "mascot.sounds.off": "ጠፍቷል",
+  "mascot.sounds.gentle": "ረጋ ያለ",
+  "mascot.sounds.playful": "ተጫዋች",
+  "mascot.sounds.description": "ረጋ ያለ ለትልልቅ ጊዜያት ብቻ፣ ለምሳሌ ግብ ሲደረስ፣ ለስላሳ ድምፅ ያሰማል። ተጫዋች መታ ማድረግና ፖፕ ይጨምራል።"
 }

@@ -2632,5 +2632,13 @@
   "platformLabel.kids": "Kinder",
   "platformLabel.autoPlaylist": "Automatische Playlist",
   "platformLabel.autoPlaylists": "Automatische Playlists",
-  "platformLabel.autoPlaylistNamed": "Automatische Playlist · {name}"
+  "platformLabel.autoPlaylistNamed": "Automatische Playlist · {name}",
+  "mascot.moment.loading": "Das Gute wird sortiert…",
+  "mascot.moment.noMatches": "Nichts gefunden. Versuch es mit weniger Wörtern.",
+  "mascot.moment.error": "Das hat nicht geladen. Versuch es noch mal.",
+  "mascot.sounds.title": "Töne",
+  "mascot.sounds.off": "Aus",
+  "mascot.sounds.gentle": "Sanft",
+  "mascot.sounds.playful": "Verspielt",
+  "mascot.sounds.description": "Sanft: leise Töne nur für große Momente, etwa ein erreichtes Ziel. Verspielt: auch Tippen und Plopp."
 }

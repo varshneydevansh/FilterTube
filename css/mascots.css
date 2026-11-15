@@ -1,4 +1,4 @@
-/* FilterTube companions (js/mascots.js): Bindu in the popup counter, Kriti, Kagaz and Mohar.
+/* FilterTube companions (js/mascots.js): Kriti and Uljhan, with a sparkle doodle by the popup counter.
  * Lines sit on a paper card: cream stock, ink text, a hairline edge and a short tail toward the speaker.
  * Motion uses transform and opacity only; prefers-reduced-motion drops to instant or opacity-only. */
 
@@ -172,7 +172,7 @@ button.ft-mascot__figure:focus-visible {
     white-space: nowrap;
 }
 
-/* ---- Popup: Bindu and the hidden counter ------------------------------------------------- */
+/* ---- Popup: the sparkle mark and the hidden counter ------------------------------------------------- */
 
 .ft-mascot-tally {
     position: relative;
@@ -352,7 +352,7 @@ html[data-theme="dark"] .ft-mascot-tally {
     transform-origin: 50% 100%;
 }
 
-/* Mohar: a short lift (anticipation), then the stamp lands with a small squash and settles. */
+/* The import cheer: a short lift (anticipation), then Kriti lands with a small squash and settles. */
 .ft-mascot--stamp.is-stamping .ft-mascot__figure {
     animation: ft-mascot-stamp 300ms var(--ft-mascot-ease-out);
 }

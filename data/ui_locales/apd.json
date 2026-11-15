@@ -2632,5 +2632,13 @@
   "platformLabel.kids": "أطفال",
   "platformLabel.autoPlaylist": "قائمة تشغيل تلقائية",
   "platformLabel.autoPlaylists": "قوائم تشغيل تلقائية",
-  "platformLabel.autoPlaylistNamed": "قائمة تشغيل تلقائية · {name}"
+  "platformLabel.autoPlaylistNamed": "قائمة تشغيل تلقائية · {name}",
+  "mascot.moment.loading": "بنفرز الحاجات الكويسة…",
+  "mascot.moment.noMatches": "ما في حاجة هنا. جرّب كلمات أقل.",
+  "mascot.moment.error": "ما اتحمّل. جرّب تاني.",
+  "mascot.sounds.title": "الأصوات",
+  "mascot.sounds.off": "مقفول",
+  "mascot.sounds.gentle": "هادي",
+  "mascot.sounds.playful": "مرح",
+  "mascot.sounds.description": "هادي: أصوات ناعمة للحظات الكبيرة بس، زي لمن تحقق هدفك. مرح: كمان نقرات وفرقعات."
 }

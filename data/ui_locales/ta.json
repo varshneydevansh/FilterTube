@@ -2632,5 +2632,13 @@
   "platformLabel.kids": "குழந்தைகள்",
   "platformLabel.autoPlaylist": "தானியங்கு பிளேலிஸ்ட்",
   "platformLabel.autoPlaylists": "தானியங்கு பிளேலிஸ்ட்கள்",
-  "platformLabel.autoPlaylistNamed": "தானியங்கு பிளேலிஸ்ட் · {name}"
+  "platformLabel.autoPlaylistNamed": "தானியங்கு பிளேலிஸ்ட் · {name}",
+  "mascot.moment.loading": "நல்லவற்றைப் பிரித்தெடுக்கிறோம்…",
+  "mascot.moment.noMatches": "இங்கே எதுவும் இல்லை. குறைவான சொற்களை முயலவும்.",
+  "mascot.moment.error": "ஏற்றப்படவில்லை. மீண்டும் முயலவும்.",
+  "mascot.sounds.title": "ஒலிகள்",
+  "mascot.sounds.off": "முடக்கு",
+  "mascot.sounds.gentle": "மென்மை",
+  "mascot.sounds.playful": "விளையாட்டு",
+  "mascot.sounds.description": "மென்மை: இலக்கை அடைவது போன்ற பெரிய தருணங்களில் மட்டும் மெல்லிய ஒலி. விளையாட்டு: தட்டல், பாப் ஒலிகளும்."
 }

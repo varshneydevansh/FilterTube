@@ -2632,5 +2632,13 @@
   "platformLabel.kids": "أطفال",
   "platformLabel.autoPlaylist": "قائمة تشغيل تلقائية",
   "platformLabel.autoPlaylists": "قوائم تشغيل تلقائية",
-  "platformLabel.autoPlaylistNamed": "قائمة تشغيل تلقائية · {name}"
+  "platformLabel.autoPlaylistNamed": "قائمة تشغيل تلقائية · {name}",
+  "mascot.moment.loading": "نفرز الأشياء الجيدة…",
+  "mascot.moment.noMatches": "لا يوجد شيء هنا. جرّب كلمات أقل.",
+  "mascot.moment.error": "لم يتم التحميل. حاول مرة أخرى.",
+  "mascot.sounds.title": "الأصوات",
+  "mascot.sounds.off": "إيقاف",
+  "mascot.sounds.gentle": "هادئ",
+  "mascot.sounds.playful": "مرِح",
+  "mascot.sounds.description": "هادئ: أصوات ناعمة للحظات الكبيرة فقط، مثل بلوغ هدف. مرِح: نقرات وفرقعات أيضًا."
 }

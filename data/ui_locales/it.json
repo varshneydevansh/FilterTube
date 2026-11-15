@@ -2632,5 +2632,13 @@
   "platformLabel.kids": "Bambini",
   "platformLabel.autoPlaylist": "Playlist automatica",
   "platformLabel.autoPlaylists": "Playlist automatiche",
-  "platformLabel.autoPlaylistNamed": "Playlist automatica · {name}"
+  "platformLabel.autoPlaylistNamed": "Playlist automatica · {name}",
+  "mascot.moment.loading": "Sto scegliendo il meglio…",
+  "mascot.moment.noMatches": "Niente qui. Prova con meno parole.",
+  "mascot.moment.error": "Non si è caricato. Riprova.",
+  "mascot.sounds.title": "Suoni",
+  "mascot.sounds.off": "Disattivato",
+  "mascot.sounds.gentle": "Delicati",
+  "mascot.sounds.playful": "Giocosi",
+  "mascot.sounds.description": "Delicati: suoni leggeri solo nei grandi momenti, come un obiettivo raggiunto. Giocosi: anche tocchi e pop."
 }

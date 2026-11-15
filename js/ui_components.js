@@ -1191,6 +1191,12 @@ const UIComponents = (() => {
         toast.textContent = message;
 
         document.body.appendChild(toast);
+        // The optional sound (Off by default) starts with the toast; the words carry the meaning.
+        try {
+            const sound = type === 'success' ? 'success' : (type === 'error' ? 'error' : '');
+            if (sound) window.FilterTubeMascots?.playSound?.(sound);
+        } catch (e) {
+        }
 
         // Trigger animation
         requestAnimationFrame(() => {

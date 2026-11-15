@@ -2632,5 +2632,13 @@
   "platformLabel.kids": "Детский",
   "platformLabel.autoPlaylist": "Автоплейлист",
   "platformLabel.autoPlaylists": "Автоплейлисты",
-  "platformLabel.autoPlaylistNamed": "Автоплейлист · {name}"
+  "platformLabel.autoPlaylistNamed": "Автоплейлист · {name}",
+  "mascot.moment.loading": "Отбираю самое хорошее…",
+  "mascot.moment.noMatches": "Ничего нет. Попробуйте меньше слов.",
+  "mascot.moment.error": "Не загрузилось. Попробуйте ещё раз.",
+  "mascot.sounds.title": "Звуки",
+  "mascot.sounds.off": "Выкл.",
+  "mascot.sounds.gentle": "Мягко",
+  "mascot.sounds.playful": "Игриво",
+  "mascot.sounds.description": "Мягко: тихие звуки только в важные моменты, например при достижении цели. Игриво: ещё касания и хлопки."
 }

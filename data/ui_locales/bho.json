@@ -2632,5 +2632,13 @@
   "platformLabel.kids": "लइका",
   "platformLabel.autoPlaylist": "ऑटो प्लेलिस्ट",
   "platformLabel.autoPlaylists": "ऑटो प्लेलिस्ट",
-  "platformLabel.autoPlaylistNamed": "ऑटो प्लेलिस्ट · {name}"
+  "platformLabel.autoPlaylistNamed": "ऑटो प्लेलिस्ट · {name}",
+  "mascot.moment.loading": "बढ़िया चीज छाँटल जा रहल बा…",
+  "mascot.moment.noMatches": "इहाँ कुछ नइखे। कम सब्द आजमाईं।",
+  "mascot.moment.error": "लोड ना भइल। फेर से कोसिस करीं।",
+  "mascot.sounds.title": "आवाज",
+  "mascot.sounds.off": "बंद",
+  "mascot.sounds.gentle": "धीमा",
+  "mascot.sounds.playful": "चंचल",
+  "mascot.sounds.description": "धीमा: खाली बड़का पल पर हल्का आवाज, जइसे लक्ष्य पूरा भइला पर। चंचल: टैप आ पॉप भी।"
 }

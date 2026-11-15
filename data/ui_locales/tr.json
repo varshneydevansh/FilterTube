@@ -2632,5 +2632,13 @@
   "platformLabel.kids": "Çocuk",
   "platformLabel.autoPlaylist": "Otomatik oynatma listesi",
   "platformLabel.autoPlaylists": "Otomatik oynatma listeleri",
-  "platformLabel.autoPlaylistNamed": "Otomatik oynatma listesi · {name}"
+  "platformLabel.autoPlaylistNamed": "Otomatik oynatma listesi · {name}",
+  "mascot.moment.loading": "İyi olanlar ayıklanıyor…",
+  "mascot.moment.noMatches": "Burada bir şey yok. Daha az kelime deneyin.",
+  "mascot.moment.error": "Yüklenemedi. Tekrar deneyin.",
+  "mascot.sounds.title": "Sesler",
+  "mascot.sounds.off": "Kapalı",
+  "mascot.sounds.gentle": "Yumuşak",
+  "mascot.sounds.playful": "Neşeli",
+  "mascot.sounds.description": "Yumuşak: yalnızca hedefe ulaşmak gibi büyük anlarda hafif sesler. Neşeli: dokunma ve pıt sesleri de."
 }

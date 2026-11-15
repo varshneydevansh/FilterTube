@@ -1,8 +1,14 @@
 /* FilterTube's companions in the extension's own pages (docs: study-mode/mascots/BIBLE.md, "Extension").
- * - Popup: Bindu, a still 20 px dot beside the hidden counter; Kriti's sieve loop once at 100, 1,000 and
+ * Kriti and Uljhan are the only characters; doodles are accents, never characters.
+ * - Popup: a still sparkle doodle beside the hidden counter; Kriti's sieve loop once at 100, 1,000 and
  *   10,000 hidden; Kriti with the upside-down sieve while the allow list (whitelist) is on.
- * - Options page: Kriti holding the logo on the first open after install; Kagaz with a blank note on empty
- *   keyword and channel lists; Mohar stamping after a backup import.
+ * - Options page: Kriti holding the logo on the first open after install; Kriti peeking over an empty
+ *   keyword or channel list; Uljhan shrugging when a search finds nothing; Kriti's thumbs up after a
+ *   backup import; Kriti waving over "Just you so far" in the profiles manager.
+ * - Moments (moment()): one pose and one line for loading, empty, nothing-found and done states, with
+ *   a slow breath (three cycles, then still) on Lively. Never on the player, a lock or a PIN screen.
+ * - Sounds (Off by default; Gentle or Playful): never carry meaning on their own, and stay silent
+ *   while the page is hidden.
  * - The Companion setting (Lively, Quiet, Off; Quiet by default) lives in chrome.storage.local beside the
  *   theme. Lively: lines appear in paper bubbles, including after events. Quiet: poses only; nothing pops
  *   up, a pose shows its line on hover, focus or click, and empty-list and welcome lines stay as plain
@@ -28,11 +34,14 @@
     const EVENT_BUBBLE_MS = 5000;
     const ASSET_DIR = 'assets/images/mascots/';
     const ASSETS = Object.freeze({
-        bindu: 'bindu_dot.webp',
+        counterMark: '../doodles/sparkle.webp',
         kritiLogo: 'kriti_logo.webp',
         kritiAllow: 'kriti_allow_sieve.webp',
-        kagazNote: 'kagaz_note.webp',
-        moharStamp: 'mohar_stamp.webp',
+        kritiPeek: 'kriti_peek.webp',
+        kritiThumbsUp: 'kriti_thumbsup.webp',
+        kritiWave: 'kriti_wave.webp',
+        kritiReading: 'kriti_reading.webp',
+        uljhanShrug: 'uljhan_shrug.webp',
         sieve: Object.freeze([1, 2, 3, 4, 5].map(index => `kriti_sieve_0${index}.webp`))
     });
 
@@ -44,7 +53,28 @@
         allowOnly: ['mascot.popup.allowOnly', 'Only allowed channels get through.'],
         emptyKeywords: ['mascot.options.emptyKeywords', 'Add a word to start filtering.'],
         emptyChannels: ['mascot.options.emptyChannels', 'Block a channel to hide it everywhere.'],
-        imported: ['mascot.options.imported', 'Settings imported.']
+        imported: ['mascot.options.imported', 'Settings imported.'],
+        noMatches: ['mascot.moment.noMatches', 'Nothing here. Try fewer words.'],
+        loading: ['mascot.moment.loading', 'Sorting the good stuff…'],
+        error: ['mascot.moment.error', 'That didn\'t load. Try again.']
+    });
+
+    // Sounds (aKriti sounds, assets/sounds): Off by default. Gentle plays the big moments only.
+    const SOUNDS_KEY = 'ftUiSounds';
+    const SOUND_MODES = Object.freeze(['off', 'gentle', 'playful']);
+    const SOUND_FILES = Object.freeze({
+        success: 'success.ogg', celebrate: 'celebrate.ogg', error: 'gentle_error.ogg',
+        select: 'select.ogg', pop: 'soft_pop.ogg', page: 'paper_flip.ogg'
+    });
+    const GENTLE_SOUNDS = Object.freeze(['success', 'celebrate', 'error']);
+    // Moment poses: one character and one line each (BIBLE.md moments map).
+    const MOMENTS = Object.freeze({
+        loading: Object.freeze({ image: 'kritiReading', copy: 'loading', character: 'Kriti' }),
+        empty: Object.freeze({ image: 'kritiPeek', copy: null, character: 'Kriti' }),
+        noMatches: Object.freeze({ image: 'uljhanShrug', copy: 'noMatches', character: 'Uljhan' }),
+        error: Object.freeze({ image: 'uljhanShrug', copy: 'error', character: 'Uljhan' }),
+        done: Object.freeze({ image: 'kritiThumbsUp', copy: null, character: 'Kriti' }),
+        hello: Object.freeze({ image: 'kritiWave', copy: null, character: 'Kriti' })
     });
 
     // ---- Pure rules (unit-tested) ----------------------------------------------------------------
@@ -397,7 +427,7 @@
         const tally = el('div', 'ft-mascot-tally');
         tally.id = 'ftMascotTallyPopup';
         const counter = el('p', 'ft-mascot-tally__counter');
-        const bindu = image(ASSETS.bindu, 'ft-mascot-tally__bindu', 20);
+        const bindu = image(ASSETS.counterMark, 'ft-mascot-tally__bindu', 20);
         const count = el('span', 'ft-mascot-tally__count');
         counter.append(bindu, count);
         const stage = el('div', 'ft-mascot-tally__stage');
@@ -563,11 +593,13 @@
     // ---- Options page ----------------------------------------------------------------------------
 
     const decoratedEmptyLists = new Set();
-    // RenderEngine's empty-list copy keys. Only the blocklist, not-searching states get Kagaz: a search with
+    // RenderEngine's empty-list copy keys. Blocked lists get Kriti peeking, a search with no matches gets Uljhan; an allow list stays plain. A search with
     // no matches or an empty allow list needs different words.
     const EMPTY_LIST_KEYS = Object.freeze({
         'render.emptyKeywordsBlocked': 'keywords',
-        'render.emptyChannelsBlocked': 'channels'
+        'render.emptyChannelsBlocked': 'channels',
+        'render.emptyKeywordsFound': 'search',
+        'render.emptyChannelsFound': 'search'
     });
 
     /** Which list an empty-state node belongs to, read from RenderEngine's copy record; null otherwise. */
@@ -577,7 +609,7 @@
         return record && Object.prototype.hasOwnProperty.call(EMPTY_LIST_KEYS, record.key) ? EMPTY_LIST_KEYS[record.key] : null;
     }
 
-    /** Puts Kagaz on an empty keyword or channel list on the options page. */
+    /** Puts Kriti (empty list) or Uljhan (no matches) on a keyword or channel list on the options page. */
     function decorateEmptyList(node, list, details = {}) {
         if (!node || !root.document || details.minimal) return;
         if (!root.document.getElementById('viewContainer')) return;
@@ -611,7 +643,7 @@
 
     function drawEmptyList(node, list, details) {
         // RenderEngine rewrites the node's textContent on a language change. Move its copy record onto a
-        // child span first, so that refresh rewrites only the label and leaves Kagaz in place.
+        // child span first, so that refresh rewrites only the label and leaves the character in place.
         if (!node.querySelector?.('.ft-mascot-empty__label')) {
             const label = el('span', 'ft-mascot-empty__label', node.textContent);
             if (node.__ftRendererCopy) {
@@ -622,11 +654,22 @@
         }
         node.querySelector?.('.ft-mascot--empty')?.remove();
         node.classList.remove('ft-mascot-empty');
-        if (details.searching || details.mode === 'whitelist' || !showsCharacters(companionMode)) return;
-        const character = createCharacter({ className: 'ft-mascot--empty', imageName: ASSETS.kagazNote, height: 112, kind: 'static', tail: 'up' });
+        if (!showsCharacters(companionMode)) return;
+        if (list === 'search') {
+            // Uljhan looks around when a search finds nothing (his face says it; the line is Kriti's tip).
+            const character = createCharacter({ className: 'ft-mascot--empty ft-mascot--search', imageName: ASSETS.uljhanShrug, height: 88, kind: 'static', tail: 'up' });
+            node.classList.add('ft-mascot-empty');
+            node.insertBefore(character.root, node.firstChild);
+            character.say(t(COPY.noMatches));
+            breathe(character.root);
+            return;
+        }
+        if (details.searching || details.mode === 'whitelist') return;
+        const character = createCharacter({ className: 'ft-mascot--empty', imageName: ASSETS.kritiPeek, height: 112, kind: 'static', tail: 'up' });
         node.classList.add('ft-mascot-empty');
         node.insertBefore(character.root, node.firstChild);
         character.say(t(list === 'channels' ? COPY.emptyChannels : COPY.emptyKeywords));
+        breathe(character.root);
     }
 
     function redrawEmptyLists() {
@@ -681,7 +724,7 @@
 
     let importMoment = null;
 
-    /** Mohar stamps beside the backup importer after a verified import. */
+    /** Kriti gives a thumbs up beside the backup importer after a verified import. */
     function celebrateImport() {
         const doc = root.document;
         const button = doc?.getElementById('ftImportV3Btn');
@@ -690,7 +733,7 @@
         importMoment?.remove();
         importMoment = null;
         if (!showsCharacters(companionMode)) return;
-        const character = createCharacter({ className: 'ft-mascot--stamp', imageName: ASSETS.moharStamp, height: 72, kind: 'event', tail: 'left' });
+        const character = createCharacter({ className: 'ft-mascot--stamp', imageName: ASSETS.kritiThumbsUp, height: 80, kind: 'event', tail: 'left' });
         const holder = el('div', 'ft-mascot-import');
         holder.appendChild(character.root);
         item.appendChild(holder);
@@ -702,6 +745,95 @@
         }
         character.say(line, { event: true });
         announce(holder, line);
+        playSound('celebrate');
+    }
+
+    // ---- Idle life and moments -------------------------------------------------------------------
+
+    /** A slow breath, three cycles then still (Lively only; never with reduced motion). */
+    function breathe(node) {
+        if (!node || companionMode !== 'lively' || prefersReducedMotion()) return;
+        node.classList.add('pk-breathing');
+        node.addEventListener('animationend', () => node.classList.remove('pk-breathing'), { once: true });
+    }
+
+    /**
+     * One pose and one line for a state: loading, empty, noMatches, error, done or hello.
+     * Returns null with the Companion set to Off, so the caller's words stand alone.
+     */
+    function moment(kind, { line = '', height = 96 } = {}) {
+        const spec = MOMENTS[kind];
+        if (!spec || !root.document || !showsCharacters(companionMode)) return null;
+        const holder = el('div', `pk-moment pk-moment--${kind}`);
+        holder.dataset.ftMoment = kind;
+        const art = image(ASSETS[spec.image], 'pk-moment__art', height);
+        art.style.setProperty('--pk-moment-size', `${height}px`);
+        holder.appendChild(art);
+        const text = line || (spec.copy ? t(COPY[spec.copy]) : '');
+        if (text) holder.appendChild(el('p', 'pk-moment__line', clampLine(text)));
+        if (!prefersReducedMotion()) {
+            holder.classList.add('is-pop');
+            if (companionMode === 'lively') art.addEventListener('animationend', () => {
+                holder.classList.remove('is-pop');
+                holder.classList.add('is-idle');
+            }, { once: true });
+        }
+        return holder;
+    }
+
+    // ---- Sounds -----------------------------------------------------------------------------------
+
+    let soundMode = 'off';
+    const soundCache = new Map();
+
+    function normalizeSoundMode(value) {
+        const mode = typeof value === 'string' ? value.trim().toLowerCase() : '';
+        return SOUND_MODES.includes(mode) ? mode : 'off';
+    }
+
+    /** Whether a sound plays in a mode: Off never, Gentle the big moments only, Playful all. Pure. */
+    function soundAllowed(mode, name) {
+        const normalized = normalizeSoundMode(mode);
+        if (normalized === 'off' || !Object.prototype.hasOwnProperty.call(SOUND_FILES, name)) return false;
+        return normalized === 'playful' || GENTLE_SOUNDS.includes(name);
+    }
+
+    function playSound(name) {
+        if (!soundAllowed(soundMode, name)) return false;
+        if (root.document?.visibilityState === 'hidden' || typeof root.Audio !== 'function') return false;
+        try {
+            let audio = soundCache.get(name);
+            if (!audio) {
+                const path = `assets/sounds/${SOUND_FILES[name]}`;
+                const url = api()?.runtime?.getURL ? api().runtime.getURL(path) : `../${path}`;
+                audio = new root.Audio(url);
+                audio.volume = 0.45;
+                soundCache.set(name, audio);
+            }
+            audio.currentTime = 0;
+            const played = audio.play();
+            played?.catch?.(() => {});
+            return true;
+        } catch (_) {
+            return false;
+        }
+    }
+
+    async function loadSoundMode() {
+        const stored = await storageGet([SOUNDS_KEY]);
+        soundMode = normalizeSoundMode(stored[SOUNDS_KEY]);
+        return soundMode;
+    }
+
+    function mountSoundSetting(doc) {
+        const select = doc.getElementById('ftUiSounds');
+        if (!select) return;
+        loadSoundMode().then(mode => { select.value = mode; });
+        select.addEventListener('change', async () => {
+            soundMode = normalizeSoundMode(select.value);
+            await storageSet({ [SOUNDS_KEY]: soundMode });
+            playSound('select') || playSound('success');
+        });
     }
 
     function mountCompanionSetting(doc) {
@@ -714,6 +846,7 @@
 
     function mountOptions(doc) {
         mountCompanionSetting(doc);
+        mountSoundSetting(doc);
         mountWelcome(doc);
         watchEmptyLists(doc);
         onModeChange(() => redrawEmptyLists());
@@ -725,8 +858,10 @@
     root.FilterTubeMascots = Object.freeze({
         COMPANION_KEY, MILESTONES_KEY, WELCOME_KEY, MODES, DEFAULT_MODE, MILESTONES,
         SIEVE_FRAME_MS, SIEVE_LOOPS, BUBBLE_MAX_CHARS, COPY, ASSETS,
+        SOUNDS_KEY, SOUND_MODES, SOUND_FILES, MOMENTS,
         normalizeMode, linePresentation, showsCharacters, evaluateMilestone, totalHidden, sieveFrames,
         allowListSwitchedOn, clampLine, loadMode, setMode,
+        normalizeSoundMode, soundAllowed, playSound, loadSoundMode, moment,
         get mode() { return companionMode; },
         emptyListKind, decorateEmptyList, celebrateImport, mountPopup
     });
@@ -736,7 +871,9 @@
         if (!doc?.getElementById) return;
         api()?.storage?.onChanged?.addListener?.((changes, area) => {
             if ((!area || area === 'local') && changes[COMPANION_KEY]) applyMode(changes[COMPANION_KEY].newValue);
+            if ((!area || area === 'local') && changes[SOUNDS_KEY]) soundMode = normalizeSoundMode(changes[SOUNDS_KEY].newValue);
         });
+        loadSoundMode();
         loadMode().then(() => {
             if (doc.getElementById('viewContainer')) mountOptions(doc);
         });

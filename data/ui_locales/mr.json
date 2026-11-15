@@ -2632,5 +2632,13 @@
   "platformLabel.kids": "मुले",
   "platformLabel.autoPlaylist": "ऑटो प्लेलिस्ट",
   "platformLabel.autoPlaylists": "ऑटो प्लेलिस्ट",
-  "platformLabel.autoPlaylistNamed": "ऑटो प्लेलिस्ट · {name}"
+  "platformLabel.autoPlaylistNamed": "ऑटो प्लेलिस्ट · {name}",
+  "mascot.moment.loading": "चांगल्या गोष्टी निवडत आहोत…",
+  "mascot.moment.noMatches": "इथे काहीच नाही. कमी शब्द वापरून पाहा.",
+  "mascot.moment.error": "लोड झाले नाही. पुन्हा प्रयत्न करा.",
+  "mascot.sounds.title": "आवाज",
+  "mascot.sounds.off": "बंद",
+  "mascot.sounds.gentle": "सौम्य",
+  "mascot.sounds.playful": "खेळकर",
+  "mascot.sounds.description": "सौम्य: फक्त मोठ्या क्षणांना हलका आवाज, जसे ध्येय पूर्ण झाल्यावर. खेळकर: टॅप आणि पॉपसुद्धा."
 }

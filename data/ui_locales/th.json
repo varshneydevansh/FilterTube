@@ -2632,5 +2632,13 @@
   "platformLabel.kids": "เด็ก",
   "platformLabel.autoPlaylist": "เพลย์ลิสต์อัตโนมัติ",
   "platformLabel.autoPlaylists": "เพลย์ลิสต์อัตโนมัติ",
-  "platformLabel.autoPlaylistNamed": "เพลย์ลิสต์อัตโนมัติ · {name}"
+  "platformLabel.autoPlaylistNamed": "เพลย์ลิสต์อัตโนมัติ · {name}",
+  "mascot.moment.loading": "กำลังคัดของดี…",
+  "mascot.moment.noMatches": "ไม่พบอะไรเลย ลองใช้คำน้อยลง",
+  "mascot.moment.error": "โหลดไม่สำเร็จ ลองอีกครั้ง",
+  "mascot.sounds.title": "เสียง",
+  "mascot.sounds.off": "ปิด",
+  "mascot.sounds.gentle": "นุ่มนวล",
+  "mascot.sounds.playful": "สนุกสนาน",
+  "mascot.sounds.description": "นุ่มนวล: เสียงเบา ๆ เฉพาะช่วงสำคัญ เช่น ทำเป้าหมายสำเร็จ สนุกสนาน: มีเสียงแตะและเสียงป๊อปด้วย"
 }

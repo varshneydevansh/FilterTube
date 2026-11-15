@@ -2632,5 +2632,13 @@
   "platformLabel.kids": "儿童",
   "platformLabel.autoPlaylist": "自动播放列表",
   "platformLabel.autoPlaylists": "自动播放列表",
-  "platformLabel.autoPlaylistNamed": "自动播放列表 · {name}"
+  "platformLabel.autoPlaylistNamed": "自动播放列表 · {name}",
+  "mascot.moment.loading": "正在筛选好内容…",
+  "mascot.moment.noMatches": "这里什么都没有。试试少用几个词。",
+  "mascot.moment.error": "没有加载出来。请再试一次。",
+  "mascot.sounds.title": "声音",
+  "mascot.sounds.off": "关闭",
+  "mascot.sounds.gentle": "轻柔",
+  "mascot.sounds.playful": "活泼",
+  "mascot.sounds.description": "轻柔：只在重要时刻发出轻声，比如达成目标。活泼：还有轻点和啵的一声。"
 }

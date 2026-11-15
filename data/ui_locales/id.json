@@ -2632,5 +2632,13 @@
   "platformLabel.kids": "Anak",
   "platformLabel.autoPlaylist": "Playlist otomatis",
   "platformLabel.autoPlaylists": "Playlist otomatis",
-  "platformLabel.autoPlaylistNamed": "Playlist otomatis · {name}"
+  "platformLabel.autoPlaylistNamed": "Playlist otomatis · {name}",
+  "mascot.moment.loading": "Memilah yang bagus…",
+  "mascot.moment.noMatches": "Tidak ada apa-apa. Coba dengan lebih sedikit kata.",
+  "mascot.moment.error": "Gagal dimuat. Coba lagi.",
+  "mascot.sounds.title": "Suara",
+  "mascot.sounds.off": "Nonaktif",
+  "mascot.sounds.gentle": "Lembut",
+  "mascot.sounds.playful": "Ceria",
+  "mascot.sounds.description": "Lembut: suara halus hanya untuk momen besar, seperti target tercapai. Ceria: juga ketukan dan letupan kecil."
 }

@@ -2632,5 +2632,13 @@
   "platformLabel.kids": "बच्चे",
   "platformLabel.autoPlaylist": "ऑटो प्लेलिस्ट",
   "platformLabel.autoPlaylists": "ऑटो प्लेलिस्ट",
-  "platformLabel.autoPlaylistNamed": "ऑटो प्लेलिस्ट · {name}"
+  "platformLabel.autoPlaylistNamed": "ऑटो प्लेलिस्ट · {name}",
+  "mascot.moment.loading": "अच्छी चीज़ें छाँट रहे हैं…",
+  "mascot.moment.noMatches": "यहाँ कुछ नहीं मिला। कम शब्द आज़माएँ।",
+  "mascot.moment.error": "लोड नहीं हुआ। फिर से कोशिश करें।",
+  "mascot.sounds.title": "आवाज़ें",
+  "mascot.sounds.off": "बंद",
+  "mascot.sounds.gentle": "धीमी",
+  "mascot.sounds.playful": "चंचल",
+  "mascot.sounds.description": "धीमी: सिर्फ़ बड़े पलों पर हल्की आवाज़, जैसे लक्ष्य पूरा होने पर। चंचल: टैप और पॉप भी।"
 }

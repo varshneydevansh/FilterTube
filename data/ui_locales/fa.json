@@ -2632,5 +2632,13 @@
   "platformLabel.kids": "کودک",
   "platformLabel.autoPlaylist": "فهرست پخش خودکار",
   "platformLabel.autoPlaylists": "فهرست‌های پخش خودکار",
-  "platformLabel.autoPlaylistNamed": "فهرست پخش خودکار · {name}"
+  "platformLabel.autoPlaylistNamed": "فهرست پخش خودکار · {name}",
+  "mascot.moment.loading": "در حال جدا کردن چیزهای خوب…",
+  "mascot.moment.noMatches": "چیزی اینجا نیست. با کلمات کمتر امتحان کنید.",
+  "mascot.moment.error": "بارگیری نشد. دوباره امتحان کنید.",
+  "mascot.sounds.title": "صداها",
+  "mascot.sounds.off": "خاموش",
+  "mascot.sounds.gentle": "ملایم",
+  "mascot.sounds.playful": "بازیگوش",
+  "mascot.sounds.description": "ملایم: صداهای نرم فقط برای لحظه‌های بزرگ، مثل رسیدن به هدف. بازیگوش: ضربه‌ها و پاپ‌ها هم."
 }

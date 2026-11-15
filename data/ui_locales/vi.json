@@ -2632,5 +2632,13 @@
   "platformLabel.kids": "Trẻ em",
   "platformLabel.autoPlaylist": "Danh sách phát tự động",
   "platformLabel.autoPlaylists": "Danh sách phát tự động",
-  "platformLabel.autoPlaylistNamed": "Danh sách phát tự động · {name}"
+  "platformLabel.autoPlaylistNamed": "Danh sách phát tự động · {name}",
+  "mascot.moment.loading": "Đang lọc những thứ hay…",
+  "mascot.moment.noMatches": "Không có gì ở đây. Hãy thử ít từ hơn.",
+  "mascot.moment.error": "Không tải được. Hãy thử lại.",
+  "mascot.sounds.title": "Âm thanh",
+  "mascot.sounds.off": "Tắt",
+  "mascot.sounds.gentle": "Nhẹ nhàng",
+  "mascot.sounds.playful": "Vui nhộn",
+  "mascot.sounds.description": "Nhẹ nhàng: âm thanh khẽ chỉ cho khoảnh khắc lớn, như khi đạt mục tiêu. Vui nhộn: thêm tiếng chạm và tiếng bụp."
 }

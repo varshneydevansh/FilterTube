@@ -2632,5 +2632,13 @@
   "platformLabel.kids": "Enfant",
   "platformLabel.autoPlaylist": "Playlist automatique",
   "platformLabel.autoPlaylists": "Playlists automatiques",
-  "platformLabel.autoPlaylistNamed": "Playlist automatique · {name}"
+  "platformLabel.autoPlaylistNamed": "Playlist automatique · {name}",
+  "mascot.moment.loading": "Tri des bonnes choses…",
+  "mascot.moment.noMatches": "Rien ici. Essayez avec moins de mots.",
+  "mascot.moment.error": "Le chargement a échoué. Réessayez.",
+  "mascot.sounds.title": "Sons",
+  "mascot.sounds.off": "Désactivé",
+  "mascot.sounds.gentle": "Doux",
+  "mascot.sounds.playful": "Ludique",
+  "mascot.sounds.description": "Doux : des sons légers pour les grands moments seulement, comme un objectif atteint. Ludique : aussi des petits tapotements et des pops."
 }

@@ -2632,5 +2632,13 @@
   "platformLabel.kids": "ಮಕ್ಕಳು",
   "platformLabel.autoPlaylist": "ಸ್ವಯಂ ಪ್ಲೇಲಿಸ್ಟ್",
   "platformLabel.autoPlaylists": "ಸ್ವಯಂ ಪ್ಲೇಲಿಸ್ಟ್‌ಗಳು",
-  "platformLabel.autoPlaylistNamed": "ಸ್ವಯಂ ಪ್ಲೇಲಿಸ್ಟ್ · {name}"
+  "platformLabel.autoPlaylistNamed": "ಸ್ವಯಂ ಪ್ಲೇಲಿಸ್ಟ್ · {name}",
+  "mascot.moment.loading": "ಒಳ್ಳೆಯದನ್ನು ಆರಿಸುತ್ತಿದ್ದೇವೆ…",
+  "mascot.moment.noMatches": "ಇಲ್ಲಿ ಏನೂ ಇಲ್ಲ. ಕಡಿಮೆ ಪದಗಳನ್ನು ಪ್ರಯತ್ನಿಸಿ.",
+  "mascot.moment.error": "ಲೋಡ್ ಆಗಲಿಲ್ಲ. ಮತ್ತೆ ಪ್ರಯತ್ನಿಸಿ.",
+  "mascot.sounds.title": "ಧ್ವನಿಗಳು",
+  "mascot.sounds.off": "ಆಫ್",
+  "mascot.sounds.gentle": "ಮೃದು",
+  "mascot.sounds.playful": "ತುಂಟ",
+  "mascot.sounds.description": "ಮೃದು: ಗುರಿ ತಲುಪಿದಾಗಿನಂತಹ ದೊಡ್ಡ ಕ್ಷಣಗಳಿಗೆ ಮಾತ್ರ ಮೆಲುವಾದ ಧ್ವನಿ. ತುಂಟ: ಟ್ಯಾಪ್ ಮತ್ತು ಪಾಪ್ ಕೂಡ."
 }

@@ -2632,5 +2632,13 @@
   "platformLabel.kids": "小囡",
   "platformLabel.autoPlaylist": "自动播放列表",
   "platformLabel.autoPlaylists": "自动播放列表",
-  "platformLabel.autoPlaylistNamed": "自动播放列表 · {name}"
+  "platformLabel.autoPlaylistNamed": "自动播放列表 · {name}",
+  "mascot.moment.loading": "正在拣好物事…",
+  "mascot.moment.noMatches": "搿搭啥也没。试试少用几个字。",
+  "mascot.moment.error": "没加载出来。再试一趟。",
+  "mascot.sounds.title": "声音",
+  "mascot.sounds.off": "关",
+  "mascot.sounds.gentle": "轻柔",
+  "mascot.sounds.playful": "活泼",
+  "mascot.sounds.description": "轻柔：只有大辰光，比如目标达成，有轻轻个声音。活泼：还有点点、啵啵个声音。"
 }

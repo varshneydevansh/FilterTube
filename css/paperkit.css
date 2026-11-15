@@ -3,6 +3,23 @@
  * dark mode. Loaded last, so it re-tunes the shared tokens and dresses the extension's own UI only:
  * nothing here reaches the video site's page. Colour comes only from the --pk-* tokens below. */
 
+/* Bundled type (SIL OFL, licences beside the files): no font is fetched from the network for these. */
+@font-face {
+  font-family: "FilterTube Delius";
+  src: url("../assets/fonts/delius.ttf") format("truetype");
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "FilterTube Outfit";
+  src: url("../assets/fonts/outfit_variable.ttf") format("truetype");
+  font-weight: 100 900;
+  font-style: normal;
+  font-display: swap;
+}
+
 :root {
   /* BrandPalette, light */
   --pk-canvas: #f6f2eb;
@@ -30,8 +47,9 @@
   --pk-ledge: rgba(27, 26, 24, 0.14);
 
   /* Type: Outfit for headings and initials, Delius for card titles (the hand), the body as before. */
-  --pk-font-hand: "Delius", "Outfit", "Plus Jakarta Sans", system-ui, sans-serif;
-  --pk-font-display: "Outfit", "Plus Jakarta Sans", system-ui, sans-serif;
+  --pk-font-hand: "FilterTube Delius", "Delius", "FilterTube Outfit", "Outfit", system-ui, sans-serif;
+  --pk-font-display: "FilterTube Outfit", "Outfit", "Plus Jakarta Sans", system-ui, sans-serif;
+  --ft-font-family-display: var(--pk-font-display);
 
   /* NativeMotion, the few durations the extension uses */
   --pk-short: 180ms;
@@ -131,6 +149,13 @@
   color: var(--pk-ink);
 }
 
+/* Brick is the one action colour (PaperKit): the page tones may tint chips and edges, never the primary. */
+body.ft-extension-surface .btn-primary:not(:disabled) {
+  background: var(--pk-brick-fill) !important;
+  color: var(--pk-on-brick-fill) !important;
+  border-color: var(--pk-brick-fill) !important;
+}
+
 .btn-primary {
   background: var(--pk-brick-fill);
   color: var(--pk-on-brick-fill);
@@ -141,9 +166,9 @@
   transition: transform var(--pk-short) var(--pk-ease-enter), box-shadow var(--pk-short) var(--pk-ease-enter), background var(--pk-short) linear;
 }
 
-.btn-primary:hover:not(:disabled) {
-  background: #93362b;
-  border-color: #93362b;
+body.ft-extension-surface .btn-primary:hover:not(:disabled) {
+  background: #93362b !important;
+  border-color: #93362b !important;
 }
 
 .btn-primary:active:not(:disabled) {
@@ -171,6 +196,90 @@
 .ft-profile-dropdown-item:focus-visible {
   outline: 2px solid var(--pk-ink);
   outline-offset: 3px;
+}
+
+/* ---------------------------------------------------------------------------
+ * The options page and popup shell: paper sheets instead of frosted glass
+ * ------------------------------------------------------------------------- */
+
+/* The frosted sidebar and top bar stay over the scenery (as the app's Control Center keeps its
+ * scenery behind the frame); everything you read or press sits on paper. The page tones style
+ * these with long selectors, so this layer wins with !important on the paper properties only. */
+body.ft-extension-surface .view-hero,
+body.ft-extension-surface .stat-card,
+body.ft-extension-surface .card {
+  background-color: var(--pk-paper) !important;
+  background-image: none !important;
+  border-color: var(--pk-line) !important;
+  -webkit-backdrop-filter: none !important;
+  backdrop-filter: none !important;
+  box-shadow: 0 2px 0 var(--pk-ledge), 0 18px 36px -30px var(--pk-ledge) !important;
+}
+
+body.ft-extension-surface .top-bar h1,
+body.ft-extension-surface .view-hero h1,
+body.ft-extension-surface .view-hero h2,
+body.ft-extension-surface .brand-name {
+  font-family: var(--pk-font-display);
+  color: var(--pk-ink);
+}
+
+body.ft-extension-surface .card-header h3,
+body.ft-extension-surface .card-header h2,
+body.ft-extension-surface .help-item-title {
+  font-family: var(--pk-font-hand);
+  font-weight: 400;
+  letter-spacing: 0;
+}
+
+body.ft-extension-surface .ft-profile-row__title { font-family: inherit; }
+
+body.ft-extension-surface .nav-item.active {
+  background: var(--pk-rose);
+  border-color: color-mix(in srgb, var(--pk-brick) 26%, transparent);
+  color: var(--pk-brick);
+}
+
+body.ft-extension-surface .stat-card .stat-value,
+body.ft-extension-surface .stat-card [class*="value"] {
+  font-family: var(--pk-font-display);
+}
+
+/* Crayon icons (aKriti icon family, currentColor) on the sidebar. The inline line icons stay in
+ * the markup for older themes and are hidden here. */
+body.ft-extension-surface .nav-item .nav-icon { position: relative; }
+body.ft-extension-surface .nav-item[data-pk-icon] .nav-icon > svg { opacity: 0; }
+body.ft-extension-surface .nav-item[data-pk-icon] .nav-icon::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  margin: auto;
+  width: 22px;
+  height: 22px;
+  background: currentColor;
+  -webkit-mask: var(--pk-nav-icon) center / contain no-repeat;
+  mask: var(--pk-nav-icon) center / contain no-repeat;
+}
+body.ft-extension-surface .nav-item.active[data-pk-icon] .nav-icon::after { -webkit-mask-image: var(--pk-nav-icon-on); mask-image: var(--pk-nav-icon-on); }
+
+.nav-item[data-pk-icon="home"] { --pk-nav-icon: url("../assets/icons/crayon/home.svg"); --pk-nav-icon-on: url("../assets/icons/crayon/home_selected.svg"); }
+.nav-item[data-pk-icon="filter"] { --pk-nav-icon: url("../assets/icons/crayon/filtertube_filter.svg"); --pk-nav-icon-on: url("../assets/icons/crayon/filtertube_filter_selected.svg"); }
+.nav-item[data-pk-icon="hide"] { --pk-nav-icon: url("../assets/icons/crayon/hide.svg"); --pk-nav-icon-on: url("../assets/icons/crayon/hide_selected.svg"); }
+.nav-item[data-pk-icon="kids"] { --pk-nav-icon: url("../assets/icons/crayon/kids.svg"); --pk-nav-icon-on: url("../assets/icons/crayon/kids_selected.svg"); }
+.nav-item[data-pk-icon="settings"] { --pk-nav-icon: url("../assets/icons/crayon/settings.svg"); --pk-nav-icon-on: url("../assets/icons/crayon/settings_selected.svg"); }
+.nav-item[data-pk-icon="timer"] { --pk-nav-icon: url("../assets/icons/crayon/timer.svg"); --pk-nav-icon-on: url("../assets/icons/crayon/timer_selected.svg"); }
+.nav-item[data-pk-icon="folder"] { --pk-nav-icon: url("../assets/icons/crayon/folder.svg"); --pk-nav-icon-on: url("../assets/icons/crayon/folder_selected.svg"); }
+.nav-item[data-pk-icon="link"] { --pk-nav-icon: url("../assets/icons/crayon/link.svg"); --pk-nav-icon-on: url("../assets/icons/crayon/link_selected.svg"); }
+.nav-item[data-pk-icon="you"] { --pk-nav-icon: url("../assets/icons/crayon/you.svg"); --pk-nav-icon-on: url("../assets/icons/crayon/you_selected.svg"); }
+.nav-item[data-pk-icon="notifications"] { --pk-nav-icon: url("../assets/icons/crayon/notifications.svg"); --pk-nav-icon-on: url("../assets/icons/crayon/notifications_selected.svg"); }
+.nav-item[data-pk-icon="help"] { --pk-nav-icon: url("../assets/icons/crayon/help.svg"); --pk-nav-icon-on: url("../assets/icons/crayon/help_selected.svg"); }
+.nav-item[data-pk-icon="info"] { --pk-nav-icon: url("../assets/icons/crayon/info.svg"); --pk-nav-icon-on: url("../assets/icons/crayon/info_selected.svg"); }
+.nav-item[data-pk-icon="favourite"] { --pk-nav-icon: url("../assets/icons/crayon/favourite.svg"); --pk-nav-icon-on: url("../assets/icons/crayon/favourite_selected.svg"); }
+
+/* Dark: the true navy desk behind paper, no glass glow. */
+:root[data-theme="dark"] body.ft-extension-surface { background: var(--pk-desk); }
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme]) body.ft-extension-surface { background: var(--pk-desk); }
 }
 
 /* ---------------------------------------------------------------------------
@@ -232,12 +341,17 @@
 
 .ft-avatar__doodle {
   position: relative;
-  width: 58%;
-  height: 58%;
+  display: block;
+  flex: none;
+  width: calc(var(--ft-avatar-size) * 0.58);
+  height: calc(var(--ft-avatar-size) * 0.58);
   background: center / contain no-repeat;
 }
 
-.ft-avatar--small .ft-avatar__doodle { width: 66%; height: 66%; }
+.ft-avatar--small .ft-avatar__doodle {
+  width: calc(var(--ft-avatar-size) * 0.66);
+  height: calc(var(--ft-avatar-size) * 0.66);
+}
 
 .ft-avatar__doodle--mask {
   background: var(--pk-avatar-ink);
@@ -249,8 +363,9 @@
   position: absolute;
   right: -8%;
   bottom: -8%;
-  width: 42%;
-  height: 42%;
+  display: block;
+  width: calc(var(--ft-avatar-size) * 0.42);
+  height: calc(var(--ft-avatar-size) * 0.42);
   background: center / contain no-repeat;
   pointer-events: none;
 }
@@ -289,20 +404,28 @@
   color: var(--pk-muted);
 }
 
-.ft-profile-dropdown-item[class*="ft-profile-role--"] {
-  background: var(--pk-paper);
-  border: 1px solid var(--pk-line);
-  border-left-width: 1px;
+/* The page tones style rows with long selectors; the role washes win with !important. */
+body .ft-profile-dropdown .ft-profile-dropdown-item[class*="ft-profile-role--"] {
+  background: var(--pk-paper) !important;
+  border: 1px solid var(--pk-line) !important;
   border-radius: 16px;
-  box-shadow: none;
+  box-shadow: none !important;
 }
 
-.ft-profile-dropdown-item.ft-profile-role--kids { background: var(--pk-sun-wash); }
-.ft-profile-dropdown-item.ft-profile-role--parent.is-active,
-.ft-profile-dropdown-item.ft-profile-role--adult.is-active { background: var(--pk-lilac); border-color: color-mix(in srgb, var(--pk-plum) 30%, transparent); }
-.ft-profile-dropdown-item.ft-profile-role--kids.is-active { border-color: color-mix(in srgb, var(--pk-sun-ink) 34%, transparent); }
-.ft-profile-dropdown-item[class*="ft-profile-role--"]:hover:not(:disabled) { transform: none; border-color: var(--pk-brick); }
-.ft-profile-dropdown-item[class*="ft-profile-role--"].is-locked { opacity: 1; }
+body .ft-profile-dropdown .ft-profile-dropdown-item.ft-profile-role--kids { background: var(--pk-sun-wash) !important; }
+body .ft-profile-dropdown .ft-profile-dropdown-item.ft-profile-role--parent.is-active,
+body .ft-profile-dropdown .ft-profile-dropdown-item.ft-profile-role--adult.is-active {
+  background: var(--pk-lilac) !important;
+  border-color: color-mix(in srgb, var(--pk-plum) 30%, transparent) !important;
+}
+body .ft-profile-dropdown .ft-profile-dropdown-item.ft-profile-role--kids.is-active {
+  border-color: color-mix(in srgb, var(--pk-sun-ink) 34%, transparent) !important;
+}
+body .ft-profile-dropdown .ft-profile-dropdown-item[class*="ft-profile-role--"]:hover:not(:disabled) {
+  transform: none;
+  border-color: var(--pk-brick) !important;
+}
+body .ft-profile-dropdown .ft-profile-dropdown-item[class*="ft-profile-role--"].is-locked { opacity: 1; }
 
 .ft-profile-dropdown-item .ft-profile-dropdown-name {
   font-family: var(--pk-font-display);
@@ -329,15 +452,14 @@
 }
 
 .help-item.ft-profile-row[class*="ft-profile-role--"] {
-  background: var(--pk-paper);
-  border: 1px solid var(--pk-line);
-  border-left: 1px solid var(--pk-line);
+  background: var(--pk-paper) !important;
+  border: 1px solid var(--pk-line) !important;
   border-radius: 18px;
 }
 
-.help-item.ft-profile-row.ft-profile-role--kids { background: var(--pk-sun-wash); }
+.help-item.ft-profile-row.ft-profile-role--kids { background: var(--pk-sun-wash) !important; }
 .help-item.ft-profile-row.ft-profile-role--parent.is-active,
-.help-item.ft-profile-row.ft-profile-role--adult.is-active { background: var(--pk-lilac); }
+.help-item.ft-profile-row.ft-profile-role--adult.is-active { background: var(--pk-lilac) !important; }
 
 .ft-profile-row__title {
   display: flex;
@@ -461,7 +583,8 @@ body.ft-managed-child-active .main-content {
   display: flex;
   align-items: center;
   gap: 14px;
-  max-width: 560px;
+  width: min(560px, calc(100% - 32px));
+  box-sizing: border-box;
   margin: 8px auto 16px;
   padding: 12px 14px;
   border: 1px solid color-mix(in srgb, var(--pk-sun) 70%, var(--pk-line));
@@ -651,6 +774,54 @@ body:not(.ft-managed-child-editor-view) .ft-managed-child-global.ft-session-bar 
   100% { transform: none; }
 }
 
+.pk-breathing {
+  transform-origin: 50% 100%;
+  animation: pk-breathe 6s ease-in-out 3;
+}
+
+/* "Just you so far" (profiles manager, one profile only) */
+.ft-profiles-empty {
+  display: grid;
+  justify-items: center;
+  gap: 8px;
+  margin-top: 12px;
+  padding: 20px 16px;
+  border: 1px dashed var(--pk-line);
+  border-radius: 20px;
+  background: var(--pk-sun-wash);
+  text-align: center;
+}
+
+.ft-profiles-empty .pk-moment { padding: 0; }
+
+.ft-profiles-empty__title {
+  margin: 0;
+  font-family: var(--pk-font-hand);
+  font-weight: 400;
+  font-size: 18px;
+  color: var(--pk-ink);
+}
+
+.ft-profiles-empty__body {
+  max-width: 42ch;
+  margin: 0;
+  color: var(--pk-muted);
+}
+
+/* A wavy crayon underline under the dashboard's headline. Doodles follow the Companion setting:
+ * Off hides them with the characters. */
+:root:not([data-ft-companion="off"]) body.ft-extension-surface .ft-dash-hero #ftDashHeroTitle::after {
+  content: "";
+  display: block;
+  width: min(220px, 50%);
+  height: 14px;
+  margin-top: 6px;
+  background: var(--pk-brick);
+  opacity: 0.7;
+  -webkit-mask: url("../assets/images/doodles/underline_wavy.webp") left center / contain no-repeat;
+  mask: url("../assets/images/doodles/underline_wavy.webp") left center / contain no-repeat;
+}
+
 /* Reduced motion: everything lands at once; meaning stays in the words. */
 @media (prefers-reduced-motion: reduce) {
   .btn-primary,
@@ -659,7 +830,8 @@ body:not(.ft-managed-child-editor-view) .ft-managed-child-global.ft-session-bar 
   .ft-session-frame.is-leaving rect,
   .ft-session-bar.is-arriving,
   .pk-moment.is-idle .pk-moment__art,
-  .pk-moment.is-pop .pk-moment__art { animation: none; }
+  .pk-moment.is-pop .pk-moment__art,
+  .pk-breathing { animation: none; }
   .ft-session-frame.is-connecting rect { stroke-dashoffset: 0; }
   .btn-primary:active:not(:disabled) { transform: none; }
 }

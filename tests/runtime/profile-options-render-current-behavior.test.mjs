@@ -96,7 +96,7 @@ function fixture(actor = 'parent-a', { withFamilyTools = false } = {}) {
   vm.runInNewContext([
     'extractMasterPinVerifier', 'extractProfilePinVerifier', 'isProfileLocked', 'getProfileName', 'getProfileType', 'getParentAccountId',
     'getSortedIdsByName', 'getAccountIds', 'getChildrenForAccount', 'buildProfileLabel', 'buildProfileSubtitle', 'getProfileInitial',
-    'renderTabProfileAvatar', 'getProfileViewingAccess', 'canActiveProfileManageProfile', 'renderProfilesManager'
+    'renderTabProfileAvatar', 'getProfileViewingAccess', 'canActiveProfileManageProfile', 'renderProfilesManager', 'renderProfilesEmptyState'
   ].map(productionFunction).join('\n'), context);
   const render = () => context.renderProfilesManager(profilesV4);
   const options = id => nodes(container).find(node => node.tagName === 'DETAILS' && node.dataset.profileOptionsId === id);

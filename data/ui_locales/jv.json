@@ -2632,5 +2632,13 @@
   "platformLabel.kids": "Bocah",
   "platformLabel.autoPlaylist": "Dhaptar puter otomatis",
   "platformLabel.autoPlaylists": "Dhaptar puter otomatis",
-  "platformLabel.autoPlaylistNamed": "Dhaptar puter otomatis · {name}"
+  "platformLabel.autoPlaylistNamed": "Dhaptar puter otomatis · {name}",
+  "mascot.moment.loading": "Milah sing apik…",
+  "mascot.moment.noMatches": "Ora ana apa-apa. Coba nganggo tembung sing luwih sithik.",
+  "mascot.moment.error": "Ora kemuat. Coba maneh.",
+  "mascot.sounds.title": "Swara",
+  "mascot.sounds.off": "Mati",
+  "mascot.sounds.gentle": "Alon",
+  "mascot.sounds.playful": "Rame",
+  "mascot.sounds.description": "Alon: swara lembut mung kanggo wayah gedhe, kaya target kagayuh. Rame: uga tutulan lan pop."
 }

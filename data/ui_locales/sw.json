@@ -2632,5 +2632,13 @@
   "platformLabel.kids": "Watoto",
   "platformLabel.autoPlaylist": "Orodha ya kucheza ya kiotomatiki",
   "platformLabel.autoPlaylists": "Orodha za kucheza za kiotomatiki",
-  "platformLabel.autoPlaylistNamed": "Orodha ya kucheza ya kiotomatiki · {name}"
+  "platformLabel.autoPlaylistNamed": "Orodha ya kucheza ya kiotomatiki · {name}",
+  "mascot.moment.loading": "Tunachuja mambo mazuri…",
+  "mascot.moment.noMatches": "Hakuna kitu hapa. Jaribu maneno machache.",
+  "mascot.moment.error": "Haikupakia. Jaribu tena.",
+  "mascot.sounds.title": "Sauti",
+  "mascot.sounds.off": "Imezimwa",
+  "mascot.sounds.gentle": "Tulivu",
+  "mascot.sounds.playful": "Uchangamfu",
+  "mascot.sounds.description": "Tulivu: sauti laini kwa matukio makubwa tu, kama kufikia lengo. Uchangamfu: pia sauti za kugusa na kupasuka."
 }

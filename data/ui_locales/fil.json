@@ -2632,5 +2632,13 @@
   "platformLabel.kids": "Bata",
   "platformLabel.autoPlaylist": "Auto playlist",
   "platformLabel.autoPlaylists": "Mga auto playlist",
-  "platformLabel.autoPlaylistNamed": "Auto playlist · {name}"
+  "platformLabel.autoPlaylistNamed": "Auto playlist · {name}",
+  "mascot.moment.loading": "Pinipili ang magaganda…",
+  "mascot.moment.noMatches": "Walang nandito. Subukan ang mas kaunting salita.",
+  "mascot.moment.error": "Hindi nag-load. Subukan ulit.",
+  "mascot.sounds.title": "Mga tunog",
+  "mascot.sounds.off": "Naka-off",
+  "mascot.sounds.gentle": "Mahinahon",
+  "mascot.sounds.playful": "Malaro",
+  "mascot.sounds.description": "Mahinahon: malambot na tunog sa malalaking sandali lang, gaya ng naabot na layunin. Malaro: may tap at pop din."
 }

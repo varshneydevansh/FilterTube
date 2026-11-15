@@ -2632,5 +2632,13 @@
   "platformLabel.kids": "Ọmọdé",
   "platformLabel.autoPlaylist": "Àkójọ eré aládàáṣe",
   "platformLabel.autoPlaylists": "Àwọn àkójọ eré aládàáṣe",
-  "platformLabel.autoPlaylistNamed": "Àkójọ eré aládàáṣe · {name}"
+  "platformLabel.autoPlaylistNamed": "Àkójọ eré aládàáṣe · {name}",
+  "mascot.moment.loading": "À ń ṣà àwọn nǹkan tó dára…",
+  "mascot.moment.noMatches": "Kò sí nǹkan kan níbí. Gbìyànjú ọ̀rọ̀ díẹ̀.",
+  "mascot.moment.error": "Kò ṣí. Gbìyànjú lẹ́ẹ̀kan sí i.",
+  "mascot.sounds.title": "Àwọn ohùn",
+  "mascot.sounds.off": "Pa",
+  "mascot.sounds.gentle": "Jẹ́jẹ́",
+  "mascot.sounds.playful": "Eré",
+  "mascot.sounds.description": "Jẹ́jẹ́: ohùn rírọ̀ fún àwọn àkókò ńlá nìkan, bí ìgbà tí o bá dé àfojúsùn. Eré: ìfọwọ́kàn àti pọ́ọ̀pù pẹ̀lú."
 }

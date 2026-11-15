@@ -2632,5 +2632,13 @@
   "platformLabel.kids": "Pikin",
   "platformLabel.autoPlaylist": "Auto playlist",
   "platformLabel.autoPlaylists": "Auto playlists",
-  "platformLabel.autoPlaylistNamed": "Auto playlist · {name}"
+  "platformLabel.autoPlaylistNamed": "Auto playlist · {name}",
+  "mascot.moment.loading": "We dey sort the better tins…",
+  "mascot.moment.noMatches": "Nothing dey here. Try fewer words.",
+  "mascot.moment.error": "E no load. Try again.",
+  "mascot.sounds.title": "Sound dem",
+  "mascot.sounds.off": "Off",
+  "mascot.sounds.gentle": "Jeje",
+  "mascot.sounds.playful": "Play-play",
+  "mascot.sounds.description": "Jeje: small soft sound for big moments only, like when you reach your goal. Play-play: tap and pop sound too."
 }

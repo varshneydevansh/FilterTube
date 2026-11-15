@@ -2632,5 +2632,13 @@
   "platformLabel.kids": "키즈",
   "platformLabel.autoPlaylist": "자동 재생목록",
   "platformLabel.autoPlaylists": "자동 재생목록",
-  "platformLabel.autoPlaylistNamed": "자동 재생목록 · {name}"
+  "platformLabel.autoPlaylistNamed": "자동 재생목록 · {name}",
+  "mascot.moment.loading": "좋은 것만 골라내는 중…",
+  "mascot.moment.noMatches": "결과가 없어요. 단어를 줄여 보세요.",
+  "mascot.moment.error": "불러오지 못했어요. 다시 시도해 보세요.",
+  "mascot.sounds.title": "소리",
+  "mascot.sounds.off": "끄기",
+  "mascot.sounds.gentle": "잔잔하게",
+  "mascot.sounds.playful": "발랄하게",
+  "mascot.sounds.description": "잔잔하게: 목표 달성처럼 큰 순간에만 부드러운 소리. 발랄하게: 톡톡, 뽁 소리도."
 }

@@ -2632,5 +2632,13 @@
   "platformLabel.kids": "শিশু",
   "platformLabel.autoPlaylist": "অটো প্লেলিস্ট",
   "platformLabel.autoPlaylists": "অটো প্লেলিস্ট",
-  "platformLabel.autoPlaylistNamed": "অটো প্লেলিস্ট · {name}"
+  "platformLabel.autoPlaylistNamed": "অটো প্লেলিস্ট · {name}",
+  "mascot.moment.loading": "ভালো জিনিস বাছাই করছি…",
+  "mascot.moment.noMatches": "এখানে কিছু নেই। কম শব্দ দিয়ে চেষ্টা করুন।",
+  "mascot.moment.error": "লোড হয়নি। আবার চেষ্টা করুন।",
+  "mascot.sounds.title": "শব্দ",
+  "mascot.sounds.off": "বন্ধ",
+  "mascot.sounds.gentle": "মৃদু",
+  "mascot.sounds.playful": "চঞ্চল",
+  "mascot.sounds.description": "মৃদু: শুধু বড় মুহূর্তে নরম শব্দ, যেমন লক্ষ্য পূরণ হলে। চঞ্চল: ট্যাপ আর পপও।"
 }

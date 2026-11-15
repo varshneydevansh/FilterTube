@@ -10,7 +10,7 @@
     <link rel="stylesheet" href="../css/tab-view.css">
     <link rel="stylesheet" href="../css/serene-shell.css">
     <link
-        href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@1,400;1,500;1,600&family=Delius&family=JetBrains+Mono:wght@500;700&family=Outfit:wght@400;500;600;700;800&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap"
+        href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@1,400;1,500;1,600&family=JetBrains+Mono:wght@500;700&family=Outfit:wght@400;500;600;700;800&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap"
         rel="stylesheet">
     <link rel="stylesheet" href="../css/device-auto-sync.css">
     <link rel="stylesheet" href="../css/page-tones.css">
@@ -31,7 +31,7 @@
             </a>
 
             <ul class="nav-list">
-                <li class="nav-item active" tabindex="0" data-tab="dashboard">
+                <li data-pk-icon="home" class="nav-item active" tabindex="0" data-tab="dashboard">
                     <span class="nav-icon">
                         <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor"
                             stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
@@ -44,7 +44,7 @@
                     <span class="nav-text"><span class="nav-label" data-ft-i18n="navigation.dashboard">Dashboard</span><span class="nav-summary" aria-hidden="true"></span><span class="nav-lock" hidden></span></span>
                 </li>
                 <li class="nav-divider" role="separator" aria-hidden="true"></li>
-                <li class="nav-item" tabindex="0" data-tab="filters">
+                <li data-pk-icon="filter" class="nav-item" tabindex="0" data-tab="filters">
                     <span class="nav-icon">
                         <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor"
                             stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
@@ -53,7 +53,7 @@
                     </span>
                     <span class="nav-text"><span class="nav-label" data-ft-i18n="navigation.filters">Filters</span><span class="nav-summary" aria-hidden="true"></span><span class="nav-lock" hidden></span></span>
                 </li>
-                <li class="nav-item nav-item--sub" tabindex="0" data-tab="filters" data-nav-id="content" data-nav-target="content">
+                <li data-pk-icon="hide" class="nav-item nav-item--sub" tabindex="0" data-tab="filters" data-nav-id="content" data-nav-target="content">
                     <span class="nav-icon">
                         <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor"
                             stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
@@ -78,7 +78,7 @@
                     </span>
                     <span class="nav-text"><span class="nav-label">Semantic ML</span><span class="nav-summary" aria-hidden="true"></span><span class="nav-lock" hidden></span></span>
                 </li>
-                <li class="nav-item" tabindex="0" data-tab="kids">
+                <li data-pk-icon="kids" class="nav-item" tabindex="0" data-tab="kids">
                     <span class="nav-icon">
                         <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor"
                             stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
@@ -92,7 +92,7 @@
                     <span class="nav-text"><span class="nav-label" data-ft-i18n="navigation.kids">Kids Mode</span><span class="nav-summary" aria-hidden="true"></span><span class="nav-lock" hidden></span></span>
                 </li>
                 <li class="nav-divider" role="separator" aria-hidden="true"></li>
-                <li class="nav-item" tabindex="0" data-tab="settings">
+                <li data-pk-icon="settings" class="nav-item" tabindex="0" data-tab="settings">
                     <span class="nav-icon">
                         <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor"
                             stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
@@ -104,7 +104,7 @@
                     </span>
                     <span class="nav-text"><span class="nav-label" data-ft-i18n="navigation.settings">Settings</span><span class="nav-summary" aria-hidden="true"></span><span class="nav-lock" hidden></span></span>
                 </li>
-                <li class="nav-item nav-item--sub" tabindex="0" data-tab="settings" data-nav-id="timeLimits" data-nav-target="selfControl">
+                <li data-pk-icon="timer" class="nav-item nav-item--sub" tabindex="0" data-tab="settings" data-nav-id="timeLimits" data-nav-target="selfControl">
                     <span class="nav-icon">
                         <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor"
                             stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
@@ -114,7 +114,7 @@
                     </span>
                     <span class="nav-text"><span class="nav-label" data-ft-i18n="study.nav.title">Study and focus</span><span class="nav-summary" aria-hidden="true"></span><span class="nav-lock" hidden></span></span>
                 </li>
-                <li class="nav-item nav-item--sub" tabindex="0" data-tab="settings" data-nav-id="backup" data-nav-target="importExport">
+                <li data-pk-icon="folder" class="nav-item nav-item--sub" tabindex="0" data-tab="settings" data-nav-id="backup" data-nav-target="importExport">
                     <span class="nav-icon">
                         <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor"
                             stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
@@ -126,7 +126,7 @@
                     <span class="nav-text"><span class="nav-label" data-ft-i18n="controls.tile.backup">Backup &amp; restore</span><span class="nav-summary" aria-hidden="true"></span><span class="nav-lock" hidden></span></span>
                 </li>
                 <li class="nav-divider" role="separator" aria-hidden="true"></li>
-                <li class="nav-item" tabindex="0" data-tab="sync">
+                <li data-pk-icon="link" class="nav-item" tabindex="0" data-tab="sync">
                     <span class="nav-icon">
                         <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor"
                             stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
@@ -138,7 +138,7 @@
                     </span>
                     <span class="nav-text"><span class="nav-label" data-ft-i18n="navigation.sync">Accounts &amp; Sync</span><span class="nav-summary" aria-hidden="true"></span><span class="nav-lock" hidden></span></span>
                 </li>
-                <li class="nav-item nav-item--sub" tabindex="0" data-tab="sync" data-nav-id="profiles" data-nav-target="profiles">
+                <li data-pk-icon="you" class="nav-item nav-item--sub" tabindex="0" data-tab="sync" data-nav-id="profiles" data-nav-target="profiles">
                     <span class="nav-icon">
                         <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor"
                             stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
@@ -151,7 +151,7 @@
                     <span class="nav-text"><span class="nav-label" data-ft-i18n="controls.tile.profiles">Profiles &amp; PIN</span><span class="nav-summary" aria-hidden="true"></span><span class="nav-lock" hidden></span></span>
                 </li>
                 <li class="nav-divider" role="separator" aria-hidden="true"></li>
-                <li class="nav-item" tabindex="0" data-tab="whatsnew">
+                <li data-pk-icon="notifications" class="nav-item" tabindex="0" data-tab="whatsnew">
                     <span class="nav-icon">
                         <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor"
                             stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
@@ -166,7 +166,7 @@
                     </span>
                     <span class="nav-text"><span class="nav-label" data-ft-i18n="navigation.whatsNew">What’s New</span><span class="nav-summary" aria-hidden="true"></span><span class="nav-lock" hidden></span></span>
                 </li>
-                <li class="nav-item" tabindex="0" data-tab="help">
+                <li data-pk-icon="help" class="nav-item" tabindex="0" data-tab="help">
                     <span class="nav-icon">
                         <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor"
                             stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
@@ -177,7 +177,7 @@
                     </span>
                     <span class="nav-text"><span class="nav-label" data-ft-i18n="navigation.help">Help</span><span class="nav-summary" aria-hidden="true"></span><span class="nav-lock" hidden></span></span>
                 </li>
-                <li class="nav-item" tabindex="0" data-tab="about">
+                <li data-pk-icon="info" class="nav-item" tabindex="0" data-tab="about">
                     <span class="nav-icon">
                         <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor"
                             stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
@@ -188,7 +188,7 @@
                     </span>
                     <span class="nav-text"><span class="nav-label" data-ft-i18n="navigation.about">About</span><span class="nav-summary" aria-hidden="true"></span><span class="nav-lock" hidden></span></span>
                 </li>
-                <li class="nav-item" tabindex="0" data-tab="donate">
+                <li data-pk-icon="favourite" class="nav-item" tabindex="0" data-tab="donate">
                     <span class="nav-icon">
                         <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor"
                             stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
@@ -1114,6 +1114,17 @@
                                                 <option value="lively" data-ft-i18n="mascot.setting.lively">Lively</option>
                                                 <option value="quiet" data-ft-i18n="mascot.setting.quiet" selected>Quiet</option>
                                                 <option value="off" data-ft-i18n="mascot.setting.off">Off</option>
+                                            </select>
+                                        </div>
+                                        <div class="toggle-row">
+                                            <div class="toggle-info">
+                                                <div id="ftUiSoundsTitle" class="toggle-title" data-ft-i18n="mascot.sounds.title">Sounds</div>
+                                                <div id="ftUiSoundsHint" class="toggle-description" data-ft-i18n="mascot.sounds.description">Gentle plays soft sounds for big moments, like a goal met. Playful adds taps and pops.</div>
+                                            </div>
+                                            <select id="ftUiSounds" class="select-input" style="min-width:160px;" aria-labelledby="ftUiSoundsTitle" aria-describedby="ftUiSoundsHint">
+                                                <option value="off" data-ft-i18n="mascot.sounds.off" selected>Off</option>
+                                                <option value="gentle" data-ft-i18n="mascot.sounds.gentle">Gentle</option>
+                                                <option value="playful" data-ft-i18n="mascot.sounds.playful">Playful</option>
                                             </select>
                                         </div>
                                     </div>

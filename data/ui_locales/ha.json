@@ -2632,5 +2632,13 @@
   "platformLabel.kids": "Yara",
   "platformLabel.autoPlaylist": "Jerin kunnawa na atomatik",
   "platformLabel.autoPlaylists": "Jerin kunnawa na atomatik",
-  "platformLabel.autoPlaylistNamed": "Jerin kunnawa na atomatik · {name}"
+  "platformLabel.autoPlaylistNamed": "Jerin kunnawa na atomatik · {name}",
+  "mascot.moment.loading": "Ana tace abubuwa masu kyau…",
+  "mascot.moment.noMatches": "Babu komai a nan. Gwada kalmomi kaɗan.",
+  "mascot.moment.error": "Bai loda ba. Sake gwadawa.",
+  "mascot.sounds.title": "Sautuka",
+  "mascot.sounds.off": "A kashe",
+  "mascot.sounds.gentle": "A hankali",
+  "mascot.sounds.playful": "Na wasa",
+  "mascot.sounds.description": "A hankali: sautuka masu laushi don manyan lokuta kawai, kamar cimma buri. Na wasa: har da taɓawa da ƙara ƙanana."
 }

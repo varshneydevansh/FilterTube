@@ -2632,5 +2632,13 @@
   "platformLabel.kids": "兒童",
   "platformLabel.autoPlaylist": "自動播放清單",
   "platformLabel.autoPlaylists": "自動播放清單",
-  "platformLabel.autoPlaylistNamed": "自動播放清單 · {name}"
+  "platformLabel.autoPlaylistNamed": "自動播放清單 · {name}",
+  "mascot.moment.loading": "揀緊好嘢…",
+  "mascot.moment.noMatches": "呢度乜都冇。試吓少啲字。",
+  "mascot.moment.error": "載入唔到。再試一次啦。",
+  "mascot.sounds.title": "聲音",
+  "mascot.sounds.off": "關閉",
+  "mascot.sounds.gentle": "輕柔",
+  "mascot.sounds.playful": "活潑",
+  "mascot.sounds.description": "輕柔：只係喺大時刻，例如達成目標，先有輕輕嘅聲。活潑：仲有篤篤、啵啵聲。"
 }

@@ -2632,5 +2632,13 @@
   "platformLabel.kids": "పిల్లలు",
   "platformLabel.autoPlaylist": "ఆటో ప్లేలిస్ట్",
   "platformLabel.autoPlaylists": "ఆటో ప్లేలిస్ట్‌లు",
-  "platformLabel.autoPlaylistNamed": "ఆటో ప్లేలిస్ట్ · {name}"
+  "platformLabel.autoPlaylistNamed": "ఆటో ప్లేలిస్ట్ · {name}",
+  "mascot.moment.loading": "మంచివాటిని వేరు చేస్తున్నాం…",
+  "mascot.moment.noMatches": "ఇక్కడ ఏమీ లేదు. తక్కువ పదాలతో ప్రయత్నించండి.",
+  "mascot.moment.error": "లోడ్ కాలేదు. మళ్లీ ప్రయత్నించండి.",
+  "mascot.sounds.title": "శబ్దాలు",
+  "mascot.sounds.off": "ఆఫ్",
+  "mascot.sounds.gentle": "మృదువు",
+  "mascot.sounds.playful": "సరదా",
+  "mascot.sounds.description": "మృదువు: లక్ష్యం చేరినప్పుడు లాంటి పెద్ద క్షణాల్లో మాత్రమే మెత్తని శబ్దం. సరదా: ట్యాప్, పాప్ శబ్దాలు కూడా."
 }

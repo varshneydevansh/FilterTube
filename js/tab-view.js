@@ -9340,7 +9340,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         const avatar = renderTabProfileAvatar(document.createElement('span'), profilesV4Cache, childId, 36);
 
         const copy = document.createElement('div');
-        copy.className = 'ft-managed-child-global__copy ft-session-bar__copy';
+        copy.className = 'ft-session-bar__copy';
         const title = document.createElement('strong');
         title.className = 'ft-session-bar__title';
         const titleText = document.createElement('span');
@@ -15695,7 +15695,10 @@ document.addEventListener('DOMContentLoaded', async () => {
                 caption.className = 'ft-avatar-picker__label';
                 caption.textContent = label;
                 button.append(art, caption);
-                button.addEventListener('click', () => select(index, false));
+                button.addEventListener('click', () => {
+                    select(index, false);
+                    try { window.FilterTubeMascots?.playSound?.('select'); } catch (e) { }
+                });
                 button.addEventListener('keydown', (event) => {
                     const step = { ArrowRight: 1, ArrowDown: 1, ArrowLeft: -1, ArrowUp: -1 }[event.key];
                     if (!step) return;
@@ -28710,6 +28713,38 @@ document.addEventListener('DOMContentLoaded', async () => {
             ftProfilesManager.appendChild(row);
         });
         if (familyTools) ftProfilesManager.appendChild(familyTools);
+        renderProfilesEmptyState(profilesV4, childAdminRestricted);
+    }
+
+    /**
+     * The first empty picker (docs/app/profiles/PROFILES_REDESIGN.md): with only the Default profile,
+     * Kriti waves over "Just you so far" and Add a Kids profile, which opens the existing create
+     * flow and its gate. A Kids profile never sees it.
+     */
+    function renderProfilesEmptyState(profilesV4, childAdminRestricted) {
+        if (!ftProfilesManager?.appendChild) return;
+        const ids = Object.keys(safeObject(safeObject(profilesV4).profiles));
+        if (ids.length !== 1 || childAdminRestricted || isSelfControlSessionActive()) return;
+        const empty = document.createElement('div');
+        empty.className = 'ft-profiles-empty';
+        const hello = window.FilterTubeMascots?.moment?.('hello', { height: 96 });
+        if (hello) empty.appendChild(hello);
+        const heading = document.createElement('h4');
+        heading.className = 'ft-profiles-empty__title';
+        heading.textContent = tabViewUiText('profiles.emptyTitle', 'Just you so far');
+        const copy = document.createElement('p');
+        copy.className = 'ft-profiles-empty__body';
+        copy.textContent = tabViewUiText('profiles.emptyBody', 'Add a Kids profile to give a child their own space, with rules you set.');
+        const add = document.createElement('button');
+        add.type = 'button';
+        add.className = 'btn-primary ft-profiles-empty__add';
+        add.textContent = tabViewUiText('profiles.addKids', 'Add a Kids profile');
+        add.disabled = !ftCreateChildBtn || ftCreateChildBtn.disabled;
+        add.addEventListener('click', () => {
+            if (ftCreateChildBtn && !ftCreateChildBtn.disabled) ftCreateChildBtn.click();
+        });
+        empty.append(heading, copy, add);
+        ftProfilesManager.appendChild(empty);
     }
 
     async function refreshProfilesUI() {

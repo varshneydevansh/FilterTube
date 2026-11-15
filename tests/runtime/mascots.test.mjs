@@ -177,7 +177,8 @@ test('English speech lines are sentence case and fit a 48-character bubble', () 
         const sample = line.replace('{count}', '10,000');
         assert.ok([...sample].length <= Mascots.BUBBLE_MAX_CHARS, `${key} is ${sample.length} characters`);
         assert.match(sample, /^[A-Z0-9{I]/, `${key} starts with a capital or a number`);
-        assert.doesNotMatch(sample.slice(1), /\b(?!I\b|I'll\b)[A-Z][a-z]+/, `${key} has no title-case words`);
+        // A new sentence may start with a capital ("Nothing here. Try fewer words.").
+        assert.doesNotMatch(sample.slice(1).replace(/[.!?]\s+[A-Z]/g, '. x'), /\b(?!I\b|I'll\b)[A-Z][a-z]+/, `${key} has no title-case words`);
     }
     assert.equal(Mascots.clampLine('x'.repeat(60)).length, 48);
 });
@@ -194,12 +195,13 @@ test('the popup and options page load the companions, and the import and install
     assert.match(fs.readFileSync('js/background.js', 'utf8'), /ftMascotWelcomePending: true/);
 });
 
-test('Kagaz joins only the blocked-list empty states RenderEngine draws, not searches or allow lists', () => {
+test('Kriti peeks over empty blocked lists and Uljhan shrugs at an empty search; allow lists stay plain', () => {
     const { Mascots } = load();
     const node = key => ({ __ftRendererCopy: { textContent: { key } }, querySelector: () => null });
     assert.equal(Mascots.emptyListKind(node('render.emptyKeywordsBlocked')), 'keywords');
     assert.equal(Mascots.emptyListKind(node('render.emptyChannelsBlocked')), 'channels');
-    assert.equal(Mascots.emptyListKind(node('render.emptyKeywordsFound')), null);
+    assert.equal(Mascots.emptyListKind(node('render.emptyKeywordsFound')), 'search');
+    assert.equal(Mascots.emptyListKind(node('render.emptyChannelsFound')), 'search');
     assert.equal(Mascots.emptyListKind(node('render.emptyChannelsAllowed')), null);
     assert.equal(Mascots.emptyListKind({ querySelector: () => null }), null);
     const renderer = fs.readFileSync('js/render_engine.js', 'utf8');
@@ -218,7 +220,11 @@ test('the hidden counter keeps a running total that survives the daily reset', (
 test('mascot images are WebP and stay under the 250 KB budget', () => {
     const { Mascots } = load();
     const assets = plain(Mascots.ASSETS);
-    const names = [assets.bindu, assets.kritiLogo, assets.kritiAllow, assets.kagazNote, assets.moharStamp, ...assets.sieve];
+    // Kriti and Uljhan only (aKriti brand library); the counter mark is a doodle, not a character.
+    assert.deepEqual(Object.keys(assets).filter(key => !['counterMark', 'sieve'].includes(key)).map(key => key.replace(/[A-Z].*$/, '')).filter((v, i, a) => a.indexOf(v) === i).sort(), ['kriti', 'uljhan']);
+    assert.equal(assets.counterMark, '../doodles/sparkle.webp');
+    const names = [assets.kritiLogo, assets.kritiAllow, assets.kritiPeek, assets.kritiThumbsUp, assets.kritiWave, assets.kritiReading,
+        assets.uljhanShrug, ...assets.sieve];
     let total = 0;
     for (const name of names) {
         assert.match(name, /\.webp$/);
@@ -229,4 +235,51 @@ test('mascot images are WebP and stay under the 250 KB budget', () => {
     const folder = fs.readdirSync('assets/images/mascots').reduce((sum, name) => sum + fs.statSync(path.join('assets/images/mascots', name)).size, 0);
     assert.equal(folder, total, 'no unused images ship');
     assert.ok(total < 250 * 1024, `${total} bytes`);
+});
+
+test('sounds are off by default; Gentle plays big moments only, Playful adds taps and pops', async () => {
+    const { Mascots } = load();
+    assert.equal(Mascots.normalizeSoundMode(undefined), 'off');
+    assert.equal(Mascots.normalizeSoundMode('LOUD'), 'off');
+    assert.equal(await Mascots.loadSoundMode(), 'off', 'nothing stored means off');
+    for (const name of Object.keys(plain(Mascots.SOUND_FILES))) assert.equal(Mascots.soundAllowed('off', name), false, name);
+    assert.equal(Mascots.soundAllowed('gentle', 'success'), true);
+    assert.equal(Mascots.soundAllowed('gentle', 'celebrate'), true);
+    assert.equal(Mascots.soundAllowed('gentle', 'select'), false, 'Gentle has no taps');
+    assert.equal(Mascots.soundAllowed('playful', 'select'), true);
+    assert.equal(Mascots.soundAllowed('playful', 'nope'), false);
+    assert.equal(Mascots.playSound('success'), false, 'off plays nothing');
+    const stored = load({ ftUiSounds: 'gentle' });
+    assert.equal(await stored.Mascots.loadSoundMode(), 'gentle');
+    let total = 0;
+    for (const file of Object.values(plain(Mascots.SOUND_FILES))) {
+        const full = path.join('assets/sounds', file);
+        assert.ok(fs.existsSync(full), full);
+        total += fs.statSync(full).size;
+    }
+    assert.ok(total < 64 * 1024, `${total} bytes of sound`);
+    const options = fs.readFileSync('html/tab-view.html', 'utf8');
+    assert.match(options, /<select id="ftUiSounds"[^>]*>\s*<option value="off"[^>]*selected>Off<\/option>\s*<option value="gentle"[^>]*>Gentle<\/option>\s*<option value="playful"[^>]*>Playful<\/option>/);
+    assert.match(fs.readFileSync('js/ui_components.js', 'utf8'), /window\.FilterTubeMascots\?\.playSound\?\.\(sound\)/, 'toasts start the optional sound');
+});
+
+test('moments use Kriti or Uljhan only, and the Companion Off setting leaves the words alone', () => {
+    const { Mascots } = load();
+    const moments = plain(Mascots.MOMENTS);
+    for (const [kind, spec] of Object.entries(moments)) {
+        assert.ok(['Kriti', 'Uljhan'].includes(spec.character), kind);
+        assert.ok(plain(Mascots.ASSETS)[spec.image], `${kind} has art`);
+        assert.equal(spec.character === 'Uljhan', /^uljhan/.test(spec.image), `${kind} art matches its character`);
+    }
+    assert.equal(moments.noMatches.character, 'Uljhan', 'nothing found is Uljhan\'s');
+    assert.equal(moments.loading.character, 'Kriti');
+    // Without a document (or with Companion Off) there is no character to draw.
+    assert.equal(Mascots.moment('loading'), null);
+    for (const locale of fs.readdirSync('data/ui_locales').filter(name => /^[a-z]{2,3}(-[A-Za-z]+)?\.json$/.test(name) && name !== 'targets.json')) {
+        const catalog = JSON.parse(fs.readFileSync(path.join('data/ui_locales', locale), 'utf8'));
+        for (const key of ['mascot.moment.loading', 'mascot.moment.noMatches', 'mascot.moment.error', 'mascot.sounds.title',
+            'mascot.sounds.off', 'mascot.sounds.gentle', 'mascot.sounds.playful', 'mascot.sounds.description', 'profiles.emptyTitle', 'profiles.addKids']) {
+            assert.equal(typeof catalog[key], 'string', `${locale} ${key}`);
+        }
+    }
 });
