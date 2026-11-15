@@ -2598,5 +2598,22 @@
   "controls.tile.backup": "Backup & restore",
   "controls.tile.profiles": "Profiles & PIN",
   "controls.summary.contentOn": "Turned on: {count}",
-  "controls.summary.profiles": "Profiles: {count}"
+  "controls.summary.profiles": "Profiles: {count}",
+  "admission.studyStatus": "Study",
+  "admission.studyOffList": "Not part of today's study",
+  "admission.studyOffListBody": "Videos from your study plan play now. This one can wait until study ends.",
+  "admission.studyNotNow": "Not during study",
+  "admission.studyNotNowBody": "Nothing plays during a break, after today's limit or while the clock is being checked.",
+  "admission.studyBack": "Back to study",
+  "study.overlay.restTitle": "Break time",
+  "study.overlay.restBody": "Rest your eyes and stretch. Study starts again soon.",
+  "study.overlay.restBodyAt": "Rest your eyes and stretch. Study starts again at {time}.",
+  "study.overlay.limitTitle": "Done for today",
+  "study.overlay.limitBody": "Today's video time is over. See you tomorrow.",
+  "study.overlay.holdTitle": "Study is on hold",
+  "study.overlay.holdBody": "The time or time zone on this device changed during a lock. Study continues when the clock is right again.",
+  "study.overlay.unavailableTitle": "Study pack unavailable",
+  "study.overlay.unavailableBody": "Your study videos can't load right now, so nothing plays until this study time ends.",
+  "study.overlay.skipBreak": "Skip break",
+  "study.overlay.breakNotice": "Break in 2 minutes. Finish this video."
 }

@@ -69,7 +69,9 @@
             'Blocked by Upload Date Filter': 'admission.blockedUploadDate',
             'Blocked by Uppercase Title Filter': 'admission.blockedUppercase',
             'Blocked by Category Filter': 'admission.blockedCategory',
-            'Blocked by Language Filter': 'admission.blockedLanguage'
+            'Blocked by Language Filter': 'admission.blockedLanguage',
+            "Not part of today's study": 'admission.studyOffList',
+            'Not during study': 'admission.studyNotNow'
         };
         return String(message || '').split('\n').map(line =>
             labels[line] ? localizedAdmissionText(labels[line], line) : line).join('\n');
@@ -119,6 +121,87 @@
         return localeCatalogLoading;
     }
 
+    // The Watch gate during Study: dom_fallback's study first lines become a calm teal study card
+    // with "Back to study" (top frames only; an embedded player can't leave its page).
+    const STUDY_LINES = { "Not part of today's study": 'offList', 'Not during study': 'notNow' };
+
+    function studyKind(message) {
+        return STUDY_LINES[String(message || '').split('\n')[0]] || '';
+    }
+
+    /** Home is the study feed while studying (the filters keep only plan videos there). */
+    function backToStudy() {
+        try { root.location.assign('/'); } catch (e) {}
+    }
+
+    function renderStudyCard(overlay, kind, message) {
+        const darkTheme = admissionOverlayUsesDarkTheme();
+        admissionOverlayStyle(overlay, {
+            position: 'fixed', inset: '0', zIndex: '2147483647', width: '100vw', height: '100vh', boxSizing: 'border-box',
+            display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 'clamp(16px, 4vw, 56px)', overflow: 'hidden',
+            pointerEvents: 'auto', userSelect: 'text', whiteSpace: 'normal',
+            background: darkTheme ? '#10201f' : '#EEF6F4', color: darkTheme ? '#e6f2ef' : '#163f3c',
+            font: '400 15px/1.55 "Plus Jakarta Sans", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif'
+        });
+        removeAdmissionOverlayBackground(overlay);
+        if (typeof overlay?.appendChild !== 'function' || typeof document.createElement !== 'function') {
+            try { overlay.textContent = localizedAdmissionMessage(message); } catch (e) {}
+            return;
+        }
+        let card = overlay.__filtertubeStudyCard || null;
+        if (!card) {
+            while (overlay.firstChild) overlay.removeChild(overlay.firstChild);
+            overlay.__filtertubeAdmissionPanel = null;
+            overlay.__filtertubeAdmissionScrim = null;
+            card = document.createElement('section');
+            card.setAttribute('data-filtertube-study-card', 'true');
+            admissionOverlayStyle(card, {
+                display: 'flex', flexDirection: 'column', gap: '14px', width: 'min(480px, 100%)', boxSizing: 'border-box',
+                padding: 'clamp(24px, 5vw, 40px)', borderRadius: '24px', border: '1px solid rgba(31,111,106,.25)',
+                background: darkTheme ? 'rgba(20,40,38,.96)' : '#ffffff', boxShadow: '0 18px 50px rgba(22,63,60,.16)'
+            });
+            const status = document.createElement('p');
+            const title = document.createElement('h1');
+            const reason = document.createElement('p');
+            const owner = document.createElement('p');
+            const actions = document.createElement('div');
+            admissionOverlayStyle(status, { margin: '0', color: '#1F6F6A', font: '700 12px/1.3 "Plus Jakarta Sans", sans-serif', letterSpacing: '.08em', textTransform: 'uppercase' });
+            admissionOverlayStyle(title, { margin: '0', font: '700 clamp(22px, 3.6vw, 32px)/1.15 "Outfit", "Plus Jakarta Sans", sans-serif', color: darkTheme ? '#e6f2ef' : '#163f3c' });
+            admissionOverlayStyle(reason, { margin: '0', font: '500 15px/1.55 "Plus Jakarta Sans", sans-serif' });
+            admissionOverlayStyle(owner, { margin: '0', opacity: '.75', font: '500 13px/1.4 "Plus Jakarta Sans", sans-serif', overflowWrap: 'anywhere' });
+            admissionOverlayStyle(actions, { display: 'flex', gap: '10px', flexWrap: 'wrap', marginTop: '6px' });
+            card.append(status, title, reason, owner, actions);
+            overlay.appendChild(card);
+            overlay.__filtertubeStudyCard = card;
+            overlay.__filtertubeStudyParts = { status, title, reason, owner, actions };
+        }
+        const parts = overlay.__filtertubeStudyParts;
+        const offList = kind === 'offList';
+        parts.status.textContent = localizedAdmissionText('admission.studyStatus', 'Study');
+        parts.title.textContent = offList
+            ? localizedAdmissionText('admission.studyOffList', "Not part of today's study")
+            : localizedAdmissionText('admission.studyNotNow', 'Not during study');
+        parts.reason.textContent = offList
+            ? localizedAdmissionText('admission.studyOffListBody', 'Videos from your study plan play now. This one can wait until study ends.')
+            : localizedAdmissionText('admission.studyNotNowBody', 'Nothing plays during a break, after today\'s limit or while the clock is being checked.');
+        parts.owner.textContent = String(message || '').split('\n').slice(1).join(' ').trim();
+        while (parts.actions.firstChild) parts.actions.removeChild(parts.actions.firstChild);
+        let topFrame = true;
+        try { topFrame = root.top === root; } catch (e) { topFrame = false; }
+        if (offList && topFrame) {
+            const back = document.createElement('button');
+            back.type = 'button';
+            back.setAttribute('data-filtertube-study-action', 'back');
+            back.textContent = localizedAdmissionText('admission.studyBack', 'Back to study');
+            admissionOverlayStyle(back, {
+                padding: '10px 20px', borderRadius: '999px', border: '0', cursor: 'pointer',
+                background: '#1F6F6A', color: '#ffffff', font: '700 14px/1 "Plus Jakarta Sans", sans-serif'
+            });
+            back.addEventListener('click', event => { event.preventDefault(); event.stopPropagation(); backToStudy(); });
+            parts.actions.appendChild(back);
+        }
+    }
+
     function resolveAdmissionMessage(message) {
         return Promise.resolve(loadAdmissionLocale()).then(() => localizedAdmissionMessage(message));
     }
@@ -162,6 +245,16 @@
                 overlay.setAttribute('aria-label', localizedAdmissionMessage(message));
             }
             loadAdmissionLocale(overlay);
+        }
+        const study = state === 'blocked' ? studyKind(message) : '';
+        if (study) {
+            renderStudyCard(overlay, study, message);
+            return;
+        }
+        if (overlay && overlay.__filtertubeStudyCard) {
+            try { overlay.__filtertubeStudyCard.remove(); } catch (e) {}
+            overlay.__filtertubeStudyCard = null;
+            overlay.__filtertubeStudyParts = null;
         }
         const blocked = state === 'blocked';
         const reducedMotion = admissionOverlayPrefersReducedMotion();
@@ -346,6 +439,9 @@
         clear: removeAdmissionOverlayBackground,
         localizeMessage: localizedAdmissionMessage,
         resolveMessage: resolveAdmissionMessage,
+        // For study_overlay.js: the same bundled catalog, by key.
+        text: (key, fallback) => localizedAdmissionText(key, fallback),
+        loadLocale: () => loadAdmissionLocale(),
         getDirection: () => localeDirection
     };
 })(typeof window !== 'undefined' ? window : globalThis);

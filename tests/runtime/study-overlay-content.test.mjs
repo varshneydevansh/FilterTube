@@ -161,3 +161,112 @@ test('every manifest loads the Study content script before content_bridge.js on 
         assert.ok(main.js.indexOf('js/content/study_overlay.js') < main.js.indexOf('js/content_bridge.js'), file);
     }
 });
+
+function gateHarness({ path = '/', admitted = false, localizer = null } = {}) {
+    const dom = fakeDom();
+    const mini = { paused: false, pauseCount: 0, pause() { this.paused = true; this.pauseCount += 1; }, closest: () => null };
+    dom.doc.querySelector = selector => (selector.includes('ytd-miniplayer') ? mini : null);
+    const rechecks = [];
+    const overlay = createStudyOverlay({
+        window: { addEventListener() {}, location: { pathname: path } },
+        document: dom.doc,
+        runtime: { sendMessage: async () => ({ ok: true }), onMessage: { addListener() {} } },
+        now: () => 1_000_000, setTimeout: () => 0, clearTimeout: () => {}, setInterval: () => 0,
+        recheckWatch: () => rechecks.push(true),
+        currentAdmitted: () => admitted,
+        localizer
+    });
+    return { overlay, dom, mini, rechecks };
+}
+
+test('Watch gate: each phase change re-decides the current video, including one already playing', () => {
+    const h = gateHarness({ path: '/watch' });
+    h.overlay.setState({ state: 'NORMAL', phase: 'normal' });
+    assert.equal(h.rechecks.length, 0, 'the first state is the starting point');
+    h.overlay.setState({ state: 'STUDY', phase: 'study', sessionStart: 1, packIds: ['in_gate'] });
+    assert.equal(h.rechecks.length, 1, 'study started');
+    h.overlay.setState({ state: 'STUDY', phase: 'study', sessionStart: 1, packIds: ['in_gate'], round: 1 });
+    assert.equal(h.rechecks.length, 1, 'the same phase does not re-check');
+    h.overlay.setState({ state: 'BREAK', phase: 'rest', breakMode: 'rest', sessionStart: 1, packIds: [] });
+    assert.equal(h.rechecks.length, 2, 'a break');
+});
+
+test('Watch gate: a miniplayer video not admitted under the study rules is paused with the study card', () => {
+    const h = gateHarness({ path: '/feed/subscriptions' });
+    h.overlay.setState({ state: 'STUDY', phase: 'study', sessionStart: 1, packIds: ['in_gate'] });
+    assert.equal(h.mini.paused, true);
+    const note = h.dom.nodes.get('filtertube-study-mini-gate');
+    assert.ok(note && note.textContent.includes("Not part of today's study"));
+    const ok = gateHarness({ path: '/', admitted: true });
+    ok.overlay.setState({ state: 'STUDY', phase: 'study', sessionStart: 1, packIds: ['in_gate'] });
+    assert.equal(ok.mini.paused, false, 'a video admitted under the study rules keeps playing');
+    const normal = gateHarness({ path: '/' });
+    normal.overlay.setState({ state: 'NORMAL', phase: 'normal' });
+    assert.equal(normal.mini.paused, false, 'outside study nothing changes');
+    const watch = gateHarness({ path: '/watch' });
+    watch.overlay.setState({ state: 'STUDY', phase: 'study', sessionStart: 1, packIds: ['x'] });
+    assert.equal(watch.mini.paused, false, 'the watch page is decided by the admission gate itself');
+});
+
+test('fail closed and a clock hold get their own calm cards, in the interface language', () => {
+    const catalog = { 'study.overlay.holdTitle': 'Estudio en pausa', 'study.overlay.unavailableTitle': 'Paquete de estudio no disponible' };
+    const localizer = { text: (key, fallback) => catalog[key] || fallback, loadLocale: async () => catalog };
+    const held = gateHarness({ path: '/watch', localizer });
+    held.overlay.setState({ state: 'LIMIT', phase: 'rest', clockHold: true });
+    const box = held.dom.nodes.get(OVERLAY_ID);
+    assert.equal(box.dataset.kind, 'hold');
+    assert.ok(JSON.stringify(box.children).includes('Estudio en pausa'));
+    const closed = gateHarness({ path: '/watch', localizer });
+    closed.overlay.setState({ state: 'STUDY', phase: 'rest', failClosed: true });
+    assert.equal(closed.dom.nodes.get(OVERLAY_ID).dataset.kind, 'unavailable');
+    assert.ok(JSON.stringify(closed.dom.nodes.get(OVERLAY_ID).children).includes('Paquete de estudio no disponible'));
+});
+
+test('the Watch gate card: dom_fallback writes the study line and the overlay renders Back to study', () => {
+    const source = fs.readFileSync('js/content/dom_fallback.js', 'utf8');
+    assert.match(source, /const studyLine = getStudyAdmissionLine\(typeof currentSettings !== 'undefined' \? currentSettings : null\);/);
+    assert.match(source, /return study\.phase === 'study' \? FILTERTUBE_STUDY_OFF_LIST : FILTERTUBE_STUDY_NOT_NOW;/);
+    const overlaySource = fs.readFileSync('js/content/admission_overlay.js', 'utf8');
+    assert.match(overlaySource, /"Not part of today's study": 'admission\.studyOffList'/);
+    assert.match(overlaySource, /localizedAdmissionText\('admission\.studyBack', 'Back to study'\)/);
+    assert.equal(/YouTube/.test(overlaySource.slice(overlaySource.indexOf('function renderStudyCard'), overlaySource.indexOf('function resolveAdmissionMessage'))), false);
+});
+
+test('the admission overlay renders the study card with Back to study in the top frame only', async () => {
+    const vm = await import('node:vm');
+    const make = tag => ({
+        tag, style: {}, children: [], attributes: {}, textContent: '', handlers: {}, isConnected: true,
+        get firstChild() { return this.children[0] || null; },
+        setAttribute(key, value) { this.attributes[key] = value; },
+        appendChild(child) { this.children.push(child); return child; },
+        append(...nodes) { nodes.forEach(node => this.children.push(node)); },
+        removeChild(child) { this.children = this.children.filter(node => node !== child); },
+        insertBefore(child) { this.children.unshift(child); },
+        addEventListener(type, fn) { this.handlers[type] = fn; },
+        remove() {}
+    });
+    const run = top => {
+        const assigned = [];
+        const context = { document: { createElement: make, documentElement: { getAttribute: () => '' } }, fetch: async () => ({ ok: false }) };
+        context.window = context;
+        context.location = { hostname: 'www.youtube.com', assign: url => assigned.push(url) };
+        context.top = top ? context : {};
+        vm.createContext(context);
+        vm.runInContext(fs.readFileSync('js/content/admission_overlay.js', 'utf8'), context);
+        const overlay = make('div');
+        context.FilterTubeAdmissionOverlay.render(overlay, 'blocked', "Not part of today's study\nSome Channel");
+        return { overlay, assigned };
+    };
+    const { overlay, assigned } = run(true);
+    const card = overlay.children.find(child => child.attributes['data-filtertube-study-card']);
+    assert.ok(card, 'the study card');
+    const text = JSON.stringify(card, (key, value) => (key === 'handlers' ? undefined : value));
+    assert.ok(text.includes("Not part of today's study") && text.includes('Some Channel'));
+    const back = card.children[4].children[0];
+    assert.equal(back.textContent, 'Back to study');
+    back.handlers.click({ preventDefault() {}, stopPropagation() {} });
+    assert.deepEqual(assigned, ['/']);
+    const embedded = run(false);
+    const embeddedCard = embedded.overlay.children.find(child => child.attributes['data-filtertube-study-card']);
+    assert.equal(embeddedCard.children[4].children.length, 0, 'an embedded player gets no navigation button');
+});

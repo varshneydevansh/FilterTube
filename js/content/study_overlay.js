@@ -6,6 +6,11 @@
  * - The break is announced 2 minutes ahead.
  * - Study time: counted only while a video actually plays in a visible tab, during STUDY, and sent
  *   to the background worker, which credits it per device and local date.
+ * - The Watch gate (STUDY_ENFORCEMENT_SPEC P0.1): at each phase change the current video is decided
+ *   again (dom_fallback's admission, which shows "Not part of today's study"), and a video still
+ *   playing in the miniplayer, away from the watch page, is paused unless it was admitted under the
+ *   rules in force now. A study round with no known pack and a clock hold get their own calm card.
+ * Copy comes from the bundled interface catalogs (data/ui_locales) through admission_overlay.js.
  * The state comes from the background (FilterTube_StudyState pushes, FilterTube_StudyGetState on load
  * and at each transition); this script keeps no clock of its own beyond those times.
  */
@@ -32,6 +37,11 @@
     const BREAK_WAIT_MAX_MS = 5 * 60 * 1000;
     const NOTICE_SHOW_MS = 10 * 1000;
 
+    function interpolate(template, values) {
+        return String(template).replace(/\{([a-zA-Z][a-zA-Z0-9]*)\}/g, (match, key) =>
+            Object.prototype.hasOwnProperty.call(values || {}, key) ? String(values[key]) : match);
+    }
+
     function formatTime(ms) {
         try {
             return new Date(ms).toLocaleTimeString([], { hour: 'numeric', minute: '2-digit' });
@@ -55,6 +65,32 @@
         let pendingSeconds = 0;
         let lastCheckAt = null;
         let holdingPlayback = false;
+        let lastPhaseKey = null;
+        const localizer = () => env.localizer || win.FilterTubeAdmissionOverlay || null;
+        function t(key, fallback, values) {
+            let value = fallback;
+            try {
+                const localized = localizer()?.text?.(key, fallback);
+                if (typeof localized === 'string' && localized.trim()) value = localized;
+            } catch (e) { }
+            return interpolate(value, values);
+        }
+        /** Re-decide the current watch page with the rules in force now (dom_fallback's Watch gate). */
+        const recheckWatch = env.recheckWatch || (() => {
+            try {
+                if (typeof win.enforceCurrentWatchOwnerBlock === 'function') win.enforceCurrentWatchOwnerBlock(win.currentSettings);
+            } catch (e) { }
+        });
+        /** True when the video in the player was admitted under the rules in force now. */
+        const currentAdmitted = env.currentAdmitted || (() => {
+            try {
+                const record = win.__filtertubeCurrentVideoAdmission;
+                return !!record && typeof win.isCurrentVideoAdmittedUnderSettings === 'function'
+                    && win.isCurrentVideoAdmittedUnderSettings(record.videoId, win.currentSettings);
+            } catch (e) {
+                return false;
+            }
+        });
 
         function send(message) {
             try {
@@ -87,15 +123,62 @@
         }
 
         function onPlay(event) {
-            if (!holdingPlayback) return;
-            try { event?.target?.pause?.(); } catch (e) { }
+            if (holdingPlayback) {
+                try { event?.target?.pause?.(); } catch (e) { }
+                return;
+            }
+            guardMiniplayer();
         }
 
         function overlayKind() {
             if (!state) return null;
+            if (state.clockHold) return 'hold';
             if (state.state === 'LIMIT') return 'limit';
             if (state.state === 'BREAK' && state.breakMode !== 'normal' && !state.breakSkipped) return 'rest';
+            // Fail closed: a study round with no known pack (and no own allowed channels) is rest.
+            if (state.state === 'STUDY' && state.phase === 'rest') return 'unavailable';
             return null;
+        }
+
+        function onWatchRoute() {
+            const path = String(win.location?.pathname || '');
+            return path.startsWith('/watch') || path.startsWith('/shorts/') || path.startsWith('/embed/');
+        }
+
+        /** The main player's video when it plays away from the watch page (the miniplayer). */
+        function miniplayerVideo() {
+            if (onWatchRoute()) return null;
+            try {
+                const video = doc.querySelector?.('ytd-miniplayer video, #movie_player video.html5-main-video');
+                if (!video || video.closest?.('ytd-video-preview, #inline-preview-player, ytd-thumbnail')) return null;
+                return video;
+            } catch (e) {
+                return null;
+            }
+        }
+
+        const MINI_ID = 'filtertube-study-mini-gate';
+
+        /** During study, a miniplayer video not admitted under the rules in force now is paused. */
+        function guardMiniplayer() {
+            const studying = !!state && (state.phase === 'study' || state.phase === 'rest');
+            const video = studying ? miniplayerVideo() : null;
+            if (!video || currentAdmitted()) {
+                removeElement(MINI_ID);
+                return false;
+            }
+            try { if (!video.paused) video.pause(); } catch (e) { }
+            if (!doc.getElementById(MINI_ID)) {
+                const note = element('div', {
+                    position: 'fixed', right: '16px', bottom: '16px', zIndex: '2147483646', padding: '12px 16px',
+                    borderRadius: '12px', background: '#EEF6F4', color: '#163f3c', border: '1px solid #1F6F6A',
+                    fontFamily: 'Roboto, Arial, sans-serif', fontSize: '14px', maxWidth: '320px'
+                }, t('admission.studyOffList', "Not part of today's study"));
+                note.id = MINI_ID;
+                note.setAttribute('role', 'status');
+                (doc.body || doc.documentElement).appendChild(note);
+            }
+            return true;
         }
 
         function removeElement(id) {
@@ -124,15 +207,21 @@
             box.setAttribute('aria-live', 'polite');
             box.dataset.kind = kind;
             const until = state?.until ? formatTime(state.until) : '';
-            box.appendChild(element('div', { fontSize: '28px', fontWeight: '600' }, rest ? 'Break time' : 'Done for today'));
-            box.appendChild(element('div', { fontSize: '16px', maxWidth: '420px', lineHeight: '1.5' }, rest
-                ? `Rest your eyes and stretch. Study starts again${until ? ` at ${until}` : ' soon'}.`
-                : 'Today\'s video time is over. See you tomorrow.'));
+            const copy = {
+                rest: [t('study.overlay.restTitle', 'Break time'), until
+                    ? t('study.overlay.restBodyAt', 'Rest your eyes and stretch. Study starts again at {time}.', { time: until })
+                    : t('study.overlay.restBody', 'Rest your eyes and stretch. Study starts again soon.')],
+                limit: [t('study.overlay.limitTitle', 'Done for today'), t('study.overlay.limitBody', 'Today\'s video time is over. See you tomorrow.')],
+                hold: [t('study.overlay.holdTitle', 'Study is on hold'), t('study.overlay.holdBody', 'The time or time zone on this device changed during a lock. Study continues when the clock is right again.')],
+                unavailable: [t('study.overlay.unavailableTitle', 'Study pack unavailable'), t('study.overlay.unavailableBody', 'Your study videos can\'t load right now, so nothing plays until this study time ends.')]
+            }[kind] || [t('study.overlay.limitTitle', 'Done for today'), ''];
+            box.appendChild(element('div', { fontSize: '28px', fontWeight: '600' }, copy[0]));
+            box.appendChild(element('div', { fontSize: '16px', maxWidth: '420px', lineHeight: '1.5' }, copy[1]));
             if (rest && state?.canSkipBreak) {
                 const button = element('button', {
                     marginTop: '8px', padding: '10px 20px', borderRadius: '20px', border: '1px solid #854F0B',
                     background: 'transparent', color: '#854F0B', fontSize: '14px', cursor: 'pointer'
-                }, 'Skip break');
+                }, t('study.overlay.skipBreak', 'Skip break'));
                 button.type = 'button';
                 button.dataset.action = 'skip-break';
                 button.addEventListener('click', () => {
@@ -196,13 +285,19 @@
             if (Number.isFinite(until) && until > at) transitionTimer = setTimer(refresh, until - at + 500);
             const noticeAt = Number(state?.breakNoticeAt);
             if (state?.state === 'STUDY' && Number.isFinite(noticeAt)) {
-                noticeTimer = setTimer(() => showNotice('Break in 2 minutes. Finish this video.'), Math.max(0, noticeAt - at));
+                noticeTimer = setTimer(() => showNotice(t('study.overlay.breakNotice', 'Break in 2 minutes. Finish this video.')), Math.max(0, noticeAt - at));
             }
         }
 
         function setState(next) {
             state = next && typeof next === 'object' && next.state ? next : null;
+            // A phase change (study starts, a break, the limit, a hold) re-decides what is playing now,
+            // including a video that was already playing when study started.
+            const phaseKey = state ? `${state.phase || 'normal'}|${state.state}|${state.sessionStart || ''}|${(state.packIds || []).join(',')}` : 'none';
+            if (lastPhaseKey !== null && phaseKey !== lastPhaseKey) recheckWatch();
+            lastPhaseKey = phaseKey;
             render();
+            guardMiniplayer();
             scheduleNext();
         }
 
@@ -237,6 +332,9 @@
         function start() {
             try { runtime.onMessage?.addListener?.(onMessage); } catch (e) { }
             try { doc.addEventListener('play', onPlay, true); } catch (e) { }
+            // SPA navigations (yt-navigate-finish) and leaving the watch page into the miniplayer.
+            try { doc.addEventListener('yt-navigate-finish', () => { guardMiniplayer(); }, true); } catch (e) { }
+            try { Promise.resolve(localizer()?.loadLocale?.()).then(() => { if (state) render(); }).catch(() => {}); } catch (e) { }
             try { doc.addEventListener('visibilitychange', () => { if (!visible()) flush(); lastCheckAt = now(); }); } catch (e) { }
             try { win.addEventListener?.('pagehide', () => flush()); } catch (e) { }
             setRepeat(checkTime, TICK_MS);
@@ -244,9 +342,9 @@
             return api;
         }
 
-        const api = { start, setState, refresh, render, checkTime, flush, onMessage, onPlay, get state() { return state; }, get pendingSeconds() { return pendingSeconds; } };
+        const api = { start, setState, refresh, render, checkTime, flush, onMessage, onPlay, guardMiniplayer, get state() { return state; }, get pendingSeconds() { return pendingSeconds; } };
         return api;
     }
 
-    return { OVERLAY_ID, NOTICE_ID, TICK_MS, BREAK_WAIT_MAX_MS, createStudyOverlay, autoStarted: false };
+    return { OVERLAY_ID, NOTICE_ID, MINI_ID: 'filtertube-study-mini-gate', TICK_MS, BREAK_WAIT_MAX_MS, createStudyOverlay, autoStarted: false };
 }));

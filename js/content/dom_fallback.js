@@ -2185,9 +2185,22 @@ function getCurrentWatchAdmissionDecision(settings, context = {}) {
     return { blocked: false, kind: 'none' };
 }
 
+// The Watch gate during Study (STUDY_ENFORCEMENT_SPEC P0.1): an off-list video never plays. The
+// admission overlay (admission_overlay.js) turns these first lines into the study card.
+const FILTERTUBE_STUDY_OFF_LIST = 'Not part of today\'s study';
+const FILTERTUBE_STUDY_NOT_NOW = 'Not during study';
+
+function getStudyAdmissionLine(settings) {
+    const study = settings && typeof settings === 'object' ? settings.study : null;
+    if (!study || typeof study !== 'object' || study.applied !== true) return '';
+    return study.phase === 'study' ? FILTERTUBE_STUDY_OFF_LIST : FILTERTUBE_STUDY_NOT_NOW;
+}
+
 function formatCurrentWatchAdmissionMessage(decision, ownerMeta = {}) {
     const ownerName = ownerMeta.name || ownerMeta.handle || ownerMeta.id || decision?.ownerName || '';
     const trimForOverlay = value => String(value || '').replace(/\s+/g, ' ').trim().slice(0, 160);
+    const studyLine = getStudyAdmissionLine(typeof currentSettings !== 'undefined' ? currentSettings : null);
+    if (studyLine) return `${studyLine}${ownerName ? `\n${trimForOverlay(ownerName)}` : ''}`;
     if (decision?.kind === 'video') {
         return `Blocked video\nVideo ID: ${trimForOverlay(decision.videoId)}`;
     }

@@ -1773,9 +1773,13 @@ async function broadcastStudyTransition() {
     for (const target of targets) {
         try {
             const settings = await getCompiledSettings({ tab: { url: target.url } }, target.profile, true);
-            browserAPI.tabs?.query?.({ url: target.patterns }, (tabs) => {
+            // Main rules also reach players embedded in other sites' pages (every frame of every tab),
+            // so an embedded video that was playing when study started is re-checked too.
+            const query = target.profile === 'main' ? {} : { url: target.patterns };
+            browserAPI.tabs?.query?.(query, (tabs) => {
                 (tabs || []).forEach((tab) => {
                     if (!tab?.id) return;
+                    if (target.profile === 'main' && /^https?:\/\/([^/]+\.)?youtubekids\.com\//.test(String(tab.url || ''))) return;
                     sendMessageToTabQuietly(tab.id, { action: 'FilterTube_ApplySettings', settings });
                     sendMessageToTabQuietly(tab.id, { action: 'FilterTube_StudyState', state: settings?.study || null });
                 });
