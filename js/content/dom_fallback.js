@@ -2192,8 +2192,12 @@ const FILTERTUBE_STUDY_NOT_NOW = 'Not during study';
 
 function getStudyAdmissionLine(settings) {
     const study = settings && typeof settings === 'object' ? settings.study : null;
-    if (!study || typeof study !== 'object' || study.applied !== true) return '';
-    return study.phase === 'study' ? FILTERTUBE_STUDY_OFF_LIST : FILTERTUBE_STUDY_NOT_NOW;
+    if (!study || typeof study !== 'object') return '';
+    // The extension compiler writes {applied, phase}; the Android payload (FilterPayloadCompiler) writes
+    // {phase: "study" | "rest" | "limit" | "normal", rest}.
+    const applied = study.applied === true || ['study', 'rest', 'limit'].includes(study.phase);
+    if (!applied) return '';
+    return study.phase === 'study' && study.rest !== true ? FILTERTUBE_STUDY_OFF_LIST : FILTERTUBE_STUDY_NOT_NOW;
 }
 
 function formatCurrentWatchAdmissionMessage(decision, ownerMeta = {}) {

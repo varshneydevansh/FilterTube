@@ -225,7 +225,16 @@ test('fail closed and a clock hold get their own calm cards, in the interface la
 test('the Watch gate card: dom_fallback writes the study line and the overlay renders Back to study', () => {
     const source = fs.readFileSync('js/content/dom_fallback.js', 'utf8');
     assert.match(source, /const studyLine = getStudyAdmissionLine\(typeof currentSettings !== 'undefined' \? currentSettings : null\);/);
-    assert.match(source, /return study\.phase === 'study' \? FILTERTUBE_STUDY_OFF_LIST : FILTERTUBE_STUDY_NOT_NOW;/);
+    const from = source.indexOf('function getStudyAdmissionLine(settings) {');
+    const block = source.slice(source.indexOf("const FILTERTUBE_STUDY_OFF_LIST"), source.indexOf('function formatCurrentWatchAdmissionMessage'));
+    assert.ok(from > 0);
+    const line = new Function(`${block}; return getStudyAdmissionLine;`)();
+    assert.equal(line({ study: { applied: true, phase: 'study' } }), "Not part of today's study");
+    assert.equal(line({ study: { applied: true, phase: 'rest' } }), 'Not during study');
+    assert.equal(line({ study: { applied: false, phase: 'normal' } }), '');
+    assert.equal(line({ study: { phase: 'study', rest: false } }), "Not part of today's study", 'the Android payload shape');
+    assert.equal(line({ study: { phase: 'limit', rest: true } }), 'Not during study');
+    assert.equal(line({}), '');
     const overlaySource = fs.readFileSync('js/content/admission_overlay.js', 'utf8');
     assert.match(overlaySource, /"Not part of today's study": 'admission\.studyOffList'/);
     assert.match(overlaySource, /localizedAdmissionText\('admission\.studyBack', 'Back to study'\)/);
