@@ -6728,6 +6728,23 @@ document.addEventListener('DOMContentLoaded', async () => {
         return char;
     }
 
+    /** Draws the profile's crayon avatar (initials or its doodle, docs/app/profiles) into `host`. */
+    function renderTabProfileAvatar(host, profilesV4, profileId, size) {
+        const render = window.UIComponents?.renderProfileAvatar;
+        const profile = safeObject(safeObject(safeObject(profilesV4).profiles)[profileId]);
+        if (typeof render !== 'function') {
+            host.textContent = getProfileInitial(profilesV4, profileId);
+            return host;
+        }
+        return render(host, {
+            id: profileId,
+            name: getProfileName(profilesV4, profileId),
+            type: getProfileType(profilesV4, profileId),
+            avatar: profile.avatar,
+            size
+        });
+    }
+
     function closeProfileDropdownTab() {
         if (!ftProfileDropdownTab || !ftProfileBadgeBtnTab) return;
         if (profileDropdownPositionRaf) {
@@ -6870,11 +6887,11 @@ document.addEventListener('DOMContentLoaded', async () => {
         const current = normalizeString(root.activeProfileId) || 'default';
 
         const badgeColors = getProfileColors(current);
-        ftProfileBadgeBtnTab.textContent = getProfileInitial(profilesV4, current);
-        ftProfileBadgeBtnTab.style.backgroundColor = badgeColors.bg;
-        ftProfileBadgeBtnTab.style.color = badgeColors.fg;
-        ftProfileBadgeBtnTab.style.borderColor = badgeColors.accentBorder || '';
+        ftProfileBadgeBtnTab.textContent = '';
+        ftProfileBadgeBtnTab.classList.add('ft-profile-badge--avatar');
+        ftProfileBadgeBtnTab.appendChild(renderTabProfileAvatar(document.createElement('span'), profilesV4, current, 40));
         ftProfileBadgeBtnTab.title = buildProfileLabel(profilesV4, current);
+        ftProfileBadgeBtnTab.setAttribute('aria-label', buildProfileLabel(profilesV4, current));
 
         try {
             document.documentElement.style.setProperty('--ft-select-border', badgeColors.accentBorder || '');
@@ -6904,9 +6921,8 @@ document.addEventListener('DOMContentLoaded', async () => {
 
             const avatar = document.createElement('div');
             avatar.className = 'ft-profile-dropdown-avatar';
-            avatar.style.backgroundColor = colors.bg;
-            avatar.style.color = colors.fg;
-            avatar.textContent = getProfileInitial(profilesV4, id);
+            renderTabProfileAvatar(avatar, profilesV4, id, 36);
+            btn.className += ` ft-profile-role--${id === 'default' ? 'parent' : (isChild ? 'kids' : 'adult')}`;
 
             const meta = document.createElement('div');
             meta.className = 'ft-profile-dropdown-meta';
@@ -6924,6 +6940,15 @@ document.addEventListener('DOMContentLoaded', async () => {
 
             btn.appendChild(avatar);
             btn.appendChild(meta);
+            if (id === current || locked) {
+                const chip = document.createElement('span');
+                chip.className = `ft-profile-status-chip${id === current ? '' : ' ft-profile-status-chip--pin'}`;
+                chip.textContent = id === current
+                    ? tabViewUiText('profiles.statusCurrent', 'You’re here')
+                    : tabViewUiText('profiles.statusPin', 'PIN');
+                btn.appendChild(chip);
+            }
+            btn.setAttribute('aria-label', `${getProfileName(profilesV4, id)}, ${buildProfileSubtitle(profilesV4, id)}${id === current ? `. ${tabViewUiText('profiles.rowCurrent', 'Current profile')}` : ''}`);
 
             btn.addEventListener('click', async (e) => {
                 e.preventDefault();
@@ -6944,7 +6969,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                 header,
                 'textContent',
                 accountId === 'default' ? 'popup.profile.groupMaster' : 'popup.profile.groupAccount',
-                accountId === 'default' ? '{name} (Master)' : '{name} (Account)',
+                accountId === 'default' ? '{name} (Parent)' : '{name} (Adult)',
                 { name: getProfileName(profilesV4, accountId) }
             );
             ftProfileDropdownTab.appendChild(header);
@@ -7171,35 +7196,35 @@ document.addEventListener('DOMContentLoaded', async () => {
         const type = getProfileType(profilesV4, profileId);
         if (profileId === 'default') {
             return locked
-                ? tabViewUiText('popup.profile.labelMasterLocked', '{name} (Master, locked)', { name })
-                : tabViewUiText('popup.profile.labelMaster', '{name} (Master)', { name });
+                ? tabViewUiText('popup.profile.labelMasterLocked', '{name} (Parent, PIN protected)', { name })
+                : tabViewUiText('popup.profile.labelMaster', '{name} (Parent)', { name });
         }
         if (type === 'account') {
             return locked
-                ? tabViewUiText('popup.profile.labelAccountLocked', '{name} (Account, locked)', { name })
-                : tabViewUiText('popup.profile.labelAccount', '{name} (Account)', { name });
+                ? tabViewUiText('popup.profile.labelAccountLocked', '{name} (Adult, PIN protected)', { name })
+                : tabViewUiText('popup.profile.labelAccount', '{name} (Adult)', { name });
         }
         return locked
-            ? tabViewUiText('popup.profile.labelChildLocked', '{name} (Child, locked)', { name })
-            : tabViewUiText('popup.profile.labelChild', '{name} (Child)', { name });
+            ? tabViewUiText('popup.profile.labelChildLocked', '{name} (Kids, PIN protected)', { name })
+            : tabViewUiText('popup.profile.labelChild', '{name} (Kids)', { name });
     }
 
     function buildProfileSubtitle(profilesV4, profileId) {
         const locked = isProfileLocked(profilesV4, profileId);
         if (profileId === 'default') {
             return locked
-                ? tabViewUiText('popup.profile.subtitleMasterLocked', 'Master • Locked')
-                : tabViewUiText('popup.profile.subtitleMaster', 'Master');
+                ? tabViewUiText('popup.profile.subtitleMasterLocked', 'Parent profile, PIN protected')
+                : tabViewUiText('popup.profile.subtitleMaster', 'Parent profile');
         }
         const type = getProfileType(profilesV4, profileId);
         if (type === 'account') {
             return locked
-                ? tabViewUiText('popup.profile.subtitleAccountLocked', 'Account • Locked')
-                : tabViewUiText('popup.profile.subtitleAccount', 'Account');
+                ? tabViewUiText('popup.profile.subtitleAccountLocked', 'Adult profile, PIN protected')
+                : tabViewUiText('popup.profile.subtitleAccount', 'Adult profile');
         }
         return locked
-            ? tabViewUiText('popup.profile.subtitleChildLocked', 'Child • Locked')
-            : tabViewUiText('popup.profile.subtitleChild', 'Child');
+            ? tabViewUiText('popup.profile.subtitleChildLocked', 'Kids profile, PIN protected')
+            : tabViewUiText('popup.profile.subtitleChild', 'Kids profile');
     }
 
     function getProfileViewingAccess(profile) {
@@ -9190,6 +9215,63 @@ document.addEventListener('DOMContentLoaded', async () => {
         }
     }
 
+    // Parent session chrome (docs/app/family/PARENT_MODE.md): while a parent manages a Kids profile,
+    // a sun crayon frame runs round the whole window and a paper session bar on every view says
+    // whose space this is, where the session runs, how long it has run, and how to leave. The chrome
+    // only shows the session; every write still passes the existing managed-edit gates.
+    const PARENT_SESSION_SLIM_AFTER_MS = 60 * 1000;
+    const PARENT_SESSION_TICK_MS = 30 * 1000;
+    let parentSessionTimer = 0;
+    let parentSessionConnectedFor = '';
+    let parentSessionScrollBound = false;
+
+    function parentSessionReducedMotion() {
+        try {
+            return window.matchMedia?.('(prefers-reduced-motion: reduce)')?.matches === true;
+        } catch (e) {
+            return false;
+        }
+    }
+
+    /** "In session 3 min" (whole minutes, at least 1), localized through Intl when it can be. */
+    function parentSessionClockText(startedAt, now = Date.now()) {
+        const minutes = Math.max(1, Math.floor(Math.max(0, now - (Number(startedAt) || now)) / 60000));
+        let amount = `${minutes} min`;
+        try {
+            amount = new Intl.NumberFormat(tabViewIntlLocale(), { style: 'unit', unit: 'minute', unitDisplay: 'short' }).format(minutes);
+        } catch (e) {
+        }
+        return tabViewUiText('parentMode.timer', 'In session {time}', { time: amount });
+    }
+
+    function ensureParentSessionFrame() {
+        let frame = document.getElementById('ftParentSessionFrame');
+        if (frame) return frame;
+        frame = document.createElement('div');
+        frame.id = 'ftParentSessionFrame';
+        frame.className = 'ft-session-frame';
+        frame.hidden = true;
+        frame.setAttribute('aria-hidden', 'true');
+        frame.innerHTML = '<svg focusable="false"><rect x="3" y="3" rx="18" ry="18" width="0" height="0" /></svg>';
+        document.body.appendChild(frame);
+        const fit = () => {
+            const rect = frame.querySelector('rect');
+            const width = Math.max(0, window.innerWidth - 6);
+            const height = Math.max(0, window.innerHeight - 6);
+            rect.setAttribute('width', String(width));
+            rect.setAttribute('height', String(height));
+            frame.style.setProperty('--pk-frame-length', String(Math.ceil(2 * (width + height))));
+        };
+        fit();
+        window.addEventListener('resize', fit, { passive: true });
+        return frame;
+    }
+
+    function stopParentSessionClock() {
+        if (parentSessionTimer) clearInterval(parentSessionTimer);
+        parentSessionTimer = 0;
+    }
+
     function renderManagedChildGlobalBanner() {
         const banner = document.getElementById('managedChildGlobalBanner');
         const currentNav = document.querySelector('.nav-item.active');
@@ -9197,49 +9279,130 @@ document.addEventListener('DOMContentLoaded', async () => {
         const active = !!managedChildEdit;
         const editorView = active && isManagedChildEditorView(currentViewId);
         const profile = active ? getManagedChildProfile() : null;
-        document.body.classList.toggle('ft-managed-child-active', active && !!profile);
+        const inSession = active && !!profile;
+        document.body.classList.toggle('ft-managed-child-active', inSession);
         document.body.classList.toggle('ft-managed-child-editor-view', editorView && !!profile);
+
+        const frame = ensureParentSessionFrame();
+        if (!inSession) {
+            stopParentSessionClock();
+            if (parentSessionConnectedFor) {
+                parentSessionConnectedFor = '';
+                if (!frame.hidden && !parentSessionReducedMotion()) {
+                    frame.classList.remove('is-connecting');
+                    frame.classList.add('is-leaving');
+                    setTimeout(() => {
+                        if (!managedChildEdit) {
+                            frame.hidden = true;
+                            frame.classList.remove('is-leaving');
+                        }
+                    }, 420);
+                } else {
+                    frame.hidden = true;
+                }
+            }
+            if (banner) {
+                banner.innerHTML = '';
+                banner.hidden = true;
+                banner.classList.remove('ft-session-bar', 'is-slim', 'is-arriving');
+            }
+            return;
+        }
+
+        const childId = normalizeString(managedChildEdit?.profileId);
+        const childName = normalizeString(profile.name) || tabViewUiText('parentMode.childFallback', 'This child');
+        if (!managedChildEdit.startedAt) managedChildEdit.startedAt = Date.now();
+        const connecting = parentSessionConnectedFor !== childId;
+        parentSessionConnectedFor = childId;
+        frame.hidden = false;
+        frame.classList.remove('is-leaving');
+        if (connecting && !parentSessionReducedMotion()) {
+            frame.classList.remove('is-connecting');
+            void frame.getBoundingClientRect();
+            frame.classList.add('is-connecting');
+        }
 
         if (!banner) return;
         banner.innerHTML = '';
-        banner.hidden = !editorView || !profile;
-        if (!editorView || !profile) return;
+        banner.hidden = false;
+        banner.classList.add('ft-session-bar');
+        banner.setAttribute('role', 'region');
+        banner.setAttribute('aria-label', tabViewUiText('parentMode.entered', 'Managing {name}’s space. Changes apply to {name}.', { name: childName }));
+        if (connecting && !parentSessionReducedMotion()) {
+            banner.classList.remove('is-arriving');
+            void banner.getBoundingClientRect();
+            banner.classList.add('is-arriving');
+        }
 
-        const colors = getProfileColors(normalizeString(managedChildEdit?.profileId));
-        banner.style.setProperty('--ft-profile-accent', colors.accent || '');
-        banner.style.setProperty('--ft-profile-accent-bg', colors.accentBg || '');
-        banner.style.setProperty('--ft-profile-accent-border', colors.accentBorder || '');
-        document.body.style.setProperty('--ft-profile-accent-border', colors.accentBorder || '');
+        const avatar = renderTabProfileAvatar(document.createElement('span'), profilesV4Cache, childId, 36);
 
         const copy = document.createElement('div');
-        copy.className = 'ft-managed-child-global__copy';
+        copy.className = 'ft-managed-child-global__copy ft-session-bar__copy';
         const title = document.createElement('strong');
-        setTabViewLocalizedCopy(title, 'textContent', 'family.profileManager.editingProfileAsParent', 'Editing {name} as {parent}', {
-            name: normalizeString(profile.name) || tabViewUiText('popup.profile.genericName', 'Profile'),
-            parent: getProfileName(profilesV4Cache, activeProfileId)
-        });
-        const body = document.createElement('span');
-        setTabViewLocalizedCopy(
-            body,
-            'textContent',
-            currentViewId === 'sync' ? 'family.profileManager.editingSyncScopeSimple' : 'family.profileManager.editingProfileScopeSimple',
-            currentViewId === 'sync'
-                ? 'Choose a device and review its receiving profile before sending. Device control stays under parent approval.'
-                : 'Saving a parent edit updates this device. Send an update separately to change another device.'
-        );
-        copy.appendChild(title);
-        copy.appendChild(body);
+        title.className = 'ft-session-bar__title';
+        const titleText = document.createElement('span');
+        setTabViewLocalizedCopy(titleText, 'textContent', 'parentMode.spaceTitle', '{name}’s space', { name: childName });
+        const badge = document.createElement('span');
+        badge.className = 'ft-session-bar__badge';
+        setTabViewLocalizedCopy(badge, 'textContent', 'parentMode.badgeManaging', 'Managing');
+        title.append(titleText, badge);
+
+        const explainer = document.createElement('span');
+        explainer.className = 'ft-session-bar__explainer';
+        if (editorView) {
+            setTabViewLocalizedCopy(explainer, 'textContent', 'parentMode.explainer', 'Changes here apply to {name}.', { name: childName });
+        } else {
+            setTabViewLocalizedCopy(explainer, 'textContent', 'parentMode.explainerOther', 'You’re managing {name}’s space.', { name: childName });
+        }
+
+        const meta = document.createElement('span');
+        meta.className = 'ft-session-bar__meta';
+        const place = document.createElement('span');
+        place.className = 'ft-session-bar__place';
+        setTabViewLocalizedCopy(place, 'textContent', 'parentMode.hereBrowser', 'In this browser');
+        const clock = document.createElement('span');
+        clock.className = 'ft-session-bar__clock';
+        clock.textContent = parentSessionClockText(managedChildEdit.startedAt);
+        meta.append(place, clock);
+        copy.append(title, explainer, meta);
 
         const doneBtn = document.createElement('button');
         doneBtn.type = 'button';
-        doneBtn.className = 'btn-primary';
-        setTabViewLocalizedCopy(doneBtn, 'textContent', 'family.profileManager.doneEditingProfile', 'Done editing {name}', {
-            name: normalizeString(profile.name) || tabViewUiText('popup.profile.genericName', 'profile')
+        doneBtn.className = 'ft-session-bar__done';
+        setTabViewLocalizedCopy(doneBtn, 'textContent', 'parentMode.done', 'Done');
+        doneBtn.setAttribute('aria-label', tabViewUiText('parentMode.doneDescription', 'Done managing {name}’s space', { name: childName }));
+        doneBtn.addEventListener('click', () => {
+            endManagedChildEdit();
+            UIComponents.showToast(tabViewUiText('parentMode.exitToast', 'Back in your space'), 'success');
         });
-        doneBtn.addEventListener('click', endManagedChildEdit);
 
-        banner.appendChild(copy);
-        banner.appendChild(doneBtn);
+        const setSlim = (slim) => {
+            banner.classList.toggle('is-slim', slim);
+            copy.setAttribute('aria-expanded', slim ? 'false' : 'true');
+        };
+        copy.addEventListener('click', () => { if (banner.classList.contains('is-slim')) setSlim(false); });
+        copy.title = tabViewUiText('parentMode.showDetails', 'Show session details');
+        setSlim(Date.now() - managedChildEdit.startedAt >= PARENT_SESSION_SLIM_AFTER_MS);
+
+        banner.append(avatar, copy, doneBtn);
+
+        stopParentSessionClock();
+        parentSessionTimer = setInterval(() => {
+            if (!managedChildEdit) {
+                stopParentSessionClock();
+                return;
+            }
+            clock.textContent = parentSessionClockText(managedChildEdit.startedAt);
+            if (Date.now() - managedChildEdit.startedAt >= PARENT_SESSION_SLIM_AFTER_MS) setSlim(true);
+        }, PARENT_SESSION_TICK_MS);
+        if (!parentSessionScrollBound) {
+            parentSessionScrollBound = true;
+            const scroller = document.querySelector('.main-content') || window;
+            scroller.addEventListener('scroll', () => {
+                const bar = document.getElementById('managedChildGlobalBanner');
+                if (managedChildEdit && bar?.classList.contains('ft-session-bar')) bar.classList.add('is-slim');
+            }, { passive: true });
+        }
     }
 
     function renderManagedChildSyncBoundary() {
@@ -9525,6 +9688,58 @@ document.addEventListener('DOMContentLoaded', async () => {
             actorPinVerifier: JSON.stringify(verifierFor(actorId)),
             targetPinVerifier: JSON.stringify(verifierFor(targetProfileId))
         });
+    }
+
+    /** True when `latest` still matches the authorization captured before a prompt opened. */
+    function profileMutationStillAuthorized(latest, profileId, currentActive, mutationAuthority) {
+        const again = captureProfileMutationAuthorization(latest, profileId, currentActive);
+        return (normalizeString(latest?.activeProfileId) || 'default') === currentActive
+            && canActiveProfileManageProfile(latest, profileId)
+            && getProfileType(latest, profileId) === mutationAuthority.targetProfileType
+            && normalizeString(latest?.profiles?.[profileId]?.parentProfileId) === mutationAuthority.parentProfileId
+            && again.actorPinVerifier === mutationAuthority.actorPinVerifier
+            && again.targetPinVerifier === mutationAuthority.targetPinVerifier
+            && !(isProfileLocked(latest, currentActive) && !isProfileUnlockSessionValid.check(currentActive, { sensitiveAction: true }));
+    }
+
+    /**
+     * Change a profile's avatar: the same gate as Rename (the manager's own unlock before the grid
+     * opens, and the whole check again before the write). Display only: never policy.
+     */
+    async function changeProfileAvatar(profileId) {
+        const io = window.FilterTubeIO || {};
+        if (isChildProfileAdminSurface()) {
+            UIComponents.showToast(tabViewUiText('family.profileManager.cannotRenameHere', 'Protected profiles cannot rename profiles here'), 'error');
+            return;
+        }
+        if (typeof io.loadProfilesV4 !== 'function' || typeof io.saveProfilesV4 !== 'function') return;
+        const fresh = await io.loadProfilesV4();
+        const currentActive = normalizeString(fresh?.activeProfileId) || 'default';
+        if (!canActiveProfileManageProfile(fresh, profileId)) {
+            UIComponents.showToast(tabViewUiText('family.profileManager.ownerRequired', 'Use this profile’s parent account or Default to manage it.'), 'error');
+            return;
+        }
+        const mutationAuthority = captureProfileMutationAuthorization(fresh, profileId, currentActive);
+        const okParent = await ensureProfileUnlocked(fresh, currentActive, { sensitiveAction: true });
+        if (!okParent) return;
+        const chosen = await showAvatarPickerModal({
+            profileId,
+            name: getProfileName(fresh, profileId),
+            type: getProfileType(fresh, profileId),
+            current: safeObject(safeObject(fresh.profiles)[profileId]).avatar
+        });
+        if (chosen === undefined) return;
+        const latest = await io.loadProfilesV4();
+        if (!profileMutationStillAuthorized(latest, profileId, currentActive, mutationAuthority)) {
+            UIComponents.showToast(tabViewUiText('family.profileManager.profileChangedBeforeSave', 'The profile or parent approval changed. Review and try again.'), 'warning');
+            return;
+        }
+        const profiles = { ...safeObject(latest.profiles) };
+        const { avatar: _previous, ...profile } = safeObject(profiles[profileId]);
+        profiles[profileId] = chosen ? { ...profile, avatar: chosen } : profile;
+        await io.saveProfilesV4({ ...latest, schemaVersion: 4, profiles });
+        await refreshProfilesUI();
+        UIComponents.showToast(tabViewUiText('family.profileManager.profileUpdated', 'Profile updated'), 'success');
     }
 
     async function loadAuthorizedProfileMutationRoot(io, authorization) {
@@ -14737,7 +14952,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     }
 
     function getNanahProfileTypeLabel(profileType, profileId = '') {
-        if (normalizeString(profileId) === 'default') return tabViewUiText('popup.profile.subtitleMaster', 'Master');
+        if (normalizeString(profileId) === 'default') return tabViewUiText('popup.profile.subtitleMaster', 'Parent profile');
         return normalizeString(profileType).toLowerCase() === 'child'
             ? tabViewUiText('managedOverlay.profile.protected', 'Protected profile')
             : tabViewUiText('managedOverlay.profile.account', 'Account profile');
@@ -15407,6 +15622,121 @@ document.addEventListener('DOMContentLoaded', async () => {
                 } catch (e) {
                 }
             }, 0);
+        });
+    }
+
+    /**
+     * The avatar grid (Android ProfileCreateSheet): "Initial" first, then the 15 doodle avatars, as a
+     * radio group. Resolves the chosen stored value (null for initials), or undefined when cancelled.
+     */
+    async function showAvatarPickerModal({ profileId, name, type, current }) {
+        const components = window.UIComponents || {};
+        const doodles = Array.isArray(components.PROFILE_AVATAR_DOODLES) ? components.PROFILE_AVATAR_DOODLES : [];
+        const known = typeof components.profileAvatarDoodle === 'function' ? components.profileAvatarDoodle(current) : null;
+        return new Promise((resolve) => {
+            const overlay = document.createElement('div');
+            overlay.className = 'ft-modal-overlay';
+            const card = document.createElement('div');
+            card.className = 'card ft-modal ft-avatar-picker';
+            card.setAttribute('role', 'dialog');
+            card.setAttribute('aria-modal', 'true');
+
+            const header = document.createElement('div');
+            header.className = 'card-header';
+            const titleEl = document.createElement('h3');
+            titleEl.className = 'ft-modal-title';
+            titleEl.id = `ftAvatarPickerTitle-${Date.now()}`;
+            titleEl.textContent = tabViewUiText('profiles.avatarPickerTitle', 'Choose an avatar for {name}', { name });
+            card.setAttribute('aria-labelledby', titleEl.id);
+            header.appendChild(titleEl);
+
+            const body = document.createElement('div');
+            body.className = 'card-body ft-modal-body';
+            const preview = document.createElement('div');
+            preview.className = 'ft-avatar-picker__preview';
+            const previewAvatar = document.createElement('span');
+            preview.appendChild(previewAvatar);
+            const grid = document.createElement('div');
+            grid.className = 'ft-avatar-picker__grid';
+            grid.setAttribute('role', 'radiogroup');
+            grid.setAttribute('aria-label', tabViewUiText('profiles.createAvatarLabel', 'Avatar'));
+
+            let chosen = known ? known.value : null;
+            const options = [{ value: null, key: 'initial', label: 'Initial' }, ...doodles];
+            const draw = (host, value, size) => {
+                if (typeof components.renderProfileAvatar === 'function') {
+                    components.renderProfileAvatar(host, { id: profileId, name, type, avatar: value, size });
+                }
+            };
+            const buttons = [];
+            const select = (index, focus) => {
+                chosen = options[index].value;
+                buttons.forEach((button, i) => {
+                    const on = i === index;
+                    button.setAttribute('aria-checked', on ? 'true' : 'false');
+                    button.tabIndex = on ? 0 : -1;
+                    button.classList.toggle('is-selected', on);
+                });
+                draw(previewAvatar, chosen, 72);
+                if (focus) buttons[index].focus();
+            };
+            options.forEach((option, index) => {
+                const button = document.createElement('button');
+                button.type = 'button';
+                button.className = 'ft-avatar-picker__option';
+                button.setAttribute('role', 'radio');
+                const label = tabViewUiText(`profiles.avatar.${option.key}`, option.label);
+                const art = document.createElement('span');
+                draw(art, option.value, 44);
+                const caption = document.createElement('span');
+                caption.className = 'ft-avatar-picker__label';
+                caption.textContent = label;
+                button.append(art, caption);
+                button.addEventListener('click', () => select(index, false));
+                button.addEventListener('keydown', (event) => {
+                    const step = { ArrowRight: 1, ArrowDown: 1, ArrowLeft: -1, ArrowUp: -1 }[event.key];
+                    if (!step) return;
+                    event.preventDefault();
+                    const rtl = document.documentElement.dir === 'rtl' && (event.key === 'ArrowLeft' || event.key === 'ArrowRight');
+                    select((index + (rtl ? -step : step) + options.length) % options.length, true);
+                });
+                buttons.push(button);
+                grid.appendChild(button);
+            });
+
+            const actions = document.createElement('div');
+            actions.className = 'ft-modal-actions';
+            const cancelBtn = document.createElement('button');
+            cancelBtn.className = 'btn-secondary';
+            cancelBtn.type = 'button';
+            cancelBtn.textContent = tabViewModalActionText('Cancel');
+            const okBtn = document.createElement('button');
+            okBtn.className = 'btn-primary';
+            okBtn.type = 'button';
+            okBtn.textContent = tabViewUiText('dashboard.modal.save', 'Save');
+            const previousFocus = document.activeElement;
+            const closeWith = (value) => {
+                try { overlay.remove(); } catch (e) { }
+                try { previousFocus?.focus?.(); } catch (e) { }
+                resolve(value);
+            };
+            cancelBtn.addEventListener('click', () => closeWith(undefined));
+            okBtn.addEventListener('click', () => closeWith(chosen));
+            overlay.addEventListener('click', (event) => { if (event.target === overlay) closeWith(undefined); });
+            card.addEventListener('keydown', (event) => {
+                if (event.key === 'Escape') {
+                    event.preventDefault();
+                    closeWith(undefined);
+                }
+            });
+            actions.append(cancelBtn, okBtn);
+            body.append(preview, grid, actions);
+            card.append(header, body);
+            overlay.appendChild(card);
+            document.body.appendChild(overlay);
+            const start = Math.max(0, options.findIndex(option => option.value === chosen));
+            select(start, false);
+            setTimeout(() => { try { buttons[start].focus(); } catch (e) { } }, 0);
         });
     }
 
@@ -27942,8 +28272,19 @@ document.addEventListener('DOMContentLoaded', async () => {
             row.style.setProperty('--ft-profile-accent-border', colors.accentBorder || '');
 
             const title = document.createElement('div');
-            title.className = 'help-item-title';
-            title.textContent = buildProfileLabel(profilesV4, profileId);
+            title.className = 'help-item-title ft-profile-row__title';
+            const rowAvatar = renderTabProfileAvatar(document.createElement('span'), profilesV4, profileId, 40);
+            const rowName = document.createElement('span');
+            rowName.className = 'ft-profile-row__name';
+            rowName.textContent = getProfileName(profilesV4, profileId);
+            const rowRole = document.createElement('span');
+            rowRole.className = 'ft-profile-row__role';
+            rowRole.textContent = buildProfileSubtitle(profilesV4, profileId);
+            const rowWords = document.createElement('span');
+            rowWords.className = 'ft-profile-row__words';
+            rowWords.append(rowName, rowRole);
+            title.append(rowAvatar, rowWords);
+            row.className += ` ft-profile-role--${profileId === 'default' ? 'parent' : (type === 'child' ? 'kids' : 'adult')}`;
 
             const body = document.createElement('div');
             body.className = 'help-item-body';
@@ -28051,6 +28392,14 @@ document.addEventListener('DOMContentLoaded', async () => {
                     UIComponents.showToast(tabViewUiText('family.profileManager.profileUpdated', 'Profile updated'), 'success');
             });
 
+            const avatarBtn = document.createElement('button');
+            avatarBtn.className = 'btn-secondary';
+            avatarBtn.type = 'button';
+            avatarBtn.textContent = tabViewUiText('profiles.changeAvatar', 'Avatar');
+            avatarBtn.disabled = childAdminRestricted || !canManageTarget;
+            avatarBtn.title = renameBtn.title;
+            avatarBtn.addEventListener('click', () => changeProfileAvatar(profileId));
+
             const deleteBtn = document.createElement('button');
             deleteBtn.className = 'btn-secondary btn-danger';
             deleteBtn.type = 'button';
@@ -28116,6 +28465,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 
             actions.appendChild(switchBtn);
             maintenanceActions.appendChild(renameBtn);
+            maintenanceActions.appendChild(avatarBtn);
             maintenanceActions.appendChild(deleteBtn);
 
             const access = getProfileViewingAccess(profiles[profileId]);
@@ -32492,9 +32842,9 @@ document.addEventListener('DOMContentLoaded', async () => {
         const name = document.getElementById('ftDashProfileName');
         const mode = document.getElementById('ftDashProfileMode');
         if (avatar && root.profiles) {
-            const colors = getProfileColors(activeProfileId);
-            avatar.textContent = getProfileInitial(root, activeProfileId);
-            avatar.style.backgroundColor = colors.bg; avatar.style.color = colors.fg;
+            avatar.style.backgroundColor = '';
+            avatar.style.color = '';
+            renderTabProfileAvatar(avatar, root, activeProfileId, 44);
         }
         if (name) name.textContent = root.profiles ? getProfileName(root, activeProfileId) : '';
         if (mode) {

@@ -76,6 +76,153 @@ const UIComponents = (() => {
     }
 
     // ============================================================================
+    // PROFILE AVATARS (Android ProfileAvatar.kt, docs/app/profiles/PROFILES_REDESIGN.md)
+    // ============================================================================
+    // A profile shows crayon initials or a doodle avatar ("avatar": "doodle:<name>"). The role
+    // decides the ring: Parent (Default) a double scribble, Adult one wobbly ring, Kids a ring plus a
+    // corner sticker on initials. Avatars are drawn, never photos, and never Kriti or Uljhan.
+    const PROFILE_AVATAR_DOODLES = Object.freeze([
+        { value: 'doodle:heart', file: 'heart', mask: false, key: 'heart', label: 'Heart' },
+        { value: 'doodle:flower', file: 'flower', mask: false, key: 'flower', label: 'Flower' },
+        { value: 'doodle:star', file: 'star', mask: false, key: 'star', label: 'Star' },
+        { value: 'doodle:sparkle', file: 'sparkle', mask: false, key: 'sparkle', label: 'Sparkle' },
+        { value: 'doodle:cloud', file: 'cloud', mask: false, key: 'cloud', label: 'Cloud' },
+        { value: 'doodle:crayon', file: 'crayon', mask: false, key: 'crayon', label: 'Crayon' },
+        { value: 'doodle:clip', file: 'clip', mask: false, key: 'clip', label: 'Paper clip' },
+        { value: 'doodle:stamp', file: 'stamp', mask: false, key: 'stamp', label: 'Stamp' },
+        { value: 'doodle:magnifier', file: 'magnifier', mask: false, key: 'magnifier', label: 'Magnifier' },
+        { value: 'doodle:bubble', file: 'bubble', mask: false, key: 'bubble', label: 'Bubble' },
+        { value: 'doodle:seal', file: 'seal', mask: true, key: 'seal', label: 'Seal' },
+        { value: 'doodle:note', file: 'note', mask: false, key: 'note', label: 'Note' },
+        { value: 'doodle:waves', file: 'waves', mask: true, key: 'waves', label: 'Waves' },
+        { value: 'doodle:arrow', file: 'arrow', mask: true, key: 'arrow', label: 'Arrow' },
+        { value: 'doodle:tick', file: 'tick', mask: true, key: 'tick', label: 'Tick mark' }
+    ].map(Object.freeze));
+    const PROFILE_AVATAR_STICKERS = Object.freeze(['heart', 'star', 'sparkle']);
+    const PROFILE_AVATAR_MAX_LENGTH = 64;
+    const DOODLE_DIR = 'assets/images/doodles/';
+
+    /** "parent" for Default, "kids" for a child profile, else "adult". Pure. */
+    function profileRole(profileId, type) {
+        if (profileId === 'default') return 'parent';
+        return type === 'child' ? 'kids' : 'adult';
+    }
+
+    /** The stored value kept as-is when it is a short string; null otherwise (initials). Pure. */
+    function normalizeProfileAvatar(value) {
+        return (typeof value === 'string' && value.trim() && value.length <= PROFILE_AVATAR_MAX_LENGTH) ? value : null;
+    }
+
+    /** The doodle for a stored value; null for no value or one this version doesn't know. Pure. */
+    function profileAvatarDoodle(value) {
+        const avatar = normalizeProfileAvatar(value);
+        return avatar ? (PROFILE_AVATAR_DOODLES.find(entry => entry.value === avatar) || null) : null;
+    }
+
+    /** With nothing chosen, a Kids profile gets a corner sticker picked from its id. Pure. */
+    function profileAvatarSticker(profileId, role) {
+        if (role !== 'kids') return null;
+        const id = String(profileId || '');
+        let hash = 0;
+        for (const ch of id) hash = (hash * 31 + ch.codePointAt(0)) & 0x7FFFFFFF;
+        return PROFILE_AVATAR_STICKERS[hash % PROFILE_AVATAR_STICKERS.length];
+    }
+
+    /** The first letter (a whole code point), upper-cased; "?" for a blank name. Pure. */
+    function profileInitial(name) {
+        const trimmed = String(name || '').trim();
+        if (!trimmed) return '?';
+        return String.fromCodePoint(trimmed.codePointAt(0)).toUpperCase();
+    }
+
+    function doodleUrl(file) {
+        const path = `${DOODLE_DIR}${file}.webp`;
+        try {
+            const runtime = (typeof chrome !== 'undefined' && chrome?.runtime) || (typeof browser !== 'undefined' && browser?.runtime);
+            if (runtime && typeof runtime.getURL === 'function') return runtime.getURL(path);
+        } catch (e) {
+        }
+        return `../${path}`;
+    }
+
+    let crayonFilterInstalled = false;
+    function ensureCrayonFilter(doc) {
+        if (crayonFilterInstalled || !doc?.body) return;
+        crayonFilterInstalled = true;
+        const ns = 'http://www.w3.org/2000/svg';
+        const svg = doc.createElementNS(ns, 'svg');
+        svg.setAttribute('width', '0');
+        svg.setAttribute('height', '0');
+        svg.setAttribute('aria-hidden', 'true');
+        svg.setAttribute('focusable', 'false');
+        svg.style.position = 'absolute';
+        svg.innerHTML = '<defs><filter id="ftCrayonEdge" x="-10%" y="-10%" width="120%" height="120%">'
+            + '<feTurbulence type="fractalNoise" baseFrequency="0.9" numOctaves="2" seed="7" result="grain"/>'
+            + '<feDisplacementMap in="SourceGraphic" in2="grain" scale="1.6" xChannelSelector="R" yChannelSelector="G"/>'
+            + '</filter></defs>';
+        doc.body.appendChild(svg);
+    }
+
+    /**
+     * Fills `host` with a profile avatar: {id, name, type, avatar, size}. Decorative: the caller's
+     * text (name and role word) carries the meaning, so the drawing is hidden from screen readers.
+     */
+    function renderProfileAvatar(host, { id = '', name = '', type = '', avatar = null, size = 36 } = {}) {
+        if (!host) return host;
+        const doc = host.ownerDocument || document;
+        ensureCrayonFilter(doc);
+        const role = profileRole(id, type);
+        const doodle = profileAvatarDoodle(avatar);
+        const px = Math.max(16, Math.round(Number(size) || 36));
+        host.textContent = '';
+        host.classList.add('ft-avatar', `ft-avatar--${role}`);
+        host.classList.toggle('ft-avatar--doodle', !!doodle);
+        host.classList.toggle('ft-avatar--small', px < 28);
+        host.style.setProperty('--ft-avatar-size', `${px}px`);
+        host.dataset.ftAvatar = doodle ? doodle.value : 'initial';
+        host.setAttribute('aria-hidden', 'true');
+
+        const ns = 'http://www.w3.org/2000/svg';
+        const ring = doc.createElementNS(ns, 'svg');
+        ring.setAttribute('class', 'ft-avatar__ring');
+        ring.setAttribute('viewBox', '0 0 40 40');
+        ring.setAttribute('focusable', 'false');
+        const rings = role === 'parent'
+            ? '<circle cx="20" cy="20" r="17.2" /><circle class="ft-avatar__ring-second" cx="20.6" cy="19.5" r="18.4" />'
+            : '<circle cx="20" cy="20" r="17.6" />';
+        ring.innerHTML = rings;
+        host.appendChild(ring);
+
+        if (doodle) {
+            const art = doc.createElement('span');
+            const tinted = doodle.mask || role !== 'kids';
+            art.className = `ft-avatar__doodle${tinted ? ' ft-avatar__doodle--mask' : ''}`;
+            const url = `url("${doodleUrl(doodle.file)}")`;
+            if (tinted) {
+                art.style.webkitMaskImage = url;
+                art.style.maskImage = url;
+            } else {
+                art.style.backgroundImage = url;
+            }
+            host.appendChild(art);
+            return host;
+        }
+
+        const initial = doc.createElement('span');
+        initial.className = 'ft-avatar__initial';
+        initial.textContent = profileInitial(name || id);
+        host.appendChild(initial);
+        const sticker = px >= 34 ? profileAvatarSticker(id, role) : null;
+        if (sticker) {
+            const mark = doc.createElement('span');
+            mark.className = 'ft-avatar__sticker';
+            mark.style.backgroundImage = `url("${doodleUrl(sticker)}")`;
+            host.appendChild(mark);
+        }
+        return host;
+    }
+
+    // ============================================================================
     // BUTTONS
     // ============================================================================
 
@@ -989,6 +1136,13 @@ const UIComponents = (() => {
     return {
         Colors,
         getProfileColors,
+        PROFILE_AVATAR_DOODLES,
+        profileRole,
+        normalizeProfileAvatar,
+        profileAvatarDoodle,
+        profileAvatarSticker,
+        profileInitial,
+        renderProfileAvatar,
         createButton,
         flashButtonSuccess,
         createToggleButton,

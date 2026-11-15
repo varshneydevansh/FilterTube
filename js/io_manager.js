@@ -1066,6 +1066,23 @@
         return writeStorage({ [FT_PROFILES_V4_KEY]: nextProfiles });
     }
 
+    // A profile's `avatar` (Android ProfileAvatarCodec): "doodle:<name>" for a doodle avatar, no
+    // value for crayon initials. Display only, never policy. Any string up to 64 characters is kept
+    // exactly, even one this version doesn't know, so a newer app's avatar survives this rewrite.
+    // Anything else (a number, an object, a blank or over-long string) is dropped, never fatal.
+    const PROFILE_AVATAR_MAX_LENGTH = 64;
+    function normalizeProfileAvatar(value) {
+        return (typeof value === 'string' && value.trim() && value.length <= PROFILE_AVATAR_MAX_LENGTH) ? value : null;
+    }
+
+    function withSanitizedProfileAvatar(profile) {
+        if (!Object.prototype.hasOwnProperty.call(profile, 'avatar')) return profile;
+        const avatar = normalizeProfileAvatar(profile.avatar);
+        if (avatar !== null) return avatar === profile.avatar ? profile : { ...profile, avatar };
+        const { avatar: _dropped, ...rest } = profile;
+        return rest;
+    }
+
     function sanitizeProfilesV4(profilesV4, { source = 'export' } = {}) {
         if (!isValidProfilesV4(profilesV4)) return null;
         const profiles = safeObject(profilesV4.profiles);
@@ -1113,7 +1130,7 @@
             }
 
             outProfiles[profileId] = {
-                ...profile,
+                ...withSanitizedProfileAvatar(profile),
                 type: isDefault ? 'account' : resolvedType,
                 parentProfileId: isDefault ? null : resolvedParentProfileId,
                 name: normalizeString(profile.name) || 'Profile',
@@ -3594,6 +3611,7 @@
         saveProfilesV3,
         loadProfilesV4,
         saveProfilesV4,
+        normalizeProfileAvatar,
         // Auto-backup functions
         createAutoBackup,
         scheduleAutoBackup,

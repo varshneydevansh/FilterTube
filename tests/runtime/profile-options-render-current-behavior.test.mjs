@@ -95,8 +95,8 @@ function fixture(actor = 'parent-a', { withFamilyTools = false } = {}) {
   }
   vm.runInNewContext([
     'extractMasterPinVerifier', 'extractProfilePinVerifier', 'isProfileLocked', 'getProfileName', 'getProfileType', 'getParentAccountId',
-    'getSortedIdsByName', 'getAccountIds', 'getChildrenForAccount', 'buildProfileLabel', 'getProfileViewingAccess',
-    'canActiveProfileManageProfile', 'renderProfilesManager'
+    'getSortedIdsByName', 'getAccountIds', 'getChildrenForAccount', 'buildProfileLabel', 'buildProfileSubtitle', 'getProfileInitial',
+    'renderTabProfileAvatar', 'getProfileViewingAccess', 'canActiveProfileManageProfile', 'renderProfilesManager'
   ].map(productionFunction).join('\n'), context);
   const render = () => context.renderProfilesManager(profilesV4);
   const options = id => nodes(container).find(node => node.tagName === 'DETAILS' && node.dataset.profileOptionsId === id);
@@ -132,7 +132,7 @@ test('profile options retain rename, deletion, access, limits, history and PIN c
   assert.equal(detail.children[0].textContent, 'Profile options');
   const controls = nodes(detail).filter(node => node.tagName === 'BUTTON');
   assert.deepEqual(controls.map(node => node.textContent), [
-    'Rename', 'Delete', 'Main blocked', 'Kids allowed', 'Change limit', 'Disable limit', 'History', 'Change PIN', 'Remove PIN'
+    'Rename', 'Avatar', 'Delete', 'Main blocked', 'Kids allowed', 'Change limit', 'Disable limit', 'History', 'Change PIN', 'Remove PIN'
   ]);
   assert.ok(controls.every(node => !node.hidden), 'details disclosure retains controls rather than removing capabilities');
   assert.ok(f.button('child-a2', 'Set limit'));

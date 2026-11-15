@@ -1,0 +1,665 @@
+/* PaperKit for the extension (Android PaperKit.kt and BrandPalette.kt, docs/app/design-system/PAPERKIT.md).
+ * Paper sheets on a warm canvas, crayon edges, a brick pill standing on its ledge, and a true-navy
+ * dark mode. Loaded last, so it re-tunes the shared tokens and dresses the extension's own UI only:
+ * nothing here reaches the video site's page. Colour comes only from the --pk-* tokens below. */
+
+:root {
+  /* BrandPalette, light */
+  --pk-canvas: #f6f2eb;
+  --pk-desk: #ece4d9;
+  --pk-paper: #fffcf6;
+  --pk-ink: #1b1a18;
+  --pk-muted: #625f58;
+  --pk-faint: #9a9389;
+  --pk-line: #dcd1c2;
+  --pk-track: #e6ddcf;
+  --pk-brick: #a93e31;
+  --pk-on-brick: #fffcf6;
+  --pk-brick-fill: #a93e31;
+  --pk-on-brick-fill: #fffcf6;
+  --pk-rose: #fae8e6;
+  --pk-sky: #e9f4fb;
+  --pk-sky-ink: #1f5f86;
+  --pk-sun: #edb12e;
+  --pk-sun-wash: #fbedc8;
+  --pk-sun-ink: #5a3a07;
+  --pk-sage: #edf4e7;
+  --pk-sage-ink: #28623f;
+  --pk-lilac: #efe6f7;
+  --pk-plum: #5b3aa4;
+  --pk-ledge: rgba(27, 26, 24, 0.14);
+
+  /* Type: Outfit for headings and initials, Delius for card titles (the hand), the body as before. */
+  --pk-font-hand: "Delius", "Outfit", "Plus Jakarta Sans", system-ui, sans-serif;
+  --pk-font-display: "Outfit", "Plus Jakarta Sans", system-ui, sans-serif;
+
+  /* NativeMotion, the few durations the extension uses */
+  --pk-short: 180ms;
+  --pk-medium: 280ms;
+  --pk-draw: 400ms;
+  --pk-ease-enter: cubic-bezier(0.2, 0.9, 0.3, 1);
+  --pk-ease-exit: cubic-bezier(0.4, 0, 1, 1);
+
+  /* The shared tokens take the palette's values. */
+  --ft-color-bg-base: var(--pk-canvas);
+  --ft-color-text-primary: var(--pk-ink);
+  --ft-color-text-secondary: var(--pk-muted);
+  --ft-color-brand-primary: var(--pk-brick);
+  --ft-color-brand-primary-hover: #93362b;
+  --ft-color-status-danger: var(--pk-brick);
+  --ft-color-status-success: var(--pk-sage-ink);
+  --ft-color-sem-neutral-border: var(--pk-line);
+  --ft-color-focus-outline: rgba(169, 62, 49, 0.32);
+}
+
+:root[data-theme="dark"] {
+  /* BrandPalette, night: the true navy */
+  --pk-canvas: #0f141b;
+  --pk-desk: #0b0f14;
+  --pk-paper: #151c24;
+  --pk-ink: #edf2f7;
+  --pk-muted: #b8c3ce;
+  --pk-faint: #7e8995;
+  --pk-line: #2a3440;
+  --pk-track: #222b36;
+  --pk-brick: #e0796b;
+  --pk-on-brick: #1b1210;
+  --pk-rose: #3a2422;
+  --pk-sky: #1b2a38;
+  --pk-sky-ink: #8cc8ea;
+  --pk-sun-wash: #3d3220;
+  --pk-sun-ink: #f6d58a;
+  --pk-sage: #1e2e26;
+  --pk-sage-ink: #7fb89a;
+  --pk-lilac: #2a2440;
+  --pk-plum: #b39ae6;
+  --pk-ledge: rgba(0, 0, 0, 0.42);
+
+  --ft-color-bg-base: var(--pk-desk);
+  --ft-color-text-primary: var(--pk-ink);
+  --ft-color-text-secondary: var(--pk-muted);
+  --ft-color-brand-primary: var(--pk-brick);
+  --ft-color-brand-primary-hover: #ea8d80;
+  --ft-color-sem-neutral-border: var(--pk-line);
+}
+
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme]) {
+    --pk-canvas: #0f141b;
+    --pk-desk: #0b0f14;
+    --pk-paper: #151c24;
+    --pk-ink: #edf2f7;
+    --pk-muted: #b8c3ce;
+    --pk-faint: #7e8995;
+    --pk-line: #2a3440;
+    --pk-track: #222b36;
+    --pk-brick: #e0796b;
+    --pk-on-brick: #1b1210;
+    --pk-rose: #3a2422;
+    --pk-sky: #1b2a38;
+    --pk-sky-ink: #8cc8ea;
+    --pk-sun-wash: #3d3220;
+    --pk-sun-ink: #f6d58a;
+    --pk-sage: #1e2e26;
+    --pk-sage-ink: #7fb89a;
+    --pk-lilac: #2a2440;
+    --pk-plum: #b39ae6;
+    --pk-ledge: rgba(0, 0, 0, 0.42);
+    --ft-color-bg-base: var(--pk-desk);
+    --ft-color-brand-primary: var(--pk-brick);
+    --ft-color-sem-neutral-border: var(--pk-line);
+  }
+}
+
+/* ---------------------------------------------------------------------------
+ * Paper: cards, titles, the brick pill and quiet secondaries
+ * ------------------------------------------------------------------------- */
+
+.card,
+.ft-modal {
+  background: var(--pk-paper);
+  border: 1px solid var(--pk-line);
+  border-radius: 20px;
+  box-shadow: 0 2px 0 var(--pk-ledge), 0 14px 30px -24px var(--pk-ledge);
+}
+
+.card > .card-header h3,
+.ft-modal .ft-modal-title {
+  font-family: var(--pk-font-hand);
+  font-weight: 400;
+  letter-spacing: 0;
+  color: var(--pk-ink);
+}
+
+.btn-primary {
+  background: var(--pk-brick-fill);
+  color: var(--pk-on-brick-fill);
+  border: 1px solid var(--pk-brick-fill);
+  border-radius: 999px;
+  min-height: 40px;
+  box-shadow: 0 3px 0 #7d2c22;
+  transition: transform var(--pk-short) var(--pk-ease-enter), box-shadow var(--pk-short) var(--pk-ease-enter), background var(--pk-short) linear;
+}
+
+.btn-primary:hover:not(:disabled) {
+  background: #93362b;
+  border-color: #93362b;
+}
+
+.btn-primary:active:not(:disabled) {
+  transform: translateY(2px);
+  box-shadow: 0 1px 0 #7d2c22;
+}
+
+.btn-secondary {
+  background: var(--pk-paper);
+  color: var(--pk-ink);
+  border: 1px solid var(--pk-line);
+  border-radius: 999px;
+  min-height: 40px;
+}
+
+.btn-secondary:hover:not(:disabled) {
+  border-color: var(--pk-brick);
+  color: var(--pk-brick);
+}
+
+.btn-primary:focus-visible,
+.btn-secondary:focus-visible,
+.ft-avatar-picker__option:focus-visible,
+.ft-session-bar button:focus-visible,
+.ft-profile-dropdown-item:focus-visible {
+  outline: 2px solid var(--pk-ink);
+  outline-offset: 3px;
+}
+
+/* ---------------------------------------------------------------------------
+ * Crayon avatars (ui_components.renderProfileAvatar)
+ * ------------------------------------------------------------------------- */
+
+.ft-avatar {
+  --ft-avatar-size: 36px;
+  --pk-avatar-wash: var(--pk-lilac);
+  --pk-avatar-ink: var(--pk-plum);
+  position: relative;
+  display: inline-grid;
+  place-items: center;
+  flex: none;
+  width: var(--ft-avatar-size);
+  height: var(--ft-avatar-size);
+  border-radius: 50%;
+  background: var(--pk-avatar-wash);
+  color: var(--pk-avatar-ink);
+  line-height: 1;
+}
+
+.ft-avatar--adult { --pk-avatar-ink: var(--pk-ink); }
+.ft-avatar--kids { --pk-avatar-wash: var(--pk-sun-wash); --pk-avatar-ink: var(--pk-sun-ink); }
+
+.ft-avatar__ring {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+  pointer-events: none;
+}
+
+.ft-avatar__ring circle {
+  fill: none;
+  stroke: var(--pk-avatar-ink);
+  stroke-width: 2.3;
+  stroke-linecap: round;
+  /* a closed shape that never quite closes */
+  stroke-dasharray: 104 7;
+  stroke-dashoffset: 12;
+  filter: url(#ftCrayonEdge);
+}
+
+.ft-avatar__ring .ft-avatar__ring-second {
+  stroke-width: 1.5;
+  stroke-dasharray: 98 18;
+  stroke-dashoffset: 40;
+  opacity: 0.6;
+}
+
+.ft-avatar__initial {
+  position: relative;
+  font-family: var(--pk-font-display);
+  font-weight: 700;
+  font-size: calc(var(--ft-avatar-size) * 0.42);
+}
+
+.ft-avatar__doodle {
+  position: relative;
+  width: 58%;
+  height: 58%;
+  background: center / contain no-repeat;
+}
+
+.ft-avatar--small .ft-avatar__doodle { width: 66%; height: 66%; }
+
+.ft-avatar__doodle--mask {
+  background: var(--pk-avatar-ink);
+  -webkit-mask: center / contain no-repeat;
+  mask: center / contain no-repeat;
+}
+
+.ft-avatar__sticker {
+  position: absolute;
+  right: -8%;
+  bottom: -8%;
+  width: 42%;
+  height: 42%;
+  background: center / contain no-repeat;
+  pointer-events: none;
+}
+
+/* The badge buttons hold the avatar; the old inline colours are gone. */
+.ft-profile-badge.ft-profile-badge--avatar {
+  background: var(--pk-paper);
+  border: 1px solid var(--pk-line);
+  box-shadow: 0 2px 0 var(--pk-ledge);
+}
+
+.ft-profile-dropdown-avatar.ft-avatar,
+.ft-dash-status__avatar.ft-avatar {
+  border: 0;
+  background: var(--pk-avatar-wash);
+  color: var(--pk-avatar-ink);
+}
+
+/* ---------------------------------------------------------------------------
+ * Profile picker rows and the profiles manager (role words, paper, washes)
+ * ------------------------------------------------------------------------- */
+
+.ft-profile-dropdown {
+  background: var(--pk-paper);
+  border: 1px solid var(--pk-line);
+  border-radius: 20px;
+  box-shadow: 0 2px 0 var(--pk-ledge), 0 26px 40px -28px var(--pk-ledge);
+  backdrop-filter: none;
+}
+
+.ft-profile-dropdown-group {
+  font-family: var(--pk-font-display);
+  text-transform: none;
+  letter-spacing: 0;
+  font-size: 12px;
+  color: var(--pk-muted);
+}
+
+.ft-profile-dropdown-item[class*="ft-profile-role--"] {
+  background: var(--pk-paper);
+  border: 1px solid var(--pk-line);
+  border-left-width: 1px;
+  border-radius: 16px;
+  box-shadow: none;
+}
+
+.ft-profile-dropdown-item.ft-profile-role--kids { background: var(--pk-sun-wash); }
+.ft-profile-dropdown-item.ft-profile-role--parent.is-active,
+.ft-profile-dropdown-item.ft-profile-role--adult.is-active { background: var(--pk-lilac); border-color: color-mix(in srgb, var(--pk-plum) 30%, transparent); }
+.ft-profile-dropdown-item.ft-profile-role--kids.is-active { border-color: color-mix(in srgb, var(--pk-sun-ink) 34%, transparent); }
+.ft-profile-dropdown-item[class*="ft-profile-role--"]:hover:not(:disabled) { transform: none; border-color: var(--pk-brick); }
+.ft-profile-dropdown-item[class*="ft-profile-role--"].is-locked { opacity: 1; }
+
+.ft-profile-dropdown-item .ft-profile-dropdown-name {
+  font-family: var(--pk-font-display);
+  font-weight: 600;
+}
+
+.ft-profile-status-chip {
+  margin-inline-start: auto;
+  flex: none;
+  padding: 3px 9px;
+  border-radius: 999px;
+  border: 1px solid color-mix(in srgb, var(--pk-sage-ink) 28%, transparent);
+  background: var(--pk-sage);
+  color: var(--pk-sage-ink);
+  font-size: 11px;
+  font-weight: 700;
+  white-space: nowrap;
+}
+
+.ft-profile-status-chip--pin {
+  border-color: color-mix(in srgb, var(--pk-plum) 28%, transparent);
+  background: var(--pk-lilac);
+  color: var(--pk-plum);
+}
+
+.help-item.ft-profile-row[class*="ft-profile-role--"] {
+  background: var(--pk-paper);
+  border: 1px solid var(--pk-line);
+  border-left: 1px solid var(--pk-line);
+  border-radius: 18px;
+}
+
+.help-item.ft-profile-row.ft-profile-role--kids { background: var(--pk-sun-wash); }
+.help-item.ft-profile-row.ft-profile-role--parent.is-active,
+.help-item.ft-profile-row.ft-profile-role--adult.is-active { background: var(--pk-lilac); }
+
+.ft-profile-row__title {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.ft-profile-row__words {
+  display: grid;
+  gap: 2px;
+  min-width: 0;
+}
+
+.ft-profile-row__name {
+  font-family: var(--pk-font-display);
+  font-weight: 700;
+  overflow-wrap: anywhere;
+}
+
+.ft-profile-row__role {
+  color: var(--pk-muted);
+  font-size: 12px;
+  font-weight: 500;
+}
+
+/* The avatar grid */
+.ft-avatar-picker { max-width: 520px; }
+
+.ft-avatar-picker__preview {
+  display: flex;
+  justify-content: center;
+  margin: 2px 0 14px;
+}
+
+.ft-avatar-picker__grid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 8px;
+  margin-bottom: 16px;
+}
+
+.ft-avatar-picker__option {
+  display: grid;
+  justify-items: center;
+  gap: 6px;
+  min-height: 48px;
+  padding: 10px 4px 8px;
+  border: 1px solid var(--pk-line);
+  border-radius: 16px;
+  background: var(--pk-paper);
+  color: var(--pk-ink);
+  cursor: pointer;
+  font: inherit;
+}
+
+.ft-avatar-picker__option.is-selected {
+  border: 2px solid var(--pk-brick);
+  padding: 9px 3px 7px;
+  background: var(--pk-rose);
+}
+
+.ft-avatar-picker__option.is-selected .ft-avatar-picker__label { font-weight: 700; }
+
+.ft-avatar-picker__label {
+  font-size: 12px;
+  text-align: center;
+  overflow-wrap: anywhere;
+}
+
+/* ---------------------------------------------------------------------------
+ * Parent session (docs/app/family/PARENT_MODE.md): a sun crayon frame round the
+ * whole window and a paper session bar that says whose space this is.
+ * ------------------------------------------------------------------------- */
+
+.ft-session-frame {
+  position: fixed;
+  inset: 0;
+  z-index: 2147482000;
+  pointer-events: none;
+}
+
+.ft-session-frame[hidden] { display: none; }
+
+.ft-session-frame svg {
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+}
+
+.ft-session-frame rect {
+  fill: none;
+  stroke: var(--pk-sun);
+  stroke-width: 4;
+  stroke-linecap: round;
+  filter: url(#ftCrayonEdge);
+}
+
+.ft-session-frame.is-connecting rect {
+  stroke-dasharray: var(--pk-frame-length, 4000);
+  stroke-dashoffset: var(--pk-frame-length, 4000);
+  animation: pk-frame-draw var(--pk-draw) var(--pk-ease-enter) forwards;
+}
+
+.ft-session-frame.is-leaving rect {
+  stroke-dasharray: var(--pk-frame-length, 4000);
+  animation: pk-frame-erase var(--pk-draw) var(--pk-ease-exit) forwards;
+}
+
+@keyframes pk-frame-draw { to { stroke-dashoffset: 0; } }
+@keyframes pk-frame-erase { from { stroke-dashoffset: 0; } to { stroke-dashoffset: var(--pk-frame-length, 4000); } }
+
+body.ft-managed-child-active .main-content {
+  border-color: transparent;
+  box-shadow: none;
+}
+
+.ft-managed-child-global.ft-session-bar {
+  position: sticky;
+  top: 8px;
+  z-index: 40;
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  max-width: 560px;
+  margin: 8px auto 16px;
+  padding: 12px 14px;
+  border: 1px solid color-mix(in srgb, var(--pk-sun) 70%, var(--pk-line));
+  border-left: 1px solid color-mix(in srgb, var(--pk-sun) 70%, var(--pk-line));
+  border-radius: 20px;
+  background: var(--pk-paper);
+  box-shadow: 0 2px 0 var(--pk-ledge), 0 16px 32px -26px var(--pk-ledge);
+}
+
+body:not(.ft-managed-child-editor-view) .ft-managed-child-global.ft-session-bar { display: flex !important; }
+.ft-managed-child-global.ft-session-bar[hidden] { display: none !important; }
+
+.ft-session-bar.is-arriving {
+  animation: pk-bar-arrive var(--pk-short) var(--pk-ease-enter) 60ms both;
+}
+
+@keyframes pk-bar-arrive {
+  from { opacity: 0; transform: translateY(-24px); }
+  to { opacity: 1; transform: none; }
+}
+
+.ft-session-bar__copy {
+  display: grid;
+  gap: 3px;
+  min-width: 0;
+  flex: 1;
+}
+
+.ft-session-bar__title {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 8px;
+  font-family: var(--pk-font-display);
+  font-weight: 700;
+  font-size: 15px;
+  color: var(--pk-ink);
+}
+
+.ft-session-bar__badge {
+  padding: 2px 9px;
+  border-radius: 999px;
+  border: 1px solid color-mix(in srgb, var(--pk-sun-ink) 30%, transparent);
+  background: var(--pk-sun-wash);
+  color: var(--pk-sun-ink);
+  font-family: inherit;
+  font-size: 11px;
+  font-weight: 700;
+}
+
+.ft-session-bar__explainer {
+  color: var(--pk-ink);
+  font-size: 13px;
+}
+
+.ft-session-bar__meta {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  gap: 4px 12px;
+  color: var(--pk-muted);
+  font-size: 12px;
+}
+
+.ft-session-bar__done {
+  flex: none;
+  min-height: 48px;
+  min-width: 88px;
+  padding: 0 18px;
+  border: 1px solid color-mix(in srgb, var(--pk-sun-ink) 40%, var(--pk-line));
+  border-radius: 999px;
+  background: var(--pk-sun-wash);
+  color: var(--pk-sun-ink);
+  font: inherit;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.ft-session-bar__done:hover { border-color: var(--pk-sun-ink); }
+
+.ft-session-bar.is-slim { padding: 6px 8px 6px 10px; }
+.ft-session-bar.is-slim .ft-session-bar__explainer,
+.ft-session-bar.is-slim .ft-session-bar__place { display: none; }
+.ft-session-bar.is-slim .ft-session-bar__done { min-height: 36px; }
+.ft-session-bar.is-slim .ft-session-bar__copy { cursor: pointer; }
+
+.ft-session-saved {
+  justify-self: start;
+  padding: 2px 9px;
+  border-radius: 999px;
+  background: var(--pk-sage);
+  color: var(--pk-sage-ink);
+  font-size: 11px;
+  font-weight: 700;
+}
+
+@media (max-width: 640px) {
+  .ft-managed-child-global.ft-session-bar { flex-wrap: wrap; margin: 8px 12px 16px; }
+  .ft-session-bar__done { width: 100%; }
+}
+
+/* ---------------------------------------------------------------------------
+ * Doodle accents and crayon icons
+ * ------------------------------------------------------------------------- */
+
+.pk-doodle {
+  display: inline-block;
+  flex: none;
+  width: var(--pk-doodle-size, 28px);
+  height: var(--pk-doodle-size, 28px);
+  background: center / contain no-repeat;
+  pointer-events: none;
+}
+
+.pk-doodle--mask {
+  background: var(--pk-doodle-ink, var(--pk-muted));
+  -webkit-mask: center / contain no-repeat;
+  mask: center / contain no-repeat;
+}
+
+.pk-underline {
+  display: block;
+  width: min(160px, 60%);
+  height: 12px;
+  margin-top: 2px;
+  background: var(--pk-brick);
+  -webkit-mask: url("../assets/images/doodles/underline_wavy.webp") left center / contain no-repeat;
+  mask: url("../assets/images/doodles/underline_wavy.webp") left center / contain no-repeat;
+  opacity: 0.75;
+}
+
+.pk-icon {
+  display: inline-block;
+  flex: none;
+  width: 20px;
+  height: 20px;
+  background: currentColor;
+  -webkit-mask: var(--pk-icon) center / contain no-repeat;
+  mask: var(--pk-icon) center / contain no-repeat;
+  vertical-align: middle;
+}
+
+/* ---------------------------------------------------------------------------
+ * Mascot moments with idle life (Kriti and Uljhan only, BIBLE.md "Extension")
+ * ------------------------------------------------------------------------- */
+
+.pk-moment {
+  display: grid;
+  justify-items: center;
+  gap: 10px;
+  padding: 18px 14px;
+  text-align: center;
+  color: var(--pk-muted);
+}
+
+.pk-moment__art {
+  width: auto;
+  height: var(--pk-moment-size, 96px);
+  pointer-events: none;
+  user-select: none;
+}
+
+.pk-moment__line {
+  max-width: 34ch;
+  font-family: var(--pk-font-hand);
+  font-size: 14px;
+  color: var(--pk-ink);
+}
+
+.pk-moment.is-idle .pk-moment__art {
+  transform-origin: 50% 100%;
+  animation: pk-breathe 6s ease-in-out 3;
+}
+
+.pk-moment.is-pop .pk-moment__art {
+  animation: pk-pop 360ms var(--pk-ease-enter) both;
+}
+
+@keyframes pk-breathe {
+  0%, 100% { transform: translateY(0) scale(1); }
+  50% { transform: translateY(-2px) scale(1.012); }
+}
+
+@keyframes pk-pop {
+  0% { transform: scale(0.86) translateY(6px); opacity: 0; }
+  70% { transform: scale(1.03); opacity: 1; }
+  100% { transform: none; }
+}
+
+/* Reduced motion: everything lands at once; meaning stays in the words. */
+@media (prefers-reduced-motion: reduce) {
+  .btn-primary,
+  .ft-profile-dropdown-item { transition: none; }
+  .ft-session-frame.is-connecting rect,
+  .ft-session-frame.is-leaving rect,
+  .ft-session-bar.is-arriving,
+  .pk-moment.is-idle .pk-moment__art,
+  .pk-moment.is-pop .pk-moment__art { animation: none; }
+  .ft-session-frame.is-connecting rect { stroke-dashoffset: 0; }
+  .btn-primary:active:not(:disabled) { transform: none; }
+}

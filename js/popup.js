@@ -1643,7 +1643,8 @@ document.addEventListener('DOMContentLoaded', async () => {
         const locked = isProfileLocked(profilesV4, profileId);
         const type = profileId === 'default' ? 'Master' : getProfileType(profilesV4, profileId) === 'account' ? 'Account' : 'Child';
         const key = `popup.profile.label${type}${locked ? 'Locked' : ''}`;
-        const fallback = `${name} (${type}${locked ? ', locked' : ''})`;
+        // Role words (docs/app/profiles/PROFILES_REDESIGN.md): Parent, Adult, Kids.
+        const fallback = `${name} (${PROFILE_ROLE_CHIP[type]}${locked ? ', PIN protected' : ''})`;
         return popupUiText(key, fallback, { name });
     }
 
@@ -1651,8 +1652,28 @@ document.addEventListener('DOMContentLoaded', async () => {
         const locked = isProfileLocked(profilesV4, profileId);
         const type = profileId === 'default' ? 'Master' : getProfileType(profilesV4, profileId) === 'account' ? 'Account' : 'Child';
         const key = `popup.profile.subtitle${type}${locked ? 'Locked' : ''}`;
-        const fallback = `${type}${locked ? ' • Locked' : ''}`;
+        const fallback = `${PROFILE_ROLE_LINE[type]}${locked ? ', PIN protected' : ''}`;
         return popupUiText(key, fallback);
+    }
+
+    const PROFILE_ROLE_CHIP = Object.freeze({ Master: 'Parent', Account: 'Adult', Child: 'Kids' });
+    const PROFILE_ROLE_LINE = Object.freeze({ Master: 'Parent profile', Account: 'Adult profile', Child: 'Kids profile' });
+
+    /** Draws the profile's crayon avatar (initials or its doodle) into `host`. */
+    function renderPopupProfileAvatar(host, profilesV4, profileId, size) {
+        const render = window.UIComponents?.renderProfileAvatar;
+        const profile = safeObject(safeObject(safeObject(profilesV4).profiles)[profileId]);
+        if (typeof render !== 'function') {
+            host.textContent = getProfileInitial(profilesV4, profileId);
+            return host;
+        }
+        return render(host, {
+            id: profileId,
+            name: getProfileName(profilesV4, profileId),
+            type: getProfileType(profilesV4, profileId),
+            avatar: profile.avatar,
+            size
+        });
     }
 
     function getProfileType(profilesV4, profileId) {
@@ -2082,12 +2103,12 @@ document.addEventListener('DOMContentLoaded', async () => {
         const profiles = safeObject(root.profiles);
         const current = normalizeString(root.activeProfileId) || 'default';
 
-        const badgeColors = getProfileColors(current);
-        ftProfileBadgeBtnPopup.textContent = getProfileInitial(profilesV4, current);
-        ftProfileBadgeBtnPopup.style.backgroundColor = badgeColors.bg;
-        ftProfileBadgeBtnPopup.style.color = badgeColors.fg;
-        ftProfileBadgeBtnPopup.style.borderColor = badgeColors.accentBorder || '';
+        ftProfileBadgeBtnPopup.textContent = '';
+        ftProfileBadgeBtnPopup.classList.add('ft-profile-badge--avatar');
+        const badgeAvatar = document.createElement('span');
+        ftProfileBadgeBtnPopup.appendChild(renderPopupProfileAvatar(badgeAvatar, profilesV4, current, 40));
         ftProfileBadgeBtnPopup.title = buildProfileLabel(profilesV4, current);
+        ftProfileBadgeBtnPopup.setAttribute('aria-label', buildProfileLabel(profilesV4, current));
 
         ftProfileDropdownPopup.innerHTML = '';
 
@@ -2112,9 +2133,8 @@ document.addEventListener('DOMContentLoaded', async () => {
 
             const avatar = document.createElement('div');
             avatar.className = 'ft-profile-dropdown-avatar';
-            avatar.style.backgroundColor = colors.bg;
-            avatar.style.color = colors.fg;
-            avatar.textContent = getProfileInitial(profilesV4, id);
+            renderPopupProfileAvatar(avatar, profilesV4, id, 36);
+            btn.className += ` ft-profile-role--${id === 'default' ? 'parent' : (isChild ? 'kids' : 'adult')}`;
 
             const meta = document.createElement('div');
             meta.className = 'ft-profile-dropdown-meta';
@@ -2132,6 +2152,18 @@ document.addEventListener('DOMContentLoaded', async () => {
 
             btn.appendChild(avatar);
             btn.appendChild(meta);
+            if (id === current) {
+                const here = document.createElement('span');
+                here.className = 'ft-profile-status-chip';
+                here.textContent = popupUiText('profiles.statusCurrent', 'You’re here');
+                btn.appendChild(here);
+            } else if (locked) {
+                const pin = document.createElement('span');
+                pin.className = 'ft-profile-status-chip ft-profile-status-chip--pin';
+                pin.textContent = popupUiText('profiles.statusPin', 'PIN');
+                btn.appendChild(pin);
+            }
+            btn.setAttribute('aria-label', `${getProfileName(profilesV4, id)}, ${buildProfileSubtitle(profilesV4, id)}${id === current ? `. ${popupUiText('profiles.rowCurrent', 'Current profile')}` : ''}`);
 
             btn.addEventListener('click', async (e) => {
                 e.preventDefault();
@@ -2149,7 +2181,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             header.className = 'ft-profile-dropdown-group';
             header.setAttribute('role', 'presentation');
             const groupKey = accountId === 'default' ? 'popup.profile.groupMaster' : 'popup.profile.groupAccount';
-            const groupFallback = accountId === 'default' ? '{name} (Master)' : '{name} (Account)';
+            const groupFallback = accountId === 'default' ? '{name} (Parent)' : '{name} (Adult)';
             header.textContent = popupUiText(groupKey, groupFallback, { name: getProfileName(profilesV4, accountId) });
             ftProfileDropdownPopup.appendChild(header);
 
