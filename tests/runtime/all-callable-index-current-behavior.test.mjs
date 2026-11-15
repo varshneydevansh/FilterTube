@@ -35,7 +35,7 @@ const expectedFamilyTotals = new Map([
   ['Build/sync scripts', { files: 6, count: 93 }],
   ['Hot page/background runtime', { files: 15, count: 4066 }],
   ['Content helper runtime', { files: 31, count: 1095 }],
-  ['UI/settings runtime', { files: 34, count: 4202 }],
+  ['UI/settings runtime', { files: 35, count: 4285 }],
   ['Generated/quarantined UI', { files: 6, count: 153 }],
   ['Vendor bundles', { files: 3, count: 279 }],
   ['Audit/test lane scripts', { files: 25, count: 517 }],
@@ -254,8 +254,8 @@ test('audit meta index docs carry the method proof gap blocker', () => {
 
 test('all-callable index accounts for every tracked JS JSX and MJS source file', () => {
   const files = trackedJsFiles();
-  assert.equal(files.length, 151);
-  assert.match(indexDoc, /current tracked JS\/JSX\/MJS files: 151/);
+  assert.equal(files.length, 152);
+  assert.match(indexDoc, /current tracked JS\/JSX\/MJS files: 152/);
 
   for (const file of files) {
     docRow(file);

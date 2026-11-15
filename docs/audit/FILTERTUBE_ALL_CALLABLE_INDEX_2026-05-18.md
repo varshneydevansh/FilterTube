@@ -222,7 +222,7 @@ lexical and its scope remains tracked JS/JSX/MJS: CJS/Python tooling requires it
 separate release/workflow review and is not silently counted as JavaScript here.
 
 ```text
-current tracked JS/JSX/MJS files: 151
+current tracked JS/JSX/MJS files: 152
 current repo-wide lexical callables: 10554
 current complete per-callable semantic proofs: 0
 current callable behavior-change approval: NO-GO
@@ -301,6 +301,7 @@ runtime behavior changed by inventory refresh: no
 | `js/layout.js` | Generated/quarantined UI | 52 | quarantined/generated boundary |
 | `js/managed_admin_authority.js` | UI/settings runtime | 18 | UI/settings counted |
 | `js/managed_parent_command_center.js` | UI/settings runtime | 78 | UI/settings counted |
+| `js/mascots.js` | UI/settings runtime | 83 | UI/settings counted; semantic proof incomplete |
 | `js/nanah_managed_live_policy.js` | UI/settings runtime | 125 | UI/settings counted |
 | `js/nanah_managed_local_network_client.js` | UI/settings runtime | 48 | UI/settings counted; semantic proof incomplete |
 | `js/nanah_managed_mailbox_client.js` | UI/settings runtime | 37 | UI/settings counted; semantic proof incomplete |
