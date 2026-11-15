@@ -1198,6 +1198,69 @@
     "Coordinate geometry",
     "Previous year questions"
    ],
+   "variantLabel": {
+    "en": "Exam",
+    "hi": "परीक्षा"
+   },
+   "variants": [
+    {
+     "id": "main",
+     "name": {
+      "en": "JEE Main",
+      "hi": "जेईई मेन"
+     },
+     "default": true,
+     "chips": [
+      "Physics",
+      "Chemistry",
+      "Maths",
+      "NCERT",
+      "NTA mock tests",
+      "Previous year questions"
+     ],
+     "keywords": [
+      "jee main",
+      "jee mains",
+      "nta",
+      "jee main pyq",
+      "percentile",
+      "ncert"
+     ],
+     "channels": [
+      "@NationalTestingAgency",
+      "@mathongo",
+      "@MohitTyagi",
+      "@physicsgalaxyworld",
+      "@competishun"
+     ]
+    },
+    {
+     "id": "advanced",
+     "name": {
+      "en": "JEE Advanced",
+      "hi": "जेईई एडवांस्ड"
+     },
+     "chips": [
+      "Physics",
+      "Chemistry",
+      "Maths",
+      "Problem solving",
+      "Previous year questions"
+     ],
+     "keywords": [
+      "jee advanced",
+      "iit jee",
+      "jee advanced pyq",
+      "multiple correct",
+      "irodov"
+     ],
+     "channels": [
+      "@MohitTyagi",
+      "@physicsgalaxyworld",
+      "@competishun"
+     ]
+    }
+   ],
    "channels": [
     {
      "channelId": "UCiGyWN6DEbnj2alu7iapuKQ",
@@ -2962,6 +3025,172 @@
     "இணைந்த கணிதம்",
     "பௌதிகவியல்"
    ],
+   "variantLabel": {
+    "en": "Stream",
+    "si": "විෂය ධාරාව",
+    "ta": "பிரிவு"
+   },
+   "variants": [
+    {
+     "id": "physical",
+     "name": {
+      "en": "Physical science",
+      "si": "භෞතික විද්‍යා",
+      "ta": "பௌதிக விஞ்ஞானம்"
+     },
+     "default": true,
+     "chips": [
+      "Combined maths",
+      "Physics",
+      "Chemistry",
+      "ICT",
+      "Past papers"
+     ],
+     "keywords": [
+      "combined maths",
+      "සංයුක්ත ගණිතය",
+      "இணைந்த கணிதம்",
+      "physics",
+      "chemistry",
+      "maths stream"
+     ],
+     "channels": [
+      "@ajanthadissanayakeofficial8370",
+      "@cjcombinedmathsofficial",
+      "@JanakaAbeywardana",
+      "@CombinedMathsJanindu",
+      "@Amila_Abeysinghe",
+      "@dushyanthamahabadugeofficial",
+      "@DarshanaUkuwelaPhysics",
+      "@AGSandaruwanPerera",
+      "@amithpussellaphysics",
+      "@manjirasaraekanayakaalphys9256",
+      "@arunapallekumbura",
+      "@ThapesanPhysics",
+      "@Physics4uonlineacademy",
+      "@Arzamp6",
+      "@janinduphysics"
+     ]
+    },
+    {
+     "id": "biological",
+     "name": {
+      "en": "Biological science",
+      "si": "ජීව විද්‍යා",
+      "ta": "உயிரியல் விஞ்ஞானம்"
+     },
+     "chips": [
+      "Biology",
+      "Physics",
+      "Chemistry",
+      "Past papers"
+     ],
+     "keywords": [
+      "biology",
+      "ජීව විද්‍යාව",
+      "bio stream",
+      "physics",
+      "chemistry"
+     ],
+     "channels": [
+      "@BioApiSL",
+      "@alkuppiya",
+      "@sashankadhanujaya2630",
+      "@lahirusiriwardana4962",
+      "@DarshanaUkuwelaPhysics",
+      "@AGSandaruwanPerera",
+      "@amithpussellaphysics",
+      "@manjirasaraekanayakaalphys9256",
+      "@arunapallekumbura",
+      "@ThapesanPhysics",
+      "@Physics4uonlineacademy",
+      "@Arzamp6",
+      "@janinduphysics"
+     ]
+    },
+    {
+     "id": "commerce",
+     "name": {
+      "en": "Commerce",
+      "si": "වාණිජ",
+      "ta": "வர்த்தகம்"
+     },
+     "chips": [
+      "Accounting",
+      "Business studies",
+      "Economics",
+      "Past papers"
+     ],
+     "keywords": [
+      "accounting",
+      "business studies",
+      "economics",
+      "commerce stream",
+      "ගිණුම්කරණය"
+     ],
+     "channels": [
+      "@Accountingwithlasantha",
+      "@RavindraDissanayaka",
+      "@AccountingKingLK",
+      "@lashan_Mallawarchchi",
+      "@AccountingNamal",
+      "@econbyluckychathuranga"
+     ]
+    },
+    {
+     "id": "arts",
+     "name": {
+      "en": "Arts",
+      "si": "කලා",
+      "ta": "கலை"
+     },
+     "chips": [
+      "Political science",
+      "Economics",
+      "Geography",
+      "History",
+      "Past papers"
+     ],
+     "keywords": [
+      "arts stream",
+      "political science",
+      "economics",
+      "geography",
+      "history",
+      "දේශපාලන විද්‍යාව"
+     ],
+     "channels": [
+      "@sanalisitisekara-political6614",
+      "@econbyluckychathuranga"
+     ]
+    },
+    {
+     "id": "technology",
+     "name": {
+      "en": "Technology",
+      "si": "තාක්ෂණවේදය",
+      "ta": "தொழில்நுட்பம்"
+     },
+     "chips": [
+      "Engineering technology",
+      "Science for technology",
+      "ICT",
+      "Past papers"
+     ],
+     "keywords": [
+      "engineering technology",
+      "science for technology",
+      "sft",
+      "et",
+      "technology stream",
+      "ඉංජිනේරු තාක්ෂණය"
+     ],
+     "channels": [
+      "@srimalwijesinghe2592",
+      "@techsiyoal"
+     ]
+    }
+   ],
    "channels": [
     {
      "channelId": "UCdCEVfyN0mWj5_MufKidubw",
@@ -3093,6 +3322,60 @@
      "channelId": "UCvS5ora2tYDKelrCuG2J4WA",
      "handle": "@lahirusiriwardana4962",
      "name": "Lahiru Siriwardana -Biology",
+     "language": "si"
+    },
+    {
+     "channelId": "UCfQzTP1jc7JXj8hYtG31osw",
+     "handle": "@Accountingwithlasantha",
+     "name": "Accounting with Lasantha",
+     "language": "si"
+    },
+    {
+     "channelId": "UC-zNa7_0M9gzRgPB_jdxuUg",
+     "handle": "@RavindraDissanayaka",
+     "name": "Accounting with Ravindra Dissanayaka",
+     "language": "si"
+    },
+    {
+     "channelId": "UC5ZNkdIVKL-M3KrNaCEzveg",
+     "handle": "@AccountingKingLK",
+     "name": "Ramesh A Priyankara (Accounting King)",
+     "language": "si"
+    },
+    {
+     "channelId": "UCO1TMeOHCQLPQQDZo3wfy9Q",
+     "handle": "@lashan_Mallawarchchi",
+     "name": "Accounting With Lashan Mallawarachchi",
+     "language": "si"
+    },
+    {
+     "channelId": "UC_V4iOMtdEkeqchISUymyog",
+     "handle": "@AccountingNamal",
+     "name": "Namal Dilanka",
+     "language": "si"
+    },
+    {
+     "channelId": "UCcaratDXMCPh3RXIxszxRVQ",
+     "handle": "@econbyluckychathuranga",
+     "name": "Econ by Lucky Chathuranga",
+     "language": "si"
+    },
+    {
+     "channelId": "UCsgMhJ_9CfvW05brLBjX-GA",
+     "handle": "@sanalisitisekara-political6614",
+     "name": "Sanali Sitisekara - Political Science",
+     "language": "si"
+    },
+    {
+     "channelId": "UCGdljXTpfEdoqjXqrXcAYRQ",
+     "handle": "@srimalwijesinghe2592",
+     "name": "Srimal Wijesinghe - ET",
+     "language": "si"
+    },
+    {
+     "channelId": "UC_MI4taUOoXcb2aCnx6zkTA",
+     "handle": "@techsiyoal",
+     "name": "Techsiyo AL",
      "language": "si"
     }
    ]
@@ -14036,16 +14319,24 @@
    "grade": "6-8",
    "board": "CBSE (NCERT)",
    "countries": [
-    "IN"
-   ],
-   "nearby": [
+    "IN",
     "NP",
     "AE",
     "SA",
     "QA",
+    "KW",
     "OM",
-    "KW"
+    "BH"
    ],
+   "taughtIn": {
+    "NP": "Indian curriculum",
+    "AE": "Indian curriculum",
+    "SA": "Indian curriculum",
+    "QA": "Indian curriculum",
+    "KW": "Indian curriculum",
+    "OM": "Indian curriculum",
+    "BH": "Indian curriculum"
+   },
    "languages": [
     "en",
     "hi"
@@ -14213,16 +14504,24 @@
    "grade": "9-10",
    "board": "CBSE (NCERT)",
    "countries": [
-    "IN"
-   ],
-   "nearby": [
+    "IN",
     "NP",
     "AE",
     "SA",
     "QA",
+    "KW",
     "OM",
-    "KW"
+    "BH"
    ],
+   "taughtIn": {
+    "NP": "Indian curriculum",
+    "AE": "Indian curriculum",
+    "SA": "Indian curriculum",
+    "QA": "Indian curriculum",
+    "KW": "Indian curriculum",
+    "OM": "Indian curriculum",
+    "BH": "Indian curriculum"
+   },
    "languages": [
     "en",
     "hi"
@@ -14416,16 +14715,24 @@
    "grade": "11-12",
    "board": "CBSE (NCERT)",
    "countries": [
-    "IN"
-   ],
-   "nearby": [
+    "IN",
     "NP",
     "AE",
     "SA",
     "QA",
+    "KW",
     "OM",
-    "KW"
+    "BH"
    ],
+   "taughtIn": {
+    "NP": "Indian curriculum",
+    "AE": "Indian curriculum",
+    "SA": "Indian curriculum",
+    "QA": "Indian curriculum",
+    "KW": "Indian curriculum",
+    "OM": "Indian curriculum",
+    "BH": "Indian curriculum"
+   },
    "languages": [
     "en",
     "hi"
@@ -14499,6 +14806,140 @@
     "History",
     "Political science",
     "Sample papers"
+   ],
+   "variantLabel": {
+    "en": "Stream",
+    "hi": "स्ट्रीम"
+   },
+   "variants": [
+    {
+     "id": "pcm",
+     "name": {
+      "en": "Science (PCM)",
+      "hi": "विज्ञान (पीसीएम)"
+     },
+     "default": true,
+     "chips": [
+      "Physics",
+      "Chemistry",
+      "Maths",
+      "Computer science",
+      "English",
+      "Sample papers"
+     ],
+     "keywords": [
+      "class 12 physics",
+      "class 12 chemistry",
+      "class 12 maths",
+      "class 11 maths",
+      "integrals",
+      "electrostatics",
+      "pcm"
+     ],
+     "channels": [
+      "@NCERTWallahClass12PW",
+      "@pwudayclass11th",
+      "@NextToppersScience",
+      "@NextToppers-12thScience",
+      "@PrashantKirad11th12th-rb7xo",
+      "@AshuGhai11th12th",
+      "@CBSEClass12PCMB",
+      "@a4sclass12maths"
+     ]
+    },
+    {
+     "id": "pcb",
+     "name": {
+      "en": "Science (PCB)",
+      "hi": "विज्ञान (पीसीबी)"
+     },
+     "chips": [
+      "Physics",
+      "Chemistry",
+      "Biology",
+      "English",
+      "Sample papers"
+     ],
+     "keywords": [
+      "class 12 biology",
+      "class 11 biology",
+      "genetics",
+      "cell the unit of life",
+      "human physiology",
+      "pcb"
+     ],
+     "channels": [
+      "@NCERTWallahClass12PW",
+      "@pwudayclass11th",
+      "@NextToppersScience",
+      "@NextToppers-12thScience",
+      "@PrashantKirad11th12th-rb7xo",
+      "@AshuGhai11th12th",
+      "@CBSEClass12PCMB",
+      "@DrRakshitaSingh",
+      "@biologyatease"
+     ]
+    },
+    {
+     "id": "commerce",
+     "name": {
+      "en": "Commerce",
+      "hi": "वाणिज्य"
+     },
+     "chips": [
+      "Accountancy",
+      "Business studies",
+      "Economics",
+      "English",
+      "Sample papers"
+     ],
+     "keywords": [
+      "commerce",
+      "class 12 accountancy",
+      "class 11 accountancy",
+      "business studies",
+      "macroeconomics",
+      "partnership accounts"
+     ],
+     "channels": [
+      "@NextToppers12Commerce",
+      "@sunilpandaofficial",
+      "@Rajataroraofficial",
+      "@pwcommercewallahclass11",
+      "@pwcommercewallahclass12"
+     ]
+    },
+    {
+     "id": "humanities",
+     "name": {
+      "en": "Humanities",
+      "hi": "मानविकी"
+     },
+     "chips": [
+      "History",
+      "Political science",
+      "Geography",
+      "Economics",
+      "English",
+      "Sample papers"
+     ],
+     "keywords": [
+      "humanities",
+      "class 12 history",
+      "class 12 political science",
+      "class 12 geography",
+      "themes in indian history",
+      "flamingo"
+     ],
+     "channels": [
+      "@PWClass-11Humanities",
+      "@pw-artswallah",
+      "@NextToppers12Humanities",
+      "@humanitiesadda247",
+      "@BladeLearnerK12",
+      "@DrishtiSchoolHumanities"
+     ]
+    }
    ],
    "channels": [
     {
@@ -14601,6 +15042,36 @@
      "channelId": "UC5qSQq2LeUsngd6mqnWqzaA",
      "handle": "@a4sclass12maths",
      "name": "A4S Hub Class12",
+     "language": "hi"
+    },
+    {
+     "channelId": "UCt6g2tATmkXy4ZUqdHKovww",
+     "handle": "@pw-artswallah",
+     "name": "Humanities Wallah - Class 12th",
+     "language": "hi"
+    },
+    {
+     "channelId": "UC_hIupJam6VSUawKZhk1OWg",
+     "handle": "@NextToppers12Humanities",
+     "name": "Next Toppers - 12th Humanities",
+     "language": "hi"
+    },
+    {
+     "channelId": "UCH0UL4tOI94XLOfK3gK82LA",
+     "handle": "@humanitiesadda247",
+     "name": "Adda247 Humanities Class 12",
+     "language": "hi"
+    },
+    {
+     "channelId": "UCJ0Tnq24QeworOV1lusvaPg",
+     "handle": "@BladeLearnerK12",
+     "name": "Blade Learner - Humanities",
+     "language": "hi"
+    },
+    {
+     "channelId": "UCDQ04GIh8VZA9bGb17hvNwQ",
+     "handle": "@DrishtiSchoolHumanities",
+     "name": "Drishti School Humanities (11th & 12th Class)",
      "language": "hi"
     }
    ]
@@ -14947,9 +15418,6 @@
    "countries": [
     "IN"
    ],
-   "nearby": [
-    "LK"
-   ],
    "languages": [
     "ta",
     "en"
@@ -15216,9 +15684,6 @@
    "countries": [
     "IN"
    ],
-   "nearby": [
-    "NP"
-   ],
    "languages": [
     "hi"
    ],
@@ -15430,6 +15895,153 @@
    ]
   },
   {
+   "id": "cls_in_wb_board_9_12",
+   "kind": "class",
+   "name": {
+    "en": "West Bengal Board (Madhyamik 9-10, Higher Secondary 11-12)",
+    "bn": "পশ্চিমবঙ্গ পর্ষদ (মাধ্যমিক ও উচ্চ মাধ্যমিক)"
+   },
+   "shortName": "WB Board",
+   "grade": "9-12",
+   "board": "WBBSE / WBCHSE",
+   "countries": [
+    "IN"
+   ],
+   "languages": [
+    "bn",
+    "en"
+   ],
+   "subjects": [
+    "Bengali",
+    "English",
+    "Mathematics",
+    "Physical Science",
+    "Life Science",
+    "History",
+    "Geography",
+    "Physics",
+    "Chemistry",
+    "Biology",
+    "Accountancy"
+   ],
+   "keywords": [
+    "WBBSE",
+    "WBCHSE",
+    "madhyamik",
+    "মাধ্যমিক",
+    "uccha madhyamik",
+    "higher secondary",
+    "উচ্চ মাধ্যমিক",
+    "physical science",
+    "life science",
+    "bhouto bigyan",
+    "test paper",
+    "suggestion",
+    "MCQ",
+    "chapter explanation"
+   ],
+   "gradeKeywords": {
+    "9": [
+     "class 9 wbbse",
+     "নবম শ্রেণি"
+    ],
+    "10": [
+     "madhyamik",
+     "class 10 wbbse",
+     "দশম শ্রেণি"
+    ],
+    "11": [
+     "class 11 wbchse",
+     "একাদশ শ্রেণি"
+    ],
+    "12": [
+     "class 12 wbchse",
+     "HS exam",
+     "দ্বাদশ শ্রেণি"
+    ]
+   },
+   "chips": [
+    "Maths",
+    "Physical science",
+    "Life science",
+    "History",
+    "Geography",
+    "Bengali",
+    "English",
+    "Physics",
+    "Chemistry",
+    "Accountancy"
+   ],
+   "channels": [
+    {
+     "channelId": "UC-enYhtHyFXVdsm--xGJzKA",
+     "handle": "@pwbanglafoundation",
+     "name": "PW Bangla 9 & 10",
+     "language": "bn"
+    },
+    {
+     "channelId": "UC_AGMamcUlS2NpitJDoTSkw",
+     "handle": "@pwbangla",
+     "name": "PW Bangla",
+     "language": "bn"
+    },
+    {
+     "channelId": "UCno2OE5YtU8YPYEpPQmiMlQ",
+     "handle": "@TutopiaClass10",
+     "name": "Tutopia Class 10",
+     "language": "bn"
+    },
+    {
+     "channelId": "UCy4S-epMGDC6ZWd7DvJFQNw",
+     "handle": "@SomsClassRoomMadhyamik",
+     "name": "Som's Classroom - Madhyamik",
+     "language": "bn"
+    },
+    {
+     "channelId": "UCORVtEJoF_5hDZu9TbQBFWw",
+     "handle": "@OxisomeMadhyamik",
+     "name": "Oxisome Madhyamik",
+     "language": "bn"
+    },
+    {
+     "channelId": "UC8pcyaaVkt5GK2X6fmPxNQQ",
+     "handle": "@madhyamikpathshaala",
+     "name": "Madhyamik Pathshaala",
+     "language": "bn"
+    },
+    {
+     "channelId": "UCpDzP_Co9-Qb_7auu00btqg",
+     "handle": "@SOEBangla_9_10",
+     "name": "SOE 9 & 10",
+     "language": "bn"
+    },
+    {
+     "channelId": "UCKltDvlVlEifZotF0Z10oMQ",
+     "handle": "@RamadanTutorialWBBSE",
+     "name": "Ramadan Tutorial - WB Madhyamik",
+     "language": "bn"
+    },
+    {
+     "channelId": "UCDpxET67wifE3ajRy__Bj0g",
+     "handle": "@ACCmadhyamik",
+     "name": "ACC Madhyamik",
+     "language": "bn"
+    },
+    {
+     "channelId": "UCWkJDya4jatibG66YzmCu0Q",
+     "handle": "@ACC11-12",
+     "name": "Ayan Chakraborty Classes - Class 11 and 12",
+     "language": "bn"
+    },
+    {
+     "channelId": "UCBj8tVKR6eAMoOz0xiuHo0w",
+     "handle": "@commercepandit",
+     "name": "Commerce Pandit - 11 & 12 (WBCHSE)",
+     "language": "bn"
+    }
+   ]
+  },
+  {
    "id": "cls_us_6_8",
    "kind": "class",
    "name": {
@@ -15439,9 +16051,6 @@
    "board": "Common Core / NGSS",
    "countries": [
     "US"
-   ],
-   "nearby": [
-    "CA"
    ],
    "languages": [
     "en"
@@ -15551,9 +16160,6 @@
    "board": "Common Core / NGSS",
    "countries": [
     "US"
-   ],
-   "nearby": [
-    "CA"
    ],
    "languages": [
     "en"
@@ -15704,9 +16310,6 @@
    "countries": [
     "GB"
    ],
-   "nearby": [
-    "IE"
-   ],
    "languages": [
     "en"
    ],
@@ -15826,11 +16429,22 @@
    "grade": "10-11",
    "board": "AQA / Edexcel / OCR / WJEC",
    "countries": [
-    "GB"
+    "GB",
+    "AE",
+    "SA",
+    "QA",
+    "KW",
+    "OM",
+    "BH"
    ],
-   "nearby": [
-    "IE"
-   ],
+   "taughtIn": {
+    "AE": "British curriculum",
+    "SA": "British curriculum",
+    "QA": "British curriculum",
+    "KW": "British curriculum",
+    "OM": "British curriculum",
+    "BH": "British curriculum"
+   },
    "languages": [
     "en"
    ],
@@ -15991,11 +16605,22 @@
    "grade": "12-13",
    "board": "AQA / Edexcel / OCR",
    "countries": [
-    "GB"
+    "GB",
+    "AE",
+    "SA",
+    "QA",
+    "KW",
+    "OM",
+    "BH"
    ],
-   "nearby": [
-    "IE"
-   ],
+   "taughtIn": {
+    "AE": "British curriculum",
+    "SA": "British curriculum",
+    "QA": "British curriculum",
+    "KW": "British curriculum",
+    "OM": "British curriculum",
+    "BH": "British curriculum"
+   },
    "languages": [
     "en"
    ],
@@ -16311,6 +16936,100 @@
      "class 12 chemistry"
     ]
    },
+   "variantLabel": {
+    "en": "Group",
+    "ur": "گروپ"
+   },
+   "variants": [
+    {
+     "id": "pre_engineering",
+     "name": {
+      "en": "Pre-Engineering",
+      "ur": "پری انجینئرنگ"
+     },
+     "default": true,
+     "chips": [
+      "Physics",
+      "Chemistry",
+      "Mathematics",
+      "English",
+      "Past papers"
+     ],
+     "keywords": [
+      "pre engineering",
+      "FSc pre engineering",
+      "FSc math",
+      "mathematics",
+      "ECAT"
+     ],
+     "channels": [
+      "@PhysicswithMuhammadArafatkhan",
+      "@PhysicsInSeconds",
+      "@mjdchemistry9241",
+      "@chemistrybyprof.javediqbal",
+      "@onlineeducationacademy512"
+     ]
+    },
+    {
+     "id": "pre_medical",
+     "name": {
+      "en": "Pre-Medical",
+      "ur": "پری میڈیکل"
+     },
+     "chips": [
+      "Physics",
+      "Chemistry",
+      "Biology",
+      "English",
+      "Past papers"
+     ],
+     "keywords": [
+      "pre medical",
+      "FSc pre medical",
+      "FSc biology",
+      "biology",
+      "MDCAT"
+     ],
+     "channels": [
+      "@PhysicswithMuhammadArafatkhan",
+      "@PhysicsInSeconds",
+      "@mjdchemistry9241",
+      "@chemistrybyprof.javediqbal",
+      "@onlineeducationacademy512",
+      "@biologybybhatti",
+      "@ilmebiology",
+      "@AbbasBiologyTV"
+     ]
+    },
+    {
+     "id": "ics",
+     "name": {
+      "en": "ICS",
+      "ur": "آئی سی ایس"
+     },
+     "chips": [
+      "Computer science",
+      "Mathematics",
+      "Physics",
+      "English",
+      "Past papers"
+     ],
+     "keywords": [
+      "ICS",
+      "computer science",
+      "ICS computer",
+      "programming",
+      "C++"
+     ],
+     "channels": [
+      "@YouthAcademy1",
+      "@ComputerTeacherOfficial",
+      "@icsatoz.",
+      "@PhysicswithMuhammadArafatkhan",
+      "@PhysicsInSeconds"
+     ]
+    }
+   ],
    "channels": [
     {
      "channelId": "UCHBRhxBvZ-HmmMwZWxgasZg",
@@ -16371,6 +17090,24 @@
      "handle": "@PhysicsInSeconds",
      "name": "Physics In Seconds - Ustaad Jee",
      "language": "ur"
+    },
+    {
+     "channelId": "UC9BL4phTFzgOFnf389PllHQ",
+     "handle": "@biologybybhatti",
+     "name": "BiologybyBhatti",
+     "language": "ur"
+    },
+    {
+     "channelId": "UCkifm_U0y9J7TXT6jeEG8Vw",
+     "handle": "@ilmebiology",
+     "name": "ilm e Biology",
+     "language": "ur"
+    },
+    {
+     "channelId": "UC-lRN5qrrQgvaINzKImp0RQ",
+     "handle": "@AbbasBiologyTV",
+     "name": "Abbas Biology TV",
+     "language": "ur"
     }
    ]
   },
@@ -16385,9 +17122,6 @@
    "board": "Bangladesh education boards (NCTB)",
    "countries": [
     "BD"
-   ],
-   "nearby": [
-    "IN"
    ],
    "languages": [
     "bn"
@@ -16514,9 +17248,6 @@
    "countries": [
     "BD"
    ],
-   "nearby": [
-    "IN"
-   ],
    "languages": [
     "bn"
    ],
@@ -16558,6 +17289,103 @@
      "HSC exam"
     ]
    },
+   "variantLabel": {
+    "en": "Group",
+    "bn": "বিভাগ"
+   },
+   "variants": [
+    {
+     "id": "science",
+     "name": {
+      "en": "Science",
+      "bn": "বিজ্ঞান"
+     },
+     "default": true,
+     "chips": [
+      "Physics",
+      "Chemistry",
+      "Higher math",
+      "Biology",
+      "ICT",
+      "Board questions"
+     ],
+     "keywords": [
+      "HSC physics",
+      "HSC chemistry",
+      "HSC higher math",
+      "HSC biology",
+      "বিজ্ঞান বিভাগ"
+     ],
+     "channels": [
+      "@HulkenSteinHSC",
+      "@Rakibs_HSC",
+      "@AbhiDattaTushar156",
+      "@HasnatShuvro",
+      "@apurbophysics",
+      "@RedwansMethodHSC",
+      "@BiologyAdda",
+      "@BattlesofBiology",
+      "@Master_biology",
+      "@HasanAnam",
+      "@aloronxyz"
+     ]
+    },
+    {
+     "id": "business",
+     "name": {
+      "en": "Business studies",
+      "bn": "ব্যবসায় শিক্ষা"
+     },
+     "chips": [
+      "Accounting",
+      "Finance and banking",
+      "Business organisation",
+      "Economics",
+      "ICT",
+      "Board questions"
+     ],
+     "keywords": [
+      "HSC accounting",
+      "হিসাববিজ্ঞান",
+      "finance banking",
+      "ফিন্যান্স ব্যাংকিং",
+      "business organization",
+      "ব্যবসায় শিক্ষা"
+     ],
+     "channels": [
+      "@hulkenstein_artscommerce",
+      "@newcommercecoachingcenter"
+     ]
+    },
+    {
+     "id": "humanities",
+     "name": {
+      "en": "Humanities",
+      "bn": "মানবিক"
+     },
+     "chips": [
+      "Civics",
+      "History",
+      "Economics",
+      "Geography",
+      "Logic",
+      "ICT",
+      "Board questions"
+     ],
+     "keywords": [
+      "HSC civics",
+      "পৌরনীতি",
+      "HSC history",
+      "ইতিহাস",
+      "যুক্তিবিদ্যা",
+      "মানবিক বিভাগ"
+     ],
+     "channels": [
+      "@hulkenstein_artscommerce",
+      "@civicsacademybd"
+     ]
+    }
+   ],
    "channels": [
     {
      "channelId": "UCVLvqneHiqvqvKHdpVYj3lQ",
@@ -16636,6 +17464,146 @@
      "handle": "@aloronxyz",
      "name": "AloronXYZ (HSC & Admission)- Mottasin Pahlovi",
      "language": "bn"
+    },
+    {
+     "channelId": "UCBTFPi19_R3gL6UEuIEGxuA",
+     "handle": "@hulkenstein_artscommerce",
+     "name": "HulkenStein Humanities & Business Studies",
+     "language": "bn"
+    },
+    {
+     "channelId": "UCNXKAfIjIeA31ZcRFtT9orw",
+     "handle": "@newcommercecoachingcenter",
+     "name": "New Commerce Coaching Center",
+     "language": "bn"
+    },
+    {
+     "channelId": "UCdwl40BQGihK_UqUDPiyf7g",
+     "handle": "@civicsacademybd",
+     "name": "CIVICS ACADEMY bd",
+     "language": "bn"
+    }
+   ]
+  },
+  {
+   "id": "cls_np_see_8_10",
+   "kind": "class",
+   "name": {
+    "en": "Nepal Classes 8-10 (SEE)",
+    "ne": "नेपाल कक्षा ८-१० (एसईई)"
+   },
+   "shortName": "SEE",
+   "grade": "8-10",
+   "board": "NEB / CDC (SEE)",
+   "countries": [
+    "NP"
+   ],
+   "languages": [
+    "ne",
+    "en"
+   ],
+   "subjects": [
+    "Compulsory Mathematics",
+    "Optional Mathematics",
+    "Science and Technology",
+    "English",
+    "Nepali",
+    "Social Studies",
+    "Accountancy"
+   ],
+   "keywords": [
+    "SEE",
+    "SEE exam",
+    "class 10 nepal",
+    "compulsory math",
+    "optional math",
+    "science and technology",
+    "social studies",
+    "model question",
+    "SEE preparation",
+    "एसईई",
+    "अनिवार्य गणित",
+    "ऐच्छिक गणित"
+   ],
+   "gradeKeywords": {
+    "8": [
+     "class 8 nepal",
+     "BLE",
+     "कक्षा ८"
+    ],
+    "9": [
+     "class 9 nepal",
+     "कक्षा ९"
+    ],
+    "10": [
+     "class 10 nepal",
+     "SEE",
+     "कक्षा १०"
+    ]
+   },
+   "chips": [
+    "Compulsory maths",
+    "Optional maths",
+    "Science",
+    "English",
+    "Nepali",
+    "Social studies",
+    "Model questions"
+   ],
+   "channels": [
+    {
+     "channelId": "UCTPjpEJSlKYyFiYqxGbTtGQ",
+     "handle": "@NK-1stFoundation",
+     "name": "NK-1st Foundation (SEE)",
+     "language": "ne"
+    },
+    {
+     "channelId": "UCrTKRd1F1Ql_61JIEb5BOvA",
+     "handle": "@NCEDVirtual",
+     "name": "NCED Virtual",
+     "language": "ne"
+    },
+    {
+     "channelId": "UCDnREhXNLaeHVML2M_SIqtg",
+     "handle": "@GurukulNepal999",
+     "name": "Gurukul Nepal",
+     "language": "ne"
+    },
+    {
+     "channelId": "UCyPr9KIODQt5J1oOGbz44Hg",
+     "handle": "@ReadersNepal",
+     "name": "Readers Nepal",
+     "language": "ne"
+    },
+    {
+     "channelId": "UCQe9q1LtB7h8lQjwKB49IbA",
+     "handle": "@mathsnepal",
+     "name": "Maths Nepal",
+     "language": "ne"
+    },
+    {
+     "channelId": "UCfARXo1NAZVwu5HWVzguYeA",
+     "handle": "@BasantNepak",
+     "name": "Basant Nepak 9th & 10th",
+     "language": "ne"
+    },
+    {
+     "channelId": "UCghGXbaEthVzgLuVH2EuVBg",
+     "handle": "@AmbitionGuru-SEE",
+     "name": "Ambition Guru - SEE",
+     "language": "ne"
+    },
+    {
+     "channelId": "UCL0YghTFDpmfAsQ9nn0eumw",
+     "handle": "@SEEclass10nepal",
+     "name": "SEE - Class 10 Nepal",
+     "language": "ne"
+    },
+    {
+     "channelId": "UCgVA0EhXQ6VwDDPv7F3c6Bg",
+     "handle": "@nkquestionsingh",
+     "name": "NK-1st Army (Class 8)",
+     "language": "ne"
     }
    ]
   },
@@ -16649,9 +17617,6 @@
    "board": "NERDC / BECE",
    "countries": [
     "NG"
-   ],
-   "nearby": [
-    "GH"
    ],
    "languages": [
     "en"
@@ -16731,9 +17696,6 @@
    "board": "NERDC / WAEC / NECO",
    "countries": [
     "NG"
-   ],
-   "nearby": [
-    "GH"
    ],
    "languages": [
     "en"
@@ -16840,10 +17802,6 @@
    "countries": [
     "KE"
    ],
-   "nearby": [
-    "UG",
-    "TZ"
-   ],
    "languages": [
     "en",
     "sw"
@@ -16946,10 +17904,6 @@
    "board": "KNEC (8-4-4)",
    "countries": [
     "KE"
-   ],
-   "nearby": [
-    "UG",
-    "TZ"
    ],
    "languages": [
     "en",
@@ -17070,13 +18024,6 @@
    "board": "DBE (CAPS) / IEB",
    "countries": [
     "ZA"
-   ],
-   "nearby": [
-    "NA",
-    "BW",
-    "LS",
-    "SZ",
-    "ZW"
    ],
    "languages": [
     "en",
@@ -17352,6 +18299,378 @@
      "handle": "@MaamArianne",
      "name": "Ma'am Arianne",
      "language": "fil"
+    }
+   ]
+  },
+  {
+   "id": "global_cls_khan_academy",
+   "kind": "class",
+   "name": {
+    "en": "Khan Academy (any curriculum)"
+   },
+   "grade": "K-12",
+   "board": "Any curriculum",
+   "languages": [
+    "en",
+    "hi",
+    "bn"
+   ],
+   "subjects": [
+    "Mathematics",
+    "Science",
+    "Physics",
+    "Chemistry",
+    "Biology",
+    "Economics",
+    "History"
+   ],
+   "keywords": [
+    "khan academy",
+    "maths",
+    "algebra",
+    "geometry",
+    "calculus",
+    "physics",
+    "chemistry",
+    "biology",
+    "economics",
+    "practice"
+   ],
+   "chips": [
+    "Maths",
+    "Science",
+    "Physics",
+    "Chemistry",
+    "Biology",
+    "Economics",
+    "History"
+   ],
+   "channels": [
+    {
+     "channelId": "UC4a-Gbdw7vOaccHmFo40b9g",
+     "handle": "@khanacademy",
+     "name": "Khan Academy",
+     "language": "en"
+    },
+    {
+     "channelId": "UCU0kWLAbhVGxXarmE3b8rHg",
+     "handle": "@khanacademyindia",
+     "name": "Khan Academy India",
+     "language": "en"
+    },
+    {
+     "channelId": "UCR_faRupOZjPVB0rAg4sxRQ",
+     "handle": "@KhanAcademyHindi",
+     "name": "Khan Academy India - Hindi medium",
+     "language": "hi"
+    },
+    {
+     "channelId": "UCK_veTewS819extd2oo4_5Q",
+     "handle": "@khanacademybangla",
+     "name": "Khan Academy Bangla",
+     "language": "bn"
+    }
+   ]
+  },
+  {
+   "id": "global_cls_crashcourse",
+   "kind": "class",
+   "name": {
+    "en": "CrashCourse and TED-Ed (any curriculum)"
+   },
+   "grade": "6-12",
+   "board": "Any curriculum",
+   "languages": [
+    "en"
+   ],
+   "subjects": [
+    "Biology",
+    "Chemistry",
+    "Physics",
+    "History",
+    "Literature",
+    "Economics",
+    "Psychology"
+   ],
+   "keywords": [
+    "crash course",
+    "crashcourse",
+    "ted-ed",
+    "biology",
+    "chemistry",
+    "world history",
+    "literature",
+    "economics",
+    "psychology"
+   ],
+   "chips": [
+    "Biology",
+    "Chemistry",
+    "Physics",
+    "History",
+    "Literature",
+    "Economics"
+   ],
+   "channels": [
+    {
+     "channelId": "UCX6b17PVsYBQ0ip5gyeme-Q",
+     "handle": "@crashcourse",
+     "name": "CrashCourse",
+     "language": "en"
+    },
+    {
+     "channelId": "UCONtPx56PSebXJOxbFv-2jQ",
+     "handle": "@crashcoursekids",
+     "name": "Crash Course Kids",
+     "language": "en"
+    },
+    {
+     "channelId": "UCsooa4yRKGN_zEE8iknghZA",
+     "handle": "@TEDEd",
+     "name": "TED-Ed",
+     "language": "en"
+    }
+   ]
+  },
+  {
+   "id": "global_cls_maths",
+   "kind": "class",
+   "name": {
+    "en": "Maths for any curriculum"
+   },
+   "grade": "6-12",
+   "board": "Any curriculum",
+   "languages": [
+    "en"
+   ],
+   "subjects": [
+    "Arithmetic",
+    "Algebra",
+    "Geometry",
+    "Trigonometry",
+    "Calculus",
+    "Statistics"
+   ],
+   "keywords": [
+    "maths",
+    "math",
+    "algebra",
+    "geometry",
+    "trigonometry",
+    "calculus",
+    "statistics",
+    "fractions",
+    "equations",
+    "worked example"
+   ],
+   "chips": [
+    "Algebra",
+    "Geometry",
+    "Trigonometry",
+    "Calculus",
+    "Statistics",
+    "Fractions"
+   ],
+   "channels": [
+    {
+     "channelId": "UCYO_jab_esuFRV4b17AJtAw",
+     "handle": "@3blue1brown",
+     "name": "3Blue1Brown",
+     "language": "en"
+    },
+    {
+     "channelId": "UCBuMwlP7kHkNxdPAqtFSJTw",
+     "handle": "@mathantics",
+     "name": "Math Antics",
+     "language": "en"
+    },
+    {
+     "channelId": "UCEWpbFLzoYGPfuWUMFPSaoA",
+     "handle": "@TheOrganicChemistryTutor",
+     "name": "The Organic Chemistry Tutor",
+     "language": "en"
+    },
+    {
+     "channelId": "UCoxcjq-8xIDTYp3uz647V5A",
+     "handle": "@numberphile",
+     "name": "Numberphile",
+     "language": "en"
+    },
+    {
+     "channelId": "UCoHhuummRZaIVX7bD4t2czg",
+     "handle": "@ProfessorLeonard",
+     "name": "Professor Leonard",
+     "language": "en"
+    },
+    {
+     "channelId": "UCFe6jenM1Bc54qtBsIJGRZQ",
+     "handle": "@PatrickJMT",
+     "name": "Patrick JMT",
+     "language": "en"
+    },
+    {
+     "channelId": "UC_SvYP0k05UKiJ_2ndB02IA",
+     "handle": "@blackpenredpen",
+     "name": "blackpenredpen",
+     "language": "en"
+    },
+    {
+     "channelId": "UCb7w5aTnt7YeXBcVCY0mgFw",
+     "handle": "@tecmath",
+     "name": "tecmath",
+     "language": "en"
+    }
+   ]
+  },
+  {
+   "id": "global_cls_science",
+   "kind": "class",
+   "name": {
+    "en": "Science for any curriculum"
+   },
+   "grade": "6-12",
+   "board": "Any curriculum",
+   "languages": [
+    "en"
+   ],
+   "subjects": [
+    "Physics",
+    "Chemistry",
+    "Biology",
+    "Earth science"
+   ],
+   "keywords": [
+    "science",
+    "physics",
+    "chemistry",
+    "biology",
+    "cell",
+    "atoms",
+    "forces",
+    "energy",
+    "evolution",
+    "experiment"
+   ],
+   "chips": [
+    "Physics",
+    "Chemistry",
+    "Biology",
+    "Earth science",
+    "Experiments"
+   ],
+   "channels": [
+    {
+     "channelId": "UC0cd_-e49hZpWLH3UIwoWRA",
+     "handle": "@ProfessorDaveExplains",
+     "name": "Professor Dave Explains",
+     "language": "en"
+    },
+    {
+     "channelId": "UCb2GCoLSBXjmI_Qj1vk-44g",
+     "handle": "@AmoebaSisters",
+     "name": "Amoeba Sisters",
+     "language": "en"
+    },
+    {
+     "channelId": "UCS3wWlfGUijnRIf745lRl2A",
+     "handle": "@FuseSchool",
+     "name": "FuseSchool - Global Education",
+     "language": "en"
+    },
+    {
+     "channelId": "UCZYTClx2T1of7BRZ86-8fow",
+     "handle": "@SciShow",
+     "name": "SciShow",
+     "language": "en"
+    },
+    {
+     "channelId": "UCHnyfMqiRRG1u-2MsSQLbXA",
+     "handle": "@veritasium",
+     "name": "Veritasium",
+     "language": "en"
+    },
+    {
+     "channelId": "UCsXVk37bltHxD1rDPwtNM8Q",
+     "handle": "@kurzgesagt",
+     "name": "Kurzgesagt - In a Nutshell",
+     "language": "en"
+    },
+    {
+     "channelId": "UCUHW94eEFW7hkUMVaZz4eDg",
+     "handle": "@MinutePhysics",
+     "name": "MinutePhysics",
+     "language": "en"
+    }
+   ]
+  },
+  {
+   "id": "global_cls_university_open",
+   "kind": "class",
+   "name": {
+    "en": "Open university lectures"
+   },
+   "grade": "11-12+",
+   "board": "Any curriculum",
+   "languages": [
+    "en"
+   ],
+   "subjects": [
+    "Mathematics",
+    "Physics",
+    "Computer science",
+    "Economics",
+    "History",
+    "Philosophy"
+   ],
+   "keywords": [
+    "lecture",
+    "opencourseware",
+    "ocw",
+    "nptel",
+    "university course",
+    "calculus",
+    "linear algebra",
+    "physics",
+    "computer science"
+   ],
+   "chips": [
+    "Maths",
+    "Physics",
+    "Computer science",
+    "Economics",
+    "History",
+    "Philosophy"
+   ],
+   "channels": [
+    {
+     "channelId": "UCEBb1b_L6zDS3xTUrIALZOw",
+     "handle": "@mitocw",
+     "name": "MIT OpenCourseWare",
+     "language": "en"
+    },
+    {
+     "channelId": "UC640y4UvDAlya_WOj5U4pfA",
+     "handle": "@iit",
+     "name": "NPTEL",
+     "language": "en"
+    },
+    {
+     "channelId": "UC4EY_qnSeAP1xGsh61eOoJA",
+     "handle": "@YaleCourses",
+     "name": "YaleCourses",
+     "language": "en"
+    },
+    {
+     "channelId": "UCBa5G_ESCn8Yd4vw5U-gIcg",
+     "handle": "@StanfordOnline",
+     "name": "Stanford Online",
+     "language": "en"
+    },
+    {
+     "channelId": "UCLv7Gzc3VTO6ggFlXY0sOyw",
+     "handle": "@harvard",
+     "name": "Harvard University",
+     "language": "en"
     }
    ]
   },

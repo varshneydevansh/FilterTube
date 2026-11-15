@@ -5,11 +5,13 @@
 //
 // Sources, in this order: draft.packs (exam packs), draft.classPacks (kind "class": grade, board,
 // subjects, gradeKeywords) and draft.kidsPacks. Each pack is written as
-//   id, kind, name, [shortName], [grade], [board], [countries], [nearby], [languages], [subjects],
-//   [keywords], [gradeKeywords], [blockedWords], [chips], [variants], channels
+//   id, kind, name, [shortName], [grade], [board], [countries], [nearby], [taughtIn], [languages],
+//   [subjects], [keywords], [gradeKeywords], [blockedWords], [chips], [variantLabel], [variants], channels
 // shortName is the exam's short label ("GATE"); chips are the study Home's subject chips; variants
 // are branches or streams (GATE CSE, ECE, ...), each {id, name, [default], [chips], [keywords],
 // [channels]}, where channels lists handles or ids of the pack's own approved channels that teach it.
+// taughtIn labels countries where a curriculum is taught abroad ({"AE": "Indian curriculum"}) and
+// variantLabel is the heading over the variant chips ({"en": "Stream"}); both are {lang|country: text}.
 // where a bracketed field is written only when it has a value. The catalog format stays version 1:
 // the new fields are additive and older loaders skip them.
 // The same generator as FilterTubeApp tools/generate-study-packs.mjs, so the extension and the apps
@@ -52,6 +54,17 @@ function channel(row) {
     const language = text(row.language).toLowerCase();
     if (language) out.language = language;
     return out.name && (out.channelId || out.handle) ? out : null;
+}
+
+/** {"AE": "Indian curriculum"} or {"en": "Stream"}: keys and labels trimmed, empty ones dropped. */
+function labels(value, key = k => k) {
+    const out = {};
+    if (!value || typeof value !== 'object' || Array.isArray(value)) return out;
+    for (const [raw, label] of Object.entries(value)) {
+        const k = key(text(raw));
+        if (k && text(label)) out[k] = text(label);
+    }
+    return out;
 }
 
 /** Branches or streams: ids unique and pack-id shaped; channels kept only when the pack lists them. */
@@ -105,8 +118,13 @@ export function buildCatalog(draft) {
         const pack = { id, kind: text(source.kind) || 'study', name };
         if (text(source.shortName)) pack.shortName = text(source.shortName);
         for (const key of ['grade', 'board']) if (text(source[key])) pack[key] = text(source[key]);
-        for (const [key, value] of [['countries', countries(source.countries)], ['nearby', countries(source.nearby)],
-            ['languages', strings(source.languages)], ['subjects', strings(source.subjects)], ['keywords', strings(source.keywords)]]) {
+        for (const [key, value] of [['countries', countries(source.countries)], ['nearby', countries(source.nearby)]]) {
+            if (value.length) pack[key] = value;
+        }
+        const taughtIn = labels(source.taughtIn, code => /^[A-Za-z]{2}$/.test(code) ? code.toUpperCase() : '');
+        if (Object.keys(taughtIn).length) pack.taughtIn = taughtIn;
+        for (const [key, value] of [['languages', strings(source.languages)], ['subjects', strings(source.subjects)],
+            ['keywords', strings(source.keywords)]]) {
             if (value.length) pack[key] = value;
         }
         const grades = gradeKeywords(source.gradeKeywords);
@@ -117,6 +135,8 @@ export function buildCatalog(draft) {
         const chips = strings(source.chips);
         if (chips.length) pack.chips = chips;
         const branches = variants(source.variants, channels);
+        const variantLabel = labels(source.variantLabel, lang => lang.toLowerCase());
+        if (branches.length && Object.keys(variantLabel).length) pack.variantLabel = variantLabel;
         if (branches.length) pack.variants = branches;
         pack.channels = channels;
         packs.push(pack);

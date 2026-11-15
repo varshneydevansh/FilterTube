@@ -61,7 +61,10 @@ test('the bundled catalog has at least 3 approved channels per pack and fits the
 });
 
 test('the bundled catalog is the generator output for the v2 draft, and the same bytes the apps bundle', t => {
-  const app = new URL('../../../study-3.6.2/', import.meta.url);
+  // The app checkout: FILTERTUBE_APP_DIR when set (a branch worktree), else the study-3.6.2 worktree.
+  const app = process.env.FILTERTUBE_APP_DIR
+    ? new URL(`file://${process.env.FILTERTUBE_APP_DIR.replace(/\/?$/, '/')}`)
+    : new URL('../../../study-3.6.2/', import.meta.url);
   const draftPath = new URL('docs/app/study-mode/study-packs-draft-v2.json', app);
   if (!fs.existsSync(draftPath)) { t.skip('the draft lives in the app repository'); return; }
   assert.equal(renderCatalog(JSON.parse(fs.readFileSync(draftPath, 'utf8'))), raw);
@@ -81,11 +84,14 @@ test('v2: class packs carry grade, board, subjects and grade keywords; the picke
   assert.deepEqual(Object.keys(cbse.gradeKeywords), ['6', '7', '8']);
   assert.ok(cbse.gradeKeywords['6'].includes('class 6 maths'));
   const rawCbse = bundled.packs.find(pack => pack.id === 'cls_in_cbse_6_8');
-  assert.deepEqual(Object.keys(rawCbse), ['id', 'kind', 'name', 'shortName', 'grade', 'board', 'countries', 'nearby', 'languages', 'subjects', 'keywords', 'gradeKeywords', 'chips', 'channels'],
+  assert.deepEqual(Object.keys(rawCbse), ['id', 'kind', 'name', 'shortName', 'grade', 'board', 'countries', 'taughtIn', 'languages', 'subjects', 'keywords', 'gradeKeywords', 'chips', 'channels'],
     'field order is part of the byte-identical contract with the apps');
   const school = Packs.forTab(catalog, 'IN', 'school');
   assert.ok(school.length > 0 && school.every(pack => pack.kind === 'class'));
   assert.equal(school[0].countries.includes('IN'), true, 'own country first');
+  assert.equal(school.some(pack => pack.id.startsWith('cls_bd_')), false, 'school packs never come from another country via nearby');
+  assert.ok(school.some(pack => pack.id === 'global_cls_khan_academy'), 'global school packs show for every country');
+  assert.equal(rawCbse.taughtIn.AE, 'Indian curriculum');
   const exams = Packs.forTab(catalog, 'IN', 'exams');
   assert.ok(exams.some(pack => pack.id === 'in_upsc_cse') && exams.every(pack => pack.kind === 'study'));
   const upsc = Packs.packById(catalog, 'in_upsc_cse');
@@ -122,6 +128,15 @@ test('shortName, chips and variants pass through like the Android generator', ()
       { id: 'ece', name: { en: 'ECE' } }
     ],
     channels: channels.map(({ name, handle }) => ({ handle, name })) });
+  const labelled = buildCatalog({ generated: 'g', packs: [
+    { id: 'cbse', kind: 'class', name: { en: 'CBSE' }, countries: ['IN', 'AE'], taughtIn: { ae: ' Indian curriculum ', xx1: 'bad', QA: '' },
+      variantLabel: { EN: 'Stream' }, channels, variants: [{ id: 'pcm', name: { en: 'PCM' } }] },
+    { id: 'plain', kind: 'study', name: { en: 'Plain' }, variantLabel: { en: 'Stream' }, channels }
+  ] }).catalog.packs;
+  assert.deepEqual(Object.keys(labelled[0]), ['id', 'kind', 'name', 'countries', 'taughtIn', 'variantLabel', 'variants', 'channels']);
+  assert.deepEqual(labelled[0].taughtIn, { AE: 'Indian curriculum' });
+  assert.deepEqual(labelled[0].variantLabel, { en: 'Stream' });
+  assert.equal('variantLabel' in labelled[1], false, 'no heading without variants');
   const gate = Packs.packById(catalog, 'in_gate');
   assert.equal(gate.shortName, 'GATE');
   assert.deepEqual(gate.variants.map(variant => variant.id), ['cse', 'ece', 'ee', 'me', 'civil']);
@@ -141,7 +156,7 @@ test('packs for a country: own first, then nearby, then global; kids packs are s
   assert.equal(new Set(nepal).size, nepal.length, 'no pack repeats');
   assert.equal(nepal.includes('us_bar'), false, 'unrelated countries are not listed');
   assert.ok(nepal.every(id => !id.startsWith('kids_') && !id.startsWith('classic_')));
-  assert.deepEqual(Packs.forCountry(catalog, '').map(pack => pack.id), catalog.packs.filter(Packs.isGlobal).filter(p => p.kind === 'study').map(p => p.id));
+  assert.deepEqual(Packs.forCountry(catalog, '').map(pack => pack.id), catalog.packs.filter(Packs.isGlobal).filter(p => p.kind === 'study' || p.kind === 'class').map(p => p.id));
   assert.deepEqual(Packs.kidsPacks(catalog).map(pack => pack.kind).filter((kind, i, all) => all.indexOf(kind) === i).sort(), ['kids_age', 'kids_classic']);
 });
 
