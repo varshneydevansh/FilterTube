@@ -530,7 +530,7 @@ test('managed parent UI surface docs and runtime binding are linked', () => {
   assert.match(tabViewHtml, /Independent profile; can manage protected profiles/);
   assert.match(tabViewHtml, /Parent-managed protected editing/);
   assert.match(tabViewHtml, /Protected-profile PIN and parent authority are separate/);
-  assert.match(tabViewHtml, /Master, account, and protected behavior/);
+  assert.match(tabViewHtml, /Parent, account, and protected behavior/);
   assert.match(tabViewHtml, /New protected profiles start as Kids only/);
   assert.match(tabViewHtml, /parents do not need to share the parent PIN/);
   assert.match(source, /It is not automatic Wi-Fi discovery; being nearby never grants control/);

@@ -202,12 +202,12 @@ test('the extension restores user audio and owns no network-blocking path', () =
 test('Help distinguishes native desktop ownership, retained fallback and profile authority', () => {
   assert.match(help, /Send adverts to The Void/);
   assert.match(help, /default-on control/);
-  assert.match(help, /filters advert plans and sponsored items on YouTube Main and YouTube Kids/);
+  assert.match(help, /filters advert plans and sponsored items on Main and Kids/);
   assert.match(help, /choose the main-video source once when needed/);
   assert.match(help, /healthy video stays untouched/);
   assert.match(help, /does not enable repeated hidden seeking or resume attempts/);
   assert.match(help, /without automatically resuming paused content/);
-  assert.match(help, /Parent and child filtering rules still apply/);
+  assert.match(help, /Parent and Kids filtering rules still apply/);
   assert.match(help, /does not prove every advert was prevented/);
   assert.match(help, /player-ad-plan-removed/);
 });

@@ -149,7 +149,7 @@ test('Help and product docs clearly describe the working independent category fi
   assert.match(help, /Block selected/);
   assert.match(help, /Allow only selected/);
   assert.match(help, /independent/);
-  assert.match(help, /official category supplied by YouTube/);
+  assert.match(help, /official category supplied for each video/);
   assert.match(functionality, /categoryFilters:\s*\{/);
   assert.match(functionality, /mode: 'allow'/);
   assert.match(currentBehavior, /microformat\.playerMicroformatRenderer\.category/);
