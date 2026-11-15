@@ -51,6 +51,110 @@
     const TOPIC_SOURCE = 'study_topic';
     const TAG_PREFIX = 'study:';
 
+    /*
+     * Study search suggestions (Android StudySuggestions.kt, StaticSuggestions; kept identical). The
+     * curated lists are lowercase English, like the packs' own topics: a topic's everyday words for
+     * routing a search, plus the multi-word phrases that are clearly lessons. A topic's multi-word
+     * synonyms ("concrete technology" under "building materials") allow a title like the topic
+     * does; single everyday words ("cement") never allow on their own, since "cement" alone names
+     * price lists and factory tours as often as lessons.
+     */
+    const SUGGESTION_KINDS = Object.freeze({ TOPIC_SYNONYMS: 'topic_synonyms', PACK_TOPICS: 'pack_topics', SEARCH_EXAMPLES: 'search_examples' });
+    const PACK_TOPIC_SUGGESTIONS = Object.freeze({
+        'in_gate:civil': ['building materials', 'construction materials', 'civil engineering']
+    });
+    const SEARCH_EXAMPLE_SUGGESTIONS = Object.freeze({
+        'in_gate:civil': ['cement', 'beam deflection'],
+        'in_gate:cse': ['deadlock', 'linked list'],
+        'in_gate:ece': ['bode plot', 'op amp'],
+        'in_gate:ee': ['transformer', 'load flow'],
+        'in_gate:me': ['rankine cycle', 'gears'],
+        in_gate: ['previous year questions', 'engineering mathematics'],
+        'in_jee:main': ['projectile motion', 'mole concept'],
+        'in_jee:advanced': ['rotational motion', 'irodov'],
+        in_jee: ['projectile motion', 'mole concept']
+    });
+    const TOPIC_SYNONYMS = Object.freeze({
+        // GATE Civil
+        'building materials': ['cement', 'concrete', 'aggregate', 'aggregates', 'bricks', 'brick', 'mortar', 'lime',
+            'timber', 'fly ash', 'admixtures', 'construction materials', 'concrete technology', 'building materials'],
+        'construction materials': ['cement', 'concrete', 'aggregate', 'bricks', 'mortar', 'concrete technology'],
+        'concrete structures': ['rcc', 'concrete', 'reinforced concrete', 'reinforced cement concrete', 'prestressed concrete',
+            'psc', 'slab', 'footing', 'limit state', 'concrete technology'],
+        rcc: ['reinforced concrete', 'reinforced cement concrete', 'rcc design', 'prestressed concrete', 'limit state'],
+        'steel structures': ['steel', 'steel design', 'plate girder', 'bolted connections', 'welded connections'],
+        'structural analysis': ['beam', 'truss', 'deflection', 'beam deflection', 'influence lines', 'slope deflection',
+            'moment distribution', 'indeterminate structures'],
+        'solid mechanics': ['stress', 'strain', 'torsion', 'strength of materials', 'bending moment', 'shear force',
+            "mohr's circle", 'mohr circle'],
+        'geotechnical engineering': ['soil', 'foundation', 'consolidation', 'compaction', 'permeability', 'soil mechanics',
+            'bearing capacity', 'shear strength', 'earth pressure', 'foundation engineering'],
+        'soil mechanics': ['soil', 'consolidation', 'compaction', 'permeability', 'bearing capacity', 'shear strength'],
+        'fluid mechanics': ['fluid', 'hydraulics', 'bernoulli', 'viscosity', 'open channel', 'open channel flow', 'pipe flow',
+            'fluid mechanics'],
+        hydrology: ['rainfall', 'runoff', 'hydrograph', 'groundwater', 'irrigation engineering'],
+        irrigation: ['canal', 'irrigation engineering', 'water requirement of crops'],
+        'environmental engineering': ['sewage', 'wastewater', 'water treatment', 'wastewater treatment', 'air pollution',
+            'solid waste', 'solid waste management'],
+        'transportation engineering': ['highway', 'pavement', 'railway', 'traffic', 'highway engineering', 'traffic engineering',
+            'pavement design'],
+        'highway engineering': ['highway', 'pavement', 'pavement design', 'traffic engineering'],
+        surveying: ['levelling', 'leveling', 'theodolite', 'traverse', 'contour', 'total station', 'chain surveying'],
+        'engineering mechanics': ['friction', 'equilibrium', 'free body diagram', 'virtual work', 'centroid', 'moment of inertia'],
+        // GATE CSE
+        'data structures': ['array', 'stack', 'queue', 'tree', 'heap', 'hashing', 'linked list', 'binary tree', 'binary search tree'],
+        algorithms: ['sorting', 'greedy', 'dynamic programming', 'time complexity', 'graph algorithms', 'divide and conquer'],
+        'operating systems': ['deadlock', 'paging', 'semaphore', 'scheduling', 'cpu scheduling', 'virtual memory',
+            'process synchronization'],
+        'operating system': ['deadlock', 'paging', 'semaphore', 'cpu scheduling', 'virtual memory'],
+        dbms: ['sql', 'normalization', 'transactions', 'indexing', 'er model', 'relational algebra', 'database management'],
+        'computer networks': ['tcp', 'subnetting', 'routing', 'osi model', 'ip addressing', 'congestion control'],
+        'theory of computation': ['dfa', 'nfa', 'automata', 'regular expressions', 'turing machine', 'context free grammar'],
+        'compiler design': ['parsing', 'lexical analysis', 'syntax directed translation', 'll parser', 'lr parser'],
+        'digital logic': ['flip flops', 'multiplexer', 'k map', 'boolean algebra', 'combinational circuits', 'sequential circuits'],
+        'computer organisation': ['pipelining', 'cache', 'cache memory', 'addressing modes', 'instruction pipeline'],
+        'computer organization': ['pipelining', 'cache', 'cache memory', 'addressing modes', 'instruction pipeline'],
+        'discrete mathematics': ['graph theory', 'set theory', 'propositional logic', 'combinatorics', 'group theory'],
+        // GATE ECE / EE
+        'signals and systems': ['convolution', 'fourier transform', 'laplace transform', 'z transform', 'sampling theorem'],
+        'control systems': ['root locus', 'bode plot', 'nyquist', 'transfer function', 'state space', 'nyquist plot'],
+        'network theory': ['thevenin', 'norton', 'network theorems', 'two port network', 'transient analysis'],
+        'electronic devices': ['diode', 'mosfet', 'bjt', 'pn junction', 'semiconductor physics'],
+        'analog circuits': ['op amp', 'amplifier', 'oscillator', 'operational amplifier', 'feedback amplifier'],
+        'digital circuits': ['flip flops', 'counters', 'multiplexer', 'k map', 'logic gates'],
+        'communication systems': ['modulation', 'amplitude modulation', 'frequency modulation', 'digital communication'],
+        electromagnetics: ["maxwell's equations", 'transmission lines', 'waveguides', 'antenna', 'plane waves'],
+        'electrical machines': ['transformer', 'induction motor', 'dc machine', 'dc machines', 'synchronous machine'],
+        'power systems': ['load flow', 'fault analysis', 'transmission line', 'power system stability'],
+        'power electronics': ['rectifier', 'inverter', 'chopper', 'thyristor', 'dc dc converter'],
+        // GATE ME
+        thermodynamics: ['entropy', 'enthalpy', 'carnot cycle', 'rankine cycle', 'otto cycle', 'first law', 'second law'],
+        'heat transfer': ['conduction', 'convection', 'radiation', 'heat exchanger', 'fins'],
+        'theory of machines': ['gears', 'cams', 'flywheel', 'governors', 'vibrations', 'gear trains'],
+        'strength of materials': ['stress', 'strain', 'torsion', 'bending moment', 'shear force', "mohr's circle"],
+        'machine design': ['shafts', 'bearings', 'springs', 'fatigue', 'design of shafts'],
+        manufacturing: ['casting', 'welding', 'machining', 'metal cutting', 'metal forming'],
+        // JEE
+        kinematics: ['projectile', 'projectile motion', 'relative motion', 'motion in a straight line', 'motion in a plane'],
+        'rotational motion': ['torque', 'rolling', 'moment of inertia', 'angular momentum', 'rigid body'],
+        electrostatics: ['capacitor', 'capacitance', 'electric field', 'electric potential', 'gauss law', "coulomb's law"],
+        'current electricity': ['kirchhoff', 'resistance', "ohm's law", 'wheatstone bridge', 'potentiometer'],
+        optics: ['lens', 'mirror', 'refraction', 'interference', 'ray optics', 'wave optics', "young's double slit"],
+        'modern physics': ['photoelectric', 'photoelectric effect', 'bohr model', 'nuclear physics', 'dual nature', 'atoms and nuclei'],
+        'organic chemistry': ['isomerism', 'hydrocarbons', 'goc', 'reaction mechanism', 'named reactions', 'aldehydes and ketones'],
+        'inorganic chemistry': ['p block', 'd block', 'coordination compounds', 'periodic table', 'chemical bonding'],
+        'physical chemistry': ['equilibrium', 'electrochemistry', 'mole concept', 'chemical kinetics', 'solutions', 'thermochemistry'],
+        'chemical bonding': ['hybridisation', 'hybridization', 'vsepr', 'molecular orbital theory'],
+        calculus: ['limits', 'continuity', 'derivatives', 'differential equations', 'definite integration', 'application of derivatives'],
+        integration: ['definite integration', 'indefinite integration', 'area under curves'],
+        'coordinate geometry': ['parabola', 'ellipse', 'hyperbola', 'circles', 'straight lines', 'conic sections'],
+        vectors: ['dot product', 'cross product', '3d geometry', 'three dimensional geometry'],
+        probability: ['bayes theorem', 'conditional probability', 'binomial distribution'],
+        matrices: ['determinants', 'inverse of a matrix'],
+        'complex numbers': ['argand plane', 'de moivre', 'roots of unity']
+    });
+    const MAX_TOPIC_PATTERNS = 200;
+
     function isObject(value) { return !!value && typeof value === 'object' && !Array.isArray(value); }
     function object(value) { return isObject(value) ? value : {}; }
     function array(value) { return Array.isArray(value) ? value : []; }
@@ -250,6 +354,94 @@
 
     function wordKey(value) { return text(typeof value === 'string' ? value : value?.word).replace(/\s+/g, ' ').toLowerCase(); }
 
+    /** "packId:variantId", or "packId" with no branch. */
+    function suggestionSeed(packId, variantId) {
+        const pack = text(packId);
+        const variant = text(variantId);
+        return variant ? `${pack}:${variant}` : pack;
+    }
+
+    function own(table, key) {
+        return Object.prototype.hasOwnProperty.call(table, key) ? table[key] : null;
+    }
+
+    /**
+     * The curated suggestions for a kind: TOPIC_SYNONYMS takes a topic, PACK_TOPICS and
+     * SEARCH_EXAMPLES take "packId:variantId" (falling back to the pack). Returns a new array.
+     */
+    function suggest(kind, seed) {
+        const key = wordKey(seed);
+        let found = null;
+        if (kind === SUGGESTION_KINDS.TOPIC_SYNONYMS) found = own(TOPIC_SYNONYMS, key);
+        else if (kind === SUGGESTION_KINDS.PACK_TOPICS) found = own(PACK_TOPIC_SUGGESTIONS, key) || own(PACK_TOPIC_SUGGESTIONS, key.split(':')[0]);
+        else if (kind === SUGGESTION_KINDS.SEARCH_EXAMPLES) found = own(SEARCH_EXAMPLE_SUGGESTIONS, key) || own(SEARCH_EXAMPLE_SUGGESTIONS, key.split(':')[0]);
+        return array(found).slice();
+    }
+
+    function distinctTopics(list) {
+        const seen = new Set();
+        const out = [];
+        for (const value of list) {
+            const key = wordKey(value);
+            if (!key || seen.has(key)) continue;
+            seen.add(key);
+            out.push(text(value));
+        }
+        return out;
+    }
+
+    /** The pack's topics for this branch plus the extra ones the suggestions give it ("building materials"). */
+    function studyTopics(packId, variantId, packTopics) {
+        return distinctTopics([...array(packTopics), ...suggest(SUGGESTION_KINDS.PACK_TOPICS, suggestionSeed(packId, variantId))]);
+    }
+
+    /**
+     * Phrases that allow a title like a topic does: the branch's extra topics, and every multi-word
+     * synonym of a topic ("concrete technology", "beam deflection"). Single words stay out.
+     */
+    function studyAllowPhrases(packId, variantId, topics) {
+        const given = distinctTopics(array(topics));
+        const all = studyTopics(packId, variantId, given);
+        const givenKeys = new Set(given.map(wordKey));
+        const extra = all.filter(topic => !givenKeys.has(wordKey(topic)));
+        const phrases = all.flatMap(topic => suggest(SUGGESTION_KINDS.TOPIC_SYNONYMS, topic)).filter(phrase => wordKey(phrase).includes(' '));
+        return distinctTopics([...extra, ...phrases]);
+    }
+
+    /** The topic itself and everything it covers. */
+    function topicTerms(topic) {
+        return distinctTopics([topic, ...suggest(SUGGESTION_KINDS.TOPIC_SYNONYMS, topic)]);
+    }
+
+    function escapeRegExp(value) { return value.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'); }
+
+    /** Whole-word, case-insensitive patterns for topics (Android StudyHomeFeed.topicPatterns). */
+    function topicPatterns(topics) {
+        const keys = [...new Set(array(topics).map(wordKey).filter(key => key.length >= 2))].slice(0, MAX_TOPIC_PATTERNS);
+        return keys.map(key => new RegExp(`(?<![\\p{L}\\p{N}])${key.split(' ').map(escapeRegExp).join('\\s+')}(?![\\p{L}\\p{N}])`, 'iu'));
+    }
+
+    /**
+     * The topics a search is about: a term named whole in the query ("cement test" names "cement"),
+     * or the whole query named in a term ("beam" in "beam deflection").
+     */
+    function topicsForQuery(query, topics) {
+        const q = wordKey(query);
+        if (q.length < 2) return [];
+        const queryPattern = topicPatterns([q])[0];
+        if (!queryPattern) return [];
+        return array(topics).filter(topic => {
+            const terms = topicTerms(topic);
+            return topicPatterns(terms).some(pattern => pattern.test(q)) || terms.some(term => queryPattern.test(term));
+        });
+    }
+
+    /** A couple of example searches for the first pack of the plan ({packId, variantId}). */
+    function exampleSearches(groups) {
+        const first = array(groups).find(isObject);
+        return first ? suggest(SUGGESTION_KINDS.SEARCH_EXAMPLES, suggestionSeed(first.packId, first.variantId)) : [];
+    }
+
     /**
      * One pack with its edits: {id, channels, keywords, blockedWords}. channelsRemoved and topicsRemoved
      * take rows out; channelsAdded and topicsAdded put rows in. Class packs add every grade's words.
@@ -283,7 +475,11 @@
             seen.add(key);
             keywords.push(text(word));
         }
-        return { id: pack.id, channels, keywords, blockedWords: array(pack.blockedWords).map(text).filter(Boolean) };
+        // Lesson phrases the kept topics cover (Android StudyEffectiveRules.layer synonyms).
+        const variantId = text(packVariant(pack, change.variant)?.id) || null;
+        const synonyms = studyAllowPhrases(pack.id, variantId, keywords)
+            .filter(phrase => !removedTopics.has(wordKey(phrase)) && !seen.has(wordKey(phrase)));
+        return { id: pack.id, channels, keywords, synonyms, blockedWords: array(pack.blockedWords).map(text).filter(Boolean) };
     }
 
     /**
@@ -390,7 +586,11 @@
                 channels.push(packChannelRow(channel, layer.id));
             }
         }
-        const allowWords = layers.flatMap(layer => layer.keywords.map(word => packWordRow(word, layer.id, TOPIC_SOURCE)));
+        // Topics first, then the synonyms they cover; a phrase that is also a topic stays the topic.
+        const allowWords = [
+            ...layers.flatMap(layer => layer.keywords.map(word => packWordRow(word, layer.id, TOPIC_SOURCE))),
+            ...layers.flatMap(layer => array(layer.synonyms).map(word => packWordRow(word, layer.id, TOPIC_SOURCE)))
+        ];
         const blockWords = layers.flatMap(layer => layer.blockedWords.map(word => packWordRow(word, layer.id)));
         const blockKey = kids ? 'blockedKeywords' : (Array.isArray(data.keywords) || !Array.isArray(data.blockedKeywords) ? 'keywords' : 'blockedKeywords');
         const next = {
@@ -533,6 +733,8 @@
         NORMAL, STUDY, BREAK, LIMIT, BREAK_NOTICE_MS, BREAK_WAIT_MAX_MS, GENTLE_END_PAUSE_MS,
         SELF_LOCK_MAX_MINUTES, PARENT_LOCK_MAX_MINUTES, STUDY_SOURCE, TOPIC_SOURCE,
         parseTime, localDateKey, splitRounds, planOccurrences, studyClock, studyRulesApply, studyPhase,
+        SUGGESTION_KINDS, suggest, suggestionSeed, studyTopics, studyAllowPhrases, topicTerms, topicPatterns,
+        topicsForQuery, exampleSearches,
         packVariant, packLayer, activePackLayers, stampPackCopies, studyEffectiveProfile,
         addProgressMinutes, minutesOn, weekProgress, selfStarted, endPolicy
     });
