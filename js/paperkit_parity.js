@@ -88,6 +88,57 @@
         try { return new Intl.NumberFormat(locale()).format(value); } catch (e) { return String(value); }
     }
 
+    /**
+     * The app's RollingCounterView: a change of 1 to 9 rolls only the digits that changed (the old one
+     * rises 60 % of its height while fading, the new one comes up from below, 220 ms, standard curve);
+     * a change of 10 or more, or new words, crossfades the whole line over 120 ms. Instant with reduced
+     * motion, and the first time a number is drawn.
+     */
+    const ROLL_MS = 220;
+    const CROSSFADE_MS = 120;
+    const ROLL_TRAVEL = 0.6;
+    const BIG_CHANGE = 10;
+    const STANDARD = 'cubic-bezier(0.4, 0, 0.2, 1)';
+
+    function rollTo(node, text) {
+        const next = String(text);
+        const previous = node.dataset.pkRoll ?? null;
+        if (previous === next) return;
+        node.dataset.pkRoll = next;
+        const reduced = !!root.matchMedia?.('(prefers-reduced-motion: reduce)')?.matches;
+        if (previous === null || reduced || !node.animate || !next || !previous) {
+            node.textContent = next;
+            return;
+        }
+        const from = Number(previous.replace(/[^\d]/g, ''));
+        const to = Number(next.replace(/[^\d]/g, ''));
+        const numeric = /\d/.test(previous) && /\d/.test(next);
+        if (!numeric || Math.abs(to - from) >= BIG_CHANGE || previous.length !== next.length) {
+            node.textContent = next;
+            node.animate([{ opacity: 0.15 }, { opacity: 1 }], { duration: CROSSFADE_MS, easing: 'linear' });
+            return;
+        }
+        node.textContent = '';
+        for (let i = 0; i < next.length; i += 1) {
+            const cell = el('span', 'pk-roll-digit');
+            const now = el('span', 'pk-roll-digit__now', next[i]);
+            cell.appendChild(now);
+            if (previous[i] !== next[i]) {
+                const old = el('span', 'pk-roll-digit__old', previous[i]);
+                old.setAttribute('aria-hidden', 'true');
+                cell.appendChild(old);
+                const up = to >= from;
+                const travel = `${ROLL_TRAVEL * 100}%`;
+                old.animate([{ transform: 'translateY(0)', opacity: 1 }, { transform: `translateY(${up ? '-' : ''}${travel})`, opacity: 0 }],
+                    { duration: ROLL_MS, easing: STANDARD, fill: 'forwards' });
+                now.animate([{ transform: `translateY(${up ? '' : '-'}${travel})`, opacity: 0 }, { transform: 'translateY(0)', opacity: 1 }],
+                    { duration: ROLL_MS, easing: STANDARD });
+            }
+            node.appendChild(cell);
+        }
+        root.setTimeout(() => { if (node.dataset.pkRoll === next) node.textContent = next; }, ROLL_MS + 40);
+    }
+
     function numberIn(text) {
         return (String(text || '').match(/\d[\d,.\s]*/g) || []).map(part => Number(part.replace(/[^\d]/g, '')) || 0);
     }
@@ -200,8 +251,8 @@
                 detail.textContent = t(COPY.emptyDetail);
             }
             const shown = formatCount(big);
-            if (digits.textContent !== shown) {
-                digits.textContent = shown;
+            if ((digits.dataset.pkRoll ?? digits.textContent) !== shown) {
+                rollTo(digits, shown);
                 if (!underline) underline = root.FilterTubeDoodles?.underline?.(number, { delay: 220 }) || null;
             }
             for (const entry of tiles) {
@@ -226,7 +277,7 @@
                 }
                 const washed = value !== null && value > 0 && entry.spec.area !== 'neutral';
                 entry.tile.classList.toggle('is-washed', washed);
-                entry.count.textContent = value !== null && value > 0 ? formatCount(value) : '';
+                rollTo(entry.count, value !== null && value > 0 ? formatCount(value) : '');
                 entry.tile.setAttribute('aria-label', [label, entry.sub.textContent, entry.badge.hidden ? '' : entry.badge.textContent].filter(Boolean).join(', '));
             }
         };
@@ -313,7 +364,7 @@
         root.addEventListener('filtertube-ui-locale-changed', () => syncToggleStatus());
     }
 
-    root.FilterTubePaperParity = Object.freeze({ COPY, TILES, NAV_AREA, plural, numberIn });
+    root.FilterTubePaperParity = Object.freeze({ COPY, TILES, NAV_AREA, plural, numberIn, rollTo });
     if (doc.readyState === 'loading') doc.addEventListener('DOMContentLoaded', () => root.setTimeout(start, 0), { once: true });
     else root.setTimeout(start, 0);
 })(typeof window !== 'undefined' ? window : globalThis);

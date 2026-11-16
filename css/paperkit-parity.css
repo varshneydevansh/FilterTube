@@ -844,3 +844,8 @@ body.ft-extension-surface[data-surface="tab-view"] .list-item:not(.channel-item)
 body.ft-extension-surface[data-surface="tab-view"] .list-item:not(.channel-item):has(> .item-left > .item-word) > .item-controls > .delete-btn {
   margin-inline-start: auto;
 }
+
+/* Rolling digits (RollingCounterView): tabular figures, each cell clips its own roll. */
+.pk-roll-digit { position: relative; display: inline-block; overflow: hidden; vertical-align: bottom; font-variant-numeric: tabular-nums; }
+.pk-roll-digit__now { display: inline-block; }
+.pk-roll-digit__old { position: absolute; inset: 0; display: inline-block; }
