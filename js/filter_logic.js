@@ -1171,6 +1171,7 @@
             this.channelIndexesDirty = false;
             this.blockedVideoIdSet = new Set(Array.isArray(this.settings.blockedVideoIds) ? this.settings.blockedVideoIds : []);
             this.allowedVideoIdSet = new Set(Array.isArray(this.settings.allowedVideoIds) ? this.settings.allowedVideoIds : []);
+            this.kidsFallbackAllowedVideoIdSet = new Set(Array.isArray(this.settings.kidsFallbackAllowedVideoIds) ? this.settings.kidsFallbackAllowedVideoIds : []);
             this.pageChannelMeta = null;
             this.blockedCount = 0;
             this.debugEnabled = !!window.__filtertubeDebug;
@@ -2924,6 +2925,15 @@
                     rendererType === 'shortsLockupViewModelV2'
                 );
 
+                if (videoId && this.kidsFallbackAllowedVideoIdSet?.has(videoId)) {
+                    this._logWhitelistDecision('allow:kids_allowed_video', {
+                        rendererType,
+                        originalRendererType,
+                        title
+                    });
+                    return this._blocksByContentRules(item, rules, rendererType);
+                }
+
                 if (!hasChannelRules && !hasKeywordRules) {
                     this._logWhitelistDecision('block:no_whitelist_rules', {
                         rendererType,
@@ -3075,6 +3085,29 @@
                     if (this._matchesAnyChannel(commentChannelInfo, this.settings.filterChannels, this.filterChannelIndex)) {
                         this._log(`🚫 Blocking comment by author: ${commentChannelInfo.name || commentChannelInfo.id || commentChannelInfo.handle}`);
                         return true;
+                    }
+                }
+
+                // Allowed-only mode flips comments as it flips cards (Android commentHidden): only a
+                // comment from an allowed author or with an allowed word shows; with layered rules a
+                // blocked word in the comment still hides it.
+                if (listMode === 'whitelist' && rules.commentText) {
+                    const allowChannels = Array.isArray(this.settings.whitelistChannels) ? this.settings.whitelistChannels : [];
+                    const allowKeywords = Array.isArray(this.settings.whitelistKeywords) ? this.settings.whitelistKeywords : [];
+                    const hasAuthor = !!(commentChannelInfo && (commentChannelInfo.name || commentChannelInfo.id || commentChannelInfo.handle || commentChannelInfo.customUrl));
+                    const authorAllowed = hasAuthor && allowChannels.length > 0
+                        && this._matchesAnyChannel(commentChannelInfo, allowChannels, this.whitelistChannelIndex);
+                    const textAllowed = !!commentText && allowKeywords.some(keywordRegex => this._regexMatches(keywordRegex, commentText));
+                    if (!authorAllowed && !textAllowed) {
+                        this._log('🚫 Blocking comment (allowed only: author and words not on the allowed list)');
+                        return true;
+                    }
+                    if (this.settings.listLayered === true && commentText) {
+                        const blockKeywords = Array.isArray(this.settings.filterKeywords) ? this.settings.filterKeywords : [];
+                        if (blockKeywords.some(keywordRegex => this._regexMatches(keywordRegex, commentText))) {
+                            this._log('🚫 Blocking comment (layered: blocked word)');
+                            return true;
+                        }
                     }
                 }
             }

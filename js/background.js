@@ -3827,6 +3827,8 @@ async function getCompiledSettings(sender = null, profileType = null, forceRefre
                         ? entry.trim()
                         : (typeof entry?.word === 'string' ? entry.word.trim() : '');
                     if (!word) continue;
+                    // A paused managed-list row stays in the list but filters nothing (as on Android).
+                    if (typeof entry === 'object' && entry?.managedListPaused === true) continue;
                     if (predicate && !predicate(entry)) continue;
 
                     const exact = (typeof entry === 'object' && entry) ? entry.exact === true : false;
@@ -3990,8 +3992,12 @@ async function getCompiledSettings(sender = null, profileType = null, forceRefre
             const activeRuleSurface = shouldUseKidsProfile ? activeKids : activeMain;
             // Layered rules (3.6.2): "whitelist" plus layered:true keeps the block list subtracting.
             compiledSettings.listLayered = compiledSettings.listMode === 'whitelist' && activeRuleSurface.layered === true;
+            // Kids `videoIds` are the parent's allowed videos (Android NativeOwnedFilterDecider),
+            // never blocked ones; on Main `videoIds` is the legacy alias of `blockedVideoIds`.
             compiledSettings.blockedVideoIds = Array.from(new Set(
-                safeArray(activeRuleSurface.blockedVideoIds || activeRuleSurface.videoIds)
+                safeArray(shouldUseKidsProfile
+                    ? activeRuleSurface.blockedVideoIds
+                    : (activeRuleSurface.blockedVideoIds || activeRuleSurface.videoIds))
                     .map(value => normalizeString(value))
                     .filter(value => /^[a-zA-Z0-9_-]{11}$/.test(value))
             ));
@@ -4000,6 +4006,15 @@ async function getCompiledSettings(sender = null, profileType = null, forceRefre
                     .map(value => normalizeString(value))
                     .filter(value => /^[a-zA-Z0-9_-]{11}$/.test(value))
             ));
+            // Android lets a Kids allowed video through only when no block or allow rule decided
+            // and the Kids list is "Allowed only"; it never outranks a blocked word or channel.
+            compiledSettings.kidsFallbackAllowedVideoIds = shouldUseKidsProfile && kidsModeFromV4 === 'whitelist'
+                ? Array.from(new Set(
+                    safeArray(activeRuleSurface.videoIds)
+                        .map(value => normalizeString(value))
+                        .filter(value => /^[a-zA-Z0-9_-]{11}$/.test(value))
+                ))
+                : [];
 
             if (activeProfileKind === 'child') {
                 const allowMainViewing = activeSettings.allowMainViewing !== false;
@@ -4053,8 +4068,15 @@ async function getCompiledSettings(sender = null, profileType = null, forceRefre
                 return compiledSettings.listMode === 'whitelist' || entry?.modeBootstrapCopy !== true;
             });
 
+            // Kids: channels the child follows are allowed alongside the allow list (Android
+            // kidsSubscriptionKeys); they are plain identity strings.
             const rawWhitelistChannels = shouldUseKidsProfile
-                ? (Array.isArray(activeKids.whitelistChannels) ? activeKids.whitelistChannels : [])
+                ? [
+                    ...(Array.isArray(activeKids.whitelistChannels) ? activeKids.whitelistChannels : []),
+                    ...(Array.isArray(activeKids.subscriptions)
+                        ? activeKids.subscriptions.filter(value => typeof value === 'string' && value.trim())
+                        : [])
+                ]
                 : (() => {
                     const mainChannels = Array.isArray(activeMain.whitelistChannels) ? activeMain.whitelistChannels : [];
                     if (!syncKidsToMain || mainModeFromV4 !== 'whitelist' || kidsModeFromV4 !== 'whitelist') return mainChannels;
@@ -4486,28 +4508,15 @@ async function getCompiledSettings(sender = null, profileType = null, forceRefre
             // Kids profile keyword compilation (YouTube Kids domain only)
             if (shouldUseKidsProfile) {
                 const rawKidsKeywords = effectiveKidsKeywords;
-                const compiledKidsKeywords = rawKidsKeywords.map(entry => {
-                    try {
-                        const word = typeof entry?.word === 'string' ? entry.word.trim() : '';
-                        if (!word) return null;
-                        const exact = entry?.exact === true;
-                        return compileKeywordPattern(word, exact);
-                    } catch (e) {
-                        return null;
-                    }
-                }).filter(Boolean);
+                // Same compiler as Main: plain-string rows (Android stores Kids words as strings),
+                // regex rows, date windows and paused rows all behave as on the phone.
+                const compiledKidsKeywords = compileKeywordEntries(rawKidsKeywords, entry => {
+                    return !(typeof entry === 'object' && entry?.scope === 'comment');
+                });
 
-                const compiledKidsKeywordsComments = rawKidsKeywords.map(entry => {
-                    try {
-                        if (!entry || typeof entry !== 'object' || entry.comments !== true) return null;
-                        const word = typeof entry?.word === 'string' ? entry.word.trim() : '';
-                        if (!word) return null;
-                        const exact = entry?.exact === true;
-                        return compileKeywordPattern(word, exact);
-                    } catch (e) {
-                        return null;
-                    }
-                }).filter(Boolean);
+                const compiledKidsKeywordsComments = compileKeywordEntries(rawKidsKeywords, entry => {
+                    return (typeof entry === 'object' && entry) ? entry.comments === true : false;
+                });
 
                 // Preserve channel-derived keywords (Filter All) alongside kids keyword list.
                 // We want: (kids keyword entries) + (channel-derived patterns) with de-dup.

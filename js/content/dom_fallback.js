@@ -4133,40 +4133,12 @@ function isAlphanumeric(char) {
     return char.toUpperCase() !== char.toLowerCase();
 }
 
-function matchesKeyword(regex, rawText, keywordData) {
+function matchesKeyword(regex, rawText) {
     if (!rawText) return false;
-
+    // The page scan matches exactly as the data-level filter and the app do: the compiled
+    // pattern against the text as written, with no accent folding ("cafe" does not hide "café").
     regex.lastIndex = 0;
-    if (regex.test(rawText)) {
-        return true;
-    }
-
-    const normalized = normalizeTextForMatching(rawText);
-    if (normalized && normalized !== rawText) {
-        regex.lastIndex = 0;
-        return regex.test(normalized);
-    }
-
-    const plainKeyword = extractPlainKeyword(keywordData);
-    if (plainKeyword) {
-        const normalizedKeyword = normalizeTextForMatching(plainKeyword).toLowerCase();
-        const normalizedText = normalized.toLowerCase();
-
-        if (normalizedKeyword && normalizedText.includes(normalizedKeyword)) {
-            const index = normalizedText.indexOf(normalizedKeyword);
-            const beforeChar = index > 0 ? normalizedText[index - 1] : '';
-            const afterCharIndex = index + normalizedKeyword.length;
-            const afterChar = afterCharIndex < normalizedText.length ? normalizedText[afterCharIndex] : '';
-
-            const hasLeftBoundary = !beforeChar || !isAlphanumeric(beforeChar);
-            const hasRightBoundary = !afterChar || !isAlphanumeric(afterChar);
-
-            if (hasLeftBoundary || hasRightBoundary) {
-                return true;
-            }
-        }
-    }
-    return false;
+    return regex.test(rawText);
 }
 
 // ============================================================================
@@ -4260,6 +4232,28 @@ function handleHomeFeedFallback(settings) {
             toggleVisibility(element, false, '', true);
         }
     });
+}
+
+// Allowed-only mode flips comments as it flips cards (Android commentHidden): a comment
+// shows only when its author is allowed or its words match an allowed word; with layered
+// rules a blocked word in it still hides it.
+function commentHiddenByAllowList(settings, commentText, channelMeta) {
+    if (!settings || settings.listMode !== 'whitelist') return false;
+    const allowChannels = Array.isArray(settings.whitelistChannels) ? settings.whitelistChannels : [];
+    const allowKeywords = Array.isArray(settings.whitelistKeywords) ? settings.whitelistKeywords : [];
+    let allowed = false;
+    if (allowChannels.length > 0 && channelMeta && (channelMeta.id || channelMeta.handle || channelMeta.customUrl || channelMeta.name)) {
+        const index = getCompiledChannelFilterIndex(settings, allowChannels);
+        allowed = !!(index && channelMetaMatchesIndex(channelMeta, index, settings.channelMap || {}));
+    }
+    if (!allowed && commentText && allowKeywords.length > 0) {
+        allowed = getCompiledKeywordRegexes(allowKeywords).some(regex => matchesKeyword(regex, commentText));
+    }
+    if (!allowed) return true;
+    if (settings.listLayered === true && commentText && Array.isArray(settings.filterKeywords) && settings.filterKeywords.length > 0) {
+        return getCompiledKeywordRegexes(settings.filterKeywords).some(regex => matchesKeyword(regex, commentText));
+    }
+    return false;
 }
 
 function handleCommentsFallback(settings) {
@@ -4365,6 +4359,7 @@ function handleCommentsFallback(settings) {
         ? settings.filterKeywordsComments
         : settings.filterKeywords;
     const shouldFilterKeywords = Boolean(commentKeywordList?.length > 0);
+    const allowOnlyComments = settings?.listMode === 'whitelist';
 
     // 3. Per-thread filtering
     commentThreads.forEach(thread => {
@@ -4419,7 +4414,7 @@ function handleCommentsFallback(settings) {
         }
 
         // If nothing is enabled, restore and stop.
-        if (!hasChannelFilters && !shouldFilterKeywords) {
+        if (!hasChannelFilters && !shouldFilterKeywords && !allowOnlyComments) {
             toggleVisibility(thread, false, '', true);
             return;
         }
@@ -4434,6 +4429,7 @@ function handleCommentsFallback(settings) {
             channelMeta,
             contentTag: (thread.tagName || '').toLowerCase()
         });
+        const hiddenByAllowList = !shouldHide && commentHiddenByAllowList(settings, commentText, channelMeta);
 
         let reason = 'Comment Filter';
         if (shouldHide && hasChannelFilters && (channelMeta.handle || channelMeta.id || channelMeta.customUrl)) {
@@ -4443,7 +4439,7 @@ function handleCommentsFallback(settings) {
             }
         }
 
-        toggleVisibility(thread, shouldHide, reason);
+        toggleVisibility(thread, shouldHide || hiddenByAllowList, hiddenByAllowList ? 'Comment not on the allowed list' : reason);
     });
 
     // 4. Reply/comment-renderer filtering (replies are often separate commentRenderer nodes)
@@ -4480,7 +4476,7 @@ function handleCommentsFallback(settings) {
                 toggleVisibility(commentEl, false, '', true);
             }
 
-            if (!hasChannelFilters && !shouldFilterKeywords) {
+            if (!hasChannelFilters && !shouldFilterKeywords && !allowOnlyComments) {
                 toggleVisibility(commentEl, false, '', true);
                 return;
             }
@@ -4509,6 +4505,7 @@ function handleCommentsFallback(settings) {
                 channelMeta,
                 contentTag: (commentEl.tagName || '').toLowerCase()
             });
+            const hiddenByAllowList = !shouldHide && commentHiddenByAllowList(settings, commentText, channelMeta);
 
             let reason = 'Comment Filter';
             if (shouldHide && hasChannelFilters && (channelMeta.handle || channelMeta.id || channelMeta.customUrl)) {
@@ -4518,7 +4515,7 @@ function handleCommentsFallback(settings) {
                 }
             }
 
-            toggleVisibility(commentEl, shouldHide, reason);
+            toggleVisibility(commentEl, shouldHide || hiddenByAllowList, hiddenByAllowList ? 'Comment not on the allowed list' : reason);
         } catch (e) {
         }
     });
@@ -4575,7 +4572,7 @@ function handleCommentsFallback(settings) {
                 toggleVisibility(containerToHide, false, '', true);
             }
 
-            if (!hasChannelFilters && !shouldFilterKeywords) {
+            if (!hasChannelFilters && !shouldFilterKeywords && !allowOnlyComments) {
                 toggleVisibility(containerToHide, false, '', true);
                 return;
             }
@@ -4610,6 +4607,7 @@ function handleCommentsFallback(settings) {
                 channelMeta,
                 contentTag: (commentVm.tagName || '').toLowerCase()
             });
+            const hiddenByAllowList = !shouldHide && commentHiddenByAllowList(settings, commentText, channelMeta);
 
             let reason = 'Comment Filter';
             if (shouldHide && hasChannelFilters && (channelMeta.handle || channelMeta.id || channelMeta.customUrl)) {
@@ -4619,7 +4617,7 @@ function handleCommentsFallback(settings) {
                 }
             }
 
-            toggleVisibility(containerToHide, shouldHide, reason);
+            toggleVisibility(containerToHide, shouldHide || hiddenByAllowList, hiddenByAllowList ? 'Comment not on the allowed list' : reason);
         } catch (e) {
         }
     });
