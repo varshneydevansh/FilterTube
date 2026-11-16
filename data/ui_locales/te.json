@@ -2924,5 +2924,7 @@
   "askParent.answerNo": "ఈసారి కాదు",
   "askParent.answerNoBody": "{name} ఇప్పుడు వద్దు అన్నారు.",
   "askParent.answerNote": "{name} నుండి ఒక నోట్",
-  "askParent.answerWatch": "ఇప్పుడే చూడు"
+  "askParent.answerWatch": "ఇప్పుడే చూడు",
+  "study.skipVideo": "ఈ వీడియోను దాటవేయి",
+  "study.skipped": "దాటవేయబడింది. ఇది మళ్లీ కనిపించదు."
 }

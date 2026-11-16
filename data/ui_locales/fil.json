@@ -2924,5 +2924,7 @@
   "askParent.answerNo": "Hindi muna ngayon",
   "askParent.answerNoBody": "Sabi ni {name}, hindi muna.",
   "askParent.answerNote": "Isang note mula kay {name}",
-  "askParent.answerWatch": "Panoorin na"
+  "askParent.answerWatch": "Panoorin na",
+  "study.skipVideo": "Laktawan ang video na ito",
+  "study.skipped": "Nilaktawan. Hindi na ito lalabas."
 }

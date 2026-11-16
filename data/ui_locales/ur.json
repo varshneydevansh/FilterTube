@@ -2924,5 +2924,7 @@
   "askParent.answerNo": "اس بار نہیں",
   "askParent.answerNoBody": "{name} نے کہا ابھی نہیں۔",
   "askParent.answerNote": "{name} کا نوٹ",
-  "askParent.answerWatch": "ابھی دیکھو"
+  "askParent.answerWatch": "ابھی دیکھو",
+  "study.skipVideo": "یہ ویڈیو چھوڑیں",
+  "study.skipped": "چھوڑ دی گئی۔ یہ دوبارہ نہیں دکھے گی۔"
 }

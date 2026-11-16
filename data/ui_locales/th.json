@@ -2922,5 +2922,7 @@
   "askParent.answerNo": "ครั้งนี้ยังไม่ได้",
   "askParent.answerNoBody": "{name} บอกว่าไว้ก่อน",
   "askParent.answerNote": "ข้อความจาก {name}",
-  "askParent.answerWatch": "ดูเลย"
+  "askParent.answerWatch": "ดูเลย",
+  "study.skipVideo": "ข้ามวิดีโอนี้",
+  "study.skipped": "ข้ามแล้ว จะไม่แสดงอีก"
 }

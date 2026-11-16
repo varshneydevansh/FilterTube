@@ -2922,5 +2922,7 @@
   "askParent.answerNo": "이번엔 안 돼요",
   "askParent.answerNoBody": "{name}이(가) 지금은 안 된대요.",
   "askParent.answerNote": "{name}의 메모",
-  "askParent.answerWatch": "지금 보기"
+  "askParent.answerWatch": "지금 보기",
+  "study.skipVideo": "이 동영상 건너뛰기",
+  "study.skipped": "건너뛰었습니다. 다시 보이지 않습니다."
 }

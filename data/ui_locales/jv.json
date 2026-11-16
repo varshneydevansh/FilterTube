@@ -2922,5 +2922,7 @@
   "askParent.answerNo": "Saiki durung",
   "askParent.answerNoBody": "{name} ngendika mengko wae.",
   "askParent.answerNote": "Cathetan saka {name}",
-  "askParent.answerWatch": "Tonton saiki"
+  "askParent.answerWatch": "Tonton saiki",
+  "study.skipVideo": "Lewati video iki",
+  "study.skipped": "Dilewati. Ora bakal katon maneh."
 }

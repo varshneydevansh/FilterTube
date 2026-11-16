@@ -2924,5 +2924,7 @@
   "askParent.answerNo": "આ વખતે નહીં",
   "askParent.answerNoBody": "{name}એ કહ્યું હમણાં નહીં.",
   "askParent.answerNote": "{name}ની નોંધ",
-  "askParent.answerWatch": "હમણાં જુઓ"
+  "askParent.answerWatch": "હમણાં જુઓ",
+  "study.skipVideo": "આ વીડિયો છોડો",
+  "study.skipped": "છોડી દીધો. તે ફરી દેખાશે નહીં."
 }

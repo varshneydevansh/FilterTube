@@ -2948,5 +2948,7 @@
   "askParent.answerNo": "مش المرة دي",
   "askParent.answerNoBody": "{name} قال مش دلوقتي.",
   "askParent.answerNote": "ملاحظة من {name}",
-  "askParent.answerWatch": "اتفرج دلوقتي"
+  "askParent.answerWatch": "اتفرج دلوقتي",
+  "study.skipVideo": "تخطَّ هذا الفيديو",
+  "study.skipped": "تم التخطي. مش هيظهر تاني."
 }

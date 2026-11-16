@@ -2924,5 +2924,7 @@
   "askParent.answerNo": "Ba wannan karon ba",
   "askParent.answerNoBody": "{name} ya ce ba yanzu ba.",
   "askParent.answerNote": "Saƙo daga {name}",
-  "askParent.answerWatch": "Kalla yanzu"
+  "askParent.answerWatch": "Kalla yanzu",
+  "study.skipVideo": "Tsallake wannan bidiyo",
+  "study.skipped": "An tsallake. Ba zai sake bayyana ba."
 }

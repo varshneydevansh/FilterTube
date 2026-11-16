@@ -357,3 +357,17 @@ test('the popup and options page offer "End and switch" and type the other profi
     const background = fs.readFileSync('js/background.js', 'utf8');
     assert.match(background, /switchProfile: \(fromProfileId, targetProfileId\) => switchProfileAfterStudy/);
 });
+
+test('"Skip this video" (Android StudyRuntime.skipVideo): only during study, hidden for that profile from then on', async () => {
+    const h = harness({ study: { plan: null }, now: at(17, 10, 0) });
+    assert.equal((await h.controller.handleMessage({ action: 'FilterTube_StudySkipVideo', videoId: 'abcdEFGH123' }, { youtubeContent: true })).error, 'not_studying');
+    await h.controller.startSession({ minutes: 30, lock: 'gentle' });
+    assert.equal((await h.controller.handleMessage({ action: 'FilterTube_StudySkipVideo', videoId: '../x' }, { youtubeContent: true })).error, 'invalid_video');
+    assert.equal((await h.controller.handleMessage({ action: 'FilterTube_StudySkipVideo', videoId: 'abcdEFGH123' }, { youtubeContent: true })).ok, true);
+    assert.ok(h.transitions.includes('skip_video'), 'the tabs hear about it at once');
+    assert.deepEqual(h.controller.skippedVideos('p1', await h.controller.prepare()), ['abcdEFGH123']);
+    h.clock.now = at(17, 12, 0);
+    assert.deepEqual(h.controller.skippedVideos('p1', await h.controller.prepare()), ['abcdEFGH123'], 'still hidden after study');
+    assert.deepEqual(h.controller.skippedVideos('p2', await h.controller.prepare()), []);
+    assert.match(fs.readFileSync('js/background.js', 'utf8'), /studyBackground\.skippedVideos\(activeProfileId, studyPrepared\)/);
+});

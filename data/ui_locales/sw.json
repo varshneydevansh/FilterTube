@@ -2924,5 +2924,7 @@
   "askParent.answerNo": "Si wakati huu",
   "askParent.answerNoBody": "{name} amesema si sasa.",
   "askParent.answerNote": "Ujumbe kutoka kwa {name}",
-  "askParent.answerWatch": "Tazama sasa"
+  "askParent.answerWatch": "Tazama sasa",
+  "study.skipVideo": "Ruka video hii",
+  "study.skipped": "Imerukwa. Haitaonekana tena."
 }

@@ -2936,5 +2936,7 @@
   "askParent.answerNo": "Не в этот раз",
   "askParent.answerNoBody": "{name} пока говорит «не сейчас».",
   "askParent.answerNote": "Записка: {name}",
-  "askParent.answerWatch": "Смотреть"
+  "askParent.answerWatch": "Смотреть",
+  "study.skipVideo": "Пропустить это видео",
+  "study.skipped": "Пропущено. Больше не появится."
 }

@@ -2924,5 +2924,7 @@
   "askParent.answerNo": "Desta vez não",
   "askParent.answerNoBody": "{name} disse agora não.",
   "askParent.answerNote": "Um recado de {name}",
-  "askParent.answerWatch": "Assistir agora"
+  "askParent.answerWatch": "Assistir agora",
+  "study.skipVideo": "Pular este vídeo",
+  "study.skipped": "Pulado. Ele não vai aparecer de novo."
 }

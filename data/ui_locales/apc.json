@@ -2948,5 +2948,7 @@
   "askParent.answerNo": "مش هالمرة",
   "askParent.answerNoBody": "{name} قال مش هلق.",
   "askParent.answerNote": "ملاحظة من {name}",
-  "askParent.answerWatch": "احضر هلق"
+  "askParent.answerWatch": "احضر هلق",
+  "study.skipVideo": "تخطَّ هذا الفيديو",
+  "study.skipped": "تم التخطي. ما رح يرجع يبيّن."
 }

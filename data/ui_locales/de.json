@@ -2924,5 +2924,7 @@
   "askParent.answerNo": "Diesmal nicht",
   "askParent.answerNoBody": "{name} hat „jetzt nicht“ gesagt.",
   "askParent.answerNote": "Eine Nachricht von {name}",
-  "askParent.answerWatch": "Jetzt ansehen"
+  "askParent.answerWatch": "Jetzt ansehen",
+  "study.skipVideo": "Dieses Video überspringen",
+  "study.skipped": "Übersprungen. Es erscheint nicht mehr."
 }

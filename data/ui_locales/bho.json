@@ -2924,5 +2924,7 @@
   "askParent.answerNo": "एह बेर ना",
   "askParent.answerNoBody": "{name} कहलें अबहीं ना।",
   "askParent.answerNote": "{name} के एगो नोट",
-  "askParent.answerWatch": "अबहीं देखऽ"
+  "askParent.answerWatch": "अबहीं देखऽ",
+  "study.skipVideo": "ई वीडियो छोड़ीं",
+  "study.skipped": "छोड़ दिहल गइल। ई फेर ना देखाई।"
 }

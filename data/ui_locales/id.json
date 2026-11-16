@@ -2922,5 +2922,7 @@
   "askParent.answerNo": "Kali ini belum",
   "askParent.answerNoBody": "{name} bilang nanti saja.",
   "askParent.answerNote": "Catatan dari {name}",
-  "askParent.answerWatch": "Tonton sekarang"
+  "askParent.answerWatch": "Tonton sekarang",
+  "study.skipVideo": "Lewati video ini",
+  "study.skipped": "Dilewati. Tidak akan tampil lagi."
 }

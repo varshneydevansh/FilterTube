@@ -2924,5 +2924,7 @@
   "askParent.answerNo": "ಈ ಸಲ ಬೇಡ",
   "askParent.answerNoBody": "{name} ಈಗ ಬೇಡ ಅಂದರು.",
   "askParent.answerNote": "{name} ಅವರಿಂದ ಟಿಪ್ಪಣಿ",
-  "askParent.answerWatch": "ಈಗಲೇ ನೋಡು"
+  "askParent.answerWatch": "ಈಗಲೇ ನೋಡು",
+  "study.skipVideo": "ಈ ವೀಡಿಯೊ ಬಿಟ್ಟುಬಿಡಿ",
+  "study.skipped": "ಬಿಟ್ಟುಬಿಡಲಾಗಿದೆ. ಮತ್ತೆ ಕಾಣುವುದಿಲ್ಲ."
 }

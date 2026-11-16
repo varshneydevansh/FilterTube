@@ -54,9 +54,14 @@
             version: 1,
             profiles: object(clone(raw.profiles)),
             seconds: object(clone(raw.seconds)),
-            lastCreditAt: Number.isFinite(raw.lastCreditAt) ? raw.lastCreditAt : 0
+            lastCreditAt: Number.isFinite(raw.lastCreditAt) ? raw.lastCreditAt : 0,
+            // "Skip this video" (Android StudyRuntimeStore skip:<profile>): per profile, newest last.
+            skipped: object(clone(raw.skipped))
         };
     }
+
+    /** Android StudyRuntimeStore.MAX_SKIPPED. */
+    const MAX_SKIPPED = 500;
 
     function profileRuntime(runtime, profileId) {
         const value = object(runtime.profiles[profileId]);
@@ -294,6 +299,32 @@
          * Synchronous, for the compiler: the profile the filters use and the public study state.
          * Returns {profile, applied, state}.
          */
+        /** The videos [profileId] skipped during study: always hidden for that profile, studying or not. */
+        function skippedVideos(profileId, prepared = null) {
+            const runtime = prepared?.runtime || emptyRuntime();
+            const list = runtime.skipped?.[text(profileId)];
+            return Array.isArray(list) ? list.filter(id => typeof id === 'string' && id) : [];
+        }
+
+        /**
+         * "Skip this video" (Android StudyRuntime.skipVideo): hides it from now on for this profile, even
+         * while locked. It only ever hides more, so a child may use it and nobody needs a PIN.
+         */
+        async function skipVideo(videoId) {
+            const id = text(videoId);
+            if (!/^[A-Za-z0-9_-]{6,64}$/.test(id)) return { ok: false, error: 'invalid_video' };
+            const { profileId, profile, runtime } = await readAll();
+            const study = Model.profileStudy(profile);
+            const { clock } = clockFor(profile, runtime, profileId);
+            if (!study || !clock.studying) return { ok: false, error: 'not_studying' };
+            const current = Array.isArray(runtime.skipped[profileId]) ? runtime.skipped[profileId] : [];
+            if (current.includes(id)) return { ok: true, already: true };
+            runtime.skipped[profileId] = [...current, id].slice(-MAX_SKIPPED);
+            await writeRuntime(runtime);
+            await deps.onTransition?.('skip_video');
+            return { ok: true };
+        }
+
         function apply(profileId, profile, prepared, options = {}) {
             const at = prepared?.now ?? now();
             const { study, local, clock } = clockFor(profile, prepared?.runtime || emptyRuntime(), profileId, at,
@@ -720,6 +751,10 @@
                 if (!youtubeContent) return Promise.resolve({ ok: false, error: 'untrusted_sender' });
                 return tick(request);
             }
+            if (action === 'FilterTube_StudySkipVideo') {
+                if (!extensionPage && !youtubeContent) return Promise.resolve({ ok: false, error: 'untrusted_sender' });
+                return skipVideo(request.videoId);
+            }
             if (action === 'FilterTube_StudySkipBreak') {
                 if (!extensionPage && !youtubeContent) return Promise.resolve({ ok: false, error: 'untrusted_sender' });
                 return skipBreak();
@@ -739,7 +774,7 @@
 
         return Object.freeze({
             ALARM, RUNTIME_KEY, prepare, apply, getState, schedule, onAlarm, startSession, requestEnd, cancelEnd, endGentleThenSwitch,
-            skipBreak, tick, update, foldProgress, handleMessage, deviceId, getChildState, updateChild, startParentLock, endParentLock,
+            skipBreak, skipVideo, skippedVideos, tick, update, foldProgress, handleMessage, deviceId, getChildState, updateChild, startParentLock, endParentLock,
             switchDecision
         });
     }

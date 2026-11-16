@@ -2948,5 +2948,7 @@
   "askParent.answerNo": "المرة دي لا",
   "askParent.answerNoBody": "{name} قال هسع لا.",
   "askParent.answerNote": "ملاحظة من {name}",
-  "askParent.answerWatch": "شوف هسع"
+  "askParent.answerWatch": "شوف هسع",
+  "study.skipVideo": "تخطَّ هذا الفيديو",
+  "study.skipped": "تم التخطي. ما حيظهر تاني."
 }

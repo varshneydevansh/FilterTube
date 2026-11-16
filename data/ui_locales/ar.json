@@ -2948,5 +2948,7 @@
   "askParent.answerNo": "ليس هذه المرة",
   "askParent.answerNoBody": "قال {name} ليس الآن.",
   "askParent.answerNote": "ملاحظة من {name}",
-  "askParent.answerWatch": "شاهد الآن"
+  "askParent.answerWatch": "شاهد الآن",
+  "study.skipVideo": "تخطَّ هذا الفيديو",
+  "study.skipped": "تم التخطي. لن يظهر مجددًا."
 }

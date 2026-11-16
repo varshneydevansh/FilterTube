@@ -2924,5 +2924,7 @@
   "askParent.answerNo": "এইবার না",
   "askParent.answerNoBody": "{name} বলেছেন এখন না।",
   "askParent.answerNote": "{name}-এর একটা নোট",
-  "askParent.answerWatch": "এখনই দেখো"
+  "askParent.answerWatch": "এখনই দেখো",
+  "study.skipVideo": "এই ভিডিও এড়িয়ে যান",
+  "study.skipped": "এড়ানো হয়েছে। এটি আর দেখাবে না।"
 }

@@ -2922,5 +2922,7 @@
   "askParent.answerNo": "这次不行",
   "askParent.answerNoBody": "{name}说现在不行。",
   "askParent.answerNote": "{name}的留言",
-  "askParent.answerWatch": "立即观看"
+  "askParent.answerWatch": "立即观看",
+  "study.skipVideo": "跳过这个视频",
+  "study.skipped": "已跳过。它不会再出现。"
 }

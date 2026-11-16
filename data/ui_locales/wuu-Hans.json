@@ -2922,5 +2922,7 @@
   "askParent.answerNo": "搿趟勿来事",
   "askParent.answerNoBody": "{name}讲现在勿来事。",
   "askParent.answerNote": "{name}个留言",
-  "askParent.answerWatch": "马上看"
+  "askParent.answerWatch": "马上看",
+  "study.skipVideo": "跳过迭个视频",
+  "study.skipped": "跳过了。伊勿会再出来。"
 }

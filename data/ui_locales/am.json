@@ -2924,5 +2924,7 @@
   "askParent.answerNo": "በዚህ ጊዜ አይደለም",
   "askParent.answerNoBody": "{name} አሁን አይደለም አለ።",
   "askParent.answerNote": "ከ{name} የመጣ ማስታወሻ",
-  "askParent.answerWatch": "አሁን እይ"
+  "askParent.answerWatch": "አሁን እይ",
+  "study.skipVideo": "ይህን ቪዲዮ ዝለል",
+  "study.skipped": "ተዘሏል። ዳግም አይታይም።"
 }

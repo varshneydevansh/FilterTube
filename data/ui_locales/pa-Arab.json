@@ -2924,5 +2924,7 @@
   "askParent.answerNo": "ایس وار نہیں",
   "askParent.answerNoBody": "{name} نے آکھیا ہلے نہیں۔",
   "askParent.answerNote": "{name} دا نوٹ",
-  "askParent.answerWatch": "ہنے ویکھو"
+  "askParent.answerWatch": "ہنے ویکھو",
+  "study.skipVideo": "ایہہ ویڈیو چھڈو",
+  "study.skipped": "چھڈ دتی۔ ایہہ مُڑ نہیں دِسے گی۔"
 }

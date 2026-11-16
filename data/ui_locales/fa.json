@@ -2924,5 +2924,7 @@
   "askParent.answerNo": "این دفعه نه",
   "askParent.answerNoBody": "{name} گفت الان نه.",
   "askParent.answerNote": "یادداشتی از {name}",
-  "askParent.answerWatch": "همین حالا ببین"
+  "askParent.answerWatch": "همین حالا ببین",
+  "study.skipVideo": "رد شدن از این ویدیو",
+  "study.skipped": "رد شد. دیگر نمایش داده نمی‌شود."
 }

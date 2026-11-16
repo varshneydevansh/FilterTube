@@ -2922,5 +2922,7 @@
   "askParent.answerNo": "Lần này chưa được",
   "askParent.answerNoBody": "{name} bảo để sau.",
   "askParent.answerNote": "Lời nhắn từ {name}",
-  "askParent.answerWatch": "Xem ngay"
+  "askParent.answerWatch": "Xem ngay",
+  "study.skipVideo": "Bỏ qua video này",
+  "study.skipped": "Đã bỏ qua. Video sẽ không hiện lại."
 }

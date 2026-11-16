@@ -4119,6 +4119,8 @@ async function getCompiledSettings(sender = null, profileType = null, forceRefre
                     : (activeRuleSurface.blockedVideoIds || activeRuleSurface.videoIds))
                     .map(value => normalizeString(value))
                     .filter(value => /^[a-zA-Z0-9_-]{11}$/.test(value))
+                    // "Skip this video" during study: hidden for this profile from then on (Android StudyRuntime).
+                    .concat(studyBackground?.skippedVideos ? studyBackground.skippedVideos(activeProfileId, studyPrepared) : [])
             ));
             // Ask a parent: "Allow once" lets the asked video play for 6 hours, read exactly like a
             // parent's allowed video (Android AskParentPasses). A study break or the plan's limit still

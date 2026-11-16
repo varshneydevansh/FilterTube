@@ -2922,5 +2922,7 @@
   "askParent.answerNo": "今次唔得",
   "askParent.answerNoBody": "{name}話住先。",
   "askParent.answerNote": "{name}嘅留言",
-  "askParent.answerWatch": "即刻睇"
+  "askParent.answerWatch": "即刻睇",
+  "study.skipVideo": "跳過呢條片",
+  "study.skipped": "已跳過。佢唔會再出現。"
 }

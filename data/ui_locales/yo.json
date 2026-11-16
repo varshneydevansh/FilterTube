@@ -2922,5 +2922,7 @@
   "askParent.answerNo": "Kì í ṣe ìgbà yìí",
   "askParent.answerNoBody": "{name} sọ pé kì í ṣe báyìí.",
   "askParent.answerNote": "Àkọsílẹ̀ láti ọ̀dọ̀ {name}",
-  "askParent.answerWatch": "Wò ó báyìí"
+  "askParent.answerWatch": "Wò ó báyìí",
+  "study.skipVideo": "Fo fídíò yìí",
+  "study.skipped": "A ti fò ó. Kò ní hàn mọ́."
 }

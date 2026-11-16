@@ -2924,5 +2924,7 @@
   "askParent.answerNo": "Non questa volta",
   "askParent.answerNoBody": "{name} ha detto non ora.",
   "askParent.answerNote": "Una nota da {name}",
-  "askParent.answerWatch": "Guarda ora"
+  "askParent.answerWatch": "Guarda ora",
+  "study.skipVideo": "Salta questo video",
+  "study.skipped": "Saltato. Non verrà più mostrato."
 }

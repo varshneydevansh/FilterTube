@@ -2924,5 +2924,7 @@
   "askParent.answerNo": "No be dis time",
   "askParent.answerNoBody": "{name} talk say no be now.",
   "askParent.answerNote": "Note from {name}",
-  "askParent.answerWatch": "Watch now"
+  "askParent.answerWatch": "Watch now",
+  "study.skipVideo": "Skip this video",
+  "study.skipped": "E don skip. E no go show again."
 }
