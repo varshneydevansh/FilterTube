@@ -209,6 +209,9 @@ test('every declared script/resource exists and quarantined CSS cannot be activa
     for (const ref of webAccessibleResources(manifest)) {
       if (ref === 'data/ui_locales/*.json') {
         assert.ok([...tracked].filter(path => path.startsWith('data/ui_locales/') && path.endsWith('.json')).length > 1);
+      } else if (ref === 'assets/images/mascots/*.webp') {
+        // Kriti and Uljhan on the gate, the study break and the first-run prompt (js/content/*.js).
+        assert.ok([...tracked].filter(path => path.startsWith('assets/images/mascots/') && path.endsWith('.webp')).length > 1);
       } else assert.ok(tracked.has(ref), `${file}: ${ref}`);
       assert.doesNotMatch(ref,/^css\//);
     }
@@ -217,7 +220,7 @@ test('every declared script/resource exists and quarantined CSS cannot be activa
 });
 
 test('fallback resources explicitly cover view counts, admission, localization and host-limited Google icons', () => {
-  const resources = ['html/video-notes.html','js/injector.js','js/content/content_playback_response.js','js/filter_logic.js','js/seed.js','js/shared/identity.js','js/shared/view_count.js','js/content/admission_overlay.js','data/ui_locales/*.json','assets/images/homepage_hero_day.mp4','icons/icon-48.png'];
+  const resources = ['html/video-notes.html','js/injector.js','js/content/content_playback_response.js','js/filter_logic.js','js/seed.js','js/shared/identity.js','js/shared/view_count.js','js/content/admission_overlay.js','data/ui_locales/*.json','assets/images/homepage_hero_day.mp4','assets/images/mascots/*.webp','icons/icon-48.png'];
   for (const file of manifestFiles) {
     const entries = readJson(file).web_accessible_resources;
     assert.deepEqual(entries[0].resources, file.includes('opera') ? resources : [...resources,'icons/file.svg']);

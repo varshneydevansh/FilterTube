@@ -196,10 +196,17 @@
         function showOverlay(kind) {
             removeElement(OVERLAY_ID);
             const rest = kind === 'rest';
+            // Night follows the page's own theme, as the gate card does: sun-wash for a break, navy otherwise.
+            let dark = false;
+            try {
+                const theme = doc.documentElement?.getAttribute?.('data-theme') || '';
+                dark = theme === 'dark' || (theme !== 'light' && win.matchMedia?.('(prefers-color-scheme: dark)')?.matches === true);
+            } catch (e) { }
             const box = element('div', {
                 position: 'fixed', inset: '0', zIndex: '2147483646', display: 'flex', flexDirection: 'column',
                 alignItems: 'center', justifyContent: 'center', gap: '12px', padding: '24px', textAlign: 'center',
-                background: rest ? '#FDF3E1' : '#ECEAE6', color: rest ? '#633806' : '#3A3732',
+                background: dark ? (rest ? '#3d3220' : '#0f141b') : (rest ? '#FDF3E1' : '#ECEAE6'),
+                color: dark ? (rest ? '#f6d58a' : '#edf2f7') : (rest ? '#633806' : '#3A3732'),
                 fontFamily: 'Roboto, Arial, sans-serif', transition: 'opacity 200ms ease-out'
             });
             box.id = OVERLAY_ID;
@@ -219,8 +226,8 @@
             box.appendChild(element('div', { fontSize: '16px', maxWidth: '420px', lineHeight: '1.5' }, copy[1]));
             if (rest && state?.canSkipBreak) {
                 const button = element('button', {
-                    marginTop: '8px', padding: '10px 20px', borderRadius: '20px', border: '1px solid #854F0B',
-                    background: 'transparent', color: '#854F0B', fontSize: '14px', cursor: 'pointer'
+                    marginTop: '8px', padding: '10px 20px', borderRadius: '20px', border: `1px solid ${dark ? '#f6d58a' : '#854F0B'}`,
+                    background: 'transparent', color: dark ? '#f6d58a' : '#854F0B', fontSize: '14px', cursor: 'pointer'
                 }, t('study.overlay.skipBreak', 'Skip break'));
                 button.type = 'button';
                 button.dataset.action = 'skip-break';
@@ -230,6 +237,23 @@
                     });
                 });
                 box.appendChild(button);
+            }
+            // Kriti keeps the break company (her mug), cheers the end of the day, and Uljhan shrugs when the
+            // pack can't load. A clock hold has no character. Appended last and drawn first, so the
+            // title and body keep their places; the Companion set to Off leaves the words alone.
+            const pose = { rest: 'kriti_mug_06.webp', limit: 'kriti_thumbsup.webp', unavailable: 'uljhan_shrug.webp' }[kind];
+            let poseUrl = '';
+            try {
+                const companion = localizer()?.getCompanion?.() || 'quiet';
+                if (pose && companion !== 'off') poseUrl = runtime?.getURL?.(`assets/images/mascots/${pose}`) || '';
+            } catch (e) { }
+            if (poseUrl) {
+                const picture = element('img', { order: '-1', height: '132px', width: 'auto', pointerEvents: 'none', userSelect: 'none' });
+                picture.src = poseUrl;
+                picture.alt = '';
+                picture.setAttribute?.('aria-hidden', 'true');
+                picture.dataset && (picture.dataset.filtertubeStudyMascot = pose);
+                box.appendChild(picture);
             }
             (doc.body || doc.documentElement).appendChild(box);
         }
@@ -335,6 +359,7 @@
             // SPA navigations (yt-navigate-finish) and leaving the watch page into the miniplayer.
             try { doc.addEventListener('yt-navigate-finish', () => { guardMiniplayer(); }, true); } catch (e) { }
             try { Promise.resolve(localizer()?.loadLocale?.()).then(() => { if (state) render(); }).catch(() => {}); } catch (e) { }
+            try { Promise.resolve(localizer()?.loadCompanion?.()).then(() => { if (state) render(); }).catch(() => {}); } catch (e) { }
             try { doc.addEventListener('visibilitychange', () => { if (!visible()) flush(); lastCheckAt = now(); }); } catch (e) { }
             try { win.addEventListener?.('pagehide', () => flush()); } catch (e) { }
             setRepeat(checkTime, TICK_MS);

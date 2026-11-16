@@ -306,6 +306,11 @@ test('sheets play once and rest on their last frame; reduced motion shows only t
     }
     assert.deepEqual(plain(Mascots.sheetFrames('nope', false)), []);
     assert.equal(Mascots.SHEET_FRAME_MS, 180);
+    // The gate plays the same shoo sheet in the page (content scripts cannot load this module).
+    const gate = fs.readFileSync('js/content/admission_overlay.js', 'utf8');
+    assert.match(gate, /const SHOO_FRAMES = \[1, 2, 3, 4, 5\]\.map\(index => `duo_shoo_0\$\{index\}\.webp`\);/);
+    assert.match(gate, /const SHOO_STILL = 'duo_shoo_05\.webp';/);
+    assert.match(gate, /companionMode !== 'lively' \|\| admissionOverlayPrefersReducedMotion\(\)/, 'the sheet plays on Lively only, never with reduced motion');
 });
 
 test('a loading line never repeats one of the last three', () => {
@@ -400,4 +405,25 @@ test('the new lines are in every interface catalog and never name the site or an
             assert.deepEqual(same, [], `${code}: left in English`);
         }
     }
+});
+
+test('the brand moments are mounted, and the gate, the break and the first-run prompt carry their poses', () => {
+    const source = fs.readFileSync('js/mascots.js', 'utf8');
+    for (const mount of ['mountHero(doc);', 'mountSidebar(doc);', 'mountAbout(doc);', 'mountSupport(doc);', 'mountNetwork(doc);', 'watchToasts(doc);', 'mountSessionSaved(doc);', 'watchPopupEmptyLists(doc);']) {
+        assert.ok(source.includes(mount), mount);
+    }
+    assert.match(fs.readFileSync('js/tab-view.js', 'utf8'), /new CustomEvent\('filtertube:parent-session-saved', \{ detail: \{ name: normalizeString\(nextProfile\.name\) \} \}\)/);
+    const gate = fs.readFileSync('js/content/admission_overlay.js', 'utf8');
+    assert.match(gate, /offList \? 'kriti_pointing\.webp' : 'kriti_mug_06\.webp'/);
+    assert.match(gate, /companionMode = mode === 'lively' \|\| mode === 'off' \? mode : 'quiet';/);
+    const study = fs.readFileSync('js/content/study_overlay.js', 'utf8');
+    assert.match(study, /\{ rest: 'kriti_mug_06\.webp', limit: 'kriti_thumbsup\.webp', unavailable: 'uljhan_shrug\.webp' \}\[kind\]/);
+    assert.match(fs.readFileSync('js/content/first_run_prompt.js', 'utf8'), /assets\/images\/mascots\/kriti_wave\.webp/);
+    for (const manifest of ['manifest.json', 'manifest.chrome.json', 'manifest.firefox.json', 'manifest.opera.json']) {
+        const resources = JSON.parse(fs.readFileSync(manifest, 'utf8')).web_accessible_resources.flatMap(entry => entry.resources || entry);
+        assert.ok(resources.includes('assets/images/mascots/*.webp'), `${manifest} lets the page load the poses`);
+    }
+    const css = fs.readFileSync('css/paperkit.css', 'utf8');
+    assert.match(css, /@media \(prefers-reduced-motion: reduce\) \{\s*\.ft-mascot--hero \.ft-mascot__figure\.is-hopping,\s*\.pk-net \{ animation: none; \}/);
+    assert.match(css, /img\[data-character="uljhan"\] \{\s*background-image: var\(--pk-spot\);/);
 });

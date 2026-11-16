@@ -121,6 +121,94 @@
         return localeCatalogLoading;
     }
 
+    // Kriti and Uljhan on the gate (BIBLE.md moments map): Kriti shoos Uljhan off a blocked video, and
+    // stands by the study card. They follow the Companion setting (Lively plays the sheet once, Quiet
+    // shows the still, Off shows no character) and never move with reduced motion.
+    const MASCOT_DIR = 'assets/images/mascots/';
+    // Five frames: Uljhan sneaks up, Kriti notices, waves him off, and he hops away (the resting frame).
+    const SHOO_FRAMES = [1, 2, 3, 4, 5].map(index => `duo_shoo_0${index}.webp`);
+    const SHOO_STILL = 'duo_shoo_05.webp';
+    const SHOO_FRAME_MS = 180;
+    let companionMode = 'quiet';
+    let companionLoading = null;
+
+    function loadAdmissionCompanion() {
+        if (companionLoading) return companionLoading;
+        if (!runtimeAPI?.storage?.local?.get) return Promise.resolve(companionMode);
+        companionLoading = new Promise(resolve => {
+            try {
+                const result = runtimeAPI.storage.local.get('ftCompanionMode', value => resolve(value));
+                if (result?.then) result.then(resolve, () => resolve({}));
+            } catch (_) { resolve({}); }
+        }).then(saved => {
+            const mode = typeof saved?.ftCompanionMode === 'string' ? saved.ftCompanionMode.trim().toLowerCase() : '';
+            companionMode = mode === 'lively' || mode === 'off' ? mode : 'quiet';
+            return companionMode;
+        }).catch(() => companionMode);
+        return companionLoading;
+    }
+
+    function admissionMascotUrl(name) {
+        try {
+            const getURL = runtimeAPI?.runtime?.getURL;
+            return typeof getURL === 'function' ? getURL.call(runtimeAPI.runtime, `${MASCOT_DIR}${name}`) : '';
+        } catch (e) { return ''; }
+    }
+
+    /** A decorative pose for a gate card; null when there is no extension URL to load it from. */
+    function createAdmissionMascot(name, height) {
+        const url = admissionMascotUrl(name);
+        if (!url || typeof document.createElement !== 'function') return null;
+        const picture = document.createElement('img');
+        picture.setAttribute('aria-hidden', 'true');
+        picture.setAttribute('data-filtertube-admission-mascot', name);
+        picture.alt = '';
+        picture.draggable = false;
+        picture.src = url;
+        admissionOverlayStyle(picture, {
+            display: 'block', width: 'auto', height: `${height}px`, maxWidth: '100%', objectFit: 'contain',
+            border: '0', margin: '0', padding: '0', background: 'none', pointerEvents: 'none', userSelect: 'none'
+        });
+        return picture;
+    }
+
+    /** The shoo sheet once (Lively, motion allowed), ending on its last frame; otherwise the still. */
+    function playAdmissionShoo(picture) {
+        if (!picture || picture.__filtertubeShooPlayed) return;
+        picture.__filtertubeShooPlayed = true;
+        if (companionMode !== 'lively' || admissionOverlayPrefersReducedMotion() || typeof root.setTimeout !== 'function') return;
+        let index = 0;
+        const step = () => {
+            if (picture.isConnected === false) return;
+            const url = admissionMascotUrl(SHOO_FRAMES[index]);
+            if (url) picture.src = url;
+            index += 1;
+            if (index < SHOO_FRAMES.length) root.setTimeout(step, SHOO_FRAME_MS);
+        };
+        step();
+    }
+
+    function syncAdmissionMascot(overlay, slot, holder, name, height) {
+        const show = companionMode !== 'off';
+        let picture = overlay[slot] || null;
+        if (!show) {
+            if (picture) { try { picture.remove?.(); } catch (e) {} }
+            overlay[slot] = null;
+            return null;
+        }
+        if (picture && picture.getAttribute?.('data-filtertube-admission-mascot') !== name) {
+            try { picture.remove?.(); } catch (e) {}
+            picture = null;
+        }
+        if (!picture) {
+            picture = createAdmissionMascot(name, height);
+            if (!picture) return null;
+            holder.appendChild(picture);
+            overlay[slot] = picture;
+        }
+        return picture;
+    }
+
     // The Watch gate during Study: dom_fallback's study first lines become a calm teal study card
     // with "Back to study" (top frames only; an embedded player can't leave its page).
     const STUDY_LINES = { "Not part of today's study": 'offList', 'Not during study': 'notNow' };
@@ -140,7 +228,7 @@
             position: 'fixed', inset: '0', zIndex: '2147483647', width: '100vw', height: '100vh', boxSizing: 'border-box',
             display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 'clamp(16px, 4vw, 56px)', overflow: 'hidden',
             pointerEvents: 'auto', userSelect: 'text', whiteSpace: 'normal',
-            background: darkTheme ? '#10201f' : '#EEF6F4', color: darkTheme ? '#e6f2ef' : '#163f3c',
+            background: darkTheme ? '#0f141b' : '#f6f2eb', color: darkTheme ? '#edf2f7' : '#1b1a18',
             font: '400 15px/1.55 "Plus Jakarta Sans", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif'
         });
         removeAdmissionOverlayBackground(overlay);
@@ -157,16 +245,16 @@
             card.setAttribute('data-filtertube-study-card', 'true');
             admissionOverlayStyle(card, {
                 display: 'flex', flexDirection: 'column', gap: '14px', width: 'min(480px, 100%)', boxSizing: 'border-box',
-                padding: 'clamp(24px, 5vw, 40px)', borderRadius: '24px', border: '1px solid rgba(31,111,106,.25)',
-                background: darkTheme ? 'rgba(20,40,38,.96)' : '#ffffff', boxShadow: '0 18px 50px rgba(22,63,60,.16)'
+                padding: 'clamp(24px, 5vw, 40px)', borderRadius: '24px', border: `1px solid ${darkTheme ? '#2a3440' : '#dcd1c2'}`,
+                background: darkTheme ? '#151c24' : '#fffcf6', boxShadow: `0 3px 0 ${darkTheme ? 'rgba(0,0,0,.42)' : 'rgba(27,26,24,.14)'}`
             });
             const status = document.createElement('p');
             const title = document.createElement('h1');
             const reason = document.createElement('p');
             const owner = document.createElement('p');
             const actions = document.createElement('div');
-            admissionOverlayStyle(status, { margin: '0', color: '#1F6F6A', font: '700 12px/1.3 "Plus Jakarta Sans", sans-serif', letterSpacing: '.08em', textTransform: 'uppercase' });
-            admissionOverlayStyle(title, { margin: '0', font: '700 clamp(22px, 3.6vw, 32px)/1.15 "Outfit", "Plus Jakarta Sans", sans-serif', color: darkTheme ? '#e6f2ef' : '#163f3c' });
+            admissionOverlayStyle(status, { margin: '0', color: darkTheme ? '#7fb89a' : '#1F6F6A', font: '700 12px/1.3 "Plus Jakarta Sans", sans-serif', letterSpacing: '.08em', textTransform: 'uppercase' });
+            admissionOverlayStyle(title, { margin: '0', font: '700 clamp(22px, 3.6vw, 32px)/1.15 "Outfit", "Plus Jakarta Sans", sans-serif', color: darkTheme ? '#edf2f7' : '#1b1a18' });
             admissionOverlayStyle(reason, { margin: '0', font: '500 15px/1.55 "Plus Jakarta Sans", sans-serif' });
             admissionOverlayStyle(owner, { margin: '0', opacity: '.75', font: '500 13px/1.4 "Plus Jakarta Sans", sans-serif', overflowWrap: 'anywhere' });
             admissionOverlayStyle(actions, { display: 'flex', gap: '10px', flexWrap: 'wrap', marginTop: '6px' });
@@ -177,6 +265,9 @@
         }
         const parts = overlay.__filtertubeStudyParts;
         const offList = kind === 'offList';
+        // Kriti points back to the plan (off the list) or holds her mug (a break, the limit, a clock check).
+        const kriti = syncAdmissionMascot(overlay, '__filtertubeStudyMascot', card, offList ? 'kriti_pointing.webp' : 'kriti_mug_06.webp', 132);
+        if (kriti) admissionOverlayStyle(kriti, { order: '-1', alignSelf: localeDirection === 'rtl' ? 'flex-start' : 'flex-end', marginBottom: '-6px' });
         parts.status.textContent = localizedAdmissionText('admission.studyStatus', 'Study');
         parts.title.textContent = offList
             ? localizedAdmissionText('admission.studyOffList', "Not part of today's study")
@@ -245,6 +336,14 @@
                 overlay.setAttribute('aria-label', localizedAdmissionMessage(message));
             }
             loadAdmissionLocale(overlay);
+            if (!companionLoading && runtimeAPI?.storage?.local?.get) {
+                // The Companion setting arrives once; redraw so the pose follows it.
+                loadAdmissionCompanion().then(() => {
+                    if (overlay.isConnected !== false && overlay.__filtertubeAdmissionState) {
+                        ensureAdmissionOverlayVisuals(overlay, overlay.__filtertubeAdmissionState, overlay.__filtertubeAdmissionMessage);
+                    }
+                });
+            }
         }
         const study = state === 'blocked' ? studyKind(message) : '';
         if (study) {
@@ -255,6 +354,7 @@
             try { overlay.__filtertubeStudyCard.remove(); } catch (e) {}
             overlay.__filtertubeStudyCard = null;
             overlay.__filtertubeStudyParts = null;
+            overlay.__filtertubeStudyMascot = null;
         }
         const blocked = state === 'blocked';
         const reducedMotion = admissionOverlayPrefersReducedMotion();
@@ -300,9 +400,7 @@
             admissionOverlayStyle(panel, {
                 position: 'relative', zIndex: '2', display: 'flex', flexDirection: 'column', gap: '18px',
                 width: 'min(540px, 100%)', maxHeight: 'calc(100vh - 32px)', overflow: 'auto', boxSizing: 'border-box',
-                padding: 'clamp(24px, 5vw, 44px)', border: '1px solid rgba(255,255,255,.28)', borderRadius: '28px',
-                boxShadow: '0 28px 90px rgba(0,0,0,.42), inset 0 1px 0 rgba(255,255,255,.08)',
-                backdropFilter: 'blur(18px)', WebkitBackdropFilter: 'blur(18px)'
+                padding: 'clamp(24px, 5vw, 44px)', border: '1px solid transparent', borderRadius: '28px'
             });
 
             brand = document.createElement('div');
@@ -406,21 +504,34 @@
                 ? 'linear-gradient(135deg, rgba(8,13,18,.78), rgba(15,23,42,.62) 45%, rgba(27,38,48,.72))'
                 : 'transparent'
         });
+        // PaperKit: what you read sits on a paper sheet (cream by day, navy at night), never on frosted glass.
+        const paperInk = darkTheme ? '#edf2f7' : '#1b1a18';
         admissionOverlayStyle(panel, {
-            background: blocked ? 'rgba(12,18,25,.82)' : (darkTheme ? 'rgba(18,24,33,.96)' : 'rgba(255,255,255,.84)'),
-            color: blocked ? blockedText : pendingText
+            background: darkTheme ? '#151c24' : '#fffcf6',
+            color: paperInk,
+            border: `1px solid ${darkTheme ? '#2a3440' : '#dcd1c2'}`,
+            boxShadow: `0 3px 0 ${darkTheme ? 'rgba(0,0,0,.42)' : 'rgba(27,26,24,.14)'}, 0 28px 70px -30px rgba(0,0,0,.45)`
         });
         admissionOverlayStyle(brandMark, { background: '#ab4438' });
-        admissionOverlayStyle(brandName, { color: blocked || darkTheme ? '#f3f6fa' : '#1b1a18' });
-        admissionOverlayStyle(status, { color: blocked ? '#cfe2d2' : (darkTheme ? '#9aa6b4' : '#827b73') });
-        admissionOverlayStyle(title, { color: blocked ? '#fffaf4' : pendingText });
+        admissionOverlayStyle(brandName, { color: paperInk });
+        admissionOverlayStyle(status, { color: blocked ? (darkTheme ? '#e0796b' : '#a93e31') : (darkTheme ? '#b8c3ce' : '#625f58') });
+        admissionOverlayStyle(title, { color: paperInk });
         admissionOverlayStyle(reason, {
             borderLeft: rtl ? 'none' : `3px solid ${accentColor}`,
             borderRight: rtl ? `3px solid ${accentColor}` : 'none',
             borderRadius: rtl ? '14px 4px 4px 14px' : '4px 14px 14px 4px',
-            background: blocked ? 'rgba(255,255,255,.1)' : (darkTheme ? 'rgba(255,255,255,.06)' : 'rgba(171,68,56,.07)'),
-            color: blocked ? '#fffaf4' : pendingText
+            background: darkTheme ? '#3a2422' : '#fae8e6',
+            color: paperInk
         });
+        // Kriti shoos Uljhan off a blocked video; the short check before playback has no character.
+        const shoo = blocked
+            ? syncAdmissionMascot(overlay, '__filtertubeAdmissionMascot', panel, SHOO_STILL, 132)
+            : (overlay.__filtertubeAdmissionMascot ? (overlay.__filtertubeAdmissionMascot.remove?.(), overlay.__filtertubeAdmissionMascot = null) : null);
+        if (shoo) {
+            admissionOverlayStyle(shoo, { order: '-1', alignSelf: 'center', marginBottom: '-4px' });
+            if (companionLoading) companionLoading.then(() => playAdmissionShoo(shoo));
+            else playAdmissionShoo(shoo);
+        }
         status.textContent = blocked
             ? localizedAdmissionText('admission.blockedStatus', 'Playback blocked')
             : localizedAdmissionText('admission.checkingStatus', 'Checking playback');
@@ -442,6 +553,9 @@
         // For study_overlay.js: the same bundled catalog, by key.
         text: (key, fallback) => localizedAdmissionText(key, fallback),
         loadLocale: () => loadAdmissionLocale(),
+        // For study_overlay.js: the Companion setting (lively, quiet or off) the poses follow.
+        loadCompanion: () => loadAdmissionCompanion(),
+        getCompanion: () => companionMode,
         getDirection: () => localeDirection
     };
 })(typeof window !== 'undefined' ? window : globalThis);
