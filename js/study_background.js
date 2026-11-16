@@ -474,7 +474,9 @@
                 todayMinutes: Engine.minutesOn(progress, date),
                 week: Engine.weekProgress(progress, at, study?.focus?.dailyGoalMinutes || 0),
                 weekView: study ? Model.weekViewEnabled(study, profile.type) : false,
-                isChild: text(profile.type) === 'child'
+                isChild: text(profile.type) === 'child',
+                // "How search works while studying", worked out here where the pack catalog is loaded.
+                searchHow: study && Engine.searchExplainer ? Engine.searchExplainer(study, catalog) : null
             };
         }
 

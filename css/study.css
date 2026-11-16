@@ -220,3 +220,11 @@
 :root[data-theme="dark"] .ft-study-ask__line { color: #d5ece8; }
 :root[data-theme="dark"] .ft-study-ask__sheet { background: #2c2716; border-color: #4a4128; }
 :root[data-theme="dark"] .ft-study-ask__title { color: #f6eccd; }
+.ft-study-ask-popup { margin: 0.42rem 0.12rem 0; padding: 0.5rem 0.7rem; border: 1px solid rgba(31, 111, 106, 0.22); border-radius: 0.9rem; background: var(--ft-study-teal-surface); }
+.ft-study-ask-popup .ft-study-ask { margin-top: 0; }
+.ft-study-ask-popup .ft-study-ask__line.is-given { margin-top: 0; }
+:root[data-theme="dark"] .ft-study-ask-popup { background: rgba(31, 111, 106, 0.16); border-color: rgba(120, 190, 180, 0.28); }
+.ft-study-ask-popup__how { margin-top: 0.4rem; font-size: 0.82rem; color: var(--ft-study-grey); }
+.ft-study-ask-popup__how summary { cursor: pointer; color: #163f3c; font-weight: 600; }
+.ft-study-ask-popup__how .ft-study-explainer__body { margin-top: 0.3rem; }
+:root[data-theme="dark"] .ft-study-ask-popup__how summary { color: #d5ece8; }

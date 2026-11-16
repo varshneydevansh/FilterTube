@@ -1273,7 +1273,7 @@ const RenderEngine = (() => {
 
         if (virtualize && displayChannels.length > LARGE_LIST_VIRTUALIZATION_THRESHOLD) {
             renderWindowedList(container, displayChannels, renderChannelRow, {
-                itemHeight: minimal ? 48 : (showNodeMapping ? 136 : 80),
+                itemHeight: minimal ? 48 : (showNodeMapping ? 152 : 96),
                 overscan: LARGE_LIST_OVERSCAN
             });
             return;

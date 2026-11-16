@@ -237,13 +237,52 @@
         if (!host) return null;
         let state = null;
         let parentName = '';
+        let time = null;
+        let grantName = '';
+        let askHost = null;
         let timer = 0;
         async function refresh() {
             const response = await send({ action: 'FilterTube_StudyGetState' });
             state = response && response.ok !== false ? response : null;
-            parentName = state?.setByParentId ? await profileName(state.setByParentId) : '';
+            const planParent = state?.setByParentId || text(object(state?.study?.plan).setByParentId) || text(object(state?.study?.lock).setByParentId);
+            parentName = planParent ? await profileName(planParent) : '';
+            time = state?.isChild ? await send({ action: 'FilterTube_AskParentTimeState' }) : null;
+            grantName = state?.grantBy ? await profileName(state.grantBy) : '';
             draw();
+            drawAsk(planParent);
         }
+        /**
+         * A child can't open the options page's Study card (it needs a parent's PIN), so the popup carries
+         * "Ask for time" under the strip, and the minutes a parent gave while they run.
+         */
+        function drawAsk(planParent) {
+            const managed = !!(state?.isChild && planParent && time?.isChild);
+            if (!managed) { askHost?.remove(); askHost = null; return; }
+            if (!askHost) {
+                askHost = el('div', 'ft-study-ask-popup');
+                host.insertAdjacentElement?.('afterend', askHost);
+            }
+            // Never redraw over a sheet the child is filling in.
+            if (askHost.querySelector?.('.ft-study-ask__sheet')) return;
+            const nodes = [];
+            if (Number.isFinite(state.grantUntil)) {
+                nodes.push(el('p', 'ft-study-ask__line is-given', t('study.ask.given', '{name} gave you {minutes} min · until {time}',
+                    { name: grantName || text(time.parentName) || t('askParent.parentFallback', 'Your parent'), minutes: state.grantMinutes, time: formatTime(state.grantUntil) })));
+            }
+            // The sheet's own Send and Not now redraw it; the strip's timer never does.
+            nodes.push(askForTime(time, () => { askHost?.replaceChildren(); return refresh(); }));
+            // The child's study home in the app shows how search works; here it folds under the ask.
+            const how = searchExplainerCard(state.study, null, true, state.searchHow);
+            if (how) {
+                const fold = el('details', 'ft-study-ask-popup__how');
+                fold.appendChild(el('summary', '', t('study.searchHow.title', 'How search works while studying')));
+                const body = how.children?.[1];
+                if (body) fold.appendChild(body);
+                nodes.push(fold);
+            }
+            askHost.replaceChildren(...nodes);
+        }
+        try { runtime()?.storage?.onChanged?.addListener((changes, area) => { if (area === 'local' && changes.ftAskParentV1) refresh(); }); } catch (e) { }
         function draw() {
             renderStrip(host, state, { onChange: refresh, parentName });
             clearTimeout(timer);
@@ -711,7 +750,7 @@
             toastHost: card,
             onPatch: async patch => { const result = await send({ action: 'FilterTube_StudyUpdate', patch }); await refresh(); return result; }
         });
-        const explainer = searchExplainerCard(study, catalog, data.isChild === true || state.isChild === true);
+        const explainer = searchExplainerCard(study, catalog, data.isChild === true || state.isChild === true, state.searchHow);
         if (explainer) card.appendChild(explainer);
         if (editable && state.state !== 'STUDY' && state.state !== 'BREAK') card.appendChild(startNow(study, refresh));
         host.replaceChildren(card);
@@ -789,8 +828,10 @@
         let category = count === 1 ? 'one' : 'other';
         try { category = new Intl.PluralRules(language()).select(count); } catch (e) { }
         const values = { count };
-        const exact = root.FilterTubeUiLocalization?.text?.(`${key}.${category}`, values);
-        if (typeof exact === 'string' && exact.trim()) return exact;
+        try {
+            const exact = root.FilterTubeUiLocalization?.text?.(`${key}.${category}`, values);
+            if (typeof exact === 'string' && exact.trim()) return exact;
+        } catch (e) { }
         return t(`${key}.${count === 1 ? 'one' : 'other'}`, count === 1 ? fallbackOne : fallbackOther, values);
     }
 
@@ -799,10 +840,12 @@
      * The plan's channel count, two of its subjects and two example searches; a child is told to ask a
      * parent for more. Null without an active pack.
      */
-    function searchExplainerCard(study, catalog, child) {
+    function searchExplainerCard(study, catalog, child, precomputed = null) {
         const Engine = engine();
-        if (!Engine?.searchExplainer || !array(object(study).activePackIds).length) return null;
-        const content = Engine.searchExplainer(study, catalog);
+        if (!array(object(study).activePackIds).length) return null;
+        const content = isObject(precomputed) ? { channels: Number(precomputed.channels) || 0, topics: array(precomputed.topics), examples: array(precomputed.examples) }
+            : (Engine?.searchExplainer ? Engine.searchExplainer(study, catalog) : null);
+        if (!content) return null;
         if (!content.channels && !content.topics.length) return null;
         const channels = plural('study.searchHow.channels', content.channels, '{count} channel', '{count} channels');
         const lines = [content.topics.length
