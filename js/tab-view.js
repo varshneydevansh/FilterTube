@@ -33033,7 +33033,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     })();
 
     var dashboardStatsSurface = 'main'; // var: the profile card can draw before this line runs
-    let dashboardStatsRotationTimer = 0;
+    var dashboardStatsRotationTimer = 0; // var: read by listeners that can run before this line
     let dashboardStatsUserOverride = false;
 
     function getDashboardSurfaceStats(surface, state) {
