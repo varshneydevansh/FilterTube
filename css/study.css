@@ -379,3 +379,35 @@
 .ft-study-endcard__actions { display: flex; flex-direction: column; align-items: center; gap: 4px; width: min(100%, 420px); }
 .ft-study-endcard__actions .btn-primary { width: 100%; }
 @media (prefers-reduced-motion: reduce) { .ft-study-endcard.is-fresh .ft-study-seal { animation: none; } }
+
+/* ---- The study card takes the colour of the moment (Android StudyStateTheme) ----
+ * js/study_ui.js paintPage sets each theme's top, bottom, fade and card edge; the registered colours
+ * let the wash cross-fade over 450 ms (instant with reduced motion). Cards inside stay paper. */
+@property --ft-page-top { syntax: '<color>'; inherits: true; initial-value: transparent; }
+@property --ft-page-bottom { syntax: '<color>'; inherits: true; initial-value: transparent; }
+body.ft-extension-surface .ft-study-card[data-study-page],
+:root[data-page-tone][data-theme] body.ft-extension-surface[data-surface] .ft-study-card[data-study-page] {
+    --ft-page-top: var(--ft-page-top-light);
+    --ft-page-bottom: var(--ft-page-bottom-light);
+    --ft-page-fade: var(--ft-page-fade-light);
+    --ft-page-edge: var(--ft-page-edge-light);
+    background: linear-gradient(to bottom, var(--ft-page-top) 0, var(--ft-page-bottom) var(--ft-page-fade), var(--ft-page-bottom) 100%) !important;
+    border-color: var(--ft-page-edge) !important;
+    transition: --ft-page-top 450ms ease-in-out, --ft-page-bottom 450ms ease-in-out;
+}
+:root[data-theme="dark"] body.ft-extension-surface .ft-study-card[data-study-page],
+:root[data-page-tone][data-theme="dark"] body.ft-extension-surface[data-surface] .ft-study-card[data-study-page] {
+    --ft-page-top: var(--ft-page-top-dark);
+    --ft-page-bottom: var(--ft-page-bottom-dark);
+    --ft-page-fade: var(--ft-page-fade-dark);
+    --ft-page-edge: var(--ft-page-edge-dark);
+}
+@media (prefers-color-scheme: dark) {
+    :root:not([data-theme]) body.ft-extension-surface .ft-study-card[data-study-page] {
+        --ft-page-top: var(--ft-page-top-dark);
+        --ft-page-bottom: var(--ft-page-bottom-dark);
+        --ft-page-fade: var(--ft-page-fade-dark);
+        --ft-page-edge: var(--ft-page-edge-dark);
+    }
+}
+@media (prefers-reduced-motion: reduce) { body.ft-extension-surface .ft-study-card[data-study-page] { transition: none; } }

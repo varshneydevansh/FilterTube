@@ -1610,6 +1610,31 @@
         return card;
     }
 
+    /**
+     * Android StudyStateTheme: the study card takes the colour of the moment (sage before and in a round,
+     * a deeper sage in its last five minutes, sun on a break, flat sage at the end, panel in the
+     * evening; night is navy with a thin state band). Both themes' colours go on as custom properties,
+     * so a theme switch needs no redraw; they cross-fade over 450 ms.
+     */
+    function paintPage(host, state, ended) {
+        const Engine = engine();
+        const page = host?.closest?.('.ft-study-card') || host;
+        if (!Engine?.pagePalette || !page?.style) return;
+        const at = Date.now();
+        const value = object(state);
+        const pageState = Engine.pageState(value.state === 'STUDY' ? Number(value.until) : null, value.state === 'BREAK', !!ended, at);
+        const evening = Engine.pageEvening(new Date(at).getHours());
+        const css = color => `#${(color & 0xFFFFFF).toString(16).padStart(6, '0')}`;
+        for (const [theme, night] of [['light', false], ['dark', true]]) {
+            const palette = Engine.pagePalette(pageState, night, evening && !night);
+            page.style.setProperty(`--ft-page-top-${theme}`, css(palette.top));
+            page.style.setProperty(`--ft-page-bottom-${theme}`, css(palette.bottom));
+            page.style.setProperty(`--ft-page-fade-${theme}`, palette.fadePx ? `${palette.fadePx}px` : '100%');
+            page.style.setProperty(`--ft-page-edge-${theme}`, css(palette.cardEdge));
+        }
+        page.dataset.studyPage = pageState.toLowerCase().replace('_', '-');
+    }
+
     function renderDashboard(host, data, { refresh, catalog }) {
         const state = object(data.state);
         const study = object(state.study);
@@ -1699,6 +1724,7 @@
         if (explainer) card.appendChild(explainer);
         if (editable && state.state !== 'STUDY' && state.state !== 'BREAK') card.appendChild(startNow(study, refresh));
         host.replaceChildren(card);
+        paintPage(host, state, !!state.sessionEnded && state.state !== 'STUDY' && state.state !== 'BREAK');
     }
 
     /**

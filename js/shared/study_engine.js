@@ -281,6 +281,74 @@
         return { breakStart: pause.start, breakEnd: pause.end, addedMinutes: added, round: before.round, roundMinutes: minutes(pause.end - before.start) };
     }
 
+    // ---- Page colour by state (Android StudyStateTheme, Study v3 §1) --------------------------------
+    // The page takes the colour of the moment; cards stay paper and only their edge takes the state.
+
+    const PAGE_STATES = Object.freeze(['IDLE', 'ROUND', 'LAST_FIVE', 'BREAK', 'END']);
+    /** The light band behind the header before a session, and every night band: 280 px. */
+    const PAGE_BAND_PX = 280;
+    /** The last five minutes of a round get their own (deeper) wash. */
+    const PAGE_LAST_FIVE_MS = 5 * MINUTE;
+    /** Page colours cross-fade over this long. */
+    const PAGE_CROSSFADE_MS = 450;
+    // BrandPalette tones (0xRRGGBB), light and night, and the washes only Study uses.
+    const TONES = Object.freeze({
+        light: { canvas: 0xF6F2EB, desk: 0xECE4D9, paper: 0xFFFCF6, line: 0xDCD1C2, sage: 0xEDF4E7, sageDeep: 0x28623F,
+            sunWash: 0xFBEDC8, sunInk: 0x5A3A07, sun: 0xEDB12E, rose: 0xFAE8E6 },
+        night: { canvas: 0x0F141B, desk: 0x0B0F14, paper: 0x151C24, line: 0x2A3440, sage: 0x1E2E26, sageDeep: 0x5E9C7D,
+            sunWash: 0x3D3220, sunInk: 0xF6D58A, sun: 0xEDB12E, rose: 0x3A2422 }
+    });
+    const SAGE_DEEP_WASH = 0xDFECD5;
+    const SAGE_LOW = 0xF2F1E8;
+    const SUN_LOW = 0xFDF5E4;
+    const PAPER_SUN = 0xFFF9EC;
+    const PANEL_LOW = 0xF1EBE2;
+    const PAPER_EVENING = 0xFBF6EE;
+    const SUN_SOFT = 0xE3B062;
+    const NIGHT_IDLE_BAND = 0x16211F;
+    const NIGHT_SAGE_DEEP_BAND = 0x24392D;
+    const EDGE_ALPHA = 0.22;
+
+    /** Linear mix of two colours (0xRRGGBB), t of the way from a to b. */
+    function mixColor(a, b, t) {
+        const ch = (c, shift) => (c >> shift) & 0xFF;
+        const lerp = shift => Math.min(255, Math.max(0, Math.trunc(ch(a, shift) + (ch(b, shift) - ch(a, shift)) * t)));
+        return (lerp(16) << 16) | (lerp(8) << 8) | lerp(0);
+    }
+
+    /** The page state: roundEndsAt in a round, onBreak on a break, ended while the end card shows. */
+    function pageState(roundEndsAt, onBreak, ended, now) {
+        if (ended) return 'END';
+        if (onBreak) return 'BREAK';
+        if (Number.isFinite(roundEndsAt)) {
+            const left = roundEndsAt - now;
+            return left >= 1 && left <= PAGE_LAST_FIVE_MS ? 'LAST_FIVE' : 'ROUND';
+        }
+        return 'IDLE';
+    }
+
+    /** After 7 pm (and before 5 am) the light page steps down to panel. */
+    function pageEvening(hour) { return hour >= 19 || hour < 5; }
+
+    /** {top, bottom, fadePx (0: over the whole page), card, cardEdge, sun} for one state. */
+    function pagePalette(state, night, evening) {
+        const t = night ? TONES.night : TONES.light;
+        const make = (top, bottom, fadePx, card, cardEdge, sun) => ({ top, bottom, fadePx, card, cardEdge, sun });
+        if (night) {
+            const band = { IDLE: NIGHT_IDLE_BAND, ROUND: t.sage, END: t.sage, LAST_FIVE: NIGHT_SAGE_DEEP_BAND, BREAK: t.sunWash }[state] ?? NIGHT_IDLE_BAND;
+            return make(band, t.canvas, PAGE_BAND_PX, t.paper, t.line, SUN_SOFT);
+        }
+        const sun = evening ? SUN_SOFT : t.sun;
+        const edge = (ink, over) => mixColor(over, ink, EDGE_ALPHA);
+        switch (state) {
+            case 'ROUND': return make(t.sage, SAGE_LOW, 0, t.paper, edge(t.sageDeep, t.paper), sun);
+            case 'LAST_FIVE': return make(SAGE_DEEP_WASH, SAGE_LOW, 0, t.paper, edge(t.sageDeep, t.paper), sun);
+            case 'BREAK': return make(t.sunWash, SUN_LOW, 0, PAPER_SUN, edge(t.sunInk, PAPER_SUN), sun);
+            case 'END': return make(t.sage, t.sage, 0, t.paper, t.line, sun);
+            default: return evening ? make(t.desk, PANEL_LOW, 0, PAPER_EVENING, t.line, sun) : make(t.sage, t.canvas, PAGE_BAND_PX, t.paper, t.line, sun);
+        }
+    }
+
     // ---- "Up next after the break" (Android StudyHomeFeed.chips, StudyPageRules.subjectOf) ---------
 
     /** The study Home's subject chips: the branch's chips, else the pack's ({label, words}). */
@@ -1186,6 +1254,7 @@
         parseTime, localDateKey, splitRounds, planOccurrences, studyClock, studyRulesApply, studyPhase,
         SUGGESTION_KINDS, suggest, suggestionSeed, studyTopics, studyAllowPhrases, topicTerms, topicPatterns,
         topicsForQuery, exampleSearches, searchExplainer, topicLabel, breakSkipPreview, SKIP_UNDO_MS,
+        PAGE_STATES, PAGE_BAND_PX, PAGE_LAST_FIVE_MS, PAGE_CROSSFADE_MS, pageState, pageEvening, pagePalette, mixColor,
         studySubjects, subjectOf, withSkips, sessionSeal, sessionEndStep, pendingSessionEnd, SESSION_END_STALE_MS, SESSION_CLOSE_SLACK_MS,
         packVariant, packLayer, activePackLayers, stampPackCopies, studyEffectiveProfile,
         BRANCH_SOURCE, KIDS_KINDS, KIDS_SPACE, AMBIGUOUS_BRANCH_WORDS,
