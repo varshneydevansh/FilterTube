@@ -739,3 +739,9 @@ body.ft-extension-surface .ft-study-status.is-hold { background: var(--pk-sage) 
     grid-column: auto;
   }
 }
+
+/* Kriti thinking while pairing waits for the other device (a still, beside the code). */
+.pk-moment.pk-pairing-thinking {
+  justify-items: start;
+  padding: 0.25rem 0 0;
+}
