@@ -2125,8 +2125,7 @@ function applyAdvertVoidDefaultMigrationOnce() {
     return new Promise((resolve) => {
         browserAPI.storage.local.get([
             ADVERT_VOID_DEFAULT_MIGRATION_KEY,
-            FT_PROFILES_V4_KEY,
-            ASK_PARENT_STORE_KEY
+            FT_PROFILES_V4_KEY
         ], (items) => {
             try {
                 if (items?.[ADVERT_VOID_DEFAULT_MIGRATION_KEY]) {
@@ -3872,7 +3871,8 @@ async function getCompiledSettings(sender = null, profileType = null, forceRefre
             'videoMetaMap',
             'stats',
             'ftProfilesV3',
-            FT_PROFILES_V4_KEY
+            FT_PROFILES_V4_KEY,
+            ASK_PARENT_STORE_KEY
         ], (items) => {
             const compiledSettings = {};
             const storageUpdates = {};

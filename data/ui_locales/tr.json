@@ -2928,5 +2928,6 @@
   "study.skipVideo": "Bu videoyu atla",
   "study.skipped": "Atlandı. Bir daha görünmeyecek.",
   "content.comments.authorHidden": "{name} kullanıcısının yorumları gizlendi",
-  "content.comments.undo": "Geri al"
+  "content.comments.undo": "Geri al",
+  "askParent.answer": "Cevapla"
 }

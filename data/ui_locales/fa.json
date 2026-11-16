@@ -2928,5 +2928,6 @@
   "study.skipVideo": "رد شدن از این ویدیو",
   "study.skipped": "رد شد. دیگر نمایش داده نمی‌شود.",
   "content.comments.authorHidden": "نظرهای {name} پنهان شد",
-  "content.comments.undo": "واگرد"
+  "content.comments.undo": "واگرد",
+  "askParent.answer": "پاسخ"
 }

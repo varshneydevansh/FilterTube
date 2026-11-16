@@ -13,7 +13,7 @@
     const Filter = window.FilterTubeLiveChatFilter;
     if (!api?.runtime || !Filter) return;
 
-    const SELECTOR = 'yt-live-chat-text-message-renderer, yt-live-chat-paid-message-renderer, yt-live-chat-membership-item-renderer, yt-live-chat-paid-sticker-renderer';
+    const SELECTOR = 'yt-live-chat-text-message-renderer, yt-live-chat-paid-message-renderer, yt-live-chat-membership-item-renderer, yt-live-chat-paid-sticker-renderer, yt-gift-message-view-model';
     let compiled = null;
 
     function messageOf(element) {

@@ -2928,5 +2928,6 @@
   "study.skipVideo": "Salta questo video",
   "study.skipped": "Saltato. Non verrà più mostrato.",
   "content.comments.authorHidden": "Commenti di {name} nascosti",
-  "content.comments.undo": "Annulla"
+  "content.comments.undo": "Annulla",
+  "askParent.answer": "Rispondi"
 }

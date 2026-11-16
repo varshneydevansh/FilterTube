@@ -224,7 +224,9 @@
          * the player can be skipped. It hides from now on for this profile and never unblocks anything.
          */
         function renderSkip() {
-            const videoId = state?.state === 'STUDY' && onWatchRoute() && !overlayKind() ? currentVideoId() : '';
+            // Only a video that plays can be skipped: not one the watch gate already holds back.
+            const gated = !!doc.querySelector?.('[data-filtertube-direct-access-overlay-host="true"]');
+            const videoId = state?.state === 'STUDY' && onWatchRoute() && !overlayKind() && !gated ? currentVideoId() : '';
             const existing = doc.getElementById(SKIP_ID);
             if (!videoId) { if (existing) existing.remove(); return; }
             if (existing && existing.getAttribute('data-video-id') === videoId) return;
@@ -477,6 +479,7 @@
             const at = now();
             const elapsed = lastCheckAt === null ? 0 : Math.min(at - lastCheckAt, TICK_MS + 5000);
             lastCheckAt = at;
+            renderSkip();
             if (state?.state !== 'STUDY' || !visible() || !playingVideo()) return;
             pendingSeconds += Math.max(0, Math.round(elapsed / 1000));
             if (pendingSeconds >= SEND_AFTER_SECONDS) flush();

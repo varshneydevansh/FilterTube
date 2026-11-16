@@ -314,6 +314,9 @@ test('the extension wires Ask a parent into the background, the filters, the pag
     const background = fs.readFileSync('js/background.js', 'utf8');
     assert.match(background, /createAskParentService/);
     assert.match(background, /askParentPassVideoIds/);
+    // The compiler reads the passes in the same storage read as the profiles (caught on the live site).
+    const compile = background.slice(background.indexOf('async function getCompiledSettings('), background.indexOf('const compiledSettings = {};', background.indexOf('async function getCompiledSettings(')));
+    assert.match(compile, /FT_PROFILES_V4_KEY,\n\s+ASK_PARENT_STORE_KEY\n\s+\], \(items\) => \{/);
     const filter = fs.readFileSync('js/filter_logic.js', 'utf8');
     assert.match(filter, /askParentPassVideoIdSet/);
     const tabView = fs.readFileSync('js/tab-view.js', 'utf8');

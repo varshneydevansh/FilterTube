@@ -2928,5 +2928,6 @@
   "study.skipVideo": "Ruka video hii",
   "study.skipped": "Imerukwa. Haitaonekana tena.",
   "content.comments.authorHidden": "Maoni ya {name} yamefichwa",
-  "content.comments.undo": "Tendua"
+  "content.comments.undo": "Tendua",
+  "askParent.answer": "Jibu"
 }

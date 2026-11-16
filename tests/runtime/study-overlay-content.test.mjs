@@ -302,4 +302,9 @@ test('"Skip this video" shows on a watch page during STUDY and asks the backgrou
     assert.match(dom.nodes.get(NOTICE_ID).textContent, /Skipped/);
     overlay.setState({ state: 'BREAK', breakMode: 'rest', until: 1_300_000 });
     assert.equal(dom.nodes.get('filtertube-study-skip'), undefined, 'a rest break shows its own card instead');
+    overlay.setState({ state: 'STUDY', until: 1_200_000 });
+    assert.ok(dom.nodes.get('filtertube-study-skip'));
+    dom.doc.querySelector = selector => (selector.includes('direct-access-overlay-host') ? {} : null);
+    overlay.renderSkip();
+    assert.equal(dom.nodes.get('filtertube-study-skip'), undefined, 'a video the watch gate holds back has nothing to skip');
 });

@@ -931,3 +931,16 @@ body.ft-extension-surface[data-surface="tab-view"] .list-item:not(.channel-item)
 .ft-ask-answer__words p { margin: 0; font-size: 13px; }
 .ft-ask-answer__note { font-style: italic; }
 .ft-ask-answer__actions { display: flex; gap: 8px; margin-top: 6px; }
+.ft-ask-hub-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin: 0 0 16px;
+  padding: 12px 16px;
+  border-radius: 18px;
+  background: var(--pk-lilac);
+  color: var(--pk-ink);
+  border: 1px solid var(--pk-edge-family, var(--pk-edge-line));
+}
+.ft-ask-hub-row__words { font: 400 18px/1.25 var(--pk-font-display, "FilterTube Delius", "Delius", system-ui, sans-serif); }

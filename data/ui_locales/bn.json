@@ -2928,5 +2928,6 @@
   "study.skipVideo": "এই ভিডিও এড়িয়ে যান",
   "study.skipped": "এড়ানো হয়েছে। এটি আর দেখাবে না।",
   "content.comments.authorHidden": "{name}-এর মন্তব্য লুকানো হয়েছে",
-  "content.comments.undo": "পূর্বাবস্থায় ফেরান"
+  "content.comments.undo": "পূর্বাবস্থায় ফেরান",
+  "askParent.answer": "উত্তর দিন"
 }

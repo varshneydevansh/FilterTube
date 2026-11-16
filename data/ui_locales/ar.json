@@ -2952,5 +2952,6 @@
   "study.skipVideo": "تخطَّ هذا الفيديو",
   "study.skipped": "تم التخطي. لن يظهر مجددًا.",
   "content.comments.authorHidden": "تم إخفاء تعليقات {name}",
-  "content.comments.undo": "تراجع"
+  "content.comments.undo": "تراجع",
+  "askParent.answer": "رد"
 }

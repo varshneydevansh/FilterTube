@@ -147,3 +147,16 @@ test('allow mode: a Short whose channel is unknown never shows on a topic match,
         navigationEndpoint: { reelWatchEndpoint: { videoId: 'shortunk001' } } } };
     assert.deepEqual(kept(engine, rules, [short, videoRenderer('videounk001', 'apex legends clip')]), ['videounk001']);
 });
+
+test('a Kids-site direct watch link is checked during a Kids learning round (and only then)', () => {
+    const source = fs.readFileSync('js/content/dom_fallback.js', 'utf8');
+    assert.match(source, /includes\('youtubekids\.com'\) && !isKidsLearningRound\(settings\)\) return;/);
+    const block = source.slice(source.indexOf('function isKidsLearningRound('), source.indexOf('function getDirectAccessRuleRequirements('));
+    const context = {};
+    vm.createContext(context);
+    vm.runInContext(`${block}\nthis.round = isKidsLearningRound;`, context);
+    assert.equal(context.round({ study: { applied: true, kidsSpace: 'learning' } }), true);
+    assert.equal(context.round({ study: { applied: true, kidsSpace: 'study_time' } }), false, 'Kids holds at rest with its own card');
+    assert.equal(context.round({ study: { applied: false, kidsSpace: 'learning' } }), false);
+    assert.equal(context.round({}), false);
+});

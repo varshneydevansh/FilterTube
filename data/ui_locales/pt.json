@@ -2928,5 +2928,6 @@
   "study.skipVideo": "Pular este vídeo",
   "study.skipped": "Pulado. Ele não vai aparecer de novo.",
   "content.comments.authorHidden": "Comentários de {name} ocultos",
-  "content.comments.undo": "Desfazer"
+  "content.comments.undo": "Desfazer",
+  "askParent.answer": "Responder"
 }

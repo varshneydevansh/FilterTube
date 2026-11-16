@@ -28280,13 +28280,40 @@ document.addEventListener('DOMContentLoaded', async () => {
         list.appendChild(card);
     }
 
+    /** The hub's "Requests" row with the count (Android ASK_A_PARENT §9.4), straight to the answers. */
+    function renderAskParentHubRow(count) {
+        const hub = document.querySelector('#dashboardView .ft-dash');
+        let row = document.getElementById('ftAskParentHubRow');
+        if (!hub || !count) { row?.remove(); return; }
+        if (!row) {
+            row = document.createElement('section');
+            row.id = 'ftAskParentHubRow';
+            row.className = 'ft-ask-hub-row';
+            const words = document.createElement('span');
+            words.className = 'ft-ask-hub-row__words';
+            const open = document.createElement('button');
+            open.type = 'button';
+            open.className = 'btn-primary';
+            open.textContent = tabViewUiText('askParent.answer', 'Answer');
+            open.addEventListener('click', () => {
+                document.querySelector('.nav-item[data-nav-id="profiles"]')?.click();
+                setTimeout(() => document.querySelector('[data-ask-parent-inbox]')?.scrollIntoView({ block: 'start', behavior: 'smooth' }), 250);
+            });
+            row.append(words, open);
+            const hero = hub.querySelector('.ft-dash-hero');
+            if (hero?.nextSibling) hub.insertBefore(row, hero.nextSibling); else hub.prepend(row);
+        }
+        row.querySelector('.ft-ask-hub-row__words').textContent = `${tabViewUiText('askParent.inboxTitle', 'Requests')} · ${count}`;
+    }
+
     async function renderAskParentInbox(host = askParentInboxHost) {
         if (!host || !host.isConnected) return;
         askParentInboxHost = host;
         const data = await sendRuntimeMessage({ action: 'FilterTube_AskParentInbox' });
         const children = [...safeArray(data?.children), ...safeArray(data?.remoteChildren)];
-        if (!data?.isParent || !children.length) { host.hidden = true; host.replaceChildren(); return; }
+        if (!data?.isParent || !children.length) { host.hidden = true; host.replaceChildren(); renderAskParentHubRow(0); return; }
         const requests = [...safeArray(data.here), ...safeArray(data.remote)].sort((a, b) => (a.createdAt || 0) - (b.createdAt || 0));
+        renderAskParentHubRow(requests.length);
         host.hidden = false;
         host.className = 'help-item ft-ask-inbox';
         const title = document.createElement('div');

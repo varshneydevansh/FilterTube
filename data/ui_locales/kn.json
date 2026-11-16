@@ -2928,5 +2928,6 @@
   "study.skipVideo": "ಈ ವೀಡಿಯೊ ಬಿಟ್ಟುಬಿಡಿ",
   "study.skipped": "ಬಿಟ್ಟುಬಿಡಲಾಗಿದೆ. ಮತ್ತೆ ಕಾಣುವುದಿಲ್ಲ.",
   "content.comments.authorHidden": "{name} ಅವರ ಕಾಮೆಂಟ್‌ಗಳನ್ನು ಮರೆಮಾಡಲಾಗಿದೆ",
-  "content.comments.undo": "ರದ್ದುಮಾಡಿ"
+  "content.comments.undo": "ರದ್ದುಮಾಡಿ",
+  "askParent.answer": "ಉತ್ತರಿಸಿ"
 }

@@ -2928,5 +2928,6 @@
   "study.skipVideo": "यह वीडियो छोड़ें",
   "study.skipped": "छोड़ दिया। यह फिर नहीं दिखेगा।",
   "content.comments.authorHidden": "{name} की टिप्पणियां छिपाई गईं",
-  "content.comments.undo": "पहले जैसा करें"
+  "content.comments.undo": "पहले जैसा करें",
+  "askParent.answer": "जवाब दें"
 }

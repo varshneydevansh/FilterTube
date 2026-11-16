@@ -2926,5 +2926,6 @@
   "study.skipVideo": "跳過呢條片",
   "study.skipped": "已跳過。佢唔會再出現。",
   "content.comments.authorHidden": "已隱藏 {name} 嘅留言",
-  "content.comments.undo": "復原"
+  "content.comments.undo": "復原",
+  "askParent.answer": "回覆"
 }

@@ -2928,5 +2928,6 @@
   "study.skipVideo": "Tsallake wannan bidiyo",
   "study.skipped": "An tsallake. Ba zai sake bayyana ba.",
   "content.comments.authorHidden": "An ɓoye sharhohin {name}",
-  "content.comments.undo": "Soke"
+  "content.comments.undo": "Soke",
+  "askParent.answer": "Amsa"
 }

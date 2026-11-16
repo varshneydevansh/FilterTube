@@ -2926,5 +2926,6 @@
   "study.skipVideo": "跳过迭个视频",
   "study.skipped": "跳过了。伊勿会再出来。",
   "content.comments.authorHidden": "{name} 个评论已经隐藏",
-  "content.comments.undo": "撤消"
+  "content.comments.undo": "撤消",
+  "askParent.answer": "回复"
 }

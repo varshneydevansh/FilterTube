@@ -2928,5 +2928,6 @@
   "study.skipVideo": "ఈ వీడియోను దాటవేయి",
   "study.skipped": "దాటవేయబడింది. ఇది మళ్లీ కనిపించదు.",
   "content.comments.authorHidden": "{name} కామెంట్‌లు దాచబడ్డాయి",
-  "content.comments.undo": "చర్యను రద్దు చేయి"
+  "content.comments.undo": "చర్యను రద్దు చేయి",
+  "askParent.answer": "జవాబు ఇవ్వండి"
 }

@@ -2928,5 +2928,6 @@
   "study.skipVideo": "Saltar este vídeo",
   "study.skipped": "Saltado. No volverá a aparecer.",
   "content.comments.authorHidden": "Comentarios de {name} ocultos",
-  "content.comments.undo": "Deshacer"
+  "content.comments.undo": "Deshacer",
+  "askParent.answer": "Responder"
 }

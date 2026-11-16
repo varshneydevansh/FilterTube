@@ -2928,5 +2928,6 @@
   "study.skipVideo": "Laktawan ang video na ito",
   "study.skipped": "Nilaktawan. Hindi na ito lalabas.",
   "content.comments.authorHidden": "Nakatago ang mga komento mula kay {name}",
-  "content.comments.undo": "I-undo"
+  "content.comments.undo": "I-undo",
+  "askParent.answer": "Sumagot"
 }

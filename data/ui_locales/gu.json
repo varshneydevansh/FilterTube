@@ -2928,5 +2928,6 @@
   "study.skipVideo": "આ વીડિયો છોડો",
   "study.skipped": "છોડી દીધો. તે ફરી દેખાશે નહીં.",
   "content.comments.authorHidden": "{name} ની ટિપ્પણીઓ છુપાવી",
-  "content.comments.undo": "પૂર્વવત્ કરો"
+  "content.comments.undo": "પૂર્વવત્ કરો",
+  "askParent.answer": "જવાબ આપો"
 }

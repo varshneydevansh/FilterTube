@@ -1904,6 +1904,12 @@ function showCurrentVideoAdmissionPendingState(state, isShortRoute) {
     showDirectAccessPendingState(state, isShortRoute, message);
 }
 
+/** A study round on the Kids site with a Kids learning pack (study_engine KIDS_SPACE.LEARNING). */
+function isKidsLearningRound(settings) {
+    const study = settings && typeof settings === 'object' ? settings.study : null;
+    return !!study && study.applied === true && study.kidsSpace === 'learning';
+}
+
 function getDirectAccessRuleRequirements(settings) {
     const hasList = value => Array.isArray(value) && value.length > 0;
     const contentFilters = settings?.contentFilters && typeof settings.contentFilters === 'object'
@@ -2343,7 +2349,9 @@ function enforceCurrentWatchOwnerBlock(settings) {
             clearCurrentShortAdmissionOverlay();
             return;
         }
-        if (String(document.location?.hostname || '').includes('youtubekids.com')) return;
+        // The Kids site keeps its own watch flow, except during a Kids learning round: then a direct
+        // watch link is checked like any other (only the round's packs play), not only by the data filter.
+        if (String(document.location?.hostname || '').includes('youtubekids.com') && !isKidsLearningRound(settings)) return;
         const listMode = (settings && settings.listMode === 'whitelist') ? 'whitelist' : 'blocklist';
 
         const routeVideoId = getCurrentWatchVideoId();

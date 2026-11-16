@@ -2926,5 +2926,6 @@
   "study.skipVideo": "Bỏ qua video này",
   "study.skipped": "Đã bỏ qua. Video sẽ không hiện lại.",
   "content.comments.authorHidden": "Đã ẩn bình luận của {name}",
-  "content.comments.undo": "Hoàn tác"
+  "content.comments.undo": "Hoàn tác",
+  "askParent.answer": "Trả lời"
 }

@@ -2940,5 +2940,6 @@
   "study.skipVideo": "Пропустить это видео",
   "study.skipped": "Пропущено. Больше не появится.",
   "content.comments.authorHidden": "Комментарии от {name} скрыты",
-  "content.comments.undo": "Отменить"
+  "content.comments.undo": "Отменить",
+  "askParent.answer": "Ответить"
 }

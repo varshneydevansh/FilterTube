@@ -2928,5 +2928,6 @@
   "study.skipVideo": "Dieses Video überspringen",
   "study.skipped": "Übersprungen. Es erscheint nicht mehr.",
   "content.comments.authorHidden": "Kommentare von {name} ausgeblendet",
-  "content.comments.undo": "Rückgängig"
+  "content.comments.undo": "Rückgängig",
+  "askParent.answer": "Antworten"
 }

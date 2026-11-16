@@ -2926,5 +2926,6 @@
   "study.skipVideo": "この動画をスキップ",
   "study.skipped": "スキップしました。今後表示されません。",
   "content.comments.authorHidden": "{name} さんのコメントを非表示にしました",
-  "content.comments.undo": "元に戻す"
+  "content.comments.undo": "元に戻す",
+  "askParent.answer": "返事する"
 }

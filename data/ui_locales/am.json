@@ -2928,5 +2928,6 @@
   "study.skipVideo": "ይህን ቪዲዮ ዝለል",
   "study.skipped": "ተዘሏል። ዳግም አይታይም።",
   "content.comments.authorHidden": "የ{name} አስተያየቶች ተደብቀዋል",
-  "content.comments.undo": "ቀልብስ"
+  "content.comments.undo": "ቀልብስ",
+  "askParent.answer": "መልስ"
 }
