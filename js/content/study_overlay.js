@@ -344,6 +344,8 @@
                 picture.setAttribute?.('aria-hidden', 'true');
                 picture.dataset && (picture.dataset.filtertubeStudyMascot = pose);
                 box.appendChild(picture);
+                // Idle life with the page's interaction wake (shared with the blocked card).
+                try { localizer()?.idle?.(picture); } catch (e) { }
             }
             (doc.body || doc.documentElement).appendChild(box);
         }

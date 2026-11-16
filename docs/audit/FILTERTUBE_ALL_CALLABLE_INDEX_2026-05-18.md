@@ -222,7 +222,7 @@ lexical and its scope remains tracked JS/JSX/MJS: CJS/Python tooling requires it
 separate release/workflow review and is not silently counted as JavaScript here.
 
 ```text
-current tracked JS/JSX/MJS files: 152
+current tracked JS/JSX/MJS files: 156
 current repo-wide lexical callables: 10554
 current complete per-callable semantic proofs: 0
 current callable behavior-change approval: NO-GO
@@ -301,7 +301,9 @@ runtime behavior changed by inventory refresh: no
 | `js/layout.js` | Generated/quarantined UI | 52 | quarantined/generated boundary |
 | `js/managed_admin_authority.js` | UI/settings runtime | 18 | UI/settings counted |
 | `js/managed_parent_command_center.js` | UI/settings runtime | 78 | UI/settings counted |
+| `js/doodles.js` | UI/settings runtime | 9 | UI/settings counted; semantic proof incomplete |
 | `js/mascots.js` | UI/settings runtime | 83 | UI/settings counted; semantic proof incomplete |
+| `js/paperkit_parity.js` | UI/settings runtime | 27 | UI/settings counted; semantic proof incomplete |
 | `js/nanah_managed_live_policy.js` | UI/settings runtime | 125 | UI/settings counted |
 | `js/nanah_managed_local_network_client.js` | UI/settings runtime | 48 | UI/settings counted; semantic proof incomplete |
 | `js/nanah_managed_mailbox_client.js` | UI/settings runtime | 37 | UI/settings counted; semantic proof incomplete |
@@ -331,8 +333,10 @@ runtime behavior changed by inventory refresh: no
 | `js/vendor/nanah.bundle.js` | Vendor bundles | 107 | vendor API/provenance boundary |
 | `js/vendor/qrcode.bundle.js` | Vendor bundles | 172 | vendor API/provenance boundary |
 | `scripts/audit-proof-drift.mjs` | Audit/test lane scripts | 19 | audit lane counted |
+| `scripts/build-crayon-edges.mjs` | Build/sync scripts | 12 | build/website counted |
 | `scripts/build-extension-ui.mjs` | Build/sync scripts | 2 | build/website counted |
 | `scripts/build-nanah-vendor.mjs` | Build/sync scripts | 4 | build/website counted |
+| `scripts/export-crayon-icons.mjs` | Build/sync scripts | 6 | build/website counted |
 | `scripts/build-qr-scanner-vendor.mjs` | Build/sync scripts | 0 | build provenance counted; semantic proof incomplete |
 | `scripts/build-study-packs.mjs` | Build/sync scripts | 15 | build provenance counted; semantic proof incomplete |
 | `scripts/check-release-note-locales.mjs` | Audit/test lane scripts | 4 | workflow/evidence tooling counted; semantic proof incomplete |

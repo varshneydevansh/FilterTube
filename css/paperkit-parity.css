@@ -1,0 +1,699 @@
+/* Second PaperKit pass: the extension's own pages in the app's exact visual language
+ * (PaperKit.kt, ControlsPaper.kt, StudyPaper.kt, BrandPalette.kt; docs/app/design-system/PAPERKIT.md).
+ * Loaded last. Colour only from the --pk-* tokens (css/paperkit.css), crayon edges from
+ * css/paperkit-edges.css. It restyles; it never hides a control or changes what is saved.
+ *
+ * What the app does, and so what this does:
+ * - Type: Delius for page titles, card titles, section headers and numerals; Outfit 600 for button
+ *   labels; the system face for reading (Roboto on Android). No uppercase eyebrows.
+ * - Cards: paper sheets with a wobbly crayon edge (20 px corners) and a second sheet peeking 3 px
+ *   below. Tiles and chips wear their area's hue; brick is the only action colour.
+ * - Buttons: the brick pill standing on its 3 px ledge (sinks onto it when pressed); the paper
+ *   secondary on a 2 px ledge. 52 px and 48 px tall.
+ * - Fields: desk-coloured, 16 px corners. Switches: the area ink when on, with a check in the thumb.
+ * - Glass, glows and blur are gone: paper, not glass, for anything you read or press.
+ */
+
+:root {
+  --ft-font-family-base: system-ui, Roboto, "Segoe UI", -apple-system, "Helvetica Neue", Arial, sans-serif;
+  --pk-font-label: "FilterTube Outfit", "Outfit", system-ui, sans-serif;
+  --pk-ledge-brick: #76291f;
+  --pk-area-wash: var(--pk-paper);
+  --pk-area-ink: var(--pk-brick);
+  --pk-area-edge: var(--pk-edge-line);
+  --pk-tick: var(--pk-brick);
+  --pk-switch-on: var(--pk-plum);
+  --pk-crayon-check: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M5.2 12.6c1.4 1.3 2.6 2.7 3.9 4.3 2.6-4.2 5.8-7.9 9.8-10.6' fill='none' stroke='%23000' stroke-width='2.6' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
+  --pk-crayon-tick: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 28 6'%3E%3Cpath d='M1.6 4.2C7 3.9 14 3.4 26.4 2.6' fill='none' stroke='%23000' stroke-width='3' stroke-linecap='round'/%3E%3C/svg%3E");
+}
+:root[data-theme="dark"] { --pk-ledge-brick: #4a1712; }
+
+/* The area of the open page (js/paperkit_parity.js). */
+:root[data-pk-area="filters"] { --pk-area-wash: var(--pk-rose); --pk-area-ink: var(--pk-brick); --pk-area-edge: var(--pk-edge-filters); --pk-tick: var(--pk-brick); --pk-switch-on: var(--pk-brick); }
+:root[data-pk-area="content"] { --pk-area-wash: var(--pk-sky); --pk-area-ink: var(--pk-sky-ink); --pk-area-edge: var(--pk-edge-content); --pk-tick: var(--pk-sky-ink); --pk-switch-on: var(--pk-sky-ink); }
+:root[data-pk-area="kids"] { --pk-area-wash: var(--pk-sun-wash); --pk-area-ink: var(--pk-sun-ink); --pk-area-edge: var(--pk-edge-kids); --pk-tick: var(--pk-sun-ink); --pk-switch-on: var(--pk-sun-ink); }
+:root[data-pk-area="study"] { --pk-area-wash: var(--pk-sage); --pk-area-ink: var(--pk-sage-ink); --pk-area-edge: var(--pk-edge-study); --pk-tick: var(--pk-sage-ink); --pk-switch-on: var(--pk-sage-ink); }
+:root[data-pk-area="family"] { --pk-area-wash: var(--pk-lilac); --pk-area-ink: var(--pk-plum); --pk-area-edge: var(--pk-edge-family); --pk-tick: var(--pk-plum); --pk-switch-on: var(--pk-plum); }
+
+/* ---------------------------------------------------------------------------
+   Page: cream canvas over the theme video with the app's scrim
+   (NativeHeroBackground: paper at 95%, 85%, 55% from top-start to bottom-end).
+   --------------------------------------------------------------------------- */
+body.ft-extension-surface {
+  font-family: var(--ft-font-family-base) !important;
+  letter-spacing: 0;
+}
+:root[data-page-tone][data-theme] body.ft-extension-surface[data-surface="tab-view"] {
+  background: var(--pk-canvas) !important;
+  color: var(--pk-ink) !important;
+}
+body.ft-extension-surface .ft-tab-view-ambient__media {
+  background: url("../assets/images/homepage_hero_poster.webp") center / cover no-repeat;
+}
+:root[data-page-tone][data-theme] body.ft-extension-surface[data-surface] .ft-tab-view-ambient__media-scrim {
+  background: linear-gradient(135deg,
+    color-mix(in srgb, var(--pk-canvas) 95%, transparent) 0%,
+    color-mix(in srgb, var(--pk-canvas) 85%, transparent) 50%,
+    color-mix(in srgb, var(--pk-canvas) 55%, transparent) 100%) !important;
+}
+
+/* ---------------------------------------------------------------------------
+   Paper sheets with a crayon edge and a sheet beneath (StudyPaper.card)
+   --------------------------------------------------------------------------- */
+body.ft-extension-surface .sidebar,
+body.ft-extension-surface .top-bar,
+body.ft-extension-surface .card,
+body.ft-extension-surface .settings-card,
+body.ft-extension-surface .view-hero,
+body.ft-extension-surface .content-control-group,
+body.ft-extension-surface .help-technical-card,
+body.ft-extension-surface .help-start-card,
+body.ft-extension-surface .nanah-delivery-card,
+body.ft-extension-surface .pk-today,
+body.ft-extension-surface .ft-dash-status,
+body.ft-extension-surface #viewContainer > .view-section > .view-shell > .card,
+:root[data-page-tone][data-theme] body.ft-extension-surface[data-surface] .card,
+:root[data-page-tone][data-theme] body.ft-extension-surface[data-surface] .view-hero,
+:root[data-page-tone][data-theme] body.ft-extension-surface[data-surface] .content-control-group,
+:root[data-page-tone][data-theme] body.ft-extension-surface[data-surface] .settings-card {
+  background: var(--pk-paper) !important;
+  border: 1.5px solid transparent !important;
+  border-image: var(--pk-edge-line) 20 / 20px / 0 round !important;
+  border-radius: 20px !important;
+  box-shadow: 2px 3px 0 0 var(--pk-desk), 2px 3px 0 1px color-mix(in srgb, var(--pk-line) 60%, transparent) !important;
+  -webkit-backdrop-filter: none !important;
+  backdrop-filter: none !important;
+}
+/* The glass glows and sheens that used to sit on these are gone. */
+body.ft-extension-surface .sidebar::before,
+body.ft-extension-surface .sidebar::after,
+body.ft-extension-surface .card::before,
+body.ft-extension-surface .card::after,
+body.ft-extension-surface .view-hero::after,
+body.ft-extension-surface .view-hero::before {
+  display: none !important;
+}
+/* The main column is the page itself, not a frosted panel. */
+body.ft-extension-surface .view-container,
+:root[data-page-tone][data-theme] body.ft-extension-surface[data-surface] .view-container {
+  background: transparent !important;
+  border: 0 !important;
+  box-shadow: none !important;
+  -webkit-backdrop-filter: none !important;
+  backdrop-filter: none !important;
+}
+/* Cards inside cards stay flat (the app never stacks a sheet on a sheet). */
+body.ft-extension-surface .card .card,
+body.ft-extension-surface .settings-card .card,
+body.ft-extension-surface .content-control-group .content-control-group {
+  box-shadow: none !important;
+}
+
+/* ---------------------------------------------------------------------------
+   Type
+   --------------------------------------------------------------------------- */
+body.ft-extension-surface .top-bar #pageTitle,
+body.ft-extension-surface .view-hero__title,
+body.ft-extension-surface .card-header h2,
+body.ft-extension-surface .card-header h3,
+body.ft-extension-surface .settings-card h2,
+body.ft-extension-surface .settings-card h3,
+body.ft-extension-surface .content-control-group__title,
+body.ft-extension-surface .section-header h2,
+body.ft-extension-surface .ft-dash-apps__title,
+body.ft-extension-surface .stat-value,
+body.ft-extension-surface .ft-dash-status__name,
+body.ft-extension-surface .pk-support__title,
+body.ft-extension-surface .pk-duo-card__title,
+:root[data-page-tone][data-theme] body.ft-extension-surface[data-surface] .view-hero__title,
+:root[data-page-tone][data-theme] body.ft-extension-surface[data-surface] .top-bar #pageTitle {
+  font-family: var(--pk-font-hand) !important;
+  font-weight: 400 !important;
+  letter-spacing: 0 !important;
+  font-variation-settings: normal;
+}
+body.ft-extension-surface .top-bar #pageTitle { font-size: 30px !important; line-height: 1.15 !important; }
+body.ft-extension-surface .view-hero__title,
+:root[data-page-tone][data-theme] body.ft-extension-surface[data-surface] .view-hero__title {
+  font-size: clamp(24px, 2.4vw, 30px) !important;
+  line-height: 1.22 !important;
+  max-width: 34ch;
+}
+body.ft-extension-surface .view-hero__body { font-size: 15px !important; line-height: 1.5 !important; color: var(--pk-muted) !important; }
+/* Eyebrows are compact section headers in the app: sentence case, never shouted. */
+body.ft-extension-surface .view-hero__eyebrow,
+body.ft-extension-surface .ft-about-eyebrow,
+body.ft-extension-surface .nanah-delivery-card__eyebrow,
+body.ft-extension-surface .stat-label,
+body.ft-extension-surface .ft-dash-status__label,
+:root[data-page-tone][data-theme] body.ft-extension-surface[data-surface] .view-hero__eyebrow {
+  text-transform: none !important;
+  letter-spacing: 0 !important;
+  font-size: 13px !important;
+  font-weight: 600 !important;
+  color: var(--pk-muted) !important;
+}
+/* The marketing pills under the old heroes are not part of the app's language. */
+body.ft-extension-surface .view-hero__meta { display: none !important; }
+
+/* Card titles and section headers: Delius with a short crayon tick in the area's ink
+   (PaperKit.sectionHeader: 19 sp, a 28 dp tick 3 dp thick). */
+body.ft-extension-surface .content-control-group__title,
+body.ft-extension-surface .card-header h2,
+body.ft-extension-surface .card-header h3,
+body.ft-extension-surface .settings-card > h3,
+body.ft-extension-surface .settings-card__body > h3 {
+  position: relative;
+  font-size: 20px !important;
+  line-height: 1.2 !important;
+  color: var(--pk-ink) !important;
+  padding-bottom: 12px !important;
+}
+body.ft-extension-surface .content-control-group__title::after,
+body.ft-extension-surface .card-header h2::after,
+body.ft-extension-surface .card-header h3::after,
+body.ft-extension-surface .settings-card > h3::after,
+body.ft-extension-surface .settings-card__body > h3::after {
+  content: "";
+  position: absolute;
+  inset-inline-start: 0;
+  bottom: 0;
+  width: 28px;
+  height: 6px;
+  background: var(--pk-tick);
+  -webkit-mask: var(--pk-crayon-tick) center / contain no-repeat;
+  mask: var(--pk-crayon-tick) center / contain no-repeat;
+}
+
+/* ---------------------------------------------------------------------------
+   Sidebar and top bar: paper, the open page washed in its area
+   --------------------------------------------------------------------------- */
+body.ft-extension-surface .sidebar .nav-item {
+  border-radius: 14px !important;
+  background: transparent !important;
+  box-shadow: none !important;
+}
+body.ft-extension-surface .sidebar .nav-item.active:not([aria-current="page"]) {
+  background: transparent !important;
+  border: 1.5px solid transparent !important;
+}
+body.ft-extension-surface .sidebar .nav-item.active[aria-current="page"] {
+  background: var(--pk-area-wash) !important;
+  color: var(--pk-ink) !important;
+  border: 1.5px solid color-mix(in srgb, var(--pk-area-ink) 45%, transparent) !important;
+}
+body.ft-extension-surface .sidebar .nav-item.active[aria-current="page"] .nav-label { color: var(--pk-area-ink) !important; font-weight: 700 !important; }
+body.ft-extension-surface .sidebar .nav-item.active[aria-current="page"] .nav-icon { color: var(--pk-area-ink) !important; }
+body.ft-extension-surface .sidebar .nav-item.active::before { display: none !important; }
+body.ft-extension-surface .sidebar .nav-item:hover:not(.active) { background: color-mix(in srgb, var(--pk-ink) 6%, transparent) !important; }
+body.ft-extension-surface .sidebar .nav-label { font-weight: 600; }
+body.ft-extension-surface .sidebar .brand {
+  background: transparent !important;
+  box-shadow: none !important;
+  border: 0 !important;
+}
+body.ft-extension-surface .sidebar .brand-name { font-family: var(--pk-font-hand) !important; font-weight: 400 !important; font-size: 24px !important; }
+body.ft-extension-surface .nav-divider { border-color: var(--pk-line) !important; background: var(--pk-line) !important; opacity: 0.8; }
+
+/* ---------------------------------------------------------------------------
+   Buttons (PaperKit.style)
+   --------------------------------------------------------------------------- */
+body.ft-extension-surface .btn-primary,
+:root[data-page-tone][data-theme] body.ft-extension-surface[data-surface] .btn-primary {
+  background: var(--pk-brick-fill) !important;
+  color: var(--pk-on-brick-fill) !important;
+  border: 0 !important;
+  border-radius: 999px !important;
+  min-height: 52px;
+  padding-inline: 24px !important;
+  font-family: var(--pk-font-label) !important;
+  font-weight: 600 !important;
+  font-size: 16px !important;
+  letter-spacing: 0 !important;
+  text-transform: none !important;
+  box-shadow: 0 3px 0 0 var(--pk-ledge-brick) !important;
+  transform: none;
+  transition: transform 90ms cubic-bezier(0.16, 1, 0.3, 1), box-shadow 90ms cubic-bezier(0.16, 1, 0.3, 1) !important;
+}
+body.ft-extension-surface .btn-primary:hover:not(:disabled) { filter: brightness(1.05); }
+body.ft-extension-surface .btn-primary:active:not(:disabled) {
+  transform: translateY(3px) !important;
+  box-shadow: 0 0 0 0 var(--pk-ledge-brick) !important;
+}
+body.ft-extension-surface .btn-secondary,
+:root[data-page-tone][data-theme] body.ft-extension-surface[data-surface] .btn-secondary {
+  background: var(--pk-paper) !important;
+  color: var(--pk-ink) !important;
+  border: 1.5px solid color-mix(in srgb, var(--pk-muted) 70%, transparent) !important;
+  border-radius: 999px !important;
+  min-height: 44px;
+  font-family: var(--pk-font-label) !important;
+  font-weight: 600 !important;
+  letter-spacing: 0 !important;
+  text-transform: none !important;
+  box-shadow: 0 2px 0 0 var(--pk-line) !important;
+  transition: transform 90ms cubic-bezier(0.16, 1, 0.3, 1), box-shadow 90ms cubic-bezier(0.16, 1, 0.3, 1) !important;
+}
+body.ft-extension-surface .btn-secondary:active:not(:disabled) {
+  transform: translateY(2px) !important;
+  box-shadow: 0 0 0 0 var(--pk-line) !important;
+}
+body.ft-extension-surface .btn-primary:focus-visible,
+body.ft-extension-surface .btn-secondary:focus-visible,
+body.ft-extension-surface .pk-tile:focus-visible {
+  outline: 3px solid var(--pk-ink) !important;
+  outline-offset: 2px !important;
+}
+
+/* ---------------------------------------------------------------------------
+   Fields (PaperKit.styleField: desk fill, 16 dp corners, 48 dp tall)
+   --------------------------------------------------------------------------- */
+body.ft-extension-surface .text-input,
+body.ft-extension-surface .select-input,
+body.ft-extension-surface #viewContainer input[type="text"],
+body.ft-extension-surface #viewContainer input[type="search"],
+body.ft-extension-surface #viewContainer input[type="number"],
+body.ft-extension-surface #viewContainer input[type="date"],
+body.ft-extension-surface #viewContainer textarea,
+:root[data-page-tone][data-theme] body.ft-extension-surface[data-surface] .text-input,
+:root[data-page-tone][data-theme] body.ft-extension-surface[data-surface] .select-input {
+  background: color-mix(in srgb, var(--pk-desk) 82%, var(--pk-paper)) !important;
+  color: var(--pk-ink) !important;
+  border: 1.5px solid var(--pk-line) !important;
+  border-radius: 16px !important;
+  min-height: 48px;
+  box-shadow: none !important;
+  font-family: var(--ft-font-family-base) !important;
+}
+body.ft-extension-surface .text-input:focus,
+body.ft-extension-surface .select-input:focus,
+body.ft-extension-surface #viewContainer input:focus-visible,
+body.ft-extension-surface #viewContainer textarea:focus-visible {
+  border-color: var(--pk-area-ink) !important;
+  outline: 2px solid color-mix(in srgb, var(--pk-area-ink) 35%, transparent) !important;
+  outline-offset: 1px;
+}
+
+/* ---------------------------------------------------------------------------
+   Switches (PaperKit.switch: the area ink when on, a check in the thumb; a muted thumb when off)
+   --------------------------------------------------------------------------- */
+body.ft-extension-surface .switch .slider,
+:root[data-page-tone][data-theme] body.ft-extension-surface[data-surface] .switch .slider {
+  background: var(--pk-track) !important;
+  border: 1.5px solid color-mix(in srgb, var(--pk-ink) 40%, transparent) !important;
+  box-shadow: none !important;
+}
+body.ft-extension-surface .switch .slider::before,
+:root[data-page-tone][data-theme] body.ft-extension-surface[data-surface] .switch .slider::before {
+  background: color-mix(in srgb, var(--pk-ink) 62%, var(--pk-paper)) !important;
+  border: 0 !important;
+  box-shadow: none !important;
+  height: 20px !important;
+  width: 20px !important;
+  left: 3px !important;
+  transition: transform 220ms cubic-bezier(0.65, 0, 0.35, 1), background-color 120ms linear !important;
+}
+body.ft-extension-surface .switch input:checked + .slider,
+:root[data-page-tone][data-theme] body.ft-extension-surface[data-surface] .switch input:checked + .slider {
+  background: var(--pk-switch-on) !important;
+  border-color: var(--pk-switch-on) !important;
+}
+body.ft-extension-surface .switch input:checked + .slider::before,
+:root[data-page-tone][data-theme] body.ft-extension-surface[data-surface] .switch input:checked + .slider::before {
+  background: var(--pk-paper) var(--pk-switch-check) center / 14px no-repeat !important;
+  transform: translate(25px, -50%) !important;
+}
+/* The thumb's check: the area ink drawn on paper (an SVG per area, as masks cannot go in a pseudo's background). */
+:root { --pk-switch-check: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M5.2 12.6c1.4 1.3 2.6 2.7 3.9 4.3 2.6-4.2 5.8-7.9 9.8-10.6' fill='none' stroke='%235b3aa4' stroke-width='3' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E"); }
+:root[data-pk-area="content"] { --pk-switch-check: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M5.2 12.6c1.4 1.3 2.6 2.7 3.9 4.3 2.6-4.2 5.8-7.9 9.8-10.6' fill='none' stroke='%231f5f86' stroke-width='3' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E"); }
+:root[data-pk-area="filters"] { --pk-switch-check: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M5.2 12.6c1.4 1.3 2.6 2.7 3.9 4.3 2.6-4.2 5.8-7.9 9.8-10.6' fill='none' stroke='%23a93e31' stroke-width='3' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E"); }
+:root[data-pk-area="kids"] { --pk-switch-check: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M5.2 12.6c1.4 1.3 2.6 2.7 3.9 4.3 2.6-4.2 5.8-7.9 9.8-10.6' fill='none' stroke='%235a3a07' stroke-width='3' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E"); }
+:root[data-pk-area="study"] { --pk-switch-check: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M5.2 12.6c1.4 1.3 2.6 2.7 3.9 4.3 2.6-4.2 5.8-7.9 9.8-10.6' fill='none' stroke='%2328623f' stroke-width='3' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E"); }
+@media (prefers-reduced-motion: reduce) {
+  body.ft-extension-surface .switch .slider::before { transition: none !important; }
+}
+
+/* The status line under each content control ("Hidden everywhere" / "Showing"). */
+.pk-toggle-status {
+  display: block;
+  margin-top: 2px;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--pk-muted);
+}
+.pk-toggle-status.is-on { color: var(--pk-area-ink); }
+body.ft-extension-surface .content-control-group .toggle-row {
+  background: transparent !important;
+  border: 0 !important;
+  border-bottom: 1.5px solid transparent !important;
+  border-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 40 4'%3E%3Cpath d='M0 2.2C10 1.2 20 3 40 1.9' fill='none' stroke='%23dcd1c2' stroke-width='1.4'/%3E%3C/svg%3E") 0 0 4 0 / 0 0 4px 0 stretch !important;
+  border-radius: 0 !important;
+  box-shadow: none !important;
+}
+:root[data-theme="dark"] body.ft-extension-surface .content-control-group .toggle-row {
+  border-image-source: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 40 4'%3E%3Cpath d='M0 2.2C10 1.2 20 3 40 1.9' fill='none' stroke='%232a3440' stroke-width='1.4'/%3E%3C/svg%3E") !important;
+}
+body.ft-extension-surface .content-control-group .toggle-row:last-child { border-image: none !important; border-bottom: 0 !important; }
+body.ft-extension-surface .toggle-title { font-size: 16px !important; font-weight: 600 !important; color: var(--pk-ink) !important; }
+
+/* ---------------------------------------------------------------------------
+   Tabs and the Blocked / Allowed segments (FiltersActivity tabs; ControlsPaper.styleSegment)
+   --------------------------------------------------------------------------- */
+body.ft-extension-surface .tab-buttons,
+:root[data-page-tone][data-theme] body.ft-extension-surface[data-surface] .tab-buttons {
+  background: var(--pk-lilac) !important;
+  border: 1.5px solid transparent !important;
+  border-image: var(--pk-edge-line) 20 / 20px / 0 round !important;
+  border-radius: 20px !important;
+  padding: 4px 8px !important;
+  box-shadow: none !important;
+}
+body.ft-extension-surface .tab-buttons .tab-button,
+:root[data-page-tone][data-theme] body.ft-extension-surface[data-surface] .tab-buttons .tab-button {
+  background: transparent !important;
+  color: var(--pk-muted) !important;
+  font-weight: 700 !important;
+  border: 0 !important;
+  border-radius: 0 !important;
+  box-shadow: none !important;
+  position: relative;
+}
+body.ft-extension-surface .tab-buttons .tab-button.active,
+:root[data-page-tone][data-theme] body.ft-extension-surface[data-surface] .tab-buttons .tab-button.active {
+  color: var(--pk-ink) !important;
+  background: transparent !important;
+}
+body.ft-extension-surface .tab-buttons .tab-button.active::after {
+  content: "";
+  position: absolute;
+  inset-inline: 18%;
+  bottom: 2px;
+  height: 5px;
+  background: var(--pk-brick);
+  -webkit-mask: var(--pk-crayon-tick) center / 100% 100% no-repeat;
+  mask: var(--pk-crayon-tick) center / 100% 100% no-repeat;
+}
+body.ft-extension-surface .ft-rule-target-tabs {
+  background: transparent !important;
+  border: 0 !important;
+  box-shadow: none !important;
+  gap: 0 !important;
+}
+body.ft-extension-surface .ft-rule-target-tab {
+  position: relative;
+  background: var(--pk-paper) !important;
+  color: var(--pk-muted) !important;
+  border: 1.5px solid var(--pk-line) !important;
+  min-height: 48px;
+  box-shadow: none !important;
+  font-weight: 600 !important;
+}
+body.ft-extension-surface .ft-rule-target-tab:first-child { border-radius: 999px 0 0 999px !important; }
+body.ft-extension-surface .ft-rule-target-tab:last-child { border-radius: 0 999px 999px 0 !important; }
+[dir="rtl"] body.ft-extension-surface .ft-rule-target-tab:first-child { border-radius: 0 999px 999px 0 !important; }
+[dir="rtl"] body.ft-extension-surface .ft-rule-target-tab:last-child { border-radius: 999px 0 0 999px !important; }
+body.ft-extension-surface .ft-rule-target-tab.is-active {
+  background: var(--pk-rose) !important;
+  color: var(--pk-brick) !important;
+  border-color: color-mix(in srgb, var(--pk-brick) 55%, transparent) !important;
+}
+
+/* ---------------------------------------------------------------------------
+   The Controls hub (dashboard): today card and area tiles
+   --------------------------------------------------------------------------- */
+#dashboardView:has(.pk-hub) .ft-dash-stats,
+#dashboardView:has(.pk-hub) .dashboard-actions { display: none !important; }
+
+.pk-hub { display: grid; gap: 18px; margin-block: 8px 28px; }
+.pk-today {
+  display: flex;
+  align-items: center;
+  gap: 18px;
+  padding: 18px 22px !important;
+}
+.pk-today__number {
+  position: relative;
+  flex: none;
+  min-width: 56px;
+  padding-bottom: 10px;
+  text-align: center;
+  font-family: var(--pk-font-hand);
+  font-size: 46px;
+  line-height: 1;
+  color: var(--pk-ink);
+  font-variant-numeric: tabular-nums;
+}
+.pk-today__words { display: grid; gap: 4px; min-width: 0; }
+.pk-today__title { font-size: 17px; font-weight: 700; color: var(--pk-ink); }
+.pk-today__detail { font-size: 14px; color: var(--pk-muted); }
+
+.pk-hub__grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  gap: 14px;
+}
+.pk-tile {
+  --pk-tile-wash: var(--pk-paper);
+  --pk-tile-ink: var(--pk-brick);
+  --pk-tile-edge: var(--pk-edge-line);
+  position: relative;
+  display: grid;
+  grid-template-rows: auto 1fr auto auto;
+  align-content: start;
+  gap: 4px;
+  min-height: 150px;
+  padding: 16px 18px 16px;
+  text-align: start;
+  color: var(--pk-ink);
+  background: var(--pk-paper);
+  border: 1.5px solid transparent;
+  border-image: var(--pk-tile-edge) 20 / 18px / 0 round;
+  border-radius: 18px;
+  cursor: pointer;
+  font: inherit;
+  transition: transform 90ms cubic-bezier(0.16, 1, 0.3, 1), background-color 120ms linear;
+}
+.pk-tile[data-area="filters"] { --pk-tile-wash: var(--pk-rose); --pk-tile-ink: var(--pk-brick); --pk-tile-edge: var(--pk-edge-filters); }
+.pk-tile[data-area="content"] { --pk-tile-wash: var(--pk-sky); --pk-tile-ink: var(--pk-sky-ink); --pk-tile-edge: var(--pk-edge-content); }
+.pk-tile[data-area="kids"] { --pk-tile-wash: var(--pk-sun-wash); --pk-tile-ink: var(--pk-sun-ink); --pk-tile-edge: var(--pk-edge-kids); }
+.pk-tile[data-area="study"] { --pk-tile-ink: var(--pk-sage-ink); --pk-tile-edge: var(--pk-edge-study); }
+.pk-tile[data-area="family"] { --pk-tile-ink: var(--pk-plum); --pk-tile-edge: var(--pk-edge-family); }
+.pk-tile.is-washed { background: var(--pk-tile-wash); }
+.pk-tile:hover { background: color-mix(in srgb, var(--pk-tile-wash) 70%, var(--pk-paper)); }
+.pk-tile.is-washed:hover { background: color-mix(in srgb, var(--pk-tile-wash) 88%, var(--pk-tile-ink)); }
+.pk-tile:active { transform: scale(0.98); }
+.pk-tile:active .pk-tile__ring { transform: translateY(-2px); }
+.pk-tile__head { display: flex; align-items: flex-start; justify-content: space-between; min-height: 44px; }
+.pk-tile__ring {
+  position: relative;
+  display: inline-grid;
+  place-items: center;
+  width: 40px;
+  height: 40px;
+  color: var(--pk-tile-ink);
+  transition: transform 90ms cubic-bezier(0.16, 1, 0.3, 1);
+}
+.pk-tile__ring svg { position: absolute; inset: 0; width: 100%; height: 100%; }
+.pk-tile__ring path { fill: none; stroke: currentColor; stroke-width: 1.6; stroke-linecap: round; }
+.pk-tile__icon {
+  width: 23px;
+  height: 23px;
+  background: currentColor;
+  -webkit-mask: var(--pk-tile-icon) center / contain no-repeat;
+  mask: var(--pk-tile-icon) center / contain no-repeat;
+}
+.pk-tile.is-washed .pk-tile__icon {
+  -webkit-mask-image: var(--pk-tile-icon-on);
+  mask-image: var(--pk-tile-icon-on);
+}
+.pk-tile__count {
+  font-family: var(--pk-font-hand);
+  font-size: 26px;
+  line-height: 1;
+  color: var(--pk-tile-ink);
+  font-variant-numeric: tabular-nums;
+}
+.pk-tile__title {
+  align-self: end;
+  margin-top: 18px;
+  font-family: var(--pk-font-hand);
+  font-size: 20px;
+  line-height: 1.2;
+}
+.pk-tile__sub { font-size: 14px; line-height: 1.35; color: var(--pk-muted); }
+.pk-tile__badge {
+  justify-self: start;
+  margin-top: 6px;
+  padding: 3px 10px 3px 8px;
+  border-radius: 999px;
+  border: 1.5px solid color-mix(in srgb, var(--pk-sage-ink) 45%, transparent);
+  background: var(--pk-sage);
+  color: var(--pk-sage-ink);
+  font-size: 13px;
+  font-weight: 700;
+}
+.pk-tile__badge::before { content: "✓ "; }
+.pk-tile__badge[hidden] { display: none; }
+
+@media (prefers-reduced-motion: reduce) {
+  .pk-tile, .pk-tile__ring { transition: none; }
+  .pk-tile:active { transform: none; }
+}
+
+/* ---------------------------------------------------------------------------
+   Doodles (js/doodles.js): masks tinted brick or the area ink
+   --------------------------------------------------------------------------- */
+@property --pk-doodle-sweep {
+  syntax: "<angle>";
+  inherits: false;
+  initial-value: 360deg;
+}
+.pk-doodle-host { position: relative; }
+.pk-doodle-mark {
+  display: inline-block;
+  pointer-events: none;
+  background: var(--pk-doodle-ink, var(--pk-brick));
+  -webkit-mask: var(--pk-doodle-art) center / contain no-repeat;
+  mask: var(--pk-doodle-art) center / contain no-repeat;
+}
+.pk-doodle-mark--check { width: 28px; height: 28px; flex: none; }
+.pk-doodle-mark--underline {
+  position: absolute;
+  inset-inline: 2px;
+  bottom: -4px;
+  height: 12px;
+  -webkit-mask-size: 100% 100%;
+  mask-size: 100% 100%;
+}
+.pk-doodle-mark--scribble {
+  position: absolute;
+  inset: -6px -10px;
+  --pk-doodle-ink: var(--pk-plum);
+  -webkit-mask: var(--pk-doodle-art) center / 100% 100% no-repeat, conic-gradient(#000 var(--pk-doodle-sweep), transparent 0);
+  -webkit-mask-composite: source-in;
+  mask: var(--pk-doodle-art) center / 100% 100% no-repeat, conic-gradient(#000 var(--pk-doodle-sweep), transparent 0);
+  mask-composite: intersect;
+}
+.ft-toast .pk-toast-check { --pk-doodle-ink: currentColor; margin-inline-end: 4px; }
+
+/* Mascot idle sparkle (MascotIdle SPARKLE) and the loading moment's 600 ms wait. */
+.pk-idle-host { position: relative; }
+.pk-idle-sparkle {
+  position: absolute;
+  top: 2px;
+  inset-inline-end: -4px;
+  width: 18px;
+  height: 18px;
+  pointer-events: none;
+}
+.pk-moment.is-waiting .pk-moment__art,
+.pk-moment.is-waiting .pk-moment__line { visibility: hidden; }
+
+/* ---------------------------------------------------------------------------
+   Popup: the same paper and crayon
+   --------------------------------------------------------------------------- */
+body.ft-extension-surface[data-surface="popup"] .ft-popup-header,
+body.ft-extension-surface[data-surface="popup"] .popup-card,
+body.ft-extension-surface[data-surface="popup"] .ft-popup-card {
+  -webkit-backdrop-filter: none !important;
+  backdrop-filter: none !important;
+}
+
+/* Night: the thumb is light, so the area's check on it stays readable. */
+:root[data-theme="dark"] body.ft-extension-surface .switch input:checked + .slider::before {
+  background-color: var(--pk-ink) !important;
+}
+
+/* Popup (392 px): the app's Controls header and paper rows. The frame is the cream canvas over the
+   theme video's still, with the same scrim as the pages; every panel is paper with a crayon edge. */
+body.ft-extension-surface[data-surface="popup"] .ft-popup-shell__ambient,
+body.ft-extension-surface[data-surface="popup"] .ft-popup-shell__video-tint { display: none !important; }
+:root[data-page-tone][data-theme] body.ft-extension-surface[data-surface="popup"] .ft-popup-shell__video-scrim {
+  background: linear-gradient(160deg,
+    color-mix(in srgb, var(--pk-canvas) 92%, transparent) 0%,
+    color-mix(in srgb, var(--pk-canvas) 85%, transparent) 55%,
+    color-mix(in srgb, var(--pk-canvas) 60%, transparent) 100%) !important;
+}
+body.ft-extension-surface[data-surface="popup"] .ft-popup-shell__media {
+  background: url("../assets/images/homepage_hero_poster.webp") center / cover no-repeat;
+}
+body.ft-extension-surface[data-surface="popup"] .ft-popup-shell__frame {
+  background: transparent !important;
+  -webkit-backdrop-filter: none !important;
+  backdrop-filter: none !important;
+}
+body.ft-extension-surface[data-surface="popup"] .ft-popup-brand,
+body.ft-extension-surface[data-surface="popup"] .ft-mascot-tally,
+body.ft-extension-surface[data-surface="popup"] .ft-popup-filter-card,
+body.ft-extension-surface[data-surface="popup"] .ft-popup-android-link,
+body.ft-extension-surface[data-surface="popup"] .ft-popup-time-status,
+:root[data-page-tone][data-theme] body.ft-extension-surface[data-surface="popup"] .ft-popup-brand,
+:root[data-page-tone][data-theme] body.ft-extension-surface[data-surface="popup"] .ft-popup-filter-card,
+:root[data-page-tone][data-theme] body.ft-extension-surface[data-surface="popup"] .ft-popup-android-link {
+  background: var(--pk-paper) !important;
+  border: 1.5px solid transparent !important;
+  border-image: var(--pk-edge-line) 20 / 18px / 0 round !important;
+  border-radius: 18px !important;
+  box-shadow: 2px 3px 0 0 var(--pk-desk) !important;
+  -webkit-backdrop-filter: none !important;
+  backdrop-filter: none !important;
+}
+body.ft-extension-surface[data-surface="popup"] .ft-popup-brand .app-title {
+  font-family: var(--pk-font-hand) !important;
+  font-weight: 400 !important;
+  letter-spacing: 0 !important;
+}
+body.ft-extension-surface[data-surface="popup"] .extension-status {
+  text-transform: none !important;
+  letter-spacing: 0 !important;
+  font-weight: 700 !important;
+  color: var(--pk-sage-ink) !important;
+}
+body.ft-extension-surface[data-surface="popup"] .ft-mascot-tally__count { font-family: var(--pk-font-hand); font-weight: 400; font-size: 17px; color: var(--pk-ink); }
+body.ft-extension-surface[data-surface="popup"] input[type="text"],
+body.ft-extension-surface[data-surface="popup"] input[type="search"] {
+  background: color-mix(in srgb, var(--pk-desk) 82%, var(--pk-paper)) !important;
+  border: 1.5px solid var(--pk-line) !important;
+  border-radius: 16px !important;
+  min-height: 44px !important;
+  height: 44px !important;
+  box-shadow: none !important;
+  color: var(--pk-ink) !important;
+}
+body.ft-extension-surface[data-surface="popup"] .btn-primary,
+body.ft-extension-surface[data-surface="popup"] button.add-btn {
+  min-height: 44px !important;
+  height: 44px !important;
+  padding-block: 0 !important;
+}
+body.ft-extension-surface[data-surface="popup"] .ft-popup-filter-card .tab-buttons,
+body.ft-extension-surface[data-surface="popup"] .tabs-container .tab-buttons { margin-bottom: 8px; }
+
+/* The app never shouts: sentence case everywhere on the extension's own pages (labels, eyebrows,
+   the list-mode pill). Words that are capitals (PIN) stay capitals. */
+body.ft-extension-surface,
+body.ft-extension-surface * { text-transform: none !important; }
+body.ft-extension-surface [class*="eyebrow"],
+body.ft-extension-surface [class*="kicker"],
+body.ft-extension-surface .ft-list-mode-pill,
+body.ft-extension-surface [class*="__label"] { letter-spacing: 0 !important; }
+
+/* Study and focus wears the app's sage (BrandPalette STUDY), breaks its sun. */
+:root, :root[data-theme] {
+  --ft-study-teal: var(--pk-sage-ink);
+  --ft-study-teal-surface: var(--pk-sage);
+  --ft-study-amber: var(--pk-sun);
+  --ft-study-amber-text: var(--pk-sun-ink);
+  --ft-study-amber-surface: var(--pk-sun-wash);
+  --ft-study-grey-surface: var(--pk-sage);
+}
+body.ft-extension-surface .ft-study-status {
+  color: var(--pk-ink) !important;
+  border: 1.5px solid transparent;
+  border-image: var(--pk-edge-study) 20 / 18px / 0 round;
+  border-radius: 18px;
+}
+body.ft-extension-surface .ft-study-status.is-break { background: var(--pk-sun-wash) !important; border-image-source: var(--pk-edge-kids); }
+body.ft-extension-surface .ft-study-status.is-done,
+body.ft-extension-surface .ft-study-status.is-normal,
+body.ft-extension-surface .ft-study-status.is-hold { background: var(--pk-sage) !important; }

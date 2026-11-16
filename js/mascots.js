@@ -39,32 +39,100 @@
     const BUBBLE_MAX_CHARS = 48;
     const EVENT_BUBBLE_MS = 5000;
     const ASSET_DIR = 'assets/images/mascots/';
+    // The app's own art (res/drawable-nodpi/study_*.webp), byte for byte, under the extension's names.
     const ASSETS = Object.freeze({
         counterMark: '../doodles/sparkle.webp',
-        kritiLogo: 'kriti_logo.webp',
-        kritiAllow: 'kriti_allow_sieve.webp',
+        // KRITI_LOGO_HUG and KRITI_LOGO_SIEVE (the app's whitelist pose); the other three logo poses
+        // come up in the loading moments only.
+        kritiLogo: 'kriti_logo_01.webp',
+        kritiAllow: 'kriti_logo_03.webp',
+        kritiLogoHat: 'kriti_logo_02.webp',
+        kritiLogoBadge: 'kriti_logo_04.webp',
+        kritiLogoTelescope: 'kriti_logo_05.webp',
         kritiPeek: 'kriti_peek.webp',
         kritiThumbsUp: 'kriti_thumbsup.webp',
         kritiWave: 'kriti_wave.webp',
         kritiReading: 'kriti_reading.webp',
+        kritiThinking: 'kriti_thinking.webp',
         uljhanShrug: 'uljhan_shrug.webp',
         kritiFunnel: 'kriti_funnel.webp',
         kritiNotebook: 'kriti_notebook.webp',
         kritiPointing: 'kriti_pointing.webp',
-        kritiEvening: 'kriti_evening_01.webp',
         uljhanFront: 'uljhan_front.webp',
         uljhanHappy: 'uljhan_happy.webp',
         uljhanSad: 'uljhan_sad.webp',
         sieve: Object.freeze([1, 2, 3, 4, 5].map(index => `kriti_sieve_0${index}.webp`)),
         // Picture-book sheets (aKriti frames): swapped stills, never warped.
         kritiMug: Object.freeze([1, 2, 3, 4, 5, 6].map(index => `kriti_mug_0${index}.webp`)),
+        kritiEvening: Object.freeze([1, 2, 3, 4, 5, 6].map(index => `kriti_evening_0${index}.webp`)),
         uljhanFetch: Object.freeze([1, 2, 3, 4, 5, 6].map(index => `uljhan_fetch_0${index}.webp`)),
         duoSieve: Object.freeze([1, 2, 3, 4, 5, 6].map(index => `duo_sieve_0${index}.webp`)),
-        duoShoo: Object.freeze([1, 2, 3, 4, 5].map(index => `duo_shoo_0${index}.webp`))
+        duoShoo: Object.freeze([1, 2, 3, 4, 5, 6].map(index => `duo_shoo_0${index}.webp`)),
+        kritiJump: Object.freeze([1, 2, 3, 4, 5].map(index => `kriti_jump_0${index}.webp`)),
+        uljhanLeaves: Object.freeze([1, 2, 3, 4, 5].map(index => `uljhan_wave_0${index}.webp`))
+    });
+    /**
+     * The app's frame animations (StudyMascotView.Motion): which frames play, in what order (0-based,
+     * a frame may repeat), and how long each stays. Each plays once and rests on its last frame; with
+     * reduced motion only that frame shows. leaves: slide out and fade after the last frame.
+     */
+    const MOTIONS = Object.freeze({
+        duoSieve: Object.freeze({ order: Object.freeze([0, 1, 2, 3, 4, 5]), ms: 420 }),
+        duoShoo: Object.freeze({ order: Object.freeze([0, 1, 2, 3, 4, 5]), ms: 420 }),
+        kritiMug: Object.freeze({ order: Object.freeze([0, 1, 2, 2, 3, 4, 5]), ms: 380 }),
+        kritiEvening: Object.freeze({ order: Object.freeze([0, 1, 2, 3, 4, 5]), ms: 420 }),
+        uljhanFetch: Object.freeze({ order: Object.freeze([0, 1, 2, 3, 4, 5]), ms: 160 }),
+        kritiJump: Object.freeze({ order: Object.freeze([0, 1, 2, 3, 4, 1, 0]), ms: 95 }),
+        uljhanLeaves: Object.freeze({ order: Object.freeze([0, 1, 2, 1, 2, 3, 4]), ms: 170, leaves: true })
     });
     const SHEET_FRAME_MS = 180;
-    // The still a sheet rests on (0-based): its last frame.
-    const SHEET_STILL = Object.freeze({ kritiMug: 5, uljhanFetch: 5, duoSieve: 5, duoShoo: 4 });
+    // The still a sheet rests on (0-based): the last frame its motion plays.
+    const SHEET_STILL = Object.freeze(Object.fromEntries(Object.entries(MOTIONS).map(([name, motion]) => [name, motion.order[motion.order.length - 1]])));
+
+    // NativeMotion: the springs and idle rhythm the app's mascots use (StudyMascotView, MascotIdle).
+    const SPRINGS = Object.freeze({
+        settle: Object.freeze({ stiffness: 1500, damping: 0.8 }),
+        pop: Object.freeze({ stiffness: 1500, damping: 0.55 }),
+        mascot: Object.freeze({ stiffness: 700, damping: 0.55 }),
+        bob: Object.freeze({ stiffness: 800, damping: 0.45 }),
+        stamp: Object.freeze({ stiffness: 700, damping: 0.5 }),
+        wiggle: Object.freeze({ stiffness: 500, damping: 0.25 })
+    });
+    const IDLE = Object.freeze({
+        firstMin: 6000,
+        firstMax: 12000,
+        gaps: Object.freeze([12000, 20000, 30000]),
+        jitter: 0.15,
+        budget: 120000,
+        sparkleChance: 0.15,
+        bobVelocity: -125,
+        hopVelocity: -250,
+        squashVelocity: -1,
+        wiggleVelocity: 95,
+        tapVelocity: -420
+    });
+    // MascotIdle.beatsFor: the beats that fit the art she rests on.
+    const IDLE_BEATS = Object.freeze({
+        uljhan: Object.freeze(['wiggle', 'bob', 'hop', 'sparkle']),
+        uljhanSad: Object.freeze(['wiggle', 'bob']),
+        sieve: Object.freeze(['bob', 'squash', 'sieve', 'sparkle']),
+        seated: Object.freeze(['bob', 'squash', 'sparkle']),
+        perched: Object.freeze(['squash', 'sparkle']),
+        duo: Object.freeze(['bob', 'squash', 'sparkle']),
+        kriti: Object.freeze(['bob', 'hop', 'squash', 'sparkle'])
+    });
+    // LoadingPersonality (GENERAL scene): which moment a wait shows, weighted; the duo sieve most.
+    const LOADING_WEIGHTS = Object.freeze([
+        ['duoSieve', 6], ['sieve', 2], ['duoShoo', 2], ['kritiJump', 2], ['kritiPeek', 2],
+        ['kritiLogo', 1], ['kritiLogoHat', 1], ['kritiAllow', 1], ['kritiLogoBadge', 1], ['kritiLogoTelescope', 1]
+    ]);
+    // Any interaction on the page (pointer, wheel or scroll, a key) wakes resting idle life and gives
+    // it a fresh two-minute budget; one throttled, passive listener on the document. No sound.
+    const IDLE_WAKE_EVENTS = Object.freeze(['pointerdown', 'keydown', 'wheel', 'scroll', 'touchstart']);
+    const IDLE_WAKE_THROTTLE_MS = 1000;
+    const LOADING_REVEAL_MS = 600;
+    const LOOP_CAP_MS = 30000;
+    const REPLAY_REST_MS = 1200;
 
     const COPY = Object.freeze({
         welcome: ['mascot.welcome.line', "I'll keep what you block out of sight."],
@@ -146,11 +214,20 @@
     // Sounds (aKriti sounds, assets/sounds): Off by default. Gentle plays the big moments only.
     const SOUNDS_KEY = 'ftUiSounds';
     const SOUND_MODES = Object.freeze(['off', 'gentle', 'playful']);
+    // The app's thirteen cues (UiSound.Cue, docs/app/design-system/SOUNDS.md), the same files.
     const SOUND_FILES = Object.freeze({
-        success: 'success.ogg', celebrate: 'celebrate.ogg', error: 'gentle_error.ogg',
-        select: 'select.ogg', pop: 'soft_pop.ogg', page: 'paper_flip.ogg'
+        stamp: 'stamp_thunk.ogg', celebrate: 'celebrate.ogg', bell: 'break_bell.ogg',
+        success: 'success.ogg', select: 'select.ogg', error: 'gentle_error.ogg',
+        scribble: 'crayon_scribble.ogg', page: 'paper_flip.ogg', pencil: 'pencil_tap.ogg',
+        pop: 'soft_pop.ogg', boing: 'uljhan_boing.ogg', giggle: 'kriti_giggle_chime.ogg', undo: 'undo_swish.ogg'
     });
-    const GENTLE_SOUNDS = Object.freeze(['success', 'celebrate', 'error']);
+    // Gentle plays the app's BIG cues only: the seal, a celebration, the break bell.
+    const GENTLE_SOUNDS = Object.freeze(['stamp', 'celebrate', 'bell']);
+    // NativeMotion: one sound per 400 ms, the same cue not within 1.5 s, at most six a minute.
+    const SOUND_GAP_MS = 400;
+    const SOUND_SAME_CUE_COOLDOWN_MS = 1500;
+    const SOUND_RATE_WINDOW_MS = 60000;
+    const SOUND_RATE_CAP = 6;
     // Moment poses: one character and one line each (BIBLE.md moments map).
     const MOMENTS = Object.freeze({
         loading: Object.freeze({ image: 'uljhanFetch', copy: 'loading', character: 'Uljhan' }),
@@ -163,7 +240,10 @@
         break: Object.freeze({ image: 'kritiMug', copy: null, character: 'Kriti' }),
         offline: Object.freeze({ image: 'uljhanSad', copy: null, character: 'Uljhan' }),
         slow: Object.freeze({ image: 'uljhanFront', copy: null, character: 'Uljhan' }),
-        restored: Object.freeze({ image: 'uljhanHappy', copy: null, character: 'Uljhan' })
+        restored: Object.freeze({ image: 'uljhanHappy', copy: null, character: 'Uljhan' }),
+        // Waiting for the other device (the app's KRITI_THINKING), and a win (KRITI_JUMP, Lively plays it).
+        thinking: Object.freeze({ image: 'kritiThinking', copy: null, character: 'Kriti' }),
+        celebrate: Object.freeze({ image: 'kritiJump', copy: null, character: 'Kriti' })
     });
 
     // ---- Pure rules (unit-tested) ----------------------------------------------------------------
@@ -243,7 +323,91 @@
         if (!Array.isArray(frames) && !(frames && typeof frames.length === 'number')) return [];
         const still = Number.isInteger(SHEET_STILL[sheet]) ? SHEET_STILL[sheet] : frames.length - 1;
         if (reducedMotion) return [still];
-        return Array.from({ length: frames.length }, (_, index) => index);
+        const motion = MOTIONS[sheet];
+        return motion ? [...motion.order] : Array.from({ length: frames.length }, (_, index) => index);
+    }
+
+    /** How long each frame of a sheet stays (the app's Motion.frameMillis). */
+    function sheetFrameMs(sheet) {
+        return MOTIONS[sheet]?.ms || SHEET_FRAME_MS;
+    }
+
+    /**
+     * A damped spring sampled at 60 fps (Android SpringAnimation from rest with a start velocity, in
+     * units per second): the offsets from rest, ending at 0. Pure.
+     */
+    function springSamples(spec, velocity, { from = 0, step = 1000 / 60, settle = 0.05, maxMs = 1500 } = {}) {
+        const omega = Math.sqrt(spec.stiffness);
+        const zeta = spec.damping;
+        const samples = [from];
+        const decay = zeta * omega;
+        const damped = omega * Math.sqrt(Math.max(1e-6, 1 - zeta * zeta));
+        let quiet = 0;
+        for (let time = step; time <= maxMs; time += step) {
+            const seconds = time / 1000;
+            const value = zeta < 1
+                ? Math.exp(-decay * seconds) * (from * Math.cos(damped * seconds) + ((velocity + decay * from) / damped) * Math.sin(damped * seconds))
+                : (from + (velocity + omega * from) * seconds) * Math.exp(-omega * seconds);
+            samples.push(value);
+            quiet = Math.abs(value) < settle ? quiet + 1 : 0;
+            if (quiet >= 3 && time > 120) break;
+        }
+        samples.push(0);
+        return samples;
+    }
+
+    /** Which idle beats fit an art file (MascotIdle.beatsFor). Pure. */
+    function idleBeatsFor(name) {
+        const file = String(name || '').replace(/^.*\//, '');
+        if (file === 'uljhan_sad.webp') return IDLE_BEATS.uljhanSad;
+        if (/^uljhan_/.test(file)) return IDLE_BEATS.uljhan;
+        if (/^kriti_sieve_/.test(file)) return IDLE_BEATS.sieve;
+        if (file === 'kriti_reading.webp' || file === 'kriti_notebook.webp') return IDLE_BEATS.seated;
+        if (file === 'kriti_peek.webp') return IDLE_BEATS.perched;
+        if (/^duo_/.test(file)) return IDLE_BEATS.duo;
+        return IDLE_BEATS.kriti;
+    }
+
+    /** The wait before idle beat number [index] (0 = the first), jittered. Pure. */
+    function idleDelay(index, random = Math.random) {
+        if (index <= 0) return Math.round(IDLE.firstMin + (IDLE.firstMax - IDLE.firstMin) * random());
+        const base = IDLE.gaps[Math.min(index - 1, IDLE.gaps.length - 1)];
+        return Math.round(base * (1 - IDLE.jitter + 2 * IDLE.jitter * random()));
+    }
+
+    /** One idle beat for the art: a sparkle at most once per rhythm, otherwise any other beat. Pure. */
+    function pickIdleBeat(beats, sparkled, random = Math.random) {
+        const list = Array.isArray(beats) && beats.length ? beats : IDLE_BEATS.kriti;
+        if (!sparkled && list.includes('sparkle') && random() < IDLE.sparkleChance) return 'sparkle';
+        const others = list.filter(beat => beat !== 'sparkle');
+        return others[Math.min(others.length - 1, Math.floor(random() * others.length))];
+    }
+
+    /** Whether an interaction at [now] may wake idle life, given the last wake (throttled). Pure. */
+    function idleWakeDue(lastWakeAt, now) {
+        return !Number.isFinite(lastWakeAt) || now - lastWakeAt >= IDLE_WAKE_THROTTLE_MS;
+    }
+
+    /**
+     * What a wake does to one rhythm: the budget restarts from now; a rhythm that had gone still
+     * (no beat waiting) starts again from its first rest. A waiting beat keeps its time. Pure.
+     */
+    function idleWake(state, now) {
+        const next = { ...state, started: now };
+        if (!state.pending) Object.assign(next, { index: 0, sparkled: false, restart: true });
+        else next.restart = false;
+        return next;
+    }
+
+    /** The loading moment for a wait (LoadingPersonality, the general set), weighted. Pure. */
+    function pickLoadingMoment(random = Math.random) {
+        const total = LOADING_WEIGHTS.reduce((sum, [, weight]) => sum + weight, 0);
+        let roll = random() * total;
+        for (const [name, weight] of LOADING_WEIGHTS) {
+            roll -= weight;
+            if (roll < 0) return name;
+        }
+        return LOADING_WEIGHTS[0][0];
     }
 
     /** The picture a pose rests on: a single image, or a sheet's still. */
@@ -643,6 +807,7 @@
                 }
                 state.frameTimer = 0;
                 character.root.classList.add('is-resting');
+                idleLife(character.picture);
             };
             preload(ASSETS.sieve).then(() => {
                 if (state.character !== character) return;
@@ -813,7 +978,8 @@
             node.classList.add('ft-mascot-empty');
             node.insertBefore(character.root, node.firstChild);
             character.say(t(COPY.noMatches));
-            breathe(character.root);
+            enter(character.picture);
+            idleLife(character.picture);
             return;
         }
         if (details.searching || details.mode === 'whitelist') return;
@@ -821,7 +987,8 @@
         node.classList.add('ft-mascot-empty');
         node.insertBefore(character.root, node.firstChild);
         character.say(t(list === 'channels' ? COPY.emptyChannels : COPY.emptyKeywords));
-        breathe(character.root);
+        enter(character.picture);
+        idleLife(character.picture);
     }
 
     function redrawEmptyLists() {
@@ -897,23 +1064,54 @@
         }
         character.say(line, { event: true });
         announce(holder, line);
-        playSound('celebrate');
+        playSound('page');
     }
 
-    // ---- Idle life and moments -------------------------------------------------------------------
+    // ---- Motion: springs, sheets, idle life and moments (StudyMascotView, MascotIdle) -------------
 
-    /** A slow breath, three cycles then still (Lively only; never with reduced motion). */
-    function breathe(node) {
-        if (!node || companionMode !== 'lively' || prefersReducedMotion()) return;
-        node.classList.add('pk-breathing');
-        node.addEventListener('animationend', () => node.classList.remove('pk-breathing'), { once: true });
+    const ENTER_EASE = 'cubic-bezier(0.2, 0, 0, 1)';
+    const EXIT_EASE = 'cubic-bezier(0.3, 0, 1, 1)';
+    const MICRO_MS = 120;
+
+    function transformFor(channel, value) {
+        if (channel === 'y') return `translateY(${value.toFixed(2)}px)`;
+        if (channel === 'x') return `translateX(${value.toFixed(2)}px)`;
+        if (channel === 'scaleY') return `scaleY(${(1 + value).toFixed(4)})`;
+        if (channel === 'scale') return `scale(${(1 + value).toFixed(4)})`;
+        return `rotate(${value.toFixed(2)}deg)`;
     }
 
     /**
-     * Plays a sheet on an image once (swapped stills at SHEET_FRAME_MS), then rests on its last frame.
-     * With reduced motion the resting still shows at once. Returns a stop function.
+     * Runs one of the app's springs on a transform channel of [node] (y and x in px, scale and scaleY
+     * as an offset from 1, rotate in degrees), from [from] with a start [velocity] per second, to rest.
+     * Never with reduced motion. Returns the Animation, or null.
      */
-    function playSheet(picture, sheet, { onDone = null, frameMs = SHEET_FRAME_MS } = {}) {
+    function spring(node, channel, spec, velocity, { from = 0, origin = '50% 100%' } = {}) {
+        if (!node?.animate || prefersReducedMotion()) return null;
+        const scale = channel === 'scale' || channel === 'scaleY';
+        const samples = springSamples(spec, velocity, { from, settle: scale ? 0.0015 : 0.05 });
+        node.style.transformOrigin = origin;
+        try {
+            return node.animate(samples.map(value => ({ transform: transformFor(channel, value) })),
+                { duration: Math.round((samples.length - 1) * 1000 / 60), easing: 'linear' });
+        } catch (e) {
+            return null;
+        }
+    }
+
+    /** A mascot arrives (springMascot: scale 0.86 to 1, with alpha over MICRO). */
+    function enter(node) {
+        if (!node?.animate || prefersReducedMotion()) return;
+        try { node.animate([{ opacity: 0 }, { opacity: 1 }], { duration: MICRO_MS, easing: ENTER_EASE }); } catch (e) { }
+        spring(node, 'scale', SPRINGS.mascot, 0, { from: -0.14, origin: '50% 100%' });
+    }
+
+    /**
+     * Plays a sheet on an image once at the app's own frame timing, then rests on its last frame (or,
+     * for a leaving motion, slides out and fades). With reduced motion the resting still shows at once.
+     * Returns a stop function.
+     */
+    function playSheet(picture, sheet, { onDone = null } = {}) {
         const names = ASSETS[sheet];
         const order = sheetFrames(sheet, prefersReducedMotion());
         if (!picture || !order.length) return () => {};
@@ -922,20 +1120,174 @@
             onDone?.();
             return () => {};
         }
+        const frameMs = sheetFrameMs(sheet);
         let timer = 0;
         let stopped = false;
+        picture.dataset.ftPlaying = sheet;
+        const finish = () => {
+            delete picture.dataset.ftPlaying;
+            if (MOTIONS[sheet]?.leaves && picture.animate && !stopped) {
+                timer = root.setTimeout(() => {
+                    try {
+                        picture.animate([{ transform: 'none', opacity: 1 }, { transform: `translateX(${Math.round((picture.width || 80) * 0.6)}px)`, opacity: 0 }],
+                            { duration: 300, easing: EXIT_EASE, fill: 'forwards' });
+                    } catch (e) { }
+                }, frameMs);
+            }
+            onDone?.();
+        };
         preload([...names]).then(() => {
             let index = 0;
             const step = () => {
-                if (stopped || !picture.isConnected) return;
+                if (stopped || !picture.isConnected) { delete picture.dataset.ftPlaying; return; }
                 picture.src = assetUrl(names[order[index]]);
                 index += 1;
                 if (index < order.length) timer = root.setTimeout(step, frameMs);
-                else onDone?.();
+                else finish();
             };
             step();
         });
-        return () => { stopped = true; root.clearTimeout(timer); };
+        return () => { stopped = true; root.clearTimeout(timer); delete picture.dataset.ftPlaying; };
+    }
+
+    /** The sieve loop (Kriti's funnel: frames 1 to 5 at 180 ms) for [loops] cycles, then its last frame. */
+    function playSieve(picture, loops = 1, onDone = null) {
+        const frames = prefersReducedMotion() ? [SIEVE_FRAME_COUNT] : [].concat(...Array.from({ length: loops }, () => [1, 2, 3, 4, 5]));
+        let index = 0;
+        let timer = 0;
+        let stopped = false;
+        picture.dataset.ftPlaying = 'sieve';
+        const step = () => {
+            if (stopped || !picture.isConnected) { delete picture.dataset.ftPlaying; return; }
+            picture.src = assetUrl(ASSETS.sieve[frames[index] - 1]);
+            index += 1;
+            if (index < frames.length) timer = root.setTimeout(step, SIEVE_FRAME_MS);
+            else { delete picture.dataset.ftPlaying; onDone?.(); }
+        };
+        preload(ASSETS.sieve).then(step);
+        return () => { stopped = true; root.clearTimeout(timer); delete picture.dataset.ftPlaying; };
+    }
+
+    /** DoodleKit's sparkle beside a mascot's head: pops (springHeart) and fades. */
+    function sparkleBeside(picture) {
+        const host = picture?.parentElement;
+        if (!host || prefersReducedMotion()) return;
+        const mark = image(ASSETS.counterMark, 'pk-idle-sparkle', 18);
+        host.classList.add('pk-idle-host');
+        host.appendChild(mark);
+        spring(mark, 'scale', { stiffness: 800, damping: 0.45 }, 0, { from: -0.4, origin: '50% 50%' });
+        root.setTimeout(() => {
+            try {
+                const fade = mark.animate([{ opacity: 1 }, { opacity: 0 }], { duration: 160, easing: EXIT_EASE, fill: 'forwards' });
+                fade.onfinish = () => mark.remove();
+            } catch (e) { mark.remove(); }
+        }, 700);
+    }
+
+    function currentArt(picture) {
+        return String(picture?.getAttribute?.('src') || picture?.src || '').replace(/^.*\//, '');
+    }
+
+    /** One idle beat on the art she rests on (bob, hop, squash, wiggle, sparkle or one sieve cycle). */
+    function idleBeat(picture, beat) {
+        if (beat === 'bob') return spring(picture, 'y', SPRINGS.bob, IDLE.bobVelocity);
+        if (beat === 'hop') return spring(picture, 'y', SPRINGS.mascot, IDLE.hopVelocity);
+        if (beat === 'squash') return spring(picture, 'scaleY', SPRINGS.mascot, IDLE.squashVelocity);
+        if (beat === 'wiggle') return spring(picture, 'rotate', SPRINGS.wiggle, IDLE.wiggleVelocity);
+        if (beat === 'sparkle') return sparkleBeside(picture);
+        if (beat === 'sieve') {
+            const rest = picture.src;
+            playSieve(picture, 1, () => { if (picture.isConnected) picture.src = rest; });
+        }
+        return null;
+    }
+
+    const idleLives = new WeakMap();
+    const liveIdle = new Set();
+    let idleWakeInstalled = false;
+    let lastIdleWake = -Infinity;
+
+    /** One throttled, passive, document-level listener wakes every resting mascot on the page. */
+    function installIdleWake(doc) {
+        if (idleWakeInstalled || !doc?.addEventListener) return;
+        idleWakeInstalled = true;
+        const onInteraction = () => {
+            const now = Date.now();
+            if (!idleWakeDue(lastIdleWake, now)) return;
+            lastIdleWake = now;
+            for (const life of [...liveIdle]) {
+                if (!life.picture.isConnected) { liveIdle.delete(life); continue; }
+                life.wake(now);
+            }
+        };
+        for (const type of IDLE_WAKE_EVENTS) doc.addEventListener(type, onInteraction, { passive: true, capture: true });
+    }
+
+    /**
+     * Idle life for a mascot that rests on a page (StudyMascotView.idle): now and then one small beat
+     * that fits the pose, the first after 6 to 12 seconds, then wider gaps (12, 20, 30 s, jittered), and
+     * none after two minutes until a tap, a re-entry or a new pose. Lively only, never with reduced
+     * motion, only while she is on screen in a visible page and no sheet is playing. A tap hops her
+     * and starts the rhythm over.
+     */
+    function idleLife(picture) {
+        if (!picture || idleLives.has(picture)) return idleLives.get(picture) || null;
+        let timer = 0;
+        let index = 0;
+        let started = Date.now();
+        let sparkled = false;
+        const may = () => companionMode === 'lively' && !prefersReducedMotion();
+        const onScreen = () => {
+            if (!picture.isConnected || root.document?.visibilityState === 'hidden' || !picture.offsetParent) return false;
+            const box = picture.getBoundingClientRect?.();
+            return !box || (box.bottom > 0 && box.top < (root.innerHeight || 1e6) && box.right > 0 && box.left < (root.innerWidth || 1e6));
+        };
+        let pending = false;
+        const schedule = () => {
+            root.clearTimeout(timer);
+            pending = false;
+            if (!picture.isConnected || !may()) return;
+            const delay = idleDelay(index);
+            if (Date.now() + delay - started > IDLE.budget) return;
+            pending = true;
+            timer = root.setTimeout(tick, delay);
+        };
+        const tick = () => {
+            pending = false;
+            if (!picture.isConnected) return;
+            if (onScreen() && !picture.dataset.ftPlaying) {
+                const beat = pickIdleBeat(idleBeatsFor(currentArt(picture)), sparkled);
+                if (beat === 'sparkle') sparkled = true;
+                idleBeat(picture, beat);
+            }
+            index += 1;
+            schedule();
+        };
+        const restart = () => {
+            index = 0;
+            sparkled = false;
+            started = Date.now();
+            schedule();
+        };
+        const tap = () => {
+            if (!may() || picture.dataset.ftPlaying) return;
+            spring(picture, 'y', SPRINGS.bob, IDLE.tapVelocity);
+            playSound('pop');
+            restart();
+        };
+        (picture.closest?.('button') || picture).addEventListener('click', tap);
+        const wake = now => {
+            const next = idleWake({ pending, index, sparkled, started }, now);
+            started = next.started;
+            if (next.restart) { index = next.index; sparkled = next.sparkled; schedule(); }
+        };
+        const life = { restart, wake, picture, stop: () => { root.clearTimeout(timer); pending = false; } };
+        idleLives.set(picture, life);
+        liveIdle.add(life);
+        installIdleWake(root.document);
+        onModeChange(() => { if (picture.isConnected) restart(); });
+        restart();
+        return life;
     }
 
     const recentLoadingLines = [];
@@ -947,32 +1299,72 @@
         return t(LOADING_LINES[index]);
     }
 
+    /** The still a loading moment shows (and rests on between plays). */
+    function loadingStill(name) {
+        if (name === 'sieve') return ASSETS.kritiFunnel;
+        if (name === 'duoShoo') return ASSETS.duoShoo[4];
+        if (name === 'kritiJump') return ASSETS.kritiJump[0];
+        return stillImage(name);
+    }
+
+    /**
+     * Runs a loading moment until the wait ends (the holder leaves the page) or for 30 seconds at
+     * most: a once-through sheet plays again after a 1.2 s rest, the sieve loops, and a still pose
+     * floats with a small bob.
+     */
+    function runLoading(holder, art, name) {
+        const startedAt = Date.now();
+        const alive = () => holder.isConnected && Date.now() - startedAt < LOOP_CAP_MS;
+        if (prefersReducedMotion()) return;
+        const again = fn => root.setTimeout(() => { if (alive()) fn(); }, REPLAY_REST_MS);
+        if (name === 'sieve') {
+            const loop = () => playSieve(art, 1, () => { if (alive()) loop(); });
+            loop();
+        } else if (MOTIONS[name]) {
+            const play = () => playSheet(art, name, { onDone: () => again(play) });
+            play();
+        } else {
+            const bob = () => { if (!alive()) return; spring(art, 'y', SPRINGS.bob, IDLE.bobVelocity); root.setTimeout(bob, 1600); };
+            root.setTimeout(bob, 400);
+        }
+    }
+
     /**
      * One pose and one line for a state: loading, empty, noMatches, error, done, hello, reading, break,
-     * offline, slow or restored. Loading is Uljhan fetching with a line that varies; Quiet shows the
-     * pose without the loading line. Returns null with the Companion set to Off, so the caller's words
-     * stand alone.
+     * offline, slow or restored. Loading picks one of the app's loading moments (the duo sieve most
+     * often), shows only after 600 ms, and carries a line in Lively. Returns null with the Companion
+     * set to Off, so the caller's words stand alone.
      */
     function moment(kind, { line = '', height = 96 } = {}) {
         const spec = MOMENTS[kind];
         if (!spec || !root.document || !showsCharacters(companionMode)) return null;
         const holder = el('div', `pk-moment pk-moment--${kind}`);
         holder.dataset.ftMoment = kind;
-        const art = image(stillImage(spec.image), 'pk-moment__art', height);
+        const loadingName = kind === 'loading' ? pickLoadingMoment() : '';
+        const art = image(kind === 'loading' ? loadingStill(loadingName) : stillImage(spec.image), 'pk-moment__art', height);
         art.style.setProperty('--pk-moment-size', `${height}px`);
         holder.appendChild(art);
         let text = line || (spec.copy && kind !== 'loading' ? t(COPY[spec.copy]) : '');
         if (!text && kind === 'loading' && companionMode === 'lively') text = nextLoadingLine();
         if (text) holder.appendChild(el('p', 'pk-moment__line', kind === 'loading' ? text : clampLine(text)));
-        const sheet = typeof ASSETS[spec.image] === 'string' ? '' : spec.image;
-        if (!prefersReducedMotion()) {
-            holder.classList.add('is-pop');
-            art.addEventListener('animationend', () => {
-                holder.classList.remove('is-pop');
-                if (sheet) playSheet(art, sheet, { onDone: () => { if (companionMode === 'lively') holder.classList.add('is-idle'); } });
-                else if (companionMode === 'lively') holder.classList.add('is-idle');
-            }, { once: true });
+        if (kind === 'loading') {
+            holder.dataset.ftLoading = loadingName;
+            holder.classList.add('is-waiting');
+            root.setTimeout(() => {
+                if (!holder.isConnected) return;
+                holder.classList.remove('is-waiting');
+                enter(art);
+                runLoading(holder, art, loadingName);
+            }, LOADING_REVEAL_MS);
+            return holder;
         }
+        const sheet = typeof ASSETS[spec.image] === 'string' ? '' : spec.image;
+        root.requestAnimationFrame?.(() => {
+            if (!holder.isConnected) return;
+            enter(art);
+            if (sheet && MOTIONS[sheet]) root.setTimeout(() => playSheet(art, sheet, { onDone: () => idleLife(art) }), 360);
+            else idleLife(art);
+        });
         return holder;
     }
 
@@ -982,23 +1374,20 @@
         root.addEventListener?.('filtertube-ui-locale-changed', listener);
     }
 
-    const HERO_HOPS = 3;
-
     /**
-     * Kriti sieving Uljhan on the dashboard hero, standing on the profile card's top edge: the sheet
-     * once on Lively, then a few small hops and rest. Her hello shows on hover, focus or click only.
+     * Kriti sieving Uljhan on the dashboard, standing on the profile card's top edge: the duo sieve
+     * once on Lively (420 ms a frame), then the app's idle rhythm. Quiet keeps the last frame still.
+     * Her hello shows on hover, focus or click only.
      */
     function mountHero(doc) {
         const card = doc.querySelector('.ft-dash-hero .ft-dash-status');
         if (!card) return;
         let holder = null;
         let stop = () => {};
-        let hopTimer = 0;
         let spoken = null;
         onLocaleChange(() => { if (holder?.isConnected) spoken?.retext(t(DUO_COPY.hello)); });
         const draw = () => {
             stop();
-            root.clearTimeout(hopTimer);
             holder?.remove();
             holder = null;
             spoken = null;
@@ -1011,18 +1400,8 @@
             card.appendChild(holder);
             character.say(t(DUO_COPY.hello));
             if (companionMode !== 'lively' || prefersReducedMotion()) return;
-            let hops = 0;
-            const hop = () => {
-                if (!holder?.isConnected || hops >= HERO_HOPS) return;
-                if (doc.visibilityState !== 'hidden' && holder.offsetParent) {
-                    hops += 1;
-                    character.figure.classList.remove('is-hopping');
-                    void character.figure.offsetWidth;
-                    character.figure.classList.add('is-hopping');
-                }
-                hopTimer = root.setTimeout(hop, 7000 + Math.floor(Math.random() * 2000));
-            };
-            stop = playSheet(character.picture, 'duoSieve', { onDone: () => { hopTimer = root.setTimeout(hop, 7000); } });
+            enter(character.picture);
+            stop = playSheet(character.picture, 'duoSieve', { onDone: () => idleLife(character.picture) });
         };
         draw();
         onModeChange(draw);
@@ -1066,7 +1445,7 @@
             card.append(art, body);
             if (anchor) shell.insertBefore(card, anchor);
             else shell.appendChild(card);
-            breathe(art);
+            for (const picture of art.querySelectorAll('img')) idleLife(picture);
         };
         draw();
         onModeChange(draw);
@@ -1124,7 +1503,9 @@
                 promo.insertBefore(entry.block, promo.firstChild);
             }
             fill();
-            if (blocks[0]) breathe(blocks[0].art);
+            const heroArt = blocks[0]?.art.querySelector('img');
+            if (heroArt && variant.id === 'evening' && companionMode === 'lively') playSheet(heroArt, 'kritiEvening', { onDone: () => idleLife(heroArt) });
+            else if (heroArt) idleLife(heroArt);
         };
         start();
         onModeChange(() => {
@@ -1179,7 +1560,8 @@
                 const art = image(stillImage(pose), 'pk-study-kriti', 76);
                 art.dataset.pose = pose;
                 node.appendChild(art);
-                if (pose === 'kritiMug' && companionMode === 'lively') playSheet(art, 'kritiMug');
+                if (pose === 'kritiMug' && companionMode === 'lively') playSheet(art, 'kritiMug', { onDone: () => idleLife(art) });
+                else idleLife(art);
             }
         };
         scan();
@@ -1194,19 +1576,35 @@
         onModeChange(scan);
     }
 
-    /** Kriti's thumbs up on a success toast, Uljhan's shrug on an error toast. The words stay the message. */
+    /**
+     * The app's paper toast (MascotPaperToast): a success shows Kriti's thumbs up in Lively (she
+     * arrives with the mascot spring, then the stamp spring), and a crayon check drawn in the leading
+     * slot otherwise; an error shows Uljhan's shrug. With the Companion Off a success still gets the
+     * check, which is a mark, not a character. The words stay the message.
+     */
     function watchToasts(doc) {
         if (typeof root.MutationObserver !== 'function' || !doc.body) return;
         new root.MutationObserver(records => {
-            if (!showsCharacters(companionMode)) return;
             for (const record of records) {
                 for (const added of record.addedNodes) {
-                    if (added.nodeType !== 1 || !added.classList?.contains('ft-toast') || added.querySelector('.pk-toast-art')) continue;
-                    const name = added.classList.contains('ft-toast-success') ? ASSETS.kritiThumbsUp
-                        : (added.classList.contains('ft-toast-error') ? ASSETS.uljhanShrug : '');
-                    if (!name) continue;
-                    added.classList.add('has-mascot');
-                    added.insertBefore(image(name, 'pk-toast-art', 36), added.firstChild);
+                    if (added.nodeType !== 1 || !added.classList?.contains('ft-toast') || added.querySelector('.pk-toast-art, .pk-toast-check')) continue;
+                    const success = added.classList.contains('ft-toast-success');
+                    const error = added.classList.contains('ft-toast-error');
+                    if (success && companionMode === 'lively') {
+                        const art = image(ASSETS.kritiThumbsUp, 'pk-toast-art', 36);
+                        added.classList.add('has-mascot');
+                        added.insertBefore(art, added.firstChild);
+                        enter(art);
+                        root.setTimeout(() => spring(art, 'scale', SPRINGS.stamp, 0, { from: -0.12 }), 220);
+                    } else if (success) {
+                        added.classList.add('has-mascot');
+                        added.insertBefore(root.FilterTubeDoodles?.check?.({ className: 'pk-toast-check', delay: 220 }) || el('span', 'pk-toast-check'), added.firstChild);
+                    } else if (error && showsCharacters(companionMode)) {
+                        added.classList.add('has-mascot');
+                        const art = image(ASSETS.uljhanShrug, 'pk-toast-art', 36);
+                        added.insertBefore(art, added.firstChild);
+                        enter(art);
+                    }
                 }
             }
         }).observe(doc.body, { childList: true });
@@ -1247,7 +1645,15 @@
             body.textContent = state === 'offline' ? t(NETWORK_COPY.offlineBody) : '';
             body.hidden = !body.textContent;
             art.replaceChildren();
-            if (showsCharacters(companionMode)) art.appendChild(image(ASSETS[NETWORK_ART[state]], 'pk-net__image', 40));
+            if (showsCharacters(companionMode)) {
+                // Back online: Uljhan waves and tiptoes off (ULJHAN_LEAVES); a still with reduced motion.
+                const leaving = state === 'restored' && !prefersReducedMotion();
+                const picture = image(leaving ? ASSETS.uljhanFront : ASSETS[NETWORK_ART[state]], 'pk-net__image', 40);
+                art.appendChild(picture);
+                enter(picture);
+                if (leaving) root.setTimeout(() => playSheet(picture, 'uljhanLeaves'), 240);
+                else if (state === 'offline') idleLife(picture);
+            }
             art.hidden = !showsCharacters(companionMode);
             strip.hidden = false;
             if (state === 'restored') {
@@ -1291,7 +1697,9 @@
                     node.replaceChildren(label);
                 }
                 node.classList.add('has-mascot');
-                node.insertBefore(image(ASSETS.kritiPeek, 'pk-popup-peek', 48), node.firstChild);
+                const peek = image(ASSETS.kritiPeek, 'pk-popup-peek', 48);
+                node.insertBefore(peek, node.firstChild);
+                idleLife(peek);
             }
         };
         scan();
@@ -1323,9 +1731,26 @@
         return normalized === 'playful' || GENTLE_SOUNDS.includes(name);
     }
 
+    const soundLog = [];
+
+    /** The app's sound gates (UiSound): 400 ms between any two, 1.5 s for the same cue, six a minute. Pure. */
+    function soundGateOpen(log, name, now) {
+        const recent = (Array.isArray(log) ? log : []).filter(entry => now - entry.at < SOUND_RATE_WINDOW_MS);
+        if (recent.length >= SOUND_RATE_CAP) return false;
+        const last = recent[recent.length - 1];
+        if (last && now - last.at < SOUND_GAP_MS) return false;
+        return !recent.some(entry => entry.name === name && now - entry.at < SOUND_SAME_CUE_COOLDOWN_MS);
+    }
+
     function playSound(name) {
         if (!soundAllowed(soundMode, name)) return false;
         if (root.document?.visibilityState === 'hidden' || typeof root.Audio !== 'function') return false;
+        // Never over a playing video on the page (the app's "no sound while media plays").
+        if ([...(root.document?.querySelectorAll?.('video') || [])].some(video => !video.paused && !video.muted)) return false;
+        const now = Date.now();
+        if (!soundGateOpen(soundLog, name, now)) return false;
+        soundLog.push({ name, at: now });
+        while (soundLog.length > SOUND_RATE_CAP) soundLog.shift();
         try {
             let audio = soundCache.get(name);
             if (!audio) {
@@ -1357,7 +1782,8 @@
         select.addEventListener('change', async () => {
             soundMode = normalizeSoundMode(select.value);
             await storageSet({ [SOUNDS_KEY]: soundMode });
-            playSound('select') || playSound('success');
+            // The preview the app plays: the stamp on Gentle, the soft pop on Playful.
+            playSound(soundMode === 'gentle' ? 'stamp' : 'pop');
         });
     }
 
@@ -1392,9 +1818,13 @@
         COMPANION_KEY, MILESTONES_KEY, WELCOME_KEY, MODES, DEFAULT_MODE, MILESTONES,
         SIEVE_FRAME_MS, SIEVE_LOOPS, BUBBLE_MAX_CHARS, COPY, ASSETS,
         SOUNDS_KEY, SOUND_MODES, SOUND_FILES, MOMENTS,
-        SHEET_FRAME_MS, SHEET_STILL, LOADING_LINES, NETWORK_COPY, DUO_COPY, SESSION_SAVED,
+        SHEET_FRAME_MS, SHEET_STILL, MOTIONS, SPRINGS, IDLE, IDLE_BEATS, LOADING_WEIGHTS, LOADING_REVEAL_MS, LOOP_CAP_MS,
+        REPLAY_REST_MS, GENTLE_SOUNDS, SOUND_GAP_MS, SOUND_SAME_CUE_COOLDOWN_MS, SOUND_RATE_CAP,
+        LOADING_LINES, NETWORK_COPY, DUO_COPY, SESSION_SAVED,
         SUPPORT_HISTORY_KEY, SUPPORT_REMEMBERED, SUPPORT_VARIANTS, SUPPORT_COPY,
-        sheetFrames, stillImage, pickLoadingLine, networkState, pickSupportVariant, rememberSupportVariant,
+        sheetFrames, sheetFrameMs, springSamples, idleBeatsFor, idleDelay, pickIdleBeat, pickLoadingMoment, soundGateOpen,
+        idleLife, spring, playSheet, idleWakeDue, idleWake, IDLE_WAKE_EVENTS, IDLE_WAKE_THROTTLE_MS,
+        stillImage, pickLoadingLine, networkState, pickSupportVariant, rememberSupportVariant,
         normalizeMode, linePresentation, showsCharacters, evaluateMilestone, totalHidden, sieveFrames,
         allowListSwitchedOn, clampLine, loadMode, setMode,
         normalizeSoundMode, soundAllowed, playSound, loadSoundMode, moment,

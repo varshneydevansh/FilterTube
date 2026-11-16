@@ -125,10 +125,11 @@
     // stands by the study card. They follow the Companion setting (Lively plays the sheet once, Quiet
     // shows the still, Off shows no character) and never move with reduced motion.
     const MASCOT_DIR = 'assets/images/mascots/';
-    // Five frames: Uljhan sneaks up, Kriti notices, waves him off, and he hops away (the resting frame).
-    const SHOO_FRAMES = [1, 2, 3, 4, 5].map(index => `duo_shoo_0${index}.webp`);
-    const SHOO_STILL = 'duo_shoo_05.webp';
-    const SHOO_FRAME_MS = 180;
+    // The app's DUO_SHOO (420 ms a frame): Uljhan sneaks up, Kriti waves him off, he hops away, and she
+    // reads on (the resting frame).
+    const SHOO_FRAMES = [1, 2, 3, 4, 5, 6].map(index => `duo_shoo_0${index}.webp`);
+    const SHOO_STILL = 'duo_shoo_06.webp';
+    const SHOO_FRAME_MS = 420;
     let companionMode = 'quiet';
     let companionLoading = null;
 
@@ -184,8 +185,88 @@
             if (url) picture.src = url;
             index += 1;
             if (index < SHOO_FRAMES.length) root.setTimeout(step, SHOO_FRAME_MS);
+            else admissionIdle(picture);
         };
         step();
+    }
+
+    // Idle life on the in-page cards (the app's MascotIdle, as js/mascots.js does on the extension's
+    // pages): a small bob or squash now and then, the first after 6 to 12 s, then 12, 20, 30 s, none
+    // after two minutes. Any interaction on the page wakes it with a fresh budget (one throttled,
+    // passive listener; no sound). Lively only, never with reduced motion.
+    const ADMISSION_IDLE = { firstMin: 6000, firstMax: 12000, gaps: [12000, 20000, 30000], jitter: 0.15, budget: 120000, wakeMs: 1000 };
+    const ADMISSION_WAKE_EVENTS = ['pointerdown', 'keydown', 'wheel', 'scroll', 'touchstart'];
+    const admissionIdleLives = new Set();
+    let admissionWakeInstalled = false;
+    let admissionLastWake = -Infinity;
+
+    function admissionSpring(stiffness, damping, velocity) {
+        const omega = Math.sqrt(stiffness);
+        const decay = damping * omega;
+        const damped = omega * Math.sqrt(1 - damping * damping);
+        const samples = [0];
+        for (let ms = 1000 / 60; ms <= 900; ms += 1000 / 60) samples.push((velocity / damped) * Math.exp(-decay * ms / 1000) * Math.sin(damped * ms / 1000));
+        samples.push(0);
+        return samples;
+    }
+
+    function admissionIdle(picture) {
+        if (!picture || picture.__filtertubeIdle || typeof root.setTimeout !== 'function') return;
+        let timer = 0;
+        let index = 0;
+        let started = Date.now();
+        let pending = false;
+        const may = () => companionMode === 'lively' && !admissionOverlayPrefersReducedMotion();
+        const delay = () => index === 0
+            ? ADMISSION_IDLE.firstMin + (ADMISSION_IDLE.firstMax - ADMISSION_IDLE.firstMin) * Math.random()
+            : ADMISSION_IDLE.gaps[Math.min(index - 1, 2)] * (1 - ADMISSION_IDLE.jitter + 2 * ADMISSION_IDLE.jitter * Math.random());
+        const schedule = () => {
+            root.clearTimeout(timer);
+            pending = false;
+            if (picture.isConnected === false || !may()) return;
+            const wait = delay();
+            if (Date.now() + wait - started > ADMISSION_IDLE.budget) return;
+            pending = true;
+            timer = root.setTimeout(beat, wait);
+        };
+        const beat = () => {
+            pending = false;
+            if (picture.isConnected === false) return;
+            if (document.visibilityState !== 'hidden' && typeof picture.animate === 'function') {
+                const squash = Math.random() < 0.4;
+                const samples = squash ? admissionSpring(700, 0.55, -1) : admissionSpring(800, 0.45, -125);
+                try {
+                    picture.style.transformOrigin = '50% 100%';
+                    picture.animate(samples.map(v => ({ transform: squash ? `scaleY(${(1 + v).toFixed(4)})` : `translateY(${v.toFixed(2)}px)` })),
+                        { duration: Math.round((samples.length - 1) * 1000 / 60), easing: 'linear' });
+                } catch (e) {}
+            }
+            index += 1;
+            schedule();
+        };
+        const life = {
+            picture,
+            wake(now) {
+                started = now;
+                if (!pending) { index = 0; schedule(); }
+            }
+        };
+        picture.__filtertubeIdle = life;
+        admissionIdleLives.add(life);
+        if (!admissionWakeInstalled && typeof document.addEventListener === 'function') {
+            admissionWakeInstalled = true;
+            const onInteraction = () => {
+                const now = Date.now();
+                if (now - admissionLastWake < ADMISSION_IDLE.wakeMs) return;
+                admissionLastWake = now;
+                for (const entry of [...admissionIdleLives]) {
+                    if (entry.picture.isConnected === false) { admissionIdleLives.delete(entry); continue; }
+                    entry.wake(now);
+                }
+            };
+            for (const type of ADMISSION_WAKE_EVENTS) document.addEventListener(type, onInteraction, { passive: true, capture: true });
+        }
+        schedule();
     }
 
     function syncAdmissionMascot(overlay, slot, holder, name, height) {
@@ -205,6 +286,7 @@
             if (!picture) return null;
             holder.appendChild(picture);
             overlay[slot] = picture;
+            if (!SHOO_FRAMES.includes(name)) admissionIdle(picture);
         }
         return picture;
     }
@@ -229,7 +311,7 @@
             display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 'clamp(16px, 4vw, 56px)', overflow: 'hidden',
             pointerEvents: 'auto', userSelect: 'text', whiteSpace: 'normal',
             background: darkTheme ? '#0f141b' : '#f6f2eb', color: darkTheme ? '#edf2f7' : '#1b1a18',
-            font: '400 15px/1.55 "Plus Jakarta Sans", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif'
+            font: '400 15px/1.55 system-ui, Roboto, "Segoe UI", -apple-system, sans-serif'
         });
         removeAdmissionOverlayBackground(overlay);
         if (typeof overlay?.appendChild !== 'function' || typeof document.createElement !== 'function') {
@@ -253,10 +335,10 @@
             const reason = document.createElement('p');
             const owner = document.createElement('p');
             const actions = document.createElement('div');
-            admissionOverlayStyle(status, { margin: '0', color: darkTheme ? '#7fb89a' : '#1F6F6A', font: '700 12px/1.3 "Plus Jakarta Sans", sans-serif', letterSpacing: '.08em', textTransform: 'uppercase' });
-            admissionOverlayStyle(title, { margin: '0', font: '700 clamp(22px, 3.6vw, 32px)/1.15 "Outfit", "Plus Jakarta Sans", sans-serif', color: darkTheme ? '#edf2f7' : '#1b1a18' });
-            admissionOverlayStyle(reason, { margin: '0', font: '500 15px/1.55 "Plus Jakarta Sans", sans-serif' });
-            admissionOverlayStyle(owner, { margin: '0', opacity: '.75', font: '500 13px/1.4 "Plus Jakarta Sans", sans-serif', overflowWrap: 'anywhere' });
+            admissionOverlayStyle(status, { margin: '0', color: darkTheme ? '#7fb89a' : '#1F6F6A', font: '700 12px/1.3 system-ui, Roboto, "Segoe UI", sans-serif', letterSpacing: '0', textTransform: 'none' });
+            admissionOverlayStyle(title, { margin: '0', font: '400 clamp(22px, 3.6vw, 32px)/1.2 "FilterTube Delius", "Outfit", system-ui, sans-serif', color: darkTheme ? '#edf2f7' : '#1b1a18' });
+            admissionOverlayStyle(reason, { margin: '0', font: '500 15px/1.55 system-ui, Roboto, "Segoe UI", sans-serif' });
+            admissionOverlayStyle(owner, { margin: '0', opacity: '.75', font: '500 13px/1.4 system-ui, Roboto, "Segoe UI", sans-serif', overflowWrap: 'anywhere' });
             admissionOverlayStyle(actions, { display: 'flex', gap: '10px', flexWrap: 'wrap', marginTop: '6px' });
             card.append(status, title, reason, owner, actions);
             overlay.appendChild(card);
@@ -286,7 +368,7 @@
             back.textContent = localizedAdmissionText('admission.studyBack', 'Back to study');
             admissionOverlayStyle(back, {
                 padding: '10px 20px', borderRadius: '999px', border: '0', cursor: 'pointer',
-                background: '#1F6F6A', color: '#ffffff', font: '700 14px/1 "Plus Jakarta Sans", sans-serif'
+                background: '#1F6F6A', color: '#ffffff', font: '700 14px/1 system-ui, Roboto, "Segoe UI", sans-serif'
             });
             back.addEventListener('click', event => { event.preventDefault(); event.stopPropagation(); backToStudy(); });
             parts.actions.appendChild(back);
@@ -315,7 +397,24 @@
         } catch (e) { return ''; }
     }
 
+    // The app's hand for titles: the extension's own Delius (SIL OFL), loaded once into this page
+    // from the extension under its own family name, so the site's fonts are never touched.
+    let admissionHandLoaded = false;
+    function loadAdmissionHand() {
+        if (admissionHandLoaded) return;
+        admissionHandLoaded = true;
+        try {
+            const runtimeAPI = typeof browser !== 'undefined' && browser?.runtime ? browser : (typeof chrome !== 'undefined' ? chrome : null);
+            const url = runtimeAPI?.runtime?.getURL?.('assets/fonts/delius.ttf');
+            if (!url || typeof FontFace !== 'function' || !document.fonts) return;
+            const face = new FontFace('FilterTube Delius', `url("${url}")`, { display: 'swap' });
+            document.fonts.add(face);
+            face.load().catch(() => {});
+        } catch (e) {}
+    }
+
     function admissionOverlayStyle(element, styles) {
+        if (styles && typeof styles.font === 'string' && styles.font.includes('FilterTube Delius')) loadAdmissionHand();
         try { if (element?.style) Object.assign(element.style, styles); } catch (e) {}
     }
 
@@ -374,7 +473,7 @@
             pointerEvents: 'auto', userSelect: 'text', whiteSpace: 'normal',
             background: blocked ? blockedBackground : pendingBackground,
             color: blocked ? blockedText : pendingText,
-            font: '400 15px/1.55 "Plus Jakarta Sans", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif'
+            font: '400 15px/1.55 system-ui, Roboto, "Segoe UI", -apple-system, sans-serif'
         });
 
         if (!canCompose) {
@@ -416,7 +515,7 @@
             brandMark.src = runtimeAPI?.runtime?.getURL?.('icons/icon-48.png') || '';
             brandMark.alt = '';
             brandName = document.createElement('span');
-            admissionOverlayStyle(brandName, { color: blocked || darkTheme ? '#f3f6fa' : '#1b1a18', font: '750 16px/1 "Outfit", sans-serif', letterSpacing: '.01em' });
+            admissionOverlayStyle(brandName, { color: blocked || darkTheme ? '#f3f6fa' : '#1b1a18', font: '400 18px/1 "FilterTube Delius", "Outfit", sans-serif', letterSpacing: '0' });
             brandName.textContent = 'FilterTube';
             brand.appendChild(brandMark);
             brand.appendChild(brandName);
@@ -425,14 +524,14 @@
             status.setAttribute('data-filtertube-admission-status', 'true');
             admissionOverlayStyle(status, {
                 margin: '12px 0 0', color: blocked ? '#cfe2d2' : (darkTheme ? '#9aa6b4' : '#827b73'),
-                font: '700 12px/1.35 "Plus Jakarta Sans", sans-serif', letterSpacing: '.08em', textTransform: 'uppercase'
+                font: '700 12px/1.35 system-ui, Roboto, "Segoe UI", sans-serif', letterSpacing: '0', textTransform: 'none'
             });
 
             title = document.createElement('h1');
             title.setAttribute('data-filtertube-admission-title', 'true');
             admissionOverlayStyle(title, {
                 margin: '0', color: blocked ? '#fffaf4' : pendingText,
-                font: '700 clamp(24px, 4vw, 38px)/1.12 "Outfit", "Plus Jakarta Sans", sans-serif', letterSpacing: '-.02em'
+                font: '400 clamp(24px, 4vw, 36px)/1.2 "FilterTube Delius", "Outfit", system-ui, sans-serif', letterSpacing: '0'
             });
 
             reason = document.createElement('p');
@@ -443,7 +542,7 @@
                 borderRight: rtl ? `3px solid ${accentColor}` : 'none',
                 borderRadius: rtl ? '14px 4px 4px 14px' : '4px 14px 14px 4px',
                 background: blocked ? 'rgba(255,255,255,.1)' : (darkTheme ? 'rgba(255,255,255,.06)' : 'rgba(171,68,56,.07)'),
-                color: blocked ? '#fffaf4' : pendingText, font: '650 14px/1.55 "Plus Jakarta Sans", sans-serif',
+                color: blocked ? '#fffaf4' : pendingText, font: '650 14px/1.55 system-ui, Roboto, "Segoe UI", sans-serif',
                 whiteSpace: 'pre-line', overflowWrap: 'anywhere'
             });
 
@@ -555,6 +654,7 @@
         loadLocale: () => loadAdmissionLocale(),
         // For study_overlay.js: the Companion setting (lively, quiet or off) the poses follow.
         loadCompanion: () => loadAdmissionCompanion(),
+        idle: picture => admissionIdle(picture),
         getCompanion: () => companionMode,
         getDirection: () => localeDirection
     };
