@@ -16263,6 +16263,11 @@ document.addEventListener('DOMContentLoaded', async () => {
         return isActiveChildNanahProfile();
     }
 
+    /**
+     * Inside a child, rules from another device merge only after the managing parent's own PIN, every time
+     * (Android 3c204e3fe requestChildNanahParentAuthority): a recent unlock for another action never
+     * carries over.
+     */
     async function ensureChildNanahParentAuthorityUnlocked() {
         if (!isNanahChildReceiveOnly()) return true;
         const io = window.FilterTubeIO || {};
@@ -16270,7 +16275,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         if (!profilesV4) return true;
         const childId = normalizeString(profilesV4.activeProfileId) || activeProfileId || 'default';
         const parentId = getParentAccountId(profilesV4, childId) || 'default';
-        const ok = await ensureProfileUnlocked(profilesV4, parentId);
+        const ok = await ensureProfileUnlocked(profilesV4, parentId, { everyTime: true });
         if (!ok) {
             UIComponents.showToast(tabViewUiText('dashboard.sync.toast.parentApprovalRequiredForNewSource', 'Parent approval is required before this protected profile can trust or apply a new sync source.'), 'error');
             return false;
@@ -27778,7 +27783,8 @@ document.addEventListener('DOMContentLoaded', async () => {
     async function ensureProfileUnlocked(profilesV4, profileId, options = {}) {
         await syncSessionUnlockStateFromBackground();
         if (!isProfileLocked(profilesV4, profileId)) return true;
-        if (isProfileUnlockSessionValid.check(profileId, options)) return true;
+        // everyTime: the PIN is asked whatever unlock is still fresh (a child merging Nearby rules).
+        if (options.everyTime !== true && isProfileUnlockSessionValid.check(profileId, options)) return true;
 
         const verifier = profileId === 'default'
             ? extractMasterPinVerifier(profilesV4)

@@ -87,3 +87,20 @@ test('the bar\'s sync words are in every catalog', () => {
         assert.match(catalog['askParent.openSpace'], /\{name\}/, name);
     }
 });
+
+// Ports Android 3c204e3fe (SettingsSectionActivity.kt requestChildNanahParentAuthority): inside a child,
+// rules from another device merge only after the managing parent's PIN, every time, and a child never
+// sets up or turns off pickup.
+test('a Kids profile can\'t merge Nearby rules or change pickup alone', () => {
+    const page = fs.readFileSync('js/tab-view.js', 'utf8');
+    const gate = page.slice(page.indexOf('async function ensureChildNanahParentAuthorityUnlocked('), page.indexOf('function getNanahScopeDescription('));
+    assert.match(gate, /ensureProfileUnlocked\(profilesV4, parentId, \{ everyTime: true \}\)/);
+    const unlock = page.slice(page.indexOf('async function ensureProfileUnlocked('), page.indexOf('async function ensureAdminUnlocked('));
+    assert.match(unlock, /options\.everyTime !== true && isProfileUnlockSessionValid\.check/, 'a fresh unlock never carries over');
+    const decision = page.slice(page.indexOf('if (isNanahChildReceiveOnly() && !isManagedReceiver) {'), page.indexOf('if (isNanahChildReceiveOnly() && !isManagedReceiver) {') + 300);
+    assert.match(decision, /ensureChildNanahParentAuthorityUnlocked\(\)/);
+    for (const name of ['async function configureNanahManagedMailboxServer(', 'async function configureNanahManagedLocalNetwork']) {
+        const body = page.slice(page.indexOf(name), page.indexOf(name) + 1200);
+        assert.match(body, /=== 'child'\)/, `${name} refuses a child`);
+    }
+});
