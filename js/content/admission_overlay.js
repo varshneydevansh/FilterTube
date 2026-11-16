@@ -125,10 +125,11 @@
     // stands by the study card. They follow the Companion setting (Lively plays the sheet once, Quiet
     // shows the still, Off shows no character) and never move with reduced motion.
     const MASCOT_DIR = 'assets/images/mascots/';
-    // Five frames: Uljhan sneaks up, Kriti notices, waves him off, and he hops away (the resting frame).
-    const SHOO_FRAMES = [1, 2, 3, 4, 5].map(index => `duo_shoo_0${index}.webp`);
-    const SHOO_STILL = 'duo_shoo_05.webp';
-    const SHOO_FRAME_MS = 180;
+    // The app's DUO_SHOO (420 ms a frame): Uljhan sneaks up, Kriti waves him off, he hops away, and she
+    // reads on (the resting frame).
+    const SHOO_FRAMES = [1, 2, 3, 4, 5, 6].map(index => `duo_shoo_0${index}.webp`);
+    const SHOO_STILL = 'duo_shoo_06.webp';
+    const SHOO_FRAME_MS = 420;
     let companionMode = 'quiet';
     let companionLoading = null;
 
