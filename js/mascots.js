@@ -1795,11 +1795,115 @@
         onModeChange(mode => { if (select.value !== mode) select.value = mode; });
     }
 
+
+    // ---- First filter and the hub peek (the app's FirstFilterMoment) -----------------------------
+    // Once per profile, the first rule gets Kriti and Uljhan sieving above the list with "That one's
+    // sieved out now." (the allowed-only form when it went on the allowed list): the bubble at 300 ms,
+    // the giggle chime on frame 5, the last frame held 600 ms; a still for 2 s on Quiet or with reduced
+    // motion. With no rules at all, Kriti peeks over the hub's tiles at most once a day per profile and
+    // offers "Add a first filter".
+    const MOMENTS_KEY = 'ftMotionMomentsV1';
+    const FIRST_COPY = Object.freeze({
+        firstFilter: ['filters.firstFilter.bubble', 'That one\'s sieved out now.'],
+        allowedOnly: ['filters.allowedOnly.bubble', 'Only your allowed list gets through now.'],
+        emptySieve: ['controls.emptySieve.bubble', 'Nothing in the sieve yet. Add a first filter.'],
+        emptySieveAction: ['controls.emptySieve.action', 'Add a first filter']
+    });
+    const FIRST_FILTER_HOLD_MS = 600;
+    const FIRST_FILTER_STILL_MS = 2000;
+
+    function localDay(date = new Date()) {
+        const pad = value => String(value).padStart(2, '0');
+        return `${date.getFullYear()}-${pad(date.getMonth() + 1)}-${pad(date.getDate())}`;
+    }
+
+    async function takeMoment(key, value) {
+        const stored = (await storageGet([MOMENTS_KEY]))[MOMENTS_KEY];
+        const moments = stored && typeof stored === 'object' ? stored : {};
+        if (value === undefined ? moments[key] : moments[key] === value) return false;
+        await storageSet({ [MOMENTS_KEY]: { ...moments, [key]: value === undefined ? Date.now() : value } });
+        return true;
+    }
+
+    async function firstFilterMoment({ profileId = 'default', anchor = null, allowed = false } = {}) {
+        if (!root.document || !showsCharacters(companionMode) || !anchor?.parentNode) return false;
+        if (!(await takeMoment(`first_filter:${profileId}`))) return false;
+        if (!anchor.parentNode) return false;
+        const character = createCharacter({ className: 'ft-mascot--first-filter', imageName: stillImage('duoSieve'), height: 96, kind: 'event', tail: 'left' });
+        const holder = el('div', 'pk-first-filter');
+        holder.appendChild(character.root);
+        anchor.parentNode.insertBefore(holder, anchor);
+        const line = t(allowed ? FIRST_COPY.allowedOnly : FIRST_COPY.firstFilter);
+        root.setTimeout(() => character.say(line, { event: true }), 300);
+        announce(holder, line);
+        const close = () => {
+            holder.classList.add('is-leaving');
+            root.setTimeout(() => holder.remove(), prefersReducedMotion() ? 0 : 300);
+        };
+        if (companionMode === 'lively' && !prefersReducedMotion()) {
+            enter(character.picture);
+            playSheet(character.picture, 'duoSieve', { onDone: () => root.setTimeout(close, FIRST_FILTER_HOLD_MS) });
+            root.setTimeout(() => playSound('giggle'), 4 * sheetFrameMs('duoSieve'));
+        } else {
+            root.setTimeout(close, FIRST_FILTER_STILL_MS);
+        }
+        return true;
+    }
+
+    function ruleCount(state) {
+        const size = value => (Array.isArray(value) ? value.length : 0);
+        const kids = state?.kids || {};
+        return size(state?.userKeywords) + size(state?.channels) + size(state?.userWhitelistKeywords) + size(state?.whitelistChannels)
+            + size(kids.blockedKeywords) + size(kids.blockedChannels) + size(kids.whitelistKeywords) + size(kids.whitelistChannels);
+    }
+
+    function mountHubPeek(doc) {
+        let peek = null;
+        let subscribed = false;
+        let tries = 0;
+        const manager = () => (typeof StateManager !== 'undefined' ? StateManager : null);
+        const later = ms => root.setTimeout(() => { draw().catch(() => {}); }, ms);
+        const draw = async () => {
+            const sm = manager();
+            if (sm?.subscribe && !subscribed) {
+                subscribed = true;
+                sm.subscribe(eventType => { if (/Added|Removed|^load$/.test(eventType)) later(0); });
+            }
+            const grid = doc.querySelector('#dashboardView .pk-hub__grid');
+            const state = sm?.getState?.();
+            if (!grid || !state?.isLoaded) {
+                if (tries++ < 12) later(800);
+                return;
+            }
+            if (ruleCount(state) > 0 || !showsCharacters(companionMode)) { peek?.remove(); peek = null; return; }
+            if (peek?.isConnected) return;
+            const profileId = state.activeProfileId || 'default';
+            if (!(await takeMoment(`hub_peek:${profileId}`, localDay()))) return;
+            if (peek?.isConnected) return;
+            peek = el('div', 'pk-hub-peek');
+            const art = image(ASSETS.kritiPeek, 'pk-hub-peek__art', 56);
+            art.setAttribute('aria-hidden', 'true');
+            const words = el('p', 'pk-hub-peek__line', t(FIRST_COPY.emptySieve));
+            const action = el('button', 'pk-hub-peek__action', t(FIRST_COPY.emptySieveAction));
+            action.type = 'button';
+            action.addEventListener('click', () => doc.querySelector('.nav-item[data-tab="filters"]:not(.nav-item--sub)')?.click());
+            peek.append(art, words, action);
+            grid.parentNode.insertBefore(peek, grid);
+            if (companionMode === 'lively' && !prefersReducedMotion() && art.animate) {
+                root.setTimeout(() => art.animate([{ transform: 'translateY(0)' }, { transform: 'translateY(-10px)' }, { transform: 'translateY(0)' }],
+                    { duration: 900, easing: 'cubic-bezier(0.2, 0, 0, 1)' }), 200);
+            }
+        };
+        later(600);
+        onModeChange(() => later(0));
+    }
+
     function mountOptions(doc) {
         mountCompanionSetting(doc);
         mountSoundSetting(doc);
         mountWelcome(doc);
         mountHero(doc);
+        mountHubPeek(doc);
         mountSidebar(doc);
         mountAbout(doc);
         mountSupport(doc);
@@ -1829,7 +1933,7 @@
         allowListSwitchedOn, clampLine, loadMode, setMode,
         normalizeSoundMode, soundAllowed, playSound, loadSoundMode, moment,
         get mode() { return companionMode; },
-        emptyListKind, decorateEmptyList, celebrateImport, mountPopup
+        emptyListKind, decorateEmptyList, celebrateImport, mountPopup, firstFilterMoment, ruleCount
     });
 
     function autoMount() {

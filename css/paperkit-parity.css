@@ -849,3 +849,31 @@ body.ft-extension-surface[data-surface="tab-view"] .list-item:not(.channel-item)
 .pk-roll-digit { position: relative; display: inline-block; overflow: hidden; vertical-align: bottom; font-variant-numeric: tabular-nums; }
 .pk-roll-digit__now { display: inline-block; }
 .pk-roll-digit__old { position: absolute; inset: 0; display: inline-block; }
+
+/* The first-filter moment above the list, and Kriti's peek over the hub's tiles. */
+.pk-first-filter { display: flex; justify-content: center; padding: 8px 0 4px; transition: opacity 300ms ease, transform 300ms ease; }
+.pk-first-filter.is-leaving { opacity: 0; transform: translateY(-6px); }
+.pk-hub-peek {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin: 0 0 12px;
+  padding: 6px 14px 6px 6px;
+  border-radius: 16px;
+  color: var(--pk-ink);
+}
+.pk-hub-peek__art { height: 56px; width: auto; flex: none; pointer-events: none; user-select: none; }
+.pk-hub-peek__line { margin: 0; flex: 1 1 auto; font-family: var(--pk-font-hand); font-size: 16px; }
+.pk-hub-peek__action {
+  flex: none;
+  min-height: 40px;
+  padding: 0 16px;
+  border: 1.5px solid var(--pk-line);
+  border-radius: 999px;
+  background: var(--pk-paper);
+  color: var(--pk-brick);
+  font: 600 14px/1 "FilterTube Outfit", "Outfit", system-ui, sans-serif;
+  cursor: pointer;
+}
+.pk-hub-peek__action:focus-visible { outline: 2px solid var(--pk-brick); outline-offset: 2px; }
+@media (prefers-reduced-motion: reduce) { .pk-first-filter { transition: none; } }

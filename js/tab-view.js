@@ -33032,7 +33032,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         setInterval(() => { if (isSelfControlSessionActive()) renderControlCenter(); }, 30000);
     })();
 
-    let dashboardStatsSurface = 'main';
+    var dashboardStatsSurface = 'main'; // var: the profile card can draw before this line runs
     let dashboardStatsRotationTimer = 0;
     let dashboardStatsUserOverride = false;
 

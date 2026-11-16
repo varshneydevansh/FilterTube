@@ -1370,7 +1370,18 @@ const UIComponents = (() => {
             if (additions.has(eventType) && data?.restored !== true) {
                 const selector = addedRowSelector(eventType, data);
                 // After the page's own listener has drawn the list.
-                if (selector) setTimeout(() => requestAnimationFrame(() => highlightAddedRows(selector)), 0);
+                if (selector) setTimeout(() => requestAnimationFrame(() => {
+                    highlightAddedRows(selector);
+                    // The first rule on this profile: Kriti and Uljhan sieve above the list (once).
+                    try {
+                        const mascots = window.FilterTubeMascots;
+                        const state = stateManager.getState?.();
+                        if (!mascots?.firstFilterMoment || !state || mascots.ruleCount?.(state) !== 1) return;
+                        const row = Array.from(document.querySelectorAll(selector)).find(node => node.offsetParent !== null);
+                        const list = row?.parentElement;
+                        if (list) mascots.firstFilterMoment({ profileId: state.activeProfileId || 'default', anchor: list, allowed: state.mode === 'whitelist' });
+                    } catch (e) { }
+                }), 0);
                 return;
             }
             if (!removals.has(eventType)) return;
