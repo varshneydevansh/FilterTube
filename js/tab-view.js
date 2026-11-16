@@ -9177,6 +9177,8 @@ document.addEventListener('DOMContentLoaded', async () => {
         } catch (e) {
         }
         updateStats();
+        // The session bar confirms the save in the child's name (js/mascots.js draws it).
+        try { document.dispatchEvent(new CustomEvent('filtertube:parent-session-saved', { detail: { name: normalizeString(nextProfile.name) } })); } catch (e) { }
         return true;
     }
 
@@ -34038,20 +34040,25 @@ function setupNavigation() {
         }
 
         // Update page title
+        // The page title is the section's own nav label, from the same catalog key (it used to stay
+        // English outside the first pages, and About kept the previous page's title).
         const titles = {
-            'dashboard': 'Dashboard',
-            'filters': 'Filters',
-            'semantic': 'Semantic ML',
-            'kids': 'Kids Mode',
-            'settings': 'Settings',
-            'sync': 'Accounts & Sync',
-            'whatsnew': 'What’s New',
-            'help': 'Help',
-            'donate': 'Donate',
-            'support': 'Donate'
+            'dashboard': ['navigation.dashboard', 'Dashboard'],
+            'filters': ['navigation.filters', 'Filters'],
+            'semantic': ['', 'Semantic ML'],
+            'kids': ['navigation.kids', 'Kids Mode'],
+            'settings': ['navigation.settings', 'Settings'],
+            'sync': ['navigation.sync', 'Accounts & Sync'],
+            'whatsnew': ['navigation.whatsNew', 'What’s New'],
+            'help': ['navigation.help', 'Help'],
+            'about': ['navigation.about', 'About'],
+            'donate': ['navigation.donate', 'Support'],
+            'support': ['navigation.donate', 'Support']
         };
         if (pageTitle && titles[effectiveViewId]) {
-            pageTitle.textContent = titles[effectiveViewId];
+            const [titleKey, titleFallback] = titles[effectiveViewId];
+            if (titleKey) setTabViewLocalizedCopy(pageTitle, 'textContent', titleKey, titleFallback);
+            else pageTitle.textContent = titleFallback;
         }
 
         try {

@@ -217,24 +217,31 @@ test('the hidden counter keeps a running total that survives the daily reset', (
     assert.match(bridge, /nextStats\.totalHiddenCount = Math\.max\(0, previousTotal \+ statsTotalHiddenDelta\);\s*statsTotalHiddenDelta = 0;/);
 });
 
-test('mascot images are WebP and stay under the 250 KB budget', () => {
+test('mascot images are WebP, Kriti and Uljhan only, none unused, under the 900 KB budget', () => {
     const { Mascots } = load();
     const assets = plain(Mascots.ASSETS);
-    // Kriti and Uljhan only (aKriti brand library); the counter mark is a doodle, not a character.
-    assert.deepEqual(Object.keys(assets).filter(key => !['counterMark', 'sieve'].includes(key)).map(key => key.replace(/[A-Z].*$/, '')).filter((v, i, a) => a.indexOf(v) === i).sort(), ['kriti', 'uljhan']);
+    // Kriti and Uljhan only (aKriti brand library); "duo" sheets show the two together. The counter mark is a doodle.
+    assert.deepEqual(Object.keys(assets).filter(key => !['counterMark', 'sieve'].includes(key)).map(key => key.replace(/[A-Z].*$/, '')).filter((v, i, a) => a.indexOf(v) === i).sort(), ['duo', 'kriti', 'uljhan']);
     assert.equal(assets.counterMark, '../doodles/sparkle.webp');
-    const names = [assets.kritiLogo, assets.kritiAllow, assets.kritiPeek, assets.kritiThumbsUp, assets.kritiWave, assets.kritiReading,
-        assets.uljhanShrug, ...assets.sieve];
+    const names = Object.entries(assets).filter(([key]) => key !== 'counterMark').flatMap(([, value]) => [].concat(value));
     let total = 0;
     for (const name of names) {
-        assert.match(name, /\.webp$/);
+        assert.match(name, /^(kriti|uljhan|duo)_[a-z0-9_]+\.webp$/);
         const file = path.join('assets/images/mascots', name);
         assert.ok(fs.existsSync(file), `${file} exists`);
         total += fs.statSync(file).size;
+        // Lossy-with-alpha or lossless WebP: every pose is cut out (no white card behind it on navy).
+        const header = fs.readFileSync(file).subarray(0, 32);
+        assert.equal(header.toString('latin1', 8, 12), 'WEBP', file);
+        const chunk = header.toString('latin1', 12, 16);
+        assert.ok(chunk === 'VP8L' || (chunk === 'VP8X' && (header[20] & 0x10) !== 0), `${file} carries transparency`);
     }
     const folder = fs.readdirSync('assets/images/mascots').reduce((sum, name) => sum + fs.statSync(path.join('assets/images/mascots', name)).size, 0);
     assert.equal(folder, total, 'no unused images ship');
-    assert.ok(total < 250 * 1024, `${total} bytes`);
+    assert.ok(total < 900 * 1024, `${total} bytes`);
+    for (const forbidden of ['kagaz', 'mohar', 'phoolu', 'bindu_', 'rekha']) {
+        assert.equal(fs.readdirSync('assets/images/mascots').some(name => name.includes(forbidden)), false, forbidden);
+    }
 });
 
 test('sounds are off by default; Gentle plays big moments only, Playful adds taps and pops', async () => {
@@ -269,10 +276,13 @@ test('moments use Kriti or Uljhan only, and the Companion Off setting leaves the
     for (const [kind, spec] of Object.entries(moments)) {
         assert.ok(['Kriti', 'Uljhan'].includes(spec.character), kind);
         assert.ok(plain(Mascots.ASSETS)[spec.image], `${kind} has art`);
+        assert.match(Mascots.stillImage(spec.image), /\.webp$/, `${kind} rests on a still`);
         assert.equal(spec.character === 'Uljhan', /^uljhan/.test(spec.image), `${kind} art matches its character`);
     }
     assert.equal(moments.noMatches.character, 'Uljhan', 'nothing found is Uljhan\'s');
-    assert.equal(moments.loading.character, 'Kriti');
+    assert.equal(moments.loading.character, 'Uljhan', 'Uljhan fetches while a list loads');
+    assert.equal(moments.break.character, 'Kriti');
+    assert.equal(moments.offline.character, 'Uljhan');
     // Without a document (or with Companion Off) there is no character to draw.
     assert.equal(Mascots.moment('loading'), null);
     for (const locale of fs.readdirSync('data/ui_locales').filter(name => /^[a-z]{2,3}(-[A-Za-z]+)?\.json$/.test(name) && name !== 'targets.json')) {
@@ -280,6 +290,114 @@ test('moments use Kriti or Uljhan only, and the Companion Off setting leaves the
         for (const key of ['mascot.moment.loading', 'mascot.moment.noMatches', 'mascot.moment.error', 'mascot.sounds.title',
             'mascot.sounds.off', 'mascot.sounds.gentle', 'mascot.sounds.playful', 'mascot.sounds.description', 'profiles.emptyTitle', 'profiles.addKids']) {
             assert.equal(typeof catalog[key], 'string', `${locale} ${key}`);
+        }
+    }
+});
+
+test('sheets play once and rest on their last frame; reduced motion shows only that still', () => {
+    const { Mascots } = load();
+    const assets = plain(Mascots.ASSETS);
+    for (const [sheet, still] of Object.entries(plain(Mascots.SHEET_STILL))) {
+        assert.ok(Array.isArray(assets[sheet]) && assets[sheet].length >= 5, sheet);
+        assert.equal(still, assets[sheet].length - 1, `${sheet} rests on its last frame`);
+        assert.deepEqual(plain(Mascots.sheetFrames(sheet, false)), assets[sheet].map((_, index) => index));
+        assert.deepEqual(plain(Mascots.sheetFrames(sheet, true)), [still]);
+        assert.equal(Mascots.stillImage(sheet), assets[sheet][still]);
+    }
+    assert.deepEqual(plain(Mascots.sheetFrames('nope', false)), []);
+    assert.equal(Mascots.SHEET_FRAME_MS, 180);
+});
+
+test('a loading line never repeats one of the last three', () => {
+    const { Mascots } = load();
+    const lines = plain(Mascots.LOADING_LINES);
+    assert.equal(lines.length, 6);
+    for (let first = 0; first < lines.length; first++) {
+        for (const roll of [0, 0.34, 0.67, 0.999]) {
+            const recent = [first, (first + 1) % 6, (first + 2) % 6];
+            const next = Mascots.pickLoadingLine(recent, () => roll);
+            assert.equal(recent.includes(next), false, `${recent} then ${next}`);
+        }
+    }
+    assert.ok(Mascots.pickLoadingLine([], () => 0) >= 0);
+    assert.ok(Mascots.pickLoadingLine('nope', () => 0.5) < lines.length);
+});
+
+test('the connection strip: offline, back online once, slow, otherwise nothing', () => {
+    const { Mascots } = load();
+    assert.equal(Mascots.networkState('ok', { online: false }), 'offline');
+    assert.equal(Mascots.networkState('offline', { online: false }), 'offline');
+    assert.equal(Mascots.networkState('offline', { online: true }), 'restored');
+    assert.equal(Mascots.networkState('restored', { online: true }), 'ok', 'back online shows once');
+    assert.equal(Mascots.networkState('ok', { online: true, effectiveType: '2g' }), 'slow');
+    assert.equal(Mascots.networkState('ok', { online: true, effectiveType: 'slow-2g' }), 'slow');
+    assert.equal(Mascots.networkState('ok', { online: true, effectiveType: '4g' }), 'ok');
+    assert.equal(Mascots.networkState('ok'), 'ok');
+});
+
+test('support variants rotate, keep to their hours, and always say free and optional', () => {
+    const { Mascots } = load();
+    const variants = plain(Mascots.SUPPORT_VARIANTS);
+    const ids = variants.map(variant => variant.id);
+    assert.deepEqual(ids, ['classic', 'sieve', 'onePerson', 'morning', 'evening']);
+    assert.equal(Mascots.pickSupportVariant([], 9).id, 'classic', 'the first one ever is classic');
+    assert.equal(Mascots.pickSupportVariant(undefined, 9).id, 'classic');
+    for (const hour of [0, 3, 4, 5, 11, 12, 17, 18, 23]) {
+        for (const roll of [0, 0.25, 0.5, 0.75, 0.999]) {
+            for (const history of [['classic'], ['classic', 'sieve'], ['sieve', 'onePerson'], ['morning', 'classic'], ['evening', 'sieve']]) {
+                const picked = Mascots.pickSupportVariant(history, hour, 'quiet', () => roll);
+                assert.equal(history.slice(-Mascots.SUPPORT_REMEMBERED).includes(picked.id), false, `${history} at ${hour}: ${picked.id}`);
+                if (picked.time === 'morning') assert.ok(hour >= 5 && hour < 12, `morning at ${hour}`);
+                if (picked.time === 'evening') assert.ok(hour >= 18 || hour < 4, `evening at ${hour}`);
+                const plainOne = Mascots.pickSupportVariant(history, hour, 'off', () => roll);
+                assert.equal(plainOne.characters, false, 'with the Companion off, no variant names a character');
+            }
+        }
+    }
+    assert.deepEqual(plain(Mascots.rememberSupportVariant(['classic', 'sieve'], 'onePerson')), ['sieve', 'onePerson']);
+    assert.deepEqual(plain(Mascots.rememberSupportVariant(null, 'classic')), ['classic']);
+    const copy = plain(Mascots.SUPPORT_COPY);
+    const assets = plain(Mascots.ASSETS);
+    for (const variant of variants) {
+        assert.match(Mascots.stillImage(variant.image), /^kriti_/, `${variant.id} is Kriti's`);
+        assert.ok(assets[variant.image], variant.id);
+        const { title, body, note } = copy[variant.id];
+        // Every note says, in its own voice, that it is free and that support is the person's choice.
+        assert.match(note[1], /\bfree\b/i, `${variant.id} says free`);
+        assert.match(note[1], /optional|up to you|if you'd like/i, `${variant.id} says optional`);
+        const all = `${title[1]} ${body[1]} ${note[1]}`;
+        assert.equal(/Kriti|Uljhan/.test(all), variant.characters, `${variant.id} names a character only when marked`);
+        // Device sync uses a small relay, so the copy may say "no servers keeping your data", never "no servers".
+        assert.doesNotMatch(all.replace(/no servers keeping your data/g, ''), /no servers?\b|no data on servers/i, variant.id);
+        assert.doesNotMatch(all, /open source|unlock|premium/i, variant.id);
+    }
+});
+
+test('the new lines are in every interface catalog and never name the site or another character', () => {
+    const { Mascots } = load();
+    const pairs = [
+        ...plain(Mascots.LOADING_LINES), ...Object.values(plain(Mascots.NETWORK_COPY)), ...Object.values(plain(Mascots.DUO_COPY)),
+        plain(Mascots.SESSION_SAVED), ...Object.values(plain(Mascots.SUPPORT_COPY)).flatMap(entry => Object.values(entry))
+    ];
+    assert.equal(pairs.length, 6 + 4 + 3 + 1 + 15);
+    const directory = 'data/ui_locales';
+    const targets = JSON.parse(fs.readFileSync(path.join(directory, 'targets.json'), 'utf8')).locales.map(entry => entry.code);
+    const english = JSON.parse(fs.readFileSync(path.join(directory, 'en.json'), 'utf8'));
+    const placeholders = value => [...String(value).matchAll(/\{([a-zA-Z]+)\}/g)].map(match => match[1]).sort().join(',');
+    for (const [key, fallback] of pairs) assert.equal(english[key], fallback, `${key}: the code fallback matches the English catalog`);
+    assert.equal(english['navigation.donate'], 'Support');
+    for (const code of targets) {
+        const catalog = JSON.parse(fs.readFileSync(path.join(directory, `${code}.json`), 'utf8'));
+        for (const [key] of [...pairs, ['navigation.donate']]) {
+            assert.equal(typeof catalog[key], 'string', `${code}: missing ${key}`);
+            assert.ok(catalog[key].trim(), `${code}: empty ${key}`);
+            assert.equal(placeholders(catalog[key]), placeholders(english[key]), `${code}: placeholders changed in ${key}`);
+            assert.doesNotMatch(catalog[key], /youtube|\b(kagaz|mohar|phoolu|bindu|rekha)\b/i, `${code}: ${key}`);
+        }
+        // Nigerian Pidgin shares some short titles with English word for word.
+        if (code !== 'en' && code !== 'pcm') {
+            const same = pairs.filter(([key]) => !['mascot.about.title'].includes(key) && catalog[key] === english[key]).map(([key]) => key);
+            assert.deepEqual(same, [], `${code}: left in English`);
         }
     }
 });
