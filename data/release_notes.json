@@ -17,7 +17,7 @@
       "Privacy: Accounts & Sync explains what the sync relay can and can't see and asks before the first internet sync, your device name is no longer sent when ringing another device, DeArrow thumbnails are a separate opt-in that starts off, account cookies go only to the video service's own sites, and release builds keep debug logs out of the system log.",
       "Tablets and TVs match the phone: Filters, Search and Ask a parent use the full width on tablets, and TVs get the crayon icons in the rail, Study on the big screen and an About this TV card with Full and Light modes.",
       "Supporting FilterTube stays free and optional: the support sheet is a friendly note, never a gate.",
-      "Fixes: PIN checks no longer freeze the screen, mascots are never cut off mid-motion, many remaining English labels are now translated, and Sangeet's load errors no longer name the video service."
+      "Fixes: PIN checks no longer freeze the screen, loading more in Study no longer flashes the page, mascots are never cut off mid-motion, many remaining English labels are now translated, and Sangeet's load errors no longer name the video service."
     ],
     "detailsUrl": "https://github.com/varshneydevansh/FilterTube/releases/tag/v3.6.2"
   },
