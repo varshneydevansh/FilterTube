@@ -761,11 +761,10 @@ export default function PrivacyPage() {
                 .
               </p>
               <p>
-                Native app implementation details may be distributed separately
-                during store release preparation. The privacy promise here is
-                based on product behavior: local filtering, no FilterTube app
-                online FilterTube account for rules/history, and optional
-                open-source P2P sync.
+                The FilterTube apps for Android, TV and iOS are free but not
+                open source. The privacy promise here is based on product
+                behavior: local filtering, no FilterTube account for rules or
+                history, and optional open-source P2P sync.
               </p>
             </PolicySection>
 
