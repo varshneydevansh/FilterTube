@@ -177,11 +177,12 @@
     const SUPPORT_HISTORY_KEY = 'ftSupportVariantHistory';
     const SUPPORT_REMEMBERED = 2;
     const SUPPORT_VARIANTS = Object.freeze([
-        Object.freeze({ id: 'classic', image: 'kritiLogo', characters: false, time: 'any' }),
-        Object.freeze({ id: 'sieve', image: 'kritiFunnel', characters: true, time: 'any' }),
-        Object.freeze({ id: 'onePerson', image: 'kritiNotebook', characters: false, time: 'any' }),
-        Object.freeze({ id: 'morning', image: 'kritiWave', characters: true, time: 'morning' }),
-        Object.freeze({ id: 'evening', image: 'kritiEvening', characters: true, time: 'evening' })
+        // touch: the variant's one crayon touch (Android SupportSheetVariants.Touch).
+        Object.freeze({ id: 'classic', image: 'kritiLogo', characters: false, time: 'any', touch: 'heartOnPick' }),
+        Object.freeze({ id: 'sieve', image: 'kritiFunnel', characters: true, time: 'any', touch: 'underlineTitle' }),
+        Object.freeze({ id: 'onePerson', image: 'kritiNotebook', characters: false, time: 'any', touch: 'underlineTitle' }),
+        Object.freeze({ id: 'morning', image: 'kritiWave', characters: true, time: 'morning', touch: 'sparkleLogo' }),
+        Object.freeze({ id: 'evening', image: 'kritiEvening', characters: true, time: 'evening', touch: 'none' })
     ]);
     const SUPPORT_COPY = Object.freeze({
         classic: Object.freeze({
@@ -1084,7 +1085,11 @@
             back.addEventListener('click', () => { if (page > 0) { page -= 1; render(true); } });
             next.addEventListener('click', () => {
                 if (page < WELCOME_PAGES.length - 1) { page += 1; render(true); playSound('page'); }
-                else close();
+                else {
+                    // The commit: a small sparkle lands with the tap (Android LauncherActivity), then the card leaves.
+                    root.FilterTubeDoodles?.sparkle?.(next);
+                    close();
+                }
             });
             container.insertBefore(card, container.firstChild);
             render();
@@ -1510,6 +1515,24 @@
      * Support: the Donate hero and the dashboard card take this opening's variant. The note under the
      * body always says that FilterTube is free and that support is optional.
      */
+    /**
+     * The variant's one crayon touch (Android SupportOfferSheet.playTouch): a sparkle on the logo, an
+     * underline under the title, or a heart that pops on Kriti when a way to support is picked.
+     */
+    function playSupportTouch(doc, variant, entry) {
+        const Doodles = root.FilterTubeDoodles;
+        if (!Doodles || !variant || !entry) return;
+        if (variant.touch === 'underlineTitle') Doodles.underline?.(entry.title);
+        else if (variant.touch === 'sparkleLogo') {
+            const logo = doc.querySelector('#donateView .donate-hero img, .app-logo img, .brand img') || entry.art;
+            root.setTimeout?.(() => Doodles.sparkle?.(logo), 300);
+        } else if (variant.touch === 'heartOnPick') {
+            doc.querySelectorAll?.('#donateView a[href], #donateView button').forEach(link => {
+                link.addEventListener('click', () => Doodles.heartPop?.(entry.art.querySelector('img') || link), { once: true });
+            });
+        }
+    }
+
     function mountSupport(doc) {
         const hero = doc.querySelector('#donateView .donate-hero');
         const promo = doc.querySelector('.donate-promo-text')?.parentElement || null;
@@ -1557,6 +1580,7 @@
                 promo.insertBefore(entry.block, promo.firstChild);
             }
             fill();
+            playSupportTouch(doc, variant, blocks[0]);
             const heroArt = blocks[0]?.art.querySelector('img');
             if (heroArt && variant.id === 'evening' && companionMode === 'lively') playSheet(heroArt, 'kritiEvening', { onDone: () => idleLife(heroArt) });
             else if (heroArt) idleLife(heroArt);

@@ -931,4 +931,3 @@ body.ft-extension-surface[data-surface="tab-view"] .list-item:not(.channel-item)
 .ft-ask-answer__words p { margin: 0; font-size: 13px; }
 .ft-ask-answer__note { font-style: italic; }
 .ft-ask-answer__actions { display: flex; gap: 8px; margin-top: 6px; }
-.ft-ask-answer__heart { width: 20px; height: 20px; }

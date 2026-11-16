@@ -2274,10 +2274,6 @@ document.addEventListener('DOMContentLoaded', async () => {
             note.textContent = `${popupUiText('askParent.answerNote', 'A note from {name}', { name })}: “${answer.reply}”`;
             words.appendChild(note);
         }
-        if (yes && window.FilterTubeDoodles?.heart) {
-            const heart = window.FilterTubeDoodles.heart({ className: 'ft-ask-answer__heart' });
-            if (heart) title.appendChild(heart);
-        }
         const actions = document.createElement('div');
         actions.className = 'ft-ask-answer__actions';
         const done = async () => {
