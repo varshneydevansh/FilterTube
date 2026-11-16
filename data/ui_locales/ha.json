@@ -3138,5 +3138,9 @@
   "parentMode.sync.upToDate": "An sabunta",
   "parentMode.sync.waiting": "Za a aika zuwa {device}",
   "parentMode.sync.offline": "Babu intanet, za a daidaita canje-canje",
-  "askParent.openSpace": "Buɗe wurin {name}"
+  "askParent.openSpace": "Buɗe wurin {name}",
+  "people.profileSwitched": "An koma wurin {name}.",
+  "people.restoreDone": "Komai ya koma wurinsa.",
+  "people.paired": "An haɗa. Yanzu tsare-tsare suna daidaita ta ɓangarorin biyu.",
+  "people.pinTryAgain": "Wannan PIN bai yi aiki ba. Sake gwadawa."
 }

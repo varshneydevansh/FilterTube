@@ -3138,5 +3138,9 @@
   "parentMode.sync.upToDate": "ወቅታዊ ነው",
   "parentMode.sync.waiting": "ወደ {device} ይላካል",
   "parentMode.sync.offline": "ከመስመር ውጭ፣ ለውጦች ይመሳሰላሉ",
-  "askParent.openSpace": "የ{name}ን ቦታ ክፈት"
+  "askParent.openSpace": "የ{name}ን ቦታ ክፈት",
+  "people.profileSwitched": "ወደ {name} ቦታ ተቀይሯል።",
+  "people.restoreDone": "ሁሉም ነገር ወደ ቦታው ተመልሷል።",
+  "people.paired": "ተጣምሯል። ዕቅዶች አሁን በሁለቱም በኩል ይመሳሰላሉ።",
+  "people.pinTryAgain": "ያ ፒን አልሰራም። እንደገና ይሞክሩ።"
 }

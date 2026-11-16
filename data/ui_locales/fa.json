@@ -3138,5 +3138,9 @@
   "parentMode.sync.upToDate": "به‌روز",
   "parentMode.sync.waiting": "برای {device} ارسال می‌شود",
   "parentMode.sync.offline": "آفلاین، تغییرات همگام‌سازی می‌شود",
-  "askParent.openSpace": "باز کردن فضای {name}"
+  "askParent.openSpace": "باز کردن فضای {name}",
+  "people.profileSwitched": "به فضای {name} رفتید.",
+  "people.restoreDone": "همه‌چیز سر جایش برگشت.",
+  "people.paired": "جفت شد. برنامه‌ها حالا در هر دو جهت همگام می‌شوند.",
+  "people.pinTryAgain": "این پین کار نکرد. دوباره امتحان کنید."
 }

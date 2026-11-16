@@ -3162,5 +3162,9 @@
   "parentMode.sync.upToDate": "محدّث",
   "parentMode.sync.waiting": "سيتم الإرسال إلى {device}",
   "parentMode.sync.offline": "غير متصل، ستتم مزامنة التغييرات",
-  "askParent.openSpace": "افتح مساحة {name}"
+  "askParent.openSpace": "افتح مساحة {name}",
+  "people.profileSwitched": "تم الانتقال إلى مساحة {name}.",
+  "people.restoreDone": "عاد كل شيء إلى مكانه.",
+  "people.paired": "تم الإقران. أصبحت الخطط تتزامن في الاتجاهين.",
+  "people.pinTryAgain": "لم يعمل رمز PIN هذا. حاول مرة أخرى."
 }

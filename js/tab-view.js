@@ -15578,7 +15578,28 @@ document.addEventListener('DOMContentLoaded', async () => {
         lockGateEl = gate;
     }
 
-    async function showPromptModal({ eyebrow = '', title, message, placeholder = '', inputType = 'text', confirmText = 'Confirm', cancelText = 'Cancel', initialValue = '' }) {
+    /**
+     * A wrong PIN (Android 4ff67ce1b PinGateMotion): the field shakes 0, -10, 10, -7, 7, -3, 0 px over
+     * 320 ms (still with reduced motion), the polite line says "That PIN didn't work. Try again.", and
+     * the field clears for the next try. No sound and no mascot on a PIN gate.
+     */
+    function rejectPinInput(input, line, text) {
+        line.textContent = text;
+        line.hidden = false;
+        input.value = '';
+        input.setAttribute('aria-invalid', 'true');
+        input.addEventListener('input', () => input.removeAttribute('aria-invalid'), { once: true });
+        try {
+            const still = window.matchMedia?.('(prefers-reduced-motion: reduce)')?.matches === true;
+            if (!still && typeof input.animate === 'function') {
+                input.animate([0, -10, 10, -7, 7, -3, 0].map(x => ({ transform: `translateX(${x}px)` })), { duration: 320, easing: 'ease-out' });
+            }
+        } catch (e) {
+        }
+        try { input.focus(); } catch (e) { }
+    }
+
+    async function showPromptModal({ eyebrow = '', title, message, placeholder = '', inputType = 'text', confirmText = 'Confirm', cancelText = 'Cancel', initialValue = '', check = null }) {
         return new Promise((resolve) => {
             const overlay = document.createElement('div');
             overlay.className = 'ft-modal-overlay';
@@ -15615,6 +15636,13 @@ document.addEventListener('DOMContentLoaded', async () => {
             input.placeholder = placeholder;
             input.value = initialValue;
             body.appendChild(input);
+            // A wrong answer's line, read politely (the PIN gate's "Try again").
+            const errorLine = document.createElement('p');
+            errorLine.className = 'ft-modal-error';
+            errorLine.setAttribute('role', 'status');
+            errorLine.setAttribute('aria-live', 'polite');
+            errorLine.hidden = true;
+            body.appendChild(errorLine);
 
             const actions = document.createElement('div');
             actions.className = 'ft-modal-actions';
@@ -15642,7 +15670,15 @@ document.addEventListener('DOMContentLoaded', async () => {
             };
 
             cancelBtn.addEventListener('click', () => closeWith(null));
-            okBtn.addEventListener('click', () => closeWith(input.value));
+            okBtn.addEventListener('click', async () => {
+                if (typeof check !== 'function') { closeWith(input.value); return; }
+                okBtn.disabled = true;
+                const result = await Promise.resolve(check(input.value)).catch(() => ({ ok: false, close: true }));
+                okBtn.disabled = false;
+                if (result?.ok) closeWith(input.value);
+                else if (result?.close) closeWith(null);
+                else rejectPinInput(input, errorLine, result?.message || tabViewUiText('people.pinTryAgain', "That PIN didn't work. Try again."));
+            });
 
             input.addEventListener('keydown', (e) => {
                 if (e.key === 'Enter') {
@@ -27738,7 +27774,9 @@ document.addEventListener('DOMContentLoaded', async () => {
             }
             return isCurrentNanahManagedTrustSession(trustSession);
         } });
-        UIComponents.showToast(linkType === 'managed_link' ? 'Managed link saved' : 'Trusted peer saved', 'success');
+        // Pairing ends with Kriti's jump (Android 4ff67ce1b); a peer link reads "Paired. Plans now sync both ways."
+        UIComponents.showToast(linkType === 'managed_link' ? 'Managed link saved' : tabViewUiText('people.paired', 'Paired. Plans now sync both ways.'), 'success');
+        { const toast = document.querySelector('.ft-toast'); if (toast) toast.dataset.ftMascot = 'jump'; }
         updateNanahUi();
     }
 
@@ -27796,27 +27834,29 @@ document.addEventListener('DOMContentLoaded', async () => {
         }
 
         const copy = getProfileAccessCopy(profilesV4, profileId);
+        // A wrong PIN shakes the field and asks again in place (Android PinGateActivity); only the
+        // attempt limit closes the gate.
         const pin = await showPromptModal({
             eyebrow: copy.eyebrow,
             title: copy.title,
             message: copy.message,
             placeholder: copy.placeholder,
             inputType: 'password',
-            confirmText: tabViewUiText('profileAccess.unlockButton', 'Unlock')
+            confirmText: tabViewUiText('profileAccess.unlockButton', 'Unlock'),
+            check: async value => {
+                const entered = normalizeString(value);
+                if (!entered) return { ok: false };
+                if (await verifyPin(entered, verifier)) return { ok: true };
+                const failedAttempt = await recordManagedAdminUnlockFailure(profileId, profilesV4);
+                if (failedAttempt.rateLimited) {
+                    UIComponents.showToast(tabViewUiText('dashboard.toast.pinRateLimited', 'Too many incorrect PIN attempts. Try again later.'), 'error');
+                    return { ok: false, close: true };
+                }
+                return { ok: false };
+            }
         });
         const normalized = normalizeString(pin);
         if (!normalized) return false;
-        const ok = await verifyPin(normalized, verifier);
-        if (!ok) {
-            const failedAttempt = await recordManagedAdminUnlockFailure(profileId, profilesV4);
-            UIComponents.showToast(
-                failedAttempt.rateLimited
-                    ? tabViewUiText('dashboard.toast.pinRateLimited', 'Too many incorrect PIN attempts. Try again later.')
-                    : tabViewUiText('dashboard.toast.pinIncorrect', 'Incorrect PIN'),
-                'error'
-            );
-            return false;
-        }
 
         await clearManagedAdminUnlockFailures(profileId);
         markProfileUnlockSession.run(profileId);
@@ -29332,7 +29372,11 @@ document.addEventListener('DOMContentLoaded', async () => {
             await refreshProfilesUI();
             void runNanahManagedBackgroundSync({ reason: 'profile_switch' });
             updateStats();
-            UIComponents.showToast(tabViewUiText('popup.profile.switched', 'Profile switched'), 'success');
+            // The switch moment, once the switch has landed (Android ProfileSwitchMoment): Kriti waves at most
+            // three times a day, else the crayon check.
+            const switchedName = normalizeString(safeObject(safeObject(profilesV4Cache?.profiles)[targetId] || profiles?.[targetId]).name);
+            if (window.FilterTubeMascots?.profileSwitched && switchedName) window.FilterTubeMascots.profileSwitched(switchedName, (m, k) => UIComponents.showToast(m, k));
+            else UIComponents.showToast(tabViewUiText('popup.profile.switched', 'Profile switched'), 'success');
         } catch (e) {
             console.warn('Tab-View: profile switch failed', e);
             UIComponents.showToast(tabViewUiText('popup.profile.switchFailed', 'Failed to switch profile'), 'error');
@@ -30350,8 +30394,9 @@ document.addEventListener('DOMContentLoaded', async () => {
                         'Import verified and trusted-device recovery data restored'
                     )
                     : tabViewUiText('dashboard.backup.import.verified', 'Import verified');
+                // Restore ends on the done toast (Android 4ff67ce1b): "Everything's back in place."
                 UIComponents.showToast(
-                    `${importStatus}. ${metadataNotice}`,
+                    `${tabViewUiText('people.restoreDone', 'Everything\'s back in place.')} ${importStatus}. ${metadataNotice}`,
                     'success'
                 );
             }

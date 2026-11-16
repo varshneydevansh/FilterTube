@@ -3150,5 +3150,9 @@
   "parentMode.sync.upToDate": "Всё актуально",
   "parentMode.sync.waiting": "Будет отправлено на {device}",
   "parentMode.sync.offline": "Нет сети, изменения синхронизируются позже",
-  "askParent.openSpace": "Открыть пространство: {name}"
+  "askParent.openSpace": "Открыть пространство: {name}",
+  "people.profileSwitched": "Вы перешли в пространство {name}.",
+  "people.restoreDone": "Всё снова на своих местах.",
+  "people.paired": "Устройства связаны. Планы теперь синхронизируются в обе стороны.",
+  "people.pinTryAgain": "Этот PIN-код не подошёл. Попробуйте ещё раз."
 }

@@ -3138,5 +3138,9 @@
   "parentMode.sync.upToDate": "Imesasishwa",
   "parentMode.sync.waiting": "Itatumwa kwa {device}",
   "parentMode.sync.offline": "Nje ya mtandao, mabadiliko yatasawazishwa",
-  "askParent.openSpace": "Fungua nafasi ya {name}"
+  "askParent.openSpace": "Fungua nafasi ya {name}",
+  "people.profileSwitched": "Umehamia nafasi ya {name}.",
+  "people.restoreDone": "Kila kitu kimerudi mahali pake.",
+  "people.paired": "Imeunganishwa. Mipango sasa inasawazishwa pande zote mbili.",
+  "people.pinTryAgain": "PIN hiyo haikufanya kazi. Jaribu tena."
 }

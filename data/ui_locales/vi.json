@@ -3136,5 +3136,9 @@
   "parentMode.sync.upToDate": "Đã cập nhật",
   "parentMode.sync.waiting": "Sẽ gửi đến {device}",
   "parentMode.sync.offline": "Ngoại tuyến, thay đổi sẽ được đồng bộ",
-  "askParent.openSpace": "Mở không gian của {name}"
+  "askParent.openSpace": "Mở không gian của {name}",
+  "people.profileSwitched": "Đã chuyển sang không gian của {name}.",
+  "people.restoreDone": "Mọi thứ đã trở lại như cũ.",
+  "people.paired": "Đã ghép nối. Kế hoạch giờ đồng bộ theo cả hai chiều.",
+  "people.pinTryAgain": "Mã PIN đó không đúng. Hãy thử lại."
 }

@@ -3138,5 +3138,9 @@
   "parentMode.sync.upToDate": "হালনাগাদ আছে",
   "parentMode.sync.waiting": "{device}-এ পাঠানো হবে",
   "parentMode.sync.offline": "অফলাইন, পরিবর্তন সিঙ্ক হবে",
-  "askParent.openSpace": "{name}-এর জায়গা খুলুন"
+  "askParent.openSpace": "{name}-এর জায়গা খুলুন",
+  "people.profileSwitched": "{name}-এর জায়গায় বদলানো হয়েছে।",
+  "people.restoreDone": "সবকিছু আবার জায়গামতো ফিরে এসেছে।",
+  "people.paired": "যুক্ত হয়েছে। পরিকল্পনা এখন দুই দিকেই সিঙ্ক হয়।",
+  "people.pinTryAgain": "ওই পিনটি কাজ করেনি। আবার চেষ্টা করুন।"
 }

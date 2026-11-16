@@ -3136,5 +3136,9 @@
   "parentMode.sync.upToDate": "Ó ti wà ní àtúnṣe",
   "parentMode.sync.waiting": "A ó fi ránṣẹ́ sí {device}",
   "parentMode.sync.offline": "Kò sí íńtánẹ́ẹ̀tì, àwọn àyípadà yóò ṣiṣẹ́pọ̀",
-  "askParent.openSpace": "Ṣí àyè {name}"
+  "askParent.openSpace": "Ṣí àyè {name}",
+  "people.profileSwitched": "O ti yí padà sí àyè {name}.",
+  "people.restoreDone": "Gbogbo nǹkan ti padà sí ààyè rẹ̀.",
+  "people.paired": "Ó ti so pọ̀. Àwọn ètò ń ṣe ìmúdọ́gba ní ẹ̀gbẹ́ méjèèjì báyìí.",
+  "people.pinTryAgain": "PIN yẹn kò ṣiṣẹ́. Gbìyànjú lẹ́ẹ̀kan sí i."
 }

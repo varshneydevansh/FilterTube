@@ -3138,5 +3138,9 @@
   "parentMode.sync.upToDate": "E don update",
   "parentMode.sync.waiting": "Dem go send am to {device}",
   "parentMode.sync.offline": "No network, changes go sync later",
-  "askParent.openSpace": "Open {name} space"
+  "askParent.openSpace": "Open {name} space",
+  "people.profileSwitched": "You don switch go {name} space.",
+  "people.restoreDone": "Everything don go back to im place.",
+  "people.paired": "E don pair. Plans go dey sync both sides now.",
+  "people.pinTryAgain": "Dat PIN no work. Try again."
 }

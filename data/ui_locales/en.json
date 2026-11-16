@@ -3138,5 +3138,9 @@
   "parentMode.sync.upToDate": "Up to date",
   "parentMode.sync.waiting": "Will send to {device}",
   "parentMode.sync.offline": "Offline, changes will sync",
-  "askParent.openSpace": "Open {name}’s space"
+  "askParent.openSpace": "Open {name}’s space",
+  "people.profileSwitched": "Switched to {name}'s space.",
+  "people.restoreDone": "Everything's back in place.",
+  "people.paired": "Paired. Plans now sync both ways.",
+  "people.pinTryAgain": "That PIN didn't work. Try again."
 }

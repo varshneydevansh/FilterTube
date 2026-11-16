@@ -3138,5 +3138,9 @@
   "parentMode.sync.upToDate": "புதுப்பிக்கப்பட்டது",
   "parentMode.sync.waiting": "{device} க்கு அனுப்பப்படும்",
   "parentMode.sync.offline": "ஆஃப்லைன், மாற்றங்கள் ஒத்திசைக்கப்படும்",
-  "askParent.openSpace": "{name}-இன் இடத்தைத் திற"
+  "askParent.openSpace": "{name}-இன் இடத்தைத் திற",
+  "people.profileSwitched": "{name} இடத்துக்கு மாற்றப்பட்டது.",
+  "people.restoreDone": "எல்லாம் மீண்டும் இடத்தில் உள்ளது.",
+  "people.paired": "இணைக்கப்பட்டது. திட்டங்கள் இப்போது இரு பக்கமும் ஒத்திசைகின்றன.",
+  "people.pinTryAgain": "அந்த பின் வேலை செய்யவில்லை. மீண்டும் முயலுங்கள்."
 }

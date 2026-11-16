@@ -3136,5 +3136,9 @@
   "parentMode.sync.upToDate": "เป็นปัจจุบัน",
   "parentMode.sync.waiting": "จะส่งไปที่ {device}",
   "parentMode.sync.offline": "ออฟไลน์ การเปลี่ยนแปลงจะซิงก์ภายหลัง",
-  "askParent.openSpace": "เปิดพื้นที่ของ {name}"
+  "askParent.openSpace": "เปิดพื้นที่ของ {name}",
+  "people.profileSwitched": "เปลี่ยนไปที่พื้นที่ของ {name} แล้ว",
+  "people.restoreDone": "ทุกอย่างกลับเข้าที่แล้ว",
+  "people.paired": "จับคู่แล้ว แผนจะซิงค์ทั้งสองทางตอนนี้",
+  "people.pinTryAgain": "PIN นั้นใช้ไม่ได้ ลองอีกครั้ง"
 }

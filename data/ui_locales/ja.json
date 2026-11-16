@@ -3136,5 +3136,9 @@
   "parentMode.sync.upToDate": "最新の状態",
   "parentMode.sync.waiting": "{device}に送信します",
   "parentMode.sync.offline": "オフライン。変更は後で同期されます",
-  "askParent.openSpace": "{name}のスペースを開く"
+  "askParent.openSpace": "{name}のスペースを開く",
+  "people.profileSwitched": "{name} のスペースに切り替えました。",
+  "people.restoreDone": "すべて元どおりになりました。",
+  "people.paired": "ペアリングしました。プランは双方向で同期されます。",
+  "people.pinTryAgain": "その PIN は使えませんでした。もう一度お試しください。"
 }

@@ -3136,5 +3136,9 @@
   "parentMode.sync.upToDate": "최신 상태",
   "parentMode.sync.waiting": "{device}에 보낼 예정",
   "parentMode.sync.offline": "오프라인 상태예요. 변경 내용은 나중에 동기화돼요",
-  "askParent.openSpace": "{name}의 공간 열기"
+  "askParent.openSpace": "{name}의 공간 열기",
+  "people.profileSwitched": "{name} 님의 공간으로 바꿨어요.",
+  "people.restoreDone": "모든 것이 제자리로 돌아왔어요.",
+  "people.paired": "연결했어요. 이제 계획이 양쪽으로 동기화돼요.",
+  "people.pinTryAgain": "PIN이 맞지 않아요. 다시 시도해 주세요."
 }

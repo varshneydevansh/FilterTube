@@ -1668,7 +1668,19 @@
                     if (added.nodeType !== 1 || !added.classList?.contains('ft-toast') || added.querySelector('.pk-toast-art, .pk-toast-check')) continue;
                     const success = added.classList.contains('ft-toast-success');
                     const error = added.classList.contains('ft-toast-error');
-                    if (success && companionMode === 'lively') {
+                    // A moment may ask for its own pose (Android MascotPaperToast.kriti): Kriti waving after a
+                    // profile switch, jumping when pairing ends; "check" keeps the crayon check only.
+                    const wanted = added.dataset?.ftMascot || '';
+                    if (success && wanted === 'check') {
+                        added.classList.add('has-mascot');
+                        added.insertBefore(root.FilterTubeDoodles?.check?.({ className: 'pk-toast-check', delay: 220 }) || el('span', 'pk-toast-check'), added.firstChild);
+                    } else if (success && companionMode === 'lively' && (wanted === 'wave' || wanted === 'jump')) {
+                        const art = image(wanted === 'wave' ? ASSETS.kritiWave : stillImage('kritiJump'), 'pk-toast-art', 36);
+                        added.classList.add('has-mascot');
+                        added.insertBefore(art, added.firstChild);
+                        enter(art);
+                        if (wanted === 'jump') root.setTimeout(() => playSheet(art, 'kritiJump'), 160);
+                    } else if (success && companionMode === 'lively') {
                         const art = image(ASSETS.kritiThumbsUp, 'pk-toast-art', 36);
                         added.classList.add('has-mascot');
                         added.insertBefore(art, added.firstChild);
@@ -1996,6 +2008,37 @@
 
     // ---- Boot ------------------------------------------------------------------------------------
 
+    // ---- The profile switch moment (Android ProfileSwitchMoment, 4ff67ce1b) ---------------------------
+    /** Kriti's wave after a switch plays at most this often a day; other switches get the crayon check. */
+    const SWITCH_KRITI_PER_DAY = 3;
+    const SWITCH_KEY = 'ftProfileSwitchMomentV1';
+
+    function switchKritiAllowed(storedDay, storedCount, today) {
+        return (storedDay === today ? Number(storedCount) || 0 : 0) < SWITCH_KRITI_PER_DAY;
+    }
+
+    /** A Kids space on one side of the switch only: the page's tone crossfades. */
+    function switchCrossesKids(fromKids, toKids) { return !!fromKids !== !!toKids; }
+
+    /**
+     * After a switch has landed (never over a PIN gate): "Switched to Aarav's space." with Kriti's wave,
+     * at most three times a day (counted on this device), else with the crayon check.
+     */
+    function profileSwitched(name, showToast) {
+        const today = new Date().toISOString().slice(0, 10);
+        let stored = {};
+        try { stored = JSON.parse(root.localStorage?.getItem(SWITCH_KEY) || '{}') || {}; } catch (e) { stored = {}; }
+        const wave = switchKritiAllowed(stored.day, stored.count, today);
+        if (wave) {
+            try { root.localStorage?.setItem(SWITCH_KEY, JSON.stringify({ day: today, count: (stored.day === today ? Number(stored.count) || 0 : 0) + 1 })); } catch (e) { }
+        }
+        const words = t(['people.profileSwitched', 'Switched to {name}\u2019s space.'], { name });
+        showToast?.(words, 'success');
+        const toast = root.document?.querySelector?.('.ft-toast');
+        if (toast) toast.dataset.ftMascot = wave ? 'wave' : 'check';
+        return wave;
+    }
+
     root.FilterTubeMascots = Object.freeze({
         COMPANION_KEY, MILESTONES_KEY, WELCOME_KEY, MODES, DEFAULT_MODE, MILESTONES,
         SIEVE_FRAME_MS, SIEVE_LOOPS, BUBBLE_MAX_CHARS, COPY, ASSETS,
@@ -2011,7 +2054,8 @@
         allowListSwitchedOn, clampLine, loadMode, setMode,
         normalizeSoundMode, soundAllowed, playSound, loadSoundMode, moment,
         get mode() { return companionMode; },
-        emptyListKind, decorateEmptyList, celebrateImport, mountPopup, firstFilterMoment, ruleCount
+        emptyListKind, decorateEmptyList, celebrateImport, mountPopup, firstFilterMoment, ruleCount,
+        SWITCH_KRITI_PER_DAY, switchKritiAllowed, switchCrossesKids, profileSwitched
     });
 
     function autoMount() {

@@ -3136,5 +3136,9 @@
   "parentMode.sync.upToDate": "已經係最新",
   "parentMode.sync.waiting": "會傳送畀{device}",
   "parentMode.sync.offline": "離線，更改稍後會同步",
-  "askParent.openSpace": "打開{name}嘅空間"
+  "askParent.openSpace": "打開{name}嘅空間",
+  "people.profileSwitched": "已經轉咗去 {name} 嘅空間。",
+  "people.restoreDone": "所有嘢都返晒原位。",
+  "people.paired": "已經配對。計劃而家兩邊同步。",
+  "people.pinTryAgain": "呢個 PIN 唔啱。再試一次。"
 }

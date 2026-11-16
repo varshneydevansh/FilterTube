@@ -3136,5 +3136,9 @@
   "parentMode.sync.upToDate": "已是最新",
   "parentMode.sync.waiting": "将发送到{device}",
   "parentMode.sync.offline": "离线，更改将在联网后同步",
-  "askParent.openSpace": "打开{name}的空间"
+  "askParent.openSpace": "打开{name}的空间",
+  "people.profileSwitched": "已切换到 {name} 的空间。",
+  "people.restoreDone": "一切都已恢复原样。",
+  "people.paired": "已配对。计划现在双向同步。",
+  "people.pinTryAgain": "这个 PIN 不对。请再试一次。"
 }

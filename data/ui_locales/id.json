@@ -3136,5 +3136,9 @@
   "parentMode.sync.upToDate": "Terbaru",
   "parentMode.sync.waiting": "Akan dikirim ke {device}",
   "parentMode.sync.offline": "Offline, perubahan akan disinkronkan",
-  "askParent.openSpace": "Buka ruang {name}"
+  "askParent.openSpace": "Buka ruang {name}",
+  "people.profileSwitched": "Beralih ke ruang {name}.",
+  "people.restoreDone": "Semuanya sudah kembali seperti semula.",
+  "people.paired": "Tersambung. Rencana kini disinkronkan ke dua arah.",
+  "people.pinTryAgain": "PIN itu tidak berhasil. Coba lagi."
 }

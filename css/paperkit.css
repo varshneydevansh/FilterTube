@@ -1243,3 +1243,21 @@ body.ft-extension-surface[data-surface="tab-view"] .ft-about-portrait-card img {
   align-self: flex-end;
   pointer-events: none;
 }
+
+/* A wrong PIN (Android PinGateActivity): the field takes the danger edge and a polite line asks again. */
+.ft-modal .ft-modal-error { margin: 6px 0 0; color: var(--pk-brick); font-size: 13px; font-weight: 600; }
+.ft-modal .ft-modal-error[hidden] { display: none; }
+.ft-modal input[aria-invalid="true"] { border-color: var(--pk-brick) !important; }
+
+/* Message dialogs enter at 0.96 with alpha (Android FilterTubeMessageDialog, 4ff67ce1b). */
+.ft-modal-overlay > .ft-modal { animation: pk-dialog-in var(--pk-medium) var(--pk-ease-enter) both; }
+@keyframes pk-dialog-in { from { opacity: 0; transform: scale(0.96); } to { opacity: 1; transform: none; } }
+@media (prefers-reduced-motion: reduce) {
+  .ft-modal-overlay > .ft-modal { animation-name: pk-dialog-fade; }
+  @keyframes pk-dialog-fade { from { opacity: 0; } to { opacity: 1; } }
+}
+
+/* The profile popup grows from the avatar (Android ProfileDropdownPopup, 4ff67ce1b). */
+.ft-profile-dropdown:not([hidden]) { transform-origin: top right; animation: pk-popup-grow var(--pk-short) var(--pk-ease-enter) both; }
+@keyframes pk-popup-grow { from { opacity: 0; transform: scale(0.92); } to { opacity: 1; transform: none; } }
+@media (prefers-reduced-motion: reduce) { .ft-profile-dropdown:not([hidden]) { animation-name: pk-dialog-fade; } }

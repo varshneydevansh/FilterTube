@@ -1829,7 +1829,28 @@ document.addEventListener('DOMContentLoaded', async () => {
         }
     }
 
-    async function showPromptModal({ eyebrow = '', title, message, placeholder = '', inputType = 'text', confirmText = 'Confirm', cancelText = popupUiText('popup.modal.cancel', 'Cancel'), initialValue = '' }) {
+    /**
+     * A wrong PIN (Android 4ff67ce1b PinGateMotion): the field shakes 0, -10, 10, -7, 7, -3, 0 px over
+     * 320 ms (still with reduced motion), the polite line says "That PIN didn't work. Try again.", and
+     * the field clears for the next try. No sound and no mascot on a PIN gate.
+     */
+    function rejectPinInput(input, line, text) {
+        line.textContent = text;
+        line.hidden = false;
+        input.value = '';
+        input.setAttribute('aria-invalid', 'true');
+        input.addEventListener('input', () => input.removeAttribute('aria-invalid'), { once: true });
+        try {
+            const still = window.matchMedia?.('(prefers-reduced-motion: reduce)')?.matches === true;
+            if (!still && typeof input.animate === 'function') {
+                input.animate([0, -10, 10, -7, 7, -3, 0].map(x => ({ transform: `translateX(${x}px)` })), { duration: 320, easing: 'ease-out' });
+            }
+        } catch (e) {
+        }
+        try { input.focus(); } catch (e) { }
+    }
+
+    async function showPromptModal({ eyebrow = '', title, message, placeholder = '', inputType = 'text', confirmText = 'Confirm', cancelText = popupUiText('popup.modal.cancel', 'Cancel'), initialValue = '', check = null }) {
         return new Promise((resolve) => {
             const overlay = document.createElement('div');
             overlay.className = 'ft-modal-overlay';
@@ -1867,6 +1888,13 @@ document.addEventListener('DOMContentLoaded', async () => {
             input.placeholder = placeholder;
             input.value = initialValue;
             if (inputType !== 'none') body.appendChild(input);
+            // A wrong answer's line, read politely (the PIN gate's "Try again").
+            const errorLine = document.createElement('p');
+            errorLine.className = 'ft-modal-error';
+            errorLine.setAttribute('role', 'status');
+            errorLine.setAttribute('aria-live', 'polite');
+            errorLine.hidden = true;
+            body.appendChild(errorLine);
 
             const actions = document.createElement('div');
             actions.className = 'ft-modal-actions';
@@ -1894,7 +1922,16 @@ document.addEventListener('DOMContentLoaded', async () => {
             };
 
             cancelBtn.addEventListener('click', () => closeWith(null));
-            okBtn.addEventListener('click', () => closeWith(inputType === 'none' ? true : input.value));
+            okBtn.addEventListener('click', async () => {
+                const value = inputType === 'none' ? true : input.value;
+                if (typeof check !== 'function' || inputType === 'none') { closeWith(value); return; }
+                okBtn.disabled = true;
+                const result = await Promise.resolve(check(value)).catch(() => ({ ok: false, close: true }));
+                okBtn.disabled = false;
+                if (result?.ok) closeWith(value);
+                else if (result?.close) closeWith(null);
+                else rejectPinInput(input, errorLine, result?.message || popupUiText('people.pinTryAgain', "That PIN didn't work. Try again."));
+            });
 
             input.addEventListener('keydown', (e) => {
                 if (e.key === 'Enter') {
@@ -1949,32 +1986,37 @@ document.addEventListener('DOMContentLoaded', async () => {
         if (!verifier) return true;
 
         const copy = getProfileAccessCopy(profilesV4, profileId);
+        // The background checks the PIN and counts wrong attempts (the same limit as the options page and
+        // the app's PIN lockout); a local check stays only for when the background can't answer. A wrong
+        // PIN shakes the field and asks again in place (Android PinGateActivity); the limit closes it.
+        let auth = null;
         const pin = await showPromptModal({
             eyebrow: copy.eyebrow,
             title: copy.title,
             message: copy.message,
             placeholder: copy.placeholder,
             inputType: 'password',
-            confirmText: popupUiText('profileAccess.unlockButton', 'Unlock')
+            confirmText: popupUiText('profileAccess.unlockButton', 'Unlock'),
+            check: async value => {
+                const entered = normalizeString(value);
+                if (!entered) return { ok: false };
+                try {
+                    auth = await sendRuntimeMessage({ action: 'FilterTube_SessionPinAuth', profileId, pin: entered });
+                } catch (e) {
+                    auth = null;
+                }
+                const ok = auth && typeof auth.ok === 'boolean' ? auth.ok : await verifyPin(entered, verifier);
+                if (ok) return { ok: true };
+                if (auth?.reason === 'rate_limited') {
+                    UIComponents.showToast(popupUiText('dashboard.toast.pinRateLimited', 'Too many incorrect PIN attempts. Try again later.'), 'error');
+                    return { ok: false, close: true };
+                }
+                return { ok: false };
+            }
         });
 
         const normalized = normalizeString(pin);
         if (!normalized) return false;
-        // The background checks the PIN and counts wrong attempts (the same limit as the options page and
-        // the app's PIN lockout); a local check stays only for when the background can't answer.
-        let auth = null;
-        try {
-            auth = await sendRuntimeMessage({ action: 'FilterTube_SessionPinAuth', profileId, pin: normalized });
-        } catch (e) {
-            auth = null;
-        }
-        const ok = auth && typeof auth.ok === 'boolean' ? auth.ok : await verifyPin(normalized, verifier);
-        if (!ok) {
-            UIComponents.showToast(auth?.reason === 'rate_limited'
-                ? popupUiText('dashboard.toast.pinRateLimited', 'Too many incorrect PIN attempts. Try again later.')
-                : popupUiText('popup.pin.incorrect', 'Incorrect PIN'), 'error');
-            return false;
-        }
         unlockedProfiles.add(profileId);
         if (!auth) await notifyBackgroundUnlocked(profileId, normalized);
         return true;
@@ -2439,7 +2481,11 @@ document.addEventListener('DOMContentLoaded', async () => {
             renderChannels();
             updateCheckboxes();
             applyLockGateIfNeeded();
-            UIComponents.showToast(popupUiText('popup.profile.switched', 'Profile switched'), 'success');
+            // The switch moment, once the switch has landed (Android ProfileSwitchMoment): Kriti waves at most
+            // three times a day, else the crayon check.
+            const switchedName = normalizeString(safeObject(safeObject(profilesV4Cache?.profiles)[targetId] || profiles?.[targetId]).name);
+            if (window.FilterTubeMascots?.profileSwitched && switchedName) window.FilterTubeMascots.profileSwitched(switchedName, (m, k) => UIComponents.showToast(m, k));
+            else UIComponents.showToast(popupUiText('popup.profile.switched', 'Profile switched'), 'success');
         } catch (e) {
             console.warn('Popup: profile switch failed', e);
             UIComponents.showToast(popupUiText('popup.profile.switchFailed', 'Failed to switch profile'), 'error');

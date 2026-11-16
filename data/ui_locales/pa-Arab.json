@@ -3138,5 +3138,9 @@
   "parentMode.sync.upToDate": "تازہ اے",
   "parentMode.sync.waiting": "{device} نوں بھیجیا جاوے گا",
   "parentMode.sync.offline": "آف لائن، تبدیلیاں سنک ہون گیاں",
-  "askParent.openSpace": "{name} دی تھاں کھولو"
+  "askParent.openSpace": "{name} دی تھاں کھولو",
+  "people.profileSwitched": "{name} دی تھاں تے بدل گیا۔",
+  "people.restoreDone": "سب کجھ اپنی تھاں تے واپس آ گیا۔",
+  "people.paired": "جُڑ گیا۔ ہُن منصوبے دوویں پاسے سنک ہوندے نیں۔",
+  "people.pinTryAgain": "اوہ پن کم نئیں کیتا۔ فیر کوشش کرو۔"
 }

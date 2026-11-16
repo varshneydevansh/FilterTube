@@ -3162,5 +3162,9 @@
   "parentMode.sync.upToDate": "محدّث",
   "parentMode.sync.waiting": "هيتبعت لـ{device}",
   "parentMode.sync.offline": "أوفلاين، التغييرات هتتزامن",
-  "askParent.openSpace": "افتح مساحة {name}"
+  "askParent.openSpace": "افتح مساحة {name}",
+  "people.profileSwitched": "اتنقلت لمساحة {name}.",
+  "people.restoreDone": "كل حاجة رجعت مكانها.",
+  "people.paired": "اتربطوا. الخطط بقت بتتزامن في الاتجاهين.",
+  "people.pinTryAgain": "الرقم السري ده ما اشتغلش. جرّب تاني."
 }

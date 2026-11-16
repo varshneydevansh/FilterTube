@@ -3138,5 +3138,9 @@
   "parentMode.sync.upToDate": "ನವೀಕೃತವಾಗಿದೆ",
   "parentMode.sync.waiting": "{device} ಗೆ ಕಳುಹಿಸಲಾಗುತ್ತದೆ",
   "parentMode.sync.offline": "ಆಫ್‌ಲೈನ್, ಬದಲಾವಣೆಗಳು ಸಿಂಕ್ ಆಗುತ್ತವೆ",
-  "askParent.openSpace": "{name} ಅವರ ಜಾಗ ತೆರೆಯಿರಿ"
+  "askParent.openSpace": "{name} ಅವರ ಜಾಗ ತೆರೆಯಿರಿ",
+  "people.profileSwitched": "{name} ಅವರ ಸ್ಥಳಕ್ಕೆ ಬದಲಾಯಿಸಲಾಗಿದೆ.",
+  "people.restoreDone": "ಎಲ್ಲವೂ ಮತ್ತೆ ತಮ್ಮ ಜಾಗದಲ್ಲಿದೆ.",
+  "people.paired": "ಜೋಡಿಸಲಾಗಿದೆ. ಯೋಜನೆಗಳು ಈಗ ಎರಡೂ ಕಡೆ ಸಿಂಕ್ ಆಗುತ್ತವೆ.",
+  "people.pinTryAgain": "ಆ ಪಿನ್ ಕೆಲಸ ಮಾಡಲಿಲ್ಲ. ಮತ್ತೆ ಪ್ರಯತ್ನಿಸಿ."
 }

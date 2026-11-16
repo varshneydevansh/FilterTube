@@ -3138,5 +3138,9 @@
   "parentMode.sync.upToDate": "Güncel",
   "parentMode.sync.waiting": "Gönderilecek: {device}",
   "parentMode.sync.offline": "Çevrimdışı, değişiklikler eşitlenecek",
-  "askParent.openSpace": "{name} alanını aç"
+  "askParent.openSpace": "{name} alanını aç",
+  "people.profileSwitched": "{name} alanına geçildi.",
+  "people.restoreDone": "Her şey yerine döndü.",
+  "people.paired": "Eşlendi. Planlar artık iki yönde eşitleniyor.",
+  "people.pinTryAgain": "Bu PIN olmadı. Yeniden dene."
 }

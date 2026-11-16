@@ -3138,5 +3138,9 @@
   "parentMode.sync.upToDate": "తాజాగా ఉంది",
   "parentMode.sync.waiting": "{device}కు పంపబడుతుంది",
   "parentMode.sync.offline": "ఆఫ్‌లైన్, మార్పులు సింక్ అవుతాయి",
-  "askParent.openSpace": "{name} స్పేస్ తెరవండి"
+  "askParent.openSpace": "{name} స్పేస్ తెరవండి",
+  "people.profileSwitched": "{name} స్థలానికి మారారు.",
+  "people.restoreDone": "అన్నీ మళ్లీ వాటి స్థానంలో ఉన్నాయి.",
+  "people.paired": "జత చేయబడింది. ప్రణాళికలు ఇప్పుడు రెండు వైపులా సింక్ అవుతాయి.",
+  "people.pinTryAgain": "ఆ పిన్ పని చేయలేదు. మళ్లీ ప్రయత్నించండి."
 }

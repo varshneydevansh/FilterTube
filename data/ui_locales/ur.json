@@ -3138,5 +3138,9 @@
   "parentMode.sync.upToDate": "تازہ ترین",
   "parentMode.sync.waiting": "{device} کو بھیجا جائے گا",
   "parentMode.sync.offline": "آف لائن، تبدیلیاں سنک ہوں گی",
-  "askParent.openSpace": "{name} کی جگہ کھولیں"
+  "askParent.openSpace": "{name} کی جگہ کھولیں",
+  "people.profileSwitched": "{name} کی جگہ پر بدل دیا گیا۔",
+  "people.restoreDone": "سب کچھ اپنی جگہ واپس آ گیا۔",
+  "people.paired": "جوڑ دیا گیا۔ اب منصوبے دونوں طرف سنک ہوتے ہیں۔",
+  "people.pinTryAgain": "وہ پن کام نہیں کیا۔ دوبارہ کوشش کریں۔"
 }

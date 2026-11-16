@@ -3138,5 +3138,9 @@
   "parentMode.sync.upToDate": "अप-टू-डेट",
   "parentMode.sync.waiting": "{device} को भेजा जाएगा",
   "parentMode.sync.offline": "ऑफ़लाइन, बदलाव सिंक हो जाएँगे",
-  "askParent.openSpace": "{name} की जगह खोलें"
+  "askParent.openSpace": "{name} की जगह खोलें",
+  "people.profileSwitched": "{name} की जगह पर बदल दिया गया।",
+  "people.restoreDone": "सब कुछ अपनी जगह वापस आ गया।",
+  "people.paired": "जुड़ गया। अब योजनाएँ दोनों ओर सिंक होती हैं।",
+  "people.pinTryAgain": "वह पिन नहीं चला। फिर से कोशिश करें।"
 }

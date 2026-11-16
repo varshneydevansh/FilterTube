@@ -3138,5 +3138,9 @@
   "parentMode.sync.upToDate": "Napapanahon",
   "parentMode.sync.waiting": "Ipapadala kay {device}",
   "parentMode.sync.offline": "Offline, masi-sync ang mga pagbabago",
-  "askParent.openSpace": "Buksan ang space ni {name}"
+  "askParent.openSpace": "Buksan ang space ni {name}",
+  "people.profileSwitched": "Lumipat sa space ni {name}.",
+  "people.restoreDone": "Bumalik na sa lugar ang lahat.",
+  "people.paired": "Naipares na. Nagsi-sync na ang mga plano sa magkabilang panig.",
+  "people.pinTryAgain": "Hindi gumana ang PIN na iyon. Subukan ulit."
 }
