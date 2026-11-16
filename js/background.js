@@ -6928,6 +6928,11 @@ browserAPI.runtime.onMessage.addListener(function (request, sender, sendResponse
         return false;
     }
 
+    else if (request.action === "FilterTube_PackChannelAvatar") {
+        studyChannelAvatar(request).then(logo => sendResponse({ ok: !!logo, logo: logo || null })).catch(() => sendResponse({ ok: false, logo: null }));
+        return true;
+    }
+
     else if (request.action === "fetchChannelDetails") {
         console.log("FilterTube Background: Received fetchChannelDetails request for:", request.channelIdOrHandle);
         fetchChannelInfo(request.channelIdOrHandle).then(channelInfo => {
@@ -7047,6 +7052,43 @@ function extractCustomUrlFromPath(path) {
     }
 
     return '';
+}
+
+/**
+ * Android StudyChannelAvatars: a study pack channel's round picture. Pack channels carry no picture, so
+ * each one is looked up once, one at a time, and its address is remembered on this device
+ * (ftStudyChannelAvatarsV1, channel id or lower-case handle -> https picture address).
+ */
+const STUDY_CHANNEL_AVATARS_KEY = 'ftStudyChannelAvatarsV1';
+const STUDY_CHANNEL_AVATARS_MAX = 600;
+let studyChannelAvatarQueue = Promise.resolve();
+const studyChannelAvatarPending = new Map();
+function studyChannelAvatar(request) {
+    const channelId = typeof request?.channelId === 'string' && /^UC[A-Za-z0-9_-]{22}$/.test(request.channelId.trim()) ? request.channelId.trim() : '';
+    const handle = typeof request?.handle === 'string' ? request.handle.trim().replace(/^@/, '') : '';
+    const key = channelId || handle.toLowerCase();
+    if (!key) return Promise.resolve(null);
+    if (studyChannelAvatarPending.has(key)) return studyChannelAvatarPending.get(key);
+    const job = new Promise(resolve => browserAPI.storage.local.get([STUDY_CHANNEL_AVATARS_KEY], resolve)).then(stored => {
+        const known = stored?.[STUDY_CHANNEL_AVATARS_KEY]?.[key];
+        if (typeof known === 'string' && known.startsWith('https://')) return known;
+        const lookup = studyChannelAvatarQueue.then(async () => {
+            const info = await fetchChannelInfo(channelId || `@${handle}`);
+            // A 40 px circle needs a small picture: the channel's s900 becomes s88.
+            const logo = typeof info?.logo === 'string' && info.logo.startsWith('https://') ? info.logo.replace(/=s\d+-/, '=s88-') : null;
+            if (!logo) return null;
+            const current = await new Promise(resolve => browserAPI.storage.local.get([STUDY_CHANNEL_AVATARS_KEY], resolve));
+            const table = { ...(current?.[STUDY_CHANNEL_AVATARS_KEY] || {}), [key]: logo };
+            const keys = Object.keys(table);
+            if (keys.length > STUDY_CHANNEL_AVATARS_MAX) keys.slice(0, keys.length - STUDY_CHANNEL_AVATARS_MAX).forEach(old => delete table[old]);
+            await new Promise(resolve => browserAPI.storage.local.set({ [STUDY_CHANNEL_AVATARS_KEY]: table }, resolve));
+            return logo;
+        }).catch(() => null);
+        studyChannelAvatarQueue = lookup.then(() => undefined);
+        return lookup;
+    }).finally(() => studyChannelAvatarPending.delete(key));
+    studyChannelAvatarPending.set(key, job);
+    return job;
 }
 
 async function fetchChannelInfo(channelIdOrHandle) {

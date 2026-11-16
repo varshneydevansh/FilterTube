@@ -768,7 +768,35 @@
         box.setAttribute('aria-hidden', 'true');
         const letter = (Array.from(text(row.name)).find(ch => /[\p{L}\p{N}]/u.test(ch)) || '•').toUpperCase();
         box.appendChild(el('span', 'ft-setup-avatar__initial', letter));
+        loadChannelAvatar(box, row);
         return box;
+    }
+
+    /**
+     * Android StudyChannelAvatars: pack channels carry no picture, so each one is looked up once in the
+     * background (FilterTube_PackChannelAvatar) and its picture address is remembered on this device.
+     * Until then, and offline, the row keeps the channel's first letter in a soft circle.
+     */
+    const avatarRequests = new Map();
+    function loadChannelAvatar(box, row) {
+        const key = text(row.channelId) || text(row.handle).replace(/^@/, '').toLowerCase();
+        if (!key) return;
+        let pending = avatarRequests.get(key);
+        if (!pending) {
+            pending = send({ action: 'FilterTube_PackChannelAvatar', channelId: row.channelId || null, handle: row.handle || null })
+                .then(response => text(response?.logo));
+            avatarRequests.set(key, pending);
+        }
+        pending.then(url => {
+            if (!/^https:\/\//.test(url)) { avatarRequests.delete(key); return; }
+            const img = el('img', 'ft-setup-avatar__img');
+            img.alt = '';
+            img.referrerPolicy = 'no-referrer';
+            img.addEventListener('load', () => box.classList.add('has-picture'), { once: true });
+            img.addEventListener('error', () => img.remove(), { once: true });
+            img.src = url;
+            box.appendChild(img);
+        });
     }
 
     /**
