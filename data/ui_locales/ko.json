@@ -429,6 +429,7 @@
   "dashboard.ruleEditor.searchChannels": "채널 검색...",
   "dashboard.ruleEditor.searchKeywords": "키워드 검색...",
   "dashboard.ruleEditor.sortBy": "정렬 기준:",
+  "dashboard.ruleEditor.moreOptions": "추가 옵션",
   "dashboard.ruleEditor.to": "부터",
   "dashboard.ruleEditor.today": "오늘",
   "dashboard.ruleEditor.turnOff": "끄기",

@@ -1008,3 +1008,27 @@ body.ft-extension-surface[data-surface="tab-view"] .channel-item .channel-map-ro
 body.ft-extension-surface[data-surface="tab-view"] .channel-item > .channel-body-row { padding-top: 8px; }
 .ft-ask-hub-row--popup { margin: 8px 12px; padding: 10px 14px; }
 .ft-ask-hub-row--popup .ft-ask-hub-row__words { font-size: 16px; }
+
+/* Keywords and Channels: date and sort behind one filter button beside search (Android
+   NativeMainRuleFilterSheet: 56 dp square, 18 dp corners, 22 dp brand icon, 8 dp gap; brick-soft while
+   a sort, a date range or a source narrows the list). The options open in a paper panel below. */
+html.pk-parity .filter-controls.pk-rule-search-row { justify-content: flex-start; align-items: center; gap: 8px; flex-wrap: nowrap; }
+html.pk-parity .pk-rule-search-row > .search-input { flex: 1 1 auto; min-width: 0; }
+html.pk-parity .pk-rule-options-btn {
+  flex: 0 0 56px; width: 56px; height: 56px; padding: 0; display: inline-grid; place-items: center;
+  border: 1px solid var(--pk-line); border-radius: 18px; background: transparent; cursor: pointer;
+}
+html.pk-parity .pk-rule-options-btn__icon { width: 22px; height: 22px; display: block; background-color: var(--pk-brick); -webkit-mask: var(--pk-rule-icon) center / contain no-repeat; mask: var(--pk-rule-icon) center / contain no-repeat; }
+html.pk-parity .pk-rule-options-btn.is-active { background: #fee2e2; border-color: transparent; }
+html.pk-parity .pk-rule-options-btn:focus-visible { outline: 2px solid var(--pk-brick); outline-offset: 2px; }
+html.pk-parity .pk-rule-options {
+  margin: 0 0 var(--ft-space-md, 16px); padding: 12px 20px 24px; border-radius: 20px;
+  background: var(--pk-paper); border: 1px solid var(--pk-line);
+}
+html.pk-parity .pk-rule-options[hidden] { display: none; }
+html.pk-parity .pk-rule-options > .date-filter-controls { margin-bottom: 8px; }
+html.pk-parity .pk-rule-options > .sort-controls { flex-wrap: wrap; }
+html.pk-parity[data-theme="dark"] .pk-rule-options-btn.is-active { background: #3a2020; }
+@media (prefers-color-scheme: dark) {
+  html.pk-parity:not([data-theme]) .pk-rule-options-btn.is-active { background: #3a2020; }
+}

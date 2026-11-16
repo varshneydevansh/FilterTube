@@ -7,6 +7,8 @@
  * - The area of the page you are on (data-pk-area on <html>), so switches, ticks and tabs take its ink.
  * - Under each content control, the app's status line: "Hidden everywhere" or "Showing".
  * - While the allow list is on, a scribble circle round "Allowed rules" (DoodleKit.scribbleCircle).
+ * - On Keywords and Channels, the date and sort options fold behind one filter button beside search
+ *   (NativeMainRuleFilterSheet); the button fills brick-soft while they narrow the list.
  * Words come from data/ui_locales; tile titles and summaries are the sidebar's own, so they stay in
  * step with it in every language.
  */
@@ -33,7 +35,9 @@
         spaceMain: ['pk.space.main', 'Main Viewing'],
         spaceKids: ['pk.space.kids', 'Kids Viewing'],
         hidden: ['pk.toggle.hidden', 'Hidden everywhere'],
-        showing: ['pk.toggle.showing', 'Showing']
+        showing: ['pk.toggle.showing', 'Showing'],
+        // Android reuses the TV's translated "More options" for this button (93cf50d53).
+        ruleOptions: ['dashboard.ruleEditor.moreOptions', 'More options']
     });
 
     // ControlsPaper.areaOf and tileIcon: which hue and crayon icon each destination wears.
@@ -341,6 +345,77 @@
         }
     }
 
+    /**
+     * Android NativeMainRuleFilterSheet (a5efd779d, 93cf50d53): on Keywords and Channels the search field
+     * shares its row with one filter button (56 px square, 18 px corners, 22 px brand icon, 8 px gap) that
+     * opens the same date ("Rule added") and sort controls, so the rule list starts higher. The controls
+     * are moved, not copied, so their listeners and saved behaviour are unchanged. The button fills
+     * brick-soft while a non-default sort, a date range or a source narrows the list.
+     */
+    function ruleOptionsNarrowed(panel) {
+        const value = selector => panel.querySelector(selector)?.value || '';
+        const sort = panel.querySelector('.sort-controls select:not(.channel-source-filter)');
+        const preset = panel.querySelector('.date-range-controls select');
+        const source = panel.querySelector('.channel-source-filter');
+        return (sort && sort.value && sort.value !== 'newest')
+            || (preset && preset.value && preset.value !== 'all')
+            || !!value('.date-inputs input[type="date"]:first-of-type') || !!value('.date-inputs input[type="date"]:last-of-type')
+            || !!(source && source.value && source.value !== 'all');
+    }
+
+    function syncRuleOptions() {
+        let index = 0;
+        for (const controls of doc.querySelectorAll('.filter-controls:not([data-pk-rule-options])')) {
+            const search = controls.querySelector(':scope > .search-input');
+            const sort = controls.querySelector(':scope > .sort-controls');
+            const dates = controls.nextElementSibling?.classList?.contains('date-filter-controls') ? controls.nextElementSibling : null;
+            if (!search || !sort) continue;
+            controls.setAttribute('data-pk-rule-options', '');
+            controls.classList.add('pk-rule-search-row');
+            const panelId = `pkRuleOptions${search.id ? `-${search.id}` : `-${index += 1}`}`;
+            const button = el('button', 'pk-rule-options-btn');
+            button.type = 'button';
+            button.setAttribute('aria-expanded', 'false');
+            button.setAttribute('aria-controls', panelId);
+            // The crayon filter icon tinted brand brick (the app's iconTint), drawn through a mask.
+            const icon = el('span', 'pk-rule-options-btn__icon');
+            icon.setAttribute('aria-hidden', 'true');
+            icon.style.setProperty('--pk-rule-icon', `url("${iconUrl('filtertube_filter')}")`);
+            button.appendChild(icon);
+            const label = () => {
+                const words = t(COPY.ruleOptions);
+                button.setAttribute('aria-label', words);
+                button.title = words;
+            };
+            label();
+            root.addEventListener('filtertube-ui-locale-changed', label);
+            const panel = el('div', 'pk-rule-options');
+            panel.id = panelId;
+            panel.hidden = true;
+            panel.setAttribute('role', 'group');
+            panel.setAttribute('aria-label', t(COPY.ruleOptions));
+            controls.after(panel);
+            if (dates) panel.appendChild(dates);
+            panel.appendChild(sort);
+            controls.appendChild(button);
+            const refresh = () => button.classList.toggle('is-active', !!ruleOptionsNarrowed(panel));
+            const setOpen = open => {
+                panel.hidden = !open;
+                button.setAttribute('aria-expanded', open ? 'true' : 'false');
+                button.classList.toggle('is-open', open);
+            };
+            button.addEventListener('click', () => setOpen(panel.hidden));
+            panel.addEventListener('keydown', event => {
+                if (event.key !== 'Escape') return;
+                setOpen(false);
+                button.focus();
+            });
+            // Values also change from code (Clear, a profile switch), so check after any change or click.
+            for (const type of ['change', 'input', 'click']) panel.addEventListener(type, () => root.setTimeout(refresh, 0));
+            refresh();
+        }
+    }
+
     function start() {
         if (!doc.getElementById('viewContainer')) return;
         doc.documentElement.classList.add('pk-parity');
@@ -348,13 +423,14 @@
         syncArea();
         syncToggleStatus();
         syncAllowCircle();
+        syncRuleOptions();
         const nav = doc.getElementById('sidebarNav');
         if (nav) new root.MutationObserver(syncArea).observe(nav, { subtree: true, attributes: true, attributeFilter: ['class', 'aria-current'] });
         let queued = false;
         new root.MutationObserver(() => {
             if (queued) return;
             queued = true;
-            root.setTimeout(() => { queued = false; syncToggleStatus(); syncAllowCircle(); }, 0);
+            root.setTimeout(() => { queued = false; syncToggleStatus(); syncAllowCircle(); syncRuleOptions(); }, 0);
         }).observe(doc.getElementById('viewContainer'), { subtree: true, childList: true });
         const pill = doc.getElementById('ftTopBarListModeControlsTab');
         if (pill) new root.MutationObserver(syncAllowCircle).observe(pill, { subtree: true, childList: true, attributes: true, attributeFilter: ['class'] });
@@ -364,7 +440,7 @@
         root.addEventListener('filtertube-ui-locale-changed', () => syncToggleStatus());
     }
 
-    root.FilterTubePaperParity = Object.freeze({ COPY, TILES, NAV_AREA, plural, numberIn, rollTo });
+    root.FilterTubePaperParity = Object.freeze({ COPY, TILES, NAV_AREA, plural, numberIn, rollTo, syncRuleOptions, ruleOptionsNarrowed });
     if (doc.readyState === 'loading') doc.addEventListener('DOMContentLoaded', () => root.setTimeout(start, 0), { once: true });
     else root.setTimeout(start, 0);
 })(typeof window !== 'undefined' ? window : globalThis);
