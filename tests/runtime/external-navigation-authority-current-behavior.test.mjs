@@ -181,7 +181,7 @@ test('extension static HTML target blank links are mixed rel-policy surfaces tod
 
   assert.equal(targetBlankCount, 7);
   assert.equal(httpsHrefCount, 8);
-  assert.match(popupHtml, /fonts\.googleapis\.com/);
+  assert.doesNotMatch(popupHtml, /fonts\.googleapis\.com/);
   assert.match(tabHtml, /<a href="https:\/\/filtertube\.in" target="_blank" class="brand"/);
   assert.match(tabHtml, /href="https:\/\/www\.filtertube\.in\/downloads" target="_blank" rel="noreferrer"/);
   assert.match(tabHtml, /href="https:\/\/nanah-signaling\.varshney-devansh614\.workers\.dev\/" target="_blank" rel="noopener noreferrer"/);

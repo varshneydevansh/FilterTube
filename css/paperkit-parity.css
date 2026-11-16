@@ -697,3 +697,45 @@ body.ft-extension-surface .ft-study-status.is-break { background: var(--pk-sun-w
 body.ft-extension-surface .ft-study-status.is-done,
 body.ft-extension-surface .ft-study-status.is-normal,
 body.ft-extension-surface .ft-study-status.is-hold { background: var(--pk-sage) !important; }
+
+/* ---------------------------------------------------------------------------
+ * Pass 3: the hub's header, as in the app (NativeControlCenterView): no hero copy and no Play
+ * promotion, just the active profile, the Main/Kids switch and Switch profile in one paper strip,
+ * with Kriti and Uljhan standing on its top edge.
+ * ------------------------------------------------------------------------- */
+:root[data-page-tone][data-theme] body.ft-extension-surface[data-surface="tab-view"] #dashboardView .ft-dash-hero.ft-dash-hero--hub {
+  display: block;
+  padding: 0;
+  border: 0;
+  background: none;
+  box-shadow: none;
+  backdrop-filter: none;
+  -webkit-backdrop-filter: none;
+  overflow: visible;
+}
+
+#dashboardView .ft-dash-hero--hub .ft-dash-status {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 0.9rem 1.4rem;
+  margin-top: 0;
+}
+
+:root:not([data-ft-companion="off"]) #dashboardView .ft-dash-hero--hub .ft-dash-status.has-duo {
+  margin-top: 112px;
+  padding-inline-end: 1.15rem;
+}
+
+#dashboardView .ft-dash-hero--hub .ft-dash-status__source {
+  grid-column: 1 / -1;
+}
+
+@media (min-width: 900px) {
+  #dashboardView .ft-dash-hero--hub .ft-dash-status {
+    grid-template-columns: minmax(0, 1fr) minmax(15rem, 22rem);
+  }
+  #dashboardView .ft-dash-hero--hub .ft-dash-status__source {
+    grid-column: auto;
+  }
+}

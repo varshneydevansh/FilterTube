@@ -9,9 +9,6 @@
     <link rel="stylesheet" href="../css/components.css">
     <link rel="stylesheet" href="../css/tab-view.css">
     <link rel="stylesheet" href="../css/serene-shell.css">
-    <link
-        href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@1,400;1,500;1,600&family=JetBrains+Mono:wght@500;700&family=Outfit:wght@400;500;600;700;800&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap"
-        rel="stylesheet">
     <link rel="stylesheet" href="../css/device-auto-sync.css">
     <link rel="stylesheet" href="../css/page-tones.css">
     <link rel="stylesheet" href="../css/dashboard-studio.css">
@@ -243,19 +240,7 @@
                 <!-- Dashboard View -->
                 <div id="dashboardView" class="view-section active">
                     <div class="view-shell view-shell--dashboard dashboard-shell ft-dash">
-                        <section class="view-hero dashboard-hero ft-dash-hero" aria-labelledby="ftDashHeroTitle">
-                            <div class="view-hero__copy ft-dash-hero__copy">
-                                <p class="view-hero__eyebrow">FilterTube control center</p>
-                                <h2 id="ftDashHeroTitle" class="view-hero__title">Keep viewing calmer for your household.</h2>
-                                <p class="view-hero__body">See what FilterTube is doing, switch between Main and Kids rules, and open the controls parents use most.</p>
-                                <div class="view-hero__meta" aria-label="Current playback protection">
-                                    <span class="view-meta-pill">Ad-free playback</span>
-                                    <span class="view-meta-pill">On by default</span>
-                                    <span class="view-meta-pill">Main + Kids</span>
-                                    <span class="view-meta-pill">Blocklist + Whitelist</span>
-                                </div>
-                                <p class="ft-dash-hero__note">If filtering stops working, please tell the developer by email, GitHub, or a video comment. It usually means the site changed its page structure.</p>
-                            </div>
+                        <section class="ft-dash-hero ft-dash-hero--hub" aria-label="Active profile" data-ft-i18n-aria-label="controls.header.label">
                             <aside class="ft-dash-status" aria-label="Active profile" data-ft-i18n-aria-label="controls.header.label">
                                 <div class="ft-dash-status__profile">
                                     <span class="ft-dash-status__avatar" id="ftDashProfileAvatar" aria-hidden="true"></span>
@@ -273,7 +258,6 @@
                                         <button id="dashboardStatsKidsBtn" class="btn-secondary" type="button">Kids</button>
                                     </div>
                                 </div>
-                                <a class="btn-primary android-closed-testing-invite__mail dashboard-android-testing-cta ft-dash-status__cta" href="https://play.google.com/store/apps/details?id=com.filtertube.app" target="_blank" rel="noreferrer">Open FilterTube on Google Play</a>
                             </aside>
                         </section>
 
@@ -357,42 +341,6 @@
                                     <span class="label">Toggle Kids Mode</span>
                                 </button>
                             </div>
-                        </section>
-
-                        <section class="dashboard-app-release ft-dash-apps" aria-labelledby="dashboardAppsTitle">
-                            <div class="ft-dash-apps__head">
-                                <p class="view-hero__eyebrow" data-ft-i18n="apps.title">FilterTube apps</p>
-                                <h2 id="dashboardAppsTitle" class="ft-dash-apps__title" data-ft-i18n="apps.heading">FilterTube for Android phones, tablets and Android TV is on Google Play, from one listing.</h2>
-                            </div>
-                            <div class="dashboard-app-release__grid ft-dash-apps__grid" id="ftControlCenterApps"></div>
-                        </section>
-
-                        <section class="dashboard-app-preview" aria-labelledby="dashboardAppPreviewTitle">
-                            <div class="dashboard-app-preview__copy">
-                                <p class="view-hero__eyebrow">App preview video</p>
-                                <h2 id="dashboardAppPreviewTitle" class="dashboard-app-preview__title">See FilterTube’s mobile experience.</h2>
-                                <p class="dashboard-app-preview__body">Press play for a quick look at the calmer app experience with no adverts built for phones, tablets, and TV.</p>
-                                <a class="dashboard-app-preview__link" href="https://www.youtube.com/watch?v=SHvSICSMHL4" target="_blank" rel="noreferrer">
-                                    <span>Open video on the video site</span>
-                                    <span aria-hidden="true">↗</span>
-                                </a>
-                            </div>
-                            <a
-                                class="dashboard-app-preview__player"
-                                href="https://www.youtube.com/watch?v=SHvSICSMHL4"
-                                target="_blank"
-                                rel="noreferrer"
-                                aria-label="Play the FilterTube mobile app preview on the video site">
-                                <img
-                                    src="https://i.ytimg.com/vi/SHvSICSMHL4/maxresdefault.jpg"
-                                    alt="FilterTube mobile app preview video thumbnail">
-                                <span class="dashboard-app-preview__play" aria-hidden="true">
-                                    <svg viewBox="0 0 24 24" focusable="false">
-                                        <path d="M9 7.6v8.8L16 12 9 7.6Z"></path>
-                                    </svg>
-                                </span>
-                                <span class="dashboard-app-preview__watch">Watch app preview</span>
-                            </a>
                         </section>
 
                         <section class="dashboard-support" aria-label="Support FilterTube">
