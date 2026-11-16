@@ -1066,7 +1066,10 @@
             return validationResult('wrong_source_profile', { ackState: 'rejected' });
         }
         const scope = normalizeManagedPolicyScope(root.scope);
-        if (!scope || (!safeArray(trustedLink.allowedScopes).includes(scope) && !safeArray(safeObject(trustedLink.policy).allowedScopes).includes(scope))) {
+        const mailboxAllowedScopes = [...safeArray(trustedLink.allowedScopes), ...safeArray(safeObject(trustedLink.policy).allowedScopes)];
+        // Study scopes never join allowedScopes: they ride on time_limits, as in validateManagedPolicyEnvelope.
+        if (!scope || !(MANAGED_STUDY_SCOPES.includes(scope)
+            ? managedStudyScopeAllowed(mailboxAllowedScopes) : mailboxAllowedScopes.includes(scope))) {
             return validationResult('scope_not_allowed', { ackState: 'rejected' });
         }
         if (root.sourcePublicKeyId !== trustedLink.sourcePublicKeyId) {
