@@ -524,3 +524,91 @@ test('the Controls hub, doodles and crayon edges are loaded and their words are 
     }
     for (const doodle of ['check', 'underline_swoosh', 'scribble_circle']) assert.ok(fs.existsSync(`assets/images/doodles/${doodle}.webp`), doodle);
 });
+
+test('idle life wakes on any interaction on the page, throttled, with a fresh two-minute budget and no sound', async () => {
+    // Pure rules first.
+    const { Mascots: pure } = load();
+    assert.deepEqual(plain(pure.IDLE_WAKE_EVENTS), ['pointerdown', 'keydown', 'wheel', 'scroll', 'touchstart']);
+    assert.equal(pure.idleWakeDue(-Infinity, 0), true);
+    assert.equal(pure.idleWakeDue(1000, 1500), false, 'throttled to one wake a second');
+    assert.equal(pure.idleWakeDue(1000, 2000), true);
+    assert.deepEqual(plain(pure.idleWake({ pending: false, index: 4, sparkled: true, started: 0 }, 500000)),
+        { pending: false, index: 0, sparkled: false, started: 500000, restart: true });
+    assert.deepEqual(plain(pure.idleWake({ pending: true, index: 2, sparkled: false, started: 0 }, 9000)),
+        { pending: true, index: 2, sparkled: false, started: 9000, restart: false }, 'a waiting beat keeps its time; the budget restarts');
+
+    // Then the page: one passive document listener drives every resting mascot.
+    let clock = 0;
+    let reduced = false;
+    let audio = 0;
+    const timers = [];
+    const listeners = [];
+    const doc = {
+        readyState: 'complete', visibilityState: 'visible',
+        documentElement: { dataset: {} },
+        getElementById: () => null, querySelector: () => null, querySelectorAll: () => [],
+        addEventListener: (type, fn, options) => listeners.push({ type, fn, options })
+    };
+    const context = {
+        Intl, Number, String, Array, Object, Math, JSON, Promise, Set, WeakMap, Map,
+        Date: { now: () => clock },
+        document: doc, innerWidth: 1000, innerHeight: 1000,
+        matchMedia: () => ({ matches: reduced }),
+        Audio: function () { audio += 1; this.play = () => Promise.resolve(); },
+        setTimeout: (fn, ms) => { timers.push({ fn, at: clock + ms }); return timers.length; },
+        clearTimeout: id => { if (timers[id - 1]) timers[id - 1].fn = null; },
+        chrome: { runtime: { getURL: value => value }, storage: { local: { get: (k, cb) => cb({}), set: (i, cb) => cb?.() } } }
+    };
+    vm.createContext(context);
+    vm.runInContext(fs.readFileSync('js/mascots.js', 'utf8'), context);
+    const M = context.FilterTubeMascots;
+    await M.setMode('lively');
+    const pending = () => timers.filter(timer => timer.fn);
+    const runAll = () => { for (let guard = 0; guard < 50 && pending().length; guard++) { const next = pending()[0]; const fn = next.fn; next.fn = null; clock = Math.max(clock, next.at); fn(); } };
+    const picture = {
+        isConnected: true, offsetParent: {}, dataset: {}, style: {}, src: 'kriti_wave.webp',
+        getAttribute: () => 'kriti_wave.webp', getBoundingClientRect: () => ({ top: 10, bottom: 100, left: 10, right: 100 }),
+        addEventListener() {}, animate: () => ({})
+    };
+    M.idleLife(picture);
+    const wakes = listeners.filter(entry => M.IDLE_WAKE_EVENTS.includes(entry.type));
+    assert.deepEqual(wakes.map(entry => entry.type), plain(M.IDLE_WAKE_EVENTS), 'one listener per interaction type, on the document');
+    assert.ok(wakes.every(entry => entry.options?.passive === true), 'passive');
+    assert.equal(pending().length, 1, 'the rhythm starts');
+    runAll();
+    assert.ok(clock >= 60000, `beats ran toward the two-minute budget (${clock})`);
+    assert.equal(pending().length, 0, 'then she rests');
+    const scroll = wakes.find(entry => entry.type === 'scroll').fn;
+    clock += 60000;
+    scroll();
+    assert.equal(pending().length, 1, 'a scroll wakes her with a fresh budget');
+    const wokenAt = clock;
+    assert.ok(pending()[0].at - wokenAt >= 6000 && pending()[0].at - wokenAt <= 12000, 'from her first rest again');
+    clock += 300;
+    wakes.find(entry => entry.type === 'keydown').fn();
+    assert.equal(pending().length, 1, 'throttled: a second interaction within a second changes nothing');
+    assert.equal(audio, 0, 'no sound on an interaction');
+    // Quiet, Off and reduced motion never wake her.
+    runAll();
+    await M.setMode('quiet');
+    runAll();
+    clock += 5000;
+    scroll();
+    assert.equal(pending().length, 0, 'Quiet stays still');
+    await M.setMode('lively');
+    runAll();
+    reduced = true;
+    clock += 5000;
+    scroll();
+    assert.equal(pending().length, 0, 'reduced motion stays still');
+});
+
+test('the in-page cards share the interaction wake', () => {
+    const gate = fs.readFileSync('js/content/admission_overlay.js', 'utf8');
+    assert.match(gate, /const ADMISSION_WAKE_EVENTS = \['pointerdown', 'keydown', 'wheel', 'scroll', 'touchstart'\];/);
+    assert.match(gate, /document\.addEventListener\(type, onInteraction, \{ passive: true, capture: true \}\)/);
+    assert.match(gate, /budget: 120000, wakeMs: 1000/);
+    assert.match(gate, /companionMode === 'lively' && !admissionOverlayPrefersReducedMotion\(\)/);
+    assert.match(gate, /idle: picture => admissionIdle\(picture\)/);
+    assert.match(fs.readFileSync('js/content/study_overlay.js', 'utf8'), /localizer\(\)\?\.idle\?\.\(picture\)/);
+});

@@ -126,6 +126,10 @@
         ['duoSieve', 6], ['sieve', 2], ['duoShoo', 2], ['kritiJump', 2], ['kritiPeek', 2],
         ['kritiLogo', 1], ['kritiLogoHat', 1], ['kritiAllow', 1], ['kritiLogoBadge', 1], ['kritiLogoTelescope', 1]
     ]);
+    // Any interaction on the page (pointer, wheel or scroll, a key) wakes resting idle life and gives
+    // it a fresh two-minute budget; one throttled, passive listener on the document. No sound.
+    const IDLE_WAKE_EVENTS = Object.freeze(['pointerdown', 'keydown', 'wheel', 'scroll', 'touchstart']);
+    const IDLE_WAKE_THROTTLE_MS = 1000;
     const LOADING_REVEAL_MS = 600;
     const LOOP_CAP_MS = 30000;
     const REPLAY_REST_MS = 1200;
@@ -377,6 +381,22 @@
         if (!sparkled && list.includes('sparkle') && random() < IDLE.sparkleChance) return 'sparkle';
         const others = list.filter(beat => beat !== 'sparkle');
         return others[Math.min(others.length - 1, Math.floor(random() * others.length))];
+    }
+
+    /** Whether an interaction at [now] may wake idle life, given the last wake (throttled). Pure. */
+    function idleWakeDue(lastWakeAt, now) {
+        return !Number.isFinite(lastWakeAt) || now - lastWakeAt >= IDLE_WAKE_THROTTLE_MS;
+    }
+
+    /**
+     * What a wake does to one rhythm: the budget restarts from now; a rhythm that had gone still
+     * (no beat waiting) starts again from its first rest. A waiting beat keeps its time. Pure.
+     */
+    function idleWake(state, now) {
+        const next = { ...state, started: now };
+        if (!state.pending) Object.assign(next, { index: 0, sparkled: false, restart: true });
+        else next.restart = false;
+        return next;
     }
 
     /** The loading moment for a wait (LoadingPersonality, the general set), weighted. Pure. */
@@ -787,6 +807,7 @@
                 }
                 state.frameTimer = 0;
                 character.root.classList.add('is-resting');
+                idleLife(character.picture);
             };
             preload(ASSETS.sieve).then(() => {
                 if (state.character !== character) return;
@@ -1182,6 +1203,25 @@
     }
 
     const idleLives = new WeakMap();
+    const liveIdle = new Set();
+    let idleWakeInstalled = false;
+    let lastIdleWake = -Infinity;
+
+    /** One throttled, passive, document-level listener wakes every resting mascot on the page. */
+    function installIdleWake(doc) {
+        if (idleWakeInstalled || !doc?.addEventListener) return;
+        idleWakeInstalled = true;
+        const onInteraction = () => {
+            const now = Date.now();
+            if (!idleWakeDue(lastIdleWake, now)) return;
+            lastIdleWake = now;
+            for (const life of [...liveIdle]) {
+                if (!life.picture.isConnected) { liveIdle.delete(life); continue; }
+                life.wake(now);
+            }
+        };
+        for (const type of IDLE_WAKE_EVENTS) doc.addEventListener(type, onInteraction, { passive: true, capture: true });
+    }
 
     /**
      * Idle life for a mascot that rests on a page (StudyMascotView.idle): now and then one small beat
@@ -1202,14 +1242,18 @@
             const box = picture.getBoundingClientRect?.();
             return !box || (box.bottom > 0 && box.top < (root.innerHeight || 1e6) && box.right > 0 && box.left < (root.innerWidth || 1e6));
         };
+        let pending = false;
         const schedule = () => {
             root.clearTimeout(timer);
+            pending = false;
             if (!picture.isConnected || !may()) return;
             const delay = idleDelay(index);
             if (Date.now() + delay - started > IDLE.budget) return;
+            pending = true;
             timer = root.setTimeout(tick, delay);
         };
         const tick = () => {
+            pending = false;
             if (!picture.isConnected) return;
             if (onScreen() && !picture.dataset.ftPlaying) {
                 const beat = pickIdleBeat(idleBeatsFor(currentArt(picture)), sparkled);
@@ -1232,8 +1276,15 @@
             restart();
         };
         (picture.closest?.('button') || picture).addEventListener('click', tap);
-        const life = { restart, stop: () => root.clearTimeout(timer) };
+        const wake = now => {
+            const next = idleWake({ pending, index, sparkled, started }, now);
+            started = next.started;
+            if (next.restart) { index = next.index; sparkled = next.sparkled; schedule(); }
+        };
+        const life = { restart, wake, picture, stop: () => { root.clearTimeout(timer); pending = false; } };
         idleLives.set(picture, life);
+        liveIdle.add(life);
+        installIdleWake(root.document);
         onModeChange(() => { if (picture.isConnected) restart(); });
         restart();
         return life;
@@ -1646,7 +1697,9 @@
                     node.replaceChildren(label);
                 }
                 node.classList.add('has-mascot');
-                node.insertBefore(image(ASSETS.kritiPeek, 'pk-popup-peek', 48), node.firstChild);
+                const peek = image(ASSETS.kritiPeek, 'pk-popup-peek', 48);
+                node.insertBefore(peek, node.firstChild);
+                idleLife(peek);
             }
         };
         scan();
@@ -1770,7 +1823,7 @@
         LOADING_LINES, NETWORK_COPY, DUO_COPY, SESSION_SAVED,
         SUPPORT_HISTORY_KEY, SUPPORT_REMEMBERED, SUPPORT_VARIANTS, SUPPORT_COPY,
         sheetFrames, sheetFrameMs, springSamples, idleBeatsFor, idleDelay, pickIdleBeat, pickLoadingMoment, soundGateOpen,
-        idleLife, spring, playSheet,
+        idleLife, spring, playSheet, idleWakeDue, idleWake, IDLE_WAKE_EVENTS, IDLE_WAKE_THROTTLE_MS,
         stillImage, pickLoadingLine, networkState, pickSupportVariant, rememberSupportVariant,
         normalizeMode, linePresentation, showsCharacters, evaluateMilestone, totalHidden, sieveFrames,
         allowListSwitchedOn, clampLine, loadMode, setMode,

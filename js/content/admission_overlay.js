@@ -185,8 +185,88 @@
             if (url) picture.src = url;
             index += 1;
             if (index < SHOO_FRAMES.length) root.setTimeout(step, SHOO_FRAME_MS);
+            else admissionIdle(picture);
         };
         step();
+    }
+
+    // Idle life on the in-page cards (the app's MascotIdle, as js/mascots.js does on the extension's
+    // pages): a small bob or squash now and then, the first after 6 to 12 s, then 12, 20, 30 s, none
+    // after two minutes. Any interaction on the page wakes it with a fresh budget (one throttled,
+    // passive listener; no sound). Lively only, never with reduced motion.
+    const ADMISSION_IDLE = { firstMin: 6000, firstMax: 12000, gaps: [12000, 20000, 30000], jitter: 0.15, budget: 120000, wakeMs: 1000 };
+    const ADMISSION_WAKE_EVENTS = ['pointerdown', 'keydown', 'wheel', 'scroll', 'touchstart'];
+    const admissionIdleLives = new Set();
+    let admissionWakeInstalled = false;
+    let admissionLastWake = -Infinity;
+
+    function admissionSpring(stiffness, damping, velocity) {
+        const omega = Math.sqrt(stiffness);
+        const decay = damping * omega;
+        const damped = omega * Math.sqrt(1 - damping * damping);
+        const samples = [0];
+        for (let ms = 1000 / 60; ms <= 900; ms += 1000 / 60) samples.push((velocity / damped) * Math.exp(-decay * ms / 1000) * Math.sin(damped * ms / 1000));
+        samples.push(0);
+        return samples;
+    }
+
+    function admissionIdle(picture) {
+        if (!picture || picture.__filtertubeIdle || typeof root.setTimeout !== 'function') return;
+        let timer = 0;
+        let index = 0;
+        let started = Date.now();
+        let pending = false;
+        const may = () => companionMode === 'lively' && !admissionOverlayPrefersReducedMotion();
+        const delay = () => index === 0
+            ? ADMISSION_IDLE.firstMin + (ADMISSION_IDLE.firstMax - ADMISSION_IDLE.firstMin) * Math.random()
+            : ADMISSION_IDLE.gaps[Math.min(index - 1, 2)] * (1 - ADMISSION_IDLE.jitter + 2 * ADMISSION_IDLE.jitter * Math.random());
+        const schedule = () => {
+            root.clearTimeout(timer);
+            pending = false;
+            if (picture.isConnected === false || !may()) return;
+            const wait = delay();
+            if (Date.now() + wait - started > ADMISSION_IDLE.budget) return;
+            pending = true;
+            timer = root.setTimeout(beat, wait);
+        };
+        const beat = () => {
+            pending = false;
+            if (picture.isConnected === false) return;
+            if (document.visibilityState !== 'hidden' && typeof picture.animate === 'function') {
+                const squash = Math.random() < 0.4;
+                const samples = squash ? admissionSpring(700, 0.55, -1) : admissionSpring(800, 0.45, -125);
+                try {
+                    picture.style.transformOrigin = '50% 100%';
+                    picture.animate(samples.map(v => ({ transform: squash ? `scaleY(${(1 + v).toFixed(4)})` : `translateY(${v.toFixed(2)}px)` })),
+                        { duration: Math.round((samples.length - 1) * 1000 / 60), easing: 'linear' });
+                } catch (e) {}
+            }
+            index += 1;
+            schedule();
+        };
+        const life = {
+            picture,
+            wake(now) {
+                started = now;
+                if (!pending) { index = 0; schedule(); }
+            }
+        };
+        picture.__filtertubeIdle = life;
+        admissionIdleLives.add(life);
+        if (!admissionWakeInstalled && typeof document.addEventListener === 'function') {
+            admissionWakeInstalled = true;
+            const onInteraction = () => {
+                const now = Date.now();
+                if (now - admissionLastWake < ADMISSION_IDLE.wakeMs) return;
+                admissionLastWake = now;
+                for (const entry of [...admissionIdleLives]) {
+                    if (entry.picture.isConnected === false) { admissionIdleLives.delete(entry); continue; }
+                    entry.wake(now);
+                }
+            };
+            for (const type of ADMISSION_WAKE_EVENTS) document.addEventListener(type, onInteraction, { passive: true, capture: true });
+        }
+        schedule();
     }
 
     function syncAdmissionMascot(overlay, slot, holder, name, height) {
@@ -206,6 +286,7 @@
             if (!picture) return null;
             holder.appendChild(picture);
             overlay[slot] = picture;
+            if (!SHOO_FRAMES.includes(name)) admissionIdle(picture);
         }
         return picture;
     }
@@ -573,6 +654,7 @@
         loadLocale: () => loadAdmissionLocale(),
         // For study_overlay.js: the Companion setting (lively, quiet or off) the poses follow.
         loadCompanion: () => loadAdmissionCompanion(),
+        idle: picture => admissionIdle(picture),
         getCompanion: () => companionMode,
         getDirection: () => localeDirection
     };
