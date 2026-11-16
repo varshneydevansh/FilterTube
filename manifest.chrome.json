@@ -117,6 +117,19 @@
             "js": ["js/shared/identity.js", "js/shared/view_count.js", "js/content/admission_overlay.js", "js/content/external_youtube_guard.js"],
             "run_at": "document_start",
             "world": "ISOLATED"
+        },
+        {
+            "matches": ["*://*.youtube.com/live_chat*", "*://*.youtube.com/live_chat_replay*"],
+            "all_frames": true,
+            "run_at": "document_idle",
+            "world": "MAIN",
+            "js": ["js/content/live_chat_identity.js"]
+        },
+        {
+            "matches": ["*://*.youtube.com/live_chat*", "*://*.youtube.com/live_chat_replay*"],
+            "all_frames": true,
+            "run_at": "document_idle",
+            "js": ["js/shared/identity.js", "js/shared/live_chat_filter.js", "js/content/live_chat_filter.js"]
         }
     ],
     "web_accessible_resources": [

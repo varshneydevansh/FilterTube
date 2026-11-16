@@ -204,6 +204,7 @@ const STUDY_TESTS = Object.freeze([
 const APP_PARITY_TESTS = Object.freeze([
   'tests/runtime/app-parity-channel-decisions.test.mjs',
   'tests/runtime/app-parity-ask-parent.test.mjs',
+  'tests/runtime/app-parity-live-chat.test.mjs',
 ]);
 // Companion characters in the popup and options page (js/mascots.js).
 const COMPANION_TESTS = Object.freeze([
