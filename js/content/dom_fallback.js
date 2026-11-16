@@ -2213,10 +2213,39 @@ function getStudyAdmissionLine(settings) {
     return study.phase === 'study' && study.rest !== true ? FILTERTUBE_STUDY_OFF_LIST : FILTERTUBE_STUDY_NOT_NOW;
 }
 
+/**
+ * Ask a parent (Android AskParentBlockedTarget): what a child could ask about on this blocked video.
+ * The ask comes from the typed block reason, never from translated text: a channel rule offers
+ * "Always allow this channel", the allow list or anything else offers "Allow once"; Study offers none.
+ */
+function rememberAskParentTarget(decision, ownerMeta = {}, studyLine = '') {
+    try {
+        const videoId = typeof getCurrentWatchVideoId === 'function' ? getCurrentWatchVideoId() : '';
+        if (!videoId || studyLine) {
+            window.__filtertubeAskParentTarget = null;
+            return;
+        }
+        const settings = typeof currentSettings !== 'undefined' ? currentSettings : null;
+        const meta = settings?.videoMetaMap?.[videoId] || {};
+        const pageTitle = String(document.title || '').replace(/\s*-\s*YouTube\s*$/i, '').trim();
+        const title = String(meta.title || pageTitle || videoId).slice(0, 120);
+        window.__filtertubeAskParentTarget = {
+            kind: 'video',
+            videoId,
+            title,
+            channelId: String(ownerMeta.id || '').trim() || null,
+            channelName: String(ownerMeta.name || ownerMeta.handle || decision?.ownerName || '').trim(),
+            blockedBy: decision?.kind === 'channel' ? 'channel' : (decision?.kind === 'allow-only' ? 'allow_list' : 'other')
+        };
+    } catch (e) {
+    }
+}
+
 function formatCurrentWatchAdmissionMessage(decision, ownerMeta = {}) {
     const ownerName = ownerMeta.name || ownerMeta.handle || ownerMeta.id || decision?.ownerName || '';
     const trimForOverlay = value => String(value || '').replace(/\s+/g, ' ').trim().slice(0, 160);
     const studyLine = getStudyAdmissionLine(typeof currentSettings !== 'undefined' ? currentSettings : null);
+    rememberAskParentTarget(decision, ownerMeta, studyLine);
     if (studyLine) return `${studyLine}${ownerName ? `\n${trimForOverlay(ownerName)}` : ''}`;
     if (decision?.kind === 'video') {
         return `Blocked video\nVideo ID: ${trimForOverlay(decision.videoId)}`;
@@ -2319,6 +2348,14 @@ function enforceCurrentWatchOwnerBlock(settings) {
 
         const routeVideoId = getCurrentWatchVideoId();
         if (!routeVideoId) return;
+        // A parent's "Allow once" plays the asked video before any rule or content filter (Android
+        // AskParentPasses); a study break or limit never compiles a pass.
+        if (Array.isArray(settings?.askParentPassVideoIds) && settings.askParentPassVideoIds.includes(routeVideoId)) {
+            rememberCurrentVideoAdmission(routeVideoId, settings);
+            releaseDirectAccessGuard(routeVideoId, true);
+            if (isShortRoute) clearCurrentShortAdmissionOverlay();
+            return;
+        }
         // Views are optional evidence: a known low total can block immediately,
         // but missing totals never request metadata or create a pending state.
         const viewCountDecision = getCurrentWatchViewCountDecision(settings, settings?.videoMetaMap?.[routeVideoId] || {});
@@ -8329,6 +8366,11 @@ function shouldHideContent(title, channel, settings, options = {}) {
         return false;
     }
     const isCommentContext = typeof contentTag === 'string' && contentTag.toLowerCase().includes('comment');
+
+    // A parent's "Allow once" (Android AskParentPasses) lets the asked video through before any list rule.
+    if (!isCommentContext && videoId && Array.isArray(settings?.askParentPassVideoIds) && settings.askParentPassVideoIds.includes(videoId)) {
+        return false;
+    }
 
     // A card whose channel isn't known yet decides like the app (see filter_logic.js
     // _pendingChannelIdentityDecision and FilterTubeIdentity.decidePendingChannelIdentity).

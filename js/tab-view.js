@@ -26073,6 +26073,23 @@ document.addEventListener('DOMContentLoaded', async () => {
         }
     }
 
+    /**
+     * Ask a parent over Nanah: one `study_family` message ({reports, asks, signed}), the same message the
+     * Android and iOS apps send, only to a device that advertised filtertube.study.v1. The background
+     * builds it (and signs answers with this device's Family key); this page only sends it.
+     */
+    async function sendNanahAskParentFamily() {
+        const client = nanahClient;
+        if (!client || !nanahSessionState.connected || !nanahSessionState.sasConfirmed) return;
+        const remote = safeObject(nanahSessionState.remoteDevice);
+        const built = await sendRuntimeMessage({ action: 'FilterTube_AskParentNanahOutbox', remote: {
+            deviceId: normalizeString(remote.deviceId), capabilities: safeArray(remote.capabilities)
+        } });
+        if (!built?.message || client !== nanahClient) return;
+        await client.send(built.message);
+        await sendRuntimeMessage({ action: 'FilterTube_AskParentNanahSent', sentByLink: safeObject(built.sentByLink) });
+    }
+
     async function sendNanahHelloEnvelope(force = false) {
         if (!nanahClient || !nanahSessionState.connected || (nanahSessionState.helloSent && !force)) return;
         const device = buildNanahDeviceDescriptor();
@@ -27221,6 +27238,8 @@ document.addEventListener('DOMContentLoaded', async () => {
             const trustedLink = getNanahCurrentTrustedLink();
             const approved = await ensureNanahTrustedReconnectApproved(trustedLink, { closeOnDecline: true });
             if (approved) {
+                // Ask a parent: this device's open asks and the answers waiting for that child.
+                void sendNanahAskParentFamily().catch(() => {});
                 if (typeof sendNanahAutoSyncReadiness === 'function') await sendNanahAutoSyncReadiness();
                 const targetProfile = normalizeNanahTargetProfileContext(nanahSessionState.remoteTargetProfile);
                 await markNanahTrustedLinkUsed(safeObject(root.device).deviceId, {
@@ -27228,6 +27247,18 @@ document.addEventListener('DOMContentLoaded', async () => {
                     localRole: getNanahRole(),
                     remoteRole: normalizeString(nanahSessionState.remoteRole)
                 });
+            }
+            return;
+        }
+        if (root.t === 'study_family') {
+            // Ask a parent (Android AskParentService.receiveAsks / applySigned): the background checks
+            // the link, the signature and the ask; this page only carries the message.
+            const remoteDeviceId = normalizeString(nanahSessionState.remoteDevice?.deviceId);
+            if (remoteDeviceId) {
+                const result = await sendRuntimeMessage({ action: 'FilterTube_AskParentNanahReceive', remoteDeviceId, message: {
+                    asks: safeArray(root.asks).slice(0, 12), signed: safeArray(root.signed).slice(0, 20)
+                } });
+                if (result?.fresh > 0) void renderAskParentInbox();
             }
             return;
         }
@@ -28137,6 +28168,163 @@ document.addEventListener('DOMContentLoaded', async () => {
         }
     }
 
+    // ---- Ask a parent: the parent's Requests (Android AskParentInboxActivity) ------------------------
+    // Open asks from children on this device and on linked devices, with Allow once, Always allow this
+    // channel and Not now, an optional kind reply, and "Let Aarav ask". The background checks the
+    // parent's authority and a fresh PIN for every answer.
+    let askParentInboxHost = null;
+
+    async function askParentWithFreshPin(message) {
+        const first = await sendRuntimeMessage(message);
+        if (first?.type !== 'parent_unlock_required' || !first.parentId) return first;
+        const pin = normalizeString(await showPromptModal({
+            title: tabViewUiText('study.parent.unlockTitle', 'Parent Controls'),
+            message: tabViewUiText('study.parent.unlockBody', 'This profile is PIN-protected. Enter its PIN to continue.'),
+            placeholder: tabViewUiText('study.parent.enterPin', 'Enter PIN'),
+            inputType: 'password',
+            confirmText: tabViewUiText('study.parent.unlock', 'Unlock')
+        }));
+        if (!pin) return { ok: false, type: 'cancelled' };
+        const auth = await sendRuntimeMessage({ action: 'FilterTube_SessionPinAuth', profileId: first.parentId, pin });
+        if (auth?.ok !== true) {
+            UIComponents.showToast(auth?.reason === 'rate_limited'
+                ? tabViewUiText('dashboard.toast.pinRateLimited', 'Too many incorrect PIN attempts. Try again later.')
+                : tabViewUiText('study.switch.pinWrong', "That PIN didn't work. Try again."), 'error');
+            return { ok: false, type: 'pin_wrong' };
+        }
+        return sendRuntimeMessage(message);
+    }
+
+    function askParentTime(value) {
+        try { return new Date(value).toLocaleTimeString([], { hour: 'numeric', minute: '2-digit' }); } catch (e) { return ''; }
+    }
+
+    function renderAskParentRequest(item, list) {
+        const card = document.createElement('article');
+        card.className = 'ft-ask-request';
+        const heading = document.createElement('div');
+        heading.className = 'ft-ask-request__title';
+        heading.textContent = item.kind === 'channel'
+            ? tabViewUiText('askParent.cardChannel', '{name} asks for the channel “{title}”', { name: item.childName, title: item.title })
+            : tabViewUiText('askParent.cardVideo', '{name} asks to watch “{title}”', { name: item.childName, title: item.title });
+        card.appendChild(heading);
+        const meta = document.createElement('div');
+        meta.className = 'ft-ask-request__meta';
+        const parts = [];
+        if (item.kind === 'video' && item.channelName) parts.push(tabViewUiText('askParent.cardBy', 'by {name}', { name: item.channelName }));
+        const reasons = { school: ['askParent.reasonSchool', 'For school'], once: ['askParent.reasonOnce', 'Just this once'], other: ['askParent.reasonOther', 'Something else'] };
+        if (reasons[item.reason]) parts.push(tabViewUiText(reasons[item.reason][0], reasons[item.reason][1]));
+        parts.push(tabViewUiText('askParent.cardTime', 'Asked at {asked} · ends at {ends}', { asked: askParentTime(item.createdAt), ends: askParentTime(item.expiresAt) }));
+        meta.textContent = parts.join(' · ');
+        card.appendChild(meta);
+        if (item.note) {
+            const note = document.createElement('p');
+            note.className = 'ft-ask-request__note';
+            note.textContent = tabViewUiText('askParent.cardNote', '“{note}”', { note: item.note });
+            card.appendChild(note);
+        }
+        const reply = document.createElement('input');
+        reply.type = 'text';
+        reply.className = 'text-input ft-ask-request__reply';
+        reply.maxLength = 120;
+        reply.placeholder = tabViewUiText('askParent.replyHint', 'Add a kind reply (optional)');
+        reply.setAttribute('aria-label', reply.placeholder);
+        card.appendChild(reply);
+        const actions = document.createElement('div');
+        actions.className = 'ft-ask-request__actions';
+        const decide = async decision => {
+            actions.querySelectorAll('button').forEach(button => { button.disabled = true; });
+            const result = await askParentWithFreshPin({ action: 'FilterTube_AskParentAnswer', askId: item.id, linkId: item.linkId || '', decision, reply: reply.value });
+            if (!result?.ok) {
+                actions.querySelectorAll('button').forEach(button => { button.disabled = false; });
+                if (result?.type === 'channel_failed') UIComponents.showToast(tabViewUiText('askParent.channelFailed', 'Couldn’t save the channel rule. Try again, or change it in Controls.'), 'error');
+                else if (result?.type === 'not_allowed') UIComponents.showToast(tabViewUiText('askParent.needsParent', 'Switch to a parent profile to answer requests.'), 'error');
+                return;
+            }
+            // The card collapses to "You said yes", with a drawn check (Android AskParentUi).
+            card.replaceChildren();
+            card.classList.add('is-answered');
+            const done = document.createElement('div');
+            done.className = 'ft-ask-request__done';
+            const said = document.createElement('span');
+            said.textContent = decision === 'no'
+                ? tabViewUiText('askParent.saidNo', 'You said not now.')
+                : tabViewUiText('askParent.saidYes', 'You said yes.');
+            if (decision !== 'no' && window.FilterTubeDoodles?.check) {
+                const check = window.FilterTubeDoodles.check({ size: 22 });
+                if (check) done.appendChild(check);
+            }
+            done.appendChild(said);
+            card.appendChild(done);
+            if (result.sendsLater) {
+                const later = document.createElement('p');
+                later.className = 'ft-ask-request__meta';
+                later.textContent = tabViewUiText('askParent.sendsLater', 'Sends next time {name} connects.', { name: item.deviceLabel || item.childName });
+                card.appendChild(later);
+            }
+        };
+        const button = (label, className, decision) => {
+            const node = document.createElement('button');
+            node.type = 'button';
+            node.className = className;
+            node.textContent = label;
+            node.addEventListener('click', () => decide(decision));
+            actions.appendChild(node);
+        };
+        if (item.kind === 'video') button(tabViewUiText('askParent.allowOnce', 'Allow once'), 'btn-primary', 'once');
+        if (item.channelId && (item.kind === 'channel' || item.blockedBy === 'channel')) {
+            button(tabViewUiText('askParent.allowChannel', 'Always allow this channel'), item.kind === 'channel' ? 'btn-primary' : 'btn-secondary', 'channel');
+        }
+        button(tabViewUiText('askParent.notNow', 'Not now'), 'btn-secondary', 'no');
+        card.appendChild(actions);
+        list.appendChild(card);
+    }
+
+    async function renderAskParentInbox(host = askParentInboxHost) {
+        if (!host || !host.isConnected) return;
+        askParentInboxHost = host;
+        const data = await sendRuntimeMessage({ action: 'FilterTube_AskParentInbox' });
+        const children = [...safeArray(data?.children), ...safeArray(data?.remoteChildren)];
+        if (!data?.isParent || !children.length) { host.hidden = true; host.replaceChildren(); return; }
+        const requests = [...safeArray(data.here), ...safeArray(data.remote)].sort((a, b) => (a.createdAt || 0) - (b.createdAt || 0));
+        host.hidden = false;
+        host.className = 'help-item ft-ask-inbox';
+        const title = document.createElement('div');
+        title.className = 'help-item-title';
+        title.textContent = requests.length
+            ? `${tabViewUiText('askParent.inboxTitle', 'Requests')} · ${requests.length}`
+            : tabViewUiText('askParent.inboxTitle', 'Requests');
+        const list = document.createElement('div');
+        list.className = 'ft-ask-inbox__list';
+        if (!requests.length) {
+            const empty = document.createElement('p');
+            empty.className = 'help-item-body';
+            empty.textContent = tabViewUiText('askParent.inboxEmpty', 'No requests right now.');
+            list.appendChild(empty);
+        }
+        requests.forEach(item => renderAskParentRequest(item, list));
+        const switches = document.createElement('div');
+        switches.className = 'ft-ask-inbox__switches';
+        children.forEach(child => {
+            const label = document.createElement('label');
+            label.className = 'ft-ask-inbox__switch';
+            const box = document.createElement('input');
+            box.type = 'checkbox';
+            box.checked = child.askingOff !== true;
+            const words = document.createElement('span');
+            words.textContent = tabViewUiText('askParent.askingSwitch', 'Let {name} ask', { name: child.name });
+            words.title = tabViewUiText('askParent.askingSwitchBody', '{name} can ask to watch blocked videos. Nothing changes until you answer.', { name: child.name });
+            box.addEventListener('change', async () => {
+                const result = await askParentWithFreshPin({ action: 'FilterTube_AskParentSetAsking', childId: child.id || '', linkId: child.linkId || '', on: box.checked });
+                if (!result?.ok) box.checked = !box.checked;
+                else void renderAskParentInbox(host);
+            });
+            label.append(box, words);
+            switches.appendChild(label);
+        });
+        host.replaceChildren(title, list, switches);
+    }
+
     function renderProfilesManager(profilesV4) {
         if (!ftProfilesManager) return;
         const root = safeObject(profilesV4);
@@ -28148,6 +28336,12 @@ document.addEventListener('DOMContentLoaded', async () => {
             .map(element => element.dataset.profileOptionsId));
         const familyToolsOpen = ftProfilesManager.querySelector?.('details[data-family-profile-tools]')?.open === true;
         ftProfilesManager.innerHTML = '';
+        // Ask a parent: the Requests a parent answers come first.
+        const askParentInbox = document.createElement('section');
+        askParentInbox.hidden = true;
+        askParentInbox.dataset.askParentInbox = 'true';
+        ftProfilesManager.appendChild(askParentInbox);
+        void renderAskParentInbox(askParentInbox);
 
         const ids = [];
         getAccountIds(profilesV4).forEach(accountId => ids.push(accountId, ...getChildrenForAccount(profilesV4, accountId)));

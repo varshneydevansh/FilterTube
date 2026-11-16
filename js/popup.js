@@ -2231,6 +2231,84 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     // Switching profile during study (Android StudySwitchGate): the background decides, and reverts any
     // switch it didn't allow; this asks for the parent's PIN or says why switching waits.
+    /**
+     * Ask a parent: a child's answer card (Android AskParentAnswerActivity). Kriti stays warm either way;
+     * a yes offers "Watch now", the parent's kind reply shows as their note. OK marks it seen.
+     */
+    async function renderAskParentAnswer() {
+        const state = await sendRuntimeMessage({ action: 'FilterTube_AskParentState' }).catch(() => null);
+        const answer = state?.isChild && Array.isArray(state.unseen) ? state.unseen[0] : null;
+        document.getElementById('ftAskParentAnswerPopup')?.remove();
+        if (!answer) return;
+        const yes = answer.decision !== 'no';
+        const name = answer.parentName || state.parentName || popupUiText('askParent.parentFallback', 'Your parent');
+        const card = document.createElement('section');
+        card.id = 'ftAskParentAnswerPopup';
+        card.className = `ft-ask-answer ${yes ? 'is-yes' : 'is-no'}`;
+        card.setAttribute('role', 'status');
+        const mascots = window.FilterTubeMascots;
+        if (mascots && mascots.showsCharacters(mascots.mode)) {
+            const pose = document.createElement('img');
+            pose.className = 'ft-ask-answer__pose';
+            pose.alt = '';
+            pose.setAttribute('aria-hidden', 'true');
+            pose.src = `../assets/images/mascots/${mascots.stillImage(yes ? 'kritiThumbsUp' : 'kritiThinking')}`;
+            card.appendChild(pose);
+        }
+        const words = document.createElement('div');
+        words.className = 'ft-ask-answer__words';
+        const title = document.createElement('h3');
+        title.textContent = yes
+            ? popupUiText('askParent.answerYes', '{name} said yes!', { name })
+            : popupUiText('askParent.answerNo', 'Not this time');
+        const body = document.createElement('p');
+        body.textContent = !yes
+            ? popupUiText('askParent.answerNoBody', '{name} said not now.', { name })
+            : (answer.decision === 'channel'
+                ? popupUiText('askParent.answerChannelBody', 'You can watch “{title}” now, and more from this channel.', { title: answer.title })
+                : popupUiText('askParent.answerYesBody', 'You can watch “{title}” now.', { title: answer.title }));
+        words.append(title, body);
+        if (answer.reply) {
+            const note = document.createElement('p');
+            note.className = 'ft-ask-answer__note';
+            note.textContent = `${popupUiText('askParent.answerNote', 'A note from {name}', { name })}: “${answer.reply}”`;
+            words.appendChild(note);
+        }
+        if (yes && window.FilterTubeDoodles?.heart) {
+            const heart = window.FilterTubeDoodles.heart({ className: 'ft-ask-answer__heart' });
+            if (heart) title.appendChild(heart);
+        }
+        const actions = document.createElement('div');
+        actions.className = 'ft-ask-answer__actions';
+        const done = async () => {
+            await sendRuntimeMessage({ action: 'FilterTube_AskParentMarkSeen', askId: answer.id }).catch(() => null);
+            card.remove();
+            void renderAskParentAnswer();
+        };
+        if (yes && answer.videoId) {
+            const watch = document.createElement('button');
+            watch.type = 'button';
+            watch.className = 'btn-primary';
+            watch.textContent = popupUiText('askParent.answerWatch', 'Watch now');
+            watch.addEventListener('click', async () => {
+                await done();
+                try { chrome.tabs.create({ url: `https://www.youtube.com/watch?v=${encodeURIComponent(answer.videoId)}` }); } catch (e) {}
+            });
+            actions.appendChild(watch);
+        }
+        const ok = document.createElement('button');
+        ok.type = 'button';
+        ok.className = yes && answer.videoId ? 'btn-secondary' : 'btn-primary';
+        ok.textContent = popupUiText('askParent.ok', 'OK');
+        ok.addEventListener('click', done);
+        actions.appendChild(ok);
+        words.appendChild(actions);
+        card.appendChild(words);
+        const anchor = document.getElementById('ftManagedTimeStatusPopup');
+        if (anchor?.parentNode) anchor.parentNode.insertBefore(card, anchor);
+        else document.body.prepend(card);
+    }
+
     async function passStudySwitchGate(targetId) {
         let decision = null;
         try {
@@ -2541,6 +2619,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     filterContentControlsPopup();
     await refreshProfilesUI();
     updateSubscriptionsShortcut();
+    void renderAskParentAnswer();
 
     if (ftProfileBadgeBtnPopup && ftProfileDropdownPopup) {
         closeProfileDropdown();

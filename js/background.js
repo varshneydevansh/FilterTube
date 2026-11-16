@@ -772,6 +772,8 @@ function extractPinVerifierFromProfilesV4(profilesV4, profileId) {
     return verifier && typeof verifier === 'object' ? verifier : null;
 }
 
+// Ask a parent's device-local state (js/ask_parent_background.js): never synced, never backed up.
+const ASK_PARENT_STORE_KEY = 'ftAskParentV1';
 const SESSION_PIN_CACHE_TTL_MS = 15 * 60 * 1000;
 const SESSION_PIN_FAILED_ATTEMPT_SCHEMA = 'filtertube_managed_admin_failed_unlock_rate_limit';
 const SESSION_PIN_FAILED_ATTEMPT_LIMIT = 5;
@@ -1224,7 +1226,7 @@ const browserAPI = IS_FIREFOX ? browser : chrome;
 // Private Notes modules are browser-only; never forwarded to MAIN or native assets.
 try {
     if (typeof importScripts === 'function' && !globalThis.FilterTubeVideoNotesBackground) {
-        importScripts('shared/saved_video_notes.js', 'shared/local_playlists.js', 'shared/study_model.js', 'shared/study_packs.js', 'shared/study_engine.js', 'shared/study_clock_guard.js', 'study_background.js', 'shared/kids_youtube_profiles.js', 'video_notes_store.js', 'video_notes_background.js', 'local_playlists_store.js', 'kids_youtube_profiles_background.js', 'personal_sync.js', 'device_auto_sync.js', 'auto_sync_wakeup.js');
+        importScripts('shared/saved_video_notes.js', 'shared/local_playlists.js', 'shared/study_model.js', 'shared/study_packs.js', 'shared/study_engine.js', 'shared/study_clock_guard.js', 'study_background.js', 'shared/kids_youtube_profiles.js', 'video_notes_store.js', 'video_notes_background.js', 'local_playlists_store.js', 'kids_youtube_profiles_background.js', 'personal_sync.js', 'device_auto_sync.js', 'auto_sync_wakeup.js', 'shared/ask_parent.js', 'ask_parent_background.js');
     }
     globalThis.FilterTubeVideoNotesBackground?.install({
         api: browserAPI,
@@ -2123,7 +2125,8 @@ function applyAdvertVoidDefaultMigrationOnce() {
     return new Promise((resolve) => {
         browserAPI.storage.local.get([
             ADVERT_VOID_DEFAULT_MIGRATION_KEY,
-            FT_PROFILES_V4_KEY
+            FT_PROFILES_V4_KEY,
+            ASK_PARENT_STORE_KEY
         ], (items) => {
             try {
                 if (items?.[ADVERT_VOID_DEFAULT_MIGRATION_KEY]) {
@@ -4117,6 +4120,19 @@ async function getCompiledSettings(sender = null, profileType = null, forceRefre
                     .map(value => normalizeString(value))
                     .filter(value => /^[a-zA-Z0-9_-]{11}$/.test(value))
             ));
+            // Ask a parent: "Allow once" lets the asked video play for 6 hours, read exactly like a
+            // parent's allowed video (Android AskParentPasses). A study break or the plan's limit still
+            // hides everything first.
+            compiledSettings.askParentPassVideoIds = (() => {
+                const studyState = normalizeString(compiledSettings.study?.state);
+                if (studyState === 'BREAK' || studyState === 'LIMIT') return [];
+                const Ask = globalThis.FilterTubeAskParent;
+                if (!Ask) return [];
+                const now = Date.now();
+                return Array.from(new Set(Ask.passesFrom(safeObject(items?.[ASK_PARENT_STORE_KEY]).passes)
+                    .filter(pass => pass.profileId === activeProfileId && now < pass.until)
+                    .map(pass => pass.videoId)));
+            })();
             compiledSettings.allowedVideoIds = Array.from(new Set(
                 safeArray(activeRuleSurface.allowedVideoIds)
                     .map(value => normalizeString(value))
@@ -5347,8 +5363,98 @@ async function performWatchIdentityFetch(videoId) {
     }
 }
 
+// Ask a parent (Android AskParentService): js/ask_parent_background.js keeps the device-local state.
+const askParentService = globalThis.FilterTubeAskParentBackground?.createAskParentService
+    ? globalThis.FilterTubeAskParentBackground.createAskParentService({
+        browserAPI,
+        Ask: globalThis.FilterTubeAskParent,
+        parentUnlockFresh: profileId => isParentUnlockFresh(profileId),
+        writeChannelRule: args => writeAskParentChannelRule(args),
+        // A pass changes what plays: recompile and tell the open tabs, like a study transition.
+        onChange: () => broadcastStudyTransition()
+    })
+    : null;
+
+/**
+ * "Always allow this channel" (Android AskParentRuleWrite): on each surface of the child's profile, a
+ * block list drops the channel and an allow list gains it. The parent's authority was checked by the
+ * caller (askParentService.answer); this re-reads the profiles and writes once.
+ */
+async function writeAskParentChannelRule({ parentId, childId, channelId, channelName }) {
+    if (await getActiveSelfControlSession()) return { ok: false, error: 'self_control_settings_locked' };
+    const stored = await storageGet([FT_PROFILES_V4_KEY]);
+    const profilesV4 = stored?.[FT_PROFILES_V4_KEY];
+    const id = normalizeString(channelId);
+    if (!isValidProfilesV4(profilesV4) || !id) return { ok: false, error: 'profiles_unavailable' };
+    const profiles = safeObject(profilesV4.profiles);
+    const child = safeObject(profiles[childId]);
+    if (normalizeString(child.type) !== 'child' || normalizeString(profilesV4.activeProfileId) !== parentId) return { ok: false, error: 'not_parent' };
+    const Identity = globalThis.FilterTubeIdentity;
+    const matches = entry => {
+        if (!entry) return false;
+        if (typeof entry === 'string') return entry.trim().toLowerCase() === id.toLowerCase();
+        return Identity?.channelMatchesFilter ? Identity.channelMatchesFilter({ id }, entry, {}) : normalizeString(entry.id).toLowerCase() === id.toLowerCase();
+    };
+    const row = { id, name: normalizeString(channelName) || id, handle: null, filterAll: false, source: 'ask_parent', addedAt: Date.now() };
+    const next = { ...child };
+    const main = { ...safeObject(child.main) };
+    if (normalizeString(main.mode) === 'whitelist') {
+        const list = safeArray(main.whitelistChannels);
+        main.whitelistChannels = list.some(matches) ? list : [...list, row];
+    } else {
+        main.channels = safeArray(main.channels).filter(entry => !matches(entry));
+    }
+    next.main = main;
+    const kids = { ...safeObject(child.kids) };
+    if (normalizeString(kids.mode) === 'whitelist') {
+        const list = safeArray(kids.whitelistChannels);
+        kids.whitelistChannels = list.some(matches) ? list : [...list, row];
+    } else {
+        kids.blockedChannels = safeArray(kids.blockedChannels).filter(entry => !matches(entry));
+    }
+    next.kids = kids;
+    await browserAPI.storage.local.set({ [FT_PROFILES_V4_KEY]: { ...profilesV4, profiles: { ...profiles, [childId]: next } } });
+    return { ok: true };
+}
+
+const ASK_PARENT_PAGE_ACTIONS = new Set([
+    'FilterTube_AskParentInbox', 'FilterTube_AskParentAnswer', 'FilterTube_AskParentSetAsking',
+    'FilterTube_AskParentNanahOutbox', 'FilterTube_AskParentNanahSent', 'FilterTube_AskParentNanahReceive'
+]);
+
+function handleAskParentMessage(request, sender, sendResponse) {
+    const action = request?.action;
+    const extensionPage = isTrustedUiSender(sender);
+    const youtubeContent = isYouTubeContentSender(sender);
+    if (!askParentService) { sendResponse?.({ ok: false, error: 'unavailable' }); return false; }
+    if (!extensionPage && (!youtubeContent || ASK_PARENT_PAGE_ACTIONS.has(action))) {
+        sendResponse?.({ ok: false, error: 'untrusted_sender' });
+        return false;
+    }
+    const run = (() => {
+        switch (action) {
+            case 'FilterTube_AskParentState': return askParentService.stateFor(request);
+            case 'FilterTube_AskParentCreate': return askParentService.ask(request);
+            case 'FilterTube_AskParentCancel': return askParentService.cancel(request.askId);
+            case 'FilterTube_AskParentMarkSeen': return askParentService.markSeen(request.askId);
+            case 'FilterTube_AskParentInbox': return askParentService.inbox();
+            case 'FilterTube_AskParentAnswer': return askParentService.answer(request);
+            case 'FilterTube_AskParentSetAsking': return askParentService.setAsking(request);
+            case 'FilterTube_AskParentNanahOutbox': return askParentService.outbox(request.remote);
+            case 'FilterTube_AskParentNanahSent': return askParentService.markSent(request.sentByLink).then(() => ({ ok: true }));
+            case 'FilterTube_AskParentNanahReceive': return askParentService.receive(normalizeString(request.remoteDeviceId), request.message);
+            default: return Promise.resolve({ ok: false, error: 'unknown_action' });
+        }
+    })();
+    Promise.resolve(run).then(result => sendResponse?.(result)).catch(e => sendResponse?.({ ok: false, error: e?.message || 'ask_parent_failed' }));
+    return true;
+}
+
 // Listen for messages sent from other parts of the extension (e.g., content scripts, popup).
 browserAPI.runtime.onMessage.addListener(function (request, sender, sendResponse) {
+    if (typeof request?.action === 'string' && request.action.startsWith('FilterTube_AskParent')) {
+        return handleAskParentMessage(request, sender, sendResponse);
+    }
     const studyResponse = studyBackground?.handleMessage(request, {
         extensionPage: isTrustedUiSender(sender),
         youtubeContent: isYouTubeContentSender(sender)

@@ -1172,6 +1172,8 @@
             this.blockedVideoIdSet = new Set(Array.isArray(this.settings.blockedVideoIds) ? this.settings.blockedVideoIds : []);
             this.allowedVideoIdSet = new Set(Array.isArray(this.settings.allowedVideoIds) ? this.settings.allowedVideoIds : []);
             this.kidsFallbackAllowedVideoIdSet = new Set(Array.isArray(this.settings.kidsFallbackAllowedVideoIds) ? this.settings.kidsFallbackAllowedVideoIds : []);
+            // Ask a parent: "Allow once" (Android AskParentPasses), read like a parent's allowed video.
+            this.askParentPassVideoIdSet = new Set(Array.isArray(this.settings.askParentPassVideoIds) ? this.settings.askParentPassVideoIds : []);
             this.pageChannelMeta = null;
             this.blockedCount = 0;
             this.debugEnabled = !!window.__filtertubeDebug;
@@ -2447,6 +2449,7 @@
             const candidate = this._autoplayEndpointCandidate(endpoint, endpointKey);
             const videoId = candidate.videoId;
             if (!videoId) return false;
+            if (this.askParentPassVideoIdSet.has(videoId)) return false;
 
             const listMode = (this.settings.listMode === 'whitelist') ? 'whitelist' : 'blocklist';
             const collaborators = candidate.collaborators;
@@ -2896,6 +2899,13 @@
                     return false;
                 }
             } catch (e) {
+            }
+
+            // A parent's "Allow once" lets the asked video through before any list rule (Android
+            // NativeOwnedFilterDecider: "allowed once by a parent"); surface switches above still hide.
+            if (!isCommentRenderer && videoId && this.askParentPassVideoIdSet.has(videoId)) {
+                this._logWhitelistDecision('allow:ask_parent_pass', { rendererType, originalRendererType, title });
+                return false;
             }
 
             // A card whose channel isn't known yet decides like the app (Android
