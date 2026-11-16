@@ -2929,5 +2929,16 @@
   "study.skipped": "এড়ানো হয়েছে। এটি আর দেখাবে না।",
   "content.comments.authorHidden": "{name}-এর মন্তব্য লুকানো হয়েছে",
   "content.comments.undo": "পূর্বাবস্থায় ফেরান",
-  "askParent.answer": "উত্তর দিন"
+  "askParent.answer": "উত্তর দিন",
+  "study.searchHow.title": "পড়ার সময় খোঁজ কীভাবে কাজ করে",
+  "study.searchHow.body": "পড়ার সময় খোঁজ আপনার {channels} আর আপনার বিষয়গুলোর ({topics}) পাঠ দেখায়। বাকি সব পড়া শেষ হওয়া পর্যন্ত অপেক্ষা করে।",
+  "study.searchHow.bodyNoTopics": "পড়ার সময় খোঁজ আপনার {channels}-এর পাঠ দেখায়। বাকি সব পড়া শেষ হওয়া পর্যন্ত অপেক্ষা করে।",
+  "study.searchHow.try": "“{first}” বা “{second}” খুঁজে দেখুন।",
+  "study.searchHow.askParent": "আরও চাইলে বাবা-মাকে বলুন।",
+  "study.searchHow.channels.zero": "{count} টি চ্যানেল",
+  "study.searchHow.channels.one": "{count} টি চ্যানেল",
+  "study.searchHow.channels.two": "{count} টি চ্যানেল",
+  "study.searchHow.channels.few": "{count} টি চ্যানেল",
+  "study.searchHow.channels.many": "{count} টি চ্যানেল",
+  "study.searchHow.channels.other": "{count} টি চ্যানেল"
 }

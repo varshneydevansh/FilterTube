@@ -2929,5 +2929,16 @@
   "study.skipped": "దాటవేయబడింది. ఇది మళ్లీ కనిపించదు.",
   "content.comments.authorHidden": "{name} కామెంట్‌లు దాచబడ్డాయి",
   "content.comments.undo": "చర్యను రద్దు చేయి",
-  "askParent.answer": "జవాబు ఇవ్వండి"
+  "askParent.answer": "జవాబు ఇవ్వండి",
+  "study.searchHow.title": "చదువుతున్నప్పుడు శోధన ఎలా పనిచేస్తుంది",
+  "study.searchHow.body": "చదువుతున్నప్పుడు, శోధన మీ {channels} మరియు మీ అంశాల ({topics}) పాఠాలను చూపిస్తుంది. మిగతావి చదువు ముగిసే వరకు వేచి ఉంటాయి.",
+  "study.searchHow.bodyNoTopics": "చదువుతున్నప్పుడు, శోధన మీ {channels} పాఠాలను చూపిస్తుంది. మిగతావి చదువు ముగిసే వరకు వేచి ఉంటాయి.",
+  "study.searchHow.try": "“{first}” లేదా “{second}” వెతికి చూడండి.",
+  "study.searchHow.askParent": "మరిన్నింటి కోసం తల్లిదండ్రులను అడగండి.",
+  "study.searchHow.channels.zero": "{count} ఛానెల్‌లు",
+  "study.searchHow.channels.one": "{count} ఛానెల్",
+  "study.searchHow.channels.two": "{count} ఛానెల్‌లు",
+  "study.searchHow.channels.few": "{count} ఛానెల్‌లు",
+  "study.searchHow.channels.many": "{count} ఛానెల్‌లు",
+  "study.searchHow.channels.other": "{count} ఛానెల్‌లు"
 }

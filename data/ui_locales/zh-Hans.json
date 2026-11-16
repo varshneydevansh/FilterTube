@@ -2927,5 +2927,16 @@
   "study.skipped": "已跳过。它不会再出现。",
   "content.comments.authorHidden": "已隐藏 {name} 的评论",
   "content.comments.undo": "撤消",
-  "askParent.answer": "回复"
+  "askParent.answer": "回复",
+  "study.searchHow.title": "学习时搜索如何运作",
+  "study.searchHow.body": "学习期间，搜索会显示你的{channels}和主题（{topics}）中的课程。其他内容等学习结束后再看。",
+  "study.searchHow.bodyNoTopics": "学习期间，搜索会显示你的{channels}中的课程。其他内容等学习结束后再看。",
+  "study.searchHow.try": "试试“{first}”或“{second}”。",
+  "study.searchHow.askParent": "想看更多，请问问家长。",
+  "study.searchHow.channels.zero": "{count} 个频道",
+  "study.searchHow.channels.one": "{count} 个频道",
+  "study.searchHow.channels.two": "{count} 个频道",
+  "study.searchHow.channels.few": "{count} 个频道",
+  "study.searchHow.channels.many": "{count} 个频道",
+  "study.searchHow.channels.other": "{count} 个频道"
 }

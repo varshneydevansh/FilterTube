@@ -2953,5 +2953,16 @@
   "study.skipped": "تم التخطي. لن يظهر مجددًا.",
   "content.comments.authorHidden": "تم إخفاء تعليقات {name}",
   "content.comments.undo": "تراجع",
-  "askParent.answer": "رد"
+  "askParent.answer": "رد",
+  "study.searchHow.title": "كيف يعمل البحث أثناء الدراسة",
+  "study.searchHow.body": "أثناء الدراسة، يعرض البحث دروسًا من {channels} ومن مواضيعك ({topics}). أي شيء آخر ينتظر حتى تنتهي الدراسة.",
+  "study.searchHow.bodyNoTopics": "أثناء الدراسة، يعرض البحث دروسًا من {channels}. أي شيء آخر ينتظر حتى تنتهي الدراسة.",
+  "study.searchHow.try": "جرّب “{first}” أو “{second}”.",
+  "study.searchHow.askParent": "اطلب المزيد من أحد الوالدين.",
+  "study.searchHow.channels.zero": "{count} قناة",
+  "study.searchHow.channels.one": "{count} قناة",
+  "study.searchHow.channels.two": "{count} قناتان",
+  "study.searchHow.channels.few": "{count} قنوات",
+  "study.searchHow.channels.many": "{count} قناة",
+  "study.searchHow.channels.other": "{count} قناة"
 }

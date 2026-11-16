@@ -2927,5 +2927,16 @@
   "study.skipped": "已跳過。佢唔會再出現。",
   "content.comments.authorHidden": "已隱藏 {name} 嘅留言",
   "content.comments.undo": "復原",
-  "askParent.answer": "回覆"
+  "askParent.answer": "回覆",
+  "study.searchHow.title": "溫書時搜尋點運作",
+  "study.searchHow.body": "溫書期間，搜尋會顯示你嘅{channels}同主題（{topics}）入面嘅課堂。其他內容等溫書完先睇。",
+  "study.searchHow.bodyNoTopics": "溫書期間，搜尋會顯示你嘅{channels}入面嘅課堂。其他內容等溫書完先睇。",
+  "study.searchHow.try": "試吓「{first}」或者「{second}」。",
+  "study.searchHow.askParent": "想睇多啲，問吓爸媽。",
+  "study.searchHow.channels.zero": "{count} 個頻道",
+  "study.searchHow.channels.one": "{count} 個頻道",
+  "study.searchHow.channels.two": "{count} 個頻道",
+  "study.searchHow.channels.few": "{count} 個頻道",
+  "study.searchHow.channels.many": "{count} 個頻道",
+  "study.searchHow.channels.other": "{count} 個頻道"
 }

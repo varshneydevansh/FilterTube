@@ -2927,5 +2927,16 @@
   "study.skipped": "ข้ามแล้ว จะไม่แสดงอีก",
   "content.comments.authorHidden": "ซ่อนความคิดเห็นจาก {name} แล้ว",
   "content.comments.undo": "เลิกทำ",
-  "askParent.answer": "ตอบ"
+  "askParent.answer": "ตอบ",
+  "study.searchHow.title": "การค้นหาระหว่างเรียนทำงานอย่างไร",
+  "study.searchHow.body": "ระหว่างเรียน การค้นหาจะแสดงบทเรียนจาก{channels}และหัวข้อของคุณ ({topics}) อย่างอื่นรอจนหมดเวลาเรียน",
+  "study.searchHow.bodyNoTopics": "ระหว่างเรียน การค้นหาจะแสดงบทเรียนจาก{channels}ของคุณ อย่างอื่นรอจนหมดเวลาเรียน",
+  "study.searchHow.try": "ลอง “{first}” หรือ “{second}”",
+  "study.searchHow.askParent": "ขอเพิ่มจากผู้ปกครอง",
+  "study.searchHow.channels.zero": "{count} ช่อง",
+  "study.searchHow.channels.one": "{count} ช่อง",
+  "study.searchHow.channels.two": "{count} ช่อง",
+  "study.searchHow.channels.few": "{count} ช่อง",
+  "study.searchHow.channels.many": "{count} ช่อง",
+  "study.searchHow.channels.other": "{count} ช่อง"
 }

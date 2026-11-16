@@ -497,6 +497,31 @@
     }
 
     /**
+     * "How search works while studying" (Android StudySearchExplainer.content): how many plan channels
+     * study search looks in, two subjects (topics with words of their own; exam names and short words
+     * never) and two example searches from the first pack. {channels, topics, examples}.
+     */
+    function searchExplainer(study, catalog) {
+        const value = object(study);
+        const layers = activePackLayers(value, catalog);
+        const keys = new Set();
+        for (const layer of layers) {
+            for (const channel of layer.channels) {
+                const id = channelIdentity(channel);
+                const key = id.id || id.handle;
+                if (key) keys.add(key);
+            }
+        }
+        const all = distinctTopics(layers.flatMap(layer => layer.keywords)).filter(topic => wordKey(topic).length > 3);
+        const topics = all.filter(topic => suggest(SUGGESTION_KINDS.TOPIC_SYNONYMS, topic).length).slice(0, 2);
+        const first = layers[0];
+        const variantId = first ? text(packVariant(packFor(value, catalog, first.id), object(object(value.packEdits)[first.id]).variant)?.id) || null : null;
+        let examples = first ? exampleSearches([{ packId: first.id, variantId }]) : [];
+        if (!examples.length && first) examples = first.keywords.filter(topic => wordKey(topic).length > 3);
+        return { channels: keys.size, topics, examples: examples.slice(0, 2) };
+    }
+
+    /**
      * One pack with its edits: {id, channels, keywords, blockedWords}. channelsRemoved and topicsRemoved
      * take rows out; channelsAdded and topicsAdded put rows in. Class packs add every grade's words.
      */
@@ -984,7 +1009,7 @@
         SELF_LOCK_MAX_MINUTES, PARENT_LOCK_MAX_MINUTES, STUDY_SOURCE, TOPIC_SOURCE,
         parseTime, localDateKey, splitRounds, planOccurrences, studyClock, studyRulesApply, studyPhase,
         SUGGESTION_KINDS, suggest, suggestionSeed, studyTopics, studyAllowPhrases, topicTerms, topicPatterns,
-        topicsForQuery, exampleSearches,
+        topicsForQuery, exampleSearches, searchExplainer,
         packVariant, packLayer, activePackLayers, stampPackCopies, studyEffectiveProfile,
         BRANCH_SOURCE, KIDS_KINDS, KIDS_SPACE, AMBIGUOUS_BRANCH_WORDS,
         packChannelsFor, packTopicsFor, hasSeparateBranches, branchTopics, otherBranchTopics,

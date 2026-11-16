@@ -2929,5 +2929,16 @@
   "study.skipped": "छोड़ दिहल गइल। ई फेर ना देखाई।",
   "content.comments.authorHidden": "{name} के कमेंट छिपा दिहल गइल",
   "content.comments.undo": "वापस लीं",
-  "askParent.answer": "जवाब दीं"
+  "askParent.answer": "जवाब दीं",
+  "study.searchHow.title": "पढ़ाई के बेरा खोज कइसे काम करेला",
+  "study.searchHow.body": "पढ़ाई के बेरा खोज रउआ {channels} आ रउआ विषय ({topics}) के पाठ देखावेला। बाकी सब पढ़ाई खतम होखे ले रुकेला।",
+  "study.searchHow.bodyNoTopics": "पढ़ाई के बेरा खोज रउआ {channels} के पाठ देखावेला। बाकी सब पढ़ाई खतम होखे ले रुकेला।",
+  "study.searchHow.try": "“{first}” भा “{second}” खोज के देखीं।",
+  "study.searchHow.askParent": "अउरी खातिर माई-बाबूजी से पूछीं।",
+  "study.searchHow.channels.zero": "{count} चैनल",
+  "study.searchHow.channels.one": "{count} चैनल",
+  "study.searchHow.channels.two": "{count} चैनल",
+  "study.searchHow.channels.few": "{count} चैनल",
+  "study.searchHow.channels.many": "{count} चैनल",
+  "study.searchHow.channels.other": "{count} चैनल"
 }

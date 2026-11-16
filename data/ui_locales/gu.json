@@ -2929,5 +2929,16 @@
   "study.skipped": "છોડી દીધો. તે ફરી દેખાશે નહીં.",
   "content.comments.authorHidden": "{name} ની ટિપ્પણીઓ છુપાવી",
   "content.comments.undo": "પૂર્વવત્ કરો",
-  "askParent.answer": "જવાબ આપો"
+  "askParent.answer": "જવાબ આપો",
+  "study.searchHow.title": "અભ્યાસ દરમિયાન શોધ કેવી રીતે કામ કરે છે",
+  "study.searchHow.body": "અભ્યાસ દરમિયાન શોધ તમારી {channels} અને તમારા વિષયો ({topics})ના પાઠ બતાવે છે. બાકીનું અભ્યાસ પૂરો થાય ત્યાં સુધી રાહ જુએ છે.",
+  "study.searchHow.bodyNoTopics": "અભ્યાસ દરમિયાન શોધ તમારી {channels}ના પાઠ બતાવે છે. બાકીનું અભ્યાસ પૂરો થાય ત્યાં સુધી રાહ જુએ છે.",
+  "study.searchHow.try": "“{first}” અથવા “{second}” શોધી જુઓ.",
+  "study.searchHow.askParent": "વધુ માટે માતા-પિતાને પૂછો.",
+  "study.searchHow.channels.zero": "{count} ચેનલ",
+  "study.searchHow.channels.one": "{count} ચેનલ",
+  "study.searchHow.channels.two": "{count} ચેનલ",
+  "study.searchHow.channels.few": "{count} ચેનલ",
+  "study.searchHow.channels.many": "{count} ચેનલ",
+  "study.searchHow.channels.other": "{count} ચેનલ"
 }

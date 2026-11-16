@@ -2927,5 +2927,16 @@
   "study.skipped": "Đã bỏ qua. Video sẽ không hiện lại.",
   "content.comments.authorHidden": "Đã ẩn bình luận của {name}",
   "content.comments.undo": "Hoàn tác",
-  "askParent.answer": "Trả lời"
+  "askParent.answer": "Trả lời",
+  "study.searchHow.title": "Tìm kiếm hoạt động thế nào khi học",
+  "study.searchHow.body": "Khi bạn học, tìm kiếm hiển thị bài học từ {channels} và các chủ đề của bạn ({topics}). Mọi thứ khác chờ đến khi giờ học kết thúc.",
+  "study.searchHow.bodyNoTopics": "Khi bạn học, tìm kiếm hiển thị bài học từ {channels} của bạn. Mọi thứ khác chờ đến khi giờ học kết thúc.",
+  "study.searchHow.try": "Thử “{first}” hoặc “{second}”.",
+  "study.searchHow.askParent": "Hỏi bố mẹ để có thêm.",
+  "study.searchHow.channels.zero": "{count} kênh",
+  "study.searchHow.channels.one": "{count} kênh",
+  "study.searchHow.channels.two": "{count} kênh",
+  "study.searchHow.channels.few": "{count} kênh",
+  "study.searchHow.channels.many": "{count} kênh",
+  "study.searchHow.channels.other": "{count} kênh"
 }

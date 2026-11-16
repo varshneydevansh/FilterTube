@@ -2927,5 +2927,16 @@
   "study.skipped": "A ti fò ó. Kò ní hàn mọ́.",
   "content.comments.authorHidden": "A ti fi àwọn àsọyé {name} pamọ́",
   "content.comments.undo": "Mú padà",
-  "askParent.answer": "Dáhùn"
+  "askParent.answer": "Dáhùn",
+  "study.searchHow.title": "Bí wíwá ṣe ń ṣiṣẹ́ nígbà ìkẹ́kọ̀ọ́",
+  "study.searchHow.body": "Nígbà tí o bá ń kẹ́kọ̀ọ́, wíwá ń fi ẹ̀kọ́ hàn láti {channels} rẹ àti àwọn àkòrí rẹ ({topics}). Àwọn yòókù ń dúró títí ìkẹ́kọ̀ọ́ yóò fi parí.",
+  "study.searchHow.bodyNoTopics": "Nígbà tí o bá ń kẹ́kọ̀ọ́, wíwá ń fi ẹ̀kọ́ hàn láti {channels} rẹ. Àwọn yòókù ń dúró títí ìkẹ́kọ̀ọ́ yóò fi parí.",
+  "study.searchHow.try": "Gbìyànjú “{first}” tàbí “{second}”.",
+  "study.searchHow.askParent": "Béèrè púpọ̀ sí i lọ́wọ́ òbí.",
+  "study.searchHow.channels.zero": "ikanni {count}",
+  "study.searchHow.channels.one": "ikanni {count}",
+  "study.searchHow.channels.two": "ikanni {count}",
+  "study.searchHow.channels.few": "ikanni {count}",
+  "study.searchHow.channels.many": "ikanni {count}",
+  "study.searchHow.channels.other": "ikanni {count}"
 }

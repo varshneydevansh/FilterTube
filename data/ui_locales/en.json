@@ -2929,5 +2929,16 @@
   "study.skipped": "Skipped. It won't show again.",
   "content.comments.authorHidden": "Comments from {name} hidden",
   "content.comments.undo": "Undo",
-  "askParent.answer": "Answer"
+  "askParent.answer": "Answer",
+  "study.searchHow.title": "How search works while studying",
+  "study.searchHow.body": "While you study, search shows lessons from your {channels} and your topics ({topics}). Anything else waits until study ends.",
+  "study.searchHow.bodyNoTopics": "While you study, search shows lessons from your {channels}. Anything else waits until study ends.",
+  "study.searchHow.try": "Try “{first}” or “{second}”.",
+  "study.searchHow.askParent": "Ask a parent for more.",
+  "study.searchHow.channels.one": "{count} channel",
+  "study.searchHow.channels.other": "{count} channels",
+  "study.searchHow.channels.zero": "{count} channels",
+  "study.searchHow.channels.two": "{count} channels",
+  "study.searchHow.channels.few": "{count} channels",
+  "study.searchHow.channels.many": "{count} channels"
 }

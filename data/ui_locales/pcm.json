@@ -2929,5 +2929,12 @@
   "study.skipped": "E don skip. E no go show again.",
   "content.comments.authorHidden": "Comments from {name} don hide",
   "content.comments.undo": "Undo",
-  "askParent.answer": "Answer"
+  "askParent.answer": "Answer",
+  "study.searchHow.title": "How search dey work when you dey study",
+  "study.searchHow.body": "When you dey study, search go show lessons from your {channels} and your topics ({topics}). Every other thing go wait till study finish.",
+  "study.searchHow.bodyNoTopics": "When you dey study, search go show lessons from your {channels}. Every other thing go wait till study finish.",
+  "study.searchHow.try": "Try “{first}” or “{second}”.",
+  "study.searchHow.askParent": "Ask your parent if you want more.",
+  "study.searchHow.channels.one": "{count} channel",
+  "study.searchHow.channels.other": "{count} channels"
 }

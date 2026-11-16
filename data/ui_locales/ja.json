@@ -2927,5 +2927,16 @@
   "study.skipped": "スキップしました。今後表示されません。",
   "content.comments.authorHidden": "{name} さんのコメントを非表示にしました",
   "content.comments.undo": "元に戻す",
-  "askParent.answer": "返事する"
+  "askParent.answer": "返事する",
+  "study.searchHow.title": "学習中の検索について",
+  "study.searchHow.body": "学習中の検索では、{channels}とトピック（{topics}）のレッスンが表示されます。それ以外は学習が終わるまでお待ちください。",
+  "study.searchHow.bodyNoTopics": "学習中の検索では、{channels}のレッスンが表示されます。それ以外は学習が終わるまでお待ちください。",
+  "study.searchHow.try": "「{first}」や「{second}」で試してみてください。",
+  "study.searchHow.askParent": "もっと見たいときは保護者に頼みましょう。",
+  "study.searchHow.channels.zero": "{count} チャンネル",
+  "study.searchHow.channels.one": "{count} チャンネル",
+  "study.searchHow.channels.two": "{count} チャンネル",
+  "study.searchHow.channels.few": "{count} チャンネル",
+  "study.searchHow.channels.many": "{count} チャンネル",
+  "study.searchHow.channels.other": "{count} チャンネル"
 }

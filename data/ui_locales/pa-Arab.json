@@ -2929,5 +2929,12 @@
   "study.skipped": "چھڈ دتی۔ ایہہ مُڑ نہیں دِسے گی۔",
   "content.comments.authorHidden": "{name} دے تبصرے لُکائے گئے",
   "content.comments.undo": "واپس لوو",
-  "askParent.answer": "جواب دیو"
+  "askParent.answer": "جواب دیو",
+  "study.searchHow.title": "پڑھائی ویلے کھوج کیویں کم کردی اے",
+  "study.searchHow.body": "پڑھائی ویلے کھوج تہاڈے {channels} تے تہاڈے موضوعاں ({topics}) دے سبق وکھاندی اے۔ باقی سب پڑھائی مکن تک اڈیکدا اے۔",
+  "study.searchHow.bodyNoTopics": "پڑھائی ویلے کھوج تہاڈے {channels} دے سبق وکھاندی اے۔ باقی سب پڑھائی مکن تک اڈیکدا اے۔",
+  "study.searchHow.try": "“{first}” یا “{second}” کھوج کے ویکھو۔",
+  "study.searchHow.askParent": "ہور لئی ماپیاں نوں پچھو۔",
+  "study.searchHow.channels.one": "{count} چینل",
+  "study.searchHow.channels.other": "{count} چینل"
 }

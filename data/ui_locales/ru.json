@@ -2941,5 +2941,14 @@
   "study.skipped": "Пропущено. Больше не появится.",
   "content.comments.authorHidden": "Комментарии от {name} скрыты",
   "content.comments.undo": "Отменить",
-  "askParent.answer": "Ответить"
+  "askParent.answer": "Ответить",
+  "study.searchHow.title": "Как работает поиск во время учёбы",
+  "study.searchHow.body": "Во время учёбы поиск показывает уроки с ваших каналов ({channels}) и по вашим темам ({topics}). Остальное подождёт до конца учёбы.",
+  "study.searchHow.bodyNoTopics": "Во время учёбы поиск показывает уроки с ваших каналов ({channels}). Остальное подождёт до конца учёбы.",
+  "study.searchHow.try": "Попробуйте «{first}» или «{second}».",
+  "study.searchHow.askParent": "Попросите родителя добавить ещё.",
+  "study.searchHow.channels.one": "{count} канал",
+  "study.searchHow.channels.few": "{count} канала",
+  "study.searchHow.channels.many": "{count} каналов",
+  "study.searchHow.channels.other": "{count} канала"
 }

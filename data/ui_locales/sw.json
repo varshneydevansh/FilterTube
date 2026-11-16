@@ -2929,5 +2929,12 @@
   "study.skipped": "Imerukwa. Haitaonekana tena.",
   "content.comments.authorHidden": "Maoni ya {name} yamefichwa",
   "content.comments.undo": "Tendua",
-  "askParent.answer": "Jibu"
+  "askParent.answer": "Jibu",
+  "study.searchHow.title": "Jinsi utafutaji unavyofanya kazi ukisoma",
+  "study.searchHow.body": "Ukisoma, utafutaji unaonyesha masomo kutoka {channels} zako na mada zako ({topics}). Mengine yanasubiri hadi muda wa kusoma uishe.",
+  "study.searchHow.bodyNoTopics": "Ukisoma, utafutaji unaonyesha masomo kutoka {channels} zako. Mengine yanasubiri hadi muda wa kusoma uishe.",
+  "study.searchHow.try": "Jaribu “{first}” au “{second}”.",
+  "study.searchHow.askParent": "Muombe mzazi zaidi.",
+  "study.searchHow.channels.one": "Chaneli {count}",
+  "study.searchHow.channels.other": "Chaneli {count}"
 }

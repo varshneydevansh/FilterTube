@@ -2929,5 +2929,16 @@
   "study.skipped": "Passée. Elle ne s’affichera plus.",
   "content.comments.authorHidden": "Commentaires de {name} masqués",
   "content.comments.undo": "Annuler",
-  "askParent.answer": "Répondre"
+  "askParent.answer": "Répondre",
+  "study.searchHow.title": "La recherche pendant l'étude",
+  "study.searchHow.body": "Pendant l'étude, la recherche montre les leçons de vos {channels} et de vos sujets ({topics}). Le reste attend la fin de l'étude.",
+  "study.searchHow.bodyNoTopics": "Pendant l'étude, la recherche montre les leçons de vos {channels}. Le reste attend la fin de l'étude.",
+  "study.searchHow.try": "Essayez « {first} » ou « {second} ».",
+  "study.searchHow.askParent": "Demandez plus à un parent.",
+  "study.searchHow.channels.zero": "{count} chaînes",
+  "study.searchHow.channels.one": "{count} chaîne",
+  "study.searchHow.channels.two": "{count} chaînes",
+  "study.searchHow.channels.few": "{count} chaînes",
+  "study.searchHow.channels.many": "{count} chaînes",
+  "study.searchHow.channels.other": "{count} chaînes"
 }

@@ -2929,5 +2929,16 @@
   "study.skipped": "ተዘሏል። ዳግም አይታይም።",
   "content.comments.authorHidden": "የ{name} አስተያየቶች ተደብቀዋል",
   "content.comments.undo": "ቀልብስ",
-  "askParent.answer": "መልስ"
+  "askParent.answer": "መልስ",
+  "study.searchHow.title": "በማጥናት ጊዜ ፍለጋ እንዴት ይሠራል",
+  "study.searchHow.body": "በማጥናት ጊዜ፣ ፍለጋ ከ{channels} እና ከርዕሶችዎ ({topics}) ትምህርቶችን ያሳያል። ሌላው ሁሉ ጥናቱ እስኪያልቅ ይጠብቃል።",
+  "study.searchHow.bodyNoTopics": "በማጥናት ጊዜ፣ ፍለጋ ከ{channels} ትምህርቶችን ያሳያል። ሌላው ሁሉ ጥናቱ እስኪያልቅ ይጠብቃል።",
+  "study.searchHow.try": "“{first}” ወይም “{second}” ይሞክሩ።",
+  "study.searchHow.askParent": "ለተጨማሪ ወላጅን ይጠይቁ።",
+  "study.searchHow.channels.zero": "{count} ቻናሎች",
+  "study.searchHow.channels.one": "{count} ቻናል",
+  "study.searchHow.channels.two": "{count} ቻናሎች",
+  "study.searchHow.channels.few": "{count} ቻናሎች",
+  "study.searchHow.channels.many": "{count} ቻናሎች",
+  "study.searchHow.channels.other": "{count} ቻናሎች"
 }

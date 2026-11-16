@@ -2929,5 +2929,16 @@
   "study.skipped": "چھوڑ دی گئی۔ یہ دوبارہ نہیں دکھے گی۔",
   "content.comments.authorHidden": "{name} کے تبصرے چھپا دیے گئے",
   "content.comments.undo": "کالعدم کریں",
-  "askParent.answer": "جواب دیں"
+  "askParent.answer": "جواب دیں",
+  "study.searchHow.title": "پڑھائی کے دوران تلاش کیسے کام کرتی ہے",
+  "study.searchHow.body": "پڑھائی کے دوران تلاش آپ کے {channels} اور آپ کے موضوعات ({topics}) کے اسباق دکھاتی ہے۔ باقی سب پڑھائی ختم ہونے تک انتظار کرتا ہے۔",
+  "study.searchHow.bodyNoTopics": "پڑھائی کے دوران تلاش آپ کے {channels} کے اسباق دکھاتی ہے۔ باقی سب پڑھائی ختم ہونے تک انتظار کرتا ہے۔",
+  "study.searchHow.try": "“{first}” یا “{second}” تلاش کر کے دیکھیں۔",
+  "study.searchHow.askParent": "مزید کے لیے والدین سے پوچھیں۔",
+  "study.searchHow.channels.zero": "{count} چینلز",
+  "study.searchHow.channels.one": "{count} چینل",
+  "study.searchHow.channels.two": "{count} چینلز",
+  "study.searchHow.channels.few": "{count} چینلز",
+  "study.searchHow.channels.many": "{count} چینلز",
+  "study.searchHow.channels.other": "{count} چینلز"
 }

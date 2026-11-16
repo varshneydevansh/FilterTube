@@ -2953,5 +2953,16 @@
   "study.skipped": "تم التخطي. مش هيظهر تاني.",
   "content.comments.authorHidden": "تعليقات {name} اتخفت",
   "content.comments.undo": "تراجع",
-  "askParent.answer": "رد"
+  "askParent.answer": "رد",
+  "study.searchHow.title": "البحث بيشتغل إزاي وانت بتذاكر",
+  "study.searchHow.body": "وانت بتذاكر، البحث بيوريك دروس من {channels} ومن مواضيعك ({topics}). أي حاجة تانية تستنى لحد ما المذاكرة تخلص.",
+  "study.searchHow.bodyNoTopics": "وانت بتذاكر، البحث بيوريك دروس من {channels}. أي حاجة تانية تستنى لحد ما المذاكرة تخلص.",
+  "study.searchHow.try": "جرّب “{first}” أو “{second}”.",
+  "study.searchHow.askParent": "اطلب أكتر من بابا أو ماما.",
+  "study.searchHow.channels.zero": "{count} قناة",
+  "study.searchHow.channels.one": "{count} قناة",
+  "study.searchHow.channels.two": "{count} قناتان",
+  "study.searchHow.channels.few": "{count} قنوات",
+  "study.searchHow.channels.many": "{count} قناة",
+  "study.searchHow.channels.other": "{count} قناة"
 }

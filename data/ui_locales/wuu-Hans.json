@@ -2927,5 +2927,16 @@
   "study.skipped": "跳过了。伊勿会再出来。",
   "content.comments.authorHidden": "{name} 个评论已经隐藏",
   "content.comments.undo": "撤消",
-  "askParent.answer": "回复"
+  "askParent.answer": "回复",
+  "study.searchHow.title": "学习辰光搜索哪能用",
+  "study.searchHow.body": "学习辰光，搜索只显示侬{channels}搭主题（{topics}）里个课。别个等学习结束再看。",
+  "study.searchHow.bodyNoTopics": "学习辰光，搜索只显示侬{channels}里个课。别个等学习结束再看。",
+  "study.searchHow.try": "试试看“{first}”或者“{second}”。",
+  "study.searchHow.askParent": "想看更多，问问爷娘。",
+  "study.searchHow.channels.zero": "{count} 个频道",
+  "study.searchHow.channels.one": "{count} 个频道",
+  "study.searchHow.channels.two": "{count} 个频道",
+  "study.searchHow.channels.few": "{count} 个频道",
+  "study.searchHow.channels.many": "{count} 个频道",
+  "study.searchHow.channels.other": "{count} 个频道"
 }

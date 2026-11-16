@@ -2953,5 +2953,16 @@
   "study.skipped": "تم التخطي. ما رح يرجع يبيّن.",
   "content.comments.authorHidden": "تعليقات {name} مخفية",
   "content.comments.undo": "تراجع",
-  "askParent.answer": "رد"
+  "askParent.answer": "رد",
+  "study.searchHow.title": "كيف بيشتغل البحث وإنت عم تدرس",
+  "study.searchHow.body": "وإنت عم تدرس، البحث بيفرجيك دروس من {channels} ومن مواضيعك ({topics}). أي شي تاني بيستنى لتخلص الدراسة.",
+  "study.searchHow.bodyNoTopics": "وإنت عم تدرس، البحث بيفرجيك دروس من {channels}. أي شي تاني بيستنى لتخلص الدراسة.",
+  "study.searchHow.try": "جرّب “{first}” أو “{second}”.",
+  "study.searchHow.askParent": "اطلب أكتر من أهلك.",
+  "study.searchHow.channels.zero": "{count} قناة",
+  "study.searchHow.channels.one": "{count} قناة",
+  "study.searchHow.channels.two": "{count} قناتان",
+  "study.searchHow.channels.few": "{count} قنوات",
+  "study.searchHow.channels.many": "{count} قناة",
+  "study.searchHow.channels.other": "{count} قناة"
 }

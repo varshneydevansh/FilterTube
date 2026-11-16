@@ -2929,5 +2929,16 @@
   "study.skipped": "رد شد. دیگر نمایش داده نمی‌شود.",
   "content.comments.authorHidden": "نظرهای {name} پنهان شد",
   "content.comments.undo": "واگرد",
-  "askParent.answer": "پاسخ"
+  "askParent.answer": "پاسخ",
+  "study.searchHow.title": "جستجو هنگام درس خواندن چطور کار می‌کند",
+  "study.searchHow.body": "هنگام درس خواندن، جستجو درس‌هایی از {channels} و موضوع‌هایت ({topics}) نشان می‌دهد. بقیه تا پایان زمان درس صبر می‌کنند.",
+  "study.searchHow.bodyNoTopics": "هنگام درس خواندن، جستجو درس‌هایی از {channels} نشان می‌دهد. بقیه تا پایان زمان درس صبر می‌کنند.",
+  "study.searchHow.try": "«{first}» یا «{second}» را امتحان کن.",
+  "study.searchHow.askParent": "برای بیشتر، از پدر یا مادرت بپرس.",
+  "study.searchHow.channels.zero": "{count} کانال",
+  "study.searchHow.channels.one": "{count} کانال",
+  "study.searchHow.channels.two": "{count} کانال",
+  "study.searchHow.channels.few": "{count} کانال",
+  "study.searchHow.channels.many": "{count} کانال",
+  "study.searchHow.channels.other": "{count} کانال"
 }

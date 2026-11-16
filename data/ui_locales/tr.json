@@ -2929,5 +2929,16 @@
   "study.skipped": "Atlandı. Bir daha görünmeyecek.",
   "content.comments.authorHidden": "{name} kullanıcısının yorumları gizlendi",
   "content.comments.undo": "Geri al",
-  "askParent.answer": "Cevapla"
+  "askParent.answer": "Cevapla",
+  "study.searchHow.title": "Çalışırken arama nasıl çalışır",
+  "study.searchHow.body": "Çalışırken arama, {channels} ve konularından ({topics}) dersler gösterir. Geri kalanı çalışma bitince gelir.",
+  "study.searchHow.bodyNoTopics": "Çalışırken arama, {channels} üzerinden dersler gösterir. Geri kalanı çalışma bitince gelir.",
+  "study.searchHow.try": "“{first}” veya “{second}” dene.",
+  "study.searchHow.askParent": "Daha fazlası için bir ebeveyne sor.",
+  "study.searchHow.channels.zero": "{count} kanal",
+  "study.searchHow.channels.one": "{count} kanal",
+  "study.searchHow.channels.two": "{count} kanal",
+  "study.searchHow.channels.few": "{count} kanal",
+  "study.searchHow.channels.many": "{count} kanal",
+  "study.searchHow.channels.other": "{count} kanal"
 }

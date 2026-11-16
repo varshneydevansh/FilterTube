@@ -2929,5 +2929,16 @@
   "study.skipped": "Übersprungen. Es erscheint nicht mehr.",
   "content.comments.authorHidden": "Kommentare von {name} ausgeblendet",
   "content.comments.undo": "Rückgängig",
-  "askParent.answer": "Antworten"
+  "askParent.answer": "Antworten",
+  "study.searchHow.title": "So funktioniert die Suche beim Lernen",
+  "study.searchHow.body": "Beim Lernen zeigt die Suche Lektionen aus deinen {channels} und deinen Themen ({topics}). Alles andere wartet bis zum Ende der Lernzeit.",
+  "study.searchHow.bodyNoTopics": "Beim Lernen zeigt die Suche Lektionen aus deinen {channels}. Alles andere wartet bis zum Ende der Lernzeit.",
+  "study.searchHow.try": "Probier „{first}“ oder „{second}“.",
+  "study.searchHow.askParent": "Frag ein Elternteil nach mehr.",
+  "study.searchHow.channels.zero": "{count} Kanäle",
+  "study.searchHow.channels.one": "{count} Kanal",
+  "study.searchHow.channels.two": "{count} Kanäle",
+  "study.searchHow.channels.few": "{count} Kanäle",
+  "study.searchHow.channels.many": "{count} Kanäle",
+  "study.searchHow.channels.other": "{count} Kanäle"
 }

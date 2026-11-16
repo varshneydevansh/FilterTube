@@ -2927,5 +2927,11 @@
   "study.skipped": "Dilewati. Ora bakal katon maneh.",
   "content.comments.authorHidden": "Komentar saka {name} didhelikake",
   "content.comments.undo": "Batalake",
-  "askParent.answer": "Wangsuli"
+  "askParent.answer": "Wangsuli",
+  "study.searchHow.title": "Carane golèk nalika sinau",
+  "study.searchHow.body": "Nalika sinau, golèk mung nuduhaké pelajaran saka {channels} lan topikmu ({topics}). Liyané ngenteni nganti wektu sinau rampung.",
+  "study.searchHow.bodyNoTopics": "Nalika sinau, golèk mung nuduhaké pelajaran saka {channels}. Liyané ngenteni nganti wektu sinau rampung.",
+  "study.searchHow.try": "Jajal “{first}” utawa “{second}”.",
+  "study.searchHow.askParent": "Njaluk luwih akèh marang wong tuwa.",
+  "study.searchHow.channels.other": "{count} saluran"
 }

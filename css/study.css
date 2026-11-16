@@ -182,3 +182,26 @@
 }
 .ft-study-unlock .text-input { min-height: 48px; }
 .ft-study-unlock__actions { display: flex; gap: 8px; justify-content: flex-end; }
+
+/* "How search works while studying" (Android StudySearchExplainer): a washed study card with a crayon
+ * magnifier by the title, the body in muted ink, nothing to tap. */
+.ft-study-explainer {
+    margin-top: 0.75rem;
+    padding: 0.85rem 1rem;
+    border: 1px solid rgba(31, 111, 106, 0.22);
+    border-radius: 1rem;
+    background: var(--ft-study-teal-surface);
+}
+.ft-study-explainer__title {
+    margin: 0;
+    padding-inline-start: 2.1rem;
+    min-height: 1.6rem;
+    font: 400 1rem/1.6rem "FilterTube Delius", "Outfit", system-ui, sans-serif;
+    color: #163f3c;
+    background: no-repeat left center / 1.6rem 1.6rem url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 26 26' fill='none' stroke='%235f8368' stroke-width='2.4' stroke-linecap='round'%3E%3Cpath d='M11 4.2c3.9-.3 6.9 2.6 6.8 6.4-.1 3.6-3 6.5-6.7 6.4-3.8-.1-6.6-3.1-6.4-6.8.2-3.3 2.9-5.8 6.3-6'/%3E%3Cpath d='M16 16.4l5.6 5.4'/%3E%3C/svg%3E");
+}
+[dir="rtl"] .ft-study-explainer__title { background-position: right center; }
+.ft-study-explainer__body { margin: 0.35rem 0 0; color: var(--ft-study-grey); font-size: 0.875rem; line-height: 1.45; }
+:root[data-theme="dark"] .ft-study-explainer { background: rgba(31, 111, 106, 0.16); border-color: rgba(120, 190, 180, 0.28); }
+:root[data-theme="dark"] .ft-study-explainer__title { color: #d5ece8; }
+:root[data-theme="dark"] .ft-study-explainer__body { color: #b8c3ce; }

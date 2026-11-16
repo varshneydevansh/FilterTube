@@ -2929,5 +2929,16 @@
   "study.skipped": "Nilaktawan. Hindi na ito lalabas.",
   "content.comments.authorHidden": "Nakatago ang mga komento mula kay {name}",
   "content.comments.undo": "I-undo",
-  "askParent.answer": "Sumagot"
+  "askParent.answer": "Sumagot",
+  "study.searchHow.title": "Paano gumagana ang paghahanap habang nag-aaral",
+  "study.searchHow.body": "Habang nag-aaral ka, ang paghahanap ay nagpapakita ng mga aralin mula sa iyong {channels} at mga paksa ({topics}). Ang iba ay maghihintay hanggang matapos ang pag-aaral.",
+  "study.searchHow.bodyNoTopics": "Habang nag-aaral ka, ang paghahanap ay nagpapakita ng mga aralin mula sa iyong {channels}. Ang iba ay maghihintay hanggang matapos ang pag-aaral.",
+  "study.searchHow.try": "Subukan ang “{first}” o “{second}”.",
+  "study.searchHow.askParent": "Humingi ng higit pa sa magulang.",
+  "study.searchHow.channels.zero": "{count} na channel",
+  "study.searchHow.channels.one": "{count} channel",
+  "study.searchHow.channels.two": "{count} na channel",
+  "study.searchHow.channels.few": "{count} na channel",
+  "study.searchHow.channels.many": "{count} na channel",
+  "study.searchHow.channels.other": "{count} na channel"
 }

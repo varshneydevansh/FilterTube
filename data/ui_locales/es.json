@@ -2929,5 +2929,16 @@
   "study.skipped": "Saltado. No volverá a aparecer.",
   "content.comments.authorHidden": "Comentarios de {name} ocultos",
   "content.comments.undo": "Deshacer",
-  "askParent.answer": "Responder"
+  "askParent.answer": "Responder",
+  "study.searchHow.title": "Cómo funciona la búsqueda mientras estudias",
+  "study.searchHow.body": "Mientras estudias, la búsqueda muestra lecciones de tus {channels} y tus temas ({topics}). Lo demás espera hasta que termine el estudio.",
+  "study.searchHow.bodyNoTopics": "Mientras estudias, la búsqueda muestra lecciones de tus {channels}. Lo demás espera hasta que termine el estudio.",
+  "study.searchHow.try": "Prueba “{first}” o “{second}”.",
+  "study.searchHow.askParent": "Pide más a un padre o una madre.",
+  "study.searchHow.channels.zero": "{count} canales",
+  "study.searchHow.channels.one": "{count} canal",
+  "study.searchHow.channels.two": "{count} canales",
+  "study.searchHow.channels.few": "{count} canales",
+  "study.searchHow.channels.many": "{count} canales",
+  "study.searchHow.channels.other": "{count} canales"
 }

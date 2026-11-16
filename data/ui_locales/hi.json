@@ -2929,5 +2929,16 @@
   "study.skipped": "छोड़ दिया। यह फिर नहीं दिखेगा।",
   "content.comments.authorHidden": "{name} की टिप्पणियां छिपाई गईं",
   "content.comments.undo": "पहले जैसा करें",
-  "askParent.answer": "जवाब दें"
+  "askParent.answer": "जवाब दें",
+  "study.searchHow.title": "पढ़ाई के समय खोज कैसे काम करती है",
+  "study.searchHow.body": "पढ़ाई के समय खोज आपके {channels} और आपके विषयों ({topics}) के पाठ दिखाती है। बाकी सब पढ़ाई खत्म होने तक रुकता है।",
+  "study.searchHow.bodyNoTopics": "पढ़ाई के समय खोज आपके {channels} के पाठ दिखाती है। बाकी सब पढ़ाई खत्म होने तक रुकता है।",
+  "study.searchHow.try": "“{first}” या “{second}” खोजकर देखें।",
+  "study.searchHow.askParent": "और के लिए माता-पिता से पूछें।",
+  "study.searchHow.channels.zero": "{count} चैनल",
+  "study.searchHow.channels.one": "{count} चैनल",
+  "study.searchHow.channels.two": "{count} चैनल",
+  "study.searchHow.channels.few": "{count} चैनल",
+  "study.searchHow.channels.many": "{count} चैनल",
+  "study.searchHow.channels.other": "{count} चैनल"
 }

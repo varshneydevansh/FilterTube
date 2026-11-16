@@ -703,8 +703,44 @@
             toastHost: card,
             onPatch: async patch => { const result = await send({ action: 'FilterTube_StudyUpdate', patch }); await refresh(); return result; }
         });
+        const explainer = searchExplainerCard(study, catalog, data.isChild === true || state.isChild === true);
+        if (explainer) card.appendChild(explainer);
         if (editable && state.state !== 'STUDY' && state.state !== 'BREAK') card.appendChild(startNow(study, refresh));
         host.replaceChildren(card);
+    }
+
+    /** A count with its plural form ("9 channels"), from key.one / key.other / key.<category>. */
+    function plural(key, count, fallbackOne, fallbackOther) {
+        let category = count === 1 ? 'one' : 'other';
+        try { category = new Intl.PluralRules(language()).select(count); } catch (e) { }
+        const values = { count };
+        const exact = root.FilterTubeUiLocalization?.text?.(`${key}.${category}`, values);
+        if (typeof exact === 'string' && exact.trim()) return exact;
+        return t(`${key}.${count === 1 ? 'one' : 'other'}`, count === 1 ? fallbackOne : fallbackOther, values);
+    }
+
+    /**
+     * "How search works while studying" (Android StudySearchExplainer): one short card, nothing to tap.
+     * The plan's channel count, two of its subjects and two example searches; a child is told to ask a
+     * parent for more. Null without an active pack.
+     */
+    function searchExplainerCard(study, catalog, child) {
+        const Engine = engine();
+        if (!Engine?.searchExplainer || !array(object(study).activePackIds).length) return null;
+        const content = Engine.searchExplainer(study, catalog);
+        if (!content.channels && !content.topics.length) return null;
+        const channels = plural('study.searchHow.channels', content.channels, '{count} channel', '{count} channels');
+        const lines = [content.topics.length
+            ? t('study.searchHow.body', 'While you study, search shows lessons from your {channels} and your topics ({topics}). Anything else waits until study ends.',
+                { channels, topics: `${content.topics.join(', ')}…` })
+            : t('study.searchHow.bodyNoTopics', 'While you study, search shows lessons from your {channels}. Anything else waits until study ends.', { channels })];
+        if (content.examples.length >= 2) lines.push(t('study.searchHow.try', 'Try “{first}” or “{second}”.', { first: content.examples[0], second: content.examples[1] }));
+        if (child) lines.push(t('study.searchHow.askParent', 'Ask a parent for more.'));
+        const box = el('div', 'ft-study-explainer');
+        box.setAttribute('data-ft-study-search-explainer', 'true');
+        box.appendChild(el('h5', 'ft-study-explainer__title', t('study.searchHow.title', 'How search works while studying')));
+        box.appendChild(el('p', 'ft-study-explainer__body', lines.join(' ')));
+        return box;
     }
 
     function startNow(study, refresh) {
@@ -878,7 +914,7 @@
 
     root.FilterTubeStudyUi = Object.freeze({
         t, phaseInfo, planSegments, segmentWords, setByLabel, packLabel, renderStrip, mountStrip,
-        renderPlanner, renderDashboard, mountDashboard, renderParentPlans
+        renderPlanner, renderDashboard, mountDashboard, renderParentPlans, searchExplainerCard
     });
 
     // Popup: the strip takes the banner slot under the header. Options page: the study card.

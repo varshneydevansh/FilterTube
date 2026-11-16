@@ -2929,5 +2929,16 @@
   "study.skipped": "தவிர்க்கப்பட்டது. இது மீண்டும் தெரியாது.",
   "content.comments.authorHidden": "{name} இன் கருத்துகள் மறைக்கப்பட்டன",
   "content.comments.undo": "செயல்தவிர்",
-  "askParent.answer": "பதில் சொல்"
+  "askParent.answer": "பதில் சொல்",
+  "study.searchHow.title": "படிக்கும்போது தேடல் எப்படி வேலை செய்கிறது",
+  "study.searchHow.body": "படிக்கும்போது, தேடல் உங்கள் {channels} மற்றும் தலைப்புகளிலிருந்து ({topics}) பாடங்களைக் காட்டும். மற்றவை படிப்பு முடியும் வரை காத்திருக்கும்.",
+  "study.searchHow.bodyNoTopics": "படிக்கும்போது, தேடல் உங்கள் {channels} இலிருந்து பாடங்களைக் காட்டும். மற்றவை படிப்பு முடியும் வரை காத்திருக்கும்.",
+  "study.searchHow.try": "“{first}” அல்லது “{second}” என்று தேடிப் பாருங்கள்.",
+  "study.searchHow.askParent": "மேலும் வேண்டுமெனில் பெற்றோரிடம் கேளுங்கள்.",
+  "study.searchHow.channels.zero": "{count} சேனல்கள்",
+  "study.searchHow.channels.one": "{count} சேனல்",
+  "study.searchHow.channels.two": "{count} சேனல்கள்",
+  "study.searchHow.channels.few": "{count} சேனல்கள்",
+  "study.searchHow.channels.many": "{count} சேனல்கள்",
+  "study.searchHow.channels.other": "{count} சேனல்கள்"
 }

@@ -2929,5 +2929,16 @@
   "study.skipped": "Saltato. Non verrà più mostrato.",
   "content.comments.authorHidden": "Commenti di {name} nascosti",
   "content.comments.undo": "Annulla",
-  "askParent.answer": "Rispondi"
+  "askParent.answer": "Rispondi",
+  "study.searchHow.title": "Come funziona la ricerca mentre studi",
+  "study.searchHow.body": "Mentre studi, la ricerca mostra lezioni dai tuoi {channels} e dai tuoi argomenti ({topics}). Il resto aspetta la fine dello studio.",
+  "study.searchHow.bodyNoTopics": "Mentre studi, la ricerca mostra lezioni dai tuoi {channels}. Il resto aspetta la fine dello studio.",
+  "study.searchHow.try": "Prova “{first}” o “{second}”.",
+  "study.searchHow.askParent": "Chiedi di più a un genitore.",
+  "study.searchHow.channels.zero": "{count} canali",
+  "study.searchHow.channels.one": "{count} canale",
+  "study.searchHow.channels.two": "{count} canali",
+  "study.searchHow.channels.few": "{count} canali",
+  "study.searchHow.channels.many": "{count} canali",
+  "study.searchHow.channels.other": "{count} canali"
 }

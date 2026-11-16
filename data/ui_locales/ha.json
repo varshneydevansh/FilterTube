@@ -2929,5 +2929,16 @@
   "study.skipped": "An tsallake. Ba zai sake bayyana ba.",
   "content.comments.authorHidden": "An ɓoye sharhohin {name}",
   "content.comments.undo": "Soke",
-  "askParent.answer": "Amsa"
+  "askParent.answer": "Amsa",
+  "study.searchHow.title": "Yadda bincike ke aiki lokacin karatu",
+  "study.searchHow.body": "Lokacin karatu, bincike yana nuna darussa daga {channels} naka da batutuwanka ({topics}). Sauran suna jira har karatu ya ƙare.",
+  "study.searchHow.bodyNoTopics": "Lokacin karatu, bincike yana nuna darussa daga {channels} naka. Sauran suna jira har karatu ya ƙare.",
+  "study.searchHow.try": "Gwada “{first}” ko “{second}”.",
+  "study.searchHow.askParent": "Tambayi iyaye don ƙari.",
+  "study.searchHow.channels.zero": "Tashoshi {count}",
+  "study.searchHow.channels.one": "Tasha {count}",
+  "study.searchHow.channels.two": "Tashoshi {count}",
+  "study.searchHow.channels.few": "Tashoshi {count}",
+  "study.searchHow.channels.many": "Tashoshi {count}",
+  "study.searchHow.channels.other": "Tashoshi {count}"
 }

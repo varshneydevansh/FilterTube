@@ -2929,5 +2929,12 @@
   "study.skipped": "ಬಿಟ್ಟುಬಿಡಲಾಗಿದೆ. ಮತ್ತೆ ಕಾಣುವುದಿಲ್ಲ.",
   "content.comments.authorHidden": "{name} ಅವರ ಕಾಮೆಂಟ್‌ಗಳನ್ನು ಮರೆಮಾಡಲಾಗಿದೆ",
   "content.comments.undo": "ರದ್ದುಮಾಡಿ",
-  "askParent.answer": "ಉತ್ತರಿಸಿ"
+  "askParent.answer": "ಉತ್ತರಿಸಿ",
+  "study.searchHow.title": "ಓದುವಾಗ ಹುಡುಕಾಟ ಹೇಗೆ ಕೆಲಸ ಮಾಡುತ್ತದೆ",
+  "study.searchHow.body": "ಓದುವಾಗ, ಹುಡುಕಾಟ ನಿಮ್ಮ {channels} ಮತ್ತು ವಿಷಯಗಳ ({topics}) ಪಾಠಗಳನ್ನು ತೋರಿಸುತ್ತದೆ. ಉಳಿದವು ಓದು ಮುಗಿಯುವವರೆಗೆ ಕಾಯುತ್ತವೆ.",
+  "study.searchHow.bodyNoTopics": "ಓದುವಾಗ, ಹುಡುಕಾಟ ನಿಮ್ಮ {channels} ಪಾಠಗಳನ್ನು ತೋರಿಸುತ್ತದೆ. ಉಳಿದವು ಓದು ಮುಗಿಯುವವರೆಗೆ ಕಾಯುತ್ತವೆ.",
+  "study.searchHow.try": "“{first}” ಅಥವಾ “{second}” ಹುಡುಕಿ ನೋಡಿ.",
+  "study.searchHow.askParent": "ಇನ್ನಷ್ಟು ಬೇಕಾದರೆ ಪೋಷಕರನ್ನು ಕೇಳಿ.",
+  "study.searchHow.channels.one": "{count} ಚಾನಲ್",
+  "study.searchHow.channels.other": "{count} ಚಾನಲ್‌ಗಳು"
 }

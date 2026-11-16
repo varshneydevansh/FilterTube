@@ -2929,5 +2929,12 @@
   "study.skipped": "वगळला. पुन्हा दिसणार नाही.",
   "content.comments.authorHidden": "{name} च्या टिप्पण्या लपवल्या",
   "content.comments.undo": "पूर्ववत करा",
-  "askParent.answer": "उत्तर द्या"
+  "askParent.answer": "उत्तर द्या",
+  "study.searchHow.title": "अभ्यासाच्या वेळी शोध कसा चालतो",
+  "study.searchHow.body": "अभ्यास करताना शोध तुमच्या {channels} आणि विषयांचे ({topics}) धडे दाखवतो. बाकी सगळं अभ्यास संपेपर्यंत थांबतं.",
+  "study.searchHow.bodyNoTopics": "अभ्यास करताना शोध तुमच्या {channels} चे धडे दाखवतो. बाकी सगळं अभ्यास संपेपर्यंत थांबतं.",
+  "study.searchHow.try": "“{first}” किंवा “{second}” शोधून पाहा.",
+  "study.searchHow.askParent": "अधिकसाठी पालकांना विचारा.",
+  "study.searchHow.channels.one": "{count} चॅनेल",
+  "study.searchHow.channels.other": "{count} चॅनेल"
 }

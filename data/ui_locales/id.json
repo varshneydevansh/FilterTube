@@ -2927,5 +2927,16 @@
   "study.skipped": "Dilewati. Tidak akan tampil lagi.",
   "content.comments.authorHidden": "Komentar dari {name} disembunyikan",
   "content.comments.undo": "Urungkan",
-  "askParent.answer": "Jawab"
+  "askParent.answer": "Jawab",
+  "study.searchHow.title": "Cara pencarian bekerja saat belajar",
+  "study.searchHow.body": "Saat belajar, pencarian menampilkan pelajaran dari {channels} dan topikmu ({topics}). Yang lain menunggu sampai waktu belajar selesai.",
+  "study.searchHow.bodyNoTopics": "Saat belajar, pencarian menampilkan pelajaran dari {channels}. Yang lain menunggu sampai waktu belajar selesai.",
+  "study.searchHow.try": "Coba “{first}” atau “{second}”.",
+  "study.searchHow.askParent": "Minta lebih banyak ke orang tua.",
+  "study.searchHow.channels.zero": "{count} channel",
+  "study.searchHow.channels.one": "{count} channel",
+  "study.searchHow.channels.two": "{count} channel",
+  "study.searchHow.channels.few": "{count} channel",
+  "study.searchHow.channels.many": "{count} channel",
+  "study.searchHow.channels.other": "{count} channel"
 }
