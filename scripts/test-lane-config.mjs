@@ -209,6 +209,8 @@ const APP_PARITY_TESTS = Object.freeze([
   'tests/runtime/app-parity-comments-note.test.mjs',
   'tests/runtime/app-parity-doodles.test.mjs',
   'tests/runtime/app-parity-pass5.test.mjs',
+  // The Android -> extension port ledger's own checks (docs/parity/HOW_TO_PORT.md).
+  'tools/parity/ledger.test.mjs',
 ]);
 // Companion characters in the popup and options page (js/mascots.js).
 const COMPANION_TESTS = Object.freeze([
