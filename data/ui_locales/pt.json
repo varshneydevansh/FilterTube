@@ -2834,5 +2834,17 @@
   "pk.hub.noRules": "Nenhuma regra ainda",
   "pk.hub.contentStatus": "Clipes, comentários, categorias e tipos de vídeo",
   "pk.space.main": "Modo principal",
-  "pk.space.kids": "Modo infantil"
+  "pk.space.kids": "Modo infantil",
+  "study.switch.parentBody": "{name} pode trocar agora com o PIN.",
+  "study.switch.parentBodyGeneric": "Um responsável pode trocar agora com o PIN.",
+  "study.switch.locked": "Os outros perfis abrem depois das {time}.",
+  "study.switch.lockedNoTime": "Os outros perfis abrem depois do estudo.",
+  "study.switch.pausedTitle": "A troca de perfil está pausada",
+  "study.switch.withPin": "Trocar",
+  "study.switch.pinWrong": "Esse PIN não funcionou. Tente de novo.",
+  "study.switch.gentleTitle": "Trocar de perfil?",
+  "study.switch.gentleBody": "Primeiro sua sessão de estudo termina. Você ainda pode cancelar durante uma pausa de 30 segundos.",
+  "study.error.running": "Não é possível alterar o plano enquanto um bloqueio está ativo.",
+  "study.restore.title": "Restaurar depois do estudo",
+  "study.restore.body": "Restaurar agora substituiria seu plano de estudo."
 }

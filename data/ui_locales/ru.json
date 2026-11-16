@@ -2842,5 +2842,17 @@
   "pk.hub.countWords.few": "{count} слова",
   "pk.hub.countWords.many": "{count} слов",
   "pk.hub.todayRules.few": "правила работают в {space}",
-  "pk.hub.todayRules.many": "правил работают в {space}"
+  "pk.hub.todayRules.many": "правил работают в {space}",
+  "study.switch.parentBody": "{name} может сменить профиль сейчас с помощью PIN-кода.",
+  "study.switch.parentBodyGeneric": "Родитель может сменить профиль сейчас с помощью PIN-кода.",
+  "study.switch.locked": "Другие профили откроются после {time}.",
+  "study.switch.lockedNoTime": "Другие профили откроются после учёбы.",
+  "study.switch.pausedTitle": "Смена профиля на паузе",
+  "study.switch.withPin": "Сменить",
+  "study.switch.pinWrong": "Этот PIN-код не подошёл. Попробуйте ещё раз.",
+  "study.switch.gentleTitle": "Сменить профиль?",
+  "study.switch.gentleBody": "Сначала закончится сеанс учёбы. Во время паузы в 30 секунд ещё можно отменить.",
+  "study.error.running": "Нельзя изменить план, пока действует блокировка.",
+  "study.restore.title": "Восстановить после учёбы",
+  "study.restore.body": "Если восстановить сейчас, ваш план учёбы заменится."
 }

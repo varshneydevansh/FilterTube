@@ -530,16 +530,24 @@
         async function update(patch = {}) {
             if (await deps.getSelfControlSession?.()) return { ok: false, error: 'locked' };
             const allowed = ['activePackIds', 'packEdits', 'focus', 'plan', 'breakMode', 'weekView', 'packChannelsOnly'];
-            const { profileId, profile } = await readAll();
+            const { profileId, profile, runtime } = await readAll();
             const current = Model.profileStudy(profile);
             const apply = study => {
                 const next = { ...study };
                 for (const key of allowed) if (Object.prototype.hasOwnProperty.call(object(patch), key)) next[key] = clone(patch[key]);
                 return next;
             };
-            // Under a parent's plan or lock the person may tighten study, never loosen it (StudyTighten).
-            if (current && (current.plan?.setByParentId || current.lock?.setByParentId)
-                && !Model.tightenAllowed(current, apply(clone(current)), { now: now() })) return { ok: false, error: 'set_by_parent' };
+            // A child never sets study up for itself (Android StudySetupActivity); a parent does that from
+            // Family control. It may only make what it has stricter.
+            const isChild = text(profile.type) === 'child';
+            if (isChild && !current) return { ok: false, error: 'child_profile' };
+            // Under a parent's plan or lock the person may tighten study, never loosen it (StudyTighten),
+            // and nobody loosens it during a clock hold (Android StudyRuntime.holdsLoosening).
+            const running = !!current && clockFor(profile, runtime, profileId, now()).clock.clockHold === true;
+            if (current && (isChild || running || current.plan?.setByParentId || current.lock?.setByParentId)
+                && !Model.tightenAllowed(current, apply(clone(current)), { now: now(), held: isChild || running })) {
+                return { ok: false, error: isChild || current.plan?.setByParentId || current.lock?.setByParentId ? 'set_by_parent' : 'study_running' };
+            }
             const result = await updateProfileStudy(profileId, apply);
             if (result?.ok === false) return result;
             await schedule();
@@ -636,6 +644,40 @@
             return { ok: true };
         }
 
+        /**
+         * Switching profile during study (Android StudyProfileSwitch). Study is per profile, so a switch
+         * away from [fromProfileId] is a way out unless it's checked:
+         * - a parent's lock, a parent's plan window or a parent's plan limit: the PIN of the parent who
+         *   set it, typed now ({kind: 'needs_parent_pin', parentProfileId, endsAt});
+         * - a clock hold or a self-started Locked session: no switching ({kind: 'locked', endsAt});
+         * - a Gentle session: it ends first ({kind: 'end_gentle_first'});
+         * - otherwise {kind: 'allowed'} and the usual PIN gates apply.
+         */
+        async function switchDecision(fromProfileId, fromProfile, targetId) {
+            const from = text(fromProfileId);
+            if (!from || text(targetId) === from) return { kind: 'allowed' };
+            const items = await storageGet([RUNTIME_KEY, CLOCK_KEY]);
+            const runtime = normalizeRuntime(items[RUNTIME_KEY]);
+            const clockStore = normalizeClockStore(items[CLOCK_KEY]);
+            const { study, local, clock, parentLock } = clockFor(object(fromProfile), runtime, from, now(), { clockStore });
+            if (!study) return { kind: 'allowed' };
+            const lock = object(study.lock);
+            if (parentLock?.active && text(lock.setByParentId)) {
+                return { kind: 'needs_parent_pin', parentProfileId: text(lock.setByParentId), endsAt: Number(lock.endsAt) || null };
+            }
+            if (clock.setByParentId && clock.studying) {
+                return { kind: 'needs_parent_pin', parentProfileId: text(clock.setByParentId), endsAt: clock.sessionEnd || null };
+            }
+            if (clock.state === Engine.LIMIT) {
+                const planParent = text(object(study.plan).setByParentId);
+                if (planParent) return { kind: 'needs_parent_pin', parentProfileId: planParent, endsAt: clock.clockHold ? null : clock.until || null };
+                if (clock.clockHold) return { kind: 'locked', endsAt: clock.until || null };
+            }
+            if (local.session?.lockMode === 'locked' && clock.studying) return { kind: 'locked', endsAt: Number(local.session.endsAt) || null };
+            if (local.session && clock.studying) return { kind: 'end_gentle_first' };
+            return { kind: 'allowed' };
+        }
+
         /** Runtime messages. Returns a promise of the response, or null when the action isn't ours. */
         function handleMessage(request, { extensionPage = false, youtubeContent = false } = {}) {
             const action = text(request?.action);
@@ -666,7 +708,8 @@
 
         return Object.freeze({
             ALARM, RUNTIME_KEY, prepare, apply, getState, schedule, onAlarm, startSession, requestEnd, cancelEnd,
-            skipBreak, tick, update, foldProgress, handleMessage, deviceId, getChildState, updateChild, startParentLock, endParentLock
+            skipBreak, tick, update, foldProgress, handleMessage, deviceId, getChildState, updateChild, startParentLock, endParentLock,
+            switchDecision
         });
     }
 

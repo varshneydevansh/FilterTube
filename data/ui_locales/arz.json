@@ -2850,5 +2850,17 @@
   "pk.hub.todayRules.zero": "قاعدة تعمل في {space}",
   "pk.hub.todayRules.two": "قاعدتان تعملان في {space}",
   "pk.hub.todayRules.few": "قواعد تعمل في {space}",
-  "pk.hub.todayRules.many": "قاعدة تعمل في {space}"
+  "pk.hub.todayRules.many": "قاعدة تعمل في {space}",
+  "study.switch.parentBody": "{name} يقدر يغيّر دلوقتي بالـ PIN بتاعه.",
+  "study.switch.parentBodyGeneric": "حد من الوالدين يقدر يغيّر دلوقتي بالـ PIN بتاعه.",
+  "study.switch.locked": "البروفايلات التانية بتفتح بعد {time}.",
+  "study.switch.lockedNoTime": "البروفايلات التانية بتفتح بعد الدراسة.",
+  "study.switch.pausedTitle": "تغيير البروفايل واقف مؤقتًا",
+  "study.switch.withPin": "غيّر",
+  "study.switch.pinWrong": "الـ PIN ده ماشتغلش. جرّب تاني.",
+  "study.switch.gentleTitle": "تغيّر البروفايل؟",
+  "study.switch.gentleBody": "جلسة الدراسة هتخلص الأول. لسه تقدر تلغي خلال وقفة 30 ثانية.",
+  "study.error.running": "مينفعش تغيير الخطة وقت وجود قفل.",
+  "study.restore.title": "الاسترجاع بعد الدراسة",
+  "study.restore.body": "لو استرجعت دلوقتي هتحل محل خطة دراستك."
 }

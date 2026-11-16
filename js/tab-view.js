@@ -28783,6 +28783,50 @@ document.addEventListener('DOMContentLoaded', async () => {
         renderProfilesManager(profilesV4Cache);
     });
 
+
+    // Switching profile during study (Android StudySwitchGate): the background decides, and reverts any
+    // switch it didn't allow; this asks for the parent's PIN or says why switching waits.
+    async function passStudySwitchGate(targetId) {
+        let decision = null;
+        try {
+            const response = await sendRuntimeMessage({ action: 'FilterTube_StudySwitchDecision', targetProfileId: targetId });
+            decision = response?.ok ? response.decision : null;
+        } catch (e) {
+            decision = null;
+        }
+        if (!decision || decision.kind === 'allowed') return true;
+        const timeLabel = Number.isFinite(decision.endsAt) && decision.endsAt > Date.now()
+            ? new Date(decision.endsAt).toLocaleTimeString([], { hour: 'numeric', minute: '2-digit' })
+            : '';
+        if (decision.kind === 'needs_parent_pin' && decision.parentHasPin) {
+            const pin = await showPromptModal({
+                title: tabViewUiText('study.switch.pausedTitle', 'Profile switching is paused'),
+                message: decision.parentName
+                    ? tabViewUiText('study.switch.parentBody', '{name} can switch now with their PIN.', { name: decision.parentName })
+                    : tabViewUiText('study.switch.parentBodyGeneric', 'A parent can switch now with their PIN.'),
+                placeholder: 'PIN',
+                inputType: 'password',
+                confirmText: tabViewUiText('study.switch.withPin', 'Switch')
+            });
+            const normalized = normalizeString(pin);
+            if (!normalized) return false;
+            const auth = await sendRuntimeMessage({ action: 'FilterTube_StudySwitchAuthorize', targetProfileId: targetId, pin: normalized });
+            if (auth?.ok === true) return true;
+            UIComponents.showToast(auth?.reason === 'rate_limited'
+                ? tabViewUiText('dashboard.toast.pinRateLimited', 'Too many incorrect PIN attempts. Try again later.')
+                : tabViewUiText('study.switch.pinWrong', "That PIN didn't work. Try again."), 'error');
+            return false;
+        }
+        if (decision.kind === 'end_gentle_first') {
+            UIComponents.showToast(tabViewUiText('study.switch.gentleBody', 'Your study session ends first. You can still cancel during a 30-second pause.'), 'info');
+            return false;
+        }
+        UIComponents.showToast(timeLabel
+            ? tabViewUiText('study.switch.locked', 'Other profiles open after {time}.', { time: timeLabel })
+            : tabViewUiText('study.switch.lockedNoTime', 'Other profiles open after study.'), 'error');
+        return false;
+    }
+
     async function switchToProfile(nextProfileId) {
         if (isHandlingProfileSwitch) return;
         if (isSelfControlSessionActive()) {
@@ -28793,6 +28837,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         }
         const targetId = normalizeString(nextProfileId);
         if (!targetId) return;
+        if (!(await passStudySwitchGate(targetId))) return;
 
         isHandlingProfileSwitch = true;
         try {
@@ -29438,8 +29483,24 @@ document.addEventListener('DOMContentLoaded', async () => {
         }
     }
 
+    // "Restore after study" (Android StudyRestoreGate): a backup restore waits while a study round, a
+    // Locked session or a clock hold runs on the active profile.
+    async function studyHoldsRestore() {
+        try {
+            const state = await sendRuntimeMessage({ action: 'FilterTube_StudyGetState' });
+            if (!state?.ok || !state.study) return false;
+            const running = state.state === 'STUDY' || state.state === 'BREAK';
+            if (!running && state.lockMode !== 'locked' && state.clockHold !== true) return false;
+            UIComponents.showToast(`${tabViewUiText('study.restore.title', 'Restore after study')}. ${tabViewUiText('study.restore.body', 'Restoring now would replace your study plan.')}`, 'error');
+            return true;
+        } catch (e) {
+            return false;
+        }
+    }
+
     async function runImportV3FromFile(file) {
         if (!file) return;
+        if (await studyHoldsRestore()) return;
         if (!ensureNonChildAdminAction(tabViewUiText(
             'dashboard.backup.protected.importBlocked',
             'Protected profiles cannot import backups from this surface.'

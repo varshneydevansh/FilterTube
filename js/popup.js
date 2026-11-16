@@ -1956,13 +1956,23 @@ document.addEventListener('DOMContentLoaded', async () => {
 
         const normalized = normalizeString(pin);
         if (!normalized) return false;
-        const ok = await verifyPin(normalized, verifier);
+        // The background checks the PIN and counts wrong attempts (the same limit as the options page and
+        // the app's PIN lockout); a local check stays only for when the background can't answer.
+        let auth = null;
+        try {
+            auth = await sendRuntimeMessage({ action: 'FilterTube_SessionPinAuth', profileId, pin: normalized });
+        } catch (e) {
+            auth = null;
+        }
+        const ok = auth && typeof auth.ok === 'boolean' ? auth.ok : await verifyPin(normalized, verifier);
         if (!ok) {
-            UIComponents.showToast(popupUiText('popup.pin.incorrect', 'Incorrect PIN'), 'error');
+            UIComponents.showToast(auth?.reason === 'rate_limited'
+                ? popupUiText('dashboard.toast.pinRateLimited', 'Too many incorrect PIN attempts. Try again later.')
+                : popupUiText('popup.pin.incorrect', 'Incorrect PIN'), 'error');
             return false;
         }
         unlockedProfiles.add(profileId);
-        await notifyBackgroundUnlocked(profileId, normalized);
+        if (!auth) await notifyBackgroundUnlocked(profileId, normalized);
         return true;
     }
 
@@ -2214,6 +2224,50 @@ document.addEventListener('DOMContentLoaded', async () => {
         }
     }
 
+
+    // Switching profile during study (Android StudySwitchGate): the background decides, and reverts any
+    // switch it didn't allow; this asks for the parent's PIN or says why switching waits.
+    async function passStudySwitchGate(targetId) {
+        let decision = null;
+        try {
+            const response = await sendRuntimeMessage({ action: 'FilterTube_StudySwitchDecision', targetProfileId: targetId });
+            decision = response?.ok ? response.decision : null;
+        } catch (e) {
+            decision = null;
+        }
+        if (!decision || decision.kind === 'allowed') return true;
+        const timeLabel = Number.isFinite(decision.endsAt) && decision.endsAt > Date.now()
+            ? new Date(decision.endsAt).toLocaleTimeString([], { hour: 'numeric', minute: '2-digit' })
+            : '';
+        if (decision.kind === 'needs_parent_pin' && decision.parentHasPin) {
+            const pin = await showPromptModal({
+                title: popupUiText('study.switch.pausedTitle', 'Profile switching is paused'),
+                message: decision.parentName
+                    ? popupUiText('study.switch.parentBody', '{name} can switch now with their PIN.', { name: decision.parentName })
+                    : popupUiText('study.switch.parentBodyGeneric', 'A parent can switch now with their PIN.'),
+                placeholder: 'PIN',
+                inputType: 'password',
+                confirmText: popupUiText('study.switch.withPin', 'Switch')
+            });
+            const normalized = normalizeString(pin);
+            if (!normalized) return false;
+            const auth = await sendRuntimeMessage({ action: 'FilterTube_StudySwitchAuthorize', targetProfileId: targetId, pin: normalized });
+            if (auth?.ok === true) return true;
+            UIComponents.showToast(auth?.reason === 'rate_limited'
+                ? popupUiText('dashboard.toast.pinRateLimited', 'Too many incorrect PIN attempts. Try again later.')
+                : popupUiText('study.switch.pinWrong', "That PIN didn't work. Try again."), 'error');
+            return false;
+        }
+        if (decision.kind === 'end_gentle_first') {
+            UIComponents.showToast(popupUiText('study.switch.gentleBody', 'Your study session ends first. You can still cancel during a 30-second pause.'), 'info');
+            return false;
+        }
+        UIComponents.showToast(timeLabel
+            ? popupUiText('study.switch.locked', 'Other profiles open after {time}.', { time: timeLabel })
+            : popupUiText('study.switch.lockedNoTime', 'Other profiles open after study.'), 'error');
+        return false;
+    }
+
     async function switchToProfile(nextProfileId) {
         if (isHandlingProfileSwitch) return;
         if (popupSelfControlSessionState?.active === true) {
@@ -2223,6 +2277,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         }
         const targetId = normalizeString(nextProfileId);
         if (!targetId) return;
+        if (!(await passStudySwitchGate(targetId))) return;
 
         isHandlingProfileSwitch = true;
         try {

@@ -2834,5 +2834,17 @@
   "pk.hub.noRules": "હજી કોઈ નિયમ નથી",
   "pk.hub.contentStatus": "ક્લિપ્સ, ટિપ્પણીઓ, શ્રેણીઓ અને વિડિયોના પ્રકાર",
   "pk.space.main": "મુખ્ય જોવાનું વાતાવરણ",
-  "pk.space.kids": "બાળકોનું જોવાનું વાતાવરણ"
+  "pk.space.kids": "બાળકોનું જોવાનું વાતાવરણ",
+  "study.switch.parentBody": "{name} હવે તેમના PIN થી બદલી શકે છે.",
+  "study.switch.parentBodyGeneric": "માતાપિતામાંથી કોઈ હવે તેમના PIN થી બદલી શકે છે.",
+  "study.switch.locked": "બીજી પ્રોફાઇલ {time} પછી ખુલશે.",
+  "study.switch.lockedNoTime": "બીજી પ્રોફાઇલ અભ્યાસ પછી ખુલશે.",
+  "study.switch.pausedTitle": "પ્રોફાઇલ બદલવાનું થોભાવેલું છે",
+  "study.switch.withPin": "બદલો",
+  "study.switch.pinWrong": "એ PIN કામ ન કર્યો. ફરી પ્રયત્ન કરો.",
+  "study.switch.gentleTitle": "પ્રોફાઇલ બદલવી છે?",
+  "study.switch.gentleBody": "પહેલા તમારું અભ્યાસ સત્ર પૂરું થશે. 30 સેકન્ડના વિરામ દરમિયાન તમે હજી રદ કરી શકો છો.",
+  "study.error.running": "લૉક ચાલુ હોય ત્યારે યોજના બદલી શકાતી નથી.",
+  "study.restore.title": "અભ્યાસ પછી પુનઃસ્થાપિત કરો",
+  "study.restore.body": "હમણાં પુનઃસ્થાપિત કરવાથી તમારી અભ્યાસ યોજના બદલાઈ જશે."
 }

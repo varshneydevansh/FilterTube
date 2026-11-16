@@ -2834,5 +2834,17 @@
   "pk.hub.noRules": "ఇంకా నియమాలు లేవు",
   "pk.hub.contentStatus": "క్లిప్‌లు, వ్యాఖ్యలు, వర్గాలు, వీడియో రకాలు",
   "pk.space.main": "ప్రధాన వీక్షణ స్థలం",
-  "pk.space.kids": "పిల్లల వీక్షణ స్థలం"
+  "pk.space.kids": "పిల్లల వీక్షణ స్థలం",
+  "study.switch.parentBody": "{name} ఇప్పుడు తమ PIN తో మార్చవచ్చు.",
+  "study.switch.parentBodyGeneric": "తల్లిదండ్రులు ఇప్పుడు తమ PIN తో మార్చవచ్చు.",
+  "study.switch.locked": "ఇతర ప్రొఫైల్‌లు {time} తర్వాత తెరుచుకుంటాయి.",
+  "study.switch.lockedNoTime": "ఇతర ప్రొఫైల్‌లు చదువు తర్వాత తెరుచుకుంటాయి.",
+  "study.switch.pausedTitle": "ప్రొఫైల్ మార్పు పాజ్ అయింది",
+  "study.switch.withPin": "మార్చండి",
+  "study.switch.pinWrong": "ఆ PIN పని చేయలేదు. మళ్ళీ ప్రయత్నించండి.",
+  "study.switch.gentleTitle": "ప్రొఫైల్ మార్చాలా?",
+  "study.switch.gentleBody": "ముందు మీ చదువు సెషన్ ముగుస్తుంది. 30 సెకన్ల విరామంలో ఇంకా రద్దు చేయవచ్చు.",
+  "study.error.running": "లాక్ నడుస్తున్నప్పుడు ప్రణాళికను మార్చలేరు.",
+  "study.restore.title": "చదువు తర్వాత పునరుద్ధరించండి",
+  "study.restore.body": "ఇప్పుడు పునరుద్ధరిస్తే మీ చదువు ప్రణాళిక మారిపోతుంది."
 }

@@ -2834,5 +2834,17 @@
   "pk.hub.noRules": "Bado hakuna sheria",
   "pk.hub.contentStatus": "Klipu, maoni, kategoria na aina za video",
   "pk.space.main": "Kutazama kwa kawaida",
-  "pk.space.kids": "Kutazama kwa watoto"
+  "pk.space.kids": "Kutazama kwa watoto",
+  "study.switch.parentBody": "{name} anaweza kubadilisha sasa kwa PIN yake.",
+  "study.switch.parentBodyGeneric": "Mzazi anaweza kubadilisha sasa kwa PIN yake.",
+  "study.switch.locked": "Wasifu mwingine utafunguka baada ya {time}.",
+  "study.switch.lockedNoTime": "Wasifu mwingine utafunguka baada ya kusoma.",
+  "study.switch.pausedTitle": "Kubadilisha wasifu kumesitishwa",
+  "study.switch.withPin": "Badilisha",
+  "study.switch.pinWrong": "PIN hiyo haikufanya kazi. Jaribu tena.",
+  "study.switch.gentleTitle": "Badilisha wasifu?",
+  "study.switch.gentleBody": "Kipindi chako cha kusoma kitaisha kwanza. Bado unaweza kughairi wakati wa kusubiri sekunde 30.",
+  "study.error.running": "Huwezi kubadilisha mpango wakati kufuli inaendelea.",
+  "study.restore.title": "Rejesha baada ya kusoma",
+  "study.restore.body": "Kurejesha sasa kungebadilisha mpango wako wa kusoma."
 }

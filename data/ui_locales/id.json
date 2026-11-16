@@ -2834,5 +2834,17 @@
   "pk.hub.noRules": "Belum ada aturan",
   "pk.hub.contentStatus": "Klip, komentar, kategori, dan jenis video",
   "pk.space.main": "Mode menonton utama",
-  "pk.space.kids": "Mode menonton anak"
+  "pk.space.kids": "Mode menonton anak",
+  "study.switch.parentBody": "{name} bisa berganti sekarang dengan PIN-nya.",
+  "study.switch.parentBodyGeneric": "Orang tua bisa berganti sekarang dengan PIN-nya.",
+  "study.switch.locked": "Profil lain terbuka setelah {time}.",
+  "study.switch.lockedNoTime": "Profil lain terbuka setelah belajar.",
+  "study.switch.pausedTitle": "Ganti profil sedang dijeda",
+  "study.switch.withPin": "Ganti",
+  "study.switch.pinWrong": "PIN itu tidak berhasil. Coba lagi.",
+  "study.switch.gentleTitle": "Ganti profil?",
+  "study.switch.gentleBody": "Sesi belajar Anda berakhir dulu. Anda masih bisa membatalkan selama jeda 30 detik.",
+  "study.error.running": "Rencana tidak bisa diubah saat kunci aktif.",
+  "study.restore.title": "Pulihkan setelah belajar",
+  "study.restore.body": "Memulihkan sekarang akan menggantikan rencana belajar Anda."
 }

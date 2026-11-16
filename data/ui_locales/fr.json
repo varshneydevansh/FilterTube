@@ -2834,5 +2834,17 @@
   "pk.hub.noRules": "Aucune règle pour l’instant",
   "pk.hub.contentStatus": "Clips, commentaires, catégories et types de vidéos",
   "pk.space.main": "Mode principal",
-  "pk.space.kids": "Mode enfants"
+  "pk.space.kids": "Mode enfants",
+  "study.switch.parentBody": "{name} peut changer maintenant avec son code PIN.",
+  "study.switch.parentBodyGeneric": "Un parent peut changer maintenant avec son code PIN.",
+  "study.switch.locked": "Les autres profils s'ouvrent après {time}.",
+  "study.switch.lockedNoTime": "Les autres profils s'ouvrent après l'étude.",
+  "study.switch.pausedTitle": "Le changement de profil est en pause",
+  "study.switch.withPin": "Changer",
+  "study.switch.pinWrong": "Ce code PIN n'a pas fonctionné. Réessayez.",
+  "study.switch.gentleTitle": "Changer de profil ?",
+  "study.switch.gentleBody": "Votre session d'étude se termine d'abord. Vous pouvez encore annuler pendant une pause de 30 secondes.",
+  "study.error.running": "Impossible de changer le plan pendant un verrouillage.",
+  "study.restore.title": "Restaurer après l'étude",
+  "study.restore.body": "Restaurer maintenant remplacerait votre plan d'étude."
 }

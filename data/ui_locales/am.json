@@ -2834,5 +2834,17 @@
   "pk.hub.noRules": "እስካሁን ደንብ የለም",
   "pk.hub.contentStatus": "ቅንጥቦች፣ አስተያየቶች፣ ምድቦች እና የቪዲዮ ዓይነቶች",
   "pk.space.main": "ዋና መመልከቻ",
-  "pk.space.kids": "የልጆች መመልከቻ"
+  "pk.space.kids": "የልጆች መመልከቻ",
+  "study.switch.parentBody": "{name} አሁን በፒን መቀየር ይችላል።",
+  "study.switch.parentBodyGeneric": "አንድ ወላጅ አሁን በፒን መቀየር ይችላል።",
+  "study.switch.locked": "ሌሎች መገለጫዎች ከ{time} በኋላ ይከፈታሉ።",
+  "study.switch.lockedNoTime": "ሌሎች መገለጫዎች ከጥናት በኋላ ይከፈታሉ።",
+  "study.switch.pausedTitle": "መገለጫ መቀየር ለጊዜው ቆሟል",
+  "study.switch.withPin": "ቀይር",
+  "study.switch.pinWrong": "ያ ፒን አልሰራም። እንደገና ሞክር።",
+  "study.switch.gentleTitle": "መገለጫ ይቀየር?",
+  "study.switch.gentleBody": "መጀመሪያ የጥናት ክፍለ ጊዜህ ይጠናቀቃል። በ30 ሴኮንድ ቆይታ ጊዜ አሁንም ማቋረጥ ትችላለህ።",
+  "study.error.running": "ቁልፍ እየሠራ ሳለ ዕቅዱን መቀየር አይቻልም።",
+  "study.restore.title": "ከጥናት በኋላ መልስ",
+  "study.restore.body": "አሁን መመለስ የጥናት ዕቅድህን ይተካዋል።"
 }

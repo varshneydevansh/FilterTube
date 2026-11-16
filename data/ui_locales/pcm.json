@@ -2834,5 +2834,17 @@
   "pk.hub.noRules": "No rule yet",
   "pk.hub.contentStatus": "Clips, comments, categories and types of video",
   "pk.space.main": "Normal viewing",
-  "pk.space.kids": "Viewing for pikin"
+  "pk.space.kids": "Viewing for pikin",
+  "study.switch.parentBody": "{name} fit change now with im PIN.",
+  "study.switch.parentBodyGeneric": "Parent fit change now with im PIN.",
+  "study.switch.locked": "Other profiles go open after {time}.",
+  "study.switch.lockedNoTime": "Other profiles go open after study.",
+  "study.switch.pausedTitle": "Profile switching don pause",
+  "study.switch.withPin": "Change",
+  "study.switch.pinWrong": "That PIN no work. Try again.",
+  "study.switch.gentleTitle": "Change profile?",
+  "study.switch.gentleBody": "Your study session go end first. You fit still cancel for the 30-second wait.",
+  "study.error.running": "You no fit change the plan while lock dey run.",
+  "study.restore.title": "Restore after study",
+  "study.restore.body": "If you restore now, e go replace your study plan."
 }

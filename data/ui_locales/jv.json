@@ -2834,5 +2834,17 @@
   "pk.hub.noRules": "Durung ana aturan",
   "pk.hub.contentStatus": "Klip, komentar, kategori, lan jinis video",
   "pk.space.main": "Tontonan utama",
-  "pk.space.kids": "Tontonan bocah"
+  "pk.space.kids": "Tontonan bocah",
+  "study.switch.parentBody": "{name} bisa ganti saiki nganggo PIN-e.",
+  "study.switch.parentBodyGeneric": "Wong tuwa bisa ganti saiki nganggo PIN-e.",
+  "study.switch.locked": "Profil liyane mbukak sawise {time}.",
+  "study.switch.lockedNoTime": "Profil liyane mbukak sawise sinau.",
+  "study.switch.pausedTitle": "Ganti profil lagi dileremaké",
+  "study.switch.withPin": "Ganti",
+  "study.switch.pinWrong": "PIN kuwi ora bisa. Coba maneh.",
+  "study.switch.gentleTitle": "Ganti profil?",
+  "study.switch.gentleBody": "Sesi sinau sampeyan rampung dhisik. Sampeyan isih bisa mbatalake sajrone jeda 30 detik.",
+  "study.error.running": "Rencana ora bisa diganti nalika kunci lagi mlaku.",
+  "study.restore.title": "Pulihake sawise sinau",
+  "study.restore.body": "Mulihake saiki bakal ngganti rencana sinau sampeyan."
 }

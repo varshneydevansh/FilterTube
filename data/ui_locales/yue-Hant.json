@@ -2834,5 +2834,17 @@
   "pk.hub.noRules": "未有規則",
   "pk.hub.contentStatus": "短片、留言、類別同影片類型",
   "pk.space.main": "主要觀看空間",
-  "pk.space.kids": "兒童觀看空間"
+  "pk.space.kids": "兒童觀看空間",
+  "study.switch.parentBody": "{name} 而家可以用 PIN 轉換。",
+  "study.switch.parentBodyGeneric": "家長而家可以用 PIN 轉換。",
+  "study.switch.locked": "其他個人檔案會喺 {time} 之後開啟。",
+  "study.switch.lockedNoTime": "其他個人檔案會喺學習完之後開啟。",
+  "study.switch.pausedTitle": "個人檔案轉換暫停咗",
+  "study.switch.withPin": "轉換",
+  "study.switch.pinWrong": "個 PIN 唔啱。再試一次。",
+  "study.switch.gentleTitle": "轉換個人檔案？",
+  "study.switch.gentleBody": "你嘅學習時段會先完結。停 30 秒嗰陣，你仲可以取消。",
+  "study.error.running": "鎖定期間唔可以改計劃。",
+  "study.restore.title": "學習之後還原",
+  "study.restore.body": "而家還原會取代你嘅學習計劃。"
 }

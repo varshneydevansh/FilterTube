@@ -502,6 +502,8 @@
         const map = {
             set_by_parent: t('study.error.setByParent', 'A parent set this plan. Ask them to change it.'),
             set_by_other_parent: t('study.error.otherParent', 'Another parent set this plan.'),
+            study_running: t('study.error.running', 'Can\'t change the plan while a lock is running.'),
+            child_profile: t('study.error.setByParent', 'A parent set this plan. Ask them to change it.'),
             locked: t('study.error.locked', 'Locked until the session ends.'),
             no_active_pack: t('study.error.noPack', 'Choose a study pack first.'),
             already_studying: t('study.error.alreadyStudying', 'A study session is already running.'),

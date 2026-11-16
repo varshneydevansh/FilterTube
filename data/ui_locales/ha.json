@@ -2834,5 +2834,17 @@
   "pk.hub.noRules": "Babu doka tukuna",
   "pk.hub.contentStatus": "Gajerun bidiyo, sharhuka, rukuni da nau’in bidiyo",
   "pk.space.main": "Kallo na yau da kullum",
-  "pk.space.kids": "Kallo don yara"
+  "pk.space.kids": "Kallo don yara",
+  "study.switch.parentBody": "{name} zai iya canzawa yanzu da PIN ɗinsa.",
+  "study.switch.parentBodyGeneric": "Iyaye za su iya canzawa yanzu da PIN ɗinsu.",
+  "study.switch.locked": "Sauran bayanan martaba za su buɗe bayan {time}.",
+  "study.switch.lockedNoTime": "Sauran bayanan martaba za su buɗe bayan karatu.",
+  "study.switch.pausedTitle": "An dakatar da canza bayanin martaba",
+  "study.switch.withPin": "Canza",
+  "study.switch.pinWrong": "Wannan PIN bai yi aiki ba. Sake gwadawa.",
+  "study.switch.gentleTitle": "A canza bayanin martaba?",
+  "study.switch.gentleBody": "Zaman karatunka zai ƙare tukuna. Har yanzu za ka iya soke cikin jiran daƙiƙa 30.",
+  "study.error.running": "Ba za a iya canja shirin ba yayin da kulle ke aiki.",
+  "study.restore.title": "Maido bayan karatu",
+  "study.restore.body": "Maido yanzu zai maye gurbin shirin karatunka."
 }

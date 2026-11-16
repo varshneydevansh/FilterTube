@@ -2834,5 +2834,17 @@
   "pk.hub.noRules": "अभी कोई नियम ना",
   "pk.hub.contentStatus": "क्लिप, कमेंट, श्रेणी आ वीडियो के प्रकार",
   "pk.space.main": "मुख्य देखे के मोड",
-  "pk.space.kids": "लइकन के देखे के मोड"
+  "pk.space.kids": "लइकन के देखे के मोड",
+  "study.switch.parentBody": "{name} अब अपना PIN से बदल सकेले।",
+  "study.switch.parentBodyGeneric": "माई-बाबूजी में से केहू अब अपना PIN से बदल सकेला।",
+  "study.switch.locked": "दोसर प्रोफ़ाइल {time} के बाद खुली।",
+  "study.switch.lockedNoTime": "दोसर प्रोफ़ाइल पढ़ाई के बाद खुली।",
+  "study.switch.pausedTitle": "प्रोफ़ाइल बदलल रुकल बा",
+  "study.switch.withPin": "बदलीं",
+  "study.switch.pinWrong": "ऊ PIN काम ना कइलस। फेर से कोसिस करीं।",
+  "study.switch.gentleTitle": "प्रोफ़ाइल बदलल जाव?",
+  "study.switch.gentleBody": "पहिले रउरा पढ़ाई के सत्र खतम होई। 30 सेकंड के रुकाव में रउरा अबहियों रद्द कर सकेनी।",
+  "study.error.running": "लॉक चलत रहला पर योजना ना बदल सकेनी।",
+  "study.restore.title": "पढ़ाई के बाद रिस्टोर करीं",
+  "study.restore.body": "अभी रिस्टोर कइला से रउरा पढ़ाई के योजना बदल जाई।"
 }

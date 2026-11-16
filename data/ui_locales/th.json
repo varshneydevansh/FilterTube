@@ -2834,5 +2834,17 @@
   "pk.hub.noRules": "ยังไม่มีกฎ",
   "pk.hub.contentStatus": "คลิปสั้น ความคิดเห็น หมวดหมู่ และประเภทวิดีโอ",
   "pk.space.main": "การรับชมทั่วไป",
-  "pk.space.kids": "การรับชมสำหรับเด็ก"
+  "pk.space.kids": "การรับชมสำหรับเด็ก",
+  "study.switch.parentBody": "{name} สลับได้ทันทีด้วย PIN ของตัวเอง",
+  "study.switch.parentBodyGeneric": "ผู้ปกครองสลับได้ทันทีด้วย PIN ของตัวเอง",
+  "study.switch.locked": "โปรไฟล์อื่นจะเปิดได้หลัง {time}",
+  "study.switch.lockedNoTime": "โปรไฟล์อื่นจะเปิดได้หลังเรียนเสร็จ",
+  "study.switch.pausedTitle": "การสลับโปรไฟล์หยุดไว้ชั่วคราว",
+  "study.switch.withPin": "สลับ",
+  "study.switch.pinWrong": "PIN นั้นใช้ไม่ได้ ลองอีกครั้ง",
+  "study.switch.gentleTitle": "สลับโปรไฟล์ไหม",
+  "study.switch.gentleBody": "รอบการเรียนของคุณจะจบก่อน คุณยังยกเลิกได้ในช่วงพัก 30 วินาที",
+  "study.error.running": "เปลี่ยนแผนไม่ได้ระหว่างที่ล็อกอยู่",
+  "study.restore.title": "กู้คืนหลังเรียน",
+  "study.restore.body": "ถ้ากู้คืนตอนนี้ แผนการเรียนของคุณจะถูกแทนที่"
 }

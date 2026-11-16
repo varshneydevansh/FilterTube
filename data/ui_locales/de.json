@@ -2834,5 +2834,17 @@
   "pk.hub.noRules": "Noch keine Regeln",
   "pk.hub.contentStatus": "Clips, Kommentare, Kategorien und Videotypen",
   "pk.space.main": "Hauptbereich",
-  "pk.space.kids": "Kinderbereich"
+  "pk.space.kids": "Kinderbereich",
+  "study.switch.parentBody": "{name} kann jetzt mit der PIN wechseln.",
+  "study.switch.parentBodyGeneric": "Ein Elternteil kann jetzt mit der PIN wechseln.",
+  "study.switch.locked": "Andere Profile öffnen sich nach {time}.",
+  "study.switch.lockedNoTime": "Andere Profile öffnen sich nach dem Lernen.",
+  "study.switch.pausedTitle": "Profilwechsel ist pausiert",
+  "study.switch.withPin": "Wechseln",
+  "study.switch.pinWrong": "Diese PIN hat nicht funktioniert. Versuch es noch einmal.",
+  "study.switch.gentleTitle": "Profil wechseln?",
+  "study.switch.gentleBody": "Zuerst endet deine Lernsitzung. Während der 30-Sekunden-Pause kannst du noch abbrechen.",
+  "study.error.running": "Der Plan lässt sich nicht ändern, solange eine Sperre läuft.",
+  "study.restore.title": "Nach dem Lernen wiederherstellen",
+  "study.restore.body": "Wiederherstellen würde jetzt deinen Lernplan ersetzen."
 }

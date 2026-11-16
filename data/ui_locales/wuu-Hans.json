@@ -2834,5 +2834,17 @@
   "pk.hub.noRules": "还呒没规则",
   "pk.hub.contentStatus": "短视频、评论、类别搭视频类型",
   "pk.space.main": "平常看个模式",
-  "pk.space.kids": "小囡看个模式"
+  "pk.space.kids": "小囡看个模式",
+  "study.switch.parentBody": "{name} 现在好用 PIN 切换。",
+  "study.switch.parentBodyGeneric": "家长现在好用 PIN 切换。",
+  "study.switch.locked": "其他档案要 {time} 以后再开。",
+  "study.switch.lockedNoTime": "其他档案要学习好以后再开。",
+  "study.switch.pausedTitle": "档案切换暂停了",
+  "study.switch.withPin": "切换",
+  "study.switch.pinWrong": "该个 PIN 勿对。再试一趟。",
+  "study.switch.gentleTitle": "切换档案？",
+  "study.switch.gentleBody": "侬个学习时段会先结束。停 30 秒个辰光还好取消。",
+  "study.error.running": "锁牢个辰光勿好改计划。",
+  "study.restore.title": "学习结束后恢复",
+  "study.restore.body": "现在恢复，会换脱侬个学习计划。"
 }

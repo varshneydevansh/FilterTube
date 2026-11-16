@@ -2834,5 +2834,17 @@
   "pk.hub.noRules": "ہلے کوئی اصول نئیں",
   "pk.hub.contentStatus": "کلپاں، تبصرے، زمرے تے ویڈیو دیاں قسماں",
   "pk.space.main": "عام ویکھن دا موڈ",
-  "pk.space.kids": "بچیاں لئی ویکھن دا موڈ"
+  "pk.space.kids": "بچیاں لئی ویکھن دا موڈ",
+  "study.switch.parentBody": "{name} ہُن اپنے PIN نال بدل سکدا اے۔",
+  "study.switch.parentBodyGeneric": "ماں پیو وچوں کوئی ہُن اپنے PIN نال بدل سکدا اے۔",
+  "study.switch.locked": "دوجے پروفائل {time} توں بعد کھلنگے۔",
+  "study.switch.lockedNoTime": "دوجے پروفائل پڑھائی توں بعد کھلنگے۔",
+  "study.switch.pausedTitle": "پروفائل بدلنا رُکیا ہویا اے",
+  "study.switch.withPin": "بدلو",
+  "study.switch.pinWrong": "او PIN نہیں چلیا۔ مڑ کوشش کرو۔",
+  "study.switch.gentleTitle": "پروفائل بدلنا اے؟",
+  "study.switch.gentleBody": "پہلاں تہاڈا پڑھائی دا سیشن مُکے گا۔ 30 سیکنڈ دی اُڈیک وچ تسیں ہالے وی ریہن کر سکدے او۔",
+  "study.error.running": "لاک چلدیاں پلان نہیں بدل سکدا۔",
+  "study.restore.title": "پڑھائی توں بعد بحال کرو",
+  "study.restore.body": "ہُنے بحال کیتا تے تہاڈا پڑھائی دا پلان بدل جاوے گا۔"
 }

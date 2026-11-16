@@ -2834,5 +2834,17 @@
   "pk.hub.noRules": "अभी कोई नियम नहीं",
   "pk.hub.contentStatus": "क्लिप, टिप्पणियाँ, श्रेणियाँ और वीडियो के प्रकार",
   "pk.space.main": "सामान्य देखने का मोड",
-  "pk.space.kids": "बच्चों का देखने का मोड"
+  "pk.space.kids": "बच्चों का देखने का मोड",
+  "study.switch.parentBody": "{name} अब अपने PIN से बदल सकते हैं।",
+  "study.switch.parentBodyGeneric": "अभिभावक अब अपने PIN से बदल सकते हैं।",
+  "study.switch.locked": "दूसरे प्रोफ़ाइल {time} के बाद खुलेंगे।",
+  "study.switch.lockedNoTime": "दूसरे प्रोफ़ाइल पढ़ाई के बाद खुलेंगे।",
+  "study.switch.pausedTitle": "प्रोफ़ाइल बदलना रुका हुआ है",
+  "study.switch.withPin": "बदलें",
+  "study.switch.pinWrong": "वह PIN काम नहीं किया। फिर से कोशिश करें।",
+  "study.switch.gentleTitle": "प्रोफ़ाइल बदलें?",
+  "study.switch.gentleBody": "पहले आपका पढ़ाई का सत्र खत्म होगा। 30 सेकंड के विराम में आप अब भी रद्द कर सकते हैं।",
+  "study.error.running": "लॉक चलते समय योजना नहीं बदल सकते।",
+  "study.restore.title": "पढ़ाई के बाद रिस्टोर करें",
+  "study.restore.body": "अभी रिस्टोर करने से आपकी पढ़ाई योजना बदल जाएगी।"
 }

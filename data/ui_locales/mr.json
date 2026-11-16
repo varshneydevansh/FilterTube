@@ -2834,5 +2834,17 @@
   "pk.hub.noRules": "अजून नियम नाहीत",
   "pk.hub.contentStatus": "क्लिप्स, टिप्पण्या, वर्गवाऱ्या आणि व्हिडिओचे प्रकार",
   "pk.space.main": "मुख्य पाहण्याची जागा",
-  "pk.space.kids": "मुलांची पाहण्याची जागा"
+  "pk.space.kids": "मुलांची पाहण्याची जागा",
+  "study.switch.parentBody": "{name} आता त्यांच्या PIN ने बदलू शकतात.",
+  "study.switch.parentBodyGeneric": "पालक आता त्यांच्या PIN ने बदलू शकतात.",
+  "study.switch.locked": "इतर प्रोफाइल {time} नंतर उघडतील.",
+  "study.switch.lockedNoTime": "इतर प्रोफाइल अभ्यासानंतर उघडतील.",
+  "study.switch.pausedTitle": "प्रोफाइल बदलणे थांबवले आहे",
+  "study.switch.withPin": "बदला",
+  "study.switch.pinWrong": "तो PIN चालला नाही. पुन्हा प्रयत्न करा.",
+  "study.switch.gentleTitle": "प्रोफाइल बदलायचे?",
+  "study.switch.gentleBody": "आधी तुमचे अभ्यास सत्र संपेल. 30 सेकंदांच्या विरामात तुम्ही अजूनही रद्द करू शकता.",
+  "study.error.running": "लॉक चालू असताना योजना बदलता येत नाही.",
+  "study.restore.title": "अभ्यासानंतर पुनर्संचयित करा",
+  "study.restore.body": "आता पुनर्संचयित केल्यास तुमची अभ्यास योजना बदलेल."
 }

@@ -2834,5 +2834,17 @@
   "pk.hub.noRules": "Wala pang panuntunan",
   "pk.hub.contentStatus": "Clips, komento, kategorya, at uri ng video",
   "pk.space.main": "Pangunahing panonood",
-  "pk.space.kids": "Panonood para sa mga bata"
+  "pk.space.kids": "Panonood para sa mga bata",
+  "study.switch.parentBody": "Puwede nang magpalit si {name} gamit ang PIN niya.",
+  "study.switch.parentBodyGeneric": "Puwede nang magpalit ang magulang gamit ang PIN niya.",
+  "study.switch.locked": "Magbubukas ang ibang profile pagkatapos ng {time}.",
+  "study.switch.lockedNoTime": "Magbubukas ang ibang profile pagkatapos ng pag-aaral.",
+  "study.switch.pausedTitle": "Naka-pause ang pagpapalit ng profile",
+  "study.switch.withPin": "Magpalit",
+  "study.switch.pinWrong": "Hindi gumana ang PIN na iyon. Subukan ulit.",
+  "study.switch.gentleTitle": "Magpalit ng profile?",
+  "study.switch.gentleBody": "Unang matatapos ang study session mo. Puwede ka pa ring magkansela sa loob ng 30-segundong paghinto.",
+  "study.error.running": "Hindi mababago ang plano habang may lock.",
+  "study.restore.title": "I-restore pagkatapos ng pag-aaral",
+  "study.restore.body": "Papalitan ng pag-restore ngayon ang plano mo sa pag-aaral."
 }

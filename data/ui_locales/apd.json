@@ -2850,5 +2850,17 @@
   "pk.hub.todayRules.zero": "قاعدة تعمل في {space}",
   "pk.hub.todayRules.two": "قاعدتان تعملان في {space}",
   "pk.hub.todayRules.few": "قواعد تعمل في {space}",
-  "pk.hub.todayRules.many": "قاعدة تعمل في {space}"
+  "pk.hub.todayRules.many": "قاعدة تعمل في {space}",
+  "study.switch.parentBody": "{name} بقدر يبدّل هسي بالـ PIN بتاعو.",
+  "study.switch.parentBodyGeneric": "أحد الوالدين بقدر يبدّل هسي بالـ PIN بتاعو.",
+  "study.switch.locked": "الملفات التانية بتفتح بعد {time}.",
+  "study.switch.lockedNoTime": "الملفات التانية بتفتح بعد الدراسة.",
+  "study.switch.pausedTitle": "تبديل الملف واقف مؤقتًا",
+  "study.switch.withPin": "بدّل",
+  "study.switch.pinWrong": "الـ PIN داك ما اشتغل. جرّب تاني.",
+  "study.switch.gentleTitle": "تبدّل الملف؟",
+  "study.switch.gentleBody": "جلسة الدراسة بتنتهي أول. لسه بتقدر تلغي خلال توقف 30 ثانية.",
+  "study.error.running": "ما بتقدر تغيير الخطة وقت وجود قفل.",
+  "study.restore.title": "الاستعادة بعد الدراسة",
+  "study.restore.body": "لو استعدت هسه بتحل مكان خطة دراستك."
 }

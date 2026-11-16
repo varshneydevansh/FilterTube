@@ -2834,5 +2834,17 @@
   "pk.hub.noRules": "아직 규칙이 없어요",
   "pk.hub.contentStatus": "숏폼, 댓글, 카테고리, 동영상 유형",
   "pk.space.main": "일반 시청",
-  "pk.space.kids": "어린이 시청"
+  "pk.space.kids": "어린이 시청",
+  "study.switch.parentBody": "{name}님은 지금 PIN으로 바꿀 수 있어요.",
+  "study.switch.parentBodyGeneric": "부모님은 지금 PIN으로 바꿀 수 있어요.",
+  "study.switch.locked": "다른 프로필은 {time} 이후에 열려요.",
+  "study.switch.lockedNoTime": "다른 프로필은 공부가 끝난 뒤에 열려요.",
+  "study.switch.pausedTitle": "프로필 전환이 일시중지됐어요",
+  "study.switch.withPin": "바꾸기",
+  "study.switch.pinWrong": "PIN이 맞지 않아요. 다시 해 보세요.",
+  "study.switch.gentleTitle": "프로필을 바꿀까요?",
+  "study.switch.gentleBody": "먼저 공부 세션이 끝납니다. 30초 기다리는 동안에는 아직 취소할 수 있어요.",
+  "study.error.running": "잠금이 진행 중일 때는 계획을 바꿀 수 없습니다.",
+  "study.restore.title": "공부 후 복원",
+  "study.restore.body": "지금 복원하면 공부 계획이 바뀌어요."
 }

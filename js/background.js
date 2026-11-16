@@ -1711,6 +1711,90 @@ async function enforceSelfControlProfileSnapshot(changedProfilesV4) {
     return true;
 }
 
+// Switching profile during study (Android StudyProfileSwitch / StudySwitchPass). A switch away from a
+// profile a parent's lock or plan holds needs that parent's PIN typed now; a Locked session or a clock
+// hold refuses it; a Gentle session ends first. Every writer of the active profile is checked here, so a
+// screen that forgets the gate is reverted rather than trusted.
+const STUDY_SWITCH_PASS_TTL_MS = 60 * 1000;
+let studySwitchPass = null;
+
+async function studySwitchDecisionFor(profilesV4, targetProfileId) {
+    if (!studyBackground?.switchDecision || !isValidProfilesV4(profilesV4)) return { kind: 'allowed' };
+    const fromId = normalizeString(profilesV4.activeProfileId) || DEFAULT_PROFILE_ID;
+    const fromProfile = safeObject(safeObject(profilesV4.profiles)[fromId]);
+    const decision = await studyBackground.switchDecision(fromId, fromProfile, normalizeString(targetProfileId));
+    if (decision?.kind === 'needs_parent_pin') {
+        const parent = safeObject(safeObject(profilesV4.profiles)[decision.parentProfileId]);
+        return {
+            ...decision,
+            parentName: normalizeString(parent.name) || '',
+            parentHasPin: !!extractPinVerifierFromProfilesV4(profilesV4, decision.parentProfileId)
+        };
+    }
+    return decision || { kind: 'allowed' };
+}
+
+function takeStudySwitchPass(targetProfileId) {
+    const pass = studySwitchPass;
+    studySwitchPass = null;
+    return !!pass && pass.targetId === targetProfileId && Date.now() - pass.issuedAt <= STUDY_SWITCH_PASS_TTL_MS;
+}
+
+async function handleStudySwitchMessage(request, sender, sendResponse) {
+    try {
+        if (!isTrustedUiSender(sender)) {
+            sendResponse?.({ ok: false, error: 'untrusted_sender' });
+            return;
+        }
+        const stored = await storageGet([FT_PROFILES_V4_KEY]);
+        const profilesV4 = stored?.[FT_PROFILES_V4_KEY];
+        const targetId = normalizeString(request?.targetProfileId);
+        const decision = await studySwitchDecisionFor(profilesV4, targetId);
+        if (request?.action === 'FilterTube_StudySwitchDecision') {
+            sendResponse?.({ ok: true, decision });
+            return;
+        }
+        // FilterTube_StudySwitchAuthorize: the parent's PIN, typed now, buys one switch to one target.
+        if (decision.kind === 'allowed') {
+            studySwitchPass = { targetId, issuedAt: Date.now() };
+            sendResponse?.({ ok: true, decision });
+            return;
+        }
+        if (decision.kind !== 'needs_parent_pin' || !decision.parentHasPin) {
+            sendResponse?.({ ok: false, error: 'study_switch_refused', decision });
+            return;
+        }
+        const auth = await verifyAndCacheSessionPin(decision.parentProfileId, normalizeString(request?.pin), sender);
+        if (auth?.ok !== true || auth?.stored !== true) {
+            sendResponse?.({ ok: false, error: auth?.error || 'incorrect_pin', reason: auth?.reason || 'incorrect_pin', retryAt: auth?.retryAt || null, decision });
+            return;
+        }
+        studySwitchPass = { targetId, issuedAt: Date.now() };
+        sendResponse?.({ ok: true, decision });
+    } catch (e) {
+        sendResponse?.({ ok: false, error: e?.message || 'study_switch_failed' });
+    }
+}
+
+async function enforceStudyProfileSwitch(change) {
+    const oldValue = change?.oldValue;
+    const newValue = change?.newValue;
+    if (!isValidProfilesV4(oldValue) || !isValidProfilesV4(newValue)) return false;
+    const fromId = normalizeString(oldValue.activeProfileId) || DEFAULT_PROFILE_ID;
+    const toId = normalizeString(newValue.activeProfileId) || DEFAULT_PROFILE_ID;
+    if (fromId === toId) return false;
+    if (!safeObject(newValue.profiles)[fromId]) return false; // the old profile was removed: nothing to hold
+    if (takeStudySwitchPass(toId)) return false;
+    const decision = await studySwitchDecisionFor(oldValue, toId);
+    if (decision.kind === 'allowed') return false;
+    studySwitchPass = { targetId: fromId, issuedAt: Date.now() }; // the revert itself is not a switch to check
+    await browserAPI.storage.local.set({
+        [FT_PROFILES_V4_KEY]: { ...newValue, schemaVersion: 4, activeProfileId: fromId }
+    });
+    console.warn('FilterTube Background: profile switch during study reverted', decision.kind);
+    return true;
+}
+
 // Study mode (3.6.2): applied at compile time from the plan and the clock; see js/study_background.js.
 async function writeStudyProfile(profileId, profile) {
     if (await getActiveSelfControlSession()) return { ok: false, error: 'self_control_settings_locked' };
@@ -3074,6 +3158,12 @@ async function handleManagedProfileSwitch(request, sender, sendResponse) {
         const targetProfile = safeObject(profiles[targetProfileId]);
         if (!targetProfileId || targetProfileId === context.profileId || !profiles[targetProfileId]) {
             sendResponse?.({ ok: false, error: 'profile_not_found' });
+            return;
+        }
+
+        const studyDecision = await studySwitchDecisionFor(context.profilesV4, targetProfileId);
+        if (studyDecision.kind !== 'allowed') {
+            sendResponse?.({ ok: false, error: 'study_switch_refused', decision: studyDecision });
             return;
         }
 
@@ -5243,6 +5333,10 @@ browserAPI.runtime.onMessage.addListener(function (request, sender, sendResponse
         return true;
     }
     const action = request?.action || request?.type;
+    if (action === 'FilterTube_StudySwitchDecision' || action === 'FilterTube_StudySwitchAuthorize') {
+        handleStudySwitchMessage(request, sender, sendResponse);
+        return true;
+    }
     if (action === 'FilterTube_AutoSyncAuthorize') return handleAutoSyncAuthorization(request, sender, sendResponse);
     if (action === 'FilterTube_PersonalPlaylistsRead' || action === 'FilterTube_PersonalPlaylistsMerge') {
         return handlePersonalPlaylistsSync(request, sender, sendResponse);
@@ -6681,6 +6775,11 @@ browserAPI.storage.onChanged.addListener((changes, area) => {
         if (changes[FT_PROFILES_V4_KEY]?.newValue && !importedMetadataWrite) {
             enforceSelfControlProfileSnapshot(changes[FT_PROFILES_V4_KEY].newValue).catch((error) => {
                 console.warn('FilterTube Background: failed to restore Self-Control Session policy', error);
+            });
+        }
+        if (changes[FT_PROFILES_V4_KEY]?.newValue && changes[FT_PROFILES_V4_KEY]?.oldValue && !importedMetadataWrite) {
+            enforceStudyProfileSwitch(changes[FT_PROFILES_V4_KEY]).catch((error) => {
+                console.warn('FilterTube Background: failed to check a profile switch during study', error);
             });
         }
         const relevantKeys = [

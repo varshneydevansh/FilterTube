@@ -2834,5 +2834,17 @@
   "pk.hub.noRules": "Chưa có quy tắc",
   "pk.hub.contentStatus": "Video ngắn, bình luận, danh mục và loại video",
   "pk.space.main": "Không gian xem chính",
-  "pk.space.kids": "Không gian xem trẻ em"
+  "pk.space.kids": "Không gian xem trẻ em",
+  "study.switch.parentBody": "{name} có thể đổi ngay bằng mã PIN của mình.",
+  "study.switch.parentBodyGeneric": "Phụ huynh có thể đổi ngay bằng mã PIN của mình.",
+  "study.switch.locked": "Các hồ sơ khác mở sau {time}.",
+  "study.switch.lockedNoTime": "Các hồ sơ khác mở sau khi học xong.",
+  "study.switch.pausedTitle": "Đã tạm dừng chuyển hồ sơ",
+  "study.switch.withPin": "Đổi",
+  "study.switch.pinWrong": "Mã PIN đó không đúng. Hãy thử lại.",
+  "study.switch.gentleTitle": "Đổi hồ sơ?",
+  "study.switch.gentleBody": "Phiên học của bạn sẽ kết thúc trước. Bạn vẫn có thể hủy trong 30 giây chờ.",
+  "study.error.running": "Không thể đổi kế hoạch khi đang khóa.",
+  "study.restore.title": "Khôi phục sau giờ học",
+  "study.restore.body": "Khôi phục bây giờ sẽ thay kế hoạch học của bạn."
 }

@@ -2834,5 +2834,17 @@
   "pk.hub.noRules": "ابھی کوئی اصول نہیں",
   "pk.hub.contentStatus": "کلپس، تبصرے، زمرے اور ویڈیو کی اقسام",
   "pk.space.main": "عام دیکھنے کا موڈ",
-  "pk.space.kids": "بچوں کا دیکھنے کا موڈ"
+  "pk.space.kids": "بچوں کا دیکھنے کا موڈ",
+  "study.switch.parentBody": "{name} اب اپنے PIN سے بدل سکتے ہیں۔",
+  "study.switch.parentBodyGeneric": "والدین میں سے کوئی اب اپنے PIN سے بدل سکتا ہے۔",
+  "study.switch.locked": "دوسرے پروفائل {time} کے بعد کھلیں گے۔",
+  "study.switch.lockedNoTime": "دوسرے پروفائل پڑھائی کے بعد کھلیں گے۔",
+  "study.switch.pausedTitle": "پروفائل بدلنا رکا ہوا ہے",
+  "study.switch.withPin": "بدلیں",
+  "study.switch.pinWrong": "وہ PIN کام نہیں کیا۔ دوبارہ کوشش کریں۔",
+  "study.switch.gentleTitle": "پروفائل بدلیں؟",
+  "study.switch.gentleBody": "پہلے آپ کا پڑھائی کا سیشن ختم ہوگا۔ 30 سیکنڈ کے وقفے میں آپ اب بھی منسوخ کر سکتے ہیں۔",
+  "study.error.running": "قفل چلتے ہوئے منصوبہ نہیں بدلا جا سکتا۔",
+  "study.restore.title": "پڑھائی کے بعد بحال کریں",
+  "study.restore.body": "ابھی بحال کرنے سے آپ کا پڑھائی کا منصوبہ بدل جائے گا۔"
 }

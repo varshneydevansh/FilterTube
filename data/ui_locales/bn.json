@@ -2834,5 +2834,17 @@
   "pk.hub.noRules": "এখনো কোনো নিয়ম নেই",
   "pk.hub.contentStatus": "ক্লিপ, মন্তব্য, বিভাগ ও ভিডিওর ধরন",
   "pk.space.main": "সাধারণ দেখার মোড",
-  "pk.space.kids": "শিশুদের দেখার মোড"
+  "pk.space.kids": "শিশুদের দেখার মোড",
+  "study.switch.parentBody": "{name} এখন তাদের PIN দিয়ে বদলাতে পারে।",
+  "study.switch.parentBodyGeneric": "একজন অভিভাবক এখন তাদের PIN দিয়ে বদলাতে পারেন।",
+  "study.switch.locked": "অন্য প্রোফাইল {time} এর পরে খুলবে।",
+  "study.switch.lockedNoTime": "অন্য প্রোফাইল পড়ার পরে খুলবে।",
+  "study.switch.pausedTitle": "প্রোফাইল বদলানো বিরতিতে আছে",
+  "study.switch.withPin": "বদলান",
+  "study.switch.pinWrong": "ওই PIN কাজ করেনি। আবার চেষ্টা করুন।",
+  "study.switch.gentleTitle": "প্রোফাইল বদলাবেন?",
+  "study.switch.gentleBody": "আগে আপনার পড়ার সেশন শেষ হবে। ৩০ সেকেন্ডের বিরতির মধ্যে এখনও বাতিল করতে পারবেন।",
+  "study.error.running": "লক চলার সময় পরিকল্পনা বদলানো যাবে না।",
+  "study.restore.title": "পড়ার পরে পুনরুদ্ধার করুন",
+  "study.restore.body": "এখন পুনরুদ্ধার করলে আপনার পড়ার পরিকল্পনা বদলে যাবে।"
 }

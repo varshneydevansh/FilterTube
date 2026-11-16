@@ -2850,5 +2850,17 @@
   "pk.hub.todayRules.zero": "قاعدة تعمل في {space}",
   "pk.hub.todayRules.two": "قاعدتان تعملان في {space}",
   "pk.hub.todayRules.few": "قواعد تعمل في {space}",
-  "pk.hub.todayRules.many": "قاعدة تعمل في {space}"
+  "pk.hub.todayRules.many": "قاعدة تعمل في {space}",
+  "study.switch.parentBody": "يمكن لـ {name} التبديل الآن باستخدام رمز PIN.",
+  "study.switch.parentBodyGeneric": "يمكن لأحد الوالدين التبديل الآن باستخدام رمز PIN.",
+  "study.switch.locked": "تُفتح الملفات الشخصية الأخرى بعد {time}.",
+  "study.switch.lockedNoTime": "تُفتح الملفات الشخصية الأخرى بعد الدراسة.",
+  "study.switch.pausedTitle": "تبديل الملف الشخصي متوقف مؤقتًا",
+  "study.switch.withPin": "تبديل",
+  "study.switch.pinWrong": "لم ينجح رمز PIN هذا. حاول مرة أخرى.",
+  "study.switch.gentleTitle": "تبديل الملف الشخصي؟",
+  "study.switch.gentleBody": "تنتهي جلسة الدراسة أولًا. ما زال بإمكانك الإلغاء خلال توقف مدته 30 ثانية.",
+  "study.error.running": "لا يمكن تغيير الخطة أثناء وجود قفل.",
+  "study.restore.title": "الاستعادة بعد الدراسة",
+  "study.restore.body": "الاستعادة الآن ستستبدل خطة دراستك."
 }

@@ -370,14 +370,15 @@
      * than that parent may only tighten study. `lockActive(lock)` defaults to "a parent's lock that
      * hasn't reached its end".
      */
-    function tightenAllowed(beforeValue, afterValue, { now = Date.now(), lockActive = null } = {}) {
+    function tightenAllowed(beforeValue, afterValue, { now = Date.now(), lockActive = null, held = false } = {}) {
         const before = normalizeStudy(beforeValue);
         if (!before) return true;
         const parentPlan = !!text(object(before.plan).setByParentId);
         const parentLock = typeof lockActive === 'function'
             ? lockActive(before.lock) === true
             : isParentLock(before.lock) && now < Number(before.lock.endsAt);
-        if (!parentPlan && !parentLock) return true;
+        // `held`: a round or a hold runs now (Android StudyRuntime.holdsLoosening), whoever set it.
+        if (!parentPlan && !parentLock && !held) return true;
         const after = normalizeStudy(afterValue);
         if (!after) return false;
         if (parentLock) {

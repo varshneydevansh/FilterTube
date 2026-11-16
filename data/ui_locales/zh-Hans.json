@@ -2834,5 +2834,17 @@
   "pk.hub.noRules": "还没有规则",
   "pk.hub.contentStatus": "短视频、评论、类别和视频类型",
   "pk.space.main": "常规观看模式",
-  "pk.space.kids": "儿童观看模式"
+  "pk.space.kids": "儿童观看模式",
+  "study.switch.parentBody": "{name} 现在可以用 PIN 切换。",
+  "study.switch.parentBodyGeneric": "家长现在可以用 PIN 切换。",
+  "study.switch.locked": "其他个人资料将在 {time} 之后开启。",
+  "study.switch.lockedNoTime": "其他个人资料将在学习结束后开启。",
+  "study.switch.pausedTitle": "个人资料切换已暂停",
+  "study.switch.withPin": "切换",
+  "study.switch.pinWrong": "这个 PIN 不对。请再试一次。",
+  "study.switch.gentleTitle": "切换个人资料？",
+  "study.switch.gentleBody": "你的学习时段会先结束。暂停 30 秒期间，你仍可以取消。",
+  "study.error.running": "锁定期间无法更改计划。",
+  "study.restore.title": "学习结束后恢复",
+  "study.restore.body": "现在恢复会替换你的学习计划。"
 }

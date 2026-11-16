@@ -2834,5 +2834,17 @@
   "pk.hub.noRules": "まだルールがありません",
   "pk.hub.contentStatus": "クリップ、コメント、カテゴリ、動画の種類",
   "pk.space.main": "通常の視聴モード",
-  "pk.space.kids": "子ども向け視聴モード"
+  "pk.space.kids": "子ども向け視聴モード",
+  "study.switch.parentBody": "{name} さんは PIN で今すぐ切り替えられます。",
+  "study.switch.parentBodyGeneric": "保護者は PIN で今すぐ切り替えられます。",
+  "study.switch.locked": "ほかのプロフィールは {time} 以降に開けます。",
+  "study.switch.lockedNoTime": "ほかのプロフィールは学習のあとに開けます。",
+  "study.switch.pausedTitle": "プロフィールの切り替えは一時停止中です",
+  "study.switch.withPin": "切り替える",
+  "study.switch.pinWrong": "その PIN は使えませんでした。もう一度お試しください。",
+  "study.switch.gentleTitle": "プロフィールを切り替えますか？",
+  "study.switch.gentleBody": "先に学習セッションが終わります。30 秒の待ち時間のあいだは、まだキャンセルできます。",
+  "study.error.running": "ロック中はプランを変更できません。",
+  "study.restore.title": "学習後に復元",
+  "study.restore.body": "今復元すると、学習プランが置き換わります。"
 }

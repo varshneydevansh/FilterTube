@@ -2834,5 +2834,17 @@
   "pk.hub.noRules": "Kò sí òfin síbẹ̀",
   "pk.hub.contentStatus": "Fídíò kúkúrú, àwọn àsọyé, àwọn ẹ̀ka àti irú fídíò",
   "pk.space.main": "Wíwo déédéé",
-  "pk.space.kids": "Wíwo àwọn ọmọ"
+  "pk.space.kids": "Wíwo àwọn ọmọ",
+  "study.switch.parentBody": "{name} lè yí padà báyìí pẹ̀lú PIN rẹ̀.",
+  "study.switch.parentBodyGeneric": "Òbí kan lè yí padà báyìí pẹ̀lú PIN rẹ̀.",
+  "study.switch.locked": "Àwọn profaili mìíràn yóò ṣí lẹ́yìn {time}.",
+  "study.switch.lockedNoTime": "Àwọn profaili mìíràn yóò ṣí lẹ́yìn ẹ̀kọ́.",
+  "study.switch.pausedTitle": "Yíyí profaili padà ti dúró díẹ̀",
+  "study.switch.withPin": "Yí padà",
+  "study.switch.pinWrong": "PIN yẹn kò ṣiṣẹ́. Gbìyànjú lẹ́ẹ̀kan sí i.",
+  "study.switch.gentleTitle": "Yí profaili padà?",
+  "study.switch.gentleBody": "Ìgbà ẹ̀kọ́ rẹ yóò parí ná. O ṣì lè fagilé nínú ìdádúró ìṣẹ́jú-àáyá 30.",
+  "study.error.running": "Kò lè yí ètò padà nígbà tí títì ń lọ.",
+  "study.restore.title": "Dá padà lẹ́yìn ẹ̀kọ́",
+  "study.restore.body": "Dídá padà báyìí yóò rọ́pò ètò ẹ̀kọ́ rẹ."
 }

@@ -247,3 +247,45 @@ test('getState names the active packs for the UI', async () => {
     assert.equal(state.packs[0].shortName, 'GATE');
     assert.equal(state.packs[0].variant.id, 'ece');
 });
+
+test('switching profile during study (Android StudyProfileSwitch): parent PIN, locked, Gentle ends first', async () => {
+    // A parent's plan window: the parent who set it, with their PIN.
+    const parentPlan = harness({ study: { plan: { days: ['mon'], start: '16:00', end: '18:00', setByParentId: 'mum' } }, now: at(16, 16, 10) });
+    const viaPlan = await parentPlan.controller.switchDecision('p1', parentPlan.profile(), 'p2');
+    assert.deepEqual({ kind: viaPlan.kind, parent: viaPlan.parentProfileId }, { kind: 'needs_parent_pin', parent: 'mum' });
+    assert.equal((await parentPlan.controller.switchDecision('p1', parentPlan.profile(), 'p1')).kind, 'allowed', 'staying put is always fine');
+    // Outside the window the usual gates apply.
+    parentPlan.clock.now = at(16, 19);
+    assert.equal((await parentPlan.controller.switchDecision('p1', parentPlan.profile(), 'p2')).kind, 'allowed');
+
+    // A self-started Gentle session ends first; a self plan outside a session is free.
+    const gentle = harness({ study: { plan: null }, now: at(17, 10, 0) });
+    assert.equal((await gentle.controller.switchDecision('p1', gentle.profile(), 'p2')).kind, 'allowed');
+    assert.equal((await gentle.controller.startSession({ minutes: 60, lock: 'gentle' })).ok, true);
+    assert.equal((await gentle.controller.switchDecision('p1', gentle.profile(), 'p2')).kind, 'end_gentle_first');
+    // A child never sets study up for itself, and may only tighten what a parent set.
+    gentle.store.ftProfilesV4.profiles.kid = { name: 'Kid', type: 'child', parentProfileId: 'p1', main: { mode: 'blocklist', channels: [], keywords: [] }, kids: { mode: 'blocklist' } };
+    gentle.store.ftProfilesV4.activeProfileId = 'kid';
+    assert.equal((await gentle.controller.update({ activePackIds: ['in_upsc_cse'] })).error, 'child_profile');
+    gentle.store.ftProfilesV4.activeProfileId = 'p1';
+
+    // A parent's lock on a child.
+    const lock = harness({ now: at(16, 12) });
+    lock.store.ftProfilesV4.profiles.kid = { name: 'Kid', type: 'child', parentProfileId: 'p1', main: { mode: 'blocklist', channels: [], keywords: [] }, kids: { mode: 'blocklist' } };
+    assert.equal((await lock.controller.handleMessage({ action: 'FilterTube_StudyUpdateChild', profileId: 'kid', patch: { activePackIds: ['in_upsc_cse'] } }, { extensionPage: true })).ok, true);
+    assert.equal((await lock.controller.startParentLock('kid', { minutes: 60 })).ok, true);
+    const kid = lock.store.ftProfilesV4.profiles.kid;
+    const viaLock = await lock.controller.switchDecision('kid', kid, 'p1');
+    assert.deepEqual({ kind: viaLock.kind, parent: viaLock.parentProfileId }, { kind: 'needs_parent_pin', parent: 'p1' });
+    assert.equal(viaLock.endsAt, kid.study.lock.endsAt);
+});
+
+test('background.js reverts a profile switch the study gate did not allow, and the popup and options page ask first', () => {
+    const background = fs.readFileSync('js/background.js', 'utf8');
+    assert.match(background, /enforceStudyProfileSwitch\(changes\[FT_PROFILES_V4_KEY\]\)/);
+    assert.match(background, /FilterTube_StudySwitchAuthorize/);
+    for (const file of ['js/popup.js', 'js/tab-view.js']) {
+        const source = fs.readFileSync(file, 'utf8');
+        assert.match(source, /if \(!\(await passStudySwitchGate\(targetId\)\)\) return;/, file);
+    }
+});

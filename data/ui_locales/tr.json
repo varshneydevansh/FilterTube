@@ -2834,5 +2834,17 @@
   "pk.hub.noRules": "Henüz kural yok",
   "pk.hub.contentStatus": "Klipler, yorumlar, kategoriler ve video türleri",
   "pk.space.main": "Ana izleme alanı",
-  "pk.space.kids": "Çocuklar için izleme alanı"
+  "pk.space.kids": "Çocuklar için izleme alanı",
+  "study.switch.parentBody": "{name} şimdi PIN koduyla değiştirebilir.",
+  "study.switch.parentBodyGeneric": "Bir ebeveyn şimdi PIN koduyla değiştirebilir.",
+  "study.switch.locked": "Diğer profiller {time} saatinden sonra açılır.",
+  "study.switch.lockedNoTime": "Diğer profiller çalışmadan sonra açılır.",
+  "study.switch.pausedTitle": "Profil değiştirme duraklatıldı",
+  "study.switch.withPin": "Değiştir",
+  "study.switch.pinWrong": "Bu PIN işe yaramadı. Tekrar dene.",
+  "study.switch.gentleTitle": "Profil değiştirilsin mi?",
+  "study.switch.gentleBody": "Önce çalışma oturumun biter. 30 saniyelik beklemede hâlâ iptal edebilirsin.",
+  "study.error.running": "Kilit sürerken plan değiştirilemez.",
+  "study.restore.title": "Dersten sonra geri yükle",
+  "study.restore.body": "Şimdi geri yüklemek ders planını değiştirir."
 }

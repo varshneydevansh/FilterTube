@@ -2834,5 +2834,17 @@
   "pk.hub.noRules": "هنوز قانونی نیست",
   "pk.hub.contentStatus": "کلیپ‌ها، دیدگاه‌ها، دسته‌ها و انواع ویدیو",
   "pk.space.main": "تماشای اصلی",
-  "pk.space.kids": "تماشای کودکان"
+  "pk.space.kids": "تماشای کودکان",
+  "study.switch.parentBody": "{name} اکنون می‌تواند با پین خودش نمایه را عوض کند.",
+  "study.switch.parentBodyGeneric": "یکی از والدین اکنون می‌تواند با پین خودش نمایه را عوض کند.",
+  "study.switch.locked": "نمایه‌های دیگر بعد از {time} باز می‌شوند.",
+  "study.switch.lockedNoTime": "نمایه‌های دیگر بعد از مطالعه باز می‌شوند.",
+  "study.switch.pausedTitle": "تغییر نمایه موقتاً متوقف است",
+  "study.switch.withPin": "تغییر",
+  "study.switch.pinWrong": "آن پین کار نکرد. دوباره امتحان کنید.",
+  "study.switch.gentleTitle": "نمایه عوض شود؟",
+  "study.switch.gentleBody": "ابتدا جلسهٔ مطالعه‌تان تمام می‌شود. در مکث ۳۰ ثانیه‌ای هنوز می‌توانید لغو کنید.",
+  "study.error.running": "هنگام فعال بودن قفل نمی‌توان برنامه را تغییر داد.",
+  "study.restore.title": "بازیابی بعد از مطالعه",
+  "study.restore.body": "بازیابی در حال حاضر برنامهٔ مطالعه‌تان را جایگزین می‌کند."
 }

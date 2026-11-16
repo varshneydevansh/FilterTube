@@ -2834,5 +2834,17 @@
   "pk.hub.noRules": "ಇನ್ನೂ ನಿಯಮಗಳಿಲ್ಲ",
   "pk.hub.contentStatus": "ಕ್ಲಿಪ್‌ಗಳು, ಕಾಮೆಂಟ್‌ಗಳು, ವರ್ಗಗಳು ಮತ್ತು ವೀಡಿಯೊ ಪ್ರಕಾರಗಳು",
   "pk.space.main": "ಮುಖ್ಯ ವೀಕ್ಷಣೆ",
-  "pk.space.kids": "ಮಕ್ಕಳ ವೀಕ್ಷಣೆ"
+  "pk.space.kids": "ಮಕ್ಕಳ ವೀಕ್ಷಣೆ",
+  "study.switch.parentBody": "{name} ಈಗ ತಮ್ಮ PIN ಬಳಸಿ ಬದಲಿಸಬಹುದು.",
+  "study.switch.parentBodyGeneric": "ಪೋಷಕರು ಈಗ ತಮ್ಮ PIN ಬಳಸಿ ಬದಲಿಸಬಹುದು.",
+  "study.switch.locked": "ಇತರ ಪ್ರೊಫೈಲ್‌ಗಳು {time} ನಂತರ ತೆರೆಯುತ್ತವೆ.",
+  "study.switch.lockedNoTime": "ಇತರ ಪ್ರೊಫೈಲ್‌ಗಳು ಅಧ್ಯಯನದ ನಂತರ ತೆರೆಯುತ್ತವೆ.",
+  "study.switch.pausedTitle": "ಪ್ರೊಫೈಲ್ ಬದಲಾವಣೆ ವಿರಾಮದಲ್ಲಿದೆ",
+  "study.switch.withPin": "ಬದಲಿಸಿ",
+  "study.switch.pinWrong": "ಆ PIN ಕೆಲಸ ಮಾಡಲಿಲ್ಲ. ಮತ್ತೆ ಪ್ರಯತ್ನಿಸಿ.",
+  "study.switch.gentleTitle": "ಪ್ರೊಫೈಲ್ ಬದಲಿಸುವುದೇ?",
+  "study.switch.gentleBody": "ಮೊದಲು ನಿಮ್ಮ ಅಧ್ಯಯನ ಅವಧಿ ಮುಗಿಯುತ್ತದೆ. 30 ಸೆಕೆಂಡುಗಳ ವಿರಾಮದಲ್ಲಿ ಇನ್ನೂ ರದ್ದುಗೊಳಿಸಬಹುದು.",
+  "study.error.running": "ಲಾಕ್ ನಡೆಯುತ್ತಿರುವಾಗ ಯೋಜನೆ ಬದಲಿಸಲು ಆಗುವುದಿಲ್ಲ.",
+  "study.restore.title": "ಅಧ್ಯಯನದ ನಂತರ ಮರುಸ್ಥಾಪಿಸಿ",
+  "study.restore.body": "ಈಗ ಮರುಸ್ಥಾಪಿಸಿದರೆ ನಿಮ್ಮ ಅಧ್ಯಯನ ಯೋಜನೆ ಬದಲಾಗುತ್ತದೆ."
 }
