@@ -2850,5 +2850,16 @@
   "sync.relay.title": "A daidaita ta intanet?",
   "sync.relay.body": "Daidaitawa ta intanet tana amfani da ƙaramin relay da mai haɓaka FilterTube ke gudanarwa don haɗa na'urorinka. Ba zai iya karanta abin da kake daidaitawa ba, domin an ɓoye shi daga farko zuwa ƙarshe. Yana ganin ID na na'ura, adireshin IP ɗinka da lokacin da kake daidaitawa. Sabar STUN ta Google tana taimakawa wajen nemo hanyar haɗi kuma ita ma tana ganin adireshin IP ɗinka. Daidaitawa ta kusa ba ta amfani da ko ɗaya daga cikinsu.",
   "sync.relay.continue": "Ci gaba",
-  "sync.relay.notNow": "Ba yanzu ba"
+  "sync.relay.notNow": "Ba yanzu ba",
+  "filters.undo.action": "Mayar",
+  "filters.undo.removedOne": "An cire “{name}”.",
+  "filters.undo.removedWords.one": "An cire kalma {count}.",
+  "filters.undo.removedWords.other": "An cire kalmomi {count}.",
+  "filters.undo.removedChannels.one": "An cire tasha {count}.",
+  "filters.undo.removedChannels.other": "An cire tashoshi {count}.",
+  "filters.undo.putBack": "An mayar.",
+  "filters.firstFilter.bubble": "Wannan an tace shi yanzu.",
+  "filters.allowedOnly.bubble": "Yanzu jerin da ka yarda da su kaɗai ke wucewa.",
+  "controls.emptySieve.bubble": "Babu komai a matatar tukuna. Ƙara matatar farko.",
+  "controls.emptySieve.action": "Ƙara matatar farko"
 }

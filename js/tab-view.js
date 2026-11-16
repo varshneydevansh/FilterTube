@@ -2595,6 +2595,9 @@ function initializeFiltersTabs() {
         applyLanguageFiltersToUI(state.languageFilters || {});
     }, 100);
 
+    // Undo after a removal, as the app's PaperUndoBar.
+    UIComponents.attachRemovalUndo?.(StateManager);
+
     StateManager.subscribe((eventType, data) => {
         if (eventType === 'contentFiltersUpdated') {
             if (window.__filtertubeIsManagedChildEditFor?.('main') === true) {

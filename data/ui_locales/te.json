@@ -2850,5 +2850,16 @@
   "sync.relay.title": "ఇంటర్నెట్ ద్వారా సింక్ చేయాలా?",
   "sync.relay.body": "మీ పరికరాలను కలపడానికి ఇంటర్నెట్ సింక్ FilterTube డెవలపర్ నడిపే ఒక చిన్న రిలేను ఉపయోగిస్తుంది. మీరు సింక్ చేసేదాన్ని అది చదవలేదు, ఎందుకంటే అది ఎండ్-టు-ఎండ్ ఎన్‌క్రిప్ట్ చేయబడింది. అది పరికర ID, మీ IP చిరునామా, మీరు సింక్ చేసే సమయం చూస్తుంది. Google STUN సర్వర్ కనెక్షన్ మార్గాన్ని కనుగొనడంలో సహాయపడుతుంది, అది కూడా మీ IP చిరునామాను చూస్తుంది. సమీప సింక్ వీటిలో దేనినీ ఉపయోగించదు.",
   "sync.relay.continue": "కొనసాగించు",
-  "sync.relay.notNow": "ఇప్పుడు వద్దు"
+  "sync.relay.notNow": "ఇప్పుడు వద్దు",
+  "filters.undo.action": "రద్దు చేయి",
+  "filters.undo.removedOne": "“{name}” తీసివేయబడింది.",
+  "filters.undo.removedWords.one": "{count} పదం తీసివేయబడింది.",
+  "filters.undo.removedWords.other": "{count} పదాలు తీసివేయబడ్డాయి.",
+  "filters.undo.removedChannels.one": "{count} ఛానెల్ తీసివేయబడింది.",
+  "filters.undo.removedChannels.other": "{count} ఛానెళ్లు తీసివేయబడ్డాయి.",
+  "filters.undo.putBack": "తిరిగి పెట్టబడింది.",
+  "filters.firstFilter.bubble": "అది ఇప్పుడు జల్లెడలో జల్లించబడింది.",
+  "filters.allowedOnly.bubble": "ఇప్పుడు మీ అనుమతి జాబితా మాత్రమే దాటుతుంది.",
+  "controls.emptySieve.bubble": "జల్లెడలో ఇంకా ఏమీ లేదు. మొదటి ఫిల్టర్ జోడించండి.",
+  "controls.emptySieve.action": "మొదటి ఫిల్టర్ జోడించండి"
 }

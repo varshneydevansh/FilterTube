@@ -2850,5 +2850,14 @@
   "sync.relay.title": "ซิงค์ผ่านอินเทอร์เน็ตไหม",
   "sync.relay.body": "การซิงค์ผ่านอินเทอร์เน็ตใช้รีเลย์ขนาดเล็กที่ผู้พัฒนา FilterTube ดูแลเพื่อเชื่อมต่ออุปกรณ์ของคุณ รีเลย์อ่านสิ่งที่คุณซิงค์ไม่ได้ เพราะเข้ารหัสแบบต้นทางถึงปลายทาง รีเลย์เห็นรหัสอุปกรณ์ ที่อยู่ IP ของคุณ และเวลาที่คุณซิงค์ เซิร์ฟเวอร์ STUN ของ Google ช่วยหาเส้นทางเชื่อมต่อ และเห็นที่อยู่ IP ของคุณด้วย การซิงค์ใกล้เคียงไม่ใช้ทั้งสองอย่าง",
   "sync.relay.continue": "ดำเนินการต่อ",
-  "sync.relay.notNow": "ไว้ก่อน"
+  "sync.relay.notNow": "ไว้ก่อน",
+  "filters.undo.action": "เลิกทำ",
+  "filters.undo.removedOne": "นำ “{name}” ออกแล้ว",
+  "filters.undo.removedWords.other": "นำออก {count} คำแล้ว",
+  "filters.undo.removedChannels.other": "นำออก {count} ช่องแล้ว",
+  "filters.undo.putBack": "ใส่กลับแล้ว",
+  "filters.firstFilter.bubble": "อันนั้นถูกกรองออกไปแล้วนะ",
+  "filters.allowedOnly.bubble": "ตอนนี้ผ่านได้แค่รายการที่อนุญาตเท่านั้น",
+  "controls.emptySieve.bubble": "ในตะแกรงยังว่างอยู่ เพิ่มตัวกรองแรกกัน",
+  "controls.emptySieve.action": "เพิ่มตัวกรองแรก"
 }

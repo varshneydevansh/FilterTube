@@ -709,6 +709,7 @@ const RenderEngine = (() => {
         // Create item container
         const item = document.createElement('div');
         item.className = minimal ? 'keyword-item' : 'list-item';
+        if (typeof entry?.word === 'string') item.dataset.ftRuleWord = entry.word.trim().toLowerCase();
         applySourceClasses(item, {
             channelDerived: isChannelDerived,
             sourceKey: isChannelDerived ? channelDerivedSourceKey : (entry?.__ftFromKids ? 'kids' : null)
@@ -1458,6 +1459,8 @@ const RenderEngine = (() => {
 
         const item = document.createElement('div');
         item.className = 'keyword-item';
+        const ruleKey = String(channel?.id || channel?.handle || channel?.customUrl || channel?.name || '').trim().toLowerCase();
+        if (ruleKey) item.dataset.ftRuleChannel = ruleKey;
         applySourceClasses(item, {
             sourceKey: channel?.__ftFromKids ? 'kids' : (channel?.source === 'comments' ? 'comments' : null)
         });
@@ -1524,6 +1527,8 @@ const RenderEngine = (() => {
 
         const item = document.createElement('div');
         item.className = 'list-item channel-item';
+        const ruleKey = String(channel?.id || channel?.handle || channel?.customUrl || channel?.name || '').trim().toLowerCase();
+        if (ruleKey) item.dataset.ftRuleChannel = ruleKey;
         applySourceClasses(item, {
             sourceKey: channel?.__ftFromKids ? 'kids' : (channel?.source === 'comments' ? 'comments' : null)
         });

@@ -2850,5 +2850,16 @@
   "sync.relay.title": "இணையம் வழியாக ஒத்திசைக்கவா?",
   "sync.relay.body": "உங்கள் சாதனங்களை இணைக்க, இணைய ஒத்திசைவு FilterTube-இன் டெவலப்பர் இயக்கும் ஒரு சிறிய ரிலேயைப் பயன்படுத்துகிறது. நீங்கள் ஒத்திசைப்பதை அதனால் படிக்க முடியாது, ஏனெனில் அது முழுமையாக மறையாக்கப்பட்டது (end-to-end). அது சாதன ID, உங்கள் IP முகவரி, ஒத்திசைக்கும் நேரம் ஆகியவற்றைப் பார்க்கிறது. Google-இன் STUN சேவையகம் இணைப்புப் பாதையைக் கண்டறிய உதவுகிறது, அதுவும் உங்கள் IP முகவரியைப் பார்க்கிறது. அருகிலுள்ள ஒத்திசைவு இவை இரண்டையும் பயன்படுத்தாது.",
   "sync.relay.continue": "தொடரவும்",
-  "sync.relay.notNow": "இப்போது வேண்டாம்"
+  "sync.relay.notNow": "இப்போது வேண்டாம்",
+  "filters.undo.action": "செயல்தவிர்",
+  "filters.undo.removedOne": "“{name}” அகற்றப்பட்டது.",
+  "filters.undo.removedWords.one": "{count} சொல் அகற்றப்பட்டது.",
+  "filters.undo.removedWords.other": "{count} சொற்கள் அகற்றப்பட்டன.",
+  "filters.undo.removedChannels.one": "{count} சேனல் அகற்றப்பட்டது.",
+  "filters.undo.removedChannels.other": "{count} சேனல்கள் அகற்றப்பட்டன.",
+  "filters.undo.putBack": "மீண்டும் வைக்கப்பட்டது.",
+  "filters.firstFilter.bubble": "அது இப்போது சல்லடையில் சலிக்கப்பட்டது.",
+  "filters.allowedOnly.bubble": "இப்போது உங்கள் அனுமதிப் பட்டியல் மட்டுமே கடந்து செல்லும்.",
+  "controls.emptySieve.bubble": "சல்லடையில் இன்னும் எதுவும் இல்லை. முதல் வடிப்பானைச் சேர்க்கவும்.",
+  "controls.emptySieve.action": "முதல் வடிப்பானைச் சேர்"
 }

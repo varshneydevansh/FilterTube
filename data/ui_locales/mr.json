@@ -2850,5 +2850,16 @@
   "sync.relay.title": "इंटरनेटवरून सिंक करायचे?",
   "sync.relay.body": "इंटरनेट सिंक तुमची डिव्हाइस जोडण्यासाठी FilterTube च्या डेव्हलपरने चालवलेला एक छोटा रिले वापरतो. तुम्ही काय सिंक करता ते तो वाचू शकत नाही, कारण ते एंड-टू-एंड एन्क्रिप्टेड आहे. तो डिव्हाइस ID, तुमचा IP पत्ता आणि सिंकची वेळ पाहतो. Google चा STUN सर्व्हर कनेक्शनचा मार्ग शोधायला मदत करतो आणि तोही तुमचा IP पत्ता पाहतो. जवळचे सिंक यांपैकी काहीही वापरत नाही.",
   "sync.relay.continue": "पुढे जा",
-  "sync.relay.notNow": "आत्ता नको"
+  "sync.relay.notNow": "आत्ता नको",
+  "filters.undo.action": "पूर्ववत करा",
+  "filters.undo.removedOne": "“{name}” काढले.",
+  "filters.undo.removedWords.one": "{count} शब्द काढला.",
+  "filters.undo.removedWords.other": "{count} शब्द काढले.",
+  "filters.undo.removedChannels.one": "{count} चॅनेल काढले.",
+  "filters.undo.removedChannels.other": "{count} चॅनेल काढले.",
+  "filters.undo.putBack": "परत ठेवले.",
+  "filters.firstFilter.bubble": "ते आता चाळणीत चाळले गेले.",
+  "filters.allowedOnly.bubble": "आता फक्त तुमची परवानगी असलेली यादीच पुढे जाईल.",
+  "controls.emptySieve.bubble": "चाळणीत अजून काही नाही. पहिला फिल्टर जोडा.",
+  "controls.emptySieve.action": "पहिला फिल्टर जोडा"
 }

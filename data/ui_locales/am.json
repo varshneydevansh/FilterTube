@@ -2850,5 +2850,16 @@
   "sync.relay.title": "በኢንተርኔት ይመሳሰል?",
   "sync.relay.body": "የኢንተርኔት ማመሳሰል መሣሪያዎችዎን ለማገናኘት በFilterTube ገንቢ የሚተዳደር ትንሽ ሪሌይ ይጠቀማል። የሚያመሳስሉትን ማንበብ አይችልም፤ ከጫፍ እስከ ጫፍ የተመሰጠረ ነው። የመሣሪያ መለያ፣ የእርስዎን IP አድራሻ እና መቼ እንደሚያመሳስሉ ያያል። የGoogle STUN አገልጋይ የግንኙነት መንገድ ለማግኘት ይረዳል፤ እሱም የእርስዎን IP አድራሻ ያያል። በአቅራቢያ ማመሳሰል ሁለቱንም አይጠቀምም።",
   "sync.relay.continue": "ቀጥል",
-  "sync.relay.notNow": "አሁን አይደለም"
+  "sync.relay.notNow": "አሁን አይደለም",
+  "filters.undo.action": "መልስ",
+  "filters.undo.removedOne": "«{name}» ተወግዷል።",
+  "filters.undo.removedWords.one": "{count} ቃል ተወግዷል።",
+  "filters.undo.removedWords.other": "{count} ቃላት ተወግደዋል።",
+  "filters.undo.removedChannels.one": "{count} ቻናል ተወግዷል።",
+  "filters.undo.removedChannels.other": "{count} ቻናሎች ተወግደዋል።",
+  "filters.undo.putBack": "ተመልሷል።",
+  "filters.firstFilter.bubble": "ያ አሁን በወንፊቱ ተጣርቷል።",
+  "filters.allowedOnly.bubble": "አሁን የሚያልፈው የተፈቀደው ዝርዝርህ ብቻ ነው።",
+  "controls.emptySieve.bubble": "ወንፊቱ ገና ባዶ ነው። የመጀመሪያ ማጣሪያ ጨምር።",
+  "controls.emptySieve.action": "የመጀመሪያ ማጣሪያ ጨምር"
 }

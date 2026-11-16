@@ -2850,5 +2850,16 @@
   "sync.relay.title": "Usawazishe kupitia intaneti?",
   "sync.relay.body": "Usawazishaji wa intaneti hutumia relay ndogo inayoendeshwa na msanidi wa FilterTube kuunganisha vifaa vyako. Haiwezi kusoma unachosawazisha, kwa sababu kimesimbwa kutoka mwanzo hadi mwisho. Huona kitambulisho cha kifaa, anwani yako ya IP na wakati unaposawazisha. Seva ya STUN ya Google husaidia kupata njia ya muunganisho na pia huona anwani yako ya IP. Usawazishaji wa karibu hautumii yoyote kati ya hizo.",
   "sync.relay.continue": "Endelea",
-  "sync.relay.notNow": "Si sasa"
+  "sync.relay.notNow": "Si sasa",
+  "filters.undo.action": "Tendua",
+  "filters.undo.removedOne": "Umeondoa “{name}”.",
+  "filters.undo.removedWords.one": "Neno {count} limeondolewa.",
+  "filters.undo.removedWords.other": "Maneno {count} yameondolewa.",
+  "filters.undo.removedChannels.one": "Chaneli {count} imeondolewa.",
+  "filters.undo.removedChannels.other": "Chaneli {count} zimeondolewa.",
+  "filters.undo.putBack": "Imerudishwa.",
+  "filters.firstFilter.bubble": "Hilo limechujwa sasa.",
+  "filters.allowedOnly.bubble": "Sasa orodha yako ya zinazoruhusiwa pekee ndiyo inapita.",
+  "controls.emptySieve.bubble": "Bado hakuna kitu kwenye chujio. Ongeza kichujio cha kwanza.",
+  "controls.emptySieve.action": "Ongeza kichujio cha kwanza"
 }

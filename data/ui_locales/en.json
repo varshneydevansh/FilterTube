@@ -2850,5 +2850,16 @@
   "sync.relay.title": "Sync over the internet?",
   "sync.relay.body": "Internet sync uses a small relay run by FilterTube's developer to connect your devices. It can't read what you sync, which is end-to-end encrypted. It sees a device ID, your IP address and when you sync. Google's STUN server helps find a connection route and also sees your IP address. Nearby sync uses neither.",
   "sync.relay.continue": "Continue",
-  "sync.relay.notNow": "Not now"
+  "sync.relay.notNow": "Not now",
+  "filters.undo.action": "Undo",
+  "filters.undo.removedOne": "Removed “{name}”.",
+  "filters.undo.removedWords.one": "Removed {count} word.",
+  "filters.undo.removedWords.other": "Removed {count} words.",
+  "filters.undo.removedChannels.one": "Removed {count} channel.",
+  "filters.undo.removedChannels.other": "Removed {count} channels.",
+  "filters.undo.putBack": "Put back.",
+  "filters.firstFilter.bubble": "That one's sieved out now.",
+  "filters.allowedOnly.bubble": "Only your allowed list gets through now.",
+  "controls.emptySieve.bubble": "Nothing in the sieve yet. Add a first filter.",
+  "controls.emptySieve.action": "Add a first filter"
 }

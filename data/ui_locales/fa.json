@@ -2850,5 +2850,16 @@
   "sync.relay.title": "همگام‌سازی از طریق اینترنت؟",
   "sync.relay.body": "همگام‌سازی اینترنتی برای اتصال دستگاه‌هایتان از یک رله کوچک استفاده می‌کند که توسعه‌دهندهٔ FilterTube آن را اداره می‌کند. این رله نمی‌تواند آنچه همگام می‌کنید را بخواند، چون سرتاسری رمزگذاری شده است. شناسهٔ دستگاه، نشانی IP شما و زمان همگام‌سازی را می‌بیند. سرور STUN متعلق به Google به یافتن مسیر اتصال کمک می‌کند و آن هم نشانی IP شما را می‌بیند. همگام‌سازی نزدیک از هیچ‌کدام استفاده نمی‌کند.",
   "sync.relay.continue": "ادامه",
-  "sync.relay.notNow": "الان نه"
+  "sync.relay.notNow": "الان نه",
+  "filters.undo.action": "واگرد",
+  "filters.undo.removedOne": "«{name}» حذف شد.",
+  "filters.undo.removedWords.one": "{count} واژه حذف شد.",
+  "filters.undo.removedWords.other": "{count} واژه حذف شد.",
+  "filters.undo.removedChannels.one": "{count} کانال حذف شد.",
+  "filters.undo.removedChannels.other": "{count} کانال حذف شد.",
+  "filters.undo.putBack": "برگردانده شد.",
+  "filters.firstFilter.bubble": "این یکی حالا از صافی رد نمی‌شود.",
+  "filters.allowedOnly.bubble": "حالا فقط فهرست مجاز تو رد می‌شود.",
+  "controls.emptySieve.bubble": "هنوز چیزی در صافی نیست. اولین فیلتر را اضافه کن.",
+  "controls.emptySieve.action": "افزودن اولین فیلتر"
 }

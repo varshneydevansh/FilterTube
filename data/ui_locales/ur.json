@@ -2850,5 +2850,16 @@
   "sync.relay.title": "انٹرنیٹ پر سنک کریں؟",
   "sync.relay.body": "انٹرنیٹ سنک آپ کے آلات کو جوڑنے کے لیے ایک چھوٹا ریلے استعمال کرتا ہے جسے FilterTube کا ڈویلپر چلاتا ہے۔ یہ وہ نہیں پڑھ سکتا جو آپ سنک کرتے ہیں، کیونکہ وہ اینڈ ٹو اینڈ انکرپٹڈ ہے۔ یہ ڈیوائس ID، آپ کا IP پتہ اور سنک کا وقت دیکھتا ہے۔ Google کا STUN سرور کنکشن کا راستہ ڈھونڈنے میں مدد کرتا ہے اور وہ بھی آپ کا IP پتہ دیکھتا ہے۔ قریبی سنک ان میں سے کوئی استعمال نہیں کرتا۔",
   "sync.relay.continue": "جاری رکھیں",
-  "sync.relay.notNow": "ابھی نہیں"
+  "sync.relay.notNow": "ابھی نہیں",
+  "filters.undo.action": "واپس کریں",
+  "filters.undo.removedOne": "“{name}” ہٹا دیا گیا۔",
+  "filters.undo.removedWords.one": "{count} لفظ ہٹایا گیا۔",
+  "filters.undo.removedWords.other": "{count} الفاظ ہٹائے گئے۔",
+  "filters.undo.removedChannels.one": "{count} چینل ہٹایا گیا۔",
+  "filters.undo.removedChannels.other": "{count} چینل ہٹائے گئے۔",
+  "filters.undo.putBack": "واپس رکھ دیا۔",
+  "filters.firstFilter.bubble": "وہ اب چھلنی میں چھن گیا۔",
+  "filters.allowedOnly.bubble": "اب صرف آپ کی اجازت والی فہرست ہی گزرے گی۔",
+  "controls.emptySieve.bubble": "چھلنی میں ابھی کچھ نہیں۔ پہلا فلٹر شامل کریں۔",
+  "controls.emptySieve.action": "پہلا فلٹر شامل کریں"
 }

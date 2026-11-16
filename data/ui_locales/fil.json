@@ -2850,5 +2850,16 @@
   "sync.relay.title": "I-sync sa internet?",
   "sync.relay.body": "Gumagamit ang internet sync ng maliit na relay na pinapatakbo ng developer ng FilterTube para ikonekta ang iyong mga device. Hindi nito mababasa ang sini-sync mo, dahil end-to-end encrypted ito. Nakikita nito ang isang device ID, ang iyong IP address at kung kailan ka nagsi-sync. Tumutulong ang STUN server ng Google na humanap ng ruta ng koneksyon at nakikita rin nito ang iyong IP address. Hindi gumagamit ng alinman sa dalawa ang nearby sync.",
   "sync.relay.continue": "Magpatuloy",
-  "sync.relay.notNow": "Hindi muna"
+  "sync.relay.notNow": "Hindi muna",
+  "filters.undo.action": "I-undo",
+  "filters.undo.removedOne": "Inalis ang “{name}”.",
+  "filters.undo.removedWords.one": "Inalis ang {count} salita.",
+  "filters.undo.removedWords.other": "Inalis ang {count} salita.",
+  "filters.undo.removedChannels.one": "Inalis ang {count} channel.",
+  "filters.undo.removedChannels.other": "Inalis ang {count} channel.",
+  "filters.undo.putBack": "Ibinalik na.",
+  "filters.firstFilter.bubble": "Nasala na ’yan ngayon.",
+  "filters.allowedOnly.bubble": "Ang listahan mo lang ng pinapayagan ang makakalusot ngayon.",
+  "controls.emptySieve.bubble": "Wala pang laman ang salaan. Magdagdag ng unang filter.",
+  "controls.emptySieve.action": "Magdagdag ng unang filter"
 }

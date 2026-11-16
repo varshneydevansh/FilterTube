@@ -2850,5 +2850,16 @@
   "sync.relay.title": "İnternet üzerinden senkronize edilsin mi?",
   "sync.relay.body": "İnternet senkronizasyonu, cihazlarınızı bağlamak için FilterTube geliştiricisinin işlettiği küçük bir aktarıcı kullanır. Senkronize ettiklerinizi okuyamaz; bunlar uçtan uca şifrelenir. Bir cihaz kimliğini, IP adresinizi ve ne zaman senkronize ettiğinizi görür. Google'ın STUN sunucusu bağlantı yolu bulmaya yardım eder ve o da IP adresinizi görür. Yakındaki senkronizasyon ikisini de kullanmaz.",
   "sync.relay.continue": "Devam",
-  "sync.relay.notNow": "Şimdi değil"
+  "sync.relay.notNow": "Şimdi değil",
+  "filters.undo.action": "Geri al",
+  "filters.undo.removedOne": "“{name}” kaldırıldı.",
+  "filters.undo.removedWords.one": "{count} kelime kaldırıldı.",
+  "filters.undo.removedWords.other": "{count} kelime kaldırıldı.",
+  "filters.undo.removedChannels.one": "{count} kanal kaldırıldı.",
+  "filters.undo.removedChannels.other": "{count} kanal kaldırıldı.",
+  "filters.undo.putBack": "Geri kondu.",
+  "filters.firstFilter.bubble": "O artık süzgeçte kaldı.",
+  "filters.allowedOnly.bubble": "Artık yalnızca izin verilen listen geçiyor.",
+  "controls.emptySieve.bubble": "Süzgeçte henüz bir şey yok. İlk filtreyi ekle.",
+  "controls.emptySieve.action": "İlk filtreyi ekle"
 }

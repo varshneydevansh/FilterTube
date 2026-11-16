@@ -2850,5 +2850,16 @@
   "sync.relay.title": "انٹرنیٹ تے سنک کرو؟",
   "sync.relay.body": "انٹرنیٹ سنک تہاڈے آلیاں نوں جوڑن لئی اک نِکا ریلے ورتدا اے جیہنوں FilterTube دا ڈویلپر چلاندا اے۔ ایہ اوہ نہیں پڑھ سکدا جو تسیں سنک کردے او، کیوں جے اوہ اینڈ ٹو اینڈ انکرپٹڈ اے۔ ایہ ڈیوائس ID، تہاڈا IP پتہ تے سنک دا ویلا ویکھدا اے۔ Google دا STUN سرور کنکشن دا راہ لبھن وچ مدد کردا اے تے اوہ وی تہاڈا IP پتہ ویکھدا اے۔ نیڑے والا سنک ایہناں وچوں کوئی نہیں ورتدا۔",
   "sync.relay.continue": "جاری رکھو",
-  "sync.relay.notNow": "ہلے نہیں"
+  "sync.relay.notNow": "ہلے نہیں",
+  "filters.undo.action": "واپس کرو",
+  "filters.undo.removedOne": "“{name}” ہٹا دتا۔",
+  "filters.undo.removedWords.one": "{count} لفظ ہٹایا۔",
+  "filters.undo.removedWords.other": "{count} لفظ ہٹائے۔",
+  "filters.undo.removedChannels.one": "{count} چینل ہٹایا۔",
+  "filters.undo.removedChannels.other": "{count} چینل ہٹائے۔",
+  "filters.undo.putBack": "واپس رکھ دتا۔",
+  "filters.firstFilter.bubble": "او ہُن چھاننی وچ چھن گیا۔",
+  "filters.allowedOnly.bubble": "ہُن صرف تہاڈی اجازت والی لسٹ ای لنگھے گی۔",
+  "controls.emptySieve.bubble": "چھاننی وچ ہلے کجھ نئیں۔ پہلا فلٹر جوڑو۔",
+  "controls.emptySieve.action": "پہلا فلٹر جوڑو"
 }

@@ -2858,5 +2858,20 @@
   "sync.relay.title": "Синхронизировать через интернет?",
   "sync.relay.body": "Синхронизация через интернет использует небольшой ретранслятор, которым управляет разработчик FilterTube, чтобы соединить ваши устройства. Он не может прочитать то, что вы синхронизируете: данные зашифрованы сквозным шифрованием. Он видит ID устройства, ваш IP-адрес и время синхронизации. STUN-сервер Google помогает найти путь соединения и тоже видит ваш IP-адрес. Синхронизация поблизости не использует ни то, ни другое.",
   "sync.relay.continue": "Продолжить",
-  "sync.relay.notNow": "Не сейчас"
+  "sync.relay.notNow": "Не сейчас",
+  "filters.undo.action": "Отменить",
+  "filters.undo.removedOne": "«{name}» удалено.",
+  "filters.undo.removedWords.one": "Удалено {count} слово.",
+  "filters.undo.removedWords.few": "Удалено {count} слова.",
+  "filters.undo.removedWords.many": "Удалено {count} слов.",
+  "filters.undo.removedWords.other": "Удалено {count} слова.",
+  "filters.undo.removedChannels.one": "Удалён {count} канал.",
+  "filters.undo.removedChannels.few": "Удалено {count} канала.",
+  "filters.undo.removedChannels.many": "Удалено {count} каналов.",
+  "filters.undo.removedChannels.other": "Удалено {count} канала.",
+  "filters.undo.putBack": "Возвращено.",
+  "filters.firstFilter.bubble": "Это теперь отсеяно.",
+  "filters.allowedOnly.bubble": "Теперь проходит только твой список разрешённых.",
+  "controls.emptySieve.bubble": "В сите пока пусто. Добавь первый фильтр.",
+  "controls.emptySieve.action": "Добавить первый фильтр"
 }

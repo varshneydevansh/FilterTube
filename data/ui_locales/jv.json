@@ -2850,5 +2850,14 @@
   "sync.relay.title": "Sinkronake liwat internet?",
   "sync.relay.body": "Sinkronisasi internet nganggo relay cilik sing dikelola developer FilterTube kanggo nyambungake piranti panjenengan. Relay ora bisa maca apa sing panjenengan sinkronake, amarga dienkripsi end-to-end. Relay weruh ID piranti, alamat IP panjenengan, lan wektu sinkronisasi. Server STUN duweke Google mbantu nemokake dalan sambungan lan uga weruh alamat IP panjenengan. Sinkronisasi cedhak ora nganggo loro-lorone.",
   "sync.relay.continue": "Terusake",
-  "sync.relay.notNow": "Mengko wae"
+  "sync.relay.notNow": "Mengko wae",
+  "filters.undo.action": "Batalna",
+  "filters.undo.removedOne": "“{name}” dibusak.",
+  "filters.undo.removedWords.other": "{count} tembung dibusak.",
+  "filters.undo.removedChannels.other": "{count} channel dibusak.",
+  "filters.undo.putBack": "Dibalèkaké.",
+  "filters.firstFilter.bubble": "Sing kuwi saiki wis kasaring.",
+  "filters.allowedOnly.bubble": "Saiki mung dhaptar sing diidinaké sing bisa liwat.",
+  "controls.emptySieve.bubble": "Saringané isih kosong. Tambahna filter kapisan.",
+  "controls.emptySieve.action": "Tambahna filter kapisan"
 }

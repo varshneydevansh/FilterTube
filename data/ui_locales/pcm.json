@@ -2850,5 +2850,16 @@
   "sync.relay.title": "Sync through internet?",
   "sync.relay.body": "Internet sync dey use one small relay wey FilterTube developer dey run to join your devices together. E no fit read wetin you dey sync, because e dey end-to-end encrypted. E dey see one device ID, your IP address and when you sync. Google STUN server dey help find road for connection and e sef dey see your IP address. Nearby sync no dey use any of dem.",
   "sync.relay.continue": "Continue",
-  "sync.relay.notNow": "No be now"
+  "sync.relay.notNow": "No be now",
+  "filters.undo.action": "Undo",
+  "filters.undo.removedOne": "We don comot “{name}”.",
+  "filters.undo.removedWords.one": "We don comot {count} word.",
+  "filters.undo.removedWords.other": "We don comot {count} words.",
+  "filters.undo.removedChannels.one": "We don comot {count} channel.",
+  "filters.undo.removedChannels.other": "We don comot {count} channels.",
+  "filters.undo.putBack": "E don come back.",
+  "filters.firstFilter.bubble": "That one don siddon for sieve now.",
+  "filters.allowedOnly.bubble": "Na only your allowed list dey pass now.",
+  "controls.emptySieve.bubble": "Nothing dey for the sieve yet. Add your first filter.",
+  "controls.emptySieve.action": "Add first filter"
 }

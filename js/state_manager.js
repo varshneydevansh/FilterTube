@@ -935,6 +935,85 @@ const StateManager = (() => {
         return true;
     }
 
+
+    // ---- Undo a removal (the app's PaperUndoBar + FilterRemovalUndo) ----------------------------
+    // The last removal is kept so the bar's Undo can put the same row back where it was. Removals in
+    // quick succession batch, as in the app: Undo puts them all back.
+    let removalBatch = { id: 0, items: [], at: 0 };
+    const REMOVAL_BATCH_MS = 5000;
+
+    function rememberRemoval(record) {
+        if (!record || !record.item) return;
+        const now = Date.now();
+        const sameBatch = removalBatch.items.length > 0 && now - removalBatch.at < REMOVAL_BATCH_MS
+            && removalBatch.items.every(item => item.kind === record.kind);
+        removalBatch = sameBatch
+            ? { id: removalBatch.id, items: [...removalBatch.items, { ...record }], at: now }
+            : { id: removalBatch.id + 1, items: [{ ...record }], at: now };
+    }
+
+    function getRemovalBatch() {
+        return { id: removalBatch.id, kind: removalBatch.items[0]?.kind || '', count: removalBatch.items.length,
+            label: removalBatch.items.length === 1 ? (removalBatch.items[0].label || getChannelLabelForUndo(removalBatch.items[0].item)) : '' };
+    }
+
+    function getChannelLabelForUndo(channel) {
+        if (!channel || typeof channel !== 'object') return typeof channel === 'string' ? channel : '';
+        return channel.name || channel.handleDisplay || channel.handle || channel.customUrl || channel.id || '';
+    }
+
+    /** Puts the batch back (newest removal last, so each lands at its old index). */
+    async function undoRemoval(batchId) {
+        await ensureLoaded();
+        if (batchId !== removalBatch.id || removalBatch.items.length === 0) return false;
+        if (isUiLocked()) {
+            await loadSettings();
+            return false;
+        }
+        const items = removalBatch.items.slice().reverse();
+        removalBatch = { id: removalBatch.id + 1, items: [], at: 0 };
+        const insert = (list, item, index) => {
+            const next = Array.isArray(list) ? list.slice() : [];
+            next.splice(Math.max(0, Math.min(index, next.length)), 0, item);
+            return next;
+        };
+        const kind = items[0].kind;
+        if (kind === 'keyword' || kind === 'channel') {
+            for (const record of items) {
+                if (record.kind === 'keyword') state.userKeywords = insert(state.userKeywords, record.item, record.index);
+                else state.channels = insert(state.channels, record.item, record.index);
+            }
+            recomputeKeywords();
+            await saveSettings();
+        } else if (kind === 'allowKeyword' || kind === 'allowChannel') {
+            for (const record of items) {
+                if (record.kind === 'allowKeyword') {
+                    state.userWhitelistKeywords = insert(state.userWhitelistKeywords, record.item, record.index);
+                    state.whitelistKeywords = [...state.userWhitelistKeywords];
+                } else {
+                    state.whitelistChannels = insert(state.whitelistChannels, record.item, record.index);
+                }
+            }
+            await persistMainProfiles({
+                mode: state.mode,
+                whitelistChannels: Array.isArray(state.whitelistChannels) ? state.whitelistChannels : [],
+                whitelistKeywords: Array.isArray(state.whitelistKeywords) ? state.whitelistKeywords : []
+            });
+            await requestRefresh('main');
+        } else {
+            const kids = getKidsState();
+            for (const record of items) kids[record.listKey] = insert(kids[record.listKey], record.item, record.index);
+            state.kids = { ...kids };
+            await persistKidsProfiles(state.kids);
+            await requestRefresh('kids');
+        }
+        const event = { keyword: 'keywordAdded', allowKeyword: 'keywordAdded', channel: 'channelAdded', allowChannel: 'channelAdded',
+            kidsKeyword: 'kidsKeywordAdded', kidsChannel: 'kidsChannelAdded' }[kind];
+        notifyListeners(event, { restored: true });
+        scheduleAutoBackup('removal_undone');
+        return true;
+    }
+
     async function removeKidsKeyword(word) {
         const options = arguments[1] || {};
         await ensureLoaded();
@@ -947,11 +1026,14 @@ const StateManager = (() => {
         const listKey = getKidsRuleListKey(options, 'blockedKeywords', 'whitelistKeywords');
         const list = Array.isArray(kids[listKey]) ? kids[listKey] : [];
         const before = list.length;
+        const removedIndex = list.findIndex(entry => (entry.word || '') === word);
+        const removedEntry = removedIndex >= 0 ? list[removedIndex] : null;
         kids[listKey] = list.filter(entry => (entry.word || '') !== word);
         if (kids[listKey].length === before) return false;
         state.kids = { ...kids };
         await persistKidsProfiles(state.kids);
         await requestRefresh('kids');
+        rememberRemoval({ kind: 'kidsKeyword', listKey, item: removedEntry, index: removedIndex, label: word });
         notifyListeners('kidsKeywordRemoved', { word });
         
         // Trigger auto-backup after successful Kids keyword removal
@@ -1213,6 +1295,7 @@ const StateManager = (() => {
         state.kids = { ...kids };
         await persistKidsProfiles(state.kids);
         await requestRefresh('kids');
+        rememberRemoval({ kind: 'kidsChannel', listKey, item: channel, index });
         notifyListeners('kidsChannelRemoved', { channel, index });
         
         // Trigger auto-backup after successful Kids channel removal
@@ -1799,6 +1882,7 @@ const StateManager = (() => {
             const list = Array.isArray(state.userWhitelistKeywords) ? state.userWhitelistKeywords : [];
             const index = list.findIndex(k => (k?.word || '') === word && k?.source !== 'channel');
             if (index === -1) return false;
+            const removedEntry = list[index];
             list.splice(index, 1);
             state.userWhitelistKeywords = [...list];
             state.whitelistKeywords = [...state.userWhitelistKeywords];
@@ -1808,6 +1892,7 @@ const StateManager = (() => {
                 whitelistKeywords: state.whitelistKeywords
             });
             await requestRefresh('main');
+            rememberRemoval({ kind: 'allowKeyword', item: removedEntry, index, label: word });
             notifyListeners('keywordRemoved', { word });
             scheduleAutoBackup('keyword_removed');
             return true;
@@ -1816,9 +1901,11 @@ const StateManager = (() => {
         const index = state.userKeywords.findIndex(k => k.word === word && k.source !== 'channel');
         if (index === -1) return false;
 
+        const removedEntry = state.userKeywords[index];
         state.userKeywords.splice(index, 1);
         recomputeKeywords();
         await saveSettings();
+        rememberRemoval({ kind: 'keyword', item: removedEntry, index, label: word });
         notifyListeners('keywordRemoved', { word });
         
         // Trigger auto-backup after successful keyword removal
@@ -2250,6 +2337,7 @@ const StateManager = (() => {
                 whitelistKeywords: Array.isArray(state.whitelistKeywords) ? state.whitelistKeywords : []
             });
             await requestRefresh('main');
+            rememberRemoval({ kind: 'allowChannel', item: channel, index });
             notifyListeners('channelRemoved', { channel, index });
             scheduleAutoBackup('channel_removed');
             return true;
@@ -2261,6 +2349,7 @@ const StateManager = (() => {
         state.channels.splice(index, 1);
         recomputeKeywords();
         await saveSettings();
+        rememberRemoval({ kind: 'channel', item: channel, index });
         notifyListeners('channelRemoved', { channel, index });
         
         // Trigger auto-backup after successful channel removal
@@ -2924,6 +3013,8 @@ const StateManager = (() => {
     return {
         // State access
         getState: () => ({ ...state }),
+        getRemovalBatch,
+        undoRemoval,
         isLoaded: () => state.isLoaded,
 
         // Settings

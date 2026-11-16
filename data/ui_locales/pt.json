@@ -2850,5 +2850,16 @@
   "sync.relay.title": "Sincronizar pela internet?",
   "sync.relay.body": "A sincronização pela internet usa um pequeno relay operado pelo desenvolvedor do FilterTube para conectar seus dispositivos. Ele não consegue ler o que você sincroniza, que é criptografado de ponta a ponta. Ele vê um ID do dispositivo, seu endereço IP e quando você sincroniza. O servidor STUN do Google ajuda a encontrar uma rota de conexão e também vê seu endereço IP. A sincronização por proximidade não usa nenhum dos dois.",
   "sync.relay.continue": "Continuar",
-  "sync.relay.notNow": "Agora não"
+  "sync.relay.notNow": "Agora não",
+  "filters.undo.action": "Desfazer",
+  "filters.undo.removedOne": "“{name}” removido.",
+  "filters.undo.removedWords.one": "{count} palavra removida.",
+  "filters.undo.removedWords.other": "{count} palavras removidas.",
+  "filters.undo.removedChannels.one": "{count} canal removido.",
+  "filters.undo.removedChannels.other": "{count} canais removidos.",
+  "filters.undo.putBack": "Restaurado.",
+  "filters.firstFilter.bubble": "Esse já ficou na peneira.",
+  "filters.allowedOnly.bubble": "Agora só passa a sua lista permitida.",
+  "controls.emptySieve.bubble": "Ainda não há nada na peneira. Adicione um primeiro filtro.",
+  "controls.emptySieve.action": "Adicionar um primeiro filtro"
 }

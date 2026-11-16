@@ -2850,5 +2850,14 @@
   "sync.relay.title": "インターネット経由で同期しますか？",
   "sync.relay.body": "インターネット同期は、デバイス同士をつなぐために FilterTube の開発者が運営する小さなリレーを使います。同期する内容はエンドツーエンドで暗号化されているため、リレーは読めません。リレーに見えるのはデバイスID、IPアドレス、同期した時刻です。Google の STUN サーバーは接続経路を見つける手助けをし、こちらにもIPアドレスが見えます。近くのデバイスとの同期はどちらも使いません。",
   "sync.relay.continue": "続行",
-  "sync.relay.notNow": "今はしない"
+  "sync.relay.notNow": "今はしない",
+  "filters.undo.action": "元に戻す",
+  "filters.undo.removedOne": "「{name}」を削除しました。",
+  "filters.undo.removedWords.other": "{count} 個のワードを削除しました。",
+  "filters.undo.removedChannels.other": "{count} 個のチャンネルを削除しました。",
+  "filters.undo.putBack": "元に戻しました。",
+  "filters.firstFilter.bubble": "それは もう ふるいで こしたよ。",
+  "filters.allowedOnly.bubble": "いまは 許可リストだけが 通るよ。",
+  "controls.emptySieve.bubble": "ふるいは まだ からっぽ。さいしょの フィルタを 足そう。",
+  "controls.emptySieve.action": "最初のフィルタを追加"
 }

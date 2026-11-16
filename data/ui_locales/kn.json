@@ -2850,5 +2850,16 @@
   "sync.relay.title": "ಇಂಟರ್ನೆಟ್ ಮೂಲಕ ಸಿಂಕ್ ಮಾಡುವುದೇ?",
   "sync.relay.body": "ನಿಮ್ಮ ಸಾಧನಗಳನ್ನು ಸಂಪರ್ಕಿಸಲು ಇಂಟರ್ನೆಟ್ ಸಿಂಕ್ FilterTube ಡೆವಲಪರ್ ನಡೆಸುವ ಒಂದು ಸಣ್ಣ ರಿಲೇ ಬಳಸುತ್ತದೆ. ನೀವು ಸಿಂಕ್ ಮಾಡುವುದನ್ನು ಅದು ಓದಲಾರದು, ಏಕೆಂದರೆ ಅದು ಎಂಡ್-ಟು-ಎಂಡ್ ಎನ್‌ಕ್ರಿಪ್ಟ್ ಆಗಿದೆ. ಅದು ಸಾಧನ ID, ನಿಮ್ಮ IP ವಿಳಾಸ ಮತ್ತು ಸಿಂಕ್ ಸಮಯವನ್ನು ನೋಡುತ್ತದೆ. Google ನ STUN ಸರ್ವರ್ ಸಂಪರ್ಕ ಮಾರ್ಗ ಹುಡುಕಲು ಸಹಾಯ ಮಾಡುತ್ತದೆ ಮತ್ತು ಅದೂ ನಿಮ್ಮ IP ವಿಳಾಸ ನೋಡುತ್ತದೆ. ಹತ್ತಿರದ ಸಿಂಕ್ ಇವುಗಳಲ್ಲಿ ಯಾವುದನ್ನೂ ಬಳಸುವುದಿಲ್ಲ.",
   "sync.relay.continue": "ಮುಂದುವರಿಸಿ",
-  "sync.relay.notNow": "ಈಗ ಬೇಡ"
+  "sync.relay.notNow": "ಈಗ ಬೇಡ",
+  "filters.undo.action": "ರದ್ದುಮಾಡಿ",
+  "filters.undo.removedOne": "“{name}” ತೆಗೆದುಹಾಕಲಾಗಿದೆ.",
+  "filters.undo.removedWords.one": "{count} ಪದ ತೆಗೆದುಹಾಕಲಾಗಿದೆ.",
+  "filters.undo.removedWords.other": "{count} ಪದಗಳನ್ನು ತೆಗೆದುಹಾಕಲಾಗಿದೆ.",
+  "filters.undo.removedChannels.one": "{count} ಚಾನಲ್ ತೆಗೆದುಹಾಕಲಾಗಿದೆ.",
+  "filters.undo.removedChannels.other": "{count} ಚಾನಲ್‌ಗಳನ್ನು ತೆಗೆದುಹಾಕಲಾಗಿದೆ.",
+  "filters.undo.putBack": "ಮರಳಿ ಇಡಲಾಗಿದೆ.",
+  "filters.firstFilter.bubble": "ಅದು ಈಗ ಜರಡಿಯಲ್ಲಿ ಸೋಸಿಹೋಯಿತು.",
+  "filters.allowedOnly.bubble": "ಈಗ ನಿಮ್ಮ ಅನುಮತಿಸಿದ ಪಟ್ಟಿ ಮಾತ್ರ ಹಾದುಹೋಗುತ್ತದೆ.",
+  "controls.emptySieve.bubble": "ಜರಡಿಯಲ್ಲಿ ಇನ್ನೂ ಏನೂ ಇಲ್ಲ. ಮೊದಲ ಫಿಲ್ಟರ್ ಸೇರಿಸಿ.",
+  "controls.emptySieve.action": "ಮೊದಲ ಫಿಲ್ಟರ್ ಸೇರಿಸಿ"
 }

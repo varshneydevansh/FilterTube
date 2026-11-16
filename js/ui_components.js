@@ -1209,11 +1209,190 @@ const UIComponents = (() => {
         }, duration);
     }
 
+
+    // ============================================================================
+    // UNDO BAR (the app's PaperUndoBar + FilterRemovalUndo)
+    // ============================================================================
+    // A paper bar rises at the foot after a rule is removed: "Removed “x”." and Undo, with a brick
+    // line draining over 5 s (paused while hovered or focused). A second removal crossfades the text
+    // and restarts the line; Undo puts the batch back, plays the undo swish (optional sound) and says
+    // "Put back." to screen readers.
+    const UNDO_HOLD_MS = 5000;
+    let undoBar = null;
+
+    function pluralText(key, fallbackOne, fallbackOther, count) {
+        let locale = 'en';
+        try { locale = window.FilterTubeUiLocalization?.locale || document.documentElement.lang || 'en'; } catch (e) { }
+        let category = 'other';
+        try { category = new Intl.PluralRules(locale).select(count); } catch (e) { }
+        let formatted = String(count);
+        try { formatted = new Intl.NumberFormat(locale).format(count); } catch (e) { }
+        for (const candidate of [category, 'other']) {
+            try {
+                const text = window.FilterTubeUiLocalization?.text?.(`${key}.${candidate}`, { count: formatted });
+                if (typeof text === 'string' && text.trim() && text !== `${key}.${candidate}`) return text;
+            } catch (e) { }
+        }
+        return (category === 'one' ? fallbackOne : fallbackOther).replace('{count}', formatted);
+    }
+
+    function closeUndoBar(bar, immediate = false) {
+        if (!bar) return;
+        clearTimeout(bar.__ftTimer);
+        if (undoBar === bar) undoBar = null;
+        bar.classList.remove('is-shown');
+        bar.classList.add('is-leaving');
+        setTimeout(() => bar.remove(), immediate ? 0 : 200);
+    }
+
+    function showUndoBar({ message, actionLabel, onUndo, holdMs = UNDO_HOLD_MS } = {}) {
+        let bar = undoBar && undoBar.isConnected ? undoBar : null;
+        if (!bar) {
+            bar = document.createElement('div');
+            bar.className = 'pk-undo-bar';
+            bar.setAttribute('role', 'status');
+            bar.setAttribute('aria-live', 'polite');
+            const text = document.createElement('span');
+            text.className = 'pk-undo-bar__text';
+            const action = document.createElement('button');
+            action.type = 'button';
+            action.className = 'pk-undo-bar__action';
+            const drain = document.createElement('span');
+            drain.className = 'pk-undo-bar__drain';
+            drain.setAttribute('aria-hidden', 'true');
+            bar.append(text, action, drain);
+            const pause = paused => {
+                bar.classList.toggle('is-paused', paused);
+                clearTimeout(bar.__ftTimer);
+                if (paused) {
+                    bar.__ftRemaining = Math.max(400, bar.__ftDeadline - Date.now());
+                } else {
+                    bar.__ftDeadline = Date.now() + (bar.__ftRemaining || holdMs);
+                    bar.__ftTimer = setTimeout(() => closeUndoBar(bar), bar.__ftRemaining || holdMs);
+                }
+            };
+            bar.addEventListener('mouseenter', () => pause(true));
+            bar.addEventListener('mouseleave', () => pause(false));
+            bar.addEventListener('focusin', () => pause(true));
+            bar.addEventListener('focusout', () => pause(false));
+            action.addEventListener('click', async () => {
+                const handler = bar.__ftOnUndo;
+                bar.__ftOnUndo = null;
+                if (typeof handler !== 'function') return;
+                clearTimeout(bar.__ftTimer);
+                action.disabled = true;
+                let ok = false;
+                try { ok = (await handler()) !== false; } catch (e) { ok = false; }
+                if (ok) {
+                    try { window.FilterTubeMascots?.playSound?.('undo'); } catch (e) { }
+                    text.textContent = localizedComponentText('filters.undo.putBack', 'Put back.');
+                    action.hidden = true;
+                    bar.classList.add('is-done');
+                    setTimeout(() => closeUndoBar(bar), 1400);
+                } else {
+                    closeUndoBar(bar);
+                }
+            });
+            document.body.appendChild(bar);
+            undoBar = bar;
+            requestAnimationFrame(() => bar.classList.add('is-shown'));
+        } else {
+            bar.classList.remove('is-swapping');
+            void bar.offsetWidth;
+            bar.classList.add('is-swapping');
+        }
+        const text = bar.querySelector('.pk-undo-bar__text');
+        const action = bar.querySelector('.pk-undo-bar__action');
+        text.textContent = message || '';
+        action.textContent = actionLabel || localizedComponentText('filters.undo.action', 'Undo');
+        action.hidden = false;
+        action.disabled = false;
+        bar.classList.remove('is-done');
+        bar.__ftOnUndo = onUndo;
+        bar.__ftRemaining = holdMs;
+        bar.style.setProperty('--pk-undo-hold', `${holdMs}ms`);
+        const drain = bar.querySelector('.pk-undo-bar__drain');
+        drain.style.animation = 'none';
+        void drain.offsetWidth;
+        drain.style.animation = '';
+        clearTimeout(bar.__ftTimer);
+        bar.__ftDeadline = Date.now() + holdMs;
+        if (!bar.classList.contains('is-paused')) bar.__ftTimer = setTimeout(() => closeUndoBar(bar), holdMs);
+        return bar;
+    }
+
+    // A new row takes the area's wash and the crayon underline draws under its word (the app's
+    // FilterRowWash): the wash holds 600 ms, then fades over 300 ms and the underline goes with it.
+    const ROW_WASH_HOLD_MS = 600;
+    const ROW_WASH_FADE_MS = 300;
+
+    function cssEscape(value) {
+        try { return CSS.escape(value); } catch (e) { return String(value).replace(/["\\]/g, '\\$&'); }
+    }
+
+    function highlightAddedRows(selector) {
+        const rows = Array.from(document.querySelectorAll(selector)).filter(row => row.offsetParent !== null);
+        const reduced = (() => { try { return matchMedia('(prefers-reduced-motion: reduce)').matches; } catch (e) { return false; } })();
+        const doodles = document.documentElement.getAttribute('data-ft-companion') !== 'off';
+        rows.forEach(row => {
+            row.classList.remove('pk-row-added', 'pk-row-added--fading');
+            void row.offsetWidth;
+            row.classList.add('pk-row-added');
+            const word = row.querySelector('.item-word, .keyword-text, .channel-name, .item-left') || null;
+            const mark = doodles && word && window.FilterTubeDoodles?.underline ? window.FilterTubeDoodles.underline(word) : null;
+            setTimeout(() => {
+                row.classList.add('pk-row-added--fading');
+                setTimeout(() => {
+                    row.classList.remove('pk-row-added', 'pk-row-added--fading');
+                    if (mark && word) window.FilterTubeDoodles.clear(word);
+                }, reduced ? 0 : ROW_WASH_FADE_MS);
+            }, ROW_WASH_HOLD_MS);
+        });
+    }
+
+    function addedRowSelector(eventType, data) {
+        if (eventType === 'keywordAdded' || eventType === 'kidsKeywordAdded') {
+            const word = typeof data?.word === 'string' ? data.word.trim().toLowerCase() : '';
+            return word ? `[data-ft-rule-word="${cssEscape(word)}"]` : '';
+        }
+        const channel = data?.channel;
+        const key = String(channel?.id || channel?.handle || channel?.customUrl || channel?.name || '').trim().toLowerCase();
+        return key ? `[data-ft-rule-channel="${cssEscape(key)}"]` : '';
+    }
+
+    /** Offers Undo after every rule removal the state manager makes (Main and Kids, both lists), and
+     * marks each newly added row. */
+    function attachRemovalUndo(stateManager) {
+        if (!stateManager?.subscribe || typeof stateManager.getRemovalBatch !== 'function') return () => {};
+        const removals = new Set(['keywordRemoved', 'channelRemoved', 'kidsKeywordRemoved', 'kidsChannelRemoved']);
+        const additions = new Set(['keywordAdded', 'channelAdded', 'kidsKeywordAdded', 'kidsChannelAdded']);
+        return stateManager.subscribe((eventType, data) => {
+            if (additions.has(eventType) && data?.restored !== true) {
+                const selector = addedRowSelector(eventType, data);
+                // After the page's own listener has drawn the list.
+                if (selector) setTimeout(() => requestAnimationFrame(() => highlightAddedRows(selector)), 0);
+                return;
+            }
+            if (!removals.has(eventType)) return;
+            const batch = stateManager.getRemovalBatch();
+            if (!batch || batch.count < 1) return;
+            const words = /keyword/i.test(batch.kind);
+            const message = batch.count === 1 && batch.label
+                ? localizedComponentText('filters.undo.removedOne', 'Removed “{name}”.', { name: batch.label })
+                : (words
+                    ? pluralText('filters.undo.removedWords', 'Removed {count} word.', 'Removed {count} words.', batch.count)
+                    : pluralText('filters.undo.removedChannels', 'Removed {count} channel.', 'Removed {count} channels.', batch.count));
+            showUndoBar({ message, onUndo: () => stateManager.undoRemoval(batch.id) });
+        });
+    }
+
     // ============================================================================
     // PUBLIC API
     // ============================================================================
 
     return {
+        showUndoBar,
+        attachRemovalUndo,
         Colors,
         getProfileColors,
         PROFILE_AVATAR_DOODLES,

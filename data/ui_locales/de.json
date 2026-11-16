@@ -2850,5 +2850,16 @@
   "sync.relay.title": "Über das Internet synchronisieren?",
   "sync.relay.body": "Die Internet-Synchronisierung nutzt ein kleines Relay, das vom Entwickler von FilterTube betrieben wird, um deine Geräte zu verbinden. Es kann nicht lesen, was du synchronisierst, denn das ist Ende-zu-Ende-verschlüsselt. Es sieht eine Geräte-ID, deine IP-Adresse und wann du synchronisierst. Der STUN-Server von Google hilft, einen Verbindungsweg zu finden, und sieht ebenfalls deine IP-Adresse. Die Synchronisierung in der Nähe nutzt keines von beiden.",
   "sync.relay.continue": "Weiter",
-  "sync.relay.notNow": "Jetzt nicht"
+  "sync.relay.notNow": "Jetzt nicht",
+  "filters.undo.action": "Rückgängig",
+  "filters.undo.removedOne": "„{name}“ entfernt.",
+  "filters.undo.removedWords.one": "{count} Wort entfernt.",
+  "filters.undo.removedWords.other": "{count} Wörter entfernt.",
+  "filters.undo.removedChannels.one": "{count} Kanal entfernt.",
+  "filters.undo.removedChannels.other": "{count} Kanäle entfernt.",
+  "filters.undo.putBack": "Wiederhergestellt.",
+  "filters.firstFilter.bubble": "Das ist jetzt ausgesiebt.",
+  "filters.allowedOnly.bubble": "Jetzt kommt nur noch deine Erlaubt-Liste durch.",
+  "controls.emptySieve.bubble": "Noch nichts im Sieb. Füge einen ersten Filter hinzu.",
+  "controls.emptySieve.action": "Ersten Filter hinzufügen"
 }

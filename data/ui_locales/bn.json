@@ -2850,5 +2850,16 @@
   "sync.relay.title": "ইন্টারনেটে সিঙ্ক করবেন?",
   "sync.relay.body": "ইন্টারনেট সিঙ্ক আপনার ডিভাইসগুলো যুক্ত করতে FilterTube-এর ডেভেলপারের চালানো একটি ছোট রিলে ব্যবহার করে। আপনি যা সিঙ্ক করেন তা এটি পড়তে পারে না, কারণ সেটি এন্ড-টু-এন্ড এনক্রিপ্টেড। এটি একটি ডিভাইস আইডি, আপনার IP ঠিকানা এবং কখন সিঙ্ক করেন তা দেখে। Google-এর STUN সার্ভার সংযোগের পথ খুঁজতে সাহায্য করে এবং সেটিও আপনার IP ঠিকানা দেখে। কাছাকাছি সিঙ্ক এর কোনোটিই ব্যবহার করে না।",
   "sync.relay.continue": "চালিয়ে যান",
-  "sync.relay.notNow": "এখন না"
+  "sync.relay.notNow": "এখন না",
+  "filters.undo.action": "পূর্বাবস্থা",
+  "filters.undo.removedOne": "“{name}” সরানো হয়েছে।",
+  "filters.undo.removedWords.one": "{count}টি শব্দ সরানো হয়েছে।",
+  "filters.undo.removedWords.other": "{count}টি শব্দ সরানো হয়েছে।",
+  "filters.undo.removedChannels.one": "{count}টি চ্যানেল সরানো হয়েছে।",
+  "filters.undo.removedChannels.other": "{count}টি চ্যানেল সরানো হয়েছে।",
+  "filters.undo.putBack": "ফিরিয়ে আনা হয়েছে।",
+  "filters.firstFilter.bubble": "ওটা এখন ছাঁকনিতে ছেঁকে বাদ গেল।",
+  "filters.allowedOnly.bubble": "এখন শুধু তোমার অনুমোদিত তালিকাই পার হবে।",
+  "controls.emptySieve.bubble": "ছাঁকনিতে এখনও কিছু নেই। প্রথম ফিল্টার যোগ করো।",
+  "controls.emptySieve.action": "প্রথম ফিল্টার যোগ করো"
 }

@@ -745,3 +745,73 @@ body.ft-extension-surface .ft-study-status.is-hold { background: var(--pk-sage) 
   justify-items: start;
   padding: 0.25rem 0 0;
 }
+
+/* The undo bar after a removal (the app's PaperUndoBar): a paper sheet at the foot, at most 560 px
+ * wide, rising 16 px over 220 ms; the brick line along its foot drains over the hold (5 s), paused
+ * while hovered or focused; a second removal crossfades the words (120 ms). */
+.pk-undo-bar {
+  position: fixed;
+  z-index: 10050;
+  inset-inline: 16px;
+  bottom: 16px;
+  margin-inline: auto;
+  max-width: 560px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 12px 14px 18px;
+  overflow: hidden;
+  border: 1px solid var(--pk-line);
+  border-radius: 16px;
+  background: var(--pk-paper);
+  color: var(--pk-ink);
+  box-shadow: 0 3px 0 var(--pk-desk), 0 14px 30px -18px rgba(27, 26, 24, 0.45);
+  font: 500 14px/1.4 system-ui, sans-serif;
+  opacity: 0;
+  transform: translateY(16px);
+  transition: opacity 220ms cubic-bezier(0.2, 0, 0, 1), transform 220ms cubic-bezier(0.2, 0, 0, 1);
+}
+.pk-undo-bar.is-shown { opacity: 1; transform: none; }
+.pk-undo-bar.is-leaving { opacity: 0; transform: translateY(8px); transition-duration: 160ms; }
+.pk-undo-bar.is-swapping .pk-undo-bar__text { animation: pk-undo-swap 120ms linear; }
+.pk-undo-bar__text { flex: 1 1 auto; min-width: 0; overflow-wrap: anywhere; }
+.pk-undo-bar__action {
+  flex: none;
+  min-height: 36px;
+  padding: 6px 16px;
+  border: 0;
+  border-radius: 999px;
+  background: transparent;
+  color: var(--pk-brick);
+  font: 600 14px/1 "FilterTube Outfit", "Outfit", system-ui, sans-serif;
+  cursor: pointer;
+}
+.pk-undo-bar__action:hover { background: var(--pk-rose); }
+.pk-undo-bar__action:focus-visible { outline: 2px solid var(--pk-brick); outline-offset: 2px; }
+.pk-undo-bar__drain {
+  position: absolute;
+  inset-inline: 0;
+  bottom: 0;
+  height: 3px;
+  background: var(--pk-brick);
+  transform-origin: 0 50%;
+  animation: pk-undo-drain var(--pk-undo-hold, 5000ms) linear forwards;
+}
+[dir="rtl"] .pk-undo-bar__drain { transform-origin: 100% 50%; }
+.pk-undo-bar.is-paused .pk-undo-bar__drain { animation-play-state: paused; }
+.pk-undo-bar.is-done .pk-undo-bar__drain { visibility: hidden; }
+@keyframes pk-undo-drain { from { transform: scaleX(1); } to { transform: scaleX(0); } }
+@keyframes pk-undo-swap { from { opacity: 0.2; } to { opacity: 1; } }
+
+/* A new rule row (the app's FilterRowWash): the area's wash, held, then faded over 300 ms. */
+.pk-row-added {
+  background: var(--pk-area-wash, var(--pk-rose)) !important;
+  transition: background-color 300ms cubic-bezier(0.4, 0, 0.2, 1);
+}
+.pk-row-added.pk-row-added--fading { background-color: transparent !important; background-image: none !important; }
+
+@media (prefers-reduced-motion: reduce) {
+  .pk-undo-bar, .pk-undo-bar.is-leaving { transition: opacity 150ms linear; transform: none; }
+  .pk-undo-bar.is-swapping .pk-undo-bar__text { animation: none; }
+  .pk-row-added { transition: none; }
+}

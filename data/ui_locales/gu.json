@@ -2850,5 +2850,16 @@
   "sync.relay.title": "ઇન્ટરનેટ પર સિંક કરીએ?",
   "sync.relay.body": "ઇન્ટરનેટ સિંક તમારા ડિવાઇસ જોડવા માટે FilterTubeના ડેવલપર દ્વારા ચલાવાતું એક નાનું રિલે વાપરે છે. તમે શું સિંક કરો છો તે તે વાંચી શકતું નથી, કારણ કે તે એન્ડ-ટુ-એન્ડ એન્ક્રિપ્ટેડ છે. તે ડિવાઇસ ID, તમારું IP સરનામું અને સિંકનો સમય જુએ છે. Googleનું STUN સર્વર કનેક્શનનો માર્ગ શોધવામાં મદદ કરે છે અને તે પણ તમારું IP સરનામું જુએ છે. નજીકનું સિંક આમાંથી કોઈ વાપરતું નથી.",
   "sync.relay.continue": "ચાલુ રાખો",
-  "sync.relay.notNow": "હમણાં નહીં"
+  "sync.relay.notNow": "હમણાં નહીં",
+  "filters.undo.action": "પૂર્વવત્",
+  "filters.undo.removedOne": "“{name}” દૂર કર્યું.",
+  "filters.undo.removedWords.one": "{count} શબ્દ દૂર કર્યો.",
+  "filters.undo.removedWords.other": "{count} શબ્દો દૂર કર્યા.",
+  "filters.undo.removedChannels.one": "{count} ચેનલ દૂર કરી.",
+  "filters.undo.removedChannels.other": "{count} ચેનલ દૂર કરી.",
+  "filters.undo.putBack": "પાછું મૂક્યું.",
+  "filters.firstFilter.bubble": "એ હવે ચાળણીમાં ચળાઈ ગયું.",
+  "filters.allowedOnly.bubble": "હવે ફક્ત તમારી મંજૂર યાદી જ પસાર થશે.",
+  "controls.emptySieve.bubble": "ચાળણીમાં હજી કંઈ નથી. પહેલું ફિલ્ટર ઉમેરો.",
+  "controls.emptySieve.action": "પહેલું ફિલ્ટર ઉમેરો"
 }

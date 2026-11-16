@@ -2850,5 +2850,14 @@
   "sync.relay.title": "Múṣiṣẹ́pọ̀ lórí ayélujára?",
   "sync.relay.body": "Ìmúṣiṣẹ́pọ̀ ayélujára ń lo relay kékeré tí olùgbéejáde FilterTube ń ṣiṣẹ́ láti so àwọn ẹ̀rọ rẹ pọ̀. Kò lè ka ohun tí o ń múṣiṣẹ́pọ̀, nítorí pé a ti fi ìpàrokò òpin-sí-òpin dáàbò bò ó. Ó ń rí ID ẹ̀rọ, àdírẹ́sì IP rẹ àti ìgbà tí o ń múṣiṣẹ́pọ̀. Sáfà STUN ti Google ń ṣèrànwọ́ láti wá ọ̀nà ìsopọ̀, òun náà sì ń rí àdírẹ́sì IP rẹ. Ìmúṣiṣẹ́pọ̀ nítòsí kò lo èyíkéyìí nínú wọn.",
   "sync.relay.continue": "Tẹ̀síwájú",
-  "sync.relay.notNow": "Kì í ṣe báyìí"
+  "sync.relay.notNow": "Kì í ṣe báyìí",
+  "filters.undo.action": "Dá padà",
+  "filters.undo.removedOne": "A ti yọ “{name}” kúrò.",
+  "filters.undo.removedWords.other": "A ti yọ ọ̀rọ̀ {count} kúrò.",
+  "filters.undo.removedChannels.other": "A ti yọ ikanni {count} kúrò.",
+  "filters.undo.putBack": "A ti dá a padà.",
+  "filters.firstFilter.bubble": "Ìyẹn ti kọjá nínú àsẹ́ báyìí.",
+  "filters.allowedOnly.bubble": "Àkójọ tí o fọwọ́ sí nìkan ló ń kọjá báyìí.",
+  "controls.emptySieve.bubble": "Kò sí nǹkan nínú àsẹ́ síbẹ̀. Fi àlẹ̀mọ́ àkọ́kọ́ kún un.",
+  "controls.emptySieve.action": "Fi àlẹ̀mọ́ àkọ́kọ́ kún un"
 }

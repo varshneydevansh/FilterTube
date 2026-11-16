@@ -2850,5 +2850,14 @@
   "sync.relay.title": "用互联网同步？",
   "sync.relay.body": "互联网同步用 FilterTube 开发者运营个一只小中继来连牢侬个设备。伊读勿到侬同步个内容，因为是端到端加密个。伊看得到设备 ID、侬个 IP 地址搭同步个辰光。Google 个 STUN 服务器帮忙寻连接路径，伊也看得到侬个 IP 地址。附近同步两样侪勿用。",
   "sync.relay.continue": "继续",
-  "sync.relay.notNow": "现在勿要"
+  "sync.relay.notNow": "现在勿要",
+  "filters.undo.action": "撤销",
+  "filters.undo.removedOne": "已移除“{name}”。",
+  "filters.undo.removedWords.other": "已移除 {count} 个词。",
+  "filters.undo.removedChannels.other": "已移除 {count} 个频道。",
+  "filters.undo.putBack": "已放回。",
+  "filters.firstFilter.bubble": "迭个已经筛脱了。",
+  "filters.allowedOnly.bubble": "现在只有侬允许个名单好通过。",
+  "controls.emptySieve.bubble": "筛子里还呒没物事。加第一个过滤器。",
+  "controls.emptySieve.action": "加第一个过滤器"
 }
