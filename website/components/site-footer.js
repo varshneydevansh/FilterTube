@@ -52,7 +52,9 @@ export function SiteFooter() {
                 </h2>
                 <p className="mt-5 max-w-[56ch] text-base leading-8 text-[var(--color-muted)]">
                   Calmer viewing on Android phones and tablets, and in your
-                  browser. iPhone, iPad and Android TV are in development.
+                  browser. iPhone and iPad can install it directly while
+                  the App Store listing is in progress. Android TV is in
+                  development.
                   Explore each platform’s features and availability.
                 </p>
                 <div className="mt-8 flex flex-col gap-3 sm:flex-row">

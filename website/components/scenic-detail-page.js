@@ -93,7 +93,7 @@ function RelatedCard({ relatedPage }) {
   );
 }
 
-export function ScenicDetailPage({ page, relatedPages }) {
+export function ScenicDetailPage({ page, relatedPages, children = null }) {
   const tone = getTonePreset(page.tone);
   const Icon = page.icon;
   const isDark = page.tone === "ink";
@@ -264,6 +264,8 @@ export function ScenicDetailPage({ page, relatedPages }) {
           </div>
         ) : null}
       </section>
+
+      {children}
 
       {page.appPreview ? (
         <section className="px-4 py-10 md:px-6 md:py-16">

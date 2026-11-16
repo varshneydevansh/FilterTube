@@ -9,7 +9,10 @@ import { ScenicDetailPage } from "@/components/scenic-detail-page";
 export const dynamicParams = false;
 
 export function generateStaticParams() {
-  return platformOrder.map((slug) => ({ slug }));
+  // /ios has its own route (app/ios/page.js) with the direct-install guide.
+  return platformOrder
+    .filter((slug) => slug !== "ios")
+    .map((slug) => ({ slug }));
 }
 
 export async function generateMetadata({ params }) {

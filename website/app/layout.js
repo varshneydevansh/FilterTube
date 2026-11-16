@@ -46,11 +46,11 @@ export const metadata = {
     template: "%s | FilterTube",
   },
   description:
-    "Calmer viewing on Android and in your browser. Explore family profiles, local filtering, verified peer-to-peer sharing, and iOS and TV development.",
+    "Calmer viewing on Android and in your browser. Explore family profiles, local filtering, verified peer-to-peer sharing, a direct iPhone and iPad install, and TV development.",
   openGraph: {
     title: "FilterTube",
     description:
-      "Your feed, your rules. FilterTube brings local filtering, family controls and verified encrypted device sharing to Android and browsers, with iOS and TV in development.",
+      "Your feed, your rules. FilterTube brings local filtering, family controls and verified encrypted device sharing to Android, iPhone, iPad and browsers, with TV in development.",
     url: "https://filtertube.in",
     siteName: "FilterTube",
     images: [

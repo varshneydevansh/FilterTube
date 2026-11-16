@@ -76,7 +76,7 @@ export const browserLinks = [
   },
   {
     name: "iOS",
-    note: "App status",
+    note: "Install directly",
     href: "/ios",
     logo: "/apps/app-store-transparent.png",
     internal: true,
@@ -707,11 +707,11 @@ export const detailPages = {
     eyebrow: "Dedicated apps",
     navTitle: "Mobile overview",
     routeSummary:
-      "A calm overview of the public Android app, finalizing Apple builds, and the future TV app family.",
+      "A calm overview of the public Android app, the direct iPhone and iPad install, and the future TV app family.",
     titleLead: "A calm FilterTube companion for",
     titleDisplay: "phones and tablets",
     description:
-      "The Android phone and tablet app is publicly available on Google Play. The native iPhone and iPad build is in final alignment, with Apple Developer account access currently delaying TestFlight.",
+      "The Android phone and tablet app is publicly available on Google Play. The native iPhone and iPad app can be installed directly with SideStore while the App Store listing is in progress.",
     heroArtworks: [
       {
         src: "/apps/android.png",
@@ -792,15 +792,15 @@ export const detailPages = {
     slug: "ios",
     icon: DeviceMobile,
     tone: "sky",
-    status: "Public access pending",
+    status: "Install directly · App Store in progress",
     eyebrow: "iPhone + iPad",
     navTitle: "iPhone and iPad",
     routeSummary:
-      "Native iPhone and iPad viewing, filters, profiles, and family controls; public distribution is not available yet.",
+      "Native iPhone and iPad viewing, filters, profiles, and family controls. Install it directly with SideStore while the App Store listing is in progress.",
     titleLead: "A native FilterTube app for",
     titleDisplay: "iPhone and iPad",
     description:
-      "FilterTube brings Main and Kids viewing, native controls, profiles, PINs, and protected time to iPhone and iPad. The builds are in testing; public TestFlight and App Store access are not available while developer enrollment is unresolved.",
+      "FilterTube brings Main and Kids viewing, native controls, profiles, PINs, and protected time to iPhone and iPad. The App Store listing is in progress; until then you can install the app directly with SideStore or AltStore.",
     heroScreensLabel: "iOS simulator development build · hover or tap a screen",
     heroScreens: [
       {
@@ -827,8 +827,8 @@ export const detailPages = {
     ],
     chips: ["Protected now", "Profile switching", "Quick toggles"],
     primaryCta: {
-      label: "Public access status",
-      href: "/downloads#ios-status",
+      label: "Install on iPhone or iPad",
+      href: "#install",
       external: false,
     },
     secondaryCta: {
@@ -840,7 +840,7 @@ export const detailPages = {
       src: "/videos/ios/ios_hero_slow_540.mp4",
       label: "iPhone app preview",
       caption:
-        "A short native iPhone preview for the current release-testing build.",
+        "A short native iPhone preview of the current build.",
     },
     previewLabel: "iPhone intent",
     previewTitle: "Fast status, shallow depth, and one-thumb rule changes.",
@@ -874,16 +874,16 @@ export const detailPages = {
       {
         id: "ipad",
         title: "Room for iPad",
-        body: "The iPad layout gives browsing, rule editing, and family setup more space while keeping the same profile boundaries. Public distribution remains pending for both devices.",
+        body: "The iPad layout gives browsing, rule editing, and family setup more space while keeping the same profile boundaries. The same direct install works on both devices.",
       },
     ],
     milestoneTitle: "iOS availability",
     milestoneIntro:
-      "A native build in testing is different from an app users can install from a public listing.",
+      "You can install the app directly today. The App Store listing is still in progress.",
     milestones: [
-      "iPhone and iPad public TestFlight and App Store access are pending.",
+      "Install directly on iPhone and iPad with SideStore or AltStore. The App Store listing is in progress.",
       "Pair verified devices and send parent updates. Newer personal Auto-sync features are not yet available on iOS.",
-      "Follow this page for public installation links when testing and distribution are ready.",
+      "This page will link the App Store listing as soon as it is live.",
     ],
     related: ["mobile", "ipados", "android"],
   },
@@ -891,7 +891,7 @@ export const detailPages = {
     slug: "ipados",
     icon: MonitorPlay,
     tone: "sky",
-    status: "Public access pending",
+    status: "Install directly · App Store in progress",
     eyebrow: "iPad app",
     navTitle: "iPadOS",
     routeSummary:
@@ -899,7 +899,7 @@ export const detailPages = {
     titleLead: "A wider FilterTube workspace for",
     titleDisplay: "iPad and home setup",
     description:
-      "The native iPad build is in final build and testing alignment alongside iPhone. Public TestFlight access is pending while developer enrollment is unresolved.",
+      "The native iPad app ships alongside iPhone. Install it directly with SideStore while the App Store listing is in progress.",
     heroArtwork: {
       src: "/apps/app-store-transparent.png",
       alt: "FilterTube iPad app artwork",
@@ -1435,7 +1435,7 @@ export const detailPages = {
     milestones: [
       "Android phones and tablets: the custom Main and Kids app is on Google Play. No invitation or email is needed.",
       "Browser extension: adds filtering to supported Kids pages. Use the full settings page to manage profiles and Kids rules.",
-      "iPhone and iPad: development builds include Kids viewing and family controls; public App Store and TestFlight access is pending.",
+      "iPhone and iPad: Kids viewing and family controls are included. Install directly with SideStore while the App Store listing is in progress.",
       "Android TV: full Kids and family-control parity is still in development. Fire TV compatibility is planned. The phone listing is not a TV release.",
       "Rules stay local. Optional verified device sharing is encrypted; helpers or relay services may be involved. Filters support parent decisions, rather than replacing review of what a child watches.",
     ],

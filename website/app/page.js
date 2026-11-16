@@ -182,10 +182,10 @@ function AppReleaseStatusSection() {
     {
       eyebrow: "iPhone + iPad",
       title: "iPhone and iPad, together.",
-      body: "A native app for smaller screens and a wider iPad workspace. In development; public TestFlight and App Store access are not available yet.",
+      body: "A native app for smaller screens and a wider iPad workspace. Install it directly with SideStore while the App Store listing is in progress.",
       image: "/apps/app-store-transparent.png",
       imageAlt: "FilterTube iPhone and iPad app artwork",
-      action: "Follow iOS status",
+      action: "Install on iPhone or iPad",
       href: "/ios",
       platform: "ios",
       icon: AppleLogo,

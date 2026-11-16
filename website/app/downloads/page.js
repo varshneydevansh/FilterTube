@@ -7,6 +7,8 @@ import {
   ShieldCheck,
 } from "@phosphor-icons/react/ssr";
 
+import Link from "next/link";
+
 import { LatestReleaseAssets } from "@/components/latest-release-assets";
 import { HeroVideo } from "@/components/hero-video";
 import { ActionLink, Panel } from "@/components/marketing-ui";
@@ -21,7 +23,7 @@ import {
 export const metadata = {
   title: "Downloads",
   description:
-    "Download FilterTube for browsers, install the public Android app from Google Play, or follow final iPhone and iPad testing progress.",
+    "Download FilterTube for browsers, install the public Android app from Google Play, or install the iPhone and iPad app directly with SideStore.",
 };
 
 const releaseHref = `${githubHref}/releases`;
@@ -72,15 +74,15 @@ const primaryDownloads = [
   },
   {
     title: "iPhone and iPad",
-    label: "Final testing alignment",
+    label: "Install directly",
     platform: "ios",
     logo: "/apps/app-store-transparent.png",
     description:
-      "The iPhone and iPad build is in final build and testing alignment. Apple Developer account access is delaying TestFlight availability. There is no public TestFlight or App Store install yet.",
+      "I'm working to bring FilterTube to the App Store. Until then, you can install it directly on iPhone and iPad with SideStore, using your own Apple ID. Free, no ads, nothing locked.",
     actions: [
       {
-        label: "iOS status",
-        href: "#ios-status",
+        label: "Install on iPhone or iPad",
+        href: "/ios#install",
         internal: true,
       },
     ],
@@ -131,7 +133,7 @@ const safetyChecks = [
   "Check the SHA-256 file before sideloading direct APK builds.",
   "Keep the Android phone/tablet package as com.filtertube.app.",
   "Android TV / Fire TV should use a separate future package, not this mobile APK.",
-  "iOS should use TestFlight or App Store distribution, not a random IPA download.",
+  "On iPhone and iPad, install only through SideStore or AltStore with the FilterTube source and IPA linked from filtertube.in/ios. Avoid paid signing services.",
 ];
 
 function ExternalTextLink({ href, children }) {
@@ -216,8 +218,8 @@ export default function DownloadsPage() {
               Browser releases stay public on GitHub and store listings. Android
               phone/tablet builds can be attached to the same release stream for
               Google Play, GrapheneOS, and other direct-install users. iPhone
-              and iPad are in final build and testing alignment, with Apple
-              Developer account access currently delaying TestFlight.
+              and iPad can install the app directly with SideStore while the
+              App Store listing is in progress.
             </p>
           </div>
 
@@ -240,14 +242,14 @@ export default function DownloadsPage() {
                   App release state
                 </p>
                 <h2 className="mt-5 font-display text-4xl tracking-[-0.06em] text-[var(--color-ink)] md:text-5xl">
-                  Android is public on Google Play; Apple testing is being
-                  finalized.
+                  Android is public on Google Play; iPhone and iPad install
+                  directly.
                 </h2>
                 <p className="mt-5 text-sm leading-7 text-[var(--color-muted)]">
                   Anyone can install the Android app from Google Play or search
-                  the store for FilterTube. The iPhone and iPad build is in
-                  final alignment, while Apple Developer account access is the
-                  current TestFlight delay. TV remains separate platform work.
+                  the store for FilterTube. iPhone and iPad can install the app
+                  directly with SideStore while the App Store listing is in
+                  progress. TV remains separate platform work.
                 </p>
               </div>
               <div id="ios-status" className="grid gap-3 sm:grid-cols-2">
@@ -267,10 +269,12 @@ export default function DownloadsPage() {
                     iOS and iPadOS
                   </h3>
                   <p className="mt-3 text-sm leading-7 text-[var(--color-muted)]">
-                    Final build and testing alignment is underway. Apple
-                    Developer account access is delaying TestFlight;
-                    Apple-channel testing will open as soon as that access is
-                    resolved.
+                    Install directly with SideStore and your own Apple ID while
+                    the App Store listing is in progress.{" "}
+                    <Link className="font-semibold text-[var(--color-accent)] underline underline-offset-4" href="/ios#install">
+                      See the iPhone and iPad install guide
+                    </Link>
+                    .
                   </p>
                 </div>
               </div>
