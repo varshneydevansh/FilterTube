@@ -15,7 +15,7 @@
     {
       "guid": "filtertube",
       "name": "FilterTube",
-      "description": "FilterTube is a free, local-first content filtering project that lets users control what appears on supported video platforms through blocklists, allowlists, keyword and channel rules, content controls, profiles, and parental protections. FilterTube is designed to keep filtering decisions under the user's control and to minimize reliance on FilterTube-operated services or accounts. The browser extension is open source under the MIT license. The Android app is free and built on the same filtering engine as the extension; the app code itself is not open source, and no FilterTube servers keep user data. Android TV and iOS/iPadOS support are under development.",
+      "description": "FilterTube is a free, local-first content filtering project that lets users control what appears on supported video platforms through blocklists, allowlists, keyword and channel rules, content controls, profiles, and parental protections. FilterTube is designed to keep filtering decisions under the user's control and to minimize reliance on FilterTube-operated services or accounts. The browser extension is open source under the MIT license. The Android app is free and built on the same filtering engine as the extension; the app code itself is not open source. Like the extension, the app needs no FilterTube sign-up, and no FilterTube servers keep user data. Android TV and iOS/iPadOS support are under development.",
       "webpageUrl": {
         "url": "https://filtertube.in"
       },

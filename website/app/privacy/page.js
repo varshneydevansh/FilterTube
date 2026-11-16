@@ -764,9 +764,9 @@ export default function PrivacyPage() {
                 The FilterTube apps for Android, TV and iOS are free and built
                 on the same filtering engine as the open-source extension. The
                 app code itself is not open source. The privacy promise here is
-                based on product behavior: local filtering, no FilterTube account
-                for rules or history, no FilterTube servers keeping your data,
-                and optional open-source P2P sync.
+                based on product behavior: local filtering, no FilterTube
+                sign-up or account (just like the extension), no FilterTube
+                servers keeping your data, and optional open-source P2P sync.
               </p>
             </PolicySection>
 
