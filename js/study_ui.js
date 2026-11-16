@@ -910,7 +910,7 @@
         const channels = plural('study.searchHow.channels', content.channels, '{count} channel', '{count} channels');
         const lines = [content.topics.length
             ? t('study.searchHow.body', 'While you study, search shows lessons from your {channels} and your topics ({topics}). Anything else waits until study ends.',
-                { channels, topics: `${content.topics.join(', ')}…` })
+                { channels, topics: `${content.topics.map(topic => (Engine?.topicLabel ? Engine.topicLabel(topic, language()) : topic)).join(', ')}…` })
             : t('study.searchHow.bodyNoTopics', 'While you study, search shows lessons from your {channels}. Anything else waits until study ends.', { channels })];
         if (content.examples.length >= 2) lines.push(t('study.searchHow.try', 'Try “{first}” or “{second}”.', { first: content.examples[0], second: content.examples[1] }));
         if (child) lines.push(t('study.searchHow.askParent', 'Ask a parent for more.'));

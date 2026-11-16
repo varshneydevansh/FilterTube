@@ -50,7 +50,7 @@ test('study search explainer card: the app\'s words, and "Ask a parent for more.
     const study = { activePackIds: ['in_gate'], packEdits: { in_gate: { variant: 'civil' } } };
     const words = card => card.children.map(child => child.textContent).join(' | ');
     const self = Ui.searchExplainerCard(study, catalog, false);
-    assert.equal(words(self), 'How search works while studying | While you study, search shows lessons from your 9 channels and your topics (fluid mechanics, structural analysis…). Anything else waits until study ends. Try “cement” or “beam deflection”.');
+    assert.equal(words(self), 'How search works while studying | While you study, search shows lessons from your 9 channels and your topics (Fluid mechanics, Structural analysis…). Anything else waits until study ends. Try “cement” or “beam deflection”.');
     assert.match(words(Ui.searchExplainerCard(study, catalog, true)), /Ask a parent for more\.$/);
     assert.equal(Ui.searchExplainerCard({ activePackIds: [] }, catalog, false), null);
     assert.doesNotMatch(words(self), /YouTube/);

@@ -496,6 +496,33 @@
         return first ? suggest(SUGGESTION_KINDS.SEARCH_EXAMPLES, suggestionSeed(first.packId, first.variantId)) : [];
     }
 
+    // Android StudyTopicLabel: known acronyms stay upper case in a topic label.
+    const TOPIC_ACRONYMS = new Set([
+        'gate', 'cse', 'ece', 'eee', 'dbms', 'os', 'dsa', 'oop', 'oops', 'sql', 'ai', 'ml', 'nlp', 'cn', 'toc', 'coa',
+        'upsc', 'ssc', 'neet', 'jee', 'cat', 'gre', 'gmat', 'ielts', 'toefl', 'sat', 'act', 'cbse', 'icse', 'ncert',
+        'html', 'css', 'api', 'dp', 'bfs', 'dfs', 'gk', 'ca', 'cs', 'it', 'ias', 'ips', 'pcm', 'pcb', 'mba', 'llb',
+        'clat', 'nda', 'cds', 'ibps', 'rbi', 'sbi', 'ugc', 'net', 'csir', 'mcat', 'lsat', 'bba', 'bca', 'mca', 'ib', 'igcse', 'ap'
+    ]);
+
+    /**
+     * A topic as a label (Android StudyTopicLabel.of): sentence case, but known acronyms stay upper case
+     * ("dbms" -> "DBMS", "gate cse" -> "GATE CSE", "algorithms and dsa" -> "Algorithms and DSA").
+     */
+    function topicLabel(topic, locale) {
+        const value = String(topic ?? '');
+        const words = value.trim().split(/\s+/).filter(Boolean);
+        if (!words.length) return value;
+        const lang = text(locale) || undefined;
+        const lower = word => { try { return word.toLocaleLowerCase(lang); } catch (e) { return word.toLowerCase(); } };
+        const upper = word => { try { return word.toLocaleUpperCase(lang); } catch (e) { return word.toUpperCase(); } };
+        return words.map((word, index) => {
+            const bare = lower(word).replace(/^[,.()&]+|[,.()&]+$/g, '');
+            if (TOPIC_ACRONYMS.has(bare)) return upper(word);
+            if (index === 0) { const [first, ...rest] = [...word]; return upper(first) + rest.join(''); }
+            return word;
+        }).join(' ');
+    }
+
     /**
      * "How search works while studying" (Android StudySearchExplainer.content): how many plan channels
      * study search looks in, two subjects (topics with words of their own; exam names and short words
@@ -1009,7 +1036,7 @@
         SELF_LOCK_MAX_MINUTES, PARENT_LOCK_MAX_MINUTES, STUDY_SOURCE, TOPIC_SOURCE,
         parseTime, localDateKey, splitRounds, planOccurrences, studyClock, studyRulesApply, studyPhase,
         SUGGESTION_KINDS, suggest, suggestionSeed, studyTopics, studyAllowPhrases, topicTerms, topicPatterns,
-        topicsForQuery, exampleSearches, searchExplainer,
+        topicsForQuery, exampleSearches, searchExplainer, topicLabel,
         packVariant, packLayer, activePackLayers, stampPackCopies, studyEffectiveProfile,
         BRANCH_SOURCE, KIDS_KINDS, KIDS_SPACE, AMBIGUOUS_BRANCH_WORDS,
         packChannelsFor, packTopicsFor, hasSeparateBranches, branchTopics, otherBranchTopics,
