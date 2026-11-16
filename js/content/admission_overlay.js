@@ -756,6 +756,7 @@
     function renderAskSent(holder, state, dark, already) {
         const name = state.parentName || askText('askParent.parentFallback', 'Your parent');
         holder.replaceChildren();
+        makeRoomForSheet(holder, false);
         const row = document.createElement('div');
         admissionOverlayStyle(row, { display: 'flex', alignItems: 'center', gap: '12px' });
         const kriti = companionMode === 'off' ? null : createAdmissionMascot('kriti_thinking.webp', 64);
@@ -785,9 +786,17 @@
         }
     }
 
+    /** The card sits inside the player: while the sheet is open the shoo pose steps aside for it. */
+    function makeRoomForSheet(holder, open) {
+        const panel = holder.parentNode;
+        const pose = panel?.querySelector?.('[data-filtertube-admission-mascot]');
+        if (pose) admissionOverlayStyle(pose, { display: open ? 'none' : 'block' });
+    }
+
     function renderAskSheet(holder, target, state, dark) {
         const name = state.parentName || askText('askParent.parentFallback', 'Your parent');
         holder.replaceChildren();
+        makeRoomForSheet(holder, true);
         // The sheet is sun paper (Android AskParentUi), inside the blocked card.
         admissionOverlayStyle(holder, { padding: '16px', borderRadius: '18px', background: dark ? '#2c2716' : '#fff3cf',
             border: `1px solid ${dark ? '#4a4128' : '#ecd9a0'}` });
@@ -854,10 +863,12 @@
         actions.append(cancel, send);
         holder.append(status, actions);
         try { note.focus({ preventScroll: true }); } catch (e) {}
+        try { send.scrollIntoView?.({ block: 'nearest' }); } catch (e) {}
     }
 
     function renderAskStart(holder, target, state, dark) {
         holder.replaceChildren();
+        makeRoomForSheet(holder, false);
         admissionOverlayStyle(holder, { padding: '0', background: 'transparent', border: '0' });
         const ask = askButton(askText('askParent.button', 'Ask to watch'), true, dark);
         ask.setAttribute('data-filtertube-ask-parent', 'true');
