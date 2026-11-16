@@ -944,3 +944,65 @@ body.ft-extension-surface[data-surface="tab-view"] .list-item:not(.channel-item)
   border: 1px solid var(--pk-edge-family, var(--pk-edge-line));
 }
 .ft-ask-hub-row__words { font: 400 18px/1.25 var(--pk-font-display, "FilterTube Delius", "Delius", system-ui, sans-serif); }
+
+/* Channel rows in the app's layout (item_channel.xml): logo, name with the handle under it, delete;
+ * the mapping line on its own ("@handle → UC…" in caption ink, a brand arrow, the id as a soft chip,
+ * scrolling sideways when long), then the chip row with Filter all. No glowing connector, no green box. */
+body.ft-extension-surface[data-surface="tab-view"] .channel-item .channel-name-block {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+body.ft-extension-surface[data-surface="tab-view"] .channel-item .channel-subtitle {
+  margin-top: 2px;
+  color: var(--ft-color-text-secondary);
+  font-size: var(--ft-font-size-caption);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 100%;
+}
+body.ft-extension-surface[data-surface="tab-view"] .channel-item .channel-map-row {
+  padding-inline-start: 3.25rem;
+  padding-top: 8px;
+  overflow-x: auto;
+  scrollbar-width: none;
+}
+body.ft-extension-surface[data-surface="tab-view"] .channel-item .channel-map-row::-webkit-scrollbar { display: none; }
+body.ft-extension-surface[data-surface="tab-view"] .channel-item .channel-map-row .channel-node-container {
+  display: inline-flex;
+  flex-wrap: nowrap;
+  gap: 0;
+  white-space: nowrap;
+}
+body.ft-extension-surface[data-surface="tab-view"] .channel-item .channel-map-row .node-source-text {
+  font-family: inherit;
+  font-weight: 400;
+  overflow-wrap: normal;
+}
+body.ft-extension-surface[data-surface="tab-view"] .channel-item .channel-map-row .node-connector,
+body.ft-extension-surface[data-surface="tab-view"] .channel-item .channel-map-row .node-connector.active {
+  color: #ab4438;
+  filter: none;
+  margin: 0 8px;
+  padding: 0;
+}
+body.ft-extension-surface[data-surface="tab-view"] .channel-item .channel-map-row .node-connector::before,
+body.ft-extension-surface[data-surface="tab-view"] .channel-item .channel-map-row .node-connector::after { content: none; }
+body.ft-extension-surface[data-surface="tab-view"] .channel-item .channel-map-row .node-badge.resolved {
+  font-family: inherit;
+  font-weight: 600;
+  padding: 7px 12px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.87);
+  color: #ab4438;
+  border: 1px solid rgba(168, 159, 143, 0.22);
+  box-shadow: none;
+  max-width: none;
+}
+:root[data-theme="dark"] body.ft-extension-surface[data-surface="tab-view"] .channel-item .channel-map-row .node-badge.resolved {
+  background: rgba(27, 32, 39, 0.9);
+  color: #e0796b;
+  border-color: rgba(255, 255, 255, 0.31);
+}
+body.ft-extension-surface[data-surface="tab-view"] .channel-item > .channel-body-row { padding-top: 8px; }

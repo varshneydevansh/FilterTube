@@ -1570,11 +1570,24 @@ const RenderEngine = (() => {
         logoImg.src = channel.logo || defaultAvatar;
         logoImg.onerror = () => { logoImg.src = defaultAvatar; };
 
-        // Name
+        // Name, then the app's subtitle under it (item_channel.xml channelSubtitle: the handle, else
+        // the custom URL, else the id) when it says something the name doesn't.
         const nameSpan = createChannelNameNode(channel);
+        const nameBlock = document.createElement('div');
+        nameBlock.className = 'channel-name-block';
+        nameBlock.appendChild(nameSpan);
+        const subtitleValue = String(channel?.handleDisplay || channel?.handle || channel?.canonicalHandle
+            || channel?.customUrl || channel?.id || '').trim();
+        if (subtitleValue && subtitleValue.toLowerCase() !== String(nameSpan.textContent || '').trim().toLowerCase()) {
+            const subtitle = document.createElement('div');
+            subtitle.className = 'channel-subtitle';
+            subtitle.textContent = subtitleValue;
+            subtitle.title = subtitleValue;
+            nameBlock.appendChild(subtitle);
+        }
 
         infoGroup.appendChild(logoImg);
-        infoGroup.appendChild(nameSpan);
+        infoGroup.appendChild(nameBlock);
         const ruleBadge = createRuleTargetBadge(ruleTarget);
         if (ruleBadge instanceof Node) infoGroup.appendChild(ruleBadge);
 
@@ -1683,17 +1696,17 @@ const RenderEngine = (() => {
         headerRow.appendChild(headerActions);
         item.appendChild(headerRow);
 
-        // Body row: Node mapping + Filter All toggle
-        const bodyRow = document.createElement('div');
-        bodyRow.className = 'channel-body-row';
-
-        // Node mapping (if enabled)
+        // The app's rows (item_channel.xml): the mapping line on its own ("@handle → UC…", scrolling
+        // sideways when long), then the chip row with Filter all.
         if (showNodeMapping) {
-            const nodeContainer = createNodeMapping(channel);
-            bodyRow.appendChild(nodeContainer);
+            const mapRow = document.createElement('div');
+            mapRow.className = 'channel-map-row';
+            mapRow.appendChild(createNodeMapping(channel));
+            item.appendChild(mapRow);
         }
 
-        // Filter All toggle
+        const bodyRow = document.createElement('div');
+        bodyRow.className = 'channel-body-row';
         const filterAllToggle = createFilterAllToggle(channel, index, profile, { onToggleFilterAll, modeOverride });
         bodyRow.appendChild(filterAllToggle);
 
