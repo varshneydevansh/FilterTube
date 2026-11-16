@@ -579,6 +579,9 @@ function ensureManagedOverlayStyles() {
         style.textContent = `
             #${MANAGED_TIME_LIMIT_OVERLAY_ID},
             #${MANAGED_VIEWING_ROUTE_GATE_OVERLAY_ID} {
+                --ftm-canvas: #f6f2eb; --ftm-paper: #fffcf6; --ftm-desk: #ece4d9; --ftm-ink: #1b1a18;
+                --ftm-muted: #625f58; --ftm-line: #dcd1c2; --ftm-brick: #a93e31; --ftm-ledge: #7e2c22;
+                --ftm-rose: #fae8e6; --ftm-on-brick: #fffaf4; --ftm-scrim: 255, 252, 246;
                 position: fixed !important;
                 inset: 0 !important;
                 z-index: 2147483647 !important;
@@ -589,230 +592,193 @@ function ensureManagedOverlayStyles() {
                 padding: clamp(14px, 3vw, 42px) !important;
                 overflow: hidden !important;
                 isolation: isolate !important;
-                color: #1b1a18 !important;
-                font-family: "Plus Jakarta Sans", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif !important;
+                color: var(--ftm-ink) !important;
+                font: 400 15px/1.5 system-ui, -apple-system, "Segoe UI", Roboto, sans-serif !important;
+                letter-spacing: 0 !important;
+                text-transform: none !important;
                 pointer-events: auto !important;
-                background: linear-gradient(180deg, #dcebf4 0%, #edf5f1 52%, #f7f4ec 100%) !important;
+                background: var(--ftm-canvas) !important;
+            }
+            #${MANAGED_TIME_LIMIT_OVERLAY_ID}[data-ftm-dark="true"],
+            #${MANAGED_VIEWING_ROUTE_GATE_OVERLAY_ID}[data-ftm-dark="true"] {
+                --ftm-canvas: #0b0f14; --ftm-paper: #151c24; --ftm-desk: #0b0f14; --ftm-ink: #edf2f7;
+                --ftm-muted: #b8c3ce; --ftm-line: #2a3440; --ftm-brick: #e0796b; --ftm-ledge: #a5483c;
+                --ftm-rose: #3a2422; --ftm-on-brick: #1b1110; --ftm-scrim: 21, 28, 36;
             }
             #${MANAGED_TIME_LIMIT_OVERLAY_ID} *,
-            #${MANAGED_VIEWING_ROUTE_GATE_OVERLAY_ID} * { box-sizing: border-box !important; }
+            #${MANAGED_VIEWING_ROUTE_GATE_OVERLAY_ID} * { box-sizing: border-box !important; text-transform: none !important; }
             .filtertube-managed-overlay__media {
                 position: absolute !important;
                 inset: 0 !important;
                 width: 100% !important;
                 height: 100% !important;
                 object-fit: cover !important;
-                transform: scale(1.035) !important;
-                filter: saturate(.82) contrast(.94) brightness(1.04) !important;
+                opacity: 1 !important;
+                filter: none !important;
                 pointer-events: none !important;
             }
+            /* The app's paper scrim over the theme video: 95 %, 85 %, 55 % from top-start to bottom-end. */
             .filtertube-managed-overlay__scrim {
                 position: absolute !important;
                 inset: 0 !important;
                 pointer-events: none !important;
-                background:
-                    radial-gradient(circle at 16% 10%, rgba(197, 222, 241, .52), transparent 34%),
-                    radial-gradient(circle at 86% 12%, rgba(244, 217, 193, .42), transparent 30%),
-                    linear-gradient(180deg, rgba(247, 250, 251, .2), rgba(239, 237, 229, .44)) !important;
-                backdrop-filter: blur(2px) !important;
+                background: linear-gradient(135deg, rgba(var(--ftm-scrim), .95), rgba(var(--ftm-scrim), .85) 50%, rgba(var(--ftm-scrim), .55)) !important;
             }
+            /* A paper sheet with a second sheet peeking beneath, 20 px corners. */
             .filtertube-managed-overlay__panel {
                 position: relative !important;
                 z-index: 1 !important;
-                width: min(460px, 100%) !important;
+                width: min(480px, 100%) !important;
                 max-height: calc(100dvh - clamp(28px, 6vw, 84px)) !important;
                 overflow: auto !important;
+                padding: 28px !important;
+                border: 1.5px solid var(--ftm-line) !important;
+                border-radius: 20px !important;
+                background: var(--ftm-paper) !important;
+                color: var(--ftm-ink) !important;
+                box-shadow: 0 3px 0 var(--ftm-desk), 0 4px 0 var(--ftm-line), 0 30px 60px -40px rgba(27, 26, 24, .45) !important;
             }
+            .filtertube-managed-overlay__panel--gate { text-align: center !important; }
             .filtertube-managed-overlay__panel--time {
                 display: grid !important;
-                grid-template-columns: minmax(0, 1.18fr) minmax(300px, .82fr) !important;
-                width: min(1120px, 100%) !important;
+                grid-template-columns: minmax(0, 1.15fr) minmax(300px, .85fr) !important;
+                width: min(1040px, 100%) !important;
                 padding: 0 !important;
-                border: 1px solid rgba(70, 60, 48, .14) !important;
-                border-radius: clamp(24px, 3vw, 42px) !important;
-                background: rgba(249, 248, 244, .9) !important;
-                color: #1b1a18 !important;
-                box-shadow: inset 0 1px 0 rgba(255,255,255,.9), 0 40px 110px -45px rgba(50, 39, 31, .5) !important;
-                backdrop-filter: blur(24px) saturate(.92) !important;
             }
             .filtertube-managed-overlay__story {
                 display: flex !important;
                 flex-direction: column !important;
                 justify-content: center !important;
-                min-height: min(620px, 72dvh) !important;
-                padding: clamp(30px, 6vw, 78px) !important;
-                background:
-                    radial-gradient(circle at 8% 8%, rgba(173,207,234,.22), transparent 34%),
-                    radial-gradient(circle at 92% 94%, rgba(182,206,193,.2), transparent 34%) !important;
+                min-height: min(560px, 70dvh) !important;
+                padding: clamp(28px, 5vw, 64px) !important;
             }
             .filtertube-managed-overlay__aside {
                 display: flex !important;
                 flex-direction: column !important;
                 justify-content: center !important;
-                padding: clamp(26px, 4vw, 54px) !important;
-                border-left: 1px solid rgba(70, 60, 48, .1) !important;
-                background: rgba(255,255,255,.46) !important;
+                padding: clamp(24px, 4vw, 48px) !important;
+                border-left: 1.5px dashed var(--ftm-line) !important;
+                background: transparent !important;
             }
+            .filtertube-managed-overlay__pose {
+                display: block !important;
+                align-self: flex-start !important;
+                height: 120px !important;
+                width: auto !important;
+                margin: 0 0 18px !important;
+                pointer-events: none !important;
+            }
+            .filtertube-managed-overlay__panel--gate .filtertube-managed-overlay__pose { margin: 0 auto 14px !important; }
             .filtertube-managed-overlay__brand {
                 display: inline-flex !important;
                 align-items: center !important;
                 align-self: flex-start !important;
                 gap: 10px !important;
-                margin-bottom: clamp(34px, 7vh, 70px) !important;
-                color: #24211d !important;
-                font-size: 13px !important;
-                font-weight: 850 !important;
-                letter-spacing: .08em !important;
-                text-transform: uppercase !important;
+                margin-bottom: 22px !important;
+                color: var(--ftm-ink) !important;
+                font: 400 17px/1 "FilterTube Delius", system-ui, sans-serif !important;
             }
             .filtertube-managed-overlay__mark {
-                display: grid !important;
-                place-items: center !important;
-                width: 30px !important;
-                height: 30px !important;
-                border: 1px solid rgba(171,68,56,.35) !important;
-                border-radius: 50% !important;
-                background: rgba(255,255,255,.72) !important;
-                color: #ab4438 !important;
-                font-family: Georgia, serif !important;
-                font-size: 16px !important;
-                font-style: italic !important;
-                box-shadow: inset 0 1px 0 rgba(255,255,255,.9) !important;
+                width: 28px !important;
+                height: 28px !important;
                 object-fit: contain !important;
-                padding: 5px !important;
-                box-sizing: border-box !important;
+                border: 0 !important;
+                background: none !important;
+                box-shadow: none !important;
+                padding: 0 !important;
             }
             .filtertube-managed-overlay__eyebrow {
-                margin: 0 0 16px !important;
-                color: #ab4438 !important;
-                font-family: "SFMono-Regular", Consolas, monospace !important;
-                font-size: 11px !important;
-                font-weight: 800 !important;
-                letter-spacing: .2em !important;
-                line-height: 1.4 !important;
-                text-transform: uppercase !important;
+                margin: 0 0 10px !important;
+                color: var(--ftm-brick) !important;
+                font: 600 14px/1.4 system-ui, sans-serif !important;
             }
             .filtertube-managed-overlay__title {
-                max-width: 11ch !important;
+                max-width: 18ch !important;
                 margin: 0 !important;
-                color: #1b1a18 !important;
-                font-family: "Outfit", "Avenir Next", "Segoe UI", sans-serif !important;
-                font-size: clamp(44px, 6vw, 78px) !important;
-                font-weight: 650 !important;
-                letter-spacing: -.07em !important;
-                line-height: .93 !important;
+                color: var(--ftm-ink) !important;
+                font: 400 clamp(30px, 4vw, 46px)/1.15 "FilterTube Delius", system-ui, sans-serif !important;
+                letter-spacing: 0 !important;
             }
-            .filtertube-managed-overlay__title-emphasis {
-                display: block !important;
-                color: #ab4438 !important;
-                font-family: "Cormorant Garamond", Georgia, serif !important;
-                font-style: italic !important;
-                font-weight: 500 !important;
-                letter-spacing: -.04em !important;
-            }
+            .filtertube-managed-overlay__panel--gate .filtertube-managed-overlay__title { max-width: none !important; font-size: clamp(24px, 3vw, 30px) !important; }
             .filtertube-managed-overlay__lede {
-                max-width: 610px !important;
-                margin: 26px 0 0 !important;
-                color: #5b5750 !important;
-                font-size: clamp(15px, 1.5vw, 18px) !important;
-                font-weight: 600 !important;
-                line-height: 1.7 !important;
+                max-width: 560px !important;
+                margin: 16px 0 0 !important;
+                color: var(--ftm-muted) !important;
+                font: 400 16px/1.6 system-ui, sans-serif !important;
             }
             .filtertube-managed-overlay__profile {
                 display: inline-flex !important;
                 align-items: center !important;
                 align-self: flex-start !important;
                 gap: 8px !important;
-                margin-top: 28px !important;
-                padding: 9px 13px !important;
-                border: 1px solid rgba(70,60,48,.12) !important;
+                margin-top: 22px !important;
+                padding: 8px 14px !important;
+                border: 1.5px solid var(--ftm-line) !important;
                 border-radius: 999px !important;
-                background: rgba(255,255,255,.66) !important;
-                color: #45413b !important;
-                font-size: 12px !important;
-                font-weight: 800 !important;
+                background: var(--ftm-desk) !important;
+                color: var(--ftm-ink) !important;
+                font: 600 13px/1.2 system-ui, sans-serif !important;
             }
-            .filtertube-managed-overlay__facts {
-                display: grid !important;
-                gap: 10px !important;
-                margin: 0 !important;
-            }
+            .filtertube-managed-overlay__facts { display: grid !important; gap: 0 !important; margin: 0 !important; }
             .filtertube-managed-overlay__fact {
                 display: grid !important;
                 grid-template-columns: 1fr auto !important;
                 align-items: baseline !important;
                 gap: 18px !important;
                 margin: 0 !important;
-                padding: 15px 16px !important;
-                border: 1px solid rgba(70,60,48,.1) !important;
-                border-radius: 16px !important;
-                background: rgba(255,255,255,.62) !important;
-                box-shadow: inset 0 1px 0 rgba(255,255,255,.84) !important;
+                padding: 14px 2px !important;
+                border-bottom: 1.5px dashed var(--ftm-line) !important;
             }
-            .filtertube-managed-overlay__fact dt {
-                margin: 0 !important;
-                color: #7a746b !important;
-                font-size: 12px !important;
-                font-weight: 750 !important;
-            }
-            .filtertube-managed-overlay__fact dd {
-                margin: 0 !important;
-                color: #292622 !important;
-                font-size: 13px !important;
-                font-weight: 850 !important;
-                text-align: right !important;
-            }
+            .filtertube-managed-overlay__fact dt { margin: 0 !important; color: var(--ftm-muted) !important; font: 500 14px/1.4 system-ui, sans-serif !important; }
+            .filtertube-managed-overlay__fact dd { margin: 0 !important; color: var(--ftm-ink) !important; font: 400 18px/1.2 "FilterTube Delius", system-ui, sans-serif !important; text-align: right !important; }
             .filtertube-managed-overlay__guidance {
                 margin-top: 18px !important;
-                padding: 14px 15px !important;
-                border-left: 3px solid #ab4438 !important;
-                border-radius: 4px 14px 14px 4px !important;
-                background: rgba(171,68,56,.07) !important;
-                color: #5b514a !important;
-                font-size: 13px !important;
-                font-weight: 650 !important;
-                line-height: 1.55 !important;
+                padding: 14px 16px !important;
+                border: 0 !important;
+                border-radius: 16px !important;
+                background: var(--ftm-rose) !important;
+                color: var(--ftm-ink) !important;
+                font: 400 14px/1.55 system-ui, sans-serif !important;
             }
-            .filtertube-managed-overlay__actions {
-                display: grid !important;
-                gap: 10px !important;
-                margin-top: 22px !important;
-            }
+            .filtertube-managed-overlay__actions { display: grid !important; gap: 12px !important; margin-top: 22px !important; }
+            /* The app's pills: brick on a 3 px ledge (sinks when pressed); paper on a 2 px ledge. */
             .filtertube-managed-overlay__button {
-                min-height: 48px !important;
+                min-height: 52px !important;
                 width: 100% !important;
-                padding: 10px 18px !important;
-                border: 1px solid rgba(70,60,48,.14) !important;
+                padding: 10px 20px !important;
+                border: 1.5px solid var(--ftm-line) !important;
                 border-radius: 999px !important;
-                background: rgba(255,255,255,.72) !important;
-                color: #24211d !important;
-                font: 800 14px/1.2 "Plus Jakarta Sans", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif !important;
+                background: var(--ftm-paper) !important;
+                color: var(--ftm-ink) !important;
+                font: 600 15px/1.2 "FilterTube Outfit", "Outfit", system-ui, sans-serif !important;
+                letter-spacing: 0 !important;
                 cursor: pointer !important;
-                box-shadow: inset 0 1px 0 rgba(255,255,255,.9), 0 16px 34px -28px rgba(17,18,24,.4) !important;
-                transition: transform 180ms ease, border-color 180ms ease, background 180ms ease !important;
+                box-shadow: 0 2px 0 var(--ftm-line) !important;
+                transform: none !important;
+                transition: transform 120ms ease, box-shadow 120ms ease !important;
             }
-            .filtertube-managed-overlay__button:hover { transform: translateY(-1px) !important; border-color: rgba(171,68,56,.42) !important; }
-            .filtertube-managed-overlay__button:focus-visible { outline: 3px solid rgba(171,68,56,.24) !important; outline-offset: 3px !important; }
-            .filtertube-managed-overlay__button--primary { border-color: #ab4438 !important; background: #ab4438 !important; color: #fffaf4 !important; }
+            .filtertube-managed-overlay__button:active { transform: translateY(2px) !important; box-shadow: 0 0 0 var(--ftm-line) !important; }
+            .filtertube-managed-overlay__button:focus-visible { outline: 3px solid var(--ftm-brick) !important; outline-offset: 3px !important; }
+            .filtertube-managed-overlay__button--primary {
+                border-color: var(--ftm-brick) !important;
+                background: var(--ftm-brick) !important;
+                color: var(--ftm-on-brick) !important;
+                box-shadow: 0 3px 0 var(--ftm-ledge) !important;
+            }
+            .filtertube-managed-overlay__button--primary:active { transform: translateY(3px) !important; box-shadow: 0 0 0 var(--ftm-ledge) !important; }
             .filtertube-managed-overlay__button:disabled { cursor: default !important; opacity: .7 !important; transform: none !important; }
             .filtertube-managed-overlay__instruction {
                 display: none !important;
                 margin: 0 !important;
                 padding: 12px 14px !important;
-                border: 1px solid rgba(70,60,48,.1) !important;
-                border-radius: 14px !important;
-                background: rgba(255,255,255,.58) !important;
-                color: #625f58 !important;
-                font-size: 12px !important;
-                font-weight: 650 !important;
-                line-height: 1.55 !important;
+                border: 1.5px solid var(--ftm-line) !important;
+                border-radius: 16px !important;
+                background: var(--ftm-desk) !important;
+                color: var(--ftm-muted) !important;
+                font: 400 13px/1.55 system-ui, sans-serif !important;
             }
             .filtertube-managed-overlay__instruction[data-visible="true"] { display: block !important; }
-            .filtertube-managed-overlay__profiles {
-                display: grid !important;
-                gap: 8px !important;
-                margin-top: 14px !important;
-            }
+            .filtertube-managed-overlay__profiles { display: grid !important; gap: 8px !important; margin-top: 14px !important; }
             .filtertube-managed-overlay__profiles[hidden] { display: none !important; }
             .filtertube-managed-overlay__profile-option {
                 display: grid !important;
@@ -822,35 +788,33 @@ function ensureManagedOverlayStyles() {
                 width: 100% !important;
                 min-height: 52px !important;
                 padding: 8px 12px !important;
-                border: 1px solid rgba(70,60,48,.12) !important;
+                border: 1.5px solid var(--ftm-line) !important;
                 border-radius: 16px !important;
-                background: rgba(255,255,255,.68) !important;
-                color: #292622 !important;
+                background: var(--ftm-paper) !important;
+                color: var(--ftm-ink) !important;
                 cursor: pointer !important;
-                text-align: left !important;
+                text-align: start !important;
             }
-            .filtertube-managed-overlay__profile-option:hover { border-color: rgba(171,68,56,.38) !important; }
+            .filtertube-managed-overlay__profile-option:hover { border-color: var(--ftm-brick) !important; }
             .filtertube-managed-overlay__profile-avatar {
                 display: grid !important;
                 place-items: center !important;
                 width: 34px !important;
                 height: 34px !important;
                 border-radius: 50% !important;
-                background: rgba(171,68,56,.12) !important;
-                color: #8e352d !important;
-                font-size: 12px !important;
-                font-weight: 850 !important;
+                background: var(--ftm-rose) !important;
+                color: var(--ftm-brick) !important;
+                font: 400 14px/1 "FilterTube Delius", system-ui, sans-serif !important;
             }
             .filtertube-managed-overlay__profile-meta { min-width: 0 !important; }
-            .filtertube-managed-overlay__profile-name { display: block !important; font-size: 13px !important; font-weight: 850 !important; }
-            .filtertube-managed-overlay__profile-type { display: block !important; margin-top: 2px !important; color: #777067 !important; font-size: 11px !important; font-weight: 650 !important; }
-            .filtertube-managed-overlay__profile-lock { color: #8e352d !important; font-size: 11px !important; font-weight: 800 !important; }
+            .filtertube-managed-overlay__profile-name { display: block !important; font: 600 14px/1.3 system-ui, sans-serif !important; }
+            .filtertube-managed-overlay__profile-type { display: block !important; margin-top: 2px !important; color: var(--ftm-muted) !important; font: 400 12px/1.3 system-ui, sans-serif !important; }
+            .filtertube-managed-overlay__profile-lock { color: var(--ftm-brick) !important; font: 600 12px/1.3 system-ui, sans-serif !important; }
             @media (max-width: 760px) {
                 .filtertube-managed-overlay__panel--time { grid-template-columns: 1fr !important; }
-                .filtertube-managed-overlay__story { min-height: auto !important; padding: 30px 24px !important; }
-                .filtertube-managed-overlay__aside { padding: 24px !important; border-left: 0 !important; border-top: 1px solid rgba(70,60,48,.1) !important; }
-                .filtertube-managed-overlay__brand { margin-bottom: 34px !important; }
-                .filtertube-managed-overlay__title { font-size: clamp(40px, 13vw, 58px) !important; }
+                .filtertube-managed-overlay__story { min-height: auto !important; padding: 28px 24px !important; }
+                .filtertube-managed-overlay__aside { padding: 24px !important; border-left: 0 !important; border-top: 1.5px dashed var(--ftm-line) !important; }
+                .filtertube-managed-overlay__pose { height: 96px !important; }
             }
             @media (prefers-reduced-motion: reduce) {
                 .filtertube-managed-overlay__media { display: none !important; }
@@ -866,20 +830,29 @@ function applyManagedOverlayShell(overlay) {
     if (!overlay) return;
     ensureManagedOverlayStyles();
     overlay.classList.add('filtertube-managed-overlay');
-    overlay.style.cssText = [
-        'position:fixed',
-        'inset:0',
-        'z-index:2147483647',
-        'display:flex',
-        'align-items:center',
-        'justify-content:center',
-        'padding:24px',
-        'background:linear-gradient(180deg,#dcebf4 0%,#edf5f1 52%,#f7f4ec 100%)',
-        'color:#f8fafc',
-        'font-family:Roboto,Arial,sans-serif',
-        'pointer-events:auto',
-        'overflow:hidden'
-    ].join(';');
+    // The paper look comes from the stylesheet; only the theme is decided here (the page's own).
+    overlay.style.cssText = 'position:fixed;inset:0;z-index:2147483647';
+    try {
+        const visuals = globalThis.FilterTubeAdmissionOverlay;
+        overlay.setAttribute('data-ftm-dark', visuals?.isDark?.() ? 'true' : 'false');
+        visuals?.loadHand?.();
+    } catch (e) {
+    }
+}
+
+/** Kriti on the managed screens (BIBLE.md moments): null with the Companion Off. */
+function createManagedOverlayPose(name, height = 120) {
+    try {
+        const visuals = globalThis.FilterTubeAdmissionOverlay;
+        const pose = visuals?.pose?.(name, height);
+        if (!pose) return null;
+        pose.classList.add('filtertube-managed-overlay__pose');
+        pose.style.removeProperty('max-width');
+        if (visuals?.getCompanion?.() === 'lively') visuals.idle?.(pose);
+        return pose;
+    } catch (e) {
+        return null;
+    }
 }
 
 function appendManagedOverlayBackground(overlay) {
@@ -895,43 +868,17 @@ function appendManagedOverlayBackground(overlay) {
         video.loop = true;
         video.playsInline = true;
         video.src = heroUrl;
-        video.style.cssText = [
-            'position:absolute',
-            'inset:0',
-            'width:100%',
-            'height:100%',
-            'object-fit:cover',
-            'opacity:.58',
-            'filter:saturate(.82) brightness(.8)',
-            'pointer-events:none'
-        ].join(';');
         overlay.appendChild(video);
     }
     const scrim = document.createElement('div');
     scrim.setAttribute('aria-hidden', 'true');
     scrim.className = 'filtertube-managed-overlay__scrim';
-    scrim.style.cssText = [
-        'position:absolute',
-        'inset:0',
-        'background:linear-gradient(135deg,rgba(8,13,18,.78),rgba(15,23,42,.62) 45%,rgba(27,38,48,.72))',
-        'pointer-events:none'
-    ].join(';');
     overlay.appendChild(scrim);
 }
 
 function createManagedOverlayPanel(kind = '') {
     const panel = document.createElement('section');
     panel.className = `filtertube-managed-overlay__panel${kind ? ` filtertube-managed-overlay__panel--${kind}` : ''}`;
-    panel.style.cssText = [
-        'position:relative',
-        'width:min(460px,100%)',
-        'border:1px solid rgba(255,255,255,.28)',
-        'border-radius:10px',
-        'background:rgba(12,18,25,.82)',
-        'box-shadow:0 28px 90px rgba(0,0,0,.42),inset 0 1px 0 rgba(255,255,255,.08)',
-        'backdrop-filter:blur(18px)',
-        'padding:26px'
-    ].join(';');
     return panel;
 }
 
@@ -959,51 +906,43 @@ function showManagedViewingBlockedOverlay(decision) {
         overlay.innerHTML = '';
         appendManagedOverlayBackground(overlay);
 
-        const panel = createManagedOverlayPanel();
+        const panel = createManagedOverlayPanel('gate');
+        // Kriti points the way to the spaces this profile may use.
+        const pose = createManagedOverlayPose('kriti_pointing.webp', 120);
 
         const eyebrow = document.createElement('div');
+        eyebrow.className = 'filtertube-managed-overlay__eyebrow';
         eyebrow.textContent = managedOverlayText('managedOverlay.blocked.eyebrow', 'FilterTube managed profile');
-        eyebrow.style.cssText = 'color:#fca5a5;font-size:12px;font-weight:800;text-transform:uppercase;letter-spacing:0;margin-bottom:10px';
 
         const title = document.createElement('h1');
+        title.className = 'filtertube-managed-overlay__title';
         title.textContent = managedOverlayText(
             'managedOverlay.blocked.title',
             '{surface} is not available for this profile',
             { surface: surfaceLabel }
         );
-        title.style.cssText = 'font-size:23px;line-height:1.2;margin:0 0 10px;font-weight:800;color:#fff';
 
         const copy = document.createElement('p');
+        copy.className = 'filtertube-managed-overlay__lede';
         copy.textContent = managedOverlayText(
             'managedOverlay.blocked.message',
             '{profileName} can use only the viewing spaces approved by the parent or caregiver profile.',
             { profileName }
         );
-        copy.style.cssText = 'font-size:14px;line-height:1.5;margin:0;color:#cbd5e1';
 
+        const actions = document.createElement('div');
+        actions.className = 'filtertube-managed-overlay__actions';
         const dashboardButton = document.createElement('button');
         dashboardButton.type = 'button';
+        dashboardButton.className = 'filtertube-managed-overlay__button filtertube-managed-overlay__button--primary';
         dashboardButton.textContent = managedOverlayText('managedOverlay.openDashboard', 'Open FilterTube');
-        dashboardButton.style.cssText = [
-            'min-height:44px',
-            'width:100%',
-            'margin-top:20px',
-            'border:1px solid rgba(255,255,255,.22)',
-            'border-radius:8px',
-            'background:rgba(18,27,38,.82)',
-            'color:#e2e8f0',
-            'font-weight:800',
-            'font-size:14px',
-            'cursor:pointer'
-        ].join(';');
         dashboardButton.addEventListener('click', () => {
             openFilterTubeDashboardFromManagedOverlay('managed_viewing_route_gate');
         });
+        actions.appendChild(dashboardButton);
 
-        panel.appendChild(eyebrow);
-        panel.appendChild(title);
-        panel.appendChild(copy);
-        panel.appendChild(dashboardButton);
+        if (pose) panel.appendChild(pose);
+        panel.append(eyebrow, title, copy, actions);
         overlay.appendChild(panel);
     } catch (e) {
     }
@@ -1388,6 +1327,9 @@ function showManagedTimeoutOverlay(state) {
             { profileName, surface: surfaceLabel }
         );
 
+        // Kriti with her mug for the daily pause; thinking while a parent needs to review the rule.
+        const pose = createManagedOverlayPose(policyExpired ? 'kriti_thinking.webp' : 'kriti_mug_06.webp', 120);
+        if (pose) story.appendChild(pose);
         story.append(brand, eyebrow, title, copy, profilePill);
 
         const aside = document.createElement('aside');

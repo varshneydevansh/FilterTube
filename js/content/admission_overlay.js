@@ -705,6 +705,11 @@
         // For study_overlay.js: the Companion setting (lively, quiet or off) the poses follow.
         loadCompanion: () => loadAdmissionCompanion(),
         idle: picture => admissionIdle(picture),
+        // For bridge_settings.js (the time-limit screen and the viewing-route gate): a pose, or null
+        // with the Companion Off; the page's theme; the app's hand for titles.
+        pose: (name, height) => (companionMode === 'off' ? null : createAdmissionMascot(name, height)),
+        isDark: () => admissionOverlayUsesDarkTheme(),
+        loadHand: () => loadAdmissionHand(),
         getCompanion: () => companionMode,
         getDirection: () => localeDirection
     };
