@@ -2846,5 +2846,9 @@
   "study.switch.gentleBody": "侬个学习时段会先结束。停 30 秒个辰光还好取消。",
   "study.error.running": "锁牢个辰光勿好改计划。",
   "study.restore.title": "学习结束后恢复",
-  "study.restore.body": "现在恢复，会换脱侬个学习计划。"
+  "study.restore.body": "现在恢复，会换脱侬个学习计划。",
+  "sync.relay.title": "用互联网同步？",
+  "sync.relay.body": "互联网同步用 FilterTube 开发者运营个一只小中继来连牢侬个设备。伊读勿到侬同步个内容，因为是端到端加密个。伊看得到设备 ID、侬个 IP 地址搭同步个辰光。Google 个 STUN 服务器帮忙寻连接路径，伊也看得到侬个 IP 地址。附近同步两样侪勿用。",
+  "sync.relay.continue": "继续",
+  "sync.relay.notNow": "现在勿要"
 }

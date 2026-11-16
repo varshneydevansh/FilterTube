@@ -2846,5 +2846,9 @@
   "study.switch.gentleBody": "Önce çalışma oturumun biter. 30 saniyelik beklemede hâlâ iptal edebilirsin.",
   "study.error.running": "Kilit sürerken plan değiştirilemez.",
   "study.restore.title": "Dersten sonra geri yükle",
-  "study.restore.body": "Şimdi geri yüklemek ders planını değiştirir."
+  "study.restore.body": "Şimdi geri yüklemek ders planını değiştirir.",
+  "sync.relay.title": "İnternet üzerinden senkronize edilsin mi?",
+  "sync.relay.body": "İnternet senkronizasyonu, cihazlarınızı bağlamak için FilterTube geliştiricisinin işlettiği küçük bir aktarıcı kullanır. Senkronize ettiklerinizi okuyamaz; bunlar uçtan uca şifrelenir. Bir cihaz kimliğini, IP adresinizi ve ne zaman senkronize ettiğinizi görür. Google'ın STUN sunucusu bağlantı yolu bulmaya yardım eder ve o da IP adresinizi görür. Yakındaki senkronizasyon ikisini de kullanmaz.",
+  "sync.relay.continue": "Devam",
+  "sync.relay.notNow": "Şimdi değil"
 }

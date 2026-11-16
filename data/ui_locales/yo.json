@@ -2846,5 +2846,9 @@
   "study.switch.gentleBody": "Ìgbà ẹ̀kọ́ rẹ yóò parí ná. O ṣì lè fagilé nínú ìdádúró ìṣẹ́jú-àáyá 30.",
   "study.error.running": "Kò lè yí ètò padà nígbà tí títì ń lọ.",
   "study.restore.title": "Dá padà lẹ́yìn ẹ̀kọ́",
-  "study.restore.body": "Dídá padà báyìí yóò rọ́pò ètò ẹ̀kọ́ rẹ."
+  "study.restore.body": "Dídá padà báyìí yóò rọ́pò ètò ẹ̀kọ́ rẹ.",
+  "sync.relay.title": "Múṣiṣẹ́pọ̀ lórí ayélujára?",
+  "sync.relay.body": "Ìmúṣiṣẹ́pọ̀ ayélujára ń lo relay kékeré tí olùgbéejáde FilterTube ń ṣiṣẹ́ láti so àwọn ẹ̀rọ rẹ pọ̀. Kò lè ka ohun tí o ń múṣiṣẹ́pọ̀, nítorí pé a ti fi ìpàrokò òpin-sí-òpin dáàbò bò ó. Ó ń rí ID ẹ̀rọ, àdírẹ́sì IP rẹ àti ìgbà tí o ń múṣiṣẹ́pọ̀. Sáfà STUN ti Google ń ṣèrànwọ́ láti wá ọ̀nà ìsopọ̀, òun náà sì ń rí àdírẹ́sì IP rẹ. Ìmúṣiṣẹ́pọ̀ nítòsí kò lo èyíkéyìí nínú wọn.",
+  "sync.relay.continue": "Tẹ̀síwájú",
+  "sync.relay.notNow": "Kì í ṣe báyìí"
 }

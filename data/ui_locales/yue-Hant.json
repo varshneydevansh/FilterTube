@@ -2846,5 +2846,9 @@
   "study.switch.gentleBody": "你嘅學習時段會先完結。停 30 秒嗰陣，你仲可以取消。",
   "study.error.running": "鎖定期間唔可以改計劃。",
   "study.restore.title": "學習之後還原",
-  "study.restore.body": "而家還原會取代你嘅學習計劃。"
+  "study.restore.body": "而家還原會取代你嘅學習計劃。",
+  "sync.relay.title": "經互聯網同步？",
+  "sync.relay.body": "互聯網同步會用 FilterTube 開發者營運嘅一個細中繼嚟連接你嘅裝置。佢睇唔到你同步嘅內容，因為係端對端加密嘅。佢睇到裝置 ID、你嘅 IP 地址同埋同步嘅時間。Google 嘅 STUN 伺服器幫手搵連接路徑，佢都睇到你嘅 IP 地址。附近同步兩樣都唔用。",
+  "sync.relay.continue": "繼續",
+  "sync.relay.notNow": "住先"
 }

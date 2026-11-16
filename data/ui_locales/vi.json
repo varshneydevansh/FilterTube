@@ -2846,5 +2846,9 @@
   "study.switch.gentleBody": "Phiên học của bạn sẽ kết thúc trước. Bạn vẫn có thể hủy trong 30 giây chờ.",
   "study.error.running": "Không thể đổi kế hoạch khi đang khóa.",
   "study.restore.title": "Khôi phục sau giờ học",
-  "study.restore.body": "Khôi phục bây giờ sẽ thay kế hoạch học của bạn."
+  "study.restore.body": "Khôi phục bây giờ sẽ thay kế hoạch học của bạn.",
+  "sync.relay.title": "Đồng bộ qua internet?",
+  "sync.relay.body": "Đồng bộ qua internet dùng một relay nhỏ do nhà phát triển FilterTube vận hành để kết nối các thiết bị của bạn. Relay không thể đọc nội dung bạn đồng bộ vì nội dung được mã hóa đầu cuối. Relay thấy ID thiết bị, địa chỉ IP của bạn và thời điểm bạn đồng bộ. Máy chủ STUN của Google giúp tìm đường kết nối và cũng thấy địa chỉ IP của bạn. Đồng bộ lân cận không dùng cái nào trong hai.",
+  "sync.relay.continue": "Tiếp tục",
+  "sync.relay.notNow": "Để sau"
 }

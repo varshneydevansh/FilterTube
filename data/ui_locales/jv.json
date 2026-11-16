@@ -2846,5 +2846,9 @@
   "study.switch.gentleBody": "Sesi sinau sampeyan rampung dhisik. Sampeyan isih bisa mbatalake sajrone jeda 30 detik.",
   "study.error.running": "Rencana ora bisa diganti nalika kunci lagi mlaku.",
   "study.restore.title": "Pulihake sawise sinau",
-  "study.restore.body": "Mulihake saiki bakal ngganti rencana sinau sampeyan."
+  "study.restore.body": "Mulihake saiki bakal ngganti rencana sinau sampeyan.",
+  "sync.relay.title": "Sinkronake liwat internet?",
+  "sync.relay.body": "Sinkronisasi internet nganggo relay cilik sing dikelola developer FilterTube kanggo nyambungake piranti panjenengan. Relay ora bisa maca apa sing panjenengan sinkronake, amarga dienkripsi end-to-end. Relay weruh ID piranti, alamat IP panjenengan, lan wektu sinkronisasi. Server STUN duweke Google mbantu nemokake dalan sambungan lan uga weruh alamat IP panjenengan. Sinkronisasi cedhak ora nganggo loro-lorone.",
+  "sync.relay.continue": "Terusake",
+  "sync.relay.notNow": "Mengko wae"
 }

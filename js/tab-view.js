@@ -24811,6 +24811,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             ftNanahStrategy.dispatchEvent(new Event('change', { bubbles: true }));
         }
 
+        if (!(await ensureInternetSyncConsent())) return null;
         const client = await createNanahClient();
         nanahSessionState.stage = 'hosting';
         nanahSessionState.code = '';
@@ -25940,6 +25941,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             });
         }
         setNanahSessionNotice(null);
+        if (!(await ensureInternetSyncConsent())) return null;
         const client = await createNanahClient();
         nanahSessionState.stage = 'hosting';
         nanahSessionState.code = '';
@@ -25976,6 +25978,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             });
         }
         setNanahSessionNotice(null);
+        if (!(await ensureInternetSyncConsent())) return null;
         const client = await createNanahClient();
         nanahSessionState.code = code;
         nanahSessionState.pairUri = buildNanahPairUri(code);
@@ -27290,6 +27293,29 @@ document.addEventListener('DOMContentLoaded', async () => {
         if (root.t === 'control_proposal' || root.t === 'app_sync') {
             await handleNanahIncomingProposal(root);
         }
+    }
+
+    // Internet sync goes through the developer's signaling relay and a STUN server (Android
+    // InternetSyncRelayConsent): the first use asks once, device-wide, with Continue / Not now.
+    const INTERNET_SYNC_CONSENT_KEY = 'ftInternetSyncConsentV1';
+    async function ensureInternetSyncConsent() {
+        try {
+            const items = await new Promise(resolve => chrome.storage.local.get([INTERNET_SYNC_CONSENT_KEY], resolve));
+            if (items?.[INTERNET_SYNC_CONSENT_KEY]?.accepted === true) return true;
+        } catch (e) {
+        }
+        const accepted = await showConfirmModal({
+            title: tabViewUiText('sync.relay.title', 'Sync over the internet?'),
+            message: tabViewUiText('sync.relay.body', "Internet sync uses a small relay run by FilterTube's developer to connect your devices. It can't read what you sync, which is end-to-end encrypted. It sees a device ID, your IP address and when you sync. Google's STUN server helps find a connection route and also sees your IP address. Nearby sync uses neither."),
+            confirmText: tabViewUiText('sync.relay.continue', 'Continue'),
+            cancelText: tabViewUiText('sync.relay.notNow', 'Not now')
+        });
+        if (!accepted) return false;
+        try {
+            await new Promise(resolve => chrome.storage.local.set({ [INTERNET_SYNC_CONSENT_KEY]: { accepted: true, at: Date.now() } }, resolve));
+        } catch (e) {
+        }
+        return true;
     }
 
     async function createNanahClient() {

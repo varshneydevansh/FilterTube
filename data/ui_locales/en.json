@@ -2846,5 +2846,9 @@
   "study.switch.gentleBody": "Your study session ends first. You can still cancel during a 30-second pause.",
   "study.error.running": "Can't change the plan while a lock is running.",
   "study.restore.title": "Restore after study",
-  "study.restore.body": "Restoring now would replace your study plan."
+  "study.restore.body": "Restoring now would replace your study plan.",
+  "sync.relay.title": "Sync over the internet?",
+  "sync.relay.body": "Internet sync uses a small relay run by FilterTube's developer to connect your devices. It can't read what you sync, which is end-to-end encrypted. It sees a device ID, your IP address and when you sync. Google's STUN server helps find a connection route and also sees your IP address. Nearby sync uses neither.",
+  "sync.relay.continue": "Continue",
+  "sync.relay.notNow": "Not now"
 }

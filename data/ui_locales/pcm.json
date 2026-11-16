@@ -2846,5 +2846,9 @@
   "study.switch.gentleBody": "Your study session go end first. You fit still cancel for the 30-second wait.",
   "study.error.running": "You no fit change the plan while lock dey run.",
   "study.restore.title": "Restore after study",
-  "study.restore.body": "If you restore now, e go replace your study plan."
+  "study.restore.body": "If you restore now, e go replace your study plan.",
+  "sync.relay.title": "Sync through internet?",
+  "sync.relay.body": "Internet sync dey use one small relay wey FilterTube developer dey run to join your devices together. E no fit read wetin you dey sync, because e dey end-to-end encrypted. E dey see one device ID, your IP address and when you sync. Google STUN server dey help find road for connection and e sef dey see your IP address. Nearby sync no dey use any of dem.",
+  "sync.relay.continue": "Continue",
+  "sync.relay.notNow": "No be now"
 }

@@ -2846,5 +2846,9 @@
   "study.switch.gentleBody": "Unang matatapos ang study session mo. Puwede ka pa ring magkansela sa loob ng 30-segundong paghinto.",
   "study.error.running": "Hindi mababago ang plano habang may lock.",
   "study.restore.title": "I-restore pagkatapos ng pag-aaral",
-  "study.restore.body": "Papalitan ng pag-restore ngayon ang plano mo sa pag-aaral."
+  "study.restore.body": "Papalitan ng pag-restore ngayon ang plano mo sa pag-aaral.",
+  "sync.relay.title": "I-sync sa internet?",
+  "sync.relay.body": "Gumagamit ang internet sync ng maliit na relay na pinapatakbo ng developer ng FilterTube para ikonekta ang iyong mga device. Hindi nito mababasa ang sini-sync mo, dahil end-to-end encrypted ito. Nakikita nito ang isang device ID, ang iyong IP address at kung kailan ka nagsi-sync. Tumutulong ang STUN server ng Google na humanap ng ruta ng koneksyon at nakikita rin nito ang iyong IP address. Hindi gumagamit ng alinman sa dalawa ang nearby sync.",
+  "sync.relay.continue": "Magpatuloy",
+  "sync.relay.notNow": "Hindi muna"
 }

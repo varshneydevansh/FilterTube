@@ -2846,5 +2846,9 @@
   "study.switch.gentleBody": "Votre session d'étude se termine d'abord. Vous pouvez encore annuler pendant une pause de 30 secondes.",
   "study.error.running": "Impossible de changer le plan pendant un verrouillage.",
   "study.restore.title": "Restaurer après l'étude",
-  "study.restore.body": "Restaurer maintenant remplacerait votre plan d'étude."
+  "study.restore.body": "Restaurer maintenant remplacerait votre plan d'étude.",
+  "sync.relay.title": "Synchroniser par internet ?",
+  "sync.relay.body": "La synchronisation par internet utilise un petit relais géré par le développeur de FilterTube pour connecter vos appareils. Il ne peut pas lire ce que vous synchronisez, qui est chiffré de bout en bout. Il voit un identifiant d'appareil, votre adresse IP et le moment où vous synchronisez. Le serveur STUN de Google aide à trouver un chemin de connexion et voit aussi votre adresse IP. La synchronisation à proximité n'utilise ni l'un ni l'autre.",
+  "sync.relay.continue": "Continuer",
+  "sync.relay.notNow": "Pas maintenant"
 }

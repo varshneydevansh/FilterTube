@@ -2846,5 +2846,9 @@
   "study.switch.gentleBody": "Primero termina tu sesión de estudio. Aún puedes cancelar durante una pausa de 30 segundos.",
   "study.error.running": "No se puede cambiar el plan mientras hay un bloqueo activo.",
   "study.restore.title": "Restaurar después del estudio",
-  "study.restore.body": "Restaurar ahora reemplazaría tu plan de estudio."
+  "study.restore.body": "Restaurar ahora reemplazaría tu plan de estudio.",
+  "sync.relay.title": "¿Sincronizar por internet?",
+  "sync.relay.body": "La sincronización por internet usa un pequeño relé gestionado por el desarrollador de FilterTube para conectar tus dispositivos. No puede leer lo que sincronizas, que está cifrado de extremo a extremo. Ve un ID de dispositivo, tu dirección IP y cuándo sincronizas. El servidor STUN de Google ayuda a encontrar una ruta de conexión y también ve tu dirección IP. La sincronización cercana no usa ninguno de los dos.",
+  "sync.relay.continue": "Continuar",
+  "sync.relay.notNow": "Ahora no"
 }

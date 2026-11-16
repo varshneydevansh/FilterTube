@@ -2846,5 +2846,9 @@
   "study.switch.gentleBody": "Sesi belajar Anda berakhir dulu. Anda masih bisa membatalkan selama jeda 30 detik.",
   "study.error.running": "Rencana tidak bisa diubah saat kunci aktif.",
   "study.restore.title": "Pulihkan setelah belajar",
-  "study.restore.body": "Memulihkan sekarang akan menggantikan rencana belajar Anda."
+  "study.restore.body": "Memulihkan sekarang akan menggantikan rencana belajar Anda.",
+  "sync.relay.title": "Sinkronkan lewat internet?",
+  "sync.relay.body": "Sinkronisasi internet memakai relay kecil yang dijalankan oleh developer FilterTube untuk menghubungkan perangkat Anda. Relay tidak dapat membaca apa yang Anda sinkronkan, karena terenkripsi end-to-end. Relay melihat ID perangkat, alamat IP Anda, dan kapan Anda menyinkronkan. Server STUN milik Google membantu menemukan jalur koneksi dan juga melihat alamat IP Anda. Sinkronisasi terdekat tidak memakai keduanya.",
+  "sync.relay.continue": "Lanjutkan",
+  "sync.relay.notNow": "Nanti saja"
 }

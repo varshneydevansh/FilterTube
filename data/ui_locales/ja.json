@@ -2846,5 +2846,9 @@
   "study.switch.gentleBody": "先に学習セッションが終わります。30 秒の待ち時間のあいだは、まだキャンセルできます。",
   "study.error.running": "ロック中はプランを変更できません。",
   "study.restore.title": "学習後に復元",
-  "study.restore.body": "今復元すると、学習プランが置き換わります。"
+  "study.restore.body": "今復元すると、学習プランが置き換わります。",
+  "sync.relay.title": "インターネット経由で同期しますか？",
+  "sync.relay.body": "インターネット同期は、デバイス同士をつなぐために FilterTube の開発者が運営する小さなリレーを使います。同期する内容はエンドツーエンドで暗号化されているため、リレーは読めません。リレーに見えるのはデバイスID、IPアドレス、同期した時刻です。Google の STUN サーバーは接続経路を見つける手助けをし、こちらにもIPアドレスが見えます。近くのデバイスとの同期はどちらも使いません。",
+  "sync.relay.continue": "続行",
+  "sync.relay.notNow": "今はしない"
 }

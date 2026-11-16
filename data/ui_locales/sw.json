@@ -2846,5 +2846,9 @@
   "study.switch.gentleBody": "Kipindi chako cha kusoma kitaisha kwanza. Bado unaweza kughairi wakati wa kusubiri sekunde 30.",
   "study.error.running": "Huwezi kubadilisha mpango wakati kufuli inaendelea.",
   "study.restore.title": "Rejesha baada ya kusoma",
-  "study.restore.body": "Kurejesha sasa kungebadilisha mpango wako wa kusoma."
+  "study.restore.body": "Kurejesha sasa kungebadilisha mpango wako wa kusoma.",
+  "sync.relay.title": "Usawazishe kupitia intaneti?",
+  "sync.relay.body": "Usawazishaji wa intaneti hutumia relay ndogo inayoendeshwa na msanidi wa FilterTube kuunganisha vifaa vyako. Haiwezi kusoma unachosawazisha, kwa sababu kimesimbwa kutoka mwanzo hadi mwisho. Huona kitambulisho cha kifaa, anwani yako ya IP na wakati unaposawazisha. Seva ya STUN ya Google husaidia kupata njia ya muunganisho na pia huona anwani yako ya IP. Usawazishaji wa karibu hautumii yoyote kati ya hizo.",
+  "sync.relay.continue": "Endelea",
+  "sync.relay.notNow": "Si sasa"
 }

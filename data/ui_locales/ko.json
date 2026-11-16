@@ -2846,5 +2846,9 @@
   "study.switch.gentleBody": "먼저 공부 세션이 끝납니다. 30초 기다리는 동안에는 아직 취소할 수 있어요.",
   "study.error.running": "잠금이 진행 중일 때는 계획을 바꿀 수 없습니다.",
   "study.restore.title": "공부 후 복원",
-  "study.restore.body": "지금 복원하면 공부 계획이 바뀌어요."
+  "study.restore.body": "지금 복원하면 공부 계획이 바뀌어요.",
+  "sync.relay.title": "인터넷으로 동기화할까요?",
+  "sync.relay.body": "인터넷 동기화는 기기를 연결하기 위해 FilterTube 개발자가 운영하는 작은 릴레이를 사용합니다. 동기화하는 내용은 종단 간 암호화되어 있어 릴레이가 읽을 수 없습니다. 릴레이는 기기 ID, IP 주소, 동기화 시각을 볼 수 있습니다. Google의 STUN 서버는 연결 경로를 찾는 데 도움을 주며, 이 서버도 IP 주소를 볼 수 있습니다. 근처 동기화는 둘 다 사용하지 않습니다.",
+  "sync.relay.continue": "계속",
+  "sync.relay.notNow": "나중에"
 }
