@@ -60,7 +60,9 @@
             // "Skip this video" (Android StudyRuntimeStore skip:<profile>): per profile, newest last.
             skipped: object(clone(raw.skipped)),
             // Minutes a parent gave (Android StudyRuntimeStore grants): normal rules until each ends.
-            grants: array(clone(raw.grants))
+            grants: array(clone(raw.grants)),
+            // The subject of the last lecture played in a round (Android StudyWatchOverlay lastSubject:<profile>).
+            subjects: object(clone(raw.subjects))
         };
     }
 
@@ -273,6 +275,12 @@
             return null;
         }
 
+        /** "Up next after the break": the last lecture's subject, only from this session. */
+        function upNextFor(runtime, profileId, clock) {
+            const last = object(object(runtime?.subjects)[profileId]);
+            return clock.state === Engine.BREAK && Number.isFinite(last.at) && last.at >= clock.sessionStart ? text(last.subject) || null : null;
+        }
+
         function publicState(study, local, clock, packIds, at, applied = {}) {
             const breakSkipped = clock.state === Engine.BREAK && Number.isFinite(local.breakSkippedUntil) && at < local.breakSkippedUntil;
             let policy = study ? Engine.endPolicy(study) : { canEnd: false, reason: 'no_study' };
@@ -292,6 +300,8 @@
                 round: clock.round,
                 rounds: clock.rounds,
                 until: clock.until,
+                // Where the current round or break began: the break sun drains from it.
+                segmentStart: (Array.isArray(clock.segments) ? clock.segments : []).find(item => item.end === clock.until)?.start ?? null,
                 sessionStart: clock.sessionStart,
                 sessionEnd: clock.sessionEnd,
                 source: clock.source,
@@ -403,7 +413,8 @@
                 { ...options, reading: prepared?.reading, clockStore: prepared?.clockStore });
             if (!study) return { profile, applied: false, state: null };
             const result = Engine.studyEffectiveProfile(profile, { catalog: prepared?.catalog, clock, study });
-            return { profile: result.profile, applied: result.applied, state: publicState(study, local, clock, result.packIds, at, result) };
+            return { profile: result.profile, applied: result.applied,
+                state: { ...publicState(study, local, clock, result.packIds, at, result), upNext: upNextFor(prepared?.runtime, profileId, clock) } };
         }
 
         async function writeRuntime(runtime) {
@@ -508,6 +519,7 @@
                 deviceId: device,
                 study,
                 ...publicState(study, local, clock, applied.packIds || [], at, applied),
+                upNext: upNextFor(runtime, profileId, clock),
                 session: local.session,
                 clockNotes: array(object(guard.clockStore?.notes)[profileId]),
                 lock: lock ? { sessionId: lock.sessionId, sessionKind: lock.sessionKind, lockedUntil: lock.lockedUntil } : null,
@@ -691,7 +703,7 @@
          * Study time from a content script: credited only while the active profile is in STUDY, at most
          * the wall time since the last credit, so two playing tabs never count twice.
          */
-        async function tick({ seconds } = {}) {
+        async function tick({ seconds, title } = {}) {
             const value = Math.trunc(Number(seconds));
             if (!Number.isFinite(value) || value <= 0) return { ok: false, error: 'invalid_seconds' };
             const { profileId, profile, runtime } = await readAll();
@@ -706,6 +718,12 @@
             days[date] = Math.min(86400, (Number(days[date]) || 0) + credited);
             runtime.seconds[profileId] = Object.fromEntries(Object.entries(days).sort().slice(-400));
             runtime.lastCreditAt = at;
+            // "Up next after the break: {subject}": the subject the lecture's title names, if any.
+            if (Engine.subjectOf && typeof title === 'string' && title.trim()) {
+                const study = Model.profileStudy(profile);
+                const subject = Engine.subjectOf(title.slice(0, 300), Engine.studySubjects(study, await loadCatalog()));
+                if (subject) runtime.subjects[profileId] = { at, subject };
+            }
             await writeRuntime(runtime);
             return { ok: true, credited, date, seconds: days[date] };
         }

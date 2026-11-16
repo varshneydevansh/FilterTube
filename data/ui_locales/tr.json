@@ -3117,5 +3117,12 @@
   "study.end.rounds.many": "{count} tur",
   "study.end.rounds.other": "{count} tur",
   "study.end.round": "Ders, {round}. tur",
-  "study.end.minutes": "{minutes} dk"
+  "study.end.minutes": "{minutes} dk",
+  "study.overlay.upNext": "Moladan sonra: {subject}",
+  "study.overlay.breakLeft.zero": "Molanın bitmesine {count} dk",
+  "study.overlay.breakLeft.one": "Molanın bitmesine {count} dk",
+  "study.overlay.breakLeft.two": "Molanın bitmesine {count} dk",
+  "study.overlay.breakLeft.few": "Molanın bitmesine {count} dk",
+  "study.overlay.breakLeft.many": "Molanın bitmesine {count} dk",
+  "study.overlay.breakLeft.other": "Molanın bitmesine {count} dk"
 }

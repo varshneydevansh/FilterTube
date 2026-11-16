@@ -3117,5 +3117,12 @@
   "study.end.rounds.many": "{count} फेऱ्या",
   "study.end.rounds.other": "{count} फेऱ्या",
   "study.end.round": "अभ्यास, फेरी {round}",
-  "study.end.minutes": "{minutes} मि"
+  "study.end.minutes": "{minutes} मि",
+  "study.overlay.upNext": "ब्रेकनंतर: {subject}",
+  "study.overlay.breakLeft.zero": "तुमच्या विश्रांतीची {count} मि बाकी",
+  "study.overlay.breakLeft.one": "तुमच्या विश्रांतीची {count} मि बाकी",
+  "study.overlay.breakLeft.two": "तुमच्या विश्रांतीची {count} मि बाकी",
+  "study.overlay.breakLeft.few": "तुमच्या विश्रांतीची {count} मि बाकी",
+  "study.overlay.breakLeft.many": "तुमच्या विश्रांतीची {count} मि बाकी",
+  "study.overlay.breakLeft.other": "तुमच्या विश्रांतीची {count} मि बाकी"
 }

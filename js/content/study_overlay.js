@@ -210,6 +210,17 @@
 
         const SKIP_ID = 'filtertube-study-skip';
 
+        /** The playing lecture's title, for "Up next after the break" (Android StudyWatchOverlay lastSubject). */
+        function lectureTitle() {
+            try {
+                const heading = doc.querySelector?.('ytd-watch-metadata h1, h1.ytd-watch-metadata, h1.title, .slim-video-information-title');
+                const value = (heading?.textContent || String(doc.title || '').replace(/\s+-\s+YouTube$/, '')).trim();
+                return value.slice(0, 300);
+            } catch (e) {
+                return '';
+            }
+        }
+
         function currentVideoId() {
             try {
                 const url = new URL(String(win.location?.href || ''));
@@ -364,8 +375,16 @@
                 hold: [t('study.overlay.holdTitle', 'Study is on hold'), t('study.overlay.holdBody', 'The time or time zone on this device changed during a lock. Study continues when the clock is right again.')],
                 unavailable: [t('study.overlay.unavailableTitle', 'Study pack unavailable'), t('study.overlay.unavailableBody', 'Your study videos can\'t load right now, so nothing plays until this study time ends.')]
             }[kind] || [t('study.overlay.limitTitle', 'Done for today'), ''];
+            if (rest && Number.isFinite(Number(state?.until)) && typeof doc.createElementNS === 'function') box.appendChild(breakSun(dark));
             box.appendChild(element('div', { fontSize: '28px', fontWeight: '600' }, copy[0]));
             box.appendChild(element('div', { fontSize: '16px', maxWidth: '420px', lineHeight: '1.5' }, copy[1]));
+            if (rest && state?.upNext) {
+                // "Up next after the break: {subject}", when the last lecture's subject is known.
+                const next = element('div', { fontSize: '18px', fontWeight: '600', maxWidth: '420px', lineHeight: '1.3' },
+                    t('study.overlay.upNext', 'Up next after the break: {subject}', { subject: state.upNext }));
+                next.dataset.role = 'up-next';
+                box.appendChild(next);
+            }
             if (rest && state?.canSkipBreak) {
                 const button = element('button', {
                     marginTop: '8px', padding: '10px 20px', borderRadius: '20px', border: `1px solid ${dark ? '#f6d58a' : '#854F0B'}`,
@@ -405,11 +424,88 @@
                 picture.alt = '';
                 picture.setAttribute?.('aria-hidden', 'true');
                 picture.dataset && (picture.dataset.filtertubeStudyMascot = pose);
-                box.appendChild(picture);
+                // On a break she stands at the sun's 4 o'clock edge, never over the numbers (Android StudyRestActivity).
+                const sunNode = rest ? Array.from(box.children || []).find(child => child.dataset?.role === 'break-sun') : null;
+                if (sunNode) {
+                    Object.assign(picture.style, { position: 'absolute', right: '-78px', bottom: '-14px', height: '120px', order: '' });
+                    sunNode.appendChild(picture);
+                } else {
+                    box.appendChild(picture);
+                }
                 // Idle life with the page's interaction wake (shared with the blocked card).
                 try { localizer()?.idle?.(picture); } catch (e) { }
             }
             (doc.body || doc.documentElement).appendChild(box);
+        }
+
+        /**
+         * The break sun (Android StudyBreakSunView, StudyBreakClock): a crayon sun whose arc drains with
+         * the break and the m:ss left in its middle, ticking every second while the screen shows. Its
+         * accessible name stays the minutes left, so a screen reader isn't read every second.
+         */
+        let sunTimer = null;
+        function breakSun(dark) {
+            const NS = 'http://www.w3.org/2000/svg';
+            const ink = dark ? '#f6d58a' : '#854F0B';
+            const sun = dark ? '#c99a2e' : '#EDB12E';
+            const wrap = element('div', { position: 'relative', width: '200px', height: '200px', order: '-2' });
+            wrap.dataset.role = 'break-sun';
+            wrap.setAttribute?.('role', 'timer');
+            const svg = doc.createElementNS(NS, 'svg');
+            svg.setAttribute('viewBox', '0 0 200 200');
+            svg.setAttribute('width', '200');
+            svg.setAttribute('height', '200');
+            svg.setAttribute('aria-hidden', 'true');
+            for (let i = 0; i < 12; i += 1) {
+                const ray = doc.createElementNS(NS, 'line');
+                const angle = (Math.PI * 2 * i) / 12;
+                ray.setAttribute('x1', String(100 + 82 * Math.cos(angle))); ray.setAttribute('y1', String(100 + 82 * Math.sin(angle)));
+                ray.setAttribute('x2', String(100 + 95 * Math.cos(angle))); ray.setAttribute('y2', String(100 + 95 * Math.sin(angle)));
+                ray.setAttribute('stroke', sun); ray.setAttribute('stroke-width', '5'); ray.setAttribute('stroke-linecap', 'round');
+                svg.appendChild(ray);
+            }
+            const disc = doc.createElementNS(NS, 'circle');
+            disc.setAttribute('cx', '100'); disc.setAttribute('cy', '100'); disc.setAttribute('r', '70');
+            disc.setAttribute('fill', dark ? 'rgba(237,177,46,.12)' : 'rgba(237,177,46,.18)');
+            const track = doc.createElementNS(NS, 'circle');
+            track.setAttribute('cx', '100'); track.setAttribute('cy', '100'); track.setAttribute('r', '62');
+            track.setAttribute('fill', 'none'); track.setAttribute('stroke', sun); track.setAttribute('stroke-opacity', '.25'); track.setAttribute('stroke-width', '10');
+            const arc = doc.createElementNS(NS, 'circle');
+            arc.setAttribute('cx', '100'); arc.setAttribute('cy', '100'); arc.setAttribute('r', '62');
+            arc.setAttribute('fill', 'none'); arc.setAttribute('stroke', sun); arc.setAttribute('stroke-width', '10'); arc.setAttribute('stroke-linecap', 'round');
+            arc.setAttribute('transform', 'rotate(-90 100 100)');
+            svg.append(disc, track, arc);
+            const digits = element('div', { position: 'absolute', inset: '0', display: 'flex', alignItems: 'center', justifyContent: 'center',
+                fontSize: '40px', fontWeight: '600', color: ink, fontVariantNumeric: 'tabular-nums' });
+            digits.dataset.role = 'sun-countdown';
+            wrap.append(svg, digits);
+            const length = 2 * Math.PI * 62;
+            let lastMinutes = null;
+            const tickSun = () => {
+                const at = now();
+                const end = Number(state?.until);
+                const start = Number(state?.segmentStart);
+                const left = Math.max(0, end - at);
+                const remaining = Number.isFinite(start) && end > start ? Math.min(1, Math.max(0, left / (end - start))) : 1;
+                arc.setAttribute('stroke-dasharray', `${(remaining * length).toFixed(1)} ${length.toFixed(1)}`);
+                digits.textContent = countdown(left);
+                const minutes = Math.ceil(left / 60000);
+                if (minutes !== lastMinutes) {
+                    lastMinutes = minutes;
+                    let category = minutes === 1 ? 'one' : 'other';
+                    try { category = new Intl.PluralRules(doc.documentElement?.lang || undefined).select(minutes); } catch (e) { }
+                    wrap.setAttribute?.('aria-label', t(`study.overlay.breakLeft.${category}`, '{count} min left in your break', { count: minutes }));
+                }
+            };
+            tickSun();
+            const every = env.setInterval || ((fn, ms) => win.setInterval(fn, ms));
+            const stop = env.clearInterval || (id => win.clearInterval(id));
+            if (sunTimer !== null) stop(sunTimer);
+            sunTimer = every(() => {
+                if (!wrap.isConnected) { stop(sunTimer); sunTimer = null; return; }
+                tickSun();
+            }, 1000);
+            return wrap;
         }
 
         /**
@@ -546,7 +642,7 @@
             const seconds = Math.min(pendingSeconds, 60);
             if (seconds <= 0) return Promise.resolve(null);
             pendingSeconds -= seconds;
-            return send({ action: 'FilterTube_StudyProgressTick', seconds });
+            return send({ action: 'FilterTube_StudyProgressTick', seconds, title: lectureTitle() });
         }
 
         function onMessage(message) {

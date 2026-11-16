@@ -3117,5 +3117,12 @@
   "study.end.rounds.many": "zagaye {count}",
   "study.end.rounds.other": "zagaye {count}",
   "study.end.round": "Karatu, zagaye {round}",
-  "study.end.minutes": "{minutes} min"
+  "study.end.minutes": "{minutes} min",
+  "study.overlay.upNext": "Na gaba bayan hutu: {subject}",
+  "study.overlay.breakLeft.zero": "Saura min {count} na hutunka",
+  "study.overlay.breakLeft.one": "Saura min {count} na hutunka",
+  "study.overlay.breakLeft.two": "Saura min {count} na hutunka",
+  "study.overlay.breakLeft.few": "Saura min {count} na hutunka",
+  "study.overlay.breakLeft.many": "Saura min {count} na hutunka",
+  "study.overlay.breakLeft.other": "Saura min {count} na hutunka"
 }

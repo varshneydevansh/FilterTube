@@ -3115,5 +3115,12 @@
   "study.end.rounds.many": "{count} babak",
   "study.end.rounds.other": "{count} babak",
   "study.end.round": "Sinau, babak {round}",
-  "study.end.minutes": "{minutes} menit"
+  "study.end.minutes": "{minutes} menit",
+  "study.overlay.upNext": "Sabanjure sawise ngaso: {subject}",
+  "study.overlay.breakLeft.zero": "Kari {count} menit ngasomu",
+  "study.overlay.breakLeft.one": "Kari {count} menit ngasomu",
+  "study.overlay.breakLeft.two": "Kari {count} menit ngasomu",
+  "study.overlay.breakLeft.few": "Kari {count} menit ngasomu",
+  "study.overlay.breakLeft.many": "Kari {count} menit ngasomu",
+  "study.overlay.breakLeft.other": "Kari {count} menit ngasomu"
 }

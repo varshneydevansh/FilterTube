@@ -3117,5 +3117,12 @@
   "study.end.rounds.many": "{count} na round",
   "study.end.rounds.other": "{count} na round",
   "study.end.round": "Pag-aaral, round {round}",
-  "study.end.minutes": "{minutes} min"
+  "study.end.minutes": "{minutes} min",
+  "study.overlay.upNext": "Susunod pagkatapos ng break: {subject}",
+  "study.overlay.breakLeft.zero": "{count} min na lang ang pahinga mo",
+  "study.overlay.breakLeft.one": "{count} min na lang ang pahinga mo",
+  "study.overlay.breakLeft.two": "{count} min na lang ang pahinga mo",
+  "study.overlay.breakLeft.few": "{count} min na lang ang pahinga mo",
+  "study.overlay.breakLeft.many": "{count} min na lang ang pahinga mo",
+  "study.overlay.breakLeft.other": "{count} min na lang ang pahinga mo"
 }

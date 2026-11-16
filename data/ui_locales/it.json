@@ -3117,5 +3117,12 @@
   "study.end.rounds.many": "{count} round",
   "study.end.rounds.other": "{count} round",
   "study.end.round": "Studio, round {round}",
-  "study.end.minutes": "{minutes} min"
+  "study.end.minutes": "{minutes} min",
+  "study.overlay.upNext": "Dopo la pausa: {subject}",
+  "study.overlay.breakLeft.zero": "Ti restano {count} min di pausa",
+  "study.overlay.breakLeft.one": "Ti resta {count} min di pausa",
+  "study.overlay.breakLeft.two": "Ti restano {count} min di pausa",
+  "study.overlay.breakLeft.few": "Ti restano {count} min di pausa",
+  "study.overlay.breakLeft.many": "Ti restano {count} min di pausa",
+  "study.overlay.breakLeft.other": "Ti restano {count} min di pausa"
 }

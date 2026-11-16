@@ -3117,5 +3117,12 @@
   "study.end.rounds.many": "{count} rodadas",
   "study.end.rounds.other": "{count} rodadas",
   "study.end.round": "Estudo, rodada {round}",
-  "study.end.minutes": "{minutes} min"
+  "study.end.minutes": "{minutes} min",
+  "study.overlay.upNext": "Depois da pausa: {subject}",
+  "study.overlay.breakLeft.zero": "Faltam {count} min da sua pausa",
+  "study.overlay.breakLeft.one": "Falta {count} min da sua pausa",
+  "study.overlay.breakLeft.two": "Faltam {count} min da sua pausa",
+  "study.overlay.breakLeft.few": "Faltam {count} min da sua pausa",
+  "study.overlay.breakLeft.many": "Faltam {count} min da sua pausa",
+  "study.overlay.breakLeft.other": "Faltam {count} min da sua pausa"
 }

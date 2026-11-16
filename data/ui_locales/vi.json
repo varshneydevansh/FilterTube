@@ -3115,5 +3115,12 @@
   "study.end.rounds.many": "{count} lượt",
   "study.end.rounds.other": "{count} lượt",
   "study.end.round": "Học, vòng {round}",
-  "study.end.minutes": "{minutes} phút"
+  "study.end.minutes": "{minutes} phút",
+  "study.overlay.upNext": "Sau giờ nghỉ: {subject}",
+  "study.overlay.breakLeft.zero": "Còn {count} phút nghỉ",
+  "study.overlay.breakLeft.one": "Còn {count} phút nghỉ",
+  "study.overlay.breakLeft.two": "Còn {count} phút nghỉ",
+  "study.overlay.breakLeft.few": "Còn {count} phút nghỉ",
+  "study.overlay.breakLeft.many": "Còn {count} phút nghỉ",
+  "study.overlay.breakLeft.other": "Còn {count} phút nghỉ"
 }

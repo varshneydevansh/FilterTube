@@ -3115,5 +3115,12 @@
   "study.end.rounds.many": "{count}라운드",
   "study.end.rounds.other": "{count}라운드",
   "study.end.round": "공부, {round}회차",
-  "study.end.minutes": "{minutes}분"
+  "study.end.minutes": "{minutes}분",
+  "study.overlay.upNext": "휴식 후: {subject}",
+  "study.overlay.breakLeft.zero": "휴식 {count}분 남음",
+  "study.overlay.breakLeft.one": "휴식 {count}분 남음",
+  "study.overlay.breakLeft.two": "휴식 {count}분 남음",
+  "study.overlay.breakLeft.few": "휴식 {count}분 남음",
+  "study.overlay.breakLeft.many": "휴식 {count}분 남음",
+  "study.overlay.breakLeft.other": "휴식 {count}분 남음"
 }

@@ -3115,5 +3115,12 @@
   "study.end.rounds.many": "{count} รอบ",
   "study.end.rounds.other": "{count} รอบ",
   "study.end.round": "เรียน รอบที่ {round}",
-  "study.end.minutes": "{minutes} นาที"
+  "study.end.minutes": "{minutes} นาที",
+  "study.overlay.upNext": "ต่อจากพัก: {subject}",
+  "study.overlay.breakLeft.zero": "เหลือเวลาพัก {count} นาที",
+  "study.overlay.breakLeft.one": "เหลือเวลาพัก {count} นาที",
+  "study.overlay.breakLeft.two": "เหลือเวลาพัก {count} นาที",
+  "study.overlay.breakLeft.few": "เหลือเวลาพัก {count} นาที",
+  "study.overlay.breakLeft.many": "เหลือเวลาพัก {count} นาที",
+  "study.overlay.breakLeft.other": "เหลือเวลาพัก {count} นาที"
 }

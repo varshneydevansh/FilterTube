@@ -3117,5 +3117,12 @@
   "study.end.rounds.many": "{count} ዙሮች",
   "study.end.rounds.other": "{count} ዙሮች",
   "study.end.round": "ጥናት፣ ዙር {round}",
-  "study.end.minutes": "{minutes} ደቂቃ"
+  "study.end.minutes": "{minutes} ደቂቃ",
+  "study.overlay.upNext": "ከእረፍቱ በኋላ የሚቀጥለው፦ {subject}",
+  "study.overlay.breakLeft.zero": "ከእረፍትህ {count} ደቂቃ ቀርቷል",
+  "study.overlay.breakLeft.one": "ከእረፍትህ {count} ደቂቃ ቀርቷል",
+  "study.overlay.breakLeft.two": "ከእረፍትህ {count} ደቂቃ ቀርቷል",
+  "study.overlay.breakLeft.few": "ከእረፍትህ {count} ደቂቃ ቀርቷል",
+  "study.overlay.breakLeft.many": "ከእረፍትህ {count} ደቂቃ ቀርቷል",
+  "study.overlay.breakLeft.other": "ከእረፍትህ {count} ደቂቃ ቀርቷል"
 }

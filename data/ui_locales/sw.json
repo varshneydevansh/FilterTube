@@ -3117,5 +3117,12 @@
   "study.end.rounds.many": "raundi {count}",
   "study.end.rounds.other": "raundi {count}",
   "study.end.round": "Kusoma, mzunguko {round}",
-  "study.end.minutes": "Dak {minutes}"
+  "study.end.minutes": "Dak {minutes}",
+  "study.overlay.upNext": "Kinachofuata baada ya mapumziko: {subject}",
+  "study.overlay.breakLeft.zero": "Zimebaki dak {count} za mapumziko yako",
+  "study.overlay.breakLeft.one": "Imebaki dak {count} ya mapumziko yako",
+  "study.overlay.breakLeft.two": "Zimebaki dak {count} za mapumziko yako",
+  "study.overlay.breakLeft.few": "Zimebaki dak {count} za mapumziko yako",
+  "study.overlay.breakLeft.many": "Zimebaki dak {count} za mapumziko yako",
+  "study.overlay.breakLeft.other": "Zimebaki dak {count} za mapumziko yako"
 }

@@ -3117,5 +3117,12 @@
   "study.end.rounds.many": "{count} راؤنڈ",
   "study.end.rounds.other": "{count} راؤنڈ",
   "study.end.round": "پڑھائی، دور {round}",
-  "study.end.minutes": "{minutes} منٹ"
+  "study.end.minutes": "{minutes} منٹ",
+  "study.overlay.upNext": "وقفے کے بعد: {subject}",
+  "study.overlay.breakLeft.zero": "آپ کے وقفے کے {count} منٹ باقی",
+  "study.overlay.breakLeft.one": "آپ کے وقفے کے {count} منٹ باقی",
+  "study.overlay.breakLeft.two": "آپ کے وقفے کے {count} منٹ باقی",
+  "study.overlay.breakLeft.few": "آپ کے وقفے کے {count} منٹ باقی",
+  "study.overlay.breakLeft.many": "آپ کے وقفے کے {count} منٹ باقی",
+  "study.overlay.breakLeft.other": "آپ کے وقفے کے {count} منٹ باقی"
 }

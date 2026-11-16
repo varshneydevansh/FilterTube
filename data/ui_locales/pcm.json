@@ -3117,5 +3117,12 @@
   "study.end.rounds.many": "{count} rounds",
   "study.end.rounds.other": "{count} rounds",
   "study.end.round": "Study, round {round}",
-  "study.end.minutes": "{minutes} min"
+  "study.end.minutes": "{minutes} min",
+  "study.overlay.upNext": "Wetin dey next after break: {subject}",
+  "study.overlay.breakLeft.zero": "{count} min of your break remain",
+  "study.overlay.breakLeft.one": "{count} min of your break remain",
+  "study.overlay.breakLeft.two": "{count} min of your break remain",
+  "study.overlay.breakLeft.few": "{count} min of your break remain",
+  "study.overlay.breakLeft.many": "{count} min of your break remain",
+  "study.overlay.breakLeft.other": "{count} min of your break remain"
 }

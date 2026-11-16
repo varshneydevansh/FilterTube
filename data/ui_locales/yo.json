@@ -3115,5 +3115,12 @@
   "study.end.rounds.many": "ìpele {count}",
   "study.end.rounds.other": "ìpele {count}",
   "study.end.round": "Ẹ̀kọ́, ìyípo {round}",
-  "study.end.minutes": "{minutes} ìṣẹ́jú"
+  "study.end.minutes": "{minutes} ìṣẹ́jú",
+  "study.overlay.upNext": "Ohun tó kàn lẹ́yìn ìsinmi: {subject}",
+  "study.overlay.breakLeft.zero": "Ìṣẹ́jú {count} ìsinmi rẹ ló kù",
+  "study.overlay.breakLeft.one": "Ìṣẹ́jú {count} ìsinmi rẹ ló kù",
+  "study.overlay.breakLeft.two": "Ìṣẹ́jú {count} ìsinmi rẹ ló kù",
+  "study.overlay.breakLeft.few": "Ìṣẹ́jú {count} ìsinmi rẹ ló kù",
+  "study.overlay.breakLeft.many": "Ìṣẹ́jú {count} ìsinmi rẹ ló kù",
+  "study.overlay.breakLeft.other": "Ìṣẹ́jú {count} ìsinmi rẹ ló kù"
 }

@@ -3117,5 +3117,12 @@
   "study.end.rounds.many": "{count} சுற்றுகள்",
   "study.end.rounds.other": "{count} சுற்றுகள்",
   "study.end.round": "படிப்பு, சுற்று {round}",
-  "study.end.minutes": "{minutes} நிமி"
+  "study.end.minutes": "{minutes} நிமி",
+  "study.overlay.upNext": "இடைவேளைக்குப் பிறகு: {subject}",
+  "study.overlay.breakLeft.zero": "உங்கள் இடைவேளையில் {count} நிமி மீதம்",
+  "study.overlay.breakLeft.one": "உங்கள் இடைவேளையில் {count} நிமி மீதம்",
+  "study.overlay.breakLeft.two": "உங்கள் இடைவேளையில் {count} நிமி மீதம்",
+  "study.overlay.breakLeft.few": "உங்கள் இடைவேளையில் {count} நிமி மீதம்",
+  "study.overlay.breakLeft.many": "உங்கள் இடைவேளையில் {count} நிமி மீதம்",
+  "study.overlay.breakLeft.other": "உங்கள் இடைவேளையில் {count} நிமி மீதம்"
 }

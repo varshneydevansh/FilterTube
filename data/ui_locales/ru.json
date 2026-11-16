@@ -3129,5 +3129,12 @@
   "study.end.rounds.many": "{count} раундов",
   "study.end.rounds.other": "{count} раунда",
   "study.end.round": "Учёба, раунд {round}",
-  "study.end.minutes": "{minutes} мин"
+  "study.end.minutes": "{minutes} мин",
+  "study.overlay.upNext": "После перерыва: {subject}",
+  "study.overlay.breakLeft.zero": "До конца перерыва {count} мин",
+  "study.overlay.breakLeft.one": "До конца перерыва {count} мин",
+  "study.overlay.breakLeft.two": "До конца перерыва {count} мин",
+  "study.overlay.breakLeft.few": "До конца перерыва {count} мин",
+  "study.overlay.breakLeft.many": "До конца перерыва {count} мин",
+  "study.overlay.breakLeft.other": "До конца перерыва {count} мин"
 }

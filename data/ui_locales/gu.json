@@ -3117,5 +3117,12 @@
   "study.end.rounds.many": "{count} રાઉન્ડ",
   "study.end.rounds.other": "{count} રાઉન્ડ",
   "study.end.round": "અભ્યાસ, રાઉન્ડ {round}",
-  "study.end.minutes": "{minutes} મિનિટ"
+  "study.end.minutes": "{minutes} મિનિટ",
+  "study.overlay.upNext": "વિરામ પછી: {subject}",
+  "study.overlay.breakLeft.zero": "તમારા વિરામની {count} મિનિટ બાકી",
+  "study.overlay.breakLeft.one": "તમારા વિરામની {count} મિનિટ બાકી",
+  "study.overlay.breakLeft.two": "તમારા વિરામની {count} મિનિટ બાકી",
+  "study.overlay.breakLeft.few": "તમારા વિરામની {count} મિનિટ બાકી",
+  "study.overlay.breakLeft.many": "તમારા વિરામની {count} મિનિટ બાકી",
+  "study.overlay.breakLeft.other": "તમારા વિરામની {count} મિનિટ બાકી"
 }

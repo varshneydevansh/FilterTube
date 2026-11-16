@@ -3117,5 +3117,12 @@
   "study.end.rounds.many": "{count} রাউন্ড",
   "study.end.rounds.other": "{count} রাউন্ড",
   "study.end.round": "পড়া, রাউন্ড {round}",
-  "study.end.minutes": "{minutes} মিনিট"
+  "study.end.minutes": "{minutes} মিনিট",
+  "study.overlay.upNext": "বিরতির পরে: {subject}",
+  "study.overlay.breakLeft.zero": "আপনার বিরতির {count} মিনিট বাকি",
+  "study.overlay.breakLeft.one": "আপনার বিরতির {count} মিনিট বাকি",
+  "study.overlay.breakLeft.two": "আপনার বিরতির {count} মিনিট বাকি",
+  "study.overlay.breakLeft.few": "আপনার বিরতির {count} মিনিট বাকি",
+  "study.overlay.breakLeft.many": "আপনার বিরতির {count} মিনিট বাকি",
+  "study.overlay.breakLeft.other": "আপনার বিরতির {count} মিনিট বাকি"
 }

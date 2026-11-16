@@ -3117,5 +3117,12 @@
   "study.end.rounds.many": "{count} rondas",
   "study.end.rounds.other": "{count} rondas",
   "study.end.round": "Estudio, ronda {round}",
-  "study.end.minutes": "{minutes} min"
+  "study.end.minutes": "{minutes} min",
+  "study.overlay.upNext": "Después del descanso: {subject}",
+  "study.overlay.breakLeft.zero": "Quedan {count} min de tu descanso",
+  "study.overlay.breakLeft.one": "Queda {count} min de tu descanso",
+  "study.overlay.breakLeft.two": "Quedan {count} min de tu descanso",
+  "study.overlay.breakLeft.few": "Quedan {count} min de tu descanso",
+  "study.overlay.breakLeft.many": "Quedan {count} min de tu descanso",
+  "study.overlay.breakLeft.other": "Quedan {count} min de tu descanso"
 }

@@ -3115,5 +3115,12 @@
   "study.end.rounds.many": "{count} ronde",
   "study.end.rounds.other": "{count} ronde",
   "study.end.round": "Belajar, putaran {round}",
-  "study.end.minutes": "{minutes} mnt"
+  "study.end.minutes": "{minutes} mnt",
+  "study.overlay.upNext": "Berikutnya setelah istirahat: {subject}",
+  "study.overlay.breakLeft.zero": "{count} mnt istirahat Anda tersisa",
+  "study.overlay.breakLeft.one": "{count} mnt istirahat Anda tersisa",
+  "study.overlay.breakLeft.two": "{count} mnt istirahat Anda tersisa",
+  "study.overlay.breakLeft.few": "{count} mnt istirahat Anda tersisa",
+  "study.overlay.breakLeft.many": "{count} mnt istirahat Anda tersisa",
+  "study.overlay.breakLeft.other": "{count} mnt istirahat Anda tersisa"
 }

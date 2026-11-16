@@ -281,6 +281,39 @@
         return { breakStart: pause.start, breakEnd: pause.end, addedMinutes: added, round: before.round, roundMinutes: minutes(pause.end - before.start) };
     }
 
+    // ---- "Up next after the break" (Android StudyHomeFeed.chips, StudyPageRules.subjectOf) ---------
+
+    /** The study Home's subject chips: the branch's chips, else the pack's ({label, words}). */
+    function studySubjects(study, catalog) {
+        const value = object(study);
+        const out = [];
+        const seen = new Set();
+        for (const id of array(value.activePackIds)) {
+            const pack = array(object(catalog).packs).find(item => item.id === id);
+            if (!pack) continue;
+            const variant = packVariant(pack, object(object(value.packEdits)[id]).variant);
+            const labels = array(variant?.chips).length ? variant.chips : array(pack.chips);
+            for (const label of labels.map(text).filter(Boolean)) {
+                const key = label.toLowerCase();
+                if (seen.has(key)) continue;
+                seen.add(key);
+                // Android's words are the label and its search query without the exam name: the label again.
+                out.push({ label, words: [label] });
+            }
+        }
+        return out;
+    }
+
+    /** The first subject a title names (a whole-word match, case-insensitive), or null. */
+    function subjectOf(title, subjects) {
+        const value = text(title);
+        if (!value) return null;
+        for (const subject of array(subjects)) {
+            if (topicPatterns(subject.words).some(rx => rx.test(value))) return subject.label;
+        }
+        return null;
+    }
+
     // ---- Session ends: the end card (Android StudySessionEnds, StudyRingModel.seal, StudyClock.withSkips) --
 
     /** An end card older than this isn't news any more: it's dropped unseen. */
@@ -1153,7 +1186,7 @@
         parseTime, localDateKey, splitRounds, planOccurrences, studyClock, studyRulesApply, studyPhase,
         SUGGESTION_KINDS, suggest, suggestionSeed, studyTopics, studyAllowPhrases, topicTerms, topicPatterns,
         topicsForQuery, exampleSearches, searchExplainer, topicLabel, breakSkipPreview, SKIP_UNDO_MS,
-        withSkips, sessionSeal, sessionEndStep, pendingSessionEnd, SESSION_END_STALE_MS, SESSION_CLOSE_SLACK_MS,
+        studySubjects, subjectOf, withSkips, sessionSeal, sessionEndStep, pendingSessionEnd, SESSION_END_STALE_MS, SESSION_CLOSE_SLACK_MS,
         packVariant, packLayer, activePackLayers, stampPackCopies, studyEffectiveProfile,
         BRANCH_SOURCE, KIDS_KINDS, KIDS_SPACE, AMBIGUOUS_BRANCH_WORDS,
         packChannelsFor, packTopicsFor, hasSeparateBranches, branchTopics, otherBranchTopics,

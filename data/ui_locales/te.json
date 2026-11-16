@@ -3117,5 +3117,12 @@
   "study.end.rounds.many": "{count} రౌండ్లు",
   "study.end.rounds.other": "{count} రౌండ్లు",
   "study.end.round": "చదువు, రౌండ్ {round}",
-  "study.end.minutes": "{minutes} నిమి"
+  "study.end.minutes": "{minutes} నిమి",
+  "study.overlay.upNext": "విరామం తర్వాత: {subject}",
+  "study.overlay.breakLeft.zero": "మీ విరామంలో {count} నిమి మిగిలింది",
+  "study.overlay.breakLeft.one": "మీ విరామంలో {count} నిమి మిగిలింది",
+  "study.overlay.breakLeft.two": "మీ విరామంలో {count} నిమి మిగిలింది",
+  "study.overlay.breakLeft.few": "మీ విరామంలో {count} నిమి మిగిలింది",
+  "study.overlay.breakLeft.many": "మీ విరామంలో {count} నిమి మిగిలింది",
+  "study.overlay.breakLeft.other": "మీ విరామంలో {count} నిమి మిగిలింది"
 }

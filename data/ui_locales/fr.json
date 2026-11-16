@@ -3117,5 +3117,12 @@
   "study.end.rounds.many": "{count} manches",
   "study.end.rounds.other": "{count} manches",
   "study.end.round": "Étude, tour {round}",
-  "study.end.minutes": "{minutes} min"
+  "study.end.minutes": "{minutes} min",
+  "study.overlay.upNext": "Après la pause : {subject}",
+  "study.overlay.breakLeft.zero": "{count} min de pause restantes",
+  "study.overlay.breakLeft.one": "{count} min de pause restante",
+  "study.overlay.breakLeft.two": "{count} min de pause restantes",
+  "study.overlay.breakLeft.few": "{count} min de pause restantes",
+  "study.overlay.breakLeft.many": "{count} min de pause restantes",
+  "study.overlay.breakLeft.other": "{count} min de pause restantes"
 }

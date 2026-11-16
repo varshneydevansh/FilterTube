@@ -3115,5 +3115,12 @@
   "study.end.rounds.many": "{count} 輪",
   "study.end.rounds.other": "{count} 輪",
   "study.end.round": "學習，第 {round} 輪",
-  "study.end.minutes": "{minutes} 分鐘"
+  "study.end.minutes": "{minutes} 分鐘",
+  "study.overlay.upNext": "休息之後：{subject}",
+  "study.overlay.breakLeft.zero": "休息仲有 {count} 分鐘",
+  "study.overlay.breakLeft.one": "休息仲有 {count} 分鐘",
+  "study.overlay.breakLeft.two": "休息仲有 {count} 分鐘",
+  "study.overlay.breakLeft.few": "休息仲有 {count} 分鐘",
+  "study.overlay.breakLeft.many": "休息仲有 {count} 分鐘",
+  "study.overlay.breakLeft.other": "休息仲有 {count} 分鐘"
 }

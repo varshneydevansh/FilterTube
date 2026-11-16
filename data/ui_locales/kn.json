@@ -3117,5 +3117,12 @@
   "study.end.rounds.many": "{count} ಸುತ್ತುಗಳು",
   "study.end.rounds.other": "{count} ಸುತ್ತುಗಳು",
   "study.end.round": "ಅಧ್ಯಯನ, ಸುತ್ತು {round}",
-  "study.end.minutes": "{minutes} ನಿಮಿ"
+  "study.end.minutes": "{minutes} ನಿಮಿ",
+  "study.overlay.upNext": "ವಿರಾಮದ ನಂತರ: {subject}",
+  "study.overlay.breakLeft.zero": "ನಿಮ್ಮ ವಿರಾಮದಲ್ಲಿ {count} ನಿಮಿ ಉಳಿದಿವೆ",
+  "study.overlay.breakLeft.one": "ನಿಮ್ಮ ವಿರಾಮದಲ್ಲಿ {count} ನಿಮಿ ಉಳಿದಿದೆ",
+  "study.overlay.breakLeft.two": "ನಿಮ್ಮ ವಿರಾಮದಲ್ಲಿ {count} ನಿಮಿ ಉಳಿದಿವೆ",
+  "study.overlay.breakLeft.few": "ನಿಮ್ಮ ವಿರಾಮದಲ್ಲಿ {count} ನಿಮಿ ಉಳಿದಿವೆ",
+  "study.overlay.breakLeft.many": "ನಿಮ್ಮ ವಿರಾಮದಲ್ಲಿ {count} ನಿಮಿ ಉಳಿದಿವೆ",
+  "study.overlay.breakLeft.other": "ನಿಮ್ಮ ವಿರಾಮದಲ್ಲಿ {count} ನಿಮಿ ಉಳಿದಿವೆ"
 }

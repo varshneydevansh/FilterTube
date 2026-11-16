@@ -3117,5 +3117,12 @@
   "study.end.rounds.many": "{count} دور",
   "study.end.rounds.other": "{count} دور",
   "study.end.round": "مطالعه، دور {round}",
-  "study.end.minutes": "{minutes} دقیقه"
+  "study.end.minutes": "{minutes} دقیقه",
+  "study.overlay.upNext": "بعد از استراحت: {subject}",
+  "study.overlay.breakLeft.zero": "{count} دقیقه از استراحت شما مانده",
+  "study.overlay.breakLeft.one": "{count} دقیقه از استراحت شما مانده",
+  "study.overlay.breakLeft.two": "{count} دقیقه از استراحت شما مانده",
+  "study.overlay.breakLeft.few": "{count} دقیقه از استراحت شما مانده",
+  "study.overlay.breakLeft.many": "{count} دقیقه از استراحت شما مانده",
+  "study.overlay.breakLeft.other": "{count} دقیقه از استراحت شما مانده"
 }

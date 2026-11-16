@@ -3141,5 +3141,12 @@
   "study.end.rounds.many": "{count} جولة",
   "study.end.rounds.other": "{count} جولة",
   "study.end.round": "دراسة، الجولة {round}",
-  "study.end.minutes": "{minutes} د"
+  "study.end.minutes": "{minutes} د",
+  "study.overlay.upNext": "الجاي بعد الاستراحة: {subject}",
+  "study.overlay.breakLeft.zero": "{count} دقيقة متبقية من استراحتك",
+  "study.overlay.breakLeft.one": "{count} دقيقة متبقية من استراحتك",
+  "study.overlay.breakLeft.two": "{count} دقيقتان متبقيتان من استراحتك",
+  "study.overlay.breakLeft.few": "{count} دقائق متبقية من استراحتك",
+  "study.overlay.breakLeft.many": "{count} دقيقة متبقية من استراحتك",
+  "study.overlay.breakLeft.other": "{count} دقيقة متبقية من استراحتك"
 }

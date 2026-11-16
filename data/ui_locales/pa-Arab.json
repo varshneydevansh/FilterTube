@@ -3117,5 +3117,12 @@
   "study.end.rounds.many": "{count} راؤنڈ",
   "study.end.rounds.other": "{count} راؤنڈ",
   "study.end.round": "پڑھائی، گیڑا {round}",
-  "study.end.minutes": "{minutes} منٹ"
+  "study.end.minutes": "{minutes} منٹ",
+  "study.overlay.upNext": "بریک توں بعد: {subject}",
+  "study.overlay.breakLeft.zero": "تہاڈے وقفے دے {count} منٹ باقی",
+  "study.overlay.breakLeft.one": "تہاڈے وقفے دا {count} منٹ باقی",
+  "study.overlay.breakLeft.two": "تہاڈے وقفے دے {count} منٹ باقی",
+  "study.overlay.breakLeft.few": "تہاڈے وقفے دے {count} منٹ باقی",
+  "study.overlay.breakLeft.many": "تہاڈے وقفے دے {count} منٹ باقی",
+  "study.overlay.breakLeft.other": "تہاڈے وقفے دے {count} منٹ باقی"
 }
