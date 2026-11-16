@@ -2474,6 +2474,8 @@
   "study.overlay.unavailableTitle": "حزمة الدراسة غير متاحة",
   "study.overlay.unavailableBody": "تعذّر تحميل مقاطع دراستك الآن، لذا لن يُشغَّل شيء حتى ينتهي وقت الدراسة هذا.",
   "study.overlay.skipBreak": "تخطي الاستراحة",
+  "study.overlay.skipCost": "+{minutes} دقيقة للجولة {round}",
+  "study.overlay.breakSkipped": "تم تخطي الاستراحة. أصبحت الجولة {round} الآن {minutes} دقيقة.",
   "study.overlay.breakNotice": "استراحة بعد دقيقتين. أنهِ هذا المقطع.",
   "study.setByParent": "حدّده أحد الوالدين",
   "study.setBy": "حدّده {name}",

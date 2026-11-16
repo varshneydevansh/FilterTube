@@ -2474,6 +2474,8 @@
   "study.overlay.unavailableTitle": "حزمة الدراسة مش متاحة",
   "study.overlay.unavailableBody": "فيديوهات دراستك ما عم تتحمّل هلق، فما في شي رح يشتغل لحتى يخلص وقت الدراسة هاد.",
   "study.overlay.skipBreak": "تخطّى الاستراحة",
+  "study.overlay.skipCost": "+{minutes} دقيقة للجولة {round}",
+  "study.overlay.breakSkipped": "تخطيت الاستراحة. الجولة {round} صارت {minutes} دقيقة.",
   "study.overlay.breakNotice": "استراحة بعد دقيقتين. خلّص هالفيديو.",
   "study.setByParent": "حطّو واحد من الأهل",
   "study.setBy": "حطّو {name}",

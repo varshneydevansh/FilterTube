@@ -2474,6 +2474,8 @@
   "study.overlay.unavailableTitle": "溫習包用唔到",
   "study.overlay.unavailableBody": "溫習影片而家載入唔到，所以喺今次溫習時間完之前乜都唔會播。",
   "study.overlay.skipBreak": "跳過休息",
+  "study.overlay.skipCost": "第{round}輪加{minutes}分鐘",
+  "study.overlay.breakSkipped": "已略過休息。第{round}輪而家係{minutes}分鐘。",
   "study.overlay.breakNotice": "2 分鐘後休息。睇埋呢條片先。",
   "study.setByParent": "由家長設定",
   "study.setBy": "由 {name} 設定",

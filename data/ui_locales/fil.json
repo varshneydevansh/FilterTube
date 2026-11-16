@@ -2474,6 +2474,8 @@
   "study.overlay.unavailableTitle": "Hindi available ang study pack",
   "study.overlay.unavailableBody": "Hindi ma-load ngayon ang mga video mo sa pag-aaral, kaya walang magpe-play hanggang matapos ang oras ng pag-aaral na ito.",
   "study.overlay.skipBreak": "Laktawan ang break",
+  "study.overlay.skipCost": "+{minutes} min sa round {round}",
+  "study.overlay.breakSkipped": "Nilaktawan ang break. {minutes} min na ngayon ang round {round}.",
   "study.overlay.breakNotice": "Break sa loob ng 2 minuto. Tapusin ang video na ito.",
   "study.setByParent": "Itinakda ng magulang",
   "study.setBy": "Itinakda ni {name}",

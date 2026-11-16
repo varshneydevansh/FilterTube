@@ -2474,6 +2474,8 @@
   "study.overlay.unavailableTitle": "የጥናት ጥቅል አይገኝም",
   "study.overlay.unavailableBody": "የጥናት ቪዲዮዎችዎ አሁን መጫን አልቻሉም፣ ስለዚህ ይህ የጥናት ጊዜ እስኪያልቅ ምንም አይጫወትም።",
   "study.overlay.skipBreak": "እረፍቱን ዝለል",
+  "study.overlay.skipCost": "+{minutes} ደቂቃ ወደ ዙር {round}",
+  "study.overlay.breakSkipped": "እረፍቱ ታልፏል። ዙር {round} አሁን {minutes} ደቂቃ ነው።",
   "study.overlay.breakNotice": "እረፍት በ2 ደቂቃ ውስጥ። ይህን ቪዲዮ ይጨርሱ።",
   "study.setByParent": "በወላጅ የተዘጋጀ",
   "study.setBy": "በ{name} የተዘጋጀ",

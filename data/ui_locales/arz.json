@@ -2474,6 +2474,8 @@
   "study.overlay.unavailableTitle": "باقة المذاكرة مش متاحة",
   "study.overlay.unavailableBody": "فيديوهات المذاكرة مش عارفة تحمّل دلوقتي، فمفيش حاجة هتشتغل لحد ما وقت المذاكرة ده يخلص.",
   "study.overlay.skipBreak": "فوّت البريك",
+  "study.overlay.skipCost": "+{minutes} دقيقة للجولة {round}",
+  "study.overlay.breakSkipped": "عديت الاستراحة. الجولة {round} بقت {minutes} دقيقة.",
   "study.overlay.breakNotice": "بريك كمان دقيقتين. خلّص الفيديو ده.",
   "study.setByParent": "حطّه حد من الأهل",
   "study.setBy": "حطّه {name}",

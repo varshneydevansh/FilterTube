@@ -2474,6 +2474,8 @@
   "study.overlay.unavailableTitle": "Pack d’études indisponible",
   "study.overlay.unavailableBody": "Tes vidéos d’études ne peuvent pas se charger pour l’instant, donc rien ne se lit avant la fin de ce temps d’études.",
   "study.overlay.skipBreak": "Passer la pause",
+  "study.overlay.skipCost": "+{minutes} min pour la manche {round}",
+  "study.overlay.breakSkipped": "Pause sautée. La manche {round} dure maintenant {minutes} min.",
   "study.overlay.breakNotice": "Pause dans 2 minutes. Termine cette vidéo.",
   "study.setByParent": "Défini par un parent",
   "study.setBy": "Défini par {name}",

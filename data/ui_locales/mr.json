@@ -2474,6 +2474,8 @@
   "study.overlay.unavailableTitle": "अभ्यास पॅक उपलब्ध नाही",
   "study.overlay.unavailableBody": "तुमचे अभ्यास व्हिडिओ आता लोड होऊ शकत नाहीत, त्यामुळे ही अभ्यास वेळ संपेपर्यंत काहीही चालणार नाही.",
   "study.overlay.skipBreak": "ब्रेक वगळा",
+  "study.overlay.skipCost": "फेरी {round} मध्ये +{minutes} मिनिटे",
+  "study.overlay.breakSkipped": "ब्रेक वगळला. फेरी {round} आता {minutes} मिनिटांची आहे.",
   "study.overlay.breakNotice": "2 मिनिटांत ब्रेक. हा व्हिडिओ पूर्ण करा.",
   "study.setByParent": "पालकांनी सेट केले",
   "study.setBy": "{name} यांनी सेट केले",

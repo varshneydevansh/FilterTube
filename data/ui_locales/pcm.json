@@ -2474,6 +2474,8 @@
   "study.overlay.unavailableTitle": "Study pack no dey available",
   "study.overlay.unavailableBody": "Your study videos no fit load now, so nothing go play till this study time finish.",
   "study.overlay.skipBreak": "Skip break",
+  "study.overlay.skipCost": "+{minutes} min to round {round}",
+  "study.overlay.breakSkipped": "You skip break. Round {round} don be {minutes} min now.",
   "study.overlay.breakNotice": "Break go start in 2 minutes. Finish this video.",
   "study.setByParent": "Na parent set am",
   "study.setBy": "Na {name} set am",

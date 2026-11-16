@@ -256,6 +256,31 @@
         return { round, rest };
     }
 
+    /** How long Undo stays after Skip break (Android StudyBreakSkip.UNDO_MILLIS). */
+    const SKIP_UNDO_MS = 5000;
+
+    /**
+     * What Skip break does (Android StudyBreakSkip.preview): the break starting at `breakStart` joins the
+     * round after it, which then runs from the break's start ("+5 min to round 3", "Round 3 is now 55
+     * min"). The last break of a session has no round after it: the round before runs on through it.
+     * {breakStart, breakEnd, addedMinutes, round, roundMinutes}, or null when that break isn't there.
+     */
+    function breakSkipPreview(segments, breakStart) {
+        const list = Array.isArray(segments) ? segments : [];
+        const index = list.findIndex(item => item && item.kind === BREAK && item.start === breakStart);
+        if (index < 0) return null;
+        const pause = list[index];
+        const minutes = ms => Math.max(1, Math.floor((ms + 30 * 1000) / MINUTE));
+        const added = minutes(pause.end - pause.start);
+        const next = list[index + 1];
+        if (next && next.kind === STUDY) {
+            return { breakStart: pause.start, breakEnd: pause.end, addedMinutes: added, round: next.round, roundMinutes: minutes(next.end - pause.start) };
+        }
+        const before = list[index - 1];
+        if (!before || before.kind !== STUDY) return null;
+        return { breakStart: pause.start, breakEnd: pause.end, addedMinutes: added, round: before.round, roundMinutes: minutes(pause.end - before.start) };
+    }
+
     /** The study and break segments of one occurrence; the last round is clamped to the end. */
     function splitRounds(start, end, focus) {
         const { round, rest } = focusMinutes(focus);
@@ -1036,7 +1061,7 @@
         SELF_LOCK_MAX_MINUTES, PARENT_LOCK_MAX_MINUTES, STUDY_SOURCE, TOPIC_SOURCE,
         parseTime, localDateKey, splitRounds, planOccurrences, studyClock, studyRulesApply, studyPhase,
         SUGGESTION_KINDS, suggest, suggestionSeed, studyTopics, studyAllowPhrases, topicTerms, topicPatterns,
-        topicsForQuery, exampleSearches, searchExplainer, topicLabel,
+        topicsForQuery, exampleSearches, searchExplainer, topicLabel, breakSkipPreview, SKIP_UNDO_MS,
         packVariant, packLayer, activePackLayers, stampPackCopies, studyEffectiveProfile,
         BRANCH_SOURCE, KIDS_KINDS, KIDS_SPACE, AMBIGUOUS_BRANCH_WORDS,
         packChannelsFor, packTopicsFor, hasSeparateBranches, branchTopics, otherBranchTopics,

@@ -2474,6 +2474,8 @@
   "study.overlay.unavailableTitle": "공부 팩을 사용할 수 없음",
   "study.overlay.unavailableBody": "지금은 공부 동영상을 불러올 수 없어 이번 공부 시간이 끝날 때까지 아무것도 재생되지 않습니다.",
   "study.overlay.skipBreak": "휴식 건너뛰기",
+  "study.overlay.skipCost": "{round}라운드에 +{minutes}분",
+  "study.overlay.breakSkipped": "휴식을 건너뛰었어요. {round}라운드는 이제 {minutes}분이에요.",
   "study.overlay.breakNotice": "2분 후 휴식입니다. 이 동영상을 마무리하세요.",
   "study.setByParent": "보호자가 설정함",
   "study.setBy": "{name}님이 설정함",

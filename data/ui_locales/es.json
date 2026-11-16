@@ -2474,6 +2474,8 @@
   "study.overlay.unavailableTitle": "Paquete de estudio no disponible",
   "study.overlay.unavailableBody": "Tus videos de estudio no se pueden cargar ahora, así que no se reproduce nada hasta que termine este tiempo de estudio.",
   "study.overlay.skipBreak": "Saltar descanso",
+  "study.overlay.skipCost": "+{minutes} min a la ronda {round}",
+  "study.overlay.breakSkipped": "Descanso omitido. La ronda {round} dura ahora {minutes} min.",
   "study.overlay.breakNotice": "Descanso en 2 minutos. Termina este video.",
   "study.setByParent": "Configurado por un padre o madre",
   "study.setBy": "Configurado por {name}",

@@ -2474,6 +2474,8 @@
   "study.overlay.unavailableTitle": "पढ़ाई पैक उपलब्ध ना बा",
   "study.overlay.unavailableBody": "रउआ पढ़ाई के वीडियो अबहीं लोड ना हो पावत बा, एहसे ई पढ़ाई के समय खतम होखे तक कुछुओ ना चली।",
   "study.overlay.skipBreak": "ब्रेक छोड़ीं",
+  "study.overlay.skipCost": "राउंड {round} में +{minutes} मिनट",
+  "study.overlay.breakSkipped": "ब्रेक छोड़ दिहल गइल। राउंड {round} अब {minutes} मिनट के बा।",
   "study.overlay.breakNotice": "2 मिनट में ब्रेक। ई वीडियो पूरा करीं।",
   "study.setByParent": "माई-बाबूजी सेट कइले बानी",
   "study.setBy": "{name} सेट कइले बा",

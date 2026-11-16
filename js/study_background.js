@@ -297,6 +297,10 @@
                 breakNoticeAt: clock.breakNoticeAt,
                 breakSkipped,
                 canSkipBreak: !!study && Engine.selfStarted(study) && !clock.setByParentId && clock.state === Engine.BREAK,
+                // "+5 min to round 3" under Skip break, and the "Round 3 is now 55 min" line after it.
+                skipPreview: !!study && Engine.selfStarted(study) && !clock.setByParentId && clock.state === Engine.BREAK && !breakSkipped
+                    && Engine.breakSkipPreview ? Engine.breakSkipPreview(clock.segments,
+                        (Array.isArray(clock.segments) ? clock.segments : []).find(item => item.kind === Engine.BREAK && item.end === clock.until)?.start) : null,
                 next: clock.next,
                 packIds,
                 phase: applied.phase || 'normal',
@@ -629,6 +633,23 @@
         }
 
         /**
+         * "Undo" in the seconds after Skip break (Android StudyRuntime.undoSkipBreak): the skipped break
+         * ending at `until` comes back while its time hasn't passed. Not skipped, or over: refused.
+         */
+        async function undoSkipBreak({ until } = {}) {
+            const { profileId, runtime } = await readAll();
+            const local = profileRuntime(runtime, profileId);
+            const end = Number(until);
+            if (!Number.isFinite(local.breakSkippedUntil) || local.breakSkippedUntil !== end || now() >= end) {
+                return { ok: false, error: 'not_skipped' };
+            }
+            runtime.profiles[profileId] = { ...local, breakSkippedUntil: null };
+            await writeRuntime(runtime);
+            await deps.onTransition?.('undo_skip_break');
+            return { ok: true, until: end };
+        }
+
+        /**
          * Study time from a content script: credited only while the active profile is in STUDY, at most
          * the wall time since the last credit, so two playing tabs never count twice.
          */
@@ -828,6 +849,10 @@
                 if (!extensionPage && !youtubeContent) return Promise.resolve({ ok: false, error: 'untrusted_sender' });
                 return skipBreak();
             }
+            if (action === 'FilterTube_StudyUndoSkipBreak') {
+                if (!extensionPage && !youtubeContent) return Promise.resolve({ ok: false, error: 'untrusted_sender' });
+                return undoSkipBreak(request);
+            }
             if (!extensionPage) return Promise.resolve({ ok: false, error: 'untrusted_sender' });
             if (action === 'FilterTube_StudyStartSession') return startSession(request);
             if (action === 'FilterTube_StudyEndSession') return requestEnd();
@@ -843,7 +868,7 @@
 
         return Object.freeze({
             ALARM, RUNTIME_KEY, prepare, apply, getState, schedule, onAlarm, startSession, requestEnd, cancelEnd, endGentleThenSwitch,
-            skipBreak, skipVideo, skippedVideos, tick, update, foldProgress, handleMessage, deviceId, getChildState, updateChild, startParentLock, endParentLock,
+            skipBreak, undoSkipBreak, skipVideo, skippedVideos, tick, update, foldProgress, handleMessage, deviceId, getChildState, updateChild, startParentLock, endParentLock,
             switchDecision, addGrant, reportFor
         });
     }

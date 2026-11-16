@@ -41,6 +41,7 @@
     const SEND_AFTER_SECONDS = 60;
     const BREAK_WAIT_MAX_MS = 5 * 60 * 1000;
     const NOTICE_SHOW_MS = 10 * 1000;
+    const SKIP_UNDO_MS = 5 * 1000;
     const KIDS_TICK_MS = 1000;
     const KRITI_READING = 'assets/images/mascots/kriti_reading.webp';
     const COMPANION_KEY = 'ftCompanionMode';
@@ -80,6 +81,8 @@
         let transitionTimer = null;
         let noticeTimer = null;
         let breakSeenAt = null;
+        // After Skip break the screen stays this long with "Break skipped ... Undo" (Android StudyRestActivity).
+        let skipped = null;
         let pendingSeconds = 0;
         let lastCheckAt = null;
         let holdingPlayback = false;
@@ -370,12 +373,22 @@
                 }, t('study.overlay.skipBreak', 'Skip break'));
                 button.type = 'button';
                 button.dataset.action = 'skip-break';
+                const preview = state.skipPreview && typeof state.skipPreview === 'object' ? state.skipPreview : null;
                 button.addEventListener('click', () => {
                     send({ action: 'FilterTube_StudySkipBreak' }).then(response => {
-                        if (response?.ok) setState({ ...state, breakSkipped: true });
+                        if (!response?.ok) return;
+                        if (preview) showSkipped(box, preview, dark);
+                        else setState({ ...state, breakSkipped: true });
                     });
                 });
                 box.appendChild(button);
+                if (preview) {
+                    // What skipping costs, under the button (Android study_break_skip_cost).
+                    const cost = element('div', { fontSize: '13px', opacity: '.85', marginTop: '-4px' },
+                        t('study.overlay.skipCost', '+{minutes} min to round {round}', { minutes: preview.addedMinutes, round: preview.round }));
+                    cost.dataset.role = 'skip-cost';
+                    box.appendChild(cost);
+                }
             }
             // Kriti keeps the break company (her mug), cheers the end of the day, and Uljhan shrugs when the
             // pack can't load. A clock hold has no character. Appended last and drawn first, so the
@@ -399,6 +412,48 @@
             (doc.body || doc.documentElement).appendChild(box);
         }
 
+        /**
+         * Skip break, then (Android StudyRestActivity.skipBreak): the break's words and button leave, Kriti
+         * gives a thumbs up, and a paper line says "Break skipped. Round 3 is now 55 min." with Undo for
+         * 5 seconds. Undo puts the break back; otherwise the screen closes and study goes on.
+         */
+        function showSkipped(box, preview, dark) {
+            const expiresAt = now() + SKIP_UNDO_MS;
+            skipped = { preview, expiresAt };
+            for (const child of Array.from(box.children || [])) {
+                if (child.dataset?.filtertubeStudyMascot) {
+                    child.dataset.filtertubeStudyMascot = 'kriti_thumbsup.webp';
+                    try { child.src = runtime?.getURL?.('assets/images/mascots/kriti_thumbsup.webp') || child.src; } catch (e) { }
+                } else if (child.style) child.style.visibility = 'hidden';
+            }
+            const toast = element('div', {
+                display: 'flex', alignItems: 'center', gap: '12px', padding: '12px 16px', borderRadius: '16px',
+                background: dark ? '#151c24' : '#fffcf6', color: dark ? '#edf2f7' : '#1b1a18',
+                border: `1px solid ${dark ? '#2a3440' : '#dcd1c2'}`, fontSize: '15px'
+            });
+            toast.dataset.role = 'skip-undo';
+            toast.setAttribute('role', 'status');
+            toast.appendChild(element('span', {}, t('study.overlay.breakSkipped', 'Break skipped. Round {round} is now {minutes} min.',
+                { round: preview.round, minutes: preview.roundMinutes })));
+            const undo = element('button', {
+                padding: '6px 14px', borderRadius: '16px', border: 'none', background: 'transparent',
+                color: dark ? '#e0796b' : '#a93e31', fontWeight: '700', fontSize: '14px', cursor: 'pointer'
+            }, t('study.undo', 'Undo'));
+            undo.type = 'button';
+            undo.dataset.action = 'undo-skip-break';
+            undo.addEventListener('click', () => {
+                skipped = null;
+                send({ action: 'FilterTube_StudyUndoSkipBreak', until: preview.breakEnd }).then(() => refresh());
+            });
+            toast.appendChild(undo);
+            box.appendChild(toast);
+            setTimer(() => {
+                if (!skipped || skipped.expiresAt !== expiresAt) return;
+                skipped = null;
+                setState({ ...state, breakSkipped: true, skipPreview: null });
+            }, SKIP_UNDO_MS);
+        }
+
         function holdPlayback(hold) {
             holdingPlayback = hold;
             if (hold) pauseAll();
@@ -419,6 +474,8 @@
 
         /** Shows or clears the overlay; a rest break waits for a playing video (5 minutes at most). */
         function render() {
+            // The 5 seconds of "Break skipped ... Undo" keep their screen whatever arrives meanwhile.
+            if (skipped && now() < skipped.expiresAt && doc.getElementById(OVERLAY_ID)) return;
             const kind = overlayKind();
             if (!kind) {
                 breakSeenAt = null;

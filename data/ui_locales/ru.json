@@ -2474,6 +2474,8 @@
   "study.overlay.unavailableTitle": "Учебный набор недоступен",
   "study.overlay.unavailableBody": "Учебные видео сейчас не загружаются, поэтому ничего не будет воспроизводиться до конца этого учебного времени.",
   "study.overlay.skipBreak": "Пропустить перерыв",
+  "study.overlay.skipCost": "+{minutes} мин к раунду {round}",
+  "study.overlay.breakSkipped": "Перерыв пропущен. Раунд {round} теперь {minutes} мин.",
   "study.overlay.breakNotice": "Перерыв через 2 минуты. Досмотрите это видео.",
   "study.setByParent": "Установлено родителем",
   "study.setBy": "Установлено: {name}",

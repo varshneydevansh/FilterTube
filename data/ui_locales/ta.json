@@ -2474,6 +2474,8 @@
   "study.overlay.unavailableTitle": "படிப்புத் தொகுப்பு கிடைக்கவில்லை",
   "study.overlay.unavailableBody": "உங்கள் படிப்பு வீடியோக்களை இப்போது ஏற்ற முடியவில்லை, எனவே இந்தப் படிப்பு நேரம் முடியும் வரை எதுவும் இயங்காது.",
   "study.overlay.skipBreak": "இடைவேளையைத் தவிர்",
+  "study.overlay.skipCost": "சுற்று {round}க்கு +{minutes} நிமி",
+  "study.overlay.breakSkipped": "இடைவேளை தவிர்க்கப்பட்டது. சுற்று {round} இப்போது {minutes} நிமி.",
   "study.overlay.breakNotice": "2 நிமிடங்களில் இடைவேளை. இந்த வீடியோவை முடியுங்கள்.",
   "study.setByParent": "பெற்றோர் அமைத்தது",
   "study.setBy": "{name} அமைத்தது",

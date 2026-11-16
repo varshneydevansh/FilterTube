@@ -2474,6 +2474,8 @@
   "study.overlay.unavailableTitle": "Ders paketi kullanılamıyor",
   "study.overlay.unavailableBody": "Ders videoların şu an yüklenemiyor, bu yüzden bu ders süresi bitene kadar hiçbir şey oynatılmaz.",
   "study.overlay.skipBreak": "Molayı atla",
+  "study.overlay.skipCost": "{round}. tura +{minutes} dk",
+  "study.overlay.breakSkipped": "Mola atlandı. {round}. tur artık {minutes} dk.",
   "study.overlay.breakNotice": "2 dakika sonra mola. Bu videoyu bitir.",
   "study.setByParent": "Bir ebeveyn ayarladı",
   "study.setBy": "{name} ayarladı",

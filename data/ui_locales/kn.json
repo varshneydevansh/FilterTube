@@ -2474,6 +2474,8 @@
   "study.overlay.unavailableTitle": "ಅಧ್ಯಯನ ಪ್ಯಾಕ್ ಲಭ್ಯವಿಲ್ಲ",
   "study.overlay.unavailableBody": "ನಿಮ್ಮ ಅಧ್ಯಯನ ವೀಡಿಯೊಗಳು ಈಗ ಲೋಡ್ ಆಗುತ್ತಿಲ್ಲ, ಆದ್ದರಿಂದ ಈ ಅಧ್ಯಯನ ಸಮಯ ಮುಗಿಯುವವರೆಗೆ ಏನೂ ಪ್ಲೇ ಆಗುವುದಿಲ್ಲ.",
   "study.overlay.skipBreak": "ವಿರಾಮ ಬಿಟ್ಟುಬಿಡಿ",
+  "study.overlay.skipCost": "ಸುತ್ತು {round}ಗೆ +{minutes} ನಿಮಿಷ",
+  "study.overlay.breakSkipped": "ವಿರಾಮ ಬಿಡಲಾಗಿದೆ. ಸುತ್ತು {round} ಈಗ {minutes} ನಿಮಿಷ.",
   "study.overlay.breakNotice": "2 ನಿಮಿಷದಲ್ಲಿ ವಿರಾಮ. ಈ ವೀಡಿಯೊ ಮುಗಿಸಿ.",
   "study.setByParent": "ಪೋಷಕರು ಹೊಂದಿಸಿದ್ದಾರೆ",
   "study.setBy": "{name} ಹೊಂದಿಸಿದ್ದಾರೆ",

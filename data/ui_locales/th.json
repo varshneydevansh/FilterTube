@@ -2474,6 +2474,8 @@
   "study.overlay.unavailableTitle": "ชุดการเรียนใช้งานไม่ได้",
   "study.overlay.unavailableBody": "ตอนนี้โหลดวิดีโอการเรียนไม่ได้ จึงไม่มีอะไรเล่นจนกว่าเวลาเรียนนี้จะจบ",
   "study.overlay.skipBreak": "ข้ามการพัก",
+  "study.overlay.skipCost": "+{minutes} นาทีให้รอบที่ {round}",
+  "study.overlay.breakSkipped": "ข้ามการพักแล้ว รอบที่ {round} ตอนนี้ยาว {minutes} นาที",
   "study.overlay.breakNotice": "พักในอีก 2 นาที ดูวิดีโอนี้ให้จบก่อน",
   "study.setByParent": "ตั้งค่าโดยผู้ปกครอง",
   "study.setBy": "ตั้งค่าโดย {name}",

@@ -2616,6 +2616,8 @@
   "study.overlay.unavailableTitle": "Study pack unavailable",
   "study.overlay.unavailableBody": "Your study videos can't load right now, so nothing plays until this study time ends.",
   "study.overlay.skipBreak": "Skip break",
+  "study.overlay.skipCost": "+{minutes} min to round {round}",
+  "study.overlay.breakSkipped": "Break skipped. Round {round} is now {minutes} min.",
   "study.overlay.breakNotice": "Break in 2 minutes. Finish this video.",
   "study.setByParent": "Set by a parent",
   "study.setBy": "Set by {name}",

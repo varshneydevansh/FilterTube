@@ -2474,6 +2474,8 @@
   "study.overlay.unavailableTitle": "చదువు ప్యాక్ అందుబాటులో లేదు",
   "study.overlay.unavailableBody": "మీ చదువు వీడియోలు ఇప్పుడు లోడ్ కావడం లేదు, కాబట్టి ఈ చదువు సమయం ముగిసే వరకు ఏదీ ప్లే కాదు.",
   "study.overlay.skipBreak": "విరామం దాటవేయండి",
+  "study.overlay.skipCost": "రౌండ్ {round}కి +{minutes} నిమి",
+  "study.overlay.breakSkipped": "విరామం దాటవేయబడింది. రౌండ్ {round} ఇప్పుడు {minutes} నిమి.",
   "study.overlay.breakNotice": "2 నిమిషాల్లో విరామం. ఈ వీడియో పూర్తి చేయండి.",
   "study.setByParent": "తల్లిదండ్రులు సెట్ చేశారు",
   "study.setBy": "{name} సెట్ చేశారు",

@@ -2474,6 +2474,8 @@
   "study.overlay.unavailableTitle": "بستهٔ مطالعه در دسترس نیست",
   "study.overlay.unavailableBody": "ویدیوهای مطالعه‌ات الان بارگیری نمی‌شوند، پس تا پایان این زمان مطالعه چیزی پخش نمی‌شود.",
   "study.overlay.skipBreak": "رد کردن استراحت",
+  "study.overlay.skipCost": "+{minutes} دقیقه به دور {round}",
+  "study.overlay.breakSkipped": "استراحت رد شد. دور {round} حالا {minutes} دقیقه است.",
   "study.overlay.breakNotice": "استراحت تا ۲ دقیقهٔ دیگر. این ویدیو را تمام کن.",
   "study.setByParent": "تنظیم‌شده توسط والد",
   "study.setBy": "تنظیم‌شده توسط {name}",

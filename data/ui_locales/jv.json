@@ -2474,6 +2474,8 @@
   "study.overlay.unavailableTitle": "Paket sinau ora kasedhiya",
   "study.overlay.unavailableBody": "Video sinaumu ora bisa dimuat saiki, dadi ora ana sing diputer nganti wektu sinau iki rampung.",
   "study.overlay.skipBreak": "Liwati ngaso",
+  "study.overlay.skipCost": "+{minutes} mnt menyang babak {round}",
+  "study.overlay.breakSkipped": "Ngaso dilewati. Babak {round} saiki {minutes} mnt.",
   "study.overlay.breakNotice": "Ngaso 2 menit menèh. Rampungna video iki.",
   "study.setByParent": "Disetel déning wong tuwa",
   "study.setBy": "Disetel déning {name}",

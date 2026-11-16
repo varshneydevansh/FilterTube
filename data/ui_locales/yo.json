@@ -2474,6 +2474,8 @@
   "study.overlay.unavailableTitle": "Àpò ẹ̀kọ́ kò sí",
   "study.overlay.unavailableBody": "Àwọn fídíò ẹ̀kọ́ rẹ kò lè ṣí báyìí, nítorí náà kò sí nǹkan tó máa ṣiṣẹ́ títí àkókò ẹ̀kọ́ yìí yóò fi parí.",
   "study.overlay.skipBreak": "Fo ìsinmi",
+  "study.overlay.skipCost": "+ìṣẹ́jú {minutes} sí ìyípo {round}",
+  "study.overlay.breakSkipped": "A fo ìsinmi. Ìyípo {round} jẹ́ ìṣẹ́jú {minutes} báyìí.",
   "study.overlay.breakNotice": "Ìsinmi ní ìṣẹ́jú 2. Parí fídíò yìí.",
   "study.setByParent": "Òbí ló ṣètò rẹ̀",
   "study.setBy": "{name} ló ṣètò rẹ̀",

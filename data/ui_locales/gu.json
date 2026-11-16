@@ -2474,6 +2474,8 @@
   "study.overlay.unavailableTitle": "અભ્યાસ પૅક ઉપલબ્ધ નથી",
   "study.overlay.unavailableBody": "તમારા અભ્યાસના વીડિયો હમણાં લોડ થઈ શકતા નથી, તેથી આ અભ્યાસ સમય પૂરો થાય ત્યાં સુધી કંઈ ચાલશે નહીં.",
   "study.overlay.skipBreak": "વિરામ છોડો",
+  "study.overlay.skipCost": "રાઉન્ડ {round}માં +{minutes} મિનિટ",
+  "study.overlay.breakSkipped": "વિરામ છોડ્યો. રાઉન્ડ {round} હવે {minutes} મિનિટનો છે.",
   "study.overlay.breakNotice": "2 મિનિટમાં વિરામ. આ વીડિયો પૂરો કરો.",
   "study.setByParent": "વાલી દ્વારા સેટ",
   "study.setBy": "{name} દ્વારા સેટ",

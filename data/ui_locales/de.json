@@ -2474,6 +2474,8 @@
   "study.overlay.unavailableTitle": "Lernpaket nicht verfügbar",
   "study.overlay.unavailableBody": "Deine Lernvideos können gerade nicht geladen werden, daher läuft nichts, bis diese Lernzeit endet.",
   "study.overlay.skipBreak": "Pause überspringen",
+  "study.overlay.skipCost": "+{minutes} Min. für Runde {round}",
+  "study.overlay.breakSkipped": "Pause übersprungen. Runde {round} dauert jetzt {minutes} Min.",
   "study.overlay.breakNotice": "Pause in 2 Minuten. Schau dieses Video zu Ende.",
   "study.setByParent": "Von einem Elternteil festgelegt",
   "study.setBy": "Festgelegt von {name}",

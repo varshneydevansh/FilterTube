@@ -2474,6 +2474,8 @@
   "study.overlay.unavailableTitle": "学習パックを利用できません",
   "study.overlay.unavailableBody": "学習用の動画を今読み込めないため、この学習時間が終わるまで何も再生されません。",
   "study.overlay.skipBreak": "休憩をスキップ",
+  "study.overlay.skipCost": "ラウンド{round}に+{minutes}分",
+  "study.overlay.breakSkipped": "休憩をスキップしました。ラウンド{round}は{minutes}分になりました。",
   "study.overlay.breakNotice": "2 分後に休憩です。この動画を見終えましょう。",
   "study.setByParent": "保護者が設定",
   "study.setBy": "{name} が設定",

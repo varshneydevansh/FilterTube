@@ -2474,6 +2474,8 @@
   "study.overlay.unavailableTitle": "学习包不可用",
   "study.overlay.unavailableBody": "学习视频暂时无法加载，因此在本次学习时间结束前不会播放任何内容。",
   "study.overlay.skipBreak": "跳过休息",
+  "study.overlay.skipCost": "第{round}轮加{minutes}分钟",
+  "study.overlay.breakSkipped": "已跳过休息。第{round}轮现在是{minutes}分钟。",
   "study.overlay.breakNotice": "2 分钟后休息。看完这个视频吧。",
   "study.setByParent": "由家长设置",
   "study.setBy": "由 {name} 设置",

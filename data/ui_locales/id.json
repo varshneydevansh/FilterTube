@@ -2474,6 +2474,8 @@
   "study.overlay.unavailableTitle": "Paket belajar tidak tersedia",
   "study.overlay.unavailableBody": "Video belajarmu tidak bisa dimuat sekarang, jadi tidak ada yang diputar sampai waktu belajar ini selesai.",
   "study.overlay.skipBreak": "Lewati istirahat",
+  "study.overlay.skipCost": "+{minutes} mnt ke putaran {round}",
+  "study.overlay.breakSkipped": "Istirahat dilewati. Putaran {round} sekarang {minutes} mnt.",
   "study.overlay.breakNotice": "Istirahat dalam 2 menit. Selesaikan video ini.",
   "study.setByParent": "Diatur oleh orang tua",
   "study.setBy": "Diatur oleh {name}",

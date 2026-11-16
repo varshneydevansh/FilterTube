@@ -2474,6 +2474,8 @@
   "study.overlay.unavailableTitle": "পড়াশোনার প্যাক উপলভ্য নয়",
   "study.overlay.unavailableBody": "আপনার পড়াশোনার ভিডিও এখন লোড হচ্ছে না, তাই এই পড়াশোনার সময় শেষ না হওয়া পর্যন্ত কিছু চলবে না।",
   "study.overlay.skipBreak": "বিরতি এড়িয়ে যান",
+  "study.overlay.skipCost": "রাউন্ড {round}-এ +{minutes} মিনিট",
+  "study.overlay.breakSkipped": "বিরতি বাদ দেওয়া হয়েছে। রাউন্ড {round} এখন {minutes} মিনিট।",
   "study.overlay.breakNotice": "২ মিনিট পর বিরতি। এই ভিডিওটি শেষ করুন।",
   "study.setByParent": "অভিভাবক সেট করেছেন",
   "study.setBy": "{name} সেট করেছেন",

@@ -2474,6 +2474,8 @@
   "study.overlay.unavailableTitle": "Pacote de estudo indisponível",
   "study.overlay.unavailableBody": "Seus vídeos de estudo não podem ser carregados agora, então nada será reproduzido até este horário de estudo terminar.",
   "study.overlay.skipBreak": "Pular pausa",
+  "study.overlay.skipCost": "+{minutes} min na rodada {round}",
+  "study.overlay.breakSkipped": "Pausa pulada. A rodada {round} agora tem {minutes} min.",
   "study.overlay.breakNotice": "Pausa em 2 minutos. Termine este vídeo.",
   "study.setByParent": "Definido por um responsável",
   "study.setBy": "Definido por {name}",

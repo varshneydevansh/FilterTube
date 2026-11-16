@@ -2474,6 +2474,8 @@
   "study.overlay.unavailableTitle": "Gói học tập không khả dụng",
   "study.overlay.unavailableBody": "Hiện không tải được video học tập, nên sẽ không có gì phát cho đến khi giờ học này kết thúc.",
   "study.overlay.skipBreak": "Bỏ qua giờ nghỉ",
+  "study.overlay.skipCost": "+{minutes} phút cho vòng {round}",
+  "study.overlay.breakSkipped": "Đã bỏ qua giờ nghỉ. Vòng {round} giờ dài {minutes} phút.",
   "study.overlay.breakNotice": "Nghỉ sau 2 phút. Hãy xem hết video này.",
   "study.setByParent": "Do phụ huynh đặt",
   "study.setBy": "Do {name} đặt",

@@ -2474,6 +2474,8 @@
   "study.overlay.unavailableTitle": "پڑھائی پیک دستیاب نہیں",
   "study.overlay.unavailableBody": "تہاڈیاں پڑھائی ویڈیوز ہن لوڈ نہیں ہو سکدیاں، ایس لئی ایہہ پڑھائی دا ویلا مکن تیک کجھ نہیں چلے گا۔",
   "study.overlay.skipBreak": "وقفہ چھڈو",
+  "study.overlay.skipCost": "راؤنڈ {round} وچ +{minutes} منٹ",
+  "study.overlay.breakSkipped": "بریک چھڈ دتی۔ راؤنڈ {round} ہن {minutes} منٹ دا اے۔",
   "study.overlay.breakNotice": "2 منٹ وچ وقفہ۔ ایہہ ویڈیو پوری کرو۔",
   "study.setByParent": "والدین ولوں سیٹ کیتا",
   "study.setBy": "{name} ولوں سیٹ کیتا",

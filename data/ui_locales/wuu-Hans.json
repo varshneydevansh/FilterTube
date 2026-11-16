@@ -2474,6 +2474,8 @@
   "study.overlay.unavailableTitle": "学习包用勿了",
   "study.overlay.unavailableBody": "学习视频现在载勿出，所以迭趟学习辰光结束前啥也勿放。",
   "study.overlay.skipBreak": "跳过休息",
+  "study.overlay.skipCost": "第{round}轮加{minutes}分钟",
+  "study.overlay.breakSkipped": "休息跳过了。第{round}轮现在{minutes}分钟。",
   "study.overlay.breakNotice": "2 分钟以后休息。拿迭只视频看好。",
   "study.setByParent": "由家长设置",
   "study.setBy": "由 {name} 设置",

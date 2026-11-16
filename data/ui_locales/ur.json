@@ -2474,6 +2474,8 @@
   "study.overlay.unavailableTitle": "پڑھائی پیک دستیاب نہیں",
   "study.overlay.unavailableBody": "آپ کی پڑھائی کی ویڈیوز ابھی لوڈ نہیں ہو سکتیں، اس لیے یہ پڑھائی کا وقت ختم ہونے تک کچھ نہیں چلے گا۔",
   "study.overlay.skipBreak": "وقفہ چھوڑیں",
+  "study.overlay.skipCost": "راؤنڈ {round} میں +{minutes} منٹ",
+  "study.overlay.breakSkipped": "وقفہ چھوڑ دیا۔ راؤنڈ {round} اب {minutes} منٹ کا ہے۔",
   "study.overlay.breakNotice": "2 منٹ میں وقفہ۔ یہ ویڈیو مکمل کریں۔",
   "study.setByParent": "والدین نے سیٹ کیا",
   "study.setBy": "{name} نے سیٹ کیا",

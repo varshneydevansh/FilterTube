@@ -2474,6 +2474,8 @@
   "study.overlay.unavailableTitle": "Pacchetto di studio non disponibile",
   "study.overlay.unavailableBody": "I tuoi video di studio non si caricano ora, quindi non si riproduce nulla fino alla fine di questo tempo di studio.",
   "study.overlay.skipBreak": "Salta la pausa",
+  "study.overlay.skipCost": "+{minutes} min al turno {round}",
+  "study.overlay.breakSkipped": "Pausa saltata. Il turno {round} ora dura {minutes} min.",
   "study.overlay.breakNotice": "Pausa tra 2 minuti. Finisci questo video.",
   "study.setByParent": "Impostato da un genitore",
   "study.setBy": "Impostato da {name}",

@@ -2474,6 +2474,8 @@
   "study.overlay.unavailableTitle": "पढ़ाई पैक उपलब्ध नहीं",
   "study.overlay.unavailableBody": "आपके पढ़ाई वाले वीडियो अभी लोड नहीं हो पा रहे, इसलिए यह पढ़ाई का समय खत्म होने तक कुछ नहीं चलेगा।",
   "study.overlay.skipBreak": "ब्रेक छोड़ें",
+  "study.overlay.skipCost": "राउंड {round} में +{minutes} मिनट",
+  "study.overlay.breakSkipped": "ब्रेक छोड़ा। राउंड {round} अब {minutes} मिनट का है।",
   "study.overlay.breakNotice": "2 मिनट में ब्रेक। यह वीडियो पूरा करें।",
   "study.setByParent": "अभिभावक द्वारा सेट",
   "study.setBy": "{name} द्वारा सेट",

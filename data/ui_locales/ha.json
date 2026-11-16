@@ -2474,6 +2474,8 @@
   "study.overlay.unavailableTitle": "Fakitin karatu babu",
   "study.overlay.unavailableBody": "Bidiyoyin karatunka ba za su iya lodawa yanzu ba, don haka babu abin da zai kunnu har wannan lokacin karatu ya ƙare.",
   "study.overlay.skipBreak": "Tsallake hutu",
+  "study.overlay.skipCost": "+mintuna {minutes} zuwa zagaye na {round}",
+  "study.overlay.breakSkipped": "An tsallake hutu. Zagaye na {round} yanzu mintuna {minutes} ne.",
   "study.overlay.breakNotice": "Hutu cikin minti 2. Gama wannan bidiyon.",
   "study.setByParent": "Iyaye ne suka saita",
   "study.setBy": "{name} ne ya saita",

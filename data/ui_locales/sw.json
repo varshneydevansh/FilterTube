@@ -2474,6 +2474,8 @@
   "study.overlay.unavailableTitle": "Kifurushi cha masomo hakipatikani",
   "study.overlay.unavailableBody": "Video zako za masomo haziwezi kupakia sasa, kwa hivyo hakuna kitakachocheza hadi muda huu wa masomo uishe.",
   "study.overlay.skipBreak": "Ruka mapumziko",
+  "study.overlay.skipCost": "+dak {minutes} kwa raundi {round}",
+  "study.overlay.breakSkipped": "Mapumziko yamerukwa. Raundi {round} sasa ni dak {minutes}.",
   "study.overlay.breakNotice": "Mapumziko baada ya dakika 2. Maliza video hii.",
   "study.setByParent": "Imewekwa na mzazi",
   "study.setBy": "Imewekwa na {name}",
