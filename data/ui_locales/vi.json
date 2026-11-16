@@ -3124,5 +3124,8 @@
   "study.overlay.breakLeft.many": "Còn {count} phút nghỉ",
   "study.overlay.breakLeft.other": "Còn {count} phút nghỉ",
   "study.family.stopped": "Thiết bị của {name} đã ngừng báo cáo",
-  "study.family.stoppedBody": "Báo cáo gần nhất {time}. Nếu thiết bị bị đặt lại hoặc FilterTube bị gỡ, kế hoạch học cũng mất. Hãy ghép đôi lại để gửi."
+  "study.family.stoppedBody": "Báo cáo gần nhất {time}. Nếu thiết bị bị đặt lại hoặc FilterTube bị gỡ, kế hoạch học cũng mất. Hãy ghép đôi lại để gửi.",
+  "study.endSession": "Kết thúc buổi học",
+  "study.endHint": "Buổi học kết thúc sau 30 giây chờ, nên bạn vẫn có thể hủy.",
+  "study.week.empty": "Mỗi ngày bạn học sẽ tô kín một vòng tròn."
 }

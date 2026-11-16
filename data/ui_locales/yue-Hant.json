@@ -3124,5 +3124,8 @@
   "study.overlay.breakLeft.many": "休息仲有 {count} 分鐘",
   "study.overlay.breakLeft.other": "休息仲有 {count} 分鐘",
   "study.family.stopped": "{name} 部裝置停咗匯報",
-  "study.family.stoppedBody": "最後一次匯報係 {time}。如果部裝置重設過或者 FilterTube 被移除，學習計劃都會冇晒。重新配對先可以再傳過去。"
+  "study.family.stoppedBody": "最後一次匯報係 {time}。如果部裝置重設過或者 FilterTube 被移除，學習計劃都會冇晒。重新配對先可以再傳過去。",
+  "study.endSession": "結束學習",
+  "study.endHint": "停 30 秒之後先會結束，所以你仲可以取消。",
+  "study.week.empty": "你每學一日，就會填滿一個圈。"
 }

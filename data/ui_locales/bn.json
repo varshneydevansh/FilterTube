@@ -3126,5 +3126,8 @@
   "study.overlay.breakLeft.many": "আপনার বিরতির {count} মিনিট বাকি",
   "study.overlay.breakLeft.other": "আপনার বিরতির {count} মিনিট বাকি",
   "study.family.stopped": "{name} এর ডিভাইস রিপোর্ট পাঠানো বন্ধ করেছে",
-  "study.family.stoppedBody": "শেষ রিপোর্ট {time}। ডিভাইস রিসেট হলে বা FilterTube সরানো হলে পড়ার পরিকল্পনাও চলে যায়। পাঠাতে আবার যুক্ত করুন।"
+  "study.family.stoppedBody": "শেষ রিপোর্ট {time}। ডিভাইস রিসেট হলে বা FilterTube সরানো হলে পড়ার পরিকল্পনাও চলে যায়। পাঠাতে আবার যুক্ত করুন।",
+  "study.endSession": "সেশন শেষ করুন",
+  "study.endHint": "৩০ সেকেন্ড বিরতির পরে শেষ হয়, তাই এখনও বাতিল করতে পারবেন।",
+  "study.week.empty": "যেদিন পড়বেন, একটি বৃত্ত ভরে উঠবে।"
 }

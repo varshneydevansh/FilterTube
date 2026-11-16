@@ -3124,5 +3124,8 @@
   "study.overlay.breakLeft.many": "休息还剩 {count} 分钟",
   "study.overlay.breakLeft.other": "休息还剩 {count} 分钟",
   "study.family.stopped": "{name} 个设备勿再汇报哉",
-  "study.family.stoppedBody": "上趟汇报是 {time}。设备重置脱或者 FilterTube 删脱，学习计划也会没脱。重新配对再发过去。"
+  "study.family.stoppedBody": "上趟汇报是 {time}。设备重置脱或者 FilterTube 删脱，学习计划也会没脱。重新配对再发过去。",
+  "study.endSession": "结束学习",
+  "study.endHint": "停 30 秒以后结束，所以侬还好取消。",
+  "study.week.empty": "侬每学一日，就填满一只圈。"
 }

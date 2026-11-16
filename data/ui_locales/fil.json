@@ -3126,5 +3126,8 @@
   "study.overlay.breakLeft.many": "{count} min na lang ang pahinga mo",
   "study.overlay.breakLeft.other": "{count} min na lang ang pahinga mo",
   "study.family.stopped": "Huminto sa pag-uulat ang device ni {name}",
-  "study.family.stoppedBody": "Huling ulat {time}. Kung na-reset ang device o inalis ang FilterTube, mawawala rin ang plano nito sa pag-aaral. Mag-pair ulit para maipadala ito."
+  "study.family.stoppedBody": "Huling ulat {time}. Kung na-reset ang device o inalis ang FilterTube, mawawala rin ang plano nito sa pag-aaral. Mag-pair ulit para maipadala ito.",
+  "study.endSession": "Tapusin ang session",
+  "study.endHint": "Matatapos ito pagkatapos ng 30 segundong paghinto, kaya puwede mo pa itong kanselahin.",
+  "study.week.empty": "Bawat araw na nag-aaral ka ay pumupuno ng isang bilog."
 }

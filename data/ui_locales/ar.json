@@ -3150,5 +3150,8 @@
   "study.overlay.breakLeft.many": "{count} دقيقة متبقية من استراحتك",
   "study.overlay.breakLeft.other": "{count} دقيقة متبقية من استراحتك",
   "study.family.stopped": "توقف جهاز {name} عن الإبلاغ",
-  "study.family.stoppedBody": "آخر تقرير {time}. إذا أُعيد ضبط الجهاز أو أُزيل FilterTube، فستضيع خطة الدراسة أيضًا. اربطه مرة أخرى لإرسالها."
+  "study.family.stoppedBody": "آخر تقرير {time}. إذا أُعيد ضبط الجهاز أو أُزيل FilterTube، فستضيع خطة الدراسة أيضًا. اربطه مرة أخرى لإرسالها.",
+  "study.endSession": "إنهاء الجلسة",
+  "study.endHint": "تنتهي بعد توقف 30 ثانية، لذا ما زال بإمكانك الإلغاء.",
+  "study.week.empty": "كل يوم تدرس فيه يملأ دائرة."
 }

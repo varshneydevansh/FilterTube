@@ -3126,5 +3126,8 @@
   "study.overlay.breakLeft.many": "ನಿಮ್ಮ ವಿರಾಮದಲ್ಲಿ {count} ನಿಮಿ ಉಳಿದಿವೆ",
   "study.overlay.breakLeft.other": "ನಿಮ್ಮ ವಿರಾಮದಲ್ಲಿ {count} ನಿಮಿ ಉಳಿದಿವೆ",
   "study.family.stopped": "{name} ಅವರ ಸಾಧನ ವರದಿ ಮಾಡುವುದನ್ನು ನಿಲ್ಲಿಸಿದೆ",
-  "study.family.stoppedBody": "ಕೊನೆಯ ವರದಿ {time}. ಸಾಧನ ರೀಸೆಟ್ ಆದರೆ ಅಥವಾ FilterTube ತೆಗೆದರೆ, ಅಧ್ಯಯನ ಯೋಜನೆಯೂ ಹೋಗುತ್ತದೆ. ಕಳುಹಿಸಲು ಮತ್ತೆ ಜೋಡಿಸಿ."
+  "study.family.stoppedBody": "ಕೊನೆಯ ವರದಿ {time}. ಸಾಧನ ರೀಸೆಟ್ ಆದರೆ ಅಥವಾ FilterTube ತೆಗೆದರೆ, ಅಧ್ಯಯನ ಯೋಜನೆಯೂ ಹೋಗುತ್ತದೆ. ಕಳುಹಿಸಲು ಮತ್ತೆ ಜೋಡಿಸಿ.",
+  "study.endSession": "ಸೆಷನ್ ಮುಗಿಸಿ",
+  "study.endHint": "30 ಸೆಕೆಂಡುಗಳ ವಿರಾಮದ ನಂತರ ಮುಗಿಯುತ್ತದೆ, ಹಾಗಾಗಿ ನೀವು ಇನ್ನೂ ರದ್ದುಮಾಡಬಹುದು.",
+  "study.week.empty": "ನೀವು ಅಧ್ಯಯನ ಮಾಡುವ ಪ್ರತಿ ದಿನ ಒಂದು ವೃತ್ತ ತುಂಬುತ್ತದೆ."
 }

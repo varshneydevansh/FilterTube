@@ -240,12 +240,21 @@
         function renderSkip() {
             // Only a video that plays can be skipped: not one the watch gate already holds back.
             const gated = !!doc.querySelector?.('[data-filtertube-direct-access-overlay-host="true"]');
-            const videoId = state?.state === 'STUDY' && onWatchRoute() && !overlayKind() && !gated ? currentVideoId() : '';
+            // During a round, and a break that plays videos (Android: "during a study round or break").
+            const running = state?.state === 'STUDY' || (state?.state === 'BREAK' && state?.breakMode === 'normal');
+            const videoId = running && onWatchRoute() && !overlayKind() && !gated ? currentVideoId() : '';
             const existing = doc.getElementById(SKIP_ID);
             if (!videoId) { if (existing) existing.remove(); return; }
-            if (existing && existing.getAttribute('data-video-id') === videoId) return;
+            const rowReady = !!doc.querySelector?.('ytd-watch-metadata #top-level-buttons-computed, #actions #top-level-buttons-computed, ytm-slim-video-action-bar-renderer .slim-video-action-bar-actions');
+            if (existing && existing.getAttribute('data-video-id') === videoId && (existing.getAttribute('data-in-action-row') === 'true' || !rowReady)) return;
             if (existing) existing.remove();
-            const button = element('button', {
+            // "Skip this video" is the first chip in the Watch page's action row (Android 9ed6a1e27), never
+            // floating over the recommendations; while the row isn't there yet it waits at the page's corner.
+            const row = doc.querySelector?.('ytd-watch-metadata #top-level-buttons-computed, #actions #top-level-buttons-computed, ytm-slim-video-action-bar-renderer .slim-video-action-bar-actions') || null;
+            const button = element('button', row ? {
+                minHeight: '36px', padding: '0 16px', marginInlineEnd: '8px', borderRadius: '999px', background: 'var(--yt-spec-badge-chip-background, rgba(0,0,0,.05))',
+                color: 'var(--yt-spec-text-primary, #0f0f0f)', border: '0', cursor: 'pointer', font: '500 14px/36px Roboto, Arial, sans-serif', flex: '0 0 auto'
+            } : {
                 position: 'fixed', left: '16px', bottom: '16px', zIndex: '2147483646', minHeight: '40px', padding: '0 16px',
                 borderRadius: '999px', background: '#FFFCF6', color: '#1b1a18', border: '1.5px solid #cdbfae', cursor: 'pointer',
                 font: '700 14px/1 Roboto, Arial, sans-serif', boxShadow: '0 3px 0 rgba(27,26,24,.14)'
@@ -253,6 +262,7 @@
             button.id = SKIP_ID;
             button.type = 'button';
             button.setAttribute('data-video-id', videoId);
+            if (row) button.setAttribute('data-in-action-row', 'true');
             button.addEventListener('click', () => {
                 button.disabled = true;
                 send({ action: 'FilterTube_StudySkipVideo', videoId }).then(response => {
@@ -265,6 +275,7 @@
                     }
                 });
             });
+            if (row && typeof row.insertBefore === 'function') { row.insertBefore(button, row.firstChild || null); return; }
             (doc.body || doc.documentElement).appendChild(button);
         }
 

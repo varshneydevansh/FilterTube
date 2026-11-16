@@ -3126,5 +3126,8 @@
   "study.overlay.breakLeft.many": "{count} دقیقه از استراحت شما مانده",
   "study.overlay.breakLeft.other": "{count} دقیقه از استراحت شما مانده",
   "study.family.stopped": "دستگاه {name} دیگر گزارش نمی‌دهد",
-  "study.family.stoppedBody": "آخرین گزارش {time}. اگر دستگاه بازنشانی شود یا FilterTube حذف شود، برنامهٔ مطالعه هم از بین می‌رود. برای ارسال دوباره جفت کنید."
+  "study.family.stoppedBody": "آخرین گزارش {time}. اگر دستگاه بازنشانی شود یا FilterTube حذف شود، برنامهٔ مطالعه هم از بین می‌رود. برای ارسال دوباره جفت کنید.",
+  "study.endSession": "پایان جلسه",
+  "study.endHint": "بعد از ۳۰ ثانیه مکث تمام می‌شود، پس هنوز می‌توانید لغو کنید.",
+  "study.week.empty": "هر روزی که مطالعه کنید، یک دایره پر می‌شود."
 }

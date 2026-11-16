@@ -3126,5 +3126,8 @@
   "study.overlay.breakLeft.many": "آپ کے وقفے کے {count} منٹ باقی",
   "study.overlay.breakLeft.other": "آپ کے وقفے کے {count} منٹ باقی",
   "study.family.stopped": "{name} کے ڈیوائس نے رپورٹ بھیجنا بند کر دیا",
-  "study.family.stoppedBody": "آخری رپورٹ {time}۔ اگر ڈیوائس ری سیٹ ہوا یا FilterTube ہٹایا گیا تو پڑھائی کا منصوبہ بھی چلا جاتا ہے۔ بھیجنے کے لیے دوبارہ جوڑیں۔"
+  "study.family.stoppedBody": "آخری رپورٹ {time}۔ اگر ڈیوائس ری سیٹ ہوا یا FilterTube ہٹایا گیا تو پڑھائی کا منصوبہ بھی چلا جاتا ہے۔ بھیجنے کے لیے دوبارہ جوڑیں۔",
+  "study.endSession": "سیشن ختم کریں",
+  "study.endHint": "یہ 30 سیکنڈ کے وقفے کے بعد ختم ہوتا ہے، اس لیے آپ اب بھی منسوخ کر سکتے ہیں۔",
+  "study.week.empty": "جس دن آپ پڑھتے ہیں، ایک دائرہ بھر جاتا ہے۔"
 }

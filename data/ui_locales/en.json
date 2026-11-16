@@ -3126,5 +3126,8 @@
   "study.overlay.breakLeft.many": "{count} min left in your break",
   "study.overlay.breakLeft.other": "{count} min left in your break",
   "study.family.stopped": "{name}'s device stopped reporting",
-  "study.family.stoppedBody": "Last report {time}. If the device was reset or FilterTube was removed, its study plan is gone too. Pair again to send it."
+  "study.family.stoppedBody": "Last report {time}. If the device was reset or FilterTube was removed, its study plan is gone too. Pair again to send it.",
+  "study.endSession": "End session",
+  "study.endHint": "It ends after a 30-second pause, so you can still cancel.",
+  "study.week.empty": "Each day you study fills a circle."
 }

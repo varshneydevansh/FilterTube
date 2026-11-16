@@ -3124,5 +3124,8 @@
   "study.overlay.breakLeft.many": "{count} mnt istirahat Anda tersisa",
   "study.overlay.breakLeft.other": "{count} mnt istirahat Anda tersisa",
   "study.family.stopped": "Perangkat {name} berhenti melapor",
-  "study.family.stoppedBody": "Laporan terakhir {time}. Jika perangkat direset atau FilterTube dihapus, rencana belajarnya ikut hilang. Pasangkan lagi untuk mengirimnya."
+  "study.family.stoppedBody": "Laporan terakhir {time}. Jika perangkat direset atau FilterTube dihapus, rencana belajarnya ikut hilang. Pasangkan lagi untuk mengirimnya.",
+  "study.endSession": "Akhiri sesi",
+  "study.endHint": "Sesi berakhir setelah jeda 30 detik, jadi Anda masih bisa membatalkan.",
+  "study.week.empty": "Setiap hari Anda belajar mengisi satu lingkaran."
 }

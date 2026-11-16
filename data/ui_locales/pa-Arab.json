@@ -3126,5 +3126,8 @@
   "study.overlay.breakLeft.many": "تہاڈے وقفے دے {count} منٹ باقی",
   "study.overlay.breakLeft.other": "تہاڈے وقفے دے {count} منٹ باقی",
   "study.family.stopped": "{name} دا ڈیوائس رپورٹ بھیجنوں رک گیا اے",
-  "study.family.stoppedBody": "آخری رپورٹ {time}۔ جے ڈیوائس ریسیٹ ہو گیا یا FilterTube ہٹا دتا گیا، تاں پڑھائی دا پلان وی چلا جاندا اے۔ بھیجن لئی فیر جوڑو۔"
+  "study.family.stoppedBody": "آخری رپورٹ {time}۔ جے ڈیوائس ریسیٹ ہو گیا یا FilterTube ہٹا دتا گیا، تاں پڑھائی دا پلان وی چلا جاندا اے۔ بھیجن لئی فیر جوڑو۔",
+  "study.endSession": "سیشن مُکاؤ",
+  "study.endHint": "ایہہ 30 سیکنڈ دی اُڈیک توں بعد مُکدا اے، ایس لئی تسیں ہُن وی رد کر سکدے او۔",
+  "study.week.empty": "جس دن تسیں پڑھدے او، اک دائرہ بھر جاندا اے۔"
 }

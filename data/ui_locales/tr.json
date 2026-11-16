@@ -3126,5 +3126,8 @@
   "study.overlay.breakLeft.many": "Molanın bitmesine {count} dk",
   "study.overlay.breakLeft.other": "Molanın bitmesine {count} dk",
   "study.family.stopped": "{name} cihazı rapor göndermeyi bıraktı",
-  "study.family.stoppedBody": "Son rapor {time}. Cihaz sıfırlandıysa veya FilterTube kaldırıldıysa ders planı da gider. Göndermek için yeniden eşleştir."
+  "study.family.stoppedBody": "Son rapor {time}. Cihaz sıfırlandıysa veya FilterTube kaldırıldıysa ders planı da gider. Göndermek için yeniden eşleştir.",
+  "study.endSession": "Oturumu bitir",
+  "study.endHint": "30 saniyelik bir beklemeden sonra biter, yani hâlâ iptal edebilirsin.",
+  "study.week.empty": "Ders çalıştığın her gün bir daireyi doldurur."
 }

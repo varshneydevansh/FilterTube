@@ -3150,5 +3150,8 @@
   "study.overlay.breakLeft.many": "{count} دقيقة متبقية من استراحتك",
   "study.overlay.breakLeft.other": "{count} دقيقة متبقية من استراحتك",
   "study.family.stopped": "جهاز {name} وقّف يبلّغ",
-  "study.family.stoppedBody": "آخر تقرير {time}. إذا انعمل ريسيت للجهاز أو انشال FilterTube، خطة الدراسة كمان بتروح. اربطه من جديد لتبعتها."
+  "study.family.stoppedBody": "آخر تقرير {time}. إذا انعمل ريسيت للجهاز أو انشال FilterTube، خطة الدراسة كمان بتروح. اربطه من جديد لتبعتها.",
+  "study.endSession": "إنهاء الجلسة",
+  "study.endHint": "بتخلص بعد توقف 30 ثانية، فلسّا فيك تلغي.",
+  "study.week.empty": "كل يوم بتدرس فيه بيعبّي دائرة."
 }

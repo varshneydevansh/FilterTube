@@ -3124,5 +3124,8 @@
   "study.overlay.breakLeft.many": "เหลือเวลาพัก {count} นาที",
   "study.overlay.breakLeft.other": "เหลือเวลาพัก {count} นาที",
   "study.family.stopped": "อุปกรณ์ของ {name} หยุดรายงาน",
-  "study.family.stoppedBody": "รายงานล่าสุด {time} ถ้ารีเซ็ตอุปกรณ์หรือลบ FilterTube แผนการเรียนก็หายไปด้วย จับคู่ใหม่เพื่อส่งแผนอีกครั้ง"
+  "study.family.stoppedBody": "รายงานล่าสุด {time} ถ้ารีเซ็ตอุปกรณ์หรือลบ FilterTube แผนการเรียนก็หายไปด้วย จับคู่ใหม่เพื่อส่งแผนอีกครั้ง",
+  "study.endSession": "จบช่วงเรียน",
+  "study.endHint": "จะจบหลังรอ 30 วินาที คุณจึงยังยกเลิกได้",
+  "study.week.empty": "ทุกวันที่คุณเรียนจะเติมวงกลมหนึ่งวง"
 }

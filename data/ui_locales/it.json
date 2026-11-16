@@ -3126,5 +3126,8 @@
   "study.overlay.breakLeft.many": "Ti restano {count} min di pausa",
   "study.overlay.breakLeft.other": "Ti restano {count} min di pausa",
   "study.family.stopped": "Il dispositivo di {name} ha smesso di inviare rapporti",
-  "study.family.stoppedBody": "Ultimo rapporto {time}. Se il dispositivo è stato ripristinato o FilterTube è stato rimosso, anche il piano di studio è perso. Associalo di nuovo per inviarlo."
+  "study.family.stoppedBody": "Ultimo rapporto {time}. Se il dispositivo è stato ripristinato o FilterTube è stato rimosso, anche il piano di studio è perso. Associalo di nuovo per inviarlo.",
+  "study.endSession": "Termina sessione",
+  "study.endHint": "Termina dopo una pausa di 30 secondi, quindi puoi ancora annullare.",
+  "study.week.empty": "Ogni giorno di studio riempie un cerchio."
 }

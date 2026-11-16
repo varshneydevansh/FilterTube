@@ -3124,5 +3124,8 @@
   "study.overlay.breakLeft.many": "休息还剩 {count} 分钟",
   "study.overlay.breakLeft.other": "休息还剩 {count} 分钟",
   "study.family.stopped": "{name} 的设备已停止汇报",
-  "study.family.stoppedBody": "上次汇报是 {time}。如果设备被重置或 FilterTube 被移除，学习计划也会丢失。重新配对即可发送。"
+  "study.family.stoppedBody": "上次汇报是 {time}。如果设备被重置或 FilterTube 被移除，学习计划也会丢失。重新配对即可发送。",
+  "study.endSession": "结束学习",
+  "study.endHint": "暂停 30 秒后才会结束，所以你还可以取消。",
+  "study.week.empty": "每学习一天，就会填满一个圆圈。"
 }

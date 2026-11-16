@@ -3124,5 +3124,8 @@
   "study.overlay.breakLeft.many": "休憩の残り {count} 分",
   "study.overlay.breakLeft.other": "休憩の残り {count} 分",
   "study.family.stopped": "{name} さんの端末が報告を止めました",
-  "study.family.stoppedBody": "最後の報告は {time} です。端末がリセットされたり FilterTube が削除されたりすると、学習プランも消えます。送るには、もう一度ペアリングしてください。"
+  "study.family.stoppedBody": "最後の報告は {time} です。端末がリセットされたり FilterTube が削除されたりすると、学習プランも消えます。送るには、もう一度ペアリングしてください。",
+  "study.endSession": "セッションを終了",
+  "study.endHint": "30 秒待つと終了します。それまではキャンセルできます。",
+  "study.week.empty": "学習した日ごとに丸がひとつ埋まります。"
 }

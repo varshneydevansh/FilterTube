@@ -3126,5 +3126,8 @@
   "study.overlay.breakLeft.many": "Saura min {count} na hutunka",
   "study.overlay.breakLeft.other": "Saura min {count} na hutunka",
   "study.family.stopped": "Na'urar {name} ta daina bayar da rahoto",
-  "study.family.stoppedBody": "Rahoto na ƙarshe {time}. Idan an sake saita na'urar ko an cire FilterTube, shirin karatu ma ya tafi. Sake haɗa su don aika shi."
+  "study.family.stoppedBody": "Rahoto na ƙarshe {time}. Idan an sake saita na'urar ko an cire FilterTube, shirin karatu ma ya tafi. Sake haɗa su don aika shi.",
+  "study.endSession": "Ƙare zama",
+  "study.endHint": "Zai ƙare bayan jira na daƙiƙa 30, don haka za ka iya soke shi har yanzu.",
+  "study.week.empty": "Kowace rana da ka yi karatu tana cike da'ira ɗaya."
 }

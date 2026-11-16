@@ -196,10 +196,13 @@
             }));
             return wrap;
         }
-        wrap.appendChild(button(t('study.end', 'End'), compact ? 'ft-study-btn' : 'btn-secondary', async () => {
+        // The card says "End session" and the 30-second pause up front (Android ee59f65b4); the popup
+        // strip keeps its short "End".
+        wrap.appendChild(button(compact ? t('study.end', 'End') : t('study.endSession', 'End session'), compact ? 'ft-study-btn' : 'btn-secondary', async () => {
             await send({ action: 'FilterTube_StudyEndSession' });
             onChange?.();
         }));
+        if (!compact) wrap.appendChild(el('span', 'ft-study-muted ft-study-end__hint', t('study.endHint', 'It ends after a 30-second pause, so you can still cancel.')));
         return wrap;
     }
 
@@ -432,7 +435,10 @@
         const box = el('div', 'ft-study-planner');
         if (!editable && options.readOnlyLabel) box.appendChild(el('span', 'ft-study-chip is-parent', options.readOnlyLabel));
 
-        const detail = el('p', 'ft-study-planner__detail', `${t('study.planner.rightNow', 'Right now')}: ${segmentWords(currentSegment(plan, focus), breakMode)}`);
+        // "Right now" follows a running session, not only the plan (Android ee59f65b4).
+        const running = { STUDY: 'study', BREAK: 'break', LIMIT: 'limit' }[text(object(options.state).state)];
+        const now = running ? { kind: running } : currentSegment(plan, focus);
+        const detail = el('p', 'ft-study-planner__detail', `${t('study.planner.rightNow', 'Right now')}: ${segmentWords(now, breakMode)}`);
         detail.setAttribute('aria-live', 'polite');
         box.appendChild(renderPlanBar(plan, focus, breakMode, {
             onSelect: (segment, label) => { detail.textContent = `${label}: ${segmentWords(segment, breakMode)}`; }
@@ -1705,7 +1711,9 @@
             week.append(el('span', 'ft-study-field__label', t('study.week.title', 'This week')), circles,
                 el('span', 'ft-study-muted', state.week.daysStudied === 1
                     ? t('study.week.oneDay', '1 day studied this week')
-                    : t('study.week.days', '{count} days studied this week', { count: state.week.daysStudied })));
+                    // A kind line for an empty week, never "0 days" (Android study_dash_week_empty).
+                    : state.week.daysStudied > 0 ? t('study.week.days', '{count} days studied this week', { count: state.week.daysStudied })
+                        : t('study.week.empty', 'Each day you study fills a circle.')));
             card.appendChild(week);
         }
 
@@ -1714,7 +1722,7 @@
         card.appendChild(el('h4', 'ft-study-dashboard__subtitle', t('study.planner.title', 'Study plan')));
         card.appendChild(plannerHost);
         renderPlanner(plannerHost, {
-            study, catalog, editable, packs: state.packs,
+            study, catalog, editable, packs: state.packs, state,
             readOnlyLabel: text(object(study.plan).setByParentId) ? setByLabel(data.parentName) : t('study.lockedUntil', 'Locked until {time}', { time: formatDayTime(state.lockedUntil) }),
             toastHost: card,
             onPatch: async patch => { const result = await send({ action: 'FilterTube_StudyUpdate', patch }); await refresh(); return result; },

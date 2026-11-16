@@ -3126,5 +3126,8 @@
   "study.overlay.breakLeft.many": "ከእረፍትህ {count} ደቂቃ ቀርቷል",
   "study.overlay.breakLeft.other": "ከእረፍትህ {count} ደቂቃ ቀርቷል",
   "study.family.stopped": "የ{name} መሣሪያ ሪፖርት ማድረግ አቁሟል",
-  "study.family.stoppedBody": "የመጨረሻ ሪፖርት {time}። መሣሪያው ዳግም ከተጀመረ ወይም FilterTube ከተወገደ የጥናት ዕቅዱም ይጠፋል። ለመላክ እንደገና አጣምር።"
+  "study.family.stoppedBody": "የመጨረሻ ሪፖርት {time}። መሣሪያው ዳግም ከተጀመረ ወይም FilterTube ከተወገደ የጥናት ዕቅዱም ይጠፋል። ለመላክ እንደገና አጣምር።",
+  "study.endSession": "ጥናቱን አቁም",
+  "study.endHint": "ከ30 ሰከንድ ቆይታ በኋላ ያበቃል፣ ስለዚህ አሁንም መሰረዝ ትችላለህ።",
+  "study.week.empty": "የምታጠናበት እያንዳንዱ ቀን አንድ ክብ ይሞላል።"
 }
