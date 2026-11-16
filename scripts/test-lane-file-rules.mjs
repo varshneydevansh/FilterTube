@@ -25,7 +25,7 @@ export const FILE_LANE_RULES = Object.freeze([
   { id: 'localization-validation-tools', patterns: [/^scripts\/(?:audit-ui-copy\.py|(?:check|extract|merge)-(?:json-keys|ui-locales|release-note-locales|family-ui-fallbacks|static-ui-copy|ui-locale-batch|ui-locale-drafts)\.(?:mjs|cjs|py))$/], lanes: ['release', 'settings', 'smoke'] },
   { id: 'family-device-evidence-tools', patterns: [/^scripts\/(?:create-family-device-(?:capture-checklist|evidence-packet)|import-family-device-downloaded-evidence|report-family-device-(?:phase11-status|phase12-status|provider-surface|release-readiness)|update-family-device-evidence-log|validate-family-device-evidence)\.mjs$/], lanes: ['release', 'settings', 'smoke'] },
   { id: 'family-device-review-evidence', patterns: [/^docs\/design\/device-sync\//, /^docs\/audit\/(?:issue-safety-formal|artifacts\/responsive-settings-[^/]+|evidence\/family-devices-[^/]+)\//], lanes: ['release', 'settings', 'smoke'] },
-  { id: 'release-design-evidence', patterns: [/^docs\/design\/(?:ANDROID-PLAY-STORE-CTA-[^/]+\.md|store-listing-drafts\/|EXTENSION_UX_AUDIT_[^/]+\.md|screens-\d{4}-\d{2}-\d{2}\/)/, /^funding\.json$/], lanes: ['release', 'smoke'] },
+  { id: 'release-design-evidence', patterns: [/^docs\/design\/(?:ANDROID-PLAY-STORE-CTA-[^/]+\.md|store-listing-drafts\/|EXTENSION_UX_AUDIT_[^/]+\.md|PARITY_PASS\d+\.md|screens-\d{4}-\d{2}-\d{2}(?:-[a-z0-9]+)?\/)/, /^funding\.json$/], lanes: ['release', 'smoke'] },
   { id: 'nanah-storage-lock-fixture', patterns: [/^tests\/runtime\/helpers\/nanah-storage-lock-fixture\.mjs$/], lanes: ['release', 'settings', 'smoke'] },
   {
     id: 'seed-json-runtime',
