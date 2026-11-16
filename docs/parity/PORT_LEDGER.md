@@ -3,17 +3,17 @@
 Generated from `PORT_LEDGER.tsv` by `node tools/parity/ledger.mjs render`. Edit the TSV, never this file.
 Rules: [HOW_TO_PORT.md](HOW_TO_PORT.md). Sync point: Android `ec9d91080` (Release Android 3.6.1), in the app repository.
 
-**189 rows:** 72 ported, 24 partial, 5 todo, 88 n/a. **71.3%** of 101 applicable rows ported (83.2% counting partial as half).
+**189 rows:** 78 ported, 23 partial, 0 todo, 88 n/a. **77.2%** of 101 applicable rows ported (88.6% counting partial as half).
 
 | Area | ported | partial | todo | n/a | share |
 |---|---|---|---|---|---|
 | brand-visual | 30 | 2 | 0 | 9 | 96.9% |
 | home-viewer | 1 | 0 | 0 | 15 | 100.0% |
 | watch | 0 | 0 | 0 | 1 | - |
-| study | 20 | 16 | 3 | 7 | 71.8% |
+| study | 24 | 15 | 0 | 7 | 80.8% |
 | kids | 0 | 0 | 0 | 3 | - |
 | profiles-family | 5 | 4 | 0 | 2 | 77.8% |
-| settings-controls | 6 | 0 | 2 | 3 | 75.0% |
+| settings-controls | 8 | 0 | 0 | 3 | 100.0% |
 | search | 0 | 0 | 0 | 2 | - |
 | music | 0 | 0 | 0 | 5 | - |
 | nearby-sync | 2 | 1 | 0 | 2 | 83.3% |
@@ -101,9 +101,6 @@ Rules: [HOW_TO_PORT.md](HOW_TO_PORT.md). Sync point: Android `ec9d91080` (Releas
 
 | Android | Date | Subject | Status | Extension | Reason / note |
 |---|---|---|---|---|---|
-| `17a81affe` | 2026-11-15 | fix(study-setup): keep acronyms upper case in topic chips (DBMS, GATE CSE) | todo |  | StudyTopicLabel: topic labels keep acronyms upper case (the search explainer lists topics) |
-| `e64d74490` | 2026-11-15 | fix(android-study): a merge keeps "Pack channels only", and a parent's choice under their plan | todo |  | study_model.js mergeStudy drops a parent's packChannelsOnly |
-| `0c08ba48b` | 2026-11-16 | feat(android-study): a light country accent on study setup | todo |  | CountryAccent: crayon stripe, 6 % wash and mark colour from the chosen country |
 | `678188f11` | 2026-11-15 | fix(android-study): stamp spring crash, Kriti fits per pose, break drain, sounds, preview safety | partial | `5a539088` | not traced: stamp spring, per-pose fit and break drain |
 | `79a3d892c` | 2026-11-15 | feat(android-study): Study v3 home renders in place, colours the page by state, sage-led crayon ring | partial | `06b3bf31`, `5a953666` | ring and sage are in; colouring the page by state is not traced |
 | `b753aa71f` | 2026-11-15 | fix(android-study): setup polish from the emulator critique | partial | `06b3bf31` | the extension's setup is a compact pack picker; the setup polish targets the app's step flow |
@@ -112,17 +109,19 @@ Rules: [HOW_TO_PORT.md](HOW_TO_PORT.md). Sync point: Android `ec9d91080` (Releas
 | `789f3fbf5` | 2026-11-15 | fix(android-study): one continuous Day Ring and a balanced home hero | partial | `06b3bf31` | the ring is in; the balanced hero is the app's layout |
 | `88d53bc09` | 2026-11-15 | feat(android-study): paper Study home with the crayon Day Ring and the end seal | partial | `06b3bf31` | the ring is in; the end seal is not traced |
 | `980a58b67` | 2026-11-15 | feat(android-study): free round and break lengths, channel avatars, Kriti and Uljhan | partial | `43bdfb37` | free round (5-240) and break (0-120) lengths are in; study channel avatars are not traced |
-| `ce156df15` | 2026-11-15 | fix(android-study): branches pick their channels and topics; breaks can be skipped | partial | `5f476d8f`, `2964d665` | branch channels and Skip break are in; the merge doesn't yet keep a parent's round and break lengths |
 | `fcd8018b8` | 2026-11-15 | feat(android-study): study pages: the gate card, hidden counts, Up next, Kids feed, loosening sheets | partial | `7cbae66d`, `a4306a68` | gate card and tighten-only changes are in; hidden counts, Up next and loosening sheets are native pages |
 | `2280f4ee3` | 2026-11-15 | fix(android-study): Self-Control expiry on the guarded clock, found on the emulator | partial | `43a28703` | clock guard is in; Self-Control expiry on the guarded clock is not traced |
 | `910016a10` | 2026-11-15 | feat(android-study): P1 enforcement: local media, fail closed, silent-device notice | partial | `199cce4f` | fail closed is in; the silent-device notice is not traced; local media is Android-only |
 | `9ed6a1e27` | 2026-11-15 | fix(android): Study review leftovers (skip chip, break Back, truthful lines) | partial | `06b3bf31`, `2964d665` | not traced: skip chip, break Back, truthful lines |
 | `ee59f65b4` | 2026-11-15 | fix(android): Study and focus review fixes, large-text Controls grid | partial | `06b3bf31` | not traced; the large-text Controls grid is Android-only |
 | `17ea3465f` | 2026-11-16 | feat(android-study): Kids learning by age keeps the Kids space Kids | partial | `5f476d8f` | Kids study time and the "Kids learning for this age shows in Kids" note are in; the Kids catalogue browse by age is the app's native Kids Home |
-| `028e59c94` | 2026-11-16 | fix(android-study): study search finds lessons in the plan's own channels | partial | `ddf3ecb0` | "How search works while studying" is in; the app's own search of plan channels can't exist on the site's search page |
+| `028e59c94` | 2026-11-16 | fix(android-study): study search finds lessons in the plan's own channels | partial | `ddf3ecb0`, `0a7e56ee` | "How search works while studying" is in, with its topics through topicLabel; the app's own search of plan channels can't exist on the site's search page |
+| `17a81affe` | 2026-11-15 | fix(study-setup): keep acronyms upper case in topic chips (DBMS, GATE CSE) | ported | `0a7e56ee` | StudyTopicLabel as study_engine.js topicLabel, used by the search explainer; StudyTopicLabelTest ported |
 | `8d8c9a270` | 2026-11-15 | feat(android-study): StudyPaper uses FilterTube's brand colours (cream, ink, brick, hero pastels) | ported | `f4111820`, `5a953666` | StudyPaper brand colours |
 | `e8ab8e644` | 2026-11-15 | feat(android-study): StudyPaper, the shared paper-and-crayon foundation for the study redesign | ported | `f4111820` | paper-and-crayon foundation |
 | `79f10fec8` | 2026-11-15 | feat(android-study): catalog v3 slice: school streams, global school packs, no cross-country school packs | ported | `4a8d88e1` | catalog v3 slice; packs-v1.json byte-identical |
+| `ce156df15` | 2026-11-15 | fix(android-study): branches pick their channels and topics; breaks can be skipped | ported | `5f476d8f`, `2964d665`, `b3256609` | branch channels and topics, Skip break, and the merge keeps a parent's round and break lengths (StudyMergeTest case ported) |
+| `e64d74490` | 2026-11-15 | fix(android-study): a merge keeps "Pack channels only", and a parent's choice under their plan | ported | `b3256609` | mergeStudy keeps a parent's packChannelsOnly under their plan, else the incoming value when set; StudyMergeTest case ported |
 | `ccc767cab` | 2026-11-15 | fix(android-study): one decision for the study Home, the top-up and the Watch gate | ported | `7cbae66d`, `2ca24cd8` | one engine decides the feed and the Watch gate (study_engine.js) |
 | `0ddbfedec` | 2026-11-15 | feat(android-study): P3 matching precision, study Home ranking, copy fixes | ported | `199cce4f`, `e6a935ff` | title-only pack words, synonyms, failing closed |
 | `16113e01c` | 2026-11-15 | feat(android-study): P2 pages: tighten-only settings and sync, calm study states | ported | `a4306a68` | tighten-only settings and sync under a parent's plan |
@@ -139,6 +138,7 @@ Rules: [HOW_TO_PORT.md](HOW_TO_PORT.md). Sync point: Android `ec9d91080` (Releas
 | `6973fdaa7` | 2026-11-15 | feat(android): Study model on each profile (study v1) and layered rules | ported | `79b831f1`, `1da48c8d` | study object per profile and layered rules |
 | `52d52ce5e` | 2026-11-15 | docs: day planner is the main Study plan screen | ported | `d8af2824` | the live policy change in nanah_managed_live_policy.js |
 | `ec84c6817` | 2026-11-16 | fix(android-study): keep other branches' lectures out of a chosen branch | ported | `5f476d8f` | other-branch titles drop out of a chosen branch (study_engine.js studyBranchFilter) |
+| `0c08ba48b` | 2026-11-16 | feat(android-study): a light country accent on study setup | ported | `1d4a1011` | CountryAccent table, mark and 6 % wash in study_packs.js; the CrayonStripe and motif on the row that lists the country's packs; CountryAccentTest ported. The setup's step dots and squiggle have no extension counterpart (no step flow) |
 | `bd6b6adb4` | 2026-11-16 | feat(android-study): study packs for more countries | ported | `a99f051b`, `5f476d8f` | data/study/packs-v1.json byte-identical to the Android asset (ledger.mjs shared) |
 | `49a8ba846` | 2026-11-15 | fix(android-study): keep the planner's scroll only once it has been laid out | n/a |  | Android platform plumbing (planner scroll restore) |
 | `c2fcb8b71` | 2026-11-15 | fix(android-study): no focus wash over the page (the slate dark mode); chip check sits with its words | n/a |  | Android platform plumbing (focus highlight over the native page) |
@@ -176,12 +176,12 @@ Rules: [HOW_TO_PORT.md](HOW_TO_PORT.md). Sync point: Android `ec9d91080` (Releas
 
 | Android | Date | Subject | Status | Extension | Reason / note |
 |---|---|---|---|---|---|
-| `93cf50d53` | 2026-11-15 | fix(android): translated filter-button label and merged-tile tests | todo |  | the date and sort button's translated label (with a5efd779d) |
-| `a5efd779d` | 2026-11-15 | feat(android): one search row with a date and sort sheet on Keywords and Channels | todo |  | date and sort move behind a filter button beside search; the button fills brick-soft while they narrow the list |
 | `d00381a36` | 2026-11-15 | feat(android-controls): Controls v2 on paper (hub, filters, channel sheet, content groups) | ported | `cd62c292`, `c57418ae`, `be37c650` | Controls on paper, keyword and channel rows in the app's layout |
 | `993471e15` | 2026-11-15 | feat(android-privacy): carry out the network audit's owner decisions | ported | `77bdd2b8` | the part that applies: relay consent (InternetSyncRelayConsent); updates, cookie policy and off-platform links are Android-only |
 | `076bd6efa` | 2026-11-15 | fix(android-motion): P1 polish from the emulator pass | ported | `95652e4e`, `9944ced3` | undo bar, row wash and first-filter moment |
 | `eddef5258` | 2026-11-15 | feat(android-motion): P1 Filters and Controls moments | ported | `95652e4e`, `9944ced3`, `db0a0677` | undo after removal, wash on a new row, first-filter moment, rolling numbers |
+| `93cf50d53` | 2026-11-15 | fix(android): translated filter-button label and merged-tile tests | ported | `db2aa87f` | the button's label is the translated "More options" in all 38 catalogs; the merged-tile test half is the app's account tile (n/a) |
+| `a5efd779d` | 2026-11-15 | feat(android): one search row with a date and sort sheet on Keywords and Channels | ported | `db2aa87f` | verified against NativeMainRuleFilterSheet: 56 px button, 18 px corners, 22 px brand icon, 8 px gap, brick-soft while narrowed; date and sort move into a panel (the options page's stand-in for the bottom sheet), Main and Kids |
 | `c6f69ca2b` | 2026-11-15 | fix(android): drop the repeated Filters hero text | ported | `4f0d02e6` | no repeated hero copy |
 | `99aa992a4` | 2026-11-15 | fix(android): brand palette for Controls buttons, toggles and search | ported | `cd62c292` | brand palette for buttons, toggles and search |
 | `63f195a2a` | 2026-11-15 | feat(android-privacy): switch and disclosure for the HD decoder | n/a |  | the app's own HD decoder |

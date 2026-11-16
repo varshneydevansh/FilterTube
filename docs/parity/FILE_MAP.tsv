@@ -18,7 +18,7 @@ apps/android/app/src/main/java/com/filtertube/app/AskParent.kt	kotlin	js/shared/
 apps/android/app/src/main/java/com/filtertube/app/AskParentActivities.kt	kotlin	js/tab-view.js;js/popup.js;js/content/admission_overlay.js	known	paired by hand in derive-file-map.mjs KNOWN_KOTLIN; check before trusting
 apps/android/app/src/main/java/com/filtertube/app/AskParentService.kt	kotlin	js/ask_parent_background.js;js/background.js;js/tab-view.js	cited	named in 3 extension file(s)
 apps/android/app/src/main/java/com/filtertube/app/AskParentUi.kt	kotlin	css/paperkit-parity.css;js/content/admission_overlay.js;js/nanah_pairing_ui.js;js/tab-view.js	cited	named in 4 extension file(s)
-apps/android/app/src/main/java/com/filtertube/app/BrandPalette.kt	kotlin	css/paperkit-parity.css;css/paperkit.css	cited	named in 2 extension file(s)
+apps/android/app/src/main/java/com/filtertube/app/BrandPalette.kt	kotlin	css/paperkit-parity.css;css/paperkit.css;js/shared/study_packs.js	cited	named in 3 extension file(s)
 apps/android/app/src/main/java/com/filtertube/app/ChannelAdapter.kt	kotlin	js/render_engine.js;js/tab-view.js;css/paperkit-parity.css	known	paired by hand in derive-file-map.mjs KNOWN_KOTLIN; check before trusting
 apps/android/app/src/main/java/com/filtertube/app/ChannelAddSheet.kt	kotlin	js/render_engine.js;js/tab-view.js;css/paperkit-parity.css	known	paired by hand in derive-file-map.mjs KNOWN_KOTLIN; check before trusting
 apps/android/app/src/main/java/com/filtertube/app/ChannelsFragment.kt	kotlin	js/render_engine.js;js/tab-view.js;css/paperkit-parity.css	known	paired by hand in derive-file-map.mjs KNOWN_KOTLIN; check before trusting
@@ -32,7 +32,7 @@ apps/android/app/src/main/java/com/filtertube/app/ControlsFiltersChrome.kt	kotli
 apps/android/app/src/main/java/com/filtertube/app/ControlsPaper.kt	kotlin	css/paperkit-parity.css;js/paperkit_parity.js	cited	named in 2 extension file(s)
 apps/android/app/src/main/java/com/filtertube/app/ControlsSheetTheme.kt	kotlin	html/tab-view.html;css/paperkit-parity.css;js/paperkit_parity.js	known	paired by hand in derive-file-map.mjs KNOWN_KOTLIN; check before trusting
 apps/android/app/src/main/java/com/filtertube/app/ControlsV2Models.kt	kotlin	html/tab-view.html;css/paperkit-parity.css;js/paperkit_parity.js	known	paired by hand in derive-file-map.mjs KNOWN_KOTLIN; check before trusting
-apps/android/app/src/main/java/com/filtertube/app/CountryAccent.kt	kotlin	js/study_ui.js;css/study.css	known	paired by hand in derive-file-map.mjs KNOWN_KOTLIN; check before trusting
+apps/android/app/src/main/java/com/filtertube/app/CountryAccent.kt	kotlin	css/study.css;js/shared/study_packs.js;js/study_ui.js	cited	named in 3 extension file(s)
 apps/android/app/src/main/java/com/filtertube/app/DashboardActivity.kt	kotlin	html/tab-view.html;css/paperkit-parity.css	audit	EXTENSION_ANDROID_PARITY_AUDIT_2026-11-16.md
 apps/android/app/src/main/java/com/filtertube/app/DebugNativeOwnedKidsAccountHost.kt	kotlin	n/a	n/a	debug builds and screenshot fixtures
 apps/android/app/src/main/java/com/filtertube/app/DebugNativeOwnedKidsAccountSheetHost.kt	kotlin	n/a	n/a	debug builds and screenshot fixtures
@@ -59,7 +59,7 @@ apps/android/app/src/main/java/com/filtertube/app/DebugNativeOwnedKidsSettingsHo
 apps/android/app/src/main/java/com/filtertube/app/DebugNativeOwnedKidsStudyHost.kt	kotlin	n/a	n/a	debug builds and screenshot fixtures
 apps/android/app/src/main/java/com/filtertube/app/DebugNativeOwnedMainObservedPayloads.kt	kotlin	n/a	n/a	debug builds and screenshot fixtures
 apps/android/app/src/main/java/com/filtertube/app/DirectUpdateSettings.kt	kotlin	n/a	n/a	Android platform plumbing (app icon, updates, WebView host, threading, deep links, insets)
-apps/android/app/src/main/java/com/filtertube/app/DoodleKit.kt	kotlin	js/doodles.js;js/mascots.js;js/paperkit_parity.js	cited	named in 3 extension file(s)
+apps/android/app/src/main/java/com/filtertube/app/DoodleKit.kt	kotlin	js/doodles.js;js/mascots.js;js/paperkit_parity.js;js/shared/study_packs.js	cited	named in 4 extension file(s)
 apps/android/app/src/main/java/com/filtertube/app/FilterPayloadCompiler.kt	kotlin	js/background.js;js/content/dom_fallback.js;js/settings_shared.js;js/shared/identity.js	cited	named in 4 extension file(s)
 apps/android/app/src/main/java/com/filtertube/app/FilterRemovalUndo.kt	kotlin	js/state_manager.js;js/ui_components.js	cited	named in 2 extension file(s)
 apps/android/app/src/main/java/com/filtertube/app/FilterRowAnimator.kt	kotlin	js/ui_components.js	audit	EXTENSION_ANDROID_PARITY_AUDIT_2026-11-16.md
@@ -153,7 +153,7 @@ apps/android/app/src/main/java/com/filtertube/app/NativeMainPlaylistLibraryView.
 apps/android/app/src/main/java/com/filtertube/app/NativeMainPlaylistOrderView.kt	kotlin	n/a	n/a	the app's native viewer (the extension filters the site's own pages)
 apps/android/app/src/main/java/com/filtertube/app/NativeMainPlaylistPage.kt	kotlin	n/a	n/a	the app's native viewer (the extension filters the site's own pages)
 apps/android/app/src/main/java/com/filtertube/app/NativeMainPlaylistSaveView.kt	kotlin	n/a	n/a	the app's native viewer (the extension filters the site's own pages)
-apps/android/app/src/main/java/com/filtertube/app/NativeMainRuleFilterSheet.kt	kotlin	n/a	n/a	the app's native viewer (the extension filters the site's own pages)
+apps/android/app/src/main/java/com/filtertube/app/NativeMainRuleFilterSheet.kt	kotlin	css/paperkit-parity.css;js/paperkit_parity.js	cited	named in 2 extension file(s)
 apps/android/app/src/main/java/com/filtertube/app/NativeMainScenicStyle.kt	kotlin	n/a	n/a	the app's native viewer (the extension filters the site's own pages)
 apps/android/app/src/main/java/com/filtertube/app/NativeMainSearchArtistHeaderUi.kt	kotlin	n/a	n/a	the app's native viewer (the extension filters the site's own pages)
 apps/android/app/src/main/java/com/filtertube/app/NativeMainSearchChipsView.kt	kotlin	n/a	n/a	the app's native viewer (the extension filters the site's own pages)
@@ -302,7 +302,7 @@ apps/android/app/src/main/java/com/filtertube/app/StudySessionStripHost.kt	kotli
 apps/android/app/src/main/java/com/filtertube/app/StudySessionViews.kt	kotlin	js/content/study_overlay.js;js/popup.js	known	paired by hand in derive-file-map.mjs KNOWN_KOTLIN; check before trusting
 apps/android/app/src/main/java/com/filtertube/app/StudySetupActivity.kt	kotlin	js/study_background.js	cited	named in 1 extension file(s)
 apps/android/app/src/main/java/com/filtertube/app/StudySetupGroups.kt	kotlin	js/study_ui.js;css/study.css	known	paired by hand in derive-file-map.mjs KNOWN_KOTLIN; check before trusting
-apps/android/app/src/main/java/com/filtertube/app/StudySetupViews.kt	kotlin	js/study_ui.js;css/study.css	known	paired by hand in derive-file-map.mjs KNOWN_KOTLIN; check before trusting
+apps/android/app/src/main/java/com/filtertube/app/StudySetupViews.kt	kotlin	js/study_ui.js	cited	named in 1 extension file(s)
 apps/android/app/src/main/java/com/filtertube/app/StudyStateTheme.kt	kotlin	js/study_ui.js;css/study.css	known	paired by hand in derive-file-map.mjs KNOWN_KOTLIN; check before trusting
 apps/android/app/src/main/java/com/filtertube/app/StudySuggestions.kt	kotlin	js/shared/study_engine.js	cited	named in 1 extension file(s)
 apps/android/app/src/main/java/com/filtertube/app/StudySwitchGate.kt	kotlin	js/popup.js;js/study_background.js;js/tab-view.js	cited	named in 3 extension file(s)
