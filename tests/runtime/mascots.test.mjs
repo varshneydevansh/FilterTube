@@ -325,7 +325,10 @@ test('sheets play once and rest on their last frame; reduced motion shows only t
     // The gate plays the same shoo sheet in the page (content scripts cannot load this module).
     const gate = fs.readFileSync('js/content/admission_overlay.js', 'utf8');
     assert.match(gate, /const SHOO_FRAMES = \[1, 2, 3, 4, 5, 6\]\.map\(index => `duo_shoo_0\$\{index\}\.webp`\);/);
-    assert.match(gate, /const SHOO_STILL = 'duo_shoo_06\.webp';/);
+    // At most three plays a day, then (and in Quiet) Uljhan's shrug still (MascotStatePolicy.BLOCKED_DAILY_PLAYS).
+    assert.match(gate, /const SHOO_DAILY_PLAYS = 3;/);
+    assert.match(gate, /const SHOO_REST = 'uljhan_shrug\.webp';/);
+    assert.match(gate, /if \(plays >= SHOO_DAILY_PLAYS\) \{ resolve\(false\); return; \}/);
     assert.match(gate, /const SHOO_FRAME_MS = 420;/);
     assert.match(gate, /companionMode !== 'lively' \|\| admissionOverlayPrefersReducedMotion\(\)/, 'the sheet plays on Lively only, never with reduced motion');
 });

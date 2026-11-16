@@ -128,7 +128,6 @@
     // The app's DUO_SHOO (420 ms a frame): Uljhan sneaks up, Kriti waves him off, he hops away, and she
     // reads on (the resting frame).
     const SHOO_FRAMES = [1, 2, 3, 4, 5, 6].map(index => `duo_shoo_0${index}.webp`);
-    const SHOO_STILL = 'duo_shoo_06.webp';
     const SHOO_FRAME_MS = 420;
     let companionMode = 'quiet';
     let companionLoading = null;
@@ -173,11 +172,62 @@
         return picture;
     }
 
-    /** The shoo sheet once (Lively, motion allowed), ending on its last frame; otherwise the still. */
+    // The shoo plays at most three times a day (Android MascotStatePolicy.BLOCKED_DAILY_PLAYS, keyed by
+    // the local date); otherwise, and in Quiet, the gate shows Uljhan's shrug still, as the app does.
+    const SHOO_DAILY_PLAYS = 3;
+    const SHOO_CAP_KEY = 'ftMascotCapsV1';
+    const SHOO_REST = 'uljhan_shrug.webp';
+
+    function admissionLocalDay(date = new Date()) {
+        const pad = value => String(value).padStart(2, '0');
+        return `${date.getFullYear()}-${pad(date.getMonth() + 1)}-${pad(date.getDate())}`;
+    }
+
+    /** Resolves true when a play is left today, and counts it. */
+    function takeShooPlay() {
+        const local = runtimeAPI?.storage?.local;
+        if (!local?.get || !local?.set) return Promise.resolve(true);
+        return new Promise(resolve => {
+            try {
+                const done = value => {
+                    const caps = value?.[SHOO_CAP_KEY] && typeof value[SHOO_CAP_KEY] === 'object' ? value[SHOO_CAP_KEY] : {};
+                    const today = admissionLocalDay();
+                    const plays = caps.blockedDay === today ? Math.max(0, Number(caps.blockedCount) || 0) : 0;
+                    if (plays >= SHOO_DAILY_PLAYS) { resolve(false); return; }
+                    try { local.set({ [SHOO_CAP_KEY]: { ...caps, blockedDay: today, blockedCount: plays + 1 } }); } catch (e) {}
+                    resolve(true);
+                };
+                const result = local.get(SHOO_CAP_KEY, done);
+                if (result && typeof result.then === 'function') result.then(done, () => resolve(true));
+            } catch (e) { resolve(true); }
+        });
+    }
+
+    function restAdmissionShoo(picture) {
+        const url = admissionMascotUrl(SHOO_REST);
+        if (!url) return;
+        picture.src = url;
+        picture.setAttribute('data-filtertube-admission-mascot', SHOO_REST);
+        admissionOverlayStyle(picture, { height: '112px' });
+    }
+
+    /** The shoo sheet once (Lively, motion allowed, under the daily cap), ending on its last frame;
+     * otherwise Uljhan's shrug still. */
     function playAdmissionShoo(picture) {
         if (!picture || picture.__filtertubeShooPlayed) return;
         picture.__filtertubeShooPlayed = true;
-        if (companionMode !== 'lively' || admissionOverlayPrefersReducedMotion() || typeof root.setTimeout !== 'function') return;
+        if (companionMode !== 'lively' || admissionOverlayPrefersReducedMotion() || typeof root.setTimeout !== 'function') {
+            restAdmissionShoo(picture);
+            return;
+        }
+        takeShooPlay().then(allowed => {
+            if (allowed) runAdmissionShoo(picture);
+            else restAdmissionShoo(picture);
+        });
+    }
+
+    function runAdmissionShoo(picture) {
+        admissionOverlayStyle(picture, { height: '132px' });
         let index = 0;
         const step = () => {
             if (picture.isConnected === false) return;
@@ -624,7 +674,7 @@
         });
         // Kriti shoos Uljhan off a blocked video; the short check before playback has no character.
         const shoo = blocked
-            ? syncAdmissionMascot(overlay, '__filtertubeAdmissionMascot', panel, SHOO_STILL, 132)
+            ? syncAdmissionMascot(overlay, '__filtertubeAdmissionMascot', panel, SHOO_REST, 112)
             : (overlay.__filtertubeAdmissionMascot ? (overlay.__filtertubeAdmissionMascot.remove?.(), overlay.__filtertubeAdmissionMascot = null) : null);
         if (shoo) {
             admissionOverlayStyle(shoo, { order: '-1', alignSelf: 'center', marginBottom: '-4px' });
