@@ -290,7 +290,7 @@ apps/android/app/src/main/java/com/filtertube/app/StudyPlannerModel.kt	kotlin	js
 apps/android/app/src/main/java/com/filtertube/app/StudyProfileSwitch.kt	kotlin	js/background.js;js/study_background.js	cited	named in 2 extension file(s)
 apps/android/app/src/main/java/com/filtertube/app/StudyRemote.kt	kotlin	js/study_ui.js;css/study.css	known	paired by hand in derive-file-map.mjs KNOWN_KOTLIN; check before trusting
 apps/android/app/src/main/java/com/filtertube/app/StudyRemoteUi.kt	kotlin	js/study_ui.js;css/study.css	known	paired by hand in derive-file-map.mjs KNOWN_KOTLIN; check before trusting
-apps/android/app/src/main/java/com/filtertube/app/StudyRestActivity.kt	kotlin	js/content/study_overlay.js;js/popup.js	known	paired by hand in derive-file-map.mjs KNOWN_KOTLIN; check before trusting
+apps/android/app/src/main/java/com/filtertube/app/StudyRestActivity.kt	kotlin	js/content/study_overlay.js	cited	named in 1 extension file(s)
 apps/android/app/src/main/java/com/filtertube/app/StudyRules.kt	kotlin	js/filter_logic.js;js/content/dom_fallback.js;js/shared/study_engine.js	audit	EXTENSION_ANDROID_PARITY_AUDIT_2026-11-16.md
 apps/android/app/src/main/java/com/filtertube/app/StudyRuntime.kt	kotlin	js/background.js;js/content_bridge.js;js/shared/study_model.js;js/study_background.js	cited	named in 4 extension file(s)
 apps/android/app/src/main/java/com/filtertube/app/StudyRuntimeStore.kt	kotlin	js/study_background.js	cited	named in 1 extension file(s)

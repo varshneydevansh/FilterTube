@@ -3,11 +3,11 @@
 Generated from `PORT_LEDGER.tsv` by `node tools/parity/ledger.mjs render`. Edit the TSV, never this file.
 Rules: [HOW_TO_PORT.md](HOW_TO_PORT.md). Sync point: Android `ec9d91080` (Release Android 3.6.1), in the app repository.
 
-**189 rows:** 78 ported, 23 partial, 0 todo, 88 n/a. **77.2%** of 101 applicable rows ported (88.6% counting partial as half).
+**189 rows:** 78 ported, 22 partial, 0 todo, 89 n/a. **78.0%** of 100 applicable rows ported (89.0% counting partial as half).
 
 | Area | ported | partial | todo | n/a | share |
 |---|---|---|---|---|---|
-| brand-visual | 30 | 2 | 0 | 9 | 96.9% |
+| brand-visual | 30 | 1 | 0 | 10 | 98.4% |
 | home-viewer | 1 | 0 | 0 | 15 | 100.0% |
 | watch | 0 | 0 | 0 | 1 | - |
 | study | 24 | 15 | 0 | 7 | 80.8% |
@@ -28,7 +28,6 @@ Rules: [HOW_TO_PORT.md](HOW_TO_PORT.md). Sync point: Android `ec9d91080` (Releas
 
 | Android | Date | Subject | Status | Extension | Reason / note |
 |---|---|---|---|---|---|
-| `173e12bfb` | 2026-11-15 | fix(android): mascots never clipped mid-motion (MascotStage) | partial | `c5c99ef9` | not traced: no clipping seen in the pass 3-5 captures, but MascotStage's padding rule is not ported as such |
 | `4ff67ce1b` | 2026-11-15 | feat(android): P2 gates, people and settings motion | partial | `c5c99ef9` | gates, people and settings motion: not traced item by item |
 | `3ec1de790` | 2026-11-15 | feat(mascots): idle life on the Study hero, end seal and support sheet; fix the update-check test after the merge | ported | `c5c99ef9`, `e579ae1d` | idle life on the study card, the end seal and the support sheet |
 | `f16a0eda4` | 2026-11-15 | feat(android): FilterTube's own crayon icon set (IconKit) | ported | `3e3721c1` | crayon icons exported from the app's vector drawables (scripts/export-crayon-icons.mjs) |
@@ -61,6 +60,7 @@ Rules: [HOW_TO_PORT.md](HOW_TO_PORT.md). Sync point: Android `ec9d91080` (Releas
 | `6faa445b0` | 2026-11-16 | fix(android): restart mascot idle life on any screen interaction | ported | `e579ae1d` | idle life wakes on any pointer, wheel, scroll, key or touch (mascots.js) |
 | `ff5c14cfc` | 2026-11-16 | feat(mascots): Uljhan fetch-more motion (hop, catch a play triangle, wave) | ported | `3e3721c1`, `c5c99ef9` | uljhan_fetch frames shipped; fetch timing 160 ms |
 | `9d7724808` | 2026-11-15 | fix(paperkit): styleChip no longer crashes inside a MaterialButtonToggleGroup (local media sections); tint instead of replacing the shape | n/a |  | Android platform plumbing (MaterialButtonToggleGroup crash) |
+| `173e12bfb` | 2026-11-15 | fix(android): mascots never clipped mid-motion (MascotStage) | n/a |  | verified 2026-11-17 in the unpacked extension: no mascot's three nearest ancestors clip it within the hop's headroom (overflow visible, or a scroller with 13 px or more above her), so there is nothing to unclip; browsers don't clip to padding the way a ViewGroup does |
 | `aeae54264` | 2026-11-15 | fix(doodles): background scenery video no longer blocks crayon marks (Allowed rules circle, add underline) | n/a |  | Android platform plumbing (z-order of the scenery video under doodles) |
 | `c5b1b289e` | 2026-11-15 | fix(android): set the dialog's entering state before its first frame | n/a |  | Android platform plumbing (dialog first frame) |
 | `9dcce521e` | 2026-11-15 | feat(android): the launch story: Uljhan dives into Kriti's funnel and a play button drops out | n/a |  | the launch story; an extension has no launch screen |
@@ -104,7 +104,7 @@ Rules: [HOW_TO_PORT.md](HOW_TO_PORT.md). Sync point: Android `ec9d91080` (Releas
 | `678188f11` | 2026-11-15 | fix(android-study): stamp spring crash, Kriti fits per pose, break drain, sounds, preview safety | partial | `5a539088` | not traced: stamp spring, per-pose fit and break drain |
 | `79a3d892c` | 2026-11-15 | feat(android-study): Study v3 home renders in place, colours the page by state, sage-led crayon ring | partial | `06b3bf31`, `5a953666` | ring and sage are in; colouring the page by state is not traced |
 | `b753aa71f` | 2026-11-15 | fix(android-study): setup polish from the emulator critique | partial | `06b3bf31` | the extension's setup is a compact pack picker; the setup polish targets the app's step flow |
-| `6c3f9f0d5` | 2026-11-15 | feat(android-study): in-session moments on paper — break sun, Skip break with Undo, gate card, Home strip | partial | `2964d665`, `5a539088` | break sun and the gate card on paper are in; Skip break with Undo and the Home strip are not traced |
+| `6c3f9f0d5` | 2026-11-15 | feat(android-study): in-session moments on paper — break sun, Skip break with Undo, gate card, Home strip | partial | `2964d665`, `5a539088`, `c4f6496c` | break on paper, the gate card, and Skip break with its cost line and 5 s Undo (c4f6496c, StudyBreakSkip and undoSkipBreak ported with their tests); not ported: the sun's m:ss countdown and "Up next after the break"; the Home strip and music chip are the app's native Home and player |
 | `3bbad1d03` | 2026-11-15 | feat(android-study): redesigned study setup on paper — what for, grouped exams, school, streams, grouped review, add a channel | partial | `06b3bf31` | the extension's setup is a compact pack picker: no what-for step, grouped exams, grouped review or add-a-channel sheet |
 | `789f3fbf5` | 2026-11-15 | fix(android-study): one continuous Day Ring and a balanced home hero | partial | `06b3bf31` | the ring is in; the balanced hero is the app's layout |
 | `88d53bc09` | 2026-11-15 | feat(android-study): paper Study home with the crayon Day Ring and the end seal | partial | `06b3bf31` | the ring is in; the end seal is not traced |
