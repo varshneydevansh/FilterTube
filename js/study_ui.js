@@ -609,6 +609,8 @@
         let tab = 'exams';
         const country = Packs.countryFromLocale(root.navigator?.language || '') || Packs.countryFromLocale(language());
         const row = el('div', 'ft-study-packs__add');
+        // The packs listed here are for `country`: the row wears its light accent (Android CountryAccent).
+        if (Packs.countryAccent) applyCountryAccent(row, Packs.countryAccent(country), Packs);
         const select = el('select', 'text-input');
         select.setAttribute('aria-label', t('study.packs.choose', 'Choose a study pack'));
         const fill = () => {
@@ -643,6 +645,64 @@
                 : t('study.packs.kidsHold', 'Kids keeps Kids videos and pauses at study time.')));
         }
         return wrap;
+    }
+
+    /**
+     * Android StudySetupViews' country card accent on the row that lists a country's packs: three short
+     * wavy crayon dashes in the country's colours (22 px each, 5 px apart, 10 px tall, 3.2 px crayon),
+     * the motif doodle (22 px, turned -8°) when there is one, and a 6 % wash of the mark on the row's
+     * paper. Countries without an entry keep Study's sage and plain paper. Decoration only: hidden from
+     * assistive technology, and brick stays the only action colour.
+     */
+    function applyCountryAccent(row, accent, Packs) {
+        if (!row || !accent) return;
+        const css = Packs.cssColor;
+        for (const night of [false, true]) {
+            const theme = night ? 'dark' : 'light';
+            row.style.setProperty(`--ft-accent-wash-${theme}`, css(accent.wash(night)));
+            row.style.setProperty(`--ft-accent-mark-${theme}`, css(accent.mark(night)));
+            accent.stripes(night).forEach((color, index) => row.style.setProperty(`--ft-accent-${index + 1}-${theme}`, css(color)));
+        }
+        row.classList.add('ft-study-accent');
+        if (!accent.isDefault) row.classList.add('is-country');
+        row.dataset.country = accent.code || '';
+        const ns = 'http://www.w3.org/2000/svg';
+        const DASHES = 3, DASH = 22, GAP = 5, HEIGHT = 10, STROKE = 3.2;
+        const width = DASH * DASHES + GAP * (DASHES - 1) + 8;
+        const strip = el('div', 'ft-study-accent__strip');
+        strip.setAttribute('aria-hidden', 'true');
+        const svg = root.document.createElementNS(ns, 'svg');
+        svg.setAttribute('class', 'ft-study-accent__stripe');
+        svg.setAttribute('viewBox', `0 0 ${width} ${HEIGHT}`);
+        svg.setAttribute('width', String(width));
+        svg.setAttribute('height', String(HEIGHT));
+        const count = Math.max(1, accent.stripes(false).length);
+        const cy = HEIGHT / 2;
+        const amp = HEIGHT / 5;
+        let x = STROKE;
+        for (let i = 0; i < DASHES; i += 1) {
+            // A one- or two-colour palette repeats, so a single green reads as a stroke, not a stray mark.
+            const path = root.document.createElementNS(ns, 'path');
+            const start = cy + (i % 2 === 0 ? amp / 2 : -amp / 2);
+            const control = cy + (i % 2 === 0 ? -amp : amp);
+            path.setAttribute('d', `M${x.toFixed(1)} ${start} Q${(x + DASH / 2).toFixed(1)} ${control} ${(x + DASH).toFixed(1)} ${cy}`);
+            path.setAttribute('class', `ft-study-accent__dash is-${(i % count) + 1}`);
+            path.setAttribute('fill', 'none');
+            path.setAttribute('stroke-width', String(STROKE));
+            path.setAttribute('stroke-linecap', 'round');
+            svg.appendChild(path);
+            x += DASH + GAP;
+        }
+        strip.appendChild(svg);
+        if (accent.motif) {
+            const motif = el('img', 'ft-study-accent__motif');
+            const api = runtime();
+            const file = `assets/images/doodles/${accent.motif}.webp`;
+            motif.src = api?.runtime?.getURL ? api.runtime.getURL(file) : `../${file}`;
+            motif.alt = '';
+            strip.appendChild(motif);
+        }
+        row.prepend(strip);
     }
 
     // ---- Dashboard (options page) -------------------------------------------------------------
@@ -1035,7 +1095,7 @@
 
     root.FilterTubeStudyUi = Object.freeze({
         t, phaseInfo, planSegments, segmentWords, setByLabel, packLabel, renderStrip, mountStrip,
-        renderPlanner, renderDashboard, mountDashboard, renderParentPlans, searchExplainerCard, askForTime
+        renderPlanner, renderDashboard, mountDashboard, renderParentPlans, searchExplainerCard, askForTime, applyCountryAccent
     });
 
     // Popup: the strip takes the banner slot under the header. Options page: the study card.

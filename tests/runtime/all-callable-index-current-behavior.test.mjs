@@ -34,8 +34,8 @@ const releaseFixStatusDoc = fs.readFileSync(
 const expectedFamilyTotals = new Map([
   ['Build/sync scripts', { files: 8, count: 111 }],
   ['Hot page/background runtime', { files: 16, count: 4110 }],
-  ['Content helper runtime', { files: 35, count: 1159 }],
-  ['UI/settings runtime', { files: 37, count: 4321 }],
+  ['Content helper runtime', { files: 35, count: 1166 }],
+  ['UI/settings runtime', { files: 37, count: 4342 }],
   ['Generated/quarantined UI', { files: 6, count: 153 }],
   ['Vendor bundles', { files: 3, count: 279 }],
   ['Audit/test lane scripts', { files: 29, count: 602 }],

@@ -137,6 +137,19 @@
 .ft-study-packs { display: flex; flex-direction: column; gap: 0.5rem; }
 .ft-study-packs__chips, .ft-study-packs__add { display: flex; gap: 0.45rem; flex-wrap: wrap; align-items: center; }
 .ft-study-packs__add select { min-width: 14rem; max-width: 100%; }
+/* Android CountryAccent on the row that lists a country's packs: the stripe, the motif and a 6 % wash. */
+.ft-study-accent { --ft-accent-wash: var(--ft-accent-wash-light); --ft-accent-1: var(--ft-accent-1-light); --ft-accent-2: var(--ft-accent-2-light, var(--ft-accent-1)); --ft-accent-3: var(--ft-accent-3-light, var(--ft-accent-1)); }
+:root[data-theme="dark"] .ft-study-accent { --ft-accent-wash: var(--ft-accent-wash-dark); --ft-accent-1: var(--ft-accent-1-dark); --ft-accent-2: var(--ft-accent-2-dark, var(--ft-accent-1)); --ft-accent-3: var(--ft-accent-3-dark, var(--ft-accent-1)); }
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme]) .ft-study-accent { --ft-accent-wash: var(--ft-accent-wash-dark); --ft-accent-1: var(--ft-accent-1-dark); --ft-accent-2: var(--ft-accent-2-dark, var(--ft-accent-1)); --ft-accent-3: var(--ft-accent-3-dark, var(--ft-accent-1)); }
+}
+.ft-study-accent.is-country { background: var(--ft-accent-wash); border-radius: 20px; padding: 10px 12px; }
+.ft-study-accent__strip { flex-basis: 100%; display: flex; align-items: center; height: 22px; margin-bottom: 2px; }
+.ft-study-accent__stripe { display: block; }
+.ft-study-accent__dash.is-1 { stroke: var(--ft-accent-1); }
+.ft-study-accent__dash.is-2 { stroke: var(--ft-accent-2); }
+.ft-study-accent__dash.is-3 { stroke: var(--ft-accent-3); }
+.ft-study-accent__motif { width: 22px; height: 22px; margin-inline-start: 6px; transform: rotate(-8deg); }
 .ft-study-week { display: flex; align-items: center; gap: 0.75rem; flex-wrap: wrap; }
 .ft-study-week__days { display: flex; gap: 0.35rem; }
 .ft-study-week__day { width: 16px; height: 16px; border-radius: 50%; border: 2px solid var(--ft-study-teal); box-sizing: border-box; }

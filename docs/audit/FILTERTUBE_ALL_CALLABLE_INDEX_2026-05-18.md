@@ -246,14 +246,14 @@ runtime behavior changed by inventory refresh: no
 | `js/shared/kids_youtube_profiles.js` | Content helper runtime | 50 | helper counted; semantic proof incomplete |
 | `js/shared/local_playlists.js` | Content helper runtime | 40 | helper counted; semantic proof incomplete |
 | `js/shared/study_model.js` | Content helper runtime | 53 | helper counted; semantic proof incomplete |
-| `js/shared/study_packs.js` | Content helper runtime | 23 | helper counted; semantic proof incomplete |
+| `js/shared/study_packs.js` | Content helper runtime | 30 | helper counted; semantic proof incomplete |
 | `js/shared/study_engine.js` | Content helper runtime | 57 | helper counted; semantic proof incomplete |
 | `js/content/study_overlay.js` | Content helper runtime | 32 | helper counted; semantic proof incomplete |
 | `js/study_background.js` | Hot page/background runtime | 57 | helper counted; semantic proof incomplete |
 | `js/shared/study_clock_guard.js` | Content helper runtime | 13 | helper counted; semantic proof incomplete |
 | `js/shared/saved_video_notes.js` | Content helper runtime | 20 | helper counted; semantic proof incomplete |
 | `js/video_notes_background.js` | Hot page/background runtime | 18 | helper counted; semantic proof incomplete |
-| `js/study_ui.js` | UI/settings runtime | 82 | UI/settings counted; semantic proof incomplete |
+| `js/study_ui.js` | UI/settings runtime | 103 | UI/settings counted; semantic proof incomplete |
 | `js/video_notes_editor.js` | UI/settings runtime | 25 | helper counted; semantic proof incomplete |
 | `js/kids_youtube_profiles_background.js` | Hot page/background runtime | 24 | helper counted; semantic proof incomplete |
 | `js/local_playlists_store.js` | Hot page/background runtime | 7 | helper counted; semantic proof incomplete |
