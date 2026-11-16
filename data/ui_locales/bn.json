@@ -3142,5 +3142,16 @@
   "people.profileSwitched": "{name}-এর জায়গায় বদলানো হয়েছে।",
   "people.restoreDone": "সবকিছু আবার জায়গামতো ফিরে এসেছে।",
   "people.paired": "যুক্ত হয়েছে। পরিকল্পনা এখন দুই দিকেই সিঙ্ক হয়।",
-  "people.pinTryAgain": "ওই পিনটি কাজ করেনি। আবার চেষ্টা করুন।"
+  "people.pinTryAgain": "ওই পিনটি কাজ করেনি। আবার চেষ্টা করুন।",
+  "study.loosen.title": "এতে আপনার পড়ার নিয়ম ঢিলে হবে",
+  "study.loosen.body": "বদলাতে সেশন শেষ করুন, অথবা {time}-এর পরে বদলান।",
+  "study.loosen.bodyNoTime": "বদলাতে সেশন শেষ করুন, অথবা পড়ার পরে বদলান।",
+  "study.loosen.lockedTitleNoTime": "পড়া শেষ না হওয়া পর্যন্ত লক করা",
+  "study.loosen.lockedBody": "আপনি ব্লক তালিকায় যোগ করতে পারেন, কিন্তু ততক্ষণ কিছু সরাতে পারবেন না।",
+  "study.loosen.parentTitle": "{name} {time} পর্যন্ত সেট করেছেন",
+  "study.loosen.parentTitleNoTime": "{name} পড়া শেষ হওয়া পর্যন্ত সেট করেছেন",
+  "study.loosen.parentBody": "আপনি নিয়ম আরও কড়া করতে পারেন, ঢিলে নয়।",
+  "study.loosen.aParent": "একজন অভিভাবক",
+  "study.loosen.keep": "পড়া চালিয়ে যান",
+  "study.loosen.gotIt": "ঠিক আছে"
 }

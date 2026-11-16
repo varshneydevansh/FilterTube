@@ -3140,5 +3140,16 @@
   "people.profileSwitched": "O ti yí padà sí àyè {name}.",
   "people.restoreDone": "Gbogbo nǹkan ti padà sí ààyè rẹ̀.",
   "people.paired": "Ó ti so pọ̀. Àwọn ètò ń ṣe ìmúdọ́gba ní ẹ̀gbẹ́ méjèèjì báyìí.",
-  "people.pinTryAgain": "PIN yẹn kò ṣiṣẹ́. Gbìyànjú lẹ́ẹ̀kan sí i."
+  "people.pinTryAgain": "PIN yẹn kò ṣiṣẹ́. Gbìyànjú lẹ́ẹ̀kan sí i.",
+  "study.loosen.title": "Èyí yóò dẹ àwọn òfin ẹ̀kọ́ rẹ",
+  "study.loosen.body": "Parí ìgbà rẹ láti yí i padà, tàbí yí i padà lẹ́yìn {time}.",
+  "study.loosen.bodyNoTime": "Parí ìgbà rẹ láti yí i padà, tàbí yí i padà lẹ́yìn ẹ̀kọ́.",
+  "study.loosen.lockedTitleNoTime": "A tì í pa títí ẹ̀kọ́ yóò fi parí",
+  "study.loosen.lockedBody": "O lè ṣàfikún sí àkójọ ìdènà rẹ, ṣùgbọ́n o kò lè yọ ohunkóhun kúrò títí di ìgbà náà.",
+  "study.loosen.parentTitle": "{name} ló ṣètò rẹ̀ títí di {time}",
+  "study.loosen.parentTitleNoTime": "{name} ló ṣètò rẹ̀ títí ẹ̀kọ́ yóò fi parí",
+  "study.loosen.parentBody": "O lè mú àwọn òfin rẹ le sí i, ṣùgbọ́n kì í ṣe kí o dẹ wọ́n.",
+  "study.loosen.aParent": "òbí kan",
+  "study.loosen.keep": "Tẹ̀síwájú ní kíkọ́",
+  "study.loosen.gotIt": "Mo ti gbọ́"
 }

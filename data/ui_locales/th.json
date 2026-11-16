@@ -3140,5 +3140,16 @@
   "people.profileSwitched": "เปลี่ยนไปที่พื้นที่ของ {name} แล้ว",
   "people.restoreDone": "ทุกอย่างกลับเข้าที่แล้ว",
   "people.paired": "จับคู่แล้ว แผนจะซิงค์ทั้งสองทางตอนนี้",
-  "people.pinTryAgain": "PIN นั้นใช้ไม่ได้ ลองอีกครั้ง"
+  "people.pinTryAgain": "PIN นั้นใช้ไม่ได้ ลองอีกครั้ง",
+  "study.loosen.title": "สิ่งนี้จะทำให้กฎการเรียนหลวมลง",
+  "study.loosen.body": "จบรอบเพื่อเปลี่ยน หรือเปลี่ยนหลัง {time}",
+  "study.loosen.bodyNoTime": "จบรอบเพื่อเปลี่ยน หรือเปลี่ยนหลังการเรียน",
+  "study.loosen.lockedTitleNoTime": "ล็อกไว้จนกว่าการเรียนจะจบ",
+  "study.loosen.lockedBody": "คุณเพิ่มลงในรายการบล็อกได้ แต่ลบอะไรออกไม่ได้จนถึงตอนนั้น",
+  "study.loosen.parentTitle": "ตั้งโดย{name} จนถึง {time}",
+  "study.loosen.parentTitleNoTime": "ตั้งโดย{name} จนกว่าการเรียนจะจบ",
+  "study.loosen.parentBody": "คุณทำให้กฎเข้มขึ้นได้ แต่ทำให้หลวมลงไม่ได้",
+  "study.loosen.aParent": "ผู้ปกครอง",
+  "study.loosen.keep": "เรียนต่อ",
+  "study.loosen.gotIt": "เข้าใจแล้ว"
 }

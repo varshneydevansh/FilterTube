@@ -3140,5 +3140,16 @@
   "people.profileSwitched": "Đã chuyển sang không gian của {name}.",
   "people.restoreDone": "Mọi thứ đã trở lại như cũ.",
   "people.paired": "Đã ghép nối. Kế hoạch giờ đồng bộ theo cả hai chiều.",
-  "people.pinTryAgain": "Mã PIN đó không đúng. Hãy thử lại."
+  "people.pinTryAgain": "Mã PIN đó không đúng. Hãy thử lại.",
+  "study.loosen.title": "Việc này sẽ nới lỏng quy tắc học của bạn",
+  "study.loosen.body": "Kết thúc phiên để đổi, hoặc đổi sau {time}.",
+  "study.loosen.bodyNoTime": "Kết thúc phiên để đổi, hoặc đổi sau giờ học.",
+  "study.loosen.lockedTitleNoTime": "Đã khóa đến khi giờ học kết thúc",
+  "study.loosen.lockedBody": "Bạn có thể thêm vào danh sách chặn, nhưng chưa thể gỡ gì cho đến lúc đó.",
+  "study.loosen.parentTitle": "Do {name} đặt đến {time}",
+  "study.loosen.parentTitleNoTime": "Do {name} đặt đến khi giờ học kết thúc",
+  "study.loosen.parentBody": "Bạn có thể làm quy tắc chặt hơn, nhưng không thể nới lỏng.",
+  "study.loosen.aParent": "phụ huynh",
+  "study.loosen.keep": "Tiếp tục học",
+  "study.loosen.gotIt": "Đã hiểu"
 }

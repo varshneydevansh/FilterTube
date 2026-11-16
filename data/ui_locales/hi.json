@@ -3142,5 +3142,16 @@
   "people.profileSwitched": "{name} की जगह पर बदल दिया गया।",
   "people.restoreDone": "सब कुछ अपनी जगह वापस आ गया।",
   "people.paired": "जुड़ गया। अब योजनाएँ दोनों ओर सिंक होती हैं।",
-  "people.pinTryAgain": "वह पिन नहीं चला। फिर से कोशिश करें।"
+  "people.pinTryAgain": "वह पिन नहीं चला। फिर से कोशिश करें।",
+  "study.loosen.title": "इससे आपकी पढ़ाई के नियम ढीले हो जाएँगे",
+  "study.loosen.body": "इसे बदलने के लिए अपना सत्र खत्म करें, या {time} के बाद बदलें।",
+  "study.loosen.bodyNoTime": "इसे बदलने के लिए अपना सत्र खत्म करें, या पढ़ाई के बाद बदलें।",
+  "study.loosen.lockedTitleNoTime": "पढ़ाई खत्म होने तक लॉक है",
+  "study.loosen.lockedBody": "आप अपनी ब्लॉक सूची में जोड़ सकते हैं, पर तब तक कुछ हटा नहीं सकते।",
+  "study.loosen.parentTitle": "{name} ने {time} तक सेट किया है",
+  "study.loosen.parentTitleNoTime": "{name} ने पढ़ाई खत्म होने तक सेट किया है",
+  "study.loosen.parentBody": "आप अपने नियम और सख्त कर सकते हैं, ढीले नहीं।",
+  "study.loosen.aParent": "एक अभिभावक",
+  "study.loosen.keep": "पढ़ाई जारी रखें",
+  "study.loosen.gotIt": "समझ गया"
 }

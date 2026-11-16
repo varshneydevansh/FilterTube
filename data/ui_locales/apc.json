@@ -3166,5 +3166,16 @@
   "people.profileSwitched": "انتقلت لمساحة {name}.",
   "people.restoreDone": "كل شي رجع لمحلّه.",
   "people.paired": "تم الربط. الخطط صارت تتزامن بالاتجاهين.",
-  "people.pinTryAgain": "هالرمز ما زبط. جرّب مرة تانية."
+  "people.pinTryAgain": "هالرمز ما زبط. جرّب مرة تانية.",
+  "study.loosen.title": "هيدا رح يخفّف قواعد دراستك",
+  "study.loosen.body": "خلّص جلستك لتغيّره، أو غيّره بعد {time}.",
+  "study.loosen.bodyNoTime": "خلّص جلستك لتغيّره، أو غيّره بعد الدراسة.",
+  "study.loosen.lockedTitleNoTime": "مقفول لحتى تخلص الدراسة",
+  "study.loosen.lockedBody": "فيك تزيد على قائمة الحظر، بس ما فيك تشيل شي لهديك الساعة.",
+  "study.loosen.parentTitle": "ضبطه {name} لحد {time}",
+  "study.loosen.parentTitleNoTime": "ضبطه {name} لحتى تخلص الدراسة",
+  "study.loosen.parentBody": "فيك تخلّي قواعدك أشد، بس مش أخف.",
+  "study.loosen.aParent": "أحد الوالدين",
+  "study.loosen.keep": "كمّل دراسة",
+  "study.loosen.gotIt": "تمام"
 }

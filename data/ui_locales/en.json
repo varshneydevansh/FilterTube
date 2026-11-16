@@ -3142,5 +3142,16 @@
   "people.profileSwitched": "Switched to {name}'s space.",
   "people.restoreDone": "Everything's back in place.",
   "people.paired": "Paired. Plans now sync both ways.",
-  "people.pinTryAgain": "That PIN didn't work. Try again."
+  "people.pinTryAgain": "That PIN didn't work. Try again.",
+  "study.loosen.title": "This would loosen your study rules",
+  "study.loosen.body": "End your session to change it, or change it after {time}.",
+  "study.loosen.bodyNoTime": "End your session to change it, or change it after study.",
+  "study.loosen.lockedTitleNoTime": "Locked until study ends",
+  "study.loosen.lockedBody": "You can add to your block list, but you can't remove anything until then.",
+  "study.loosen.parentTitle": "Set by {name} until {time}",
+  "study.loosen.parentTitleNoTime": "Set by {name} until study ends",
+  "study.loosen.parentBody": "You can make your rules stricter, but not looser.",
+  "study.loosen.aParent": "a parent",
+  "study.loosen.keep": "Keep studying",
+  "study.loosen.gotIt": "Got it"
 }

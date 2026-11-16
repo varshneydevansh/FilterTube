@@ -3166,5 +3166,16 @@
   "people.profileSwitched": "اتنقلت لمساحة {name}.",
   "people.restoreDone": "كل حاجة رجعت مكانها.",
   "people.paired": "اتربطوا. الخطط بقت بتتزامن في الاتجاهين.",
-  "people.pinTryAgain": "الرقم السري ده ما اشتغلش. جرّب تاني."
+  "people.pinTryAgain": "الرقم السري ده ما اشتغلش. جرّب تاني.",
+  "study.loosen.title": "ده هيخفف قواعد دراستك",
+  "study.loosen.body": "خلّص جلستك عشان تغيّره، أو غيّره بعد {time}.",
+  "study.loosen.bodyNoTime": "خلّص جلستك عشان تغيّره، أو غيّره بعد الدراسة.",
+  "study.loosen.lockedTitleNoTime": "مقفول لحد ما الدراسة تخلص",
+  "study.loosen.lockedBody": "تقدر تضيف لقايمة الحظر، بس مش هتقدر تشيل حاجة لحد ساعتها.",
+  "study.loosen.parentTitle": "ظبطه {name} لحد {time}",
+  "study.loosen.parentTitleNoTime": "ظبطه {name} لحد ما الدراسة تخلص",
+  "study.loosen.parentBody": "تقدر تخلّي قواعدك أشد، بس مش أخف.",
+  "study.loosen.aParent": "حد من الوالدين",
+  "study.loosen.keep": "كمّل دراسة",
+  "study.loosen.gotIt": "تمام"
 }

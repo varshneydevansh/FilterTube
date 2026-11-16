@@ -3140,5 +3140,16 @@
   "people.profileSwitched": "已经切到 {name} 个空间。",
   "people.restoreDone": "一切侪回到原位了。",
   "people.paired": "已配对。计划现在两边同步。",
-  "people.pinTryAgain": "个只 PIN 弗对。再试一趟。"
+  "people.pinTryAgain": "个只 PIN 弗对。再试一趟。",
+  "study.loosen.title": "搿样会放松侬个学习规则",
+  "study.loosen.body": "结束时段就好改，或者 {time} 以后再改。",
+  "study.loosen.bodyNoTime": "结束时段就好改，或者学习结束以后再改。",
+  "study.loosen.lockedTitleNoTime": "学习结束前锁牢",
+  "study.loosen.lockedBody": "侬好往屏蔽列表里加，不过到辰光前勿好删。",
+  "study.loosen.parentTitle": "由{name}设置，到 {time} 为止",
+  "study.loosen.parentTitleNoTime": "由{name}设置，到学习结束为止",
+  "study.loosen.parentBody": "规则好改得更严，勿好改得更松。",
+  "study.loosen.aParent": "家长",
+  "study.loosen.keep": "继续学习",
+  "study.loosen.gotIt": "晓得了"
 }

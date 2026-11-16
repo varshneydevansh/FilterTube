@@ -3140,5 +3140,16 @@
   "people.profileSwitched": "{name} 님의 공간으로 바꿨어요.",
   "people.restoreDone": "모든 것이 제자리로 돌아왔어요.",
   "people.paired": "연결했어요. 이제 계획이 양쪽으로 동기화돼요.",
-  "people.pinTryAgain": "PIN이 맞지 않아요. 다시 시도해 주세요."
+  "people.pinTryAgain": "PIN이 맞지 않아요. 다시 시도해 주세요.",
+  "study.loosen.title": "공부 규칙이 느슨해져요",
+  "study.loosen.body": "바꾸려면 세션을 끝내거나 {time} 이후에 바꾸세요.",
+  "study.loosen.bodyNoTime": "바꾸려면 세션을 끝내거나 공부가 끝난 뒤에 바꾸세요.",
+  "study.loosen.lockedTitleNoTime": "공부가 끝날 때까지 잠김",
+  "study.loosen.lockedBody": "차단 목록에 추가할 수는 있지만 그때까지 삭제할 수는 없어요.",
+  "study.loosen.parentTitle": "{name}님이 {time}까지 설정함",
+  "study.loosen.parentTitleNoTime": "{name}님이 공부가 끝날 때까지 설정함",
+  "study.loosen.parentBody": "규칙을 더 엄격하게 할 수는 있지만 느슨하게 할 수는 없어요.",
+  "study.loosen.aParent": "부모님",
+  "study.loosen.keep": "계속 공부하기",
+  "study.loosen.gotIt": "알겠어요"
 }

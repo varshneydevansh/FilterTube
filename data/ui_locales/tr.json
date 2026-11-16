@@ -3142,5 +3142,16 @@
   "people.profileSwitched": "{name} alanına geçildi.",
   "people.restoreDone": "Her şey yerine döndü.",
   "people.paired": "Eşlendi. Planlar artık iki yönde eşitleniyor.",
-  "people.pinTryAgain": "Bu PIN olmadı. Yeniden dene."
+  "people.pinTryAgain": "Bu PIN olmadı. Yeniden dene.",
+  "study.loosen.title": "Bu, ders kurallarını gevşetir",
+  "study.loosen.body": "Değiştirmek için oturumunu bitir ya da {time} sonrasında değiştir.",
+  "study.loosen.bodyNoTime": "Değiştirmek için oturumunu bitir ya da dersten sonra değiştir.",
+  "study.loosen.lockedTitleNoTime": "Ders bitene kadar kilitli",
+  "study.loosen.lockedBody": "Engel listene ekleme yapabilirsin ama o zamana kadar bir şey kaldıramazsın.",
+  "study.loosen.parentTitle": "{name} tarafından {time} saatine kadar ayarlandı",
+  "study.loosen.parentTitleNoTime": "{name} tarafından ders bitene kadar ayarlandı",
+  "study.loosen.parentBody": "Kurallarını daha sıkı yapabilirsin ama daha gevşek yapamazsın.",
+  "study.loosen.aParent": "bir ebeveyn",
+  "study.loosen.keep": "Çalışmaya devam et",
+  "study.loosen.gotIt": "Anladım"
 }

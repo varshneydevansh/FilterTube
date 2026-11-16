@@ -3142,5 +3142,16 @@
   "people.profileSwitched": "{name} کی جگہ پر بدل دیا گیا۔",
   "people.restoreDone": "سب کچھ اپنی جگہ واپس آ گیا۔",
   "people.paired": "جوڑ دیا گیا۔ اب منصوبے دونوں طرف سنک ہوتے ہیں۔",
-  "people.pinTryAgain": "وہ پن کام نہیں کیا۔ دوبارہ کوشش کریں۔"
+  "people.pinTryAgain": "وہ پن کام نہیں کیا۔ دوبارہ کوشش کریں۔",
+  "study.loosen.title": "اس سے آپ کی پڑھائی کے اصول ڈھیلے ہو جائیں گے",
+  "study.loosen.body": "بدلنے کے لیے اپنا سیشن ختم کریں، یا {time} کے بعد بدلیں۔",
+  "study.loosen.bodyNoTime": "بدلنے کے لیے اپنا سیشن ختم کریں، یا پڑھائی کے بعد بدلیں۔",
+  "study.loosen.lockedTitleNoTime": "پڑھائی ختم ہونے تک لاک ہے",
+  "study.loosen.lockedBody": "آپ بلاک فہرست میں اضافہ کر سکتے ہیں، مگر تب تک کچھ ہٹا نہیں سکتے۔",
+  "study.loosen.parentTitle": "{name} نے {time} تک سیٹ کیا",
+  "study.loosen.parentTitleNoTime": "{name} نے پڑھائی ختم ہونے تک سیٹ کیا",
+  "study.loosen.parentBody": "آپ اصول اور سخت کر سکتے ہیں، ڈھیلے نہیں۔",
+  "study.loosen.aParent": "والدین میں سے کوئی",
+  "study.loosen.keep": "پڑھائی جاری رکھیں",
+  "study.loosen.gotIt": "سمجھ گیا"
 }

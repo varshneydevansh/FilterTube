@@ -3142,5 +3142,16 @@
   "people.profileSwitched": "{name} यांच्या जागेत बदलले.",
   "people.restoreDone": "सगळं पुन्हा जागेवर आलं.",
   "people.paired": "जोडले. योजना आता दोन्ही बाजूंनी सिंक होतात.",
-  "people.pinTryAgain": "तो पिन चालला नाही. पुन्हा प्रयत्न करा."
+  "people.pinTryAgain": "तो पिन चालला नाही. पुन्हा प्रयत्न करा.",
+  "study.loosen.title": "यामुळे तुमचे अभ्यासाचे नियम सैल होतील",
+  "study.loosen.body": "बदलण्यासाठी तुमचे सत्र संपवा, किंवा {time} नंतर बदला.",
+  "study.loosen.bodyNoTime": "बदलण्यासाठी तुमचे सत्र संपवा, किंवा अभ्यासानंतर बदला.",
+  "study.loosen.lockedTitleNoTime": "अभ्यास संपेपर्यंत लॉक",
+  "study.loosen.lockedBody": "तुम्ही अवरोध सूचीत भर घालू शकता, पण तोपर्यंत काहीही काढू शकत नाही.",
+  "study.loosen.parentTitle": "{name} यांनी {time} पर्यंत सेट केले",
+  "study.loosen.parentTitleNoTime": "{name} यांनी अभ्यास संपेपर्यंत सेट केले",
+  "study.loosen.parentBody": "तुम्ही नियम आणखी कडक करू शकता, सैल नाही.",
+  "study.loosen.aParent": "एक पालक",
+  "study.loosen.keep": "अभ्यास सुरू ठेवा",
+  "study.loosen.gotIt": "समजले"
 }

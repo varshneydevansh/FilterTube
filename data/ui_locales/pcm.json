@@ -3142,5 +3142,16 @@
   "people.profileSwitched": "You don switch go {name} space.",
   "people.restoreDone": "Everything don go back to im place.",
   "people.paired": "E don pair. Plans go dey sync both sides now.",
-  "people.pinTryAgain": "Dat PIN no work. Try again."
+  "people.pinTryAgain": "Dat PIN no work. Try again.",
+  "study.loosen.title": "This one go loosen your study rules",
+  "study.loosen.body": "End your session to change am, or change am after {time}.",
+  "study.loosen.bodyNoTime": "End your session to change am, or change am after study.",
+  "study.loosen.lockedTitleNoTime": "E lock until study end",
+  "study.loosen.lockedBody": "You fit add to your block list, but you no fit remove anything until then.",
+  "study.loosen.parentTitle": "{name} set am until {time}",
+  "study.loosen.parentTitleNoTime": "{name} set am until study end",
+  "study.loosen.parentBody": "You fit make your rules strong pass, but no fit make dem soft.",
+  "study.loosen.aParent": "one parent",
+  "study.loosen.keep": "Continue to study",
+  "study.loosen.gotIt": "I don understand"
 }

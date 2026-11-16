@@ -448,7 +448,9 @@
         const patch = async (change, undoChange) => {
             const result = await options.onPatch?.(change);
             if (result?.ok === false) {
-                notify(options.toastHost || host, errorText(result.error), null);
+                const sheet = looseningSheet(result.error, options.state, options.parentName);
+                if (sheet) showLoosening(options.toastHost || host, sheet);
+                else notify(options.toastHost || host, errorText(result.error), null);
                 return;
             }
             notify(options.toastHost || host, t('study.planner.saved', 'Saved'), undoChange ? async () => { await options.onPatch?.(undoChange); } : null);
@@ -563,9 +565,60 @@
         return map[code] || t('study.error.generic', 'That didn\'t save. Try again.');
     }
 
+    /**
+     * Android StudyLoosening (fcd8018b8, C41-C43): a change that would loosen study while it runs says why
+     * instead of failing quietly. Gentle: "This would loosen your study rules" with End session;
+     * self-Locked: "Locked until ..."; a parent's plan or lock: "Set by Mum until ...". Null for other
+     * refusals.
+     */
+    function looseningSheet(error, state, parentName) {
+        const value = object(state);
+        const running = value.state === 'STUDY' || value.state === 'BREAK';
+        const until = Number(value.lockedUntil || value.sessionEnd);
+        const time = Number.isFinite(until) && until > 0 ? formatDayTime(until) : '';
+        if (error === 'set_by_parent' && (running || value.setByParentId)) {
+            const name = text(parentName) && text(parentName).toLowerCase() !== 'default' ? text(parentName) : t('study.loosen.aParent', 'a parent');
+            return { title: time ? t('study.loosen.parentTitle', 'Set by {name} until {time}', { name, time }) : t('study.loosen.parentTitleNoTime', 'Set by {name} until study ends', { name }),
+                body: t('study.loosen.parentBody', 'You can make your rules stricter, but not looser.') };
+        }
+        if (!running) return null;
+        if (error === 'locked' || value.lockMode === 'locked') {
+            return { title: time ? t('study.lockedUntil', 'Locked until {time}', { time }) : t('study.loosen.lockedTitleNoTime', 'Locked until study ends'),
+                body: t('study.loosen.lockedBody', 'You can add to your block list, but you can\'t remove anything until then.') };
+        }
+        if (error === 'study_running') {
+            return { title: t('study.loosen.title', 'This would loosen your study rules'),
+                body: time ? t('study.loosen.body', 'End your session to change it, or change it after {time}.', { time }) : t('study.loosen.bodyNoTime', 'End your session to change it, or change it after study.'),
+                endSession: value.endPolicy?.canEnd === true, keep: true };
+        }
+        return null;
+    }
+
+    /** Where a message lands: the card it belongs to, or the page's study card when a redraw replaced it. */
+    function messageHolder(host) {
+        const holder = host?.closest?.('.ft-study-card, .ft-study-parent') || host;
+        if (holder && holder.isConnected === false) return root.document?.getElementById?.('ftStudyCard') || holder;
+        return holder;
+    }
+
+    function showLoosening(host, sheet) {
+        const holder = messageHolder(host);
+        if (!holder) return;
+        holder.querySelector?.(':scope > .ft-study-loosen')?.remove();
+        const card = el('div', 'ft-study-loosen');
+        card.setAttribute('role', 'alertdialog');
+        card.append(el('strong', 'ft-study-loosen__title', sheet.title), el('p', 'ft-study-muted', sheet.body));
+        const actions = el('div', 'ft-study-actions');
+        if (sheet.endSession) actions.appendChild(button(t('study.endSession', 'End session'), 'btn-secondary', async () => { card.remove(); await send({ action: 'FilterTube_StudyEndSession' }); }));
+        actions.appendChild(button(sheet.keep ? t('study.loosen.keep', 'Keep studying') : t('study.loosen.gotIt', 'Got it'), 'btn-primary', () => card.remove()));
+        card.appendChild(actions);
+        holder.appendChild(card);
+        try { actions.lastChild.focus(); } catch (e) { }
+    }
+
     /** A short message with an optional Undo, in the page's toast style when there is one. */
     function notify(host, message, undo) {
-        const holder = host?.closest?.('.ft-study-card, .ft-study-parent') || host;
+        const holder = messageHolder(host);
         if (!holder) return;
         holder.querySelector?.(':scope > .ft-study-toast')?.remove();
         const toast = el('div', 'ft-study-toast');
@@ -1763,7 +1816,7 @@
         card.appendChild(el('h4', 'ft-study-dashboard__subtitle', t('study.planner.title', 'Study plan')));
         card.appendChild(plannerHost);
         renderPlanner(plannerHost, {
-            study, catalog, editable, packs: state.packs, state,
+            study, catalog, editable, packs: state.packs, state, parentName: data.parentName,
             readOnlyLabel: text(object(study.plan).setByParentId) ? setByLabel(data.parentName) : t('study.lockedUntil', 'Locked until {time}', { time: formatDayTime(state.lockedUntil) }),
             toastHost: card,
             onPatch: async patch => { const result = await send({ action: 'FilterTube_StudyUpdate', patch }); await refresh(); return result; },

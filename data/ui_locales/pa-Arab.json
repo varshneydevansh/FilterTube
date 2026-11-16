@@ -3142,5 +3142,16 @@
   "people.profileSwitched": "{name} دی تھاں تے بدل گیا۔",
   "people.restoreDone": "سب کجھ اپنی تھاں تے واپس آ گیا۔",
   "people.paired": "جُڑ گیا۔ ہُن منصوبے دوویں پاسے سنک ہوندے نیں۔",
-  "people.pinTryAgain": "اوہ پن کم نئیں کیتا۔ فیر کوشش کرو۔"
+  "people.pinTryAgain": "اوہ پن کم نئیں کیتا۔ فیر کوشش کرو۔",
+  "study.loosen.title": "ایہدے نال تہاڈی پڑھائی دے اصول ڈھلے ہو جان گے",
+  "study.loosen.body": "بدلن لئی اپنا سیشن مُکاؤ، یا {time} توں بعد بدلو۔",
+  "study.loosen.bodyNoTime": "بدلن لئی اپنا سیشن مُکاؤ، یا پڑھائی توں بعد بدلو۔",
+  "study.loosen.lockedTitleNoTime": "پڑھائی مُکن تک لاک اے",
+  "study.loosen.lockedBody": "تسیں روک لسٹ وچ ودھا سکدے او، پر اوس ویلے تک کجھ ہٹا نہیں سکدے۔",
+  "study.loosen.parentTitle": "{name} نے {time} تک سیٹ کیتا",
+  "study.loosen.parentTitleNoTime": "{name} نے پڑھائی مُکن تک سیٹ کیتا",
+  "study.loosen.parentBody": "تسیں اصول ہور سخت کر سکدے او، ڈھلے نہیں۔",
+  "study.loosen.aParent": "ماں پیو وچوں کوئی",
+  "study.loosen.keep": "پڑھائی جاری رکھو",
+  "study.loosen.gotIt": "ٹھیک اے"
 }

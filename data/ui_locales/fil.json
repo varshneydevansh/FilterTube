@@ -3142,5 +3142,16 @@
   "people.profileSwitched": "Lumipat sa space ni {name}.",
   "people.restoreDone": "Bumalik na sa lugar ang lahat.",
   "people.paired": "Naipares na. Nagsi-sync na ang mga plano sa magkabilang panig.",
-  "people.pinTryAgain": "Hindi gumana ang PIN na iyon. Subukan ulit."
+  "people.pinTryAgain": "Hindi gumana ang PIN na iyon. Subukan ulit.",
+  "study.loosen.title": "Luluwag nito ang mga panuntunan mo sa pag-aaral",
+  "study.loosen.body": "Tapusin ang session mo para baguhin ito, o baguhin pagkatapos ng {time}.",
+  "study.loosen.bodyNoTime": "Tapusin ang session mo para baguhin ito, o baguhin pagkatapos ng pag-aaral.",
+  "study.loosen.lockedTitleNoTime": "Naka-lock hanggang matapos ang pag-aaral",
+  "study.loosen.lockedBody": "Puwede kang magdagdag sa block list mo, pero hindi ka makakapag-alis hanggang doon.",
+  "study.loosen.parentTitle": "Itinakda ng {name} hanggang {time}",
+  "study.loosen.parentTitleNoTime": "Itinakda ng {name} hanggang matapos ang pag-aaral",
+  "study.loosen.parentBody": "Puwede mong gawing mas mahigpit ang mga panuntunan, pero hindi mas maluwag.",
+  "study.loosen.aParent": "isang magulang",
+  "study.loosen.keep": "Ituloy ang pag-aaral",
+  "study.loosen.gotIt": "Sige"
 }

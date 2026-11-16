@@ -3140,5 +3140,16 @@
   "people.profileSwitched": "Beralih ke ruang {name}.",
   "people.restoreDone": "Semuanya sudah kembali seperti semula.",
   "people.paired": "Tersambung. Rencana kini disinkronkan ke dua arah.",
-  "people.pinTryAgain": "PIN itu tidak berhasil. Coba lagi."
+  "people.pinTryAgain": "PIN itu tidak berhasil. Coba lagi.",
+  "study.loosen.title": "Ini akan melonggarkan aturan belajarmu",
+  "study.loosen.body": "Akhiri sesimu untuk mengubahnya, atau ubah setelah {time}.",
+  "study.loosen.bodyNoTime": "Akhiri sesimu untuk mengubahnya, atau ubah setelah belajar.",
+  "study.loosen.lockedTitleNoTime": "Terkunci sampai belajar selesai",
+  "study.loosen.lockedBody": "Kamu bisa menambah ke daftar blokir, tetapi belum bisa menghapus apa pun sampai saat itu.",
+  "study.loosen.parentTitle": "Diatur oleh {name} sampai {time}",
+  "study.loosen.parentTitleNoTime": "Diatur oleh {name} sampai belajar selesai",
+  "study.loosen.parentBody": "Kamu bisa membuat aturan lebih ketat, tetapi tidak lebih longgar.",
+  "study.loosen.aParent": "orang tua",
+  "study.loosen.keep": "Lanjut belajar",
+  "study.loosen.gotIt": "Mengerti"
 }

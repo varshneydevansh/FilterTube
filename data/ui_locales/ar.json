@@ -3166,5 +3166,16 @@
   "people.profileSwitched": "تم الانتقال إلى مساحة {name}.",
   "people.restoreDone": "عاد كل شيء إلى مكانه.",
   "people.paired": "تم الإقران. أصبحت الخطط تتزامن في الاتجاهين.",
-  "people.pinTryAgain": "لم يعمل رمز PIN هذا. حاول مرة أخرى."
+  "people.pinTryAgain": "لم يعمل رمز PIN هذا. حاول مرة أخرى.",
+  "study.loosen.title": "سيخفف هذا قواعد دراستك",
+  "study.loosen.body": "أنهِ جلستك لتغييره، أو غيّره بعد {time}.",
+  "study.loosen.bodyNoTime": "أنهِ جلستك لتغييره، أو غيّره بعد الدراسة.",
+  "study.loosen.lockedTitleNoTime": "مقفل حتى تنتهي الدراسة",
+  "study.loosen.lockedBody": "يمكنك الإضافة إلى قائمة الحظر، لكن لا يمكنك إزالة أي شيء حتى ذلك الحين.",
+  "study.loosen.parentTitle": "ضبطه {name} حتى {time}",
+  "study.loosen.parentTitleNoTime": "ضبطه {name} حتى تنتهي الدراسة",
+  "study.loosen.parentBody": "يمكنك جعل قواعدك أشد، لكن ليس أخف.",
+  "study.loosen.aParent": "أحد الوالدين",
+  "study.loosen.keep": "متابعة الدراسة",
+  "study.loosen.gotIt": "حسنًا"
 }

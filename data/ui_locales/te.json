@@ -3142,5 +3142,16 @@
   "people.profileSwitched": "{name} స్థలానికి మారారు.",
   "people.restoreDone": "అన్నీ మళ్లీ వాటి స్థానంలో ఉన్నాయి.",
   "people.paired": "జత చేయబడింది. ప్రణాళికలు ఇప్పుడు రెండు వైపులా సింక్ అవుతాయి.",
-  "people.pinTryAgain": "ఆ పిన్ పని చేయలేదు. మళ్లీ ప్రయత్నించండి."
+  "people.pinTryAgain": "ఆ పిన్ పని చేయలేదు. మళ్లీ ప్రయత్నించండి.",
+  "study.loosen.title": "దీనివల్ల మీ చదువు నియమాలు సడలుతాయి",
+  "study.loosen.body": "మార్చడానికి మీ సెషన్ ముగించండి, లేదా {time} తర్వాత మార్చండి.",
+  "study.loosen.bodyNoTime": "మార్చడానికి మీ సెషన్ ముగించండి, లేదా చదువు తర్వాత మార్చండి.",
+  "study.loosen.lockedTitleNoTime": "చదువు ముగిసే వరకు లాక్ అయింది",
+  "study.loosen.lockedBody": "మీరు బ్లాక్ జాబితాకు జోడించవచ్చు, కానీ అప్పటివరకు ఏదీ తీసివేయలేరు.",
+  "study.loosen.parentTitle": "{name} {time} వరకు సెట్ చేశారు",
+  "study.loosen.parentTitleNoTime": "{name} చదువు ముగిసే వరకు సెట్ చేశారు",
+  "study.loosen.parentBody": "మీరు నియమాలను మరింత కఠినం చేయవచ్చు, సడలించలేరు.",
+  "study.loosen.aParent": "తల్లిదండ్రులలో ఒకరు",
+  "study.loosen.keep": "చదువు కొనసాగించండి",
+  "study.loosen.gotIt": "అర్థమైంది"
 }

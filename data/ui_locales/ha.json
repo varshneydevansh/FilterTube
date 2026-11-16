@@ -3142,5 +3142,16 @@
   "people.profileSwitched": "An koma wurin {name}.",
   "people.restoreDone": "Komai ya koma wurinsa.",
   "people.paired": "An haɗa. Yanzu tsare-tsare suna daidaita ta ɓangarorin biyu.",
-  "people.pinTryAgain": "Wannan PIN bai yi aiki ba. Sake gwadawa."
+  "people.pinTryAgain": "Wannan PIN bai yi aiki ba. Sake gwadawa.",
+  "study.loosen.title": "Wannan zai sassauta dokokin karatunka",
+  "study.loosen.body": "Ka ƙare zamanka don canza shi, ko ka canza bayan {time}.",
+  "study.loosen.bodyNoTime": "Ka ƙare zamanka don canza shi, ko ka canza bayan karatu.",
+  "study.loosen.lockedTitleNoTime": "A kulle har karatu ya ƙare",
+  "study.loosen.lockedBody": "Za ka iya ƙara a jerin toshewarka, amma ba za ka iya cire komai ba har sai lokacin.",
+  "study.loosen.parentTitle": "{name} ne ya saita har {time}",
+  "study.loosen.parentTitleNoTime": "{name} ne ya saita har karatu ya ƙare",
+  "study.loosen.parentBody": "Za ka iya tsaurara dokokinka, amma ba sassauta su ba.",
+  "study.loosen.aParent": "iyaye",
+  "study.loosen.keep": "Ci gaba da karatu",
+  "study.loosen.gotIt": "Na gane"
 }

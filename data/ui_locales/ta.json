@@ -3142,5 +3142,16 @@
   "people.profileSwitched": "{name} இடத்துக்கு மாற்றப்பட்டது.",
   "people.restoreDone": "எல்லாம் மீண்டும் இடத்தில் உள்ளது.",
   "people.paired": "இணைக்கப்பட்டது. திட்டங்கள் இப்போது இரு பக்கமும் ஒத்திசைகின்றன.",
-  "people.pinTryAgain": "அந்த பின் வேலை செய்யவில்லை. மீண்டும் முயலுங்கள்."
+  "people.pinTryAgain": "அந்த பின் வேலை செய்யவில்லை. மீண்டும் முயலுங்கள்.",
+  "study.loosen.title": "இது உங்கள் படிப்பு விதிகளைத் தளர்த்தும்",
+  "study.loosen.body": "மாற்ற உங்கள் அமர்வை முடியுங்கள், அல்லது {time} க்குப் பிறகு மாற்றுங்கள்.",
+  "study.loosen.bodyNoTime": "மாற்ற உங்கள் அமர்வை முடியுங்கள், அல்லது படிப்புக்குப் பிறகு மாற்றுங்கள்.",
+  "study.loosen.lockedTitleNoTime": "படிப்பு முடியும் வரை பூட்டப்பட்டுள்ளது",
+  "study.loosen.lockedBody": "தடுப்புப் பட்டியலில் சேர்க்கலாம், ஆனால் அதுவரை எதையும் நீக்க முடியாது.",
+  "study.loosen.parentTitle": "{name} {time} வரை அமைத்துள்ளார்",
+  "study.loosen.parentTitleNoTime": "{name} படிப்பு முடியும் வரை அமைத்துள்ளார்",
+  "study.loosen.parentBody": "விதிகளை மேலும் கடுமையாக்கலாம், தளர்த்த முடியாது.",
+  "study.loosen.aParent": "ஒரு பெற்றோர்",
+  "study.loosen.keep": "தொடர்ந்து படி",
+  "study.loosen.gotIt": "சரி"
 }

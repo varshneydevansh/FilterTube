@@ -3142,5 +3142,16 @@
   "people.profileSwitched": "Umehamia nafasi ya {name}.",
   "people.restoreDone": "Kila kitu kimerudi mahali pake.",
   "people.paired": "Imeunganishwa. Mipango sasa inasawazishwa pande zote mbili.",
-  "people.pinTryAgain": "PIN hiyo haikufanya kazi. Jaribu tena."
+  "people.pinTryAgain": "PIN hiyo haikufanya kazi. Jaribu tena.",
+  "study.loosen.title": "Hii ingelegeza sheria zako za kusoma",
+  "study.loosen.body": "Maliza kipindi chako ili kuibadilisha, au ibadilishe baada ya {time}.",
+  "study.loosen.bodyNoTime": "Maliza kipindi chako ili kuibadilisha, au ibadilishe baada ya kusoma.",
+  "study.loosen.lockedTitleNoTime": "Imefungwa hadi kusoma kuishe",
+  "study.loosen.lockedBody": "Unaweza kuongeza kwenye orodha yako ya kuzuia, lakini huwezi kuondoa chochote hadi wakati huo.",
+  "study.loosen.parentTitle": "Imewekwa na {name} hadi {time}",
+  "study.loosen.parentTitleNoTime": "Imewekwa na {name} hadi kusoma kuishe",
+  "study.loosen.parentBody": "Unaweza kufanya sheria zako kuwa kali zaidi, si legevu zaidi.",
+  "study.loosen.aParent": "mzazi",
+  "study.loosen.keep": "Endelea kusoma",
+  "study.loosen.gotIt": "Nimeelewa"
 }

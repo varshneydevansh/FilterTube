@@ -3142,5 +3142,16 @@
   "people.profileSwitched": "ወደ {name} ቦታ ተቀይሯል።",
   "people.restoreDone": "ሁሉም ነገር ወደ ቦታው ተመልሷል።",
   "people.paired": "ተጣምሯል። ዕቅዶች አሁን በሁለቱም በኩል ይመሳሰላሉ።",
-  "people.pinTryAgain": "ያ ፒን አልሰራም። እንደገና ይሞክሩ።"
+  "people.pinTryAgain": "ያ ፒን አልሰራም። እንደገና ይሞክሩ።",
+  "study.loosen.title": "ይህ የጥናት ደንቦችህን ያላላል",
+  "study.loosen.body": "ለመቀየር ክፍለ ጊዜህን አጠናቅ፣ ወይም ከ{time} በኋላ ቀይር።",
+  "study.loosen.bodyNoTime": "ለመቀየር ክፍለ ጊዜህን አጠናቅ፣ ወይም ከጥናት በኋላ ቀይር።",
+  "study.loosen.lockedTitleNoTime": "ጥናት እስኪያበቃ ተቆልፏል",
+  "study.loosen.lockedBody": "ወደ የማገጃ ዝርዝርህ ማከል ትችላለህ፣ ግን እስከዚያ ምንም ማስወገድ አትችልም።",
+  "study.loosen.parentTitle": "በ{name} እስከ {time} ተቀናብሯል",
+  "study.loosen.parentTitleNoTime": "በ{name} ጥናት እስኪያበቃ ተቀናብሯል",
+  "study.loosen.parentBody": "ደንቦችህን ይበልጥ ጥብቅ ማድረግ ትችላለህ፣ ማላላት ግን አትችልም።",
+  "study.loosen.aParent": "አንድ ወላጅ",
+  "study.loosen.keep": "ማጥናት ቀጥል",
+  "study.loosen.gotIt": "እሺ"
 }

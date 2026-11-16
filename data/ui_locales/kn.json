@@ -3142,5 +3142,16 @@
   "people.profileSwitched": "{name} ಅವರ ಸ್ಥಳಕ್ಕೆ ಬದಲಾಯಿಸಲಾಗಿದೆ.",
   "people.restoreDone": "ಎಲ್ಲವೂ ಮತ್ತೆ ತಮ್ಮ ಜಾಗದಲ್ಲಿದೆ.",
   "people.paired": "ಜೋಡಿಸಲಾಗಿದೆ. ಯೋಜನೆಗಳು ಈಗ ಎರಡೂ ಕಡೆ ಸಿಂಕ್ ಆಗುತ್ತವೆ.",
-  "people.pinTryAgain": "ಆ ಪಿನ್ ಕೆಲಸ ಮಾಡಲಿಲ್ಲ. ಮತ್ತೆ ಪ್ರಯತ್ನಿಸಿ."
+  "people.pinTryAgain": "ಆ ಪಿನ್ ಕೆಲಸ ಮಾಡಲಿಲ್ಲ. ಮತ್ತೆ ಪ್ರಯತ್ನಿಸಿ.",
+  "study.loosen.title": "ಇದು ನಿಮ್ಮ ಅಧ್ಯಯನ ನಿಯಮಗಳನ್ನು ಸಡಿಲಗೊಳಿಸುತ್ತದೆ",
+  "study.loosen.body": "ಬದಲಿಸಲು ನಿಮ್ಮ ಅವಧಿಯನ್ನು ಮುಗಿಸಿ, ಅಥವಾ {time} ನಂತರ ಬದಲಿಸಿ.",
+  "study.loosen.bodyNoTime": "ಬದಲಿಸಲು ನಿಮ್ಮ ಅವಧಿಯನ್ನು ಮುಗಿಸಿ, ಅಥವಾ ಅಧ್ಯಯನದ ನಂತರ ಬದಲಿಸಿ.",
+  "study.loosen.lockedTitleNoTime": "ಅಧ್ಯಯನ ಮುಗಿಯುವವರೆಗೆ ಲಾಕ್ ಆಗಿದೆ",
+  "study.loosen.lockedBody": "ನೀವು ನಿರ್ಬಂಧ ಪಟ್ಟಿಗೆ ಸೇರಿಸಬಹುದು, ಆದರೆ ಅಲ್ಲಿಯವರೆಗೆ ಏನನ್ನೂ ತೆಗೆಯಲು ಆಗುವುದಿಲ್ಲ.",
+  "study.loosen.parentTitle": "{name} ಅವರು {time} ವರೆಗೆ ಹೊಂದಿಸಿದ್ದಾರೆ",
+  "study.loosen.parentTitleNoTime": "{name} ಅವರು ಅಧ್ಯಯನ ಮುಗಿಯುವವರೆಗೆ ಹೊಂದಿಸಿದ್ದಾರೆ",
+  "study.loosen.parentBody": "ನೀವು ನಿಯಮಗಳನ್ನು ಇನ್ನಷ್ಟು ಕಟ್ಟುನಿಟ್ಟಾಗಿಸಬಹುದು, ಸಡಿಲಗೊಳಿಸಲು ಆಗುವುದಿಲ್ಲ.",
+  "study.loosen.aParent": "ಒಬ್ಬ ಪೋಷಕರು",
+  "study.loosen.keep": "ಅಧ್ಯಯನ ಮುಂದುವರಿಸಿ",
+  "study.loosen.gotIt": "ಸರಿ"
 }

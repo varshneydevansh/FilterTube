@@ -3142,5 +3142,16 @@
   "people.profileSwitched": "به فضای {name} رفتید.",
   "people.restoreDone": "همه‌چیز سر جایش برگشت.",
   "people.paired": "جفت شد. برنامه‌ها حالا در هر دو جهت همگام می‌شوند.",
-  "people.pinTryAgain": "این پین کار نکرد. دوباره امتحان کنید."
+  "people.pinTryAgain": "این پین کار نکرد. دوباره امتحان کنید.",
+  "study.loosen.title": "این کار قوانین مطالعه‌تان را سست‌تر می‌کند",
+  "study.loosen.body": "برای تغییرش جلسه را تمام کنید، یا بعد از {time} تغییرش دهید.",
+  "study.loosen.bodyNoTime": "برای تغییرش جلسه را تمام کنید، یا بعد از مطالعه تغییرش دهید.",
+  "study.loosen.lockedTitleNoTime": "تا پایان مطالعه قفل است",
+  "study.loosen.lockedBody": "می‌توانید به فهرست مسدودی اضافه کنید، اما تا آن موقع چیزی را نمی‌توانید حذف کنید.",
+  "study.loosen.parentTitle": "تنظیم‌شده توسط {name} تا {time}",
+  "study.loosen.parentTitleNoTime": "تنظیم‌شده توسط {name} تا پایان مطالعه",
+  "study.loosen.parentBody": "می‌توانید قوانین را سخت‌تر کنید، اما نه سست‌تر.",
+  "study.loosen.aParent": "یکی از والدین",
+  "study.loosen.keep": "ادامهٔ مطالعه",
+  "study.loosen.gotIt": "متوجه شدم"
 }

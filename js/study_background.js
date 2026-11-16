@@ -762,10 +762,15 @@
             if (isChild && !current) return { ok: false, error: 'child_profile' };
             // Under a parent's plan or lock the person may tighten study, never loosen it (StudyTighten),
             // and nobody loosens it during a clock hold (Android StudyRuntime.holdsLoosening).
-            const running = !!current && clockFor(profile, runtime, profileId, now()).clock.clockHold === true;
-            if (current && (isChild || running || current.plan?.setByParentId || current.lock?.setByParentId)
-                && !Model.tightenAllowed(current, apply(clone(current)), { now: now(), held: isChild || running })) {
-                return { ok: false, error: isChild || current.plan?.setByParentId || current.lock?.setByParentId ? 'set_by_parent' : 'study_running' };
+            // A self-started session holds too while it runs (Android StudyLoosening: Gentle during a round
+            // or break, Locked for its whole window), so a loosening save says why instead of going through.
+            const held = current ? clockFor(profile, runtime, profileId, now()) : null;
+            const running = !!held && held.clock.clockHold === true;
+            const selfRunning = !!held && !!held.local.session && held.clock.studying === true && held.clock.source === 'session';
+            if (current && (isChild || running || selfRunning || current.plan?.setByParentId || current.lock?.setByParentId)
+                && !Model.tightenAllowed(current, apply(clone(current)), { now: now(), held: isChild || running || selfRunning })) {
+                if (isChild || current.plan?.setByParentId || current.lock?.setByParentId) return { ok: false, error: 'set_by_parent' };
+                return { ok: false, error: selfRunning && held.local.session.lockMode === 'locked' ? 'locked' : 'study_running' };
             }
             const result = await updateProfileStudy(profileId, apply);
             if (result?.ok === false) return result;

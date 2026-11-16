@@ -3142,5 +3142,16 @@
   "people.profileSwitched": "Gewechselt zu {name}.",
   "people.restoreDone": "Alles ist wieder an seinem Platz.",
   "people.paired": "Gekoppelt. Pläne werden jetzt in beide Richtungen abgeglichen.",
-  "people.pinTryAgain": "Diese PIN hat nicht gepasst. Versuch es noch einmal."
+  "people.pinTryAgain": "Diese PIN hat nicht gepasst. Versuch es noch einmal.",
+  "study.loosen.title": "Das würde deine Lernregeln lockern",
+  "study.loosen.body": "Beende deine Sitzung, um es zu ändern, oder ändere es nach {time}.",
+  "study.loosen.bodyNoTime": "Beende deine Sitzung, um es zu ändern, oder ändere es nach dem Lernen.",
+  "study.loosen.lockedTitleNoTime": "Zu, bis das Lernen endet",
+  "study.loosen.lockedBody": "Du kannst deiner Sperrliste etwas hinzufügen, aber bis dahin nichts entfernen.",
+  "study.loosen.parentTitle": "Festgelegt von {name} bis {time}",
+  "study.loosen.parentTitleNoTime": "Festgelegt von {name}, bis das Lernen endet",
+  "study.loosen.parentBody": "Du kannst deine Regeln strenger machen, aber nicht lockerer.",
+  "study.loosen.aParent": "einem Elternteil",
+  "study.loosen.keep": "Weiterlernen",
+  "study.loosen.gotIt": "Verstanden"
 }

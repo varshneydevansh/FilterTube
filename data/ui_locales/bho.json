@@ -3142,5 +3142,16 @@
   "people.profileSwitched": "{name} के जगह में बदल गइल।",
   "people.restoreDone": "सब कुछ अपना जगह पर लौट आइल।",
   "people.paired": "जुड़ गइल। अब योजना दूनो ओर सिंक होखी।",
-  "people.pinTryAgain": "ऊ पिन ना चलल। फेर से कोसिस करीं।"
+  "people.pinTryAgain": "ऊ पिन ना चलल। फेर से कोसिस करीं।",
+  "study.loosen.title": "एहसे रउरा पढ़ाई के नियम ढील हो जाई",
+  "study.loosen.body": "एकरा के बदले खातिर आपन सत्र खतम करीं, या {time} के बाद बदलीं।",
+  "study.loosen.bodyNoTime": "एकरा के बदले खातिर आपन सत्र खतम करीं, या पढ़ाई के बाद बदलीं।",
+  "study.loosen.lockedTitleNoTime": "पढ़ाई खतम होखे तक लॉक बा",
+  "study.loosen.lockedBody": "रउरा ब्लॉक सूची में जोड़ सकीले, बाकिर तब तक कुछ हटा ना सकीं।",
+  "study.loosen.parentTitle": "{name} {time} तक सेट कइले बा",
+  "study.loosen.parentTitleNoTime": "{name} पढ़ाई खतम होखे तक सेट कइले बा",
+  "study.loosen.parentBody": "रउरा नियम के अउरी सख्त कर सकीले, ढील ना।",
+  "study.loosen.aParent": "माई-बाबूजी में से केहू",
+  "study.loosen.keep": "पढ़ाई जारी राखीं",
+  "study.loosen.gotIt": "ठीक बा"
 }

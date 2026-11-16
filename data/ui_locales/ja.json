@@ -3140,5 +3140,16 @@
   "people.profileSwitched": "{name} のスペースに切り替えました。",
   "people.restoreDone": "すべて元どおりになりました。",
   "people.paired": "ペアリングしました。プランは双方向で同期されます。",
-  "people.pinTryAgain": "その PIN は使えませんでした。もう一度お試しください。"
+  "people.pinTryAgain": "その PIN は使えませんでした。もう一度お試しください。",
+  "study.loosen.title": "学習のルールがゆるくなります",
+  "study.loosen.body": "変更するにはセッションを終えるか、{time} 以降に変更してください。",
+  "study.loosen.bodyNoTime": "変更するにはセッションを終えるか、学習のあとに変更してください。",
+  "study.loosen.lockedTitleNoTime": "学習が終わるまでロック中",
+  "study.loosen.lockedBody": "ブロックリストに追加はできますが、それまで削除はできません。",
+  "study.loosen.parentTitle": "{name} が {time} まで設定",
+  "study.loosen.parentTitleNoTime": "{name} が学習の終わりまで設定",
+  "study.loosen.parentBody": "ルールを厳しくはできますが、ゆるくはできません。",
+  "study.loosen.aParent": "保護者",
+  "study.loosen.keep": "学習を続ける",
+  "study.loosen.gotIt": "わかりました"
 }

@@ -3142,5 +3142,16 @@
   "people.profileSwitched": "Mudou para o espaço de {name}.",
   "people.restoreDone": "Tudo voltou ao lugar.",
   "people.paired": "Pareados. Os planos agora sincronizam nos dois sentidos.",
-  "people.pinTryAgain": "Esse PIN não funcionou. Tente de novo."
+  "people.pinTryAgain": "Esse PIN não funcionou. Tente de novo.",
+  "study.loosen.title": "Isso afrouxaria suas regras de estudo",
+  "study.loosen.body": "Encerre sua sessão para mudar, ou mude depois das {time}.",
+  "study.loosen.bodyNoTime": "Encerre sua sessão para mudar, ou mude depois do estudo.",
+  "study.loosen.lockedTitleNoTime": "Travado até o estudo terminar",
+  "study.loosen.lockedBody": "Você pode adicionar à sua lista de bloqueio, mas não remover nada até lá.",
+  "study.loosen.parentTitle": "Definido por {name} até {time}",
+  "study.loosen.parentTitleNoTime": "Definido por {name} até o estudo terminar",
+  "study.loosen.parentBody": "Você pode deixar suas regras mais rígidas, mas não mais leves.",
+  "study.loosen.aParent": "um responsável",
+  "study.loosen.keep": "Continuar estudando",
+  "study.loosen.gotIt": "Entendi"
 }

@@ -3140,5 +3140,16 @@
   "people.profileSwitched": "已經轉咗去 {name} 嘅空間。",
   "people.restoreDone": "所有嘢都返晒原位。",
   "people.paired": "已經配對。計劃而家兩邊同步。",
-  "people.pinTryAgain": "呢個 PIN 唔啱。再試一次。"
+  "people.pinTryAgain": "呢個 PIN 唔啱。再試一次。",
+  "study.loosen.title": "咁會放寬你嘅學習規則",
+  "study.loosen.body": "完結時段就可以改，或者喺 {time} 之後先改。",
+  "study.loosen.bodyNoTime": "完結時段就可以改，或者學習完咗之後先改。",
+  "study.loosen.lockedTitleNoTime": "學習完之前鎖住咗",
+  "study.loosen.lockedBody": "你可以加嘢落封鎖清單，但喺嗰陣之前唔可以移除任何嘢。",
+  "study.loosen.parentTitle": "由{name}設定，直到 {time}",
+  "study.loosen.parentTitleNoTime": "由{name}設定，直到學習完結",
+  "study.loosen.parentBody": "你可以將規則設得更嚴，但唔可以更鬆。",
+  "study.loosen.aParent": "家長",
+  "study.loosen.keep": "繼續學習",
+  "study.loosen.gotIt": "知道"
 }

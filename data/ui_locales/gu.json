@@ -3142,5 +3142,16 @@
   "people.profileSwitched": "{name}ની જગ્યામાં બદલાયું.",
   "people.restoreDone": "બધું ફરી તેની જગ્યાએ છે.",
   "people.paired": "જોડાયું. યોજનાઓ હવે બંને બાજુ સિંક થાય છે.",
-  "people.pinTryAgain": "એ પિન કામ ન કર્યો. ફરી પ્રયાસ કરો."
+  "people.pinTryAgain": "એ પિન કામ ન કર્યો. ફરી પ્રયાસ કરો.",
+  "study.loosen.title": "આથી તમારા અભ્યાસના નિયમો ઢીલા થશે",
+  "study.loosen.body": "બદલવા માટે સત્ર પૂરું કરો, અથવા {time} પછી બદલો.",
+  "study.loosen.bodyNoTime": "બદલવા માટે સત્ર પૂરું કરો, અથવા અભ્યાસ પછી બદલો.",
+  "study.loosen.lockedTitleNoTime": "અભ્યાસ પૂરો થાય ત્યાં સુધી લૉક",
+  "study.loosen.lockedBody": "તમે બ્લૉક સૂચિમાં ઉમેરી શકો છો, પણ ત્યાં સુધી કંઈ દૂર કરી શકતા નથી.",
+  "study.loosen.parentTitle": "{name} દ્વારા {time} સુધી સેટ",
+  "study.loosen.parentTitleNoTime": "{name} દ્વારા અભ્યાસ પૂરો થાય ત્યાં સુધી સેટ",
+  "study.loosen.parentBody": "તમે નિયમો વધુ કડક કરી શકો છો, ઢીલા નહીં.",
+  "study.loosen.aParent": "માતાપિતામાંથી કોઈ",
+  "study.loosen.keep": "અભ્યાસ ચાલુ રાખો",
+  "study.loosen.gotIt": "સમજાયું"
 }

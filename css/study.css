@@ -418,3 +418,8 @@ body.ft-extension-surface .ft-study-card[data-study-page],
 .ft-study-ring__sun, .ft-study-ring__notch { stroke: var(--pk-sun, #edb12e); stroke-linecap: butt; }
 .ft-study-ring__drain { stroke: var(--pk-sun, #edb12e); stroke-linecap: round; }
 .ft-study-ring__tick { stroke: var(--pk-ink, #1b1a18); stroke-width: 2.5; stroke-linecap: round; }
+
+/* ---- The loosening sheet (Android StudyLooseningSheet, C41-C43) ---- */
+.ft-study-loosen { display: flex; flex-direction: column; gap: 6px; padding: 14px 16px 16px; border: 1.5px solid var(--pk-line, #dcd1c2); border-radius: 20px; background: var(--pk-paper, #fffcf6); box-shadow: 3px 3px 0 var(--pk-ledge, rgba(27, 26, 24, 0.14)); }
+.ft-study-loosen__title { font-family: var(--pk-font-display, inherit); font-size: 1.1rem; }
+.ft-study-loosen p { margin: 0; }

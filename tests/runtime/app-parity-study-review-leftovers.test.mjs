@@ -61,3 +61,52 @@ test('the review copy is in every catalog', () => {
         for (const key of ['study.endSession', 'study.endHint', 'study.week.empty']) assert.ok((catalog[key] || '').trim(), `${name} ${key}`);
     }
 });
+
+// Ports Android fcd8018b8 (StudyLooseningSheet.kt, StudyPageRules.kt StudyLoosening, C41-C43): a change
+// that would loosen study while it runs says why instead of failing quietly.
+test('the loosening sheets: Gentle, self-Locked and a parent\'s plan', async () => {
+    globalThis.window = globalThis;
+    await import('../../js/study_ui.js');
+    const page = fs.readFileSync('js/study_ui.js', 'utf8');
+    const body = page.slice(page.indexOf('function looseningSheet('), page.indexOf('function showLoosening('));
+    const looseningSheet = new Function('object', 'text', 't', 'formatDayTime', `${body}; return looseningSheet;`)(
+        value => (value && typeof value === 'object' ? value : {}), value => (typeof value === 'string' ? value.trim() : ''),
+        (key, fallback, values = {}) => fallback.replace(/\{(\w+)\}/g, (m, k) => values[k] ?? m), () => '6:00 PM');
+    const gentle = looseningSheet('study_running', { state: 'STUDY', sessionEnd: 1, endPolicy: { canEnd: true } });
+    assert.equal(gentle.title, 'This would loosen your study rules');
+    assert.equal(gentle.body, 'End your session to change it, or change it after 6:00 PM.');
+    assert.equal(gentle.endSession, true);
+    const locked = looseningSheet('locked', { state: 'BREAK', lockMode: 'locked', lockedUntil: 1 });
+    assert.equal(locked.title, 'Locked until 6:00 PM');
+    const parent = looseningSheet('set_by_parent', { state: 'STUDY', setByParentId: 'mum', lockedUntil: 1 }, 'Mum');
+    assert.equal(parent.title, 'Set by Mum until 6:00 PM');
+    assert.equal(parent.body, 'You can make your rules stricter, but not looser.');
+    assert.equal(looseningSheet('set_by_parent', { state: 'STUDY', setByParentId: 'x', lockedUntil: 1 }, 'Default').title, 'Set by a parent until 6:00 PM');
+    assert.equal(looseningSheet('study_running', { state: 'NORMAL' }), null, 'outside study it is a plain message');
+});
+
+test('a running self session refuses a loosening save with the reason the sheet names', async () => {
+    const require = createRequire(import.meta.url);
+    const Engine = require('../../js/shared/study_engine.js');
+    const Model = require('../../js/shared/study_model.js');
+    const Packs = require('../../js/shared/study_packs.js');
+    const { createStudyBackground } = require('../../js/study_background.js');
+    const catalog = Packs.parseCatalog(JSON.parse(fs.readFileSync('data/study/packs-v1.json', 'utf8')));
+    const at = new Date(2026, 10, 16, 16, 10).getTime();
+    const store = { ftProfilesV4: { schemaVersion: 4, activeProfileId: 'p1', profiles: { p1: { name: 'Me', type: 'account',
+        main: { mode: 'blocklist', channels: [], keywords: [], whitelistChannels: [] }, kids: { mode: 'blocklist', blockedKeywords: [] },
+        study: Model.createStudy({ activePackIds: ['in_gate'] }) } } } };
+    const browserAPI = { storage: { local: {
+        get(keys, cb) { const out = {}; for (const key of [].concat(keys)) if (key in store) out[key] = structuredClone(store[key]); cb(out); },
+        set(items, cb) { Object.assign(store, structuredClone(items)); cb?.(); }
+    } }, alarms: { create() {}, clear() {} } };
+    const controller = createStudyBackground({ browserAPI, Engine, Model, Packs, now: () => at, loadCatalog: async () => catalog,
+        getSelfControlSession: async () => null, startLockedSession: async () => ({ ok: true }),
+        writeProfile: async (id, profile) => { store.ftProfilesV4.profiles[id] = structuredClone(profile); return { ok: true }; } });
+    assert.equal((await controller.startSession({ minutes: 50, lock: 'gentle' })).ok, true);
+    // Another pack lets more in, and normal videos in breaks loosen the rest screen.
+    assert.deepEqual(await controller.update({ activePackIds: ['in_gate', 'in_clat'] }), { ok: false, error: 'study_running' });
+    assert.deepEqual(await controller.update({ breakMode: 'normal' }), { ok: false, error: 'study_running' });
+    const tighten = await controller.update({ activePackIds: [], focus: { roundMinutes: 50, breakMinutes: 5 } });
+    assert.equal(tighten.ok, true, 'a stricter save still goes through');
+});

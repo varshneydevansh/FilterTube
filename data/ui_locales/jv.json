@@ -3140,5 +3140,16 @@
   "people.profileSwitched": "Pindhah menyang papan {name}.",
   "people.restoreDone": "Kabeh wis bali ing panggonané.",
   "people.paired": "Wis kasambung. Rencana saiki disinkronaké rong arah.",
-  "people.pinTryAgain": "PIN kuwi ora bisa. Coba maneh."
+  "people.pinTryAgain": "PIN kuwi ora bisa. Coba maneh.",
+  "study.loosen.title": "Iki bakal ngendhokaké aturan sinaumu",
+  "study.loosen.body": "Rampungna sesi kanggo ngganti, utawa ganti sawisé {time}.",
+  "study.loosen.bodyNoTime": "Rampungna sesi kanggo ngganti, utawa ganti sawisé sinau.",
+  "study.loosen.lockedTitleNoTime": "Dikunci nganti sinau rampung",
+  "study.loosen.lockedBody": "Sampeyan bisa nambah ing dhaptar pamblokiran, nanging durung bisa mbusak apa-apa nganti wektu kuwi.",
+  "study.loosen.parentTitle": "Disetel {name} nganti {time}",
+  "study.loosen.parentTitleNoTime": "Disetel {name} nganti sinau rampung",
+  "study.loosen.parentBody": "Sampeyan bisa nggawé aturan luwih ketat, nanging ora luwih longgar.",
+  "study.loosen.aParent": "wong tuwa",
+  "study.loosen.keep": "Terusake sinau",
+  "study.loosen.gotIt": "Ngerti"
 }

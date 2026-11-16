@@ -3154,5 +3154,16 @@
   "people.profileSwitched": "Вы перешли в пространство {name}.",
   "people.restoreDone": "Всё снова на своих местах.",
   "people.paired": "Устройства связаны. Планы теперь синхронизируются в обе стороны.",
-  "people.pinTryAgain": "Этот PIN-код не подошёл. Попробуйте ещё раз."
+  "people.pinTryAgain": "Этот PIN-код не подошёл. Попробуйте ещё раз.",
+  "study.loosen.title": "Это ослабит ваши правила учёбы",
+  "study.loosen.body": "Завершите сеанс, чтобы изменить это, или измените после {time}.",
+  "study.loosen.bodyNoTime": "Завершите сеанс, чтобы изменить это, или измените после учёбы.",
+  "study.loosen.lockedTitleNoTime": "Закрыто до конца учёбы",
+  "study.loosen.lockedBody": "Можно добавлять в список блокировки, но удалять ничего нельзя до этого времени.",
+  "study.loosen.parentTitle": "Установлено: {name}, до {time}",
+  "study.loosen.parentTitleNoTime": "Установлено: {name}, до конца учёбы",
+  "study.loosen.parentBody": "Правила можно сделать строже, но не мягче.",
+  "study.loosen.aParent": "родитель",
+  "study.loosen.keep": "Продолжить учёбу",
+  "study.loosen.gotIt": "Понятно"
 }
