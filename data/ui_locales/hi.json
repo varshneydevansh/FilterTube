@@ -2926,5 +2926,7 @@
   "askParent.answerNote": "{name} का नोट",
   "askParent.answerWatch": "अभी देखो",
   "study.skipVideo": "यह वीडियो छोड़ें",
-  "study.skipped": "छोड़ दिया। यह फिर नहीं दिखेगा।"
+  "study.skipped": "छोड़ दिया। यह फिर नहीं दिखेगा।",
+  "content.comments.authorHidden": "{name} की टिप्पणियां छिपाई गईं",
+  "content.comments.undo": "पहले जैसा करें"
 }

@@ -2924,5 +2924,7 @@
   "askParent.answerNote": "{name}嘅留言",
   "askParent.answerWatch": "即刻睇",
   "study.skipVideo": "跳過呢條片",
-  "study.skipped": "已跳過。佢唔會再出現。"
+  "study.skipped": "已跳過。佢唔會再出現。",
+  "content.comments.authorHidden": "已隱藏 {name} 嘅留言",
+  "content.comments.undo": "復原"
 }

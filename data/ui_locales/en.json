@@ -2926,5 +2926,7 @@
   "askParent.answerNote": "A note from {name}",
   "askParent.answerWatch": "Watch now",
   "study.skipVideo": "Skip this video",
-  "study.skipped": "Skipped. It won't show again."
+  "study.skipped": "Skipped. It won't show again.",
+  "content.comments.authorHidden": "Comments from {name} hidden",
+  "content.comments.undo": "Undo"
 }

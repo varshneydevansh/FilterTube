@@ -2926,5 +2926,7 @@
   "askParent.answerNote": "ከ{name} የመጣ ማስታወሻ",
   "askParent.answerWatch": "አሁን እይ",
   "study.skipVideo": "ይህን ቪዲዮ ዝለል",
-  "study.skipped": "ተዘሏል። ዳግም አይታይም።"
+  "study.skipped": "ተዘሏል። ዳግም አይታይም።",
+  "content.comments.authorHidden": "የ{name} አስተያየቶች ተደብቀዋል",
+  "content.comments.undo": "ቀልብስ"
 }

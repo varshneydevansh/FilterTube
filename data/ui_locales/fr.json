@@ -2926,5 +2926,7 @@
   "askParent.answerNote": "Un mot de {name}",
   "askParent.answerWatch": "Regarder",
   "study.skipVideo": "Passer cette vidéo",
-  "study.skipped": "Passée. Elle ne s’affichera plus."
+  "study.skipped": "Passée. Elle ne s’affichera plus.",
+  "content.comments.authorHidden": "Commentaires de {name} masqués",
+  "content.comments.undo": "Annuler"
 }

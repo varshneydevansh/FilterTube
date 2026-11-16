@@ -2926,5 +2926,7 @@
   "askParent.answerNote": "{name} دا نوٹ",
   "askParent.answerWatch": "ہنے ویکھو",
   "study.skipVideo": "ایہہ ویڈیو چھڈو",
-  "study.skipped": "چھڈ دتی۔ ایہہ مُڑ نہیں دِسے گی۔"
+  "study.skipped": "چھڈ دتی۔ ایہہ مُڑ نہیں دِسے گی۔",
+  "content.comments.authorHidden": "{name} دے تبصرے لُکائے گئے",
+  "content.comments.undo": "واپس لوو"
 }

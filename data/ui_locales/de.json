@@ -2926,5 +2926,7 @@
   "askParent.answerNote": "Eine Nachricht von {name}",
   "askParent.answerWatch": "Jetzt ansehen",
   "study.skipVideo": "Dieses Video überspringen",
-  "study.skipped": "Übersprungen. Es erscheint nicht mehr."
+  "study.skipped": "Übersprungen. Es erscheint nicht mehr.",
+  "content.comments.authorHidden": "Kommentare von {name} ausgeblendet",
+  "content.comments.undo": "Rückgängig"
 }

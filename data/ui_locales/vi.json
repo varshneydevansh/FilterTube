@@ -2924,5 +2924,7 @@
   "askParent.answerNote": "Lời nhắn từ {name}",
   "askParent.answerWatch": "Xem ngay",
   "study.skipVideo": "Bỏ qua video này",
-  "study.skipped": "Đã bỏ qua. Video sẽ không hiện lại."
+  "study.skipped": "Đã bỏ qua. Video sẽ không hiện lại.",
+  "content.comments.authorHidden": "Đã ẩn bình luận của {name}",
+  "content.comments.undo": "Hoàn tác"
 }

@@ -2926,5 +2926,7 @@
   "askParent.answerNote": "{name} నుండి ఒక నోట్",
   "askParent.answerWatch": "ఇప్పుడే చూడు",
   "study.skipVideo": "ఈ వీడియోను దాటవేయి",
-  "study.skipped": "దాటవేయబడింది. ఇది మళ్లీ కనిపించదు."
+  "study.skipped": "దాటవేయబడింది. ఇది మళ్లీ కనిపించదు.",
+  "content.comments.authorHidden": "{name} కామెంట్‌లు దాచబడ్డాయి",
+  "content.comments.undo": "చర్యను రద్దు చేయి"
 }

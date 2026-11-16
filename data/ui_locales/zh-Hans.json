@@ -2924,5 +2924,7 @@
   "askParent.answerNote": "{name}的留言",
   "askParent.answerWatch": "立即观看",
   "study.skipVideo": "跳过这个视频",
-  "study.skipped": "已跳过。它不会再出现。"
+  "study.skipped": "已跳过。它不会再出现。",
+  "content.comments.authorHidden": "已隐藏 {name} 的评论",
+  "content.comments.undo": "撤消"
 }

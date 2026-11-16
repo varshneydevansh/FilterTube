@@ -2950,5 +2950,7 @@
   "askParent.answerNote": "ملاحظة من {name}",
   "askParent.answerWatch": "شوف هسع",
   "study.skipVideo": "تخطَّ هذا الفيديو",
-  "study.skipped": "تم التخطي. ما حيظهر تاني."
+  "study.skipped": "تم التخطي. ما حيظهر تاني.",
+  "content.comments.authorHidden": "تعليقات {name} اتخفت",
+  "content.comments.undo": "تراجع"
 }

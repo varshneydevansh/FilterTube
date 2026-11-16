@@ -2926,5 +2926,7 @@
   "askParent.answerNote": "{name} ಅವರಿಂದ ಟಿಪ್ಪಣಿ",
   "askParent.answerWatch": "ಈಗಲೇ ನೋಡು",
   "study.skipVideo": "ಈ ವೀಡಿಯೊ ಬಿಟ್ಟುಬಿಡಿ",
-  "study.skipped": "ಬಿಟ್ಟುಬಿಡಲಾಗಿದೆ. ಮತ್ತೆ ಕಾಣುವುದಿಲ್ಲ."
+  "study.skipped": "ಬಿಟ್ಟುಬಿಡಲಾಗಿದೆ. ಮತ್ತೆ ಕಾಣುವುದಿಲ್ಲ.",
+  "content.comments.authorHidden": "{name} ಅವರ ಕಾಮೆಂಟ್‌ಗಳನ್ನು ಮರೆಮಾಡಲಾಗಿದೆ",
+  "content.comments.undo": "ರದ್ದುಮಾಡಿ"
 }

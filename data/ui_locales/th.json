@@ -2924,5 +2924,7 @@
   "askParent.answerNote": "ข้อความจาก {name}",
   "askParent.answerWatch": "ดูเลย",
   "study.skipVideo": "ข้ามวิดีโอนี้",
-  "study.skipped": "ข้ามแล้ว จะไม่แสดงอีก"
+  "study.skipped": "ข้ามแล้ว จะไม่แสดงอีก",
+  "content.comments.authorHidden": "ซ่อนความคิดเห็นจาก {name} แล้ว",
+  "content.comments.undo": "เลิกทำ"
 }

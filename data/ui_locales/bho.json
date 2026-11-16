@@ -2926,5 +2926,7 @@
   "askParent.answerNote": "{name} के एगो नोट",
   "askParent.answerWatch": "अबहीं देखऽ",
   "study.skipVideo": "ई वीडियो छोड़ीं",
-  "study.skipped": "छोड़ दिहल गइल। ई फेर ना देखाई।"
+  "study.skipped": "छोड़ दिहल गइल। ई फेर ना देखाई।",
+  "content.comments.authorHidden": "{name} के कमेंट छिपा दिहल गइल",
+  "content.comments.undo": "वापस लीं"
 }

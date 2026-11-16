@@ -7770,8 +7770,17 @@ browserAPI.runtime.onMessage.addListener((message, sender, sendResponse) => {
                 }
             } catch (e) {
             }
+            // "Comments from X hidden · Undo" on the site: a block from a comment can be taken back.
+            if (result && result.success && isYouTubeContentSender(sender)) {
+                rememberCommentAuthorBlock(result, targetProfile);
+            }
             sendResponse(result);
         });
+        return true;
+    }
+
+    if (message.type === 'undoCommentAuthorBlock') {
+        undoCommentAuthorBlock(message, sender).then(sendResponse).catch(e => sendResponse({ success: false, error: e?.message || 'undo_failed' }));
         return true;
     }
 
@@ -7790,6 +7799,65 @@ browserAPI.runtime.onMessage.addListener((message, sender, sendResponse) => {
 
     return false;
 });
+
+// "Comments from X hidden · Undo" (Android NativeCommentsHiddenNote): a channel blocked from a
+// comment on the site can be taken back from the note that takes the comment's place, for as long as
+// the note can still be on screen (10 minutes) and only for blocks this worker made.
+const COMMENT_AUTHOR_UNDO_TTL_MS = 10 * 60 * 1000;
+const recentCommentAuthorBlocks = new Map();
+
+function commentAuthorBlockKey(value) {
+    return normalizeString(value).toLowerCase();
+}
+
+function rememberCommentAuthorBlock(result, profile) {
+    const data = safeObject(result.channelData);
+    const key = commentAuthorBlockKey(data.id || data.handle);
+    if (!key) return;
+    const now = Date.now();
+    for (const [existing, entry] of recentCommentAuthorBlocks) {
+        if (now - entry.at > COMMENT_AUTHOR_UNDO_TTL_MS) recentCommentAuthorBlocks.delete(existing);
+    }
+    recentCommentAuthorBlocks.set(key, { at: now, profile: profile === 'kids' ? 'kids' : 'main', id: normalizeString(data.id), handle: normalizeString(data.handle) });
+}
+
+async function undoCommentAuthorBlock(message, sender) {
+    if (!isYouTubeContentSender(sender)) return { success: false, error: 'untrusted_sender' };
+    const key = commentAuthorBlockKey(message.channelKey);
+    const entry = recentCommentAuthorBlocks.get(key);
+    if (!entry || Date.now() - entry.at > COMMENT_AUTHOR_UNDO_TTL_MS) return { success: false, error: 'undo_expired' };
+    if (await getActiveSelfControlSession()) return { success: false, error: 'self_control_settings_locked' };
+    recentCommentAuthorBlocks.delete(key);
+    const stored = await storageGet([FT_PROFILES_V4_KEY, 'filterChannels']);
+    const profilesV4 = stored?.[FT_PROFILES_V4_KEY];
+    if (!isValidProfilesV4(profilesV4)) return { success: false, error: 'profiles_unavailable' };
+    const activeId = normalizeString(profilesV4.activeProfileId) || DEFAULT_PROFILE_ID;
+    const profiles = safeObject(profilesV4.profiles);
+    const profile = safeObject(profiles[activeId]);
+    const matches = row => {
+        const value = typeof row === 'string' ? { id: row } : safeObject(row);
+        return (entry.id && commentAuthorBlockKey(value.id) === commentAuthorBlockKey(entry.id))
+            || (entry.handle && [value.handle, value.handleDisplay, value.canonicalHandle].some(handle => commentAuthorBlockKey(handle) === commentAuthorBlockKey(entry.handle)));
+    };
+    const update = {};
+    if (entry.profile === 'kids') {
+        const kids = safeObject(profile.kids);
+        profiles[activeId] = { ...profile, kids: { ...kids, blockedChannels: safeArray(kids.blockedChannels).filter(row => !matches(row)) } };
+    } else {
+        const main = safeObject(profile.main);
+        const channels = safeArray(main.channels).filter(row => !matches(row));
+        const keywords = syncStoredMainKeywordsWithChannels(Array.isArray(main.keywords) ? main.keywords : safeArray(main.blockedKeywords), channels);
+        profiles[activeId] = { ...profile, main: { ...main, channels, keywords, blockedKeywords: keywords } };
+        if (activeId === DEFAULT_PROFILE_ID && Array.isArray(stored?.filterChannels)) {
+            update.filterChannels = stored.filterChannels.filter(row => !matches(row));
+        }
+    }
+    update[FT_PROFILES_V4_KEY] = { ...profilesV4, schemaVersion: 4, profiles };
+    await browserAPI.storage.local.set(update);
+    compiledSettingsCache.main = null;
+    compiledSettingsCache.kids = null;
+    return { success: true };
+}
 
 /**
  * Handle adding a filtered channel (from 3-dot menu or enrichment queue)

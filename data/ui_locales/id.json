@@ -2924,5 +2924,7 @@
   "askParent.answerNote": "Catatan dari {name}",
   "askParent.answerWatch": "Tonton sekarang",
   "study.skipVideo": "Lewati video ini",
-  "study.skipped": "Dilewati. Tidak akan tampil lagi."
+  "study.skipped": "Dilewati. Tidak akan tampil lagi.",
+  "content.comments.authorHidden": "Komentar dari {name} disembunyikan",
+  "content.comments.undo": "Urungkan"
 }

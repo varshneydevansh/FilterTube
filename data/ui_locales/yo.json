@@ -2924,5 +2924,7 @@
   "askParent.answerNote": "Àkọsílẹ̀ láti ọ̀dọ̀ {name}",
   "askParent.answerWatch": "Wò ó báyìí",
   "study.skipVideo": "Fo fídíò yìí",
-  "study.skipped": "A ti fò ó. Kò ní hàn mọ́."
+  "study.skipped": "A ti fò ó. Kò ní hàn mọ́.",
+  "content.comments.authorHidden": "A ti fi àwọn àsọyé {name} pamọ́",
+  "content.comments.undo": "Mú padà"
 }

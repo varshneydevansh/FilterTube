@@ -2924,5 +2924,7 @@
   "askParent.answerNote": "{name}からのメッセージ",
   "askParent.answerWatch": "今すぐ見る",
   "study.skipVideo": "この動画をスキップ",
-  "study.skipped": "スキップしました。今後表示されません。"
+  "study.skipped": "スキップしました。今後表示されません。",
+  "content.comments.authorHidden": "{name} さんのコメントを非表示にしました",
+  "content.comments.undo": "元に戻す"
 }

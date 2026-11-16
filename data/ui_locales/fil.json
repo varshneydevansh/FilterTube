@@ -2926,5 +2926,7 @@
   "askParent.answerNote": "Isang note mula kay {name}",
   "askParent.answerWatch": "Panoorin na",
   "study.skipVideo": "Laktawan ang video na ito",
-  "study.skipped": "Nilaktawan. Hindi na ito lalabas."
+  "study.skipped": "Nilaktawan. Hindi na ito lalabas.",
+  "content.comments.authorHidden": "Nakatago ang mga komento mula kay {name}",
+  "content.comments.undo": "I-undo"
 }

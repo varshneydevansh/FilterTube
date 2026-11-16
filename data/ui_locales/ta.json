@@ -2926,5 +2926,7 @@
   "askParent.answerNote": "{name}-இடமிருந்து ஒரு குறிப்பு",
   "askParent.answerWatch": "இப்போதே பார்",
   "study.skipVideo": "இந்தக் காணொளியைத் தவிர்",
-  "study.skipped": "தவிர்க்கப்பட்டது. இது மீண்டும் தெரியாது."
+  "study.skipped": "தவிர்க்கப்பட்டது. இது மீண்டும் தெரியாது.",
+  "content.comments.authorHidden": "{name} இன் கருத்துகள் மறைக்கப்பட்டன",
+  "content.comments.undo": "செயல்தவிர்"
 }

@@ -2926,5 +2926,7 @@
   "askParent.answerNote": "یادداشتی از {name}",
   "askParent.answerWatch": "همین حالا ببین",
   "study.skipVideo": "رد شدن از این ویدیو",
-  "study.skipped": "رد شد. دیگر نمایش داده نمی‌شود."
+  "study.skipped": "رد شد. دیگر نمایش داده نمی‌شود.",
+  "content.comments.authorHidden": "نظرهای {name} پنهان شد",
+  "content.comments.undo": "واگرد"
 }

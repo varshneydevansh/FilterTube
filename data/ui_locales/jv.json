@@ -2924,5 +2924,7 @@
   "askParent.answerNote": "Cathetan saka {name}",
   "askParent.answerWatch": "Tonton saiki",
   "study.skipVideo": "Lewati video iki",
-  "study.skipped": "Dilewati. Ora bakal katon maneh."
+  "study.skipped": "Dilewati. Ora bakal katon maneh.",
+  "content.comments.authorHidden": "Komentar saka {name} didhelikake",
+  "content.comments.undo": "Batalake"
 }

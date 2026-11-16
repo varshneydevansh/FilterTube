@@ -2926,5 +2926,7 @@
   "askParent.answerNote": "Um recado de {name}",
   "askParent.answerWatch": "Assistir agora",
   "study.skipVideo": "Pular este vídeo",
-  "study.skipped": "Pulado. Ele não vai aparecer de novo."
+  "study.skipped": "Pulado. Ele não vai aparecer de novo.",
+  "content.comments.authorHidden": "Comentários de {name} ocultos",
+  "content.comments.undo": "Desfazer"
 }

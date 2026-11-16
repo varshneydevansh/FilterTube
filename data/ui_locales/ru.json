@@ -2938,5 +2938,7 @@
   "askParent.answerNote": "Записка: {name}",
   "askParent.answerWatch": "Смотреть",
   "study.skipVideo": "Пропустить это видео",
-  "study.skipped": "Пропущено. Больше не появится."
+  "study.skipped": "Пропущено. Больше не появится.",
+  "content.comments.authorHidden": "Комментарии от {name} скрыты",
+  "content.comments.undo": "Отменить"
 }

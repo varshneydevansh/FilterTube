@@ -2926,5 +2926,7 @@
   "askParent.answerNote": "{name} bir not gönderdi",
   "askParent.answerWatch": "Şimdi izle",
   "study.skipVideo": "Bu videoyu atla",
-  "study.skipped": "Atlandı. Bir daha görünmeyecek."
+  "study.skipped": "Atlandı. Bir daha görünmeyecek.",
+  "content.comments.authorHidden": "{name} kullanıcısının yorumları gizlendi",
+  "content.comments.undo": "Geri al"
 }

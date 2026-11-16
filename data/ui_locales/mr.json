@@ -2926,5 +2926,7 @@
   "askParent.answerNote": "{name} यांची टीप",
   "askParent.answerWatch": "आत्ता बघ",
   "study.skipVideo": "हा व्हिडिओ वगळा",
-  "study.skipped": "वगळला. पुन्हा दिसणार नाही."
+  "study.skipped": "वगळला. पुन्हा दिसणार नाही.",
+  "content.comments.authorHidden": "{name} च्या टिप्पण्या लपवल्या",
+  "content.comments.undo": "पूर्ववत करा"
 }
