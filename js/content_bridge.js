@@ -837,6 +837,7 @@ function renderFilterTubeMenuEntries({ dropdown, newMenuList, oldMenuList, chann
                     : filterTubeCollaboratorGroupLabel(collaboratorCount)
             });
         }
+        injectStudySkipMenuItem(dropdown, videoCard, channelInfo);
         forceDropdownResize(dropdown);
         return;
     }
@@ -856,7 +857,72 @@ function renderFilterTubeMenuEntries({ dropdown, newMenuList, oldMenuList, chann
     } else if (containers.oldMenuList) {
         injectIntoOldMenu(containers.oldMenuList, channelInfo, videoCard, null, singleChannelInjectionOptions);
     }
+    injectStudySkipMenuItem(dropdown, videoCard, channelInfo);
     forceDropdownResize(dropdown);
+}
+
+/**
+ * "Skip this video" in a card's menu while a study round runs (Android: the card menu's Skip during
+ * study, StudyRuntime.skipVideo). It sits under the FilterTube entry, hides that video for this profile
+ * from then on and never unblocks anything, so a child may use it.
+ */
+function injectStudySkipMenuItem(dropdown, videoCard, channelInfo) {
+    try {
+        const settings = typeof currentSettings !== 'undefined' ? currentSettings : null;
+        if (!dropdown || settings?.study?.state !== 'STUDY') return;
+        const videoId = String(channelInfo?.videoId || videoCard?.getAttribute?.('data-filtertube-video-id')
+            || (typeof extractVideoIdFromCard === 'function' ? extractVideoIdFromCard(videoCard) : '') || '').trim();
+        if (!/^[A-Za-z0-9_-]{11}$/.test(videoId)) return;
+        const items = Array.from(dropdown.querySelectorAll('.filtertube-block-channel-item'));
+        items.filter(node => node.classList?.contains('filtertube-study-skip-item')).forEach(node => node.remove());
+        const anchor = items.filter(node => !node.classList?.contains('filtertube-study-skip-item')).pop();
+        if (!anchor || !anchor.parentNode) return;
+        const item = document.createElement(String(anchor.tagName || 'div').toLowerCase());
+        item.className = `${anchor.className} filtertube-study-skip-item`;
+        item.setAttribute('role', 'menuitem');
+        item.setAttribute('tabindex', '0');
+        item.setAttribute('data-filtertube-study-skip', videoId);
+        const inner = anchor.firstElementChild;
+        const row = document.createElement(inner ? String(inner.tagName).toLowerCase() : 'div');
+        row.className = inner?.className || 'filtertube-menu-item';
+        row.style.display = 'flex';
+        row.style.alignItems = 'center';
+        row.style.gap = '12px';
+        const icon = document.createElement('span');
+        icon.setAttribute('aria-hidden', 'true');
+        icon.style.cssText = 'display:flex;align-items:center;justify-content:center;width:24px;height:24px;flex-shrink:0;';
+        icon.appendChild(createFilterTubeIconElement());
+        const label = document.createElement('span');
+        label.className = 'filtertube-menu-title filtertube-study-skip-label';
+        label.textContent = filterTubeContentMenuText('study.skipVideo', 'Skip this video');
+        row.append(icon, label);
+        item.appendChild(row);
+        let busy = false;
+        const skip = async event => {
+            event?.preventDefault?.();
+            event?.stopImmediatePropagation?.();
+            event?.stopPropagation?.();
+            if (busy) return;
+            busy = true;
+            let response = null;
+            try {
+                response = await browserAPI_BRIDGE.runtime.sendMessage({ action: 'FilterTube_StudySkipVideo', videoId });
+            } catch (e) {
+            }
+            busy = false;
+            if (response?.ok !== true) return;
+            try {
+                videoCard?.setAttribute?.('data-filtertube-study-skipped', 'true');
+                if (videoCard?.style) videoCard.style.display = 'none';
+            } catch (e) {
+            }
+            try { forceCloseDropdown(dropdown); } catch (e) { }
+        };
+        item.addEventListener('click', skip, true);
+        item.addEventListener('keydown', event => { if (event.key === 'Enter' || event.key === ' ') skip(event); });
+        anchor.parentNode.insertBefore(item, anchor.nextSibling);
+    } catch (e) {
+    }
 }
 
 function updateInjectedMenuChannelName(dropdown, channelInfo) {
