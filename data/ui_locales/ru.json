@@ -2640,5 +2640,12 @@
   "mascot.sounds.off": "Выкл.",
   "mascot.sounds.gentle": "Мягко",
   "mascot.sounds.playful": "Игриво",
-  "mascot.sounds.description": "Мягко: тихие звуки только в важные моменты, например при достижении цели. Игриво: ещё касания и хлопки."
+  "mascot.sounds.description": "Мягко: тихие звуки только в важные моменты, например при достижении цели. Игриво: ещё касания и хлопки.",
+  "study.overlay.kidsTitle": "Время учёбы",
+  "study.overlay.kidsBody": "Детские видео ждут, пока ты учишься. Они вернутся на перерыве.",
+  "study.overlay.kidsBackAtBreak": "Перерыв через {left}, в {time}",
+  "study.overlay.kidsBackAtEnd": "Учёба закончится через {left}, в {time}",
+  "study.packs.kids": "Обучение для детей",
+  "study.packs.kidsLearning": "Обучение для этого возраста появится в детском разделе.",
+  "study.packs.kidsHold": "Детский раздел остаётся с детскими видео и встаёт на паузу во время учёбы."
 }

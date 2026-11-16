@@ -10,6 +10,11 @@
  *   again (dom_fallback's admission, which shows "Not part of today's study"), and a video still
  *   playing in the miniplayer, away from the watch page, is paused unless it was admitted under the
  *   rules in force now. A study round with no known pack and a clock hold get their own calm card.
+ * - Kids study time (Android StudyKidsSpace, KidsStudyTimeHost): on the Kids site, a study round
+ *   with no Kids learning pack holds Kids. Nothing loads there (the rules allow nothing) and every
+ *   page shows the calm study card with Kriti reading and the countdown to the next break, or to
+ *   the end of the last round. With a Kids learning pack the Kids site stays open with that pack.
+ *   Kriti is left out when the Companion setting is Off.
  * Copy comes from the bundled interface catalogs (data/ui_locales) through admission_overlay.js.
  * The state comes from the background (FilterTube_StudyState pushes, FilterTube_StudyGetState on load
  * and at each transition); this script keeps no clock of its own beyond those times.
@@ -36,6 +41,19 @@
     const SEND_AFTER_SECONDS = 60;
     const BREAK_WAIT_MAX_MS = 5 * 60 * 1000;
     const NOTICE_SHOW_MS = 10 * 1000;
+    const KIDS_TICK_MS = 1000;
+    const KRITI_READING = 'assets/images/mascots/kriti_reading.webp';
+    const COMPANION_KEY = 'ftCompanionMode';
+
+    /** "4:12" (minutes and seconds), rounded up so it never shows 0:00 early (Android StudyBreakClock). */
+    function countdown(leftMs) {
+        const seconds = Math.floor((Math.max(0, Number(leftMs) || 0) + 999) / 1000);
+        return `${Math.floor(seconds / 60)}:${String(seconds % 60).padStart(2, '0')}`;
+    }
+
+    function isKidsHost(hostname) {
+        return /(^|\.)youtubekids\.com$/.test(String(hostname || ''));
+    }
 
     function interpolate(template, values) {
         return String(template).replace(/\{([a-zA-Z][a-zA-Z0-9]*)\}/g, (match, key) =>
@@ -66,6 +84,10 @@
         let lastCheckAt = null;
         let holdingPlayback = false;
         let lastPhaseKey = null;
+        let kidsTick = null;
+        let companionOff = false;
+        const clearRepeat = env.clearInterval || (id => win.clearInterval?.(id));
+        const onKids = isKidsHost(win.location?.hostname);
         const localizer = () => env.localizer || win.FilterTubeAdmissionOverlay || null;
         function t(key, fallback, values) {
             let value = fallback;
@@ -137,6 +159,8 @@
             if (state.state === 'BREAK' && state.breakMode !== 'normal' && !state.breakSkipped) return 'rest';
             // Fail closed: a study round with no known pack (and no own allowed channels) is rest.
             if (state.state === 'STUDY' && state.phase === 'rest') return 'unavailable';
+            // Kids holds during an exam or class round; Kids learning packs keep it open.
+            if (onKids && state.state === 'STUDY' && state.kidsSpace === 'study_time') return 'kids';
             return null;
         }
 
@@ -193,7 +217,73 @@
             return node;
         }
 
+        function stopKidsTick() {
+            if (kidsTick !== null) clearRepeat(kidsTick);
+            kidsTick = null;
+        }
+
+        /** "Break in 4:12, at 5:30 PM", or "Study ends in ..." in the last round; empty once it is due. */
+        function kidsBackLine() {
+            const opensAt = Number(state?.kidsOpensAt);
+            const at = now();
+            if (!Number.isFinite(opensAt) || opensAt <= at) return '';
+            const values = { left: countdown(opensAt - at), time: formatTime(opensAt) };
+            return state.kidsOpensAtBreak
+                ? t('study.overlay.kidsBackAtBreak', 'Break in {left}, at {time}', values)
+                : t('study.overlay.kidsBackAtEnd', 'Study ends in {left}, at {time}', values);
+        }
+
+        /** Kids study time: the study card (admission_overlay's study card look) with Kriti reading. */
+        function showKidsStudyTime() {
+            removeElement(OVERLAY_ID);
+            stopKidsTick();
+            let dark = false;
+            try { dark = !!win.matchMedia?.('(prefers-color-scheme: dark)')?.matches; } catch (e) { }
+            const box = element('div', {
+                position: 'fixed', inset: '0', zIndex: '2147483646', display: 'flex', alignItems: 'center', justifyContent: 'center',
+                padding: 'clamp(16px, 4vw, 56px)', boxSizing: 'border-box', textAlign: 'center',
+                background: dark ? '#10201f' : '#EEF6F4', color: dark ? '#e6f2ef' : '#163f3c',
+                font: '400 15px/1.55 "Plus Jakarta Sans", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif'
+            });
+            box.id = OVERLAY_ID;
+            box.setAttribute('role', 'dialog');
+            box.setAttribute('aria-live', 'polite');
+            box.dataset.kind = 'kids';
+            const card = element('section', {
+                display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '10px', width: 'min(480px, 100%)', boxSizing: 'border-box',
+                padding: 'clamp(24px, 5vw, 40px)', borderRadius: '24px', border: '1px solid rgba(31,111,106,.25)',
+                background: dark ? 'rgba(20,40,38,.96)' : '#ffffff', boxShadow: '0 18px 50px rgba(22,63,60,.16)'
+            });
+            card.dataset.filtertubeStudyCard = 'kids';
+            let kritiUrl = '';
+            try { kritiUrl = companionOff ? '' : String(runtime.getURL?.(KRITI_READING) || ''); } catch (e) { }
+            if (kritiUrl) {
+                const kriti = element('img', { width: '120px', height: '120px', objectFit: 'contain' });
+                kriti.src = kritiUrl;
+                kriti.alt = '';
+                kriti.setAttribute('aria-hidden', 'true');
+                kriti.dataset.mascot = 'kriti-reading';
+                card.appendChild(kriti);
+            }
+            card.appendChild(element('div', { font: '700 clamp(22px, 3.6vw, 30px)/1.15 "Outfit", "Plus Jakarta Sans", sans-serif' },
+                t('study.overlay.kidsTitle', 'Study time')));
+            card.appendChild(element('div', { fontSize: '15px', maxWidth: '380px', lineHeight: '1.5', opacity: '.85' },
+                t('study.overlay.kidsBody', 'Kids videos wait while you study. They come back at your break.')));
+            const back = element('div', { fontSize: '16px', fontWeight: '600', fontVariantNumeric: 'tabular-nums', minHeight: '1.5em' });
+            back.dataset.role = 'kids-back';
+            back.textContent = kidsBackLine();
+            card.appendChild(back);
+            box.appendChild(card);
+            (doc.body || doc.documentElement).appendChild(box);
+            kidsTick = setRepeat(() => {
+                if (overlayKind() !== 'kids' || !doc.getElementById(OVERLAY_ID)) { stopKidsTick(); return; }
+                back.textContent = kidsBackLine();
+            }, KIDS_TICK_MS);
+        }
+
         function showOverlay(kind) {
+            if (kind === 'kids') { showKidsStudyTime(); return; }
+            stopKidsTick();
             removeElement(OVERLAY_ID);
             const rest = kind === 'rest';
             const box = element('div', {
@@ -257,6 +347,7 @@
             const kind = overlayKind();
             if (!kind) {
                 breakSeenAt = null;
+                stopKidsTick();
                 removeElement(OVERLAY_ID);
                 holdPlayback(false);
                 return;
@@ -293,7 +384,7 @@
             state = next && typeof next === 'object' && next.state ? next : null;
             // A phase change (study starts, a break, the limit, a hold) re-decides what is playing now,
             // including a video that was already playing when study started.
-            const phaseKey = state ? `${state.phase || 'normal'}|${state.state}|${state.sessionStart || ''}|${(state.packIds || []).join(',')}` : 'none';
+            const phaseKey = state ? `${state.phase || 'normal'}|${state.state}|${state.sessionStart || ''}|${(state.packIds || []).join(',')}|${state.kidsSpace || ''}` : 'none';
             if (lastPhaseKey !== null && phaseKey !== lastPhaseKey) recheckWatch();
             lastPhaseKey = phaseKey;
             render();
@@ -337,6 +428,14 @@
             try { Promise.resolve(localizer()?.loadLocale?.()).then(() => { if (state) render(); }).catch(() => {}); } catch (e) { }
             try { doc.addEventListener('visibilitychange', () => { if (!visible()) flush(); lastCheckAt = now(); }); } catch (e) { }
             try { win.addEventListener?.('pagehide', () => flush()); } catch (e) { }
+            // Companion Off: no characters, so the Kids study card shows without Kriti.
+            try {
+                const storage = env.storage || win.chrome?.storage?.local || win.browser?.storage?.local;
+                const apply = items => { companionOff = items?.[COMPANION_KEY] === 'off'; if (state) render(); };
+                const read = storage?.get?.([COMPANION_KEY]);
+                if (read && typeof read.then === 'function') read.then(apply).catch(() => {});
+                else storage?.get?.([COMPANION_KEY], apply);
+            } catch (e) { }
             setRepeat(checkTime, TICK_MS);
             refresh();
             return api;
@@ -346,5 +445,5 @@
         return api;
     }
 
-    return { OVERLAY_ID, NOTICE_ID, MINI_ID: 'filtertube-study-mini-gate', TICK_MS, BREAK_WAIT_MAX_MS, createStudyOverlay, autoStarted: false };
+    return { OVERLAY_ID, NOTICE_ID, MINI_ID: 'filtertube-study-mini-gate', TICK_MS, BREAK_WAIT_MAX_MS, KRITI_READING, countdown, isKidsHost, createStudyOverlay, autoStarted: false };
 }));

@@ -2640,5 +2640,12 @@
   "mascot.sounds.off": "ጠፍቷል",
   "mascot.sounds.gentle": "ረጋ ያለ",
   "mascot.sounds.playful": "ተጫዋች",
-  "mascot.sounds.description": "ረጋ ያለ ለትልልቅ ጊዜያት ብቻ፣ ለምሳሌ ግብ ሲደረስ፣ ለስላሳ ድምፅ ያሰማል። ተጫዋች መታ ማድረግና ፖፕ ይጨምራል።"
+  "mascot.sounds.description": "ረጋ ያለ ለትልልቅ ጊዜያት ብቻ፣ ለምሳሌ ግብ ሲደረስ፣ ለስላሳ ድምፅ ያሰማል። ተጫዋች መታ ማድረግና ፖፕ ይጨምራል።",
+  "study.overlay.kidsTitle": "የጥናት ጊዜ",
+  "study.overlay.kidsBody": "በምታጠናበት ጊዜ የልጆች ቪዲዮዎች ይጠብቃሉ። በእረፍትህ ጊዜ ይመለሳሉ።",
+  "study.overlay.kidsBackAtBreak": "እረፍት በ{left} ውስጥ፣ በ{time}",
+  "study.overlay.kidsBackAtEnd": "ጥናቱ በ{left} ውስጥ ያበቃል፣ በ{time}",
+  "study.packs.kids": "የልጆች ትምህርት",
+  "study.packs.kidsLearning": "ለዚህ ዕድሜ የልጆች ትምህርት በልጆች ቦታ ይታያል።",
+  "study.packs.kidsHold": "የልጆች ቦታ የልጆች ቪዲዮዎችን ይይዛል፣ በጥናት ጊዜም ይቆማል።"
 }

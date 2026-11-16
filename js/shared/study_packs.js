@@ -95,6 +95,8 @@
                 shortName: text(json.shortName) || null,
                 chips: strings(json.chips),
                 variants: parseVariants(json.variants),
+                // True when the variants are levels of one syllabus (JEE Main and Advanced), not branches.
+                variantsShareTopics: json.variantsShareTopics === true,
                 channels: array(json.channels).map(parseChannel).filter(Boolean)
             });
         }
@@ -141,8 +143,12 @@
         return [...own, ...nearby, ...global].filter(pack => !seen.has(pack.id) && seen.add(pack.id));
     }
 
-    /** The picker's two tabs: "exams" (kind study/exam) and "school" (kind class), for a country. */
+    /**
+     * The picker's tabs: "exams" (kind study/exam) and "school" (kind class), for a country, and
+     * "kids": Kids learning by age (the classic decades aren't study).
+     */
     function forTab(catalog, country, tab) {
+        if (tab === 'kids') return array(catalog?.packs).filter(pack => pack.kind === 'kids_age');
         return forCountry(catalog, country, { kinds: tab === 'school' ? ['class'] : ['study', 'exam'] });
     }
 

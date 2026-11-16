@@ -2640,5 +2640,12 @@
   "mascot.sounds.off": "关闭",
   "mascot.sounds.gentle": "轻柔",
   "mascot.sounds.playful": "活泼",
-  "mascot.sounds.description": "轻柔：只在重要时刻发出轻声，比如达成目标。活泼：还有轻点和啵的一声。"
+  "mascot.sounds.description": "轻柔：只在重要时刻发出轻声，比如达成目标。活泼：还有轻点和啵的一声。",
+  "study.overlay.kidsTitle": "学习时间",
+  "study.overlay.kidsBody": "你学习的时候，儿童视频会等着。休息时就回来。",
+  "study.overlay.kidsBackAtBreak": "{left}后休息（{time}）",
+  "study.overlay.kidsBackAtEnd": "{left}后学习结束（{time}）",
+  "study.packs.kids": "儿童学习",
+  "study.packs.kidsLearning": "这个年龄的儿童学习会显示在儿童空间。",
+  "study.packs.kidsHold": "儿童空间保留儿童视频，在学习时间暂停。"
 }

@@ -2640,5 +2640,12 @@
   "mascot.sounds.off": "बंद",
   "mascot.sounds.gentle": "सौम्य",
   "mascot.sounds.playful": "खेळकर",
-  "mascot.sounds.description": "सौम्य: फक्त मोठ्या क्षणांना हलका आवाज, जसे ध्येय पूर्ण झाल्यावर. खेळकर: टॅप आणि पॉपसुद्धा."
+  "mascot.sounds.description": "सौम्य: फक्त मोठ्या क्षणांना हलका आवाज, जसे ध्येय पूर्ण झाल्यावर. खेळकर: टॅप आणि पॉपसुद्धा.",
+  "study.overlay.kidsTitle": "अभ्यासाची वेळ",
+  "study.overlay.kidsBody": "तू अभ्यास करत असताना मुलांचे व्हिडिओ थांबतात. सुट्टीत परत येतील.",
+  "study.overlay.kidsBackAtBreak": "सुट्टी {left} मध्ये, {time} वाजता",
+  "study.overlay.kidsBackAtEnd": "अभ्यास {left} मध्ये संपेल, {time} वाजता",
+  "study.packs.kids": "मुलांचे शिक्षण",
+  "study.packs.kidsLearning": "या वयासाठी मुलांचे शिक्षण मुलांच्या जागेत दिसते.",
+  "study.packs.kidsHold": "मुलांच्या जागेत मुलांचे व्हिडिओ राहतात आणि अभ्यासाच्या वेळी ती थांबते."
 }

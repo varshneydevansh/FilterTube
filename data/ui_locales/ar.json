@@ -2640,5 +2640,12 @@
   "mascot.sounds.off": "إيقاف",
   "mascot.sounds.gentle": "هادئ",
   "mascot.sounds.playful": "مرِح",
-  "mascot.sounds.description": "هادئ: أصوات ناعمة للحظات الكبيرة فقط، مثل بلوغ هدف. مرِح: نقرات وفرقعات أيضًا."
+  "mascot.sounds.description": "هادئ: أصوات ناعمة للحظات الكبيرة فقط، مثل بلوغ هدف. مرِح: نقرات وفرقعات أيضًا.",
+  "study.overlay.kidsTitle": "وقت الدراسة",
+  "study.overlay.kidsBody": "تنتظر فيديوهات الأطفال أثناء دراستك. تعود في الاستراحة.",
+  "study.overlay.kidsBackAtBreak": "الاستراحة بعد {left}، في {time}",
+  "study.overlay.kidsBackAtEnd": "تنتهي الدراسة بعد {left}، في {time}",
+  "study.packs.kids": "تعلّم الأطفال",
+  "study.packs.kidsLearning": "يظهر تعلّم الأطفال لهذا العمر في مساحة الأطفال.",
+  "study.packs.kidsHold": "تحتفظ مساحة الأطفال بفيديوهات الأطفال وتتوقف وقت الدراسة."
 }

@@ -2777,5 +2777,12 @@
   "mascot.sounds.off": "Off",
   "mascot.sounds.gentle": "Gentle",
   "mascot.sounds.playful": "Playful",
-  "mascot.sounds.description": "Gentle plays soft sounds for big moments, like a goal met. Playful adds taps and pops."
+  "mascot.sounds.description": "Gentle plays soft sounds for big moments, like a goal met. Playful adds taps and pops.",
+  "study.overlay.kidsTitle": "Study time",
+  "study.overlay.kidsBody": "Kids videos wait while you study. They come back at your break.",
+  "study.overlay.kidsBackAtBreak": "Break in {left}, at {time}",
+  "study.overlay.kidsBackAtEnd": "Study ends in {left}, at {time}",
+  "study.packs.kids": "Kids learning",
+  "study.packs.kidsLearning": "Kids learning for this age shows in the Kids space.",
+  "study.packs.kidsHold": "The Kids space keeps Kids videos and pauses at study time."
 }

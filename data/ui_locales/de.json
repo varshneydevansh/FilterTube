@@ -2640,5 +2640,12 @@
   "mascot.sounds.off": "Aus",
   "mascot.sounds.gentle": "Sanft",
   "mascot.sounds.playful": "Verspielt",
-  "mascot.sounds.description": "Sanft: leise Töne nur für große Momente, etwa ein erreichtes Ziel. Verspielt: auch Tippen und Plopp."
+  "mascot.sounds.description": "Sanft: leise Töne nur für große Momente, etwa ein erreichtes Ziel. Verspielt: auch Tippen und Plopp.",
+  "study.overlay.kidsTitle": "Lernzeit",
+  "study.overlay.kidsBody": "Kindervideos warten, während du lernst. In deiner Pause sind sie wieder da.",
+  "study.overlay.kidsBackAtBreak": "Pause in {left}, um {time}",
+  "study.overlay.kidsBackAtEnd": "Lernen endet in {left}, um {time}",
+  "study.packs.kids": "Lernen für Kinder",
+  "study.packs.kidsLearning": "Lernen für Kinder in diesem Alter erscheint im Kinderbereich.",
+  "study.packs.kidsHold": "Der Kinderbereich behält Kindervideos und pausiert zur Lernzeit."
 }

@@ -578,7 +578,8 @@
                 select.appendChild(option);
             }
         };
-        const tabs = segmented([['exams', t('study.packs.exams', 'Exams')], ['school', t('study.packs.school', 'School')]], tab, value => {
+        const tabs = segmented([['exams', t('study.packs.exams', 'Exams')], ['school', t('study.packs.school', 'School')],
+            ['kids', t('study.packs.kids', 'Kids learning')]], tab, value => {
             tab = value;
             mark(tabs, value);
             fill();
@@ -589,6 +590,13 @@
         });
         row.append(tabs, select);
         wrap.appendChild(row);
+        // What Kids does during study: Kids learning packs show there; exam and class packs never do.
+        const kidsNote = engine()?.kidsSetupNote ? engine().kidsSetupNote(active, catalog) : null;
+        if (kidsNote) {
+            wrap.appendChild(el('p', 'ft-study-muted ft-study-packs__kids', kidsNote === 'kids_learning'
+                ? t('study.packs.kidsLearning', 'Kids learning for this age shows in Kids.')
+                : t('study.packs.kidsHold', 'Kids keeps Kids videos and pauses at study time.')));
+        }
         return wrap;
     }
 

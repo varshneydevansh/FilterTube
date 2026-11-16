@@ -821,7 +821,8 @@
       "computer organisation",
       "coa",
       "discrete mathematics",
-      "discrete maths"
+      "discrete maths",
+      "operating system"
      ],
      "channels": [
       "@GateSmashers",
@@ -829,7 +830,8 @@
       "@KNOWLEDGEGATE_kg",
       "@Gatecsit-dsai",
       "@abdul_bari",
-      "@nesoacademy"
+      "@nesoacademy",
+      "@JennyslecturesCSIT"
      ]
     },
     {
@@ -994,7 +996,8 @@
       "environmental engineering",
       "transportation engineering",
       "highway engineering",
-      "surveying"
+      "surveying",
+      "geotechnical"
      ],
      "channels": [
       "@MADEEASYEducation",
@@ -1261,6 +1264,7 @@
      ]
     }
    ],
+   "variantsShareTopics": true,
    "channels": [
     {
      "channelId": "UCiGyWN6DEbnj2alu7iapuKQ",
@@ -3052,7 +3056,10 @@
       "இணைந்த கணிதம்",
       "physics",
       "chemistry",
-      "maths stream"
+      "maths stream",
+      "භෞතික විද්‍යාව",
+      "රසායන විද්‍යාව",
+      "பௌதிகவியல்"
      ],
      "channels": [
       "@ajanthadissanayakeofficial8370",
@@ -3090,7 +3097,10 @@
       "ජීව විද්‍යාව",
       "bio stream",
       "physics",
-      "chemistry"
+      "chemistry",
+      "භෞතික විද්‍යාව",
+      "රසායන විද්‍යාව",
+      "பௌதிகவியல்"
      ],
      "channels": [
       "@BioApiSL",
@@ -3126,7 +3136,8 @@
       "business studies",
       "economics",
       "commerce stream",
-      "ගිණුම්කරණය"
+      "ගිණුම්කරණය",
+      "ict"
      ],
      "channels": [
       "@Accountingwithlasantha",
@@ -3157,7 +3168,8 @@
       "economics",
       "geography",
       "history",
-      "දේශපාලන විද්‍යාව"
+      "දේශපාලන විද්‍යාව",
+      "ict"
      ],
      "channels": [
       "@sanalisitisekara-political6614",
@@ -16088,7 +16100,11 @@
       "class 11 maths",
       "integrals",
       "electrostatics",
-      "pcm"
+      "pcm",
+      "class 11 physics",
+      "class 11 chemistry",
+      "units and measurement",
+      "sets relations functions"
      ],
      "channels": [
       "@NCERTWallahClass12PW",
@@ -16120,7 +16136,13 @@
       "genetics",
       "cell the unit of life",
       "human physiology",
-      "pcb"
+      "pcb",
+      "class 11 physics",
+      "class 11 chemistry",
+      "units and measurement",
+      "class 12 physics",
+      "class 12 chemistry",
+      "electrostatics"
      ],
      "channels": [
       "@NCERTWallahClass12PW",
@@ -16153,7 +16175,11 @@
       "class 11 accountancy",
       "business studies",
       "macroeconomics",
-      "partnership accounts"
+      "partnership accounts",
+      "class 12 accountancy partnership",
+      "applied maths",
+      "applied mathematics",
+      "maths"
      ],
      "channels": [
       "@NextToppers12Commerce",
@@ -18214,14 +18240,16 @@
       "FSc pre engineering",
       "FSc math",
       "mathematics",
-      "ECAT"
+      "ECAT",
+      "class 12 chemistry"
      ],
      "channels": [
       "@PhysicswithMuhammadArafatkhan",
       "@PhysicsInSeconds",
       "@mjdchemistry9241",
       "@chemistrybyprof.javediqbal",
-      "@onlineeducationacademy512"
+      "@onlineeducationacademy512",
+      "@pgclectures-federalboard9519"
      ]
     },
     {
@@ -18242,7 +18270,8 @@
       "FSc pre medical",
       "FSc biology",
       "biology",
-      "MDCAT"
+      "MDCAT",
+      "class 12 chemistry"
      ],
      "channels": [
       "@PhysicswithMuhammadArafatkhan",
@@ -18273,14 +18302,17 @@
       "computer science",
       "ICS computer",
       "programming",
-      "C++"
+      "C++",
+      "FSc math",
+      "ECAT"
      ],
      "channels": [
       "@YouthAcademy1",
       "@ComputerTeacherOfficial",
       "@icsatoz.",
       "@PhysicswithMuhammadArafatkhan",
-      "@PhysicsInSeconds"
+      "@PhysicsInSeconds",
+      "@pgclectures-federalboard9519"
      ]
     }
    ],
@@ -21596,7 +21628,9 @@
       "فيزياء",
       "كيمياء",
       "أحياء",
-      "جيولوجيا"
+      "جيولوجيا",
+      "علمي",
+      "عربي"
      ],
      "channels": [
       "@HossamDackrony.PhysicsDragon",
@@ -21625,7 +21659,8 @@
       "تاريخ",
       "جغرافيا",
       "فلسفة",
-      "علم نفس"
+      "علم نفس",
+      "فلسفة ومنطق"
      ],
      "channels": [
       "@MohamedTolbaa_",

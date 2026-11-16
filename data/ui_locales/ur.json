@@ -2640,5 +2640,12 @@
   "mascot.sounds.off": "بند",
   "mascot.sounds.gentle": "نرم",
   "mascot.sounds.playful": "چنچل",
-  "mascot.sounds.description": "نرم: صرف بڑے لمحوں پر ہلکی آواز، جیسے ہدف پورا ہونے پر۔ چنچل: ٹیپ اور پاپ بھی۔"
+  "mascot.sounds.description": "نرم: صرف بڑے لمحوں پر ہلکی آواز، جیسے ہدف پورا ہونے پر۔ چنچل: ٹیپ اور پاپ بھی۔",
+  "study.overlay.kidsTitle": "پڑھائی کا وقت",
+  "study.overlay.kidsBody": "جب تک تم پڑھتے ہو، بچوں کی ویڈیوز انتظار کرتی ہیں۔ وقفے میں واپس آئیں گی۔",
+  "study.overlay.kidsBackAtBreak": "وقفہ {left} میں، {time} بجے",
+  "study.overlay.kidsBackAtEnd": "پڑھائی {left} میں ختم، {time} بجے",
+  "study.packs.kids": "بچوں کی پڑھائی",
+  "study.packs.kidsLearning": "اس عمر کے لیے بچوں کی پڑھائی بچوں کی جگہ میں دکھتی ہے۔",
+  "study.packs.kidsHold": "بچوں کی جگہ بچوں کی ویڈیوز رکھتی ہے اور پڑھائی کے وقت رک جاتی ہے۔"
 }

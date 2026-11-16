@@ -198,6 +198,7 @@ const STUDY_TESTS = Object.freeze([
   'tests/runtime/study-clock-guard.test.mjs',
   'tests/runtime/study-ui.test.mjs',
   'tests/runtime/study-topic-synonyms.test.mjs',
+  'tests/runtime/study-branch-kids-parity.test.mjs',
 ]);
 // Companion characters in the popup and options page (js/mascots.js).
 const COMPANION_TESTS = Object.freeze([

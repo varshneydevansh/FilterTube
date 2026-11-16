@@ -249,8 +249,14 @@
             const transitions = [clock.next?.at, local.endRequestedAt ? local.endRequestedAt + Engine.GENTLE_END_PAUSE_MS : null,
                 clock.clockHold || clock.source === 'parent_lock' ? at + 60 * 1000 : null]
                 .filter(value => Number.isFinite(value) && value > at);
+            // Kids during a study round: "learning" (a Kids pack is active) or "study_time" (it holds).
+            const kidsSpace = applied.kidsSpace || 'untouched';
+            const kidsOpens = kidsSpace === 'study_time' && Engine.kidsOpensAt ? Engine.kidsOpensAt(clock) : null;
             return {
                 state: clock.state,
+                kidsSpace,
+                kidsOpensAt: kidsOpens ? kidsOpens.at : null,
+                kidsOpensAtBreak: kidsOpens ? kidsOpens.atBreak : false,
                 round: clock.round,
                 rounds: clock.rounds,
                 until: clock.until,

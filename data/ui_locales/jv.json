@@ -2640,5 +2640,12 @@
   "mascot.sounds.off": "Mati",
   "mascot.sounds.gentle": "Alon",
   "mascot.sounds.playful": "Rame",
-  "mascot.sounds.description": "Alon: swara lembut mung kanggo wayah gedhe, kaya target kagayuh. Rame: uga tutulan lan pop."
+  "mascot.sounds.description": "Alon: swara lembut mung kanggo wayah gedhe, kaya target kagayuh. Rame: uga tutulan lan pop.",
+  "study.overlay.kidsTitle": "Wektu sinau",
+  "study.overlay.kidsBody": "Video bocah ngenteni nalika kowe sinau. Bakal bali nalika ngaso.",
+  "study.overlay.kidsBackAtBreak": "Ngaso ing {left}, jam {time}",
+  "study.overlay.kidsBackAtEnd": "Sinau rampung ing {left}, jam {time}",
+  "study.packs.kids": "Sinau bocah",
+  "study.packs.kidsLearning": "Sinau bocah kanggo umur iki katon ing papan bocah.",
+  "study.packs.kidsHold": "Papan bocah tetep isi video bocah lan mandheg nalika wektu sinau."
 }

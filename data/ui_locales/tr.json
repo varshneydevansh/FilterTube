@@ -2640,5 +2640,12 @@
   "mascot.sounds.off": "Kapalı",
   "mascot.sounds.gentle": "Yumuşak",
   "mascot.sounds.playful": "Neşeli",
-  "mascot.sounds.description": "Yumuşak: yalnızca hedefe ulaşmak gibi büyük anlarda hafif sesler. Neşeli: dokunma ve pıt sesleri de."
+  "mascot.sounds.description": "Yumuşak: yalnızca hedefe ulaşmak gibi büyük anlarda hafif sesler. Neşeli: dokunma ve pıt sesleri de.",
+  "study.overlay.kidsTitle": "Ders zamanı",
+  "study.overlay.kidsBody": "Sen ders çalışırken çocuk videoları bekler. Molanda geri gelirler.",
+  "study.overlay.kidsBackAtBreak": "Mola {left} sonra, saat {time}",
+  "study.overlay.kidsBackAtEnd": "Ders {left} sonra bitiyor, saat {time}",
+  "study.packs.kids": "Çocuklar için öğrenme",
+  "study.packs.kidsLearning": "Bu yaş için çocuk öğrenme içerikleri çocuk alanında görünür.",
+  "study.packs.kidsHold": "Çocuk alanı çocuk videolarını korur ve ders zamanında durur."
 }

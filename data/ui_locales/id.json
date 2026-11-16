@@ -2640,5 +2640,12 @@
   "mascot.sounds.off": "Nonaktif",
   "mascot.sounds.gentle": "Lembut",
   "mascot.sounds.playful": "Ceria",
-  "mascot.sounds.description": "Lembut: suara halus hanya untuk momen besar, seperti target tercapai. Ceria: juga ketukan dan letupan kecil."
+  "mascot.sounds.description": "Lembut: suara halus hanya untuk momen besar, seperti target tercapai. Ceria: juga ketukan dan letupan kecil.",
+  "study.overlay.kidsTitle": "Waktunya belajar",
+  "study.overlay.kidsBody": "Video anak menunggu selagi kamu belajar. Kembali saat istirahat.",
+  "study.overlay.kidsBackAtBreak": "Istirahat dalam {left}, pukul {time}",
+  "study.overlay.kidsBackAtEnd": "Belajar selesai dalam {left}, pukul {time}",
+  "study.packs.kids": "Belajar anak",
+  "study.packs.kidsLearning": "Belajar anak untuk usia ini tampil di ruang anak.",
+  "study.packs.kidsHold": "Ruang anak tetap berisi video anak dan berhenti sejenak saat waktu belajar."
 }

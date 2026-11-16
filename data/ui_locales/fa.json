@@ -2640,5 +2640,12 @@
   "mascot.sounds.off": "خاموش",
   "mascot.sounds.gentle": "ملایم",
   "mascot.sounds.playful": "بازیگوش",
-  "mascot.sounds.description": "ملایم: صداهای نرم فقط برای لحظه‌های بزرگ، مثل رسیدن به هدف. بازیگوش: ضربه‌ها و پاپ‌ها هم."
+  "mascot.sounds.description": "ملایم: صداهای نرم فقط برای لحظه‌های بزرگ، مثل رسیدن به هدف. بازیگوش: ضربه‌ها و پاپ‌ها هم.",
+  "study.overlay.kidsTitle": "وقت درس",
+  "study.overlay.kidsBody": "ویدیوهای کودکان تا وقتی درس می‌خوانی منتظر می‌مانند. در استراحت برمی‌گردند.",
+  "study.overlay.kidsBackAtBreak": "استراحت تا {left} دیگر، ساعت {time}",
+  "study.overlay.kidsBackAtEnd": "درس تا {left} دیگر تمام می‌شود، ساعت {time}",
+  "study.packs.kids": "یادگیری کودکان",
+  "study.packs.kidsLearning": "یادگیری کودکان برای این سن در فضای کودکان نشان داده می‌شود.",
+  "study.packs.kidsHold": "فضای کودکان ویدیوهای کودکان را نگه می‌دارد و در وقت درس متوقف می‌شود."
 }

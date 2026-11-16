@@ -2640,5 +2640,12 @@
   "mascot.sounds.off": "ఆఫ్",
   "mascot.sounds.gentle": "మృదువు",
   "mascot.sounds.playful": "సరదా",
-  "mascot.sounds.description": "మృదువు: లక్ష్యం చేరినప్పుడు లాంటి పెద్ద క్షణాల్లో మాత్రమే మెత్తని శబ్దం. సరదా: ట్యాప్, పాప్ శబ్దాలు కూడా."
+  "mascot.sounds.description": "మృదువు: లక్ష్యం చేరినప్పుడు లాంటి పెద్ద క్షణాల్లో మాత్రమే మెత్తని శబ్దం. సరదా: ట్యాప్, పాప్ శబ్దాలు కూడా.",
+  "study.overlay.kidsTitle": "చదువుకునే సమయం",
+  "study.overlay.kidsBody": "నువ్వు చదువుకునేటప్పుడు పిల్లల వీడియోలు ఎదురుచూస్తాయి. విరామంలో తిరిగి వస్తాయి.",
+  "study.overlay.kidsBackAtBreak": "విరామం {left}లో, {time}కి",
+  "study.overlay.kidsBackAtEnd": "చదువు {left}లో ముగుస్తుంది, {time}కి",
+  "study.packs.kids": "పిల్లల నేర్చుకోవడం",
+  "study.packs.kidsLearning": "ఈ వయసుకు పిల్లల నేర్చుకోవడం పిల్లల స్థలంలో కనిపిస్తుంది.",
+  "study.packs.kidsHold": "పిల్లల స్థలం పిల్లల వీడియోలనే ఉంచుతుంది, చదువుకునే సమయంలో ఆగుతుంది."
 }

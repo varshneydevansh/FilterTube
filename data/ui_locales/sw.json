@@ -2640,5 +2640,12 @@
   "mascot.sounds.off": "Imezimwa",
   "mascot.sounds.gentle": "Tulivu",
   "mascot.sounds.playful": "Uchangamfu",
-  "mascot.sounds.description": "Tulivu: sauti laini kwa matukio makubwa tu, kama kufikia lengo. Uchangamfu: pia sauti za kugusa na kupasuka."
+  "mascot.sounds.description": "Tulivu: sauti laini kwa matukio makubwa tu, kama kufikia lengo. Uchangamfu: pia sauti za kugusa na kupasuka.",
+  "study.overlay.kidsTitle": "Muda wa kusoma",
+  "study.overlay.kidsBody": "Video za watoto zinasubiri unaposoma. Zitarudi wakati wa mapumziko.",
+  "study.overlay.kidsBackAtBreak": "Mapumziko baada ya {left}, saa {time}",
+  "study.overlay.kidsBackAtEnd": "Kusoma kunaisha baada ya {left}, saa {time}",
+  "study.packs.kids": "Kujifunza kwa watoto",
+  "study.packs.kidsLearning": "Kujifunza kwa watoto wa umri huu kunaonekana katika eneo la watoto.",
+  "study.packs.kidsHold": "Eneo la watoto linabaki na video za watoto na linasimama wakati wa kusoma."
 }

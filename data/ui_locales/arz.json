@@ -2640,5 +2640,12 @@
   "mascot.sounds.off": "مقفول",
   "mascot.sounds.gentle": "هادي",
   "mascot.sounds.playful": "مرح",
-  "mascot.sounds.description": "هادي: أصوات ناعمة للحظات الكبيرة بس، زي لما توصل لهدفك. مرح: كمان نقرات وفرقعات."
+  "mascot.sounds.description": "هادي: أصوات ناعمة للحظات الكبيرة بس، زي لما توصل لهدفك. مرح: كمان نقرات وفرقعات.",
+  "study.overlay.kidsTitle": "وقت المذاكرة",
+  "study.overlay.kidsBody": "فيديوهات الأطفال مستنية وإنت بتذاكر. هترجع في البريك.",
+  "study.overlay.kidsBackAtBreak": "البريك بعد {left}، الساعة {time}",
+  "study.overlay.kidsBackAtEnd": "المذاكرة هتخلص بعد {left}، الساعة {time}",
+  "study.packs.kids": "تعليم الأطفال",
+  "study.packs.kidsLearning": "تعليم الأطفال للسن ده بيظهر في مساحة الأطفال.",
+  "study.packs.kidsHold": "مساحة الأطفال بتفضل فيها فيديوهات أطفال وبتقف وقت المذاكرة."
 }

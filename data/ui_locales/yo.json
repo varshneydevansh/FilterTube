@@ -2640,5 +2640,12 @@
   "mascot.sounds.off": "Pa",
   "mascot.sounds.gentle": "Jẹ́jẹ́",
   "mascot.sounds.playful": "Eré",
-  "mascot.sounds.description": "Jẹ́jẹ́: ohùn rírọ̀ fún àwọn àkókò ńlá nìkan, bí ìgbà tí o bá dé àfojúsùn. Eré: ìfọwọ́kàn àti pọ́ọ̀pù pẹ̀lú."
+  "mascot.sounds.description": "Jẹ́jẹ́: ohùn rírọ̀ fún àwọn àkókò ńlá nìkan, bí ìgbà tí o bá dé àfojúsùn. Eré: ìfọwọ́kàn àti pọ́ọ̀pù pẹ̀lú.",
+  "study.overlay.kidsTitle": "Àkókò ẹ̀kọ́",
+  "study.overlay.kidsBody": "Àwọn fídíò ọmọdé ń dúró nígbà tí o bá ń kàwé. Wọn yóò padà dé ní ìsinmi rẹ.",
+  "study.overlay.kidsBackAtBreak": "Ìsinmi ní {left}, ní {time}",
+  "study.overlay.kidsBackAtEnd": "Ẹ̀kọ́ parí ní {left}, ní {time}",
+  "study.packs.kids": "Ẹ̀kọ́ ọmọdé",
+  "study.packs.kidsLearning": "Ẹ̀kọ́ ọmọdé fún ọjọ́ orí yìí ń hàn ní ibi ọmọdé.",
+  "study.packs.kidsHold": "Ibi ọmọdé ń pa àwọn fídíò ọmọdé mọ́, ó sì ń dúró ní àkókò ẹ̀kọ́."
 }

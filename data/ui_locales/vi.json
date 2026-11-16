@@ -2640,5 +2640,12 @@
   "mascot.sounds.off": "Tắt",
   "mascot.sounds.gentle": "Nhẹ nhàng",
   "mascot.sounds.playful": "Vui nhộn",
-  "mascot.sounds.description": "Nhẹ nhàng: âm thanh khẽ chỉ cho khoảnh khắc lớn, như khi đạt mục tiêu. Vui nhộn: thêm tiếng chạm và tiếng bụp."
+  "mascot.sounds.description": "Nhẹ nhàng: âm thanh khẽ chỉ cho khoảnh khắc lớn, như khi đạt mục tiêu. Vui nhộn: thêm tiếng chạm và tiếng bụp.",
+  "study.overlay.kidsTitle": "Giờ học",
+  "study.overlay.kidsBody": "Video thiếu nhi chờ trong lúc bạn học. Chúng quay lại vào giờ nghỉ.",
+  "study.overlay.kidsBackAtBreak": "Nghỉ sau {left}, lúc {time}",
+  "study.overlay.kidsBackAtEnd": "Hết giờ học sau {left}, lúc {time}",
+  "study.packs.kids": "Học cho thiếu nhi",
+  "study.packs.kidsLearning": "Nội dung học cho độ tuổi này hiện trong không gian thiếu nhi.",
+  "study.packs.kidsHold": "Không gian thiếu nhi giữ video thiếu nhi và tạm dừng vào giờ học."
 }

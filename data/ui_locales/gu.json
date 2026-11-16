@@ -2640,5 +2640,12 @@
   "mascot.sounds.off": "બંધ",
   "mascot.sounds.gentle": "હળવો",
   "mascot.sounds.playful": "રમતિયાળ",
-  "mascot.sounds.description": "હળવો: ફક્ત મોટી પળો માટે નરમ અવાજ, જેમ કે લક્ષ્ય પૂરું થાય ત્યારે. રમતિયાળ: ટૅપ અને પૉપ પણ."
+  "mascot.sounds.description": "હળવો: ફક્ત મોટી પળો માટે નરમ અવાજ, જેમ કે લક્ષ્ય પૂરું થાય ત્યારે. રમતિયાળ: ટૅપ અને પૉપ પણ.",
+  "study.overlay.kidsTitle": "ભણવાનો સમય",
+  "study.overlay.kidsBody": "તમે ભણો ત્યાં સુધી બાળકોના વીડિયો રાહ જુએ છે. વિરામમાં પાછા આવશે.",
+  "study.overlay.kidsBackAtBreak": "વિરામ {left} પછી, {time} વાગ્યે",
+  "study.overlay.kidsBackAtEnd": "ભણવાનું {left} પછી પૂરું, {time} વાગ્યે",
+  "study.packs.kids": "બાળકોનું શિક્ષણ",
+  "study.packs.kidsLearning": "આ ઉંમરનું બાળકોનું શિક્ષણ બાળકોની જગ્યામાં દેખાય છે.",
+  "study.packs.kidsHold": "બાળકોની જગ્યા બાળકોના વીડિયો રાખે છે અને ભણવાના સમયે અટકે છે."
 }

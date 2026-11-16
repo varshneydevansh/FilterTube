@@ -24,6 +24,15 @@
  *    Fail closed: a study round with no known pack (catalog failed, pack removed, empty pack list)
  *    uses the person's own allowed channels, or rest; never the normal rules. The master switch and
  *    comments can't be turned on during study.
+ *    Branches (Android StudyPackCatalog channelsFor/topicsFor, StudyBranchFilter): a pack with
+ *    branches gives the chosen branch's channels plus the pack channels no branch claims, and the
+ *    shared topics plus the branch's own. For packs with separate branches, a title that names a
+ *    topic only other branches study and none of the studied ones is hidden: one title-only block
+ *    row (source "study_branch") on Main, so feeds, Shorts, search and the Watch gate agree.
+ *    Kids (Android StudyKidsSpace): only Kids packs (kids_age, kids_classic) drive the Kids site.
+ *    In a study round with one active, Kids gets those packs' allow layer ("learning"); with exam,
+ *    class or skill packs only, Kids holds at rest ("study_time") and study_overlay.js shows Kriti's
+ *    study-time card. Outside a round the Kids site is "untouched".
  * 3. Progress helpers: minutes per device id and local date.
  */
 (function (root, factory) {
@@ -50,6 +59,16 @@
     // Pack topics: they match a video's title only, never its channel name or category (audit M1).
     const TOPIC_SOURCE = 'study_topic';
     const TAG_PREFIX = 'study:';
+    // The one row that hides another branch's uploads (studyBranchFilter).
+    const BRANCH_SOURCE = 'study_branch';
+    const KIDS_KINDS = Object.freeze(['kids_age', 'kids_classic']);
+    const KIDS_SPACE = Object.freeze({ UNTOUCHED: 'untouched', LEARNING: 'learning', STUDY_TIME: 'study_time' });
+    /*
+     * Branch words too common elsewhere to hide a video by (Android StudyPack.AMBIGUOUS_BRANCH_WORDS):
+     * "networks" also names water and road networks, "manufacturing" cement factory tours a Civil
+     * search wants, "logic" logic gates in ICT.
+     */
+    const AMBIGUOUS_BRANCH_WORDS = Object.freeze(['networks', 'measurements', 'communications', 'communication', 'manufacturing', 'logic']);
 
     /*
      * Study search suggestions (Android StudySuggestions.kt, StaticSuggestions; kept identical). The
@@ -489,22 +508,205 @@
             || variants.find(variant => variant.isDefault === true || variant.default === true) || variants[0] || null;
     }
 
+    function handleKey(value) { return text(value).replace(/^@/, '').toLowerCase(); }
+
+    function variantsOf(pack) { return array(object(pack).variants).filter(isObject); }
+
+    function distinctByKey(list) {
+        const seen = new Set();
+        return array(list).filter(value => {
+            const key = wordKey(value);
+            return !!key && !seen.has(key) && !!seen.add(key);
+        });
+    }
+
+    /**
+     * The channels studied with a branch (Android StudyPack.channelsFor): that branch's own plus the
+     * pack channels no branch claims (NPTEL, MIT OpenCourseWare). Another branch's channels drop out,
+     * so GATE Civil doesn't keep the CSE channels. Packs without branches keep every channel.
+     */
+    function packChannelsFor(pack, variantId) {
+        const channels = array(object(pack).channels).filter(isObject);
+        const variants = variantsOf(pack);
+        if (!variants.length) return channels;
+        const chosen = new Set(array(packVariant(pack, variantId)?.channels).map(handleKey));
+        const claimed = new Set(variants.flatMap(variant => array(variant.channels)).map(handleKey));
+        return channels.filter(channel => {
+            const keys = [channel.handle, channel.channelId].map(handleKey).filter(Boolean);
+            return keys.some(key => chosen.has(key)) || !keys.some(key => claimed.has(key));
+        });
+    }
+
+    /**
+     * The topics studied with a branch (Android StudyPack.topicsFor): the pack's shared topics plus
+     * that branch's own. A pack topic another branch names ("thermodynamics" for ME) drops out.
+     */
+    function packTopicsFor(pack, variantId) {
+        const value = object(pack);
+        const base = [...array(value.keywords), ...Object.values(object(value.gradeKeywords)).flat()].map(text).filter(Boolean);
+        const variants = variantsOf(pack);
+        if (!variants.length) return distinctByKey(base);
+        const chosen = packVariant(pack, variantId);
+        const terms = variant => [...array(variant?.keywords), ...array(variant?.chips)].map(wordKey);
+        const own = new Set(terms(chosen));
+        const claimed = new Set(variants.flatMap(terms));
+        const shared = base.filter(topic => own.has(wordKey(topic)) || !claimed.has(wordKey(topic)));
+        return distinctByKey([...shared, ...array(chosen?.keywords).map(text)]);
+    }
+
+    /** True when choosing a variant hides the other variants' uploads (GATE branches, school streams). */
+    function hasSeparateBranches(pack) {
+        return variantsOf(pack).length > 1 && object(pack).variantsShareTopics !== true;
+    }
+
+    function hasLowerCase(value) { return /\p{Ll}/u.test(value); }
+
+    /** A branch's keywords and chips, its acronym name ("CSE", not "EE") and "<exam> <branch>" ("GATE Civil"). */
+    function branchTerms(pack, variant) {
+        const names = object(variant.names || variant.name);
+        const name = text(names.en) || text(Object.values(names)[0]) || text(variant.id);
+        const single = !!name && !/\s/.test(name);
+        const out = [...array(variant.keywords), ...array(variant.chips)].map(text).filter(Boolean);
+        if (single && name.length >= 3 && !hasLowerCase(name)) out.push(name);
+        const exam = text(object(pack).shortName);
+        if (single && exam) out.push(`${exam} ${name}`);
+        return out;
+    }
+
+    /**
+     * What names a branch in a title (Android StudyPack.branchTopics): its own keywords and chips, its
+     * acronym and "<exam> <branch>", without the terms every branch shares ("Engineering maths",
+     * "Previous year questions"), which name no branch. Empty without separate branches.
+     */
+    function branchTopics(pack, variantId) {
+        if (!hasSeparateBranches(pack)) return [];
+        const chosen = packVariant(pack, variantId);
+        if (!chosen) return [];
+        const sets = variantsOf(pack).map(variant => new Set(branchTerms(pack, variant).map(wordKey)));
+        const common = new Set([...sets[0]].filter(key => sets.every(set => set.has(key))));
+        return distinctByKey(branchTerms(pack, chosen).filter(term => !common.has(wordKey(term))));
+    }
+
+    /**
+     * Topics only the other branches name ("dbms", "gate cse", "power electronics" for GATE Civil;
+     * Android StudyPack.otherBranchTopics). Topics the chosen branch also names stay out, and so do
+     * short or ambiguous words: a lowercase word of three letters or fewer ("toc", "som", "et") and
+     * AMBIGUOUS_BRANCH_WORDS. "EE" and "ME" only count as "gate ee" / "gate me".
+     */
+    function otherBranchTopics(pack, variantId) {
+        if (!hasSeparateBranches(pack)) return [];
+        const chosen = packVariant(pack, variantId);
+        if (!chosen) return [];
+        const own = new Set(branchTerms(pack, chosen).map(wordKey));
+        const others = variantsOf(pack).filter(variant => variant !== chosen && variant.id !== chosen.id)
+            .flatMap(variant => branchTerms(pack, variant));
+        return distinctByKey(others.filter(term => {
+            const key = wordKey(term);
+            if (own.has(key) || key.length < 2) return false;
+            if (key.includes(' ')) return true;
+            if (AMBIGUOUS_BRANCH_WORDS.includes(key)) return false;
+            return key.length > 3 || (key.length === 3 && !hasLowerCase(term));
+        }));
+    }
+
+    /**
+     * Another branch's uploads (Android StudyBranchFilter.of): {ownTopics, otherBranchTopics}, or null
+     * when no pack has separate branches. Multi-branch channels (MADE EASY, ACE, GATE Academy) upload
+     * every branch's lectures, so a GATE Civil student would otherwise get "GATE CSE DBMS" lectures.
+     * A branched pack counts its branch's topics and the topics the user added as its own; a pack
+     * without branches counts all its topics, so GATE Civil + JEE keeps "thermodynamics". Shared
+     * subjects (engineering maths, aptitude, past papers) name no branch, so they never hide a video.
+     */
+    function studyBranchFilter(packs, edits) {
+        const list = array(packs).filter(isObject);
+        if (!list.some(hasSeparateBranches)) return null;
+        const changes = object(edits);
+        const own = distinctByKey(list.flatMap(pack => {
+            const edit = object(changes[pack.id]);
+            return [...(hasSeparateBranches(pack) ? branchTopics(pack, edit.variant) : packTopicsFor(pack, edit.variant)),
+                ...array(edit.topicsAdded).map(text)];
+        }));
+        const ownKeys = new Set(own.map(wordKey));
+        const other = distinctByKey(list.flatMap(pack => otherBranchTopics(pack, object(changes[pack.id]).variant))
+            .filter(topic => !ownKeys.has(wordKey(topic))));
+        return other.length ? { ownTopics: own, otherBranchTopics: other } : null;
+    }
+
+    /** True for a title that names another branch's topic and none of the studied ones. */
+    function branchFilterDrops(filter, title) {
+        if (!filter) return false;
+        const value = String(title || '');
+        return topicPatterns(filter.otherBranchTopics).some(pattern => pattern.test(value))
+            && !topicPatterns(filter.ownTopics).some(pattern => pattern.test(value));
+    }
+
+    /**
+     * The filter as one title-only block row: a pattern that matches exactly the titles
+     * branchFilterDrops() drops, so the JSON filter, the page filter and the Watch gate use it as they
+     * use any blocked word. Null without a filter.
+     */
+    function branchFilterRow(filter) {
+        if (!filter) return null;
+        const alternatives = topics => topicPatterns(topics).map(pattern => pattern.source).join('|');
+        const other = alternatives(filter.otherBranchTopics);
+        if (!other) return null;
+        const own = alternatives(filter.ownTopics);
+        const word = `^${own ? `(?![\\s\\S]*(?:${own}))` : ''}(?=[\\s\\S]*(?:${other}))`;
+        return { word, matchMode: 'regex', regexFlags: 'iu', exact: false, comments: false, titleOnly: true,
+            source: BRANCH_SOURCE, managedListId: `${TAG_PREFIX}branch` };
+    }
+
+    function isKidsPack(pack) { return KIDS_KINDS.includes(text(object(pack).kind)); }
+
+    /** The active packs that are Kids packs, in their order. Unknown packs (or no catalog) are not. */
+    function kidsPackIds(packIds, catalog) {
+        const packs = array(object(catalog).packs);
+        return array(packIds).filter(id => isKidsPack(packs.find(pack => pack.id === id)));
+    }
+
+    /**
+     * What the Kids site shows now (Android StudyKidsSpace.kind): "untouched" outside a study round
+     * (normal rules, a break, the limit: those already have their own screens), "learning" in a round
+     * with a Kids pack active, else "study_time".
+     */
+    function studyKidsSpace(phase, packIds, catalog) {
+        if (phase !== 'study') return KIDS_SPACE.UNTOUCHED;
+        return kidsPackIds(packIds, catalog).length ? KIDS_SPACE.LEARNING : KIDS_SPACE.STUDY_TIME;
+    }
+
+    /**
+     * When Kids opens again during a study round (Android StudyKidsSpace.opensAt): the next break,
+     * else (the last round) the end of the session. {at, atBreak}, or null outside a round.
+     */
+    function kidsOpensAt(clock) {
+        const value = object(clock);
+        if (value.state !== STUDY) return null;
+        if (object(value.next).state === BREAK && Number.isFinite(value.until)) return { at: value.until, atBreak: true };
+        const end = Number.isFinite(value.sessionEnd) ? value.sessionEnd : value.until;
+        return Number.isFinite(end) ? { at: end, atBreak: false } : null;
+    }
+
+    /** The one-line Kids note under the pack picker (Android StudyKidsSpace.setupNote); null with nothing chosen. */
+    function kidsSetupNote(selected, catalog) {
+        if (!array(selected).length) return null;
+        return kidsPackIds(selected, catalog).length ? 'kids_learning' : 'kids_hold';
+    }
+
     function packLayer(pack, edits) {
         const change = object(edits);
         const removedChannels = array(change.channelsRemoved);
         const removedTopics = new Set(array(change.topicsRemoved).map(wordKey));
         const channels = [];
-        for (const channel of [...array(pack.channels), ...array(change.channelsAdded)]) {
+        for (const channel of [...packChannelsFor(pack, change.variant), ...array(change.channelsAdded)]) {
             if (removedChannels.some(removed => sameChannel(channel, removed))) continue;
             if (channels.some(existing => sameChannel(existing, channel))) continue;
             channels.push({ channelId: text(channel.channelId) || null, handle: text(channel.handle) || null, name: text(channel.name) });
         }
         const keywords = [];
         const seen = new Set();
-        const grades = Object.values(object(pack.gradeKeywords)).flat();
-        // The chosen branch's topics (GATE CSE: "dbms", ...) join the pack's own.
-        const variantWords = array(packVariant(pack, change.variant)?.keywords);
-        for (const word of [...array(pack.keywords), ...grades, ...variantWords, ...array(change.topicsAdded)]) {
+        // The pack's shared topics and the chosen branch's own (GATE CSE: "dbms", ...); a topic
+        // another branch names drops out.
+        for (const word of [...packTopicsFor(pack, change.variant), ...array(change.topicsAdded)]) {
             const key = wordKey(word);
             if (!key || removedTopics.has(key) || seen.has(key)) continue;
             seen.add(key);
@@ -514,7 +716,7 @@
         const variantId = text(packVariant(pack, change.variant)?.id) || null;
         const synonyms = studyAllowPhrases(pack.id, variantId, keywords)
             .filter(phrase => !removedTopics.has(wordKey(phrase)) && !seen.has(wordKey(phrase)));
-        return { id: pack.id, channels, keywords, synonyms, blockedWords: array(pack.blockedWords).map(text).filter(Boolean) };
+        return { id: pack.id, kind: text(pack.kind), channels, keywords, synonyms, blockedWords: array(pack.blockedWords).map(text).filter(Boolean) };
     }
 
     /**
@@ -553,12 +755,11 @@
         for (const id of array(value.activePackIds)) {
             const pack = packs.find(item => item.id === id);
             if (pack) {
-                const variantWords = array(packVariant(pack, object(object(value.packEdits)[id]).variant)?.keywords);
-                const seen = new Set();
-                const topics = [...array(pack.keywords), ...Object.values(object(pack.gradeKeywords)).flat(), ...variantWords]
-                    .map(text).filter(word => word && !seen.has(wordKey(word)) && seen.add(wordKey(word))).slice(0, 400);
+                // The chosen branch's channels and topics (Android StudyPackCopy.of).
+                const variantId = object(object(value.packEdits)[id]).variant;
+                const topics = packTopicsFor(pack, variantId).slice(0, 400);
                 copies[id] = {
-                    channels: array(pack.channels).slice(0, 400).map(channel => ({
+                    channels: packChannelsFor(pack, variantId).slice(0, 400).map(channel => ({
                         ...(text(channel.channelId) ? { channelId: text(channel.channelId) } : {}),
                         ...(text(channel.handle) ? { handle: text(channel.handle) } : {}),
                         ...(text(channel.name) ? { name: text(channel.name) } : {})
@@ -602,7 +803,7 @@
         return out;
     }
 
-    function studySurface(surface, layers, { kids, packChannelsOnly = false }) {
+    function studySurface(surface, layers, { kids, packChannelsOnly = false, branchRow = null }) {
         const data = object(surface);
         const savedLayering = text(data.mode) === 'whitelist' ? (data.layered === true ? 'layered' : 'whitelist') : 'blocklist';
         // The user's own allowed channels stay; rows a mode switch only copied over (blocklist users)
@@ -627,6 +828,8 @@
             ...layers.flatMap(layer => array(layer.synonyms).map(word => packWordRow(word, layer.id, TOPIC_SOURCE)))
         ];
         const blockWords = layers.flatMap(layer => layer.blockedWords.map(word => packWordRow(word, layer.id)));
+        // Another branch's uploads ("GATE CSE DBMS" while GATE Civil is studied) are hidden by title.
+        if (branchRow) blockWords.push(branchRow);
         const blockKey = kids ? 'blockedKeywords' : (Array.isArray(data.keywords) || !Array.isArray(data.blockedKeywords) ? 'keywords' : 'blockedKeywords');
         const next = {
             ...clone(data),
@@ -679,14 +882,14 @@
     function studyEffectiveProfile(profile, { catalog, clock, study } = {}) {
         const source = object(profile);
         const value = study || source.study;
-        const unchanged = { profile, applied: false, packIds: [], phase: 'normal', failClosed: false };
+        const unchanged = { profile, applied: false, packIds: [], phase: 'normal', failClosed: false, kidsSpace: KIDS_SPACE.UNTOUCHED, branchFilter: null };
         if (!isObject(value)) return unchanged;
         const phase = studyPhase(clock);
         if (phase === 'normal') return unchanged;
         if (phase === 'rest') {
             return {
                 profile: { ...source, settings: studySettings(source.settings), main: restSurface(source.main, { kids: false }), kids: restSurface(source.kids, { kids: true }) },
-                applied: true, packIds: [], phase: 'rest', failClosed: false
+                applied: true, packIds: [], phase: 'rest', failClosed: false, kidsSpace: KIDS_SPACE.UNTOUCHED, branchFilter: null
             };
         }
         const packChannelsOnly = !!text(object(clock).setByParentId) && value.packChannelsOnly !== false;
@@ -700,22 +903,34 @@
                     ...source,
                     settings: studySettings(source.settings),
                     main: rest ? restSurface(source.main, { kids: false }) : studySurface(source.main, [], { kids: false }),
-                    kids: rest ? restSurface(source.kids, { kids: true }) : studySurface(source.kids, [], { kids: true })
+                    // No known pack is no Kids pack: Kids holds (study time), as on Android.
+                    kids: restSurface(source.kids, { kids: true })
                 },
-                applied: true, packIds: [], phase: rest ? 'rest' : 'study', failClosed: true
+                applied: true, packIds: [], phase: rest ? 'rest' : 'study', failClosed: true,
+                kidsSpace: rest ? KIDS_SPACE.UNTOUCHED : KIDS_SPACE.STUDY_TIME, branchFilter: null
             };
         }
+        const packIds = layers.map(layer => layer.id);
+        // Another branch's uploads leave Main; needs the catalog's branches (a pack copy has none).
+        const branchFilter = studyBranchFilter(packIds.map(id => array(object(catalog).packs).find(pack => pack.id === id)).filter(Boolean),
+            value.packEdits);
+        // Only Kids packs drive Kids: an exam or class pack never puts its videos there.
+        const kidsLayers = layers.filter(isKidsPack);
         return {
             profile: {
                 ...source,
                 settings: studySettings(source.settings),
-                main: studySurface(source.main, layers, { kids: false, packChannelsOnly }),
-                kids: studySurface(source.kids, layers, { kids: true, packChannelsOnly })
+                main: studySurface(source.main, layers, { kids: false, packChannelsOnly, branchRow: branchFilterRow(branchFilter) }),
+                kids: kidsLayers.length
+                    ? studySurface(source.kids, kidsLayers, { kids: true, packChannelsOnly })
+                    : restSurface(source.kids, { kids: true })
             },
             applied: true,
-            packIds: layers.map(layer => layer.id),
+            packIds,
             phase: 'study',
-            failClosed: false
+            failClosed: false,
+            kidsSpace: kidsLayers.length ? KIDS_SPACE.LEARNING : KIDS_SPACE.STUDY_TIME,
+            branchFilter
         };
     }
 
@@ -771,6 +986,10 @@
         SUGGESTION_KINDS, suggest, suggestionSeed, studyTopics, studyAllowPhrases, topicTerms, topicPatterns,
         topicsForQuery, exampleSearches,
         packVariant, packLayer, activePackLayers, stampPackCopies, studyEffectiveProfile,
+        BRANCH_SOURCE, KIDS_KINDS, KIDS_SPACE, AMBIGUOUS_BRANCH_WORDS,
+        packChannelsFor, packTopicsFor, hasSeparateBranches, branchTopics, otherBranchTopics,
+        studyBranchFilter, branchFilterDrops, branchFilterRow,
+        isKidsPack, kidsPackIds, studyKidsSpace, kidsOpensAt, kidsSetupNote,
         addProgressMinutes, minutesOn, weekProgress, selfStarted, endPolicy
     });
 }));

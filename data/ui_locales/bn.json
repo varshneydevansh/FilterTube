@@ -2640,5 +2640,12 @@
   "mascot.sounds.off": "বন্ধ",
   "mascot.sounds.gentle": "মৃদু",
   "mascot.sounds.playful": "চঞ্চল",
-  "mascot.sounds.description": "মৃদু: শুধু বড় মুহূর্তে নরম শব্দ, যেমন লক্ষ্য পূরণ হলে। চঞ্চল: ট্যাপ আর পপও।"
+  "mascot.sounds.description": "মৃদু: শুধু বড় মুহূর্তে নরম শব্দ, যেমন লক্ষ্য পূরণ হলে। চঞ্চল: ট্যাপ আর পপও।",
+  "study.overlay.kidsTitle": "পড়ার সময়",
+  "study.overlay.kidsBody": "তুমি পড়ার সময় ছোটদের ভিডিও অপেক্ষা করে। বিরতিতে ফিরে আসবে।",
+  "study.overlay.kidsBackAtBreak": "বিরতি {left} পরে, {time}-এ",
+  "study.overlay.kidsBackAtEnd": "পড়া শেষ {left} পরে, {time}-এ",
+  "study.packs.kids": "ছোটদের শেখা",
+  "study.packs.kidsLearning": "এই বয়সের ছোটদের শেখা ছোটদের জায়গায় দেখা যায়।",
+  "study.packs.kidsHold": "ছোটদের জায়গায় ছোটদের ভিডিও থাকে, আর পড়ার সময় থেমে থাকে।"
 }

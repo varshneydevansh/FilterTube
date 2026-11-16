@@ -6,12 +6,15 @@
 // Sources, in this order: draft.packs (exam packs), draft.classPacks (kind "class": grade, board,
 // subjects, gradeKeywords) and draft.kidsPacks. Each pack is written as
 //   id, kind, name, [shortName], [grade], [board], [countries], [nearby], [taughtIn], [languages],
-//   [subjects], [keywords], [gradeKeywords], [blockedWords], [chips], [variantLabel], [variants], channels
+//   [subjects], [keywords], [gradeKeywords], [blockedWords], [chips], [variantLabel], [variants],
+//   [variantsShareTopics], channels
 // shortName is the exam's short label ("GATE"); chips are the study Home's subject chips; variants
 // are branches or streams (GATE CSE, ECE, ...), each {id, name, [default], [chips], [keywords],
 // [channels]}, where channels lists handles or ids of the pack's own approved channels that teach it.
 // taughtIn labels countries where a curriculum is taught abroad ({"AE": "Indian curriculum"}) and
 // variantLabel is the heading over the variant chips ({"en": "Stream"}); both are {lang|country: text}.
+// variantsShareTopics (true, else left out) marks variants that are levels of one syllabus (JEE Main
+// and Advanced): the extension and the apps then don't hide uploads naming another variant's topics.
 // where a bracketed field is written only when it has a value. The catalog format stays version 1:
 // the new fields are additive and older loaders skip them.
 // The same generator as FilterTubeApp tools/generate-study-packs.mjs, so the extension and the apps
@@ -138,6 +141,7 @@ export function buildCatalog(draft) {
         const variantLabel = labels(source.variantLabel, lang => lang.toLowerCase());
         if (branches.length && Object.keys(variantLabel).length) pack.variantLabel = variantLabel;
         if (branches.length) pack.variants = branches;
+        if (branches.length && source.variantsShareTopics === true) pack.variantsShareTopics = true;
         pack.channels = channels;
         packs.push(pack);
     }

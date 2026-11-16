@@ -2640,5 +2640,12 @@
   "mascot.sounds.off": "关",
   "mascot.sounds.gentle": "轻柔",
   "mascot.sounds.playful": "活泼",
-  "mascot.sounds.description": "轻柔：只有大辰光，比如目标达成，有轻轻个声音。活泼：还有点点、啵啵个声音。"
+  "mascot.sounds.description": "轻柔：只有大辰光，比如目标达成，有轻轻个声音。活泼：还有点点、啵啵个声音。",
+  "study.overlay.kidsTitle": "学习辰光",
+  "study.overlay.kidsBody": "侬学习个辰光，儿童视频等一歇。休息个辰光再回来。",
+  "study.overlay.kidsBackAtBreak": "{left}以后休息（{time}）",
+  "study.overlay.kidsBackAtEnd": "{left}以后学习结束（{time}）",
+  "study.packs.kids": "儿童学习",
+  "study.packs.kidsLearning": "迭个年龄个儿童学习会出现在儿童空间里。",
+  "study.packs.kidsHold": "儿童空间保留儿童视频，学习辰光暂停。"
 }

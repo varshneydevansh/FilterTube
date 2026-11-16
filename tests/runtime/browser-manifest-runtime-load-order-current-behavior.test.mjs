@@ -217,7 +217,7 @@ test('every declared script/resource exists and quarantined CSS cannot be activa
 });
 
 test('fallback resources explicitly cover view counts, admission, localization and host-limited Google icons', () => {
-  const resources = ['html/video-notes.html','js/injector.js','js/content/content_playback_response.js','js/filter_logic.js','js/seed.js','js/shared/identity.js','js/shared/view_count.js','js/content/admission_overlay.js','data/ui_locales/*.json','assets/images/homepage_hero_day.mp4','icons/icon-48.png'];
+  const resources = ['html/video-notes.html','js/injector.js','js/content/content_playback_response.js','js/filter_logic.js','js/seed.js','js/shared/identity.js','js/shared/view_count.js','js/content/admission_overlay.js','data/ui_locales/*.json','assets/images/mascots/kriti_reading.webp','assets/images/homepage_hero_day.mp4','icons/icon-48.png'];
   for (const file of manifestFiles) {
     const entries = readJson(file).web_accessible_resources;
     assert.deepEqual(entries[0].resources, file.includes('opera') ? resources : [...resources,'icons/file.svg']);

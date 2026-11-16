@@ -2640,5 +2640,12 @@
   "mascot.sounds.off": "끄기",
   "mascot.sounds.gentle": "잔잔하게",
   "mascot.sounds.playful": "발랄하게",
-  "mascot.sounds.description": "잔잔하게: 목표 달성처럼 큰 순간에만 부드러운 소리. 발랄하게: 톡톡, 뽁 소리도."
+  "mascot.sounds.description": "잔잔하게: 목표 달성처럼 큰 순간에만 부드러운 소리. 발랄하게: 톡톡, 뽁 소리도.",
+  "study.overlay.kidsTitle": "공부 시간",
+  "study.overlay.kidsBody": "공부하는 동안 키즈 동영상은 기다려요. 쉬는 시간에 다시 나와요.",
+  "study.overlay.kidsBackAtBreak": "{left} 후 쉬는 시간 ({time})",
+  "study.overlay.kidsBackAtEnd": "{left} 후 공부 끝 ({time})",
+  "study.packs.kids": "키즈 학습",
+  "study.packs.kidsLearning": "이 나이에 맞는 키즈 학습이 키즈 공간에 나와요.",
+  "study.packs.kidsHold": "키즈 공간은 키즈 동영상을 그대로 두고 공부 시간에는 잠시 멈춰요."
 }

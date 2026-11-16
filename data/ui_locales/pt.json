@@ -2640,5 +2640,12 @@
   "mascot.sounds.off": "Desativado",
   "mascot.sounds.gentle": "Suave",
   "mascot.sounds.playful": "Divertido",
-  "mascot.sounds.description": "Suave: sons leves só nos grandes momentos, como uma meta cumprida. Divertido: também toques e estalos."
+  "mascot.sounds.description": "Suave: sons leves só nos grandes momentos, como uma meta cumprida. Divertido: também toques e estalos.",
+  "study.overlay.kidsTitle": "Hora de estudar",
+  "study.overlay.kidsBody": "Os vídeos infantis esperam enquanto você estuda. Voltam no seu intervalo.",
+  "study.overlay.kidsBackAtBreak": "Intervalo em {left}, às {time}",
+  "study.overlay.kidsBackAtEnd": "O estudo termina em {left}, às {time}",
+  "study.packs.kids": "Aprendizado infantil",
+  "study.packs.kidsLearning": "O aprendizado infantil para esta idade aparece no espaço infantil.",
+  "study.packs.kidsHold": "O espaço infantil mantém os vídeos infantis e pausa na hora de estudar."
 }

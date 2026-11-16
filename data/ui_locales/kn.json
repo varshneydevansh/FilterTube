@@ -2640,5 +2640,12 @@
   "mascot.sounds.off": "ಆಫ್",
   "mascot.sounds.gentle": "ಮೃದು",
   "mascot.sounds.playful": "ತುಂಟ",
-  "mascot.sounds.description": "ಮೃದು: ಗುರಿ ತಲುಪಿದಾಗಿನಂತಹ ದೊಡ್ಡ ಕ್ಷಣಗಳಿಗೆ ಮಾತ್ರ ಮೆಲುವಾದ ಧ್ವನಿ. ತುಂಟ: ಟ್ಯಾಪ್ ಮತ್ತು ಪಾಪ್ ಕೂಡ."
+  "mascot.sounds.description": "ಮೃದು: ಗುರಿ ತಲುಪಿದಾಗಿನಂತಹ ದೊಡ್ಡ ಕ್ಷಣಗಳಿಗೆ ಮಾತ್ರ ಮೆಲುವಾದ ಧ್ವನಿ. ತುಂಟ: ಟ್ಯಾಪ್ ಮತ್ತು ಪಾಪ್ ಕೂಡ.",
+  "study.overlay.kidsTitle": "ಓದುವ ಸಮಯ",
+  "study.overlay.kidsBody": "ನೀನು ಓದುವಾಗ ಮಕ್ಕಳ ವೀಡಿಯೊಗಳು ಕಾಯುತ್ತವೆ. ವಿರಾಮದಲ್ಲಿ ಮರಳಿ ಬರುತ್ತವೆ.",
+  "study.overlay.kidsBackAtBreak": "ವಿರಾಮ {left} ನಲ್ಲಿ, {time} ಕ್ಕೆ",
+  "study.overlay.kidsBackAtEnd": "ಓದು {left} ನಲ್ಲಿ ಮುಗಿಯುತ್ತದೆ, {time} ಕ್ಕೆ",
+  "study.packs.kids": "ಮಕ್ಕಳ ಕಲಿಕೆ",
+  "study.packs.kidsLearning": "ಈ ವಯಸ್ಸಿನ ಮಕ್ಕಳ ಕಲಿಕೆ ಮಕ್ಕಳ ಸ್ಥಳದಲ್ಲಿ ಕಾಣಿಸುತ್ತದೆ.",
+  "study.packs.kidsHold": "ಮಕ್ಕಳ ಸ್ಥಳವು ಮಕ್ಕಳ ವೀಡಿಯೊಗಳನ್ನು ಇಟ್ಟುಕೊಳ್ಳುತ್ತದೆ ಮತ್ತು ಓದುವ ಸಮಯದಲ್ಲಿ ನಿಲ್ಲುತ್ತದೆ."
 }

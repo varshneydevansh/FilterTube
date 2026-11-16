@@ -2640,5 +2640,12 @@
   "mascot.sounds.off": "A kashe",
   "mascot.sounds.gentle": "A hankali",
   "mascot.sounds.playful": "Na wasa",
-  "mascot.sounds.description": "A hankali: sautuka masu laushi don manyan lokuta kawai, kamar cimma buri. Na wasa: har da taɓawa da ƙara ƙanana."
+  "mascot.sounds.description": "A hankali: sautuka masu laushi don manyan lokuta kawai, kamar cimma buri. Na wasa: har da taɓawa da ƙara ƙanana.",
+  "study.overlay.kidsTitle": "Lokacin karatu",
+  "study.overlay.kidsBody": "Bidiyon yara suna jira yayin da kake karatu. Za su dawo a hutunka.",
+  "study.overlay.kidsBackAtBreak": "Hutu cikin {left}, da {time}",
+  "study.overlay.kidsBackAtEnd": "Karatu zai ƙare cikin {left}, da {time}",
+  "study.packs.kids": "Koyon yara",
+  "study.packs.kidsLearning": "Koyon yara na wannan shekaru yana nunawa a wurin yara.",
+  "study.packs.kidsHold": "Wurin yara yana riƙe bidiyon yara kuma yana tsayawa a lokacin karatu."
 }

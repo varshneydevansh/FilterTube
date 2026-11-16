@@ -2640,5 +2640,12 @@
   "mascot.sounds.off": "Désactivé",
   "mascot.sounds.gentle": "Doux",
   "mascot.sounds.playful": "Ludique",
-  "mascot.sounds.description": "Doux : des sons légers pour les grands moments seulement, comme un objectif atteint. Ludique : aussi des petits tapotements et des pops."
+  "mascot.sounds.description": "Doux : des sons légers pour les grands moments seulement, comme un objectif atteint. Ludique : aussi des petits tapotements et des pops.",
+  "study.overlay.kidsTitle": "L’heure d’étudier",
+  "study.overlay.kidsBody": "Les vidéos enfants attendent pendant que tu étudies. Elles reviennent à ta pause.",
+  "study.overlay.kidsBackAtBreak": "Pause dans {left}, à {time}",
+  "study.overlay.kidsBackAtEnd": "Fin de l’étude dans {left}, à {time}",
+  "study.packs.kids": "Apprentissage enfants",
+  "study.packs.kidsLearning": "L’apprentissage enfants pour cet âge s’affiche dans l’espace enfants.",
+  "study.packs.kidsHold": "L’espace enfants garde ses vidéos et se met en pause pendant l’étude."
 }

@@ -2640,5 +2640,12 @@
   "mascot.sounds.off": "ปิด",
   "mascot.sounds.gentle": "นุ่มนวล",
   "mascot.sounds.playful": "สนุกสนาน",
-  "mascot.sounds.description": "นุ่มนวล: เสียงเบา ๆ เฉพาะช่วงสำคัญ เช่น ทำเป้าหมายสำเร็จ สนุกสนาน: มีเสียงแตะและเสียงป๊อปด้วย"
+  "mascot.sounds.description": "นุ่มนวล: เสียงเบา ๆ เฉพาะช่วงสำคัญ เช่น ทำเป้าหมายสำเร็จ สนุกสนาน: มีเสียงแตะและเสียงป๊อปด้วย",
+  "study.overlay.kidsTitle": "เวลาเรียน",
+  "study.overlay.kidsBody": "วิดีโอเด็กรออยู่ระหว่างที่เธอเรียน จะกลับมาตอนพัก",
+  "study.overlay.kidsBackAtBreak": "พักในอีก {left} เวลา {time}",
+  "study.overlay.kidsBackAtEnd": "เรียนจบในอีก {left} เวลา {time}",
+  "study.packs.kids": "การเรียนรู้สำหรับเด็ก",
+  "study.packs.kidsLearning": "การเรียนรู้สำหรับเด็กวัยนี้จะแสดงในพื้นที่สำหรับเด็ก",
+  "study.packs.kidsHold": "พื้นที่สำหรับเด็กยังคงเป็นวิดีโอเด็ก และหยุดพักในเวลาเรียน"
 }

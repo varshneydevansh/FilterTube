@@ -2640,5 +2640,12 @@
   "mascot.sounds.off": "關閉",
   "mascot.sounds.gentle": "輕柔",
   "mascot.sounds.playful": "活潑",
-  "mascot.sounds.description": "輕柔：只係喺大時刻，例如達成目標，先有輕輕嘅聲。活潑：仲有篤篤、啵啵聲。"
+  "mascot.sounds.description": "輕柔：只係喺大時刻，例如達成目標，先有輕輕嘅聲。活潑：仲有篤篤、啵啵聲。",
+  "study.overlay.kidsTitle": "溫書時間",
+  "study.overlay.kidsBody": "你溫書嗰陣，兒童影片會等住。小休時就返嚟。",
+  "study.overlay.kidsBackAtBreak": "{left}後小休（{time}）",
+  "study.overlay.kidsBackAtEnd": "{left}後溫完書（{time}）",
+  "study.packs.kids": "兒童學習",
+  "study.packs.kidsLearning": "呢個年齡嘅兒童學習會喺兒童空間顯示。",
+  "study.packs.kidsHold": "兒童空間會保留兒童影片，溫書時間會暫停。"
 }

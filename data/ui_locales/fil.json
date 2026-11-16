@@ -2640,5 +2640,12 @@
   "mascot.sounds.off": "Naka-off",
   "mascot.sounds.gentle": "Mahinahon",
   "mascot.sounds.playful": "Malaro",
-  "mascot.sounds.description": "Mahinahon: malambot na tunog sa malalaking sandali lang, gaya ng naabot na layunin. Malaro: may tap at pop din."
+  "mascot.sounds.description": "Mahinahon: malambot na tunog sa malalaking sandali lang, gaya ng naabot na layunin. Malaro: may tap at pop din.",
+  "study.overlay.kidsTitle": "Oras ng pag-aaral",
+  "study.overlay.kidsBody": "Naghihintay ang mga video pambata habang nag-aaral ka. Babalik sila sa break mo.",
+  "study.overlay.kidsBackAtBreak": "Break sa loob ng {left}, sa {time}",
+  "study.overlay.kidsBackAtEnd": "Tapos ang pag-aaral sa loob ng {left}, sa {time}",
+  "study.packs.kids": "Pag-aaral pambata",
+  "study.packs.kidsLearning": "Lumalabas sa espasyong pambata ang pag-aaral pambata para sa edad na ito.",
+  "study.packs.kidsHold": "Nananatili ang mga video pambata sa espasyong pambata at humihinto ito sa oras ng pag-aaral."
 }

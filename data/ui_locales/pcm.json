@@ -2640,5 +2640,12 @@
   "mascot.sounds.off": "Off",
   "mascot.sounds.gentle": "Jeje",
   "mascot.sounds.playful": "Play-play",
-  "mascot.sounds.description": "Jeje: small soft sound for big moments only, like when you reach your goal. Play-play: tap and pop sound too."
+  "mascot.sounds.description": "Jeje: small soft sound for big moments only, like when you reach your goal. Play-play: tap and pop sound too.",
+  "study.overlay.kidsTitle": "Study time",
+  "study.overlay.kidsBody": "Pikin videos go wait as you dey study. Dem go come back for your break.",
+  "study.overlay.kidsBackAtBreak": "Break for {left}, for {time}",
+  "study.overlay.kidsBackAtEnd": "Study go end for {left}, for {time}",
+  "study.packs.kids": "Pikin learning",
+  "study.packs.kidsLearning": "Pikin learning for dis age dey show for di Pikin space.",
+  "study.packs.kidsHold": "Di Pikin space go keep pikin videos and e go pause for study time."
 }

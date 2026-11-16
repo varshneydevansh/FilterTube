@@ -2640,5 +2640,12 @@
   "mascot.sounds.off": "बंद",
   "mascot.sounds.gentle": "धीमा",
   "mascot.sounds.playful": "चंचल",
-  "mascot.sounds.description": "धीमा: खाली बड़का पल पर हल्का आवाज, जइसे लक्ष्य पूरा भइला पर। चंचल: टैप आ पॉप भी।"
+  "mascot.sounds.description": "धीमा: खाली बड़का पल पर हल्का आवाज, जइसे लक्ष्य पूरा भइला पर। चंचल: टैप आ पॉप भी।",
+  "study.overlay.kidsTitle": "पढ़ाई के समय",
+  "study.overlay.kidsBody": "जब तू पढ़त बाड़, बच्चन के वीडियो इंतजार करत बा। ब्रेक में लवट आई।",
+  "study.overlay.kidsBackAtBreak": "ब्रेक {left} में, {time} बजे",
+  "study.overlay.kidsBackAtEnd": "पढ़ाई {left} में खतम, {time} बजे",
+  "study.packs.kids": "बच्चन के पढ़ाई",
+  "study.packs.kidsLearning": "एह उमिर के बच्चन के पढ़ाई बच्चन वाला जगह में देखाई।",
+  "study.packs.kidsHold": "बच्चन वाला जगह में बच्चन के वीडियो रही, आ पढ़ाई के समय रुक जाई।"
 }

@@ -2640,5 +2640,12 @@
   "mascot.sounds.off": "オフ",
   "mascot.sounds.gentle": "おだやか",
   "mascot.sounds.playful": "にぎやか",
-  "mascot.sounds.description": "おだやか：目標達成など、大きな場面だけでやさしい音。にぎやか：タップやポンという音も。"
+  "mascot.sounds.description": "おだやか：目標達成など、大きな場面だけでやさしい音。にぎやか：タップやポンという音も。",
+  "study.overlay.kidsTitle": "勉強の時間",
+  "study.overlay.kidsBody": "勉強しているあいだ、キッズ動画はお休みです。休憩になったら戻ってきます。",
+  "study.overlay.kidsBackAtBreak": "休憩まであと{left}（{time}）",
+  "study.overlay.kidsBackAtEnd": "勉強の終わりまであと{left}（{time}）",
+  "study.packs.kids": "キッズの学び",
+  "study.packs.kidsLearning": "この年齢向けのキッズの学びがキッズ用スペースに表示されます。",
+  "study.packs.kidsHold": "キッズ用スペースはキッズ動画のままで、勉強の時間は一時停止します。"
 }

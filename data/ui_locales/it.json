@@ -2640,5 +2640,12 @@
   "mascot.sounds.off": "Disattivato",
   "mascot.sounds.gentle": "Delicati",
   "mascot.sounds.playful": "Giocosi",
-  "mascot.sounds.description": "Delicati: suoni leggeri solo nei grandi momenti, come un obiettivo raggiunto. Giocosi: anche tocchi e pop."
+  "mascot.sounds.description": "Delicati: suoni leggeri solo nei grandi momenti, come un obiettivo raggiunto. Giocosi: anche tocchi e pop.",
+  "study.overlay.kidsTitle": "Ora di studio",
+  "study.overlay.kidsBody": "I video per bambini aspettano mentre studi. Tornano nella tua pausa.",
+  "study.overlay.kidsBackAtBreak": "Pausa tra {left}, alle {time}",
+  "study.overlay.kidsBackAtEnd": "Lo studio finisce tra {left}, alle {time}",
+  "study.packs.kids": "Imparare da piccoli",
+  "study.packs.kidsLearning": "L’apprendimento per questa età appare nello spazio bambini.",
+  "study.packs.kidsHold": "Lo spazio bambini tiene i suoi video e si ferma durante lo studio."
 }

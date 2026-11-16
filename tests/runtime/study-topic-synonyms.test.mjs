@@ -67,7 +67,7 @@ test('during a GATE Civil round the allow layer carries the synonyms after the p
         assert.equal(row.source, Engine.TOPIC_SOURCE);
         assert.equal(row.managedListId, 'study:in_gate');
     }
-    assert.deepEqual(words(result.profile.kids.whitelistKeywords), allow, 'Kids gets the same layer');
+    assert.deepEqual(words(result.profile.kids.whitelistKeywords), [], 'an exam pack never reaches Kids');
 });
 
 test('a removed topic takes its own synonyms with it, and a removed phrase stays out', () => {

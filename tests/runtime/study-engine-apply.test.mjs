@@ -1,5 +1,6 @@
 // Applying Study: during STUDY the active packs (bundled catalog + packEdits) are the allow layer of Main
-// and Kids, the block list plus the pack's blocked words still subtract (layered), and the user's own
+// (Kids packs are the allow layer of Kids; exam and class packs hold Kids, see study-branch-kids-parity),
+// the block list plus the pack's blocked words still subtract (layered), and the user's own
 // allowed channels stay. A "normal" break and NORMAL leave the profile untouched.
 import test from 'node:test';
 import assert from 'node:assert/strict';
@@ -99,11 +100,12 @@ test('pack topics and blocked words are title-only rows; the chosen variant adds
     const onlyCse = (cse.keywords || []).filter(word => !(ece.keywords || []).includes(word) && !pack.keywords.includes(word));
     if (onlyCse.length) assert.equal(words.includes(onlyCse[0]), false, 'another branch\'s topics stay out');
     const stamped = Engine.stampPackCopies(gate.study, catalog);
-    assert.ok(stamped.packCopies.in_gate.channels.length === pack.channels.length);
+    assert.equal(stamped.packCopies.in_gate.channels.length, Engine.packChannelsFor(pack, 'ece').length, 'the copy keeps the branch\'s channels');
+    assert.ok(stamped.packCopies.in_gate.channels.length < pack.channels.length);
     assert.equal(Engine.stampPackCopies(stamped, catalog), stamped, 'stable once stamped');
 });
 
-test('during study the pack is the allow layer, layered over the block list, on Main and Kids', () => {
+test('during study the pack is the allow layer, layered over the block list, on Main; an exam pack holds Kids', () => {
     const base = profile();
     const before = JSON.stringify(base);
     const { profile: effective, applied, packIds } = Engine.studyEffectiveProfile(base, { catalog, clock: studying });
@@ -111,7 +113,11 @@ test('during study the pack is the allow layer, layered over the block list, on 
     assert.deepEqual(packIds, ['in_upsc_cse']);
     assert.equal(JSON.stringify(base), before, 'the stored profile is not mutated');
     const upsc = Packs.packById(catalog, 'in_upsc_cse');
-    for (const surface of [effective.main, effective.kids]) {
+    // Kids: allow mode with nothing allowed. An exam pack never puts its channels there.
+    assert.equal(effective.kids.mode, 'whitelist');
+    assert.deepEqual(effective.kids.whitelistChannels, []);
+    assert.deepEqual(effective.kids.whitelistKeywords, []);
+    for (const surface of [effective.main]) {
         assert.equal(surface.mode, 'whitelist');
         assert.equal(surface.layered, true);
         const tagged = surface.whitelistChannels.filter(row => row.managedListId === 'study:in_upsc_cse');
@@ -150,7 +156,7 @@ test('packEdits add and remove channels and topics; pack blocked words join the 
     assert.equal(effective.main.whitelistKeywords.some(row => row.word === 'upsc'), false);
     assert.ok(effective.main.whitelistKeywords.some(row => row.word === 'answer writing practice'));
     assert.deepEqual(effective.main.keywords.map(row => row.word), ['drama', 'reaction', 'result live']);
-    assert.deepEqual(effective.kids.blockedKeywords.map(row => row.word), ['scary', 'reaction', 'result live']);
+    assert.deepEqual(effective.kids.blockedKeywords.map(row => row.word), ['scary'], 'Kids holds; its own block list stays');
 });
 
 test('class packs bring every grade\'s topic words; two packs merge without repeating a channel', () => {
