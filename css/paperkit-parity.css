@@ -655,15 +655,21 @@ body.ft-extension-surface[data-surface="popup"] input[type="search"] {
   background: color-mix(in srgb, var(--pk-desk) 82%, var(--pk-paper)) !important;
   border: 1.5px solid var(--pk-line) !important;
   border-radius: 16px !important;
-  min-height: 44px !important;
-  height: 44px !important;
+  /* The app's 48 dp field: the whole box, padding included. */
+  box-sizing: border-box !important;
+  min-height: 48px !important;
+  height: 48px !important;
+  padding-block: 0 !important;
   box-shadow: none !important;
   color: var(--pk-ink) !important;
 }
+body.ft-extension-surface[data-surface="popup"] .search-row,
+body.ft-extension-surface[data-surface="popup"] .add-keyword-row { min-height: 0 !important; align-items: center; }
 body.ft-extension-surface[data-surface="popup"] .btn-primary,
 body.ft-extension-surface[data-surface="popup"] button.add-btn {
-  min-height: 44px !important;
-  height: 44px !important;
+  box-sizing: border-box !important;
+  min-height: 48px !important;
+  height: 48px !important;
   padding-block: 0 !important;
 }
 body.ft-extension-surface[data-surface="popup"] .ft-popup-filter-card .tab-buttons,
@@ -814,4 +820,27 @@ body.ft-extension-surface .ft-study-status.is-hold { background: var(--pk-sage) 
   .pk-undo-bar, .pk-undo-bar.is-leaving { transition: opacity 150ms linear; transform: none; }
   .pk-undo-bar.is-swapping .pk-undo-bar__text { animation: none; }
   .pk-row-added { transition: none; }
+}
+
+/* Keyword rows in the app's layout (item_keyword.xml): the word on its own line, then the chip row
+ * (Comment, Exact, Date, ...) with the move action, and delete at the end of the chip row. */
+body.ft-extension-surface[data-surface="tab-view"] .list-item:not(.channel-item):has(> .item-left > .item-word) {
+  flex-direction: column;
+  align-items: stretch;
+  gap: 10px;
+}
+body.ft-extension-surface[data-surface="tab-view"] .list-item:not(.channel-item) > .item-left:has(> .item-word) {
+  flex-wrap: wrap;
+  min-width: 0;
+}
+body.ft-extension-surface[data-surface="tab-view"] .list-item:not(.channel-item) > .item-left > .item-word {
+  overflow-wrap: anywhere;
+}
+body.ft-extension-surface[data-surface="tab-view"] .list-item:not(.channel-item):has(> .item-left > .item-word) > .item-controls {
+  justify-content: flex-start;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+body.ft-extension-surface[data-surface="tab-view"] .list-item:not(.channel-item):has(> .item-left > .item-word) > .item-controls > .delete-btn {
+  margin-inline-start: auto;
 }
