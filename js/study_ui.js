@@ -449,7 +449,7 @@
         };
         const planPatch = next => patch({ plan: next }, { plan: clone(study.plan ?? null) });
 
-        if (editable) box.appendChild(packPicker(study, options.catalog, patch));
+        if (editable) box.appendChild(packPicker(study, options.catalog, patch, options));
         else if (array(options.packs).length) box.appendChild(el('p', 'ft-study-planner__packs', array(options.packs).map(packLabel).join(', ')));
 
         const days = el('div', 'ft-study-days');
@@ -574,7 +574,12 @@
 
     // ---- Pack picker: Exams | School ----------------------------------------------------------
 
-    function packPicker(study, catalog, patch) {
+    /**
+     * The chosen packs as chips, and the way into setup (Android StudyFocusActivity "Change plan" ->
+     * StudySetupActivity): what for, the list, a stream, review, ready. Setup saves through `patch`'s
+     * onPatch, so a parent's plan for a child goes through the same fresh-PIN path.
+     */
+    function packPicker(study, catalog, patch, options = {}) {
         const Packs = packsApi();
         const wrap = el('div', 'ft-study-packs');
         const active = array(study.activePackIds);
@@ -589,53 +594,24 @@
             remove.setAttribute('aria-label', t('study.packs.remove', 'Remove {pack}', { pack: label }));
             chip.appendChild(remove);
             chips.appendChild(chip);
-            if (pack && array(pack.variants).length) {
-                const select = el('select', 'text-input ft-study-variant');
-                select.setAttribute('aria-label', t('study.packs.branch', 'Branch or stream'));
-                for (const item of pack.variants) {
-                    const option = el('option', '', localizedName(item.names, item.id));
-                    option.value = item.id;
-                    option.selected = variant?.id === item.id;
-                    select.appendChild(option);
-                }
-                select.addEventListener('change', () => patch(
-                    { packEdits: { ...edits, [id]: { ...object(edits[id]), variant: select.value } } }, { packEdits: clone(edits) }));
-                chips.appendChild(select);
-            }
         }
         if (!active.length) chips.appendChild(el('span', 'ft-study-muted', t('study.packs.none', 'No study pack yet')));
         wrap.appendChild(chips);
         if (!Packs || !catalog) return wrap;
-        let tab = 'exams';
-        const country = Packs.countryFromLocale(root.navigator?.language || '') || Packs.countryFromLocale(language());
         const row = el('div', 'ft-study-packs__add');
-        // The packs listed here are for `country`: the row wears its light accent (Android CountryAccent).
+        const country = Packs.countryFromLocale(root.navigator?.language || '') || Packs.countryFromLocale(language());
+        // The packs listed in setup are for `country`: the row wears its light accent (Android CountryAccent).
         if (Packs.countryAccent) applyCountryAccent(row, Packs.countryAccent(country), Packs);
-        const select = el('select', 'text-input');
-        select.setAttribute('aria-label', t('study.packs.choose', 'Choose a study pack'));
-        const fill = () => {
-            select.replaceChildren();
-            const first = el('option', '', t('study.packs.choose', 'Choose a study pack'));
-            first.value = '';
-            select.appendChild(first);
-            for (const pack of Packs.forTab(catalog, country, tab)) {
-                if (active.includes(pack.id)) continue;
-                const option = el('option', '', Packs.packName(pack, language()));
-                option.value = pack.id;
-                select.appendChild(option);
-            }
-        };
-        const tabs = segmented([['exams', t('study.packs.exams', 'Exams')], ['school', t('study.packs.school', 'School')],
-            ['kids', t('study.packs.kids', 'Kids learning')]], tab, value => {
-            tab = value;
-            mark(tabs, value);
-            fill();
-        }, t('study.packs.kind', 'Pack type'));
-        fill();
-        select.addEventListener('change', () => {
-            if (select.value) patch({ activePackIds: [...active, select.value] }, { activePackIds: active });
-        });
-        row.append(tabs, select);
+        const open = button(active.length ? t('study.setup.change', 'Change') : t('study.setup.title', 'Set up study'),
+            active.length ? 'btn-secondary ft-study-packs__open' : 'btn-primary ft-study-packs__open', () => {
+                openSetup(open, {
+                    study, catalog, isSelf: options.isSelf !== false, profileId: options.profileId || null,
+                    onPatch: change => options.onPatch?.(change),
+                    onStart: (minutes, lock) => send({ action: 'FilterTube_StudyStartSession', minutes, lock }),
+                    onClose: () => options.onSetupClosed?.()
+                });
+            });
+        row.appendChild(open);
         wrap.appendChild(row);
         // What Kids does during study: Kids learning packs show there; exam and class packs never do.
         const kidsNote = engine()?.kidsSetupNote ? engine().kidsSetupNote(active, catalog) : null;
@@ -703,6 +679,785 @@
             strip.appendChild(motif);
         }
         row.prepend(strip);
+    }
+
+    // ---- Study setup, step by step (Android StudySetupActivity, StudySetupViews, StudyAddChannelSheet) --
+
+    function setupApi() { return root.FilterTubeStudySetup || null; }
+
+    /** A still of Kriti or Uljhan when the Companion shows characters; null otherwise (and decorative). */
+    function companionArt(name, className, height) {
+        const Mascots = root.FilterTubeMascots;
+        if (!Mascots || !Mascots.showsCharacters?.(Mascots.mode)) return null;
+        const file = Mascots.stillImage?.(name);
+        if (!file) return null;
+        const img = el('img', className);
+        const api = runtime();
+        img.src = api?.runtime?.getURL ? api.runtime.getURL(`assets/images/mascots/${file}`) : `../assets/images/mascots/${file}`;
+        img.alt = '';
+        img.setAttribute('aria-hidden', 'true');
+        if (height) img.style.height = `${height}px`;
+        return img;
+    }
+
+    function doodleArt(name, className) {
+        const img = el('img', className || 'ft-setup-doodle');
+        const api = runtime();
+        const file = `assets/images/doodles/${name}.webp`;
+        img.src = api?.runtime?.getURL ? api.runtime.getURL(file) : `../${file}`;
+        img.alt = '';
+        img.setAttribute('aria-hidden', 'true');
+        return img;
+    }
+
+    function countryName(code) {
+        if (!code) return t('study.setup.anywhere', 'Anywhere');
+        try { return new Intl.DisplayNames([language()], { type: 'region' }).of(code) || code; } catch (e) { return code; }
+    }
+
+    /** "UPSC", "UPSC + 1" (Android StudyPackLabels). */
+    function packsShortLabel(ids, catalog) {
+        const Packs = packsApi();
+        const names = ids.map(id => Packs?.packById(catalog, id)).filter(Boolean).map(pack => Packs.packName(pack, language()));
+        if (!names.length) return '';
+        const short = name => {
+            const plain = name.split(' (')[0].trim() || name.trim();
+            const words = plain.split(/\s+/);
+            return words.length >= 3 && /^[A-Z][A-Z0-9-]{1,}$/.test(words[0]) && !/^\d/.test(words[1]) && words[1].toLowerCase() !== 'class' ? words[0] : plain;
+        };
+        return names.length === 1 ? short(names[0]) : `${short(names[0])} + ${names.length - 1}`;
+    }
+
+    /** "24 channels · English, Hindi" (Android StudySetupText.meta). */
+    function packMeta(pack) {
+        let names = '';
+        try {
+            const display = new Intl.DisplayNames([language()], { type: 'language' });
+            names = array(pack.languages).slice(0, 3).map(code => { const name = display.of(code) || code; return name.charAt(0).toUpperCase() + name.slice(1); }).join(', ');
+        } catch (e) { }
+        if (array(pack.languages).length > 3) names += ` +${pack.languages.length - 3}`;
+        const count = plural('study.setup.nChannels', array(pack.channels).length, '{count} channel', '{count} channels');
+        return names ? `${count} · ${names}` : count;
+    }
+
+    /** "Data structures, Algorithms, Operating systems and 10 more" (5 named). */
+    function topicLine(topics) {
+        const Engine = engine();
+        const label = topic => (Engine?.topicLabel ? Engine.topicLabel(topic, language()) : topic);
+        const named = topics.slice(0, 5).map(label).join(', ');
+        const rest = topics.length - 5;
+        return rest > 0 ? pluralWith('study.setup.andMore', rest, { names: named }, '{names} and {count} more') : named;
+    }
+
+    function pluralWith(key, count, values, fallback) {
+        let category = count === 1 ? 'one' : 'other';
+        try { category = new Intl.PluralRules(language()).select(count); } catch (e) { }
+        return t(`${key}.${category}`, fallback, { ...values, count });
+    }
+
+    function setupChip(label, on, onClick, { quiet = false, square = false, description = '' } = {}) {
+        const chip = button(label, `ft-setup-chip${on ? ' is-on' : ''}${quiet ? ' is-quiet' : ''}${square ? ' is-square' : ''}`, onClick);
+        chip.setAttribute('aria-pressed', on ? 'true' : 'false');
+        if (description) chip.setAttribute('aria-label', description);
+        return chip;
+    }
+
+    function channelAvatar(row, size = 40) {
+        const box = el('span', 'ft-setup-avatar');
+        box.style.width = box.style.height = `${size}px`;
+        box.setAttribute('aria-hidden', 'true');
+        const letter = (Array.from(text(row.name)).find(ch => /[\p{L}\p{N}]/u.test(ch)) || '•').toUpperCase();
+        box.appendChild(el('span', 'ft-setup-avatar__initial', letter));
+        return box;
+    }
+
+    /**
+     * The setup, opened from the study card (or a parent's plan for a child). It takes over the card
+     * until it closes: what for, the list, a stream, review, ready. options: {study, catalog, isSelf,
+     * profileId, onPatch(patch) -> Promise<{ok}>, onStart(minutes, lock), onClose()}.
+     */
+    function openSetup(anchor, options) {
+        const Setup = setupApi();
+        const Packs = packsApi();
+        const catalog = options.catalog;
+        if (!Setup || !Packs || !catalog) return null;
+        const holder = anchor?.closest?.('#ftStudyDashboard, .ft-study-parent__body') || anchor?.parentElement;
+        if (!holder) return null;
+        const study = object(options.study);
+        const isSelf = options.isSelf !== false;
+        const deviceCountry = Packs.countryFromLocale(root.navigator?.language || '') || Packs.countryFromLocale(language()) || null;
+        const start = Setup.reopenAt(array(study.activePackIds), catalog, deviceCountry);
+        const s = {
+            step: start.step, mode: start.mode, country: start.country, query: '', alsoOpen: false, board: null,
+            selected: array(study.activePackIds).filter(id => Packs.packById(catalog, id)),
+            edits: clone(object(study.packEdits)) || {},
+            opened: {}, showAll: new Set(), keptOwn: {}, grade: {}, lockMode: 'gentle', direction: 0, addFor: null
+        };
+        // The card's own styles set display, so the hidden attribute alone wouldn't hide it.
+        const hidden = Array.from(holder.children).map(node => [node, node.style.display]);
+        hidden.forEach(([node]) => { node.style.display = 'none'; });
+        holder.dataset.ftStudySetupOpen = 'true';
+        const panel = el('section', 'ft-setup');
+        panel.setAttribute('aria-label', t('study.setup.title', 'Set up study'));
+        holder.appendChild(panel);
+
+        const packs = () => s.selected.map(id => Packs.packById(catalog, id)).filter(Boolean);
+        const needsStream = () => Setup.StudySetupPath.needsStream(packs());
+        const close = () => {
+            panel.remove();
+            delete holder.dataset.ftStudySetupOpen;
+            hidden.forEach(([node, display]) => { node.style.display = display; });
+            options.onClose?.();
+        };
+        const go = (next, forward = true) => {
+            if (!next) { close(); return; }
+            s.direction = forward ? 1 : -1;
+            s.step = next;
+            s.addFor = null;
+            render();
+            try { panel.scrollIntoView({ block: 'start', behavior: 'smooth' }); } catch (e) { }
+        };
+        const back = () => go(Setup.StudySetupPath.back(s.step, needsStream()), false);
+        const goNext = () => go(Setup.StudySetupPath.next(s.step, needsStream()));
+        const toggle = id => { s.selected = s.selected.includes(id) ? s.selected.filter(item => item !== id) : [...s.selected, id]; render(); };
+        const chipLabel = pack => Setup.StudyExamList.chipLabel(pack, language());
+
+        function title() {
+            if (s.step === 'kind') return t('study.setup.title', 'Set up study');
+            if (s.step === 'list') {
+                if (s.mode === 'exam') return s.country ? t('study.setup.examsIn', 'Exams in {country}', { country: countryName(s.country) }) : t('study.setup.examsTitle', 'Exams');
+                return s.mode === 'school' ? t('study.setup.kindSchool', 'School') : t('study.setup.kindSkill', 'Learn a skill');
+            }
+            if (s.step === 'stream') {
+                const list = packs().filter(pack => array(pack.variants).length && pack.kind !== 'class');
+                return list.length === 1 ? chipLabel(list[0]) : t('study.setup.branch', 'Branch');
+            }
+            if (s.step === 'review') {
+                const label = Setup.planLabel(packs(), s.edits, language());
+                return label ? t('study.setup.reviewPlan', 'Your {plan} plan', { plan: label }) : t('study.setup.reviewPlanMany', 'Your plan');
+            }
+            return t('study.setup.readyTitle', 'What changes');
+        }
+
+        function header() {
+            const head = el('div', 'ft-setup__head');
+            const backButton = button('', 'ft-setup__back', back);
+            backButton.setAttribute('aria-label', t('askParent.back', 'Back'));
+            backButton.appendChild(el('span', '', '←')).setAttribute('aria-hidden', 'true');
+            const heading = el('h4', 'ft-setup__title', title());
+            const path = Setup.StudySetupPath.of(needsStream());
+            const index = Math.max(0, path.indexOf(s.step));
+            const dots = el('span', 'ft-setup__dots');
+            dots.setAttribute('role', 'img');
+            dots.setAttribute('aria-label', t('study.setup.step', 'Step {step} of {steps}', { step: index + 1, steps: path.length }));
+            path.forEach((_, i) => dots.appendChild(el('span', `ft-setup__dot${i === index ? ' is-on' : i < index ? ' is-done' : ''}`)));
+            head.append(backButton, heading, dots);
+            return head;
+        }
+
+        function bar(label, action, onClick, enabled = true) {
+            const node = el('div', 'ft-setup__bar');
+            if (label) node.appendChild(el('span', 'ft-setup__bar-label', label));
+            const go = button(action, 'btn-primary ft-setup__bar-action', onClick);
+            go.disabled = !enabled;
+            node.appendChild(go);
+            if (!label) node.classList.add('is-wide');
+            return node;
+        }
+
+        function render() {
+            const body = el('div', `ft-setup__body${s.direction > 0 ? ' is-forward' : s.direction < 0 ? ' is-back' : ''}`);
+            panel.dataset.step = s.step;
+            const country = s.country;
+            if (Packs.countryAccent) panel.dataset.country = country || '';
+            const parts = { kind: renderKind, list: s.mode === 'exam' ? renderExams : s.mode === 'school' ? renderSchool : renderSkills,
+                stream: renderStream, review: renderReview, ready: renderReady }[s.step];
+            const tail = parts(body);
+            panel.replaceChildren(header(), body);
+            if (tail) panel.appendChild(tail);
+            s.direction = 0;
+        }
+
+        // ---- Step 1: what for
+        function renderKind(body) {
+            const card = el('div', 'ft-setup-country');
+            const words = el('div', 'ft-setup-country__words');
+            words.append(el('span', 'ft-study-muted', t('study.setup.where', 'You\'re studying in')), el('strong', '', countryName(s.country)));
+            const select = el('select', 'text-input ft-setup-country__select');
+            select.setAttribute('aria-label', t('study.setup.countryTitle', 'Where are you studying?'));
+            const codes = Setup.countries(catalog).sort((a, b) => countryName(a).localeCompare(countryName(b), language()));
+            // The chosen country leads the list (Android b753aa71f).
+            const ordered = s.country && codes.includes(s.country) ? [s.country, ...codes.filter(code => code !== s.country)] : codes;
+            const anywhere = el('option', '', `${t('study.setup.anywhere', 'Anywhere')} · ${t('study.setup.countryAnywhereBody', 'Only exams and lessons taken anywhere')}`);
+            anywhere.value = '';
+            select.appendChild(anywhere);
+            for (const code of ordered) {
+                const option = el('option', '', countryName(code));
+                option.value = code;
+                option.selected = code === s.country;
+                select.appendChild(option);
+            }
+            if (!s.country) anywhere.selected = true;
+            select.addEventListener('change', () => { s.country = select.value || null; s.board = null; s.alsoOpen = false; render(); });
+            if (Packs.countryAccent) applyCountryAccent(card, Packs.countryAccent(s.country), Packs);
+            card.append(words, select);
+            body.appendChild(card);
+
+            const question = el('div', 'ft-setup-question');
+            const qwords = el('div', 'ft-setup-question__words');
+            qwords.append(el('h3', 'ft-setup-h1', t('study.setup.question', 'What are you studying for?')),
+                doodleArt('underline_wavy', 'ft-setup-squiggle'),
+                el('p', 'ft-study-muted', t('study.setup.questionBody', 'We\'ll pick channels and topics that fit. You can change any of them.')));
+            question.appendChild(qwords);
+            const kriti = companionArt('kritiPointing', 'ft-setup-mascot', 124);
+            if (kriti) question.appendChild(kriti);
+            body.appendChild(question);
+
+            const own = Setup.StudyExamList.of(catalog, s.country, '', Setup.MIN_CHANNELS).own.flatMap(section => section.packs);
+            const examLine = !s.country || !own.length ? t('study.setup.kindExamAnywhere', 'Exams people take anywhere, like IELTS and GRE')
+                : t('study.setup.kindExamples', '{names} and more', { names: [...new Set([...own].sort((a, b) => (a.shortName ? 0 : 1) - (b.shortName ? 0 : 1))
+                    .map(chipLabel).filter(label => label.length <= 12))].slice(0, 5).join(', ') });
+            const boards = Setup.StudySchool.boards(catalog, s.country, Setup.MIN_CHANNELS);
+            const schoolLine = !boards.length ? t('study.setup.kindSchoolNone', 'Lessons that fit any curriculum')
+                : t('study.setup.kindExamples', '{names} and more', { names: boards.map(board => board.label).filter(label => label.length <= 16).slice(0, 3).join(', ') || boards[0].label });
+            const tiles = el('div', 'ft-setup-tiles');
+            for (const [mode, name, line, doodle] of [
+                ['exam', t('study.setup.kindExam', 'An exam'), examLine, 'seal'],
+                ['school', t('study.setup.kindSchool', 'School'), schoolLine, 'note'],
+                ['skill', t('study.setup.kindSkill', 'Learn a skill'), t('study.setup.kindSkillBody', 'Coding, maths and science. Add your own channels too.'), 'crayon']
+            ]) {
+                const tile = button('', `ft-setup-tile is-${mode}`, () => {
+                    if (s.mode !== mode) { s.query = ''; s.alsoOpen = false; }
+                    s.mode = mode;
+                    go('list');
+                });
+                const copy = el('span', 'ft-setup-tile__copy');
+                copy.append(el('strong', 'ft-setup-tile__name', name), el('span', 'ft-setup-tile__line', line));
+                tile.append(copy, doodleArt(doodle, 'ft-setup-tile__doodle'));
+                tiles.appendChild(tile);
+            }
+            body.appendChild(tiles);
+            if (isSelf) body.appendChild(el('p', 'ft-study-muted ft-setup-center', t('study.setup.familyNote', 'Setting this up for your child? Use Family instead.')));
+            return null;
+        }
+
+        function listBar() {
+            if (!s.selected.length) return null;
+            return bar(packsShortLabel(s.selected, catalog), t('study.setup.next', 'Next'), goNext);
+        }
+
+        // ---- Step 2a: exams
+        function renderExams(body) {
+            const model = Setup.StudyExamList.of(catalog, s.country, '', Setup.MIN_CHANNELS);
+            const example = model.own.flatMap(section => section.packs).find(pack => pack.shortName);
+            const search = el('input', 'text-input ft-setup-search');
+            search.type = 'search';
+            search.value = s.query;
+            search.placeholder = t('study.setup.examsSearch', 'Search exams, like {example}', { example: example ? chipLabel(example) : 'IELTS' });
+            search.setAttribute('aria-label', search.placeholder);
+            const host = el('div', 'ft-setup-list');
+            search.addEventListener('input', () => { s.query = search.value; drawExamList(host); });
+            body.append(search, host);
+            drawExamList(host);
+            return listBar();
+        }
+
+        function drawExamList(host) {
+            const model = Setup.StudyExamList.of(catalog, s.country, s.query, Setup.MIN_CHANNELS);
+            host.replaceChildren();
+            if (model.isEmpty) { host.appendChild(el('p', 'ft-study-muted ft-setup-center', t('study.setup.empty', 'Nothing matches. Try another country or word.'))); return; }
+            const section = (name, list, { withCountry = false, quiet = false } = {}) => {
+                host.appendChild(el('p', 'ft-setup-section', name));
+                const flow = el('div', 'ft-setup-flow');
+                for (const pack of list) {
+                    let label = chipLabel(pack);
+                    if (withCountry && array(pack.countries).length) label = `${label} (${countryName(pack.countries[0])})`;
+                    flow.appendChild(setupChip(label, s.selected.includes(pack.id), () => {
+                        const keep = host.closest('.ft-setup')?.querySelector('.ft-setup-search');
+                        toggle(pack.id);
+                        keep?.focus?.();
+                    }, { quiet, description: `${Packs.packName(pack, language())}. ${packMeta(pack)}` }));
+                }
+                host.appendChild(flow);
+            };
+            const fieldName = field => t(`study.setup.field.${field}`, field);
+            model.own.forEach(group => section(fieldName(group.field), group.packs));
+            const searching = !!text(s.query);
+            if (model.also.length) {
+                // A chosen exam is never hidden inside the fold.
+                const open = s.alsoOpen || searching || model.alsoPacks.some(pack => s.selected.includes(pack.id));
+                const names = model.alsoPacks.slice(0, 3).map(chipLabel).join(', ');
+                const line = model.alsoPacks.length > 3 ? pluralWith('study.setup.andMore', model.alsoPacks.length - 3, { names }, '{names} and {count} more') : names;
+                const fold = button('', `ft-setup-fold${open ? ' is-open' : ''}`, () => { if (!searching) { s.alsoOpen = !s.alsoOpen; drawExamList(host); } });
+                fold.setAttribute('aria-expanded', open ? 'true' : 'false');
+                const words = el('span', 'ft-setup-fold__words');
+                words.appendChild(el('span', 'ft-setup-fold__title', t('study.setup.examsAlso', 'Also taken from {country}', { country: countryName(s.country) })));
+                if (!open) words.appendChild(el('span', 'ft-study-muted', line));
+                fold.append(words, el('span', 'ft-setup-fold__chevron', '⌄'));
+                host.appendChild(el('hr', 'ft-setup-dashed'));
+                host.appendChild(fold);
+                if (open) model.also.forEach(group => section(fieldName(group.field), group.packs, { quiet: true }));
+            }
+            if (model.elsewhere.length) section(t('study.setup.examsElsewhere', 'From other countries'), model.elsewhere, { withCountry: true, quiet: true });
+            // The bar follows the choice without redrawing the list.
+            const panelBar = panel.querySelector(':scope > .ft-setup__bar');
+            const nextBar = listBar();
+            if (panelBar && nextBar) panelBar.replaceWith(nextBar);
+            else if (panelBar) panelBar.remove();
+            else if (nextBar && panel.contains(host)) panel.appendChild(nextBar);
+        }
+
+        // ---- Step 2b: school
+        function chooseVariant(pack, variantId) {
+            const current = object(s.edits[pack.id]);
+            if (Setup.variant(pack, current.variant)?.id === variantId && current.variant) return;
+            // A new stream brings its own channels and topics; earlier switches start over.
+            s.edits[pack.id] = { ...current, variant: variantId, channelsRemoved: [], topicsRemoved: [] };
+            render();
+        }
+
+        function renderSchool(body) {
+            const boards = Setup.StudySchool.boards(catalog, s.country, Setup.MIN_CHANNELS);
+            const globals = Setup.StudySchool.globals(catalog, Setup.MIN_CHANNELS);
+            if (!boards.length) {
+                body.append(el('h3', 'ft-setup-h1', t('study.setup.schoolNoneTitle', 'No school packs for {country} yet', { country: countryName(s.country) })),
+                    el('p', 'ft-study-muted', t('study.setup.schoolNoneBody', 'These work with any curriculum. You can also add your own channels.')),
+                    button(t('study.setup.schoolCheckExams', 'Check exams'), 'btn-secondary', () => { s.mode = 'exam'; s.query = ''; go('list'); }));
+                addGlobals(body, globals);
+                return s.selected.length ? bar(null, t('study.setup.nextChannels', 'Next: check channels'), goNext) : null;
+            }
+            const located = Setup.StudySchool.locate(boards, s.selected);
+            const current = boards.find(board => board.key === s.board) || located?.board || boards[0];
+            s.board = current.key;
+            let grade = located && located.board.key === current.key ? located.grade : null;
+            if (grade) {
+                // The class picked last time, when it's in the same band (Class 12 rather than the band's first).
+                const saved = s.grade[grade.packId];
+                grade = current.grades.find(item => item.key === saved && item.packId === grade.packId) || grade;
+            }
+            const head = el('div', 'ft-setup-question');
+            head.appendChild(el('h3', 'ft-setup-h1', t('study.setup.schoolQuestion', 'Which board and class?')));
+            const kriti = companionArt('kritiNotebook', 'ft-setup-mascot', 108);
+            if (kriti) head.appendChild(kriti);
+            body.appendChild(head);
+            body.appendChild(el('p', 'ft-setup-h2', t('study.setup.schoolBoard', 'Board')));
+            const boardFlow = el('div', 'ft-setup-flow');
+            boards.forEach(board => boardFlow.appendChild(setupChip(board.label, board.key === current.key, () => { if (s.board !== board.key) { s.board = board.key; render(); } })));
+            body.appendChild(boardFlow);
+            body.appendChild(el('p', 'ft-setup-h2', t('study.setup.schoolClass', 'Class')));
+            const classFlow = el('div', 'ft-setup-flow');
+            for (const item of current.grades) {
+                const label = item.form ? t('study.setup.schoolFormN', 'Form {number}', { number: item.number }) : item.number;
+                const spoken = item.form ? label : t('study.setup.schoolClassN', 'Class {number}', { number: item.number });
+                classFlow.appendChild(setupChip(label, grade?.key === item.key && grade?.packId === item.packId, () => {
+                    // A class picks its pack: this country's other school packs drop out; global ones stay.
+                    const own = new Set(boards.flatMap(board => board.packIds));
+                    s.selected = [...s.selected.filter(id => !own.has(id) || id === item.packId)];
+                    if (!s.selected.includes(item.packId)) s.selected.push(item.packId);
+                    s.grade[item.packId] = item.key;
+                    render();
+                }, { square: !item.form, description: spoken }));
+            }
+            body.appendChild(classFlow);
+            const pack = grade ? Packs.packById(catalog, grade.packId) : null;
+            if (!pack) {
+                body.appendChild(el('p', 'ft-study-muted', t('study.setup.schoolPickClass', 'Pick your class to see its channels.')));
+            } else {
+                const variants = array(pack.variants);
+                if (variants.length && (Number(grade.number) || 0) >= 11) {
+                    const card = el('div', 'ft-setup-paper');
+                    card.appendChild(el('p', 'ft-setup-h2', t('study.setup.branch', 'Branch')));
+                    card.appendChild(el('p', 'ft-study-muted', t('study.setup.schoolStreamBody', 'Pick the one you\'re in.')));
+                    const chosen = Setup.variant(pack, object(s.edits[pack.id]).variant);
+                    const flow = el('div', 'ft-setup-flow');
+                    variants.forEach(item => flow.appendChild(setupChip(Setup.variantName(item, language()), item.id === chosen?.id, () => chooseVariant(pack, item.id))));
+                    card.appendChild(flow);
+                    body.appendChild(card);
+                }
+                const chosen = variants.length ? Setup.variant(pack, object(s.edits[pack.id]).variant) : null;
+                const who = [current.label, grade.form ? null : t('study.setup.schoolClassN', 'Class {number}', { number: grade.number }),
+                    chosen ? Setup.variantName(chosen, language()) : null].filter(Boolean).join(', ');
+                const chips = array(chosen?.chips).length ? chosen.chips : array(pack.chips).length ? pack.chips : array(pack.subjects);
+                body.appendChild(el('p', 'ft-study-muted', t('study.setup.covers', '{who} covers {topics}.', { who, topics: topicLine(chips) })));
+            }
+            addGlobals(body, globals);
+            body.appendChild(el('p', 'ft-study-muted', t('study.setup.schoolOtherCountry', 'Studying another country\'s board? Change the country first.')));
+            return s.selected.length ? bar(null, t('study.setup.nextChannels', 'Next: check channels'), goNext) : null;
+        }
+
+        function addGlobals(body, globals) {
+            if (!globals.length) return;
+            body.appendChild(el('p', 'ft-setup-h2', t('study.setup.schoolEvery', 'For every curriculum')));
+            body.appendChild(el('p', 'ft-study-muted', t('study.setup.schoolEveryBody', 'Add these to any class, or pick them on their own.')));
+            const flow = el('div', 'ft-setup-flow');
+            globals.forEach(pack => flow.appendChild(setupChip(chipLabel(pack).replace(/ for any curriculum$/, ''), s.selected.includes(pack.id), () => toggle(pack.id),
+                { description: `${Packs.packName(pack, language())}. ${packMeta(pack)}` })));
+            body.appendChild(flow);
+        }
+
+        // ---- Step 2c: a skill
+        function skillDoodle(pack) {
+            const words = new Set(Setup.StudyExamFields.words(pack.id));
+            if (words.has('coding')) return 'note';
+            if (words.has('maths')) return 'crayon';
+            if (words.has('science')) return 'sparkle';
+            if (words.has('university')) return 'star';
+            if (words.has('crashcourse')) return 'cloud';
+            return 'bubble';
+        }
+
+        function pickRow(pack) {
+            const chosen = s.selected.includes(pack.id);
+            const row = button('', `ft-setup-pick${chosen ? ' is-on' : ''}`, () => toggle(pack.id));
+            row.setAttribute('role', 'checkbox');
+            row.setAttribute('aria-checked', chosen ? 'true' : 'false');
+            const name = Packs.packName(pack, language());
+            const words = el('span', 'ft-setup-pick__words');
+            words.append(el('strong', 'ft-setup-pick__name', name.split(' (')[0] || name), el('span', 'ft-study-muted', packMeta(pack)));
+            row.append(doodleArt(skillDoodle(pack), 'ft-setup-pick__doodle'), words, el('span', 'ft-setup-pick__check', chosen ? '✓' : ''));
+            row.setAttribute('aria-label', `${name}. ${packMeta(pack)}`);
+            return row;
+        }
+
+        function renderSkills(body) {
+            body.append(el('h3', 'ft-setup-h1', t('study.setup.skillQuestion', 'What do you want to learn?')),
+                el('p', 'ft-study-muted', t('study.setup.skillBody', 'Pick one or more. You can add your own channels next.')));
+            const list = el('div', 'ft-setup-picks');
+            Setup.StudySkills.of(catalog, Setup.MIN_CHANNELS).forEach(pack => list.appendChild(pickRow(pack)));
+            // Kids learning by age: these packs fill the Kids space during study.
+            const kids = Packs.forTab(catalog, '', 'kids');
+            if (kids.length) {
+                list.appendChild(el('p', 'ft-setup-h2', t('study.setup.skillKidsHeading', 'Kids learning')));
+                kids.forEach(pack => list.appendChild(pickRow(pack)));
+            }
+            body.appendChild(list);
+            return listBar();
+        }
+
+        // ---- Step 3: stream
+        function renderStream(body) {
+            const list = packs().filter(pack => array(pack.variants).length && pack.kind !== 'class');
+            const head = el('div', 'ft-setup-question');
+            const words = el('div', 'ft-setup-question__words');
+            words.append(el('h3', 'ft-setup-h1', t('study.setup.streamQuestion', 'Which one are you taking?')),
+                el('p', 'ft-study-muted', t('study.setup.streamBody', 'Each one gets its own channels. Shared ones come along.')));
+            head.appendChild(words);
+            const kriti = companionArt('kritiThinking', 'ft-setup-mascot', 116);
+            if (kriti) head.appendChild(kriti);
+            body.appendChild(head);
+            for (const pack of list) {
+                const chosen = Setup.variant(pack, object(s.edits[pack.id]).variant);
+                if (list.length > 1) body.appendChild(el('p', 'ft-setup-h2', chipLabel(pack)));
+                const grid = el('div', 'ft-setup-streams');
+                for (const item of pack.variants) {
+                    const on = item.id === chosen?.id;
+                    const tile = button('', `ft-setup-stream${on ? ' is-on' : ''}`, () => chooseVariant(pack, item.id));
+                    tile.setAttribute('aria-pressed', on ? 'true' : 'false');
+                    tile.append(el('strong', '', Setup.variantName(item, language())), el('span', 'ft-study-muted', array(item.chips).slice(0, 2).join(', ')));
+                    grid.appendChild(tile);
+                }
+                body.appendChild(grid);
+                if (chosen) {
+                    const topics = [...new Map([...array(chosen.chips), ...array(chosen.keywords)].map(topic => [Setup.topicKey(topic), topic])).values()];
+                    const card = el('div', 'ft-setup-paper');
+                    card.appendChild(el('p', '', t('study.setup.covers', '{who} covers {topics}.', { who: Setup.variantName(chosen, language()), topics: topicLine(topics) })));
+                    body.appendChild(card);
+                }
+            }
+            return bar(null, t('study.setup.nextChannels', 'Next: check channels'), goNext);
+        }
+
+        // ---- Step 4: review
+        function groupTitle(pack, kind) {
+            if (kind === 'stream') return t('study.setup.groupStream', 'For {stream}', { stream: Setup.variantName(Setup.variant(pack, object(s.edits[pack.id]).variant), language()) });
+            if (kind === 'shared') return pack.kind === 'class'
+                ? t('study.setup.groupSharedClass', 'Everyone in {exam}', { exam: chipLabel(pack) })
+                : t('study.setup.groupShared', 'Everyone taking {exam}', { exam: chipLabel(pack) });
+            return t('study.setup.groupOwn', 'Your own');
+        }
+
+        function countsLabel() {
+            const [channels, topics] = Setup.StudyReviewGroups.counts(packs(), s.edits);
+            if (channels + topics === 0) return [t('study.setup.keepOne', 'Keep at least one channel or topic so Home has something to show.'), false];
+            return [t('study.setup.reviewCounts', '{channels} · {topics}', {
+                channels: plural('study.setup.nChannels', channels, '{count} channel', '{count} channels'),
+                topics: plural('study.setup.nTopics', topics, '{count} topic', '{count} topics')
+            }), true];
+        }
+
+        function updateReviewBar() {
+            const node = panel.querySelector(':scope > .ft-setup__bar');
+            if (!node) return;
+            const [label, any] = countsLabel();
+            node.querySelector('.ft-setup__bar-label').textContent = label;
+            node.querySelector('.ft-setup__bar-action').disabled = !any;
+        }
+
+        function channelRow(pack, row) {
+            const node = button('', `ft-setup-row${row.on ? ' is-on' : ''}`, () => {
+                const on = !row.on;
+                const ref = { channelId: row.channelId, handle: row.handle, name: row.name };
+                if (row.own && !on) (s.keptOwn[pack.id] = s.keptOwn[pack.id] || []).push(ref);
+                s.edits[pack.id] = Setup.StudyReviewGroups.setChannel(s.edits[pack.id], row, on);
+                if (row.own && on) s.keptOwn[pack.id] = array(s.keptOwn[pack.id]).filter(item => Setup.refKey(item) !== Setup.refKey(ref));
+                row.on = on;
+                node.classList.toggle('is-on', on);
+                node.setAttribute('aria-checked', on ? 'true' : 'false');
+                updateReviewBar();
+            });
+            node.setAttribute('role', 'switch');
+            node.setAttribute('aria-checked', row.on ? 'true' : 'false');
+            node.setAttribute('aria-label', [row.name, row.displayHandle].filter(Boolean).join(', '));
+            const words = el('span', 'ft-setup-row__words');
+            words.appendChild(el('span', 'ft-setup-row__name', row.name));
+            if (row.displayHandle) words.appendChild(el('span', 'ft-study-muted ft-setup-row__handle', row.displayHandle));
+            node.append(channelAvatar(row), words, el('span', 'ft-setup-switch'));
+            return node;
+        }
+
+        function addChannelGroups(host, pack) {
+            const groups = Setup.StudyReviewGroups.channels(pack, s.edits[pack.id], array(s.keptOwn[pack.id]));
+            const firstOpen = groups.find(group => group.kind !== 'own')?.kind;
+            groups.forEach((group, index) => {
+                const key = `${pack.id}:${group.kind}`;
+                // An empty "Your own" has nothing to fold: the Add row below says what lands there.
+                if (group.kind === 'own' && !group.rows.length) return;
+                const open = s.opened[key] ?? (group.kind === firstOpen);
+                if (index > 0) host.appendChild(el('hr', 'ft-setup-dashed'));
+                const head = button('', `ft-setup-group${open ? ' is-open' : ''}`, () => { s.opened[key] = !open; render(); });
+                head.setAttribute('aria-expanded', open ? 'true' : 'false');
+                const words = el('span', 'ft-setup-group__words');
+                words.append(el('strong', '', groupTitle(pack, group.kind)), el('span', 'ft-study-muted', plural('study.setup.nOn', group.onCount, '{count} on', '{count} on')));
+                head.appendChild(words);
+                // A folded group shows who's in it: the first three channels that are on.
+                if (!open && group.onCount) {
+                    const stack = el('span', 'ft-setup-stack');
+                    group.rows.filter(row => row.on).slice(0, 3).forEach(row => stack.appendChild(channelAvatar(row, 28)));
+                    head.appendChild(stack);
+                }
+                head.appendChild(el('span', 'ft-setup-fold__chevron', '⌄'));
+                host.appendChild(head);
+                if (!open) return;
+                const all = s.showAll.has(key);
+                const folds = Setup.StudyReviewGroups.folds(group.rows.length);
+                const visible = all || !folds ? group.rows : group.rows.slice(0, Setup.ROWS_FOLDED);
+                visible.forEach(row => host.appendChild(channelRow(pack, row)));
+                if (folds) {
+                    const more = group.rows.length - Setup.ROWS_FOLDED;
+                    host.appendChild(button(all ? t('study.setup.showLess', 'Show fewer') : plural('study.setup.showMore', more, 'Show {count} more', 'Show {count} more'),
+                        'ft-setup-text-button', () => { if (all) s.showAll.delete(key); else s.showAll.add(key); render(); }));
+                }
+            });
+            const add = button('', 'ft-setup-add', () => { s.addFor = pack.id; render(); });
+            const words = el('span', 'ft-setup-row__words');
+            words.append(el('strong', '', t('study.setup.addChannel', 'Add a channel')), el('span', 'ft-study-muted', t('study.setup.addChannelLine', 'Search by name or paste a link')));
+            add.append(el('span', 'ft-setup-add__plus', '+'), words);
+            host.appendChild(add);
+            if (s.addFor === pack.id) host.appendChild(addChannelSheet(pack));
+        }
+
+        function addTopicGroups(host, pack, named) {
+            if (named) host.appendChild(el('p', 'ft-setup-h2', chipLabel(pack)));
+            for (const group of Setup.StudyReviewGroups.topics(pack, s.edits[pack.id])) {
+                host.appendChild(el('p', 'ft-setup-section', groupTitle(pack, group.kind)));
+                const key = `${pack.id}:topics:${group.kind}`;
+                const all = s.showAll.has(key);
+                const flow = el('div', 'ft-setup-flow is-soft');
+                const visible = all ? group.topics.slice(0, Setup.MAX_TOPICS) : group.topics.slice(0, Setup.TOPICS_FOLDED);
+                for (const item of visible) {
+                    const label = engine()?.topicLabel ? engine().topicLabel(item.topic, language()) : item.topic;
+                    const chip = setupChip(label, item.on, () => {
+                        const now = chip.getAttribute('aria-pressed') !== 'true';
+                        s.edits[pack.id] = group.kind === 'own'
+                            ? Setup.StudyReviewGroups.setOwnTopic(s.edits[pack.id], item.topic, now)
+                            : Setup.StudyReviewGroups.setTopic(s.edits[pack.id], item.topic, now);
+                        chip.classList.toggle('is-on', now);
+                        chip.setAttribute('aria-pressed', now ? 'true' : 'false');
+                        updateReviewBar();
+                    });
+                    chip.classList.add('is-soft');
+                    flow.appendChild(chip);
+                }
+                if (!all && group.topics.length > Setup.TOPICS_FOLDED) {
+                    const more = group.topics.length - Setup.TOPICS_FOLDED;
+                    flow.appendChild(button(plural('study.setup.topicsMore', more, '+{count} more', '+{count} more'), 'ft-setup-chip is-more', () => { s.showAll.add(key); render(); }));
+                }
+                host.appendChild(flow);
+            }
+        }
+
+        function renderReview(body) {
+            const list = packs();
+            body.appendChild(el('p', 'ft-study-muted', t('study.setup.reviewIntro', 'Turn off anything you don\'t want. Add your own.')));
+            const columns = el('div', 'ft-setup-columns');
+            const left = el('div', 'ft-setup-column');
+            const right = el('div', 'ft-setup-column');
+            list.forEach((pack, index) => {
+                if (list.length > 1) {
+                    if (index > 0) left.appendChild(el('hr', 'ft-setup-dashed'));
+                    left.appendChild(el('h3', 'ft-setup-h1 is-small', chipLabel(pack)));
+                }
+                addChannelGroups(left, pack);
+            });
+            right.appendChild(el('p', 'ft-setup-h2', t('study.setup.reviewTopics', 'Topics')));
+            list.forEach(pack => addTopicGroups(right, pack, list.length > 1));
+            const explainer = searchExplainerCard({ activePackIds: s.selected, packEdits: s.edits }, catalog, !isSelf);
+            if (explainer) right.appendChild(explainer);
+            columns.append(left, right);
+            body.appendChild(columns);
+            const [label, any] = countsLabel();
+            return bar(label, t('study.setup.next', 'Next'), goNext, any);
+        }
+
+        // ---- "Add a channel" (Android StudyAddChannelSheet)
+        function addChannelSheet(pack) {
+            const Input = Setup.StudyChannelInput;
+            const sheet = el('div', 'ft-setup-sheet');
+            sheet.setAttribute('role', 'group');
+            sheet.setAttribute('aria-label', t('study.setup.addChannel', 'Add a channel'));
+            sheet.appendChild(el('p', 'ft-study-muted', t('study.setup.addBody', 'Search by name, or paste a channel\'s link or @handle.')));
+            const field = el('input', 'text-input');
+            field.type = 'text';
+            field.placeholder = t('study.setup.addHint', 'Name, @handle or link');
+            field.setAttribute('aria-label', field.placeholder);
+            const results = el('div', 'ft-setup-results');
+            const status = el('p', 'ft-study-muted');
+            status.setAttribute('role', 'status');
+            const isOn = ref => Setup.StudyReviewGroups.isOn(pack, s.edits[pack.id], ref);
+            const added = ref => {
+                s.edits[pack.id] = Setup.StudyReviewGroups.add(s.edits[pack.id], ref, pack);
+                s.keptOwn[pack.id] = array(s.keptOwn[pack.id]).filter(item => Setup.refKey(item) !== Setup.refKey(ref));
+                s.opened[`${pack.id}:own`] = true;
+                s.addFor = null;
+                render();
+                notify(panel, t('study.setup.addDone', '{name} added to Your own', { name: ref.name || ref.handle || ref.channelId }), null);
+            };
+            const resultRow = (ref, meta) => {
+                const on = isOn(ref);
+                const row = el('div', 'ft-setup-result');
+                const words = el('span', 'ft-setup-row__words');
+                words.append(el('span', 'ft-setup-row__name', ref.name || ref.handle || ref.channelId), el('span', 'ft-study-muted', meta || (ref.handle ? `@${String(ref.handle).replace(/^@/, '')}` : '')));
+                const action = button(on ? t('study.setup.addAdded', 'Added') : t('study.setup.addAction', 'Add'), on ? 'btn-secondary' : 'btn-primary', () => added(ref));
+                action.disabled = on;
+                row.append(channelAvatar(ref, 32), words, action);
+                return row;
+            };
+            const lookup = async value => {
+                status.textContent = t('study.setup.addLooking', 'Looking it up…');
+                results.replaceChildren();
+                const info = await send({ action: 'fetchChannelDetails', channelIdOrHandle: value });
+                if (info?.success && (info.id || info.handle)) {
+                    status.textContent = '';
+                    results.appendChild(resultRow({ channelId: info.id || null, handle: info.handle ? String(info.handle).replace(/^@/, '') : null, name: info.name || info.handle || info.id }));
+                } else if (info?.errorCode === 'channel_not_found') {
+                    status.textContent = t('study.setup.addNone', 'No channel called "{query}". Check the spelling or paste its link.', { query: field.value.trim() });
+                } else {
+                    status.textContent = t('study.setup.addFailed', 'Couldn\'t look that up. Check your connection and try again.');
+                }
+            };
+            const search = () => {
+                const input = Input.parse(field.value);
+                results.replaceChildren();
+                status.textContent = '';
+                if (input.type === 'empty') return;
+                const value = Input.lookup(input);
+                if (value) { lookup(value); return; }
+                const hits = Input.searchCatalog(catalog, input.value);
+                if (hits.length) {
+                    results.appendChild(el('p', 'ft-setup-section', t('study.setup.addKnown', 'From study packs')));
+                    hits.forEach(channel => results.appendChild(resultRow({ channelId: channel.channelId, handle: channel.handle, name: channel.name })));
+                }
+                // The handle lookup hides when a pack channel already has that handle (Android b753aa71f).
+                const guess = Input.handleGuess(input.value);
+                if (guess && !hits.some(channel => String(channel.handle || '').replace(/^@/, '').toLowerCase() === guess.toLowerCase())) {
+                    results.appendChild(button(t('study.setup.addLookupHandle', 'Look up @{handle}', { handle: guess }), 'btn-secondary', () => lookup(`@${guess}`)));
+                }
+                if (!hits.length && !guess) status.textContent = t('study.setup.addNone', 'No channel called "{query}". Check the spelling or paste its link.', { query: input.value });
+            };
+            let timer = 0;
+            field.addEventListener('input', () => { clearTimeout(timer); timer = setTimeout(search, 250); });
+            field.addEventListener('keydown', event => { if (event.key === 'Enter') { event.preventDefault(); clearTimeout(timer); search(); } if (event.key === 'Escape') { s.addFor = null; render(); } });
+            const actions = el('div', 'ft-study-actions');
+            actions.appendChild(button(t('popup.modal.cancel', 'Cancel'), 'btn-secondary', () => { s.addFor = null; render(); }));
+            sheet.append(field, status, results, actions);
+            setTimeout(() => { try { field.focus(); } catch (e) { } }, 0);
+            return sheet;
+        }
+
+        // ---- Step 5: ready
+        function renderReady(body) {
+            const focus = object(study.focus);
+            const round = Number.isFinite(focus.roundMinutes) ? focus.roundMinutes : 25;
+            const rest = Number.isFinite(focus.breakMinutes) ? focus.breakMinutes : 5;
+            const card = el('div', 'ft-setup-paper ft-setup-ready');
+            const line = value => {
+                const row = el('p', 'ft-setup-ready__line');
+                row.append(el('span', 'ft-setup-ready__check', '✓'), el('span', '', value));
+                card.appendChild(row);
+                return row;
+            };
+            line(t('study.setup.readyAllow', 'During study, only {plan} channels and topics show.', { plan: packsShortLabel(s.selected, catalog) }));
+            const blockLine = line('');
+            blockLine.hidden = true;
+            // The block list keeps working during study (layered rules); name only what's in it.
+            blockCounts(options.profileId).then(([channels, words]) => {
+                const channelText = plural('study.setup.nChannels', channels, '{count} channel', '{count} channels');
+                const wordText = plural('study.setup.nWords', words, '{count} word', '{count} words');
+                const list = channels > 0 && words > 0 ? t('study.setup.readyAnd', '{first} and {second}', { first: channelText, second: wordText })
+                    : channels > 0 ? channelText : words > 0 ? wordText : '';
+                if (!list) return;
+                blockLine.lastChild.textContent = t('study.setup.readyBlockKept', 'Your block list still applies: {list}.', { list });
+                blockLine.hidden = false;
+            });
+            line(t('study.setup.readyBreaks', 'A {breakMinutes}-minute break after every {roundMinutes} minutes.', { breakMinutes: rest, roundMinutes: round }));
+            line(t('study.setup.readyShorts', 'Clips show only from these channels.'));
+            line(t('study.setup.readySkip', 'You can always skip a video you don\'t want.'));
+            const kidsNote = engine()?.kidsSetupNote ? engine().kidsSetupNote(s.selected, catalog) : null;
+            if (kidsNote === 'kids_learning') line(t('study.setup.readyKidsLearning', 'Kids learning for this age shows in the Kids space.'));
+            else if (kidsNote === 'kids_hold') line(t('study.setup.readyKidsHold', 'The Kids space keeps Kids videos and pauses at study time.'));
+            body.appendChild(card);
+            const actions = el('div', 'ft-setup-ready__actions');
+            if (isSelf) {
+                actions.appendChild(el('p', 'ft-setup-h2', t('study.setup.lockSection', 'Lock it in')));
+                const lockCard = el('div', 'ft-setup-paper');
+                const row = el('div', 'ft-setup-flow');
+                for (const [mode, name] of [['gentle', t('study.setup.lockGentle', 'Gentle')], ['locked', t('study.setup.lockLocked', 'Locked')]]) {
+                    row.appendChild(setupChip(name, s.lockMode === mode, () => { s.lockMode = mode; render(); }));
+                }
+                lockCard.append(row, el('p', 'ft-study-muted', s.lockMode === 'locked'
+                    ? t('study.setup.lockLockedBody', 'No early end, up to 4 hours. Uses Self-Control.')
+                    : t('study.setup.lockGentleBody', 'You can end early after a 30-second pause.')));
+                actions.appendChild(lockCard);
+            }
+            const save = async startNowToo => {
+                const result = await options.onPatch?.({ activePackIds: s.selected.slice(), packEdits: Setup.savedEdits(s.selected, s.edits, catalog) });
+                if (result?.ok === false) { notify(panel, errorText(result.error), null); return; }
+                if (startNowToo) {
+                    const started = await options.onStart?.(50, s.lockMode);
+                    if (started?.ok === false) { notify(panel, errorText(started.error), null); return; }
+                }
+                close();
+            };
+            actions.appendChild(button(t('study.setup.savePlan', 'Save plan'), isSelf ? 'btn-secondary' : 'btn-primary', () => save(false)));
+            if (isSelf) actions.appendChild(button(t('study.setup.startNow', 'Start now'), 'btn-primary', () => save(true)));
+            body.appendChild(actions);
+            return null;
+        }
+
+        render();
+        return { close, state: s };
+    }
+
+    async function blockCounts(profileId) {
+        try {
+            const stored = await new Promise(resolve => runtime().storage.local.get(['ftProfilesV4'], resolve));
+            const profiles = object(stored?.ftProfilesV4);
+            const profile = object(object(profiles.profiles)[profileId || profiles.activeProfileId]);
+            const main = object(profile.main);
+            return [array(main.channels).length, array(main.keywords).length];
+        } catch (e) {
+            return [0, 0];
+        }
     }
 
     // ---- Dashboard (options page) -------------------------------------------------------------
@@ -808,7 +1563,8 @@
             study, catalog, editable, packs: state.packs,
             readOnlyLabel: text(object(study.plan).setByParentId) ? setByLabel(data.parentName) : t('study.lockedUntil', 'Locked until {time}', { time: formatDayTime(state.lockedUntil) }),
             toastHost: card,
-            onPatch: async patch => { const result = await send({ action: 'FilterTube_StudyUpdate', patch }); await refresh(); return result; }
+            onPatch: async patch => { const result = await send({ action: 'FilterTube_StudyUpdate', patch }); await refresh(); return result; },
+            onSetupClosed: refresh
         });
         const explainer = searchExplainerCard(study, catalog, data.isChild === true || state.isChild === true, state.searchHow);
         if (explainer) card.appendChild(explainer);
@@ -968,6 +1724,8 @@
         let catalog = null;
         let timer = 0;
         async function refresh() {
+            // Never redraw over setup while someone is in it; it refreshes when it closes.
+            if (host.dataset.ftStudySetupOpen === 'true') { clearTimeout(timer); timer = setTimeout(refresh, 30000); return; }
             const state = await send({ action: 'FilterTube_StudyGetState' });
             if (!state || state.ok === false) { host.hidden = true; return; }
             host.hidden = false;
@@ -1084,18 +1842,19 @@
         }
         body.replaceChildren(plannerHost, lockRow);
         renderPlanner(plannerHost, {
-            study: data.study || {}, catalog, editable: true, toastHost: body,
+            study: data.study || {}, catalog, editable: true, toastHost: body, isSelf: false, profileId: childId,
             onPatch: async patch => {
                 const result = await sendAsParent(body, { action: 'FilterTube_StudyUpdateChild', profileId: childId, patch });
-                redraw();
+                if (!body.dataset.ftStudySetupOpen) redraw();
                 return result;
-            }
+            },
+            onSetupClosed: redraw
         });
     }
 
     root.FilterTubeStudyUi = Object.freeze({
         t, phaseInfo, planSegments, segmentWords, setByLabel, packLabel, renderStrip, mountStrip,
-        renderPlanner, renderDashboard, mountDashboard, renderParentPlans, searchExplainerCard, askForTime, applyCountryAccent
+        renderPlanner, renderDashboard, mountDashboard, renderParentPlans, searchExplainerCard, askForTime, applyCountryAccent, openSetup
     });
 
     // Popup: the strip takes the banner slot under the header. Options page: the study card.
