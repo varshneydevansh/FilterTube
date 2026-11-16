@@ -3,6 +3,60 @@
     "_comment": "Shared release notes source for the dashboard What's New tab and the YouTube release banner. Keep entries sorted newest-first by version."
   },
   {
+    "version": "3.6.2",
+    "headline": "Meet Kriti and Uljhan, a rebuilt Study planner and Ask a parent",
+    "summary": "FilterTube 3.6.2 gets its own look, with Kriti and Uljhan, crayon icons, doodles and optional sounds. Study is rebuilt around a day planner with ready-made packs for 29 countries, children can ask a parent for a video or channel, and the viewer, profiles, tablets and TVs get a calmer redesign with clearer privacy notes.",
+    "bannerSummary": "Kriti and Uljhan, a rebuilt Study planner, Ask a parent and a calmer viewer.",
+    "highlights": [
+      "Study is rebuilt: a paper Study home with a crayon Day Ring, a day planner, a setup that explains each choice, and ready-made packs for exams and school classes in 29 countries. Feeds follow the branch you pick, so GATE Civil stays Civil, and Search during study looks only in your plan's channels.",
+      "Ask a parent: when something is blocked, a child can ask to watch that video or allow that channel, and a parent answers. Parent mode opens a framed parent session inside a Kids profile with one clear way out, and Kids learning by age fills the Kids space with age-picked lessons during study.",
+      "A new look: Kriti and Uljhan keep you company while pages load, lists are empty, you're offline or something is blocked. FilterTube has its own crayon icons, doodles, doodle avatars, Kriti, Uljhan and duo app icons to choose from, and optional sounds you can set to Off, Gentle or Playful.",
+      "A calmer viewer: full-bleed posters on phones, a new playlist page and account sheet, the Watch glow reaching up under the status bar, Uljhan fetching more as you scroll, pull to refresh, and one clear notice when the connection is slow or offline.",
+      "Profiles are redesigned with crayon avatars, a picker that shows who is a parent and who is a child, and a guarded way to add a profile.",
+      "FilterTube uses its own words everywhere: Clips, Following, Saved, and Sangeet for music, in every language.",
+      "Privacy: Accounts & Sync explains what the sync relay can and can't see and asks before the first internet sync, your device name is no longer sent when ringing another device, DeArrow thumbnails are a separate opt-in that starts off, account cookies go only to the video service's own sites, and release builds keep debug logs out of the system log.",
+      "Tablets and TVs match the phone: Filters, Search and Ask a parent use the full width on tablets, and TVs get the crayon icons in the rail, Study on the big screen and an About this TV card with Full and Light modes.",
+      "Supporting FilterTube stays free and optional: the support sheet is a friendly note, never a gate.",
+      "Fixes: PIN checks no longer freeze the screen, mascots are never cut off mid-motion, many remaining English labels are now translated, and Sangeet's load errors no longer name the video service."
+    ],
+    "detailsUrl": "https://github.com/varshneydevansh/FilterTube/releases/tag/v3.6.2"
+  },
+  {
+    "version": "3.6.1",
+    "headline": "Landscape that fits every screen, steadier playback controls and stricter filtering",
+    "summary": "FilterTube 3.6.1 sizes every landscape page from the window, so phones on their side, tablets and TVs get a full-height video and a right-hand panel. Captions, the transcript and card menus behave as expected, and a channel you filter is hidden everywhere.",
+    "bannerSummary": "Landscape fitted to every screen, caption and transcript fixes, and stricter filtering.",
+    "highlights": [
+      "Landscape is calculated from your screen: on a phone on its side, a tablet or a TV, Watch shows a full-height 16:9 video with Up next beside it, Search sits at the top of the side rail, and nothing is clipped by the camera cutout.",
+      "Music on its side shows the same Up next as upright, the turntable turns at 33⅓ rpm with the playback speed, and Up next starts at the playing song.",
+      "Captions turn off when you choose Off, Auto-translate works on the playing video, and a choice the player can't apply yet tells you so instead of failing quietly.",
+      "Tapping a transcript line keeps the transcript open and following, like lyrics, and the Watch glow reaches across the whole page in landscape.",
+      "A channel in your filter list hides everything from it, however it was added. Blocking from a comment hides that channel's comments and videos, Mixes seeded by a blocked channel are hidden, and live chat follows your rules.",
+      "In Allow only selected mode, comments show only allowed commenters or allowed words.",
+      "Card menus keep working after a filter change, a picked channel sort survives refresh, and the Watch picture stays after a filter change while scrolled.",
+      "A step-by-step guide helps set YouTube links to open in FilterTube, and tablets show the Main and Kids profiles side by side."
+    ],
+    "detailsUrl": "https://github.com/varshneydevansh/FilterTube/releases/tag/v3.6.1"
+  },
+  {
+    "version": "3.6.0",
+    "headline": "A new Music player, faster pages and YouTube links that open in FilterTube",
+    "summary": "FilterTube 3.6.0 redesigns Music around each song's cover, loads Music, Home and album pages much faster, opens YouTube links from other apps in the protected viewer and makes PIN locking predictable. Phones, tablets and TVs get the same improvements.",
+    "bannerSummary": "New Music player and colours, faster loading, YouTube links in FilterTube and a clearer PIN lock.",
+    "highlights": [
+      "Music is coloured by what you're listening to: every Music page, the mini player and the bottom bar take the cover's colours, change smoothly between songs and albums, and return to normal when you leave Music.",
+      "A redesigned Music player: one seek ring around a turning cover, a lyrics card that rises from the bottom, a light visualizer that moves with the beat, and live stations shown as LIVE.",
+      "Real synced lyrics from YouTube Music, then the song's own captions in your language, with LRCLIB as an optional extra you're asked about once. Lyrics and transcripts keep the current line centred to the end.",
+      "Much faster loading: Music songs use the channel YouTube Music already lists, on-screen cards are checked first, and channel checks are paced so YouTube stops refusing them. Album and playlist songs no longer wait for minutes.",
+      "Music plays audio only until you show the video, so songs start faster and use far less data. Skipping from the lock screen and moving to the next song now play straight away.",
+      "YouTube links from chat apps and other apps can open in FilterTube's protected viewer. A one-time prompt and a check in Settings help parents switch it on.",
+      "PIN locking is predictable: profiles stay unlocked while in use and lock when FilterTube closes, the phone restarts or you switch profile. Parents can choose to lock after time away instead.",
+      "The Watch page glows with the playing video's colours, from the status bar to the sheets and Up next; the transcript docks under the player; chips match their page; and Mix queues keep loading.",
+      "Android TV and tablets: Music colours and the new player on TV with remote seeking, a lighter visualizer for TV boxes, Watch panels in the video's colours, and two-pane fixes and larger album covers on tablets."
+    ],
+    "detailsUrl": "https://github.com/varshneydevansh/FilterTube/releases/tag/v3.6.0"
+  },
+  {
     "version": "3.5.0",
     "headline": "Android TV, YouTube Kids profiles and filtering fixes",
     "summary": "FilterTube 3.5.0 brings the apps to Android TV, adds YouTube Kids profile switching, syncs local playlists between devices and fixes filtering for Korean, Japanese and Chinese keywords, view counts and autoplay.",
