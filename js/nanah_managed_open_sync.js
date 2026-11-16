@@ -356,6 +356,13 @@
                 for (const item of result.items) {
                     try {
                         const applyResult = await applyMailboxItem(item);
+                        // Deferred (a Self-Control session runs here): left unacknowledged, so the
+                        // next pull after the session picks it up again.
+                        if (applyResult?.ackState === 'pending' && applyResult?.accepted !== true) {
+                            linkRow.deferredItemCount = (linkRow.deferredItemCount || 0) + 1;
+                            state.deferredItemCount = (state.deferredItemCount || 0) + 1;
+                            continue;
+                        }
                         if (applyResult?.accepted === true || applyResult?.applied === true || applyResult === true) {
                             linkRow.appliedItemCount += 1;
                             state.appliedItemCount += 1;

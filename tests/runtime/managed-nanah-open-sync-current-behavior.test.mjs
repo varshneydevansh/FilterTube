@@ -380,3 +380,27 @@ test('open-sync helper does not add page hot-path observers timers or network cl
   assert.doesNotMatch(helperSource, /chrome\.tabs/);
   assert.doesNotMatch(helperSource, /browser\.tabs/);
 });
+
+test('open-sync leaves an item deferred by a Self-Control session unacknowledged, so the next pull applies it', async () => {
+  const ackPayloads = [];
+  const provider = {
+    async pullDecryptedMailboxItems() {
+      return { ok: true, items: [{ schema: 'filtertube_managed_mailbox_item', mailboxItemId: 'lock-item' }] };
+    },
+    async ackDecryptedMailboxItems(payload) {
+      ackPayloads.push(payload);
+      return { ok: true, ackedItemCount: payload.records.length };
+    }
+  };
+  const helper = loadFactory({ provider });
+  const state = await helper.runOpenSync({
+    links: [managedLink()],
+    activeProfileId: 'child-profile-1',
+    profilesV4: profilesV4(),
+    applyMailboxItem: async () => ({ accepted: false, reason: 'self_control_active', ackState: 'pending', deferred: true }),
+    writeState: async () => {}
+  });
+  assert.equal(state.deferredItemCount, 1);
+  assert.equal(state.rejectedItemCount, 0);
+  assert.equal(ackPayloads.reduce((sum, payload) => sum + payload.records.length, 0), 0);
+});

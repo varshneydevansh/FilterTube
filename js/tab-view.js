@@ -26406,6 +26406,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             stale_pairing: 'This saved pairing is stale. Re-pair this device.',
             trusted_link_quarantined: 'This saved trust link is quarantined and needs parent review.',
             locked_trusted_updates_not_allowed: 'This protected profile is not allowed to receive saved parent updates yet.',
+            self_control_active: 'A Self-Control session is running on this device. The update applies after it ends.',
             managed_apply_unavailable: 'FilterTube cannot apply this managed update here.',
             managed_mailbox_apply_unavailable: 'FilterTube cannot apply this Internet Pickup update here.',
             managed_local_network_apply_unavailable: 'FilterTube cannot apply this Home Pickup update here.',
@@ -26471,6 +26472,11 @@ document.addEventListener('DOMContentLoaded', async () => {
                 UIComponents.showToast(tabViewUiText('dashboard.sync.toast.managedPolicyAlreadyAccepted', 'Managed policy already matches the last accepted revision'), 'info');
                 return;
             }
+            if (result.reason === 'self_control_active') {
+                // Waits for the Self-Control session to end (Android refuses the write while one runs).
+                UIComponents.showToast(formatManagedNanahBlockedReason(result.reason), 'info');
+                return;
+            }
             UIComponents.showToast(tabViewUiText('dashboard.sync.toast.managedPolicyRejected', 'Managed policy rejected: {reason}', { reason: formatManagedNanahBlockedReason(result.reason, 'apply failed') }), 'error');
             return;
         }
@@ -26531,6 +26537,11 @@ document.addEventListener('DOMContentLoaded', async () => {
             }
             if (result.accepted === true && result.decision === 'idempotent_same_hash') {
                 UIComponents.showToast(tabViewUiText('dashboard.sync.toast.internetPickupUpdateAlreadyAccepted', 'Internet Pickup update already matches the last accepted revision'), 'info');
+                return result;
+            }
+            if (result.reason === 'self_control_active') {
+                // Waits for the Self-Control session to end (Android refuses the write while one runs).
+                UIComponents.showToast(formatManagedNanahBlockedReason(result.reason), 'info');
                 return result;
             }
             UIComponents.showToast(tabViewUiText('dashboard.sync.toast.internetPickupUpdateRejected', 'Internet Pickup update rejected: {reason}', { reason: formatManagedNanahBlockedReason(result.reason, 'apply failed') }), 'error');
@@ -26600,6 +26611,11 @@ document.addEventListener('DOMContentLoaded', async () => {
             }
             if (result.accepted === true && result.decision === 'idempotent_same_hash') {
                 UIComponents.showToast(tabViewUiText('dashboard.sync.toast.homePickupUpdateAlreadyAccepted', 'Home Pickup update already matches the last accepted revision'), 'info');
+                return result;
+            }
+            if (result.reason === 'self_control_active') {
+                // Waits for the Self-Control session to end (Android refuses the write while one runs).
+                UIComponents.showToast(formatManagedNanahBlockedReason(result.reason), 'info');
                 return result;
             }
             UIComponents.showToast(tabViewUiText('dashboard.sync.toast.homePickupUpdateRejected', 'Home Pickup update rejected: {reason}', { reason: formatManagedNanahBlockedReason(result.reason, 'apply failed') }), 'error');
