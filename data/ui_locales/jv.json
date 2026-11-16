@@ -3127,5 +3127,14 @@
   "study.family.stoppedBody": "Laporan pungkasan {time}. Yen piranti direset utawa FilterTube dicopot, rencana sinaune uga ilang. Pasangna maneh kanggo ngirim.",
   "study.endSession": "Rampungake sesi",
   "study.endHint": "Sesi rampung sawise ngenteni 30 detik, dadi sampeyan isih bisa mbatalake.",
-  "study.week.empty": "Saben dina sampeyan sinau ngisi siji bunderan."
+  "study.week.empty": "Saben dina sampeyan sinau ngisi siji bunderan.",
+  "parentMode.remoteDeviceFallback": "Piranti {name}",
+  "parentMode.sync.connecting": "Nyambung…",
+  "parentMode.sync.connected": "Wis nyambung",
+  "parentMode.sync.sending": "Ngirim…",
+  "parentMode.sync.savedTo": "Wis disimpen ing {device}",
+  "parentMode.sync.upToDate": "Wis anyar",
+  "parentMode.sync.waiting": "Bakal dikirim menyang {device}",
+  "parentMode.sync.offline": "Offline, owah-owahan bakal disinkronake",
+  "askParent.openSpace": "Bukak papane {name}"
 }

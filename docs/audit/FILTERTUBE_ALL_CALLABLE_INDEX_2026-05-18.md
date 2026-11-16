@@ -222,7 +222,7 @@ lexical and its scope remains tracked JS/JSX/MJS: CJS/Python tooling requires it
 separate release/workflow review and is not silently counted as JavaScript here.
 
 ```text
-current tracked JS/JSX/MJS files: 166
+current tracked JS/JSX/MJS files: 167
 current repo-wide lexical callables: 10662
 current complete per-callable semantic proofs: 0
 current callable behavior-change approval: NO-GO
@@ -302,6 +302,7 @@ runtime behavior changed by inventory refresh: no
 | `js/layout.js` | Generated/quarantined UI | 52 | quarantined/generated boundary |
 | `js/managed_admin_authority.js` | UI/settings runtime | 18 | UI/settings counted |
 | `js/managed_parent_command_center.js` | UI/settings runtime | 78 | UI/settings counted |
+| `js/parent_mode.js` | UI/settings runtime | 17 | UI/settings counted; semantic proof incomplete |
 | `js/doodles.js` | UI/settings runtime | 9 | UI/settings counted; semantic proof incomplete |
 | `js/mascots.js` | UI/settings runtime | 83 | UI/settings counted; semantic proof incomplete |
 | `js/paperkit_parity.js` | UI/settings runtime | 27 | UI/settings counted; semantic proof incomplete |

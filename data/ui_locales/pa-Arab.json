@@ -3129,5 +3129,14 @@
   "study.family.stoppedBody": "آخری رپورٹ {time}۔ جے ڈیوائس ریسیٹ ہو گیا یا FilterTube ہٹا دتا گیا، تاں پڑھائی دا پلان وی چلا جاندا اے۔ بھیجن لئی فیر جوڑو۔",
   "study.endSession": "سیشن مُکاؤ",
   "study.endHint": "ایہہ 30 سیکنڈ دی اُڈیک توں بعد مُکدا اے، ایس لئی تسیں ہُن وی رد کر سکدے او۔",
-  "study.week.empty": "جس دن تسیں پڑھدے او، اک دائرہ بھر جاندا اے۔"
+  "study.week.empty": "جس دن تسیں پڑھدے او، اک دائرہ بھر جاندا اے۔",
+  "parentMode.remoteDeviceFallback": "{name} دا ڈیوائس",
+  "parentMode.sync.connecting": "جڑ رہیا اے…",
+  "parentMode.sync.connected": "جڑ گیا",
+  "parentMode.sync.sending": "بھیج رہے آں…",
+  "parentMode.sync.savedTo": "{device} تے محفوظ ہو گیا",
+  "parentMode.sync.upToDate": "تازہ اے",
+  "parentMode.sync.waiting": "{device} نوں بھیجیا جاوے گا",
+  "parentMode.sync.offline": "آف لائن، تبدیلیاں سنک ہون گیاں",
+  "askParent.openSpace": "{name} دی تھاں کھولو"
 }

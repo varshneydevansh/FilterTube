@@ -3129,5 +3129,14 @@
   "study.family.stoppedBody": "آخری رپورٹ {time}۔ اگر ڈیوائس ری سیٹ ہوا یا FilterTube ہٹایا گیا تو پڑھائی کا منصوبہ بھی چلا جاتا ہے۔ بھیجنے کے لیے دوبارہ جوڑیں۔",
   "study.endSession": "سیشن ختم کریں",
   "study.endHint": "یہ 30 سیکنڈ کے وقفے کے بعد ختم ہوتا ہے، اس لیے آپ اب بھی منسوخ کر سکتے ہیں۔",
-  "study.week.empty": "جس دن آپ پڑھتے ہیں، ایک دائرہ بھر جاتا ہے۔"
+  "study.week.empty": "جس دن آپ پڑھتے ہیں، ایک دائرہ بھر جاتا ہے۔",
+  "parentMode.remoteDeviceFallback": "{name} کا آلہ",
+  "parentMode.sync.connecting": "کنیکٹ ہو رہا ہے…",
+  "parentMode.sync.connected": "کنیکٹ ہو گیا",
+  "parentMode.sync.sending": "بھیجا جا رہا ہے…",
+  "parentMode.sync.savedTo": "{device} پر محفوظ ہو گیا",
+  "parentMode.sync.upToDate": "تازہ ترین",
+  "parentMode.sync.waiting": "{device} کو بھیجا جائے گا",
+  "parentMode.sync.offline": "آف لائن، تبدیلیاں سنک ہوں گی",
+  "askParent.openSpace": "{name} کی جگہ کھولیں"
 }

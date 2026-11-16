@@ -3127,5 +3127,14 @@
   "study.family.stoppedBody": "最後一次匯報係 {time}。如果部裝置重設過或者 FilterTube 被移除，學習計劃都會冇晒。重新配對先可以再傳過去。",
   "study.endSession": "結束學習",
   "study.endHint": "停 30 秒之後先會結束，所以你仲可以取消。",
-  "study.week.empty": "你每學一日，就會填滿一個圈。"
+  "study.week.empty": "你每學一日，就會填滿一個圈。",
+  "parentMode.remoteDeviceFallback": "{name}嘅裝置",
+  "parentMode.sync.connecting": "連接緊…",
+  "parentMode.sync.connected": "已連接",
+  "parentMode.sync.sending": "傳送緊…",
+  "parentMode.sync.savedTo": "已儲存到{device}",
+  "parentMode.sync.upToDate": "已經係最新",
+  "parentMode.sync.waiting": "會傳送畀{device}",
+  "parentMode.sync.offline": "離線，更改稍後會同步",
+  "askParent.openSpace": "打開{name}嘅空間"
 }

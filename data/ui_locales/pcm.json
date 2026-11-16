@@ -3129,5 +3129,14 @@
   "study.family.stoppedBody": "Last report {time}. If dem reset the device or dem remove FilterTube, the study plan go go too. Pair am again make e fit send am.",
   "study.endSession": "End session",
   "study.endHint": "E go end after 30-second pause, so you fit still cancel am.",
-  "study.week.empty": "Every day wey you study go fill one circle."
+  "study.week.empty": "Every day wey you study go fill one circle.",
+  "parentMode.remoteDeviceFallback": "{name} device",
+  "parentMode.sync.connecting": "E dey connect…",
+  "parentMode.sync.connected": "E don connect",
+  "parentMode.sync.sending": "E dey send…",
+  "parentMode.sync.savedTo": "Don save am for {device}",
+  "parentMode.sync.upToDate": "E don update",
+  "parentMode.sync.waiting": "Dem go send am to {device}",
+  "parentMode.sync.offline": "No network, changes go sync later",
+  "askParent.openSpace": "Open {name} space"
 }

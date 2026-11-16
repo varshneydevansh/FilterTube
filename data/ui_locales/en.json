@@ -3129,5 +3129,14 @@
   "study.family.stoppedBody": "Last report {time}. If the device was reset or FilterTube was removed, its study plan is gone too. Pair again to send it.",
   "study.endSession": "End session",
   "study.endHint": "It ends after a 30-second pause, so you can still cancel.",
-  "study.week.empty": "Each day you study fills a circle."
+  "study.week.empty": "Each day you study fills a circle.",
+  "parentMode.remoteDeviceFallback": "{name}’s device",
+  "parentMode.sync.connecting": "Connecting…",
+  "parentMode.sync.connected": "Connected",
+  "parentMode.sync.sending": "Sending…",
+  "parentMode.sync.savedTo": "Saved to {device}",
+  "parentMode.sync.upToDate": "Up to date",
+  "parentMode.sync.waiting": "Will send to {device}",
+  "parentMode.sync.offline": "Offline, changes will sync",
+  "askParent.openSpace": "Open {name}’s space"
 }

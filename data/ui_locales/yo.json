@@ -3127,5 +3127,14 @@
   "study.family.stoppedBody": "Ìròyìn ìkẹyìn {time}. Tí a bá tún ẹ̀rọ náà ṣe tàbí tí a yọ FilterTube kúrò, ètò ẹ̀kọ́ náà yóò parẹ́ pẹ̀lú. Tún so ó pọ̀ láti fi ranṣẹ.",
   "study.endSession": "Parí ìgbà ẹ̀kọ́",
   "study.endHint": "Ó máa parí lẹ́yìn ìdádúró ìṣẹ́jú-àáyá 30, nítorí náà o ṣì lè fagilé.",
-  "study.week.empty": "Ọjọ́ kọ̀ọ̀kan tí o bá kẹ́kọ̀ọ́ máa kún òbírí kan."
+  "study.week.empty": "Ọjọ́ kọ̀ọ̀kan tí o bá kẹ́kọ̀ọ́ máa kún òbírí kan.",
+  "parentMode.remoteDeviceFallback": "Ẹ̀rọ {name}",
+  "parentMode.sync.connecting": "Ń sopọ̀…",
+  "parentMode.sync.connected": "Ti sopọ̀",
+  "parentMode.sync.sending": "Ń fi ránṣẹ́…",
+  "parentMode.sync.savedTo": "A ti fi pamọ́ sí {device}",
+  "parentMode.sync.upToDate": "Ó ti wà ní àtúnṣe",
+  "parentMode.sync.waiting": "A ó fi ránṣẹ́ sí {device}",
+  "parentMode.sync.offline": "Kò sí íńtánẹ́ẹ̀tì, àwọn àyípadà yóò ṣiṣẹ́pọ̀",
+  "askParent.openSpace": "Ṣí àyè {name}"
 }

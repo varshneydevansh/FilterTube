@@ -3129,5 +3129,14 @@
   "study.family.stoppedBody": "கடைசி அறிக்கை {time}. சாதனம் ரீசெட் ஆனாலும் FilterTube நீக்கப்பட்டாலும் படிப்புத் திட்டமும் போய்விடும். அனுப்ப மீண்டும் இணைக்கவும்.",
   "study.endSession": "அமர்வை முடி",
   "study.endHint": "30 வினாடி இடைநிறுத்தத்துக்குப் பின் முடியும், அதனால் இன்னும் ரத்துசெய்யலாம்.",
-  "study.week.empty": "நீங்கள் படிக்கும் ஒவ்வொரு நாளும் ஒரு வட்டத்தை நிரப்பும்."
+  "study.week.empty": "நீங்கள் படிக்கும் ஒவ்வொரு நாளும் ஒரு வட்டத்தை நிரப்பும்.",
+  "parentMode.remoteDeviceFallback": "{name} இன் சாதனம்",
+  "parentMode.sync.connecting": "இணைக்கிறது…",
+  "parentMode.sync.connected": "இணைக்கப்பட்டது",
+  "parentMode.sync.sending": "அனுப்புகிறது…",
+  "parentMode.sync.savedTo": "{device} இல் சேமிக்கப்பட்டது",
+  "parentMode.sync.upToDate": "புதுப்பிக்கப்பட்டது",
+  "parentMode.sync.waiting": "{device} க்கு அனுப்பப்படும்",
+  "parentMode.sync.offline": "ஆஃப்லைன், மாற்றங்கள் ஒத்திசைக்கப்படும்",
+  "askParent.openSpace": "{name}-இன் இடத்தைத் திற"
 }

@@ -3153,5 +3153,14 @@
   "study.family.stoppedBody": "آخر تقرير {time}. لو الجهاز اتمسح أو FilterTube اتشال، خطة الدراسة كمان بتضيع. اربطو تاني عشان ترسلها.",
   "study.endSession": "إنهاء الجلسة",
   "study.endHint": "بتنتهي بعد توقف 30 ثانية، فلسه بتقدر تلغي.",
-  "study.week.empty": "كل يوم بتقرا فيه بيملا دائرة."
+  "study.week.empty": "كل يوم بتقرا فيه بيملا دائرة.",
+  "parentMode.remoteDeviceFallback": "جهاز {name}",
+  "parentMode.sync.connecting": "بنتّصل…",
+  "parentMode.sync.connected": "متصل",
+  "parentMode.sync.sending": "بنرسل…",
+  "parentMode.sync.savedTo": "اتحفظ في {device}",
+  "parentMode.sync.upToDate": "محدَّث",
+  "parentMode.sync.waiting": "حا يتبعت لـ{device}",
+  "parentMode.sync.offline": "غير متصل، التغييرات حتتزامن",
+  "askParent.openSpace": "افتح مساحة {name}"
 }

@@ -3129,5 +3129,14 @@
   "study.family.stoppedBody": "చివరి రిపోర్ట్ {time}. పరికరం రీసెట్ అయినా లేదా FilterTube తీసివేసినా చదువు ప్రణాళిక కూడా పోతుంది. పంపడానికి మళ్లీ జత చేయండి.",
   "study.endSession": "సెషన్ ముగించు",
   "study.endHint": "30 సెకన్ల విరామం తర్వాత ముగుస్తుంది, కాబట్టి మీరు ఇంకా రద్దు చేయవచ్చు.",
-  "study.week.empty": "మీరు చదివిన ప్రతి రోజు ఒక వృత్తాన్ని నింపుతుంది."
+  "study.week.empty": "మీరు చదివిన ప్రతి రోజు ఒక వృత్తాన్ని నింపుతుంది.",
+  "parentMode.remoteDeviceFallback": "{name} పరికరం",
+  "parentMode.sync.connecting": "కనెక్ట్ అవుతోంది…",
+  "parentMode.sync.connected": "కనెక్ట్ అయింది",
+  "parentMode.sync.sending": "పంపుతోంది…",
+  "parentMode.sync.savedTo": "{device}లో సేవ్ చేయబడింది",
+  "parentMode.sync.upToDate": "తాజాగా ఉంది",
+  "parentMode.sync.waiting": "{device}కు పంపబడుతుంది",
+  "parentMode.sync.offline": "ఆఫ్‌లైన్, మార్పులు సింక్ అవుతాయి",
+  "askParent.openSpace": "{name} స్పేస్ తెరవండి"
 }

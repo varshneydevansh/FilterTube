@@ -3153,5 +3153,14 @@
   "study.family.stoppedBody": "آخر تقرير {time}. إذا أُعيد ضبط الجهاز أو أُزيل FilterTube، فستضيع خطة الدراسة أيضًا. اربطه مرة أخرى لإرسالها.",
   "study.endSession": "إنهاء الجلسة",
   "study.endHint": "تنتهي بعد توقف 30 ثانية، لذا ما زال بإمكانك الإلغاء.",
-  "study.week.empty": "كل يوم تدرس فيه يملأ دائرة."
+  "study.week.empty": "كل يوم تدرس فيه يملأ دائرة.",
+  "parentMode.remoteDeviceFallback": "جهاز {name}",
+  "parentMode.sync.connecting": "جارٍ الاتصال…",
+  "parentMode.sync.connected": "متصل",
+  "parentMode.sync.sending": "جارٍ الإرسال…",
+  "parentMode.sync.savedTo": "تم الحفظ في {device}",
+  "parentMode.sync.upToDate": "محدّث",
+  "parentMode.sync.waiting": "سيتم الإرسال إلى {device}",
+  "parentMode.sync.offline": "غير متصل، ستتم مزامنة التغييرات",
+  "askParent.openSpace": "افتح مساحة {name}"
 }

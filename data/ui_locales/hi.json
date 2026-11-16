@@ -3129,5 +3129,14 @@
   "study.family.stoppedBody": "आखिरी रिपोर्ट {time}। अगर डिवाइस रीसेट हुआ या FilterTube हटाया गया, तो पढ़ाई योजना भी चली जाती है। भेजने के लिए फिर से जोड़ें।",
   "study.endSession": "सेशन खत्म करें",
   "study.endHint": "यह 30 सेकंड रुकने के बाद खत्म होता है, इसलिए आप अब भी रद्द कर सकते हैं।",
-  "study.week.empty": "जिस दिन आप पढ़ते हैं, एक गोला भर जाता है।"
+  "study.week.empty": "जिस दिन आप पढ़ते हैं, एक गोला भर जाता है।",
+  "parentMode.remoteDeviceFallback": "{name} का डिवाइस",
+  "parentMode.sync.connecting": "कनेक्ट हो रहा है…",
+  "parentMode.sync.connected": "कनेक्ट हो गया",
+  "parentMode.sync.sending": "भेजा जा रहा है…",
+  "parentMode.sync.savedTo": "{device} पर सहेजा गया",
+  "parentMode.sync.upToDate": "अप-टू-डेट",
+  "parentMode.sync.waiting": "{device} को भेजा जाएगा",
+  "parentMode.sync.offline": "ऑफ़लाइन, बदलाव सिंक हो जाएँगे",
+  "askParent.openSpace": "{name} की जगह खोलें"
 }

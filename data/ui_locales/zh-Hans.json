@@ -3127,5 +3127,14 @@
   "study.family.stoppedBody": "上次汇报是 {time}。如果设备被重置或 FilterTube 被移除，学习计划也会丢失。重新配对即可发送。",
   "study.endSession": "结束学习",
   "study.endHint": "暂停 30 秒后才会结束，所以你还可以取消。",
-  "study.week.empty": "每学习一天，就会填满一个圆圈。"
+  "study.week.empty": "每学习一天，就会填满一个圆圈。",
+  "parentMode.remoteDeviceFallback": "{name}的设备",
+  "parentMode.sync.connecting": "正在连接…",
+  "parentMode.sync.connected": "已连接",
+  "parentMode.sync.sending": "正在发送…",
+  "parentMode.sync.savedTo": "已保存到{device}",
+  "parentMode.sync.upToDate": "已是最新",
+  "parentMode.sync.waiting": "将发送到{device}",
+  "parentMode.sync.offline": "离线，更改将在联网后同步",
+  "askParent.openSpace": "打开{name}的空间"
 }

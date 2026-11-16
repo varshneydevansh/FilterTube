@@ -3129,5 +3129,14 @@
   "study.family.stoppedBody": "आखिरी रिपोर्ट {time}। अगर डिवाइस रीसेट भइल भा FilterTube हटा दिहल गइल, त पढ़ाई के योजना भी चल जाई। भेजे खातिर फेर से जोड़ीं।",
   "study.endSession": "सेशन खतम करीं",
   "study.endHint": "30 सेकंड रुकला के बाद खतम होई, एसे अबहियों रद्द कर सकेनी।",
-  "study.week.empty": "जवना दिन रउआ पढ़ब, एगो गोला भर जाई।"
+  "study.week.empty": "जवना दिन रउआ पढ़ब, एगो गोला भर जाई।",
+  "parentMode.remoteDeviceFallback": "{name} के डिवाइस",
+  "parentMode.sync.connecting": "जुड़त बा…",
+  "parentMode.sync.connected": "जुड़ गइल",
+  "parentMode.sync.sending": "भेजत बा…",
+  "parentMode.sync.savedTo": "{device} पर सहेजल गइल",
+  "parentMode.sync.upToDate": "अपडेट बा",
+  "parentMode.sync.waiting": "{device} के भेजल जाई",
+  "parentMode.sync.offline": "ऑफ़लाइन, बदलाव सिंक हो जाई",
+  "askParent.openSpace": "{name} के जगह खोलीं"
 }

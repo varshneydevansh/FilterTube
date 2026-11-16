@@ -3141,5 +3141,14 @@
   "study.family.stoppedBody": "Последний отчёт: {time}. Если устройство сбросили или FilterTube удалили, план учёбы тоже пропадёт. Подключите устройство заново, чтобы отправить его.",
   "study.endSession": "Закончить занятие",
   "study.endHint": "Оно закончится после паузы в 30 секунд, так что ещё можно отменить.",
-  "study.week.empty": "Каждый день учёбы заполняет один кружок."
+  "study.week.empty": "Каждый день учёбы заполняет один кружок.",
+  "parentMode.remoteDeviceFallback": "Устройство: {name}",
+  "parentMode.sync.connecting": "Подключение…",
+  "parentMode.sync.connected": "Подключено",
+  "parentMode.sync.sending": "Отправка…",
+  "parentMode.sync.savedTo": "Сохранено на устройстве: {device}",
+  "parentMode.sync.upToDate": "Всё актуально",
+  "parentMode.sync.waiting": "Будет отправлено на {device}",
+  "parentMode.sync.offline": "Нет сети, изменения синхронизируются позже",
+  "askParent.openSpace": "Открыть пространство: {name}"
 }

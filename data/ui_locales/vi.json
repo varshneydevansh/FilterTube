@@ -3127,5 +3127,14 @@
   "study.family.stoppedBody": "Báo cáo gần nhất {time}. Nếu thiết bị bị đặt lại hoặc FilterTube bị gỡ, kế hoạch học cũng mất. Hãy ghép đôi lại để gửi.",
   "study.endSession": "Kết thúc buổi học",
   "study.endHint": "Buổi học kết thúc sau 30 giây chờ, nên bạn vẫn có thể hủy.",
-  "study.week.empty": "Mỗi ngày bạn học sẽ tô kín một vòng tròn."
+  "study.week.empty": "Mỗi ngày bạn học sẽ tô kín một vòng tròn.",
+  "parentMode.remoteDeviceFallback": "Thiết bị của {name}",
+  "parentMode.sync.connecting": "Đang kết nối…",
+  "parentMode.sync.connected": "Đã kết nối",
+  "parentMode.sync.sending": "Đang gửi…",
+  "parentMode.sync.savedTo": "Đã lưu vào {device}",
+  "parentMode.sync.upToDate": "Đã cập nhật",
+  "parentMode.sync.waiting": "Sẽ gửi đến {device}",
+  "parentMode.sync.offline": "Ngoại tuyến, thay đổi sẽ được đồng bộ",
+  "askParent.openSpace": "Mở không gian của {name}"
 }

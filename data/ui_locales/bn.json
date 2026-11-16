@@ -3129,5 +3129,14 @@
   "study.family.stoppedBody": "শেষ রিপোর্ট {time}। ডিভাইস রিসেট হলে বা FilterTube সরানো হলে পড়ার পরিকল্পনাও চলে যায়। পাঠাতে আবার যুক্ত করুন।",
   "study.endSession": "সেশন শেষ করুন",
   "study.endHint": "৩০ সেকেন্ড বিরতির পরে শেষ হয়, তাই এখনও বাতিল করতে পারবেন।",
-  "study.week.empty": "যেদিন পড়বেন, একটি বৃত্ত ভরে উঠবে।"
+  "study.week.empty": "যেদিন পড়বেন, একটি বৃত্ত ভরে উঠবে।",
+  "parentMode.remoteDeviceFallback": "{name}-এর ডিভাইস",
+  "parentMode.sync.connecting": "সংযোগ হচ্ছে…",
+  "parentMode.sync.connected": "সংযুক্ত",
+  "parentMode.sync.sending": "পাঠানো হচ্ছে…",
+  "parentMode.sync.savedTo": "{device}-এ সংরক্ষিত",
+  "parentMode.sync.upToDate": "হালনাগাদ আছে",
+  "parentMode.sync.waiting": "{device}-এ পাঠানো হবে",
+  "parentMode.sync.offline": "অফলাইন, পরিবর্তন সিঙ্ক হবে",
+  "askParent.openSpace": "{name}-এর জায়গা খুলুন"
 }

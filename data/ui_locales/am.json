@@ -3129,5 +3129,14 @@
   "study.family.stoppedBody": "የመጨረሻ ሪፖርት {time}። መሣሪያው ዳግም ከተጀመረ ወይም FilterTube ከተወገደ የጥናት ዕቅዱም ይጠፋል። ለመላክ እንደገና አጣምር።",
   "study.endSession": "ጥናቱን አቁም",
   "study.endHint": "ከ30 ሰከንድ ቆይታ በኋላ ያበቃል፣ ስለዚህ አሁንም መሰረዝ ትችላለህ።",
-  "study.week.empty": "የምታጠናበት እያንዳንዱ ቀን አንድ ክብ ይሞላል።"
+  "study.week.empty": "የምታጠናበት እያንዳንዱ ቀን አንድ ክብ ይሞላል።",
+  "parentMode.remoteDeviceFallback": "የ{name} መሣሪያ",
+  "parentMode.sync.connecting": "በመገናኘት ላይ…",
+  "parentMode.sync.connected": "ተገናኝቷል",
+  "parentMode.sync.sending": "በመላክ ላይ…",
+  "parentMode.sync.savedTo": "ወደ {device} ተቀምጧል",
+  "parentMode.sync.upToDate": "ወቅታዊ ነው",
+  "parentMode.sync.waiting": "ወደ {device} ይላካል",
+  "parentMode.sync.offline": "ከመስመር ውጭ፣ ለውጦች ይመሳሰላሉ",
+  "askParent.openSpace": "የ{name}ን ቦታ ክፈት"
 }

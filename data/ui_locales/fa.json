@@ -3129,5 +3129,14 @@
   "study.family.stoppedBody": "آخرین گزارش {time}. اگر دستگاه بازنشانی شود یا FilterTube حذف شود، برنامهٔ مطالعه هم از بین می‌رود. برای ارسال دوباره جفت کنید.",
   "study.endSession": "پایان جلسه",
   "study.endHint": "بعد از ۳۰ ثانیه مکث تمام می‌شود، پس هنوز می‌توانید لغو کنید.",
-  "study.week.empty": "هر روزی که مطالعه کنید، یک دایره پر می‌شود."
+  "study.week.empty": "هر روزی که مطالعه کنید، یک دایره پر می‌شود.",
+  "parentMode.remoteDeviceFallback": "دستگاه {name}",
+  "parentMode.sync.connecting": "در حال اتصال…",
+  "parentMode.sync.connected": "متصل",
+  "parentMode.sync.sending": "در حال ارسال…",
+  "parentMode.sync.savedTo": "در {device} ذخیره شد",
+  "parentMode.sync.upToDate": "به‌روز",
+  "parentMode.sync.waiting": "برای {device} ارسال می‌شود",
+  "parentMode.sync.offline": "آفلاین، تغییرات همگام‌سازی می‌شود",
+  "askParent.openSpace": "باز کردن فضای {name}"
 }

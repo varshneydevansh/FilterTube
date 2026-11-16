@@ -3129,5 +3129,14 @@
   "study.family.stoppedBody": "Son rapor {time}. Cihaz sıfırlandıysa veya FilterTube kaldırıldıysa ders planı da gider. Göndermek için yeniden eşleştir.",
   "study.endSession": "Oturumu bitir",
   "study.endHint": "30 saniyelik bir beklemeden sonra biter, yani hâlâ iptal edebilirsin.",
-  "study.week.empty": "Ders çalıştığın her gün bir daireyi doldurur."
+  "study.week.empty": "Ders çalıştığın her gün bir daireyi doldurur.",
+  "parentMode.remoteDeviceFallback": "Cihaz: {name}",
+  "parentMode.sync.connecting": "Bağlanıyor…",
+  "parentMode.sync.connected": "Bağlandı",
+  "parentMode.sync.sending": "Gönderiliyor…",
+  "parentMode.sync.savedTo": "Kaydedildi: {device}",
+  "parentMode.sync.upToDate": "Güncel",
+  "parentMode.sync.waiting": "Gönderilecek: {device}",
+  "parentMode.sync.offline": "Çevrimdışı, değişiklikler eşitlenecek",
+  "askParent.openSpace": "{name} alanını aç"
 }

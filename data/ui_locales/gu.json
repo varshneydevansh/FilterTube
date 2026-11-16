@@ -3129,5 +3129,14 @@
   "study.family.stoppedBody": "છેલ્લો રિપોર્ટ {time}. જો ડિવાઇસ રીસેટ થયું હોય અથવા FilterTube કાઢી નખાયું હોય, તો અભ્યાસ યોજના પણ જતી રહે છે. મોકલવા માટે ફરી જોડો.",
   "study.endSession": "સત્ર પૂરું કરો",
   "study.endHint": "તે 30 સેકન્ડના વિરામ પછી પૂરું થાય છે, તેથી તમે હજી રદ કરી શકો છો.",
-  "study.week.empty": "તમે અભ્યાસ કરો તે દરેક દિવસ એક વર્તુળ ભરે છે."
+  "study.week.empty": "તમે અભ્યાસ કરો તે દરેક દિવસ એક વર્તુળ ભરે છે.",
+  "parentMode.remoteDeviceFallback": "{name}નું ડિવાઇસ",
+  "parentMode.sync.connecting": "કનેક્ટ થઈ રહ્યું છે…",
+  "parentMode.sync.connected": "કનેક્ટેડ",
+  "parentMode.sync.sending": "મોકલી રહ્યા છીએ…",
+  "parentMode.sync.savedTo": "{device} પર સાચવ્યું",
+  "parentMode.sync.upToDate": "અદ્યતન",
+  "parentMode.sync.waiting": "{device} ને મોકલાશે",
+  "parentMode.sync.offline": "ઑફલાઇન, ફેરફારો સિંક થશે",
+  "askParent.openSpace": "{name}ની જગ્યા ખોલો"
 }

@@ -3129,5 +3129,14 @@
   "study.family.stoppedBody": "शेवटचा अहवाल {time}. डिव्हाइस रीसेट झाले किंवा FilterTube काढले गेले, तर अभ्यास योजनाही जाते. पाठवण्यासाठी पुन्हा जोडा.",
   "study.endSession": "सत्र संपवा",
   "study.endHint": "30 सेकंदांच्या विरामानंतर ते संपते, म्हणून तुम्ही अजूनही रद्द करू शकता.",
-  "study.week.empty": "तुम्ही अभ्यास करता तो प्रत्येक दिवस एक वर्तुळ भरतो."
+  "study.week.empty": "तुम्ही अभ्यास करता तो प्रत्येक दिवस एक वर्तुळ भरतो.",
+  "parentMode.remoteDeviceFallback": "{name} चे डिव्हाइस",
+  "parentMode.sync.connecting": "कनेक्ट होत आहे…",
+  "parentMode.sync.connected": "कनेक्ट झाले",
+  "parentMode.sync.sending": "पाठवत आहे…",
+  "parentMode.sync.savedTo": "{device} वर सेव्ह केले",
+  "parentMode.sync.upToDate": "अद्ययावत",
+  "parentMode.sync.waiting": "{device} ला पाठवले जाईल",
+  "parentMode.sync.offline": "ऑफलाइन, बदल सिंक होतील",
+  "askParent.openSpace": "{name} यांची जागा उघडा"
 }

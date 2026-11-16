@@ -3127,5 +3127,14 @@
   "study.family.stoppedBody": "最後の報告は {time} です。端末がリセットされたり FilterTube が削除されたりすると、学習プランも消えます。送るには、もう一度ペアリングしてください。",
   "study.endSession": "セッションを終了",
   "study.endHint": "30 秒待つと終了します。それまではキャンセルできます。",
-  "study.week.empty": "学習した日ごとに丸がひとつ埋まります。"
+  "study.week.empty": "学習した日ごとに丸がひとつ埋まります。",
+  "parentMode.remoteDeviceFallback": "{name}さんのデバイス",
+  "parentMode.sync.connecting": "接続中…",
+  "parentMode.sync.connected": "接続済み",
+  "parentMode.sync.sending": "送信中…",
+  "parentMode.sync.savedTo": "{device}に保存しました",
+  "parentMode.sync.upToDate": "最新の状態",
+  "parentMode.sync.waiting": "{device}に送信します",
+  "parentMode.sync.offline": "オフライン。変更は後で同期されます",
+  "askParent.openSpace": "{name}のスペースを開く"
 }

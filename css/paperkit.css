@@ -665,6 +665,19 @@ body:not(.ft-managed-child-editor-view) .ft-managed-child-global.ft-session-bar 
 
 .ft-session-bar__done:hover { border-color: var(--pk-sun-ink); }
 
+/* A remote session's sync badge (Android ParentMode.syncTone): busy, done or waiting. */
+.ft-session-bar__sync {
+  padding: 1px 8px;
+  border-radius: 999px;
+  border: 1px solid var(--pk-line);
+  font-weight: 700;
+}
+.ft-session-bar__sync.is-busy { background: var(--pk-sky); color: var(--pk-sky-ink); }
+.ft-session-bar__sync.is-done { background: var(--pk-sage); color: var(--pk-sage-ink); }
+.ft-session-bar__sync.is-waiting { background: var(--pk-sun-wash); color: var(--pk-sun-ink); }
+.ft-session-bar.is-slim .ft-session-bar__sync { display: none; }
+.ft-ask-request__space { margin-inline-start: auto; }
+
 .ft-session-bar.is-slim { padding: 6px 8px 6px 10px; }
 .ft-session-bar.is-slim .ft-session-bar__explainer,
 .ft-session-bar.is-slim .ft-session-bar__place { display: none; }
@@ -684,6 +697,8 @@ body:not(.ft-managed-child-editor-view) .ft-managed-child-global.ft-session-bar 
 @media (max-width: 640px) {
   .ft-managed-child-global.ft-session-bar { flex-wrap: wrap; margin: 8px 12px 16px; }
   .ft-session-bar__done { width: 100%; }
+  /* A remote bar stacks the device name above the sync badge so it never truncates (Android 685cf9b23). */
+  .ft-session-bar.is-remote .ft-session-bar__meta { flex-direction: column; align-items: flex-start; }
 }
 
 /* ---------------------------------------------------------------------------

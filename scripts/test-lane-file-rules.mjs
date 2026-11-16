@@ -121,6 +121,7 @@ export const FILE_LANE_RULES = Object.freeze([
     lanes: ['release', 'settings', 'smoke']
   },
   { id: 'managed-admin-authority-runtime', patterns: [/^js\/managed_admin_authority\.js$/], lanes: ['release', 'settings', 'smoke'] },
+  { id: 'parent-mode-runtime', patterns: [/^js\/parent_mode\.js$/], lanes: ['release', 'settings', 'smoke'] },
   { id: 'security-crypto-runtime', patterns: [/^js\/security_manager\.js$/], lanes: ['release', 'settings', 'smoke'] },
   { id: 'legacy-layout-quarantine', patterns: [/^js\/layout\.js$/], lanes: ['release', 'dom', 'smoke'] },
   { id: 'identity-runtime', patterns: [/^js\/shared\/identity\.js$/, /^js\/content\/(?:dom_extractors|handle_resolver)\.js$/], lanes: ['blocking', 'menu', 'whitelist'] },

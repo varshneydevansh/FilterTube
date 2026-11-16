@@ -9182,6 +9182,11 @@ document.addEventListener('DOMContentLoaded', async () => {
         updateStats();
         // The session bar confirms the save in the child's name (js/mascots.js draws it).
         try { document.dispatchEvent(new CustomEvent('filtertube:parent-session-saved', { detail: { name: normalizeString(nextProfile.name) } })); } catch (e) { }
+        // A change in the session waits for the next send ("Will send to Aarav's tablet").
+        if (parentSessionSync && parentSessionSync.state.childId === normalizeString(profileId)) {
+            parentSessionSync.recordChange();
+            renderManagedChildGlobalBanner();
+        }
         return true;
     }
 
@@ -9231,6 +9236,18 @@ document.addEventListener('DOMContentLoaded', async () => {
     const PARENT_SESSION_TICK_MS = 30 * 1000;
     let parentSessionTimer = 0;
     let parentSessionConnectedFor = '';
+    // Android ParentModeSession: what Accounts & Sync reported for the managed child, and changes since.
+    let parentSessionSync = null;
+
+    /** Accounts & Sync reports a remote session's state (Android 9af03736d hook 1); null clears a live one. */
+    function reportParentSessionSync(value, deviceLabel = '') {
+        const Mode = window.FilterTubeParentMode;
+        const childId = normalizeString(managedChildEdit?.profileId);
+        if (!Mode || !childId || !parentSessionSync) return;
+        if (value) parentSessionSync.report(childId, value, deviceLabel);
+        else parentSessionSync.clearLive(childId);
+        renderManagedChildGlobalBanner();
+    }
     let parentSessionScrollBound = false;
 
     function parentSessionReducedMotion() {
@@ -9367,11 +9384,40 @@ document.addEventListener('DOMContentLoaded', async () => {
         meta.className = 'ft-session-bar__meta';
         const place = document.createElement('span');
         place.className = 'ft-session-bar__place';
-        setTabViewLocalizedCopy(place, 'textContent', 'parentMode.hereBrowser', 'In this browser');
+        // A remote session (Android ParentMode.Origin.REMOTE): the child's device and a live sync badge.
+        const Mode = window.FilterTubeParentMode;
+        const remote = Mode ? Mode.remoteLinkFor(childId, safeArray(nanahTrustedLinks).map(link => normalizeNanahTrustedLink(link)).filter(Boolean)) : null;
+        if (Mode && (!parentSessionSync || parentSessionSync.state.childId !== childId)) parentSessionSync = Mode.createSession(childId);
+        let badgeNode = null;
+        if (remote) {
+            const deviceLabel = normalizeString(remote.deviceLabel) || tabViewUiText('parentMode.remoteDeviceFallback', '{name}’s device', { name: childName });
+            place.textContent = deviceLabel;
+            const online = navigator.onLine !== false;
+            const state = parentSessionSync.badge(online);
+            badgeNode = document.createElement('span');
+            badgeNode.className = `ft-session-bar__sync is-${Mode.syncTone(state)}`;
+            badgeNode.setAttribute('role', 'status');
+            const savedTo = parentSessionSync.state.savedTo || deviceLabel;
+            badgeNode.textContent = {
+                connecting: tabViewUiText('parentMode.sync.connecting', 'Connecting…'),
+                connected: tabViewUiText('parentMode.sync.connected', 'Connected'),
+                sending: tabViewUiText('parentMode.sync.sending', 'Sending…'),
+                saved: tabViewUiText('parentMode.sync.savedTo', 'Saved to {device}', { device: savedTo }),
+                upToDate: tabViewUiText('parentMode.sync.upToDate', 'Up to date'),
+                waiting: tabViewUiText('parentMode.sync.waiting', 'Will send to {device}', { device: deviceLabel }),
+                offline: tabViewUiText('parentMode.sync.offline', 'Offline, changes will sync')
+            }[state] || '';
+            banner.classList.add('is-remote');
+        } else {
+            setTabViewLocalizedCopy(place, 'textContent', 'parentMode.hereBrowser', 'In this browser');
+            banner.classList.remove('is-remote');
+        }
         const clock = document.createElement('span');
         clock.className = 'ft-session-bar__clock';
         clock.textContent = parentSessionClockText(managedChildEdit.startedAt);
-        meta.append(place, clock);
+        meta.append(place);
+        if (badgeNode) meta.append(badgeNode);
+        meta.append(clock);
         copy.append(title, explainer, meta);
 
         const doneBtn = document.createElement('button');
@@ -22899,6 +22945,9 @@ document.addEventListener('DOMContentLoaded', async () => {
             providerMissingCount: 0,
             noLinkCount: 0
         };
+        // The managed child in a parent session, when this send carries its rules: the bar says "Sending…".
+        const sessionChildSent = allowedTargets.includes(normalizeString(managedChildEdit?.profileId)) ? normalizeString(managedChildEdit.profileId) : '';
+        if (sessionChildSent) reportParentSessionSync(window.FilterTubeParentMode?.SYNC.SENDING);
 
         for (const targetId of allowedTargets) {
             const targetProfile = safeObject(profiles[targetId]);
@@ -23059,6 +23108,16 @@ document.addEventListener('DOMContentLoaded', async () => {
         }
 
         await loadNanahTrustedLinks();
+        // The session bar: "Saved to <device>" when a send to the managed child landed; a failure or a
+        // pickup-queued update never leaves "Sending…" behind.
+        if (sessionChildSent) {
+            if (summary.liveSentCount > 0 || summary.localNetworkDeliveredCount > 0) {
+                const sentLink = getNanahSourceManagedLinksForTargetProfile(sessionChildSent, normalizedScope)[0];
+                reportParentSessionSync(window.FilterTubeParentMode?.SYNC.SAVED_TO_DEVICE, normalizeString(sentLink?.deviceLabel));
+            } else {
+                reportParentSessionSync(null);
+            }
+        }
         if (summary.mailboxUploadedCount > 0) {
             await checkNanahManagedMailboxServerHealth({ reason: 'post_parent_push', silent: true });
         }
@@ -25893,6 +25952,8 @@ document.addEventListener('DOMContentLoaded', async () => {
     }
 
     async function resetNanahSession(closeClient = false, options = {}) {
+        // A closed link never leaves a live "Connecting…" or "Connected" on the session bar.
+        try { reportParentSessionSync(null); } catch (e) { }
         if (closeClient && nanahClient) {
             try {
                 await nanahClient.close();
@@ -25930,6 +25991,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             return null;
         }
         if (nanahClient) await resetNanahSession(true);
+        reportParentSessionSync(window.FilterTubeParentMode?.SYNC.CONNECTING);
         if (intentTitle) {
             setNanahFamilyDeviceIntent({
                 title: intentTitle,
@@ -25968,6 +26030,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     async function joinNanahSessionWithCode(rawCode, { source = 'join-button' } = {}) {
         const code = extractNanahCodeFromInput(rawCode);
         if (code.length < 4) throw new Error('Enter the 4-character pairing code first');
+        reportParentSessionSync(window.FilterTubeParentMode?.SYNC.CONNECTING);
         const existingCode = normalizeNanahCode(nanahSessionState.code);
         if (nanahClient && existingCode && existingCode === code) {
             throw new Error('This device is already using that pairing code');
@@ -28279,8 +28342,30 @@ document.addEventListener('DOMContentLoaded', async () => {
         no.textContent = tabViewUiText('askParent.notNow', 'Not now');
         no.addEventListener('click', () => decide(false));
         actions.append(give, no);
+        const space = askParentSpaceButton(item);
+        if (space) actions.appendChild(space);
         card.appendChild(actions);
         list.appendChild(card);
+    }
+
+    /**
+     * Ask a parent › "Open Aarav's space" (Android 5b9b8d079 AskParentSessionEntry): the same gate as
+     * Manage rules (a fresh, sensitive unlock of the parent's own profile; the parent stays active), then
+     * the child's space as a parent-mode session. A linked child device opens through the local child its
+     * Family link sends; with no local child the button isn't offered.
+     */
+    function askParentSpaceButton(item) {
+        const Mode = window.FilterTubeParentMode;
+        const links = safeArray(nanahTrustedLinks).map(link => normalizeNanahTrustedLink(link)).filter(Boolean);
+        const target = Mode ? Mode.spaceTarget(item.linkId ? '' : (item.childProfileId || ''), item.linkId || '', links) : null;
+        const profiles = safeObject(safeObject(profilesV4Cache).profiles);
+        if (!target || !profiles[target]) return null;
+        const open = document.createElement('button');
+        open.type = 'button';
+        open.className = 'btn-secondary ft-ask-request__space';
+        open.textContent = tabViewUiText('askParent.openSpace', 'Open {name}’s space', { name: normalizeString(profiles[target].name) || item.childName });
+        open.addEventListener('click', () => { void startManagedChildEdit(target, ''); });
+        return open;
     }
 
     function renderAskParentRequest(item, list) {
@@ -28361,6 +28446,8 @@ document.addEventListener('DOMContentLoaded', async () => {
             button(tabViewUiText('askParent.allowChannel', 'Always allow this channel'), item.kind === 'channel' ? 'btn-primary' : 'btn-secondary', 'channel');
         }
         button(tabViewUiText('askParent.notNow', 'Not now'), 'btn-secondary', 'no');
+        const space = askParentSpaceButton(item);
+        if (space) actions.appendChild(space);
         card.appendChild(actions);
         list.appendChild(card);
     }
@@ -31153,6 +31240,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                     if (confirmed !== 'confirm') return;
                     await nanahClient.confirmSas();
                     nanahSessionState.sasConfirmed = true;
+                    reportParentSessionSync(window.FilterTubeParentMode?.SYNC.CONNECTED);
                     void sendNanahHelloEnvelope(true).then(() => sendNanahAutoSyncReadiness()).catch(() => {});
                     void deviceAutoSync?.run({ wake: true }).catch(() => {});
                     updateNanahUi();

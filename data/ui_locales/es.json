@@ -3129,5 +3129,14 @@
   "study.family.stoppedBody": "Último informe {time}. Si el dispositivo se restableció o se quitó FilterTube, el plan de estudio también se pierde. Vuelve a vincularlo para enviarlo.",
   "study.endSession": "Terminar sesión",
   "study.endHint": "Termina tras una pausa de 30 segundos, así que aún puedes cancelar.",
-  "study.week.empty": "Cada día que estudias llena un círculo."
+  "study.week.empty": "Cada día que estudias llena un círculo.",
+  "parentMode.remoteDeviceFallback": "Dispositivo de {name}",
+  "parentMode.sync.connecting": "Conectando…",
+  "parentMode.sync.connected": "Conectado",
+  "parentMode.sync.sending": "Enviando…",
+  "parentMode.sync.savedTo": "Guardado en {device}",
+  "parentMode.sync.upToDate": "Al día",
+  "parentMode.sync.waiting": "Se enviará a {device}",
+  "parentMode.sync.offline": "Sin conexión, los cambios se sincronizarán",
+  "askParent.openSpace": "Abrir el espacio de {name}"
 }

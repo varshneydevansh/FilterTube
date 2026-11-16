@@ -3129,5 +3129,14 @@
   "study.family.stoppedBody": "Ripoti ya mwisho {time}. Kama kifaa kilirudishwa upya au FilterTube iliondolewa, mpango wa kusoma pia unapotea. Kiunganishe tena ili kuutuma.",
   "study.endSession": "Maliza kipindi",
   "study.endHint": "Kinaisha baada ya kusubiri sekunde 30, kwa hiyo bado unaweza kughairi.",
-  "study.week.empty": "Kila siku unayosoma hujaza duara moja."
+  "study.week.empty": "Kila siku unayosoma hujaza duara moja.",
+  "parentMode.remoteDeviceFallback": "Kifaa cha {name}",
+  "parentMode.sync.connecting": "Inaunganisha…",
+  "parentMode.sync.connected": "Imeunganishwa",
+  "parentMode.sync.sending": "Inatuma…",
+  "parentMode.sync.savedTo": "Imehifadhiwa kwenye {device}",
+  "parentMode.sync.upToDate": "Imesasishwa",
+  "parentMode.sync.waiting": "Itatumwa kwa {device}",
+  "parentMode.sync.offline": "Nje ya mtandao, mabadiliko yatasawazishwa",
+  "askParent.openSpace": "Fungua nafasi ya {name}"
 }

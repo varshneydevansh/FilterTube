@@ -3127,5 +3127,14 @@
   "study.family.stoppedBody": "รายงานล่าสุด {time} ถ้ารีเซ็ตอุปกรณ์หรือลบ FilterTube แผนการเรียนก็หายไปด้วย จับคู่ใหม่เพื่อส่งแผนอีกครั้ง",
   "study.endSession": "จบช่วงเรียน",
   "study.endHint": "จะจบหลังรอ 30 วินาที คุณจึงยังยกเลิกได้",
-  "study.week.empty": "ทุกวันที่คุณเรียนจะเติมวงกลมหนึ่งวง"
+  "study.week.empty": "ทุกวันที่คุณเรียนจะเติมวงกลมหนึ่งวง",
+  "parentMode.remoteDeviceFallback": "อุปกรณ์ของ {name}",
+  "parentMode.sync.connecting": "กำลังเชื่อมต่อ…",
+  "parentMode.sync.connected": "เชื่อมต่อแล้ว",
+  "parentMode.sync.sending": "กำลังส่ง…",
+  "parentMode.sync.savedTo": "บันทึกไปที่ {device} แล้ว",
+  "parentMode.sync.upToDate": "เป็นปัจจุบัน",
+  "parentMode.sync.waiting": "จะส่งไปที่ {device}",
+  "parentMode.sync.offline": "ออฟไลน์ การเปลี่ยนแปลงจะซิงก์ภายหลัง",
+  "askParent.openSpace": "เปิดพื้นที่ของ {name}"
 }

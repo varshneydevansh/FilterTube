@@ -3129,5 +3129,14 @@
   "study.family.stoppedBody": "Huling ulat {time}. Kung na-reset ang device o inalis ang FilterTube, mawawala rin ang plano nito sa pag-aaral. Mag-pair ulit para maipadala ito.",
   "study.endSession": "Tapusin ang session",
   "study.endHint": "Matatapos ito pagkatapos ng 30 segundong paghinto, kaya puwede mo pa itong kanselahin.",
-  "study.week.empty": "Bawat araw na nag-aaral ka ay pumupuno ng isang bilog."
+  "study.week.empty": "Bawat araw na nag-aaral ka ay pumupuno ng isang bilog.",
+  "parentMode.remoteDeviceFallback": "Device ni {name}",
+  "parentMode.sync.connecting": "Kumokonekta…",
+  "parentMode.sync.connected": "Nakakonekta",
+  "parentMode.sync.sending": "Ipinapadala…",
+  "parentMode.sync.savedTo": "Na-save sa {device}",
+  "parentMode.sync.upToDate": "Napapanahon",
+  "parentMode.sync.waiting": "Ipapadala kay {device}",
+  "parentMode.sync.offline": "Offline, masi-sync ang mga pagbabago",
+  "askParent.openSpace": "Buksan ang space ni {name}"
 }

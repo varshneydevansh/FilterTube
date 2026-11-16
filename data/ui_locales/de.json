@@ -3129,5 +3129,14 @@
   "study.family.stoppedBody": "Letzte Meldung {time}. Wurde das Gerät zurückgesetzt oder FilterTube entfernt, ist auch der Lernplan weg. Koppele es erneut, um ihn zu senden.",
   "study.endSession": "Lerneinheit beenden",
   "study.endHint": "Sie endet nach 30 Sekunden Pause, du kannst also noch abbrechen.",
-  "study.week.empty": "Jeder Lerntag füllt einen Kreis."
+  "study.week.empty": "Jeder Lerntag füllt einen Kreis.",
+  "parentMode.remoteDeviceFallback": "Gerät von {name}",
+  "parentMode.sync.connecting": "Verbinden…",
+  "parentMode.sync.connected": "Verbunden",
+  "parentMode.sync.sending": "Senden…",
+  "parentMode.sync.savedTo": "Auf {device} gespeichert",
+  "parentMode.sync.upToDate": "Aktuell",
+  "parentMode.sync.waiting": "Wird an {device} gesendet",
+  "parentMode.sync.offline": "Offline, Änderungen werden synchronisiert",
+  "askParent.openSpace": "Bereich von {name} öffnen"
 }

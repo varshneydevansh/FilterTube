@@ -3127,5 +3127,14 @@
   "study.family.stoppedBody": "마지막 보고는 {time}입니다. 기기가 초기화되거나 FilterTube가 삭제되면 공부 계획도 사라져요. 보내려면 다시 연결하세요.",
   "study.endSession": "세션 끝내기",
   "study.endHint": "30초 기다린 뒤 끝나므로 그 전에 취소할 수 있습니다.",
-  "study.week.empty": "공부한 날마다 원이 하나씩 채워집니다."
+  "study.week.empty": "공부한 날마다 원이 하나씩 채워집니다.",
+  "parentMode.remoteDeviceFallback": "{name}의 기기",
+  "parentMode.sync.connecting": "연결 중…",
+  "parentMode.sync.connected": "연결됨",
+  "parentMode.sync.sending": "보내는 중…",
+  "parentMode.sync.savedTo": "{device}에 저장됨",
+  "parentMode.sync.upToDate": "최신 상태",
+  "parentMode.sync.waiting": "{device}에 보낼 예정",
+  "parentMode.sync.offline": "오프라인 상태예요. 변경 내용은 나중에 동기화돼요",
+  "askParent.openSpace": "{name}의 공간 열기"
 }

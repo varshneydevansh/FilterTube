@@ -3129,5 +3129,14 @@
   "study.family.stoppedBody": "ಕೊನೆಯ ವರದಿ {time}. ಸಾಧನ ರೀಸೆಟ್ ಆದರೆ ಅಥವಾ FilterTube ತೆಗೆದರೆ, ಅಧ್ಯಯನ ಯೋಜನೆಯೂ ಹೋಗುತ್ತದೆ. ಕಳುಹಿಸಲು ಮತ್ತೆ ಜೋಡಿಸಿ.",
   "study.endSession": "ಸೆಷನ್ ಮುಗಿಸಿ",
   "study.endHint": "30 ಸೆಕೆಂಡುಗಳ ವಿರಾಮದ ನಂತರ ಮುಗಿಯುತ್ತದೆ, ಹಾಗಾಗಿ ನೀವು ಇನ್ನೂ ರದ್ದುಮಾಡಬಹುದು.",
-  "study.week.empty": "ನೀವು ಅಧ್ಯಯನ ಮಾಡುವ ಪ್ರತಿ ದಿನ ಒಂದು ವೃತ್ತ ತುಂಬುತ್ತದೆ."
+  "study.week.empty": "ನೀವು ಅಧ್ಯಯನ ಮಾಡುವ ಪ್ರತಿ ದಿನ ಒಂದು ವೃತ್ತ ತುಂಬುತ್ತದೆ.",
+  "parentMode.remoteDeviceFallback": "{name} ಅವರ ಸಾಧನ",
+  "parentMode.sync.connecting": "ಸಂಪರ್ಕಿಸಲಾಗುತ್ತಿದೆ…",
+  "parentMode.sync.connected": "ಸಂಪರ್ಕಗೊಂಡಿದೆ",
+  "parentMode.sync.sending": "ಕಳುಹಿಸಲಾಗುತ್ತಿದೆ…",
+  "parentMode.sync.savedTo": "{device} ನಲ್ಲಿ ಉಳಿಸಲಾಗಿದೆ",
+  "parentMode.sync.upToDate": "ನವೀಕೃತವಾಗಿದೆ",
+  "parentMode.sync.waiting": "{device} ಗೆ ಕಳುಹಿಸಲಾಗುತ್ತದೆ",
+  "parentMode.sync.offline": "ಆಫ್‌ಲೈನ್, ಬದಲಾವಣೆಗಳು ಸಿಂಕ್ ಆಗುತ್ತವೆ",
+  "askParent.openSpace": "{name} ಅವರ ಜಾಗ ತೆರೆಯಿರಿ"
 }

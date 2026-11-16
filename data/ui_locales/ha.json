@@ -3129,5 +3129,14 @@
   "study.family.stoppedBody": "Rahoto na ƙarshe {time}. Idan an sake saita na'urar ko an cire FilterTube, shirin karatu ma ya tafi. Sake haɗa su don aika shi.",
   "study.endSession": "Ƙare zama",
   "study.endHint": "Zai ƙare bayan jira na daƙiƙa 30, don haka za ka iya soke shi har yanzu.",
-  "study.week.empty": "Kowace rana da ka yi karatu tana cike da'ira ɗaya."
+  "study.week.empty": "Kowace rana da ka yi karatu tana cike da'ira ɗaya.",
+  "parentMode.remoteDeviceFallback": "Na’urar {name}",
+  "parentMode.sync.connecting": "Ana haɗawa…",
+  "parentMode.sync.connected": "An haɗa",
+  "parentMode.sync.sending": "Ana aikawa…",
+  "parentMode.sync.savedTo": "An adana a {device}",
+  "parentMode.sync.upToDate": "An sabunta",
+  "parentMode.sync.waiting": "Za a aika zuwa {device}",
+  "parentMode.sync.offline": "Babu intanet, za a daidaita canje-canje",
+  "askParent.openSpace": "Buɗe wurin {name}"
 }
