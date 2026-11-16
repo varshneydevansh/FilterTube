@@ -315,6 +315,10 @@
                 until: clock.until,
                 // Where the current round or break began: the break sun drains from it.
                 segmentStart: (Array.isArray(clock.segments) ? clock.segments : []).find(item => item.end === clock.until)?.start ?? null,
+                // The session's rounds and breaks, for the Day Ring (a skipped break folds into its round).
+                segments: Engine.withSkips && Array.isArray(clock.segments) ? Engine.withSkips(clock.segments,
+                    breakSkipped ? clock.segments.filter(item => item.kind === Engine.BREAK && item.end === local.breakSkippedUntil).map(item => item.start) : [])
+                    .map(({ kind, start, end, round }) => ({ kind, start, end, round })) : [],
                 sessionStart: clock.sessionStart,
                 sessionEnd: clock.sessionEnd,
                 source: clock.source,

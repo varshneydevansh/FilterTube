@@ -281,6 +281,62 @@
         return { breakStart: pause.start, breakEnd: pause.end, addedMinutes: added, round: before.round, roundMinutes: minutes(pause.end - before.start) };
     }
 
+    // ---- The Day Ring (Android StudyRingModel.of, boundaries, currentBreak) --------------------------
+    // A session's rounds and breaks bent into a circle; fractions run 0..1 clockwise from 12 o'clock.
+
+    /** {arcs: [{kind: DONE|LIVE|TODO, start, end, round}], beads, breaks: [[from, to]], tick, studiedMinutes, plannedMinutes, rounds}. */
+    function dayRing(segments, now) {
+        const list = array(segments);
+        if (!list.length) return { arcs: [], beads: [], breaks: [], tick: null, studiedMinutes: 0, plannedMinutes: 0, rounds: 0 };
+        const start = list[0].start;
+        const end = list[list.length - 1].end;
+        const span = end - start;
+        if (!(span > 0)) return { arcs: [], beads: [], breaks: [], tick: null, studiedMinutes: 0, plannedMinutes: 0, rounds: 0 };
+        const f = t => Math.min(1, Math.max(0, (t - start) / span));
+        const arcs = [];
+        const beads = [];
+        const breaks = [];
+        let studied = 0;
+        let planned = 0;
+        for (const segment of list) {
+            if (segment.kind === BREAK) {
+                beads.push(f((segment.start + segment.end) / 2));
+                breaks.push([f(segment.start), f(segment.end)]);
+                continue;
+            }
+            planned += segment.end - segment.start;
+            if (!Number.isFinite(now) || now <= segment.start) arcs.push({ kind: 'TODO', start: f(segment.start), end: f(segment.end), round: segment.round });
+            else if (now >= segment.end) {
+                arcs.push({ kind: 'DONE', start: f(segment.start), end: f(segment.end), round: segment.round });
+                studied += segment.end - segment.start;
+            } else {
+                // The round running now: done up to now, the rest still to fill.
+                arcs.push({ kind: 'DONE', start: f(segment.start), end: f(now), round: segment.round });
+                arcs.push({ kind: 'LIVE', start: f(now), end: f(segment.end), round: segment.round });
+                studied += now - segment.start;
+            }
+        }
+        const tick = Number.isFinite(now) && now >= start && now < end ? f(now) : null;
+        return { arcs, beads, breaks, tick, studiedMinutes: roundMinutes(studied), plannedMinutes: roundMinutes(planned),
+            rounds: list.filter(segment => segment.kind === STUDY).length };
+    }
+
+    /** Where one segment meets the next, for the 5° gaps: not the join between a round's done and live parts. */
+    function ringBoundaries(ring) {
+        const arcs = array(ring?.arcs);
+        const joins = new Set();
+        for (let i = 0; i + 1 < arcs.length; i += 1) if (arcs[i].round === arcs[i + 1].round && arcs[i].end === arcs[i + 1].start) joins.add(arcs[i].end);
+        const edges = [...arcs.flatMap(arc => [arc.start, arc.end]), ...array(ring?.breaks).flat()].map(edge => (edge >= 1 ? 0 : edge));
+        return [...new Set(edges.filter(edge => !joins.has(edge)))].sort((a, b) => a - b);
+    }
+
+    /** The break running now (the tick lies inside it), as its index, or null. */
+    function currentBreak(ring) {
+        if (!Number.isFinite(ring?.tick)) return null;
+        const index = array(ring.breaks).findIndex(([from, to]) => ring.tick >= from && ring.tick < to);
+        return index >= 0 ? index : null;
+    }
+
     // ---- Page colour by state (Android StudyStateTheme, Study v3 §1) --------------------------------
     // The page takes the colour of the moment; cards stay paper and only their edge takes the state.
 
@@ -1254,6 +1310,7 @@
         parseTime, localDateKey, splitRounds, planOccurrences, studyClock, studyRulesApply, studyPhase,
         SUGGESTION_KINDS, suggest, suggestionSeed, studyTopics, studyAllowPhrases, topicTerms, topicPatterns,
         topicsForQuery, exampleSearches, searchExplainer, topicLabel, breakSkipPreview, SKIP_UNDO_MS,
+        dayRing, ringBoundaries, currentBreak,
         PAGE_STATES, PAGE_BAND_PX, PAGE_LAST_FIVE_MS, PAGE_CROSSFADE_MS, pageState, pageEvening, pagePalette, mixColor,
         studySubjects, subjectOf, withSkips, sessionSeal, sessionEndStep, pendingSessionEnd, SESSION_END_STALE_MS, SESSION_CLOSE_SLACK_MS,
         packVariant, packLayer, activePackLayers, stampPackCopies, studyEffectiveProfile,

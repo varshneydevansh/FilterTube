@@ -411,3 +411,10 @@ body.ft-extension-surface .ft-study-card[data-study-page],
     }
 }
 @media (prefers-reduced-motion: reduce) { body.ft-extension-surface .ft-study-card[data-study-page] { transition: none; } }
+
+/* ---- The Day Ring (Android StudyDayRingView) ---- */
+.ft-study-ring__arc { stroke: var(--pk-sage-ink, #28623f); stroke-linecap: butt; }
+.ft-study-ring__arc.is-live { stroke-opacity: 0.38; }
+.ft-study-ring__sun, .ft-study-ring__notch { stroke: var(--pk-sun, #edb12e); stroke-linecap: butt; }
+.ft-study-ring__drain { stroke: var(--pk-sun, #edb12e); stroke-linecap: round; }
+.ft-study-ring__tick { stroke: var(--pk-ink, #1b1a18); stroke-width: 2.5; stroke-linecap: round; }

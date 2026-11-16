@@ -1496,34 +1496,75 @@
 
     // ---- Dashboard (options page) -------------------------------------------------------------
 
+    /**
+     * The Day Ring (Android StudyDayRingView, StudyRingModel): the session's rounds as sage arcs on one
+     * continuous pencil track, 5° gaps at every round and break edge, solid where done and lighter for
+     * the rest of the round running now, the current break as a full sun arc with a thin sun arc inside
+     * that drains with it, other breaks as sun notches, and an ink tick for now. Outside a session, the
+     * plain track.
+     */
     function ring(state) {
         const ns = 'http://www.w3.org/2000/svg';
         const value = object(state);
-        const start = Number(value.segmentStart);
-        const until = Number(value.until);
-        let fraction = 0;
-        if (Number.isFinite(until)) {
-            const segment = array(value.segments).find(item => item.end === until);
-            const from = segment ? segment.start : (Number.isFinite(start) ? start : Number(value.sessionStart));
-            if (Number.isFinite(from) && until > from) fraction = Math.min(1, Math.max(0, (Date.now() - from) / (until - from)));
-        }
+        const Engine = engine();
         const svg = root.document.createElementNS(ns, 'svg');
         svg.setAttribute('viewBox', '0 0 120 120');
         svg.setAttribute('class', 'ft-study-ring__svg');
         svg.setAttribute('aria-hidden', 'true');
-        const track = root.document.createElementNS(ns, 'circle');
-        const fill = root.document.createElementNS(ns, 'circle');
-        for (const circle of [track, fill]) {
-            circle.setAttribute('cx', '60'); circle.setAttribute('cy', '60'); circle.setAttribute('r', '52');
-            circle.setAttribute('fill', 'none'); circle.setAttribute('stroke-width', '10');
+        const R = 52;
+        const point = (fraction, radius = R) => {
+            const angle = fraction * 2 * Math.PI - Math.PI / 2;
+            return [60 + radius * Math.cos(angle), 60 + radius * Math.sin(angle)];
+        };
+        const arcPath = (from, to, radius = R) => {
+            if (to - from >= 0.9999) return `M60 ${60 - radius} A${radius} ${radius} 0 1 1 59.99 ${60 - radius}`;
+            const [x1, y1] = point(from, radius);
+            const [x2, y2] = point(to, radius);
+            return `M${x1.toFixed(2)} ${y1.toFixed(2)} A${radius} ${radius} 0 ${to - from > 0.5 ? 1 : 0} 1 ${x2.toFixed(2)} ${y2.toFixed(2)}`;
+        };
+        const add = (d, className, width) => {
+            const path = root.document.createElementNS(ns, 'path');
+            path.setAttribute('d', d);
+            path.setAttribute('class', className);
+            path.setAttribute('fill', 'none');
+            if (width) path.setAttribute('stroke-width', String(width));
+            svg.appendChild(path);
+            return path;
+        };
+        add(arcPath(0, 1), 'ft-study-ring__track', 10);
+        const segments = array(value.segments);
+        if (!Engine?.dayRing || !segments.length || !(value.state === 'STUDY' || value.state === 'BREAK')) return svg;
+        const model = Engine.dayRing(segments, Date.now());
+        const GAP = 2.5 / 360;
+        const edges = Engine.ringBoundaries(model);
+        const isEdge = at => edges.some(edge => Math.abs(edge - (at >= 1 ? 0 : at)) < 1e-6);
+        for (const arc of model.arcs) {
+            if (arc.kind === 'TODO') continue;
+            const from = arc.start + (isEdge(arc.start) ? GAP : 0);
+            const to = arc.end - (isEdge(arc.end) ? GAP : 0);
+            if (to - from <= 0.0015) continue;
+            add(arcPath(from, to), `ft-study-ring__arc is-${arc.kind.toLowerCase()}`, 10);
         }
-        track.setAttribute('class', 'ft-study-ring__track');
-        fill.setAttribute('class', 'ft-study-ring__fill');
-        const length = 2 * Math.PI * 52;
-        // The ring fills and never shrinks.
-        fill.setAttribute('stroke-dasharray', `${(fraction * length).toFixed(1)} ${length.toFixed(1)}`);
-        fill.setAttribute('transform', 'rotate(-90 60 60)');
-        svg.append(track, fill);
+        const current = Engine.currentBreak(model);
+        model.breaks.forEach(([from, to], index) => {
+            if (index === current) {
+                add(arcPath(from + GAP, to - GAP), 'ft-study-ring__sun', 10);
+                // The break drains: a thin sun arc inside the ring, from now to the break's end.
+                if (Number.isFinite(model.tick) && to - model.tick > 0.002) add(arcPath(model.tick, to, R - 10), 'ft-study-ring__drain', 3);
+            } else {
+                const middle = (from + to) / 2;
+                add(arcPath(middle - 2.5 / 360, middle + 2.5 / 360), 'ft-study-ring__notch', 10);
+            }
+        });
+        if (Number.isFinite(model.tick)) {
+            const [x1, y1] = point(model.tick, R - 8);
+            const [x2, y2] = point(model.tick, R + 8);
+            const tick = root.document.createElementNS(ns, 'line');
+            tick.setAttribute('x1', x1.toFixed(2)); tick.setAttribute('y1', y1.toFixed(2));
+            tick.setAttribute('x2', x2.toFixed(2)); tick.setAttribute('y2', y2.toFixed(2));
+            tick.setAttribute('class', 'ft-study-ring__tick');
+            svg.appendChild(tick);
+        }
         return svg;
     }
 
