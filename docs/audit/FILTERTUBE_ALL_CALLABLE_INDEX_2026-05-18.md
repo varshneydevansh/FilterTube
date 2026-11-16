@@ -222,7 +222,7 @@ lexical and its scope remains tracked JS/JSX/MJS: CJS/Python tooling requires it
 separate release/workflow review and is not silently counted as JavaScript here.
 
 ```text
-current tracked JS/JSX/MJS files: 161
+current tracked JS/JSX/MJS files: 165
 current repo-wide lexical callables: 10662
 current complete per-callable semantic proofs: 0
 current callable behavior-change approval: NO-GO
@@ -237,7 +237,7 @@ runtime behavior changed by inventory refresh: no
 | UI/settings runtime | 33 | 4117 |
 | Generated/quarantined UI | 6 | 153 |
 | Vendor bundles | 3 | 279 |
-| Audit/test lane scripts | 25 | 517 |
+| Audit/test lane scripts | 29 | 602 |
 | Website routes/components/config | 31 | 149 |
 
 | File | Family | Lexical callables | Audit status |
@@ -366,6 +366,10 @@ runtime behavior changed by inventory refresh: no
 | `scripts/sync-native-runtime.mjs` | Build/sync scripts | 1 | build/website counted |
 | `scripts/test-lane-config.mjs` | Audit/test lane scripts | 0 | audit lane counted |
 | `scripts/test-lane-file-rules.mjs` | Audit/test lane scripts | 0 | audit lane counted |
+| `tools/parity/derive-file-map.mjs` | Audit/test lane scripts | 14 | audit lane counted |
+| `tools/parity/ledger.mjs` | Audit/test lane scripts | 32 | audit lane counted |
+| `tools/parity/ledger.test.mjs` | Audit/test lane scripts | 2 | audit lane counted |
+| `tools/parity/lib.mjs` | Audit/test lane scripts | 37 | audit lane counted |
 | `scripts/update-family-device-evidence-log.mjs` | Audit/test lane scripts | 23 | workflow/evidence tooling counted; semantic proof incomplete |
 | `scripts/validate-family-device-evidence.mjs` | Audit/test lane scripts | 24 | workflow/evidence tooling counted; semantic proof incomplete |
 | `scripts/verify-managed-app-policy-contract.mjs` | Audit/test lane scripts | 14 | workflow/evidence tooling counted; semantic proof incomplete |
