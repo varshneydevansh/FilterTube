@@ -72,27 +72,27 @@
         const prefersDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
         if (prefersDark) {
             return {
-                surface: '#1E1E1E',
-                border: 'rgba(255,255,255,0.12)',
-                text: '#F5F5F5',
-                subtext: '#CFCFD0',
-                accent: '#C0392B',
-                accentSoft: 'rgba(192,57,43,0.25)',
-                buttonText: '#FFFFFF',
-                secondaryBg: 'rgba(255,255,255,0.08)',
-                shadow: '0 16px 40px rgba(0,0,0,0.45)'
+                surface: '#151c24',
+                border: '#2a3440',
+                text: '#edf2f7',
+                subtext: '#b8c3ce',
+                accent: '#a93e31',
+                accentSoft: 'rgba(224,121,107,0.25)',
+                buttonText: '#fffcf6',
+                secondaryBg: 'rgba(255,255,255,0.06)',
+                shadow: '0 3px 0 rgba(0,0,0,0.42), 0 16px 40px rgba(0,0,0,0.45)'
             };
         }
         return {
-            surface: '#FFFFFF',
-            border: 'rgba(0,0,0,0.08)',
-            text: '#111827',
-            subtext: '#4B5563',
-            accent: '#C0392B',
-            accentSoft: 'rgba(192,57,43,0.12)',
-            buttonText: '#FFFFFF',
-            secondaryBg: 'rgba(17,24,39,0.04)',
-            shadow: '0 18px 46px rgba(15,23,36,0.14)'
+            surface: '#fffcf6',
+            border: '#dcd1c2',
+            text: '#1b1a18',
+            subtext: '#625f58',
+            accent: '#a93e31',
+            accentSoft: 'rgba(169,62,49,0.12)',
+            buttonText: '#fffcf6',
+            secondaryBg: 'rgba(27,26,24,0.04)',
+            shadow: '0 3px 0 rgba(27,26,24,0.14), 0 18px 46px rgba(27,26,24,0.14)'
         };
     }
 
@@ -119,7 +119,6 @@
         container.style.fontFamily = 'Inter, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif';
         container.style.lineHeight = '1.45';
         container.style.boxSizing = 'border-box';
-        container.style.backdropFilter = 'blur(10px)';
         container.style.animation = 'ft-first-run-fade 220ms ease-out';
 
         const accentBar = document.createElement('div');
@@ -129,6 +128,21 @@
         accentBar.style.background = `linear-gradient(135deg, ${palette.accent}, ${palette.accentSoft})`;
         accentBar.style.marginBottom = '14px';
         container.appendChild(accentBar);
+
+        // Kriti waves from the card's corner (decorative; the words carry the message).
+        try {
+            const kritiUrl = api.runtime.getURL('assets/images/mascots/kriti_wave.webp');
+            if (kritiUrl) {
+                const kriti = document.createElement('img');
+                kriti.src = kritiUrl;
+                kriti.alt = '';
+                kriti.setAttribute('aria-hidden', 'true');
+                kriti.draggable = false;
+                kriti.style.cssText = 'float:right;height:72px;width:auto;margin:-6px 18px 4px 10px;border:0;background:none;pointer-events:none;';
+                kriti.dataset.ftFirstRunMascot = 'kriti';
+                container.appendChild(kriti);
+            }
+        } catch (_) { /* The prompt works without the picture. */ }
 
         const title = document.createElement('div');
         title.style.fontWeight = '700';
@@ -163,7 +177,7 @@
         refreshBtn.style.padding = '10px 16px';
         refreshBtn.style.fontWeight = '600';
         refreshBtn.style.cursor = 'pointer';
-        refreshBtn.style.boxShadow = '0 12px 28px rgba(192,57,43,0.25)';
+        refreshBtn.style.boxShadow = '0 3px 0 #7d2c22';
         refreshBtn.onclick = () => {
             markComplete();
             window.location.reload();

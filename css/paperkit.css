@@ -835,3 +835,396 @@ body:not(.ft-managed-child-editor-view) .ft-managed-child-global.ft-session-bar 
   .ft-session-frame.is-connecting rect { stroke-dashoffset: 0; }
   .btn-primary:active:not(:disabled) { transform: none; }
 }
+
+/* ---------------------------------------------------------------------------
+ * Brand moments (js/mascots.js): the dashboard hero pair, the sidebar peek, About, the support
+ * variants, toasts and the connection strip. Kriti and Uljhan only; all of it leaves with the
+ * Companion set to Off, and nothing moves with reduced motion.
+ * ------------------------------------------------------------------------- */
+
+/* Night: a soft pool of paper light under Uljhan, whose ink limbs would vanish on navy. It sits
+ * behind the picture (never on its edge), so no pose carries a halo. */
+:root {
+  --pk-spot: none;
+}
+
+:root[data-theme="dark"] {
+  --pk-spot: radial-gradient(closest-side, rgba(255, 244, 222, 0.18), rgba(255, 244, 222, 0.07) 62%, transparent);
+}
+
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme]) {
+    --pk-spot: radial-gradient(closest-side, rgba(255, 244, 222, 0.18), rgba(255, 244, 222, 0.07) 62%, transparent);
+  }
+}
+
+img[data-character="uljhan"] {
+  background-image: var(--pk-spot);
+  background-position: center;
+  background-repeat: no-repeat;
+}
+
+/* Dashboard hero: the pair stands on the profile card's top edge. The card drops to the hero's
+ * foot and keeps room above it, so the pose is never clipped. */
+:root:not([data-ft-companion="off"]) #dashboardView .ft-dash-status.has-duo {
+  position: relative;
+  align-self: end;
+  margin-top: 128px;
+}
+
+.pk-hero-duo {
+  position: absolute;
+  inset-inline-end: 18px;
+  bottom: calc(100% - 3px);
+  z-index: 1;
+  line-height: 0;
+}
+
+.ft-mascot--hero .ft-mascot__image { height: 124px; }
+
+.ft-mascot--hero .ft-mascot__figure { transform-origin: 50% 100%; }
+
+.ft-mascot--hero .ft-mascot__figure.is-hopping { animation: pk-hop 520ms var(--pk-ease-enter); }
+
+/* Her hello floats on the reading side of the pose and never moves the layout. */
+.ft-mascot--hero .ft-mascot__line--bubble,
+.ft-mascot--hero .ft-mascot__line--popover {
+  position: absolute;
+  z-index: 40;
+  top: 28%;
+  inset-inline-start: auto;
+  inset-inline-end: calc(100% + 0.7rem);
+  width: max-content;
+  max-width: 13rem;
+  translate: none;
+  line-height: 1.38;
+}
+
+.ft-mascot--hero .ft-mascot__line[data-tail="left"]::before {
+  top: 50%;
+  left: auto;
+  right: -0.33rem;
+  transform: translateY(-50%) rotate(135deg);
+}
+
+[dir="rtl"] .ft-mascot--hero .ft-mascot__line[data-tail="left"]::before {
+  right: auto;
+  left: -0.33rem;
+  transform: translateY(-50%) rotate(-45deg);
+}
+
+@keyframes pk-hop {
+  0% { transform: translateY(0) scale(1, 1); }
+  18% { transform: translateY(2px) scale(1.03, 0.96); }
+  50% { transform: translateY(-6px) scale(0.99, 1.02); }
+  82% { transform: translateY(0) scale(1.03, 0.96); }
+  100% { transform: none; }
+}
+
+/* Sidebar: Kriti peeks beside the version, inside the footer's own height. */
+.sidebar-footer:has(.pk-sidebar-peek) {
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  gap: 8px;
+}
+
+.pk-sidebar-peek {
+  flex: none;
+  line-height: 0;
+  pointer-events: none;
+}
+
+.pk-sidebar-peek__art { height: 36px; width: auto; }
+
+/* About: the two, side by side on a sun-wash sheet. */
+.pk-duo-card {
+  display: flex;
+  align-items: center;
+  gap: 24px;
+  margin: 0 0 20px;
+  padding: 20px 24px;
+  border: 1px solid var(--pk-line);
+  border-radius: 24px;
+  background: var(--pk-sun-wash);
+  box-shadow: 0 3px 0 var(--pk-ledge);
+}
+
+.pk-duo-card__art {
+  display: flex;
+  align-items: flex-end;
+  gap: 6px;
+  flex: none;
+  line-height: 0;
+  transform-origin: 50% 100%;
+}
+
+.pk-duo-card__kriti { height: 132px; width: auto; }
+.pk-duo-card__uljhan { height: 96px; width: auto; }
+
+.pk-duo-card__title {
+  margin: 0 0 6px;
+  font-family: var(--pk-font-hand);
+  font-weight: 400;
+  font-size: 22px;
+  color: var(--pk-ink);
+}
+
+.pk-duo-card__line {
+  margin: 0;
+  max-width: 52ch;
+  color: var(--pk-muted);
+  font-size: 15px;
+  line-height: 1.55;
+}
+
+/* Support variants: the pose, the words and the always-there note. */
+.pk-support {
+  display: flex;
+  align-items: center;
+  gap: 24px;
+  min-width: 0;
+}
+
+.pk-support__art {
+  flex: none;
+  line-height: 0;
+  transform-origin: 50% 100%;
+}
+
+.pk-support__art[hidden] { display: none; }
+
+.pk-support__image { width: auto; }
+.pk-support--hero .pk-support__image { height: 168px; }
+.pk-support--card .pk-support__image { height: 96px; }
+
+.pk-support__body { min-width: 0; }
+
+.pk-support__title {
+  margin: 0 0 8px;
+  font-family: var(--pk-font-display);
+  font-weight: 700;
+  letter-spacing: -0.01em;
+  color: var(--pk-ink);
+  text-wrap: balance;
+}
+
+.pk-support--hero .pk-support__title { font-size: clamp(26px, 3vw, 34px); line-height: 1.1; }
+.pk-support--card .pk-support__title { font-size: 20px; line-height: 1.2; }
+
+.pk-support__text {
+  margin: 0;
+  max-width: 56ch;
+  color: var(--pk-muted);
+  font-size: 15px;
+  line-height: 1.6;
+}
+
+.pk-support__note {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  margin: 12px 0 0;
+  padding: 6px 12px;
+  border-radius: 999px;
+  background: var(--pk-sage);
+  color: var(--pk-sage-ink);
+  font-family: var(--pk-font-hand);
+  font-size: 14px;
+  line-height: 1.35;
+}
+
+.pk-support__note::before {
+  content: "";
+  flex: none;
+  width: 16px;
+  height: 16px;
+  background: currentColor;
+  -webkit-mask: url("../assets/images/doodles/tick.webp") center / contain no-repeat;
+  mask: url("../assets/images/doodles/tick.webp") center / contain no-repeat;
+}
+
+.donate-hero.has-support-variant > .view-hero__copy,
+.has-support-variant > .donate-promo-text,
+.has-support-variant > .donate-promo-icon { display: none; }
+
+.has-support-variant > .pk-support--card { flex: 1 1 auto; }
+
+@media (max-width: 720px) {
+  .pk-support,
+  .pk-duo-card { flex-direction: column; align-items: flex-start; }
+}
+
+/* Toasts: Kriti's thumbs up (success) or Uljhan's shrug (error) beside the words. */
+.ft-toast.has-mascot {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  padding-inline-start: 10px;
+}
+
+.pk-toast-art {
+  flex: none;
+  height: 36px;
+  width: auto;
+  padding: 2px;
+  border-radius: 12px;
+  background: var(--ft-mascot-paper, #fff7e6);
+}
+
+/* Connection strip: offline, slow, back online. */
+.pk-net {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin: 0 0 12px;
+  padding: 8px 16px 8px 10px;
+  border: 1px solid var(--pk-line);
+  border-radius: 18px;
+  background: var(--pk-sun-wash);
+  color: var(--pk-sun-ink);
+  font-size: 14px;
+  line-height: 1.4;
+  animation: pk-net-in var(--pk-medium) var(--pk-ease-enter);
+}
+
+.pk-net[hidden] { display: none; }
+
+.pk-net[data-state="restored"] {
+  background: var(--pk-sage);
+  color: var(--pk-sage-ink);
+}
+
+.pk-net__art { flex: none; line-height: 0; }
+.pk-net__art[hidden] { display: none; }
+.pk-net__image { height: 40px; width: auto; }
+.pk-net__title { font-family: var(--pk-font-hand); font-weight: 400; font-size: 15px; }
+.pk-net__body[hidden] { display: none; }
+
+#popupRoot .pk-net {
+  flex-wrap: wrap;
+  row-gap: 0;
+  margin: 6px 7px 0;
+  padding: 6px 12px 6px 8px;
+  border-radius: 14px;
+  font-size: 12.5px;
+}
+
+#popupRoot .pk-net .pk-net__image { height: 32px; }
+#popupRoot .pk-net .pk-net__title { font-size: 13.5px; }
+
+/* Popup: the list card is a paper sheet with its own corners (it used to end square in the frame). */
+body.ft-extension-surface[data-surface="popup"] .ft-popup-filter-card {
+  margin-inline: 2px;
+  border-radius: 16px;
+  overflow: hidden;
+}
+
+@keyframes pk-net-in {
+  from { opacity: 0; transform: translateY(-4px); }
+  to { opacity: 1; transform: none; }
+}
+
+/* Popup: Kriti peeks beside an empty blocked list. */
+.empty-state.has-mascot {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+}
+
+.pk-popup-peek { flex: none; height: 48px; width: auto; }
+
+@media (prefers-reduced-motion: reduce) {
+  .ft-mascot--hero .ft-mascot__figure.is-hopping,
+  .pk-net { animation: none; }
+}
+
+/* ---------------------------------------------------------------------------
+ * Night parity: one navy on every page (the app's BrandPalette night). The page tones keep
+ * their accent for chips and edges; the page, panels, strokes and ink are the palette's.
+ * ------------------------------------------------------------------------- */
+
+:root[data-theme="dark"][data-page-tone] {
+  --ft-tone-page-start: var(--pk-canvas);
+  --ft-tone-page-end: var(--pk-desk);
+  --ft-tone-panel: var(--pk-paper);
+  --ft-tone-stroke: var(--pk-line);
+  --ft-tone-ink: var(--pk-ink);
+  --ft-tone-ink-soft: var(--pk-muted);
+}
+
+/* The brand tile is a night sheet too (it used to stay cream in the dark sidebar). */
+html[data-theme="dark"] body.ft-extension-surface[data-surface="tab-view"] .sidebar .brand {
+  border-color: var(--pk-line);
+  background: var(--pk-paper);
+  box-shadow: 0 2px 0 var(--pk-ledge);
+}
+
+html[data-theme="dark"] body.ft-extension-surface[data-surface="tab-view"] .sidebar .brand-name { color: var(--pk-ink); }
+html[data-theme="dark"] body.ft-extension-surface[data-surface="tab-view"] .sidebar .brand-accent { color: var(--pk-brick); }
+
+/* "Connect a device" stayed white at night. */
+html[data-theme="dark"] body.ft-extension-surface .nanah-pairing-details {
+  border-color: var(--pk-line) !important;
+  background: var(--pk-paper) !important;
+  box-shadow: 0 2px 0 var(--pk-ledge);
+}
+
+/* A stray hairline ran down the left edge of the content column. */
+body.ft-extension-surface[data-surface="tab-view"] .main-content { border-inline-start: 0; }
+
+/* About: the headline no longer runs to five lines, and the portrait fills its card. */
+body.ft-extension-surface[data-surface="tab-view"] .ft-about-hero-site {
+  min-height: 0;
+  align-items: center;
+}
+
+body.ft-extension-surface[data-surface="tab-view"] .ft-about-title {
+  max-width: 17ch;
+  font-size: clamp(2.4rem, 4.4vw, 4rem);
+  letter-spacing: -0.04em;
+  line-height: 1;
+}
+
+body.ft-extension-surface[data-surface="tab-view"] .ft-about-portrait-card {
+  align-self: center;
+  min-height: 0;
+}
+
+body.ft-extension-surface[data-surface="tab-view"] .ft-about-portrait-card img {
+  height: auto;
+  min-height: 0;
+  aspect-ratio: 4 / 5;
+}
+
+/* "Saved for {name}" on the parent session bar. */
+.pk-session-saved {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 3px 12px 3px 4px;
+  border-radius: 999px;
+  background: var(--pk-sage);
+  color: var(--pk-sage-ink);
+  font-family: var(--pk-font-hand);
+  font-size: 14px;
+  line-height: 1.3;
+  animation: pk-net-in var(--pk-medium) var(--pk-ease-enter);
+}
+
+.pk-session-saved__art { height: 28px; width: auto; }
+
+@media (prefers-reduced-motion: reduce) {
+  .pk-session-saved { animation: none; }
+}
+
+/* Study status card: Kriti at the far end of the card. */
+.ft-study-status > .pk-study-kriti {
+  flex: none;
+  height: 76px;
+  width: auto;
+  margin-inline-start: auto;
+  align-self: flex-end;
+  pointer-events: none;
+}

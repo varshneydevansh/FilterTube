@@ -138,8 +138,8 @@
                 "js/seed.js",
                 "js/shared/identity.js", "js/shared/view_count.js", "js/content/admission_overlay.js",
                 "data/ui_locales/*.json",
-                "assets/images/mascots/kriti_reading.webp",
                 "assets/images/homepage_hero_day.mp4",
+                "assets/images/mascots/*.webp",
                 "icons/icon-48.png"
             ],
             "matches": [

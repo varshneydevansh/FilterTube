@@ -7,6 +7,12 @@
  *   backup import; Kriti waving over "Just you so far" in the profiles manager.
  * - Moments (moment()): one pose and one line for loading, empty, nothing-found and done states, with
  *   a slow breath (three cycles, then still) on Lively. Never on the player, a lock or a PIN screen.
+ *   Loading is Uljhan fetching, with a line that never repeats one of the last three.
+ * - Brand moments: Kriti sieving Uljhan on the dashboard hero (once on Lively, then a few small hops and
+ *   rest), Kriti peeking over the sidebar footer, the pair on About, Kriti's thumbs up on a success toast
+ *   and Uljhan's shrug on an error toast, Uljhan on the offline, slow and back-online strip.
+ * - Support (Donate page and the dashboard card): the words and the pose rotate; every variant says that
+ *   FilterTube is free and that support is optional, and claims nothing else.
  * - Sounds (Off by default; Gentle or Playful): never carry meaning on their own, and stay silent
  *   while the page is hidden.
  * - The Companion setting (Lively, Quiet, Off; Quiet by default) lives in chrome.storage.local beside the
@@ -42,8 +48,23 @@
         kritiWave: 'kriti_wave.webp',
         kritiReading: 'kriti_reading.webp',
         uljhanShrug: 'uljhan_shrug.webp',
-        sieve: Object.freeze([1, 2, 3, 4, 5].map(index => `kriti_sieve_0${index}.webp`))
+        kritiFunnel: 'kriti_funnel.webp',
+        kritiNotebook: 'kriti_notebook.webp',
+        kritiPointing: 'kriti_pointing.webp',
+        kritiEvening: 'kriti_evening_01.webp',
+        uljhanFront: 'uljhan_front.webp',
+        uljhanHappy: 'uljhan_happy.webp',
+        uljhanSad: 'uljhan_sad.webp',
+        sieve: Object.freeze([1, 2, 3, 4, 5].map(index => `kriti_sieve_0${index}.webp`)),
+        // Picture-book sheets (aKriti frames): swapped stills, never warped.
+        kritiMug: Object.freeze([1, 2, 3, 4, 5, 6].map(index => `kriti_mug_0${index}.webp`)),
+        uljhanFetch: Object.freeze([1, 2, 3, 4, 5, 6].map(index => `uljhan_fetch_0${index}.webp`)),
+        duoSieve: Object.freeze([1, 2, 3, 4, 5, 6].map(index => `duo_sieve_0${index}.webp`)),
+        duoShoo: Object.freeze([1, 2, 3, 4, 5].map(index => `duo_shoo_0${index}.webp`))
     });
+    const SHEET_FRAME_MS = 180;
+    // The still a sheet rests on (0-based): its last frame.
+    const SHEET_STILL = Object.freeze({ kritiMug: 5, uljhanFetch: 5, duoSieve: 5, duoShoo: 4 });
 
     const COPY = Object.freeze({
         welcome: ['mascot.welcome.line', "I'll keep what you block out of sight."],
@@ -59,6 +80,69 @@
         error: ['mascot.moment.error', 'That didn\'t load. Try again.']
     });
 
+    // Lines that name the characters or run longer than a bubble live outside COPY (the app's own words).
+    const LOADING_LINES = Object.freeze([
+        ['mascot.loading.1', 'Uljhan is hiding somewhere…'],
+        ['mascot.loading.2', 'Kriti is sieving, hang tight…'],
+        ['mascot.loading.3', 'Sorting the keepers from the rest…'],
+        ['mascot.loading.4', 'Checking the funnel twice…'],
+        ['mascot.loading.5', 'Noodling on it…'],
+        ['mascot.loading.6', 'Polishing the shortlist…']
+    ]);
+    const RECENT_LOADING_LINES = 3;
+    const NETWORK_COPY = Object.freeze({
+        offline: ['mascot.net.offline', 'You’re offline'],
+        offlineBody: ['mascot.net.offlineBody', 'Your filters still work. Sync will wait.'],
+        slow: ['mascot.net.slow', 'Slow connection, still sifting…'],
+        restored: ['mascot.net.restored', 'Back online']
+    });
+    const NETWORK_ART = Object.freeze({ offline: 'uljhanSad', slow: 'uljhanFront', restored: 'uljhanHappy' });
+    const RESTORED_MS = 3500;
+    const DUO_COPY = Object.freeze({
+        hello: ['mascot.hello', 'Hi, I\'m Kriti. I keep the good stuff flowing.'],
+        aboutTitle: ['mascot.about.title', 'Kriti and Uljhan'],
+        aboutUljhan: ['mascot.about.uljhan', 'Uljhan is the tangle of distraction she sieves out.']
+    });
+    const SESSION_SAVED = Object.freeze(['parentMode.savedFor', 'Saved for {name}']);
+    // Support variants (the app's SupportSheetVariants, the ones that are true for the extension).
+    // Each note says, in its own voice, that FilterTube is free and that support is optional.
+    const SUPPORT_HISTORY_KEY = 'ftSupportVariantHistory';
+    const SUPPORT_REMEMBERED = 2;
+    const SUPPORT_VARIANTS = Object.freeze([
+        Object.freeze({ id: 'classic', image: 'kritiLogo', characters: false, time: 'any' }),
+        Object.freeze({ id: 'sieve', image: 'kritiFunnel', characters: true, time: 'any' }),
+        Object.freeze({ id: 'onePerson', image: 'kritiNotebook', characters: false, time: 'any' }),
+        Object.freeze({ id: 'morning', image: 'kritiWave', characters: true, time: 'morning' }),
+        Object.freeze({ id: 'evening', image: 'kritiEvening', characters: true, time: 'evening' })
+    ]);
+    const SUPPORT_COPY = Object.freeze({
+        classic: Object.freeze({
+            title: ['support.variant.classic.title', 'Help keep FilterTube free'],
+            body: ['support.variant.classic.body', 'One developer, no company and no ads. Support pays for fixes, test devices and store fees. Nothing is locked, now or later.'],
+            note: ['support.variant.classic.note', 'Free for everyone, always. Supporting is optional.']
+        }),
+        sieve: Object.freeze({
+            title: ['support.variant.sieve.title', 'Kriti\'s been sieving all day'],
+            body: ['support.variant.sieve.body', 'Every video you didn\'t want to see got caught in her tiny crayon sieve. Your support keeps it sharp.'],
+            note: ['support.variant.sieve.note', 'The sieve stays free for everyone. Chipping in is up to you.']
+        }),
+        onePerson: Object.freeze({
+            title: ['support.variant.onePerson.title', 'Made by one person, on purpose'],
+            body: ['support.variant.onePerson.body', 'One developer, no company, no ads and no servers keeping your data. Support pays for the next fix.'],
+            note: ['support.variant.onePerson.note', 'Every feature stays free. Supporting is optional.']
+        }),
+        morning: Object.freeze({
+            title: ['support.variant.morning.title', 'Good morning from Kriti'],
+            body: ['support.variant.morning.body', 'Your feed is already sieved and ready. One developer keeps it that way, with no ads and no servers keeping your data.'],
+            note: ['support.variant.morning.note', 'Free every morning, and every night. Support is optional.']
+        }),
+        evening: Object.freeze({
+            title: ['support.variant.evening.title', 'Kriti\'s heading to bed'],
+            body: ['support.variant.evening.body', 'Your feed stays filtered all night while she sleeps. Thanks for spending your day with FilterTube.'],
+            note: ['support.variant.evening.note', 'Free by day and by night. Support only if you\'d like to.']
+        })
+    });
+
     // Sounds (aKriti sounds, assets/sounds): Off by default. Gentle plays the big moments only.
     const SOUNDS_KEY = 'ftUiSounds';
     const SOUND_MODES = Object.freeze(['off', 'gentle', 'playful']);
@@ -69,12 +153,17 @@
     const GENTLE_SOUNDS = Object.freeze(['success', 'celebrate', 'error']);
     // Moment poses: one character and one line each (BIBLE.md moments map).
     const MOMENTS = Object.freeze({
-        loading: Object.freeze({ image: 'kritiReading', copy: 'loading', character: 'Kriti' }),
+        loading: Object.freeze({ image: 'uljhanFetch', copy: 'loading', character: 'Uljhan' }),
         empty: Object.freeze({ image: 'kritiPeek', copy: null, character: 'Kriti' }),
         noMatches: Object.freeze({ image: 'uljhanShrug', copy: 'noMatches', character: 'Uljhan' }),
         error: Object.freeze({ image: 'uljhanShrug', copy: 'error', character: 'Uljhan' }),
         done: Object.freeze({ image: 'kritiThumbsUp', copy: null, character: 'Kriti' }),
-        hello: Object.freeze({ image: 'kritiWave', copy: null, character: 'Kriti' })
+        hello: Object.freeze({ image: 'kritiWave', copy: null, character: 'Kriti' }),
+        reading: Object.freeze({ image: 'kritiReading', copy: null, character: 'Kriti' }),
+        break: Object.freeze({ image: 'kritiMug', copy: null, character: 'Kriti' }),
+        offline: Object.freeze({ image: 'uljhanSad', copy: null, character: 'Uljhan' }),
+        slow: Object.freeze({ image: 'uljhanFront', copy: null, character: 'Uljhan' }),
+        restored: Object.freeze({ image: 'uljhanHappy', copy: null, character: 'Uljhan' })
     });
 
     // ---- Pure rules (unit-tested) ----------------------------------------------------------------
@@ -146,6 +235,68 @@
     /** Whether the allow-list bubble should pop: only when the mode turned on since the popup last looked. */
     function allowListSwitchedOn(previous, current) {
         return current === 'whitelist' && previous !== 'whitelist' && previous !== undefined && previous !== null;
+    }
+
+    /** Frames to show for a sheet (0-based): the whole sheet once, or only its resting still with reduced motion. */
+    function sheetFrames(sheet, reducedMotion) {
+        const frames = ASSETS[sheet];
+        if (!Array.isArray(frames) && !(frames && typeof frames.length === 'number')) return [];
+        const still = Number.isInteger(SHEET_STILL[sheet]) ? SHEET_STILL[sheet] : frames.length - 1;
+        if (reducedMotion) return [still];
+        return Array.from({ length: frames.length }, (_, index) => index);
+    }
+
+    /** The picture a pose rests on: a single image, or a sheet's still. */
+    function stillImage(name) {
+        const entry = ASSETS[name];
+        if (typeof entry === 'string') return entry;
+        if (entry && typeof entry.length === 'number') return entry[Number.isInteger(SHEET_STILL[name]) ? SHEET_STILL[name] : entry.length - 1];
+        return '';
+    }
+
+    /** A loading line (index) that is none of the last three shown. random is Math.random-like. */
+    function pickLoadingLine(recent, random = Math.random) {
+        const seen = (Array.isArray(recent) ? recent : []).slice(-RECENT_LOADING_LINES);
+        const pool = LOADING_LINES.map((_, index) => index).filter(index => !seen.includes(index));
+        const from = pool.length ? pool : LOADING_LINES.map((_, index) => index);
+        return from[Math.min(from.length - 1, Math.floor(random() * from.length))];
+    }
+
+    /** offline, slow, restored (online again after offline) or ok. */
+    function networkState(previous, { online = true, effectiveType = '', saveData = false } = {}) {
+        if (online === false) return 'offline';
+        if (previous === 'offline') return 'restored';
+        if (effectiveType === 'slow-2g' || effectiveType === '2g') return 'slow';
+        return 'ok';
+    }
+
+    function supportTimeFits(time, hour) {
+        if (time === 'morning') return hour >= 5 && hour < 12;
+        if (time === 'evening') return hour >= 18 || hour < 4;
+        return true;
+    }
+
+    /**
+     * The support variant for this opening. The first one ever is classic; none of the last two comes
+     * back; morning and evening ones keep to their hours; with the Companion off, only the variants
+     * that name no character.
+     */
+    function pickSupportVariant(history, hour, mode = DEFAULT_MODE, random = Math.random) {
+        const past = (Array.isArray(history) ? history : []).filter(id => SUPPORT_VARIANTS.some(variant => variant.id === id));
+        if (!past.length) return SUPPORT_VARIANTS[0];
+        const clock = Number.isFinite(Number(hour)) ? ((Math.floor(Number(hour)) % 24) + 24) % 24 : 12;
+        const fitting = SUPPORT_VARIANTS.filter(variant => supportTimeFits(variant.time, clock)
+            && (showsCharacters(mode) || !variant.characters));
+        const recent = past.slice(-SUPPORT_REMEMBERED);
+        let pool = fitting.filter(variant => !recent.includes(variant.id));
+        if (!pool.length) pool = fitting.filter(variant => variant.id !== past[past.length - 1]);
+        if (!pool.length) pool = fitting;
+        return pool[Math.min(pool.length - 1, Math.floor(random() * pool.length))];
+    }
+
+    function rememberSupportVariant(history, id) {
+        const past = (Array.isArray(history) ? history : []).filter(entry => typeof entry === 'string');
+        return [...past, id].slice(-SUPPORT_REMEMBERED);
     }
 
     function clampLine(value) {
@@ -255,6 +406,7 @@
         node.setAttribute('aria-hidden', 'true');
         node.decoding = 'async';
         node.draggable = false;
+        if (/(^|\/)(uljhan|kriti|duo)_/.test(name)) node.dataset.character = name.replace(/^.*\//, '').split('_')[0];
         if (height) node.height = height;
         return node;
     }
@@ -427,9 +579,9 @@
         const tally = el('div', 'ft-mascot-tally');
         tally.id = 'ftMascotTallyPopup';
         const counter = el('p', 'ft-mascot-tally__counter');
-        const bindu = image(ASSETS.counterMark, 'ft-mascot-tally__bindu', 20);
+        const mark = image(ASSETS.counterMark, 'ft-mascot-tally__mark', 20);
         const count = el('span', 'ft-mascot-tally__count');
-        counter.append(bindu, count);
+        counter.append(mark, count);
         const stage = el('div', 'ft-mascot-tally__stage');
         tally.append(counter, stage);
         header.insertAdjacentElement('afterend', tally);
@@ -458,7 +610,7 @@
 
         function renderCount() {
             count.textContent = t(COPY.hiddenCount, { count: formatCount(state.total) });
-            bindu.hidden = !showsCharacters(companionMode);
+            mark.hidden = !showsCharacters(companionMode);
         }
 
         function showCharacter(pose, imageName) {
@@ -478,9 +630,9 @@
             if (!character) return;
             const line = t(COPY.milestone, { count: formatCount(milestone) });
             const frames = sieveFrames(prefersReducedMotion());
-            bindu.classList.remove('is-popping');
-            void bindu.offsetWidth;
-            if (!prefersReducedMotion()) bindu.classList.add('is-popping');
+            mark.classList.remove('is-popping');
+            void mark.offsetWidth;
+            if (!prefersReducedMotion()) mark.classList.add('is-popping');
             let index = 0;
             const step = () => {
                 character.picture.src = assetUrl(ASSETS.sieve[frames[index] - 1]);
@@ -758,27 +910,400 @@
     }
 
     /**
-     * One pose and one line for a state: loading, empty, noMatches, error, done or hello.
-     * Returns null with the Companion set to Off, so the caller's words stand alone.
+     * Plays a sheet on an image once (swapped stills at SHEET_FRAME_MS), then rests on its last frame.
+     * With reduced motion the resting still shows at once. Returns a stop function.
+     */
+    function playSheet(picture, sheet, { onDone = null, frameMs = SHEET_FRAME_MS } = {}) {
+        const names = ASSETS[sheet];
+        const order = sheetFrames(sheet, prefersReducedMotion());
+        if (!picture || !order.length) return () => {};
+        if (order.length === 1) {
+            picture.src = assetUrl(names[order[0]]);
+            onDone?.();
+            return () => {};
+        }
+        let timer = 0;
+        let stopped = false;
+        preload([...names]).then(() => {
+            let index = 0;
+            const step = () => {
+                if (stopped || !picture.isConnected) return;
+                picture.src = assetUrl(names[order[index]]);
+                index += 1;
+                if (index < order.length) timer = root.setTimeout(step, frameMs);
+                else onDone?.();
+            };
+            step();
+        });
+        return () => { stopped = true; root.clearTimeout(timer); };
+    }
+
+    const recentLoadingLines = [];
+
+    function nextLoadingLine() {
+        const index = pickLoadingLine(recentLoadingLines);
+        recentLoadingLines.push(index);
+        if (recentLoadingLines.length > RECENT_LOADING_LINES) recentLoadingLines.shift();
+        return t(LOADING_LINES[index]);
+    }
+
+    /**
+     * One pose and one line for a state: loading, empty, noMatches, error, done, hello, reading, break,
+     * offline, slow or restored. Loading is Uljhan fetching with a line that varies; Quiet shows the
+     * pose without the loading line. Returns null with the Companion set to Off, so the caller's words
+     * stand alone.
      */
     function moment(kind, { line = '', height = 96 } = {}) {
         const spec = MOMENTS[kind];
         if (!spec || !root.document || !showsCharacters(companionMode)) return null;
         const holder = el('div', `pk-moment pk-moment--${kind}`);
         holder.dataset.ftMoment = kind;
-        const art = image(ASSETS[spec.image], 'pk-moment__art', height);
+        const art = image(stillImage(spec.image), 'pk-moment__art', height);
         art.style.setProperty('--pk-moment-size', `${height}px`);
         holder.appendChild(art);
-        const text = line || (spec.copy ? t(COPY[spec.copy]) : '');
-        if (text) holder.appendChild(el('p', 'pk-moment__line', clampLine(text)));
+        let text = line || (spec.copy && kind !== 'loading' ? t(COPY[spec.copy]) : '');
+        if (!text && kind === 'loading' && companionMode === 'lively') text = nextLoadingLine();
+        if (text) holder.appendChild(el('p', 'pk-moment__line', kind === 'loading' ? text : clampLine(text)));
+        const sheet = typeof ASSETS[spec.image] === 'string' ? '' : spec.image;
         if (!prefersReducedMotion()) {
             holder.classList.add('is-pop');
-            if (companionMode === 'lively') art.addEventListener('animationend', () => {
+            art.addEventListener('animationend', () => {
                 holder.classList.remove('is-pop');
-                holder.classList.add('is-idle');
+                if (sheet) playSheet(art, sheet, { onDone: () => { if (companionMode === 'lively') holder.classList.add('is-idle'); } });
+                else if (companionMode === 'lively') holder.classList.add('is-idle');
             }, { once: true });
         }
         return holder;
+    }
+
+    // ---- Brand moments on the options page -------------------------------------------------------
+
+    function onLocaleChange(listener) {
+        root.addEventListener?.('filtertube-ui-locale-changed', listener);
+    }
+
+    const HERO_HOPS = 3;
+
+    /**
+     * Kriti sieving Uljhan on the dashboard hero, standing on the profile card's top edge: the sheet
+     * once on Lively, then a few small hops and rest. Her hello shows on hover, focus or click only.
+     */
+    function mountHero(doc) {
+        const card = doc.querySelector('.ft-dash-hero .ft-dash-status');
+        if (!card) return;
+        let holder = null;
+        let stop = () => {};
+        let hopTimer = 0;
+        let spoken = null;
+        onLocaleChange(() => { if (holder?.isConnected) spoken?.retext(t(DUO_COPY.hello)); });
+        const draw = () => {
+            stop();
+            root.clearTimeout(hopTimer);
+            holder?.remove();
+            holder = null;
+            spoken = null;
+            card.classList.toggle('has-duo', showsCharacters(companionMode));
+            if (!showsCharacters(companionMode)) return;
+            const character = createCharacter({ className: 'ft-mascot--hero', imageName: stillImage('duoSieve'), height: 124, kind: 'event', tail: 'left' });
+            spoken = character;
+            holder = el('div', 'pk-hero-duo');
+            holder.appendChild(character.root);
+            card.appendChild(holder);
+            character.say(t(DUO_COPY.hello));
+            if (companionMode !== 'lively' || prefersReducedMotion()) return;
+            let hops = 0;
+            const hop = () => {
+                if (!holder?.isConnected || hops >= HERO_HOPS) return;
+                if (doc.visibilityState !== 'hidden' && holder.offsetParent) {
+                    hops += 1;
+                    character.figure.classList.remove('is-hopping');
+                    void character.figure.offsetWidth;
+                    character.figure.classList.add('is-hopping');
+                }
+                hopTimer = root.setTimeout(hop, 7000 + Math.floor(Math.random() * 2000));
+            };
+            stop = playSheet(character.picture, 'duoSieve', { onDone: () => { hopTimer = root.setTimeout(hop, 7000); } });
+        };
+        draw();
+        onModeChange(draw);
+    }
+
+    /** Kriti peeks over the sidebar footer on every page: present, and out of the way. */
+    function mountSidebar(doc) {
+        const footer = doc.querySelector('#sidebarNav .sidebar-footer');
+        if (!footer) return;
+        let peek = null;
+        const draw = () => {
+            peek?.remove();
+            peek = null;
+            if (!showsCharacters(companionMode)) return;
+            peek = el('div', 'pk-sidebar-peek');
+            peek.appendChild(image(ASSETS.kritiPeek, 'pk-sidebar-peek__art', 36));
+            footer.insertBefore(peek, footer.firstChild);
+        };
+        draw();
+        onModeChange(draw);
+    }
+
+    /** About: who the two are, in their own words. */
+    function mountAbout(doc) {
+        const shell = doc.querySelector('#aboutView .ft-about-site');
+        const anchor = shell?.querySelector('.ft-about-feature-grid');
+        if (!shell) return;
+        let card = null;
+        const draw = () => {
+            card?.remove();
+            card = null;
+            if (!showsCharacters(companionMode)) return;
+            card = el('section', 'pk-duo-card');
+            const art = el('div', 'pk-duo-card__art');
+            art.append(image(ASSETS.kritiWave, 'pk-duo-card__kriti', 132), image(ASSETS.uljhanFront, 'pk-duo-card__uljhan', 96));
+            const body = el('div', 'pk-duo-card__body');
+            const title = el('h3', 'pk-duo-card__title', t(DUO_COPY.aboutTitle));
+            const kriti = el('p', 'pk-duo-card__line', t(DUO_COPY.hello));
+            const uljhan = el('p', 'pk-duo-card__line', t(DUO_COPY.aboutUljhan));
+            body.append(title, kriti, uljhan);
+            card.append(art, body);
+            if (anchor) shell.insertBefore(card, anchor);
+            else shell.appendChild(card);
+            breathe(art);
+        };
+        draw();
+        onModeChange(draw);
+        onLocaleChange(draw);
+    }
+
+    /**
+     * Support: the Donate hero and the dashboard card take this opening's variant. The note under the
+     * body always says that FilterTube is free and that support is optional.
+     */
+    function mountSupport(doc) {
+        const hero = doc.querySelector('#donateView .donate-hero');
+        const promo = doc.querySelector('.donate-promo-text')?.parentElement || null;
+        if (!hero && !promo) return;
+        let variant = null;
+        const blocks = [];
+        const build = (className, artHeight) => {
+            const block = el('div', `pk-support ${className}`);
+            const art = el('div', 'pk-support__art');
+            const body = el('div', 'pk-support__body');
+            const title = el('h2', 'pk-support__title');
+            const text = el('p', 'pk-support__text');
+            const note = el('p', 'pk-support__note');
+            body.append(title, text, note);
+            block.append(art, body);
+            return { block, art, title, text, note, artHeight };
+        };
+        const fill = () => {
+            if (!variant) return;
+            const copy = SUPPORT_COPY[variant.id];
+            for (const entry of blocks) {
+                entry.block.dataset.variant = variant.id;
+                entry.title.textContent = t(copy.title);
+                entry.text.textContent = t(copy.body);
+                entry.note.textContent = t(copy.note);
+                entry.art.replaceChildren();
+                if (showsCharacters(companionMode)) entry.art.appendChild(image(stillImage(variant.image), 'pk-support__image', entry.artHeight));
+                entry.art.hidden = !showsCharacters(companionMode);
+            }
+        };
+        const start = async () => {
+            const stored = await storageGet([SUPPORT_HISTORY_KEY]);
+            variant = pickSupportVariant(stored[SUPPORT_HISTORY_KEY], new Date().getHours(), companionMode);
+            storageSet({ [SUPPORT_HISTORY_KEY]: rememberSupportVariant(stored[SUPPORT_HISTORY_KEY], variant.id) });
+            if (hero) {
+                const entry = build('pk-support--hero', 168);
+                blocks.push(entry);
+                hero.classList.add('has-support-variant');
+                hero.insertBefore(entry.block, hero.firstChild);
+            }
+            if (promo) {
+                const entry = build('pk-support--card', 96);
+                blocks.push(entry);
+                promo.classList.add('has-support-variant');
+                promo.insertBefore(entry.block, promo.firstChild);
+            }
+            fill();
+            if (blocks[0]) breathe(blocks[0].art);
+        };
+        start();
+        onModeChange(() => {
+            // A variant that names Kriti gives way to a plain one when the Companion is switched off.
+            if (variant && variant.characters && !showsCharacters(companionMode)) variant = SUPPORT_VARIANTS[0];
+            fill();
+        });
+        onLocaleChange(fill);
+    }
+
+    /** "Saved for {name}" on the parent session bar after a change to a child's space saves (Kriti's thumbs up). */
+    function mountSessionSaved(doc) {
+        let hideTimer = 0;
+        doc.addEventListener?.('filtertube:parent-session-saved', event => {
+            const bar = doc.querySelector('#managedChildGlobalBanner.ft-session-bar');
+            const name = String(event?.detail?.name || '').trim();
+            if (!bar || !name) return;
+            bar.querySelector('.pk-session-saved')?.remove();
+            root.clearTimeout(hideTimer);
+            const chip = el('span', 'pk-session-saved');
+            chip.setAttribute('role', 'status');
+            if (showsCharacters(companionMode)) chip.appendChild(image(ASSETS.kritiThumbsUp, 'pk-session-saved__art', 28));
+            chip.appendChild(el('span', 'pk-session-saved__text', t(SESSION_SAVED, { name })));
+            bar.appendChild(chip);
+            playSound('success');
+            hideTimer = root.setTimeout(() => chip.remove(), 2600);
+        });
+    }
+
+    /**
+     * Kriti keeps the Study status card company on the options page: reading when no session is on,
+     * with her notebook during a round, her mug on a break, a thumbs up when the day is done. A clock
+     * hold has no character, and the in-session strip in the popup never does.
+     */
+    function watchStudyStatus(doc) {
+        const container = doc.getElementById('viewContainer');
+        if (!container) return;
+        const poseFor = node => {
+            if (node.classList.contains('is-hold')) return '';
+            if (node.classList.contains('is-break')) return 'kritiMug';
+            if (node.classList.contains('is-done')) return 'kritiThumbsUp';
+            if (node.classList.contains('is-normal')) return 'kritiReading';
+            return 'kritiNotebook';
+        };
+        const scan = () => {
+            for (const node of container.querySelectorAll('.ft-study-status')) {
+                const pose = showsCharacters(companionMode) ? poseFor(node) : '';
+                const existing = node.querySelector(':scope > .pk-study-kriti');
+                if (existing && existing.dataset.pose === pose) continue;
+                existing?.remove();
+                if (!pose) continue;
+                const art = image(stillImage(pose), 'pk-study-kriti', 76);
+                art.dataset.pose = pose;
+                node.appendChild(art);
+                if (pose === 'kritiMug' && companionMode === 'lively') playSheet(art, 'kritiMug');
+            }
+        };
+        scan();
+        if (typeof root.MutationObserver === 'function') {
+            let queued = false;
+            new root.MutationObserver(() => {
+                if (queued) return;
+                queued = true;
+                root.setTimeout(() => { queued = false; scan(); }, 0);
+            }).observe(container, { childList: true, subtree: true, attributes: true, attributeFilter: ['class'] });
+        }
+        onModeChange(scan);
+    }
+
+    /** Kriti's thumbs up on a success toast, Uljhan's shrug on an error toast. The words stay the message. */
+    function watchToasts(doc) {
+        if (typeof root.MutationObserver !== 'function' || !doc.body) return;
+        new root.MutationObserver(records => {
+            if (!showsCharacters(companionMode)) return;
+            for (const record of records) {
+                for (const added of record.addedNodes) {
+                    if (added.nodeType !== 1 || !added.classList?.contains('ft-toast') || added.querySelector('.pk-toast-art')) continue;
+                    const name = added.classList.contains('ft-toast-success') ? ASSETS.kritiThumbsUp
+                        : (added.classList.contains('ft-toast-error') ? ASSETS.uljhanShrug : '');
+                    if (!name) continue;
+                    added.classList.add('has-mascot');
+                    added.insertBefore(image(name, 'pk-toast-art', 36), added.firstChild);
+                }
+            }
+        }).observe(doc.body, { childList: true });
+    }
+
+    /** Uljhan on a slim strip when the connection drops, crawls or comes back. Filters never need it. */
+    function mountNetwork(doc) {
+        const host = doc.querySelector('.main-content') || doc.getElementById('popupRoot');
+        if (!host || !root.navigator) return;
+        const strip = el('div', 'pk-net');
+        strip.setAttribute('role', 'status');
+        strip.setAttribute('aria-live', 'polite');
+        strip.hidden = true;
+        const art = el('span', 'pk-net__art');
+        const title = el('strong', 'pk-net__title');
+        const body = el('span', 'pk-net__body');
+        strip.append(art, title, body);
+        const anchor = doc.getElementById('viewContainer');
+        if (anchor && anchor.parentElement === host) host.insertBefore(strip, anchor);
+        else host.insertBefore(strip, host.firstChild);
+        let state = 'ok';
+        let hideTimer = 0;
+        const read = () => {
+            const connection = root.navigator.connection || {};
+            return { online: root.navigator.onLine !== false, effectiveType: connection.effectiveType || '', saveData: connection.saveData === true };
+        };
+        const draw = () => {
+            root.clearTimeout(hideTimer);
+            // The popup builds its shell late: keep the strip under the hidden counter, inside the frame.
+            const tally = doc.getElementById('ftMascotTallyPopup');
+            if (tally && strip.previousElementSibling !== tally) tally.insertAdjacentElement('afterend', strip);
+            strip.dataset.state = state;
+            if (state === 'ok') {
+                strip.hidden = true;
+                return;
+            }
+            title.textContent = t(NETWORK_COPY[state]);
+            body.textContent = state === 'offline' ? t(NETWORK_COPY.offlineBody) : '';
+            body.hidden = !body.textContent;
+            art.replaceChildren();
+            if (showsCharacters(companionMode)) art.appendChild(image(ASSETS[NETWORK_ART[state]], 'pk-net__image', 40));
+            art.hidden = !showsCharacters(companionMode);
+            strip.hidden = false;
+            if (state === 'restored') {
+                hideTimer = root.setTimeout(() => { state = networkState('ok', read()); draw(); }, RESTORED_MS);
+            }
+        };
+        const update = () => {
+            const next = networkState(state, read());
+            if (next === state) return;
+            state = next;
+            draw();
+        };
+        root.addEventListener?.('online', update);
+        root.addEventListener?.('offline', update);
+        root.navigator.connection?.addEventListener?.('change', update);
+        onModeChange(draw);
+        onLocaleChange(draw);
+        update();
+    }
+
+    /** Kriti peeks beside "No keywords blocked" in the popup (48 px; the popup's lists are small). */
+    function watchPopupEmptyLists(doc) {
+        const rootNode = doc.getElementById('popupRoot');
+        if (!rootNode) return;
+        const scan = () => {
+            for (const node of rootNode.querySelectorAll('.empty-state')) {
+                const kind = emptyListKind(node);
+                const existing = node.querySelector('.pk-popup-peek');
+                if (!showsCharacters(companionMode) || (kind !== 'keywords' && kind !== 'channels')) {
+                    existing?.remove();
+                    node.classList.remove('has-mascot');
+                    continue;
+                }
+                if (existing) continue;
+                if (!node.querySelector('.ft-mascot-empty__label')) {
+                    const label = el('span', 'ft-mascot-empty__label', node.textContent);
+                    if (node.__ftRendererCopy) {
+                        label.__ftRendererCopy = node.__ftRendererCopy;
+                        delete node.__ftRendererCopy;
+                    }
+                    node.replaceChildren(label);
+                }
+                node.classList.add('has-mascot');
+                node.insertBefore(image(ASSETS.kritiPeek, 'pk-popup-peek', 48), node.firstChild);
+            }
+        };
+        scan();
+        if (typeof root.MutationObserver === 'function') {
+            let queued = false;
+            new root.MutationObserver(() => {
+                if (queued) return;
+                queued = true;
+                root.setTimeout(() => { queued = false; scan(); }, 0);
+            }).observe(rootNode, { childList: true, subtree: true });
+        }
+        onModeChange(scan);
     }
 
     // ---- Sounds -----------------------------------------------------------------------------------
@@ -848,6 +1373,14 @@
         mountCompanionSetting(doc);
         mountSoundSetting(doc);
         mountWelcome(doc);
+        mountHero(doc);
+        mountSidebar(doc);
+        mountAbout(doc);
+        mountSupport(doc);
+        mountNetwork(doc);
+        watchToasts(doc);
+        mountSessionSaved(doc);
+        watchStudyStatus(doc);
         watchEmptyLists(doc);
         onModeChange(() => redrawEmptyLists());
         root.addEventListener?.('filtertube-ui-locale-changed', () => redrawEmptyLists());
@@ -859,6 +1392,9 @@
         COMPANION_KEY, MILESTONES_KEY, WELCOME_KEY, MODES, DEFAULT_MODE, MILESTONES,
         SIEVE_FRAME_MS, SIEVE_LOOPS, BUBBLE_MAX_CHARS, COPY, ASSETS,
         SOUNDS_KEY, SOUND_MODES, SOUND_FILES, MOMENTS,
+        SHEET_FRAME_MS, SHEET_STILL, LOADING_LINES, NETWORK_COPY, DUO_COPY, SESSION_SAVED,
+        SUPPORT_HISTORY_KEY, SUPPORT_REMEMBERED, SUPPORT_VARIANTS, SUPPORT_COPY,
+        sheetFrames, stillImage, pickLoadingLine, networkState, pickSupportVariant, rememberSupportVariant,
         normalizeMode, linePresentation, showsCharacters, evaluateMilestone, totalHidden, sieveFrames,
         allowListSwitchedOn, clampLine, loadMode, setMode,
         normalizeSoundMode, soundAllowed, playSound, loadSoundMode, moment,
@@ -878,6 +1414,10 @@
             if (doc.getElementById('viewContainer')) mountOptions(doc);
         });
         if (doc.getElementById('popupRoot')) {
+            loadMode().then(() => {
+                mountNetwork(doc);
+                watchPopupEmptyLists(doc);
+            });
             const tryPopup = () => mountPopup(doc);
             if (!tryPopup() && typeof root.MutationObserver === 'function') {
                 const watcher = new root.MutationObserver(() => { if (tryPopup()) watcher.disconnect(); });
