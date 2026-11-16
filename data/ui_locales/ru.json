@@ -3136,5 +3136,7 @@
   "study.overlay.breakLeft.two": "До конца перерыва {count} мин",
   "study.overlay.breakLeft.few": "До конца перерыва {count} мин",
   "study.overlay.breakLeft.many": "До конца перерыва {count} мин",
-  "study.overlay.breakLeft.other": "До конца перерыва {count} мин"
+  "study.overlay.breakLeft.other": "До конца перерыва {count} мин",
+  "study.family.stopped": "Устройство ({name}) перестало отправлять отчёты",
+  "study.family.stoppedBody": "Последний отчёт: {time}. Если устройство сбросили или FilterTube удалили, план учёбы тоже пропадёт. Подключите устройство заново, чтобы отправить его."
 }

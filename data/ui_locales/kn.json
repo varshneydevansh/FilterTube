@@ -3124,5 +3124,7 @@
   "study.overlay.breakLeft.two": "ನಿಮ್ಮ ವಿರಾಮದಲ್ಲಿ {count} ನಿಮಿ ಉಳಿದಿವೆ",
   "study.overlay.breakLeft.few": "ನಿಮ್ಮ ವಿರಾಮದಲ್ಲಿ {count} ನಿಮಿ ಉಳಿದಿವೆ",
   "study.overlay.breakLeft.many": "ನಿಮ್ಮ ವಿರಾಮದಲ್ಲಿ {count} ನಿಮಿ ಉಳಿದಿವೆ",
-  "study.overlay.breakLeft.other": "ನಿಮ್ಮ ವಿರಾಮದಲ್ಲಿ {count} ನಿಮಿ ಉಳಿದಿವೆ"
+  "study.overlay.breakLeft.other": "ನಿಮ್ಮ ವಿರಾಮದಲ್ಲಿ {count} ನಿಮಿ ಉಳಿದಿವೆ",
+  "study.family.stopped": "{name} ಅವರ ಸಾಧನ ವರದಿ ಮಾಡುವುದನ್ನು ನಿಲ್ಲಿಸಿದೆ",
+  "study.family.stoppedBody": "ಕೊನೆಯ ವರದಿ {time}. ಸಾಧನ ರೀಸೆಟ್ ಆದರೆ ಅಥವಾ FilterTube ತೆಗೆದರೆ, ಅಧ್ಯಯನ ಯೋಜನೆಯೂ ಹೋಗುತ್ತದೆ. ಕಳುಹಿಸಲು ಮತ್ತೆ ಜೋಡಿಸಿ."
 }

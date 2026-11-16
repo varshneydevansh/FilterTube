@@ -3124,5 +3124,7 @@
   "study.overlay.breakLeft.two": "ከእረፍትህ {count} ደቂቃ ቀርቷል",
   "study.overlay.breakLeft.few": "ከእረፍትህ {count} ደቂቃ ቀርቷል",
   "study.overlay.breakLeft.many": "ከእረፍትህ {count} ደቂቃ ቀርቷል",
-  "study.overlay.breakLeft.other": "ከእረፍትህ {count} ደቂቃ ቀርቷል"
+  "study.overlay.breakLeft.other": "ከእረፍትህ {count} ደቂቃ ቀርቷል",
+  "study.family.stopped": "የ{name} መሣሪያ ሪፖርት ማድረግ አቁሟል",
+  "study.family.stoppedBody": "የመጨረሻ ሪፖርት {time}። መሣሪያው ዳግም ከተጀመረ ወይም FilterTube ከተወገደ የጥናት ዕቅዱም ይጠፋል። ለመላክ እንደገና አጣምር።"
 }

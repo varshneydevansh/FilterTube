@@ -3124,5 +3124,7 @@
   "study.overlay.breakLeft.two": "તમારા વિરામની {count} મિનિટ બાકી",
   "study.overlay.breakLeft.few": "તમારા વિરામની {count} મિનિટ બાકી",
   "study.overlay.breakLeft.many": "તમારા વિરામની {count} મિનિટ બાકી",
-  "study.overlay.breakLeft.other": "તમારા વિરામની {count} મિનિટ બાકી"
+  "study.overlay.breakLeft.other": "તમારા વિરામની {count} મિનિટ બાકી",
+  "study.family.stopped": "{name} ના ડિવાઇસે રિપોર્ટ મોકલવાનું બંધ કર્યું",
+  "study.family.stoppedBody": "છેલ્લો રિપોર્ટ {time}. જો ડિવાઇસ રીસેટ થયું હોય અથવા FilterTube કાઢી નખાયું હોય, તો અભ્યાસ યોજના પણ જતી રહે છે. મોકલવા માટે ફરી જોડો."
 }

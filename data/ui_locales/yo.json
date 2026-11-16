@@ -3122,5 +3122,7 @@
   "study.overlay.breakLeft.two": "Ìṣẹ́jú {count} ìsinmi rẹ ló kù",
   "study.overlay.breakLeft.few": "Ìṣẹ́jú {count} ìsinmi rẹ ló kù",
   "study.overlay.breakLeft.many": "Ìṣẹ́jú {count} ìsinmi rẹ ló kù",
-  "study.overlay.breakLeft.other": "Ìṣẹ́jú {count} ìsinmi rẹ ló kù"
+  "study.overlay.breakLeft.other": "Ìṣẹ́jú {count} ìsinmi rẹ ló kù",
+  "study.family.stopped": "Ẹ̀rọ {name} ti dáwọ́ ròyìn dúró",
+  "study.family.stoppedBody": "Ìròyìn ìkẹyìn {time}. Tí a bá tún ẹ̀rọ náà ṣe tàbí tí a yọ FilterTube kúrò, ètò ẹ̀kọ́ náà yóò parẹ́ pẹ̀lú. Tún so ó pọ̀ láti fi ranṣẹ."
 }

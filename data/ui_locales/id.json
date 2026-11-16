@@ -3122,5 +3122,7 @@
   "study.overlay.breakLeft.two": "{count} mnt istirahat Anda tersisa",
   "study.overlay.breakLeft.few": "{count} mnt istirahat Anda tersisa",
   "study.overlay.breakLeft.many": "{count} mnt istirahat Anda tersisa",
-  "study.overlay.breakLeft.other": "{count} mnt istirahat Anda tersisa"
+  "study.overlay.breakLeft.other": "{count} mnt istirahat Anda tersisa",
+  "study.family.stopped": "Perangkat {name} berhenti melapor",
+  "study.family.stoppedBody": "Laporan terakhir {time}. Jika perangkat direset atau FilterTube dihapus, rencana belajarnya ikut hilang. Pasangkan lagi untuk mengirimnya."
 }

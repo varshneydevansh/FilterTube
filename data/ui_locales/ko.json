@@ -3122,5 +3122,7 @@
   "study.overlay.breakLeft.two": "휴식 {count}분 남음",
   "study.overlay.breakLeft.few": "휴식 {count}분 남음",
   "study.overlay.breakLeft.many": "휴식 {count}분 남음",
-  "study.overlay.breakLeft.other": "휴식 {count}분 남음"
+  "study.overlay.breakLeft.other": "휴식 {count}분 남음",
+  "study.family.stopped": "{name}님의 기기가 보고를 멈췄어요",
+  "study.family.stoppedBody": "마지막 보고는 {time}입니다. 기기가 초기화되거나 FilterTube가 삭제되면 공부 계획도 사라져요. 보내려면 다시 연결하세요."
 }

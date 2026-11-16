@@ -3124,5 +3124,7 @@
   "study.overlay.breakLeft.two": "{count} min left in your break",
   "study.overlay.breakLeft.few": "{count} min left in your break",
   "study.overlay.breakLeft.many": "{count} min left in your break",
-  "study.overlay.breakLeft.other": "{count} min left in your break"
+  "study.overlay.breakLeft.other": "{count} min left in your break",
+  "study.family.stopped": "{name}'s device stopped reporting",
+  "study.family.stoppedBody": "Last report {time}. If the device was reset or FilterTube was removed, its study plan is gone too. Pair again to send it."
 }

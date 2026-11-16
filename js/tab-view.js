@@ -28435,7 +28435,23 @@ document.addEventListener('DOMContentLoaded', async () => {
             label.append(box, words);
             switches.appendChild(label);
         });
-        host.replaceChildren(title, list, switches);
+        // A linked child's device that stopped reporting may have been reset or had FilterTube removed
+        // (Android StudyFamilyActivity, StudyReportFreshness).
+        const stopped = safeArray(data.remoteChildren).filter(child => Number.isFinite(child.stoppedSince)).map(child => {
+            const notice = document.createElement('div');
+            notice.className = 'ft-ask-inbox__stopped';
+            notice.setAttribute('role', 'status');
+            const head = document.createElement('strong');
+            head.textContent = tabViewUiText('study.family.stopped', '{name}\'s device stopped reporting', { name: child.name });
+            const body = document.createElement('p');
+            body.className = 'help-item-body';
+            let when = '';
+            try { when = new Date(child.stoppedSince).toLocaleString(undefined, { weekday: 'short', day: 'numeric', month: 'short', hour: 'numeric', minute: '2-digit' }); } catch (e) { }
+            body.textContent = tabViewUiText('study.family.stoppedBody', 'Last report {time}. If the device was reset or FilterTube was removed, its study plan is gone too. Pair again to send it.', { time: when });
+            notice.append(head, body);
+            return notice;
+        });
+        host.replaceChildren(...stopped, title, list, switches);
     }
 
     function renderProfilesManager(profilesV4) {

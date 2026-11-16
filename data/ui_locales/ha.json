@@ -3124,5 +3124,7 @@
   "study.overlay.breakLeft.two": "Saura min {count} na hutunka",
   "study.overlay.breakLeft.few": "Saura min {count} na hutunka",
   "study.overlay.breakLeft.many": "Saura min {count} na hutunka",
-  "study.overlay.breakLeft.other": "Saura min {count} na hutunka"
+  "study.overlay.breakLeft.other": "Saura min {count} na hutunka",
+  "study.family.stopped": "Na'urar {name} ta daina bayar da rahoto",
+  "study.family.stoppedBody": "Rahoto na ƙarshe {time}. Idan an sake saita na'urar ko an cire FilterTube, shirin karatu ma ya tafi. Sake haɗa su don aika shi."
 }

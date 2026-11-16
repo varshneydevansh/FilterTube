@@ -3124,5 +3124,7 @@
   "study.overlay.breakLeft.two": "Faltam {count} min da sua pausa",
   "study.overlay.breakLeft.few": "Faltam {count} min da sua pausa",
   "study.overlay.breakLeft.many": "Faltam {count} min da sua pausa",
-  "study.overlay.breakLeft.other": "Faltam {count} min da sua pausa"
+  "study.overlay.breakLeft.other": "Faltam {count} min da sua pausa",
+  "study.family.stopped": "O dispositivo de {name} parou de enviar relatórios",
+  "study.family.stoppedBody": "Último relatório {time}. Se o dispositivo foi redefinido ou o FilterTube foi removido, o plano de estudo também se perde. Pareie de novo para enviá-lo."
 }

@@ -3124,5 +3124,7 @@
   "study.overlay.breakLeft.two": "Noch {count} Min. Pause",
   "study.overlay.breakLeft.few": "Noch {count} Min. Pause",
   "study.overlay.breakLeft.many": "Noch {count} Min. Pause",
-  "study.overlay.breakLeft.other": "Noch {count} Min. Pause"
+  "study.overlay.breakLeft.other": "Noch {count} Min. Pause",
+  "study.family.stopped": "Das Gerät von {name} meldet sich nicht mehr",
+  "study.family.stoppedBody": "Letzte Meldung {time}. Wurde das Gerät zurückgesetzt oder FilterTube entfernt, ist auch der Lernplan weg. Koppele es erneut, um ihn zu senden."
 }

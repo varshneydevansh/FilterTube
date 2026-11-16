@@ -3122,5 +3122,7 @@
   "study.overlay.breakLeft.two": "休憩の残り {count} 分",
   "study.overlay.breakLeft.few": "休憩の残り {count} 分",
   "study.overlay.breakLeft.many": "休憩の残り {count} 分",
-  "study.overlay.breakLeft.other": "休憩の残り {count} 分"
+  "study.overlay.breakLeft.other": "休憩の残り {count} 分",
+  "study.family.stopped": "{name} さんの端末が報告を止めました",
+  "study.family.stoppedBody": "最後の報告は {time} です。端末がリセットされたり FilterTube が削除されたりすると、学習プランも消えます。送るには、もう一度ペアリングしてください。"
 }

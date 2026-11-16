@@ -3124,5 +3124,7 @@
   "study.overlay.breakLeft.two": "Quedan {count} min de tu descanso",
   "study.overlay.breakLeft.few": "Quedan {count} min de tu descanso",
   "study.overlay.breakLeft.many": "Quedan {count} min de tu descanso",
-  "study.overlay.breakLeft.other": "Quedan {count} min de tu descanso"
+  "study.overlay.breakLeft.other": "Quedan {count} min de tu descanso",
+  "study.family.stopped": "El dispositivo de {name} dejó de informar",
+  "study.family.stoppedBody": "Último informe {time}. Si el dispositivo se restableció o se quitó FilterTube, el plan de estudio también se pierde. Vuelve a vincularlo para enviarlo."
 }

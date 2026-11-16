@@ -3148,5 +3148,7 @@
   "study.overlay.breakLeft.two": "{count} دقيقتان متبقيتان من استراحتك",
   "study.overlay.breakLeft.few": "{count} دقائق متبقية من استراحتك",
   "study.overlay.breakLeft.many": "{count} دقيقة متبقية من استراحتك",
-  "study.overlay.breakLeft.other": "{count} دقيقة متبقية من استراحتك"
+  "study.overlay.breakLeft.other": "{count} دقيقة متبقية من استراحتك",
+  "study.family.stopped": "جهاز {name} وقّف يبلّغ",
+  "study.family.stoppedBody": "آخر تقرير {time}. إذا انعمل ريسيت للجهاز أو انشال FilterTube، خطة الدراسة كمان بتروح. اربطه من جديد لتبعتها."
 }

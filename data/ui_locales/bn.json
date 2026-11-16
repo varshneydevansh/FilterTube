@@ -3124,5 +3124,7 @@
   "study.overlay.breakLeft.two": "আপনার বিরতির {count} মিনিট বাকি",
   "study.overlay.breakLeft.few": "আপনার বিরতির {count} মিনিট বাকি",
   "study.overlay.breakLeft.many": "আপনার বিরতির {count} মিনিট বাকি",
-  "study.overlay.breakLeft.other": "আপনার বিরতির {count} মিনিট বাকি"
+  "study.overlay.breakLeft.other": "আপনার বিরতির {count} মিনিট বাকি",
+  "study.family.stopped": "{name} এর ডিভাইস রিপোর্ট পাঠানো বন্ধ করেছে",
+  "study.family.stoppedBody": "শেষ রিপোর্ট {time}। ডিভাইস রিসেট হলে বা FilterTube সরানো হলে পড়ার পরিকল্পনাও চলে যায়। পাঠাতে আবার যুক্ত করুন।"
 }

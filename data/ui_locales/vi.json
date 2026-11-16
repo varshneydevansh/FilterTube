@@ -3122,5 +3122,7 @@
   "study.overlay.breakLeft.two": "Còn {count} phút nghỉ",
   "study.overlay.breakLeft.few": "Còn {count} phút nghỉ",
   "study.overlay.breakLeft.many": "Còn {count} phút nghỉ",
-  "study.overlay.breakLeft.other": "Còn {count} phút nghỉ"
+  "study.overlay.breakLeft.other": "Còn {count} phút nghỉ",
+  "study.family.stopped": "Thiết bị của {name} đã ngừng báo cáo",
+  "study.family.stoppedBody": "Báo cáo gần nhất {time}. Nếu thiết bị bị đặt lại hoặc FilterTube bị gỡ, kế hoạch học cũng mất. Hãy ghép đôi lại để gửi."
 }

@@ -3124,5 +3124,7 @@
   "study.overlay.breakLeft.two": "रउआ ब्रेक के {count} मिनट बाकी",
   "study.overlay.breakLeft.few": "रउआ ब्रेक के {count} मिनट बाकी",
   "study.overlay.breakLeft.many": "रउआ ब्रेक के {count} मिनट बाकी",
-  "study.overlay.breakLeft.other": "रउआ ब्रेक के {count} मिनट बाकी"
+  "study.overlay.breakLeft.other": "रउआ ब्रेक के {count} मिनट बाकी",
+  "study.family.stopped": "{name} के डिवाइस रिपोर्ट भेजल बंद कर दिहलस",
+  "study.family.stoppedBody": "आखिरी रिपोर्ट {time}। अगर डिवाइस रीसेट भइल भा FilterTube हटा दिहल गइल, त पढ़ाई के योजना भी चल जाई। भेजे खातिर फेर से जोड़ीं।"
 }

@@ -910,6 +910,9 @@ body.ft-extension-surface[data-surface="tab-view"] .list-item:not(.channel-item)
 .ft-ask-request__done { display: flex; align-items: center; gap: 8px; font-weight: 700; color: var(--pk-plum); }
 .ft-ask-request__done .pk-doodle-mark--check { width: 22px; height: 22px; }
 .ft-ask-inbox__switches { display: grid; gap: 6px; }
+/* A linked child's device that stopped reporting (Android StudyFamilyActivity addNotice). */
+.ft-ask-inbox__stopped { display: grid; gap: 4px; padding: 12px 14px; border: 1.5px solid var(--pk-line); border-radius: 16px; background: var(--pk-sun-wash); color: var(--pk-sun-ink); }
+.ft-ask-inbox__stopped .help-item-body { margin: 0; color: inherit; }
 .ft-ask-inbox__switch { display: flex; align-items: center; gap: 8px; min-height: 40px; cursor: pointer; }
 
 /* Ask a parent: the child's answer card in the popup (Android AskParentAnswerActivity). */

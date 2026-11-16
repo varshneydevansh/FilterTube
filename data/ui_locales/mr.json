@@ -3124,5 +3124,7 @@
   "study.overlay.breakLeft.two": "तुमच्या विश्रांतीची {count} मि बाकी",
   "study.overlay.breakLeft.few": "तुमच्या विश्रांतीची {count} मि बाकी",
   "study.overlay.breakLeft.many": "तुमच्या विश्रांतीची {count} मि बाकी",
-  "study.overlay.breakLeft.other": "तुमच्या विश्रांतीची {count} मि बाकी"
+  "study.overlay.breakLeft.other": "तुमच्या विश्रांतीची {count} मि बाकी",
+  "study.family.stopped": "{name} यांच्या डिव्हाइसने अहवाल देणे थांबवले",
+  "study.family.stoppedBody": "शेवटचा अहवाल {time}. डिव्हाइस रीसेट झाले किंवा FilterTube काढले गेले, तर अभ्यास योजनाही जाते. पाठवण्यासाठी पुन्हा जोडा."
 }

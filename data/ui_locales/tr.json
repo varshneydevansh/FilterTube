@@ -3124,5 +3124,7 @@
   "study.overlay.breakLeft.two": "Molanın bitmesine {count} dk",
   "study.overlay.breakLeft.few": "Molanın bitmesine {count} dk",
   "study.overlay.breakLeft.many": "Molanın bitmesine {count} dk",
-  "study.overlay.breakLeft.other": "Molanın bitmesine {count} dk"
+  "study.overlay.breakLeft.other": "Molanın bitmesine {count} dk",
+  "study.family.stopped": "{name} cihazı rapor göndermeyi bıraktı",
+  "study.family.stoppedBody": "Son rapor {time}. Cihaz sıfırlandıysa veya FilterTube kaldırıldıysa ders planı da gider. Göndermek için yeniden eşleştir."
 }

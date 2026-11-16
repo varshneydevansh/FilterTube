@@ -3124,5 +3124,7 @@
   "study.overlay.breakLeft.two": "{count} min of your break remain",
   "study.overlay.breakLeft.few": "{count} min of your break remain",
   "study.overlay.breakLeft.many": "{count} min of your break remain",
-  "study.overlay.breakLeft.other": "{count} min of your break remain"
+  "study.overlay.breakLeft.other": "{count} min of your break remain",
+  "study.family.stopped": "{name} device don stop to report",
+  "study.family.stoppedBody": "Last report {time}. If dem reset the device or dem remove FilterTube, the study plan go go too. Pair am again make e fit send am."
 }

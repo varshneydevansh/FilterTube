@@ -3124,5 +3124,7 @@
   "study.overlay.breakLeft.two": "{count} min de pause restantes",
   "study.overlay.breakLeft.few": "{count} min de pause restantes",
   "study.overlay.breakLeft.many": "{count} min de pause restantes",
-  "study.overlay.breakLeft.other": "{count} min de pause restantes"
+  "study.overlay.breakLeft.other": "{count} min de pause restantes",
+  "study.family.stopped": "L'appareil de {name} ne signale plus rien",
+  "study.family.stoppedBody": "Dernier signalement {time}. Si l'appareil a été réinitialisé ou si FilterTube a été supprimé, son plan d'étude disparaît aussi. Associez-le à nouveau pour l'envoyer."
 }

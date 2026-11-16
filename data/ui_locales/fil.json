@@ -3124,5 +3124,7 @@
   "study.overlay.breakLeft.two": "{count} min na lang ang pahinga mo",
   "study.overlay.breakLeft.few": "{count} min na lang ang pahinga mo",
   "study.overlay.breakLeft.many": "{count} min na lang ang pahinga mo",
-  "study.overlay.breakLeft.other": "{count} min na lang ang pahinga mo"
+  "study.overlay.breakLeft.other": "{count} min na lang ang pahinga mo",
+  "study.family.stopped": "Huminto sa pag-uulat ang device ni {name}",
+  "study.family.stoppedBody": "Huling ulat {time}. Kung na-reset ang device o inalis ang FilterTube, mawawala rin ang plano nito sa pag-aaral. Mag-pair ulit para maipadala ito."
 }

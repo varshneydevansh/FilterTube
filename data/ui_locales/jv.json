@@ -3122,5 +3122,7 @@
   "study.overlay.breakLeft.two": "Kari {count} menit ngasomu",
   "study.overlay.breakLeft.few": "Kari {count} menit ngasomu",
   "study.overlay.breakLeft.many": "Kari {count} menit ngasomu",
-  "study.overlay.breakLeft.other": "Kari {count} menit ngasomu"
+  "study.overlay.breakLeft.other": "Kari {count} menit ngasomu",
+  "study.family.stopped": "Piranti {name} mandheg nglapor",
+  "study.family.stoppedBody": "Laporan pungkasan {time}. Yen piranti direset utawa FilterTube dicopot, rencana sinaune uga ilang. Pasangna maneh kanggo ngirim."
 }

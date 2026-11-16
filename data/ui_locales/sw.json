@@ -3124,5 +3124,7 @@
   "study.overlay.breakLeft.two": "Zimebaki dak {count} za mapumziko yako",
   "study.overlay.breakLeft.few": "Zimebaki dak {count} za mapumziko yako",
   "study.overlay.breakLeft.many": "Zimebaki dak {count} za mapumziko yako",
-  "study.overlay.breakLeft.other": "Zimebaki dak {count} za mapumziko yako"
+  "study.overlay.breakLeft.other": "Zimebaki dak {count} za mapumziko yako",
+  "study.family.stopped": "Kifaa cha {name} kimeacha kutuma ripoti",
+  "study.family.stoppedBody": "Ripoti ya mwisho {time}. Kama kifaa kilirudishwa upya au FilterTube iliondolewa, mpango wa kusoma pia unapotea. Kiunganishe tena ili kuutuma."
 }

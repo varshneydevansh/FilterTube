@@ -3124,5 +3124,7 @@
   "study.overlay.breakLeft.two": "تہاڈے وقفے دے {count} منٹ باقی",
   "study.overlay.breakLeft.few": "تہاڈے وقفے دے {count} منٹ باقی",
   "study.overlay.breakLeft.many": "تہاڈے وقفے دے {count} منٹ باقی",
-  "study.overlay.breakLeft.other": "تہاڈے وقفے دے {count} منٹ باقی"
+  "study.overlay.breakLeft.other": "تہاڈے وقفے دے {count} منٹ باقی",
+  "study.family.stopped": "{name} دا ڈیوائس رپورٹ بھیجنوں رک گیا اے",
+  "study.family.stoppedBody": "آخری رپورٹ {time}۔ جے ڈیوائس ریسیٹ ہو گیا یا FilterTube ہٹا دتا گیا، تاں پڑھائی دا پلان وی چلا جاندا اے۔ بھیجن لئی فیر جوڑو۔"
 }

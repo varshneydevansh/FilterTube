@@ -118,6 +118,17 @@
         const askingOff = (store, key) => object(store.asking[key]).off === true;
         const parentLinksFor = (links, childId) => links.filter(link => usable(link) && link.localRole === 'replica'
             && link.remoteRole === 'source' && text(object(link.policy).targetProfileId) === childId);
+        /**
+         * Android StudyReportFreshness: FilterTube can't stop a child clearing its data or removing the
+         * extension, so the parent's device notices instead. Reports only travel on a parent's managed
+         * link, so a report this old is from a managed child. Returns its time, or null while it's fresh.
+         */
+        const REPORT_STALE_MS = 3 * 24 * 60 * 60 * 1000;
+        function reportStopped(report, at) {
+            const generatedAt = Number(object(report).generatedAt);
+            return Number.isFinite(generatedAt) && generatedAt > 0 && at - generatedAt > REPORT_STALE_MS ? generatedAt : null;
+        }
+
         const childLinks = links => links.filter(link => usable(link) && link.localRole === 'source' && link.remoteRole === 'replica');
         /** A parent profile on this device that could answer (AskParentAccess.parentHere). */
         const parentHere = (profiles, child) => !!child && child.type === 'child' && Object.entries(object(profiles.profiles))
@@ -333,7 +344,9 @@
             })));
             const remoteChildren = childLinks(links).map(link => ({
                 linkId: link.linkId, name: text(object(link.policy).targetProfileName) || text(link.deviceLabel),
-                askingOff: askingOff(store, `link:${link.linkId}`)
+                askingOff: askingOff(store, `link:${link.linkId}`),
+                // "Aarav's device stopped reporting": its last report is older than 3 days.
+                stoppedSince: reportStopped(store.reports[link.linkId], at)
             }));
             // Ask for time: requests from children here, and each linked child's last report minus what
             // this parent already answered (a grant waiting to send, or "Not now").
