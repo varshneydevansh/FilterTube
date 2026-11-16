@@ -449,7 +449,8 @@ test("Kriti's reading pose is packaged for the pages that show the card", () => 
     assert.ok(fs.existsSync(KRITI_READING));
     for (const file of ['manifest.json', 'manifest.chrome.json', 'manifest.firefox.json', 'manifest.opera.json']) {
         const manifest = JSON.parse(fs.readFileSync(file, 'utf8'));
-        const entry = manifest.web_accessible_resources.find(item => item.resources.includes(KRITI_READING));
+        const entry = manifest.web_accessible_resources.find(item => item.resources.includes(KRITI_READING)
+            || item.resources.includes('assets/images/mascots/*.webp'));
         assert.ok(entry, file);
         assert.ok(entry.matches.some(match => match.includes('youtubekids.com')), file);
     }
