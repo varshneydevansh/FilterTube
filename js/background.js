@@ -2207,21 +2207,16 @@ function schedulePostBlockEnrichment(channel, profile = 'main', metadata = {}) {
     pendingPostBlockEnrichments.set(key, run);
 }
 
+// "Filter all": the word and key follow Android FilterPayloadCompiler (channelKeywordWord and
+// channelKey), shared in js/shared/identity.js so both platforms derive the same word.
 function getChannelDerivedKeywordRef(channel) {
-    if (!channel || typeof channel !== 'object') return '';
-    const keySource = channel.id || channel.handle || channel.originalInput || channel.name || '';
-    return typeof keySource === 'string' ? keySource.toLowerCase() : '';
+    const shared = globalThis.FilterTubeIdentity?.channelFilterAllKey;
+    return typeof shared === 'function' ? shared(channel) : '';
 }
 
 function getChannelDerivedKeywordWord(channel) {
-    if (!channel || typeof channel !== 'object') return '';
-    if (channel.name && channel.name !== channel.id) {
-        return channel.name;
-    }
-    if (channel.handle) {
-        return channel.handle;
-    }
-    return channel.id || channel.originalInput || '';
+    const shared = globalThis.FilterTubeIdentity?.channelFilterAllWord;
+    return typeof shared === 'function' ? shared(channel) : '';
 }
 
 function parsePackedChannelKeywordSource(sourceValue) {
@@ -4450,8 +4445,9 @@ async function getCompiledSettings(sender = null, profileType = null, forceRefre
                         };
 
                         // If filterAll is enabled, add the channel name to keywords
-                        if (channelObj.filterAll && channelObj.name && channelObj.name !== channelObj.id) {
-                            additionalKeywordsFromChannels.push(compileKeywordPattern(channelObj.name, true));
+                        const filterAllWord = channelObj.filterAll ? getChannelDerivedKeywordWord(channelObj) : '';
+                        if (filterAllWord) {
+                            additionalKeywordsFromChannels.push(compileKeywordPattern(filterAllWord, true));
                         }
 
                         return channelObj;

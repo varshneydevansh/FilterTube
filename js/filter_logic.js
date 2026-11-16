@@ -2317,6 +2317,70 @@
             };
         }
 
+        /**
+         * Android NativeOwnedFilterDecider lines 884-999: a video whose channel isn't known yet.
+         * Returns 'block', 'allow', 'wait' (hidden: the data-level filter can't hold a card back, so
+         * waiting means removing it; the page scan re-decides when the channel arrives) or null
+         * (the channel is known, or the extension keeps its own fallback: an unmatched card in
+         * block mode with a weak solo identity still shows, since the site may never name it).
+         */
+        _pendingChannelIdentityDecision(item, candidate, collaborators, context) {
+            const Identity = window.FilterTubeIdentity;
+            if (!Identity || typeof Identity.decidePendingChannelIdentity !== 'function') return null;
+            const { listMode, videoId, skipKeywordFiltering, rules, rendererType } = context;
+            if (!videoId || candidate.isPlaylist || candidate.isStructural || candidate.isMix) return null;
+            const allowMode = listMode === 'whitelist';
+            const filterChannels = Array.isArray(this.settings.filterChannels) ? this.settings.filterChannels : [];
+            const whitelistChannels = Array.isArray(this.settings.whitelistChannels) ? this.settings.whitelistChannels : [];
+            const hasChannelRules = filterChannels.length > 0 || whitelistChannels.length > 0;
+            if (!hasChannelRules && !(allowMode && candidate.isShort)) return null;
+            const layered = this.settings.listLayered === true;
+            const blockedVideo = this.blockedVideoIdSet.has(videoId);
+            const allowedVideo = this.allowedVideoIdSet.has(videoId);
+            // Video ids decide before the channel (layered: a blocked id hides at once).
+            if (blockedVideo || (!layered && allowedVideo)) return null;
+            const bylineLabel = [item?.shortBylineText, item?.longBylineText, item?.ownerText]
+                .map(text => flattenText(text)).filter(Boolean).join(' ');
+            const strength = Identity.channelIdentityStrength(collaborators, {
+                indexes: [this.filterChannelIndex, this.whitelistChannelIndex],
+                channelMap: this.channelMap,
+                expectedCollaboratorCount: Identity.collapsedCollaboratorExpectedCount(bylineLabel)
+            });
+            if (strength === 'strong') return null;
+            // On a creator's own page the page names the channel for its shelves (the app's channel
+            // page carries it on every card); the extension's creator-page fallback below decides.
+            if (strength === 'weak' && this.pageChannelMeta) {
+                try {
+                    const path = document.location?.pathname || '';
+                    if (/^\/(@[^/]+|channel\/UC[\w-]{22}|c\/[^/]+|user\/[^/]+)(?:\/|$)/i.test(path)) return null;
+                } catch (e) {
+                }
+            }
+            const keywordMatch = (keywords) => {
+                if (skipKeywordFiltering || !Array.isArray(keywords) || keywords.length === 0) return false;
+                const textToSearch = this._candidateSearchText(candidate);
+                return keywords.some(keywordRegex =>
+                    this._regexMatches(keywordRegex, this._keywordText(keywordRegex, candidate, textToSearch)) &&
+                    this._keywordDateFilterAllows(keywordRegex, candidate, item, rules, rendererType));
+            };
+            const decision = Identity.decidePendingChannelIdentity({
+                layered,
+                allowMode,
+                isShort: candidate.isShort === true,
+                blockedKeyword: keywordMatch(this.settings.filterKeywords),
+                allowedKeyword: keywordMatch(this.settings.whitelistKeywords),
+                blockedChannelName: Identity.matchesChannelNameRows(collaborators, this.filterChannelIndex),
+                allowedChannelName: Identity.matchesChannelNameRows(collaborators, this.whitelistChannelIndex),
+                allowedVideo,
+                // Android mainBlockedChannelKeys: channel rows other than BlockTube name rows.
+                hasBlockedChannelRules: filterChannels.some(entry => entry && entry.source !== 'blocktube-channel-name')
+            });
+            if (decision !== 'wait') return decision;
+            // A collaboration still loading waits in every mode; a weak solo card waits under allow
+            // mode or layered rules, and otherwise keeps the extension's own fallback.
+            return (strength === 'resolving' || allowMode || layered) ? 'wait' : null;
+        }
+
         _candidateSearchText(candidate) {
             if (!candidate || typeof candidate !== 'object') return '';
             const channelText = (candidate.collaborators || [])
@@ -2736,7 +2800,8 @@
                 this.settings.filterKeywordsComments
             ].some(list => Array.isArray(list) && list.length > 0);
             const candidate = this._buildCandidate(item, rendererType, unwrappedRenderer.wrapperRendererType, {
-                extractChannelIdentity: needsChannelIdentity,
+                // Allow mode always reads the channel: a Short shows only once its channel is known.
+                extractChannelIdentity: needsChannelIdentity || listMode === 'whitelist',
                 extractSearchMetadata: needsSearchMetadata
             });
             const title = candidate.title;
@@ -2831,6 +2896,22 @@
                     return false;
                 }
             } catch (e) {
+            }
+
+            // A card whose channel isn't known yet decides like the app (Android
+            // NativeOwnedFilterDecider, "channel identity pending"); see decidePendingChannelIdentity.
+            if (!isCommentRenderer) {
+                const pendingDecision = this._pendingChannelIdentityDecision(item, candidate, collaborators, {
+                    listMode, videoId, skipKeywordFiltering, rules, rendererType
+                });
+                if (pendingDecision === 'block' || pendingDecision === 'wait') {
+                    this._logWhitelistDecision(`${pendingDecision}:channel_identity_pending`, { rendererType, originalRendererType, title });
+                    return true;
+                }
+                if (pendingDecision === 'allow') {
+                    this._logWhitelistDecision('allow:channel_identity_pending', { rendererType, originalRendererType, title });
+                    return this._blocksByContentRules(item, rules, rendererType);
+                }
             }
 
             // Block and allow rules stay active together. The profile mode only

@@ -796,6 +796,8 @@ function getCompiledChannelFilterIndex(settings, listOverride = null) {
     const stableNames = new Set();
     const nameOnlyNames = new Set();
     const blockTubeNameRules = [];
+    // Android strongAliasKeys: the stable aliases of rules that carry a UC id.
+    const strongAliases = new Set();
     const unresolvedHandleKeys = [];
     const unresolvedHandleKeysSeen = new Set();
 
@@ -892,6 +894,13 @@ function getCompiledChannelFilterIndex(settings, listOverride = null) {
             if (idKey) {
                 const mappedHandle = normalizeHandleForComparison(lookupChannelMap(idKey));
                 if (mappedHandle) handles.add(mappedHandle);
+                strongAliases.add(idKey);
+                [entry.handle, entry.canonicalHandle, entry.handleDisplay].forEach(value => {
+                    const handle = normalizeHandleForComparison(typeof value === 'string' ? value : '');
+                    if (handle) strongAliases.add(handle);
+                });
+                const ruleCustomUrl = normalizeCustomUrlForComparison(entry.customUrl || '');
+                if (ruleCustomUrl) strongAliases.add(ruleCustomUrl);
             }
         }
     }
@@ -906,6 +915,7 @@ function getCompiledChannelFilterIndex(settings, listOverride = null) {
         names,
         stableNames,
         nameOnlyNames,
+        strongAliases,
         blockTubeNameRules,
         blockTubeNameMatcher: buildFilterTubeDomBlockTubeChannelNameMatcher(blockTubeNameRules),
         unresolvedHandleKeys
@@ -951,7 +961,10 @@ function channelMetaMatchesIndex(meta, index, channelMap) {
 
     const metaName = normalizeChannelNameForComparison(meta.name || '');
     if (metaName && index.nameOnlyNames?.has(metaName)) return true;
-    if (metaName && !metaId && index.stableNames?.has(metaName)) return true;
+    // Android matches channel keys as one set (NativeOwnedFilterDecider matchesAnyChannel): a
+    // rule's name or handle meets the card's name or handle whatever UC id either side carries.
+    if (metaName && index.stableNames?.has(metaName)) return true;
+    if (metaName && !/\s/.test(metaName) && index.handles.has(`@${metaName}`)) return true;
     if (
         metaName &&
         !index.nameOnlyNames &&
@@ -964,7 +977,7 @@ function channelMetaMatchesIndex(meta, index, channelMap) {
     if (metaHandle) {
         const withoutAt = metaHandle.replace(/^@/, '');
         if (withoutAt && index.nameOnlyNames?.has(withoutAt)) return true;
-        if (withoutAt && !metaId && index.stableNames?.has(withoutAt)) return true;
+        if (withoutAt && index.stableNames?.has(withoutAt)) return true;
     }
 
     if (metaId) {
@@ -7263,7 +7276,12 @@ async function applyDOMFallback(settings, options = {}) {
                 channelMeta,
                 collaborators: collaboratorMetas,
                 contentTag: isShortVideoRenderer ? 'ytd-video-renderer-short' : elementTag,
-                publishTimestamp: keywordPublishTimestamp
+                publishTimestamp: keywordPublishTimestamp,
+                videoId: keywordVideoId || '',
+                expectedCollaboratorCount: Math.max(
+                    parseInt(element.getAttribute?.('data-filtertube-expected-collaborators') || '0', 10) || 0,
+                    window.FilterTubeIdentity?.collapsedCollaboratorExpectedCount?.(channel) || 0
+                )
             });
 
             // Handle Container Logic (e.g., rich-grid-media inside rich-item)
@@ -8179,6 +8197,75 @@ async function applyDOMFallback(settings, options = {}) {
 }
 
 // Helper function to check if content should be hidden
+const FILTERTUBE_DOM_SHORT_TAGS = new Set([
+    'ytd-reel-item-renderer',
+    'ytm-shorts-lockup-view-model',
+    'ytm-shorts-lockup-view-model-v2',
+    'ytd-video-renderer-short'
+]);
+
+/**
+ * The page scan's half of Android's "channel identity pending" (NativeOwnedFilterDecider lines
+ * 884-999). 'block', 'allow', 'wait' (hidden until the channel arrives) or null (the channel is
+ * known, or the extension keeps its own fallback for an unmatched weak solo card in block mode).
+ */
+function domPendingChannelIdentityDecision(input) {
+    const Identity = window.FilterTubeIdentity;
+    if (!Identity || typeof Identity.decidePendingChannelIdentity !== 'function') return null;
+    const { title, settings, channelMeta, videoId, tag, skipKeywords, publishTimestamp, listMode } = input;
+    if (!videoId || !settings) return null;
+    const allowMode = listMode === 'whitelist';
+    const isShort = FILTERTUBE_DOM_SHORT_TAGS.has(tag);
+    const filterChannels = Array.isArray(settings.filterChannels) ? settings.filterChannels : [];
+    const whitelistChannels = Array.isArray(settings.whitelistChannels) ? settings.whitelistChannels : [];
+    if (filterChannels.length === 0 && whitelistChannels.length === 0 && !(allowMode && isShort)) return null;
+    const layered = settings.listLayered === true;
+    const blockedVideo = Array.isArray(settings.blockedVideoIds) && settings.blockedVideoIds.includes(videoId);
+    const allowedVideo = Array.isArray(settings.allowedVideoIds) && settings.allowedVideoIds.includes(videoId);
+    if (blockedVideo || (!layered && allowedVideo)) return null;
+    const channelMap = settings.channelMap || {};
+    const blockIndex = getCompiledChannelFilterIndex(settings, filterChannels);
+    const allowIndex = getCompiledChannelFilterIndex(settings, whitelistChannels);
+    const usable = meta => meta && typeof meta === 'object' && (meta.id || meta.handle || meta.customUrl || meta.name);
+    const collaboratorList = (Array.isArray(input.collaborators) ? input.collaborators : []).filter(usable);
+    const roster = collaboratorList.length > 0 ? collaboratorList : [channelMeta].filter(usable);
+    const strength = Identity.channelIdentityStrength(roster, {
+        indexes: [blockIndex, allowIndex],
+        channelMap,
+        expectedCollaboratorCount: Number(input.expectedCollaboratorCount) || 0
+    });
+    if (strength === 'strong') return null;
+    if (strength === 'weak') {
+        try {
+            const path = document.location?.pathname || '';
+            if (isCreatorChannelPagePath(path) && getCurrentPageChannelMeta()) return null;
+        } catch (e) {
+        }
+    }
+    const keywordMatch = keywords => {
+        if (skipKeywords || !Array.isArray(keywords) || keywords.length === 0) return false;
+        return getCompiledKeywordRegexes(keywords).some(regex =>
+            matchesKeyword(regex, title) && keywordDateFilterAllows(regex, publishTimestamp));
+    };
+    const nameRows = index => !!index && roster.some(meta =>
+        (index.blockTubeNameMatcher && matchesFilterTubeDomBlockTubeChannelNameRules(meta.name, index.blockTubeNameMatcher)) ||
+        (Array.isArray(index.blockTubeNameRules) && !index.blockTubeNameMatcher &&
+            index.blockTubeNameRules.some(rule => matchesFilterTubeDomBlockTubeChannelNameRule(rule, meta))));
+    const decision = Identity.decidePendingChannelIdentity({
+        layered,
+        allowMode,
+        isShort,
+        blockedKeyword: keywordMatch(settings.filterKeywords),
+        allowedKeyword: keywordMatch(settings.whitelistKeywords),
+        blockedChannelName: nameRows(blockIndex),
+        allowedChannelName: nameRows(allowIndex),
+        allowedVideo,
+        hasBlockedChannelRules: filterChannels.some(entry => entry && !isFilterTubeDomBlockTubeChannelNameRule(entry))
+    });
+    if (decision !== 'wait') return decision;
+    return (strength === 'resolving' || allowMode || layered) ? 'wait' : null;
+}
+
 function shouldHideContent(title, channel, settings, options = {}) {
     const {
         skipKeywords = false,
@@ -8187,7 +8274,8 @@ function shouldHideContent(title, channel, settings, options = {}) {
         collaborators = [],
         contentTag = '',
         publishTimestamp = null,
-        videoId = ''
+        videoId = '',
+        expectedCollaboratorCount = 0
     } = options;
     const channelMeta = providedChannelMeta || buildChannelMetadata(channel, channelHref);
     const hasChannelIdentity = Boolean(channelMeta.handle || channelMeta.id || channelMeta.customUrl);
@@ -8241,6 +8329,23 @@ function shouldHideContent(title, channel, settings, options = {}) {
         return false;
     }
     const isCommentContext = typeof contentTag === 'string' && contentTag.toLowerCase().includes('comment');
+
+    // A card whose channel isn't known yet decides like the app (see filter_logic.js
+    // _pendingChannelIdentityDecision and FilterTubeIdentity.decidePendingChannelIdentity).
+    if (!isCommentContext) {
+        const pending = domPendingChannelIdentityDecision({
+            title, settings, channelMeta, collaborators, videoId, tag, skipKeywords, publishTimestamp,
+            expectedCollaboratorCount, listMode
+        });
+        if (pending === 'block' || pending === 'wait') {
+            logWhitelistDecision(`${pending}:channel_identity_pending`);
+            return true;
+        }
+        if (pending === 'allow') {
+            logWhitelistDecision('allow:channel_identity_pending');
+            return false;
+        }
+    }
 
     // Keep block and allow rules active together in the DOM fallback too. This
     // mirrors the JSON-first evaluator: channel rules outrank keyword rules and

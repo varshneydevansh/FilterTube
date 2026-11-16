@@ -1,0 +1,51 @@
+{
+  "source": "Android feature/android-3.6.2-study: NativeOwnedFilterDecider.kt (884-999, matchesAnyChannel, resolvedChannelIdentityStrength), StudyRules.kt ShortsAllowRule, FilterPayloadCompiler.kt channelKey/channelKeywordWord, NativeOwnedMainPublicRendererNormalizer.kt NORMALIZER_RX_45. Cases named after the app test that pins them.",
+  "ids": {
+    "apex": "UCa6vGFO9ty8v5KZJXQxdhaw",
+    "other": "UCX6OQ3DkcsbYNE6H8uQQuVA",
+    "blocked": "UCbbbbbbbbbbbbbbbbbbbbbb",
+    "uploader": "UCuuuuuuuuuuuuuuuuuuuuuu",
+    "guest": "UCgggggggggggggggggggggg"
+  },
+  "pending": [
+    { "app": "StudyRulesTest: an unknown-channel video on an allowed topic shows", "input": { "allowMode": true, "isShort": false, "allowedKeyword": true }, "expect": "allow" },
+    { "app": "StudyRulesTest: an unknown-channel Short on an allowed topic never shows", "input": { "allowMode": true, "isShort": true, "allowedKeyword": true }, "expect": "wait" },
+    { "app": "StudyRulesTest: layered, an unknown-channel Short on an allowed topic never shows", "input": { "layered": true, "allowMode": true, "isShort": true, "allowedKeyword": true }, "expect": "wait" },
+    { "app": "NativeOwnedFilterDecider 951: layered, an allowed word waits while a blocked channel could still match", "input": { "layered": true, "allowMode": true, "allowedKeyword": true, "hasBlockedChannelRules": true }, "expect": "wait" },
+    { "app": "NativeOwnedFilterDecider 955: layered, an allowed word shows when no blocked channel can match", "input": { "layered": true, "allowMode": true, "allowedKeyword": true }, "expect": "allow" },
+    { "app": "NativeOwnedFilterDecider 952: layered, a blocked word hides at once", "input": { "layered": true, "allowMode": true, "allowedKeyword": true, "blockedKeyword": true }, "expect": "block" },
+    { "app": "NativeOwnedFilterDecider 968: an allowed word beats a blocked channel name while the channel is unknown", "input": { "allowMode": false, "allowedKeyword": true, "blockedChannelName": true }, "expect": "allow" },
+    { "app": "NativeOwnedFilterDecider 981: a blocked word hides", "input": { "allowMode": false, "blockedKeyword": true }, "expect": "block" },
+    { "app": "NativeOwnedFilterDecider 984: nothing matched waits for the channel", "input": { "allowMode": true }, "expect": "wait" },
+    { "app": "NativeOwnedFilterDecider 955: layered, an allowed video id shows when no blocked channel can match", "input": { "layered": true, "allowMode": true, "allowedVideo": true }, "expect": "allow" }
+  ],
+  "strength": [
+    { "app": "nativeDeciderKeepsSuspectedCollaboratorRosterPendingWithStableUploaderIdentity", "roster": [{ "id": "uploader", "name": "Uploader" }], "expected": 3, "rules": [{ "id": "blocked", "name": "Blocked Channel" }], "expect": "resolving" },
+    { "app": "nativeDeciderCanMatchBlockedChannelFromVideoRoster", "roster": [{ "id": "uploader", "name": "Primary Channel" }, { "id": "guest", "name": "Guest Channel" }], "expected": 0, "rules": [{ "id": "guest", "name": "Guest Channel" }], "expect": "strong" },
+    { "app": "resolvedChannelIdentityStrength: a loading roster resolves when a known channel hits a rule's stable alias", "roster": [{ "id": "guest", "name": "Guest Channel" }], "expected": 3, "rules": [{ "id": "guest", "name": "Guest Channel" }], "expect": "strong" },
+    { "app": "explicitAllowedKeywordCanDecideBeforeWeakChannelIdentityResolves (no channel on the card)", "roster": [], "expected": 0, "rules": [{ "id": "apex", "name": "Allowed Channel" }], "expect": "weak" },
+    { "app": "strongAliasKeys: a handle that a UC-id rule carries is a known channel", "roster": [{ "handle": "@apexcoach", "name": "Apex Coach" }], "expected": 0, "rules": [{ "id": "apex", "handle": "@apexcoach", "name": "Apex Coach" }], "expect": "strong" },
+    { "app": "strongAliasKeys: a handle-only rule never vouches for the channel", "roster": [{ "handle": "@apexcoach", "name": "Apex Coach" }], "expected": 0, "rules": [{ "id": "@apexcoach", "handle": "@apexcoach", "name": "Apex Coach" }], "expect": "weak" },
+    { "app": "stableMappedAliasKeys: the learned channel map ties the handle to a UC id", "roster": [{ "handle": "@apexcoach" }], "expected": 0, "rules": [{ "id": "other", "name": "Other" }], "channelMap": { "@apexcoach": "apex" }, "expect": "strong" }
+  ],
+  "names": [
+    { "app": "matchesAnyChannel: a rule's name meets a card with another UC id (two channels with one name)", "rule": { "id": "apex", "name": "Apex Coach" }, "card": { "id": "other", "name": "Apex Coach" }, "expect": true },
+    { "app": "matchesAnyChannel: a rule's handle meets the card's name", "rule": { "id": "apex", "handle": "@apexcoach" }, "card": { "id": "other", "name": "apexcoach" }, "expect": true },
+    { "app": "matchesAnyChannel: a rule's name meets the card's handle", "rule": { "id": "apex", "name": "apexcoach" }, "card": { "id": "other", "handle": "@apexcoach" }, "expect": true },
+    { "app": "matchesAnyChannel: different names and ids never meet", "rule": { "id": "apex", "name": "Apex Coach" }, "card": { "id": "other", "name": "Other Creator" }, "expect": false }
+  ],
+  "collapsedCount": [
+    { "label": "Primary Channel and 2 more", "expect": 3 },
+    { "label": "Primary Channel AND 1 MORE", "expect": 2 },
+    { "label": "Primary Channel and Guest Channel", "expect": 0 },
+    { "label": "and 0 more", "expect": 0 }
+  ],
+  "filterAll": [
+    { "app": "mainSearchBlocksWeakIdentityCardsByFilterAllDerivedKeyword", "channel": { "name": "Sabrina Carpenter", "id": "UCPKWE1H6xhxwPlqUlKgHb_w", "handle": "@sabrinacarpenter" }, "word": "Sabrina Carpenter", "key": "ucpkwe1h6xhxwplqulkghb_w" },
+    { "app": "channelKeywordWord: a name that is only the id falls back to the handle", "channel": { "name": "UCPKWE1H6xhxwPlqUlKgHb_w", "id": "UCPKWE1H6xhxwPlqUlKgHb_w", "handle": "@sabrinacarpenter" }, "word": "@sabrinacarpenter", "key": "ucpkwe1h6xhxwplqulkghb_w" },
+    { "app": "channelKeywordWord: the id differs only in case, still the handle", "channel": { "name": "ucpkwe1h6xhxwplqulkghb_w", "id": "UCPKWE1H6xhxwPlqUlKgHb_w", "handle": "@sabrinacarpenter" }, "word": "@sabrinacarpenter", "key": "ucpkwe1h6xhxwplqulkghb_w" },
+    { "app": "channelKeywordWord: handle display, then canonical handle, then custom URL", "channel": { "name": "", "id": "", "handleDisplay": "@Display", "canonicalHandle": "@canonical", "customUrl": "c/custom" }, "word": "@Display", "key": "@canonical" },
+    { "app": "channelKeywordWord: custom URL before the id", "channel": { "name": "", "id": "UCPKWE1H6xhxwPlqUlKgHb_w", "customUrl": "c/custom" }, "word": "c/custom", "key": "ucpkwe1h6xhxwplqulkghb_w" },
+    { "app": "channelKey: no id falls back to the handle, trimmed and lower-cased", "channel": { "name": "Sabrina", "id": " ", "handle": " @Sabrina " }, "word": "Sabrina", "key": "@sabrina" }
+  ]
+}
