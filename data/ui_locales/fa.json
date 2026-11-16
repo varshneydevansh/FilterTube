@@ -2861,5 +2861,15 @@
   "filters.firstFilter.bubble": "این یکی حالا از صافی رد نمی‌شود.",
   "filters.allowedOnly.bubble": "حالا فقط فهرست مجاز تو رد می‌شود.",
   "controls.emptySieve.bubble": "هنوز چیزی در صافی نیست. اولین فیلتر را اضافه کن.",
-  "controls.emptySieve.action": "افزودن اولین فیلتر"
+  "controls.emptySieve.action": "افزودن اولین فیلتر",
+  "welcome.one.title": "به FilterTube خوش آمدید",
+  "welcome.one.subtitle": "شما انتخاب می‌کنید چه چیزی نمایش داده شود.",
+  "welcome.one.body": "یک کانال، کلمه یا موضوع را یک بار مسدود کنید. FilterTube آن را در همه صفحه‌ها، در جستجو و در ویدیوهای بعدی پنهان می‌کند.",
+  "welcome.fact.account": "بدون حساب FilterTube.",
+  "welcome.fact.ads": "بدون تبلیغ و بدون نمایه ردیابی.",
+  "welcome.two.title": "یک بار مسدود کنید، همه‌جا پنهان",
+  "welcome.two.body": "یک کانال یا کلمه اضافه کنید تا از خانه، جستجو، کلیپ‌ها و تماشا حذف شود. کودکان فضای جداگانه و قوانین خودش را دارد.",
+  "welcome.three.title": "رایگان، و رایگان می‌ماند",
+  "welcome.next": "بعدی",
+  "welcome.back": "بازگشت"
 }

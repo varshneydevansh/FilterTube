@@ -2859,5 +2859,15 @@
   "filters.firstFilter.bubble": "迭个已经筛脱了。",
   "filters.allowedOnly.bubble": "现在只有侬允许个名单好通过。",
   "controls.emptySieve.bubble": "筛子里还呒没物事。加第一个过滤器。",
-  "controls.emptySieve.action": "加第一个过滤器"
+  "controls.emptySieve.action": "加第一个过滤器",
+  "welcome.one.title": "欢迎用 FilterTube",
+  "welcome.one.subtitle": "显示啥物事，侬自家决定。",
+  "welcome.one.body": "频道、关键词或者话题屏蔽一趟就可以，FilterTube 会得勒每只页面、搜索搭下一只播放个内容里向拿伊囥脱。",
+  "welcome.fact.account": "勿需要 FilterTube 账号。",
+  "welcome.fact.ads": "呒没广告，也呒没跟踪档案。",
+  "welcome.two.title": "屏蔽一趟，到处囥脱",
+  "welcome.two.body": "加一只频道或者关键词，伊就会从首页、搜索、短视频搭观看里向消失。小朋友有自家个空间搭规则。",
+  "welcome.three.title": "免费，以后也一直免费",
+  "welcome.next": "下一页",
+  "welcome.back": "退转去"
 }

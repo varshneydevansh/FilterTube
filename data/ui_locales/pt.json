@@ -2861,5 +2861,15 @@
   "filters.firstFilter.bubble": "Esse já ficou na peneira.",
   "filters.allowedOnly.bubble": "Agora só passa a sua lista permitida.",
   "controls.emptySieve.bubble": "Ainda não há nada na peneira. Adicione um primeiro filtro.",
-  "controls.emptySieve.action": "Adicionar um primeiro filtro"
+  "controls.emptySieve.action": "Adicionar um primeiro filtro",
+  "welcome.one.title": "Bem-vindo ao FilterTube",
+  "welcome.one.subtitle": "Você escolhe o que aparece.",
+  "welcome.one.body": "Bloqueie um canal, uma palavra ou um tema uma única vez. O FilterTube oculta isso em todas as páginas, na pesquisa e no que toca em seguida.",
+  "welcome.fact.account": "Sem conta do FilterTube.",
+  "welcome.fact.ads": "Sem anúncios e sem perfil de rastreamento.",
+  "welcome.two.title": "Bloqueie uma vez, oculto em todo lugar",
+  "welcome.two.body": "Adicione um canal ou uma palavra e ele some de Início, Pesquisar, Clipes e Assistir. Kids tem seu próprio espaço, com regras próprias.",
+  "welcome.three.title": "Grátis, e vai continuar grátis",
+  "welcome.next": "Seguinte",
+  "welcome.back": "Voltar"
 }

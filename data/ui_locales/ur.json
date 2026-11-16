@@ -2861,5 +2861,15 @@
   "filters.firstFilter.bubble": "وہ اب چھلنی میں چھن گیا۔",
   "filters.allowedOnly.bubble": "اب صرف آپ کی اجازت والی فہرست ہی گزرے گی۔",
   "controls.emptySieve.bubble": "چھلنی میں ابھی کچھ نہیں۔ پہلا فلٹر شامل کریں۔",
-  "controls.emptySieve.action": "پہلا فلٹر شامل کریں"
+  "controls.emptySieve.action": "پہلا فلٹر شامل کریں",
+  "welcome.one.title": "FilterTube میں خوش آمدید",
+  "welcome.one.subtitle": "آپ چنتے ہیں کہ کیا دکھے۔",
+  "welcome.one.body": "کسی چینل، لفظ یا موضوع کو ایک بار بلاک کریں۔ FilterTube اسے ہر صفحے پر، تلاش میں اور اگلی چلنے والی ویڈیوز میں چھپا دیتا ہے۔",
+  "welcome.fact.account": "کوئی FilterTube اکاؤنٹ نہیں۔",
+  "welcome.fact.ads": "نہ اشتہارات، نہ ٹریکنگ پروفائل۔",
+  "welcome.two.title": "ایک بار بلاک، ہر جگہ چھپا",
+  "welcome.two.body": "کوئی چینل یا لفظ شامل کریں تو وہ ہوم، تلاش کریں، کلپس اور دیکھیں سے غائب ہو جاتا ہے۔ Kids کی اپنی جگہ اور اپنے اصول ہیں۔",
+  "welcome.three.title": "مفت، اور مفت ہی رہے گا",
+  "welcome.next": "اگلا",
+  "welcome.back": "واپس"
 }

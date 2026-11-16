@@ -2885,5 +2885,15 @@
   "filters.firstFilter.bubble": "هذه صارت خارج المصفاة الآن.",
   "filters.allowedOnly.bubble": "قائمتك المسموحة فقط تمرّ الآن.",
   "controls.emptySieve.bubble": "المصفاة فارغة بعد. أضف أول فلتر.",
-  "controls.emptySieve.action": "أضف أول فلتر"
+  "controls.emptySieve.action": "أضف أول فلتر",
+  "welcome.one.title": "مرحبًا بك في FilterTube",
+  "welcome.one.subtitle": "أنت تختار ما يظهر.",
+  "welcome.one.body": "احظر قناة أو كلمة أو موضوعًا مرة واحدة. يخفيه FilterTube في كل صفحة وفي البحث وفي ما يُشغَّل بعد ذلك.",
+  "welcome.fact.account": "لا حاجة إلى حساب FilterTube.",
+  "welcome.fact.ads": "لا إعلانات ولا ملف تتبّع.",
+  "welcome.two.title": "احظر مرة، يختفي في كل مكان",
+  "welcome.two.body": "أضف قناة أو كلمة فتختفي من الرئيسية وبحث والمقاطع ومشاهدة. ولقسم الأطفال مساحة خاصة بقواعده الخاصة.",
+  "welcome.three.title": "مجاني، وسيبقى مجانيًا",
+  "welcome.next": "التالي",
+  "welcome.back": "رجوع"
 }

@@ -2861,5 +2861,15 @@
   "filters.firstFilter.bubble": "Nasala na ’yan ngayon.",
   "filters.allowedOnly.bubble": "Ang listahan mo lang ng pinapayagan ang makakalusot ngayon.",
   "controls.emptySieve.bubble": "Wala pang laman ang salaan. Magdagdag ng unang filter.",
-  "controls.emptySieve.action": "Magdagdag ng unang filter"
+  "controls.emptySieve.action": "Magdagdag ng unang filter",
+  "welcome.one.title": "Maligayang pagdating sa FilterTube",
+  "welcome.one.subtitle": "Ikaw ang pumipili kung ano ang lalabas.",
+  "welcome.one.body": "I-block nang isang beses ang channel, salita o paksa. Itatago ito ng FilterTube sa bawat page, sa paghahanap at sa susunod na papatugtugin.",
+  "welcome.fact.account": "Walang FilterTube account.",
+  "welcome.fact.ads": "Walang ads at walang tracking profile.",
+  "welcome.two.title": "I-block nang isang beses, tago kahit saan",
+  "welcome.two.body": "Magdagdag ng channel o salita at mawawala ito sa Home, Maghanap, Clips at Panoorin. May sariling espasyo at sariling patakaran ang Mga bata.",
+  "welcome.three.title": "Libre, at mananatiling libre",
+  "welcome.next": "Susunod",
+  "welcome.back": "Bumalik"
 }

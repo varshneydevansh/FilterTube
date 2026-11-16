@@ -2859,5 +2859,15 @@
   "filters.firstFilter.bubble": "那个已经筛掉啦。",
   "filters.allowedOnly.bubble": "现在只有你允许的名单能通过。",
   "controls.emptySieve.bubble": "筛子里还空空的。添加第一个过滤器吧。",
-  "controls.emptySieve.action": "添加第一个过滤器"
+  "controls.emptySieve.action": "添加第一个过滤器",
+  "welcome.one.title": "欢迎使用 FilterTube",
+  "welcome.one.subtitle": "显示什么，由你决定。",
+  "welcome.one.body": "只需屏蔽一次频道、关键词或话题，FilterTube 就会在每个页面、搜索结果和接下来播放的内容中将其隐藏。",
+  "welcome.fact.account": "无需 FilterTube 账号。",
+  "welcome.fact.ads": "没有广告，也没有跟踪档案。",
+  "welcome.two.title": "屏蔽一次，处处隐藏",
+  "welcome.two.body": "添加频道或关键词后，它会从首页、搜索、短视频和观看中消失。儿童拥有独立空间和独立规则。",
+  "welcome.three.title": "免费，并将一直免费",
+  "welcome.next": "下一步",
+  "welcome.back": "返回"
 }

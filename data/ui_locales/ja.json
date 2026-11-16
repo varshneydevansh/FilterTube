@@ -2859,5 +2859,15 @@
   "filters.firstFilter.bubble": "それは もう ふるいで こしたよ。",
   "filters.allowedOnly.bubble": "いまは 許可リストだけが 通るよ。",
   "controls.emptySieve.bubble": "ふるいは まだ からっぽ。さいしょの フィルタを 足そう。",
-  "controls.emptySieve.action": "最初のフィルタを追加"
+  "controls.emptySieve.action": "最初のフィルタを追加",
+  "welcome.one.title": "FilterTube へようこそ",
+  "welcome.one.subtitle": "表示する内容はあなたが選べます。",
+  "welcome.one.body": "チャンネル、キーワード、トピックを一度ブロックするだけ。FilterTube がすべてのページ、検索、次に再生される動画から非表示にします。",
+  "welcome.fact.account": "FilterTube のアカウントは不要です。",
+  "welcome.fact.ads": "広告もトラッキング用プロフィールもありません。",
+  "welcome.two.title": "一度ブロックすれば、どこでも非表示",
+  "welcome.two.body": "チャンネルやキーワードを追加すると、ホーム、検索、クリップ、視聴から消えます。キッズには独自のルールを持つ専用スペースがあります。",
+  "welcome.three.title": "無料で、これからも無料",
+  "welcome.next": "次へ",
+  "welcome.back": "戻る"
 }

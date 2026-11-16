@@ -2861,5 +2861,15 @@
   "filters.firstFilter.bubble": "Quello ora è nel setaccio.",
   "filters.allowedOnly.bubble": "Ora passa solo la tua lista consentita.",
   "controls.emptySieve.bubble": "Nel setaccio non c'è ancora niente. Aggiungi un primo filtro.",
-  "controls.emptySieve.action": "Aggiungi un primo filtro"
+  "controls.emptySieve.action": "Aggiungi un primo filtro",
+  "welcome.one.title": "Benvenuto in FilterTube",
+  "welcome.one.subtitle": "Scegli tu cosa appare.",
+  "welcome.one.body": "Blocca un canale, una parola o un argomento una volta sola. FilterTube lo nasconde in ogni pagina, nella ricerca e in ciò che viene riprodotto dopo.",
+  "welcome.fact.account": "Nessun account FilterTube.",
+  "welcome.fact.ads": "Niente pubblicità e nessun profilo di tracciamento.",
+  "welcome.two.title": "Blocca una volta, nascosto ovunque",
+  "welcome.two.body": "Aggiungi un canale o una parola e sparisce da Home, Cerca, Clip e Guarda. Bambini ha uno spazio tutto suo con regole proprie.",
+  "welcome.three.title": "Gratis, e resterà gratis",
+  "welcome.next": "Avanti",
+  "welcome.back": "Indietro"
 }

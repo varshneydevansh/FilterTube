@@ -2859,5 +2859,15 @@
   "filters.firstFilter.bubble": "อันนั้นถูกกรองออกไปแล้วนะ",
   "filters.allowedOnly.bubble": "ตอนนี้ผ่านได้แค่รายการที่อนุญาตเท่านั้น",
   "controls.emptySieve.bubble": "ในตะแกรงยังว่างอยู่ เพิ่มตัวกรองแรกกัน",
-  "controls.emptySieve.action": "เพิ่มตัวกรองแรก"
+  "controls.emptySieve.action": "เพิ่มตัวกรองแรก",
+  "welcome.one.title": "ยินดีต้อนรับสู่ FilterTube",
+  "welcome.one.subtitle": "คุณเลือกเองว่าจะให้อะไรแสดง",
+  "welcome.one.body": "บล็อกช่อง คำ หรือหัวข้อเพียงครั้งเดียว FilterTube จะซ่อนไว้ในทุกหน้า ในการค้นหา และในวิดีโอที่เล่นถัดไป",
+  "welcome.fact.account": "ไม่ต้องมีบัญชี FilterTube",
+  "welcome.fact.ads": "ไม่มีโฆษณาและไม่มีโปรไฟล์ติดตาม",
+  "welcome.two.title": "บล็อกครั้งเดียว ซ่อนทุกที่",
+  "welcome.two.body": "เพิ่มช่องหรือคำ แล้วจะหายไปจากหน้าแรก ค้นหา คลิปสั้น และดู ส่วนเด็กมีพื้นที่และกฎของตัวเอง",
+  "welcome.three.title": "ฟรี และจะฟรีตลอดไป",
+  "welcome.next": "ถัดไป",
+  "welcome.back": "ย้อนกลับ"
 }

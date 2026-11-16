@@ -2861,5 +2861,15 @@
   "filters.firstFilter.bubble": "That one don siddon for sieve now.",
   "filters.allowedOnly.bubble": "Na only your allowed list dey pass now.",
   "controls.emptySieve.bubble": "Nothing dey for the sieve yet. Add your first filter.",
-  "controls.emptySieve.action": "Add first filter"
+  "controls.emptySieve.action": "Add first filter",
+  "welcome.one.title": "Welcome to FilterTube",
+  "welcome.one.subtitle": "Na you go choose wetin go show.",
+  "welcome.one.body": "Block one channel, word or topic one time. FilterTube go hide am for every page, for search and for wetin go play next.",
+  "welcome.fact.account": "No FilterTube account.",
+  "welcome.fact.ads": "No ads and no tracking profile.",
+  "welcome.two.title": "Block one time, e hide everywhere",
+  "welcome.two.body": "Add channel or word and e go comot from Home, Search, Clips and Watch. Kids get im own space with im own rules.",
+  "welcome.three.title": "E free, and e go stay free",
+  "welcome.next": "Next",
+  "welcome.back": "Back"
 }

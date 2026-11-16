@@ -2861,5 +2861,15 @@
   "filters.firstFilter.bubble": "Wannan an tace shi yanzu.",
   "filters.allowedOnly.bubble": "Yanzu jerin da ka yarda da su kaɗai ke wucewa.",
   "controls.emptySieve.bubble": "Babu komai a matatar tukuna. Ƙara matatar farko.",
-  "controls.emptySieve.action": "Ƙara matatar farko"
+  "controls.emptySieve.action": "Ƙara matatar farko",
+  "welcome.one.title": "Maraba da zuwa FilterTube",
+  "welcome.one.subtitle": "Kai ne ke zaɓar abin da zai bayyana.",
+  "welcome.one.body": "Toshe tasha, kalma ko batu sau ɗaya. FilterTube zai ɓoye shi a kowane shafi, a bincike da kuma a abin da zai biyo baya.",
+  "welcome.fact.account": "Babu asusun FilterTube.",
+  "welcome.fact.ads": "Babu talla, babu bayanan bin diddigi.",
+  "welcome.two.title": "Toshe sau ɗaya, a ɓoye ko'ina",
+  "welcome.two.body": "Ƙara tasha ko kalma kuma za ta ɓace daga Shafin farko, Bincike, Gajerun bidiyo da Kallo. Yara na da nasa wuri da nasa dokoki.",
+  "welcome.three.title": "Kyauta ne, kuma zai ci gaba da zama kyauta",
+  "welcome.next": "Na gaba",
+  "welcome.back": "Baya"
 }

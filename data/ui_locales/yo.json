@@ -2859,5 +2859,15 @@
   "filters.firstFilter.bubble": "Ìyẹn ti kọjá nínú àsẹ́ báyìí.",
   "filters.allowedOnly.bubble": "Àkójọ tí o fọwọ́ sí nìkan ló ń kọjá báyìí.",
   "controls.emptySieve.bubble": "Kò sí nǹkan nínú àsẹ́ síbẹ̀. Fi àlẹ̀mọ́ àkọ́kọ́ kún un.",
-  "controls.emptySieve.action": "Fi àlẹ̀mọ́ àkọ́kọ́ kún un"
+  "controls.emptySieve.action": "Fi àlẹ̀mọ́ àkọ́kọ́ kún un",
+  "welcome.one.title": "Ẹ káàbọ̀ sí FilterTube",
+  "welcome.one.subtitle": "Ìwọ lo máa yan ohun tó máa hàn.",
+  "welcome.one.body": "Dí ikanni, ọ̀rọ̀ tàbí kókó kan lẹ́ẹ̀kan. FilterTube yóò fi pamọ́ ní gbogbo ojú-ewé, nínú ìwádìí àti nínú ohun tó máa ṣiṣẹ́ tẹ̀lé e.",
+  "welcome.fact.account": "Kò sí àkọọ́lẹ̀ FilterTube.",
+  "welcome.fact.ads": "Kò sí ìpolówó, kò sí àkọsílẹ̀ ìtọpinpin.",
+  "welcome.two.title": "Dí i lẹ́ẹ̀kan, ó pamọ́ níbi gbogbo",
+  "welcome.two.body": "Ṣàfikún ikanni tàbí ọ̀rọ̀, yóò sì pòórá kúrò ní Ojú ìbẹ̀rẹ̀, Ìwádìí, Fídíò kúkúrú àti Wíwò. Àwọn ọmọ ní àyè tirẹ̀ pẹ̀lú òfin tirẹ̀.",
+  "welcome.three.title": "Ọ̀fẹ́ ni, yóò sì máa jẹ́ ọ̀fẹ́",
+  "welcome.next": "Tókàn",
+  "welcome.back": "Padà"
 }

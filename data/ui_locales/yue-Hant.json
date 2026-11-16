@@ -2859,5 +2859,15 @@
   "filters.firstFilter.bubble": "嗰個而家已經隔走咗。",
   "filters.allowedOnly.bubble": "而家淨係你允許嘅清單先過到。",
   "controls.emptySieve.bubble": "個篩仲係空嘅。加第一個篩選器啦。",
-  "controls.emptySieve.action": "加第一個篩選器"
+  "controls.emptySieve.action": "加第一個篩選器",
+  "welcome.one.title": "歡迎使用 FilterTube",
+  "welcome.one.subtitle": "顯示咩內容，由你決定。",
+  "welcome.one.body": "頻道、關鍵字或者話題封鎖一次就得，FilterTube 會喺每個頁面、搜尋結果同埋之後播放嘅內容入面將佢隱藏。",
+  "welcome.fact.account": "唔使 FilterTube 帳戶。",
+  "welcome.fact.ads": "冇廣告，亦冇追蹤檔案。",
+  "welcome.two.title": "封鎖一次，處處隱藏",
+  "welcome.two.body": "加入頻道或者關鍵字之後，佢會喺首頁、搜尋、短片同觀看消失。小朋友有自己嘅空間同規則。",
+  "welcome.three.title": "免費，而且會一直免費",
+  "welcome.next": "下一步",
+  "welcome.back": "返回"
 }

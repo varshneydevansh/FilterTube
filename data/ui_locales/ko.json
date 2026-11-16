@@ -2859,5 +2859,15 @@
   "filters.firstFilter.bubble": "그건 이제 체에 걸러졌어요.",
   "filters.allowedOnly.bubble": "이제 허용 목록만 통과해요.",
   "controls.emptySieve.bubble": "체가 아직 비어 있어요. 첫 필터를 추가해 보세요.",
-  "controls.emptySieve.action": "첫 필터 추가"
+  "controls.emptySieve.action": "첫 필터 추가",
+  "welcome.one.title": "FilterTube에 오신 것을 환영합니다",
+  "welcome.one.subtitle": "표시할 콘텐츠는 직접 선택하세요.",
+  "welcome.one.body": "채널, 단어, 주제를 한 번만 차단하세요. FilterTube가 모든 페이지, 검색, 다음 재생 목록에서 숨겨 줍니다.",
+  "welcome.fact.account": "FilterTube 계정이 필요 없습니다.",
+  "welcome.fact.ads": "광고도 추적 프로필도 없습니다.",
+  "welcome.two.title": "한 번 차단하면 어디서나 숨김",
+  "welcome.two.body": "채널이나 단어를 추가하면 홈, 검색, 숏폼, 시청에서 사라집니다. 어린이에는 자체 규칙이 있는 별도 공간이 있습니다.",
+  "welcome.three.title": "무료이며 앞으로도 무료",
+  "welcome.next": "다음",
+  "welcome.back": "뒤로"
 }

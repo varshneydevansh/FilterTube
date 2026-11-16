@@ -2861,5 +2861,15 @@
   "filters.firstFilter.bubble": "O artık süzgeçte kaldı.",
   "filters.allowedOnly.bubble": "Artık yalnızca izin verilen listen geçiyor.",
   "controls.emptySieve.bubble": "Süzgeçte henüz bir şey yok. İlk filtreyi ekle.",
-  "controls.emptySieve.action": "İlk filtreyi ekle"
+  "controls.emptySieve.action": "İlk filtreyi ekle",
+  "welcome.one.title": "FilterTube’a hoş geldiniz",
+  "welcome.one.subtitle": "Neyin görüneceğini siz seçersiniz.",
+  "welcome.one.body": "Bir kanalı, kelimeyi veya konuyu bir kez engelleyin. FilterTube bunu her sayfada, aramada ve sıradaki videolarda gizler.",
+  "welcome.fact.account": "FilterTube hesabı yok.",
+  "welcome.fact.ads": "Reklam yok, izleme profili yok.",
+  "welcome.two.title": "Bir kez engelle, her yerde gizli",
+  "welcome.two.body": "Bir kanal veya kelime ekleyin; Ana sayfa, Ara, Klipler ve İzle ekranlarından kaybolur. Çocuklar kendi kurallarıyla kendi alanına sahiptir.",
+  "welcome.three.title": "Ücretsiz ve ücretsiz kalacak",
+  "welcome.next": "İleri",
+  "welcome.back": "Geri"
 }

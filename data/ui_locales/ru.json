@@ -2873,5 +2873,15 @@
   "filters.firstFilter.bubble": "Это теперь отсеяно.",
   "filters.allowedOnly.bubble": "Теперь проходит только твой список разрешённых.",
   "controls.emptySieve.bubble": "В сите пока пусто. Добавь первый фильтр.",
-  "controls.emptySieve.action": "Добавить первый фильтр"
+  "controls.emptySieve.action": "Добавить первый фильтр",
+  "welcome.one.title": "Добро пожаловать в FilterTube",
+  "welcome.one.subtitle": "Вы решаете, что показывать.",
+  "welcome.one.body": "Заблокируйте канал, слово или тему один раз. FilterTube скроет это на всех страницах, в поиске и в следующих видео.",
+  "welcome.fact.account": "Без аккаунта FilterTube.",
+  "welcome.fact.ads": "Без рекламы и профиля отслеживания.",
+  "welcome.two.title": "Один раз заблокировали, скрыто везде",
+  "welcome.two.body": "Добавьте канал или слово, и они исчезнут из разделов «Главная», «Поиск», «Клипы» и «Просмотр». У раздела «Детский режим» свое пространство и свои правила.",
+  "welcome.three.title": "Бесплатно и останется бесплатным",
+  "welcome.next": "Далее",
+  "welcome.back": "Назад"
 }

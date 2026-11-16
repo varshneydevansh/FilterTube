@@ -2861,5 +2861,15 @@
   "filters.firstFilter.bubble": "That one's sieved out now.",
   "filters.allowedOnly.bubble": "Only your allowed list gets through now.",
   "controls.emptySieve.bubble": "Nothing in the sieve yet. Add a first filter.",
-  "controls.emptySieve.action": "Add a first filter"
+  "controls.emptySieve.action": "Add a first filter",
+  "welcome.one.title": "Welcome to FilterTube",
+  "welcome.one.subtitle": "You choose what shows up.",
+  "welcome.one.body": "Block a channel, word or topic once. FilterTube hides it on every page, in search and in what plays next.",
+  "welcome.fact.account": "No FilterTube account.",
+  "welcome.fact.ads": "No ads and no tracking profile.",
+  "welcome.two.title": "Block once, hidden everywhere",
+  "welcome.two.body": "Add a channel or word and it disappears from Home, Search, Clips and Watch. Kids gets its own space with its own rules.",
+  "welcome.three.title": "Free, and it stays free",
+  "welcome.next": "Next",
+  "welcome.back": "Back"
 }

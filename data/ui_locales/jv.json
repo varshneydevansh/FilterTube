@@ -2859,5 +2859,15 @@
   "filters.firstFilter.bubble": "Sing kuwi saiki wis kasaring.",
   "filters.allowedOnly.bubble": "Saiki mung dhaptar sing diidinaké sing bisa liwat.",
   "controls.emptySieve.bubble": "Saringané isih kosong. Tambahna filter kapisan.",
-  "controls.emptySieve.action": "Tambahna filter kapisan"
+  "controls.emptySieve.action": "Tambahna filter kapisan",
+  "welcome.one.title": "Sugeng rawuh ing FilterTube",
+  "welcome.one.subtitle": "Panjenengan sing milih apa sing katon.",
+  "welcome.one.body": "Blokir channel, tembung, utawa topik sapisan wae. FilterTube ndhelikake ing saben kaca, ing panelusuran, lan ing video sabanjure.",
+  "welcome.fact.account": "Ora ana akun FilterTube.",
+  "welcome.fact.ads": "Ora ana iklan lan ora ana profil pelacakan.",
+  "welcome.two.title": "Blokir sapisan, ilang ing ngendi wae",
+  "welcome.two.body": "Tambahna channel utawa tembung, banjur ilang saka Beranda, Golèk, Klip, lan Nonton. Bocah duwe papan dhewe kanthi aturan dhewe.",
+  "welcome.three.title": "Gratis, lan tetep gratis",
+  "welcome.next": "Sabanjure",
+  "welcome.back": "Bali"
 }

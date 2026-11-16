@@ -2861,5 +2861,15 @@
   "filters.firstFilter.bubble": "Hilo limechujwa sasa.",
   "filters.allowedOnly.bubble": "Sasa orodha yako ya zinazoruhusiwa pekee ndiyo inapita.",
   "controls.emptySieve.bubble": "Bado hakuna kitu kwenye chujio. Ongeza kichujio cha kwanza.",
-  "controls.emptySieve.action": "Ongeza kichujio cha kwanza"
+  "controls.emptySieve.action": "Ongeza kichujio cha kwanza",
+  "welcome.one.title": "Karibu kwenye FilterTube",
+  "welcome.one.subtitle": "Wewe unachagua kinachoonekana.",
+  "welcome.one.body": "Zuia kituo, neno au mada mara moja. FilterTube hukificha kwenye kila ukurasa, katika utafutaji na kwenye kinachocheza baadaye.",
+  "welcome.fact.account": "Hakuna akaunti ya FilterTube.",
+  "welcome.fact.ads": "Hakuna matangazo wala wasifu wa ufuatiliaji.",
+  "welcome.two.title": "Zuia mara moja, kimefichwa kila mahali",
+  "welcome.two.body": "Ongeza kituo au neno na kitatoweka kwenye Mwanzo, Tafuta, Klipu na Tazama. Watoto ina nafasi yake na sheria zake.",
+  "welcome.three.title": "Bure, na itabaki bure",
+  "welcome.next": "Endelea",
+  "welcome.back": "Rudi"
 }

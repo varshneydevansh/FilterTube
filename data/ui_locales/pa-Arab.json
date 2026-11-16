@@ -2861,5 +2861,15 @@
   "filters.firstFilter.bubble": "او ہُن چھاننی وچ چھن گیا۔",
   "filters.allowedOnly.bubble": "ہُن صرف تہاڈی اجازت والی لسٹ ای لنگھے گی۔",
   "controls.emptySieve.bubble": "چھاننی وچ ہلے کجھ نئیں۔ پہلا فلٹر جوڑو۔",
-  "controls.emptySieve.action": "پہلا فلٹر جوڑو"
+  "controls.emptySieve.action": "پہلا فلٹر جوڑو",
+  "welcome.one.title": "FilterTube وچ جی آیاں نوں",
+  "welcome.one.subtitle": "تسیں چُݨدے او کہ کیہ وکھے۔",
+  "welcome.one.body": "کسے چینل، لفظ یا موضوع نوں اک وار بلاک کرو۔ FilterTube اوہنوں ہر صفحے تے، کھوج وچ تے اگلیاں ویڈیوز وچ لُکا دیندا اے۔",
+  "welcome.fact.account": "کوئی FilterTube اکاؤنٹ نہیں۔",
+  "welcome.fact.ads": "نہ اشتہار، نہ ٹریکنگ پروفائل۔",
+  "welcome.two.title": "اک وار بلاک، ہر تھاں لُکیا",
+  "welcome.two.body": "کوئی چینل یا لفظ شامل کرو تے اوہ ہوم، کھوج، کلپاں تے ویکھنا توں غائب ہو جاندا اے۔ بچے دی اپنی تھاں تے اپنے اصول نیں۔",
+  "welcome.three.title": "مفت، تے مفت ای رہوے گا",
+  "welcome.next": "اگے",
+  "welcome.back": "پچھے"
 }

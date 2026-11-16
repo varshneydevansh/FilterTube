@@ -2861,5 +2861,15 @@
   "filters.firstFilter.bubble": "ऊ अब छन्नी में छना गइल।",
   "filters.allowedOnly.bubble": "अब खाली रउआ अनुमति वाला सूची पार होई।",
   "controls.emptySieve.bubble": "छन्नी अबहीं खाली बा। पहिला फ़िल्टर जोड़ीं।",
-  "controls.emptySieve.action": "पहिला फ़िल्टर जोड़ीं"
+  "controls.emptySieve.action": "पहिला फ़िल्टर जोड़ीं",
+  "welcome.one.title": "FilterTube में रउआ के स्वागत बा",
+  "welcome.one.subtitle": "का देखाई, ई रउआ चुनीं।",
+  "welcome.one.body": "कवनो चैनल, शब्द भा विषय के एक बेर ब्लॉक करीं। FilterTube ओकरा के हर पन्ना पर, खोज में आ आगे चले वाला वीडियो में छिपा देला।",
+  "welcome.fact.account": "कवनो FilterTube खाता ना।",
+  "welcome.fact.ads": "ना विज्ञापन, ना ट्रैकिंग प्रोफ़ाइल।",
+  "welcome.two.title": "एक बेर ब्लॉक, हर जगह छिपल",
+  "welcome.two.body": "कवनो चैनल भा शब्द जोड़ीं, ऊ मुख्य पन्ना, खोज, क्लिप आ वीडियो देखल से गायब हो जाला। बच्चा के आपन जगह आ आपन नियम बा।",
+  "welcome.three.title": "मुफ़्त, आ मुफ़्त रही",
+  "welcome.next": "अगिला",
+  "welcome.back": "पीछे"
 }

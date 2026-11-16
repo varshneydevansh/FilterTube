@@ -877,3 +877,15 @@ body.ft-extension-surface[data-surface="tab-view"] .list-item:not(.channel-item)
 }
 .pk-hub-peek__action:focus-visible { outline: 2px solid var(--pk-brick); outline-offset: 2px; }
 @media (prefers-reduced-motion: reduce) { .pk-first-filter { transition: none; } }
+
+/* The welcome, three pages as in the app (FirstInstallWelcomePlan). */
+.ft-mascot-welcome--pages { align-items: center; }
+.ft-mascot-welcome--pages .ft-mascot__line { display: none !important; }
+.ft-mascot-welcome__title { margin: 0; font: 400 26px/1.2 var(--pk-font-hand); color: var(--pk-ink); outline: none; }
+.ft-mascot-welcome__subtitle { margin: -4px 0 0; font-weight: 600; color: var(--pk-ink); }
+.ft-mascot-welcome__text { margin: 0; max-width: 46ch; color: var(--pk-muted); line-height: 1.55; }
+.ft-mascot-welcome__facts { margin: 0; padding-inline-start: 1.1rem; color: var(--pk-ink); line-height: 1.6; }
+.ft-mascot-welcome__nav { display: flex; align-items: center; gap: 10px; width: 100%; }
+.ft-mascot-welcome__dots { display: flex; gap: 6px; margin-inline-end: auto; }
+.ft-mascot-welcome__dots span { width: 8px; height: 8px; border-radius: 50%; background: var(--pk-line); }
+.ft-mascot-welcome__dots span.is-current { width: 20px; border-radius: 4px; background: var(--pk-brick); }

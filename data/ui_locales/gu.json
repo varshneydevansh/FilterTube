@@ -2861,5 +2861,15 @@
   "filters.firstFilter.bubble": "એ હવે ચાળણીમાં ચળાઈ ગયું.",
   "filters.allowedOnly.bubble": "હવે ફક્ત તમારી મંજૂર યાદી જ પસાર થશે.",
   "controls.emptySieve.bubble": "ચાળણીમાં હજી કંઈ નથી. પહેલું ફિલ્ટર ઉમેરો.",
-  "controls.emptySieve.action": "પહેલું ફિલ્ટર ઉમેરો"
+  "controls.emptySieve.action": "પહેલું ફિલ્ટર ઉમેરો",
+  "welcome.one.title": "FilterTube માં તમારું સ્વાગત છે",
+  "welcome.one.subtitle": "શું દેખાશે તે તમે પસંદ કરો છો.",
+  "welcome.one.body": "કોઈ ચેનલ, શબ્દ કે વિષયને એક વાર બ્લૉક કરો. FilterTube તેને દરેક પેજ પર, શોધમાં અને પછી ચાલતા વીડિયોમાં છુપાવે છે.",
+  "welcome.fact.account": "કોઈ FilterTube એકાઉન્ટ નહીં.",
+  "welcome.fact.ads": "જાહેરાતો નહીં, ટ્રેકિંગ પ્રોફાઇલ નહીં.",
+  "welcome.two.title": "એક વાર બ્લૉક, બધે છુપાયેલું",
+  "welcome.two.body": "કોઈ ચેનલ કે શબ્દ ઉમેરો અને તે હોમ, શોધો, ક્લિપ્સ અને જુઓ માંથી ગાયબ થઈ જાય છે. બાળકો ની પોતાની જગ્યા અને પોતાના નિયમો છે.",
+  "welcome.three.title": "મફત, અને મફત જ રહેશે",
+  "welcome.next": "આગળ",
+  "welcome.back": "પાછળ"
 }

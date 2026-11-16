@@ -2861,5 +2861,15 @@
   "filters.firstFilter.bubble": "Eso ya quedó en el colador.",
   "filters.allowedOnly.bubble": "Ahora solo pasa tu lista permitida.",
   "controls.emptySieve.bubble": "Aún no hay nada en el colador. Añade un primer filtro.",
-  "controls.emptySieve.action": "Añadir un primer filtro"
+  "controls.emptySieve.action": "Añadir un primer filtro",
+  "welcome.one.title": "Te damos la bienvenida a FilterTube",
+  "welcome.one.subtitle": "Tú eliges lo que aparece.",
+  "welcome.one.body": "Bloquea un canal, una palabra o un tema una sola vez. FilterTube lo oculta en todas las páginas, en la búsqueda y en lo que se reproduce después.",
+  "welcome.fact.account": "Sin cuenta de FilterTube.",
+  "welcome.fact.ads": "Sin anuncios ni perfil de seguimiento.",
+  "welcome.two.title": "Bloquea una vez, oculto en todas partes",
+  "welcome.two.body": "Añade un canal o una palabra y desaparece de Inicio, Buscar, Clips y Ver. Kids tiene su propio espacio con sus propias reglas.",
+  "welcome.three.title": "Gratis, y seguirá siéndolo",
+  "welcome.next": "Siguiente",
+  "welcome.back": "Atrás"
 }

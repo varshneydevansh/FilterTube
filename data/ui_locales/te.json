@@ -2861,5 +2861,15 @@
   "filters.firstFilter.bubble": "అది ఇప్పుడు జల్లెడలో జల్లించబడింది.",
   "filters.allowedOnly.bubble": "ఇప్పుడు మీ అనుమతి జాబితా మాత్రమే దాటుతుంది.",
   "controls.emptySieve.bubble": "జల్లెడలో ఇంకా ఏమీ లేదు. మొదటి ఫిల్టర్ జోడించండి.",
-  "controls.emptySieve.action": "మొదటి ఫిల్టర్ జోడించండి"
+  "controls.emptySieve.action": "మొదటి ఫిల్టర్ జోడించండి",
+  "welcome.one.title": "FilterTubeకు స్వాగతం",
+  "welcome.one.subtitle": "ఏం కనిపించాలో మీరే ఎంచుకుంటారు.",
+  "welcome.one.body": "ఒక ఛానెల్, పదం లేదా అంశాన్ని ఒకసారి బ్లాక్ చేయండి. FilterTube దాన్ని ప్రతి పేజీలో, వెతుకులాటలో, తర్వాత ప్లే అయ్యే వాటిలో దాచేస్తుంది.",
+  "welcome.fact.account": "FilterTube ఖాతా లేదు.",
+  "welcome.fact.ads": "ప్రకటనలు లేవు, ట్రాకింగ్ ప్రొఫైల్ లేదు.",
+  "welcome.two.title": "ఒకసారి బ్లాక్, అంతటా దాచబడుతుంది",
+  "welcome.two.body": "ఒక ఛానెల్ లేదా పదాన్ని జోడిస్తే అది హోమ్, వెతకండి, క్లిప్‌లు, చూడండి నుండి మాయమవుతుంది. పిల్లలుకి సొంత స్థలం, సొంత నియమాలు ఉన్నాయి.",
+  "welcome.three.title": "ఉచితం, ఎప్పటికీ ఉచితమే",
+  "welcome.next": "తదుపరి",
+  "welcome.back": "వెనుకకు"
 }

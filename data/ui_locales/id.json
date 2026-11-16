@@ -2859,5 +2859,15 @@
   "filters.firstFilter.bubble": "Yang itu sudah tersaring sekarang.",
   "filters.allowedOnly.bubble": "Sekarang hanya daftar yang diizinkan yang lolos.",
   "controls.emptySieve.bubble": "Saringannya masih kosong. Tambahkan filter pertama.",
-  "controls.emptySieve.action": "Tambahkan filter pertama"
+  "controls.emptySieve.action": "Tambahkan filter pertama",
+  "welcome.one.title": "Selamat datang di FilterTube",
+  "welcome.one.subtitle": "Anda yang memilih apa yang muncul.",
+  "welcome.one.body": "Blokir channel, kata, atau topik sekali saja. FilterTube menyembunyikannya di setiap halaman, di pencarian, dan di video berikutnya.",
+  "welcome.fact.account": "Tanpa akun FilterTube.",
+  "welcome.fact.ads": "Tanpa iklan dan tanpa profil pelacakan.",
+  "welcome.two.title": "Blokir sekali, tersembunyi di mana saja",
+  "welcome.two.body": "Tambahkan channel atau kata, dan itu hilang dari Beranda, Cari, Klip, dan Tonton. Kids punya ruang sendiri dengan aturan sendiri.",
+  "welcome.three.title": "Gratis, dan tetap gratis",
+  "welcome.next": "Berikutnya",
+  "welcome.back": "Kembali"
 }

@@ -2861,5 +2861,15 @@
   "filters.firstFilter.bubble": "ያ አሁን በወንፊቱ ተጣርቷል።",
   "filters.allowedOnly.bubble": "አሁን የሚያልፈው የተፈቀደው ዝርዝርህ ብቻ ነው።",
   "controls.emptySieve.bubble": "ወንፊቱ ገና ባዶ ነው። የመጀመሪያ ማጣሪያ ጨምር።",
-  "controls.emptySieve.action": "የመጀመሪያ ማጣሪያ ጨምር"
+  "controls.emptySieve.action": "የመጀመሪያ ማጣሪያ ጨምር",
+  "welcome.one.title": "ወደ FilterTube እንኳን በደህና መጡ",
+  "welcome.one.subtitle": "ምን እንደሚታይ እርስዎ ይመርጣሉ።",
+  "welcome.one.body": "አንድን ቻናል፣ ቃል ወይም ርዕስ አንድ ጊዜ ያግዱ። FilterTube በእያንዳንዱ ገጽ፣ በፍለጋ እና በቀጣይ በሚጫወቱት ውስጥ ይደብቀዋል።",
+  "welcome.fact.account": "የFilterTube መለያ የለም።",
+  "welcome.fact.ads": "ማስታወቂያ የለም፣ የመከታተያ መገለጫ የለም።",
+  "welcome.two.title": "አንድ ጊዜ ያግዱ፣ በሁሉም ቦታ ይደበቃል",
+  "welcome.two.body": "ቻናል ወይም ቃል ያክሉ፣ ከመነሻ፣ ፍለጋ፣ ቅንጥቦች እና መመልከት ይጠፋል። ልጆች የራሱ ቦታ እና የራሱ ደንቦች አሉት።",
+  "welcome.three.title": "ነጻ ነው፣ ነጻም ሆኖ ይቀጥላል",
+  "welcome.next": "ቀጣይ",
+  "welcome.back": "ተመለስ"
 }

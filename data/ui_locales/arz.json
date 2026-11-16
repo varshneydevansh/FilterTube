@@ -2885,5 +2885,15 @@
   "filters.firstFilter.bubble": "دي اتصفّت خلاص.",
   "filters.allowedOnly.bubble": "اللي في قايمتك المسموحة بس هو اللي بيعدّي دلوقتي.",
   "controls.emptySieve.bubble": "المصفاة لسه فاضية. ضيف أول فلتر.",
-  "controls.emptySieve.action": "ضيف أول فلتر"
+  "controls.emptySieve.action": "ضيف أول فلتر",
+  "welcome.one.title": "أهلاً بيك في FilterTube",
+  "welcome.one.subtitle": "إنت اللي بتختار إيه اللي يظهر.",
+  "welcome.one.body": "احظر قناة أو كلمة أو موضوع مرة واحدة. FilterTube هيخفيه في كل صفحة وفي البحث وفي اللي هيشتغل بعد كده.",
+  "welcome.fact.account": "مفيش حساب FilterTube.",
+  "welcome.fact.ads": "مفيش إعلانات ولا ملف تتبّع.",
+  "welcome.two.title": "احظر مرة، يختفي في كل حتة",
+  "welcome.two.body": "ضيف قناة أو كلمة وهتختفي من الصفحة الرئيسية وبحث والمقاطع ومشاهدة. والأطفال ليها مساحتها وقواعدها الخاصة.",
+  "welcome.three.title": "مجاني، وهيفضل مجاني",
+  "welcome.next": "التالي",
+  "welcome.back": "رجوع"
 }

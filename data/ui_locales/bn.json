@@ -2861,5 +2861,15 @@
   "filters.firstFilter.bubble": "ওটা এখন ছাঁকনিতে ছেঁকে বাদ গেল।",
   "filters.allowedOnly.bubble": "এখন শুধু তোমার অনুমোদিত তালিকাই পার হবে।",
   "controls.emptySieve.bubble": "ছাঁকনিতে এখনও কিছু নেই। প্রথম ফিল্টার যোগ করো।",
-  "controls.emptySieve.action": "প্রথম ফিল্টার যোগ করো"
+  "controls.emptySieve.action": "প্রথম ফিল্টার যোগ করো",
+  "welcome.one.title": "FilterTube-এ স্বাগতম",
+  "welcome.one.subtitle": "কী দেখা যাবে, তা আপনিই বেছে নেন।",
+  "welcome.one.body": "কোনো চ্যানেল, শব্দ বা বিষয় একবার ব্লক করুন। FilterTube সেটি প্রতিটি পাতায়, সার্চে এবং পরের ভিডিওগুলোতে লুকিয়ে রাখে।",
+  "welcome.fact.account": "কোনো FilterTube অ্যাকাউন্ট নেই।",
+  "welcome.fact.ads": "বিজ্ঞাপন নেই, ট্র্যাকিং প্রোফাইল নেই।",
+  "welcome.two.title": "একবার ব্লক, সব জায়গায় লুকানো",
+  "welcome.two.body": "একটি চ্যানেল বা শব্দ যোগ করুন, সেটি হোম, খুঁজুন, ক্লিপ এবং দেখুন থেকে সরে যাবে। Kids-এর নিজস্ব জায়গা ও নিজস্ব নিয়ম আছে।",
+  "welcome.three.title": "বিনামূল্যে, আর বিনামূল্যেই থাকবে",
+  "welcome.next": "পরবর্তী",
+  "welcome.back": "পিছনে"
 }

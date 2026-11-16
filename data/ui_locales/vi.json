@@ -2859,5 +2859,15 @@
   "filters.firstFilter.bubble": "Cái đó giờ đã được lọc ra rồi.",
   "filters.allowedOnly.bubble": "Giờ chỉ danh sách được phép mới đi qua.",
   "controls.emptySieve.bubble": "Cái rây vẫn còn trống. Thêm bộ lọc đầu tiên nhé.",
-  "controls.emptySieve.action": "Thêm bộ lọc đầu tiên"
+  "controls.emptySieve.action": "Thêm bộ lọc đầu tiên",
+  "welcome.one.title": "Chào mừng đến với FilterTube",
+  "welcome.one.subtitle": "Bạn chọn những gì được hiển thị.",
+  "welcome.one.body": "Chặn một kênh, từ khóa hoặc chủ đề chỉ một lần. FilterTube sẽ ẩn nó trên mọi trang, trong tìm kiếm và trong video phát tiếp theo.",
+  "welcome.fact.account": "Không cần tài khoản FilterTube.",
+  "welcome.fact.ads": "Không quảng cáo, không hồ sơ theo dõi.",
+  "welcome.two.title": "Chặn một lần, ẩn ở mọi nơi",
+  "welcome.two.body": "Thêm một kênh hoặc từ khóa, nó sẽ biến mất khỏi Trang chủ, Tìm kiếm, Video ngắn và Xem. Trẻ em có không gian riêng với quy tắc riêng.",
+  "welcome.three.title": "Miễn phí và sẽ luôn miễn phí",
+  "welcome.next": "Tiếp theo",
+  "welcome.back": "Quay lại"
 }

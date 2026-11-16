@@ -2861,5 +2861,15 @@
   "filters.firstFilter.bubble": "ಅದು ಈಗ ಜರಡಿಯಲ್ಲಿ ಸೋಸಿಹೋಯಿತು.",
   "filters.allowedOnly.bubble": "ಈಗ ನಿಮ್ಮ ಅನುಮತಿಸಿದ ಪಟ್ಟಿ ಮಾತ್ರ ಹಾದುಹೋಗುತ್ತದೆ.",
   "controls.emptySieve.bubble": "ಜರಡಿಯಲ್ಲಿ ಇನ್ನೂ ಏನೂ ಇಲ್ಲ. ಮೊದಲ ಫಿಲ್ಟರ್ ಸೇರಿಸಿ.",
-  "controls.emptySieve.action": "ಮೊದಲ ಫಿಲ್ಟರ್ ಸೇರಿಸಿ"
+  "controls.emptySieve.action": "ಮೊದಲ ಫಿಲ್ಟರ್ ಸೇರಿಸಿ",
+  "welcome.one.title": "FilterTube ಗೆ ಸ್ವಾಗತ",
+  "welcome.one.subtitle": "ಏನು ಕಾಣಬೇಕು ಎಂಬುದನ್ನು ನೀವೇ ಆರಿಸುತ್ತೀರಿ.",
+  "welcome.one.body": "ಒಂದು ಚಾನಲ್, ಪದ ಅಥವಾ ವಿಷಯವನ್ನು ಒಮ್ಮೆ ನಿರ್ಬಂಧಿಸಿ. FilterTube ಅದನ್ನು ಪ್ರತಿ ಪುಟದಲ್ಲಿ, ಹುಡುಕಾಟದಲ್ಲಿ ಮತ್ತು ಮುಂದೆ ಪ್ಲೇ ಆಗುವುದರಲ್ಲಿ ಮರೆಮಾಡುತ್ತದೆ.",
+  "welcome.fact.account": "FilterTube ಖಾತೆ ಇಲ್ಲ.",
+  "welcome.fact.ads": "ಜಾಹೀರಾತುಗಳಿಲ್ಲ, ಟ್ರ್ಯಾಕಿಂಗ್ ಪ್ರೊಫೈಲ್ ಇಲ್ಲ.",
+  "welcome.two.title": "ಒಮ್ಮೆ ನಿರ್ಬಂಧಿಸಿ, ಎಲ್ಲೆಡೆ ಮರೆ",
+  "welcome.two.body": "ಚಾನಲ್ ಅಥವಾ ಪದ ಸೇರಿಸಿದರೆ ಅದು ಮುಖಪುಟ, ಹುಡುಕಿ, ಕ್ಲಿಪ್‌ಗಳು ಮತ್ತು ನೋಡಿ ನಿಂದ ಮಾಯವಾಗುತ್ತದೆ. ಮಕ್ಕಳು ಗೆ ತನ್ನದೇ ಸ್ಥಳ ಮತ್ತು ತನ್ನದೇ ನಿಯಮಗಳಿವೆ.",
+  "welcome.three.title": "ಉಚಿತ, ಮತ್ತು ಉಚಿತವಾಗಿಯೇ ಇರುತ್ತದೆ",
+  "welcome.next": "ಮುಂದೆ",
+  "welcome.back": "ಹಿಂದೆ"
 }

@@ -1001,6 +1001,27 @@
         }
     }
 
+    // The app's first-install welcome (FirstInstallWelcomePlan, three pages), in the extension's terms:
+    // what FilterTube does, block once and it's hidden everywhere, and that it stays free. Kriti holds
+    // the logo beside it and says hello on the first page; with the Companion Off the words stand alone.
+    const WELCOME_PAGES = Object.freeze([
+        Object.freeze({
+            title: ['welcome.one.title', 'Welcome to FilterTube'],
+            subtitle: ['welcome.one.subtitle', 'You choose what shows up.'],
+            body: ['welcome.one.body', 'Block a channel, word or topic once. FilterTube hides it on every page, in search and in what plays next.'],
+            facts: Object.freeze([['welcome.fact.account', 'No FilterTube account.'], ['welcome.fact.ads', 'No ads and no tracking profile.']])
+        }),
+        Object.freeze({
+            title: ['welcome.two.title', 'Block once, hidden everywhere'],
+            body: ['welcome.two.body', 'Add a channel or word and it disappears from Home, Search, Clips and Watch. Kids gets its own space with its own rules.']
+        }),
+        Object.freeze({
+            title: ['welcome.three.title', 'Free, and it stays free'],
+            body: ['support.variant.classic.note', 'Free for everyone, always. Supporting is optional.']
+        })
+    ]);
+    const WELCOME_NAV = Object.freeze({ next: ['welcome.next', 'Next'], back: ['welcome.back', 'Back'] });
+
     function mountWelcome(doc) {
         const container = doc.getElementById('viewContainer');
         if (!container) return;
@@ -1013,28 +1034,61 @@
             }
             // First open after install: show once, then clear the flag so it never returns.
             storageSet({ [WELCOME_KEY]: false });
-            if (!showsCharacters(companionMode)) return;
-            card = el('section', 'ft-mascot-welcome');
-            card.setAttribute('aria-label', t(COPY.welcome));
-            const character = createCharacter({ className: 'ft-mascot--welcome', imageName: ASSETS.kritiLogo, height: 160, kind: 'static', tail: 'left' });
-            const dismiss = el('button', 'btn-secondary ft-mascot-welcome__dismiss', t(COPY.welcomeDismiss));
-            dismiss.type = 'button';
-            dismiss.addEventListener('click', () => {
+            let page = 0;
+            card = el('section', 'ft-mascot-welcome ft-mascot-welcome--pages');
+            card.setAttribute('aria-roledescription', 'carousel');
+            const character = showsCharacters(companionMode)
+                ? createCharacter({ className: 'ft-mascot--welcome', imageName: ASSETS.kritiLogo, height: 160, kind: 'static', tail: 'left' })
+                : null;
+            const body = el('div', 'ft-mascot-welcome__body');
+            const title = el('h2', 'ft-mascot-welcome__title');
+            title.tabIndex = -1;
+            const subtitle = el('p', 'ft-mascot-welcome__subtitle');
+            const text = el('p', 'ft-mascot-welcome__text');
+            const facts = el('ul', 'ft-mascot-welcome__facts');
+            const nav = el('div', 'ft-mascot-welcome__nav');
+            const dots = el('div', 'ft-mascot-welcome__dots');
+            dots.setAttribute('aria-hidden', 'true');
+            const back = el('button', 'btn-secondary ft-mascot-welcome__back');
+            back.type = 'button';
+            const next = el('button', 'btn-primary ft-mascot-welcome__dismiss');
+            next.type = 'button';
+            nav.append(dots, back, next);
+            body.append(title, subtitle, text, facts, nav);
+            if (character) {
+                character.root.setAttribute('aria-hidden', 'true');
+                card.append(character.root);
+            }
+            card.append(body);
+            const close = () => {
                 card.classList.add('is-leaving');
                 const remove = () => card.remove();
                 if (prefersReducedMotion()) remove();
                 else root.setTimeout(remove, 150);
+            };
+            const render = (focus = false) => {
+                const spec = WELCOME_PAGES[page];
+                title.textContent = t(spec.title);
+                subtitle.textContent = spec.subtitle ? t(spec.subtitle) : '';
+                subtitle.hidden = !spec.subtitle;
+                text.textContent = t(spec.body);
+                facts.replaceChildren(...(spec.facts || []).map(entry => el('li', '', t(entry))));
+                facts.hidden = !spec.facts;
+                dots.replaceChildren(...WELCOME_PAGES.map((_, index) => el('span', index === page ? 'is-current' : '')));
+                back.textContent = t(WELCOME_NAV.back);
+                back.hidden = page === 0;
+                next.textContent = page === WELCOME_PAGES.length - 1 ? t(COPY.welcomeDismiss) : t(WELCOME_NAV.next);
+                card.setAttribute('aria-label', `${t(spec.title)} (${page + 1}/${WELCOME_PAGES.length})`);
+                if (focus) title.focus({ preventScroll: true });
+            };
+            back.addEventListener('click', () => { if (page > 0) { page -= 1; render(true); } });
+            next.addEventListener('click', () => {
+                if (page < WELCOME_PAGES.length - 1) { page += 1; render(true); playSound('page'); }
+                else close();
             });
-            const body = el('div', 'ft-mascot-welcome__body');
-            body.append(character.line, dismiss);
-            card.append(character.root, body);
             container.insertBefore(card, container.firstChild);
-            character.say(t(COPY.welcome));
-            root.addEventListener?.('filtertube-ui-locale-changed', () => {
-                character.retext(t(COPY.welcome));
-                card.setAttribute('aria-label', t(COPY.welcome));
-                dismiss.textContent = t(COPY.welcomeDismiss);
-            });
+            render();
+            root.addEventListener?.('filtertube-ui-locale-changed', () => render());
             card.classList.add('is-entering');
             root.requestAnimationFrame?.(() => root.requestAnimationFrame?.(() => card.classList.remove('is-entering')));
         };
