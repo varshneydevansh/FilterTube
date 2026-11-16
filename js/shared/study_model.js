@@ -272,7 +272,8 @@
      * - progress takes the larger value per device and per day, whatever the strategy;
      * - the running lock is never copied: this device keeps its own (or none). Only Move account
      *   (carryLock) brings the other device's lock and saved list mode;
-     * - a plan a parent set here, and its break mode, stay unless carryLock.
+     * - a plan a parent set here, its break mode, its round and break lengths and "Pack channels only"
+     *   stay unless carryLock; otherwise an incoming "Pack channels only" wins when it is set.
      */
     function mergeStudy(local, incoming, { strategy = 'merge', carryLock = false, now = Date.now() } = {}) {
         const mine = normalizeStudy(local);
@@ -289,14 +290,18 @@
     function mergeStudyValues(mine, theirs, { strategy, carryLock }) {
         const replace = strategy === 'replace';
         const parentPlan = !!(mine.plan && mine.plan.setByParentId) && !carryLock;
-        return {
+        // "Pack channels only" is a parent's setting too (Android StudyMerge, e64d74490): under a parent's
+        // plan it stays the parent's; otherwise the incoming value wins when it is set.
+        const packChannelsOnly = parentPlan ? mine.packChannelsOnly : (theirs.packChannelsOnly ?? mine.packChannelsOnly);
+        const merged = {
             ...extras(mine, KNOWN.study),
             ...extras(theirs, KNOWN.study),
             version: Math.max(mine.version, theirs.version),
             activePackIds: replace ? theirs.activePackIds
                 : Array.from(new Set([...mine.activePackIds, ...theirs.activePackIds])).slice(0, MAX_PACKS),
             packEdits: replace ? theirs.packEdits : mergePackEdits(mine.packEdits, theirs.packEdits),
-            focus: theirs.focus,
+            // Round and break lengths belong with the plan: a sync can't stretch a parent's breaks (ce156df15).
+            focus: parentPlan ? mine.focus : theirs.focus,
             plan: parentPlan ? mine.plan : (replace ? theirs.plan : (theirs.plan || mine.plan)),
             lock: carryLock ? theirs.lock : mine.lock,
             savedListMode: carryLock ? (theirs.savedListMode || mine.savedListMode) : (mine.savedListMode || theirs.savedListMode),
@@ -304,6 +309,9 @@
             progress: mergeProgress(mine.progress, theirs.progress),
             weekView: theirs.weekView ?? mine.weekView
         };
+        if (typeof packChannelsOnly === 'boolean') merged.packChannelsOnly = packChannelsOnly;
+        else delete merged.packChannelsOnly;
+        return merged;
     }
 
     /** A parent's lock: set by a parent with a window ({startsAt, endsAt}). */
