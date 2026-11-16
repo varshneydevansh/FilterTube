@@ -3102,5 +3102,18 @@
   "study.setup.lockGentleBody": "O lè parí ní kùtùkùtù lẹ́yìn ìdádúró ìṣẹ́jú-àáyá 30.",
   "study.setup.lockLockedBody": "Kò sí ìparí kùtùkùtù, títí di wákàtí 4. Ó ń lo Ìṣàkóso Ara-ẹni.",
   "study.setup.savePlan": "Fi ètò pamọ́",
-  "study.setup.startNow": "Bẹ̀rẹ̀ báyìí"
+  "study.setup.startNow": "Bẹ̀rẹ̀ báyìí",
+  "study.end.headline": "O kàwé ìṣẹ́jú {minutes}. Ó jẹ́ ohun kan.",
+  "study.end.seal": "Ìjókòó parí: ìṣẹ́jú {minutes} ti ẹ̀kọ́ nínú {rounds}.",
+  "study.end.planTomorrow": "Ṣètò ọ̀la",
+  "study.end.done": "Ó ti parí",
+  "study.end.studied": "ìṣẹ́jú tí o ti kà",
+  "study.end.rounds.zero": "ìpele {count}",
+  "study.end.rounds.one": "ìpele {count}",
+  "study.end.rounds.two": "ìpele {count}",
+  "study.end.rounds.few": "ìpele {count}",
+  "study.end.rounds.many": "ìpele {count}",
+  "study.end.rounds.other": "ìpele {count}",
+  "study.end.round": "Ẹ̀kọ́, ìyípo {round}",
+  "study.end.minutes": "{minutes} ìṣẹ́jú"
 }

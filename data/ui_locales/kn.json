@@ -3104,5 +3104,18 @@
   "study.setup.lockGentleBody": "30 ಸೆಕೆಂಡುಗಳ ವಿರಾಮದ ನಂತರ ಬೇಗ ಮುಗಿಸಬಹುದು.",
   "study.setup.lockLockedBody": "ಬೇಗ ಮುಗಿಸಲು ಆಗುವುದಿಲ್ಲ, 4 ಗಂಟೆಗಳವರೆಗೆ. ಸ್ವಯಂ-ನಿಯಂತ್ರಣ ಬಳಸುತ್ತದೆ.",
   "study.setup.savePlan": "ಯೋಜನೆ ಉಳಿಸಿ",
-  "study.setup.startNow": "ಈಗ ಆರಂಭಿಸಿ"
+  "study.setup.startNow": "ಈಗ ಆರಂಭಿಸಿ",
+  "study.end.headline": "{minutes} ನಿಮಿ ಓದಿದ್ದೀರಿ. ಇದೂ ಲೆಕ್ಕಕ್ಕೆ ಬರುತ್ತದೆ.",
+  "study.end.seal": "ಅವಧಿ ಮುಗಿಯಿತು: {rounds} ನಲ್ಲಿ {minutes} ನಿಮಿ ಓದು.",
+  "study.end.planTomorrow": "ನಾಳೆಯ ಯೋಜನೆ ಮಾಡಿ",
+  "study.end.done": "ಮುಗಿಯಿತು",
+  "study.end.studied": "ನಿಮಿ ಓದಿದ್ದು",
+  "study.end.rounds.zero": "{count} ಸುತ್ತುಗಳು",
+  "study.end.rounds.one": "{count} ಸುತ್ತು",
+  "study.end.rounds.two": "{count} ಸುತ್ತುಗಳು",
+  "study.end.rounds.few": "{count} ಸುತ್ತುಗಳು",
+  "study.end.rounds.many": "{count} ಸುತ್ತುಗಳು",
+  "study.end.rounds.other": "{count} ಸುತ್ತುಗಳು",
+  "study.end.round": "ಅಧ್ಯಯನ, ಸುತ್ತು {round}",
+  "study.end.minutes": "{minutes} ನಿಮಿ"
 }

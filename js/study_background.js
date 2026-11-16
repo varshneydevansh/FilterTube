@@ -32,6 +32,8 @@
     'use strict';
 
     const RUNTIME_KEY = 'ftStudyRuntimeV1';
+    /** Android StudySessionEnds (sessionOpen:/sessionEnd:<profile>): {profileId: {open, ended}}. */
+    const SESSION_ENDS_KEY = 'ftStudySessionEndsV1';
     const DEVICE_KEY = 'ftStudyDeviceIdV1';
     const NANAH_DEVICE_KEY = 'ftNanahDeviceId';
     const PROFILES_KEY = 'ftProfilesV4';
@@ -454,6 +456,38 @@
             });
         }
 
+        /**
+         * Android StudySessionEnds.observe: keeps the running session per profile and, once it leaves the
+         * clock, its end card until it's seen (ftStudySessionEndsV1, its own key so the runtime's
+         * read-modify-writes never race it). Returns the pending end card, or null.
+         */
+        async function observeSessionEnd(profileId, study, local, clock, at) {
+            if (!Engine.sessionEndStep) return null;
+            const items = await storageGet([SESSION_ENDS_KEY]);
+            const table = object(clone(items[SESSION_ENDS_KEY]));
+            const entry = object(table[profileId]);
+            const skipped = clock.state === Engine.BREAK && Number.isFinite(local.breakSkippedUntil)
+                ? array(clock.segments).filter(item => item.kind === Engine.BREAK && item.end === local.breakSkippedUntil).map(item => item.start) : [];
+            const [open, ended] = Engine.sessionEndStep(isObject(entry.open) ? entry.open : null, clock, study?.focus, skipped, at);
+            const next = { open, ended: ended || (isObject(entry.ended) ? entry.ended : null) };
+            if (JSON.stringify(next) !== JSON.stringify({ open: entry.open || null, ended: entry.ended || null })) {
+                table[profileId] = next;
+                await storageSet({ [SESSION_ENDS_KEY]: table });
+            }
+            return Engine.pendingSessionEnd(next.ended, at);
+        }
+
+        /** The end card was seen (Done or Plan tomorrow): it doesn't show again. */
+        async function acknowledgeSessionEnd() {
+            const [{ profileId }, items] = await Promise.all([readAll(), storageGet([SESSION_ENDS_KEY])]);
+            const table = object(clone(items[SESSION_ENDS_KEY]));
+            if (isObject(table[profileId])) {
+                table[profileId] = { ...table[profileId], ended: null };
+                await storageSet({ [SESSION_ENDS_KEY]: table });
+            }
+            return { ok: true };
+        }
+
         /** The UI state for the active profile. */
         async function getState() {
             const guard = await readClock();
@@ -465,9 +499,12 @@
             const progress = study ? Model.mergeProgress(study.progress, { [device]: Object.fromEntries(
                 Object.entries(object(runtime.seconds[profileId])).map(([day, seconds]) => [day, Math.floor(seconds / 60)])) }) : {};
             const lock = await deps.getSelfControlSession?.();
+            // A session that ended while no page was open is noticed the moment one asks.
+            const sessionEnded = await observeSessionEnd(profileId, study, local, clock, at).catch(() => null);
             return {
                 ok: true,
                 profileId,
+                sessionEnded,
                 deviceId: device,
                 study,
                 ...publicState(study, local, clock, applied.packIds || [], at, applied),
@@ -490,6 +527,7 @@
             const { profileId, profile, runtime } = await readAll();
             const at = now();
             const { study, local, clock, parentLock } = clockFor(profile, runtime, profileId, at, guard);
+            await observeSessionEnd(profileId, study, local, clock, at).catch(() => null);
             // A hold re-checks every minute; a parent's lock advances its running-time meter every minute.
             const minute = clock.clockHold || parentLock?.active || clockSensitive(study, local) && clock.studying ? at + 60 * 1000 : null;
             const candidates = [clock.next?.at, local.endRequestedAt ? local.endRequestedAt + Engine.GENTLE_END_PAUSE_MS : null, minute]
@@ -854,6 +892,7 @@
                 return undoSkipBreak(request);
             }
             if (!extensionPage) return Promise.resolve({ ok: false, error: 'untrusted_sender' });
+            if (action === 'FilterTube_StudyAckSessionEnd') return acknowledgeSessionEnd();
             if (action === 'FilterTube_StudyStartSession') return startSession(request);
             if (action === 'FilterTube_StudyEndSession') return requestEnd();
             if (action === 'FilterTube_StudyCancelEnd') return cancelEnd();
@@ -869,7 +908,7 @@
         return Object.freeze({
             ALARM, RUNTIME_KEY, prepare, apply, getState, schedule, onAlarm, startSession, requestEnd, cancelEnd, endGentleThenSwitch,
             skipBreak, undoSkipBreak, skipVideo, skippedVideos, tick, update, foldProgress, handleMessage, deviceId, getChildState, updateChild, startParentLock, endParentLock,
-            switchDecision, addGrant, reportFor
+            switchDecision, addGrant, reportFor, acknowledgeSessionEnd
         });
     }
 

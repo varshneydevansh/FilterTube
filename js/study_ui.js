@@ -1521,6 +1521,95 @@
         return svg;
     }
 
+    /**
+     * The end card (Android StudyFocusActivity end card, StudyDayRingView seal): once a session leaves
+     * the clock, the seal stamps with the minutes studied, Kriti jumps beside it, "{n} min studied.
+     * That counts.", the rounds when there were several, Done and Plan tomorrow. Shown once: Done (or
+     * Plan tomorrow) tells the background it was seen.
+     */
+    let endCardShown = null;
+    function endCard(ended, { onDone, onPlan } = {}) {
+        const ns = 'http://www.w3.org/2000/svg';
+        const card = el('section', 'ft-study-endcard');
+        card.setAttribute('role', 'status');
+        const roundsText = plural('study.end.rounds', ended.rounds, '{count} round', '{count} rounds');
+        const stage = el('div', 'ft-study-endcard__stage');
+        const seal = root.document.createElementNS(ns, 'svg');
+        seal.setAttribute('viewBox', '0 0 200 200');
+        seal.setAttribute('class', 'ft-study-seal');
+        seal.setAttribute('role', 'img');
+        seal.setAttribute('aria-label', t('study.end.seal', 'Session sealed: {minutes} min studied in {rounds}.', { minutes: ended.studiedMinutes, rounds: roundsText }));
+        // A scalloped rim: 24 bumps around the paper disc.
+        const bumps = 24;
+        let d = '';
+        for (let i = 0; i <= bumps * 2; i += 1) {
+            const angle = (Math.PI * i) / bumps - Math.PI / 2;
+            const r = i % 2 === 0 ? 96 : 89;
+            d += `${i ? 'L' : 'M'}${(100 + r * Math.cos(angle)).toFixed(1)} ${(100 + r * Math.sin(angle)).toFixed(1)}`;
+        }
+        const rim = root.document.createElementNS(ns, 'path');
+        rim.setAttribute('d', `${d}Z`);
+        rim.setAttribute('class', 'ft-study-seal__rim');
+        seal.appendChild(rim);
+        // The rounds close the circle: one sage arc each, with a small gap between.
+        const parts = array(ended.perRound);
+        const total = parts.reduce((sum, item) => sum + item.minutes, 0) || 1;
+        const r = 70;
+        const circumference = 2 * Math.PI * r;
+        const gap = parts.length > 1 ? 0.011 * circumference : 0;
+        let offset = 0;
+        for (const item of parts.length ? parts : [{ minutes: 1 }]) {
+            const length = (item.minutes / total) * circumference;
+            const arc = root.document.createElementNS(ns, 'circle');
+            arc.setAttribute('cx', '100'); arc.setAttribute('cy', '100'); arc.setAttribute('r', String(r));
+            arc.setAttribute('class', 'ft-study-seal__arc');
+            arc.setAttribute('stroke-dasharray', `${Math.max(1, length - gap).toFixed(1)} ${circumference.toFixed(1)}`);
+            arc.setAttribute('stroke-dashoffset', (-offset).toFixed(1));
+            arc.setAttribute('transform', 'rotate(-90 100 100)');
+            seal.appendChild(arc);
+            offset += length;
+        }
+        const number = root.document.createElementNS(ns, 'text');
+        number.setAttribute('x', '100'); number.setAttribute('y', '104');
+        number.setAttribute('class', 'ft-study-seal__number');
+        number.textContent = String(ended.studiedMinutes);
+        const label = root.document.createElementNS(ns, 'text');
+        label.setAttribute('x', '100'); label.setAttribute('y', '128');
+        label.setAttribute('class', 'ft-study-seal__label');
+        label.textContent = t('study.end.studied', 'min studied');
+        seal.append(number, label);
+        stage.appendChild(seal);
+        const Mascots = root.FilterTubeMascots;
+        // The stamp, the jump and the sound play once per session end; the 30 s redraw shows it still.
+        const fresh = endCardShown !== ended.start;
+        endCardShown = ended.start;
+        if (fresh) card.classList.add('is-fresh');
+        const kriti = companionArt('kritiJump', 'ft-study-endcard__kriti', 128);
+        if (kriti) {
+            stage.appendChild(kriti);
+            // Her jump lands as the seal stamps, then she rests on the last frame.
+            if (fresh) { try { Mascots.playSheet?.(kriti, 'kritiJump'); } catch (e) { } }
+        }
+        card.appendChild(stage);
+        if (fresh) { try { Mascots?.playSound?.('stamp'); } catch (e) { } }
+        card.appendChild(el('h4', 'ft-study-endcard__headline', t('study.end.headline', '{minutes} min studied. That counts.', { minutes: ended.studiedMinutes })));
+        if (parts.length > 1) {
+            const list = el('div', 'ft-study-endcard__rounds');
+            for (const item of parts) {
+                const row = el('div', 'ft-study-endcard__round');
+                row.append(el('span', 'ft-study-endcard__bead'), el('span', '', t('study.end.round', 'Study, round {round}', { round: item.round })),
+                    el('span', 'ft-study-muted', t('study.end.minutes', '{minutes} min', { minutes: item.minutes })));
+                list.appendChild(row);
+            }
+            card.appendChild(list);
+        }
+        const actions = el('div', 'ft-study-endcard__actions');
+        actions.appendChild(button(t('study.end.done', 'Done'), 'btn-primary', () => onDone?.()));
+        if (onPlan) actions.appendChild(button(t('study.end.planTomorrow', 'Plan tomorrow'), 'btn-secondary', () => onPlan()));
+        card.appendChild(actions);
+        return card;
+    }
+
     function renderDashboard(host, data, { refresh, catalog }) {
         const state = object(data.state);
         const study = object(state.study);
@@ -1531,6 +1620,18 @@
         if (state.setByParentId) head.appendChild(el('span', 'ft-study-chip is-parent', setByLabel(data.parentName)));
         else if (array(state.packs).length) head.appendChild(el('span', 'ft-study-chip', packsLabel(state)));
         card.appendChild(head);
+        if (state.sessionEnded && state.state !== 'STUDY' && state.state !== 'BREAK') {
+            const seen = () => send({ action: 'FilterTube_StudyAckSessionEnd' });
+            const canPlan = !state.setByParentId && !text(object(study.plan).setByParentId) && isObject(study.plan);
+            card.appendChild(endCard(state.sessionEnded, {
+                onDone: async () => { await seen(); refresh(); },
+                onPlan: canPlan ? async () => {
+                    await seen();
+                    await refresh();
+                    try { host.querySelector('.ft-study-planner-host')?.scrollIntoView({ block: 'start', behavior: 'smooth' }); } catch (e) { }
+                } : null
+            }));
+        }
 
         const status = el('div', `ft-study-status is-${info.tone}`);
         const ringBox = el('div', 'ft-study-ring');

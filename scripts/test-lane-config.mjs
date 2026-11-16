@@ -215,6 +215,7 @@ const APP_PARITY_TESTS = Object.freeze([
   'tests/runtime/app-parity-rule-options.test.mjs',
   'tests/runtime/app-parity-study-skip-break.test.mjs',
   'tests/runtime/app-parity-study-setup.test.mjs',
+  'tests/runtime/app-parity-study-session-end.test.mjs',
   // The Android -> extension port ledger's own checks (docs/parity/HOW_TO_PORT.md).
   'tools/parity/ledger.test.mjs',
 ]);

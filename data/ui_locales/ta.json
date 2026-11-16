@@ -3104,5 +3104,18 @@
   "study.setup.lockGentleBody": "30 வினாடி இடைநிறுத்தத்துக்குப் பின் முன்பே முடிக்கலாம்.",
   "study.setup.lockLockedBody": "முன்பே முடிக்க முடியாது, 4 மணி நேரம் வரை. சுயக்கட்டுப்பாட்டைப் பயன்படுத்துகிறது.",
   "study.setup.savePlan": "திட்டத்தைச் சேமி",
-  "study.setup.startNow": "இப்போது தொடங்கு"
+  "study.setup.startNow": "இப்போது தொடங்கு",
+  "study.end.headline": "{minutes} நிமி படித்தீர்கள். இதுவும் கணக்கில் உண்டு.",
+  "study.end.seal": "அமர்வு முடிந்தது: {rounds}-ல் {minutes} நிமி படித்தீர்கள்.",
+  "study.end.planTomorrow": "நாளையைத் திட்டமிடு",
+  "study.end.done": "முடிந்தது",
+  "study.end.studied": "நிமி படித்தது",
+  "study.end.rounds.zero": "{count} சுற்றுகள்",
+  "study.end.rounds.one": "{count} சுற்று",
+  "study.end.rounds.two": "{count} சுற்றுகள்",
+  "study.end.rounds.few": "{count} சுற்றுகள்",
+  "study.end.rounds.many": "{count} சுற்றுகள்",
+  "study.end.rounds.other": "{count} சுற்றுகள்",
+  "study.end.round": "படிப்பு, சுற்று {round}",
+  "study.end.minutes": "{minutes} நிமி"
 }

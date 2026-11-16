@@ -3104,5 +3104,18 @@
   "study.setup.lockGentleBody": "30 سیکنڈ کے وقفے کے بعد جلد ختم کر سکتے ہیں۔",
   "study.setup.lockLockedBody": "جلد ختم نہیں، زیادہ سے زیادہ 4 گھنٹے۔ ضبطِ نفس استعمال کرتا ہے۔",
   "study.setup.savePlan": "منصوبہ محفوظ کریں",
-  "study.setup.startNow": "ابھی شروع کریں"
+  "study.setup.startNow": "ابھی شروع کریں",
+  "study.end.headline": "{minutes} منٹ پڑھائی ہوئی۔ یہ بھی گنا جاتا ہے۔",
+  "study.end.seal": "سیشن مکمل: {rounds} میں {minutes} منٹ پڑھائی۔",
+  "study.end.planTomorrow": "کل کا منصوبہ بنائیں",
+  "study.end.done": "ہو گیا",
+  "study.end.studied": "منٹ پڑھائی",
+  "study.end.rounds.zero": "{count} راؤنڈ",
+  "study.end.rounds.one": "{count} راؤنڈ",
+  "study.end.rounds.two": "{count} راؤنڈ",
+  "study.end.rounds.few": "{count} راؤنڈ",
+  "study.end.rounds.many": "{count} راؤنڈ",
+  "study.end.rounds.other": "{count} راؤنڈ",
+  "study.end.round": "پڑھائی، دور {round}",
+  "study.end.minutes": "{minutes} منٹ"
 }

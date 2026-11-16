@@ -3104,5 +3104,18 @@
   "study.setup.lockGentleBody": "Unaweza kumaliza mapema baada ya kusubiri sekunde 30.",
   "study.setup.lockLockedBody": "Hakuna kumaliza mapema, hadi saa 4. Hutumia Kujidhibiti.",
   "study.setup.savePlan": "Hifadhi mpango",
-  "study.setup.startNow": "Anza sasa"
+  "study.setup.startNow": "Anza sasa",
+  "study.end.headline": "Umesoma dak {minutes}. Hiyo inahesabika.",
+  "study.end.seal": "Kipindi kimekamilika: dak {minutes} za kusoma katika {rounds}.",
+  "study.end.planTomorrow": "Panga kesho",
+  "study.end.done": "Imekamilika",
+  "study.end.studied": "dak za kusoma",
+  "study.end.rounds.zero": "raundi {count}",
+  "study.end.rounds.one": "raundi {count}",
+  "study.end.rounds.two": "raundi {count}",
+  "study.end.rounds.few": "raundi {count}",
+  "study.end.rounds.many": "raundi {count}",
+  "study.end.rounds.other": "raundi {count}",
+  "study.end.round": "Kusoma, mzunguko {round}",
+  "study.end.minutes": "Dak {minutes}"
 }

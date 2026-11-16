@@ -3102,5 +3102,18 @@
   "study.setup.lockGentleBody": "Bạn có thể kết thúc sớm sau 30 giây chờ.",
   "study.setup.lockLockedBody": "Không kết thúc sớm, tối đa 4 giờ. Dùng Tự kiểm soát.",
   "study.setup.savePlan": "Lưu kế hoạch",
-  "study.setup.startNow": "Bắt đầu ngay"
+  "study.setup.startNow": "Bắt đầu ngay",
+  "study.end.headline": "Đã học {minutes} phút. Thế là có giá trị.",
+  "study.end.seal": "Đã khép buổi học: {minutes} phút học trong {rounds}.",
+  "study.end.planTomorrow": "Lên kế hoạch mai",
+  "study.end.done": "Xong",
+  "study.end.studied": "phút đã học",
+  "study.end.rounds.zero": "{count} lượt",
+  "study.end.rounds.one": "{count} lượt",
+  "study.end.rounds.two": "{count} lượt",
+  "study.end.rounds.few": "{count} lượt",
+  "study.end.rounds.many": "{count} lượt",
+  "study.end.rounds.other": "{count} lượt",
+  "study.end.round": "Học, vòng {round}",
+  "study.end.minutes": "{minutes} phút"
 }

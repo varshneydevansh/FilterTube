@@ -3128,5 +3128,18 @@
   "study.setup.lockGentleBody": "يمكنك الإنهاء مبكرًا بعد توقف 30 ثانية.",
   "study.setup.lockLockedBody": "لا إنهاء مبكر، حتى 4 ساعات. يستخدم ضبط النفس.",
   "study.setup.savePlan": "احفظ الخطة",
-  "study.setup.startNow": "ابدأ الآن"
+  "study.setup.startNow": "ابدأ الآن",
+  "study.end.headline": "درست {minutes} د. وهذا يُحتسب.",
+  "study.end.seal": "انتهت الجلسة: {minutes} د من الدراسة في {rounds}.",
+  "study.end.planTomorrow": "خطط للغد",
+  "study.end.done": "تم",
+  "study.end.studied": "د دراسة",
+  "study.end.rounds.zero": "{count} جولة",
+  "study.end.rounds.one": "جولة واحدة ({count})",
+  "study.end.rounds.two": "جولتان ({count})",
+  "study.end.rounds.few": "{count} جولات",
+  "study.end.rounds.many": "{count} جولة",
+  "study.end.rounds.other": "{count} جولة",
+  "study.end.round": "دراسة، الجولة {round}",
+  "study.end.minutes": "{minutes} د"
 }

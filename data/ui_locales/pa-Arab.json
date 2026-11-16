@@ -3104,5 +3104,18 @@
   "study.setup.lockGentleBody": "30 سیکنڈ دی اُڈیک توں بعد تسیں چھیتی مُکا سکدے او۔",
   "study.setup.lockLockedBody": "چھیتی نہیں مُکدا، 4 گھنٹے تیکر۔ سیلف کنٹرول ورتدا اے۔",
   "study.setup.savePlan": "پلان سانبھو",
-  "study.setup.startNow": "ہُݨ شروع کرو"
+  "study.setup.startNow": "ہُݨ شروع کرو",
+  "study.end.headline": "{minutes} منٹ پڑھائی ہوئی۔ ایہہ وی گنیا جاندا اے۔",
+  "study.end.seal": "سیشن پورا: {rounds} وچ {minutes} منٹ پڑھائی۔",
+  "study.end.planTomorrow": "کل دا منصوبہ بناؤ",
+  "study.end.done": "ہو گیا",
+  "study.end.studied": "منٹ پڑھائی",
+  "study.end.rounds.zero": "{count} راؤنڈ",
+  "study.end.rounds.one": "{count} راؤنڈ",
+  "study.end.rounds.two": "{count} راؤنڈ",
+  "study.end.rounds.few": "{count} راؤنڈ",
+  "study.end.rounds.many": "{count} راؤنڈ",
+  "study.end.rounds.other": "{count} راؤنڈ",
+  "study.end.round": "پڑھائی، گیڑا {round}",
+  "study.end.minutes": "{minutes} منٹ"
 }

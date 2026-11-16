@@ -3102,5 +3102,18 @@
   "study.setup.lockGentleBody": "30 秒待つと早めに終了できます。",
   "study.setup.lockLockedBody": "早めの終了はできません。最長 4 時間。セルフコントロールを使います。",
   "study.setup.savePlan": "プランを保存",
-  "study.setup.startNow": "今すぐ開始"
+  "study.setup.startNow": "今すぐ開始",
+  "study.end.headline": "{minutes} 分学習しました。 ちゃんと積み重なっています。",
+  "study.end.seal": "セッション完了：{rounds} で {minutes} 分学習。",
+  "study.end.planTomorrow": "明日を計画",
+  "study.end.done": "完了",
+  "study.end.studied": "分 学習済み",
+  "study.end.rounds.zero": "{count} ラウンド",
+  "study.end.rounds.one": "{count} ラウンド",
+  "study.end.rounds.two": "{count} ラウンド",
+  "study.end.rounds.few": "{count} ラウンド",
+  "study.end.rounds.many": "{count} ラウンド",
+  "study.end.rounds.other": "{count} ラウンド",
+  "study.end.round": "学習、ラウンド {round}",
+  "study.end.minutes": "{minutes} 分"
 }

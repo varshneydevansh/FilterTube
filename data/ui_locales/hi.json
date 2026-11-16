@@ -3104,5 +3104,18 @@
   "study.setup.lockGentleBody": "30 सेकंड रुकने के बाद आप जल्दी खत्म कर सकते हैं।",
   "study.setup.lockLockedBody": "जल्दी खत्म नहीं, 4 घंटे तक। आत्म-नियंत्रण का उपयोग करता है।",
   "study.setup.savePlan": "योजना सेव करें",
-  "study.setup.startNow": "अभी शुरू करें"
+  "study.setup.startNow": "अभी शुरू करें",
+  "study.end.headline": "{minutes} मिनट पढ़ाई हुई. यह भी मायने रखता है.",
+  "study.end.seal": "सत्र पूरा: {rounds} में {minutes} मिनट पढ़ाई.",
+  "study.end.planTomorrow": "कल का प्लान बनाएँ",
+  "study.end.done": "हो गया",
+  "study.end.studied": "मिनट पढ़ाई",
+  "study.end.rounds.zero": "{count} राउंड",
+  "study.end.rounds.one": "{count} राउंड",
+  "study.end.rounds.two": "{count} राउंड",
+  "study.end.rounds.few": "{count} राउंड",
+  "study.end.rounds.many": "{count} राउंड",
+  "study.end.rounds.other": "{count} राउंड",
+  "study.end.round": "पढ़ाई, राउंड {round}",
+  "study.end.minutes": "{minutes} मिनट"
 }

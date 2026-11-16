@@ -3104,5 +3104,18 @@
   "study.setup.lockGentleBody": "بعد از ۳۰ ثانیه مکث می‌توانید زودتر تمام کنید.",
   "study.setup.lockLockedBody": "بدون پایان زودهنگام، تا ۴ ساعت. از خودکنترلی استفاده می‌کند.",
   "study.setup.savePlan": "ذخیرهٔ برنامه",
-  "study.setup.startNow": "همین حالا شروع کنید"
+  "study.setup.startNow": "همین حالا شروع کنید",
+  "study.end.headline": "{minutes} دقیقه مطالعه. همین هم حساب است.",
+  "study.end.seal": "جلسه تمام شد: {minutes} دقیقه مطالعه در {rounds}.",
+  "study.end.planTomorrow": "برنامهٔ فردا",
+  "study.end.done": "تمام",
+  "study.end.studied": "دقیقه مطالعه",
+  "study.end.rounds.zero": "{count} دور",
+  "study.end.rounds.one": "{count} دور",
+  "study.end.rounds.two": "{count} دور",
+  "study.end.rounds.few": "{count} دور",
+  "study.end.rounds.many": "{count} دور",
+  "study.end.rounds.other": "{count} دور",
+  "study.end.round": "مطالعه، دور {round}",
+  "study.end.minutes": "{minutes} دقیقه"
 }

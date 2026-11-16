@@ -281,6 +281,97 @@
         return { breakStart: pause.start, breakEnd: pause.end, addedMinutes: added, round: before.round, roundMinutes: minutes(pause.end - before.start) };
     }
 
+    // ---- Session ends: the end card (Android StudySessionEnds, StudyRingModel.seal, StudyClock.withSkips) --
+
+    /** An end card older than this isn't news any more: it's dropped unseen. */
+    const SESSION_END_STALE_MS = 18 * 60 * MINUTE;
+    /** Within this of its end, a session that left the clock counts as ended (the alarm wakes late). */
+    const SESSION_CLOSE_SLACK_MS = MINUTE;
+    /** Sessions shorter than this (a mistaken start) get no card. */
+    const SESSION_MIN_STUDIED_MINUTES = 1;
+
+    /** Skipped breaks (their start times) fold into the round before, which runs on to the next round's end. */
+    function withSkips(segments, skippedBreaks) {
+        const skipped = new Set(array(skippedBreaks));
+        if (!skipped.size) return array(segments).slice();
+        const list = array(segments);
+        const out = [];
+        for (let i = 0; i < list.length; i += 1) {
+            const segment = list[i];
+            const last = out[out.length - 1];
+            if (segment.kind === BREAK && skipped.has(segment.start) && last && last.kind === STUDY) {
+                const next = list[i + 1] && list[i + 1].kind === STUDY ? list[i + 1] : null;
+                out[out.length - 1] = { ...last, end: next ? next.end : segment.end, round: next ? next.round : last.round };
+                if (next) i += 1;
+                continue;
+            }
+            out.push(segment);
+        }
+        return out;
+    }
+
+    /** Whole minutes, rounded to the nearest (a 39.6-minute round reads 40). */
+    function roundMinutes(ms) { return Math.floor((ms + 30 * 1000) / MINUTE); }
+
+    /**
+     * The end seal (Android StudyRingModel.seal): the segments clipped to what really happened (a Gentle
+     * end can stop early), trailing breaks dropped. {studiedMinutes, rounds, perRound: [{round, minutes}]}.
+     */
+    function sessionSeal(segments, endedAt) {
+        const clipped = [];
+        for (const segment of array(segments)) {
+            const end = Math.min(segment.end, endedAt);
+            if (end > segment.start) clipped.push({ ...segment, end });
+        }
+        while (clipped.length && clipped[clipped.length - 1].kind === BREAK) clipped.pop();
+        const rounds = clipped.filter(segment => segment.kind === STUDY);
+        const studied = rounds.reduce((sum, segment) => sum + (segment.end - segment.start), 0);
+        const studiedMinutes = roundMinutes(studied);
+        // The rounds with the minutes each one held, out of the rounded total.
+        const perRound = rounds.map(segment => ({ round: segment.round,
+            minutes: studied > 0 ? Math.round(((segment.end - segment.start) / studied) * studiedMinutes) : 0 }))
+            .filter(item => item.minutes > 0);
+        return { studiedMinutes, rounds: rounds.length, perRound };
+    }
+
+    /**
+     * Android StudySessionEnds.step: the open session for `clock` at `now`, and a session that just ended.
+     * open: {start, end, planEnd, roundMinutes, breakMinutes, skipped: [breakStart]}; returns [open, ended],
+     * ended = {start, endedAt, studiedMinutes, rounds, perRound}.
+     */
+    function sessionEndStep(open, clock, focus, skippedBreaks, now) {
+        const value = object(clock);
+        const { round, rest } = focusMinutes(focus);
+        const studying = (value.state === STUDY || value.state === BREAK) && Number.isFinite(value.sessionStart) && Number.isFinite(value.sessionEnd);
+        const skipped = array(skippedBreaks).filter(Number.isFinite);
+        if (studying) {
+            if (open && open.start === value.sessionStart) {
+                return [{ ...open, end: value.sessionEnd, planEnd: Math.max(open.planEnd, value.sessionEnd),
+                    roundMinutes: round, breakMinutes: rest, skipped: [...new Set([...array(open.skipped), ...skipped])] }, null];
+            }
+            // A new session: the previous one (if any) ended where this one began, at the latest.
+            const started = { start: value.sessionStart, end: value.sessionEnd, planEnd: value.sessionEnd, roundMinutes: round, breakMinutes: rest, skipped };
+            return [started, open ? closeSession(open, Math.min(open.end, value.sessionStart)) : null];
+        }
+        if (!open) return [null, null];
+        // A clock hold keeps the lock on; time a parent gave pauses study. Neither ends it before its time.
+        if (now < open.end - SESSION_CLOSE_SLACK_MS) return [open, null];
+        return [null, closeSession(open, Math.min(open.end, now))];
+    }
+
+    function closeSession(open, endedAt) {
+        const segments = withSkips(splitRounds(open.start, open.planEnd, { roundMinutes: open.roundMinutes, breakMinutes: open.breakMinutes }), open.skipped);
+        const seal = sessionSeal(segments, endedAt);
+        if (seal.studiedMinutes < SESSION_MIN_STUDIED_MINUTES) return null;
+        return { start: open.start, endedAt, ...seal };
+    }
+
+    /** The end waiting for its card, or null (none, or too old to be news). */
+    function pendingSessionEnd(ended, now) {
+        if (!ended || !Number.isFinite(ended.endedAt)) return null;
+        return now - ended.endedAt > SESSION_END_STALE_MS ? null : ended;
+    }
+
     /** The study and break segments of one occurrence; the last round is clamped to the end. */
     function splitRounds(start, end, focus) {
         const { round, rest } = focusMinutes(focus);
@@ -1062,6 +1153,7 @@
         parseTime, localDateKey, splitRounds, planOccurrences, studyClock, studyRulesApply, studyPhase,
         SUGGESTION_KINDS, suggest, suggestionSeed, studyTopics, studyAllowPhrases, topicTerms, topicPatterns,
         topicsForQuery, exampleSearches, searchExplainer, topicLabel, breakSkipPreview, SKIP_UNDO_MS,
+        withSkips, sessionSeal, sessionEndStep, pendingSessionEnd, SESSION_END_STALE_MS, SESSION_CLOSE_SLACK_MS,
         packVariant, packLayer, activePackLayers, stampPackCopies, studyEffectiveProfile,
         BRANCH_SOURCE, KIDS_KINDS, KIDS_SPACE, AMBIGUOUS_BRANCH_WORDS,
         packChannelsFor, packTopicsFor, hasSeparateBranches, branchTopics, otherBranchTopics,

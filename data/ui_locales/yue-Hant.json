@@ -3102,5 +3102,18 @@
   "study.setup.lockGentleBody": "停 30 秒之後可以提早完。",
   "study.setup.lockLockedBody": "唔可以提早完，最多 4 個鐘。會用自我控制。",
   "study.setup.savePlan": "儲存計劃",
-  "study.setup.startNow": "即刻開始"
+  "study.setup.startNow": "即刻開始",
+  "study.end.headline": "溫咗 {minutes} 分鐘。 全部都算數。",
+  "study.end.seal": "完成今節：{rounds}，溫咗 {minutes} 分鐘。",
+  "study.end.planTomorrow": "計劃聽日",
+  "study.end.done": "完成",
+  "study.end.studied": "分鐘溫咗",
+  "study.end.rounds.zero": "{count} 輪",
+  "study.end.rounds.one": "{count} 輪",
+  "study.end.rounds.two": "{count} 輪",
+  "study.end.rounds.few": "{count} 輪",
+  "study.end.rounds.many": "{count} 輪",
+  "study.end.rounds.other": "{count} 輪",
+  "study.end.round": "學習，第 {round} 輪",
+  "study.end.minutes": "{minutes} 分鐘"
 }

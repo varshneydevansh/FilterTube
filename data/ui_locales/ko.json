@@ -3102,5 +3102,18 @@
   "study.setup.lockGentleBody": "30초 기다린 뒤 일찍 끝낼 수 있습니다.",
   "study.setup.lockLockedBody": "일찍 끝낼 수 없으며 최대 4시간입니다. 자기 통제를 사용합니다.",
   "study.setup.savePlan": "계획 저장",
-  "study.setup.startNow": "지금 시작"
+  "study.setup.startNow": "지금 시작",
+  "study.end.headline": "{minutes}분 공부했어요. 이것도 소중해요.",
+  "study.end.seal": "세션 완료: {rounds} 동안 {minutes}분 공부.",
+  "study.end.planTomorrow": "내일 계획하기",
+  "study.end.done": "완료",
+  "study.end.studied": "분 공부함",
+  "study.end.rounds.zero": "{count}라운드",
+  "study.end.rounds.one": "{count}라운드",
+  "study.end.rounds.two": "{count}라운드",
+  "study.end.rounds.few": "{count}라운드",
+  "study.end.rounds.many": "{count}라운드",
+  "study.end.rounds.other": "{count}라운드",
+  "study.end.round": "공부, {round}회차",
+  "study.end.minutes": "{minutes}분"
 }

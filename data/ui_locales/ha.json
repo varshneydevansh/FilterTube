@@ -3104,5 +3104,18 @@
   "study.setup.lockGentleBody": "Za ka iya tsayawa da wuri bayan jira na daƙiƙa 30.",
   "study.setup.lockLockedBody": "Babu tsayawa da wuri, har zuwa awa 4. Yana amfani da Kamun Kai.",
   "study.setup.savePlan": "Ajiye shiri",
-  "study.setup.startNow": "Fara yanzu"
+  "study.setup.startNow": "Fara yanzu",
+  "study.end.headline": "An yi karatu min {minutes}. Wannan yana da daraja.",
+  "study.end.seal": "An rufe zama: karatu min {minutes} cikin {rounds}.",
+  "study.end.planTomorrow": "Tsara gobe",
+  "study.end.done": "An gama",
+  "study.end.studied": "min na karatu",
+  "study.end.rounds.zero": "zagaye {count}",
+  "study.end.rounds.one": "zagaye {count}",
+  "study.end.rounds.two": "zagaye {count}",
+  "study.end.rounds.few": "zagaye {count}",
+  "study.end.rounds.many": "zagaye {count}",
+  "study.end.rounds.other": "zagaye {count}",
+  "study.end.round": "Karatu, zagaye {round}",
+  "study.end.minutes": "{minutes} min"
 }

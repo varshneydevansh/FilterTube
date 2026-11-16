@@ -3104,5 +3104,18 @@
   "study.setup.lockGentleBody": "30 సెకన్ల విరామం తర్వాత ముందుగానే ముగించవచ్చు.",
   "study.setup.lockLockedBody": "ముందుగా ముగించలేరు, 4 గంటల వరకు. స్వీయ నియంత్రణను ఉపయోగిస్తుంది.",
   "study.setup.savePlan": "ప్రణాళికను సేవ్ చేయి",
-  "study.setup.startNow": "ఇప్పుడే ప్రారంభించు"
+  "study.setup.startNow": "ఇప్పుడే ప్రారంభించు",
+  "study.end.headline": "{minutes} నిమి చదివారు. ఇది కూడా లెక్కే.",
+  "study.end.seal": "సెషన్ పూర్తి: {rounds} లో {minutes} నిమి చదివారు.",
+  "study.end.planTomorrow": "రేపటి ప్రణాళిక వేయండి",
+  "study.end.done": "పూర్తయింది",
+  "study.end.studied": "నిమి చదివారు",
+  "study.end.rounds.zero": "{count} రౌండ్లు",
+  "study.end.rounds.one": "{count} రౌండ్",
+  "study.end.rounds.two": "{count} రౌండ్లు",
+  "study.end.rounds.few": "{count} రౌండ్లు",
+  "study.end.rounds.many": "{count} రౌండ్లు",
+  "study.end.rounds.other": "{count} రౌండ్లు",
+  "study.end.round": "చదువు, రౌండ్ {round}",
+  "study.end.minutes": "{minutes} నిమి"
 }

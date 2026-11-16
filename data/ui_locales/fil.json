@@ -3104,5 +3104,18 @@
   "study.setup.lockGentleBody": "Puwede kang tumigil nang maaga pagkatapos ng 30 segundong paghinto.",
   "study.setup.lockLockedBody": "Walang maagang pagtigil, hanggang 4 na oras. Gumagamit ng Self-Control.",
   "study.setup.savePlan": "I-save ang plano",
-  "study.setup.startNow": "Simulan ngayon"
+  "study.setup.startNow": "Simulan ngayon",
+  "study.end.headline": "{minutes} min ang napag-aralan. Mahalaga iyan.",
+  "study.end.seal": "Tapos ang session: {minutes} min ng pag-aaral sa {rounds}.",
+  "study.end.planTomorrow": "Iplano ang bukas",
+  "study.end.done": "Tapos na",
+  "study.end.studied": "min napag-aralan",
+  "study.end.rounds.zero": "{count} na round",
+  "study.end.rounds.one": "{count} round",
+  "study.end.rounds.two": "{count} na round",
+  "study.end.rounds.few": "{count} na round",
+  "study.end.rounds.many": "{count} na round",
+  "study.end.rounds.other": "{count} na round",
+  "study.end.round": "Pag-aaral, round {round}",
+  "study.end.minutes": "{minutes} min"
 }

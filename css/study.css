@@ -356,3 +356,26 @@
     .ft-setup-switch, .ft-setup-switch::after, .ft-setup-fold__chevron { transition: none; }
 }
 .ft-setup [hidden] { display: none !important; }
+
+/* ---- The end card (Android StudyFocusActivity end card, StudyDayRingView seal) ----
+ * A scalloped paper seal closed by the rounds' sage arcs; it stamps in (springStamp: from 1.25,
+ * 700 / 0.5) while Kriti jumps beside it. Still with reduced motion. */
+.ft-study-endcard { display: flex; flex-direction: column; align-items: center; gap: 12px; padding: 18px 16px 20px; border: 1.5px solid var(--pk-line, #dcd1c2); border-radius: 20px; background: var(--pk-sage, #edf4e7); box-shadow: 3px 3px 0 var(--pk-ledge, rgba(27, 26, 24, 0.14)); text-align: center; }
+.ft-study-endcard__stage { position: relative; display: flex; align-items: flex-end; justify-content: center; gap: 4px; }
+.ft-study-seal { width: 228px; height: 228px; }
+.ft-study-endcard.is-fresh .ft-study-seal { animation: ft-study-stamp 520ms cubic-bezier(0.3, 1.6, 0.5, 1) both; }
+@keyframes ft-study-stamp { 0% { transform: scale(1.25) rotate(-4deg); opacity: 0; } 60% { opacity: 1; } 100% { transform: none; opacity: 1; } }
+.ft-study-seal__rim { fill: var(--pk-paper, #fffcf6); stroke: var(--pk-sage-ink, #28623f); stroke-width: 2.5; stroke-linejoin: round; }
+.ft-study-seal__arc { fill: none; stroke: var(--pk-sage-ink, #28623f); stroke-width: 24; opacity: 0.85; }
+.ft-study-seal__number { font-family: var(--pk-font-hand, inherit); font-size: 44px; font-weight: 600; text-anchor: middle; fill: var(--pk-ink, #1b1a18); }
+.ft-study-seal__label { font-size: 13px; text-anchor: middle; fill: var(--pk-muted, #625f58); }
+.ft-study-endcard__kriti { margin-inline-start: -28px; object-fit: contain; }
+.ft-study-endcard__headline { margin: 0; font-family: var(--pk-font-hand, inherit); font-size: 1.8rem; font-weight: 400; line-height: 1.15; color: var(--pk-ink, inherit); }
+.ft-study-endcard__rounds { width: min(100%, 420px); padding: 2px 16px; border: 1.5px solid var(--pk-line, #dcd1c2); border-radius: 20px; background: var(--pk-paper, #fffcf6); }
+.ft-study-endcard__round { display: flex; align-items: center; gap: 12px; min-height: 48px; text-align: start; }
+.ft-study-endcard__round + .ft-study-endcard__round { border-top: 1px solid var(--pk-line, #dcd1c2); }
+.ft-study-endcard__round > span:nth-child(2) { flex: 1; }
+.ft-study-endcard__bead { width: 14px; height: 14px; border-radius: 50%; background: var(--pk-sage-ink, #28623f); }
+.ft-study-endcard__actions { display: flex; flex-direction: column; align-items: center; gap: 4px; width: min(100%, 420px); }
+.ft-study-endcard__actions .btn-primary { width: 100%; }
+@media (prefers-reduced-motion: reduce) { .ft-study-endcard.is-fresh .ft-study-seal { animation: none; } }

@@ -3104,5 +3104,18 @@
   "study.setup.lockGentleBody": "30 સેકન્ડના વિરામ પછી તમે વહેલું પૂરું કરી શકો છો.",
   "study.setup.lockLockedBody": "વહેલું પૂરું નહીં, 4 કલાક સુધી. સ્વ-નિયંત્રણ વાપરે છે.",
   "study.setup.savePlan": "યોજના સાચવો",
-  "study.setup.startNow": "હમણાં શરૂ કરો"
+  "study.setup.startNow": "હમણાં શરૂ કરો",
+  "study.end.headline": "{minutes} મિનિટ અભ્યાસ થયો. એ પણ ગણાય.",
+  "study.end.seal": "સત્ર પૂરું: {rounds} માં {minutes} મિનિટ અભ્યાસ.",
+  "study.end.planTomorrow": "આવતીકાલની યોજના કરો",
+  "study.end.done": "થઈ ગયું",
+  "study.end.studied": "મિનિટ અભ્યાસ",
+  "study.end.rounds.zero": "{count} રાઉન્ડ",
+  "study.end.rounds.one": "{count} રાઉન્ડ",
+  "study.end.rounds.two": "{count} રાઉન્ડ",
+  "study.end.rounds.few": "{count} રાઉન્ડ",
+  "study.end.rounds.many": "{count} રાઉન્ડ",
+  "study.end.rounds.other": "{count} રાઉન્ડ",
+  "study.end.round": "અભ્યાસ, રાઉન્ડ {round}",
+  "study.end.minutes": "{minutes} મિનિટ"
 }

@@ -3104,5 +3104,18 @@
   "study.setup.lockGentleBody": "30 saniyelik bir beklemeden sonra erken bitirebilirsin.",
   "study.setup.lockLockedBody": "Erken bitirme yok, en fazla 4 saat. Kendi Kendini Denetleme kullanır.",
   "study.setup.savePlan": "Planı kaydet",
-  "study.setup.startNow": "Şimdi başla"
+  "study.setup.startNow": "Şimdi başla",
+  "study.end.headline": "{minutes} dk çalıştın. Bu da sayılır.",
+  "study.end.seal": "Oturum tamamlandı: {rounds} içinde {minutes} dk çalışıldı.",
+  "study.end.planTomorrow": "Yarını planla",
+  "study.end.done": "Tamam",
+  "study.end.studied": "dk çalışıldı",
+  "study.end.rounds.zero": "{count} tur",
+  "study.end.rounds.one": "{count} tur",
+  "study.end.rounds.two": "{count} tur",
+  "study.end.rounds.few": "{count} tur",
+  "study.end.rounds.many": "{count} tur",
+  "study.end.rounds.other": "{count} tur",
+  "study.end.round": "Ders, {round}. tur",
+  "study.end.minutes": "{minutes} dk"
 }

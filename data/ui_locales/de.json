@@ -3104,5 +3104,18 @@
   "study.setup.lockGentleBody": "Du kannst nach 30 Sekunden Pause früher aufhören.",
   "study.setup.lockLockedBody": "Kein früheres Ende, bis zu 4 Stunden. Nutzt Selbstkontrolle.",
   "study.setup.savePlan": "Plan speichern",
-  "study.setup.startNow": "Jetzt starten"
+  "study.setup.startNow": "Jetzt starten",
+  "study.end.headline": "{minutes} Min. gelernt. Das zählt.",
+  "study.end.seal": "Sitzung abgeschlossen: {minutes} Min. gelernt in {rounds}.",
+  "study.end.planTomorrow": "Morgen planen",
+  "study.end.done": "Fertig",
+  "study.end.studied": "Min. gelernt",
+  "study.end.rounds.zero": "{count} Runden",
+  "study.end.rounds.one": "{count} Runde",
+  "study.end.rounds.two": "{count} Runden",
+  "study.end.rounds.few": "{count} Runden",
+  "study.end.rounds.many": "{count} Runden",
+  "study.end.rounds.other": "{count} Runden",
+  "study.end.round": "Lernen, Runde {round}",
+  "study.end.minutes": "{minutes} Min."
 }

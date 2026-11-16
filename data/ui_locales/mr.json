@@ -3104,5 +3104,18 @@
   "study.setup.lockGentleBody": "30 सेकंदांच्या विरामानंतर तुम्ही लवकर संपवू शकता.",
   "study.setup.lockLockedBody": "लवकर संपवता येत नाही, 4 तासांपर्यंत. स्व-नियंत्रण वापरते.",
   "study.setup.savePlan": "योजना जतन करा",
-  "study.setup.startNow": "आता सुरू करा"
+  "study.setup.startNow": "आता सुरू करा",
+  "study.end.headline": "{minutes} मि अभ्यास झाला. हेही महत्त्वाचं आहे.",
+  "study.end.seal": "सत्र पूर्ण: {rounds} मध्ये {minutes} मि अभ्यास.",
+  "study.end.planTomorrow": "उद्याची योजना करा",
+  "study.end.done": "झालं",
+  "study.end.studied": "मि अभ्यास",
+  "study.end.rounds.zero": "{count} फेऱ्या",
+  "study.end.rounds.one": "{count} फेरी",
+  "study.end.rounds.two": "{count} फेऱ्या",
+  "study.end.rounds.few": "{count} फेऱ्या",
+  "study.end.rounds.many": "{count} फेऱ्या",
+  "study.end.rounds.other": "{count} फेऱ्या",
+  "study.end.round": "अभ्यास, फेरी {round}",
+  "study.end.minutes": "{minutes} मि"
 }

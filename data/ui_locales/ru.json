@@ -3116,5 +3116,18 @@
   "study.setup.lockGentleBody": "Можно закончить раньше после паузы в 30 секунд.",
   "study.setup.lockLockedBody": "Без раннего завершения, до 4 часов. Использует Самоконтроль.",
   "study.setup.savePlan": "Сохранить план",
-  "study.setup.startNow": "Начать сейчас"
+  "study.setup.startNow": "Начать сейчас",
+  "study.end.headline": "{minutes} мин учёбы. Это считается.",
+  "study.end.seal": "Сессия завершена: {minutes} мин учёбы за {rounds}.",
+  "study.end.planTomorrow": "Спланировать завтра",
+  "study.end.done": "Готово",
+  "study.end.studied": "мин учёбы",
+  "study.end.rounds.zero": "{count} раунда",
+  "study.end.rounds.one": "{count} раунд",
+  "study.end.rounds.two": "{count} раунда",
+  "study.end.rounds.few": "{count} раунда",
+  "study.end.rounds.many": "{count} раундов",
+  "study.end.rounds.other": "{count} раунда",
+  "study.end.round": "Учёба, раунд {round}",
+  "study.end.minutes": "{minutes} мин"
 }

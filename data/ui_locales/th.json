@@ -3102,5 +3102,18 @@
   "study.setup.lockGentleBody": "จบก่อนได้หลังรอ 30 วินาที",
   "study.setup.lockLockedBody": "จบก่อนไม่ได้ นานสุด 4 ชั่วโมง ใช้การควบคุมตนเอง",
   "study.setup.savePlan": "บันทึกแผน",
-  "study.setup.startNow": "เริ่มเลย"
+  "study.setup.startNow": "เริ่มเลย",
+  "study.end.headline": "เรียนไป {minutes} นาที นับว่ามีค่าแล้ว",
+  "study.end.seal": "จบรอบเรียน: เรียน {minutes} นาทีใน {rounds}",
+  "study.end.planTomorrow": "วางแผนพรุ่งนี้",
+  "study.end.done": "เสร็จ",
+  "study.end.studied": "นาทีที่เรียนแล้ว",
+  "study.end.rounds.zero": "{count} รอบ",
+  "study.end.rounds.one": "{count} รอบ",
+  "study.end.rounds.two": "{count} รอบ",
+  "study.end.rounds.few": "{count} รอบ",
+  "study.end.rounds.many": "{count} รอบ",
+  "study.end.rounds.other": "{count} รอบ",
+  "study.end.round": "เรียน รอบที่ {round}",
+  "study.end.minutes": "{minutes} นาที"
 }

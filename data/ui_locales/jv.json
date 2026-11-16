@@ -3102,5 +3102,18 @@
   "study.setup.lockGentleBody": "Sampeyan bisa mungkasi luwih awal sawise ngenteni 30 detik.",
   "study.setup.lockLockedBody": "Ora bisa mungkasi luwih awal, nganti 4 jam. Nganggo Kontrol Dhiri.",
   "study.setup.savePlan": "Simpen rencana",
-  "study.setup.startNow": "Wiwit saiki"
+  "study.setup.startNow": "Wiwit saiki",
+  "study.end.headline": "{minutes} menit sinau. Kuwi ana regane.",
+  "study.end.seal": "Sesi rampung: {minutes} menit sinau ing {rounds}.",
+  "study.end.planTomorrow": "Rencanakna sesuk",
+  "study.end.done": "Rampung",
+  "study.end.studied": "menit sinau",
+  "study.end.rounds.zero": "{count} babak",
+  "study.end.rounds.one": "{count} babak",
+  "study.end.rounds.two": "{count} babak",
+  "study.end.rounds.few": "{count} babak",
+  "study.end.rounds.many": "{count} babak",
+  "study.end.rounds.other": "{count} babak",
+  "study.end.round": "Sinau, babak {round}",
+  "study.end.minutes": "{minutes} menit"
 }

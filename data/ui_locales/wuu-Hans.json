@@ -3102,5 +3102,18 @@
   "study.setup.lockGentleBody": "停 30 秒以后好提早结束。",
   "study.setup.lockLockedBody": "勿好提早结束，最多 4 个钟头。用自我控制。",
   "study.setup.savePlan": "保存计划",
-  "study.setup.startNow": "现在开始"
+  "study.setup.startNow": "现在开始",
+  "study.end.headline": "学了 {minutes} 分钟。 搿也算数个。",
+  "study.end.seal": "搿趟结束：{rounds}，学了 {minutes} 分钟。",
+  "study.end.planTomorrow": "计划明朝",
+  "study.end.done": "好了",
+  "study.end.studied": "分钟已经学",
+  "study.end.rounds.zero": "{count} 轮",
+  "study.end.rounds.one": "{count} 轮",
+  "study.end.rounds.two": "{count} 轮",
+  "study.end.rounds.few": "{count} 轮",
+  "study.end.rounds.many": "{count} 轮",
+  "study.end.rounds.other": "{count} 轮",
+  "study.end.round": "学习，第 {round} 轮",
+  "study.end.minutes": "{minutes} 分钟"
 }

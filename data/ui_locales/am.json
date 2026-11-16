@@ -3104,5 +3104,18 @@
   "study.setup.lockGentleBody": "ከ30 ሰከንድ ቆይታ በኋላ ቀድመህ ማቆም ትችላለህ።",
   "study.setup.lockLockedBody": "ቀድሞ ማቆም የለም፣ እስከ 4 ሰዓት። ራስ-ቁጥጥርን ይጠቀማል።",
   "study.setup.savePlan": "ዕቅድ አስቀምጥ",
-  "study.setup.startNow": "አሁን ጀምር"
+  "study.setup.startNow": "አሁን ጀምር",
+  "study.end.headline": "{minutes} ደቂቃ ተጠንቷል። ይህም ይቆጠራል።",
+  "study.end.seal": "ክፍለ ጊዜ ተጠናቀቀ፦ በ{rounds} {minutes} ደቂቃ ጥናት።",
+  "study.end.planTomorrow": "ነገን አቅድ",
+  "study.end.done": "ተጠናቋል",
+  "study.end.studied": "ደቂቃ ተጠንቷል",
+  "study.end.rounds.zero": "{count} ዙሮች",
+  "study.end.rounds.one": "{count} ዙር",
+  "study.end.rounds.two": "{count} ዙሮች",
+  "study.end.rounds.few": "{count} ዙሮች",
+  "study.end.rounds.many": "{count} ዙሮች",
+  "study.end.rounds.other": "{count} ዙሮች",
+  "study.end.round": "ጥናት፣ ዙር {round}",
+  "study.end.minutes": "{minutes} ደቂቃ"
 }

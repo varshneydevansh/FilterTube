@@ -3104,5 +3104,18 @@
   "study.setup.lockGentleBody": "You can end early after a 30-second pause.",
   "study.setup.lockLockedBody": "No early end, up to 4 hours. Uses Self-Control.",
   "study.setup.savePlan": "Save plan",
-  "study.setup.startNow": "Start now"
+  "study.setup.startNow": "Start now",
+  "study.end.headline": "{minutes} min studied. That counts.",
+  "study.end.seal": "Session sealed: {minutes} min studied in {rounds}.",
+  "study.end.planTomorrow": "Plan tomorrow",
+  "study.end.done": "Done",
+  "study.end.studied": "min studied",
+  "study.end.rounds.zero": "{count} rounds",
+  "study.end.rounds.one": "{count} round",
+  "study.end.rounds.two": "{count} rounds",
+  "study.end.rounds.few": "{count} rounds",
+  "study.end.rounds.many": "{count} rounds",
+  "study.end.rounds.other": "{count} rounds",
+  "study.end.round": "Study, round {round}",
+  "study.end.minutes": "{minutes} min"
 }

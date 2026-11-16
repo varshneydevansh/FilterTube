@@ -3104,5 +3104,18 @@
   "study.setup.lockGentleBody": "৩০ সেকেন্ড বিরতির পরে আগে শেষ করতে পারবেন।",
   "study.setup.lockLockedBody": "আগে শেষ করা যাবে না, সর্বোচ্চ ৪ ঘণ্টা। আত্মনিয়ন্ত্রণ ব্যবহার করে।",
   "study.setup.savePlan": "পরিকল্পনা সংরক্ষণ করুন",
-  "study.setup.startNow": "এখনই শুরু করুন"
+  "study.setup.startNow": "এখনই শুরু করুন",
+  "study.end.headline": "{minutes} মিনিট পড়া হয়েছে. এটাও গোনা হয়.",
+  "study.end.seal": "সেশন শেষ: {rounds}-এ {minutes} মিনিট পড়া.",
+  "study.end.planTomorrow": "কালকের পরিকল্পনা করো",
+  "study.end.done": "হয়ে গেছে",
+  "study.end.studied": "মিনিট পড়া হয়েছে",
+  "study.end.rounds.zero": "{count} রাউন্ড",
+  "study.end.rounds.one": "{count} রাউন্ড",
+  "study.end.rounds.two": "{count} রাউন্ড",
+  "study.end.rounds.few": "{count} রাউন্ড",
+  "study.end.rounds.many": "{count} রাউন্ড",
+  "study.end.rounds.other": "{count} রাউন্ড",
+  "study.end.round": "পড়া, রাউন্ড {round}",
+  "study.end.minutes": "{minutes} মিনিট"
 }

@@ -3102,5 +3102,18 @@
   "study.setup.lockGentleBody": "Anda bisa berhenti lebih awal setelah jeda 30 detik.",
   "study.setup.lockLockedBody": "Tidak bisa berhenti lebih awal, hingga 4 jam. Memakai Kontrol Diri.",
   "study.setup.savePlan": "Simpan rencana",
-  "study.setup.startNow": "Mulai sekarang"
+  "study.setup.startNow": "Mulai sekarang",
+  "study.end.headline": "{minutes} mnt belajar. Itu berarti.",
+  "study.end.seal": "Sesi selesai: {minutes} mnt belajar dalam {rounds}.",
+  "study.end.planTomorrow": "Rencanakan besok",
+  "study.end.done": "Selesai",
+  "study.end.studied": "mnt belajar",
+  "study.end.rounds.zero": "{count} ronde",
+  "study.end.rounds.one": "{count} ronde",
+  "study.end.rounds.two": "{count} ronde",
+  "study.end.rounds.few": "{count} ronde",
+  "study.end.rounds.many": "{count} ronde",
+  "study.end.rounds.other": "{count} ronde",
+  "study.end.round": "Belajar, putaran {round}",
+  "study.end.minutes": "{minutes} mnt"
 }

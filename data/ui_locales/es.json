@@ -3104,5 +3104,18 @@
   "study.setup.lockGentleBody": "Puedes terminar antes tras una pausa de 30 segundos.",
   "study.setup.lockLockedBody": "Sin final anticipado, hasta 4 horas. Usa Autocontrol.",
   "study.setup.savePlan": "Guardar plan",
-  "study.setup.startNow": "Empezar ahora"
+  "study.setup.startNow": "Empezar ahora",
+  "study.end.headline": "{minutes} min estudiados. Cuenta.",
+  "study.end.seal": "Sesión cerrada: {minutes} min estudiados en {rounds}.",
+  "study.end.planTomorrow": "Planear mañana",
+  "study.end.done": "Listo",
+  "study.end.studied": "min estudiados",
+  "study.end.rounds.zero": "{count} rondas",
+  "study.end.rounds.one": "{count} ronda",
+  "study.end.rounds.two": "{count} rondas",
+  "study.end.rounds.few": "{count} rondas",
+  "study.end.rounds.many": "{count} rondas",
+  "study.end.rounds.other": "{count} rondas",
+  "study.end.round": "Estudio, ronda {round}",
+  "study.end.minutes": "{minutes} min"
 }
