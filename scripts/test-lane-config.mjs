@@ -187,6 +187,7 @@ const STUDY_TESTS = Object.freeze([
   'tests/runtime/study-backup-roundtrip.test.mjs',
   'tests/runtime/study-personal-sync.test.mjs',
   'tests/runtime/study-family-scopes.test.mjs',
+  'tests/runtime/study-scope-routes.test.mjs',
   'tests/runtime/study-packs-catalog.test.mjs',
   'tests/runtime/study-layered-rules.test.mjs',
   'tests/runtime/study-engine-clock.test.mjs',
