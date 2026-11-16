@@ -2871,5 +2871,12 @@
   "welcome.two.body": "Magdagdag ng channel o salita at mawawala ito sa Home, Maghanap, Clips at Panoorin. May sariling espasyo at sariling patakaran ang Mga bata.",
   "welcome.three.title": "Libre, at mananatiling libre",
   "welcome.next": "Susunod",
-  "welcome.back": "Bumalik"
+  "welcome.back": "Bumalik",
+  "study.switch.end": "Tapusin at magpalit",
+  "study.switch.keep": "Ituloy ang pag-aaral",
+  "study.switch.ending": "Matatapos ang session mo sa loob ng 30 segundo. Pagkatapos, magpapalit ang profile.",
+  "study.parent.unlockTitle": "Mga kontrol ng magulang",
+  "study.parent.unlockBody": "Protektado ng PIN ang profile na ito. Ilagay ang PIN nito para magpatuloy.",
+  "study.parent.enterPin": "Ilagay ang PIN",
+  "study.parent.unlock": "I-unlock"
 }

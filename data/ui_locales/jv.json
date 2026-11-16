@@ -2869,5 +2869,12 @@
   "welcome.two.body": "Tambahna channel utawa tembung, banjur ilang saka Beranda, Golèk, Klip, lan Nonton. Bocah duwe papan dhewe kanthi aturan dhewe.",
   "welcome.three.title": "Gratis, lan tetep gratis",
   "welcome.next": "Sabanjure",
-  "welcome.back": "Bali"
+  "welcome.back": "Bali",
+  "study.switch.end": "Rampungake lan ganti",
+  "study.switch.keep": "Terusake sinau",
+  "study.switch.ending": "Sesi sampeyan rampung sajrone 30 detik. Banjur profil diganti.",
+  "study.parent.unlockTitle": "Kontrol wong tuwa",
+  "study.parent.unlockBody": "Profil iki dilindhungi nganggo PIN. Lebokake PIN-ne kanggo nerusake.",
+  "study.parent.enterPin": "Lebokake PIN",
+  "study.parent.unlock": "Bukak"
 }

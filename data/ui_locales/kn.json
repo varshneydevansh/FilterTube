@@ -2871,5 +2871,12 @@
   "welcome.two.body": "ಚಾನಲ್ ಅಥವಾ ಪದ ಸೇರಿಸಿದರೆ ಅದು ಮುಖಪುಟ, ಹುಡುಕಿ, ಕ್ಲಿಪ್‌ಗಳು ಮತ್ತು ನೋಡಿ ನಿಂದ ಮಾಯವಾಗುತ್ತದೆ. ಮಕ್ಕಳು ಗೆ ತನ್ನದೇ ಸ್ಥಳ ಮತ್ತು ತನ್ನದೇ ನಿಯಮಗಳಿವೆ.",
   "welcome.three.title": "ಉಚಿತ, ಮತ್ತು ಉಚಿತವಾಗಿಯೇ ಇರುತ್ತದೆ",
   "welcome.next": "ಮುಂದೆ",
-  "welcome.back": "ಹಿಂದೆ"
+  "welcome.back": "ಹಿಂದೆ",
+  "study.switch.end": "ಮುಗಿಸಿ ಬದಲಿಸಿ",
+  "study.switch.keep": "ಅಧ್ಯಯನ ಮುಂದುವರಿಸಿ",
+  "study.switch.ending": "ನಿಮ್ಮ ಅವಧಿ 30 ಸೆಕೆಂಡುಗಳಲ್ಲಿ ಮುಗಿಯುತ್ತದೆ. ನಂತರ ಪ್ರೊಫೈಲ್ ಬದಲಾಗುತ್ತದೆ.",
+  "study.parent.unlockTitle": "ಪೋಷಕರ ನಿಯಂತ್ರಣಗಳು",
+  "study.parent.unlockBody": "ಈ ಪ್ರೊಫೈಲ್ PIN ಮೂಲಕ ರಕ್ಷಿತವಾಗಿದೆ. ಮುಂದುವರಿಯಲು ಅದರ PIN ನಮೂದಿಸಿ.",
+  "study.parent.enterPin": "PIN ನಮೂದಿಸಿ",
+  "study.parent.unlock": "ಅನ್‌ಲಾಕ್ ಮಾಡಿ"
 }

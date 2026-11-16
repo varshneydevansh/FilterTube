@@ -2871,5 +2871,12 @@
   "welcome.two.body": "Add channel or word and e go comot from Home, Search, Clips and Watch. Kids get im own space with im own rules.",
   "welcome.three.title": "E free, and e go stay free",
   "welcome.next": "Next",
-  "welcome.back": "Back"
+  "welcome.back": "Back",
+  "study.switch.end": "End am and change",
+  "study.switch.keep": "Continue to study",
+  "study.switch.ending": "Your session go end in 30 seconds. Then the profile go change.",
+  "study.parent.unlockTitle": "Parent controls",
+  "study.parent.unlockBody": "Dem protect this profile with PIN. Enter im PIN to continue.",
+  "study.parent.enterPin": "Enter PIN",
+  "study.parent.unlock": "Open"
 }

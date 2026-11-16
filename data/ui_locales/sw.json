@@ -2871,5 +2871,12 @@
   "welcome.two.body": "Ongeza kituo au neno na kitatoweka kwenye Mwanzo, Tafuta, Klipu na Tazama. Watoto ina nafasi yake na sheria zake.",
   "welcome.three.title": "Bure, na itabaki bure",
   "welcome.next": "Endelea",
-  "welcome.back": "Rudi"
+  "welcome.back": "Rudi",
+  "study.switch.end": "Maliza na ubadilishe",
+  "study.switch.keep": "Endelea kusoma",
+  "study.switch.ending": "Kipindi chako kitaisha baada ya sekunde 30. Kisha wasifu utabadilika.",
+  "study.parent.unlockTitle": "Udhibiti wa wazazi",
+  "study.parent.unlockBody": "Wasifu huu umelindwa kwa PIN. Weka PIN yake ili uendelee.",
+  "study.parent.enterPin": "Weka PIN",
+  "study.parent.unlock": "Fungua"
 }

@@ -2869,5 +2869,12 @@
   "welcome.two.body": "Ṣàfikún ikanni tàbí ọ̀rọ̀, yóò sì pòórá kúrò ní Ojú ìbẹ̀rẹ̀, Ìwádìí, Fídíò kúkúrú àti Wíwò. Àwọn ọmọ ní àyè tirẹ̀ pẹ̀lú òfin tirẹ̀.",
   "welcome.three.title": "Ọ̀fẹ́ ni, yóò sì máa jẹ́ ọ̀fẹ́",
   "welcome.next": "Tókàn",
-  "welcome.back": "Padà"
+  "welcome.back": "Padà",
+  "study.switch.end": "Parí kí o sì yí padà",
+  "study.switch.keep": "Tẹ̀síwájú ní kíkọ́",
+  "study.switch.ending": "Ìgbà rẹ yóò parí láàrín ìṣẹ́jú-àáyá 30. Lẹ́yìn náà profaili yóò yí padà.",
+  "study.parent.unlockTitle": "Ìṣàkóso òbí",
+  "study.parent.unlockBody": "A dáàbò bo profaili yìí pẹ̀lú PIN. Tẹ PIN rẹ̀ sílẹ̀ láti tẹ̀ síwájú.",
+  "study.parent.enterPin": "Tẹ PIN sílẹ̀",
+  "study.parent.unlock": "Ṣí i"
 }

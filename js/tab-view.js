@@ -28847,7 +28847,22 @@ document.addEventListener('DOMContentLoaded', async () => {
             return false;
         }
         if (decision.kind === 'end_gentle_first') {
-            UIComponents.showToast(tabViewUiText('study.switch.gentleBody', 'Your study session ends first. You can still cancel during a 30-second pause.'), 'info');
+            // Android StudySwitchGate: "End and switch" ends the session after its 30-second pause,
+            // then switches. The other profile's own PIN is typed now; the background switches later.
+            const endAndSwitch = await showConfirmModal({
+                title: tabViewUiText('study.switch.gentleTitle', 'Switch profile?'),
+                message: tabViewUiText('study.switch.gentleBody', 'Your study session ends first. You can still cancel during a 30-second pause.'),
+                confirmText: tabViewUiText('study.switch.end', 'End and switch'),
+                cancelText: tabViewUiText('study.switch.keep', 'Keep studying')
+            });
+            if (!endAndSwitch) return false;
+            const io = window.FilterTubeIO || {};
+            const profilesV4 = typeof io.loadProfilesV4 === 'function' ? await io.loadProfilesV4() : null;
+            if (!profilesV4 || !(await ensureProfileUnlocked(profilesV4, targetId))) return false;
+            const ending = await sendRuntimeMessage({ action: 'FilterTube_StudyEndGentleThenSwitch', targetProfileId: targetId });
+            UIComponents.showToast(ending?.ok
+                ? tabViewUiText('study.switch.ending', 'Your session ends in 30 seconds. The profile switches then.')
+                : tabViewUiText('study.error.generic', 'That didn\'t save. Try again.'), ending?.ok ? 'info' : 'error');
             return false;
         }
         UIComponents.showToast(timeLabel

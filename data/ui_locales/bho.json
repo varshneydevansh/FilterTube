@@ -2871,5 +2871,12 @@
   "welcome.two.body": "कवनो चैनल भा शब्द जोड़ीं, ऊ मुख्य पन्ना, खोज, क्लिप आ वीडियो देखल से गायब हो जाला। बच्चा के आपन जगह आ आपन नियम बा।",
   "welcome.three.title": "मुफ़्त, आ मुफ़्त रही",
   "welcome.next": "अगिला",
-  "welcome.back": "पीछे"
+  "welcome.back": "पीछे",
+  "study.switch.end": "खतम करीं आ बदलीं",
+  "study.switch.keep": "पढ़ाई जारी राखीं",
+  "study.switch.ending": "रउरा सत्र 30 सेकंड में खतम होई। ओकरा बाद प्रोफ़ाइल बदल जाई।",
+  "study.parent.unlockTitle": "अभिभावक के नियंत्रण",
+  "study.parent.unlockBody": "ई प्रोफ़ाइल PIN से सुरक्षित बा। आगे बढ़े खातिर एकर PIN डालीं।",
+  "study.parent.enterPin": "PIN डालीं",
+  "study.parent.unlock": "अनलॉक करीं"
 }

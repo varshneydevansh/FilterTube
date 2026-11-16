@@ -2871,5 +2871,12 @@
   "welcome.two.body": "एखादे चॅनल किंवा शब्द जोडा, ते होम, शोधा, क्लिप्स आणि पहा मधून नाहीसे होते. मुलांसाठी ला स्वतःची जागा आणि स्वतःचे नियम आहेत.",
   "welcome.three.title": "मोफत, आणि मोफतच राहील",
   "welcome.next": "पुढे",
-  "welcome.back": "मागे"
+  "welcome.back": "मागे",
+  "study.switch.end": "संपवा आणि बदला",
+  "study.switch.keep": "अभ्यास सुरू ठेवा",
+  "study.switch.ending": "तुमचे सत्र 30 सेकंदांत संपेल. त्यानंतर प्रोफाइल बदलेल.",
+  "study.parent.unlockTitle": "पालक नियंत्रणे",
+  "study.parent.unlockBody": "ही प्रोफाइल PIN ने संरक्षित आहे. पुढे जाण्यासाठी तिचा PIN प्रविष्ट करा.",
+  "study.parent.enterPin": "PIN प्रविष्ट करा",
+  "study.parent.unlock": "अनलॉक करा"
 }

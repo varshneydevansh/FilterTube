@@ -2871,5 +2871,12 @@
   "welcome.two.body": "একটি চ্যানেল বা শব্দ যোগ করুন, সেটি হোম, খুঁজুন, ক্লিপ এবং দেখুন থেকে সরে যাবে। Kids-এর নিজস্ব জায়গা ও নিজস্ব নিয়ম আছে।",
   "welcome.three.title": "বিনামূল্যে, আর বিনামূল্যেই থাকবে",
   "welcome.next": "পরবর্তী",
-  "welcome.back": "পিছনে"
+  "welcome.back": "পিছনে",
+  "study.switch.end": "শেষ করে বদলান",
+  "study.switch.keep": "পড়া চালিয়ে যান",
+  "study.switch.ending": "আপনার সেশন ৩০ সেকেন্ডে শেষ হবে। তারপর প্রোফাইল বদলাবে।",
+  "study.parent.unlockTitle": "অভিভাবক নিয়ন্ত্রণ",
+  "study.parent.unlockBody": "এই প্রোফাইল PIN দিয়ে সুরক্ষিত। চালিয়ে যেতে এর PIN লিখুন।",
+  "study.parent.enterPin": "PIN লিখুন",
+  "study.parent.unlock": "আনলক করুন"
 }

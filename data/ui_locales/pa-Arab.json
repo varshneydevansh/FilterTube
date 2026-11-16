@@ -2871,5 +2871,12 @@
   "welcome.two.body": "کوئی چینل یا لفظ شامل کرو تے اوہ ہوم، کھوج، کلپاں تے ویکھنا توں غائب ہو جاندا اے۔ بچے دی اپنی تھاں تے اپنے اصول نیں۔",
   "welcome.three.title": "مفت، تے مفت ای رہوے گا",
   "welcome.next": "اگے",
-  "welcome.back": "پچھے"
+  "welcome.back": "پچھے",
+  "study.switch.end": "مُکاؤ تے بدلو",
+  "study.switch.keep": "پڑھائی جاری رکھو",
+  "study.switch.ending": "تہاڈا سیشن 30 سیکنڈ وچ مُکے گا۔ فیر پروفائل بدل جاوے گا۔",
+  "study.parent.unlockTitle": "والدین دے کنٹرول",
+  "study.parent.unlockBody": "ایہ پروفائل PIN نال محفوظ اے۔ اگے ودھن لئی ایہدا PIN درج کرو۔",
+  "study.parent.enterPin": "PIN درج کرو",
+  "study.parent.unlock": "ان لاک کرو"
 }

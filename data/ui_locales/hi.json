@@ -2871,5 +2871,12 @@
   "welcome.two.body": "कोई चैनल या शब्द जोड़ें, वह होम, खोजें, क्लिप और देखें से गायब हो जाता है। Kids की अपनी जगह और अपने नियम हैं।",
   "welcome.three.title": "मुफ़्त, और मुफ़्त ही रहेगा",
   "welcome.next": "अगला",
-  "welcome.back": "वापस"
+  "welcome.back": "वापस",
+  "study.switch.end": "खत्म करें और बदलें",
+  "study.switch.keep": "पढ़ाई जारी रखें",
+  "study.switch.ending": "आपका सत्र 30 सेकंड में खत्म होगा। उसके बाद प्रोफ़ाइल बदल जाएगा।",
+  "study.parent.unlockTitle": "अभिभावक नियंत्रण",
+  "study.parent.unlockBody": "यह प्रोफ़ाइल PIN से सुरक्षित है। जारी रखने के लिए इसका PIN दर्ज करें।",
+  "study.parent.enterPin": "PIN दर्ज करें",
+  "study.parent.unlock": "अनलॉक करें"
 }

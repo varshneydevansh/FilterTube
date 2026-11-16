@@ -2869,5 +2869,12 @@
   "welcome.two.body": "Thêm một kênh hoặc từ khóa, nó sẽ biến mất khỏi Trang chủ, Tìm kiếm, Video ngắn và Xem. Trẻ em có không gian riêng với quy tắc riêng.",
   "welcome.three.title": "Miễn phí và sẽ luôn miễn phí",
   "welcome.next": "Tiếp theo",
-  "welcome.back": "Quay lại"
+  "welcome.back": "Quay lại",
+  "study.switch.end": "Kết thúc và đổi",
+  "study.switch.keep": "Tiếp tục học",
+  "study.switch.ending": "Phiên của bạn sẽ kết thúc sau 30 giây. Sau đó hồ sơ sẽ đổi.",
+  "study.parent.unlockTitle": "Quyền kiểm soát của phụ huynh",
+  "study.parent.unlockBody": "Hồ sơ này được bảo vệ bằng PIN. Nhập PIN của hồ sơ để tiếp tục.",
+  "study.parent.enterPin": "Nhập PIN",
+  "study.parent.unlock": "Mở khóa"
 }

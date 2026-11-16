@@ -2871,5 +2871,12 @@
   "welcome.two.body": "Add a channel or word and it disappears from Home, Search, Clips and Watch. Kids gets its own space with its own rules.",
   "welcome.three.title": "Free, and it stays free",
   "welcome.next": "Next",
-  "welcome.back": "Back"
+  "welcome.back": "Back",
+  "study.switch.end": "End and switch",
+  "study.switch.keep": "Keep studying",
+  "study.switch.ending": "Your session ends in 30 seconds. The profile switches then.",
+  "study.parent.unlockTitle": "Parent Controls",
+  "study.parent.unlockBody": "This profile is PIN-protected. Enter its PIN to continue.",
+  "study.parent.enterPin": "Enter PIN",
+  "study.parent.unlock": "Unlock"
 }

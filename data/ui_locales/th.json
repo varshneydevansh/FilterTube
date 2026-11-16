@@ -2869,5 +2869,12 @@
   "welcome.two.body": "เพิ่มช่องหรือคำ แล้วจะหายไปจากหน้าแรก ค้นหา คลิปสั้น และดู ส่วนเด็กมีพื้นที่และกฎของตัวเอง",
   "welcome.three.title": "ฟรี และจะฟรีตลอดไป",
   "welcome.next": "ถัดไป",
-  "welcome.back": "ย้อนกลับ"
+  "welcome.back": "ย้อนกลับ",
+  "study.switch.end": "จบแล้วสลับ",
+  "study.switch.keep": "เรียนต่อ",
+  "study.switch.ending": "รอบของคุณจะจบใน 30 วินาที จากนั้นโปรไฟล์จะสลับ",
+  "study.parent.unlockTitle": "การควบคุมโดยผู้ปกครอง",
+  "study.parent.unlockBody": "โปรไฟล์นี้ได้รับการป้องกันด้วย PIN ป้อน PIN ของโปรไฟล์นี้เพื่อดำเนินการต่อ",
+  "study.parent.enterPin": "ป้อน PIN",
+  "study.parent.unlock": "ปลดล็อก"
 }

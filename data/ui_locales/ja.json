@@ -2869,5 +2869,12 @@
   "welcome.two.body": "チャンネルやキーワードを追加すると、ホーム、検索、クリップ、視聴から消えます。キッズには独自のルールを持つ専用スペースがあります。",
   "welcome.three.title": "無料で、これからも無料",
   "welcome.next": "次へ",
-  "welcome.back": "戻る"
+  "welcome.back": "戻る",
+  "study.switch.end": "終了して切り替える",
+  "study.switch.keep": "学習を続ける",
+  "study.switch.ending": "セッションは 30 秒後に終わります。そのあとプロフィールが切り替わります。",
+  "study.parent.unlockTitle": "保護者による管理",
+  "study.parent.unlockBody": "このプロフィールは PIN で保護されています。続行するには、このプロフィールの PIN を入力してください。",
+  "study.parent.enterPin": "PIN を入力",
+  "study.parent.unlock": "ロックを解除"
 }

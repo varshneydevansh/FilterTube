@@ -2895,5 +2895,12 @@
   "welcome.two.body": "أضف قناة أو كلمة فتختفي من الرئيسية وبحث والمقاطع ومشاهدة. ولقسم الأطفال مساحة خاصة بقواعده الخاصة.",
   "welcome.three.title": "مجاني، وسيبقى مجانيًا",
   "welcome.next": "التالي",
-  "welcome.back": "رجوع"
+  "welcome.back": "رجوع",
+  "study.switch.end": "إنهاء وتبديل",
+  "study.switch.keep": "متابعة الدراسة",
+  "study.switch.ending": "ستنتهي جلستك خلال 30 ثانية. ثم يتم تبديل الملف الشخصي.",
+  "study.parent.unlockTitle": "الرقابة الأبوية",
+  "study.parent.unlockBody": "هذا الملف محمي برمز PIN. أدخل PIN الخاص به للمتابعة.",
+  "study.parent.enterPin": "أدخل PIN",
+  "study.parent.unlock": "إلغاء القفل"
 }

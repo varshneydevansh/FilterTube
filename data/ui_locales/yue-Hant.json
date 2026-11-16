@@ -2869,5 +2869,12 @@
   "welcome.two.body": "加入頻道或者關鍵字之後，佢會喺首頁、搜尋、短片同觀看消失。小朋友有自己嘅空間同規則。",
   "welcome.three.title": "免費，而且會一直免費",
   "welcome.next": "下一步",
-  "welcome.back": "返回"
+  "welcome.back": "返回",
+  "study.switch.end": "完結再轉換",
+  "study.switch.keep": "繼續學習",
+  "study.switch.ending": "你嘅時段會喺 30 秒後完結。跟住個人檔案就會轉換。",
+  "study.parent.unlockTitle": "家長控制",
+  "study.parent.unlockBody": "呢個個人檔案受 PIN 保護。請輸入佢嘅 PIN 以繼續。",
+  "study.parent.enterPin": "輸入 PIN",
+  "study.parent.unlock": "解鎖"
 }

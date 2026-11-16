@@ -2871,5 +2871,12 @@
   "welcome.two.body": "Adicione um canal ou uma palavra e ele some de Início, Pesquisar, Clipes e Assistir. Kids tem seu próprio espaço, com regras próprias.",
   "welcome.three.title": "Grátis, e vai continuar grátis",
   "welcome.next": "Seguinte",
-  "welcome.back": "Voltar"
+  "welcome.back": "Voltar",
+  "study.switch.end": "Encerrar e trocar",
+  "study.switch.keep": "Continuar estudando",
+  "study.switch.ending": "Sua sessão termina em 30 segundos. Depois o perfil muda.",
+  "study.parent.unlockTitle": "Controles parentais",
+  "study.parent.unlockBody": "Este perfil está protegido por um PIN. Introduza o seu PIN para continuar.",
+  "study.parent.enterPin": "Introduza o PIN",
+  "study.parent.unlock": "Desbloquear"
 }

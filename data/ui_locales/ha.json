@@ -2871,5 +2871,12 @@
   "welcome.two.body": "Ƙara tasha ko kalma kuma za ta ɓace daga Shafin farko, Bincike, Gajerun bidiyo da Kallo. Yara na da nasa wuri da nasa dokoki.",
   "welcome.three.title": "Kyauta ne, kuma zai ci gaba da zama kyauta",
   "welcome.next": "Na gaba",
-  "welcome.back": "Baya"
+  "welcome.back": "Baya",
+  "study.switch.end": "Gama a canza",
+  "study.switch.keep": "Ci gaba da karatu",
+  "study.switch.ending": "Zamanka zai ƙare cikin daƙiƙa 30. Sai bayanin martaba ya canza.",
+  "study.parent.unlockTitle": "Tsarin kula na iyaye",
+  "study.parent.unlockBody": "An kare wannan bayanin martaba da PIN. Shigar da PIN ɗinsa don ci gaba.",
+  "study.parent.enterPin": "Shigar da PIN",
+  "study.parent.unlock": "Buɗe"
 }

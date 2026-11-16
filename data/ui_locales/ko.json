@@ -2869,5 +2869,12 @@
   "welcome.two.body": "채널이나 단어를 추가하면 홈, 검색, 숏폼, 시청에서 사라집니다. 어린이에는 자체 규칙이 있는 별도 공간이 있습니다.",
   "welcome.three.title": "무료이며 앞으로도 무료",
   "welcome.next": "다음",
-  "welcome.back": "뒤로"
+  "welcome.back": "뒤로",
+  "study.switch.end": "끝내고 바꾸기",
+  "study.switch.keep": "계속 공부하기",
+  "study.switch.ending": "세션이 30초 뒤에 끝나요. 그다음 프로필이 바뀝니다.",
+  "study.parent.unlockTitle": "보호자 설정",
+  "study.parent.unlockBody": "이 프로필은 PIN으로 보호되어 있습니다. 계속하려면 해당 PIN을 입력하세요.",
+  "study.parent.enterPin": "PIN을 입력하세요",
+  "study.parent.unlock": "잠금 해제"
 }

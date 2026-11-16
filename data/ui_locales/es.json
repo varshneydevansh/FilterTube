@@ -2871,5 +2871,12 @@
   "welcome.two.body": "Añade un canal o una palabra y desaparece de Inicio, Buscar, Clips y Ver. Kids tiene su propio espacio con sus propias reglas.",
   "welcome.three.title": "Gratis, y seguirá siéndolo",
   "welcome.next": "Siguiente",
-  "welcome.back": "Atrás"
+  "welcome.back": "Atrás",
+  "study.switch.end": "Terminar y cambiar",
+  "study.switch.keep": "Seguir estudiando",
+  "study.switch.ending": "Tu sesión termina en 30 segundos. Entonces cambia el perfil.",
+  "study.parent.unlockTitle": "Controles parentales",
+  "study.parent.unlockBody": "Este perfil está protegido con un PIN. Introduce su PIN para continuar.",
+  "study.parent.enterPin": "Introduce el PIN",
+  "study.parent.unlock": "Desbloquear"
 }

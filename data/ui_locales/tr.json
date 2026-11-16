@@ -2871,5 +2871,12 @@
   "welcome.two.body": "Bir kanal veya kelime ekleyin; Ana sayfa, Ara, Klipler ve İzle ekranlarından kaybolur. Çocuklar kendi kurallarıyla kendi alanına sahiptir.",
   "welcome.three.title": "Ücretsiz ve ücretsiz kalacak",
   "welcome.next": "İleri",
-  "welcome.back": "Geri"
+  "welcome.back": "Geri",
+  "study.switch.end": "Bitir ve değiştir",
+  "study.switch.keep": "Çalışmaya devam et",
+  "study.switch.ending": "Oturumun 30 saniye içinde biter. Sonra profil değişir.",
+  "study.parent.unlockTitle": "Ebeveyn denetimleri",
+  "study.parent.unlockBody": "Bu profil PIN ile korunuyor. Devam etmek için bu profilin PIN’ini girin.",
+  "study.parent.enterPin": "PIN girin",
+  "study.parent.unlock": "Kilidi Aç"
 }

@@ -2895,5 +2895,12 @@
   "welcome.two.body": "ضيف قناة أو كلمة وبتختفي من الصفحة الرئيسية وبحث والمقاطع ومشاهدة. والأطفال عندها مساحتها وقواعدها براها.",
   "welcome.three.title": "مجاني، وح يفضل مجاني",
   "welcome.next": "التالي",
-  "welcome.back": "رجوع"
+  "welcome.back": "رجوع",
+  "study.switch.end": "أنهي وبدّل",
+  "study.switch.keep": "كمّل دراسة",
+  "study.switch.ending": "جلستك بتنتهي بعد 30 ثانية. وبعدها الملف بيتبدّل.",
+  "study.parent.unlockTitle": "ضوابط ولي الأمر",
+  "study.parent.unlockBody": "الملف الشخصي دا محمي بـPIN. أدخل PIN بتاعه عشان تواصل.",
+  "study.parent.enterPin": "أدخل PIN",
+  "study.parent.unlock": "افتح القفل"
 }

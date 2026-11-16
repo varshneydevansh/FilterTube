@@ -1860,12 +1860,13 @@ document.addEventListener('DOMContentLoaded', async () => {
                 body.appendChild(msg);
             }
 
+            // inputType 'none': a question with two answers; resolves true or null.
             const input = document.createElement('input');
             input.className = 'text-input';
-            input.type = inputType;
+            input.type = inputType === 'none' ? 'hidden' : inputType;
             input.placeholder = placeholder;
             input.value = initialValue;
-            body.appendChild(input);
+            if (inputType !== 'none') body.appendChild(input);
 
             const actions = document.createElement('div');
             actions.className = 'ft-modal-actions';
@@ -1893,7 +1894,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             };
 
             cancelBtn.addEventListener('click', () => closeWith(null));
-            okBtn.addEventListener('click', () => closeWith(input.value));
+            okBtn.addEventListener('click', () => closeWith(inputType === 'none' ? true : input.value));
 
             input.addEventListener('keydown', (e) => {
                 if (e.key === 'Enter') {
@@ -2262,7 +2263,23 @@ document.addEventListener('DOMContentLoaded', async () => {
             return false;
         }
         if (decision.kind === 'end_gentle_first') {
-            UIComponents.showToast(popupUiText('study.switch.gentleBody', 'Your study session ends first. You can still cancel during a 30-second pause.'), 'info');
+            // Android StudySwitchGate: "End and switch" ends the session after its 30-second pause,
+            // then switches. The other profile's own PIN is typed now; the background switches later.
+            const endAndSwitch = await showPromptModal({
+                title: popupUiText('study.switch.gentleTitle', 'Switch profile?'),
+                message: popupUiText('study.switch.gentleBody', 'Your study session ends first. You can still cancel during a 30-second pause.'),
+                inputType: 'none',
+                confirmText: popupUiText('study.switch.end', 'End and switch'),
+                cancelText: popupUiText('study.switch.keep', 'Keep studying')
+            });
+            if (endAndSwitch !== true) return false;
+            const io = window.FilterTubeIO || {};
+            const profilesV4 = typeof io.loadProfilesV4 === 'function' ? await io.loadProfilesV4() : null;
+            if (!profilesV4 || !(await ensureProfileUnlocked(profilesV4, targetId))) return false;
+            const ending = await sendRuntimeMessage({ action: 'FilterTube_StudyEndGentleThenSwitch', targetProfileId: targetId });
+            UIComponents.showToast(ending?.ok
+                ? popupUiText('study.switch.ending', 'Your session ends in 30 seconds. The profile switches then.')
+                : popupUiText('study.error.generic', 'That didn\'t save. Try again.'), ending?.ok ? 'info' : 'error');
             return false;
         }
         UIComponents.showToast(timeLabel

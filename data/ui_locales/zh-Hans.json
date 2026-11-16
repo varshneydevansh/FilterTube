@@ -2869,5 +2869,12 @@
   "welcome.two.body": "添加频道或关键词后，它会从首页、搜索、短视频和观看中消失。儿童拥有独立空间和独立规则。",
   "welcome.three.title": "免费，并将一直免费",
   "welcome.next": "下一步",
-  "welcome.back": "返回"
+  "welcome.back": "返回",
+  "study.switch.end": "结束并切换",
+  "study.switch.keep": "继续学习",
+  "study.switch.ending": "你的时段将在 30 秒后结束。然后个人资料会切换。",
+  "study.parent.unlockTitle": "家长控制",
+  "study.parent.unlockBody": "此个人资料受 PIN 保护。请输入其 PIN 以继续。",
+  "study.parent.enterPin": "输入 PIN",
+  "study.parent.unlock": "解锁"
 }

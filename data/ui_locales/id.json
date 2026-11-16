@@ -2869,5 +2869,12 @@
   "welcome.two.body": "Tambahkan channel atau kata, dan itu hilang dari Beranda, Cari, Klip, dan Tonton. Kids punya ruang sendiri dengan aturan sendiri.",
   "welcome.three.title": "Gratis, dan tetap gratis",
   "welcome.next": "Berikutnya",
-  "welcome.back": "Kembali"
+  "welcome.back": "Kembali",
+  "study.switch.end": "Akhiri dan ganti",
+  "study.switch.keep": "Lanjut belajar",
+  "study.switch.ending": "Sesi Anda berakhir dalam 30 detik. Setelah itu profil berganti.",
+  "study.parent.unlockTitle": "Kontrol orang tua",
+  "study.parent.unlockBody": "Profil ini dilindungi PIN. Masukkan PIN-nya untuk melanjutkan.",
+  "study.parent.enterPin": "Masukkan PIN",
+  "study.parent.unlock": "Buka Kunci"
 }

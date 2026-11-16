@@ -967,6 +967,7 @@ async function verifyAndCacheSessionPin(profileId, pin, sender = null) {
     sessionPinCache.set(id, {
         pin,
         tabId: getTrustedUiSenderTabId(sender),
+        verifiedAt: Date.now(),
         expiresAt: Date.now() + SESSION_PIN_CACHE_TTL_MS
     });
     return { ok: true, stored: true };
@@ -1881,11 +1882,41 @@ const studyBackground = globalThis.FilterTubeStudyBackground?.createStudyBackgro
         startLockedSession: startStudyLockedSession,
         writeProfile: writeStudyProfile,
         onTransition: () => broadcastStudyTransition(),
+        parentUnlockFresh: profileId => isParentUnlockFresh(profileId),
+        switchProfile: (fromProfileId, targetProfileId) => switchProfileAfterStudy(fromProfileId, targetProfileId),
         // The clock guard's network time: the Date header of a tiny request to the video site, read
         // only when a jump is suspected (or the worker restarted) during a lock or a parent's plan.
         networkTime: () => readStudyNetworkTime()
     })
     : null;
+
+// Android ProfileUnlockSession.SENSITIVE_REAUTH_TTL_MILLIS: a parent's edit needs a PIN typed in
+// the last 5 minutes; a profile with no PIN has nothing to type.
+const PARENT_SENSITIVE_UNLOCK_TTL_MS = 5 * 60 * 1000;
+
+async function isParentUnlockFresh(profileId) {
+    const id = normalizeString(profileId) || DEFAULT_PROFILE_ID;
+    const stored = await storageGet([FT_PROFILES_V4_KEY]);
+    const profilesV4 = stored?.[FT_PROFILES_V4_KEY];
+    if (!isValidProfilesV4(profilesV4) || !extractPinVerifierFromProfilesV4(profilesV4, id)) return true;
+    const entry = safeObject(sessionPinCache.get(id));
+    const now = Date.now();
+    return Number(entry.expiresAt) > now && now - Number(entry.verifiedAt || 0) < PARENT_SENSITIVE_UNLOCK_TTL_MS;
+}
+
+// "End and switch": once a Gentle session's pause is over, the profile the person picked becomes
+// active. Its own PIN was typed before the request; the study gate has nothing left to hold.
+async function switchProfileAfterStudy(fromProfileId, targetProfileId) {
+    const stored = await storageGet([FT_PROFILES_V4_KEY]);
+    const profilesV4 = stored?.[FT_PROFILES_V4_KEY];
+    const from = normalizeString(fromProfileId);
+    const target = normalizeString(targetProfileId);
+    if (!isValidProfilesV4(profilesV4) || !target || !safeObject(profilesV4.profiles)[target]) return false;
+    if ((normalizeString(profilesV4.activeProfileId) || DEFAULT_PROFILE_ID) !== from) return false;
+    studySwitchPass = { targetId: target, issuedAt: Date.now() };
+    await browserAPI.storage.local.set({ [FT_PROFILES_V4_KEY]: { ...profilesV4, schemaVersion: 4, activeProfileId: target } });
+    return true;
+}
 
 async function readStudyNetworkTime() {
     try {

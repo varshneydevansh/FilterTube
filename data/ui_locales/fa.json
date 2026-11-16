@@ -2871,5 +2871,12 @@
   "welcome.two.body": "یک کانال یا کلمه اضافه کنید تا از خانه، جستجو، کلیپ‌ها و تماشا حذف شود. کودکان فضای جداگانه و قوانین خودش را دارد.",
   "welcome.three.title": "رایگان، و رایگان می‌ماند",
   "welcome.next": "بعدی",
-  "welcome.back": "بازگشت"
+  "welcome.back": "بازگشت",
+  "study.switch.end": "پایان و تغییر",
+  "study.switch.keep": "ادامهٔ مطالعه",
+  "study.switch.ending": "جلسه‌تان تا ۳۰ ثانیه دیگر تمام می‌شود. بعد نمایه عوض می‌شود.",
+  "study.parent.unlockTitle": "کنترل‌های والدین",
+  "study.parent.unlockBody": "این نمایه با PIN محافظت شده است. برای ادامه، PIN آن را وارد کنید.",
+  "study.parent.enterPin": "PIN را وارد کنید",
+  "study.parent.unlock": "باز کردن قفل"
 }

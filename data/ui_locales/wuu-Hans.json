@@ -2869,5 +2869,12 @@
   "welcome.two.body": "加一只频道或者关键词，伊就会从首页、搜索、短视频搭观看里向消失。小朋友有自家个空间搭规则。",
   "welcome.three.title": "免费，以后也一直免费",
   "welcome.next": "下一页",
-  "welcome.back": "退转去"
+  "welcome.back": "退转去",
+  "study.switch.end": "结束再切换",
+  "study.switch.keep": "继续学习",
+  "study.switch.ending": "侬个时段 30 秒以后结束。接下来档案就切换。",
+  "study.parent.unlockTitle": "家长控制",
+  "study.parent.unlockBody": "箇个个人资料有 PIN 保护。输伊个 PIN 才好继续。",
+  "study.parent.enterPin": "输 PIN",
+  "study.parent.unlock": "开锁"
 }

@@ -2871,5 +2871,12 @@
   "welcome.two.body": "کوئی چینل یا لفظ شامل کریں تو وہ ہوم، تلاش کریں، کلپس اور دیکھیں سے غائب ہو جاتا ہے۔ Kids کی اپنی جگہ اور اپنے اصول ہیں۔",
   "welcome.three.title": "مفت، اور مفت ہی رہے گا",
   "welcome.next": "اگلا",
-  "welcome.back": "واپس"
+  "welcome.back": "واپس",
+  "study.switch.end": "ختم کریں اور بدلیں",
+  "study.switch.keep": "پڑھائی جاری رکھیں",
+  "study.switch.ending": "آپ کا سیشن 30 سیکنڈ میں ختم ہوگا۔ پھر پروفائل بدل جائے گا۔",
+  "study.parent.unlockTitle": "والدین کے کنٹرول",
+  "study.parent.unlockBody": "یہ پروفائل PIN سے محفوظ ہے۔ آگے بڑھنے کے لیے اس کا PIN درج کریں۔",
+  "study.parent.enterPin": "PIN درج کریں",
+  "study.parent.unlock": "اَن لاک کریں"
 }
