@@ -668,3 +668,32 @@ body.ft-extension-surface[data-surface="popup"] button.add-btn {
 }
 body.ft-extension-surface[data-surface="popup"] .ft-popup-filter-card .tab-buttons,
 body.ft-extension-surface[data-surface="popup"] .tabs-container .tab-buttons { margin-bottom: 8px; }
+
+/* The app never shouts: sentence case everywhere on the extension's own pages (labels, eyebrows,
+   the list-mode pill). Words that are capitals (PIN) stay capitals. */
+body.ft-extension-surface,
+body.ft-extension-surface * { text-transform: none !important; }
+body.ft-extension-surface [class*="eyebrow"],
+body.ft-extension-surface [class*="kicker"],
+body.ft-extension-surface .ft-list-mode-pill,
+body.ft-extension-surface [class*="__label"] { letter-spacing: 0 !important; }
+
+/* Study and focus wears the app's sage (BrandPalette STUDY), breaks its sun. */
+:root, :root[data-theme] {
+  --ft-study-teal: var(--pk-sage-ink);
+  --ft-study-teal-surface: var(--pk-sage);
+  --ft-study-amber: var(--pk-sun);
+  --ft-study-amber-text: var(--pk-sun-ink);
+  --ft-study-amber-surface: var(--pk-sun-wash);
+  --ft-study-grey-surface: var(--pk-sage);
+}
+body.ft-extension-surface .ft-study-status {
+  color: var(--pk-ink) !important;
+  border: 1.5px solid transparent;
+  border-image: var(--pk-edge-study) 20 / 18px / 0 round;
+  border-radius: 18px;
+}
+body.ft-extension-surface .ft-study-status.is-break { background: var(--pk-sun-wash) !important; border-image-source: var(--pk-edge-kids); }
+body.ft-extension-surface .ft-study-status.is-done,
+body.ft-extension-surface .ft-study-status.is-normal,
+body.ft-extension-surface .ft-study-status.is-hold { background: var(--pk-sage) !important; }
