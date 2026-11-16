@@ -1,4 +1,55 @@
 {
+  "3.6.2": {
+    "headline": "Kilalanin sina Kriti at Uljhan, ang binagong Study planner at Magtanong sa magulang",
+    "summary": "May sariling hitsura na ang FilterTube 3.6.2, kasama sina Kriti at Uljhan, mga icon na krayola, mga doodle at opsyonal na tunog. Binago ang Study batay sa isang planner ng araw na may mga handang pack para sa 29 na bansa, puwedeng humiling ang mga bata sa magulang ng video o channel, at mas payapa ang bagong disenyo ng viewer, mga profile, tablet at TV na may mas malinaw na mga paalala sa privacy.",
+    "bannerSummary": "Sina Kriti at Uljhan, binagong Study planner, Magtanong sa magulang at mas payapang viewer.",
+    "ctaLabel": "Tingnan ang mga bago",
+    "highlights": [
+      "Binago ang Study: isang papel na Study home na may krayolang Day Ring, planner ng araw, setup na nagpapaliwanag ng bawat pagpili, at mga handang pack para sa mga exam at klase sa paaralan sa 29 na bansa. Sumusunod ang mga feed sa sangay na pipiliin mo, kaya nananatiling Civil ang GATE Civil, at sa mga channel lang ng plano mo naghahanap ang Search habang nag-aaral.",
+      "Magtanong sa magulang: kapag may naka-block, puwedeng humiling ang bata na mapanood ang video na iyon o payagan ang channel na iyon, at sasagot ang magulang. Nagbubukas ang Parent mode ng naka-frame na session ng magulang sa loob ng isang Kids profile na may iisang malinaw na labasan, at pinupuno ng Kids learning ayon sa edad ang Kids space ng mga aralin na pinili ayon sa edad habang nag-aaral.",
+      "Bagong hitsura: sinasamahan ka nina Kriti at Uljhan habang naglo-load ang mga page, kapag walang laman ang mga listahan, offline ka o may naka-block. May sariling mga icon na krayola ang FilterTube, mga doodle, doodle avatar, mga app icon na Kriti, Uljhan at duo na mapagpipilian, at opsyonal na tunog na maitatakda sa Off, Mahinahon o Masaya.",
+      "Mas payapang viewer: full-bleed na poster sa mga telepono, bagong page ng playlist at account sheet, ang Watch glow na umaabot hanggang sa ilalim ng status bar, si Uljhan na kumukuha ng higit pa habang nag-i-scroll ka, pull to refresh, at iisang malinaw na abiso kapag mabagal o offline ang koneksyon.",
+      "Binago ang disenyo ng mga profile na may krayolang avatar, picker na nagpapakita kung sino ang magulang at sino ang bata, at protektadong paraan ng pagdaragdag ng profile.",
+      "Sariling mga salita ang gamit ng FilterTube saanman: clips, sinusundan, naka-save, at Sangeet para sa musika, sa bawat wika.",
+      "Privacy: Ipinapaliwanag ng Accounts & Sync kung ano ang nakikita at hindi nakikita ng sync relay at nagtatanong bago ang unang sync sa internet, hindi na ipinapadala ang pangalan ng device mo kapag pinapatunog ang ibang device, hiwalay na opt-in ang mga DeArrow thumbnail na naka-off sa simula, sa sariling mga site lang ng video service pumupunta ang mga account cookie, at hindi isinasama ng mga release build ang debug log sa system log.",
+      "Kapareho na ng telepono ang mga tablet at TV: buong lapad ang gamit ng Filters, Search at Magtanong sa magulang sa mga tablet, at may mga icon na krayola sa rail ang mga TV, Study sa malaking screen, at isang card na Tungkol sa TV na ito na may mga mode na Full at Light.",
+      "Libre at opsyonal pa rin ang pagsuporta sa FilterTube: isang magiliw na paalala ang support sheet, hindi kailanman harang.",
+      "Mga ayos: hindi na nagpapa-freeze ng screen ang pag-check ng PIN, hindi na kumukurap ang page kapag naglo-load ng higit pa sa Study, hindi na napuputol ang mga mascot sa gitna ng galaw, naisalin na ang maraming natitirang English na label, at hindi na binabanggit ng mga error sa pag-load ng Sangeet ang video service."
+    ]
+  },
+  "3.6.1": {
+    "headline": "Landscape na akma sa bawat screen, mas matatag na kontrol sa playback at mas mahigpit na pagfi-filter",
+    "summary": "Sinusukat ng FilterTube 3.6.1 ang bawat landscape page mula sa window, kaya may full-height na video at panel sa kanan ang mga nakatagilid na telepono, tablet at TV. Gumagana nang tama ang captions, transcript at mga menu ng card, at nakatago saanman ang channel na fini-filter mo.",
+    "bannerSummary": "Landscape na akma sa bawat screen, ayos sa captions at transcript, at mas mahigpit na pagfi-filter.",
+    "ctaLabel": "Tingnan ang mga bago",
+    "highlights": [
+      "Kinukuwenta ang landscape mula sa screen mo: sa nakatagilid na telepono, tablet o TV, nagpapakita ang Watch ng full-height na 16:9 na video na may Susunod sa tabi nito, nasa itaas ng side rail ang Search, at walang naputol ng camera cutout.",
+      "Ipinapakita ng nakatagilid na Music ang parehong Susunod gaya ng nakatayo, umiikot ang turntable sa 33⅓ rpm kasabay ng bilis ng playback, at nagsisimula ang Susunod sa kantang tumutugtog.",
+      "Nao-off ang captions kapag pinili mo ang Off, gumagana ang Auto-translate sa video na tumutugtog, at sinasabi sa iyo kapag may pagpiling hindi pa mailapat ng player sa halip na tahimik na pumalya.",
+      "Kapag tinapik ang isang linya ng transcript, nananatiling bukas at sumusunod ang transcript, gaya ng lyrics, at umaabot sa buong page ang Watch glow sa landscape.",
+      "Itinatago ng isang channel sa filter list mo ang lahat mula rito, paano man ito naidagdag. Itinatago ng pag-block mula sa komento ang mga komento at video ng channel na iyon, nakatago ang mga Mix na nagmula sa naka-block na channel, at sumusunod ang live chat sa mga tuntunin mo.",
+      "Sa mode na Payagan lang ang napili, mga pinapayagang nagkomento o pinapayagang salita lang ang ipinapakita sa mga komento.",
+      "Gumagana pa rin ang mga menu ng card pagkatapos magpalit ng filter, nananatili ang napiling sort ng channel pagkatapos mag-refresh, at nananatili ang larawan ng Watch pagkatapos magpalit ng filter habang naka-scroll.",
+      "Tumutulong ang isang hakbang-hakbang na gabay na itakdang magbukas sa FilterTube ang mga link ng YouTube, at magkatabi ang mga profile na Main at Kids sa mga tablet."
+    ]
+  },
+  "3.6.0": {
+    "headline": "Bagong Music player, mas mabilis na mga page at mga link ng YouTube na nagbubukas sa FilterTube",
+    "summary": "Binago ng FilterTube 3.6.0 ang disenyo ng Music batay sa cover ng bawat kanta, mas mabilis nang naglo-load ang mga page ng Music, Home at album, binubuksan ang mga link ng YouTube mula sa ibang app sa protektadong viewer, at ginagawang predictable ang PIN lock. Pareho ang mga pagpapahusay sa mga telepono, tablet at TV.",
+    "bannerSummary": "Bagong Music player at kulay, mas mabilis na pag-load, mga link ng YouTube sa FilterTube at mas malinaw na PIN lock.",
+    "ctaLabel": "Tingnan ang mga bago",
+    "highlights": [
+      "Kinukulayan ang Music ayon sa pinakikinggan mo: kinukuha ng bawat Music page, mini player at bottom bar ang mga kulay ng cover, maayos na nagbabago sa pagitan ng mga kanta at album, at bumabalik sa normal kapag umalis ka sa Music.",
+      "Binagong Music player: iisang seek ring sa paligid ng umiikot na cover, isang lyrics card na umaangat mula sa ibaba, magaan na visualizer na gumagalaw kasabay ng beat, at mga live station na may markang LIVE.",
+      "Totoong naka-sync na lyrics mula sa YouTube Music, sunod ang sariling captions ng kanta sa wika mo, at LRCLIB bilang opsyonal na dagdag na minsan lang itatanong sa iyo. Pinananatiling nasa gitna ng lyrics at transcript ang kasalukuyang linya hanggang sa dulo.",
+      "Mas mabilis na pag-load: ginagamit ng mga kanta sa Music ang channel na nakalista na sa YouTube Music, inuunang suriin ang mga card na nasa screen, at dinadahan-dahan ang pag-check ng channel para tumigil ang YouTube sa pagtanggi sa mga ito. Hindi na naghihintay nang ilang minuto ang mga kanta sa album at playlist.",
+      "Audio lang ang tinutugtog ng Music hangga't hindi mo ipinapakita ang video, kaya mas mabilis magsimula ang mga kanta at mas kaunti ang data na nagagamit. Agad nang tumutugtog ang pag-skip mula sa lock screen at ang paglipat sa susunod na kanta.",
+      "Puwedeng magbukas sa protektadong viewer ng FilterTube ang mga link ng YouTube mula sa mga chat app at ibang app. Tumutulong ang isang beses na prompt at isang check sa Mga Setting para i-on ito ng mga magulang.",
+      "Predictable na ang PIN lock: nananatiling naka-unlock ang mga profile habang ginagamit at nagla-lock kapag isinara ang FilterTube, nag-restart ang telepono o nagpalit ka ng profile. Puwede namang piliin ng mga magulang na mag-lock pagkalipas ng oras na wala.",
+      "Kumikinang ang Watch page sa mga kulay ng tumutugtog na video, mula sa status bar hanggang sa mga sheet at Susunod; nakadikit ang transcript sa ilalim ng player; tugma ang mga chip sa kanilang page; at patuloy na naglo-load ang mga Mix queue.",
+      "Android TV at mga tablet: mga kulay ng Music at ang bagong player sa TV na may seek gamit ang remote, mas magaan na visualizer para sa mga TV box, mga Watch panel sa kulay ng video, at mga ayos sa two-pane at mas malalaking album cover sa mga tablet."
+    ]
+  },
   "3.4.1": {
     "headline": "38 wika ng interface at mas ligtas na pagsusuri ng pag-play",
     "summary": "Nagdaragdag ang FilterTube 3.4.1 ng 38 kasamang wika ng interface at pinapahusay ang pagsusuri ng video sa YouTube at mga suportadong naka-embed na player. Inaayos din nito ang pagsisimula ng dashboard at pagtutugma ng naka-save na keyword ng komento. Naayos ang duplicate na Korean at Bengali translation entry na tinanggihan ng Mozilla. Sinusuri na ng build ang duplicate na JSON key bago mag-package.",

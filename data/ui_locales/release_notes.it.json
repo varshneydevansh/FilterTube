@@ -1,4 +1,55 @@
 {
+  "3.6.2": {
+    "headline": "Ecco Kriti e Uljhan, un planner Study rifatto e Chiedi a un genitore",
+    "summary": "FilterTube 3.6.2 ha un aspetto tutto suo, con Kriti e Uljhan, icone a pastello, scarabocchi e suoni facoltativi. Study è rifatto attorno a un planner giornaliero con pacchetti pronti per 29 paesi, i bambini possono chiedere a un genitore un video o un canale, e il lettore, i profili, i tablet e le TV hanno un design più calmo con note sulla privacy più chiare.",
+    "bannerSummary": "Kriti e Uljhan, un planner Study rifatto, Chiedi a un genitore e un lettore più calmo.",
+    "ctaLabel": "Scopri le novità",
+    "highlights": [
+      "Study è rifatto: una home Study di carta con un anello del giorno a pastello, un planner giornaliero, una configurazione che spiega ogni scelta e pacchetti pronti per esami e classi scolastiche in 29 paesi. I feed seguono l’indirizzo che scegli, quindi GATE Civil resta Civil, e la ricerca durante lo studio cerca solo nei canali del tuo piano.",
+      "Chiedi a un genitore: quando qualcosa è bloccato, un bambino può chiedere di guardare quel video o di consentire quel canale, e un genitore risponde. La modalità genitore apre una sessione genitore delimitata dentro un profilo Kids con un’unica uscita chiara, e l’apprendimento Kids per età riempie lo spazio Kids di lezioni scelte in base all’età durante lo studio.",
+      "Un nuovo aspetto: Kriti e Uljhan ti fanno compagnia mentre le pagine si caricano, quando gli elenchi sono vuoti, sei offline o qualcosa è bloccato. FilterTube ha le sue icone a pastello, scarabocchi, avatar a scarabocchio, icone dell’app Kriti, Uljhan e duo tra cui scegliere, e suoni facoltativi che puoi impostare su Off, Delicati o Giocosi.",
+      "Un lettore più calmo: locandine a tutto schermo sui telefoni, una nuova pagina playlist e un nuovo pannello account, il bagliore di Watch che arriva fin sotto la barra di stato, Uljhan che carica altro mentre scorri, trascina per aggiornare e un unico avviso chiaro quando la connessione è lenta o assente.",
+      "I profili sono ridisegnati con avatar a pastello, un selettore che mostra chi è genitore e chi è bambino, e un modo protetto per aggiungere un profilo.",
+      "FilterTube usa ovunque parole sue: clip, seguiti, salvati, e Sangeet per la musica, in ogni lingua.",
+      "Privacy: Account e sincronizzazione spiega cosa il relay di sincronizzazione può e non può vedere e chiede conferma prima della prima sincronizzazione via internet, il nome del dispositivo non viene più inviato quando fai squillare un altro dispositivo, le miniature DeArrow sono un’opzione separata disattivata all’inizio, i cookie dell’account vanno solo ai siti del servizio video stesso, e le build di rilascio tengono i log di debug fuori dal log di sistema.",
+      "Tablet e TV come il telefono: Filtri, Cerca e Chiedi a un genitore usano tutta la larghezza sui tablet, e le TV hanno le icone a pastello nella barra laterale, Study sul grande schermo e una scheda Info su questa TV con le modalità Completa e Leggera.",
+      "Sostenere FilterTube resta gratuito e facoltativo: il pannello di supporto è un messaggio amichevole, mai un ostacolo.",
+      "Correzioni: i controlli del PIN non bloccano più lo schermo, caricare altro in Study non fa più lampeggiare la pagina, le mascotte non vengono mai tagliate a metà movimento, molte etichette rimaste in inglese ora sono tradotte e gli errori di caricamento di Sangeet non nominano più il servizio video."
+    ]
+  },
+  "3.6.1": {
+    "headline": "Orizzontale adatto a ogni schermo, controlli di riproduzione più stabili e filtri più rigorosi",
+    "summary": "FilterTube 3.6.1 dimensiona ogni pagina in orizzontale in base alla finestra, così telefoni girati, tablet e TV hanno un video a tutta altezza e un pannello a destra. Sottotitoli, trascrizione e menu delle schede funzionano come previsto, e un canale che filtri è nascosto ovunque.",
+    "bannerSummary": "Orizzontale adatto a ogni schermo, correzioni a sottotitoli e trascrizione, e filtri più rigorosi.",
+    "ctaLabel": "Scopri le novità",
+    "highlights": [
+      "L’orizzontale è calcolato dal tuo schermo: su un telefono girato, un tablet o una TV, Watch mostra un video 16:9 a tutta altezza con A seguire accanto, Cerca si trova in cima alla barra laterale e niente viene tagliato dal foro della fotocamera.",
+      "Music in orizzontale mostra lo stesso A seguire che in verticale, il giradischi gira a 33⅓ rpm con la velocità di riproduzione e A seguire parte dal brano in riproduzione.",
+      "I sottotitoli si disattivano quando scegli Off, la traduzione automatica funziona sul video in riproduzione e una scelta che il lettore non può ancora applicare te lo dice invece di fallire in silenzio.",
+      "Toccare una riga della trascrizione la mantiene aperta e sincronizzata, come i testi, e il bagliore di Watch si estende su tutta la pagina in orizzontale.",
+      "Un canale nella tua lista di filtri nasconde tutto ciò che proviene da lì, comunque sia stato aggiunto. Bloccare da un commento nasconde commenti e video di quel canale, i Mix generati da un canale bloccato sono nascosti e la chat dal vivo segue le tue regole.",
+      "In modalità Consenti solo selezionati, i commenti mostrano solo autori consentiti o parole consentite.",
+      "I menu delle schede continuano a funzionare dopo un cambio di filtro, l’ordinamento del canale scelto resta dopo l’aggiornamento e l’immagine di Watch rimane dopo un cambio di filtro mentre scorri.",
+      "Una guida passo passo aiuta a far aprire i link di YouTube in FilterTube, e i tablet mostrano i profili Main e Kids affiancati."
+    ]
+  },
+  "3.6.0": {
+    "headline": "Un nuovo lettore Music, pagine più veloci e link di YouTube che si aprono in FilterTube",
+    "summary": "FilterTube 3.6.0 ridisegna Music attorno alla copertina di ogni brano, carica molto più velocemente le pagine Music, Home e degli album, apre nel visualizzatore protetto i link di YouTube provenienti da altre app e rende prevedibile il blocco con PIN. Telefoni, tablet e TV ricevono gli stessi miglioramenti.",
+    "bannerSummary": "Nuovo lettore e colori Music, caricamento più veloce, link di YouTube in FilterTube e blocco PIN più chiaro.",
+    "ctaLabel": "Scopri le novità",
+    "highlights": [
+      "Music si colora in base a ciò che ascolti: ogni pagina Music, il mini lettore e la barra in basso prendono i colori della copertina, cambiano con fluidità tra brani e album e tornano normali quando esci da Music.",
+      "Un lettore Music ridisegnato: un unico anello di avanzamento attorno a una copertina che gira, una scheda dei testi che sale dal basso, un visualizzatore leggero che si muove a ritmo e le stazioni dal vivo indicate come LIVE.",
+      "Testi sincronizzati reali da YouTube Music, poi i sottotitoli del brano nella tua lingua, con LRCLIB come extra facoltativo che ti viene proposto una sola volta. Testi e trascrizioni tengono la riga corrente centrata fino alla fine.",
+      "Caricamento molto più veloce: i brani di Music usano il canale già indicato da YouTube Music, le schede sullo schermo vengono controllate per prime e i controlli dei canali sono distanziati così YouTube smette di rifiutarli. I brani di album e playlist non attendono più per minuti.",
+      "Music riproduce solo l’audio finché non mostri il video, così i brani partono prima e usano molti meno dati. Saltare dalla schermata di blocco e passare al brano successivo ora partono subito.",
+      "I link di YouTube dalle app di chat e da altre app possono aprirsi nel visualizzatore protetto di FilterTube. Un avviso una tantum e un controllo nelle Impostazioni aiutano i genitori ad attivarlo.",
+      "Il blocco con PIN è prevedibile: i profili restano sbloccati durante l’uso e si bloccano quando FilterTube si chiude, il telefono si riavvia o cambi profilo. I genitori possono invece scegliere il blocco dopo un periodo di inattività.",
+      "La pagina Watch si illumina con i colori del video in riproduzione, dalla barra di stato ai pannelli e ad A seguire; la trascrizione si aggancia sotto il lettore; i chip corrispondono alla loro pagina; e le code Mix continuano a caricarsi.",
+      "Android TV e tablet: colori Music e nuovo lettore sulla TV con avanzamento dal telecomando, un visualizzatore più leggero per i box TV, pannelli Watch nei colori del video, correzioni alla vista a due riquadri e copertine degli album più grandi sui tablet."
+    ]
+  },
   "3.4.1": {
     "headline": "38 lingue dell’interfaccia e controlli di riproduzione più sicuri",
     "summary": "FilterTube 3.4.1 aggiunge 38 lingue dell’interfaccia integrate e migliora i controlli dei video su YouTube e nei lettori incorporati supportati. Corregge inoltre l’avvio della dashboard e il riconoscimento delle parole chiave dei commenti salvate. Corrette le voci duplicate in coreano e bengalese rifiutate da Mozilla. La compilazione controlla le chiavi JSON duplicate prima di creare il pacchetto.",
