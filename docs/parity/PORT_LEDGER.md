@@ -3,20 +3,20 @@
 Generated from `PORT_LEDGER.tsv` by `node tools/parity/ledger.mjs render`. Edit the TSV, never this file.
 Rules: [HOW_TO_PORT.md](HOW_TO_PORT.md). Sync point: Android `ec9d91080` (Release Android 3.6.1), in the app repository.
 
-**189 rows:** 78 ported, 22 partial, 0 todo, 89 n/a. **78.0%** of 100 applicable rows ported (89.0% counting partial as half).
+**189 rows:** 99 ported, 1 partial, 0 todo, 89 n/a. **99.0%** of 100 applicable rows ported (99.5% counting partial as half).
 
 | Area | ported | partial | todo | n/a | share |
 |---|---|---|---|---|---|
-| brand-visual | 30 | 1 | 0 | 10 | 98.4% |
+| brand-visual | 31 | 0 | 0 | 10 | 100.0% |
 | home-viewer | 1 | 0 | 0 | 15 | 100.0% |
 | watch | 0 | 0 | 0 | 1 | - |
-| study | 24 | 15 | 0 | 7 | 80.8% |
+| study | 39 | 0 | 0 | 7 | 100.0% |
 | kids | 0 | 0 | 0 | 3 | - |
-| profiles-family | 5 | 4 | 0 | 2 | 77.8% |
+| profiles-family | 9 | 0 | 0 | 2 | 100.0% |
 | settings-controls | 8 | 0 | 0 | 3 | 100.0% |
 | search | 0 | 0 | 0 | 2 | - |
 | music | 0 | 0 | 0 | 5 | - |
-| nearby-sync | 2 | 1 | 0 | 2 | 83.3% |
+| nearby-sync | 3 | 0 | 0 | 2 | 100.0% |
 | support | 1 | 1 | 0 | 0 | 75.0% |
 | strings | 3 | 0 | 0 | 13 | 100.0% |
 | tablet-tv | 0 | 0 | 0 | 15 | - |
@@ -28,7 +28,6 @@ Rules: [HOW_TO_PORT.md](HOW_TO_PORT.md). Sync point: Android `ec9d91080` (Releas
 
 | Android | Date | Subject | Status | Extension | Reason / note |
 |---|---|---|---|---|---|
-| `4ff67ce1b` | 2026-11-15 | feat(android): P2 gates, people and settings motion | partial | `c5c99ef9` | gates, people and settings motion: not traced item by item |
 | `3ec1de790` | 2026-11-15 | feat(mascots): idle life on the Study hero, end seal and support sheet; fix the update-check test after the merge | ported | `c5c99ef9`, `e579ae1d` | idle life on the study card, the end seal and the support sheet |
 | `f16a0eda4` | 2026-11-15 | feat(android): FilterTube's own crayon icon set (IconKit) | ported | `3e3721c1` | crayon icons exported from the app's vector drawables (scripts/export-crayon-icons.mjs) |
 | `8c86d7e04` | 2026-11-15 | fix(android-mascot): loop beats only on the loop's own art | ported | `c5c99ef9` | each sheet plays its own frames at its own timing (mascots.js MOTIONS) |
@@ -37,6 +36,7 @@ Rules: [HOW_TO_PORT.md](HOW_TO_PORT.md). Sync point: Android `ec9d91080` (Releas
 | `6f7425410` | 2026-11-15 | feat(android): apply doodles to avatars, Study, TV capability card and paper toast | ported | `812c11ad`, `f4111820`, `6656f8e4` | doodles on avatars, Study and the toast; the TV card is Android-only |
 | `bc57eaafd` | 2026-11-15 | feat(android): doodle library with typed catalogue, placement and motions | ported | `3e3721c1`, `f4111820` | doodle library (js/doodles.js) |
 | `fa1d74cd5` | 2026-11-15 | feat(android-ui): PaperKit, one paper-and-crayon component kit (Wave 1A) | ported | `f4111820` | PaperKit look (css/paperkit.css) |
+| `4ff67ce1b` | 2026-11-15 | feat(android): P2 gates, people and settings motion | ported | `c5c99ef9`, `73609c38` | item by item: the PIN gate's shake, polite "Try again" and no mascot or sound; the profile popup growing from the avatar; the switch moment with Kriti's wave at most 3 a day; dialogs entering at 0.96; toast poses (wave, jump, check); restore and pairing endings; PeopleMotionTest ported. The PIN pad and haptics, the Kids parent check crossfade, Settings' section slide and the Nearby screen are Android-only |
 | `7cdaeeb9a` | 2026-11-15 | fix(mascots): remove light halos on cut-out edges so mascots sit cleanly on dark and coloured surfaces | ported | `3e3721c1` | mascot frames byte-identical to Android's |
 | `184da9e82` | 2026-11-15 | fix(mascots): clear white background gaps between legs and arms so mascots sit cleanly on any colour or dark mode | ported | `3e3721c1` | mascot frames byte-identical to Android's |
 | `8f36623fe` | 2026-11-15 | feat(android): sounds, wider duet slot and QA previews for the Wave 2A sheets | ported | `c5c99ef9`, `04561b52` | sounds on the welcome and support sheets |
@@ -101,33 +101,31 @@ Rules: [HOW_TO_PORT.md](HOW_TO_PORT.md). Sync point: Android `ec9d91080` (Releas
 
 | Android | Date | Subject | Status | Extension | Reason / note |
 |---|---|---|---|---|---|
-| `678188f11` | 2026-11-15 | fix(android-study): stamp spring crash, Kriti fits per pose, break drain, sounds, preview safety | partial | `5a539088` | not traced: stamp spring, per-pose fit and break drain |
-| `79a3d892c` | 2026-11-15 | feat(android-study): Study v3 home renders in place, colours the page by state, sage-led crayon ring | partial | `06b3bf31`, `5a953666` | ring and sage are in; colouring the page by state is not traced |
-| `b753aa71f` | 2026-11-15 | fix(android-study): setup polish from the emulator critique | partial | `06b3bf31` | the extension's setup is a compact pack picker; the setup polish targets the app's step flow |
-| `6c3f9f0d5` | 2026-11-15 | feat(android-study): in-session moments on paper — break sun, Skip break with Undo, gate card, Home strip | partial | `2964d665`, `5a539088`, `c4f6496c` | break on paper, the gate card, and Skip break with its cost line and 5 s Undo (c4f6496c, StudyBreakSkip and undoSkipBreak ported with their tests); not ported: the sun's m:ss countdown and "Up next after the break"; the Home strip and music chip are the app's native Home and player |
-| `3bbad1d03` | 2026-11-15 | feat(android-study): redesigned study setup on paper — what for, grouped exams, school, streams, grouped review, add a channel | partial | `06b3bf31` | the extension's setup is a compact pack picker: no what-for step, grouped exams, grouped review or add-a-channel sheet |
-| `789f3fbf5` | 2026-11-15 | fix(android-study): one continuous Day Ring and a balanced home hero | partial | `06b3bf31` | the ring is in; the balanced hero is the app's layout |
-| `88d53bc09` | 2026-11-15 | feat(android-study): paper Study home with the crayon Day Ring and the end seal | partial | `06b3bf31` | the ring is in; the end seal is not traced |
-| `980a58b67` | 2026-11-15 | feat(android-study): free round and break lengths, channel avatars, Kriti and Uljhan | partial | `43bdfb37` | free round (5-240) and break (0-120) lengths are in; study channel avatars are not traced |
-| `fcd8018b8` | 2026-11-15 | feat(android-study): study pages: the gate card, hidden counts, Up next, Kids feed, loosening sheets | partial | `7cbae66d`, `a4306a68` | gate card and tighten-only changes are in; hidden counts, Up next and loosening sheets are native pages |
-| `2280f4ee3` | 2026-11-15 | fix(android-study): Self-Control expiry on the guarded clock, found on the emulator | partial | `43a28703` | clock guard is in; Self-Control expiry on the guarded clock is not traced |
-| `910016a10` | 2026-11-15 | feat(android-study): P1 enforcement: local media, fail closed, silent-device notice | partial | `199cce4f` | fail closed is in; the silent-device notice is not traced; local media is Android-only |
-| `9ed6a1e27` | 2026-11-15 | fix(android): Study review leftovers (skip chip, break Back, truthful lines) | partial | `06b3bf31`, `2964d665` | not traced: skip chip, break Back, truthful lines |
-| `ee59f65b4` | 2026-11-15 | fix(android): Study and focus review fixes, large-text Controls grid | partial | `06b3bf31` | not traced; the large-text Controls grid is Android-only |
-| `17ea3465f` | 2026-11-16 | feat(android-study): Kids learning by age keeps the Kids space Kids | partial | `5f476d8f` | Kids study time and the "Kids learning for this age shows in Kids" note are in; the Kids catalogue browse by age is the app's native Kids Home |
-| `028e59c94` | 2026-11-16 | fix(android-study): study search finds lessons in the plan's own channels | partial | `ddf3ecb0`, `0a7e56ee` | "How search works while studying" is in, with its topics through topicLabel; the app's own search of plan channels can't exist on the site's search page |
+| `678188f11` | 2026-11-15 | fix(android-study): stamp spring crash, Kriti fits per pose, break drain, sounds, preview safety | ported | `5a539088`, `e5f91eec`, `c5d15ae6` | the seal stamps once per session end with the stamp cue (e5f91eec); on a break a thin sun arc inside the Day Ring drains with it (c5d15ae6). The spring crash, per-pose art fitting and debug preview safety are Android-only |
 | `17a81affe` | 2026-11-15 | fix(study-setup): keep acronyms upper case in topic chips (DBMS, GATE CSE) | ported | `0a7e56ee` | StudyTopicLabel as study_engine.js topicLabel, used by the search explainer; StudyTopicLabelTest ported |
+| `79a3d892c` | 2026-11-15 | feat(android-study): Study v3 home renders in place, colours the page by state, sage-led crayon ring | ported | `06b3bf31`, `5a953666`, `f54d3cb3`, `c5d15ae6` | page colour by state: StudyStateTheme (pageState, pagePalette, pageEvening, mixColor) on the study card, both themes as custom properties, a 450 ms cross-fade; the sage-led Day Ring with the current break's sun arc and notches (c5d15ae6); StudyV3Test colour cases ported. The app's render-in-place, rolling steppers, Kriti's per-state stance and debug previews belong to its own home screen |
+| `b753aa71f` | 2026-11-15 | fix(android-study): setup polish from the emulator critique | ported | `06b3bf31`, `9bc49507`, `c8117191` | the setup polish in the same port: a chosen exam opens the fold, quiet dashed fold chips, Review folds only past 8 rows, an empty "Your own" shows only the Add row, sentence-case topics, the check beside the word and none on square class chips, the handle lookup hidden when a pack channel has that handle, the chosen country first. The add-sheet crash and the step-dot clipping were Android-only; the Hindi verb comes with the app's translations |
+| `6c3f9f0d5` | 2026-11-15 | feat(android-study): in-session moments on paper — break sun, Skip break with Undo, gate card, Home strip | ported | `2964d665`, `5a539088`, `c4f6496c`, `913e8f7d` | break on paper, the gate card, Skip break with its cost and 5 s Undo (c4f6496c); the sun's m:ss countdown draining from the break's start with Kriti at its edge, and "Up next after the break: {subject}" from the last lecture's title against the plan's subject chips (913e8f7d). The Home strip and music chip are the app's native Home and player |
+| `3bbad1d03` | 2026-11-15 | feat(android-study): redesigned study setup on paper — what for, grouped exams, school, streams, grouped review, add a channel | ported | `06b3bf31`, `9bc49507`, `c8117191`, `cfc92b45` | the step flow: what for (country card, three tiles, Kriti pointing), exams by field with the "Also taken from" fold and search, school boards, classes and streams, skills, the stream step, Review groups with switches, soft topics and Add a channel (looked up through fetchChannelDetails), the counts bar, Ready with Lock it in; StudySetupGroupsTest ported in app-parity-study-setup.test.mjs. Tablet and TV two-pane and remote focus are Android layout |
+| `789f3fbf5` | 2026-11-15 | fix(android-study): one continuous Day Ring and a balanced home hero | ported | `06b3bf31`, `c5d15ae6` | one continuous Day Ring: a faint full track, rounds and the sun break on it with 5° gaps at every edge (ringBoundaries, StudyHomeModelsTest ported), the now tick across the track. The balanced hero's "Open study" opens the app's study Home; the extension's status card keeps the ring, words, End session or Skip break, and Kriti |
+| `88d53bc09` | 2026-11-15 | feat(android-study): paper Study home with the crayon Day Ring and the end seal | ported | `06b3bf31`, `e5f91eec`, `c5d15ae6` | the end seal: StudySessionEnds (sessionEndStep, withSkips, sessionSeal, pendingSessionEnd) per profile in ftStudySessionEndsV1, the scalloped seal with the rounds' sage arcs, Kriti's jump, "{n} min studied. That counts.", the rounds, Done and Plan tomorrow, shown once; the crayon Day Ring in c5d15ae6. The app's paper home layout (folded Start choices, quiet rows) is its own screen; the extension keeps its study card |
 | `8d8c9a270` | 2026-11-15 | feat(android-study): StudyPaper uses FilterTube's brand colours (cream, ink, brick, hero pastels) | ported | `f4111820`, `5a953666` | StudyPaper brand colours |
 | `e8ab8e644` | 2026-11-15 | feat(android-study): StudyPaper, the shared paper-and-crayon foundation for the study redesign | ported | `f4111820` | paper-and-crayon foundation |
 | `79f10fec8` | 2026-11-15 | feat(android-study): catalog v3 slice: school streams, global school packs, no cross-country school packs | ported | `4a8d88e1` | catalog v3 slice; packs-v1.json byte-identical |
+| `980a58b67` | 2026-11-15 | feat(android-study): free round and break lengths, channel avatars, Kriti and Uljhan | ported | `43bdfb37`, `2f161e21` | free round (5-240) and break (0-120) lengths (43bdfb37); round channel pictures on Review rows, folded groups and Add a channel results, looked up once in the background and remembered (ftStudyChannelAvatarsV1, 2f161e21); Kriti and Uljhan on study surfaces were already in |
 | `ce156df15` | 2026-11-15 | fix(android-study): branches pick their channels and topics; breaks can be skipped | ported | `5f476d8f`, `2964d665`, `b3256609` | branch channels and topics, Skip break, and the merge keeps a parent's round and break lengths (StudyMergeTest case ported) |
 | `e64d74490` | 2026-11-15 | fix(android-study): a merge keeps "Pack channels only", and a parent's choice under their plan | ported | `b3256609` | mergeStudy keeps a parent's packChannelsOnly under their plan, else the incoming value when set; StudyMergeTest case ported |
 | `ccc767cab` | 2026-11-15 | fix(android-study): one decision for the study Home, the top-up and the Watch gate | ported | `7cbae66d`, `2ca24cd8` | one engine decides the feed and the Watch gate (study_engine.js) |
+| `fcd8018b8` | 2026-11-15 | feat(android-study): study pages: the gate card, hidden counts, Up next, Kids feed, loosening sheets | ported | `7cbae66d`, `a4306a68`, `810ee4cb` | gate card and tighten-only changes (7cbae66d, a4306a68); the loosening sheets C41-C43 with a running self session holding study (810ee4cb). Hidden counts on You lists, Up next on Watch, the Kids feed and the Filters editor are the app's native pages |
+| `2280f4ee3` | 2026-11-15 | fix(android-study): Self-Control expiry on the guarded clock, found on the emulator | ported | `43a28703`, `ec5b57a2` | Self-Control expiry and its reconcile read lockClockNow (the guarded clock); a forward clock re-arms the expiry for the guarded time left; no Start now during a clock hold; a self Locked session already stayed Locked for its window. The 16 dp study page margin is Android layout |
 | `0ddbfedec` | 2026-11-15 | feat(android-study): P3 matching precision, study Home ranking, copy fixes | ported | `199cce4f`, `e6a935ff` | title-only pack words, synonyms, failing closed |
 | `16113e01c` | 2026-11-15 | feat(android-study): P2 pages: tighten-only settings and sync, calm study states | ported | `a4306a68` | tighten-only settings and sync under a parent's plan |
+| `910016a10` | 2026-11-15 | feat(android-study): P1 enforcement: local media, fail closed, silent-device notice | ported | `199cce4f`, `96cd497d` | fail closed (199cce4f); the silent-device notice: the Requests inbox flags a linked child whose last report is over 3 days old, "Aarav's device stopped reporting" (96cd497d, StudyReportFreshness ported). Local media is Android-only |
 | `5b6f8f6e7` | 2026-11-15 | feat(android-study): P0 enforcement: Watch gate, clock anchors, profile-switch guard | ported | `7cbae66d`, `43a28703`, `300205ac` | Watch gate, clock guard, profile-switch guard |
 | `31080e0d5` | 2026-11-15 | feat(android): Study Family control screens for parents and children | ported | `06b3bf31` | parents' study plans on the options page |
 | `114904612` | 2026-11-15 | feat(android): Study Family control rules, codes and signed messages | ported | `ee748d4a`, `d8af2824` | Family scopes and signed study messages |
+| `9ed6a1e27` | 2026-11-15 | fix(android): Study review leftovers (skip chip, break Back, truthful lines) | ported | `06b3bf31`, `2964d665`, `fd6ffc49` | Skip this video as the first chip in the Watch action row during a round or a break that plays videos (fd6ffc49). Break Back is the app's rest screen navigation; the Filters tile and daily-limit card lines fix app copy the extension never had |
+| `ee59f65b4` | 2026-11-15 | fix(android): Study and focus review fixes, large-text Controls grid | ported | `06b3bf31`, `9bc49507`, `fd6ffc49` | End session with the 30-second pause said up front, the kind empty-week line, "Right now" following a running session (fd6ffc49), setup reopening on the chosen pack's list and country (9bc49507), "min left in your break" (913e8f7d) and "this video" were already the copy. The large-text Controls grid, 48 dp chips, the hub tile and the planner's barcode fix are Android layout |
 | `35303c7df` | 2026-11-15 | feat(android): Study and focus phone UI | ported | `06b3bf31` | popup strip, options study card, planner |
 | `361cfd06a` | 2026-11-15 | feat(android): Study engine with layered rules on the clock | ported | `44857de1`, `c22576dd`, `2ca24cd8` | study engine, layered rules, the clock |
 | `57c1508d4` | 2026-11-15 | feat(android): bundle the v2 Study pack catalog with class packs | ported | `a86825b1` | v2 pack catalog with class packs |
@@ -137,9 +135,11 @@ Rules: [HOW_TO_PORT.md](HOW_TO_PORT.md). Sync point: Android `ec9d91080` (Releas
 | `d95c866c6` | 2026-11-15 | feat(android): Study merges like keywords and never copies a running lock | ported | `43bdfb37` | study merges like keywords; a running lock is never copied |
 | `6973fdaa7` | 2026-11-15 | feat(android): Study model on each profile (study v1) and layered rules | ported | `79b831f1`, `1da48c8d` | study object per profile and layered rules |
 | `52d52ce5e` | 2026-11-15 | docs: day planner is the main Study plan screen | ported | `d8af2824` | the live policy change in nanah_managed_live_policy.js |
+| `17ea3465f` | 2026-11-16 | feat(android-study): Kids learning by age keeps the Kids space Kids | ported | `5f476d8f` | Kids study time and the "Kids learning for this age shows in Kids" note, in setup's Ready too (c8117191). Browsing the Kids catalogue by age is the app's native Kids Home |
 | `ec84c6817` | 2026-11-16 | fix(android-study): keep other branches' lectures out of a chosen branch | ported | `5f476d8f` | other-branch titles drop out of a chosen branch (study_engine.js studyBranchFilter) |
 | `0c08ba48b` | 2026-11-16 | feat(android-study): a light country accent on study setup | ported | `1d4a1011` | CountryAccent table, mark and 6 % wash in study_packs.js; the CrayonStripe and motif on the row that lists the country's packs; CountryAccentTest ported. The setup's step dots and squiggle have no extension counterpart (no step flow) |
 | `bd6b6adb4` | 2026-11-16 | feat(android-study): study packs for more countries | ported | `a99f051b`, `5f476d8f` | data/study/packs-v1.json byte-identical to the Android asset (ledger.mjs shared) |
+| `028e59c94` | 2026-11-16 | fix(android-study): study search finds lessons in the plan's own channels | ported | `ddf3ecb0`, `0a7e56ee` | "How search works while studying" with its topics through topicLabel, on the card and in setup's Review (c8117191). Searching the plan's own channels is the app's native search; the extension filters the site's search page, which it can't extend |
 | `49a8ba846` | 2026-11-15 | fix(android-study): keep the planner's scroll only once it has been laid out | n/a |  | Android platform plumbing (planner scroll restore) |
 | `c2fcb8b71` | 2026-11-15 | fix(android-study): no focus wash over the page (the slate dark mode); chip check sits with its words | n/a |  | Android platform plumbing (focus highlight over the native page) |
 | `4a27d8595` | 2026-11-15 | fix(android-study): cream switch thumbs in dark setup | n/a |  | Android platform plumbing (Material switch tint) |
@@ -160,15 +160,15 @@ Rules: [HOW_TO_PORT.md](HOW_TO_PORT.md). Sync point: Android `ec9d91080` (Releas
 
 | Android | Date | Subject | Status | Extension | Reason / note |
 |---|---|---|---|---|---|
-| `5b9b8d079` | 2026-11-15 | feat(android): Ask a parent opens the child's space as a parent-mode session | partial | `9effc66a` | a parent answers in the dashboard after a fresh PIN; no framed session in the child's space |
-| `c95f2c6a8` | 2026-11-15 | feat(android): parent mode, a framed session inside a Kids profile | partial | `812c11ad` | parent session bar; the framed parent-mode session inside a Kids profile is not traced |
-| `9af03736d` | 2026-11-16 | feat(android-family): finish parent mode: live sync badge, one exit, in-page wording, slim bar, gate hardening | partial | `812c11ad`, `6a9feba6` | parent session bar and the fresh-unlock gate are in; the live sync badge, one exit and in-page wording are not traced |
-| `685cf9b23` | 2026-11-16 | fix(android): parent-mode bar polish from device shots, plus screenshots | partial | `812c11ad` | parent session bar exists; the polish from device shots is not compared side by side |
+| `5b9b8d079` | 2026-11-15 | feat(android): Ask a parent opens the child's space as a parent-mode session | ported | `9effc66a`, `6d0df9e2` | each Ask a parent request offers "Open Aarav's space", which walks into the parent-mode session through Manage rules' fresh, sensitive unlock; a linked child device opens through the local child its Family link sends (spaceTarget ported) |
+| `c95f2c6a8` | 2026-11-15 | feat(android): parent mode, a framed session inside a Kids profile | ported | `812c11ad`, `6d0df9e2` | the framed session inside a Kids profile (sun frame, session bar, Managing, clock, Done, "Back in your space", "Saved for Aarav") in 812c11ad; the remote session naming the child's device (remoteLinkFor) in 6d0df9e2. Full-screen video and picture-in-picture presentation are the app's player |
 | `d5434b55b` | 2026-11-15 | feat(android-family): Ask a parent, child asks and parent answers | ported | `a5d69dd9`, `9effc66a` | Ask a parent: ask model and limits, signed filtertube.ask.v1, Requests, Allow once |
 | `d800183ba` | 2026-11-15 | feat(android): doodle avatars for profiles | ported | `812c11ad` | the avatar field (doodle:<name>) survives every rewrite and draws the doodle |
 | `f26f976ca` | 2026-11-15 | feat(android-ui): Settings creates profiles through ProfileCreateFlow; PaperKit polish | ported | `812c11ad` | profiles are created through the one create sheet (tab-view.js ProfileCreateSheet) |
 | `92b4e95cb` | 2026-11-15 | feat(android-profiles): crayon avatars, role-clear picker and a gated create sheet | ported | `812c11ad` | crayon avatars, role words, gated create |
 | `495ed51ee` | 2026-11-16 | fix(android-ask-parent): pick the ask from the typed block reason | ported | `a5d69dd9`, `9effc66a` | verified: the ask's blockedBy comes from the typed decision kind (dom_fallback.js), never page text; "Always allow this channel" only for a channel rule (shared/ask_parent.js channelAnswerable) |
+| `9af03736d` | 2026-11-16 | feat(android-family): finish parent mode: live sync badge, one exit, in-page wording, slim bar, gate hardening | ported | `812c11ad`, `6a9feba6`, `6d0df9e2` | the live sync badge (Connecting, Connected, Sending, Saved to, Will send to, Offline, Up to date) from the four Accounts & Sync places, ParentModeSession ported; one exit (the bar's Done) and the in-page wording were already so; the slim bar is in 812c11ad. The Kids parent gate categories and ChildActorWriteGuard are Android write paths; the extension's child admin restrictions already refuse those writes |
+| `685cf9b23` | 2026-11-16 | fix(android): parent-mode bar polish from device shots, plus screenshots | ported | `812c11ad`, `6d0df9e2` | compared with the app's shots: the title in the display face, and on narrow screens a remote bar stacks the device name above the sync badge (6d0df9e2). Insets, the scenery video and the debug night extra are Android-only |
 | `25fad1d90` | 2026-11-15 | fix(android): PIN gate verifies off main and handles insets | n/a |  | Android platform plumbing (PIN checks off the main thread, insets) |
 | `b2237068b` | 2026-11-15 | fix(android): verify PINs off the main thread | n/a |  | Android platform plumbing (PIN checks off the main thread) |
 
@@ -209,7 +209,7 @@ Rules: [HOW_TO_PORT.md](HOW_TO_PORT.md). Sync point: Android `ec9d91080` (Releas
 
 | Android | Date | Subject | Status | Extension | Reason / note |
 |---|---|---|---|---|---|
-| `3c204e3fe` | 2026-11-15 | fix(android): a Kids profile can't change pickup or merge Nearby rules alone | partial |  | a child can't set up pickup (tab-view.js configureNanahManagedMailboxServer refuses a child profile); a Nearby rules merge asking the managing parent's PIN every time is not traced |
+| `3c204e3fe` | 2026-11-15 | fix(android): a Kids profile can't change pickup or merge Nearby rules alone | ported | `b7693e57` | a Nearby rules merge into a child asks the managing parent's PIN every time (everyTime skips the fresh-unlock window); a child already couldn't set up or turn off pickup. The Study Focus PARENT role check has no counterpart |
 | `fad68cd40` | 2026-11-16 | fix(android): Study scopes over Internet Pickup and nearby delivery | ported | `b9242c7b` | extension commit cites it: Internet Pickup accepts signed Study scopes |
 | `21f2d3acb` | 2026-11-16 | fix(android): let a 3.6.2 child receive signed Study scopes | ported | `b9242c7b`, `390feeb2` | the extension child already receives signed study/focus_lock/schedule scopes (study-family-scopes test) |
 | `1c5d3de2e` | 2026-11-15 | fix(android): confirm nanah://pair links; Settings PIN checks off main | n/a |  | Android platform plumbing (nanah:// deep links, Settings threading) |
@@ -219,7 +219,7 @@ Rules: [HOW_TO_PORT.md](HOW_TO_PORT.md). Sync point: Android `ec9d91080` (Releas
 
 | Android | Date | Subject | Status | Extension | Reason / note |
 |---|---|---|---|---|---|
-| `d4c6fee30` | 2026-11-15 | feat(android-support): rotating support sheet variants with mascot moments | partial | `c5c99ef9`, `9c7ec12a` | 5 of 9 variants on purpose: caught and shoo say "no data on servers", unlocked promises the sheet stops showing, tea talks about cancelling |
+| `d4c6fee30` | 2026-11-15 | feat(android-support): rotating support sheet variants with mascot moments | partial | `c5c99ef9`, `9c7ec12a` | partial on purpose: 5 of 9 variants; caught and shoo say "no data on servers", unlocked promises the sheet stops showing, tea talks about cancelling |
 | `8dfad6d2d` | 2026-11-16 | fix(android-copy): say no servers keep your data, not that FilterTube has none | ported | `9c7ec12a`, `b2551b5d` | support copy says "no servers keeping your data"; caught/shoo stay out on purpose (see d4c6fee30) |
 
 ## strings
