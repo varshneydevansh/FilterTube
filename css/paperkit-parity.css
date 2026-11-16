@@ -1006,3 +1006,5 @@ body.ft-extension-surface[data-surface="tab-view"] .channel-item .channel-map-ro
   border-color: rgba(255, 255, 255, 0.31);
 }
 body.ft-extension-surface[data-surface="tab-view"] .channel-item > .channel-body-row { padding-top: 8px; }
+.ft-ask-hub-row--popup { margin: 8px 12px; padding: 10px 14px; }
+.ft-ask-hub-row--popup .ft-ask-hub-row__words { font-size: 16px; }

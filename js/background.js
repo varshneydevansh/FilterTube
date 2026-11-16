@@ -4125,6 +4125,9 @@ async function getCompiledSettings(sender = null, profileType = null, forceRefre
             // Ask a parent: "Allow once" lets the asked video play for 6 hours, read exactly like a
             // parent's allowed video (Android AskParentPasses). A study break or the plan's limit still
             // hides everything first.
+            // A blocked channel page offers "Ask for this channel" to a child instead of leaving at once
+            // (Android AskParentBlockedTarget on a channel); the page asks the background whether it can.
+            compiledSettings.askParentChild = activeProfileKind === 'child';
             compiledSettings.askParentPassVideoIds = (() => {
                 const studyState = normalizeString(compiledSettings.study?.state);
                 if (studyState === 'BREAK' || studyState === 'LIMIT') return [];
@@ -5372,10 +5375,50 @@ const askParentService = globalThis.FilterTubeAskParentBackground?.createAskPare
         Ask: globalThis.FilterTubeAskParent,
         parentUnlockFresh: profileId => isParentUnlockFresh(profileId),
         writeChannelRule: args => writeAskParentChannelRule(args),
+        // Ask for time: a parent's minutes go to the study runtime; a child's report carries its week.
+        addGrant: grant => studyBackground?.addGrant ? studyBackground.addGrant(grant) : { ok: false },
+        studyReport: profileId => studyBackground?.reportFor ? studyBackground.reportFor(profileId) : null,
         // A pass changes what plays: recompile and tell the open tabs, like a study transition.
-        onChange: () => broadcastStudyTransition()
+        onChange: () => { scheduleAskParentBadge(); return broadcastStudyTransition(); }
     })
     : null;
+
+/**
+ * Requests for a parent (Android notifies with "New family request"). The extension doesn't ask for the
+ * `notifications` permission, which would add an install warning; instead the toolbar badge shows how
+ * many asks and time requests the active parent profile can answer, next to the dashboard's
+ * "Requests · N" row and the popup's Requests entry. A child or nothing open shows no badge.
+ */
+let askParentBadgeTimer = null;
+function scheduleAskParentBadge() {
+    if (askParentBadgeTimer) clearTimeout(askParentBadgeTimer);
+    askParentBadgeTimer = setTimeout(() => { askParentBadgeTimer = null; void refreshAskParentBadge(); }, 250);
+}
+
+async function refreshAskParentBadge() {
+    const action = browserAPI.action || browserAPI.browserAction;
+    if (!askParentService || typeof action?.setBadgeText !== 'function') return;
+    try {
+        const count = await askParentService.openRequestCount();
+        const text = count > 0 ? String(Math.min(count, 99)) : '';
+        await Promise.resolve(action.setBadgeText({ text }));
+        if (text && typeof action.setBadgeBackgroundColor === 'function') {
+            await Promise.resolve(action.setBadgeBackgroundColor({ color: '#AB4438' }));
+        }
+        if (text && typeof action.setBadgeTextColor === 'function') {
+            await Promise.resolve(action.setBadgeTextColor({ color: '#FFFAF4' }));
+        }
+    } catch (e) {
+    }
+}
+
+try {
+    browserAPI.storage?.onChanged?.addListener?.((changes, area) => {
+        if (area === 'local' && (changes.ftAskParentV1 || changes[FT_PROFILES_V4_KEY] || changes.ftNanahTrustedLinks)) scheduleAskParentBadge();
+    });
+} catch (e) {
+}
+scheduleAskParentBadge();
 
 /**
  * "Always allow this channel" (Android AskParentRuleWrite): on each surface of the child's profile, a
@@ -5392,12 +5435,16 @@ async function writeAskParentChannelRule({ parentId, childId, channelId, channel
     const child = safeObject(profiles[childId]);
     if (normalizeString(child.type) !== 'child' || normalizeString(profilesV4.activeProfileId) !== parentId) return { ok: false, error: 'not_parent' };
     const Identity = globalThis.FilterTubeIdentity;
+    // An ask from a channel page may know only the @handle; the rule then holds the handle.
+    const handle = id.startsWith('@') ? id : null;
+    const meta = handle ? { handle } : { id };
     const matches = entry => {
         if (!entry) return false;
         if (typeof entry === 'string') return entry.trim().toLowerCase() === id.toLowerCase();
-        return Identity?.channelMatchesFilter ? Identity.channelMatchesFilter({ id }, entry, {}) : normalizeString(entry.id).toLowerCase() === id.toLowerCase();
+        if (Identity?.channelMatchesFilter) return Identity.channelMatchesFilter(meta, entry, {});
+        return normalizeString(handle ? entry.handle : entry.id).toLowerCase() === id.toLowerCase();
     };
-    const row = { id, name: normalizeString(channelName) || id, handle: null, filterAll: false, source: 'ask_parent', addedAt: Date.now() };
+    const row = { id: handle ? '' : id, name: normalizeString(channelName) || id, handle, filterAll: false, source: 'ask_parent', addedAt: Date.now() };
     const next = { ...child };
     const main = { ...safeObject(child.main) };
     if (normalizeString(main.mode) === 'whitelist') {
@@ -5421,6 +5468,7 @@ async function writeAskParentChannelRule({ parentId, childId, channelId, channel
 
 const ASK_PARENT_PAGE_ACTIONS = new Set([
     'FilterTube_AskParentInbox', 'FilterTube_AskParentAnswer', 'FilterTube_AskParentSetAsking',
+    'FilterTube_AskParentTimeState', 'FilterTube_AskParentTimeAsk', 'FilterTube_AskParentTimeCancel', 'FilterTube_AskParentTimeAnswer',
     'FilterTube_AskParentNanahOutbox', 'FilterTube_AskParentNanahSent', 'FilterTube_AskParentNanahReceive'
 ]);
 
@@ -5442,6 +5490,10 @@ function handleAskParentMessage(request, sender, sendResponse) {
             case 'FilterTube_AskParentInbox': return askParentService.inbox();
             case 'FilterTube_AskParentAnswer': return askParentService.answer(request);
             case 'FilterTube_AskParentSetAsking': return askParentService.setAsking(request);
+            case 'FilterTube_AskParentTimeState': return askParentService.timeState();
+            case 'FilterTube_AskParentTimeAsk': return askParentService.askTime(request);
+            case 'FilterTube_AskParentTimeCancel': return askParentService.cancelTime(request.requestId);
+            case 'FilterTube_AskParentTimeAnswer': return askParentService.answerTime(request);
             case 'FilterTube_AskParentNanahOutbox': return askParentService.outbox(request.remote);
             case 'FilterTube_AskParentNanahSent': return askParentService.markSent(request.sentByLink).then(() => ({ ok: true }));
             case 'FilterTube_AskParentNanahReceive': return askParentService.receive(normalizeString(request.remoteDeviceId), request.message);

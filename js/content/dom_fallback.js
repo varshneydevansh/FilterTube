@@ -2279,14 +2279,75 @@ function formatCurrentWatchAdmissionMessage(decision, ownerMeta = {}) {
     return 'Blocked by an active FilterTube rule';
 }
 
+const FILTERTUBE_BLOCKED_CHANNEL_PAGE_ID = 'filtertube-blocked-channel-page';
+
+/** The channel a child could ask for: its UC id, else its @handle (what a channel rule can hold). */
+function blockedChannelAskId(pageMeta = {}) {
+    const id = String(pageMeta?.id || '').trim();
+    if (/^UC[\w-]{22}$/.test(id)) return id;
+    const handle = String(pageMeta?.handle || '').trim();
+    if (handle) return handle.startsWith('@') ? handle : `@${handle}`;
+    return '';
+}
+
+function clearBlockedChannelPage() {
+    try {
+        const overlay = document.getElementById(FILTERTUBE_BLOCKED_CHANNEL_PAGE_ID);
+        if (!overlay) return;
+        window.FilterTubeAdmissionOverlay?.clear?.(overlay);
+        overlay.remove();
+        if (window.__filtertubeAskParentTarget?.kind === 'channel') window.__filtertubeAskParentTarget = null;
+    } catch (e) {
+    }
+}
+
+/**
+ * A blocked channel page for a child: a full-page blocked card (the admission overlay's look) with
+ * "Ask for this channel" when a parent can answer, and Back to Home. The channel's own videos pause.
+ * Returns false when there is nothing to draw it with, so the caller leaves the page as before.
+ */
+function showBlockedChannelPage(path, pageMeta, channelName, blockedBy) {
+    try {
+        const renderer = window.FilterTubeAdmissionOverlay;
+        const host = document.body || document.documentElement;
+        const channelId = blockedChannelAskId(pageMeta);
+        if (typeof renderer?.render !== 'function' || !host || !channelId) return false;
+        const name = String(channelName || pageMeta?.name || channelId).replace(/\s+/g, ' ').trim().slice(0, 120);
+        window.__filtertubeAskParentTarget = {
+            kind: 'channel', videoId: null, channelId, title: name, channelName: name,
+            blockedBy: blockedBy === 'allow_list' ? 'allow_list' : 'channel'
+        };
+        let overlay = document.getElementById(FILTERTUBE_BLOCKED_CHANNEL_PAGE_ID);
+        if (!overlay) {
+            overlay = document.createElement('div');
+            overlay.id = FILTERTUBE_BLOCKED_CHANNEL_PAGE_ID;
+            overlay.setAttribute('role', 'dialog');
+            overlay.setAttribute('aria-modal', 'true');
+            overlay.setAttribute('data-state', 'blocked');
+            host.appendChild(overlay);
+        }
+        const message = `${blockedBy === 'allow_list' ? 'Not in Allow only selected' : 'Blocked channel'}\n${name}`;
+        if (overlay.__filtertubeChannelPath !== path || overlay.__filtertubeAdmissionMessage !== message) {
+            overlay.__filtertubeChannelPath = path;
+            overlay.__filtertubeAdmissionKind = 'channel';
+            renderer.render(overlay, 'blocked', message);
+        }
+        try { document.querySelectorAll('video').forEach(video => video.pause?.()); } catch (e) {}
+        return true;
+    } catch (e) {
+        return false;
+    }
+}
+
 function enforceCurrentChannelPageDirectAccess(settings) {
     try {
         if (!isFilterTubeFilteringEnabled(settings)) {
+            clearBlockedChannelPage();
             releaseDisabledDirectAccessState();
             return false;
         }
         const path = String(document.location?.pathname || '');
-        if (!isCreatorChannelPagePath(path)) return false;
+        if (!isCreatorChannelPagePath(path)) { clearBlockedChannelPage(); return false; }
         const routeMeta = buildChannelMetadata('', path) || {};
         const pageMeta = getCurrentPageChannelMeta() || routeMeta;
         const channelName = pageMeta?.name || pageMeta?.handle || pageMeta?.id || pageMeta?.customUrl || '';
@@ -2306,7 +2367,10 @@ function enforceCurrentChannelPageDirectAccess(settings) {
                 Array.isArray(settings?.whitelistChannels) &&
                 settings.whitelistChannels.length > 0
             ));
-        if (!shouldBlock) return false;
+        if (!shouldBlock) { clearBlockedChannelPage(); return false; }
+        // A child may ask a parent for this channel (Android: the ask from a blocked channel): the page
+        // stays behind a blocked card with "Ask for this channel" and Back instead of leaving at once.
+        if (settings?.askParentChild === true && showBlockedChannelPage(path, pageMeta, channelName, blockMatch ? 'channel' : 'allow_list')) return true;
         if (document.documentElement?.getAttribute('data-filtertube-direct-channel-redirect') === path) return true;
         document.documentElement?.setAttribute('data-filtertube-direct-channel-redirect', path);
         document.location.replace('/');

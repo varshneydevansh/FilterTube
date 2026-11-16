@@ -2305,6 +2305,39 @@ document.addEventListener('DOMContentLoaded', async () => {
         else document.body.prepend(card);
     }
 
+    /**
+     * Ask a parent, the parent's side: "Requests · 2" with Answer, which opens the dashboard where the
+     * Requests are answered with a fresh PIN. With the toolbar badge, this stands in for the app's
+     * notification (no `notifications` permission, so no extra install warning).
+     */
+    async function renderAskParentRequestsEntry() {
+        const data = await sendRuntimeMessage({ action: 'FilterTube_AskParentInbox' }).catch(() => null);
+        document.getElementById('ftAskParentRequestsPopup')?.remove();
+        if (!data?.isParent) return;
+        const count = ['here', 'remote', 'timeHere', 'timeRemote'].reduce((sum, key) => sum + (Array.isArray(data[key]) ? data[key].length : 0), 0);
+        if (!count) return;
+        const row = document.createElement('section');
+        row.id = 'ftAskParentRequestsPopup';
+        row.className = 'ft-ask-hub-row ft-ask-hub-row--popup';
+        const words = document.createElement('span');
+        words.className = 'ft-ask-hub-row__words';
+        words.textContent = `${popupUiText('askParent.inboxTitle', 'Requests')} · ${count}`;
+        const open = document.createElement('button');
+        open.type = 'button';
+        open.className = 'btn-primary';
+        open.textContent = popupUiText('askParent.answer', 'Answer');
+        open.addEventListener('click', () => {
+            const api = (typeof chrome !== 'undefined' && chrome.runtime) ? chrome : (typeof browser !== 'undefined' ? browser : null);
+            const url = api?.runtime?.getURL ? api.runtime.getURL('html/tab-view.html?view=dashboard') : 'html/tab-view.html?view=dashboard';
+            try { api.tabs.create({ url }); } catch (e) { window.open(url, '_blank', 'noopener,noreferrer'); }
+            try { window.close(); } catch (e) {}
+        });
+        row.append(words, open);
+        const anchor = document.getElementById('ftManagedTimeStatusPopup');
+        if (anchor?.parentNode) anchor.parentNode.insertBefore(row, anchor);
+        else document.body.prepend(row);
+    }
+
     async function passStudySwitchGate(targetId) {
         let decision = null;
         try {
@@ -2616,6 +2649,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     await refreshProfilesUI();
     updateSubscriptionsShortcut();
     void renderAskParentAnswer();
+    void renderAskParentRequestsEntry();
 
     if (ftProfileBadgeBtnPopup && ftProfileDropdownPopup) {
         closeProfileDropdown();

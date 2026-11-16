@@ -28215,7 +28215,76 @@ document.addEventListener('DOMContentLoaded', async () => {
         try { return new Date(value).toLocaleTimeString([], { hour: 'numeric', minute: '2-digit' }); } catch (e) { return ''; }
     }
 
+    /**
+     * A child's "Ask for time" (Android StudyFamilyActivity.addRequests): "Aarav asks for 20 more minutes",
+     * the reason, when it was asked and until when it waits, then "Give 20 min" and "Not now". For a
+     * child on another device the signed grant goes at the next connection.
+     */
+    function renderAskParentTimeRequest(item, list) {
+        const card = document.createElement('article');
+        card.className = 'ft-ask-request is-time';
+        const heading = document.createElement('div');
+        heading.className = 'ft-ask-request__title';
+        heading.textContent = tabViewUiText('askParent.cardTimeAsk', '{name} asks for {minutes} more minutes', { name: item.childName, minutes: item.minutes });
+        card.appendChild(heading);
+        const meta = document.createElement('div');
+        meta.className = 'ft-ask-request__meta';
+        meta.textContent = tabViewUiText('study.family.requestTime', 'Asked at {asked} · Open until {ends}', { asked: askParentTime(item.createdAt), ends: askParentTime(item.expiresAt) });
+        card.appendChild(meta);
+        if (item.reason) {
+            const note = document.createElement('p');
+            note.className = 'ft-ask-request__note';
+            note.textContent = tabViewUiText('askParent.cardNote', '“{note}”', { note: item.reason });
+            card.appendChild(note);
+        }
+        const actions = document.createElement('div');
+        actions.className = 'ft-ask-request__actions';
+        const decide = async grant => {
+            actions.querySelectorAll('button').forEach(node => { node.disabled = true; });
+            const result = await askParentWithFreshPin({ action: 'FilterTube_AskParentTimeAnswer', requestId: item.id, linkId: item.linkId || '', grant });
+            if (!result?.ok) {
+                actions.querySelectorAll('button').forEach(node => { node.disabled = false; });
+                if (result?.type === 'not_allowed') UIComponents.showToast(tabViewUiText('askParent.needsParent', 'Switch to a parent profile to answer requests.'), 'error');
+                return;
+            }
+            card.replaceChildren();
+            card.classList.add('is-answered');
+            const done = document.createElement('div');
+            done.className = 'ft-ask-request__done';
+            if (grant && window.FilterTubeDoodles?.check) {
+                const check = window.FilterTubeDoodles.check({ size: 22 });
+                if (check) done.appendChild(check);
+            }
+            const said = document.createElement('span');
+            said.textContent = grant
+                ? tabViewUiText('study.family.gave', 'Gave {minutes} min', { minutes: item.minutes })
+                : tabViewUiText('study.family.declined', 'Said not now');
+            done.appendChild(said);
+            card.appendChild(done);
+            if (result.sendsLater) {
+                const later = document.createElement('p');
+                later.className = 'ft-ask-request__meta';
+                later.textContent = tabViewUiText('study.family.sendsLater', 'It reaches {name}\'s device when they connect.', { name: item.childName });
+                card.appendChild(later);
+            }
+        };
+        const give = document.createElement('button');
+        give.type = 'button';
+        give.className = 'btn-primary';
+        give.textContent = tabViewUiText('study.family.give', 'Give {minutes} min', { minutes: item.minutes });
+        give.addEventListener('click', () => decide(true));
+        const no = document.createElement('button');
+        no.type = 'button';
+        no.className = 'btn-secondary';
+        no.textContent = tabViewUiText('askParent.notNow', 'Not now');
+        no.addEventListener('click', () => decide(false));
+        actions.append(give, no);
+        card.appendChild(actions);
+        list.appendChild(card);
+    }
+
     function renderAskParentRequest(item, list) {
+        if (item.kind === 'time') { renderAskParentTimeRequest(item, list); return; }
         const card = document.createElement('article');
         card.className = 'ft-ask-request';
         const heading = document.createElement('div');
@@ -28328,7 +28397,8 @@ document.addEventListener('DOMContentLoaded', async () => {
         const data = await sendRuntimeMessage({ action: 'FilterTube_AskParentInbox' });
         const children = [...safeArray(data?.children), ...safeArray(data?.remoteChildren)];
         if (!data?.isParent || !children.length) { host.hidden = true; host.replaceChildren(); renderAskParentHubRow(0); return; }
-        const requests = [...safeArray(data.here), ...safeArray(data.remote)].sort((a, b) => (a.createdAt || 0) - (b.createdAt || 0));
+        const requests = [...safeArray(data.here), ...safeArray(data.remote), ...safeArray(data.timeHere), ...safeArray(data.timeRemote)]
+            .sort((a, b) => (a.createdAt || 0) - (b.createdAt || 0));
         renderAskParentHubRow(requests.length);
         host.hidden = false;
         host.className = 'help-item ft-ask-inbox';

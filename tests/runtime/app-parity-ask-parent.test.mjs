@@ -265,7 +265,8 @@ test('end to end over study_family: the child\'s ask reaches the parent, the sig
     assert.equal(await child.service.outbox({ deviceId: 'android-parent', capabilities: [] }), null, 'never to a device without filtertube.study.v1');
     const fromChild = await child.service.outbox({ deviceId: 'android-parent', capabilities: ['filtertube.study.v1'] });
     assert.equal(fromChild.message.t, 'study_family');
-    assert.deepEqual(fromChild.message.reports, []);
+    // The child's study report rides along (Android StudyFamilyService.reportsFor): totals and time requests only.
+    assert.deepEqual(fromChild.message.reports.map(report => [report.type, report.childProfileId, report.requests.length]), [['filtertube.study.report.v1', 'aarav', 0]]);
     assert.equal(fromChild.message.asks.length, 1);
     assert.equal(await child.service.outbox({ deviceId: 'android-stranger', capabilities: ['filtertube.study.v1'] }), null);
 

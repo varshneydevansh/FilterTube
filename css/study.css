@@ -205,3 +205,18 @@
 :root[data-theme="dark"] .ft-study-explainer { background: rgba(31, 111, 106, 0.16); border-color: rgba(120, 190, 180, 0.28); }
 :root[data-theme="dark"] .ft-study-explainer__title { color: #d5ece8; }
 :root[data-theme="dark"] .ft-study-explainer__body { color: #b8c3ce; }
+
+/* "Ask for time" (Android StudyFamilyUi): the request line in study ink, then the button or the sheet
+ * on sun paper with the 10 / 20 / 30 min choice and an optional reason. */
+.ft-study-ask { margin-top: 0.75rem; display: grid; gap: 0.45rem; }
+.ft-study-ask__line { margin: 0; color: #163f3c; font-weight: 600; }
+.ft-study-ask__line.is-given { margin-top: 0.6rem; color: var(--ft-study-green); }
+.ft-study-ask__sheet {
+    display: grid; gap: 0.6rem; padding: 0.9rem 1rem; border-radius: 1rem;
+    background: #fff3cf; border: 1px solid #ecd9a0;
+}
+.ft-study-ask__title { margin: 0; font: 400 1.1rem/1.3 "FilterTube Delius", "Outfit", system-ui, sans-serif; color: #1b1a18; }
+.ft-study-ask__reason { width: 100%; box-sizing: border-box; min-height: 44px; }
+:root[data-theme="dark"] .ft-study-ask__line { color: #d5ece8; }
+:root[data-theme="dark"] .ft-study-ask__sheet { background: #2c2716; border-color: #4a4128; }
+:root[data-theme="dark"] .ft-study-ask__title { color: #f6eccd; }

@@ -681,13 +681,23 @@
             if (companionLoading) companionLoading.then(() => playAdmissionShoo(shoo));
             else playAdmissionShoo(shoo);
         }
-        status.textContent = blocked
-            ? localizedAdmissionText('admission.blockedStatus', 'Playback blocked')
-            : localizedAdmissionText('admission.checkingStatus', 'Checking playback');
-        title.textContent = blocked
-            ? localizedAdmissionText('admission.blockedTitle', 'This video is blocked')
-            : localizedAdmissionText('admission.checkingTitle', 'Checking before playback');
+        // A blocked channel page (dom_fallback.js showBlockedChannelPage): the reason as the status,
+        // the channel's name as the title, then the ask and a way back. There is no player here.
+        const channelPage = blocked && overlay.__filtertubeAdmissionKind === 'channel';
+        const channelLines = channelPage ? String(message || '').split('\n') : [];
+        status.textContent = channelPage
+            ? localizedAdmissionMessage(channelLines[0] || '')
+            : (blocked
+                ? localizedAdmissionText('admission.blockedStatus', 'Playback blocked')
+                : localizedAdmissionText('admission.checkingStatus', 'Checking playback'));
+        title.textContent = channelPage
+            ? (channelLines.slice(1).join(' ').trim() || localizedAdmissionMessage(channelLines[0] || ''))
+            : (blocked
+                ? localizedAdmissionText('admission.blockedTitle', 'This video is blocked')
+                : localizedAdmissionText('admission.checkingTitle', 'Checking before playback'));
         reason.textContent = localizedAdmissionMessage(message);
+        admissionOverlayStyle(reason, { display: channelPage ? 'none' : 'block' });
+        if (channelPage) mountChannelBack(overlay, panel, darkTheme);
         if (blocked) mountAskParent(overlay, panel, darkTheme);
         else removeAskParent(overlay);
         if (blocked && background?.play && background.paused !== false) {
@@ -801,7 +811,9 @@
         admissionOverlayStyle(holder, { padding: '16px', borderRadius: '18px', background: dark ? '#2c2716' : '#fff3cf',
             border: `1px solid ${dark ? '#4a4128' : '#ecd9a0'}` });
         const title = document.createElement('h2');
-        title.textContent = askText('askParent.titleVideo', 'Ask to watch');
+        title.textContent = target.kind === 'channel'
+            ? askText('askParent.titleChannel', 'Ask for this channel')
+            : askText('askParent.titleVideo', 'Ask to watch');
         admissionOverlayStyle(title, { margin: '0', font: '400 22px/1.2 "FilterTube Delius", "Outfit", system-ui, sans-serif', color: dark ? '#f6eccd' : '#1b1a18' });
         holder.appendChild(title);
         holder.appendChild(askLine(askText('askParent.sheetBody', '{name} will see your ask and answer it.', { name }), dark));
@@ -870,21 +882,41 @@
         holder.replaceChildren();
         makeRoomForSheet(holder, false);
         admissionOverlayStyle(holder, { padding: '0', background: 'transparent', border: '0' });
-        const ask = askButton(askText('askParent.button', 'Ask to watch'), true, dark);
+        const ask = askButton(target.kind === 'channel'
+            ? askText('askParent.titleChannel', 'Ask for this channel')
+            : askText('askParent.button', 'Ask to watch'), true, dark);
         ask.setAttribute('data-filtertube-ask-parent', 'true');
         ask.addEventListener('click', () => renderAskSheet(holder, target, state, dark));
         holder.appendChild(ask);
     }
 
+    /** "Back" on a blocked channel page: there is no player to return to, so it goes Home. */
+    function mountChannelBack(overlay, panel, dark) {
+        if (!panel || typeof document.createElement !== 'function' || overlay.__filtertubeChannelBack) return;
+        const back = askButton(askText('askParent.back', 'Back'), false, dark);
+        back.setAttribute('data-filtertube-channel-back', 'true');
+        back.addEventListener('click', () => {
+            try { root.location.assign('/'); } catch (e) {}
+        });
+        const row = document.createElement('div');
+        admissionOverlayStyle(row, { display: 'flex', justifyContent: 'flex-start', order: '10' });
+        row.appendChild(back);
+        panel.appendChild(row);
+        overlay.__filtertubeChannelBack = row;
+    }
+
     async function mountAskParent(overlay, panel, dark) {
         const target = root.__filtertubeAskParentTarget;
-        if (!overlay || !panel || !target?.videoId || typeof document.createElement !== 'function') { removeAskParent(overlay); return; }
-        const key = `${target.videoId}|${target.blockedBy}`;
-        // One ask card per blocked video; a redraw of the same card keeps it (and its typed note).
+        const channelAsk = target?.kind === 'channel' && !!target.channelId;
+        if (!overlay || !panel || (!target?.videoId && !channelAsk) || typeof document.createElement !== 'function') { removeAskParent(overlay); return; }
+        const key = channelAsk ? `c:${target.channelId}|${target.blockedBy}` : `${target.videoId}|${target.blockedBy}`;
+        // One ask card per blocked video or channel; a redraw of the same card keeps it (and its typed note).
         if (overlay.__filtertubeAskParentKey === key) return;
         removeAskParent(overlay);
         overlay.__filtertubeAskParentKey = key;
-        const state = await askSend({ action: 'FilterTube_AskParentState', videoId: target.videoId });
+        const state = await askSend(channelAsk
+            ? { action: 'FilterTube_AskParentState', channelId: target.channelId }
+            : { action: 'FilterTube_AskParentState', videoId: target.videoId });
         if (!state?.isChild || overlay.__filtertubeAskParentKey !== key || overlay.__filtertubeAdmissionState !== 'blocked') return;
         if (!state.canAsk && !state.openFor) return;
         const holder = document.createElement('div');

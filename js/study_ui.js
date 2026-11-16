@@ -675,6 +675,14 @@
         words.appendChild(actions);
         status.append(ringBox, words);
         card.appendChild(status);
+        if (Number.isFinite(state.grantUntil)) {
+            card.appendChild(el('p', 'ft-study-ask__line is-given', t('study.ask.given', '{name} gave you {minutes} min · until {time}',
+                { name: data.grantName || data.parentName || t('askParent.parentFallback', 'Your parent'), minutes: state.grantMinutes, time: formatTime(state.grantUntil) })));
+        }
+        if (data.isChild === true || state.isChild === true) {
+            const managed = !!(state.setByParentId || text(object(study.plan).setByParentId) || text(object(study.lock).setByParentId));
+            if (managed && data.time?.isChild) card.appendChild(askForTime(data.time, refresh));
+        }
 
         if (state.weekView && state.week) {
             const week = el('div', 'ft-study-week');
@@ -707,6 +715,73 @@
         if (explainer) card.appendChild(explainer);
         if (editable && state.state !== 'STUDY' && state.state !== 'BREAK') card.appendChild(startNow(study, refresh));
         host.replaceChildren(card);
+    }
+
+    /**
+     * "Ask for time" (Android StudyFamilyUi.addAskForTime): the child's request line, then the button, or
+     * the sheet: How long? 10, 20 or 30 min, an optional reason, Send request. Nothing is granted until a
+     * parent answers.
+     */
+    function askForTime(time, refresh) {
+        const box = el('div', 'ft-study-ask');
+        box.setAttribute('data-ft-study-ask-time', 'true');
+        const name = text(time.parentName) || t('askParent.parentFallback', 'Your parent');
+        const latest = object(time.latest);
+        const pending = latest.status === 'pending' && Number(latest.expiresAt) > Date.now();
+        const line = pending
+            ? t('study.ask.waiting', 'Asked for {minutes} min · Waiting for {name}', { minutes: latest.minutes, name })
+            : latest.status === 'declined' && Date.now() - Number(latest.decidedAt || 0) < 6 * 60 * 60 * 1000
+                ? t('study.ask.declined', '{name} said not now. You can ask again later.', { name })
+                : latest.status === 'expired' && Date.now() - Number(latest.expiresAt || 0) < 60 * 60 * 1000
+                    ? t('study.ask.expired', 'Your request ran out. You can ask again.')
+                    : '';
+        if (line) box.appendChild(el('p', 'ft-study-ask__line', line));
+        if (pending && time.route === 'relay') {
+            box.appendChild(el('p', 'ft-study-muted', t('askParent.waitingRemote', '{name} will see it next time their device connects.', { name })));
+        }
+        const row = el('div', 'ft-study-actions');
+        if (pending) {
+            row.appendChild(button(t('study.ask.cancel', 'Cancel request'), 'btn-secondary', async () => {
+                await send({ action: 'FilterTube_AskParentTimeCancel', requestId: latest.id });
+                refresh();
+            }));
+        } else if (time.canAsk) {
+            row.appendChild(button(t('study.ask.forTime', 'Ask for time'), 'btn-primary', () => box.replaceChildren(askForTimeSheet(time, name, refresh))));
+        } else {
+            box.appendChild(el('p', 'ft-study-muted', t('askParent.noParent', 'No parent is linked yet, so this can\'t be sent.')));
+        }
+        box.appendChild(row);
+        return box;
+    }
+
+    function askForTimeSheet(time, name, refresh) {
+        const sheet = el('div', 'ft-study-ask__sheet');
+        sheet.setAttribute('role', 'group');
+        sheet.appendChild(el('h5', 'ft-study-ask__title', t('study.ask.title', 'Ask for more time')));
+        sheet.appendChild(el('p', 'ft-study-muted', t('study.ask.body', '{name} decides. You\'ll see the answer here.', { name })));
+        let minutes = 20;
+        const length = segmented([10, 20, 30].map(value => [value, t('study.minutes', '{minutes} min', { minutes: value })]), minutes,
+            value => { minutes = value; mark(length, value); }, t('study.ask.howLong', 'How long?'));
+        const reason = el('input', 'text-input ft-study-ask__reason');
+        reason.type = 'text';
+        reason.maxLength = 80;
+        reason.placeholder = t('study.ask.reasonHint', 'For example: finishing a lecture');
+        reason.setAttribute('aria-label', t('study.ask.reason', 'Why? (optional)'));
+        const status = el('p', 'ft-study-muted', '');
+        status.setAttribute('role', 'status');
+        const actions = el('div', 'ft-study-actions');
+        actions.appendChild(button(t('study.ask.notNow', 'Not now'), 'btn-secondary', () => refresh()));
+        const go = button(t('study.ask.send', 'Send request'), 'btn-primary', async () => {
+            go.disabled = true;
+            const result = await send({ action: 'FilterTube_AskParentTimeAsk', minutes, reason: reason.value });
+            go.disabled = false;
+            if (result?.type === 'already_waiting') status.textContent = t('study.ask.already', 'You already asked. Wait for the answer, or cancel it first.');
+            else if (result?.ok) refresh();
+            else status.textContent = t('askParent.noParent', 'No parent is linked yet, so this can\'t be sent.');
+        });
+        actions.appendChild(go);
+        sheet.append(field(t('study.ask.howLong', 'How long?'), length), field(t('study.ask.reason', 'Why? (optional)'), reason), status, actions);
+        return sheet;
     }
 
     /** A count with its plural form ("9 channels"), from key.one / key.other / key.<category>. */
@@ -796,13 +871,16 @@
             if (!catalog) catalog = await loadCatalog();
             const parentName = state.setByParentId || text(object(state.study?.plan).setByParentId)
                 ? await profileName(state.setByParentId || state.study.plan.setByParentId) : '';
-            renderDashboard(host, { state, parentName }, { refresh, catalog });
+            // A child's "Ask for time" and who gave the minutes running now.
+            const time = state.isChild ? await send({ action: 'FilterTube_AskParentTimeState' }) : null;
+            const grantName = state.grantBy ? await profileName(state.grantBy) : '';
+            renderDashboard(host, { state, parentName, time, grantName: grantName || text(time?.parentName) }, { refresh, catalog });
             clearTimeout(timer);
             const ending = Number.isFinite(state.endRequestedAt);
             timer = setTimeout(refresh, ending ? 1000 : 30000);
         }
         root.addEventListener?.('filtertube-ui-locale-changed', refresh);
-        try { runtime()?.storage?.onChanged?.addListener((changes, area) => { if (area === 'local' && (changes.ftProfilesV4 || changes.ftStudyRuntimeV1)) refresh(); }); } catch (e) { }
+        try { runtime()?.storage?.onChanged?.addListener((changes, area) => { if (area === 'local' && (changes.ftProfilesV4 || changes.ftStudyRuntimeV1 || changes.ftAskParentV1)) refresh(); }); } catch (e) { }
         refresh();
         return { refresh };
     }
@@ -914,7 +992,7 @@
 
     root.FilterTubeStudyUi = Object.freeze({
         t, phaseInfo, planSegments, segmentWords, setByLabel, packLabel, renderStrip, mountStrip,
-        renderPlanner, renderDashboard, mountDashboard, renderParentPlans, searchExplainerCard
+        renderPlanner, renderDashboard, mountDashboard, renderParentPlans, searchExplainerCard, askForTime
     });
 
     // Popup: the strip takes the banner slot under the header. Options page: the study card.

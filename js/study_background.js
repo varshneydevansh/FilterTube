@@ -56,7 +56,9 @@
             seconds: object(clone(raw.seconds)),
             lastCreditAt: Number.isFinite(raw.lastCreditAt) ? raw.lastCreditAt : 0,
             // "Skip this video" (Android StudyRuntimeStore skip:<profile>): per profile, newest last.
-            skipped: object(clone(raw.skipped))
+            skipped: object(clone(raw.skipped)),
+            // Minutes a parent gave (Android StudyRuntimeStore grants): normal rules until each ends.
+            grants: array(clone(raw.grants))
         };
     }
 
@@ -84,6 +86,8 @@
         const Engine = deps.Engine || root.FilterTubeStudyEngine;
         const Model = deps.Model || root.FilterTubeStudyModel;
         const Packs = deps.Packs || root.FilterTubeStudyPacks;
+        const Ask = deps.Ask || root.FilterTubeAskParent
+            || (typeof module === 'object' && module.exports && typeof require === 'function' ? require('./shared/ask_parent.js') : null);
         const Guard = deps.Guard || root.FilterTubeStudyClockGuard
             || (typeof module === 'object' && module.exports && typeof require === 'function' ? require('./shared/study_clock_guard.js') : null);
         const now = () => (typeof deps.now === 'function' ? deps.now() : Date.now());
@@ -176,12 +180,31 @@
             return false;
         }
 
+        /**
+         * Time a parent gave, running now on both clocks (Android StudyRuntime.clockState: a grant wins
+         * over rounds, the rest screen, the limit and a lock), or null.
+         */
+        function runningGrant(runtime, profileId, at, reading) {
+            if (!Ask?.activeGrant) return null;
+            const grants = array(runtime?.grants);
+            const times = reading ? [reading.wall, reading.trusted].filter(Number.isFinite) : [at];
+            const found = (times.length ? times : [at]).map(time => Ask.activeGrant(grants, profileId, time));
+            return found.every(Boolean) ? found[0] : null;
+        }
+
         /** The clock for one profile, from its study plan, this device's runtime and the clock guard. */
         function clockFor(profile, runtime, profileId, at = now(), options = {}) {
             const study = Model.profileStudy(profile);
             const local = profileRuntime(runtime, profileId);
             if (!study) return { study: null, local, clock: Engine.studyClock({ plan: null, now: at }), reading: null };
             const reading = options.reading || (Guard ? Guard.wallOnly(at, zoneId()) : null);
+            const grant = runningGrant(runtime, profileId, at, options.reading || null);
+            if (grant) {
+                const endsAt = Ask.grantEndsAt(grant);
+                const clock = { ...Engine.studyClock({ plan: null, now: at }), next: { state: Engine.NORMAL, at: endsAt, round: null },
+                    grantUntil: endsAt, grantMinutes: grant.minutes, grantBy: grant.parentProfileId || null };
+                return { study, local, clock, reading, parentLock: { active: false, ended: false, remainingMs: 0 } };
+            }
             const guarded = reading ? guardFor(study, reading, options.clockStore) : { lock: { active: false }, window: null };
             const clockHold = !!reading && reading.changed && clockInForce(study, local, reading, guarded);
             const clock = Engine.studyClock({
@@ -284,6 +307,9 @@
                 lockMode: clock.setByParentId ? 'locked' : (local.session?.lockMode || null),
                 endPolicy: policy,
                 endRequestedAt: local.endRequestedAt,
+                grantUntil: Number.isFinite(clock.grantUntil) ? clock.grantUntil : null,
+                grantMinutes: Number.isFinite(clock.grantMinutes) ? clock.grantMinutes : null,
+                grantBy: clock.grantBy || null,
                 validUntil: transitions.length ? Math.min(...transitions) : null
             };
         }
@@ -304,6 +330,46 @@
             const runtime = prepared?.runtime || emptyRuntime();
             const list = runtime.skipped?.[text(profileId)];
             return Array.isArray(list) ? list.filter(id => typeof id === 'string' && id) : [];
+        }
+
+        /**
+         * Minutes a parent gave (Android StudyRuntime.addGrant): added once by id; one that arrives while
+         * another runs starts when that one ends. Only the Ask-a-parent service calls this, after the
+         * parent's authority (here) or signature (from the parent's device) was checked.
+         */
+        async function addGrant(grant) {
+            if (!Ask?.addGrant) return { ok: false, error: 'unavailable' };
+            const items = await storageGet([RUNTIME_KEY]);
+            const runtime = normalizeRuntime(items[RUNTIME_KEY]);
+            const next = Ask.addGrant(runtime.grants, grant, now());
+            if (!next) return { ok: false, error: 'duplicate' };
+            runtime.grants = next;
+            await writeRuntime(runtime);
+            await schedule();
+            await deps.onTransition?.('grant');
+            return { ok: true, grant: next[next.length - 1] };
+        }
+
+        /** Whole minutes studied this week per day and when a parent's lock ends, for a child's report. */
+        async function reportFor(profileId) {
+            const [{ profiles, runtime }, device] = await Promise.all([readAll(), deviceId()]);
+            const profile = object(object(profiles.profiles)[text(profileId)]);
+            const study = Model.profileStudy(profile);
+            if (!study) return { dayMinutes: {}, lockEndsAt: null };
+            const progress = Model.mergeProgress(study.progress, { [device]: Object.fromEntries(
+                Object.entries(object(runtime.seconds[text(profileId)])).map(([day, seconds]) => [day, Math.floor(seconds / 60)])) });
+            const start = Ask?.weekStart ? Ask.weekStart(now()) : Engine.localDateKey(now());
+            const dayMinutes = {};
+            for (let index = 0; index < 7; index += 1) {
+                const date = new Date(`${start}T12:00:00`);
+                date.setDate(date.getDate() + index);
+                const key = Engine.localDateKey(date.getTime());
+                const minutes = Engine.minutesOn(progress, key);
+                if (minutes > 0) dayMinutes[key] = minutes;
+            }
+            const lock = study.lock;
+            const lockEndsAt = Model.isParentLock?.(lock) && Number(lock.endsAt) > now() ? Number(lock.endsAt) : null;
+            return { dayMinutes, lockEndsAt };
         }
 
         /**
@@ -776,7 +842,7 @@
         return Object.freeze({
             ALARM, RUNTIME_KEY, prepare, apply, getState, schedule, onAlarm, startSession, requestEnd, cancelEnd, endGentleThenSwitch,
             skipBreak, skipVideo, skippedVideos, tick, update, foldProgress, handleMessage, deviceId, getChildState, updateChild, startParentLock, endParentLock,
-            switchDecision
+            switchDecision, addGrant, reportFor
         });
     }
 

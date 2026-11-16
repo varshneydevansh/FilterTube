@@ -48,14 +48,20 @@
             seen: array(raw.seen).filter(id => typeof id === 'string').slice(-60),
             nonces: object(raw.nonces),
             asking: object(raw.asking),
-            outbox: object(raw.outbox)
+            outbox: object(raw.outbox),
+            // Ask for time (Android StudyFamilyStore): this device's requests, the parent's copy of each
+            // linked child's last report, and the remote requests a parent said "Not now" to.
+            timeRequests: array(raw.timeRequests),
+            reports: object(raw.reports),
+            dismissed: object(raw.dismissed)
         };
     }
 
     /**
      * deps: { browserAPI, Ask (FilterTubeAskParent), now?, verify(jwk, bytes, signature)?, sign(payload,
      * keyPair)?, parentUnlockFresh(profileId), writeChannelRule({ parentId, childId, channelId, channelName }),
-     * onChange?() }
+     * addGrant?(grant) (Study: minutes a parent gave, normal rules until they end), studyReport?(childId)
+     * ({dayMinutes, lockEndsAt} for the child's report), onChange?() }
      */
     function createAskParentService(deps) {
         const api = deps.browserAPI;
@@ -179,6 +185,87 @@
             });
         }
 
+        // ---- Child: Ask for time (Android StudyFamilyService.ask / latestRequest) --------------------
+
+        /** The active child's latest time request and who decides it. */
+        async function timeState() {
+            const { store, links, profiles } = await read();
+            const at = now();
+            const child = activeOf(profiles);
+            if (!child || child.type !== 'child') return { ok: true, isChild: false };
+            const remote = parentLinksFor(links, child.id);
+            const routes = Ask.routes(parentHere(profiles, child), remote.length);
+            const latest = Ask.latestTimeRequest(store.timeRequests, child.id, at);
+            return {
+                ok: true, isChild: true, childId: child.id, parentName: parentName(profiles, child, remote),
+                route: routes[0], canAsk: routes[0] !== 'none', latest: latest ? Ask.timeRequestToJson(latest) : null
+            };
+        }
+
+        async function askTime({ minutes, reason } = {}) {
+            const { links, profiles } = await read();
+            const child = activeOf(profiles);
+            if (!child || child.type !== 'child') return { ok: false, type: 'not_child' };
+            if (Ask.routes(parentHere(profiles, child), parentLinksFor(links, child.id).length)[0] === 'none') return { ok: false, type: 'no_parent' };
+            return mutate(store => {
+                const result = Ask.createTimeRequest(store.timeRequests, child.id, Math.trunc(Number(minutes)), reason, now(), Ask.randomId('ask'));
+                if (result.type === 'created') store.timeRequests = result.list.map(Ask.timeRequestToJson);
+                return { ok: result.type === 'created', type: result.type, request: result.request ? Ask.timeRequestToJson(result.request) : undefined };
+            });
+        }
+
+        async function cancelTime(requestId) {
+            return mutate(store => {
+                store.timeRequests = Ask.cancelTimeRequest(store.timeRequests, text(requestId), now()).map(Ask.timeRequestToJson);
+                return { ok: true };
+            });
+        }
+
+        /** Child device: one report per child the parent on [remoteDeviceId] manages here (StudyFamilyService.reportsFor). */
+        async function reportsFor(remoteDeviceId) {
+            const { store, links } = await read();
+            const at = now();
+            const children = [...new Set(links.filter(link => usable(link) && link.localRole === 'replica' && link.remoteDeviceId === remoteDeviceId)
+                .map(link => text(object(link.policy).targetProfileId)).filter(Boolean))];
+            const reports = [];
+            for (const childId of children) {
+                const study = object(await Promise.resolve(deps.studyReport?.(childId)).catch(() => null));
+                reports.push(Ask.reportJson({ childProfileId: childId, generatedAt: at, dayMinutes: object(study.dayMinutes),
+                    requests: store.timeRequests, lockEndsAt: Number.isFinite(study.lockEndsAt) ? study.lockEndsAt : null }));
+            }
+            return reports;
+        }
+
+        /** Child device: a signed grant from the parent on [remoteDeviceId] (StudyFamilyService.applySigned). */
+        async function applyGrantSigned(remoteDeviceId, message) {
+            const body = Ask.parseGrant(text(message?.payload));
+            if (!body) return { ok: false, reason: 'malformed' };
+            const { links } = await read();
+            const link = links.find(item => usable(item) && item.localRole === 'replica' && item.remoteDeviceId === remoteDeviceId
+                && text(object(item.policy).targetProfileId) === body.childProfileId);
+            if (!link) return { ok: false, reason: 'no_link' };
+            const jwk = object(link.sourcePublicKeyJwk && Object.keys(object(link.sourcePublicKeyJwk)).length ? link.sourcePublicKeyJwk : object(link.policy).sourcePublicKeyJwk);
+            if (!Object.keys(jwk).length) return { ok: false, reason: 'no_key' };
+            const signer = { parentProfileId: text(link.sourceProfileId) || text(object(link.policy).sourceProfileId), publicKeyJwk: jwk };
+            const checked = await mutate(async store => {
+                const at = now();
+                const childId = body.childProfileId;
+                const nonces = array(store.nonces[childId]);
+                const check = await Ask.checkGrant(childId, message, signer, new Set(nonces), at, deps.verify || verifyEd25519);
+                if (!check.ok) return { ok: false, reason: check.reason };
+                store.nonces[childId] = Array.from(new Set([...nonces, body.nonce])).slice(-200);
+                if (body.requestId) {
+                    const decided = Ask.decideTimeRequest(store.timeRequests, body.requestId, true, at, signer.parentProfileId);
+                    if (decided.type === 'decided') store.timeRequests = decided.list.map(Ask.timeRequestToJson);
+                }
+                return { ok: true, grant: { id: `signed-${body.nonce}`, profileId: childId, minutes: body.minutes, startsAt: at,
+                    source: 'signed', parentProfileId: signer.parentProfileId, requestId: body.requestId } };
+            });
+            if (!checked.ok) return checked;
+            const placed = await Promise.resolve(deps.addGrant?.(checked.grant)).catch(() => null);
+            return { ok: true, type: 'granted', grant: placed?.grant || checked.grant };
+        }
+
         /** Child device: open asks for the parent on [remoteDeviceId] (every child it manages here). */
         async function asksFor(remoteDeviceId) {
             const { store, links } = await read();
@@ -248,7 +335,22 @@
                 linkId: link.linkId, name: text(object(link.policy).targetProfileName) || text(link.deviceLabel),
                 askingOff: askingOff(store, `link:${link.linkId}`)
             }));
-            return { ok: true, isParent: true, parentId: active.id, here, remote, children, remoteChildren };
+            // Ask for time: requests from children here, and each linked child's last report minus what
+            // this parent already answered (a grant waiting to send, or "Not now").
+            const timeHere = Ask.pendingTimeRequests(store.timeRequests, at).filter(item => ids.has(item.childProfileId)).map(item => ({
+                ...Ask.timeRequestToJson(item), kind: 'time',
+                childName: children.find(child => child.id === item.childProfileId)?.name || item.childProfileId
+            }));
+            const timeRemote = childLinks(links).flatMap(link => {
+                const answered = new Set([...array(store.dismissed[link.linkId]),
+                    ...array(store.outbox[link.linkId]).map(payload => Ask.parseGrant(payload)?.requestId).filter(Boolean)]);
+                return Ask.pendingTimeRequests(array(object(store.reports[link.linkId]).requests), at)
+                    .filter(item => !answered.has(item.id)).map(item => ({
+                        ...Ask.timeRequestToJson(item), kind: 'time', linkId: link.linkId,
+                        childName: text(object(link.policy).targetProfileName) || text(link.deviceLabel), deviceLabel: text(link.deviceLabel)
+                    }));
+            });
+            return { ok: true, isParent: true, parentId: active.id, here, remote, timeHere, timeRemote, children, remoteChildren };
         }
 
         /**
@@ -294,6 +396,51 @@
                 grantPass(next, decided.ask, at);
                 return { ok: true, type: 'decided', ask: Ask.toJson(decided.ask) };
             });
+        }
+
+        /**
+         * A parent answers a time request: "Give 20 min" or "Not now" (StudyFamilyService.giveHere /
+         * declineHere / giveRemote / dismissRemote). Here the grant starts now; for a child on another
+         * device the signed grant is queued and goes at the next connection. Same authority as an ask.
+         */
+        async function answerTime({ requestId, linkId, grant } = {}) {
+            const { store: snapshot, links, profiles } = await read();
+            const active = activeOf(profiles);
+            const fresh = active ? await deps.parentUnlockFresh?.(active.id) !== false : false;
+            const id = text(requestId);
+            if (text(linkId)) {
+                const link = childLinks(links).find(item => item.linkId === text(linkId));
+                if (!link || !Ask.canDecideRemote(active, true, fresh)) return { ok: false, type: fresh ? 'not_allowed' : 'parent_unlock_required', parentId: active?.id };
+                const request = Ask.pendingTimeRequests(array(object(snapshot.reports[link.linkId]).requests), now()).find(item => item.id === id);
+                if (!request) return { ok: false, type: 'not_pending' };
+                return mutate(store => {
+                    if (grant === true) {
+                        const payload = Ask.grantPayload(text(object(link.policy).targetProfileId), text(link.sourceProfileId) || active.id,
+                            request.minutes, now(), Ask.randomId('n'), request.id);
+                        store.outbox[link.linkId] = [...array(store.outbox[link.linkId]), payload].slice(-20);
+                    } else {
+                        store.dismissed[link.linkId] = Array.from(new Set([...array(store.dismissed[link.linkId]), request.id])).slice(-40);
+                    }
+                    return { ok: true, type: 'decided', minutes: request.minutes, sendsLater: grant === true };
+                });
+            }
+            const current = Ask.pendingTimeRequests(snapshot.timeRequests, now()).find(item => item.id === id);
+            const child = current ? profileOf(profiles, current.childProfileId) : null;
+            if (!current) return { ok: false, type: 'not_pending' };
+            if (!Ask.canDecide(active, child, true, fresh)) {
+                return { ok: false, type: active && active.type !== 'child' && !fresh ? 'parent_unlock_required' : 'not_allowed', parentId: active?.id };
+            }
+            const decided = await mutate(store => {
+                const at = now();
+                const result = Ask.decideTimeRequest(store.timeRequests, id, grant === true, at, active.id);
+                if (result.type !== 'decided') return { ok: false, type: result.type };
+                store.timeRequests = result.list.map(Ask.timeRequestToJson);
+                return { ok: true, type: 'decided', minutes: result.request.minutes, request: Ask.timeRequestToJson(result.request), at };
+            });
+            if (!decided.ok || grant !== true) return decided;
+            await Promise.resolve(deps.addGrant?.({ id: Ask.randomId('give'), profileId: current.childProfileId, minutes: current.minutes,
+                startsAt: decided.at, source: 'parent_here', parentProfileId: active.id, requestId: current.id })).catch(() => null);
+            return decided;
         }
 
         /** "Let Aarav ask": here for a child on this device, or a signed switch for a linked device. */
@@ -350,6 +497,30 @@
             });
         }
 
+        /**
+         * Parent device: reports from the child on [remoteDeviceId], kept per link where this device is
+         * the parent (StudyFamilyService.receiveReports). Returns how many time requests are new.
+         */
+        async function receiveReports(remoteDeviceId, incoming) {
+            const reports = array(incoming).map(Ask.reportFrom).filter(Boolean);
+            if (!reports.length) return 0;
+            const { links } = await read();
+            const targets = childLinks(links).filter(link => link.remoteDeviceId === remoteDeviceId);
+            if (!targets.length) return 0;
+            return mutate(store => {
+                const at = now();
+                let fresh = 0;
+                for (const link of targets) {
+                    const report = reports.find(item => item.childProfileId === text(object(link.policy).targetProfileId));
+                    if (!report) continue;
+                    const known = new Set(Ask.pendingTimeRequests(array(object(store.reports[link.linkId]).requests), at).map(item => item.id));
+                    fresh += Ask.pendingTimeRequests(report.requests, at).filter(item => !known.has(item.id)).length;
+                    store.reports[link.linkId] = report;
+                }
+                return fresh;
+            });
+        }
+
         /** Bodies waiting for the child on [remoteDeviceId]: [{linkId, payload}]. */
         async function toSign(remoteDeviceId) {
             const { store, links } = await read();
@@ -358,7 +529,7 @@
         }
 
         async function sent(linkId, payloads) {
-            const mine = array(payloads).filter(Ask.isAskPayload);
+            const mine = array(payloads).filter(payload => Ask.isAskPayload(payload) || Ask.isGrantPayload(payload));
             if (!mine.length) return;
             await mutate(store => {
                 store.outbox[linkId] = array(store.outbox[linkId]).filter(payload => !mine.includes(payload));
@@ -377,6 +548,7 @@
             const capabilities = array(object(remote).capabilities).map(text);
             if (!remoteId || !capabilities.includes(STUDY_CAPABILITY)) return null;
             const asks = (await asksFor(remoteId)).slice(0, 12);
+            const reports = (await reportsFor(remoteId)).slice(0, 8);
             const pending = await toSign(remoteId);
             const signed = [];
             if (pending.length) {
@@ -390,9 +562,9 @@
                     }
                 }
             }
-            if (!asks.length && !signed.length) return null;
+            if (!asks.length && !signed.length && !reports.length) return null;
             return {
-                message: { t: 'study_family', reports: [], asks, signed: signed.map(({ linkId, ...rest }) => rest) },
+                message: { t: 'study_family', reports, asks, signed: signed.map(({ linkId, ...rest }) => rest) },
                 sentByLink: signed.reduce((byLink, item) => { (byLink[item.linkId] = byLink[item.linkId] || []).push(item.payload); return byLink; }, {})
             };
         }
@@ -406,12 +578,22 @@
             const root = object(message);
             const asks = array(root.asks).slice(0, 12);
             const fresh = asks.length ? await receiveAsks(remoteDeviceId, asks) : 0;
+            const freshTime = await receiveReports(remoteDeviceId, array(root.reports).slice(0, 8));
             const results = [];
             for (const signedMessage of array(root.signed).slice(0, 20)) {
-                if (!Ask.isAskPayload(text(object(signedMessage).payload))) continue;
-                results.push(await applySigned(remoteDeviceId, signedMessage));
+                const payload = text(object(signedMessage).payload);
+                if (Ask.isAskPayload(payload)) results.push(await applySigned(remoteDeviceId, signedMessage));
+                else if (Ask.isGrantPayload(payload)) results.push(await applyGrantSigned(remoteDeviceId, signedMessage));
             }
-            return { ok: true, fresh, answered: results.filter(result => result.ok && result.type === 'answered').length };
+            return { ok: true, fresh: fresh + freshTime, answered: results.filter(result => result.ok && result.type === 'answered').length,
+                granted: results.filter(result => result.ok && result.type === 'granted').length };
+        }
+
+        /** What a parent profile here has to answer: asks and time requests (the toolbar badge's count). */
+        async function openRequestCount() {
+            const data = await inbox();
+            if (!data.isParent) return 0;
+            return array(data.here).length + array(data.remote).length + array(data.timeHere).length + array(data.timeRemote).length;
         }
 
         // ---- Filtering ---------------------------------------------------------------------------
@@ -425,7 +607,8 @@
 
         return Object.freeze({
             STORE_KEY, stateFor, ask, cancel, markSeen, asksFor, applySigned, inbox, answer, setAsking,
-            receiveAsks, toSign, sent, outbox, markSent, receive, passVideoIds
+            receiveAsks, toSign, sent, outbox, markSent, receive, passVideoIds,
+            timeState, askTime, cancelTime, answerTime, reportsFor, receiveReports, applyGrantSigned, openRequestCount
         });
     }
 

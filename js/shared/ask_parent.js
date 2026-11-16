@@ -391,7 +391,239 @@
         return out;
     }
 
+    // ---- Ask for time (Android StudyFamily.kt) -----------------------------------------------------
+    // A child asks for 10, 20 or 30 more minutes with an optional reason; one request waits at a time
+    // and runs out after 30 minutes. Only a parent's decision grants: on this device, or from the
+    // parent's device as a `filtertube.study.grant.v1` body signed with the parent's Family key (the
+    // same signed format the apps send). While a grant runs the profile's normal rules apply. The
+    // child's device reports its requests in a `filtertube.study.report.v1` report.
+
+    const TIME_MINUTES = Object.freeze([10, 20, 30]);
+    const TIME_REASON_MAX = 80;
+    const TIME_TTL_MS = 30 * 60 * 1000;
+    const TIME_KEEP_MS = 24 * HOUR_MS;
+    const TIME_MAX_KEPT = 20;
+    const TIME_PENDING = 'pending';
+    const TIME_GRANTED = 'granted';
+    const TIME_DECLINED = 'declined';
+    const TIME_EXPIRED = 'expired';
+    const TIME_CANCELLED = 'cancelled';
+    const TIME_STATUSES = new Set([TIME_PENDING, TIME_GRANTED, TIME_DECLINED, TIME_EXPIRED, TIME_CANCELLED]);
+    /** StudyGrants.MAX_MINUTES */
+    const GRANT_MAX_MINUTES = 60;
+    const GRANT_KEEP_MS = 24 * HOUR_MS;
+    const GRANT_SOURCES = new Set(['parent_here', 'code', 'signed']);
+    const GRANT_TYPE = 'filtertube.study.grant.v1';
+    /** StudyGrantCheck.MAX_AGE_MILLIS */
+    const GRANT_MAX_AGE_MS = 2 * HOUR_MS;
+    const SIGNED_PAYLOAD_MAX = 2048;
+    const REPORT_TYPE = 'filtertube.study.report.v1';
+    const DAY_KEY = /^\d{4}-\d{2}-\d{2}$/;
+
+    /** StudyTimeRequest.from */
+    function timeRequestFrom(json) {
+        if (!json || typeof json !== 'object') return null;
+        const id = text(json.id).trim();
+        const child = text(json.childProfileId).trim();
+        if (!validId(id) || !child || child.length > 128) return null;
+        const minutes = finite(json.minutes);
+        if (!TIME_MINUTES.includes(minutes)) return null;
+        const createdAt = finite(json.createdAt);
+        const expiresAt = finite(json.expiresAt);
+        if (!createdAt || createdAt <= 0 || !expiresAt || expiresAt <= createdAt || expiresAt - createdAt > TIME_TTL_MS) return null;
+        if (!TIME_STATUSES.has(json.status)) return null;
+        const decidedBy = text(json.decidedBy).trim();
+        return {
+            id, childProfileId: child, minutes, reason: cleanLine(json.reason, TIME_REASON_MAX), createdAt, expiresAt,
+            status: json.status, decidedAt: finite(json.decidedAt), decidedBy: decidedBy && decidedBy.length <= 128 ? decidedBy : null
+        };
+    }
+
+    /** StudyTimeRequest.toJson */
+    function timeRequestToJson(request) {
+        const out = { id: request.id, childProfileId: request.childProfileId, minutes: request.minutes, reason: request.reason || '',
+            createdAt: request.createdAt, expiresAt: request.expiresAt, status: request.status };
+        if (request.decidedAt != null) out.decidedAt = request.decidedAt;
+        if (request.decidedBy) out.decidedBy = request.decidedBy;
+        return out;
+    }
+
+    const isTimePendingAt = (request, now) => request.status === TIME_PENDING && now < request.expiresAt;
+
+    /** StudyRequests.normalize: expires pending requests past their time; never grants. */
+    function normalizeTimeRequests(list, now) {
+        const seen = new Set();
+        return (Array.isArray(list) ? list : []).map(timeRequestFrom).filter(Boolean)
+            .map(request => (request.status === TIME_PENDING && now >= request.expiresAt ? { ...request, status: TIME_EXPIRED } : request))
+            .filter(request => now - request.createdAt < TIME_KEEP_MS && request.createdAt <= now + SKEW_MS)
+            .filter(request => (seen.has(request.id) ? false : (seen.add(request.id), true)))
+            .slice(-TIME_MAX_KEPT);
+    }
+
+    function pendingTimeRequests(list, now, childProfileId = null) {
+        return normalizeTimeRequests(list, now).filter(request => isTimePendingAt(request, now)
+            && (childProfileId == null || request.childProfileId === childProfileId));
+    }
+
+    /** StudyRequests.create: {type:'created', request, list} | {type:'already_waiting', request} | {type:'invalid_minutes'}. */
+    function createTimeRequest(list, childProfileId, minutes, reason, now, id) {
+        if (!TIME_MINUTES.includes(minutes)) return { type: 'invalid_minutes' };
+        const current = normalizeTimeRequests(list, now);
+        const waiting = current.find(request => request.childProfileId === childProfileId && isTimePendingAt(request, now));
+        if (waiting) return { type: 'already_waiting', request: waiting };
+        const request = { id, childProfileId, minutes, reason: cleanLine(reason, TIME_REASON_MAX), createdAt: now,
+            expiresAt: now + TIME_TTL_MS, status: TIME_PENDING, decidedAt: null, decidedBy: null };
+        return { type: 'created', request, list: [...current, request].slice(-TIME_MAX_KEPT) };
+    }
+
+    /** StudyRequests.decide: only a request still pending now can be answered. */
+    function decideTimeRequest(list, requestId, grant, now, parentId) {
+        const current = normalizeTimeRequests(list, now);
+        const request = current.find(item => item.id === requestId);
+        if (!request || !isTimePendingAt(request, now)) return { type: 'not_pending' };
+        const decided = { ...request, status: grant ? TIME_GRANTED : TIME_DECLINED, decidedAt: now, decidedBy: parentId || null };
+        return { type: 'decided', request: decided, list: current.map(item => (item.id === requestId ? decided : item)) };
+    }
+
+    function cancelTimeRequest(list, requestId, now) {
+        return normalizeTimeRequests(list, now).map(request => (request.id === requestId && isTimePendingAt(request, now)
+            ? { ...request, status: TIME_CANCELLED, decidedAt: now } : request));
+    }
+
+    /** The child's latest request, for its status line ("Waiting for Mum", "Mum said not now"). */
+    function latestTimeRequest(list, childProfileId, now) {
+        return normalizeTimeRequests(list, now).filter(request => request.childProfileId === childProfileId).pop() || null;
+    }
+
+    /** StudyRequests.merge: a decision always beats "pending"; nothing turns back into pending. */
+    function mergeTimeRequests(local, incoming, now) {
+        const out = new Map();
+        [...normalizeTimeRequests(local, now), ...normalizeTimeRequests(incoming, now)].sort((a, b) => a.createdAt - b.createdAt)
+            .forEach(next => {
+                const current = out.get(next.id);
+                if (!current || current.status === TIME_PENDING) out.set(next.id, next);
+            });
+        return normalizeTimeRequests([...out.values()].map(timeRequestToJson), now);
+    }
+
+    /** StudyGrant.from */
+    function grantFrom(json) {
+        if (!json || typeof json !== 'object') return null;
+        const id = text(json.id).trim();
+        const profileId = text(json.profileId).trim();
+        const minutes = finite(json.minutes);
+        const startsAt = finite(json.startsAt);
+        if (!validId(id) || !profileId || profileId.length > 128) return null;
+        if (!Number.isInteger(minutes) || minutes < 1 || minutes > GRANT_MAX_MINUTES || !startsAt || startsAt <= 0) return null;
+        if (!GRANT_SOURCES.has(json.source)) return null;
+        return { id, profileId, minutes, startsAt, source: json.source,
+            parentProfileId: text(json.parentProfileId).trim() || null, requestId: text(json.requestId).trim() || null };
+    }
+
+    const grantEndsAt = grant => grant.startsAt + grant.minutes * 60 * 1000;
+
+    /** StudyGrants.active: the grant running now for this profile (the one that ends last). */
+    function activeGrant(list, profileId, now) {
+        return (Array.isArray(list) ? list : []).map(grantFrom).filter(Boolean)
+            .filter(grant => grant.profileId === profileId && now >= grant.startsAt && now < grantEndsAt(grant))
+            .sort((a, b) => grantEndsAt(b) - grantEndsAt(a))[0] || null;
+    }
+
+    /** StudyGrants.add: once by id; a grant that arrives while another runs starts when that one ends. */
+    function addGrant(list, grant, now) {
+        const current = (Array.isArray(list) ? list : []).map(grantFrom).filter(Boolean);
+        const next = grantFrom(grant);
+        if (!next || current.some(item => item.id === next.id)) return null;
+        const running = activeGrant(current, next.profileId, now);
+        const placed = running && next.startsAt < grantEndsAt(running) ? { ...next, startsAt: grantEndsAt(running) } : next;
+        return [...current.filter(item => now - grantEndsAt(item) < GRANT_KEEP_MS), placed].slice(-40);
+    }
+
+    /** StudySignedMessage.grantPayload: sorted keys, no spaces, `requestId` null when none. */
+    function grantPayload(childProfileId, parentProfileId, minutes, issuedAt, nonce, requestId) {
+        return canonical({ type: GRANT_TYPE, childProfileId, parentProfileId, minutes, issuedAt, nonce, requestId: requestId || null });
+    }
+
+    function isGrantPayload(payload) {
+        try { return JSON.parse(payload).type === GRANT_TYPE; } catch (e) { return false; }
+    }
+
+    /** StudySignedMessage.body for a grant. */
+    function parseGrant(payload) {
+        if (text(payload).length > SIGNED_PAYLOAD_MAX) return null;
+        let json;
+        try { json = JSON.parse(payload); } catch (e) { return null; }
+        if (!json || json.type !== GRANT_TYPE) return null;
+        if (typeof json.childProfileId !== 'string' || typeof json.parentProfileId !== 'string') return null;
+        if (finite(json.issuedAt) === null || !validId(json.nonce)) return null;
+        return { type: GRANT_TYPE, childProfileId: json.childProfileId, parentProfileId: json.parentProfileId, issuedAt: json.issuedAt,
+            nonce: json.nonce, minutes: finite(json.minutes), requestId: json.requestId == null ? null : (text(json.requestId) || null) };
+    }
+
+    /** StudyGrantCheck.check: signed by the child's Family parent, fresh, never seen. {ok, body} | {ok:false, reason}. */
+    async function checkGrant(childProfileId, message, signer, seenNonces, now, verify) {
+        const body = parseGrant(text(message?.payload));
+        if (!body) return { ok: false, reason: 'malformed' };
+        const signature = /^[A-Za-z0-9_-]{86}$/.test(text(message?.signature)) ? base64UrlToBytes(message.signature) : null;
+        let verified = false;
+        if (signature && signature.length === 64) {
+            try { verified = await verify(signer.publicKeyJwk, new TextEncoder().encode(message.payload), signature); } catch (e) { verified = false; }
+        }
+        if (!verified) return { ok: false, reason: 'bad_signature' };
+        if (body.parentProfileId !== signer.parentProfileId) return { ok: false, reason: 'not_this_parent' };
+        if (body.childProfileId !== childProfileId) return { ok: false, reason: 'other_child' };
+        if (!Number.isInteger(body.minutes) || body.minutes < 1 || body.minutes > GRANT_MAX_MINUTES) return { ok: false, reason: 'invalid_minutes' };
+        if (body.issuedAt > now + SKEW_MS || now - body.issuedAt > GRANT_MAX_AGE_MS) return { ok: false, reason: 'stale' };
+        if (seenNonces && (seenNonces.has ? seenNonces.has(body.nonce) : seenNonces.includes(body.nonce))) return { ok: false, reason: 'replayed' };
+        return { ok: true, body };
+    }
+
+    /** StudyChildReport.weekStart: the Monday that starts this week, in this device's zone. */
+    function weekStart(now) {
+        const day = new Date(now);
+        day.setHours(12, 0, 0, 0);
+        day.setDate(day.getDate() - ((day.getDay() + 6) % 7));
+        const pad = value => String(value).padStart(2, '0');
+        return `${day.getFullYear()}-${pad(day.getMonth() + 1)}-${pad(day.getDate())}`;
+    }
+
+    /**
+     * StudyChildReport.toJson: totals only (minutes per day this week, never titles), the child's time
+     * requests and when a parent's lock ends. The extension keeps no per-channel time, so `channels` is empty.
+     */
+    function reportJson({ childProfileId, generatedAt, dayMinutes = {}, requests = [], lockEndsAt = null }) {
+        const days = {};
+        for (const [day, minutes] of Object.entries(dayMinutes && typeof dayMinutes === 'object' ? dayMinutes : {})) {
+            const value = Math.max(0, Math.min(24 * 60, Math.trunc(Number(minutes) || 0)));
+            if (DAY_KEY.test(day) && value > 0) days[day] = value;
+        }
+        const out = { type: REPORT_TYPE, childProfileId, generatedAt, weekStart: weekStart(generatedAt), dayMinutes: days, channels: [],
+            requests: normalizeTimeRequests(requests, generatedAt).filter(request => request.childProfileId === childProfileId).map(timeRequestToJson) };
+        if (Number.isFinite(lockEndsAt)) out.lockEndsAt = lockEndsAt;
+        return out;
+    }
+
+    /** StudyChildReport.from: what a parent's device keeps of a child's report. */
+    function reportFrom(json) {
+        if (!json || typeof json !== 'object' || json.type !== REPORT_TYPE) return null;
+        const child = text(json.childProfileId).trim();
+        if (!child || child.length > 128 || !DAY_KEY.test(text(json.weekStart))) return null;
+        const dayMinutes = {};
+        for (const [day, minutes] of Object.entries(json.dayMinutes && typeof json.dayMinutes === 'object' ? json.dayMinutes : {}).slice(0, 7)) {
+            if (DAY_KEY.test(day)) dayMinutes[day] = Math.max(0, Math.min(24 * 60, Math.trunc(Number(minutes) || 0)));
+        }
+        const requests = (Array.isArray(json.requests) ? json.requests : []).map(timeRequestFrom).filter(Boolean)
+            .filter(request => request.childProfileId === child).slice(0, TIME_MAX_KEPT);
+        return { type: REPORT_TYPE, childProfileId: child, generatedAt: finite(json.generatedAt) || 0, weekStart: json.weekStart,
+            dayMinutes, requests: requests.map(timeRequestToJson), lockEndsAt: finite(json.lockEndsAt) };
+    }
+
     return Object.freeze({
+        TIME_MINUTES, TIME_REASON_MAX, TIME_TTL_MS, TIME_PENDING, TIME_GRANTED, TIME_DECLINED, TIME_EXPIRED, TIME_CANCELLED,
+        GRANT_MAX_MINUTES, GRANT_TYPE, REPORT_TYPE,
+        timeRequestFrom, timeRequestToJson, normalizeTimeRequests, pendingTimeRequests, createTimeRequest, decideTimeRequest,
+        cancelTimeRequest, latestTimeRequest, mergeTimeRequests, isTimePendingAt,
+        grantFrom, grantEndsAt, activeGrant, addGrant, grantPayload, isGrantPayload, parseGrant, checkGrant, weekStart, reportJson, reportFrom,
         KIND_VIDEO, KIND_CHANNEL, BLOCKED_CHANNEL, BLOCKED_ALLOW_LIST, BLOCKED_OTHER,
         STATUS_OPEN, STATUS_ALLOWED, STATUS_DECLINED, STATUS_EXPIRED, STATUS_CANCELLED,
         DECISION_ONCE, DECISION_CHANNEL, DECISION_NO, REASONS, ANSWER_TYPE,
