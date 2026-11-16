@@ -200,6 +200,14 @@ const STUDY_TESTS = Object.freeze([
   'tests/runtime/study-topic-synonyms.test.mjs',
   'tests/runtime/study-branch-kids-parity.test.mjs',
 ]);
+// Parity with the Android app: filtering decisions, Ask a parent, live chat (docs/design/PARITY_PASS4.md).
+const APP_PARITY_TESTS = Object.freeze([
+  'tests/runtime/app-parity-channel-decisions.test.mjs',
+  'tests/runtime/app-parity-ask-parent.test.mjs',
+  'tests/runtime/app-parity-live-chat.test.mjs',
+  'tests/runtime/app-parity-comments-note.test.mjs',
+  'tests/runtime/app-parity-doodles.test.mjs',
+]);
 // Companion characters in the popup and options page (js/mascots.js).
 const COMPANION_TESTS = Object.freeze([
   'tests/runtime/mascots.test.mjs',
@@ -240,6 +248,7 @@ export const LANES = Object.freeze({
       ...SAFETY_AND_PREFERENCE_TESTS,
       ...VIDEO_NOTES_TESTS,
       ...STUDY_TESTS,
+      ...APP_PARITY_TESTS,
       ...COMPANION_TESTS,
       ...PROFILE_AVATAR_TESTS,
       'tests/runtime/ad-void-native-ownership-current-behavior.test.mjs',
@@ -515,6 +524,7 @@ export const LANES = Object.freeze({
       ...SAFETY_AND_PREFERENCE_TESTS,
       ...VIDEO_NOTES_TESTS,
       ...STUDY_TESTS,
+      ...APP_PARITY_TESTS,
       ...COMPANION_TESTS,
       ...PROFILE_AVATAR_TESTS,
       'tests/runtime/content-playback-admission-current-behavior.test.mjs',
@@ -603,6 +613,7 @@ export const LANES = Object.freeze({
       ...SAFETY_AND_PREFERENCE_TESTS,
       ...VIDEO_NOTES_TESTS,
       ...STUDY_TESTS,
+      ...APP_PARITY_TESTS,
       ...COMPANION_TESTS,
       ...PROFILE_AVATAR_TESTS,
       ...CONTENT_PLAYBACK_TESTS,

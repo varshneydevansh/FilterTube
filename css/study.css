@@ -169,3 +169,16 @@
 }
 .ft-study-packs select.text-input { width: auto; flex: 0 1 auto; max-width: 100%; }
 .ft-study-planner > .ft-study-chip { align-self: flex-start; }
+
+/* A parent's PIN, typed now, before a Family edit (Android ParentModeChrome sensitive unlock). */
+.ft-study-unlock {
+    display: grid;
+    gap: 8px;
+    margin: 0 0 12px;
+    padding: 12px 14px;
+    border-radius: 14px;
+    border: 1px solid var(--ft-color-sem-neutral-border);
+    background: var(--ft-color-sem-neutral-bg);
+}
+.ft-study-unlock .text-input { min-height: 48px; }
+.ft-study-unlock__actions { display: flex; gap: 8px; justify-content: flex-end; }

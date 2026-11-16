@@ -205,6 +205,55 @@
             return true;
         }
 
+        const SKIP_ID = 'filtertube-study-skip';
+
+        function currentVideoId() {
+            try {
+                const url = new URL(String(win.location?.href || ''));
+                const fromQuery = url.searchParams.get('v');
+                if (fromQuery) return fromQuery;
+                const match = url.pathname.match(/^\/(?:shorts|embed)\/([A-Za-z0-9_-]{6,64})/);
+                return match ? match[1] : '';
+            } catch (e) {
+                return '';
+            }
+        }
+
+        /**
+         * "Skip this video" (Android StudyWatchOverlay SKIP_ACTION_ID): while study runs, the video in
+         * the player can be skipped. It hides from now on for this profile and never unblocks anything.
+         */
+        function renderSkip() {
+            // Only a video that plays can be skipped: not one the watch gate already holds back.
+            const gated = !!doc.querySelector?.('[data-filtertube-direct-access-overlay-host="true"]');
+            const videoId = state?.state === 'STUDY' && onWatchRoute() && !overlayKind() && !gated ? currentVideoId() : '';
+            const existing = doc.getElementById(SKIP_ID);
+            if (!videoId) { if (existing) existing.remove(); return; }
+            if (existing && existing.getAttribute('data-video-id') === videoId) return;
+            if (existing) existing.remove();
+            const button = element('button', {
+                position: 'fixed', left: '16px', bottom: '16px', zIndex: '2147483646', minHeight: '40px', padding: '0 16px',
+                borderRadius: '999px', background: '#FFFCF6', color: '#1b1a18', border: '1.5px solid #cdbfae', cursor: 'pointer',
+                font: '700 14px/1 Roboto, Arial, sans-serif', boxShadow: '0 3px 0 rgba(27,26,24,.14)'
+            }, t('study.skipVideo', 'Skip this video'));
+            button.id = SKIP_ID;
+            button.type = 'button';
+            button.setAttribute('data-video-id', videoId);
+            button.addEventListener('click', () => {
+                button.disabled = true;
+                send({ action: 'FilterTube_StudySkipVideo', videoId }).then(response => {
+                    if (response?.ok) {
+                        removeElement(SKIP_ID);
+                        pauseAll();
+                        showNotice(t('study.skipped', 'Skipped. It won\'t show again.'));
+                    } else {
+                        button.disabled = false;
+                    }
+                });
+            });
+            (doc.body || doc.documentElement).appendChild(button);
+        }
+
         function removeElement(id) {
             const existing = doc.getElementById(id);
             if (existing) existing.remove();
@@ -415,6 +464,7 @@
             lastPhaseKey = phaseKey;
             render();
             guardMiniplayer();
+            renderSkip();
             scheduleNext();
         }
 
@@ -429,6 +479,7 @@
             const at = now();
             const elapsed = lastCheckAt === null ? 0 : Math.min(at - lastCheckAt, TICK_MS + 5000);
             lastCheckAt = at;
+            renderSkip();
             if (state?.state !== 'STUDY' || !visible() || !playingVideo()) return;
             pendingSeconds += Math.max(0, Math.round(elapsed / 1000));
             if (pendingSeconds >= SEND_AFTER_SECONDS) flush();
@@ -450,7 +501,7 @@
             try { runtime.onMessage?.addListener?.(onMessage); } catch (e) { }
             try { doc.addEventListener('play', onPlay, true); } catch (e) { }
             // SPA navigations (yt-navigate-finish) and leaving the watch page into the miniplayer.
-            try { doc.addEventListener('yt-navigate-finish', () => { guardMiniplayer(); }, true); } catch (e) { }
+            try { doc.addEventListener('yt-navigate-finish', () => { guardMiniplayer(); renderSkip(); }, true); } catch (e) { }
             try { Promise.resolve(localizer()?.loadLocale?.()).then(() => { if (state) render(); }).catch(() => {}); } catch (e) { }
             try { Promise.resolve(localizer()?.loadCompanion?.()).then(() => { if (state) render(); }).catch(() => {}); } catch (e) { }
             try { doc.addEventListener('visibilitychange', () => { if (!visible()) flush(); lastCheckAt = now(); }); } catch (e) { }
@@ -468,7 +519,7 @@
             return api;
         }
 
-        const api = { start, setState, refresh, render, checkTime, flush, onMessage, onPlay, guardMiniplayer, get state() { return state; }, get pendingSeconds() { return pendingSeconds; } };
+        const api = { start, setState, refresh, render, renderSkip, checkTime, flush, onMessage, onPlay, guardMiniplayer, get state() { return state; }, get pendingSeconds() { return pendingSeconds; } };
         return api;
     }
 

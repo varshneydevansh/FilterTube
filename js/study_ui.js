@@ -509,6 +509,10 @@
             already_studying: t('study.error.alreadyStudying', 'A study session is already running.'),
             session_already_active: t('study.error.alreadyStudying', 'A study session is already running.'),
             not_parent: t('study.error.notParent', 'Switch to the parent profile to change this plan.'),
+            parent_unlock_required: t('study.parent.unlockBody', 'This profile is PIN-protected. Enter its PIN to continue.'),
+            pin_wrong: t('study.switch.pinWrong', 'That PIN didn\'t work. Try again.'),
+            pin_rate_limited: t('dashboard.toast.pinRateLimited', 'Too many incorrect PIN attempts. Try again later.'),
+            cancelled: t('study.parent.unlockBody', 'This profile is PIN-protected. Enter its PIN to continue.'),
             invalid_duration: t('study.error.duration', 'Choose a shorter time.')
         };
         return map[code] || t('study.error.generic', 'That didn\'t save. Try again.');
@@ -787,6 +791,48 @@
         return section;
     }
 
+    /**
+     * A parent's edit needs a fresh unlock of that parent (Android ParentModeChrome: a sensitive
+     * unlock, the PIN typed in the last 5 minutes). On 'parent_unlock_required' this asks for the
+     * PIN inline, checks it in the background, then sends the edit once more.
+     */
+    async function sendAsParent(host, message) {
+        const first = await send(message);
+        if (first?.error !== 'parent_unlock_required' || !first.parentId) return first;
+        const pin = await askParentPin(host);
+        if (!pin) return { ok: false, error: 'cancelled' };
+        const auth = await send({ action: 'FilterTube_SessionPinAuth', profileId: first.parentId, pin });
+        if (auth?.ok !== true) {
+            return { ok: false, error: auth?.reason === 'rate_limited' ? 'pin_rate_limited' : 'pin_wrong' };
+        }
+        return send(message);
+    }
+
+    function askParentPin(host) {
+        return new Promise(resolve => {
+            const holder = host?.closest?.('.ft-study-parent__body') || host;
+            if (!holder) { resolve(''); return; }
+            holder.querySelector?.(':scope > .ft-study-unlock')?.remove();
+            const form = el('form', 'ft-study-unlock');
+            form.appendChild(el('div', 'help-item-title', t('study.parent.unlockTitle', 'Parent Controls')));
+            form.appendChild(el('div', 'help-item-body', t('study.parent.unlockBody', 'This profile is PIN-protected. Enter its PIN to continue.')));
+            const input = el('input', 'text-input');
+            input.type = 'password';
+            input.inputMode = 'numeric';
+            input.autocomplete = 'off';
+            input.placeholder = t('study.parent.enterPin', 'Enter PIN');
+            input.setAttribute('aria-label', input.placeholder);
+            const done = value => { form.remove(); resolve(value); };
+            const actions = el('div', 'ft-study-unlock__actions');
+            actions.append(button(t('popup.modal.cancel', 'Cancel'), 'btn-secondary', () => done('')),
+                button(t('study.parent.unlock', 'Unlock'), 'btn-primary', () => done(text(input.value))));
+            form.append(input, actions);
+            form.addEventListener('submit', event => { event.preventDefault(); done(text(input.value)); });
+            holder.prepend(form);
+            try { input.focus(); } catch (e) { }
+        });
+    }
+
     async function drawChild(body, childId) {
         const [data, catalog] = await Promise.all([send({ action: 'FilterTube_StudyGetChild', profileId: childId }), loadCatalog()]);
         if (!data || data.ok === false) {
@@ -799,7 +845,7 @@
         if (data.lockedUntil && data.lockedUntil > Date.now()) {
             lockRow.appendChild(el('span', 'ft-study-locked', t('study.lockedUntil', 'Locked until {time}', { time: formatDayTime(data.lockedUntil) })));
             lockRow.appendChild(button(t('study.parent.endLock', 'End lock now'), 'btn-secondary', async () => {
-                const result = await send({ action: 'FilterTube_StudyEndParentLock', profileId: childId });
+                const result = await sendAsParent(body, { action: 'FilterTube_StudyEndParentLock', profileId: childId });
                 if (result?.ok === false) notify(body, errorText(result.error), null);
                 redraw();
             }));
@@ -814,7 +860,7 @@
             }
             lockRow.append(el('span', 'ft-study-field__label', t('study.parent.lockFor', 'Lock study for')), choice,
                 button(t('study.parent.lockNow', 'Lock now'), 'btn-primary', async () => {
-                    const result = await send({ action: 'FilterTube_StudyStartParentLock', profileId: childId, minutes: Number(choice.value) });
+                    const result = await sendAsParent(body, { action: 'FilterTube_StudyStartParentLock', profileId: childId, minutes: Number(choice.value) });
                     if (result?.ok === false) notify(body, errorText(result.error), null);
                     redraw();
                 }));
@@ -823,7 +869,7 @@
         renderPlanner(plannerHost, {
             study: data.study || {}, catalog, editable: true, toastHost: body,
             onPatch: async patch => {
-                const result = await send({ action: 'FilterTube_StudyUpdateChild', profileId: childId, patch });
+                const result = await sendAsParent(body, { action: 'FilterTube_StudyUpdateChild', profileId: childId, patch });
                 redraw();
                 return result;
             }

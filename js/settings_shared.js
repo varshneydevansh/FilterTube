@@ -484,21 +484,25 @@
             });
     }
 
+    // "Filter all" word and key: Android FilterPayloadCompiler channelKey / channelKeywordWord (the
+    // same rules as FilterTubeIdentity.channelFilterAllKey / channelFilterAllWord in the background).
+    function channelText(channel, key) {
+        return typeof channel?.[key] === 'string' ? channel[key].trim() : '';
+    }
+
     function getChannelDerivedKey(channel) {
-        if (!channel) return '';
-        const keySource = channel.id || channel.handle || channel.originalInput || channel.name || '';
-        return keySource.toLowerCase();
+        if (!channel || typeof channel !== 'object') return '';
+        return (channelText(channel, 'id') || channelText(channel, 'handle') || channelText(channel, 'canonicalHandle')
+            || channelText(channel, 'handleDisplay') || channelText(channel, 'customUrl')
+            || channelText(channel, 'originalInput') || channelText(channel, 'name')).toLowerCase();
     }
 
     function getChannelKeywordWord(channel) {
-        if (!channel) return '';
-        if (channel.name && channel.name !== channel.id) {
-            return channel.name;
-        }
-        if (channel.handle) {
-            return channel.handle;
-        }
-        return channel.id || channel.originalInput || '';
+        if (!channel || typeof channel !== 'object') return '';
+        const name = channelText(channel, 'name');
+        if (name && name.toLowerCase() !== channelText(channel, 'id').toLowerCase()) return name;
+        return channelText(channel, 'handle') || channelText(channel, 'handleDisplay') || channelText(channel, 'canonicalHandle')
+            || channelText(channel, 'customUrl') || channelText(channel, 'id') || channelText(channel, 'originalInput') || '';
     }
 
     function syncFilterAllKeywords(keywords, channels) {

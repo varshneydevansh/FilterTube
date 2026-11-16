@@ -442,6 +442,8 @@
         const stableNames = new Set();
         const nameOnlyNames = new Set();
         const blockTubeNameRules = [];
+        // Android strongAliasKeys: the stable aliases (id, handles, custom URL) of rules that carry a UC id.
+        const strongAliases = new Set();
         const unresolvedHandleKeys = [];
         const unresolvedHandleKeysSeen = new Set();
 
@@ -542,6 +544,14 @@
                 addName(entry.name, hasStableIdentity);
                 addName(entry.handle, hasStableIdentity);
                 addName(entry.originalInput, hasStableIdentity);
+
+                const ruleIds = collectChannelUcIds(entry);
+                if (ruleIds.length > 0) {
+                    ruleIds.forEach(id => strongAliases.add(id));
+                    collectHandleVariants(entry).forEach(handle => strongAliases.add(handle));
+                    const ruleCustomUrl = normalizeCustomUrlForComparison(entry.customUrl || '');
+                    if (ruleCustomUrl) strongAliases.add(ruleCustomUrl);
+                }
             }
         }
 
@@ -552,6 +562,7 @@
             names,
             stableNames,
             nameOnlyNames,
+            strongAliases,
             blockTubeNameRules,
             blockTubeNameMatcher: buildBlockTubeChannelNameMatcher(blockTubeNameRules),
             unresolvedHandleKeys
@@ -582,7 +593,9 @@
             if (index.handles?.has(metaHandle)) return true;
             const withoutAt = metaHandle.replace(/^@/, '');
             if (withoutAt && index.nameOnlyNames?.has(withoutAt)) return true;
-            if (withoutAt && !metaId && index.stableNames?.has(withoutAt)) return true;
+            // Android matches channel keys as one set (NativeOwnedFilterDecider matchesAnyChannel):
+            // a rule's name or handle meets the card's handle whatever UC id either side carries.
+            if (withoutAt && index.stableNames?.has(withoutAt)) return true;
         }
 
         const metaCustomUrl = normalizeCustomUrlForComparison(meta.customUrl || '');
@@ -590,7 +603,8 @@
 
         const metaName = normalizeChannelNameForComparison(meta.name || '');
         if (metaName && index.nameOnlyNames?.has(metaName)) return true;
-        if (metaName && !metaId && index.stableNames?.has(metaName)) return true;
+        if (metaName && index.stableNames?.has(metaName)) return true;
+        if (metaName && !/\s/.test(metaName) && index.handles?.has(`@${metaName}`)) return true;
         if (
             metaName &&
             !index.nameOnlyNames &&
@@ -974,6 +988,107 @@
         }
     }
 
+
+    // ---- When a card's channel counts as known (Android NativeOwnedFilterDecider) -------------
+    //
+    // STRONG: a UC id, or an alias that a channel rule with a UC id (strongAliasKeys) or the learned
+    // channel map ties to a UC id. A collaboration whose roster is still loading ("A and 2 more" with
+    // fewer channels known), or a roster with a member lacking a UC id, stays RESOLVING until one of
+    // its channels hits a rule's stable alias (resolvedChannelIdentityStrength).
+    const COLLAPSED_COLLABORATOR_COUNT = /\band\s+(\d+)\s+more\b/i;
+
+    /** "A and 2 more" -> 3 (Android collapsedCollaboratorExpectedChannelCount); 0 when the label says nothing. */
+    function collapsedCollaboratorExpectedCount(label) {
+        if (!label || typeof label !== 'string') return 0;
+        const match = label.match(COLLAPSED_COLLABORATOR_COUNT);
+        const more = match ? parseInt(match[1], 10) : 0;
+        return Number.isFinite(more) && more > 0 ? more + 1 : 0;
+    }
+
+    function channelIdentityStrength(collaborators, options = {}) {
+        const list = (Array.isArray(collaborators) ? collaborators : [collaborators])
+            .filter(meta => meta && typeof meta === 'object');
+        const indexes = (Array.isArray(options.indexes) ? options.indexes : []).filter(Boolean);
+        const lookupChannelMap = getChannelMapLookup(options.channelMap || {});
+        const expected = Number(options.expectedCollaboratorCount) || 0;
+        const hasUcId = meta => collectChannelUcIds(meta).length > 0;
+        const ruleAlias = meta => {
+            const keys = [...collectChannelUcIds(meta), ...collectHandleVariants(meta)];
+            const customUrl = normalizeCustomUrlForComparison(meta.customUrl || '');
+            if (customUrl) keys.push(customUrl);
+            return indexes.some(index => keys.some(key => index.strongAliases?.has(key)));
+        };
+        const mappedToUcId = meta => {
+            for (const handle of collectHandleVariants(meta)) {
+                if (normalizeUcIdForComparison(lookupChannelMap(handle))) return true;
+            }
+            const customUrl = normalizeCustomUrlForComparison(meta.customUrl || '');
+            return !!(customUrl && normalizeUcIdForComparison(lookupChannelMap(customUrl)));
+        };
+        const rosterLoading = (expected > 1 && list.length < expected)
+            || (list.length > 1 && list.some(meta => !hasUcId(meta)));
+        if (rosterLoading) return list.some(ruleAlias) ? 'strong' : 'resolving';
+        if (list.some(hasUcId) || list.some(ruleAlias) || list.some(mappedToUcId)) return 'strong';
+        return 'weak';
+    }
+
+    /** BlockTube channel-name rows only (Android mainBlockedChannelNameMatchers). */
+    function matchesChannelNameRows(collaborators, index) {
+        if (!index) return false;
+        const list = (Array.isArray(collaborators) ? collaborators : [collaborators]).filter(meta => meta && typeof meta === 'object');
+        return list.some(meta => {
+            if (index.blockTubeNameMatcher && matchesBlockTubeChannelNameRules(meta.name, index.blockTubeNameMatcher)) return true;
+            return Array.isArray(index.blockTubeNameRules) && !index.blockTubeNameMatcher
+                && index.blockTubeNameRules.some(rule => matchesBlockTubeChannelNameRule(rule, meta));
+        });
+    }
+
+    /**
+     * A card whose channel isn't known yet (Android NativeOwnedFilterDecider, "channel identity
+     * pending"). Returns 'block', 'allow' (content filters still apply) or 'wait' (hidden until the
+     * channel arrives). Only BlockTube channel-name rows count as channel matches here: a display
+     * name alone never stands in for the channel.
+     * - Layered rules: a block match hides now; an allow match shows only while no blocked channel
+     *   could still match, and never for an allow-mode Short.
+     * - Otherwise an allow match shows, a block match hides; an allow-mode Short always waits.
+     */
+    function decidePendingChannelIdentity(input = {}) {
+        const shortsWait = input.allowMode === true && input.isShort === true;
+        const allowMatch = input.allowedChannelName === true || input.allowedKeyword === true;
+        const blockMatch = input.blockedChannelName === true || input.blockedKeyword === true;
+        if (input.layered === true) {
+            if (blockMatch) return 'block';
+            if ((allowMatch || input.allowedVideo === true) && input.hasBlockedChannelRules !== true && !shortsWait) return 'allow';
+            return 'wait';
+        }
+        if (shortsWait) return 'wait';
+        if (allowMatch) return 'allow';
+        if (blockMatch) return 'block';
+        return 'wait';
+    }
+
+    /**
+     * The "Filter all" word a channel adds (Android FilterPayloadCompiler.channelKeywordWord): its
+     * name unless that is just its id, else handle, handle display, canonical handle, custom URL, id,
+     * original input.
+     */
+    function channelFilterAllWord(channel) {
+        if (!channel || typeof channel !== 'object') return '';
+        const value = key => (typeof channel[key] === 'string' ? channel[key].trim() : '');
+        const name = value('name');
+        if (name && name.toLowerCase() !== value('id').toLowerCase()) return name;
+        return value('handle') || value('handleDisplay') || value('canonicalHandle') || value('customUrl')
+            || value('id') || value('originalInput') || '';
+    }
+
+    /** The key a "Filter all" word is stored under (Android FilterPayloadCompiler.channelKey). */
+    function channelFilterAllKey(channel) {
+        if (!channel || typeof channel !== 'object') return '';
+        const value = key => (typeof channel[key] === 'string' ? channel[key].trim() : '');
+        return (value('id') || value('handle') || value('canonicalHandle') || value('handleDisplay')
+            || value('customUrl') || value('originalInput') || value('name')).toLowerCase();
+    }
+
     /**
      * True if `channelInfo` matches any entry in `filterChannels`.
      */
@@ -999,6 +1114,12 @@
         channelMetaMatchesIndex,
         channelMatchesFilter,
         isChannelBlocked,
+        collapsedCollaboratorExpectedCount,
+        channelIdentityStrength,
+        decidePendingChannelIdentity,
+        matchesChannelNameRows,
+        channelFilterAllWord,
+        channelFilterAllKey,
         extractCustomUrlFromPath,
         extractChannelIdFromPath,
         fastExtractIdentityFromHtmlChunk

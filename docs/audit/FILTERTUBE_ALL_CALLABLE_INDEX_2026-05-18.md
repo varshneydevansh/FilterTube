@@ -222,8 +222,8 @@ lexical and its scope remains tracked JS/JSX/MJS: CJS/Python tooling requires it
 separate release/workflow review and is not silently counted as JavaScript here.
 
 ```text
-current tracked JS/JSX/MJS files: 156
-current repo-wide lexical callables: 10554
+current tracked JS/JSX/MJS files: 161
+current repo-wide lexical callables: 10662
 current complete per-callable semantic proofs: 0
 current callable behavior-change approval: NO-GO
 runtime behavior changed by inventory refresh: no
@@ -320,6 +320,11 @@ runtime behavior changed by inventory refresh: no
 | `js/shared/content_playback_resolver.js` | Content helper runtime | 25 | helper counted; semantic proof incomplete |
 | `js/shared/content_playback_source.js` | Content helper runtime | 18 | helper counted; semantic proof incomplete |
 | `js/shared/identity.js` | Content helper runtime | 110 | helper counted |
+| `js/shared/ask_parent.js` | Content helper runtime | 41 | helper counted; semantic proof incomplete |
+| `js/ask_parent_background.js` | Hot page/background runtime | 44 | helper counted; semantic proof incomplete |
+| `js/shared/live_chat_filter.js` | Content helper runtime | 8 | helper counted; semantic proof incomplete |
+| `js/content/live_chat_filter.js` | Content helper runtime | 10 | helper counted; semantic proof incomplete |
+| `js/content/live_chat_identity.js` | Content helper runtime | 5 | helper counted; semantic proof incomplete |
 | `js/shared/view_count.js` | Content helper runtime | 4 | helper counted; semantic proof incomplete |
 | `js/state_manager.js` | UI/settings runtime | 180 | UI/settings counted |
 | `js/tab-view.js` | UI/settings runtime | 2201 | UI/settings counted |

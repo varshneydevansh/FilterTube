@@ -688,9 +688,212 @@
             ? localizedAdmissionText('admission.blockedTitle', 'This video is blocked')
             : localizedAdmissionText('admission.checkingTitle', 'Checking before playback');
         reason.textContent = localizedAdmissionMessage(message);
+        if (blocked) mountAskParent(overlay, panel, darkTheme);
+        else removeAskParent(overlay);
         if (blocked && background?.play && background.paused !== false) {
             try { background.play()?.catch?.(() => {}); } catch (e) {}
         }
+    }
+
+
+    // ---- Ask a parent (Android AskParentUi) ---------------------------------------------------------
+    // On a child profile with a parent who can answer, the blocked card offers "Ask to watch": reason
+    // chips, a one-line note, then "Sent to Mum" with Kriti thinking. The ask goes to the background
+    // (js/ask_parent_background.js); nothing plays until a parent answers.
+
+    function askText(key, fallback, values = {}) {
+        return String(localizedAdmissionText(key, fallback)).replace(/\{([a-zA-Z]+)\}/g, (match, name) =>
+            Object.prototype.hasOwnProperty.call(values, name) ? String(values[name]) : match);
+    }
+
+    function askSend(message) {
+        return new Promise(resolve => {
+            try {
+                const maybe = runtimeAPI?.runtime?.sendMessage?.(message, response => {
+                    if (runtimeAPI.runtime.lastError) resolve(null); else resolve(response);
+                });
+                if (maybe && typeof maybe.then === 'function') maybe.then(resolve, () => resolve(null));
+            } catch (e) { resolve(null); }
+        });
+    }
+
+    function removeAskParent(overlay) {
+        const holder = overlay?.__filtertubeAskParent;
+        if (holder) {
+            try { holder.remove(); } catch (e) {}
+            overlay.__filtertubeAskParent = null;
+            overlay.__filtertubeAskParentKey = '';
+        }
+    }
+
+    function askButton(label, primary, dark) {
+        const node = document.createElement('button');
+        node.type = 'button';
+        node.textContent = label;
+        admissionOverlayStyle(node, {
+            minHeight: '44px', padding: '0 18px', borderRadius: '999px', cursor: 'pointer',
+            font: '700 14px/1 system-ui, Roboto, "Segoe UI", sans-serif', letterSpacing: '0',
+            border: primary ? '0' : `1.5px solid ${dark ? '#3a4654' : '#cdbfae'}`,
+            background: primary ? '#ab4438' : 'transparent', color: primary ? '#fffaf4' : (dark ? '#edf2f7' : '#1b1a18')
+        });
+        return node;
+    }
+
+    function askLine(textValue, dark, weight = 500) {
+        const node = document.createElement('p');
+        node.textContent = textValue;
+        admissionOverlayStyle(node, { margin: '0', color: dark ? '#cfd8e2' : '#4a4640', font: `${weight} 14px/1.5 system-ui, Roboto, "Segoe UI", sans-serif` });
+        return node;
+    }
+
+    function waitingLine(state) {
+        const name = state.parentName || askText('askParent.parentFallback', 'Your parent');
+        return state.route === 'same_device'
+            ? askText('askParent.waitingHere', '{name} can answer on this device.', { name })
+            : askText('askParent.waitingRemote', '{name} will see it next time their device connects.', { name });
+    }
+
+    function renderAskSent(holder, state, dark, already) {
+        const name = state.parentName || askText('askParent.parentFallback', 'Your parent');
+        holder.replaceChildren();
+        makeRoomForSheet(holder, false);
+        const row = document.createElement('div');
+        admissionOverlayStyle(row, { display: 'flex', alignItems: 'center', gap: '12px' });
+        const kriti = companionMode === 'off' ? null : createAdmissionMascot('kriti_thinking.webp', 64);
+        if (kriti) row.appendChild(kriti);
+        const words = document.createElement('div');
+        admissionOverlayStyle(words, { display: 'grid', gap: '4px' });
+        words.appendChild(askLine(already
+            ? askText('askParent.already', 'You already asked for this. Waiting for {name}.', { name })
+            : askText('askParent.sent', 'Sent to {name}', { name }), dark, 700));
+        words.appendChild(askLine(waitingLine(state), dark));
+        row.appendChild(words);
+        holder.appendChild(row);
+    }
+
+    function askRefusal(result, state) {
+        const name = state.parentName || askText('askParent.parentFallback', 'Your parent');
+        switch (result?.type) {
+            case 'too_many': return askText('askParent.tooMany', 'You have {count} asks waiting. Wait for an answer first.', { count: 3 });
+            case 'wait': return askText('askParent.wait', 'Wait a little before asking again.');
+            case 'recently_declined': {
+                let time = '';
+                try { time = new Date(result.at).toLocaleTimeString([], { hour: 'numeric', minute: '2-digit' }); } catch (e) {}
+                return askText('askParent.recentlyNo', '{name} said not now. You can ask again at {time}.', { name, time });
+            }
+            case 'asking_off': return askText('askParent.off', 'Asking is turned off.');
+            default: return askText('askParent.noParent', 'No parent is linked yet, so this can\'t be sent.');
+        }
+    }
+
+    /** The card sits inside the player: while the sheet is open the shoo pose steps aside for it. */
+    function makeRoomForSheet(holder, open) {
+        const panel = holder.parentNode;
+        const pose = panel?.querySelector?.('[data-filtertube-admission-mascot]');
+        if (pose) admissionOverlayStyle(pose, { display: open ? 'none' : 'block' });
+    }
+
+    function renderAskSheet(holder, target, state, dark) {
+        const name = state.parentName || askText('askParent.parentFallback', 'Your parent');
+        holder.replaceChildren();
+        makeRoomForSheet(holder, true);
+        // The sheet is sun paper (Android AskParentUi), inside the blocked card.
+        admissionOverlayStyle(holder, { padding: '16px', borderRadius: '18px', background: dark ? '#2c2716' : '#fff3cf',
+            border: `1px solid ${dark ? '#4a4128' : '#ecd9a0'}` });
+        const title = document.createElement('h2');
+        title.textContent = askText('askParent.titleVideo', 'Ask to watch');
+        admissionOverlayStyle(title, { margin: '0', font: '400 22px/1.2 "FilterTube Delius", "Outfit", system-ui, sans-serif', color: dark ? '#f6eccd' : '#1b1a18' });
+        holder.appendChild(title);
+        holder.appendChild(askLine(askText('askParent.sheetBody', '{name} will see your ask and answer it.', { name }), dark));
+        holder.appendChild(askLine(askText('askParent.why', 'Why do you want it?'), dark, 700));
+        const chips = document.createElement('div');
+        chips.setAttribute('role', 'radiogroup');
+        admissionOverlayStyle(chips, { display: 'flex', flexWrap: 'wrap', gap: '8px' });
+        let reason = '';
+        const chipLabels = { school: ['askParent.reasonSchool', 'For school'], once: ['askParent.reasonOnce', 'Just this once'], other: ['askParent.reasonOther', 'Something else'] };
+        const chipNodes = [];
+        for (const [key, [labelKey, fallback]] of Object.entries(chipLabels)) {
+            const chip = askButton(askText(labelKey, fallback), false, dark);
+            chip.setAttribute('role', 'radio');
+            chip.setAttribute('aria-checked', 'false');
+            chip.addEventListener('click', () => {
+                reason = reason === key ? '' : key;
+                for (const [node, nodeKey] of chipNodes) {
+                    const on = nodeKey === reason;
+                    node.setAttribute('aria-checked', on ? 'true' : 'false');
+                    admissionOverlayStyle(node, { background: on ? (dark ? '#e7c35a' : '#1b1a18') : 'transparent', color: on ? (dark ? '#1b1a18' : '#fffaf4') : (dark ? '#edf2f7' : '#1b1a18') });
+                }
+            });
+            chipNodes.push([chip, key]);
+            chips.appendChild(chip);
+        }
+        holder.appendChild(chips);
+        const note = document.createElement('input');
+        note.type = 'text';
+        note.maxLength = 80;
+        note.placeholder = askText('askParent.noteHint', 'Add a note (optional)');
+        note.setAttribute('aria-label', note.placeholder);
+        admissionOverlayStyle(note, { minHeight: '48px', padding: '0 14px', borderRadius: '14px', boxSizing: 'border-box', width: '100%',
+            border: `1.5px solid ${dark ? '#4a4128' : '#d8c38a'}`, background: dark ? '#151c24' : '#fffcf6', color: dark ? '#edf2f7' : '#1b1a18',
+            font: '500 15px/1.4 system-ui, Roboto, "Segoe UI", sans-serif' });
+        holder.appendChild(note);
+        const status = askLine('', dark);
+        status.setAttribute('role', 'status');
+        const actions = document.createElement('div');
+        admissionOverlayStyle(actions, { display: 'flex', gap: '10px', justifyContent: 'flex-end', flexWrap: 'wrap' });
+        const cancel = askButton(askText('askParent.cancel', 'Not now'), false, dark);
+        const send = askButton(askText('askParent.send', 'Send to {name}', { name }), true, dark);
+        cancel.addEventListener('click', () => renderAskStart(holder, target, state, dark));
+        send.addEventListener('click', async () => {
+            send.disabled = true;
+            const result = await askSend({ action: 'FilterTube_AskParentCreate', target, reason, note: note.value });
+            if (result?.type === 'created') {
+                // The crayon note folds and flies (Android PAPER_FLIP), then "Sent".
+                const still = admissionOverlayPrefersReducedMotion() || typeof holder.animate !== 'function';
+                if (!still) {
+                    try { await holder.animate([{ transform: 'none', opacity: 1 }, { transform: 'translateY(-24px) rotate(-4deg) scale(.92)', opacity: 0 }], { duration: 320, easing: 'cubic-bezier(.4,0,.2,1)' }).finished; } catch (e) {}
+                }
+                renderAskSent(holder, state, dark, false);
+                return;
+            }
+            if (result?.type === 'already_open') { renderAskSent(holder, state, dark, true); return; }
+            send.disabled = false;
+            status.textContent = askRefusal(result, state);
+        });
+        actions.append(cancel, send);
+        holder.append(status, actions);
+        try { note.focus({ preventScroll: true }); } catch (e) {}
+        try { send.scrollIntoView?.({ block: 'nearest' }); } catch (e) {}
+    }
+
+    function renderAskStart(holder, target, state, dark) {
+        holder.replaceChildren();
+        makeRoomForSheet(holder, false);
+        admissionOverlayStyle(holder, { padding: '0', background: 'transparent', border: '0' });
+        const ask = askButton(askText('askParent.button', 'Ask to watch'), true, dark);
+        ask.setAttribute('data-filtertube-ask-parent', 'true');
+        ask.addEventListener('click', () => renderAskSheet(holder, target, state, dark));
+        holder.appendChild(ask);
+    }
+
+    async function mountAskParent(overlay, panel, dark) {
+        const target = root.__filtertubeAskParentTarget;
+        if (!overlay || !panel || !target?.videoId || typeof document.createElement !== 'function') { removeAskParent(overlay); return; }
+        const key = `${target.videoId}|${target.blockedBy}`;
+        // One ask card per blocked video; a redraw of the same card keeps it (and its typed note).
+        if (overlay.__filtertubeAskParentKey === key) return;
+        removeAskParent(overlay);
+        overlay.__filtertubeAskParentKey = key;
+        const state = await askSend({ action: 'FilterTube_AskParentState', videoId: target.videoId });
+        if (!state?.isChild || overlay.__filtertubeAskParentKey !== key || overlay.__filtertubeAdmissionState !== 'blocked') return;
+        if (!state.canAsk && !state.openFor) return;
+        const holder = document.createElement('div');
+        holder.setAttribute('data-filtertube-ask-parent-holder', 'true');
+        admissionOverlayStyle(holder, { display: 'grid', gap: '12px' });
+        panel.appendChild(holder);
+        overlay.__filtertubeAskParent = holder;
+        if (state.openFor) renderAskSent(holder, state, dark, true);
+        else renderAskStart(holder, target, state, dark);
     }
 
 

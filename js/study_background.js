@@ -54,9 +54,14 @@
             version: 1,
             profiles: object(clone(raw.profiles)),
             seconds: object(clone(raw.seconds)),
-            lastCreditAt: Number.isFinite(raw.lastCreditAt) ? raw.lastCreditAt : 0
+            lastCreditAt: Number.isFinite(raw.lastCreditAt) ? raw.lastCreditAt : 0,
+            // "Skip this video" (Android StudyRuntimeStore skip:<profile>): per profile, newest last.
+            skipped: object(clone(raw.skipped))
         };
     }
+
+    /** Android StudyRuntimeStore.MAX_SKIPPED. */
+    const MAX_SKIPPED = 500;
 
     function profileRuntime(runtime, profileId) {
         const value = object(runtime.profiles[profileId]);
@@ -64,7 +69,9 @@
             session: isObject(value.session) ? value.session : null,
             endRequestedAt: Number.isFinite(value.endRequestedAt) ? value.endRequestedAt : null,
             endedUntil: Number.isFinite(value.endedUntil) ? value.endedUntil : null,
-            breakSkippedUntil: Number.isFinite(value.breakSkippedUntil) ? value.breakSkippedUntil : null
+            breakSkippedUntil: Number.isFinite(value.breakSkippedUntil) ? value.breakSkippedUntil : null,
+            // "End and switch": the profile to switch to once a Gentle session's pause is over.
+            switchTo: typeof value.switchTo === 'string' && value.switchTo.trim() ? value.switchTo.trim() : null
         };
     }
 
@@ -292,6 +299,32 @@
          * Synchronous, for the compiler: the profile the filters use and the public study state.
          * Returns {profile, applied, state}.
          */
+        /** The videos [profileId] skipped during study: always hidden for that profile, studying or not. */
+        function skippedVideos(profileId, prepared = null) {
+            const runtime = prepared?.runtime || emptyRuntime();
+            const list = runtime.skipped?.[text(profileId)];
+            return Array.isArray(list) ? list.filter(id => typeof id === 'string' && id) : [];
+        }
+
+        /**
+         * "Skip this video" (Android StudyRuntime.skipVideo): hides it from now on for this profile, even
+         * while locked. It only ever hides more, so a child may use it and nobody needs a PIN.
+         */
+        async function skipVideo(videoId) {
+            const id = text(videoId);
+            if (!/^[A-Za-z0-9_-]{6,64}$/.test(id)) return { ok: false, error: 'invalid_video' };
+            const { profileId, profile, runtime } = await readAll();
+            const study = Model.profileStudy(profile);
+            const { clock } = clockFor(profile, runtime, profileId);
+            if (!study || !clock.studying) return { ok: false, error: 'not_studying' };
+            const current = Array.isArray(runtime.skipped[profileId]) ? runtime.skipped[profileId] : [];
+            if (current.includes(id)) return { ok: true, already: true };
+            runtime.skipped[profileId] = [...current, id].slice(-MAX_SKIPPED);
+            await writeRuntime(runtime);
+            await deps.onTransition?.('skip_video');
+            return { ok: true };
+        }
+
         function apply(profileId, profile, prepared, options = {}) {
             const at = prepared?.now ?? now();
             const { study, local, clock } = clockFor(profile, prepared?.runtime || emptyRuntime(), profileId, at,
@@ -403,14 +436,21 @@
             if (!local.endRequestedAt || now() < local.endRequestedAt + Engine.GENTLE_END_PAUSE_MS) return false;
             const { profile } = await readAll();
             const { clock } = clockFor(profile, runtime, profileId);
+            const switchTo = text(local.switchTo);
             runtime.profiles[profileId] = {
                 ...local,
                 session: null,
                 endRequestedAt: null,
+                switchTo: null,
                 endedUntil: clock.sessionEnd || now()
             };
             await writeRuntime(runtime);
             await updateProfileStudy(profileId, study => ({ ...study, lock: null }));
+            // "End and switch" (Android StudySwitchGate.endGentleThenSwitch): the pause is over, so the
+            // switch the person asked for goes ahead now.
+            if (switchTo && typeof deps.switchProfile === 'function') {
+                try { await deps.switchProfile(profileId, switchTo); } catch (e) { }
+            }
             return true;
         }
 
@@ -483,10 +523,26 @@
             return { ok: true, endsAt: endRequestedAt + Engine.GENTLE_END_PAUSE_MS };
         }
 
+        /**
+         * "End and switch" (Android StudySwitchGate): a Gentle session ends after its 30-second pause,
+         * then the profile switches to [targetProfileId]. "Keep studying" (cancelEnd) drops both.
+         */
+        async function endGentleThenSwitch(targetProfileId) {
+            const target = text(targetProfileId);
+            if (!target) return { ok: false, error: 'invalid_target' };
+            const result = await requestEnd();
+            if (!result?.ok) return result;
+            const { profileId, runtime } = await readAll();
+            const local = profileRuntime(runtime, profileId);
+            runtime.profiles[profileId] = { ...local, switchTo: target };
+            await writeRuntime(runtime);
+            return { ...result, switchTo: target };
+        }
+
         async function cancelEnd() {
             const { profileId, runtime } = await readAll();
             const local = profileRuntime(runtime, profileId);
-            runtime.profiles[profileId] = { ...local, endRequestedAt: null };
+            runtime.profiles[profileId] = { ...local, endRequestedAt: null, switchTo: null };
             await writeRuntime(runtime);
             await schedule();
             return { ok: true };
@@ -561,7 +617,7 @@
          * sends it as the schedule scope and the child can only tighten it. A plan or lock another
          * parent set stays theirs.
          */
-        async function parentContext(childId) {
+        async function parentContext(childId, { edit = false } = {}) {
             if (await deps.getSelfControlSession?.()) return { ok: false, error: 'locked' };
             const { profiles } = await readAll();
             const parentId = text(profiles.activeProfileId) || 'default';
@@ -571,6 +627,11 @@
             const parentIsAccount = parentId === 'default' || text(parent.type || 'account') === 'account';
             if (!Object.keys(child).length || text(child.type) !== 'child' || text(child.parentProfileId) !== parentId || !parentIsAccount) {
                 return { ok: false, error: 'not_parent' };
+            }
+            // An edit needs a fresh unlock of that parent (Android ParentModeChrome.openSpace:
+            // requestActiveProfileUnlock with sensitiveAction, a PIN typed in the last 5 minutes).
+            if (edit && typeof deps.parentUnlockFresh === 'function' && !(await deps.parentUnlockFresh(parentId))) {
+                return { ok: false, error: 'parent_unlock_required', parentId };
             }
             return { ok: true, parentId, child, childId: text(childId) };
         }
@@ -586,7 +647,7 @@
         }
 
         async function updateChild(childId, patch = {}) {
-            const context = await parentContext(childId);
+            const context = await parentContext(childId, { edit: true });
             if (!context.ok) return context;
             const current = Model.profileStudy(context.child) || Model.createStudy();
             const owner = value => text(object(value).setByParentId);
@@ -608,7 +669,7 @@
 
         /** A parent's session lock on a child: study rounds for `minutes` (7 days at most), from now. */
         async function startParentLock(childId, { minutes } = {}) {
-            const context = await parentContext(childId);
+            const context = await parentContext(childId, { edit: true });
             if (!context.ok) return context;
             const length = Math.trunc(Number(minutes));
             if (!Number.isFinite(length) || length < 15 || length > Engine.PARENT_LOCK_MAX_MINUTES) {
@@ -632,7 +693,7 @@
 
         /** Only the parent who set a lock ends it early. */
         async function endParentLock(childId) {
-            const context = await parentContext(childId);
+            const context = await parentContext(childId, { edit: true });
             if (!context.ok) return context;
             const current = Model.profileStudy(context.child);
             if (!current?.lock) return { ok: true };
@@ -690,6 +751,10 @@
                 if (!youtubeContent) return Promise.resolve({ ok: false, error: 'untrusted_sender' });
                 return tick(request);
             }
+            if (action === 'FilterTube_StudySkipVideo') {
+                if (!extensionPage && !youtubeContent) return Promise.resolve({ ok: false, error: 'untrusted_sender' });
+                return skipVideo(request.videoId);
+            }
             if (action === 'FilterTube_StudySkipBreak') {
                 if (!extensionPage && !youtubeContent) return Promise.resolve({ ok: false, error: 'untrusted_sender' });
                 return skipBreak();
@@ -698,6 +763,7 @@
             if (action === 'FilterTube_StudyStartSession') return startSession(request);
             if (action === 'FilterTube_StudyEndSession') return requestEnd();
             if (action === 'FilterTube_StudyCancelEnd') return cancelEnd();
+            if (action === 'FilterTube_StudyEndGentleThenSwitch') return endGentleThenSwitch(request.targetProfileId);
             if (action === 'FilterTube_StudyUpdate') return update(request.patch);
             if (action === 'FilterTube_StudyGetChild') return getChildState(request.profileId);
             if (action === 'FilterTube_StudyUpdateChild') return updateChild(request.profileId, request.patch);
@@ -707,8 +773,8 @@
         }
 
         return Object.freeze({
-            ALARM, RUNTIME_KEY, prepare, apply, getState, schedule, onAlarm, startSession, requestEnd, cancelEnd,
-            skipBreak, tick, update, foldProgress, handleMessage, deviceId, getChildState, updateChild, startParentLock, endParentLock,
+            ALARM, RUNTIME_KEY, prepare, apply, getState, schedule, onAlarm, startSession, requestEnd, cancelEnd, endGentleThenSwitch,
+            skipBreak, skipVideo, skippedVideos, tick, update, foldProgress, handleMessage, deviceId, getChildState, updateChild, startParentLock, endParentLock,
             switchDecision
         });
     }

@@ -13510,6 +13510,59 @@ function isCommentContextTag(tagName) {
     return COMMENT_CONTEXT_TAGS.has(String(tagName || '').toLowerCase());
 }
 
+/**
+ * "Comments from X hidden · Undo" (Android NativeOverlayCommentsSheetUi hiddenAuthorStrip): a quiet strip
+ * where the comment was. Undo takes the block back (the background allows it for its own recent blocks)
+ * and the author's comments come back.
+ */
+function showCommentAuthorHiddenNote(commentTarget, channelInfo) {
+    if (!commentTarget || !commentTarget.parentNode || typeof document === 'undefined') return null;
+    const channelKey = String(channelInfo?.id || channelInfo?.handle || '').trim();
+    if (!channelKey) return null;
+    const label = String(channelInfo?.name || channelInfo?.handleDisplay || channelInfo?.handle || channelKey).trim().slice(0, 80);
+    const previous = commentTarget.previousElementSibling;
+    if (previous?.getAttribute?.('data-filtertube-comment-note') === channelKey) return previous;
+    const dark = document.documentElement?.hasAttribute?.('dark') || document.documentElement?.getAttribute?.('data-theme') === 'dark';
+    const note = document.createElement('div');
+    note.setAttribute('data-filtertube-comment-note', channelKey);
+    note.setAttribute('role', 'status');
+    note.style.cssText = [
+        'display:flex', 'align-items:center', 'gap:8px', 'min-height:44px', 'margin:8px 0', 'padding:4px 4px 4px 14px',
+        'box-sizing:border-box', 'border-radius:14px', `border:1px solid ${dark ? '#3a4654' : '#dcd1c2'}`,
+        `background:${dark ? '#151c24' : '#fffcf6'}`, 'font:400 14px/1.4 Roboto, Arial, sans-serif'
+    ].join(';');
+    const words = document.createElement('span');
+    words.style.cssText = `flex:1;min-width:0;color:${dark ? '#b8c3ce' : '#625f58'};overflow:hidden;text-overflow:ellipsis;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical`;
+    words.textContent = filterTubeContentMenuText('content.comments.authorHidden', 'Comments from {name} hidden', { name: label });
+    const undo = document.createElement('button');
+    undo.type = 'button';
+    undo.textContent = filterTubeContentMenuText('content.comments.undo', 'Undo');
+    undo.style.cssText = `min-width:64px;min-height:40px;padding:0 12px;border:0;border-radius:999px;background:transparent;cursor:pointer;font:700 14px/1 Roboto, Arial, sans-serif;color:${dark ? '#e0796b' : '#ab4438'}`;
+    undo.addEventListener('click', () => {
+        undo.disabled = true;
+        browserAPI_BRIDGE.runtime.sendMessage({ type: 'undoCommentAuthorBlock', channelKey }, async response => {
+            if (!response?.success) { undo.disabled = false; return; }
+            note.remove();
+            try {
+                const refreshed = await requestSettingsFromBackground({ forceRefresh: true });
+                if (refreshed?.success && refreshed.settings) currentSettings = refreshed.settings;
+                document.querySelectorAll('[data-filtertube-hidden]').forEach(element => {
+                    if (element.closest?.('ytd-comments, ytm-comment-section-renderer, #comments')) {
+                        element.style.display = '';
+                        element.classList.remove('filtertube-hidden');
+                        element.removeAttribute('data-filtertube-hidden');
+                    }
+                });
+                applyDOMFallback(currentSettings, { forceReprocess: true, preserveScroll: true });
+            } catch (e) {
+            }
+        });
+    });
+    note.append(words, undo);
+    commentTarget.parentNode.insertBefore(note, commentTarget);
+    return note;
+}
+
 function resolveCommentHideTarget(node) {
     if (!node || !(node instanceof Element)) return node;
     return node.closest('ytd-comment-thread-renderer, ytm-comment-thread-renderer')
@@ -14820,6 +14873,11 @@ async function handleBlockChannelClick(channelInfo, menuItem, filterAll = false,
             applyDOMFallback(refreshedSettings || currentSettings, { forceReprocess: true, preserveScroll: true });
         } catch (domError) {
             console.warn('FilterTube: DOM fallback re-run failed after blocking channel', domError);
+        }
+
+        // "Comments from X hidden · Undo" takes the blocked comment's place (Android NativeCommentsHiddenNote).
+        if (isCommentContextBlock && videoCard) {
+            try { showCommentAuthorHiddenNote(resolveCommentHideTarget(videoCard), channelInfo); } catch (e) { }
         }
 
         // Enrich all Shorts on the page with channel info so they can be matched to the blocked channel
