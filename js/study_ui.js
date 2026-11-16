@@ -1722,7 +1722,8 @@
         });
         const explainer = searchExplainerCard(study, catalog, data.isChild === true || state.isChild === true, state.searchHow);
         if (explainer) card.appendChild(explainer);
-        if (editable && state.state !== 'STUDY' && state.state !== 'BREAK') card.appendChild(startNow(study, refresh));
+        // No "Start now" while the clock is on hold (Android 2280f4ee3).
+        if (editable && state.state !== 'STUDY' && state.state !== 'BREAK' && !state.clockHold) card.appendChild(startNow(study, refresh));
         host.replaceChildren(card);
         paintPage(host, state, !!state.sessionEnded && state.state !== 'STUDY' && state.state !== 'BREAK');
     }

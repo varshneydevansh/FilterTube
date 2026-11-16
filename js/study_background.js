@@ -268,6 +268,19 @@
             return { reading: result.reading, clockStore };
         }
 
+        /**
+         * Android StudyRuntime.lockClockNow: the time locks are measured on, the earlier of the wall clock
+         * and the guard's trusted clock, so moving the device clock forward can't end one early.
+         */
+        async function lockClockNow() {
+            try {
+                const guard = await readClock();
+                return Number.isFinite(guard.reading?.lockNow) ? guard.reading.lockNow : now();
+            } catch (e) {
+                return now();
+            }
+        }
+
         /** When a lock ends, for "Locked until ...": a parent's lock or plan, or a self Locked session. */
         function lockedUntil(study, local, clock) {
             if (clock.setByParentId) return clock.source === 'parent_lock' ? Number(object(study?.lock).endsAt) || clock.sessionEnd : clock.sessionEnd;
@@ -926,7 +939,7 @@
         return Object.freeze({
             ALARM, RUNTIME_KEY, prepare, apply, getState, schedule, onAlarm, startSession, requestEnd, cancelEnd, endGentleThenSwitch,
             skipBreak, undoSkipBreak, skipVideo, skippedVideos, tick, update, foldProgress, handleMessage, deviceId, getChildState, updateChild, startParentLock, endParentLock,
-            switchDecision, addGrant, reportFor, acknowledgeSessionEnd
+            switchDecision, addGrant, reportFor, acknowledgeSessionEnd, lockClockNow
         });
     }
 

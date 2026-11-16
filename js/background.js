@@ -1517,9 +1517,24 @@ async function clearSelfControlSessionExpiryAlarm() {
     }
 }
 
+/**
+ * Android 2280f4ee3: Self-Control expiry reads the guarded clock (StudyRuntime.lockClockNow), the
+ * earlier of the wall clock and the study clock guard's trusted time, so moving the device clock
+ * forward can't end a session early.
+ */
+async function selfControlClockNow() {
+    try {
+        if (studyBackground?.lockClockNow) return await studyBackground.lockClockNow();
+    } catch (e) {
+    }
+    return Date.now();
+}
+
 async function getActiveSelfControlSession({ clearExpired = true } = {}) {
     const data = await storageGet([SELF_CONTROL_SESSION_KEY]);
-    const session = normalizeSelfControlSession(data?.[SELF_CONTROL_SESSION_KEY]);
+    const session = data?.[SELF_CONTROL_SESSION_KEY]
+        ? normalizeSelfControlSession(data[SELF_CONTROL_SESSION_KEY], await selfControlClockNow())
+        : null;
     if (!session || session.active !== true) {
         let hardWhitelistRestored = false;
         if (clearExpired && session?.sessionKind === SELF_CONTROL_SESSION_KIND_HARD_WHITELIST && !restoringExpiredHardWhitelistSession) {
@@ -9290,9 +9305,11 @@ function initializeImportedChannelEnrichment() {
 async function reconcileSelfControlSessionExpiry() {
     try {
         const data = await storageGet([SELF_CONTROL_SESSION_KEY]);
-        const session = normalizeSelfControlSession(data?.[SELF_CONTROL_SESSION_KEY]);
+        const guardedNow = await selfControlClockNow();
+        const session = normalizeSelfControlSession(data?.[SELF_CONTROL_SESSION_KEY], guardedNow);
         if (session?.active === true) {
-            await scheduleSelfControlSessionExpiry(session);
+            // A forward clock fired the alarm early: wake again when the guarded time really runs out.
+            await scheduleSelfControlSessionExpiry(session, Date.now() + Math.max(1000, session.lockedUntil - guardedNow));
             return session;
         }
         if (session) {

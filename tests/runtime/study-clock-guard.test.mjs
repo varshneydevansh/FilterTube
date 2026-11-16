@@ -124,3 +124,18 @@ test('a parent session lock: Locked until its end, not ended by moving the clock
     await h.controller.onAlarm(h.controller.ALARM);
     assert.equal(h.store.ftProfilesV4.profiles.p1.study.lock?.sessionId, 'mum-lock-1', 'a parent lock is never cleared on wall-clock expiry');
 });
+
+// Ports Android 2280f4ee3 (StudyEnforcementP0Test "Self-Control reads the guarded clock"): moving the
+// clock two days ahead can't end a Self-Control session, because its expiry reads lockClockNow.
+test('Self-Control reads the guarded clock, so a forward clock can\'t end a Locked session', async () => {
+    const h = harness({ study: { ...parentPlan, lock: { sessionId: 'lock-exam-6', setByParentId: 'mum', scope: 'session',
+        startsAt: at(16, 16, 10), endsAt: at(16, 16, 10) + 120 * MIN } }, now: at(16, 16, 10) });
+    await h.controller.getState();
+    h.tick(MIN);
+    h.clock.now += 2 * 24 * 60 * MIN;
+    const guarded = await h.controller.lockClockNow();
+    assert.equal(guarded, at(16, 16, 11));
+    const session = { startedAt: at(16, 16, 10), lockedUntil: at(16, 16, 35) };
+    assert.ok(guarded < session.lockedUntil, 'still active on the guarded clock');
+    assert.ok(h.clock.now >= session.lockedUntil, 'over on the wall clock');
+});
