@@ -1302,3 +1302,22 @@ body.ft-extension-surface[data-surface="tab-view"] .ft-about-portrait-card img {
 .ft-modal.is-message .import-export-hint { color: var(--pk-ink); font-size: 15px; line-height: 1.5; }
 .ft-modal.is-message .ft-modal-actions { display: flex; flex-direction: column-reverse; align-items: stretch; gap: 8px; margin-top: 18px; }
 .ft-modal.is-message .ft-modal-actions .btn-primary, .ft-modal.is-message .ft-modal-actions .btn-secondary { width: 100%; min-height: 48px; justify-content: center; }
+
+/* Toasts sit at the bottom centre, as the app's paper toasts do (StudyFocusActivity.paperToast,
+ * NativeToast): a paper card with a crayon edge, never pinned to a corner. */
+.ft-toast {
+  left: 0;
+  right: 0;
+  margin-inline: auto;
+  width: max-content;
+  max-width: min(560px, calc(100vw - 32px));
+  bottom: 16px;
+  background: var(--pk-paper);
+  color: var(--pk-ink);
+  border: 1.5px solid transparent;
+  border-image: var(--pk-edge-line) 20 / 18px / 0 round;
+  border-radius: 16px;
+  box-shadow: 0 3px 0 var(--pk-ledge);
+}
+.ft-toast-error { border-inline-start: 1.5px solid transparent; }
+@media (prefers-reduced-motion: reduce) { .ft-toast { transition: opacity 0.2s ease; transform: none; } }
