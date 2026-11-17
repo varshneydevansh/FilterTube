@@ -1305,7 +1305,8 @@ const UIComponents = (() => {
         const action = bar.querySelector('.pk-undo-bar__action');
         text.textContent = message || '';
         action.textContent = actionLabel || localizedComponentText('filters.undo.action', 'Undo');
-        action.hidden = false;
+        // A plain paper toast (Android StudyFocusActivity.paperToast) has no action, only the drain.
+        action.hidden = typeof onUndo !== 'function';
         action.disabled = false;
         bar.classList.remove('is-done');
         bar.__ftOnUndo = onUndo;

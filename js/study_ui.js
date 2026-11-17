@@ -453,8 +453,13 @@
         try { actions.lastChild.focus(); } catch (e) { }
     }
 
-    /** A short message with an optional Undo, in the page's toast style when there is one. */
+    /** A short message with an optional Undo: the app's paper toast with its brick drain (PaperKit). */
     function notify(host, message, undo) {
+        const kit = root.UIComponents;
+        if (kit?.showUndoBar) {
+            kit.showUndoBar({ message, actionLabel: t('study.undo', 'Undo'), onUndo: undo ? async () => { await undo(); return true; } : null, holdMs: 5000 });
+            return;
+        }
         const holder = messageHolder(host);
         if (!holder) return;
         holder.querySelector?.(':scope > .ft-study-toast')?.remove();

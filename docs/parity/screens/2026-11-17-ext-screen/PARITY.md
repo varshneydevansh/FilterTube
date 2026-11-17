@@ -191,3 +191,40 @@ Captures: `profiles/android-switch-profile.jpg`; `profiles/before-{tab,popup}-sw
   profile has no PIN, and setting one on the shared emulator was out of bounds for this pass.
 - Android's profile picker also shows the Self-Control "pinned" and "unavailable" row lines; the
   extension disables the other rows during a Self-Control Session with its own tooltip.
+
+---
+
+## 4. Toasts
+
+Android: `StudyFocusActivity.paperToast` (and the filters' undo bar): a paper card with a crayon edge,
+ink text, an optional brick action, and a brick line that drains while it shows.
+
+Captures: `toasts/android-paper-toast.jpg`, `toasts/after-study-toast.jpg`.
+
+- Before: Study's "Saved" / errors were a dark teal pill inside the card (`.ft-study-toast`); the
+  filters already used the paper undo bar.
+- Ported: Study's `notify()` uses `UIComponents.showUndoBar` (paper, drain, Undo when there is one);
+  `showUndoBar` hides its action when there is nothing to undo.
+- Removed: the teal study toast as the shown style (kept only as a fallback where `UIComponents` is absent).
+
+---
+
+## 5. Not re-audited in this pass
+
+These have ledger rows and earlier ports; this pass did not put them side by side with the app, so their
+parity is not claimed here:
+
+- Parent mode and Ask a parent (the answer card in the popup, the parent's request list, the live sync badge).
+- Nearby sync (pairing, the QR and code screens).
+- The support sheet and the Support page's variants.
+- Dialogs (FilterTubeMessageDialog against the extension's confirm and PIN prompts).
+- Mascot moments outside Study and Controls: the loading lines, "Shoo, Uljhan!" on the blocked-video
+  gate, the network moments, and the empty lists. A source check found these already ported
+  (`js/mascots.js` MOMENTS / LOADING_LINES, `js/content/admission_overlay.js` SHOO_FRAMES with the daily
+  cap), but they were not captured against the emulator.
+- Kids profiles' own viewer (the app's NativeOwnedKids stack): an extension has no viewer of its own;
+  the Kids rules apply on the Kids site in the same tab.
+
+## Commits
+
+See `git log feature/ext-parity..feature/ext-screen-parity`.
