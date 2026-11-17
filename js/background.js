@@ -4131,6 +4131,16 @@ async function getCompiledSettings(sender = null, profileType = null, forceRefre
             const activeRuleSurface = shouldUseKidsProfile ? activeKids : activeMain;
             // Layered rules (3.6.2): "whitelist" plus layered:true keeps the block list subtracting.
             compiledSettings.listLayered = compiledSettings.listMode === 'whitelist' && activeRuleSurface.layered === true;
+            // Study round: the plan's topics and every synonym they cover ("cement" for GATE Civil), so a
+            // search suggestion about the plan passes (search_suggestions_filter.js, topicsForQuery).
+            compiledSettings.studySearchTerms = (() => {
+                const engine = globalThis.FilterTubeStudyEngine;
+                if (compiledSettings.study?.phase !== 'study' || typeof engine?.planSearchTerms !== 'function') return [];
+                const topics = (Array.isArray(activeRuleSurface.whitelistKeywords) ? activeRuleSurface.whitelistKeywords : [])
+                    .filter(row => row && typeof row === 'object' && row.source === 'study_topic' && typeof row.word === 'string')
+                    .map(row => row.word);
+                try { return engine.planSearchTerms(topics); } catch (e) { return []; }
+            })();
             // Kids `videoIds` are the parent's allowed videos (Android NativeOwnedFilterDecider),
             // never blocked ones; on Main `videoIds` is the legacy alias of `blockedVideoIds`.
             compiledSettings.blockedVideoIds = Array.from(new Set(

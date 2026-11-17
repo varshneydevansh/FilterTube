@@ -772,6 +772,16 @@
         });
     }
 
+    /**
+     * Every term a plan's search may name: each topic and all it covers, single words included
+     * ("cement" under "building materials"). Search suggestions use it in the page (topicsForQuery
+     * without the catalog); capped so a big plan stays cheap to match.
+     */
+    function planSearchTerms(topics) {
+        return distinctTopics(array(topics).flatMap(topic => topicTerms(topic))).slice(0, MAX_PLAN_SEARCH_TERMS);
+    }
+    const MAX_PLAN_SEARCH_TERMS = 600;
+
     /** A couple of example searches for the first pack of the plan ({packId, variantId}). */
     function exampleSearches(groups) {
         const first = array(groups).find(isObject);
@@ -1319,7 +1329,7 @@
         SELF_LOCK_MAX_MINUTES, PARENT_LOCK_MAX_MINUTES, STUDY_SOURCE, TOPIC_SOURCE,
         parseTime, localDateKey, splitRounds, planOccurrences, studyClock, studyRulesApply, studyPhase,
         SUGGESTION_KINDS, suggest, suggestionSeed, studyTopics, studyAllowPhrases, topicTerms, topicPatterns,
-        topicsForQuery, exampleSearches, searchExplainer, topicLabel, breakSkipPreview, SKIP_UNDO_MS,
+        topicsForQuery, planSearchTerms, exampleSearches, searchExplainer, topicLabel, breakSkipPreview, SKIP_UNDO_MS,
         dayRing, ringBoundaries, currentBreak,
         PAGE_STATES, PAGE_BAND_PX, PAGE_LAST_FIVE_MS, PAGE_CROSSFADE_MS, pageState, pageEvening, pagePalette, mixColor,
         studySubjects, subjectOf, withSkips, sessionSeal, sessionEndStep, pendingSessionEnd, SESSION_END_STALE_MS, SESSION_CLOSE_SLACK_MS,

@@ -1968,15 +1968,46 @@
         return new Response(stream, { status: response.status, statusText: response.statusText, headers });
     }
 
+    // ------------------------------------------------------------------------
+    // Search suggestions (js/shared/search_suggestions_filter.js), three layers:
+    // the fetch/XHR response text, the JSONP callback (window.google.ac.h) and,
+    // in the isolated world, the dropdown itself (content/search_suggestions_dom.js).
+    // Before settings arrive nothing is known, so suggestions wait briefly and
+    // then stay empty (fail closed for allow lists, Study and Kids).
+    // ------------------------------------------------------------------------
+    const SUGGESTION_SETTINGS_WAIT_MS = 1500;
+
+    function suggestionKidsHost() {
+        return /(^|\.)youtubekids\.com$/i.test(String(document.location?.hostname || ''));
+    }
+
+    /** Resolves once settings are known, or with null after a short wait. */
+    function suggestionSettingsReady() {
+        if (cachedSettings) return Promise.resolve(cachedSettings);
+        return new Promise(resolve => {
+            const startedAt = Date.now();
+            const poll = () => {
+                if (cachedSettings) resolve(cachedSettings);
+                else if (Date.now() - startedAt >= SUGGESTION_SETTINGS_WAIT_MS) resolve(null);
+                else setTimeout(poll, 50);
+            };
+            setTimeout(poll, 50);
+        });
+    }
+
+    /** The suggestion text under the settings (null settings: fail closed, no suggestions). */
+    function filterSuggestionText(raw, suggestions, settings) {
+        if (!settings) return suggestions.filterResponseText(raw, null, { failClosed: true });
+        if (settings.enabled === false) return raw;
+        return suggestions.filterResponseText(raw, settings, { kids: suggestionKidsHost() });
+    }
+
     /** The suggestion response with blocked (or, in allow mode, unallowed) suggestions taken out. */
     function filterSuggestionResponse(response, suggestions) {
         try {
-            if (!response || !response.ok || !cachedSettings || cachedSettings.enabled === false) return response;
-            const kids = /(^|\.)youtubekids\.com$/i.test(String(document.location?.hostname || ''));
-            const rules = suggestions.compile(cachedSettings, { kids });
-            if (!suggestions.hasWork(rules)) return response;
-            return response.clone().text().then(raw => {
-                const filtered = suggestions.filterResponseText(raw, cachedSettings, { rules });
+            if (!response || !response.ok) return response;
+            return Promise.all([response.clone().text(), suggestionSettingsReady()]).then(([raw, settings]) => {
+                const filtered = filterSuggestionText(raw, suggestions, settings);
                 if (filtered === raw) return response;
                 const headers = new Headers(response.headers);
                 headers.delete('content-length');
@@ -1986,6 +2017,62 @@
         } catch (e) {
             return response;
         }
+    }
+
+    /** The JSONP callback's payload under the settings; the call waits for settings when needed. */
+    function wrapSuggestionCallback(original) {
+        if (typeof original !== 'function' || original.__filtertubeSuggestionWrapped) return original;
+        const wrapped = function (payload, ...rest) {
+            const suggestions = window.FilterTubeSearchSuggestions;
+            const deliver = (settings) => {
+                let next = payload;
+                try {
+                    if (suggestions && Array.isArray(payload)) {
+                        if (!settings) next = suggestions.emptyPayload(payload);
+                        else if (settings.enabled !== false) {
+                            const rules = suggestions.compile(settings, { kids: suggestionKidsHost() });
+                            if (suggestions.hasWork(rules)) next = suggestions.filterPayload(payload, rules).payload;
+                        }
+                    }
+                } catch (e) {
+                    next = payload;
+                }
+                return original.call(this, next, ...rest);
+            };
+            if (cachedSettings || !suggestions) return deliver(cachedSettings);
+            suggestionSettingsReady().then(deliver);
+            return undefined;
+        };
+        try { Object.defineProperty(wrapped, '__filtertubeSuggestionWrapped', { value: true }); } catch (e) { }
+        return wrapped;
+    }
+
+    /** Traps window.google -> google.ac -> h before the site's script defines them. */
+    function setupSuggestionCallbackTrap() {
+        const trapProperty = (owner, key, onValue) => {
+            try {
+                const existing = Object.getOwnPropertyDescriptor(owner, key);
+                if (existing && !existing.configurable) return;
+                let current = existing ? existing.value ?? existing.get?.call(owner) : undefined;
+                if (current !== undefined) current = onValue(current);
+                Object.defineProperty(owner, key, {
+                    configurable: true,
+                    enumerable: true,
+                    get() { return current; },
+                    set(value) { current = onValue(value); }
+                });
+            } catch (e) {
+            }
+        };
+        trapProperty(window, 'google', google => {
+            if (google && typeof google === 'object') {
+                trapProperty(google, 'ac', ac => {
+                    if (ac && typeof ac === 'object') trapProperty(ac, 'h', wrapSuggestionCallback);
+                    return ac;
+                });
+            }
+            return google;
+        });
     }
 
     function setupFetchInterception() {
@@ -2152,11 +2239,32 @@
                 return wrapped;
             };
 
+            // Suggestions over XHR: the text is filtered in place (no settings yet: none shown).
+            const processSuggestionXhr = (xhr) => {
+                xhr.__filtertube_responseProcessed = true;
+                const suggestions = window.FilterTubeSearchSuggestions;
+                const responseType = xhr.responseType || '';
+                if (!suggestions || (responseType !== '' && responseType !== 'text')) return;
+                const status = Number(xhr.status || 0);
+                if (status && status >= 400) return;
+                const protoResponseTextDesc = Object.getOwnPropertyDescriptor(proto, 'responseText');
+                const raw = protoResponseTextDesc?.get ? protoResponseTextDesc.get.call(xhr) : xhr.responseText;
+                if (typeof raw !== 'string' || !raw) return;
+                const filtered = filterSuggestionText(raw, suggestions, cachedSettings);
+                if (filtered === raw) return;
+                Object.defineProperty(xhr, 'responseText', { configurable: true, get: () => filtered });
+                Object.defineProperty(xhr, 'response', { configurable: true, get: () => filtered });
+            };
+
             const ensureXhrResponseProcessed = (xhr) => {
                 try {
                     if (!xhr || xhr.__filtertube_responseProcessed) return;
                     if (!xhr.__filtertube_shouldProcessXhr) return;
                     if (xhr.readyState !== 4) return;
+                    if (xhr.__filtertube_suggestXhr) {
+                        processSuggestionXhr(xhr);
+                        return;
+                    }
                     if (!cachedSettings) return;
                     if (cachedSettings.enabled === false) return;
 
@@ -2272,7 +2380,8 @@
                     this.__filtertube_url = url;
                     const urlStr = typeof url === 'string' ? url : String(url || '');
                     const dataName = `xhr:${getPathname(urlStr)}`;
-                    this.__filtertube_shouldProcessXhr = Boolean(
+                    this.__filtertube_suggestXhr = Boolean(window.FilterTubeSearchSuggestions?.isSuggestionUrl(urlStr));
+                    this.__filtertube_shouldProcessXhr = this.__filtertube_suggestXhr || Boolean(
                         urlStr
                         && xhrEndpoints.some(endpoint => urlStr.includes(endpoint))
                         && !shouldBypassYouTubeiNetworkResponse(dataName)
@@ -2288,11 +2397,11 @@
                     const rawUrl = this.__filtertube_url;
                     const urlStr = typeof rawUrl === 'string' ? rawUrl : String(rawUrl || '');
                     const dataName = `xhr:${getPathname(urlStr)}`;
-                    if (
+                    if (this.__filtertube_suggestXhr || (
                         urlStr
                         && xhrEndpoints.some(endpoint => urlStr.includes(endpoint))
                         && !shouldBypassYouTubeiNetworkResponse(dataName)
-                    ) {
+                    )) {
                         this.__filtertube_shouldProcessXhr = true;
                         this.__filtertube_responseProcessed = false;
                         const xhr = this;
@@ -2500,6 +2609,7 @@
     establishDataHooks();
     
     // Set up fetch interception
+    setupSuggestionCallbackTrap();
     setupFetchInterception();
 
     setupXhrInterception();
