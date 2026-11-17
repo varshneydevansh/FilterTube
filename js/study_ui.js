@@ -230,8 +230,26 @@
                 ? t('study.strip.roundLeft', 'Round {round} of {rounds} · {minutes} min left', { round: value.round, rounds: value.rounds, minutes: left })
                 : t('study.strip.minutesLeft', '{minutes} min left', { minutes: left })));
         }
+        // The app's session strip (StudySessionViews): on a break, Skip break with what it costs; ending
+        // lives on the Study page, so the strip has no End. A lock still says until when, and an end
+        // already asked for keeps its countdown with Cancel.
         const actions = el('span', 'ft-study-strip__actions');
-        actions.appendChild(endControls(value, { onChange, compact: true }));
+        if (value.lockedUntil && (value.setByParentId || value.lockMode === 'locked') || Number.isFinite(value.endRequestedAt)) {
+            actions.appendChild(endControls(value, { onChange, compact: true }));
+        }
+        if (value.state === 'BREAK' && value.canSkipBreak && !value.breakSkipped) {
+            const skip = button(t('study.overlay.skipBreak', 'Skip break'), 'ft-study-btn ft-study-btn--skip', async () => {
+                skip.disabled = true;
+                await send({ action: 'FilterTube_StudySkipBreak' });
+                onChange?.();
+            });
+            if (value.skipPreview) {
+                const cost = t('study.overlay.skipCost', '+{minutes} min to round {round}', { minutes: value.skipPreview.addedMinutes, round: value.skipPreview.round });
+                skip.setAttribute('aria-label', `${t('study.overlay.skipBreak', 'Skip break')}, ${cost}`);
+                skip.title = cost;
+            }
+            actions.appendChild(skip);
+        }
         actions.appendChild(button(t('study.open', 'Open'), 'ft-study-btn', openOptions));
         host.append(copy, actions);
     }

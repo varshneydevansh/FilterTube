@@ -32,7 +32,7 @@ function load(messages = {}) {
 
 const flat = node => JSON.stringify(node, (key, value) => (key === 'handlers' ? undefined : value));
 
-test('the strip shows phase, pack and time; End for Gentle and Locked until for parent sessions', () => {
+test('the strip shows phase, pack and time; no End (the Study page ends a session), Locked until for parent sessions, Skip break on a break', () => {
     const { Ui, make } = load();
     const host = make('div');
     const until = Date.now() + 23 * 60000;
@@ -42,7 +42,11 @@ test('the strip shows phase, pack and time; End for Gentle and Locked until for 
     const text = flat(host);
     assert.ok(text.includes('Studying GATE · CSE until'));
     assert.ok(text.includes('Round 1 of 2'));
-    assert.ok(text.includes('"End"'));
+    // Android's session strip has no End: ending lives on the Study page.
+    assert.equal(text.includes('"End"'), false);
+    const onBreak = make('div');
+    Ui.renderStrip(onBreak, { state: 'BREAK', until, canSkipBreak: true, skipPreview: { addedMinutes: 5, round: 2 }, endPolicy: { canEnd: true } });
+    assert.ok(flat(onBreak).includes('Skip break'));
     const parent = make('div');
     Ui.renderStrip(parent, { state: 'STUDY', phase: 'study', until, setByParentId: 'mum', lockedUntil: until, lockMode: 'locked', endPolicy: { canEnd: false } }, { parentName: 'Default' });
     assert.ok(flat(parent).includes('Locked until'));

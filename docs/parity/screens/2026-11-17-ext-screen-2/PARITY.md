@@ -143,5 +143,7 @@ which this pass must not create. Their ledger rows and earlier ports stand; pari
 - The Help page still names "Dashboard" in a few answers (see §1).
 - The popup's study strip is older than the app's session strip (`StudySessionViews.kt`): the app's
   shows "Round 2 of 4" or "Break", Skip break with its cost, and the music state, with no End button
-  (ending lives on the Study page). The popup strip shows the phase line, minutes left, End and Open.
-  Not changed in this pass.
+  (ending lives on the Study page). The popup strip showed the phase line, minutes left, End and Open.
+  Ported: the strip drops End (a lock's "Locked until" and an end already asked for, with its Cancel,
+  stay), and on a break it offers Skip break with its cost as the app's strip does
+  (`popup/after-study-strip-break.jpg`). Removed: the popup's End button.
