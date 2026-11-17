@@ -3387,5 +3387,10 @@
   "feed.calm.review": "フィルターを確認",
   "about.why.title": "FilterTube が生まれた理由",
   "about.why.body": "2020 年、ある保護者が動画プラットフォームのヘルプフォーラムでシンプルな質問をしました。「キーワードで動画をブロックするには？」答えは「できません」でした。2,500 人を超える保護者が同じ疑問を持っていると書き込み、スレッドがロックされるまで何年も尋ね続けました。私も尋ねていた一人でした。そして 2023 年、ある父親が「子どもが泣きやまないので、何かできないか」と私に直接尋ねてきました。作らずにはいられませんでした。FilterTube はそこから始まりました。すべての家族のためのワードとチャンネルのフィルター、次に穏やかなキッズスペース、そして音楽も穏やかでいられるように Sangeet。",
-  "about.why.link": "スレッドを読む"
+  "about.why.link": "スレッドを読む",
+  "popup.apps.label": "FilterTube アプリ",
+  "popup.apps.android": "Android",
+  "popup.apps.androidStore": "Google Play",
+  "popup.apps.ios": "iPhone に登場",
+  "popup.apps.iosGuide": "SideStore ガイド"
 }

@@ -906,7 +906,7 @@ function initializePopupFiltersTabs() {
             manage.textContent = popupUiText('popup.kidsProfiles.manage', 'Link profiles in Kids Mode');
             manage.addEventListener('click', () => api.tabs.create({ url: api.runtime.getURL('html/tab-view.html?view=kids') }));
             section.append(title, chips, status, manage);
-            const anchorNode = document.querySelector('.ft-popup-android-link');
+            const anchorNode = document.querySelector('.ft-popup-apps');
             if (anchorNode?.parentNode) anchorNode.parentNode.insertBefore(section, anchorNode);
             else (document.querySelector('.ft-popup-shell__frame') || document.body).appendChild(section);
         }

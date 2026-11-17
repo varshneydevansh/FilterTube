@@ -127,9 +127,9 @@ body.ft-extension-surface :is(.btn-secondary, .btn-import, .icon-button, .icon-b
 /* Choice cards and list rows (sync modes, the device compass, picker rows): the wash and an ink edge. */
 :root[data-page-tone][data-theme] body.ft-extension-surface[data-surface] :is(.nanah-sync-mode, .nanah-device-compass__choice,
   .ft-picker-pill, .ft-picker-manage, .ft-profile-dropdown-item, .exact-toggle, .ft-rule-target-tab, .tab-button,
-  .ft-popup-android-link, .release-note-card__link, .ft-profile-badge):hover:not(:disabled):not([aria-disabled="true"]),
+  .release-note-card__link, .ft-profile-badge):hover:not(:disabled):not([aria-disabled="true"]),
 body.ft-extension-surface :is(.nanah-sync-mode, .nanah-device-compass__choice, .ft-picker-pill, .ft-picker-manage,
-  .ft-profile-dropdown-item, .exact-toggle, .ft-rule-target-tab, .tab-button, .ft-popup-android-link, .release-note-card__link,
+  .ft-profile-dropdown-item, .exact-toggle, .ft-rule-target-tab, .tab-button, .release-note-card__link,
   .ft-profile-badge):hover:not(:disabled):not([aria-disabled="true"]) {
   background-image: linear-gradient(var(--ft-state-hover-wash), var(--ft-state-hover-wash)) !important;
 }
@@ -138,9 +138,8 @@ body.ft-extension-surface :is(.nanah-sync-mode, .nanah-device-compass__choice):h
   border-color: var(--pk-ink) !important;
 }
 body.ft-extension-surface :is(.tab-button, .ft-rule-target-tab):not(.active):not(.is-active):hover { color: var(--pk-ink) !important; }
-body.ft-extension-surface :is(.ft-popup-android-link, .release-note-card__link):hover span,
+body.ft-extension-surface .release-note-card__link:hover span,
 body.ft-extension-surface .release-note-card__link:hover { text-decoration: underline; text-underline-offset: 3px; }
-body.ft-extension-surface .ft-popup-android-link:hover svg { color: var(--pk-brick); }
 
 /* Plain links in running text. */
 body.ft-extension-surface #viewContainer p a[href]:hover,
@@ -185,9 +184,9 @@ body.ft-extension-surface .toggle-row:hover .switch input:not(:disabled) + .slid
 
 :root[data-page-tone][data-theme] body.ft-extension-surface[data-surface] :is(.tab-button, .ft-rule-target-tab, .nanah-sync-mode,
   .nanah-device-compass__choice, .exact-toggle, .ft-profile-badge, .icon-button, .icon-btn, .pk-rule-options-btn, .ft-select-trigger,
-  .video-filters-manage, .ft-popup-android-link, .release-note-card__link, .ft-picker-pill, .ft-profile-dropdown-item, summary):active:not(:disabled),
+  .video-filters-manage, .release-note-card__link, .ft-picker-pill, .ft-profile-dropdown-item, summary):active:not(:disabled),
 body.ft-extension-surface :is(.tab-button, .ft-rule-target-tab, .nanah-sync-mode, .nanah-device-compass__choice, .exact-toggle,
-  .ft-profile-badge, .icon-button, .icon-btn, .pk-rule-options-btn, .ft-select-trigger, .video-filters-manage, .ft-popup-android-link,
+  .ft-profile-badge, .icon-button, .icon-btn, .pk-rule-options-btn, .ft-select-trigger, .video-filters-manage,
   .release-note-card__link, .ft-picker-pill, .ft-profile-dropdown-item, summary):active:not(:disabled) {
   transform: var(--ft-state-press-shift);
   background-image: linear-gradient(var(--ft-state-press-wash), var(--ft-state-press-wash)) !important;
@@ -196,7 +195,7 @@ body.ft-extension-surface .switch:active input:not(:disabled) + .slider::before 
 body.ft-extension-surface select:active:not(:disabled) { border-color: var(--pk-ink) !important; }
 
 body.ft-extension-surface :is(.tab-button, .ft-rule-target-tab, .nanah-sync-mode, .nanah-device-compass__choice, .exact-toggle,
-  .icon-button, .icon-btn, .pk-rule-options-btn, .ft-select-trigger, .video-filters-manage, .ft-popup-android-link,
+  .icon-button, .icon-btn, .pk-rule-options-btn, .ft-select-trigger, .video-filters-manage,
   .release-note-card__link, .ft-picker-pill, .ft-profile-dropdown-item, summary, .btn-secondary) {
   transition-property: background-color, background-image, border-color, color, transform, box-shadow;
   transition-duration: var(--ft-state-duration);

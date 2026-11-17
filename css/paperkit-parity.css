@@ -625,11 +625,9 @@ body.ft-extension-surface[data-surface="popup"] .ft-popup-shell__frame {
 body.ft-extension-surface[data-surface="popup"] .ft-popup-brand,
 body.ft-extension-surface[data-surface="popup"] .ft-mascot-tally,
 body.ft-extension-surface[data-surface="popup"] .ft-popup-filter-card,
-body.ft-extension-surface[data-surface="popup"] .ft-popup-android-link,
 body.ft-extension-surface[data-surface="popup"] .ft-popup-time-status,
 :root[data-page-tone][data-theme] body.ft-extension-surface[data-surface="popup"] .ft-popup-brand,
-:root[data-page-tone][data-theme] body.ft-extension-surface[data-surface="popup"] .ft-popup-filter-card,
-:root[data-page-tone][data-theme] body.ft-extension-surface[data-surface="popup"] .ft-popup-android-link {
+:root[data-page-tone][data-theme] body.ft-extension-surface[data-surface="popup"] .ft-popup-filter-card {
   background: var(--pk-paper) !important;
   border: 1.5px solid transparent !important;
   border-image: var(--pk-edge-line) 20 / 18px / 0 round !important;
@@ -1127,4 +1125,64 @@ html.pk-parity[data-theme="dark"] .pk-rule-options-btn.is-active { background: #
   box-shadow: 0 10px 28px rgba(27, 26, 24, 0.18);
   display: grid;
   gap: 8px;
+}
+
+/* FilterTube apps pills: small paper tabs, sage for Android and lilac for iPhone (the dashboard cards' tints).
+   Hover lifts the paper and tips the badge; press sinks it; focus draws the ink ring. */
+:root[data-page-tone][data-theme] body.ft-extension-surface[data-surface="popup"] .ft-popup-apps__pill {
+  position: relative;
+  background: var(--pk-paper) !important;
+  border: 1.5px solid transparent !important;
+  border-image: var(--pk-edge-line) 20 / 14px / 0 round !important;
+  border-radius: 14px !important;
+  box-shadow: 2px 3px 0 0 var(--pk-desk) !important;
+  color: var(--pk-ink) !important;
+  -webkit-backdrop-filter: none !important;
+  backdrop-filter: none !important;
+  transition: transform var(--ft-state-duration) ease-out, box-shadow var(--ft-state-duration) ease-out,
+    background-color var(--ft-state-duration) linear !important;
+}
+:root[data-page-tone][data-theme] body.ft-extension-surface[data-surface="popup"] .ft-popup-apps__pill--android .ft-popup-apps__badge {
+  background: color-mix(in srgb, var(--pk-sage) 80%, var(--pk-paper));
+}
+:root[data-page-tone][data-theme] body.ft-extension-surface[data-surface="popup"] .ft-popup-apps__pill--ios .ft-popup-apps__badge {
+  background: color-mix(in srgb, var(--pk-lilac) 80%, var(--pk-paper));
+  color: var(--pk-ink);
+}
+body.ft-extension-surface[data-surface="popup"] .ft-popup-apps__text strong {
+  font-family: var(--pk-font-hand);
+  font-weight: 400;
+  font-size: 0.86rem;
+  color: var(--pk-ink);
+}
+body.ft-extension-surface[data-surface="popup"] .ft-popup-apps__text span { color: var(--pk-muted); }
+:root[data-page-tone][data-theme] body.ft-extension-surface[data-surface="popup"] .ft-popup-apps__pill:hover {
+  background: color-mix(in srgb, var(--pk-paper) 92%, var(--pk-ink)) !important;
+  box-shadow: 3px 4px 0 0 var(--pk-desk) !important;
+  transform: translateY(-1px);
+}
+:root[data-page-tone][data-theme] body.ft-extension-surface[data-surface="popup"] .ft-popup-apps__pill--android:hover {
+  background: color-mix(in srgb, var(--pk-sage) 70%, var(--pk-paper)) !important;
+}
+:root[data-page-tone][data-theme] body.ft-extension-surface[data-surface="popup"] .ft-popup-apps__pill--ios:hover {
+  background: color-mix(in srgb, var(--pk-lilac) 70%, var(--pk-paper)) !important;
+}
+body.ft-extension-surface[data-surface="popup"] .ft-popup-apps__pill:hover .ft-popup-apps__badge { transform: rotate(-8deg) scale(1.06); }
+body.ft-extension-surface[data-surface="popup"] .ft-popup-apps__pill:hover .ft-popup-apps__text span { color: var(--pk-brick); }
+:root[data-page-tone][data-theme] body.ft-extension-surface[data-surface="popup"] .ft-popup-apps__pill:active {
+  transform: var(--ft-state-press-shift);
+  box-shadow: 1px 1px 0 0 var(--pk-desk) !important;
+  background-image: linear-gradient(var(--ft-state-press-wash), var(--ft-state-press-wash)) !important;
+}
+body.ft-extension-surface[data-surface="popup"] .ft-popup-apps__pill:active .ft-popup-apps__badge { transform: rotate(-4deg) scale(0.96); }
+:root[data-page-tone][data-theme] body.ft-extension-surface[data-surface="popup"] .ft-popup-apps__pill:focus-visible {
+  outline: var(--ft-state-focus-width) solid var(--ft-state-focus-ring) !important;
+  outline-offset: var(--ft-state-focus-offset) !important;
+}
+@media (prefers-reduced-motion: reduce) {
+  :root[data-page-tone][data-theme] body.ft-extension-surface[data-surface="popup"] .ft-popup-apps__pill,
+  body.ft-extension-surface[data-surface="popup"] .ft-popup-apps__badge { transition: none !important; }
+  :root[data-page-tone][data-theme] body.ft-extension-surface[data-surface="popup"] .ft-popup-apps__pill:hover,
+  body.ft-extension-surface[data-surface="popup"] .ft-popup-apps__pill:hover .ft-popup-apps__badge,
+  body.ft-extension-surface[data-surface="popup"] .ft-popup-apps__pill:active .ft-popup-apps__badge { transform: none; }
 }
