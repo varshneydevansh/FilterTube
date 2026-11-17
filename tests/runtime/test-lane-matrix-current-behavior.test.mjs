@@ -649,7 +649,7 @@ test('executable classifier covers every tracked repository file', () => {
 
 test('new view, playback, family and localization files retain explicit proof ownership', () => {
   for (const [files, lanes] of [
-    [['js/shared/view_count.js'], ['blocking', 'json', 'dom', 'settings', 'performance']],
+    [['js/shared/view_count.js', 'js/shared/view_count_isolated.js'], ['blocking', 'json', 'dom', 'settings', 'performance']],
     [['js/content/admission_overlay.js', 'js/content/external_youtube_guard.js', 'js/content/external_youtube_network.js'], ['blocking', 'whitelist', 'json', 'dom', 'performance']],
     [['js/nanah_storage_lock.js', 'js/nanah_qr_scanner.js', 'js/family_device_navigation.js', 'tests/runtime/helpers/nanah-storage-lock-fixture.mjs'], ['release', 'settings']],
     [['js/ui_localization.js', 'js/ui_localization_boot.js', 'js/ui_static_copy_capture.js', 'data/ui_locales/en.json', '_locales/en/messages.json'], ['release', 'settings']],

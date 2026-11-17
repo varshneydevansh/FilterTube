@@ -6,10 +6,9 @@ import fs from 'node:fs';
 // MAIN entry and again in an ISOLATED entry for the same pages runs in only one of them (verified on
 // the live site through the DevTools protocol: the isolated world had no FilterTubeSearchSuggestions).
 // So no file may sit in both worlds for overlapping pages.
-//
-// Known: js/shared/view_count.js is in both and, live, FilterTubeViewCount is missing from the isolated
-// world. It predates this check and is tracked separately; nothing new may join it.
-const KNOWN_BOTH_WORLDS = new Set(['js/shared/view_count.js']);
+// view_count.js used to sit in both, which left FilterTubeViewCount undefined in the isolated world;
+// the isolated world now loads its own copy, js/shared/view_count_isolated.js.
+const KNOWN_BOTH_WORLDS = new Set();
 
 const MANIFESTS = ['manifest.json', 'manifest.chrome.json', 'manifest.opera.json', 'manifest.firefox.json'];
 
@@ -30,4 +29,10 @@ test('no content script is listed in both the main and the isolated world for th
             }
         }
     }
+});
+
+test('the isolated view-count copy stays identical to the main-world file', () => {
+    const read = name => fs.readFileSync(new URL(`../../js/shared/${name}`, import.meta.url), 'utf8');
+    assert.equal(read('view_count_isolated.js'), read('view_count.js'),
+        'js/shared/view_count_isolated.js must be a byte-for-byte copy of js/shared/view_count.js');
 });

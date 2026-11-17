@@ -37,7 +37,7 @@
             ],
             "exclude_matches": ["*://*.youtube.com/embed/*"],
             "js": [
-                "js/shared/view_count.js", "js/shared/search_suggestions_filter.js", "js/content/search_suggestions_dom.js", "js/shared/feed_guard.js",
+                "js/shared/view_count_isolated.js", "js/shared/search_suggestions_filter.js", "js/content/search_suggestions_dom.js", "js/shared/feed_guard.js",
                 "js/seed.js"
             ],
             "run_at": "document_start"
@@ -49,7 +49,7 @@
             ],
             "exclude_matches": ["*://*.youtube.com/embed/*"],
             "js": [
-                "js/shared/identity.js", "js/shared/view_count.js", "js/content/admission_overlay.js",
+                "js/shared/identity.js", "js/shared/view_count_isolated.js", "js/content/admission_overlay.js",
                 "js/content/dom_state.js",
                 "js/content/menu.js",
                 "js/content/dom_helpers.js",
@@ -87,7 +87,7 @@
                 "*://*.youtube.com/embed/*",
                 "*://*.youtube-nocookie.com/embed/*"
             ],
-            "js": ["js/shared/view_count.js", "js/seed.js"],
+            "js": ["js/shared/view_count_isolated.js", "js/seed.js"],
             "run_at": "document_start",
             "all_frames": true
         },
@@ -97,7 +97,7 @@
                 "*://*.youtube-nocookie.com/embed/*"
             ],
             "js": [
-                "js/shared/identity.js", "js/shared/view_count.js", "js/content/admission_overlay.js",
+                "js/shared/identity.js", "js/shared/view_count_isolated.js", "js/content/admission_overlay.js",
                 "js/content/external_youtube_guard.js",
                 "js/content/dom_state.js",
                 "js/content/menu.js",
@@ -124,7 +124,7 @@
         },
         {
             "matches": ["https://*.google.com/search*"],
-            "js": ["js/shared/identity.js", "js/shared/view_count.js", "js/content/admission_overlay.js", "js/content/external_youtube_guard.js"],
+            "js": ["js/shared/identity.js", "js/shared/view_count_isolated.js", "js/content/admission_overlay.js", "js/content/external_youtube_guard.js"],
             "run_at": "document_start"
         },
         {
