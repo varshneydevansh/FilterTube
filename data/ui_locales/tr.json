@@ -3361,5 +3361,11 @@
   "home.greet.afternoon": "İyi günler.",
   "home.study.now": "Şu an çalışılıyor, {time} saatine kadar",
   "home.stats.channels": "Kanallar",
-  "apps.ios.sideloadCta": "iPhone rehberini aç"
+  "apps.ios.sideloadCta": "iPhone rehberini aç",
+  "search.channels.studyTitle": "Çalışma kanalların gösteriliyor",
+  "search.channels.allowedTitle": "İzin verdiğin kanallar gösteriliyor",
+  "search.channels.studyAll": "Tüm çalışma kanallarında “{query}” ara",
+  "search.channels.allowedAll": "İzin verilen tüm kanallarda “{query}” ara",
+  "search.channels.studyOffline": "Çalışma kanallarına ulaşılamadı. Bağlantını kontrol edip tekrar dene.",
+  "search.channels.allowedOffline": "İzin verilen kanallarına ulaşılamadı. Bağlantını kontrol edip tekrar dene."
 }

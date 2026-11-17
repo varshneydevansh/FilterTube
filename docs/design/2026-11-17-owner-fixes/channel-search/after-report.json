@@ -1,0 +1,40 @@
+{
+ "allowed-algebra": {
+  "query": "algebra",
+  "channelSearchRequests": 2,
+  "shelf": {
+   "title": "Showing your allowed channels",
+   "cards": [
+    "The beauty of algebra | Introduction to algebra | Algebra I | Khan Academy | Khan Academy · 3.7M views · 14 years ago",
+    "SAT Math on Khan Academy: Algebra (Medium) | Scalar Learning · 2.4K views · Streamed 1 year ago",
+    "Algebra Foundations - Course Trailer | Khan Academy · 113K views · 7 years ago",
+    "OpenStax: Algebra and Trigonometry - Chapter 1, Section 1 | Real Numbers: Algebra Essentials | Scalar Learning · 15K views · 4 years ago",
+    "What are variables, expressions, and equations? | Introduction to algebra | Algebra I | Khan Academy | Khan Academy · 2.1M views · 14 years ago",
+    "SAT Math: Critical Concepts for an 800 - Heart of Algebra (Part 1 of 4) | Scalar Learning · 204K views · 6 years ago",
+    "Algebra: Solving Inequalities | Khan Academy · 1.7M views · 19 years ago",
+    "ACT Math: Critical Concepts for a 36 - Algebra (Part 1 of 4) | Scalar Learning · 7.8K views · 4 years ago"
+   ],
+   "more": null,
+   "note": null
+  }
+ },
+ "study-gate-civil-cement": {
+  "query": "cement",
+  "channelSearchRequests": 6,
+  "shelf": {
+   "title": "Showing your study channels",
+   "cards": [
+    "Cement: Production and Composition | nptelhrd · 307K views · 12 years ago",
+    "What is the Difference between Cement and Concrete #ESE2024IGP #iesquestions #gatewallah | GATE Wallah · 86K views · 2 years ago",
+    "Design of Concrete? | Proportion to Performance | Civil Engineering | MADE EASY | MADE EASY · 46K views · 3 years ago",
+    "Why is Concrete Tested for 28 Days  | 1 Minute Gyan | GATE 2023 | ACE Online | ACE Engineering Academy · 680 views · 4 years ago",
+    "RCC Engineering – GATE, ESE Previous Year Questions (CE) | L 7 | Engineers Academy : GATE | IES | PSUs · 126 views · Streamed 4 years ago",
+    "Introduction | Lecture 1 | Reinforced Cement Concrete | GATE ACADEMY by Umesh Dhande · 262K views · 7 years ago",
+    "Cement: Structure and Hydration (contd) | nptelhrd · 41K views · 12 years ago",
+    "What is Difference Between Reinforced and Prestressed Concrete | IES Interview Rank 123 #Shorts #PW | GATE Wallah · 12K views · 2 years ago"
+   ],
+   "more": "Search all your study channels for “cement”",
+   "note": null
+  }
+ }
+}

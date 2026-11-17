@@ -3359,5 +3359,11 @@
   "home.greet.afternoon": "Chào buổi chiều.",
   "home.study.now": "Đang học, đến {time}",
   "home.stats.channels": "Kênh",
-  "apps.ios.sideloadCta": "Mở hướng dẫn cho iPhone"
+  "apps.ios.sideloadCta": "Mở hướng dẫn cho iPhone",
+  "search.channels.studyTitle": "Đang hiển thị kênh học của bạn",
+  "search.channels.allowedTitle": "Đang hiển thị các kênh bạn cho phép",
+  "search.channels.studyAll": "Tìm “{query}” trong tất cả kênh học của bạn",
+  "search.channels.allowedAll": "Tìm “{query}” trong tất cả kênh được phép",
+  "search.channels.studyOffline": "Không kết nối được với các kênh học. Hãy kiểm tra kết nối và thử lại.",
+  "search.channels.allowedOffline": "Không kết nối được với các kênh được phép. Hãy kiểm tra kết nối và thử lại."
 }

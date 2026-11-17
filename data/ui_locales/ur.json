@@ -3361,5 +3361,11 @@
   "home.greet.afternoon": "سہ پہر بخیر۔",
   "home.study.now": "ابھی پڑھائی جاری ہے، {time} تک",
   "home.stats.channels": "چینلز",
-  "apps.ios.sideloadCta": "iPhone گائیڈ کھولیں"
+  "apps.ios.sideloadCta": "iPhone گائیڈ کھولیں",
+  "search.channels.studyTitle": "آپ کے پڑھائی والے چینل دکھائے جا رہے ہیں",
+  "search.channels.allowedTitle": "آپ کے اجازت یافتہ چینل دکھائے جا رہے ہیں",
+  "search.channels.studyAll": "اپنے تمام پڑھائی والے چینلز میں “{query}” تلاش کریں",
+  "search.channels.allowedAll": "اپنے تمام اجازت یافتہ چینلز میں “{query}” تلاش کریں",
+  "search.channels.studyOffline": "آپ کے پڑھائی والے چینلز تک نہیں پہنچ سکے۔ کنکشن چیک کریں اور دوبارہ کوشش کریں۔",
+  "search.channels.allowedOffline": "آپ کے اجازت یافتہ چینلز تک نہیں پہنچ سکے۔ کنکشن چیک کریں اور دوبارہ کوشش کریں۔"
 }

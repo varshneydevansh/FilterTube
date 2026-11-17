@@ -3359,5 +3359,11 @@
   "home.greet.afternoon": "Ẹ káàsán.",
   "home.study.now": "Ò ń kẹ́kọ̀ọ́ báyìí, títí di {time}",
   "home.stats.channels": "Àwọn ikanni",
-  "apps.ios.sideloadCta": "Ṣí ìtọ́sọ́nà iPhone"
+  "apps.ios.sideloadCta": "Ṣí ìtọ́sọ́nà iPhone",
+  "search.channels.studyTitle": "À ń fi àwọn ikanni ìkẹ́kọ̀ọ́ rẹ hàn",
+  "search.channels.allowedTitle": "À ń fi àwọn ikanni tí o gbà láàyè hàn",
+  "search.channels.studyAll": "Wá “{query}” nínú gbogbo ikanni ìkẹ́kọ̀ọ́ rẹ",
+  "search.channels.allowedAll": "Wá “{query}” nínú gbogbo ikanni tí a gbà láàyè",
+  "search.channels.studyOffline": "A kò lè dé àwọn ikanni ìkẹ́kọ̀ọ́ rẹ. Ṣàyẹ̀wò ìsopọ̀ rẹ kí o sì tún gbìyànjú.",
+  "search.channels.allowedOffline": "A kò lè dé àwọn ikanni tí a gbà láàyè. Ṣàyẹ̀wò ìsopọ̀ rẹ kí o sì tún gbìyànjú."
 }

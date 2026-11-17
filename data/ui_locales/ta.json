@@ -3361,5 +3361,11 @@
   "home.greet.afternoon": "மதிய வணக்கம்.",
   "home.study.now": "இப்போது படிப்பு, {time} வரை",
   "home.stats.channels": "சேனல்கள்",
-  "apps.ios.sideloadCta": "iPhone வழிகாட்டியைத் திற"
+  "apps.ios.sideloadCta": "iPhone வழிகாட்டியைத் திற",
+  "search.channels.studyTitle": "உங்கள் படிப்பு சேனல்கள் காட்டப்படுகின்றன",
+  "search.channels.allowedTitle": "நீங்கள் அனுமதித்த சேனல்கள் காட்டப்படுகின்றன",
+  "search.channels.studyAll": "உங்கள் எல்லா படிப்பு சேனல்களிலும் “{query}” தேடு",
+  "search.channels.allowedAll": "அனுமதித்த எல்லா சேனல்களிலும் “{query}” தேடு",
+  "search.channels.studyOffline": "உங்கள் படிப்பு சேனல்களை அடைய முடியவில்லை. இணைப்பைச் சரிபார்த்து மீண்டும் முயலுங்கள்.",
+  "search.channels.allowedOffline": "அனுமதித்த சேனல்களை அடைய முடியவில்லை. இணைப்பைச் சரிபார்த்து மீண்டும் முயலுங்கள்."
 }

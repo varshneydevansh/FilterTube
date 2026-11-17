@@ -4195,6 +4195,13 @@ async function getCompiledSettings(sender = null, profileType = null, forceRefre
                     .map(row => row.word);
                 try { return engine.planSearchTerms(topics); } catch (e) { return []; }
             })();
+            // Study round on Main: each pack's channels and topics, so a search also asks the plan's own
+            // channels (channel_search.js, Android StudySearchGroup). Channels without a UC id are left out.
+            compiledSettings.channelSearchGroups = (() => {
+                const engine = globalThis.FilterTubeStudyEngine;
+                if (compiledSettings.study?.phase !== 'study' || shouldUseKidsProfile || typeof engine?.channelSearchGroups !== 'function') return [];
+                try { return engine.channelSearchGroups(activeRuleSurface); } catch (e) { return []; }
+            })();
             // Kids `videoIds` are the parent's allowed videos (Android NativeOwnedFilterDecider),
             // never blocked ones; on Main `videoIds` is the legacy alias of `blockedVideoIds`.
             compiledSettings.blockedVideoIds = Array.from(new Set(

@@ -23,3 +23,20 @@ Captures: live site, headless Chromium, throwaway profile, never signed in. `bef
 | blocklist | block "song" | `sad s` | 14 options, 11 with "song" | `sad shayari`, `sad status` |
 | allowlist | allow "sat math", "algebra", Khan Academy | `sat m` | 14 unrelated options | `sat math`, `sat ma` |
 | allowlist-prefix | same | `alg` | 14 incl. `algo trading`, songs | 6 "algebra" options |
+
+## Second pass (filter-modes review, section 5)
+
+- The text rule is now Android's `allowsSearchText` (`RuleLayerDecision.allowsText`): a block list keeps a
+  suggestion that names an allowed word even when a blocked one matches; layered rules (Study) never do.
+  Allow lists made only of channels show those channels' names and handles.
+- Study rounds also accept the plan's topic synonyms (`study_engine.planSearchTerms`, compiled as
+  `studySearchTerms`); a rest break, the limit or a hold shows no suggestions at all.
+- Pictures need a known channel (`videoChannelMap`, never fetched per suggestion) and, for a video, its own
+  `i.ytimg.com` thumbnail; Kids never shows one.
+- Three layers: the fetch/XHR text in `seed.js` (it waits up to 1.5 s for settings, then fails closed),
+  `window.google.ac.h` trapped before the site defines it, and `content/search_suggestions_dom.js`, which
+  hides dropdown rows that fail the rule.
+
+| Scenario | Rule | Typed | Before | After |
+| --- | --- | --- | --- | --- |
+| study-gate-civil | GATE Civil round | `cement` | site list | every "cement" suggestion: "cement" is a Building materials term (the search then shows plan lessons, see `../channel-search/`) |

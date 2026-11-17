@@ -3359,5 +3359,11 @@
   "home.greet.afternoon": "下半日好。",
   "home.study.now": "正在学习，到 {time}",
   "home.stats.channels": "频道",
-  "apps.ios.sideloadCta": "打开 iPhone 指南"
+  "apps.ios.sideloadCta": "打开 iPhone 指南",
+  "search.channels.studyTitle": "正在显示侬个学习频道",
+  "search.channels.allowedTitle": "正在显示侬允许个频道",
+  "search.channels.studyAll": "到侬所有学习频道里搜“{query}”",
+  "search.channels.allowedAll": "到侬所有允许个频道里搜“{query}”",
+  "search.channels.studyOffline": "连勿上侬个学习频道。检查一下网络再试试看。",
+  "search.channels.allowedOffline": "连勿上侬允许个频道。检查一下网络再试试看。"
 }

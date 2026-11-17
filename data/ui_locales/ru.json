@@ -3373,5 +3373,11 @@
   "home.greet.afternoon": "Добрый день.",
   "home.study.now": "Сейчас учёба, до {time}",
   "home.stats.channels": "Каналы",
-  "apps.ios.sideloadCta": "Открыть инструкцию для iPhone"
+  "apps.ios.sideloadCta": "Открыть инструкцию для iPhone",
+  "search.channels.studyTitle": "Показаны ваши учебные каналы",
+  "search.channels.allowedTitle": "Показаны ваши разрешённые каналы",
+  "search.channels.studyAll": "Искать «{query}» на всех учебных каналах",
+  "search.channels.allowedAll": "Искать «{query}» на всех разрешённых каналах",
+  "search.channels.studyOffline": "Не удалось связаться с учебными каналами. Проверьте подключение и попробуйте снова.",
+  "search.channels.allowedOffline": "Не удалось связаться с разрешёнными каналами. Проверьте подключение и попробуйте снова."
 }

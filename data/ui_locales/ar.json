@@ -3385,5 +3385,11 @@
   "home.greet.afternoon": "مساء الخير.",
   "home.study.now": "تدرس الآن، حتى {time}",
   "home.stats.channels": "القنوات",
-  "apps.ios.sideloadCta": "افتح دليل iPhone"
+  "apps.ios.sideloadCta": "افتح دليل iPhone",
+  "search.channels.studyTitle": "يتم عرض قنوات دراستك",
+  "search.channels.allowedTitle": "يتم عرض قنواتك المسموح بها",
+  "search.channels.studyAll": "ابحث عن “{query}” في كل قنوات دراستك",
+  "search.channels.allowedAll": "ابحث عن “{query}” في كل قنواتك المسموح بها",
+  "search.channels.studyOffline": "تعذّر الوصول إلى قنوات دراستك. تحقّق من الاتصال وحاول مرة أخرى.",
+  "search.channels.allowedOffline": "تعذّر الوصول إلى قنواتك المسموح بها. تحقّق من الاتصال وحاول مرة أخرى."
 }

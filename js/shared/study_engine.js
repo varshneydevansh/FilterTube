@@ -782,6 +782,32 @@
     }
     const MAX_PLAN_SEARCH_TERMS = 600;
 
+    /**
+     * Each pack's channels (UC ids) and topics on a study surface (studySurface rows carry
+     * managedListId "study:<pack>"), with every term the topics cover: what a search during a round
+     * also asks (Android StudySearchGroup). Channels without an id are left out.
+     */
+    function channelSearchGroups(surface) {
+        const data = object(surface);
+        const groups = new Map();
+        const groupOf = tag => {
+            if (!groups.has(tag)) groups.set(tag, { packId: tag.slice(TAG_PREFIX.length), channels: [], topics: [] });
+            return groups.get(tag);
+        };
+        for (const row of array(data.whitelistChannels)) {
+            const tag = text(object(row).managedListId);
+            const id = text(object(row).id);
+            if (tag.startsWith(TAG_PREFIX) && /^UC[\w-]{10,}$/.test(id) && !groupOf(tag).channels.includes(id)) groupOf(tag).channels.push(id);
+        }
+        for (const row of array(data.whitelistKeywords)) {
+            const value = object(row);
+            const tag = text(value.managedListId);
+            if (tag.startsWith(TAG_PREFIX) && value.source === TOPIC_SOURCE && text(value.word)) groupOf(tag).topics.push(text(value.word));
+        }
+        return [...groups.values()].filter(group => group.channels.length)
+            .map(group => ({ ...group, terms: planSearchTerms(group.topics) }));
+    }
+
     /** A couple of example searches for the first pack of the plan ({packId, variantId}). */
     function exampleSearches(groups) {
         const first = array(groups).find(isObject);
@@ -1332,7 +1358,7 @@
         SELF_LOCK_MAX_MINUTES, PARENT_LOCK_MAX_MINUTES, STUDY_SOURCE, TOPIC_SOURCE,
         parseTime, localDateKey, splitRounds, planOccurrences, studyClock, studyRulesApply, studyPhase,
         SUGGESTION_KINDS, suggest, suggestionSeed, studyTopics, studyAllowPhrases, topicTerms, topicPatterns,
-        topicsForQuery, planSearchTerms, exampleSearches, searchExplainer, topicLabel, breakSkipPreview, SKIP_UNDO_MS,
+        topicsForQuery, planSearchTerms, channelSearchGroups, exampleSearches, searchExplainer, topicLabel, breakSkipPreview, SKIP_UNDO_MS,
         dayRing, ringBoundaries, currentBreak,
         PAGE_STATES, PAGE_BAND_PX, PAGE_LAST_FIVE_MS, PAGE_CROSSFADE_MS, pageState, pageEvening, pagePalette, mixColor,
         studySubjects, subjectOf, withSkips, sessionSeal, sessionEndStep, pendingSessionEnd, SESSION_END_STALE_MS, SESSION_CLOSE_SLACK_MS,

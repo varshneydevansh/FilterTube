@@ -21,7 +21,7 @@ export const FILE_LANE_RULES = Object.freeze([
   { id: 'test-lane-file-rules', patterns: [/^scripts\/test-lane-file-rules\.mjs$/], lanes: ['release', 'performance', 'smoke'] },
   { id: 'installed-firefox-android-evidence', patterns: [/^docs\/audit\/FIREFOX_ANDROID_.*\.json$/], lanes: ['release', 'smoke'] },
   { id: 'minimum-view-count-runtime', patterns: [/^js\/shared\/view_count\.js$/], lanes: ['blocking', 'whitelist', 'json', 'dom', 'settings', 'performance'] },
-  { id: 'search-suggestions-filter', patterns: [/^js\/shared\/(?:search_suggestions_filter|paced_fetch)\.js$/, /^js\/content\/search_suggestions_dom\.js$/, /^tests\/runtime\/(?:search-suggestions-filter|paced-fetch)\.test\.mjs$/], lanes: ['release', 'blocking', 'whitelist', 'json', 'smoke'] },
+  { id: 'search-suggestions-filter', patterns: [/^js\/shared\/(?:search_suggestions_filter|paced_fetch|channel_search)\.js$/, /^js\/content\/(?:search_suggestions_dom|channel_search_shelf)\.js$/, /^tests\/runtime\/(?:search-suggestions-filter|paced-fetch|channel-search)\.test\.mjs$/], lanes: ['release', 'blocking', 'whitelist', 'json', 'smoke'] },
   { id: 'external-playback-admission-runtime', patterns: [/^js\/content\/(?:external_youtube_guard|external_youtube_network|admission_overlay)\.js$/], lanes: ['release', 'blocking', 'whitelist', 'json', 'dom', 'performance', 'settings'] },
   { id: 'ui-localization-catalogs', patterns: [/^(?:data\/ui_locales|_locales)\//], lanes: ['release', 'settings', 'smoke'] },
   { id: 'localization-validation-tools', patterns: [/^scripts\/(?:audit-ui-copy\.py|(?:check|extract|merge)-(?:json-keys|ui-locales|release-note-locales|family-ui-fallbacks|static-ui-copy|ui-locale-batch|ui-locale-drafts)\.(?:mjs|cjs|py))$/], lanes: ['release', 'settings', 'smoke'] },

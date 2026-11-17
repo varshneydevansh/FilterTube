@@ -222,7 +222,7 @@ lexical and its scope remains tracked JS/JSX/MJS: CJS/Python tooling requires it
 separate release/workflow review and is not silently counted as JavaScript here.
 
 ```text
-current tracked JS/JSX/MJS files: 171
+current tracked JS/JSX/MJS files: 176
 current repo-wide lexical callables: 10662
 current complete per-callable semantic proofs: 0
 current callable behavior-change approval: NO-GO
@@ -252,6 +252,10 @@ runtime behavior changed by inventory refresh: no
 | `js/shared/paced_fetch.js` | Content helper runtime | 6 | helper counted; semantic proof incomplete |
 | `js/content/search_suggestions_dom.js` | Content helper runtime | 11 | helper counted; semantic proof incomplete |
 | `js/shared/study_plan_drag.js` | Content helper runtime | 17 | helper counted; semantic proof incomplete |
+| `js/shared/hidden_log.js` | Content helper runtime | 10 | helper counted; semantic proof incomplete |
+| `js/shared/effective_mode.js` | Content helper runtime | 8 | helper counted; semantic proof incomplete |
+| `js/shared/channel_search.js` | Content helper runtime | 28 | helper counted; semantic proof incomplete |
+| `js/content/channel_search_shelf.js` | Content helper runtime | 24 | helper counted; semantic proof incomplete |
 | `js/shared/study_engine.js` | Content helper runtime | 57 | helper counted; semantic proof incomplete |
 | `js/content/study_overlay.js` | Content helper runtime | 32 | helper counted; semantic proof incomplete |
 | `js/study_background.js` | Hot page/background runtime | 57 | helper counted; semantic proof incomplete |
@@ -310,6 +314,7 @@ runtime behavior changed by inventory refresh: no
 | `js/doodles.js` | UI/settings runtime | 9 | UI/settings counted; semantic proof incomplete |
 | `js/mascots.js` | UI/settings runtime | 83 | UI/settings counted; semantic proof incomplete |
 | `js/paperkit_parity.js` | UI/settings runtime | 27 | UI/settings counted; semantic proof incomplete |
+| `js/dashboard_home.js` | UI/settings runtime | 48 | UI/settings counted; semantic proof incomplete |
 | `js/nanah_managed_live_policy.js` | UI/settings runtime | 125 | UI/settings counted |
 | `js/nanah_managed_local_network_client.js` | UI/settings runtime | 48 | UI/settings counted; semantic proof incomplete |
 | `js/nanah_managed_mailbox_client.js` | UI/settings runtime | 37 | UI/settings counted; semantic proof incomplete |

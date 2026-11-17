@@ -3361,5 +3361,11 @@
   "home.greet.afternoon": "శుభ మధ్యాహ్నం.",
   "home.study.now": "ఇప్పుడు చదువుతున్నారు, {time} వరకు",
   "home.stats.channels": "ఛానెల్‌లు",
-  "apps.ios.sideloadCta": "iPhone గైడ్ తెరవండి"
+  "apps.ios.sideloadCta": "iPhone గైడ్ తెరవండి",
+  "search.channels.studyTitle": "మీ చదువు ఛానెల్‌లను చూపిస్తోంది",
+  "search.channels.allowedTitle": "మీరు అనుమతించిన ఛానెల్‌లను చూపిస్తోంది",
+  "search.channels.studyAll": "మీ అన్ని చదువు ఛానెల్‌లలో “{query}” వెతకండి",
+  "search.channels.allowedAll": "అనుమతించిన అన్ని ఛానెల్‌లలో “{query}” వెతకండి",
+  "search.channels.studyOffline": "మీ చదువు ఛానెల్‌లను చేరుకోలేకపోయాము. కనెక్షన్ చూసి మళ్లీ ప్రయత్నించండి.",
+  "search.channels.allowedOffline": "అనుమతించిన ఛానెల్‌లను చేరుకోలేకపోయాము. కనెక్షన్ చూసి మళ్లీ ప్రయత్నించండి."
 }

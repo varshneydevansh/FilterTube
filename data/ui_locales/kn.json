@@ -3361,5 +3361,11 @@
   "home.greet.afternoon": "ಶುಭ ಮಧ್ಯಾಹ್ನ.",
   "home.study.now": "ಈಗ ಓದು ನಡೆಯುತ್ತಿದೆ, {time} ವರೆಗೆ",
   "home.stats.channels": "ಚಾನೆಲ್‌ಗಳು",
-  "apps.ios.sideloadCta": "iPhone ಮಾರ್ಗದರ್ಶಿ ತೆರೆಯಿರಿ"
+  "apps.ios.sideloadCta": "iPhone ಮಾರ್ಗದರ್ಶಿ ತೆರೆಯಿರಿ",
+  "search.channels.studyTitle": "ನಿಮ್ಮ ಅಧ್ಯಯನ ಚಾನೆಲ್‌ಗಳನ್ನು ತೋರಿಸಲಾಗುತ್ತಿದೆ",
+  "search.channels.allowedTitle": "ನೀವು ಅನುಮತಿಸಿದ ಚಾನೆಲ್‌ಗಳನ್ನು ತೋರಿಸಲಾಗುತ್ತಿದೆ",
+  "search.channels.studyAll": "ನಿಮ್ಮ ಎಲ್ಲಾ ಅಧ್ಯಯನ ಚಾನೆಲ್‌ಗಳಲ್ಲಿ “{query}” ಹುಡುಕಿ",
+  "search.channels.allowedAll": "ಅನುಮತಿಸಿದ ಎಲ್ಲಾ ಚಾನೆಲ್‌ಗಳಲ್ಲಿ “{query}” ಹುಡುಕಿ",
+  "search.channels.studyOffline": "ನಿಮ್ಮ ಅಧ್ಯಯನ ಚಾನೆಲ್‌ಗಳನ್ನು ತಲುಪಲಾಗಲಿಲ್ಲ. ಸಂಪರ್ಕ ಪರಿಶೀಲಿಸಿ ಮತ್ತೆ ಪ್ರಯತ್ನಿಸಿ.",
+  "search.channels.allowedOffline": "ಅನುಮತಿಸಿದ ಚಾನೆಲ್‌ಗಳನ್ನು ತಲುಪಲಾಗಲಿಲ್ಲ. ಸಂಪರ್ಕ ಪರಿಶೀಲಿಸಿ ಮತ್ತೆ ಪ್ರಯತ್ನಿಸಿ."
 }

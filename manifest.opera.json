@@ -67,7 +67,7 @@
                 "js/content/content_playback_admission.js",
                 "js/content/content_playback_native.js",
                 "js/content/content_playback.js",
-                "js/content/video_notes.js", "js/content/study_overlay.js", "js/shared/search_suggestions_filter.js", "js/content/search_suggestions_dom.js",
+                "js/content/video_notes.js", "js/content/study_overlay.js", "js/shared/search_suggestions_filter.js", "js/content/search_suggestions_dom.js", "js/shared/paced_fetch.js", "js/shared/channel_search.js", "js/content/channel_search_shelf.js",
                 "js/shared/hidden_log.js", "js/content_bridge.js"
             ],
             "run_at": "document_start"

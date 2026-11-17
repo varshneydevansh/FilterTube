@@ -3361,5 +3361,11 @@
   "home.greet.afternoon": "नमस्कार।",
   "home.study.now": "अबहीं पढ़ाई चलत बा, {time} ले",
   "home.stats.channels": "चैनल",
-  "apps.ios.sideloadCta": "iPhone गाइड खोलीं"
+  "apps.ios.sideloadCta": "iPhone गाइड खोलीं",
+  "search.channels.studyTitle": "रउआ पढ़ाई वाला चैनल देखावल जा रहल बा",
+  "search.channels.allowedTitle": "रउआ अनुमति वाला चैनल देखावल जा रहल बा",
+  "search.channels.studyAll": "अपना सगरी पढ़ाई वाला चैनल में “{query}” खोजीं",
+  "search.channels.allowedAll": "अपना सगरी अनुमति वाला चैनल में “{query}” खोजीं",
+  "search.channels.studyOffline": "रउआ पढ़ाई वाला चैनल ले ना पहुँचल गइल। कनेक्शन देखीं आ फेर कोसिस करीं।",
+  "search.channels.allowedOffline": "रउआ अनुमति वाला चैनल ले ना पहुँचल गइल। कनेक्शन देखीं आ फेर कोसिस करीं।"
 }

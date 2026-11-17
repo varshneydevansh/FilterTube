@@ -3359,5 +3359,11 @@
   "home.greet.afternoon": "Sugeng siang.",
   "home.study.now": "Lagi sinau, nganti {time}",
   "home.stats.channels": "Kanal",
-  "apps.ios.sideloadCta": "Bukak pandhuan iPhone"
+  "apps.ios.sideloadCta": "Bukak pandhuan iPhone",
+  "search.channels.studyTitle": "Nuduhaké saluran sinaumu",
+  "search.channels.allowedTitle": "Nuduhaké saluran sing kokidinaké",
+  "search.channels.studyAll": "Golèk “{query}” ing kabèh saluran sinaumu",
+  "search.channels.allowedAll": "Golèk “{query}” ing kabèh saluran sing diidinaké",
+  "search.channels.studyOffline": "Saluran sinaumu ora bisa digayuh. Priksa sambunganmu lan jajal manèh.",
+  "search.channels.allowedOffline": "Saluran sing diidinaké ora bisa digayuh. Priksa sambunganmu lan jajal manèh."
 }

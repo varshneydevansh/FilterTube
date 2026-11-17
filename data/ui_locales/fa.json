@@ -3361,5 +3361,11 @@
   "home.greet.afternoon": "عصر بخیر.",
   "home.study.now": "در حال مطالعه، تا {time}",
   "home.stats.channels": "کانال‌ها",
-  "apps.ios.sideloadCta": "باز کردن راهنمای iPhone"
+  "apps.ios.sideloadCta": "باز کردن راهنمای iPhone",
+  "search.channels.studyTitle": "کانال‌های درسی‌ات نشان داده می‌شود",
+  "search.channels.allowedTitle": "کانال‌های مجازت نشان داده می‌شود",
+  "search.channels.studyAll": "جستجوی «{query}» در همه کانال‌های درسی",
+  "search.channels.allowedAll": "جستجوی «{query}» در همه کانال‌های مجاز",
+  "search.channels.studyOffline": "به کانال‌های درسی‌ات دسترسی نبود. اتصال را بررسی کن و دوباره امتحان کن.",
+  "search.channels.allowedOffline": "به کانال‌های مجازت دسترسی نبود. اتصال را بررسی کن و دوباره امتحان کن."
 }

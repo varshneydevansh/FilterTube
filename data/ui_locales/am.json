@@ -3361,5 +3361,11 @@
   "home.greet.afternoon": "እንደምን ዋሉ።",
   "home.study.now": "አሁን በጥናት ላይ፣ እስከ {time}",
   "home.stats.channels": "ቻናሎች",
-  "apps.ios.sideloadCta": "የiPhone መመሪያውን ክፈት"
+  "apps.ios.sideloadCta": "የiPhone መመሪያውን ክፈት",
+  "search.channels.studyTitle": "የጥናት ቻናሎችዎን እያሳየ ነው",
+  "search.channels.allowedTitle": "የተፈቀዱ ቻናሎችዎን እያሳየ ነው",
+  "search.channels.studyAll": "በሁሉም የጥናት ቻናሎችዎ “{query}” ይፈልጉ",
+  "search.channels.allowedAll": "በሁሉም የተፈቀዱ ቻናሎች “{query}” ይፈልጉ",
+  "search.channels.studyOffline": "የጥናት ቻናሎችዎን መድረስ አልተቻለም። ግንኙነትዎን ያረጋግጡ እና እንደገና ይሞክሩ።",
+  "search.channels.allowedOffline": "የተፈቀዱ ቻናሎችዎን መድረስ አልተቻለም። ግንኙነትዎን ያረጋግጡ እና እንደገና ይሞክሩ።"
 }

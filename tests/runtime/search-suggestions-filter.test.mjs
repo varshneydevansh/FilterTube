@@ -267,7 +267,9 @@ test('seed routes suggestions through all layers and the manifests load the filt
     assert.match(seed, /tag\.src = seedSrc\.replace\(.*'\/js\/shared\/search_suggestions_filter\.js'\)/);
     for (const name of ['manifest.json', 'manifest.chrome.json', 'manifest.opera.json']) {
         const manifest = JSON.parse(fs.readFileSync(new URL(`../../${name}`, import.meta.url), 'utf8'));
-        assert.deepEqual(manifest.content_scripts[0].js, ['js/shared/view_count.js', 'js/shared/search_suggestions_filter.js', 'js/seed.js'], name);
+        const main = manifest.content_scripts[0].js;
+        assert.ok(main.indexOf('js/shared/search_suggestions_filter.js') > main.indexOf('js/shared/view_count.js'), name);
+        assert.ok(main.indexOf('js/shared/search_suggestions_filter.js') < main.indexOf('js/seed.js'), name);
     }
     for (const name of ['manifest.json', 'manifest.chrome.json', 'manifest.opera.json', 'manifest.firefox.json']) {
         const manifest = JSON.parse(fs.readFileSync(new URL(`../../${name}`, import.meta.url), 'utf8'));

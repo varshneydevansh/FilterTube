@@ -3361,5 +3361,11 @@
   "home.greet.afternoon": "Barka da rana.",
   "home.study.now": "Ana karatu yanzu, har zuwa {time}",
   "home.stats.channels": "Tashoshi",
-  "apps.ios.sideloadCta": "Buɗe jagorar iPhone"
+  "apps.ios.sideloadCta": "Buɗe jagorar iPhone",
+  "search.channels.studyTitle": "Ana nuna tasoshin karatunka",
+  "search.channels.allowedTitle": "Ana nuna tasoshin da ka yarda da su",
+  "search.channels.studyAll": "Nemi “{query}” a dukkan tasoshin karatunka",
+  "search.channels.allowedAll": "Nemi “{query}” a dukkan tasoshin da aka yarda",
+  "search.channels.studyOffline": "Ba a iya isa tasoshin karatunka ba. Duba haɗin kai ka sake gwadawa.",
+  "search.channels.allowedOffline": "Ba a iya isa tasoshin da aka yarda ba. Duba haɗin kai ka sake gwadawa."
 }

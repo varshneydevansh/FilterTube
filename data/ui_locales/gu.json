@@ -3361,5 +3361,11 @@
   "home.greet.afternoon": "નમસ્તે.",
   "home.study.now": "હમણાં અભ્યાસ ચાલુ, {time} સુધી",
   "home.stats.channels": "ચેનલ",
-  "apps.ios.sideloadCta": "iPhone માર્ગદર્શિકા ખોલો"
+  "apps.ios.sideloadCta": "iPhone માર્ગદર્શિકા ખોલો",
+  "search.channels.studyTitle": "તમારી અભ્યાસ ચેનલો બતાવી રહ્યાં છીએ",
+  "search.channels.allowedTitle": "તમારી મંજૂર ચેનલો બતાવી રહ્યાં છીએ",
+  "search.channels.studyAll": "તમારી બધી અભ્યાસ ચેનલોમાં “{query}” શોધો",
+  "search.channels.allowedAll": "તમારી બધી મંજૂર ચેનલોમાં “{query}” શોધો",
+  "search.channels.studyOffline": "તમારી અભ્યાસ ચેનલો સુધી પહોંચી શકાયું નહીં. કનેક્શન તપાસો અને ફરી પ્રયાસ કરો.",
+  "search.channels.allowedOffline": "તમારી મંજૂર ચેનલો સુધી પહોંચી શકાયું નહીં. કનેક્શન તપાસો અને ફરી પ્રયાસ કરો."
 }

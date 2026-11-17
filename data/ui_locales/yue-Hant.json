@@ -3359,5 +3359,11 @@
   "home.greet.afternoon": "午安。",
   "home.study.now": "溫緊書，到 {time}",
   "home.stats.channels": "頻道",
-  "apps.ios.sideloadCta": "打開 iPhone 指南"
+  "apps.ios.sideloadCta": "打開 iPhone 指南",
+  "search.channels.studyTitle": "而家顯示緊你嘅學習頻道",
+  "search.channels.allowedTitle": "而家顯示緊你允許嘅頻道",
+  "search.channels.studyAll": "喺所有學習頻道搜尋「{query}」",
+  "search.channels.allowedAll": "喺所有允許嘅頻道搜尋「{query}」",
+  "search.channels.studyOffline": "連唔到你嘅學習頻道。請檢查網絡再試。",
+  "search.channels.allowedOffline": "連唔到你允許嘅頻道。請檢查網絡再試。"
 }

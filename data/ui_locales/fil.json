@@ -3361,5 +3361,11 @@
   "home.greet.afternoon": "Magandang hapon.",
   "home.study.now": "Nag-aaral ngayon, hanggang {time}",
   "home.stats.channels": "Mga channel",
-  "apps.ios.sideloadCta": "Buksan ang gabay sa iPhone"
+  "apps.ios.sideloadCta": "Buksan ang gabay sa iPhone",
+  "search.channels.studyTitle": "Ipinapakita ang iyong mga study channel",
+  "search.channels.allowedTitle": "Ipinapakita ang iyong mga pinapayagang channel",
+  "search.channels.studyAll": "Hanapin ang “{query}” sa lahat ng iyong study channel",
+  "search.channels.allowedAll": "Hanapin ang “{query}” sa lahat ng iyong pinapayagang channel",
+  "search.channels.studyOffline": "Hindi maabot ang iyong mga study channel. Tingnan ang koneksyon at subukan ulit.",
+  "search.channels.allowedOffline": "Hindi maabot ang iyong mga pinapayagang channel. Tingnan ang koneksyon at subukan ulit."
 }

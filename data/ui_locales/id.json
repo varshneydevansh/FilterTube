@@ -3359,5 +3359,11 @@
   "home.greet.afternoon": "Selamat siang.",
   "home.study.now": "Sedang belajar, sampai {time}",
   "home.stats.channels": "Saluran",
-  "apps.ios.sideloadCta": "Buka panduan iPhone"
+  "apps.ios.sideloadCta": "Buka panduan iPhone",
+  "search.channels.studyTitle": "Menampilkan saluran belajarmu",
+  "search.channels.allowedTitle": "Menampilkan saluran yang kamu izinkan",
+  "search.channels.studyAll": "Cari “{query}” di semua saluran belajarmu",
+  "search.channels.allowedAll": "Cari “{query}” di semua saluran yang diizinkan",
+  "search.channels.studyOffline": "Saluran belajarmu tidak bisa dihubungi. Periksa koneksi dan coba lagi.",
+  "search.channels.allowedOffline": "Saluran yang diizinkan tidak bisa dihubungi. Periksa koneksi dan coba lagi."
 }

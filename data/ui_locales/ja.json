@@ -3359,5 +3359,11 @@
   "home.greet.afternoon": "こんにちは。",
   "home.study.now": "学習中（{time} まで）",
   "home.stats.channels": "チャンネル",
-  "apps.ios.sideloadCta": "iPhone ガイドを開く"
+  "apps.ios.sideloadCta": "iPhone ガイドを開く",
+  "search.channels.studyTitle": "学習チャンネルを表示中",
+  "search.channels.allowedTitle": "許可したチャンネルを表示中",
+  "search.channels.studyAll": "すべての学習チャンネルで「{query}」を検索",
+  "search.channels.allowedAll": "許可したすべてのチャンネルで「{query}」を検索",
+  "search.channels.studyOffline": "学習チャンネルに接続できませんでした。接続を確認して、もう一度お試しください。",
+  "search.channels.allowedOffline": "許可したチャンネルに接続できませんでした。接続を確認して、もう一度お試しください。"
 }

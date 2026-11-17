@@ -40,7 +40,7 @@ const playbackStack = [
   'js/content/content_playback_native.js',
   'js/content/content_playback.js',
 ];
-const normalHelperStack = [...helperStack.slice(0, -1), ...playbackStack, 'js/content/video_notes.js', 'js/content/study_overlay.js', 'js/shared/search_suggestions_filter.js', 'js/content/search_suggestions_dom.js', ...helperStack.slice(-1)];
+const normalHelperStack = [...helperStack.slice(0, -1), ...playbackStack, 'js/content/video_notes.js', 'js/content/study_overlay.js', 'js/shared/search_suggestions_filter.js', 'js/content/search_suggestions_dom.js', 'js/shared/paced_fetch.js', 'js/shared/channel_search.js', 'js/content/channel_search_shelf.js', ...helperStack.slice(-1)];
 
 const commonMatches = [
   '*://*.youtube.com/*',

@@ -3359,5 +3359,11 @@
   "home.greet.afternoon": "좋은 오후예요.",
   "home.study.now": "공부 중, {time}까지",
   "home.stats.channels": "채널",
-  "apps.ios.sideloadCta": "iPhone 안내 열기"
+  "apps.ios.sideloadCta": "iPhone 안내 열기",
+  "search.channels.studyTitle": "공부 채널을 보여 주는 중",
+  "search.channels.allowedTitle": "허용한 채널을 보여 주는 중",
+  "search.channels.studyAll": "모든 공부 채널에서 “{query}” 검색",
+  "search.channels.allowedAll": "허용한 모든 채널에서 “{query}” 검색",
+  "search.channels.studyOffline": "공부 채널에 연결할 수 없어요. 연결을 확인하고 다시 시도하세요.",
+  "search.channels.allowedOffline": "허용한 채널에 연결할 수 없어요. 연결을 확인하고 다시 시도하세요."
 }

@@ -3361,5 +3361,11 @@
   "home.greet.afternoon": "শুভ অপরাহ্ন।",
   "home.study.now": "এখন পড়া চলছে, {time} পর্যন্ত",
   "home.stats.channels": "চ্যানেল",
-  "apps.ios.sideloadCta": "iPhone গাইড খুলুন"
+  "apps.ios.sideloadCta": "iPhone গাইড খুলুন",
+  "search.channels.studyTitle": "আপনার পড়ার চ্যানেল দেখানো হচ্ছে",
+  "search.channels.allowedTitle": "আপনার অনুমোদিত চ্যানেল দেখানো হচ্ছে",
+  "search.channels.studyAll": "আপনার সব পড়ার চ্যানেলে “{query}” খুঁজুন",
+  "search.channels.allowedAll": "আপনার সব অনুমোদিত চ্যানেলে “{query}” খুঁজুন",
+  "search.channels.studyOffline": "আপনার পড়ার চ্যানেলে পৌঁছানো গেল না। সংযোগ দেখে আবার চেষ্টা করুন।",
+  "search.channels.allowedOffline": "আপনার অনুমোদিত চ্যানেলে পৌঁছানো গেল না। সংযোগ দেখে আবার চেষ্টা করুন।"
 }

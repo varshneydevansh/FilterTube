@@ -3361,5 +3361,11 @@
   "home.greet.afternoon": "Habari za mchana.",
   "home.study.now": "Unasoma sasa, hadi {time}",
   "home.stats.channels": "Chaneli",
-  "apps.ios.sideloadCta": "Fungua mwongozo wa iPhone"
+  "apps.ios.sideloadCta": "Fungua mwongozo wa iPhone",
+  "search.channels.studyTitle": "Inaonyesha chaneli zako za kusoma",
+  "search.channels.allowedTitle": "Inaonyesha chaneli zako zinazoruhusiwa",
+  "search.channels.studyAll": "Tafuta “{query}” katika chaneli zako zote za kusoma",
+  "search.channels.allowedAll": "Tafuta “{query}” katika chaneli zote zinazoruhusiwa",
+  "search.channels.studyOffline": "Chaneli zako za kusoma hazikufikiwa. Angalia muunganisho kisha ujaribu tena.",
+  "search.channels.allowedOffline": "Chaneli zinazoruhusiwa hazikufikiwa. Angalia muunganisho kisha ujaribu tena."
 }

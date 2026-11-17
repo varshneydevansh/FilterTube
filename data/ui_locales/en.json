@@ -3361,5 +3361,11 @@
   "home.greet.afternoon": "Good afternoon.",
   "home.study.now": "Studying now, until {time}",
   "home.stats.channels": "Channels",
-  "apps.ios.sideloadCta": "Open the iPhone guide"
+  "apps.ios.sideloadCta": "Open the iPhone guide",
+  "search.channels.studyTitle": "Showing your study channels",
+  "search.channels.allowedTitle": "Showing your allowed channels",
+  "search.channels.studyAll": "Search all your study channels for “{query}”",
+  "search.channels.allowedAll": "Search all your allowed channels for “{query}”",
+  "search.channels.studyOffline": "Your study channels couldn't be reached. Check your connection and try again.",
+  "search.channels.allowedOffline": "Your allowed channels couldn't be reached. Check your connection and try again."
 }

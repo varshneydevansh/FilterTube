@@ -3359,5 +3359,11 @@
   "home.greet.afternoon": "下午好。",
   "home.study.now": "正在学习，到 {time}",
   "home.stats.channels": "频道",
-  "apps.ios.sideloadCta": "打开 iPhone 指南"
+  "apps.ios.sideloadCta": "打开 iPhone 指南",
+  "search.channels.studyTitle": "正在显示你的学习频道",
+  "search.channels.allowedTitle": "正在显示你允许的频道",
+  "search.channels.studyAll": "在所有学习频道中搜索“{query}”",
+  "search.channels.allowedAll": "在所有允许的频道中搜索“{query}”",
+  "search.channels.studyOffline": "无法连接你的学习频道。请检查网络后重试。",
+  "search.channels.allowedOffline": "无法连接你允许的频道。请检查网络后重试。"
 }

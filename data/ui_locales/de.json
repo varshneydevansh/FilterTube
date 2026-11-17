@@ -3361,5 +3361,11 @@
   "home.greet.afternoon": "Guten Tag.",
   "home.study.now": "Gerade am Lernen, bis {time}",
   "home.stats.channels": "Kanäle",
-  "apps.ios.sideloadCta": "iPhone-Anleitung öffnen"
+  "apps.ios.sideloadCta": "iPhone-Anleitung öffnen",
+  "search.channels.studyTitle": "Zeigt deine Lernkanäle",
+  "search.channels.allowedTitle": "Zeigt deine erlaubten Kanäle",
+  "search.channels.studyAll": "Alle deine Lernkanäle nach „{query}“ durchsuchen",
+  "search.channels.allowedAll": "Alle erlaubten Kanäle nach „{query}“ durchsuchen",
+  "search.channels.studyOffline": "Deine Lernkanäle sind nicht erreichbar. Prüfe deine Verbindung und versuch es noch einmal.",
+  "search.channels.allowedOffline": "Deine erlaubten Kanäle sind nicht erreichbar. Prüfe deine Verbindung und versuch es noch einmal."
 }

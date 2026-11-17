@@ -3359,5 +3359,11 @@
   "home.greet.afternoon": "สวัสดีตอนบ่าย",
   "home.study.now": "กำลังเรียน ถึง {time}",
   "home.stats.channels": "ช่อง",
-  "apps.ios.sideloadCta": "เปิดคู่มือ iPhone"
+  "apps.ios.sideloadCta": "เปิดคู่มือ iPhone",
+  "search.channels.studyTitle": "กำลังแสดงช่องเรียนของคุณ",
+  "search.channels.allowedTitle": "กำลังแสดงช่องที่คุณอนุญาต",
+  "search.channels.studyAll": "ค้นหา “{query}” ในช่องเรียนทั้งหมดของคุณ",
+  "search.channels.allowedAll": "ค้นหา “{query}” ในช่องที่อนุญาตทั้งหมด",
+  "search.channels.studyOffline": "ติดต่อช่องเรียนของคุณไม่ได้ ตรวจสอบการเชื่อมต่อแล้วลองอีกครั้ง",
+  "search.channels.allowedOffline": "ติดต่อช่องที่อนุญาตไม่ได้ ตรวจสอบการเชื่อมต่อแล้วลองอีกครั้ง"
 }
