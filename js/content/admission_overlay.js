@@ -476,15 +476,173 @@
         try { overlay.__filtertubeAdmissionBackground = null; } catch (e) {}
     }
 
-    function ensureAdmissionOverlayVisuals(overlay, state, message) {
+    // ---- Quiet blocking (settings.quietBlocking) ---------------------------------------------------
+    // A parent can ask for blocks a child does not notice: no brand, no reason, no character, no
+    // "blocked". The check before playback is a plain dark cover with no words, and a blocked video
+    // (or channel page) reads like an ordinary unavailable item with a way back. Only presentation
+    // changes here; the callers' pause and play guards decide exactly as before.
+
+    /** options.quiet wins when given; a redraw without options (locale, companion) keeps the last value. */
+    function resolveAdmissionQuiet(overlay, options) {
+        if (options && typeof options.quiet === 'boolean') return options.quiet;
+        return overlay?.__filtertubeAdmissionQuiet === true;
+    }
+
+    function emptyAdmissionOverlay(overlay) {
+        try {
+            if (typeof overlay.replaceChildren === 'function') { overlay.replaceChildren(); return; }
+        } catch (e) {}
+        try { while (overlay.firstChild) overlay.removeChild(overlay.firstChild); } catch (e) {}
+        try { if (Array.isArray(overlay.children)) overlay.children.slice().forEach(child => overlay.removeChild(child)); } catch (e) {}
+    }
+
+    /** Drops every branded part so the next branded render rebuilds from nothing. */
+    function clearBrandedAdmissionParts(overlay) {
+        if (!overlay) return;
+        removeAdmissionOverlayBackground(overlay);
+        removeAskParent(overlay);
+        emptyAdmissionOverlay(overlay);
+        for (const slot of ['__filtertubeAdmissionPanel', '__filtertubeAdmissionBrand', '__filtertubeAdmissionBrandMark',
+            '__filtertubeAdmissionBrandName', '__filtertubeAdmissionStatus', '__filtertubeAdmissionTitle',
+            '__filtertubeAdmissionReason', '__filtertubeAdmissionScrim', '__filtertubeAdmissionMascot',
+            '__filtertubeChannelBack', '__filtertubeStudyCard', '__filtertubeStudyParts', '__filtertubeStudyMascot']) {
+            try { overlay[slot] = null; } catch (e) {}
+        }
+    }
+
+    function removeQuietAdmissionCover(overlay) {
+        if (!overlay?.__filtertubeQuietCover) return;
+        emptyAdmissionOverlay(overlay);
+        overlay.__filtertubeQuietCover = null;
+        overlay.__filtertubeQuietParts = null;
+        try { overlay.removeAttribute?.('data-filtertube-quiet'); } catch (e) {}
+        try { overlay.removeAttribute?.('aria-busy'); } catch (e) {}
+    }
+
+    /** Back in history when there is somewhere to go, else the site's Home. */
+    function quietGoBack() {
+        try {
+            if (root.history && Number(root.history.length) > 1 && typeof root.history.back === 'function') {
+                root.history.back();
+                return;
+            }
+        } catch (e) {}
+        try { root.location.assign('/'); } catch (e) {}
+    }
+
+    function quietAdmissionTitle(overlay) {
+        return overlay?.__filtertubeAdmissionKind === 'channel'
+            ? localizedAdmissionText('admission.quietChannelTitle', "This channel isn't available")
+            : localizedAdmissionText('admission.quietVideoTitle', "This video isn't available");
+    }
+
+    function renderQuietAdmissionCover(overlay, state) {
+        if (!overlay) return;
+        const blocked = state === 'blocked';
+        const channelPage = overlay.__filtertubeAdmissionKind === 'channel';
+        // Inside the player the cover is player-dark; a channel page follows the page's theme.
+        const dark = channelPage ? admissionOverlayUsesDarkTheme() : true;
+        const ink = dark ? '#e8e8e8' : '#1f1f1f';
+        admissionOverlayStyle(overlay, {
+            position: 'fixed', inset: '0', zIndex: '2147483647', width: '100vw', height: '100vh',
+            boxSizing: 'border-box', display: 'flex', alignItems: 'center', justifyContent: 'center',
+            padding: 'clamp(16px, 4vw, 56px)', overflow: 'hidden', isolation: 'isolate',
+            pointerEvents: 'auto', userSelect: 'none', whiteSpace: 'normal',
+            background: dark ? (blocked ? '#121212' : '#000000') : '#ffffff', color: ink,
+            font: '400 15px/1.5 system-ui, Roboto, "Segoe UI", -apple-system, sans-serif'
+        });
+        const title = blocked ? quietAdmissionTitle(overlay) : '';
+        if (typeof overlay.setAttribute === 'function') {
+            overlay.setAttribute('data-filtertube-quiet', 'true');
+            if (blocked) {
+                overlay.setAttribute('aria-label', title);
+                try { overlay.removeAttribute?.('aria-busy'); } catch (e) {}
+            } else {
+                try { overlay.removeAttribute?.('aria-label'); } catch (e) {}
+                overlay.setAttribute('aria-busy', 'true');
+            }
+        }
+        const canCompose = typeof overlay.appendChild === 'function' && typeof document.createElement === 'function';
+        if (!canCompose) {
+            try { overlay.textContent = title; } catch (e) {}
+            return;
+        }
+        let cover = overlay.__filtertubeQuietCover || null;
+        if (!cover) {
+            clearBrandedAdmissionParts(overlay);
+            cover = document.createElement('section');
+            cover.setAttribute('data-filtertube-quiet-cover', 'true');
+            admissionOverlayStyle(cover, {
+                display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '16px',
+                maxWidth: 'min(420px, 100%)', textAlign: 'center'
+            });
+            const heading = document.createElement('h1');
+            heading.setAttribute('data-filtertube-quiet-title', 'true');
+            admissionOverlayStyle(heading, {
+                margin: '0', font: '500 clamp(16px, 2.4vw, 20px)/1.4 system-ui, Roboto, "Segoe UI", -apple-system, sans-serif',
+                letterSpacing: '0', color: ink
+            });
+            const actions = document.createElement('div');
+            admissionOverlayStyle(actions, { display: 'flex', gap: '10px', justifyContent: 'center' });
+            cover.appendChild(heading);
+            cover.appendChild(actions);
+            overlay.appendChild(cover);
+            overlay.__filtertubeQuietCover = cover;
+            overlay.__filtertubeQuietParts = { heading, actions, back: null };
+        }
+        const parts = overlay.__filtertubeQuietParts;
+        admissionOverlayStyle(cover, { display: blocked ? 'flex' : 'none' });
+        parts.heading.textContent = title;
+        admissionOverlayStyle(parts.heading, { color: ink });
+        let topFrame = true;
+        try { topFrame = root.top === root; } catch (e) { topFrame = false; }
+        // An embedded player cannot leave its host page, so it gets the words only.
+        if (blocked && topFrame) {
+            if (!parts.back) {
+                const back = document.createElement('button');
+                back.type = 'button';
+                back.setAttribute('data-filtertube-quiet-action', 'back');
+                back.addEventListener('click', event => {
+                    event?.preventDefault?.();
+                    event?.stopPropagation?.();
+                    quietGoBack();
+                });
+                parts.actions.appendChild(back);
+                parts.back = back;
+            }
+            parts.back.textContent = localizedAdmissionText('admission.quietBack', 'Go back');
+            admissionOverlayStyle(parts.back, {
+                minHeight: '40px', padding: '0 20px', borderRadius: '999px', cursor: 'pointer',
+                border: `1px solid ${dark ? 'rgba(255,255,255,.35)' : 'rgba(0,0,0,.3)'}`,
+                background: 'transparent', color: ink, font: '500 14px/1 system-ui, Roboto, "Segoe UI", sans-serif'
+            });
+        } else if (parts.back) {
+            try { parts.back.remove(); } catch (e) {}
+            parts.back = null;
+        }
+    }
+
+    function ensureAdmissionOverlayVisuals(overlay, state, message, options) {
+        const quiet = resolveAdmissionQuiet(overlay, options);
+        // Study cards stay as they are: a study plan is chosen, not a hidden block.
+        const studyLine = state === 'blocked' ? studyKind(message) : '';
+        const quietCover = quiet && !studyLine;
         if (overlay) {
+            overlay.__filtertubeAdmissionQuiet = quiet;
             overlay.__filtertubeAdmissionState = state;
             overlay.__filtertubeAdmissionMessage = message;
             applyAdmissionDirection(overlay);
-            if (typeof overlay.setAttribute === 'function') {
+            if (!quietCover && typeof overlay.setAttribute === 'function') {
                 overlay.setAttribute('aria-label', localizedAdmissionMessage(message));
             }
             loadAdmissionLocale(overlay);
+        }
+        if (quietCover) {
+            renderQuietAdmissionCover(overlay, state);
+            return;
+        }
+        removeQuietAdmissionCover(overlay);
+        if (overlay) {
             if (!companionLoading && runtimeAPI?.storage?.local?.get) {
                 // The Companion setting arrives once; redraw so the pose follows it.
                 loadAdmissionCompanion().then(() => {
@@ -494,7 +652,7 @@
                 });
             }
         }
-        const study = state === 'blocked' ? studyKind(message) : '';
+        const study = studyLine;
         if (study) {
             renderStudyCard(overlay, study, message);
             return;
@@ -918,6 +1076,8 @@
             ? { action: 'FilterTube_AskParentState', channelId: target.channelId }
             : { action: 'FilterTube_AskParentState', videoId: target.videoId });
         if (!state?.isChild || overlay.__filtertubeAskParentKey !== key || overlay.__filtertubeAdmissionState !== 'blocked') return;
+        // Quiet blocking turned on while the state was loading: the ask would name the block.
+        if (overlay.__filtertubeAdmissionQuiet === true || overlay.__filtertubeAdmissionPanel !== panel) return;
         if (!state.canAsk && !state.openFor) return;
         const holder = document.createElement('div');
         holder.setAttribute('data-filtertube-ask-parent-holder', 'true');
@@ -930,7 +1090,9 @@
 
 
     root.FilterTubeAdmissionOverlay = {
+        // render(overlay, state, message, { quiet }): quiet draws the unbranded cover (settings.quietBlocking).
         render: ensureAdmissionOverlayVisuals,
+        isQuiet: overlay => overlay?.__filtertubeAdmissionQuiet === true,
         clear: removeAdmissionOverlayBackground,
         localizeMessage: localizedAdmissionMessage,
         resolveMessage: resolveAdmissionMessage,

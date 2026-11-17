@@ -1285,13 +1285,18 @@ function setLocalizedAdmissionOverlayMessage(overlay, state, message) {
     const sourceMessage = String(message || '');
     overlay.__filtertubeAdmissionSourceMessage = sourceMessage;
     overlay.__filtertubeAdmissionSourceState = state;
+    overlay.__filtertubeAdmissionSourceQuiet = isQuietBlockingEnabled();
 
     const localizer = window.FilterTubeAdmissionOverlay;
     const renderMessage = localized => {
+        const quiet = isQuietBlockingEnabled();
         if (typeof localizer?.render === 'function') {
-            localizer.render(overlay, state, localized);
+            localizer.render(overlay, state, localized, { quiet });
             Object.assign(overlay.style, { position: 'absolute', width: '100%', height: '100%' });
-        } else if (overlay.textContent !== localized) overlay.textContent = localized;
+        } else {
+            const text = quiet ? '' : localized;
+            if (overlay.textContent !== text) overlay.textContent = text;
+        }
     };
     const applyDirection = () => {
         try {
@@ -1328,6 +1333,19 @@ function setLocalizedAdmissionOverlayMessage(overlay, state, message) {
     }
 }
 
+// Quiet blocking (settings.quietBlocking, parent-locked): the player covers drop the brand and the
+// reason. Presentation only; pause, play guard and decisions are unchanged.
+function isQuietBlockingEnabled(settings) {
+    try {
+        const source = settings && typeof settings === 'object'
+            ? settings
+            : (typeof currentSettings !== 'undefined' ? currentSettings : null);
+        return source?.quietBlocking === true;
+    } catch (e) {
+        return false;
+    }
+}
+
 function setCurrentShortAdmissionOverlay(state, message) {
     const host = getCurrentShortPlayerHost();
     if (!host) return false;
@@ -1343,7 +1361,8 @@ function setCurrentShortAdmissionOverlay(state, message) {
     const nextMessage = String(message || '');
     if (overlay.getAttribute('data-state') !== nextState) overlay.setAttribute('data-state', nextState);
     if (overlay.__filtertubeAdmissionSourceMessage !== nextMessage ||
-        overlay.__filtertubeAdmissionSourceState !== nextState) {
+        overlay.__filtertubeAdmissionSourceState !== nextState ||
+        overlay.__filtertubeAdmissionSourceQuiet !== isQuietBlockingEnabled()) {
         setLocalizedAdmissionOverlayMessage(overlay, nextState, nextMessage);
     }
     host.setAttribute('data-filtertube-current-short-admission-host', 'true');
@@ -1774,7 +1793,8 @@ function setDirectAccessOverlay(stateValue, message) {
     const nextMessage = String(message || (stateValue === 'blocked' ? 'Blocked by FilterTube' : 'Checking FilterTube rules…'));
     if (overlay.getAttribute('data-state') !== nextState) overlay.setAttribute('data-state', nextState);
     if (overlay.__filtertubeAdmissionSourceMessage !== nextMessage ||
-        overlay.__filtertubeAdmissionSourceState !== nextState) {
+        overlay.__filtertubeAdmissionSourceState !== nextState ||
+        overlay.__filtertubeAdmissionSourceQuiet !== isQuietBlockingEnabled()) {
         setLocalizedAdmissionOverlayMessage(overlay, nextState, nextMessage);
     }
     return true;
@@ -2327,10 +2347,12 @@ function showBlockedChannelPage(path, pageMeta, channelName, blockedBy) {
             host.appendChild(overlay);
         }
         const message = `${blockedBy === 'allow_list' ? 'Not in Allow only selected' : 'Blocked channel'}\n${name}`;
-        if (overlay.__filtertubeChannelPath !== path || overlay.__filtertubeAdmissionMessage !== message) {
+        const quiet = isQuietBlockingEnabled();
+        if (overlay.__filtertubeChannelPath !== path || overlay.__filtertubeAdmissionMessage !== message ||
+            overlay.__filtertubeAdmissionQuiet !== quiet) {
             overlay.__filtertubeChannelPath = path;
             overlay.__filtertubeAdmissionKind = 'channel';
-            renderer.render(overlay, 'blocked', message);
+            renderer.render(overlay, 'blocked', message, { quiet });
         }
         try { document.querySelectorAll('video').forEach(video => video.pause?.()); } catch (e) {}
         return true;
@@ -2966,10 +2988,11 @@ function setCurrentWatchCategoryOverlay(state, message) {
         : (state === 'unavailable' ? 'unavailable' : 'pending');
     overlay.setAttribute('data-state', normalizedState);
     const overlayMessage = message || (state === 'blocked' ? 'Blocked by Category Filter' : 'Checking category…');
+    const quiet = isQuietBlockingEnabled();
     if (window.FilterTubeAdmissionOverlay) {
-        window.FilterTubeAdmissionOverlay.render(overlay, normalizedState, overlayMessage);
+        window.FilterTubeAdmissionOverlay.render(overlay, normalizedState, overlayMessage, { quiet });
         Object.assign(overlay.style, { position: 'absolute', width: '100%', height: '100%' });
-    } else overlay.textContent = overlayMessage;
+    } else overlay.textContent = quiet ? '' : overlayMessage;
     return true;
 }
 
