@@ -83,7 +83,7 @@ const promises = [
 ];
 
 const checklist = [
-  { icon: DeviceMobile, text: "An iPhone or iPad with a passcode, on iOS or iPadOS 15 or newer" },
+  { icon: DeviceMobile, text: "An iPhone or iPad with a passcode, on iOS or iPadOS 17 or newer (FilterTube needs 17)" },
   { icon: Desktop, text: "A computer (Mac, Windows, Linux or a recent Chromebook), only for the first install" },
   { icon: UserCircle, text: "An Apple Account (Apple ID). A spare free one works fine" },
   { icon: WifiHigh, text: "Wi-Fi. Mobile data won't work for the setup" },
