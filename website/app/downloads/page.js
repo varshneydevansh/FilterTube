@@ -248,8 +248,8 @@ export default function DownloadsPage() {
                 <p className="mt-5 text-sm leading-7 text-[var(--color-muted)]">
                   Anyone can install the Android app from Google Play or search
                   the store for FilterTube. iPhone and iPad can install the app
-                  directly with SideStore while the App Store listing is in
-                  progress. TV remains separate platform work.
+                  directly with SideStore while Apple sorts out the developer
+                  account. TV remains separate platform work.
                 </p>
               </div>
               <div id="ios-status" className="grid gap-3 sm:grid-cols-2">
