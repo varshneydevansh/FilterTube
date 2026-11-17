@@ -3298,5 +3298,15 @@
   "study.handle.value": "{name}, {time}",
   "study.hoursMinutes": "{hours} Std. {minutes} Min.",
   "study.length.title": "Lernzeit",
-  "study.length.hint": "Ziehen, um länger oder kürzer zu lernen. Der Beginn bleibt gleich."
+  "study.length.hint": "Ziehen, um länger oder kürzer zu lernen. Der Beginn bleibt gleich.",
+  "study.pill.label": "Lernen",
+  "study.pill.roundTitle": "Lernen · bis {time} nur die Kanäle und Themen deines Plans",
+  "study.pill.roundTitleNoTime": "Lernen · bis zum Ende des Lernens nur die Kanäle und Themen deines Plans",
+  "study.pill.restTitle": "Lernen · Pause, bis {time} wird nichts angezeigt",
+  "study.pill.restTitleNoTime": "Lernen · Pause, gerade wird nichts angezeigt",
+  "study.pill.limitTitle": "Lernen · heutiges Lernlimit, bis {time} wird nichts angezeigt",
+  "study.pill.limitTitleNoTime": "Lernen · heutiges Lernlimit, gerade wird nichts angezeigt",
+  "study.coverage.privateTitle": "Private Fenster sind nicht abgedeckt",
+  "study.coverage.privateBody": "FilterTube darf in privaten Fenstern nicht laufen, dort enden die Lernregeln. Schalte in den Erweiterungseinstellungen deines Browsers „Im privaten Modus erlauben“ für FilterTube ein.",
+  "study.coverage.familyPolicy": "Auf dem Gerät eines Kindes kann eine Browser-Richtlinie FilterTube installiert lassen und private Fenster abschalten. Frag die Person, die das Gerät verwaltet, nach ExtensionSettings / IncognitoModeAvailability."
 }

@@ -3298,5 +3298,15 @@
   "study.handle.value": "{name}, {time}",
   "study.hoursMinutes": "{hours} h {minutes} min",
   "study.length.title": "Duración del estudio",
-  "study.length.hint": "Arrastra para alargar o acortar el estudio. Empieza a la misma hora."
+  "study.length.hint": "Arrastra para alargar o acortar el estudio. Empieza a la misma hora.",
+  "study.pill.label": "Estudio",
+  "study.pill.roundTitle": "Estudio · solo los canales y temas de tu plan hasta las {time}",
+  "study.pill.roundTitleNoTime": "Estudio · solo los canales y temas de tu plan hasta que termine el estudio",
+  "study.pill.restTitle": "Estudio · en descanso, no se muestra nada hasta las {time}",
+  "study.pill.restTitleNoTime": "Estudio · en descanso, ahora no se muestra nada",
+  "study.pill.limitTitle": "Estudio · límite de estudio de hoy, no se muestra nada hasta las {time}",
+  "study.pill.limitTitleNoTime": "Estudio · límite de estudio de hoy, ahora no se muestra nada",
+  "study.coverage.privateTitle": "Las ventanas privadas no están cubiertas",
+  "study.coverage.privateBody": "FilterTube no tiene permiso en ventanas privadas, así que las reglas de estudio no llegan ahí. Activa «Permitir en modo privado» para FilterTube en la configuración de extensiones de tu navegador.",
+  "study.coverage.familyPolicy": "En el dispositivo de un niño, una política del navegador puede mantener FilterTube instalado y desactivar las ventanas privadas. Pregunta a quien administra el dispositivo por ExtensionSettings / IncognitoModeAvailability."
 }

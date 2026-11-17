@@ -1080,3 +1080,51 @@ html.pk-parity[data-theme="dark"] .pk-rule-options-btn.is-active { background: #
 #familyDeviceUpdatesCard #ftNanahPairingDetails .nanah-sync-panel__badge { color: var(--pk-brick); background: var(--pk-paper); border: 1px solid var(--pk-line); border-radius: 999px; padding: 4px 10px; font-size: 12px; font-weight: 600; }
 #familyDeviceUpdatesCard #ftNanahPairingDetails .nanah-sync-status[data-tone="retry"] { background: var(--pk-rose); border-color: color-mix(in srgb, var(--pk-brick) 30%, transparent); }
 #familyDeviceUpdatesCard #ftNanahDeviceCompassRule, #familyDeviceUpdatesCard #ftNanahDeviceSelectionPreview { display: none !important; }
+
+/* The effective mode during study (js/shared/effective_mode.js): the list-mode pill says "Study" in the
+   app's sage with the study timer; it opens the Study page instead of switching the list. */
+:root[data-theme] body.ft-extension-surface .ft-topbar-list-mode .exact-toggle.ft-list-mode-pill--study,
+:root body.ft-extension-surface .ft-topbar-list-mode .exact-toggle.ft-list-mode-pill--study {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35em;
+  background: var(--pk-sage) !important;
+  color: var(--pk-sage-ink) !important;
+  border: 1.5px solid var(--pk-sage-ink) !important;
+  box-shadow: none !important;
+  cursor: pointer;
+}
+:root[data-theme] body.ft-extension-surface .ft-topbar-list-mode .exact-toggle.ft-list-mode-pill--study:hover {
+  background: color-mix(in srgb, var(--pk-sage) 78%, var(--pk-sage-ink)) !important;
+}
+:root[data-theme] body.ft-extension-surface .ft-topbar-list-mode .exact-toggle.ft-list-mode-pill--study:focus-visible {
+  outline: 2px solid var(--pk-ink, #1b1a18);
+  outline-offset: 2px;
+}
+.ft-list-mode-pill--study .ft-list-mode-pill__icon { display: inline-flex; line-height: 0; }
+
+/* A loosening refused while study holds the rules (study_ui.js showLooseningNotice): the app's sheet,
+   over whichever page made the change. */
+.ft-study-loosen-float {
+  position: fixed;
+  inset-inline: 0;
+  bottom: 24px;
+  z-index: 2147483000;
+  display: flex;
+  justify-content: center;
+  padding: 0 16px;
+  pointer-events: none;
+}
+.ft-study-loosen-float > .ft-study-loosen {
+  pointer-events: auto;
+  max-width: 420px;
+  width: 100%;
+  background: var(--pk-paper, #fffdfa);
+  color: var(--pk-ink, #1b1a18);
+  border: 1.5px solid var(--pk-sage-ink);
+  border-radius: 18px;
+  padding: 16px 18px;
+  box-shadow: 0 10px 28px rgba(27, 26, 24, 0.18);
+  display: grid;
+  gap: 8px;
+}

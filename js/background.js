@@ -1797,6 +1797,13 @@ async function handleStudySwitchMessage(request, sender, sendResponse) {
     }
 }
 
+// An uninstall leaves a page that tells the family (review 4.4): FilterTube can't outlive its own removal.
+try {
+    const uninstallPage = browserAPI.runtime?.setUninstallURL?.('https://filtertube.in/uninstalled');
+    uninstallPage?.catch?.(() => {});
+} catch (e) {
+}
+
 async function enforceStudyProfileSwitch(change) {
     const oldValue = change?.oldValue;
     const newValue = change?.newValue;
@@ -1814,6 +1821,53 @@ async function enforceStudyProfileSwitch(change) {
     });
     console.warn('FilterTube Background: profile switch during study reverted', decision.kind);
     return true;
+}
+
+/**
+ * Study holds the rules (Android AppPreferences.saveProfilesV4 + StudyLooseningSheet): a write that
+ * loosens a profile study holds (a self Gentle or Locked session, or a parent's plan or lock) gets its
+ * settings, Main and Kids put back, and the open pages are told so they show the loosening sheet.
+ * Stricter changes (more blocks, fewer allowed) go through.
+ */
+async function enforceStudyRuleLoosening(change) {
+    const oldValue = change?.oldValue;
+    const newValue = change?.newValue;
+    if (!isValidProfilesV4(oldValue) || !isValidProfilesV4(newValue) || !studyBackground?.looseningNotice) return false;
+    const notice = await studyBackground.looseningNotice(oldValue, newValue);
+    if (!notice) return false;
+    const before = safeObject(safeObject(oldValue.profiles)[notice.profileId]);
+    const stored = (await storageGet([FT_PROFILES_V4_KEY]))?.[FT_PROFILES_V4_KEY];
+    const latest = isValidProfilesV4(stored) ? stored : newValue;
+    const profile = safeObject(safeObject(latest.profiles)[notice.profileId]);
+    if (!Object.keys(profile).length) return false;
+    const Model = globalThis.FilterTubeStudyModel;
+    if (Model?.ruleLoosens && !Model.ruleLoosens(before, profile)) return false; // already put back
+    await browserAPI.storage.local.set({
+        [FT_PROFILES_V4_KEY]: {
+            ...latest,
+            schemaVersion: 4,
+            profiles: {
+                ...safeObject(latest.profiles),
+                [notice.profileId]: { ...profile, settings: cloneJsonValue(safeObject(before.settings)), main: cloneJsonValue(safeObject(before.main)), kids: cloneJsonValue(safeObject(before.kids)) }
+            }
+        }
+    });
+    try {
+        browserAPI.runtime.sendMessage({ action: 'FilterTube_StudyLooseningRefused', notice }, () => void browserAPI.runtime.lastError);
+    } catch (e) {
+    }
+    console.warn('FilterTube Background: a change that loosens study was put back', notice.sheet);
+    return true;
+}
+
+/** For handlers that can only loosen (allow-list imports, a mode switch): the refusal, or null. */
+async function studyLooseningRefusal() {
+    try {
+        const notice = studyBackground?.activeHold ? await studyBackground.activeHold() : null;
+        return notice ? { ok: false, success: false, error: 'study_loosening', errorCode: 'study_loosening', notice } : null;
+    } catch (e) {
+        return null;
+    }
 }
 
 // Study mode (3.6.2): applied at compile time from the plan and the clock; see js/study_background.js.
@@ -5789,6 +5843,12 @@ browserAPI.runtime.onMessage.addListener(function (request, sender, sendResponse
             : 'main';
         const shouldCopyBlocklist = request?.copyBlocklist === true;
         (async () => {
+            // During study the list mode is the plan's; switching it would loosen the rules.
+            const studyRefusal = await studyLooseningRefusal();
+            if (studyRefusal) {
+                sendResponse?.(studyRefusal);
+                return;
+            }
             const selfControlSession = await getActiveSelfControlSession();
             if (selfControlSession) {
                 sendResponse?.({
@@ -6014,6 +6074,12 @@ browserAPI.runtime.onMessage.addListener(function (request, sender, sendResponse
             const targetProfileId = normalizeString(request?.targetProfileId) || DEFAULT_PROFILE_ID;
             const requestId = normalizeString(request?.requestId) || '';
             const incomingChannels = safeArray(request?.channels);
+            // Allowed channels added while study holds that profile would open them at once.
+            const studyRefusal = await studyLooseningRefusal();
+            if (studyRefusal && studyRefusal.notice.profileId === targetProfileId) {
+                sendResponse?.(studyRefusal);
+                return;
+            }
 
             const storage = await storageGet([FT_PROFILES_V4_KEY, 'ftProfilesV3', 'channelMap']);
             let profilesV4 = storage?.[FT_PROFILES_V4_KEY];
@@ -6193,7 +6259,8 @@ browserAPI.runtime.onMessage.addListener(function (request, sender, sendResponse
             return false;
         }
 
-        handleAddFilteredChannel(
+        // An allowed Kids channel added while study holds the profile would loosen it.
+        studyLooseningRefusal().then(studyRefusal => studyRefusal || handleAddFilteredChannel(
             input,
             false,
             null,
@@ -6208,7 +6275,11 @@ browserAPI.runtime.onMessage.addListener(function (request, sender, sendResponse
             'kids',
             rawVideoId,
             'whitelist'
-        ).then(result => {
+        )).then(result => {
+            if (result?.error === 'study_loosening') {
+                sendResponse?.(result);
+                return;
+            }
             try {
                 if (result && result.success) {
                     scheduleAutoBackupInBackground('kids_whitelist_channel_added');
@@ -6237,6 +6308,12 @@ browserAPI.runtime.onMessage.addListener(function (request, sender, sendResponse
             : 'main';
 
         (async () => {
+            // The list mode is the plan's during study; moving the allow list back would loosen it.
+            const studyRefusal = await studyLooseningRefusal();
+            if (studyRefusal) {
+                sendResponse?.(studyRefusal);
+                return;
+            }
             const storage = await storageGet([
                 FT_PROFILES_V4_KEY,
                 'filterChannels',
@@ -7003,6 +7080,9 @@ browserAPI.storage.onChanged.addListener((changes, area) => {
         if (changes[FT_PROFILES_V4_KEY]?.newValue && changes[FT_PROFILES_V4_KEY]?.oldValue && !importedMetadataWrite) {
             enforceStudyProfileSwitch(changes[FT_PROFILES_V4_KEY]).catch((error) => {
                 console.warn('FilterTube Background: failed to check a profile switch during study', error);
+            });
+            enforceStudyRuleLoosening(changes[FT_PROFILES_V4_KEY]).catch((error) => {
+                console.warn('FilterTube Background: failed to check a rule change during study', error);
             });
         }
         const relevantKeys = [

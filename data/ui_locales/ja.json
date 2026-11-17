@@ -3296,5 +3296,15 @@
   "study.handle.value": "{name}、{time}",
   "study.hoursMinutes": "{hours} 時間 {minutes} 分",
   "study.length.title": "勉強時間",
-  "study.length.hint": "ドラッグして勉強時間を長く、または短くできます。開始時刻は変わりません。"
+  "study.length.hint": "ドラッグして勉強時間を長く、または短くできます。開始時刻は変わりません。",
+  "study.pill.label": "学習",
+  "study.pill.roundTitle": "学習 · {time}まで計画のチャンネルとトピックだけ",
+  "study.pill.roundTitleNoTime": "学習 · 学習が終わるまで計画のチャンネルとトピックだけ",
+  "study.pill.restTitle": "学習 · 休憩中、{time}まで何も表示されません",
+  "study.pill.restTitleNoTime": "学習 · 休憩中、今は何も表示されません",
+  "study.pill.limitTitle": "学習 · 今日の学習上限、{time}まで何も表示されません",
+  "study.pill.limitTitleNoTime": "学習 · 今日の学習上限、今は何も表示されません",
+  "study.coverage.privateTitle": "プライベートウィンドウは対象外です",
+  "study.coverage.privateBody": "FilterTubeはプライベートウィンドウで許可されていないため、そこでは学習ルールが止まります。ブラウザの拡張機能の設定で、FilterTubeの「プライベートで許可」をオンにしてください。",
+  "study.coverage.familyPolicy": "子どもの端末では、ブラウザのポリシーでFilterTubeをインストールしたままにし、プライベートウィンドウをオフにできます。端末の管理者にExtensionSettings / IncognitoModeAvailabilityについて聞いてください。"
 }

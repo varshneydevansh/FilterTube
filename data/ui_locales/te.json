@@ -3298,5 +3298,15 @@
   "study.handle.value": "{name}, {time}",
   "study.hoursMinutes": "{hours} గం {minutes} నిమి",
   "study.length.title": "చదువు సమయం",
-  "study.length.hint": "చదువును పెంచడానికి లేదా తగ్గించడానికి లాగండి. మొదలయ్యే సమయం అదే ఉంటుంది."
+  "study.length.hint": "చదువును పెంచడానికి లేదా తగ్గించడానికి లాగండి. మొదలయ్యే సమయం అదే ఉంటుంది.",
+  "study.pill.label": "చదువు",
+  "study.pill.roundTitle": "చదువు · {time} వరకు మీ ప్లాన్ ఛానెల్‌లు, అంశాలు మాత్రమే",
+  "study.pill.roundTitleNoTime": "చదువు · చదువు అయ్యే వరకు మీ ప్లాన్ ఛానెల్‌లు, అంశాలు మాత్రమే",
+  "study.pill.restTitle": "చదువు · విరామంలో, {time} వరకు ఏమీ కనిపించదు",
+  "study.pill.restTitleNoTime": "చదువు · విరామంలో, ప్రస్తుతం ఏమీ కనిపించదు",
+  "study.pill.limitTitle": "చదువు · ఈరోజు చదువు పరిమితి, {time} వరకు ఏమీ కనిపించదు",
+  "study.pill.limitTitleNoTime": "చదువు · ఈరోజు చదువు పరిమితి, ప్రస్తుతం ఏమీ కనిపించదు",
+  "study.coverage.privateTitle": "ప్రైవేట్ విండోలు ఇందులో లేవు",
+  "study.coverage.privateBody": "ప్రైవేట్ విండోలలో FilterTube కి అనుమతి లేదు, కాబట్టి అక్కడ చదువు నియమాలు ఆగిపోతాయి. మీ బ్రౌజర్ ఎక్స్‌టెన్షన్ సెట్టింగ్‌లలో FilterTube కోసం \"ప్రైవేట్‌లో అనుమతించు\" ఆన్ చేయండి.",
+  "study.coverage.familyPolicy": "పిల్లల పరికరంలో బ్రౌజర్ విధానం FilterTube ను ఇన్‌స్టాల్ చేసి ఉంచి, ప్రైవేట్ విండోలను ఆపివేయగలదు. పరికరాన్ని చూసుకునే వారిని ExtensionSettings / IncognitoModeAvailability గురించి అడగండి."
 }

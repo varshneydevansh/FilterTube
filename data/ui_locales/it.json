@@ -3298,5 +3298,15 @@
   "study.handle.value": "{name}, {time}",
   "study.hoursMinutes": "{hours} h {minutes} min",
   "study.length.title": "Durata dello studio",
-  "study.length.hint": "Trascina per studiare più a lungo o meno. L’inizio resta lo stesso."
+  "study.length.hint": "Trascina per studiare più a lungo o meno. L’inizio resta lo stesso.",
+  "study.pill.label": "Studio",
+  "study.pill.roundTitle": "Studio · solo i canali e gli argomenti del tuo piano fino alle {time}",
+  "study.pill.roundTitleNoTime": "Studio · solo i canali e gli argomenti del tuo piano fino alla fine dello studio",
+  "study.pill.restTitle": "Studio · in pausa, non si vede nulla fino alle {time}",
+  "study.pill.restTitleNoTime": "Studio · in pausa, per ora non si vede nulla",
+  "study.pill.limitTitle": "Studio · limite di studio di oggi, non si vede nulla fino alle {time}",
+  "study.pill.limitTitleNoTime": "Studio · limite di studio di oggi, per ora non si vede nulla",
+  "study.coverage.privateTitle": "Le finestre private non sono coperte",
+  "study.coverage.privateBody": "FilterTube non è consentito nelle finestre private, quindi lì le regole di studio si fermano. Attiva «Consenti in modalità privata» per FilterTube nelle impostazioni delle estensioni del browser.",
+  "study.coverage.familyPolicy": "Sul dispositivo di un bambino, un criterio del browser può mantenere FilterTube installato e disattivare le finestre private. Chiedi a chi gestisce il dispositivo di ExtensionSettings / IncognitoModeAvailability."
 }

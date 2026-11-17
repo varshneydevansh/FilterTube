@@ -3298,5 +3298,15 @@
   "study.handle.value": "{name}, {time}",
   "study.hoursMinutes": "{hours} மணி {minutes} நிமி",
   "study.length.title": "படிப்பு நேரம்",
-  "study.length.hint": "படிப்பை நீட்டவோ குறைக்கவோ இழுக்கவும். தொடங்கும் நேரம் மாறாது."
+  "study.length.hint": "படிப்பை நீட்டவோ குறைக்கவோ இழுக்கவும். தொடங்கும் நேரம் மாறாது.",
+  "study.pill.label": "படிப்பு",
+  "study.pill.roundTitle": "படிப்பு · {time} வரை உங்கள் திட்டத்தின் சேனல்களும் தலைப்புகளும் மட்டும்",
+  "study.pill.roundTitleNoTime": "படிப்பு · படிப்பு முடியும் வரை உங்கள் திட்டத்தின் சேனல்களும் தலைப்புகளும் மட்டும்",
+  "study.pill.restTitle": "படிப்பு · இடைவேளையில், {time} வரை எதுவும் தெரியாது",
+  "study.pill.restTitleNoTime": "படிப்பு · இடைவேளையில், இப்போது எதுவும் தெரியாது",
+  "study.pill.limitTitle": "படிப்பு · இன்றைய படிப்பு வரம்பு, {time} வரை எதுவும் தெரியாது",
+  "study.pill.limitTitleNoTime": "படிப்பு · இன்றைய படிப்பு வரம்பு, இப்போது எதுவும் தெரியாது",
+  "study.coverage.privateTitle": "தனிப்பட்ட சாளரங்கள் இதில் அடங்காது",
+  "study.coverage.privateBody": "தனிப்பட்ட சாளரங்களில் FilterTube-க்கு அனுமதி இல்லை, அதனால் அங்கு படிப்பு விதிகள் நின்றுவிடும். உங்கள் உலாவியின் நீட்டிப்பு அமைப்புகளில் FilterTube-க்கு \"தனிப்பட்டதில் அனுமதி\" இயக்குங்கள்.",
+  "study.coverage.familyPolicy": "குழந்தையின் சாதனத்தில், உலாவிக் கொள்கை FilterTube-ஐ நிறுவியபடியே வைத்துத் தனிப்பட்ட சாளரங்களை அணைக்க முடியும். சாதனத்தை நிர்வகிப்பவரிடம் ExtensionSettings / IncognitoModeAvailability பற்றிக் கேளுங்கள்."
 }

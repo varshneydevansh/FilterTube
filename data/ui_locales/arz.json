@@ -3322,5 +3322,15 @@
   "study.handle.value": "{name}، {time}",
   "study.hoursMinutes": "{hours} س {minutes} د",
   "study.length.title": "مدة المذاكرة",
-  "study.length.hint": "اسحب عشان تطوّل المذاكرة أو تقصّرها. بتبدأ في نفس المعاد."
+  "study.length.hint": "اسحب عشان تطوّل المذاكرة أو تقصّرها. بتبدأ في نفس المعاد.",
+  "study.pill.label": "مذاكرة",
+  "study.pill.roundTitle": "مذاكرة · قنوات ومواضيع خطتك بس لحد {time}",
+  "study.pill.roundTitleNoTime": "مذاكرة · قنوات ومواضيع خطتك بس لحد ما المذاكرة تخلص",
+  "study.pill.restTitle": "مذاكرة · في بريك، مفيش حاجة هتظهر لحد {time}",
+  "study.pill.restTitleNoTime": "مذاكرة · في بريك، مفيش حاجة هتظهر دلوقتي",
+  "study.pill.limitTitle": "مذاكرة · حد مذاكرة النهارده، مفيش حاجة هتظهر لحد {time}",
+  "study.pill.limitTitleNoTime": "مذاكرة · حد مذاكرة النهارده، مفيش حاجة هتظهر دلوقتي",
+  "study.coverage.privateTitle": "النوافذ الخاصة مش متغطية",
+  "study.coverage.privateBody": "FilterTube مش مسموح في النوافذ الخاصة، فقواعد المذاكرة بتقف هناك. شغّل «السماح في الوضع الخاص» لـ FilterTube من إعدادات إضافات المتصفح.",
+  "study.coverage.familyPolicy": "على جهاز طفل، سياسة المتصفح تقدر تخلي FilterTube متثبت وتقفل النوافذ الخاصة. اسأل اللي بيدير الجهاز عن ExtensionSettings / IncognitoModeAvailability."
 }

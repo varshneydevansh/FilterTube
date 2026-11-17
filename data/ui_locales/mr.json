@@ -3298,5 +3298,15 @@
   "study.handle.value": "{name}, {time}",
   "study.hoursMinutes": "{hours} तास {minutes} मि",
   "study.length.title": "अभ्यासाचा कालावधी",
-  "study.length.hint": "अभ्यास वाढवण्यासाठी किंवा कमी करण्यासाठी ओढा. सुरुवातीची वेळ तीच राहते."
+  "study.length.hint": "अभ्यास वाढवण्यासाठी किंवा कमी करण्यासाठी ओढा. सुरुवातीची वेळ तीच राहते.",
+  "study.pill.label": "अभ्यास",
+  "study.pill.roundTitle": "अभ्यास · {time} पर्यंत फक्त तुमच्या योजनेतील चॅनेल आणि विषय",
+  "study.pill.roundTitleNoTime": "अभ्यास · अभ्यास संपेपर्यंत फक्त तुमच्या योजनेतील चॅनेल आणि विषय",
+  "study.pill.restTitle": "अभ्यास · विश्रांतीवर, {time} पर्यंत काहीही दिसणार नाही",
+  "study.pill.restTitleNoTime": "अभ्यास · विश्रांतीवर, आत्ता काहीही दिसणार नाही",
+  "study.pill.limitTitle": "अभ्यास · आजची अभ्यास मर्यादा, {time} पर्यंत काहीही दिसणार नाही",
+  "study.pill.limitTitleNoTime": "अभ्यास · आजची अभ्यास मर्यादा, आत्ता काहीही दिसणार नाही",
+  "study.coverage.privateTitle": "खाजगी विंडो यात येत नाहीत",
+  "study.coverage.privateBody": "खाजगी विंडोमध्ये FilterTube ला परवानगी नाही, त्यामुळे तिथे अभ्यासाचे नियम थांबतात. तुमच्या ब्राउझरच्या एक्सटेन्शन सेटिंग्जमध्ये FilterTube साठी \"खाजगीमध्ये परवानगी द्या\" सुरू करा.",
+  "study.coverage.familyPolicy": "मुलाच्या डिव्हाइसवर ब्राउझर धोरण FilterTube इंस्टॉल ठेवू शकते आणि खाजगी विंडो बंद करू शकते. डिव्हाइस सांभाळणाऱ्यांना ExtensionSettings / IncognitoModeAvailability बद्दल विचारा."
 }

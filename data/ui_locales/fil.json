@@ -3298,5 +3298,15 @@
   "study.handle.value": "{name}, {time}",
   "study.hoursMinutes": "{hours} oras {minutes} min",
   "study.length.title": "Haba ng pag-aaral",
-  "study.length.hint": "I-drag para humaba o umikli ang pag-aaral. Pareho pa rin ang oras ng simula."
+  "study.length.hint": "I-drag para humaba o umikli ang pag-aaral. Pareho pa rin ang oras ng simula.",
+  "study.pill.label": "Pag-aaral",
+  "study.pill.roundTitle": "Pag-aaral · mga channel at paksa lang ng plano mo hanggang {time}",
+  "study.pill.roundTitleNoTime": "Pag-aaral · mga channel at paksa lang ng plano mo hanggang matapos ang pag-aaral",
+  "study.pill.restTitle": "Pag-aaral · naka-break, walang lalabas hanggang {time}",
+  "study.pill.restTitleNoTime": "Pag-aaral · naka-break, walang lalabas sa ngayon",
+  "study.pill.limitTitle": "Pag-aaral · limit ng pag-aaral ngayon, walang lalabas hanggang {time}",
+  "study.pill.limitTitleNoTime": "Pag-aaral · limit ng pag-aaral ngayon, walang lalabas sa ngayon",
+  "study.coverage.privateTitle": "Hindi sakop ang mga private window",
+  "study.coverage.privateBody": "Hindi pinapayagan ang FilterTube sa mga private window, kaya doon humihinto ang mga panuntunan sa pag-aaral. I-on ang \"Payagan sa private\" para sa FilterTube sa mga setting ng extension ng browser mo.",
+  "study.coverage.familyPolicy": "Sa device ng bata, kayang panatilihing naka-install ng patakaran ng browser ang FilterTube at patayin ang mga private window. Tanungin ang namamahala sa device tungkol sa ExtensionSettings / IncognitoModeAvailability."
 }

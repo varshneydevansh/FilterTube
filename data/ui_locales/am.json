@@ -3298,5 +3298,15 @@
   "study.handle.value": "{name}፣ {time}",
   "study.hoursMinutes": "{hours} ሰዓት {minutes} ደቂቃ",
   "study.length.title": "የጥናት ርዝመት",
-  "study.length.hint": "ጥናቱን ለማራዘም ወይም ለማሳጠር ይጎትቱ። የሚጀምርበት ሰዓት አይቀየርም።"
+  "study.length.hint": "ጥናቱን ለማራዘም ወይም ለማሳጠር ይጎትቱ። የሚጀምርበት ሰዓት አይቀየርም።",
+  "study.pill.label": "ጥናት",
+  "study.pill.roundTitle": "ጥናት · እስከ {time} የዕቅድህ ቻናሎችና ርዕሶች ብቻ",
+  "study.pill.roundTitleNoTime": "ጥናት · ጥናቱ እስኪያልቅ የዕቅድህ ቻናሎችና ርዕሶች ብቻ",
+  "study.pill.restTitle": "ጥናት · በእረፍት ላይ፣ እስከ {time} ምንም አይታይም",
+  "study.pill.restTitleNoTime": "ጥናት · በእረፍት ላይ፣ ለአሁን ምንም አይታይም",
+  "study.pill.limitTitle": "ጥናት · የዛሬው የጥናት ገደብ፣ እስከ {time} ምንም አይታይም",
+  "study.pill.limitTitleNoTime": "ጥናት · የዛሬው የጥናት ገደብ፣ ለአሁን ምንም አይታይም",
+  "study.coverage.privateTitle": "የግል መስኮቶች አይሸፈኑም",
+  "study.coverage.privateBody": "FilterTube በግል መስኮቶች አልተፈቀደም፣ ስለዚህ የጥናት ደንቦች እዚያ ይቆማሉ። በአሳሽህ የቅጥያ ቅንብሮች ውስጥ ለFilterTube «በግል ፍቀድ»ን አብራ።",
+  "study.coverage.familyPolicy": "በልጅ መሣሪያ ላይ የአሳሽ ፖሊሲ FilterTubeን ተጭኖ እንዲቆይ እና የግል መስኮቶችን እንዲያጠፋ ማድረግ ይችላል። መሣሪያውን የሚያስተዳድረውን ሰው ስለ ExtensionSettings / IncognitoModeAvailability ጠይቅ።"
 }

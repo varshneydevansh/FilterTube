@@ -3298,5 +3298,15 @@
   "study.handle.value": "{name}, {time}",
   "study.hoursMinutes": "{hours} sa {minutes} dk",
   "study.length.title": "Çalışma süresi",
-  "study.length.hint": "Çalışmayı uzatmak ya da kısaltmak için sürükleyin. Başlangıç saati aynı kalır."
+  "study.length.hint": "Çalışmayı uzatmak ya da kısaltmak için sürükleyin. Başlangıç saati aynı kalır.",
+  "study.pill.label": "Ders",
+  "study.pill.roundTitle": "Ders · {time} saatine kadar yalnızca planındaki kanallar ve konular",
+  "study.pill.roundTitleNoTime": "Ders · ders bitene kadar yalnızca planındaki kanallar ve konular",
+  "study.pill.restTitle": "Ders · moladasın, {time} saatine kadar hiçbir şey görünmez",
+  "study.pill.restTitleNoTime": "Ders · moladasın, şu an hiçbir şey görünmez",
+  "study.pill.limitTitle": "Ders · bugünkü ders sınırı, {time} saatine kadar hiçbir şey görünmez",
+  "study.pill.limitTitleNoTime": "Ders · bugünkü ders sınırı, şu an hiçbir şey görünmez",
+  "study.coverage.privateTitle": "Gizli pencereler kapsanmıyor",
+  "study.coverage.privateBody": "FilterTube'a gizli pencerelerde izin verilmiyor, bu yüzden ders kuralları orada durur. Tarayıcının uzantı ayarlarında FilterTube için \"Gizli modda izin ver\"i aç.",
+  "study.coverage.familyPolicy": "Bir çocuğun cihazında tarayıcı politikası FilterTube'u yüklü tutabilir ve gizli pencereleri kapatabilir. Cihazı yöneten kişiye ExtensionSettings / IncognitoModeAvailability hakkında sor."
 }

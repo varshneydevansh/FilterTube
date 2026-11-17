@@ -3296,5 +3296,15 @@
   "study.handle.value": "{name}, {time}",
   "study.hoursMinutes": "{hours} jam {minutes} menit",
   "study.length.title": "Suwene sinau",
-  "study.length.hint": "Geret supaya sinau luwih suwe utawa luwih cekak. Wiwité tetep jam sing padha."
+  "study.length.hint": "Geret supaya sinau luwih suwe utawa luwih cekak. Wiwité tetep jam sing padha.",
+  "study.pill.label": "Sinau",
+  "study.pill.roundTitle": "Sinau · mung channel lan topik rencanamu nganti {time}",
+  "study.pill.roundTitleNoTime": "Sinau · mung channel lan topik rencanamu nganti sinau rampung",
+  "study.pill.restTitle": "Sinau · lagi ngaso, ora ana sing katon nganti {time}",
+  "study.pill.restTitleNoTime": "Sinau · lagi ngaso, saiki ora ana sing katon",
+  "study.pill.limitTitle": "Sinau · wates sinau dina iki, ora ana sing katon nganti {time}",
+  "study.pill.limitTitleNoTime": "Sinau · wates sinau dina iki, saiki ora ana sing katon",
+  "study.coverage.privateTitle": "Jendhela pribadi ora klebu",
+  "study.coverage.privateBody": "FilterTube ora diidini ing jendhela pribadi, mula aturan sinau mandheg ing kana. Uripna \"Idinaké ing mode pribadi\" kanggo FilterTube ing setelan ekstensi browser-mu.",
+  "study.coverage.familyPolicy": "Ing piranti bocah, kabijakan browser bisa njaga FilterTube tetep kapasang lan mateni jendhela pribadi. Takon ExtensionSettings / IncognitoModeAvailability marang sing ngurus piranti."
 }

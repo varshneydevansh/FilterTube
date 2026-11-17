@@ -3296,5 +3296,15 @@
   "study.handle.value": "{name}, {time}",
   "study.hoursMinutes": "{hours} ชม. {minutes} นาที",
   "study.length.title": "ระยะเวลาเรียน",
-  "study.length.hint": "ลากเพื่อเรียนนานขึ้นหรือสั้นลง เวลาเริ่มยังเหมือนเดิม"
+  "study.length.hint": "ลากเพื่อเรียนนานขึ้นหรือสั้นลง เวลาเริ่มยังเหมือนเดิม",
+  "study.pill.label": "เรียน",
+  "study.pill.roundTitle": "เรียน · เฉพาะช่องและหัวข้อในแผนของคุณจนถึง {time}",
+  "study.pill.roundTitleNoTime": "เรียน · เฉพาะช่องและหัวข้อในแผนของคุณจนกว่าจะเรียนเสร็จ",
+  "study.pill.restTitle": "เรียน · พักอยู่ ไม่มีอะไรแสดงจนถึง {time}",
+  "study.pill.restTitleNoTime": "เรียน · พักอยู่ ตอนนี้ไม่มีอะไรแสดง",
+  "study.pill.limitTitle": "เรียน · ครบเวลาเรียนของวันนี้ ไม่มีอะไรแสดงจนถึง {time}",
+  "study.pill.limitTitleNoTime": "เรียน · ครบเวลาเรียนของวันนี้ ตอนนี้ไม่มีอะไรแสดง",
+  "study.coverage.privateTitle": "หน้าต่างส่วนตัวไม่ครอบคลุม",
+  "study.coverage.privateBody": "FilterTube ไม่ได้รับอนุญาตในหน้าต่างส่วนตัว กฎการเรียนจึงหยุดที่นั่น เปิด \"อนุญาตในโหมดส่วนตัว\" ให้ FilterTube ในการตั้งค่าส่วนขยายของเบราว์เซอร์",
+  "study.coverage.familyPolicy": "ในอุปกรณ์ของเด็ก นโยบายเบราว์เซอร์ช่วยให้ FilterTube ติดตั้งอยู่และปิดหน้าต่างส่วนตัวได้ ถามผู้ดูแลอุปกรณ์เรื่อง ExtensionSettings / IncognitoModeAvailability"
 }

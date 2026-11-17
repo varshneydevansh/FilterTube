@@ -3298,5 +3298,15 @@
   "study.handle.value": "{name}, {time}",
   "study.hoursMinutes": "{hours} awa {minutes} min",
   "study.length.title": "Tsawon karatu",
-  "study.length.hint": "Ja don ƙara ko rage lokacin karatu. Yana farawa a lokaci ɗaya."
+  "study.length.hint": "Ja don ƙara ko rage lokacin karatu. Yana farawa a lokaci ɗaya.",
+  "study.pill.label": "Karatu",
+  "study.pill.roundTitle": "Karatu · tashoshi da batutuwan shirinka kawai har {time}",
+  "study.pill.roundTitleNoTime": "Karatu · tashoshi da batutuwan shirinka kawai har karatu ya ƙare",
+  "study.pill.restTitle": "Karatu · ana hutu, babu abin da zai bayyana har {time}",
+  "study.pill.restTitleNoTime": "Karatu · ana hutu, babu abin da zai bayyana yanzu",
+  "study.pill.limitTitle": "Karatu · iyakar karatun yau, babu abin da zai bayyana har {time}",
+  "study.pill.limitTitleNoTime": "Karatu · iyakar karatun yau, babu abin da zai bayyana yanzu",
+  "study.coverage.privateTitle": "Tagogin sirri ba su cikin wannan",
+  "study.coverage.privateBody": "Ba a yarda FilterTube ya yi aiki a tagogin sirri ba, don haka dokokin karatu suna tsayawa a can. Kunna \"Ba da izini a sirri\" don FilterTube a saitunan ƙari na burauzarka.",
+  "study.coverage.familyPolicy": "A na'urar yaro, manufar burauza na iya ajiye FilterTube a sanye kuma ta kashe tagogin sirri. Tambayi wanda ke kula da na'urar game da ExtensionSettings / IncognitoModeAvailability."
 }

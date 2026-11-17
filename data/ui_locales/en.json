@@ -3298,5 +3298,15 @@
   "study.handle.value": "{name}, {time}",
   "study.hoursMinutes": "{hours} h {minutes} min",
   "study.length.title": "Study length",
-  "study.length.hint": "Drag to make study longer or shorter. It starts at the same time."
+  "study.length.hint": "Drag to make study longer or shorter. It starts at the same time.",
+  "study.pill.label": "Study",
+  "study.pill.roundTitle": "Study · only your plan's channels and topics until {time}",
+  "study.pill.roundTitleNoTime": "Study · only your plan's channels and topics until study ends",
+  "study.pill.restTitle": "Study · on a break, nothing shows until {time}",
+  "study.pill.restTitleNoTime": "Study · on a break, nothing shows for now",
+  "study.pill.limitTitle": "Study · today's study limit, nothing shows until {time}",
+  "study.pill.limitTitleNoTime": "Study · today's study limit, nothing shows for now",
+  "study.coverage.privateTitle": "Private windows aren't covered",
+  "study.coverage.privateBody": "FilterTube isn't allowed in private windows, so study rules stop there. Turn on \"Allow in private\" for FilterTube in your browser's extension settings.",
+  "study.coverage.familyPolicy": "On a child's device, a browser policy can keep FilterTube installed and turn private windows off. Ask whoever manages the device about ExtensionSettings and IncognitoModeAvailability."
 }

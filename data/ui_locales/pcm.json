@@ -3298,5 +3298,15 @@
   "study.handle.value": "{name}, {time}",
   "study.hoursMinutes": "{hours} h {minutes} min",
   "study.length.title": "How long you go study",
-  "study.length.hint": "Drag am make study long or short. E go still start for di same time."
+  "study.length.hint": "Drag am make study long or short. E go still start for di same time.",
+  "study.pill.label": "Study",
+  "study.pill.roundTitle": "Study · na only your plan channels and topics till {time}",
+  "study.pill.roundTitleNoTime": "Study · na only your plan channels and topics till study finish",
+  "study.pill.restTitle": "Study · you dey break, nothing go show till {time}",
+  "study.pill.restTitleNoTime": "Study · you dey break, nothing go show for now",
+  "study.pill.limitTitle": "Study · today study limit, nothing go show till {time}",
+  "study.pill.limitTitleNoTime": "Study · today study limit, nothing go show for now",
+  "study.coverage.privateTitle": "Private windows no dey covered",
+  "study.coverage.privateBody": "FilterTube no get permission for private windows, so study rules stop for there. Turn on \"Allow in private\" for FilterTube for your browser extension settings.",
+  "study.coverage.familyPolicy": "For pikin device, browser policy fit keep FilterTube installed and off private windows. Ask the person wey dey manage the device about ExtensionSettings / IncognitoModeAvailability."
 }

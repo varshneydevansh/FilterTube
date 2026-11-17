@@ -471,6 +471,40 @@
         try { actions.lastChild.focus(); } catch (e) { }
     }
 
+    /**
+     * A refusal from the background (FilterTube_StudyLooseningRefused, or a reply with error
+     * 'study_loosening'): {sheet: 'gentle'|'locked'|'parent', endsAt, parentName, lockMode}. Shows the
+     * app's loosening sheet over whichever page made the change (Android StudyLooseningSheet.post),
+     * once per burst of refused saves.
+     */
+    let lastLooseningAt = 0;
+    function showLooseningNotice(notice, host) {
+        const value = object(notice);
+        const errors = { gentle: 'study_running', locked: 'locked', parent: 'set_by_parent' };
+        const error = errors[value.sheet];
+        if (!error) return false;
+        const at = Date.now();
+        if (at - lastLooseningAt < 1500) return true;
+        lastLooseningAt = at;
+        const state = { state: 'STUDY', sessionEnd: Number(value.endsAt) || null, lockMode: value.lockMode || null,
+            setByParentId: value.sheet === 'parent' ? 'parent' : null, endPolicy: { canEnd: value.sheet === 'gentle' } };
+        const sheet = looseningSheet(error, state, value.parentName);
+        if (!sheet) return false;
+        const doc = root.document;
+        let holder = host || null;
+        if (!holder && doc?.body) {
+            holder = doc.querySelector('.ft-study-loosen-float');
+            if (!holder) {
+                holder = doc.createElement('div');
+                holder.className = 'ft-study-loosen-float';
+                doc.body.appendChild(holder);
+            }
+        }
+        if (!holder) return false;
+        showLoosening(holder, sheet);
+        return true;
+    }
+
     /** A short message with an optional Undo: the app's paper toast with its brick drain (PaperKit). */
     function notify(host, message, undo) {
         const kit = root.UIComponents;
@@ -2711,6 +2745,15 @@
             }
         }
         for (const part of [linksCard(data, local), preferencesCard(data, local), familyCard(data, local)]) if (part) view.appendChild(part);
+        // What an extension can't cover (review 4.4): said plainly, never enforced from here.
+        if (state.incognitoAllowed === false && (state.study || running(state))) {
+            const note = el('section', 'ft-home-card ft-study-coverage');
+            note.setAttribute('role', 'note');
+            note.append(el('strong', '', t('study.coverage.privateTitle', 'Private windows aren\'t covered')),
+                el('p', 'ft-study-muted', t('study.coverage.privateBody', 'FilterTube isn\'t allowed in private windows, so study rules stop there. Turn on "Allow in private" for FilterTube in your browser\'s extension settings.')),
+                el('p', 'ft-study-muted', t('study.coverage.familyPolicy', 'On a child\'s device, a browser policy can keep FilterTube installed and turn private windows off. Ask whoever manages the device about ExtensionSettings and IncognitoModeAvailability.')));
+            view.appendChild(note);
+        }
         replaceKeepingFocus(host, view);
     }
     /**
@@ -3147,8 +3190,16 @@
 
     root.FilterTubeStudyUi = Object.freeze({
         t, phaseInfo, planSegments, segmentWords, setByLabel, packLabel, renderStrip, mountStrip,
-        renderPlanPage, renderDashboard, mountDashboard, mountLengthSlider, lengthLabel, dayRing, ringState, heroLines, renderParentPlans, searchExplainerCard, askForTime, applyCountryAccent, openSetup
+        renderPlanPage, renderDashboard, mountDashboard, mountLengthSlider, showLooseningNotice, lengthLabel, dayRing, ringState, heroLines, renderParentPlans, searchExplainerCard, askForTime, applyCountryAccent, openSetup
     });
+
+    // Any page that loads this file shows the sheet when the background puts a loosening back.
+    try {
+        const runtimeApi = root.chrome?.runtime || root.browser?.runtime;
+        runtimeApi?.onMessage?.addListener?.(message => {
+            if (message?.action === 'FilterTube_StudyLooseningRefused') showLooseningNotice(message.notice);
+        });
+    } catch (e) { }
 
     // Popup: the strip takes the banner slot under the header. Options page: the study card.
     function autoMount() {

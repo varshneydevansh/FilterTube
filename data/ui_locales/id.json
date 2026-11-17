@@ -3296,5 +3296,15 @@
   "study.handle.value": "{name}, {time}",
   "study.hoursMinutes": "{hours} jam {minutes} mnt",
   "study.length.title": "Lama belajar",
-  "study.length.hint": "Geser untuk memperpanjang atau mempersingkat belajar. Waktu mulainya tetap."
+  "study.length.hint": "Geser untuk memperpanjang atau mempersingkat belajar. Waktu mulainya tetap.",
+  "study.pill.label": "Belajar",
+  "study.pill.roundTitle": "Belajar · hanya channel dan topik rencanamu sampai {time}",
+  "study.pill.roundTitleNoTime": "Belajar · hanya channel dan topik rencanamu sampai belajar selesai",
+  "study.pill.restTitle": "Belajar · sedang istirahat, tidak ada yang tampil sampai {time}",
+  "study.pill.restTitleNoTime": "Belajar · sedang istirahat, tidak ada yang tampil untuk saat ini",
+  "study.pill.limitTitle": "Belajar · batas belajar hari ini, tidak ada yang tampil sampai {time}",
+  "study.pill.limitTitleNoTime": "Belajar · batas belajar hari ini, tidak ada yang tampil untuk saat ini",
+  "study.coverage.privateTitle": "Jendela pribadi tidak tercakup",
+  "study.coverage.privateBody": "FilterTube tidak diizinkan di jendela pribadi, jadi aturan belajar berhenti di sana. Aktifkan \"Izinkan dalam mode pribadi\" untuk FilterTube di setelan ekstensi browser-mu.",
+  "study.coverage.familyPolicy": "Di perangkat anak, kebijakan browser bisa menjaga FilterTube tetap terpasang dan mematikan jendela pribadi. Tanyakan ExtensionSettings / IncognitoModeAvailability kepada pengelola perangkat."
 }

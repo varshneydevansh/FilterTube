@@ -3296,5 +3296,15 @@
   "study.handle.value": "{name}, {time}",
   "study.hoursMinutes": "{hours} wákàtí {minutes} ìṣẹ́jú",
   "study.length.title": "Gígùn ẹ̀kọ́",
-  "study.length.hint": "Fà á láti mú ẹ̀kọ́ gùn tàbí kúrú sí i. Ó ṣì ń bẹ̀rẹ̀ ní àkókò kan náà."
+  "study.length.hint": "Fà á láti mú ẹ̀kọ́ gùn tàbí kúrú sí i. Ó ṣì ń bẹ̀rẹ̀ ní àkókò kan náà.",
+  "study.pill.label": "Ẹ̀kọ́",
+  "study.pill.roundTitle": "Ẹ̀kọ́ · àwọn ikanni àti kókó ètò rẹ nìkan títí di {time}",
+  "study.pill.roundTitleNoTime": "Ẹ̀kọ́ · àwọn ikanni àti kókó ètò rẹ nìkan títí ẹ̀kọ́ yóò fi parí",
+  "study.pill.restTitle": "Ẹ̀kọ́ · o wà ní ìsinmi, kò sí ohun tí yóò hàn títí di {time}",
+  "study.pill.restTitleNoTime": "Ẹ̀kọ́ · o wà ní ìsinmi, kò sí ohun tí yóò hàn báyìí",
+  "study.pill.limitTitle": "Ẹ̀kọ́ · òpin ẹ̀kọ́ òní, kò sí ohun tí yóò hàn títí di {time}",
+  "study.pill.limitTitleNoTime": "Ẹ̀kọ́ · òpin ẹ̀kọ́ òní, kò sí ohun tí yóò hàn báyìí",
+  "study.coverage.privateTitle": "Àwọn fèrèsé àdáni kò sí nínú rẹ̀",
+  "study.coverage.privateBody": "A kò gba FilterTube láàyè nínú àwọn fèrèsé àdáni, nítorí náà àwọn òfin ẹ̀kọ́ dúró níbẹ̀. Tan \"Gbà láàyè ní àdáni\" fún FilterTube nínú ètò àwọn àfikún aṣàwákiri rẹ.",
+  "study.coverage.familyPolicy": "Lórí ẹ̀rọ ọmọdé, ìlànà aṣàwákiri lè jẹ́ kí FilterTube wà níbẹ̀ kí ó sì pa àwọn fèrèsé àdáni. Béèrè lọ́wọ́ ẹni tó ń ṣàkóso ẹ̀rọ náà nípa ExtensionSettings / IncognitoModeAvailability."
 }

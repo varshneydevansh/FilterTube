@@ -33142,6 +33142,69 @@ document.addEventListener('DOMContentLoaded', async () => {
         renderManagedChildEditorBanner();
     }
 
+    // The effective mode (js/shared/effective_mode.js): during study the header pill says "Study" in sage
+    // and opens the Study page; it changes back by itself when the session ends.
+    let tabStudyState = null;
+    let tabStudyLoad = null;
+    let tabStudyTimer = null;
+    let tabStudyAsked = false;
+    function refreshTabStudyState() {
+        tabStudyAsked = true;
+        if (tabStudyLoad) return tabStudyLoad;
+        tabStudyLoad = (async () => {
+            try {
+                const resp = await sendRuntimeMessage({ action: 'FilterTube_StudyGetState' });
+                tabStudyState = resp && resp.ok !== false ? resp : null;
+            } catch (e) {
+                tabStudyState = null;
+            }
+            tabStudyLoad = null;
+            renderListModeControls();
+            if (tabStudyTimer) clearTimeout(tabStudyTimer);
+            const at = [tabStudyState?.until, tabStudyState?.next?.at].map(Number).filter(value => Number.isFinite(value) && value > Date.now());
+            if (at.length) tabStudyTimer = setTimeout(refreshTabStudyState, Math.min(Math.min(...at) - Date.now() + 500, 10 * 60 * 1000));
+        })();
+        return tabStudyLoad;
+    }
+    try {
+        const storageApi = (typeof chrome !== 'undefined' && chrome.storage) || (typeof browser !== 'undefined' && browser.storage);
+        storageApi?.onChanged?.addListener?.((changes, area) => {
+            if (area === 'local' && (changes.ftStudyRuntimeV1 || changes.ftProfilesV4)) refreshTabStudyState();
+        });
+    } catch (e) {
+    }
+
+    function renderStudyModePill(container, effective) {
+        const text = window.FilterTubeEffectiveMode?.effectiveModeText?.(effective, (key, fallback, values) => tabViewUiText(key, fallback, values),
+            at => new Date(at).toLocaleTimeString([], { hour: 'numeric', minute: '2-digit' }));
+        if (!text) return false;
+        const pill = document.createElement('div');
+        pill.className = 'exact-toggle active ft-list-mode-pill ft-list-mode-pill--study';
+        pill.dataset.effectiveMode = 'study';
+        const icon = document.createElement('span');
+        icon.className = 'ft-list-mode-pill__icon';
+        icon.setAttribute('aria-hidden', 'true');
+        icon.innerHTML = '<svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="13" r="8"/><path d="M12 9v4l2 2M9 2h6"/></svg>';
+        const label = document.createElement('span');
+        label.textContent = text.label;
+        pill.append(icon, label);
+        pill.title = text.title;
+        pill.setAttribute('aria-label', text.title);
+        pill.setAttribute('role', 'link');
+        pill.setAttribute('tabindex', '0');
+        const open = () => {
+            const row = document.querySelector('.nav-item[data-tab="study"]');
+            if (row) row.click();
+            else window.location.hash = '#study';
+        };
+        pill.addEventListener('click', open);
+        pill.addEventListener('keydown', event => {
+            if (event.key === 'Enter' || event.key === ' ') { event.preventDefault(); open(); }
+        });
+        container.appendChild(pill);
+        return true;
+    }
+
     function renderListModeControls() {
         const state = StateManager.getState();
         if (!ftTopBarListModeControlsTab) return;
@@ -33160,6 +33223,9 @@ document.addEventListener('DOMContentLoaded', async () => {
         })();
 
         ftTopBarListModeControlsTab.innerHTML = '';
+        if (!tabStudyAsked) refreshTabStudyState();
+        const studyEffective = window.FilterTubeEffectiveMode?.effectiveModeFor?.(currentMode, tabStudyState, Date.now());
+        if (studyEffective?.mode === 'study' && renderStudyModePill(ftTopBarListModeControlsTab, studyEffective)) return;
 
         const toggle = document.createElement('div');
         toggle.className = [
@@ -33264,6 +33330,11 @@ document.addEventListener('DOMContentLoaded', async () => {
                 }
 
                 if (!resp || resp.ok !== true) {
+                    // During study the list mode is the plan's: the app's loosening sheet says why.
+                    if (resp?.error === 'study_loosening' && window.FilterTubeStudyUi?.showLooseningNotice?.(resp.notice)) {
+                        renderListModeControls();
+                        return;
+                    }
                     UIComponents.showToast(tabViewUiText('popup.listMode.updateFailed', 'Failed to update list mode'), 'error');
                     renderListModeControls();
                     return;

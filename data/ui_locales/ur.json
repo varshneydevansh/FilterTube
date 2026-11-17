@@ -3298,5 +3298,15 @@
   "study.handle.value": "{name}، {time}",
   "study.hoursMinutes": "{hours} گھنٹے {minutes} منٹ",
   "study.length.title": "پڑھائی کا دورانیہ",
-  "study.length.hint": "پڑھائی لمبی یا چھوٹی کرنے کے لیے کھینچیں۔ شروع ہونے کا وقت وہی رہتا ہے۔"
+  "study.length.hint": "پڑھائی لمبی یا چھوٹی کرنے کے لیے کھینچیں۔ شروع ہونے کا وقت وہی رہتا ہے۔",
+  "study.pill.label": "پڑھائی",
+  "study.pill.roundTitle": "پڑھائی · {time} تک صرف آپ کے منصوبے کے چینل اور موضوعات",
+  "study.pill.roundTitleNoTime": "پڑھائی · پڑھائی ختم ہونے تک صرف آپ کے منصوبے کے چینل اور موضوعات",
+  "study.pill.restTitle": "پڑھائی · وقفے پر، {time} تک کچھ نہیں دکھے گا",
+  "study.pill.restTitleNoTime": "پڑھائی · وقفے پر، ابھی کچھ نہیں دکھے گا",
+  "study.pill.limitTitle": "پڑھائی · آج کی پڑھائی کی حد، {time} تک کچھ نہیں دکھے گا",
+  "study.pill.limitTitleNoTime": "پڑھائی · آج کی پڑھائی کی حد، ابھی کچھ نہیں دکھے گا",
+  "study.coverage.privateTitle": "پرائیویٹ ونڈوز اس میں شامل نہیں",
+  "study.coverage.privateBody": "پرائیویٹ ونڈوز میں FilterTube کو اجازت نہیں، اس لیے پڑھائی کے اصول وہاں رک جاتے ہیں۔ اپنے براؤزر کی ایکسٹینشن سیٹنگز میں FilterTube کے لیے \"پرائیویٹ میں اجازت دیں\" آن کریں۔",
+  "study.coverage.familyPolicy": "بچے کے آلے پر براؤزر پالیسی FilterTube کو انسٹال رکھ سکتی ہے اور پرائیویٹ ونڈوز بند کر سکتی ہے۔ آلہ سنبھالنے والے سے ExtensionSettings / IncognitoModeAvailability کے بارے میں پوچھیں۔"
 }

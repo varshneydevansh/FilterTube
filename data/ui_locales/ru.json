@@ -3310,5 +3310,15 @@
   "study.handle.value": "{name}, {time}",
   "study.hoursMinutes": "{hours} ч {minutes} мин",
   "study.length.title": "Длительность учёбы",
-  "study.length.hint": "Перетащите, чтобы учиться дольше или меньше. Начало остаётся тем же."
+  "study.length.hint": "Перетащите, чтобы учиться дольше или меньше. Начало остаётся тем же.",
+  "study.pill.label": "Учёба",
+  "study.pill.roundTitle": "Учёба · только каналы и темы вашего плана до {time}",
+  "study.pill.roundTitleNoTime": "Учёба · только каналы и темы вашего плана до конца учёбы",
+  "study.pill.restTitle": "Учёба · перерыв, до {time} ничего не показывается",
+  "study.pill.restTitleNoTime": "Учёба · перерыв, сейчас ничего не показывается",
+  "study.pill.limitTitle": "Учёба · дневной лимит учёбы, до {time} ничего не показывается",
+  "study.pill.limitTitleNoTime": "Учёба · дневной лимит учёбы, сейчас ничего не показывается",
+  "study.coverage.privateTitle": "Приватные окна не охвачены",
+  "study.coverage.privateBody": "FilterTube не разрешён в приватных окнах, поэтому правила учёбы там не действуют. Включите «Разрешить в приватном режиме» для FilterTube в настройках расширений браузера.",
+  "study.coverage.familyPolicy": "На устройстве ребёнка политика браузера может не давать удалить FilterTube и отключить приватные окна. Спросите того, кто управляет устройством, про ExtensionSettings / IncognitoModeAvailability."
 }

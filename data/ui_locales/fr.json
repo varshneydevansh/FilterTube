@@ -3298,5 +3298,15 @@
   "study.handle.value": "{name}, {time}",
   "study.hoursMinutes": "{hours} h {minutes} min",
   "study.length.title": "Durée d’étude",
-  "study.length.hint": "Faites glisser pour allonger ou raccourcir l’étude. Elle commence à la même heure."
+  "study.length.hint": "Faites glisser pour allonger ou raccourcir l’étude. Elle commence à la même heure.",
+  "study.pill.label": "Études",
+  "study.pill.roundTitle": "Études · uniquement les chaînes et sujets de votre plan jusqu'à {time}",
+  "study.pill.roundTitleNoTime": "Études · uniquement les chaînes et sujets de votre plan jusqu'à la fin de l'étude",
+  "study.pill.restTitle": "Études · en pause, rien ne s'affiche avant {time}",
+  "study.pill.restTitleNoTime": "Études · en pause, rien ne s'affiche pour l'instant",
+  "study.pill.limitTitle": "Études · limite d'étude du jour, rien ne s'affiche avant {time}",
+  "study.pill.limitTitleNoTime": "Études · limite d'étude du jour, rien ne s'affiche pour l'instant",
+  "study.coverage.privateTitle": "Les fenêtres privées ne sont pas couvertes",
+  "study.coverage.privateBody": "FilterTube n'est pas autorisé dans les fenêtres privées, les règles d'étude s'y arrêtent. Activez « Autoriser en navigation privée » pour FilterTube dans les paramètres des extensions de votre navigateur.",
+  "study.coverage.familyPolicy": "Sur l'appareil d'un enfant, une stratégie du navigateur peut garder FilterTube installé et désactiver les fenêtres privées. Demandez à la personne qui gère l'appareil pour ExtensionSettings / IncognitoModeAvailability."
 }

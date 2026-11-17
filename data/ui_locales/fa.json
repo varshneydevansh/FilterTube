@@ -3298,5 +3298,15 @@
   "study.handle.value": "{name}، {time}",
   "study.hoursMinutes": "{hours} ساعت و {minutes} دقیقه",
   "study.length.title": "مدت مطالعه",
-  "study.length.hint": "بکشید تا مطالعه بیشتر یا کمتر شود. زمان شروع همان می‌ماند."
+  "study.length.hint": "بکشید تا مطالعه بیشتر یا کمتر شود. زمان شروع همان می‌ماند.",
+  "study.pill.label": "مطالعه",
+  "study.pill.roundTitle": "مطالعه · فقط کانال‌ها و موضوع‌های برنامه‌تان تا {time}",
+  "study.pill.roundTitleNoTime": "مطالعه · فقط کانال‌ها و موضوع‌های برنامه‌تان تا پایان مطالعه",
+  "study.pill.restTitle": "مطالعه · در استراحت، تا {time} چیزی نشان داده نمی‌شود",
+  "study.pill.restTitleNoTime": "مطالعه · در استراحت، فعلاً چیزی نشان داده نمی‌شود",
+  "study.pill.limitTitle": "مطالعه · سقف مطالعهٔ امروز، تا {time} چیزی نشان داده نمی‌شود",
+  "study.pill.limitTitleNoTime": "مطالعه · سقف مطالعهٔ امروز، فعلاً چیزی نشان داده نمی‌شود",
+  "study.coverage.privateTitle": "پنجره‌های خصوصی پوشش داده نمی‌شوند",
+  "study.coverage.privateBody": "FilterTube در پنجره‌های خصوصی اجازه ندارد، پس قوانین مطالعه آنجا متوقف می‌شوند. در تنظیمات افزونه‌های مرورگر، «اجازه در حالت خصوصی» را برای FilterTube روشن کنید.",
+  "study.coverage.familyPolicy": "روی دستگاه کودک، سیاست مرورگر می‌تواند FilterTube را نصب نگه دارد و پنجره‌های خصوصی را خاموش کند. از کسی که دستگاه را مدیریت می‌کند دربارهٔ ExtensionSettings / IncognitoModeAvailability بپرسید."
 }

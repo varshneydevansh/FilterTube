@@ -1271,6 +1271,10 @@ const StateManager = (() => {
                 
                 return { success: true, channel: response.channel };
             } else {
+                // Study holds the rules: the app's loosening sheet says why (study_ui.js).
+                if (response?.error === 'study_loosening') {
+                    try { globalThis.FilterTubeStudyUi?.showLooseningNotice?.(response.notice); } catch (e) { }
+                }
                 return { success: false, error: response?.error || 'Failed to add Kids channel' };
             }
         } catch (e) {
@@ -2287,6 +2291,9 @@ const StateManager = (() => {
             });
 
             if (!response || response.success !== true) {
+                if (response?.error === 'study_loosening') {
+                    try { globalThis.FilterTubeStudyUi?.showLooseningNotice?.(response.notice); } catch (e) { }
+                }
                 return {
                     success: false,
                     error: response?.error || 'Failed to save imported subscriptions',

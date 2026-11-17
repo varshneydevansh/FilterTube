@@ -382,6 +382,8 @@ async function setListModeFixture(profileType, copyBlocklist, { locked = false }
     sessionPinCache: new Map(), request: { mode: 'whitelist', profileType, copyBlocklist }, sender: {},
     sendResponse: resolveResponse, isTrustedUiSender: () => true,
     getActiveSelfControlSession: async () => null,
+    // No study holds the profile here (study-rule-loosening.test.mjs covers the refusal).
+    studyLooseningRefusal: async () => null,
     storageGet: async () => ({ ftProfilesV4: structuredClone(root) }),
     isValidProfilesV4: value => value?.schemaVersion === 4,
     compiledSettingsCache: { main: {}, kids: {} }, scheduleAutoBackupInBackground() {},

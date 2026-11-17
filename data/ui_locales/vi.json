@@ -3296,5 +3296,15 @@
   "study.handle.value": "{name}, {time}",
   "study.hoursMinutes": "{hours} giờ {minutes} phút",
   "study.length.title": "Thời lượng học",
-  "study.length.hint": "Kéo để học lâu hơn hoặc ngắn hơn. Giờ bắt đầu vẫn giữ nguyên."
+  "study.length.hint": "Kéo để học lâu hơn hoặc ngắn hơn. Giờ bắt đầu vẫn giữ nguyên.",
+  "study.pill.label": "Học tập",
+  "study.pill.roundTitle": "Học tập · chỉ kênh và chủ đề trong kế hoạch của bạn đến {time}",
+  "study.pill.roundTitleNoTime": "Học tập · chỉ kênh và chủ đề trong kế hoạch của bạn đến khi học xong",
+  "study.pill.restTitle": "Học tập · đang nghỉ, không hiện gì đến {time}",
+  "study.pill.restTitleNoTime": "Học tập · đang nghỉ, hiện chưa có gì",
+  "study.pill.limitTitle": "Học tập · giới hạn học hôm nay, không hiện gì đến {time}",
+  "study.pill.limitTitleNoTime": "Học tập · giới hạn học hôm nay, hiện chưa có gì",
+  "study.coverage.privateTitle": "Cửa sổ riêng tư không được áp dụng",
+  "study.coverage.privateBody": "FilterTube không được phép trong cửa sổ riêng tư nên quy tắc học dừng ở đó. Bật \"Cho phép ở chế độ riêng tư\" cho FilterTube trong cài đặt tiện ích của trình duyệt.",
+  "study.coverage.familyPolicy": "Trên thiết bị của trẻ, chính sách trình duyệt có thể giữ FilterTube luôn được cài và tắt cửa sổ riêng tư. Hãy hỏi người quản lý thiết bị về ExtensionSettings / IncognitoModeAvailability."
 }

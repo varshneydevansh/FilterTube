@@ -3298,5 +3298,15 @@
   "study.handle.value": "{name}, {time}",
   "study.hoursMinutes": "{hours} घं {minutes} मिनट",
   "study.length.title": "पढ़ाई की अवधि",
-  "study.length.hint": "पढ़ाई लंबी या छोटी करने के लिए खींचें। शुरू होने का समय वही रहता है।"
+  "study.length.hint": "पढ़ाई लंबी या छोटी करने के लिए खींचें। शुरू होने का समय वही रहता है।",
+  "study.pill.label": "पढ़ाई",
+  "study.pill.roundTitle": "पढ़ाई · {time} तक सिर्फ़ आपकी योजना के चैनल और विषय",
+  "study.pill.roundTitleNoTime": "पढ़ाई · पढ़ाई खत्म होने तक सिर्फ़ आपकी योजना के चैनल और विषय",
+  "study.pill.restTitle": "पढ़ाई · ब्रेक पर, {time} तक कुछ नहीं दिखेगा",
+  "study.pill.restTitleNoTime": "पढ़ाई · ब्रेक पर, अभी कुछ नहीं दिखेगा",
+  "study.pill.limitTitle": "पढ़ाई · आज की पढ़ाई की सीमा, {time} तक कुछ नहीं दिखेगा",
+  "study.pill.limitTitleNoTime": "पढ़ाई · आज की पढ़ाई की सीमा, अभी कुछ नहीं दिखेगा",
+  "study.coverage.privateTitle": "प्राइवेट विंडो इसमें शामिल नहीं हैं",
+  "study.coverage.privateBody": "प्राइवेट विंडो में FilterTube को अनुमति नहीं है, इसलिए पढ़ाई के नियम वहाँ रुक जाते हैं। अपने ब्राउज़र की एक्सटेंशन सेटिंग में FilterTube के लिए \"प्राइवेट में अनुमति दें\" चालू करें।",
+  "study.coverage.familyPolicy": "बच्चे के डिवाइस पर ब्राउज़र नीति FilterTube को इंस्टॉल रख सकती है और प्राइवेट विंडो बंद कर सकती है। डिवाइस सँभालने वाले से ExtensionSettings / IncognitoModeAvailability के बारे में पूछें।"
 }

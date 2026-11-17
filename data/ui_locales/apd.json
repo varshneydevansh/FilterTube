@@ -3322,5 +3322,15 @@
   "study.handle.value": "{name}، {time}",
   "study.hoursMinutes": "{hours} س {minutes} د",
   "study.length.title": "مدة القراية",
-  "study.length.hint": "اسحب عشان تطوّل القراية أو تقصّرها. بتبدا في نفس الوقت."
+  "study.length.hint": "اسحب عشان تطوّل القراية أو تقصّرها. بتبدا في نفس الوقت.",
+  "study.pill.label": "القراية",
+  "study.pill.roundTitle": "القراية · قنوات ومواضيع خطتك بس لحدي {time}",
+  "study.pill.roundTitleNoTime": "القراية · قنوات ومواضيع خطتك بس لحدي ما القراية تخلص",
+  "study.pill.restTitle": "القراية · في استراحة، ما في حاجة بتظهر لحدي {time}",
+  "study.pill.restTitleNoTime": "القراية · في استراحة، ما في حاجة بتظهر هسي",
+  "study.pill.limitTitle": "القراية · حد قراية الليلة، ما في حاجة بتظهر لحدي {time}",
+  "study.pill.limitTitleNoTime": "القراية · حد قراية الليلة، ما في حاجة بتظهر هسي",
+  "study.coverage.privateTitle": "النوافذ الخاصة ما مشمولة",
+  "study.coverage.privateBody": "FilterTube ما مسموح في النوافذ الخاصة، فقواعد القراية بتقيف هناك. شغّل «السماح في الوضع الخاص» لـ FilterTube في إعدادات إضافات المتصفح.",
+  "study.coverage.familyPolicy": "في جهاز الطفل، سياسة المتصفح بتقدر تخلي FilterTube مثبت وتقفل النوافذ الخاصة. اسأل الزول البدير الجهاز عن ExtensionSettings / IncognitoModeAvailability."
 }

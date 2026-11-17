@@ -3296,5 +3296,15 @@
   "study.handle.value": "{name}, {time}",
   "study.hoursMinutes": "{hours}시간 {minutes}분",
   "study.length.title": "공부 시간",
-  "study.length.hint": "끌어서 공부 시간을 늘리거나 줄이세요. 시작 시간은 그대로예요."
+  "study.length.hint": "끌어서 공부 시간을 늘리거나 줄이세요. 시작 시간은 그대로예요.",
+  "study.pill.label": "공부",
+  "study.pill.roundTitle": "공부 · {time}까지 계획한 채널과 주제만",
+  "study.pill.roundTitleNoTime": "공부 · 공부가 끝날 때까지 계획한 채널과 주제만",
+  "study.pill.restTitle": "공부 · 쉬는 중, {time}까지 아무것도 보이지 않아요",
+  "study.pill.restTitleNoTime": "공부 · 쉬는 중, 지금은 아무것도 보이지 않아요",
+  "study.pill.limitTitle": "공부 · 오늘 공부 한도, {time}까지 아무것도 보이지 않아요",
+  "study.pill.limitTitleNoTime": "공부 · 오늘 공부 한도, 지금은 아무것도 보이지 않아요",
+  "study.coverage.privateTitle": "비공개 창은 적용되지 않아요",
+  "study.coverage.privateBody": "FilterTube는 비공개 창에서 허용되지 않아 공부 규칙이 그곳에서는 멈춰요. 브라우저의 확장 프로그램 설정에서 FilterTube의 '비공개 모드에서 허용'을 켜세요.",
+  "study.coverage.familyPolicy": "아이 기기에서는 브라우저 정책으로 FilterTube를 설치된 상태로 두고 비공개 창을 끌 수 있어요. 기기를 관리하는 사람에게 ExtensionSettings / IncognitoModeAvailability에 대해 물어보세요."
 }

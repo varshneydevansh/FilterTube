@@ -3296,5 +3296,15 @@
   "study.handle.value": "{name}，{time}",
   "study.hoursMinutes": "{hours} 小时 {minutes} 分钟",
   "study.length.title": "学习时长",
-  "study.length.hint": "拖动可延长或缩短学习时间。开始时间不变。"
+  "study.length.hint": "拖动可延长或缩短学习时间。开始时间不变。",
+  "study.pill.label": "学习",
+  "study.pill.roundTitle": "学习 · 到 {time} 只显示你计划中的频道和主题",
+  "study.pill.roundTitleNoTime": "学习 · 学习结束前只显示你计划中的频道和主题",
+  "study.pill.restTitle": "学习 · 休息中，{time} 前不显示任何内容",
+  "study.pill.restTitleNoTime": "学习 · 休息中，暂时不显示任何内容",
+  "study.pill.limitTitle": "学习 · 今天的学习上限，{time} 前不显示任何内容",
+  "study.pill.limitTitleNoTime": "学习 · 今天的学习上限，暂时不显示任何内容",
+  "study.coverage.privateTitle": "无痕窗口不在范围内",
+  "study.coverage.privateBody": "FilterTube 未获准在无痕窗口中运行，所以学习规则在那里不起作用。请在浏览器的扩展程序设置中为 FilterTube 打开“在无痕模式下启用”。",
+  "study.coverage.familyPolicy": "在孩子的设备上，浏览器策略可以让 FilterTube 保持安装并关闭无痕窗口。请向管理设备的人询问 ExtensionSettings / IncognitoModeAvailability。"
 }

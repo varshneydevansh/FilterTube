@@ -449,12 +449,76 @@
             return { ok: true };
         }
 
+        /**
+         * Does study hold this profile's rules now, and with which sheet (Android StudyLoosening.sheet)?
+         * {sheet: 'parent'|'locked'|'gentle', endsAt, parentId, lockMode} or null.
+         */
+        function holdFrom({ study, local, clock, parentLock }, activeProfileId) {
+            if (!study) return null;
+            const running = clock.state === Engine.STUDY || clock.state === Engine.BREAK || clock.clockHold === true;
+            const lock = object(study.lock);
+            const parentLockActive = !!parentLock?.active && Model.isParentLock?.(lock);
+            const parentId = text(clock.setByParentId) || (parentLockActive ? text(lock.setByParentId) : '') || null;
+            const parentHolds = !!parentId && (running || parentLockActive);
+            const lockMode = local.session && running ? text(local.session.lockMode) || 'gentle'
+                : (!Model.isParentLock?.(lock) && text(lock.mode)) || null;
+            const sheet = Model.looseningSheetKind({ parentHolds, activeIsSetter: !!parentId && activeProfileId === parentId, lockMode, running });
+            if (!sheet) return null;
+            const endsAt = [clock.sessionEnd, parentLockActive ? Number(lock.endsAt) : null, Number(local.session?.endsAt)]
+                .find(value => Number.isFinite(value) && value > 0) || null;
+            return { sheet, endsAt, parentId: parentId || null, lockMode };
+        }
+
+        /** The rules each held profile had when study took hold (worker memory; the store is reverted too). */
+        const heldRules = new Map();
+
+        /**
+         * A save that would loosen a held profile (Android StudyLooseningSheet.noticeFor): the first held
+         * profile that loosens decides. {sheet, profileId, endsAt, parentId, parentName, lockMode} or null.
+         */
+        async function looseningNotice(current, next) {
+            if (!Model.ruleLoosens) return null;
+            const before = object(object(current).profiles);
+            const after = object(object(next).profiles);
+            const activeId = text(object(current).activeProfileId) || text(object(next).activeProfileId);
+            const runtime = normalizeRuntime((await storageGet([RUNTIME_KEY]))[RUNTIME_KEY]);
+            const at = now();
+            for (const [profileId, profile] of Object.entries(after)) {
+                const old = before[profileId];
+                if (!isObject(old) || !Model.profileStudy(old)) continue;
+                if (!Model.ruleLoosens(old, profile)) continue;
+                const hold = holdFrom(clockFor(old, runtime, profileId, at), activeId);
+                if (!hold) continue;
+                const parent = hold.parentId ? object(before[hold.parentId]) : {};
+                return { ...hold, profileId, parentName: text(parent.name) || null };
+            }
+            return null;
+        }
+
+        /** The active profile's hold, for handlers that would only loosen it (allow-list imports, mode switch). */
+        async function activeHold() {
+            const { profileId, profile, profiles, runtime } = await readAll();
+            const hold = holdFrom(clockFor(profile, runtime, profileId, now()), profileId);
+            if (!hold) return null;
+            const parent = hold.parentId ? object(object(object(profiles).profiles)[hold.parentId]) : {};
+            return { ...hold, profileId, parentName: text(parent.name) || null };
+        }
+
         function apply(profileId, profile, prepared, options = {}) {
             const at = prepared?.now ?? now();
-            const { study, local, clock } = clockFor(profile, prepared?.runtime || emptyRuntime(), profileId, at,
+            const read = clockFor(profile, prepared?.runtime || emptyRuntime(), profileId, at,
                 { ...options, reading: prepared?.reading, clockStore: prepared?.clockStore });
-            if (!study) return { profile, applied: false, state: null };
-            const result = Engine.studyEffectiveProfile(profile, { catalog: prepared?.catalog, clock, study });
+            const { study, local, clock } = read;
+            if (!study) { heldRules.delete(profileId); return { profile, applied: false, state: null }; }
+            // While study holds the profile, compile from the rules it had then plus stricter changes only,
+            // so a loosening write never compiles in the moment before it is put back.
+            let rulesProfile = profile;
+            if (Model.ruleLoosens && holdFrom(read, profileId)) {
+                const held = heldRules.get(profileId);
+                if (held && Model.ruleLoosens(held, profile)) rulesProfile = Model.withHeldRules(profile, held);
+                else heldRules.set(profileId, Model.ruleSnapshot(profile));
+            } else heldRules.delete(profileId);
+            const result = Engine.studyEffectiveProfile(rulesProfile, { catalog: prepared?.catalog, clock, study });
             return { profile: result.profile, applied: result.applied,
                 state: { ...publicState(study, local, clock, result.packIds, at, result), upNext: upNextFor(prepared?.runtime, profileId, clock) } };
         }
@@ -541,6 +605,20 @@
             return { ok: true };
         }
 
+        /** Whether the browser lets FilterTube run in private windows (true, false, or null when unknown). */
+        function incognitoAllowed() {
+            const ext = api?.extension;
+            if (typeof ext?.isAllowedIncognitoAccess !== 'function') return Promise.resolve(null);
+            return new Promise(resolve => {
+                try {
+                    const maybe = ext.isAllowedIncognitoAccess(value => resolve(typeof value === 'boolean' ? value : null));
+                    if (maybe && typeof maybe.then === 'function') maybe.then(value => resolve(typeof value === 'boolean' ? value : null), () => resolve(null));
+                } catch (e) {
+                    resolve(null);
+                }
+            });
+        }
+
         /** The UI state for the active profile. */
         async function getState() {
             const guard = await readClock();
@@ -573,6 +651,8 @@
                 week: Engine.weekProgress(progress, at, study?.focus?.dailyGoalMinutes || 0),
                 weekView: study ? Model.weekViewEnabled(study, profile.type) : false,
                 isChild: text(profile.type) === 'child',
+                // Private windows run without FilterTube unless the browser allows it: the Study page says so.
+                incognitoAllowed: await incognitoAllowed(),
                 // "How search works while studying", worked out here where the pack catalog is loaded.
                 searchHow: study && Engine.searchExplainer ? Engine.searchExplainer(study, catalog) : null
             };
@@ -654,6 +734,10 @@
             const { profileId, profile, runtime } = await readAll();
             const study = Model.profileStudy(profile);
             if (!study || !study.activePackIds.length) return { ok: false, error: 'no_active_pack' };
+            // Android StudyRuntime.startGentle: a child, or a profile under a parent's plan or lock, waits for the parent.
+            if (text(profile.type) === 'child' || text(object(study.plan).setByParentId) || Model.isParentLock?.(study.lock)) {
+                return { ok: false, error: 'set_by_parent' };
+            }
             const { clock } = clockFor(profile, runtime, profileId);
             if (clock.studying) return { ok: false, error: 'already_studying' };
             if (await deps.getSelfControlSession?.()) return { ok: false, error: 'session_already_active' };
@@ -674,7 +758,7 @@
             }
             await schedule();
             await deps.onTransition?.('start');
-            return { ok: true, sessionId, startedAt, endsAt, lock: mode };
+            return { ok: true, sessionId, startedAt, endsAt, lock: mode, incognitoAllowed: await incognitoAllowed() };
         }
 
         /** Gentle: the session ends after a 30-second pause, unless cancelled. Locked: refused. */
@@ -987,7 +1071,7 @@
 
         return Object.freeze({
             ALARM, RUNTIME_KEY, prepare, apply, getState, schedule, onAlarm, startSession, requestEnd, cancelEnd, endGentleThenSwitch,
-            skipBreak, undoSkipBreak, skipVideo, skippedVideos, tick, update, foldProgress, handleMessage, deviceId, getChildState, updateChild, startParentLock, endParentLock,
+            skipBreak, undoSkipBreak, skipVideo, looseningNotice, activeHold, skippedVideos, tick, update, foldProgress, handleMessage, deviceId, getChildState, updateChild, startParentLock, endParentLock,
             switchDecision, addGrant, reportFor, acknowledgeSessionEnd, lockClockNow
         });
     }

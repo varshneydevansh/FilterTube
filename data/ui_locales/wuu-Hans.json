@@ -3296,5 +3296,15 @@
   "study.handle.value": "{name}，{time}",
   "study.hoursMinutes": "{hours} 小时 {minutes} 分钟",
   "study.length.title": "读书辰光",
-  "study.length.hint": "拖一拖就好读长一点或者短一点。开始辰光勿变。"
+  "study.length.hint": "拖一拖就好读长一点或者短一点。开始辰光勿变。",
+  "study.pill.label": "学习",
+  "study.pill.roundTitle": "学习 · 到 {time} 只有侬计划里个频道搭主题",
+  "study.pill.roundTitleNoTime": "学习 · 到学习结束只有侬计划里个频道搭主题",
+  "study.pill.restTitle": "学习 · 辣海休息，到 {time} 啥也勿显示",
+  "study.pill.restTitleNoTime": "学习 · 辣海休息，现在啥也勿显示",
+  "study.pill.limitTitle": "学习 · 今朝个学习上限，到 {time} 啥也勿显示",
+  "study.pill.limitTitleNoTime": "学习 · 今朝个学习上限，现在啥也勿显示",
+  "study.coverage.privateTitle": "无痕窗口勿包括辣里",
+  "study.coverage.privateBody": "FilterTube 勿允许辣无痕窗口里运行，所以学习规则到搿搭就停脱了。到浏览器个扩展设置里，帮 FilterTube 开开“允许辣无痕模式下运行”。",
+  "study.coverage.familyPolicy": "辣小囡个设备高头，浏览器策略可以让 FilterTube 一直装辣海，再关脱无痕窗口。问问管设备个人 ExtensionSettings / IncognitoModeAvailability。"
 }

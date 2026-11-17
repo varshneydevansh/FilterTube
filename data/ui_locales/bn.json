@@ -3298,5 +3298,15 @@
   "study.handle.value": "{name}, {time}",
   "study.hoursMinutes": "{hours} ঘণ্টা {minutes} মিনিট",
   "study.length.title": "পড়ার সময়কাল",
-  "study.length.hint": "পড়া বাড়াতে বা কমাতে টেনে আনুন। শুরুর সময় একই থাকে।"
+  "study.length.hint": "পড়া বাড়াতে বা কমাতে টেনে আনুন। শুরুর সময় একই থাকে।",
+  "study.pill.label": "পড়াশোনা",
+  "study.pill.roundTitle": "পড়াশোনা · {time} পর্যন্ত শুধু আপনার পরিকল্পনার চ্যানেল ও বিষয়",
+  "study.pill.roundTitleNoTime": "পড়াশোনা · পড়া শেষ হওয়া পর্যন্ত শুধু আপনার পরিকল্পনার চ্যানেল ও বিষয়",
+  "study.pill.restTitle": "পড়াশোনা · বিরতিতে, {time} পর্যন্ত কিছুই দেখাবে না",
+  "study.pill.restTitleNoTime": "পড়াশোনা · বিরতিতে, এখন কিছুই দেখাবে না",
+  "study.pill.limitTitle": "পড়াশোনা · আজকের পড়ার সীমা, {time} পর্যন্ত কিছুই দেখাবে না",
+  "study.pill.limitTitleNoTime": "পড়াশোনা · আজকের পড়ার সীমা, এখন কিছুই দেখাবে না",
+  "study.coverage.privateTitle": "প্রাইভেট উইন্ডো এর আওতায় নেই",
+  "study.coverage.privateBody": "প্রাইভেট উইন্ডোতে FilterTube চালানোর অনুমতি নেই, তাই সেখানে পড়ার নিয়ম থেমে যায়। ব্রাউজারের এক্সটেনশন সেটিংসে FilterTube-এর জন্য \"প্রাইভেটে অনুমতি দিন\" চালু করুন।",
+  "study.coverage.familyPolicy": "শিশুর ডিভাইসে ব্রাউজার নীতি FilterTube ইনস্টল রাখতে ও প্রাইভেট উইন্ডো বন্ধ করতে পারে। ডিভাইস যিনি দেখেন তাঁকে ExtensionSettings / IncognitoModeAvailability নিয়ে জিজ্ঞেস করুন।"
 }

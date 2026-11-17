@@ -488,12 +488,104 @@
         return { ...normalizeStudy(value), lock: null };
     }
 
+    // ---- Loosening while study holds a profile (Android StudyRuleLoosening, StudyLoosening.sheet) ----------
+
+    /** A rule row's identity: UC id, else handle, else name (Android StudyRuleLoosening.channelKeys). */
+    function ruleChannelKeys(rows) {
+        const keys = new Set();
+        for (const row of array(rows)) {
+            if (isObject(row) && row.managedListPaused === true) continue;
+            if (typeof row === 'string') { const key = channelKey(row); if (key) keys.add(key); continue; }
+            const ref = object(row);
+            const id = text(ref.channelId) || (CHANNEL_ID.test(text(ref.id)) ? text(ref.id) : '');
+            const handle = text(ref.handle || ref.canonicalHandle);
+            const name = text(ref.name);
+            if (id) keys.add(`id:${id}`);
+            else if (handle) keys.add(`h:${handle.replace(/^@/, '').toLowerCase()}`);
+            else if (name) keys.add(`n:${name.toLowerCase()}`);
+        }
+        return keys;
+    }
+
+    function wordKeys(rows) {
+        return new Set(array(rows).map(row => topicKey(typeof row === 'string' ? row : object(row).word)).filter(Boolean));
+    }
+
+    function videoKeys(rows) {
+        return new Set(array(rows).map(row => text(typeof row === 'string' ? row : object(row).videoId || object(row).id)).filter(Boolean));
+    }
+
+    function covers(big, small) {
+        for (const key of small) if (!big.has(key)) return false;
+        return true;
+    }
+
+    /**
+     * Does going from `before` to `after` (two profiles) loosen the rules? A port of Android
+     * StudyRuleLoosening.loosens: the master switch off, Hide Shorts or Hide comments off, a blocked
+     * channel, word or video removed, an allowed channel or video added, on Main or on Kids. The owner
+     * adds: an allow list switched back to the block list. Stricter changes are never loosening.
+     */
+    function ruleLoosens(before, after) {
+        const b = object(before);
+        const a = object(after);
+        const s0 = object(b.settings);
+        const s1 = object(a.settings);
+        if (s0.enabled !== false && s1.enabled === false) return true;
+        if (s0.hideShorts === true && s1.hideShorts !== true) return true;
+        if (s0.hideComments === true && s1.hideComments !== true) return true;
+        if (s0.hideAllComments === true && s1.hideAllComments !== true) return true;
+        const m0 = object(b.main);
+        const m1 = object(a.main);
+        if (text(m0.mode) === 'whitelist' && text(m1.mode) !== 'whitelist') return true;
+        if (!covers(ruleChannelKeys(m1.channels), ruleChannelKeys(m0.channels))) return true;
+        if (!covers(wordKeys(m1.keywords), wordKeys(m0.keywords))) return true;
+        if (!covers(videoKeys(m1.blockedVideoIds || m1.videoIds), videoKeys(m0.blockedVideoIds || m0.videoIds))) return true;
+        if (!covers(ruleChannelKeys(m0.whitelistChannels), ruleChannelKeys(m1.whitelistChannels))) return true;
+        if (!covers(videoKeys(m0.allowedVideoIds), videoKeys(m1.allowedVideoIds))) return true;
+        const k0 = object(b.kids);
+        const k1 = object(a.kids);
+        if (text(k0.mode) === 'whitelist' && text(k1.mode) !== 'whitelist') return true;
+        if (!covers(ruleChannelKeys(k1.blockedChannels), ruleChannelKeys(k0.blockedChannels))) return true;
+        if (!covers(wordKeys(k1.blockedKeywords), wordKeys(k0.blockedKeywords))) return true;
+        if (!covers(ruleChannelKeys(k0.whitelistChannels), ruleChannelKeys(k1.whitelistChannels))) return true;
+        if (!covers(videoKeys(k0.videoIds), videoKeys(k1.videoIds))) return true;
+        return false;
+    }
+
+    /**
+     * Which sheet a refused loosening gets (Android StudyLoosening.sheet): 'parent' while a parent's plan
+     * or lock holds and the editor isn't that parent, 'locked' for a Locked session, 'gentle' while a
+     * Gentle session runs; null lets the change through.
+     */
+    function looseningSheetKind({ parentHolds = false, activeIsSetter = false, lockMode = null, running = false } = {}) {
+        if (parentHolds && !activeIsSetter) return 'parent';
+        if (parentHolds) return null;
+        if (lockMode === 'locked') return 'locked';
+        if (lockMode === 'gentle' && running) return 'gentle';
+        return null;
+    }
+
+    /** The rules a held profile keeps: its held settings, Main and Kids over the rest of `current`. */
+    function withHeldRules(current, held) {
+        const value = object(current);
+        const rules = object(held);
+        return { ...value, settings: clone(rules.settings), main: clone(rules.main), kids: clone(rules.kids) };
+    }
+
+    /** The rule parts of a profile, as held at a point in time. */
+    function ruleSnapshot(profile) {
+        const value = object(profile);
+        return { settings: clone(object(value.settings)), main: clone(object(value.main)), kids: clone(object(value.kids)) };
+    }
+
     return Object.freeze({
         VERSION, PROFILE_KEY, CAPABILITY, MANAGED_SCOPES, TAG_PREFIX, DEFAULT_FOCUS, FOCUS_LIMITS, DAYS,
         BREAK_REST, BREAK_NORMAL, SAVED_LIST_MODES,
         normalizeStudy, createStudy, weekViewEnabled, mergeStudy, mergeProgress, mergePackEdits, withoutLock,
         tightenAllowed, isParentLock, musicAllowed,
         channelKey, topicKey, isPackId, packIdOfTag, packIdsFromTags, profileStudy,
-        ruleLayers, withRuleLayering, validateForSync
+        ruleLayers, withRuleLayering, validateForSync,
+        ruleLoosens, looseningSheetKind, withHeldRules, ruleSnapshot
     });
 }));

@@ -3298,5 +3298,15 @@
   "study.handle.value": "{name}, {time}",
   "study.hoursMinutes": "{hours} घंटा {minutes} मिनट",
   "study.length.title": "पढ़ाई के समय",
-  "study.length.hint": "पढ़ाई लंबा भा छोट करे खातिर खींचीं। सुरू होखे के समय उहे रही।"
+  "study.length.hint": "पढ़ाई लंबा भा छोट करे खातिर खींचीं। सुरू होखे के समय उहे रही।",
+  "study.pill.label": "पढ़ाई",
+  "study.pill.roundTitle": "पढ़ाई · {time} ले खाली रउरा प्लान के चैनल आ टॉपिक",
+  "study.pill.roundTitleNoTime": "पढ़ाई · पढ़ाई खतम होखे ले खाली रउरा प्लान के चैनल आ टॉपिक",
+  "study.pill.restTitle": "पढ़ाई · ब्रेक पर, {time} ले कुछुओ ना देखाई",
+  "study.pill.restTitleNoTime": "पढ़ाई · ब्रेक पर, अभी कुछुओ ना देखाई",
+  "study.pill.limitTitle": "पढ़ाई · आज के पढ़ाई के सीमा, {time} ले कुछुओ ना देखाई",
+  "study.pill.limitTitleNoTime": "पढ़ाई · आज के पढ़ाई के सीमा, अभी कुछुओ ना देखाई",
+  "study.coverage.privateTitle": "प्राइवेट विंडो में ई लागू ना होला",
+  "study.coverage.privateBody": "FilterTube के प्राइवेट विंडो में अनुमति नइखे, एह से पढ़ाई के नियम उहाँ रुक जाला। ब्राउज़र के एक्सटेंशन सेटिंग में FilterTube खातिर \"प्राइवेट में अनुमति\" चालू करीं।",
+  "study.coverage.familyPolicy": "लइका के डिवाइस पर ब्राउज़र पॉलिसी FilterTube के इंस्टॉल रख सकेले आ प्राइवेट विंडो बंद कर सकेले। डिवाइस सँभारे वाला से ExtensionSettings / IncognitoModeAvailability के बारे में पूछीं।"
 }

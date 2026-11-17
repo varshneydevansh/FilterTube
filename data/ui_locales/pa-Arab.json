@@ -3298,5 +3298,15 @@
   "study.handle.value": "{name}، {time}",
   "study.hoursMinutes": "{hours} گھنٹہ {minutes} منٹ",
   "study.length.title": "پڑھائی دا ویلا",
-  "study.length.hint": "پڑھائی لمی یا چھوٹی کرن لئی کھچو۔ شروع ہون دا ویلا اوہی رہندا اے۔"
+  "study.length.hint": "پڑھائی لمی یا چھوٹی کرن لئی کھچو۔ شروع ہون دا ویلا اوہی رہندا اے۔",
+  "study.pill.label": "پڑھائی",
+  "study.pill.roundTitle": "پڑھائی · {time} تک صرف تہاڈی یوجنا دے چینل تے موضوع",
+  "study.pill.roundTitleNoTime": "پڑھائی · پڑھائی مکن تک صرف تہاڈی یوجنا دے چینل تے موضوع",
+  "study.pill.restTitle": "پڑھائی · وقفے تے، {time} تک کجھ نہیں دسے گا",
+  "study.pill.restTitleNoTime": "پڑھائی · وقفے تے، ہُنے کجھ نہیں دسے گا",
+  "study.pill.limitTitle": "پڑھائی · اج دی پڑھائی دی حد، {time} تک کجھ نہیں دسے گا",
+  "study.pill.limitTitleNoTime": "پڑھائی · اج دی پڑھائی دی حد، ہُنے کجھ نہیں دسے گا",
+  "study.coverage.privateTitle": "پرائیویٹ ونڈو ایہدے وچ شامل نہیں",
+  "study.coverage.privateBody": "پرائیویٹ ونڈو وچ FilterTube نوں اجازت نہیں، ایس لئی پڑھائی دے اصول اوتھے رک جاندے نیں۔ اپنے براؤزر دی ایکسٹینشن سیٹنگ وچ FilterTube لئی \"پرائیویٹ وچ اجازت دیو\" چالو کرو۔",
+  "study.coverage.familyPolicy": "بچے دے ڈیوائس تے براؤزر پالیسی FilterTube نوں انسٹال رکھ سکدی اے تے پرائیویٹ ونڈو بند کر سکدی اے۔ ڈیوائس سنبھالن والے توں ExtensionSettings / IncognitoModeAvailability بارے پچھو۔"
 }

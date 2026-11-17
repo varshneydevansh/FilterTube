@@ -3298,5 +3298,15 @@
   "study.handle.value": "{name}, {time}",
   "study.hoursMinutes": "Saa {hours} dak {minutes}",
   "study.length.title": "Muda wa kusoma",
-  "study.length.hint": "Buruta ili kusoma muda mrefu au mfupi zaidi. Inaanza saa ileile."
+  "study.length.hint": "Buruta ili kusoma muda mrefu au mfupi zaidi. Inaanza saa ileile.",
+  "study.pill.label": "Masomo",
+  "study.pill.roundTitle": "Masomo · chaneli na mada za mpango wako pekee hadi {time}",
+  "study.pill.roundTitleNoTime": "Masomo · chaneli na mada za mpango wako pekee hadi masomo yaishe",
+  "study.pill.restTitle": "Masomo · mapumzikoni, hakuna kitakachoonekana hadi {time}",
+  "study.pill.restTitleNoTime": "Masomo · mapumzikoni, hakuna kitakachoonekana kwa sasa",
+  "study.pill.limitTitle": "Masomo · kikomo cha masomo cha leo, hakuna kitakachoonekana hadi {time}",
+  "study.pill.limitTitleNoTime": "Masomo · kikomo cha masomo cha leo, hakuna kitakachoonekana kwa sasa",
+  "study.coverage.privateTitle": "Madirisha ya faragha hayahusiki",
+  "study.coverage.privateBody": "FilterTube hairuhusiwi kwenye madirisha ya faragha, kwa hiyo sheria za masomo zinasimama hapo. Washa \"Ruhusu kwenye faragha\" kwa FilterTube katika mipangilio ya viendelezi vya kivinjari chako.",
+  "study.coverage.familyPolicy": "Kwenye kifaa cha mtoto, sera ya kivinjari inaweza kuweka FilterTube imesakinishwa na kuzima madirisha ya faragha. Muulize anayesimamia kifaa kuhusu ExtensionSettings / IncognitoModeAvailability."
 }

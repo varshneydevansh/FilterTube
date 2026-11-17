@@ -3296,5 +3296,15 @@
   "study.handle.value": "{name}，{time}",
   "study.hoursMinutes": "{hours} 小時 {minutes} 分鐘",
   "study.length.title": "溫書時間",
-  "study.length.hint": "拖動就可以溫長啲或者短啲。開始時間唔變。"
+  "study.length.hint": "拖動就可以溫長啲或者短啲。開始時間唔變。",
+  "study.pill.label": "溫習",
+  "study.pill.roundTitle": "溫習 · 到 {time} 淨係你計劃嘅頻道同主題",
+  "study.pill.roundTitleNoTime": "溫習 · 到溫習完淨係你計劃嘅頻道同主題",
+  "study.pill.restTitle": "溫習 · 休息緊，到 {time} 乜都唔會顯示",
+  "study.pill.restTitleNoTime": "溫習 · 休息緊，而家乜都唔會顯示",
+  "study.pill.limitTitle": "溫習 · 今日溫習上限，到 {time} 乜都唔會顯示",
+  "study.pill.limitTitleNoTime": "溫習 · 今日溫習上限，而家乜都唔會顯示",
+  "study.coverage.privateTitle": "私密視窗唔包括喺入面",
+  "study.coverage.privateBody": "FilterTube 唔可以喺私密視窗運行，所以溫習規則去到嗰度就停。喺瀏覽器嘅擴充功能設定入面，幫 FilterTube 開「允許喺私密模式運行」。",
+  "study.coverage.familyPolicy": "喺細路嘅裝置上，瀏覽器政策可以令 FilterTube 一直安裝住，同埋關閉私密視窗。問下管理部裝置嘅人關於 ExtensionSettings / IncognitoModeAvailability。"
 }

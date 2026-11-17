@@ -3298,5 +3298,15 @@
   "study.handle.value": "{name}, {time}",
   "study.hoursMinutes": "{hours} કલાક {minutes} મિનિટ",
   "study.length.title": "અભ્યાસનો સમયગાળો",
-  "study.length.hint": "અભ્યાસ લાંબો કે ટૂંકો કરવા ખેંચો. શરૂ થવાનો સમય એ જ રહે છે."
+  "study.length.hint": "અભ્યાસ લાંબો કે ટૂંકો કરવા ખેંચો. શરૂ થવાનો સમય એ જ રહે છે.",
+  "study.pill.label": "અભ્યાસ",
+  "study.pill.roundTitle": "અભ્યાસ · {time} સુધી ફક્ત તમારી યોજનાની ચેનલો અને વિષયો",
+  "study.pill.roundTitleNoTime": "અભ્યાસ · અભ્યાસ પૂરો થાય ત્યાં સુધી ફક્ત તમારી યોજનાની ચેનલો અને વિષયો",
+  "study.pill.restTitle": "અભ્યાસ · વિરામ પર, {time} સુધી કંઈ દેખાશે નહીં",
+  "study.pill.restTitleNoTime": "અભ્યાસ · વિરામ પર, હમણાં કંઈ દેખાશે નહીં",
+  "study.pill.limitTitle": "અભ્યાસ · આજની અભ્યાસ મર્યાદા, {time} સુધી કંઈ દેખાશે નહીં",
+  "study.pill.limitTitleNoTime": "અભ્યાસ · આજની અભ્યાસ મર્યાદા, હમણાં કંઈ દેખાશે નહીં",
+  "study.coverage.privateTitle": "ખાનગી વિન્ડો આવરી લેવાતી નથી",
+  "study.coverage.privateBody": "ખાનગી વિન્ડોમાં FilterTube ને મંજૂરી નથી, તેથી ત્યાં અભ્યાસના નિયમો અટકી જાય છે. તમારા બ્રાઉઝરના એક્સટેન્શન સેટિંગ્સમાં FilterTube માટે \"ખાનગીમાં મંજૂરી આપો\" ચાલુ કરો.",
+  "study.coverage.familyPolicy": "બાળકના ડિવાઇસ પર બ્રાઉઝર નીતિ FilterTube ને ઇન્સ્ટોલ રાખી શકે અને ખાનગી વિન્ડો બંધ કરી શકે. ડિવાઇસ સંભાળનારને ExtensionSettings / IncognitoModeAvailability વિશે પૂછો."
 }

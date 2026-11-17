@@ -1204,7 +1204,10 @@
 
     /** Fail closed: the master switch can't turn study off, and comments are off while studying. */
     function studySettings(settings) {
-        return { ...clone(object(settings)), enabled: true, syncKidsToMain: false, hideComments: true };
+        // Trending and the search page's own shelves ("People also watched", "For you") are off while
+        // study holds the rules (review E-08): they would only fill with what the plan hides.
+        return { ...clone(object(settings)), enabled: true, syncKidsToMain: false, hideComments: true,
+            hideExploreTrending: true, hideSearchShelves: true };
     }
 
     /** "study" during a round, "rest" for a rest break, the limit or a clock hold, else "normal". */

@@ -3322,5 +3322,15 @@
   "study.handle.value": "{name}، {time}",
   "study.hoursMinutes": "{hours} س {minutes} د",
   "study.length.title": "مدة الدراسة",
-  "study.length.hint": "اسحب لتطوّل الدراسة أو تقصّرها. بتبلّش بنفس الوقت."
+  "study.length.hint": "اسحب لتطوّل الدراسة أو تقصّرها. بتبلّش بنفس الوقت.",
+  "study.pill.label": "دراسة",
+  "study.pill.roundTitle": "دراسة · بس قنوات ومواضيع خطتك لـ {time}",
+  "study.pill.roundTitleNoTime": "دراسة · بس قنوات ومواضيع خطتك لحتى تخلص الدراسة",
+  "study.pill.restTitle": "دراسة · بالاستراحة، ما في شي بيبين لـ {time}",
+  "study.pill.restTitleNoTime": "دراسة · بالاستراحة، ما في شي بيبين هلق",
+  "study.pill.limitTitle": "دراسة · حد دراسة اليوم، ما في شي بيبين لـ {time}",
+  "study.pill.limitTitleNoTime": "دراسة · حد دراسة اليوم، ما في شي بيبين هلق",
+  "study.coverage.privateTitle": "النوافذ الخاصة مش مشمولة",
+  "study.coverage.privateBody": "FilterTube مش مسموح بالنوافذ الخاصة، فقواعد الدراسة بتوقف هونيك. شغّل «السماح في الوضع الخاص» لـ FilterTube بإعدادات إضافات المتصفح.",
+  "study.coverage.familyPolicy": "على جهاز ولد، سياسة المتصفح بتقدر تخلّي FilterTube مثبّت وتطفي النوافذ الخاصة. اسأل يلي بيدير الجهاز عن ExtensionSettings / IncognitoModeAvailability."
 }

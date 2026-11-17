@@ -3322,5 +3322,15 @@
   "study.handle.value": "{name}، {time}",
   "study.hoursMinutes": "{hours} س {minutes} د",
   "study.length.title": "مدة الدراسة",
-  "study.length.hint": "اسحب لإطالة الدراسة أو تقصيرها. تبدأ في الوقت نفسه."
+  "study.length.hint": "اسحب لإطالة الدراسة أو تقصيرها. تبدأ في الوقت نفسه.",
+  "study.pill.label": "الدراسة",
+  "study.pill.roundTitle": "الدراسة · قنوات خطتك ومواضيعها فقط حتى {time}",
+  "study.pill.roundTitleNoTime": "الدراسة · قنوات خطتك ومواضيعها فقط حتى نهاية الدراسة",
+  "study.pill.restTitle": "الدراسة · في استراحة، لا يظهر شيء حتى {time}",
+  "study.pill.restTitleNoTime": "الدراسة · في استراحة، لا يظهر شيء الآن",
+  "study.pill.limitTitle": "الدراسة · حد الدراسة اليوم، لا يظهر شيء حتى {time}",
+  "study.pill.limitTitleNoTime": "الدراسة · حد الدراسة اليوم، لا يظهر شيء الآن",
+  "study.coverage.privateTitle": "النوافذ الخاصة غير مشمولة",
+  "study.coverage.privateBody": "FilterTube غير مسموح في النوافذ الخاصة، لذلك تتوقف قواعد الدراسة هناك. فعّل «السماح في الوضع الخاص» لـ FilterTube في إعدادات إضافات المتصفح.",
+  "study.coverage.familyPolicy": "على جهاز الطفل، يمكن لسياسة المتصفح إبقاء FilterTube مثبتًا وإيقاف النوافذ الخاصة. اسأل من يدير الجهاز عن ExtensionSettings / IncognitoModeAvailability."
 }
