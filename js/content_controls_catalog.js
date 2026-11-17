@@ -213,6 +213,11 @@
                     description: 'When autoplay reaches a video your rules block, continue to the next allowed video (up to 3 tries)'
                 },
                 {
+                    key: 'quietBlocking',
+                    title: 'Quiet blocking',
+                    description: 'Blocked videos show a plain “not available” screen instead of the FilterTube notice'
+                },
+                {
                     key: 'contentOnlyPlayback',
                     title: 'Content-only playback (Experimental)',
                     description: 'On by default with advert filtering. Choose a main-video source automatically when needed on desktop, keeping the site’s controls and playlist. If playback has trouble, turn off and reload the video.'

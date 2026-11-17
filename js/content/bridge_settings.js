@@ -2257,6 +2257,7 @@ function handleStorageChanges(changes, area) {
         'hideEndscreenCards',
         'disableAutoplay',
         'skipBlockedAutoplay',
+        'quietBlocking',
         'alwaysUseOriginalAudio',
         'disableAnnotations',
         'hideTopHeader',

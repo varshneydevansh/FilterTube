@@ -158,6 +158,7 @@ const FILTER_LOGIC_AUDIT_PROOF_TESTS = Object.freeze([
 const SAFETY_AND_PREFERENCE_TESTS = Object.freeze([
   'tests/runtime/managed-time-usage-transactions.test.mjs',
   'tests/runtime/profile-preference-reset.test.mjs',
+  'tests/runtime/quiet-blocking-overlay.test.mjs',
 ]);
 const AUTO_SYNC_TESTS = Object.freeze([
   'tests/runtime/auto-sync-two-endpoint.test.mjs',

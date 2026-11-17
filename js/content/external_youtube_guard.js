@@ -431,8 +431,10 @@
     }
 
     function ensureAdmissionOverlayVisuals(overlay, state, message) {
-        if (root.FilterTubeAdmissionOverlay) root.FilterTubeAdmissionOverlay.render(overlay, state, message);
-        else overlay.textContent = String(message || '');
+        // Quiet blocking (parent-locked): an unbranded cover with no reason; the guard still pauses.
+        const quiet = currentSettings?.quietBlocking === true;
+        if (root.FilterTubeAdmissionOverlay) root.FilterTubeAdmissionOverlay.render(overlay, state, message, { quiet });
+        else overlay.textContent = quiet ? '' : String(message || '');
     }
 
     function removeAdmissionOverlayBackground(overlay) {
@@ -446,12 +448,11 @@
                 overlay = document.createElement('div');
                 overlay.id = 'filtertube-external-youtube-admission';
                 overlay.setAttribute('role', 'status');
-                overlay.setAttribute('aria-label', String(message || ''));
                 (document.body || document.documentElement)?.appendChild(overlay);
             }
             if (overlay.dataset) overlay.dataset.state = state;
             else overlay.setAttribute?.('data-state', state);
-            overlay.setAttribute?.('aria-label', String(message || ''));
+            if (currentSettings?.quietBlocking !== true) overlay.setAttribute?.('aria-label', String(message || ''));
             ensureAdmissionOverlayVisuals(overlay, state, message);
         } catch (e) {}
     }
