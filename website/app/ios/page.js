@@ -1,12 +1,15 @@
 import {
   ArrowUpRight,
   CheckCircle,
+  Clock,
   Coffee,
+  Desktop,
   DeviceMobile,
   Heart,
   Question,
   ShieldCheck,
-  Timer,
+  WifiHigh,
+  UserCircle,
 } from "@phosphor-icons/react/ssr";
 
 import { ActionLink, Panel } from "@/components/marketing-ui";
@@ -23,13 +26,26 @@ const SOURCE_JSON_URL = "SOURCE_JSON_URL";
 const GITHUB_RELEASE_URL = "GITHUB_RELEASE_URL";
 const IPA_SHA256 = "IPA_SHA256_CHECKSUM";
 
+// Set VIDEO_URL (a direct video file or embeddable URL) to show the
+// "Watch the 2-minute walkthrough" slot. While it is a placeholder it hides.
+const VIDEO_URL = "VIDEO_URL";
+
 const isPlaceholder = (value) =>
+  value === "VIDEO_URL" ||
   value === "SOURCE_JSON_URL" ||
   value === "GITHUB_RELEASE_URL" ||
   value === "IPA_SHA256_CHECKSUM";
 
 const sideStoreAddSourceHref = `sidestore://source?url=${encodeURIComponent(SOURCE_JSON_URL)}`;
-const sideStoreHref = "https://sidestore.io";
+const localDevVpnHref = "https://apps.apple.com/app/localdevvpn/id6755608044";
+const iloaderLinks = [
+  { label: "macOS", href: "https://iloader.app/" },
+  { label: "Windows", href: "https://iloader.app/" },
+  { label: "Linux", href: "https://iloader.app/" },
+  { label: "Chromebook", href: "https://iloader.app/" },
+];
+const sideStorePrereqHref = "https://docs.sidestore.io/docs/installation/prerequisites";
+const sideStoreTroubleHref = "https://docs.sidestore.io/docs/troubleshooting";
 const sideStoreDocsHref = "https://docs.sidestore.io";
 const altStoreHref = "https://altstore.io";
 const koFiHref = "https://ko-fi.com/filtertube";
@@ -66,64 +82,72 @@ const promises = [
   "No FilterTube server keeps your rules or history",
 ];
 
+const checklist = [
+  { icon: DeviceMobile, text: "An iPhone or iPad with a passcode, on iOS or iPadOS 15 or newer" },
+  { icon: Desktop, text: "A computer (Mac, Windows, Linux or a recent Chromebook), only for the first install" },
+  { icon: UserCircle, text: "An Apple Account (Apple ID). A spare free one works fine" },
+  { icon: WifiHigh, text: "Wi-Fi. Mobile data won't work for the setup" },
+  { icon: Clock, text: "About 15 minutes" },
+];
+
 const safetyPoints = [
   {
     title: "It uses Apple's own signing",
-    body: "SideStore and AltStore sign the app with your own Apple ID, using Apple's standard free developer signing. It is the same thing Xcode does when a developer runs an app on their own phone.",
+    body: "SideStore signs the app with your Apple ID, using Apple's free developer signing. Developers do the same thing when they run an app on their own phone.",
   },
   {
     title: "Nothing is jailbroken",
-    body: "Your iPhone or iPad is not modified. iOS runs FilterTube inside its normal sandbox, exactly like an App Store app.",
+    body: "Your iPhone or iPad isn't modified. FilterTube runs in iOS's normal sandbox, like any App Store app.",
   },
   {
     title: "Skip paid signing services",
-    body: "Avoid services that sell \"signing\" with enterprise certificates. Apple revokes those often, and you are trusting a stranger with your device. SideStore and AltStore keep it between you and Apple.",
+    body: "Avoid sites that sell \"signing\" with enterprise certificates. Apple revokes those often.",
   },
   {
     title: "Cautious? Use a spare Apple ID",
-    body: "Any Apple ID works. If you would rather keep your main account out of it, create a separate free Apple ID just for sideloading.",
+    body: "Any Apple ID works. You can make a separate free one just for this.",
   },
 ];
 
-const expectations = [
+const stuck = [
   {
-    icon: DeviceMobile,
-    title: "One-time setup, about 10 minutes",
-    body: "The first install needs a Mac or Windows computer. After that, you do not need it again for SideStore.",
+    q: "SideStore can't connect, or install and refresh fail",
+    a: "Open LocalDevVPN and make sure it's connected. SideStore needs it on every time you install, update or refresh.",
   },
   {
-    icon: Timer,
-    title: "A refresh every 7 days",
-    body: "Free Apple ID signing lasts 7 days. SideStore refreshes the app on your phone, no computer needed.",
+    q: "\"Maximum number of apps\"",
+    a: "A free Apple ID allows only 3 sideloaded apps at once, and SideStore counts as one. Remove an app you don't need in SideStore, then try again.",
   },
   {
-    icon: ShieldCheck,
-    title: "Missed a refresh? Nothing is lost",
-    body: "If 7 days pass without a refresh, the app will not open until you refresh it in SideStore. Your settings stay on the device the whole time.",
+    q: "A provisioning error, like 0xe8008024",
+    a: "Some free Apple IDs hit this. Sign in with a fresh free Apple ID instead. Creating one just for SideStore is fine.",
   },
   {
-    icon: CheckCircle,
-    title: "Three apps at a time",
-    body: "A free Apple ID can have 3 sideloaded apps installed at once. SideStore counts as one of them.",
+    q: "FilterTube won't open after a week",
+    a: "Its 7-day signing ran out. Turn LocalDevVPN on, open SideStore and tap Refresh on FilterTube. Your settings are kept.",
+  },
+  {
+    q: "Setup stops partway",
+    a: "Check that your phone and computer are on Wi-Fi (not mobile data), then run iloader again.",
   },
 ];
 
 const faqs = [
   {
     q: "Will I lose my settings when the app refreshes?",
-    a: "No. A refresh only renews the signature. Your rules, profiles, and PINs stay on the device.",
+    a: "No. A refresh only renews the signature. Your rules, profiles and PINs stay on the device.",
   },
   {
     q: "Does it work on iPad?",
-    a: "Yes. The same install works on iPhone and iPad. FilterTube needs iOS 17 or iPadOS 17 or later.",
+    a: "Yes. The same install works on iPhone and iPad. FilterTube itself needs iOS or iPadOS 17 or later.",
   },
   {
     q: "How do updates work?",
-    a: "SideStore checks the FilterTube source and shows new versions in its updates list. Tap update and you are done.",
+    a: "SideStore shows new FilterTube versions in its updates list. Tap update and you're done.",
   },
   {
     q: "Can I move to the App Store version later?",
-    a: "Yes. Export a backup from FilterTube's settings, install the App Store version when it is live, then import the backup there.",
+    a: "Yes. Export a backup from FilterTube's settings, install the App Store version when it's live, then import the backup there.",
   },
 ];
 
@@ -173,10 +197,38 @@ function Mascot({ src, alt = "", className = "", width, height }) {
   );
 }
 
+function StepCard({ number, where, title, mascot, children }) {
+  return (
+    <li className="grid gap-5 rounded-[1.4rem] border border-[color:var(--color-line)] bg-[color:var(--color-soft-panel)] p-5 md:grid-cols-[auto_minmax(0,1fr)_auto] md:items-center md:p-7">
+      <span className="flex h-12 w-12 shrink-0 items-center justify-center rounded-full bg-[var(--color-accent)] font-display text-2xl text-[#fff8f1]">
+        {number}
+      </span>
+      <div className="min-w-0 text-base leading-8 text-[var(--color-muted)]">
+        <p className="text-[0.72rem] uppercase tracking-[0.22em]">{where}</p>
+        <h3 className="mt-1 font-display text-3xl tracking-[-0.04em] text-[var(--color-ink)]">
+          {title}
+        </h3>
+        {children}
+      </div>
+      <Mascot
+        alt={mascot.alt}
+        className="mx-auto h-28 w-auto md:h-36"
+        height={mascot.height}
+        src={mascot.src}
+        width={mascot.width}
+      />
+    </li>
+  );
+}
+
+const kritiWave = { src: "/mascots/kriti_wave.webp", alt: "Kriti waving", width: 176, height: 224 };
+const kritiThumbs = { src: "/mascots/kriti_thumbsup.webp", alt: "Kriti giving a thumbs up", width: 217, height: 300 };
+const uljhanHappy = { src: "/mascots/uljhan_happy.webp", alt: "", width: 225, height: 211 };
+
 function InstallGuide() {
   return (
     <div id="install" className="scroll-mt-28">
-      {/* 1. Intro */}
+      {/* Intro */}
       <section className="px-4 pb-8 pt-16 md:px-6 md:pt-20">
         <div className="mx-auto max-w-[1180px]">
           <Reveal>
@@ -218,11 +270,11 @@ function InstallGuide() {
                   </p>
                 </div>
                 <Mascot
-                  alt="Kriti waving hello"
+                  alt={kritiWave.alt}
                   className="mx-auto h-44 w-auto md:h-56"
-                  height={224}
-                  src="/mascots/kriti_wave.webp"
-                  width={176}
+                  height={kritiWave.height}
+                  src={kritiWave.src}
+                  width={kritiWave.width}
                 />
               </div>
             </Panel>
@@ -230,14 +282,162 @@ function InstallGuide() {
         </div>
       </section>
 
-      {/* 2. Legal and safe */}
+      {/* Checklist + steps */}
+      <section className="px-4 py-8 md:px-6">
+        <div className="mx-auto max-w-[1180px]">
+          <Reveal>
+            <Panel innerClassName="p-6 md:p-10">
+              <Eyebrow>Before you start</Eyebrow>
+              <h2 className="mt-5 max-w-[22ch] text-balance font-display text-4xl tracking-[-0.06em] text-[var(--color-ink)] md:text-5xl">
+                Have these ready.
+              </h2>
+              <ul className="mt-8 grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+                {checklist.map(({ icon: Icon, text }) => (
+                  <li
+                    className="flex items-start gap-4 rounded-[1.2rem] border border-[color:var(--color-line)] bg-[color:var(--color-soft-panel)] p-5"
+                    key={text}
+                  >
+                    <Icon aria-hidden="true" className="shrink-0 text-[var(--color-accent)]" size={28} weight="light" />
+                    <span className="text-sm leading-7 text-[var(--color-ink)]">{text}</span>
+                  </li>
+                ))}
+              </ul>
+              <p className="mt-4 text-sm leading-7 text-[var(--color-muted)]">
+                Windows also needs iTunes. The full list is in{" "}
+                <TextLink href={sideStorePrereqHref}>SideStore&apos;s own guide</TextLink>.
+              </p>
+
+              <div className="mt-12">
+                <Eyebrow>Install steps</Eyebrow>
+                <h2 className="mt-5 max-w-[22ch] text-balance font-display text-4xl tracking-[-0.06em] text-[var(--color-ink)] md:text-5xl">
+                  Four steps. That&apos;s it.
+                </h2>
+              </div>
+              <ol className="mt-8 grid gap-4">
+                <StepCard number="1" where="On your iPhone" title="Install LocalDevVPN, then turn it on" mascot={kritiWave}>
+                  <p className="mt-2">
+                    Get{" "}
+                    <TextLink href={localDevVpnHref}>LocalDevVPN from the App Store</TextLink>{" "}
+                    and switch it on. Tap Allow if it asks to add a VPN
+                    configuration.
+                  </p>
+                  <p className="mt-2 text-sm">
+                    Why? It&apos;s a local VPN that lives on your phone.
+                    SideStore uses it to install and refresh apps. Your
+                    traffic doesn&apos;t go anywhere.
+                  </p>
+                </StepCard>
+                <StepCard number="2" where="On your computer" title="Use iloader to put SideStore on your phone" mascot={kritiThumbs}>
+                  <p className="mt-2">
+                    Download iloader, open it, sign in with your Apple ID, pick
+                    your iPhone, then tap Install.
+                  </p>
+                  <div className="mt-3 flex flex-wrap gap-x-5 gap-y-2 text-sm">
+                    {iloaderLinks.map((item) => (
+                      <TextLink href={item.href} key={item.label}>
+                        {item.label}
+                      </TextLink>
+                    ))}
+                  </div>
+                </StepCard>
+                <StepCard number="3" where="On your iPhone" title={"Open SideStore and tap \u201cAdd FilterTube\u201d"} mascot={kritiWave}>
+                  <p className="mt-2">
+                    Open this page on your phone and tap the button. Then tap
+                    Install.
+                  </p>
+                  <div className="mt-4 flex flex-col items-start gap-3">
+                    <ActionLink href={sideStoreAddSourceHref}>Add FilterTube</ActionLink>
+                    {isPlaceholder(SOURCE_JSON_URL) ? (
+                      <PlaceholderMark name="SOURCE_JSON_URL" />
+                    ) : null}
+                  </div>
+                </StepCard>
+                <StepCard number="4" where="Done" title="Keep it fresh" mascot={uljhanHappy}>
+                  <p className="mt-2">
+                    SideStore refreshes FilterTube every 7 days, right on your
+                    phone, as long as LocalDevVPN is on. You won&apos;t need the
+                    computer again.
+                  </p>
+                </StepCard>
+              </ol>
+
+              <details className="ft-disclosure mt-6 rounded-[1.2rem] border border-[color:var(--color-line)] p-5">
+                <summary className="cursor-pointer font-medium text-[var(--color-ink)]">
+                  Prefer AltStore?
+                </summary>
+                <p className="mt-3 text-sm leading-7 text-[var(--color-muted)]">
+                  <TextLink href={altStoreHref}>AltStore</TextLink> works too.
+                  It needs a computer running AltServer on the same Wi-Fi as
+                  your phone about once a week. Advanced setups are covered in{" "}
+                  <TextLink href={sideStoreDocsHref}>SideStore&apos;s docs</TextLink>.
+                </p>
+              </details>
+            </Panel>
+          </Reveal>
+        </div>
+      </section>
+
+      {/* Video */}
+      {isPlaceholder(VIDEO_URL) ? null : (
+        <section className="px-4 py-8 md:px-6">
+          <div className="mx-auto max-w-[1180px]">
+            <Reveal>
+              <Panel innerClassName="p-6 md:p-10">
+                <Eyebrow>Prefer to watch?</Eyebrow>
+                <h2 className="mt-5 font-display text-4xl tracking-[-0.06em] text-[var(--color-ink)] md:text-5xl">
+                  Watch the 2-minute walkthrough
+                </h2>
+                <video
+                  className="mt-8 w-full rounded-[1.2rem] border border-[color:var(--color-line)]"
+                  controls
+                  preload="metadata"
+                  src={VIDEO_URL}
+                />
+              </Panel>
+            </Reveal>
+          </div>
+        </section>
+      )}
+
+      {/* Stuck */}
+      <section className="px-4 py-8 md:px-6">
+        <div className="mx-auto max-w-[1180px]">
+          <Reveal>
+            <Panel innerClassName="p-6 md:p-10">
+              <Eyebrow>Stuck?</Eyebrow>
+              <h2 className="mt-5 font-display text-4xl tracking-[-0.06em] text-[var(--color-ink)] md:text-5xl">
+                Quick fixes.
+              </h2>
+              <div className="mt-8 grid gap-3">
+                {stuck.map((item) => (
+                  <details
+                    className="ft-disclosure rounded-[1.2rem] border border-[color:var(--color-line)] p-5"
+                    key={item.q}
+                  >
+                    <summary className="cursor-pointer font-medium text-[var(--color-ink)]">
+                      {item.q}
+                    </summary>
+                    <p className="mt-3 text-sm leading-7 text-[var(--color-muted)]">{item.a}</p>
+                  </details>
+                ))}
+              </div>
+              <p className="mt-5 text-sm leading-7 text-[var(--color-muted)]">
+                Still stuck? See{" "}
+                <TextLink href={sideStoreTroubleHref}>SideStore&apos;s troubleshooting guide</TextLink>.
+              </p>
+            </Panel>
+          </Reveal>
+        </div>
+      </section>
+
+      {/* Safe and legal */}
       <section className="px-4 py-8 md:px-6">
         <div className="mx-auto max-w-[1180px]">
           <Reveal>
             <Panel innerClassName="p-6 md:p-10">
               <Eyebrow>Is this legal and safe?</Eyebrow>
               <h2 className="mt-5 max-w-[22ch] text-balance font-display text-4xl tracking-[-0.06em] text-[var(--color-ink)] md:text-5xl">
-                Yes. Here is what actually happens.
+                Yes. Here is what happens.
               </h2>
               <div className="mt-8 grid gap-3 sm:grid-cols-2">
                 {safetyPoints.map((point) => (
@@ -263,9 +463,8 @@ function InstallGuide() {
                   <div className="min-w-0 text-sm leading-7 text-[var(--color-muted)]">
                     <p className="font-semibold text-[var(--color-ink)]">Verify the download.</p>
                     <p className="mt-1">
-                      Only install the FilterTube app file from the official
-                      GitHub release linked here, and check that its SHA-256
-                      checksum matches.
+                      Only install the app file from the official GitHub
+                      release, and check that its SHA-256 matches.
                     </p>
                     <div className="mt-3 flex flex-wrap items-center gap-3">
                       {isPlaceholder(GITHUB_RELEASE_URL) ? (
@@ -285,177 +484,32 @@ function InstallGuide() {
                   </div>
                 </div>
               </div>
-              <p className="mt-5 text-sm leading-7 text-[var(--color-muted)]">
-                <strong className="text-[var(--color-ink)]">Seeing error 0xe8008024?</strong>{" "}
-                Some free Apple IDs have recently hit this provisioning error.
-                Signing in with a fresh Apple ID usually fixes it.
-              </p>
             </Panel>
           </Reveal>
         </div>
       </section>
 
-      {/* 3. What to expect */}
-      <section className="px-4 py-8 md:px-6">
-        <div className="mx-auto max-w-[1180px]">
-          <Reveal>
-            <Panel innerClassName="p-6 md:p-10">
-              <div className="grid gap-6 md:grid-cols-[minmax(0,1fr)_auto] md:items-end">
-                <div>
-                  <Eyebrow>What to expect</Eyebrow>
-                  <h2 className="mt-5 max-w-[22ch] text-balance font-display text-4xl tracking-[-0.06em] text-[var(--color-ink)] md:text-5xl">
-                    A short setup, then a weekly refresh.
-                  </h2>
-                </div>
-                <Mascot
-                  alt=""
-                  className="hidden h-32 w-auto md:block"
-                  height={211}
-                  src="/mascots/uljhan_happy.webp"
-                  width={225}
-                />
-              </div>
-              <div className="mt-8 grid gap-3 sm:grid-cols-2">
-                {expectations.map(({ icon: Icon, title, body }) => (
-                  <div
-                    className="rounded-[1.2rem] border border-[color:var(--color-line)] bg-[color:var(--color-soft-panel)] p-5"
-                    key={title}
-                  >
-                    <Icon aria-hidden="true" size={24} weight="light" />
-                    <h3 className="mt-4 font-display text-2xl tracking-[-0.04em] text-[var(--color-ink)]">
-                      {title}
-                    </h3>
-                    <p className="mt-3 text-sm leading-7 text-[var(--color-muted)]">{body}</p>
-                  </div>
-                ))}
-              </div>
-            </Panel>
-          </Reveal>
-        </div>
-      </section>
-
-      {/* 4. Steps */}
-      <section className="px-4 py-8 md:px-6">
-        <div className="mx-auto max-w-[1180px]">
-          <Reveal>
-            <Panel innerClassName="p-6 md:p-10">
-              <Eyebrow>Install steps</Eyebrow>
-              <h2 className="mt-5 max-w-[22ch] text-balance font-display text-4xl tracking-[-0.06em] text-[var(--color-ink)] md:text-5xl">
-                Three steps with SideStore.
-              </h2>
-              <ol className="mt-8 grid gap-4">
-                <li className="flex gap-4 rounded-[1.2rem] border border-[color:var(--color-line)] bg-[color:var(--color-soft-panel)] p-5">
-                  <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-[var(--color-accent)] font-display text-lg text-[#fff8f1]">
-                    1
-                  </span>
-                  <div className="min-w-0 text-sm leading-7 text-[var(--color-muted)]">
-                    <h3 className="font-display text-2xl tracking-[-0.04em] text-[var(--color-ink)]">
-                      Install SideStore
-                    </h3>
-                    <p className="mt-2">
-                      Follow SideStore&apos;s official guide. It walks you
-                      through the one-time computer step for Mac or Windows,
-                      and it stays up to date as things change.
-                    </p>
-                    <div className="mt-3 flex flex-wrap gap-4">
-                      <TextLink href={sideStoreHref}>sidestore.io</TextLink>
-                      <TextLink href={sideStoreDocsHref}>SideStore install guide</TextLink>
-                    </div>
-                  </div>
-                </li>
-                <li className="flex gap-4 rounded-[1.2rem] border border-[color:var(--color-line)] bg-[color:var(--color-soft-panel)] p-5">
-                  <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-[var(--color-accent)] font-display text-lg text-[#fff8f1]">
-                    2
-                  </span>
-                  <div className="min-w-0 text-sm leading-7 text-[var(--color-muted)]">
-                    <h3 className="font-display text-2xl tracking-[-0.04em] text-[var(--color-ink)]">
-                      Turn on LocalDevVPN
-                    </h3>
-                    <p className="mt-2">
-                      SideStore uses LocalDevVPN to sign and refresh apps on
-                      the phone itself. Turn it on as the SideStore guide
-                      describes. It runs locally on your device.
-                    </p>
-                  </div>
-                </li>
-                <li className="flex gap-4 rounded-[1.2rem] border border-[color:var(--color-line)] bg-[color:var(--color-soft-panel)] p-5">
-                  <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-[var(--color-accent)] font-display text-lg text-[#fff8f1]">
-                    3
-                  </span>
-                  <div className="min-w-0 text-sm leading-7 text-[var(--color-muted)]">
-                    <h3 className="font-display text-2xl tracking-[-0.04em] text-[var(--color-ink)]">
-                      Add FilterTube and install
-                    </h3>
-                    <p className="mt-2">
-                      Open this page on your iPhone or iPad and tap the button.
-                      SideStore adds the FilterTube source; tap FilterTube,
-                      then Install.
-                    </p>
-                    <div className="mt-4 flex flex-col items-start gap-3">
-                      <ActionLink href={sideStoreAddSourceHref}>
-                        Add FilterTube to SideStore
-                      </ActionLink>
-                      {isPlaceholder(SOURCE_JSON_URL) ? (
-                        <PlaceholderMark name="SOURCE_JSON_URL" />
-                      ) : (
-                        <p className="break-all font-mono text-xs">
-                          Or add this source by hand: {SOURCE_JSON_URL}
-                        </p>
-                      )}
-                    </div>
-                  </div>
-                </li>
-              </ol>
-
-              <div className="mt-6 grid gap-3 md:grid-cols-2">
-                <details className="ft-disclosure rounded-[1.2rem] border border-[color:var(--color-line)] p-5">
-                  <summary className="cursor-pointer font-medium text-[var(--color-ink)]">
-                    Prefer AltStore?
-                  </summary>
-                  <p className="mt-3 text-sm leading-7 text-[var(--color-muted)]">
-                    <TextLink href={altStoreHref}>AltStore</TextLink> works
-                    too. It refreshes through AltServer, so a Mac or Windows
-                    computer running AltServer needs to be on the same Wi-Fi
-                    as your phone at least once a week.
-                  </p>
-                </details>
-                <details className="ft-disclosure rounded-[1.2rem] border border-[color:var(--color-line)] p-5">
-                  <summary className="cursor-pointer font-medium text-[var(--color-ink)]">
-                    In the EU?
-                  </summary>
-                  <p className="mt-3 text-sm leading-7 text-[var(--color-muted)]">
-                    AltStore PAL is an approved alternative app marketplace in
-                    the EU. FilterTube isn&apos;t listed there yet, so use
-                    SideStore or AltStore as described above for now.
-                  </p>
-                </details>
-              </div>
-            </Panel>
-          </Reveal>
-        </div>
-      </section>
-
-      {/* 5. Direct version */}
+      {/* What you get */}
       <section className="px-4 py-8 md:px-6">
         <div className="mx-auto max-w-[1180px]">
           <Reveal>
             <Panel innerClassName="p-6 md:p-10">
               <div className="grid gap-8 md:grid-cols-[auto_minmax(0,1fr)] md:items-center">
                 <Mascot
-                  alt=""
+                  alt={kritiThumbs.alt}
                   className="mx-auto hidden h-44 w-auto md:block"
-                  height={300}
-                  src="/mascots/kriti_thumbsup.webp"
-                  width={217}
+                  height={kritiThumbs.height}
+                  src={kritiThumbs.src}
+                  width={kritiThumbs.width}
                 />
                 <div>
-                  <Eyebrow>The direct version</Eyebrow>
+                  <Eyebrow>What you get on iPhone</Eyebrow>
                   <h2 className="mt-5 max-w-[24ch] text-balance font-display text-4xl tracking-[-0.06em] text-[var(--color-ink)] md:text-5xl">
                     Same as the Android direct build.
                   </h2>
                   <p className="mt-5 max-w-[62ch] text-sm leading-7 text-[var(--color-muted)]">
-                    The direct version includes saving videos for offline
-                    viewing. Saved copies expire after 30 days.
+                    The direct version lets you save videos for offline
+                    viewing. Saved videos last 30 days and are rechecked.
                   </p>
                   <p className="mt-4 max-w-[62ch] text-sm leading-7 text-[var(--color-muted)]">
                     Supporting FilterTube on Ko-fi is optional. If it helps
@@ -477,7 +531,7 @@ function InstallGuide() {
         </div>
       </section>
 
-      {/* 6. FAQ */}
+      {/* FAQ */}
       <section className="px-4 pb-8 pt-8 md:px-6">
         <div className="mx-auto max-w-[1180px]">
           <Reveal>

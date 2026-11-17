@@ -1,0 +1,33 @@
+{
+  "name": "FilterTube",
+  "identifier": "com.filtertube.source",
+  "subtitle": "Calmer, safer video on iPhone and iPad",
+  "iconURL": "https://filtertube.in/brand/logo.png",
+  "website": "https://filtertube.in/ios",
+  "apps": [
+    {
+      "name": "FilterTube (Direct)",
+      "bundleIdentifier": "com.filtertube.app.direct",
+      "developerName": "Devansh Varshney",
+      "subtitle": "Filters, profiles and offline saving",
+      "localizedDescription": "FilterTube helps you decide what shows up in your feed. Hide channels and words you don't want, set up profiles for the family, and save videos to watch offline. Free, no ads, no sign-up.",
+      "iconURL": "https://filtertube.in/brand/logo.png",
+      "versions": [
+        {
+          "version": "3.6.2",
+          "buildVersion": "1",
+          "date": "2026-01-01",
+          "localizedDescription": "First iPhone and iPad release. Filters, profiles and offline saving.",
+          "downloadURL": "GITHUB_RELEASE_IPA_URL",
+          "size": 0,
+          "minOSVersion": "17.0"
+        }
+      ],
+      "appPermissions": {
+        "entitlements": [],
+        "privacy": {}
+      }
+    }
+  ],
+  "news": []
+}
