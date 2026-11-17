@@ -33444,12 +33444,13 @@ document.addEventListener('DOMContentLoaded', async () => {
             kicker: ['apps.tv.kicker', 'Android TV'],
             body: ['apps.tv.body', 'The same Google Play listing, installed on your Android TV.'],
             cta: ['apps.android.cta', 'Install from Google Play'] },
-        // Apple hasn't approved the developer account yet: until it does, the iPhone and iPad app is
-        // sideloaded (SideStore or AltStore) with the guide at filtertube.in/ios.
+        // Apple is having trouble on their end with the developer account, so the App Store release will
+        // take a while. Until then the iPhone and iPad app is sideloaded, SideStore preferred (AltStore also
+        // works), with the guide at filtertube.in/ios.
         { id: 'ios', status: 'coming_soon', variant: 'ios', icon: '../assets/images/App_Store_transparent.png', href: 'https://filtertube.in/ios',
             kicker: ['apps.ios.kicker', 'iPhone and iPad'],
-            title: ['apps.ios.sideloadTitle', 'Install it with SideStore or AltStore'],
-            body: ['apps.ios.sideloadBody', 'Apple hasn\u2019t approved the developer account yet. While Apple reviews it, you can sideload FilterTube with the step-by-step guide.'],
+            title: ['apps.ios.sideloadTitle', 'Install it with SideStore'],
+            body: ['apps.ios.sideloadBody', 'Apple is having trouble on their end with the developer account, so the App Store version will take a while. Until then, SideStore is the best way we\u2019ve found to install FilterTube, and AltStore works too. The step-by-step guide shows you how.'],
             cta: ['apps.ios.sideloadCta', 'Open the iPhone guide'], ctaWhileComingSoon: true }
     ]);
     let controlCenterAppsRendered = false;
