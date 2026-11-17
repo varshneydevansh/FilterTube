@@ -259,7 +259,7 @@ test('seed JSONP layer: google.ac.h is wrapped before the site defines it', asyn
     assert.deepEqual(seen[1][1].map(entry => entry[0]), ['sat math']);
 });
 
-test('seed routes suggestions through all layers and the manifests load the filter in both worlds', () => {
+test('seed routes suggestions through all layers and starts the dropdown net in its own world', () => {
     const seed = fs.readFileSync(new URL('../../js/seed.js', import.meta.url), 'utf8');
     assert.match(seed, /suggestions\.isSuggestionUrl\(urlStr\)/);
     assert.match(seed, /function setupSuggestionCallbackTrap\(\)/);
@@ -271,10 +271,21 @@ test('seed routes suggestions through all layers and the manifests load the filt
         assert.ok(main.indexOf('js/shared/search_suggestions_filter.js') > main.indexOf('js/shared/view_count.js'), name);
         assert.ok(main.indexOf('js/shared/search_suggestions_filter.js') < main.indexOf('js/seed.js'), name);
     }
+    // Chrome injects a file once per frame across worlds: both files live in the main world only.
     for (const name of ['manifest.json', 'manifest.chrome.json', 'manifest.opera.json', 'manifest.firefox.json']) {
         const manifest = JSON.parse(fs.readFileSync(new URL(`../../${name}`, import.meta.url), 'utf8'));
         const isolated = manifest.content_scripts.find(entry => entry.js.includes('js/content_bridge.js') && !entry.all_frames);
-        assert.ok(isolated.js.indexOf('js/content/search_suggestions_dom.js') > isolated.js.indexOf('js/shared/search_suggestions_filter.js'), name);
-        assert.ok(manifest.web_accessible_resources[0].resources.includes('js/shared/search_suggestions_filter.js'), name);
+        assert.equal(isolated.js.includes('js/shared/search_suggestions_filter.js'), false, name);
+        assert.equal(isolated.js.includes('js/content/search_suggestions_dom.js'), false, name);
+        if (!name.includes('firefox')) {
+            const main = manifest.content_scripts[0].js;
+            assert.ok(main.indexOf('js/content/search_suggestions_dom.js') > main.indexOf('js/shared/search_suggestions_filter.js'), name);
+            assert.ok(main.indexOf('js/content/search_suggestions_dom.js') < main.indexOf('js/seed.js'), name);
+        }
+        for (const file of ['js/shared/search_suggestions_filter.js', 'js/content/search_suggestions_dom.js']) {
+            assert.ok(manifest.web_accessible_resources[0].resources.includes(file), `${name}: ${file}`);
+        }
     }
+    assert.match(seed, /dom\.watch\(\{ window, document, settings: \(\) => cachedSettings \}\)/);
+    assert.match(seed, /'\/js\/content\/search_suggestions_dom\.js'/);
 });

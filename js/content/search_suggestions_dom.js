@@ -1,4 +1,6 @@
-/* The search box dropdown, last line (isolated world). The network layers in seed.js already filter
+/* The search box dropdown, last line (main world, beside seed.js, which starts it with its settings).
+ * Chrome injects a file once per frame across worlds, so this sits in the same world as
+ * search_suggestions_filter.js, whose rule it uses. The network layers in seed.js already filter
  * the suggestions; this catches any other way they arrive (a cached list, a new delivery path).
  * - A row whose text the rules don't allow is hidden (search_suggestions_filter.allowsSearchText).
  * - Pictures: none on Kids, in allow mode, Study or a rest break (the network layer keeps only admitted
@@ -11,15 +13,7 @@
 (function (root, factory) {
     const api = factory();
     if (typeof module === 'object' && module.exports) module.exports = api;
-    else root.FilterTubeSearchSuggestionsDom = api;
-    try {
-        if (!api.autoStarted && root.document && root.MutationObserver
-            && /(^|\.)youtube(kids)?\.com$/.test(String(root.location?.hostname || ''))) {
-            api.autoStarted = true;
-            api.watch({ window: root, document: root.document });
-        }
-    } catch (e) {
-    }
+    else if (root && !root.FilterTubeSearchSuggestionsDom) root.FilterTubeSearchSuggestionsDom = api;
 }(typeof globalThis !== 'undefined' ? globalThis : this, function () {
     'use strict';
 
@@ -68,7 +62,7 @@
         const win = env.window;
         const doc = env.document;
         const kidsHost = /(^|\.)youtubekids\.com$/i.test(String(win.location?.hostname || ''));
-        const settings = () => env.settings ? env.settings() : (win.currentSettings || null);
+        const settings = () => (env.settings ? env.settings() : null);
         let scheduled = false;
         let waitTimer = null;
 

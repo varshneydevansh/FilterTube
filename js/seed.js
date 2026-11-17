@@ -23,6 +23,13 @@
         if (!window.FilterTubeSearchSuggestions && seedSrc && /\/js\/seed\.js(?:\?.*)?$/.test(seedSrc)) {
             const tag = document.createElement('script');
             tag.src = seedSrc.replace(/\/js\/seed\.js(?:\?.*)?$/, '/js/shared/search_suggestions_filter.js');
+            // The dropdown safety net needs the filter first.
+            tag.onload = () => {
+                const dom = document.createElement('script');
+                dom.src = seedSrc.replace(/\/js\/seed\.js(?:\?.*)?$/, '/js/content/search_suggestions_dom.js');
+                dom.onload = () => { try { window.__filtertubeStartSuggestionDom?.(); } catch (e) { } };
+                (document.head || document.documentElement).appendChild(dom);
+            };
             (document.head || document.documentElement).appendChild(tag);
         }
     } catch (e) {
@@ -2047,6 +2054,20 @@
         return wrapped;
     }
 
+    /** The dropdown safety net (content/search_suggestions_dom.js), in this world, on these settings. */
+    let suggestionDomStarted = false;
+    function startSuggestionDom() {
+        try {
+            const dom = window.FilterTubeSearchSuggestionsDom;
+            if (suggestionDomStarted || !dom || typeof dom.watch !== 'function' || !window.MutationObserver) return;
+            suggestionDomStarted = true;
+            dom.watch({ window, document, settings: () => cachedSettings });
+        } catch (e) {
+        }
+    }
+    // Firefox loads the module after seed (see the top of this file) and starts it from there.
+    try { Object.defineProperty(window, '__filtertubeStartSuggestionDom', { value: startSuggestionDom, configurable: true }); } catch (e) { }
+
     /** Traps window.google -> google.ac -> h before the site's script defines them. */
     function setupSuggestionCallbackTrap() {
         const trapProperty = (owner, key, onValue) => {
@@ -2610,6 +2631,7 @@
     
     // Set up fetch interception
     setupSuggestionCallbackTrap();
+    startSuggestionDom();
     setupFetchInterception();
 
     setupXhrInterception();

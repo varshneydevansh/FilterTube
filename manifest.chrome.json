@@ -33,7 +33,7 @@
             ],
             "exclude_matches": ["*://*.youtube.com/embed/*"],
             "js": [
-                "js/shared/view_count.js", "js/shared/search_suggestions_filter.js",
+                "js/shared/view_count.js", "js/shared/search_suggestions_filter.js", "js/content/search_suggestions_dom.js",
                 "js/seed.js"
             ],
             "run_at": "document_start",
@@ -64,7 +64,7 @@
                 "js/content/content_playback_admission.js",
                 "js/content/content_playback_native.js",
                 "js/content/content_playback.js",
-                "js/content/video_notes.js", "js/content/study_overlay.js", "js/shared/search_suggestions_filter.js", "js/content/search_suggestions_dom.js", "js/shared/paced_fetch.js", "js/shared/channel_search.js", "js/content/channel_search_shelf.js",
+                "js/content/video_notes.js", "js/content/study_overlay.js", "js/shared/paced_fetch.js", "js/shared/channel_search.js", "js/content/channel_search_shelf.js",
                 "js/shared/hidden_log.js", "js/content_bridge.js"
             ],
             "run_at": "document_start",
@@ -141,7 +141,7 @@
                 "js/filter_logic.js",
                 "js/seed.js",
                 "js/shared/identity.js", "js/shared/view_count.js",
-                "js/shared/search_suggestions_filter.js", "js/content/admission_overlay.js",
+                "js/shared/search_suggestions_filter.js", "js/content/search_suggestions_dom.js", "js/content/admission_overlay.js",
                 "data/ui_locales/*.json",
                 "assets/images/homepage_hero_day.mp4",
                 "assets/images/mascots/*.webp", "assets/fonts/delius.ttf",
