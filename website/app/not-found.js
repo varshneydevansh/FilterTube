@@ -1,22 +1,25 @@
 import Link from "next/link";
 
 import { ActionLink, Panel } from "@/components/marketing-ui";
+import { MascotSprite } from "@/components/mascot-sprite";
 
 export default function NotFound() {
   return (
     <section className="px-4 pb-24 pt-32 md:px-6 md:pb-32 md:pt-40">
       <div className="mx-auto max-w-[900px]">
         <Panel innerClassName="p-8 text-center md:p-12">
-          <p className="text-[0.72rem] uppercase tracking-[0.24em] text-[var(--color-muted)]">
+          <div className="ft-paper ft-paper-ruled mx-auto max-w-[30rem] rounded-[1.75rem] px-6 pb-4 pt-6">
+            <MascotSprite className="mx-auto w-[min(20rem,90%)]" loops={1} motion="untangle" />
+          </div>
+          <p className="mt-8 text-[0.72rem] uppercase tracking-[0.24em] text-[var(--color-muted)]">
             Page not found
           </p>
-          <h1 className="mx-auto mt-6 max-w-[10ch] font-display text-5xl tracking-[-0.06em] text-[var(--color-ink)] md:text-7xl">
-            This route never made it through the filter.
+          <h1 className="mx-auto mt-5 max-w-[16ch] text-balance font-display text-5xl tracking-[-0.06em] text-[var(--color-ink)] md:text-6xl">
+            This page got tangled up.
           </h1>
           <p className="mx-auto mt-6 max-w-[54ch] text-base leading-8 text-[var(--color-muted)]">
-            The page may have moved during the rebuild. Head back to the main
-            site or open the privacy page if you came here from an old footer
-            link.
+            Kriti is untangling it. The page may have moved during the rebuild, so head
+            back home, or open the privacy page if you came from an old footer link.
           </p>
           <div className="mt-10 flex flex-col items-center justify-center gap-4 sm:flex-row">
             <ActionLink href="/">Return home</ActionLink>

@@ -9,7 +9,10 @@ import {
 } from "@phosphor-icons/react/ssr";
 
 import { BrowserLogoRail } from "@/components/browser-logo-rail";
+import { DeviceStrip } from "@/components/device-strip";
 import { HeroVideo } from "@/components/hero-video";
+import { HowItWorks } from "@/components/how-it-works";
+import { MeetMascots } from "@/components/meet-mascots";
 import { ActionLink, Panel, SectionHeading } from "@/components/marketing-ui";
 import { Reveal } from "@/components/reveal";
 import { P2PSyncExplainer } from "@/components/p2p-sync-explainer";
@@ -474,9 +477,9 @@ export default function HomePage() {
                 <span className="rounded-full border border-white/24 bg-[rgba(255,255,255,0.08)] px-4 py-2 text-[#fffaf4] shadow-[inset_0_1px_0_rgba(255,255,255,0.16)] backdrop-blur-xl">
                   Hide Shorts
                 </span>
-                <span className="rounded-full border border-white/24 bg-[rgba(255,255,255,0.08)] px-4 py-2 text-[#fffaf4] shadow-[inset_0_1px_0_rgba(255,255,255,0.16)] backdrop-blur-xl">
-                  Whitelist mode
-                </span>
+                <a href="#how-it-works" className="rounded-full border border-white/24 bg-[rgba(255,255,255,0.08)] px-4 py-2 text-[#fffaf4] shadow-[inset_0_1px_0_rgba(255,255,255,0.16)] backdrop-blur-xl underline decoration-white/50 underline-offset-4">
+                  Allow list and Study mode
+                </a>
                 <span className="rounded-full border border-white/24 bg-[rgba(255,255,255,0.08)] px-4 py-2 text-[#fffaf4] shadow-[inset_0_1px_0_rgba(255,255,255,0.16)] backdrop-blur-xl">
                   PIN locked profiles
                 </span>
@@ -489,9 +492,15 @@ export default function HomePage() {
         </div>
       </section>
 
+      <HowItWorks />
+
+      <DeviceStrip />
+
       <AppReleaseStatusSection />
 
       <QuickGuideSection />
+
+      <MeetMascots />
 
       <section id="story" className="px-4 py-20 md:px-6 md:py-28 lg:py-32">
         <div className="mx-auto grid max-w-[1400px] gap-10 lg:grid-cols-[minmax(0,0.9fr)_minmax(0,1.1fr)] lg:gap-16">

@@ -107,3 +107,21 @@ Edge and other supported-browser choices in the copy and installation links.
 Home release cards use one shared layout; at narrow widths keep full-width copy
 and a compact icon, reserving larger artwork for wider screens. Download cards
 and buttons must fit their containers without relying on page overflow clipping.
+
+## Site refresh — 18 November 2026
+
+How it works sits right after the home hero: a block list / allow list demo that
+switches the same six made-up videos (a schematic list, not a fake screenshot),
+then Study mode as a four-step story, then "What we keep out" and the time-saved
+medal. Kriti and Uljhan are the only characters. Their art is cut from the aKriti
+library by tools/cut-mascots.py and stands on a light "paper" stage that stays
+light in dark mode so the crayon colours hold. Animated strips play with CSS
+steps() on transform only, start when scrolled into view, stop after two loops or
+fewer (under five seconds) and rest on a still frame; selecting one replays it.
+Reduced motion shows the still frame only.
+
+Every app screenshot comes from data/screenshots.js. The home device strip lays
+out two rows whose tiles grow by aspect ratio so screens in a row share a height.
+Devices without captures show an honest "screens are on the way" card instead of
+borrowing another device's screen. docs/refresh-2026-11-18/CAPTURE_LIST.md lists
+the six screens to capture per device.
