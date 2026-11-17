@@ -3310,7 +3310,6 @@
   "study.coverage.privateBody": "खाजगी विंडोमध्ये FilterTube ला परवानगी नाही, त्यामुळे तिथे अभ्यासाचे नियम थांबतात. तुमच्या ब्राउझरच्या एक्सटेन्शन सेटिंग्जमध्ये FilterTube साठी \"खाजगीमध्ये परवानगी द्या\" सुरू करा.",
   "study.coverage.familyPolicy": "मुलाच्या डिव्हाइसवर ब्राउझर धोरण FilterTube इंस्टॉल ठेवू शकते आणि खाजगी विंडो बंद करू शकते. डिव्हाइस सांभाळणाऱ्यांना ExtensionSettings / IncognitoModeAvailability बद्दल विचारा.",
   "home.tried.title": "आज उलझनने काय प्रयत्न केला",
-  "about.duo.code": "हे ब्राउझर एक्सटेंशन ओपन सोर्स आहे; फोन आणि टीव्ही ॲप्स नाहीत. कोणतेही वापरा, कोणताही सर्व्हर तुमचा डेटा ठेवत नाही आणि FilterTube वर साइन-अप नाही.",
   "home.study.next": "पुढची फेरी {time} वाजता",
   "home.quick.addChannel": "चॅनेल जोडा",
   "apps.ios.sideloadTitle": "SideStore ने इन्स्टॉल करा",

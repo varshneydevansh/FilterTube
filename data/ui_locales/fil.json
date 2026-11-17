@@ -3310,7 +3310,6 @@
   "study.coverage.privateBody": "Hindi pinapayagan ang FilterTube sa mga private window, kaya doon humihinto ang mga panuntunan sa pag-aaral. I-on ang \"Payagan sa private\" para sa FilterTube sa mga setting ng extension ng browser mo.",
   "study.coverage.familyPolicy": "Sa device ng bata, kayang panatilihing naka-install ng patakaran ng browser ang FilterTube at patayin ang mga private window. Tanungin ang namamahala sa device tungkol sa ExtensionSettings / IncognitoModeAvailability.",
   "home.tried.title": "Ang sinubukan ni Uljhan ngayon",
-  "about.duo.code": "Open source ang browser extension na ito; hindi ang mga app sa phone at TV. Anuman ang gamit mo, walang server na nagtatago ng data mo at walang FilterTube sign-up.",
   "home.study.next": "Susunod na round sa {time}",
   "home.quick.addChannel": "Magdagdag ng channel",
   "apps.ios.sideloadTitle": "I-install gamit ang SideStore",

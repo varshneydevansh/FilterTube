@@ -3310,7 +3310,6 @@
   "study.coverage.privateBody": "प्राइवेट विंडो में FilterTube को अनुमति नहीं है, इसलिए पढ़ाई के नियम वहाँ रुक जाते हैं। अपने ब्राउज़र की एक्सटेंशन सेटिंग में FilterTube के लिए \"प्राइवेट में अनुमति दें\" चालू करें।",
   "study.coverage.familyPolicy": "बच्चे के डिवाइस पर ब्राउज़र नीति FilterTube को इंस्टॉल रख सकती है और प्राइवेट विंडो बंद कर सकती है। डिवाइस सँभालने वाले से ExtensionSettings / IncognitoModeAvailability के बारे में पूछें।",
   "home.tried.title": "आज उलझन ने क्या कोशिश की",
-  "about.duo.code": "यह ब्राउज़र एक्सटेंशन ओपन सोर्स है; फ़ोन और टीवी ऐप नहीं हैं। दोनों में, कोई सर्वर आपका डेटा नहीं रखता और FilterTube पर साइन-अप नहीं करना पड़ता।",
   "home.study.next": "अगला राउंड {time} पर",
   "home.quick.addChannel": "चैनल जोड़ें",
   "apps.ios.sideloadTitle": "SideStore से इंस्टॉल करें",

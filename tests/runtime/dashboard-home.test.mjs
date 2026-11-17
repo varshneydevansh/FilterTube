@@ -146,8 +146,8 @@ test('About tells the Kriti and Uljhan story and keeps open source straight', ()
   const story = html.slice(html.indexOf('<section class="ft-about-duo" data-ft-duo-story'), html.indexOf('<div class="ft-about-feature-grid">'));
   assert.match(story, /Kriti is my sister/);
   assert.match(story, /Uljhan means tangle, or confusion, in Hindi\. He isn't evil\./);
-  assert.match(story, /This browser extension is open source; the phone and TV apps are not\./);
-  assert.match(story, /no servers keep your data and there's no FilterTube sign-up/);
+  // The owner removed the open-source/no-servers note from About.
+  assert.doesNotMatch(story, /about\.duo\.code|ft-about-duo__note|open source/);
   assert.match(story, /duo_sieve_06\.webp/);
 });
 

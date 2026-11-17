@@ -3308,7 +3308,6 @@
   "study.coverage.privateBody": "FilterTube 未获准在无痕窗口中运行，所以学习规则在那里不起作用。请在浏览器的扩展程序设置中为 FilterTube 打开“在无痕模式下启用”。",
   "study.coverage.familyPolicy": "在孩子的设备上，浏览器策略可以让 FilterTube 保持安装并关闭无痕窗口。请向管理设备的人询问 ExtensionSettings / IncognitoModeAvailability。",
   "home.tried.title": "Uljhan 今天想做什么",
-  "about.duo.code": "这个浏览器扩展是开源的；手机和电视应用不是。无论哪种，都没有服务器保存你的数据，也不需要注册 FilterTube。",
   "home.study.next": "下一轮在 {time}",
   "home.quick.addChannel": "添加频道",
   "apps.ios.sideloadTitle": "用 SideStore 安装",

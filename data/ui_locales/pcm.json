@@ -3310,7 +3310,6 @@
   "study.coverage.privateBody": "FilterTube no get permission for private windows, so study rules stop for there. Turn on \"Allow in private\" for FilterTube for your browser extension settings.",
   "study.coverage.familyPolicy": "For pikin device, browser policy fit keep FilterTube installed and off private windows. Ask the person wey dey manage the device about ExtensionSettings / IncognitoModeAvailability.",
   "home.tried.title": "Wetin Uljhan try today",
-  "about.duo.code": "Dis browser extension na open source; the phone and TV apps no be. Anyhow, no server dey keep your data and you no need FilterTube sign-up.",
   "home.study.next": "Next round for {time}",
   "home.quick.addChannel": "Add channel",
   "apps.ios.sideloadTitle": "Install am with SideStore",

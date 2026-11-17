@@ -3334,7 +3334,6 @@
   "study.coverage.privateBody": "FilterTube غير مسموح في النوافذ الخاصة، لذلك تتوقف قواعد الدراسة هناك. فعّل «السماح في الوضع الخاص» لـ FilterTube في إعدادات إضافات المتصفح.",
   "study.coverage.familyPolicy": "على جهاز الطفل، يمكن لسياسة المتصفح إبقاء FilterTube مثبتًا وإيقاف النوافذ الخاصة. اسأل من يدير الجهاز عن ExtensionSettings / IncognitoModeAvailability.",
   "home.tried.title": "ما حاول أُلجهان فعله اليوم",
-  "about.duo.code": "إضافة المتصفح هذه مفتوحة المصدر؛ تطبيقات الهاتف والتلفاز ليست كذلك. في كل الأحوال لا توجد خوادم تحتفظ ببياناتك ولا حاجة إلى التسجيل في FilterTube.",
   "home.study.next": "الجولة التالية في {time}",
   "home.quick.addChannel": "إضافة قناة",
   "apps.ios.sideloadTitle": "ثبّته عبر SideStore",

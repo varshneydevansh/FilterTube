@@ -3308,7 +3308,6 @@
   "study.coverage.privateBody": "FilterTube 唔可以喺私密視窗運行，所以溫習規則去到嗰度就停。喺瀏覽器嘅擴充功能設定入面，幫 FilterTube 開「允許喺私密模式運行」。",
   "study.coverage.familyPolicy": "喺細路嘅裝置上，瀏覽器政策可以令 FilterTube 一直安裝住，同埋關閉私密視窗。問下管理部裝置嘅人關於 ExtensionSettings / IncognitoModeAvailability。",
   "home.tried.title": "Uljhan 今日試過做乜",
-  "about.duo.code": "呢個瀏覽器擴充功能係開源嘅；手機同電視 App 唔係。無論邊樣，都冇伺服器保存你嘅資料，亦唔使登記 FilterTube。",
   "home.study.next": "下一輪喺 {time}",
   "home.quick.addChannel": "加頻道",
   "apps.ios.sideloadTitle": "用 SideStore 安裝",

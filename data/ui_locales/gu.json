@@ -3310,7 +3310,6 @@
   "study.coverage.privateBody": "ખાનગી વિન્ડોમાં FilterTube ને મંજૂરી નથી, તેથી ત્યાં અભ્યાસના નિયમો અટકી જાય છે. તમારા બ્રાઉઝરના એક્સટેન્શન સેટિંગ્સમાં FilterTube માટે \"ખાનગીમાં મંજૂરી આપો\" ચાલુ કરો.",
   "study.coverage.familyPolicy": "બાળકના ડિવાઇસ પર બ્રાઉઝર નીતિ FilterTube ને ઇન્સ્ટોલ રાખી શકે અને ખાનગી વિન્ડો બંધ કરી શકે. ડિવાઇસ સંભાળનારને ExtensionSettings / IncognitoModeAvailability વિશે પૂછો.",
   "home.tried.title": "આજે ઉલઝને શું પ્રયત્ન કર્યો",
-  "about.duo.code": "આ બ્રાઉઝર એક્સ્ટેન્શન ઓપન સોર્સ છે; ફોન અને ટીવી એપ્સ નથી. કોઈ પણ રીતે, કોઈ સર્વર તમારો ડેટા રાખતો નથી અને FilterTube પર સાઇન-અપ નથી.",
   "home.study.next": "આગલો રાઉન્ડ {time} વાગ્યે",
   "home.quick.addChannel": "ચેનલ ઉમેરો",
   "apps.ios.sideloadTitle": "SideStore વડે ઇન્સ્ટોલ કરો",

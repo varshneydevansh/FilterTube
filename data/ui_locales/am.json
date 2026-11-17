@@ -3310,7 +3310,6 @@
   "study.coverage.privateBody": "FilterTube በግል መስኮቶች አልተፈቀደም፣ ስለዚህ የጥናት ደንቦች እዚያ ይቆማሉ። በአሳሽህ የቅጥያ ቅንብሮች ውስጥ ለFilterTube «በግል ፍቀድ»ን አብራ።",
   "study.coverage.familyPolicy": "በልጅ መሣሪያ ላይ የአሳሽ ፖሊሲ FilterTubeን ተጭኖ እንዲቆይ እና የግል መስኮቶችን እንዲያጠፋ ማድረግ ይችላል። መሣሪያውን የሚያስተዳድረውን ሰው ስለ ExtensionSettings / IncognitoModeAvailability ጠይቅ።",
   "home.tried.title": "ኡልጃን ዛሬ የሞከረው",
-  "about.duo.code": "ይህ የአሳሽ ቅጥያ ክፍት ምንጭ ነው፤ የስልክና የቲቪ መተግበሪያዎቹ ግን አይደሉም። በየትኛውም መንገድ፣ ውሂብዎን የሚያስቀምጥ አገልጋይ የለም፤ የFilterTube ምዝገባም የለም።",
   "home.study.next": "ቀጣዩ ዙር {time} ላይ",
   "home.quick.addChannel": "ቻናል አክል",
   "apps.ios.sideloadTitle": "በSideStore ይጫኑት",

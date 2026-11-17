@@ -3308,7 +3308,6 @@
   "study.coverage.privateBody": "FilterTube ora diidini ing jendhela pribadi, mula aturan sinau mandheg ing kana. Uripna \"Idinaké ing mode pribadi\" kanggo FilterTube ing setelan ekstensi browser-mu.",
   "study.coverage.familyPolicy": "Ing piranti bocah, kabijakan browser bisa njaga FilterTube tetep kapasang lan mateni jendhela pribadi. Takon ExtensionSettings / IncognitoModeAvailability marang sing ngurus piranti.",
   "home.tried.title": "Apa sing dicoba Uljhan dina iki",
-  "about.duo.code": "Ekstensi browser iki open source; aplikasi telpon lan TV ora. Apa wae sing dienggo, ora ana server sing nyimpen data sampeyan lan ora perlu daftar FilterTube.",
   "home.study.next": "Babak sabanjure jam {time}",
   "home.quick.addChannel": "Tambah kanal",
   "apps.ios.sideloadTitle": "Pasang nganggo SideStore",

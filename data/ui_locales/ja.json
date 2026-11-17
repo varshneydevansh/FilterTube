@@ -3308,7 +3308,6 @@
   "study.coverage.privateBody": "FilterTubeはプライベートウィンドウで許可されていないため、そこでは学習ルールが止まります。ブラウザの拡張機能の設定で、FilterTubeの「プライベートで許可」をオンにしてください。",
   "study.coverage.familyPolicy": "子どもの端末では、ブラウザのポリシーでFilterTubeをインストールしたままにし、プライベートウィンドウをオフにできます。端末の管理者にExtensionSettings / IncognitoModeAvailabilityについて聞いてください。",
   "home.tried.title": "ウルジャンが今日しようとしたこと",
-  "about.duo.code": "このブラウザー拡張機能はオープンソースです。スマホと TV のアプリはそうではありません。どちらでも、データを保管するサーバーはなく、FilterTube への登録も不要です。",
   "home.study.next": "次のラウンドは {time}",
   "home.quick.addChannel": "チャンネルを追加",
   "apps.ios.sideloadTitle": "SideStore でインストール",

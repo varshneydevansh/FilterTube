@@ -3310,7 +3310,6 @@
   "study.coverage.privateBody": "FilterTube no tiene permiso en ventanas privadas, así que las reglas de estudio no llegan ahí. Activa «Permitir en modo privado» para FilterTube en la configuración de extensiones de tu navegador.",
   "study.coverage.familyPolicy": "En el dispositivo de un niño, una política del navegador puede mantener FilterTube instalado y desactivar las ventanas privadas. Pregunta a quien administra el dispositivo por ExtensionSettings / IncognitoModeAvailability.",
   "home.tried.title": "Lo que Uljhan intentó hoy",
-  "about.duo.code": "Esta extensión del navegador es de código abierto; las apps para teléfono y TV no. En cualquier caso, ningún servidor guarda tus datos y no hay registro en FilterTube.",
   "home.study.next": "Siguiente ronda a las {time}",
   "home.quick.addChannel": "Añadir canal",
   "apps.ios.sideloadTitle": "Instálalo con SideStore",

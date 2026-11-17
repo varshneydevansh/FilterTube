@@ -3308,7 +3308,6 @@
   "study.coverage.privateBody": "FilterTube không được phép trong cửa sổ riêng tư nên quy tắc học dừng ở đó. Bật \"Cho phép ở chế độ riêng tư\" cho FilterTube trong cài đặt tiện ích của trình duyệt.",
   "study.coverage.familyPolicy": "Trên thiết bị của trẻ, chính sách trình duyệt có thể giữ FilterTube luôn được cài và tắt cửa sổ riêng tư. Hãy hỏi người quản lý thiết bị về ExtensionSettings / IncognitoModeAvailability.",
   "home.tried.title": "Hôm nay Uljhan đã thử gì",
-  "about.duo.code": "Tiện ích trình duyệt này là mã nguồn mở; ứng dụng điện thoại và TV thì không. Dù sao, không máy chủ nào giữ dữ liệu của bạn và không cần đăng ký FilterTube.",
   "home.study.next": "Vòng tiếp theo lúc {time}",
   "home.quick.addChannel": "Thêm kênh",
   "apps.ios.sideloadTitle": "Cài bằng SideStore",

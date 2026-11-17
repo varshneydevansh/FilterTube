@@ -3308,7 +3308,6 @@
   "study.coverage.privateBody": "FilterTube ไม่ได้รับอนุญาตในหน้าต่างส่วนตัว กฎการเรียนจึงหยุดที่นั่น เปิด \"อนุญาตในโหมดส่วนตัว\" ให้ FilterTube ในการตั้งค่าส่วนขยายของเบราว์เซอร์",
   "study.coverage.familyPolicy": "ในอุปกรณ์ของเด็ก นโยบายเบราว์เซอร์ช่วยให้ FilterTube ติดตั้งอยู่และปิดหน้าต่างส่วนตัวได้ ถามผู้ดูแลอุปกรณ์เรื่อง ExtensionSettings / IncognitoModeAvailability",
   "home.tried.title": "สิ่งที่อุลจันพยายามทำวันนี้",
-  "about.duo.code": "ส่วนขยายเบราว์เซอร์นี้เป็นโอเพนซอร์ส แต่แอปบนโทรศัพท์และทีวีไม่ใช่ ไม่ว่าแบบไหน ก็ไม่มีเซิร์ฟเวอร์เก็บข้อมูลของคุณ และไม่ต้องสมัคร FilterTube",
   "home.study.next": "รอบถัดไปเวลา {time}",
   "home.quick.addChannel": "เพิ่มช่อง",
   "apps.ios.sideloadTitle": "ติดตั้งด้วย SideStore",

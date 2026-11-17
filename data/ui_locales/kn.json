@@ -3310,7 +3310,6 @@
   "study.coverage.privateBody": "ಖಾಸಗಿ ವಿಂಡೋಗಳಲ್ಲಿ FilterTube ಗೆ ಅನುಮತಿ ಇಲ್ಲ, ಹಾಗಾಗಿ ಅಲ್ಲಿ ಅಧ್ಯಯನ ನಿಯಮಗಳು ನಿಲ್ಲುತ್ತವೆ. ನಿಮ್ಮ ಬ್ರೌಸರ್‌ನ ವಿಸ್ತರಣೆ ಸೆಟ್ಟಿಂಗ್‌ಗಳಲ್ಲಿ FilterTube ಗಾಗಿ \"ಖಾಸಗಿಯಲ್ಲಿ ಅನುಮತಿಸಿ\" ಆನ್ ಮಾಡಿ.",
   "study.coverage.familyPolicy": "ಮಗುವಿನ ಸಾಧನದಲ್ಲಿ ಬ್ರೌಸರ್ ನೀತಿ FilterTube ಅನ್ನು ಸ್ಥಾಪಿತವಾಗಿಟ್ಟು ಖಾಸಗಿ ವಿಂಡೋಗಳನ್ನು ಆಫ್ ಮಾಡಬಹುದು. ಸಾಧನ ನಿರ್ವಹಿಸುವವರನ್ನು ExtensionSettings / IncognitoModeAvailability ಬಗ್ಗೆ ಕೇಳಿ.",
   "home.tried.title": "ಇಂದು ಉಲ್ಝನ್ ಏನು ಪ್ರಯತ್ನಿಸಿದ",
-  "about.duo.code": "ಈ ಬ್ರೌಸರ್ ಎಕ್ಸ್‌ಟೆನ್ಶನ್ ಓಪನ್ ಸೋರ್ಸ್; ಫೋನ್ ಮತ್ತು ಟಿವಿ ಆ್ಯಪ್‌ಗಳು ಅಲ್ಲ. ಯಾವುದೇ ಆದರೂ, ಯಾವುದೇ ಸರ್ವರ್ ನಿಮ್ಮ ಡೇಟಾ ಇಡುವುದಿಲ್ಲ ಮತ್ತು FilterTube ಸೈನ್-ಅಪ್ ಇಲ್ಲ.",
   "home.study.next": "ಮುಂದಿನ ಸುತ್ತು {time} ಕ್ಕೆ",
   "home.quick.addChannel": "ಚಾನೆಲ್ ಸೇರಿಸಿ",
   "apps.ios.sideloadTitle": "SideStore ಮೂಲಕ ಇನ್‌ಸ್ಟಾಲ್ ಮಾಡಿ",

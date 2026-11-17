@@ -3310,7 +3310,6 @@
   "study.coverage.privateBody": "FilterTube darf in privaten Fenstern nicht laufen, dort enden die Lernregeln. Schalte in den Erweiterungseinstellungen deines Browsers „Im privaten Modus erlauben“ für FilterTube ein.",
   "study.coverage.familyPolicy": "Auf dem Gerät eines Kindes kann eine Browser-Richtlinie FilterTube installiert lassen und private Fenster abschalten. Frag die Person, die das Gerät verwaltet, nach ExtensionSettings / IncognitoModeAvailability.",
   "home.tried.title": "Was Uljhan heute versucht hat",
-  "about.duo.code": "Diese Browser-Erweiterung ist Open Source, die Apps für Handy und TV nicht. So oder so speichern keine Server deine Daten, und es gibt keine FilterTube-Anmeldung.",
   "home.study.next": "Nächste Runde um {time}",
   "home.quick.addChannel": "Kanal hinzufügen",
   "apps.ios.sideloadTitle": "Mit SideStore installieren",

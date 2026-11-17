@@ -3308,7 +3308,6 @@
   "study.coverage.privateBody": "FilterTube는 비공개 창에서 허용되지 않아 공부 규칙이 그곳에서는 멈춰요. 브라우저의 확장 프로그램 설정에서 FilterTube의 '비공개 모드에서 허용'을 켜세요.",
   "study.coverage.familyPolicy": "아이 기기에서는 브라우저 정책으로 FilterTube를 설치된 상태로 두고 비공개 창을 끌 수 있어요. 기기를 관리하는 사람에게 ExtensionSettings / IncognitoModeAvailability에 대해 물어보세요.",
   "home.tried.title": "오늘 울잔이 시도한 것",
-  "about.duo.code": "이 브라우저 확장 프로그램은 오픈 소스예요. 휴대폰과 TV 앱은 그렇지 않아요. 어느 쪽이든 데이터를 보관하는 서버는 없고 FilterTube 가입도 필요 없어요.",
   "home.study.next": "다음 라운드 {time}",
   "home.quick.addChannel": "채널 추가",
   "apps.ios.sideloadTitle": "SideStore로 설치하기",

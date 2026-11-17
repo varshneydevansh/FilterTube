@@ -3310,7 +3310,6 @@
   "study.coverage.privateBody": "ప్రైవేట్ విండోలలో FilterTube కి అనుమతి లేదు, కాబట్టి అక్కడ చదువు నియమాలు ఆగిపోతాయి. మీ బ్రౌజర్ ఎక్స్‌టెన్షన్ సెట్టింగ్‌లలో FilterTube కోసం \"ప్రైవేట్‌లో అనుమతించు\" ఆన్ చేయండి.",
   "study.coverage.familyPolicy": "పిల్లల పరికరంలో బ్రౌజర్ విధానం FilterTube ను ఇన్‌స్టాల్ చేసి ఉంచి, ప్రైవేట్ విండోలను ఆపివేయగలదు. పరికరాన్ని చూసుకునే వారిని ExtensionSettings / IncognitoModeAvailability గురించి అడగండి.",
   "home.tried.title": "ఈరోజు ఉల్జన్ ఏమి ప్రయత్నించాడు",
-  "about.duo.code": "ఈ బ్రౌజర్ ఎక్స్‌టెన్షన్ ఓపెన్ సోర్స్; ఫోన్, టీవీ యాప్‌లు కావు. ఏదైనా సరే, ఏ సర్వరూ మీ డేటాను ఉంచదు, FilterTube సైన్-అప్ కూడా లేదు.",
   "home.study.next": "తదుపరి రౌండ్ {time}కి",
   "home.quick.addChannel": "ఛానెల్ జోడించు",
   "apps.ios.sideloadTitle": "SideStoreతో ఇన్‌స్టాల్ చేయండి",

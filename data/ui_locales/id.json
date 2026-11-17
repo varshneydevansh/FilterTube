@@ -3308,7 +3308,6 @@
   "study.coverage.privateBody": "FilterTube tidak diizinkan di jendela pribadi, jadi aturan belajar berhenti di sana. Aktifkan \"Izinkan dalam mode pribadi\" untuk FilterTube di setelan ekstensi browser-mu.",
   "study.coverage.familyPolicy": "Di perangkat anak, kebijakan browser bisa menjaga FilterTube tetap terpasang dan mematikan jendela pribadi. Tanyakan ExtensionSettings / IncognitoModeAvailability kepada pengelola perangkat.",
   "home.tried.title": "Yang dicoba Uljhan hari ini",
-  "about.duo.code": "Ekstensi browser ini open source; aplikasi ponsel dan TV tidak. Bagaimanapun juga, tidak ada server yang menyimpan datamu dan tidak perlu daftar FilterTube.",
   "home.study.next": "Ronde berikutnya pukul {time}",
   "home.quick.addChannel": "Tambah saluran",
   "apps.ios.sideloadTitle": "Pasang dengan SideStore",

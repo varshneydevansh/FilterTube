@@ -3310,7 +3310,6 @@
   "study.coverage.privateBody": "FilterTube'a gizli pencerelerde izin verilmiyor, bu yüzden ders kuralları orada durur. Tarayıcının uzantı ayarlarında FilterTube için \"Gizli modda izin ver\"i aç.",
   "study.coverage.familyPolicy": "Bir çocuğun cihazında tarayıcı politikası FilterTube'u yüklü tutabilir ve gizli pencereleri kapatabilir. Cihazı yöneten kişiye ExtensionSettings / IncognitoModeAvailability hakkında sor.",
   "home.tried.title": "Uljhan bugün neler denedi",
-  "about.duo.code": "Bu tarayıcı uzantısı açık kaynaklıdır; telefon ve TV uygulamaları değildir. Her durumda hiçbir sunucu verilerini tutmaz ve FilterTube kaydı yoktur.",
   "home.study.next": "Sonraki tur saat {time}",
   "home.quick.addChannel": "Kanal ekle",
   "apps.ios.sideloadTitle": "SideStore ile yükle",

@@ -3310,7 +3310,6 @@
   "study.coverage.privateBody": "FilterTube در پنجره‌های خصوصی اجازه ندارد، پس قوانین مطالعه آنجا متوقف می‌شوند. در تنظیمات افزونه‌های مرورگر، «اجازه در حالت خصوصی» را برای FilterTube روشن کنید.",
   "study.coverage.familyPolicy": "روی دستگاه کودک، سیاست مرورگر می‌تواند FilterTube را نصب نگه دارد و پنجره‌های خصوصی را خاموش کند. از کسی که دستگاه را مدیریت می‌کند دربارهٔ ExtensionSettings / IncognitoModeAvailability بپرسید.",
   "home.tried.title": "اولجان امروز چه کرد",
-  "about.duo.code": "این افزونهٔ مرورگر متن‌باز است؛ اپ‌های تلفن و تلویزیون نیستند. در هر صورت هیچ سروری داده‌های شما را نگه نمی‌دارد و ثبت‌نامی در FilterTube لازم نیست.",
   "home.study.next": "دور بعدی ساعت {time}",
   "home.quick.addChannel": "افزودن کانال",
   "apps.ios.sideloadTitle": "با SideStore نصبش کنید",
