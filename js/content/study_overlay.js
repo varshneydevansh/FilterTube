@@ -163,7 +163,8 @@
             if (!state) return null;
             if (state.clockHold) return 'hold';
             if (state.state === 'LIMIT') return 'limit';
-            if (state.state === 'BREAK' && state.breakMode !== 'normal' && !state.breakSkipped) return 'rest';
+            // A skipped break comes back from the clock as STUDY (it folds into the round), so it is never rest.
+            if (state.state === 'BREAK' && state.breakMode !== 'normal') return 'rest';
             // Fail closed: a study round with no known pack (and no own allowed channels) is rest.
             if (state.state === 'STUDY' && state.phase === 'rest') return 'unavailable';
             // Kids holds during an exam or class round; Kids learning packs keep it open.
@@ -412,7 +413,7 @@
                     send({ action: 'FilterTube_StudySkipBreak' }).then(response => {
                         if (!response?.ok) return;
                         if (preview) showSkipped(box, preview, dark);
-                        else setState({ ...state, breakSkipped: true });
+                        else { setState({ ...state, state: 'STUDY', breakSkipped: true, canSkipBreak: false }); refresh(); }
                     });
                 });
                 box.appendChild(button);
@@ -569,7 +570,9 @@
             setTimer(() => {
                 if (!skipped || skipped.expiresAt !== expiresAt) return;
                 skipped = null;
-                setState({ ...state, breakSkipped: true, skipPreview: null });
+                // The round runs through the skipped break now; the background says so on the next read.
+                setState({ ...state, state: 'STUDY', breakSkipped: true, skipPreview: null, canSkipBreak: false });
+                refresh();
             }, SKIP_UNDO_MS);
         }
 

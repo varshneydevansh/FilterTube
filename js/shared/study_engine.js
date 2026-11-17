@@ -609,12 +609,18 @@
         const covering = occurrences.filter(occurrence => occurrence.start <= now && now < occurrence.end);
         const current = covering.find(occurrence => occurrence.setByParentId) || covering[0];
         if (current) {
-            const segments = splitRounds(current.start, current.end, input.focus);
+            // A skipped break folds into study (Android StudyClock.withSkips): its rules and its time are study's.
+            const raw = splitRounds(current.start, current.end, input.focus);
+            const skips = array(input.skippedBreaks).filter(Number.isFinite);
+            const segments = skips.length ? withSkips(raw, skips) : raw;
             const segment = segments.find(item => item.start <= now && now < item.end) || segments[segments.length - 1];
+            const rawNow = raw.find(item => item.start <= now && now < item.end);
+            const skippedBreak = rawNow && rawNow.kind === BREAK && segment.kind === STUDY && skips.includes(rawNow.start)
+                ? { start: rawNow.start, end: rawNow.end } : null;
             return {
                 state: segment.kind, round: segment.round, rounds: segment.rounds, until: segment.end,
                 sessionStart: current.start, sessionEnd: current.end, source: current.source,
-                setByParentId: current.setByParentId || null, segments
+                setByParentId: current.setByParentId || null, segments, skippedBreak
             };
         }
         const limited = occurrences.find(occurrence => occurrence.limitAt !== null
@@ -628,7 +634,8 @@
      * The study state at `now`:
      *   {state, round, rounds, until, sessionStart, sessionEnd, source, breakMode, segments,
      *    next: {state, at} | null, breakNoticeAt}
-     * Input: {plan, focus, breakMode, now, session?, endedUntil?, limitReached?, parentLock?, clockHold?}.
+     * Input: {plan, focus, breakMode, now, session?, endedUntil?, limitReached?, parentLock?, clockHold?,
+     *         skippedBreaks?: [breakStart]} (skipped breaks fold into study, Android StudyClock.withSkips).
      */
     function studyClock(input = {}) {
         const now = toMs(input.now);
@@ -648,7 +655,9 @@
         }
         const breakMode = text(input.breakMode) === 'normal' ? 'normal' : 'rest';
         const result = { round: null, rounds: null, sessionStart: null, sessionEnd: null, source: null, setByParentId: null,
-            clockHold: false, segments: [], ...current, breakMode, next };
+            clockHold: false, segments: [], skippedBreak: null, ...current, breakMode, next };
+        // Within a skipped break's own time the round runs on; the UI still says the break was skipped.
+        result.breakSkipped = !!result.skippedBreak;
         result.breakNoticeAt = result.state === STUDY && next && next.state === BREAK ? Math.max(now, next.at - BREAK_NOTICE_MS) : null;
         result.studying = result.state === STUDY || result.state === BREAK;
         return result;
@@ -1193,7 +1202,8 @@
         const value = object(clock);
         if (value.clockHold === true || value.state === LIMIT) return 'rest';
         if (value.state === STUDY) return 'study';
-        if (value.state === BREAK && value.breakMode !== 'normal' && value.breakSkipped !== true) return 'rest';
+        // A skipped break is not a BREAK any more: the clock folds it into the round (withSkips).
+        if (value.state === BREAK && value.breakMode !== 'normal') return 'rest';
         return 'normal';
     }
 

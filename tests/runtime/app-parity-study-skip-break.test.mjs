@@ -182,3 +182,52 @@ test('the two new lines are in every catalog with both placeholders', () => {
         }
     }
 });
+
+// Review P0 #1 (STUDY_EDGE_CASES E-10): a skipped break is study time, as Android StudyClock.withSkips
+// folds it. The allow list stays on, the minutes are credited, and Undo brings the break back.
+test('a skipped rest break keeps the study rules on and credits the time', async () => {
+    const h = harness({ now: at(16, 16, 55) });
+    const prepared = async () => h.controller.prepare();
+    const onBreak = h.controller.apply('p1', h.profile(), await prepared());
+    assert.equal(onBreak.state.phase, 'rest', 'a rest break hides everything');
+    assert.equal((await h.controller.skipBreak()).ok, true);
+    const skipped = await h.controller.getState();
+    assert.equal(skipped.state, 'STUDY', 'the round runs through the skipped break');
+    assert.equal(skipped.round, 2);
+    assert.equal(skipped.until, at(16, 18, 0), 'round 2 runs to its own end');
+    assert.equal(skipped.phase, 'study');
+    assert.deepEqual({ ...skipped.skippedBreak }, { start: at(16, 16, 50), end: at(16, 17, 0) });
+    const applied = h.controller.apply('p1', h.profile(), await prepared());
+    assert.equal(applied.applied, true);
+    assert.equal(applied.state.phase, 'study', 'never the normal rules');
+    assert.equal(applied.profile.main.mode, 'whitelist');
+    assert.ok(applied.profile.main.whitelistChannels.length > 0, 'the pack channels stay allowed');
+    h.clock.now = at(16, 16, 56);
+    const credit = await h.controller.tick({ seconds: 60 });
+    assert.equal(credit.ok, true);
+    assert.ok(credit.credited > 0, 'the skipped break counts as study');
+    assert.equal((await h.controller.undoSkipBreak({ until: at(16, 17, 0) })).ok, true);
+    const back = h.controller.apply('p1', h.profile(), await prepared());
+    assert.equal(back.state.phase, 'rest', 'Undo: the break is a break again');
+});
+
+test('the skipped break start is kept per profile and an old runtime field is read as that break', async () => {
+    const h = harness({ now: at(16, 16, 55) });
+    await h.controller.skipBreak();
+    const local = h.store.ftStudyRuntimeV1.profiles.p1;
+    assert.deepEqual(local.skippedBreaks, [at(16, 16, 50)]);
+    assert.equal(local.breakSkippedUntil, null);
+    // An older runtime kept only the end of the skipped break.
+    local.skippedBreaks = [];
+    local.breakSkippedUntil = at(16, 17, 0);
+    assert.equal((await h.controller.getState()).state, 'STUDY');
+});
+
+test('only the clock folds a skip: a BREAK state is rest whatever flag it carries', () => {
+    assert.equal(Engine.studyPhase({ state: 'BREAK', breakMode: 'rest', breakSkipped: true }), 'rest');
+    const clock = Engine.studyClock({ plan: { days: ['mon'], start: '16:00', end: '18:00' }, focus: { roundMinutes: 50, breakMinutes: 10 },
+        now: at(16, 16, 55), skippedBreaks: [at(16, 16, 50)] });
+    assert.equal(clock.state, 'STUDY');
+    assert.equal(clock.breakSkipped, true);
+    assert.equal(Engine.studyPhase(clock), 'study');
+});

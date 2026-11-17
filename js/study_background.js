@@ -69,6 +69,15 @@
         };
     }
 
+    /** Skipped break starts are kept this long (Android StudyRuntime prunes them after 36 hours). */
+    const SKIPPED_BREAK_KEEP_MS = 36 * 60 * 60 * 1000;
+    /** No Skip break in a session's last minute (Android StudyRuntime.canSkipBreak). */
+    const SKIP_BREAK_LAST_MS = 60 * 1000;
+
+    function prunedSkips(list, at) {
+        return [...new Set(array(list).filter(start => Number.isFinite(start) && at - start < SKIPPED_BREAK_KEEP_MS))].sort((a, b) => a - b);
+    }
+
     /** Android StudyRuntimeStore.MAX_SKIPPED. */
     const MAX_SKIPPED = 500;
 
@@ -78,7 +87,10 @@
             session: isObject(value.session) ? value.session : null,
             endRequestedAt: Number.isFinite(value.endRequestedAt) ? value.endRequestedAt : null,
             endedUntil: Number.isFinite(value.endedUntil) ? value.endedUntil : null,
+            // Before 3.6.2's fold: the end of the one skipped break (read as its start, then dropped).
             breakSkippedUntil: Number.isFinite(value.breakSkippedUntil) ? value.breakSkippedUntil : null,
+            // Skipped breaks by their start time (Android StudyRuntime skipped breaks), pruned after 36 h.
+            skippedBreaks: array(value.skippedBreaks).filter(Number.isFinite),
             // "End and switch": the profile to switch to once a Gentle session's pause is over.
             switchTo: typeof value.switchTo === 'string' && value.switchTo.trim() ? value.switchTo.trim() : null
         };
@@ -214,13 +226,22 @@
             }
             const guarded = reading ? guardFor(study, reading, options.clockStore) : { lock: { active: false }, window: null };
             const clockHold = !!reading && reading.changed && clockInForce(study, local, reading, guarded);
-            const clock = Engine.studyClock({
+            const input = {
                 plan: study.plan, focus: study.focus, breakMode: study.breakMode, now: at,
                 session: local.session, endedUntil: local.endedUntil, limitReached: options.limitReached === true,
                 parentLock: guarded.window, clockHold
-            });
-            if (clock.state === Engine.BREAK && Number.isFinite(local.breakSkippedUntil) && at < local.breakSkippedUntil) clock.breakSkipped = true;
-            return { study, local, clock, reading, parentLock: guarded.lock };
+            };
+            // The clock without any skip: where the breaks really are (Skip break and Undo read it).
+            const plain = Engine.studyClock(input);
+            const skippedBreaks = [...local.skippedBreaks];
+            // An older runtime kept only the skipped break's end: read it as that break's start.
+            if (Number.isFinite(local.breakSkippedUntil)) {
+                const legacy = array(plain.segments).find(item => item.kind === Engine.BREAK && item.end === local.breakSkippedUntil);
+                if (legacy && !skippedBreaks.includes(legacy.start)) skippedBreaks.push(legacy.start);
+            }
+            // A skipped break is study (Android StudyClock.withSkips): the allow list stays on and the time counts.
+            const clock = options.ignoreSkips || !skippedBreaks.length ? plain : Engine.studyClock({ ...input, skippedBreaks });
+            return { study, local: { ...local, skippedBreaks }, clock, plain, reading, parentLock: guarded.lock };
         }
 
         /**
@@ -298,7 +319,7 @@
         }
 
         function publicState(study, local, clock, packIds, at, applied = {}) {
-            const breakSkipped = clock.state === Engine.BREAK && Number.isFinite(local.breakSkippedUntil) && at < local.breakSkippedUntil;
+            const breakSkipped = clock.breakSkipped === true;
             let policy = study ? Engine.endPolicy(study) : { canEnd: false, reason: 'no_study' };
             if (clock.setByParentId) policy = { canEnd: false, reason: 'set_by_parent' };
             else if (local.session?.lockMode === 'locked') policy = { canEnd: false, reason: 'locked' };
@@ -319,16 +340,17 @@
                 // Where the current round or break began: the break sun drains from it.
                 segmentStart: (Array.isArray(clock.segments) ? clock.segments : []).find(item => item.end === clock.until)?.start ?? null,
                 // The session's rounds and breaks, for the Day Ring (a skipped break folds into its round).
-                segments: Engine.withSkips && Array.isArray(clock.segments) ? Engine.withSkips(clock.segments,
-                    breakSkipped ? clock.segments.filter(item => item.kind === Engine.BREAK && item.end === local.breakSkippedUntil).map(item => item.start) : [])
-                    .map(({ kind, start, end, round }) => ({ kind, start, end, round })) : [],
+                segments: (Array.isArray(clock.segments) ? clock.segments : []).map(({ kind, start, end, round }) => ({ kind, start, end, round })),
                 sessionStart: clock.sessionStart,
                 sessionEnd: clock.sessionEnd,
                 source: clock.source,
                 breakMode: clock.breakMode,
                 breakNoticeAt: clock.breakNoticeAt,
                 breakSkipped,
-                canSkipBreak: !!study && Engine.selfStarted(study) && !clock.setByParentId && clock.state === Engine.BREAK,
+                canSkipBreak: !!study && Engine.selfStarted(study) && !clock.setByParentId && clock.state === Engine.BREAK
+                    && !(Number.isFinite(clock.sessionEnd) && clock.sessionEnd - at <= SKIP_BREAK_LAST_MS),
+                // The skipped break the round runs through now ({start, end}), for Undo.
+                skippedBreak: clock.skippedBreak || null,
                 // "+5 min to round 3" under Skip break, and the "Round 3 is now 55 min" line after it.
                 skipPreview: !!study && Engine.selfStarted(study) && !clock.setByParentId && clock.state === Engine.BREAK && !breakSkipped
                     && Engine.breakSkipPreview ? Engine.breakSkipPreview(clock.segments,
@@ -497,8 +519,8 @@
             const items = await storageGet([SESSION_ENDS_KEY]);
             const table = object(clone(items[SESSION_ENDS_KEY]));
             const entry = object(table[profileId]);
-            const skipped = clock.state === Engine.BREAK && Number.isFinite(local.breakSkippedUntil)
-                ? array(clock.segments).filter(item => item.kind === Engine.BREAK && item.end === local.breakSkippedUntil).map(item => item.start) : [];
+            const skipped = array(local.skippedBreaks).filter(start => Number.isFinite(clock.sessionStart) && start >= clock.sessionStart
+                && (!Number.isFinite(clock.sessionEnd) || start < clock.sessionEnd));
             const [open, ended] = Engine.sessionEndStep(isObject(entry.open) ? entry.open : null, clock, study?.focus, skipped, at);
             const next = { open, ended: ended || (isObject(entry.ended) ? entry.ended : null) };
             if (JSON.stringify(next) !== JSON.stringify({ open: entry.open || null, ended: entry.ended || null })) {
@@ -644,7 +666,8 @@
                 if (!result?.ok) return result || { ok: false, error: 'lock_failed' };
             }
             const local = profileRuntime(runtime, profileId);
-            runtime.profiles[profileId] = { ...local, session: { sessionId, startedAt, endsAt, lockMode: mode }, endRequestedAt: null, breakSkippedUntil: null };
+            runtime.profiles[profileId] = { ...local, session: { sessionId, startedAt, endsAt, lockMode: mode }, endRequestedAt: null, breakSkippedUntil: null,
+                skippedBreaks: prunedSkips(local.skippedBreaks, startedAt) };
             await writeRuntime(runtime);
             if (mode === 'gentle') {
                 await updateProfileStudy(profileId, value => ({ ...value, lock: { sessionId, sessionKind: 'self_control', mode: 'gentle', setByParentId: null } }));
@@ -694,15 +717,23 @@
             return { ok: true };
         }
 
+        /**
+         * Skip break (Android StudyRuntime.skipBreak): the break folds into study, so the allow list stays
+         * on and the time is credited. The person's own session or plan only; never in the last minute.
+         */
         async function skipBreak() {
             const { profileId, profile, runtime } = await readAll();
-            const { study, local, clock } = clockFor(profile, runtime, profileId);
+            const at = now();
+            const { study, local, clock } = clockFor(profile, runtime, profileId, at);
             if (!study || clock.state !== Engine.BREAK) return { ok: false, error: 'not_on_break' };
-            if (!Engine.selfStarted(study)) return { ok: false, error: 'set_by_parent' };
-            runtime.profiles[profileId] = { ...local, breakSkippedUntil: clock.until };
+            if (!Engine.selfStarted(study) || clock.setByParentId) return { ok: false, error: 'set_by_parent' };
+            if (Number.isFinite(clock.sessionEnd) && clock.sessionEnd - at <= SKIP_BREAK_LAST_MS) return { ok: false, error: 'last_minute' };
+            const segment = array(clock.segments).find(item => item.kind === Engine.BREAK && item.start <= at && at < item.end);
+            if (!segment) return { ok: false, error: 'not_on_break' };
+            runtime.profiles[profileId] = { ...local, breakSkippedUntil: null, skippedBreaks: prunedSkips([...local.skippedBreaks, segment.start], at) };
             await writeRuntime(runtime);
             await deps.onTransition?.('skip_break');
-            return { ok: true, until: clock.until };
+            return { ok: true, until: segment.end, breakStart: segment.start };
         }
 
         /**
@@ -710,13 +741,15 @@
          * ending at `until` comes back while its time hasn't passed. Not skipped, or over: refused.
          */
         async function undoSkipBreak({ until } = {}) {
-            const { profileId, runtime } = await readAll();
-            const local = profileRuntime(runtime, profileId);
+            const { profileId, profile, runtime } = await readAll();
+            const at = now();
+            const { local, plain } = clockFor(profile, runtime, profileId, at);
             const end = Number(until);
-            if (!Number.isFinite(local.breakSkippedUntil) || local.breakSkippedUntil !== end || now() >= end) {
+            const segment = array(plain?.segments).find(item => item.kind === Engine.BREAK && item.end === end);
+            if (!segment || !local.skippedBreaks.includes(segment.start) || at >= end) {
                 return { ok: false, error: 'not_skipped' };
             }
-            runtime.profiles[profileId] = { ...local, breakSkippedUntil: null };
+            runtime.profiles[profileId] = { ...local, breakSkippedUntil: null, skippedBreaks: local.skippedBreaks.filter(start => start !== segment.start) };
             await writeRuntime(runtime);
             await deps.onTransition?.('undo_skip_break');
             return { ok: true, until: end };
