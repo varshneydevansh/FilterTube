@@ -3391,5 +3391,10 @@
   "about.why.body": "En 2020, un padre hizo una pregunta sencilla en el foro de ayuda de la plataforma de vídeos: ¿cómo bloqueo vídeos por palabra clave? La respuesta fue que no se puede. Más de 2.500 padres dijeron que tenían la misma pregunta, y siguieron preguntando durante años hasta que se cerró el hilo. Yo también lo preguntaba. Luego, en 2023, un padre me preguntó directamente si podía hacer algo, porque su hijo no paraba de llorar. No pude evitar construirlo. Ahí empezó FilterTube: filtros por palabra y canal para cada familia, luego un espacio Kids tranquilo y después Sangeet, para que la música también pudiera ser tranquila.",
   "about.why.link": "Leer el hilo",
   "mascot.timeSaved.one": "Ya has ahorrado {count} hora.",
-  "mascot.timeSaved.other": "Ya has ahorrado {count} horas."
+  "mascot.timeSaved.other": "Ya has ahorrado {count} horas.",
+  "popup.apps.label": "Apps de FilterTube",
+  "popup.apps.android": "Android",
+  "popup.apps.androidStore": "Google Play",
+  "popup.apps.ios": "Ya en iPhone",
+  "popup.apps.iosGuide": "Guía de SideStore"
 }

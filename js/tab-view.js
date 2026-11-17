@@ -33445,18 +33445,18 @@ document.addEventListener('DOMContentLoaded', async () => {
     const FILTERTUBE_PLAY_LISTING = 'https://play.google.com/store/apps/details?id=com.filtertube.app';
     // One Google Play listing covers phone, tablet and TV. Flip a platform's status here when it ships.
     const FILTERTUBE_APP_PLATFORMS = Object.freeze([
-        { id: 'android', status: 'available', variant: 'android', icon: '../assets/images/Android_icon.png', href: FILTERTUBE_PLAY_LISTING,
+        { id: 'android', status: 'available', variant: 'android', icon: '../assets/images/Android_icon.png', art: '../assets/images/apps/android_robot.webp', href: FILTERTUBE_PLAY_LISTING,
             kicker: ['apps.android.kicker', 'Android phone and tablet'],
             body: ['apps.android.body', 'The complete custom Main and Kids viewing experience, more feature-rich than the direct APK.'],
             cta: ['apps.android.cta', 'Install from Google Play'] },
-        { id: 'android-tv', status: 'available', variant: 'tv', icon: '../assets/images/Android_icon.png', href: FILTERTUBE_PLAY_LISTING,
+        { id: 'android-tv', status: 'available', variant: 'tv', icon: '../assets/images/Android_icon.png', art: '../assets/images/apps/android_robot.webp', href: FILTERTUBE_PLAY_LISTING,
             kicker: ['apps.tv.kicker', 'Android TV'],
             body: ['apps.tv.body', 'The same Google Play listing, installed on your Android TV.'],
             cta: ['apps.android.cta', 'Install from Google Play'] },
         // Apple is having trouble on their end with the developer account, so the App Store release will
         // take a while. Until then the iPhone and iPad app is sideloaded, SideStore preferred (AltStore also
         // works), with the guide at filtertube.in/ios.
-        { id: 'ios', status: 'coming_soon', variant: 'ios', icon: '../assets/images/App_Store_transparent.png', href: 'https://filtertube.in/ios',
+        { id: 'ios', status: 'coming_soon', variant: 'ios', icon: '../assets/images/App_Store_transparent.png', art: '../assets/images/apps/app_store_mark.webp', href: 'https://filtertube.in/ios',
             kicker: ['apps.ios.kicker', 'iPhone and iPad'],
             title: ['apps.ios.sideloadTitle', 'Install it with SideStore'],
             body: ['apps.ios.sideloadBody', 'Apple is having trouble on their end with the developer account, so the App Store version will take a while. Until then, SideStore is the best way we\u2019ve found to install FilterTube, and AltStore works too. The step-by-step guide shows you how.'],
@@ -33619,19 +33619,20 @@ document.addEventListener('DOMContentLoaded', async () => {
                 cta.append(icon, label);
                 content.appendChild(cta);
             }
+            // The platform at a glance: a large picture tucked into the card's lower corner, behind the words.
             const art = document.createElement('span');
-            art.className = 'dashboard-app-card__art'; art.setAttribute('aria-hidden', 'true');
+            art.className = `dashboard-app-card__art ft-app-art ft-app-art--${platform.variant}`; art.setAttribute('aria-hidden', 'true');
+            const artImg = document.createElement('img'); artImg.src = platform.art || platform.icon; artImg.alt = '';
+            artImg.decoding = 'async'; artImg.loading = 'lazy';
             if (platform.variant === 'tv') {
-                // A TV showing FilterTube, drawn in CSS: no extra image asset.
-                art.classList.add('ft-tv-art');
-                const screen = document.createElement('span'); screen.className = 'ft-tv-art__screen';
-                const logo = document.createElement('img'); logo.src = '../icons/icon-128.png'; logo.alt = '';
-                const bar = document.createElement('span'); bar.className = 'ft-tv-art__bar';
-                screen.append(logo, bar);
-                const stand = document.createElement('span'); stand.className = 'ft-tv-art__stand';
-                art.append(screen, stand);
+                // A TV drawn in CSS, the Android robot peeking up from its screen.
+                const tv = document.createElement('span'); tv.className = 'ft-app-tv';
+                const screen = document.createElement('span'); screen.className = 'ft-app-tv__screen';
+                screen.appendChild(artImg);
+                const stand = document.createElement('span'); stand.className = 'ft-app-tv__stand';
+                tv.append(screen, stand);
+                art.appendChild(tv);
             } else {
-                const artImg = document.createElement('img'); artImg.src = platform.icon; artImg.alt = '';
                 art.appendChild(artImg);
             }
             card.append(content, art);

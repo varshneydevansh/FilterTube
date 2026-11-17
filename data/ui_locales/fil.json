@@ -3391,5 +3391,10 @@
   "about.why.body": "Noong 2020, may magulang na nagtanong ng simpleng tanong sa help forum ng video platform: paano ko iba-block ang mga video ayon sa keyword? Ang sagot: hindi puwede. Mahigit 2,500 magulang ang nagsabing pareho ang tanong nila, at patuloy silang nagtanong nang ilang taon hanggang ma-lock ang thread. Nagtatanong din ako. Pagkatapos, noong 2023, may amang direktang nagtanong sa akin kung may magagawa ako, dahil hindi tumitigil sa pag-iyak ang anak niya. Hindi ko napigilang gawin ito. Doon nagsimula ang FilterTube: mga filter ayon sa salita at channel para sa bawat pamilya, pagkatapos ay isang kalmadong Kids space, pagkatapos ay Sangeet, para kalmado rin ang musika.",
   "about.why.link": "Basahin ang thread",
   "mascot.timeSaved.one": "Nakatipid ka na ng {count} oras.",
-  "mascot.timeSaved.other": "Nakatipid ka na ng {count} oras."
+  "mascot.timeSaved.other": "Nakatipid ka na ng {count} oras.",
+  "popup.apps.label": "Mga app ng FilterTube",
+  "popup.apps.android": "Android",
+  "popup.apps.androidStore": "Google Play",
+  "popup.apps.ios": "Nasa iPhone na",
+  "popup.apps.iosGuide": "Gabay sa SideStore"
 }

@@ -3391,5 +3391,10 @@
   "about.why.body": "In 2020 a parent asked the video platform's help forum a simple question: how do I block videos by keyword? The answer was that you can't. More than 2,500 parents said they had the same question, and they kept asking for years until the thread was locked. I was asking too. Then in 2023 a parent asked me directly whether I could do something, because his child wouldn't stop crying. I couldn't stop myself from building it. FilterTube started there: filters by word and channel for every family, then a calm Kids space, then Sangeet, so music could stay calm too.",
   "about.why.link": "Read the thread",
   "mascot.timeSaved.one": "You’ve saved {count} hour so far.",
-  "mascot.timeSaved.other": "You’ve saved {count} hours so far."
+  "mascot.timeSaved.other": "You’ve saved {count} hours so far.",
+  "popup.apps.label": "FilterTube apps",
+  "popup.apps.android": "Android",
+  "popup.apps.androidStore": "Google Play",
+  "popup.apps.ios": "Now on iPhone",
+  "popup.apps.iosGuide": "SideStore guide"
 }

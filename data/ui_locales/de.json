@@ -3391,5 +3391,10 @@
   "about.why.body": "2020 stellte ein Elternteil im Hilfeforum der Videoplattform eine einfache Frage: Wie blockiere ich Videos nach Stichwort? Die Antwort war: gar nicht. Mehr als 2.500 Eltern sagten, sie hätten dieselbe Frage, und sie fragten jahrelang weiter, bis der Thread geschlossen wurde. Ich habe auch gefragt. Dann fragte mich 2023 ein Vater direkt, ob ich etwas tun könne, weil sein Kind nicht aufhörte zu weinen. Ich konnte nicht anders, als es zu bauen. Dort begann FilterTube: Filter nach Wort und Kanal für jede Familie, dann ein ruhiger Kids-Bereich, dann Sangeet, damit auch Musik ruhig bleiben kann.",
   "about.why.link": "Thread lesen",
   "mascot.timeSaved.one": "Du hast schon {count} Stunde gespart.",
-  "mascot.timeSaved.other": "Du hast schon {count} Stunden gespart."
+  "mascot.timeSaved.other": "Du hast schon {count} Stunden gespart.",
+  "popup.apps.label": "FilterTube-Apps",
+  "popup.apps.android": "Android",
+  "popup.apps.androidStore": "Google Play",
+  "popup.apps.ios": "Jetzt auf dem iPhone",
+  "popup.apps.iosGuide": "SideStore-Anleitung"
 }

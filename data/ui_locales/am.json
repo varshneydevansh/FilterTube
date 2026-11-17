@@ -3391,5 +3391,10 @@
   "about.why.body": "በ2020 አንድ ወላጅ በቪዲዮ መድረኩ የእገዛ መድረክ ላይ ቀላል ጥያቄ ጠየቁ፦ ቪዲዮዎችን በቁልፍ ቃል እንዴት ላግድ? መልሱ አይቻልም የሚል ነበር። ከ2,500 በላይ ወላጆች ተመሳሳይ ጥያቄ እንዳላቸው ተናገሩ፣ ውይይቱ እስኪዘጋም ለዓመታት መጠየቃቸውን ቀጠሉ። እኔም እጠይቅ ነበር። ከዚያ በ2023 አንድ አባት ልጃቸው ማልቀስ ስላላቆመ አንድ ነገር ማድረግ እችል እንደሆነ በቀጥታ ጠየቁኝ። ሳልገነባው መቆየት አልቻልኩም። FilterTube ከዚያ ጀመረ፦ ለእያንዳንዱ ቤተሰብ በቃልና በቻናል ማጣሪያዎች፣ ከዚያ የተረጋጋ የKids ቦታ፣ ከዚያም ሙዚቃም እንዲረጋጋ Sangeet።",
   "about.why.link": "ውይይቱን አንብብ",
   "mascot.timeSaved.one": "እስካሁን {count} ሰዓት ቆጥበዋል።",
-  "mascot.timeSaved.other": "እስካሁን {count} ሰዓታት ቆጥበዋል።"
+  "mascot.timeSaved.other": "እስካሁን {count} ሰዓታት ቆጥበዋል።",
+  "popup.apps.label": "የFilterTube መተግበሪያዎች",
+  "popup.apps.android": "Android",
+  "popup.apps.androidStore": "Google Play",
+  "popup.apps.ios": "አሁን በiPhone ላይ",
+  "popup.apps.iosGuide": "የSideStore መመሪያ"
 }

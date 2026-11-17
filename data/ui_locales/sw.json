@@ -3391,5 +3391,10 @@
   "about.why.body": "Mwaka 2020 mzazi mmoja aliuliza swali rahisi kwenye jukwaa la msaada la jukwaa la video: nitazuiaje video kwa neno muhimu? Jibu lilikuwa kwamba huwezi. Wazazi zaidi ya 2,500 walisema walikuwa na swali hilo hilo, na waliendelea kuuliza kwa miaka hadi mjadala ulipofungwa. Mimi pia nilikuwa nikiuliza. Kisha mwaka 2023 baba mmoja aliniuliza moja kwa moja kama ningeweza kufanya kitu, kwa sababu mtoto wake hakuacha kulia. Sikuweza kujizuia kuijenga. FilterTube ilianzia hapo: vichujio kwa neno na chaneli kwa kila familia, kisha nafasi tulivu ya Kids, kisha Sangeet, ili muziki nao ubaki mtulivu.",
   "about.why.link": "Soma mjadala",
   "mascot.timeSaved.one": "Umeokoa saa {count} hadi sasa.",
-  "mascot.timeSaved.other": "Umeokoa saa {count} hadi sasa."
+  "mascot.timeSaved.other": "Umeokoa saa {count} hadi sasa.",
+  "popup.apps.label": "Programu za FilterTube",
+  "popup.apps.android": "Android",
+  "popup.apps.androidStore": "Google Play",
+  "popup.apps.ios": "Sasa kwenye iPhone",
+  "popup.apps.iosGuide": "Mwongozo wa SideStore"
 }

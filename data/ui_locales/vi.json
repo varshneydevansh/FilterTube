@@ -3389,5 +3389,10 @@
   "about.why.body": "Năm 2020, một phụ huynh hỏi một câu đơn giản trên diễn đàn trợ giúp của nền tảng video: làm sao chặn video theo từ khóa? Câu trả lời là không thể. Hơn 2.500 phụ huynh nói họ cũng có câu hỏi đó, và họ tiếp tục hỏi suốt nhiều năm cho đến khi chủ đề bị khóa. Tôi cũng đã hỏi. Rồi năm 2023, một người cha hỏi thẳng tôi có làm được gì không, vì con anh ấy cứ khóc mãi. Tôi không thể không làm ra nó. FilterTube bắt đầu từ đó: bộ lọc theo từ và kênh cho mọi gia đình, rồi không gian Kids yên tĩnh, rồi Sangeet, để âm nhạc cũng được yên tĩnh.",
   "about.why.link": "Đọc chủ đề",
   "mascot.timeSaved.one": "Bạn đã tiết kiệm được {count} giờ.",
-  "mascot.timeSaved.other": "Bạn đã tiết kiệm được {count} giờ."
+  "mascot.timeSaved.other": "Bạn đã tiết kiệm được {count} giờ.",
+  "popup.apps.label": "Ứng dụng FilterTube",
+  "popup.apps.android": "Android",
+  "popup.apps.androidStore": "Google Play",
+  "popup.apps.ios": "Đã có trên iPhone",
+  "popup.apps.iosGuide": "Hướng dẫn SideStore"
 }
