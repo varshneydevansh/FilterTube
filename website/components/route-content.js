@@ -711,7 +711,7 @@ export const detailPages = {
     titleLead: "A calm FilterTube companion for",
     titleDisplay: "phones and tablets",
     description:
-      "The Android phone and tablet app is publicly available on Google Play. The native iPhone and iPad app can be installed directly with SideStore while the App Store listing is in progress.",
+      "The Android phone and tablet app is publicly available on Google Play. The native iPhone and iPad app can be installed directly with SideStore while Apple sorts out the developer account.",
     heroArtworks: [
       {
         src: "/apps/android.png",
@@ -792,15 +792,15 @@ export const detailPages = {
     slug: "ios",
     icon: DeviceMobile,
     tone: "sky",
-    status: "Install directly · App Store in progress",
+    status: "Install directly · App Store later",
     eyebrow: "iPhone + iPad",
     navTitle: "iPhone and iPad",
     routeSummary:
-      "Native iPhone and iPad viewing, filters, profiles, and family controls. Install it directly with SideStore while the App Store listing is in progress.",
+      "Native iPhone and iPad viewing, filters, profiles, and family controls. Install it directly with SideStore while Apple sorts out the developer account.",
     titleLead: "A native FilterTube app for",
     titleDisplay: "iPhone and iPad",
     description:
-      "FilterTube brings Main and Kids viewing, native controls, profiles, PINs, and protected time to iPhone and iPad. The App Store listing is in progress; until then you can install the app directly with SideStore or AltStore.",
+      "FilterTube brings Main and Kids viewing, native controls, profiles, PINs, and protected time to iPhone and iPad. Apple is having trouble on their end with the developer account, so the App Store version will take a while; until then you can install the app directly with SideStore or AltStore.",
     heroScreensLabel: "iOS simulator development build · hover or tap a screen",
     heroScreens: [
       {
@@ -879,9 +879,9 @@ export const detailPages = {
     ],
     milestoneTitle: "iOS availability",
     milestoneIntro:
-      "You can install the app directly today. The App Store listing is still in progress.",
+      "You can install the app directly today. The App Store version will take a while because of trouble on Apple's end.",
     milestones: [
-      "Install directly on iPhone and iPad with SideStore or AltStore. The App Store listing is in progress.",
+      "Install directly on iPhone and iPad with SideStore or AltStore. The App Store version will take a while because of trouble on Apple's end.",
       "Pair verified devices and send parent updates. Newer personal Auto-sync features are not yet available on iOS.",
       "This page will link the App Store listing as soon as it is live.",
     ],
@@ -891,7 +891,7 @@ export const detailPages = {
     slug: "ipados",
     icon: MonitorPlay,
     tone: "sky",
-    status: "Install directly · App Store in progress",
+    status: "Install directly · App Store later",
     eyebrow: "iPad app",
     navTitle: "iPadOS",
     routeSummary:
@@ -899,7 +899,7 @@ export const detailPages = {
     titleLead: "A wider FilterTube workspace for",
     titleDisplay: "iPad and home setup",
     description:
-      "The native iPad app ships alongside iPhone. Install it directly with SideStore while the App Store listing is in progress.",
+      "The native iPad app ships alongside iPhone. Install it directly with SideStore while Apple sorts out the developer account.",
     heroArtwork: {
       src: "/apps/app-store-transparent.png",
       alt: "FilterTube iPad app artwork",
@@ -1435,7 +1435,7 @@ export const detailPages = {
     milestones: [
       "Android phones and tablets: the custom Main and Kids app is on Google Play. No invitation or email is needed.",
       "Browser extension: adds filtering to supported Kids pages. Use the full settings page to manage profiles and Kids rules.",
-      "iPhone and iPad: Kids viewing and family controls are included. Install directly with SideStore while the App Store listing is in progress.",
+      "iPhone and iPad: Kids viewing and family controls are included. Install directly with SideStore while Apple sorts out the developer account.",
       "Android TV: full Kids and family-control parity is still in development. Fire TV compatibility is planned. The phone listing is not a TV release.",
       "Rules stay local. Optional verified device sharing is encrypted; helpers or relay services may be involved. Filters support parent decisions, rather than replacing review of what a child watches.",
     ],

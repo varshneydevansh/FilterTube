@@ -218,8 +218,8 @@ export default function DownloadsPage() {
               Browser releases stay public on GitHub and store listings. Android
               phone/tablet builds can be attached to the same release stream for
               Google Play, GrapheneOS, and other direct-install users. iPhone
-              and iPad can install the app directly with SideStore while the
-              App Store listing is in progress.
+              and iPad can install the app directly with SideStore while Apple
+              sorts out the developer account.
             </p>
           </div>
 
@@ -270,7 +270,7 @@ export default function DownloadsPage() {
                   </h3>
                   <p className="mt-3 text-sm leading-7 text-[var(--color-muted)]">
                     Install directly with SideStore and your own Apple ID while
-                    the App Store listing is in progress.{" "}
+                    Apple sorts out the developer account.{" "}
                     <Link className="font-semibold text-[var(--color-accent)] underline underline-offset-4" href="/ios#install">
                       See the iPhone and iPad install guide
                     </Link>

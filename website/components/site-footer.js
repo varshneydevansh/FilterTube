@@ -53,7 +53,7 @@ export function SiteFooter() {
                 <p className="mt-5 max-w-[56ch] text-base leading-8 text-[var(--color-muted)]">
                   Calmer viewing on Android phones and tablets, and in your
                   browser. iPhone and iPad can install it directly while
-                  the App Store listing is in progress. Android TV is in
+                  the App Store version waits on Apple. Android TV is in
                   development.
                   Explore each platform’s features and availability.
                 </p>

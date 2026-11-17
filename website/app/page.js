@@ -182,7 +182,7 @@ function AppReleaseStatusSection() {
     {
       eyebrow: "iPhone + iPad",
       title: "iPhone and iPad, together.",
-      body: "A native app for smaller screens and a wider iPad workspace. Install it directly with SideStore while the App Store listing is in progress.",
+      body: "A native app for smaller screens and a wider iPad workspace. Install it directly with SideStore while Apple sorts out the developer account.",
       image: "/apps/app-store-transparent.png",
       imageAlt: "FilterTube iPhone and iPad app artwork",
       action: "Install on iPhone or iPad",
