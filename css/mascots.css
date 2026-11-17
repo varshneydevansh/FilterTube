@@ -480,3 +480,16 @@ html[data-theme="dark"] .ft-mascot-tally {
 
 /* Above a study refusal ("Locked until ..."): the sign leads the card. */
 .ft-study-loosen .ft-study-loosen__sign { align-self: center; margin-bottom: 2px; }
+
+/* ---- Second 2026-11-18 batch ------------------------------------------------------------------------ */
+
+/* A sync landed: the duo high-fives on the toast, a little taller than a pose. */
+.ft-toast .pk-toast-art--duo { height: 48px; }
+
+/* Time-saved milestone: Kriti's medal and Uljhan's cheer on the Home "Time saved" card. */
+.stat-card[data-stat="saved"] { position: relative; }
+.pk-medal { display: flex; justify-content: center; margin-top: 6px; }
+.ft-mascot--medal .ft-mascot__image { height: 72px; }
+
+/* About: the v3 sieve loop takes the place of the static picture. */
+.ft-about-duo__loop .pk-loop__art { height: 180px; }

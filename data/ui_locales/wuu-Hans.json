@@ -3387,5 +3387,7 @@
   "feed.calm.review": "看看过滤器",
   "about.why.title": "为啥会有 FilterTube",
   "about.why.body": "2020 年，有位家长辣视频平台个帮助论坛浪问了一个简单个问题：哪能按关键词屏蔽视频？回答是：做勿到。超过 2,500 位家长讲伊拉也有同样个问题，伊拉问了好几年，一直问到帖子拨锁脱。我也一直辣问。后来 2023 年，有位爷叔直接问我好勿好做点啥，因为伊个小囡哭个勿停。我忍勿牢就动手做了。FilterTube 就是从搿搭开始个：为每户人家做按关键词搭频道个过滤，再是一个安静个小囡空间，再是 Sangeet，让音乐也好保持安静。",
-  "about.why.link": "读讨论帖"
+  "about.why.link": "读讨论帖",
+  "mascot.timeSaved.one": "侬已经省脱 {count} 个钟头了。",
+  "mascot.timeSaved.other": "侬已经省脱 {count} 个钟头了。"
 }

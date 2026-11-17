@@ -3387,5 +3387,7 @@
   "feed.calm.review": "Tinjau filter",
   "about.why.title": "Mengapa FilterTube ada",
   "about.why.body": "Pada 2020, seorang orang tua bertanya hal sederhana di forum bantuan platform video: bagaimana cara memblokir video berdasarkan kata kunci? Jawabannya: tidak bisa. Lebih dari 2.500 orang tua bilang mereka punya pertanyaan yang sama, dan mereka terus bertanya selama bertahun-tahun sampai utasnya dikunci. Saya juga bertanya. Lalu pada 2023 seorang ayah bertanya langsung kepada saya apakah saya bisa berbuat sesuatu, karena anaknya tak berhenti menangis. Saya tak bisa menahan diri untuk membuatnya. Di situlah FilterTube dimulai: filter kata dan saluran untuk setiap keluarga, lalu ruang Kids yang tenang, lalu Sangeet, agar musik juga tetap tenang.",
-  "about.why.link": "Baca utasnya"
+  "about.why.link": "Baca utasnya",
+  "mascot.timeSaved.one": "Kamu sudah menghemat {count} jam.",
+  "mascot.timeSaved.other": "Kamu sudah menghemat {count} jam."
 }

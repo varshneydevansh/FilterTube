@@ -43,7 +43,7 @@
     const NOTICE_SHOW_MS = 10 * 1000;
     const SKIP_UNDO_MS = 5 * 1000;
     const KIDS_TICK_MS = 1000;
-    const KRITI_READING = 'assets/images/mascots/kriti_reading.webp';
+    const KRITI_READING = 'assets/images/mascots/kriti_pose_04.webp';
     // KRITI_STRETCH (StudyMascotView.Motion): frames and timing as the app plays them on the rest screen.
     const STRETCH_FRAMES = [1, 2, 3, 4, 5].map(index => `kriti_stretch_0${index}.webp`);
     const STRETCH_ORDER = [0, 1, 2, 3, 3, 4, 0];
@@ -428,7 +428,7 @@
             // Kriti stretches as the break opens (Android StudyRestActivity, KRITI_STRETCH), cheers the end of the day, and Uljhan shrugs when the
             // pack can't load. A clock hold has no character. Appended last and drawn first, so the
             // title and body keep their places; the Companion set to Off leaves the words alone.
-            const pose = { rest: 'kriti_stretch_01.webp', limit: 'kriti_thumbsup.webp', unavailable: 'uljhan_shrug.webp' }[kind];
+            const pose = { rest: 'kriti_stretch_01.webp', limit: 'kriti_thumbsup.webp', unavailable: 'uljhan_pose_02.webp' }[kind];
             let poseUrl = '';
             try {
                 const companion = localizer()?.getCompanion?.() || 'quiet';

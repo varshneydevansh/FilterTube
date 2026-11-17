@@ -3387,5 +3387,7 @@
   "feed.calm.review": "Ṣàyẹ̀wò àwọn àlẹ̀mọ́",
   "about.why.title": "Ìdí tí FilterTube fi wà",
   "about.why.body": "Ní 2020, òbí kan béèrè ìbéèrè kan tó rọrùn lórí àpéjọ ìrànlọ́wọ́ pẹpẹ fídíò: báwo ni mo ṣe lè dí fídíò nípa ọ̀rọ̀ kókó? Ìdáhùn ni pé o kò lè ṣe é. Ó ju òbí 2,500 lọ tó sọ pé ìbéèrè kan náà ni wọ́n ní, wọ́n sì ń béèrè fún ọdún púpọ̀ títí wọ́n fi tì ìjíròrò náà. Èmi náà ń béèrè. Lẹ́yìn náà ní 2023, bàbá kan béèrè lọ́wọ́ mi tààrà bóyá mo lè ṣe nǹkan kan, nítorí pé ọmọ rẹ̀ kò dẹ́kun ẹkún. N kò lè dá ara mi dúró láti kọ́ ọ. Ibẹ̀ ni FilterTube ti bẹ̀rẹ̀: àlẹ̀mọ́ nípa ọ̀rọ̀ àti ikanni fún gbogbo ìdílé, lẹ́yìn náà àyè Kids tó dákẹ́ jẹ́ẹ́, lẹ́yìn náà Sangeet, kí orin náà lè dákẹ́ jẹ́ẹ́.",
-  "about.why.link": "Ka ìjíròrò náà"
+  "about.why.link": "Ka ìjíròrò náà",
+  "mascot.timeSaved.one": "O ti fi wákàtí {count} pamọ́ títí di báyìí.",
+  "mascot.timeSaved.other": "O ti fi wákàtí {count} pamọ́ títí di báyìí."
 }

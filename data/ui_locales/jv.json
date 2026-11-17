@@ -3387,5 +3387,7 @@
   "feed.calm.review": "Tinjau filter",
   "about.why.title": "Kenapa FilterTube ana",
   "about.why.body": "Ing taun 2020 ana wong tuwa takon prasaja ing forum pitulung platform video: piye carane mblokir video miturut tembung kunci? Wangsulane: ora bisa. Luwih saka 2.500 wong tuwa ngomong yen dheweke duwe pitakonan sing padha, lan terus takon nganti pirang-pirang taun nganti utase dikunci. Aku uga takon. Banjur ing taun 2023 ana bapak sing takon langsung marang aku apa aku bisa nindakake sawijining bab, amarga anake ora mandheg nangis. Aku ora bisa ngempet kanggo nggawe. FilterTube diwiwiti saka kono: saringan tembung lan kanal kanggo saben kulawarga, banjur papan Kids sing tenang, banjur Sangeet, supaya musik uga tetep tenang.",
-  "about.why.link": "Waca utase"
+  "about.why.link": "Waca utase",
+  "mascot.timeSaved.one": "Kowé wis ngirit {count} jam.",
+  "mascot.timeSaved.other": "Kowé wis ngirit {count} jam."
 }

@@ -3389,5 +3389,7 @@
   "feed.calm.review": "Rivedi i filtri",
   "about.why.title": "Perché esiste FilterTube",
   "about.why.body": "Nel 2020 un genitore fece una domanda semplice nel forum di assistenza della piattaforma video: come blocco i video per parola chiave? La risposta fu che non si può. Più di 2.500 genitori dissero di avere la stessa domanda, e continuarono a chiederlo per anni finché la discussione non fu chiusa. Lo chiedevo anch’io. Poi, nel 2023, un padre mi chiese direttamente se potevo fare qualcosa, perché suo figlio non smetteva di piangere. Non sono riuscito a non costruirlo. FilterTube è nato lì: filtri per parola e canale per ogni famiglia, poi uno spazio Kids tranquillo, poi Sangeet, perché anche la musica potesse restare tranquilla.",
-  "about.why.link": "Leggi la discussione"
+  "about.why.link": "Leggi la discussione",
+  "mascot.timeSaved.one": "Finora hai risparmiato {count} ora.",
+  "mascot.timeSaved.other": "Finora hai risparmiato {count} ore."
 }

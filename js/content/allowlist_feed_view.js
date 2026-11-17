@@ -261,7 +261,7 @@ html[${BUILT_ATTR}] ytd-browse[page-subtype="home"] ytd-rich-grid-renderer #ghos
                 ? t('feed.built.emptyBodyStudy', 'Try a subject search, or open the plan to add channels.')
                 : t('feed.built.emptyBody', 'Search for something on your list, or add channels to it.')));
         const row = el('div', 'ftf-empty');
-        const kriti = mascot(unreachable ? 'uljhan_shrug.webp' : 'kriti_pointing.webp', '');
+        const kriti = mascot(unreachable ? 'uljhan_pose_02.webp' : 'kriti_pose_08.webp', '');
         if (kriti) row.append(kriti);
         const actions = el('div', 'ftf-actions');
         if (unreachable) actions.append(button(t('feed.built.retry', 'Try again'), () => { built = null; decide(true); }, true));

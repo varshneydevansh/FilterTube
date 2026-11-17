@@ -421,12 +421,12 @@ apps/android/app/src/main/res/drawable-nodpi/study_duo_shoo_03.webp	drawable	ass
 apps/android/app/src/main/res/drawable-nodpi/study_duo_shoo_04.webp	drawable	assets/images/mascots/duo_shoo_04.webp	assets	
 apps/android/app/src/main/res/drawable-nodpi/study_duo_shoo_05.webp	drawable	assets/images/mascots/duo_shoo_05.webp	assets	
 apps/android/app/src/main/res/drawable-nodpi/study_duo_shoo_06.webp	drawable	assets/images/mascots/duo_shoo_06.webp	assets	
-apps/android/app/src/main/res/drawable-nodpi/study_duo_sieve_01.webp	drawable	assets/images/mascots/duo_sieve_01.webp	assets	
-apps/android/app/src/main/res/drawable-nodpi/study_duo_sieve_02.webp	drawable	assets/images/mascots/duo_sieve_02.webp	assets	
-apps/android/app/src/main/res/drawable-nodpi/study_duo_sieve_03.webp	drawable	assets/images/mascots/duo_sieve_03.webp	assets	
-apps/android/app/src/main/res/drawable-nodpi/study_duo_sieve_04.webp	drawable	assets/images/mascots/duo_sieve_04.webp	assets	
-apps/android/app/src/main/res/drawable-nodpi/study_duo_sieve_05.webp	drawable	assets/images/mascots/duo_sieve_05.webp	assets	
-apps/android/app/src/main/res/drawable-nodpi/study_duo_sieve_06.webp	drawable	assets/images/mascots/duo_sieve_06.webp	assets	
+apps/android/app/src/main/res/drawable-nodpi/study_duo_sieve_01.webp	drawable	n/a	n/a	2026-11-18: the extension ships the owner's v3 sieve as duo_sieve_01..11.webp
+apps/android/app/src/main/res/drawable-nodpi/study_duo_sieve_02.webp	drawable	n/a	n/a	2026-11-18: the extension ships the owner's v3 sieve as duo_sieve_01..11.webp
+apps/android/app/src/main/res/drawable-nodpi/study_duo_sieve_03.webp	drawable	n/a	n/a	2026-11-18: the extension ships the owner's v3 sieve as duo_sieve_01..11.webp
+apps/android/app/src/main/res/drawable-nodpi/study_duo_sieve_04.webp	drawable	n/a	n/a	2026-11-18: the extension ships the owner's v3 sieve as duo_sieve_01..11.webp
+apps/android/app/src/main/res/drawable-nodpi/study_duo_sieve_05.webp	drawable	n/a	n/a	2026-11-18: the extension ships the owner's v3 sieve as duo_sieve_01..11.webp
+apps/android/app/src/main/res/drawable-nodpi/study_duo_sieve_06.webp	drawable	n/a	n/a	2026-11-18: the extension ships the owner's v3 sieve as duo_sieve_01..11.webp
 apps/android/app/src/main/res/drawable-nodpi/study_kriti_crayon.webp	drawable	n/a	n/a	Android drawable (shape, selector or player art)
 apps/android/app/src/main/res/drawable-nodpi/study_kriti_done.webp	drawable	n/a	n/a	Android drawable (shape, selector or player art)
 apps/android/app/src/main/res/drawable-nodpi/study_kriti_evening_01.webp	drawable	assets/images/mascots/kriti_evening_01.webp	assets	
@@ -471,8 +471,8 @@ apps/android/app/src/main/res/drawable-nodpi/study_kriti_pencil_03.webp	drawable
 apps/android/app/src/main/res/drawable-nodpi/study_kriti_pencil_04.webp	drawable	n/a	n/a	Android drawable (shape, selector or player art)
 apps/android/app/src/main/res/drawable-nodpi/study_kriti_pencil_05.webp	drawable	n/a	n/a	Android drawable (shape, selector or player art)
 apps/android/app/src/main/res/drawable-nodpi/study_kriti_pencil_06.webp	drawable	n/a	n/a	Android drawable (shape, selector or player art)
-apps/android/app/src/main/res/drawable-nodpi/study_kriti_pointing.webp	drawable	assets/images/mascots/kriti_pointing.webp	assets	
-apps/android/app/src/main/res/drawable-nodpi/study_kriti_reading.webp	drawable	assets/images/mascots/kriti_reading.webp	assets	
+apps/android/app/src/main/res/drawable-nodpi/study_kriti_pointing.webp	drawable	n/a	n/a	2026-11-18: the extension uses the owner's kriti_pose_08 (point).webp
+apps/android/app/src/main/res/drawable-nodpi/study_kriti_reading.webp	drawable	n/a	n/a	2026-11-18: the extension uses the owner's kriti_pose_04 (read).webp
 apps/android/app/src/main/res/drawable-nodpi/study_kriti_salute.webp	drawable	n/a	n/a	Android drawable (shape, selector or player art)
 apps/android/app/src/main/res/drawable-nodpi/study_kriti_shrug.webp	drawable	n/a	n/a	Android drawable (shape, selector or player art)
 apps/android/app/src/main/res/drawable-nodpi/study_kriti_sign.webp	drawable	n/a	n/a	Android drawable (shape, selector or player art)
@@ -483,9 +483,9 @@ apps/android/app/src/main/res/drawable-nodpi/study_kriti_stretch_02.webp	drawabl
 apps/android/app/src/main/res/drawable-nodpi/study_kriti_stretch_03.webp	drawable	n/a	n/a	Android drawable (shape, selector or player art)
 apps/android/app/src/main/res/drawable-nodpi/study_kriti_stretch_04.webp	drawable	n/a	n/a	Android drawable (shape, selector or player art)
 apps/android/app/src/main/res/drawable-nodpi/study_kriti_stretch_05.webp	drawable	n/a	n/a	Android drawable (shape, selector or player art)
-apps/android/app/src/main/res/drawable-nodpi/study_kriti_thinking.webp	drawable	assets/images/mascots/kriti_thinking.webp	assets	
+apps/android/app/src/main/res/drawable-nodpi/study_kriti_thinking.webp	drawable	n/a	n/a	2026-11-18: the extension uses the owner's kriti_pose_03 (think).webp
 apps/android/app/src/main/res/drawable-nodpi/study_kriti_thumbsup.webp	drawable	assets/images/mascots/kriti_thumbsup.webp	assets	
-apps/android/app/src/main/res/drawable-nodpi/study_kriti_wave.webp	drawable	assets/images/mascots/kriti_wave.webp	assets	
+apps/android/app/src/main/res/drawable-nodpi/study_kriti_wave.webp	drawable	n/a	n/a	2026-11-18: the extension uses the owner's kriti_pose_01 (wave).webp
 apps/android/app/src/main/res/drawable-nodpi/study_uljhan_fetch_01.webp	drawable	assets/images/mascots/uljhan_fetch_01.webp	assets	
 apps/android/app/src/main/res/drawable-nodpi/study_uljhan_fetch_02.webp	drawable	assets/images/mascots/uljhan_fetch_02.webp	assets	
 apps/android/app/src/main/res/drawable-nodpi/study_uljhan_fetch_03.webp	drawable	assets/images/mascots/uljhan_fetch_03.webp	assets	
@@ -493,9 +493,9 @@ apps/android/app/src/main/res/drawable-nodpi/study_uljhan_fetch_04.webp	drawable
 apps/android/app/src/main/res/drawable-nodpi/study_uljhan_fetch_05.webp	drawable	assets/images/mascots/uljhan_fetch_05.webp	assets	
 apps/android/app/src/main/res/drawable-nodpi/study_uljhan_fetch_06.webp	drawable	assets/images/mascots/uljhan_fetch_06.webp	assets	
 apps/android/app/src/main/res/drawable-nodpi/study_uljhan_front.webp	drawable	assets/images/mascots/uljhan_front.webp	assets	
-apps/android/app/src/main/res/drawable-nodpi/study_uljhan_happy.webp	drawable	assets/images/mascots/uljhan_happy.webp	assets	
+apps/android/app/src/main/res/drawable-nodpi/study_uljhan_happy.webp	drawable	n/a	n/a	2026-11-18: the extension uses the owner's uljhan_pose_04 (hop).webp
 apps/android/app/src/main/res/drawable-nodpi/study_uljhan_sad.webp	drawable	n/a	n/a	offline is Uljhan tangled (uljhan_tangle_0N.webp) since 2026-11-18
-apps/android/app/src/main/res/drawable-nodpi/study_uljhan_shrug.webp	drawable	assets/images/mascots/uljhan_shrug.webp	assets	
+apps/android/app/src/main/res/drawable-nodpi/study_uljhan_shrug.webp	drawable	n/a	n/a	2026-11-18: the extension uses the owner's uljhan_pose_02 (shrug).webp
 apps/android/app/src/main/res/drawable-nodpi/study_uljhan_wave_01.webp	drawable	assets/images/mascots/uljhan_wave_01.webp	assets	
 apps/android/app/src/main/res/drawable-nodpi/study_uljhan_wave_02.webp	drawable	assets/images/mascots/uljhan_wave_02.webp	assets	
 apps/android/app/src/main/res/drawable-nodpi/study_uljhan_wave_03.webp	drawable	assets/images/mascots/uljhan_wave_03.webp	assets	

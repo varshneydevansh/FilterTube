@@ -319,7 +319,8 @@ test('sheets play once and rest on their last frame; reduced motion shows only t
     // The app's StudyMascotView.Motion timings, frame for frame.
     const timing = Object.fromEntries(Object.entries(plain(Mascots.MOTIONS)).map(([name, motion]) => [name, motion.ms]));
     assert.deepEqual(timing, { duoSieve: 420, duoShoo: 420, kritiMug: 380, kritiEvening: 420, uljhanFetch: 160, kritiJump: 95, kritiPencil: 300, kritiStretch: 280, uljhanLeaves: 170,
-        kritiOpenNotebook: 260, uljhanWave: 170, uljhanTangle: 420, duoUntangle: 400, duoBackup: 390, duoSearchEmpty: 420 });
+        kritiOpenNotebook: 260, uljhanWave: 170, uljhanTangle: 420, duoUntangle: 400, duoBackup: 390, duoSearchEmpty: 420,
+        duoSieveLoop: 420, duoMedal: 450, uljhanBounce: 140, kritiBreath: 260, duoSweep: 300, duoHighFive: 300 });
     // Borrowed sheets play another sheet's frames (KRITI_OPEN_NOTEBOOK: pencil 1-3; the footer wave stays put).
     assert.deepEqual(plain(Mascots.sheetFrames('kritiOpenNotebook', false)), [0, 1, 2]);
     assert.equal(Mascots.stillImage('kritiOpenNotebook'), 'kriti_pencil_03.webp');
@@ -336,7 +337,7 @@ test('sheets play once and rest on their last frame; reduced motion shows only t
     assert.match(gate, /const SHOO_FRAMES = \[1, 2, 3, 4, 5, 6\]\.map\(index => `duo_shoo_0\$\{index\}\.webp`\);/);
     // At most three plays a day, then (and in Quiet) Uljhan's shrug still (MascotStatePolicy.BLOCKED_DAILY_PLAYS).
     assert.match(gate, /const SHOO_DAILY_PLAYS = 3;/);
-    assert.match(gate, /const SHOO_REST = 'uljhan_shrug\.webp';/);
+    assert.match(gate, /const SHOO_REST = 'uljhan_pose_02\.webp';/);
     assert.match(gate, /if \(plays >= SHOO_DAILY_PLAYS\) \{ resolve\(false\); return; \}/);
     assert.match(gate, /const SHOO_FRAME_MS = 420;/);
     assert.match(gate, /companionMode !== 'lively' \|\| admissionOverlayPrefersReducedMotion\(\)/, 'the sheet plays on Lively only, never with reduced motion');
@@ -443,11 +444,11 @@ test('the brand moments are mounted, and the gate, the break and the first-run p
     }
     assert.match(fs.readFileSync('js/tab-view.js', 'utf8'), /new CustomEvent\('filtertube:parent-session-saved', \{ detail: \{ name: normalizeString\(nextProfile\.name\) \} \}\)/);
     const gate = fs.readFileSync('js/content/admission_overlay.js', 'utf8');
-    assert.match(gate, /offList \? 'kriti_pointing\.webp' : 'kriti_mug_06\.webp'/);
+    assert.match(gate, /offList \? 'kriti_pose_08\.webp' : 'kriti_mug_06\.webp'/);
     assert.match(gate, /companionMode = mode === 'lively' \|\| mode === 'off' \? mode : 'quiet';/);
     const study = fs.readFileSync('js/content/study_overlay.js', 'utf8');
-    assert.match(study, /\{ rest: 'kriti_stretch_01\.webp', limit: 'kriti_thumbsup\.webp', unavailable: 'uljhan_shrug\.webp' \}\[kind\]/);
-    assert.match(fs.readFileSync('js/content/first_run_prompt.js', 'utf8'), /assets\/images\/mascots\/kriti_wave\.webp/);
+    assert.match(study, /\{ rest: 'kriti_stretch_01\.webp', limit: 'kriti_thumbsup\.webp', unavailable: 'uljhan_pose_02\.webp' \}\[kind\]/);
+    assert.match(fs.readFileSync('js/content/first_run_prompt.js', 'utf8'), /assets\/images\/mascots\/kriti_pose_01\.webp/);
     for (const manifest of ['manifest.json', 'manifest.chrome.json', 'manifest.firefox.json', 'manifest.opera.json']) {
         const resources = JSON.parse(fs.readFileSync(manifest, 'utf8')).web_accessible_resources.flatMap(entry => entry.resources || entry);
         assert.ok(resources.includes('assets/images/mascots/*.webp'), `${manifest} lets the page load the poses`);
@@ -470,11 +471,14 @@ test('motion matches the app: springs, the idle rhythm and the loading moments',
     assert.ok(Math.max(...entrance) > 0, 'springMascot overshoots a little');
     // Idle beats fit the art (MascotIdle.beatsFor).
     assert.deepEqual(plain(Mascots.idleBeatsFor('uljhan_tangle_03.webp')), ['wiggle', 'bob']);
-    assert.deepEqual(plain(Mascots.idleBeatsFor('uljhan_front.webp')), ['wiggle', 'bob', 'hop', 'sparkle']);
+    assert.deepEqual(plain(Mascots.idleBeatsFor('uljhan_front.webp')), ['bounce', 'wiggle', 'bob', 'sparkle'], 'standing Uljhan bounces');
+    assert.deepEqual(plain(Mascots.idleBeatsFor('uljhan_pose_06.webp')), ['squash'], 'asleep he only breathes');
+    assert.deepEqual(plain(Mascots.idleBeatsFor('uljhan_bounce_01.webp')), ['wiggle', 'bob', 'hop', 'sparkle']);
     assert.deepEqual(plain(Mascots.idleBeatsFor('kriti_peek.webp')), ['squash', 'sparkle']);
-    assert.deepEqual(plain(Mascots.idleBeatsFor('kriti_reading.webp')), ['bob', 'squash', 'sparkle']);
+    assert.deepEqual(plain(Mascots.idleBeatsFor('kriti_pose_04.webp')), ['bob', 'squash', 'sparkle']);
     assert.deepEqual(plain(Mascots.idleBeatsFor('duo_sieve_06.webp')), ['bob', 'squash', 'sparkle']);
-    assert.deepEqual(plain(Mascots.idleBeatsFor('kriti_wave.webp')), ['bob', 'hop', 'squash', 'sparkle']);
+    assert.deepEqual(plain(Mascots.idleBeatsFor('kriti_pose_01.webp')), ['breath', 'bob', 'sparkle'], 'standing Kriti breathes');
+    assert.deepEqual(plain(Mascots.idleBeatsFor('kriti_pose_06.webp')), ['bob', 'hop', 'squash', 'sparkle']);
     // The rhythm: first after 6 to 12 s, then 12, 20 and 30 s (the last repeats), each jittered 15%.
     assert.equal(Mascots.idleDelay(0, () => 0), 6000);
     assert.equal(Mascots.idleDelay(0, () => 1), 12000);
@@ -683,7 +687,7 @@ test('support variants play the app\'s motions, and the loop API is there for pa
     assert.equal(Mascots.mountLoop(null, 'duoSieve'), null);
     const source = fs.readFileSync('js/mascots.js', 'utf8');
     assert.match(source, /if \(prefersReducedMotion\(\)\) return;\n\s+if \(companionMode !== 'lively'\)/, 'reduced motion keeps the still; Quiet plays once');
-    assert.match(source, /if \(Date\.now\(\) - started > LOOP_CAP_MS\) \{ resting = true; idleLife\(picture\); return; \}/, 'Lively loops for 30 s, then rests');
+    assert.match(source, /if \(Date\.now\(\) - started > LOOP_CAP_MS\) \{ resting = true; picture\.src = assetUrl\(still\(\)\); idleLife\(picture\); return; \}/, 'Lively loops for 30 s, then rests');
     assert.match(source, /#aboutView \[data-ft-duo-story\]/, 'About\'s own story section replaces the duo card');
 });
 
@@ -729,7 +733,8 @@ test('the sign shows the time alone today and the weekday on a later day', () =>
 
 test('the popup plays a sheet as its first, middle and last frames in 400 ms at most', () => {
     const { Mascots } = load();
-    assert.deepEqual(plain(Mascots.popupSheet('duoSieve')), { order: [0, 3, 5], ms: 133 }, 'frames 1, 4 and 6');
+    assert.deepEqual(plain(Mascots.popupSheet('duoShoo')), { order: [0, 3, 5], ms: 133 }, 'frames 1, 4 and 6');
+    assert.deepEqual(plain(Mascots.popupSheet('uljhanBounce')), { order: [0, 3, 5], ms: 133 });
     assert.deepEqual(plain(Mascots.popupSheet('uljhanTangle')), { order: [0, 1, 2], ms: 133 });
     assert.deepEqual(plain(Mascots.popupSheet('duoUntangle')), { order: [0, 1, 2], ms: 133 });
     assert.deepEqual(plain(Mascots.popupSheet('kritiJump')).order, [0, 4, 0]);
@@ -782,4 +787,87 @@ test('Self-Control refusals put the locked sign on the toast and the study sheet
     const { Mascots } = load();
     assert.equal(Object.hasOwn(plain(Mascots.ASSETS), 'kritiFunnel'), false);
     assert.equal(Mascots.stillImage(plain(Mascots.SUPPORT_VARIANTS).find(variant => variant.id === 'sieve').image), 'kriti_sieve_05.webp');
+});
+
+// ---- The second 2026-11-18 batch: v3 sieve, medal, bounce, breath, sweep, high five, poses -------------
+
+test('the v3 sieve: eleven frames; played once it is frames 1 to 7, looped it holds like the app', () => {
+    const { Mascots } = load();
+    assert.equal(plain(Mascots.ASSETS.duoSieve).length, 11);
+    assert.equal(Mascots.ASSETS.duoSieve[0], 'duo_sieve_01.webp');
+    assert.equal(Mascots.ASSETS.duoSieve[10], 'duo_sieve_11.webp');
+    assert.deepEqual(plain(Mascots.sheetFrames('duoSieve', false)), [0, 1, 2, 3, 4, 5, 6]);
+    assert.equal(Mascots.stillImage('duoSieve'), 'duo_sieve_07.webp', 'the play-once rests with Uljhan in the funnel');
+    assert.deepEqual(plain(Mascots.sheetFrames('duoSieveLoop', false)), [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10]);
+    assert.equal(Mascots.stillImage('duoSieveLoop'), 'duo_sieve_01.webp', 'the loop rests on frame 1');
+    assert.deepEqual(plain(Mascots.sheetFrames('duoSieveLoop', true)), [0]);
+    assert.deepEqual([...Array(11).keys()].map(index => Mascots.sheetHoldMs('duoSieveLoop', index)),
+        [3200, 420, 300, 300, 360, 700, 700, 420, 300, 360, 600]);
+    assert.equal(Mascots.sheetHoldMs('duoShoo', 2), 420, 'without holds, the frame time');
+    assert.match(fs.readFileSync('js/dashboard_home.js', 'utf8'), /mountLoop\?\.\(duo, 'duoSieveLoop'/, 'the Home greeting loops v3');
+    assert.match(fs.readFileSync('html/tab-view.html', 'utf8'), /mascots\/duo_sieve_01\.webp/);
+});
+
+test('time saved: 1, 10 and 100 hours, once each, Lively only; the running total survives the daily reset', () => {
+    const { Mascots } = load();
+    assert.deepEqual(plain(Mascots.TIME_MILESTONES_HOURS), [1, 10, 100]);
+    const hour = 3600;
+    assert.equal(Mascots.evaluateTimeMilestone(59 * 60, [], 'lively').celebrate, null);
+    const first = Mascots.evaluateTimeMilestone(hour, [], 'lively');
+    assert.equal(first.celebrate, 1);
+    assert.equal(Mascots.evaluateTimeMilestone(2 * hour, first.seen, 'lively').celebrate, null, 'once');
+    const quiet = Mascots.evaluateTimeMilestone(11 * hour, first.seen, 'quiet');
+    assert.equal(quiet.celebrate, null, 'Quiet marks it seen without playing');
+    assert.deepEqual(plain(quiet.seen), [1, 10]);
+    assert.equal(Mascots.evaluateTimeMilestone(200 * hour, [], 'lively').celebrate, 100, 'the highest crossed');
+    assert.equal(Mascots.totalSavedSeconds({ statsBySurface: { main: { totalSavedSeconds: 5000, savedSeconds: 10 }, kids: { savedSeconds: 600 } } }), 5600);
+    assert.equal(Mascots.totalSavedSeconds({ stats: { savedSeconds: 90 } }), 90);
+    assert.equal(Mascots.timeMilestoneLine(1), 'You\u2019ve saved 1 hour so far.');
+    assert.equal(Mascots.timeMilestoneLine(10), 'You\u2019ve saved 10 hours so far.');
+    const bridge = fs.readFileSync('js/content_bridge.js', 'utf8');
+    assert.match(bridge, /statsTotalSavedDelta \+= secondsSaved;/);
+    assert.match(bridge, /statsTotalSavedDelta -= savedTime;/);
+    assert.match(bridge, /nextStats\.totalSavedSeconds = Math\.max\(0, previousSaved \+ statsTotalSavedDelta\);\s*statsTotalSavedDelta = 0;/);
+    const directory = 'data/ui_locales';
+    for (const { code } of JSON.parse(fs.readFileSync(path.join(directory, 'targets.json'), 'utf8')).locales) {
+        const catalog = JSON.parse(fs.readFileSync(path.join(directory, `${code}.json`), 'utf8'));
+        for (const key of ['mascot.timeSaved.one', 'mascot.timeSaved.other']) {
+            assert.match(catalog[key] || '', /\{count\}/, `${code}: ${key}`);
+            assert.doesNotMatch(catalog[key], /youtube/i);
+        }
+    }
+});
+
+test('a removal that empties a list gets the sweep within 2.5 s; a sync gets the high five', () => {
+    const { Mascots } = load();
+    assert.equal(Mascots.sweepAfterRemoval(0, 1000), false);
+    assert.equal(Mascots.sweepAfterRemoval(1000, 3000), true);
+    assert.equal(Mascots.sweepAfterRemoval(1000, 4000), false);
+    assert.equal(Mascots.stillImage('duoSweep'), 'duo_sweep_06.webp');
+    assert.equal(Mascots.stillImage('duoHighFive'), 'duo_high_five_06.webp');
+    const tabView = fs.readFileSync('js/tab-view.js', 'utf8');
+    assert.equal((tabView.match(/toast\.dataset\.ftMascot = 'highfive'/g) || []).length, 3, 'managed, Internet Pickup and Home Pickup updates');
+    assert.match(tabView, /subscriptionsImportNoChannels[^\n]*\n[^\n]*toast\.dataset\.ftMascot = 'shrug'/, 'nothing to import: Uljhan shrugs');
+});
+
+test('the pose registry names every 2026-11-18 pose, and each moment uses the right one', () => {
+    const { Mascots } = load();
+    const assets = plain(Mascots.ASSETS);
+    const poses = plain(Mascots.POSES);
+    assert.deepEqual(Object.keys(poses.kriti), ['wave', 'cheer', 'think', 'read', 'sleepy', 'proud', 'shh', 'point']);
+    assert.deepEqual(Object.keys(poses.uljhan), ['peek', 'shrug', 'knotted', 'hop', 'tiptoe', 'asleep']);
+    assert.deepEqual(Object.values(poses.kriti).map(key => assets[key]), [1, 2, 3, 4, 5, 6, 7, 8].map(index => `kriti_pose_0${index}.webp`));
+    assert.deepEqual(Object.values(poses.uljhan).map(key => assets[key]), [1, 2, 3, 4, 5, 6].map(index => `uljhan_pose_0${index}.webp`));
+    const moments = plain(Mascots.MOMENTS);
+    assert.equal(moments.error.image, 'uljhanKnotted');
+    assert.equal(moments.empty.image, 'uljhanPeek');
+    assert.equal(moments.resting.image, 'uljhanAsleep');
+    assert.equal(moments.slow.image, 'uljhanTiptoe');
+    assert.equal(plain(Mascots.NETWORK_ART).slow, 'uljhanTiptoe');
+    assert.match(fs.readFileSync('js/dashboard_home.js', 'utf8'), /moment\?\.\('resting', \{ height: 56 \}\)/, 'nothing got past: Uljhan asleep');
+    assert.match(fs.readFileSync('js/study_ui.js', 'utf8'), /pose: 'kritiSleepy'/, 'late at night Kriti is sleepy');
+    const source = fs.readFileSync('js/mascots.js', 'utf8');
+    assert.match(source, /return 'kritiShh';/, 'in a focus round: shh');
+    assert.match(source, /image\(ASSETS\.uljhanKnotted, 'pk-toast-art', 36\)/, 'errors: knotted');
+    assert.match(source, /image\(ASSETS\.uljhanPeek, 'pk-popup-peek', 48\)/, 'an empty popup list: Uljhan peeks');
 });

@@ -908,7 +908,7 @@ function showManagedViewingBlockedOverlay(decision) {
 
         const panel = createManagedOverlayPanel('gate');
         // Kriti points the way to the spaces this profile may use.
-        const pose = createManagedOverlayPose('kriti_pointing.webp', 120);
+        const pose = createManagedOverlayPose('kriti_pose_08.webp', 120);
 
         const eyebrow = document.createElement('div');
         eyebrow.className = 'filtertube-managed-overlay__eyebrow';
@@ -1328,7 +1328,7 @@ function showManagedTimeoutOverlay(state) {
         );
 
         // Kriti with her mug for the daily pause; thinking while a parent needs to review the rule.
-        const pose = createManagedOverlayPose(policyExpired ? 'kriti_thinking.webp' : 'kriti_mug_06.webp', 120);
+        const pose = createManagedOverlayPose(policyExpired ? 'kriti_pose_03.webp' : 'kriti_mug_06.webp', 120);
         if (pose) story.appendChild(pose);
         story.append(brand, eyebrow, title, copy, profilePill);
 

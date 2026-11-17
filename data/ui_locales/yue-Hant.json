@@ -3387,5 +3387,7 @@
   "feed.calm.review": "睇吓過濾器",
   "about.why.title": "點解會有 FilterTube",
   "about.why.body": "2020 年，一位家長喺影片平台嘅幫助論壇問咗一個簡單問題：點樣按關鍵字封鎖影片？答案係：做唔到。超過 2,500 位家長話佢哋都有同一個問題，佢哋問咗好多年，直到個帖被鎖。我都一直有問。之後喺 2023 年，有位爸爸直接問我可唔可以做啲嘢，因為佢個仔喊個不停。我忍唔住動手整咗出嚟。FilterTube 就係由嗰度開始：為每個家庭而設嘅關鍵字同頻道過濾，然後係一個平靜嘅兒童空間，再之後係 Sangeet，等音樂都可以保持平靜。",
-  "about.why.link": "睇吓個帖"
+  "about.why.link": "睇吓個帖",
+  "mascot.timeSaved.one": "你已經慳咗 {count} 個鐘。",
+  "mascot.timeSaved.other": "你已經慳咗 {count} 個鐘。"
 }

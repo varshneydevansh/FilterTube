@@ -3389,5 +3389,7 @@
   "feed.calm.review": "Duba matatu",
   "about.why.title": "Me ya sa FilterTube ke nan",
   "about.why.body": "A 2020 wani iyaye ya yi tambaya mai sauƙi a dandalin taimako na dandalin bidiyo: ta yaya zan toshe bidiyo ta kalmar maɓalli? Amsar ita ce ba za ka iya ba. Iyaye fiye da 2,500 sun ce suna da tambaya iri ɗaya, kuma suka ci gaba da tambaya tsawon shekaru har aka kulle zaren. Ni ma ina tambaya. Sannan a 2023 wani uba ya tambaye ni kai tsaye ko zan iya yin wani abu, saboda ɗansa bai daina kuka ba. Ban iya hana kaina gina shi ba. FilterTube ya fara daga nan: matatun kalma da tasha ga kowane iyali, sannan wurin Kids mai natsuwa, sannan Sangeet, don kiɗa ma ya kasance da natsuwa.",
-  "about.why.link": "Karanta zaren"
+  "about.why.link": "Karanta zaren",
+  "mascot.timeSaved.one": "Ka adana awa {count} zuwa yanzu.",
+  "mascot.timeSaved.other": "Ka adana awanni {count} zuwa yanzu."
 }

@@ -1088,6 +1088,9 @@ function refreshActiveCollaborationMenu(videoId, collaborators, options = {}) {
 let statsCountToday = 0;
 // Hidden since the last write; flushStatsToStorage adds it to the stored running total (totalHiddenCount).
 let statsTotalHiddenDelta = 0;
+// Seconds saved since the last write; flushStatsToStorage adds it to the running total (totalSavedSeconds),
+// which the time-saved milestones read (the daily savedSeconds resets each day).
+let statsTotalSavedDelta = 0;
 let statsTotalSeconds = 0; // Track total seconds saved instead of using multiplier
 let statsLastDate = new Date().toDateString();
 let statsInitialized = false;
@@ -4815,6 +4818,7 @@ function incrementHiddenStats(element, reason = '') {
         statsCountToday++;
         statsTotalHiddenDelta++;
         statsTotalSeconds += secondsSaved;
+        statsTotalSavedDelta += secondsSaved;
 
         if (element) {
             element.setAttribute('data-filtertube-time-saved', secondsSaved.toString());
@@ -4846,6 +4850,7 @@ function decrementHiddenStats(element) {
         statsCountToday = Math.max(0, statsCountToday - 1);
         statsTotalHiddenDelta--;
         statsTotalSeconds = Math.max(0, statsTotalSeconds - savedTime);
+        statsTotalSavedDelta -= savedTime;
 
         // Remove the attribute
         if (element) {
@@ -4911,6 +4916,11 @@ function flushStatsToStorage() {
                 : Math.max(0, Number(previousEntry.hiddenCount) || 0);
             nextStats.totalHiddenCount = Math.max(0, previousTotal + statsTotalHiddenDelta);
             statsTotalHiddenDelta = 0;
+            const previousSaved = Number.isFinite(Number(previousEntry.totalSavedSeconds))
+                ? Number(previousEntry.totalSavedSeconds)
+                : Math.max(0, Number(previousEntry.savedSeconds) || 0);
+            nextStats.totalSavedSeconds = Math.max(0, previousSaved + statsTotalSavedDelta);
+            statsTotalSavedDelta = 0;
 
             const statsBySurface = {
                 ...existingBySurface,

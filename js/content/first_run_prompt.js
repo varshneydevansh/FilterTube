@@ -131,7 +131,7 @@
 
         // Kriti waves from the card's corner (decorative; the words carry the message).
         try {
-            const kritiUrl = api.runtime.getURL('assets/images/mascots/kriti_wave.webp');
+            const kritiUrl = api.runtime.getURL('assets/images/mascots/kriti_pose_01.webp');
             if (kritiUrl) {
                 const kriti = document.createElement('img');
                 kriti.src = kritiUrl;

@@ -176,7 +176,7 @@
     // the local date); otherwise, and in Quiet, the gate shows Uljhan's shrug still, as the app does.
     const SHOO_DAILY_PLAYS = 3;
     const SHOO_CAP_KEY = 'ftMascotCapsV1';
-    const SHOO_REST = 'uljhan_shrug.webp';
+    const SHOO_REST = 'uljhan_pose_02.webp';
 
     function admissionLocalDay(date = new Date()) {
         const pad = value => String(value).padStart(2, '0');
@@ -398,7 +398,7 @@
         const parts = overlay.__filtertubeStudyParts;
         const offList = kind === 'offList';
         // Kriti points back to the plan (off the list) or holds her mug (a break, the limit, a clock check).
-        const kriti = syncAdmissionMascot(overlay, '__filtertubeStudyMascot', card, offList ? 'kriti_pointing.webp' : 'kriti_mug_06.webp', 132);
+        const kriti = syncAdmissionMascot(overlay, '__filtertubeStudyMascot', card, offList ? 'kriti_pose_08.webp' : 'kriti_mug_06.webp', 132);
         if (kriti) admissionOverlayStyle(kriti, { order: '-1', alignSelf: localeDirection === 'rtl' ? 'flex-start' : 'flex-end', marginBottom: '-6px' });
         parts.status.textContent = localizedAdmissionText('admission.studyStatus', 'Study');
         parts.title.textContent = offList
@@ -927,7 +927,7 @@
         makeRoomForSheet(holder, false);
         const row = document.createElement('div');
         admissionOverlayStyle(row, { display: 'flex', alignItems: 'center', gap: '12px' });
-        const kriti = companionMode === 'off' ? null : createAdmissionMascot('kriti_thinking.webp', 64);
+        const kriti = companionMode === 'off' ? null : createAdmissionMascot('kriti_pose_03.webp', 64);
         if (kriti) row.appendChild(kriti);
         const words = document.createElement('div');
         admissionOverlayStyle(words, { display: 'grid', gap: '4px' });

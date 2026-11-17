@@ -61,35 +61,48 @@
         // Looking hard: a search's wait (LoadingPersonality, search scene).
         kritiMagnifier: 'kriti_magnifier.webp',
         kritiThumbsUp: 'kriti_thumbsup.webp',
-        kritiWave: 'kriti_wave.webp',
-        kritiReading: 'kriti_reading.webp',
-        kritiThinking: 'kriti_thinking.webp',
-        uljhanShrug: 'uljhan_shrug.webp',
+        kritiWave: 'kriti_pose_01.webp',
+        kritiReading: 'kriti_pose_04.webp',
+        kritiThinking: 'kriti_pose_03.webp',
+        uljhanShrug: 'uljhan_pose_02.webp',
         // Kriti holding the logo funnel is the sieve loop's last frame (ASSETS.sieve[4]); the old kitchen
         // sieve pose is gone (Android KRITI_FUNNEL -> study_kriti_loading_05).
         // Self-Control and study-lock refusals: Kriti holds a blank sign; the page writes "Locked until <time>".
         kritiLockedSign: 'kriti_locked_sign.webp',
         kritiNotebook: 'kriti_notebook.webp',
-        kritiPointing: 'kriti_pointing.webp',
+        kritiPointing: 'kriti_pose_08.webp',
         // Study's perch poses (StudyFocusActivity.KritiPerch): before a session she reads, on a break she's
         // happy, in the last five minutes she holds up a blank sign (the page writes "5 min" on it), after
         // Skip break she salutes, and the end card's seal brings her medal.
-        kritiHappy: 'kriti_happy.webp',
+        // The owner's 2026-11-18 poses (kriti_pose_01..08, uljhan_pose_01..06; POSES names them): cheer.
+        kritiHappy: 'kriti_pose_02.webp',
         kritiSignRaised: 'kriti_sign_raised.webp',
         kritiSalute: 'kriti_salute.webp',
-        kritiMedal: 'kriti_medal.webp',
+        // Proud, for achievements (the Study end card's seal).
+        kritiMedal: 'kriti_pose_06.webp',
+        // Sleepy (late night), shh (Study focus).
+        kritiSleepy: 'kriti_pose_05.webp',
+        kritiShh: 'kriti_pose_07.webp',
         // Ask a parent: Kriti with her crayon beside the child's ask (AskParentUi.buildAsk, KRITI_CRAYON).
         kritiCrayon: 'kriti_crayon.webp',
         // The child's "Not this time" answer with no note (AskParentUi.answerCard, KRITI_FRONT).
         kritiFront: 'kriti_front.webp',
         uljhanFront: 'uljhan_front.webp',
-        uljhanHappy: 'uljhan_happy.webp',
+        // Hop.
+        uljhanHappy: 'uljhan_pose_04.webp',
+        // Peeking from behind a card (an empty list), knotted (an error), tiptoeing (a slow connection),
+        // asleep (resting, nothing to do).
+        uljhanPeek: 'uljhan_pose_01.webp',
+        uljhanKnotted: 'uljhan_pose_03.webp',
+        uljhanTiptoe: 'uljhan_pose_05.webp',
+        uljhanAsleep: 'uljhan_pose_06.webp',
         sieve: Object.freeze([1, 2, 3, 4, 5].map(index => `kriti_sieve_0${index}.webp`)),
         // Picture-book sheets (aKriti frames): swapped stills, never warped.
         kritiMug: Object.freeze([1, 2, 3, 4, 5, 6].map(index => `kriti_mug_0${index}.webp`)),
         kritiEvening: Object.freeze([1, 2, 3, 4, 5, 6].map(index => `kriti_evening_0${index}.webp`)),
         uljhanFetch: Object.freeze([1, 2, 3, 4, 5, 6].map(index => `uljhan_fetch_0${index}.webp`)),
-        duoSieve: Object.freeze([1, 2, 3, 4, 5, 6].map(index => `duo_sieve_0${index}.webp`)),
+        // The owner's v3 red-funnel sieve, eleven frames (the old six drew two funnels on frame 5).
+        duoSieve: Object.freeze([1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11].map(index => `duo_sieve_${String(index).padStart(2, '0')}.webp`)),
         duoShoo: Object.freeze([1, 2, 3, 4, 5, 6].map(index => `duo_shoo_0${index}.webp`)),
         kritiJump: Object.freeze([1, 2, 3, 4, 5].map(index => `kriti_jump_0${index}.webp`)),
         // In a round (KRITI_OPEN_NOTEBOOK then KRITI_PENCIL_TAP): frames 1-3 open the notebook, 3-6 tap the pencil.
@@ -104,7 +117,22 @@
         uljhanTangle: Object.freeze([1, 2, 3].map(index => `uljhan_tangle_0${index}.webp`)),
         duoUntangle: Object.freeze([1, 2, 3].map(index => `duo_untangle_0${index}.webp`)),
         duoBackup: Object.freeze([1, 2, 3, 4].map(index => `duo_backup_0${index}.webp`)),
-        duoSearchEmpty: Object.freeze([1, 2, 3, 4].map(index => `duo_search_empty_0${index}.webp`))
+        duoSearchEmpty: Object.freeze([1, 2, 3, 4].map(index => `duo_search_empty_0${index}.webp`)),
+        // The second 2026-11-18 batch: a time-saved medal (sheet frames 1, 3, 5, 6), Uljhan's idle bounce and
+        // Kriti's idle breath (alternate frames), the sweep after a list is cleared and the high five after a
+        // sync (alternate frames).
+        duoMedal: Object.freeze([1, 2, 3, 4].map(index => `duo_medal_0${index}.webp`)),
+        uljhanBounce: Object.freeze([1, 2, 3, 4, 5, 6].map(index => `uljhan_bounce_0${index}.webp`)),
+        kritiBreath: Object.freeze([1, 2, 3, 4].map(index => `kriti_breath_0${index}.webp`)),
+        duoSweep: Object.freeze([1, 2, 3, 4, 5, 6].map(index => `duo_sweep_0${index}.webp`)),
+        duoHighFive: Object.freeze([1, 2, 3, 4, 5, 6].map(index => `duo_high_five_0${index}.webp`))
+    });
+    /** The pose registry (Android StudyMascotView.Pose, 2026-11-18): each named pose and the art it uses. */
+    const POSES = Object.freeze({
+        kriti: Object.freeze({ wave: 'kritiWave', cheer: 'kritiHappy', think: 'kritiThinking', read: 'kritiReading',
+            sleepy: 'kritiSleepy', proud: 'kritiMedal', shh: 'kritiShh', point: 'kritiPointing' }),
+        uljhan: Object.freeze({ peek: 'uljhanPeek', shrug: 'uljhanShrug', knotted: 'uljhanKnotted', hop: 'uljhanHappy',
+            tiptoe: 'uljhanTiptoe', asleep: 'uljhanAsleep' })
     });
     /**
      * The app's frame animations (StudyMascotView.Motion): which frames play, in what order (0-based,
@@ -112,7 +140,8 @@
      * reduced motion only that frame shows. leaves: slide out and fade after the last frame.
      */
     const MOTIONS = Object.freeze({
-        duoSieve: Object.freeze({ order: Object.freeze([0, 1, 2, 3, 4, 5]), ms: 420 }),
+        // The v3 sieve played once: frames 1 to 7, resting with Uljhan in the funnel.
+        duoSieve: Object.freeze({ order: Object.freeze([0, 1, 2, 3, 4, 5, 6]), ms: 420, holds: Object.freeze([420, 420, 300, 300, 360, 700, 700]) }),
         duoShoo: Object.freeze({ order: Object.freeze([0, 1, 2, 3, 4, 5]), ms: 420 }),
         kritiMug: Object.freeze({ order: Object.freeze([0, 1, 2, 2, 3, 4, 5]), ms: 380 }),
         kritiEvening: Object.freeze({ order: Object.freeze([0, 1, 2, 3, 4, 5]), ms: 420 }),
@@ -131,7 +160,15 @@
         uljhanTangle: Object.freeze({ order: Object.freeze([0, 1, 2]), ms: 420 }),
         duoUntangle: Object.freeze({ order: Object.freeze([0, 1, 2]), ms: 400, leaves: true }),
         duoBackup: Object.freeze({ order: Object.freeze([0, 1, 2, 3]), ms: 390 }),
-        duoSearchEmpty: Object.freeze({ order: Object.freeze([0, 1, 2, 3]), ms: 420 })
+        duoSearchEmpty: Object.freeze({ order: Object.freeze([0, 1, 2, 3]), ms: 420 }),
+        // The v3 loop (Android About card): frames 1 to 11 with their own holds, 11 back to 1; at rest, frame 1.
+        duoSieveLoop: Object.freeze({ frames: 'duoSieve', order: Object.freeze([0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10]), ms: 420, loop: true, still: 0,
+            holds: Object.freeze([3200, 420, 300, 300, 360, 700, 700, 420, 300, 360, 600]) }),
+        duoMedal: Object.freeze({ order: Object.freeze([0, 1, 2, 3]), ms: 450 }),
+        uljhanBounce: Object.freeze({ order: Object.freeze([0, 1, 2, 3, 4, 5]), ms: 140 }),
+        kritiBreath: Object.freeze({ order: Object.freeze([0, 1, 2, 3, 2, 1, 0]), ms: 260 }),
+        duoSweep: Object.freeze({ order: Object.freeze([0, 1, 2, 3, 4, 5]), ms: 300 }),
+        duoHighFive: Object.freeze({ order: Object.freeze([0, 1, 2, 3, 4, 5]), ms: 300 })
     });
     /** The pictures a sheet plays (its own, or the frames it borrows). Pure. */
     function sheetAssets(sheet) {
@@ -143,7 +180,7 @@
         .map(([name, motion]) => [name, motion.order[motion.order.length - 1]])));
     // A borrowed sheet rests on the last frame it plays.
     const BORROWED_STILL = Object.freeze(Object.fromEntries(Object.entries(MOTIONS).filter(([, motion]) => motion.frames)
-        .map(([name, motion]) => [name, motion.order[motion.order.length - 1]])));
+        .map(([name, motion]) => [name, Number.isInteger(motion.still) ? motion.still : motion.order[motion.order.length - 1]])));
 
     // NativeMotion: the springs and idle rhythm the app's mascots use (StudyMascotView, MascotIdle).
     const SPRINGS = Object.freeze({
@@ -171,6 +208,12 @@
     const IDLE_BEATS = Object.freeze({
         uljhan: Object.freeze(['wiggle', 'bob', 'hop', 'sparkle']),
         uljhanTangled: Object.freeze(['wiggle', 'bob']),
+        // Standing Uljhan bounces (uljhan_bounce); asleep he only breathes; peeking he only wiggles.
+        uljhanStanding: Object.freeze(['bounce', 'wiggle', 'bob', 'sparkle']),
+        uljhanAsleep: Object.freeze(['squash']),
+        uljhanPeek: Object.freeze(['wiggle']),
+        // Standing Kriti breathes (kriti_breath) between the small beats.
+        kritiStanding: Object.freeze(['breath', 'bob', 'sparkle']),
         sieve: Object.freeze(['bob', 'squash', 'sieve', 'sparkle']),
         seated: Object.freeze(['bob', 'squash', 'sparkle']),
         perched: Object.freeze(['squash', 'sparkle']),
@@ -210,6 +253,10 @@
     const LOCKED_SIGN = Object.freeze({ left: 0.5, top: 0.646, right: 0.846, bottom: 0.882, aspect: 247 / 280, timeScale: 1.45, lineHeight: 1.12 });
     const LOCKED_COPY = Object.freeze(['study.lockedUntil', 'Locked until {time}']);
     const BACKUP_MOMENT_KEY = 'backup_saved';
+    const SWEEP_WINDOW_MS = 2500;
+    const TIME_MILESTONES_HOURS = Object.freeze([1, 10, 100]);
+    const TIME_MILESTONES_KEY = 'ftMascotTimeMilestonesSeen';
+    const TIME_SAVED_COPY = Object.freeze({ one: 'You\u2019ve saved {count} hour so far.', other: 'You\u2019ve saved {count} hours so far.' });
 
     const COPY = Object.freeze({
         welcome: ['mascot.welcome.line', "I'll keep what you block out of sight."],
@@ -242,7 +289,7 @@
         restored: ['mascot.net.restored', 'Back online']
     });
     // Offline: Uljhan tangled in his string; back online: Kriti has unwound him (each a sheet's still).
-    const NETWORK_ART = Object.freeze({ offline: 'uljhanTangle', slow: 'uljhanFront', restored: 'duoUntangle' });
+    const NETWORK_ART = Object.freeze({ offline: 'uljhanTangle', slow: 'uljhanTiptoe', restored: 'duoUntangle' });
     const RESTORED_MS = 3500;
     const DUO_COPY = Object.freeze({
         hello: ['mascot.hello', 'Hi, I\'m Kriti. I keep the good stuff flowing.'],
@@ -317,16 +364,18 @@
     // Moment poses: one character and one line each (BIBLE.md moments map).
     const MOMENTS = Object.freeze({
         loading: Object.freeze({ image: 'uljhanFetch', copy: 'loading', character: 'Uljhan' }),
-        empty: Object.freeze({ image: 'kritiPeek', copy: null, character: 'Kriti' }),
+        empty: Object.freeze({ image: 'uljhanPeek', copy: null, character: 'Uljhan' }),
         // character 'Duo': Kriti and Uljhan together on one picture.
         noMatches: Object.freeze({ image: 'duoSearchEmpty', copy: 'noMatches', character: 'Duo' }),
-        error: Object.freeze({ image: 'uljhanShrug', copy: 'error', character: 'Uljhan' }),
+        error: Object.freeze({ image: 'uljhanKnotted', copy: 'error', character: 'Uljhan' }),
         done: Object.freeze({ image: 'kritiThumbsUp', copy: null, character: 'Kriti' }),
         hello: Object.freeze({ image: 'kritiWave', copy: null, character: 'Kriti' }),
         reading: Object.freeze({ image: 'kritiReading', copy: null, character: 'Kriti' }),
         break: Object.freeze({ image: 'kritiMug', copy: null, character: 'Kriti' }),
         offline: Object.freeze({ image: 'uljhanTangle', copy: null, character: 'Uljhan' }),
-        slow: Object.freeze({ image: 'uljhanFront', copy: null, character: 'Uljhan' }),
+        slow: Object.freeze({ image: 'uljhanTiptoe', copy: null, character: 'Uljhan' }),
+        // Nothing to do (nothing got past today): Uljhan asleep.
+        resting: Object.freeze({ image: 'uljhanAsleep', copy: null, character: 'Uljhan' }),
         restored: Object.freeze({ image: 'duoUntangle', copy: null, character: 'Duo' }),
         // Waiting for the other device (the app's KRITI_THINKING), and a win (KRITI_JUMP, Lively plays it).
         thinking: Object.freeze({ image: 'kritiThinking', copy: null, character: 'Kriti' }),
@@ -420,6 +469,12 @@
         return MOTIONS[sheet]?.ms || SHEET_FRAME_MS;
     }
 
+    /** How long the [index]th frame a sheet plays stays (its own hold, else the sheet's frame time). Pure. */
+    function sheetHoldMs(sheet, index) {
+        const hold = MOTIONS[sheet]?.holds?.[index];
+        return Number.isFinite(hold) ? hold : sheetFrameMs(sheet);
+    }
+
     /**
      * A damped spring sampled at 60 fps (Android SpringAnimation from rest with a start velocity, in
      * units per second): the offsets from rest, ending at 0. Pure.
@@ -447,10 +502,14 @@
     /** Which idle beats fit an art file (MascotIdle.beatsFor). Pure. */
     function idleBeatsFor(name) {
         const file = String(name || '').replace(/^.*\//, '');
-        if (/^uljhan_tangle_/.test(file)) return IDLE_BEATS.uljhanTangled;
+        if (/^uljhan_tangle_/.test(file) || file === 'uljhan_pose_03.webp') return IDLE_BEATS.uljhanTangled;
+        if (file === 'uljhan_pose_06.webp') return IDLE_BEATS.uljhanAsleep;
+        if (file === 'uljhan_pose_01.webp') return IDLE_BEATS.uljhanPeek;
+        if (file === 'uljhan_front.webp' || file === 'uljhan_pose_04.webp' || file === 'uljhan_pose_02.webp') return IDLE_BEATS.uljhanStanding;
+        if (file === 'kriti_pose_01.webp' || file === 'kriti_front.webp') return IDLE_BEATS.kritiStanding;
         if (/^uljhan_/.test(file)) return IDLE_BEATS.uljhan;
         if (/^kriti_sieve_/.test(file)) return IDLE_BEATS.sieve;
-        if (file === 'kriti_reading.webp' || file === 'kriti_notebook.webp') return IDLE_BEATS.seated;
+        if (file === 'kriti_pose_04.webp' || file === 'kriti_notebook.webp') return IDLE_BEATS.seated;
         if (file === 'kriti_peek.webp') return IDLE_BEATS.perched;
         if (/^duo_/.test(file)) return IDLE_BEATS.duo;
         return IDLE_BEATS.kriti;
@@ -606,6 +665,55 @@
         } catch (e) {
             return new Intl.DateTimeFormat('en', options).format(end);
         }
+    }
+
+    /** A list emptied within 2.5 s of a removal gets the sweep. Pure. */
+    function sweepAfterRemoval(removedAt, now) {
+        return Number(removedAt) > 0 && now - Number(removedAt) <= SWEEP_WINDOW_MS;
+    }
+
+    /** The running time saved (seconds) across surfaces: totalSavedSeconds, else today's savedSeconds. Pure. */
+    function totalSavedSeconds(storage) {
+        const data = storage && typeof storage === 'object' ? storage : {};
+        const bySurface = data.statsBySurface && typeof data.statsBySurface === 'object' && !Array.isArray(data.statsBySurface) ? data.statsBySurface : {};
+        let total = 0;
+        let sawMain = false;
+        const read = entry => Math.max(0, Number.isFinite(Number(entry.totalSavedSeconds)) ? Number(entry.totalSavedSeconds) : Number(entry.savedSeconds) || 0);
+        for (const [surface, entry] of Object.entries(bySurface)) {
+            if (!entry || typeof entry !== 'object') continue;
+            if (surface === 'main') sawMain = true;
+            total += read(entry);
+        }
+        if (!sawMain && data.stats && typeof data.stats === 'object') total += read(data.stats);
+        return Math.floor(total);
+    }
+
+    /**
+     * Time-saved milestones (1, 10 and 100 hours): each once, Lively only (Quiet and Off mark it seen without
+     * playing), the highest when several are crossed at once. Pure, like evaluateMilestone.
+     */
+    function evaluateTimeMilestone(seconds, seenValue, mode = DEFAULT_MODE) {
+        const seen = (Array.isArray(seenValue) ? seenValue : []).map(Number).filter(value => TIME_MILESTONES_HOURS.includes(value))
+            .filter((value, index, all) => all.indexOf(value) === index);
+        const hours = Math.max(0, Number(seconds) || 0) / 3600;
+        const reached = TIME_MILESTONES_HOURS.filter(value => hours >= value && !seen.includes(value));
+        const next = [...seen, ...reached].sort((a, b) => a - b);
+        const celebrate = reached.length && normalizeMode(mode) === 'lively' ? reached[reached.length - 1] : null;
+        return { celebrate, seen: next, changed: reached.length > 0 };
+    }
+
+    /** "You've saved 10 hours so far." in the page's language, plural-aware (mascot.timeSaved.one / .other). */
+    function timeMilestoneLine(hours) {
+        const lang = locale();
+        let category = 'other';
+        try { category = new Intl.PluralRules(lang).select(hours); } catch (e) { }
+        const count = formatCount(hours);
+        const fallback = category === 'one' ? TIME_SAVED_COPY.one : TIME_SAVED_COPY.other;
+        try {
+            const text = root.FilterTubeUiLocalization?.text?.(`mascot.timeSaved.${category}`, { count });
+            if (typeof text === 'string' && text.trim() && !text.startsWith('mascot.timeSaved')) return text;
+        } catch (e) { }
+        return fallback.replace('{count}', count);
     }
 
     /** Backup saved plays the duo at most once a local day (Android takeBackupSavedToday). Pure. */
@@ -1185,6 +1293,13 @@
     function watchEmptyLists(doc) {
         const container = doc.getElementById('viewContainer');
         if (!container) return;
+        // Removals are when a list may be emptied (StateManager announces keywordRemoved, channelRemoved...).
+        const listen = (tries = 0) => {
+            const manager = typeof StateManager !== 'undefined' ? StateManager : root.StateManager;
+            if (manager?.subscribe) manager.subscribe(eventType => { if (/Removed|Cleared/i.test(String(eventType))) lastRemovalAt = Date.now(); });
+            else if (tries < 10) root.setTimeout(() => listen(tries + 1), 500);
+        };
+        listen();
         scanEmptyLists(container);
         if (typeof root.MutationObserver !== 'function') return;
         new root.MutationObserver(records => {
@@ -1197,6 +1312,7 @@
     }
 
     let lastSearchEmptyAt = 0;
+    let lastRemovalAt = 0;
 
     function drawEmptyList(node, list, details) {
         // RenderEngine rewrites the node's textContent on a language change. Move its copy record onto a
@@ -1232,12 +1348,26 @@
         // MascotMoments.emptyState: pointing over a first keyword list, reading over a first channel list,
         // peeking over a Kids list.
         const pose = emptyListPose(list, { kids: !!node.closest?.('#kidsView') });
-        const character = createCharacter({ className: `ft-mascot--empty ft-mascot--${pose}`, imageName: stillImage(pose), height: 112, kind: 'static', tail: 'up' });
+        // A removal just emptied the list: Kriti and Uljhan sweep the card clean once, then her pose.
+        const sweeping = !prefersReducedMotion() && sweepAfterRemoval(lastRemovalAt, Date.now());
+        if (sweeping) lastRemovalAt = 0;
+        const character = createCharacter({ className: `ft-mascot--empty ft-mascot--${pose}`, imageName: sweeping ? ASSETS.duoSweep[0] : stillImage(pose), height: 112, kind: 'static', tail: 'up' });
         node.classList.add('ft-mascot-empty');
         node.insertBefore(character.root, node.firstChild);
         character.say(t(list === 'channels' ? COPY.emptyChannels : COPY.emptyKeywords));
         enter(character.picture);
-        idleLife(character.picture);
+        if (sweeping) {
+            root.setTimeout(() => playSheet(character.picture, 'duoSweep', {
+                onDone: () => root.setTimeout(() => {
+                    if (!character.picture.isConnected) return;
+                    character.picture.src = assetUrl(stillImage(pose));
+                    enter(character.picture);
+                    idleLife(character.picture);
+                }, 500)
+            }), 240);
+        } else {
+            idleLife(character.picture);
+        }
     }
 
     function redrawEmptyLists() {
@@ -1550,7 +1680,7 @@
                 if (stopped || !picture.isConnected) { delete picture.dataset.ftPlaying; return; }
                 picture.src = assetUrl(names[order[index]]);
                 index += 1;
-                if (index < order.length) timer = root.setTimeout(step, frameMs);
+                if (index < order.length) timer = root.setTimeout(step, popup ? frameMs : sheetHoldMs(sheet, index - 1));
                 else finish();
             };
             step();
@@ -1606,6 +1736,11 @@
         if (beat === 'sieve') {
             const rest = picture.src;
             playSieve(picture, 1, () => { if (picture.isConnected) picture.src = rest; });
+        }
+        if (beat === 'bounce' || beat === 'breath') {
+            const rest = picture.src;
+            const popup = !!root.document?.getElementById?.('popupRoot');
+            playSheet(picture, beat === 'bounce' ? 'uljhanBounce' : 'kritiBreath', { popup, onDone: () => { if (picture.isConnected) picture.src = rest; } });
         }
         return null;
     }
@@ -1726,8 +1861,10 @@
             root.clearTimeout(timer);
             if (stopped || !picture?.isConnected) return;
             if (!visible()) { timer = root.setTimeout(cycle, 2000); return; }
-            if (Date.now() - started > LOOP_CAP_MS) { resting = true; idleLife(picture); return; }
-            const next = () => { timer = root.setTimeout(cycle, REPLAY_REST_MS); };
+            if (Date.now() - started > LOOP_CAP_MS) { resting = true; picture.src = assetUrl(still()); idleLife(picture); return; }
+            const motion = MOTIONS[sheet];
+            const gap = motion?.loop ? sheetHoldMs(sheet, motion.order.length - 1) : REPLAY_REST_MS;
+            const next = () => { timer = root.setTimeout(cycle, gap); };
             stopSheet = sheet === 'sieve' ? playSieve(picture, 1, next) : playSheet(picture, sheet, { onDone: next });
         };
         const draw = () => {
@@ -1821,7 +1958,7 @@
             return;
         }
         if (name === 'uljhanHop' || name === 'uljhanWiggle') {
-            const beat = () => { if (!alive()) return; idleBeat(art, name === 'uljhanHop' ? 'hop' : 'wiggle'); root.setTimeout(beat, 1600); };
+            const beat = () => { if (!alive()) return; idleBeat(art, name === 'uljhanHop' ? 'bounce' : 'wiggle'); root.setTimeout(beat, 1600); };
             root.setTimeout(beat, 300);
         } else if (name === 'sieve') {
             const loop = () => playSieve(art, 1, () => { if (alive()) loop(); });
@@ -2081,7 +2218,8 @@
             if (node.classList.contains('is-break')) return 'kritiMug';
             if (node.classList.contains('is-done')) return 'kritiThumbsUp';
             if (node.classList.contains('is-normal')) return 'kritiReading';
-            return 'kritiNotebook';
+            // In a focus round: Kriti's finger to her lips.
+            return 'kritiShh';
         };
         const scan = () => {
             for (const node of container.querySelectorAll('.ft-study-status')) {
@@ -2129,6 +2267,14 @@
                     if (success && wanted === 'check') {
                         added.classList.add('has-mascot');
                         added.insertBefore(root.FilterTubeDoodles?.check?.({ className: 'pk-toast-check', delay: 220 }) || el('span', 'pk-toast-check'), added.firstChild);
+                    } else if (success && companionMode === 'lively' && wanted === 'highfive') {
+                        // A sync landed: Kriti and Uljhan high-five (Lively; reduced motion shows the still).
+                        const plays = !prefersReducedMotion();
+                        const art = image(plays ? ASSETS.duoHighFive[0] : stillImage('duoHighFive'), 'pk-toast-art pk-toast-art--duo', 48);
+                        added.classList.add('has-mascot');
+                        added.insertBefore(art, added.firstChild);
+                        enter(art);
+                        if (plays) root.setTimeout(() => playSheet(art, 'duoHighFive'), 160);
                     } else if (success && companionMode === 'lively' && (wanted === 'wave' || wanted === 'jump')) {
                         const art = image(wanted === 'wave' ? ASSETS.kritiWave : stillImage('kritiJump'), 'pk-toast-art', 36);
                         added.classList.add('has-mascot');
@@ -2144,9 +2290,16 @@
                     } else if (success) {
                         added.classList.add('has-mascot');
                         added.insertBefore(root.FilterTubeDoodles?.check?.({ className: 'pk-toast-check', delay: 220 }) || el('span', 'pk-toast-check'), added.firstChild);
-                    } else if (error && showsCharacters(companionMode)) {
+                    } else if (wanted === 'shrug' && showsCharacters(companionMode)) {
+                        // Nothing to bring in, a filter that wasn't added: Uljhan shrugs.
                         added.classList.add('has-mascot');
                         const art = image(ASSETS.uljhanShrug, 'pk-toast-art', 36);
+                        added.insertBefore(art, added.firstChild);
+                        enter(art);
+                    } else if (error && showsCharacters(companionMode)) {
+                        // Something went wrong: Uljhan is knotted up.
+                        added.classList.add('has-mascot');
+                        const art = image(ASSETS.uljhanKnotted, 'pk-toast-art', 36);
                         added.insertBefore(art, added.firstChild);
                         enter(art);
                     }
@@ -2248,8 +2401,8 @@
                     node.replaceChildren(label);
                 }
                 node.classList.add('has-mascot');
-                // The same poses as the options page's empty lists (pointing at words, reading the channels).
-                const peek = image(stillImage(emptyListPose(kind)), 'pk-popup-peek', 48);
+                // An empty list in the popup: Uljhan peeks from behind the card (the owner's 2026-11-18 pose).
+                const peek = image(ASSETS.uljhanPeek, 'pk-popup-peek', 48);
                 node.insertBefore(peek, node.firstChild);
                 idleLife(peek);
             }
@@ -2464,6 +2617,60 @@
         onModeChange(() => later(0));
     }
 
+    /**
+     * Time saved: at 1, 10 and 100 hours Kriti holds up her medal and Uljhan cheers (duo_milestone_medal) on
+     * the Home "Time saved" card, once each, Lively only. Reduced motion shows the last frame.
+     */
+    function mountTimeMilestones(doc) {
+        const card = doc.querySelector('.stat-card[data-stat="saved"]');
+        const value = doc.getElementById('statSavedTime');
+        if (!card || !value) return;
+        let busy = false;
+        const check = async () => {
+            if (busy) return;
+            busy = true;
+            try {
+                const stored = await storageGet(['stats', 'statsBySurface', TIME_MILESTONES_KEY]);
+                const verdict = evaluateTimeMilestone(totalSavedSeconds(stored), stored[TIME_MILESTONES_KEY], companionMode);
+                if (verdict.changed) await storageSet({ [TIME_MILESTONES_KEY]: verdict.seen });
+                if (!verdict.celebrate || !card.isConnected) return;
+                card.querySelector(':scope > .pk-medal')?.remove();
+                const plays = !prefersReducedMotion();
+                const character = createCharacter({ className: 'ft-mascot--medal', imageName: plays ? ASSETS.duoMedal[0] : stillImage('duoMedal'), height: 72, kind: 'event', tail: 'up' });
+                const holder = el('div', 'pk-medal');
+                holder.appendChild(character.root);
+                card.appendChild(holder);
+                const line = timeMilestoneLine(verdict.celebrate);
+                character.say(line, { event: true });
+                announce(holder, line);
+                enter(character.picture);
+                if (plays) {
+                    root.setTimeout(() => playSheet(character.picture, 'duoMedal', { onDone: () => idleLife(character.picture) }), 240);
+                    root.setTimeout(() => playSound('celebrate'), 240 + 2 * sheetFrameMs('duoMedal'));
+                }
+            } finally {
+                busy = false;
+            }
+        };
+        let queued = 0;
+        if (typeof root.MutationObserver === 'function') {
+            new root.MutationObserver(() => { root.clearTimeout(queued); queued = root.setTimeout(check, 600); })
+                .observe(value, { childList: true, characterData: true, subtree: true });
+        }
+        root.setTimeout(check, 800);
+    }
+
+    /** About: the owner's v3 sieve cycles on "Kriti and Uljhan" (Android About card); Companion Off keeps the picture. */
+    function mountAboutLoop(doc) {
+        const host = doc.querySelector('#aboutView .ft-about-duo__art');
+        const picture = host?.querySelector('.ft-about-duo__picture');
+        if (!host || !picture) return;
+        const loop = mountLoop(host, 'duoSieveLoop', { height: 180, className: 'ft-about-duo__loop' });
+        const sync = () => { picture.hidden = !!loop && showsCharacters(companionMode); };
+        sync();
+        onModeChange(sync);
+    }
+
     function mountOptions(doc) {
         mountCompanionSetting(doc);
         mountSoundSetting(doc);
@@ -2474,6 +2681,8 @@
         mountSupport(doc);
         mountNetwork(doc);
         watchToasts(doc);
+        mountTimeMilestones(doc);
+        mountAboutLoop(doc);
         mountSessionSaved(doc);
         watchStudyStatus(doc);
         watchEmptyLists(doc);
@@ -2533,6 +2742,7 @@
         emptyListKind, decorateEmptyList, celebrateImport, mountPopup, firstFilterMoment, ruleCount,
         NETWORK_ART, LOCKED_SIGN, popupSheet, signLines, fitSignSize, signTime, lockedSign, lockedToast,
         backupSavedDue, backupSaved, searchEmptyPlays,
+        POSES, TIME_MILESTONES_HOURS, sheetHoldMs, sweepAfterRemoval, totalSavedSeconds, evaluateTimeMilestone, timeMilestoneLine,
         SWITCH_KRITI_PER_DAY, switchKritiAllowed, switchCrossesKids, profileSwitched
     });
 

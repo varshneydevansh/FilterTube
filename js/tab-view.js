@@ -15447,6 +15447,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                 canEnableWhitelist: false
             });
             UIComponents.showToast(tabViewUiText('dashboard.toast.subscriptionsImportNoChannels', 'No followed channels found'), 'info');
+            { const toast = document.querySelector('.ft-toast'); if (toast) toast.dataset.ftMascot = 'shrug'; }
             return;
         }
 
@@ -26638,6 +26639,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             if (result.accepted === true && result.applied !== false) {
                 await refreshFilterTubeUiAfterNanahImport();
                 UIComponents.showToast(tabViewUiText('dashboard.sync.toast.managedPolicyApplied', 'Applied managed {scope} update', { scope: normalizeString(validation.scope) || 'policy' }), 'success');
+                { const toast = globalThis.document?.querySelector?.('.ft-toast'); if (toast) toast.dataset.ftMascot = 'highfive'; } // a sync landed: the duo high-fives
                 return;
             }
             if (result.accepted === true && result.decision === 'idempotent_same_hash') {
@@ -26705,6 +26707,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             if (result.accepted === true && result.applied !== false) {
                 await refreshFilterTubeUiAfterNanahImport();
                 UIComponents.showToast(tabViewUiText('dashboard.sync.toast.internetPickupApplied', 'Applied Internet Pickup {scope} update', { scope: normalizeString(validation.scope) || 'policy' }), 'success');
+                { const toast = globalThis.document?.querySelector?.('.ft-toast'); if (toast) toast.dataset.ftMascot = 'highfive'; } // a sync landed: the duo high-fives
                 return result;
             }
             if (result.accepted === true && result.decision === 'idempotent_same_hash') {
@@ -26779,6 +26782,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             if (result.accepted === true && result.applied !== false) {
                 await refreshFilterTubeUiAfterNanahImport();
                 UIComponents.showToast(tabViewUiText('dashboard.sync.toast.homePickupApplied', 'Applied Home Pickup {scope} update', { scope: normalizeString(validation.scope) || 'policy' }), 'success');
+                { const toast = globalThis.document?.querySelector?.('.ft-toast'); if (toast) toast.dataset.ftMascot = 'highfive'; } // a sync landed: the duo high-fives
                 return result;
             }
             if (result.accepted === true && result.decision === 'idempotent_same_hash') {

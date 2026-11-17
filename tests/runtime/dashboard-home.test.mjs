@@ -148,7 +148,7 @@ test('About tells the Kriti and Uljhan story and keeps open source straight', ()
   assert.match(story, /Uljhan means tangle, or confusion, in Hindi\. He isn't evil\./);
   // The owner removed the open-source/no-servers note from About.
   assert.doesNotMatch(story, /about\.duo\.code|ft-about-duo__note|open source/);
-  assert.match(story, /duo_sieve_06\.webp/);
+  assert.match(story, /duo_sieve_01\.webp/);
 });
 
 test('during a study session the greeting and the Home and Filters rows say Study (the effective mode)', () => {

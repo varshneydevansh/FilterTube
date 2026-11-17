@@ -275,7 +275,7 @@
         root.addEventListener('filtertube-ui-locale-changed', render);
         root.setInterval(render, 5 * 60 * 1000);
         const duo = doc.getElementById('ftHomeDuo');
-        const mount = () => root.FilterTubeMascots?.mountLoop?.(duo, 'duoSieve', { height: 150, className: 'ft-home-duo' });
+        const mount = () => root.FilterTubeMascots?.mountLoop?.(duo, 'duoSieveLoop', { height: 150, className: 'ft-home-duo' });
         if (duo && !mount()) root.setTimeout(mount, 400);
     }
 
@@ -399,7 +399,7 @@
             if (!items.length) {
                 const empty = el('li', 'ft-home-tried__empty');
                 const art = root.FilterTubeMascots?.showsCharacters?.(root.FilterTubeMascots?.mode)
-                    ? root.FilterTubeMascots.moment?.('restored', { height: 56 }) : null;
+                    ? root.FilterTubeMascots.moment?.('resting', { height: 56 }) : null;
                 if (art) empty.appendChild(art);
                 empty.appendChild(el('span', 'ft-home-tried__empty-line', t('home.tried.empty', 'Nothing got past today. Uljhan is resting.')));
                 list.appendChild(empty);

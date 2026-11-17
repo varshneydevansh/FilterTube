@@ -1737,7 +1737,8 @@
         if (pageState === 'ROUND') return { pose: 'kritiPencil', size: 64, end: false, behind: true };
         if (pageState === 'LAST_FIVE') return { pose: 'kritiSignRaised', size: 80, end: true, behind: false, sign: t('study.minutes', '{minutes} min', { minutes: 5 }) };
         if (pageState === 'BREAK') return { pose: 'kritiMug', size: 64, end: true, behind: false };
-        return { pose: 'kritiReading', size: new Date().getHours() >= 21 ? 80 : 96, end: true, behind: false };
+        // Late at night she's sleepy (the owner's 2026-11-18 pose).
+        return new Date().getHours() >= 21 ? { pose: 'kritiSleepy', size: 80, end: true, behind: false } : { pose: 'kritiReading', size: 96, end: true, behind: false };
     }
 
     function perchImage(spot) {
