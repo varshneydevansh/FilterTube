@@ -240,6 +240,13 @@ html[data-theme="dark"] .ft-mascot-tally {
     height: 48px;
 }
 
+/* The card's resting company (popupTallyPose): the duo and her evening sheet are wider than tall;
+ * peeking low, she sits on the card's bottom edge. */
+.ft-mascot--popup.is-resting .ft-mascot__figure { display: block; line-height: 0; }
+.ft-mascot--popup-shoo .ft-mascot__image,
+.ft-mascot--popup-sieve .ft-mascot__image { height: 46px; }
+.ft-mascot--popup-waiting .ft-mascot__image { height: 40px; margin-bottom: -0.3rem; }
+
 .ft-mascot--popup .ft-mascot__line {
     position: absolute;
     z-index: 40;
@@ -411,3 +418,26 @@ html[data-theme="dark"] .ft-mascot-tally {
         opacity: 0;
     }
 }
+
+/* ---- A looping sheet on a page card (FilterTubeMascots.mountLoop) ----------------------------------- */
+
+.pk-loop {
+    display: flex;
+    align-items: flex-end;
+    justify-content: center;
+    line-height: 0;
+    pointer-events: none;
+}
+
+.pk-loop[hidden] { display: none; }
+
+.pk-loop__art {
+    display: block;
+    width: auto;
+    max-width: 100%;
+    object-fit: contain;
+    transform-origin: 50% 100%;
+}
+
+/* A fetch-more footer (Uljhan alone): he hops up from below its edge, so the footer clips him. */
+.pk-moment[data-ft-scene="fetch"] { overflow: hidden; }

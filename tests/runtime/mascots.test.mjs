@@ -316,7 +316,13 @@ test('sheets play once and rest on their last frame; reduced motion shows only t
     assert.deepEqual(plain(Mascots.sheetFrames('nope', false)), []);
     // The app's StudyMascotView.Motion timings, frame for frame.
     const timing = Object.fromEntries(Object.entries(plain(Mascots.MOTIONS)).map(([name, motion]) => [name, motion.ms]));
-    assert.deepEqual(timing, { duoSieve: 420, duoShoo: 420, kritiMug: 380, kritiEvening: 420, uljhanFetch: 160, kritiJump: 95, kritiPencil: 300, kritiStretch: 280, uljhanLeaves: 170 });
+    assert.deepEqual(timing, { duoSieve: 420, duoShoo: 420, kritiMug: 380, kritiEvening: 420, uljhanFetch: 160, kritiJump: 95, kritiPencil: 300, kritiStretch: 280, uljhanLeaves: 170,
+        kritiOpenNotebook: 260, uljhanWave: 170 });
+    // Borrowed sheets play another sheet's frames (KRITI_OPEN_NOTEBOOK: pencil 1-3; the footer wave stays put).
+    assert.deepEqual(plain(Mascots.sheetFrames('kritiOpenNotebook', false)), [0, 1, 2]);
+    assert.equal(Mascots.stillImage('kritiOpenNotebook'), 'kriti_pencil_03.webp');
+    assert.equal(Mascots.stillImage('uljhanWave'), 'uljhan_wave_05.webp');
+    assert.equal(Mascots.MOTIONS.uljhanWave.leaves, undefined);
     assert.deepEqual(plain(Mascots.MOTIONS.kritiJump.order), [0, 1, 2, 3, 4, 1, 0]);
     assert.deepEqual(plain(Mascots.MOTIONS.uljhanLeaves.order), [0, 1, 2, 1, 2, 3, 4]);
     assert.deepEqual(plain(Mascots.MOTIONS.kritiMug.order), [0, 1, 2, 2, 3, 4, 5]);
@@ -615,4 +621,66 @@ test('the in-page cards share the interaction wake', () => {
     assert.match(gate, /companionMode === 'lively' && !admissionOverlayPrefersReducedMotion\(\)/);
     assert.match(gate, /idle: picture => admissionIdle\(picture\)/);
     assert.match(fs.readFileSync('js/content/study_overlay.js', 'utf8'), /localizer\(\)\?\.idle\?\.\(picture\)/);
+});
+
+test('loading scenes follow LoadingPersonality: Kids, Study, a search and Uljhan\'s fetch-more', () => {
+    const { Mascots } = load();
+    const scenes = plain(Mascots.LOADING_SCENES);
+    assert.deepEqual(Object.keys(scenes).sort(), ['fetch', 'general', 'kids', 'search', 'study']);
+    assert.deepEqual(scenes.kids, [['duoSieve', 4], ['duoShoo', 2], ['kritiJump', 2], ['uljhanWave', 2], ['kritiWave', 2]]);
+    assert.deepEqual(scenes.study, [['duoSieve', 3], ['sieve', 1], ['kritiReading', 1], ['kritiNotebook', 1], ['kritiPencil', 1], ['kritiOpenNotebook', 1]]);
+    for (const [scene, weights] of Object.entries(scenes)) {
+        for (const [name] of weights) assert.ok(Mascots.stillImage(name) || name === 'sieve', `${scene}: ${name} has a still`);
+    }
+    // Fetch-more is Uljhan alone, the fetch most, never the same action twice in a row.
+    assert.ok(scenes.fetch.every(([name]) => /^uljhan/.test(name)));
+    assert.equal(Mascots.pickLoadingMoment(() => 0, 'fetch'), 'uljhanFetch');
+    for (const roll of [0, 0.3, 0.6, 0.99]) assert.notEqual(Mascots.pickLoadingMoment(() => roll, 'fetch', 'uljhanFetch'), 'uljhanFetch');
+    assert.equal(Mascots.pickLoadingMoment(() => 0, 'search'), 'kritiMagnifier');
+    assert.equal(Mascots.pickLoadingMoment(() => 0, 'unknown'), 'duoSieve', 'an unknown scene is the general one');
+    const at = selector => ({ closest: wanted => (wanted.split(', ').includes(selector) ? {} : null) });
+    assert.equal(Mascots.loadingScene(at('.subscriptions-import-inline')), 'fetch');
+    assert.equal(Mascots.loadingScene(at('#studyView')), 'study');
+    assert.equal(Mascots.loadingScene(at('#kidsView')), 'kids');
+    assert.equal(Mascots.loadingScene(at('[role="search"]')), 'search');
+    assert.equal(Mascots.loadingScene({ closest: () => null }), 'general');
+    assert.equal(Mascots.loadingScene(null), 'general');
+});
+
+test('empty lists take the app\'s poses: pointing, reading, a Kids peek, Uljhan for no matches', () => {
+    const { Mascots } = load();
+    assert.equal(Mascots.emptyListPose('keywords'), 'kritiPointing');
+    assert.equal(Mascots.emptyListPose('channels'), 'kritiReading');
+    assert.equal(Mascots.emptyListPose('keywords', { kids: true }), 'kritiPeek');
+    assert.equal(Mascots.emptyListPose('channels', { kids: true }), 'kritiPeek');
+    assert.equal(Mascots.emptyListPose('search', { kids: true }), 'uljhanShrug');
+});
+
+test('the popup counter card keeps company: peeking, the duo, a wave, good evening; Off shows none', () => {
+    const { Mascots } = load();
+    const pose = input => plain(Mascots.popupTallyPose(input));
+    assert.equal(Mascots.popupTallyPose({ total: 9, mode: 'off' }), null);
+    assert.equal(pose({ total: 9, listMode: 'whitelist', mode: 'lively' }).art, 'kritiAllow');
+    assert.deepEqual(pose({ total: 0, mode: 'lively', firstToday: true }), { pose: 'waiting', art: 'kritiPeekLow', play: '' });
+    assert.deepEqual(pose({ total: 5, hour: 14, firstToday: true, mode: 'lively' }), { pose: 'shoo', art: 'duoShoo', play: 'duoShoo' });
+    assert.deepEqual(pose({ total: 5, hour: 14, firstToday: true, mode: 'quiet' }), { pose: 'shoo', art: 'duoShoo', play: '' }, 'Quiet keeps the still');
+    assert.deepEqual(pose({ total: 5, hour: 14, firstToday: false, mode: 'lively' }), { pose: 'sieve', art: 'duoSieve', play: '' });
+    assert.deepEqual(pose({ total: 5, hour: 8, firstToday: true, mode: 'lively' }), { pose: 'morning', art: 'kritiWave', play: '' });
+    assert.deepEqual(pose({ total: 5, hour: 21, firstToday: true, mode: 'lively' }), { pose: 'evening', art: 'kritiEvening', play: 'kritiEvening' });
+    assert.equal(pose({ total: 5, hour: 21, firstToday: false, mode: 'lively' }).play, '');
+});
+
+test('support variants play the app\'s motions, and the loop API is there for page cards', () => {
+    const { Mascots } = load();
+    assert.deepEqual(plain(Mascots.SUPPORT_MOTIONS), {
+        sieve: { sheet: 'sieve', times: 3 },
+        onePerson: { sheet: 'kritiPencil', times: 3, restOn: 'kritiNotebook' },
+        evening: { sheet: 'kritiEvening', times: 1 }
+    });
+    assert.equal(typeof Mascots.mountLoop, 'function');
+    assert.equal(Mascots.mountLoop(null, 'duoSieve'), null);
+    const source = fs.readFileSync('js/mascots.js', 'utf8');
+    assert.match(source, /if \(prefersReducedMotion\(\)\) return;\n\s+if \(companionMode !== 'lively'\)/, 'reduced motion keeps the still; Quiet plays once');
+    assert.match(source, /if \(Date\.now\(\) - started > LOOP_CAP_MS\) \{ resting = true; idleLife\(picture\); return; \}/, 'Lively loops for 30 s, then rests');
+    assert.match(source, /#aboutView \[data-ft-duo-story\]/, 'About\'s own story section replaces the duo card');
 });
