@@ -3290,5 +3290,7 @@
   "profiles.about.adult": "قواعده وسجله براهو",
   "study.setup.whereDetected": "مختار من لغة المتصفح بتاعك",
   "study.setup.countryDetected": "لغة المتصفح بتاعك",
-  "study.setup.countrySearch": "ابحث عن دولة"
+  "study.setup.countrySearch": "ابحث عن دولة",
+  "askParent.sendReply": "رسّل",
+  "sync.relayDisclosure": "المزامنة بالإنترنت بتستخدم مُرحِّل صغير بيشغّلو مطوّر FilterTube عشان يوصّل أجهزتك ببعض. ما بيقدر يقرا الحاجات البتزامنها، لأنها مشفّرة من طرف لطرف. بيشوف معرّف الجهاز وعنوان IP حقك ووقت المزامنة. خادم STUN حق Google بيساعد يلقى طريق للاتصال وبرضو بيشوف عنوان IP حقك. المزامنة القريبة ما بتستخدم ولا واحد فيهم."
 }

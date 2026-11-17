@@ -3266,5 +3266,7 @@
   "profiles.about.adult": "Own rules and history",
   "study.setup.whereDetected": "Picked from your browser's language",
   "study.setup.countryDetected": "Your browser's language",
-  "study.setup.countrySearch": "Search countries"
+  "study.setup.countrySearch": "Search countries",
+  "askParent.sendReply": "Send",
+  "sync.relayDisclosure": "Internet sync uses a small relay run by FilterTube's developer to connect your devices. It can't read what you sync, which is end-to-end encrypted. It sees a device ID, your IP address and when you sync. Google's STUN server helps find a connection route and also sees your IP address. Nearby sync uses neither."
 }

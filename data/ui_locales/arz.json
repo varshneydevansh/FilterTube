@@ -3290,5 +3290,7 @@
   "profiles.about.adult": "قواعده وسجله الخاص",
   "study.setup.whereDetected": "متختار من لغة المتصفح بتاعك",
   "study.setup.countryDetected": "لغة المتصفح بتاعك",
-  "study.setup.countrySearch": "ابحث عن دولة"
+  "study.setup.countrySearch": "ابحث عن دولة",
+  "askParent.sendReply": "ابعت",
+  "sync.relayDisclosure": "المزامنة على الإنترنت بتستخدم مُرحِّل صغير بيشغّله مطوّر FilterTube علشان يوصّل أجهزتك ببعض. مايقدرش يقرا اللي بتزامنه، لأنه متشفّر من طرف لطرف. بيشوف رقم تعريف الجهاز وعنوان IP بتاعك وإمتى بتزامن. سيرفر STUN بتاع Google بيساعد يلاقي طريق للاتصال وكمان بيشوف عنوان IP بتاعك. المزامنة القريبة مابتستخدمش ولا واحد فيهم."
 }

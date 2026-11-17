@@ -65,6 +65,10 @@
         kritiSignRaised: 'kriti_sign_raised.webp',
         kritiSalute: 'kriti_salute.webp',
         kritiMedal: 'kriti_medal.webp',
+        // Ask a parent: Kriti with her crayon beside the child's ask (AskParentUi.buildAsk, KRITI_CRAYON).
+        kritiCrayon: 'kriti_crayon.webp',
+        // The child's "Not this time" answer with no note (AskParentUi.answerCard, KRITI_FRONT).
+        kritiFront: 'kriti_front.webp',
         uljhanFront: 'uljhan_front.webp',
         uljhanHappy: 'uljhan_happy.webp',
         uljhanSad: 'uljhan_sad.webp',

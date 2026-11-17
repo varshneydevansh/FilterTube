@@ -936,7 +936,38 @@
             : askText('askParent.sent', 'Sent to {name}', { name }), dark, 700));
         words.appendChild(askLine(waitingLine(state), dark));
         row.appendChild(words);
+        // A sage crayon check beside "Sent" (AskParentUi.buildSent), decorative.
+        if (!already && typeof document.createElementNS === 'function') {
+            const ns = 'http://www.w3.org/2000/svg';
+            const check = document.createElementNS(ns, 'svg');
+            check.setAttribute('viewBox', '0 0 28 28');
+            check.setAttribute('width', '28');
+            check.setAttribute('height', '28');
+            check.setAttribute('aria-hidden', 'true');
+            const path = document.createElementNS(ns, 'path');
+            path.setAttribute('d', 'M5 15.5l6 6L23.5 7');
+            path.setAttribute('fill', 'none');
+            path.setAttribute('stroke', dark ? '#7fb89a' : '#28623f');
+            path.setAttribute('stroke-width', '3');
+            path.setAttribute('stroke-linecap', 'round');
+            path.setAttribute('stroke-linejoin', 'round');
+            check.appendChild(path);
+            admissionOverlayStyle(check, { flex: 'none' });
+            row.appendChild(check);
+        }
         holder.appendChild(row);
+        // OK closes the sent card down to the waiting line (the app's sheet closes the same way).
+        if (!already) {
+            const ok = askButton(askText('askParent.ok', 'OK'), false, dark);
+            ok.addEventListener('click', () => {
+                holder.replaceChildren(askLine(waitingLine(state), dark));
+                admissionOverlayStyle(holder, { padding: '0', background: 'transparent', border: '0' });
+            });
+            const okRow = document.createElement('div');
+            admissionOverlayStyle(okRow, { display: 'flex', justifyContent: 'flex-end', marginTop: '12px' });
+            okRow.appendChild(ok);
+            holder.appendChild(okRow);
+        }
     }
 
     function askRefusal(result, state) {
@@ -968,12 +999,29 @@
         // The sheet is sun paper (Android AskParentUi), inside the blocked card.
         admissionOverlayStyle(holder, { padding: '16px', borderRadius: '18px', background: dark ? '#2c2716' : '#fff3cf',
             border: `1px solid ${dark ? '#4a4128' : '#ecd9a0'}` });
+        // Kriti with her crayon beside the title (AskParentUi.buildAsk), then what's asked for as a
+        // small washed note: the title, then the channel.
+        const head = document.createElement('div');
+        admissionOverlayStyle(head, { display: 'flex', alignItems: 'center', gap: '12px' });
+        const crayon = companionMode === 'off' ? null : createAdmissionMascot('kriti_crayon.webp', 64);
+        if (crayon) { crayon.removeAttribute('data-filtertube-admission-mascot'); head.appendChild(crayon); }
         const title = document.createElement('h2');
         title.textContent = target.kind === 'channel'
             ? askText('askParent.titleChannel', 'Ask for this channel')
             : askText('askParent.titleVideo', 'Ask to watch');
         admissionOverlayStyle(title, { margin: '0', font: '400 22px/1.2 "FilterTube Delius", "Outfit", system-ui, sans-serif', color: dark ? '#f6eccd' : '#1b1a18' });
-        holder.appendChild(title);
+        head.appendChild(title);
+        holder.appendChild(head);
+        if (target.title) {
+            const what = document.createElement('div');
+            admissionOverlayStyle(what, { display: 'grid', gap: '2px', padding: '10px 14px 12px', borderRadius: '14px',
+                background: dark ? '#3a3220' : '#fbe7ad', border: `1px solid ${dark ? '#4a4128' : '#e6cf86'}` });
+            const name = askLine(target.title, dark, 700);
+            admissionOverlayStyle(name, { fontSize: '16px', overflow: 'hidden', display: '-webkit-box', webkitLineClamp: '2', webkitBoxOrient: 'vertical' });
+            what.appendChild(name);
+            if (target.kind === 'video' && target.channelName) what.appendChild(askLine(target.channelName, dark));
+            holder.appendChild(what);
+        }
         holder.appendChild(askLine(askText('askParent.sheetBody', '{name} will see your ask and answer it.', { name }), dark));
         holder.appendChild(askLine(askText('askParent.why', 'Why do you want it?'), dark, 700));
         const chips = document.createElement('div');
@@ -1021,7 +1069,18 @@
                 // The crayon note folds and flies (Android PAPER_FLIP), then "Sent".
                 const still = admissionOverlayPrefersReducedMotion() || typeof holder.animate !== 'function';
                 if (!still) {
-                    try { await holder.animate([{ transform: 'none', opacity: 1 }, { transform: 'translateY(-24px) rotate(-4deg) scale(.92)', opacity: 0 }], { duration: 320, easing: 'cubic-bezier(.4,0,.2,1)' }).finished; } catch (e) {}
+                    // AskParentUi.flyAway: the note folds (scaleY to .28, 220 ms), then flies up and off to
+                    // the side, turning -14 degrees as it fades (420 ms).
+                    const rtl = (holder.ownerDocument?.documentElement?.dir || '') === 'rtl';
+                    const dx = Math.round((holder.offsetWidth || 300) * 0.6) * (rtl ? -1 : 1);
+                    const dy = -Math.round((holder.offsetHeight || 200) * 1.4);
+                    try {
+                        await holder.animate([{ transform: 'none' }, { transform: 'scaleY(.28)' }], { duration: 220, easing: 'cubic-bezier(.4,0,.2,1)', fill: 'forwards' }).finished;
+                        await holder.animate([{ transform: 'scaleY(.28)', opacity: 1 },
+                            { transform: `translate(${dx}px, ${dy}px) rotate(${rtl ? 14 : -14}deg) scale(.22, .16)`, opacity: 0 }],
+                        { duration: 420, easing: 'cubic-bezier(.3,0,.2,1)', fill: 'forwards' }).finished;
+                    } catch (e) {}
+                    try { holder.getAnimations?.().forEach(animation => animation.cancel()); } catch (e) {}
                 }
                 renderAskSent(holder, state, dark, false);
                 return;

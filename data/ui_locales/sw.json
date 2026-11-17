@@ -3266,5 +3266,7 @@
   "profiles.about.adult": "Kanuni na historia zake mwenyewe",
   "study.setup.whereDetected": "Imechaguliwa kutoka lugha ya kivinjari chako",
   "study.setup.countryDetected": "Lugha ya kivinjari chako",
-  "study.setup.countrySearch": "Tafuta nchi"
+  "study.setup.countrySearch": "Tafuta nchi",
+  "askParent.sendReply": "Tuma",
+  "sync.relayDisclosure": "Usawazishaji wa intaneti hutumia relay ndogo inayoendeshwa na msanidi wa FilterTube kuunganisha vifaa vyako. Haiwezi kusoma unachosawazisha, kwa sababu kimesimbwa kutoka mwanzo hadi mwisho. Huona kitambulisho cha kifaa, anwani yako ya IP na wakati unaposawazisha. Seva ya STUN ya Google husaidia kupata njia ya muunganisho na pia huona anwani yako ya IP. Usawazishaji wa karibu hautumii yoyote kati ya hizo."
 }

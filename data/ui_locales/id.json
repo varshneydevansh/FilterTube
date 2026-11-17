@@ -3264,5 +3264,7 @@
   "profiles.about.adult": "Aturan dan riwayat sendiri",
   "study.setup.whereDetected": "Dipilih dari bahasa browser Anda",
   "study.setup.countryDetected": "Bahasa browser Anda",
-  "study.setup.countrySearch": "Cari negara"
+  "study.setup.countrySearch": "Cari negara",
+  "askParent.sendReply": "Kirim",
+  "sync.relayDisclosure": "Sinkronisasi internet memakai relay kecil yang dijalankan oleh developer FilterTube untuk menghubungkan perangkat Anda. Relay tidak dapat membaca apa yang Anda sinkronkan, karena terenkripsi end-to-end. Relay melihat ID perangkat, alamat IP Anda, dan kapan Anda menyinkronkan. Server STUN milik Google membantu menemukan jalur koneksi dan juga melihat alamat IP Anda. Sinkronisasi terdekat tidak memakai keduanya."
 }

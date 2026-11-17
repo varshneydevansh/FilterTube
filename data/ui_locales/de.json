@@ -3266,5 +3266,7 @@
   "profiles.about.adult": "Eigene Regeln und eigener Verlauf",
   "study.setup.whereDetected": "Aus der Sprache deines Browsers übernommen",
   "study.setup.countryDetected": "Sprache deines Browsers",
-  "study.setup.countrySearch": "Länder suchen"
+  "study.setup.countrySearch": "Länder suchen",
+  "askParent.sendReply": "Senden",
+  "sync.relayDisclosure": "Die Internet-Synchronisierung nutzt ein kleines Relay, das vom Entwickler von FilterTube betrieben wird, um deine Geräte zu verbinden. Es kann nicht lesen, was du synchronisierst, denn das ist Ende-zu-Ende-verschlüsselt. Es sieht eine Geräte-ID, deine IP-Adresse und wann du synchronisierst. Der STUN-Server von Google hilft, einen Verbindungsweg zu finden, und sieht ebenfalls deine IP-Adresse. Die Synchronisierung in der Nähe nutzt keines von beiden."
 }

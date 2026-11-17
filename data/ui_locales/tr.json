@@ -3266,5 +3266,7 @@
   "profiles.about.adult": "Kendi kuralları ve geçmişi",
   "study.setup.whereDetected": "Tarayıcınızın dilinden seçildi",
   "study.setup.countryDetected": "Tarayıcınızın dili",
-  "study.setup.countrySearch": "Ülke ara"
+  "study.setup.countrySearch": "Ülke ara",
+  "askParent.sendReply": "Gönder",
+  "sync.relayDisclosure": "İnternet senkronizasyonu, cihazlarınızı bağlamak için FilterTube geliştiricisinin işlettiği küçük bir aktarıcı kullanır. Senkronize ettiklerinizi okuyamaz; bunlar uçtan uca şifrelenir. Bir cihaz kimliğini, IP adresinizi ve ne zaman senkronize ettiğinizi görür. Google'ın STUN sunucusu bağlantı yolu bulmaya yardım eder ve o da IP adresinizi görür. Yakındaki senkronizasyon ikisini de kullanmaz."
 }

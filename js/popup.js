@@ -2336,7 +2336,8 @@ document.addEventListener('DOMContentLoaded', async () => {
             pose.className = 'ft-ask-answer__pose';
             pose.alt = '';
             pose.setAttribute('aria-hidden', 'true');
-            pose.src = `../assets/images/mascots/${mascots.stillImage(yes ? 'kritiThumbsUp' : 'kritiThinking')}`;
+            // AskParentUi.answerCard: happy for a yes, reading when the parent wrote a note, else facing the child.
+            pose.src = `../assets/images/mascots/${mascots.stillImage(yes ? 'kritiHappy' : (answer.reply ? 'kritiReading' : 'kritiFront'))}`;
             card.appendChild(pose);
         }
         const words = document.createElement('div');
@@ -2353,9 +2354,16 @@ document.addEventListener('DOMContentLoaded', async () => {
                 : popupUiText('askParent.answerYesBody', 'You can watch “{title}” now.', { title: answer.title }));
         words.append(title, body);
         if (answer.reply) {
-            const note = document.createElement('p');
+            // The parent's note on washed Family paper: who wrote it, then the words in the hand font.
+            const note = document.createElement('div');
             note.className = 'ft-ask-answer__note';
-            note.textContent = `${popupUiText('askParent.answerNote', 'A note from {name}', { name })}: “${answer.reply}”`;
+            const from = document.createElement('span');
+            from.className = 'ft-ask-answer__note-from';
+            from.textContent = popupUiText('askParent.answerNote', 'A note from {name}', { name });
+            const said = document.createElement('span');
+            said.className = 'ft-ask-answer__note-text';
+            said.textContent = answer.reply;
+            note.append(from, said);
             words.appendChild(note);
         }
         const actions = document.createElement('div');

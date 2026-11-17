@@ -3266,5 +3266,7 @@
   "profiles.about.adult": "Dokokinsa da tarihinsa",
   "study.setup.whereDetected": "An zaɓa daga harshen burauzarka",
   "study.setup.countryDetected": "Harshen burauzarka",
-  "study.setup.countrySearch": "Nemi ƙasashe"
+  "study.setup.countrySearch": "Nemi ƙasashe",
+  "askParent.sendReply": "Aika",
+  "sync.relayDisclosure": "Daidaitawa ta intanet tana amfani da ƙaramin relay da mai haɓaka FilterTube ke gudanarwa don haɗa na'urorinka. Ba zai iya karanta abin da kake daidaitawa ba, domin an ɓoye shi daga farko zuwa ƙarshe. Yana ganin ID na na'ura, adireshin IP ɗinka da lokacin da kake daidaitawa. Sabar STUN ta Google tana taimakawa wajen nemo hanyar haɗi kuma ita ma tana ganin adireshin IP ɗinka. Daidaitawa ta kusa ba ta amfani da ko ɗaya daga cikinsu."
 }

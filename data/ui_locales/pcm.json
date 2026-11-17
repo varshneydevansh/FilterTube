@@ -3266,5 +3266,7 @@
   "profiles.about.adult": "Im own rules and history",
   "study.setup.whereDetected": "We pick am from your browser language",
   "study.setup.countryDetected": "Your browser language",
-  "study.setup.countrySearch": "Search countries"
+  "study.setup.countrySearch": "Search countries",
+  "askParent.sendReply": "Send",
+  "sync.relayDisclosure": "Internet sync dey use one small relay wey FilterTube developer dey run to join your devices together. E no fit read wetin you dey sync, because e dey end-to-end encrypted. E dey see one device ID, your IP address and when you sync. Google STUN server dey help find road for connection and e sef dey see your IP address. Nearby sync no dey use any of dem."
 }

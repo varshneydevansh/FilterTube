@@ -3290,5 +3290,7 @@
   "profiles.about.adult": "قواعد وسجل خاصّان به",
   "study.setup.whereDetected": "اختير من لغة متصفحك",
   "study.setup.countryDetected": "لغة متصفحك",
-  "study.setup.countrySearch": "ابحث عن دولة"
+  "study.setup.countrySearch": "ابحث عن دولة",
+  "askParent.sendReply": "إرسال",
+  "sync.relayDisclosure": "تستخدم المزامنة عبر الإنترنت مُرحِّلًا صغيرًا يديره مطوّر FilterTube لربط أجهزتك. لا يمكنه قراءة ما تزامنه، فهو مشفّر تشفيرًا تامًّا بين الطرفين. يرى معرّف الجهاز وعنوان IP الخاص بك ووقت المزامنة. يساعد خادم STUN التابع لـ Google في إيجاد مسار للاتصال ويرى أيضًا عنوان IP الخاص بك. المزامنة القريبة لا تستخدم أيًّا منهما."
 }

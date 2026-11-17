@@ -28494,24 +28494,34 @@ document.addEventListener('DOMContentLoaded', async () => {
         meta.className = 'ft-ask-request__meta';
         const parts = [];
         if (item.kind === 'video' && item.channelName) parts.push(tabViewUiText('askParent.cardBy', 'by {name}', { name: item.channelName }));
+        // Android AskParentUi.requestCard: who asks for what, by whom, the reason as a note badge, the
+        // child's note in italics, then when it was asked and when it ends.
+        if (parts.length) { meta.textContent = parts.join(' · '); card.appendChild(meta); }
         const reasons = { school: ['askParent.reasonSchool', 'For school'], once: ['askParent.reasonOnce', 'Just this once'], other: ['askParent.reasonOther', 'Something else'] };
-        if (reasons[item.reason]) parts.push(tabViewUiText(reasons[item.reason][0], reasons[item.reason][1]));
-        parts.push(tabViewUiText('askParent.cardTime', 'Asked at {asked} · ends at {ends}', { asked: askParentTime(item.createdAt), ends: askParentTime(item.expiresAt) }));
-        meta.textContent = parts.join(' · ');
-        card.appendChild(meta);
+        if (reasons[item.reason]) {
+            const badge = document.createElement('span');
+            badge.className = 'ft-ask-request__reason';
+            badge.textContent = tabViewUiText(reasons[item.reason][0], reasons[item.reason][1]);
+            card.appendChild(badge);
+        }
         if (item.note) {
             const note = document.createElement('p');
             note.className = 'ft-ask-request__note';
             note.textContent = tabViewUiText('askParent.cardNote', '“{note}”', { note: item.note });
             card.appendChild(note);
         }
+        const when = document.createElement('div');
+        when.className = 'ft-ask-request__meta';
+        when.textContent = tabViewUiText('askParent.cardTime', 'Asked at {asked} · ends at {ends}', { asked: askParentTime(item.createdAt), ends: askParentTime(item.expiresAt) });
+        card.appendChild(when);
+        // Not now opens a one-line kind reply in place (no second dialog), with its own Send.
         const reply = document.createElement('input');
         reply.type = 'text';
         reply.className = 'text-input ft-ask-request__reply';
         reply.maxLength = 120;
         reply.placeholder = tabViewUiText('askParent.replyHint', 'Add a kind reply (optional)');
         reply.setAttribute('aria-label', reply.placeholder);
-        card.appendChild(reply);
+        reply.hidden = true;
         const actions = document.createElement('div');
         actions.className = 'ft-ask-request__actions';
         const decide = async decision => {
@@ -28553,14 +28563,34 @@ document.addEventListener('DOMContentLoaded', async () => {
             node.addEventListener('click', () => decide(decision));
             actions.appendChild(node);
         };
-        if (item.kind === 'video') button(tabViewUiText('askParent.allowOnce', 'Allow once'), 'btn-primary', 'once');
+        if (item.kind === 'video') button(tabViewUiText('askParent.allowOnce', 'Allow once'), 'btn-primary ft-ask-request__wide', 'once');
         if (item.channelId && (item.kind === 'channel' || item.blockedBy === 'channel')) {
-            button(tabViewUiText('askParent.allowChannel', 'Always allow this channel'), item.kind === 'channel' ? 'btn-primary' : 'btn-secondary', 'channel');
+            button(tabViewUiText('askParent.allowChannel', 'Always allow this channel'), `${item.kind === 'channel' ? 'btn-primary' : 'btn-secondary'} ft-ask-request__wide`, 'channel');
         }
-        button(tabViewUiText('askParent.notNow', 'Not now'), 'btn-secondary', 'no');
+        const row = document.createElement('div');
+        row.className = 'ft-ask-request__row';
+        const notNow = document.createElement('button');
+        notNow.type = 'button';
+        notNow.className = 'ft-link-button';
+        notNow.textContent = tabViewUiText('askParent.notNow', 'Not now');
+        const send = document.createElement('button');
+        send.type = 'button';
+        send.className = 'btn-secondary ft-ask-request__send';
+        send.textContent = tabViewUiText('askParent.sendReply', 'Send');
+        send.hidden = true;
+        notNow.addEventListener('click', () => {
+            if (!reply.hidden) { decide('no'); return; }
+            reply.hidden = false;
+            send.hidden = false;
+            try { reply.focus(); } catch (e) { }
+        });
+        send.addEventListener('click', () => decide('no'));
+        row.appendChild(notNow);
         const space = askParentSpaceButton(item);
-        if (space) actions.appendChild(space);
+        if (space) { space.className = 'ft-link-button ft-ask-request__space'; row.appendChild(space); }
+        actions.appendChild(row);
         card.appendChild(actions);
+        card.append(reply, send);
         list.appendChild(card);
     }
 

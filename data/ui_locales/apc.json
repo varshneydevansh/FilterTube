@@ -3290,5 +3290,7 @@
   "profiles.about.adult": "قواعده وسجله الخاص",
   "study.setup.whereDetected": "مختار من لغة المتصفح تبعك",
   "study.setup.countryDetected": "لغة المتصفح تبعك",
-  "study.setup.countrySearch": "ابحث عن دولة"
+  "study.setup.countrySearch": "ابحث عن دولة",
+  "askParent.sendReply": "ابعت",
+  "sync.relayDisclosure": "المزامنة عالإنترنت بتستعمل مُرحِّل صغير بيشغّله مطوّر FilterTube لتوصل أجهزتك ببعض. ما بيقدر يقرا شو عم تزامن، لأنه مشفّر من طرف لطرف. بيشوف معرّف الجهاز وعنوان IP تبعك وإيمتى عم تزامن. خادم STUN تبع Google بيساعد يلاقي طريق للاتصال وكمان بيشوف عنوان IP تبعك. المزامنة القريبة ما بتستعمل ولا واحد منهم."
 }

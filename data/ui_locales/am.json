@@ -3266,5 +3266,7 @@
   "profiles.about.adult": "የራሱ ደንቦች እና ታሪክ",
   "study.setup.whereDetected": "ከአሳሽዎ ቋንቋ የተመረጠ",
   "study.setup.countryDetected": "የአሳሽዎ ቋንቋ",
-  "study.setup.countrySearch": "አገሮችን ፈልግ"
+  "study.setup.countrySearch": "አገሮችን ፈልግ",
+  "askParent.sendReply": "ላክ",
+  "sync.relayDisclosure": "የኢንተርኔት ማመሳሰል መሣሪያዎችዎን ለማገናኘት በFilterTube ገንቢ የሚተዳደር ትንሽ ሪሌይ ይጠቀማል። የሚያመሳስሉትን ማንበብ አይችልም፤ ከጫፍ እስከ ጫፍ የተመሰጠረ ነው። የመሣሪያ መለያ፣ የእርስዎን IP አድራሻ እና መቼ እንደሚያመሳስሉ ያያል። የGoogle STUN አገልጋይ የግንኙነት መንገድ ለማግኘት ይረዳል፤ እሱም የእርስዎን IP አድራሻ ያያል። በአቅራቢያ ማመሳሰል ሁለቱንም አይጠቀምም።"
 }

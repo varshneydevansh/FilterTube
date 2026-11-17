@@ -3264,5 +3264,7 @@
   "profiles.about.adult": "自己的规则和记录",
   "study.setup.whereDetected": "根据浏览器语言选择",
   "study.setup.countryDetected": "浏览器语言",
-  "study.setup.countrySearch": "搜索国家"
+  "study.setup.countrySearch": "搜索国家",
+  "askParent.sendReply": "发送",
+  "sync.relayDisclosure": "互联网同步通过 FilterTube 开发者运营的一个小型中继来连接你的设备。它无法读取你同步的内容，这些内容经过端到端加密。它能看到设备 ID、你的 IP 地址以及同步时间。Google 的 STUN 服务器帮助找到连接路径，也能看到你的 IP 地址。附近同步两者都不使用。"
 }

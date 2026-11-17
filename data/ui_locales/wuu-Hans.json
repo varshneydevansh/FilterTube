@@ -3264,5 +3264,7 @@
   "profiles.about.adult": "自家个规则搭记录",
   "study.setup.whereDetected": "根据侬浏览器个语言选个",
   "study.setup.countryDetected": "侬浏览器个语言",
-  "study.setup.countrySearch": "搜国家"
+  "study.setup.countrySearch": "搜国家",
+  "askParent.sendReply": "发送",
+  "sync.relayDisclosure": "互联网同步用 FilterTube 开发者运营个一只小中继来连牢侬个设备。伊读勿到侬同步个内容，因为是端到端加密个。伊看得到设备 ID、侬个 IP 地址搭同步个辰光。Google 个 STUN 服务器帮忙寻连接路径，伊也看得到侬个 IP 地址。附近同步两样侪勿用。"
 }

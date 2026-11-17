@@ -3266,5 +3266,7 @@
   "profiles.about.adult": "Regras e histórico próprios",
   "study.setup.whereDetected": "Escolhido pelo idioma do seu navegador",
   "study.setup.countryDetected": "O idioma do seu navegador",
-  "study.setup.countrySearch": "Buscar países"
+  "study.setup.countrySearch": "Buscar países",
+  "askParent.sendReply": "Enviar",
+  "sync.relayDisclosure": "A sincronização pela internet usa um pequeno relay operado pelo desenvolvedor do FilterTube para conectar seus dispositivos. Ele não consegue ler o que você sincroniza, que é criptografado de ponta a ponta. Ele vê um ID do dispositivo, seu endereço IP e quando você sincroniza. O servidor STUN do Google ajuda a encontrar uma rota de conexão e também vê seu endereço IP. A sincronização por proximidade não usa nenhum dos dois."
 }

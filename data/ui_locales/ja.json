@@ -3264,5 +3264,7 @@
   "profiles.about.adult": "自分のルールと履歴",
   "study.setup.whereDetected": "ブラウザの言語から選択",
   "study.setup.countryDetected": "ブラウザの言語",
-  "study.setup.countrySearch": "国を検索"
+  "study.setup.countrySearch": "国を検索",
+  "askParent.sendReply": "送信",
+  "sync.relayDisclosure": "インターネット同期は、デバイス同士をつなぐために FilterTube の開発者が運営する小さなリレーを使います。同期する内容はエンドツーエンドで暗号化されているため、リレーは読めません。リレーに見えるのはデバイスID、IPアドレス、同期した時刻です。Google の STUN サーバーは接続経路を見つける手助けをし、こちらにもIPアドレスが見えます。近くのデバイスとの同期はどちらも使いません。"
 }

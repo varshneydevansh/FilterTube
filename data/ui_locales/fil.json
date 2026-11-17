@@ -3266,5 +3266,7 @@
   "profiles.about.adult": "Sariling mga panuntunan at history",
   "study.setup.whereDetected": "Pinili mula sa wika ng iyong browser",
   "study.setup.countryDetected": "Wika ng iyong browser",
-  "study.setup.countrySearch": "Maghanap ng bansa"
+  "study.setup.countrySearch": "Maghanap ng bansa",
+  "askParent.sendReply": "Ipadala",
+  "sync.relayDisclosure": "Gumagamit ang internet sync ng maliit na relay na pinapatakbo ng developer ng FilterTube para ikonekta ang iyong mga device. Hindi nito mababasa ang sini-sync mo, dahil end-to-end encrypted ito. Nakikita nito ang isang device ID, ang iyong IP address at kung kailan ka nagsi-sync. Tumutulong ang STUN server ng Google na humanap ng ruta ng koneksyon at nakikita rin nito ang iyong IP address. Hindi gumagamit ng alinman sa dalawa ang nearby sync."
 }
