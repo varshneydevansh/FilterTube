@@ -1581,39 +1581,6 @@ body:not(.ft-managed-child-editor-view) .ft-managed-child-global {
     --ft-kids-cyan: #22D3EE;
 }
 
-/* Kids Header - Clean minimal style */
-.kids-header {
-    margin-bottom: var(--ft-space-lg);
-    padding-bottom: var(--ft-space-md);
-    border-bottom: 1px solid var(--ft-color-sem-neutral-border);
-}
-
-.kids-header-title {
-    display: flex;
-    align-items: center;
-    gap: var(--ft-space-sm);
-    font-size: var(--ft-font-size-h3);
-    font-weight: 600;
-    color: var(--ft-color-text-primary);
-    margin-bottom: var(--ft-space-xs);
-}
-
-.kids-header-title svg {
-    color: var(--ft-kids-pink);
-    flex-shrink: 0;
-}
-
-.kids-header-desc {
-    margin: 0;
-    font-size: var(--ft-font-size-body);
-    color: var(--ft-color-text-secondary);
-}
-
-/* Dark mode */
-:root[data-theme="dark"] .kids-header-title svg {
-    color: #F472B8;
-}
-
 /* Kids tab navigation */
 #kidsView .tabs-nav {
     background: linear-gradient(90deg, var(--ft-kids-pink-light) 0%, var(--ft-kids-purple-light) 100%);

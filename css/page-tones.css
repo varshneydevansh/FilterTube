@@ -20,9 +20,9 @@
    --------------------------------------------------------------------------- */
 
 :root[data-page-tone="watch"] {
-    --ft-tone-page-start: #f6f2eb;
-    --ft-tone-page-end: #f2ede5;
-    --ft-tone-panel: #fbf8f3;
+    --ft-tone-page-start: #f7f5f1;
+    --ft-tone-page-end: #f3f0eb;
+    --ft-tone-panel: #fcfaf7;
     --ft-tone-accent: #ba352c;
     --ft-tone-on-accent: #ffffff;
     --ft-tone-soft: #f6deda;
@@ -32,8 +32,8 @@
 }
 
 :root[data-page-tone="amber"] {
-    --ft-tone-page-start: #fff9ef;
-    --ft-tone-page-end: #fbf5eb;
+    --ft-tone-page-start: #fdfaf5;
+    --ft-tone-page-end: #f9f6f1;
     --ft-tone-panel: #fffcff;
     --ft-tone-accent: #8f5339;
     --ft-tone-on-accent: #ffffff;

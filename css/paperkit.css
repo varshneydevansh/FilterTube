@@ -21,19 +21,20 @@
 }
 
 :root {
-  /* BrandPalette, light */
-  --pk-canvas: #f6f2eb;
-  --pk-desk: #ece4d9;
-  --pk-paper: #fffcf6;
+  /* BrandPalette, light. The paper sits a little nearer a warm white than the app's #FFFCF6 cream
+     (owner, 2026-11-17: the pages read too yellow on a monitor); ink, brick and the areas are unchanged. */
+  --pk-canvas: #f7f5f1;
+  --pk-desk: #ece7e0;
+  --pk-paper: #fffdfa;
   --pk-ink: #1b1a18;
   --pk-muted: #625f58;
   --pk-faint: #9a9389;
-  --pk-line: #dcd1c2;
-  --pk-track: #e6ddcf;
+  --pk-line: #ddd5ca;
+  --pk-track: #e7e1d8;
   --pk-brick: #a93e31;
-  --pk-on-brick: #fffcf6;
+  --pk-on-brick: #fffdfa;
   --pk-brick-fill: #a93e31;
-  --pk-on-brick-fill: #fffcf6;
+  --pk-on-brick-fill: #fffdfa;
   --pk-rose: #fae8e6;
   --pk-sky: #e9f4fb;
   --pk-sky-ink: #1f5f86;
@@ -1114,6 +1115,9 @@ body.ft-extension-surface[data-surface="popup"] .ft-popup-filter-card {
   margin-inline: 2px;
   border-radius: 16px;
   overflow: hidden;
+  /* The popup's main column is the scroller: the card keeps its full height instead of shrinking
+     into the column and clipping its own list (the third tab ended after "Hide All Comments"). */
+  flex: 0 0 auto;
 }
 
 @keyframes pk-net-in {

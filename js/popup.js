@@ -1248,6 +1248,9 @@ document.addEventListener('DOMContentLoaded', async () => {
         }
     }
 
+    // Declared before any listener that reads it: a locale change can fire during start-up.
+    let isPopupChannelAddInProgress = false;
+
     const openInTabBtn = document.getElementById('openInTabBtn');
     const toggleEnabledBrandBtn = document.getElementById('toggleEnabledBrandBtn');
 
@@ -2795,8 +2798,6 @@ document.addEventListener('DOMContentLoaded', async () => {
             filterContentControlsPopup();
         });
     }
-
-    let isPopupChannelAddInProgress = false;
 
     // Add keyword
     if (addKeywordBtn) {

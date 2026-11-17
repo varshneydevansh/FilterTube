@@ -49,6 +49,15 @@ function PopupShell() {
                 Enabled
               </span>
             </div>
+            {/* The app's switch (PaperKit.styleSwitch): sage track and a checked paper thumb when on,
+                a plain track and a muted thumb when off. The brand card is the button; this only shows it. */}
+            <span className="ft-popup-power" aria-hidden="true">
+              <span className="ft-popup-power__thumb">
+                <svg viewBox="0 0 16 16" width="12" height="12" fill="none" stroke="currentColor">
+                  <path d="M3.4 8.6l3 2.9 6.2-6.8" strokeWidth="2.1" strokeLinecap="round" strokeLinejoin="round" />
+                </svg>
+              </span>
+            </span>
           </div>
 
           <div className="header-actions">

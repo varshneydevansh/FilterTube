@@ -330,7 +330,8 @@
         "data-ft-i18n-title": "popup.toggleFiltering"
       },
       /* @__PURE__ */ _("img", { src: "../icons/icon-48.png", alt: "FilterTube", className: "logo-icon" }),
-      /* @__PURE__ */ _("div", { className: "brand-text" }, /* @__PURE__ */ _("h1", { className: "app-title" }, "FilterTube"), /* @__PURE__ */ _("span", { id: "extensionStatusText", className: "extension-status", "data-ft-i18n": "popup.enabled" }, "Enabled"))
+      /* @__PURE__ */ _("div", { className: "brand-text" }, /* @__PURE__ */ _("h1", { className: "app-title" }, "FilterTube"), /* @__PURE__ */ _("span", { id: "extensionStatusText", className: "extension-status", "data-ft-i18n": "popup.enabled" }, "Enabled")),
+      /* @__PURE__ */ _("span", { className: "ft-popup-power", "aria-hidden": "true" }, /* @__PURE__ */ _("span", { className: "ft-popup-power__thumb" }, /* @__PURE__ */ _("svg", { viewBox: "0 0 16 16", width: "12", height: "12", fill: "none", stroke: "currentColor" }, /* @__PURE__ */ _("path", { d: "M3.4 8.6l3 2.9 6.2-6.8", strokeWidth: "2.1", strokeLinecap: "round", strokeLinejoin: "round" }))))
     ), /* @__PURE__ */ _("div", { className: "header-actions" }, /* @__PURE__ */ _("div", { id: "ftProfileMenuPopup", className: "ft-profile-menu" }, /* @__PURE__ */ _(
       "button",
       {
