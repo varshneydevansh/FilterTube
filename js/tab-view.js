@@ -30697,6 +30697,11 @@ document.addEventListener('DOMContentLoaded', async () => {
             }
         });
     }
+    // Connect a device is the page's own section (Android's Connect page): the pairing card stays open.
+    if (ftNanahPairingDetails) {
+        ftNanahPairingDetails.open = true;
+        ftNanahPairingDetails.addEventListener('toggle', () => { if (!ftNanahPairingDetails.open) ftNanahPairingDetails.open = true; });
+    }
     if (ftNanahAddDeviceBtn) {
         ftNanahAddDeviceBtn.addEventListener('click', () => {
             if (isActiveChildNanahProfile()) {

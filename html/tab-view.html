@@ -1070,30 +1070,28 @@
 
                         <div id="familyDeviceUpdatesCard" class="card settings-card settings-card--featured nanah-sync-card" tabindex="-1">
                             <div class="card-header">
-                                <h3>My Devices &amp; Family</h3>
+                                <h3 data-ft-i18n="sync.connect.title">Connect a device</h3>
                             </div>
                             <div class="card-body settings-card__body">
                                 <div class="nanah-sync-shell">
                                     <div class="nanah-sync-intro">
                                         <div class="nanah-device-compass-stage" aria-label="Choose a device">
-                                            <div class="nanah-device-compass-stage__heading">
+                                            <div class="nanah-device-compass-stage__heading" hidden>
                                                 <span id="ftNanahMapEyebrow" hidden>Family device map</span>
                                                 <strong id="ftNanahMapTitle">Choose a device to update</strong>
                                                 <small id="ftNanahMapDetail">Choose a device, review its profile, then send.</small>
                                             </div>
                                             <div class="nanah-device-compass" aria-label="Family Devices map for pairing and verified updates">
-                                                <div class="nanah-device-toolbar" aria-label="Connect a device">
-                                                    <button id="ftNanahAddDeviceBtn" class="btn-primary" type="button" data-family-device-focus-fallback>Add with code or QR</button>
-                                                    <button id="ftNanahShowNearbyBtn" class="btn-secondary" type="button" aria-pressed="false">Receive nearby</button>
-                                                    <button id="ftNanahFindNearbyBtn" class="btn-secondary" type="button">Find nearby</button>
-                                                </div>
-                                                <p class="nanah-device-discovery-note">Nearby needs the optional helper on both computers. Code or QR works across the internet while both devices are open.</p>
-                                                <!-- Android sync_relay_disclosure: what the internet path sees, said where pairing starts. -->
+                                                <!-- Android SettingsSectionActivity.addNearbyDevicesCard: "Your devices", what tapping does, the
+                                                     relay disclosure, the device list, then the nearby buttons (the desktop helper here). -->
+                                                <div class="nanah-your-devices">
+                                                    <h4 class="nanah-your-devices__title" data-ft-i18n="sync.devices.title">Your devices</h4>
+                                                    <p class="nanah-device-discovery-note" data-ft-i18n="sync.devices.body">Tap a device to sync with it. Nearby devices use your Wi-Fi; paired devices elsewhere connect over the internet, end-to-end encrypted. New devices pair after you match the safety phrase on both screens.</p>
+                                                    <!-- Android sync_relay_disclosure: what the internet path sees, said where pairing starts. -->
                                                 <p class="nanah-device-discovery-note nanah-relay-disclosure" data-ft-i18n="sync.relayDisclosure">Internet sync uses a small relay run by FilterTube's developer to connect your devices. It can't read what you sync, which is end-to-end encrypted. It sees a device ID, your IP address and when you sync. Google's STUN server helps find a connection route and also sees your IP address. Nearby sync uses neither.</p>
+                                                </div>
                                                 <div class="nanah-device-radar">
-                                                    <div class="nanah-device-radar__rings" aria-hidden="true"><i></i><i></i><i></i></div>
-                                                    <div class="nanah-device-compass__center">
-                                                        <div class="nanah-device-compass__hub-mark" aria-hidden="true"><i></i></div>
+                                                    <div class="nanah-device-compass__center" hidden>
                                                         <span id="ftNanahMapCenterEyebrow">This device</span>
                                                         <strong id="ftNanahMapCenterTitle">This device</strong>
                                                         <small id="ftNanahMapCenterDetail">Choose rules here, then send.</small>
@@ -1102,7 +1100,13 @@
                                                     <div id="ftNanahTrustedDeviceStrip" class="nanah-device-compass__trusted-strip" aria-label="Verified devices" hidden></div>
                                                     <div id="ftNanahHomeBridgePresenceRow" class="nanah-device-compass__presence-row" aria-live="polite" hidden></div>
                                                 </div>
-                                                <div id="ftNanahDeviceCompassRule" class="nanah-device-compass__rule">Pair a new device with a code or QR, then match the safety phrase.</div>
+                                                <div class="nanah-device-toolbar" aria-label="Connect a device">
+                                                    <button id="ftNanahAddDeviceBtn" class="btn-primary" type="button" hidden data-family-device-focus-fallback>Add with code or QR</button>
+                                                    <button id="ftNanahShowNearbyBtn" class="btn-secondary" type="button" aria-pressed="false">Receive nearby</button>
+                                                    <button id="ftNanahFindNearbyBtn" class="btn-secondary" type="button">Find nearby</button>
+                                                </div>
+                                                <p class="nanah-device-discovery-note">Nearby needs the optional helper on both computers. Code or QR works across the internet while both devices are open.</p>
+                                                <div id="ftNanahDeviceCompassRule" class="nanah-device-compass__rule" hidden>Pair a new device with a code or QR, then match the safety phrase.</div>
                                                 <div id="ftNanahDeviceSelectionPreview" class="nanah-device-compass__selection-preview" aria-live="polite" hidden>
                                                     <span>Next step</span>
                                                     <strong>Choose a device</strong>
@@ -1113,7 +1117,6 @@
                                                         <button id="ftNanahDeviceSourceBtn" class="btn-secondary" type="button" hidden>Choose rules profile</button>
                                                     </div>
                                                 </div>
-                                                <section id="ftDeviceAutoSync" aria-label="Peer-to-peer Auto-sync"></section>
                                                 <p id="ftNanahAdvancedStatus" class="nanah-advanced-status" aria-live="polite" hidden></p>
                                                 <details class="nanah-device-help nanah-device-help--compact">
                                                     <summary>Advanced connection options</summary>
@@ -1252,7 +1255,7 @@
                                         <span id="ftNanahChildBannerBody"></span>
                                     </div>
 
-                                    <details id="ftNanahPairingDetails" class="nanah-pairing-details">
+                                    <details id="ftNanahPairingDetails" class="nanah-pairing-details nanah-pairing-details--page" open>
                                         <summary class="nanah-pairing-details__summary" data-filtertube-help="Open this when you are ready to pair a device, type a code, scan a QR, send the reviewed update, or inspect trusted-device details.">
                                             <span>
                                                 <strong>Connect a device</strong>
@@ -1402,27 +1405,6 @@
                                                         <button id="ftNanahTrustBtn" class="btn-secondary" type="button" disabled data-filtertube-help="Save parent trust only for devices that should keep receiving approved updates for a protected profile.">Save Trust</button>
                                                         <button id="ftNanahEndSessionBtn" class="btn-secondary" type="button" disabled data-filtertube-help="Close this pairing session. It does not remove existing rules or saved trusted-device links.">End Session</button>
                                                     </div>
-<div id="ftNanahJoinControls">
-                                                <label class="nanah-sync-field" data-filtertube-help="Type the short code shown on the other device, then verify the same safety phrase on both screens.">
-                                                    <span>Enter pairing code</span>
-                                                    <div class="nanah-sync-join-row">
-                                                        <input id="ftNanahJoinCode" class="text-input nanah-sync-code-input" type="text" maxlength="8" placeholder="ABCD" />
-                                                        <button id="ftNanahJoinBtn" class="btn-secondary" type="button" data-filtertube-help="Join the live pairing session from the other device. Nothing applies until the phrase is confirmed.">Join Session</button>
-                                                    </div>
-                                                </label>
-
-                                                <div class="nanah-qr-actions">
-                                                    <button id="ftNanahScanQrBtn" class="btn-secondary" type="button">Scan QR</button>
-                                                    <button id="ftNanahReadQrImageBtn" class="btn-secondary" type="button">Read QR image</button>
-                                                    <input id="ftNanahQrImageInput" type="file" accept="image/png,image/jpeg,image/webp" hidden />
-                                                </div>
-                                                </div>
-<div id="ftNanahQrReader" class="nanah-qr-reader" hidden>
-                                                    <video id="ftNanahQrVideo" hidden autoplay muted playsinline aria-label="Pairing QR camera preview"></video>
-                                                    <canvas id="ftNanahQrReaderCanvas" hidden></canvas>
-                                                    <p id="ftNanahQrReaderStatus" role="status">Point the camera at the pairing QR on your other device.</p>
-                                                    <button id="ftNanahQrStopBtn" class="btn-secondary" type="button">Close scanner</button>
-                                                </div>
 <div class="nanah-sync-panel__stack nanah-sync-panel__stack--status">
                                                     <div class="nanah-sync-status" id="ftNanahStatusCard">
                                                         <div class="nanah-sync-status__headline">
@@ -1490,19 +1472,40 @@
                                         <div class="nanah-sync-panel nanah-sync-panel--join">
                                             <div class="nanah-sync-panel__header">
                                                 <div>
-                                                    <span class="nanah-sync-panel__eyebrow" data-filtertube-help="Use this side when another device already created a pairing code or QR.">Other device</span>
-                                                    <h4 class="nanah-sync-panel__title" data-filtertube-help="Join the code from the other device. Rules do not apply until the safety phrase is confirmed.">Connect the other device</h4>
-                                                    <p class="nanah-sync-panel__body" data-filtertube-help="The code only connects devices. It does not give permission to change rules until both sides verify the same phrase.">Type the code from the other device or scan its QR. Nothing applies until both devices show the same phrase.</p>
+                                                    <span class="nanah-sync-panel__eyebrow" data-ft-i18n="sync.join.eyebrow">Join another device</span>
+                                                    <h4 class="nanah-sync-panel__title" data-ft-i18n="sync.join.title">Enter pairing code</h4>
+                                                    <p class="nanah-sync-panel__body" data-ft-i18n="sync.join.body">Create a code or enter one from your other device.</p>
                                                 </div>
-                                                <span class="nanah-sync-panel__badge" data-filtertube-help="This device is joining a session started somewhere else.">Pair here</span>
                                             </div>
 
                                             <div class="nanah-sync-stack">
+<div id="ftNanahJoinControls">
+                                                <label class="nanah-sync-field" data-filtertube-help="Type the short code shown on the other device, then verify the same safety phrase on both screens.">
+                                                    <span>Enter pairing code</span>
+                                                    <div class="nanah-sync-join-row">
+                                                        <input id="ftNanahJoinCode" class="text-input nanah-sync-code-input" type="text" maxlength="8" placeholder="ABCD" />
+                                                        <button id="ftNanahJoinBtn" class="btn-secondary" type="button" data-filtertube-help="Join the live pairing session from the other device. Nothing applies until the phrase is confirmed.">Join Session</button>
+                                                    </div>
+                                                </label>
+
+                                                <div class="nanah-qr-actions">
+                                                    <button id="ftNanahScanQrBtn" class="btn-secondary" type="button">Scan QR</button>
+                                                    <button id="ftNanahReadQrImageBtn" class="btn-secondary" type="button">Read QR image</button>
+                                                    <input id="ftNanahQrImageInput" type="file" accept="image/png,image/jpeg,image/webp" hidden />
+                                                </div>
+                                                </div>
 
 
 
 
-                                                <details id="ftNanahPairUriRow" class="nanah-pairing-secondary">
+
+                                                <div id="ftNanahQrReader" class="nanah-qr-reader" hidden>
+                                                    <video id="ftNanahQrVideo" hidden autoplay muted playsinline aria-label="Pairing QR camera preview"></video>
+                                                    <canvas id="ftNanahQrReaderCanvas" hidden></canvas>
+                                                    <p id="ftNanahQrReaderStatus" role="status">Point the camera at the pairing QR on your other device.</p>
+                                                    <button id="ftNanahQrStopBtn" class="btn-secondary" type="button">Close scanner</button>
+                                                </div>
+<details id="ftNanahPairUriRow" class="nanah-pairing-secondary">
                                                     <summary>Copy pairing link</summary>
                                                 <div class="nanah-sync-link-row">
                                                     <input id="ftNanahPairUri" class="text-input" type="text" readonly placeholder="Pairing URI will appear here" data-filtertube-help="This link contains pairing information only. The other device still has to verify the same safety phrase." />
@@ -1530,7 +1533,20 @@
                                             </details>
                                         </div>
                                     </div>
+                                    
+                                    <!-- Android createNanahFlowRow and createNanahPrinciplesBlock. -->
+                                    <div class="nanah-flow-steps">
+                                        <article class="nanah-flow-step"><span data-ft-i18n="sync.step.one">Step 1</span><strong data-ft-i18n="sync.step.pair">Pair</strong><small data-ft-i18n="sync.step.pairBody">Create a short code on one device and join from the other device.</small></article>
+                                        <article class="nanah-flow-step"><span data-ft-i18n="sync.step.two">Step 2</span><strong data-ft-i18n="sync.step.verify">Verify</strong><small data-ft-i18n="sync.step.verifyBody">Confirm the exact same safety phrase on both devices before anything applies.</small></article>
+                                        <article class="nanah-flow-step"><span data-ft-i18n="sync.step.three">Step 3</span><strong data-ft-i18n="sync.step.send">Send</strong><small data-ft-i18n="sync.step.sendBody">Send the reviewed update now. Saved trust and pickup stay in Advanced.</small></article>
+                                    </div>
+                                    <div class="nanah-trust-notes">
+                                        <h5 data-ft-i18n="sync.notes.title">Privacy and trust notes</h5>
+                                        <article class="nanah-flow-step"><span data-ft-i18n="sync.notes.relayTitle">What the relay sees</span><strong data-ft-i18n="sync.notes.relayLead">Connection setup only</strong><small data-ft-i18n="sync.notes.relayBody">The relay is just the meeting place that helps both devices find each other.</small></article>
+                                        <article class="nanah-flow-step"><span data-ft-i18n="sync.notes.trustTitle">What trust means</span><strong data-ft-i18n="sync.notes.trustLead">Remembered policy</strong><small data-ft-i18n="sync.notes.trustBody">Trust remembers the approved relationship, target, scope, and saved-update choice. Network pickup still needs a configured provider and local validation.</small></article>
+                                    </div>
                                     </details>
+                                    <section id="ftDeviceAutoSync" aria-label="Peer-to-peer Auto-sync"></section>
                                 </div>
                             </div>
                         </div>

@@ -1247,10 +1247,6 @@
     "kind": "text",
     "line": 1066
   },
-  "My Devices & Family": {
-    "kind": "text",
-    "line": 1073
-  },
   "Choose a device": {
     "kind": "aria-label",
     "line": 1078
@@ -1271,3396 +1267,3364 @@
     "kind": "aria-label",
     "line": 1084
   },
-  "Connect a device": {
-    "kind": "aria-label",
-    "line": 1085
-  },
-  "Add with code or QR": {
-    "kind": "text",
-    "line": 1086
-  },
-  "Receive nearby": {
-    "kind": "text",
-    "line": 1087
-  },
-  "Find nearby": {
-    "kind": "text",
-    "line": 1088
-  },
-  "Nearby needs the optional helper on both computers. Code or QR works across the internet while both devices are open.": {
-    "kind": "text",
-    "line": 1090
-  },
   "This device": {
     "kind": "text",
-    "line": 1097
+    "line": 1095
   },
   "Choose rules here, then send.": {
     "kind": "text",
-    "line": 1099
+    "line": 1097
   },
   "No saved devices yet. Find a nearby device or add one with a code.": {
     "kind": "text",
-    "line": 1101
+    "line": 1099
   },
   "Verified devices": {
     "kind": "aria-label",
-    "line": 1102
+    "line": 1100
   },
-  "Pair a new device with a code or QR, then match the safety phrase.": {
+  "Connect a device": {
+    "kind": "aria-label",
+    "line": 1103
+  },
+  "Add with code or QR": {
+    "kind": "text",
+    "line": 1104
+  },
+  "Receive nearby": {
     "kind": "text",
     "line": 1105
   },
-  "Next step": {
+  "Find nearby": {
     "kind": "text",
-    "line": 1107
+    "line": 1106
   },
-  "Choose a saved device, or pair a new one.": {
+  "Nearby needs the optional helper on both computers. Code or QR works across the internet while both devices are open.": {
+    "kind": "text",
+    "line": 1108
+  },
+  "Pair a new device with a code or QR, then match the safety phrase.": {
     "kind": "text",
     "line": 1109
   },
-  "Continue": {
+  "Next step": {
     "kind": "text",
-    "line": 1112
+    "line": 1111
   },
-  "Choose rules profile": {
+  "Choose a saved device, or pair a new one.": {
     "kind": "text",
     "line": 1113
   },
-  "Peer-to-peer Auto-sync": {
-    "kind": "aria-label",
+  "Continue": {
+    "kind": "text",
     "line": 1116
+  },
+  "Choose rules profile": {
+    "kind": "text",
+    "line": 1117
   },
   "Advanced connection options": {
     "kind": "text",
-    "line": 1119
+    "line": 1122
   },
   "Best default. Keep both devices open, pair with the code or QR, verify the phrase, then send the update.": {
     "kind": "data-filtertube-help",
-    "line": 1121
+    "line": 1124
   },
   "Start here": {
     "kind": "text",
-    "line": 1123
+    "line": 1126
   },
   "Open now": {
     "kind": "text",
-    "line": 1124
+    "line": 1127
   },
   "Use code or QR while both devices are open.": {
     "kind": "text",
-    "line": 1125
+    "line": 1128
   },
   "Optional advanced path for a trusted home, school, or clinic pickup service. Wi-Fi discovery alone never grants control.": {
     "kind": "data-filtertube-help",
-    "line": 1127
+    "line": 1130
   },
   "Same place": {
     "kind": "text",
-    "line": 1129
+    "line": 1132
   },
   "Home or school": {
     "kind": "text",
-    "line": 1130
+    "line": 1133
   },
   "Only after the device is paired and trusted.": {
     "kind": "text",
-    "line": 1131
+    "line": 1134
   },
   "Optional advanced path for a verified device that opens later or is away. The device still validates signed parent updates locally.": {
     "kind": "data-filtertube-help",
-    "line": 1133
+    "line": 1136
   },
   "Away or later": {
     "kind": "text",
-    "line": 1135
+    "line": 1138
   },
   "Open later": {
     "kind": "text",
-    "line": 1136
+    "line": 1139
   },
   "For a verified device that checks in later.": {
     "kind": "text",
-    "line": 1137
+    "line": 1140
   },
   "Open now is the normal setup.": {
     "kind": "text",
-    "line": 1141
+    "line": 1144
   },
   "Same-place and open-later delivery only work after the protected device is already paired and trusted.": {
     "kind": "text",
-    "line": 1142
+    "line": 1145
   },
   "How parent updates can reach verified devices": {
     "kind": "aria-label",
-    "line": 1144
+    "line": 1147
   },
   "Use live Send Update first. It is the simplest path and does not require a pickup provider.": {
     "kind": "data-filtertube-help",
-    "line": 1145
+    "line": 1148
   },
   "Live update": {
     "kind": "text",
-    "line": 1147
+    "line": 1150
   },
   "Open both devices": {
     "kind": "text",
-    "line": 1148
+    "line": 1151
   },
   "Use Send Update when parent and protected devices are open together.": {
     "kind": "text",
-    "line": 1149
+    "line": 1152
   },
   "Advanced delivery is only for verified protected devices that cannot stay open while the parent sends an update.": {
     "kind": "data-filtertube-help",
-    "line": 1152
+    "line": 1155
   },
   "Pickup services": {
     "kind": "text",
-    "line": 1153
+    "line": 1156
   },
   "Internet Pickup off": {
     "kind": "text",
-    "line": 1158
+    "line": 1161
   },
   "Optional waiting updates for verified devices that open later or are away.": {
     "kind": "text",
-    "line": 1159
+    "line": 1162
   },
   "Configure Internet Pickup for signed updates a verified protected device can collect later. This is not parent authority by itself.": {
     "kind": "data-filtertube-help",
-    "line": 1162
+    "line": 1165
   },
   "Set Up": {
     "kind": "text",
-    "line": 1162
+    "line": 1165
   },
   "Check whether the configured Internet Pickup provider is reachable.": {
     "kind": "data-filtertube-help",
-    "line": 1163
+    "line": 1166
   },
   "Check": {
     "kind": "text",
-    "line": 1163
+    "line": 1166
   },
   "Same network": {
     "kind": "text",
-    "line": 1168
+    "line": 1171
   },
   "Home Pickup off": {
     "kind": "text",
-    "line": 1169
+    "line": 1172
   },
   "Optional home/school pickup path. Wi-Fi alone never grants control.": {
     "kind": "text",
-    "line": 1170
+    "line": 1173
   },
   "Configure Home Pickup for a trusted same-network service. The protected device still validates every update.": {
     "kind": "data-filtertube-help",
-    "line": 1173
+    "line": 1176
   },
   "Check whether the configured Home Pickup service is reachable from this browser.": {
     "kind": "data-filtertube-help",
-    "line": 1174
+    "line": 1177
   },
   "Protected device": {
     "kind": "text",
-    "line": 1180
+    "line": 1183
   },
   "Check waiting parent updates": {
     "kind": "text",
-    "line": 1181
+    "line": 1184
   },
   "Available after this protected profile saves a trusted parent link.": {
     "kind": "text",
-    "line": 1182
+    "line": 1185
   },
   "Protected device check: look for waiting signed parent updates from Internet Pickup or Home Pickup.": {
     "kind": "data-filtertube-help",
-    "line": 1184
+    "line": 1187
   },
   "Check Now": {
     "kind": "text",
-    "line": 1184
+    "line": 1187
   },
   "Parent device": {
     "kind": "text",
-    "line": 1188
+    "line": 1191
   },
   "Check protected-device delivery": {
     "kind": "text",
-    "line": 1189
+    "line": 1192
   },
   "Available after this parent sends a protected update through a pickup path.": {
     "kind": "text",
-    "line": 1190
+    "line": 1193
   },
   "Parent device check: see whether a protected device accepted or rejected a saved parent update.": {
     "kind": "data-filtertube-help",
-    "line": 1192
+    "line": 1195
   },
   "Check Delivery": {
     "kind": "text",
-    "line": 1192
+    "line": 1195
   },
   "How parent editing reaches a protected device": {
     "kind": "aria-label",
-    "line": 1196
+    "line": 1199
   },
   "Edit here": {
     "kind": "text",
-    "line": 1199
+    "line": 1202
   },
   "Open the child/protected row and choose Edit Rules. You are editing that profile from the parent side.": {
     "kind": "text",
-    "line": 1200
+    "line": 1203
   },
   "Kids profile PIN is different": {
     "kind": "text",
-    "line": 1204
+    "line": 1207
   },
   "The Kids profile PIN only protects switching into that profile. It does not unlock parent controls.": {
     "kind": "text",
-    "line": 1205
+    "line": 1208
   },
   "Deliver when ready": {
     "kind": "text",
-    "line": 1209
+    "line": 1212
   },
   "Send now when both devices are open, or let the verified device pick up the signed update later.": {
     "kind": "text",
-    "line": 1210
+    "line": 1213
   },
   "Family device update path": {
     "kind": "aria-label",
-    "line": 1213
+    "line": 1216
   },
   "Choose profile": {
     "kind": "text",
-    "line": 1216
+    "line": 1219
   },
   "Protected profile, this profile, or full backup.": {
     "kind": "text",
-    "line": 1217
+    "line": 1220
   },
   "Pair and verify": {
     "kind": "text",
-    "line": 1221
+    "line": 1224
   },
   "Use the short code or QR, then match the phrase.": {
     "kind": "text",
-    "line": 1222
+    "line": 1225
   },
   "Send update": {
     "kind": "text",
-    "line": 1226
+    "line": 1229
   },
   "Only reviewed rules, access, or time limits apply.": {
     "kind": "text",
-    "line": 1227
+    "line": 1230
   },
   "Files, saved links, and pickup paths cannot change PINs, trust, profiles, or time limits on their own.": {
     "kind": "text",
-    "line": 1229
+    "line": 1232
   },
   "Support evidence": {
     "kind": "text",
-    "line": 1232
+    "line": 1235
   },
   "Family Devices evidence tools": {
     "kind": "aria-label",
-    "line": 1233
+    "line": 1236
   },
   "Need support?": {
     "kind": "text",
-    "line": 1235
+    "line": 1238
   },
   "Share a redacted Family Devices snapshot without rules, PINs, profile IDs, or device names.": {
     "kind": "text",
-    "line": 1236
+    "line": 1239
   },
   "Copies a redacted Family Devices map snapshot for a bug report or manual check. It does not include device names, profile IDs, rules, PINs, or update payloads.": {
     "kind": "data-filtertube-help",
-    "line": 1239
+    "line": 1242
   },
   "Copy evidence": {
     "kind": "text",
-    "line": 1239
+    "line": 1242
   },
   "Downloads the same redacted Family Devices evidence JSON. Use this when clipboard access is blocked or you want to attach a file to an audit row.": {
     "kind": "data-filtertube-help",
-    "line": 1240
+    "line": 1243
   },
   "Download evidence": {
     "kind": "text",
-    "line": 1240
+    "line": 1243
   },
   "Open this when you are ready to pair a device, type a code, scan a QR, send the reviewed update, or inspect trusted-device details.": {
     "kind": "data-filtertube-help",
-    "line": 1256
+    "line": 1259
   },
   "Create a code or enter one from your other device.": {
     "kind": "text",
-    "line": 1259
+    "line": 1262
   },
   "Connect": {
     "kind": "text",
-    "line": 1261
+    "line": 1264
   },
   "Keep Accounts & Sync open on both devices while connecting and sending.": {
     "kind": "text",
-    "line": 1263
+    "line": 1266
   },
   "Choose what kind of update you want to send: family controls, this profile once, or a full account move.": {
     "kind": "data-filtertube-help",
-    "line": 1268
+    "line": 1271
   },
   "Profile update": {
     "kind": "text",
-    "line": 1268
+    "line": 1271
   },
   "Choose whether to copy this profile, manage a protected profile, or move a full account.": {
     "kind": "data-filtertube-help",
-    "line": 1269
+    "line": 1272
   },
   "Choose the update": {
     "kind": "text",
-    "line": 1269
+    "line": 1272
   },
   "The wording and controls below follow the update type you select.": {
     "kind": "data-filtertube-help",
-    "line": 1270
+    "line": 1273
   },
   "Choose the option that matches what you are doing.": {
     "kind": "text",
-    "line": 1270
+    "line": 1273
   },
   "The sending device chooses what is offered. Nothing applies before pairing and phrase verification.": {
     "kind": "data-filtertube-help",
-    "line": 1272
+    "line": 1275
   },
   "Review first": {
     "kind": "text",
-    "line": 1272
+    "line": 1275
   },
   "Choose device update mode": {
     "kind": "aria-label",
-    "line": 1277
+    "line": 1280
   },
   "Use this for a child, family member, or protected device. It sends parent-approved rules, time limits, and viewing access.": {
     "kind": "data-filtertube-help",
-    "line": 1278
+    "line": 1281
   },
   "Family control": {
     "kind": "text",
-    "line": 1279
+    "line": 1282
   },
   "Rules, time, and access.": {
     "kind": "text",
-    "line": 1281
+    "line": 1284
   },
   "Use this for your own second device. It copies this profile once and does not create parent control.": {
     "kind": "data-filtertube-help",
-    "line": 1283
+    "line": 1286
   },
   "Copy once": {
     "kind": "text",
-    "line": 1284
+    "line": 1287
   },
   "This profile": {
     "kind": "text",
-    "line": 1285
+    "line": 1288
   },
   "Copy to your own device.": {
     "kind": "text",
-    "line": 1286
+    "line": 1289
   },
   "Use only for reinstall, migration, or full recovery. This sends the wider account backup after verification.": {
     "kind": "data-filtertube-help",
-    "line": 1288
+    "line": 1291
   },
   "Move account": {
     "kind": "text",
-    "line": 1289
+    "line": 1292
   },
   "Full account": {
     "kind": "text",
-    "line": 1290
+    "line": 1293
   },
   "Migration or recovery.": {
     "kind": "text",
-    "line": 1291
+    "line": 1294
   },
   "On the receiving device, open the intended protected profile before entering the code.": {
     "kind": "text",
-    "line": 1296
+    "line": 1299
   },
   "Choose where this update should land. If left blank, it follows the profile currently open on the other device.": {
     "kind": "data-filtertube-help",
-    "line": 1299
+    "line": 1302
   },
   "Profile to update": {
     "kind": "text",
-    "line": 1300
+    "line": 1303
   },
   "Use the profile open there": {
     "kind": "text",
-    "line": 1302
+    "line": 1305
   },
   "After pairing, choose exactly which protected profile on the other device should receive this update.": {
     "kind": "text",
-    "line": 1304
+    "line": 1307
   },
   "Saved protected profiles from the connected device appear here when they can be targeted directly.": {
     "kind": "data-filtertube-help",
-    "line": 1306
+    "line": 1309
   },
   "Managed targets": {
     "kind": "text",
-    "line": 1307
+    "line": 1310
   },
   "Saved protected profiles on the connected device can be selected here.": {
     "kind": "text",
-    "line": 1309
+    "line": 1312
   },
   "Advanced controls for role, scope, rule source, and merge/replace behavior. Most families can leave this closed.": {
     "kind": "data-filtertube-help",
-    "line": 1313
+    "line": 1316
   },
   "Open only when you need to repair a link, choose a smaller rule scope, or change merge versus replace behavior.": {
     "kind": "data-filtertube-help",
-    "line": 1314
+    "line": 1317
   },
   "More options": {
     "kind": "text",
-    "line": 1315
+    "line": 1318
   },
   "My other device · Active profile · Merge": {
     "kind": "text",
-    "line": 1316
+    "line": 1319
   },
   "About this update": {
     "kind": "text",
-    "line": 1319
+    "line": 1322
   },
   "Use this to send parent-approved rules, time limits, and viewing access to a protected profile or family device.": {
     "kind": "text",
-    "line": 1325
+    "line": 1328
   },
   "Choose or create the protected profile you manage.": {
     "kind": "text",
-    "line": 1327
+    "line": 1330
   },
   "On the receiving device, create or switch to the intended protected profile before entering the code or scanning QR.": {
     "kind": "text",
-    "line": 1328
+    "line": 1331
   },
   "Match the safety phrase before sending anything.": {
     "kind": "text",
-    "line": 1329
+    "line": 1332
   },
   "Send update. Save parent trust only for devices that should keep receiving approved updates.": {
     "kind": "text",
-    "line": 1330
+    "line": 1333
   },
   "Device name": {
     "kind": "text",
-    "line": 1335
+    "line": 1338
   },
   "A friendly name shown to the other device during pairing and in trusted-device history.": {
     "kind": "data-filtertube-help",
-    "line": 1336
+    "line": 1339
   },
   "This device name": {
     "kind": "text",
-    "line": 1337
+    "line": 1340
   },
   "My laptop": {
     "kind": "placeholder",
-    "line": 1338
+    "line": 1341
   },
   "Family setup shortcuts": {
     "kind": "text",
-    "line": 1341
+    "line": 1344
   },
   "Personal device sync and family control actions": {
     "kind": "aria-label",
-    "line": 1343
+    "line": 1346
   },
   "Copy the profile currently open to your own second device. No protected profile or PIN is required. Switch profiles first if you want to copy a different profile.": {
     "kind": "data-filtertube-help",
-    "line": 1344
+    "line": 1347
   },
   "Sync My Devices": {
     "kind": "text",
-    "line": 1344
+    "line": 1347
   },
   "Create a protected child/user profile only when you want parent-managed rules, time limits, or viewing access.": {
     "kind": "data-filtertube-help",
-    "line": 1345
+    "line": 1348
   },
   "Set Up Family Control": {
     "kind": "text",
-    "line": 1345
+    "line": 1348
   },
   "Send parent-approved rules, time, and viewing access to an existing protected profile. Use this when both devices are open together.": {
     "kind": "data-filtertube-help",
-    "line": 1346
+    "line": 1349
   },
   "Send Protected Update": {
     "kind": "text",
-    "line": 1346
+    "line": 1349
   },
   "Relationship decides whether this device sends, receives, or just copies settings once. Family control uses parent-to-protected defaults.": {
     "kind": "data-filtertube-help",
-    "line": 1352
+    "line": 1355
   },
   "Relationship": {
     "kind": "text",
-    "line": 1353
+    "line": 1356
   },
   "My other device": {
     "kind": "text",
-    "line": 1355
+    "line": 1358
   },
   "This device controls another profile": {
     "kind": "text",
-    "line": 1356
+    "line": 1359
   },
   "This device receives protected updates": {
     "kind": "text",
-    "line": 1357
+    "line": 1360
   },
   "Most families can leave this alone. Use it only for repair, migration, or a receive-only protected device.": {
     "kind": "text",
-    "line": 1359
+    "line": 1362
   },
   "Scope decides what is sent: current profile, Main rules, Kids rules, keywords, channels, time limits, or full backup.": {
     "kind": "data-filtertube-help",
-    "line": 1361
+    "line": 1364
   },
   "Scope to send": {
     "kind": "text",
-    "line": 1362
+    "line": 1365
   },
   "Main only": {
     "kind": "text",
-    "line": 1365
+    "line": 1368
   },
   "Kids only": {
     "kind": "text",
-    "line": 1366
+    "line": 1369
   },
   "Keyword rules": {
     "kind": "text",
-    "line": 1367
+    "line": 1370
   },
   "Channel rules": {
     "kind": "text",
-    "line": 1368
+    "line": 1371
   },
   "Blocked video IDs": {
     "kind": "text",
-    "line": 1369
+    "line": 1372
   },
   "Rule bundle": {
     "kind": "text",
-    "line": 1370
+    "line": 1373
   },
   "Viewing access": {
     "kind": "text",
-    "line": 1371
+    "line": 1374
   },
   "Time limits": {
     "kind": "text",
-    "line": 1372
+    "line": 1375
   },
   "Full backup": {
     "kind": "text",
-    "line": 1373
+    "line": 1376
   },
   "For keyword, channel, and video rule sends, choose whether the local Main or Kids rules are used.": {
     "kind": "data-filtertube-help",
-    "line": 1376
+    "line": 1379
   },
   "Rule source": {
     "kind": "text",
-    "line": 1377
+    "line": 1380
   },
   "Main rules": {
     "kind": "text",
-    "line": 1379
+    "line": 1382
   },
   "Kids rules": {
     "kind": "text",
-    "line": 1380
+    "line": 1383
   },
   "Keyword, channel, and video updates use this local rule surface.": {
     "kind": "text",
-    "line": 1382
+    "line": 1385
   },
   "Merge adds the selected rules. Replace overwrites only the selected scope for managed protected devices.": {
     "kind": "data-filtertube-help",
-    "line": 1385
+    "line": 1388
   },
   "How update applies": {
     "kind": "text",
-    "line": 1386
+    "line": 1389
   },
   "Merge into remote": {
     "kind": "text",
-    "line": 1388
+    "line": 1391
   },
   "Replace remote scope": {
     "kind": "text",
-    "line": 1389
+    "line": 1392
   },
   "Merge adds to the remote profile. Replace overwrites the selected scope for managed protected devices.": {
     "kind": "text",
-    "line": 1391
+    "line": 1394
   },
   "Create a pairing code or QR on this device. The other device must join and show the same safety phrase.": {
     "kind": "data-filtertube-help",
-    "line": 1400
+    "line": 1403
   },
   "Start Pairing": {
     "kind": "text",
-    "line": 1400
+    "line": 1403
   },
   "Send the selected update after both devices connect and the safety phrase is confirmed.": {
     "kind": "data-filtertube-help",
-    "line": 1401
+    "line": 1404
   },
   "Send Update": {
     "kind": "text",
-    "line": 1401
+    "line": 1404
   },
   "Save parent trust only for devices that should keep receiving approved updates for a protected profile.": {
     "kind": "data-filtertube-help",
-    "line": 1402
+    "line": 1405
   },
   "Save Trust": {
     "kind": "text",
-    "line": 1402
+    "line": 1405
   },
   "Close this pairing session. It does not remove existing rules or saved trusted-device links.": {
     "kind": "data-filtertube-help",
-    "line": 1403
+    "line": 1406
   },
   "End Session": {
     "kind": "text",
-    "line": 1403
-  },
-  "Type the short code shown on the other device, then verify the same safety phrase on both screens.": {
-    "kind": "data-filtertube-help",
     "line": 1406
-  },
-  "Enter pairing code": {
-    "kind": "text",
-    "line": 1407
-  },
-  "ABCD": {
-    "kind": "placeholder",
-    "line": 1409
-  },
-  "Join the live pairing session from the other device. Nothing applies until the phrase is confirmed.": {
-    "kind": "data-filtertube-help",
-    "line": 1410
-  },
-  "Join Session": {
-    "kind": "text",
-    "line": 1410
-  },
-  "Scan QR": {
-    "kind": "text",
-    "line": 1415
-  },
-  "Read QR image": {
-    "kind": "text",
-    "line": 1416
-  },
-  "Pairing QR camera preview": {
-    "kind": "aria-label",
-    "line": 1421
-  },
-  "Point the camera at the pairing QR on your other device.": {
-    "kind": "text",
-    "line": 1423
-  },
-  "Close scanner": {
-    "kind": "text",
-    "line": 1424
   },
   "Shows whether this device is idle, hosting, joining, connected, verified, or ready to send.": {
     "kind": "data-filtertube-help",
-    "line": 1430
+    "line": 1412
   },
   "Session state": {
     "kind": "text",
-    "line": 1430
+    "line": 1412
   },
   "Idle": {
     "kind": "text",
-    "line": 1431
+    "line": 1413
   },
   "Both devices must show the same safety phrase before anything is trusted.": {
     "kind": "data-filtertube-help",
-    "line": 1433
+    "line": 1415
   },
   "Secure handshake": {
     "kind": "text",
-    "line": 1433
+    "line": 1415
   },
   "Remote profile + device": {
     "kind": "text",
-    "line": 1436
+    "line": 1418
   },
   "Not connected": {
     "kind": "text",
-    "line": 1437
+    "line": 1419
   },
   "Pairing code": {
     "kind": "text",
-    "line": 1440
+    "line": 1422
   },
   "----": {
     "kind": "text",
-    "line": 1441
+    "line": 1423
   },
   "Safety phrase": {
     "kind": "text",
-    "line": 1444
+    "line": 1426
   },
   "Waiting": {
     "kind": "text",
-    "line": 1445
+    "line": 1427
   },
   "Start pairing on one device, then join from the other device using the same short code.": {
     "kind": "text",
-    "line": 1447
+    "line": 1429
   },
   "Selected intent": {
     "kind": "text",
-    "line": 1451
+    "line": 1433
   },
   "Pairing still needs code or QR": {
     "kind": "text",
-    "line": 1452
+    "line": 1434
   },
   "Nothing is trusted until both devices show the same safety phrase.": {
     "kind": "text",
-    "line": 1453
+    "line": 1435
   },
   "Connection details": {
     "kind": "text",
-    "line": 1456
+    "line": 1438
   },
   "This profile + device": {
     "kind": "text",
-    "line": 1458
+    "line": 1440
   },
   "Default (parent account)": {
     "kind": "text",
-    "line": 1459
+    "line": 1441
   },
   "Remote active profile": {
     "kind": "text",
-    "line": 1462
+    "line": 1444
   },
   "Unknown": {
     "kind": "text",
-    "line": 1463
+    "line": 1445
   },
   "Updates write into the receiver's active profile by default, or a fixed protected profile if one was chosen. Saved links remember trust and allowed policy. They are not a live connection, but Pickup can let a verified device collect a signed parent update when it opens later.": {
     "kind": "text",
-    "line": 1465
+    "line": 1447
   },
   "Connection privacy": {
     "kind": "text",
-    "line": 1469
+    "line": 1451
   },
   "The meeting service helps devices find each other. After the handshake, signed settings move between devices and still need local validation.": {
     "kind": "data-filtertube-help",
-    "line": 1470
+    "line": 1452
   },
   "Private after the handshake": {
     "kind": "text",
-    "line": 1471
+    "line": 1453
   },
   "For Send Update, keep both devices open. This meeting step connects them; it does not store rules or PINs.": {
     "kind": "text",
-    "line": 1472
+    "line": 1454
   },
   "Advanced link for the public meeting service. It helps with pairing, but it should not read your private settings payload.": {
     "kind": "data-filtertube-help",
-    "line": 1473
+    "line": 1455
   },
   "Meeting service link": {
     "kind": "text",
-    "line": 1474
+    "line": 1456
   },
   "nanah-signaling.varshney-devansh614.workers.dev": {
     "kind": "text",
-    "line": 1475
+    "line": 1457
   },
   "Click only if both devices display the same safety phrase. This prevents sending to the wrong device.": {
     "kind": "data-filtertube-help",
-    "line": 1480
+    "line": 1462
   },
   "Confirm Matching Phrase": {
     "kind": "text",
-    "line": 1480
+    "line": 1462
   },
-  "Use this side when another device already created a pairing code or QR.": {
+  "Type the short code shown on the other device, then verify the same safety phrase on both screens.": {
     "kind": "data-filtertube-help",
-    "line": 1493
+    "line": 1483
   },
-  "Other device": {
+  "Enter pairing code": {
+    "kind": "text",
+    "line": 1484
+  },
+  "ABCD": {
+    "kind": "placeholder",
+    "line": 1486
+  },
+  "Join the live pairing session from the other device. Nothing applies until the phrase is confirmed.": {
+    "kind": "data-filtertube-help",
+    "line": 1487
+  },
+  "Join Session": {
+    "kind": "text",
+    "line": 1487
+  },
+  "Scan QR": {
+    "kind": "text",
+    "line": 1492
+  },
+  "Read QR image": {
     "kind": "text",
     "line": 1493
   },
-  "Join the code from the other device. Rules do not apply until the safety phrase is confirmed.": {
-    "kind": "data-filtertube-help",
-    "line": 1494
+  "Pairing QR camera preview": {
+    "kind": "aria-label",
+    "line": 1503
   },
-  "Connect the other device": {
+  "Point the camera at the pairing QR on your other device.": {
     "kind": "text",
-    "line": 1494
+    "line": 1505
   },
-  "The code only connects devices. It does not give permission to change rules until both sides verify the same phrase.": {
-    "kind": "data-filtertube-help",
-    "line": 1495
-  },
-  "Type the code from the other device or scan its QR. Nothing applies until both devices show the same phrase.": {
-    "kind": "text",
-    "line": 1495
-  },
-  "This device is joining a session started somewhere else.": {
-    "kind": "data-filtertube-help",
-    "line": 1497
-  },
-  "Pair here": {
-    "kind": "text",
-    "line": 1497
-  },
-  "Copy pairing link": {
+  "Close scanner": {
     "kind": "text",
     "line": 1506
   },
+  "Copy pairing link": {
+    "kind": "text",
+    "line": 1509
+  },
   "Pairing URI will appear here": {
     "kind": "placeholder",
-    "line": 1508
+    "line": 1511
   },
   "This link contains pairing information only. The other device still has to verify the same safety phrase.": {
     "kind": "data-filtertube-help",
-    "line": 1508
+    "line": 1511
   },
   "Copy the pairing link for another device. The receiving device still has to verify the same safety phrase.": {
     "kind": "data-filtertube-help",
-    "line": 1509
+    "line": 1512
   },
   "Copy Link": {
     "kind": "text",
-    "line": 1509
+    "line": 1512
   },
   "Nanah pairing QR": {
     "kind": "aria-label",
-    "line": 1514
+    "line": 1517
   },
   "Start pairing first, then this area shows a QR or status message for the other device.": {
     "kind": "data-filtertube-help",
-    "line": 1515
+    "line": 1518
   },
   "No active pairing session": {
     "kind": "text",
-    "line": 1515
+    "line": 1518
   },
   "Saved device links": {
     "kind": "text",
-    "line": 1520
+    "line": 1523
   },
   "Trusted devices remember a verified relationship so future sends are easier.": {
     "kind": "data-filtertube-help",
-    "line": 1523
+    "line": 1526
   },
   "Trusted devices": {
     "kind": "text",
-    "line": 1523
+    "line": 1526
   },
   "Saved trust is not a live connection and never skips local validation.": {
     "kind": "data-filtertube-help",
-    "line": 1524
+    "line": 1527
   },
   "Saved links remember verified devices. They are not a live connection.": {
     "kind": "text",
-    "line": 1524
+    "line": 1527
   },
   "No trusted devices yet.": {
     "kind": "text",
-    "line": 1527
+    "line": 1530
+  },
+  "Peer-to-peer Auto-sync": {
+    "kind": "aria-label",
+    "line": 1549
   },
   "Profiles": {
     "kind": "text",
-    "line": 1542
+    "line": 1558
   },
   "Each device can have several profiles. Choose whose rules you want to edit or send.": {
     "kind": "text",
-    "line": 1546
+    "line": 1562
   },
   "Default": {
     "kind": "text",
-    "line": 1547
+    "line": 1563
   },
   "is the parent account; each parent manages their own Kids profiles.": {
     "kind": "text",
-    "line": 1547
+    "line": 1563
   },
   "Create Account": {
     "kind": "text",
-    "line": 1551
+    "line": 1567
   },
   "Create Protected Profile": {
     "kind": "text",
-    "line": 1552
+    "line": 1568
   },
   "Security": {
     "kind": "text",
-    "line": 1561
+    "line": 1577
   },
   "The Master PIN protects Default and its admin controls. Set a PIN on each parent account too. A child switching PIN protects entry to that child profile; it does not protect an unlocked parent account.": {
     "kind": "text",
-    "line": 1564
+    "line": 1580
   },
   "When enabled, the Default (Parent) profile can create new independent accounts.": {
     "kind": "title",
-    "line": 1567
+    "line": 1583
   },
   "Allow independent account creation": {
     "kind": "text",
-    "line": 1569
+    "line": 1585
   },
   "Limits how many independent accounts can exist (excluding Default).": {
     "kind": "title",
-    "line": 1576
+    "line": 1592
   },
   "Max independent accounts": {
     "kind": "text",
-    "line": 1578
+    "line": 1594
   },
   "Set / Change Master PIN": {
     "kind": "text",
-    "line": 1583
+    "line": 1599
   },
   "Remove Master PIN": {
     "kind": "text",
-    "line": 1584
+    "line": 1600
   },
   "Immediately lock temporary parent/admin unlocks in this dashboard tab.": {
     "kind": "title",
-    "line": 1585
+    "line": 1601
   },
   "Lock Admin Session": {
     "kind": "text",
-    "line": 1585
+    "line": 1601
   },
   "Release track": {
     "kind": "text",
-    "line": 1600
+    "line": 1616
   },
   "Follow what FilterTube shipped without digging through the whole project history.": {
     "kind": "text",
-    "line": 1601
+    "line": 1617
   },
   "New controls, UI improvements, and behavior changes land here first so you can see what is already live today.": {
     "kind": "text",
-    "line": 1602
+    "line": 1618
   },
   "Current version: v3.5.0": {
     "kind": "text",
-    "line": 1605
+    "line": 1621
   },
   "Desktop release cadence": {
     "kind": "text",
-    "line": 1606
+    "line": 1622
   },
   "Loading release notes…": {
     "kind": "text",
-    "line": 1612
+    "line": 1628
   },
   "Help for parents and everyday users": {
     "kind": "text",
-    "line": 1623
+    "line": 1639
   },
   "Start simple, then open the advanced parts only when you need them.": {
     "kind": "text",
-    "line": 1624
+    "line": 1640
   },
   "Use this page to decide what to click first, how keyword matching works, and where profiles, backups, imports, and device updates belong.": {
     "kind": "text",
-    "line": 1625
+    "line": 1641
   },
   "Search help...": {
     "kind": "placeholder",
-    "line": 1631
+    "line": 1647
   },
   "No help topics match your search.": {
     "kind": "text",
-    "line": 1632
+    "line": 1648
   },
   "FilterTube parent quick start": {
     "kind": "aria-label",
-    "line": 1636
+    "line": 1652
   },
   "Parent setup in plain words": {
     "kind": "text",
-    "line": 1639
+    "line": 1655
   },
   "Do these first. You can ignore advanced sync, imports, and backup settings until the basic rules feel right.": {
     "kind": "text",
-    "line": 1640
+    "line": 1656
   },
   "Add what you never want to see": {
     "kind": "text",
-    "line": 1645
+    "line": 1661
   },
   "Use Filters for keywords and channels. Start with a few obvious rules, then test them on a few pages.": {
     "kind": "text",
-    "line": 1646
+    "line": 1662
   },
   "Use Exact only for short words": {
     "kind": "text",
-    "line": 1650
+    "line": 1666
   },
   "Exact off is broader. Exact on is stricter and helps avoid false matches for small words.": {
     "kind": "text",
-    "line": 1651
+    "line": 1667
   },
   "Create a protected profile": {
     "kind": "text",
-    "line": 1655
+    "line": 1671
   },
   "Use Accounts & Sync when a child or family member needs their own rules, viewing space, PIN, or time limit.": {
     "kind": "text",
-    "line": 1656
+    "line": 1672
   },
   "Send updates only after rules look right": {
     "kind": "text",
-    "line": 1660
+    "line": 1676
   },
   "Use Send Update when both devices are open. Use Pickup only if the other verified device must collect the update later.": {
     "kind": "text",
-    "line": 1661
+    "line": 1677
   },
   "FilterTube Feature Guide": {
     "kind": "text",
-    "line": 1668
+    "line": 1684
   },
   "Start here for the main filtering, focus, migration, and page behavior controls.": {
     "kind": "text",
-    "line": 1671
+    "line": 1687
   },
   "Use the detailed Help sections below whenever you need the full behavior or safety boundary.": {
     "kind": "text",
-    "line": 1671
+    "line": 1687
   },
   "Self-Control Sessions and time limits for every profile": {
     "kind": "text",
-    "line": 1674
+    "line": 1690
   },
   "Any profile can have its own daily viewing time. The popup shows the remaining daily time, and an exhausted profile receives the full-page serene pause screen. Separately, Settings now offers a Self-Control Session that pins the active profile and freezes its current filters until a non-cancellable countdown ends.": {
     "kind": "text",
-    "line": 1675
+    "line": 1691
   },
   "Blocked and Always allowed rule collections": {
     "kind": "text",
-    "line": 1678
+    "line": 1694
   },
   "Main and Kids each keep independent Blocked and Allowed rule collections. Opening a collection only chooses which saved rules you are editing; it does not change the active": {
     "kind": "text",
-    "line": 1679
+    "line": 1695
   },
   "Blocklist": {
     "kind": "text",
-    "line": 1679
+    "line": 1695
   },
   "Whitelist": {
     "kind": "text",
-    "line": 1679
+    "line": 1695
   },
   "mode. Quick additions in the popup follow the active mode, while advanced exceptions stay in the full Filters page.": {
     "kind": "text",
-    "line": 1679
+    "line": 1695
   },
   "Direct-access and description checks": {
     "kind": "text",
-    "line": 1682
+    "line": 1698
   },
   "Blocked Watch, Clips, channel, playlist/autoplay, and embedded-player routes cannot bypass the active rules. FilterTube reuses the page's loaded Player response and visible Watch description before considering another metadata lookup, so ordinary blocklist playback is not held merely because a complete description is still missing. Allow-only mode remains safer and waits when identity is required.": {
     "kind": "text",
-    "line": 1683
+    "line": 1699
   },
   "Send adverts to The Void": {
     "kind": "text",
-    "line": 1686
+    "line": 1702
   },
   "This default-on control filters advert plans and sponsored items on Main and Kids in both Blocklist and Whitelist modes. On desktop watch pages,": {
     "kind": "text",
-    "line": 1687
+    "line": 1703
   },
   "Content-only playback": {
     "kind": "text",
-    "line": 1687
+    "line": 1703
   },
   "can choose the main-video source once when needed, then leave playback to the player’s own controls, captions, audio choices and playlist. A healthy video stays untouched. Turning Content-only playback off keeps ordinary playback; it does not enable repeated hidden seeking or resume attempts. Other surfaces retain their existing advert fallback, without automatically resuming paused content. Parent and Kids filtering rules still apply. For troubleshooting,": {
     "kind": "text",
-    "line": 1687
+    "line": 1703
   },
   "player-ad-plan-removed": {
     "kind": "text",
-    "line": 1687
+    "line": 1703
   },
   "in the latest 100": {
     "kind": "text",
-    "line": 1687
+    "line": 1703
   },
   "window.__filtertubeAdVoidLog": {
     "kind": "text",
-    "line": 1687
+    "line": 1703
   },
   "events confirms observed advert-data removal; it does not prove every advert was prevented.": {
     "kind": "text",
-    "line": 1687
+    "line": 1703
   },
   "Safer complete BlockTube migration": {
     "kind": "text",
-    "line": 1690
+    "line": 1706
   },
   "Large BlockTube JSON exports are previewed, capacity-checked, applied transactionally, read back, and summarized with an apply receipt. A failed write rolls the import back instead of reporting false success. Imported JavaScript is never executed, the BlockTube UI password never becomes a FilterTube PIN, and importing rules does not replace the FilterTube theme. After approval, missing channel names, handles or custom URLs, and avatars are filled one ID at a time by the extension background worker. Closing the dashboard does not stop the queue; browser shutdown, authorization checks, and wakeup limits can delay it.": {
     "kind": "text",
-    "line": 1691
+    "line": 1707
   },
   "Official category filtering": {
     "kind": "text",
-    "line": 1694
+    "line": 1710
   },
   "Category Filters now use the official video category, have their own independent Block/Allow-only mode, appear below Core in full Content Controls, and are also available in the popup. Nearby uncached cards are checked in small bounded batches so FilterTube does not continuously request metadata.": {
     "kind": "text",
-    "line": 1695
+    "line": 1711
   },
   "Spoken-language filtering (Experimental)": {
     "kind": "text",
-    "line": 1698
+    "line": 1714
   },
   "Language Filters prefer the original/default spoken-audio evidence. Auto-dubbed alternatives do not change the source language. For captionless videos, FilterTube can use strong writing-system evidence from creator-supplied Player metadata; weak or ambiguous text remains unknown. Category and language checks share one paced Player-metadata request and one cache entry per video.": {
     "kind": "text",
-    "line": 1699
+    "line": 1715
   },
   "Always use original audio (Experimental)": {
     "kind": "text",
-    "line": 1702
+    "line": 1718
   },
   "This separate Player control changes only the currently playing video's audio track. It reuses the page's loaded Player response and in-page player API to prefer a proven original track over an automatic dub. It makes no extra request, never delays playback, and leaves the current audio unchanged when the original cannot be proven.": {
     "kind": "text",
-    "line": 1703
+    "line": 1719
   },
   "Current Watch, auto playlist, comments, and page layouts": {
     "kind": "text",
-    "line": 1706
+    "line": 1722
   },
   "Current camelCase video lockups and Watch recommendations are recognized without treating comments, navigation chips, or auto playlist queue rows as ordinary category-owned videos. An auto playlist discovery card can use its seed video's identity, including for faster 3-dot channel actions, without copying that identity to every queue item.": {
     "kind": "text",
-    "line": 1707
+    "line": 1723
   },
   "Category Filters Are Working": {
     "kind": "text",
-    "line": 1715
+    "line": 1731
   },
   "Category Filters use the official category supplied for each video.": {
     "kind": "text",
-    "line": 1718
+    "line": 1734
   },
   "Open": {
     "kind": "text",
-    "line": 1718
+    "line": 1734
   },
   ", find the Category Filters card directly below Core, choose categories, select a mode, and turn the filter on. The same controls are also available in the extension popup.": {
     "kind": "text",
-    "line": 1718
+    "line": 1734
   },
   "Block selected": {
     "kind": "text",
-    "line": 1721
+    "line": 1737
   },
   "Selected categories are hidden. Videos in every other resolved category remain visible.": {
     "kind": "text",
-    "line": 1722
+    "line": 1738
   },
   "Allow only selected": {
     "kind": "text",
-    "line": 1725
+    "line": 1741
   },
   "Only videos whose resolved category is selected are shown. Unknown cards stay covered while FilterTube checks their category, so unrelated videos should not flash briefly and disappear later.": {
     "kind": "text",
-    "line": 1726
+    "line": 1742
   },
   "This mode is independent": {
     "kind": "text",
-    "line": 1729
+    "line": 1745
   },
   "The category mode does not change the profile's normal Blocklist or Whitelist mode. For example, a Blocklist profile can still use": {
     "kind": "text",
-    "line": 1730
+    "line": 1746
   },
   "Allow only Education and Gaming": {
     "kind": "text",
-    "line": 1730
+    "line": 1746
   },
   "for categories.": {
     "kind": "text",
-    "line": 1730
+    "line": 1746
   },
   "Where it applies": {
     "kind": "text",
-    "line": 1733
+    "line": 1749
   },
   "FilterTube applies resolved categories to ordinary video cards, the current Watch video, and Watch recommendations. An auto playlist discovery card may use its seed video's category, but playlist and auto playlist queue rows are not treated as separate category-owned videos. Comments are never category-filter targets.": {
     "kind": "text",
-    "line": 1734
+    "line": 1750
   },
   "Why a card may load briefly": {
     "kind": "text",
-    "line": 1737
+    "line": 1753
   },
   "Home and Search responses often omit category. FilterTube checks only nearby cards through the structured Player response, reuses saved results, and limits requests to small batches. A short loading veil is expected on uncached cards; repeated “Category unavailable” cards are not normal.": {
     "kind": "text",
-    "line": 1738
+    "line": 1754
   },
   "Filter Videos By Spoken Language (Experimental)": {
     "kind": "text",
-    "line": 1745
+    "line": 1761
   },
   "Language Filters prefer the language linked to the video's default audio track.": {
     "kind": "text",
-    "line": 1747
+    "line": 1763
   },
   "For captionless videos, strong script evidence in creator-supplied Player metadata can provide a fallback. Find this experimental card at the bottom of": {
     "kind": "text",
-    "line": 1747
+    "line": 1763
   },
   ", then turn it on to choose": {
     "kind": "text",
-    "line": 1747
+    "line": 1763
   },
   "and select languages from the visible pills. Turning the filter off collapses the picker but keeps your saved selection. Unknown-language videos remain visible, and Kids is not filtered by language yet. Main controls are also available in the popup.": {
     "kind": "text",
-    "line": 1747
+    "line": 1763
   },
   "What counts as the language?": {
     "kind": "text",
-    "line": 1749
+    "line": 1765
   },
   "FilterTube first uses the explicit original/default audio-format metadata, excluding auto-dubbed alternatives, then its audio/caption-track mapping. If those are absent, it can accept strong writing-system evidence from the title, description, and tags inside the same Player response—for example, dominant Russian Cyrillic text. It does not use the interface language, country, channel locale, or translated-subtitle menu.": {
     "kind": "text",
-    "line": 1749
+    "line": 1765
   },
   "A resolved matching language is hidden. A video whose language is unavailable stays visible.": {
     "kind": "text",
-    "line": 1750
+    "line": 1766
   },
   "A resolved nonmatching language is blocked. While language evidence is loading—or if it remains unavailable—the page stays usable instead of being blanked or pausing playback.": {
     "kind": "text",
-    "line": 1751
+    "line": 1767
   },
   "Why this does not double requests": {
     "kind": "text",
-    "line": 1752
+    "line": 1768
   },
   "FilterTube first reuses a Player response already loaded by the page. If a visible uncached card needs more information, category, language, description, dates, and identity needs are merged into one paced request for that video and then cached.": {
     "kind": "text",
-    "line": 1752
+    "line": 1768
   },
   "Current boundary": {
     "kind": "text",
-    "line": 1753
+    "line": 1769
   },
   "This control applies to Main. Kids does not show it until Kids responses provide equally reliable default-audio evidence. A dubbed video follows the selected default track.": {
     "kind": "text",
-    "line": 1753
+    "line": 1769
   },
   "Always Use Original Audio (Experimental)": {
     "kind": "text",
-    "line": 1759
+    "line": 1775
   },
   "This is a playback preference, not a language filter.": {
     "kind": "text",
-    "line": 1761
+    "line": 1777
   },
   "Filters > Content Controls > Player": {
     "kind": "text",
-    "line": 1761
+    "line": 1777
   },
   "and enable": {
     "kind": "text",
-    "line": 1761
+    "line": 1777
   },
   ". On Main, FilterTube will prefer the creator's proven original track instead of an automatic dub.": {
     "kind": "text",
-    "line": 1761
+    "line": 1777
   },
   "What changes?": {
     "kind": "text",
-    "line": 1763
+    "line": 1779
   },
   "Only the audio track selected in the current player. Search results, recommendations, translated titles and descriptions, captions, and filtering rules do not change.": {
     "kind": "text",
-    "line": 1763
+    "line": 1779
   },
   "Does it make another request?": {
     "kind": "text",
-    "line": 1764
+    "line": 1780
   },
   "No. FilterTube reads the Player response the page already loaded, then uses the player's own in-page audio-track controls. There is no caption download, language lookup, or repeated network polling.": {
     "kind": "text",
-    "line": 1764
+    "line": 1780
   },
   "What if the original is unclear?": {
     "kind": "text",
-    "line": 1765
+    "line": 1781
   },
   "Playback continues normally. FilterTube does not guess from the title or channel and does not show a checking screen. It acts only when a non-auto-dubbed original/source track can be matched uniquely.": {
     "kind": "text",
-    "line": 1765
+    "line": 1781
   },
   "The experimental preference applies to Main Watch playback, including SPA navigation and playlist or autoplay transitions. Kids is excluded until its Player data exposes equally reliable original-track evidence.": {
     "kind": "text",
-    "line": 1766
+    "line": 1782
   },
   "Control Another Device In Plain Words": {
     "kind": "text",
-    "line": 1773
+    "line": 1789
   },
   "Your own device:": {
     "kind": "text",
-    "line": 1776
+    "line": 1792
   },
   "choose": {
     "kind": "text",
-    "line": 1776
+    "line": 1792
   },
   "to copy the profile currently open. No protected profile or PIN is required. Switch profiles first when you want to copy a different independent profile.": {
     "kind": "text",
-    "line": 1776
+    "line": 1792
   },
   "Choose a device:": {
     "kind": "text",
-    "line": 1777
+    "line": 1793
   },
   "code or QR works from the same room or across the internet while both devices are open. For a nearby picker, run the optional FilterTube helper on both computers, then use": {
     "kind": "text",
-    "line": 1777
+    "line": 1793
   },
   "Family control:": {
     "kind": "text",
-    "line": 1778
+    "line": 1794
   },
   "use the steps below when a child, family member, or protected device should receive rules managed from the parent side.": {
     "kind": "text",
-    "line": 1778
+    "line": 1794
   },
   "Family device control steps": {
     "kind": "aria-label",
-    "line": 1779
+    "line": 1795
   },
   "Make a protected profile": {
     "kind": "text",
-    "line": 1782
+    "line": 1798
   },
   "Set its Main/Kids access, blocked words, blocked channels, whitelist rules, and time limit here first.": {
     "kind": "text",
-    "line": 1783
+    "line": 1799
   },
   "Pair once with code or QR": {
     "kind": "text",
-    "line": 1787
+    "line": 1803
   },
   "Both devices must show the same safety phrase. Being nearby or on the same network is not enough.": {
     "kind": "text",
-    "line": 1788
+    "line": 1804
   },
   "Use Send Update while both devices are open. The protected device checks the saved parent link before applying anything.": {
     "kind": "text",
-    "line": 1793
+    "line": 1809
   },
   "Pickup later is optional": {
     "kind": "text",
-    "line": 1797
+    "line": 1813
   },
   "Same-network or away pickup only helps a verified device collect a signed update later. It does not grant control by itself.": {
     "kind": "text",
-    "line": 1798
+    "line": 1814
   },
   "Family device safety notes": {
     "kind": "aria-label",
-    "line": 1801
+    "line": 1817
   },
   "Parent or Master PIN": {
     "kind": "text",
-    "line": 1802
+    "line": 1818
   },
   "Unlocks rules, time limits, trusted devices, backups, and profile policy.": {
     "kind": "text",
-    "line": 1802
+    "line": 1818
   },
   "Kids profile PIN": {
     "kind": "text",
-    "line": 1803
+    "line": 1819
   },
   "Only protects switching into that profile, so siblings or other users cannot casually open it.": {
     "kind": "text",
-    "line": 1803
+    "line": 1819
   },
   "Nearby vs verified": {
     "kind": "text",
-    "line": 1804
+    "line": 1820
   },
   "Nearby means reachable. Verified means this device is allowed to receive signed parent updates.": {
     "kind": "text",
-    "line": 1804
+    "line": 1820
   },
   "Nearby helper": {
     "kind": "text",
-    "line": 1805
+    "line": 1821
   },
   "Shows opted-in FilterTube devices on the same network. It never sends rules or creates trust; pairing still needs the matching safety phrase.": {
     "kind": "text",
-    "line": 1805
+    "line": 1821
   },
   "Common Parent Questions": {
     "kind": "text",
-    "line": 1813
+    "line": 1829
   },
   "Where do I add a blocked word?": {
     "kind": "text",
-    "line": 1818
+    "line": 1834
   },
   "Filters": {
     "kind": "text",
-    "line": 1819
+    "line": 1835
   },
   ", add the word under Keywords, then reload or navigate the page once. Use the Comment pill only if that word should also filter comments.": {
     "kind": "text",
-    "line": 1819
+    "line": 1835
   },
   "What does Exact mean?": {
     "kind": "text",
-    "line": 1822
+    "line": 1838
   },
   "Exact off:": {
     "kind": "text",
-    "line": 1823
+    "line": 1839
   },
   "broader matching, so": {
     "kind": "text",
-    "line": 1823
+    "line": 1839
   },
   "poop": {
     "kind": "text",
-    "line": 1823
+    "line": 1839
   },
   "can also catch text like": {
     "kind": "text",
-    "line": 1823
+    "line": 1839
   },
   "poops": {
     "kind": "text",
-    "line": 1823
+    "line": 1839
   },
   "pooping": {
     "kind": "text",
-    "line": 1823
+    "line": 1839
   },
   "when the page exposes that text.": {
     "kind": "text",
-    "line": 1823
+    "line": 1839
   },
   "Exact on:": {
     "kind": "text",
-    "line": 1823
+    "line": 1839
   },
   "stricter matching, so": {
     "kind": "text",
-    "line": 1823
+    "line": 1839
   },
   "matches as its own word only.": {
     "kind": "text",
-    "line": 1823
+    "line": 1839
   },
   "What does Date mean on a keyword?": {
     "kind": "text",
-    "line": 1826
+    "line": 1842
   },
   "Use the": {
     "kind": "text",
-    "line": 1827
+    "line": 1843
   },
   "Date": {
     "kind": "text",
-    "line": 1827
+    "line": 1843
   },
   "pill only when that one word should apply to videos from a certain upload date. Example:": {
     "kind": "text",
-    "line": 1827
+    "line": 1843
   },
   "Deltarune": {
     "kind": "text",
-    "line": 1827
+    "line": 1843
   },
   "after": {
     "kind": "text",
-    "line": 1827
+    "line": 1843
   },
   "2025-06-10": {
     "kind": "text",
-    "line": 1827
+    "line": 1843
   },
   "blocks newer Deltarune videos but leaves older ones alone. If the Comment pill is also on, matching comments follow the video's upload date, not the comment's posted date. The Date pill should only stay active after you save a valid date.": {
     "kind": "text",
-    "line": 1827
+    "line": 1843
   },
   "Where do I block a channel?": {
     "kind": "text",
-    "line": 1830
+    "line": 1846
   },
   "Use the 3-dot menu on a video or add the channel in": {
     "kind": "text",
-    "line": 1831
+    "line": 1847
   },
   "Filters > Channels": {
     "kind": "text",
-    "line": 1831
+    "line": 1847
   },
   ". A stable": {
     "kind": "text",
-    "line": 1831
+    "line": 1847
   },
   "channel ID is best, but handles and channel URLs are supported.": {
     "kind": "text",
-    "line": 1831
+    "line": 1847
   },
   "How do I limit viewing time?": {
     "kind": "text",
-    "line": 1834
+    "line": 1850
   },
   "Accounts & Sync": {
     "kind": "text",
-    "line": 1835
+    "line": 1851
   },
   ", create or choose a protected profile, then use": {
     "kind": "text",
-    "line": 1835
+    "line": 1851
   },
   "Set limit": {
     "kind": "text",
-    "line": 1835
+    "line": 1851
   },
   ". When time is finished, the page shows a calm FilterTube screen until the next reset or parent approval.": {
     "kind": "text",
-    "line": 1835
+    "line": 1851
   },
   "Can I hide update notifications?": {
     "kind": "text",
-    "line": 1838
+    "line": 1854
   },
   "Settings > Extension updates": {
     "kind": "text",
-    "line": 1839
+    "line": 1855
   },
   "and turn on": {
     "kind": "text",
-    "line": 1839
+    "line": 1855
   },
   ". This hides automatic reload reminders and What’s New banners on Main and Kids. The dashboard’s": {
     "kind": "text",
-    "line": 1839
+    "line": 1855
   },
   "What’s New": {
     "kind": "text",
-    "line": 1839
+    "line": 1855
   },
   "page remains available whenever you want to read it.": {
     "kind": "text",
-    "line": 1839
+    "line": 1855
   },
   "Can my child change these settings?": {
     "kind": "text",
-    "line": 1842
+    "line": 1858
   },
   "Not from a protected profile. A protected profile can watch within its rules, but it cannot change rules, PINs, trusted devices, viewing spaces, backups, or time limits without parent/account authority.": {
     "kind": "text",
-    "line": 1843
+    "line": 1859
   },
   "Why are there two PINs for a Kids profile?": {
     "kind": "text",
-    "line": 1846
+    "line": 1862
   },
   "They do different jobs. The parent/account or Master PIN controls rules, time limits, viewing access, trusted devices, and backups.": {
     "kind": "text",
-    "line": 1847
+    "line": 1863
   },
   "The child/profile PIN only protects opening that profile, so siblings or any other user cannot casually switch into it. It never grants rule-editing power.": {
     "kind": "text",
-    "line": 1847
+    "line": 1863
   },
   "Can I edit child rules without touching the child device?": {
     "kind": "text",
-    "line": 1850
+    "line": 1866
   },
   "Yes. From the parent/account profile, open": {
     "kind": "text",
-    "line": 1851
+    "line": 1867
   },
   ", choose the protected profile row, then select": {
     "kind": "text",
-    "line": 1851
+    "line": 1867
   },
   "Edit Rules": {
     "kind": "text",
-    "line": 1851
+    "line": 1867
   },
   ". FilterTube opens that child profile in parent-managed edit mode on your device. When the rules look right, send them to the verified child device.": {
     "kind": "text",
-    "line": 1851
+    "line": 1867
   },
   "How do I update their other device?": {
     "kind": "text",
-    "line": 1854
+    "line": 1870
   },
   "Start with": {
     "kind": "text",
-    "line": 1855
+    "line": 1871
   },
   "while both devices are open. After the protected device saves the parent link, Pickup can let that verified device collect a signed parent update when it opens later. The device still checks the saved parent link before applying anything.": {
     "kind": "text",
-    "line": 1855
+    "line": 1871
   },
   "Where do imported lists go?": {
     "kind": "text",
-    "line": 1858
+    "line": 1874
   },
   "Settings > Rule list imports": {
     "kind": "text",
-    "line": 1859
+    "line": 1875
   },
   ". Choose Main, Kids, or Both before applying. CSV, TXT, and FilterTube rule-list files add channel and keyword rules; BlockTube migration JSON also imports its supported Main video IDs and safe setting mappings. Missing names, handles/custom URLs, and avatars are completed after approval in a slow persisted queue, regardless of import format. Files cannot change PINs, devices, profiles, time limits, or access.": {
     "kind": "text",
-    "line": 1859
+    "line": 1875
   },
   "What should I avoid touching at first?": {
     "kind": "text",
-    "line": 1862
+    "line": 1878
   },
   "Leave device Pickup, full-account sync, import/export, and advanced profile policy alone until basic blocking works. They are useful, but not required for day-one setup.": {
     "kind": "text",
-    "line": 1863
+    "line": 1879
   },
   "Which Page Do I Use?": {
     "kind": "text",
-    "line": 1871
+    "line": 1887
   },
   "FilterTube page map": {
     "kind": "aria-label",
-    "line": 1874
+    "line": 1890
   },
   "See status and the buttons parents use most.": {
     "kind": "text",
-    "line": 1875
+    "line": 1891
   },
   "Block words, channels, comments, clips, and other surfaces.": {
     "kind": "text",
-    "line": 1876
+    "line": 1892
   },
   "Kids Mode": {
     "kind": "text",
-    "line": 1877
+    "line": 1893
   },
   "Manage Kids rules separately.": {
     "kind": "text",
-    "line": 1877
+    "line": 1893
   },
   "Settings": {
     "kind": "text",
-    "line": 1878
+    "line": 1894
   },
   "Start a Self-Control Session, back up, restore, or import rule lists safely.": {
     "kind": "text",
-    "line": 1878
+    "line": 1894
   },
   "Create protected profiles, set PINs, time limits, Main/Kids access, and device updates.": {
     "kind": "text",
-    "line": 1879
+    "line": 1895
   },
   "Button And Badge Glossary": {
     "kind": "text",
-    "line": 1886
+    "line": 1902
   },
   "Optional": {
     "kind": "text",
-    "line": 1887
+    "line": 1903
   },
   "Source badges on rows": {
     "kind": "text",
-    "line": 1892
+    "line": 1908
   },
   "From Channel": {
     "kind": "text",
-    "line": 1895
+    "line": 1911
   },
   "From Comments": {
     "kind": "text",
-    "line": 1896
+    "line": 1912
   },
   "Collaboration": {
     "kind": "text",
-    "line": 1897
+    "line": 1913
   },
   "From Kids": {
     "kind": "text",
-    "line": 1898
+    "line": 1914
   },
   "Badges match row tinting: green for channel-derived, brown for comment-sourced, yellow for collaborations, Pink for Kids Derived.": {
     "kind": "text",
-    "line": 1900
+    "line": 1916
   },
   "Pills & row chips": {
     "kind": "text",
-    "line": 1904
+    "line": 1920
   },
   "Exact": {
     "kind": "text",
-    "line": 1907
+    "line": 1923
   },
   "E": {
     "kind": "text",
-    "line": 1909
+    "line": 1925
   },
   "Exact is whole-term matching.": {
     "kind": "text",
-    "line": 1910
+    "line": 1926
   },
   "Comment": {
     "kind": "text",
-    "line": 1913
+    "line": 1929
   },
   "Comment is opt-in per keyword; turn it on when that keyword should also affect comment text.": {
     "kind": "text",
-    "line": 1916
+    "line": 1932
   },
   "Filter All": {
     "kind": "text",
-    "line": 1919
+    "line": 1935
   },
   "Creates a channel-derived keyword with Exact on the channel name.": {
     "kind": "text",
-    "line": 1920
+    "line": 1936
   },
   "Semantic ML (Future)": {
     "kind": "text",
-    "line": 1923
+    "line": 1939
   },
   "Disabled until local runtime matching is implemented and verified.": {
     "kind": "text",
-    "line": 1924
+    "line": 1940
   },
   "Content control tooltips": {
     "kind": "text",
-    "line": 1929
+    "line": 1945
   },
   "Hover, focus with keyboard/remote, or long-press buttons, toggles, pills, and helpful rows to see what they do. Short clicks still run the normal action, such as changing a setting or opening the Date editor.": {
     "kind": "text",
-    "line": 1930
+    "line": 1946
   },
   "How FilterTube Works": {
     "kind": "text",
-    "line": 1940
+    "line": 1956
   },
   "FilterTube uses two hiding paths so rules keep working as the site changes pages.": {
     "kind": "text",
-    "line": 1944
+    "line": 1960
   },
   "Before a card is drawn": {
     "kind": "text",
-    "line": 1947
+    "line": 1963
   },
   "When the page loads video data through JSON, FilterTube tries to remove blocked items before they appear.": {
     "kind": "text",
-    "line": 1948
+    "line": 1964
   },
   "After the page changes": {
     "kind": "text",
-    "line": 1951
+    "line": 1967
   },
   "The site reuses page pieces while you scroll and navigate. FilterTube checks visible cards again and hides anything that matches your rules.": {
     "kind": "text",
-    "line": 1952
+    "line": 1968
   },
   "FilterTube uses a hybrid approach to hide content across the site:": {
     "kind": "text",
-    "line": 1964
+    "line": 1980
   },
   "Data interception (Zero-flash when possible)": {
     "kind": "text",
-    "line": 1967
+    "line": 1983
   },
   "When the page loads content via JSON, FilterTube removes blocked items before they render.": {
     "kind": "text",
-    "line": 1968
+    "line": 1984
   },
   "DOM fallback (Safety net)": {
     "kind": "text",
-    "line": 1971
+    "line": 1987
   },
   "For SPA navigation, hydration, and recycled DOM nodes, FilterTube scans the page and hides blocked elements.": {
     "kind": "text",
-    "line": 1972
+    "line": 1988
   },
   "Channel ID Details": {
     "kind": "text",
-    "line": 1982
+    "line": 1998
   },
   "UC Channel ID (recommended)": {
     "kind": "text",
-    "line": 1988
+    "line": 2004
   },
   "A stable identifier like": {
     "kind": "text",
-    "line": 1989
+    "line": 2005
   },
   "UCxjr9iAaC5QaIbp5hlERHDQ": {
     "kind": "text",
-    "line": 1989
+    "line": 2005
   },
   ". This is the most reliable way to block a channel.": {
     "kind": "text",
-    "line": 1989
+    "line": 2005
   },
   "@handle (supports unicode)": {
     "kind": "text",
-    "line": 1992
+    "line": 2008
   },
   "Handles like": {
     "kind": "text",
-    "line": 1993
+    "line": 2009
   },
   "@감동메모리": {
     "kind": "text",
-    "line": 1993
+    "line": 2009
   },
   "@BTS": {
     "kind": "text",
-    "line": 1993
+    "line": 2009
   },
   ". FilterTube normalizes percent-encoding and unicode so handles match everywhere.": {
     "kind": "text",
-    "line": 1993
+    "line": 2009
   },
   "Legacy channel URLs": {
     "kind": "text",
-    "line": 1996
+    "line": 2012
   },
   "Some channels appear as": {
     "kind": "text",
-    "line": 1997
+    "line": 2013
   },
   ". FilterTube stores them as normalized": {
     "kind": "text",
-    "line": 1997
+    "line": 2013
   },
   "c/name": {
     "kind": "text",
-    "line": 1997
+    "line": 2013
   },
   "user/name": {
     "kind": "text",
-    "line": 1997
+    "line": 2013
   },
   "and maps them to a": {
     "kind": "text",
-    "line": 1997
+    "line": 2013
   },
   "UC ID": {
     "kind": "text",
-    "line": 1997
+    "line": 2013
   },
   "when possible.": {
     "kind": "text",
-    "line": 1997
+    "line": 2013
   },
   "Keywords": {
     "kind": "text",
-    "line": 2010
+    "line": 2026
   },
   "Add keywords to block or always allow videos whose title, available description, video tags, or visible metadata matches your list. Home and Search often provide only a short description snippet; the complete creator description and tags normally arrive with the Watch/player response. FilterTube reuses that supplied data and does not send a separate description request for every card.": {
     "kind": "text",
-    "line": 2011
+    "line": 2027
   },
   "can catch": {
     "kind": "text",
-    "line": 2015
+    "line": 2031
   },
   "when that text is visible to FilterTube.": {
     "kind": "text",
-    "line": 2015
+    "line": 2031
   },
   "stricter whole-word matching, so": {
     "kind": "text",
-    "line": 2015
+    "line": 2031
   },
   "must appear as its own word. Use Exact for short words that cause false matches.": {
     "kind": "text",
-    "line": 2015
+    "line": 2031
   },
   "Keyword Date pill": {
     "kind": "text",
-    "line": 2018
+    "line": 2034
   },
   "Use Date for one keyword when only newer, older, or date-range videos should be affected. It uses upload/release date evidence when available. If FilterTube cannot prove the video date, that date-limited keyword does not hide the video or matching comments by itself.": {
     "kind": "text",
-    "line": 2019
+    "line": 2035
   },
   "Channels": {
     "kind": "text",
-    "line": 2022
+    "line": 2038
   },
   "Add a channel by": {
     "kind": "text",
-    "line": 2023
+    "line": 2039
   },
   "Channels blocked from the 3-dot menu will appear here automatically.": {
     "kind": "text",
-    "line": 2023
+    "line": 2039
   },
   "Open Settings > Import / Export > Rule list imports. Choose Main, Kids, or Both, then preview a CSV, TXT, raw HTTPS list, FilterTube JSON rule list, or BlockTube migration JSON before applying it. Imported rows are then reviewed and edited from the normal Main/Kids rule pages. Missing channel metadata is enriched slowly after approval for every supported import format, one row at a time.": {
     "kind": "text",
-    "line": 2027
+    "line": 2043
   },
   "Filter All Content (per-channel)": {
     "kind": "text",
-    "line": 2030
+    "line": 2046
   },
   "Adds the channel name as a keyword source so content mentioning that channel is also hidden (useful for auto playlists, reposts, and recommendations).": {
     "kind": "text",
-    "line": 2031
+    "line": 2047
   },
   "Hide Clips": {
     "kind": "text",
-    "line": 2044
+    "line": 2060
   },
   "Hides clip cards across all surfaces.": {
     "kind": "text",
-    "line": 2045
+    "line": 2061
   },
   "Hide All Comments": {
     "kind": "text",
-    "line": 2048
+    "line": 2064
   },
   "Removes comment sections entirely.": {
     "kind": "text",
-    "line": 2049
+    "line": 2065
   },
   "Keyword Comment Pills": {
     "kind": "text",
-    "line": 2052
+    "line": 2068
   },
   "Keywords always apply to video titles and available metadata. Turn on a row's Comment pill when that keyword should also filter matching comment text. If the same keyword has a Date rule, comments use the parent video's upload date; FilterTube does not use the comment's posted date as the video date.": {
     "kind": "text",
-    "line": 2053
+    "line": 2069
   },
   "Watch Page Playlists": {
     "kind": "text",
-    "line": 2061
+    "line": 2077
   },
   "Playlist panel hiding": {
     "kind": "text",
-    "line": 2066
+    "line": 2082
   },
   "FilterTube hides blocked-channel rows inside the watch-page playlist panel, including after refresh and scroll/load-more.": {
     "kind": "text",
-    "line": 2067
+    "line": 2083
   },
   "No-flash Next/Prev skipping": {
     "kind": "text",
-    "line": 2070
+    "line": 2086
   },
   "When Next/Prev would land on a blocked item, FilterTube redirects to the next visible item before playback is visible.": {
     "kind": "text",
-    "line": 2071
+    "line": 2087
   },
   "Backup And Restore Details": {
     "kind": "text",
-    "line": 2081
+    "line": 2097
   },
   "Export": {
     "kind": "text",
-    "line": 2087
+    "line": 2103
   },
   "Full vs Active-only:": {
     "kind": "text",
-    "line": 2090
+    "line": 2106
   },
   "Parent (Default) can export all profiles; other profiles are forced to “Export active profile only”.": {
     "kind": "text",
-    "line": 2090
+    "line": 2106
   },
   "Formats:": {
     "kind": "text",
-    "line": 2091
+    "line": 2107
   },
   "Plain JSON or Encrypted; encrypted exports require a PIN at import.": {
     "kind": "text",
-    "line": 2091
+    "line": 2107
   },
   "Destination:": {
     "kind": "text",
-    "line": 2092
+    "line": 2108
   },
   "with versioned filename.": {
     "kind": "text",
-    "line": 2092
+    "line": 2108
   },
   "Import": {
     "kind": "text",
-    "line": 2097
+    "line": 2113
   },
   "Merges channels/keywords; matching entries update, new ones append. Profiles in the file are restored as-is.": {
     "kind": "text",
-    "line": 2100
+    "line": 2116
   },
   "Encrypted imports prompt for the PIN. Admin-only actions (full restore) require unlocking Master.": {
     "kind": "text",
-    "line": 2101
+    "line": 2117
   },
   "Auto-backup settings and modes from the backup are applied per profile.": {
     "kind": "text",
-    "line": 2102
+    "line": 2118
   },
   "Auto-backup": {
     "kind": "text",
-    "line": 2107
+    "line": 2123
   },
   "Per-profile toggle; mode (Latest/History) and format (Plain/Encrypted/Auto) follow the active profile.": {
     "kind": "text",
-    "line": 2110
+    "line": 2126
   },
   "Backups save to": {
     "kind": "text",
-    "line": 2111
+    "line": 2127
   },
   "Downloads/FilterTube Backup/": {
     "kind": "text",
-    "line": 2111
+    "line": 2127
   },
   ". Encrypted backups require a verified PIN to create.": {
     "kind": "text",
-    "line": 2111
+    "line": 2127
   },
   "On Firefox, encrypted downloads use a fallback save flow so backup export does not fail when the downloads API refuses the file.": {
     "kind": "text",
-    "line": 2112
+    "line": 2128
   },
   "Popup and New Tab both respect lock state: controls disable when locked.": {
     "kind": "text",
-    "line": 2113
+    "line": 2129
   },
   "Advanced Profile and PIN Reference": {
     "kind": "text",
-    "line": 2123
+    "line": 2139
   },
   "Advanced": {
     "kind": "text",
-    "line": 2124
+    "line": 2140
   },
   "Profile types": {
     "kind": "text",
-    "line": 2129
+    "line": 2145
   },
   "Default (Parent):": {
     "kind": "text",
-    "line": 2132
+    "line": 2148
   },
   "Admin for full exports, profile management, and account policy.": {
     "kind": "text",
-    "line": 2132
+    "line": 2148
   },
   "Account:": {
     "kind": "text",
-    "line": 2133
+    "line": 2149
   },
   "Independent profile; can manage protected profiles.": {
     "kind": "text",
-    "line": 2133
+    "line": 2149
   },
   "Protected profile:": {
     "kind": "text",
-    "line": 2134
+    "line": 2150
   },
   "Private viewing profile with its own Main/Kids rules; rule editing and settings stay parent-managed.": {
     "kind": "text",
-    "line": 2134
+    "line": 2150
   },
   "Parent-managed protected editing:": {
     "kind": "text",
-    "line": 2135
+    "line": 2151
   },
   "A parent/account profile can use a protected profile row’s": {
     "kind": "text",
-    "line": 2135
+    "line": 2151
   },
   "action without switching into that protected profile.": {
     "kind": "text",
-    "line": 2135
+    "line": 2151
   },
   "Locks & PINs": {
     "kind": "text",
-    "line": 2140
+    "line": 2156
   },
   "Locked profiles disable toggles and auto-backup controls until unlocked.": {
     "kind": "text",
-    "line": 2143
+    "line": 2159
   },
   "Encrypted exports/backups need the profile’s PIN; Master unlock is required for admin actions.": {
     "kind": "text",
-    "line": 2144
+    "line": 2160
   },
   "Protected-profile PINs protect switching into that profile and can open receive-only Accounts & Sync; they do not grant parent/admin authority.": {
     "kind": "text",
-    "line": 2145
+    "line": 2161
   },
   "Parent/account or Master PIN controls rule edits, allowed viewing spaces, time limits, backups, trusted-link policy, and settings.": {
     "kind": "text",
-    "line": 2146
+    "line": 2162
   },
   "Parents can set or remove a protected profile’s switching PIN from the parent/account profile row after parent/account unlock.": {
     "kind": "text",
-    "line": 2147
+    "line": 2163
   },
   "in Security when you want temporary parent/admin unlocks to end immediately on this dashboard.": {
     "kind": "text",
-    "line": 2148
+    "line": 2164
   },
   "Opening receive-only Accounts & Sync with a protected-profile PIN does not unlock Controls, Filters, Kids Mode, Settings, or parent controls after you return to the viewing surface.": {
     "kind": "text",
-    "line": 2149
+    "line": 2165
   },
   "Unlock is per-session in both Popup and New Tab.": {
     "kind": "text",
-    "line": 2150
+    "line": 2166
   },
   "Auto-backup & actions": {
     "kind": "text",
-    "line": 2155
+    "line": 2171
   },
   "New profiles inherit the creator’s auto-backup mode/format/enable state.": {
     "kind": "text",
-    "line": 2158
+    "line": 2174
   },
   "Scheduling runs on profile creation and mode/format changes only if auto-backup is enabled for that profile.": {
     "kind": "text",
-    "line": 2159
+    "line": 2175
   },
   "Export scope toggle is disabled/forced to active-only for other profiles; enabled for Parent.": {
     "kind": "text",
-    "line": 2160
+    "line": 2176
   },
   "Where to change things": {
     "kind": "text",
-    "line": 2165
+    "line": 2181
   },
   "Popup:": {
     "kind": "text",
-    "line": 2168
+    "line": 2184
   },
   "Quick toggle changes; respects locks/PINs; auto-backup controls visible when enabled.": {
     "kind": "text",
-    "line": 2168
+    "line": 2184
   },
   "New Tab:": {
     "kind": "text",
-    "line": 2169
+    "line": 2185
   },
   "Full profile management (create/rename/delete, PIN set/remove), export/import, auto-backup mode/format.": {
     "kind": "text",
-    "line": 2169
+    "line": 2185
   },
   "Family Controls In Plain Words": {
     "kind": "text",
-    "line": 2181
+    "line": 2197
   },
   "For this device only": {
     "kind": "text",
-    "line": 2186
+    "line": 2202
   },
   "Add keywords and channels in Filters. No pairing or Pickup setup is needed when the child uses this same browser profile.": {
     "kind": "text",
-    "line": 2187
+    "line": 2203
   },
   "For a protected profile": {
     "kind": "text",
-    "line": 2190
+    "line": 2206
   },
   "Use Accounts & Sync to create the profile, choose Main/Kids access, set a daily time limit, then edit the profile's rules from the parent side.": {
     "kind": "text",
-    "line": 2191
+    "line": 2207
   },
   "For another device": {
     "kind": "text",
-    "line": 2194
+    "line": 2210
   },
   "Open both devices, pair with the short code, confirm the same safety phrase, then send the update. Save the parent link only on devices you trust.": {
     "kind": "text",
-    "line": 2195
+    "line": 2211
   },
   "For later updates": {
     "kind": "text",
-    "line": 2198
+    "line": 2214
   },
   "If Pickup is configured, a verified protected device can collect signed parent updates when it opens later. Without Pickup, open both devices and send again.": {
     "kind": "text",
-    "line": 2199
+    "line": 2215
   },
   "What protected users cannot change": {
     "kind": "text",
-    "line": 2202
+    "line": 2218
   },
   "They cannot change rules, parent PINs, trusted devices, backups, viewing-space access, sync targets, or time limits from the protected surface.": {
     "kind": "text",
-    "line": 2203
+    "line": 2219
   },
   "Parent managed profile update flow": {
     "kind": "aria-label",
-    "line": 2206
+    "line": 2222
   },
   "Hard part made simple": {
     "kind": "text",
-    "line": 2208
+    "line": 2224
   },
   "Parent edits here. Child device receives later.": {
     "kind": "text",
-    "line": 2209
+    "line": 2225
   },
   "The parent device can open a protected profile in edit mode without becoming that child. The child device only receives the signed update after it has been paired and trusted.": {
     "kind": "text",
-    "line": 2210
+    "line": 2226
   },
   "Edit protected profile": {
     "kind": "text",
-    "line": 2215
+    "line": 2231
   },
   "Use the protected row's Edit Rules button.": {
     "kind": "text",
-    "line": 2216
+    "line": 2232
   },
   "Parent authority": {
     "kind": "text",
-    "line": 2219
+    "line": 2235
   },
   "Save rules, time, access": {
     "kind": "text",
-    "line": 2220
+    "line": 2236
   },
   "Parent/account unlock controls the edit.": {
     "kind": "text",
-    "line": 2221
+    "line": 2237
   },
   "Verified device": {
     "kind": "text",
-    "line": 2224
+    "line": 2240
   },
   "Send now or Pickup later": {
     "kind": "text",
-    "line": 2225
+    "line": 2241
   },
   "The child device applies only newer signed parent updates.": {
     "kind": "text",
-    "line": 2226
+    "line": 2242
   },
   "The child/profile PIN is only a switching guard for that profile. It helps stop siblings or any other user from opening it, but it is not the parent PIN and cannot grant rule-editing power.": {
     "kind": "text",
-    "line": 2229
+    "line": 2245
   },
   "Family Devices map labels": {
     "kind": "aria-label",
-    "line": 2231
+    "line": 2247
   },
   "Device map words": {
     "kind": "text",
-    "line": 2233
+    "line": 2249
   },
   "What the Family Devices map means": {
     "kind": "text",
-    "line": 2234
+    "line": 2250
   },
   ". The other paths are only for devices that were already paired and trusted.": {
     "kind": "text",
-    "line": 2235
+    "line": 2251
   },
   "Both devices are open. Pair, match the phrase, then send.": {
     "kind": "text",
-    "line": 2238
+    "line": 2254
   },
   "A verified device can collect from a trusted local pickup setup.": {
     "kind": "text",
-    "line": 2239
+    "line": 2255
   },
   "A verified device can collect a signed parent update after it opens later.": {
     "kind": "text",
-    "line": 2240
+    "line": 2256
   },
   "The parent sent an update, but the protected device has not collected it yet.": {
     "kind": "text",
-    "line": 2241
+    "line": 2257
   },
   "Device Update Details": {
     "kind": "text",
-    "line": 2249
+    "line": 2265
   },
   "Family Devices": {
     "kind": "text",
-    "line": 2255
+    "line": 2271
   },
   "Open this only when you want the detailed device-update model used by implementation and audit docs.": {
     "kind": "text",
-    "line": 2256
+    "line": 2272
   },
   "Advanced delivery": {
     "kind": "text",
-    "line": 2259
+    "line": 2275
   },
   "Home Pickup and Internet Pickup are optional setup paths for verified devices that cannot stay open for Send Update. They are not required for normal parent control.": {
     "kind": "text",
-    "line": 2260
+    "line": 2276
   },
   "Three simple ways to send updates": {
     "kind": "text",
-    "line": 2267
+    "line": 2283
   },
   "This profile:": {
     "kind": "text",
-    "line": 2270
+    "line": 2286
   },
   "Best for your own second device. Pair, verify, send, and let the other device review the update.": {
     "kind": "text",
-    "line": 2270
+    "line": 2286
   },
   "Protected device:": {
     "kind": "text",
-    "line": 2271
+    "line": 2287
   },
   "Best for parent/caregiver control. Pick the protected profile once, then save parent trust.": {
     "kind": "text",
-    "line": 2271
+    "line": 2287
   },
   "Full account:": {
     "kind": "text",
-    "line": 2272
+    "line": 2288
   },
   "Use only for migration, reinstall recovery, or the wider account tree.": {
     "kind": "text",
-    "line": 2272
+    "line": 2288
   },
   "Protected receive-only:": {
     "kind": "text",
-    "line": 2273
+    "line": 2289
   },
   "Protected profiles can join a parent code and receive updates, but cannot send, save trust policy, move backups, or unlock parent controls from that page.": {
     "kind": "text",
-    "line": 2273
+    "line": 2289
   },
   "The": {
     "kind": "text",
-    "line": 2274
+    "line": 2290
   },
   "section is still there if you need to tune role, scope, or merge/replace manually.": {
     "kind": "text",
-    "line": 2274
+    "line": 2290
   },
   "How the pairing flow works": {
     "kind": "text",
-    "line": 2279
+    "line": 2295
   },
   "Pair:": {
     "kind": "text",
-    "line": 2282
+    "line": 2298
   },
   "Create a 4-character code or QR on one device and join from the other.": {
     "kind": "text",
-    "line": 2282
+    "line": 2298
   },
   "Verify:": {
     "kind": "text",
-    "line": 2283
+    "line": 2299
   },
   "Confirm the same safety phrase on both devices before sending anything.": {
     "kind": "text",
-    "line": 2283
+    "line": 2299
   },
   "Send:": {
     "kind": "text",
-    "line": 2284
+    "line": 2300
   },
   "Share only the scope you want:": {
     "kind": "text",
-    "line": 2284
+    "line": 2300
   },
   "active": {
     "kind": "text",
-    "line": 2284
+    "line": 2300
   },
   "main": {
     "kind": "text",
-    "line": 2284
+    "line": 2300
   },
   "kids": {
     "kind": "text",
-    "line": 2284
+    "line": 2300
   },
   "full": {
     "kind": "text",
-    "line": 2284
+    "line": 2300
   },
   "Simplest mental model:": {
     "kind": "text",
-    "line": 2285
+    "line": 2301
   },
   "Pair, verify, send once, then save trust only if this protected device should receive future approved updates.": {
     "kind": "text",
-    "line": 2285
+    "line": 2301
   },
   "Quick start for parents": {
     "kind": "text",
-    "line": 2290
+    "line": 2306
   },
   "Choose": {
     "kind": "text",
-    "line": 2293
+    "line": 2309
   },
   "on the parent device.": {
     "kind": "text",
-    "line": 2293
+    "line": 2309
   },
   "Connect once and confirm the same safety phrase.": {
     "kind": "text",
-    "line": 2294
+    "line": 2310
   },
   "Pick the protected profile in": {
     "kind": "text",
-    "line": 2295
+    "line": 2311
   },
   "on the parent side.": {
     "kind": "text",
-    "line": 2295
+    "line": 2311
   },
   "On the first managed connection, the protected device may still need one local unlock step to save the parent link for that profile.": {
     "kind": "text",
-    "line": 2296
+    "line": 2312
   },
   "After you choose": {
     "kind": "text",
-    "line": 2297
+    "line": 2313
   },
   "Apply + Save Parent Link": {
     "kind": "text",
-    "line": 2297
+    "line": 2313
   },
   ", later signed parent updates can reuse that target and policy instead of asking the protected user to reconfigure everything again.": {
     "kind": "text",
-    "line": 2297
+    "line": 2313
   },
   "What is private and what is not": {
     "kind": "text",
-    "line": 2302
+    "line": 2318
   },
   "The meeting service only helps both devices find each other. Think of it as a meeting place, not a place where your settings live.": {
     "kind": "text",
-    "line": 2305
+    "line": 2321
   },
   "After the secure handshake, your settings are meant to move directly from one device to the other.": {
     "kind": "text",
-    "line": 2306
+    "line": 2322
   },
   "FilterTube does not need a central sync account to read or store your Nanah settings traffic.": {
     "kind": "text",
-    "line": 2307
+    "line": 2323
   },
   "There is no product goal here around reading your synced rules or chasing user-count analytics from your private settings.": {
     "kind": "text",
-    "line": 2308
+    "line": 2324
   },
   "You should still trust only your own devices and confirm the same safety phrase before applying anything.": {
     "kind": "text",
-    "line": 2309
+    "line": 2325
   },
   "Device roles and trust": {
     "kind": "text",
-    "line": 2314
+    "line": 2330
   },
   "My other device:": {
     "kind": "text",
-    "line": 2317
+    "line": 2333
   },
   "Best for one-off syncing between your own equal devices.": {
     "kind": "text",
-    "line": 2317
+    "line": 2333
   },
   "This device controls another profile:": {
     "kind": "text",
-    "line": 2318
+    "line": 2334
   },
   "Use this on the parent/caregiver device that sends future protected-device updates.": {
     "kind": "text",
-    "line": 2318
+    "line": 2334
   },
   "This device receives protected updates:": {
     "kind": "text",
-    "line": 2319
+    "line": 2335
   },
   "Use this on the protected profile or family device that should accept matching parent updates.": {
     "kind": "text",
-    "line": 2319
+    "line": 2335
   },
   "Saved trust:": {
     "kind": "text",
-    "line": 2320
+    "line": 2336
   },
   "A trusted link remembers which parent can send which update. It is not an always-on live connection; if Pickup is set up, the protected device can collect a signed parent update when it opens later.": {
     "kind": "text",
-    "line": 2320
+    "line": 2336
   },
   "Managed links on the first connection": {
     "kind": "text",
-    "line": 2325
+    "line": 2341
   },
   "A first parent-to-protected-device session still asks the receiving device what to do with the first incoming update.": {
     "kind": "text",
-    "line": 2328
+    "line": 2344
   },
   "The protected device can": {
     "kind": "text",
-    "line": 2329
+    "line": 2345
   },
   "apply once": {
     "kind": "text",
-    "line": 2329
+    "line": 2345
   },
   "without saving trust, or": {
     "kind": "text",
-    "line": 2329
+    "line": 2345
   },
   "apply and save": {
     "kind": "text",
-    "line": 2329
+    "line": 2345
   },
   "a parent link for future updates.": {
     "kind": "text",
-    "line": 2329
+    "line": 2345
   },
   "Saving parent trust is what turns future parent policy into something precise and repeatable.": {
     "kind": "text",
-    "line": 2330
+    "line": 2346
   },
   "Allowed scopes inside parent trust": {
     "kind": "text",
-    "line": 2335
+    "line": 2351
   },
   "Each trusted parent link can allow one or more scopes:": {
     "kind": "text",
-    "line": 2338
+    "line": 2354
   },
   "The default scope and the merge/replace policy live on the trusted link itself, not only in the live session.": {
     "kind": "text",
-    "line": 2339
+    "line": 2355
   },
   "If an incoming managed update does not match the saved allowed scopes, FilterTube blocks it instead of applying the wrong scope.": {
     "kind": "text",
-    "line": 2340
+    "line": 2356
   },
   "Protected-device links can choose a target mode on the receiving device:": {
     "kind": "text",
-    "line": 2341
+    "line": 2357
   },
   "Current active profile": {
     "kind": "text",
-    "line": 2341
+    "line": 2357
   },
   "Always this local profile": {
     "kind": "text",
-    "line": 2341
+    "line": 2357
   },
   "The fixed target mode is the safe way to make": {
     "kind": "text",
-    "line": 2342
+    "line": 2358
   },
   "B -> B": {
     "kind": "text",
-    "line": 2342
+    "line": 2358
   },
   "work across devices without guessing by profile name.": {
     "kind": "text",
-    "line": 2342
+    "line": 2358
   },
   "PINs and encrypted backups": {
     "kind": "text",
-    "line": 2347
+    "line": 2363
   },
   "PIN checks stay local. Nanah can require the sender or receiver to unlock locally, but the PIN itself is not sent.": {
     "kind": "text",
-    "line": 2350
+    "line": 2366
   },
   "Protected-profile PIN and parent authority are separate. A protected-profile PIN can open receive-only sync for that profile, while parent/account PIN controls rule edits, backups, sync policy, and trusted links.": {
     "kind": "text",
-    "line": 2351
+    "line": 2367
   },
   "Encrypted backup": {
     "kind": "text",
-    "line": 2352
+    "line": 2368
   },
   "is still the archive path. Nanah is the live device-to-device sync path.": {
     "kind": "text",
-    "line": 2352
+    "line": 2368
   },
   "full-account": {
     "kind": "text",
-    "line": 2353
+    "line": 2369
   },
   "backup can also carry trusted-device recovery data for same-device reinstall recovery, but normal/plain export does not.": {
     "kind": "text",
-    "line": 2353
+    "line": 2369
   },
   "Restoring trusted-device recovery data is explicit during encrypted import. It is not silently restored from ordinary backup files.": {
     "kind": "text",
-    "line": 2354
+    "line": 2370
   },
   "Parents can still keep stricter control by using PIN-locked profiles plus trusted parent links for protected devices.": {
     "kind": "text",
-    "line": 2355
+    "line": 2371
   },
   "Refresh, reconnect, and trusted links": {
     "kind": "text",
-    "line": 2360
+    "line": 2376
   },
   "A live Nanah session is not meant to survive a page refresh, browser restart, or tab close. Refresh ends the live pairing session.": {
     "kind": "text",
-    "line": 2363
+    "line": 2379
   },
   "Trusted links are saved locally so you do not lose the remembered relationship, but today you still start a fresh live session when reconnecting.": {
     "kind": "text",
-    "line": 2364
+    "line": 2380
   },
   "The trusted-device card now has a": {
     "kind": "text",
-    "line": 2365
+    "line": 2381
   },
   "Start New Session": {
     "kind": "text",
-    "line": 2365
+    "line": 2381
   },
   "shortcut that starts the next fresh session with the saved role/policy defaults.": {
     "kind": "text",
-    "line": 2365
+    "line": 2381
   },
   "Saved trust means a faster next Send Update session. If Internet Pickup is separately configured, a protected profile can check for signed parent updates when it opens without adding page background work.": {
     "kind": "text",
-    "line": 2366
+    "line": 2382
   },
   "If you try to reuse the same pairing code on the same active device session, FilterTube now blocks that locally instead of silently burning the code.": {
     "kind": "text",
-    "line": 2367
+    "line": 2383
   },
   "If no fixed target is saved on the managed replica link, non-": {
     "kind": "text",
-    "line": 2368
+    "line": 2384
   },
   "sync still writes into the receiver's current active profile at receive time.": {
     "kind": "text",
-    "line": 2368
+    "line": 2384
   },
   "If a managed replica link is saved with": {
     "kind": "text",
-    "line": 2369
+    "line": 2385
   },
   ", future managed updates land in that pinned local profile even when some other profile is active on the receiving device.": {
     "kind": "text",
-    "line": 2369
+    "line": 2385
   },
   "What backups include today": {
     "kind": "text",
-    "line": 2374
+    "line": 2390
   },
   "Current Nanah trusted-link records are stored in local extension storage, not inside the normal FilterTube export/import payload.": {
     "kind": "text",
-    "line": 2377
+    "line": 2393
   },
   "Normal/plain backup restores your profiles and filters, but not the saved Nanah trust graph.": {
     "kind": "text",
-    "line": 2378
+    "line": 2394
   },
   "Encrypted full-account backup can include trusted-device recovery data, and import asks whether to restore it for same-device recovery.": {
     "kind": "text",
-    "line": 2379
+    "line": 2395
   },
   "That recovery path is intentionally explicit and should not be used to clone one device identity onto another device.": {
     "kind": "text",
-    "line": 2380
+    "line": 2396
   },
   "Parent, account, and protected behavior": {
     "kind": "text",
-    "line": 2385
+    "line": 2401
   },
   "Default / Parent:": {
     "kind": "text",
-    "line": 2388
+    "line": 2404
   },
   "Owns full import/export, parent policy, and the broadest account controls.": {
     "kind": "text",
-    "line": 2388
+    "line": 2404
   },
   "Independent account:": {
     "kind": "text",
-    "line": 2389
+    "line": 2405
   },
   "Owns its own settings and can manage its own protected profiles, but does not gain authority over parallel accounts.": {
     "kind": "text",
-    "line": 2389
+    "line": 2405
   },
   "A private viewing surface with its own Main/Kids rules. The profile PIN protects switching into it, but parent/account PIN controls policy and rule edits.": {
     "kind": "text",
-    "line": 2390
+    "line": 2406
   },
   "Viewing spaces:": {
     "kind": "text",
-    "line": 2391
+    "line": 2407
   },
   "A parent can set each protected profile to Kids only, Main only, or Main + Kids. New protected profiles start as Kids only.": {
     "kind": "text",
-    "line": 2391
+    "line": 2407
   },
   "Parent editing:": {
     "kind": "text",
-    "line": 2392
+    "line": 2408
   },
   "Parent/account surfaces can edit a protected profile’s Main or Kids rule list directly from the protected profile row, so parents do not need to share the parent PIN.": {
     "kind": "text",
-    "line": 2392
+    "line": 2408
   },
   "Targeting today:": {
     "kind": "text",
-    "line": 2393
+    "line": 2409
   },
   "Protected-device links should usually save a fixed local target so parent updates stay tied to that protected or family profile.": {
     "kind": "text",
-    "line": 2393
+    "line": 2409
   },
   "Parent-safe targeting:": {
     "kind": "text",
-    "line": 2394
+    "line": 2410
   },
   "FilterTube blocks send-anyway paths from protected profiles when the other device has a different profile active. The intended parent flow is to save one parent trust link on the receiving protected profile and choose": {
     "kind": "text",
-    "line": 2394
+    "line": 2410
   },
   "Parent managed:": {
     "kind": "text",
-    "line": 2395
+    "line": 2411
   },
   "The normal protected-device preset saves a fixed target, allows matching signed parent updates while locked, and checks for later updates when the profile opens.": {
     "kind": "text",
-    "line": 2395
+    "line": 2411
   },
   "Ask first:": {
     "kind": "text",
-    "line": 2396
+    "line": 2412
   },
   "A stricter option can require local approval/unlock before later parent updates apply.": {
     "kind": "text",
-    "line": 2396
+    "line": 2412
   },
   "Protected profiles do not expose broad backup/import/export/account-admin actions in Settings and cannot rename/delete profiles, mutate PIN policy, or edit trusted parent links from the protected surface.": {
     "kind": "text",
-    "line": 2397
+    "line": 2413
   },
   "Parent control without giving kids the PIN": {
     "kind": "text",
-    "line": 2402
+    "line": 2418
   },
   "Kids should not learn or type the parent PIN for normal managed updates.": {
     "kind": "text",
-    "line": 2405
+    "line": 2421
   },
   "The right model is local authorization on the protected device: trust the parent link once, then allow only the saved managed scopes and policies.": {
     "kind": "text",
-    "line": 2406
+    "line": 2422
   },
   "FilterTube keeps PIN values local. A trusted protected-device link can either let matching parent updates apply while locked or ask on this device first, and that permission is saved only on the protected device.": {
     "kind": "text",
-    "line": 2407
+    "line": 2423
   },
   "How devices meet": {
     "kind": "text",
-    "line": 2412
+    "line": 2428
   },
   "Nanah’s meeting service only helps two open devices exchange connection setup data. It does not read parent rules, PINs, or profile data. In the normal parent flow, open both devices, pair, verify the phrase, and use Send Update. Internet Pickup and Home Pickup are optional delivery tools for advanced setups; they still cannot apply anything unless the protected device already trusts that parent link. The underlying project is open here:": {
     "kind": "text",
-    "line": 2413
+    "line": 2429
   },
   "github.com/varshneydevansh/nanah": {
     "kind": "text",
-    "line": 2413
+    "line": 2429
   },
   "Nearby helper and Home Pickup": {
     "kind": "text",
-    "line": 2416
+    "line": 2432
   },
   "The optional nearby helper lets you select an opted-in FilterTube device on the same network, then returns to normal code/phrase verification. Home Pickup is different: it is an advanced waiting-update service for already verified protected devices. Neither path trusts every device on the network.": {
     "kind": "text",
-    "line": 2417
+    "line": 2433
   },
   "Internet Pickup": {
     "kind": "text",
-    "line": 2420
+    "line": 2436
   },
   "Internet Pickup is for a verified protected device that may open later or away from the parent device. It needs a trusted online pickup setup that stores unreadable signed updates until the protected device checks in. The service cannot read rules, approve itself, change PINs, or pick a profile; the protected device still validates the saved parent link before applying anything.": {
     "kind": "text",
-    "line": 2421
+    "line": 2437
   },
   "Collaboration & 3-dot Tools": {
     "kind": "text",
-    "line": 2429
+    "line": 2445
   },
   "Collaboration-aware blocking": {
     "kind": "text",
-    "line": 2434
+    "line": 2450
   },
   "FilterTube can resolve collaborator rosters from the watch-page and menu data so the 3-dot UI can show all channels involved in a collab instead of only the visible uploader.": {
     "kind": "text",
-    "line": 2435
+    "line": 2451
   },
   "Where collab recovery works": {
     "kind": "text",
-    "line": 2438
+    "line": 2454
   },
   "Watch right rail and watch-like recommendation lockups": {
     "kind": "text",
-    "line": 2441
+    "line": 2457
   },
   "Watch-page playlist rows": {
     "kind": "text",
-    "line": 2442
+    "line": 2458
   },
   "Sangeet surfaces, including auto playlist cards seeded by collaboration videos": {
     "kind": "text",
-    "line": 2443
+    "line": 2459
   },
   "If the menu only shows “Block Channel”": {
     "kind": "text",
-    "line": 2448
+    "line": 2464
   },
   "That usually means the page supplied incomplete or stale card metadata. Reopen the menu or refresh the page to let FilterTube rebuild the collaboration roster from fresh watch-page data.": {
     "kind": "text",
-    "line": 2449
+    "line": 2465
   },
   "Quick Block vs 3-dot Block item": {
     "kind": "text",
-    "line": 2452
+    "line": 2468
   },
   "These are separate toggles in Content Controls. You can keep the hover Quick Block button, the 3-dot Block entry, both, or neither depending on how much inline UI you want.": {
     "kind": "text",
-    "line": 2453
+    "line": 2469
   },
   "Blocklist, Whitelist, and exceptions": {
     "kind": "text",
-    "line": 2463
+    "line": 2479
   },
   "Choose the default policy": {
     "kind": "text",
-    "line": 2468
+    "line": 2484
   },
   "keeps everything visible except for things you block.": {
     "kind": "text",
-    "line": 2469
+    "line": 2485
   },
   "hides by default and shows only matching allowed channels or keywords.": {
     "kind": "text",
-    "line": 2469
+    "line": 2485
   },
   "Add an exception without changing modes": {
     "kind": "text",
-    "line": 2472
+    "line": 2488
   },
   "The full Main and Kids filter pages each have a list browser. Open": {
     "kind": "text",
-    "line": 2474
+    "line": 2490
   },
   "Blocked rules": {
     "kind": "text",
-    "line": 2474
+    "line": 2490
   },
   "Allowed rules": {
     "kind": "text",
-    "line": 2474
+    "line": 2490
   },
   "to view and edit that saved collection. This only changes the list you are looking at; it does not switch": {
     "kind": "text",
-    "line": 2474
+    "line": 2490
   },
   "/": {
     "kind": "text",
-    "line": 2474
+    "line": 2490
   },
   "mode, and Kids rules remain independent from Main:": {
     "kind": "text",
-    "line": 2474
+    "line": 2490
   },
   "Blocked": {
     "kind": "text",
-    "line": 2476
+    "line": 2492
   },
   "to add a normal block rule.": {
     "kind": "text",
-    "line": 2476
+    "line": 2492
   },
   "Put a favorite channel or useful keyword in": {
     "kind": "text",
-    "line": 2477
+    "line": 2493
   },
   "The popup follows the active global mode for quick additions; advanced exception editing stays in the full Filters page.": {
     "kind": "text",
-    "line": 2478
+    "line": 2494
   },
   "In Blocklist mode, an allowed channel can rescue its videos from a broader blocked keyword.": {
     "kind": "text",
-    "line": 2479
+    "line": 2495
   },
   "When you switch from": {
     "kind": "text",
-    "line": 2480
+    "line": 2496
   },
   "to": {
     "kind": "text",
-    "line": 2480
+    "line": 2496
   },
   "with an empty Allowed list, FilterTube can copy your current blocked rules into Allowed rules to get started. The original Blocked rules are kept.": {
     "kind": "text",
-    "line": 2480
+    "line": 2496
   },
   "Switching back to": {
     "kind": "text",
-    "line": 2481
+    "line": 2497
   },
   "never transfers or deletes either list. Bootstrap copies do not cancel their original blocked rules in Blocklist mode; Allowed rules you add yourself still work as normal exceptions.": {
     "kind": "text",
-    "line": 2481
+    "line": 2497
   },
   "What stays visible?": {
     "kind": "text",
-    "line": 2486
+    "line": 2502
   },
   "In Whitelist mode, FilterTube:": {
     "kind": "text",
-    "line": 2488
+    "line": 2504
   },
   "hides by default,": {
     "kind": "text",
-    "line": 2490
+    "line": 2506
   },
   "shows videos from allowed channels,": {
     "kind": "text",
-    "line": 2491
+    "line": 2507
   },
   "shows videos that match allowed keyword rules,": {
     "kind": "text",
-    "line": 2492
+    "line": 2508
   },
   "keeps normal watch pages and playlists usable for allowed content.": {
     "kind": "text",
-    "line": 2493
+    "line": 2509
   },
   "Following page stays reachable": {
     "kind": "text",
-    "line": 2498
+    "line": 2514
   },
   "Your followed-channels page stays visible so you can still review and manage channels without locking yourself out.": {
     "kind": "text",
-    "line": 2499
+    "line": 2515
   },
   "Creator and channel pages": {
     "kind": "text",
-    "line": 2502
+    "line": 2518
   },
   "Opening a blocked channel directly redirects back to Home. Creator and channel cards still follow the same allow-only idea: if FilterTube cannot confirm a card is allowed, it chooses the safer hidden state.": {
     "kind": "text",
-    "line": 2503
+    "line": 2519
   },
   "Direct links and embedded players": {
     "kind": "text",
-    "line": 2506
+    "line": 2522
   },
   "A direct Watch, Clips, playlist/autoplay, or embedded player cannot bypass your rules. FilterTube pauses a blocked current video and stays on that video; it does not automatically choose another video, including in a playlist. You can choose what to open next. It reuses the loaded Player response and visible Watch description first. Block selected does not hold normal playback merely because a complete description is still unavailable; Allow only selected waits when identity is required to prove the video is allowed.": {
     "kind": "text",
-    "line": 2507
+    "line": 2523
   },
   "Links on Google and other websites": {
     "kind": "text",
-    "line": 2510
+    "line": 2526
   },
   "FilterTube does not read or remove ordinary video links on Google Search or other websites. When the link opens the video site, the direct-access gate applies there. Embedded and privacy-enhanced players are covered inside their player frames. Hiding links on external pages would be a separate opt-in feature because it requires permission to read and modify those websites.": {
     "kind": "text",
-    "line": 2511
+    "line": 2527
   },
   "Which rule wins?": {
     "kind": "text",
-    "line": 2514
+    "line": 2530
   },
   "A video rule is more specific than a channel rule, and a channel rule is more specific than a keyword. When equally specific block and allow rules both match, allow wins. Core controls such as Hide Clips and Hide All Comments still win over ordinary exceptions.": {
     "kind": "text",
-    "line": 2515
+    "line": 2531
   },
   "Moving from BlockTube": {
     "kind": "text",
-    "line": 2518
+    "line": 2534
   },
   "Choose the BlockTube migration JSON under Rule list imports (or choose it in the full backup importer). FilterTube first shows counts for channels, video IDs, title rules, comment rules, regex rules, mapped settings, and unsupported fields. Large imports are capacity-checked and applied as a transaction: if any required write fails, FilterTube restores the previous state instead of showing false success. A successful import is read back and produces an apply receipt. Imported JavaScript stays inactive, BlockTube's UI password is never used as a FilterTube PIN, and the FilterTube theme is preserved. Missing channel metadata is fetched only after approval by the extension background worker, one request at a randomized 7–15 second interval while it is awake. A failed row retries after about 2 minutes, then backs off to a 30-minute maximum without pausing fresh rows. Closing this dashboard does not stop the job; browser shutdown or wakeup limits can delay it. You can download the migration report before importing.": {
     "kind": "text",
-    "line": 2519
+    "line": 2535
   },
   "Profiles, PINs, and Protected Profiles": {
     "kind": "text",
-    "line": 2527
+    "line": 2543
   },
   "What is a protected profile?": {
     "kind": "text",
-    "line": 2532
+    "line": 2548
   },
   "A protected profile is a viewing space for a child, family member, or anyone who should watch within rules but not change those rules. It can have its own Main rules, Kids rules, PIN, and time limit.": {
     "kind": "text",
-    "line": 2533
+    "line": 2549
   },
   "Two PINs: control vs switching": {
     "kind": "text",
-    "line": 2536
+    "line": 2552
   },
   "Parent/account or Master unlock is the control PIN. It edits rules, time limits, backups, trusted devices, and Main/Kids access. The protected profile PIN is only a switching PIN. It helps stop siblings or any other user from opening each other's profiles, but it cannot edit policy or remove parent controls.": {
     "kind": "text",
-    "line": 2537
+    "line": 2553
   },
   "Admin unlock safety": {
     "kind": "text",
-    "line": 2540
+    "line": 2556
   },
   "Parent/admin unlock is temporary. Sensitive actions can ask for the PIN again, Lock Admin Session ends the current dashboard unlock immediately, and repeated wrong PIN attempts are delayed and written to protected history so the parent can notice tampering without exposing the PIN.": {
     "kind": "text",
-    "line": 2541
+    "line": 2557
   },
   "Who sets a protected profile PIN": {
     "kind": "text",
-    "line": 2544
+    "line": 2560
   },
   "A parent/account profile can set, change, or remove a protected profile's switching PIN from the protected profile row after parent/account unlock. The protected user cannot use that PIN to remove parent controls.": {
     "kind": "text",
-    "line": 2545
+    "line": 2561
   },
   "Where parents edit protected rules": {
     "kind": "text",
-    "line": 2548
+    "line": 2564
   },
   "Open Accounts & Sync from the parent/account profile and use the protected profile row's Edit Rules button. A banner stays visible while you edit that protected profile's Controls, Filters, Kids Mode, Settings, and Accounts & Sync surfaces.": {
     "kind": "text",
-    "line": 2549
+    "line": 2565
   },
   "Allowed viewing spaces": {
     "kind": "text",
-    "line": 2552
+    "line": 2568
   },
   "Each profile can be set to Kids only, Main only, or Main + Kids. This supports younger kids on Kids and teenagers on supervised Main without letting either edit policy.": {
     "kind": "text",
-    "line": 2553
+    "line": 2569
   },
   "Family Controls": {
     "kind": "text",
-    "line": 2556
+    "line": 2572
   },
   "Use the parent/account profile to create a protected profile, set Main/Kids access, set daily viewing time, edit rules, and send updates to a verified device. The protected profile can watch within those rules, but cannot change parent controls from its own surface.": {
     "kind": "text",
-    "line": 2557
+    "line": 2573
   },
   "Import a rule list for protected profiles": {
     "kind": "text",
-    "line": 2562
+    "line": 2578
   },
   "From the parent/account profile, open a protected profile row and choose": {
     "kind": "text",
-    "line": 2563
+    "line": 2579
   },
   ". Then use Settings > Import / Export > Rule list imports and choose Main, Kids, or Both. Imported files only add channel/keyword rules; they cannot change PINs, trusted devices, viewing spaces, or sync targets. After import, use the protected profile row to send the updated policy to a verified device.": {
     "kind": "text",
-    "line": 2564
+    "line": 2580
   },
   "When time is finished": {
     "kind": "text",
-    "line": 2568
+    "line": 2584
   },
   "Daily time is counted separately for every profile that has a limit—not as one shared browser allowance. The popup shows the active profile's remaining time. The video page and its controls stay behind a full-page FilterTube pause screen with the serene landscape only while the active profile is exhausted. A protected profile can wait for its daily reset, request more time for parent review, or switch through the normal PIN flow to another independently governed profile. Account profiles use their own policy and remaining balance, and active playback continues counting even when another extension or developer window temporarily has focus.": {
     "kind": "text",
-    "line": 2569
+    "line": 2585
   },
   "Self-Control Session vs daily viewing time": {
     "kind": "text",
-    "line": 2574
+    "line": 2590
   },
   "A daily limit controls how long a profile can watch. A": {
     "kind": "text",
-    "line": 2575
+    "line": 2591
   },
   ", started from": {
     "kind": "text",
-    "line": 2576
+    "line": 2592
   },
   ", instead enables and freezes the active profile's current filters and settings for a countdown you choose. During that session, profile switching, filtering pause, rule edits, mode changes, and imports are blocked. It survives a browser restart, shows its countdown in the popup and dashboard, and has no FilterTube cancel button. The browser owner can still disable or uninstall an extension unless the browser or device is externally managed.": {
     "kind": "text",
-    "line": 2576
+    "line": 2592
   },
   "Remote updates in plain words": {
     "kind": "text",
-    "line": 2580
+    "line": 2596
   },
   "Normal parent control is Send Update: open parent and protected devices, pair, verify the phrase, then send the selected profile update. Saved trust remembers the verified parent/protected-device relationship and target profile for the next live session. Home Pickup covers explicitly configured home/school pickup, and Internet Pickup covers away or opens-later devices through a trusted online pickup setup. These paths are optional, are not required for ordinary parent control, do not scan Wi-Fi for authority, and never let a protected profile edit its own rules.": {
     "kind": "text",
-    "line": 2581
+    "line": 2597
   },
   "Keep Kids rules separate": {
     "kind": "text",
-    "line": 2596
+    "line": 2612
   },
   "Kids has its own rules in FilterTube. Use Kids Mode when you want a different list for younger children.": {
     "kind": "text",
-    "line": 2597
+    "line": 2613
   },
   "Parent changes stay parent-side": {
     "kind": "text",
-    "line": 2600
+    "line": 2616
   },
   "FilterTube avoids adding rule-changing shortcut buttons inside Kids because a protected user could tap them. Change Kids rules from FilterTube or YouTube Kids parent controls instead.": {
     "kind": "text",
-    "line": 2601
+    "line": 2617
   },
   "YouTube blocks and FilterTube blocks are separate": {
     "kind": "text",
-    "line": 2604
+    "line": 2620
   },
   "If you block something inside YouTube Kids itself, YouTube manages that block. FilterTube keeps its own Kids list so you can back it up, edit it, and sync it separately.": {
     "kind": "text",
-    "line": 2605
+    "line": 2621
   },
   "If a Kids channel still looks blocked": {
     "kind": "text",
-    "line": 2608
+    "line": 2624
   },
   "There may be two lists involved:": {
     "kind": "text",
-    "line": 2610
+    "line": 2626
   },
   "FilterTube's Kids list.": {
     "kind": "text",
-    "line": 2612
+    "line": 2628
   },
   "YouTube Kids' own parent-account block list.": {
     "kind": "text",
-    "line": 2613
+    "line": 2629
   },
   "If removing a rule from FilterTube does not bring the channel back, check YouTube's official unblock steps:": {
     "kind": "text",
-    "line": 2614
+    "line": 2630
   },
   "Unblock channels from YouTube using your linked parent account": {
     "kind": "text",
-    "line": 2614
+    "line": 2630
   },
   "YouTube Kids parent account": {
     "kind": "text",
-    "line": 2619
+    "line": 2635
   },
   "Some YouTube Kids actions still require YouTube's linked parent account. FilterTube adds extra local rules; it does not replace YouTube's parent-account controls. See": {
     "kind": "text",
-    "line": 2620
+    "line": 2636
   },
   "YouTube Kids Help Center": {
     "kind": "text",
-    "line": 2620
+    "line": 2636
   },
   "for YouTube-owned controls.": {
     "kind": "text",
-    "line": 2620
+    "line": 2636
   },
   "Using Kids rules on Main": {
     "kind": "text",
-    "line": 2623
+    "line": 2639
   },
   "Kids block rules can apply on Main when Main is also in Blocklist mode.": {
     "kind": "text",
-    "line": 2626
+    "line": 2642
   },
   "Kids allow rules can apply on Main when Main is also in Whitelist mode.": {
     "kind": "text",
-    "line": 2627
+    "line": 2643
   },
   "FilterTube does not flip a Kids allow-list into a Main blocklist, or a Kids blocklist into a Main allow-list.": {
     "kind": "text",
-    "line": 2628
+    "line": 2644
   },
   "Rows copied from Kids Mode are labeled so parents can see where they came from.": {
     "kind": "text",
-    "line": 2629
+    "line": 2645
   },
   "Troubleshooting": {
     "kind": "text",
-    "line": 2639
+    "line": 2655
   },
   "\"Failed to fetch\" while blocking": {
     "kind": "text",
-    "line": 2644
+    "line": 2660
   },
   "If FilterTube already knows the channel UC ID, it can still persist the block even if fetching the logo/name fails. Try reloading if the UI doesn't update immediately.": {
     "kind": "text",
-    "line": 2645
+    "line": 2661
   },
   "Blocked channel still appears": {
     "kind": "text",
-    "line": 2648
+    "line": 2664
   },
   "The site sometimes reuses DOM nodes during SPA navigation. FilterTube re-scans and clears stale cached metadata, but a hard refresh can help confirm persistence.": {
     "kind": "text",
-    "line": 2649
+    "line": 2665
   },
   "Followed-channel import": {
     "kind": "text",
-    "line": 2652
+    "line": 2668
   },
   "Imported followed channels are now captured more defensively across browsers. If the first pass looks incomplete, reopen the followed channels page and let FilterTube re-capture the page data before trying again.": {
     "kind": "text",
-    "line": 2653
+    "line": 2669
   },
   "About the builder": {
     "kind": "text",
-    "line": 2666
+    "line": 2682
   },
   "Devansh builds tools from": {
     "kind": "text",
-    "line": 2667
+    "line": 2683
   },
   "curiosity, focus, and open source.": {
     "kind": "text",
-    "line": 2669
+    "line": 2685
   },
   "An open-source developer from India, building FilterTube after ADHD experiments and parent feedback made the need clear: a calmer control layer for families, caregivers, neurodivergent users, and anyone who wants to shape their own algorithm.": {
     "kind": "text",
-    "line": 2671
+    "line": 2687
   },
   "Read the TDF profile": {
     "kind": "text",
-    "line": 2674
+    "line": 2690
   },
   "GitHub": {
     "kind": "text",
-    "line": 2678
+    "line": 2694
   },
   "YouTube": {
     "kind": "text",
-    "line": 2682
+    "line": 2698
   },
   "Devansh Varshney": {
     "kind": "alt",
-    "line": 2688
+    "line": 2704
   },
   "Open source developer, builder, and long-running codebase explorer.": {
     "kind": "text",
-    "line": 2689
+    "line": 2705
   },
   "Personal video": {
     "kind": "text",
-    "line": 2695
+    "line": 2711
   },
   "Sisters are an invaluable gift": {
     "kind": "text",
-    "line": 2696
+    "line": 2712
   },
   "A personal video about how my sisters have shaped my life.": {
     "kind": "text",
-    "line": 2697
+    "line": 2713
   },
   "Work in progress": {
     "kind": "text",
-    "line": 2701
+    "line": 2717
   },
   "ADHD experiment notes, book thinking, and children's illustration work": {
     "kind": "text",
-    "line": 2702
+    "line": 2718
   },
   "One tiny WIP document collecting the ADHD experiments, writing direction, and children's Ramayan illustration-book notes.": {
     "kind": "text",
-    "line": 2703
+    "line": 2719
   },
   "Follow and connect": {
     "kind": "text",
-    "line": 2707
+    "line": 2723
   },
   "LinkedIn": {
     "kind": "text",
-    "line": 2711
+    "line": 2727
   },
   "TDF profile": {
     "kind": "text",
-    "line": 2712
+    "line": 2728
   },
   "Grokipedia": {
     "kind": "text",
-    "line": 2713
+    "line": 2729
   },
   "Support the product": {
     "kind": "text",
-    "line": 2724
+    "line": 2740
   },
   "Help FilterTube keep growing across desktop, mobile, tablet, and TV without compromising trust.": {
     "kind": "text",
-    "line": 2725
+    "line": 2741
   },
   "Support is optional, the product stays fully usable, and contributions go toward maintenance, faster fixes, new surfaces, and the developer costs behind shipping them well.": {
     "kind": "text",
-    "line": 2726
+    "line": 2742
   },
   "Long-term maintenance and faster bug fixes": {
     "kind": "text",
-    "line": 2730
+    "line": 2746
   },
   "Mobile, tablet, and TV product work": {
     "kind": "text",
-    "line": 2731
+    "line": 2747
   },
   "Platform fees, tooling, and release overhead": {
     "kind": "text",
-    "line": 2732
+    "line": 2748
   },
   "Support on Ko-fi": {
     "kind": "text",
-    "line": 2735
+    "line": 2751
   },
   "Trust and payment handling": {
     "kind": "text",
-    "line": 2743
+    "line": 2759
   },
   "Payments are processed securely by Ko-fi and PayPal. FilterTube does not receive or store any login or payment information.": {
     "kind": "text",
-    "line": 2746
+    "line": 2762
   },
   "Support is optional and there are no features locked behind a paywall. The goal is to keep the product sustainable while continuing to ship calm, privacy-first control surfaces.": {
     "kind": "text",
-    "line": 2749
+    "line": 2765
   }
 }

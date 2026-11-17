@@ -1044,3 +1044,39 @@ html.pk-parity[data-theme="dark"] .pk-rule-options-btn.is-active { background: #
 .ft-ask-request__row { display: flex; align-items: center; justify-content: space-between; gap: 8px; }
 .ft-ask-request__send { align-self: flex-end; }
 .ft-ask-request__reply[hidden], .ft-ask-request__send[hidden] { display: none; }
+
+/* ---- Connect a device (Android SettingsSectionActivity: addNearbyDevicesCard, addNanahSyncCard) ----
+ * "Your devices" first (what tapping does, the relay disclosure, the device list, the nearby buttons),
+ * then the pairing card always open (Profile update, Start Pairing, Session state; Join another device),
+ * then Step 1-3 and the privacy and trust notes, then Keep in sync. The old device map's radar, hub and
+ * compass rule are gone. */
+#familyDeviceUpdatesCard .nanah-your-devices { display: grid; gap: 8px; margin-bottom: 12px; }
+#familyDeviceUpdatesCard .nanah-your-devices__title { margin: 0; font-family: var(--pk-font-hand); font-weight: 400; font-size: 1.25rem; color: var(--pk-ink); }
+#familyDeviceUpdatesCard .nanah-device-radar { min-height: 0 !important; padding: 0 !important; background: none !important; border: 0 !important; display: grid; gap: 8px; }
+#familyDeviceUpdatesCard .nanah-device-radar::before, #familyDeviceUpdatesCard .nanah-device-radar::after { display: none !important; }
+#familyDeviceUpdatesCard .nanah-device-empty { position: static !important; transform: none !important; margin: 4px 0 !important; text-align: start !important; }
+#familyDeviceUpdatesCard .nanah-device-toolbar { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 4px; }
+#familyDeviceUpdatesCard .nanah-device-compass, #familyDeviceUpdatesCard .nanah-device-compass-stage { background: none !important; border: 0 !important; box-shadow: none !important; padding: 0 !important; }
+.nanah-pairing-details--page > summary { display: none !important; }
+.nanah-pairing-details--page { margin-top: 18px; padding-top: 18px; border-top: 1px solid var(--pk-line); }
+.nanah-flow-steps { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 8px; margin-top: 16px; }
+.nanah-trust-notes { display: grid; gap: 8px; margin-top: 16px; }
+.nanah-trust-notes h5 { margin: 0; font-family: var(--pk-font-hand); font-weight: 400; font-size: 1.1rem; color: var(--pk-ink); }
+.nanah-flow-step { display: grid; gap: 4px; padding: 12px 14px; border-radius: 16px; background: var(--pk-paper); border: 1px solid var(--pk-line); }
+.nanah-flow-step > span { font-family: var(--pk-font-hand); font-size: 1.05rem; color: var(--pk-ink); }
+.nanah-flow-step > span::after { content: ''; display: block; width: 22px; height: 3px; margin-top: 4px; border-radius: 2px; background: var(--pk-plum); }
+.nanah-flow-step > strong { font-size: 0.85rem; color: var(--pk-ink); }
+.nanah-flow-step > small { font-size: 0.85rem; color: var(--pk-muted); line-height: 1.4; }
+#ftDeviceAutoSync { margin-top: 18px; }
+/* The app's pairing card keeps its headings in every phase: "Profile update / Choose the update" with
+ * Review first, "Session state" with the Secure handshake pill; "Join another device / Enter pairing
+ * code" only while connecting (Android createNanahJoinPanel shows it in the CONNECT phase). */
+#familyDeviceUpdatesCard #ftNanahPairingDetails[data-pairing-phase] .nanah-sync-panel--setup .nanah-sync-panel__header { display: flex; align-items: flex-start; justify-content: space-between; gap: 12px; }
+#familyDeviceUpdatesCard #ftNanahPairingDetails[data-pairing-phase="connect"] .nanah-sync-panel--join .nanah-sync-panel__header { display: flex; align-items: flex-start; gap: 12px; }
+#familyDeviceUpdatesCard #ftNanahPairingDetails[data-pairing-phase] .nanah-sync-status__eyebrow { display: block; }
+#familyDeviceUpdatesCard #ftNanahPairingDetails[data-pairing-phase] #ftNanahStatusSignal { display: inline-flex; }
+#familyDeviceUpdatesCard #ftNanahPairingDetails .nanah-sync-panel__eyebrow { font-family: var(--pk-font-hand); font-size: 1.15rem; color: var(--pk-ink); text-transform: none; letter-spacing: 0; }
+#familyDeviceUpdatesCard #ftNanahPairingDetails .nanah-sync-panel__eyebrow::after { content: ''; display: block; width: 22px; height: 3px; margin-top: 4px; border-radius: 2px; background: var(--pk-plum); }
+#familyDeviceUpdatesCard #ftNanahPairingDetails .nanah-sync-panel__badge { color: var(--pk-brick); background: var(--pk-paper); border: 1px solid var(--pk-line); border-radius: 999px; padding: 4px 10px; font-size: 12px; font-weight: 600; }
+#familyDeviceUpdatesCard #ftNanahPairingDetails .nanah-sync-status[data-tone="retry"] { background: var(--pk-rose); border-color: color-mix(in srgb, var(--pk-brick) 30%, transparent); }
+#familyDeviceUpdatesCard #ftNanahDeviceCompassRule, #familyDeviceUpdatesCard #ftNanahDeviceSelectionPreview { display: none !important; }
