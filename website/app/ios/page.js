@@ -188,11 +188,15 @@ function InstallGuide() {
                     FilterTube for iPhone and iPad.
                   </h2>
                   <p className="mt-6 max-w-[62ch] text-pretty text-base leading-8 text-[var(--color-muted)] md:text-lg">
-                    I&apos;m working to bring FilterTube to the App Store
-                    &mdash; that&apos;s where I want it to be. Apple is having
-                    trouble on their end, so that will take a while. Until
-                    then, SideStore is the best way I&apos;ve found to install
-                    it, and AltStore works too.
+                    I&apos;m sorry for the extra steps. I&apos;m working to
+                    bring FilterTube to the App Store &mdash; that&apos;s where
+                    I want it to be &mdash; but Apple is making things difficult
+                    with the developer account, so that will take a while. Until
+                    then, SideStore is the best way I&apos;ve found to install it,
+                    and AltStore works too. From everything I&apos;ve read, it&apos;s
+                    safe and legal: it uses Apple&apos;s own free developer
+                    signing with your Apple ID, the same way developers run apps
+                    on their own phones.
                   </p>
                   <ul className="mt-7 grid gap-3 sm:grid-cols-2">
                     {promises.map((item) => (
