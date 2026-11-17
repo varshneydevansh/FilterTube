@@ -141,5 +141,7 @@ which this pass must not create. Their ledger rows and earlier ports stand; pari
 ## 6. Other older surfaces found
 
 - The Help page still names "Dashboard" in a few answers (see §1).
-- The popup's study strip still says "End" (compact) where the app's session strip says "End session";
-  kept because the popup row has no room for the 30-second note.
+- The popup's study strip is older than the app's session strip (`StudySessionViews.kt`): the app's
+  shows "Round 2 of 4" or "Break", Skip break with its cost, and the music state, with no End button
+  (ending lives on the Study page). The popup strip shows the phase line, minutes left, End and Open.
+  Not changed in this pass.
