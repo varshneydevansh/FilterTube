@@ -3990,6 +3990,7 @@ function resolveRequestedView() {
         'semantic': 'semantic',
         'kids': 'kids',
         'settings': 'settings',
+        'study': 'study',
         'sync': 'sync',
         'nanah': 'sync',
         'nanahsync': 'sync',
@@ -4739,8 +4740,10 @@ document.addEventListener('DOMContentLoaded', async () => {
     let lockGateEl = null;
 
     const LOCK_ALLOWED_VIEWS = new Set(['help', 'whatsnew', 'about', 'donate']);
-    const SELF_CONTROL_ALLOWED_VIEWS = new Set(['settings', ...LOCK_ALLOWED_VIEWS]);
-    const CHILD_ALLOWED_VIEWS = new Set([...LOCK_ALLOWED_VIEWS, 'sync']);
+    // Study shows during a Self-Control Session ("Locked until ...") and to a child, read-only: the
+    // background refuses every change a child or a lock can't make (Android StudyFocusActivity roles).
+    const SELF_CONTROL_ALLOWED_VIEWS = new Set(['settings', 'study', ...LOCK_ALLOWED_VIEWS]);
+    const CHILD_ALLOWED_VIEWS = new Set([...LOCK_ALLOWED_VIEWS, 'sync', 'study']);
     const MANAGED_TIME_LIMIT_SCHEMA = 'filtertube_managed_time_limit';
     const MANAGED_LOCAL_EDIT_POLICY_SCHEMA = 'filtertube_managed_local_edit_policy';
     const MANAGED_ACTION_HISTORY_SCHEMA = 'filtertube_managed_action_history';
@@ -33345,10 +33348,36 @@ document.addEventListener('DOMContentLoaded', async () => {
     function revealControlCenterTarget(target) {
         const scrollTo = node => node && requestAnimationFrame(() => node.scrollIntoView({ behavior: 'smooth', block: 'start' }));
         if (target === 'content') document.querySelector('#filtersView [data-tab-id="content"]')?.click();
-        if (target === 'selfControl') scrollTo(document.getElementById('ftStudyCard') || document.querySelector('#settingsView .ft-self-control-card'));
+        if (target === 'selfControl') scrollTo(document.getElementById('ftSelfControlCard') || document.querySelector('#settingsView .ft-self-control-card'));
         if (target === 'importExport') scrollTo(document.getElementById('ftImportExportCard'));
         if (target === 'profiles') scrollTo(document.getElementById('ftProfilesManager')?.closest('.settings-card'));
     }
+
+    // The Study page's links (Android StudyFocusActivity): Self-Control lives in Settings, and a
+    // child's plan in the Family command centre.
+    window.FilterTubeOpenSelfControl = () => {
+        if (typeof window.switchView === 'function') window.switchView('settings');
+        revealControlCenterTarget('selfControl');
+    };
+    window.FilterTubeOpenStudyFamily = childId => {
+        if (typeof window.switchView === 'function') window.switchView('sync');
+        requestAnimationFrame(() => {
+            const row = Array.from(document.querySelectorAll('.ft-study-parent__child')).find(node => node.dataset.childId === String(childId));
+            if (!row) return;
+            const tools = row.closest('details.ft-family-profile-tools');
+            if (tools) tools.open = true;
+            row.open = true;
+            row.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        });
+    };
+    window.FilterTubeStudyChildren = () => {
+        const profilesV4 = profilesV4Cache;
+        if (!profilesV4) return [];
+        const activeId = normalizeString(activeProfileId) || 'default';
+        return getChildrenForAccount(profilesV4, activeId)
+            .filter(childId => getProfileType(profilesV4, childId) === 'child' && canActiveProfileManageProfile(profilesV4, childId))
+            .map(childId => ({ id: childId, name: getProfileName(profilesV4, childId), plan: profilesV4.profiles?.[childId]?.study?.plan || null }));
+    };
 
     async function openControlCenterDestination(view) {
         if (resolveViewAccess(view).reason === 'locked' && resolveViewAccess(view).viewId !== view) {
@@ -34615,6 +34644,7 @@ function setupNavigation() {
             'semantic': ['', 'Semantic ML'],
             'kids': ['navigation.kids', 'Kids Mode'],
             'settings': ['navigation.settings', 'Settings'],
+            'study': ['study.nav.title', 'Study and focus'],
             'sync': ['navigation.sync', 'Accounts & Sync'],
             'whatsnew': ['navigation.whatsNew', 'What’s New'],
             'help': ['navigation.help', 'Help'],

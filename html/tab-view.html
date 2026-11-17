@@ -103,7 +103,7 @@
                     </span>
                     <span class="nav-text"><span class="nav-label" data-ft-i18n="navigation.settings">Settings</span><span class="nav-summary" aria-hidden="true"></span><span class="nav-lock" hidden></span></span>
                 </li>
-                <li data-pk-icon="timer" class="nav-item nav-item--sub" tabindex="0" data-tab="settings" data-nav-id="timeLimits" data-nav-target="selfControl">
+                <li data-pk-icon="timer" class="nav-item nav-item--sub" tabindex="0" data-tab="study" data-nav-id="timeLimits">
                     <span class="nav-icon">
                         <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor"
                             stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
@@ -467,6 +467,13 @@
                 </div>
 
                 <!-- Settings View -->
+                <div id="studyView" class="view-section">
+                    <!-- Study and focus (Android StudyFocusActivity): its own page, painted by study_ui.js. -->
+                    <section id="ftStudyCard" class="ft-study-card ft-study-page" aria-label="Study and focus" data-ft-i18n-aria-label="study.nav.title">
+                        <div id="ftStudyDashboard"></div>
+                    </section>
+                </div>
+
                 <div id="settingsView" class="view-section">
                     <div class="view-shell view-shell--settings settings-shell">
                         <section class="view-hero settings-hero">
@@ -484,19 +491,7 @@
 
                         <div class="settings-grid">
                             <div class="settings-core">
-                                <div id="ftStudyCard" class="card settings-card settings-card--featured ft-study-card" aria-labelledby="ftStudyCardTitle">
-                                    <div class="card-header">
-                                        <div>
-                                            <p class="ft-self-control-card__eyebrow" data-ft-i18n="study.card.eyebrow">Study mode</p>
-                                            <h3 id="ftStudyCardTitle" data-ft-i18n="study.nav.title">Study and focus</h3>
-                                        </div>
-                                    </div>
-                                    <div class="card-body settings-card__body">
-                                        <p class="import-export-summary" data-ft-i18n="study.card.summary">Pick a study pack and a time. During study only videos from your plan show and play, and your block list still applies.</p>
-                                        <div id="ftStudyDashboard" aria-live="polite"></div>
-                                    </div>
-                                </div>
-                                <div class="card settings-card settings-card--featured ft-self-control-card">
+                                <div id="ftSelfControlCard" class="card settings-card settings-card--featured ft-self-control-card">
                                     <div class="card-header">
                                         <div>
                                             <p class="ft-self-control-card__eyebrow">Voluntary focus protection</p>

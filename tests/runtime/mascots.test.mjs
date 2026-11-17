@@ -239,7 +239,8 @@ test('mascot images are WebP, Kriti and Uljhan only, none unused, under the 1.3 
     const folder = fs.readdirSync('assets/images/mascots').reduce((sum, name) => sum + fs.statSync(path.join('assets/images/mascots', name)).size, 0);
     assert.equal(folder, total, 'no unused images ship');
     // The app's own frames, byte for byte (study-3.6.2 res/drawable-nodpi): every motion the app plays.
-    assert.ok(total < 1300 * 1024, `${total} bytes`);
+    // 1.3 MB grew to 1.6 MB with Study's perch poses, the pencil tap and the rest-screen stretch (2026-11-17).
+    assert.ok(total < 1600 * 1024, `${total} bytes`);
     for (const forbidden of ['kagaz', 'mohar', 'phoolu', 'bindu_', 'rekha']) {
         assert.equal(fs.readdirSync('assets/images/mascots').some(name => name.includes(forbidden)), false, forbidden);
     }
@@ -315,7 +316,7 @@ test('sheets play once and rest on their last frame; reduced motion shows only t
     assert.deepEqual(plain(Mascots.sheetFrames('nope', false)), []);
     // The app's StudyMascotView.Motion timings, frame for frame.
     const timing = Object.fromEntries(Object.entries(plain(Mascots.MOTIONS)).map(([name, motion]) => [name, motion.ms]));
-    assert.deepEqual(timing, { duoSieve: 420, duoShoo: 420, kritiMug: 380, kritiEvening: 420, uljhanFetch: 160, kritiJump: 95, uljhanLeaves: 170 });
+    assert.deepEqual(timing, { duoSieve: 420, duoShoo: 420, kritiMug: 380, kritiEvening: 420, uljhanFetch: 160, kritiJump: 95, kritiPencil: 300, kritiStretch: 280, uljhanLeaves: 170 });
     assert.deepEqual(plain(Mascots.MOTIONS.kritiJump.order), [0, 1, 2, 3, 4, 1, 0]);
     assert.deepEqual(plain(Mascots.MOTIONS.uljhanLeaves.order), [0, 1, 2, 1, 2, 3, 4]);
     assert.deepEqual(plain(Mascots.MOTIONS.kritiMug.order), [0, 1, 2, 2, 3, 4, 5]);

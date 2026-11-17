@@ -44,6 +44,10 @@
     const SKIP_UNDO_MS = 5 * 1000;
     const KIDS_TICK_MS = 1000;
     const KRITI_READING = 'assets/images/mascots/kriti_reading.webp';
+    // KRITI_STRETCH (StudyMascotView.Motion): frames and timing as the app plays them on the rest screen.
+    const STRETCH_FRAMES = [1, 2, 3, 4, 5].map(index => `kriti_stretch_0${index}.webp`);
+    const STRETCH_ORDER = [0, 1, 2, 3, 3, 4, 0];
+    const STRETCH_FRAME_MS = 280;
     const COMPANION_KEY = 'ftCompanionMode';
 
     /** "4:12" (minutes and seconds), rounded up so it never shows 0:00 early (Android StudyBreakClock). */
@@ -387,6 +391,26 @@
                 unavailable: [t('study.overlay.unavailableTitle', 'Study pack unavailable'), t('study.overlay.unavailableBody', 'Your study videos can\'t load right now, so nothing plays until this study time ends.')]
             }[kind] || [t('study.overlay.limitTitle', 'Done for today'), ''];
             if (rest && Number.isFinite(Number(state?.until)) && typeof doc.createElementNS === 'function') box.appendChild(breakSun(dark));
+            if (rest) {
+                // Kriti stretches once as the break opens (Android StudyRestActivity, KRITI_STRETCH), then rests.
+                let urls = [];
+                try { urls = companionOff ? [] : STRETCH_FRAMES.map(name => String(runtime.getURL?.(`assets/images/mascots/${name}`) || '')).filter(Boolean); } catch (e) { }
+                if (urls.length === STRETCH_FRAMES.length) {
+                    const kriti = element('img', { height: '132px', width: 'auto', objectFit: 'contain' });
+                    kriti.src = urls[0];
+                    kriti.alt = '';
+                    kriti.setAttribute('aria-hidden', 'true');
+                    kriti.dataset.mascot = 'kriti-stretch';
+                    box.appendChild(kriti);
+                    let reduced = false;
+                    try { reduced = !!win.matchMedia?.('(prefers-reduced-motion: reduce)')?.matches; } catch (e) { }
+                    if (!reduced) {
+                        STRETCH_ORDER.forEach((frame, index) => {
+                            setTimer(() => { if (kriti.isConnected) kriti.src = urls[frame]; }, 120 + index * STRETCH_FRAME_MS);
+                        });
+                    }
+                }
+            }
             box.appendChild(element('div', { fontSize: '28px', fontWeight: '600' }, copy[0]));
             box.appendChild(element('div', { fontSize: '16px', maxWidth: '420px', lineHeight: '1.5' }, copy[1]));
             if (rest && state?.upNext) {
@@ -653,7 +677,7 @@
             const seconds = Math.min(pendingSeconds, 60);
             if (seconds <= 0) return Promise.resolve(null);
             pendingSeconds -= seconds;
-            return send({ action: 'FilterTube_StudyProgressTick', seconds, title: lectureTitle() });
+            return send({ action: 'FilterTube_StudyProgressTick', seconds, title: lectureTitle(), videoId: currentVideoId() || '' });
         }
 
         function onMessage(message) {

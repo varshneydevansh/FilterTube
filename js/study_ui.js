@@ -164,7 +164,7 @@
 
     function openOptions() {
         const api = runtime();
-        const url = api?.runtime?.getURL ? api.runtime.getURL('html/tab-view.html#settings') : 'html/tab-view.html#settings';
+        const url = api?.runtime?.getURL ? api.runtime.getURL('html/tab-view.html#study') : 'html/tab-view.html#study';
         try {
             const tabs = api?.tabs;
             if (tabs?.create) {
@@ -347,39 +347,6 @@
         }[kind] || kind;
     }
 
-    function renderPlanBar(plan, focus, breakMode, { now = new Date(), onSelect } = {}) {
-        const segments = planSegments(plan, focus);
-        const from = segments[0]?.start ?? 0;
-        const to = segments[segments.length - 1]?.end ?? 1440;
-        const span = Math.max(1, to - from);
-        const wrap = el('div', 'ft-study-bar');
-        const track = el('div', 'ft-study-bar__track');
-        track.setAttribute('role', 'list');
-        for (const segment of segments) {
-            const part = el('button', `ft-study-bar__seg is-${segment.kind}`);
-            part.type = 'button';
-            part.setAttribute('role', 'listitem');
-            part.style.left = `${((segment.start - from) / span) * 100}%`;
-            part.style.width = `${((segment.end - segment.start) / span) * 100}%`;
-            const label = `${segmentName(segment.kind)}, ${clockLabel(segment.start)} – ${clockLabel(segment.end)}`;
-            part.setAttribute('aria-label', label);
-            part.title = label;
-            part.addEventListener('click', () => onSelect?.(segment, label));
-            track.appendChild(part);
-        }
-        const minutesNow = now.getHours() * 60 + now.getMinutes();
-        if (minutesNow >= from && minutesNow <= to) {
-            const marker = el('span', 'ft-study-bar__now', '▼');
-            marker.setAttribute('aria-hidden', 'true');
-            marker.style.left = `${((minutesNow - from) / span) * 100}%`;
-            track.appendChild(marker);
-        }
-        const scale = el('div', 'ft-study-bar__scale');
-        scale.append(el('span', '', clockLabel(from)), el('span', '', clockLabel(to)));
-        wrap.append(track, scale);
-        return wrap;
-    }
-
     function segmented(options, current, onPick, label) {
         const group = el('div', 'ft-study-segmented');
         group.setAttribute('role', 'group');
@@ -392,136 +359,6 @@
         // Kept so mark() can find the pressed item.
         group.__values = options.map(([value]) => value);
         return group;
-    }
-
-    function timeRow(label, minutes, { min, max, disabled, onChange }) {
-        const row = el('div', 'ft-study-time');
-        const id = `ftStudyTime${Math.random().toString(36).slice(2, 8)}`;
-        const name = el('label', 'ft-study-time__label', label);
-        name.htmlFor = id;
-        const slider = el('input', 'ft-study-time__slider');
-        slider.type = 'range';
-        slider.id = id;
-        slider.min = String(min);
-        slider.max = String(max);
-        slider.step = String(STEP);
-        slider.value = String(minutes);
-        slider.disabled = !!disabled;
-        // Screen readers hear "Study starts, 4:00 pm".
-        slider.setAttribute('aria-valuetext', `${label}, ${clockLabel(minutes)}`);
-        const value = el('output', 'ft-study-time__value', clockLabel(minutes));
-        value.htmlFor = id;
-        slider.addEventListener('input', () => { value.textContent = clockLabel(Number(slider.value)); });
-        slider.addEventListener('change', () => onChange(Number(slider.value)));
-        const minus = button('−15', 'ft-study-btn', () => onChange(Math.max(min, minutes - STEP)));
-        const plus = button('+15', 'ft-study-btn', () => onChange(Math.min(max, minutes + STEP)));
-        minus.setAttribute('aria-label', t('study.planner.earlier', '{label}: 15 minutes earlier', { label }));
-        plus.setAttribute('aria-label', t('study.planner.later', '{label}: 15 minutes later', { label }));
-        minus.disabled = plus.disabled = !!disabled;
-        row.append(name, minus, slider, plus, value);
-        return row;
-    }
-
-    /**
-     * The planner. options: {study, editable, readOnlyLabel, catalog, onPatch(patch) -> Promise<{ok}>}.
-     * Every change can be undone; there are no confirmation dialogs.
-     */
-    function renderPlanner(host, options) {
-        const study = object(options.study);
-        const editable = options.editable !== false;
-        const plan = isObject(study.plan) ? study.plan : { days: ['mon', 'tue', 'wed', 'thu', 'fri'], start: '16:00', end: '18:00' };
-        const focus = object(study.focus);
-        const breakMode = study.breakMode === 'normal' ? 'normal' : 'rest';
-        const box = el('div', 'ft-study-planner');
-        if (!editable && options.readOnlyLabel) box.appendChild(el('span', 'ft-study-chip is-parent', options.readOnlyLabel));
-
-        // "Right now" follows a running session, not only the plan (Android ee59f65b4).
-        const running = { STUDY: 'study', BREAK: 'break', LIMIT: 'limit' }[text(object(options.state).state)];
-        const now = running ? { kind: running } : currentSegment(plan, focus);
-        const detail = el('p', 'ft-study-planner__detail', `${t('study.planner.rightNow', 'Right now')}: ${segmentWords(now, breakMode)}`);
-        detail.setAttribute('aria-live', 'polite');
-        box.appendChild(renderPlanBar(plan, focus, breakMode, {
-            onSelect: (segment, label) => { detail.textContent = `${label}: ${segmentWords(segment, breakMode)}`; }
-        }));
-        box.appendChild(detail);
-
-        const patch = async (change, undoChange) => {
-            const result = await options.onPatch?.(change);
-            if (result?.ok === false) {
-                const sheet = looseningSheet(result.error, options.state, options.parentName);
-                if (sheet) showLoosening(options.toastHost || host, sheet);
-                else notify(options.toastHost || host, errorText(result.error), null);
-                return;
-            }
-            notify(options.toastHost || host, t('study.planner.saved', 'Saved'), undoChange ? async () => { await options.onPatch?.(undoChange); } : null);
-        };
-        const planPatch = next => patch({ plan: next }, { plan: clone(study.plan ?? null) });
-
-        if (editable) box.appendChild(packPicker(study, options.catalog, patch, options));
-        else if (array(options.packs).length) box.appendChild(el('p', 'ft-study-planner__packs', array(options.packs).map(packLabel).join(', ')));
-
-        const days = el('div', 'ft-study-days');
-        days.setAttribute('role', 'group');
-        days.setAttribute('aria-label', t('study.planner.days', 'Days'));
-        const dayNames = dayLabels();
-        DAY_KEYS.forEach((day, index) => {
-            const on = array(plan.days).includes(day);
-            const chip = button(dayNames[index], `ft-study-day${on ? ' is-on' : ''}`, () => {
-                const next = on ? array(plan.days).filter(item => item !== day) : [...array(plan.days), day];
-                planPatch({ ...plan, days: DAY_KEYS.filter(item => next.includes(item)) });
-            });
-            chip.setAttribute('aria-pressed', on ? 'true' : 'false');
-            chip.disabled = !editable;
-            days.appendChild(chip);
-        });
-        box.appendChild(days);
-
-        const start = minuteOf(plan.start) ?? 16 * 60;
-        const end = minuteOf(plan.end) ?? 18 * 60;
-        const limit = minuteOf(plan.limit);
-        box.appendChild(timeRow(t('study.planner.starts', 'Study starts'), start, { min: 0, max: 1440 - MIN_STUDY - STEP, disabled: !editable,
-            onChange: value => planPatch({ ...plan, start: hhmm(value), end: hhmm(Math.max(end, value + MIN_STUDY)) }) }));
-        box.appendChild(timeRow(t('study.planner.ends', 'Study ends'), end, { min: MIN_STUDY, max: 1440 - STEP, disabled: !editable,
-            onChange: value => {
-                const next = Math.max(value, start + MIN_STUDY);
-                const changed = { ...plan, end: hhmm(next) };
-                if (limit !== null && limit < next) changed.limit = hhmm(next);
-                planPatch(changed);
-            } }));
-        const limitRow = el('div', 'ft-study-limit');
-        const limitToggle = el('input');
-        limitToggle.type = 'checkbox';
-        limitToggle.id = `ftStudyLimit${Math.random().toString(36).slice(2, 8)}`;
-        limitToggle.checked = limit !== null;
-        limitToggle.disabled = !editable;
-        const limitLabel = el('label', '', t('study.planner.dailyLimit', 'Nothing plays after a daily limit'));
-        limitLabel.htmlFor = limitToggle.id;
-        limitToggle.addEventListener('change', () => {
-            const next = { ...plan };
-            if (limitToggle.checked) next.limit = hhmm(Math.max(end, 20 * 60));
-            else delete next.limit;
-            planPatch(next);
-        });
-        limitRow.append(limitToggle, limitLabel);
-        box.appendChild(limitRow);
-        if (limit !== null) {
-            box.appendChild(timeRow(t('study.planner.limitAt', 'Limit'), limit, { min: end, max: 1440 - STEP, disabled: !editable,
-                onChange: value => planPatch({ ...plan, limit: hhmm(Math.max(value, end)) }) }));
-        }
-
-        const settings = el('div', 'ft-study-settings');
-        const round = Number(focus.roundMinutes) >= 50 ? 50 : 25;
-        settings.appendChild(field(t('study.planner.rounds', 'Rounds'), segmented([[25, t('study.planner.round25', '25 / 5 min')], [50, t('study.planner.round50', '50 / 10 min')]], round,
-            value => editable && patch({ focus: { ...focus, roundMinutes: value, breakMinutes: value === 50 ? 10 : 5 } }, { focus: clone(focus) }), t('study.planner.rounds', 'Rounds'))));
-        settings.appendChild(field(t('study.planner.duringBreaks', 'During breaks'), segmented([['rest', t('study.planner.restScreen', 'Rest screen')], ['normal', t('study.planner.normalVideos', 'Normal videos')]], breakMode,
-            value => editable && patch({ breakMode: value }, { breakMode }), t('study.planner.duringBreaks', 'During breaks'))));
-        const music = typeof plan.music === 'boolean' ? plan.music : !text(plan.setByParentId);
-        settings.appendChild(field(t('study.planner.music', 'Music while studying'), segmented([[true, t('study.on', 'On')], [false, t('study.off', 'Off')]], music,
-            value => editable && planPatch({ ...plan, music: value }), t('study.planner.music', 'Music while studying'))));
-        if (!editable) settings.querySelectorAll('button').forEach(node => { node.disabled = true; });
-        box.appendChild(settings);
-        host.replaceChildren(box);
-        return box;
     }
 
     function currentSegment(plan, focus) {
@@ -632,55 +469,6 @@
     }
 
     // ---- Pack picker: Exams | School ----------------------------------------------------------
-
-    /**
-     * The chosen packs as chips, and the way into setup (Android StudyFocusActivity "Change plan" ->
-     * StudySetupActivity): what for, the list, a stream, review, ready. Setup saves through `patch`'s
-     * onPatch, so a parent's plan for a child goes through the same fresh-PIN path.
-     */
-    function packPicker(study, catalog, patch, options = {}) {
-        const Packs = packsApi();
-        const wrap = el('div', 'ft-study-packs');
-        const active = array(study.activePackIds);
-        const edits = object(study.packEdits);
-        const chips = el('div', 'ft-study-packs__chips');
-        for (const id of active) {
-            const pack = Packs?.packById(catalog, id);
-            const variant = pack && Packs.packVariant ? Packs.packVariant(pack, object(edits[id]).variant) : null;
-            const label = packLabel(pack ? { ...pack, variant } : { id });
-            const chip = el('span', 'ft-study-chip', label);
-            const remove = button('×', 'ft-study-chip__remove', () => patch({ activePackIds: active.filter(item => item !== id) }, { activePackIds: active }));
-            remove.setAttribute('aria-label', t('study.packs.remove', 'Remove {pack}', { pack: label }));
-            chip.appendChild(remove);
-            chips.appendChild(chip);
-        }
-        if (!active.length) chips.appendChild(el('span', 'ft-study-muted', t('study.packs.none', 'No study pack yet')));
-        wrap.appendChild(chips);
-        if (!Packs || !catalog) return wrap;
-        const row = el('div', 'ft-study-packs__add');
-        const country = Packs.countryFromLocale(root.navigator?.language || '') || Packs.countryFromLocale(language());
-        // The packs listed in setup are for `country`: the row wears its light accent (Android CountryAccent).
-        if (Packs.countryAccent) applyCountryAccent(row, Packs.countryAccent(country), Packs);
-        const open = button(active.length ? t('study.setup.change', 'Change') : t('study.setup.title', 'Set up study'),
-            active.length ? 'btn-secondary ft-study-packs__open' : 'btn-primary ft-study-packs__open', () => {
-                openSetup(open, {
-                    study, catalog, isSelf: options.isSelf !== false, profileId: options.profileId || null,
-                    onPatch: change => options.onPatch?.(change),
-                    onStart: (minutes, lock) => send({ action: 'FilterTube_StudyStartSession', minutes, lock }),
-                    onClose: () => options.onSetupClosed?.()
-                });
-            });
-        row.appendChild(open);
-        wrap.appendChild(row);
-        // What Kids does during study: Kids learning packs show there; exam and class packs never do.
-        const kidsNote = engine()?.kidsSetupNote ? engine().kidsSetupNote(active, catalog) : null;
-        if (kidsNote) {
-            wrap.appendChild(el('p', 'ft-study-muted ft-study-packs__kids', kidsNote === 'kids_learning'
-                ? t('study.packs.kidsLearning', 'Kids learning for this age shows in Kids.')
-                : t('study.packs.kidsHold', 'Kids keeps Kids videos and pauses at study time.')));
-        }
-        return wrap;
-    }
 
     /**
      * Android StudySetupViews' country card accent on the row that lists a country's packs: three short
@@ -1020,7 +808,9 @@
                 });
                 const copy = el('span', 'ft-setup-tile__copy');
                 copy.append(el('strong', 'ft-setup-tile__name', name), el('span', 'ft-setup-tile__line', line));
-                tile.append(copy, doodleArt(doodle, 'ft-setup-tile__doodle'));
+                const chevron = icon('chevron');
+                chevron.classList.add('ft-setup-tile__chevron');
+                tile.append(copy, doodleArt(doodle, 'ft-setup-tile__doodle'), chevron);
                 tiles.appendChild(tile);
             }
             body.appendChild(tiles);
@@ -1549,179 +1339,1010 @@
 
     // ---- Dashboard (options page) -------------------------------------------------------------
 
+    // ---- The Study home (Android StudyFocusActivity, STUDY_V3) ---------------------------------
+    // One page: the hero card (Kriti's perch, the Day Ring, the moment's line and its one action),
+    // Continue lecture, This week, "Session and channels" link rows, Settings and Family. "Change
+    // plan" opens the plan page (the day planner and the daily limit) in the same place.
+
+    const HOME_PREFS_KEY = 'ftStudyHomeUiV1';
+    const SVG_NS = 'http://www.w3.org/2000/svg';
+    /** Kriti arrives this long after the ring starts drawing: content leads (KRITI_DELAY_MILLIS). */
+    const KRITI_DELAY_MS = 260;
+    /** The ring's draw-on, once a day and after Start (NativeMotion.SIGNATURE_RING). */
+    const RING_DRAW_MS = 900;
+    /** Skip break's salute stays this long (THUMBS_UP_MILLIS). */
+    const SALUTE_MS = 1800;
+    /** Start now's lengths (Android addStartControls). */
+    const START_LENGTHS = [25, 50, 60, 120];
+
+    function homePrefs() {
+        try { return object(JSON.parse(root.localStorage?.getItem(HOME_PREFS_KEY) || '{}')); } catch (e) { return {}; }
+    }
+    function setHomePref(key, value) {
+        const prefs = homePrefs();
+        if (value === null || value === undefined) delete prefs[key]; else prefs[key] = value;
+        try { root.localStorage?.setItem(HOME_PREFS_KEY, JSON.stringify(prefs)); } catch (e) { }
+    }
+
+    function motionAllowed() {
+        try { return !root.matchMedia?.('(prefers-reduced-motion: reduce)')?.matches; } catch (e) { return true; }
+    }
+
+    function svgNode(tag, attrs = {}) {
+        const node = root.document.createElementNS(SVG_NS, tag);
+        for (const [key, value] of Object.entries(attrs)) node.setAttribute(key, String(value));
+        return node;
+    }
+
+    function minutesLabel(value) {
+        return value >= 60 && value % 60 === 0 ? t('study.hoursChip', '{hours} h', { hours: value / 60 }) : t('study.minutes', '{minutes} min', { minutes: value });
+    }
+
+    /** "4 – 7 PM", in the page's language (Android DateUtils.formatDateRange). */
+    function timeRange(fromMinute, toMinute) {
+        const at = minute => new Date(2026, 0, 5, 0, minute).getTime();
+        try { return new Intl.DateTimeFormat(language(), { hour: 'numeric', minute: '2-digit' }).formatRange(at(fromMinute), at(toMinute)); } catch (e) { }
+        return `${clockLabel(fromMinute)} – ${clockLabel(toMinute)}`;
+    }
+
+    function minuteOfDay(ms) { const date = new Date(ms); return date.getHours() * 60 + date.getMinutes(); }
+
     /**
-     * The Day Ring (Android StudyDayRingView, StudyRingModel): the session's rounds as sage arcs on one
-     * continuous pencil track, 5° gaps at every round and break edge, solid where done and lighter for
-     * the rest of the round running now, the current break as a full sun arc with a thin sun arc inside
-     * that drains with it, other breaks as sun notches, and an ink tick for now. Outside a session, the
-     * plain track.
+     * The Day Ring (StudyDayRingView): today's plan as a crayon circle. Rounds are sage: solid for study
+     * done, hatched for the rest of the running round, the pencil track for later rounds. The break
+     * running now is a full sun arc with a thin sun arc inside that drains; every other break is a sun
+     * bead. Now is a rounded brick pointer. The centre holds the big minutes, or a break's m:ss.
+     * opts: {ring (Engine.dayRing), number, label, countdown, breakLeft, drawOn}.
      */
-    function ring(state) {
-        const ns = 'http://www.w3.org/2000/svg';
-        const value = object(state);
-        const Engine = engine();
-        const svg = root.document.createElementNS(ns, 'svg');
-        svg.setAttribute('viewBox', '0 0 120 120');
-        svg.setAttribute('class', 'ft-study-ring__svg');
-        svg.setAttribute('aria-hidden', 'true');
-        const R = 52;
+    function dayRing(opts) {
+        const model = object(opts.ring);
+        const svg = svgNode('svg', { viewBox: '0 0 236 236', class: 'ft-day-ring', 'aria-hidden': 'true' });
+        const cx = 118; const cy = 118; const stroke = 24; const R = 118 - stroke / 2 - 9;
+        const id = `ftRing${Math.random().toString(36).slice(2, 8)}`;
+        const defs = svgNode('defs');
+        // The running round's hatch: sage crayon stripes on the paper.
+        const hatch = svgNode('pattern', { id: `${id}h`, width: 7, height: 7, patternUnits: 'userSpaceOnUse', patternTransform: 'rotate(40)' });
+        hatch.appendChild(svgNode('rect', { width: 7, height: 7, class: 'ft-day-ring__hatch-bg' }));
+        hatch.appendChild(svgNode('rect', { width: 3.2, height: 7, class: 'ft-day-ring__hatch-line' }));
+        defs.appendChild(hatch);
+        // Wax: a slight wobble on every stroke.
+        const wax = svgNode('filter', { id: `${id}w`, x: '-5%', y: '-5%', width: '110%', height: '110%' });
+        wax.appendChild(svgNode('feTurbulence', { type: 'fractalNoise', baseFrequency: 0.9, numOctaves: 1, seed: 7, result: 'n' }));
+        wax.appendChild(svgNode('feDisplacementMap', { in: 'SourceGraphic', in2: 'n', scale: 1.6 }));
+        defs.appendChild(wax);
+        svg.appendChild(defs);
+        const body = svgNode('g', { filter: `url(#${id}w)` });
+        svg.appendChild(body);
         const point = (fraction, radius = R) => {
             const angle = fraction * 2 * Math.PI - Math.PI / 2;
-            return [60 + radius * Math.cos(angle), 60 + radius * Math.sin(angle)];
+            return [cx + radius * Math.cos(angle), cy + radius * Math.sin(angle)];
         };
         const arcPath = (from, to, radius = R) => {
-            if (to - from >= 0.9999) return `M60 ${60 - radius} A${radius} ${radius} 0 1 1 59.99 ${60 - radius}`;
+            if (to - from >= 0.9999) return `M${cx} ${cy - radius} A${radius} ${radius} 0 1 1 ${cx - 0.01} ${cy - radius}`;
             const [x1, y1] = point(from, radius);
             const [x2, y2] = point(to, radius);
             return `M${x1.toFixed(2)} ${y1.toFixed(2)} A${radius} ${radius} 0 ${to - from > 0.5 ? 1 : 0} 1 ${x2.toFixed(2)} ${y2.toFixed(2)}`;
         };
-        const add = (d, className, width) => {
-            const path = root.document.createElementNS(ns, 'path');
-            path.setAttribute('d', d);
-            path.setAttribute('class', className);
-            path.setAttribute('fill', 'none');
-            if (width) path.setAttribute('stroke-width', String(width));
-            svg.appendChild(path);
+        const arc = (from, to, className, width = stroke, radius = R, parent = body) => {
+            const path = svgNode('path', { d: arcPath(from, to, radius), class: className, fill: 'none', 'stroke-width': width });
+            parent.appendChild(path);
             return path;
         };
-        add(arcPath(0, 1), 'ft-study-ring__track', 10);
-        const segments = array(value.segments);
-        if (!Engine?.dayRing || !segments.length || !(value.state === 'STUDY' || value.state === 'BREAK')) return svg;
-        const model = Engine.dayRing(segments, Date.now());
-        const GAP = 2.5 / 360;
-        const edges = Engine.ringBoundaries(model);
-        const isEdge = at => edges.some(edge => Math.abs(edge - (at >= 1 ? 0 : at)) < 1e-6);
-        for (const arc of model.arcs) {
-            if (arc.kind === 'TODO') continue;
-            const from = arc.start + (isEdge(arc.start) ? GAP : 0);
-            const to = arc.end - (isEdge(arc.end) ? GAP : 0);
-            if (to - from <= 0.0015) continue;
-            add(arcPath(from, to), `ft-study-ring__arc is-${arc.kind.toLowerCase()}`, 10);
+        arc(0, 1, 'ft-day-ring__track');
+        const Engine = engine();
+        const arcs = array(model.arcs);
+        const breaks = array(model.breaks);
+        const current = Engine?.currentBreak ? Engine.currentBreak(model) : null;
+        for (const item of arcs) {
+            if (item.kind === 'TODO' || item.end - item.start <= 0.001) continue;
+            const path = arc(item.start, item.end, item.kind === 'LIVE' ? 'ft-day-ring__live' : 'ft-day-ring__done');
+            if (item.kind === 'LIVE') path.setAttribute('stroke', `url(#${id}h)`);
         }
-        const current = Engine.currentBreak(model);
-        model.breaks.forEach(([from, to], index) => {
-            if (index === current) {
-                add(arcPath(from + GAP, to - GAP), 'ft-study-ring__sun', 10);
-                // The break drains: a thin sun arc inside the ring, from now to the break's end.
-                if (Number.isFinite(model.tick) && to - model.tick > 0.002) add(arcPath(model.tick, to, R - 10), 'ft-study-ring__drain', 3);
-            } else {
-                const middle = (from + to) / 2;
-                add(arcPath(middle - 2.5 / 360, middle + 2.5 / 360), 'ft-study-ring__notch', 10);
-            }
+        breaks.forEach(([from, to], index) => {
+            if (index === current) return;
+            const [x, y] = point((from + to) / 2);
+            body.appendChild(svgNode('circle', { cx: x.toFixed(2), cy: y.toFixed(2), r: (stroke * 0.27).toFixed(2), class: 'ft-day-ring__bead' }));
         });
+        // The cuts (StudyRingModel.cuts): 12 o'clock and the current break's edges, a notch of the card's paper.
+        const GAP = 2.5 / 360;
+        const cuts = new Set([0]);
+        if (current !== null && breaks[current]) breaks[current].forEach(edge => cuts.add(edge >= 1 ? 0 : edge));
+        for (const at of cuts) arc(at - GAP, at + GAP, 'ft-day-ring__cut', stroke + 4);
+        if (current !== null && breaks[current]) arc(breaks[current][0], breaks[current][1], 'ft-day-ring__sun');
+        if (Number.isFinite(opts.breakLeft) && opts.breakLeft > 0) arc(0, Math.min(1, opts.breakLeft) * 0.9999, 'ft-day-ring__drain', 5, R - stroke / 2 - 9);
         if (Number.isFinite(model.tick)) {
-            const [x1, y1] = point(model.tick, R - 8);
-            const [x2, y2] = point(model.tick, R + 8);
-            const tick = root.document.createElementNS(ns, 'line');
-            tick.setAttribute('x1', x1.toFixed(2)); tick.setAttribute('y1', y1.toFixed(2));
-            tick.setAttribute('x2', x2.toFixed(2)); tick.setAttribute('y2', y2.toFixed(2));
-            tick.setAttribute('class', 'ft-study-ring__tick');
-            svg.appendChild(tick);
+            const [x1, y1] = point(model.tick, R - stroke / 2 - 4);
+            const [x2, y2] = point(model.tick, R + stroke / 2 + 6);
+            const coords = { x1: x1.toFixed(2), y1: y1.toFixed(2), x2: x2.toFixed(2), y2: y2.toFixed(2) };
+            svg.appendChild(svgNode('line', { ...coords, class: 'ft-day-ring__pointer-edge' }));
+            svg.appendChild(svgNode('line', { ...coords, class: 'ft-day-ring__pointer' }));
+        }
+        // The draw-on: the ring sweeps in clockwise from 12 o'clock under a mask.
+        if (opts.drawOn && motionAllowed()) {
+            const mask = svgNode('mask', { id: `${id}m` });
+            const sweep = svgNode('circle', { cx, cy, r: R, fill: 'none', stroke: '#fff', 'stroke-width': stroke + 30, pathLength: 1,
+                'stroke-dasharray': '1 1', 'stroke-dashoffset': 1, transform: `rotate(-90 ${cx} ${cy})`, class: 'ft-day-ring__sweep' });
+            sweep.style.animationDuration = `${RING_DRAW_MS}ms`;
+            mask.appendChild(sweep);
+            defs.appendChild(mask);
+            body.setAttribute('mask', `url(#${id}m)`);
+        }
+        const number = svgNode('text', { x: cx, y: opts.label ? 124 : 134, class: `ft-day-ring__number${opts.countdown ? ' is-countdown' : ''}` });
+        number.textContent = text(opts.number);
+        // The figure stays inside the ring at any length.
+        const length = text(opts.number).length;
+        if (length >= 4) number.style.fontSize = `${Math.max(34, 62 - (length - 3) * 9)}px`;
+        svg.appendChild(number);
+        if (opts.label) {
+            const label = svgNode('text', { x: cx, y: 150, class: `ft-day-ring__label${opts.countdown ? ' is-countdown' : ''}` });
+            label.textContent = text(opts.label);
+            svg.appendChild(label);
         }
         return svg;
     }
 
+    /** What the ring shows now (ringState): a running session, or the next one (the plan's, or Start now's). */
+    function ringState(state, study, now = Date.now()) {
+        const Engine = engine();
+        const value = object(state);
+        const segments = array(value.segments);
+        if ((value.state === 'STUDY' || value.state === 'BREAK') && segments.length && Engine?.dayRing) {
+            const ring = Engine.dayRing(segments, now);
+            const ends = Number(value.sessionEnd) || segments[segments.length - 1].end;
+            if (value.state === 'STUDY') {
+                const left = Math.max(0, Math.ceil((Number(value.until) - now) / MINUTE));
+                return { ring, number: String(left), label: t('study.ring.left', 'min left'),
+                    summary: t('study.ring.summaryRound', 'Round {round} of {rounds}. {left} min left in this round, {studied} min studied so far. Done at {time}.',
+                        { round: value.round, rounds: value.rounds, left, studied: ring.studiedMinutes, time: formatTime(ends) }) };
+            }
+            const seconds = Math.max(0, Math.ceil((Number(value.until) - now) / 1000));
+            const start = Number(value.segmentStart);
+            const span = Number(value.until) - start;
+            return { ring, number: `${Math.floor(seconds / 60)}:${String(seconds % 60).padStart(2, '0')}`, label: t('study.ring.breakLeft', 'left of your break'),
+                countdown: true, breakLeft: Number.isFinite(start) && span > 0 ? Math.min(1, Math.max(0, (Number(value.until) - now) / span)) : null,
+                summary: t('study.ring.summaryBreak', 'Break until {time}. {studied} min studied so far. Done at {end}.',
+                    { time: formatTime(value.until), studied: ring.studiedMinutes, end: formatTime(ends) }) };
+        }
+        const today = Number(value.todayMinutes) || 0;
+        const focus = object(object(study).focus);
+        const plan = object(study).plan;
+        let planned = null;
+        if (Engine?.planOccurrences && isObject(plan)) {
+            const midnight = new Date(now); midnight.setHours(0, 0, 0, 0);
+            const next = Engine.planOccurrences(plan, midnight.getTime(), midnight.getTime() + 86400000)
+                .find(item => item.start > now && new Date(item.start).toDateString() === new Date(now).toDateString());
+            if (next) planned = Engine.splitRounds(next.start, next.end, focus);
+        }
+        let ring; let summary;
+        if (planned && Engine?.dayRing) {
+            ring = Engine.dayRing(planned, null);
+            summary = t('study.ring.summaryPlan', 'Today\'s plan, {range}: {minutes} min of study in {rounds}.', {
+                range: timeRange(minuteOfDay(planned[0].start), minuteOfDay(planned[planned.length - 1].end)),
+                minutes: ring.plannedMinutes, rounds: plural('study.nRounds', ring.rounds, '{count} round', '{count} rounds') });
+        } else {
+            const minutes = startMinutes(value.profileId);
+            ring = Engine?.dayRing ? Engine.dayRing(Engine.splitRounds(now, now + minutes * MINUTE, focus), null) : { arcs: [], plannedMinutes: minutes, rounds: 1 };
+            summary = t('study.ring.summaryStart', 'Start now: {minutes} min of study in {rounds}.',
+                { minutes: ring.plannedMinutes, rounds: plural('study.nRounds', ring.rounds, '{count} round', '{count} rounds') });
+        }
+        // Never a zero in the middle: today's minutes once there are some, else what's ahead.
+        if (today > 0) return { ring, number: String(today), label: t('study.ring.studied', 'min studied'),
+            summary: `${t('study.ring.summaryToday', '{minutes} min studied today.', { minutes: today })} ${summary}` };
+        return { ring, number: String(ring.plannedMinutes), label: planned ? t('study.ring.planned', 'min planned') : t('study.ring.session', 'min session'), summary };
+    }
+
+    function startMinutes(profileId) {
+        const value = Number(homePrefs()[`minutes:${profileId || 'default'}`]);
+        return START_LENGTHS.includes(value) ? value : 50;
+    }
+    function startLocked(profileId) { return homePrefs()[`lock:${profileId || 'default'}`] === 'locked'; }
+
+    function hasPack(study, catalog) {
+        const ids = array(object(study).activePackIds);
+        if (!ids.length) return false;
+        const Packs = packsApi();
+        return !catalog || !Packs?.packById ? true : ids.some(id => Packs.packById(catalog, id));
+    }
+
+    function nextPlanLine(study, now = Date.now()) {
+        const Engine = engine();
+        const plan = object(study).plan;
+        if (!Engine?.planOccurrences || !isObject(plan)) return null;
+        const next = Engine.planOccurrences(plan, now, now + 8 * 86400000).find(item => item.start > now);
+        if (!next) return null;
+        const same = new Date(next.start).toDateString() === new Date(now).toDateString();
+        let day = '';
+        if (!same) { try { day = `${new Date(next.start).toLocaleDateString(language(), { weekday: 'short' })} `; } catch (e) { } }
+        return t('study.dash.next', 'Next study {time}', { time: day + formatTime(next.start) });
+    }
+
+    /** The home's role (StudyHomeRender.Role): the person's own study, or a child's under a parent. */
+    function homeRole(data) { return data.state?.isChild === true ? 'child' : 'self'; }
+
+    function running(state) { return state?.state === 'STUDY' || state?.state === 'BREAK'; }
+
+    function canStart(data, catalog) {
+        const state = object(data.state);
+        const study = object(state.study);
+        return homeRole(data) === 'self' && !state.lock && !running(state) && hasPack(study, catalog)
+            && !text(object(study.plan).setByParentId) && !state.clockHold;
+    }
+
+    /** heroLines: the title under the ring and its meta pill. */
+    function heroLines(data, catalog) {
+        const state = object(data.state);
+        const study = object(state.study);
+        if (Number.isFinite(state.grantUntil)) return [t('study.tile.extraTime', 'Extra time until {time}', { time: formatTime(state.grantUntil) }), null];
+        if (state.clockHold) return [t('study.clockHold.title', 'Check the clock'), t('study.clockHold.body', 'The time or time zone changed during study. Videos stay off until it\'s set back.')];
+        if (state.state === 'STUDY') {
+            const next = array(state.segments).find(item => item.kind === 'BREAK' && item.start >= Number(state.until));
+            return [t('study.roundOf', 'Round {round} of {rounds}', { round: state.round, rounds: state.rounds }),
+                next ? t('study.roundMeta', 'Break at {time}, done by {end}', { time: formatTime(next.start), end: formatTime(state.sessionEnd) })
+                    : t('study.doneBy', 'Done by {time}', { time: formatTime(state.sessionEnd) })];
+        }
+        if (state.state === 'BREAK') return [t('study.tile.onBreak', 'On a break until {time}', { time: formatTime(state.until) }),
+            state.sessionEnd ? t('study.doneBy', 'Done by {time}', { time: formatTime(state.sessionEnd) }) : null];
+        if (state.state === 'LIMIT') return [t('study.planner.limit', 'Limit reached'), t('study.detail.limit', 'Nothing plays until midnight.')];
+        if (state.lock && Number.isFinite(state.lock.lockedUntil)) return [t('study.lockedUntil', 'Locked until {time}', { time: formatDayTime(state.lock.lockedUntil) }), null];
+        const role = homeRole(data);
+        if (!isObject(study.plan) && role !== 'self') return [t('study.invite.title', 'Set up a study plan'), null];
+        if (!isObject(study.plan) && !hasPack(study, catalog)) return [t('study.invite.title', 'Set up a study plan'),
+            t('study.invite.body', 'Pick an exam or a class. During study time, only those channels and topics show, and your block list still applies.')];
+        if (canStart(data, catalog)) return [t('study.startRound', 'Start a round'), nextPlanLine(study)];
+        return [phaseInfo(state).line, nextPlanLine(study)];
+    }
+
     /**
-     * The end card (Android StudyFocusActivity end card, StudyDayRingView seal): once a session leaves
-     * the clock, the seal stamps with the minutes studied, Kriti jumps beside it, "{n} min studied.
-     * That counts.", the rounds when there were several, Done and Plan tomorrow. Shown once: Done (or
-     * Plan tomorrow) tells the background it was seen.
+     * Kriti always stands on something and never covers data (KritiPerch). Before a session she sits on
+     * the hero card's top-right edge reading; in a round she peeks over its top-left edge from behind it
+     * with her notebook; in the last five minutes she holds up "5 min"; on a break she has her mug; a
+     * child under a parent's plan sees her pointing. Companion Off hides her.
+     */
+    function perchSpot(data, pageState, moment) {
+        const Mascots = root.FilterTubeMascots;
+        if (!Mascots?.showsCharacters?.(Mascots.mode)) return null;
+        if (moment) return { pose: moment, size: 64, end: true, behind: false };
+        const state = object(data.state);
+        if (homeRole(data) === 'child' && text(object(object(state.study).plan).setByParentId)) return { pose: 'kritiPointing', size: 80, end: true, behind: false };
+        if (pageState === 'ROUND') return { pose: 'kritiPencil', size: 64, end: false, behind: true };
+        if (pageState === 'LAST_FIVE') return { pose: 'kritiSignRaised', size: 80, end: true, behind: false, sign: t('study.minutes', '{minutes} min', { minutes: 5 }) };
+        if (pageState === 'BREAK') return { pose: 'kritiMug', size: 64, end: true, behind: false };
+        return { pose: 'kritiReading', size: new Date().getHours() >= 21 ? 80 : 96, end: true, behind: false };
+    }
+
+    function perchImage(spot) {
+        const Mascots = root.FilterTubeMascots;
+        const file = Mascots?.stillImage?.(spot.pose);
+        if (!file) return null;
+        const img = el('img', `ft-perch__kriti is-${spot.end ? 'end' : 'start'}${spot.behind ? ' is-behind' : ''}`);
+        const api = runtime();
+        img.src = api?.runtime?.getURL ? api.runtime.getURL(`assets/images/mascots/${file}`) : `../assets/images/mascots/${file}`;
+        img.alt = '';
+        img.setAttribute('aria-hidden', 'true');
+        img.style.setProperty('--ft-perch-size', `${spot.size}px`);
+        img.dataset.pose = spot.pose;
+        return img;
+    }
+
+    /** At most one line per visit, and each kind at most once a day (bubbleLine). */
+    let bubbleShownThisVisit = false;
+    function bubbleLine(data, catalog) {
+        const Mascots = root.FilterTubeMascots;
+        if (bubbleShownThisVisit || Mascots?.mode !== 'lively') return null;
+        const state = object(data.state);
+        if (state.state && state.state !== 'NORMAL') return null;
+        const today = new Date().toDateString();
+        let key; let line;
+        if (homeRole(data) === 'child' && text(object(object(state.study).plan).setByParentId)) {
+            key = `kriti:parent:${today}`; line = t('study.kriti.parent', '{name} set today\'s plan.', { name: text(data.parentName) || t('study.parentFallback', 'Your parent') });
+        } else if (canStart(data, catalog)) {
+            key = `kriti:start:${today}`; line = t('study.kriti.start', 'One round is plenty to start.');
+        } else return null;
+        if (homePrefs()[key]) return null;
+        setHomePref(key, true);
+        bubbleShownThisVisit = true;
+        return line;
+    }
+
+    let perchMoment = null;
+    let perchCache = null;
+    let shownPose = '';
+    let startedJustNow = false;
+
+    function heroCard(data, ctx) {
+        const state = object(data.state);
+        const study = object(state.study);
+        const catalog = ctx.catalog;
+        const stage = el('div', 'ft-perch');
+        const card = el('section', 'ft-home-card ft-hero');
+        const pageState = ctx.pageState;
+        const ringInfo = ringState(state, study);
+        // The draw-on: once a day, and after Start.
+        const drawKey = `ringDrawOn:${state.profileId || 'default'}`;
+        const today = new Date().toDateString();
+        const drawOn = startedJustNow || (!ctx.redraw && homePrefs()[drawKey] !== today);
+        if (drawOn) setHomePref(drawKey, today);
+        const ringBox = el('div', 'ft-hero__ring');
+        ringBox.setAttribute('role', 'img');
+        ringBox.setAttribute('aria-label', ringInfo.summary);
+        ringBox.appendChild(dayRing({ ...ringInfo, drawOn }));
+        card.appendChild(ringBox);
+        const [heading, meta] = heroLines(data, catalog);
+        const words = el('div', 'ft-hero__words');
+        words.setAttribute('aria-live', 'polite');
+        words.appendChild(el('h3', 'ft-hero__title', heading));
+        if (meta) words.appendChild(el('p', 'ft-hero__meta', meta));
+        card.appendChild(words);
+        const actions = el('div', 'ft-hero__actions');
+        buildHeroActions(actions, data, ctx);
+        if (actions.childNodes.length) card.appendChild(actions);
+        // A child's own card under a parent: Ask for time, and who gave the minutes running now.
+        if (Number.isFinite(state.grantUntil)) {
+            card.appendChild(el('p', 'ft-study-ask__line is-given', t('study.ask.given', '{name} gave you {minutes} min · until {time}',
+                { name: data.grantName || data.parentName || t('askParent.parentFallback', 'Your parent'), minutes: state.grantMinutes, time: formatTime(state.grantUntil) })));
+        }
+        stage.appendChild(card);
+        const spot = perchSpot(data, pageState, perchMoment && perchMoment.until > Date.now() ? perchMoment.pose : null);
+        if (spot) {
+            // The same picture across the page's redraws, so a frame animation plays on to its end.
+            const kriti = perchCache && perchCache.pose === spot.pose ? perchCache.img : perchImage(spot);
+            if (kriti) perchCache = { pose: spot.pose, img: kriti };
+            if (kriti) {
+                kriti.className = `ft-perch__kriti is-${spot.end ? 'end' : 'start'}${spot.behind ? ' is-behind' : ''}`;
+                stage.classList.add(spot.behind ? 'has-peek' : 'has-perch');
+                stage.style.setProperty('--ft-perch-size', `${spot.size}px`);
+                // With a sign, she and the words share one box, so the words sit on the sign at any size.
+                let figure = kriti;
+                if (spot.sign) {
+                    figure = el('span', 'ft-perch__figure is-end');
+                    figure.style.setProperty('--ft-perch-size', `${spot.size}px`);
+                    figure.appendChild(kriti);
+                }
+                if (spot.behind) stage.insertBefore(figure, card); else stage.appendChild(figure);
+                const moved = shownPose !== spot.pose;
+                shownPose = spot.pose;
+                const Mascots = root.FilterTubeMascots;
+                if (moved && motionAllowed()) {
+                    kriti.classList.add('is-arriving');
+                    kriti.style.animationDelay = `${drawOn ? KRITI_DELAY_MS : 0}ms`;
+                    if (spot.pose === 'kritiMug' || spot.pose === 'kritiPencil') {
+                        try { Mascots?.playSheet?.(kriti, spot.pose); } catch (e) { }
+                    }
+                }
+                // "5 min" written on her blank sign (the art stays wordless; the page writes the words).
+                if (spot.sign) {
+                    const sign = el('span', 'ft-perch__sign', spot.sign);
+                    sign.setAttribute('aria-hidden', 'true');
+                    figure.appendChild(sign);
+                }
+                const line = !spot.behind && pageState === 'IDLE' ? bubbleLine(data, catalog) : null;
+                if (line) {
+                    const bubble = el('p', 'ft-perch__bubble', line);
+                    bubble.setAttribute('role', 'status');
+                    stage.appendChild(bubble);
+                }
+            }
+        } else {
+            shownPose = '';
+            perchCache = null;
+        }
+        startedJustNow = false;
+        return stage;
+    }
+
+    /**
+     * The hero's action, by moment: in a round, Open study with End session quiet under it; on a break,
+     * Skip break (a brick crayon pill) when allowed; outside a session, Start now with its "50 min,
+     * Gentle · Change" line, or Set up when there's nothing to study yet.
+     */
+    function buildHeroActions(slot, data, ctx) {
+        const state = object(data.state);
+        const study = object(state.study);
+        const role = homeRole(data);
+        if (state.state === 'STUDY') {
+            slot.appendChild(button(t('study.openStudy', 'Open study'), 'btn-primary ft-hero__primary', () => openSite('')));
+        } else if (state.state === 'BREAK') {
+            if (state.canSkipBreak && !state.breakSkipped) {
+                const skip = button(t('study.overlay.skipBreak', 'Skip break'), 'btn-secondary ft-hero__skip', async () => {
+                    skip.disabled = true;
+                    const result = await send({ action: 'FilterTube_StudySkipBreak' });
+                    if (result?.ok === false) { skip.disabled = false; skip.classList.add('is-rejected'); return; }
+                    skip.classList.add('is-squash');
+                    perchMoment = { pose: 'kritiSalute', until: Date.now() + SALUTE_MS };
+                    try { root.FilterTubeMascots?.playSound?.('scribble'); } catch (e) { }
+                    setTimeout(() => ctx.refresh(), SALUTE_MS + 40);
+                    ctx.refresh();
+                });
+                slot.appendChild(skip);
+                if (state.skipPreview) slot.appendChild(el('p', 'ft-hero__note', t('study.overlay.skipCost', '+{minutes} min to round {round}',
+                    { minutes: state.skipPreview.addedMinutes, round: state.skipPreview.round })));
+            }
+        } else if (!isObject(study.plan) && !hasPack(study, ctx.catalog)) {
+            if (role === 'self' && !state.lock) slot.appendChild(button(t('study.invite.action', 'Set up'), 'btn-primary ft-hero__primary', () => ctx.openSetup(slot)));
+        } else if (canStart(data, ctx.catalog)) {
+            addStartControls(slot, data, ctx);
+        }
+        // End session (Gentle, with its 30-second pause) or its countdown; nothing for Locked.
+        if (role === 'self' && running(state) && state.endPolicy?.canEnd === true) {
+            if (Number.isFinite(state.endRequestedAt)) {
+                const row = el('div', 'ft-hero__ending');
+                const seconds = Math.max(0, Math.ceil((state.endRequestedAt + 30000 - Date.now()) / 1000));
+                row.append(el('span', 'ft-hero__ending-text', t('study.endingSeconds', 'Ending in {seconds} seconds', { seconds })),
+                    button(t('study.cancelEnd', 'Cancel'), 'ft-link-button', async () => { await send({ action: 'FilterTube_StudyCancelEnd' }); ctx.refresh(); }));
+                slot.appendChild(row);
+            } else {
+                slot.appendChild(button(t('study.endSession', 'End session'), 'ft-link-button ft-hero__end', async () => {
+                    await send({ action: 'FilterTube_StudyEndSession' });
+                    ctx.toast(t('study.endHint', 'It ends after a 30-second pause, so you can still cancel.'));
+                    ctx.refresh();
+                }));
+            }
+        } else if (role === 'self' && running(state) && state.lockedUntil) {
+            slot.appendChild(el('p', 'ft-hero__note', t('study.lockedNoEnd', 'Locked until {time}. It can\'t end early.', { time: formatTime(state.lockedUntil) })));
+        }
+        if (role === 'child' && running(state) && (state.setByParentId || state.lockMode === 'locked') && state.lockedUntil) {
+            slot.appendChild(el('p', 'ft-hero__note', t('study.lockedNoEnd', 'Locked until {time}. It can\'t end early.', { time: formatTime(state.lockedUntil) })));
+        }
+    }
+
+    /** Out of session: Start now, "50 min, Gentle · Change" under it, and the folded choices. */
+    let choosing = false;
+    function addStartControls(slot, data, ctx) {
+        const profileId = data.state?.profileId;
+        const minutes = startMinutes(profileId);
+        const locked = startLocked(profileId);
+        const summary = t('study.startSummary', '{length}, {mode}', { length: minutesLabel(minutes), mode: locked ? t('study.start.locked', 'Locked') : t('study.start.gentle', 'Gentle') });
+        const go = button(t('study.start.title', 'Start now'), 'btn-primary ft-hero__primary', async () => {
+            go.disabled = true;
+            choosing = false;
+            const result = await send({ action: 'FilterTube_StudyStartSession', minutes, lock: locked ? 'locked' : 'gentle' });
+            go.disabled = false;
+            if (result?.ok === false) { ctx.toast(errorText(result.error)); ctx.refresh(); return; }
+            startedJustNow = true;
+            try { root.FilterTubeMascots?.playSound?.('pop'); } catch (e) { }
+            ctx.refresh();
+        });
+        slot.appendChild(go);
+        const line = el('div', 'ft-hero__summary');
+        const change = button(t('study.setup.change', 'Change'), 'ft-link-button', () => { choosing = !choosing; ctx.redrawHome(); });
+        change.setAttribute('aria-expanded', choosing ? 'true' : 'false');
+        change.setAttribute('aria-label', `${t('study.setup.change', 'Change')}: ${summary}`);
+        line.append(el('span', '', summary), change);
+        slot.appendChild(line);
+        if (!choosing) return;
+        const choices = el('div', 'ft-hero__choices');
+        choices.appendChild(choiceRow(START_LENGTHS.map(value => [value, minutesLabel(value)]), minutes, value => {
+            setHomePref(`minutes:${profileId || 'default'}`, value); ctx.redrawHome();
+        }, t('study.start.length', 'Session length')));
+        choices.appendChild(choiceRow([[false, t('study.start.gentle', 'Gentle')], [true, t('study.start.locked', 'Locked')]], locked, value => {
+            setHomePref(`lock:${profileId || 'default'}`, value ? 'locked' : 'gentle'); ctx.redrawHome();
+        }, t('study.start.lock', 'How it ends')));
+        choices.appendChild(el('p', 'ft-hero__note', locked
+            ? t('study.lock.lockedBody', 'No early end, up to 4 hours. Uses Self-Control.')
+            : t('study.lock.gentleBody', 'You can end early after a 30-second pause.')));
+        slot.appendChild(choices);
+    }
+
+    /** PaperKit choice chips in a row: a check on the chosen one (choiceRow). */
+    function choiceRow(options, current, onPick, label, enabled = true) {
+        const group = el('div', 'ft-choice-row');
+        group.setAttribute('role', 'radiogroup');
+        if (label) group.setAttribute('aria-label', label);
+        for (const [value, name] of options) {
+            const on = String(value) === String(current);
+            const chip = button('', `ft-choice${on ? ' is-on' : ''}`, () => { if (!on && enabled) onPick(value); });
+            chip.setAttribute('role', 'radio');
+            chip.setAttribute('aria-checked', on ? 'true' : 'false');
+            chip.disabled = !enabled;
+            chip.append(el('span', 'ft-choice__mark'), el('span', 'ft-choice__label', name));
+            group.appendChild(chip);
+        }
+        return group;
+    }
+
+    function openSite(path) {
+        const url = `https://www.youtube.com/${path || ''}`;
+        try {
+            const tabs = runtime()?.tabs;
+            if (tabs?.create) { const pending = tabs.create({ url }); if (pending?.catch) pending.catch(() => {}); } else root.open(url, '_blank');
+        } catch (e) { }
+    }
+
+    /** Continue lecture: the last video of this round, in a sage tile with a crayon play mark. */
+    function continueRow(state) {
+        const videoId = text(state.lastVideoId);
+        if (state.state !== 'STUDY' || !/^[A-Za-z0-9_-]{11}$/.test(videoId)) return null;
+        const row = button('', 'ft-home-card ft-continue', () => openSite(`watch?v=${videoId}`));
+        const mark = el('span', 'ft-continue__mark');
+        mark.setAttribute('aria-hidden', 'true');
+        mark.appendChild(icon('play'));
+        const words = el('span', 'ft-continue__words');
+        words.append(el('strong', 'ft-continue__title', t('study.continue.title', 'Continue lecture')), el('span', 'ft-study-muted', t('study.continue.body', 'Pick up where you left off')));
+        row.append(mark, words);
+        return row;
+    }
+
+    function icon(name) {
+        const paths = {
+            play: 'M8 5.5v13l11-6.5z',
+            chevron: 'M9 6l6 6-6 6',
+            minus: 'M6 12h12',
+            plus: 'M12 6v12M6 12h12',
+            back: 'M15 6l-6 6 6 6',
+            close: 'M6 6l12 12M18 6L6 18',
+            check: 'M5 12.5l4.5 4.5L19 7.5'
+        };
+        const svg = svgNode('svg', { viewBox: '0 0 24 24', width: 24, height: 24, fill: 'none', 'aria-hidden': 'true', class: `ft-icon ft-icon--${name}` });
+        svg.appendChild(svgNode('path', { d: paths[name] || '', stroke: 'currentColor', 'stroke-width': 2.2, 'stroke-linecap': 'round', 'stroke-linejoin': 'round',
+            fill: name === 'play' ? 'currentColor' : 'none' }));
+        return svg;
+    }
+
+    /**
+     * This week (StudyWeekBeads): seven beads, today's ringed until a round fills it, the count on the
+     * right ("2 study days", or "Your first round starts the week."); never the days missed.
+     */
+    function weekCard(state) {
+        const week = object(state.week);
+        const days = array(week.days);
+        const card = el('section', 'ft-home-card ft-week');
+        const todayIndex = (new Date().getDay() + 6) % 7;
+        const studiedNow = running(state) && Number(state.todayMinutes) > 0;
+        const studied = days.filter((day, index) => day.minutes > 0 || (index === todayIndex && studiedNow)).length;
+        const head = el('div', 'ft-week__head');
+        head.append(el('h4', 'ft-card-title', t('study.week.title', 'This week')),
+            el('span', 'ft-study-muted', studied === 0 ? t('study.week.first', 'Your first round starts the week.') : plural('study.week.studyDays', studied, '{count} study day', '{count} study days')));
+        card.appendChild(head);
+        const row = el('div', 'ft-week__beads');
+        const names = dayLabels();
+        let narrow = names;
+        try {
+            const monday = new Date(2026, 10, 16);
+            narrow = DAY_KEYS.map((_, index) => new Date(monday.getTime() + index * 86400000).toLocaleDateString(language(), { weekday: 'narrow' }));
+        } catch (e) { }
+        const studiedNames = [];
+        DAY_KEYS.forEach((key, index) => {
+            const day = object(days[index]);
+            const done = day.minutes > 0 || (index === todayIndex && studiedNow);
+            const mark = done ? 'full' : index === todayIndex ? 'today' : index < todayIndex ? 'past' : 'later';
+            if (done) studiedNames.push(names[index]);
+            const cell = el('span', 'ft-week__day');
+            const bead = el('span', `ft-bead is-${mark}`);
+            if (index === todayIndex && done && motionAllowed()) {
+                const fillKey = `beadFilled:${state.profileId || 'default'}:${day.date || ''}`;
+                if (!homePrefs()[fillKey]) { setHomePref(fillKey, true); bead.classList.add('is-popping'); }
+            }
+            cell.append(bead, el('span', 'ft-week__name', narrow[index]));
+            row.appendChild(cell);
+        });
+        card.appendChild(row);
+        card.setAttribute('aria-label', [t('study.week.title', 'This week'), head.lastChild.textContent,
+            studiedNames.length ? t('study.week.studiedOn', 'Studied on {days}', { days: studiedNames.join(', ') }) : ''].filter(Boolean).join('. '));
+        row.setAttribute('aria-hidden', 'true');
+        return card;
+    }
+
+    /** "Change plan            4–6:55 pm ›": a 64 px row (linkRow). */
+    function linkRow(title, value, onClick) {
+        const row = onClick ? button('', 'ft-link-row', onClick) : el('div', 'ft-link-row is-static');
+        const words = el('span', 'ft-link-row__words');
+        words.append(el('span', 'ft-link-row__title', title));
+        if (value) words.append(el('span', 'ft-link-row__value', value));
+        row.appendChild(words);
+        if (onClick) row.appendChild(icon('chevron'));
+        return row;
+    }
+
+    function sectionTitle(value) { return el('h4', 'ft-section-title', value); }
+
+    function packsValue(study, catalog) {
+        const Packs = packsApi();
+        const ids = array(object(study).activePackIds);
+        const list = ids.map(id => (catalog && Packs?.packById ? Packs.packById(catalog, id) : null)).filter(Boolean);
+        if (!list.length) return t('study.packs.noneChosen', 'No exam or class chosen yet');
+        return list.map(pack => text(pack.shortName) || localizedName(pack.names, pack.id)).join(', ');
+    }
+
+    /** Change plan, What you study, Daily limit and Self-Control: one paper card (addLinks). */
+    function linksCard(data, ctx) {
+        const state = object(data.state);
+        const study = object(state.study);
+        const role = homeRole(data);
+        const plan = isObject(study.plan) ? study.plan : null;
+        const card = el('section', 'ft-home-card ft-links');
+        const editable = role === 'self' && !state.lock;
+        if (plan) {
+            const start = minuteOf(plan.start); const end = minuteOf(plan.end);
+            card.appendChild(linkRow(t('study.dash.changePlan', 'Change plan'), start !== null && end !== null ? timeRange(start, end) : '', () => ctx.setMode('plan')));
+        }
+        if (plan || hasPack(study, ctx.catalog)) {
+            card.appendChild(linkRow(t('study.link.packs', 'What you study'), packsValue(study, ctx.catalog), editable ? () => ctx.openSetup(card) : null));
+        }
+        if (plan) {
+            const limit = minuteOf(plan.limit);
+            card.appendChild(linkRow(t('study.section.limit', 'Daily limit'), limit !== null ? t('study.limit.at', 'Nothing plays after {time}', { time: clockLabel(limit) })
+                : t('study.limit.none', 'No daily limit'), () => ctx.setMode('plan')));
+        }
+        if (role === 'self') {
+            card.appendChild(linkRow(t('study.selfControl.title', 'Self-Control Session'), state.lock && Number.isFinite(state.lock.lockedUntil)
+                ? t('study.lockedUntil', 'Locked until {time}', { time: formatDayTime(state.lock.lockedUntil) })
+                : t('study.selfControl.body', 'Freeze today\'s filters for a set time'), () => ctx.openSelfControl()));
+        }
+        const explainer = searchExplainerCard(study, ctx.catalog, role === 'child', state.searchHow);
+        if (explainer) {
+            const how = linkRow(t('study.searchHow.link', 'What search shows during study'), '', () => {
+                const open = how.getAttribute('aria-expanded') === 'true';
+                how.setAttribute('aria-expanded', open ? 'false' : 'true');
+                explainer.hidden = open;
+            });
+            how.setAttribute('aria-expanded', 'false');
+            explainer.hidden = true;
+            card.append(how, explainer);
+        }
+        if (!card.childNodes.length) return null;
+        const wrap = el('div', 'ft-home-section');
+        wrap.append(sectionTitle(t('study.sessionChannels', 'Session and channels')), card);
+        return wrap;
+    }
+
+    function switchRow(label, on, enabled, onChange) {
+        const row = el('label', 'ft-switch-row');
+        const input = el('input', 'ft-switch');
+        input.type = 'checkbox';
+        input.setAttribute('role', 'switch');
+        input.checked = !!on;
+        input.disabled = !enabled;
+        input.addEventListener('change', () => onChange(input.checked));
+        row.append(el('span', 'ft-switch-row__label', label), input);
+        return row;
+    }
+
+    /** Settings (addPreferences): Show this week. */
+    function preferencesCard(data, ctx) {
+        const state = object(data.state);
+        if (homeRole(data) === 'child' || !isObject(object(state.study).plan)) return null;
+        const card = el('section', 'ft-home-card ft-prefs');
+        card.appendChild(switchRow(t('study.weekSwitch', 'Show this week'), state.weekView === true, !state.lock, async on => {
+            const result = await send({ action: 'FilterTube_StudyUpdate', patch: { weekView: on } });
+            if (result?.ok === false) ctx.toast(t('study.saveRefused', 'Can\'t change the plan while a lock is running.'));
+            ctx.refresh();
+        }));
+        const wrap = el('div', 'ft-home-section');
+        wrap.append(sectionTitle(t('study.settingsTitle', 'Settings')), card);
+        return wrap;
+    }
+
+    /** Family (addFamily): a plan row for each child the active parent manages. */
+    function familyCard(data, ctx) {
+        const children = array(ctx.children);
+        if (homeRole(data) !== 'self' || data.state?.lock || !children.length) return null;
+        const card = el('section', 'ft-home-card ft-links');
+        for (const child of children) {
+            const plan = object(child.plan);
+            const start = minuteOf(plan.start); const end = minuteOf(plan.end);
+            card.appendChild(linkRow(t('study.family.row', 'Plan for {name}', { name: child.name }),
+                start !== null && end !== null ? t('study.tile.planned', 'Study plan · {range}', { range: timeRange(start, end) }) : t('study.invite.title', 'Set up a study plan'),
+                () => ctx.openFamily(child.id)));
+        }
+        const wrap = el('div', 'ft-home-section');
+        wrap.append(sectionTitle(t('study.family.title', 'Family')), card);
+        return wrap;
+    }
+
+    // ---- The plan page (renderPlan: the day planner card, then the daily limit) -----------------
+
+    /** A ±step row: label, a round − button, the rolling value, a round + button (stepperRow). */
+    function stepperRow(label, value, { onLess, onMore, lessOk = true, moreOk = true, enabled = true }) {
+        const row = el('div', 'ft-stepper');
+        row.appendChild(el('span', 'ft-stepper__label', label));
+        const less = button('', 'ft-stepper__btn', () => onLess());
+        less.appendChild(icon('minus'));
+        less.setAttribute('aria-label', t('study.planner.earlier', '{label}: 15 minutes earlier', { label }));
+        less.disabled = !enabled || !lessOk;
+        const shown = el('output', 'ft-stepper__value', value);
+        shown.setAttribute('aria-live', 'polite');
+        const more = button('', 'ft-stepper__btn', () => onMore());
+        more.appendChild(icon('plus'));
+        more.setAttribute('aria-label', t('study.planner.later', '{label}: 15 minutes later', { label }));
+        more.disabled = !enabled || !moreOk;
+        row.append(less, shown, more);
+        return row;
+    }
+
+    /** The day bar (StudyDayPlannerView): hour ticks, the plan's segments, now, and start/end handles you can drag. */
+    function planBar(plan, focus, breakMode, { editable, onSelect, onDrag } = {}) {
+        const segments = planSegments(plan, focus, { from: 6 * 60, to: 23 * 60 });
+        const from = segments[0]?.start ?? 0;
+        const to = segments[segments.length - 1]?.end ?? 1440;
+        const span = Math.max(1, to - from);
+        const pct = minute => `${(((minute - from) / span) * 100).toFixed(3)}%`;
+        const wrap = el('div', 'ft-dayplan');
+        const track = el('div', 'ft-dayplan__track');
+        for (const segment of segments) {
+            if (segment.kind === 'normal') continue;
+            const part = button('', `ft-dayplan__seg is-${segment.kind}`, () => onSelect?.(segment));
+            part.style.left = pct(segment.start);
+            part.style.width = `${(((segment.end - segment.start) / span) * 100).toFixed(3)}%`;
+            part.setAttribute('aria-label', `${segmentName(segment.kind)}, ${clockLabel(segment.start)} – ${clockLabel(segment.end)}`);
+            track.appendChild(part);
+        }
+        const now = new Date();
+        const minutesNow = now.getHours() * 60 + now.getMinutes();
+        if (minutesNow >= from && minutesNow <= to) {
+            const marker = el('span', 'ft-dayplan__now');
+            marker.setAttribute('aria-hidden', 'true');
+            marker.style.left = pct(minutesNow);
+            track.appendChild(marker);
+        }
+        const start = minuteOf(plan.start);
+        let end = minuteOf(plan.end);
+        if (start !== null && end !== null) {
+            if (end <= start) end += 1440;
+            for (const [which, at] of [['start', start], ['end', end]]) {
+                const handle = el('span', `ft-dayplan__handle is-${which}`);
+                handle.style.left = pct(at);
+                handle.setAttribute('aria-hidden', 'true');
+                if (editable && onDrag) {
+                    handle.addEventListener('pointerdown', event => {
+                        event.preventDefault();
+                        const box = track.getBoundingClientRect();
+                        let minute = at;
+                        try { handle.setPointerCapture(event.pointerId); } catch (e) { }
+                        handle.classList.add('is-dragging');
+                        const move = ev => {
+                            minute = Math.round((from + ((ev.clientX - box.left) / box.width) * span) / STEP) * STEP;
+                            handle.style.left = pct(Math.max(from, Math.min(to, minute)));
+                        };
+                        const up = () => {
+                            handle.removeEventListener('pointermove', move);
+                            handle.classList.remove('is-dragging');
+                            if (minute !== at) onDrag(which, minute);
+                        };
+                        handle.addEventListener('pointermove', move);
+                        handle.addEventListener('pointerup', up, { once: true });
+                        handle.addEventListener('pointercancel', up, { once: true });
+                    });
+                }
+                track.appendChild(handle);
+            }
+        }
+        const scale = el('div', 'ft-dayplan__scale');
+        for (let hour = Math.ceil(from / 180) * 180; hour <= to - 60; hour += 180) {
+            const tick = el('span', 'ft-dayplan__hour', clockLabel(hour % 1440).replace(/:00/, ''));
+            tick.style.left = pct(hour);
+            scale.appendChild(tick);
+        }
+        wrap.append(track, scale);
+        return wrap;
+    }
+
+    /**
+     * The plan page's card: the day bar with its "Right now" note, Days, Start and End steppers, During
+     * breaks, Music while studying, Rounds, then Study round and Break lengths. Then the Daily limit
+     * card. options: {study, state, editable, readOnlyLabel, onPatch(patch) -> Promise<{ok}>, toastHost}.
+     */
+    function renderPlanPage(host, options) {
+        const study = object(options.study);
+        const editable = options.editable !== false;
+        const plan = isObject(study.plan) ? study.plan : { days: ['mon', 'tue', 'wed', 'thu', 'fri'], start: '16:00', end: '18:00' };
+        const focus = object(study.focus);
+        const round = Number.isFinite(focus.roundMinutes) ? focus.roundMinutes : 25;
+        const rest = Number.isFinite(focus.breakMinutes) ? focus.breakMinutes : 5;
+        const breakMode = study.breakMode === 'normal' ? 'normal' : 'rest';
+        const page = el('div', 'ft-plan-page');
+        if (options.readOnlyLabel) page.appendChild(el('span', `ft-note-chip${editable ? '' : ' is-locked'}`, options.readOnlyLabel));
+        const patch = async (change, undoChange) => {
+            const result = await options.onPatch?.(change);
+            if (result?.ok === false) {
+                const sheet = looseningSheet(result.error, options.state, options.parentName);
+                if (sheet) showLoosening(options.toastHost || host, sheet);
+                else notify(options.toastHost || host, errorText(result.error), null);
+                return;
+            }
+            notify(options.toastHost || host, t('study.planner.saved', 'Saved'), undoChange ? async () => { await options.onPatch?.(undoChange); } : null);
+        };
+        const planPatch = next => patch({ plan: next }, { plan: clone(study.plan ?? null) });
+        const focusPatch = next => patch({ focus: { ...focus, ...next } }, { focus: clone(focus) });
+
+        const card = el('section', 'ft-home-card ft-plan-card');
+        const detail = el('div', 'ft-plan-card__detail');
+        detail.setAttribute('aria-live', 'polite');
+        const showDetail = (segment, now) => {
+            const titleText = now
+                ? `${t('study.planner.rightNow', 'Right now')} · ${segmentName(segment.kind)}`
+                : `${segmentName(segment.kind)} · ${clockLabel(segment.start)} – ${clockLabel(segment.end)}`;
+            detail.replaceChildren(el('strong', 'ft-plan-card__detail-title', titleText), el('span', 'ft-study-muted', segmentWords(segment, breakMode)));
+        };
+        const start = minuteOf(plan.start) ?? 16 * 60;
+        const end = minuteOf(plan.end) ?? 18 * 60;
+        const limit = minuteOf(plan.limit);
+        const setStart = value => planPatch({ ...plan, start: hhmm(value), end: hhmm(Math.max(end, value + MIN_STUDY)) });
+        const setEnd = value => {
+            const next = Math.max(value, start + MIN_STUDY);
+            const changed = { ...plan, end: hhmm(next) };
+            if (limit !== null && limit < next) changed.limit = hhmm(next);
+            planPatch(changed);
+        };
+        card.appendChild(planBar(plan, focus, breakMode, {
+            editable,
+            onSelect: segment => showDetail(segment, false),
+            onDrag: (which, minute) => (which === 'start' ? setStart(Math.max(0, Math.min(1440 - MIN_STUDY - STEP, minute))) : setEnd(Math.min(1440 - STEP, minute)))
+        }));
+        const runningKind = { STUDY: 'study', BREAK: 'break', LIMIT: 'limit' }[text(object(options.state).state)];
+        showDetail(runningKind ? { kind: runningKind } : currentSegment(plan, focus), true);
+        card.appendChild(detail);
+
+        card.appendChild(el('span', 'ft-plan-card__label', t('study.planner.days', 'Days')));
+        const days = el('div', 'ft-plan-days');
+        days.setAttribute('role', 'group');
+        days.setAttribute('aria-label', t('study.planner.days', 'Days'));
+        const dayNames = dayLabels();
+        DAY_KEYS.forEach((day, index) => {
+            const on = array(plan.days).includes(day);
+            const chip = button(dayNames[index], `ft-plan-day${on ? ' is-on' : ''}`, () => {
+                const next = on ? array(plan.days).filter(item => item !== day) : [...array(plan.days), day];
+                planPatch({ ...plan, days: DAY_KEYS.filter(item => next.includes(item)) });
+            });
+            chip.setAttribute('aria-pressed', on ? 'true' : 'false');
+            chip.disabled = !editable;
+            days.appendChild(chip);
+        });
+        card.appendChild(days);
+        card.appendChild(stepperRow(t('study.startLabel', 'Start'), clockLabel(start), { enabled: editable,
+            lessOk: start >= STEP, moreOk: start + STEP <= 1440 - MIN_STUDY - STEP,
+            onLess: () => setStart(start - STEP), onMore: () => setStart(start + STEP) }));
+        card.appendChild(stepperRow(t('study.endLabel', 'End'), clockLabel(end % 1440), { enabled: editable,
+            lessOk: end - STEP >= start + MIN_STUDY, moreOk: end + STEP <= 1440 - STEP,
+            onLess: () => setEnd(end - STEP), onMore: () => setEnd(end + STEP) }));
+
+        card.appendChild(el('span', 'ft-plan-card__label', t('study.planner.duringBreaks', 'During breaks')));
+        card.appendChild(choiceRow([['rest', t('study.planner.restScreen', 'Rest screen')], ['normal', t('study.planner.normalVideos', 'Normal videos')]], breakMode,
+            value => patch({ breakMode: value }, { breakMode }), t('study.planner.duringBreaks', 'During breaks'), editable));
+        const music = typeof plan.music === 'boolean' ? plan.music : !text(plan.setByParentId);
+        card.appendChild(el('span', 'ft-plan-card__label', t('study.planner.music', 'Music while studying')));
+        card.appendChild(choiceRow([[true, t('study.on', 'On')], [false, t('study.off', 'Off')]], music,
+            value => planPatch({ ...plan, music: value }), t('study.planner.music', 'Music while studying'), editable));
+        card.appendChild(el('p', 'ft-plan-card__hint', t('study.music.body', 'Songs keep playing. Podcasts follow your study list, and music videos play as audio only.')));
+
+        card.appendChild(el('span', 'ft-plan-card__label', t('study.planner.rounds', 'Rounds')));
+        const preset = round === 25 && rest === 5 ? 25 : round === 50 && rest === 10 ? 50 : 0;
+        card.appendChild(choiceRow([[25, t('study.planner.round25', '25 / 5 min')], [50, t('study.planner.round50', '50 / 10 min')]], preset,
+            value => focusPatch({ roundMinutes: value, breakMinutes: value === 50 ? 10 : 5 }), t('study.planner.rounds', 'Rounds'), editable));
+        card.appendChild(stepperRow(t('study.roundLength', 'Study round'), t('study.minutes', '{minutes} min', { minutes: round }), { enabled: editable,
+            lessOk: round > 10, moreOk: round < 120,
+            onLess: () => focusPatch({ roundMinutes: Math.max(10, round - 5) }), onMore: () => focusPatch({ roundMinutes: Math.min(120, round + 5) }) }));
+        card.appendChild(stepperRow(t('study.breakLength', 'Break'), rest === 0 ? t('study.noBreak', 'No break') : t('study.minutes', '{minutes} min', { minutes: rest }), { enabled: editable,
+            lessOk: rest > 0, moreOk: rest < 30,
+            onLess: () => focusPatch({ breakMinutes: Math.max(0, rest - 5) }), onMore: () => focusPatch({ breakMinutes: Math.min(30, rest + 5) }) }));
+        page.appendChild(card);
+
+        // The daily limit (addLimit).
+        const limitCard = el('section', 'ft-home-card ft-plan-card');
+        limitCard.appendChild(el('h4', 'ft-card-title', limit !== null ? t('study.limit.at', 'Nothing plays after {time}', { time: clockLabel(limit) }) : t('study.limit.none', 'No daily limit')));
+        if (editable) {
+            limitCard.appendChild(el('p', 'ft-plan-card__hint', limit === null
+                ? t('study.limit.bodyNone', 'Tap + to choose a time. After it, nothing plays until midnight.')
+                : t('study.limit.body', 'Drag the grey limit handle on the plan, or step it here. After the limit, nothing plays until midnight.')));
+            const endOfStudy = end % 1440;
+            limitCard.appendChild(stepperRow(t('study.section.limit', 'Daily limit'), limit === null ? t('study.limit.noLimit', 'No limit') : clockLabel(limit), {
+                lessOk: limit !== null, moreOk: limit === null || limit + STEP <= 1440 - STEP,
+                onLess: () => {
+                    const next = { ...plan };
+                    if (limit - STEP < Math.max(endOfStudy, 0)) delete next.limit; else next.limit = hhmm(limit - STEP);
+                    planPatch(next);
+                },
+                onMore: () => planPatch({ ...plan, limit: hhmm(limit === null ? Math.max(endOfStudy, 20 * 60) : limit + STEP) })
+            }));
+        }
+        const limitWrap = el('div', 'ft-home-section');
+        limitWrap.append(sectionTitle(t('study.section.limit', 'Daily limit')), limitCard);
+        page.appendChild(limitWrap);
+        host.replaceChildren(page);
+        return page;
+    }
+
+    /**
+     * The end card (showEndCard): the ring closes into a scalloped sage seal, Kriti jumps onto its rim
+     * and settles with her medal, "{n} min studied. That counts." with a crayon underline, the rounds,
+     * the week, Done and Plan tomorrow. The page is flat sage. Shown once.
      */
     let endCardShown = null;
-    function endCard(ended, { onDone, onPlan } = {}) {
-        const ns = 'http://www.w3.org/2000/svg';
-        const card = el('section', 'ft-study-endcard');
+    function endCard(ended, state, { onDone, onPlan } = {}) {
+        const card = el('section', 'ft-endcard');
         card.setAttribute('role', 'status');
+        const close = button('', 'ft-endcard__close', () => onDone?.());
+        close.appendChild(icon('close'));
+        close.setAttribute('aria-label', t('study.end.done', 'Done'));
+        card.appendChild(close);
         const roundsText = plural('study.end.rounds', ended.rounds, '{count} round', '{count} rounds');
-        const stage = el('div', 'ft-study-endcard__stage');
-        const seal = root.document.createElementNS(ns, 'svg');
-        seal.setAttribute('viewBox', '0 0 200 200');
-        seal.setAttribute('class', 'ft-study-seal');
-        seal.setAttribute('role', 'img');
-        seal.setAttribute('aria-label', t('study.end.seal', 'Session sealed: {minutes} min studied in {rounds}.', { minutes: ended.studiedMinutes, rounds: roundsText }));
-        // A scalloped rim: 24 bumps around the paper disc.
-        const bumps = 24;
+        const stage = el('div', 'ft-endcard__stage');
+        const seal = svgNode('svg', { viewBox: '0 0 236 236', class: 'ft-seal', role: 'img',
+            'aria-label': t('study.end.seal', 'Session sealed: {minutes} min studied in {rounds}.', { minutes: ended.studiedMinutes, rounds: roundsText }) });
+        // A 22-point scalloped rosette, like a wax seal.
         let d = '';
-        for (let i = 0; i <= bumps * 2; i += 1) {
-            const angle = (Math.PI * i) / bumps - Math.PI / 2;
-            const r = i % 2 === 0 ? 96 : 89;
-            d += `${i ? 'L' : 'M'}${(100 + r * Math.cos(angle)).toFixed(1)} ${(100 + r * Math.sin(angle)).toFixed(1)}`;
+        const r1 = 118 * 0.95; const r2 = 118 * 0.88;
+        for (let i = 0; i <= 176; i += 1) {
+            const angle = (i / 176) * 2 * Math.PI;
+            const r = (r1 + r2) / 2 + ((r1 - r2) / 2) * Math.cos(22 * angle);
+            d += `${i ? 'L' : 'M'}${(118 + r * Math.cos(angle)).toFixed(1)} ${(118 + r * Math.sin(angle)).toFixed(1)}`;
         }
-        const rim = root.document.createElementNS(ns, 'path');
-        rim.setAttribute('d', `${d}Z`);
-        rim.setAttribute('class', 'ft-study-seal__rim');
-        seal.appendChild(rim);
-        // The rounds close the circle: one sage arc each, with a small gap between.
+        seal.appendChild(svgNode('path', { d: `${d}Z`, class: 'ft-seal__rim' }));
+        seal.appendChild(svgNode('circle', { cx: 118, cy: 118, r: 118 * 0.81, class: 'ft-seal__dots' }));
         const parts = array(ended.perRound);
         const total = parts.reduce((sum, item) => sum + item.minutes, 0) || 1;
-        const r = 70;
+        const r = 118 * 0.66;
         const circumference = 2 * Math.PI * r;
-        const gap = parts.length > 1 ? 0.011 * circumference : 0;
+        const gap = parts.length > 1 ? 0.02 * circumference : 0;
         let offset = 0;
         for (const item of parts.length ? parts : [{ minutes: 1 }]) {
             const length = (item.minutes / total) * circumference;
-            const arc = root.document.createElementNS(ns, 'circle');
-            arc.setAttribute('cx', '100'); arc.setAttribute('cy', '100'); arc.setAttribute('r', String(r));
-            arc.setAttribute('class', 'ft-study-seal__arc');
-            arc.setAttribute('stroke-dasharray', `${Math.max(1, length - gap).toFixed(1)} ${circumference.toFixed(1)}`);
-            arc.setAttribute('stroke-dashoffset', (-offset).toFixed(1));
-            arc.setAttribute('transform', 'rotate(-90 100 100)');
-            seal.appendChild(arc);
+            seal.appendChild(svgNode('circle', { cx: 118, cy: 118, r: r.toFixed(2), class: 'ft-seal__arc',
+                'stroke-dasharray': `${Math.max(1, length - gap).toFixed(1)} ${circumference.toFixed(1)}`, 'stroke-dashoffset': (-offset).toFixed(1),
+                transform: 'rotate(-90 118 118)' }));
+            if (parts.length > 1 && offset > 0) {
+                const angle = (offset / circumference) * 2 * Math.PI - Math.PI / 2;
+                seal.appendChild(svgNode('circle', { cx: (118 + r * Math.cos(angle)).toFixed(1), cy: (118 + r * Math.sin(angle)).toFixed(1), r: 7, class: 'ft-seal__bead' }));
+            }
             offset += length;
         }
-        const number = root.document.createElementNS(ns, 'text');
-        number.setAttribute('x', '100'); number.setAttribute('y', '104');
-        number.setAttribute('class', 'ft-study-seal__number');
+        const number = svgNode('text', { x: 118, y: 124, class: 'ft-seal__number' });
         number.textContent = String(ended.studiedMinutes);
-        const label = root.document.createElementNS(ns, 'text');
-        label.setAttribute('x', '100'); label.setAttribute('y', '128');
-        label.setAttribute('class', 'ft-study-seal__label');
+        const label = svgNode('text', { x: 118, y: 150, class: 'ft-seal__label' });
         label.textContent = t('study.end.studied', 'min studied');
         seal.append(number, label);
         stage.appendChild(seal);
-        const Mascots = root.FilterTubeMascots;
-        // The stamp, the jump and the sound play once per session end; the 30 s redraw shows it still.
         const fresh = endCardShown !== ended.start;
         endCardShown = ended.start;
         if (fresh) card.classList.add('is-fresh');
-        const kriti = companionArt('kritiJump', 'ft-study-endcard__kriti', 128);
+        const Mascots = root.FilterTubeMascots;
+        const kriti = companionArt(fresh && motionAllowed() ? 'kritiJump' : 'kritiMedal', 'ft-endcard__kriti');
         if (kriti) {
             stage.appendChild(kriti);
-            // Her jump lands as the seal stamps, then she rests on the last frame.
-            if (fresh) { try { Mascots.playSheet?.(kriti, 'kritiJump'); } catch (e) { } }
+            if (fresh && motionAllowed()) {
+                // Her jump lands as the seal stamps, then she settles with her medal.
+                try {
+                    Mascots.playSheet?.(kriti, 'kritiJump', { onDone: () => setTimeout(() => {
+                        const file = Mascots.stillImage?.('kritiMedal');
+                        const api = runtime();
+                        if (file) kriti.src = api?.runtime?.getURL ? api.runtime.getURL(`assets/images/mascots/${file}`) : `../assets/images/mascots/${file}`;
+                    }, 120) });
+                } catch (e) { }
+            }
         }
         card.appendChild(stage);
         if (fresh) { try { Mascots?.playSound?.('stamp'); } catch (e) { } }
-        card.appendChild(el('h4', 'ft-study-endcard__headline', t('study.end.headline', '{minutes} min studied. That counts.', { minutes: ended.studiedMinutes })));
+        const headline = el('h3', 'ft-endcard__headline', t('study.end.headline', '{minutes} min studied. That counts.', { minutes: ended.studiedMinutes }));
+        card.appendChild(headline);
         if (parts.length > 1) {
-            const list = el('div', 'ft-study-endcard__rounds');
+            const list = el('div', 'ft-home-card ft-endcard__rounds');
             for (const item of parts) {
-                const row = el('div', 'ft-study-endcard__round');
-                row.append(el('span', 'ft-study-endcard__bead'), el('span', '', t('study.end.round', 'Study, round {round}', { round: item.round })),
+                const row = el('div', 'ft-endcard__round');
+                row.append(el('span', 'ft-endcard__bead'), el('span', '', t('study.end.round', 'Study, round {round}', { round: item.round })),
                     el('span', 'ft-study-muted', t('study.end.minutes', '{minutes} min', { minutes: item.minutes })));
                 list.appendChild(row);
             }
             card.appendChild(list);
         }
-        const actions = el('div', 'ft-study-endcard__actions');
-        actions.appendChild(button(t('study.end.done', 'Done'), 'btn-primary', () => onDone?.()));
-        if (onPlan) actions.appendChild(button(t('study.end.planTomorrow', 'Plan tomorrow'), 'btn-secondary', () => onPlan()));
+        if (state && state.week) card.appendChild(weekCard(state));
+        const actions = el('div', 'ft-endcard__actions');
+        actions.appendChild(button(t('study.end.done', 'Done'), 'btn-primary ft-hero__primary', () => onDone?.()));
+        if (onPlan) actions.appendChild(button(t('study.end.planTomorrow', 'Plan tomorrow'), 'ft-link-button', () => onPlan()));
         card.appendChild(actions);
         return card;
     }
 
     /**
-     * Android StudyStateTheme: the study card takes the colour of the moment (sage before and in a round,
-     * a deeper sage in its last five minutes, sun on a break, flat sage at the end, panel in the
-     * evening; night is navy with a thin state band). Both themes' colours go on as custom properties,
-     * so a theme switch needs no redraw; they cross-fade over 450 ms.
+     * Android StudyStateTheme: the page takes the colour of the moment (sage before and in a round, a
+     * deeper sage in its last five minutes, sun on a break, flat sage at the end, panel in the evening;
+     * night is navy with a thin state band). Both themes' colours go on as custom properties, so a theme
+     * switch needs no redraw; they cross-fade over 450 ms. Returns the page state.
      */
     function paintPage(host, state, ended) {
         const Engine = engine();
         const page = host?.closest?.('.ft-study-card') || host;
-        if (!Engine?.pagePalette || !page?.style) return;
         const at = Date.now();
         const value = object(state);
+        if (!Engine?.pagePalette || !page?.style) return 'IDLE';
         const pageState = Engine.pageState(value.state === 'STUDY' ? Number(value.until) : null, value.state === 'BREAK', !!ended, at);
         const evening = Engine.pageEvening(new Date(at).getHours());
         const css = color => `#${(color & 0xFFFFFF).toString(16).padStart(6, '0')}`;
@@ -1733,103 +2354,85 @@
             page.style.setProperty(`--ft-page-edge-${theme}`, css(palette.cardEdge));
         }
         page.dataset.studyPage = pageState.toLowerCase().replace('_', '-');
+        return pageState;
     }
 
-    function renderDashboard(host, data, { refresh, catalog }) {
+    /** The page header (buildScaffold): back on the plan page, the title, and the pack tag. */
+    function pageHeader(data, ctx) {
+        const head = el('div', 'ft-study-head');
+        if (ctx.mode === 'plan') {
+            const back = button('', 'ft-study-head__back', () => ctx.setMode('home'));
+            back.appendChild(icon('back'));
+            back.setAttribute('aria-label', t('askParent.back', 'Back'));
+            head.appendChild(back);
+        }
+        // Home's title is the page header's own ("Study and focus"); the plan page names itself.
+        const title = el('h3', 'ft-study-head__title', ctx.mode === 'plan' ? t('study.dash.changePlan', 'Change plan') : '');
+        if (ctx.mode !== 'plan') title.setAttribute('aria-hidden', 'true');
+        head.appendChild(title);
+        const tag = packsLabel(data.state);
+        if (tag && ctx.mode !== 'plan') head.appendChild(el('span', 'ft-study-head__tag', tag));
+        return head;
+    }
+
+    /** The page redraws every second on a break: keyboard focus stays on the same control. */
+    function replaceKeepingFocus(host, view) {
+        const active = root.document?.activeElement;
+        const key = active && host.contains?.(active) && active.tagName === 'BUTTON' ? `${active.className}|${active.textContent}|${active.getAttribute('aria-label') || ''}` : null;
+        host.replaceChildren(view);
+        if (!key) return;
+        const match = Array.from(view.querySelectorAll('button')).find(node => `${node.className}|${node.textContent}|${node.getAttribute('aria-label') || ''}` === key);
+        try { match?.focus({ preventScroll: true }); } catch (e) { }
+    }
+
+    function renderDashboard(host, data, ctx) {
         const state = object(data.state);
         const study = object(state.study);
-        const info = phaseInfo(state);
-        const card = el('div', 'ft-study-dashboard');
-        const head = el('div', 'ft-study-dashboard__head');
-        head.appendChild(el('h4', 'ft-study-dashboard__title', t('study.title', 'Study')));
-        if (state.setByParentId) head.appendChild(el('span', 'ft-study-chip is-parent', setByLabel(data.parentName)));
-        else if (array(state.packs).length) head.appendChild(el('span', 'ft-study-chip', packsLabel(state)));
-        card.appendChild(head);
-        if (state.sessionEnded && state.state !== 'STUDY' && state.state !== 'BREAK') {
+        const role = homeRole(data);
+        const ended = state.sessionEnded && !running(state) ? state.sessionEnded : null;
+        const pageState = paintPage(host, state, !!ended);
+        const view = el('div', 'ft-study-home');
+        view.dataset.mode = ctx.mode;
+        const local = { ...ctx, pageState };
+        if (ended && role === 'self' && ctx.mode !== 'plan') {
             const seen = () => send({ action: 'FilterTube_StudyAckSessionEnd' });
             const canPlan = !state.setByParentId && !text(object(study.plan).setByParentId) && isObject(study.plan);
-            card.appendChild(endCard(state.sessionEnded, {
-                onDone: async () => { await seen(); refresh(); },
-                onPlan: canPlan ? async () => {
-                    await seen();
-                    await refresh();
-                    try { host.querySelector('.ft-study-planner-host')?.scrollIntoView({ block: 'start', behavior: 'smooth' }); } catch (e) { }
-                } : null
+            view.appendChild(endCard(ended, state, {
+                onDone: async () => { await seen(); ctx.refresh(); },
+                onPlan: canPlan ? async () => { await seen(); ctx.setMode('plan'); } : null
             }));
+            replaceKeepingFocus(host, view);
+            return;
         }
-
-        const status = el('div', `ft-study-status is-${info.tone}`);
-        const ringBox = el('div', 'ft-study-ring');
-        ringBox.appendChild(ring(state));
-        const center = el('div', 'ft-study-ring__center');
-        if (state.state === 'STUDY' || state.state === 'BREAK') {
-            center.appendChild(el('strong', '', t('study.ring.until', 'until {time}', { time: formatTime(state.sessionEnd || state.until) })));
-            const left = minutesLeft(state);
-            if (left !== null) center.appendChild(el('span', '', t('study.ring.minutesLeft', '{minutes} min left', { minutes: left })));
-        } else {
-            center.appendChild(el('strong', '', info.word));
-        }
-        ringBox.appendChild(center);
-        const words = el('div', 'ft-study-status__words');
-        words.appendChild(el('span', 'ft-study-status__word', info.word));
-        words.appendChild(el('p', 'ft-study-status__line', info.line));
-        if (state.clockHold) words.appendChild(el('p', 'import-export-hint', t('study.overlay.holdBody', 'The time or time zone on this device changed during a lock. Study continues when the clock is right again.')));
-        if (state.failClosed && state.state === 'STUDY') words.appendChild(el('p', 'import-export-hint', t('study.overlay.unavailableBody', 'Your study videos can\'t load right now, so nothing plays until this study time ends.')));
-        const actions = el('div', 'ft-study-actions');
-        actions.appendChild(endControls(state, { onChange: refresh }));
-        if (state.canSkipBreak && !state.breakSkipped) {
-            actions.appendChild(button(t('study.overlay.skipBreak', 'Skip break'), 'btn-secondary', async () => { await send({ action: 'FilterTube_StudySkipBreak' }); refresh(); }));
-        }
-        words.appendChild(actions);
-        status.append(ringBox, words);
-        card.appendChild(status);
-        if (Number.isFinite(state.grantUntil)) {
-            card.appendChild(el('p', 'ft-study-ask__line is-given', t('study.ask.given', '{name} gave you {minutes} min · until {time}',
-                { name: data.grantName || data.parentName || t('askParent.parentFallback', 'Your parent'), minutes: state.grantMinutes, time: formatTime(state.grantUntil) })));
-        }
-        if (data.isChild === true || state.isChild === true) {
-            const managed = !!(state.setByParentId || text(object(study.plan).setByParentId) || text(object(study.lock).setByParentId));
-            if (managed && data.time?.isChild) card.appendChild(askForTime(data.time, refresh));
-        }
-
-        if (state.weekView && state.week) {
-            const week = el('div', 'ft-study-week');
-            const circles = el('div', 'ft-study-week__days');
-            const labels = dayLabels();
-            array(state.week.days).forEach((day, index) => {
-                const circle = el('span', `ft-study-week__day is-${day.fill}`);
-                circle.title = `${labels[index]}: ${t('study.week.minutes', '{minutes} min', { minutes: day.minutes })}`;
-                circle.setAttribute('aria-label', circle.title);
-                circles.appendChild(circle);
+        view.appendChild(pageHeader(data, ctx));
+        if (ctx.mode === 'plan') {
+            const holder = el('div', 'ft-study-plan-host');
+            view.appendChild(holder);
+            const parentPlan = text(object(study.plan).setByParentId) || state.setByParentId;
+            const editable = role === 'self' && !parentPlan && !text(object(study.lock).setByParentId) && state.lockMode !== 'locked' && !state.lock;
+            renderPlanPage(holder, {
+                study, state, editable, parentName: data.parentName, toastHost: host,
+                readOnlyLabel: role === 'child' || parentPlan ? setByLabel(data.parentName) : '',
+                onPatch: async patch => { const result = await send({ action: 'FilterTube_StudyUpdate', patch }); await ctx.refresh(); return result; }
             });
-            week.append(el('span', 'ft-study-field__label', t('study.week.title', 'This week')), circles,
-                el('span', 'ft-study-muted', state.week.daysStudied === 1
-                    ? t('study.week.oneDay', '1 day studied this week')
-                    // A kind line for an empty week, never "0 days" (Android study_dash_week_empty).
-                    : state.week.daysStudied > 0 ? t('study.week.days', '{count} days studied this week', { count: state.week.daysStudied })
-                        : t('study.week.empty', 'Each day you study fills a circle.')));
-            card.appendChild(week);
+            replaceKeepingFocus(host, view);
+            return;
         }
-
-        const plannerHost = el('div', 'ft-study-planner-host');
-        const editable = !state.setByParentId && !text(object(study.plan).setByParentId) && !text(object(study.lock).setByParentId) && state.lockMode !== 'locked';
-        card.appendChild(el('h4', 'ft-study-dashboard__subtitle', t('study.planner.title', 'Study plan')));
-        card.appendChild(plannerHost);
-        renderPlanner(plannerHost, {
-            study, catalog, editable, packs: state.packs, state, parentName: data.parentName,
-            readOnlyLabel: text(object(study.plan).setByParentId) ? setByLabel(data.parentName) : t('study.lockedUntil', 'Locked until {time}', { time: formatDayTime(state.lockedUntil) }),
-            toastHost: card,
-            onPatch: async patch => { const result = await send({ action: 'FilterTube_StudyUpdate', patch }); await refresh(); return result; },
-            onSetupClosed: refresh
-        });
-        const explainer = searchExplainerCard(study, catalog, data.isChild === true || state.isChild === true, state.searchHow);
-        if (explainer) card.appendChild(explainer);
-        // No "Start now" while the clock is on hold (Android 2280f4ee3).
-        if (editable && state.state !== 'STUDY' && state.state !== 'BREAK' && !state.clockHold) card.appendChild(startNow(study, refresh));
-        host.replaceChildren(card);
-        paintPage(host, state, !!state.sessionEnded && state.state !== 'STUDY' && state.state !== 'BREAK');
+        view.appendChild(heroCard(data, local));
+        const resume = continueRow(state);
+        if (resume) view.appendChild(resume);
+        if (state.weekView) view.appendChild(weekCard(state));
+        if (role === 'child') {
+            const managed = !!(state.setByParentId || text(object(study.plan).setByParentId) || text(object(study.lock).setByParentId));
+            if (managed && data.time?.isChild) {
+                const ask = el('section', 'ft-home-card ft-ask-card');
+                ask.appendChild(askForTime(data.time, ctx.refresh));
+                view.appendChild(ask);
+            }
+        }
+        for (const part of [linksCard(data, local), preferencesCard(data, local), familyCard(data, local)]) if (part) view.appendChild(part);
+        replaceKeepingFocus(host, view);
     }
-
     /**
      * "Ask for time" (Android StudyFamilyUi.addAskForTime): the child's request line, then the button, or
      * the sheet: How long? 10, 20 or 30 min, an optional reason, Send request. Nothing is granted until a
@@ -1935,35 +2538,6 @@
         return box;
     }
 
-    function startNow(study, refresh) {
-        const box = el('div', 'ft-study-start');
-        box.appendChild(el('h4', 'ft-study-dashboard__subtitle', t('study.start.title', 'Start now')));
-        let minutes = 50;
-        let mode = 'gentle';
-        const length = segmented([[25, t('study.minutes', '{minutes} min', { minutes: 25 })], [50, t('study.minutes', '{minutes} min', { minutes: 50 })],
-            [90, t('study.minutes', '{minutes} min', { minutes: 90 })], [120, t('study.minutes', '{minutes} min', { minutes: 120 })]], minutes, value => { minutes = value; mark(length, value); }, t('study.start.length', 'Session length'));
-        const lock = segmented([['gentle', t('study.start.gentle', 'Gentle')], ['locked', t('study.start.locked', 'Locked')]], mode, value => {
-            mode = value; mark(lock, value); hint.textContent = lockHint(value);
-        }, t('study.start.lock', 'How it ends'));
-        const hint = el('p', 'import-export-hint', lockHint(mode));
-        const go = button(t('study.start.action', 'Start studying'), 'btn-primary', async () => {
-            go.disabled = true;
-            const result = await send({ action: 'FilterTube_StudyStartSession', minutes, lock: mode });
-            go.disabled = false;
-            if (result?.ok === false) notify(box, errorText(result.error), null);
-            refresh();
-        });
-        go.disabled = !array(study.activePackIds).length;
-        box.append(field(t('study.start.length', 'Session length'), length), field(t('study.start.lock', 'How it ends'), lock), hint, go);
-        return box;
-    }
-
-    function lockHint(mode) {
-        return mode === 'locked'
-            ? t('study.start.lockedHint', 'Locked can\'t be ended early. It runs for 4 hours at most.')
-            : t('study.start.gentleHint', 'Gentle can be ended after a 30-second pause.');
-    }
-
     function mark(group, value) {
         const items = Array.from(group.querySelectorAll('button'));
         items.forEach((node, index) => {
@@ -1981,6 +2555,42 @@
         if (!host) return null;
         let catalog = null;
         let timer = 0;
+        let mode = 'home';
+        let last = null;
+        const ctx = {
+            get mode() { return mode; },
+            catalog: null,
+            children: [],
+            redraw: false,
+            refresh: () => refresh(),
+            redrawHome: () => draw(true),
+            setMode: next => {
+                mode = next === 'plan' ? 'plan' : 'home';
+                draw(false);
+                try { host.closest('.ft-study-card')?.scrollIntoView({ block: 'start', behavior: motionAllowed() ? 'smooth' : 'auto' }); } catch (e) { }
+            },
+            toast: message => notify(host, message, null),
+            openSetup: anchor => {
+                const study = object(last?.state?.study);
+                openSetup(anchor && anchor.isConnected ? anchor : host.firstChild || host, {
+                    study, catalog, isSelf: true,
+                    onPatch: change => send({ action: 'FilterTube_StudyUpdate', patch: change }),
+                    onStart: (minutes, lock) => send({ action: 'FilterTube_StudyStartSession', minutes, lock }),
+                    onClose: () => refresh()
+                });
+            },
+            // Self-Control lives in Settings (Android SettingsSectionActivity CATEGORY_SELF_CONTROL).
+            openSelfControl: () => { try { root.FilterTubeOpenSelfControl?.(); } catch (e) { } },
+            openFamily: childId => { try { root.FilterTubeOpenStudyFamily?.(childId); } catch (e) { } }
+        };
+        function draw(redraw) {
+            if (!last) return;
+            ctx.redraw = !!redraw;
+            ctx.catalog = catalog;
+            try { ctx.children = array(root.FilterTubeStudyChildren?.()); } catch (e) { ctx.children = []; }
+            renderDashboard(host, last, ctx);
+            ctx.redraw = false;
+        }
         async function refresh() {
             // Never redraw over setup while someone is in it; it refreshes when it closes.
             if (host.dataset.ftStudySetupOpen === 'true') { clearTimeout(timer); timer = setTimeout(refresh, 30000); return; }
@@ -1993,15 +2603,19 @@
             // A child's "Ask for time" and who gave the minutes running now.
             const time = state.isChild ? await send({ action: 'FilterTube_AskParentTimeState' }) : null;
             const grantName = state.grantBy ? await profileName(state.grantBy) : '';
-            renderDashboard(host, { state, parentName, time, grantName: grantName || text(time?.parentName) }, { refresh, catalog });
+            const first = !last;
+            last = { state, parentName, time, grantName: grantName || text(time?.parentName) };
+            // Every refresh after the first keeps motion for moments only (the draw-on is once a day).
+            draw(!first);
             clearTimeout(timer);
-            const ending = Number.isFinite(state.endRequestedAt);
-            timer = setTimeout(refresh, ending ? 1000 : 30000);
+            // A break counts down by the second; a Gentle end too; otherwise the minute.
+            const fast = Number.isFinite(state.endRequestedAt) || state.state === 'BREAK';
+            timer = setTimeout(refresh, fast ? 1000 : 20000);
         }
-        root.addEventListener?.('filtertube-ui-locale-changed', refresh);
-        try { runtime()?.storage?.onChanged?.addListener((changes, area) => { if (area === 'local' && (changes.ftProfilesV4 || changes.ftStudyRuntimeV1 || changes.ftAskParentV1)) refresh(); }); } catch (e) { }
+        root.addEventListener?.('filtertube-ui-locale-changed', () => draw(true));
+        try { runtime()?.storage?.onChanged?.addListener((changes, area) => { if (area === 'local' && (changes.ftProfilesV4 || changes.ftStudyRuntimeV1 || changes.ftAskParentV1 || changes.ftCompanionMode)) refresh(); }); } catch (e) { }
         refresh();
-        return { refresh };
+        return { refresh, setMode: ctx.setMode };
     }
 
     // ---- The parent's plan, inside the Family command centre -----------------------------------
@@ -2014,6 +2628,7 @@
         section.appendChild(el('div', 'help-item-body', t('study.parent.body', 'Set when each protected profile studies. They can make the plan stricter, never looser.')));
         for (const child of children) {
             const details = el('details', 'ft-study-parent__child');
+            details.dataset.childId = child.id;
             const summary = el('summary', '', t('study.parent.planFor', 'Study plan for {name}', { name: child.name }));
             const body = el('div', 'ft-study-parent__body');
             details.append(summary, body);
@@ -2098,21 +2713,27 @@
                     redraw();
                 }));
         }
-        body.replaceChildren(plannerHost, lockRow);
-        renderPlanner(plannerHost, {
-            study: data.study || {}, catalog, editable: true, toastHost: body, isSelf: false, profileId: childId,
-            onPatch: async patch => {
-                const result = await sendAsParent(body, { action: 'FilterTube_StudyUpdateChild', profileId: childId, patch });
-                if (!body.dataset.ftStudySetupOpen) redraw();
-                return result;
-            },
-            onSetupClosed: redraw
+        // A parent planning for a child (StudyFocusActivity, PARENT role): "Set by you", what they
+        // study (into setup), then the same plan page the person sees for their own plan.
+        const onPatch = async patch => {
+            const result = await sendAsParent(body, { action: 'FilterTube_StudyUpdateChild', profileId: childId, patch });
+            if (!body.dataset.ftStudySetupOpen) redraw();
+            return result;
+        };
+        const links = el('section', 'ft-home-card ft-links');
+        const packsRow = linkRow(t('study.link.packs', 'What you study'), packsValue(data.study || {}, catalog), () => {
+            openSetup(packsRow, { study: data.study || {}, catalog, isSelf: false, profileId: childId, onPatch, onClose: redraw });
+        });
+        links.appendChild(packsRow);
+        body.replaceChildren(links, plannerHost, lockRow);
+        renderPlanPage(plannerHost, {
+            study: data.study || {}, catalog, editable: true, toastHost: body, readOnlyLabel: t('study.setByYou', 'Set by you'), onPatch
         });
     }
 
     root.FilterTubeStudyUi = Object.freeze({
         t, phaseInfo, planSegments, segmentWords, setByLabel, packLabel, renderStrip, mountStrip,
-        renderPlanner, renderDashboard, mountDashboard, renderParentPlans, searchExplainerCard, askForTime, applyCountryAccent, openSetup
+        renderPlanPage, renderDashboard, mountDashboard, dayRing, ringState, heroLines, renderParentPlans, searchExplainerCard, askForTime, applyCountryAccent, openSetup
     });
 
     // Popup: the strip takes the banner slot under the header. Options page: the study card.

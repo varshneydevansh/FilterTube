@@ -99,7 +99,7 @@ function PopupShell() {
           aria-live="polite"
           hidden
         >
-          <span className="ft-popup-time-status__label" data-ft-i18n="popup.youtubeTime">YouTube time</span>
+          <span className="ft-popup-time-status__label" data-ft-i18n="popup.youtubeTime">Viewing time</span>
           <strong id="ftManagedTimeStatusValuePopup" className="ft-popup-time-status__value" />
         </div>
 

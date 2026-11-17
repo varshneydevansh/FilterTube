@@ -58,6 +58,13 @@
         kritiFunnel: 'kriti_funnel.webp',
         kritiNotebook: 'kriti_notebook.webp',
         kritiPointing: 'kriti_pointing.webp',
+        // Study's perch poses (StudyFocusActivity.KritiPerch): before a session she reads, on a break she's
+        // happy, in the last five minutes she holds up a blank sign (the page writes "5 min" on it), after
+        // Skip break she salutes, and the end card's seal brings her medal.
+        kritiHappy: 'kriti_happy.webp',
+        kritiSignRaised: 'kriti_sign_raised.webp',
+        kritiSalute: 'kriti_salute.webp',
+        kritiMedal: 'kriti_medal.webp',
         uljhanFront: 'uljhan_front.webp',
         uljhanHappy: 'uljhan_happy.webp',
         uljhanSad: 'uljhan_sad.webp',
@@ -69,6 +76,10 @@
         duoSieve: Object.freeze([1, 2, 3, 4, 5, 6].map(index => `duo_sieve_0${index}.webp`)),
         duoShoo: Object.freeze([1, 2, 3, 4, 5, 6].map(index => `duo_shoo_0${index}.webp`)),
         kritiJump: Object.freeze([1, 2, 3, 4, 5].map(index => `kriti_jump_0${index}.webp`)),
+        // In a round (KRITI_OPEN_NOTEBOOK then KRITI_PENCIL_TAP): frames 1-3 open the notebook, 3-6 tap the pencil.
+        kritiPencil: Object.freeze([1, 2, 3, 4, 5, 6].map(index => `kriti_pencil_0${index}.webp`)),
+        // The rest screen's stretch (KRITI_STRETCH).
+        kritiStretch: Object.freeze([1, 2, 3, 4, 5].map(index => `kriti_stretch_0${index}.webp`)),
         uljhanLeaves: Object.freeze([1, 2, 3, 4, 5].map(index => `uljhan_wave_0${index}.webp`))
     });
     /**
@@ -83,6 +94,9 @@
         kritiEvening: Object.freeze({ order: Object.freeze([0, 1, 2, 3, 4, 5]), ms: 420 }),
         uljhanFetch: Object.freeze({ order: Object.freeze([0, 1, 2, 3, 4, 5]), ms: 160 }),
         kritiJump: Object.freeze({ order: Object.freeze([0, 1, 2, 3, 4, 1, 0]), ms: 95 }),
+        // KRITI_PENCIL_TAP: one cycle; Study plays it three times, then rests on frame 3 (reading).
+        kritiPencil: Object.freeze({ order: Object.freeze([2, 3, 3, 4, 5, 5, 2]), ms: 300 }),
+        kritiStretch: Object.freeze({ order: Object.freeze([0, 1, 2, 3, 3, 4, 0]), ms: 280 }),
         uljhanLeaves: Object.freeze({ order: Object.freeze([0, 1, 2, 1, 2, 3, 4]), ms: 170, leaves: true })
     });
     const SHEET_FRAME_MS = 180;

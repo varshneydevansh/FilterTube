@@ -62,7 +62,10 @@
             // Minutes a parent gave (Android StudyRuntimeStore grants): normal rules until each ends.
             grants: array(clone(raw.grants)),
             // The subject of the last lecture played in a round (Android StudyWatchOverlay lastSubject:<profile>).
-            subjects: object(clone(raw.subjects))
+            subjects: object(clone(raw.subjects)),
+            // The lecture playing last in a round, for the Study page's "Continue lecture" (Android
+            // StudyWatchOverlay.lastVideoKey): {profileId: {at, videoId}}.
+            lastVideo: object(clone(raw.lastVideo))
         };
     }
 
@@ -537,6 +540,9 @@
                 study,
                 ...publicState(study, local, clock, applied.packIds || [], at, applied),
                 upNext: upNextFor(runtime, profileId, clock),
+                // Only a lecture from this session (Continue lecture shows during a round).
+                lastVideoId: clock.state === Engine.STUDY && Number(object(runtime.lastVideo?.[profileId]).at) >= Number(clock.sessionStart)
+                    ? text(object(runtime.lastVideo[profileId]).videoId) || null : null,
                 session: local.session,
                 clockNotes: array(object(guard.clockStore?.notes)[profileId]),
                 lock: lock ? { sessionId: lock.sessionId, sessionKind: lock.sessionKind, lockedUntil: lock.lockedUntil } : null,
@@ -720,7 +726,7 @@
          * Study time from a content script: credited only while the active profile is in STUDY, at most
          * the wall time since the last credit, so two playing tabs never count twice.
          */
-        async function tick({ seconds, title } = {}) {
+        async function tick({ seconds, title, videoId } = {}) {
             const value = Math.trunc(Number(seconds));
             if (!Number.isFinite(value) || value <= 0) return { ok: false, error: 'invalid_seconds' };
             const { profileId, profile, runtime } = await readAll();
@@ -741,6 +747,7 @@
                 const subject = Engine.subjectOf(title.slice(0, 300), Engine.studySubjects(study, await loadCatalog()));
                 if (subject) runtime.subjects[profileId] = { at, subject };
             }
+            if (typeof videoId === 'string' && /^[A-Za-z0-9_-]{11}$/.test(videoId)) runtime.lastVideo[profileId] = { at, videoId };
             await writeRuntime(runtime);
             return { ok: true, credited, date, seconds: days[date] };
         }
