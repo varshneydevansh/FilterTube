@@ -194,7 +194,8 @@
     function mountHub() {
         const view = doc.getElementById('dashboardView');
         const hero = view?.querySelector('.ft-dash-hero');
-        if (!view || !hero || view.querySelector('.pk-hub')) return;
+        // The Home page (js/dashboard_home.js) replaces the tile grid: the sidebar rows carry the tiles' hues.
+        if (!view || !hero || view.querySelector('.pk-hub') || view.hasAttribute('data-ft-home')) return;
         const hub = el('section', 'pk-hub');
         const today = el('div', 'pk-today');
         const number = el('span', 'pk-today__number');

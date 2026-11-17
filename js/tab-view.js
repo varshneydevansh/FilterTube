@@ -27952,13 +27952,13 @@ document.addEventListener('DOMContentLoaded', async () => {
     }
 
     function kidsYouTubeStatusText(status, profiles) {
-        if (status === 'loading') return tabViewUiText('kids.youtubeProfiles.loading', 'Reading your YouTube Kids profiles…');
+        if (status === 'loading') return tabViewUiText('kids.youtubeProfiles.loading', 'Reading your children\'s profiles on the Kids site…');
         if (status === 'no_tab') return tabViewUiText('kids.youtubeProfiles.noTab', 'Open youtubekids.com, or select Show profiles to read them.');
-        if (status === 'signed_out') return tabViewUiText('kids.youtubeProfiles.signedOut', 'Sign in to YouTube Kids on youtubekids.com first.');
-        if (status === 'ok' && !profiles.length) return tabViewUiText('kids.youtubeProfiles.none', 'No YouTube Kids profiles yet. Add one on youtubekids.com.');
+        if (status === 'signed_out') return tabViewUiText('kids.youtubeProfiles.signedOut', 'Sign in on youtubekids.com first.');
+        if (status === 'ok' && !profiles.length) return tabViewUiText('kids.youtubeProfiles.none', 'No children\'s profiles yet. Add one on youtubekids.com.');
         if (status === 'ok') return '';
         if (!status) return '';
-        return tabViewUiText('kids.youtubeProfiles.failed', 'YouTube Kids profiles could not be read. Try again.');
+        return tabViewUiText('kids.youtubeProfiles.failed', 'The Kids site profiles could not be read. Try again.');
     }
 
     async function loadKidsYouTubeProfiles({ openIfNeeded = false } = {}) {
@@ -27994,7 +27994,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         const pendingSetup = Number(kidsYouTubeProfilesState.roster?.hiddenForOnboarding) || 0;
         statusEl.textContent = [kidsYouTubeStatusText(kidsYouTubeProfilesState.status, profiles),
             kidsYouTubeProfilesState.status === 'ok' && pendingSetup
-                ? tabViewUiText('kids.youtubeProfiles.pendingSetup', '{count} more profiles still need setup in YouTube Kids.', { count: pendingSetup })
+                ? tabViewUiText('kids.youtubeProfiles.pendingSetup', '{count} more profiles still need setup on the Kids site.', { count: pendingSetup })
                 : ''].filter(Boolean).join(' ');
 
         tilesEl.replaceChildren(...profiles.map(kid => {
@@ -28027,7 +28027,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             watch.type = 'button'; watch.className = 'btn-secondary kids-yt-profiles__watch';
             watch.textContent = kid.selected ? tabViewUiText('kids.youtubeProfiles.watchingButton', 'Watching') : tabViewUiText('kids.youtubeProfiles.watchButton', 'Watch as {name}', { name: kid.displayName });
             watch.disabled = kid.selected || decision !== 'allowed' || kidsYouTubeProfilesState.busy;
-            if (decision === 'linked') watch.title = tabViewUiText('kids.youtubeProfiles.lockedLinked', '{profile} is linked to another YouTube Kids profile. Change it here as the parent.', { profile: getProfileName(root, actorId) });
+            if (decision === 'linked') watch.title = tabViewUiText('kids.youtubeProfiles.lockedLinked', '{profile} is linked to another Kids site profile. Change it here as the parent.', { profile: getProfileName(root, actorId) });
             if (decision === 'child') watch.title = tabViewUiText('kids.youtubeProfiles.lockedChild', 'Ask a parent to choose who is watching.');
             watch.addEventListener('click', () => switchKidsYouTubeProfile(kid));
             tile.append(name, meta, watch);
@@ -28038,7 +28038,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         if (contract.profileType(root, actorId) === 'child') {
             const note = document.createElement('p');
             note.className = 'kids-yt-profiles__note';
-            note.textContent = tabViewUiText('kids.youtubeProfiles.parentOnly', 'Only a parent can link YouTube Kids profiles.');
+            note.textContent = tabViewUiText('kids.youtubeProfiles.parentOnly', 'Only a parent can link Kids site profiles.');
             linksEl.appendChild(note);
             return;
         }
@@ -28060,7 +28060,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             if (profiles.length) {
                 const select = document.createElement('select');
                 select.className = 'select-input kids-yt-profiles__select';
-                select.setAttribute('aria-label', tabViewUiText('kids.youtubeProfiles.selectLabel', 'YouTube Kids profile for {profile}', { profile: getProfileName(root, profileId) }));
+                select.setAttribute('aria-label', tabViewUiText('kids.youtubeProfiles.selectLabel', 'Kids site profile for {profile}', { profile: getProfileName(root, profileId) }));
                 for (const kid of profiles) {
                     const option = document.createElement('option');
                     option.value = kid.personaKey; option.textContent = kid.displayName;
@@ -28114,14 +28114,14 @@ document.addEventListener('DOMContentLoaded', async () => {
         row.append(label, who, change);
         const note = document.createElement('p');
         note.className = 'kids-yt-profiles__note';
-        note.textContent = tabViewUiText('kids.youtubeProfiles.parentNote', "YouTube Kids parents are Google accounts; brand accounts can't own YouTube Kids profiles. Change opens YouTube Kids' own account chooser and only changes YouTube Kids.");
+        note.textContent = tabViewUiText('kids.youtubeProfiles.parentNote', "Kids site parents are Google accounts; brand accounts can't own children's profiles there. Change opens the Kids site's own account chooser and only changes the Kids site.");
         host.append(row, note);
         if (contract.linkedParentDecision(links, actorId, parent.parentKey) === 'switch_needed') {
             const link = contract.linkFor(links, actorId);
             const banner = document.createElement('div');
             banner.className = 'kids-yt-profiles__parent-banner';
             const text = document.createElement('span');
-            text.textContent = tabViewUiText('kids.youtubeProfiles.parentMismatch', "{profile}'s YouTube Kids profile ({kid}) is in {parent}'s account.",
+            text.textContent = tabViewUiText('kids.youtubeProfiles.parentMismatch', "{profile}'s Kids site profile ({kid}) is in {parent}'s account.",
                 { profile: getProfileName(root, actorId), kid: link.displayName, parent: link.parentName });
             const apply = document.createElement('button');
             apply.type = 'button'; apply.className = 'btn-primary';
@@ -28135,15 +28135,15 @@ document.addEventListener('DOMContentLoaded', async () => {
     async function startKidsYouTubeParentSwitch(mode) {
         const result = await sendRuntimeMessage({ action: 'FilterTube_KidsParentSwitch', mode });
         if (result?.ok && result.status === 'already_current') {
-            UIComponents.showToast(tabViewUiText('kids.youtubeProfiles.parentAlready', 'YouTube Kids already uses that parent account.'), 'info');
+            UIComponents.showToast(tabViewUiText('kids.youtubeProfiles.parentAlready', 'The Kids site already uses that parent account.'), 'info');
         } else if (result?.ok) {
             UIComponents.showToast(tabViewUiText('kids.youtubeProfiles.parentChooser', 'Choose the parent account in the youtubekids.com tab. Google may ask you to confirm.'), 'info');
         } else {
             UIComponents.showToast(result?.error === 'child'
-                ? tabViewUiText('kids.youtubeProfiles.parentOnlyChange', 'Only a parent can change the YouTube Kids parent account.')
+                ? tabViewUiText('kids.youtubeProfiles.parentOnlyChange', 'Only a parent can change the Kids site parent account.')
                 : result?.error === 'locked'
                     ? tabViewUiText('kids.youtubeProfiles.unlockFirst', 'Unlock this profile first.')
-                    : tabViewUiText('kids.youtubeProfiles.parentFailed', 'YouTube Kids could not start its sign-in. Open youtubekids.com and try again.'), 'error');
+                    : tabViewUiText('kids.youtubeProfiles.parentFailed', 'The Kids site could not start its sign-in. Open youtubekids.com and try again.'), 'error');
         }
     }
 
@@ -28155,7 +28155,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         const fresh = await io.loadProfilesV4();
         const actorId = normalizeString(fresh?.activeProfileId) || 'default';
         if (contract.parentChangeDecision(fresh, actorId) !== 'allowed') {
-            UIComponents.showToast(tabViewUiText('kids.youtubeProfiles.parentOnlyChange', 'Only a parent can change the YouTube Kids parent account.'), 'error');
+            UIComponents.showToast(tabViewUiText('kids.youtubeProfiles.parentOnlyChange', 'Only a parent can change the Kids site parent account.'), 'error');
             return;
         }
         if (isProfileLocked(fresh, actorId) && !(await ensureProfileUnlocked(fresh, actorId, { sensitiveAction: true }))) return;
@@ -28188,7 +28188,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         kidsYouTubeProfilesState.promptedParent = marker;
         const choice = await showChoiceModal({
             title: tabViewUiText('kids.youtubeProfiles.parentPromptTitle', 'Switch parent account?'),
-            message: tabViewUiText('kids.youtubeProfiles.parentPromptMessage', "{profile} uses {kid}, which is in {parent}'s YouTube Kids account. YouTube Kids is using {current}.",
+            message: tabViewUiText('kids.youtubeProfiles.parentPromptMessage', "{profile} uses {kid}, which is in {parent}'s Kids site account. The Kids site is using {current}.",
                 { profile: getProfileName(root, actorId), kid: link.displayName, parent: link.parentName, current: parent.displayName }),
             choices: [{ value: 'switch', label: tabViewUiText('kids.youtubeProfiles.parentSwitchTo', 'Switch to {parent}', { parent: link.parentName }), recommended: true }],
             cancelText: tabViewUiText('kids.youtubeProfiles.parentNotNow', 'Not now')
@@ -28199,7 +28199,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     async function switchKidsYouTubeProfile(kid) {
         const result = await sendRuntimeMessage({ action: 'FilterTube_KidsProfilesSwitch', personaKey: kid.personaKey });
         if (result?.ok) {
-            UIComponents.showToast(tabViewUiText('kids.youtubeProfiles.switched', 'YouTube Kids is switching to {name}.', { name: kid.displayName }), 'success');
+            UIComponents.showToast(tabViewUiText('kids.youtubeProfiles.switched', 'The Kids site is switching to {name}.', { name: kid.displayName }), 'success');
             setTimeout(() => loadKidsYouTubeProfiles(), 2500);
             return;
         }
@@ -28208,7 +28208,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             ? tabViewUiText('kids.youtubeProfiles.lockedChild', 'Ask a parent to choose who is watching.')
             : reason === 'locked'
                 ? tabViewUiText('kids.youtubeProfiles.unlockFirst', 'Unlock this profile first.')
-                : tabViewUiText('kids.youtubeProfiles.switchFailed', 'YouTube Kids could not switch profiles. Open youtubekids.com and try again.'), 'error');
+                : tabViewUiText('kids.youtubeProfiles.switchFailed', 'The Kids site could not switch profiles. Open youtubekids.com and try again.'), 'error');
     }
 
     /** Link or unlink a FilterTube profile: parent context only, PIN required, fresh PIN entry. */
@@ -28221,7 +28221,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         const decision = contract.linkDecision(fresh, actorId, profileId);
         if (decision !== 'allowed') {
             UIComponents.showToast(decision === 'child'
-                ? tabViewUiText('kids.youtubeProfiles.parentOnly', 'Only a parent can link YouTube Kids profiles.')
+                ? tabViewUiText('kids.youtubeProfiles.parentOnly', 'Only a parent can link Kids site profiles.')
                 : tabViewUiText('family.profileManager.switchParentToEdit', 'Switch to the master or parent account to edit this protected profile'), 'error');
             return;
         }
@@ -28248,7 +28248,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         }
         kidsYouTubeProfilesState.root = await io.loadProfilesV4();
         UIComponents.showToast(kid
-            ? tabViewUiText('kids.youtubeProfiles.linked', '{profile} now uses {kid} on YouTube Kids.', { profile: getProfileName(latest, profileId), kid: kid.displayName })
+            ? tabViewUiText('kids.youtubeProfiles.linked', '{profile} now uses {kid} on the Kids site.', { profile: getProfileName(latest, profileId), kid: kid.displayName })
             : tabViewUiText('kids.youtubeProfiles.unlinked', 'Link removed.'), 'success');
         renderKidsYouTubeProfiles();
     }
@@ -28260,9 +28260,9 @@ document.addEventListener('DOMContentLoaded', async () => {
             const outcome = String(message.outcome || '');
             const name = String(message.parentName || '');
             const copy = {
-                SWITCHED: [tabViewUiText('kids.youtubeProfiles.parentSwitched', 'YouTube Kids now uses {parent}.', { parent: name }), 'success'],
-                UNCHANGED: [tabViewUiText('kids.youtubeProfiles.parentUnchanged', 'YouTube Kids kept the same parent account.'), 'info'],
-                OTHER_ACCOUNT: [tabViewUiText('kids.youtubeProfiles.parentOther', 'YouTube Kids now uses {parent}, not the linked account.', { parent: name }), 'warning'],
+                SWITCHED: [tabViewUiText('kids.youtubeProfiles.parentSwitched', 'The Kids site now uses {parent}.', { parent: name }), 'success'],
+                UNCHANGED: [tabViewUiText('kids.youtubeProfiles.parentUnchanged', 'The Kids site kept the same parent account.'), 'info'],
+                OTHER_ACCOUNT: [tabViewUiText('kids.youtubeProfiles.parentOther', 'The Kids site now uses {parent}, not the linked account.', { parent: name }), 'warning'],
                 REJECTED: [tabViewUiText('kids.youtubeProfiles.parentRejected', "Google didn't allow this sign-in."), 'error']
             }[outcome] || [tabViewUiText('kids.youtubeProfiles.parentStopped', 'The parent account switch did not finish.'), 'warning'];
             UIComponents.showToast(copy[0], copy[1]);
@@ -33443,11 +33443,13 @@ document.addEventListener('DOMContentLoaded', async () => {
             kicker: ['apps.tv.kicker', 'Android TV'],
             body: ['apps.tv.body', 'The same Google Play listing, installed on your Android TV.'],
             cta: ['apps.android.cta', 'Install from Google Play'] },
-        { id: 'ios', status: 'coming_soon', variant: 'ios', icon: '../assets/images/App_Store_transparent.png', href: 'https://www.filtertube.in/downloads',
+        // Apple hasn't approved the developer account yet: until it does, the iPhone and iPad app is
+        // sideloaded (SideStore or AltStore) with the guide at filtertube.in/ios.
+        { id: 'ios', status: 'coming_soon', variant: 'ios', icon: '../assets/images/App_Store_transparent.png', href: 'https://filtertube.in/ios',
             kicker: ['apps.ios.kicker', 'iPhone and iPad'],
-            title: ['apps.ios.title', 'Final build and testing alignment'],
-            body: ['apps.ios.body', 'The native Apple build is being finalized. Apple Developer account access is delaying TestFlight availability and will be resolved as soon as possible.'],
-            cta: ['apps.ios.cta', 'View status'], ctaWhileComingSoon: true }
+            title: ['apps.ios.sideloadTitle', 'Install it with SideStore or AltStore'],
+            body: ['apps.ios.sideloadBody', 'Apple hasn\u2019t approved the developer account yet. While Apple reviews it, you can sideload FilterTube with the step-by-step guide.'],
+            cta: ['apps.ios.sideloadCta', 'Open the iPhone guide'], ctaWhileComingSoon: true }
     ]);
     let controlCenterAppsRendered = false;
     let controlCenterSelectedRow = 'dashboard';
@@ -34822,7 +34824,7 @@ function setupNavigation() {
         // The page title is the section's own nav label, from the same catalog key (it used to stay
         // English outside the first pages, and About kept the previous page's title).
         const titles = {
-            'dashboard': ['controls.pageTitle', 'Controls'],
+            'dashboard': ['home.nav.title', 'Home'],
             'filters': ['navigation.filters', 'Filters'],
             'semantic': ['', 'Semantic ML'],
             'kids': ['navigation.kids', 'Kids Mode'],
@@ -34863,7 +34865,7 @@ function setupNavigation() {
     window.switchView = switchView;
     // The first page is Controls until a route says otherwise: its title in the chosen language.
     if (pageTitle && document.getElementById('dashboardView')?.classList.contains('active')) {
-        setTabViewLocalizedCopy(pageTitle, 'textContent', 'controls.pageTitle', 'Controls');
+        setTabViewLocalizedCopy(pageTitle, 'textContent', 'home.nav.title', 'Home');
         try { document.title = `FilterTube · ${pageTitle.textContent}`; } catch (e) { }
     }
 }

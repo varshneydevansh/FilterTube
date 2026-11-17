@@ -230,6 +230,8 @@ const APP_PARITY_TESTS = Object.freeze([
 // Companion characters in the popup and options page (js/mascots.js).
 const COMPANION_TESTS = Object.freeze([
   'tests/runtime/mascots.test.mjs',
+  // The options page's Home and "What Uljhan tried today" (js/dashboard_home.js, js/shared/hidden_log.js).
+  'tests/runtime/dashboard-home.test.mjs',
 ]);
 // App parity: profile avatars (Android ProfileAvatarCodec), the profile picker's look and the
 // neutral terminology guard (docs/app/design-system/TERMINOLOGY.md in the app repo).

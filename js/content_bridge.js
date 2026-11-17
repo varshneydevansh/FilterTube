@@ -1094,6 +1094,38 @@ let statsInitialized = false;
 let statsSaveScheduled = false;
 let statsSaveInFlight = false;
 let statsSavePending = false;
+// "What Uljhan tried today" (js/shared/hidden_log.js): entries waiting for the next stats write.
+let pendingHiddenLog = [];
+
+/** One hidden-log entry for a counted hide: the card's title, channel, video and which rule hid it. */
+function hiddenLogEntryFor(element, title, reason) {
+    const Log = globalThis.FilterTubeHiddenLog;
+    if (!Log || !element) return null;
+    try {
+        const settings = globalThis.currentSettings || {};
+        const link = element.querySelector('a[href*="/watch?"], a[href*="/shorts/"]');
+        const channelEl = element.querySelector('#channel-name a, ytd-channel-name a, .ytd-channel-name a, a[href^="/@"]');
+        const handle = element.getAttribute('data-filtertube-channel-handle') || '';
+        const channelId = element.getAttribute('data-filtertube-channel-id') || '';
+        const blocked = Array.isArray(settings.filterChannels) && settings.filterChannels.some(row => {
+            const value = typeof row === 'string' ? row : (row?.id || row?.handle || '');
+            const key = String(value || '').toLowerCase();
+            return !!key && (key === handle.toLowerCase() || key === channelId.toLowerCase());
+        });
+        return Log.entry({
+            at: Date.now(),
+            title,
+            videoId: Log.videoIdFromHref(link?.getAttribute('href') || ''),
+            channel: channelEl?.textContent || '',
+            channelId,
+            handle,
+            reason: Log.classify(reason, { listMode: settings.listMode, channelBlocked: blocked }),
+            surface: getStatsSurfaceKey() === 'kids' ? 'kids' : 'main'
+        });
+    } catch (e) {
+        return null;
+    }
+}
 
 function getStatsSurfaceKey() {
     try {
@@ -4728,7 +4760,7 @@ function estimateTimeSaved(contentType, duration = null) {
  * Increment hidden stats when content is hidden
  * @param {HTMLElement} element - The hidden element
  */
-function incrementHiddenStats(element) {
+function incrementHiddenStats(element, reason = '') {
     const today = new Date().toDateString();
 
     if (today !== statsLastDate) {
@@ -4786,6 +4818,8 @@ function incrementHiddenStats(element) {
 
         if (element) {
             element.setAttribute('data-filtertube-time-saved', secondsSaved.toString());
+            const logged = hiddenLogEntryFor(element, title, reason);
+            if (logged) pendingHiddenLog = [...pendingHiddenLog, logged].slice(-30);
         }
 
         if (window.__filtertubeDebug === true) {
@@ -4858,7 +4892,10 @@ function flushStatsToStorage() {
     };
 
     try {
-        chrome.storage.local.get(['stats', 'statsBySurface'], (result) => {
+        const logKey = globalThis.FilterTubeHiddenLog?.KEY;
+        const logItems = pendingHiddenLog;
+        pendingHiddenLog = [];
+        chrome.storage.local.get(logKey && logItems.length ? ['stats', 'statsBySurface', logKey] : ['stats', 'statsBySurface'], (result) => {
             const safeResult = result && typeof result === 'object' ? result : {};
             const existingBySurface = (safeResult.statsBySurface && typeof safeResult.statsBySurface === 'object' && !Array.isArray(safeResult.statsBySurface))
                 ? safeResult.statsBySurface
@@ -4881,6 +4918,7 @@ function flushStatsToStorage() {
             };
 
             const payload = { statsBySurface };
+            if (logKey && logItems.length) payload[logKey] = globalThis.FilterTubeHiddenLog.push(safeResult[logKey], logItems);
 
             // Back-compat: keep `stats` in sync for main.
             if (surface === 'main') {

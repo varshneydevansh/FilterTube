@@ -234,6 +234,7 @@
         Object.freeze({ id: 'morning', image: 'kritiWave', characters: true, time: 'morning', touch: 'sparkleLogo' }),
         Object.freeze({ id: 'evening', image: 'kritiEvening', characters: true, time: 'evening', touch: 'none' })
     ]);
+    const SUPPORT_PRICE = Object.freeze(['support.price.line', 'Even $1 a month on Ko-fi is a big help. A yearly option works too, about $10\u201312 a year.']);
     // The motion each variant plays on the support sheet (Android SupportSheetVariants.motion).
     const SUPPORT_MOTIONS = Object.freeze({
         sieve: Object.freeze({ sheet: 'sieve', times: 3 }),
@@ -1788,9 +1789,11 @@
             const title = el('h2', 'pk-support__title');
             const text = el('p', 'pk-support__text');
             const note = el('p', 'pk-support__note');
-            body.append(title, text, note);
+            // What a small amount does (owner, 2026-11-17): monthly from $1 on Ko-fi, or yearly.
+            const price = el('p', 'pk-support__price');
+            body.append(title, text, note, price);
             block.append(art, body);
-            return { block, art, title, text, note, artHeight };
+            return { block, art, title, text, note, price, artHeight };
         };
         const fill = () => {
             if (!variant) return;
@@ -1800,6 +1803,7 @@
                 entry.title.textContent = t(copy.title);
                 entry.text.textContent = t(copy.body);
                 entry.note.textContent = t(copy.note);
+                entry.price.textContent = t(SUPPORT_PRICE);
                 entry.art.replaceChildren();
                 if (showsCharacters(companionMode)) entry.art.appendChild(image(stillImage(variant.image), 'pk-support__image', entry.artHeight));
                 entry.art.hidden = !showsCharacters(companionMode);

@@ -181,7 +181,7 @@ function toggleVisibility(element, shouldHide, reason = '', skipStats = false) {
         if (wasAlreadyHidden && wasWhitelistPending && !skipStats) {
             element.removeAttribute('data-filtertube-whitelist-pending');
             filteringTracker.recordHide(element, reason);
-            incrementHiddenStats(element);
+            incrementHiddenStats(element, reason);
         }
 
         if (!wasAlreadyHidden) {
@@ -208,7 +208,7 @@ function toggleVisibility(element, shouldHide, reason = '', skipStats = false) {
             // Increment stats only for newly hidden items (not already hidden)
             // AND only if skipStats is false (meaning this is a direct filter hit, not a container cleanup)
             if (!skipStats) {
-                incrementHiddenStats(element);
+                incrementHiddenStats(element, reason);
             }
         }
         handleMediaPlayback(element, true);
