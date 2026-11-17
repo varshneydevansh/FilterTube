@@ -42,20 +42,20 @@ const relatedPages = page.related
 export const metadata = {
   title: "Install on iPhone and iPad",
   description:
-    "Install FilterTube on iPhone and iPad directly with SideStore or AltStore while the App Store listing is in progress. Free, no ads, nothing locked, no FilterTube sign-up.",
+    "Apple is having trouble on their end, so the App Store version will take a while. Until then, install FilterTube on iPhone and iPad with SideStore, or AltStore. Free, no ads, nothing locked, no FilterTube sign-up.",
   alternates: {
     canonical: "https://filtertube.in/ios",
   },
   openGraph: {
     title: "FilterTube for iPhone and iPad",
     description:
-      "Install FilterTube directly with SideStore or AltStore while the App Store listing is in progress.",
+      "The App Store version will take a while because of trouble on Apple's end. Until then, install FilterTube with SideStore, or AltStore.",
     url: "https://filtertube.in/ios",
   },
   twitter: {
     title: "FilterTube for iPhone and iPad",
     description:
-      "Install FilterTube directly with SideStore or AltStore while the App Store listing is in progress.",
+      "The App Store version will take a while because of trouble on Apple's end. Until then, install FilterTube with SideStore, or AltStore.",
   },
 };
 
@@ -189,8 +189,10 @@ function InstallGuide() {
                   </h2>
                   <p className="mt-6 max-w-[62ch] text-pretty text-base leading-8 text-[var(--color-muted)] md:text-lg">
                     I&apos;m working to bring FilterTube to the App Store
-                    &mdash; that&apos;s where I want it to be. Until then, you
-                    can install it directly.
+                    &mdash; that&apos;s where I want it to be. Apple is having
+                    trouble on their end, so that will take a while. Until
+                    then, SideStore is the best way I&apos;ve found to install
+                    it, and AltStore works too.
                   </p>
                   <ul className="mt-7 grid gap-3 sm:grid-cols-2">
                     {promises.map((item) => (
