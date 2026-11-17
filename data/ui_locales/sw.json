@@ -3263,5 +3263,8 @@
   "profiles.about.parent": "Unashikilia PIN Kuu na kusimamia kila mtu",
   "profiles.about.kids": "Nafasi ya watoto. Mzazi huweka kanuni",
   "profiles.about.kidsNamed": "Nafasi ya watoto. {name} huweka kanuni",
-  "profiles.about.adult": "Kanuni na historia zake mwenyewe"
+  "profiles.about.adult": "Kanuni na historia zake mwenyewe",
+  "study.setup.whereDetected": "Imechaguliwa kutoka lugha ya kivinjari chako",
+  "study.setup.countryDetected": "Lugha ya kivinjari chako",
+  "study.setup.countrySearch": "Tafuta nchi"
 }

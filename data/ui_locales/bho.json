@@ -3263,5 +3263,8 @@
   "profiles.about.parent": "मास्टर PIN एकरे पास बा आ ई सभके सँभालेला",
   "profiles.about.kids": "लइकन के जगह। नियम माई-बाबू तय करेलें",
   "profiles.about.kidsNamed": "लइकन के जगह। नियम {name} तय करेलें",
-  "profiles.about.adult": "आपन नियम आ इतिहास"
+  "profiles.about.adult": "आपन नियम आ इतिहास",
+  "study.setup.whereDetected": "रउरा ब्राउज़र के भाषा से चुनल गइल",
+  "study.setup.countryDetected": "रउरा ब्राउज़र के भाषा",
+  "study.setup.countrySearch": "देस खोजीं"
 }

@@ -3263,5 +3263,8 @@
   "profiles.about.parent": "Ana PIN'i tutar ve herkesi yönetir",
   "profiles.about.kids": "Çocuk alanı. Kuralları bir ebeveyn belirler",
   "profiles.about.kidsNamed": "Çocuk alanı. Kuralları {name} belirler",
-  "profiles.about.adult": "Kendi kuralları ve geçmişi"
+  "profiles.about.adult": "Kendi kuralları ve geçmişi",
+  "study.setup.whereDetected": "Tarayıcınızın dilinden seçildi",
+  "study.setup.countryDetected": "Tarayıcınızın dili",
+  "study.setup.countrySearch": "Ülke ara"
 }

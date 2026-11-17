@@ -3287,5 +3287,8 @@
   "profiles.about.parent": "معه الـ PIN الرئيسي وبيدير الكل",
   "profiles.about.kids": "مساحة للولاد. الأهل بيحطوا القواعد",
   "profiles.about.kidsNamed": "مساحة للولاد. {name} بيحط القواعد",
-  "profiles.about.adult": "قواعده وسجله الخاص"
+  "profiles.about.adult": "قواعده وسجله الخاص",
+  "study.setup.whereDetected": "مختار من لغة المتصفح تبعك",
+  "study.setup.countryDetected": "لغة المتصفح تبعك",
+  "study.setup.countrySearch": "ابحث عن دولة"
 }

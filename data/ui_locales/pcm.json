@@ -3263,5 +3263,8 @@
   "profiles.about.parent": "E hold the Master PIN and e dey manage everybody",
   "profiles.about.kids": "Pikin space. Na parent dey set the rules",
   "profiles.about.kidsNamed": "Pikin space. Na {name} dey set the rules",
-  "profiles.about.adult": "Im own rules and history"
+  "profiles.about.adult": "Im own rules and history",
+  "study.setup.whereDetected": "We pick am from your browser language",
+  "study.setup.countryDetected": "Your browser language",
+  "study.setup.countrySearch": "Search countries"
 }

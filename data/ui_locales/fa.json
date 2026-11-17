@@ -3263,5 +3263,8 @@
   "profiles.about.parent": "PIN اصلی را دارد و همه را مدیریت می‌کند",
   "profiles.about.kids": "فضای کودک. والد قوانین را تعیین می‌کند",
   "profiles.about.kidsNamed": "فضای کودک. {name} قوانین را تعیین می‌کند",
-  "profiles.about.adult": "قوانین و سابقه خودش"
+  "profiles.about.adult": "قوانین و سابقه خودش",
+  "study.setup.whereDetected": "از زبان مرورگر شما انتخاب شد",
+  "study.setup.countryDetected": "زبان مرورگر شما",
+  "study.setup.countrySearch": "جست‌وجوی کشور"
 }

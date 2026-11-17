@@ -3261,5 +3261,8 @@
   "profiles.about.parent": "Nyekel PIN Master lan ngatur kabeh profil",
   "profiles.about.kids": "Papan bocah. Wong tuwa sing nemtokake aturane",
   "profiles.about.kidsNamed": "Papan bocah. {name} sing nemtokake aturane",
-  "profiles.about.adult": "Aturan lan riwayat dhewe"
+  "profiles.about.adult": "Aturan lan riwayat dhewe",
+  "study.setup.whereDetected": "Dipilih saka basa browser sampeyan",
+  "study.setup.countryDetected": "Basa browser sampeyan",
+  "study.setup.countrySearch": "Golek negara"
 }

@@ -3261,5 +3261,8 @@
   "profiles.about.parent": "マスター PIN を持ち、全員を管理します",
   "profiles.about.kids": "キッズ用スペース。ルールは保護者が決めます",
   "profiles.about.kidsNamed": "キッズ用スペース。ルールは {name} が決めます",
-  "profiles.about.adult": "自分のルールと履歴"
+  "profiles.about.adult": "自分のルールと履歴",
+  "study.setup.whereDetected": "ブラウザの言語から選択",
+  "study.setup.countryDetected": "ブラウザの言語",
+  "study.setup.countrySearch": "国を検索"
 }

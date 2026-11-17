@@ -3263,5 +3263,8 @@
   "profiles.about.parent": "Master PIN ይይዛል እና ሁሉንም ያስተዳድራል",
   "profiles.about.kids": "የልጆች ቦታ። ደንቦቹን ወላጅ ያዘጋጃል",
   "profiles.about.kidsNamed": "የልጆች ቦታ። ደንቦቹን {name} ያዘጋጃል",
-  "profiles.about.adult": "የራሱ ደንቦች እና ታሪክ"
+  "profiles.about.adult": "የራሱ ደንቦች እና ታሪክ",
+  "study.setup.whereDetected": "ከአሳሽዎ ቋንቋ የተመረጠ",
+  "study.setup.countryDetected": "የአሳሽዎ ቋንቋ",
+  "study.setup.countrySearch": "አገሮችን ፈልግ"
 }

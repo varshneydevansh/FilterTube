@@ -3263,5 +3263,8 @@
   "profiles.about.parent": "Master PIN রাখে এবং সবাইকে পরিচালনা করে",
   "profiles.about.kids": "শিশুদের জায়গা। নিয়ম ঠিক করেন অভিভাবক",
   "profiles.about.kidsNamed": "শিশুদের জায়গা। নিয়ম ঠিক করেন {name}",
-  "profiles.about.adult": "নিজের নিয়ম ও ইতিহাস"
+  "profiles.about.adult": "নিজের নিয়ম ও ইতিহাস",
+  "study.setup.whereDetected": "আপনার ব্রাউজারের ভাষা থেকে বাছাই করা",
+  "study.setup.countryDetected": "আপনার ব্রাউজারের ভাষা",
+  "study.setup.countrySearch": "দেশ খুঁজুন"
 }

@@ -3263,5 +3263,8 @@
   "profiles.about.parent": "मास्टर PIN याच्याकडे असतो आणि हे सर्वांचे व्यवस्थापन करते",
   "profiles.about.kids": "मुलांची जागा. नियम पालक ठरवतात",
   "profiles.about.kidsNamed": "मुलांची जागा. नियम {name} ठरवतात",
-  "profiles.about.adult": "स्वतःचे नियम आणि इतिहास"
+  "profiles.about.adult": "स्वतःचे नियम आणि इतिहास",
+  "study.setup.whereDetected": "तुमच्या ब्राउझरच्या भाषेवरून निवडले",
+  "study.setup.countryDetected": "तुमच्या ब्राउझरची भाषा",
+  "study.setup.countrySearch": "देश शोधा"
 }

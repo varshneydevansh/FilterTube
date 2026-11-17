@@ -3263,5 +3263,8 @@
   "profiles.about.parent": "Hat die Master-PIN und verwaltet alle",
   "profiles.about.kids": "Kinderbereich. Ein Elternteil legt die Regeln fest",
   "profiles.about.kidsNamed": "Kinderbereich. {name} legt die Regeln fest",
-  "profiles.about.adult": "Eigene Regeln und eigener Verlauf"
+  "profiles.about.adult": "Eigene Regeln und eigener Verlauf",
+  "study.setup.whereDetected": "Aus der Sprache deines Browsers übernommen",
+  "study.setup.countryDetected": "Sprache deines Browsers",
+  "study.setup.countrySearch": "Länder suchen"
 }

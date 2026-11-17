@@ -3263,5 +3263,8 @@
   "profiles.about.parent": "Ha il PIN principale e gestisce tutti",
   "profiles.about.kids": "Spazio bambini. Un genitore stabilisce le regole",
   "profiles.about.kidsNamed": "Spazio bambini. {name} stabilisce le regole",
-  "profiles.about.adult": "Regole e cronologia personali"
+  "profiles.about.adult": "Regole e cronologia personali",
+  "study.setup.whereDetected": "Scelto in base alla lingua del browser",
+  "study.setup.countryDetected": "La lingua del tuo browser",
+  "study.setup.countrySearch": "Cerca paesi"
 }

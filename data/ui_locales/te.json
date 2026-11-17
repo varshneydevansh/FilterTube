@@ -3263,5 +3263,8 @@
   "profiles.about.parent": "మాస్టర్ PINను కలిగి ఉండి అందరినీ నిర్వహిస్తుంది",
   "profiles.about.kids": "పిల్లల స్థలం. నియమాలను తల్లిదండ్రులు సెట్ చేస్తారు",
   "profiles.about.kidsNamed": "పిల్లల స్థలం. నియమాలను {name} సెట్ చేస్తారు",
-  "profiles.about.adult": "సొంత నియమాలు, చరిత్ర"
+  "profiles.about.adult": "సొంత నియమాలు, చరిత్ర",
+  "study.setup.whereDetected": "మీ బ్రౌజర్ భాష నుండి ఎంచుకోబడింది",
+  "study.setup.countryDetected": "మీ బ్రౌజర్ భాష",
+  "study.setup.countrySearch": "దేశాలు వెతకండి"
 }

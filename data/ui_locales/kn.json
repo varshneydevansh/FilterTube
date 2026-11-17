@@ -3263,5 +3263,8 @@
   "profiles.about.parent": "Master PIN ಹೊಂದಿದ್ದು ಎಲ್ಲರನ್ನೂ ನಿರ್ವಹಿಸುತ್ತದೆ",
   "profiles.about.kids": "ಮಕ್ಕಳ ಸ್ಥಳ. ನಿಯಮಗಳನ್ನು ಪೋಷಕರು ಹೊಂದಿಸುತ್ತಾರೆ",
   "profiles.about.kidsNamed": "ಮಕ್ಕಳ ಸ್ಥಳ. ನಿಯಮಗಳನ್ನು {name} ಹೊಂದಿಸುತ್ತಾರೆ",
-  "profiles.about.adult": "ಸ್ವಂತ ನಿಯಮಗಳು ಮತ್ತು ಇತಿಹಾಸ"
+  "profiles.about.adult": "ಸ್ವಂತ ನಿಯಮಗಳು ಮತ್ತು ಇತಿಹಾಸ",
+  "study.setup.whereDetected": "ನಿಮ್ಮ ಬ್ರೌಸರ್ ಭಾಷೆಯಿಂದ ಆಯ್ಕೆಮಾಡಲಾಗಿದೆ",
+  "study.setup.countryDetected": "ನಿಮ್ಮ ಬ್ರೌಸರ್ ಭಾಷೆ",
+  "study.setup.countrySearch": "ದೇಶಗಳನ್ನು ಹುಡುಕಿ"
 }

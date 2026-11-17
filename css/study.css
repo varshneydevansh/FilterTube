@@ -236,7 +236,28 @@
 .ft-setup-country { display: flex; align-items: center; justify-content: space-between; gap: 12px; flex-wrap: wrap; padding: 10px 12px 13px 16px; border: 1.5px solid var(--pk-line, #dcd1c2); border-radius: 20px; box-shadow: 3px 3px 0 var(--pk-ledge, rgba(27, 26, 24, 0.14)); }
 .ft-setup-country__words { display: flex; flex-direction: column; gap: 2px; }
 .ft-setup-country__words strong { font-family: var(--pk-font-display, inherit); font-size: 1.25rem; font-weight: 600; }
-.ft-setup-country__select { max-width: 280px; }
+.ft-setup-country__note { font-size: 0.82rem; }
+.ft-setup-country__change { font-size: 1rem; }
+/* StudyPaperSheet: a paper sheet over the setup, a search field and the country rows. */
+.ft-setup { position: relative; }
+.ft-sheet-scrim { position: fixed; inset: 0; z-index: 10040; display: flex; align-items: flex-end; justify-content: center; padding: 24px 16px 0; background: rgba(27, 26, 24, 0.32); animation: ft-fade-in 160ms both; }
+.ft-sheet {
+    width: min(560px, 100%); max-height: min(78vh, 720px); display: flex; flex-direction: column; box-sizing: border-box;
+    padding: 18px 20px 12px; background: var(--pk-paper); color: var(--pk-ink); border: 1.5px solid var(--pk-line); border-bottom: 0;
+    border-radius: 24px 24px 0 0; box-shadow: 0 -12px 40px -24px var(--pk-ledge); animation: ft-sheet-rise 280ms cubic-bezier(0.2, 0.9, 0.3, 1) both;
+}
+@keyframes ft-sheet-rise { from { transform: translateY(24px); opacity: 0.6; } to { transform: none; opacity: 1; } }
+.ft-sheet__head { display: flex; align-items: center; justify-content: space-between; gap: 8px; }
+.ft-sheet__title { margin: 0; font-family: var(--pk-font-hand); font-weight: 400; font-size: 1.3rem; }
+.ft-sheet__close { display: grid; place-items: center; width: 44px; height: 44px; border: 0; border-radius: 50%; background: none; color: var(--pk-ink); cursor: pointer; }
+.ft-sheet__search { margin-top: 14px; }
+.ft-sheet__list { margin-top: 6px; overflow-y: auto; display: flex; flex-direction: column; }
+.ft-sheet__row { display: flex; align-items: center; gap: 8px; min-height: 54px; padding: 6px; border: 0; border-radius: 12px; background: none; color: var(--pk-ink); font: inherit; text-align: start; cursor: pointer; }
+.ft-sheet__row:hover { background: color-mix(in srgb, var(--pk-ink) 5%, transparent); }
+.ft-sheet__row-words { display: flex; flex-direction: column; flex: 1; gap: 2px; }
+.ft-sheet__row-name { font-size: 1.05rem; }
+.ft-sheet__row.is-current .ft-sheet__row-name, .ft-sheet__row.is-current .ft-icon { color: var(--pk-brick); }
+@media (prefers-reduced-motion: reduce) { .ft-sheet-scrim, .ft-sheet { animation: none; } }
 .ft-setup-tiles { display: flex; flex-direction: column; gap: 16px; margin-top: 10px; }
 .ft-setup-tile { display: flex; align-items: center; gap: 16px; min-height: 104px; padding: 14px 14px 17px 18px; border: 1.5px solid var(--pk-line, #dcd1c2); border-radius: 20px; box-shadow: 3px 3px 0 var(--pk-ledge, rgba(27, 26, 24, 0.14)); color: inherit; font: inherit; text-align: start; cursor: pointer; transition: transform var(--pk-short, 180ms) ease-out; }
 .ft-setup-tile.is-exam { background: var(--pk-rose, #fae8e6); transform: rotate(-0.5deg); }
@@ -592,4 +613,23 @@ body.ft-extension-surface .ft-study-card[data-study-page],
 
 @media (prefers-reduced-motion: reduce) {
     .ft-perch__kriti.is-arriving, .ft-bead.is-popping, .ft-endcard.is-fresh .ft-seal, .ft-hero__skip.is-squash, .ft-perch__bubble, .ft-hero__choices { animation: none; }
+}
+
+/* The ring's moments (StudyDayRingView.sealRound, exhale, ripple, scribble). */
+.ft-day-ring__sealing { stroke-width: 24; animation: ft-ring-seal 300ms cubic-bezier(0.2, 0, 0, 1) forwards; }
+@keyframes ft-ring-seal { from { opacity: 1; } to { opacity: 0; } }
+.ft-day-ring .is-rippling { animation: ft-ring-ripple 600ms cubic-bezier(0.2, 0, 0, 1); }
+@keyframes ft-ring-ripple { 0%, 100% { stroke-width: 24; } 50% { stroke-width: 27.84; } }
+.ft-hero__ring.is-exhaling { animation: ft-ring-exhale 720ms cubic-bezier(0.2, 0, 0, 1); }
+@keyframes ft-ring-exhale { 0% { transform: scale(1); } 42% { transform: scale(0.97); } 100% { transform: scale(1); } }
+.ft-day-ring__scribble {
+    stroke: var(--pk-sage-ink); stroke-width: 2.4; stroke-linecap: round; stroke-linejoin: round;
+    stroke-dasharray: 1 1; stroke-dashoffset: 1; animation: ft-ring-scribble 300ms cubic-bezier(0.2, 0.9, 0.3, 1) forwards, ft-ring-scribble-out 220ms 1100ms ease-in forwards;
+}
+@keyframes ft-ring-scribble { to { stroke-dashoffset: 0; } }
+@keyframes ft-ring-scribble-out { to { opacity: 0; } }
+@media (prefers-reduced-motion: reduce) {
+    .ft-day-ring__sealing { animation: none; opacity: 0; }
+    .ft-day-ring .is-rippling, .ft-hero__ring.is-exhaling { animation: none; }
+    .ft-day-ring__scribble { display: none; }
 }

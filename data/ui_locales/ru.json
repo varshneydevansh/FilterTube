@@ -3275,5 +3275,8 @@
   "profiles.about.parent": "Хранит главный PIN-код и управляет всеми",
   "profiles.about.kids": "Детское пространство. Правила задаёт родитель",
   "profiles.about.kidsNamed": "Детское пространство. Правила задаёт {name}",
-  "profiles.about.adult": "Свои правила и история"
+  "profiles.about.adult": "Свои правила и история",
+  "study.setup.whereDetected": "Выбрано по языку браузера",
+  "study.setup.countryDetected": "Язык вашего браузера",
+  "study.setup.countrySearch": "Поиск стран"
 }

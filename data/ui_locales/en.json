@@ -3263,5 +3263,8 @@
   "profiles.about.parent": "Holds the Master PIN and manages everyone",
   "profiles.about.kids": "Kids space. A parent sets the rules",
   "profiles.about.kidsNamed": "Kids space. {name} sets the rules",
-  "profiles.about.adult": "Own rules and history"
+  "profiles.about.adult": "Own rules and history",
+  "study.setup.whereDetected": "Picked from your browser's language",
+  "study.setup.countryDetected": "Your browser's language",
+  "study.setup.countrySearch": "Search countries"
 }

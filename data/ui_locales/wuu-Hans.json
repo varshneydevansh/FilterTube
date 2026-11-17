@@ -3261,5 +3261,8 @@
   "profiles.about.parent": "拿牢主 PIN，管所有人",
   "profiles.about.kids": "小囡空间。规则由家长来定",
   "profiles.about.kidsNamed": "小囡空间。规则由 {name} 来定",
-  "profiles.about.adult": "自家个规则搭记录"
+  "profiles.about.adult": "自家个规则搭记录",
+  "study.setup.whereDetected": "根据侬浏览器个语言选个",
+  "study.setup.countryDetected": "侬浏览器个语言",
+  "study.setup.countrySearch": "搜国家"
 }

@@ -34704,6 +34704,8 @@ function setupNavigation() {
             const [titleKey, titleFallback] = titles[effectiveViewId];
             if (titleKey) setTabViewLocalizedCopy(pageTitle, 'textContent', titleKey, titleFallback);
             else pageTitle.textContent = titleFallback;
+            // The browser tab names the page too ("FilterTube · Controls"), never the old "Dashboard".
+            try { document.title = `FilterTube · ${pageTitle.textContent}`; } catch (e) { }
         }
 
         try {
@@ -34727,6 +34729,7 @@ function setupNavigation() {
     // The first page is Controls until a route says otherwise: its title in the chosen language.
     if (pageTitle && document.getElementById('dashboardView')?.classList.contains('active')) {
         setTabViewLocalizedCopy(pageTitle, 'textContent', 'controls.pageTitle', 'Controls');
+        try { document.title = `FilterTube · ${pageTitle.textContent}`; } catch (e) { }
     }
 }
 

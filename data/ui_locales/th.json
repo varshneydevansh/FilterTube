@@ -3261,5 +3261,8 @@
   "profiles.about.parent": "ถือ PIN หลักและจัดการทุกคน",
   "profiles.about.kids": "พื้นที่เด็ก ผู้ปกครองเป็นผู้ตั้งกฎ",
   "profiles.about.kidsNamed": "พื้นที่เด็ก {name} เป็นผู้ตั้งกฎ",
-  "profiles.about.adult": "กฎและประวัติของตัวเอง"
+  "profiles.about.adult": "กฎและประวัติของตัวเอง",
+  "study.setup.whereDetected": "เลือกจากภาษาของเบราว์เซอร์",
+  "study.setup.countryDetected": "ภาษาของเบราว์เซอร์",
+  "study.setup.countrySearch": "ค้นหาประเทศ"
 }

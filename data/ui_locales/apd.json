@@ -3287,5 +3287,8 @@
   "profiles.about.parent": "عنده PIN الرئيسي وبيدير الكل",
   "profiles.about.kids": "مساحة للأطفال. الأهل بيحددوا القواعد",
   "profiles.about.kidsNamed": "مساحة للأطفال. {name} بيحدد القواعد",
-  "profiles.about.adult": "قواعده وسجله براهو"
+  "profiles.about.adult": "قواعده وسجله براهو",
+  "study.setup.whereDetected": "مختار من لغة المتصفح بتاعك",
+  "study.setup.countryDetected": "لغة المتصفح بتاعك",
+  "study.setup.countrySearch": "ابحث عن دولة"
 }

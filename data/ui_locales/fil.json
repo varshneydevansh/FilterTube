@@ -3263,5 +3263,8 @@
   "profiles.about.parent": "Hawak ang Master PIN at namamahala sa lahat",
   "profiles.about.kids": "Espasyo ng bata. Magulang ang nagtatakda ng mga panuntunan",
   "profiles.about.kidsNamed": "Espasyo ng bata. Si {name} ang nagtatakda ng mga panuntunan",
-  "profiles.about.adult": "Sariling mga panuntunan at history"
+  "profiles.about.adult": "Sariling mga panuntunan at history",
+  "study.setup.whereDetected": "Pinili mula sa wika ng iyong browser",
+  "study.setup.countryDetected": "Wika ng iyong browser",
+  "study.setup.countrySearch": "Maghanap ng bansa"
 }

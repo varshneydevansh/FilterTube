@@ -758,29 +758,77 @@
             s.direction = 0;
         }
 
+        /** "Where are you studying?": the browser's region first, Anywhere, then every country with packs, A to Z. */
+        function openCountrySheet() {
+            root.document.querySelector('body > .ft-sheet-scrim')?.remove();
+            const scrim = el('div', 'ft-sheet-scrim');
+            const sheet = el('section', 'ft-sheet');
+            sheet.setAttribute('role', 'dialog');
+            sheet.setAttribute('aria-modal', 'true');
+            sheet.setAttribute('aria-label', t('study.setup.countryTitle', 'Where are you studying?'));
+            const close = () => { scrim.remove(); root.document.removeEventListener('keydown', onKey, true); try { panel.querySelector('.ft-setup-country__change')?.focus(); } catch (e) { } };
+            const onKey = event => { if (event.key === 'Escape') { event.preventDefault(); close(); } };
+            root.document.addEventListener('keydown', onKey, true);
+            scrim.addEventListener('click', event => { if (event.target === scrim) close(); });
+            const head = el('div', 'ft-sheet__head');
+            head.appendChild(el('h4', 'ft-sheet__title', t('study.setup.countryTitle', 'Where are you studying?')));
+            const shut = button('', 'ft-sheet__close', close);
+            shut.appendChild(icon('close'));
+            shut.setAttribute('aria-label', t('study.end.done', 'Done'));
+            head.appendChild(shut);
+            const search = el('input', 'text-input ft-sheet__search');
+            search.type = 'search';
+            search.placeholder = t('study.setup.countrySearch', 'Search countries');
+            search.setAttribute('aria-label', search.placeholder);
+            const list = el('div', 'ft-sheet__list');
+            list.setAttribute('role', 'listbox');
+            const codes = Setup.countries(catalog).sort((x, y) => countryName(x).localeCompare(countryName(y), language()));
+            const fill = () => {
+                const words = text(search.value).toLowerCase();
+                const first = [...new Set([deviceCountry, s.country].filter(Boolean))];
+                const ordered = [...first, null, ...codes.filter(code => !first.includes(code))];
+                list.replaceChildren();
+                for (const code of ordered) {
+                    const name = countryName(code);
+                    if (words && !name.toLowerCase().includes(words) && (code || '').toLowerCase() !== words) continue;
+                    const note = code && code === deviceCountry ? t('study.setup.countryDetected', 'Your browser\'s language')
+                        : code === null ? t('study.setup.countryAnywhereBody', 'Only exams and lessons taken anywhere') : '';
+                    const current = (code || null) === (s.country || null);
+                    const row = button('', `ft-sheet__row${current ? ' is-current' : ''}`, () => {
+                        close();
+                        if ((code || null) !== (s.country || null)) { s.country = code || null; s.board = null; s.alsoOpen = false; render(); }
+                    });
+                    row.setAttribute('role', 'option');
+                    row.setAttribute('aria-selected', current ? 'true' : 'false');
+                    const label = el('span', 'ft-sheet__row-words');
+                    label.appendChild(el('span', 'ft-sheet__row-name', name));
+                    if (note) label.appendChild(el('span', 'ft-study-muted', note));
+                    row.appendChild(label);
+                    if (current) row.appendChild(icon('check'));
+                    list.appendChild(row);
+                }
+            };
+            search.addEventListener('input', fill);
+            fill();
+            sheet.append(head, search, list);
+            scrim.appendChild(sheet);
+            // On the page's body, above the sidebar and any transformed card (a fixed layer inside one is clipped).
+            (root.document.body || panel).appendChild(scrim);
+            try { search.focus(); } catch (e) { }
+        }
+
         // ---- Step 1: what for
         function renderKind(body) {
+            // The country card (StudySetupKit.countryCard): where, the country, where it came from, and
+            // Change, which opens "Where are you studying?" (StudyCountrySheet).
             const card = el('div', 'ft-setup-country');
             const words = el('div', 'ft-setup-country__words');
             words.append(el('span', 'ft-study-muted', t('study.setup.where', 'You\'re studying in')), el('strong', '', countryName(s.country)));
-            const select = el('select', 'text-input ft-setup-country__select');
-            select.setAttribute('aria-label', t('study.setup.countryTitle', 'Where are you studying?'));
-            const codes = Setup.countries(catalog).sort((a, b) => countryName(a).localeCompare(countryName(b), language()));
-            // The chosen country leads the list (Android b753aa71f).
-            const ordered = s.country && codes.includes(s.country) ? [s.country, ...codes.filter(code => code !== s.country)] : codes;
-            const anywhere = el('option', '', `${t('study.setup.anywhere', 'Anywhere')} · ${t('study.setup.countryAnywhereBody', 'Only exams and lessons taken anywhere')}`);
-            anywhere.value = '';
-            select.appendChild(anywhere);
-            for (const code of ordered) {
-                const option = el('option', '', countryName(code));
-                option.value = code;
-                option.selected = code === s.country;
-                select.appendChild(option);
-            }
-            if (!s.country) anywhere.selected = true;
-            select.addEventListener('change', () => { s.country = select.value || null; s.board = null; s.alsoOpen = false; render(); });
+            if (s.country && s.country === deviceCountry) words.appendChild(el('span', 'ft-study-muted ft-setup-country__note', t('study.setup.whereDetected', 'Picked from your browser\'s language')));
+            const change = button(t('study.setup.change', 'Change'), 'ft-link-button ft-setup-country__change', () => openCountrySheet());
+            change.setAttribute('aria-haspopup', 'dialog');
             if (Packs.countryAccent) applyCountryAccent(card, Packs.countryAccent(s.country), Packs);
-            card.append(words, select);
+            card.append(words, change);
             body.appendChild(card);
 
             const question = el('div', 'ft-setup-question');
@@ -1438,10 +1486,18 @@
         const arcs = array(model.arcs);
         const breaks = array(model.breaks);
         const current = Engine?.currentBreak ? Engine.currentBreak(model) : null;
+        // The running round (its done and live parts) swells once on the five-minute ripple.
+        const runningRound = arcs.find(item => item.kind === 'LIVE')?.round ?? null;
         for (const item of arcs) {
             if (item.kind === 'TODO' || item.end - item.start <= 0.001) continue;
             const path = arc(item.start, item.end, item.kind === 'LIVE' ? 'ft-day-ring__live' : 'ft-day-ring__done');
             if (item.kind === 'LIVE') path.setAttribute('stroke', `url(#${id}h)`);
+            if (opts.ripple && item.round === runningRound) path.classList.add('is-rippling');
+            // A round completing (sealRound): the hatch it ran on turns solid sage over 300 ms.
+            if (opts.sealRound && item.round === opts.sealRound && item.kind === 'DONE') {
+                const hatchOver = arc(item.start, item.end, 'ft-day-ring__sealing');
+                hatchOver.setAttribute('stroke', `url(#${id}h)`);
+            }
         }
         breaks.forEach(([from, to], index) => {
             if (index === current) return;
@@ -1455,6 +1511,18 @@
         for (const at of cuts) arc(at - GAP, at + GAP, 'ft-day-ring__cut', stroke + 4);
         if (current !== null && breaks[current]) arc(breaks[current][0], breaks[current][1], 'ft-day-ring__sun');
         if (Number.isFinite(opts.breakLeft) && opts.breakLeft > 0) arc(0, Math.min(1, opts.breakLeft) * 0.9999, 'ft-day-ring__drain', 5, R - stroke / 2 - 9);
+        // Skip break's scribble: a sage zigzag between the ring's inner and outer edge over the skipped
+        // span, drawn on and then faded as the next round takes the ring.
+        if (opts.scribble && opts.scribble.to > opts.scribble.from) {
+            const { from, to } = opts.scribble;
+            const steps = Math.max(6, Math.round(((to - from) * 360) / 2.2));
+            let d = '';
+            for (let i = 0; i <= steps; i += 1) {
+                const [x, y] = point(from + ((to - from) * i) / steps, R + (i % 2 === 0 ? -1 : 1) * stroke * 0.38);
+                d += `${i ? 'L' : 'M'}${x.toFixed(2)} ${y.toFixed(2)}`;
+            }
+            svg.appendChild(svgNode('path', { d, class: 'ft-day-ring__scribble', fill: 'none', pathLength: 1 }));
+        }
         if (Number.isFinite(model.tick)) {
             const [x1, y1] = point(model.tick, R - stroke / 2 - 4);
             const [x2, y2] = point(model.tick, R + stroke / 2 + 6);
@@ -1649,6 +1717,45 @@
         return line;
     }
 
+    /**
+     * The ring's moments, each tied to its cause (StudyFocusActivity.heroMoments): a round completing
+     * (replayed once when it finished while the page was closed; the first look at a session replays
+     * none), the break arriving (the ring exhales), the five-minute ripple of a round, and Skip break's
+     * scribble. Reduced motion shows none of them.
+     */
+    let lastPageState = null;
+    let lastRippleCheck = null;
+    let pendingScribble = null;
+    function ringMoments(state, ringInfo, pageState) {
+        const out = {};
+        const before = lastPageState;
+        lastPageState = pageState;
+        if (!motionAllowed()) { pendingScribble = null; return out; }
+        if (before && before !== 'BREAK' && pageState === 'BREAK') out.exhale = true;
+        if (pendingScribble) { out.scribble = pendingScribble; pendingScribble = null; }
+        const value = object(state);
+        if (!(value.state === 'STUDY' || value.state === 'BREAK') || !Number.isFinite(Number(value.sessionStart))) { lastRippleCheck = null; return out; }
+        const arcs = array(object(ringInfo.ring).arcs);
+        const rounds = new Map();
+        for (const item of arcs) rounds.set(item.round, (rounds.get(item.round) ?? true) && item.kind === 'DONE');
+        const completed = [...rounds.values()].filter(Boolean).length;
+        const seenKey = `seenRounds:${value.profileId || 'default'}:${value.sessionStart}`;
+        const seen = homePrefs()[seenKey];
+        if (Number.isFinite(seen) && completed > seen) out.sealRound = completed;
+        if (seen !== completed) setHomePref(seenKey, completed);
+        // Every five minutes of a round, counted from its start (StudyRipple.due).
+        const now = Date.now();
+        const round = array(value.segments).find(item => item.kind === 'STUDY' && item.start <= now && now < item.end);
+        if (value.state === 'STUDY' && round) {
+            const beat = at => Math.floor(Math.max(0, at - round.start) / (5 * MINUTE));
+            if (lastRippleCheck && lastRippleCheck.start === round.start && beat(now) > beat(lastRippleCheck.at)) out.ripple = true;
+            lastRippleCheck = { start: round.start, at: now };
+        } else {
+            lastRippleCheck = null;
+        }
+        return out;
+    }
+
     let perchMoment = null;
     let perchCache = null;
     let shownPose = '';
@@ -1670,7 +1777,10 @@
         const ringBox = el('div', 'ft-hero__ring');
         ringBox.setAttribute('role', 'img');
         ringBox.setAttribute('aria-label', ringInfo.summary);
-        ringBox.appendChild(dayRing({ ...ringInfo, drawOn }));
+        const moments = ringMoments(state, ringInfo, pageState);
+        if (moments.exhale) ringBox.classList.add('is-exhaling');
+        if (moments.sealRound) { try { root.FilterTubeMascots?.playSound?.('giggle'); } catch (e) { } }
+        ringBox.appendChild(dayRing({ ...ringInfo, drawOn, ...moments }));
         card.appendChild(ringBox);
         const [heading, meta] = heroLines(data, catalog);
         const words = el('div', 'ft-hero__words');
@@ -1750,8 +1860,16 @@
             if (state.canSkipBreak && !state.breakSkipped) {
                 const skip = button(t('study.overlay.skipBreak', 'Skip break'), 'btn-secondary ft-hero__skip', async () => {
                     skip.disabled = true;
+                    // The break being skipped, as a span of the ring, for the scribble on the next draw.
+                    const Engine = engine();
+                    const segs = array(state.segments);
+                    if (Engine?.dayRing && segs.length) {
+                        const model = Engine.dayRing(segs, Date.now());
+                        const index = Engine.currentBreak ? Engine.currentBreak(model) : null;
+                        if (index !== null && model.breaks[index]) pendingScribble = { from: model.breaks[index][0], to: model.breaks[index][1] };
+                    }
                     const result = await send({ action: 'FilterTube_StudySkipBreak' });
-                    if (result?.ok === false) { skip.disabled = false; skip.classList.add('is-rejected'); return; }
+                    if (result?.ok === false) { pendingScribble = null; skip.disabled = false; skip.classList.add('is-rejected'); return; }
                     skip.classList.add('is-squash');
                     perchMoment = { pose: 'kritiSalute', until: Date.now() + SALUTE_MS };
                     try { root.FilterTubeMascots?.playSound?.('scribble'); } catch (e) { }
@@ -2390,7 +2508,21 @@
         try { match?.focus({ preventScroll: true }); } catch (e) { }
     }
 
+    /**
+     * After Skip break the clock still says BREAK until the break's own end; the home shows what the app
+     * shows (StudyRuntime.skipBreak moves the session on): the next round, running now, to its new end.
+     */
+    function effectiveState(state) {
+        const value = object(state);
+        if (value.state !== 'BREAK' || !value.breakSkipped) return value;
+        const now = Date.now();
+        const round = array(value.segments).find(item => item.kind === 'STUDY' && item.start <= now && now < item.end)
+            || array(value.segments).find(item => item.kind === 'STUDY' && item.end > now);
+        return { ...value, state: 'STUDY', round: round?.round || (Number(value.round) || 0) + 1, until: round ? round.end : value.until, canSkipBreak: false };
+    }
+
     function renderDashboard(host, data, ctx) {
+        data = { ...data, state: effectiveState(data.state) };
         const state = object(data.state);
         const study = object(state.study);
         const role = homeRole(data);

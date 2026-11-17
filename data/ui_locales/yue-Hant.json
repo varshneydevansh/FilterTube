@@ -3261,5 +3261,8 @@
   "profiles.about.parent": "揸住主 PIN，管理所有人",
   "profiles.about.kids": "兒童空間。規則由家長設定",
   "profiles.about.kidsNamed": "兒童空間。規則由 {name} 設定",
-  "profiles.about.adult": "自己嘅規則同記錄"
+  "profiles.about.adult": "自己嘅規則同記錄",
+  "study.setup.whereDetected": "根據你瀏覽器嘅語言揀嘅",
+  "study.setup.countryDetected": "你瀏覽器嘅語言",
+  "study.setup.countrySearch": "搜尋國家"
 }

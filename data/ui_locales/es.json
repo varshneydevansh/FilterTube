@@ -3263,5 +3263,8 @@
   "profiles.about.parent": "Tiene el PIN maestro y gestiona a todos",
   "profiles.about.kids": "Espacio infantil. Un padre o una madre pone las reglas",
   "profiles.about.kidsNamed": "Espacio infantil. {name} pone las reglas",
-  "profiles.about.adult": "Sus propias reglas e historial"
+  "profiles.about.adult": "Sus propias reglas e historial",
+  "study.setup.whereDetected": "Elegido según el idioma de tu navegador",
+  "study.setup.countryDetected": "El idioma de tu navegador",
+  "study.setup.countrySearch": "Buscar países"
 }

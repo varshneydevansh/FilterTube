@@ -3263,5 +3263,8 @@
   "profiles.about.parent": "ماسٹر PIN رکھتی ہے اور سب کو منظم کرتی ہے",
   "profiles.about.kids": "بچوں کی جگہ۔ قواعد والدین طے کرتے ہیں",
   "profiles.about.kidsNamed": "بچوں کی جگہ۔ قواعد {name} طے کرتے ہیں",
-  "profiles.about.adult": "اپنے قواعد اور ہسٹری"
+  "profiles.about.adult": "اپنے قواعد اور ہسٹری",
+  "study.setup.whereDetected": "آپ کے براؤزر کی زبان سے منتخب کیا گیا",
+  "study.setup.countryDetected": "آپ کے براؤزر کی زبان",
+  "study.setup.countrySearch": "ملک تلاش کریں"
 }

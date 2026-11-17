@@ -3261,5 +3261,8 @@
   "profiles.about.parent": "마스터 PIN을 보유하고 모두를 관리해요",
   "profiles.about.kids": "키즈 공간. 보호자가 규칙을 정해요",
   "profiles.about.kidsNamed": "키즈 공간. {name} 님이 규칙을 정해요",
-  "profiles.about.adult": "나만의 규칙과 기록"
+  "profiles.about.adult": "나만의 규칙과 기록",
+  "study.setup.whereDetected": "브라우저 언어에서 선택됨",
+  "study.setup.countryDetected": "브라우저 언어",
+  "study.setup.countrySearch": "나라 검색"
 }

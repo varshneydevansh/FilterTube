@@ -3263,5 +3263,8 @@
   "profiles.about.parent": "Master PIN رکھدی اے تے سبھ نوں سنبھالدی اے",
   "profiles.about.kids": "بچیاں دی جگہ۔ قاعدے ماپے طے کردے نیں",
   "profiles.about.kidsNamed": "بچیاں دی جگہ۔ قاعدے {name} طے کردا اے",
-  "profiles.about.adult": "اپنے قاعدے تے ہسٹری"
+  "profiles.about.adult": "اپنے قاعدے تے ہسٹری",
+  "study.setup.whereDetected": "تہاڈے براؤزر دی زبان توں چُنیا گیا",
+  "study.setup.countryDetected": "تہاڈے براؤزر دی زبان",
+  "study.setup.countrySearch": "ملک لبھو"
 }

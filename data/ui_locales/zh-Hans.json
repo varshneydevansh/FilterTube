@@ -3261,5 +3261,8 @@
   "profiles.about.parent": "持有主 PIN，管理所有人",
   "profiles.about.kids": "儿童空间。规则由家长设置",
   "profiles.about.kidsNamed": "儿童空间。规则由 {name} 设置",
-  "profiles.about.adult": "自己的规则和记录"
+  "profiles.about.adult": "自己的规则和记录",
+  "study.setup.whereDetected": "根据浏览器语言选择",
+  "study.setup.countryDetected": "浏览器语言",
+  "study.setup.countrySearch": "搜索国家"
 }

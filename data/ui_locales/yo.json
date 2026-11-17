@@ -3261,5 +3261,8 @@
   "profiles.about.parent": "Ó ní PIN Alákóso, ó sì ń ṣàkóso gbogbo ènìyàn",
   "profiles.about.kids": "Àyè àwọn ọmọdé. Òbí ló ń ṣètò àwọn òfin",
   "profiles.about.kidsNamed": "Àyè àwọn ọmọdé. {name} ló ń ṣètò àwọn òfin",
-  "profiles.about.adult": "Àwọn òfin àti ìtàn tirẹ̀"
+  "profiles.about.adult": "Àwọn òfin àti ìtàn tirẹ̀",
+  "study.setup.whereDetected": "A yàn án láti inú èdè aṣàwákiri rẹ",
+  "study.setup.countryDetected": "Èdè aṣàwákiri rẹ",
+  "study.setup.countrySearch": "Wá orílẹ̀-èdè"
 }

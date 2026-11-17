@@ -3263,5 +3263,8 @@
   "profiles.about.parent": "Yana riƙe da Babban PIN kuma yana sarrafa kowa",
   "profiles.about.kids": "Wurin yara. Iyaye ne ke saita dokoki",
   "profiles.about.kidsNamed": "Wurin yara. {name} ne ke saita dokoki",
-  "profiles.about.adult": "Dokokinsa da tarihinsa"
+  "profiles.about.adult": "Dokokinsa da tarihinsa",
+  "study.setup.whereDetected": "An zaɓa daga harshen burauzarka",
+  "study.setup.countryDetected": "Harshen burauzarka",
+  "study.setup.countrySearch": "Nemi ƙasashe"
 }

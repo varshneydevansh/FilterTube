@@ -3263,5 +3263,8 @@
   "profiles.about.parent": "முதன்மை PIN-ஐ வைத்திருந்து அனைவரையும் நிர்வகிக்கும்",
   "profiles.about.kids": "குழந்தைகளுக்கான இடம். விதிகளைப் பெற்றோர் அமைப்பார்",
   "profiles.about.kidsNamed": "குழந்தைகளுக்கான இடம். விதிகளை {name} அமைப்பார்",
-  "profiles.about.adult": "சொந்த விதிகளும் வரலாறும்"
+  "profiles.about.adult": "சொந்த விதிகளும் வரலாறும்",
+  "study.setup.whereDetected": "உங்கள் உலாவியின் மொழியிலிருந்து தேர்ந்தெடுக்கப்பட்டது",
+  "study.setup.countryDetected": "உங்கள் உலாவியின் மொழி",
+  "study.setup.countrySearch": "நாடுகளைத் தேடு"
 }

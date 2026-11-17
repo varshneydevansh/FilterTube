@@ -3287,5 +3287,8 @@
   "profiles.about.parent": "يحمل PIN الرئيسي ويدير الجميع",
   "profiles.about.kids": "مساحة للأطفال. أحد الوالدين يضع القواعد",
   "profiles.about.kidsNamed": "مساحة للأطفال. {name} يضع القواعد",
-  "profiles.about.adult": "قواعد وسجل خاصّان به"
+  "profiles.about.adult": "قواعد وسجل خاصّان به",
+  "study.setup.whereDetected": "اختير من لغة متصفحك",
+  "study.setup.countryDetected": "لغة متصفحك",
+  "study.setup.countrySearch": "ابحث عن دولة"
 }

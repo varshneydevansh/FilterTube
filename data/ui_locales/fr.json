@@ -3263,5 +3263,8 @@
   "profiles.about.parent": "Détient le code PIN maître et gère tout le monde",
   "profiles.about.kids": "Espace enfant. Un parent fixe les règles",
   "profiles.about.kidsNamed": "Espace enfant. {name} fixe les règles",
-  "profiles.about.adult": "Ses propres règles et son historique"
+  "profiles.about.adult": "Ses propres règles et son historique",
+  "study.setup.whereDetected": "Choisi d’après la langue de votre navigateur",
+  "study.setup.countryDetected": "La langue de votre navigateur",
+  "study.setup.countrySearch": "Rechercher un pays"
 }

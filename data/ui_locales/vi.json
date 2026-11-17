@@ -3261,5 +3261,8 @@
   "profiles.about.parent": "Giữ mã PIN chính và quản lý mọi người",
   "profiles.about.kids": "Không gian trẻ em. Phụ huynh đặt quy tắc",
   "profiles.about.kidsNamed": "Không gian trẻ em. {name} đặt quy tắc",
-  "profiles.about.adult": "Quy tắc và lịch sử riêng"
+  "profiles.about.adult": "Quy tắc và lịch sử riêng",
+  "study.setup.whereDetected": "Chọn theo ngôn ngữ trình duyệt của bạn",
+  "study.setup.countryDetected": "Ngôn ngữ trình duyệt của bạn",
+  "study.setup.countrySearch": "Tìm quốc gia"
 }

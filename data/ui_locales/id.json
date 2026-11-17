@@ -3261,5 +3261,8 @@
   "profiles.about.parent": "Memegang PIN Master dan mengelola semua profil",
   "profiles.about.kids": "Ruang anak. Orang tua yang mengatur aturannya",
   "profiles.about.kidsNamed": "Ruang anak. {name} yang mengatur aturannya",
-  "profiles.about.adult": "Aturan dan riwayat sendiri"
+  "profiles.about.adult": "Aturan dan riwayat sendiri",
+  "study.setup.whereDetected": "Dipilih dari bahasa browser Anda",
+  "study.setup.countryDetected": "Bahasa browser Anda",
+  "study.setup.countrySearch": "Cari negara"
 }
