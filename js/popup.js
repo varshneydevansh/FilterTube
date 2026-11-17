@@ -1887,6 +1887,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             input.type = inputType === 'none' ? 'hidden' : inputType;
             // A PIN (Android PinGateActivity): eyebrow over the title, the digits centred, Unlock across
             // the card with Cancel under it, the "Try again" line in the danger ink.
+            if (inputType === 'none') card.classList.add('is-message');
             if (inputType === 'password') {
                 card.classList.add('is-pin');
                 card.setAttribute('role', 'dialog');

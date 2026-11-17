@@ -1293,3 +1293,12 @@ body.ft-extension-surface[data-surface="tab-view"] .ft-about-portrait-card img {
 .ft-modal.is-pin .ft-modal-actions { display: flex; flex-direction: column-reverse; align-items: stretch; gap: 6px; }
 .ft-modal.is-pin .ft-modal-actions .btn-primary { width: 100%; min-height: 52px; }
 :root[data-page-tone] body.ft-extension-surface .ft-modal.is-pin .ft-modal-actions .btn-secondary, .ft-modal.is-pin .ft-modal-actions .btn-secondary { border-color: transparent !important; border: 0 !important; background: none !important; box-shadow: none !important; color: var(--pk-muted) !important; }
+
+/* Dialogs (Android FilterTubeMessageDialog): a paper card, the title over the message, the brick
+ * primary across the card and the secondary under it, both full width. */
+.ft-modal.is-message .card-header { display: flex; flex-direction: column; align-items: flex-start; gap: 4px; }
+.ft-modal.is-message .ft-modal-eyebrow { color: var(--pk-brick) !important; font-family: var(--pk-font-display); font-weight: 600; font-size: 13px; text-transform: none; letter-spacing: 0; }
+.ft-modal.is-message .ft-modal-title { margin: 0; text-align: start; font-family: var(--pk-font-hand); font-weight: 400; font-size: 1.3rem; }
+.ft-modal.is-message .import-export-hint { color: var(--pk-ink); font-size: 15px; line-height: 1.5; }
+.ft-modal.is-message .ft-modal-actions { display: flex; flex-direction: column-reverse; align-items: stretch; gap: 8px; margin-top: 18px; }
+.ft-modal.is-message .ft-modal-actions .btn-primary, .ft-modal.is-message .ft-modal-actions .btn-secondary { width: 100%; min-height: 48px; justify-content: center; }

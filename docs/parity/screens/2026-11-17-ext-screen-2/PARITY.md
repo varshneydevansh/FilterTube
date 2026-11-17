@@ -81,3 +81,65 @@ a quiet text button under it.
 Still different: the app's title names where the PIN leads ("Enter Master PIN for Main Viewing"); the
 extension's says "Enter Master PIN" because its gate is for the whole options page. The app's gate has
 the avatar button that opens the profile picker; in the extension the page's own avatar does that.
+
+## 4. Dialogs, toasts, support, parent mode and Nearby
+
+### Dialogs (FilterTubeMessageDialog)
+
+Android `FilterTubeMessageDialog.kt`: a paper card, an optional mascot only on a failure notice, the
+title (card title) over the message (body ink), the brick primary across the card, the secondary under it.
+
+- Before: confirm dialogs (`showConfirmModal` on the options page, the popup's yes/no prompt) put the
+  title in a header row and Cancel / Confirm side by side, small.
+- Ported: `.ft-modal.is-message` (`css/paperkit.css`), set by `showConfirmModal` (with `role="alertdialog"`)
+  and the popup's question prompt: stacked header, message in ink, the primary across the card with the
+  secondary full width under it.
+- Capture: `dialogs/after-confirm-dialog-fixture.jpg` (the markup `showConfirmModal` builds, drawn in
+  place, because no confirm can be reached in a fresh profile without changing data). No Android capture:
+  every message dialog on the emulator sits behind an action that changes the shared device.
+
+### Toasts
+
+- Study's toasts became the paper toast in pass 1. The general `UIComponents.showToast` (success with a
+  check, error with Uljhan) is already the app's notice look (`dialogs/current-toast-success.jpg`,
+  `dialogs/current-toast-error.jpg`) and was not changed; the filters' Undo uses the paper undo bar.
+- Still different: Android shows plain confirmations (no Undo) as a paper toast at the bottom centre;
+  the extension's general toasts sit at the bottom right of the options page.
+
+### Support page
+
+Captures: `support/android-support.jpg` (store build), `support/current-support.jpg`.
+
+- Different by distribution, so not ported: the app's page is the store build's (Google Play
+  subscriptions, "A subscription simply keeps the project going"); the extension's is Ko-fi with the
+  app's support-sheet variants (Kriti's "been sieving all day" and the others), which is the app's own
+  direct-build sheet.
+- "I've already supported FilterTube": on Android it silences the launcher's support reminder
+  (`SupportOfferSheet`). The extension shows no support reminder, so the switch would have nothing to do.
+
+### Parent mode / Ask a parent and Nearby sync
+
+Not captured against the app: both need a child profile or a second device on the shared emulator,
+which this pass must not create. Their ledger rows and earlier ports stand; parity is not claimed here.
+
+## 5. Mascot moments outside Study and Controls
+
+| Android moment (file) | Extension surface | State |
+| --- | --- | --- |
+| Loading with a loading line (`LoadingPersonality`, KRITI_SIEVE_LOOP, the loading lines) | `FilterTubeMascots.moment('loading')`: the Study page's first load, the followed-channels import while it fetches | Added here: the moment existed but nothing showed it |
+| Uljhan fetch-more (`UljhanLoadMore`, ULJHAN_FETCH) | The followed-channels import (page after page) | Added here (the loading moment's Uljhan fetch). The site's own feeds load more by themselves; the extension doesn't own that footer |
+| Empty lists (`MascotMoments.emptyState` + its one action) | Keyword and channel lists on the options page and in the popup (`decorateEmptyList`) | Already ported |
+| "Shoo, Uljhan!" on a blocked video (DUO_SHOO, three a day, then Uljhan's shrug) | `js/content/admission_overlay.js` blocked card (`SHOO_FRAMES`, `SHOO_DAILY_PLAYS = 3`) | Already ported |
+| Idle life (`MascotIdleInteraction`) | `idleLife()` on every mascot moment, the support art, the gate's Kriti | Already ported |
+| First filter (DUO_SIEVE), allowed-only nod (KRITI_LOGO_SIEVE) | `firstFilterMoment` above the lists | Already ported |
+| Hub peek (`FirstFilterMoment.buildHubPeek`) | Controls | Pass 1 |
+| Break stretch (KRITI_STRETCH) | Break overlay on the video page | Pass 1 |
+| Network offline / back online / slow | `mountNetwork` on the options page | Already ported |
+| Good evening (KRITI_GOOD_EVENING) | The evening support variant | Already ported |
+| Kids viewer motions (`KidsViewerMotion`) | None: the extension has no viewer of its own | Can't exist |
+
+## 6. Other older surfaces found
+
+- The Help page still names "Dashboard" in a few answers (see §1).
+- The popup's study strip still says "End" (compact) where the app's session strip says "End session";
+  kept because the popup row has no room for the 30-second note.

@@ -5466,6 +5466,17 @@ document.addEventListener('DOMContentLoaded', async () => {
         );
         importSubscriptionsNotice.classList.add(`subscriptions-import-inline--${nextTone}`);
         importSubscriptionsNotice.classList.toggle('is-loading', subscriptionsImportState.inProgress === true);
+        // Fetching page after page of followed channels is a load-more: Uljhan's fetch (Android
+        // UljhanLoadMore), held while pages keep coming and gone when the import stops.
+        let fetchMoment = importSubscriptionsNotice.querySelector(':scope > .pk-moment--loading');
+        if (subscriptionsImportState.inProgress === true) {
+            if (!fetchMoment) {
+                fetchMoment = window.FilterTubeMascots?.moment?.('loading', { height: 56 }) || null;
+                if (fetchMoment) importSubscriptionsNotice.insertBefore(fetchMoment, importSubscriptionsNotice.firstChild);
+            }
+        } else if (fetchMoment) {
+            fetchMoment.remove();
+        }
         importSubscriptionsNotice.setAttribute('aria-busy', subscriptionsImportState.inProgress === true ? 'true' : 'false');
 
         const message = tabViewDisplayCopy(normalizeString(subscriptionsImportState.message), SUBSCRIPTION_IMPORT_COPY_LOOKUP);
@@ -15890,7 +15901,11 @@ document.addEventListener('DOMContentLoaded', async () => {
             overlay.className = 'ft-modal-overlay';
 
             const card = document.createElement('div');
-            card.className = 'card ft-modal';
+            // Android FilterTubeMessageDialog: title over the message, the brick primary across the card,
+            // the secondary under it.
+            card.className = 'card ft-modal is-message';
+            card.setAttribute('role', 'alertdialog');
+            card.setAttribute('aria-modal', 'true');
 
             const header = document.createElement('div');
             header.className = 'card-header';

@@ -2750,6 +2750,12 @@
             timer = setTimeout(refresh, fast ? 1000 : 20000);
         }
         root.addEventListener?.('filtertube-ui-locale-changed', () => draw(true));
+        // Until the first state arrives: Kriti's loading moment with one of the app's loading lines
+        // (LoadingPersonality); none with the Companion off.
+        try {
+            const waiting = root.FilterTubeMascots?.moment?.('loading', { height: 96 });
+            if (waiting && !host.firstChild) { waiting.classList.add('ft-study-loading'); host.appendChild(waiting); }
+        } catch (e) { }
         try { runtime()?.storage?.onChanged?.addListener((changes, area) => { if (area === 'local' && (changes.ftProfilesV4 || changes.ftStudyRuntimeV1 || changes.ftAskParentV1 || changes.ftCompanionMode)) refresh(); }); } catch (e) { }
         refresh();
         return { refresh, setMode: ctx.setMode };
