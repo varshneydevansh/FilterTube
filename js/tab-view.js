@@ -1295,6 +1295,8 @@ function initializeFiltersTabs() {
         const groupEl = document.createElement('div');
         groupEl.setAttribute('data-ft-control-group', 'true');
         groupEl.setAttribute('data-ft-group-title', group?.title || '');
+        // Each group wears its own tint (css/content-control-tints.css), as in the popup.
+        groupEl.setAttribute('data-ft-group-id', group?.id || '');
         groupEl.className = 'content-control-group';
         applyControlGroupTheme(groupEl, group?.accentColor);
 

@@ -1,0 +1,50 @@
+/* Content Controls: each group keeps its own tint (owner, 2026-11-17: "the groups lost their colours").
+ * The extension's groups always carried an accent (content_controls_catalog.js accentColor: Core red,
+ * Feeds green, Watch page violet, Video info sky, Player orange, Navigation slate, Search emerald);
+ * the paper pass painted every group plain paper. The app draws its groups in the Content area
+ * (BrandPalette.Area.CONTENT), so these tints are the extension's own, mapped onto PaperKit's washes:
+ * the sheet takes the group's wash, its title tick the group's ink. Switches keep the Content area's
+ * sky, as in the app, so "on" reads the same in every group. Popup and options page alike. */
+
+.content-control-group { --ft-group-wash: transparent; --ft-group-ink: var(--pk-tick); }
+
+.content-control-group[data-ft-group-id="core"]       { --ft-group-wash: #fae8e6; --ft-group-ink: #a93e31; }
+.content-control-group[data-ft-group-id="feed"],
+.content-control-group.video-filters-section           { --ft-group-wash: #e9f2e3; --ft-group-ink: #28623f; }
+.content-control-group[data-ft-group-id="watch"]      { --ft-group-wash: #efe6f7; --ft-group-ink: #5b3aa4; }
+.content-control-group[data-ft-group-id="video_info"] { --ft-group-wash: #e6f1f9; --ft-group-ink: #1f5f86; }
+.content-control-group[data-ft-group-id="player"]     { --ft-group-wash: #fbeedd; --ft-group-ink: #8a4a12; }
+.content-control-group[data-ft-group-id="navigation"] { --ft-group-wash: #ece9e4; --ft-group-ink: #625f58; }
+.content-control-group[data-ft-group-id="search"]     { --ft-group-wash: #e2f2ec; --ft-group-ink: #1d6b5a; }
+.content-control-group.category-filters-section       { --ft-group-wash: #f8e9e0; --ft-group-ink: #8f4a26; }
+.content-control-group:is(.language-filters-section, .popup-language-filters-section) { --ft-group-wash: #f5e7ef; --ft-group-ink: #8a3d63; }
+
+:root[data-theme="dark"] .content-control-group[data-ft-group-id="core"]       { --ft-group-wash: #3a2422; --ft-group-ink: #e0796b; }
+:root[data-theme="dark"] .content-control-group[data-ft-group-id="feed"],
+:root[data-theme="dark"] .content-control-group.video-filters-section           { --ft-group-wash: #1e2e26; --ft-group-ink: #7fb89a; }
+:root[data-theme="dark"] .content-control-group[data-ft-group-id="watch"]      { --ft-group-wash: #2a2440; --ft-group-ink: #b39ae6; }
+:root[data-theme="dark"] .content-control-group[data-ft-group-id="video_info"] { --ft-group-wash: #1b2a38; --ft-group-ink: #8cc8ea; }
+:root[data-theme="dark"] .content-control-group[data-ft-group-id="player"]     { --ft-group-wash: #352a1c; --ft-group-ink: #f0bf7a; }
+:root[data-theme="dark"] .content-control-group[data-ft-group-id="navigation"] { --ft-group-wash: #222b36; --ft-group-ink: #b8c3ce; }
+:root[data-theme="dark"] .content-control-group[data-ft-group-id="search"]     { --ft-group-wash: #18302b; --ft-group-ink: #79c2ad; }
+:root[data-theme="dark"] .content-control-group.category-filters-section       { --ft-group-wash: #35261d; --ft-group-ink: #e8a77f; }
+:root[data-theme="dark"] .content-control-group:is(.language-filters-section, .popup-language-filters-section) { --ft-group-wash: #352230; --ft-group-ink: #e19bbd; }
+
+/* The sheet: the wash over paper, so text keeps paper contrast (worst case light: ink 15.0:1, muted 5.5:1; dark: ink 13.3:1, muted 8.4:1). */
+body.ft-extension-surface .content-control-group[data-ft-group-id]:not([data-ft-group-id=""]),
+body.ft-extension-surface .content-control-group.video-filters-section,
+body.ft-extension-surface .content-control-group.category-filters-section,
+:root[data-page-tone][data-theme] body.ft-extension-surface[data-surface] .content-control-group[data-ft-group-id]:not([data-ft-group-id=""]),
+:root[data-page-tone][data-theme] body.ft-extension-surface[data-surface] .content-control-group.video-filters-section,
+:root[data-page-tone][data-theme] body.ft-extension-surface[data-surface] .content-control-group.category-filters-section {
+  background: color-mix(in srgb, var(--ft-group-wash) 72%, var(--pk-paper)) !important;
+}
+/* A group nested in a group stays flat and takes no second wash. */
+body.ft-extension-surface .content-control-group .content-control-group { background: transparent !important; }
+
+body.ft-extension-surface .content-control-group .content-control-group__title::after { background: var(--ft-group-ink); }
+/* The row dividers lean toward the group's ink a little, so the rows still read as one sheet. */
+body.ft-extension-surface .content-control-group[data-ft-group-id] .toggle-row:hover,
+body.ft-extension-surface .content-control-group.category-filters-section .toggle-row:hover {
+  background-image: linear-gradient(color-mix(in srgb, var(--ft-group-ink) 7%, transparent), color-mix(in srgb, var(--ft-group-ink) 7%, transparent)) !important;
+}
