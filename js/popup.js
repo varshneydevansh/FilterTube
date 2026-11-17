@@ -1400,10 +1400,12 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     // The effective mode (js/shared/effective_mode.js): during study the pill says "Study", not the
     // profile's own Blocklist/Whitelist, and opens the Study page instead of switching the list.
-    let popupStudyState = null;
-    let popupStudyLoad = null;
-    let popupStudyTimer = null;
-    let popupStudyAsked = false;
+    // var without a value: the page can draw the pill before these lines run (no temporal dead zone),
+    // and reaching them later must not reset a load already started.
+    var popupStudyState;
+    var popupStudyLoad;
+    var popupStudyTimer;
+    var popupStudyAsked;
     function refreshPopupStudyState() {
         popupStudyAsked = true;
         if (popupStudyLoad) return popupStudyLoad;

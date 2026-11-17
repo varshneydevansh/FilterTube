@@ -74,3 +74,20 @@ test('the popup and the dashboard header render the Study pill from the shared h
         assert.ok(helper < html.indexOf(file.includes('popup') ? 'js/popup.js' : 'js/tab-view.js'), `${file}: loaded before the page script`);
     }
 });
+
+test('the pill\'s state is declared so an early draw can\'t hit the temporal dead zone', () => {
+    // renderListModeControls can run before its state lines (owner's options page: "Cannot access
+    // 'tabStudyAsked' before initialization"); they are vars without a value, so a later pass can't reset a load.
+    for (const [file, prefix] of [['js/tab-view.js', 'tabStudy'], ['js/popup.js', 'popupStudy']]) {
+        const source = fs.readFileSync(file, 'utf8');
+        for (const name of ['State', 'Load', 'Timer', 'Asked']) {
+            assert.doesNotMatch(source, new RegExp(`(?:let|const) ${prefix}${name}\\b`), `${file} ${prefix}${name}`);
+            assert.match(source, new RegExp(`var ${prefix}${name};`), `${file} ${prefix}${name}`);
+        }
+    }
+});
+
+test('the dashboard Study home offers Undo right after Skip break', () => {
+    const source = fs.readFileSync('js/study_ui.js', 'utf8');
+    assert.match(source, /action: 'FilterTube_StudyUndoSkipBreak', until: result\.until/);
+});

@@ -1923,6 +1923,14 @@
                     const result = await send({ action: 'FilterTube_StudySkipBreak' });
                     if (result?.ok === false) { pendingScribble = null; skip.disabled = false; skip.classList.add('is-rejected'); return; }
                     skip.classList.add('is-squash');
+                    // "Break skipped. Round 3 is now 55 min." with Undo for 5 seconds (Android StudyRuntime.undoSkipBreak).
+                    const preview = object(state.skipPreview);
+                    if (Number.isFinite(result?.until)) {
+                        notify(slot, preview.round
+                            ? t('study.overlay.breakSkipped', 'Break skipped. Round {round} is now {minutes} min.', { round: preview.round, minutes: preview.roundMinutes })
+                            : t('study.overlay.skipBreak', 'Skip break'),
+                            async () => { await send({ action: 'FilterTube_StudyUndoSkipBreak', until: result.until }); ctx.refresh(); });
+                    }
                     perchMoment = { pose: 'kritiSalute', until: Date.now() + SALUTE_MS };
                     try { root.FilterTubeMascots?.playSound?.('scribble'); } catch (e) { }
                     setTimeout(() => ctx.refresh(), SALUTE_MS + 40);

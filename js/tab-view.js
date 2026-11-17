@@ -33144,10 +33144,12 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     // The effective mode (js/shared/effective_mode.js): during study the header pill says "Study" in sage
     // and opens the Study page; it changes back by itself when the session ends.
-    let tabStudyState = null;
-    let tabStudyLoad = null;
-    let tabStudyTimer = null;
-    let tabStudyAsked = false;
+    // var without a value: the page can draw the pill before these lines run (no temporal dead zone),
+    // and reaching them later must not reset a load already started.
+    var tabStudyState;
+    var tabStudyLoad;
+    var tabStudyTimer;
+    var tabStudyAsked;
     function refreshTabStudyState() {
         tabStudyAsked = true;
         if (tabStudyLoad) return tabStudyLoad;
