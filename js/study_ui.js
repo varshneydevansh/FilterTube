@@ -439,6 +439,7 @@
         if (!running) return null;
         if (error === 'locked' || value.lockMode === 'locked') {
             return { title: time ? t('study.lockedUntil', 'Locked until {time}', { time }) : t('study.loosen.lockedTitleNoTime', 'Locked until study ends'),
+                lockedUntil: time ? until : null,
                 body: t('study.loosen.lockedBody', 'You can add to your block list, but you can\'t remove anything until then.') };
         }
         if (error === 'study_running') {
@@ -462,6 +463,10 @@
         holder.querySelector?.(':scope > .ft-study-loosen')?.remove();
         const card = el('div', 'ft-study-loosen');
         card.setAttribute('role', 'alertdialog');
+        // A Locked refusal: Kriti holds the "Locked until <time>" sign above the words (Android
+        // StudyLooseningSheet, a still). Only where the companions load; Companion Off: words only.
+        const sign = sheet.lockedUntil ? root.FilterTubeMascots?.lockedSign?.(sheet.lockedUntil, { height: 132, className: 'ft-study-loosen__sign' }) : null;
+        if (sign) card.appendChild(sign);
         card.append(el('strong', 'ft-study-loosen__title', sheet.title), el('p', 'ft-study-muted', sheet.body));
         const actions = el('div', 'ft-study-actions');
         if (sheet.endSession) actions.appendChild(button(t('study.endSession', 'End session'), 'btn-secondary', async () => { card.remove(); await send({ action: 'FilterTube_StudyEndSession' }); }));

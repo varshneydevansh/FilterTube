@@ -29431,6 +29431,8 @@ document.addEventListener('DOMContentLoaded', async () => {
             UIComponents.showToast(tabViewUiText('family.profileManager.switchingLocked', 'Profile switching is locked for {remaining}', {
                 remaining: formatSelfControlRemaining(selfControlSessionState.remainingSeconds)
             }), 'error');
+            // Kriti holds the "Locked until <time>" sign beside the words (a still; Companion Off: words only).
+            window.FilterTubeMascots?.lockedToast?.(selfControlSessionState?.lockedUntil);
             return;
         }
         const targetId = normalizeString(nextProfileId);
@@ -29993,6 +29995,8 @@ document.addEventListener('DOMContentLoaded', async () => {
                     : tabViewUiText('dashboard.backup.toast.exportedToDownloadsFolder', 'Exported JSON to Downloads/FilterTube Export/'),
                 'success'
             );
+            // Backup saved: Kriti stamps a check and Uljhan claps beside the button, once a day.
+            window.FilterTubeMascots?.backupSaved?.('ftExportV3Btn');
         } catch (e) {
             UIComponents.showToast(tabViewUiText('dashboard.backup.toast.exportFailed', 'Export failed'), 'error');
             console.error('Export V3 failed', e);
@@ -30079,6 +30083,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                         : tabViewUiText('dashboard.backup.toast.encryptedExportedToDownloadsFolder', 'Exported encrypted JSON to Downloads/FilterTube Export/')),
                 'success'
             );
+            window.FilterTubeMascots?.backupSaved?.('ftExportV3EncryptedBtn');
         } catch (e) {
             UIComponents.showToast(tabViewUiText('dashboard.backup.toast.encryptedExportFailed', 'Encrypted export failed'), 'error');
             console.error('Export encrypted failed', e);

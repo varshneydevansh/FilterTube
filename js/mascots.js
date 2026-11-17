@@ -10,7 +10,11 @@
  *   Loading is Uljhan fetching, with a line that never repeats one of the last three.
  * - Brand moments: Kriti sieving Uljhan on the dashboard hero (once on Lively, then a few small hops and
  *   rest), Kriti peeking over the sidebar footer, the pair on About, Kriti's thumbs up on a success toast
- *   and Uljhan's shrug on an error toast, Uljhan on the offline, slow and back-online strip.
+ *   and Uljhan's shrug on an error toast, Uljhan on the offline, slow and back-online strip (offline he
+ *   tangles himself in his string; back online Kriti unwinds him).
+ * - The 2026-11-18 moments: Kriti holding a sign with "Locked until <time>" written on it beside a
+ *   Self-Control or study-lock refusal (a still); the duo's backup stamp after an export or import, once a
+ *   day; Kriti's magnifier and Uljhan's shrug over a search that found nothing.
  * - Support (Donate page and the dashboard card): the words and the pose rotate; every variant says that
  *   FilterTube is free and that support is optional, and claims nothing else.
  * - Sounds (Off by default; Gentle or Playful): never carry meaning on their own, and stay silent
@@ -61,7 +65,10 @@
         kritiReading: 'kriti_reading.webp',
         kritiThinking: 'kriti_thinking.webp',
         uljhanShrug: 'uljhan_shrug.webp',
-        kritiFunnel: 'kriti_funnel.webp',
+        // Kriti holding the logo funnel is the sieve loop's last frame (ASSETS.sieve[4]); the old kitchen
+        // sieve pose is gone (Android KRITI_FUNNEL -> study_kriti_loading_05).
+        // Self-Control and study-lock refusals: Kriti holds a blank sign; the page writes "Locked until <time>".
+        kritiLockedSign: 'kriti_locked_sign.webp',
         kritiNotebook: 'kriti_notebook.webp',
         kritiPointing: 'kriti_pointing.webp',
         // Study's perch poses (StudyFocusActivity.KritiPerch): before a session she reads, on a break she's
@@ -77,7 +84,6 @@
         kritiFront: 'kriti_front.webp',
         uljhanFront: 'uljhan_front.webp',
         uljhanHappy: 'uljhan_happy.webp',
-        uljhanSad: 'uljhan_sad.webp',
         sieve: Object.freeze([1, 2, 3, 4, 5].map(index => `kriti_sieve_0${index}.webp`)),
         // Picture-book sheets (aKriti frames): swapped stills, never warped.
         kritiMug: Object.freeze([1, 2, 3, 4, 5, 6].map(index => `kriti_mug_0${index}.webp`)),
@@ -90,7 +96,15 @@
         kritiPencil: Object.freeze([1, 2, 3, 4, 5, 6].map(index => `kriti_pencil_0${index}.webp`)),
         // The rest screen's stretch (KRITI_STRETCH).
         kritiStretch: Object.freeze([1, 2, 3, 4, 5].map(index => `kriti_stretch_0${index}.webp`)),
-        uljhanLeaves: Object.freeze([1, 2, 3, 4, 5].map(index => `uljhan_wave_0${index}.webp`))
+        uljhanLeaves: Object.freeze([1, 2, 3, 4, 5].map(index => `uljhan_wave_0${index}.webp`)),
+        // The 2026-11-18 moments (aKriti duo_offline_untangle, duo_backup_saved, duo_search_empty). Offline:
+        // Uljhan tangles himself in his string. Back online: Kriti kneels, unwinds him, he hops free (sheet
+        // frames 3, 5 and 6). Backup saved: Kriti stamps a check, Uljhan claps (sheet frames 1, 3, 4 and 6).
+        // No results: Kriti searches with her magnifier, Uljhan peeks in and shrugs.
+        uljhanTangle: Object.freeze([1, 2, 3].map(index => `uljhan_tangle_0${index}.webp`)),
+        duoUntangle: Object.freeze([1, 2, 3].map(index => `duo_untangle_0${index}.webp`)),
+        duoBackup: Object.freeze([1, 2, 3, 4].map(index => `duo_backup_0${index}.webp`)),
+        duoSearchEmpty: Object.freeze([1, 2, 3, 4].map(index => `duo_search_empty_0${index}.webp`))
     });
     /**
      * The app's frame animations (StudyMascotView.Motion): which frames play, in what order (0-based,
@@ -111,7 +125,13 @@
         // The same frames played another way (frames: whose pictures). KRITI_OPEN_NOTEBOOK opens her
         // notebook and rests reading; Uljhan's wave in a fetch-more footer stays put (no leaving).
         kritiOpenNotebook: Object.freeze({ frames: 'kritiPencil', order: Object.freeze([0, 1, 2]), ms: 260 }),
-        uljhanWave: Object.freeze({ frames: 'uljhanLeaves', order: Object.freeze([0, 1, 2, 1, 2, 3, 4]), ms: 170 })
+        uljhanWave: Object.freeze({ frames: 'uljhanLeaves', order: Object.freeze([0, 1, 2, 1, 2, 3, 4]), ms: 170 }),
+        // StudyMascotView.Motion ULJHAN_TANGLE, DUO_UNTANGLE (leaves after), DUO_BACKUP_SAVED and DUO_SEARCH_EMPTY,
+        // with the same total length over the frames the extension ships.
+        uljhanTangle: Object.freeze({ order: Object.freeze([0, 1, 2]), ms: 420 }),
+        duoUntangle: Object.freeze({ order: Object.freeze([0, 1, 2]), ms: 400, leaves: true }),
+        duoBackup: Object.freeze({ order: Object.freeze([0, 1, 2, 3]), ms: 390 }),
+        duoSearchEmpty: Object.freeze({ order: Object.freeze([0, 1, 2, 3]), ms: 420 })
     });
     /** The pictures a sheet plays (its own, or the frames it borrows). Pure. */
     function sheetAssets(sheet) {
@@ -150,7 +170,7 @@
     // MascotIdle.beatsFor: the beats that fit the art she rests on.
     const IDLE_BEATS = Object.freeze({
         uljhan: Object.freeze(['wiggle', 'bob', 'hop', 'sparkle']),
-        uljhanSad: Object.freeze(['wiggle', 'bob']),
+        uljhanTangled: Object.freeze(['wiggle', 'bob']),
         sieve: Object.freeze(['bob', 'squash', 'sieve', 'sparkle']),
         seated: Object.freeze(['bob', 'squash', 'sparkle']),
         perched: Object.freeze(['squash', 'sparkle']),
@@ -183,6 +203,13 @@
     const LOADING_REVEAL_MS = 600;
     const LOOP_CAP_MS = 30000;
     const REPLAY_REST_MS = 1200;
+    const POPUP_MOTION_MS = 400;
+    const SEARCH_EMPTY_REPLAY_MS = 10000;
+    // The sign's writable area in kriti_locked_sign.webp, as fractions of the picture (between her hands),
+    // and the type: the time 1.45 times the words, lines 1.12 apart (Android LockedSignView).
+    const LOCKED_SIGN = Object.freeze({ left: 0.5, top: 0.646, right: 0.846, bottom: 0.882, aspect: 247 / 280, timeScale: 1.45, lineHeight: 1.12 });
+    const LOCKED_COPY = Object.freeze(['study.lockedUntil', 'Locked until {time}']);
+    const BACKUP_MOMENT_KEY = 'backup_saved';
 
     const COPY = Object.freeze({
         welcome: ['mascot.welcome.line', "I'll keep what you block out of sight."],
@@ -214,7 +241,8 @@
         slow: ['mascot.net.slow', 'Slow connection, still sifting…'],
         restored: ['mascot.net.restored', 'Back online']
     });
-    const NETWORK_ART = Object.freeze({ offline: 'uljhanSad', slow: 'uljhanFront', restored: 'uljhanHappy' });
+    // Offline: Uljhan tangled in his string; back online: Kriti has unwound him (each a sheet's still).
+    const NETWORK_ART = Object.freeze({ offline: 'uljhanTangle', slow: 'uljhanFront', restored: 'duoUntangle' });
     const RESTORED_MS = 3500;
     const DUO_COPY = Object.freeze({
         hello: ['mascot.hello', 'Hi, I\'m Kriti. I keep the good stuff flowing.'],
@@ -229,7 +257,7 @@
     const SUPPORT_VARIANTS = Object.freeze([
         // touch: the variant's one crayon touch (Android SupportSheetVariants.Touch).
         Object.freeze({ id: 'classic', image: 'kritiLogo', characters: false, time: 'any', touch: 'heartOnPick' }),
-        Object.freeze({ id: 'sieve', image: 'kritiFunnel', characters: true, time: 'any', touch: 'underlineTitle' }),
+        Object.freeze({ id: 'sieve', image: 'sieve', characters: true, time: 'any', touch: 'underlineTitle' }),
         Object.freeze({ id: 'onePerson', image: 'kritiNotebook', characters: false, time: 'any', touch: 'underlineTitle' }),
         Object.freeze({ id: 'morning', image: 'kritiWave', characters: true, time: 'morning', touch: 'sparkleLogo' }),
         Object.freeze({ id: 'evening', image: 'kritiEvening', characters: true, time: 'evening', touch: 'none' })
@@ -290,15 +318,16 @@
     const MOMENTS = Object.freeze({
         loading: Object.freeze({ image: 'uljhanFetch', copy: 'loading', character: 'Uljhan' }),
         empty: Object.freeze({ image: 'kritiPeek', copy: null, character: 'Kriti' }),
-        noMatches: Object.freeze({ image: 'uljhanShrug', copy: 'noMatches', character: 'Uljhan' }),
+        // character 'Duo': Kriti and Uljhan together on one picture.
+        noMatches: Object.freeze({ image: 'duoSearchEmpty', copy: 'noMatches', character: 'Duo' }),
         error: Object.freeze({ image: 'uljhanShrug', copy: 'error', character: 'Uljhan' }),
         done: Object.freeze({ image: 'kritiThumbsUp', copy: null, character: 'Kriti' }),
         hello: Object.freeze({ image: 'kritiWave', copy: null, character: 'Kriti' }),
         reading: Object.freeze({ image: 'kritiReading', copy: null, character: 'Kriti' }),
         break: Object.freeze({ image: 'kritiMug', copy: null, character: 'Kriti' }),
-        offline: Object.freeze({ image: 'uljhanSad', copy: null, character: 'Uljhan' }),
+        offline: Object.freeze({ image: 'uljhanTangle', copy: null, character: 'Uljhan' }),
         slow: Object.freeze({ image: 'uljhanFront', copy: null, character: 'Uljhan' }),
-        restored: Object.freeze({ image: 'uljhanHappy', copy: null, character: 'Uljhan' }),
+        restored: Object.freeze({ image: 'duoUntangle', copy: null, character: 'Duo' }),
         // Waiting for the other device (the app's KRITI_THINKING), and a win (KRITI_JUMP, Lively plays it).
         thinking: Object.freeze({ image: 'kritiThinking', copy: null, character: 'Kriti' }),
         celebrate: Object.freeze({ image: 'kritiJump', copy: null, character: 'Kriti' })
@@ -418,7 +447,7 @@
     /** Which idle beats fit an art file (MascotIdle.beatsFor). Pure. */
     function idleBeatsFor(name) {
         const file = String(name || '').replace(/^.*\//, '');
-        if (file === 'uljhan_sad.webp') return IDLE_BEATS.uljhanSad;
+        if (/^uljhan_tangle_/.test(file)) return IDLE_BEATS.uljhanTangled;
         if (/^uljhan_/.test(file)) return IDLE_BEATS.uljhan;
         if (/^kriti_sieve_/.test(file)) return IDLE_BEATS.sieve;
         if (file === 'kriti_reading.webp' || file === 'kriti_notebook.webp') return IDLE_BEATS.seated;
@@ -511,9 +540,82 @@
      * a first channel list reads, a Kids list peeks, and a search that found nothing gets Uljhan. Pure.
      */
     function emptyListPose(list, { kids = false } = {}) {
-        if (list === 'search') return 'uljhanShrug';
+        if (list === 'search') return 'duoSearchEmpty';
         if (kids) return 'kritiPeek';
         return list === 'channels' ? 'kritiReading' : 'kritiPointing';
+    }
+
+    /**
+     * The popup closes when it loses focus, so a sheet there plays its first, middle and last frames
+     * (frames 1, 4 and 6 of a six-frame sheet) in 400 ms at most (BIBLE, extension popup). Pure.
+     */
+    function popupSheet(sheet) {
+        const order = MOTIONS[sheet]?.order;
+        if (!order?.length) return { order: [], ms: 0 };
+        const last = order.length - 1;
+        const picks = [order[0], order[Math.round(last * 0.6)], order[last]].filter((value, index, all) => index === 0 || value !== all[index - 1]);
+        return { order: picks, ms: Math.floor(POPUP_MOTION_MS / picks.length) };
+    }
+
+    /**
+     * The lines written on Kriti's sign (Android LockedSignView.lines): the translated "Locked until {time}"
+     * split around the time, so each locale keeps its own order. The words before and after are small
+     * lines, the time is the big one; blank parts drop out. Pure.
+     */
+    function signLines(template, time) {
+        const text = String(template || '');
+        const clean = value => value.replace(/\s+/g, ' ').trim();
+        const at = text.indexOf('{time}');
+        if (at < 0) {
+            const lines = [clean(text), String(time)].filter(Boolean);
+            return { lines, timeIndex: lines.length - 1 };
+        }
+        const before = clean(clean(text.slice(0, at)).replace(/[,،:]+$/, ''));
+        const after = clean(clean(text.slice(at + '{time}'.length)).replace(/^[,،:]+/, '').replace(/[,،]+$/, ''));
+        const lines = before ? [before] : [];
+        const timeIndex = lines.length;
+        lines.push(String(time));
+        if (after) lines.push(after);
+        return { lines, timeIndex };
+    }
+
+    /**
+     * The largest label size (px) at which every line fits width x height (the time drawn timeScale times
+     * bigger); everything shrinks together. measure(text, px, bold) gives a line's width. 0 if nothing fits.
+     */
+    function fitSignSize(sign, width, height, measure) {
+        const lines = sign?.lines || [];
+        if (!lines.length || !(width > 0) || !(height > 0)) return 0;
+        const scale = index => (index === sign.timeIndex ? LOCKED_SIGN.timeScale : 1);
+        let size = height / lines.reduce((sum, _, index) => sum + scale(index) * LOCKED_SIGN.lineHeight, 0);
+        while (size > 1) {
+            const widest = Math.max(...lines.map((line, index) => measure(line, size * scale(index), index === sign.timeIndex)));
+            if (widest <= width) return size;
+            size *= 0.94;
+        }
+        return 0;
+    }
+
+    /** The time on the sign: the clock time today, with the short weekday on a later day. */
+    function signTime(until, now = Date.now(), lang = locale()) {
+        const end = new Date(Number(until));
+        const sameDay = end.toDateString() === new Date(now).toDateString();
+        const options = sameDay ? { hour: 'numeric', minute: '2-digit' } : { weekday: 'short', hour: 'numeric', minute: '2-digit' };
+        try {
+            return new Intl.DateTimeFormat(lang, options).format(end);
+        } catch (e) {
+            return new Intl.DateTimeFormat('en', options).format(end);
+        }
+    }
+
+    /** Backup saved plays the duo at most once a local day (Android takeBackupSavedToday). Pure. */
+    function backupSavedDue(storedDay, today) {
+        return storedDay !== today;
+    }
+
+    /** A search list redraws on every keystroke: the no-results sheet replays at most every 10 s. Pure. */
+    function searchEmptyPlays(lastPlayedAt, now) {
+        return !(Number(lastPlayedAt) > 0) || now - Number(lastPlayedAt) >= SEARCH_EMPTY_REPLAY_MS;
     }
 
     /** The picture a pose rests on: a single image, or a sheet's still. */
@@ -1094,6 +1196,8 @@
         }).observe(container, { childList: true, subtree: true });
     }
 
+    let lastSearchEmptyAt = 0;
+
     function drawEmptyList(node, list, details) {
         // RenderEngine rewrites the node's textContent on a language change. Move its copy record onto a
         // child span first, so that refresh rewrites only the label and leaves the character in place.
@@ -1109,13 +1213,19 @@
         node.classList.remove('ft-mascot-empty');
         if (!showsCharacters(companionMode)) return;
         if (list === 'search') {
-            // Uljhan looks around when a search finds nothing (his face says it; the line is Kriti's tip).
-            const character = createCharacter({ className: 'ft-mascot--empty ft-mascot--search', imageName: stillImage(emptyListPose('search')), height: 88, kind: 'static', tail: 'up' });
+            // Kriti searches with her magnifier and Uljhan peeks in and shrugs (DUO_SEARCH_EMPTY), once,
+            // then rests on the shrug; the list redraws on each keystroke, so it replays at most every 10 s.
+            const pose = emptyListPose('search');
+            const now = Date.now();
+            const plays = !prefersReducedMotion() && searchEmptyPlays(lastSearchEmptyAt, now);
+            if (plays) lastSearchEmptyAt = now;
+            const character = createCharacter({ className: 'ft-mascot--empty ft-mascot--search', imageName: plays ? sheetAssets(pose)[0] : stillImage(pose), height: 88, kind: 'static', tail: 'up' });
             node.classList.add('ft-mascot-empty');
             node.insertBefore(character.root, node.firstChild);
             character.say(t(COPY.noMatches));
             enter(character.picture);
-            idleLife(character.picture);
+            if (plays) root.setTimeout(() => playSheet(character.picture, pose, { onDone: () => idleLife(character.picture) }), 240);
+            else idleLife(character.picture);
             return;
         }
         if (details.searching || details.mode === 'whitelist') return;
@@ -1240,21 +1350,60 @@
 
     let importMoment = null;
 
-    /** Kriti gives a thumbs up beside the backup importer after a verified import. */
+    /**
+     * After a verified import (a restore): the duo's backup moment once a day, else Kriti's thumbs up
+     * beside the backup importer.
+     */
     function celebrateImport() {
+        return backupSaved('ftImportV3Btn', { line: t(COPY.imported), thumbsFallback: true });
+    }
+
+    /**
+     * A finished backup or restore the person asked for (Android MascotPaperToast.backupSaved): Kriti stamps
+     * a check on the page and Uljhan claps (DUO_BACKUP_SAVED) beside the button, at most once a local day.
+     * Reduced motion shows the clapping still; Companion Off shows nothing (the toast says it).
+     */
+    async function backupSaved(buttonId = 'ftExportV3Btn', { line = '', thumbsFallback = false } = {}) {
         const doc = root.document;
-        const button = doc?.getElementById('ftImportV3Btn');
+        const button = doc?.getElementById?.(buttonId);
         const item = button?.closest?.('.help-item') || button?.parentElement;
-        if (!item) return;
+        if (!item) return false;
         importMoment?.remove();
         importMoment = null;
-        if (!showsCharacters(companionMode)) return;
+        if (!showsCharacters(companionMode)) return false;
+        if (!(await takeMoment(BACKUP_MOMENT_KEY, localDay()))) {
+            if (thumbsFallback) thumbsUp(item, line);
+            return false;
+        }
+        const plays = !prefersReducedMotion();
+        const character = createCharacter({ className: 'ft-mascot--stamp ft-mascot--backup', imageName: plays ? ASSETS.duoBackup[0] : stillImage('duoBackup'),
+            height: 80, kind: 'event', tail: 'left' });
+        const holder = el('div', 'ft-mascot-import');
+        holder.appendChild(character.root);
+        item.appendChild(holder);
+        importMoment = holder;
+        if (line) {
+            character.say(line, { event: true });
+            announce(holder, line);
+        }
+        enter(character.picture);
+        if (plays) {
+            root.setTimeout(() => playSheet(character.picture, 'duoBackup', { onDone: () => idleLife(character.picture) }), 240);
+            // The stamp lands on the second frame the extension ships (the sheet's third).
+            root.setTimeout(() => playSound('stamp'), 240 + sheetFrameMs('duoBackup'));
+        } else {
+            idleLife(character.picture);
+        }
+        return true;
+    }
+
+    /** Kriti's thumbs up beside the importer (an import after today's backup moment). */
+    function thumbsUp(item, line) {
         const character = createCharacter({ className: 'ft-mascot--stamp', imageName: ASSETS.kritiThumbsUp, height: 80, kind: 'event', tail: 'left' });
         const holder = el('div', 'ft-mascot-import');
         holder.appendChild(character.root);
         item.appendChild(holder);
         importMoment = holder;
-        const line = t(COPY.imported);
         if (!prefersReducedMotion()) {
             character.root.classList.add('is-stamping');
             character.root.addEventListener('animationend', () => character.root.classList.remove('is-stamping'), { once: true });
@@ -1262,6 +1411,66 @@
         character.say(line, { event: true });
         announce(holder, line);
         playSound('page');
+    }
+
+    // ---- Kriti's locked sign (Android LockedSignView) ---------------------------------------------
+
+    /**
+     * Kriti holding the sign with "Locked until <time>" written on it, for a Self-Control or study-lock
+     * refusal: a decision surface, so always a still (no sheet, no idle beats, no sound). Decorative for
+     * screen readers: the words beside her say the same. Null with the Companion Off or no end time.
+     */
+    function lockedSign(until, { height = 120, className = '' } = {}) {
+        const end = Number(until);
+        const doc = root.document;
+        if (!doc || !showsCharacters(companionMode) || !Number.isFinite(end) || end <= Date.now()) return null;
+        const sign = signLines(t(LOCKED_COPY, { time: '{time}' }), signTime(end));
+        const holder = el('div', `pk-locked-sign${className ? ` ${className}` : ''}`);
+        holder.setAttribute('aria-hidden', 'true');
+        holder.style.height = `${height}px`;
+        holder.style.width = `${Math.round(height * LOCKED_SIGN.aspect)}px`;
+        const art = image(ASSETS.kritiLockedSign, 'pk-locked-sign__art', height);
+        const words = el('div', 'pk-locked-sign__words');
+        words.style.left = `${LOCKED_SIGN.left * 100}%`;
+        words.style.top = `${LOCKED_SIGN.top * 100}%`;
+        words.style.width = `${((LOCKED_SIGN.right - LOCKED_SIGN.left) * 100).toFixed(1)}%`;
+        words.style.height = `${((LOCKED_SIGN.bottom - LOCKED_SIGN.top) * 100).toFixed(1)}%`;
+        let family = 'sans-serif';
+        try { family = root.getComputedStyle?.(doc.body)?.fontFamily || family; } catch (e) { }
+        words.style.fontFamily = family;
+        let context = null;
+        try { context = doc.createElement('canvas').getContext?.('2d') || null; } catch (e) { }
+        const measure = (text, px, bold) => {
+            if (!context) return [...text].length * px * 0.56;
+            context.font = `${bold ? 700 : 400} ${px}px ${family}`;
+            return context.measureText(text).width;
+        };
+        const areaWidth = height * LOCKED_SIGN.aspect * (LOCKED_SIGN.right - LOCKED_SIGN.left);
+        const areaHeight = height * (LOCKED_SIGN.bottom - LOCKED_SIGN.top);
+        // A little margin inside the sign's edges.
+        const size = fitSignSize(sign, areaWidth * 0.92, areaHeight * 0.96, measure);
+        sign.lines.forEach((line, index) => {
+            const time = index === sign.timeIndex;
+            const span = el('span', time ? 'pk-locked-sign__time' : 'pk-locked-sign__label', line);
+            span.style.fontSize = `${(size * (time ? LOCKED_SIGN.timeScale : 1)).toFixed(2)}px`;
+            words.appendChild(span);
+        });
+        words.hidden = !(size > 0);
+        holder.append(art, words);
+        return holder;
+    }
+
+    /** Puts the locked sign on the toast just shown (a refused profile switch during Self-Control). */
+    function lockedToast(until) {
+        const toasts = root.document?.querySelectorAll?.('.ft-toast');
+        const toast = toasts?.length ? toasts[toasts.length - 1] : null;
+        if (!toast) return false;
+        const sign = lockedSign(until, { height: 96, className: 'pk-toast-sign' });
+        if (!sign) return false;
+        toast.querySelector('.pk-toast-art')?.remove();
+        toast.classList.add('has-mascot', 'has-sign');
+        toast.insertBefore(sign, toast.firstChild);
+        return true;
     }
 
     // ---- Motion: springs, sheets, idle life and moments (StudyMascotView, MascotIdle) -------------
@@ -1308,22 +1517,24 @@
      * for a leaving motion, slides out and fades). With reduced motion the resting still shows at once.
      * Returns a stop function.
      */
-    function playSheet(picture, sheet, { onDone = null } = {}) {
+    function playSheet(picture, sheet, { onDone = null, popup = false } = {}) {
         const names = sheetAssets(sheet);
-        const order = sheetFrames(sheet, prefersReducedMotion());
+        const reduced = prefersReducedMotion();
+        // The popup plays the short form (popupSheet) and never slides a leaving character out.
+        const order = popup && !reduced ? popupSheet(sheet).order : sheetFrames(sheet, reduced);
         if (!picture || !order.length) return () => {};
         if (order.length === 1) {
             picture.src = assetUrl(names[order[0]]);
             onDone?.();
             return () => {};
         }
-        const frameMs = sheetFrameMs(sheet);
+        const frameMs = popup ? popupSheet(sheet).ms : sheetFrameMs(sheet);
         let timer = 0;
         let stopped = false;
         picture.dataset.ftPlaying = sheet;
         const finish = () => {
             delete picture.dataset.ftPlaying;
-            if (MOTIONS[sheet]?.leaves && picture.animate && !stopped) {
+            if (MOTIONS[sheet]?.leaves && !popup && picture.animate && !stopped) {
                 timer = root.setTimeout(() => {
                     try {
                         picture.animate([{ transform: 'none', opacity: 1 }, { transform: `translateX(${Math.round((picture.width || 80) * 0.6)}px)`, opacity: 0 }],
@@ -1509,7 +1720,7 @@
         let started = 0;
         let resting = false;
         let stopped = false;
-        const still = () => (sheet === 'sieve' ? ASSETS.kritiFunnel : stillImage(sheet));
+        const still = () => stillImage(sheet);
         const visible = () => !!picture?.isConnected && root.document.visibilityState !== 'hidden' && !!picture.offsetParent;
         const cycle = () => {
             root.clearTimeout(timer);
@@ -1566,7 +1777,6 @@
 
     /** The still a loading moment shows (and rests on between plays). */
     function loadingStill(name) {
-        if (name === 'sieve') return ASSETS.kritiFunnel;
         if (name === 'duoShoo') return ASSETS.duoShoo[4];
         if (name === 'kritiJump') return ASSETS.kritiJump[0];
         return stillImage(name);
@@ -1910,7 +2120,7 @@
         new root.MutationObserver(records => {
             for (const record of records) {
                 for (const added of record.addedNodes) {
-                    if (added.nodeType !== 1 || !added.classList?.contains('ft-toast') || added.querySelector('.pk-toast-art, .pk-toast-check')) continue;
+                    if (added.nodeType !== 1 || !added.classList?.contains('ft-toast') || added.querySelector('.pk-toast-art, .pk-toast-check, .pk-locked-sign')) continue;
                     const success = added.classList.contains('ft-toast-success');
                     const error = added.classList.contains('ft-toast-error');
                     // A moment may ask for its own pose (Android MascotPaperToast.kriti): Kriti waving after a
@@ -1981,13 +2191,19 @@
             body.hidden = !body.textContent;
             art.replaceChildren();
             if (showsCharacters(companionMode)) {
-                // Back online: Uljhan waves and tiptoes off (ULJHAN_LEAVES); a still with reduced motion.
-                const leaving = state === 'restored' && !prefersReducedMotion();
-                const picture = image(leaving ? ASSETS.uljhanFront : ASSETS[NETWORK_ART[state]], 'pk-net__image', 40);
+                // Offline: Uljhan tangles himself in his string once and sits there (ULJHAN_TANGLE). Back
+                // online: Kriti kneels and unwinds him, he hops free (DUO_UNTANGLE). Reduced motion: the
+                // stills. The popup plays the short form (400 ms).
+                const current = state;
+                const sheet = current === 'offline' ? 'uljhanTangle' : current === 'restored' ? 'duoUntangle' : '';
+                const plays = !!sheet && !prefersReducedMotion();
+                const picture = image(plays ? sheetAssets(sheet)[0] : stillImage(NETWORK_ART[current]), 'pk-net__image', 40);
                 art.appendChild(picture);
                 enter(picture);
-                if (leaving) root.setTimeout(() => playSheet(picture, 'uljhanLeaves'), 240);
-                else if (state === 'offline') idleLife(picture);
+                const popup = !!doc.getElementById('popupRoot');
+                const rest = () => { if (current === 'offline') idleLife(picture); };
+                if (plays) root.setTimeout(() => playSheet(picture, sheet, { popup, onDone: rest }), 240);
+                else rest();
             }
             art.hidden = !showsCharacters(companionMode);
             strip.hidden = false;
@@ -2315,6 +2531,8 @@
         normalizeSoundMode, soundAllowed, playSound, loadSoundMode, moment,
         get mode() { return companionMode; },
         emptyListKind, decorateEmptyList, celebrateImport, mountPopup, firstFilterMoment, ruleCount,
+        NETWORK_ART, LOCKED_SIGN, popupSheet, signLines, fitSignSize, signTime, lockedSign, lockedToast,
+        backupSavedDue, backupSaved, searchEmptyPlays,
         SWITCH_KRITI_PER_DAY, switchKritiAllowed, switchCrossesKids, profileSwitched
     });
 

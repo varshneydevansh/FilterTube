@@ -441,3 +441,42 @@ html[data-theme="dark"] .ft-mascot-tally {
 
 /* A fetch-more footer (Uljhan alone): he hops up from below its edge, so the footer clips him. */
 .pk-moment[data-ft-scene="fetch"] { overflow: hidden; }
+
+/* ---- Kriti's locked sign (FilterTubeMascots.lockedSign): the time written on her blank sign ------------ */
+
+.pk-locked-sign {
+    position: relative;
+    flex: none;
+    line-height: 0;
+    pointer-events: none;
+}
+
+.pk-locked-sign__art {
+    display: block;
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+}
+
+.pk-locked-sign__words {
+    position: absolute;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    color: var(--ft-mascot-ink, #2a241f);
+    text-align: center;
+    white-space: nowrap;
+    line-height: 1.12;
+}
+
+.pk-locked-sign__words[hidden] { display: none; }
+.pk-locked-sign__label { font-weight: 400; }
+.pk-locked-sign__time { font-weight: 700; }
+
+/* On a toast: the sign sits beside the words, a little taller than a pose (Android LOCKED_SIGN_DP). */
+.ft-toast.has-sign { align-items: center; }
+.ft-toast .pk-toast-sign { border-radius: 12px; background: var(--ft-mascot-paper, #fff7e6); }
+
+/* Above a study refusal ("Locked until ..."): the sign leads the card. */
+.ft-study-loosen .ft-study-loosen__sign { align-self: center; margin-bottom: 2px; }

@@ -281,12 +281,14 @@ test('moments use Kriti or Uljhan only, and the Companion Off setting leaves the
     const { Mascots } = load();
     const moments = plain(Mascots.MOMENTS);
     for (const [kind, spec] of Object.entries(moments)) {
-        assert.ok(['Kriti', 'Uljhan'].includes(spec.character), kind);
+        // 'Duo' is Kriti and Uljhan together on one picture.
+        assert.ok(['Kriti', 'Uljhan', 'Duo'].includes(spec.character), kind);
         assert.ok(plain(Mascots.ASSETS)[spec.image], `${kind} has art`);
         assert.match(Mascots.stillImage(spec.image), /\.webp$/, `${kind} rests on a still`);
         assert.equal(spec.character === 'Uljhan', /^uljhan/.test(spec.image), `${kind} art matches its character`);
+        assert.equal(spec.character === 'Duo', /^duo/.test(spec.image), `${kind} art matches its pair`);
     }
-    assert.equal(moments.noMatches.character, 'Uljhan', 'nothing found is Uljhan\'s');
+    assert.equal(moments.noMatches.character, 'Duo', 'nothing found: Kriti searches, Uljhan shrugs');
     assert.equal(moments.loading.character, 'Uljhan', 'Uljhan fetches while a list loads');
     assert.equal(moments.break.character, 'Kriti');
     assert.equal(moments.offline.character, 'Uljhan');
@@ -305,7 +307,7 @@ test('sheets play once and rest on their last frame; reduced motion shows only t
     const { Mascots } = load();
     const assets = plain(Mascots.ASSETS);
     for (const [sheet, still] of Object.entries(plain(Mascots.SHEET_STILL))) {
-        assert.ok(Array.isArray(assets[sheet]) && assets[sheet].length >= 5, sheet);
+        assert.ok(Array.isArray(assets[sheet]) && assets[sheet].length >= 3, sheet);
         const order = plain(Mascots.MOTIONS[sheet].order);
         assert.equal(still, order[order.length - 1], `${sheet} rests on the last frame it plays`);
         assert.deepEqual(plain(Mascots.sheetFrames(sheet, false)), order);
@@ -317,7 +319,7 @@ test('sheets play once and rest on their last frame; reduced motion shows only t
     // The app's StudyMascotView.Motion timings, frame for frame.
     const timing = Object.fromEntries(Object.entries(plain(Mascots.MOTIONS)).map(([name, motion]) => [name, motion.ms]));
     assert.deepEqual(timing, { duoSieve: 420, duoShoo: 420, kritiMug: 380, kritiEvening: 420, uljhanFetch: 160, kritiJump: 95, kritiPencil: 300, kritiStretch: 280, uljhanLeaves: 170,
-        kritiOpenNotebook: 260, uljhanWave: 170 });
+        kritiOpenNotebook: 260, uljhanWave: 170, uljhanTangle: 420, duoUntangle: 400, duoBackup: 390, duoSearchEmpty: 420 });
     // Borrowed sheets play another sheet's frames (KRITI_OPEN_NOTEBOOK: pencil 1-3; the footer wave stays put).
     assert.deepEqual(plain(Mascots.sheetFrames('kritiOpenNotebook', false)), [0, 1, 2]);
     assert.equal(Mascots.stillImage('kritiOpenNotebook'), 'kriti_pencil_03.webp');
@@ -467,7 +469,7 @@ test('motion matches the app: springs, the idle rhythm and the loading moments',
     assert.equal(entrance[0], -0.14);
     assert.ok(Math.max(...entrance) > 0, 'springMascot overshoots a little');
     // Idle beats fit the art (MascotIdle.beatsFor).
-    assert.deepEqual(plain(Mascots.idleBeatsFor('uljhan_sad.webp')), ['wiggle', 'bob']);
+    assert.deepEqual(plain(Mascots.idleBeatsFor('uljhan_tangle_03.webp')), ['wiggle', 'bob']);
     assert.deepEqual(plain(Mascots.idleBeatsFor('uljhan_front.webp')), ['wiggle', 'bob', 'hop', 'sparkle']);
     assert.deepEqual(plain(Mascots.idleBeatsFor('kriti_peek.webp')), ['squash', 'sparkle']);
     assert.deepEqual(plain(Mascots.idleBeatsFor('kriti_reading.webp')), ['bob', 'squash', 'sparkle']);
@@ -653,7 +655,7 @@ test('empty lists take the app\'s poses: pointing, reading, a Kids peek, Uljhan 
     assert.equal(Mascots.emptyListPose('channels'), 'kritiReading');
     assert.equal(Mascots.emptyListPose('keywords', { kids: true }), 'kritiPeek');
     assert.equal(Mascots.emptyListPose('channels', { kids: true }), 'kritiPeek');
-    assert.equal(Mascots.emptyListPose('search', { kids: true }), 'uljhanShrug');
+    assert.equal(Mascots.emptyListPose('search', { kids: true }), 'duoSearchEmpty');
 });
 
 test('the popup counter card keeps company: peeking, the duo, a wave, good evening; Off shows none', () => {
@@ -683,4 +685,101 @@ test('support variants play the app\'s motions, and the loop API is there for pa
     assert.match(source, /if \(prefersReducedMotion\(\)\) return;\n\s+if \(companionMode !== 'lively'\)/, 'reduced motion keeps the still; Quiet plays once');
     assert.match(source, /if \(Date\.now\(\) - started > LOOP_CAP_MS\) \{ resting = true; idleLife\(picture\); return; \}/, 'Lively loops for 30 s, then rests');
     assert.match(source, /#aboutView \[data-ft-duo-story\]/, 'About\'s own story section replaces the duo card');
+});
+
+// ---- The 2026-11-18 moments (Android MascotStates, LockedSignView, NativeViewerShellMotion) ----------
+
+test('the locked sign splits the translated line around the time, so every locale keeps its order', () => {
+    const { Mascots } = load();
+    const lines = (template, time) => plain(Mascots.signLines(template, time));
+    assert.deepEqual(lines('Locked until {time}', '5:30 PM'), { lines: ['Locked until', '5:30 PM'], timeIndex: 1 });
+    // Time first (Japanese), time in the middle, a comma before the time.
+    assert.deepEqual(lines('{time}までロック', '17:30'), { lines: ['17:30', 'までロック'], timeIndex: 0 });
+    assert.deepEqual(lines('Bis {time} gesperrt', '17:30'), { lines: ['Bis', '17:30', 'gesperrt'], timeIndex: 1 });
+    assert.deepEqual(lines('Locked, {time}', '9:00'), { lines: ['Locked', '9:00'], timeIndex: 1 });
+    assert.deepEqual(lines('مقفل حتى {time}،', '9:00'), { lines: ['مقفل حتى', '9:00'], timeIndex: 1 });
+    // A catalog without the placeholder still shows the words, then the time.
+    assert.deepEqual(lines('Locked', '9:00'), { lines: ['Locked', '9:00'], timeIndex: 1 });
+    assert.deepEqual(lines('  {time}  ', '9:00'), { lines: ['9:00'], timeIndex: 0 });
+});
+
+test('the sign shrinks every line together until the widest fits; the time is the big line', () => {
+    const { Mascots } = load();
+    const area = plain(Mascots.LOCKED_SIGN);
+    assert.deepEqual([area.left, area.top, area.right, area.bottom], [0.5, 0.646, 0.846, 0.882]);
+    const measure = (text, px) => text.length * px * 0.5;
+    const sign = { lines: ['Locked until', '5:30 PM'], timeIndex: 1 };
+    const size = Mascots.fitSignSize(sign, 60, 40, measure);
+    assert.ok(size > 0);
+    assert.ok(measure('Locked until', size) <= 60);
+    assert.ok(measure('5:30 PM', size * area.timeScale) <= 60);
+    assert.ok((1 + area.timeScale) * area.lineHeight * size <= 40 + 1e-9, 'the lines fit the height');
+    assert.ok(Mascots.fitSignSize(sign, 200, 40, measure) > size, 'more room, bigger words');
+    assert.equal(Mascots.fitSignSize(sign, 0, 40, measure), 0);
+    assert.equal(Mascots.fitSignSize({ lines: [], timeIndex: 0 }, 60, 40, measure), 0);
+});
+
+test('the sign shows the time alone today and the weekday on a later day', () => {
+    const { Mascots } = load();
+    const now = new Date(2026, 10, 18, 9, 0).getTime();
+    assert.doesNotMatch(Mascots.signTime(new Date(2026, 10, 18, 17, 30).getTime(), now, 'en-US'), /Wed|Thu/);
+    assert.match(Mascots.signTime(new Date(2026, 10, 19, 17, 30).getTime(), now, 'en-US'), /Thu/);
+    assert.equal(Mascots.lockedSign(Date.now() + 60000), null, 'no document, no sign');
+});
+
+test('the popup plays a sheet as its first, middle and last frames in 400 ms at most', () => {
+    const { Mascots } = load();
+    assert.deepEqual(plain(Mascots.popupSheet('duoSieve')), { order: [0, 3, 5], ms: 133 }, 'frames 1, 4 and 6');
+    assert.deepEqual(plain(Mascots.popupSheet('uljhanTangle')), { order: [0, 1, 2], ms: 133 });
+    assert.deepEqual(plain(Mascots.popupSheet('duoUntangle')), { order: [0, 1, 2], ms: 133 });
+    assert.deepEqual(plain(Mascots.popupSheet('kritiJump')).order, [0, 4, 0]);
+    for (const sheet of Object.keys(plain(Mascots.MOTIONS))) {
+        const { order, ms } = plain(Mascots.popupSheet(sheet));
+        assert.ok(order.length * ms <= 400, sheet);
+    }
+    assert.deepEqual(plain(Mascots.popupSheet('nope')), { order: [], ms: 0 });
+});
+
+test('offline tangles Uljhan and rests on frame 3; back online Kriti unwinds him', () => {
+    const { Mascots } = load();
+    assert.deepEqual(plain(Mascots.ASSETS.uljhanTangle), ['uljhan_tangle_01.webp', 'uljhan_tangle_02.webp', 'uljhan_tangle_03.webp']);
+    assert.equal(Mascots.stillImage('uljhanTangle'), 'uljhan_tangle_03.webp');
+    assert.equal(Mascots.stillImage('duoUntangle'), 'duo_untangle_03.webp');
+    assert.equal(plain(Mascots.NETWORK_ART).offline, 'uljhanTangle');
+    assert.equal(plain(Mascots.NETWORK_ART).restored, 'duoUntangle');
+    assert.equal(Mascots.MOTIONS.uljhanTangle.ms, 420);
+    assert.deepEqual(plain(Mascots.sheetFrames('uljhanTangle', true)), [2], 'reduced motion: the tangled still');
+    assert.deepEqual(plain(Mascots.idleBeatsFor('uljhan_tangle_03.webp')), ['wiggle', 'bob'], 'tangled, he only wiggles and bobs');
+    const source = fs.readFileSync('js/mascots.js', 'utf8');
+    assert.match(source, /current === 'offline' \? 'uljhanTangle' : current === 'restored' \? 'duoUntangle'/);
+});
+
+test('backup saved plays the duo at most once a day, then falls back', async () => {
+    const { Mascots } = load();
+    assert.equal(Mascots.backupSavedDue(undefined, '2026-11-18'), true);
+    assert.equal(Mascots.backupSavedDue('2026-11-17', '2026-11-18'), true);
+    assert.equal(Mascots.backupSavedDue('2026-11-18', '2026-11-18'), false);
+    assert.equal(Mascots.stillImage('duoBackup'), 'duo_backup_04.webp');
+    assert.equal(await Mascots.backupSaved('ftExportV3Btn'), false, 'no page, no moment');
+    const tabView = fs.readFileSync('js/tab-view.js', 'utf8');
+    assert.equal((tabView.match(/window\.FilterTubeMascots\?\.backupSaved\?\.\('ftExportV3(Encrypted)?Btn'\)/g) || []).length, 2, 'both exports');
+});
+
+test('a search with no results gets Kriti and her magnifier with Uljhan, replayed at most every 10 s', () => {
+    const { Mascots } = load();
+    assert.equal(Mascots.emptyListPose('search'), 'duoSearchEmpty');
+    assert.equal(Mascots.stillImage('duoSearchEmpty'), 'duo_search_empty_04.webp');
+    assert.equal(Mascots.searchEmptyPlays(0, 50000), true);
+    assert.equal(Mascots.searchEmptyPlays(45000, 50000), false, 'typing does not replay it');
+    assert.equal(Mascots.searchEmptyPlays(40000, 50000), true);
+});
+
+test('Self-Control refusals put the locked sign on the toast and the study sheet; the kitchen sieve is gone', () => {
+    assert.match(fs.readFileSync('js/popup.js', 'utf8'), /FilterTubeMascots\?\.lockedToast\?\.\(popupSelfControlSessionState\?\.lockedUntil\)/);
+    assert.match(fs.readFileSync('js/tab-view.js', 'utf8'), /FilterTubeMascots\?\.lockedToast\?\.\(selfControlSessionState\?\.lockedUntil\)/);
+    assert.match(fs.readFileSync('js/study_ui.js', 'utf8'), /FilterTubeMascots\?\.lockedSign\?\.\(sheet\.lockedUntil/);
+    assert.equal(fs.existsSync('assets/images/mascots/kriti_funnel.webp'), false);
+    const { Mascots } = load();
+    assert.equal(Object.hasOwn(plain(Mascots.ASSETS), 'kritiFunnel'), false);
+    assert.equal(Mascots.stillImage(plain(Mascots.SUPPORT_VARIANTS).find(variant => variant.id === 'sieve').image), 'kriti_sieve_05.webp');
 });

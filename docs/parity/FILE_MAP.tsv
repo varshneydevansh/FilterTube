@@ -436,7 +436,7 @@ apps/android/app/src/main/res/drawable-nodpi/study_kriti_evening_04.webp	drawabl
 apps/android/app/src/main/res/drawable-nodpi/study_kriti_evening_05.webp	drawable	assets/images/mascots/kriti_evening_05.webp	assets	
 apps/android/app/src/main/res/drawable-nodpi/study_kriti_evening_06.webp	drawable	assets/images/mascots/kriti_evening_06.webp	assets	
 apps/android/app/src/main/res/drawable-nodpi/study_kriti_front.webp	drawable	n/a	n/a	Android drawable (shape, selector or player art)
-apps/android/app/src/main/res/drawable-nodpi/study_kriti_funnel.webp	drawable	assets/images/mascots/kriti_funnel.webp	assets	
+apps/android/app/src/main/res/drawable-nodpi/study_kriti_funnel.webp	drawable	n/a	n/a	removed 2026-11-18: the kitchen-sieve pose; uses point to kriti_sieve_05.webp
 apps/android/app/src/main/res/drawable-nodpi/study_kriti_happy.webp	drawable	n/a	n/a	Android drawable (shape, selector or player art)
 apps/android/app/src/main/res/drawable-nodpi/study_kriti_jump_01.webp	drawable	assets/images/mascots/kriti_jump_01.webp	assets	
 apps/android/app/src/main/res/drawable-nodpi/study_kriti_jump_02.webp	drawable	assets/images/mascots/kriti_jump_02.webp	assets	
@@ -494,7 +494,7 @@ apps/android/app/src/main/res/drawable-nodpi/study_uljhan_fetch_05.webp	drawable
 apps/android/app/src/main/res/drawable-nodpi/study_uljhan_fetch_06.webp	drawable	assets/images/mascots/uljhan_fetch_06.webp	assets	
 apps/android/app/src/main/res/drawable-nodpi/study_uljhan_front.webp	drawable	assets/images/mascots/uljhan_front.webp	assets	
 apps/android/app/src/main/res/drawable-nodpi/study_uljhan_happy.webp	drawable	assets/images/mascots/uljhan_happy.webp	assets	
-apps/android/app/src/main/res/drawable-nodpi/study_uljhan_sad.webp	drawable	assets/images/mascots/uljhan_sad.webp	assets	
+apps/android/app/src/main/res/drawable-nodpi/study_uljhan_sad.webp	drawable	n/a	n/a	offline is Uljhan tangled (uljhan_tangle_0N.webp) since 2026-11-18
 apps/android/app/src/main/res/drawable-nodpi/study_uljhan_shrug.webp	drawable	assets/images/mascots/uljhan_shrug.webp	assets	
 apps/android/app/src/main/res/drawable-nodpi/study_uljhan_wave_01.webp	drawable	assets/images/mascots/uljhan_wave_01.webp	assets	
 apps/android/app/src/main/res/drawable-nodpi/study_uljhan_wave_02.webp	drawable	assets/images/mascots/uljhan_wave_02.webp	assets	

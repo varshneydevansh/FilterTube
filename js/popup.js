@@ -2570,6 +2570,8 @@ document.addEventListener('DOMContentLoaded', async () => {
         if (popupSelfControlSessionState?.active === true) {
             UIComponents.showToast(popupUiText('popup.profile.switchLocked',
                 'Profile switching is locked until the Self-Control Session ends'), 'error');
+            // Kriti holds the "Locked until <time>" sign beside the words (a still; Companion Off: words only).
+            window.FilterTubeMascots?.lockedToast?.(popupSelfControlSessionState?.lockedUntil);
             return;
         }
         const targetId = normalizeString(nextProfileId);
