@@ -55,3 +55,29 @@ Ported (`js/study_ui.js` `ringMoments`, `dayRing`; `css/study.css`):
 Removed: the country drop-down (`.ft-setup-country__select`).
 
 All motion is off with reduced motion, as on Android.
+
+## 3. PIN gate
+
+Android: `PinGateActivity.kt`, `res/layout/activity_pin_gate.xml`, `strings.xml` (`pin_gate_*`, `pin_hint_*`).
+No Android capture: the shared emulator's profile has no PIN and must not get one. The PIN for these
+captures (2468) was set only in the headless test profile, with `FilterTubeSecurity.createPinVerifier`.
+
+Captures: `pin/before-pin-prompt.jpg`, `pin/before-popup-locked.jpg`, `pin/after-pin-prompt.jpg`,
+`pin/after-pin-wrong.jpg`.
+
+| Area | Android (layout and code) | Extension before |
+| --- | --- | --- |
+| Header | Eyebrow in brick ("Master access" / "Protected profile") over the card title | Eyebrow and title side by side, the title pushed to the right |
+| Field | `numberPassword`, digits centred | Text field, left-aligned, no numeric keyboard hint |
+| Error | "Try again" line in the danger colour under the field | The line existed but read in ink on the page tones |
+| Action | One full-width Unlock (profile switch and close are separate icons) | Cancel and Unlock side by side |
+| Wrong PIN | Field shakes, clears, line shows | Same (ported earlier) |
+
+Ported (`js/tab-view.js` and `js/popup.js` `showPromptModal` for `inputType: 'password'`, `css/paperkit.css`
+`.ft-modal.is-pin`): a dialog role, the stacked brick eyebrow and hand-lettered title, the centred
+numeric field, the brick "That PIN didn't work. Try again." line, Unlock across the card with Cancel as
+a quiet text button under it.
+
+Still different: the app's title names where the PIN leads ("Enter Master PIN for Main Viewing"); the
+extension's says "Enter Master PIN" because its gate is for the whole options page. The app's gate has
+the avatar button that opens the profile picker; in the extension the page's own avatar does that.

@@ -15674,6 +15674,16 @@ document.addEventListener('DOMContentLoaded', async () => {
             const input = document.createElement('input');
             input.className = 'text-input';
             input.type = inputType;
+            // A PIN (Android PinGateActivity): eyebrow over the title, the digits centred, Unlock across
+            // the card with Cancel under it, the "Try again" line in the danger ink.
+            if (inputType === 'password') {
+                card.classList.add('is-pin');
+                card.setAttribute('role', 'dialog');
+                card.setAttribute('aria-modal', 'true');
+                input.inputMode = 'numeric';
+                input.autocomplete = 'off';
+                input.setAttribute('aria-label', placeholder || title);
+            }
             input.placeholder = placeholder;
             input.value = initialValue;
             body.appendChild(input);

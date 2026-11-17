@@ -1281,3 +1281,15 @@ body.ft-extension-surface[data-surface="tab-view"] .ft-about-portrait-card img {
 #popupRoot .ft-profile-dropdown, body.ft-popup .ft-profile-dropdown, #ftProfileDropdownPopup {
   position: fixed; top: 64px; left: 8px; right: 8px; min-width: 0; max-width: none; transform: none !important; max-height: calc(100vh - 76px);
 }
+
+/* The PIN gate (Android activity_pin_gate): the eyebrow in brick over the card title, the PIN field
+ * centred with wide digits, Unlock across the card and Cancel quietly under it. */
+.ft-modal.is-pin .card-header { display: flex; flex-direction: column; align-items: flex-start; gap: 4px; }
+.ft-modal.is-pin .ft-modal-eyebrow { color: var(--pk-brick) !important; font-family: var(--pk-font-display); font-weight: 600; font-size: 13px; letter-spacing: 0; text-transform: none; }
+.ft-modal.is-pin .ft-modal-title { margin: 0; text-align: start; font-family: var(--pk-font-hand); font-weight: 400; font-size: 1.35rem; }
+.ft-modal.is-pin .text-input { text-align: center; font-size: 1.2rem; letter-spacing: 0.3em; min-height: 52px; }
+.ft-modal.is-pin .text-input::placeholder { letter-spacing: 0; }
+:root body .ft-modal.is-pin .ft-modal-error { text-align: center; color: var(--pk-brick) !important; }
+.ft-modal.is-pin .ft-modal-actions { display: flex; flex-direction: column-reverse; align-items: stretch; gap: 6px; }
+.ft-modal.is-pin .ft-modal-actions .btn-primary { width: 100%; min-height: 52px; }
+:root[data-page-tone] body.ft-extension-surface .ft-modal.is-pin .ft-modal-actions .btn-secondary, .ft-modal.is-pin .ft-modal-actions .btn-secondary { border-color: transparent !important; border: 0 !important; background: none !important; box-shadow: none !important; color: var(--pk-muted) !important; }
