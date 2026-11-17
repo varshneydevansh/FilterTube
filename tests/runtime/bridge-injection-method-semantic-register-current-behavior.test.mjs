@@ -459,11 +459,11 @@ test('bridge injection register preserves manifest background and fallback entry
     }
   }
 
-  assert.deepEqual(readJson('manifest.json').content_scripts[0].js, ['js/shared/view_count.js', 'js/shared/search_suggestions_filter.js', 'js/content/search_suggestions_dom.js', 'js/seed.js']);
+  assert.deepEqual(readJson('manifest.json').content_scripts[0].js, ['js/shared/view_count.js', 'js/shared/search_suggestions_filter.js', 'js/content/search_suggestions_dom.js', 'js/shared/feed_guard.js', 'js/seed.js']);
   assert.equal(readJson('manifest.json').content_scripts[0].world, 'MAIN');
-  assert.deepEqual(readJson('manifest.chrome.json').content_scripts[0].js, ['js/shared/view_count.js', 'js/shared/search_suggestions_filter.js', 'js/content/search_suggestions_dom.js', 'js/seed.js']);
+  assert.deepEqual(readJson('manifest.chrome.json').content_scripts[0].js, ['js/shared/view_count.js', 'js/shared/search_suggestions_filter.js', 'js/content/search_suggestions_dom.js', 'js/shared/feed_guard.js', 'js/seed.js']);
   assert.equal(readJson('manifest.chrome.json').content_scripts[0].world, 'MAIN');
-  assert.deepEqual(readJson('manifest.opera.json').content_scripts[0].js, ['js/shared/view_count.js', 'js/shared/search_suggestions_filter.js', 'js/content/search_suggestions_dom.js', 'js/seed.js']);
+  assert.deepEqual(readJson('manifest.opera.json').content_scripts[0].js, ['js/shared/view_count.js', 'js/shared/search_suggestions_filter.js', 'js/content/search_suggestions_dom.js', 'js/shared/feed_guard.js', 'js/seed.js']);
   assert.equal(readJson('manifest.firefox.json').content_scripts.some(entry => entry.js?.includes('js/seed.js')), false, 'Firefox seed is supplied by the ordered fallback injection');
 
   assert.match(injectScriptsBlock, /const tabId = Number\(sender\?\.tab\?\.id\)/);

@@ -5728,9 +5728,10 @@ browserAPI.runtime.onMessage.addListener(function (request, sender, sendResponse
         return true;
     } else if (action === 'FilterTube_OpenDashboard') {
         const requestedView = normalizeString(request?.view).toLowerCase();
+        // The page's calm states open Filters or Study (allowlist_feed_view.js); only known views pass.
         const dashboardUrl = requestedView === 'sync'
             ? `${DASHBOARD_PAGE_URL}?view=sync&flow=switch-profile`
-            : DASHBOARD_PAGE_URL;
+            : (['filters', 'study', 'kids'].includes(requestedView) ? `${DASHBOARD_PAGE_URL}?view=${requestedView}` : DASHBOARD_PAGE_URL);
         browserAPI.tabs.create({ url: dashboardUrl, active: true }, (tab) => {
             if (browserAPI.runtime.lastError) {
                 console.warn('FilterTube Background: failed to open dashboard tab', browserAPI.runtime.lastError);

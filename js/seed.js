@@ -32,6 +32,12 @@
             };
             (document.head || document.documentElement).appendChild(tag);
         }
+        // The empty-feed guard and rule-change check (js/shared/feed_guard.js), loaded the same way.
+        if (!window.FilterTubeFeedGuard && seedSrc && /\/js\/seed\.js(?:\?.*)?$/.test(seedSrc)) {
+            const feedTag = document.createElement('script');
+            feedTag.src = seedSrc.replace(/\/js\/seed\.js(?:\?.*)?$/, '/js/shared/feed_guard.js');
+            (document.head || document.documentElement).appendChild(feedTag);
+        }
     } catch (e) {
     }
 
@@ -1545,6 +1551,94 @@
         });
     }
 
+    // ============================================================================
+    // EMPTY FEED GUARD AND LIVE RULE CHANGES (js/shared/feed_guard.js)
+    // ============================================================================
+    // A feed page or continuation that loses every card to the rules counts as empty; after
+    // MAX_EMPTY_AUTO_LOADS in a row on one route its continuation is removed so the page stops
+    // asking for more (Android NativeMainContinuationAutoLoadGuard), and the isolated world is told
+    // through attributes on <html> (it shows the allow-list feed or a calm state). Cards hidden here
+    // are counted per route so a looser rule change can bring them back.
+    let feedGuard = null;
+    let feedGuardRoute = '';
+    let routeJsonHidden = 0;
+
+    function currentRouteKey() {
+        try { return `${location.pathname}${location.search}`; } catch (e) { return ''; }
+    }
+
+    function shouldGuardFeedPayload(dataName) {
+        const api = window.FilterTubeFeedGuard;
+        return Boolean(api && typeof api.countFeedItems === 'function' && api.isGuardedPayload(dataName));
+    }
+
+    function setFeedSignal(name, value) {
+        try {
+            const rootEl = document.documentElement;
+            if (!rootEl) return;
+            if (value === null || value === undefined) rootEl.removeAttribute(name);
+            else rootEl.setAttribute(name, String(value));
+        } catch (e) {
+        }
+    }
+
+    function guardEmptyFeed(result, cardsBefore, dataName) {
+        try {
+            const api = window.FilterTubeFeedGuard;
+            if (!feedGuard) feedGuard = api.createContinuationGuard({ max: api.MAX_EMPTY_AUTO_LOADS });
+            const routeKey = currentRouteKey();
+            if (routeKey !== feedGuardRoute) {
+                feedGuardRoute = routeKey;
+                routeJsonHidden = 0;
+                setFeedSignal('data-filtertube-feed-empty', null);
+                setFeedSignal('data-filtertube-feed-exhausted', null);
+            }
+            const cardsAfter = api.countFeedItems(result).cards;
+            routeJsonHidden += Math.max(0, cardsBefore - cardsAfter);
+            setFeedSignal('data-filtertube-json-hidden', routeJsonHidden || null);
+            const verdict = feedGuard.observe({ routeKey, before: cardsBefore, after: cardsAfter });
+            if (!verdict.empty) {
+                if (cardsAfter > 0) setFeedSignal('data-filtertube-feed-empty', null);
+                return;
+            }
+            setFeedSignal('data-filtertube-feed-empty', `${verdict.streak}:${routeKey}`);
+            if (verdict.exhausted) {
+                const removed = api.stripContinuations(result);
+                seedDebugLog(`🛑 ${dataName}: ${verdict.streak} fully hidden feed loads in a row; removed ${removed} continuation(s)`);
+                setFeedSignal('data-filtertube-feed-exhausted', `${cachedSettings?.listMode === 'whitelist' ? 'allow' : 'block'}:${routeKey}`);
+            }
+        } catch (e) {
+            seedDebugLog('⚠️ Empty-feed guard failed:', e);
+        }
+    }
+
+    /**
+     * Rules that may show something hidden before (study ended, a rule removed, allow list added to,
+     * the list switched back to the block list) bring the hidden cards back: cards removed from the
+     * page's data can't be put back, so a feed page that lost cards at the data level loads again.
+     * Watch pages are never reloaded (the video keeps playing; the rail updates on the next page).
+     */
+    let pendingRuleRefresh = 0;
+    function refreshAfterLooserRules(previous, next) {
+        try {
+            const api = window.FilterTubeFeedGuard;
+            if (!api || !previous || !next) return;
+            if (api.classifyRuleChange(previous, next) !== 'loosen') return;
+            if (api.isPlayerPath(location.pathname)) return;
+            const builtFeedShown = document.documentElement?.hasAttribute('data-filtertube-built-feed');
+            const hiddenHere = feedGuardRoute === currentRouteKey() ? routeJsonHidden : 0;
+            if (hiddenHere <= 0 && !builtFeedShown) return;
+            if (pendingRuleRefresh) return;
+            seedDebugLog('🔁 Looser rules: reloading the page\'s data to bring hidden items back');
+            setFeedSignal('data-filtertube-rules-loosened', String(Date.now()));
+            pendingRuleRefresh = window.setTimeout(() => {
+                pendingRuleRefresh = 0;
+                try { location.reload(); } catch (e) { }
+            }, 350);
+        } catch (e) {
+        }
+    }
+
     function processWithEngine(data, dataName) {
         if (!data) {
             seedDebugLog(`⚠️ No data to process for ${dataName}`);
@@ -1626,7 +1720,10 @@
                 const debugStatsEnabled = isSeedDebugEnabled();
                 const startedAt = debugStatsEnabled ? Date.now() : 0;
                 const originalSize = debugStatsEnabled ? JSON.stringify(data).length : 0;
+                const guarded = shouldGuardFeedPayload(dataName);
+                const cardsBefore = guarded ? window.FilterTubeFeedGuard.countFeedItems(data).cards : 0;
                 const result = window.FilterTubeEngine.processData(data, cachedSettings, dataName);
+                if (guarded) guardEmptyFeed(result, cardsBefore, dataName);
                 const newSize = debugStatsEnabled ? JSON.stringify(result).length : 0;
                 
                 seedDebugLog(`✅ Successfully processed ${dataName} with engine`);
@@ -2477,7 +2574,9 @@
             hideAllShorts: newSettings.hideAllShorts
         });
         
+        const previousSettings = cachedSettings;
         cachedSettings = newSettings;
+        refreshAfterLooserRules(previousSettings, newSettings);
         syncAdVoidRuntime();
         if (isOriginalAudioPreferenceEnabled()) {
             scheduleOriginalAudioPreference(true);
