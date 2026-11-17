@@ -303,7 +303,7 @@ body.ft-extension-surface .nav-item.active[data-pk-icon] .nav-icon::after { -web
   line-height: 1;
 }
 
-.ft-avatar--adult { --pk-avatar-ink: var(--pk-ink); }
+/* Android ProfileAvatar: Parent and Adult take the Family area (lilac wash, plum ink), Kids the sun. */
 .ft-avatar--kids { --pk-avatar-wash: var(--pk-sun-wash); --pk-avatar-ink: var(--pk-sun-ink); }
 
 .ft-avatar__ring {
@@ -315,22 +315,22 @@ body.ft-extension-surface .nav-item.active[data-pk-icon] .nav-icon::after { -web
   pointer-events: none;
 }
 
-.ft-avatar__ring circle {
+/* crayon(ink, 1.6dp): round caps and joins, the jitter is in the path itself (crayonRingPath). */
+.ft-avatar__ring path {
   fill: none;
   stroke: var(--pk-avatar-ink);
-  stroke-width: 2.3;
   stroke-linecap: round;
-  /* a closed shape that never quite closes */
-  stroke-dasharray: 104 7;
-  stroke-dashoffset: 12;
-  filter: url(#ftCrayonEdge);
+  stroke-linejoin: round;
 }
 
-.ft-avatar__ring .ft-avatar__ring-second {
-  stroke-width: 1.5;
-  stroke-dasharray: 98 18;
-  stroke-dashoffset: 40;
-  opacity: 0.6;
+/* Parent: the two scribbled loops, tinted with the ink, inset 2% (ProfileAvatarDrawable). */
+.ft-avatar__ring--scribble {
+  inset: 2%;
+  width: auto;
+  height: auto;
+  background: var(--pk-avatar-ink);
+  -webkit-mask: center / contain no-repeat;
+  mask: center / contain no-repeat;
 }
 
 .ft-avatar__initial {

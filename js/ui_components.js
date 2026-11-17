@@ -164,6 +164,74 @@ const UIComponents = (() => {
     }
 
     /**
+     * Android's crayon ring (ProfileAvatarDrawable + StudyPaper.crayon): one closed circle, inset by one
+     * stroke width, cut into ~5 px pieces whose corners are pushed sideways by up to 0.55 px
+     * (DiscretePathEffect) and then rounded (CornerPathEffect). The jitter is seeded, so the same size
+     * always draws the same ring, as Skia's fixed seed does. Pure: returns an SVG path in a
+     * `size` x `size` box.
+     */
+    function crayonRingPath(size, { strokeWidth = 1.6, segment = 5, deviation = 0.55, seed = 0 } = {}) {
+        const box = Math.max(8, Number(size) || 36);
+        const width = Math.max(0.5, Number(strokeWidth) || 1.6);
+        const radius = box / 2 - width;
+        const centre = box / 2;
+        const count = Math.max(12, Math.round((2 * Math.PI * radius) / Math.max(1, segment)));
+        let state = (Number(seed) >>> 0) ^ 0x9E3779B9;
+        const random = () => {
+            state = (state + 0x6D2B79F5) >>> 0;
+            let t = state;
+            t = Math.imul(t ^ (t >>> 15), t | 1);
+            t ^= t + Math.imul(t ^ (t >>> 7), t | 61);
+            return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
+        };
+        const points = [];
+        for (let index = 0; index < count; index++) {
+            const angle = -Math.PI / 2 + (index / count) * Math.PI * 2;
+            const r = radius + (random() * 2 - 1) * deviation;
+            points.push([centre + Math.cos(angle) * r, centre + Math.sin(angle) * r]);
+        }
+        const fixed = value => Number(value.toFixed(2));
+        const mid = (a, b) => [(a[0] + b[0]) / 2, (a[1] + b[1]) / 2];
+        // Rounded corners: each vertex becomes the control point between the midpoints around it.
+        const start = mid(points[count - 1], points[0]);
+        let d = `M${fixed(start[0])} ${fixed(start[1])}`;
+        for (let index = 0; index < count; index++) {
+            const corner = points[index];
+            const end = mid(corner, points[(index + 1) % count]);
+            d += `Q${fixed(corner[0])} ${fixed(corner[1])} ${fixed(end[0])} ${fixed(end[1])}`;
+        }
+        return `${d}Z`;
+    }
+
+    /** Ring stroke widths in px, as the app draws them: Adult and Kids 1.6 dp; Parent's inset uses 1.4 dp. */
+    function avatarRingWidth(role) {
+        return role === 'parent' ? 1.4 : 1.6;
+    }
+
+    function drawAvatarRing(host, doc, role, px) {
+        if (role === 'parent') {
+            // Parent: the app's two scribbled loops (doodle_scribble_circle), tinted with the ink, 2% inset.
+            const loops = doc.createElement('span');
+            loops.className = 'ft-avatar__ring ft-avatar__ring--scribble';
+            const url = `url("${doodleUrl('scribble_circle')}")`;
+            loops.style.webkitMaskImage = url;
+            loops.style.maskImage = url;
+            host.appendChild(loops);
+            return;
+        }
+        const ns = 'http://www.w3.org/2000/svg';
+        const ring = doc.createElementNS(ns, 'svg');
+        ring.setAttribute('class', 'ft-avatar__ring');
+        ring.setAttribute('viewBox', `0 0 ${px} ${px}`);
+        ring.setAttribute('focusable', 'false');
+        const path = doc.createElementNS(ns, 'path');
+        path.setAttribute('d', crayonRingPath(px, { strokeWidth: avatarRingWidth(role) }));
+        path.setAttribute('stroke-width', String(avatarRingWidth(role)));
+        ring.appendChild(path);
+        host.appendChild(ring);
+    }
+
+    /**
      * Fills `host` with a profile avatar: {id, name, type, avatar, size}. Decorative: the caller's
      * text (name and role word) carries the meaning, so the drawing is hidden from screen readers.
      */
@@ -182,16 +250,7 @@ const UIComponents = (() => {
         host.dataset.ftAvatar = doodle ? doodle.value : 'initial';
         host.setAttribute('aria-hidden', 'true');
 
-        const ns = 'http://www.w3.org/2000/svg';
-        const ring = doc.createElementNS(ns, 'svg');
-        ring.setAttribute('class', 'ft-avatar__ring');
-        ring.setAttribute('viewBox', '0 0 40 40');
-        ring.setAttribute('focusable', 'false');
-        const rings = role === 'parent'
-            ? '<circle cx="20" cy="20" r="17.2" /><circle class="ft-avatar__ring-second" cx="20.6" cy="19.5" r="18.4" />'
-            : '<circle cx="20" cy="20" r="17.6" />';
-        ring.innerHTML = rings;
-        host.appendChild(ring);
+        drawAvatarRing(host, doc, role, px);
 
         if (doodle) {
             const art = doc.createElement('span');
@@ -1481,6 +1540,8 @@ const UIComponents = (() => {
         profileAvatarSticker,
         profileInitial,
         renderProfileAvatar,
+        crayonRingPath,
+        avatarRingWidth,
         profileRoleChip,
         profileAboutLine,
         profilePickerFooter,
@@ -1508,6 +1569,19 @@ const UIComponents = (() => {
 try {
     if (typeof window !== 'undefined') {
         window.UIComponents = UIComponents;
+        /**
+         * FilterTubeAvatarRing.render(host, {letter, kind: 'adult'|'kids'|'parent', size, avatar?})
+         * fills `host` with a crayon avatar (wash disc, Android's crayon ring, the initial or a doodle).
+         * ringPath(size, opts) returns the ring's SVG path alone.
+         */
+        window.FilterTubeAvatarRing = Object.freeze({
+            render(host, { letter = '', kind = 'adult', size = 36, avatar = null, id = '' } = {}) {
+                const type = kind === 'kids' ? 'child' : 'account';
+                const profileId = kind === 'parent' ? 'default' : (id && id !== 'default' ? id : `ring-${kind}`);
+                return UIComponents.renderProfileAvatar(host, { id: profileId, name: letter, type, avatar, size });
+            },
+            ringPath: UIComponents.crayonRingPath
+        });
     }
 } catch (e) {
 }

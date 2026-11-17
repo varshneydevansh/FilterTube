@@ -233,3 +233,47 @@ test('the profile picker, manager and dashboard card draw avatars and use the ro
     assert.match(catalog['parentMode.spaceTitle'], /\{name\}/, `${file} keeps the placeholder`);
   }
 });
+
+// The crayon ring (Android ProfileAvatarDrawable + StudyPaper.crayon): one closed circle inset by one
+// stroke width, ~5 px pieces pushed sideways by at most 0.55 px, corners rounded; seeded, so it never
+// changes between draws.
+function ringComponents() {
+  const box = { console };
+  box.window = box; vm.createContext(box);
+  vm.runInContext(`${read('ui_components')}\nthis.__ui = UIComponents;`, box);
+  return box.__ui;
+}
+
+function ringPoints(d) {
+  return [...d.matchAll(/Q(-?[\d.]+) (-?[\d.]+) (-?[\d.]+) (-?[\d.]+)/g)].map(m => [Number(m[1]), Number(m[2])]);
+}
+
+test('the avatar ring is the same path every time for the same size', () => {
+  const ui = ringComponents();
+  assert.equal(ui.crayonRingPath(36), ui.crayonRingPath(36));
+  assert.notEqual(ui.crayonRingPath(36), ui.crayonRingPath(36, { seed: 3 }));
+  assert.match(ui.crayonRingPath(36), /^M[\d.]+ [\d.]+(Q[\d. ]+)+Z$/);
+});
+
+test('the avatar ring wobbles within 0.55 px of a circle inset by the stroke width', () => {
+  const ui = ringComponents();
+  for (const size of [24, 36, 56, 96]) {
+    const corners = ringPoints(ui.crayonRingPath(size, { strokeWidth: 1.6 }));
+    const radius = size / 2 - 1.6;
+    assert.ok(Math.abs(corners.length - Math.round(2 * Math.PI * radius / 5)) <= 1 || corners.length === 12, `~5 px pieces at ${size}`);
+    let wobble = 0;
+    for (const [x, y] of corners) {
+      const off = Math.abs(Math.hypot(x - size / 2, y - size / 2) - radius);
+      assert.ok(off <= 0.56, `vertex ${off} px off the circle at ${size}`);
+      wobble = Math.max(wobble, off);
+    }
+    assert.ok(wobble > 0.1, 'it is a crayon line, not a perfect circle');
+  }
+});
+
+test('Parent draws one width thinner than Adult and Kids, as the app does', () => {
+  const ui = ringComponents();
+  assert.equal(ui.avatarRingWidth('parent'), 1.4);
+  assert.equal(ui.avatarRingWidth('adult'), 1.6);
+  assert.equal(ui.avatarRingWidth('kids'), 1.6);
+});
