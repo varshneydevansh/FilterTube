@@ -65,7 +65,7 @@ Captures: `study/android-study-{idle,round,last5,break,end,plan}.jpg`, `study/an
 - 65 strings ported from `strings_study.xml` in all 38 locales (`tools: port_strings.py`); plural
   forms filled for every category.
 - Setup kind tiles get the chevron.
-- The break rest overlay on the video page: Kriti stretches once as the break opens (KRITI_STRETCH, 280 ms frames), then rests; none with Companion Off, a still with reduced motion.
+- The break rest overlay on the video page: Kriti stretches once as the break opens (KRITI_STRETCH, 280 ms frames) instead of the mug still, then rests; none with Companion Off, a still with reduced motion.
 - `src/extension-shell/popup.jsx` said "YouTube time" while the committed bundle said "Viewing time":
   the source now matches the bundle.
 
